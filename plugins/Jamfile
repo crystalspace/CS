@@ -6,6 +6,7 @@ SubInclude TOP plugins cscript ;
 SubInclude TOP plugins csparser ;
 SubInclude TOP plugins cssaver ;
 SubInclude TOP plugins culling ;
+SubInclude TOP plugins decal ;
 SubInclude TOP plugins device ;
 SubInclude TOP plugins documentsystem ;
 SubInclude TOP plugins engine ;

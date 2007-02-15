@@ -259,7 +259,7 @@ iShader* StdLoaderContext::FindShader (const char *name)
 
   csRefArray<iShader> shaders = shaderMgr->GetShaders ();
   size_t i;
-  for (i = 0 ; i < shaders.Length () ; i++)
+  for (i = 0 ; i < shaders.GetSize () ; i++)
   {
     iShader* s = shaders[i];
     if (region->IsInRegion (s->QueryObject ())
@@ -440,7 +440,7 @@ iShader* ThreadedLoaderContext::FindShader (const char *name)
 
   csRefArray<iShader> shaders = shaderMgr->GetShaders ();
   size_t i;
-  for (i = 0 ; i < shaders.Length () ; i++)
+  for (i = 0 ; i < shaders.GetSize () ; i++)
   {
     iShader* s = shaders[i];
     if (region->IsInRegion (s->QueryObject ())
@@ -2839,7 +2839,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         //the meshes' hierarchy, starting from the 'mesh' mesh object.
         csRefArray<iMeshWrapper> meshesArray;
         CollectAllChildren (mesh, meshesArray);
-        size_t i, count = meshesArray.Length ();
+        size_t i, count = meshesArray.GetSize ();
         for (i = 0; i < count; i++)
         {
           csRef<iVisibilityObject> visobj = 
@@ -2857,7 +2857,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         //the meshes' hierarchy, starting from the 'mesh' mesh object.
         csRefArray<iMeshWrapper> meshesArray;
         CollectAllChildren (mesh, meshesArray);
-        size_t i, count = meshesArray.Length ();
+        size_t i, count = meshesArray.GetSize ();
         for (i = 0; i < count; i++)
         {
           csRef<iVisibilityObject> visobj = 
@@ -2875,7 +2875,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         {
           csRefArray<iMeshWrapper> meshesArray;
           CollectAllChildren (mesh, meshesArray);
-          size_t i, count = meshesArray.Length ();
+          size_t i, count = meshesArray.GetSize ();
           for (i = 0; i < count; i++)
           {
             ClosedFlags (meshesArray[i]);
@@ -2893,7 +2893,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         {
           csRefArray<iMeshWrapper> meshesArray;
           CollectAllChildren (mesh, meshesArray);
-          size_t i, count = meshesArray.Length ();
+          size_t i, count = meshesArray.GetSize ();
           for (i = 0; i < count; i++)
           {
             ConvexFlags (meshesArray[i]);
@@ -3098,7 +3098,7 @@ csRef<iMeshWrapper> csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_con
   {
     csRefArray<iMeshWrapper> meshesArray;
     CollectAllChildren (mesh, meshesArray);
-    size_t i, count = meshesArray.Length ();
+    size_t i, count = meshesArray.GetSize ();
     for (i = 0; i < count; i++)
     {
       iMeshWrapper* mesh = meshesArray[i];
@@ -4657,7 +4657,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
   l->SetType (type);
   l->SetSpotLightFalloff (spotfalloffInner, spotfalloffOuter);
 
-  for (size_t i = 0; i < shader_variables.Length(); i++)
+  for (size_t i = 0; i < shader_variables.GetSize (); i++)
   {
      l->GetSVContext()->AddVariable(shader_variables[i]);
   }
@@ -4948,7 +4948,7 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
   }
 
   size_t i;
-  for (i = 0 ; i < key_nodes.Length () ; i++)
+  for (i = 0 ; i < key_nodes.GetSize () ; i++)
   {
     if (!ParseKey (key_nodes[i], container_mesh->QueryObject()))
       return false;
@@ -5620,7 +5620,7 @@ void csLoader::CollectAllChildren (iMeshWrapper* meshWrapper,
   size_t lastMeshVisited = 0;
   meshesArray.Push (meshWrapper);
     
-  while (lastMeshVisited < meshesArray.Length ())
+  while (lastMeshVisited < meshesArray.GetSize ())
   {
     // Get the children of the current mesh (ie 'mesh').
     const csRef<iSceneNodeArray> ml = 

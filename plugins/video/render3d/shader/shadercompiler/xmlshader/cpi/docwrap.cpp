@@ -745,7 +745,7 @@ bool csWrappedDocumentNode::ProcessTemplate (ConditionEval& eval,
           shared->DebugProcessing ("Starting generation\n");
           InvokeTemplate (&generateTempl, params, templatedNodes);
           size_t i;
-          for (i = 0; i < templatedNodes.Length(); i++)
+          for (i = 0; i < templatedNodes.GetSize (); i++)
           {
             ProcessSingleWrappedNode (eval, state, templatedNodes[i]);
           }
@@ -776,7 +776,7 @@ bool csWrappedDocumentNode::InvokeTemplate (Template* templ,
   csRef<Substitutions> newSubst;
   {
     Substitutions paramSubst;
-    for (size_t i = 0; i < csMin (params.Length(), templ->paramMap.Length()); i++)
+    for (size_t i = 0; i < csMin (params.GetSize (), templ->paramMap.GetSize ()); i++)
     {
       shared->DebugProcessing (" %s -> %s\n", templ->paramMap[i].GetData(), 
         params[i].GetData());
@@ -785,7 +785,7 @@ bool csWrappedDocumentNode::InvokeTemplate (Template* templ,
     newSubst.AttachNew (new Substitutions (paramSubst));
   }
 
-  for (size_t i = 0; i < templ->nodes.Length(); i++)
+  for (size_t i = 0; i < templ->nodes.GetSize (); i++)
   {
     csRef<iDocumentNode> newNode = 
       shared->replacerFactory.CreateWrapper (templ->nodes.Get (i), 0,
@@ -812,7 +812,7 @@ bool csWrappedDocumentNode::InvokeTemplate (ConditionEval& eval,
     return false;
 
   size_t i;
-  for (i = 0; i < nodes.Length(); i++)
+  for (i = 0; i < nodes.GetSize (); i++)
   {
     ProcessSingleWrappedNode (eval, state, nodes[i]);
   }
@@ -955,7 +955,7 @@ bool csWrappedDocumentNode::ProcessInstrTemplate (NodeProcessingState* state,
       paramNames, true);
 
     csSet<TempString<>, TempHeapAlloc> dupeCheck;
-    for (size_t i = 0; i < paramNames.Length(); i++)
+    for (size_t i = 0; i < paramNames.GetSize (); i++)
     {
       if (dupeCheck.Contains (paramNames[i]))
       {
@@ -1161,7 +1161,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 		  "'endif' has parameters");
 		okay = false;
 	      }
-	      if (okay && (wrapperStack.Length() == 0))
+	      if (okay && (wrapperStack.GetSize () == 0))
 	      {
 		Report (syntaxErrorSeverity, node,
 		  "'endif' without 'if' or 'elsif'");
@@ -1184,7 +1184,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 		  "'else' has parameters");
 		okay = false;
 	      }
-	      if (okay && (wrapperStack.Length() == 0))
+	      if (okay && (wrapperStack.GetSize () == 0))
 	      {
 		Report (syntaxErrorSeverity, node,
 		  "'else' without 'if' or 'elsif'");
@@ -1212,7 +1212,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	  case csWrappedDocumentNodeFactory::PITOKEN_ELSIF:
 	    {
 	      bool okay = true;
-	      if (wrapperStack.Length() == 0)
+	      if (wrapperStack.GetSize () == 0)
 	      {
 		Report (syntaxErrorSeverity, node,
 		  "'elsif' without 'if' or 'elsif'");
@@ -1661,7 +1661,7 @@ void csWrappedDocumentNode::WrapperWalker::SeekNext()
 
   while (!next.IsValid () && (currentPos != 0))
   {
-    if (currentPos->currentIndex < currentPos->currentWrappers->Length ())
+    if (currentPos->currentIndex < currentPos->currentWrappers->GetSize ())
     {
       csWrappedDocumentNode::WrappedChild& wrapper = 
 	*(currentPos->currentWrappers->Get (currentPos->currentIndex));
@@ -1675,7 +1675,7 @@ void csWrappedDocumentNode::WrapperWalker::SeekNext()
         if ((wrapper.condition == csCondAlwaysTrue)
           || (resolver->Evaluate (wrapper.condition) == wrapper.conditionValue))
 	{
-	  currentPos = &posStack.GetExtend (posStack.Length ());
+	  currentPos = &posStack.GetExtend (posStack.GetSize ());
 	  currentPos->currentIndex = 0;
 	  currentPos->currentWrappers = &wrapper.childrenWrappers;
 	}
@@ -1684,7 +1684,7 @@ void csWrappedDocumentNode::WrapperWalker::SeekNext()
     else
     {
       posStack.Pop ();
-      size_t psl = posStack.Length();
+      size_t psl = posStack.GetSize ();
       currentPos = (psl > 0) ? &posStack[psl - 1] : 0;
     }
   }

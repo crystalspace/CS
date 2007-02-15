@@ -29,6 +29,7 @@ WALKALL.PLUGINLIST =
   csopcode
   csparser
   cssynldr
+  decal
   dynavis
   particles
   particlesldr

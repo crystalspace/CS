@@ -132,10 +132,10 @@ iTextureHandle *awsTextureManager::GetTexturebyID (
     csPrintf (
       "aws-debug: (%s) texture count is: %lu\n",
       __FILE__,
-      (unsigned long)textures.Length ());
+      (unsigned long)textures.GetSize ());
 
   size_t i;
-  for (i = 0; i < textures.Length () && txtfound == false; ++i)
+  for (i = 0; i < textures.GetSize () && txtfound == false; ++i)
   {
     awsTexture *awstxt = textures[i];
 

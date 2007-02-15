@@ -66,14 +66,20 @@ template <class T> class csRef;
 #endif
 
 /**
- * A normal pointer. This class should ONLY be used for functions
- * returning pointers that are already IncRef()'ed for the caller.
- * This class behaves like a pointer encapsulator. Please do NOT
- * use this for anything else (for example, don't use this class
- * to remember pointers to anything. Use csRef for that).
- * It only stores the pointer. Nothing else. When it is assigned to
- * a csRef, the csRef smart pointer will 'inherit' the reference
- * (so no IncRef() happens).
+ * A pointer encapsulator. 
+ * Represents a single, owned, one-time-transferable reference to an object
+ * and should be used only as the return value of a function, or when
+ * creating a brand new object which is assigned directly to a csRef<>.
+ * csPtr<> simply stores the pointer (it never invokes IncRef() or DecRef()).
+ * It is very specialized, and exists solely as a mechanism for transferring 
+ * an existing reference into a csRef<>.
+ *
+ * \b Important: There is only one valid way to use the result of a function 
+ * which returns a csPtr<>: assign it to a csRef<>.
+ *
+ * \remarks An extended explanation on smart pointers - how they work and what
+ *   type to use in what scenario - is contained in the User's manual, 
+ *   section "Correctly Using Smart Pointers".
  */
 template <class T>
 class  csPtr
@@ -118,6 +124,10 @@ public:
  * reference-counted object.  This template requires only that the object type
  * T implement the methods IncRef() and DecRef().  No other requirements are
  * placed upon T.
+ *
+ * \remarks An extended explanation on smart pointers - how they work and what
+ *   type to use in what scenario - is contained in the User's manual, 
+ *   section "Correctly Using Smart Pointers".
  */
 template <class T>
 class  csRef

@@ -21,7 +21,10 @@
 #include "csutil/array.h"
 #include "ivaria/profile.h"
 #include "csutil/scf_implementation.h"
+#include "cstool/numberedfilenamehelper.h"
+#include "csutil/csstring.h"
 
+struct iFile;
 
 CS_PLUGIN_NAMESPACE_BEGIN(Profiler)
 {
@@ -54,14 +57,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(Profiler)
 
     const csArray<CS::Debug::ProfileCounter*>& GetProfileCounters ();
 
+    void StartLogging (const char* filenamebase, iObjectRegistry* objectreg);
+    void StopLogging ();
+
   private:
-
-
     csArray<CS::Debug::ProfileZone*> allZones;
     csArray<CS::Debug::ProfileCounter*> allCounters;
 
     csBlockAllocator<CS::Debug::ProfileZone> zoneAllocator;
     csBlockAllocator<CS::Debug::ProfileCounter> counterAllocator;
+
+    // Logging related
+    csRef<iFile> logfile;
+    FILE* nativeLogfile;
+    CS::NumberedFilenameHelper logfileNameHelper;
+    bool isLogging;
+
+    // Helper function to write a string to the logfile (independent of type)
+    void WriteLogEntry (const csString& entry, bool flush = false);
   };
 
 }

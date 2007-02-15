@@ -82,14 +82,14 @@ struct iSkeletonBone : public virtual iBase
   virtual void SetTransform (const csReversibleTransform &transform) = 0;
 
   /**
-   * Set full transform of the bone.
+   * Get full transform of the bone.
    */
   virtual csReversibleTransform &GetFullTransform () = 0;
 
   /**
    * Set parent bone.
    */
-  virtual  void SetParent (iSkeletonBone *parent) = 0;
+  virtual void SetParent (iSkeletonBone *parent) = 0;
 
   /**
    * Get parent bone
@@ -119,12 +119,12 @@ struct iSkeletonBone : public virtual iBase
   /**
    * Set skin bbox (usefull for creating collider or ragdoll object).
    */
-  virtual void SetSkinBox (csBox3 & box) = 0;
+  virtual void SetSkinBox (csBox3 &box) = 0;
 
   /**
    * Get skin bbox.
    */
-  virtual csBox3 & GetSkinBox () = 0;
+  virtual csBox3 &GetSkinBox () = 0;
 
   /**
    * Set callback to the bone. By default there

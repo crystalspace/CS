@@ -354,7 +354,7 @@ awsGridBagLayout::GridBagLayoutInfo * awsGridBagLayout::GetLayoutInfo (
   memset (xMax, 0, sizeof (int) * MAXGRIDSIZE);
   memset (yMax, 0, sizeof (int) * MAXGRIDSIZE);
 
-  for (compindex = 0; compindex < comps.Length (); ++compindex)
+  for (compindex = 0; compindex < comps.GetSize (); ++compindex)
   {
     cmp = comps.Get (compindex);
 
@@ -456,7 +456,7 @@ awsGridBagLayout::GridBagLayoutInfo * awsGridBagLayout::GetLayoutInfo (
   memset (xMax, 0, sizeof (int) * MAXGRIDSIZE);
   memset (yMax, 0, sizeof (int) * MAXGRIDSIZE);
 
-  for (compindex = 0; compindex < comps.Length(); compindex++)
+  for (compindex = 0; compindex < comps.GetSize (); compindex++)
   {
     cmp = comps.Get (compindex);
 
@@ -566,7 +566,7 @@ awsGridBagLayout::GridBagLayoutInfo * awsGridBagLayout::GetLayoutInfo (
 
   for (i = 1; i != GBS_MAXINT; i = nextSize, nextSize = GBS_MAXINT)
   {
-    for (compindex = 0; compindex < comps.Length(); ++compindex)
+    for (compindex = 0; compindex < comps.GetSize (); ++compindex)
     {
       cmp = comps.Get (compindex);
 
@@ -908,7 +908,7 @@ void awsGridBagLayout::ArrangeGrid (iAwsComponent *parent)
   info->startx = diffw / 2 + insets.xmin;
   info->starty = diffh / 2 + insets.ymin;
 
-  for (compindex = 0; compindex < comps.Length (); ++compindex)
+  for (compindex = 0; compindex < comps.GetSize (); ++compindex)
   {
     cmp = comps.Get (compindex);
     if (cmp->isHidden ()) continue;

@@ -252,7 +252,7 @@ struct csScreenBoxResult
  */
 struct iMeshWrapper : public virtual iBase
 {
-  SCF_INTERFACE(iMeshWrapper, 2, 0, 0);
+  SCF_INTERFACE(iMeshWrapper, 2, 1, 0);
 
   /**
    * Get the iObject for this mesh object. This can be used to get the
@@ -728,6 +728,29 @@ struct iMeshWrapper : public virtual iBase
    * Get the shader variable context of the mesh object.
    */
   virtual iShaderVariableContext* GetSVContext() = 0;
+
+  /**
+   * Adds a render mesh to the list of extra render meshes.
+   * This list is used for special cases (like decals) where additional
+   * things need to be renderered for the mesh in an abstract way.
+   */
+  virtual void AddExtraRenderMesh(csRenderMesh* renderMesh, long priority, 
+          csZBufMode zBufMode) = 0;
+
+  /** 
+   * Gets the priority of a specific extra rendermesh.
+   */
+  virtual long GetExtraRenderMeshPriority(size_t idx) const = 0;
+
+  /**
+   * Gets the z-buffer mode of a specific extra rendermesh
+   */
+  virtual csZBufMode GetExtraRenderMeshZBufMode(size_t idx) const = 0;
+
+  /**
+   * Deletes a specific extra rendermesh
+   */
+  virtual void RemoveExtraRenderMesh(csRenderMesh* renderMesh) = 0;
 };
 
 /**

@@ -63,13 +63,13 @@ size_t csBSPTree::FindBestSplitter (csTriangle* triangles, csPlane3* planes,
   size_t i, j;
   float mincost = 1000000.0;
   size_t minidx = (size_t)-1;
-  for (i = 0 ; i < triidx.Length () ; i++)
+  for (i = 0 ; i < triidx.GetSize () ; i++)
   {
     int cnt_splits = 0;
     int cnt_left = 0;
     int cnt_right = 0;
     csPlane3& pl = planes[triidx[i]];
-    for (j = 0 ; j < triidx.Length () ; j++)
+    for (j = 0 ; j < triidx.GetSize () ; j++)
       if (i != j)
       {
         csTriangle& trj = triangles[triidx[j]];
@@ -102,8 +102,8 @@ size_t csBSPTree::FindBestSplitter (csTriangle* triangles, csPlane3* planes,
 	    cnt_right++;
 	}
       }
-    float split = float (cnt_splits) / float (triidx.Length ());
-    float balance = float (ABS (cnt_left-cnt_right)) / float (triidx.Length ());
+    float split = float (cnt_splits) / float (triidx.GetSize ());
+    float balance = float (ABS (cnt_left-cnt_right)) / float (triidx.GetSize ());
     float cost = 10.0 * split + balance;
     if (cost < mincost)
     {
@@ -118,8 +118,8 @@ void csBSPTree::Build (csTriangle* triangles, csPlane3* planes,
 	int num_triangles, csVector3* vertices,
 	const csArray<int>& triidx)
 {
-  CS_ASSERT (triidx.Length () > 0);
-  if (triidx.Length () == 1)
+  CS_ASSERT (triidx.GetSize () > 0);
+  if (triidx.GetSize () == 1)
   {
     splitters.Push (triidx[0]);
     return;
@@ -134,7 +134,7 @@ void csBSPTree::Build (csTriangle* triangles, csPlane3* planes,
   csArray<int> right;
   size_t i;
   split_plane = planes[triidx[idx]];
-  for (i = 0 ; i < triidx.Length () ; i++)
+  for (i = 0 ; i < triidx.GetSize () ; i++)
     if (i != idx)
     {
       int idxi = triidx[i];
@@ -171,12 +171,12 @@ void csBSPTree::Build (csTriangle* triangles, csPlane3* planes,
 	  splitters.Push (idxi);
       }
     }
-  if (left.Length () > 0)
+  if (left.GetSize () > 0)
   {
     child1 = TreeNodes()->Alloc ();
     child1->Build (triangles, planes, num_triangles, vertices, left);
   }
-  if (right.Length () > 0)
+  if (right.GetSize () > 0)
   {
     child2 = TreeNodes()->Alloc ();
     child2->Build (triangles, planes, num_triangles, vertices, right);
@@ -215,7 +215,7 @@ void csBSPTree::Back2Front (const csVector3& pos, csDirtyAccessArray<int>& arr,
   }
 
   size_t i;
-  for (i = 0 ; i < splitters.Length () ; i++)
+  for (i = 0 ; i < splitters.GetSize () ; i++)
     if (!used_indices.In (splitters[i]))
     {
       used_indices.AddNoTest (splitters[i]);

@@ -2,10 +2,121 @@ Crystal Space detailed change log.
 http://www.crystalspace3d.org/
 
 The overall history is in reverse (descending) chronological order, so that
-each new day's entries apears before the previous day's entries.  The
+each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+
+15-Feb-2007
+	- res fixed the reflect and reflectsphere shaders to actually map the
+	  diffuse texture coordinates. (Reported in CS-forum:1557.)
+14-Feb-2007
+	- res made various fixes to the shader weaver and Cg combiner plugins.
+	- res added parallax mapping to the example std_lighting_2.
+	- Jorrit fixed a compile error in weavertypes.h.
+	- Marten fixed a destruction/iteration order problem in 
+	  csGLVBOBufferManager destructor.
+	- Jorrit disabled the profiler in ivaria/profile.h because it seems
+	  to cause problems for static builds.
+	- Marten fixed interleaved render buffers when using VBO.
+	- res reverted r26367 (use exceptions in csjpgimg) since it causes
+	  an abort on Linux when an exception is thrown (see #256) and I'm
+	  at loss at how to fix that. 
+	- res made more shader weaver tweaks (fixed wrong emission order of
+	  graph nodes; corrected comments in source and config files).
+13-Feb-2007
+	- Marten hopefully fixed bitoperations on VC7 and VC7.1.
+	- res added CS::DocumentHelper::CloneAttributes() to clone only the
+	  attributes of a node.
+	- res added CS::DocumentHelper::FlattenNode(), a function that flattens
+	  a document node hierarchy into a string (can be used for e.g. 
+	  hashing).
+	- res made a small constness tweak to CS::ScopedDelete<>.
+	- res added a missing shared lib export marker for generic
+	  csExpandPlatformFilename().
+	- res removed the Bsymbolic linker flag - it causes problem with shared
+	  libs on Linux. Also, searching a bit around has revealed that this
+	  flag is generally problematic with C++. Lastly, the custom allocation
+	  issues having caused the initial use of this flag probably went away
+	  when the global new/delete override was removed.
+	- res added an initial version of a "shader combiner", generating
+	  xmlshader documents from snippets of shader code. In the shader
+	  itself only the shader building blocks and dependencies between
+	  these have to be specified (ie an Abstract Shade Tree).
+12-Feb-2007
+	- Andrew Robberts updated decals so reduce z-fighting and seams.
+	- Marten rewrote the VBO buffer handling to be more robust, contain
+	  less cruft and be a bit faster.
+	- Andrew Robberts updated decals to better specify a top and
+	  bottom clipping plane for decals.
+	- res slightly expanded the manual section on smart pointers with
+	  information on translation to and from normal pointers as well as
+	  information on csWeakRef<> and how to deal with references in
+	  function parameters.
+	- res replaced the csPtr<> API docs with an excerpt from the user
+	  manual description. Also added pointer to section in manual.
+	- res made csRenderBuffer use cs_malloc() for buffer data allocation.
+	- res marked the new temp file/dir functions for DLL exporting.
+	- res fixed an inclusion of a non-existant header in the bullet 
+	  plugin. (Probably went undetected due a blunder in cs-win32libs 
+	  which actually ships this header [which was removed between bullet 
+	  versions]...)
+	- res made more Windows SDK 6.0 compatibility fixes.
+	- Marten added CSV logging to the profiling plugin. Also added a
+	  command to start and stop logging as well as activating automatic
+	  reset (and writing) of data once per frame.
+	- Marten removed some left-over debugging code in lighter2. Fixes
+	  trac #237.
+10-Feb-2007
+	- Marten hopefully fixed lighter2 compiled with MSVC on win64.
+	- res changed csjpgimg to not use setjmp() but exceptions for error
+	  handling (setjmp doesn't work right on Win64 MSVC). Also added some
+	  wrappers around the JPEG structs so the client code more feels like
+	  C++ and less like C.
+9-Feb-2007
+        - Piotr started implementation of iSkeleton related interfaces in
+          Cal3d plugin.
+	- res added a csPackRGB::PackRGBpixelToRGB() variant that packs to a
+	  given buffer.
+	- res fixed a couple of compile errors with VC7.0.
+8-Feb-2007
+	- Marten added (untested) code for atomic operations on SPARC.
+	- Piotr improved choosing pixelformat in wxgl plugin (on win32 only).
+        - Piotr made wxgl plugin compilable and working with wxwidgets 2.8
+	- Marten made two tweaks to particles:
+	    - Exposed initial angular velocity setting on emitters to xml.
+	    - Made sure rotation-mode resets the texcoord vectors. Fixes
+	      problem when switching from texcoord rotation to none.
+	- res split csutil/threading/atomicops.h up into multiple files (one
+	  per implementation).
+        - Piotr made more backward compatibility safe and improved code quality
+          (removed not valid comments and unecesery method) in his latest commit.
+	- Andrew Robberts made decals a bit more efficient sharing memory and
+	  adding the ability to reuse/change existing decals
+7-Feb-2007
+	- Genjix changed csWeakRefArray to not use deprecated Length ().
+	- res changed configure to normalize sparc* cpu names to sparc (so
+	  e.g. sparc64 is treated as sparc).
+6-Feb-2007
+	- res added CS::ScopedDelete<>, a helper class to delete a pointer 
+	  when leaving a scope.
+4-Feb-2007
+	- res worked around an apparent incompatibility between one of VC8's
+	  headers and a header from the latest Windows SDK 6.0.
+	- res fixed a couple of compile warnings.
+	- res changed the CS_REQUEST_FONTSERVER macro to pull in the font
+	  multiplexer plugin instead of the "default" font plugin. (The idea
+	  is that nowadays most people would probably like to use TrueType
+	  fonts instead of the built-in bitmap fonts; using the font plexer
+	  by default this will work out of the box.)
+	- Luca fixed the source code of the examples in the Threading 
+	  Library section of the manual.
+	- res fixed the static plugin dependencies file to contain the correct
+	  library names.
+3-Feb-2007
+	- Jorrit added 'decal_test' to the online help for walktest.
+	- Marten fixed a compilation error in sector.cpp that only showed
+	  in release mode.
 2-Feb-2007
 	- res worked around Cg not being properly detected on Linux when
 	  -Wl,--as-needed was passed in LDFLAGS.
@@ -14,6 +125,27 @@ chronological order.
 	  is internally used by the CS build test macros as a separator.
 	  Worked around by not using the CS build macros but the relevant AC_
 	  macros directly.)
+	- res fixed a couple of warnings and errors after the temp file name
+	  stuff change. Also removed an (actually inappropriate) use of
+	  GetTempFilename in importkit_glue.cpp.
+	- res slightly changed CS_TEMP_DIR and CS_TEMP_FILE to emit a warning
+	  when employed.
+	- Marten removed deprecated methods from:
+	    - csArray and derived types
+	    - csPath
+	    - csImageBase
+	- Marten put back csArray::Length and csArray::SetLength but properly
+	  marked them deprecated.
+	- Andrew Robberts added the ability to attach arbitrary rendermeshes 
+	  with priority and zbufmodes to any iMeshWrapper.
+	- Andrew Robberts added an InSphere function to poly3d to test 
+  	  if the poly is within a sphere.
+	- Andrew Robberts added decal support and a decalmanager plugin
+	  to CS.  Decals are currently supported by thing and static
+	  genmeshes.
+        - Andrew Robberts fixed copyright, interface versions, and comments
+        - Andrew Robberts added missing include/igeom/decal.h
+	- Andrew Robberts fixed pointer and csRef references in decals.
 1-Feb-2007
 	- Marten fixed compilation of CS::DataBuffer on gcc.
 	- Marten made sure genmesh doesn't return any rendermeshes when
@@ -176,7 +308,8 @@ chronological order.
 	    - fixed vector division, was misimplemented as multiplication.
 	    - added declaration for some key event macros which are not
 	      found automatically by swig.
-	- Genjix added fix for iGeneralFactory::AddTriangle() crash in Invalidate().
+	- Genjix added fix for iGeneralFactory::AddTriangle() crash in
+          Invalidate().
 12-Jan-2007
 	- caedes added scfImplementationExt1 template to scf.i swig file so
 	  this template can be wrapped.

@@ -43,6 +43,7 @@
 #include "csutil/scf.h"
 #include "csutil/scfarray.h"
 #include "csutil/strset.h"
+#include "ivaria/profile.h"
 
 #include "igeom/clip2d.h"
 #include "iutil/cmdline.h"
@@ -66,7 +67,8 @@
 
 #include "csplugincommon/opengl/glextmanager.h"
 
-
+CS_DECLARE_PROFILER
+CS_DECLARE_PROFILER_ZONE(csGLGraphics3D_DrawMesh);
 
 #define BYTE_TO_FLOAT(x) ((x) * (1.0 / 255.0))
 
@@ -160,7 +162,7 @@ void csGLGraphics3D::OutputMarkerString (const char* function,
   {
     csStringFast<256> marker;
     marker.Format ("[%ls %s():%d] %s", file, function, line, message);
-    ext->glStringMarkerGREMEDY ((GLsizei)marker.Length(), marker);
+    ext->glStringMarkerGREMEDY ((GLsizei)marker.Length (), marker);
   }
 }
 
@@ -173,7 +175,7 @@ void csGLGraphics3D::OutputMarkerString (const char* function,
     csStringFast<256> marker;
     marker.Format ("[%ls %s():%d] %s", file, function, line, 
       message.GetStr());
-    ext->glStringMarkerGREMEDY ((GLsizei)marker.Length(), marker);
+    ext->glStringMarkerGREMEDY ((GLsizei)marker.Length (), marker);
   }
 }
 
@@ -725,6 +727,34 @@ void csGLGraphics3D::SetupProjection ()
   needProjectionUpdate = false;
 }
 
+void csGLGraphics3D::ParseByteSize (const char* sizeStr, size_t& size)
+{
+  const char* end = sizeStr + strspn (sizeStr, "0123456789"); 	 
+  size_t sizeFactor = 1; 	 
+  if ((*end == 'k') || (*end == 'K')) 	 
+    sizeFactor = 1024; 	 
+  else if ((*end == 'm') || (*end == 'M')) 	 
+    sizeFactor = 1024*1024; 	 
+  else if (*end != 0)
+  { 	 
+    Report (CS_REPORTER_SEVERITY_WARNING, 	 
+      "Unknown suffix '%s' in maximum buffer size '%s'.", end, sizeStr); 	 
+    sizeFactor = 0; 	 
+  } 	 
+  if (sizeFactor != 0) 	 
+  { 	 
+    unsigned long tmp;
+    if (sscanf (sizeStr, "%lu", &tmp) != 0)
+    {
+      size = tmp;
+      size *= sizeFactor; 	 
+    }
+    else 	 
+      Report (CS_REPORTER_SEVERITY_WARNING, 	 
+      "Invalid buffer size '%s'.", sizeStr); 	 
+  }
+}
+
 ////////////////////////////////////////////////////////////////////
 // iGraphics3D
 ////////////////////////////////////////////////////////////////////
@@ -851,7 +881,16 @@ bool csGLGraphics3D::Open ()
   // check for support of VBO
   use_hw_render_buffers = ext->CS_GL_ARB_vertex_buffer_object;
   if (use_hw_render_buffers) 
-    vboManager.AttachNew (new csGLVBOBufferManager (ext, statecache, object_reg));
+  {
+    size_t vboSize;
+
+
+    ParseByteSize (config->GetStr ("Video.OpenGL.VBO.MaxSize", "64M"), vboSize);
+
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Using VBO with %d MB of VBO memory",
+      vboSize / (1024*1024));
+    vboManager.AttachNew (new csGLVBOBufferManager (ext, statecache, vboSize));
+  }
 
   GLint dbits;
   glGetIntegerv (GL_DEPTH_BITS, &dbits);
@@ -1138,7 +1177,7 @@ void csGLGraphics3D::Close ()
   txtmgr = 0;
   shadermgr = 0;
   delete r2tbackend; r2tbackend = 0;
-  for (size_t h = 0; h < halos.Length(); h++)
+  for (size_t h = 0; h < halos.GetSize (); h++)
   {
     if (halos[h]) halos[h]->DeleteTexture();
   }
@@ -1158,7 +1197,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 
   clipportal_dirty = true;
   clipportal_floating = 0;
-  CS_ASSERT (clipportal_stack.Length () == 0);
+  CS_ASSERT (clipportal_stack.GetSize () == 0);
 
   debug_inhibit_draw = false;
 
@@ -1292,7 +1331,7 @@ void csGLGraphics3D::Print (csRect const* area)
 
   if (vboManager.IsValid ())
   {
-    vboManager->ResetFrameStats ();
+//@@TODO:    vboManager->ResetFrameStats ();
   }
 
   if (enableDelaySwap)
@@ -1694,6 +1733,8 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 {
   if (cliptype == CS_CLIPPER_EMPTY) 
     return;
+
+  CS_PROFILER_ZONE(csGLGraphics3D_DrawMesh);
 
   GLRENDER3D_OUTPUT_STRING_MARKER(("%p ('%s')", mymesh, mymesh->db_mesh_name));
   SwapIfNeeded();
@@ -2161,13 +2202,13 @@ void csGLGraphics3D::OpenPortal (size_t numVertices,
   else if (flags.Check(CS_OPENPORTAL_FLOAT))
     clipportal_floating = 1;
     
-  //if (clipportal_stack.Length() > 1) debug_inhibit_draw = true;
+  //if (clipportal_stack.GetSize () > 1) debug_inhibit_draw = true;
 }
 
 void csGLGraphics3D::ClosePortal ()
 {
-  if (clipportal_stack.Length () <= 0) return;
-  bool mirror = IsPortalMirrored (clipportal_stack.Length()-1);
+  if (clipportal_stack.GetSize () <= 0) return;
+  bool mirror = IsPortalMirrored (clipportal_stack.GetSize ()-1);
   csClipPortal* cp = clipportal_stack.Pop ();
   GLRENDER3D_OUTPUT_STRING_MARKER(("portal %p", cp));
 
@@ -2234,7 +2275,7 @@ void csGLGraphics3D::ClosePortal ()
   if (clipportal_floating > 0)
     clipportal_floating--;
     
-  //if (clipportal_stack.Length() < 2) debug_inhibit_draw = false;
+  //if (clipportal_stack.GetSize () < 2) debug_inhibit_draw = false;
 }
 
 void* csGLGraphics3D::RenderLock (iRenderBuffer* buffer, 
@@ -2277,7 +2318,7 @@ void csGLGraphics3D::ApplyBufferChanges()
 {
   GLRENDER3D_OUTPUT_LOCATION_MARKER;
 
-  for (size_t i = 0; i < changeQueue.Length(); i++)
+  for (size_t i = 0; i < changeQueue.GetSize (); i++)
   {
     const BufferChange& changeEntry = changeQueue[i];
     csVertexAttrib att = changeEntry.attrib;
@@ -2468,7 +2509,7 @@ static void DoFixup (iRenderBuffer* src, T* dest, const T2 scales[],
 csRef<iRenderBuffer> csGLGraphics3D::DoNPOTSFixup (iRenderBuffer* buffer, int unit)
 {
   csRef<iRenderBuffer> scrapBuf;
-  if (npotsFixupScrap.Length() > 0) scrapBuf = npotsFixupScrap.Pop();
+  if (npotsFixupScrap.GetSize () > 0) scrapBuf = npotsFixupScrap.Pop();
   if (!scrapBuf.IsValid()
     || (scrapBuf->GetElementCount() < buffer->GetElementCount())
     || (scrapBuf->GetComponentCount() != buffer->GetComponentCount())
@@ -2708,7 +2749,7 @@ void csGLGraphics3D::SetupClipPortals ()
   //init portal indexes
   ffpnz = csArrayItemNotFound;
   ffps = csArrayItemNotFound; 
-  cfp = clipportal_stack.Length()-1; 
+  cfp = clipportal_stack.GetSize ()-1; 
   for (ffp = 0; ffp <= cfp; ffp++) 
     if (clipportal_stack[ffp]->flags.Check (CS_OPENPORTAL_FLOAT)) break;
     
@@ -2825,7 +2866,7 @@ void csGLGraphics3D::SetupClipPortals ()
   		{0.0,0.0,0.5}, {0.0,0.5,0.0}, {0.5,0.0,0.0},
   		{0.5,0.5,0.0}, {0.0,0.5,0.5}, {0.5,0.0,0.5},
   		{1.0,1.0,1.0}};
-  	//int j = clipportal_stack.Length()-1;
+  	//int j = clipportal_stack.GetSize ()-1;
   	int j = cfp;
   	if (j>12) j=12;
   	glColorMask (true, true, true, true);

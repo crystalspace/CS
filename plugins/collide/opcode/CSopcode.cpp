@@ -156,8 +156,8 @@ void csOPCODECollideSystem::CopyCollisionPairs (csOPCODECollider* col1,
   Point* current;
   int i, j;
 
-  size_t oldlen = pairs.Length ();
-  pairs.SetLength (oldlen + N_pairs);
+  size_t oldlen = pairs.GetSize ();
+  pairs.SetSize (oldlen + N_pairs);
 
   for (i = 0 ; i < N_pairs ; i++)
   {
@@ -378,8 +378,8 @@ bool csOPCODECollideSystem::CollideRaySegment (
 
   RayCol.SetHitCallback (ray_cb);
   RayCol.SetUserData ((void*)&collision_faces);
-  intersecting_triangles.SetLength (0);
-  collision_faces.SetLength (0);
+  intersecting_triangles.SetSize (0);
+  collision_faces.SetSize (0);
   if (use_ray)
   {
     max_dist = MAX_FLOAT;
@@ -401,10 +401,10 @@ bool csOPCODECollideSystem::CollideRaySegment (
       if (!vertholder) return true;
       udword* indexholder = col->indexholder;
       if (!indexholder) return true;
-      if (collision_faces.Length () == 0) return false;
+      if (collision_faces.GetSize () == 0) return false;
       Point* c;
       size_t i;
-      for (i = 0 ; i < collision_faces.Length () ; i++)
+      for (i = 0 ; i < collision_faces.GetSize () ; i++)
       {
         int idx = collision_faces[i] * 3;
 	int it_idx = (int)intersecting_triangles.Push (csIntersectingTriangle ());
@@ -442,8 +442,8 @@ void csOPCODECollideSystem::CopyCollisionPairs (csOPCODECollider* col1,
   Point* current;
   int i, j;
 
-  size_t oldlen = pairs.Length ();
-  pairs.SetLength (oldlen + N_pairs);
+  size_t oldlen = pairs.GetSize ();
+  pairs.SetSize (oldlen + N_pairs);
 
   // it really sucks having to copy all this each Collide query, but
   // since opcode library uses his own vector types,
@@ -491,7 +491,7 @@ csCollisionPair* csOPCODECollideSystem::GetCollisionPairs ()
 
 size_t csOPCODECollideSystem::GetCollisionPairCount ()
 {
-  return pairs.Length ();
+  return pairs.GetSize ();
 }
 
 void csOPCODECollideSystem::ResetCollisionPairs ()

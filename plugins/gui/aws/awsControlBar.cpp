@@ -108,7 +108,7 @@ void awsControlBar::DoLayout ()
     // Pass once through all the components to find the max width.
     int max_width = 0;
     size_t i;
-    for (i = 0; i < comps.Length (); i++)
+    for (i = 0; i < comps.GetSize (); i++)
     {
       if (comps.Get (i)->isHidden ()) continue;
       if (comps.Get (i)->Flags () & AWSF_CMP_INVISIBLE) continue;
@@ -125,7 +125,7 @@ void awsControlBar::DoLayout ()
     
     // Pass again to lay them all out.
     int y = ClientFrame ().ymin + vGap;
-    for (i = 0; i < comps.Length (); i++)
+    for (i = 0; i < comps.GetSize (); i++)
     {
       if (comps.Get (i)->isHidden ()) continue;
       if (comps.Get (i)->Flags () & AWSF_CMP_INVISIBLE) continue;
@@ -163,7 +163,7 @@ void awsControlBar::DoLayout ()
     // Pass once through all the components to find the max height.
     int max_height = 0;
     size_t i;
-    for (i = 0; i < comps.Length (); i++)
+    for (i = 0; i < comps.GetSize (); i++)
     {
       if(comps.Get (i)->isHidden ()) continue;
       if(comps.Get (i)->Flags () & AWSF_CMP_INVISIBLE) continue;
@@ -180,7 +180,7 @@ void awsControlBar::DoLayout ()
     
     // Pass again to lay them all out.
     int x = ClientFrame ().xmin + hGap;
-    for (i = 0; i < comps.Length (); i++)
+    for (i = 0; i < comps.GetSize (); i++)
     {
       if (comps.Get (i)->isHidden ()) continue;
       if (comps.Get (i)->Flags () & AWSF_CMP_INVISIBLE) continue;

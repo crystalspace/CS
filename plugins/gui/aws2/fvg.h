@@ -54,7 +54,7 @@ namespace aws
       /// Draws out the fvg object to a pen.
       void Draw (iPen *pen)
       {
-        for(size_t i=0; i < shapes.Length (); ++i)
+        for(size_t i=0; i < shapes.GetSize (); ++i)
         {
           shapes[i]->Draw (pen);
         }

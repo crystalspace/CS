@@ -160,7 +160,7 @@ public:
   {
   }
 
-  virtual size_t GetCount () const { return priorities.Length (); }
+  virtual size_t GetCount () const { return priorities.GetSize (); }
   virtual int GetPriority (size_t idx) const { return priorities[idx]; }
 };
 

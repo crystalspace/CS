@@ -496,7 +496,7 @@ public:
   void SetAttribute( TiDocument* document, const char * name, int value );
 
   /// Get number of attributes.
-  size_t GetAttributeCount () const { return attributeSet.set.Length (); }
+  size_t GetAttributeCount () const { return attributeSet.set.GetSize (); }
   /// Get attribute.
   const TiDocumentAttribute& GetAttribute (size_t idx) const
   {

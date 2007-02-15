@@ -308,7 +308,7 @@ TrXmlDeclaration::TrXmlDeclaration( const char * _version,
 size_t TrDocumentAttributeSet::Find (const char * name) const
 {
   size_t i;
-  for (i = 0 ; i < set.Length () ; i++)
+  for (i = 0 ; i < set.GetSize () ; i++)
   {
     if (strcmp (set[i].name, name) == 0) return i;
   }
@@ -318,7 +318,7 @@ size_t TrDocumentAttributeSet::Find (const char * name) const
 size_t TrDocumentAttributeSet::FindExact (const char * reg_name) const
 {
   size_t i;
-  for (i = 0 ; i < set.Length () ; i++)
+  for (i = 0 ; i < set.GetSize () ; i++)
   {
     if (set[i].name == reg_name) return i;
   }

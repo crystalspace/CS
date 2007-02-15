@@ -563,7 +563,7 @@ bool csPolygonMeshTools::IsMeshConvex (iPolygonMesh* polyMesh)
     	verts);
     size_t j;
     const csArray<int>& ap = adjacent_polygons[i];
-    for (j = 0 ; j < ap.Length () ; j++)
+    for (j = 0 ; j < ap.GetSize () ; j++)
     {
       float cl = plane.Classify (poly_centers[ap[j]]);
       if (cl > SMALL_EPSILON)

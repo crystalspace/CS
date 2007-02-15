@@ -213,7 +213,7 @@ void csSector::RemoveLightVisibleCallback (iLightVisibleCallback* cb)
 
 void csSector::FireLightVisibleCallbacks (iLight* light)
 {
-  size_t i = lightVisibleCallbackList.Length ();
+  size_t i = lightVisibleCallbackList.GetSize ();
   while (i > 0)
   {
     i--;
@@ -254,7 +254,7 @@ void csSector::RegisterEntireMeshToCuller (iMeshWrapper* mesh)
   if (cmesh->GetStaticLODMesh ()) return;
   size_t i;
   const csRefArray<iSceneNode>& ml = cmesh->GetChildren ();
-  for (i = 0 ; i < ml.Length () ; i++)
+  for (i = 0 ; i < ml.GetSize () ; i++)
   {
     iMeshWrapper* child = ml[i]->QueryMesh ();
     if (child)
@@ -287,7 +287,7 @@ void csSector::PrepareMesh (iMeshWrapper *mesh)
   if (culler) RegisterMeshToCuller (mesh);
   size_t i;
   const csRefArray<iSceneNode>& ml = ((csMeshWrapper*)mesh)->GetChildren ();
-  for (i = 0 ; i < ml.Length () ; i++)
+  for (i = 0 ; i < ml.GetSize () ; i++)
   {
     iMeshWrapper* child = ml[i]->QueryMesh ();
     if (child)
@@ -302,7 +302,7 @@ void csSector::UnprepareMesh (iMeshWrapper *mesh)
   if (culler) UnregisterMeshToCuller (mesh);
   size_t i;
   const csRefArray<iSceneNode>& ml = ((csMeshWrapper*)mesh)->GetChildren ();
-  for (i = 0 ; i < ml.Length () ; i++)
+  for (i = 0 ; i < ml.GetSize () ; i++)
   {
     iMeshWrapper* child = ml[i]->QueryMesh ();
     if (child)
@@ -318,7 +318,7 @@ void csSector::RelinkMesh (iMeshWrapper *mesh)
 
   size_t i;
   const csRefArray<iSceneNode>& ml = ((csMeshWrapper*)mesh)->GetChildren ();
-  for (i = 0 ; i < ml.Length () ; i++)
+  for (i = 0 ; i < ml.GetSize () ; i++)
   {
     iMeshWrapper* child = ml[i]->QueryMesh ();
     if (child)
@@ -464,7 +464,7 @@ public:
     ObjectVisible (cmesh, frustum_mask);
     size_t i;
     const csRefArray<iSceneNode>& children = cmesh->GetChildren ();
-    for (i = 0 ; i < children.Length () ; i++)
+    for (i = 0 ; i < children.GetSize () ; i++)
     {
       iMeshWrapper* child = children[i]->QueryMesh ();
       // @@@ Traverse too in case there are lights/cameras?
@@ -494,7 +494,7 @@ public:
       float lod = static_lod->GetLODValue (distance);
       csArray<iMeshWrapper*>& meshes = static_lod->GetMeshesForLOD (lod);
       size_t i;
-      for (i = 0 ; i < meshes.Length () ; i++)
+      for (i = 0 ; i < meshes.GetSize () ; i++)
         MarkMeshAndChildrenVisible (meshes[i], frustum_mask);
     }
 
@@ -502,15 +502,27 @@ public:
     csRenderMesh** meshes = cmesh->GetRenderMeshes (num, rview, frustum_mask);
 //@@@  CS_ASSERT(!((num != 0) && (meshes == 0)));
 #ifdef CS_DEBUG
-    int i;
-    for (i = 0 ; i < num ; i++)
+    for (int i = 0 ; i < num ; i++)
       meshes[i]->db_mesh_name = cmesh->GetName ();
 #endif
     if (num > 0)
     {
       privMeshlist->AddRenderMeshes (meshes, num,
       	cmesh->csMeshWrapper::GetRenderPriority (),
-	cmesh->csMeshWrapper::GetZBufMode (), (iMeshWrapper*)cmesh);
+      	cmesh->csMeshWrapper::GetZBufMode (), (iMeshWrapper*)cmesh);
+
+      // get extra render meshes
+      size_t numExtra = 0;
+      csRenderMesh** extraMeshes = cmesh->GetExtraRenderMeshes (numExtra, rview,
+                                            frustum_mask);
+      CS_ASSERT(!((numExtra != 0) && (extraMeshes == 0)));
+      for (size_t i = 0; i < numExtra; ++i)
+      {
+          privMeshlist->AddRenderMeshes (&extraMeshes[i], 1,
+                  cmesh->csMeshWrapper::GetExtraRenderMeshPriority(i),
+                  cmesh->csMeshWrapper::GetExtraRenderMeshZBufMode(i),
+                  (iMeshWrapper*)cmesh);
+      }
     }
   }
 
@@ -566,7 +578,7 @@ csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
   size_t i;
   uint32 cur_framenr = engine->GetCurrentFrameNumber ();
   uint32 cur_context_id = rview->GetRenderContext ()->context_id;
-  for (i = 0 ; i < visibleMeshCache.Length () ; i++)
+  for (i = 0 ; i < visibleMeshCache.GetSize () ; i++)
   {
     visibleMeshCacheHolder& entry = visibleMeshCache[i];
     if (entry.cachedFrameNumber == cur_framenr &&
@@ -577,7 +589,7 @@ csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
   }
 
   //try to find a spot to do a new cache
-  for (i = 0 ; i < visibleMeshCache.Length () ; i++)
+  for (i = 0 ; i < visibleMeshCache.GetSize () ; i++)
   {
     visibleMeshCacheHolder& entry = visibleMeshCache[i];
     if (entry.cachedFrameNumber != cur_framenr)
@@ -859,7 +871,7 @@ void csSector::PrepareDraw (iRenderView *rview)
   csRenderView* csrview = (csRenderView*)rview;
   csrview->SetThisSector ((iSector*)this);
 
-  size_t i = sectorCallbackList.Length ();
+  size_t i = sectorCallbackList.GetSize ();
   while (i > 0)
   {
     i--;
@@ -869,14 +881,14 @@ void csSector::PrepareDraw (iRenderView *rview)
 
   // Mesh generators.
   const csVector3& pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
-  for (i = 0 ; i < meshGenerators.Length () ; i++)
+  for (i = 0 ; i < meshGenerators.GetSize () ; i++)
   {
     meshGenerators[i]->AllocateBlocks (pos);
   }
 
   // CS_ENTITY_CAMERA meshes have to be moved to right position first.
   const csArray<iMeshWrapper*>& cm = cameraMeshes;
-  for (i = 0 ; i < cm.Length () ; i++)
+  for (i = 0 ; i < cm.GetSize () ; i++)
   {
     iMeshWrapper* m = cm.Get (i);
     if (m->GetFlags ().Check (CS_ENTITY_CAMERA))
@@ -1035,7 +1047,7 @@ void csSector::RemoveSectorMeshCallback (iSectorMeshCallback* cb)
 
 void csSector::FireNewMesh (iMeshWrapper* mesh)
 {
-  size_t i = sectorMeshCallbackList.Length ();
+  size_t i = sectorMeshCallbackList.GetSize ();
   while (i > 0)
   {
     i--;
@@ -1045,7 +1057,7 @@ void csSector::FireNewMesh (iMeshWrapper* mesh)
 
 void csSector::FireRemoveMesh (iMeshWrapper* mesh)
 {
-  size_t i = sectorMeshCallbackList.Length ();
+  size_t i = sectorMeshCallbackList.GetSize ();
   while (i > 0)
   {
     i--;
@@ -1055,7 +1067,7 @@ void csSector::FireRemoveMesh (iMeshWrapper* mesh)
 
 void csSector::CheckFrustum (iFrustumView *lview)
 {
-  int i = (int)sectorCallbackList.Length ()-1;
+  int i = (int)sectorCallbackList.GetSize ()-1;
   while (i >= 0)
   {
     iSectorCallback* cb = sectorCallbackList.Get (i);
@@ -1309,7 +1321,7 @@ bool csSectorList::Remove (int n)
 void csSectorList::RemoveAll ()
 {
   size_t i;
-  for (i = 0 ; i < list.Length () ; i++)
+  for (i = 0 ; i < list.GetSize () ; i++)
   {
     list[i]->QueryObject ()->RemoveNameChangeListener (listener);
     FreeSector (list[i]);

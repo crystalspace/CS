@@ -234,7 +234,7 @@ void csTerrBlock::SetupMesh ()
       if (terr->materialAlphaMaps)
       {
 	csArray< csArray<char> > alphamaps = csArray< csArray<char> >();
-	for (int i = 0; i < (int)terr->palette.Length() - 1; i++)
+	for (int i = 0; i < (int)terr->palette.GetSize () - 1; i++)
 	{
 	  csString alphaname = csString("alphamap ");
 	  alphaname += i;
@@ -715,7 +715,7 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
   const csVector3& wo = o2wt.GetOrigin ();
   bool isMirrored = rview->GetCamera()->IsMirrored();
 
-  for (int i=0; i<=(baseonly?0:(int)terr->palette.Length ()); ++i)
+  for (int i=0; i<=(baseonly?0:(int)terr->palette.GetSize ()); ++i)
   {
 //@@@ fix
     //if ((i > 0) && !IsMaterialUsed (i - 1)) continue;
@@ -858,7 +858,7 @@ public:
     const csVector3& this_pos = vertex->pos;
     float min_cosa = 1000.0;
     float min_sq_dist = 1000000.;
-    for (i = 0 ; i < vertex->con_vertices.Length () ; i++)
+    for (i = 0 ; i < vertex->con_vertices.GetSize () ; i++)
     {
       int connected_i = vertex->con_vertices[i];
       float cur_cosa = n * normals[connected_i];
@@ -890,7 +890,7 @@ public:
 	bool bad = false;
 	csVector3 v3[3];
 	csVector2 v[3];
-	for (j = 0 ; j < vertex->con_triangles.Length () ; j++)
+	for (j = 0 ; j < vertex->con_triangles.GetSize () ; j++)
 	{
 	  csTriangle& tri = tris[vertex->con_triangles[j]];
 	  v3[0] = vertices->GetVertex (tri.a).pos; v[0].Set (v3[0].x, v3[0].z);
@@ -1363,7 +1363,7 @@ void csTerrainObject::SetStaticLighting (bool enable)
   staticlighting = enable;
   if (staticlighting)
   {
-    staticLights.SetLength (lmres * lmres);
+    staticLights.SetSize (lmres * lmres);
   }
   else
   {
@@ -1374,7 +1374,7 @@ void csTerrainObject::SetStaticLighting (bool enable)
 void csTerrainObject::FireListeners ()
 {
   size_t i;
-  for (i = 0 ; i < listeners.Length () ; i++)
+  for (i = 0 ; i < listeners.GetSize () ; i++)
     listeners[i]->ObjectModelChanged (this);
 }
 
@@ -1501,7 +1501,7 @@ void csTerrainObject::InitializeDefault (bool clear)
     float lightScale = CS_NORMAL_LIGHT_LEVEL / 256.0f;
     pFactory->engine->GetAmbientLight (amb);
     amb *= lightScale;
-    for (size_t i = 0 ; i < staticLights.Length(); i++)
+    for (size_t i = 0 ; i < staticLights.GetSize (); i++)
     {
       staticLights[i] = amb;
     }
@@ -1562,7 +1562,7 @@ bool csTerrainObject::ReadFromCache (iCacheManager* cache_mgr)
     if (strcmp (magic, CachedLightingMagic) == 0)
     {
       size_t v;
-      for (v = 0; v < staticLights.Length(); v++)
+      for (v = 0; v < staticLights.GetSize (); v++)
       {
 	csColor& c = staticLights[v];
 	uint8 b;
@@ -1585,9 +1585,9 @@ bool csTerrainObject::ReadFromCache (iCacheManager* cache_mgr)
 	l->AddAffectedLightingInfo ((iLightingInfo*)this);
 
 	csShadowArray* shadowArr = new csShadowArray();
-	float* intensities = new float[staticLights.Length()];
+	float* intensities = new float[staticLights.GetSize ()];
 	shadowArr->shadowmap = intensities;
-	for (size_t n = 0; n < staticLights.Length(); n++)
+	for (size_t n = 0; n < staticLights.GetSize (); n++)
 	{
           uint8 b;
           if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b))
@@ -1620,7 +1620,7 @@ bool csTerrainObject::WriteToCache (iCacheManager* cache_mgr)
   bool rc = false;
   csMemFile mf;
   mf.Write (CachedLightingMagic, CachedLightingMagicSize);
-  for (size_t v = 0; v < staticLights.Length(); v++)
+  for (size_t v = 0; v < staticLights.GetSize (); v++)
   {
     const csColor& c = staticLights[v];
     int i; uint8 b;
@@ -1651,7 +1651,7 @@ bool csTerrainObject::WriteToCache (iCacheManager* cache_mgr)
     mf.Write ((char*)lid, 16);
 
     float* intensities = shadowArr->shadowmap;
-    for (size_t n = 0; n < staticLights.Length(); n++)
+    for (size_t n = 0; n < staticLights.GetSize (); n++)
     {
       int i; uint8 b;
       i = csQint (intensities[n] * STATIC_LIGHT_SCALE);
@@ -1675,7 +1675,7 @@ void csTerrainObject::PrepareLighting ()
   {
     const csArray<iLightSectorInfluence*>& relevant_lights = pFactory->light_mgr
       ->GetRelevantLights (logparent, -1, false);
-    for (size_t i = 0; i < relevant_lights.Length(); i++)
+    for (size_t i = 0; i < relevant_lights.GetSize (); i++)
       affecting_lights.Add (relevant_lights[i]->GetLight ());
   }
 }
@@ -1720,9 +1720,9 @@ void csTerrainObject::UpdateColors (iMovable* movable)
   if (colorVersion == last_colorVersion) return;
   last_colorVersion = colorVersion;
       
-  staticColors.SetLength (staticLights.Length ());
+  staticColors.SetSize (staticLights.GetSize ());
   size_t i;
-  for (i = 0; i < staticLights.Length(); i++)
+  for (i = 0; i < staticLights.GetSize (); i++)
   {
     staticColors[i] = staticLights[i] + baseColor;
   }
@@ -1739,7 +1739,7 @@ void csTerrainObject::UpdateColors (iMovable* movable)
     if (lightcol.red > EPSILON || lightcol.green > EPSILON
         || lightcol.blue > EPSILON)
     {
-      for (i = 0; i < staticLights.Length(); i++)
+      for (i = 0; i < staticLights.GetSize (); i++)
       {
         staticColors[i] += lightcol * intensities[i];
       }
@@ -1810,8 +1810,8 @@ void csTerrainObject::CastShadows (iMovable* movable, iFrustumView* fview)
   {
     shadowArr = new csShadowArray ();
     pseudoDynInfo.Put (li, shadowArr);
-    shadowArr->shadowmap = new float[staticLights.Length()];
-    memset(shadowArr->shadowmap, 0, staticLights.Length() * sizeof(float));
+    shadowArr->shadowmap = new float[staticLights.GetSize ()];
+    memset(shadowArr->shadowmap, 0, staticLights.GetSize () * sizeof(float));
   }
 
   float lightScale = CS_NORMAL_LIGHT_LEVEL / 256.0f;
@@ -1829,11 +1829,11 @@ void csTerrainObject::CastShadows (iMovable* movable, iFrustumView* fview)
   csColor col;
   size_t i;
   float light_radiussq = csSquare (li->GetCutoffDistance ());
-  for (i = 0 ; i < staticLights.Length() ; i++)
+  for (i = 0 ; i < staticLights.GetSize () ; i++)
   {
     if (verbose && (i % 10000 == 0))
     {
-      csPrintf ("%zu out of %zu\n", i, staticLights.Length ());
+      csPrintf ("%zu out of %zu\n", i, staticLights.GetSize ());
       fflush (stdout);
     }
     /*
@@ -1898,9 +1898,9 @@ void csTerrainObject::CastShadows (iMovable* movable, iFrustumView* fview)
 bool csTerrainObject::SetMaterialPalette (
   const csArray<iMaterialWrapper*>& pal)
 {
-  palette.SetLength (pal.Length());
-  paletteContexts.SetLength (pal.Length());
-  for (size_t i = 0; i < pal.Length(); i++)
+  palette.SetSize (pal.GetSize ());
+  paletteContexts.SetSize (pal.GetSize ());
+  for (size_t i = 0; i < pal.GetSize (); i++)
   {
     palette[i] = pal[i];
     paletteContexts[i] = new csShaderVariableContext();
@@ -1956,12 +1956,12 @@ CS_DEPRECATED_METHOD bool csTerrainObject::SetMaterialAlphaMaps (
 bool csTerrainObject::SetCurrentMaterialAlphaMaps (
 	const csArray<csArray<char> >& data, int w, int h)
 {
-  if (data.Length () != palette.Length ()-1)
+  if (data.GetSize () != palette.GetSize ()-1)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
 	  "crystalspace.mesh.bruteblock",
 	  "There are %zd palette entries. That means there must be %zd alpha "
-	  "maps!", palette.Length (), palette.Length ()-1);
+	  "maps!", palette.GetSize (), palette.GetSize ()-1);
     return false;
   }
   //use_singlemap = false;
@@ -1985,13 +1985,13 @@ bool csTerrainObject::SetCurrentMaterialAlphaMaps (
   baseContext->AddVariable (lod_var);
 
   csArray<char> total;
-  total.SetLength (w * h);
+  total.SetSize (w * h);
   size_t i;
   for (i = 0 ; i < size_t (w * h) ; i++) total[i] = 0;
 
   int count_overflow = 0;
-  globalMaterialsUsed.SetLength (0);
-  for (i = 0 ; i < palette.Length () ; i++)
+  globalMaterialsUsed.SetSize (0);
+  for (i = 0 ; i < palette.GetSize () ; i++)
   {
     csRef<iImage> alpha = csPtr<iImage> (new csImageMemory (w, h, 
       CS_IMGFMT_ALPHA | CS_IMGFMT_TRUECOLOR));
@@ -2005,7 +2005,7 @@ bool csTerrainObject::SetCurrentMaterialAlphaMaps (
       for (x = 0; x < w; x ++) 
       {
 	int v;
-        if (i < palette.Length ()-1)
+        if (i < palette.GetSize ()-1)
 	{
           v = (unsigned char)data[i][idx];
 	  int vv = total[idx];
@@ -2080,18 +2080,18 @@ csArray<iImage*>& maps)
   csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
     object_reg, "crystalspace.shared.stringset");
 
-  if (maps.Length () != palette.Length ()-1)
+  if (maps.GetSize () != palette.GetSize ()-1)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
 	  "crystalspace.mesh.bruteblock",
 	  "There are %zd palette entries. That means there must be %zd alpha "
-	  "maps!", palette.Length (), palette.Length ()-1);
+	  "maps!", palette.GetSize (), palette.GetSize ()-1);
     return false;
   }
   size_t idx;
   csArray<csArray<char> > image_datas;
   int w = -1, h = -1;
-  for (idx = 0 ; idx < palette.Length ()-1 ; idx++)
+  for (idx = 0 ; idx < palette.GetSize ()-1 ; idx++)
   {
     iImage* map = maps[idx];
     int mw = map->GetWidth ();
@@ -2114,7 +2114,7 @@ csArray<iImage*>& maps)
     }
     const size_t mapSize = w * h;
     csArray<char> image_data;
-    image_data.SetLength (mapSize);
+    image_data.SetSize (mapSize);
     if (map->GetFormat () & CS_IMGFMT_PALETTED8)
     {
       uint8 *data = (uint8 *)map->GetImageData ();
@@ -2198,8 +2198,8 @@ bool csTerrainObject::SetCurrentMaterialMap (const csArray<char>& data,
   lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
   baseContext->AddVariable (lod_var);
 
-  globalMaterialsUsed.SetLength (0);
-  for (size_t i = 0; i < palette.Length(); i ++) 
+  globalMaterialsUsed.SetSize (0);
+  for (size_t i = 0; i < palette.GetSize (); i ++) 
   {
     csRef<iImage> alpha = csPtr<iImage> (new csImageMemory (w, h, 
       CS_IMGFMT_ALPHA | CS_IMGFMT_TRUECOLOR));
@@ -2267,7 +2267,7 @@ CS_DEPRECATED_METHOD bool csTerrainObject::SetMaterialMap (iImage* map)
 
   const size_t mapSize = map->GetWidth() * map->GetHeight();
   csArray<char> image_data;
-  image_data.SetLength (mapSize);
+  image_data.SetSize (mapSize);
   if (map->GetFormat () & CS_IMGFMT_PALETTED8)
   {
     uint8 *data = (uint8 *)map->GetImageData ();
@@ -2345,7 +2345,7 @@ bool csTerrainObject::SetLODValue (const char* parameter, float value)
   {
     lmres = int (value);
     if (staticlighting)
-      staticLights.SetLength (lmres * lmres);
+      staticLights.SetSize (lmres * lmres);
     return true;
   }
   return false;
@@ -2485,7 +2485,7 @@ bool csTerrainObject::DrawTest (iRenderView* rview, iMovable* movable,
   if (staticlighting)
     rootblock->UpdateStaticLighting ();
 
-  if (returnMeshes->Length () == 0)
+  if (returnMeshes->GetSize () == 0)
     return false;
 
   return true;
@@ -2505,7 +2505,7 @@ csRenderMesh** csTerrainObject::GetRenderMeshes (int &n,
 {
   SetupObject();
   DrawTest (rview, movable, frustum_mask);
-  n = (int)returnMeshes->Length ();
+  n = (int)returnMeshes->GetSize ();
   return returnMeshes->GetArray ();
 }
 
@@ -2810,7 +2810,7 @@ bool csTerrainObject::HitBeamObject (const csVector3& start,
     if (y < 0) y = 0; else if (y > materialMapH-1) y = materialMapH-1;
     size_t i;
     int idx = y * materialMapW + x;
-    for (i = 0 ; i < globalMaterialsUsed.Length () ; i++)
+    for (i = 0 ; i < globalMaterialsUsed.GetSize () ; i++)
     {
       const csBitArray& bits = globalMaterialsUsed[i];
       if (bits[idx])

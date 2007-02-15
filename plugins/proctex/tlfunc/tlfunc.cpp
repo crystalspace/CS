@@ -21,6 +21,7 @@
 #include "csqint.h"
 
 #include "csutil/csmd5.h"
+#include "csutil/documenthelper.h"
 #include "csutil/ref.h"
 #include "csutil/scfarray.h"
 #include "csutil/scf.h"
@@ -65,32 +66,6 @@ bool csFuncTexLoader::Initialize(iObjectRegistry *object_reg)
 {
   csFuncTexLoader::object_reg = object_reg;
   return true;
-}
-
-static void CrudeDocumentFlattener (iDocumentNode* node, csString& str)
-{
-  str << node->GetValue ();
-  csRef<iDocumentAttributeIterator> attrIter = node->GetAttributes ();
-  if (attrIter)
-  {
-    str << '[';
-    while (attrIter->HasNext())
-    {
-      csRef<iDocumentAttribute> attr = attrIter->Next();
-      str << attr->GetName () << '=' << attr->GetValue() << ',';
-    }
-    str << ']';
-  }
-  str << '(';
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  while (it->HasNext ())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () == CS_NODE_COMMENT) continue;
-    CrudeDocumentFlattener (child, str);
-    str << ',';
-  }
-  str << ')';
 }
 
 csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node, 
@@ -183,8 +158,7 @@ csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node,
 
   if (exprNode)
   {
-    csString flattened;
-    CrudeDocumentFlattener (exprNode, flattened);
+    csString flattened (CS::DocumentHelper::FlattenNode (exprNode));
 
     csMD5::Digest md5 (csMD5::Encode (flattened));
     cache_scope << md5.HexString ();

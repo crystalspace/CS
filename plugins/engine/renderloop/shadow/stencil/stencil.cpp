@@ -303,15 +303,15 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
 
     csHash<EdgeInfo*> edge_stack(new_triangle_count*3);
     csArray<EdgeInfo> edge_array;
-    edge_array.SetLength (new_triangle_count*3, EdgeInfo());
+    edge_array.SetSize (new_triangle_count*3, EdgeInfo());
     edge_count = 0;
     int NextEdge = 0;
     int TriIndex = 0;
 
-    face_normals.SetLength (new_triangle_count*3);
-    edge_indices.SetLength(new_triangle_count*9);
-    edge_normals.SetLength(new_triangle_count*3);
-    edge_midpoints.SetLength(new_triangle_count*3);
+    face_normals.SetSize (new_triangle_count*3);
+    edge_indices.SetSize (new_triangle_count*9);
+    edge_normals.SetSize (new_triangle_count*3);
+    edge_midpoints.SetSize (new_triangle_count*3);
 
     if (mesh->GetFlags ().Check (CS_POLYMESH_TRIANGLEMESH))
     {
@@ -523,7 +523,7 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
   iShader* shadow;
   if (!enableShadows || ((shadow = type->GetShadow ()) == 0))
   {
-    for (size_t i = 0; i < steps.Length (); i++)
+    for (size_t i = 0; i < steps.GetSize (); i++)
     {
       steps[i]->Perform (rview, sector, light, stacks);
     }
@@ -607,7 +607,7 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
   culler->VisTest (lightSphere, this);
 
   size_t numShadowMeshes;
-  if ((numShadowMeshes = shadowMeshes.Length ()) > 0)
+  if ((numShadowMeshes = shadowMeshes.GetSize ()) > 0)
   {
     csVector3 center;
     float maxRadius;
@@ -661,7 +661,7 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
 
   g3d->SetShadowState (CS_SHADOW_VOLUME_USE);
 
-  for (size_t i = 0; i < steps.Length (); i++)
+  for (size_t i = 0; i < steps.GetSize (); i++)
   {
     steps[i]->Perform (rview, sector, light, stacks);
   }
@@ -700,7 +700,7 @@ size_t csStencilShadowStep::Find (iRenderStep* step) const
 
 size_t csStencilShadowStep::GetStepCount () const
 {
-  return steps.Length();
+  return steps.GetSize ();
 }
 
 void csStencilShadowStep::ObjectVisible (

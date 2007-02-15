@@ -49,6 +49,8 @@
 #include "ivaria/reporter.h"
 #include "ivaria/view.h"
 #include "ivideo/graph3d.h"
+#include "igeom/decal.h"
+#include "ivideo/material.h"
 
 #include "bot.h"
 #include "command.h"
@@ -469,12 +471,12 @@ void WalkTest::del_bot (bool manual)
 {
   if (manual)
   {
-    if (manual_bots.Length () > 0)
+    if (manual_bots.GetSize () > 0)
       manual_bots.DeleteIndex (0);
   }
   else
   {
-    if (bots.Length () > 0)
+    if (bots.GetSize () > 0)
       bots.DeleteIndex (0);
   }
 }
@@ -482,7 +484,7 @@ void WalkTest::del_bot (bool manual)
 void WalkTest::move_bots (csTicks elapsed_time)
 {
   size_t i;
-  for (i = 0; i < bots.Length(); i++)
+  for (i = 0; i < bots.GetSize (); i++)
   {
     bots[i]->move (elapsed_time);
   }
@@ -748,6 +750,77 @@ void fire_missile ()
     sp->GetMovable ()->SetTransform (m);
     sp->GetMovable ()->UpdateMove ();
   }
+}
+
+void test_decal ()
+{
+  csRef<iDecalManager> decalMgr = csLoadPluginCheck<iDecalManager> (
+  	Sys->object_reg, "crystalspace.decal.manager");
+  if (!decalMgr)
+    return;
+
+  iMaterialWrapper * material = 
+    Sys->view->GetEngine()->GetMaterialList()->FindByName("decal");
+  if (!material)
+  {
+    csRef<iLoader> loader = csQueryRegistry<iLoader>(Sys->object_reg);
+    if (!loader)
+    {
+      Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, "Couldn't find iLoader");
+      return; 
+    }
+
+    if (!loader->LoadTexture ("decal", "/lib/std/cslogo2.png"))
+      Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, 
+                  "Couldn't load decal texture!");
+
+    material = Sys->view->GetEngine()->GetMaterialList()->FindByName("decal");
+    if (!material)
+    {
+      Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, 
+                  "Error finding decal material");
+      return;
+    }
+  }
+
+  // create a template for our new decal
+  csRef<iDecalTemplate> decalTemplate = 
+      decalMgr->CreateDecalTemplate(material);
+  decalTemplate->SetTimeToLive(5.0f);
+  
+  // figure out the starting point
+  csRef<iCollideSystem> cdsys = csQueryRegistry<iCollideSystem>(Sys->object_reg);
+  if (!cdsys)
+  {
+    Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, "Couldn't find iCollideSystem");
+    return;
+  }
+
+  csVector3 start = Sys->view->GetCamera()->GetTransform().GetOrigin();
+
+  csVector3 normal = 
+    Sys->view->GetCamera()->GetTransform().This2OtherRelative(
+	csVector3(0,0,-1));
+
+  csVector3 end = start - normal * 100.0f;
+
+  // intersect with world to get a decal position
+  csVector3 iSect;
+  csIntersectingTriangle closestTri;
+  iMeshWrapper * selMesh;
+  csColliderHelper::TraceBeam(cdsys, Sys->view->GetCamera()->GetSector(), 
+      start, end, true, closestTri, iSect, &selMesh);
+
+  start = iSect;
+
+  // make the up direction of the decal the same as the camera
+  csVector3 up =
+    Sys->view->GetCamera()->GetTransform().This2OtherRelative(
+	csVector3(0,1,0));
+
+  // create the decal
+  decalMgr->CreateDecal(decalTemplate, Sys->view->GetCamera()->GetSector(),
+	  start, up, normal, 1.0f, 0.5f);
 }
 
 void AttachRandomLight (iLight* light)

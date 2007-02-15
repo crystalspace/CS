@@ -2247,6 +2247,7 @@ sub DESTROY {
 *ComputePlane = *cspacec::csPoly3D_ComputePlane;
 *GetArea = *cspacec::csPoly3D_GetArea;
 *GetCenter = *cspacec::csPoly3D_GetCenter;
+*InSphere = *cspacec::csPoly3D_InSphere;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -3489,7 +3490,6 @@ sub new {
 }
 
 *GetSize = *cspacec::csPluginRequestArray_GetSize;
-*Length = *cspacec::csPluginRequestArray_Length;
 *Get = *cspacec::csPluginRequestArray_Get;
 *Push = *cspacec::csPluginRequestArray_Push;
 *Pop = *cspacec::csPluginRequestArray_Pop;
@@ -3506,6 +3506,7 @@ sub new {
 *__eq__ = *cspacec::csPluginRequestArray___eq__;
 *__ne__ = *cspacec::csPluginRequestArray___ne__;
 *GetAllocator = *cspacec::csPluginRequestArray_GetAllocator;
+*Length = *cspacec::csPluginRequestArray_Length;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -4750,11 +4751,9 @@ sub DESTROY {
 
 *Length = *cspacec::csPath_Length;
 *CalculateAtTime = *cspacec::csPath_CalculateAtTime;
-*Calculate = *cspacec::csPath_Calculate;
 *GetCurrentIndex = *cspacec::csPath_GetCurrentIndex;
 *GetTime = *cspacec::csPath_GetTime;
 *SetTime = *cspacec::csPath_SetTime;
-*SetTimeValue = *cspacec::csPath_SetTimeValue;
 *SetTimes = *cspacec::csPath_SetTimes;
 *GetTimes = *cspacec::csPath_GetTimes;
 *SetPositionVectors = *cspacec::csPath_SetPositionVectors;
@@ -4960,7 +4959,6 @@ sub new {
 }
 
 *GetSize = *cspacec::csIntArray_GetSize;
-*Length = *cspacec::csIntArray_Length;
 *Get = *cspacec::csIntArray_Get;
 *Put = *cspacec::csIntArray_Put;
 *Push = *cspacec::csIntArray_Push;
@@ -4978,6 +4976,7 @@ sub new {
 *__eq__ = *cspacec::csIntArray___eq__;
 *__ne__ = *cspacec::csIntArray___ne__;
 *GetAllocator = *cspacec::csIntArray_GetAllocator;
+*Length = *cspacec::csIntArray_Length;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -5020,7 +5019,6 @@ sub new {
 }
 
 *GetSize = *cspacec::csIntArrayArray_GetSize;
-*Length = *cspacec::csIntArrayArray_Length;
 *Get = *cspacec::csIntArrayArray_Get;
 *Put = *cspacec::csIntArrayArray_Put;
 *Push = *cspacec::csIntArrayArray_Push;
@@ -5037,6 +5035,7 @@ sub new {
 *__eq__ = *cspacec::csIntArrayArray___eq__;
 *__ne__ = *cspacec::csIntArrayArray___ne__;
 *GetAllocator = *cspacec::csIntArrayArray_GetAllocator;
+*Length = *cspacec::csIntArrayArray_Length;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -6737,6 +6736,10 @@ package cspace::iMeshWrapper;
 *AddMeshToStaticLOD = *cspacec::iMeshWrapper_AddMeshToStaticLOD;
 *RemoveMeshFromStaticLOD = *cspacec::iMeshWrapper_RemoveMeshFromStaticLOD;
 *GetSVContext = *cspacec::iMeshWrapper_GetSVContext;
+*AddExtraRenderMesh = *cspacec::iMeshWrapper_AddExtraRenderMesh;
+*GetExtraRenderMeshPriority = *cspacec::iMeshWrapper_GetExtraRenderMeshPriority;
+*GetExtraRenderMeshZBufMode = *cspacec::iMeshWrapper_GetExtraRenderMeshZBufMode;
+*RemoveExtraRenderMesh = *cspacec::iMeshWrapper_RemoveExtraRenderMesh;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -9121,6 +9124,7 @@ package cspace::iMeshObject;
 *GetMixMode = *cspacec::iMeshObject_GetMixMode;
 *InvalidateMaterialHandles = *cspacec::iMeshObject_InvalidateMaterialHandles;
 *PositionChild = *cspacec::iMeshObject_PositionChild;
+*BuildDecal = *cspacec::iMeshObject_BuildDecal;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -9478,7 +9482,6 @@ sub new {
 }
 
 *GetSize = *cspacec::csCharArrayArray_GetSize;
-*Length = *cspacec::csCharArrayArray_Length;
 *Get = *cspacec::csCharArrayArray_Get;
 *Put = *cspacec::csCharArrayArray_Put;
 *Push = *cspacec::csCharArrayArray_Push;
@@ -9496,6 +9499,7 @@ sub new {
 *__eq__ = *cspacec::csCharArrayArray___eq__;
 *__ne__ = *cspacec::csCharArrayArray___ne__;
 *GetAllocator = *cspacec::csCharArrayArray_GetAllocator;
+*Length = *cspacec::csCharArrayArray_Length;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -14605,9 +14609,7 @@ package cspace::iImage;
 *GetPalette = *cspacec::iImage_GetPalette;
 *GetAlpha = *cspacec::iImage_GetAlpha;
 *HasKeyColor = *cspacec::iImage_HasKeyColor;
-*HasKeycolor = *cspacec::iImage_HasKeycolor;
 *GetKeyColor = *cspacec::iImage_GetKeyColor;
-*GetKeycolor = *cspacec::iImage_GetKeycolor;
 *HasMipmaps = *cspacec::iImage_HasMipmaps;
 *GetMipmap = *cspacec::iImage_GetMipmap;
 *GetRawFormat = *cspacec::iImage_GetRawFormat;
@@ -14689,9 +14691,7 @@ sub DESTROY {
 *GetPalette = *cspacec::csImageBase_GetPalette;
 *GetAlpha = *cspacec::csImageBase_GetAlpha;
 *HasKeyColor = *cspacec::csImageBase_HasKeyColor;
-*HasKeycolor = *cspacec::csImageBase_HasKeycolor;
 *GetKeyColor = *cspacec::csImageBase_GetKeyColor;
-*GetKeycolor = *cspacec::csImageBase_GetKeycolor;
 *HasMipmaps = *cspacec::csImageBase_HasMipmaps;
 *GetMipmap = *cspacec::csImageBase_GetMipmap;
 *GetRawFormat = *cspacec::csImageBase_GetRawFormat;
@@ -14831,7 +14831,6 @@ sub new {
 }
 
 *GetSize = *cspacec::csImageIOFileFormatDescriptions_GetSize;
-*Length = *cspacec::csImageIOFileFormatDescriptions_Length;
 *Get = *cspacec::csImageIOFileFormatDescriptions_Get;
 *Put = *cspacec::csImageIOFileFormatDescriptions_Put;
 *Push = *cspacec::csImageIOFileFormatDescriptions_Push;
@@ -14849,6 +14848,7 @@ sub new {
 *__eq__ = *cspacec::csImageIOFileFormatDescriptions___eq__;
 *__ne__ = *cspacec::csImageIOFileFormatDescriptions___ne__;
 *GetAllocator = *cspacec::csImageIOFileFormatDescriptions_GetAllocator;
+*Length = *cspacec::csImageIOFileFormatDescriptions_Length;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);

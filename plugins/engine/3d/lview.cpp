@@ -170,7 +170,7 @@ void csShadowBlock::AddAllShadows (iShadowBlockList *source)
 void csShadowBlock::AddUniqueRelevantShadows (csShadowBlockList *source)
 {
   int i;
-  int cnt = (int)shadows.Length ();
+  int cnt = (int)shadows.GetSize ();
 
   csShadowIterator *shadow_it = source->GetCsShadowIterator ();
   while (shadow_it->HasNext ())
@@ -220,7 +220,7 @@ const csBox3& csShadowBlock::GetBoundingBox ()
   if (!bbox_valid)
   {
     bbox.StartBoundingBox ();
-    for (size_t i = 0 ; i < shadows.Length () ; i++)
+    for (size_t i = 0 ; i < shadows.GetSize () ; i++)
     {
       csShadowFrustum *sf = shadows[i];
       for (size_t j = 0 ; j < sf->GetVertexCount () ; j++)

@@ -85,29 +85,13 @@ public:
   {
     return spline.GetPointCount();
   }
-  /**
-   * Get the number of vector points in this spline.
-   * \deprecated Use Length() instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use Length() instead.")
-  int GetPointCount()
-  {
-    return Length();
-  }
+
   /// Calculate internal values for this spline given some time value.
   virtual void CalculateAtTime (float time)
   {
     spline.Calculate (time);
   }
-  /**
-   * Calculate internal values for this spline given some time value.
-   * \deprecated Use CalculateAtTime() instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use CalculateAtTime() instead.")
-  virtual void Calculate (float time)
-  {
-    CalculateAtTime(time);
-  }
+ 
   /// Get current index.
   virtual int GetCurrentIndex ()
   {
@@ -118,29 +102,13 @@ public:
   {
     return spline.GetTimeValue(idx);
   }
-  /**
-   * Get one time point.
-   * \deprecated Use GetTime() instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use GetTime() instead.")
-  float GetTimeValue (int idx) const
-  {
-    return spline.GetTimeValue(idx);
-  }
+  
   /// Set one time point.
   virtual void SetTime (int idx, float t)
   {
     spline.SetTimeValue(idx,t);
   }
-  /**
-   * Set one time point.
-   * \deprecated Use SetTime() instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use SetTime() instead.")
-  virtual void SetTimeValue (int idx, float t)
-  {
-    SetTime(idx, t);
-  }
+  
   /**
    * Set the time values. 't' should point to an array containing
    * 'num_points' values. These values typically start with 0 and end
@@ -151,29 +119,13 @@ public:
   {
     spline.SetTimeValues(t);
   }
-  /**
-   * Set the time values.
-   * \deprecated Use SetTimes() instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use SetTimes() instead.")
-  void SetTimeValues (float const* t)
-  {
-    SetTimes(t);
-  }
+ 
   /// Get the time values.
   float const* GetTimes () const
   {
     return spline.GetTimeValues();
   }
-  /**
-   * Get the time values.
-   * \deprecated Use GetTimes() instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use GetTimes() instead.")
-  float const* GetTimeValues () const
-  {
-    return GetTimes();
-  }
+  
   /// Set the position vectors (first three dimensions of the cubic spline).
   virtual void SetPositionVectors (csVector3* v)
   {

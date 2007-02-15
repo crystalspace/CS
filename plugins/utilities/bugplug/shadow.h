@@ -165,6 +165,12 @@ public:
    * does nothing.
    */
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
+
+  virtual void BuildDecal(const csVector3* pos, float decalRadius,
+	iDecalBuilder* decalBuilder)
+  {
+  }
+
 };
 
 #include "csutil/win32/msvc_deprecated_warn_on.h"

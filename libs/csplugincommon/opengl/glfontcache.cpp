@@ -73,7 +73,7 @@ csGLFontCache::~csGLFontCache ()
 
   statecache->SetTexture (GL_TEXTURE_2D, 0);
   size_t tex;
-  for (tex = 0; tex < textures.Length (); tex++)
+  for (tex = 0; tex < textures.GetSize (); tex++)
   {
     glDeleteTextures (1, &textures[tex].handle);
     if (!(afpText || multiTexText || intensityBlendText))
@@ -245,7 +245,7 @@ csGLFontCache::GlyphCacheData* csGLFontCache::InternalCacheGlyph (
       ((bmetrics.height + glyphAlign - 1) / glyphAlign) * glyphAlign;
   }*/
   size_t tex = 0;
-  while (tex < textures.Length ())
+  while (tex < textures.GetSize ())
   {
     sr = textures[tex].glyphRects->Alloc (allocWidth, allocHeight, 
       texRect);
@@ -255,10 +255,10 @@ csGLFontCache::GlyphCacheData* csGLFontCache::InternalCacheGlyph (
     }
     tex++;
   }
-  if ((sr == 0) && (textures.Length () < maxTxts))
+  if ((sr == 0) && (textures.GetSize () < maxTxts))
   {
-    tex = textures.Length ();
-    textures.SetLength (textures.Length () + 1);
+    tex = textures.GetSize ();
+    textures.SetSize (textures.GetSize () + 1);
 
     textures[tex].InitRects (texSize);
 
@@ -944,7 +944,7 @@ void csGLFontCache::FlushText ()
 
 void csGLFontCache::DumpFontCache (csRefArray<iImage>& pages)
 {
-  for (size_t t = 0; t < textures.Length(); t++)
+  for (size_t t = 0; t < textures.GetSize (); t++)
   {
     csRef<csImageMemory> page;
     page.AttachNew (new csImageMemory (texSize, texSize, 

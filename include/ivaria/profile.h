@@ -28,7 +28,9 @@
 #include "csutil/sysfunc.h"
 #include "csutil/threading/atomicops.h"
 
-#define CS_USE_PROFILER
+struct iObjectRegistry;
+
+//#define CS_USE_PROFILER
 
 namespace CS
 {
@@ -59,6 +61,7 @@ namespace Debug
   {
   public:
     // Methods
+
     ProfileCounter ()
       : counterName (0), counterValue (0)
     {
@@ -152,6 +155,18 @@ struct iProfiler : public virtual iBase
    * Get all profiler counters.
    */
   virtual const csArray<CS::Debug::ProfileCounter*>& GetProfileCounters () = 0;
+
+  /**
+   * Start logging profiling data to file.
+   * \param filenamebase path and basic portion of filename. This will be 
+   * postfixed with an unique id for every logging session.
+   */
+  virtual void StartLogging (const char* filenamebase, iObjectRegistry* objreg) = 0;
+
+  /**
+   * Stop logging.
+   */
+  virtual void StopLogging () = 0;
 };
 
 /**
@@ -208,6 +223,12 @@ CS::Debug::ProfilerZoneScope CS_DEBUG_Profiler_zone ## name ## __LINE__ \
   (CS_DEBUG_Profiler_GetProfileZone ## name());
 #define CS_PROFILER_COUNTER(name) \
 CS::Debug::ProfilerCounterAdd (CS_DEBUG_Profiler_GetProfileCounter ## name());
+#define CS_PROFILER_START_LOGGING(filebase, objectreg) \
+  CS_DEBUG_Profiler_GetProfiler ()->StartLogging (filebase, objectreg);
+#define CS_PROFILER_STOP_LOGGING() \
+  CS_DEBUG_Profiler_GetProfiler ()->StopLogging ();
+#define CS_PROFILER_RESET() \
+  CS_DEBUG_Profiler_GetProfiler ()->Reset ();
 #else
 
 #define CS_DECLARE_PROFILER 
@@ -216,7 +237,9 @@ CS::Debug::ProfilerCounterAdd (CS_DEBUG_Profiler_GetProfileCounter ## name());
 #define CS_PROFILER_GET_PROFILER (0)
 #define CS_PROFILER_ZONE(name)
 #define CS_PROFILER_COUNTER(name)
-
+#define CS_PROFILER_START_LOGGING(filebase, objectreg)
+#define CS_PROFILER_STOP_LOGGING()
+#define CS_PROFILER_RESET()
 #endif
 
 

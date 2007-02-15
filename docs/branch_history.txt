@@ -8,6 +8,8 @@ chronological order.
 
 This file describes the history of the SoC imposter branch.
 
+15-Feb-2007
+	- Jorrit merged 26314:26416 from trunk
 1-Feb-2007
 	- Jorrit merged 25383:25400 from trunk
 	- Jorrit merged 25401:25425 from trunk

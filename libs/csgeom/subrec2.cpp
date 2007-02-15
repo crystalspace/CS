@@ -464,7 +464,7 @@ csSubRectangles::SubRect* csSubRectangles::Alloc (int w, int h, csRect &rect)
 {
   csSubRectangles::SubRect::AllocInfo ai;
 
-  for (size_t i = 0; i < leaves.Length(); i++)
+  for (size_t i = 0; i < leaves.GetSize (); i++)
   {
     leaves[i]->TestAlloc (w, h, ai);
     if (ai.res && (ai.d == 0)) break;

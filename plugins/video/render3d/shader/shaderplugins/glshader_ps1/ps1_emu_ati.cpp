@@ -275,7 +275,7 @@ bool csShaderGLPS1_ATI::LoadProgramStringToGL ()
 
   size_t i;
 
-  for(i = 0; i < constants.Length(); i++)
+  for(i = 0; i < constants.GetSize (); i++)
   {
     const csPSConstant& constant = constants.Get (i);
 
@@ -311,7 +311,7 @@ bool csShaderGLPS1_ATI::LoadProgramStringToGL ()
       static uint programNum = 0;
       csString filename;
       filename.Format ("/tmp/shader/ps14conv%u.txt", programNum++);
-      if (vfs->WriteFile (filename, dump, dump.Length()))
+      if (vfs->WriteFile (filename, dump, dump.Length ()))
         Report (CS_REPORTER_SEVERITY_NOTIFY, 
 	  "Written conversion output to %s",
           filename.GetData());
@@ -330,7 +330,7 @@ bool csShaderGLPS1_ATI::LoadProgramStringToGL ()
 
   ext->glBeginFragmentShaderATI ();
 
-  for(i = 0; i < instrs->Length (); i++)
+  for(i = 0; i < instrs->GetSize (); i++)
   {
     if(!GetATIShaderCommand (parser, instrs->Get (i)))
     {

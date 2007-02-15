@@ -467,13 +467,13 @@ static uint LayerSourceToFlag (GLenum source)
 
 void csGLShaderFFP::CompactLayers()
 {
-  if (texlayers.Length() >= 2)
+  if (texlayers.GetSize () >= 2)
   {
-    CS_ALLOC_STACK_ARRAY(uint, layerUseFlags, texlayers.Length());
-    CS_ALLOC_STACK_ARRAY(int, layerMap, texlayers.Length());
-    memset (layerUseFlags, 0, sizeof (uint) * texlayers.Length());
+    CS_ALLOC_STACK_ARRAY(uint, layerUseFlags, texlayers.GetSize ());
+    CS_ALLOC_STACK_ARRAY(int, layerMap, texlayers.GetSize ());
+    memset (layerUseFlags, 0, sizeof (uint) * texlayers.GetSize ());
     size_t p;
-    for (p = 0; p < texlayers.Length(); p++)
+    for (p = 0; p < texlayers.GetSize (); p++)
     {
       const mtexlayer& tl = texlayers[p];
       int i;
@@ -491,7 +491,7 @@ void csGLShaderFFP::CompactLayers()
     mtexlayer nextlayer = texlayers[0];
     p = 0;
     size_t layerOfs = 0;
-    while (p+1 < texlayers.Length())
+    while (p+1 < texlayers.GetSize ())
     {
       // Check if used resources overlap
       if ((layerUseFlags[p] & layerUseFlags[p+1]) == 0)
@@ -552,7 +552,7 @@ void csGLShaderFFP::CompactLayers()
 
 #ifdef DUMP_LAYERS
   {
-    for (size_t i = 0; i < texlayers.Length(); i++)
+    for (size_t i = 0; i < texlayers.GetSize (); i++)
     {
       csPrintf ("Layer %zu:\n", i);
       const mtexlayer& tl = texlayers[i];
@@ -626,17 +626,17 @@ bool csGLShaderFFP::Compile ()
   csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (objectReg);
   g2d->PerformExtension ("getstatecache", &statecache);
 
-  if (texlayers.Length () > (size_t)maxlayers)
+  if (texlayers.GetSize () > (size_t)maxlayers)
     return false;
 
   // Don't support layers if the COMBINE ext isn't present
-  if ((!shaderPlug->enableCombine) && (texlayers.Length() > 0))
+  if ((!shaderPlug->enableCombine) && (texlayers.GetSize () > 0))
     return false;
 
   const bool hasDOT3 = ext->CS_GL_ARB_texture_env_dot3 || 
     ext->CS_GL_EXT_texture_env_dot3;
 
-  for(size_t i = 0; i < texlayers.Length(); ++i)
+  for(size_t i = 0; i < texlayers.GetSize (); ++i)
   {
     const mtexlayer& layer = texlayers[i];
     if (((layer.color.op == GL_DOT3_RGB_ARB) || 
@@ -689,7 +689,7 @@ void csGLShaderFFP::ActivateTexFunc (const mtexlayer::TexFunc& tf,
 
 void csGLShaderFFP::Activate ()
 {
-  for(size_t i = 0; i < texlayers.Length(); ++i)
+  for(size_t i = 0; i < texlayers.GetSize (); ++i)
   {
     statecache->SetCurrentTU ((int)i);
     statecache->ActivateTU (csGLStateCache::activateTexEnv);

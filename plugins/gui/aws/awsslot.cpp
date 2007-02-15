@@ -66,7 +66,7 @@ void awsSinkManager::RegisterSink (const char *name, iAwsSink *sink)
 
 bool awsSinkManager::RemoveSink (iAwsSink* sink)
 {
-  for (size_t i = 0; i < sinks.Length (); ++i)
+  for (size_t i = 0; i < sinks.GetSize (); ++i)
   {
     SinkMap *sm = sinks[i];
     if (sm->sink == sink)
@@ -81,7 +81,7 @@ bool awsSinkManager::RemoveSink (iAwsSink* sink)
 iAwsSink *awsSinkManager::FindSink (const char *_name)
 {
   unsigned long name = NameToId (_name);
-  for (size_t i = 0; i < sinks.Length (); ++i)
+  for (size_t i = 0; i < sinks.GetSize (); ++i)
   {
     SinkMap *sm = sinks[i];
     if (sm->name == name)
@@ -132,7 +132,7 @@ unsigned long awsSink::GetTriggerID (const char *_name)
   unsigned long name = NameToId (_name);
   sink_err=0;
 
-  for (size_t i = 0; i < triggers.Length (); ++i)
+  for (size_t i = 0; i < triggers.GetSize (); ++i)
   {
     TriggerMap *tm = triggers[i];
     if (tm->name == name)
@@ -147,7 +147,7 @@ void awsSink::HandleTrigger (int trigger, iAwsSource *source)
 {
   sink_err = 0;
 
-  if (triggers.Length () == 0)
+  if (triggers.GetSize () == 0)
   {
     sink_err = AWS_ERR_SINK_NO_TRIGGERS;
     return ;
@@ -184,7 +184,7 @@ iAwsComponent *awsSource::GetComponent ()
 
 bool awsSource::RegisterSlot (iAwsSlot *slot, unsigned long signal)
 {
-  size_t n = slots.Length();
+  size_t n = slots.GetSize ();
   for( size_t i = 0; i < n; ++i )
   {
     SlotSignalMap *ssm = slots.Get( i );
@@ -203,7 +203,7 @@ bool awsSource::RegisterSlot (iAwsSlot *slot, unsigned long signal)
 
 bool awsSource::UnregisterSlot (iAwsSlot *slot, unsigned long signal)
 {
-  for (size_t i = 0; i < slots.Length (); ++i)
+  for (size_t i = 0; i < slots.GetSize (); ++i)
   {
     SlotSignalMap *ssm = slots[i];
     if (ssm->signal == signal && ssm->slot == slot)
@@ -217,7 +217,7 @@ bool awsSource::UnregisterSlot (iAwsSlot *slot, unsigned long signal)
 
 void awsSource::Broadcast (uint32 signal)
 {
-  for (size_t i = 0; i < slots.Length (); ++i)
+  for (size_t i = 0; i < slots.GetSize (); ++i)
   {
     SlotSignalMap *ssm = slots[i];
     if (ssm->signal == signal)
@@ -245,7 +245,7 @@ void awsSlot::Connect (
 {
   source->RegisterSlot (this, signal);
 
-  for (size_t i = 0; i < stmap.Length (); ++i)
+  for (size_t i = 0; i < stmap.GetSize (); ++i)
   {
     SignalTriggerMap *stm = stmap[i];
     if (stm->signal == signal && stm->trigger == trigger && stm->sink == sink)
@@ -266,7 +266,7 @@ void awsSlot::Disconnect (
 {
   source->UnregisterSlot (this, signal);
 
-  for (size_t i = 0; i < stmap.Length (); ++i)
+  for (size_t i = 0; i < stmap.GetSize (); ++i)
   {
     SignalTriggerMap *stm = stmap[i];
     if (stm->signal == signal && stm->trigger == trigger && stm->sink == sink)
@@ -281,7 +281,7 @@ void awsSlot::Disconnect (
 
 void awsSlot::Emit (iAwsSource &source, unsigned long signal)
 {
-  for (size_t i = 0; i < stmap.Length (); ++i)
+  for (size_t i = 0; i < stmap.GetSize (); ++i)
   {
     SignalTriggerMap *stm = stmap[i];
     if (stm->signal == signal)

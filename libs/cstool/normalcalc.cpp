@@ -161,8 +161,8 @@ void csNormalCalculator::CalculateNormals (
   size_t i;
   size_t j;
 
-  mesh_normals.SetLength (mesh_vertices.Length ());
-  size_t num_triangles = mesh_triangles.Length ();
+  mesh_normals.SetSize (mesh_vertices.GetSize ());
+  size_t num_triangles = mesh_triangles.GetSize ();
   csTriangle* tris;
   csVector3* new_verts;
   size_t new_num_verts;
@@ -172,7 +172,7 @@ void csNormalCalculator::CalculateNormals (
   if (do_compress)
   {
     compressed = CompressVertices (mesh_vertices.GetArray (),
-      mesh_vertices.Length (),
+      mesh_vertices.GetSize (),
       new_verts, new_num_verts,
       mesh_triangles.GetArray (), num_triangles, tris,
       mapping);
@@ -181,7 +181,7 @@ void csNormalCalculator::CalculateNormals (
   {
     compressed = false;
     new_verts = mesh_vertices.GetArray ();
-    new_num_verts = mesh_vertices.Length ();
+    new_num_verts = mesh_vertices.GetSize ();
     tris = mesh_triangles.GetArray ();
     mapping = 0;
   }
@@ -231,7 +231,7 @@ void csNormalCalculator::CalculateNormals (
   if (compressed)
   {
     // Translate the mapped normal table back to the original table.
-    for (j = 0 ; j < mesh_vertices.Length () ; j++)
+    for (j = 0 ; j < mesh_vertices.GetSize () ; j++)
     {
       mesh_normals[j] = new_normals[mapping[j]];
     }

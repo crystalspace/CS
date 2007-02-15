@@ -279,7 +279,7 @@ void HeightMapGen::Start ()
   int heightmap_res = cfgmgr->GetInt ("HeightMapGen.HeightmapResolution", 513);
   int num_texture_layers = cfgmgr->GetInt ("HeightMapGen.NumTextureLayers", 3);
   csArray<TextureLayer> txt_layers;
-  txt_layers.SetLength (num_texture_layers);
+  txt_layers.SetSize (num_texture_layers);
   int i;
   for (i = 0 ; i < num_texture_layers ; i++)
   {

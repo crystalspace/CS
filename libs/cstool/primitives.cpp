@@ -30,9 +30,9 @@ void csPrimitives::GenerateBox (
       csDirtyAccessArray<csVector3>& mesh_normals,
       csDirtyAccessArray<csTriangle>& mesh_triangles)
 {
-  mesh_vertices.SetLength (24);
-  mesh_texels.SetLength (24);
-  mesh_normals.SetLength (24);
+  mesh_vertices.SetSize (24);
+  mesh_texels.SetSize (24);
+  mesh_normals.SetSize (24);
   csVector3* vertices = mesh_vertices.GetArray ();
   vertices[0].Set(box.MinX(), box.MaxY(), box.MinZ());
   vertices[1].Set(box.MinX(), box.MaxY(), box.MinZ());
@@ -101,7 +101,7 @@ void csPrimitives::GenerateBox (
   texels[22].Set(1, 1); // 3
   texels[23].Set(0, 1); // 6
 
-  mesh_triangles.SetLength (12);
+  mesh_triangles.SetSize (12);
   csTriangle* triangles = mesh_triangles.GetArray ();
   triangles[0].a = 0; triangles[0].b = 9; triangles[0].c = 18;
   triangles[1].a = 0; triangles[1].b = 18; triangles[1].c = 21;
@@ -162,10 +162,10 @@ void csPrimitives::GenerateQuad (const csVector3 &v1, const csVector3 &v2,
                           csDirtyAccessArray<csVector3>& mesh_normals,
                           csDirtyAccessArray<csTriangle>& mesh_triangles)
 {
-  mesh_vertices.SetLength (4);
-  mesh_texels.SetLength (4);
-  mesh_normals.SetLength (4);
-  mesh_triangles.SetLength (4);
+  mesh_vertices.SetSize (4);
+  mesh_texels.SetSize (4);
+  mesh_normals.SetSize (4);
+  mesh_triangles.SetSize (4);
 
   mesh_normals[0] = mesh_vertices[0] = v1;
   mesh_normals[1] = mesh_vertices[1] = v2;
@@ -394,7 +394,7 @@ void csPrimitives::GenerateSphere (const csEllipsoid& ellips, int num,
     }
 
   // Scale and shift all the vertices.
-  mesh_normals.SetLength (num_vertices);
+  mesh_normals.SetSize (num_vertices);
   const csVector3& sphere_radius = ellips.GetRadius ();
   for (i = 0 ; i < num_vertices ; i++)
   {
@@ -416,8 +416,8 @@ void csPrimitives::GenerateSphere (const csEllipsoid& ellips, int num,
     }
   }
 
-  mesh_vertices.SetLength (num_vertices);
-  mesh_texels.SetLength (num_vertices);
+  mesh_vertices.SetSize (num_vertices);
+  mesh_texels.SetSize (num_vertices);
   csVector3* genmesh_vertices = mesh_vertices.GetArray ();
   memcpy (genmesh_vertices, vertices.GetArray (),
       sizeof(csVector3)*num_vertices);
@@ -426,7 +426,7 @@ void csPrimitives::GenerateSphere (const csEllipsoid& ellips, int num,
   memcpy (genmesh_texels, uvverts.GetArray (),
       sizeof(csVector2)*num_vertices);
 
-  mesh_triangles.SetLength (num_triangles);
+  mesh_triangles.SetSize (num_triangles);
   csTriangle* ball_triangles = mesh_triangles.GetArray ();
   memcpy (ball_triangles, triangles.GetArray (),
       sizeof(csTriangle)*num_triangles);

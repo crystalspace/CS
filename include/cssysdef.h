@@ -214,12 +214,13 @@ class csString;
 
 namespace CS
 {
-namespace Platform
-{
-  csString GetTempDirectory ();
+  namespace Macros
+  {
+    CS_DEPRECATED_METHOD_MSG("Use CS::Platform::GetTempDirectory () from "
+      "syspath.h") CS_CRYSTALSPACE_EXPORT csString CS_TEMP_DIR ();
+  }
 }
-}
-#  define CS_TEMP_DIR CS::Platform::GetTempDirectory ().GetDataSafe()
+#  define CS_TEMP_DIR CS::Macros::CS_TEMP_DIR.GetDataSafe()
 #endif
 
 
@@ -229,14 +230,16 @@ namespace Platform
  */
 #ifndef CS_TEMP_FILE
 class csString;
+
 namespace CS
 {
-namespace Platform
-{
-  csString GetTempFilename (const char* p = 0);
+  namespace Macros
+  {
+    CS_DEPRECATED_METHOD_MSG("Use CS::Platform::GetTempFilename () from "
+      "syspath.h") CS_CRYSTALSPACE_EXPORT csString CS_TEMP_FILE ();
+  }
 }
-}
-#  define CS_TEMP_FILE CS::Platform::GetTempFilename ().GetDataSafe()
+#  define CS_TEMP_FILE CS::Macros::CS_TEMP_FILE.GetDataSafe()
 #endif
 
 /**\def CS_HAVE_POSIX_MMAP

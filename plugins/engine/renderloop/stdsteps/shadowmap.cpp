@@ -328,7 +328,7 @@ void csShadowmapRenderStep::Perform (iRenderView* rview, iSector* sector,
 
       mesh_list->Empty();
 
-      for (size_t i = 0; i < lightMeshes.Length() ;i++)
+      for (size_t i = 0; i < lightMeshes.GetSize () ;i++)
       {
 	int num;
 	uint32 frustum_mask = 0;
@@ -344,8 +344,8 @@ void csShadowmapRenderStep::Perform (iRenderView* rview, iSector* sector,
 
       size_t num = mesh_list->SortMeshLists (rview);
 
-      render_meshes.SetLength(num);
-      mesh_wrappers.SetLength(num);
+      render_meshes.SetSize (num);
+      mesh_wrappers.SetSize (num);
 
       mesh_list->GetSortedMeshes (render_meshes.GetArray(), mesh_wrappers.GetArray());
 

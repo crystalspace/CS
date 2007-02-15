@@ -414,7 +414,7 @@ public:
   iAwsKey* GetAt (int i) const { return children[i]; }
 
   /// Returns number of childrens.
-  int Length () const { return (int)children.Length (); }
+  int Length () const { return (int)children.GetSize (); }
     
   /// Removes an item from the container.
   void Remove (iString *name);
@@ -720,7 +720,7 @@ public:
   void RemoveAllWindowDefs ()
   {
     size_t i;
-    for (i = 0; i < win_defs.Length (); i++)
+    for (i = 0; i < win_defs.GetSize (); i++)
       win_defs[i]->RemoveAll ();
     win_defs.DeleteAll ();
   }
@@ -743,7 +743,7 @@ public:
   void RemoveAllSkinDefs ()
   {
     size_t i;
-    for (i = 0; i < skin_defs.Length (); i++)
+    for (i = 0; i < skin_defs.GetSize (); i++)
       skin_defs[i]->RemoveAll ();
     skin_defs.DeleteAll ();
   }

@@ -201,7 +201,7 @@ iCameraPosition *csCameraPositionList::NewCameraPosition (const char *name)
 
 int csCameraPositionList::GetCount () const
 {
-  return (int)positions.Length ();
+  return (int)positions.GetSize ();
 }
 
 iCameraPosition *csCameraPositionList::Get (int n) const
@@ -768,11 +768,11 @@ void csEngine::RegisterRenderPriority (
 
   // If our priority goes over the number of defined priorities
   // then we have to initialize.
-  size_t old_pri_len = renderPriorities.Length ();
-  if ((size_t)(priority + 1) >= renderPrioritySortflag.Length ())
+  size_t old_pri_len = renderPriorities.GetSize ();
+  if ((size_t)(priority + 1) >= renderPrioritySortflag.GetSize ())
   {
-    renderPrioritySortflag.SetLength (priority + 2);
-    renderPriorities.SetLength (priority+2);
+    renderPrioritySortflag.SetSize (priority + 2);
+    renderPriorities.SetSize (priority+2);
   }
   for (i = (int)old_pri_len; i <= priority; i++)
   {
@@ -800,7 +800,7 @@ void csEngine::UpdateStandardRenderPriorities ()
 long csEngine::GetRenderPriority (const char *name) const
 {
   size_t i;
-  for (i = 0; i < renderPriorities.Length (); i++)
+  for (i = 0; i < renderPriorities.GetSize (); i++)
   {
     const char *n = renderPriorities[i];
     if (n && !strcmp (name, n)) return (long)i;
@@ -812,7 +812,7 @@ long csEngine::GetRenderPriority (const char *name) const
 csRenderPrioritySorting csEngine::GetRenderPrioritySorting (const char *name) const
 {
   size_t i;
-  for (i = 0; i < renderPriorities.Length (); i++)
+  for (i = 0; i < renderPriorities.GetSize (); i++)
   {
     const char *n = renderPriorities[i];
     if (n && !strcmp (name, n)) return renderPrioritySortflag[i];
@@ -830,7 +830,7 @@ void csEngine::ClearRenderPriorities ()
 {
   renderPrioritiesDirty = true;
   renderPriorities.DeleteAll ();
-  renderPrioritySortflag.SetLength (0);
+  renderPrioritySortflag.SetSize (0);
   RegisterRenderPriority ("init", 1);
   RegisterRenderPriority ("sky", 2);
   RegisterRenderPriority ("sky2", 3);
@@ -846,12 +846,12 @@ void csEngine::ClearRenderPriorities ()
 
 int csEngine::GetRenderPriorityCount () const
 {
-  return (int)renderPriorities.Length ();
+  return (int)renderPriorities.GetSize ();
 }
 
 const char* csEngine::GetRenderPriorityName (long priority) const
 {
-  if (priority < 0 && (size_t)priority >= renderPriorities.Length ()) 
+  if (priority < 0 && (size_t)priority >= renderPriorities.GetSize ()) 
     return 0;
   return renderPriorities[priority];
 }
@@ -880,7 +880,7 @@ void csEngine::PrepareTextures ()
   iTextureManager *txtmgr = G3D->GetTextureManager ();
 
   // First register all textures to the texture manager.
-  for (i = 0; i < textures->Length (); i++)
+  for (i = 0; i < textures->GetSize (); i++)
   {
     iTextureWrapper *csth = textures->Get ((int)i);
     if (!csth->GetTextureHandle ()) csth->Register (txtmgr);
@@ -1209,7 +1209,7 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
         else
           if (!linfo->ReadFromCache (cm))
 	  {
-	    if (failed_meshes.Length () < max_failed_meshes)
+	    if (failed_meshes.GetSize () < max_failed_meshes)
 	      failed_meshes.Push (s);
 	    failed++;
           }
@@ -1223,11 +1223,11 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
     Warn ("Couldn't load cached lighting for %zu object(s). Use -relight to calculate lighting:",
 	  failed);
     size_t i;
-    for (i = 0 ; i < failed_meshes.Length () ; i++)
+    for (i = 0 ; i < failed_meshes.GetSize () ; i++)
     {
       Warn ("    %s", failed_meshes[i]->QueryObject ()->GetName ());
     }
-    if (failed_meshes.Length () < failed)
+    if (failed_meshes.GetSize () < failed)
       Warn ("    ...");
   }
 
@@ -1360,7 +1360,7 @@ void csEngine::PrecacheDraw (iRegion* region)
   }
 
   size_t i;
-  for (i = 0 ; i < textures->Length () ; i++)
+  for (i = 0 ; i < textures->GetSize () ; i++)
   {
     iTextureWrapper* txt = textures->Get ((int)i);
     if (txt->GetTextureHandle ())
@@ -1443,10 +1443,10 @@ void csEngine::Draw (iCamera *c, iClipper2D *view, iMeshWrapper* mesh)
   }
 
   // draw all halos on the screen
-  if (halos.Length () > 0)
+  if (halos.GetSize () > 0)
   {
     csTicks elapsed = virtualClock->GetElapsedTicks ();
-    size_t halo = halos.Length ();
+    size_t halo = halos.GetSize ();
     while (halo-- > 0)
       if (!halos[halo]->Process (elapsed, c, this))
 	halos.DeleteIndex (halo);
@@ -1615,7 +1615,7 @@ void csEngine::AddHalo (iCamera* camera, csLight *Light)
 void csEngine::RemoveHalo (csLight *Light)
 {
   size_t i;
-  for (i = 0 ; i < halos.Length () ; i++)
+  for (i = 0 ; i < halos.GetSize () ; i++)
   {
     csLightHalo* lh = halos[i];
     if (lh->Light == Light)
@@ -1670,7 +1670,7 @@ void csEngine::ControlMeshes ()
   // Delete all objects that should be removed given the current
   // time.
   csTicks current = virtualClock->GetCurrentTicks ();
-  while (delayedRemoves.Length () > 0
+  while (delayedRemoves.GetSize () > 0
       && delayedRemoves.Top ().time_to_delete <= current)
   {
     csDelayedRemoveObject ro = delayedRemoves.Pop ();
@@ -2361,7 +2361,7 @@ static void HandleStaticLOD (csMeshWrapper* cmesh, const csVector3& pos,
   size_t i;
   // @@@ We assume here that there will be no portals as children.
   // This is perhaps a bad assumption.
-  for (i = 0 ; i < meshes.Length () ; i++)
+  for (i = 0 ; i < meshes.GetSize () ; i++)
     list.Push (meshes[i]);
 }
 
@@ -2729,7 +2729,7 @@ void csEngine::RemoveEngineFrameCallback (iEngineFrameCallback* cb)
 
 void csEngine::FireStartFrame (iRenderView* rview)
 {
-  size_t i = frameCallbacks.Length ();
+  size_t i = frameCallbacks.GetSize ();
   while (i > 0)
   {
     i--;
@@ -2749,7 +2749,7 @@ void csEngine::RemoveEngineSectorCallback (iEngineSectorCallback* cb)
 
 void csEngine::FireNewSector (iSector* sector)
 {
-  size_t i = sectorCallbacks.Length ();
+  size_t i = sectorCallbacks.GetSize ();
   while (i > 0)
   {
     i--;
@@ -2759,7 +2759,7 @@ void csEngine::FireNewSector (iSector* sector)
 
 void csEngine::FireRemoveSector (iSector* sector)
 {
-  size_t i = sectorCallbacks.Length ();
+  size_t i = sectorCallbacks.GetSize ();
   while (i > 0)
   {
     i--;
@@ -2963,7 +2963,7 @@ iShader* EngineLoaderContext::FindShader (const char* name)
   const csRefArray<iShader>& shaders = 
     Engine->shaderManager->GetShaders ();
   size_t i;
-  for (i = 0 ; i < shaders.Length () ; i++)
+  for (i = 0 ; i < shaders.GetSize () ; i++)
   {
     iShader* s = shaders[i];
     if (region->IsInRegion (s->QueryObject ())
@@ -3277,7 +3277,7 @@ void csEngine::RemoveDelayedRemoves (bool remove)
 {
   if (remove)
   {
-    while (delayedRemoves.Length () > 0)
+    while (delayedRemoves.GetSize () > 0)
     {
       csDelayedRemoveObject ro = delayedRemoves.Pop ();
       RemoveObject (ro.object);

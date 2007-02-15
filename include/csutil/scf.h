@@ -212,7 +212,7 @@ void Class::DecRef ()							\
 void Class::scfRemoveRefOwners ()					\
 {									\
   if (!scfWeakRefOwners) return;					\
-  for (size_t i = 0 ; i < scfWeakRefOwners->Length () ; i++)		\
+  for (size_t i = 0 ; i < scfWeakRefOwners->GetSize () ; i++)		\
   {									\
     void** p = (*scfWeakRefOwners)[i];					\
     *p = 0;								\

@@ -189,7 +189,7 @@ void csGenmeshSkelAnimationControl::Update (csTicks current)
   csRef<csShaderVariable> _bones = mesh_obj->GetMeshWrapper()->GetSVContext ()->GetVariable (bones_name);
   if (_bones.IsValid())
   {
-    for (size_t i=0; i< used_bones.Length(); ++i)
+    for (size_t i=0; i< used_bones.GetSize (); ++i)
     {
       int bone_idx = used_bones[i];
       csReversibleTransform offset_tr = 
@@ -211,9 +211,9 @@ void csGenmeshSkelAnimationControl::Update (csTicks current)
     _bones.AttachNew(new csShaderVariable(bones_name));
     _bones->SetType (csShaderVariable::ARRAY);
 
-    _bones->SetArraySize (used_bones.Length()*2);
+    _bones->SetArraySize (used_bones.GetSize ()*2);
 
-    for (size_t i=0; i< used_bones.Length(); ++i)
+    for (size_t i=0; i< used_bones.GetSize (); ++i)
     {
       int bone_idx = used_bones[i];
       csReversibleTransform offset_tr = 
@@ -306,7 +306,7 @@ CreateAnimationControl (iMeshObject *mesh)
   csGenmeshSkelAnimationControl* ctrl = new csGenmeshSkelAnimationControl (this, mesh, object_reg);
 
   size_t i;
-  for (i = 0 ; i < autorun_scripts.Length () ; i++)
+  for (i = 0 ; i < autorun_scripts.GetSize () ; i++)
     ctrl->GetSkeleton()->Execute (autorun_scripts[i]);
   return csPtr<iGenMeshAnimationControl> (ctrl);
 }

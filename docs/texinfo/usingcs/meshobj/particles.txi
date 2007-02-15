@@ -106,10 +106,9 @@ Velocity to position integration mode. Valid values are
 @item <commondirection x="" y="" z="" />
 Set common direction. Common direction is used as a reference direction for
 billboard setup for a few particle billboard orientations.
-@item <localmode>yes/no</localmode>
-Set if particle system should be in local or global mode. In local mode the
-positions of emitters and particles are relative to the particles mesh, while
-in global mode they are world space.
+@item <transformmode>tmode</transformmode>
+Set the transform mode of the particle system and thereby the coordinate systems
+used. Valid values are @samp{local}, @samp{localemitter}, @samp{world}.
 @item <individualsize>yes/no</individualsize>
 Determin if particle rendering should use the individual size associated with 
 each particle, or if the global <particlesize> property should be used.
@@ -292,7 +291,11 @@ only the magnitude should be used and direction should be emitter-specific.
 
 @item @code{<initialvelocity x="" y="" z=""/>}
 @tab @samp{all}
-@tab Set initial velocity vector.
+@tab Set initial linear velocity vector.
+
+@item @code{<initialangularvelocity x="" y="" z=""/>}
+@tab @samp{all}
+@tab Set initial angular velocity vector.
 
 @item @code{<radius>rad</radius>}
 @tab @samp{sphere}, @samp{cylinder}
@@ -327,6 +330,7 @@ The built in effectors are also loadable via the normal particle loader using
 @itemize @bullet
 @item @samp{force}
 @item @samp{lincolor}
+@item @samp{forcefield}
 @end itemize
 
 @samp{Force} effector loader recognize following keywords:
@@ -337,6 +341,8 @@ Add a constant acceleration to particles. Useful for example for gravity.
 Add a constant force to particles.
 @item <randomacceleration>mag</randomacceleration>
 Add a random acceleration with given magnitude.
+@item <randomacceleration x="" y="" z="" />
+Add a random acceleration with given magnitude in the form of a vector.
 @end table
 
 @samp{Lincolor} effector sets the color of particles based on their remaning
@@ -347,3 +353,20 @@ TTL. It takes a fixed number of "keypoints" and then interpolates between them.
 Set a keypoint color at given time.
 @end table
 
+@samp{Velocityfield} effector is a more complicated and resource using way of giving
+intricate movements to the particles. It works by taking a function defining
+the velocity of particles as a function of position and time. It then integrates
+to the new particle positions. Each function can take a number of vector and
+scalar parameters that affects their output
+To be noted is that @samp{velocityfield} effector does not change the particle
+velocities, so any "external" movement will be integrated as normally.
+@samp{Velocityfield} effector loader recognize following keywords:
+@table @code
+@item <type>field-type</type>
+Set the field function. Currently supported values are @samp{spiral} and 
+@samp{radialpoint}.
+@item <fparam>value</fparam>
+Specify a scalar parameter.
+@item <vparam x="" y="" z="" />
+Specify a vector parameter.
+@end table

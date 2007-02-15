@@ -824,7 +824,7 @@ void awsNotebookButtonBar::DoLayout ()
 
   r = Frame ();
 
-  for (i=MAX(first,0); i < vTabs.Length (); i++)
+  for (i=MAX(first,0); i < vTabs.GetSize (); i++)
   {
     awsNotebookButton *btn = vTabs.Get (i)->button;
     csRect br =  btn->Frame ();
@@ -879,7 +879,7 @@ bool awsNotebookButtonBar::Add (iAwsComponent *comp)
   {
     if (str) str->DecRef ();
     csString theCap ("Tab ");
-    theCap += (uint)vTabs.Length ()+1;
+    theCap += (uint)vTabs.GetSize ()+1;
     str = new scfString ((const char*)theCap);
   }
 
@@ -908,7 +908,7 @@ bool awsNotebookButtonBar::Add (iAwsComponent *comp)
 
   // resize button
   csRect r(btn->getPreferredSize ());
-  int last = (int)vTabs.Length ();
+  int last = (int)vTabs.GetSize ();
   if (r.Height () > Frame ().Height())
   {
     int delta = r.Height () - Frame ().Height ();
@@ -958,14 +958,14 @@ bool awsNotebookButtonBar::Remove (iAwsComponent *comp)
   if (idx != csArrayItemNotFound)
   {
     if (idx == (size_t)active)
-      if (vTabs.Length () - 1 == (size_t)active)
+      if (vTabs.GetSize () - 1 == (size_t)active)
         Activate (active-1);
       else
         Activate (active+1);
 
     vTabs.Get (first)->button->SetFirst (false);
     if ((idx < (size_t)first) || (idx == (size_t)first && 
-      (first > 0 || vTabs.Length () < 2)))
+      (first > 0 || vTabs.GetSize () < 2)))
       first--;
 
     if (first > -1)
@@ -1018,11 +1018,11 @@ void awsNotebookButtonBar::OnDraw (csRect)
 
 void awsNotebookButtonBar::ScrollLeft ()
 {
-  if (vTabs.Length () && (size_t)first != vTabs.Length ()-1)
+  if (vTabs.GetSize () && (size_t)first != vTabs.GetSize ()-1)
   {
     int xdelta = vTabs.Get (first)->button->Frame ().Width ()+1;
     vTabs.Get (first)->button->SetFirst (false);
-    for (size_t i = 0; i < vTabs.Length (); i++)
+    for (size_t i = 0; i < vTabs.GetSize (); i++)
     {
       awsNotebookButton *btn = vTabs.Get (i)->button;
       csRect f = btn->Frame ();
@@ -1039,11 +1039,11 @@ void awsNotebookButtonBar::ScrollLeft ()
 
 void awsNotebookButtonBar::ScrollRight ()
 {
-  if (vTabs.Length () && first != 0)
+  if (vTabs.GetSize () && first != 0)
   {
     int xdelta = vTabs.Get (first-1)->button->Frame ().Width ()+1;
     vTabs.Get (first)->button->SetFirst (false);
-    for (size_t i=0; i < vTabs.Length (); i++)
+    for (size_t i=0; i < vTabs.GetSize (); i++)
     {
       awsNotebookButton *btn = vTabs.Get (i)->button;
       csRect f = btn->Frame ();

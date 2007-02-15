@@ -88,7 +88,7 @@ bool csAnimControlRunnable::Do (csTicks current, bool& stop)
   //-------
   // Perform all running colors.
   //-------
-  size_t i = colors.Length ();
+  size_t i = colors.GetSize ();
   while (i > 0)
   {
     i--;
@@ -109,7 +109,7 @@ bool csAnimControlRunnable::Do (csTicks current, bool& stop)
   //-------
   // Perform all running moves.
   //-------
-  i = moves.Length ();
+  i = moves.GetSize ();
   while (i > 0)
   {
     i--;
@@ -130,7 +130,7 @@ bool csAnimControlRunnable::Do (csTicks current, bool& stop)
   //-------
   // Perform all running scales.
   //-------
-  i = scales.Length ();
+  i = scales.GetSize ();
   while (i > 0)
   {
     i--;
@@ -158,7 +158,7 @@ bool csAnimControlRunnable::Do (csTicks current, bool& stop)
   //-------
   // Perform all running rotates.
   //-------
-  i = rotates.Length ();
+  i = rotates.GetSize ();
   while (i > 0)
   {
     i--;
@@ -362,7 +362,7 @@ void csGenmeshAnimationControl::UpdateAnimation (csTicks current,
   if (current != last_update_time)
   {
     last_update_time = current;
-    size_t i = running_scripts.Length ();
+    size_t i = running_scripts.GetSize ();
     while (i > 0)
     {
       i--;
@@ -423,30 +423,30 @@ const csVector3* csGenmeshAnimationControl::UpdateVertices (csTicks current,
     const csPDelArray<csAnimControlGroup>& groups = factory->GetGroups ();
     size_t i;
 
-    if (groups.Length () > group_transforms.Length ())
-      group_transforms.SetLength (groups.Length ());
+    if (groups.GetSize () > group_transforms.GetSize ())
+      group_transforms.SetSize (groups.GetSize ());
 
     if (factory->HasHierarchicalGroups ())
-      for (i = 0 ; i < groups.Length () ; i++)
+      for (i = 0 ; i < groups.GetSize () ; i++)
         group_transforms[i] = groups[i]->GetFullTransform ();
     else
-      for (i = 0 ; i < groups.Length () ; i++)
+      for (i = 0 ; i < groups.GetSize () ; i++)
         group_transforms[i] = groups[i]->GetTransform ();
 
     const csArray<csArray<ac_group_data> >& groups_vertices = factory
     	->GetGroupsVerticesMapping ();
     for (i = 0 ; i < (size_t)num_verts ; i++)
     {
-      if (i >= groups_vertices.Length ())
+      if (i >= groups_vertices.GetSize ())
         animated_verts[i] = verts[i];
       else
       {
         const csArray<ac_group_data>& vtgr = groups_vertices[i];
-	if (vtgr.Length () == 0)
+	if (vtgr.GetSize () == 0)
 	{
 	  animated_verts[i] = verts[i];
 	}
-        else if (vtgr.Length () == 1)
+        else if (vtgr.GetSize () == 1)
 	{
 	  csReversibleTransform& transform = group_transforms[vtgr[0].idx];
 	  animated_verts[i] = transform.Other2This (verts[i]);
@@ -457,7 +457,7 @@ const csVector3* csGenmeshAnimationControl::UpdateVertices (csTicks current,
 	  float total_weight = vtgr[0].weight;
 	  csVector3 orig = vtgr[0].weight * transform.Other2This (verts[i]);
 	  size_t j;
-	  for (j = 1 ; j < vtgr.Length () ; j++)
+	  for (j = 1 ; j < vtgr.GetSize () ; j++)
 	  {
 	    csReversibleTransform& transform2 = group_transforms[vtgr[j].idx];
 	    total_weight += vtgr[j].weight;
@@ -502,30 +502,30 @@ const csColor4* csGenmeshAnimationControl::UpdateColors (csTicks current,
     const csPDelArray<csAnimControlGroup>& groups = factory->GetGroups ();
     size_t i;
 
-    if (groups.Length () > group_colors.Length ())
-      group_colors.SetLength (groups.Length ());
+    if (groups.GetSize () > group_colors.GetSize ())
+      group_colors.SetSize (groups.GetSize ());
 
     if (factory->HasHierarchicalGroups ())
-      for (i = 0 ; i < groups.Length () ; i++)
+      for (i = 0 ; i < groups.GetSize () ; i++)
         group_colors[i] = groups[i]->GetFullColor ();
     else
-      for (i = 0 ; i < groups.Length () ; i++)
+      for (i = 0 ; i < groups.GetSize () ; i++)
         group_colors[i] = groups[i]->GetColor ();
 
     const csArray<csArray<ac_group_data> >& gc = factory
     	->GetGroupsColorsMapping ();
     for (i = 0 ; i < (size_t)num_colors ; i++)
     {
-      if (i >= gc.Length ())
+      if (i >= gc.GetSize ())
         animated_colors[i] = colors[i];
       else
       {
         const csArray<ac_group_data>& vtgr = gc[i];
-	if (vtgr.Length () == 0)
+	if (vtgr.GetSize () == 0)
 	{
 	  animated_colors[i] = colors[i];
 	}
-        else if (vtgr.Length () == 1)
+        else if (vtgr.GetSize () == 1)
 	{
 	  csColor4& color = group_colors[vtgr[0].idx];
 	  animated_colors[i] = color * colors[i];
@@ -536,7 +536,7 @@ const csColor4* csGenmeshAnimationControl::UpdateColors (csTicks current,
 	  float total_weight = vtgr[0].weight;
 	  csColor4 orig = vtgr[0].weight * color * colors[i];
 	  size_t j;
-	  for (j = 1 ; j < vtgr.Length () ; j++)
+	  for (j = 1 ; j < vtgr.GetSize () ; j++)
 	  {
 	    csColor4& color2 = group_colors[vtgr[j].idx];
 	    total_weight += vtgr[j].weight;
@@ -587,7 +587,7 @@ csPtr<iGenMeshAnimationControl> csGenmeshAnimationControlFactory::
 {
   csGenmeshAnimationControl* ctrl = new csGenmeshAnimationControl (this);
   size_t i;
-  for (i = 0 ; i < autorun_scripts.Length () ; i++)
+  for (i = 0 ; i < autorun_scripts.GetSize () ; i++)
     ctrl->Execute (autorun_scripts[i]);
   return csPtr<iGenMeshAnimationControl> (ctrl);
 }
@@ -595,12 +595,12 @@ csPtr<iGenMeshAnimationControl> csGenmeshAnimationControlFactory::
 void csGenmeshAnimationControlFactory::UpdateGroupsMapping ()
 {
   size_t i;
-  for (i = 0 ; i < groups.Length () ; i++)
+  for (i = 0 ; i < groups.GetSize () ; i++)
   {
     csAnimControlGroup* g = groups[i];
     const csArray<ac_vertex_data>& vtdata = g->GetVertexData ();
     size_t j;
-    for (j = 0 ; j < vtdata.Length () ; j++)
+    for (j = 0 ; j < vtdata.GetSize () ; j++)
     {
       if (vtdata[j].weight > SMALL_EPSILON)
       {
@@ -628,7 +628,7 @@ csAnimControlScript* csGenmeshAnimationControlFactory::FindScript (
 	const char* scriptname) const
 {
   size_t i;
-  for (i = 0 ; i < scripts.Length () ; i++)
+  for (i = 0 ; i < scripts.GetSize () ; i++)
     if (strcmp (scripts[i]->GetName (), scriptname) == 0)
       return scripts[i];
   return 0;
@@ -638,7 +638,7 @@ csAnimControlGroup* csGenmeshAnimationControlFactory::FindGroup (
 	const char* groupname) const
 {
   size_t i;
-  for (i = 0 ; i < groups.Length () ; i++)
+  for (i = 0 ; i < groups.GetSize () ; i++)
     if (strcmp (groups[i]->GetName (), groupname) == 0)
       return groups[i];
   return 0;
@@ -648,7 +648,7 @@ size_t csGenmeshAnimationControlFactory::FindGroupIndex (
 	const char* groupname) const
 {
   size_t i;
-  for (i = 0 ; i < groups.Length () ; i++)
+  for (i = 0 ; i < groups.GetSize () ; i++)
     if (strcmp (groups[i]->GetName (), groupname) == 0)
       return i;
   return (size_t)~0;

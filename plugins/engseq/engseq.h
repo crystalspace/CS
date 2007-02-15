@@ -63,30 +63,30 @@ public:
 
   virtual size_t GetParameterCount () const
   {
-    return params.Length ();
+    return params.GetSize ();
   }
   virtual iBase* GetParameter (size_t idx) const
   {
-    CS_ASSERT (idx < params.Length ());
+    CS_ASSERT (idx < params.GetSize ());
     return params[idx]->value;
   }
   virtual iBase* GetParameter (const char* name) const
   {
     size_t i;
-    for (i = 0 ; i < params.Length () ; i++)
+    for (i = 0 ; i < params.GetSize () ; i++)
       if (!strcmp (name, params[i]->name)) return params[i]->value;
     return 0;
   }
   virtual size_t GetParameterIdx (const char* name) const
   {
     size_t i;
-    for (i = 0 ; i < params.Length () ; i++)
+    for (i = 0 ; i < params.GetSize () ; i++)
       if (!strcmp (name, params[i]->name)) return i;
     return csArrayItemNotFound;
   }
   virtual const char* GetParameterName (size_t idx) const
   {
-    CS_ASSERT (idx < params.Length ());
+    CS_ASSERT (idx < params.GetSize ());
     return params[idx]->name;
   }
   virtual void AddParameter (const char* name, iBase* def_value = 0)
@@ -99,7 +99,7 @@ public:
   }
   virtual void SetParameter (size_t idx, iBase* value)
   {
-    CS_ASSERT (idx < params.Length ());
+    CS_ASSERT (idx < params.GetSize ());
     params[idx]->value = value;
   }
   virtual void SetParameter (const char* name, iBase* value)

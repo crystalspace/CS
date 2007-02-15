@@ -244,7 +244,7 @@ void csShaderManager::UnregisterShaderVariableAccessor (const char* name,
 iShaderVariableAccessor* csShaderManager::GetShaderVariableAccessor (
       const char* name)
 {
-  return sva_hash.Get (name, 0);
+  return sva_hash.Get (name, (iShaderVariableAccessor*)0);
 }
 
 void csShaderManager::UnregisterShaderVariableAcessors ()

@@ -24,7 +24,7 @@ const float TRI_EPSILON=0.0000000001f;
 float csTriangulate2::Area(const csContour2 &contour)
 {
 
-  int n = (int)contour.Length();
+  int n = (int)contour.GetSize ();
 
   float A=0.0f;
 
@@ -93,7 +93,7 @@ bool csTriangulate2::Process(const csContour2 &contour, csTriangleMesh &result, 
 {
   /* allocate and initialize list of Vertices in polygon */
 
-  int n = (int)contour.Length();
+  int n = (int)contour.GetSize ();
   if ( n < 3 ) return false;
 
   int *V = new int[n];

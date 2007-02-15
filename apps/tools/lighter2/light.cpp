@@ -213,7 +213,10 @@ namespace lighter
     csSegment3 visSegment (lightPos, point);
     if (!lightFrustum.Contains (point-lightFrustum.GetOrigin ()) ||
       !lightFrustum.Intersect (visSegment))
-     return csColor (0,0,1);
+    {
+      pdf = 0.0f;
+      return csColor (0,0,0);
+    }
 
     if (visLimitPlane)
       csIntersect3::SegmentPlane (*visLimitPlane, visSegment);

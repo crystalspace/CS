@@ -23,11 +23,12 @@
 
 #include "csutil/archive.h"
 #include "csutil/csendian.h"
+#include "csutil/csstring.h"
 #include "csutil/set.h"
 #include "csutil/snprintf.h"
 #include "csutil/sysfunc.h"
+#include "csutil/syspath.h"
 #include "csutil/util.h"
-#include "csutil/csstring.h"
 #include "iutil/vfs.h"	// For csFileTime
 
 // Default compression method to use when adding entries (there is no choice for now)
@@ -92,7 +93,7 @@ csArchive::~csArchive ()
   if (file) fclose (file);
 
   size_t i;
-  for (i = 0; i < lazy.Length (); i++)
+  for (i = 0; i < lazy.GetSize (); i++)
   {
     ArchiveEntry* e = lazy[i];
     delete e;
@@ -131,7 +132,7 @@ csArchive::ArchiveEntry *csArchive::CreateArchiveEntry (const char *name, size_t
 
 void csArchive::ReadDirectory ()
 {
-  if (dir.Length ())
+  if (dir.GetSize ())
     return;                     /* Directory already read */
 
   ReadZipDirectory (file);
@@ -143,12 +144,12 @@ void csArchive::ReadDirectory ()
   // First, make a list of all possible directory components.
   csString filename, slice;
   csSet<csString> dset;
-  for (size_t i = 0, n = dir.Length(); i < n; i++)
+  for (size_t i = 0, n = dir.GetSize (); i < n; i++)
   {
     ArchiveEntry const* e = dir.Get (i);
     filename = e->filename;
     size_t sep = 0;
-    while (sep < filename.Length())
+    while (sep < filename.Length ())
     {
       size_t slash = filename.FindFirst ('/', sep);
       if (slash == (size_t)-1)
@@ -238,7 +239,7 @@ void csArchive::ReadZipDirectory (FILE *infile)
 	    	sizeof (hdr_central)) ||
 		(memcmp (buff, hdr_central, sizeof (hdr_central)) != 0))
             {
-              if (dir.Length ())
+              if (dir.GetSize ())
                 return;         /* Finished reading central directory */
               else
                 goto rebuild_cdr;       /* Broken central directory */
@@ -348,7 +349,7 @@ void csArchive::Dir () const
   csPrintf (" size | size |offset| (CRC32)| name\n");
   csPrintf ("------+------+------+--------+------\n");
   size_t fn;
-  for (fn = 0; fn < dir.Length (); fn++)
+  for (fn = 0; fn < dir.GetSize (); fn++)
   {
     ArchiveEntry *e = dir.Get (fn);
     csPrintf ("%6" PRIu32 "|%6" PRIu32 "|%6" PRIu32 "|%08" PRIx32 "|%s\n",
@@ -522,7 +523,7 @@ bool csArchive::Write (void *entry, const char *data, size_t len)
 // Flush all pending operations (if any)
 bool csArchive::Flush ()
 {
-  if (!lazy.Length () && !del.Length ())
+  if (!lazy.GetSize () && !del.GetSize ())
     return true;                /* Nothing to do */
   return WriteZipArchive ();
 }
@@ -653,7 +654,7 @@ skip_entry:
   } /* endwhile */
 
   /* Now we have to append all files that were added to archive */
-  for (n = 0; n < lazy.Length (); n++)
+  for (n = 0; n < lazy.GetSize (); n++)
   {
     ArchiveEntry *f = lazy.Get (n);
     if (!f->WriteFile (temp))
@@ -714,7 +715,7 @@ bool csArchive::WriteCentralDirectory (FILE *temp)
   size_t n, count = 0;
   size_t cdroffs = ftell (temp);
 
-  for (n = 0; n < dir.Length (); n++)
+  for (n = 0; n < dir.GetSize (); n++)
   {
     ArchiveEntry *f = dir.Get (n);
     // Don't write deleted or faked entries
@@ -725,7 +726,7 @@ bool csArchive::WriteCentralDirectory (FILE *temp)
     count++;
   } /* endwhile */
 
-  for (n = 0; n < lazy.Length (); n++)
+  for (n = 0; n < lazy.GetSize (); n++)
   {
     ArchiveEntry *f = lazy.Get (n);
     if (!f->WriteCDFH (temp))
@@ -750,7 +751,7 @@ bool csArchive::WriteCentralDirectory (FILE *temp)
 void csArchive::UpdateDirectory ()
 {
   /* Update archive directory: remove deleted entries first */
-  size_t n = dir.Length ();
+  size_t n = dir.GetSize ();
   while (n > 0)
   {
     n--;
@@ -760,7 +761,7 @@ void csArchive::UpdateDirectory ()
   }
   del.DeleteAll ();
 
-  for (n = 0; n < lazy.Length (); n++)
+  for (n = 0; n < lazy.GetSize (); n++)
   {
     ArchiveEntry *e = lazy.Get (n);
     e->FreeBuffer ();

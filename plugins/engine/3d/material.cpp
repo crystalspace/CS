@@ -292,7 +292,7 @@ bool csMaterialList::Remove (int n)
 void csMaterialList::RemoveAll ()
 {
   size_t i;
-  for (i = 0 ; i < list.Length () ; i++)
+  for (i = 0 ; i < list.GetSize () ; i++)
     list[i]->QueryObject ()->RemoveNameChangeListener (listener);
   list.DeleteAll ();
   mat_hash.DeleteAll ();

@@ -848,7 +848,7 @@ bool csGraphics2DGLCommon::DebugCommand (const char* cmdstr)
     ((csGLFontCache*)fontCache)->DumpFontCache (images);
 
     csString outfn;
-    for (size_t i = 0; i < images.Length(); i++)
+    for (size_t i = 0; i < images.GetSize (); i++)
     {
       csRef<iDataBuffer> buf = imgsaver->Save (images[i], "image/png");
       if (!buf)
@@ -998,7 +998,7 @@ void csGraphics2DGLCommon::csGLPixelFormatPicker::ReadPickerValue (
     }
   }
 
-  if (values.Length() == 0)
+  if (values.GetSize () == 0)
     values.Push (0);
 
   values.Sort (ReverseCompare<int>);

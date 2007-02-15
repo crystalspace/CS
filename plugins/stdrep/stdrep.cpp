@@ -292,7 +292,7 @@ void csReporterListener::WriteLine (int severity, const char* msgID,
     }
     if (debug_file.IsValid())
     {
-      debug_file->Write (msg.GetData(), msg.Length());
+      debug_file->Write (msg.GetData(), msg.Length ());
       debug_file->Flush ();
     }
   }
@@ -345,7 +345,7 @@ bool csReporterListener::HandleEvent (iEvent& event)
   if (event.Name == PostProcess)
   {
     CS::Threading::RecursiveMutexScopedLock lock (mutex);
-    size_t l = messages.Length ();
+    size_t l = messages.GetSize ();
     if (l > 0)
     {
       size_t i;

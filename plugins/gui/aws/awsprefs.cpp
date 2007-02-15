@@ -273,8 +273,8 @@ bool awsPrefManager::Load (const char *def_file)
     return false;
   }
 
-  size_t ncw = win_defs.Length();
-  size_t ncs = skin_defs.Length();
+  size_t ncw = win_defs.GetSize ();
+  size_t ncs = skin_defs.GetSize ();
 
   if (awsparse (wmgr))
   {
@@ -284,8 +284,8 @@ bool awsPrefManager::Load (const char *def_file)
 
   csPrintf (
     "\tload successful (%zu windows, %zu skins loaded.)\n",
-    win_defs.Length() - ncw,
-    skin_defs.Length() - ncs);
+    win_defs.GetSize () - ncw,
+    skin_defs.GetSize () - ncs);
 
   return true;
 }
@@ -294,7 +294,7 @@ bool awsPrefManager::SelectDefaultSkin (const char* skin_name)
 {
   unsigned long id = NameToId (skin_name);
 
-  for (size_t i = 0; i < skin_defs.Length(); i++)
+  for (size_t i = 0; i < skin_defs.GetSize (); i++)
   {
     if (skin_defs[i]->Name () == id)
     {
@@ -593,7 +593,7 @@ iAwsComponentNode *awsPrefManager::FindWindowDef (const char *name)
 {
   unsigned long id = NameToId (name);
 
-  for (size_t i = 0; i < win_defs.Length(); i++)
+  for (size_t i = 0; i < win_defs.GetSize (); i++)
     if (win_defs[i]->Name () == id)
       return win_defs[i];
 
@@ -604,7 +604,7 @@ iAwsKeyContainer *awsPrefManager::FindSkinDef (const char *name)
 {
   unsigned long id = NameToId (name);
 
-  for (size_t i = 0; i < skin_defs.Length(); i++)
+  for (size_t i = 0; i < skin_defs.GetSize (); i++)
     if (skin_defs[i]->Name () == id)
       return skin_defs[i];
 
@@ -626,7 +626,7 @@ int awsPrefManager::GetConstantValue (const char *name)
   unsigned int namev = NameToId (name);
 
   size_t i;
-  for (i = 0; i < constants.Length (); ++i)
+  for (i = 0; i < constants.GetSize (); ++i)
   {
     constant_entry *c = constants.Get (i);
 
@@ -641,7 +641,7 @@ bool awsPrefManager::ConstantExists (const char *name)
   unsigned int namev = NameToId (name);
 
   size_t i;
-  for (i = 0; i < constants.Length (); ++i)
+  for (i = 0; i < constants.GetSize (); ++i)
   {
     constant_entry *c = constants.Get (i);
 
