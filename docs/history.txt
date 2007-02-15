@@ -7,6 +7,9 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 
+15-Feb-2007
+	- res fixed the reflect and reflectsphere shaders to actually map the
+	  diffuse texture coordinates. (Reported in CS-forum:1557.)
 14-Feb-2007
 	- res made various fixes to the shader weaver and Cg combiner plugins.
 	- res added parallax mapping to the example std_lighting_2.
@@ -19,6 +22,8 @@ chronological order.
 	- res reverted r26367 (use exceptions in csjpgimg) since it causes
 	  an abort on Linux when an exception is thrown (see #256) and I'm
 	  at loss at how to fix that. 
+	- res made more shader weaver tweaks (fixed wrong emission order of
+	  graph nodes; corrected comments in source and config files).
 13-Feb-2007
 	- Marten hopefully fixed bitoperations on VC7 and VC7.1.
 	- res added CS::DocumentHelper::CloneAttributes() to clone only the
