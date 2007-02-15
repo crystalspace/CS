@@ -10,6 +10,9 @@ chronological order.
 15-Feb-2007
 	- res fixed the reflect and reflectsphere shaders to actually map the
 	  diffuse texture coordinates. (Reported in CS-forum:1557.)
+    - Andrew Robberts fixed a potential array out of bounds crash in decals
+    - Andrew Robberts fixed a sizing issue with decals if the given  up
+      vector wasn't normalized.
 14-Feb-2007
 	- res made various fixes to the shader weaver and Cg combiner plugins.
 	- res added parallax mapping to the example std_lighting_2.

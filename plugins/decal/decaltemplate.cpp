@@ -29,8 +29,10 @@ csDecalTemplate::csDecalTemplate()
       zBufMode(CS_ZBUF_TEST),
       polygonNormalThreshold(CS_DECAL_DEFAULT_NORMAL_THRESHOLD),
       decalOffset(CS_DECAL_DEFAULT_OFFSET),
-      hasTopClip(true), topClipScale(0.5f),
-      hasBottomClip(true), bottomClipScale(0.5f),
+      hasTopClip(CS_DECAL_DEFAULT_TOP_CLIP_ON), 
+      topClipScale(CS_DECAL_DEFAULT_TOP_CLIP_SCALE),
+      hasBottomClip(CS_DECAL_DEFAULT_BOTTOM_CLIP_ON), 
+      bottomClipScale(CS_DECAL_DEFAULT_BOTTOM_CLIP_SCALE),
       minTexCoord(0,0),
       maxTexCoord(1,1),
       mixMode(CS_FX_COPY)
@@ -111,6 +113,16 @@ const uint csDecalTemplate::GetMixMode() const
   return mixMode;
 }
 
+float csDecalTemplate::GetPerpendicularFaceThreshold() const
+{
+  return perpendicularFaceThreshold;
+}
+
+float csDecalTemplate::GetPerpendicularFaceOffset() const
+{
+  return perpendicularFaceOffset;
+}
+
 void csDecalTemplate::SetTimeToLive(float timeToLive)
 {
     this->timeToLive = timeToLive;
@@ -156,12 +168,22 @@ void csDecalTemplate::SetBottomClipping(bool enabled, float bottomPlaneScale)
 void csDecalTemplate::SetTexCoords(const csVector2 & min, 
     const csVector2 & max)
 {
-    this->minTexCoord = min;
-    this->maxTexCoord = max;
+  this->minTexCoord = min;
+  this->maxTexCoord = max;
 }
 
 void csDecalTemplate::SetMixMode(uint mixMode)
 {
   this->mixMode = mixMode;
+}
+
+void csDecalTemplate::SetPerpendicularFaceThreshold(float threshold)
+{
+  perpendicularFaceThreshold = threshold;
+}
+
+void csDecalTemplate::SetPerpendicularFaceOffset(float offset)
+{
+  perpendicularFaceOffset = offset;
 }
 

@@ -151,6 +151,23 @@ struct iDecalTemplate : public virtual iBase
   virtual const uint GetMixMode() const = 0;
   
   /**
+   * The perpendicular face threshold specifies which faces are considered
+   * to be perpendicular in the decal.  Perpendicular faces will be tapered
+   * outwards by an amount relative to the perpendicular face offset.
+   *  \return The perpendicular face threshold.
+   */
+  virtual float GetPerpendicularFaceThreshold() const = 0;
+
+  /**
+   * The perpendicular face offset specifies how much perpendicular faces in
+   * the decal will taper out.  The bottom of the perpendicular face will
+   * taper out by the amount given, but the top of the perpendicular face
+   * will not taper at all.
+   *  \return The perpendicular face offset.
+   */
+  virtual float GetPerpendicularFaceOffset() const = 0;
+      
+  /**
    * Sets the time the decal will have to live in seconds before it is 
    * killed.
    *  \param timeToLive	The time to live in seconds.
@@ -227,6 +244,23 @@ struct iDecalTemplate : public virtual iBase
    *  \param mixMode	 The mixmode of the decal.
    */
   virtual void SetMixMode(uint mixMode) = 0;
+  
+  /**
+   * The perpendicular face threshold specifies which faces are considered
+   * to be perpendicular in the decal.  Perpendicular faces will be tapered
+   * outwards by an amount relative to the perpendicular face offset.
+   *  \param threshold The new perpendicular face threshold.
+   */
+  virtual void SetPerpendicularFaceThreshold(float threshold) = 0;
+
+  /**
+   * The perpendicular face offset specifies how much perpendicular faces in
+   * the decal will taper out.  The bottom of the perpendicular face will
+   * taper out by the amount given, but the top of the perpendicular face
+   * will not taper at all.
+   *  \param offset The new perpendicular face offset.
+   */
+  virtual void SetPerpendicularFaceOffset(float offset) = 0;
 };
 
 /**

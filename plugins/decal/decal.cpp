@@ -213,7 +213,8 @@ void csDecal::AddStaticPoly(const csPoly3D & p)
   float invHighLowFaceDist;
   csVector3 faceBottomOffset;
   csVector3 faceCenter;
-  if (polyNormThresholdValue < CS_DECAL_FACE_OFFSET_THRESHOLD)
+  if (fabs(polyNormThresholdValue) 
+        < decalTemplate->GetPerpendicularFaceThreshold())
   {
     doFaceOffset = true;
 
@@ -240,7 +241,7 @@ void csDecal::AddStaticPoly(const csPoly3D & p)
       }
     }
     invHighLowFaceDist = 1.0f / (faceHighDot - faceLowDot);
-    faceBottomOffset = -CS_DECAL_FACE_MAX_OFFSET * polyNorm;
+    faceBottomOffset = -decalTemplate->GetPerpendicularFaceOffset() * polyNorm;
     faceCenter /= (float)vertCount;
   }
 #endif // CS_DECAL_CLIP_DECAL
@@ -264,7 +265,7 @@ void csDecal::AddStaticPoly(const csPoly3D & p)
 
       // spread out the base to avoid vertical seams
       vertPos += (vertPos - faceCenter).Unit() 
-	* (CS_DECAL_FACE_MAX_OFFSET * 2.0f); 
+	* (decalTemplate->GetPerpendicularFaceOffset() * 2.0f); 
     }
 
     vertPos += vertOffset;
