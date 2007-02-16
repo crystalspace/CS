@@ -46,6 +46,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Profiler)
   ProfilerFactory::ProfilerFactory (iBase* parent)
     : scfImplementationType (this, parent)
   {
+    // Force us to be kept
+    parent->IncRef ();
   }
   
   ProfilerFactory::~ProfilerFactory ()

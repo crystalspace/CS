@@ -15,6 +15,8 @@ chronological order.
 	- Marten fixed an issue in lighter2 related to multiple submeshes
 	  sharing vertices and those vertices getting separate lightmap
 	  coordinates.
+	- Marten fixed so the profiling plugin isn't unloaded until program 
+	  ends or it is explicitly unloaded.
 15-Feb-2007
 	- res fixed the reflect and reflectsphere shaders to actually map the
 	  diffuse texture coordinates. (Reported in CS-forum:1557.)
