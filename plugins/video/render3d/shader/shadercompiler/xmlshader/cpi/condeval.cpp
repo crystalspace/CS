@@ -2009,13 +2009,18 @@ EvaluatorShadervarValues::EvalResult EvaluatorShadervarValues::LogicAnd (
   CS_ASSERT (b.type == operandOperation);
   if (rA.state == Logic3::Truth)
   {
+    /* A is definitely true: so the possible values for a true/false outcome
+     * are those of evaluating B. */
     rB = evaluator.CheckConditionResults (b.operation,
       trueVarsA, trueVars, falseVars);
   }
   else if (rA.state == Logic3::Lie)
   {
-    rB = evaluator.CheckConditionResults (b.operation,
-      falseVarsA, trueVars, falseVars);
+    /* A is definitely false: so the possible values for a true/false outcome
+     * are those of evaluating A. */
+    trueVars = trueVarsA;
+    falseVars = falseVarsA;
+    rB = Logic3::Uncertain;
   }
   else
   {
@@ -2055,16 +2060,19 @@ EvaluatorShadervarValues::EvalResult EvaluatorShadervarValues::LogicOr (
     vars, trueVarsA, falseVarsA);
 
   Logic3 rB;
-  Variables trueVarsB; 
-  Variables falseVarsB;
   CS_ASSERT (b.type == operandOperation);
   if (rA.state == Logic3::Truth)
   {
-    rB = evaluator.CheckConditionResults (b.operation,
-      trueVarsA, trueVars, falseVars);
+    /* A is definitely true: so the possible values for a true/false outcome
+     * are those of evaluating A. */
+    trueVars = trueVarsA;
+    falseVars = falseVarsA;
+    rB = Logic3::Uncertain;
   }
   else if (rA.state == Logic3::Lie)
   {
+    /* A is definitely false: so the possible values for a true/false outcome
+     * are those of evaluating B. */
     rB = evaluator.CheckConditionResults (b.operation,
       falseVarsA, trueVars, falseVars);
   }

@@ -7,6 +7,9 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 
+16-Feb-2007
+	- res fixed an issue in xmlshader where conditions were incorrectly
+	  folded away.
 15-Feb-2007
 	- res fixed the reflect and reflectsphere shaders to actually map the
 	  diffuse texture coordinates. (Reported in CS-forum:1557.)
