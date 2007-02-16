@@ -12,6 +12,9 @@ chronological order.
 	  folded away.
 	- res added an additonal debugging feature to xmlshader to inspect
 	  the possible value sets computed.
+	- Marten fixed an issue in lighter2 related to multiple submeshes
+	  sharing vertices and those vertices getting separate lightmap
+	  coordinates.
 15-Feb-2007
 	- res fixed the reflect and reflectsphere shaders to actually map the
 	  diffuse texture coordinates. (Reported in CS-forum:1557.)

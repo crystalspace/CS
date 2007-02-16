@@ -30,7 +30,8 @@ namespace lighter
   csPtr<LightmapUVObjectLayouter> SimpleUVFactoryLayouter::LayoutFactory (
     const PrimitiveArray& inPrims, ObjectVertexData& vertexData,
     const ObjectFactory* factory,
-    csArray<PrimitiveArray>& outPrims)
+    csArray<PrimitiveArray>& outPrims,
+    BoolDArray& usedVerts)
   {
     if (inPrims.GetSize () == 0) return 0;
 
@@ -43,16 +44,10 @@ namespace lighter
     csArray<PrimitiveArray> coplanarPrims;
     DetermineNeighbouringPrims (inPrims, vertexData, coplanarPrims);
 
-    // This is really dumb.. make sure every vertex have unqiue UV
-    size_t i;
-
-    BoolDArray vused;
-    vused.SetSize (vertexData.vertexArray.GetSize (), false);
-
     //TODO Reimplement simple UV-FactoryLayouter
     
     // Layout every primitive by itself    
-    for (i = 0; i < coplanarPrims.GetSize (); i++)
+    for (size_t i = 0; i < coplanarPrims.GetSize (); i++)
     {
       PrimitiveArray& prims = coplanarPrims[i];
       
@@ -63,7 +58,7 @@ namespace lighter
       while (!lmCoordsGood && its < 5)
       {
         // Compute lightmapping
-        ProjectPrimitives (prims, vused,
+        ProjectPrimitives (prims, usedVerts,
                            factory->GetLMuTexelPerUnit () / (1<<its), 
                            factory->GetLMvTexelPerUnit () / (1<<its));
 

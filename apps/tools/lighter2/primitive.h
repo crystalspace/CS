@@ -211,7 +211,7 @@ namespace lighter
 
     //@{
     /// Elements
-    size_t elementCount;
+    //size_t elementCount;
     ElementAreas elementAreas;
     //@}
 
