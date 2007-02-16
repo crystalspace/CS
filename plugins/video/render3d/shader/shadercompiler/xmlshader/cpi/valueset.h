@@ -28,11 +28,7 @@
 #include "logic3.h"
 #include "tempheap.h"
 
-// Hack: Work around problems caused by #defining 'new'.
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-# undef new
-#endif
-#include <new>
+#include "csutil/custom_new_disable.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
@@ -298,6 +294,31 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
       else
         return Logic3::Uncertain;
     }
+
+    void Dump (csString& str) const
+    {
+      for (size_t i = 0; i < intervals.GetSize(); i++)
+      {
+        if (intervals[i].left.GetInclusive ()) 
+          str << '[';
+        else
+          str << ']';
+        if (!intervals[i].left.IsFinite ())
+          str << "-INF";
+        else
+          str << intervals[i].left.GetValue ();
+        str << ';';
+        if (!intervals[i].right.IsFinite ())
+          str << "+INF";
+        else
+          str << intervals[i].right.GetValue ();
+        if (intervals[i].right.GetInclusive ()) 
+          str << ']';
+        else
+          str << '[';
+        str << ' ';
+      }
+    }
   };
 
 #undef CS_INFINITY
@@ -305,8 +326,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 }
 CS_PLUGIN_NAMESPACE_END(XMLShader)
 
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-# define new CS_EXTENSIVE_MEMDEBUG_NEW
-#endif
+#include "csutil/custom_new_enable.h"
 
 #endif // __CS_VALUESET_H__

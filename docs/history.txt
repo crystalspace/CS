@@ -10,6 +10,8 @@ chronological order.
 16-Feb-2007
 	- res fixed an issue in xmlshader where conditions were incorrectly
 	  folded away.
+	- res added an additonal debugging feature to xmlshader to inspect
+	  the possible value sets computed.
 15-Feb-2007
 	- res fixed the reflect and reflectsphere shaders to actually map the
 	  diffuse texture coordinates. (Reported in CS-forum:1557.)
