@@ -17,6 +17,8 @@ chronological order.
 	  coordinates.
 	- Marten fixed so the profiling plugin isn't unloaded until program 
 	  ends or it is explicitly unloaded.
+        - Daniel Fryer cleaned up the coreaudio sound renderer and fixed a 
+          byte-swapping problem in libs/csplugincommon/sndsys/convert.cpp
 15-Feb-2007
 	- res fixed the reflect and reflectsphere shaders to actually map the
 	  diffuse texture coordinates. (Reported in CS-forum:1557.)
