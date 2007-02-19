@@ -17,6 +17,7 @@ chronological order.
 	    - Default description of SCF instances to the class ID.
 	    - Made scfImplementationX register a reftracker alias for iBase.
 	    - Adjusted DecRef() for pooled classes to be reftracker-friendly.
+	- res made the callstack-related classes custom allocated.
 19-Feb-2007
 	- Marten made a few changes in lighter2:
 	   - Disabled the use of the exposure function and use a simple
