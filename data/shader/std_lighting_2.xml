@@ -33,6 +33,9 @@
       <snippet id="surface" file="surface/surface-classic.xml" />
       <snippet id="lighting" file="lighting/light-classic.xml" />
       <snippet id="mod_light_surf" file="snippets/modulate.xml" />
+      <!-- snippet file="fog/fog-sector.xml" / -->
+      <snippet id="glow" file="surface/glow.xml" />
+      <!-- snippet file="snippets/mixmode-alpha.xml" / -->
       <!-- "connections" describe what snippets take input from what other
            snippets (ie the "data flow" is modeled). The exact resolution of
 	   what output is linked to what input is done automatically. -->
@@ -40,9 +43,7 @@
       <connection from="parallax" to="surface" />
       <connection from="surface" to="mod_light_surf" />
       <connection from="lighting" to="mod_light_surf" />
-      <!-- snippet file="fog/fog-sector.xml" / -->
-      <!-- snippet file="surface/glow.xml" / -->
-      <!-- snippet file="snippets/mixmode-alpha.xml" / -->
+      <connection from="mod_light_surf" to="glow" />
     </pass>
   </technique>
   

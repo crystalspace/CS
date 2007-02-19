@@ -23,6 +23,7 @@
 #include "csutil/csmd5.h"
 #include "csutil/csstring.h"
 #include "csutil/customallocated.h"
+#include "csutil/noncopyable.h"
 #include "csutil/parray.h"
 #include "csutil/strhash.h"
 
@@ -46,18 +47,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         csString classId;
         csRef<iDocumentNode> params;
       };
-      //csArray<CombinerPlugin> combiners;
       struct Block
       {
         csString combinerName;
         csString location;
         csRef<iDocumentNode> node;
       };
-      //csArray<Block> blocks;
       struct Input
       {
         csString name;
         csString type;
+        csString condition;
         enum
         {
           None,
@@ -67,37 +67,28 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         
         Input() : defaultType (None) {}
       };
-      //csArray<Input> inputs;
       struct Output
       {
         csString name;
         csString type;
       };
-      //csArray<Output> outputs;
       
       Technique() : priority (0) {}
       virtual ~Technique() {}
       
       virtual bool IsCompound() const = 0;
       
-      //virtual BasicIterator<const CombinerPlugin>* GetCombiners() const = 0;
       virtual const CombinerPlugin& GetCombiner() const = 0;
       virtual BasicIterator<const Input>* GetInputs() const = 0;
       virtual BasicIterator<const Output>* GetOutputs() const = 0;
       
       virtual BasicIterator<const Block>* GetBlocks() const = 0;
-      //virtual BasicIterator<const Technique>* GetTechniques() const = 0;
-      
-      //void Link() = 0;
-      
-      //bool HasOutput (const char* name) const;
     };
     
     class AtomTechnique : public Snippet::Technique
     {
       friend class Snippet;
       csMD5::Digest id;
-      //csArray<CombinerPlugin> combiners;
       CombinerPlugin combiner;
       csArray<Block> blocks;
       csArray<Input> inputs;
@@ -107,13 +98,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
       virtual bool IsCompound() const { return false; }
       
-      //void AddCombiner (const CombinerPlugin& comb) { combiners.Push (comb); }
       void SetCombiner (const CombinerPlugin& comb) { combiner = comb; }
       void AddBlock (const Block& block) { blocks.Push (block); }
       void AddInput (const Input& input) { inputs.Push (input); }
       void AddOutput (const Output& output) { outputs.Push (output); }
     
-      //virtual BasicIterator<const CombinerPlugin>* GetCombiners() const;
       virtual const CombinerPlugin& GetCombiner() const { return combiner; }
       virtual BasicIterator<const Block>* GetBlocks() const
       { return new BasicIteratorImpl<const Block, csArray<Block> > (blocks); }
@@ -121,7 +110,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       { return new BasicIteratorImpl<const Input, csArray<Input> > (inputs); }
       virtual BasicIterator<const Output>* GetOutputs() const
       { return new BasicIteratorImpl<const Output, csArray<Output> > (outputs); }
-      //virtual BasicIterator<const Technique>* GetTechniques() const { return 0; }
     };
     
     struct Connection
@@ -130,7 +118,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       Snippet* to;
     };
     
-    class CompoundTechnique : public Snippet::Technique
+    class CompoundTechnique : public Snippet::Technique,
+                              public CS::NonCopyable
     {
       friend class TechniqueGraphBuilder;
       friend class Snippet;
@@ -144,6 +133,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       csArray<Snippet*> outSnippets;
       Technique::CombinerPlugin combiner;
     public:
+      ~CompoundTechnique();
+
       virtual bool IsCompound() const { return true; }
       
       void AddSnippet (const char* id, Snippet* snippet);
@@ -151,12 +142,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       { return snippets.Get (id, 0); }
       void AddConnection (const Connection& conn);
       
-      //virtual BasicIterator<const CombinerPlugin>* GetCombiners() const { return 0; }
       virtual const CombinerPlugin& GetCombiner() const { return combiner; }
       virtual BasicIterator<const Block>* GetBlocks() const { return 0; }
       virtual BasicIterator<const Input>* GetInputs() const;
       virtual BasicIterator<const Output>* GetOutputs() const;
-      //virtual BasicIterator<const Technique>* GetTechniques() const;
     };
     
     Snippet (WeaverCompiler* compiler, iDocumentNode* node, bool topLevel = false);
@@ -184,8 +173,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       csArray<Technique::Block>& blocks);
     
     static int CompareTechnique (Technique* const&, Technique* const&);
-    
-    //void ClearSnippets ();
     
     void LoadCompoundTechniques (iDocumentNode* node, bool topLevel);
     void LoadCompoundTechnique (iDocumentNode* node);

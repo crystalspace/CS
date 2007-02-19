@@ -23,17 +23,22 @@
 #include "csplugincommon/shader/weavercombiner.h"
 #include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/strhash.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 {
+  class WeaverCompiler;
 
   class CombinerDefault : 
     public scfImplementation1<CombinerDefault,
 			      CS::PluginCommon::ShaderWeaver::iCombiner>
   {
+    WeaverCompiler* compiler;
+  
+    csStringHash& xmltokens;
     csRefArray<iDocumentNode> passNodes;
   public:
-    CombinerDefault ();
+    CombinerDefault (WeaverCompiler* compiler);
     
     void BeginSnippet ();
     void AddInput (const char* name, const char* type) {}
@@ -50,6 +55,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     uint CoerceCost (const char* fromType, const char* toType);
     void WriteToPass (iDocumentNode* pass);
     bool CompatibleParams (iDocumentNode* params);
+    csRef<iString> QueryInputTag (const char* location, 
+      iDocumentNode* blockNodes);
   };
 
 }

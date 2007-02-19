@@ -83,6 +83,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         const Snippet::Technique* outTech, LinkHash& links);
       const Node& GetNodeForTech (const Snippet::Technique* tech)
       { return nodes[techToNode.Get (tech, csArrayItemNotFound)]; }
+
+      void ReverseNodeArray();
       
       void Rebuild (const TechniqueGraph& graph,
         const csArray<const Snippet::Technique*>& outputs);
@@ -146,6 +148,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       const Snippet::Technique::CombinerPlugin& comb,
       const Snippet::Technique::CombinerPlugin& requested,
       const char* requestedName);
+
+    csString GetInputTag (CS::PluginCommon::ShaderWeaver::iCombiner* combiner,
+      const Snippet::Technique::CombinerPlugin& comb,
+      const Snippet::Technique::CombinerPlugin& combTech,
+      const Snippet::Technique::Input& input);
+    /// Structure to track what default inputs to emit.
+    struct EmittedInput
+    {
+      const SynthesizeNodeTree::Node* node;
+      const Snippet::Technique::Input* input;
+      csArray<csString> conditions;
+    };
   public:
     WeaverCompiler* compiler;
   

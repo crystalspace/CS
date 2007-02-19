@@ -29,6 +29,7 @@
 #include "csplugincommon/shader/weavertypes.h"
 #include "csutil/documenthelper.h"
 #include "csutil/fifo.h"
+#include "csutil/scfstr.h"
 #include "csutil/set.h"
 #include "csutil/xmltiny.h"
 
@@ -575,7 +576,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       appender.Append ("  void dummy() {}\n");
       for (size_t s = 0; s < snippets.GetSize(); s++)
       {
-        appender.Append (snippets[s].vert2frag);
+        AppendProgramInput (snippets[s].vert2frag, appender);
       }
       
       appender.Append ("};\n\n");
@@ -653,7 +654,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       appender.Append ("  void dummy() {}\n");
       for (size_t s = 0; s < snippets.GetSize(); s++)
       {
-        appender.Append (snippets[s].vert2frag);
+        AppendProgramInput (snippets[s].vert2frag, appender);
       }
       
       appender.Append ("};\n\n");
@@ -700,6 +701,37 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     return true;
   }
     
+  csRef<iString> ShaderCombinerCg::QueryInputTag (const char* location, 
+                                                  iDocumentNode* blockNode)
+  {
+    /* @@@ FIXME: Also check vertexToFragment and fragmentIn? */
+    if (strcmp (location, "vertexIn") == 0)
+    {
+      csRef<iString> result;
+      bool hasBinding = false;
+      csRef<iDocumentNodeIterator> nodes = blockNode->GetNodes();
+      while (nodes->HasNext())
+      {
+        csRef<iDocumentNode> node = nodes->Next();
+        if (node->GetType() != CS_NODE_ELEMENT) continue;
+
+        csStringID id = loader->xmltokens.Request (node->GetValue());
+        if ((id == ShaderCombinerLoaderCg::XMLTOKEN_UNIFORM)
+          || (id == ShaderCombinerLoaderCg::XMLTOKEN_VARYING))
+        {
+          const char* binding = node->GetAttributeValue ("binding");
+          if (!binding || !*binding) continue;
+          // For now only support 1 binding...
+          if (hasBinding) return 0;
+          hasBinding = true;
+          result.AttachNew (new scfString (binding));
+        }
+      }
+      return result;
+    }
+    return 0;
+  }
+
   void ShaderCombinerCg::AppendProgramInput (
     const csRefArray<iDocumentNode>& nodes,
     DocNodeAppender& appender)

@@ -26,6 +26,13 @@ chronological order.
 	- res fixed excessive IncRef()s in csRenderView.
 	- res fixed a leak in the software sound renderer.
 	- res made the GL renderer lightmap textures more reftracker-friendly.
+	- res made the following changes to shaderweaver:
+	    - Ability to detect same inputs (to some extent) and avoid
+	      duplication of these.
+	    - Ability to give inputs "conditions" (have the same effect like
+	      manually added <?if?>s; however, they allow merging of inputs).
+	    - Leak fix.
+	- res added "glow" ability to the std_lighting_2 weaver test shader.
 19-Feb-2007
 	- Marten made a few changes in lighter2:
 	   - Disabled the use of the exposure function and use a simple

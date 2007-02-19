@@ -20,70 +20,54 @@
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
-    <input name="texCoord" type="texcoord2" default="complex"
-	condition='vars."tex diffuse".texture'>
+    <input name="texCoordGlow" type="texcoord2" default="complex"
+	condition='vars."tex glow".texture'>
       <block location="pass">
-	<buffer source="texture coordinate" 
-	  destination="vertexIn.texcoord" />
+        <buffer source="texture coordinate" 
+	  destination="vertexIn.texcoordGlow" />
       </block>
       
       <block location="cg:vertexToFragment">
-	float2 texcoord;
-	<?endif?>
+	float2 texcoordGlow;
       </block>
       
       <block location="cg:vertexIn">
-	<varying type="texcoord2" name="texcoord" />
+	<varying type="texcoord2" name="texcoordGlow" />
       </block>
       
       <block location="cg:vertexMain">
-	vertexToFragment.texcoord = vertexIn.texcoord;
+	vertexToFragment.texcoordGlow = vertexIn.texcoordGlow;
       </block>
       
       <block location="cg:fragmentMain">
-	texCoord = vertexToFragment.texcoord;
+	texCoordGlow = vertexToFragment.texcoordGlow;
       </block>
     </input>
     
-    <input name="texDiffuse" type="tex2d" default="complex"
-	condition='vars."tex diffuse".texture'>
+    <input name="texGlow" type="tex2d" default="complex"
+	condition='vars."tex glow".texture'>
       <block location="pass">
-	<texture name="tex diffuse" destination="fragmentIn.texDiffuse" />
+	<texture name="tex glow" destination="fragmentIn.texGlow" />
       </block>
       
       <block location="cg:fragmentIn">
-	<uniform type="tex2d" name="texDiffuse" />
+	<uniform type="tex2d" name="texGlow" />
       </block>
       
       <block location="cg:fragmentMain">
-	texDiffuse = fragmentIn.texDiffuse;
+	texGlow = fragmentIn.texGlow;
       </block>
     </input>
     
-    <input name="flatColor" type="rgba" default="complex"
-	condition='!vars."tex diffuse".texture'>
-      <block location="cg:variablemap">
-        <variablemap variable="mat flatcolor" 
-	 destination="fragmentIn.flatColor" />
-      </block>
-      
-      <block location="cg:fragmentIn">
-	<uniform type="rgba" name="flatColor" />
-      </block>
-      
-      <block location="cg:fragmentMain">
-	flatColor = fragmentIn.flatColor;
-      </block>
-    </input>
-      
+    <input name="surfaceColor" type="rgba" />
+   
     <block location="cg:fragmentMain">
-      <?if vars."tex diffuse".texture?>
-	surfaceColor = tex2D (texDiffuse, texCoord);
-      <?else?>
-	surfaceColor = flatColor;
+      surfaceWithGlow = surfaceColor;
+      <?if vars."tex glow".texture ?>
+	surfaceWithGlow.rgb += tex2D (texGlow, texCoordGlow);
       <?endif?>
     </block>
     
-    <output name="surfaceColor" type="rgba" />
+    <output name="surfaceWithGlow" type="rgba" />
   </technique>
 </snippet>

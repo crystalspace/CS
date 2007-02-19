@@ -264,6 +264,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	      "Invalid 'default' attribute for 'input' node: %s", def);
 	  }
 	}
+        const char* condition = child->GetAttributeValue ("condition");
+        newInput.condition = condition;
 	
 	newTech.AddInput (newInput);
       }
@@ -360,14 +362,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
             LoadCompoundTechnique (child);
           }
           break;
-#if 0
-	case WeaverCompiler::XMLTOKEN_FALLBACKSHADER:
-	  /* Bit of a hack: the "main" shader is treated like a compound 
-	   * snippet. It can contain a <fallbackshader> which should not
-	   * result in an error ...
-	   */
-	  if (topLevel) break;
-#endif
         default:
           compiler->synldr->ReportBadToken (child);
       }
@@ -376,7 +370,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   
   void Snippet::LoadCompoundTechnique (iDocumentNode* node)
   {
-    CompoundTechnique newTech;
+    CompoundTechnique* newTech = new CompoundTechnique;
   
     csRef<iDocumentNodeIterator> nodes = node->GetNodes ();
     while (nodes->HasNext ())
@@ -389,17 +383,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       {
         case WeaverCompiler::XMLTOKEN_COMBINER:
           {
-            HandleCombinerNode (newTech, child);
+            HandleCombinerNode (*newTech, child);
           }
           break;
         case WeaverCompiler::XMLTOKEN_SNIPPET:
           {
-            HandleSnippetNode (newTech, child);
+            HandleSnippetNode (*newTech, child);
           }
           break;
 	case WeaverCompiler::XMLTOKEN_CONNECTION:
 	  {
-	    HandleConnectionNode (newTech, child);
+	    HandleConnectionNode (*newTech, child);
 	  }
 	  break;
         default:
@@ -407,7 +401,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       }
     }
     
-    techniques.Push (new CompoundTechnique (newTech));
+    techniques.Push (newTech);
   }
   
   void Snippet::HandleSnippetNode (CompoundTechnique& tech,
@@ -534,6 +528,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
   
   //-------------------------------------------------------------------
+  Snippet::CompoundTechnique::~CompoundTechnique()
+  {
+    IdSnippetHash::GlobalIterator it (snippets.GetIterator());
+    while (it.HasNext())
+    {
+      Snippet* snip = it.Next();
+      delete snip;
+    }
+  }
+
   void Snippet::CompoundTechnique::AddSnippet (const char* id, 
                                                Snippet* snippet)
   {

@@ -153,6 +153,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     void WriteToPass (iDocumentNode* pass);
     
     bool CompatibleParams (iDocumentNode* params);
+
+    csRef<iString> QueryInputTag (const char* location, 
+      iDocumentNode* blockNodes);
   private:
     class DocNodeAppender;
   

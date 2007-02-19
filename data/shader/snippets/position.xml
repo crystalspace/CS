@@ -22,7 +22,7 @@
     
     <input name="Hposition" type="position4_object" default="complex">
       <block location="cg:vertexToFragment">
-	float4 position : POSITION;
+	<varying type="position4" name="position" binding="POSITION" />
       </block>
       
       <block location="cg:vertexIn">

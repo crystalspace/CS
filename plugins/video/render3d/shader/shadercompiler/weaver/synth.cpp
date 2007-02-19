@@ -21,6 +21,7 @@
 
 #include "imap/services.h"
 #include "iutil/plugin.h"
+#include "iutil/string.h"
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 
@@ -31,6 +32,7 @@
 #include "csutil/xmltiny.h"
 
 #include "combiner_default.h"
+#include "docnodes.h"
 #include "weaver.h"
 #include "snippet.h"
 #include "synth.h"
@@ -117,12 +119,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     return csPtr<iDocument> (synthesizedDoc);
   }
-  
+
   bool Synthesizer::SynthesizeTechnique (iDocumentNode* passNode,
                                          const Snippet* snippet, 
                                          const TechniqueGraph& techGraph)
   {
-    defaultCombiner.AttachNew (new CombinerDefault);
+    defaultCombiner.AttachNew (new CombinerDefault (compiler));
 
     TechniqueGraph graph (techGraph);
     /*
@@ -213,6 +215,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     SynthesizeNodeTree synthTree;
     synthTree.AddAllInputNodes (graph, generatedOutput, combiner);
     synthTree.AddAllInputNodes (graph, outTechniquePos, combiner);
+    // The input linking works better if "top" nodes come first
+    synthTree.ReverseNodeArray();
     
     LinkHash links;
     /* Linking.
@@ -226,6 +230,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
      * (1) "Suitable" means a coercion exists.
      */
     {
+      typedef csHash<size_t, csString> TaggedInputHash;
+      csArray<EmittedInput> emitInputs;
+      TaggedInputHash taggedInputs;
+
       CS::ScopedDelete<BasicIterator<const SynthesizeNodeTree::Node> > nodeIt (
         synthTree.GetNodes());
       while (nodeIt->HasNext())
@@ -241,7 +249,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  
 	  const Snippet::Technique* sourceTech;
           const Snippet::Technique::Output* output;
-          
+
+          // Look if there's already an input that has the same tag as this.
+          EmittedInput* prevInput = 0;
+          csString tag = GetInputTag (combiner, *comb, 
+            node.tech->GetCombiner(), inp);
+          if (!tag.IsEmpty())
+          {
+            TaggedInputHash::Iterator iter (
+              taggedInputs.GetIterator (tag));
+            while (iter.HasNext())
+            {
+              size_t taggedInpIndex = iter.Next();
+              if (emitInputs[taggedInpIndex].input->type == inp.type)
+              {
+                prevInput = &emitInputs[taggedInpIndex];
+                break;
+              }
+            }
+          }
+
           WEAVER_PRINTF ("find input: %p, %s", node.tech, inp.name.GetData());
           if (FindInput (graph, combiner, node.tech, inp, sourceTech, output,
             usedOutputs))
@@ -257,7 +284,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	    
 	      link.toName = node.inputRenames.Get (inp.name, (const char*)0);
 	      CS_ASSERT(!link.toName.IsEmpty());
-	      //link.toType = inp.type;
 	    
   	      links.Put (sourceTech, link);
 	    }
@@ -282,35 +308,110 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	        break;
 	      case Snippet::Technique::Input::Complex:
 	        {
-		  defaultCombiner->BeginSnippet();
-		  combiner->BeginSnippet ();
-		  for (size_t b = 0; b < inp.complexBlocks.GetSize(); b++)
-		  {
-		    const Snippet::Technique::Block& block = 
-		      inp.complexBlocks[b];
-		    csRef<WeaverCommon::iCombiner> theCombiner (GetCombiner (
-		      combiner, *comb, node.tech->GetCombiner(),
-		      block.combinerName));
-		    if (theCombiner.IsValid())
-		      theCombiner->WriteBlock (block.location, block.node);
-		  }
-		  
-		  csString inpOutputName;
-		  inpOutputName.Format ("in_%s", inp.name.GetData());
-		  combiner->AddGlobal (inpOutputName, inp.type);
-		  
-		  combiner->AddOutput (inp.name, inp.type);
-		  combiner->OutputRename (inp.name, inpOutputName);
-		  combiner->Link (inpOutputName,
-		    node.inputRenames.Get (inp.name, (const char*)0));
-		  combiner->EndSnippet ();
-		  
-		  defaultCombiner->EndSnippet ();
-	        }
+                  if (prevInput != 0)
+                  {
+	            Link link;
+	            link.fromName = 
+	              synthTree.GetNodeForTech (prevInput->node->tech).outputRenames.Get (
+		        prevInput->input->name, (const char*)0);
+	            CS_ASSERT(!link.fromName.IsEmpty());
+      	    
+	            link.toName = node.inputRenames.Get (inp.name, (const char*)0);
+	            CS_ASSERT(!link.toName.IsEmpty());
+      	    
+  	            links.Put (prevInput->node->tech, link);
+                  }
+                  else
+                  {
+                    EmittedInput emit;
+                    emit.node = &node;
+                    emit.input = &inp;
+                    if (!inp.condition.IsEmpty())
+                      emit.conditions.Push (inp.condition);
+                    size_t index = emitInputs.Push (emit);
+                    if (!tag.IsEmpty())
+                      taggedInputs.Put (tag, index);
+                  }
+                }
 	        break;
 	    }
 	  }
+          if (prevInput != 0)
+          {
+            if (inp.condition.IsEmpty())
+              /* No condition. Make sure input is always pulled. */
+              prevInput->conditions.DeleteAll();
+            else
+            {
+              /* This input has a condition. If all other previous inputs with
+                 the same tag have a condition add ours as well, so any of the
+                 conditions being true pulls in the input. */
+              if (prevInput->conditions.GetSize() != 0)
+                prevInput->conditions.Push (inp.condition);
+            }
+          }
         }
+      }
+
+      for (size_t i = 0; i < emitInputs.GetSize(); i++)
+      {
+        const EmittedInput& emitted = emitInputs[i];
+        const Snippet::Technique::Input& inp = *emitted.input;
+
+	defaultCombiner->BeginSnippet();
+	combiner->BeginSnippet ();
+	for (size_t b = 0; b < inp.complexBlocks.GetSize(); b++)
+	{
+	  const Snippet::Technique::Block& block = 
+	    inp.complexBlocks[b];
+	  csRef<WeaverCommon::iCombiner> theCombiner (GetCombiner (
+	    combiner, *comb, emitted.node->tech->GetCombiner(),
+	    block.combinerName));
+          if (theCombiner.IsValid())
+          {
+            csRef<iDocumentNode> node;
+            if (emitted.conditions.GetSize() > 0)
+            {
+              /* Synthesize <?if?>/<?endif?> nodes around block 
+                 contents */
+              DocumentNodeContainer* container = 
+                new DocumentNodeContainer (block.node->GetParent ());
+              container->AddAttributesOf (block.node);
+              container->SetValue (block.node->GetValue ());
+              csRef<iDocumentNode> piNode;
+              csString conditionStr;
+              conditionStr.AppendFmt ("(%s)", emitted.conditions[0].GetData());
+              for (size_t c = 1; c < emitted.conditions.GetSize(); c++)
+                conditionStr.AppendFmt (" || (%s)", 
+                  emitted.conditions[c].GetData());
+              csString conditionPI;
+              conditionPI.Format ("if %s", conditionStr.GetData());
+              piNode.AttachNew (new DocumentNodePI (container, 
+                conditionPI));
+              container->AddChild (piNode);
+              container->AddChildrenOf (block.node);
+              piNode.AttachNew (new DocumentNodePI (container, 
+                "endif"));
+              container->AddChild (piNode);
+              node.AttachNew (container);
+            }
+            else
+              node = block.node;
+            theCombiner->WriteBlock (block.location, node);
+          }
+        }
+		  
+        csString inpOutputName;
+	inpOutputName.Format ("in_%s", inp.name.GetData());
+	combiner->AddGlobal (inpOutputName, inp.type);
+		  
+	combiner->AddOutput (inp.name, inp.type);
+	combiner->OutputRename (inp.name, inpOutputName);
+	combiner->Link (inpOutputName,
+	  emitted.node->inputRenames.Get (inp.name, (const char*)0));
+
+	combiner->EndSnippet ();
+	defaultCombiner->EndSnippet ();
       }
     }
     {
@@ -553,6 +654,49 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     return used;
   }
 
+  csString Synthesizer::GetInputTag (WeaverCommon::iCombiner* combiner,
+    const Snippet::Technique::CombinerPlugin& comb, 
+    const Snippet::Technique::CombinerPlugin& combTech,
+    const Snippet::Technique::Input& input)
+  {
+    csString tag;
+    if (input.defaultType == Snippet::Technique::Input::Complex)
+    {
+      // First check if the default combiner can give a tag
+      for (size_t b = 0; b < input.complexBlocks.GetSize(); b++)
+      {
+        const Snippet::Technique::Block& block = input.complexBlocks[b];
+        if (!block.combinerName.IsEmpty()) continue;
+        csRef<iString> newTag = defaultCombiner->QueryInputTag (block.location,
+          block.node);
+        if (!newTag.IsValid() || newTag->IsEmpty()) continue;
+        // Ambiguity: return no tag
+        if (!tag.IsEmpty() && (tag != newTag->GetData())) 
+          return csString();
+        tag = newTag->GetData();
+      }
+      // Now check if the user combiner can give a tag
+      if (tag.IsEmpty())
+      {
+        for (size_t b = 0; b < input.complexBlocks.GetSize(); b++)
+        {
+          const Snippet::Technique::Block& block = input.complexBlocks[b];
+          if (block.combinerName.IsEmpty()) continue;
+          csRef<WeaverCommon::iCombiner> theCmbiner (GetCombiner (
+            combiner, comb, combTech, block.combinerName));
+          csRef<iString> newTag = combiner->QueryInputTag (block.location,
+            block.node);
+          if (!newTag.IsValid() || newTag->IsEmpty()) continue;
+          // Ambiguity: return no tag
+          if (!tag.IsEmpty() && (tag != newTag->GetData()))
+            return csString();
+          tag = newTag->GetData();
+        }
+      }
+    }
+    return tag;
+  }
+
   //-------------------------------------------------------------------------
       
   void Synthesizer::SynthesizeNodeTree::ComputeRenames (Node& node,
@@ -689,6 +833,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     }
   }
   
+  void Synthesizer::SynthesizeNodeTree::ReverseNodeArray()
+  {
+    const size_t maxIndex = nodes.GetSize()-1;
+    for (size_t n = 0, n2 = maxIndex; n < nodes.GetSize() / 2; n++, n2--)
+    {
+      Node tmp = nodes[n];
+      nodes[n] = nodes[n2];
+      nodes[n2] = tmp;
+    }
+    csHash<size_t, csConstPtrKey<Snippet::Technique> >::GlobalIterator it (
+      techToNode.GetIterator());
+    while (it.HasNext())
+    {
+      size_t& v = it.Next();
+      v = maxIndex - v;
+    }
+  }
+
   void Synthesizer::SynthesizeNodeTree::Rebuild (const TechniqueGraph& graph,
     const csArray<const Snippet::Technique*>& outputs)
   {
