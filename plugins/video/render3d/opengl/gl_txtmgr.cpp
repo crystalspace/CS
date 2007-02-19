@@ -1480,13 +1480,14 @@ void csGLTextureManager::DumpSuperLightmaps (iVFS* VFS, iImageIO* iio,
 
 void csGLRendererLightmap::DecRef ()
 {
-  if (scfRefCount == 1)							
+  csRefTrackerAccess::TrackDecRef (scfObject, scfRefCount);
+  scfRefCount--;							
+  if (scfRefCount == 0)							
   {									
     CS_ASSERT (slm != 0);
     slm->FreeRLM (this);
     return;								
   }									
-  scfRefCount--;							
 }
 
 csGLRendererLightmap::csGLRendererLightmap () : scfImplementationType (this)
@@ -1554,14 +1555,15 @@ void csGLRendererLightmap::SetLightCellSize (int size)
 
 void csGLSuperLightmap::DecRef ()
 {
-  if (scfRefCount == 1)							
+  csRefTrackerAccess::TrackDecRef (scfObject, scfRefCount);
+  scfRefCount--;							
+  if (scfRefCount == 0)							
   {
     if (txtmgr != 0)
       txtmgr->superLMs.Delete (this);
     delete this;
     return;								
   }									
-  scfRefCount--;							
 }
 
 csGLSuperLightmap::csGLSuperLightmap (csGLTextureManager* txtmgr, 
@@ -1653,6 +1655,7 @@ void csGLSuperLightmap::FreeRLM (csGLRendererLightmap* rlm)
   // Otherwise freeing the RLM could trigger our own destruction -
   // causing an assertion in block allocator (due to how BA frees items and
   // the safety assertions on BA destruction.)
+  csRefTrackerAccess::TrackIncRef (this, scfRefCount);
   scfRefCount++;
   GetRLMAlloc ()->Free (rlm);
   DecRef ();
