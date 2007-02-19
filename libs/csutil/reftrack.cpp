@@ -23,9 +23,13 @@
 #include "csutil/scf.h"
 #include "csutil/scopedmutexlock.h"
 #include "csutil/sysfunc.h"
+
 #include "reftrack.h"
 
-csRefTracker::csRefTracker () : scfImplementationType (this), riAlloc(1000)
+const size_t RefInfoAllocChunk = 2*1024*1024;
+
+csRefTracker::csRefTracker () : scfImplementationType (this), 
+  riAlloc (RefInfoAllocChunk / sizeof (RefInfo))
 {
 }
 
@@ -82,6 +86,7 @@ void csRefTracker::TrackConstruction (void* object)
   RefInfo* oldRef = trackedRefs.Get (object, 0);
   if (oldRef != 0)
   {
+    oldRef->actions.ShrinkBestFit();
     OldRefInfo oldInfo = {object, oldRef};
     oldData.Push (oldInfo);
     trackedRefs.DeleteAll (object);
@@ -104,7 +109,8 @@ void csRefTracker::TrackDestruction (void* object, int refCount)
   action.refCount = refCount;
   action.stack = csCallStackHelper::CreateCallStack (1, true);
   action.tag = 0;
-  refInfo.destructed = true;
+  refInfo.refCount = refCount;
+  refInfo.flags |= RefInfo::flagDestructed;
 }
 
 void csRefTracker::MatchIncRef (void* object, int refCount, void* tag)
@@ -167,16 +173,6 @@ void csRefTracker::MatchDecRef (void* object, int refCount, void* tag)
     action.tag = tag;
     refInfo.refCount = refCount - 1;
   }
-  if (refCount == 0)
-  {
-    /*
-      Ditch tracked object as a new one might just 
-      coincidentally be alloced at the same spot.
-    */
-    trackedRefs.DeleteAll (object);
-    RefInfo* ref = trackedRefs.Get (object, 0);
-    riAlloc.Free (ref);
-  }
 }
 
 void csRefTracker::AddAlias (void* obj, void* mapTo)
@@ -205,17 +201,29 @@ void csRefTracker::SetDescription (void* obj, const char* description)
   refInfo.descr = description;
 }
 
+void csRefTracker::SetDescriptionWeak (void* obj, const char* description)
+{
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
+
+  RefInfo& refInfo = GetObjRefInfo (obj);
+  if (refInfo.descr == 0)
+    refInfo.descr = description;
+}
+
 void csRefTracker::ReportOnObj (void* obj, RefInfo* info)
 {
-  bool okay = (info->refCount == 0) ||
-    (info->destructed && (info->refCount <= 1));
+  bool okay = (info->refCount == 0)
+    /* The next check is to "let through" objects that have been 
+     * destructed with a refcount of 1 remaining
+     * (e.g. ref counted objects created on the stack). */
+     || ((info->flags & RefInfo::flagDestructed) && (info->refCount == 1));
   if (!okay)
   {
-    csPrintf ("object %p (%s), refcount %d, %s\n",
+    csPrintf ("LEAK: object %p (%s), refcount %d, %s\n",
       obj,
       info->descr ? info->descr : "<unknown>",
       info->refCount,
-      info->destructed ? "destructed" : "not destructed");
+      (info->flags & RefInfo::flagDestructed) ? "destructed" : "not destructed");
     for (size_t i = 0; i < info->actions.GetSize (); i++)
     {
       csPrintf ("%s by %p from %d\n",
