@@ -57,6 +57,9 @@ namespace lighter
     // Apply the exposure function
     void ApplyExposureFunction (float expConstant, float expMax);
 
+    // Apply scale and clamp function
+    void ApplyScaleClampFunction (float scaleVal, float maxValue);
+
     // Grow the lightmap    
     inline void Grow (uint w, uint h)
     { 
@@ -158,6 +161,10 @@ namespace lighter
     // Apply the exposure function
     static void ApplyExposureFunction (csColor* colors, size_t numColors, 
       float expConstant, float expMax);
+
+    // Do a static scaling
+    static void ApplyScaleClampFunction (csColor* colors, size_t numColors, 
+      float scaleValue, float maxValue);
   };
 
   // File-backed cache for LM data

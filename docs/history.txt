@@ -7,6 +7,13 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 
+19-Feb-2007
+	- Marten made a few changes in lighter2:
+	   - Disabled the use of the exposure function and use a simple
+	     scale and clamp instead. Gives more consistant result with both
+	     old-style lightmaps and "simple" hardware lighting.
+	   - Implemented a small optimization to the primitivie setup step.
+	   - Removed some dead code.
 16-Feb-2007
 	- res fixed an issue in xmlshader where conditions were incorrectly
 	  folded away.
