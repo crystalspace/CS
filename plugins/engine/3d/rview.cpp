@@ -49,7 +49,6 @@ csRenderView::csRenderView (iCamera *c) :
 {
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));
-  c->IncRef ();
   ctxt->icamera = c;
   context_id = 0;
 }
@@ -64,7 +63,6 @@ csRenderView::csRenderView (
 {
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));
-  c->IncRef ();
   ctxt->icamera = c;
   ctxt->iview = v;
   if (v)
