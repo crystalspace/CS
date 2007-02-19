@@ -18,10 +18,6 @@
 */
 
 #include "cssysdef.h"
-#if defined(CS_REF_TRACKER) && !defined(CS_REF_TRACKER_EXTENSIVE)
-  // Performance hack
-  #undef CS_REF_TRACKER
-#endif
 #include <ctype.h>
 
 #include "csgeom/math.h"

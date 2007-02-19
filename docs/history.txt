@@ -18,6 +18,10 @@ chronological order.
 	    - Made scfImplementationX register a reftracker alias for iBase.
 	    - Adjusted DecRef() for pooled classes to be reftracker-friendly.
 	- res made the callstack-related classes custom allocated.
+	- res removed "speed hacks" for reftracking used in some document
+	  implementations: these hacks unfortunately trip out the reftracker,
+	  causing false leak reports.
+	- res made the TinyXML wrapper reftracker-friendlier.
 19-Feb-2007
 	- Marten made a few changes in lighter2:
 	   - Disabled the use of the exposure function and use a simple
