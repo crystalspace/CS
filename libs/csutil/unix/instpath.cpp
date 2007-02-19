@@ -159,8 +159,7 @@ csPathsList* csInstallationPathsHelper::GetPlatformInstallationPaths()
   const char *envpath = getenv ("CRYSTAL");
   if (envpath && *envpath)
   {
-    return 
-      new csPathsList (csPathsUtilities::ExpandAll (csPathsList (envpath)));
+    return new csPathsList (envpath, true);
   }
 
   csPathsList* paths = new csPathsList;

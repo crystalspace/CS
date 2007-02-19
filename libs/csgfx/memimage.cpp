@@ -22,17 +22,14 @@
 #include "csgfx/quantize.h"
 #include "csgfx/imagememory.h"
 #include "csgfx/rgbpixel.h"
-#include "csutil/debug.h"
 #include "csutil/util.h"
 
 CS_LEAKGUARD_IMPLEMENT (csImageMemory);
 
 void csImageMemory::ConstructCommon()
 {
-  DG_ADDI (this, 0);
-  DG_TYPE (this, "csImageMemory");
+  databuf = 0;
 
-  Image = 0;
   Palette = 0;
   Alpha = 0;
   imageType = csimg2D;
@@ -56,7 +53,9 @@ void csImageMemory::ConstructSource (iImage* source)
     source->GetFormat());
 
   AllocImage();
-  memcpy (Image, source->GetImageData(), csImageTools::ComputeDataSize (this));
+  size_t size = csImageTools::ComputeDataSize (this);
+  memcpy (databuf->GetData (), source->GetImageData (), size);
+
   if (Alpha)
     memcpy (Alpha, source->GetAlpha(), Width * Height);
   if (Palette)
@@ -71,7 +70,9 @@ void csImageMemory::ConstructBuffers (int width, int height, void* buffer,
   Height = height;
   Depth = 1;
   Format = format;
-  Image = buffer;
+  size_t size = csImageTools::ComputeDataSize (this);
+  databuf.AttachNew (new csDataBuffer ((char*)buffer, size, false));
+
   Palette = palette;
   destroy_image = destroy;
 }
@@ -102,7 +103,9 @@ csImageMemory::csImageMemory (int width, int height, const void* buffer,
 {
   ConstructWHDF (width, height, 1, format);
   AllocImage();
-  memcpy (Image, buffer, csImageTools::ComputeDataSize (this));
+  size_t size = csImageTools::ComputeDataSize (this);
+  memcpy (databuf->GetData (), buffer, size);
+
   if (Palette)
     memcpy (Palette, palette, sizeof (csRGBpixel) * 256);
 }
@@ -128,18 +131,21 @@ csImageMemory::csImageMemory (int iFormat) :
 
 void csImageMemory::AllocImage()
 {
+  size_t size = Width*Height*Depth;
   switch (Format & CS_IMGFMT_MASK)
   {
     case CS_IMGFMT_PALETTED8:
-      Image = (void*) new uint8[Width*Height*Depth];
+      databuf.AttachNew (new csDataBuffer ((char*)new uint8[size],
+	    sizeof(uint8)*size, false));
       if (Format & CS_IMGFMT_ALPHA)
       {
-        Alpha =  new uint8[Width*Height*Depth];
+        Alpha =  new uint8[size];
       }
       Palette = new csRGBpixel[256];
       break;
     case CS_IMGFMT_TRUECOLOR:
-      Image = (void*) new csRGBpixel[Width*Height*Depth];
+      databuf.AttachNew (new csDataBuffer ((char*)new csRGBpixel[size],
+	    sizeof(csRGBpixel)*size, false));
       break;
   }
   destroy_image = true;
@@ -147,7 +153,7 @@ void csImageMemory::AllocImage()
 
 void csImageMemory::EnsureImage()
 {
-  if ((Image == 0) && (Palette == 0) && (Alpha == 0))
+  if (databuf == 0 && (Palette == 0) && (Alpha == 0))
     AllocImage();
 }
 
@@ -157,22 +163,27 @@ void csImageMemory::FreeImage ()
   {
     // Clear the 'Image' and 'Palette' pointers so that they won't be
     // deallocated later.
-    Image = 0;
+    databuf = 0;
     Palette = 0;
   }
   /*csImageFile::FreeImage();*/
-  switch (Format & CS_IMGFMT_MASK)
+  if (databuf)
   {
-    case CS_IMGFMT_TRUECOLOR:
-      delete [] (csRGBpixel *)Image;
-      break;
-    case CS_IMGFMT_PALETTED8:
-      delete [] (uint8 *)Image;
-      break;
+    switch (Format & CS_IMGFMT_MASK)
+    {
+      case CS_IMGFMT_TRUECOLOR:
+        delete [] (csRGBpixel *)(databuf->GetData ());
+        break;
+      case CS_IMGFMT_PALETTED8:
+        delete [] (uint8 *)(databuf->GetData ());
+        break;
+    }
   }
   delete [] Palette;
   delete [] Alpha;
-  Image = 0; Palette = 0; Alpha = 0;
+  databuf = 0;
+  Palette = 0;
+  Alpha = 0;
 }
 
 void csImageMemory::SetDimensions (int newWidth, int newHeight)
@@ -193,17 +204,16 @@ csImageMemory::~csImageMemory ()
     // Before calling FreeImage() we first
     // clear the 'Image' and 'Palette' pointers so that
     // it will not try to deallocate.
-    Image = 0;
+    databuf = 0;
     Palette = 0;
   }
   FreeImage();
-  DG_REM (this);
 }
 
 void* csImageMemory::GetImagePtr ()
 {
   EnsureImage();
-  return Image;
+  return (void*)databuf->GetData ();
 }
 csRGBpixel* csImageMemory::GetPalettePtr ()
 {
@@ -223,7 +233,7 @@ void csImageMemory::Clear (const csRGBpixel &colour)
   EnsureImage ();
 
   uint32 *src = (uint32*) &colour;
-  uint32 *dst = (uint32*)Image;
+  uint32 *dst = (uint32*)databuf->GetData ();
 
   int i;
   for (i = 0; i < Width*Height*Depth; i++, dst++)
@@ -251,7 +261,7 @@ void csImageMemory::CheckAlpha ()
       break;
     case CS_IMGFMT_TRUECOLOR:
       for (i = 0; i < pixels; i++)
-        if (((csRGBpixel *)Image) [i].alpha != 255)
+        if (((csRGBpixel *)databuf->GetData ()) [i].alpha != 255)
         {
           noalpha = false;
           break;
@@ -296,20 +306,25 @@ void csImageMemory::ConvertFromRGBA (csRGBpixel *iImage)
 
         quant.Count (iImage, pixels);
         quant.Palette (Palette, maxcolors);
-        uint8* img8 = (uint8*)Image; /* RemapDither() wants an uint8*&, casting
+        uint8* img8 = (uint8*)databuf->GetData (); /* RemapDither() wants an uint8*&, casting
                                       * Image to that breaks strict-aliasing */
         quant.RemapDither (iImage, pixels, Width, Palette, maxcolors,
           img8, has_keycolour ? &keycolour : 0);
-	Image = img8;
+	CS_ASSERT (img8 == (uint8*)databuf->GetData ());
 
         quant.End ();
       }
       delete [] iImage;
       break;
     case CS_IMGFMT_TRUECOLOR:
-      if (Image != iImage)
-        FreeImage ();
-      Image = iImage;
+      {
+        if (!databuf || databuf->GetData () != (char*)iImage)
+	{
+          FreeImage ();
+          size_t size = csImageTools::ComputeDataSize (this);
+          databuf.AttachNew (new csDataBuffer ((char*)iImage, size, false));
+	}
+      }
       break;
   }
 }
@@ -341,18 +356,26 @@ void csImageMemory::ConvertFromPal8 (uint8 *iImage, uint8* alpha,
       delete[] Alpha;
       break;
     case CS_IMGFMT_PALETTED8:
-      Image = iImage;
-      Palette = iPalette;
-      Alpha = alpha;
+      {
+        size_t size = csImageTools::ComputeDataSize (this);
+        databuf.AttachNew (new csDataBuffer ((char*)iImage, size, false));
+
+        Palette = iPalette;
+        Alpha = alpha;
+      }
       break;
     case CS_IMGFMT_TRUECOLOR:
     {
       uint8 *in = iImage;
       csRGBpixel *out;
-      if (Image)
-        out = (csRGBpixel *)Image;
+      if (databuf)
+        out = (csRGBpixel *)databuf->GetData ();
       else
-        Image = out = new csRGBpixel [pixels];
+      {
+        out = new csRGBpixel [pixels];
+        size_t size = csImageTools::ComputeDataSize (this);
+        databuf.AttachNew (new csDataBuffer ((char*)out, size, false));
+      }
 
       if ((Format & CS_IMGFMT_ALPHA) && alpha)
       {
@@ -394,10 +417,10 @@ void csImageMemory::SetFormat (int iFormat)
 {
   int pixels = Width * Height * Depth;
   int oldformat = Format;
-  void *oldimage = Image;
+  void *oldimage = databuf->GetData ();
   uint8* oldalpha = Alpha;
   Alpha = 0;
-  Image = 0;
+  databuf = 0;
   Format = iFormat;
 
   if ((oldformat & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
@@ -428,9 +451,11 @@ void csImageMemory::SetFormat (int iFormat)
     if ((Format & CS_IMGFMT_ALPHA) && !Alpha)
       Alpha = new uint8 [pixels];
     if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
-      Image = new uint8 [pixels];
+      databuf.AttachNew (new csDataBuffer ((char*)new uint8 [pixels],
+	    sizeof(uint8)*pixels, false));
     else if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
-      Image = new csRGBpixel [pixels];
+      databuf.AttachNew (new csDataBuffer ((char*)new csRGBpixel[pixels],
+	    sizeof(csRGBpixel)*pixels, false));
   }
 }
 
@@ -450,9 +475,9 @@ void csImageMemory::ApplyKeyColor ()
   if (has_keycolour
     && ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8))
   {
-    if (Image == 0) return;
+    if (databuf == 0) return;
 
-    uint8* imageData = (uint8*)Image;
+    uint8* imageData = (uint8*)databuf->GetData ();
     uint8* imagePtr;
     const int pixcount = Width * Height * Depth;
     int i;
@@ -542,7 +567,7 @@ bool csImageMemory::Copy (iImage* simage_, int x, int y,
       memcpy (Alpha + (i+y)*Width + x, simage->GetAlpha() + i*width, width);
   }
 
-  if (Image)
+  if (databuf)
   {
     switch (Format & CS_IMGFMT_MASK)
     {
@@ -550,12 +575,12 @@ bool csImageMemory::Copy (iImage* simage_, int x, int y,
         break;
       case CS_IMGFMT_PALETTED8:
         for ( i=0; i<height; i++ )
-          memcpy ((uint8*)Image + (i+y)*Width + x,
+          memcpy ((uint8*)databuf->GetData () + (i+y)*Width + x,
                 (uint8*)simage->GetImageData() + i*width,  width);
         break;
       case CS_IMGFMT_TRUECOLOR:
         for ( i=0; i<height; i++ )
-          memcpy ((csRGBpixel*)Image + (i+y)*Width + x,
+          memcpy ((csRGBpixel*)databuf->GetData () + (i+y)*Width + x,
                 (csRGBpixel*)simage->GetImageData() + i*width,
                 width * sizeof (csRGBpixel));
         break;

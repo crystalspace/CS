@@ -78,7 +78,7 @@ csFatLoopLoader::csFatLoopLoader (iBase* p) : csBaseRenderStepLoader (p)
 
 csPtr<iBase> csFatLoopLoader::Parse (iDocumentNode* node, 
                                      iStreamSource*,
-				     iLoaderContext* /*ldr_context*/,
+				     iLoaderContext* ldr_context,
                                      iBase* /*context*/)
 {
   csRef<csFatLoopStep> step;
@@ -122,7 +122,7 @@ csPtr<iBase> csFatLoopLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_PASS:
         {
           RenderPass pass;
-          if (!ParsePass (child, pass))
+          if (!ParsePass (ldr_context, child, pass))
             return 0;
           step->AddPass (pass);
         }
@@ -140,10 +140,11 @@ csPtr<iBase> csFatLoopLoader::Parse (iDocumentNode* node,
   return csPtr<iBase> (step);
 }
 
-bool csFatLoopLoader::ParsePass (iDocumentNode* node, RenderPass& pass)
+bool csFatLoopLoader::ParsePass (iLoaderContext* ldr_context,
+    iDocumentNode* node, RenderPass& pass)
 {
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
+    (object_reg, "crystalspace.shared.stringset");
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -157,7 +158,7 @@ bool csFatLoopLoader::ParsePass (iDocumentNode* node, RenderPass& pass)
 	pass.shadertype = strings->Request (child->GetContentsValue ());
 	break;
       case XMLTOKEN_DEFAULTSHADER:
-        pass.defShader = synldr->ParseShaderRef (child);
+        pass.defShader = synldr->ParseShaderRef (ldr_context, child);
 	break;
       case XMLTOKEN_MAXLIGHTS:
 	pass.maxLights = child->GetContentsValueAsInt ();
@@ -218,13 +219,13 @@ csFatLoopStep::csFatLoopStep (iObjectRegistry* object_reg) :
   SCF_CONSTRUCT_IBASE(0);
   this->object_reg = object_reg;
 
-  shaderManager = CS_QUERY_REGISTRY (object_reg, iShaderManager);
+  shaderManager = csQueryRegistry<iShaderManager> (object_reg);
   nullShader = shaderManager->GetShader ("*null");
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
-  lightmgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
+  engine = csQueryRegistry<iEngine> (object_reg);
+  lightmgr = csQueryRegistry<iLightManager> (object_reg);
 
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
-    "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet>
+    (object_reg, "crystalspace.shared.stringset");
   fogplane_name = strings->Request ("fogplane");
   fogdensity_name = strings->Request ("fog density");
   fogcolor_name = strings->Request ("fog color");
@@ -511,7 +512,7 @@ csPtr<iTextureHandle> csFatLoopStep::GetAttenuationTexture (
     csRef<iImage> img = csPtr<iImage> (new csImageMemory (
       CS_ATTTABLE_SIZE, CS_ATTTABLE_SIZE, attenuationdata, true, 
       CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
-    csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+    csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
     attTex = g3d->GetTextureManager()->RegisterTexture (
 	img, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS);
     attTex->SetTextureClass ("lookup");

@@ -34,32 +34,32 @@ Simple::~Simple ()
 bool Simple::Setup ()
 {
   // The virtual clock.
-  vc = CS_QUERY_REGISTRY (GetObjectRegistry (), iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry ());
   if (!vc)
     return ReportError("Can't find the virtual clock!");
 
   // Find the pointer to engine plugin
-  engine = CS_QUERY_REGISTRY (GetObjectRegistry (), iEngine);
+  engine = csQueryRegistry<iEngine> (GetObjectRegistry ());
   if (!engine)
     return ReportError("No iEngine plugin!");
 
-  loader = CS_QUERY_REGISTRY (GetObjectRegistry (), iLoader);
+  loader = csQueryRegistry<iLoader> (GetObjectRegistry ());
   if (!loader)
     return ReportError("No iLoader plugin!");
 
-  kbd = CS_QUERY_REGISTRY (GetObjectRegistry (), iKeyboardDriver);
+  kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry ());
   if (!kbd)
     return ReportError("No iKeyboardDriver plugin!");
 
-  g3d = CS_QUERY_REGISTRY (GetObjectRegistry (), iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry ());
   if (!g3d)
     return ReportError("No iGraphics3D plugin!");
 
-  vfs = CS_QUERY_REGISTRY(GetObjectRegistry(), iVFS);
+  vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
   if (!vfs) 
     return ReportError("Failed to locate Virtual FileSystem!");
 
-  cegui = CS_QUERY_REGISTRY(GetObjectRegistry(), iCEGUI);
+  cegui = csQueryRegistry<iCEGUI> (GetObjectRegistry());
   if (!cegui) 
     return ReportError("Failed to locate CEGUI plugin");
 
@@ -164,7 +164,7 @@ bool Simple::HandleEvent (iEvent& ev)
   else if ((ev.Name == csevKeyboardDown(object_reg)) &&
     (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (GetObjectRegistry (), iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (GetObjectRegistry ()));
     if (q)
       q->GetEventOutlet()->Broadcast (csevQuit(object_reg));
     res = true;
@@ -220,28 +220,17 @@ void Simple::CreateGui()
   // Set the logging level
   cegui->GetLoggerPtr ()->setLoggingLevel(CEGUI::Informative);
 
-#if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR >= 5)
-  // Use the 0.5 version of the skin
   vfs->ChDir ("/ceguitest/0.5/");
-#else
-  // Use the old version of the skin
-  vfs->ChDir ("/ceguitest/");
-#endif
 
   // Load the ice skin (which uses Falagard skinning system)
   cegui->GetSchemeManagerPtr ()->loadScheme("ice.scheme");
 
   cegui->GetSystemPtr ()->setDefaultMouseCursor("ice", "MouseArrow");
 
-#if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR >= 5)
   CEGUI::Font* font = cegui->GetFontManagerPtr ()->createFont("FreeType",
     "Vera", "/fonts/ttf/Vera.ttf");
   font->setProperty("PointSize", "10");
   font->load();
-#else
-  cegui->GetFontManagerPtr ()->createFont("Vera", "/fonts/ttf/Vera.ttf", 10,
-    CEGUI::Default);
-#endif
 
   CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 

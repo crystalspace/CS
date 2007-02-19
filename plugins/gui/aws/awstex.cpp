@@ -61,8 +61,8 @@ void awsTextureManager::Initialize (iObjectRegistry *obj_reg)
   if (!obj_reg) csPrintf ("aws-debug:  bad obj_reg (%s)\n", __FILE__);
   if (!object_reg) csPrintf ("aws-debug:  bad object_reg (%s)\n", __FILE__);
 
-  loader = CS_QUERY_REGISTRY (object_reg, iImageIO);
-  vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+  loader = csQueryRegistry<iImageIO> (object_reg);
+  vfs = csQueryRegistry<iVFS> (object_reg);
 
   if (!loader)
   {
@@ -91,8 +91,8 @@ void awsTextureManager::Initialize (iObjectRegistry *obj_reg)
       "could not mount the default aws skin (awsdef.zip)aws.");
   }
 
-  strset = CS_QUERY_REGISTRY_TAG_INTERFACE(object_reg,
-    "crystalspace.shared.stringset", iStringSet);
+  strset = csQueryRegistryTagInterface<iStringSet>
+    (object_reg, "crystalspace.shared.stringset");
   if (!strset.IsValid())
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.awstex",
@@ -132,10 +132,10 @@ iTextureHandle *awsTextureManager::GetTexturebyID (
     csPrintf (
       "aws-debug: (%s) texture count is: %lu\n",
       __FILE__,
-      (unsigned long)textures.Length ());
+      (unsigned long)textures.GetSize ());
 
   size_t i;
-  for (i = 0; i < textures.Length () && txtfound == false; ++i)
+  for (i = 0; i < textures.GetSize () && txtfound == false; ++i)
   {
     awsTexture *awstxt = textures[i];
 

@@ -238,6 +238,12 @@ public:
   	csVector3* vertices,
   	csTriangleMinMax* tris, int tri_count,
 	csPlane3* planes);
+
+  /* Create a table of vertex connections for this mesh. The resulting
+   * data structure must be freed by user after using it. 
+   */
+  static csArray<csArray<int> > *CalculateVertexConnections (
+		  				iPolygonMesh* mesh);
 };
 
 /** @} */

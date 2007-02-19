@@ -188,12 +188,12 @@ public:
 
   bool HasNext()
   {
-    return CurrentIterator;
+    return CurrentIterator.IsValid();
   }
 
   virtual const char *GetKey(bool Local) const
   {
-    return currentKey ? currentKey + (Local ? Subsection.Length() : 0) : 0;
+    return currentKey ? currentKey + (Local ? Subsection.Length () : 0) : 0;
   }
   virtual int GetInt() const
   {
@@ -292,7 +292,7 @@ void csConfigManager::CleanUp ()
   }
   // every iterator holds a reference to this object, so when this is
   // deleted there shouldn't be any iterators left.
-  CS_ASSERT(Iterators.Length() == 0);
+  CS_ASSERT(Iterators.GetSize () == 0);
 }
 
 void csConfigManager::AddDomain(iConfigFile *Config, int Priority)
@@ -634,7 +634,7 @@ void csConfigManager::FlushRemoved(size_t n)
 
 size_t csConfigManager::FindRemoved(const char *Name) const
 {
-  for (size_t i=0; i<Removed.Length(); i++)
+  for (size_t i=0; i<Removed.GetSize (); i++)
   {
     iConfigFile *cfg = Removed[i];
     if (cfg->GetFileName())

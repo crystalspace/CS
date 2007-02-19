@@ -20,6 +20,8 @@
 #ifndef SNDSYS_SOFTWARE_DRIVER_NULL_H
 #define SNDSYS_SOFTWARE_DRIVER_NULL_H
 
+#include "csutil/threading/thread.h"
+
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 
@@ -33,29 +35,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(SndSysNull)
 
 class SndSysDriverNull;
 
-class SndSysDriverRunnable : public csRunnable
+class SndSysDriverRunnable : public CS::Threading::Runnable
 {
 private:
   SndSysDriverNull* m_pParent;
-  int m_RefCount;
 
 public:
-  SndSysDriverRunnable (SndSysDriverNull* pParent) :
-  	m_pParent (pParent), m_RefCount (1) { }
+  SndSysDriverRunnable (SndSysDriverNull* pParent) 
+    : m_pParent (pParent)
+  { }
   virtual ~SndSysDriverRunnable () { }
 
   virtual void Run ();
-  virtual void IncRef() { ++m_RefCount; }
-  /// Decrement reference count.
-  virtual void DecRef()
-  {
-    --m_RefCount;
-    if (m_RefCount <= 0)
-      delete this;
-  }
-
-  /// Get reference count.
-  virtual int GetRefCount() { return m_RefCount; }
 };
 
 // NULL implementation of the iSndSysSoftwareDriver interface
@@ -125,7 +116,7 @@ protected:
   volatile bool m_bRunning;
 
   /// A reference to the CS interface for our background thread
-  csRef<csThread> m_pBGThread;
+  csRef<CS::Threading::Thread> m_pBGThread;
 
   /// The event recorder interface, if active
   csRef<iSndSysEventRecorder> m_EventRecorder;

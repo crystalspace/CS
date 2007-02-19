@@ -96,7 +96,8 @@ bool csDriverDBReader::Apply (iDocumentNode* node)
       case XMLTOKEN_USECFG:
 	{
 	  const char* cfgname = child->GetContentsValue ();
-	  csRef<csConfigDocument> cfg (configs.Get (cfgname, 0));
+	  csRef<csConfigDocument> cfg (configs.Get (cfgname, 
+	    (csConfigDocument*)0));
 	  if (!cfg.IsValid ())
 	  {
 	    synsrv->Report (
@@ -389,7 +390,8 @@ bool csDriverDBReader::ParseConfigs (iDocumentNode* node)
 	      "<config> has no name");
 	    return false;
 	  }
-	  csRef<csConfigDocument> cfg (configs.Get (name, 0));
+	  csRef<csConfigDocument> cfg (configs.Get (name, 
+	    (csConfigDocument*)0));
 	  if (!cfg.IsValid ())
 	  {
 	    cfg.AttachNew (new csConfigDocument ());
@@ -534,7 +536,7 @@ void csGLDriverDatabase::Close ()
   if (!ogl2d) return;
   csRef<iConfigManager> cfgmgr = 
     csQueryRegistry<iConfigManager> (ogl2d->object_reg);
-  for (size_t i = 0; i < addedConfigs.Length(); i++)
+  for (size_t i = 0; i < addedConfigs.GetSize (); i++)
   {
     cfgmgr->RemoveDomain (addedConfigs[i]);
   }

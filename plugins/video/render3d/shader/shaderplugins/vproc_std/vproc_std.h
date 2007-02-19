@@ -61,7 +61,6 @@ public:
   csStringID string_object2world;
   csStringID string_world2camera;
   csLightShaderVarCache lsvCache;
-
 private:
   bool isOpen;
 

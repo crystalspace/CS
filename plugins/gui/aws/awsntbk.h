@@ -151,7 +151,7 @@ protected:
     void FreeAll ()
     {
       size_t i;
-      for (i = 0 ; i < Length () ; i++)
+      for (i = 0 ; i < GetSize () ; i++)
         FreeItem (Get (i));
       DeleteAll ();
     }

@@ -369,19 +369,12 @@ struct iSCF : public iBase
  * For old-style interfaces it is specialized through SCF_VERSION macro,
  * with new style interfaces no specialization is needed.
  */
-template <class Interface> 
+template <typename Interface> 
 class scfInterfaceTraits
 {
 public:
   typedef typename Interface::InterfaceTraits::InterfaceType 
     InterfaceType;
-
-  /*
-  Make sure that we either have a SCF_VERSION macro which results in this class
-  being specialized, or that we have a SCF_INTERFACE macro in the interface itself.
-  */
-  CS_COMPILE_ASSERT((::CS::TypeTraits::IsSame<InterfaceType,
-    Interface>::value));
 
   /**
    * Retrieve the interface's current version number.

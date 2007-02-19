@@ -23,6 +23,7 @@
 #include "csutil/threading/condition.h"
 
 #include <windows.h>
+#include <process.h>
 
 #if defined (__CYGWIN__) 
 //No _beginthreadex, emulate it
@@ -75,8 +76,8 @@ namespace Implementation
     class ThreadStartParams
     {
     public:
-      ThreadStartParams (Runnable* runner, int32& isRunningFlag)
-        : runnable (runner), isRunning (isRunningFlag)
+      ThreadStartParams (Runnable* runner, int32* isRunningPtr)
+        : runnable (runner), isRunningPtr (isRunningPtr)
       {
       }
 
@@ -84,20 +85,15 @@ namespace Implementation
       void Wait ()
       {
         ScopedLock<Mutex> lock (mutex);
-        while (!isRunning)
+        while (!(*isRunningPtr))
           startCondition.Wait (mutex);
       }
 
       void Started ()
       {
         ScopedLock<Mutex> lock (mutex);
-        AtomicOperations::Set (&isRunning, 1);
+        AtomicOperations::Set (isRunningPtr, 1);
         startCondition.NotifyOne ();
-      }
-
-      void Stopped ()
-      {
-        AtomicOperations::Set (&isRunning, 0);
       }
 
     
@@ -105,18 +101,21 @@ namespace Implementation
       Condition startCondition;
 
       Runnable* runnable;
-      int32& isRunning;
+      int32* isRunningPtr;
     };
 
     unsigned int __stdcall proxyFunc (void* param)
     {
       ThreadStartParams* tp = static_cast<ThreadStartParams*> (param);
 
+      int32* isRunningPtr = tp->isRunningPtr;
+      Runnable* runnable = tp->runnable;
+
       tp->Started ();
 
-      tp->runnable->Run ();
+      runnable->Run ();
 
-      tp->Stopped ();
+      AtomicOperations::Set (isRunningPtr, 0);
 
       return 0;
     }
@@ -125,15 +124,20 @@ namespace Implementation
 
 
   ThreadBase::ThreadBase (Runnable* runnable)
-    : runnable (runnable), threadHandle (0), threadId (0), isRunning (false)
+    : runnable (runnable), threadHandle (0), threadId (0), isRunning (0)
   {
+  }
+
+  ThreadBase::~ThreadBase ()
+  {
+
   }
 
   void ThreadBase::Start ()
   {
     if (!threadHandle)
     {
-      ThreadStartParams param (runnable, isRunning);
+      ThreadStartParams param (runnable, &isRunning);
 
       // _beginthreadex does not always return a void*,
       // on some versions of MSVC it gives uintptr_t

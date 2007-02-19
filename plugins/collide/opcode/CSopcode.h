@@ -54,7 +54,8 @@ class csOPCODECollideSystem :
 {
 
   bool Collide (csOPCODECollider* collider1,
-    const csReversibleTransform* trans1, csTerraFormerCollider* terraformer);
+    const csReversibleTransform* trans1, csTerraFormerCollider* terraformer,
+    const csReversibleTransform* trans2);
   
   bool Collide (csOPCODECollider* collider1, const csReversibleTransform*
     trans1, iTerrainSystem* terrain);

@@ -44,7 +44,7 @@ void awsActionDispatcher::Execute (
   unsigned long name = strset->Request(action);
 
   size_t i;
-  for (i = 0; i < actions.Length (); ++i)
+  for (i = 0; i < actions.GetSize (); ++i)
   {
     awsActionMap *map = actions[i];
 

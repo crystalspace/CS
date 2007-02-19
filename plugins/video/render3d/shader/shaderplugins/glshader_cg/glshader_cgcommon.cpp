@@ -77,7 +77,7 @@ void csShaderGLCGCommon::SetupState (const csRenderMesh* /*mesh*/,
   csRef<csShaderVariable> var;
 
   // set variables
-  for(i = 0; i < variablemap.Length(); ++i)
+  for(i = 0; i < variablemap.GetSize (); ++i)
   {
     VariableMapEntry& mapping = variablemap[i];
     
@@ -384,7 +384,7 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
   }
 
   i = 0;
-  while (i < variablemap.Length ())
+  while (i < variablemap.GetSize ())
   {
     // Get the Cg parameter
     CGparameter param = cgGetNamedParameter (program, 
@@ -464,7 +464,7 @@ void csShaderGLCGCommon::DoDebugDump ()
   output << cgGetProgramString (program, CG_COMPILED_PROGRAM);
   output << "\n";
 
-  csRef<iVFS> vfs = CS_QUERY_REGISTRY (objectReg, iVFS);
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectReg);
   if (debugFN.IsEmpty())
   {
     static int programCounter = 0;
@@ -484,7 +484,7 @@ void csShaderGLCGCommon::DoDebugDump ()
   }
   else
   {
-    debugFile->Write (output.GetData(), output.Length());
+    debugFile->Write (output.GetData(), output.Length ());
     csReport (objectReg, CS_REPORTER_SEVERITY_NOTIFY, 
       "crystalspace.graphics3d.shader.glcg",
       "Dumped Cg program info to '%s'", debugFN.GetData());
@@ -496,14 +496,14 @@ void csShaderGLCGCommon::WriteAdditionalDumpInfo (const char* description,
 {
   if (!shaderPlug->debugDump || !debugFN) return;
 
-  csRef<iVFS> vfs = CS_QUERY_REGISTRY (objectReg, iVFS);
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectReg);
   csRef<iDataBuffer> oldDump = vfs->ReadFile (debugFN, true);
 
   csString output ((char*)oldDump->GetData());
   output << description << ":\n";
   output << content;
   output << "\n";
-  if (!vfs->WriteFile (debugFN, output.GetData(), output.Length()))
+  if (!vfs->WriteFile (debugFN, output.GetData(), output.Length ()))
   {
     csReport (objectReg, CS_REPORTER_SEVERITY_WARNING, 
       "crystalspace.graphics3d.shader.glcg",
@@ -517,8 +517,8 @@ bool csShaderGLCGCommon::Load (iShaderDestinationResolver*,
   if(!program)
     return false;
 
-  csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(
-  	shaderPlug->object_reg, iShaderManager);
+  csRef<iShaderManager> shadermgr = 
+  	csQueryRegistry<iShaderManager> (shaderPlug->object_reg);
 
   csRef<iDocumentNode> variablesnode = program->GetNode (programType);
   if(variablesnode)

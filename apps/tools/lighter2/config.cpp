@@ -16,10 +16,10 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "cssysdef.h"
+#include "crystalspace.h"
 
 #include "config.h"
-
+#include "lighter.h"
 
 namespace lighter
 {
@@ -30,22 +30,28 @@ namespace lighter
   {
     //Setup defaults
     lighterProperties.doDirectLight = true;
-    lighterProperties.doRadiosity = false;
 
-    lmProperties.uTexelPerUnit = 16.0f;
-    lmProperties.vTexelPerUnit = 16.0f;
+    lmProperties.uTexelPerUnit = 1.0f;
+    lmProperties.vTexelPerUnit = 1.0f;
     lmProperties.maxLightmapU = 1024;
     lmProperties.maxLightmapV = 1024;
 
     diProperties.pointLightMultiplier = 1.0f;
     diProperties.areaLightMultiplier = 1.0f;
-
-    radProperties.uPatchResolution = 4;
-    radProperties.vPatchResolution = 4;
   }
 
-  void Configuration::Initialize (const csStringArray& /*files*/)
+  void Configuration::Initialize ()
   {
+    csRef<iConfigManager> cfgMgr = globalLighter->configMgr;
     
+    lighterProperties.doDirectLight = cfgMgr->GetBool ("lighter2.DirectLight", true);
+
+
+    lmProperties.uTexelPerUnit = cfgMgr->GetFloat ("lighter2.uTexelPerUnit", 2.0f);
+    lmProperties.vTexelPerUnit = cfgMgr->GetFloat ("lighter2.vTexelPerUnit", 2.0f);
+
+    lmProperties.maxLightmapU = cfgMgr->GetInt ("lighter2.maxLightmapU", 1024);
+    lmProperties.maxLightmapV = cfgMgr->GetInt ("lighter2.maxLightmapV", 1024);
+   
   }
 }

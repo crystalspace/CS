@@ -293,20 +293,20 @@ bool awsComponent::Setup (iAws *_wmgr, iAwsComponentNode *settings)
       if (strcmp ("GridBag", ln->GetData ()) == 0)
       {
         awsGridBagLayout* temp = new awsGridBagLayout (self, settings, pm);
-        layout = SCF_QUERY_INTERFACE (temp, iAwsLayoutManager);
+        layout = scfQueryInterface<iAwsLayoutManager> (temp);
         temp->DecRef ();
       }
       else if (strcmp ("Border", ln->GetData ()) == 0)
       {
         awsBorderLayout* temp = new awsBorderLayout (self, settings, pm);
-        layout = SCF_QUERY_INTERFACE (temp, iAwsLayoutManager);
+        layout = scfQueryInterface<iAwsLayoutManager> (temp);
         temp->DecRef ();
       }
     }
 
     iString *setStr = 0;
     const csStringArray &cusProps = pm->GetCustomStringProperties();
-    for( size_t i = 0; i < cusProps.Length(); ++i )
+    for( size_t i = 0; i < cusProps.GetSize (); ++i )
     {
       const char *tp = cusProps[ i ];
       pm->GetString( settings, tp, setStr );
@@ -917,7 +917,7 @@ iAwsComponent *awsComponent::TabNext (iAwsComponent *child)
 
   if (n == csArrayItemNotFound)
     return 0;
-  else if (n == TabOrder.Length () - 1)
+  else if (n == TabOrder.GetSize () - 1)
     return ((iAwsComponent *)TabOrder[0]);
   else
     return ((iAwsComponent *)TabOrder[n + 1]);
@@ -932,7 +932,7 @@ iAwsComponent *awsComponent::TabPrev (iAwsComponent *child)
   else
   {
     if (n == 0)
-      return ((iAwsComponent *)TabOrder[TabOrder.Length() - 1]);
+      return ((iAwsComponent *)TabOrder[TabOrder.GetSize () - 1]);
     else
       return ((iAwsComponent *)TabOrder[n - 1]);
   }
@@ -940,12 +940,12 @@ iAwsComponent *awsComponent::TabPrev (iAwsComponent *child)
 
 int awsComponent::GetTabLength ()
 {
-  return (int)TabOrder.Length ();
+  return (int)TabOrder.GetSize ();
 }
 
 iAwsComponent *awsComponent::GetTabComponent (int index)
 {
-  if ((size_t)index < TabOrder.Length ())
+  if ((size_t)index < TabOrder.GetSize ())
     return TabOrder[index];
   else
     return 0;

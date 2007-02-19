@@ -101,12 +101,12 @@ public:
   /// Copy constructor.
   csPathsList (csPathsList const& o) : paths(o.paths) {}
   /// Construct from a list of paths separated by CS_PATH_DELIMITER.
-  csPathsList (const char* pathList);
+  csPathsList (const char* pathList, bool expand = false);
   /**
    * Construct from a list of single paths. The list must be terminated by a
    * 0 entry.
    */
-  csPathsList (const char* const pathList[]);
+  csPathsList (const char* const pathList[], bool expand = false);
   /// Destructor.
   ~csPathsList() {}
   /// Assignment operator.
@@ -177,10 +177,10 @@ public:
   
   //@{
   /// Return number of contained paths.
-  size_t Length () const { return paths.Length(); }
-  size_t GetSize () const { return paths.Length(); }
+  size_t Length () const { return paths.GetSize (); }
+  size_t GetSize () const { return paths.GetSize (); }
   //@}
-  CS_DEPRECATED_METHOD_MSG("Use Length() instead") 
+  CS_DEPRECATED_METHOD_MSG("Use GetSize() instead") 
   size_t GetCount () const { return Length(); }
   //@{
   /// Retrieve the n'th path record.
@@ -264,6 +264,7 @@ public:
   /// Expands all paths in a path list.
   static csPathsList ExpandAll (const csPathsList& paths);
 };
+
 
 /**
  * A helper class containing a number of functions to deal with Crystal Space
@@ -363,6 +364,22 @@ CS_DEPRECATED_METHOD inline csString csGetAppDir (const char* argv0)
 CS_DEPRECATED_METHOD inline csString csGetResourceDir (const char* argv0)
 { return csInstallationPathsHelper::GetResourceDir (argv0); }
 //@}
+
+
+namespace CS
+{
+namespace Platform
+{
+
+/// Get system specific temporary folder
+CS_CRYSTALSPACE_EXPORT csString GetTempDirectory ();
+
+/// Get file name for temporary file within specified directory
+CS_CRYSTALSPACE_EXPORT csString GetTempFilename (const char* path/* = 0*/);
+
+}
+}
+
 
 /** @} */
 /** @} */

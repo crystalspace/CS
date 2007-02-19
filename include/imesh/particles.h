@@ -478,7 +478,7 @@ struct iParticleSystemFactory : public iParticleSystemBase
  */
 struct iParticleSystem : public iParticleSystemBase
 {
-  SCF_INTERFACE(iParticleSystem,1,0,0);
+  SCF_INTERFACE(iParticleSystem,1,0,1);
 
   /// Get number of particles currently in the system
   virtual size_t GetParticleCount () const = 0;
@@ -494,6 +494,15 @@ struct iParticleSystem : public iParticleSystemBase
    * 
    */
   virtual csParticleBuffer* LockForExternalControl (size_t maxParticles) = 0;
+  
+  /**
+   * Advance the time of the particle system object by the given duration.
+   * This is useful to "fill" a particle system after its initial creation.
+   * \remarks Internally, the time is advanced in multiple steps of a smaller
+   *  duration. This means that the run time needed to advance a particle
+   *  system grows proportionally with the time to advance!
+   */
+  virtual void Advance (csTicks time) = 0;
 };
 
 
@@ -718,7 +727,7 @@ enum csParticleBuiltinEffectorVFType
    *
    * ODE:
    * pl = closest point on line defined by vparam[0] + t*vparam[1]
-   * p' = vparam[2] * p-pl x vparam[1] + vparam[3]
+   * p' = vparam[2] * p-pl x vparam[1] + (p-pl) * fparam[0] + vparam[3]
    */
   CS_PARTICLE_BUILTIN_SPIRAL,
 

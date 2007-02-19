@@ -127,6 +127,10 @@ rule LinkStaticPlugins
     # First include static plugin info
     if ! $(HAVE_STATICDEPS.$(package))
     {
+      if ! $($(package).STATICDEPS)
+      {
+        Echo "$(target): Warning: no dependencies file for static plugin package \"$(package)\"" ;
+      }
       include $($(package).STATICDEPS) ;
       HAVE_STATICDEPS.$(package) = yes ;
     }
@@ -143,6 +147,10 @@ rule LinkStaticPlugins
     for p in $(plugins)
     {
       NotFile $(p) ;
+      if ! [ IsElem $(p) : $(STATICPLUGINS.AVAILABLE) ]
+      {
+        Echo "$(target): Warning: Static plugin \"$(p)\" from package \"$(package)\" not available." ;
+      }
       CFlags $(target) : $(STATICPLUGIN.$(p).CFLAGS) ;
       lflags = [ MergeLFlags $(lflags) : $(STATICPLUGIN.$(p).LFLAGS) ] ;
     }
@@ -269,21 +277,26 @@ rule WriteDependencies
   local depfile = $(<) ;
   local plugin = $(>) ;
   local name = $(3) ;
+  local libname = [ LibraryBaseName $(name) ] ;
   local depfile_gristed = $(depfile:G=$(plugin)) ;
   MakeLocate $(depfile_gristed) : [ on $(depfile) GetVar LOCATE ] ;
   
   # Collect flags
-  lflags += -l$(name) ;
+  lflags = -l$(libname) ;
   local libs = [ ResolveLibs $($(plugin).NEEDLIBS) ] ;
-  lflags += -l$(libs) ;
-  
   local l ;
+  for l in $(libs)
+  {
+    libname = [ LibraryBaseName $(l) ] ;
+    lflags = [ MergeLFlags $(lflags) : -l$(libname) ] ;
+  }
+  
   for l in $($(plugin).EXTERNALLIBS)
   {
     cflags += $($(l).CFLAGS) ;
-    lflags += [ Filter $($(l).LFLAGS) : $(LINKLIBS) $(PLUGIN.LFLAGS) ] ;
+    lflags = [ MergeLFlags $(lflags) : [ Filter $($(l).LFLAGS) : $(LINKLIBS) $(PLUGIN.LFLAGS) ] ] ;
   }
-  lflags += [ Filter $($(plugin).LFLAGS) : $(LINKLIBS) $(PLUGIN.LFLAGS) ] ;
+  lflags = [ MergeLFlags $(lflags) : [ Filter $($(plugin).LFLAGS) : $(LINKLIBS) $(PLUGIN.LFLAGS) ] ] ;
   CFLAGS on $(depfile_gristed) = "$(cflags)" ;
   LFLAGS on $(depfile_gristed) = "$(lflags)" ;
   

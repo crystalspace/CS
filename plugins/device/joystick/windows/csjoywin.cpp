@@ -66,7 +66,7 @@ bool csWindowsJoystick::Initialize (iObjectRegistry* oreg)
 
 void csWindowsJoystick::LoadAxes(joystate& j)
 {
-  size_t const n = j.axes.Length();
+  size_t const n = j.axes.GetSize ();
   if (n > 0) j.axes[0] = j.di.lX;
   if (n > 1) j.axes[1] = j.di.lY;
   if (n > 2) j.axes[2] = j.di.lZ;
@@ -82,7 +82,7 @@ bool csWindowsJoystick::HandleEvent (iEvent& ev)
   if (ev.Name != PreProcess)
     return false;
 
-  for (size_t i = 0; i < joystick.Length (); i++)
+  for (size_t i = 0; i < joystick.GetSize (); i++)
   {
     joydata& jd = joystick[i];
     jd.device->Poll ();
@@ -161,7 +161,7 @@ bool csWindowsJoystick::CreateDevice (const DIDEVICEINSTANCE*  pdidInstanc)
       DIDFT_AXIS)))
     {
       joydata data;
-      data.number = (int)joystick.Length() + 0; // CS joystick numbers 1-based
+      data.number = (int)joystick.GetSize () + 0; // CS joystick numbers 1-based
       data.device = device2;
       data.nButtons = caps.dwButtons;    
       data.nAxes = (uint)caps.dwAxes;
@@ -182,7 +182,7 @@ static BOOL CALLBACK dev_callback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
 
 bool csWindowsJoystick::Init ()
 {
-  csRef<iWin32Assistant> win32 = CS_QUERY_REGISTRY(object_reg, iWin32Assistant);
+  csRef<iWin32Assistant> win32 = csQueryRegistry<iWin32Assistant> (object_reg);
   HRESULT hr = DirectInputCreate (win32->GetInstance (), DIRECTINPUT_VERSION, 
     &lpdin, 0);
   if (SUCCEEDED (hr))
@@ -202,7 +202,7 @@ bool csWindowsJoystick::Init ()
     lpdin->EnumDevices (DIDEVTYPE_JOYSTICK, &dev_callback,
       (LPVOID)this, DIEDFL_ATTACHEDONLY);
     size_t i;
-    size_t const njoys = joystick.Length();
+    size_t const njoys = joystick.GetSize ();
     for (i = 0; i < njoys; i++) 
     {
       joydata& jd = joystick[i];
@@ -243,7 +243,7 @@ bool csWindowsJoystick::Init ()
     PreProcess = csevPreProcess (object_reg);
     if (njoys > 0)
     {
-      eq = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+      eq = csQueryRegistry<iEventQueue> (object_reg);
       if (eq)
       {
 	eq->RegisterListener (this, PreProcess);
@@ -270,7 +270,7 @@ bool csWindowsJoystick::Close ()
     eq = 0;
   }
   EventOutlet = 0;
-  for (size_t i = 0; i < joystick.Length (); i++)
+  for (size_t i = 0; i < joystick.GetSize (); i++)
   {  
     joystick[i].device->Unacquire ();
     joystick[i].device->Release ();

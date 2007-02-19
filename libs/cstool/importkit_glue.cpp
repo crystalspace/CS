@@ -46,6 +46,10 @@
 #include "importkit_glue.h"
 
 #include <ctype.h>
+#if defined(CS_PLATFORM_WIN32) && !defined(__CYGWIN__)
+#include <process.h>
+#define getpid _getpid
+#endif
 
 namespace CS
 {
@@ -54,7 +58,7 @@ namespace CS
     
     Glue::Glue (iObjectRegistry* objectReg) : objectReg(objectReg), texId(0)
     {
-      vfs = CS_QUERY_REGISTRY (objectReg, iVFS);
+      vfs = csQueryRegistry<iVFS> (objectReg);
     }
 
     Glue::~Glue()
@@ -66,8 +70,7 @@ namespace CS
     const char* Glue::GetTempName()
     {
       static int n = 0;
-      GetTempScratch()->Format (CS_TEMP_FILE);
-      GetTempScratch()->AppendFmt ("_%d", n++);
+      GetTempScratch()->Format ("%x_%d", getpid (), n++);
       return GetTempScratch()->GetData();
     }
 
@@ -101,7 +104,7 @@ namespace CS
 	if (!file) return false;
 
 	csRef<iDocumentSystem> docsys (
-	    CS_QUERY_REGISTRY (objectReg, iDocumentSystem));
+	    csQueryRegistry<iDocumentSystem> (objectReg));
 	if (!docsys) docsys = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
 	csRef<iDocument> doc = docsys->CreateDocument ();
 	const char* error = doc->Parse (file, true);
@@ -122,11 +125,12 @@ namespace CS
 	if (ProbeMeshFactory (container, obj)) continue;
 	if (ProbeMaterial (container, obj)) continue;
 	if (ProbeTexture (container, obj)) continue;
+	if (ProbeMeshObject (container, obj)) continue;
       }
 
       engine->RemoveObject (loadRegion);
 
-      return container.models.Length() > 0;
+      return container.models.GetSize () > 0;
     }
 
 #if defined(CS_PLATFORM_WIN32) && !defined(__CYGWIN__)
@@ -157,7 +161,7 @@ namespace CS
       }
       ret = vfs->ChDir (path);
 
-      platform_free (cwd);
+      free (cwd);
       return ret;
     }
 
@@ -223,17 +227,17 @@ namespace CS
 
       GluedModel* model = glueModelPool.Alloc();
       int vc = gmfact->GetVertexCount ();
-      model->allVertices.SetLength (vc);
+      model->allVertices.SetSize (vc);
       memcpy (model->allVertices.GetArray(), gmfact->GetVertices(),
 	sizeof (csVector3) * vc);
-      model->allTCs.SetLength (vc);
+      model->allTCs.SetSize (vc);
       memcpy (model->allTCs.GetArray(), gmfact->GetTexels(),
 	sizeof (csVector2) * vc);
-      model->allNormals.SetLength (vc);
+      model->allNormals.SetSize (vc);
       memcpy (model->allNormals.GetArray(), gmfact->GetNormals(),
 	sizeof (csVector3) * vc);
       size_t tc = gmfact->GetTriangleCount();
-      model->tris.SetLength (tc);
+      model->tris.SetSize (tc);
       memcpy (model->tris.GetArray(), gmfact->GetTriangles(),
 	sizeof(csTriangle) * tc);
 
@@ -266,17 +270,17 @@ namespace CS
 
       GluedModel* model = glueModelPool.Alloc();
       int vc = sprfact->GetVertexCount ();
-      model->allVertices.SetLength (vc);
+      model->allVertices.SetSize (vc);
       memcpy (model->allVertices.GetArray(), sprfact->GetVertices (0),
 	sizeof (csVector3) * vc);
-      model->allTCs.SetLength (vc);
+      model->allTCs.SetSize (vc);
       memcpy (model->allTCs.GetArray(), sprfact->GetTexels (0),
 	sizeof (csVector2) * vc);
-      model->allNormals.SetLength (vc);
+      model->allNormals.SetSize (vc);
       memcpy (model->allNormals.GetArray(), sprfact->GetNormals (0),
 	sizeof (csVector3) * vc);
       size_t tc = sprfact->GetTriangleCount();
-      model->tris.SetLength (tc);
+      model->tris.SetSize (tc);
       memcpy (model->tris.GetArray(), sprfact->GetTriangles(),
 	sizeof(csTriangle) * tc);
 
@@ -301,12 +305,25 @@ namespace CS
     }
 
     bool Glue::ProbeThingFactory (ImportKit::Container& container, 
-			       iMeshFactoryWrapper* fact, const char* name)
+			          iMeshFactoryWrapper* fact, const char* name)
     {
       csRef<iThingFactoryState> thingfact = 
 	scfQueryInterface<iThingFactoryState> (fact->GetMeshObjectFactory());
       if (!thingfact ) return false;
 
+      ImportKit::Container::Model newModel;
+      if (HandleThingFactory (newModel, thingfact))
+      {
+        newModel.name = csStrNewW (name);
+        container.models.Push (newModel);
+        return true;
+      }
+      return false;
+    }
+
+    bool Glue::HandleThingFactory (ImportKit::Container::Model& newModel,
+                                   iThingFactoryState* thingfact)
+    {
       csHash<GluedModel, size_t> models;
       size_t totalVert = 0, totalTri = 0;
 
@@ -327,7 +344,7 @@ namespace CS
 	csTransform object2texture (tm, tv);
 
 	int pvc = thingfact->GetPolygonVertexCount (i);
-	uint vo = (uint)model->allVertices.Length();
+	uint vo = (uint)model->allVertices.GetSize ();
 	for (int v = 0; v < pvc; v++)
 	{
 	  totalVert++;
@@ -349,7 +366,6 @@ namespace CS
 	}
       }
 
-      ImportKit::Container::Model newModel;
       GluedModel* model = glueModelPool.Alloc();
       model->allVertices.SetCapacity (totalVert);
       model->allNormals.SetCapacity (totalVert);
@@ -361,12 +377,12 @@ namespace CS
       {
 	size_t mat;
 	const GluedModel& partModel = it.Next (mat);
-	uint vo = (uint)model->allVertices.Length();
-	size_t vc = partModel.allVertices.Length();
+	uint vo = (uint)model->allVertices.GetSize ();
+	size_t vc = partModel.allVertices.GetSize ();
 
-	model->allVertices.SetLength (vo + vc);
-	model->allNormals.SetLength (vo + vc);
-	model->allTCs.SetLength (vo + vc);
+	model->allVertices.SetSize (vo + vc);
+	model->allNormals.SetSize (vo + vc);
+	model->allTCs.SetSize (vo + vc);
 	memcpy (model->allVertices.GetArray() + vo,
 	  partModel.allVertices.GetArray(), vc * sizeof(csVector3));
 	memcpy (model->allNormals.GetArray() + vo,
@@ -374,8 +390,8 @@ namespace CS
 	memcpy (model->allTCs.GetArray() + vo,
 	  partModel.allTCs.GetArray(), vc * sizeof(csVector2));
 
-	size_t to = model->tris.Length();
-	for (size_t t = 0; t < partModel.tris.Length(); t++)
+	size_t to = model->tris.GetSize ();
+	for (size_t t = 0; t < partModel.tris.GetSize (); t++)
 	{
 	  csTriangle tri;
 	  tri.a = partModel.tris[t].a + vo;
@@ -390,7 +406,7 @@ namespace CS
 	newMesh.verts = (float*)(model->allVertices.GetArray()+vo);
 	newMesh.texcoords = (float*)(model->allTCs.GetArray()+vo);
 	newMesh.normals = (float*)(model->allNormals.GetArray()+vo);
-	newMesh.triCount = model->tris.Length()+to;
+	newMesh.triCount = model->tris.GetSize ()+to;
 	newMesh.tris = (uint*)(model->tris.GetArray()+to);
 	newMesh.material = mat;
 
@@ -398,10 +414,38 @@ namespace CS
       }
 
       newModel.glueModel = model;
-      newModel.name = csStrNewW (name);
-      container.models.Push (newModel);
       
       return true;
+    }
+
+    bool Glue::ProbeMeshObject (ImportKit::Container& container, 
+			        iObject* obj)
+    {
+      csRef<iMeshWrapper> wrap = 
+	scfQueryInterface<iMeshWrapper> (obj);
+      if (!wrap) return false;
+      if (ProbeThingObject (container, wrap, obj->GetName()))
+	return true;
+      return false;
+    }
+
+    bool Glue::ProbeThingObject (ImportKit::Container& container, 
+			         iMeshWrapper* wrap, const char* name)
+    {
+      csRef<iThingFactoryState> thingfact = 
+	scfQueryInterface<iThingFactoryState> (
+        wrap->GetFactory ()->GetMeshObjectFactory());
+      if (!thingfact ) return false;
+
+      ImportKit::Container::Model newModel;
+      if (HandleThingFactory (newModel, thingfact))
+      {
+        newModel.name = csStrNewW (name);
+        newModel.type = ImportKit::Container::Model::Object;
+        container.models.Push (newModel);
+        return true;
+      }
+      return false;
     }
 
   } // namespace ImportKitImpl 

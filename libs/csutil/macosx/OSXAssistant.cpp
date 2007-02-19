@@ -95,7 +95,7 @@ OSXAssistant::~OSXAssistant()
 csRef<iEventQueue> OSXAssistant::get_event_queue()
 {
   if (!event_queue.IsValid() && registry != 0)
-    event_queue = CS_QUERY_REGISTRY(registry, iEventQueue);
+    event_queue = csQueryRegistry<iEventQueue> (registry);
   return event_queue;
 }
 
@@ -106,7 +106,7 @@ csRef<iEventQueue> OSXAssistant::get_event_queue()
 csRef<iVirtualClock> OSXAssistant::get_virtual_clock()
 {
   if (!virtual_clock.IsValid() && registry != 0)
-    virtual_clock = CS_QUERY_REGISTRY(registry, iVirtualClock);
+    virtual_clock = csQueryRegistry<iVirtualClock> (registry);
   return virtual_clock;
 }
 
@@ -132,14 +132,14 @@ void OSXAssistant::init_menu(iConfigFile* macosx_config)
 void OSXAssistant::init_runmode()
 {
   csRef<iCommandLineParser> parser = 
-    CS_QUERY_REGISTRY(registry, iCommandLineParser);
+    csQueryRegistry<iCommandLineParser> (registry);
   char const* s = parser->GetOption("alwaysruns");
   if (s != 0)
     run_always = 1;
   else
   {
     // Query whether to pause on loss of focus.
-    csRef<iConfigManager> cfg = CS_QUERY_REGISTRY(registry, iConfigManager);
+    csRef<iConfigManager> cfg = csQueryRegistry<iConfigManager> (registry);
     if (cfg.IsValid())
       run_always = cfg->GetBool("System.RunWhenNotFocused");
   }
@@ -321,11 +321,11 @@ bool OSXAssistant::eiEventHandler::HandleEvent(iEvent& e)
 bool csDefaultRunLoop(iObjectRegistry* r)
 {
   bool ok = false;
-  csRef<iOSXAssistant> a = CS_QUERY_REGISTRY(r, iOSXAssistant);
+  csRef<iOSXAssistant> a = csQueryRegistry<iOSXAssistant> (r);
   if (a.IsValid())
   {
     csRef<iOSXAssistantLocal> al =
-      SCF_QUERY_INTERFACE(a, iOSXAssistantLocal);
+      scfQueryInterface<iOSXAssistantLocal> (a);
     if (al.IsValid())
     {
       al->start_event_loop();
@@ -356,7 +356,7 @@ bool csPlatformStartup(iObjectRegistry* r)
 //-----------------------------------------------------------------------------
 bool csPlatformShutdown(iObjectRegistry* r)
 {
-  csRef<iOSXAssistant> a = CS_QUERY_REGISTRY(r, iOSXAssistant);
+  csRef<iOSXAssistant> a = csQueryRegistry<iOSXAssistant> (r);
   if (a.IsValid())
     r->Unregister(a, "OSXAssistant"); // DecRefs() assistant as a side-effect.
   return true;

@@ -51,7 +51,7 @@ static JSBool Vfs (JSContext *cx, JSObject *obj, uintN argc, jsval *argv,
 	vfs_name = JS_GetStringBytes (name);
 	
 	// Get a handle to the VFS.		
-	csRef<iVFS> *to = new csRef<iVFS>((CS_QUERY_REGISTRY (AwsMgr ()->GetObjectRegistry (), iVFS)));
+	csRef<iVFS> *to = new csRef<iVFS>((csQueryRegistry<iVFS> (AwsMgr ()->GetObjectRegistry ())));
 	
 	if (!(to->IsValid()))
 	{

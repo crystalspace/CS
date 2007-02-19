@@ -149,6 +149,15 @@ csColliderWrapper* csColliderWrapper::GetColliderWrapper (iObject* object)
   return w;	// This will DecRef() but that's ok in this case.
 }
 
+void csColliderWrapper::UpdateCollider (iPolygonMesh* mesh)
+{
+  collider = collide_system->CreateCollider (mesh);
+}
+
+void csColliderWrapper::UpdateCollider (iTerraFormer* terrain)
+{
+  collider = collide_system->CreateCollider (terrain);
+}
 //----------------------------------------------------------------------
 
 csColliderWrapper* csColliderHelper::InitializeCollisionWrapper (
@@ -263,11 +272,12 @@ csColliderWrapper* csColliderHelper::InitializeCollisionWrapper (
     cw->DecRef ();
   }
 
-  const csRefArray<iSceneNode>& ml = mesh->QuerySceneNode ()->GetChildren ();
+  const csRef<iSceneNodeArray> ml = 
+    mesh->QuerySceneNode ()->GetChildrenArray ();
   size_t i;
-  for (i = 0 ; i < ml.Length () ; i++)
+  for (i = 0 ; i < ml->GetSize () ; i++)
   {
-    iMeshWrapper* child = ml[i]->QueryMesh ();
+    iMeshWrapper* child = ml->Get (i)->QueryMesh ();
     // @@@ What if we have a light containing another mesh?
     if (child)
       InitializeCollisionWrapper (colsys, child);
@@ -450,7 +460,7 @@ float csColliderHelper::TraceBeam (iCollideSystem* cdsys, iSector* sector,
 	const csArray<csIntersectingTriangle>& tris = cdsys->
 		GetIntersectingTriangles ();
 	size_t i;
-	for (i = 0 ; i < tris.Length () ; i++)
+	for (i = 0 ; i < tris.GetSize () ; i++)
 	{
 	  csVector3 isect;
 	  csIntersectingTriangle tri;
@@ -967,8 +977,9 @@ bool csColliderActor::AdjustForCollisions (
 
   // localvel is smaller because we can partly move the object in that direction
   localvel -= maxmove - oldpos;
+  csVector3 correctedVel(localvel);
 
-  for (i = 0; i < our_cd_contact.Length () ; i++ )
+  for (i = 0; i < our_cd_contact.GetSize () ; i++ )
   {
     csCollisionPair& cd = our_cd_contact[i];
     csPlane3 obstacle (cd.a2, cd.b2, cd.c2);
@@ -981,9 +992,11 @@ bool csColliderActor::AdjustForCollisions (
     if (unit * localvel > 0) continue;
 
     // Bounce back
-    localvel -= unit * (unit * localvel)*1.1; //(-(localvel % unit) % unit);
+
+    correctedVel -= unit * (unit * correctedVel)*1.1; //(-(localvel % unit) % unit);
   }
  
+  localvel = correctedVel;
   newpos = maxmove + localvel;
 
   transform_newpos = csOrthoTransform (csMatrix3(), newpos);
@@ -1036,23 +1049,17 @@ bool csColliderActor::AdjustForCollisions (
   while (hits > 0 && newpos.y < maxJump)
   {
     bool adjust = false;
-    for (i = 0; i < our_cd_contact.Length (); i++ )
+    for (i = 0; i < our_cd_contact.GetSize (); i++ )
     {
       csCollisionPair cd = our_cd_contact[i];
       csPlane3 obstacle (cd.a2, cd.b2, cd.c2);
       csVector3 normal = obstacle.Normal();
       float norm = normal.Norm ();
-      if (fabs (norm) < SMALL_EPSILON) continue;
+
+      // Ensure this is a big-enough triangle to count as a collision.
+      if (fabs (norm) < 1e-4f ) continue;
 
       csVector3 n = normal / norm;
-
-      //csVector3 n = -((cd.c2-cd.b2)%(cd.b2-cd.a2)).Unit ();
-
-      // Is it a collision with a ground polygon?
-      //  (this tests for the angle between ground and colldet
-      //  triangle)
-      if (n.y < 0.7)
-        continue;
 
       csVector3 line[2];
 
@@ -1061,8 +1068,12 @@ bool csColliderActor::AdjustForCollisions (
       if(!FindIntersection (cd,line))
         continue;
 
-      // Hit a ground polygon so we are not falling
-      onground = adjust = true;
+      // Is it a collision with a ground polygon?
+      //  (this tests for the angle between ground and colldet
+      //  triangle)
+      if(!(n.y < 0.7))
+          onground = true;
+      adjust = true;
       max_y = MAX(MAX(line[0].y, line[1].y)+shift.y,max_y);
       if (max_y > maxJump)
       {
@@ -1072,6 +1083,12 @@ bool csColliderActor::AdjustForCollisions (
     }
     hits = 0;
 
+    // This prevents us from going up if there is no surface to rest on.
+    if(!onground && max_y > oldpos.y)
+    {
+        newpos.y = oldpos.y;
+        break;
+    }
     if (adjust)
     {
       // Temporarily lift the model up so that it passes the final check
@@ -1118,7 +1135,7 @@ bool csColliderActor::AdjustForCollisions (
     cd = 0;
 
   hits = 0;
-  for (i = 0; i < our_cd_contact.Length () ; i++ )
+  for (i = 0; i < our_cd_contact.GetSize () ; i++ )
   {
     csCollisionPair& cd = our_cd_contact[i];
     csPlane3 obstacle (cd.a2, cd.b2, cd.c2);
@@ -1309,7 +1326,6 @@ bool csColliderActor::MoveV (float delta,
 }
 
 #define MAX_CD_INTERVAL 1
-#define MIN_CD_INTERVAL 0.01
 #define MAX_CD_ITERATIONS 20
 
 static float ComputeLocalMaxInterval (
@@ -1317,14 +1333,14 @@ static float ComputeLocalMaxInterval (
 	const csVector3& intervalSize)
 {
   float local_max_interval =
-    MAX (MIN (MIN ((fabs (bodyVel.y) < SMALL_EPSILON)
+    MIN (MIN ((fabs (bodyVel.y) < SMALL_EPSILON)
   	? MAX_CD_INTERVAL
 	: fabs (intervalSize.y/bodyVel.y), (fabs (bodyVel.x) < SMALL_EPSILON)
 		? MAX_CD_INTERVAL
 		: fabs (intervalSize.x/bodyVel.x)),
 			(fabs (bodyVel.z) < SMALL_EPSILON)
 			? MAX_CD_INTERVAL
-			: fabs (intervalSize.z/bodyVel.z)), MIN_CD_INTERVAL);
+			: fabs (intervalSize.z/bodyVel.z));
   return local_max_interval;
 }
 
@@ -1357,12 +1373,10 @@ bool csColliderActor::Move (float delta, float speed, const csVector3& velBody,
   // Calculate the total velocity (body and world) in OBJECT space.
   csVector3 bodyVel (fulltransf.Other2ThisRelative (velWorld) + velBody);
 
-  float local_max_interval = ComputeLocalMaxInterval (bodyVel, intervalSize);
+  float local_max_interval = ComputeLocalMaxInterval (bodyVel, intervalSize - csVector3(0.005f));
 
   // Compensate for speed
   local_max_interval /= speed;
-  // Err on the side of safety
-  local_max_interval -= 0.005f;
 
   int maxiter = MAX_CD_ITERATIONS;
 

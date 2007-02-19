@@ -25,6 +25,7 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/texture.h"
+#include "csutil/scfstr.h"
 #include "iutil/document.h"
 #include "iutil/objreg.h"
 #include "iengine/engine.h"
@@ -34,6 +35,7 @@
 #include "imap/services.h"
 #include "ivaria/reporter.h"
 #include "itexture/itexloaderctx.h"
+#include "csgeom/fixed.h"
 #include "csgeom/math.h"
 #include "csutil/cscolor.h"
 #include "csutil/csstring.h"
@@ -91,7 +93,8 @@ csPtr<iBase> ProctexPDLightLoader::Parse (iDocumentNode* node,
   csRef<iImage> img = (ctx && ctx->HasImage()) ? ctx->GetImage() : 0;
   if (!img)
   {
-    csRef<iDocumentNode> file = node ? node->GetNode ("file") : 0;
+    csRef<iDocumentNode> file = 
+      node ? node->GetNode ("file") : csRef<iDocumentNode> (0);
     if (!file) 
     {
       Report (CS_REPORTER_SEVERITY_WARNING, node, 
@@ -123,9 +126,16 @@ csPtr<iBase> ProctexPDLightLoader::Parse (iDocumentNode* node,
     csRef<iTextureManager> tm = G3D->GetTextureManager();
     if (!tm) return 0;
     int texFlags = (ctx && ctx->HasFlags()) ? ctx->GetFlags() : CS_TEXTURE_3D;
+    csRef<scfString> fail_reason;
+    fail_reason.AttachNew (new scfString ());
     csRef<iTextureHandle> TexHandle (tm->RegisterTexture (img, 
-      texFlags));
-    if (!TexHandle) return 0;
+      texFlags, fail_reason));
+    if (!TexHandle)
+    {
+      Report (CS_REPORTER_SEVERITY_ERROR, node,
+	  "Couldn't create texture: %s", fail_reason->GetData ());
+      return 0;
+    }
 
     pt->GetTextureWrapper()->SetTextureHandle (TexHandle);
 
@@ -150,12 +160,20 @@ csPtr<iBase> ProctexPDLightLoader::Parse (iDocumentNode* node,
           }
           ProctexPDLight::MappedLight light;
           light.map = map;
-          light.lightId = new csString (lightId);
-          const char* err = pt->AddLight (light);
-          if (err != 0)
+          light.lightId = new char[16];
+          if (!HexToLightID (light.lightId, lightId))
           {
             Report (CS_REPORTER_SEVERITY_WARNING, child, 
-              "Couldn't add map '%s' for light '%s': %s", image, lightId, err);
+              "Invalid light ID '%s'", lightId);
+          }
+          else
+          {
+            const char* err = pt->AddLight (light);
+            if (err != 0)
+            {
+              Report (CS_REPORTER_SEVERITY_WARNING, child, 
+                "Couldn't add map '%s' for light '%s': %s", image, lightId, err);
+            }
           }
         }
       }
@@ -194,64 +212,9 @@ void ProctexPDLightLoader::Report (int severity, iDocumentNode* node,
   va_end (arg);
 }
 
-//---------------------------------------------------------------------------
-
-CS_IMPLEMENT_STATIC_CLASSVAR_REF(ProctexPDLight, lightmapScratch, GetScratch,
-                                 ProctexPDLight::LightmapScratch, ());
-
-void ProctexPDLight::PDMap::ComputeValueBounds ()
+bool ProctexPDLightLoader::HexToLightID (char* lightID, const char* lightIDHex)
 {
-  csRect r (0, 0, 
-    image ? image->GetWidth() : 0, 
-    image ? image->GetHeight() : 0);
-  ComputeValueBounds (r);
-}
-
-void ProctexPDLight::PDMap::ComputeValueBounds (const csRect& area)
-{
-  maxValue.Set (0, 0, 0);
-  nonNullArea.Set (INT_MAX, INT_MAX, INT_MIN, INT_MIN);
-  if (!image) return;
-
-  const int width = image->GetWidth();
-  csRGBpixel* map = ((csRGBpixel*)image->GetImageData()) +
-    area.ymin * width + area.xmin;
-  int mapPitch = width - area.Width ();
-  for (int y = area.ymin; y < area.ymax; y++)
-  {
-    for (int x = area.xmin; x < area.xmax; x++)
-    {
-      const csRGBpixel& p = *map++;
-
-      if (p.red > maxValue.red)
-        maxValue.red = p.red;
-      if (p.green > maxValue.green)
-        maxValue.green = p.green;
-      if (p.blue > maxValue.blue)
-        maxValue.blue = p.blue;
-
-      if (p.red + p.green + p.blue > 0)
-      {
-        nonNullArea.Extend (x, y);
-      }
-    }
-    map += mapPitch;
-  }
-}
-
-void ProctexPDLight::Report (int severity, const char* msg, ...)
-{
-  static const char msgId[] = "crystalspace.proctex.pdlight";
-
-  va_list arg;
-  va_start (arg, msg);
-  csReportV (object_reg, severity, msgId, msg, arg);
-  va_end (arg);
-}
-
-bool ProctexPDLight::HexToLightID (char* lightID, const csString& lightIDHex)
-{
-  bool valid = lightIDHex.Length() == 32;
+  bool valid = strlen (lightIDHex) == 32;
   if (valid)
   {
     for (size_t i = 0; i < 16; i++)
@@ -286,14 +249,80 @@ bool ProctexPDLight::HexToLightID (char* lightID, const csString& lightIDHex)
       lightID[i] = char (v);
     }
   }
-  if (valid)
-    return true;
-  else
+  return valid;
+}
+
+//---------------------------------------------------------------------------
+
+CS_IMPLEMENT_STATIC_CLASSVAR_REF(ProctexPDLight, lightmapScratch, GetScratch,
+                                 ProctexPDLight::LightmapScratch, ());
+
+void ProctexPDLight::PDMap::ComputeValueBounds ()
+{
+  csRect r (0, 0, imageW, imageH);
+  ComputeValueBounds (r);
+}
+
+void ProctexPDLight::PDMap::ComputeValueBounds (const csRect& area)
+{
+  maxValue.Set (0, 0, 0);
+  nonNullArea.Set (INT_MAX, INT_MAX, INT_MIN, INT_MIN);
+  if (!imageData) return;
+
+  const int width = imageW;
+  const Lumel* map = imageData->data + area.ymin * width + area.xmin;
+  int mapPitch = width - area.Width ();
+  for (int y = area.ymin; y < area.ymax; y++)
   {
-    Report (CS_REPORTER_SEVERITY_WARNING, 
-      "Invalid light ID: '%s'", lightIDHex.GetData());
-    return false;
+    for (int x = area.xmin; x < area.xmax; x++)
+    {
+      const Lumel& p = *map++;
+
+      if (p.red > maxValue.red)
+        maxValue.red = p.red;
+      if (p.green > maxValue.green)
+        maxValue.green = p.green;
+      if (p.blue > maxValue.blue)
+        maxValue.blue = p.blue;
+
+      if (p.red + p.green + p.blue > 0)
+      {
+        nonNullArea.Extend (x, y);
+      }
+    }
+    map += mapPitch;
   }
+}
+
+void ProctexPDLight::PDMap::SetImage (iImage* img)
+{
+  CS::ImageAutoConvert useImage (img, CS_IMGFMT_TRUECOLOR);
+  imageW = useImage->GetWidth();
+  imageH = useImage->GetHeight();
+  size_t numPixels = imageW * imageH;
+  imageData.AttachNew (new (numPixels) LumelBuffer);
+  const csRGBpixel* src = (csRGBpixel*)useImage->GetImageData();
+  Lumel* dst = imageData->data;
+  while (numPixels-- > 0)
+  {
+    dst->red = src->red;
+    dst->green = src->green;
+    dst->blue = src->blue;
+    dst->alpha = 0xff;
+    dst++;
+    src++;
+  }
+  ComputeValueBounds (); 
+}
+
+void ProctexPDLight::Report (int severity, const char* msg, ...)
+{
+  static const char msgId[] = "crystalspace.proctex.pdlight";
+
+  va_list arg;
+  va_start (arg, msg);
+  csReportV (object_reg, severity, msgId, msg, arg);
+  va_end (arg);
 }
 
 void ProctexPDLight::UpdateAffectedArea ()
@@ -315,8 +344,8 @@ void ProctexPDLight::UpdateAffectedArea ()
 
 const char* ProctexPDLight::AddLight (const MappedLight& light)
 {
-  if ((light.map->GetWidth() != baseMap->GetWidth())
-    || (light.map->GetHeight() != baseMap->GetHeight()))
+  if ((light.map.imageW != baseMap.imageW)
+    || (light.map.imageH != baseMap.imageH))
     return "PD lightmap dimensions don't correspond to base lightmap dimensions";
   lights.Push (light);
   state.Set (stateAffectedAreaDirty);
@@ -351,29 +380,28 @@ bool ProctexPDLight::PrepareAnim ()
     return false;
   }
 
-  if (!baseMap) return false;
-  lightmapSize = baseMap->GetWidth() * baseMap->GetHeight();
+  if (!baseMap.imageData) return false;
+  lightmapSize = baseMap.imageW * baseMap.imageH;
   for (size_t i = 0; i < lights.GetSize(); )
   {
     MappedLight& light = lights[i];
-    char lightID[16];
     bool success = false;
-    if (HexToLightID (lightID, *light.lightId))
+    light.light = engine->FindLightID (light.lightId);
+    if (light.light)
     {
-      light.light = engine->FindLightID (lightID);
-      if (light.light)
-      {
-        success = true;
-        light.light->AddAffectedLightingInfo (
-          static_cast<iLightingInfo*> (this));
-      }
-      else
-      {
-        Report (CS_REPORTER_SEVERITY_WARNING, 
-          "Could not find light with ID '%s'", light.lightId->GetData());
-      }
+      success = true;
+      light.light->AddAffectedLightingInfo (
+        static_cast<iLightingInfo*> (this));
     }
-    delete light.lightId;
+    else
+    {
+      csString hexId;
+      for (int i = 0; i < 16; i++)
+        hexId.AppendFmt ("%02x", light.lightId[i]);
+      Report (CS_REPORTER_SEVERITY_WARNING, 
+        "Could not find light with ID '%s'", hexId.GetData());
+    }
+    delete[] light.lightId; light.lightId = 0;
     if (success)
     {
       i++;
@@ -397,13 +425,13 @@ void ProctexPDLight::Animate (csTicks /*current_time*/)
       LightmapScratch& scratch = GetScratch();
       scratch.SetSize (lightmapSize);
       {
-        csRGBpixel* basePtr = ((csRGBpixel*)baseMap->GetImageData()) +
+        Lumel* basePtr = (baseMap.imageData->data) +
           totalAffectedAreas.ymin * mat_w + totalAffectedAreas.xmin;
         int lines = totalAffectedAreas.Height();
-        csRGBpixel* scratchPtr = scratch.GetArray();
+        Lumel* scratchPtr = scratch.GetArray();
         for (int y = 0; y < lines; y++)
         {
-          memcpy (scratchPtr, basePtr, scratchW * sizeof (csRGBpixel));
+          memcpy (scratchPtr, basePtr, scratchW * sizeof (Lumel));
           scratchPtr += scratchW;
           basePtr += mat_w;
         }
@@ -421,24 +449,26 @@ void ProctexPDLight::Animate (csTicks /*current_time*/)
         }
         else
           i++;
-        const csColor& lightColor = light.light->GetColor ();
+        csFixed16 lightR = light.light->GetColor ().red;
+        csFixed16 lightG = light.light->GetColor ().green;
+        csFixed16 lightB = light.light->GetColor ().blue;
 
         int mapW = light.map.nonNullArea.Width();
-        const csRGBpixel* mapPtr = ((csRGBpixel*)light.map->GetImageData()) +
+        const Lumel* mapPtr = (light.map.imageData->data) +
           light.map.nonNullArea.ymin * mat_w +
           light.map.nonNullArea.xmin;
         int lines = light.map.nonNullArea.Height();
         int mapPitch = mat_w - mapW;
 
-        csRGBpixel* scratchPtr = scratch.GetArray() + 
+        Lumel* scratchPtr = scratch.GetArray() + 
           (light.map.nonNullArea.ymin - totalAffectedAreas.ymin) * scratchW +
            light.map.nonNullArea.xmin - totalAffectedAreas.xmin;
         int scratchPitch = scratchW - mapW;
 
         csRGBcolor mapMax = light.map.maxValue;
-        mapMax.red = int (mapMax.red * lightColor.red);
-        mapMax.green = int (mapMax.green * lightColor.green);
-        mapMax.blue = int (mapMax.blue * lightColor.blue);
+        mapMax.red = int (lightR * int (mapMax.red));
+        mapMax.green = int (lightG * int (mapMax.green));
+        mapMax.blue = int (lightB * int (mapMax.blue));
         if ((scratchMax.red + mapMax.red <= 255)
           && (scratchMax.green + mapMax.green <= 255)
           && (scratchMax.blue + mapMax.blue <= 255))
@@ -448,10 +478,10 @@ void ProctexPDLight::Animate (csTicks /*current_time*/)
           {
             for (int x = 0; x < mapW; x++)
             {
-              csRGBpixel mappedColor (int (lightColor.red * mapPtr->red),
-                int (lightColor.green * mapPtr->green),
-                int (lightColor.blue * mapPtr->blue));
-              scratchPtr->UnsafeAdd (mappedColor);
+              scratchPtr->UnsafeAdd (
+                int (lightR * int (mapPtr->red)),
+                int (lightG * int (mapPtr->green)),
+                int (lightB * int (mapPtr->blue)));
               scratchPtr++;
               mapPtr++;
             }
@@ -466,10 +496,10 @@ void ProctexPDLight::Animate (csTicks /*current_time*/)
           {
             for (int x = 0; x < mapW; x++)
             {
-              csRGBpixel mappedColor (int (lightColor.red * mapPtr->red),
-                int (lightColor.green * mapPtr->green),
-                int (lightColor.blue * mapPtr->blue));
-              scratchPtr->SafeAdd (mappedColor);
+              scratchPtr->SafeAdd (
+                int (lightR * int (mapPtr->red)),
+                int (lightG * int (mapPtr->green)),
+                int (lightB * int (mapPtr->blue)));
               scratchPtr++;
               mapPtr++;
             }
@@ -483,7 +513,8 @@ void ProctexPDLight::Animate (csTicks /*current_time*/)
       tex->GetTextureHandle ()->Blit (totalAffectedAreas.xmin, 
         totalAffectedAreas.ymin, 
         totalAffectedAreas.Width(), totalAffectedAreas.Height(),
-        (uint8*)scratch.GetArray());
+        (uint8*)scratch.GetArray(),
+        iTextureHandle::BGRA8888);
     }
 
     state.Reset (stateDirty);
@@ -497,7 +528,7 @@ void ProctexPDLight::LightDisconnect (iLight* light)
     if (lights[i].light == light)
     {
       lights.DeleteIndexFast (i);
-      state.Set (stateAffectedAreaDirty);
+      state.Set (stateDirty);
       return;
     }
   }

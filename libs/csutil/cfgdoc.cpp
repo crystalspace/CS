@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "iutil/vfs.h"
+#include "iutil/stringarray.h"
 #include "csutil/cfgdoc.h"
 #include "csutil/physfile.h"
 #include "csutil/util.h"
@@ -405,7 +406,7 @@ bool csConfigDocument::GetBool (const char *Key, bool Def) const
      strcasecmp(val, "1"   ) == 0);
 }
 
-csPtr<iStringArray> csConfigDocument::GetTuple (const char *Key) const
+csPtr<iStringArray> csConfigDocument::GetTuple (const char * /*Key*/) const
 {
   return 0;
 }

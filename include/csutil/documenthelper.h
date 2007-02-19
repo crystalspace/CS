@@ -166,6 +166,40 @@ namespace CS
       }
     }
 
+    /**
+     * Copy the attributes of a node to another node.
+     * \param from Source node
+     * \param to Destination node
+     */
+    inline void CloneAttributes (iDocumentNode* from, iDocumentNode* to)
+    {
+      csRef<iDocumentAttributeIterator> atit = from->GetAttributes ();
+      while (atit->HasNext ())
+      {
+        csRef<iDocumentAttribute> attr = atit->Next ();
+        to->SetAttribute (attr->GetName (), attr->GetValue ());
+      }
+    }
+
+    /**
+     * Recursively clone a node with all its attributes and child-nodes.
+     * \param from Source root node
+     * \param to Destination root node
+     */
+    inline void CloneNode (iDocumentNode* from, iDocumentNode* to)
+    {
+      to->SetValue (from->GetValue ());
+      csRef<iDocumentNodeIterator> it = from->GetNodes ();
+      while (it->HasNext ())
+      {
+        csRef<iDocumentNode> child = it->Next ();
+        csRef<iDocumentNode> child_clone = to->CreateNodeBefore (
+          child->GetType (), 0);
+        CloneNode (child, child_clone);
+      }
+      CloneAttributes (from, to);
+    }
+
     /**\name Functors 
      * @{ */
 
@@ -291,7 +325,8 @@ namespace CS
     /** @} */
 
     /** 
-     * Get a filtering iDocumentNodeIterator
+     * Get a filtering iDocumentNodeIterator. Only nodes matching the filter
+     * are returned.
      * Example usage: 
      * \code
      * DocumentHelper::NodeAttributeValueTest test ("name", "Marten");
@@ -308,6 +343,12 @@ namespace CS
       return new Implementation::FilterDocumentNodeIterator<T>
         (parent, filter);
     }
+    
+    /**
+     * "Flatten" a document node structure into a string, suitable for e.g.
+     * hashing.
+     */
+    CS_CRYSTALSPACE_EXPORT csString FlattenNode (iDocumentNode* node);
   }
 } //namespace CS
 

@@ -95,14 +95,14 @@ public:
     if (position == (size_t)-1) return 0;
     iVisibilityObject* vo = vector->Get (position);
     position++;
-    if (position == vector->Length ())
+    if (position == vector->GetSize ())
       position = (size_t)-1;
     return vo;
   }
 
   virtual void Reset()
   {
-    if (vector == 0 || vector->Length () < 1)
+    if (vector == 0 || vector->GetSize () < 1)
       position = (size_t)-1;
     else
       position = 0;
@@ -110,7 +110,7 @@ public:
 
   virtual bool HasNext () const
   {
-    return ((position != (size_t)-1) && position <= vector->Length ());
+    return ((position != (size_t)-1) && position <= vector->GetSize ());
   }
 };
 
@@ -165,12 +165,12 @@ csFrustumVis::~csFrustumVis ()
 {
   if (object_reg)
   {
-    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
     if (q)
       CS::RemoveWeakListener (q, weakEventHandler);
   }
 
-  while (visobj_vector.Length () > 0)
+  while (visobj_vector.GetSize () > 0)
   {
     csFrustVisObjectWrapper* visobj_wrap = visobj_vector.Pop ();
     iVisibilityObject* visobj = visobj_wrap->visobj;
@@ -188,7 +188,7 @@ bool csFrustumVis::HandleEvent (iEvent& ev)
 {
   if (ev.Name == CanvasResize)
   {
-    csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+    csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
     scr_width = g3d->GetWidth ();
     scr_height = g3d->GetHeight ();
     //printf ("Got resize %dx%d!\n", scr_width, scr_height);fflush (stdout);
@@ -202,7 +202,7 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
 
   delete kdtree;
 
-  csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (object_reg);
   if (g3d)
   {
     scr_width = g3d->GetWidth ();
@@ -224,7 +224,7 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
   if (g2d)
   {
     CanvasResize = csevCanvasResize(object_reg, g2d);
-    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
     if (q)
       CS::RegisterWeakListener (q, this, CanvasResize, weakEventHandler);
   }
@@ -262,7 +262,7 @@ void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
 {
 #ifdef CS_DEBUG
   size_t i;
-  for (i = 0 ; i < visobj_vector.Length () ; i++)
+  for (i = 0 ; i < visobj_vector.GetSize () ; i++)
   {
     if (visobj_vector[i]->visobj == visobj)
     {
@@ -303,7 +303,7 @@ void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
 void csFrustumVis::UnregisterVisObject (iVisibilityObject* visobj)
 {
   size_t i;
-  for (i = 0 ; i < visobj_vector.Length () ; i++)
+  for (i = 0 ; i < visobj_vector.GetSize () ; i++)
   {
     csFrustVisObjectWrapper* visobj_wrap = visobj_vector[i];
     if (visobj_wrap->visobj == visobj)
@@ -1189,7 +1189,7 @@ void csFrustumVis::CastShadows (iFrustumView* fview)
   // the receivers are processed.
   //======================================
 
-  data.shadobjs = new ShadObj [visobj_vector.Length () * 2];
+  data.shadobjs = new ShadObj [visobj_vector.GetSize () * 2];
   data.num_shadobjs = 0;
 
   // First check if we need to do frustum clipping.

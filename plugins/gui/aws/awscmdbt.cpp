@@ -62,7 +62,7 @@ bool awsCmdButton::Setup (iAws *_wmgr, iAwsComponentNode *settings)
     pm->GetString (settings, "Image", tn))
   {
     awsStringKey* temp = new awsStringKey (_wmgr, "BitmapOverlay", tn);
-    csRef<iAwsStringKey> key (SCF_QUERY_INTERFACE (temp, iAwsStringKey));
+    csRef<iAwsStringKey> key (scfQueryInterface<iAwsStringKey> (temp));
     settings->Add (key);
     temp->DecRef ();
   }

@@ -139,7 +139,7 @@ void csSprite3DMeshObjectFactory::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
+  csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
   if (rep)
     rep->ReportV (severity, "crystalspace.mesh.sprite.3d", msg, arg);
   else
@@ -197,7 +197,7 @@ void csSprite3DMeshObjectFactory::AddVertices (int num)
   size_t frame;
 
   int oldvt = GetVertexCount ();
-  for (frame = 0; frame < frames.Length(); frame++)
+  for (frame = 0; frame < frames.GetSize (); frame++)
   {
     normals.Get (frame)->SetVertexCount (oldvt + num);
     memset (normals.Get (frame)->GetVertices () + oldvt, 0,
@@ -234,7 +234,7 @@ csPtr<iMeshObject> csSprite3DMeshObjectFactory::NewInstance ()
   spr->SetLightingQualityConfig (GetLightingQualityConfig());
   spr->SetAction ("default");
   spr->InitSprite ();
-  csRef<iMeshObject> im (SCF_QUERY_INTERFACE (spr, iMeshObject));
+  csRef<iMeshObject> im (scfQueryInterface<iMeshObject> (spr));
   spr->DecRef ();
   return csPtr<iMeshObject> (im);
 }
@@ -267,7 +267,7 @@ void csSprite3DMeshObjectFactory::GenerateLOD ()
   csVector2* new_texels = new csVector2 [GetVertexCount ()];
   csVector3* new_vertices = new csVector3 [GetVertexCount ()];
   csVector3* new_normals = new csVector3 [GetVertexCount ()];
-  for (i = 0 ; i < (int)texels.Length () ; i++)
+  for (i = 0 ; i < (int)texels.GetSize () ; i++)
   {
     int j;
     csPoly2D* tx = texels.Get (i);
@@ -330,13 +330,13 @@ void csSprite3DMeshObjectFactory::ComputeBoundingBox ()
 
 iSpriteFrame* csSprite3DMeshObjectFactory::AddFrame ()
 {
-  csSpriteFrame* fr = new csSpriteFrame ((int)frames.Length(), 
-    (int)texels.Length());
+  csSpriteFrame* fr = new csSpriteFrame ((int)frames.GetSize (), 
+    (int)texels.GetSize ());
   csPoly3D* nr = new csPoly3D ();
   csPoly2D* tx = new csPoly2D ();
   csPoly3D* vr = new csPoly3D ();
 
-  if (frames.Length() > 0)
+  if (frames.GetSize () > 0)
   {
     nr->SetVertexCount (GetVertexCount ());
     tx->SetVertexCount (GetVertexCount ());
@@ -444,13 +444,13 @@ void csSprite3DMeshObjectFactory::ComputeNormals (csSpriteFrame* frame)
   for (i = 0; i < GetVertexCount(); i++)
   {
     csTriangleVertexCost &vt = tri_verts->GetVertex (i);
-    if (vt.con_triangles.Length ())
+    if (vt.con_triangles.GetSize ())
     {
       csVector3 &n = const_cast<csVector3&> (GetNormal (frame_number, i));
       if (n.IsZero())
       {
         n.Set (0,0,0);
-        for (j = 0; j < vt.con_triangles.Length (); j++)
+        for (j = 0; j < vt.con_triangles.GetSize (); j++)
           n += tri_normals [vt.con_triangles[j]];
         float norm = n.Norm ();
         if (norm)
@@ -563,11 +563,11 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
   for (i = 0; i < GetVertexCount(); i++)
   {
     csTriangleVertexCost &vt = tv->GetVertex (i);
-    if (vt.con_triangles.Length ())
+    if (vt.con_triangles.GetSize ())
     {
       csVector3 &n = fr_normals[i];
       n.Set (tri_normals[vt.con_triangles[0]]);
-      for (j = 1; j < vt.con_triangles.Length (); j++)
+      for (j = 1; j < vt.con_triangles.GetSize (); j++)
         n += tri_normals [vt.con_triangles[j]];
       float norm = n.Norm ();
       if (norm)
@@ -931,12 +931,12 @@ void csSprite3DMeshObject::GenerateSpriteLOD (int num_vts)
 
 void csSprite3DMeshObject::UpdateWorkTables (int max_size)
 {
-  if ((size_t)max_size > tr_verts->Length ())
+  if ((size_t)max_size > tr_verts->GetSize ())
   {
-    tr_verts->SetLength (max_size);
-    uv_verts->SetLength (max_size);
-    obj_verts->SetLength (max_size);
-    tween_verts->SetLength (max_size);
+    tr_verts->SetSize (max_size);
+    uv_verts->SetSize (max_size);
+    obj_verts->SetSize (max_size);
+    tween_verts->SetSize (max_size);
   }
 }
 
@@ -1659,7 +1659,7 @@ void csSprite3DMeshObject::UpdateLightingFast (
   float amb_b = b / 128.0;
 #endif
 
-  int num_lights = (int)lights.Length ();
+  int num_lights = (int)lights.GetSize ();
   for (light_num = 0 ; light_num < num_lights ; light_num++)
   {
     iLight* li = lights[light_num]->GetLight ();
@@ -1765,7 +1765,7 @@ void csSprite3DMeshObject::UpdateLightingLQ (
   }
   csColor color;
 
-  int num_lights = (int)lights.Length ();
+  int num_lights = (int)lights.GetSize ();
   for (i = 0 ; i < num_lights ; i++)
   {
     iLight* li = lights[i]->GetLight ();
@@ -1851,7 +1851,7 @@ void csSprite3DMeshObject::UpdateLightingHQ (
   csColor color;
 
   csReversibleTransform movtrans = movable->GetFullTransform ();
-  int num_lights = (int)lights.Length ();
+  int num_lights = (int)lights.GetSize ();
   for (i = 0 ; i < num_lights ; i++)
   {
     iLight* li = lights[i]->GetLight ();
@@ -1969,7 +1969,7 @@ void csSprite3DMeshObject::PositionChild (iMeshObject* child,
 {
   iSpriteSocket* socket = 0;
   size_t i;
-  for(i=0;i<sockets.Length();i++)
+  for(i=0;i<sockets.GetSize ();i++)
   {
     if(sockets[i]->GetMeshWrapper())
     {

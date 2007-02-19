@@ -36,6 +36,8 @@
 
 class csSndSysManager;
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * Sound wrapper.
  */
@@ -47,6 +49,7 @@ class csSndSysWrapper : public scfImplementationExt2<csSndSysWrapper,
 private:
   csSndSysManager* mgr;
   csRef<iSndSysStream> stream;
+  csRef<iSndSysData> data;
 
 public:
   csSndSysWrapper (csSndSysManager* mgr, const char* name)
@@ -62,11 +65,19 @@ public:
   {
     csSndSysWrapper::stream = stream;
   }
+  virtual iSndSysData* GetData () { return data; }
+  /// Set the sound data associated with this wrapper.
+  virtual void SetData (iSndSysData* data)
+  {
+    csSndSysWrapper::data = data;
+  }
 
   //--------------------- iSelfDestruct implementation -------------------//
 
   virtual void SelfDestruct ();
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * Sound manager plugin.
@@ -96,7 +107,7 @@ public:
   virtual void RemoveSound (iSndSysWrapper* snd);
   virtual void RemoveSound (size_t idx);
   virtual void RemoveSounds ();
-  virtual size_t GetSoundCount () const { return sounds.Length (); }
+  virtual size_t GetSoundCount () const { return sounds.GetSize (); }
   virtual iSndSysWrapper* GetSound (size_t idx);
   virtual iSndSysWrapper* FindSoundByName (const char* name);
 };

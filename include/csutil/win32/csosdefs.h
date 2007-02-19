@@ -32,44 +32,16 @@
 #endif // CS_BUILD_SHARED_LIBS
 
 #if defined(CS_COMPILER_MSVC)
-  //#pragma warning(disable:4097)   // use of xxx as synonym for a classname
-  //#pragma warning(disable:4099)   // type seen as both 'struct' and `class'
-  //#pragma warning(disable:4100)   // Use of void* as a formal function parameter
-  //#pragma warning(disable:4102)   // 'label' : unreferenced label
-  //#pragma warning(disable:4146)   /* unary minus operator applied to unsigned 
-  //                                 * type, result still unsigned */
-  //#pragma warning(disable:4201)   // VC6: structure/ union without name.
   #pragma warning(disable:4244)   // conversion from 'double' to 'float'
   #pragma warning(disable:4250)   // '...' inherits '..' via dominance
-  //#pragma warning(disable:4251)   /* class needs to have dll-interface to be 
-  //				   * used by clients */
-  //#pragma warning(disable:4275)   /* non-DLL-interface used as base for
-  //                                 * DLL-interface */
   #pragma warning(disable:4290)   // C++ exception specification ignored
-  //#pragma warning(disable:4291)   // no matching operator delete found
   #pragma warning(disable:4312)	  /* 'variable' : conversion from 'type' to 
 				   * 'type' of greater size */
   #pragma warning(disable:4345)   /* VC7.1: an object of POD type constructed 
 				   * with an initializer of the form () will 
 				   * be default-initialized */
   #pragma warning(disable:4355)   // 'this' used in base member initializer list
-  //#pragma warning(disable:4390)   // Empty control statement
-  //#pragma warning(disable:4505)   /* 'function' : unreferenced local function 
-  //                                 * has been removed */
-  //#pragma warning(disable:4611)   /* interaction between _setjmp and C++ 
-  //                                 * destructors not portable */
-  //#pragma warning(disable:4702)   // Unreachable Code
-  //#pragma warning(disable:4706)   // Assignment in conditional expression
-  //#pragma warning(disable:4710)   // function not inlined
-//  #pragma warning(disable:4711)   /* function 'function' selected for inline 
-//				   * expansion */
-//  #pragma warning(disable:4786)   /* VC6: identifier was truncated to '255'
-//				   * characters in the browser information */
-//  #pragma warning(disable:4800)   // Forcing value to bool
-  //#pragma warning(disable:4805)   // unsafe mix of bool and int.
 
-//  #pragma warning(default:4265)   /* class has virtual functions, but 
-//				   * destructor is not virtual */
 
   #pragma inline_depth (255)
   #pragma inline_recursion (on)
@@ -83,11 +55,33 @@
   #pragma intrinsic (_byteswap_ushort, _byteswap_ulong, _byteswap_uint64)
   
   #if _MSC_VER >= 1400
+    /* Work around an apparent incompatibility between VC8's intrin.h and
+     * the Windows SDK 6.0's winnt.h - _interlockedbittestandset and
+     * _interlockedbittestandreset have slightly different prototypes.
+     * Go Microsoft!
+     */
+    #define _interlockedbittestandset   workaround_header_bug_1
+    #define _interlockedbittestandreset workaround_header_bug_2
     #include <intrin.h>
+    #undef _interlockedbittestandset
+    #undef _interlockedbittestandreset
   #else
+    extern "C" long _InterlockedCompareExchange (long volatile *, long, long);
+    extern "C" long _InterlockedDecrement (long volatile *);
     extern "C" long _InterlockedExchange (long volatile *, long);
+    extern "C" long _InterlockedIncrement (long volatile *);
+
+    extern "C" unsigned char _BitScanForward (unsigned long* Index, unsigned long Mask);
+    extern "C" unsigned char _BitScanReverse (unsigned long* Index, unsigned long Mask);
   #endif
+  #pragma intrinsic (_InterlockedCompareExchange)
+  #pragma intrinsic (_InterlockedDecrement)
   #pragma intrinsic (_InterlockedExchange)
+  #pragma intrinsic (_InterlockedIncrement)
+  #pragma intrinsic (_BitScanForward)
+  #pragma intrinsic (_BitScanReverse)
+
+  #define CS_HAVE_BITSCAN_INTRINSICS
 
   #if defined(__CRYSTAL_SPACE__) && !defined(CS_DEBUG)
     #pragma code_seg("CSpace")	  // Just for fun :)
@@ -363,77 +357,6 @@ struct DIR;
   extern "C" CS_IMPORT_SYM int closedir (DIR *dirp);
   extern "C" CS_IMPORT_SYM bool isdir (const char *path, dirent *de);
 # endif // CS_BUILD_SHARED_LIBS
-#endif
-
-#if defined (CS_COMPILER_BCC) || defined (__CYGWIN32__)
-#  define GETPID() getpid()
-#else
-#  define GETPID() _getpid()
-#endif
-
-#ifdef __CYGWIN32__
-#  include <unistd.h>
-#  define CS_TEMP_FILE "cs%lu.tmp", (unsigned long)getpid()
-#  define CS_TEMP_DIR  "/tmp"
-#else
-#  include <process.h>
-#  define CS_TEMP_FILE "%x.cs", (int)GETPID()
-#  define CS_TEMP_DIR win32_tempdir()
-   // This is the function called by CS_TEMP_DIR macro
-   static inline char *win32_tempdir()
-   {
-     char *tmp;
-     if ((tmp = getenv ("TMP")) != 0)
-       return tmp;
-     if ((tmp = getenv ("TEMP")) != 0)
-       return tmp;
-     return "";
-   }
-#endif
-
-// Microsoft Visual C++ compiler includes a very in-efficient 'memcpy'.
-// This also replaces the older 'better_memcpy', which was also not as
-// efficient as it could be ergo... heres a better solution.
-#if defined(CS_COMPILER_MSVC) && (_MSC_VER < 1300)
-#include <memory.h>
-#define memcpy fast_mem_copy
-static inline void* fast_mem_copy (void *dest, const void *src, int count)
-{
-    __asm
-    {
-      mov		eax, count
-      mov		esi, src
-      mov		edi, dest
-      xor		ecx, ecx
-
-      // Check for 'short' moves
-      cmp		eax, 16
-      jl		do_short
-		
-      // Move enough bytes to align 'dest'
-      sub		ecx, edi
-      and		ecx, 3
-      je		skip
-      sub		eax, ecx
-      rep		movsb
-
-      skip:
-        mov		ecx, eax
-        and		eax, 3
-        shr		ecx, 2
-        rep		movsd
-        test	eax, eax
-        je		end
-
-      do_short:
-        mov		ecx, eax
-        rep		movsb
-
-      end:
-    }
-
-    return dest;
-}
 #endif
 
 #ifdef CS_COMPILER_BCC

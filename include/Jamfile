@@ -44,18 +44,10 @@ CS_MASTER_HEADER_REJECTS =
 # List of headers that should not appear in the master-headers because they 
 # are deprecated.
 CS_MASTER_HEADER_REJECTS +=
-  [ ConcatDirs csgeom cspoint.h      ]
-  [ ConcatDirs csgeom fastsqrt.h     ]
-  [ ConcatDirs csgeom quaterni.h     ]
-  [ ConcatDirs csgeom subrec2.h      ]
-  [ ConcatDirs csgfx  memimage.h     ]
-  [ ConcatDirs csutil garray.h       ]
-  [ ConcatDirs csutil hashhandlers.h ]
-  [ ConcatDirs csutil objpool.h      ]
+  [ ConcatDirs csutil  debug.h        ]
+  [ ConcatDirs csutil  profile.h      ]
+  [ ConcatDirs iengine collectn.h     ]
   ;
-
-# Excluded because of name clash with gmeshskel.h
-CS_MASTER_HEADER_REJECTS += [ ConcatDirs imesh gmeshskel2.h ] ;
 
 {
   local CSWIN32LIBS_REJECTS =

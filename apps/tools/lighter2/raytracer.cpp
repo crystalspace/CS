@@ -23,345 +23,298 @@
 
 namespace lighter
 {
+  RaytraceCore globalRaycore;
 
-  // Helperstruct for kd traversal
-  struct kdTraversalS
+  MailboxHash::MailboxHash ()
+    : rayID (1)
   {
-    KDTreeNode *node;
-    float tnear, tfar;
-  };
-
-
-  bool Raytracer::TraceRecursive(const Ray &ray, HitPoint& hit, KDTreeNode* node, float tmin, float tmax) const
-  {
-    if(node->leftChild)
-    {
-      //Inner
-      // Check intersection with ray-plane
-      int dim = node->splitDimension;
-      float thit = (node->splitLocation - ray.origin[dim]) / ray.direction[dim];
-      KDTreeNode *nearNode, *farNode;
-      if(ray.direction[dim] > 0) 
-      {
-        nearNode = node->leftChild;
-        farNode = node->rightChild;
-      }
-      else
-      {
-        nearNode = node->rightChild;
-        farNode = node->leftChild;
-      }
-
-      if (thit <= tmin)
-      {
-        if(TraceRecursive (ray, hit, farNode, tmin, tmax))
-          return true;
-      }
-      else if(thit >= tmax)
-      {
-        if(TraceRecursive (ray, hit, nearNode, tmin, tmax))
-          return true;
-      }
-      else
-      {
-        if(TraceRecursive (ray, hit, nearNode, tmin, thit))
-          return true;
-        if(TraceRecursive (ray, hit, farNode, thit, tmax))
-          return true;
-      }
-    }
-    else
-    {
-      //Leaf
-      bool haveHit = IntersectPrimitives (node, ray, hit, true); 
-      if(haveHit)
-      {
-        return true;
-      }
-    }
-    return false;
+    hash = static_cast<HashEntry*> (CS::Memory::AlignedMalloc (
+      sizeof (HashEntry) * HASH_SIZE, 16));
+    memset (hash, 0, sizeof (HashEntry) * HASH_SIZE);
   }
 
-  bool Raytracer::TraceAnyHit (const Ray &ray, HitPoint& hit) const
-  {
-    if (!tree || !tree->rootNode) return false;
 
-    RaytraceProfiler prof(1);
+  MailboxHash::~MailboxHash ()
+  {
+    CS::Memory::AlignedFree (hash);
+  }
+
+  RaytraceState::RaytraceState ()
+    : traversalStackPtr (0)
+  {
+    traversalStack = static_cast<KDTraversalNode*> (CS::Memory::AlignedMalloc (
+      sizeof (KDTraversalNode) * MAX_STACK_DEPTH, 32));
+  }
+
+  RaytraceState::~RaytraceState ()
+  {
+    CS::Memory::AlignedFree (traversalStack);
+  }
+
+  static const uint mod5[] = {0,1,2,0,1};
+
+  static bool IntersectPrimitiveRay (const KDTreePrimitive &primitive, const Ray &ray,
+    HitPoint &hit)
+  {
+    const uint k = primitive.normal_K & ~KDPRIM_FLAG_MASK;
+    const uint ku = mod5[k+1];
+    const uint kv = mod5[k+2];
+
+    // prefetch?
+
+    const float nd = 1.0f / (ray.direction[k] + 
+      primitive.normal_U * ray.direction[ku] + primitive.normal_V * ray.direction[kv]);
+
+    const float f = (primitive.normal_D - ray.origin[k] - 
+      primitive.normal_U * ray.origin[ku] - primitive.normal_V * ray.origin[kv]) * nd;
+
+    // Check for distance..
+    if (!(ray.maxLength > f && f > ray.minLength)) return false;
+
+    // Compute hitpoint on plane
+    const float hu = (ray.origin[ku] + f * ray.direction[ku]);
+    const float hv = (ray.origin[kv] + f * ray.direction[kv]);
+
+    // First barycentric coordinate
+    const float lambda = (hu * primitive.edgeA_U + hv * primitive.edgeA_V + primitive.edgeA_D);
+    if (lambda < 0.0f) 
+      return false;
+
+    // Second barycentric coordinate
+    const float mu = (hu * primitive.edgeB_U + hv * primitive.edgeB_V + primitive.edgeB_D);
+    if (mu < 0.0f) 
+      return false;
+
+    // Third barycentric coordinate
+    if (lambda + mu > 1.0f) 
+      return false;
+
+    // Ok, is a hit, store it
+    hit.hitPoint = ray.origin + ray.direction * f;
+    hit.distance = f;
+    hit.primitive = primitive.primPointer;
+
+    return true;
+  }
+
+  template<bool ExitFirstHit, typename HitCallback, typename HitIgnore>
+  static bool IntersectPrimitives (const KDTreeNode* node, const Ray &ray, 
+    HitPoint &hit, RaytraceState& state, HitCallback& hitCB, HitIgnore& ignoreCB)
+  {
+    size_t nIdx, nMax;
+    nMax = KDTreeNode_Op::GetPrimitiveListSize (node);;
+    bool haveHit = false;
+    bool haveAnyHit = false;
+
+    HitPoint thisHit;
+
+    KDTreePrimitive* primList = KDTreeNode_Op::GetPrimitiveList (node);
+
+    for (nIdx = 0; nIdx < nMax; nIdx++)
+    {
+      KDTreePrimitive* prim = primList + nIdx;
+
+      if (ray.ignoreFlags & (prim->normal_K & KDPRIM_FLAG_MASK)) 
+        continue; 
+
+      if (ignoreCB (prim->primPointer) ||
+        ray.ignorePrimitive == prim->primPointer ||
+        state.mailbox.PutPrimitiveRay (prim->primPointer, ray.rayID))
+        continue;
+
+      haveHit = IntersectPrimitiveRay (*prim, ray, thisHit);
+      if (haveHit)
+      {
+        hitCB (ray, thisHit);
+
+        haveAnyHit = true;
+        if (ExitFirstHit) 
+        {
+          hit = thisHit;
+          return true;
+        }
+        if (thisHit.distance < hit.distance) 
+          hit = thisHit;
+      }
+    }
+
+    return haveAnyHit;
+  }
+
+  // Generic traversal function
+
+  template<bool ExitFirstHit, typename HitCallback, typename HitIgnore>
+  static bool TraceFunction (const KDTree* tree, const Ray& ray, HitPoint& hit, 
+    HitCallback& hitCB, HitIgnore& ignoreCB)
+  {
+    if (!tree || !tree->nodeList) 
+      return false;
+
+    RaytraceProfiler prof (1);
 
     //Copy and clip the ray
     Ray myRay = ray;
     if (!myRay.Clip (tree->boundingBox))
       return false;
 
+    // Get a state object
+    RaytraceState& state = globalRaycore.GetRaytraceState ();
+
+    state.SetupState (myRay);
     float tmin (myRay.minLength), tmax (myRay.maxLength);
 
-    //return TraceRecursive (myRay, hit, tree->rootNode, tmin, tmax);
+    KDTreeNode* node = tree->nodeList;
 
-    KDTreeNode* node = tree->rootNode;
-
-    //Setup a stack for traversal
-    csArray<kdTraversalS> traceStack;
-    traceStack.SetCapacity (64);
-    
-    while (true)
+    enum 
     {
-      while (node->leftChild)
+      HaveHit = 0x01,
+      TraversalFinished = 0x02
+    };
+
+    size_t traversalState = 0;
+
+    while (!(traversalState & TraversalFinished))
+    {
+      while (!KDTreeNode_Op::IsLeaf (node))
       {
-        uint dim = node->splitDimension;
-        float thit = (node->splitLocation - ray.origin[dim]) / ray.direction[dim];
+        uint dim = KDTreeNode_Op::GetDimension (node);
+        //float thit = (node->inner.splitLocation - ray.origin[dim]) / ray.direction[dim];
+        const float thit = (node->inner.splitLocation - ray.origin[dim]) * state.invD[dim];
 
-        KDTreeNode *nearNode, *farNode;
-        if(ray.direction[dim] > 0) 
-        {
-          nearNode = node->leftChild;
-          farNode = node->rightChild;
-        }
-        else
-        {
-          nearNode = node->rightChild;
-          farNode = node->leftChild;
-        }
+        const csVector3 hitPoint = myRay.origin + myRay.direction * thit;
 
-        if (thit <= tmin)
+        KDTreeNode *nearNode, *farNode, *leftNode;
+        leftNode = KDTreeNode_Op::GetLeft (node);
+
+        state.GetNewNodes (leftNode, dim, nearNode, farNode);
+
+        if (thit < tmin)
         {
           node = farNode;
         }
-        else if (thit >= tmax)
+        else if (thit > tmax)
         {
           node = nearNode;
         }
         else
         {
-          kdTraversalS e = {farNode, thit, tmax};
+          state.PutNode (farNode, thit, tmax);
+
           node = nearNode;
           tmax = thit;
-          traceStack.Push (e);
         }
       }
 
-      if (IntersectPrimitives (node, ray, hit, true))
-        return true;
+      if (IntersectPrimitives<ExitFirstHit, HitCallback, HitIgnore> 
+        (node, myRay, hit, state, hitCB, ignoreCB))
+      {
+        traversalState |= HaveHit;
 
-      if (traceStack.IsEmpty ())
-        return false;
+        if (ExitFirstHit)
+          traversalState |= TraversalFinished;
+      }
 
-      kdTraversalS n = traceStack.Pop ();
-      node = n.node;
-      tmin = n.tnear;
-      tmax = n.tfar;
+      if (!state.GetNode (node, tmin, tmax))
+        traversalState |= TraversalFinished;
     }
 
-    return true;
-
+    return traversalState & HaveHit;
   }
 
-  bool Raytracer::TraceClosestHit (const Ray &ray, HitPoint &hit) const
+  // Hit callback functors
+  struct HitCallbackNone 
   {
-    return false;
-    /*if (!tree || !tree->rootNode) return false;
+    CS_FORCEINLINE void operator () (const Ray& ray, const HitPoint& hit)
+    {}
+  };
 
-    //Copy and clip the ray
-    Ray myRay = ray;
-    if (!myRay.Clip (tree->rootNode->boundingBox))
+  struct HitCallbackObj
+  {
+    HitCallbackObj (HitPointCallback* hitCallback)
+      : cb (hitCallback)
+    {}
+
+    CS_FORCEINLINE void operator () (const Ray& ray, const HitPoint& hit)
+    {
+      cb->RegisterHit (ray, hit);
+    }
+
+    HitPointCallback* cb;
+  };
+
+  // Hit ignore functors
+  struct IgnoreCallbackNone
+  {
+    CS_FORCEINLINE bool operator () (const Primitive* prim)
+    {
       return false;
+    }
+  };
 
-    float minT (myRay.minLength), maxT (myRay.maxLength);
+  struct IgnoreCallbackObj
+  {
+    IgnoreCallbackObj (HitIgnoreCallback* cb)
+      : cb (cb)
+    {}
 
-
-    // Setup for traversal
-    csArray<kdTraversalS> kdstack;
-    kdstack.SetCapacity (64);
-    float t;
-    HitPoint hitPoint, bestHit;
-    hitPoint.distance = myRay.maxLength;
-    bestHit.distance = FLT_MAX*0.9f;
-
-    KDTreeNode *node = tree->rootNode;
-
-    while (true)
+    CS_FORCEINLINE bool operator () (const Primitive* prim)
     {
-      // traverse until we hit a leaf
-      while (node->leftChild)
-      {
-        uint splitDim = node->splitDimension;
-
-        t = (node->splitLocation - ray.origin[splitDim]) / ray.direction[splitDim];
-
-        if (t <= minT)
-        {
-          // t <= minLength <= maxLength, cull left traverse right
-          node = node->rightChild;
-        }
-        else if (t >= maxT)
-        {
-          // minLength <= maxLength <= t, cull right traverse left
-          node = node->leftChild;
-        }
-        else
-        {
-          // minLength < t < maxLength, traverse both
-          kdstack.Push (kdTraversalS (node->rightChild, t, maxT));
-          node = node->leftChild;
-          maxT = t;
-        }
-      }
-
-      // Ok, down to leaf.. process it
-      bool anyHit = IntersectPrimitives (node, myRay, hitPoint);
-      
-      if (anyHit)
-      {
-        if (hitPoint.distance < bestHit.distance) bestHit = hitPoint;
-      }
-
-      // Early termination
-      if (anyHit && maxT <= hitPoint.distance)
-      {
-        hit = bestHit;
-        return true;
-      }
-
-      if (kdstack.GetSize () == 0)
-      {
-        // no more nodes, and no hit.. return
-        hit = bestHit;
-        return anyHit;
-      }
-
-      kdTraversalS s = kdstack.Pop ();
-      node = s.node;
-      minT = s.tnear;
-      maxT = s.tfar;
+      return cb->IgnoreHit (prim);
     }
 
-    return false;*/
+    HitIgnoreCallback* cb;
+  };
+
+
+  //-- Primary ray trace functions
+
+  bool Raytracer::TraceAnyHit (const KDTree* tree, const Ray &ray, 
+    HitPoint& hit, HitIgnoreCallback* ignoreCB)
+  {
+    HitCallbackNone hitCB;
+    if (ignoreCB)
+    {
+      IgnoreCallbackObj ignCB (ignoreCB);
+      return TraceFunction<true> (tree, ray, hit, hitCB, ignCB);
+    }
+    else
+    {
+      IgnoreCallbackNone ignCB;
+      return TraceFunction<true> (tree, ray, hit, hitCB, ignCB);
+    }
   }
 
-  static const uint mod5[] = {0,1,2,0,1};
-
-  bool IntersectPrimitiveRay (const KDTreePrimitive &primitive, const Ray &ray,
-    HitPoint &hit)
+  bool Raytracer::TraceClosestHit (const KDTree* tree, const Ray &ray, 
+    HitPoint &hit, HitIgnoreCallback* ignoreCB) 
   {
-    /*
+    HitCallbackNone hitCB;
+    if (ignoreCB)
     {
-      
-      float nom = - (primitive.normal * (ray.origin - primitive.vertices[0]));
-      float den = primitive.normal * ray.direction;
-
-      if(den < 0) 
-        return false; //backface culling
-
-
-      float dist = nom / den;
-      if(dist < ray.minLength || dist > ray.maxLength)
-        return false;
-
-      csVector3 I = ray.origin + ray.direction * dist;
-
-      // Is inside?
-      csVector3 u, v, w;
-      float uu, uv, vv, wu, wv, D;
-
-      u = primitive.vertices[2] - primitive.vertices[0];
-      v = primitive.vertices[1] - primitive.vertices[0];
-
-      uu = u*u;
-      uv = u*v;
-      vv = v*v;
-      w = I - primitive.vertices[0];
-      wu = w*u;
-      wv = w*v;
-      D = uv*uv - uu*vv;
-
-      // Test barycentric
-      float s, t;
-      s = (uv*wv - vv*wu) / D;
-      if (s < 0.0f || s > 1.0f)
-        return false;
-
-      t = (uv*wu - uu*wv) / D;
-      if (t < 0.0f || (t+s) > 1.0f)
-        return false;
-
-      hit.hitPoint = I;
-      hit.distance = dist;
-      hit.primitive = primitive.primPointer;
-    }*/
- 
-
-    {
-      const uint k = primitive.k;
-      const uint ku = mod5[primitive.k+1];
-      const uint kv = mod5[primitive.k+2];
-
-      // prefetch?
-
-      const float nd = 1.0f / (ray.direction[k] + 
-        primitive.n_u * ray.direction[ku] + primitive.n_v * ray.direction[kv]);
-
-      const float f = (primitive.n_d - ray.origin[k] - 
-        primitive.n_u * ray.origin[ku] - primitive.n_v * ray.origin[kv]) * nd;
-
-      // Check for distance..
-      if (!(ray.maxLength > f && f > ray.minLength)) return false;
-
-      // Compute hitpoint on plane
-      const float hu = (ray.origin[ku] + f * ray.direction[ku]);
-      const float hv = (ray.origin[kv] + f * ray.direction[kv]);
-
-      // First barycentric coordinate
-      const float lambda = (hu * primitive.b_nu + hv * primitive.b_nv + primitive.b_d);
-      if (lambda < 0.0f) 
-        return false;
-
-      // Second barycentric coordinate
-      const float mu = (hu * primitive.c_nu + hv * primitive.c_nv + primitive.c_d);
-      if (mu < 0.0f) 
-        return false;
-
-      // Third barycentric coordinate
-      if (lambda + mu > 1.0f) 
-        return false;
-
-      // Ok, is a hit, store it
-      hit.hitPoint = ray.origin + ray.direction * f;
-      hit.distance = f;
-      hit.primitive = primitive.primPointer;
+      IgnoreCallbackObj ignCB (ignoreCB);
+      return TraceFunction<false> (tree, ray, hit, hitCB, ignCB);
     }
-
-
-    return true;
+    else
+    {
+      IgnoreCallbackNone ignCB;
+      return TraceFunction<false> (tree, ray, hit, hitCB, ignCB);;
+    }
   }
 
-  bool Raytracer::IntersectPrimitives (const KDTreeNode* node, const Ray &ray, 
-    HitPoint &hit, bool earlyExit /* = false */) const
+  void Raytracer::TraceAllHits (const KDTree* tree, const Ray &ray, 
+    HitPointCallback* hitCallback, HitIgnoreCallback* ignoreCB)
   {
-    size_t nIdx, nMax;
-    nMax = node->triangleIndices.GetSize ();
-    bool haveHit = false;
-    bool haveAnyHit = false;
-
-    HitPoint bestHit, thisHit;
-    bestHit.distance = FLT_MAX*0.95f;
-
-    for (nIdx = 0; nIdx < nMax; nIdx++)
+    HitCallbackObj hitCB (hitCallback);
+    HitPoint hit;
+    if (ignoreCB)
     {
-      haveHit = IntersectPrimitiveRay (tree->allTriangles[node->triangleIndices[nIdx]], ray, thisHit);
-      if (haveHit)
-      {
-        haveAnyHit = true;
-        if (earlyExit) 
-        {
-          hit = thisHit;
-          return true;
-        }
-        if (thisHit.distance < bestHit.distance) bestHit = thisHit;
-      }
+      IgnoreCallbackObj ignCB (ignoreCB);
+      TraceFunction<false> (tree, ray, hit, hitCB, ignCB);
     }
-
-    hit = bestHit;
-
-    return haveAnyHit;
+    else
+    {
+      IgnoreCallbackNone ignCB;
+      TraceFunction<false> (tree, ray, hit, hitCB, ignCB);
+    }
   }
 }
 

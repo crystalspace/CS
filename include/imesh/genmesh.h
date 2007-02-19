@@ -241,7 +241,7 @@ struct iGeneralMeshState : public virtual iGeneralMeshCommonState
  */
 struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
 {
-  SCF_INTERFACE (iGeneralFactoryState, 1, 1, 0);
+  SCF_INTERFACE (iGeneralFactoryState, 1, 1, 1);
   
   /// Set the color to use. Will be added to the lighting values.
   virtual void SetColor (const csColor& col) = 0;
@@ -440,6 +440,14 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
   /// Get a specific submesh
   virtual iGeneralMeshSubMesh* GetSubMesh (size_t index) const = 0;
   /** @} */
+
+  /**
+   * Disable auto-generated normals.
+   * This does not have an effect on the current normals, but only changes the
+   * return value of IsAutoNormals(). However, this affects saving of genmesh
+   * factories, as all vertex normals will be written out explicitly.
+   */
+  virtual void DisableAutoNormals () = 0;
 };
 
 /**

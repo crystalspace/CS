@@ -136,7 +136,7 @@ public:
   void ResetManualPositions (int new_celldim);
 
   virtual void AddFactory (iMeshFactoryWrapper* factory, float maxdist);
-  virtual size_t GetFactoryCount () const { return factories.Length (); }
+  virtual size_t GetFactoryCount () const { return factories.GetSize (); }
   virtual void RemoveFactory (size_t idx);
   virtual iMeshFactoryWrapper* GetFactory (size_t idx)
   {
@@ -472,7 +472,7 @@ public:
   int GetCellId (const csVector2& pos);
 
   virtual iMeshGeneratorGeometry* CreateGeometry ();
-  virtual size_t GetGeometryCount () const { return geometries.Length (); }
+  virtual size_t GetGeometryCount () const { return geometries.GetSize (); }
   virtual iMeshGeneratorGeometry* GetGeometry (size_t idx)
   {
     return geometries[idx];
@@ -480,7 +480,7 @@ public:
   virtual void RemoveGeometry (size_t idx);
 
   virtual void AddMesh (iMeshWrapper* mesh) { meshes.Push (mesh); }
-  virtual size_t GetMeshCount () const { return meshes.Length (); }
+  virtual size_t GetMeshCount () const { return meshes.GetSize (); }
   virtual iMeshWrapper* GetMesh (size_t idx) { return meshes[idx]; }
   virtual void RemoveMesh (size_t idx);
 

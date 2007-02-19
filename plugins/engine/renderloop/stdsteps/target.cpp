@@ -82,7 +82,7 @@ csPtr<iBase> csTargetRSLoader::Parse (iDocumentNode* node,
   newstep.AttachNew (step);
 
   csRef<iRenderStepContainer> steps =
-    SCF_QUERY_INTERFACE (step, iRenderStepContainer);
+    scfQueryInterface<iRenderStepContainer> (step);
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -168,7 +168,7 @@ csTargetRenderStep::csTargetRenderStep (
   iObjectRegistry* object_reg) :
   scfImplementationType (this)
 {
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = csQueryRegistry<iEngine> (object_reg);
   doCreate = false;
   persistent = false;
 }
@@ -198,7 +198,7 @@ void csTargetRenderStep::Perform (iRenderView* rview, iSector* sector,
     engine->SetContext (tex->GetTextureHandle ());
   }
   //g3d->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER);
-  for (size_t i = 0; i < steps.Length(); i++)
+  for (size_t i = 0; i < steps.GetSize (); i++)
   {
     steps[i]->Perform (rview, sector, stacks);
   }
@@ -233,5 +233,5 @@ size_t csTargetRenderStep::Find (iRenderStep* step) const
 
 size_t csTargetRenderStep::GetStepCount () const
 {
-  return steps.Length();
+  return steps.GetSize ();
 }

@@ -37,12 +37,11 @@
 #include "ivideo/natwin.h"
 #include "ivideo/cursor.h"
 
+#include <windows.h>
 
 #include "csutil/win32/wintools.h"
 #include "win32kbd.h"
 #include "cachedll.h"
-
-#include <windows.h>
 
 #include <stdio.h>
 #include <time.h>
@@ -222,7 +221,7 @@ bool csPlatformStartup(iObjectRegistry* r)
    */
   SetThreadAffinityMask (GetCurrentThread(), 1);
   
-  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (r, iCommandLineParser));
+  csRef<iCommandLineParser> cmdline (csQueryRegistry<iCommandLineParser> (r));
 
   csPathsList* pluginpaths = csGetPluginPaths (cmdline->GetAppPath());
 
@@ -324,7 +323,7 @@ BOOL WINAPI Win32Assistant::ConsoleHandlerRoutine (DWORD dwCtrlType)
     case CTRL_LOGOFF_EVENT:
     case CTRL_SHUTDOWN_EVENT:
       {
-	for (size_t i = 0; i < assistants.Length(); i++)
+	for (size_t i = 0; i < assistants.GetSize (); i++)
 	{
 	  assistants[i]->GetEventOutlet()->ImmediateBroadcast (
 	    csevQuit (assistants[i]->registry), 0);
@@ -370,7 +369,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r)
 
   use_own_message_loop = true;
 
-  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (r, iCommandLineParser));
+  csRef<iCommandLineParser> cmdline (csQueryRegistry<iCommandLineParser> (r));
   console_window = cmdline->GetBoolOption ("console", console_window);
 
   cmdline_help_wanted = (cmdline->GetOption ("help") != 0);
@@ -403,7 +402,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r)
       if (!IsStdHandleRedirected (STD_OUTPUT_HANDLE)) 
         freopen("CONOUT$", "a", stdout);
       if (!IsStdHandleRedirected (STD_INPUT_HANDLE)) 
-        freopen("CONIN$", "a", stdin);
+        freopen("CONIN$", "r", stdin);
     }
   }
 
@@ -451,7 +450,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r)
     {
       strcat (apppath, ".ico");
     }
-    appIcon = (HICON)LoadImage (ModuleHandle, apppath, IMAGE_ICON,
+    appIcon = (HICON)LoadImageA (ModuleHandle, apppath, IMAGE_ICON,
       0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
   }
   // finally the default one
@@ -513,7 +512,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r)
 
   m_hCursor = LoadCursor (0, IDC_ARROW);
 
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY (registry, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (registry));
   CS_ASSERT (q != 0);
   csEventID events[] = {
     csevPreProcess (registry),
@@ -540,12 +539,12 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r)
   }
 
   csRef<iBase> currentKbd = 
-    CS_QUERY_REGISTRY_TAG (r, "iKeyboardDriver");
+    csQueryRegistryTag (r, "iKeyboardDriver");
   if (currentKbd != 0)
   {
     // Bit hacky: remove old keyboard driver
-    csRef<iEventHandler> eh = SCF_QUERY_INTERFACE (currentKbd, 
-      iEventHandler);
+    csRef<iEventHandler> eh =  
+      scfQueryInterface<iEventHandler> (currentKbd);
     q->RemoveListener (eh);
     r->Unregister (currentKbd, "iKeyboardDriver");
   }
@@ -566,7 +565,7 @@ Win32Assistant::~Win32Assistant ()
 
 void Win32Assistant::Shutdown()
 {
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY (registry, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (registry));
   if (q != 0)
     q->RemoveListener(this);
   if (!is_console_app && (cmdline_help_wanted || console_window))
@@ -612,7 +611,7 @@ iEventOutlet* Win32Assistant::GetEventOutlet()
 {
   if (!EventOutlet.IsValid())
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY(registry, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (registry));
     if (q != 0)
       EventOutlet = q->CreateEventOutlet(this);
   }
@@ -881,11 +880,19 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
       if (assistant != 0)
       {
         iEventOutlet* outlet = assistant->GetEventOutlet();
-        ::SetCursor (assistant->m_hCursor);
         outlet->Mouse (csmbNone, false, short(LOWORD(lParam)), 
 	  short(HIWORD(lParam)));
       }
       return TRUE;
+    }
+    case WM_SETCURSOR:
+    {
+      if ((assistant != 0) && (LOWORD (lParam) == HTCLIENT))
+      {
+        ::SetCursor (assistant->m_hCursor);
+        return TRUE;
+      }
+      break;
     }
     case WM_SIZE:
     {

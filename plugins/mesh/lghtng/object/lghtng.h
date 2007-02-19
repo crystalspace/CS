@@ -131,6 +131,10 @@ public:
    * does nothing.
    */
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
+  virtual void BuildDecal(const csVector3* pos, float decalRadius,
+          iDecalBuilder* decalBuilder)
+  {
+  }
 
   //------------------------- iLightningState implementation ----------------
   virtual void SetOrigin(const csVector3& pos) { this->origin = pos; }
@@ -226,8 +230,7 @@ public:
   {     
     if (GenMeshFact)
     {
-      GenFactState = SCF_QUERY_INTERFACE(
-          GenMeshFact, iGeneralFactoryState);      
+      GenFactState = scfQueryInterface<iGeneralFactoryState> (GenMeshFact);      
       GenFactState->SetVertexCount(MaxPoints * 2);
       GenFactState->SetTriangleCount((MaxPoints - 1) * 2);
             

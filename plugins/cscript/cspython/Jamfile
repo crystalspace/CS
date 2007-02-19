@@ -66,7 +66,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   InstallCSPythonPY $(cspacepy) : bindings python ;
 
   Description crystalspace_python : "Python-specific support" ;
-  Library crystalspace_python : $(common) : shared independent optional ;
+  Library crystalspace_python : $(common) staticvarcleanup.cpp : shared independent optional ;
   LibDepends crystalspace_python : crystalspace ;
   ExternalLibs crystalspace_python : PYTHON ;
   CFlags crystalspace_python : $(CSPYTHON.CFLAGS) ;
@@ -85,7 +85,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   #--------
   # pythmod -- Pure Python module
   #--------
-  PythMod pythmod : _cspace : pythmod.cpp : crystalspace_python : 
+  PythMod pythmod : _cspace : pythmod.cpp : crystalspace crystalspace_python : 
 		: "pure Python module" ;
   Depends pythmod : $(cspacepy) ;
     

@@ -1,0 +1,9 @@
+SubDir TOP plugins utilities profiler ;
+
+Description profiler : "profiling plugin" ;
+
+Plugin profiler
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith profiler : crystalspace ;
+

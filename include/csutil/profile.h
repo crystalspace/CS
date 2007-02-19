@@ -16,35 +16,34 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifdef CS_COMPILER_GCC
+  #warning Profiler support from csutil/profile.h has been deprecated. \
+Check ivaria/profile.h for new interface.
+#endif
+#ifdef CS_COMPILER_MSVC
+  #pragma message ("Profiler support from csutil/profile.h has been deprecated. \
+Check ivaria/profile.h for new interface.")
+#endif
+
 #ifndef __CS_UTIL_PROFILE_H__
 #define __CS_UTIL_PROFILE_H__
 
 /**\file
- * Profiling utilities.
  */
 
 #include "csextern.h"
 #include "csutil/array.h"
 #include "csutil/csstring.h"
 #include "csutil/scf_implementation.h"
+#include "ivaria/profile.h"
 
-#ifdef CS_DO_PROFILING
+#include "csutil/win32/msvc_deprecated_warn_off.h"
 
-#include <sys/time.h>
-
-
-struct iProfiler : public virtual iBase
-{
-  SCF_INTERFACE(iProfiler, 2,0,0);
-  virtual void RegisterProfilePoint (const char* token,
-  	const char* file, int line,
-  	uint32* ptr_count, uint32* ptr_time,
-	uint32* ptr_timemin, uint32* ptr_timemax) = 0;
-  virtual void Dump () = 0;
-  virtual void Reset () = 0;
-};
-
-struct csProfileInfo
+/**
+ * \deprecated Old profiling discontinued; check docs for new API
+ */
+struct CS_DEPRECATED_TYPE_MSG("Old profiling discontinued; check docs for new API")
+csProfileInfo
 {
   const char* token;
   const char* file;
@@ -55,87 +54,72 @@ struct csProfileInfo
   uint32* ptr_timemax;
 };
 
-class csProfiler : public scfImplementation1<csProfiler, iProfiler>
+/**
+ * \deprecated Old profiling discontinued; use iProfiler interface
+ */
+class CS_DEPRECATED_TYPE_MSG("Old profiling discontinued; check docs for new API")
+csProfiler : public scfImplementation0<csProfiler>
 {
 public:
   csArray<csProfileInfo> profile_info;
+  csArray<CS::Debug::ProfileZone*> profile_zones;
+  csArray<CS::Debug::ProfileCounter*> profile_counters;
 
 public:
-  csProfiler ();
-  virtual ~csProfiler ();
+  csProfiler () : scfImplementationType (this) {}
+  virtual ~csProfiler () {}
 
-  virtual void RegisterProfilePoint (const char* token,
-  	const char* file, int line,
-  	uint32* ptr_count, uint32* ptr_time,
-	uint32* ptr_timemin, uint32* ptr_timemax);
-  virtual void Dump ();
-  virtual void Reset ();
+  // Dummies to keep class compiling
+  void Reset () {}
+  CS::Debug::ProfileZone* GetProfileZone (const char* zonename)
+  { return 0; }
+  CS::Debug::ProfileCounter* GetProfileCounter (const char* countername)
+  { return 0; }
+  const csArray<CS::Debug::ProfileZone*>& GetProfileZones ()
+  { return profile_zones; }
+  const csArray<CS::Debug::ProfileCounter*>& GetProfileCounters ()
+  { return profile_counters; }
 };
 
-#if 1
-#define CS_PROFTIME(v) \
-v = csGetTicks()
-#else
-#define CS_PROFTIME(v) \
-{\
-struct timeval tv;\
-gettimeofday(&tv, 0);\
-v = tv.tv_sec + tv.tv_usec*1000000;\
-}
-#endif
+namespace CS
+{
+  namespace Macros
+  {
+    CS_DEPRECATED_TYPE_MSG("Old profiling discontinued; check docs for new API")
+    inline void CS_PROFTIME() {}
+    CS_DEPRECATED_TYPE_MSG("Old profiling discontinued; check docs for new API")
+    inline void CS_PROFRESET() {}
+    CS_DEPRECATED_TYPE_MSG("Old profiling discontinued; check docs for new API")
+    inline void CS_PROFDUMP() {}
+    CS_DEPRECATED_TYPE_MSG("Old profiling discontinued; check docs for new API")
+    inline void CS_PROFSTART() {}
+    CS_DEPRECATED_TYPE_MSG("Old profiling discontinued; check docs for new API")
+    inline void CS_PROFSTOP() {}
+  } // namespace Macros
+} // namespace CS
 
-#define CS_PROFRESET(obj_reg) \
-{ \
-csRef<iProfiler> profiler = CS_QUERY_REGISTRY (obj_reg, iProfiler); \
-if (profiler) profiler->Reset (); \
-}
+/**\def CS_PROFTIME
+ * \deprecated Old profiling discontinued; use iProfiler interface
+ */
+#define CS_PROFTIME(v) CS::Macros::CS_PROFTIME(); v = 0
+/**\def CS_PROFRESET
+ * \deprecated Old profiling discontinued; use iProfiler interface
+ */
+#define CS_PROFRESET(a) CS::Macros::CS_PROFRESET()
+/**\def CS_PROFDUMP
+ * \deprecated Old profiling discontinued; use iProfiler interface
+ */
+#define CS_PROFDUMP(a) CS::Macros::CS_PROFDUMP()
+/**\def CS_PROFSTART
+ * \deprecated Old profiling discontinued; use iProfiler interface
+ */
+#define CS_PROFSTART(a,b) CS::Macros::CS_PROFSTART()
+/**\def CS_PROFSTOP
+ * \deprecated Old profiling discontinued; use iProfiler interface
+ */
+#define CS_PROFSTOP(a) CS::Macros::CS_PROFSTOP()
 
-#define CS_PROFDUMP(obj_reg) \
-{ \
-csRef<iProfiler> profiler = CS_QUERY_REGISTRY (obj_reg, iProfiler); \
-if (profiler) profiler->Dump (); \
-}
-
-#define CS_PROFSTART(tok,obj_reg) \
-static bool tok##__prof__init = false; \
-static uint32 tok##__prof__cnt = 0; \
-static uint32 tok##__prof__time = 0; \
-static uint32 tok##__prof__timemin = 1000000000; \
-static uint32 tok##__prof__timemax = 0; \
-if (!tok##__prof__init) \
-{ \
-  tok##__prof__init = true; \
-  csRef<iProfiler> profiler = CS_QUERY_REGISTRY (obj_reg, iProfiler); \
-  if (!profiler) \
-  { \
-    profiler.AttachNew (new csProfiler ()); \
-    obj_reg->Register (profiler, "iProfiler"); \
-  } \
-  if (profiler) \
-    profiler->RegisterProfilePoint (#tok,__FILE__, __LINE__, &tok##__prof__cnt, &tok##__prof__time, &tok##__prof__timemin, &tok##__prof__timemax); \
-} \
-uint32 tok##__prof__starttime; \
-CS_PROFTIME(tok##__prof__starttime)
-
-#define CS_PROFSTOP(tok) \
-{ \
-uint32 prof__endtime; \
-CS_PROFTIME(prof__endtime); \
-uint32 prof__dt = prof__endtime - tok##__prof__starttime; \
-if (prof__dt < tok##__prof__timemin) tok##__prof__timemin = prof__dt; \
-if (prof__dt > tok##__prof__timemax) tok##__prof__timemax = prof__dt; \
-tok##__prof__time += prof__dt; \
-} \
-tok##__prof__cnt++
-
-#else
-
-#define CS_PROFRESET(obj_reg)
-#define CS_PROFDUMP(obj_reg)
-#define CS_PROFSTART(tok,obj_reg)
-#define CS_PROFSTOP(tok)
-
-#endif
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif //__CS_UTIL_PROFILE_H__
 

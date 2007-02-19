@@ -74,8 +74,8 @@ csGeneralFactoryLoader::~csGeneralFactoryLoader ()
 bool csGeneralFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csGeneralFactoryLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
   InitTokenTable (xmltokens);
   return true;
@@ -137,7 +137,7 @@ bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
       {
         csRef<csShaderVariable> sv;
         sv.AttachNew (new csShaderVariable);
-        if (!synldr->ParseShaderVar (child, *sv)) return false;
+        if (!synldr->ParseShaderVar (ldr_context, child, *sv)) return false;
         shadervars.Push (sv);
         break;
       }
@@ -287,7 +287,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
   csRef<iGeneralFactoryState> state;
 
   fact = type->NewFactory ();
-  state = SCF_QUERY_INTERFACE (fact, iGeneralFactoryState);
+  state = scfQueryInterface<iGeneralFactoryState> (fact);
 
   bool num_tri_given = false;
   bool num_vt_given = false;
@@ -771,8 +771,8 @@ csGeneralFactorySaver::~csGeneralFactorySaver ()
 bool csGeneralFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csGeneralFactorySaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
   return true;
 }
 
@@ -833,9 +833,9 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
   if (obj)
   {
     csRef<iGeneralFactoryState> gfact = 
-      SCF_QUERY_INTERFACE (obj, iGeneralFactoryState);
+      scfQueryInterface<iGeneralFactoryState> (obj);
     csRef<iMeshObjectFactory> meshfact = 
-      SCF_QUERY_INTERFACE (obj, iMeshObjectFactory);
+      scfQueryInterface<iMeshObjectFactory> (obj);
     if (!gfact) return false;
     if (!meshfact) return false;
 
@@ -847,11 +847,15 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
       ->SetValueAsInt(gfact->GetVertexCount());
 
     //Write NumTri Tag
-    csRef<iDocumentNode> numtriNode = 
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    numtriNode->SetValue("numtri");
-    numtriNode->CreateNodeBefore(CS_NODE_TEXT, 0)
-      ->SetValueAsInt(gfact->GetTriangleCount());
+    bool writeTriangles = gfact->GetSubMeshCount() == 0;
+    if (writeTriangles)
+    {
+      csRef<iDocumentNode> numtriNode = 
+        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      numtriNode->SetValue("numtri");
+      numtriNode->CreateNodeBefore(CS_NODE_TEXT, 0)
+        ->SetValueAsInt(gfact->GetTriangleCount());
+    }
 
     int i;
     //Write Vertex Tags
@@ -881,15 +885,18 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
     }
 
     //Write Triangle Tags
-    for (i=0; i<gfact->GetTriangleCount(); i++)
+    if (writeTriangles)
     {
-      csRef<iDocumentNode> triaNode = 
-        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      triaNode->SetValue("t");
-      csTriangle tria = gfact->GetTriangles()[i];
-      triaNode->SetAttributeAsInt("v1", tria.a);
-      triaNode->SetAttributeAsInt("v2", tria.b);
-      triaNode->SetAttributeAsInt("v3", tria.c);
+      for (i=0; i<gfact->GetTriangleCount(); i++)
+      {
+        csRef<iDocumentNode> triaNode = 
+          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        triaNode->SetValue("t");
+        csTriangle tria = gfact->GetTriangles()[i];
+        triaNode->SetAttributeAsInt("v1", tria.a);
+        triaNode->SetAttributeAsInt("v2", tria.b);
+        triaNode->SetAttributeAsInt("v3", tria.c);
+      }
     }
 
     //Writedown DefaultColor tag
@@ -983,7 +990,7 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
     //TBD: Writedown box tag
 
     // Write submeshes
-    if (gfact->GetSubMeshCount() > 0)
+    if (!writeTriangles)
     {
       size_t smc = gfact->GetSubMeshCount();
       for (size_t s = 0; s < smc; s++)
@@ -1027,8 +1034,8 @@ csGeneralMeshLoader::~csGeneralMeshLoader ()
 bool csGeneralMeshLoader::Initialize (iObjectRegistry* object_reg)
 {
   csGeneralMeshLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
   InitTokenTable (xmltokens);
   return true;
@@ -1158,10 +1165,10 @@ bool csGeneralMeshLoader::ParseLegacySubMesh(iDocumentNode *node,
   }
 
   if (do_mixmode)
-    state->AddSubMesh (triangles.GetArray (), (int)triangles.Length (),
+    state->AddSubMesh (triangles.GetArray (), (int)triangles.GetSize (),
   	  material, mixmode);
   else
-    state->AddSubMesh (triangles.GetArray (), (int)triangles.Length (),
+    state->AddSubMesh (triangles.GetArray (), (int)triangles.GetSize (),
   	  material);
 
   return true;
@@ -1230,7 +1237,7 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
       {
         csRef<csShaderVariable> sv;
         sv.AttachNew (new csShaderVariable);
-        if (!synldr->ParseShaderVar (child, *sv)) return false;
+        if (!synldr->ParseShaderVar (ldr_context, child, *sv)) return false;
         svc->AddVariable (sv);
         break;
       }
@@ -1316,8 +1323,8 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find factory '%s'!", factname);
 	    return 0;
 	  }
-	  factstate = SCF_QUERY_INTERFACE (fact->GetMeshObjectFactory(), 
-	    iGeneralFactoryState);
+	  factstate =  
+	    scfQueryInterface<iGeneralFactoryState> (fact->GetMeshObjectFactory());
 	  if (!factstate)
 	  {
       	    synldr->ReportError (
@@ -1328,7 +1335,7 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
 	  CS_ASSERT (mesh != 0);
-          meshstate = SCF_QUERY_INTERFACE (mesh, iGeneralMeshState);
+          meshstate = scfQueryInterface<iGeneralMeshState> (mesh);
 	  if (!meshstate)
 	  {
       	    synldr->ReportError (
@@ -1371,6 +1378,50 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 	CHECK_MESH(meshstate);
         ParseSubMesh (child, meshstate, ldr_context);
         break;
+      case XMLTOKEN_ANIMCONTROL:
+        {
+	  const char* pluginname = child->GetAttributeValue ("plugin");
+	  if (!pluginname)
+	  {
+	    synldr->ReportError (
+		    "crystalspace.genmeshfactoryloader.parse",
+		    child, "Plugin name missing for <animcontrol>!");
+	    return 0;
+	  }
+	  csRef<iGenMeshAnimationControlType> type =
+	  	csLoadPluginCheck<iGenMeshAnimationControlType> (
+		object_reg, pluginname, false);
+	  if (!type)
+	  {
+	    synldr->ReportError (
+		"crystalspace.genmeshloader.parse",
+		child, "Could not load animation control plugin '%s'!",
+		pluginname);
+	    return 0;
+    	  }
+	  csRef<iGenMeshAnimationControlFactory> anim_ctrl_fact = type->
+	  	CreateAnimationControlFactory ();
+	  const char* error = anim_ctrl_fact->Load (child);
+	  if (error)
+	  {
+	    synldr->ReportError (
+		"crystalspace.genmeshloader.parse",
+		child, "Error loading animation control factory: '%s'!",
+		error);
+	    return 0;
+	  }
+          csRef<iGenMeshAnimationControl> animctrl = 
+            anim_ctrl_fact->CreateAnimationControl (mesh);
+	  if (!type)
+	  {
+	    synldr->ReportError (
+		"crystalspace.genmeshloader.parse",
+		child, "Could not create animation control");
+	    return 0;
+    	  }
+          meshstate->SetAnimationControl (animctrl);
+	}
+	break;
       default:
         synldr->ReportBadToken (child);
 	return 0;
@@ -1394,8 +1445,8 @@ csGeneralMeshSaver::~csGeneralMeshSaver ()
 bool csGeneralMeshSaver::Initialize (iObjectRegistry* object_reg)
 {
   csGeneralMeshSaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
   return true;
 }
 

@@ -405,7 +405,7 @@ csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory) :
 {
   csHazeMeshObject::factory = factory;
   logparent = 0;
-  ifactory = SCF_QUERY_INTERFACE (factory, iMeshObjectFactory);
+  ifactory = scfQueryInterface<iMeshObjectFactory> (factory);
   material = factory->GetMaterialWrapper ();
   MixMode = factory->GetMixMode ();
   initialized = false;
@@ -421,7 +421,7 @@ csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory) :
   directional = factory->GetDirectional();
   csPDelArray<csHazeLayer> *factlayers = factory->GetLayers();
   size_t i;
-  for(i = 0; i < factlayers->Length(); i++)
+  for(i = 0; i < factlayers->GetSize (); i++)
   {
     csHazeLayer *p = new csHazeLayer (factlayers->Get(i)->hull,
       factlayers->Get(i)->scale);
@@ -429,8 +429,8 @@ csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory) :
   }
 
   csRef<iStringSet> strings;
-  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (factory->object_reg,
-    "crystalspace.shared.stringset", iStringSet);
+  strings = csQueryRegistryTagInterface<iStringSet>
+    (factory->object_reg, "crystalspace.shared.stringset");
 
   if ((vertex_name == csInvalidStringID) ||
     (texel_name == csInvalidStringID) ||
@@ -455,7 +455,7 @@ void csHazeMeshObject::SetupObject ()
     csVector3 pos;
     size_t l;
     int i;
-    for(l=0; l<layers.Length(); l++)
+    for(l=0; l<layers.GetSize (); l++)
       for(i=0; i<layers[l]->hull->GetVerticeCount(); i++)
       {
 	layers[l]->hull->GetVertex(pos, i);
@@ -567,7 +567,7 @@ void csHazeMeshObject::GenGeometryAdapt (iRenderView *rview, iGraphics3D *g3d,
     // emit geometry
     for (int i = 0; i < 3; i++)
     {
-      GetTempIndices()->Push ((uint)GetTempVertices()->Length());
+      GetTempIndices()->Push ((uint)GetTempVertices()->GetSize ());
       GetTempVertices()->Push (campts[i]);
       GetTempTexels()->Push (uvs[i]);
     }
@@ -610,7 +610,7 @@ csRenderMesh** csHazeMeshObject::GetRenderMeshes (int &n, iRenderView* rview,
 { 
   SetupObject ();
 
-  if(layers.Length() <= 0)
+  if(layers.GetSize () <= 0)
   {
     n = 0; 
     return 0; 
@@ -709,7 +709,7 @@ csRenderMesh** csHazeMeshObject::GetRenderMeshes (int &n, iRenderView* rview,
   }
 
   bool bufferCreated;
-  const size_t vertCount = GetTempVertices()->Length();
+  const size_t vertCount = GetTempVertices()->GetSize ();
   HazeRenderBuffer& vertices = renderBuffers.GetUnusedData (bufferCreated,
     rview->GetCurrentFrameNumber());
   if (bufferCreated || (vertices.count < vertCount))
@@ -730,14 +730,14 @@ csRenderMesh** csHazeMeshObject::GetRenderMeshes (int &n, iRenderView* rview,
     vertCount);
   HazeRenderBuffer& indices = indexBuffers.GetUnusedData (bufferCreated,
     rview->GetCurrentFrameNumber());
-  if (bufferCreated || (indices.count < GetTempIndices()->Length()))
+  if (bufferCreated || (indices.count < GetTempIndices()->GetSize ()))
   {
     indices.buffer = csRenderBuffer::CreateIndexRenderBuffer (
-      GetTempIndices()->Length(), CS_BUF_STREAM, 
+      GetTempIndices()->GetSize (), CS_BUF_STREAM, 
       CS_BUFCOMP_UNSIGNED_INT, 0, vertCount-1);
   }
   indices.buffer->CopyInto (GetTempIndices()->GetArray(), 
-    GetTempIndices()->Length());
+    GetTempIndices()->GetSize ());
 
   bool rmCreated;
   csRenderMesh*& rm = rmHolder.GetUnusedMesh (rmCreated, 
@@ -763,7 +763,7 @@ csRenderMesh** csHazeMeshObject::GetRenderMeshes (int &n, iRenderView* rview,
 
   rm->object2world = camera->GetTransform ();
 
-  rm->indexend = (uint)GetTempIndices()->Length();
+  rm->indexend = (uint)GetTempIndices()->GetSize ();
 
   rm->buffers->SetRenderBuffer (CS_BUFFER_INDEX, indices.buffer);
   rm->buffers->SetRenderBuffer (CS_BUFFER_POSITION, vertices.buffer);
@@ -886,7 +886,7 @@ csHazeMeshObjectFactory::~csHazeMeshObjectFactory ()
 csPtr<iMeshObject> csHazeMeshObjectFactory::NewInstance ()
 {
   csHazeMeshObject* cm = new csHazeMeshObject (this);
-  csRef<iMeshObject> im (SCF_QUERY_INTERFACE (cm, iMeshObject));
+  csRef<iMeshObject> im (scfQueryInterface<iMeshObject> (cm));
   cm->DecRef ();
   return csPtr<iMeshObject> (im);
 }
@@ -908,7 +908,7 @@ csPtr<iMeshObjectFactory> csHazeMeshObjectType::NewFactory ()
 {
   csHazeMeshObjectFactory* cm = new csHazeMeshObjectFactory (this);
   csRef<iMeshObjectFactory> ifact (
-  	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
+  	scfQueryInterface<iMeshObjectFactory> (cm));
   cm->DecRef ();
   return csPtr<iMeshObjectFactory> (ifact);
 }

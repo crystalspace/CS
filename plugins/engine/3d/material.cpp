@@ -19,7 +19,6 @@
 #include "cssysdef.h"
 #include "csqint.h"
 
-#include "csutil/debug.h"
 #include "iengine/texture.h"
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
@@ -132,7 +131,7 @@ void csMaterial::SetShader (csStringID type, iShader* shd)
 
 iShader* csMaterial::GetShader(csStringID type)
 {
-  return shaders.Get (type, 0);
+  return shaders.Get (type, (iShader*)0);
 }
 
 iTextureHandle *csMaterial::GetTexture ()
@@ -195,7 +194,7 @@ csMaterialWrapper::csMaterialWrapper (iMaterialList* materials,
   scfImplementationType (this), materials (materials)
 {
   material = m;
-  matEngine = SCF_QUERY_INTERFACE (material, iMaterialEngine);
+  matEngine = scfQueryInterface<iMaterialEngine> (material);
 }
 
 csMaterialWrapper::~csMaterialWrapper ()
@@ -210,7 +209,7 @@ void csMaterialWrapper::SelfDestruct ()
 void csMaterialWrapper::SetMaterial (iMaterial *m)
 {
   material = m;
-  matEngine = SCF_QUERY_INTERFACE (material, iMaterialEngine);
+  matEngine = scfQueryInterface<iMaterialEngine> (material);
 }
 
 void csMaterialWrapper::Visit ()
@@ -293,7 +292,7 @@ bool csMaterialList::Remove (int n)
 void csMaterialList::RemoveAll ()
 {
   size_t i;
-  for (i = 0 ; i < list.Length () ; i++)
+  for (i = 0 ; i < list.GetSize () ; i++)
     list[i]->QueryObject ()->RemoveNameChangeListener (listener);
   list.DeleteAll ();
   mat_hash.DeleteAll ();

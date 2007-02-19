@@ -28,7 +28,7 @@ csCEGUIScriptModule::csCEGUIScriptModule (iScript* script, iObjectRegistry* reg)
   d_identifierString = "Crystal Space iScript Scripting Module";
 
   obj_reg = reg;
-  vfs = CS_QUERY_REGISTRY(obj_reg, iVFS);
+  vfs = csQueryRegistry<iVFS> (obj_reg);
   scripting = script;
 }
 
@@ -77,8 +77,6 @@ void csCEGUIScriptModule::executeString (const CEGUI::String &str)
   scripting->RunText (str.c_str ());
 }
 
-#if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR >= 5)
-
 CEGUI::Event::Connection csCEGUIScriptModule::subscribeEvent(
   CEGUI::EventSet* target, const CEGUI::String& name,
   const CEGUI::String& subscriber_name)
@@ -95,6 +93,3 @@ CEGUI::Event::Connection csCEGUIScriptModule::subscribeEvent(
   // @@@: Not implemented
   return 0;
 }
-
-#endif
-

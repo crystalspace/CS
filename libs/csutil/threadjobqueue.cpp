@@ -19,203 +19,182 @@
 
 #include "cssysdef.h"
 
+#include "csgeom/math.h"
 #include "csutil/scopedmutexlock.h"
 #include "csutil/sysfunc.h"
 #include "csutil/threadjobqueue.h"
 
-//#define THREADJOBQUEUE_PRINT_STATS
 
-csThreadJobQueue::csThreadJobQueue()
-  : scfImplementationType (this), jobsAdded (0), jobsPulled (0),
-  jobsWaited (0), jobsUnqueued (0)
+namespace CS
 {
-  jobFinishMutex = csMutex::Create ();
-  sharedData.jobFifo = new JobFifo ();
-  sharedData.fifoXS = csMutex::Create ();
-  sharedData.queueWake = csCondition::Create ();
-  sharedData.jobXS = csMutex::Create ();
-  sharedData.currentJob = &currentJob;
-  sharedData.jobFinish = csCondition::Create ();
-
-  csRef<csRunnable> queueRunnable;
-  queueRunnable.AttachNew (new QueueRunnable (sharedData));
-  queueThread = csThread::Create (queueRunnable);
-  bool res = queueThread->Start();
-  CS_ASSERT (res); (void)res;
-}
-
-csThreadJobQueue::~csThreadJobQueue()
+namespace Threading
 {
-  {
-    // Flush remaining jobs
-    csScopedMutexLock fifoLock (sharedData.fifoXS);
-    sharedData.jobFifo->DeleteAll();
-  }
-  sharedData.queueWake->Signal();
-  queueThread->Wait();
 
-  delete sharedData.jobFifo;
-#ifdef THREADJOBQUEUE_PRINT_STATS
-  csPrintf ("csThreadJobQueue %p: %u added, %u pulled, %u waited, %u unqueued\n",
-    this, jobsAdded, jobsPulled, jobsWaited, jobsUnqueued);
-#endif
-}
-
-void csThreadJobQueue::Enqueue (iJob* job)
-{
-  CS_ASSERT (job != 0);
-  jobsAdded++;
+  ThreadedJobQueue::ThreadedJobQueue (size_t numWorkers)
+    : scfImplementationType (this), 
+    numWorkerThreads (csMin<size_t> (MAX_WORKER_THREADS, numWorkers)), 
+    shutdownQueue (false)
   {
-    csScopedMutexLock fifoLock (sharedData.fifoXS);
-    sharedData.jobFifo->Length();
-    sharedData.jobFifo->Push (job);
-    sharedData.queueWake->Signal();
-  }
-}
-
-void csThreadJobQueue::PullAndRun (iJob* job)
-{
-  CS_ASSERT (job != 0);
-  sharedData.jobXS->LockWait();
-  bool jobEnqueued;
-  {
-    csScopedMutexLock fifoLock (sharedData.fifoXS);
-    jobEnqueued = sharedData.jobFifo->Delete (job);
-  }
-  if (!jobEnqueued)
-  {
-    bool didWait = false;
-    while (currentJob == job)
+    // Start up the threads
+    for (size_t i = 0; i < numWorkerThreads; ++i)
     {
-      csScopedMutexLock jobLock (jobFinishMutex);
-      sharedData.jobXS->Release();
-      // wait for the job completion
-      if (!sharedData.jobFinish->Wait (jobFinishMutex, 500))
+      allThreadState[i] = new ThreadState (this);
+      allThreads.Add (allThreadState[i]->threadObject);
+    }
+    allThreads.StartAll ();
+  }
+
+  ThreadedJobQueue::~ThreadedJobQueue ()
+  {
+    {
+      // Empty the queue for new jobs
+      MutexScopedLock lock (jobMutex);
+      jobQueue.DeleteAll ();
+    }
+
+    // Wait for all threads to finish their current job
+    shutdownQueue = true;
+    newJob.NotifyAll ();
+    allThreads.WaitAll ();
+
+    // Deallocate
+    for (size_t i = 0; i < numWorkerThreads; ++i)
+    {
+      delete allThreadState[i];
+    }
+  }
+
+
+  void ThreadedJobQueue::Enqueue (iJob* job)
+  {
+    if (!job)
+      return;
+
+    MutexScopedLock lock (jobMutex);
+    jobQueue.Push (job);
+    newJob.NotifyOne ();
+  }
+
+  void ThreadedJobQueue::PullAndRun (iJob* job)
+  {
+    bool jobUnqued = false;
+
+    {
+      MutexScopedLock lock (jobMutex);
+      // Check if in queue
+      jobUnqued = jobQueue.Delete (job);
+    }
+
+    if (jobUnqued)
+    {
+      job->Run ();
+      return;
+    }
+
+    // Now we have to check the active jobs, just wait until it is done
+    {
+      MutexScopedLock lock (threadStateMutex);
+
+      bool isRunning = false;
+      size_t index;
+
+      for (size_t i = 0; i < numWorkerThreads; ++i)
       {
-	// @@@ Timeout not v. nice
-#ifdef CS_DEBUG
-	csPrintf ("csThreadJobQueue::PullAndRun(): timeout\n");
-#endif
+        if (allThreadState[i]->currentJob == job)
+        {
+          isRunning = true;
+          index = i;
+          break;
+        }
       }
-      didWait = true;
-      sharedData.jobXS->LockWait();
-    }
-    if (didWait) jobsWaited++;
-  }
-  else
-    jobsPulled++;
-  sharedData.jobXS->Release();
-  // If it was in the queue, run now.
-  // if it was not, it either was waited for above or already finished.
-  if (jobEnqueued) job->Run();
-}
 
-void csThreadJobQueue::Unqueue (iJob* job, bool waitIfCurrent)
-{
-  CS_ASSERT (job != 0);
-  sharedData.jobXS->LockWait();
-  bool jobEnqueued;
-  {
-    csScopedMutexLock fifoLock (sharedData.fifoXS);
-    jobEnqueued = sharedData.jobFifo->Delete (job);
-  }
-  if (!jobEnqueued && waitIfCurrent)
-  {
-    bool didWait = false;
-    while (currentJob == job)
-    {
-      sharedData.jobXS->Release();
-      // wait for the job completion
-      csScopedMutexLock jobLock (jobFinishMutex);
-      sharedData.jobFinish->Wait (jobFinishMutex);
-      didWait = true;
-      sharedData.jobXS->LockTry();
-    }
-    if (didWait) jobsWaited++;
-  }
-  else
-    jobsUnqueued++;
-  sharedData.jobXS->Release();
-}
-
-//---------------------------------------------------------------------------
-
-//#define RUNNABLE_CHATTY
-
-csThreadJobQueue::QueueRunnable::QueueRunnable (
-  const QueueAndRunnableShared& sharedData)
-{
-  refCount = 1;
-  this->sharedData = sharedData;
-}
-
-csThreadJobQueue::QueueRunnable::~QueueRunnable()
-{
-}
-
-void csThreadJobQueue::QueueRunnable::Run ()
-{
-  csRef<csMutex> awakenMutex = csMutex::Create ();
-  csScopedMutexLock awakeLock (awakenMutex);
-  bool jobbing = false;
-  while (true)
-  {
-#ifdef RUNNABLE_CHATTY
-    if (!jobbing) csPrintf ("csThreadJobQueue::QueueRunnable::Run(): zzzz\n");
-#endif
-    if (!jobbing) sharedData.queueWake->Wait (awakenMutex);
-#ifdef RUNNABLE_CHATTY
-    if (!jobbing) csPrintf ("csThreadJobQueue::QueueRunnable::Run(): *yawn*\n");
-#endif
-
-    csRef<iJob> newJob;
-    {
-      csScopedMutexLock jobLock (sharedData.jobXS);
+      if (isRunning)
       {
-	csScopedMutexLock fifoLock (sharedData.fifoXS);
-	if (sharedData.jobFifo->Length() > 0)
-	{
-	  newJob = sharedData.jobFifo->PopTop();
-	  jobbing = true;
-	}
-	else
-	{
-	  if (jobbing)
-	    jobbing = false;
-	  else
-	    // We were awoken, but fifo empty? End running.
-	    break;
-	}
+        while (allThreadState[index]->currentJob == job)
+          allThreadState[index]->jobFinished.Wait (threadStateMutex);
       }
-      *sharedData.currentJob = newJob;
-    }
-    if (newJob.IsValid())
-    {
-      newJob->Run();
-#ifdef RUNNABLE_CHATTY
-      csPrintf ("csThreadJobQueue::QueueRunnable::Run(): finished a job, yay\n");
-#endif
-      {
-	csScopedMutexLock jobLock (sharedData.jobXS);
-	*sharedData.currentJob = 0;
-	sharedData.jobFinish->Signal();
-      }
+
     }
   }
-}
 
-void csThreadJobQueue::QueueRunnable::IncRef()
-{
-  refCount++;
-}
+  void ThreadedJobQueue::Unqueue (iJob* job, bool waitIfCurrent)
+  {
+    {
+      MutexScopedLock lock (jobMutex);
+      // Check if in queue
+      bool jobUnqued = jobQueue.Delete (job);
 
-void csThreadJobQueue::QueueRunnable::DecRef()
-{
-  if (--refCount == 0)
-    delete this;
-}
+      if (jobUnqued)
+        return;
+    }
 
-int csThreadJobQueue::QueueRunnable::GetRefCount()
-{
-  return refCount;
+    {
+      // Check the running threads
+      MutexScopedLock lock (threadStateMutex);
+
+      bool isRunning = false;
+      size_t index;
+
+      for (size_t i = 0; i < numWorkerThreads; ++i)
+      {
+        if (allThreadState[i]->currentJob == job)
+        {
+          isRunning = true;
+          index = i;
+          break;
+        }
+      }
+
+      if (isRunning && waitIfCurrent)
+      {
+        while (allThreadState[index]->currentJob == job)
+          allThreadState[index]->jobFinished.Wait (threadStateMutex);
+      }
+
+    }
+  }
+
+  ThreadedJobQueue::QueueRunnable::QueueRunnable (ThreadedJobQueue* queue, 
+    ThreadState* ts)
+    : ownerQueue (queue), threadState (ts)
+  {
+  }
+
+  void ThreadedJobQueue::QueueRunnable::Run ()
+  {
+    while (true)
+    {
+      // Get a job
+      {
+        MutexScopedLock lock (ownerQueue->jobMutex);
+        while (ownerQueue->jobQueue.GetSize () == 0)
+        {
+          if (ownerQueue->shutdownQueue)
+            return;
+          ownerQueue->newJob.Wait (ownerQueue->jobMutex);
+        }
+
+        {
+          MutexScopedLock lock2 (ownerQueue->threadStateMutex);
+          threadState->currentJob = ownerQueue->jobQueue.PopTop (); 
+        }
+      }
+
+      // Execute it
+      if (threadState->currentJob)
+      {
+        threadState->currentJob->Run ();
+      }
+
+      // Clean up
+      {
+        MutexScopedLock lock (ownerQueue->threadStateMutex);
+        threadState->currentJob = 0;
+        threadState->jobFinished.NotifyAll ();
+      }
+
+    }
+  }
+
+}
 }

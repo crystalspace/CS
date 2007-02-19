@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2005 by Marten Svanfeldt
+  Copyright (C) 2005-2006 by Marten Svanfeldt
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -25,8 +25,8 @@ namespace lighter
 {
   class Scene;
   class Sector;
-  class Light;
-  class RadPrimitive;
+  class Light_old;
+  class Primitive;
   class Raytracer;
 
   class Lighter : public csRefCount
@@ -34,6 +34,8 @@ namespace lighter
   public:
     Lighter (iObjectRegistry *objectRegistry);
     ~Lighter ();
+
+    int Run ();
 
     // Initialize and load plugins we want
     bool Initialize ();
@@ -52,21 +54,21 @@ namespace lighter
     csRef<iPluginManager> pluginManager;
     csRef<iReporter> reporter;
     csRef<iVFS> vfs;
+    csRef<iCommandLineParser> cmdLine;
+    csRef<iConfigManager> configMgr;
     iObjectRegistry *objectRegistry;
     csRef<iStringSet> strings;
 
-    // FIXME: move to class Configuration
-    struct Settings
-    {
-      bool keepGenmeshSubmeshes;
-    };
-    Settings settings;
-
   protected:
+    // Cleanup and prepare for shutdown
+    void CleanUp ();
+
     // Parse the commandline and load any files specified
     bool LoadFiles ();
 
-    void LoadSettings ();
+    void LoadConfiguration ();
+
+    void CommandLineHelp () const;
 
     Scene *scene;
   };

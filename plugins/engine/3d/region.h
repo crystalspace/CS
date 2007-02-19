@@ -115,10 +115,6 @@ public:
   virtual iMaterialWrapper *FindMaterial (const char *iName);
   /// Find a camera position in this region by name
   virtual iCameraPosition *FindCameraPosition (const char *iName);
-  /// Find a collection in this region by name
-  virtual iCollection *FindCollection (const char *iName);
-
-
 };
 
 

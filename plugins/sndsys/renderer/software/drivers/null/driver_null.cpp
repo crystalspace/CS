@@ -64,8 +64,8 @@ bool SndSysDriverNull::Initialize (iObjectRegistry *pObjectReg)
   // Make sure sound.cfg is available
   Config.AddConfig(m_pObjectReg, "/config/sound.cfg");
 
-  csRef<iCommandLineParser> CMDLine (CS_QUERY_REGISTRY (m_pObjectReg,
-    iCommandLineParser));
+  csRef<iCommandLineParser> CMDLine (
+    csQueryRegistry<iCommandLineParser> (m_pObjectReg));
 
   m_BufferLengthms=0;
   if (CMDLine)
@@ -117,7 +117,7 @@ bool SndSysDriverNull::StartThread()
 
   m_bRunning=true;
   SndSysDriverRunnable* runnable = new SndSysDriverRunnable (this);
-  m_pBGThread = csThread::Create(runnable);
+  m_pBGThread.AttachNew (new CS::Threading::Thread (runnable, false));
   runnable->DecRef ();
 
   m_pBGThread->Start();

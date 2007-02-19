@@ -19,82 +19,51 @@
 #ifndef __LIGHTMAPUV_H__
 #define __LIGHTMAPUV_H__
 
-#include "radprimitive.h"
+#include "primitive.h"
 #include "lightmap.h"
 
 namespace lighter
 {
 
-  struct RadObjectVertexData;
+  struct ObjectVertexData;
   
-  class LightmapUVLayoutFactory;
+  class LightmapUVObjectLayouter;
+  class ObjectFactory;
 
-  class LightmapUVLayouter 
+  class LightmapUVFactoryLayouter 
   {
   public:
-    virtual ~LightmapUVLayouter() {}
+    virtual ~LightmapUVFactoryLayouter () {}
     /**
      * Lay out lightmaps for a factory.
      * This should split vertices as necessary and assign primitives
      * to lightmaps.
      * \param inPrims Input primitives.
      * \param inPrims Input vertex data.
+     * \param factory Factory object primitives are part of
      * \param outPrims Output primitives. A number of primitive arrays. All
      *   primitives of a sub-array would fit on a single lightmap.
      */
-    virtual LightmapUVLayoutFactory* LayoutFactory (
-      const RadPrimitiveArray& inPrims, RadObjectVertexData& vertexData,
-      csArray<RadPrimitiveArray>& outPrims) = 0;
+    virtual csPtr<LightmapUVObjectLayouter> LayoutFactory (
+      const PrimitiveArray& inPrims, ObjectVertexData& vertexData,
+      const ObjectFactory* factory, csArray<PrimitiveArray>& outPrims,
+      BoolDArray& usedVerts) = 0;
   };
 
-  class LightmapUVLayoutFactory
+  class LightmapUVObjectLayouter : public csRefCount
   {
   public:
-    virtual ~LightmapUVLayoutFactory() {}
     /**
-     * Lay out lightmaps for primitives of ab object.
+     * Lay out lightmaps for primitives of an object.
      * \param prims Input primitives.
+     * \param groupNum Index of the primitive arrays as returned by 
+     *   LightmapUVLayouter::LayoutFactory.
      * \param inPrims Input vertex data.
      * \param lmID Output global lightmap ID onto which all primitives were
      *   layouted.
      */
-    virtual bool LayoutUVOnPrimitives (RadPrimitiveArray &prims, 
-      RadObjectVertexData& vertexData, uint& lmID) = 0;
-  };
-
-  class SimpleUVLayoutFactory;
-
-  class SimpleUVLayouter : public LightmapUVLayouter
-  {
-  public:
-    SimpleUVLayouter (LightmapPtrDelArray& lightmaps) : 
-      globalLightmaps (lightmaps)
-    {}
-
-    virtual LightmapUVLayoutFactory* LayoutFactory (
-      const RadPrimitiveArray& inPrims, RadObjectVertexData& vertexData,
-      csArray<RadPrimitiveArray>& outPrims);
-  protected:
-    friend class SimpleUVLayoutFactory;
-
-    LightmapPtrDelArray& globalLightmaps;
-
-    bool AllocLightmap (LightmapPtrDelArray& lightmaps, int u, int v, 
-      csRect &lightmapArea, int &lightmapID);
-
-    bool ProjectPrimitive (RadPrimitive &prim, BoolDArray &usedVerts,
-      float uscale, float vscale);
-  };
-
-  class SimpleUVLayoutFactory : public LightmapUVLayoutFactory
-  {
-  public:
-    SimpleUVLayoutFactory (SimpleUVLayouter* parent) : parent (parent) {}
-
-    virtual bool LayoutUVOnPrimitives (RadPrimitiveArray &prims, 
-      RadObjectVertexData& vertexData, uint& lmID);
-  protected:
-    SimpleUVLayouter* parent;
+    virtual bool LayoutUVOnPrimitives (PrimitiveArray &prims, 
+      size_t groupNum, ObjectVertexData& vertexData, uint& lmID) = 0;
   };
 
 } // namespace lighter

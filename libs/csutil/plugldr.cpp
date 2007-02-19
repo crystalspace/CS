@@ -92,7 +92,7 @@
  */
 bool csPluginList::Sort (iObjectRegistry* object_reg)
 {
-  size_t row, col, len = Length ();
+  size_t row, col, len = GetSize ();
 
   // Build the dependency matrix
   CS_ALLOC_STACK_ARRAY (bool, matrix, len * len);
@@ -166,7 +166,7 @@ bool csPluginList::RecurseSort (iObjectRegistry *object_reg,
   if (strchr_int (order, row + 1))
     return true;
 
-  size_t len = Length ();
+  size_t len = GetSize ();
   bool *dep = matrix + row * len;
   bool error = false;
   size_t* loopp = strchr_int (loop, 0);
@@ -231,8 +231,8 @@ csPluginLoader::~csPluginLoader ()
 bool csPluginLoader::LoadPlugins ()
 {
   // Collect all options from command line
-  csRef<iCommandLineParser> CommandLine (CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser));
+  csRef<iCommandLineParser> CommandLine (
+  	csQueryRegistry<iCommandLineParser> (object_reg));
   CS_ASSERT (CommandLine != 0);
 
   // The list of plugins
@@ -294,7 +294,7 @@ bool csPluginLoader::LoadPlugins ()
   }
 
   // Now load and initialize all plugins
-  csRef<iConfigManager> Config (CS_QUERY_REGISTRY (object_reg, iConfigManager));
+  csRef<iConfigManager> Config (csQueryRegistry<iConfigManager> (object_reg));
   csRef<iConfigIterator> plugin_list (Config->Enumerate ("System.Plugins."));
   if (plugin_list)
   {
@@ -311,17 +311,17 @@ bool csPluginLoader::LoadPlugins ()
     }
   }
 
-  csRef<iVFS> VFS (CS_QUERY_REGISTRY (object_reg, iVFS));
+  csRef<iVFS> VFS (csQueryRegistry<iVFS> (object_reg));
 
   // Check all requested plugins and see if there is already
   // a plugin with that tag present. If not we add it.
   size_t i;
-  for (i = 0 ; i < requested_plugins.Length () ; i++)
+  for (i = 0 ; i < requested_plugins.GetSize () ; i++)
   {
     csPluginLoadRec* req_plugin = requested_plugins.Get (i);
     size_t j;
     bool present = false;
-    for (j = 0 ; j < PluginList.Length () ; j++)
+    for (j = 0 ; j < PluginList.GetSize () ; j++)
     {
       csPluginLoadRec* plugin = PluginList.Get (j);
       if (plugin->Tag && !strcmp (plugin->Tag, req_plugin->Tag))
@@ -344,10 +344,10 @@ bool csPluginLoader::LoadPlugins ()
   }
 
   csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+  	csQueryRegistry<iPluginManager> (object_reg));
 
   // Load all plugins
-  for (n = 0; n < PluginList.Length (); n++)
+  for (n = 0; n < PluginList.GetSize (); n++)
   {
     csPluginLoadRec* r = PluginList.Get(n);
     // If plugin is VFS then skip if already loaded earlier.

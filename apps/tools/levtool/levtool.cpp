@@ -719,7 +719,7 @@ bool LevTool::IsAddonAPlane (iDocumentNode* addonnode)
     return false;
   }
   size_t i;
-  for (i = 0 ; i < plane_plugins.Length () ; i++)
+  for (i = 0 ; i < plane_plugins.GetSize () ; i++)
   {
     csString* str = plane_plugins.Get (i);
     if (str->Compare (plugname))
@@ -743,7 +743,7 @@ bool LevTool::IsMeshAThing (iDocumentNode* meshnode)
     return false;
   }
   size_t i;
-  for (i = 0 ; i < thing_plugins.Length () ; i++)
+  for (i = 0 ; i < thing_plugins.GetSize () ; i++)
   {
     csString* str = thing_plugins.Get (i);
     if (str->Compare (plugname))
@@ -1025,7 +1025,7 @@ void LevTool::WriteOutThing (iDocumentNode* params_node, ltThing* th,
 void LevTool::SplitThing (iDocumentNode* meshnode, iDocumentNode* parentnode)
 {
   size_t i;
-  for (i = 0 ; i < things.Length () ; i++)
+  for (i = 0 ; i < things.GetSize () ; i++)
   {
     ltThing* th = things.Get (i);
     if (th->GetMeshNode ()->Equals (meshnode))
@@ -1250,7 +1250,7 @@ void LevTool::CloneAndMovePlanes (iDocumentNode* node, iDocumentNode* newnode)
       {
         const char* planename = child->GetContentsValue ();
 	size_t i;
-	for (i = 0 ; i < planes.Length () ; i++)
+	for (i = 0 ; i < planes.GetSize () ; i++)
 	{
 	  ltPlane* pl = planes[i];
 	  if (strcmp (pl->name, planename) == 0)
@@ -1410,7 +1410,7 @@ void LevTool::CloneAndChangeFlags (iDocumentNode* node, iDocumentNode* newnode,
   {
     ltThing* th = 0;
     size_t i;
-    for (i = 0 ; i < things.Length () ; i++)
+    for (i = 0 ; i < things.GetSize () ; i++)
     {
       th = things.Get (i);
       if (th->GetMeshNode ()->Equals (node)) break;
@@ -1609,7 +1609,7 @@ void LevTool::ValidateContents (ltThing* thing)
 void LevTool::ValidateContents ()
 {
   size_t i;
-  for (i = 0 ; i < things.Length () ; i++)
+  for (i = 0 ; i < things.GetSize () ; i++)
   {
     ltThing* th = things.Get (i);
     ValidateContents (th);
@@ -1633,10 +1633,10 @@ LevTool::~LevTool ()
 
 void LevTool::Main ()
 {
-  cmdline = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
-  vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+  cmdline = csQueryRegistry<iCommandLineParser> (object_reg);
+  vfs = csQueryRegistry<iVFS> (object_reg);
   csRef<iPluginManager> plugin_mgr = 
-    CS_QUERY_REGISTRY (object_reg, iPluginManager);
+    csQueryRegistry<iPluginManager> (object_reg);
 
   int op = OP_HELP;
 
@@ -1917,7 +1917,7 @@ void LevTool::Main ()
 	csBox3 global_bbox;
 	global_bbox.StartBoundingBox ();
 	size_t i;
-	for (i = 0 ; i < things.Length () ; i++)
+	for (i = 0 ; i < things.GetSize () ; i++)
 	{
 	  ltThing* th = things.Get (i);
 	  th->CreateBoundingBox ();
@@ -1936,7 +1936,7 @@ void LevTool::Main ()
         int counts[51];
 	for (i = 0 ; i <= 50 ; i++)
 	  counts[i] = 0;
-	for (i = 0 ; i < things.Length () ; i++)
+	for (i = 0 ; i < things.GetSize () ; i++)
 	{
 	  ltThing* th = things.Get (i);
 	  const csBox3& b = th->GetBoundingBox ();
@@ -1981,7 +1981,7 @@ void LevTool::Main ()
 	csRef<iDocument> newdoc = newsys->CreateDocument ();
 
 	size_t i;
-	for (i = 0 ; i < things.Length () ; i++)
+	for (i = 0 ; i < things.GetSize () ; i++)
 	{
 	  ltThing* th = things.Get (i);
 	  th->CreateVertexInfo ();
@@ -2005,7 +2005,7 @@ void LevTool::Main ()
 	csRef<iDocument> newdoc = newsys->CreateDocument ();
 
 	size_t i;
-	for (i = 0 ; i < things.Length () ; i++)
+	for (i = 0 ; i < things.GetSize () ; i++)
 	{
 	  ltThing* th = things.Get (i);
 	  th->CompressVertices ();
@@ -2034,7 +2034,7 @@ void LevTool::Main ()
 	csBox3 global_bbox;
 	global_bbox.StartBoundingBox ();
 	size_t i;
-	for (i = 0 ; i < things.Length () ; i++)
+	for (i = 0 ; i < things.GetSize () ; i++)
 	{
 	  ltThing* th = things.Get (i);
 	  th->CompressVertices ();
@@ -2050,7 +2050,7 @@ void LevTool::Main ()
 		     (global_bbox.MaxZ () - global_bbox.MinZ ());
 	global_area = pow (global_area, 1.0f/3.0f);
 
-	for (i = 0 ; i < things.Length () ; i++)
+	for (i = 0 ; i < things.GetSize () ; i++)
 	{
 	  ltThing* th = things.Get (i);
 	  const csBox3& b = th->GetBoundingBox ();
@@ -2084,7 +2084,7 @@ void LevTool::Main ()
 	csBox3 global_bbox;
 	global_bbox.StartBoundingBox ();
 	size_t i;
-	for (i = 0 ; i < things.Length () ; i++)
+	for (i = 0 ; i < things.GetSize () ; i++)
 	{
 	  ltThing* th = things.Get (i);
 	  th->CreateBoundingBox ();
@@ -2096,7 +2096,7 @@ void LevTool::Main ()
 		     (global_bbox.MaxZ () - global_bbox.MinZ ());
 	global_area = pow (global_area, 1.0f/3.0f);
 
-	for (i = 0 ; i < things.Length () ; i++)
+	for (i = 0 ; i < things.GetSize () ; i++)
 	{
 	  ltThing* th = things.Get (i);
 	  const csBox3& b = th->GetBoundingBox ();
@@ -2135,7 +2135,7 @@ void LevTool::Main ()
 	csBox3 global_bbox;
 	global_bbox.StartBoundingBox ();
 	size_t i;
-	for (i = 0 ; i < things.Length () ; i++)
+	for (i = 0 ; i < things.GetSize () ; i++)
 	{
 	  ltThing* th = things.Get (i);
 	  th->CreateBoundingBox ();

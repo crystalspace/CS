@@ -48,7 +48,7 @@ csCEGUIRenderer::csCEGUIRenderer (iBase *parent) :
 // TODO add description
 bool csCEGUIRenderer::Initialize (iScript* script)
 {
-  g3d = CS_QUERY_REGISTRY (obj_reg, iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (obj_reg);
 
   if (!g3d) {
     return false;
@@ -76,13 +76,8 @@ bool csCEGUIRenderer::Initialize (iScript* script)
 
   if (script)
   {
-  #if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR < 5)
-    scriptModule = new csCEGUIScriptModule (script, obj_reg);
-    new CEGUI::System (this, scriptModule);
-  #else
     scriptModule = new csCEGUIScriptModule (script, obj_reg);
     new CEGUI::System (this, 0, 0, scriptModule);  
-  #endif
   }
   else
   {
@@ -420,6 +415,30 @@ csVector4 csCEGUIRenderer::ColorToCS (const CEGUI::colour& col) const
 {
   csVector4 color (col.getRed(), col.getGreen(), col.getBlue(), col.getAlpha());
   return color;
+}
+
+/// Allow CEGUI to capture mouse events.
+void csCEGUIRenderer::EnableMouseCapture ()
+{
+  events->EnableMouseCapture ();
+}
+
+/// Keep CEGUI from capturing mouse events.
+void csCEGUIRenderer::DisableMouseCapture ()
+{
+  events->DisableMouseCapture ();
+}
+
+/// Allow CEGUI to capture keyboard events.
+void csCEGUIRenderer::EnableKeyboardCapture ()
+{
+  events->EnableKeyboardCapture ();
+}
+
+/// Keep CEGUI from capturing keyboard events.
+void csCEGUIRenderer::DisableKeyboardCapture ()
+{
+  events->DisableKeyboardCapture ();
 }
 
 // TODO add description

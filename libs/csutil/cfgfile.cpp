@@ -317,7 +317,7 @@ const char *csConfigIterator::GetSubsection() const
 
 void csConfigIterator::Rewind ()
 {
-  Node = Config->FirstNode;
+  nextNode = Config->FirstNode;
   Next();
 }
 
@@ -439,7 +439,7 @@ csConfigFile::~csConfigFile()
   delete LastNode;
   // every iterator holds a reference to this object, so when this is
   // deleted there shouldn't be any iterators left.
-  CS_ASSERT(Iterators->Length() == 0);
+  CS_ASSERT(Iterators->GetSize () == 0);
   delete Iterators;
   delete[] Filename;
 }
@@ -590,7 +590,7 @@ void csConfigFile::Clear()
   // delete all nodes but the first and last one
   FirstNode->DeleteDataNodes();
   // rewind all iterators
-  for (size_t i = 0; i < Iterators->Length(); i++)
+  for (size_t i = 0; i < Iterators->GetSize (); i++)
   {
     csConfigIterator *it = Iterators->Get(i);
     it->Rewind();
@@ -770,7 +770,7 @@ void csConfigFile::DeleteKey(const char *Name)
   if (!Node) return;
 
   // look for iterators on that node
-  for (size_t i = 0; i < Iterators->Length(); i++)
+  for (size_t i = 0; i < Iterators->GetSize (); i++)
   {
     csConfigIterator *it = (csConfigIterator*)Iterators->Get(i);
     if (it->Node == Node) it->Prev();

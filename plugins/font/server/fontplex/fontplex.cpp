@@ -89,7 +89,7 @@ iFont* csFontLoadOrderEntry::GetFont (csFontPlexer* parent)
 void csFontLoaderOrder::AppendSmart (const csFontLoaderOrder& other)
 {
   size_t i;
-  for (i = 0; i < other.Length (); i++)
+  for (i = 0; i < other.GetSize (); i++)
   {
     PushSmart (other[i]);
   }
@@ -208,7 +208,7 @@ bool csFontServerMultiplexer::Initialize (iObjectRegistry *object_reg)
     if (fs.IsValid()) fontservers.Push (fs);
   }
 
-  if (!fontservers.Length ())
+  if (!fontservers.GetSize ())
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
         "crystalspace.font.fontplex",
@@ -287,7 +287,7 @@ csPtr<iFont> csFontServerMultiplexer::LoadFont (const char *filename,
   iFont* primary = 0;
   size_t i;
   bool wasFallback = false;
-  for (i = 0; i < order->Length (); i++)
+  for (i = 0; i < order->GetSize (); i++)
   {
     csFontLoadOrderEntry& orderEntry = (*order)[i];
     if ((i > 0) && !wasFallback && orderEntry.fallback)
@@ -364,8 +364,8 @@ void csFontServerMultiplexer::ParseFontLoaderOrder (
 
 csPtr<iFontServer> csFontServerMultiplexer::ResolveFontServer (const char* name)
 {
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
-    iPluginManager);
+  csRef<iPluginManager> plugin_mgr = 
+    csQueryRegistry<iPluginManager> (object_reg);
 
   csRef<iFontServer> fs;
   if (iSCF::SCF->ClassRegistered (name))
@@ -416,7 +416,7 @@ csFontPlexer::~csFontPlexer ()
 
   delete order;
 
-  size_t i = DeleteCallbacks.Length ();
+  size_t i = DeleteCallbacks.GetSize ();
   while (i-- > 0)
   {
     iFontDeleteNotify* delnot = DeleteCallbacks[i];
@@ -438,7 +438,7 @@ bool csFontPlexer::GetGlyphMetrics (utf32_char c, csGlyphMetrics& metrics)
 {
   iFont* font;
   size_t i;
-  for (i = 0; i < order->Length (); i++)
+  for (i = 0; i < order->GetSize (); i++)
   {
     if ((font = (*order)[i].GetFont (this)))
     {
@@ -454,7 +454,7 @@ csPtr<iDataBuffer> csFontPlexer::GetGlyphBitmap (utf32_char c,
 {
   iFont* font;
   size_t i;
-  for (i = 0; i < order->Length (); i++)
+  for (i = 0; i < order->GetSize (); i++)
   {
     if ((font = (*order)[i].GetFont (this)))
     {
@@ -474,7 +474,7 @@ csPtr<iDataBuffer> csFontPlexer::GetGlyphAlphaBitmap (utf32_char c,
 {
   iFont* font;
   size_t i;
-  for (i = 0; i < order->Length (); i++)
+  for (i = 0; i < order->GetSize (); i++)
   {
     if ((font = (*order)[i].GetFont (this)))
     {
@@ -514,7 +514,7 @@ void csFontPlexer::GetDimensions (const char *text, int &oW, int &oH, int &desc)
     csGlyphMetrics gMetrics = defMetrics;
     iFont* font;
     size_t i;
-    for (i = 0; i < order->Length (); i++)
+    for (i = 0; i < order->GetSize (); i++)
     {
       if ((font = (*order)[i].GetFont (this)))
       {
@@ -565,7 +565,7 @@ int csFontPlexer::GetLength (const char *text, int maxwidth)
     csGlyphMetrics gMetrics = defMetrics;
     iFont* font;
     size_t i;
-    for (i = 0; i < order->Length (); i++)
+    for (i = 0; i < order->GetSize (); i++)
     {
       if ((font = (*order)[i].GetFont (this)))
       {
@@ -592,7 +592,7 @@ void csFontPlexer::AddDeleteCallback (iFontDeleteNotify* func)
 
 bool csFontPlexer::RemoveDeleteCallback (iFontDeleteNotify* func)
 {
-  size_t i = DeleteCallbacks.Length ();
+  size_t i = DeleteCallbacks.GetSize ();
   while (i-- > 0)
   {
     iFontDeleteNotify* delnot = DeleteCallbacks[i];
@@ -619,7 +619,7 @@ bool csFontPlexer::HasGlyph (utf32_char c)
 {
   iFont* font;
   size_t i;
-  for (i = 0; i < order->Length (); i++)
+  for (i = 0; i < order->GetSize (); i++)
   {
     if ((font = (*order)[i].GetFont (this)))
     {

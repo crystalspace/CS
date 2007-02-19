@@ -331,6 +331,15 @@ public:
     csVector3& isect, float& dist);              // intersection point
 
   /**
+   * Intersect a 3D segment with a plane.
+   * \return true if there is an
+   * intersection, segment updated to reflect the clipped part.
+   */
+  static bool SegmentPlane (
+    const csPlane3& plane,
+    csSegment3& segment);
+
+  /**
    * Intersect a 3D segment with a plane.  Returns true if there is an
    * intersection, with the intersection point returned in isect.
    * The distance from u to the intersection point is returned in dist.

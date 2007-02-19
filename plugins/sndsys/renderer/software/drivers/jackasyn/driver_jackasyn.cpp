@@ -94,7 +94,7 @@ void SndSysDriverJackasyn::Report(int severity, const char* msg, ...)
   va_list arg;
   va_start (arg, msg);
 
-  csRef<iReporter> reporter = CS_QUERY_REGISTRY(object_reg, iReporter);
+  csRef<iReporter> reporter = csQueryRegistry<iReporter> (object_reg);
 
   if (reporter)
     reporter->ReportV (severity, "crystalspace.SndSys.driver.software.jackasyn", msg, arg);
@@ -225,7 +225,7 @@ bool SndSysDriverJackasyn::StartThread()
 
   running=true;
   SndSysDriverRunnable* runnable = new SndSysDriverRunnable (this);
-  bgthread = csThread::Create(runnable);
+  bgthread.AttachNew (new CS::Threading::Thread (runnable, false));
   runnable->DecRef ();
 
   bgthread->Start();

@@ -47,7 +47,7 @@ namespace CS
       AllocatorMalloc() : mti (0) {}
     #endif
       /// Allocate a block of memory of size \p n.
-      void* Alloc (const size_t n)
+      CS_ATTRIBUTE_MALLOC void* Alloc (const size_t n)
       {
       #ifdef CS_MEMORY_TRACKER
 	size_t* p = (size_t*)cs_malloc (n + sizeof (size_t));
@@ -203,7 +203,7 @@ namespace CS
       /**
        * Allocate a raw block of given size. 
        */
-      static inline void* Alloc (size_t size) 
+      static inline CS_ATTRIBUTE_MALLOC void* Alloc (size_t size) 
       {
         return AlignedMalloc (size, A);
       }
@@ -229,6 +229,96 @@ namespace CS
     };
 
     /**
+     * A default memory allocator that allocates new char[].
+     * \c Reallocatable specifies whether Realloc() should be supported.
+     * (This support incurs an overhead as the allocated size has to be stored.)
+     */
+    template<bool Reallocatable = true>
+    class AllocatorNewChar
+    {
+    #ifdef CS_MEMORY_TRACKER
+      /// Memory tracking info
+      csMemTrackerInfo* mti;
+    #endif
+    public:
+    #ifdef CS_MEMORY_TRACKER
+      AllocatorMalloc() : mti (0) {}
+    #endif
+      /// Allocate a block of memory of size \p n.
+      CS_ATTRIBUTE_MALLOC void* Alloc (const size_t n)
+      {
+        // Note that with memtracking we store the alloc'ed size anyway.
+      #ifndef CS_MEMORY_TRACKER
+        if (!Reallocatable)
+        {
+          return new char[n];
+        }
+      #endif
+	size_t* p = (size_t*)new char[n + sizeof (size_t)];
+	*p = n;
+	p++;
+      #ifdef CS_MEMORY_TRACKER
+	if (mti) mtiUpdateAmount (mti, 1, int (n));
+      #endif
+	return p;
+      }
+      /// Free the block \p p.
+      void Free (void* p)
+      {
+      #ifndef CS_MEMORY_TRACKER
+        if (!Reallocatable)
+        {
+          delete[] (char*)p;
+          return;
+        }
+      #endif
+	size_t* x = (size_t*)p;
+	x--;
+	size_t allocSize = *x;
+	delete[] (char*)x;
+      #ifdef CS_MEMORY_TRACKER
+	if (mti) mtiUpdateAmount (mti, -1, -int (allocSize));
+      #else
+        (void)allocSize;
+      #endif
+      }
+      /// Resize the allocated block \p p to size \p newSize.
+      void* Realloc (void* p, size_t newSize)
+      {
+        CS_ASSERT_MSG("Realloc() called on non-reallocatable AllocatorNewChar",
+          Reallocatable);
+        if (p == 0) return Alloc (newSize);
+	size_t* x = (size_t*)p;
+	x--;
+        size_t oldSize = *x;
+      #ifdef CS_MEMORY_TRACKER
+	if (mti) mtiUpdateAmount (mti, -1, -int (oldSize));
+      #endif
+	size_t* np = Alloc (newSize);
+        if (newSize < oldSize)
+          memcpy (np, p, newSize);
+        else
+          memcpy (np, p, oldSize);
+        Free (p);
+      #ifdef CS_MEMORY_TRACKER
+	if (mti) mtiUpdateAmount (mti, 1, int (newSize));
+      #endif
+	return np;
+      }
+      /// Set the information used for memory tracking.
+      void SetMemTrackerInfo (const char* info)
+      {
+      #ifdef CS_MEMORY_TRACKER
+	mti = mtiRegister (info);
+      #else
+	(void)info;
+      #endif
+      }
+    };
+
+
+    
+    /**
      * Class to store a pointer that is allocated from Allocator,
      * to eliminate overhead from a possibly empty Allocator.
      * See http://www.cantrip.org/emptyopt.html for details.
@@ -246,6 +336,7 @@ namespace CS
       AllocatorPointerWrapper (const Allocator& alloc, T* p) : 
         Allocator (alloc), p (p) {}
     };
+
   } // namespace Memory
 } // namespace CS
 

@@ -79,7 +79,7 @@ void StartMe::ProcessFrame ()
   }
 
   float dr = elapsed_seconds / star_maxage;
-  size_t j = star_queue.Length ();
+  size_t j = star_queue.GetSize ();
   while (j > 0)
   {
     j--;
@@ -135,7 +135,7 @@ void StartMe::ProcessFrame ()
   if (sqdist >= 0 && sel_mesh)
   {
     const char* name = sel_mesh->QueryObject ()->GetName ();
-    for (i = 0 ; i < demos.Length () ; i++)
+    for (i = 0 ; i < demos.GetSize () ; i++)
       if (!strcmp (demos[i].name, name))
       {
         demos[i].spinning_speed += elapsed_seconds / 80.0f;
@@ -146,7 +146,7 @@ void StartMe::ProcessFrame ()
   }
   last_selected = sel;
 
-  for (i = 0 ; i < demos.Length () ; i++)
+  for (i = 0 ; i < demos.GetSize () ; i++)
   {
     if (sel != i)
     {
@@ -234,7 +234,7 @@ bool StartMe::OnKeyboard(iEvent& ev)
         // main runloop to stop. To do that we get the event queue from
         // the object registry and then post the event.
         csRef<iEventQueue> q = 
-          CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
+          csQueryRegistry<iEventQueue> (GetObjectRegistry());
         if (q.IsValid()) 
 	  q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
       }
@@ -248,7 +248,7 @@ bool StartMe::OnMouseDown (iEvent& /*event*/)
   if (InDescriptionMode ())
   {
     csRef<iCommandLineParser> cmdline =
-        CS_QUERY_REGISTRY(GetObjectRegistry(), iCommandLineParser);
+        csQueryRegistry<iCommandLineParser> (GetObjectRegistry());
     csString appdir = cmdline->GetAppDir ();
     system (appdir << CS_PATH_SEPARATOR <<
         csInstallationPathsHelper::GetAppFilename (
@@ -273,7 +273,7 @@ bool StartMe::LoadTextures ()
 
   vfs->ChDir ("/lib/startme");
   size_t i;
-  for (i = 0 ; i < demos.Length () ; i++)
+  for (i = 0 ; i < demos.GetSize () ; i++)
   {
     if (!loader->LoadTexture (demos[i].name, demos[i].image))
       return ReportError ("Error loading '%s' texture!", demos[i].image);
@@ -332,31 +332,31 @@ bool StartMe::Application()
   // Now get the pointer to various modules we need. We fetch them
   // from the object registry. The RequestPlugins() call we did earlier
   // registered all loaded plugins with the object registry.
-  g3d = CS_QUERY_REGISTRY(GetObjectRegistry(), iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry());
   if (!g3d) return ReportError("Failed to locate 3D renderer!");
 
-  engine = CS_QUERY_REGISTRY(GetObjectRegistry(), iEngine);
+  engine = csQueryRegistry<iEngine> (GetObjectRegistry());
   if (!engine) return ReportError("Failed to locate 3D engine!");
 
-  vc = CS_QUERY_REGISTRY(GetObjectRegistry(), iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry());
   if (!vc) return ReportError("Failed to locate Virtual Clock!");
 
-  kbd = CS_QUERY_REGISTRY(GetObjectRegistry(), iKeyboardDriver);
+  kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry());
   if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
 
-  mouse = CS_QUERY_REGISTRY(GetObjectRegistry(), iMouseDriver);
+  mouse = csQueryRegistry<iMouseDriver> (GetObjectRegistry());
   if (!mouse) return ReportError("Failed to locate Mouse Driver!");
 
-  cdsys = CS_QUERY_REGISTRY(GetObjectRegistry(), iCollideSystem);
+  cdsys = csQueryRegistry<iCollideSystem> (GetObjectRegistry());
   if (!cdsys) return ReportError("Failed to locate CollDet System!");
 
-  loader = CS_QUERY_REGISTRY(GetObjectRegistry(), iLoader);
+  loader = csQueryRegistry<iLoader> (GetObjectRegistry());
   if (!loader) return ReportError("Failed to locate Loader!");
 
-  vfs = CS_QUERY_REGISTRY(GetObjectRegistry(), iVFS);
+  vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
   if (!vfs) return ReportError("Failed to locate VFS!");
 
-  confman = CS_QUERY_REGISTRY(GetObjectRegistry(), iConfigManager);
+  confman = csQueryRegistry<iConfigManager> (GetObjectRegistry());
   if (!confman) return ReportError("Failed to locate Config Manager!");
 
   // We need a View to the virtual world.
@@ -417,8 +417,9 @@ void StartMe::CreateRoom ()
   iMaterialWrapper* spark_mat = engine->FindMaterial ("spark");
   csRef<iMeshFactoryWrapper> spark_fact = engine->CreateMeshFactory (
   	"crystalspace.mesh.object.genmesh", "spark_fact");
-  csRef<iGeneralFactoryState> spark_state = SCF_QUERY_INTERFACE (
-  	spark_fact->GetMeshObjectFactory (), iGeneralFactoryState);
+  csRef<iGeneralFactoryState> spark_state = 
+    scfQueryInterface<iGeneralFactoryState> (
+      spark_fact->GetMeshObjectFactory ());
   spark_state->SetVertexCount (4);
   spark_state->GetVertices ()[0].Set (-.1f, -.1f, 0);
   spark_state->GetVertices ()[1].Set (.1f, -.1f, 0);
@@ -455,18 +456,19 @@ void StartMe::CreateRoom ()
 
   box_fact = engine->CreateMeshFactory (
   	"crystalspace.mesh.object.genmesh", "box_fact");
-  csRef<iGeneralFactoryState> box_state = SCF_QUERY_INTERFACE (
-  	box_fact->GetMeshObjectFactory (), iGeneralFactoryState);
+  csRef<iGeneralFactoryState> box_state = 
+    scfQueryInterface<iGeneralFactoryState> (
+      box_fact->GetMeshObjectFactory ());
   csBox3 b (-1, -1, -1, 1, 1, 1);
   box_state->GenerateBox (b);
   box_state->CalculateNormals ();
 
   int cols = 4;
-  int rows = int (demos.Length ()-1) / cols + 1;
+  int rows = int (demos.GetSize ()-1) / cols + 1;
   float dx = (DEMO_MESH_MAXX-DEMO_MESH_MINX) / float (cols-1);
   float dy = (DEMO_MESH_MAXY-DEMO_MESH_MINY) / float (rows-1);
   int x = 0, y = rows-1;
-  for (i = 0 ; i < demos.Length () ; i++)
+  for (i = 0 ; i < demos.GetSize () ; i++)
   {
     demos[i].mesh = CreateDemoMesh (demos[i].name,
       	csVector3 (DEMO_MESH_MINX + dx * float (x),

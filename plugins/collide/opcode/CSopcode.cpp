@@ -163,8 +163,8 @@ void csOPCODECollideSystem::CopyCollisionPairs (csOPCODECollider* col1,
   Point* current;
   int i, j;
 
-  size_t oldlen = pairs.Length ();
-  pairs.SetLength (oldlen + N_pairs);
+  size_t oldlen = pairs.GetSize ();
+  pairs.SetSize (oldlen + N_pairs);
 
   for (i = 0 ; i < N_pairs ; i++)
   {
@@ -214,7 +214,7 @@ bool csOPCODECollideSystem::Collide (
 
 bool csOPCODECollideSystem::Collide (
   csOPCODECollider* col1, const csReversibleTransform* trans1,
-  csTerraFormerCollider* terraformer)
+  csTerraFormerCollider* terraformer, const csReversibleTransform* trans2)
 {
   ColCache.Model0 = col1->m_pCollisionModel;
   terraformer->UpdateOPCODEModel (trans1->GetOrigin (), col1->GetRadius ());
@@ -243,6 +243,28 @@ bool csOPCODECollideSystem::Collide (
   col1->transform.m[3][1] = u.y;
   col1->transform.m[3][2] = u.z;
 
+
+  if (trans1) m1 = trans2->GetT2O ();
+
+  u = m1.Row1 ();
+  terraformer->transform.m[0][0] = u.x;
+  terraformer->transform.m[1][0] = u.y;
+  terraformer->transform.m[2][0] = u.z;
+  u = m1.Row2 ();
+  terraformer->transform.m[0][1] = u.x;
+  terraformer->transform.m[1][1] = u.y;
+  terraformer->transform.m[2][1] = u.z;
+  u = m1.Row3 ();
+  terraformer->transform.m[0][2] = u.x;
+  terraformer->transform.m[1][2] = u.y;
+  terraformer->transform.m[2][2] = u.z;
+
+  if (trans1) u = trans2->GetO2TTranslation ();
+  else u.Set (0, 0, 0);
+  terraformer->transform.m[3][0] = u.x;
+  terraformer->transform.m[3][1] = u.y;
+  terraformer->transform.m[3][2] = u.z;
+
   bool isOk = TreeCollider.Collide (ColCache, &col1->transform,
   	&terraformer->transform);
   if (isOk)
@@ -267,11 +289,11 @@ bool csOPCODECollideSystem::Collide (
   // csPrintf( " we are in Collide \n");
   if (collider1->GetColliderType () == CS_TERRAFORMER_COLLIDER && 
     collider2->GetColliderType () == CS_MESH_COLLIDER)
-    return Collide ((csOPCODECollider*)collider2, trans2, (csTerraFormerCollider*)collider1);
+    return Collide ((csOPCODECollider*)collider2, trans2, (csTerraFormerCollider*)collider1, trans1);
     
   if (collider2->GetColliderType () == CS_TERRAFORMER_COLLIDER && 
     collider1->GetColliderType () == CS_MESH_COLLIDER)
-    return Collide ((csOPCODECollider*)collider1, trans1, (csTerraFormerCollider*)collider2);
+    return Collide ((csOPCODECollider*)collider1, trans1, (csTerraFormerCollider*)collider2, trans2);
 
   if (collider1->GetColliderType () == CS_TERRAIN_COLLIDER && 
     collider2->GetColliderType () == CS_MESH_COLLIDER)
@@ -401,8 +423,8 @@ bool csOPCODECollideSystem::CollideRaySegment (
 
   RayCol.SetHitCallback (ray_cb);
   RayCol.SetUserData ((void*)&collision_faces);
-  intersecting_triangles.SetLength (0);
-  collision_faces.SetLength (0);
+  intersecting_triangles.SetSize (0);
+  collision_faces.SetSize (0);
   if (use_ray)
   {
     max_dist = MAX_FLOAT;
@@ -424,10 +446,10 @@ bool csOPCODECollideSystem::CollideRaySegment (
       if (!vertholder) return true;
       udword* indexholder = col->indexholder;
       if (!indexholder) return true;
-      if (collision_faces.Length () == 0) return false;
+      if (collision_faces.GetSize () == 0) return false;
       Point* c;
       size_t i;
-      for (i = 0 ; i < collision_faces.Length () ; i++)
+      for (i = 0 ; i < collision_faces.GetSize () ; i++)
       {
         int idx = collision_faces[i] * 3;
 	int it_idx = (int)intersecting_triangles.Push (csIntersectingTriangle ());
@@ -465,8 +487,8 @@ void csOPCODECollideSystem::CopyCollisionPairs (csOPCODECollider* col1,
   Point* current;
   int i, j;
 
-  size_t oldlen = pairs.Length ();
-  pairs.SetLength (oldlen + N_pairs);
+  size_t oldlen = pairs.GetSize ();
+  pairs.SetSize (oldlen + N_pairs);
 
   // it really sucks having to copy all this each Collide query, but
   // since opcode library uses his own vector types,
@@ -514,7 +536,7 @@ csCollisionPair* csOPCODECollideSystem::GetCollisionPairs ()
 
 size_t csOPCODECollideSystem::GetCollisionPairCount ()
 {
-  return pairs.Length ();
+  return pairs.GetSize ();
 }
 
 void csOPCODECollideSystem::ResetCollisionPairs ()

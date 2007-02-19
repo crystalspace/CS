@@ -149,90 +149,6 @@ public:
 };
 
 
-#if 0
-// The block builder is not currently used.
-class csBlockBuilder : public csRunnable
-{
-private:
-  csTerrainObject* terr;
-  csList< csRef<csTerrBlock> > pendingbuilds;
-  int buildcount;
-  int refcount;
-  bool run;
-  csRef<csCondition> processlock;
-  csRef<csMutex> listlock;
-
-  void Process ()
-  {
-    while (true)
-    {
-      csRef<csTerrBlock> block;
-      if (listlock->LockWait ())
-      {
-        if (pendingbuilds.IsEmpty ())
-          break;
-
-        block = pendingbuilds.Last ();
-        pendingbuilds.PopBack ();
-        listlock->Release ();
-      }
-
-      if (block->GetRefCount ()>1)
-        block->SetupMesh ();
-    }
-  }
-
-public:
-
-  csBlockBuilder::csBlockBuilder (csTerrainObject *t)
-  {
-    processlock = csCondition::Create ();
-    listlock = csMutex::Create ();
-    run = true;
-    terr = t;
-    refcount = 1;
-    buildcount = 0;
-  }
-
-  virtual csBlockBuilder::~csBlockBuilder ()
-  {
-  }
-
-  virtual void Run ()
-  {
-    listlock->LockWait ();
-    while (run)
-    {
-      processlock->Wait (listlock);
-      listlock->Release ();
-      if (!run)
-        break;
-      Process ();
-    }
-  }
-
-  void BuildBlock (csTerrBlock *block)
-  {
-    if (listlock->LockWait ())
-    {
-      pendingbuilds.PushFront (block);
-      listlock->Release ();
-      processlock->Signal ();
-    }
-  }
-
-  void Stop ()
-  {
-    run = false;
-    processlock->Signal ();
-  }
-
-  virtual void IncRef() {refcount++;}
-  virtual void DecRef() {refcount--;}
-  virtual int GetRefCount() {return refcount;}
-};
-#endif
-
 /**
  * An array giving shadow information for a pseudo-dynamic light.
  */
@@ -297,9 +213,6 @@ private:
   float block_maxsize;
   float block_minsize;
   int block_res;
-
-  //csBlockBuilder *builder;
-  csRef<csThread> buildthread;
 
   csRef<iTerraFormer> terraformer;
 
@@ -500,6 +413,10 @@ public:
   virtual void InvalidateMaterialHandles () { }
   virtual void PositionChild (iMeshObject* /*child*/,
   	csTicks /*current_time*/) { }
+  virtual void BuildDecal(const csVector3* pos, float decalRadius,
+          iDecalBuilder* decalBuilder)
+  {
+  }
 
   void FireListeners ();
   void AddListener (iObjectModelListener* listener);

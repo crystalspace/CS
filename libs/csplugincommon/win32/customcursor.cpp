@@ -41,7 +41,7 @@ csWin32CustomCursors::~csWin32CustomCursors ()
     else
       DestroyCursor (cur.cursor);
   }
-  for (size_t i = 0; i < blindCursors.Length(); i++)
+  for (size_t i = 0; i < blindCursors.GetSize (); i++)
   {
     CachedCursor& cur = blindCursors[i];
     if (cur.destroyAsIcon)

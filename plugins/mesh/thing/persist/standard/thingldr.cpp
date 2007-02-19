@@ -533,7 +533,7 @@ bool csThingLoader::ParsePoly3d (
         {
 	  int vt_idx = child->GetContentsValueAsInt ();
 	  bool ignore = false;
-	  int cnt = (int)vertices_to_add.Length ();
+	  int cnt = (int)vertices_to_add.GetSize ();
 	  for (int i = 0 ; i < cnt ; i++)
 	  {
 	    if (vertices_to_add[i] == vt_idx+vt_offset)
@@ -589,7 +589,7 @@ bool csThingLoader::ParsePoly3d (
     }
   }
 
-  if (vertices_to_add.Length () < 3)
+  if (vertices_to_add.GetSize () < 3)
   {
     synldr->ReportError ("crystalspace.thingldr.polygon", node,
       "Polygon '%s' contains just %d vertices!",
@@ -599,7 +599,7 @@ bool csThingLoader::ParsePoly3d (
   }
 
   thing_fact_state->SetPolygonVertexIndices (CS_POLYRANGE_LAST,
-  	(int)vertices_to_add.Length (), vertices_to_add.GetArray ());
+  	(int)vertices_to_add.GetSize (), vertices_to_add.GetArray ());
 
   mat = thing_fact_state->GetPolygonMaterial (CS_POLYINDEX_LAST);
   csRef<iMaterialEngine> mateng = scfQueryInterface<iMaterialEngine> (
@@ -890,15 +890,15 @@ bool csThingLoader::ParsePoly3d (
   else if (set_colldet == -1)
     thing_fact_state->ResetPolygonFlags (CS_POLYRANGE_LAST, CS_POLY_COLLDET);
 
-  for (size_t i  = 0; i < renderbuffers.Length(); i++)
+  for (size_t i  = 0; i < renderbuffers.GetSize (); i++)
   {
     const ParsedRB& rb = renderbuffers[i];
-    if (rb.buf->GetElementCount() != vertices_to_add.Length())
+    if (rb.buf->GetElementCount() != vertices_to_add.GetSize ())
     {
       synldr->ReportError ("crystalspace.thingldr.polygon", rb.node,
 	"Render buffer element count does not match polygon vertex count: "
 	"%zu != %zu", rb.buf->GetElementCount(), 
-	vertices_to_add.Length());
+	vertices_to_add.GetSize ());
       return false;
     }
     if (!thing_fact_state->AddPolygonRenderBuffer (CS_POLYINDEX_LAST, 
@@ -1194,7 +1194,7 @@ Nag to Jorrit about this feature if you want it.");
   if (mixmode == CS_FX_COPY)
   {
     // Mixmode is copy, delete all polygons that became portals.
-    size_t i = polygons_to_delete.Length ();
+    size_t i = polygons_to_delete.GetSize ();
     while (i-- > 0)
       info.thing_fact_state->RemovePolygon (polygons_to_delete[i]);
   }
@@ -1249,7 +1249,7 @@ csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
       return 0;
     }
     size_t i;
-    for (i = 0 ; i < info.replace_materials.Length () ; i++)
+    for (i = 0 ; i < info.replace_materials.GetSize () ; i++)
     {
       RepMaterial& rm = info.replace_materials[i];
       iMaterialWrapper* old_mat = ldr_context->FindMaterial (rm.oldmat);

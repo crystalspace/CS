@@ -26,6 +26,8 @@
 #include "csutil/ref.h"
 #include "csutil/refcount.h"
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /// List of errorcodes for threads.
 enum
 {
@@ -70,8 +72,10 @@ typedef enum
 /**
  * Abstract interface for objects which can be run in a thread.  Objects which
  * want to be run in a thread must implement this interface.
+ * \deprecated csRunnable is deprecated. Use new subsystem in CS::Threading instead
  */
-class csRunnable
+class CS_DEPRECATED_TYPE_MSG("csRunnable is deprecated. Use new subsystem in CS::Threading instead") 
+  csRunnable
 {
 protected:
   /**
@@ -102,8 +106,11 @@ public:
 
 /**
  * Representation of a thread of executation.
+ * \deprecated csThread is deprecated. Use CS::Threading::Thread instead.
  */
-class CS_CRYSTALSPACE_EXPORT csThread : public csRefCount
+class CS_CRYSTALSPACE_EXPORT 
+  CS_DEPRECATED_TYPE_MSG("csThread is deprecated. Use CS::Threading::Thread instead")
+  csThread : public csRefCount
 {
 public:
   /**
@@ -167,8 +174,11 @@ public:
  * execution.  A thread should access the shared resource(s) only after it has
  * successfully locked the mutex; and it should unlock the mutex when it is
  * done accessing the shared resource so that other threads may access it.
+ * \deprecated csMutex is deprecated. Use new subsystem in CS::Threading instead.
  */
-class CS_CRYSTALSPACE_EXPORT csMutex : public csRefCount
+class CS_CRYSTALSPACE_EXPORT 
+  CS_DEPRECATED_TYPE_MSG("csMutex is deprecated. Use new subsystem in CS::Threading instead") 
+  csMutex : public csRefCount
 {
 public:
   /**
@@ -224,8 +234,11 @@ public:
 
 /**
  * A semaphore object.
+ * \deprecated csSemaphore is deprecated. Use new subsystem in CS::Threading instead
  */
-class CS_CRYSTALSPACE_EXPORT csSemaphore : public csRefCount
+class CS_CRYSTALSPACE_EXPORT 
+  CS_DEPRECATED_TYPE_MSG("csSemaphore is deprecated. Use new subsystem in CS::Threading instead") 
+  csSemaphore : public csRefCount
 {
 public:
   /// Create a semaphore with some initial value.
@@ -267,8 +280,11 @@ public:
 
 /**
  * A condition object.
+ * \deprecated csCondition is deprecated. Use new subsystem in CS::Threading instead
  */
-class CS_CRYSTALSPACE_EXPORT csCondition : public csRefCount
+class CS_CRYSTALSPACE_EXPORT
+  CS_DEPRECATED_TYPE_MSG("csCondition is deprecated. Use new subsystem in CS::Threading instead") 
+  csCondition : public csRefCount
 {
 public:
   /// Create a condition  with specific attributes.
@@ -316,5 +332,7 @@ public:
    */
   virtual char const* GetLastError () const = 0;
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_CSSYS_THREAD_H__

@@ -41,7 +41,6 @@
 #include "imesh/lighting.h"
 #include "imesh/object.h"
 #include "imesh/partsys.h"
-#include "imesh/spiral.h"
 #include "imesh/sprite3d.h"
 #include "imesh/thing.h"
 #include "isndsys.h"
@@ -50,6 +49,8 @@
 #include "ivaria/reporter.h"
 #include "ivaria/view.h"
 #include "ivideo/graph3d.h"
+#include "igeom/decal.h"
+#include "ivideo/material.h"
 
 #include "bot.h"
 #include "command.h"
@@ -420,44 +421,6 @@ void add_particles_explosion (iSector* sector, iEngine* engine,
 }
 
 //===========================================================================
-// Demo particle system (spiral).
-//===========================================================================
-void add_particles_spiral (iSector* sector, const csVector3& bottom,
-	char* matname)
-{
-  // First check if the material exists.
-  iMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterialList ()->
-  	FindByName (matname);
-  if (!mat)
-  {
-    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material '%s' in memory!", matname);
-    return;
-  }
-
-  csRef<iMeshFactoryWrapper> mfw (Sys->view->GetEngine ()->
-    CreateMeshFactory ("crystalspace.mesh.object.spiral", "spiral"));
-  if (!mfw) return;
-
-  csRef<iMeshWrapper> exp (
-  	Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom spiral",
-	sector, bottom));
-
-  exp->SetZBufMode(CS_ZBUF_TEST);
-
-  csRef<iParticleState> partstate (
-  	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState));
-  exp->GetMeshObject()->SetMaterialWrapper (mat);
-  partstate->SetMixMode (CS_FX_SETALPHA (0.50));
-  exp->GetMeshObject()->SetColor (csColor (1, 1, 0));
-  partstate->SetChangeColor (csColor(+0.01f, 0.0f, -0.012f));
-
-  csRef<iSpiralState> spirstate (
-  	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iSpiralState));
-  spirstate->SetParticleCount (500);
-  spirstate->SetSource (csVector3 (0, 0, 0));
-}
-
-//===========================================================================
 // Everything for bots.
 //===========================================================================
 
@@ -491,7 +454,7 @@ void WalkTest::add_bot (float size, iSector* where, csVector3 const& pos,
   botWrapper->GetMovable ()->SetTransform (m);
   
   botWrapper->GetMovable ()->UpdateMove ();
-  csRef<iSprite3DState> state (SCF_QUERY_INTERFACE (botmesh, iSprite3DState));
+  csRef<iSprite3DState> state (scfQueryInterface<iSprite3DState> (botmesh));
   state->SetAction ("default");
   
   Bot* bot = new Bot (Sys->view->GetEngine(), botWrapper);
@@ -508,12 +471,12 @@ void WalkTest::del_bot (bool manual)
 {
   if (manual)
   {
-    if (manual_bots.Length () > 0)
+    if (manual_bots.GetSize () > 0)
       manual_bots.DeleteIndex (0);
   }
   else
   {
-    if (bots.Length () > 0)
+    if (bots.GetSize () > 0)
       bots.DeleteIndex (0);
   }
 }
@@ -521,7 +484,7 @@ void WalkTest::del_bot (bool manual)
 void WalkTest::move_bots (csTicks elapsed_time)
 {
   size_t i;
-  for (i = 0; i < bots.Length(); i++)
+  for (i = 0; i < bots.GetSize (); i++)
   {
     bots[i]->move (elapsed_time);
   }
@@ -546,6 +509,7 @@ struct MissileStruct
   csOrthoTransform dir;
   csRef<iMeshWrapper> sprite;
   csRef<iSndSysSource> snd;
+  csRef<iSndSysStream> snd_stream;
 };
 
 struct ExplosionStruct
@@ -601,14 +565,15 @@ bool HandleDynLight (iLight* dyn, iEngine* engine)
         dyn->QueryObject ()->ObjRemove (ido);
         if (ms->snd)
         {
-          ms->snd->GetStream ()->Pause();
+          ms->snd_stream->Pause();
         }
         delete ms;
         if (Sys->mySound)
         {
 	  if (Sys->wMissile_boom)
 	  {
-	    iSndSysStream* st = Sys->wMissile_boom->GetStream ();
+	    csRef<iSndSysStream> st = Sys->mySound->CreateStream (
+		Sys->wMissile_boom->GetData (), CS_SND3D_ABSOLUTE);
 	    csRef<iSndSysSource> sndsource = Sys->mySound->
 	      	CreateSource (st);
 	    if (sndsource)
@@ -705,8 +670,8 @@ bool HandleDynLight (iLight* dyn, iEngine* engine)
 
 void show_lightning ()
 {
-  csRef<iEngineSequenceManager> seqmgr(CS_QUERY_REGISTRY (Sys->object_reg,
-  	iEngineSequenceManager));
+  csRef<iEngineSequenceManager> seqmgr(
+  	csQueryRegistry<iEngineSequenceManager> (Sys->object_reg));
   if (seqmgr)
   {
     // This finds the light L1 (the colored light over the stairs) and
@@ -746,8 +711,9 @@ void fire_missile ()
   ms->snd = 0;
   if (Sys->mySound)
   {
-    iSndSysStream* sndstream = Sys->wMissile_whoosh->GetStream ();
-    ms->snd = Sys->mySound->CreateSource (sndstream);
+    iSndSysData* snddata = Sys->wMissile_whoosh->GetData ();
+    ms->snd_stream = Sys->mySound->CreateStream (snddata, CS_SND3D_ABSOLUTE);
+    ms->snd = Sys->mySound->CreateSource (ms->snd_stream);
     if (ms->snd)
     {
       csRef<iSndSysSourceSoftware3D> sndsource3d
@@ -755,7 +721,7 @@ void fire_missile ()
 
       sndsource3d->SetPosition (pos);
       sndsource3d->SetVolume (1.0f);
-      ms->snd->GetStream ()->Unpause ();
+      ms->snd_stream->Unpause ();
     }
   }
   ms->type = DYN_TYPE_MISSILE;
@@ -784,6 +750,77 @@ void fire_missile ()
     sp->GetMovable ()->SetTransform (m);
     sp->GetMovable ()->UpdateMove ();
   }
+}
+
+void test_decal ()
+{
+  csRef<iDecalManager> decalMgr = csLoadPluginCheck<iDecalManager> (
+  	Sys->object_reg, "crystalspace.decal.manager");
+  if (!decalMgr)
+    return;
+
+  iMaterialWrapper * material = 
+    Sys->view->GetEngine()->GetMaterialList()->FindByName("decal");
+  if (!material)
+  {
+    csRef<iLoader> loader = csQueryRegistry<iLoader>(Sys->object_reg);
+    if (!loader)
+    {
+      Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, "Couldn't find iLoader");
+      return; 
+    }
+
+    if (!loader->LoadTexture ("decal", "/lib/std/cslogo2.png"))
+      Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, 
+                  "Couldn't load decal texture!");
+
+    material = Sys->view->GetEngine()->GetMaterialList()->FindByName("decal");
+    if (!material)
+    {
+      Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, 
+                  "Error finding decal material");
+      return;
+    }
+  }
+
+  // create a template for our new decal
+  csRef<iDecalTemplate> decalTemplate = 
+      decalMgr->CreateDecalTemplate(material);
+  decalTemplate->SetTimeToLive(5.0f);
+  
+  // figure out the starting point
+  csRef<iCollideSystem> cdsys = csQueryRegistry<iCollideSystem>(Sys->object_reg);
+  if (!cdsys)
+  {
+    Sys->Report(CS_REPORTER_SEVERITY_NOTIFY, "Couldn't find iCollideSystem");
+    return;
+  }
+
+  csVector3 start = Sys->view->GetCamera()->GetTransform().GetOrigin();
+
+  csVector3 normal = 
+    Sys->view->GetCamera()->GetTransform().This2OtherRelative(
+	csVector3(0,0,-1));
+
+  csVector3 end = start - normal * 100.0f;
+
+  // intersect with world to get a decal position
+  csVector3 iSect;
+  csIntersectingTriangle closestTri;
+  iMeshWrapper * selMesh;
+  csColliderHelper::TraceBeam(cdsys, Sys->view->GetCamera()->GetSector(), 
+      start, end, true, closestTri, iSect, &selMesh);
+
+  start = iSect;
+
+  // make the up direction of the decal the same as the camera
+  csVector3 up =
+    Sys->view->GetCamera()->GetTransform().This2OtherRelative(
+	csVector3(0,1,0));
+
+  // create the decal
+  decalMgr->CreateDecal(decalTemplate, Sys->view->GetCamera()->GetSector(),
+	  start, up, normal, 1.0f, 0.5f);
 }
 
 void AttachRandomLight (iLight* light)
@@ -977,8 +1014,8 @@ static csPtr<iMeshWrapper> CreatePortalThing (const char* name, iSector* room,
   thing_fact_state->SetPolygonMaterial (CS_POLYRANGE_ALL, tm);
   thing_fact_state->SetPolygonFlags (CS_POLYRANGE_ALL, CS_POLY_COLLDET);
 
-  csRef<iLightingInfo> linfo (SCF_QUERY_INTERFACE (thing->GetMeshObject (),
-    iLightingInfo));
+  csRef<iLightingInfo> linfo (
+    scfQueryInterface<iLightingInfo> (thing->GetMeshObject ()));
   linfo->InitializeDefault (true);
   room->ShineLights (thing);
   linfo->PrepareLighting ();

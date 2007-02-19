@@ -39,6 +39,7 @@ struct iMeshList;
 struct iLightList;
 struct iLight;
 struct iVisibilityCuller;
+struct iLightSectorInfluence;
 
 struct iObject;
 
@@ -186,7 +187,7 @@ struct csSectorHitBeamResult
  */
 struct iSector : public virtual iBase
 {
-  SCF_INTERFACE(iSector,2,1,0);
+  SCF_INTERFACE(iSector,2,1,1);
   /// Get the iObject for this sector.
   virtual iObject *QueryObject () = 0;
 
@@ -497,6 +498,12 @@ struct iSector : public virtual iBase
 
   /// Get the shader variable context for this sector.
   virtual iShaderVariableContext* GetSVContext() = 0;
+
+  /**
+   * This function precaches a sector by rendering one frame
+   * with this sector visible. This will speed up later rendering.
+   */
+  virtual void PrecacheDraw () = 0;
 };
 
 

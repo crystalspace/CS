@@ -309,6 +309,10 @@ public:
   * does nothing.
   */
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
+  virtual void BuildDecal(const csVector3* pos, float decalRadius,
+          iDecalBuilder* decalBuilder)
+  {
+  }
 
   /// Calculate bounding box and radius.
   void CalculateBBoxRadius ();
@@ -450,7 +454,7 @@ public:
   void AddVertex (const csVector3& v,
     const csVector2& uv, const csVector3& normal,
     const csColor4& color);
-  size_t GetVertexCount () const { return fact_vertices.Length (); }
+  size_t GetVertexCount () const { return fact_vertices.GetSize (); }
   const csVector3* GetVertices ()
   {
     return fact_vertices.GetArray ();
@@ -472,7 +476,7 @@ public:
   {
     fact_triangles.Push (tri);
   }
-  size_t GetTriangleCount () const { return fact_triangles.Length (); }
+  size_t GetTriangleCount () const { return fact_triangles.GetSize (); }
   const csTriangle* GetTriangles () { return fact_triangles.GetArray (); }
 
   void CalculateNormals (bool compress);

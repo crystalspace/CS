@@ -116,7 +116,7 @@ bool SndTest::OnKeyboard(iEvent& ev)
       // main runloop to stop. To do that we get the event queue from
       // the object registry and then post the event.
       csRef<iEventQueue> q = 
-        CS_QUERY_REGISTRY(GetObjectRegistry (), iEventQueue);
+        csQueryRegistry<iEventQueue> (GetObjectRegistry ());
       if (q.IsValid ()) 
 	q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
     }
@@ -145,7 +145,7 @@ bool SndTest::CreateSprites ()
   sprite->GetMovable ()->SetTransform (m);
   sprite->GetMovable ()->UpdateMove ();
   csRef<iSprite3DState> spstate (
-    SCF_QUERY_INTERFACE (sprite->GetMeshObject (), iSprite3DState));
+    scfQueryInterface<iSprite3DState> (sprite->GetMeshObject ()));
   spstate->SetAction ("default");
 
   return true;
@@ -154,7 +154,7 @@ bool SndTest::CreateSprites ()
 bool SndTest::LoadSound ()
 {
   const char* fname = "/lib/std/loopbzzt.wav";
-  csRef<iVFS> vfs = CS_QUERY_REGISTRY (GetObjectRegistry (), iVFS);
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (GetObjectRegistry ());
 
   csRef<iDataBuffer> soundbuf = vfs->ReadFile (fname);
   if (!soundbuf)
@@ -172,7 +172,7 @@ bool SndTest::LoadSound ()
   sndsource = sndrenderer->CreateSource (sndstream);
   if (!sndsource)
     return ReportError ("Can't create source for '%s'!", fname);
-  sndsource3d = SCF_QUERY_INTERFACE (sndsource, iSndSysSourceSoftware3D);
+  sndsource3d = scfQueryInterface<iSndSysSourceSoftware3D> (sndsource);
 
   sndsource3d->SetPosition (GetSoundPos (0));
   sndsource3d->SetVolume (1.0f);
@@ -197,25 +197,25 @@ bool SndTest::Application()
   // Now get the pointer to various modules we need. We fetch them
   // from the object registry. The RequestPlugins() call we did earlier
   // registered all loaded plugins with the object registry.
-  g3d = CS_QUERY_REGISTRY(GetObjectRegistry(), iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry());
   if (!g3d) return ReportError("Failed to locate 3D renderer!");
 
-  engine = CS_QUERY_REGISTRY(GetObjectRegistry(), iEngine);
+  engine = csQueryRegistry<iEngine> (GetObjectRegistry());
   if (!engine) return ReportError("Failed to locate 3D engine!");
 
-  vc = CS_QUERY_REGISTRY(GetObjectRegistry(), iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry());
   if (!vc) return ReportError("Failed to locate Virtual Clock!");
 
-  kbd = CS_QUERY_REGISTRY(GetObjectRegistry(), iKeyboardDriver);
+  kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry());
   if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
 
-  loader = CS_QUERY_REGISTRY(GetObjectRegistry(), iLoader);
+  loader = csQueryRegistry<iLoader> (GetObjectRegistry());
   if (!loader) return ReportError("Failed to locate Loader!");
 
-  sndrenderer = CS_QUERY_REGISTRY(GetObjectRegistry(), iSndSysRenderer);
+  sndrenderer = csQueryRegistry<iSndSysRenderer> (GetObjectRegistry());
   if (!sndrenderer) return ReportError("Failed to locate sound renderer!");
 
-  sndloader = CS_QUERY_REGISTRY(GetObjectRegistry(), iSndSysLoader);
+  sndloader = csQueryRegistry<iSndSysLoader> (GetObjectRegistry());
   if (!sndloader) return ReportError("Failed to locate sound loader!");
 
   // We need a View to the virtual world.

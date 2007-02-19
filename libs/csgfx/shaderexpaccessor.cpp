@@ -28,7 +28,7 @@
 
 csShaderExpressionAccessor::csShaderExpressionAccessor (
   iObjectRegistry* object_reg, csShaderExpression* expression) : 
-  scfImplementationType(this, 0),
+  scfImplementationType(this),
   object_reg (object_reg), expression (expression)
 {
   shaderMgr = csQueryRegistry<iShaderManager> (object_reg);
@@ -54,3 +54,12 @@ void csShaderExpressionAccessor::PreGetValue (csShaderVariable *variable)
     }
   }
 }
+
+void csShaderExpressionAccessor::SelfDestruct ()
+{
+  if (shaderMgr)
+  {
+    shaderMgr->UnregisterShaderVariableAccessor (GetName (), this);
+  }
+}
+

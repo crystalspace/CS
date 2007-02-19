@@ -2094,7 +2094,7 @@ Particle emission is controlled via instances of @code{iParticleEmitter},
 physical effects controlled via @code{iParticleEffector}.
 
 The full documentation for the new particle systems can be found at 
-@xref{MeshObject Particles}
+@xref{MeshObject Particles}.
 
 @imports{appendix,apimod100_part.txi}
 

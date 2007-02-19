@@ -30,7 +30,6 @@
 #include "csutil/csendian.h"
 #include "csutil/csmd5.h"
 #include "csutil/csstring.h"
-#include "csutil/debug.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/memfile.h"
 #include "iengine/camera.h"
@@ -156,8 +155,8 @@ csBezierMesh::csBezierMesh (iBase *parent, csBezierMeshObjectType* thing_type) :
   dynamic_ambient_version = 0;
 
   csRef<iStringSet> strings;
-  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (thing_type->object_reg,
-    "crystalspace.shared.stringset", iStringSet);
+  strings = csQueryRegistryTagInterface<iStringSet>
+    (thing_type->object_reg, "crystalspace.shared.stringset");
 
   if ((vertex_name == csInvalidStringID) ||
     (texel_name == csInvalidStringID) ||
@@ -182,7 +181,7 @@ char* csBezierMesh::GenerateCacheName ()
   int32 l;
   l = csLittleEndian::Convert ((int32)static_data->num_curve_vertices);
   mf.Write ((char*)&l, 4);
-  l = csLittleEndian::Convert ((int32)curves.Length ());
+  l = csLittleEndian::Convert ((int32)curves.GetSize ());
   mf.Write ((char*)&l, 4);
 
   if (logparent)
@@ -217,7 +216,7 @@ void csBezierMesh::LightDisconnect (iLight* light)
   MarkLightmapsDirty ();
   size_t i;
   int dt = light->GetDynamicType ();
-  for (i = 0; i < curves.Length (); i++)
+  for (i = 0; i < curves.GetSize (); i++)
   {
     csCurve *c = curves[i];
     if (dt == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
@@ -231,7 +230,7 @@ void csBezierMesh::DisconnectAllLights ()
 {
   MarkLightmapsDirty ();
   size_t i;
-  for (i = 0; i < curves.Length (); i++)
+  for (i = 0; i < curves.GetSize (); i++)
   {
     csCurve *c = curves[i];
     c->DisconnectAllLights ();
@@ -350,7 +349,7 @@ void csBezierMesh::InvalidateThing ()
 csCurve *csBezierMesh::GetCurve (char *name) const
 {
   size_t i;
-  for (i = 0 ; i < curves.Length () ; i++)
+  for (i = 0 ; i < curves.GetSize () ; i++)
   {
     const char* n = curves[i]->GetName ();
     if (n && !strcmp (n, name))
@@ -405,7 +404,7 @@ void csBezierMesh::HardTransform (const csReversibleTransform &t)
       	static_data->curve_vertices[i]);
 
   curves_transf_ok = false;
-  for (i = 0; i < curves.Length (); i++)
+  for (i = 0; i < curves.GetSize (); i++)
   {
     csCurve *c = curves[i];
     c->HardTransform (t);
@@ -499,13 +498,13 @@ void csBezierMesh::AppendShadows (
   WorUpdate ();
 
   iShadowBlock *list = shadows->NewShadowBlock (0);
-      //@@@polygons.Length ());
+      //@@@polygons.GetSize ());
 (void)list;
 #if 0
   csFrustum *frust;
   int i, j;
   bool cw = true;                   //@@@ Use mirroring parameter here!
-  for (i = 0; i < static_data->static_polygons.Length (); i++)
+  for (i = 0; i < static_data->static_polygons.GetSize (); i++)
   {
     sp = static_data->static_polygons.Get (i);
     if (sp->GetPortal ()) continue;  // No portals
@@ -767,7 +766,7 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
   bool listCreated;
   csDirtyAccessArray<csRenderMesh*>& meshes = rmListHolder.GetUnusedData (
     listCreated, currentFrame);
-  meshes.SetLength (GetCurveCount(), 0);
+  meshes.SetSize (GetCurveCount(), 0);
 
   iSector* s = movable->GetSectors ()->Get (0);
   csColor ambient = s->GetDynamicAmbientLight ();
@@ -856,7 +855,7 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
     rm->material = c->GetMaterial ();
   }
 
-  n = (int)meshes.Length();
+  n = (int)meshes.GetSize ();
   return meshes.GetArray();
 }
 
@@ -982,7 +981,7 @@ void csBezierMesh::Merge (csBezierMesh *other)
     AddCurveVertex (other->static_data->GetCurveVertex (i),
     	other->static_data->GetCurveTexel (i));
 
-  while (other->curves.Length () > 0)
+  while (other->curves.GetSize () > 0)
   {
     csCurve *c = other->curves.Extract (0);
     AddCurve (c);
@@ -1002,7 +1001,7 @@ void csBezierMesh::MergeTemplate (
   static_data->curves_scale = tpl->GetCurvesScale ();
 
   //@@@ TEMPORARY
-  csRef<iBezierState> ith = SCF_QUERY_INTERFACE (tpl, iBezierState);
+  csRef<iBezierState> ith = scfQueryInterface<iBezierState> (tpl);
   ParentTemplate = (csBezierMesh*)(iBezierState*)ith;
 
   for (i = 0; i < tpl->GetCurveVertexCount (); i++)
@@ -1057,15 +1056,15 @@ csBezierMeshObjectType::~csBezierMeshObjectType ()
 bool csBezierMeshObjectType::Initialize (iObjectRegistry *object_reg)
 {
   csBezierMeshObjectType::object_reg = object_reg;
-  csRef<iEngine> e = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iEngine> e = csQueryRegistry<iEngine> (object_reg);
   engine = e;	// We don't want a real ref here to avoid circular refs.
-  csRef<iGraphics3D> g = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> g = csQueryRegistry<iGraphics3D> (object_reg);
   G3D = g;
 
   lightpatch_pool = new csBezierLightPatchPool ();
 
   csRef<iVerbosityManager> verbosemgr (
-    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+    csQueryRegistry<iVerbosityManager> (object_reg));
   if (verbosemgr) 
     do_verbose = verbosemgr->Enabled ("bezier");
 
@@ -1081,8 +1080,8 @@ void csBezierMeshObjectType::Clear ()
 csPtr<iMeshObjectFactory> csBezierMeshObjectType::NewFactory ()
 {
   csBezierMesh *cm = new csBezierMesh (this, this);
-  csRef<iMeshObjectFactory> ifact (SCF_QUERY_INTERFACE (
-      cm, iMeshObjectFactory));
+  csRef<iMeshObjectFactory> ifact (
+    scfQueryInterface<iMeshObjectFactory> (cm));
   cm->DecRef ();
   return csPtr<iMeshObjectFactory> (ifact);
 }

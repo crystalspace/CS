@@ -114,7 +114,7 @@ csSoftwareGraphics3DCommon::~csSoftwareGraphics3DCommon ()
 {
   if (scfiEventHandler)
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
     if (q != 0)
       q->RemoveListener (scfiEventHandler);
     scfiEventHandler->DecRef ();
@@ -490,7 +490,7 @@ bool csSoftwareGraphics3DCommon::BeginDraw (int DrawFlags)
 {
   clipportal_dirty = true;
   clipportal_floating = 0;
-  CS_ASSERT (clipportal_stack.Length () == 0);
+  CS_ASSERT (clipportal_stack.GetSize () == 0);
 
   if ((G2D->GetWidth() != display_width) ||
       (G2D->GetHeight() != display_height))
@@ -673,10 +673,11 @@ void csSoftwareGraphics3DCommon::OpenPortal (size_t numVertices,
 
 void csSoftwareGraphics3DCommon::ClosePortal ()
 {
-  if (clipportal_stack.Length () <= 0) return;
+  if (clipportal_stack.GetSize () <= 0) return;
   csClipPortal* cp = clipportal_stack.Pop ();
 
-  if (cp->flags.Check(CS_OPENPORTAL_ZFILL))
+  if (cp->flags.Check(CS_OPENPORTAL_ZFILL)
+    && (DrawMode != 0)) // polyrast_ZFill is only valid after a BefinDraw()
   {
     CS_ALLOC_STACK_ARRAY(csVector3, vertices, cp->num_poly);
     for (int v = 0; v < cp->num_poly; v++)
@@ -1001,6 +1002,8 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     const csRenderMeshModes& modes,
     const iShaderVarStack* stacks)
 {
+  if (DrawMode == 0) return;
+
   ScanlineRendererHelper aNameThatDoesNotReallyMatter (this);
   if (!scanlineRenderer) return;
 

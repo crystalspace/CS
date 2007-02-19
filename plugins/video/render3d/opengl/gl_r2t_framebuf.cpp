@@ -42,8 +42,8 @@ void csGLRender2TextureFramebuf::SetRenderTarget (iTextureHandle* handle,
 
     G3D->GetDriver2D()->GetClipRect (rt_old_minx, rt_old_miny, 
       rt_old_maxx, rt_old_maxy);
-    if ((rt_old_minx != 0) && (rt_old_miny != 0)
-      && (rt_old_maxx != txt_w) && (rt_old_maxy != txt_h))
+    if ((rt_old_minx != 0) || (rt_old_miny != 0)
+      || (rt_old_maxx != txt_w) || (rt_old_maxy != txt_h))
     {
       G3D->GetDriver2D()->SetClipRect (0, 0, txt_w, txt_h);
     }
@@ -132,7 +132,7 @@ void csGLRender2TextureFramebuf::FinishDraw ()
     {
       // @@@ Processing sucks, but how else to handle keycolor?
       const size_t numPix = txt_w * txt_h;
-      pixelScratch.SetLength (numPix * 4);
+      pixelScratch.SetSize (numPix * 4);
       glReadPixels (0, 0, txt_w, txt_h, GL_RGBA, 
 	GL_UNSIGNED_BYTE, pixelScratch.GetArray());
       csRGBpixel key;

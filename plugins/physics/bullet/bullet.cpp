@@ -31,7 +31,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <CcdPhysics/CcdPhysicsController.h>
 #include <Dynamics/RigidBody.h>
 #include <CcdPhysics/CcdPhysicsEnvironment.h>
-#include <ConstraintSolver/SimpleConstraintSolver.h>
 #include <BroadphaseCollision/SimpleBroadphase.h>
 #include <CollisionShapes/BoxShape.h>
 #include <CollisionShapes/EmptyShape.h>
@@ -48,8 +47,12 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "bullet.h"
 
+class TriangleCallback;
 
 CS_IMPLEMENT_PLUGIN
+
+CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
+{
 
 SCF_IMPLEMENT_FACTORY (csBulletDynamics)
 
@@ -78,7 +81,7 @@ bool csBulletDynamics::Initialize (iObjectRegistry* object_reg)
 csPtr<iDynamicSystem> csBulletDynamics::CreateSystem ()
 {
   csBulletDynamicsSystem* system = new csBulletDynamicsSystem ();
-  csRef<iDynamicSystem> isystem (SCF_QUERY_INTERFACE (system, iDynamicSystem));
+  csRef<iDynamicSystem> isystem (scfQueryInterface<iDynamicSystem> (system));
   systems.Push (system);
   isystem->DecRef ();
 
@@ -113,7 +116,7 @@ csBulletDynamicsSystem::csBulletDynamicsSystem ()
 :  scfImplementationType (this)
 {
   CollisionDispatcher* dispatcher = new CollisionDispatcher ();
-  BroadphaseInterface* broadphase = new SimpleBroadphase();
+  SimpleBroadphase* broadphase = new SimpleBroadphase();
 
   bullet_sys = new CcdPhysicsEnvironment(dispatcher,broadphase);
 }
@@ -169,7 +172,7 @@ csPtr<iRigidBody> csBulletDynamicsSystem::CreateBody ()
   csBulletRigidBody *b = new csBulletRigidBody (this);
   bullet_sys->addCcdPhysicsController (b->GetBulletBody ());
 
-  csRef<iRigidBody> ib = SCF_QUERY_INTERFACE (b, iRigidBody);
+  csRef<iRigidBody> ib = scfQueryInterface<iRigidBody> (b);
   bodies.Push (ib);
   ib->DecRef ();
 
@@ -262,6 +265,15 @@ csRef<iDynamicsSystemCollider> csBulletDynamicsSystem::CreateCollider ()
 }
 
 //-------------------------------csBulletRigidBody----------------------------------------------//
+
+class EmptyShape_Fixed : public EmptyShape
+{
+public:
+  void ProcessAllTriangles(TriangleCallback* callback,
+    const SimdVector3& aabbMin, const SimdVector3& aabbMax) const
+  { }
+};
+
 csBulletRigidBody::csBulletRigidBody (csBulletDynamicsSystem* dynsys)
 :  scfImplementationType (this)
 {
@@ -272,7 +284,7 @@ csBulletRigidBody::csBulletRigidBody (csBulletDynamicsSystem* dynsys)
 
   CcdConstructionInfo ccdObjectCi;
 
-  ccdObjectCi.m_collisionShape = new EmptyShape ();
+  ccdObjectCi.m_collisionShape = new EmptyShape_Fixed ();
   ccdObjectCi.m_collisionShape->SetMargin (1);
   ccdObjectCi.m_gravity = SimdVector3(0,0,0);
   ccdObjectCi.m_localInertiaTensor = SimdVector3(0,0,0);
@@ -670,7 +682,7 @@ csBulletCollider::csBulletCollider (csBulletDynamicsSystem* dynsys)
   ms->setWorldPosition (0, 0, 0);
   ms->setWorldOrientation (0,0,0,1);
 
-  ccdObjectCi.m_collisionShape = new EmptyShape ();
+  ccdObjectCi.m_collisionShape = new EmptyShape_Fixed ();
   ccdObjectCi.m_collisionShape->SetMargin (1.f);
   ccdObjectCi.m_gravity = SimdVector3(0,0,0);
   ccdObjectCi.m_localInertiaTensor = SimdVector3(0,0,0);
@@ -835,3 +847,6 @@ bool csBulletCollider::IsStatic ()
 {
   return false;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(Bullet)

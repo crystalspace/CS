@@ -20,7 +20,6 @@
 
 #include "csgeom/tri.h"
 #include "csutil/csendian.h"
-#include "csutil/debug.h"
 #include "csutil/memfile.h"
 #include "csutil/util.h"
 #include "iengine/engine.h"
@@ -53,14 +52,14 @@ void csCurveShadowMap::Alloc (iLight *l, int w, int h)
 
   int lw = csCurveLightMap::CalcLightMapWidth (w);
   int lh = csCurveLightMap::CalcLightMapHeight (h);
-  csCurveShadowMapHelper::SetLength (lw * lh);
-  memset (GetArray (), 0, Length ());
+  csCurveShadowMapHelper::SetSize (lw * lh);
+  memset (GetArray (), 0, GetSize ());
 }
 
 void csCurveShadowMap::CalcMaxShadow()
 {
   max_shadow=0;
-  int len = (int)Length ();
+  int len = (int)GetSize ();
   for (int i=0; i<len; i++)
     if (GetArray()[i] > max_shadow)
       max_shadow = GetArray()[i];
@@ -157,8 +156,8 @@ void csCurveLightMap::Alloc (int w, int h, int r, int g, int b)
   static_lm.DeleteAll ();
   real_lm.DeleteAll ();
 
-  static_lm.SetLength (lm_size);
-  real_lm.SetLength (lm_size);
+  static_lm.SetSize (lm_size);
+  real_lm.SetSize (lm_size);
 
   csRGBpixel *map = static_lm.GetArray ();
   csRGBpixel def (r, g, b);
@@ -284,7 +283,7 @@ const char* csCurveLightMap::ReadFromCache (
   // The cached item is valid.
   //-------------------------------
   static_lm.DeleteAll ();
-  static_lm.SetLength (lm_size);
+  static_lm.SetSize (lm_size);
 
   int n = lm_size;
   char *lm_ptr = (char*)static_lm.GetArray ();
@@ -679,7 +678,7 @@ void csCurveLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
   lm_size = lwidth * lheight;
 
   // Allocate new data and transform old to new.
-  static_lm.SetLength (lm_size);
+  static_lm.SetSize (lm_size);
   ResizeMap2 (
     o_stat.GetArray (),
     oldw,
@@ -688,7 +687,7 @@ void csCurveLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
     lwidth,
     lheight);
 
-  real_lm.SetLength (lm_size);
+  real_lm.SetSize (lm_size);
   ResizeMap2 (
     o_real.GetArray (),
     oldw,
@@ -701,8 +700,8 @@ void csCurveLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
   csCurveShadowMap *smap = first_smap;
   while (smap)
   {
-    unsigned char *old_map = new unsigned char[smap->Length ()];
-    memcpy (old_map, smap->GetArray (), smap->Length ());
+    unsigned char *old_map = new unsigned char[smap->GetSize ()];
+    memcpy (old_map, smap->GetArray (), smap->GetSize ());
     ResizeMap (old_map, oldw, oldh, smap->GetArray (), lwidth, lheight);
     delete[] old_map;
     smap = smap->next;

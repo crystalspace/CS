@@ -76,7 +76,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     }
 
 
-    //-- iMeshObjectFactory
+    /**\name iMeshObjectFactory implementation
+     * @{ */
     virtual csFlags& GetFlags ()
     {
       return flags;
@@ -135,8 +136,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     {
       return mixMode;
     }
+    /** @} */
 
-    //-- iParticleSystemFactory
+    /**\name iParticleSystemFactory implementation
+     * @{ */
     virtual void SetDeepCreation (bool deep)
     {
       deepCreation = deep;
@@ -146,8 +149,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     {
       return deepCreation;
     }
+    /** @} */
 
-    //-- iParticleSystemBase
+    /**\name iParticleSystemBase implementation
+     * @{ */
     virtual void SetParticleRenderOrientation (csParticleRenderOrientation o)
     {
       particleOrientation = o;
@@ -277,6 +282,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     {
       return effectors.GetSize ();
     }
+    /** @} */
 
   private:
     ParticlesMeshObjectType* objectType;
@@ -343,7 +349,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     void InvalidateVertexSetup ();
 
 
-    //-- iMeshObject
+    /**\name iMeshObject implementation
+     * @{ */
     virtual iMeshObjectFactory* GetFactory () const
     {
       return factory;
@@ -445,9 +452,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 
     virtual void PositionChild (iMeshObject* child,csTicks current_time)
     {}
+    virtual void BuildDecal(const csVector3* pos, float decalRadius,
+            iDecalBuilder* decalBuilder)
+    {
+    }
+    /** @} */
 
-
-    //-- iObjectModel
+    /**\name iObjectModel implementation
+     * @{ */
     virtual const csBox3& GetObjectBoundingBox ();
 
     virtual void GetObjectBoundingBox (csBox3& bbox)
@@ -458,9 +470,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     virtual void SetObjectBoundingBox (const csBox3& bbox);
 
     virtual void GetRadius (float& radius, csVector3& center);
+    /** @} */
 
 
-    //-- iParticleSystem
+    /**\name iParticleSystem implementation
+     * @{ */
     virtual size_t GetParticleCount () const
     {
       return particleBuffer.particleCount;
@@ -477,8 +491,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     }
 
     virtual csParticleBuffer* LockForExternalControl (size_t maxParticles);
+    
+    virtual void Advance (csTicks time);
+    /** @} */
 
-    //-- iParticleSystemBase
+    /**\name iParticleSystemBase implementation
+     * @{ */
     virtual void SetParticleRenderOrientation (csParticleRenderOrientation o)
     {
       particleOrientation = o;
@@ -494,6 +512,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     {
       rotationMode = mode;
       InvalidateVertexSetup ();
+      // Make sure TC buffer is regenerated
+      tcBuffer = 0;
     }
 
     virtual csParticleRotationMode GetRotationMode () const
@@ -616,13 +636,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     {
       return effectors.GetSize ();
     }
-
+    /** @} */
     
   private:
     friend class ParticlesMeshFactory;
     ParticlesMeshFactory* factory;
 
     iVertexSetup* vertexSetup; //Helper object
+    
+    /**
+     * Advance particle system by given amount of seconds.
+     * \warning Does not do capping of the duration; too large values can
+     *  cause undesired effects like "particle system explosion".
+     */
+    void Advance (float dt, float& newRadiusSq);
 
     //-- iMeshObject
     iMeshWrapper* meshWrapper;

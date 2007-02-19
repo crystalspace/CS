@@ -40,7 +40,7 @@
 
 #if defined(__CYGWIN__) || defined(_WIN32)
 /* Cygwin has funny issues with atexit() that ptmalloc seems to tickle.
- * So within ptmalloc we use own own single-use implementation of atexit()
+ * So within ptmalloc we use our own single-use implementation of atexit()
  * when on Cygwin.  
  *
  * With the MSVC runtime(ie MSVC itself and MingW), the catch is that 

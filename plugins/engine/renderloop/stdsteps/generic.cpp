@@ -71,7 +71,7 @@ csGenericRSLoader::csGenericRSLoader (iBase* p) :
 
 csPtr<iBase> csGenericRSLoader::Parse (iDocumentNode* node, 
 				       iStreamSource*,
-				       iLoaderContext* /*ldr_context*/, 
+				       iLoaderContext* ldr_context,
 				       iBase* /*context*/)
 {
   csRef<iGenericRenderStep> step;
@@ -106,7 +106,8 @@ csPtr<iBase> csGenericRSLoader::Parse (iDocumentNode* node,
 	break;
       case XMLTOKEN_DEFAULTSHADER:
 	{
-	  csRef<iShader> defshader = synldr->ParseShaderRef (child);
+	  csRef<iShader> defshader = synldr->ParseShaderRef (ldr_context,
+	      child);
 	  step->SetDefaultShader (defshader);
 	}
 	break;
@@ -162,9 +163,9 @@ csGenericRenderStep::csGenericRenderStep (
 {
   objreg = object_reg;
 
-  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.shared.stringset", iStringSet);
-  shaderManager = CS_QUERY_REGISTRY (object_reg, iShaderManager);
+  strings = csQueryRegistryTagInterface<iStringSet> 
+    (object_reg, "crystalspace.shared.stringset");
+  shaderManager = csQueryRegistry<iShaderManager> (object_reg);
 
   shadertype = 0;
   zOffset = false;
@@ -226,7 +227,7 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
   ToggleStepSettings (g3d, true);
   if (!shaderManager)
   {
-    shaderManager = CS_QUERY_REGISTRY (objreg, iShaderManager);
+    shaderManager = csQueryRegistry<iShaderManager> (objreg);
   }
   csRef<csShaderVariable> svO2W = 
     shadervars.Top ().GetVariable(string_object2world);
@@ -393,9 +394,9 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
 
   csRenderMeshList* meshlist = sector->GetVisibleMeshes (rview);
   size_t num = meshlist->SortMeshLists (rview);
-  visible_meshes.SetLength (visible_meshes_index+num);
-  imeshes_scratch.SetLength (num);
-  mesh_info.SetLength (visible_meshes_index+num);
+  visible_meshes.SetSize (visible_meshes_index+num);
+  imeshes_scratch.SetSize (num);
+  mesh_info.SetSize (visible_meshes_index+num);
   csRenderMesh** sameShaderMeshes = visible_meshes.GetArray ()
   	+ visible_meshes_index;
   meshInfo* sameShaderMeshInfo = mesh_info.GetArray ()
@@ -478,7 +479,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   ShaderVarPusher pusher;
   pusher.sectorContext = sector->GetSVContext();
   pusher.light = light;
-  ShaderTicketHelper ticketHelper (stacks, shadervars, shadervars.Length ()-1);
+  ShaderTicketHelper ticketHelper (stacks, shadervars, shadervars.GetSize ()-1);
   const csReversibleTransform& camt = rview->GetCamera ()->GetTransform ();
 
   csLightType light_type;
@@ -581,7 +582,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
       if (meshShader == 0) 
       {
 	bool doDefault = true;
-	for (size_t i = 0; i < disableDefaultTypes.Length(); i++)
+	for (size_t i = 0; i < disableDefaultTypes.GetSize (); i++)
 	{
 	  if (hdl->GetShader (disableDefaultTypes[i]) != 0)
 	  {

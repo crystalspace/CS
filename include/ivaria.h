@@ -35,12 +35,14 @@
 #include "ivaria/ode.h"
 #include "ivaria/pagingformer.h"
 #include "ivaria/pmeter.h"
+#include "ivaria/profile.h"
 #include "ivaria/reporter.h"
 #include "ivaria/script.h"
 #include "ivaria/sequence.h"
 #include "ivaria/simpleformer.h"
 #include "ivaria/stdrep.h"
 #include "ivaria/terraform.h"
+#include "ivaria/translator.h"
 #include "ivaria/view.h"
 #endif /* __IVARIA_H__ */
 

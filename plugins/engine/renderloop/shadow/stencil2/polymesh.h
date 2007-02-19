@@ -44,7 +44,7 @@ private:
   void CalcFaceNormals()
   {
     Triangulate();
-    face_normals.SetLength(0);
+    face_normals.SetSize (0);
     face_normals.SetMinimalCapacity (tri_count);
     int i;
     for (i = 0; i < tri_count; i ++) 
@@ -74,9 +74,9 @@ public:
   {
     CS_ASSERT (secondary_vertidx == 0);
     secondary_vertidx = vertidx;
-    polys.SetCapacity (polys.Length () + polysToAdd.Length ());
+    polys.SetCapacity (polys.GetSize () + polysToAdd.GetSize ());
     size_t i;
-    for (i = 0; i < polysToAdd.Length (); i++)
+    for (i = 0; i < polysToAdd.GetSize (); i++)
     {
       polys.Push (polysToAdd[i]);
     }
@@ -93,19 +93,19 @@ public:
 
     int numVerts = polyMesh->GetVertexCount ();
     csVector3* oldVerts = polyMesh->GetVertices ();
-    verts.SetLength (numVerts);
+    verts.SetSize (numVerts);
     memcpy (verts.GetArray (), oldVerts, sizeof (csVector3) * numVerts);
 
     int numPolys = polyMesh->GetPolygonCount ();
     csMeshedPolygon* oldPolys = polyMesh->GetPolygons ();
-    polys.SetLength (numPolys);
+    polys.SetSize (numPolys);
 
     int i;
     // First count how many vertex indices we need.
     int totvertidx = 0;
     for (i = 0 ; i < numPolys ; i++)
       totvertidx += oldPolys[i].num_vertices;
-    vertidx.SetLength (totvertidx);
+    vertidx.SetSize (totvertidx);
     int* vertidx_p = vertidx.GetArray ();
 
     for (i = 0; i < numPolys; i++)
@@ -125,7 +125,7 @@ public:
 
   virtual int GetVertexCount () 
   { 
-    return (int)verts.Length (); 
+    return (int)verts.GetSize (); 
   }
   virtual csVector3* GetVertices () 
   { 
@@ -133,7 +133,7 @@ public:
   }
   virtual int GetPolygonCount () 
   { 
-    return (int)polys.Length (); 
+    return (int)polys.GetSize (); 
   }
   virtual csMeshedPolygon* GetPolygons () 
   { 

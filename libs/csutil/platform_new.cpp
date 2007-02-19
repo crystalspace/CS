@@ -21,8 +21,8 @@
  */
 #define CS_NO_NEW_OVERRIDE
 #include "cssysdef.h"
-
-#include <new>
+/* memtracker overrides new, too, which interferes as well */
+#include "csutil/custom_new_disable.h"
 
 namespace CS
 {
@@ -42,17 +42,17 @@ void* operator new (size_t s, const CS::AllocPlatform&) throw ()
    * is non-trivial here. 
    * For now, solve the issue pragmatically and employ platform_malloc().
    */
-  return platform_malloc (s);
+  return malloc (s);
 }
 void* operator new[] (size_t s, const CS::AllocPlatform&) throw ()
 { 
-  return platform_malloc (s);
+  return malloc (s);
 }
 void operator delete (void* p, const CS::AllocPlatform&) throw ()
 { 
-  platform_free (p);
+  free (p);
 }
 void operator delete[] (void* p, const CS::AllocPlatform&) throw ()
 { 
-  platform_free (p);
+  free (p);
 }

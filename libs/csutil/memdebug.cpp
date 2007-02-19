@@ -303,7 +303,7 @@ static void MemoryCheck ()
         ShowBlockInfo (me);
         csPrintf("CHK: Size in table does not correspond to size in block!\n");
         fflush (stdout);
-        DEBUG_BREAK;
+        CS_DEBUG_BREAK;
       }
       if (me.freed)
       {
@@ -312,14 +312,14 @@ static void MemoryCheck ()
           ShowBlockInfo (me);
           csPrintf ("CHK: Bad start of block for freed block!\n");
           fflush (stdout);
-          DEBUG_BREAK;
+          CS_DEBUG_BREAK;
         }
         if (strncmp (rc+4+DETECT_WALL+s, DETECTFREE, DETECT_WALL) != 0)
         {
           ShowBlockInfo (me);
           csPrintf ("CHK: Bad end of block for freed block!\n");
           fflush (stdout);
-          DEBUG_BREAK;
+          CS_DEBUG_BREAK;
         }
 #if DETECT_KEEP_FREE_MEMORY
         unsigned int j;
@@ -330,7 +330,7 @@ static void MemoryCheck ()
             ShowBlockInfo (me);
             csPrintf ("CHK: Freed memory is used at offset (%u)!\n", j);
             fflush (stdout);
-            DEBUG_BREAK;
+            CS_DEBUG_BREAK;
           }
         }
 #endif
@@ -342,14 +342,14 @@ static void MemoryCheck ()
           ShowBlockInfo (me);
           csPrintf ("CHK: Bad start of block!\n");
           fflush (stdout);
-          DEBUG_BREAK;
+          CS_DEBUG_BREAK;
         }
         if (strncmp (rc+4+DETECT_WALL+s, DETECT, DETECT_WALL_SAME) != 0)
         {
           ShowBlockInfo (me);
           csPrintf ("CHK: Bad end of block!\n");
           fflush (stdout);
-          DEBUG_BREAK;
+          CS_DEBUG_BREAK;
         }
       }
     }
@@ -384,7 +384,7 @@ static void DumpError (const char* msg, int info, char* rc)
   fflush (stdout);
   if (do_crash)
   {
-    DEBUG_BREAK;
+    CS_DEBUG_BREAK;
   }
 }
 
@@ -903,9 +903,8 @@ void mtiRegisterModule (char* Class)
 
   if (iSCF::SCF->object_reg)
   {
-    csRef<iMemoryTracker> mtiTR = CS_QUERY_REGISTRY_TAG_INTERFACE (
-        iSCF::SCF->object_reg, "crystalspace.utilities.memorytracker",
-        iMemoryTracker);
+    csRef<iMemoryTracker> mtiTR = csQueryRegistryTagInterface<iMemoryTracker> (
+        iSCF::SCF->object_reg, "crystalspace.utilities.memorytracker");
     if (!mtiTR)
     {
       mtiTR.AttachNew (new csMemTrackerRegistry);

@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "csloader.h"
 #include "csutil/scanstr.h"
+#include "csutil/scfstr.h"
 #include "iutil/document.h"
 #include "csgfx/rgbpixel.h"
 #include "cstool/gentrtex.h"
@@ -435,7 +436,7 @@ bool csLoader::ParseHeightgen (iLoaderContext* ldr_context, iDocumentNode* node)
           
           csString cache_enable = child->GetAttributeValue ("cache");
           csRef<iImage> img;
-          csRef<iImageIO> imageio (CS_QUERY_REGISTRY (object_reg, iImageIO));
+          csRef<iImageIO> imageio (csQueryRegistry<iImageIO> (object_reg));
 
           // get from cache
           if(Engine && cache_enable == "yes")
@@ -483,13 +484,15 @@ bool csLoader::ParseHeightgen (iLoaderContext* ldr_context, iDocumentNode* node)
           }
 
           // add texture
+	  csRef<scfString> fail_reason;
+	  fail_reason.AttachNew (new scfString ());
 	  csRef<iTextureHandle> TexHandle (G3D->GetTextureManager ()
-	  	->RegisterTexture (img, CS_TEXTURE_3D));
+	  	->RegisterTexture (img, CS_TEXTURE_3D, fail_reason));
 	  if (!TexHandle)
 	  {
 	    ReportError (
 	      "crystalspace.maploader.parse.heightgen",
-	      "Cannot create texture!");
+	      "Cannot create texture : %s", fail_reason->GetData ());
 	    return false;
 	  }
 	  iTextureWrapper *TexWrapper = Engine->GetTextureList ()

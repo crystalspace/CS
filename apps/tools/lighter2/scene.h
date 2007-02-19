@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2005 by Marten Svanfeldt
+  Copyright (C) 2005-2006 by Marten Svanfeldt
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -19,29 +19,29 @@
 #ifndef __SCENE_H__
 #define __SCENE_H__
 
-#include "radobject.h"
+#include "object.h"
 #include "kdtree.h"
+#include "light.h"
 
 namespace lighter
 {
-  struct KDTree;
+  class KDTree;
+  class Scene;
+  class Sector;
 
-  // A lightsource
-  class Light : public csRefCount
+  class Portal : public csRefCount
   {
   public:
-    csVector3 position;
-    csColor color;
-    csLightAttenuationMode attenuation;
-    csVector3 attenuationConsts;
+    Portal ()
+    {}
 
-    csColor freeEnergy;
-
-    csBox3 boundingBox;
+    Sector* sourceSector;
+    Sector* destSector;
+    csReversibleTransform wrapTransform;
+    Vector3DArray worldVertices;
+    csPlane3 portalPlane;
   };
-  typedef csRefArray<Light> LightRefArray;
-
-  class Scene;
+  typedef csRefArray<Portal> PortalRefArray;
 
   // Representation of sector in our local setup
   class Sector : public csRefCount
@@ -60,10 +60,16 @@ namespace lighter
     void Initialize ();
 
     // All objects in sector
-    RadObjectHash allObjects;
+    ObjectHash allObjects;
 
-    // All lightsources
-    LightRefArray allLights;
+    // All light sources (no PD lights)
+    LightRefArray allNonPDLights;
+
+    // All PD light sources
+    LightRefArray allPDLights;
+
+    // All portals in sector
+    PortalRefArray allPortals;
 
     // KD-tree of all primitives in sector
     KDTree *kdTree;
@@ -79,6 +85,7 @@ namespace lighter
   {
   public:
     Scene ();
+    ~Scene ();
 
     // Add a file for later loading
     void AddFile (const char* directory);
@@ -93,10 +100,10 @@ namespace lighter
     bool ParseEngine ();
 
     // Data access
-    inline RadObjectFactoryHash& GetFactories () 
+    inline ObjectFactoryHash& GetFactories () 
     { return radFactories; }
 
-    inline const RadObjectFactoryHash& GetFactories () const
+    inline const ObjectFactoryHash& GetFactories () const
     { return radFactories; }
 
     inline SectorHash& GetSectors () { return sectors; }
@@ -108,15 +115,54 @@ namespace lighter
 
     LightmapPtrDelArray& GetLightmaps () 
     { return lightmaps; }
+
+    Lightmap* GetLightmap (uint lightmapID, Light* light);
+
+    csArray<LightmapPtrDelArray*> GetAllLightmaps ();
+
+    /**
+     * Helper class to perform some lightmap postprocessing
+     * (exposure + ambient term).
+     */
+    class LightingPostProcessor
+    {
+    private:
+      friend class Scene;
+      Scene* scene;
+
+      LightingPostProcessor (Scene* scene);
+    public:
+      //@{
+      /// Apply exposure function
+      void ApplyExposure (Lightmap* lightmap);
+      void ApplyExposure (csColor* colors, size_t numColors);
+      //@}
+
+      //@{
+      /**
+       * Apply ambient term.
+       * Ambient may be a hack to approximate indirect lighting, but then, 
+       * as long as that is not supported, or disabled by the user later on, 
+       * ambient can still serve a purpose.
+       */
+      void ApplyAmbient (Lightmap* lightmap);
+      void ApplyAmbient (csColor* colors, size_t numColors);
+      //@}
+    };
+    LightingPostProcessor lightmapPostProc;
   protected:
     
-    // Rad factories
-    RadObjectFactoryHash radFactories;
+    //  factories
+    ObjectFactoryHash radFactories;
  
     // All sectors
     SectorHash sectors;
+    typedef csHash<Sector*, csPtrKey<iSector> > SectorOrigSectorHash;
+    SectorOrigSectorHash originalSectorHash;
 
     LightmapPtrDelArray lightmaps;
+    typedef csHash<LightmapPtrDelArray*, csPtrKey<Light> > PDLightmapsHash;
+    PDLightmapsHash pdLightmaps;
 
     struct LoadedFile
     {
@@ -132,27 +178,35 @@ namespace lighter
     {
       csString filename;
       csString texname;
+      csStringArray pdLightmapFiles;
+      csStringArray pdLightIDs;
     };
     csArray<SaveTexture> texturesToSave;
     csSet<csString> texturesToClean;
 
     // Save functions
+    void CollectDeleteTextures (iDocumentNode* textureNode,
+      csSet<csString>& filesToDelete);
     void CleanOldLightmaps (LoadedFile* fileInfo, 
-      const csStringArray& texFileNames);
+      const csSet<csString>& texFileNames);
     void SaveSceneToDom (iDocumentNode* root, LoadedFile* fileInfo);
+    bool SaveSceneLibrary (const char* libFile, LoadedFile* fileInfo);
+    void HandleLibraryNode (iDocumentNode* node, LoadedFile* fileInfo);
     void SaveMeshFactoryToDom (iDocumentNode* factNode, LoadedFile* fileInfo);
     void SaveSectorToDom (iDocumentNode* sectorNode, LoadedFile* fileInfo);
     void SaveMeshObjectToDom (iDocumentNode *objNode, Sector* sect, LoadedFile* fileInfo);
     
     // Load functions
     void ParseSector (iSector *sector);
+    void ParsePortals (iSector *srcSect, Sector* sector);
     enum MeshParseResult
     {
       Failure, Success, NotAGenMesh
     };
     MeshParseResult ParseMesh (Sector *sector, iMeshWrapper *mesh);
     MeshParseResult ParseMeshFactory (iMeshFactoryWrapper *factory, 
-      RadObjectFactory*& radFact);
+      ObjectFactory*& radFact);
+    void PropagateLight (Light* light, const csFrustum& lightFrustum);
 
   };
 }

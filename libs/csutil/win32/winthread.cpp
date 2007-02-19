@@ -24,6 +24,9 @@
 
 #include "csutil/win32/wintools.h"
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
+
 /* Uncomment to throw an assertion in case of a returned error
  * (otherwise, the error is just printed) */
 //#define ASSERT_ON_ERROR
@@ -390,3 +393,5 @@ uint csWinThread::ThreadRun (void* param)
   #endif
   return 0;
 }
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"

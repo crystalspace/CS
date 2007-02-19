@@ -171,7 +171,7 @@ bool csFreeType2Server::Initialize (iObjectRegistry *object_reg)
     return false;
   }
 
-  VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  VFS = csQueryRegistry<iVFS> (object_reg);
   ftconfig.AddConfig(object_reg, "config/freetype.cfg");
 
   fontset = ftconfig->GetStr ("Freetype2.Settings.FontSet", 0);
@@ -323,7 +323,7 @@ csFreeType2Font::csFreeType2Font (csFreeType2Server* server,
 
 csFreeType2Font::~csFreeType2Font ()
 {
-  size_t i = DeleteCallbacks.Length ();
+  size_t i = DeleteCallbacks.GetSize ();
   while (i-- > 0)
   {
     iFontDeleteNotify* delnot = DeleteCallbacks[i];
@@ -664,7 +664,7 @@ void csFreeType2Font::AddDeleteCallback (iFontDeleteNotify* func)
 
 bool csFreeType2Font::RemoveDeleteCallback (iFontDeleteNotify* func)
 {
-  size_t i = DeleteCallbacks.Length ();
+  size_t i = DeleteCallbacks.GetSize ();
   while (i-- > 0)
   {
     iFontDeleteNotify* delnot = DeleteCallbacks[i];

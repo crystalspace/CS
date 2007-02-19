@@ -106,7 +106,7 @@ DemoSequenceLoader::DemoSequenceLoader (Demo* demo,
   }
 
   csRef<iDocumentSystem> xml (
-  	CS_QUERY_REGISTRY (demo->object_reg, iDocumentSystem));
+  	csQueryRegistry<iDocumentSystem> (demo->object_reg));
   if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
   csRef<iDocument> doc = xml->CreateDocument ();
   const char* error = doc->Parse (buf, true);
@@ -126,7 +126,7 @@ DemoSequenceLoader::~DemoSequenceLoader ()
 iSequence* DemoSequenceLoader::GetSequence (const char* name)
 {
   size_t i;
-  for (i = 0 ; i < sequences.Length () ; i++)
+  for (i = 0 ; i < sequences.GetSize () ; i++)
   {
     NamedSequence* ns = sequences[i];
     if (!strcmp (ns->name, name)) return ns->sequence;
@@ -514,7 +514,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (iDocumentNode* node,
 	  exit (0);
 	}
 	csRef<iDocumentSystem> xml (
-		CS_QUERY_REGISTRY (demo->object_reg, iDocumentSystem));
+		csQueryRegistry<iDocumentSystem> (demo->object_reg));
 	if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
 	csRef<iDocument> doc = xml->CreateDocument ();
 	const char* error = doc->Parse (buf, true);

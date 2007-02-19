@@ -77,7 +77,7 @@ csCamera::~csCamera ()
 void csCamera::FireCameraSectorListeners (iSector* sector)
 {
   size_t i;
-  for (i = 0 ; i < listeners.Length () ; i++)
+  for (i = 0 ; i < listeners.GetSize () ; i++)
     listeners[i]->NewSector ((iCamera*)this, sector);
 }
 

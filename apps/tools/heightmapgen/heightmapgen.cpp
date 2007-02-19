@@ -36,7 +36,7 @@ HeightMapGen::~HeightMapGen ()
 
 bool HeightMapGen::LoadMap ()
 {
-  csRef<iVFS> VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  csRef<iVFS> VFS = csQueryRegistry<iVFS> (object_reg);
   csStringArray paths;
   paths.Push ("/lev/");
   csString map = cfgmgr->GetStr ("HeightMapGen.WorldInputPath", "/this");
@@ -64,8 +64,6 @@ bool HeightMapGen::LoadMap ()
 
 bool HeightMapGen::Initialize ()
 {
-  csDebuggingGraph::SetupGraph (object_reg);
-
   if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,
 	CS_REQUEST_PLUGIN("crystalspace.graphics3d.null", iGraphics3D),
@@ -93,7 +91,7 @@ bool HeightMapGen::Initialize ()
   }
 
   // The virtual clock.
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
   if (!vc)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -103,7 +101,7 @@ bool HeightMapGen::Initialize ()
   }
 
   // Find the pointer to engine plugin
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = csQueryRegistry<iEngine> (object_reg);
   if (!engine)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -112,7 +110,7 @@ bool HeightMapGen::Initialize ()
     return false;
   }
 
-  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  loader = csQueryRegistry<iLoader> (object_reg);
   if (!loader)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -121,7 +119,7 @@ bool HeightMapGen::Initialize ()
     return false;
   }
 
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
   if (!g3d)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -130,7 +128,7 @@ bool HeightMapGen::Initialize ()
     return false;
   }
 
-  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  kbd = csQueryRegistry<iKeyboardDriver> (object_reg);
   if (!kbd)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -148,8 +146,8 @@ bool HeightMapGen::Initialize ()
     return false;
   }
 
-  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
+  csRef<iCommandLineParser> cmdline = 
+  	csQueryRegistry<iCommandLineParser> (object_reg);
   const char* configfile = cmdline->GetName (0);
   if (!configfile)
   {
@@ -254,8 +252,8 @@ void HeightMapGen::CreateBasemap (int heightmap_res, csRGBpixel* basemap_dst,
 
 void HeightMapGen::Start ()
 {
-  csRef<iImageIO> imageio = CS_QUERY_REGISTRY (object_reg, iImageIO);
-  csRef<iVFS> VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  csRef<iImageIO> imageio = csQueryRegistry<iImageIO> (object_reg);
+  csRef<iVFS> VFS = csQueryRegistry<iVFS> (object_reg);
   csString meshname = cfgmgr->GetStr ("HeightMapGen.MeshInput", "");
   iMeshWrapper* mesh = engine->FindMeshObject (meshname);
   if (!mesh)
@@ -273,7 +271,7 @@ void HeightMapGen::Start ()
   	box.MinX (), box.MinY (), box.MinZ (),
   	box.MaxX (), box.MaxY (), box.MaxZ ());
 
-  csRef<iCollideSystem> cdsys = CS_QUERY_REGISTRY (object_reg, iCollideSystem);
+  csRef<iCollideSystem> cdsys = csQueryRegistry<iCollideSystem> (object_reg);
   csColliderHelper::InitializeCollisionWrapper (cdsys, mesh);
   iSector* sector = mesh->GetMovable ()->GetSectors ()->Get (0);
 
@@ -281,7 +279,7 @@ void HeightMapGen::Start ()
   int heightmap_res = cfgmgr->GetInt ("HeightMapGen.HeightmapResolution", 513);
   int num_texture_layers = cfgmgr->GetInt ("HeightMapGen.NumTextureLayers", 3);
   csArray<TextureLayer> txt_layers;
-  txt_layers.SetLength (num_texture_layers);
+  txt_layers.SetSize (num_texture_layers);
   int i;
   for (i = 0 ; i < num_texture_layers ; i++)
   {

@@ -21,6 +21,7 @@
 #define __CS_TRIANGLESTREAM_H__
 
 /**\file
+ * Triangle extraction from index buffers
  */
 
 #include "ivideo/graph3d.h"
@@ -43,6 +44,7 @@ namespace CS
     bool stripFlag;
     int quadPart;
 
+    iRenderBuffer* buf;
     csRenderBufferComponentType compType;
     csRenderMeshType meshtype;
 
@@ -108,8 +110,30 @@ namespace CS
       return 0;
     }
   public:
-    TriangleIndicesStream ()
+    /**
+     * Construct uninitialized triangle stream.
+     * \remark Don't forget to call BeginTriangulate() before using 
+     * HasNext() or Next()!
+     */
+    TriangleIndicesStream () : buf (0) { }
+    /**
+     * Construct triangle stream with an index buffer.
+     * \param indices Index buffer to triangulate.
+     * \param meshtype Mesh type of the index data.
+     * \param indexStart Element of the index buffer to start iterating at.
+     * \param indexEnd Element of the index buffer to stop iterating at.
+     *   (size_t)~0 means last element.
+     */
+    TriangleIndicesStream (iRenderBuffer* indices,
+			   csRenderMeshType meshtype,
+			   size_t indexStart = 0, 
+			   size_t indexEnd = (size_t)~0)
     {
+      BeginTriangulate (indices, meshtype, indexStart, indexEnd);
+    }
+    ~TriangleIndicesStream()
+    {
+      if (buf != 0) buf->Release ();
     }
 
     /**
@@ -117,7 +141,8 @@ namespace CS
      * \param index Pointer to start of the indices.
      * \param indexEnd Pointer to end of the indices.
      * \param stride Distance between index elements in bytes.
-     * \param meshType Mesh type of the index data.
+     * \param compType Type of component contained in the data.
+     * \param meshtype Mesh type of the index data.
      */
     void BeginTriangulate (const uint8* index, const uint8* indexEnd,
       size_t stride, csRenderBufferComponentType compType,
@@ -144,76 +169,107 @@ namespace CS
 	;
       }
     }
+    
+    /**
+     * Begin triangulation of an index buffer.
+     * \param indices Index buffer to triangulate.
+     * \param meshtype Mesh type of the index data.
+     * \param indexStart Element of the index buffer to start iterating at.
+     * \param indexEnd Element of the index buffer to stop iterating at.
+     *   (size_t)~0 means last element.
+     */
+    void BeginTriangulate (iRenderBuffer* indices,
+			    csRenderMeshType meshtype,
+			    size_t indexStart = 0, 
+			    size_t indexEnd = (size_t)~0)
+    {
+      if (indexEnd == (size_t)~0) indexEnd = indices->GetElementCount();
+      
+      buf = indices;
+      uint8* indexLock = (uint8*)buf->Lock (CS_BUF_LOCK_READ);
+  
+      size_t stride = indices->GetElementDistance();
+      uint8* tri = indexLock + indexStart*stride;
+      const uint8* triEnd = indexLock + indexEnd*stride;
+      
+      BeginTriangulate (tri, triEnd, stride, indices->GetComponentType(), 
+	meshtype);
+    }
 
     /// Returns whether a triangle is available.
-    bool HasNextTri() const
+    bool HasNext() const
     {
       return (index < indexEnd);
     }
+    CS_DEPRECATED_METHOD_MSG("Use HasNext() instead")
+    bool HasNextTri() const { return HasNext(); }
     /// Fetches the next triangle from the buffer.
+    TriangleT<T> Next ()
+    {
+      CS_ASSERT (index < indexEnd);
+      TriangleT<T> t;
+      switch (meshtype)
+      {
+      case CS_MESHTYPE_TRIANGLES:
+	{
+	  t.a = GetIndex (0);
+	  t.b = GetIndex (1);
+	  t.c = GetIndex (2);
+	  index += 3*csRenderBufferComponentSizes[compType];
+	}
+	break;
+      case CS_MESHTYPE_TRIANGLESTRIP:
+	{
+	  const T cur = GetNextIndex();
+	  t.a = old1;
+	  t.b = old2;
+	  t.c = cur;
+	  if (stripFlag)
+	    old2 = cur;
+	  else
+	    old1 = cur;
+	  stripFlag = !stripFlag;
+	}
+	break;
+      case CS_MESHTYPE_TRIANGLEFAN:
+	{
+	  const T cur = GetNextIndex();
+	  t.a = old2;
+	  t.b = old1;
+	  t.c = cur;
+	  old1 = cur;
+	}
+	break;
+      case CS_MESHTYPE_QUADS:
+	{
+	  if (quadPart == 0)
+	  {
+	    t.a = GetIndex (0);
+	    t.b = GetIndex (1);
+	    t.c = GetIndex (2);
+	  }
+	  else
+	  {
+	    t.a = GetIndex (0);
+	    t.b = GetIndex (2);
+	    t.c = GetIndex (3);
+	    index += 4*csRenderBufferComponentSizes[compType];
+	  }
+	  quadPart ^= 1;
+	}
+	break;
+      default:
+	CS_ASSERT_MSG("Unsupported mesh type", false);
+	;
+      }
+      return t;
+    }
+    CS_DEPRECATED_METHOD_MSG("Use Next() instead")
     bool NextTriangle (T& a, T& b, T& c)
     {
-      if (index < indexEnd)
-      {
-	switch (meshtype)
-	{
-	case CS_MESHTYPE_TRIANGLES:
-	  {
-            a = GetIndex (0);
-            b = GetIndex (1);
-            c = GetIndex (2);
-	    index += 3*csRenderBufferComponentSizes[compType];
-            return true;
-	  }
-	  break;
-	case CS_MESHTYPE_TRIANGLESTRIP:
-	  {
-	    const T cur = GetNextIndex();
-            a = old1;
-            b = old2;
-            c = cur;
-            if (stripFlag)
-	      old2 = cur;
-            else
-              old1 = cur;
-            stripFlag = !stripFlag;
-            return true;
-	  }
-	  break;
-	case CS_MESHTYPE_TRIANGLEFAN:
-	  {
-	    const T cur = GetNextIndex();
-            a = old2;
-            b = old1;
-            c = cur;
-	    old1 = cur;
-            return true;
-	  }
-          break;
-	case CS_MESHTYPE_QUADS:
-	  {
-	    if (quadPart == 0)
-            {
-              a = GetIndex (0);
-              b = GetIndex (1);
-              c = GetIndex (2);
-            }
-	    else
-	    {
-              a = GetIndex (0);
-              b = GetIndex (2);
-              c = GetIndex (3);
-	      index += 4*csRenderBufferComponentSizes[compType];
-	    }
-	    quadPart ^= 1;
-            return true;
-	  }
-	  break;
-	default:
-	  ;
-	}
-      }
-      return false;
+      TriangleT<T> tri = Next ();
+      a = tri.a; b = tri.b; c = tri.c;
+      return true;
     }
   };
   

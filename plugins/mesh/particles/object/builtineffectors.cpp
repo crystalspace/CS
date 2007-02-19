@@ -30,7 +30,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 {
   SCF_IMPLEMENT_FACTORY(ParticleEffectorFactory);
 
-  CS_IMPLEMENT_STATIC_VAR(GetVGen, csRandomVectorGen,);
+  CS_IMPLEMENT_STATIC_VAR(GetVGen, csRandomVectorGen, ());
 
   csPtr<iParticleBuiltinEffectorForce> ParticleEffectorFactory::CreateForce () const
   {
@@ -200,18 +200,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     void StepParticles (FnType& fn, const csParticleBuffer& particleBuffer, 
       float dt, float t0 = 0)
     {
-      float invDt = dt ? 1.0f/dt : 0.0f;
+      // Calculate stepping
+      const float maxDt = 1/30.0f;
+      dt = csMin (dt, maxDt);
 
       for (size_t idx = 0; idx < particleBuffer.particleCount; ++idx)
       {
         csParticle& particle = particleBuffer.particleData[idx];
-        csParticleAux& particleAux = particleBuffer.particleAuxData[idx];
 
         const csVector3& oldPos = particle.position;
 
-        //Calculate new position
-        float err = CS::Math::Ode45::Step<FnType, float> 
+         //Calculate new position
+        /*float err = */CS::Math::Ode45::Step<FnType, float> 
           (fn, dt, t0, oldPos, particle.position);
+          
       }
     }
 
@@ -219,7 +221,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     struct SpiralFunc
     {
       SpiralFunc (const csVector3& O, const csVector3& D)
-        : lineO (O), lineD (D), velScale (1.0f), velOffset (0.0f)
+        : lineO (O), lineD (D), velScale (1.0f), velOffset (0.0f),
+        spreadFactor (0)
       {
       }
 
@@ -239,11 +242,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
         result.y *= velScale.y;
         result.z *= velScale.z;
 
+        result += PP*spreadFactor;
+
         return result + velOffset;
       }
 
       csVector3 lineO, lineD;
       csVector3 velScale, velOffset;
+      float spreadFactor;
     };
 
     // Radial push/pull functor
@@ -285,6 +291,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
           func.velScale = vparams[2];
         if (vparams.GetSize () >= 4)
           func.velOffset = vparams[3];
+        if (fparams.GetSize () >= 1)
+          func.spreadFactor = fparams[0];
 
         StepParticles (func, particleBuffer, dt, totalTime);
       }

@@ -1,0 +1,129 @@
+<!--
+  Copyright (C) 2007 by Frank Richter
+	    (C) 2007 by Jorrit Tyberghein
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<snippet>
+  <technique priority="100">
+    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    
+    <input name="primaryColor" type="rgb" default="complex">
+      <block location="pass">
+	<?if !vars."tex lightmap".texture?>
+	  <buffer source="primary color" destination="vertexIn.primaryColor" />
+	<?endif?>
+      </block>
+      
+      <block location="cg:vertexIn">
+	<?if !vars."tex lightmap".texture?>
+	<varying type="rgb" name="primaryColor" />
+	<?endif?>
+      </block>
+      
+      <block location="cg:vertexToFragment">
+	<?if !vars."tex lightmap".texture?>
+	float3 primaryColor : COLOR;
+	<?endif?>
+      </block>
+      
+      <block location="cg:vertexMain">
+	<?if !vars."tex lightmap".texture?>
+	vertexToFragment.primaryColor = vertexIn.primaryColor;
+	<?endif?>
+      </block>
+      
+      <block location="cg:fragmentMain">
+	<?if !vars."tex lightmap".texture?>
+	primaryColor = vertexToFragment.primaryColor;
+	<?endif?>
+      </block>
+    </input>
+    
+    <input name="ambient" type="rgb" default="complex">
+      <block location="cg:variablemap">
+	<variablemap variable="dynamic ambient" destination="fragmentIn.lightingAmbient" />
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<uniform type="rgb" name="lightingAmbient" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	ambient = fragmentIn.lightingAmbient;
+      </block>
+    </input>
+    
+    <input name="texCoordLM" type="texcoord2" default="complex">
+      <block location="pass">
+        <?if vars."tex lightmap".texture?>
+	 <buffer source="texture coordinate lightmap" 
+	   destination="vertexIn.texcoordLM" />
+        <?endif?>
+      </block>
+      
+      <block location="cg:vertexToFragment">
+	<?if vars."tex lightmap".texture?>
+	float2 texcoordLM;
+	<?endif?>
+      </block>
+      
+      <block location="cg:vertexIn">
+	<varying type="texcoord2" name="texcoordLM" />
+      </block>
+      
+      <block location="cg:vertexMain">
+	<?if vars."tex lightmap".texture?>
+	vertexToFragment.texcoordLM = vertexIn.texcoordLM;
+	<?endif?>
+      </block>
+      
+      <block location="cg:fragmentMain">
+	<?if vars."tex lightmap".texture?>
+	texCoordLM = vertexToFragment.texcoordLM;
+	<?endif?>
+      </block>
+    </input>
+    
+    <input name="lightmap" type="tex2d" default="complex">
+      <block location="pass">
+	<?if vars."tex lightmap".texture?>
+	  <texture name="tex lightmap" destination="fragmentIn.lightmap" />
+	<?endif?>
+      </block>
+      
+      <block location="cg:fragmentIn">
+	<uniform type="tex2d" name="lightmap" />
+      </block>
+      
+      <block location="cg:fragmentMain">
+	lightmap = fragmentIn.lightmap;
+      </block>
+    </input>
+      
+    <block location="cg:fragmentMain">
+      <?if vars."tex lightmap".texture ?>
+	float3 illum_ambient = ambient;
+	float3 illum_diffuse = 2 * tex2D (lightmap, texCoordLM).rgb;
+      <?else?>
+	float3 illum_ambient = float3 (0, 0, 0);
+	float3 illum_diffuse = vertexToFragment.primaryColor.rgb;
+      <?endif?>
+      illumination = illum_ambient + illum_diffuse;
+    </block>
+    
+    <output name="illumination" type="rgb" />
+  </technique>
+</snippet>

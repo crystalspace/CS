@@ -151,7 +151,7 @@ public:
 
   /// Multiply a vector and a scalar.
   inline friend csVector4T operator* (float f, const csVector4T& v)
-  { return csVector4(v.x*f, v.y*f, v.z*f, v.w*f); }
+  { return csVector4T(v.x*f, v.y*f, v.z*f, v.w*f); }
 
   /// Multiply a vector and a scalar int.
   inline friend csVector4T operator* (const csVector4T& v, int f)

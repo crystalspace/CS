@@ -63,7 +63,7 @@ protected:
    * this is an internal state only. No operation should fail due
    * undefined image data (although the data may stay undefined).
    */
-  void* Image;
+  csRef<csDataBuffer> databuf;
   /// The image palette or 0
   csRGBpixel *Palette;
   /// The alpha map
@@ -180,6 +180,8 @@ public:
   virtual int GetHeight () const { return Height; }
   virtual int GetDepth () const { return Depth; }
 
+  virtual const char* GetRawFormat() const { return "b8g8r8a8"; }
+  virtual csRef<iDataBuffer> GetRawData() const { return databuf; }
   virtual int GetFormat () const { return Format; }
   virtual const csRGBpixel* GetPalette () { return GetPalettePtr(); }
   virtual const uint8* GetAlpha () { return GetAlphaPtr(); }
@@ -224,14 +226,14 @@ public:
 
   virtual uint HasMipmaps () const 
   { 
-    size_t num = mipmaps.Length();
+    size_t num = mipmaps.GetSize ();
     while ((num > 0) && (mipmaps[num-1] == 0)) num--;
     return (uint)num; 
   }
   virtual csRef<iImage> GetMipmap (uint num) 
   { 
     if (num == 0) return this;
-    if (num <= mipmaps.Length()) return mipmaps[num-1];
+    if (num <= mipmaps.GetSize ()) return mipmaps[num-1];
     return 0; 
   }
   /**

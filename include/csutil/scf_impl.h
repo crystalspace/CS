@@ -118,6 +118,13 @@
 #define SCF_IMPL_CAT_I(a, b) SCF_IMPL_CAT_II(a ## b)
 #define SCF_IMPL_CAT_II(res) res
 
+/* The deprecation turn-off may seem odd here - but MSVC emits
+ * deprecation warnings when using the destructor of a deprecated
+ * class. Since interfaces may be deprecated this may cause 
+ * deprecation warnings emitted in ~SCF_IMPL_NAME, which is kinda silly.
+ */
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 template<class Class SCF_IMPL_TYPES>
 class CS_CRYSTALSPACE_EXPORT SCF_IMPL_NAME :
   public SCF_IMPL_SUPER
@@ -342,6 +349,8 @@ private:
 #endif
   }
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #undef SCF_IMPL_NAME
 #undef SCF_IMPL_SUPER

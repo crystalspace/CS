@@ -43,6 +43,13 @@ namespace genmeshify
     region->DeleteAll();
   }
 
+  static bool IsVfsDir (iVFS* vfs, const char* path)
+  {
+    if (!vfs->Exists (path)) return false;
+    csRef<iFile> probe = vfs->Open (path, VFS_FILE_READ);
+    return !probe.IsValid();
+  }
+
   csRef<iFile> Processor::OpenPath (App* app, const char* path, 
                                     csString& fileNameToOpen)
   {
@@ -61,8 +68,10 @@ namespace genmeshify
       fileNameToOpen = base;
       dirSet = app->vfs->ChDirAuto (dir, &paths, 0, base);
     }
-    if (!dirSet)
+    bool isDir = IsVfsDir (app->vfs, fileNameToOpen);
+    if (!dirSet || fileNameToOpen.IsEmpty() || isDir)
     {
+      if (isDir) app->vfs->ChDir (fileNameToOpen);
       fileNameToOpen = "world";
       dirSet = app->vfs->ChDirAuto (filename, &paths, 0, "world");
     }
@@ -282,8 +291,25 @@ namespace genmeshify
               CloneNode (child, child_clone);
               if (!shallow)
               {
-                csRef<iDataBuffer> fullPath = app->vfs->ExpandPath (
-                  child->GetContentsValue ());
+                csRef<iDataBuffer> fullPath;
+                const char* file = child->GetAttributeValue ("file");
+                if (file)
+                {
+                  csVfsDirectoryChanger changer (app->vfs);
+                  const char* path = child->GetAttributeValue ("path");
+
+                  if (path)
+                  {
+                    changer.PushDir ();
+                    app->vfs->ChDir (path);
+                  }
+                  fullPath = app->vfs->ExpandPath (file);
+                }
+                else
+                {
+                  fullPath = app->vfs->ExpandPath (
+                    child->GetContentsValue ());
+                }
                 if (fullPath.IsValid())
                   if (!Process (fullPath->GetData(), shallow, true)) return false;
               }

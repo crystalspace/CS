@@ -203,22 +203,46 @@ inline csPtr<Interface> csQueryRegistryTagInterface (
   return csPtr<Interface> (x);
 }  
 
+inline CS_DEPRECATED_METHOD_MSG ("CS_QUERY_REGISTRY_TAG macro is deprecated")
+csPtr<iBase> CS_QUERY_REGISTRY_TAG_is_deprecated (iObjectRegistry *Reg, 
+  const char* Tag)
+{
+  return csQueryRegistryTag(Reg, Tag);
+}
 /**
  * \deprecated Compatibility macro
  * \sa csQueryRegistryTag
  */
-#define CS_QUERY_REGISTRY_TAG(Reg, Tag) (csQueryRegistryTag(Reg, Tag))
+#define CS_QUERY_REGISTRY_TAG(Reg, Tag) \
+  (CS_QUERY_REGISTRY_TAG_is_deprecated (Reg, Tag))
+
+template<class Interface>
+inline CS_DEPRECATED_METHOD_MSG ("CS_QUERY_REGISTRY macro is deprecated")
+csPtr<Interface> CS_QUERY_REGISTRY_is_deprecated (iObjectRegistry *Reg)
+{
+  return csQueryRegistry<Interface> (Reg);
+}
 /**
  * \deprecated Compatibility macro
  * \sa csQueryRegistry
  */
-#define CS_QUERY_REGISTRY(Reg,Interface) (csQueryRegistry<Interface>(Reg))
+#define CS_QUERY_REGISTRY(Reg,Interface) \
+  (CS_QUERY_REGISTRY_is_deprecated<Interface> (Reg))
+
+template<class Interface>
+inline CS_DEPRECATED_METHOD_MSG (
+  "CS_QUERY_REGISTRY_TAG_INTERFACE macro is deprecated")
+csPtr<Interface> CS_QUERY_REGISTRY_TAG_INTERFACE_is_deprecated (
+  iObjectRegistry *Reg, const char* Tag)
+{
+  return csQueryRegistryTagInterface<Interface>(Reg, Tag);
+}
 /**
  * \deprecated Compatibility macro
  * \sa csQueryRegistryTagInterface
  */
 #define CS_QUERY_REGISTRY_TAG_INTERFACE(Reg, Tag, Interface) \
-  (csQueryRegistryTagInterface<Interface>(Reg, Tag))
+  (CS_QUERY_REGISTRY_TAG_INTERFACE_is_deprecated<Interface>(Reg, Tag))
 
 #endif // __CS_IUTIL_OBJREG_H__
 

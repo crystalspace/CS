@@ -65,7 +65,7 @@ void csShaderGLAVP::SetupState (const csRenderMesh* /*mesh*/,
   csRef<csShaderVariable> var;
 
   // set variables
-  for(i = 0; i < variablemap.Length(); ++i)
+  for(i = 0; i < variablemap.GetSize (); ++i)
   {
     VariableMapEntry& mapping = variablemap[i];
 
@@ -82,7 +82,6 @@ void csShaderGLAVP::SetupState (const csRenderMesh* /*mesh*/,
     case csShaderVariable::INT:
     case csShaderVariable::FLOAT:
     case csShaderVariable::VECTOR2:
-    case csShaderVariable::COLOR:
     case csShaderVariable::VECTOR3:
     case csShaderVariable::VECTOR4:
       {
@@ -139,7 +138,6 @@ void csShaderGLAVP::SetupState (const csRenderMesh* /*mesh*/,
         case csShaderVariable::INT:
         case csShaderVariable::FLOAT:
         case csShaderVariable::VECTOR2:
-        case csShaderVariable::COLOR:
         case csShaderVariable::VECTOR3:
         case csShaderVariable::VECTOR4:
           {
@@ -309,8 +307,8 @@ bool csShaderGLAVP::Load (iShaderDestinationResolver*, iDocumentNode* program)
   if(!program)
     return false;
 
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    shaderPlug->object_reg, "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+    shaderPlug->object_reg, "crystalspace.shared.stringset");
 
   csRef<iDocumentNode> variablesnode = program->GetNode("arbvp");
   if (variablesnode)
@@ -334,7 +332,7 @@ bool csShaderGLAVP::Load (iShaderDestinationResolver*, const char* program,
   programBuffer.AttachNew (new csDataBuffer (csStrNew (program),
     strlen (program)));
 
-  for (size_t i = 0; i < mappings.Length(); i++)
+  for (size_t i = 0; i < mappings.GetSize (); i++)
   {
     variablemap.Push (VariableMapEntry (mappings[i]));
   }
@@ -346,7 +344,7 @@ bool csShaderGLAVP::Compile()
 {
   shaderPlug->Open ();
 
-  for (size_t i = 0; i < variablemap.Length ();)
+  for (size_t i = 0; i < variablemap.GetSize ();)
   {
     int dest;
     if (sscanf (variablemap[i].destination, "register %d", &dest) != 1)

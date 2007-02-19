@@ -19,10 +19,13 @@
 #ifndef __CS_CSUTIL_THREADING_PTHREAD_CONDITION_H__
 #define __CS_CSUTIL_THREADING_PTHREAD_CONDITION_H__
 
+#ifndef DOXYGEN_RUN
 
 #include "csutil/threading/atomicops.h"
 #include "csutil/threading/mutex.h"
 #include "csutil/noncopyable.h"
+
+#include <sys/time.h>
 
 namespace CS
 {
@@ -50,9 +53,29 @@ namespace Implementation
     }
 
     template<typename LockType>
-    void Wait (LockType& lock)
+    bool Wait (LockType& lock, csTicks timeout)
     {
-      pthread_cond_wait (&condition, &lock.mutex);
+      if (timeout > 0)
+      {
+        long const nsec_per_sec = 1000 * 1000 * 1000;
+        struct timeval now;
+        struct timespec to;
+        gettimeofday (&now, 0);
+        to.tv_sec = now.tv_sec + (timeout / 1000);
+        to.tv_nsec = (now.tv_usec + (timeout % 1000) * 1000) * 1000;
+        if (to.tv_nsec >= nsec_per_sec) // Catch overflow.
+        {
+          to.tv_sec += to.tv_nsec / nsec_per_sec;
+          to.tv_nsec %= nsec_per_sec;
+        }
+        return pthread_cond_timedwait (&condition, &lock.mutex, &to) 
+	  == 0;
+      }
+      else
+      {
+        pthread_cond_wait (&condition, &lock.mutex);
+	return true;
+      }      
     }
 
 
@@ -64,4 +87,6 @@ namespace Implementation
 }
 }
 
-#endif
+#endif // DOXYGEN_RUN
+
+#endif // __CS_CSUTIL_THREADING_PTHREAD_CONDITION_H__

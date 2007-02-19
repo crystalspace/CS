@@ -49,9 +49,9 @@ bool csSoftwareGraphics3D::Initialize (iObjectRegistry *object_reg)
 {
   csSoftwareGraphics3DCommon::Initialize(object_reg);
   csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
-  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser));
+  	csQueryRegistry<iPluginManager> (object_reg));
+  csRef<iCommandLineParser> cmdline (
+  	csQueryRegistry<iCommandLineParser> (object_reg));
 
   NewInitialize ();
   const char *driver = cmdline->GetOption ("canvas");

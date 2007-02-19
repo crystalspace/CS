@@ -72,7 +72,7 @@ bool awsPrefManager::Setup (iObjectRegistry *obj_reg)
   if (DEBUG_INIT) csPrintf ("aws-debug: initializing AWS Texture Manager\n");
   if (DEBUG_INIT) csPrintf ("aws-debug: creating texture manager.\n");
 
-  g2d = CS_QUERY_REGISTRY (obj_reg, iGraphics2D);
+  g2d = csQueryRegistry<iGraphics2D> (obj_reg);
   if (!g2d)
   {
     csPrintf ("aws-debug: Couldn't find iGraphics2D plugin!!\n");
@@ -273,8 +273,8 @@ bool awsPrefManager::Load (const char *def_file)
     return false;
   }
 
-  size_t ncw = win_defs.Length();
-  size_t ncs = skin_defs.Length();
+  size_t ncw = win_defs.GetSize ();
+  size_t ncs = skin_defs.GetSize ();
 
   if (awsparse (wmgr))
   {
@@ -284,8 +284,8 @@ bool awsPrefManager::Load (const char *def_file)
 
   csPrintf (
     "\tload successful (%zu windows, %zu skins loaded.)\n",
-    win_defs.Length() - ncw,
-    skin_defs.Length() - ncs);
+    win_defs.GetSize () - ncw,
+    skin_defs.GetSize () - ncs);
 
   return true;
 }
@@ -294,7 +294,7 @@ bool awsPrefManager::SelectDefaultSkin (const char* skin_name)
 {
   unsigned long id = NameToId (skin_name);
 
-  for (size_t i = 0; i < skin_defs.Length(); i++)
+  for (size_t i = 0; i < skin_defs.GetSize (); i++)
   {
     if (skin_defs[i]->Name () == id)
     {
@@ -311,7 +311,7 @@ bool awsPrefManager::SelectDefaultSkin (const char* skin_name)
 
         if (k->Type () == KEY_STR)
         {
-          csRef<iAwsStringKey> sk (SCF_QUERY_INTERFACE(k, iAwsStringKey));
+          csRef<iAwsStringKey> sk (scfQueryInterface<iAwsStringKey> (k));
 
           if (awstxtmgr)
             (void)awstxtmgr->GetTexturebyID (
@@ -341,7 +341,7 @@ bool awsPrefManager::LookupIntKey (unsigned long id, int &val)
   {
     if (k->Type () == KEY_INT)
     {
-      csRef<iAwsIntKey> intKey (SCF_QUERY_INTERFACE(k, iAwsIntKey));
+      csRef<iAwsIntKey> intKey (scfQueryInterface<iAwsIntKey> (k));
       val = intKey->Value ();
       return true;
     }
@@ -363,7 +363,7 @@ bool awsPrefManager::LookupFloatKey (unsigned long id, float &val)
   {
     if (k->Type () == KEY_FLOAT)
     {
-      csRef<iAwsFloatKey> floatKey (SCF_QUERY_INTERFACE(k, iAwsFloatKey));
+      csRef<iAwsFloatKey> floatKey (scfQueryInterface<iAwsFloatKey> (k));
       val = floatKey->Value ();
       return true;
     }
@@ -386,7 +386,7 @@ bool awsPrefManager::LookupStringKey (unsigned long id, iString * &val)
   {
     if (k->Type () == KEY_STR)
     {
-      csRef<iAwsStringKey> stringKey (SCF_QUERY_INTERFACE(k, iAwsStringKey));
+      csRef<iAwsStringKey> stringKey (scfQueryInterface<iAwsStringKey> (k));
       val = stringKey->Value ();
       return true;
     }
@@ -408,7 +408,7 @@ bool awsPrefManager::LookupRectKey (unsigned long id, csRect &val)
   {
     if (k->Type () == KEY_RECT)
     {
-      csRef<iAwsRectKey> rectKey (SCF_QUERY_INTERFACE(k, iAwsRectKey));
+      csRef<iAwsRectKey> rectKey (scfQueryInterface<iAwsRectKey> (k));
       val = rectKey->Value ();
       return true;
     }
@@ -439,7 +439,7 @@ bool awsPrefManager::LookupRGBKey (
     if (k->Type () == KEY_RGB)
     {
       iAwsRGBKey::RGB rgb;
-      csRef<iAwsRGBKey> rgbKey (SCF_QUERY_INTERFACE(k, iAwsRGBKey));
+      csRef<iAwsRGBKey> rgbKey (scfQueryInterface<iAwsRGBKey> (k));
       rgb = rgbKey->Value ();
 
       red = rgb.red;
@@ -466,7 +466,7 @@ bool awsPrefManager::LookupPointKey (unsigned long id, csVector2 &val)
   {
     if (k->Type () == KEY_POINT)
     {
-      csRef<iAwsPointKey> pointKey (SCF_QUERY_INTERFACE(k, iAwsPointKey));
+      csRef<iAwsPointKey> pointKey (scfQueryInterface<iAwsPointKey> (k));
       val = pointKey->Value ();
       return true;
     }
@@ -486,7 +486,7 @@ bool awsPrefManager::GetInt (iAwsComponentNode *node, const char *name,
   {
     if (k->Type () == KEY_INT)
     {
-      csRef<iAwsIntKey> ik (SCF_QUERY_INTERFACE(k, iAwsIntKey));
+      csRef<iAwsIntKey> ik (scfQueryInterface<iAwsIntKey> (k));
       val = ik->Value ();
       return true;
     }
@@ -506,7 +506,7 @@ bool awsPrefManager::GetFloat (iAwsComponentNode *node, const char *name,
   {
     if (k->Type () == KEY_FLOAT)
     {
-      csRef<iAwsFloatKey> fk (SCF_QUERY_INTERFACE(k, iAwsFloatKey));
+      csRef<iAwsFloatKey> fk (scfQueryInterface<iAwsFloatKey> (k));
       val = fk->Value ();
       return true;
     }
@@ -527,7 +527,7 @@ bool awsPrefManager::GetRGB (iAwsComponentNode *node, const char *name,
     if (k->Type () == KEY_RGB)
     {
       iAwsRGBKey::RGB rgb;
-      csRef<iAwsRGBKey> rgbKey (SCF_QUERY_INTERFACE(k, iAwsRGBKey));
+      csRef<iAwsRGBKey> rgbKey (scfQueryInterface<iAwsRGBKey> (k));
       rgb = rgbKey->Value ();
 
       red = rgb.red;
@@ -558,7 +558,7 @@ bool awsPrefManager::GetRect (iAwsComponentNode *node, const char *name,
   {
     if (k->Type () == KEY_RECT)
     {
-      csRef<iAwsRectKey> rectKey (SCF_QUERY_INTERFACE(k, iAwsRectKey));
+      csRef<iAwsRectKey> rectKey (scfQueryInterface<iAwsRectKey> (k));
       val = rectKey->Value ();
       return true;
     }
@@ -579,7 +579,7 @@ awsPrefManager::GetString (iAwsComponentNode *node,  const char *name, iString* 
   {
     if (k->Type () == KEY_STR)
     {
-      csRef<iAwsStringKey> stringKey (SCF_QUERY_INTERFACE(k, iAwsStringKey));
+      csRef<iAwsStringKey> stringKey (scfQueryInterface<iAwsStringKey> (k));
       val->Replace (stringKey->Value());
       return true;
     }
@@ -593,7 +593,7 @@ iAwsComponentNode *awsPrefManager::FindWindowDef (const char *name)
 {
   unsigned long id = NameToId (name);
 
-  for (size_t i = 0; i < win_defs.Length(); i++)
+  for (size_t i = 0; i < win_defs.GetSize (); i++)
     if (win_defs[i]->Name () == id)
       return win_defs[i];
 
@@ -604,7 +604,7 @@ iAwsKeyContainer *awsPrefManager::FindSkinDef (const char *name)
 {
   unsigned long id = NameToId (name);
 
-  for (size_t i = 0; i < skin_defs.Length(); i++)
+  for (size_t i = 0; i < skin_defs.GetSize (); i++)
     if (skin_defs[i]->Name () == id)
       return skin_defs[i];
 
@@ -626,7 +626,7 @@ int awsPrefManager::GetConstantValue (const char *name)
   unsigned int namev = NameToId (name);
 
   size_t i;
-  for (i = 0; i < constants.Length (); ++i)
+  for (i = 0; i < constants.GetSize (); ++i)
   {
     constant_entry *c = constants.Get (i);
 
@@ -641,7 +641,7 @@ bool awsPrefManager::ConstantExists (const char *name)
   unsigned int namev = NameToId (name);
 
   size_t i;
-  for (i = 0; i < constants.Length (); ++i)
+  for (i = 0; i < constants.GetSize (); ++i)
   {
     constant_entry *c = constants.Get (i);
 

@@ -67,7 +67,7 @@ csEventTimer::csEventTimer (iObjectRegistry* object_reg) :
   object_reg (object_reg),
   FinalProcess (csevFinalProcess (object_reg))
 {
-  csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
   CS_ASSERT (q != 0);
   if (q != 0)
   {
@@ -80,7 +80,7 @@ csEventTimer::csEventTimer (iObjectRegistry* object_reg) :
   {
     handler = 0;
   }
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
   CS_ASSERT (vc != 0);
 
   minimum_time = 2000000000;
@@ -95,7 +95,7 @@ csEventTimer::~csEventTimer ()
     // the object registry is already being destructed. No idea how I
     // should solve this...
     // @@@@@
-    //csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    //csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
     //if (q != 0)
       //q->RemoveListener (handler);
   }
@@ -117,7 +117,7 @@ bool csEventTimer::HandleEvent (iEvent& event)
 
   minimum_time = 2000000000;
   size_t i;
-  for (i = timerevents.Length() ; i > 0 ; i--)
+  for (i = timerevents.GetSize () ; i > 0 ; i--)
   {
     const size_t idx = i - 1;
     timerevent& te = timerevents[idx];
@@ -153,7 +153,7 @@ csTicks csEventTimer::GetTimeLeft (size_t idx) const
 size_t csEventTimer::FindTimerEvent (iTimerEvent* ev)
 {
   size_t i;
-  for (i = 0 ; i < timerevents.Length () ; i++)
+  for (i = 0 ; i < timerevents.GetSize () ; i++)
   {
     if (timerevents[i].event == ev)
       return i;
@@ -194,8 +194,8 @@ void csEventTimer::RemoveAllTimerEvents ()
 
 csPtr<iEventTimer> csEventTimer::GetStandardTimer (iObjectRegistry* object_reg)
 {
-  csRef<iEventTimer> timer = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
-  	"crystalspace.timer.standard", iEventTimer);
+  csRef<iEventTimer> timer = csQueryRegistryTagInterface<iEventTimer>
+  	(object_reg, "crystalspace.timer.standard");
   if (!timer)
   {
     timer = csPtr<iEventTimer> (new csEventTimer (object_reg));

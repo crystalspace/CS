@@ -640,10 +640,10 @@ public:
   /// Get the maximum Z value of the box
   inline float MaxZ () const { return maxbox.z; }
   /// Get Min component for 0 (x), 1 (y), or 2 (z).
-  inline float Min (int idx) const
+  inline float Min (size_t idx) const
   { return minbox[idx]; }
   /// Get Max component for 0 (x), 1 (y), or 2 (z).
-  inline float Max (int idx) const
+  inline float Max (size_t idx) const
   { return maxbox[idx]; }
   /// Get the 3d vector of minimum (x, y, z) values
   inline const csVector3& Min () const { return minbox; }
@@ -970,19 +970,27 @@ public:
   }
 
   /// Set Min component for 0 (x), 1 (y), or 2 (z).
-  inline void SetMin (int idx, float val)
+  inline void SetMin (size_t idx, float val)
   {
-    if (idx == 1) minbox.y = val;
-    else if (idx == 0) minbox.x = val;
-    else minbox.z = val;
+    minbox[idx] = val;
   }
 
   /// Set Max component for 0 (x), 1 (y), or 2 (z).
-  inline void SetMax (int idx, float val)
+  inline void SetMax (size_t idx, float val)
   {
-    if (idx == 1) maxbox.y = val;
-    else if (idx == 0) maxbox.x = val;
-    else maxbox.z = val;
+    maxbox[idx] = val;
+  }
+
+  /// Get Min component for 0 (x), 1 (y), or 2 (z).
+  inline float GetMin (size_t idx)
+  {
+    return minbox[idx];
+  }
+
+  /// Get Max component for 0 (x), 1 (y), or 2 (z).
+  inline float GetMax (size_t idx)
+  {
+    return maxbox[idx];
   }
 
   /**

@@ -38,6 +38,7 @@ CS_PROG_CC
 CS_PROG_CXX
 CS_PROG_LINK
 
+AC_PROG_CPP
 AC_PROG_CXXCPP
 CS_EMIT_BUILD_PROPERTY([CMD.C++CPP], [$CXXCPP])
 
@@ -74,6 +75,11 @@ AS_IF([test -n "$SWIG"],
     [CS_CHECK_PROG_VERSION([swig], [$SWIG -version 2>&1], [1.3.21],
 	[9.9|.9], [CS_EMIT_BUILD_PROPERTY([CMD.SWIG], [$SWIG])])])
 
+CS_CHECK_PROGS([RSVG], [rsvg])
+CS_EMIT_BUILD_PROPERTY([CMD.RSVG], [$RSVG])
+
+CS_CHECK_PROGS([CONVERT], [convert])
+CS_EMIT_BUILD_PROPERTY([CMD.CONVERT], [$CONVERT])
 
 
 #------------------------------------------------------------------------------
@@ -137,6 +143,7 @@ CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [$LDFLAGS], [+])
 AC_LANG_PUSH([C++])
 AC_CHECK_HEADERS([cmath], [CS_HEADER_PROPERTY([CS_HAVE_CMATH_H])])
 AC_CHECK_HEADERS([math.h], [CS_HEADER_PROPERTY([CS_HAVE_MATH_H])])
+AC_CHECK_HEADERS([ieeefp.h], [CS_HEADER_PROPERTY([CS_HAVE_IEEEFP_H])])
 AC_LANG_POP([C++])
 
 CS_CHECK_COMMON_LIBS
@@ -157,7 +164,7 @@ AS_IF([test $ac_cv_lib_m_cosf != no || test $ac_cv_lib_mx_cosf != no],
 
 #------------------------------------------------------------------------------
 # Check for pthread.  Also check if pthread implementation supports the
-# recursive mutex extension.
+# recursive mutex extension and `atfork' functionality.
 #------------------------------------------------------------------------------
 CS_CHECK_PTHREAD([cygwin*])
 CS_EMIT_BUILD_RESULT([cs_cv_sys_pthread], [PTHREAD])
@@ -376,21 +383,17 @@ AS_IF([test "$with_java" != no && test -n "$JAVAC" && test -n "$JAVA"],
     [CS_JAVA_FLAGS([cs_java], [$JAVAC])
     CS_CHECK_BUILD([if Java2 SDK is usable], [cs_cv_java],
 	[AC_LANG_PROGRAM(
-	    [[
-	    #if defined(__GNUC__)
-	        typedef long long __int64; /*For gcc on Windows */
+	    [[#if defined(__GNUC__)
+	    typedef long long __int64; /* For GCC on Windows */
 	    #endif
-
-	    /* fix for 'jlong' on x86_64 */
+	    /* Fix for 'jlong' on x86_64. */
 	    #if defined(__x86_64)
 	    #ifdef _LP64 /* 64-bit Solaris */
 	    #undef _LP64
 	    #endif
 	    #endif
-
 	    #include <jni.h>
-
-	    JNIEXPORT void JNICALL f(JNIEnv *env, jobject obj);]])],
+	    JNIEXPORT void JNICALL f(JNIEnv* env, jobject obj);]])],
 	[CS_CREATE_TUPLE() \
         CS_CREATE_TUPLE([$cs_java_cflags],[$cs_java_lflags],[$cs_java_libs])],
 	[], [CS_EMIT_BUILD_RESULT([cs_cv_java], [JAVA])])])
@@ -586,20 +589,6 @@ CS_EMIT_BUILD_FLAGS([how to export all dynamic symbols],
 
 
 #------------------------------------------------------------------------------
-# Check whether the linker needs -Bsymbolic. This binds "references to global 
-# symbols to the definition within the shared library" (from man ld). If this
-# flag is not set, it can happen that symbols in plugins get bound against
-# symbols from other modules (including the application executable itself),
-# causing side-effects such as violating the "memory allocation and freeing in
-# the same module" rule.
-#------------------------------------------------------------------------------
-CS_EMIT_BUILD_FLAGS([for -Bsymbolic linker flag],
-    [cs_cv_prog_link_Bsymbolic], [CS_CREATE_TUPLE([-Wl,-Bsymbolic])],
-    [C++], [COMPILER.LFLAGS], [+])
-
-
-
-#------------------------------------------------------------------------------
 # Check if linker recognizes --kill-at which is needed to make csjava.dll
 # usable by JNI on Windows.  Without this, JNI is unable to find the exported
 # JNI glue functions in csjava.dll.
@@ -785,9 +774,11 @@ AS_IF([test $enable_cpu_specific_optimizations != no],
     [AC_CACHE_CHECK([for code generation flags], [cs_cv_prog_cxx_code_gen],
 	[cs_cv_prog_cxx_code_gen=no
 	AS_IF([test $enable_cpu_specific_optimizations = maximum],
-	    [CS_CHECK_CODE_GEN_FLAG([athlon], [-march=athlon])
+	    [CS_CHECK_CODE_GEN_FLAG([athlon], [-march=athlon -mtune=generic])
+	    CS_CHECK_CODE_GEN_FLAG([athlon], [-march=athlon])
 	    CS_CHECK_CODE_GEN_FLAG([athlon], [-mcpu=athlon -march=athlon])
 	    CS_CHECK_CODE_GEN_FLAG([athlon], [-mcpu=athlon])
+	    CS_CHECK_CODE_GEN_FLAG([*686], [-march=i686 -mtune=generic])
 	    CS_CHECK_CODE_GEN_FLAG([*686], [-march=i686])
 	    CS_CHECK_CODE_GEN_FLAG([*686], [-mcpu=pentiumpro -march=i686])
 	    CS_CHECK_CODE_GEN_FLAG([*686], [-mcpu=pentiumpro])
@@ -804,6 +795,7 @@ AS_IF([test $enable_cpu_specific_optimizations != no],
 	    CS_CHECK_CODE_GEN_FLAG([[*[3-9]86]], [-march=i686])])
 	CS_CHECK_CODE_GEN_FLAG([x86_64], [-march=k8])
 	CS_CHECK_CODE_GEN_FLAG([x86_64], [-mtune=k8])
+	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-march=i586 -mtune=generic])
 	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-march=i586])
 	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-mcpu=pentium -march=i586])
 	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-mcpu=pentium])
@@ -818,15 +810,6 @@ AS_IF([test $enable_cpu_specific_optimizations != no],
     AS_IF([test "$cs_cv_prog_cxx_code_gen" != no],
 	[CS_EMIT_BUILD_PROPERTY(
 	    [COMPILER.CFLAGS], [$cs_cv_prog_cxx_code_gen], [+])])])
-
-
-
-#------------------------------------------------------------------------------
-# Check if byteswap.h is available, which contains optimized byte swapping
-# functiosn (used for endian conversion).
-#------------------------------------------------------------------------------
-AC_CHECK_HEADERS([byteswap.h],
-    [CS_HEADER_PROPERTY([CS_HAVE_BYTESWAP_H])])
 
 
 
@@ -863,6 +846,41 @@ CS_CHECK_OPTIMIZE_FLAGS
 
 
 #------------------------------------------------------------------------------
+# Determine build mode; either "optimize", "debug", or "profile".
+#------------------------------------------------------------------------------
+AC_ARG_ENABLE([optimize], [AC_HELP_STRING([--enable-optimize],
+    [build with optimizations enabled (default YES);
+	same as --enable-mode=optimize])],
+    [test "$enableval" = "yes" && cs_build_mode=optimize])
+
+AC_ARG_ENABLE([debug], [AC_HELP_STRING([--enable-debug],
+    [build with debugging information (default NO);
+	same as --enable-mode=debug])],
+    [test "$enableval" = "yes" && cs_build_mode=debug])
+
+AC_ARG_ENABLE([profile], [AC_HELP_STRING([--enable-profile],
+    [build with profiling information (default NO);
+	same as --enable-mode=profile])],
+    [test "$enableval" = "yes" && cs_build_mode=profile])
+
+AC_ARG_ENABLE([mode], [AC_HELP_STRING([--enable-mode=mode],
+    [set build mode; recognized modes are `optimize', `debug', `profile'
+	(default OPTIMIZE)])],
+    [case $enableval in
+	optimize|debug|profile) cs_build_mode=$enableval ;;
+	*) CS_MSG_ERROR([m4_text_wrap(
+	    [unrecognized mode --enable-mode=$enableval;
+	    use `optimize', `debug', or `profile'], [    ], [[]], [60])]) ;;
+    esac])
+
+AC_MSG_CHECKING([build mode])
+AS_VAR_SET_IF([cs_build_mode], [], [cs_build_mode=optimize])
+AC_MSG_RESULT([$cs_build_mode])
+CS_EMIT_BUILD_PROPERTY([MODE], [$cs_build_mode])
+
+
+
+#------------------------------------------------------------------------------
 # Check for compiler debug flags.
 #------------------------------------------------------------------------------
 CS_CHECK_BINUTILS_2_17
@@ -871,14 +889,18 @@ AC_MSG_CHECKING([whether to split debug information])
 AC_ARG_ENABLE([separate-debug-info], 
     [AC_HELP_STRING([--enable-separate-debug-info],
         [split debug information into separate files. (default YES if 
-        binutils >= 2.17, otherwise default NO)])])
+        binutils >= 2.17 and build mode not 'profile', 
+	otherwise default NO)])])
 AS_IF([test -z "$enable_separate_debug_info"], 
-    AS_IF([test -z `uname | grep -i CYGWIN`],
-        [enable_separate_debug_info=$cs_cv_binutils_2_17],
-        [enable_separate_debug_info=$cs_cv_binutils_true_2_17]))
+    [AS_IF([test "$cs_build_mode$" = "profile"],
+	[enable_separate_debug_info=no],
+	[AS_IF([test -z `uname | grep -i CYGWIN`],
+	    [enable_separate_debug_info=$cs_cv_binutils_2_17],
+	    [enable_separate_debug_info=$cs_cv_binutils_true_2_17])])])
 AC_MSG_RESULT([$enable_separate_debug_info])
 
-CS_EMIT_BUILD_PROPERTY([LINK.DEBUG.INFO.SEPARATE], [$enable_separate_debug_info])
+CS_EMIT_BUILD_PROPERTY([LINK.DEBUG.INFO.SEPARATE],
+    [$enable_separate_debug_info])
 
 CS_EMIT_BUILD_FLAGS([how to enable debug mode debugging symbols],
     [cs_cv_prog_cxx_debug_symbols_extra],
@@ -960,8 +982,9 @@ CS_CHECK_VA_COPY([__va_copy])
 
 
 #------------------------------------------------------------------------------
-# Check for X-Windows.  If the X-Windows implementation is XFree86, then also
-# enable the `VideoMode' extension.
+# Check for X-Windows and several extensions. This check can identify both
+# new-style modular X.Org installations and old-style monolithic installations,
+# such as XFree86.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_X_CHECK_PREPARE],
     [AC_REQUIRE([AC_CANONICAL_HOST])
@@ -984,8 +1007,38 @@ AC_DEFUN([CS_X_CHECK_PREPARE],
     AS_IF([test x$cs_host_macosx = xyes], [with_x=no])])
 
 CS_X_CHECK_PREPARE
-AC_PATH_X
-AC_PATH_XTRA
+
+# Compatiblity: use --with-x param for individual X lib checks
+AS_IF([test -z "$with_x11"], [with_x11=$with_x])
+
+# Newer X.org versions ship with pkgconfig packages, which will be consulted
+# by CS_CHECK_LIB_WITH().
+CS_CHECK_LIB_WITH([x11],
+    [AC_LANG_PROGRAM(
+	[[#include <X11/Xlib.h>]],
+	[XOpenDisplay (0)])])
+AS_IF([test $cs_cv_libx11 = yes],
+    [# Probably newer style modular X.org installation.
+    AS_IF([test -z "$with_xext"], [with_xext=$with_x])
+    CS_CHECK_LIB_WITH([xext],
+	[AC_LANG_PROGRAM(
+	    [[#include <X11/Xlib.h>
+	    #include <X11/extensions/XShm.h>]],
+	    [XShmCreateImage(0, 0, 0, 0, 0, 0, 0, 0)])], [], [], [],
+	    [$cs_cv_libx11_cflags], 
+	    [$cs_cv_libx11_lflags], 
+	    [$cs_cv_libx11_libs])
+    no_x=no
+    X_CFLAGS="$cs_cv_libxext_cflags $cs_cv_libx11_cflags"
+    X_LFLAGS="$cs_cv_libxext_lflags $cs_cv_libx11_lflags"
+    X_LIBS="$cs_cv_libxext_libs $cs_cv_libx11_libs"
+    ],
+    [# Probably an older style monolithic X11 installation.
+    # Use old Autoconf built-in X11 detection.
+    AC_PATH_X
+    AC_PATH_XTRA
+    X_LFLAGS="$X_PRE_LIBS $X_LIBS -lXext -lX11 $X_EXTRA_LIBS"])
+
 
 AS_IF([test "$no_x" != yes],
     [# We must be especially careful to instruct CS_EMIT_BUILD_PROPERTY() to
@@ -998,15 +1051,10 @@ AS_IF([test "$no_x" != yes],
     # must ensure that those other variables are defined (even if only with an
     # empty string).
     CS_EMIT_BUILD_PROPERTY([X11.AVAILABLE], [yes])
-    CS_EMIT_BUILD_PROPERTY([X_CFLAGS], [$X_CFLAGS], [], [Y])
-    CS_EMIT_BUILD_PROPERTY([X_LIBS], [$X_LIBS], [], [Y])
-    CS_EMIT_BUILD_PROPERTY([X_PRE_LIBS], [$X_PRE_LIBS], [], [Y])
-    CS_EMIT_BUILD_PROPERTY([X_EXTRA_LIBS], [$X_EXTRA_LIBS], [], [Y])
-    CS_EMIT_BUILD_PROPERTY([X11.CFLAGS], [AS_ESCAPE([$(X_CFLAGS)])])
-    CS_EMIT_BUILD_PROPERTY([X11.LFLAGS],
-      [AS_ESCAPE([$(X_PRE_LIBS) $(X_LIBS) -lXext -lX11 $(X_EXTRA_LIBS)])])
+    CS_EMIT_BUILD_PROPERTY([X11.CFLAGS], [$X_CFLAGS])
+    CS_EMIT_BUILD_PROPERTY([X11.LFLAGS], [$X_LIBS $X_LFLAGS])
 
-    CS_CHECK_LIB_WITH([Xxf86vm],
+    CS_CHECK_LIB_WITH([xxf86vm],
 	[AC_LANG_PROGRAM(
 	    [[#define XK_MISCELLANY 1
 	    #include <X11/Xlib.h>
@@ -1015,19 +1063,24 @@ AS_IF([test "$no_x" != yes],
 	    #include <X11/extensions/xf86vmode.h>]],
 	    [XF86VidModeLockModeSwitch(0, 0, 0)])], [], [],
 	[CS_EMIT_BUILD_PROPERTY([XFREE86VM.AVAILABLE], [yes])
-	CS_EMIT_BUILD_PROPERTY([XFREE86VM.CFLAGS], [AS_ESCAPE([$(X_CFLAGS)])])
-	CS_EMIT_BUILD_PROPERTY([XFREE86VM.LFLAGS],
-	    [AS_ESCAPE([$(X_PRE_LIBS) $(X_LIBS) -lXxf86vm -lXext -lX11
-	    $(X_EXTRA_LIBS)])])], [],
-	[$X_CFLAGS], [], [$X_PRE_LIBS $X_LIBS -lX11 -lXext $X_EXTRA_LIBS])
+	CS_EMIT_BUILD_PROPERTY([XFREE86VM.CFLAGS], [$cs_cv_libxxf86vm_cflags])
+	CS_EMIT_BUILD_PROPERTY([XFREE86VM.LFLAGS], 
+	    [$cs_cv_libxxf86vm_libs $cs_cv_libxxf86vm_lflags])], [],
+	[$X_CFLAGS], 
+	[$X_LFLAGS], 
+	[$X_PRE_LIBS $X_LIBS -lX11 -lXext $X_EXTRA_LIBS],
+	[Xxf86vm])
 
-    CS_CHECK_LIB_WITH([Xaw],
+    CS_CHECK_LIB_WITH([xaw7],
 	[AC_LANG_PROGRAM(
 	    [[#include <X11/Shell.h>
 	    #include <X11/Xaw/Form.h>]],
 	    [XtVaGetValues(0,0,0,0)])],
-	[], [],	[CS_EMIT_BUILD_RESULT([cs_cv_libXaw], [XAW])], [],
-	[$X_CFLAGS], [], [$X_PRE_LIBS $X_LIBS -lXt -lX11 $X_EXTRA_LIBS])])
+	[], [],	[CS_EMIT_BUILD_RESULT([cs_cv_libxaw7], [XAW])], [],
+	[$X_CFLAGS], 
+	[$X_LFLAGS], 
+	[$X_PRE_LIBS $X_LIBS -lXt -lX11 $X_EXTRA_LIBS],
+	[Xaw])])
 
 
 
@@ -1048,18 +1101,20 @@ AC_DEFUN([CS_CHECK_OPENGL_TYPE],
     [CS_CHECK_BUILD([for $1], [cs_cv_libgl_$1],
 	[AC_LANG_PROGRAM(
 	    [CS_GL_INCLUDE([CS_OPENGL_PATH],[GL],[gl.h])],
-		[$1 x; (void)x;])],
+	    [$1 x; (void)x;])],
 	[], [], [$2], [], [],
 	[$cs_cv_libgl_cflags], [$cs_cv_libgl_lflags], [$cs_cv_libgl_libs])])
 AS_IF([test $cs_cv_libgl = yes],
-    [CS_CHECK_OPENGL_TYPE([GLhandleARB], [CS_HEADER_PROPERTY([CS_HAVE_GLHANDLEARB_T])])
-    CS_CHECK_OPENGL_TYPE([GLcharARB], [CS_HEADER_PROPERTY([CS_HAVE_GLCHARARB_T])]) 
+    [CS_CHECK_OPENGL_TYPE([GLhandleARB],
+        [CS_HEADER_PROPERTY([CS_HAVE_GLHANDLEARB_T])])
+    CS_CHECK_OPENGL_TYPE([GLcharARB],
+        [CS_HEADER_PROPERTY([CS_HAVE_GLCHARARB_T])]) 
     CS_CHECK_OPENGL_TYPE([GLchar], [CS_HEADER_PROPERTY([CS_HAVE_GLCHAR_T])])])
 CS_CHECK_GLU
 CS_CHECK_GLX
-# Check for GLX extensions.  Define CSGL_EXT_STATIC_ASSERTION if _not_
-# present.
+# Check for GLX extensions.  Define CSGL_EXT_STATIC_ASSERTION if _not_ present.
 CS_CHECK_GLXEXT([], [CS_HEADER_PROPERTY([CSGL_EXT_STATIC_ASSERTION])])
+
 
 
 #------------------------------------------------------------------------------
@@ -1292,11 +1347,15 @@ CS_CHECK_LIB_WITH([bullet],
     #include <CcdPhysics/CcdPhysicsEnvironment.h>
     #include <CollisionDispatch/CollisionDispatcher.h>
     ]],
-    [CollisionDispatcher dispatcher; SimpleBroadphase broadphase;
-    new CcdPhysicsEnvironment (&dispatcher, &broadphase)])],
+    [CollisionDispatcher d;
+    SimpleBroadphase b;
+    CcdPhysicsEnvironment* e = new CcdPhysicsEnvironment (&d, &b)])],
     [], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libbullet], [BULLET])], [],
     [], [], 
-    [-lbulletccdphysics -lbulletphysicsinterfacecommon -lbulletdynamics -lbullet])
+    [-lbulletccdphysics \
+    -lbulletphysicsinterfacecommon \
+    -lbulletdynamics \
+    -lbullet])
 
 
 
@@ -1342,8 +1401,8 @@ CS_CHECK_LIBOPENAL
 
 #------------------------------------------------------------------------------
 # Check for FreeType2. Note that on MacOS/X, Fink strangely installs
-# `freetype-config' in /sw/lib/freetype2/bin, thus we augment PATH so that
-# CS_CHECK_LIB_WITH() will take this unusual location into account.
+# `freetype-config' in the unusual location /sw/lib/freetype2/bin, thus we
+# augment PATH so that CS_CHECK_LIB_WITH() will be able to find it if present.
 #------------------------------------------------------------------------------
 PATH=$PATH$PATH_SEPARATOR/sw/lib/freetype2/bin
 export PATH
@@ -1439,6 +1498,7 @@ AS_IF([test $cs_cv_libsdl = yes],
 	[$cs_cv_libsdl_cflags], [$cs_cv_libsdl_lflags], [$cs_cv_libsdl_libs])])
 
 
+
 #------------------------------------------------------------------------------
 # Check for wxWidgets. Also check if it was built with OpenGL support since it
 # is required by the Crystal Space wxWidgets canvas.
@@ -1515,58 +1575,18 @@ AS_IF([test $cs_cv_libCEGUI = yes],
     [CS_CHECK_BUILD([if CEGUI is sufficiently recent], [cs_cv_CEGUI_recent],
 	[AC_LANG_PROGRAM(
 	    [[#include <falagard/CEGUIFalWidgetLookManager.h>]],
-	    [CEGUI::WidgetLookManager::getSingleton();])],
+	    [CEGUI::WidgetLookManager::getSingleton();
+	    #if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR < 5)
+	    who took the ram from the ramalamadingdong?
+	    #endif
+	    ])],
 	[], [C++],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libCEGUI], [CEGUI])], [], [],
 	[$cs_cv_libCEGUI_cflags],
 	[$cs_cv_libCEGUI_lflags],
 	[$cs_cv_libCEGUI_libs])])
 
-#------------------------------------------------------------------------------
-# Check if cegui.i is available, cegui.py compatible and cegui new enough
-#------------------------------------------------------------------------------
-m4_define([pycegui_paths_default],
-	  [/usr/local/include/CEGUI/bindings /usr/include/CEGUI/bindings /sw/include/CEGUI/bindings /opt/local/include/CEGUI/bindings /opt/include/CEGUI/bindings])
-pyceguitest="
-import os.path
-try:
-	import cegui
-	pyfile=getattr(cegui,'__'+'file__')
-	print pyfile.replace('.pyc','.py')
-except:
-	pass
-"
-AC_ARG_WITH([pycegui], [AC_HELP_STRING([--with-pycegui],
-    [use pycegui scripting interface (default YES)])])
-AS_IF([test -z "$with_pycegui"], [with_pycegui=yes])
 
-AS_IF([test -n "$PYTHON" && test -n "$SWIG"],[
-
-  AS_IF([test "$with_pycegui" != no && test $cs_cv_libCEGUI = yes], [
-
-    CS_CHECK_BUILD([if CEGUI is bleeding edge], [cs_cv_CEGUI_bleeding],
-      [AC_LANG_PROGRAM(
-	[[#include <CEGUIWindow.h>]],
-	[CEGUI::Window *w=new CEGUI::Window("","");w->getXPosition();])],
-      [], [C++],[
-      AS_IF([test "$with_pycegui" != yes],
-          [PYCEGUI_I_FILE="$with_pycegui/package/cegui.i"
-           PYCEGUI_PY_FILE="$with_pycegui/src/cegui.py"],
-          [AC_PATH_PROGS([PYCEGUI_I_FILE],[cegui.i],[],[pycegui_paths_default])
-	   PYCEGUI_PY_FILE=CS_RUN_PATH_NORMALIZE([$PYTHON -c "$pyceguitest"])])
-      m4_define([PYCEGUI_EXPECTED_SWIG_VERSION],[cs_prog_swig_version])
-      AS_IF([test -f "$PYCEGUI_PY_FILE" && test -f "$PYCEGUI_I_FILE"],[
-	CS_CHECK_PROG_VERSION([cegui.py was generated with same swig],
-		[sed -n -e '1p' "$PYCEGUI_PY_FILE"],
-		[PYCEGUI_EXPECTED_SWIG_VERSION],[9.9|.9],
-		[PYCEGUI_I_DIR=`AS_DIRNAME([$PYCEGUI_I_FILE])`
-		 CS_EMIT_BUILD_PROPERTY([PYCEGUI.SWIGOK], [yes])
-		 CS_EMIT_BUILD_PROPERTY([PYCEGUI.SWIGFLAGS], [-I$PYCEGUI_I_DIR])
-		],[],[=])
-      ]) # AS_IF
-    ],[],[],[$cs_cv_libCEGUI_cflags],[$cs_cv_libCEGUI_lflags],[$cs_cv_libCEGUI_libs])
-  ],[]) # AS_IF ["$with_pycegui" != no && test $cs_cv_libCEGUI = yes]
-],[]) # AS_IF([test -n "$PYTHON" && test -n "$SWIG"],[
 
 #------------------------------------------------------------------------------
 # Check if GNU/Linux joystick API is present.
@@ -1595,18 +1615,30 @@ AS_IF([test $cs_host_family != windows],
 
 #------------------------------------------------------------------------------
 # Check for Cg shader package.
+#
+# A note on the 'log()' call: on Linux, libCg.so itself doesn't depend on
+# the libmy's shared object. However, if the --as-needed flag is used in 
+# LDFLAGS, and the app itself doesn't use a function from libm, it's symbols 
+# won't be available, causing problems. Normally any app calls some libm
+# function. However, the default test program doesn't, so a call to log() was 
+# added explicitly.
+# And the same applies to pthread, too.
+# The workaround is to explicitly strip -Wl,--as-needed from LDFLAGS.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_LIBCG],
     [AC_REQUIRE([CS_CHECK_COMMON_LIBS])
     AC_REQUIRE([CS_CHECK_PTHREAD])
+    AC_REQUIRE([CS_PROG_LINK])
+    LDFLAGS_BACKUP="$LDFLAGS"
+    LDFLAGS=`echo "$LDFLAGS" | sed s/-Wl,--as-needed//`
     CS_CHECK_LIB_WITH([Cg],
-	[AC_LANG_PROGRAM(
-	    [[#include <Cg/cg.h>]],
-	    [CGcontext c = cgCreateContext()])],
-	[], [], [], [],
-	[$cs_cv_libm_cflags $cs_cv_sys_pthread_cflags], 
-	[$cs_cv_libm_lflags $cs_cv_sys_pthread_lflags], 
-	[$cs_cv_libm_libs   $cs_cv_sys_pthread_libs],
+    	[AC_LANG_PROGRAM(
+    	    [[#include <Cg/cg.h>]],
+	   [CGcontext c = cgCreateContext();])],
+    	[], [], [], [],
+    	[$cs_cv_libm_cflags $cs_cv_sys_pthread_cflags], 
+    	[$cs_cv_libm_lflags $cs_cv_sys_pthread_lflags], 
+    	[$cs_cv_libm_libs   $cs_cv_sys_pthread_libs],
 	[cg, CG])
 
     AS_IF([test $cs_cv_libCg = yes],
@@ -1630,7 +1662,9 @@ AC_DEFUN([CS_CHECK_LIBCG],
 	    [$cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags],
 	    [$cs_cv_libCg_lflags $cs_cv_libgl_lflags $cs_cv_libglu_lflags],
 	    [$cs_cv_libCg_libs   $cs_cv_libgl_libs   $cs_cv_libglu_libs],
-	    [cggl, cgGL, CGGL, Cg, cg, CG])])])
+	    [cggl, cgGL, CGGL, Cg, cg, CG])])
+	    
+    LDFLAGS="$LDFLAGS_BACKUP"])
 
 CS_CHECK_LIBCG
 
@@ -1654,8 +1688,10 @@ AS_IF([test $cs_host_family != windows],
     [AS_IF([test $cs_cv_header_soundcard_h = yes],
 	[CS_EMIT_BUILD_PROPERTY([OSS.AVAILABLE], [yes])])])
 
+
+
 #------------------------------------------------------------------------------
-# Check for JACK daemon jackasyn library (JACKASYN)
+# Check for JACK daemon jackasyn library (JACKASYN).
 #------------------------------------------------------------------------------
 AS_IF([test $cs_host_family != windows],
     [CS_CHECK_LIB_WITH([jackasyn],
@@ -1665,8 +1701,10 @@ AS_IF([test $cs_host_family != windows],
 	    [jackoss_open("/dev/dsp",1);])],
 	[], [], [CS_EMIT_BUILD_RESULT([cs_cv_libjackasyn], [JACKASYN])])])
 
+
+
 #------------------------------------------------------------------------------
-# Check for Advanced GNU/Linux Sound Architecture (ALSA)
+# Check for Advanced GNU/Linux Sound Architecture (ALSA).
 #------------------------------------------------------------------------------
 AS_IF([test $cs_host_family != windows],
     [CS_CHECK_LIB_WITH([asound],
@@ -1691,13 +1729,10 @@ CS_CHECK_LIB_WITH([caca],
 # Check for SpiderMonkey JavaScript library.
 #------------------------------------------------------------------------------
 case $cs_host_family in
-    windows)
-	cs_spidermonkey_platform='XP_WIN'
-	;;
-    *)
-	cs_spidermonkey_platform='XP_UNIX'
-	;;
+    windows) cs_spidermonkey_platform='XP_WIN' ;;
+    *) cs_spidermonkey_platform='XP_UNIX' ;;
 esac
+
 CS_CHECK_LIB_WITH([js],
     [AC_LANG_PROGRAM([[#include <js/jsapi.h>]], 
     [JS_NewRuntime(0)])],
@@ -1874,6 +1909,7 @@ AC_DEFUN([CS_CHECK_HOST_CPU],
     case $host_cpu in
 	[[Ii][3-9]86*|[Xx]86*]) cs_host_cpu=x86 ;;
 	powerpc*) cs_host_cpu=powerpc ;;
+	sparc*) cs_host_cpu=sparc ;;
 	*) cs_host_cpu=$host_cpu ;;
     esac
     cs_host_cpu_normalized="AS_TR_CPP([$cs_host_cpu])"])
@@ -2097,6 +2133,15 @@ AS_IF([test $cs_cv_sys_socket = yes],
 
 
 #------------------------------------------------------------------------------
+# Check if byteswap.h is available, which contains optimized byte swapping
+# functions (used for endian conversion).
+#------------------------------------------------------------------------------
+AC_CHECK_HEADERS([byteswap.h],
+    [CS_HEADER_PROPERTY([CS_HAVE_BYTESWAP_H])])
+
+
+
+#------------------------------------------------------------------------------
 # Check how to declare functions and types deprecated.
 #------------------------------------------------------------------------------
 CS_SYMBOL_QUALIFIER([how to declare deprecations],
@@ -2130,6 +2175,18 @@ CS_SYMBOL_QUALIFIER([how to declare pure functions],
     [__attribute__((pure))], [], [C++],
     [CS_HEADER_PROPERTY([CS_PURE_METHOD],
 	[$cs_cv_prog_cxx_declare_pure])])
+
+
+
+#------------------------------------------------------------------------------
+# Check if the "malloc" attribute is available.
+#------------------------------------------------------------------------------
+CS_SYMBOL_QUALIFIER([for "malloc" attribute],
+    [cs_cv_prog_c_attr_malloc],
+    [__attribute__((malloc))], [], [C])
+AS_IF([test $cs_cv_prog_c_attr_malloc != no],
+    [CS_HEADER_PROPERTY([CS_ATTRIBUTE_MALLOC],
+	[$cs_cv_prog_c_attr_malloc])])
 
 
 
@@ -2178,6 +2235,9 @@ AC_DEFUN([CS_CHECK_FINITE],
 	    #endif
 	    #if HAVE_MATH_H
 	    #include <math.h>
+	    #endif
+	    #if HAVE_IEEEFP_H
+	    #include <ieeefp.h>
 	    #endif]],
 	    [float f; $1(f)])],
 	[], [C++], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_HAVE_$1]))], [], [],
@@ -2190,10 +2250,14 @@ CS_CHECK_BUILD([for std::isfinite], [cs_cv_func_std__isfinite],
 	#endif
 	#if HAVE_MATH_H
 	#include <math.h>
+	#endif
+	#if HAVE_IEEEFP_H
+	#include <ieeefp.h>
 	#endif]],
 	[float f; std::isfinite(f)])],
-    [], [C++], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_HAVE_STD__ISFINITE]))], [], [],
-    [$cs_cv_prog_cxx_enable_pedantic])
+    [], [C++], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_HAVE_STD__ISFINITE]))],
+    [], [], [$cs_cv_prog_cxx_enable_pedantic])
+
 CS_CHECK_FINITE([isfinite])
 CS_CHECK_FINITE([finitef])
 CS_CHECK_FINITE([finite])
@@ -2215,41 +2279,6 @@ AS_IF([test $enable_meta_info_embedding = yes],
     AC_CHECK_HEADERS([elf.h], [CS_HEADER_PROPERTY([CS_HAVE_ELF_H])])
     AS_IF([test "$cs_cv_libbfd_ok" = yes],
 	[CS_HEADER_PROPERTY([CS_HAVE_LIBBFD])])])
-
-
-
-#------------------------------------------------------------------------------
-# Determine build mode; either "optimize", "debug", or "profile".
-#------------------------------------------------------------------------------
-AC_ARG_ENABLE([optimize], [AC_HELP_STRING([--enable-optimize],
-    [build with optimizations enabled (default YES);
-	same as --enable-mode=optimize])],
-    [test "$enableval" = "yes" && cs_build_mode=optimize])
-
-AC_ARG_ENABLE([debug], [AC_HELP_STRING([--enable-debug],
-    [build with debugging information (default NO);
-	same as --enable-mode=debug])],
-    [test "$enableval" = "yes" && cs_build_mode=debug])
-
-AC_ARG_ENABLE([profile], [AC_HELP_STRING([--enable-profile],
-    [build with profiling information (default NO);
-	same as --enable-mode=profile])],
-    [test "$enableval" = "yes" && cs_build_mode=profile])
-
-AC_ARG_ENABLE([mode], [AC_HELP_STRING([--enable-mode=mode],
-    [set build mode; recognized modes are `optimize', `debug', `profile'
-	(default OPTIMIZE)])],
-    [case $enableval in
-	optimize|debug|profile) cs_build_mode=$enableval ;;
-	*) CS_MSG_ERROR([m4_text_wrap(
-	    [unrecognized mode --enable-mode=$enableval;
-	    use `optimize', `debug', or `profile'], [    ], [[]], [60])]) ;;
-    esac])
-
-AC_MSG_CHECKING([build mode])
-AS_VAR_SET_IF([cs_build_mode], [], [cs_build_mode=optimize])
-AC_MSG_RESULT([$cs_build_mode])
-CS_EMIT_BUILD_PROPERTY([MODE], [$cs_build_mode])
 
 
 

@@ -161,8 +161,8 @@ void csNormalCalculator::CalculateNormals (
   size_t i;
   size_t j;
 
-  mesh_normals.SetLength (mesh_vertices.Length ());
-  size_t num_triangles = mesh_triangles.Length ();
+  mesh_normals.SetSize (mesh_vertices.GetSize ());
+  size_t num_triangles = mesh_triangles.GetSize ();
   csTriangle* tris;
   csVector3* new_verts;
   size_t new_num_verts;
@@ -172,7 +172,7 @@ void csNormalCalculator::CalculateNormals (
   if (do_compress)
   {
     compressed = CompressVertices (mesh_vertices.GetArray (),
-      mesh_vertices.Length (),
+      mesh_vertices.GetSize (),
       new_verts, new_num_verts,
       mesh_triangles.GetArray (), num_triangles, tris,
       mapping);
@@ -181,63 +181,57 @@ void csNormalCalculator::CalculateNormals (
   {
     compressed = false;
     new_verts = mesh_vertices.GetArray ();
-    new_num_verts = mesh_vertices.Length ();
+    new_num_verts = mesh_vertices.GetSize ();
     tris = mesh_triangles.GetArray ();
     mapping = 0;
-  }
-
-  csTriangleMesh* tri_mesh = new csTriangleMesh ();
-  tri_mesh->SetTriangles (tris, (int)num_triangles);
-  csTriangleVertices* tri_verts = new csTriangleVertices (tri_mesh,
-    new_verts, (int)new_num_verts);
-
-  csVector3* mesh_tri_normals = new csVector3[num_triangles];
-
-  // Calculate triangle normals.
-  // Get the cross-product of 2 edges of the triangle and normalize it.
-  for (i = 0; i < num_triangles; i++)
-  {
-    csVector3 ab = new_verts [tris[i].b] - new_verts [tris[i].a];
-    csVector3 bc = new_verts [tris[i].c] - new_verts [tris[i].b];
-    mesh_tri_normals [i] = ab % bc;
-    float norm = mesh_tri_normals[i].Norm ();
-    if (norm)
-      mesh_tri_normals[i] /= norm;
   }
 
   csVector3* new_normals = mesh_normals.GetArray ();
   if (compressed)
     new_normals = new csVector3[new_num_verts];
 
-  // Calculate vertex normals, by averaging connected triangle normals.
-  for (i = 0 ; i < new_num_verts ; i++)
+  for (i = 0; i < new_num_verts; ++i)
   {
-    csTriangleVertex &vt = tri_verts->GetVertex ((int)i);
-    if (vt.con_triangles.Length ())
+    new_normals[i].Set (0.0f);
+  }
+
+  // Calculate normals for each triangle, accumulate at the vertices weighted
+  // by angle between edges
+  for (i = 0; i < num_triangles; i++)
+  {
+    const csTriangle& tri = tris[i];
+
+    // Accumulate it at the three vertices
+    for (j = 0; j < 3; ++j)
     {
-      csVector3 &n = new_normals[i];
-      n.Set (0,0,0);
-      for (j = 0; j < vt.con_triangles.Length () ; j++)
-        n += mesh_tri_normals [vt.con_triangles[j]];
-      float norm = n.Norm ();
-      if (norm)
-        n /= norm;
-    }
-    else
-    {
-      // If there are no connecting triangles then we just
-      // initialize the normal to a default value.
-      new_normals[i].Set (1, 0, 0);
+      csVector3 e1 = new_verts[tri[(j+1)%3]] - new_verts[tri[j]];
+      csVector3 e2 = new_verts[tri[(j+2)%3]] - new_verts[tri[j]];
+
+      csVector3 normalAtVertex = e1 % e2;
+
+      float sqVertexNorm = normalAtVertex.SquaredNorm ();
+      if (sqVertexNorm)
+      {
+        // This way we only have to compute two square roots instead of three..
+        float sinAngleSq = sqVertexNorm / 
+          (e1.SquaredNorm () * e2.SquaredNorm ());
+
+        float triAngle = asinf (csClamp (sqrtf (sinAngleSq), 1.0f, 0.0f));
+
+        new_normals[tri[j]] += normalAtVertex * (triAngle / sqrtf (sqVertexNorm));
+      }
     }
   }
 
-  delete tri_verts;
-  delete tri_mesh;
+  for (i = 0; i < new_num_verts; ++i)
+  {
+    new_normals[i].Normalize ();
+  }
 
   if (compressed)
   {
     // Translate the mapped normal table back to the original table.
-    for (j = 0 ; j < mesh_vertices.Length () ; j++)
+    for (j = 0 ; j < mesh_vertices.GetSize () ; j++)
     {
       mesh_normals[j] = new_normals[mapping[j]];
     }
@@ -248,7 +242,7 @@ void csNormalCalculator::CalculateNormals (
     delete[] mapping;
   }
 
-  delete[] mesh_tri_normals;
+  //delete[] mesh_tri_normals;
 }
 
 //---------------------------------------------------------------------------

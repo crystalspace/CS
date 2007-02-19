@@ -37,13 +37,13 @@ namespace Implementation
     NonCopyable_ (const NonCopyable_&);
     const NonCopyable_& operator= (const NonCopyable_&);
   };
-}
+} // namespace Implementation
 
-// Avoid Argument Dependent Loocup
+// Avoid Argument Dependent Lookup
 typedef Implementation::NonCopyable_ NonCopyable;
 
-}
+} // namespace CS
 
 
 
-#endif
+#endif // __CS_CSUTIL_NONCOPYABLE_H__

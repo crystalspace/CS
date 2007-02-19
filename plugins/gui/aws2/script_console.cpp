@@ -45,7 +45,7 @@ void scriptConsole::Message (const csString &txt)
   csPrintf (tmp.GetDataSafe ());
 
   // Make sure that the console only maintains the history_size specified
-  while (msgs.Length ()>history_size)
+  while (msgs.GetSize ()>history_size)
   {
     msgs.DeleteIndex (0);	
   }
@@ -54,7 +54,7 @@ void scriptConsole::Message (const csString &txt)
 void scriptConsole::Initialize (iObjectRegistry *obj_reg)
 {
   csRef<iKeyboardDriver> currentKbd = 
-    CS_QUERY_REGISTRY (obj_reg, iKeyboardDriver);
+    csQueryRegistry<iKeyboardDriver> (obj_reg);
 
   if (currentKbd == 0)
   {
@@ -73,8 +73,8 @@ void scriptConsole::OnKeypress (csKeyEventData &eventData)
   case CSKEY_UP:
     if (cmd_ptr>0)
     {
-      if (cmd_ptr==cmds.Length () && cmd.Length ()>0 && 
-         (cmds.Length ()==0 || cmds.Top () != cmd)) 
+      if (cmd_ptr==cmds.GetSize () && cmd.Length ()>0 && 
+         (cmds.GetSize ()==0 || cmds.Top () != cmd)) 
       { 
         cmds.Push (cmd); 
       }
@@ -88,11 +88,11 @@ void scriptConsole::OnKeypress (csKeyEventData &eventData)
     break;
 
   case CSKEY_DOWN:
-    if (cmd_ptr<cmds.Length ())
+    if (cmd_ptr<cmds.GetSize ())
     {
 
       ++cmd_ptr;						  
-      if (cmd_ptr<cmds.Length ()) 
+      if (cmd_ptr<cmds.GetSize ()) 
         cmd = cmds[cmd_ptr];
       else 
         cmd.Clear ();			  
@@ -126,7 +126,7 @@ void scriptConsole::OnKeypress (csKeyEventData &eventData)
 
       Message (cmd);
       cmds.Push (cmd);
-      cmd_ptr=cmds.Length ();
+      cmd_ptr=cmds.GetSize ();
 
       sc=JS_CompileScript (
         ScriptMgr ()->GetContext (), 
@@ -216,7 +216,7 @@ void scriptConsole::Redraw (iGraphics2D * g2d)
   int y=g2d->GetHeight ()-thd;
   int tw=0,th=thd;
 
-  size_t i=msgs.Length ();
+  size_t i=msgs.GetSize ();
 
   int fg = (active ?  g2d->FindRGB (192,192,192,255) : 
                       g2d->FindRGB (128,128,128,128));

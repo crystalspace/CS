@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- shaderweaver.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphics3d.shadercompiler.weaver</name>
+        <implementation>WeaverCompiler</implementation>
+        <description>Shader weaver</description>
+        <requires>
+          <class>crystalspace.graphics3d.shadercompiler.xmlshader</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

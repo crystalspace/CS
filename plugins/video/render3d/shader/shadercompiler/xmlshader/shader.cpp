@@ -261,10 +261,13 @@ void csShaderConditionResolver::DumpConditionNode (csString& out,
 //---------------------------------------------------------------------------
 
 csXMLShader::csXMLShader (csXMLShaderCompiler* compiler, 
+    			  iLoaderContext* ldr_context,
 			  iDocumentNode* source,
 			  int forcepriority) : scfImplementationType (this)
 {
   InitTokenTable (xmltokens);
+
+  csXMLShader::ldr_context = ldr_context;
 
   activeTech = 0;
   filename = 0;
@@ -273,7 +276,7 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler,
   csXMLShader::forcepriority = forcepriority;
   useFallbackContext = false;
 
-  shadermgr = CS_QUERY_REGISTRY (compiler->objectreg, iShaderManager);
+  shadermgr = csQueryRegistry<iShaderManager> (compiler->objectreg);
   CS_ASSERT (shadermgr); // Should be present - loads us, after all
 
   csRefArray<iDocumentNode> extraNodes;
@@ -317,7 +320,7 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler,
     resolver->DumpConditionTree (tree);
     csString filename;
     filename.Format ("/tmp/shader/cond_%s.txt", source->GetAttributeValue ("name"));
-    compiler->vfs->WriteFile (filename, tree.GetData(), tree.Length());
+    compiler->vfs->WriteFile (filename, tree.GetData(), tree.Length ());
   }
   else
     wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (source, 
@@ -330,18 +333,19 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler,
     xmltokens.Request (csXMLShaderCompiler::XMLTOKEN_SHADERVARS));
  
   if (varNode)
-    ParseGlobalSVs (varNode);
+    ParseGlobalSVs (ldr_context, varNode);
 
   csRef<iDocumentNode> fallbackNode = shaderSource->GetNode ("fallbackshader");
   if (fallbackNode.IsValid())
   {
-    fallbackShader = compiler->synldr->ParseShaderRef (fallbackNode);
+    fallbackShader = compiler->synldr->ParseShaderRef (ldr_context,
+	fallbackNode);
   }
 }
 
 csXMLShader::~csXMLShader ()
 {
-  for (size_t i = 0; i < variants.Length(); i++)
+  for (size_t i = 0; i < variants.GetSize (); i++)
   {
     delete variants[i].tech;
   }
@@ -443,12 +447,13 @@ public:
   { return wrappedSVC.RemoveVariable (variable); }
 };
 
-void csXMLShader::ParseGlobalSVs (iDocumentNode* node)
+void csXMLShader::ParseGlobalSVs (iLoaderContext* ldr_context,
+    iDocumentNode* node)
 {
   SVCWrapper wrapper (globalSVContext);
   resolver->ResetEvaluationCache();
   resolver->SetEvalParams (0, wrapper.svStack);
-  compiler->LoadSVBlock (node, &wrapper);
+  compiler->LoadSVBlock (ldr_context, node, &wrapper);
   resolver->SetEvalParams (0, 0);
 }
 
@@ -506,7 +511,7 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
       {
 	TechniqueKeeper tk = techIt.Next();
 	csXMLShaderTech* tech = new csXMLShaderTech (this);
-	if (tech->Load (tk.node, shaderSource, vi))
+	if (tech->Load (ldr_context, tk.node, shaderSource, vi))
 	{
 	  if (compiler->do_verbose)
 	    compiler->Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -598,8 +603,8 @@ void csXMLShader::DumpStats (csString& str)
 
 csRef<iDocumentNode> csXMLShader::OpenDocFile (const char* filename)
 {
-  csRef<iVFS> VFS = CS_QUERY_REGISTRY (compiler->objectreg, 
-    iVFS);
+  csRef<iVFS> VFS =  
+    csQueryRegistry<iVFS> (compiler->objectreg);
   csRef<iFile> file = VFS->Open (filename, VFS_FILE_READ);
   if (!file)
   {
@@ -608,7 +613,7 @@ csRef<iDocumentNode> csXMLShader::OpenDocFile (const char* filename)
     return 0;
   }
   csRef<iDocumentSystem> docsys (
-    CS_QUERY_REGISTRY (compiler->objectreg, iDocumentSystem));
+    csQueryRegistry<iDocumentSystem> (compiler->objectreg));
   if (docsys == 0)
     docsys.AttachNew (new csTinyDocumentSystem ());
 
@@ -634,7 +639,7 @@ csRef<iDocumentNode> csXMLShader::LoadProgramFile (const char* filename,
   if (compiler->doDumpConds || compiler->doDumpXML)
   {
     csString filenameClean (filename);
-    for (size_t p = 0; p < filenameClean.Length(); p++)
+    for (size_t p = 0; p < filenameClean.Length (); p++)
     {
       if (!isalnum (filenameClean[p])) filenameClean[p] = '_';
     }
@@ -650,7 +655,7 @@ csRef<iDocumentNode> csXMLShader::LoadProgramFile (const char* filename,
       programRoot, resolver, &tree));
     resolver->DumpConditionTree (tree);
     compiler->vfs->WriteFile (csString().Format ("/tmp/shader/%s_%zu.txt",
-      dumpFN.GetData(), variant), tree.GetData(), tree.Length());
+      dumpFN.GetData(), variant), tree.GetData(), tree.Length ());
   }
   else
     programNode.AttachNew (compiler->wrapperFact->CreateWrapperStatic (

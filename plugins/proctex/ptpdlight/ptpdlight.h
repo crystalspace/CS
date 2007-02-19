@@ -47,7 +47,7 @@ protected:
   iObjectRegistry* object_reg;
 
   void Report (int severity, iDocumentNode* node, const char* msg, ...);
-
+  bool HexToLightID (char* lightID, const char* lightIDHex);
 public:
   ProctexPDLightLoader (iBase *p);
   virtual ~ProctexPDLightLoader ();
@@ -65,36 +65,94 @@ class ProctexPDLight :
                                iLightingInfo>
 {
 public:
+  struct Lumel
+  {
+    uint8 blue, green, red, alpha;
+
+    void UnsafeAdd (int R, int G, int B)
+    {
+      red   = (unsigned char)(red   + R);
+      green = (unsigned char)(green + G);
+      blue  = (unsigned char)(blue  + B);
+    }
+    void SafeAdd (int R, int G, int B)
+    {
+      int color = red + R;
+      red   = (unsigned char)(color > 255 ? 255 : color);
+      color = green + G;
+      green = (unsigned char)(color > 255 ? 255 : color);
+      color = blue + B;
+      blue  = (unsigned char)(color > 255 ? 255 : color);
+    }
+  };
+  struct LumelBuffer : public csRefCount
+  {
+    Lumel data[1];
+    
+    inline void* operator new (size_t n, size_t lumels)
+    { 
+      CS_ASSERT (n == sizeof (LumelBuffer));
+      size_t allocSize = offsetof (LumelBuffer, data) + lumels * sizeof (Lumel);
+      return cs_malloc (allocSize);
+    }
+    inline void operator delete (void* p, size_t lumels) 
+    {
+      cs_free (p);
+    }
+    inline void operator delete (void* p) 
+    {
+      LumelBuffer* lb = static_cast<LumelBuffer*> (p);
+      lb->~LumelBuffer ();
+      cs_free (p);
+    }
+
+  };
   class PDMap
   {
     friend class ProctexPDLight;
     void ComputeValueBounds ();
     void ComputeValueBounds (const csRect& area);
+
+    void SetImage (iImage* img);
   public:
-    csRef<iImage> image;
     csRGBcolor maxValue;
     csRect nonNullArea;
+    int imageW, imageH;
+    csRef<LumelBuffer> imageData;
 
-    PDMap () { ComputeValueBounds (); }
-    PDMap (iImage* img) : image (img) { ComputeValueBounds (); }
+    PDMap () : imageW (0), imageH (0), imageData (0) { ComputeValueBounds (); }
+    PDMap (iImage* img) : imageData (0)
+    { SetImage (img); }
 
-    iImage* operator->() const { return image; }
-    operator iImage*() const { return image; }
     PDMap& operator=(iImage* image)
     {
-      this->image = CS::ImageAutoConvert (image, CS_IMGFMT_TRUECOLOR);
-      ComputeValueBounds();
+      SetImage (image);
       return *this;
     }
   };
   struct MappedLight
   {
     PDMap map;
-    csString* lightId;
+    char* lightId;
     csWeakRef<iLight> light;
+
+    MappedLight() : lightId (0) {}
+    MappedLight (const MappedLight& other)
+    {
+      map = other.map;
+      if (other.lightId != 0)
+      {
+        lightId = new char[16];
+        memcpy (lightId, other.lightId, 16);
+      }
+      else
+        lightId = 0;
+      light = other.light;
+    }
+    ~MappedLight() { delete[] lightId; }
   };
 private:
-  typedef csDirtyAccessArray<csRGBpixel> LightmapScratch;
+  typedef csDirtyAccessArray<Lumel> LightmapScratch;
   CS_DECLARE_STATIC_CLASSVAR_REF(lightmapScratch, GetScratch, LightmapScratch);
   size_t lightmapSize;
 
@@ -110,7 +168,6 @@ private:
   csFlags state;
 
   void Report (int severity, const char* msg, ...);
-  bool HexToLightID (char* lightID, const csString& lightIDHex);
   void UpdateAffectedArea ();
 public:
   const char* AddLight (const MappedLight& light);

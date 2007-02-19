@@ -152,7 +152,7 @@ int main(int argc,char *argv[])
 	     fatal_usage();
      }
   }
-  if (!anims.Length() ) // no anims means we need to specify a default one
+  if (!anims.GetSize() ) // no anims means we need to specify a default one
   {
         csPrintf("Warning: Only default action being generated!\n");
 

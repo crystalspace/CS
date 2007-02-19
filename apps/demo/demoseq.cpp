@@ -56,7 +56,7 @@ DemoSequenceManager::DemoSequenceManager (Demo* demo)
   loader = 0;
   iObjectRegistry* object_reg = demo->object_reg;
   csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+  	csQueryRegistry<iPluginManager> (object_reg));
   seqmgr = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.utilities.sequence",
   	iSequenceManager);
   if (!seqmgr)
@@ -221,7 +221,7 @@ void DemoSequenceManager::ReplacePathObject (csNamedPath* path,
 	iMeshWrapper* mesh)
 {
   size_t i;
-  for (i = 0 ; i < pathForMesh.Length () ; i++)
+  for (i = 0 ; i < pathForMesh.GetSize () ; i++)
   {
     PathForMesh* pfm = pathForMesh[i];
     if (pfm->path == path)
@@ -250,7 +250,7 @@ void DemoSequenceManager::ControlPaths (iCamera* camera, csTicks elapsed_time)
   if (suspended) return;
   csTicks current_time = seqmgr->GetMainTime ();
   size_t i = 0;
-  size_t len = pathForMesh.Length ();
+  size_t len = pathForMesh.GetSize ();
   while (i < len)
   {
     PathForMesh* pfm = pathForMesh[i];
@@ -315,7 +315,7 @@ void DemoSequenceManager::ControlPaths (iCamera* camera, csTicks elapsed_time)
   }
 
   i = 0;
-  len = meshRotation.Length ();
+  len = meshRotation.GetSize ();
   while (i < len)
   {
     MeshRotation* mrot = meshRotation[i];
@@ -338,7 +338,7 @@ void DemoSequenceManager::DebugPositionObjects (iCamera* camera,
     csTicks debug_time)
 {
   size_t i = 0;
-  size_t len = pathForMesh.Length ();
+  size_t len = pathForMesh.GetSize ();
   while (i < len)
   {
     PathForMesh* pfm = pathForMesh[i];
@@ -449,7 +449,7 @@ void DemoSequenceManager::DebugDrawPaths (iCamera* camera,
 	int selpoint)
 {
   size_t i;
-  size_t len = pathForMesh.Length ();
+  size_t len = pathForMesh.GetSize ();
   csTicks current_time = seqmgr->GetMainTime ();
 
   //=====
@@ -542,7 +542,7 @@ void DemoSequenceManager::DebugDrawPaths (iCamera* camera,
 
 void DemoSequenceManager::SelectFirstPath (char* hilight)
 {
-  if (pathForMesh.Length () > 0)
+  if (pathForMesh.GetSize () > 0)
   {
     strcpy (hilight, pathForMesh[0]->path->GetName ());
   }
@@ -550,9 +550,9 @@ void DemoSequenceManager::SelectFirstPath (char* hilight)
 
 void DemoSequenceManager::SelectLastPath (char* hilight)
 {
-  if (pathForMesh.Length () > 0)
+  if (pathForMesh.GetSize () > 0)
   {
-    strcpy (hilight, pathForMesh[pathForMesh.Length ()-1]->path->GetName ());
+    strcpy (hilight, pathForMesh[pathForMesh.GetSize ()-1]->path->GetName ());
   }
 }
 
@@ -565,7 +565,7 @@ void DemoSequenceManager::SelectPreviousPath (char* hilight)
     return;
   }
   size_t i;
-  for (i = 0 ; i < pathForMesh.Length () ; i++)
+  for (i = 0 ; i < pathForMesh.GetSize () ; i++)
   {
     PathForMesh* pfm = pathForMesh[i];
     if (pfm->path == np)
@@ -594,12 +594,12 @@ void DemoSequenceManager::SelectNextPath (char* hilight)
     return;
   }
   size_t i;
-  for (i = 0 ; i < pathForMesh.Length () ; i++)
+  for (i = 0 ; i < pathForMesh.GetSize () ; i++)
   {
     PathForMesh* pfm = pathForMesh[i];
     if (pfm->path == np)
     {
-      if (i < pathForMesh.Length ()-1)
+      if (i < pathForMesh.GetSize ()-1)
       {
         pfm = pathForMesh[i+1];
 	strcpy (hilight, pfm->path->GetName ());
@@ -622,7 +622,7 @@ csNamedPath* DemoSequenceManager::GetSelectedPath (const char* hilight,
 	csTicks& start, csTicks& total)
 {
   size_t i = 0;
-  size_t len = pathForMesh.Length ();
+  size_t len = pathForMesh.GetSize ();
   while (i < len)
   {
     PathForMesh* pfm = pathForMesh[i];
@@ -643,7 +643,7 @@ void DemoSequenceManager::SetupRotatePart (iMeshWrapper* mesh,
 	float angle_speed, csTicks total_rotate_time, csTicks already_elapsed)
 {
   MeshRotation* mrot = new MeshRotation ();
-  mrot->particle = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iParticle);
+  mrot->particle = scfQueryInterface<iParticle> (mesh->GetMeshObject ());
   if (!mrot->particle)
   {
     delete mrot;

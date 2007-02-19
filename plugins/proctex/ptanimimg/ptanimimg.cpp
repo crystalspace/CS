@@ -22,6 +22,7 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/texture.h"
+#include "csutil/scfstr.h"
 #include "iutil/document.h"
 #include "iutil/objreg.h"
 #include "iengine/engine.h"
@@ -73,7 +74,7 @@ csPtr<iBase> csAnimateProctexLoader::Parse (iDocumentNode* node,
   if (context)
   {
     ctx = csPtr<iTextureLoaderContext>
-      (SCF_QUERY_INTERFACE (context, iTextureLoaderContext));
+      (scfQueryInterface<iTextureLoaderContext> (context));
   }
 
   csRef<iImage> img = (ctx && ctx->HasImage()) ? ctx->GetImage() : 0;
@@ -86,7 +87,7 @@ csPtr<iBase> csAnimateProctexLoader::Parse (iDocumentNode* node,
       return 0;
     }
 
-    csRef<iLoader> LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);
+    csRef<iLoader> LevelLoader = csQueryRegistry<iLoader> (object_reg);
     if (!LevelLoader) 
     {
       Report (CS_REPORTER_SEVERITY_WARNING, 0, "No level loader");
@@ -120,13 +121,21 @@ csPtr<iBase> csAnimateProctexLoader::Parse (iDocumentNode* node,
   csRef<csProcTexture> pt = csPtr<csProcTexture> (new csProcAnimated (img));
   if (pt->Initialize (object_reg))
   {
-    csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+    csRef<iGraphics3D> G3D = csQueryRegistry<iGraphics3D> (object_reg);
     if (!G3D) return 0;
     csRef<iTextureManager> tm = G3D->GetTextureManager();
     if (!tm) return 0;
     int texFlags = (ctx && ctx->HasFlags()) ? ctx->GetFlags() : CS_TEXTURE_3D;
-    csRef<iTextureHandle> TexHandle (tm->RegisterTexture (img, texFlags));
-    if (!TexHandle) return 0;
+    csRef<scfString> fail_reason;
+    fail_reason.AttachNew (new scfString ());
+    csRef<iTextureHandle> TexHandle (tm->RegisterTexture (img, texFlags,
+	  fail_reason));
+    if (!TexHandle)
+    {
+      Report (CS_REPORTER_SEVERITY_ERROR, node, 
+	"Couldn't create texture: %s", fail_reason->GetData ());
+      return 0;
+    }
 
     pt->GetTextureWrapper()->SetTextureHandle (TexHandle);
 
@@ -149,7 +158,7 @@ void csAnimateProctexLoader::Report (int severity, iDocumentNode* node,
   csRef<iSyntaxService> synserv;
 
   if (node)
-    synserv = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+    synserv = csQueryRegistry<iSyntaxService> (object_reg);
 
   if (node && synserv)
   {

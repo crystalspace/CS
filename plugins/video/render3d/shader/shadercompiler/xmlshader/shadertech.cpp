@@ -113,7 +113,6 @@ bool csXMLShaderTech::ParseInstanceBinds (iDocumentNode *node, shaderPass *pass)
     size_t binds_cnt = 0;
     switch (source_variable->GetType ())
     {
-    case csShaderVariable::COLOR:
     case csShaderVariable::VECTOR2:
     case csShaderVariable::VECTOR3:
     case csShaderVariable::VECTOR4:
@@ -515,8 +514,8 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
   return true;
 }
 
-bool csXMLShaderCompiler::LoadSVBlock (iDocumentNode *node,
-  iShaderVariableContext *context)
+bool csXMLShaderCompiler::LoadSVBlock (iLoaderContext* ldr_context,
+    iDocumentNode *node, iShaderVariableContext *context)
 {
   csRef<csShaderVariable> svVar;
   
@@ -526,7 +525,7 @@ bool csXMLShaderCompiler::LoadSVBlock (iDocumentNode *node,
     csRef<iDocumentNode> var = it->Next ();
     svVar.AttachNew (new csShaderVariable);
 
-    if (synldr->ParseShaderVar (var, *svVar))
+    if (synldr->ParseShaderVar (ldr_context, var, *svVar))
       context->AddVariable(svVar);
   }
 
@@ -590,8 +589,8 @@ csPtr<iShaderProgram> csXMLShaderTech::LoadProgram (
   return csPtr<iShaderProgram> (program);
 }
 
-bool csXMLShaderTech::Load (iDocumentNode* node, iDocumentNode* parentSV, 
-                            size_t variant)
+bool csXMLShaderTech::Load (iLoaderContext* ldr_context,
+    iDocumentNode* node, iDocumentNode* parentSV, size_t variant)
 {
   if ((node->GetType() != CS_NODE_ELEMENT) || 
     (xmltokens.Request (node->GetValue()) 
@@ -654,14 +653,14 @@ bool csXMLShaderTech::Load (iDocumentNode* node, iDocumentNode* parentSV,
     csRef<iDocumentNode> varNode = parentSV->GetNode(
       xmltokens.Request (csXMLShaderCompiler::XMLTOKEN_SHADERVARS));
     if (varNode)
-      parent->compiler->LoadSVBlock (varNode, &svcontext);
+      parent->compiler->LoadSVBlock (ldr_context, varNode, &svcontext);
   }
 
   csRef<iDocumentNode> varNode = node->GetNode(
     xmltokens.Request (csXMLShaderCompiler::XMLTOKEN_SHADERVARS));
 
   if (varNode)
-    parent->compiler->LoadSVBlock (varNode, &svcontext);
+    parent->compiler->LoadSVBlock (ldr_context, varNode, &svcontext);
 
   // copy over metadata from parent
   metadata.description = csStrNew (parent->allShaderMeta.description);
@@ -767,7 +766,7 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
 
   //now map our buffers. all refs should be set
   size_t i;
-  for (i = 0; i < thispass->custommapping_attrib.Length (); i++)
+  for (i = 0; i < thispass->custommapping_attrib.GetSize (); i++)
   {
     if (thispass->custommapping_buffer[i] != CS_BUFFER_NONE)
     {
@@ -788,8 +787,8 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   }
   g3d->ActivateBuffers (modes.buffers, thispass->defaultMappings);
   g3d->ActivateBuffers (thispass->custommapping_attrib.GetArray (), 
-    last_buffers, (uint)thispass->custommapping_attrib.Length ());
-  lastBufferCount = thispass->custommapping_attrib.Length ();
+    last_buffers, (uint)thispass->custommapping_attrib.GetSize ());
+  lastBufferCount = thispass->custommapping_attrib.GetSize ();
   
   //and the textures
   int j;
