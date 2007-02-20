@@ -34,6 +34,14 @@ namespace CS
           TypeInfo typeInfo;
         };
         static const TypeInfoMap typeInfoMap[] = {
+          {"float", 
+            {TypeInfo::Vector,  false, 1, TypeInfo::NoSemantics, TypeInfo::NoSpace}},
+          {"float2", 
+            {TypeInfo::Vector,  false, 2, TypeInfo::NoSemantics, TypeInfo::NoSpace}},
+          {"float3", 
+            {TypeInfo::Vector,  false, 3, TypeInfo::NoSemantics, TypeInfo::NoSpace}},
+          {"float4", 
+            {TypeInfo::Vector,  false, 4, TypeInfo::NoSemantics, TypeInfo::NoSpace}},
           {"normal",
             {TypeInfo::Vector,  false, 3, TypeInfo::Normal,      TypeInfo::NoSpace}},
           {"position4",

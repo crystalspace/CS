@@ -494,9 +494,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     {
       destNodes = &currentSnippet.fragmentIn;
     }
-    else if (strcmp (location, "includes") == 0)
+    else if (strcmp (location, "definitions") == 0)
     {
-      destNodes = &includes;
+      destNodes = &definitions;
     }
     
     if (destNodes != 0)
@@ -564,10 +564,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       
       DocNodeAppender appender (programNode);
 
-      if (includes.GetSize() > 0)
+      if (definitions.GetSize() > 0)
       {
         appender.Append ("\n");
-        appender.Append (includes);
+        appender.Append (definitions);
         appender.Append ("\n");
       }
       
@@ -642,10 +642,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       
       DocNodeAppender appender (programNode);
       
-      if (includes.GetSize() > 0)
+      if (definitions.GetSize() > 0)
       {
         appender.Append ("\n");
-        appender.Append (includes);
+        appender.Append (definitions);
         appender.Append ("\n");
       }
       

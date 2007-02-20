@@ -128,7 +128,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     Snippet currentSnippet;
     csRefArray<iDocumentNode> variableMaps;
     csString outputAssign;
-    csRefArray<iDocumentNode> includes;
+    csRefArray<iDocumentNode> definitions;
     csSet<csString> globalIDs;
     csString globals;
   public:
