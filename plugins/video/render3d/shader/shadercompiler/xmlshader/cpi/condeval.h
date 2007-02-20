@@ -459,7 +459,8 @@ public:
     {
       const Values* vals = possibleValues->GetIndex (n);
       if (vals == 0) continue;
-      out.AppendFmt ("var %zu: ", possibleValues->GetIndexName (n));
+      out.AppendFmt ("var %lu: ", 
+	(unsigned long)possibleValues->GetIndexName (n));
       vals->Dump (out);
     }
   }
