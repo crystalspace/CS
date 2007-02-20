@@ -35,6 +35,7 @@ chronological order.
 	- res added "glow" ability to the std_lighting_2 weaver test shader.
 	- res fixed a lack decrement operators in xmlshader.
 	- res changed csMemoryPool to use cs_malloc().
+	- res fixed an uninitialized variable access in shaderweaver.
 19-Feb-2007
 	- Marten made a few changes in lighter2:
 	   - Disabled the use of the exposure function and use a simple

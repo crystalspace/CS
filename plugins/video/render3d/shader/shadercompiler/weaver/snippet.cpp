@@ -266,6 +266,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	}
         const char* condition = child->GetAttributeValue ("condition");
         newInput.condition = condition;
+        if (child->GetAttributeValueAsBool ("private"))
+          newInput.flags |= Technique::Input::flagPrivate;
 	
 	newTech.AddInput (newInput);
       }

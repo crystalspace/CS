@@ -270,7 +270,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
           }
 
           WEAVER_PRINTF ("find input: %p, %s", node.tech, inp.name.GetData());
-          if (FindInput (graph, combiner, node.tech, inp, sourceTech, output,
+          if (!(inp.flags & Snippet::Technique::Input::flagPrivate)
+            && FindInput (graph, combiner, node.tech, inp, sourceTech, output,
             usedOutputs))
           {
             WEAVER_PRINTF (" ...found\n");
@@ -312,7 +313,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
                   {
 	            Link link;
 	            link.fromName = 
-	              synthTree.GetNodeForTech (prevInput->node->tech).outputRenames.Get (
+	              synthTree.GetNodeForTech (prevInput->node->tech).inputRenames.Get (
 		        prevInput->input->name, (const char*)0);
 	            CS_ASSERT(!link.fromName.IsEmpty());
       	    

@@ -63,9 +63,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
           None,
           Complex
         } defaultType;
+        enum
+        {
+          flagPrivate = 1
+        };
+        uint flags;
         csArray<Block> complexBlocks;
         
-        Input() : defaultType (None) {}
+        Input() : defaultType (None), flags (0) {}
       };
       struct Output
       {
