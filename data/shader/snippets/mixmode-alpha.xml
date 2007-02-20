@@ -20,7 +20,7 @@
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
-    <input name="inputColor" type="rgba" default="complex" />
+    <input name="inputColor" type="rgba" />
     
     <input name="primaryColor" type="rgba" default="complex" private="yes">
       <block location="pass">
