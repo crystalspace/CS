@@ -357,7 +357,9 @@ public:
 
 //----------------------------------------- Class factory implementation ----//
 
+#ifdef CS_REF_TRACKER
 static class csStringHash* classIDs = 0; 
+#endif
 
 scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
   const char *iFactoryClass, scfFactoryFunc iCreate, const char *iDescription,

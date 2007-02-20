@@ -35,7 +35,7 @@ namespace CS
   namespace Debug
   {
   
-    class CallStackNameResolverBfd : public iCallStackNameResolver
+    class CallStackNameResolverBfd : public iCallStackNameResolver,
 				      public CS::Memory::CustomAllocated
     {
       csHash<BfdSymbols*, uint64> moduleBfds;
