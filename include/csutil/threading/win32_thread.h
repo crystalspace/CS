@@ -37,7 +37,7 @@ namespace Implementation
 {
 
   // Thread base-class for win32
-  class ThreadBase
+  class CS_CRYSTALSPACE_EXPORT ThreadBase
   {
   public:
     ThreadBase (Runnable* runnable);

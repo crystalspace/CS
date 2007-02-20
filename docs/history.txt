@@ -39,6 +39,8 @@ chronological order.
 	- res added the missing "parallax" weaver snippet.
 	- res fixed a lack of decrement operators in xmlshader.
 	- res added sector fog support to std_lighting_2.
+	- res added a missing export marker for the Win32 & pthread threading
+	  implementation classes.
 19-Feb-2007
 	- Marten made a few changes in lighter2:
 	   - Disabled the use of the exposure function and use a simple
