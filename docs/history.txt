@@ -29,6 +29,8 @@ chronological order.
 	  coordinates).
 	- res changed csRenderBuffer::GetBufferNameFromDescr() to also accept
 	  a 0 buffer name.
+	- Andrew Robberts added an #include <limits.h> to weavercombiner.h to fix
+	  an undeclared UINT_MAX error.
 20-Feb-2007
 	- res made a number of reftracker-related tweaks:
 	    - Made CS compile again with reftracker enabled.

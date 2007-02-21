@@ -21,6 +21,7 @@
 #define __CS_CSPLUGINCOMMON_SHADER_WEAVERCOMBINER_H__
 
 #include "csutil/scf.h"
+#include <limits.h>
 
 /**\file
  */
