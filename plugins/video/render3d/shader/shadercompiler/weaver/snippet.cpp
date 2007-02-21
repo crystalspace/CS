@@ -268,6 +268,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         newInput.condition = condition;
         if (child->GetAttributeValueAsBool ("private"))
           newInput.flags |= Technique::Input::flagPrivate;
+        if (child->GetAttributeValueAsBool ("forcenomerge"))
+          newInput.flags |= Technique::Input::flagNoMerge;
 	
 	newTech.AddInput (newInput);
       }

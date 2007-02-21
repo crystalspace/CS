@@ -19,6 +19,8 @@ chronological order.
 	  static linking into a binary.
 	- res added dsplex to the walktest plugin list (since it's the 
 	  iDocumentSystem set in walktest.cfg).
+	- res augmented shaderweaver to optionally prevent merging of input
+	  (can be useful when targetting more restricted hardware and such).
 20-Feb-2007
 	- res made a number of reftracker-related tweaks:
 	    - Made CS compile again with reftracker enabled.

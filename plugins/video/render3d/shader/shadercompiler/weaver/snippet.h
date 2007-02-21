@@ -65,7 +65,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         } defaultType;
         enum
         {
-          flagPrivate = 1
+          flagPrivate = 1,
+          flagNoMerge = 2
         };
         uint flags;
         csArray<Block> complexBlocks;

@@ -252,19 +252,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 
           // Look if there's already an input that has the same tag as this.
           EmittedInput* prevInput = 0;
-          csString tag = GetInputTag (combiner, *comb, 
-            node.tech->GetCombiner(), inp);
-          if (!tag.IsEmpty())
+          csString tag;
+          if (!(inp.flags & Snippet::Technique::Input::flagNoMerge))
           {
-            TaggedInputHash::Iterator iter (
-              taggedInputs.GetIterator (tag));
-            while (iter.HasNext())
+            tag = GetInputTag (combiner, *comb, node.tech->GetCombiner(), 
+              inp);
+            if (!tag.IsEmpty())
             {
-              size_t taggedInpIndex = iter.Next();
-              if (emitInputs[taggedInpIndex].input->type == inp.type)
+              TaggedInputHash::Iterator iter (
+                taggedInputs.GetIterator (tag));
+              while (iter.HasNext())
               {
-                prevInput = &emitInputs[taggedInpIndex];
-                break;
+                size_t taggedInpIndex = iter.Next();
+                if (emitInputs[taggedInpIndex].input->type == inp.type)
+                {
+                  prevInput = &emitInputs[taggedInpIndex];
+                  break;
+                }
               }
             }
           }
@@ -330,7 +334,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
                     if (!inp.condition.IsEmpty())
                       emit.conditions.Push (inp.condition);
                     size_t index = emitInputs.Push (emit);
-                    if (!tag.IsEmpty())
+                    if (!tag.IsEmpty()
+                      && !(inp.flags & Snippet::Technique::Input::flagNoMerge))
                       taggedInputs.Put (tag, index);
                   }
                 }
