@@ -27,6 +27,8 @@ chronological order.
 	- res augmented shaderweaver with the ability to read <input>s from
 	  files. This is useful for often reused inputs (e.g. texture 
 	  coordinates).
+	- res changed csRenderBuffer::GetBufferNameFromDescr() to also accept
+	  a 0 buffer name.
 20-Feb-2007
 	- res made a number of reftracker-related tweaks:
 	    - Made CS compile again with reftracker enabled.
