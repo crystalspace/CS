@@ -9,6 +9,14 @@ chronological order.
 
 21-Feb-2007
 	- res added a missing export marker for csExpandPlatformFilename().
+	- res changed the way plugins are statically linked when shared
+	  libraries are enabled: instead of statically linking into an 
+	  application. a shared library is created which contains the desired
+	  static plugins, which is then referenced by the application binary.
+	  In practice that should be as good as "true" static linking; 
+	  however, it's more LGPL compliant, as the static plugins can be 
+	  replaced with different versions rather easily, compared to true
+	  static linking into a binary.
 20-Feb-2007
 	- res made a number of reftracker-related tweaks:
 	    - Made CS compile again with reftracker enabled.
