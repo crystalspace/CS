@@ -30,6 +30,7 @@ WALKALL.PLUGINLIST =
   csparser
   cssynldr
   decal
+  dsplex
   dynavis
   particles
   particlesldr
@@ -139,7 +140,7 @@ Application walktest_static : [ Wildcard *.cpp *.h ] :
   independent noinstall nohelp ;
 CFlags walktest_static : [ FDefines CS_STATIC_LINKED ] : nostatic ;
 MsvcDefine walktest_static : CS_STATIC_LINKED ;
-LinkWith walktest_static : crystalspace_staticplugins crystalspace ;
+LinkWith walktest_static : crystalspace ;
 LinkStaticPlugins walktest_static : $(WALKTEST_STATIC.PLUGINLIST) ;
 SubVariant ;
 }

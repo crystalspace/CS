@@ -17,6 +17,8 @@ chronological order.
 	  however, it's more LGPL compliant, as the static plugins can be 
 	  replaced with different versions rather easily, compared to true
 	  static linking into a binary.
+	- res added dsplex to the walktest plugin list (since it's the 
+	  iDocumentSystem set in walktest.cfg).
 20-Feb-2007
 	- res made a number of reftracker-related tweaks:
 	    - Made CS compile again with reftracker enabled.
