@@ -20,31 +20,8 @@
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
-    <!-- @@@ TODO: Almost the same as in surface-classic.xml...
-         Reuse some common input definitions? -->
-    <input name="texCoord" type="texcoord2" default="complex"
-	condition='vars."tex height".texture'>
-      <block location="pass">
-	 <buffer source="texture coordinate" 
-	   destination="vertexIn.texcoord" />
-      </block>
-      
-      <block location="cg:vertexToFragment">
-	float2 texcoord;
-      </block>
-      
-      <block location="cg:vertexIn">
-	<varying type="texcoord2" name="texcoord" />
-      </block>
-      
-      <block location="cg:vertexMain">
-	texCoord = vertexToFragment.texcoord = vertexIn.texcoord;
-      </block>
-      
-      <block location="cg:fragmentMain">
-	texCoord = vertexToFragment.texcoord;
-      </block>
-    </input>
+    <input file="/shader/snippets/texCoord.inp"	
+      condition='vars."tex height".texture' />
     
     <input name="position" type="position4_object" />
     
@@ -143,29 +120,8 @@
   <technique priority="50">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
-    <input name="texCoord" type="texcoord2" default="complex"
-	condition='vars."tex diffuse".texture'>
-      <block location="pass">
-	 <buffer source="texture coordinate" 
-	   destination="vertexIn.texcoord" />
-      </block>
-      
-      <block location="cg:vertexToFragment">
-	float2 texcoord;
-      </block>
-      
-      <block location="cg:vertexIn">
-	<varying type="texcoord2" name="texcoord" />
-      </block>
-      
-      <block location="cg:vertexMain">
-	vertexToFragment.texcoord = vertexIn.texcoord;
-      </block>
-      
-      <block location="cg:fragmentMain">
-	texCoord = vertexToFragment.texcoord;
-      </block>
-    </input>
+    <input file="/shader/snippets/texCoord.inp"	
+      condition='vars."tex height".texture' />
     
     <block location="cg:vertexMain">
       // In case the coords are used on the VP side...

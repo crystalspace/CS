@@ -20,29 +20,8 @@
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
-    <input name="texCoord" type="texcoord2" default="complex"
-	condition='vars."tex diffuse".texture'>
-      <block location="pass">
-	<buffer source="texture coordinate" 
-	  destination="vertexIn.texcoord" />
-      </block>
-      
-      <block location="cg:vertexToFragment">
-	float2 texcoord;
-      </block>
-      
-      <block location="cg:vertexIn">
-	<varying type="texcoord2" name="texcoord" />
-      </block>
-      
-      <block location="cg:vertexMain">
-	texCoord = vertexToFragment.texcoord = vertexIn.texcoord;
-      </block>
-      
-      <block location="cg:fragmentMain">
-	texCoord = vertexToFragment.texcoord;
-      </block>
-    </input>
+    <input file="/shader/snippets/texCoord.inp"	
+      condition='vars."tex diffuse".texture' />
     
     <input name="texDiffuse" type="tex2d" default="complex"
 	condition='vars."tex diffuse".texture'>

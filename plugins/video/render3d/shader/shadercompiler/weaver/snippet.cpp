@@ -26,7 +26,6 @@
 
 #include "csutil/documenthelper.h"
 #include "csutil/scopeddelete.h"
-#include "csutil/xmltiny.h"
 
 #include "snippet.h"
 #include "weaver.h"
@@ -51,16 +50,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       return storage;
     }
   };
-
-  /*bool Snippet::Technique::HasOutput (const char* name) const
-  {
-    for (size_t o = 0; o < outputs.GetSize(); o++)
-    {
-      if (strcmp (outputs[o].name, name) == 0)
-        return true;
-    }
-    return false;
-  }*/
 
   //-------------------------------------------------------------------
 
@@ -235,41 +224,62 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	if (child->GetType() != CS_NODE_ELEMENT) continue;
 	
 	Technique::Input newInput;
-	newInput.name = child->GetAttributeValue ("name");
-	if (newInput.name.IsEmpty())
-	{
-	  compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
-	    "'input' node without 'name' attribute");
-	  return 0;
-	}
-	newInput.type = child->GetAttributeValue ("type");
-	if (newInput.type.IsEmpty())
-	{
-	  compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
-	    "'input' node without 'type' attribute");
-	  return 0;
-	}
-	const char* def = child->GetAttributeValue ("default");
-	if (def != 0)
-	{
-	  if (strcmp (def, "complex") == 0)
-	  {
-	    newInput.defaultType = Technique::Input::Complex;
-	    if (!ReadBlocks (compiler, child, newInput.complexBlocks))
-	      return 0;
-	  }
-	  else
-	  {
-	    compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
-	      "Invalid 'default' attribute for 'input' node: %s", def);
-	  }
-	}
         const char* condition = child->GetAttributeValue ("condition");
         newInput.condition = condition;
         if (child->GetAttributeValueAsBool ("private"))
           newInput.flags |= Technique::Input::flagPrivate;
         if (child->GetAttributeValueAsBool ("forcenomerge"))
           newInput.flags |= Technique::Input::flagNoMerge;
+
+        csRef<iDocumentNode> inputNode;
+
+        const char* filename = child->GetAttributeValue ("file");
+        if (filename != 0)
+        {
+          csRef<iDocumentNode> rootNode = 
+            compiler->LoadDocumentFromFile (filename, child);
+          if (!rootNode.IsValid()) return 0;
+        
+          inputNode = rootNode->GetNode ("input");
+          if (!inputNode.IsValid())
+          {
+	    compiler->Report (CS_REPORTER_SEVERITY_WARNING,
+	      "Expected 'input' node in file '%s'", filename);
+	    return 0;
+          }
+        }
+        else
+          inputNode = child;
+
+	newInput.name = inputNode->GetAttributeValue ("name");
+	if (newInput.name.IsEmpty())
+	{
+	  compiler->Report (CS_REPORTER_SEVERITY_WARNING, inputNode,
+	    "'input' node without 'name' attribute");
+	  return 0;
+	}
+	newInput.type = inputNode->GetAttributeValue ("type");
+	if (newInput.type.IsEmpty())
+	{
+	  compiler->Report (CS_REPORTER_SEVERITY_WARNING, inputNode,
+	    "'input' node without 'type' attribute");
+	  return 0;
+	}
+	const char* def = inputNode->GetAttributeValue ("default");
+	if (def != 0)
+	{
+	  if (strcmp (def, "complex") == 0)
+	  {
+	    newInput.defaultType = Technique::Input::Complex;
+	    if (!ReadBlocks (compiler, inputNode, newInput.complexBlocks))
+	      return 0;
+	  }
+	  else
+	  {
+	    compiler->Report (CS_REPORTER_SEVERITY_WARNING, inputNode,
+	      "Invalid 'default' attribute for 'input' node: %s", def);
+	  }
+	}
 	
 	newTech.AddInput (newInput);
       }
@@ -430,28 +440,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     const char* filename = node->GetAttributeValue ("file");
     if (filename != 0)
     {
-      csRef<iFile> file = compiler->vfs->Open (filename, VFS_FILE_READ);
-      if (!file)
-      {
-	compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	  "Unable to open snippet program file '%s'", filename);
-	return;
-      }
-      csRef<iDocumentSystem> docsys (
-	csQueryRegistry<iDocumentSystem> (compiler->objectreg));
-      if (docsys == 0)
-	docsys.AttachNew (new csTinyDocumentSystem ());
+      csRef<iDocumentNode> rootNode = 
+        compiler->LoadDocumentFromFile (filename, node);
+      if (!rootNode.IsValid()) return;
     
-      csRef<iDocument> doc = docsys->CreateDocument ();
-      const char* err = doc->Parse (file);
-      if (err != 0)
-      {
-	compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	  "Unable to parse snippet file '%s': %s", filename, err);
-	return;
-      }
-    
-      snippetNode = doc->GetRoot ()->GetNode ("snippet");
+      snippetNode = rootNode->GetNode ("snippet");
       if (!snippetNode.IsValid())
       {
 	compiler->Report (CS_REPORTER_SEVERITY_WARNING,

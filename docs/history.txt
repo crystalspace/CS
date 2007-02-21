@@ -24,6 +24,9 @@ chronological order.
 	- res moved the "glow" shader snippet to the (perhaps more fitting)
 	  directory lighting/.
 	- res made the "glow" shader snippet better support PS 1.x hardware.
+	- res augmented shaderweaver with the ability to read <input>s from
+	  files. This is useful for often reused inputs (e.g. texture 
+	  coordinates).
 20-Feb-2007
 	- res made a number of reftracker-related tweaks:
 	    - Made CS compile again with reftracker enabled.
