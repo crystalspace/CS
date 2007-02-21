@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 
+21-Feb-2007
+	- res added a missing export marker for csExpandPlatformFilename().
 20-Feb-2007
 	- res made a number of reftracker-related tweaks:
 	    - Made CS compile again with reftracker enabled.
