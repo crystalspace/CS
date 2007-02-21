@@ -569,7 +569,7 @@ struct iLoader : public virtual iBase
   /**
    * Load a shader from a file.
    */
-  virtual bool LoadShader (const char* filename) = 0;
+  virtual csRef<iShader> LoadShader (const char* filename, bool registerShader = true) = 0;
   
   /**
    * Set whether to load each file into a separate region.

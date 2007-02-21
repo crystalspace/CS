@@ -390,7 +390,7 @@ private:
   bool ParseShaderList (iLoaderContext* ldr_context, iDocumentNode* node);
   bool ParseShader (iLoaderContext* ldr_context, iDocumentNode* node,
     iShaderManager* shaderMgr);
-  virtual bool LoadShader (const char* filename);
+  virtual csRef<iShader> LoadShader (const char* filename, bool registerShader = true);
 
   /// For heightgen.
   csGenerateImageTexture* ParseHeightgenTexture (iDocumentNode* node);

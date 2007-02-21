@@ -31,6 +31,10 @@ chronological order.
 	  a 0 buffer name.
 	- Andrew Robberts added an #include <limits.h> to weavercombiner.h to fix
 	  an undeclared UINT_MAX error.
+	- Anders Stenberg changed LoadShader to return a csRef<iShader> instead 
+          of a bool, and take an option on whether to register to the shader 
+          manager or not (defaulting to true). This should hopefully not break any 
+          compilation, unless someone is doing something I didn't think of.
 20-Feb-2007
 	- res made a number of reftracker-related tweaks:
 	    - Made CS compile again with reftracker enabled.
