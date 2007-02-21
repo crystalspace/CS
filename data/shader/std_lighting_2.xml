@@ -33,7 +33,7 @@
       <snippet id="surface" file="surface/surface-classic.xml" />
       <snippet id="lighting" file="lighting/light-classic.xml" />
       <snippet id="mod_light_surf" file="snippets/modulate.xml" />
-      <snippet id="glow" file="surface/glow.xml" />
+      <snippet id="glow" file="lighting/glow.xml" />
       <snippet id="apply_mixmode_alpha" file="snippets/mixmode-alpha.xml" />
       <snippet id="sectorfog" file="fog/fog-sector.xml" />
       <!-- "connections" describe what snippets take input from what other

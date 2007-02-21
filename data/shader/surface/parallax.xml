@@ -38,7 +38,7 @@
       </block>
       
       <block location="cg:vertexMain">
-	vertexToFragment.texcoord = vertexIn.texcoord;
+	texCoord = vertexToFragment.texcoord = vertexIn.texcoord;
       </block>
       
       <block location="cg:fragmentMain">
@@ -116,6 +116,8 @@
 	  vertexToFragment.tcParallax = texCoord * tcScale; 
 	<?endif?>
       <?endif?>
+      // In case the coords are used on the VP side...
+      texCoordOffset = texCoord;
     </block>
     
     <block location="cg:fragmentMain">
@@ -164,6 +166,11 @@
 	texCoord = vertexToFragment.texcoord;
       </block>
     </input>
+    
+    <block location="cg:vertexMain">
+      // In case the coords are used on the VP side...
+      texCoordOffset = texCoord;
+    </block>
     
     <block location="cg:fragmentMain">
       texCoordOffset = texCoord;
