@@ -27,6 +27,8 @@ chronological order.
 	  - added iShader, iDecalManager and iDecalTemplate to
 	    interface_apply's.
 	  - added SWIGLUA test for language pre/post files.
+        - Piotr made genmesh to reset its user render buffers when they
+          change.
 21-Feb-2007
 	- res added a missing export marker for csExpandPlatformFilename().
 	- res changed the way plugins are statically linked when shared
