@@ -108,12 +108,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   Snippet::Technique* Snippet::LoadLibraryTechnique (WeaverCompiler* compiler, 
     iDocumentNode* node, const Technique::CombinerPlugin& combiner)
   {
-    Snippet::AtomTechnique* technique = ParseAtomTechnique (compiler, node);
+    Snippet::AtomTechnique* technique = 
+      ParseAtomTechnique (compiler, node, true, combiner.name);
     technique->combiner = combiner;
-    for (size_t b = 0; b < technique->blocks.GetSize(); b++)
-    {
-      technique->blocks[b].combinerName = combiner.name;
-    }
     return technique;
   }
   
@@ -164,13 +161,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   
   void Snippet::LoadAtomTechnique (iDocumentNode* node)
   {
-    AtomTechnique* newTech = ParseAtomTechnique (compiler, node);
+    AtomTechnique* newTech = ParseAtomTechnique (compiler, node, false);
     if (newTech != 0)
       techniques.InsertSorted (newTech, &CompareTechnique);
   }
   
   Snippet::AtomTechnique* Snippet::ParseAtomTechnique (
-    WeaverCompiler* compiler, iDocumentNode* node)
+    WeaverCompiler* compiler, iDocumentNode* node, bool canOmitCombiner,
+    const char* defaultCombinerName)
   {
     AtomTechnique newTech (
       csMD5::Encode (CS::DocumentHelper::FlattenNode (node)));
@@ -213,6 +211,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  newTech.SetCombiner (newCombiner);
 	  hasCombiner = true;
 	}
+      }
+      if (!canOmitCombiner && !hasCombiner)
+      {
+	compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
+	  "Technique without 'combiner' node");
+        return 0;
       }
     }
     
@@ -271,7 +275,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  if (strcmp (def, "complex") == 0)
 	  {
 	    newInput.defaultType = Technique::Input::Complex;
-	    if (!ReadBlocks (compiler, inputNode, newInput.complexBlocks))
+	    if (!ReadBlocks (compiler, inputNode, newInput.complexBlocks, 
+                defaultCombinerName))
 	      return 0;
 	  }
 	  else
@@ -312,7 +317,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       }
       
       csArray<Technique::Block> newBlocks;
-      if (!ReadBlocks (compiler, node, newBlocks))
+      if (!ReadBlocks (compiler, node, newBlocks, defaultCombinerName))
         return 0;
       for (size_t b = 0; b < newBlocks.GetSize(); b++)
         newTech.AddBlock (newBlocks[b]);
@@ -321,7 +326,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
   
   bool Snippet::ReadBlocks (WeaverCompiler* compiler, iDocumentNode* node, 
-		            csArray<Technique::Block>& blocks)
+		            csArray<Technique::Block>& blocks,
+                            const char* defaultCombinerName)
   {
     csRef<iDocumentNodeIterator> nodes = node->GetNodes ("block");
     while (nodes->HasNext ())
@@ -345,7 +351,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         newBlock.location = location.Slice (colon + 1);
       }
       else
+      {
+        newBlock.combinerName = defaultCombinerName;
         newBlock.location = location;
+      }
       newBlock.node = child;
       
       blocks.Push (newBlock);
@@ -525,6 +534,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
   
   //-------------------------------------------------------------------
+
   Snippet::CompoundTechnique::~CompoundTechnique()
   {
     IdSnippetHash::GlobalIterator it (snippets.GetIterator());
@@ -569,18 +579,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   void TechniqueGraph::AddTechnique (const Snippet::Technique* tech)
   {
     techniques.Push (tech);
+    inTechniques.Push (tech);
     outTechniques.Push (tech);
   }
   
   void TechniqueGraph::AddConnection (const Connection& conn)
   {
     connections.Push (conn);
+    inTechniques.Delete (conn.to);
     outTechniques.Delete (conn.from);
   }
 
   void TechniqueGraph::RemoveConnection (const Connection& conn)
   {
     connections.Delete (conn);
+    // @@@ FIXME: is re-adding to inTechniques/outTechniques needed?
   }
 
   void TechniqueGraph::Merge (const TechniqueGraph& other)
@@ -643,6 +656,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       const Snippet::Technique* tech = techIter->Next();
       if (tech->IsCompound ())
       {
+        csArray<GraphInfo> techGraphs;
         const Snippet::CompoundTechnique* compTech =
           static_cast<const Snippet::CompoundTechnique*> (tech);
 	// Each sub-snippet ...
@@ -651,9 +665,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	while (snippetIter.HasNext())
 	{
 	  Snippet* snippet = snippetIter.Next ();
-	  if (graphs.GetSize() == 0)
+	  if (techGraphs.GetSize() == 0)
 	  {
-	    BuildSubGraphs (snippet, graphs);
+	    BuildSubGraphs (snippet, techGraphs);
 	  }
 	  else
 	  {
@@ -665,22 +679,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	     * the technique into each. */
 	    for (size_t g = 0; g < newGraphs.GetSize(); g++)
 	    {
-	      for (size_t g2 = 0; g2 < graphs.GetSize(); g2++)
+	      for (size_t g2 = 0; g2 < techGraphs.GetSize(); g2++)
 	      {
-		GraphInfo graphMerged (graphs[g2]);
+		GraphInfo graphMerged (techGraphs[g2]);
 		graphMerged.Merge (newGraphs[g]);
 		graphs2.Push (graphMerged);
 	      }
 	    }
-	    graphs = graphs2;
+	    techGraphs = graphs2;
 	  }
 	}
 	/* Apply connections.
 	 * Connect "out" techs to "in" techs.
 	 */
-	for (size_t g = 0; g < graphs.GetSize(); g++)
+	for (size_t g = 0; g < techGraphs.GetSize(); g++)
 	{
-	  GraphInfo& graphInfo = graphs[g];
+	  GraphInfo& graphInfo = techGraphs[g];
 	  for (size_t c = 0; c < compTech->connections.GetSize(); c++)
 	  {
 	    TechniqueGraph::Connection newConn;
@@ -700,18 +714,50 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	    }
 	  }
 	}
+        // Add all the graphs for the technique to the complete graph list
+        for (size_t g = 0; g < techGraphs.GetSize(); g++)
+          graphs.Push (techGraphs[g]);
       }
       else
       {
 	GraphInfo graphInfo;
-	graphInfo.snippetToTechIn.PutUnique (snip, tech);
-	graphInfo.snippetToTechOut.PutUnique (snip, tech);
 	graphInfo.graph.AddTechnique (tech);
 	graphs.Push (graphInfo);
       }
     }
+    MapGraphInputsOutputs (graphs, snip);
+  }
+
+  void TechniqueGraphBuilder::MapGraphInputsOutputs (GraphInfo& graphInfo, 
+                                                     const Snippet* snip)
+  {
+    {
+      csArray<const Snippet::Technique*> inTechs;
+      graphInfo.graph.GetInputTechniques (inTechs);
+      for (size_t t = 0; t < inTechs.GetSize(); t++)
+      {
+        graphInfo.snippetToTechIn.PutUnique (snip, inTechs[t]);
+      }
+    }
+    {
+      csArray<const Snippet::Technique*> outTechs;
+      graphInfo.graph.GetOutputTechniques (outTechs);
+      for (size_t t = 0; t < outTechs.GetSize(); t++)
+      {
+        graphInfo.snippetToTechOut.PutUnique (snip, outTechs[t]);
+      }
+    }
   }
       
+  void TechniqueGraphBuilder::MapGraphInputsOutputs (
+    csArray<GraphInfo>& graphs, const Snippet* snip)
+  {
+    for (size_t g = 0; g < graphs.GetSize(); g++)
+    {
+      MapGraphInputsOutputs (graphs[g], snip);
+    }
+  }
+
   void TechniqueGraphBuilder::BuildGraphs (const Snippet* snip, 
                                            csArray<TechniqueGraph>& graphs)
   {

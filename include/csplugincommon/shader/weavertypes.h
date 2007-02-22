@@ -61,13 +61,8 @@ namespace CS
           Texcoord,
           /// Position
           Position,
-          /// Surface normal (or tangents/bitangents)
-          Normal
-	#if 0
-	  ,
-          /// Direction (e.g. light direction...)
+          /// Direction (surface normal, tangent/bitangent, light direction...)
           Direction
-	#endif
         } semantics;
         /// Space of direction/position
         enum
@@ -79,17 +74,14 @@ namespace CS
           /// World space
           World,
           /// Camera space
-          Camera
-	#if 0
-	  ,
+          Camera,
+          /// Screen space (camera and projection)
+          Screen,
           /// Tangent space
           Tangent
-	#endif
         } space;
-        #if 0
         /// Whether the values should be normalized
         bool unit;
-        #endif
       };
       
       CS_CRYSTALSPACE_EXPORT const TypeInfo* QueryTypeInfo (

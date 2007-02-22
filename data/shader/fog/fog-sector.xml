@@ -21,17 +21,13 @@
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
 
     <input name="litColor" type="rgba" />
-    <input name="Position" type="position4_object" />
+    <input name="eyePos" type="position4_camera" />
     
     <block location="cg:vertexIn">
       <uniform type="float4" name="fogPlaneS" />
       <uniform type="float4" name="fogPlaneT" />
     </block>
 
-    <block location="cg:vertexIn">
-      <uniform type="float4x4" name="ModelView" binding="state.matrix.modelview" />
-    </block>
-    
     <block location="cg:fragmentIn">
       <uniform type="tex2d" name="fogTex" />
       <uniform type="rgb" name="fogColor" />
@@ -45,8 +41,6 @@
     
     <block location="cg:vertexMain">
       <?if vars."fog density".float &gt; 0 ?>
-	// @@@ FIXME: let coercion do the magic here, really.
-	float4 eyePos = mul (vertexIn.ModelView, Position);
 	vertexToFragment.fogTC.x = dot (eyePos, vertexIn.fogPlaneS);
 	vertexToFragment.fogTC.y = dot (eyePos, vertexIn.fogPlaneT);
       <?endif?>

@@ -7,6 +7,12 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 
+22-Feb-2007
+	- res fixed shaderweaver to not crash when a snippet lacks a 
+	  <combiner> node.
+	- res made nested snippets work right in shaderweaver.
+	- res added a few additional weaver types and coercions, and made
+	  shader use them.
 21-Feb-2007
 	- res added a missing export marker for csExpandPlatformFilename().
 	- res changed the way plugins are statically linked when shared

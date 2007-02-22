@@ -31,4 +31,110 @@
     
     <output name="output" type="rgba" />
   </coercion>
+  
+  <!------------------------------------------------------------------------->
+  
+  <coercion from="position4_world" to="position4_screen" cost="4">
+    <input name="input" type="position4_world" />
+
+    <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
+	 verbatim -->
+    <input name="ModelViewProj" type="float4x4" default="complex"
+	private="yes">
+      <block location="vertexIn">
+	<uniform type="float4x4" name="ModelViewProj" binding="state.matrix.mvp" />
+      </block>
+      
+      <block location="vertexMain">
+	ModelViewProj = vertexIn.ModelViewProj;
+      </block>
+    </input>
+    
+    <block location="vertexMain">
+      output = mul (ModelViewProj, input);
+    </block>
+    
+    <output name="output" type="position4_screen" />
+  </coercion>
+  
+  <coercion from="position4_world" to="position4_camera" cost="4">
+    <input name="input" type="position4_world" />
+
+    <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
+	 verbatim -->
+    <input name="ModelView" type="float4x4" default="complex"
+	private="yes">
+      <block location="vertexIn">
+	<uniform type="float4x4" name="ModelView" binding="state.matrix.modelview" />
+      </block>
+      
+      <block location="vertexMain">
+	ModelView = vertexIn.ModelView;
+      </block>
+    </input>
+    
+    <block location="vertexMain">
+      output = mul (ModelView, input);
+    </block>
+    
+    <output name="output" type="position4_camera" />
+  </coercion>
+  
+  <!------------------------------------------------------------------------->
+  
+  <coercion from="direction_object" to="direction_tangent" cost="3">
+    <input name="input" type="direction_object" />
+
+    <input name="Normal" type="normal" default="complex" private="yes">
+      <block location="vertexIn">
+	<varying type="normal" name="Normal" />
+      </block>
+      
+      <block location=":pass">
+	<buffer source="normal" destination="vertexIn.Normal" />
+      </block>
+      
+      <block location="vertexMain">
+	Normal = vertexIn.Normal;
+      </block>
+    </input>
+    
+    <input name="Tangent" type="normal" default="complex" private="yes">
+      <block location="vertexIn">
+	<varying type="normal" name="Tangent" />
+      </block>
+      
+      <block location=":pass">
+	<buffer source="tangent" destination="vertexIn.Tangent" />
+      </block>
+      
+      <block location="vertexMain">
+	Tangent = vertexIn.Tangent;
+      </block>
+    </input>
+    
+    <input name="Bitangent" type="normal" default="complex" private="yes">
+      <block location="vertexIn">
+	<varying type="normal" name="Bitangent" />
+      </block>
+      
+      <block location=":pass">
+	<buffer source="binormal" destination="vertexIn.Bitangent" />
+      </block>
+      
+      <block location="vertexMain">
+	Bitangent = vertexIn.Bitangent;
+      </block>
+    </input>
+    
+    <block location="vertexMain">
+      float3x3 obj2tang;
+      obj2tang[0] = Tangent;
+      obj2tang[1] = Bitangent;
+      obj2tang[2] = Normal;
+      output =  mul (obj2tang, input);
+    </block>
+    
+    <output name="output" type="direction_tangent" />
+  </coercion>
 </combinerlibrary>

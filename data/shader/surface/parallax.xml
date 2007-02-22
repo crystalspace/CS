@@ -16,122 +16,114 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
-<snippet>
+<snippet type="compound">
   <technique priority="100">
-    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+    <snippet id="eyeVecObj" file="/shader/snippets/eye-direction-obj.xml" />
     
-    <input file="/shader/snippets/texCoord.inp"	
-      condition='vars."tex height".texture' />
-    
-    <input name="position" type="position4_object" />
-    
-    <input name="texHeight" type="tex2d" default="complex"
-	condition='vars."tex height".texture'>
-      <block location="pass">
-	<texture name="tex height" destination="fragmentIn.texHeight" />
-      </block>
-      
-      <block location="cg:fragmentIn">
-	<uniform type="tex2d" name="texHeight" />
-      </block>
-      
-      <block location="cg:fragmentMain">
-	texHeight = fragmentIn.texHeight;
-      </block>
-    </input>
-   
-    <!-- FIXME: share this -->
-    <block location="cg:vertexIn">
-      <varying type="normal" name="Normal" />
-      <varying type="normal" name="Tangent" />
-      <varying type="normal" name="Binormal" />
-      <uniform type="float4x4" name="ModelViewIT" 
-	binding="state.matrix.modelview.invtrans" />
-    </block>
-    <block location="pass">
-      <buffer source="normal" destination="vertexIn.Normal" />
-      <buffer source="tangent" destination="vertexIn.Tangent" />
-      <buffer source="binormal" destination="vertexIn.Binormal" />
-    </block>
-    
-    <block location="cg:definitions">
-      <?Include /shader/snippets/cg-common.cginc?>
-    </block>
-    
-    <block location="cg:variablemap">
-      <variablemap variable="tex height scale" 
-        destination="vertexIn.tcScale" />
-    </block>
-    
-    <block location="cg:vertexIn">
-      <varying type="float2" name="tcScale" />
-    </block>
-      
-    <block location="cg:vertexToFragment">
-      <?if vars."tex height".texture?>
-        // FIXME: make input?
-	float3 eyeVec;
-	<?if vars."tex height scale" 
-	  && ((vars."tex height scale".x != 1) 
-	    || (vars."tex height scale".y != 1)) ?>
-	  float2 tcParallax;
-	<?endif?>
-      <?endif?>
-    </block>
-    
-    <block location="cg:vertexMain">
-      <?if vars."tex height".texture ?>
-	float3x3 obj2tang;
-	obj2tang[0] = vertexIn.Tangent;
-	obj2tang[1] = vertexIn.Binormal;
-	obj2tang[2] = vertexIn.Normal;
-	float3 eyeVecObj = vertexIn.ModelViewIT[3] - position;
-	vertexToFragment.eyeVec =  mul (obj2tang, eyeVecObj);
-	<?if vars."tex height scale" 
-	  && ((vars."tex height scale".x != 1) 
-	    || (vars."tex height scale".y != 1)) ?>
-	  vertexToFragment.tcParallax = texCoord * tcScale; 
-	<?endif?>
-      <?endif?>
-      // In case the coords are used on the VP side...
-      texCoordOffset = texCoord;
-    </block>
-    
-    <block location="cg:fragmentMain">
-      float2 offset = float2 (0, 0);
-      float2 usedTC;
-      <?if vars."tex height scale" 
-	&& ((vars."tex height scale".x != 1) 
-	  || (vars."tex height scale".y != 1)) ?>
-	usedTC = vertexToFragment.tcParallax;
-      <?else?>
-	usedTC = texCoord;
-      <?endif?>
-      <?if vars."tex height".texture ?>
-	offset = ComputeParallaxOffset (texHeight, usedTC, 
-	  normalize (vertexToFragment.eyeVec), 0.04);
-      <?endif?>
-      texCoordOffset = texCoord + offset;
-    </block>
-    
-    <output name="texCoordOffset" type="texcoord2" />
+    <snippet id="parallax">
+      <technique priority="100">
+	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+	
+	<input file="/shader/snippets/texCoord.inp"	
+	  condition='vars."tex height".texture' />
+	
+	<!-- vector pointing to eye, in tangent space -->
+	<input name="eyeVec" type="direction_tangent" />
+	
+	<input name="texHeight" type="tex2d" default="complex"
+	    condition='vars."tex height".texture'>
+	  <block location="pass">
+	    <texture name="tex height" destination="fragmentIn.texHeight" />
+	  </block>
+	  
+	  <block location="cg:fragmentIn">
+	    <uniform type="tex2d" name="texHeight" />
+	  </block>
+	  
+	  <block location="cg:fragmentMain">
+	    texHeight = fragmentIn.texHeight;
+	  </block>
+	</input>
+       
+	<block location="cg:definitions">
+	  <?Include /shader/snippets/cg-common.cginc?>
+	</block>
+	
+	<block location="cg:variablemap">
+	  <variablemap variable="tex height scale" 
+	    destination="vertexIn.tcScale" />
+	</block>
+	
+	<block location="cg:vertexIn">
+	  <varying type="float2" name="tcScale" />
+	</block>
+	  
+	<block location="cg:vertexToFragment">
+	  <?if vars."tex height".texture?>
+	    float3 eyeVec;
+	    <?if vars."tex height scale" 
+	      && ((vars."tex height scale".x != 1) 
+		|| (vars."tex height scale".y != 1)) ?>
+	      float2 tcParallax;
+	    <?endif?>
+	  <?endif?>
+	</block>
+	
+	<block location="cg:vertexMain">
+	  <?if vars."tex height".texture ?>
+	    vertexToFragment.eyeVec =  eyeVec;
+	    <?if vars."tex height scale" 
+	      && ((vars."tex height scale".x != 1) 
+		|| (vars."tex height scale".y != 1)) ?>
+	      vertexToFragment.tcParallax = texCoord * tcScale; 
+	    <?endif?>
+	  <?endif?>
+	  // In case the coords are used on the VP side...
+	  texCoordOffset = texCoord;
+	</block>
+	
+	<block location="cg:fragmentMain">
+	  float2 offset = float2 (0, 0);
+	  float2 usedTC;
+	  <?if vars."tex height scale" 
+	    && ((vars."tex height scale".x != 1) 
+	      || (vars."tex height scale".y != 1)) ?>
+	    usedTC = vertexToFragment.tcParallax;
+	  <?else?>
+	    usedTC = texCoord;
+	  <?endif?>
+	  <?if vars."tex height".texture ?>
+	    offset = ComputeParallaxOffset (texHeight, usedTC, 
+	      normalize (vertexToFragment.eyeVec), 0.04);
+	  <?endif?>
+	  texCoordOffset = texCoord + offset;
+	</block>
+	
+	<output name="texCoordOffset" type="texcoord2" />
+      </technique>
+    </snippet>
+    <connection from="eyeVecObj" to="parallax" />
   </technique>
   
   <technique priority="50">
-    <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
-    
-    <input file="/shader/snippets/texCoord.inp"	
-      condition='vars."tex height".texture' />
-    
-    <block location="cg:vertexMain">
-      // In case the coords are used on the VP side...
-      texCoordOffset = texCoord;
-    </block>
-    
-    <block location="cg:fragmentMain">
-      texCoordOffset = texCoord;
-    </block>
-    
-    <output name="texCoordOffset" type="texcoord2" />
+    <snippet id="parallax">
+      <technique priority="100">
+	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
+	
+	<input file="/shader/snippets/texCoord.inp"	
+	  condition='vars."tex height".texture' />
+	
+	<block location="cg:vertexMain">
+	  // In case the coords are used on the VP side...
+	  texCoordOffset = texCoord;
+	</block>
+	
+	<block location="cg:fragmentMain">
+	  texCoordOffset = texCoord;
+	</block>
+	
+	<output name="texCoordOffset" type="texcoord2" />
+      </technique>
+    </snippet>
   </technique>
 </snippet>

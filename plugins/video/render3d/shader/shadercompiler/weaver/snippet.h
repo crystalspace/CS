@@ -174,9 +174,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     void LoadAtomTechniques (iDocumentNode* node);
     void LoadAtomTechnique (iDocumentNode* node);
     static AtomTechnique* ParseAtomTechnique (WeaverCompiler* compiler,
-      iDocumentNode* node);
+      iDocumentNode* node, bool canOmitCombiner, 
+      const char* defaultCombinerName = 0);
     static bool ReadBlocks (WeaverCompiler* compiler, iDocumentNode* node,
-      csArray<Technique::Block>& blocks);
+      csArray<Technique::Block>& blocks, const char* defaultCombinerName = 0);
     
     static int CompareTechnique (Technique* const&, Technique* const&);
     
@@ -206,12 +207,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     void Merge (const TechniqueGraph& other);
     
+    void GetInputTechniques (csArray<const Snippet::Technique*>& inTechs) const
+    { inTechs = inTechniques; }
     void GetOutputTechniques (csArray<const Snippet::Technique*>& outTechs) const
     { outTechs = outTechniques; }
     void GetDependencies (const Snippet::Technique* tech, csArray<const Snippet::Technique*>& deps) const;
   private:
     csArray<const Snippet::Technique*> techniques;
     csArray<Connection> connections;
+    csArray<const Snippet::Technique*> inTechniques;
     csArray<const Snippet::Technique*> outTechniques;
   };
 
@@ -227,6 +231,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       void Merge (const GraphInfo& other);
     };
     void BuildSubGraphs (const Snippet* snip, csArray<GraphInfo>& graphs);
+    void MapGraphInputsOutputs (GraphInfo& graphInfo, const Snippet* snip);
+    void MapGraphInputsOutputs (csArray<GraphInfo>& graphs, 
+      const Snippet* snip);
   public:
     void BuildGraphs (const Snippet* snip, csArray<TechniqueGraph>& graphs);
   };
