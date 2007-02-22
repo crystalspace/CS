@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2002 by Keith Fulton and Jorrit Tyberghein
+    Rewritten during Sommer of Code 2006 by Christoph "Fossi" Mewes
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -19,82 +20,211 @@
 #include "cssysdef.h"
 #include "csgfx/imagememory.h"
 #include "cstool/csview.h"
-#include "cstool/proctex.h"
+#include "csgeom/polyclip.h"
+#include "csgeom/math.h"
 #include "csutil/cscolor.h"
 #include "iengine/camera.h"
 #include "iengine/engine.h"
 #include "iengine/rview.h"
 #include "iengine/sector.h"
 #include "iutil/objreg.h"
+#include "iutil/plugin.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
-#include "plugins/engine/3d/engine.h"
-#include "plugins/engine/3d/impprctx.h"
+#include "ivideo/material.h"
+#include "engine.h"
+#include "material.h"
+#include "impmesh.h"
+#include "meshobj.h"
+#include "impprctx.h"
 
-#include "plugins/engine/3d/impmesh.h"
-#include "plugins/engine/3d/meshobj.h"
+//@@@ debugging
+#include "cstool/debugimagewriter.h"
+#include "csgfx/imagememory.h"
 
-//#include "iutil/vfs.h"
 
-csImposterProcTex::csImposterProcTex (csEngine* engine, 
-                                      csImposterMesh *parent) : 
-  csProcTexture (), engine (engine)
+csImposterProcTex::csImposterProcTex  (csEngine* engine,  
+  csImposterMesh *parent) : scfImplementationType(this), engine(engine)
 {
   mesh = parent;
 
-  mat_w = 256;
-  mat_h = 256;
+  //@@@ make dynamic
+  w = h = 256;
 
-  texFlags = CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;
+  int texFlags = CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;
 
-  csProcTexture::Initialize (engine->objectRegistry);
+  //initialize shortcuts
+  g3d = engine->G3D;
+  g2d = g3d->GetDriver2D ();
+  shadermanager = csQueryRegistryOrLoad<iShaderManager>
+    (engine->objectRegistry, "crystalspace.graphics3d.shadermanager");
+
+  
+  csRef<iImage> thisImage = new csImageMemory (w, h,
+    CS_IMGFMT_ALPHA && CS_IMGFMT_TRUECOLOR );
+  tex = engine->GetTextureList ()->NewTexture (thisImage);
+  tex->SetFlags (tex->GetFlags() | texFlags);
+  tex->Register(g3d->GetTextureManager());
+  thisImage = 0;
+
+  csRef<iStringSet> stringSet = engine->globalStringSet;
+  stringid_standard = stringSet->Request("standard");
+  stringid_light_ambient = stringSet->Request("light ambient");
+
+  clip = new csBoxClipper (0, 0, w, h);
+
+  updating = false;
 }
 
 csImposterProcTex::~csImposterProcTex ()
 {
+  delete clip;
 }
 
-bool csImposterProcTex::PrepareAnim ()
+void csImposterProcTex::Update (iRenderView* rview)
 {
-  if (anim_prepared) return true;
-  if (!csProcTexture::PrepareAnim ()) return false;
-
-  // special things may be necessary here
-
-  return true;
+  // Check if we're not already updating.
+  // @@@ Note! In the future we might want to support imposters
+  // different for various views. i.e. the same object visible at
+  // different distances through different portals or views.
+  // In that case it might make sense to also add the imposter to
+  // other rview update queues in the engine.
+  if (!updating && rview)
+  {
+    printf ("Requesting update!\n"); fflush (stdout);
+    engine->AddImposterToUpdateQueue (this, rview);
+    //engine->imposterUpdateList.Push (csWeakRef<csImposterProcTex> (this));
+    updating = true;
+  }
 }
 
-void csImposterProcTex::Animate (csTicks CurrentTime)
+
+void csImposterProcTex::RenderToTexture (iRenderView *rview, iSector *s)
 {
-  CS_ASSERT_MSG("Cannot remove this", 0);
-  // move the camera
-  csVector3 Position (-0.5, 0, 3 + sin (CurrentTime / (10*1000.0))*1);
-  View->GetCamera ()->Move (Position - View->GetCamera ()
-  	->GetTransform ().GetOrigin ());
+  if (!mesh) return;
 
-  g3d->SetRenderTarget (tex->GetTextureHandle ());
+  //start r2t
+  csRef<iTextureHandle> handle = tex->GetTextureHandle ();
+  g3d->SetRenderTarget (handle);
 
-  // Switch to the context of the procedural texture.
-  iTextureHandle *oldContext = engine->GetContext ();
-  engine->SetContext (tex->GetTextureHandle ());
+  g3d->BeginDraw (CSDRAW_3DGRAPHICS | engine->GetBeginDrawFlags ()
+    | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN);
+ 
+  //get imposted mesh
+  csRef<iMeshWrapper> originalmesh = mesh->parent_mesh;
+  csRef<iMeshObject> meshobj = originalmesh->GetMeshObject ();
+  csVector3 mesh_pos = originalmesh->GetWorldBoundingBox ().GetCenter ();
 
-  // Draw the engine view.
-  g3d->BeginDraw (CSDRAW_3DGRAPHICS | engine->GetBeginDrawFlags ());
+  //update imposter billbord
+  iCamera* cam = rview->GetCamera ();
+  mesh->FindImposterRectangle (cam);
 
-  // Determine and save the actual polygon on which the texture will be rendered
-  mesh->FindImposterRectangle (View->GetCamera () );
+  //save camerastate for later
+  const csOrthoTransform oldt = cam->GetTransform ();
+  int persx, persy;
+  g3d->GetPerspectiveCenter ( persx, persy );
+  int oldFOV = cam->GetFOV ();
 
-  // This actually draws the mesh on the backbuffer
-/*  mesh->GetParent()->GetMeshObject()->Draw (View, 
-        &mesh->GetParent()->GetCsMovable().scfiMovable, 
-	mesh->GetParent()->GetZBufMode());*/
+  //Calculate camera position for imposter rendering
+  const csVector3& cam_pos = cam->GetTransform ().GetOrigin ();
+  csVector3 camdir = mesh_pos-cam_pos;
+
+  csOrthoTransform transform = cam->GetTransform();;
+
+  csVector3 col3 = transform.GetT2O ().Col3 ();
+//printf("transform col3: %f %f %f\n", col3.x, col3.y, col3.z);
+
+  //look at the mesh
+  cam->GetTransform ().LookAt (camdir, cam->GetTransform ().GetT2O ().Col2 ());
+
+  col3 = transform.GetT2O ().Col3 ();
+//printf("transform col3: %f %f %f\n", col3.x, col3.y, col3.z);
+
+
+  //the distance to the mesh has the same ratio as
+  //the billbordsize to the screen.
+  //@@@ this is only roughly correct
+  float maxratio = csMax (
+    mesh->width/engine->frameWidth,
+    mesh->height/engine->frameHeight);
   
-  // This copies the backbuffer to the iTextureHandle I think.
-  g3d->FinishDraw ();
+  csVector3 new_cam_pos = mesh_pos - maxratio * camdir;
+  cam->GetTransform ().SetOrigin (new_cam_pos);
 
-  // switch back to the old context
-  engine->SetContext (oldContext);
+//printf("maxr: %f\n", maxratio);
+//printf("camdir: %f %f %f\n", camdir.x, camdir.y, camdir.z);
+//printf("newpos: %f %f %f\n", new_cam_pos.x, new_cam_pos.y, new_cam_pos.z);
+
+  //Setup rendering
+  g3d->SetPerspectiveCenter (w/2, w/2);
+  g3d->SetClipper (clip, CS_CLIPPER_TOPLEVEL);
+  cam->SetFOV (w, h);
+  g3d->SetPerspectiveAspect (cam->GetFOV ());
+  g3d->SetWorldToCamera (cam->GetTransform ().GetInverse ());
+
+  //get the original rendermeshes
+  int num;
+  csRenderMesh** rendermeshes = meshobj->GetRenderMeshes (num, rview, 
+    originalmesh->GetMovable (), ~0);
+
+  //draw them, as the view, engine and renderloops do
+  for (int i = 0; i < num; i++)
+  {
+    csRenderMesh* rendermesh = rendermeshes[i];
+    csRenderMeshModes mode (*rendermesh);
+    iShaderVarStack *sva = shadermanager->GetShaderVariableStack ();
+
+    iMaterial* hdl = rendermesh->material->GetMaterial ();
+    iShader* meshShader = hdl->GetShader (stringid_standard);
+
+    if (meshShader == 0)
+    {
+      static bool defaultshaderused = 0;
+      if (!defaultshaderused)
+      {
+        defaultshaderused = 1;
+        engine->Warn("No 'standard' Shader! Using default.");
+      }
+      meshShader = engine->defaultShader;
+    }
+
+    iShaderVariableContext *svc = new csShaderVariableContext();
+
+    //add ambient shadervariable
+    csRef<csShaderVariable> sv;
+    sv = svc->GetVariableAdd(stringid_light_ambient);
+    csColor ambient;
+    engine->GetAmbientLight (ambient);
+    if (s) sv->SetValue (ambient + s->GetDynamicAmbientLight());
+    svc->PushVariables (sva);
+
+    if (rendermesh->variablecontext)
+      rendermesh->variablecontext->PushVariables (sva);
+    meshShader->PushVariables (sva);
+    if (hdl) hdl->PushVariables (sva);
+
+    size_t shaderTicket = meshShader->GetTicket (mode, sva);
+    size_t passCount = meshShader->GetNumberOfPasses (shaderTicket);
+
+    for (size_t p = 0; p < passCount; p++)
+    {
+      meshShader->ActivatePass (shaderTicket, p);
+      meshShader->SetupPass (shaderTicket, rendermesh, mode, sva);
+      g3d->DrawMesh(rendermesh, mode, sva);
+      meshShader->TeardownPass (shaderTicket);
+      meshShader->DeactivatePass (shaderTicket);
+    }
+  }
+
+  //restore old camera values
+  g3d->SetPerspectiveCenter (persx, persy);
+  cam->SetFOV (oldFOV, engine->frameHeight);
+  cam->SetTransform (oldt);
+
+  g3d->FinishDraw ();
+  mesh->SetImposterReady (true, 0);
+  updating = false;
 }
 

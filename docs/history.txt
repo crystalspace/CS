@@ -14,6 +14,14 @@ chronological order.
 	- res added a few additional weaver types and coercions, and made
 	  shader use them.
 	- Andrew Robberts added a colour falloff to decals.
+	- Jorrit moved the engine code from the imposter branch to main
+	  trunk. Reworked the code so that it now uses a preprocess
+	  event handler to update all the imposter textures instead of
+	  trying to do it in the main engine view. This required
+	  rewriting the update queue in the engine so that there is now
+	  a separate update queue for every camera.
+	- Jorrit moved the simple2 imposter test code to a new imptest app
+	  in CS. This clearly shows that imposters are not yet working.
 21-Feb-2007
 	- res added a missing export marker for csExpandPlatformFilename().
 	- res changed the way plugins are statically linked when shared
@@ -36,12 +44,12 @@ chronological order.
 	  coordinates).
 	- res changed csRenderBuffer::GetBufferNameFromDescr() to also accept
 	  a 0 buffer name.
-	- Andrew Robberts added an #include <limits.h> to weavercombiner.h to fix
-	  an undeclared UINT_MAX error.
+	- Andrew Robberts added an #include <limits.h> to weavercombiner.h to
+	  fix an undeclared UINT_MAX error.
 	- Anders Stenberg changed LoadShader to return a csRef<iShader> instead 
           of a bool, and take an option on whether to register to the shader 
-          manager or not (defaulting to true). This should hopefully not break any 
-          compilation, unless someone is doing something I didn't think of.
+          manager or not (defaulting to true). This should hopefully not break
+	  any compilation, unless someone is doing something I didn't think of.
 20-Feb-2007
 	- res made a number of reftracker-related tweaks:
 	    - Made CS compile again with reftracker enabled.

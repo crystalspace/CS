@@ -87,6 +87,8 @@ public:
   ///
   csRenderView (iCamera* c, iClipper2D* v, iGraphics3D* ig3d,
     iGraphics2D* ig2d);
+  /// Copy constructor.
+  csRenderView (const csRenderView& other);
 
   virtual ~csRenderView ();
 

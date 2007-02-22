@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2002 by Keith Fulton and Jorrit Tyberghein
+    Rewritten during Sommer of Code 2006 by Christoph "Fossi" Mewes
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -21,7 +22,9 @@
 #include "iengine/portal.h"
 #include "iengine/rview.h"
 #include "ivideo/graph3d.h"
+#include "csgfx/renderbuffer.h"
 
+#include "material.h"
 #include "impmesh.h"
 #include "sector.h"
 #include "meshobj.h"
@@ -30,87 +33,236 @@
 
 csImposterMesh::csImposterMesh (csEngine* engine, csMeshWrapper *parent)
 {
+  csImposterMesh::engine = engine;
   parent_mesh = parent;
+
   tex = new csImposterProcTex (engine, this);
-  ready	= false;
-  incidence_dist = 0;
+  impostermat = engine->CreateMaterial ("Imposter", tex->GetTexture ());
+
+  //@@@ Add four to initialise array because of bug in csPoly3D
+  cutout.AddVertex (csVector3 ());
+  cutout.AddVertex (csVector3 ());
+  cutout.AddVertex (csVector3 ());
+  cutout.AddVertex (csVector3 ());
+
+  SetImposterReady (false, 0);
+  dirty = true;
+  anglecamera = PI;
+  angleobject = PI;
 }
 
-float csImposterMesh::CalcIncidenceAngleDist (iRenderView *rview)
+csImposterMesh::~csImposterMesh ()
 {
-  // Jorrit, not sure about this correctness but it compiles at least. -Keith
-
-  // Calculate angle of incidence vs. the camera
-  iCamera* camera = rview->GetCamera ();
-  csReversibleTransform obj = (parent_mesh->GetCsMovable()).csMovable::GetTransform ();
-  csReversibleTransform cam = camera->GetTransform ();
-  csReversibleTransform seg = obj / cam;  // Matrix Math Magic!
-  csVector3 straight(0,0,1);
-  csVector3 pt = seg * straight;
-  return csSquaredDist::PointPoint (straight, pt);
+  delete tex;
 }
 
-bool csImposterMesh::CheckIncidenceAngle (iRenderView *rview, float tolerance)
+void csImposterMesh::UpdateValues (iCamera *cam,
+  float &camangle, float &objangle)
 {
-  float const dist2 = CalcIncidenceAngleDist(rview);
-  float diff = dist2 - incidence_dist;
-  if (diff < 0) diff = -diff;
+  csReversibleTransform objt = 
+    (parent_mesh->GetCsMovable ()).csMovable::GetTransform ();
+  csReversibleTransform camt = cam->GetTransform ();
+
+  csVector3 m2c = (
+    parent_mesh->GetWorldBoundingBox ().GetCenter ()
+    - camt.GetOrigin ()
+  ).Unit ();
+
+  csVector3 objf = objt.GetT2O ().Col3 ();
+  csVector3 camf = camt.GetT2O ().Col3 ();
+
+  camangle = acosf (camf * m2c);
+  objangle = acosf (objf * m2c);
+}
+
+bool csImposterMesh::CheckUpdateNeeded (iRenderView *rview, float tolerance)
+{
+  float curangle_cam;
+  float curangle_obj;
+
+  UpdateValues (rview->GetCamera (), curangle_cam, curangle_obj);
+
+  float camdiff = fabsf (curangle_cam - anglecamera);
+  float objdiff = fabsf (curangle_obj - angleobject);
+
+  float diff = camdiff + objdiff;
 
   // If not ok, mark for redraw of imposter
   if (diff > tolerance)
   {
-    SetImposterReady (false);
+    SetImposterReady (false, rview);
     return false;
   }
   return true;
 }
 
-void csImposterMesh::FindImposterRectangle (const iCamera* /*camera*/)
+void csImposterMesh::SetImposterReady (bool r, iRenderView* rview)
+{
+printf("setting ready: %i\n", ready);
+  ready = r;
+  if (!ready) tex->Update (rview);
+}
+
+bool csImposterMesh::GetImposterReady (iRenderView* rview)
+{
+  if (!ready) tex->Update (rview);
+  return tex->GetImposterReady();
+}
+
+
+void csImposterMesh::FindImposterRectangle (iCamera* c)
 {
   // Called from csImposterProcTex during Anim.
   //  (Recalc of texture causes recalc of imposter poly also.)
 
-  // Rotate camera to look at object directly.
-  // Get screen bounding box, modified to also return depth of
-  //  point of max width or height in the box.
-  // Rotate camera back to original lookat
+  // Save camera orientation
+  const csOrthoTransform oldt = c->GetTransform ();
+
+  // Look at mesh
+  csVector3 meshcenter = parent_mesh->GetWorldBoundingBox ().GetCenter ();
+  csVector3 campos = c->GetTransform ().GetOrigin ();
+
+  c->GetTransform ().LookAt (meshcenter - campos,
+     c->GetTransform ().GetT2O ().Col2 ());
+
+  // Get screen bounding box
+  res = parent_mesh->GetScreenBoundingBox (c);
+
+  //calculate height and width of the imposter on screen
+  height = (res.sbox.GetCorner (1) - res.sbox.GetCorner (0)).y;
+  width = (res.sbox.GetCorner (2) - res.sbox.GetCorner (0)).x;
+
   // Project screen bounding box, at the returned depth to
   //  the camera transform to rotate it around where we need it
+  float middle = (res.cbox.MinZ () + res.cbox.MaxZ ()) / 2;
+
+  csVector3 v1 = c->InvPerspective (res.sbox.GetCorner (0), middle);
+  csVector3 v2 = c->InvPerspective (res.sbox.GetCorner (1), middle);
+  csVector3 v3 = c->InvPerspective (res.sbox.GetCorner (3), middle);
+  csVector3 v4 = c->InvPerspective (res.sbox.GetCorner (2), middle);
+  
+  //@@@ put these into w2o and save transform
+  v1 = c->GetTransform ().This2Other (v1);
+  v2 = c->GetTransform ().This2Other (v2);
+  v3 = c->GetTransform ().This2Other (v3);
+  v4 = c->GetTransform ().This2Other (v4);
+
   // Save as csPoly3d for later rendering
-#if 0
-  parent_mesh->GetScreenBoundingBox (camera,sbox,cbox);
-#endif
+  cutout[0] = v1;
+  cutout[1] = v2;
+  cutout[2] = v3;
+  cutout[3] = v4;
+
+  // Revert camera changes
+  c->SetTransform (oldt);
+
+  // save current facing for angle checking
+  UpdateValues (c, anglecamera, angleobject);
+
+  dirty = true;
 }
 
-void csImposterMesh::Draw (iRenderView* /*rview*/)
+//static arrays that keep the imposterdata
+CS_IMPLEMENT_STATIC_VAR (GetMeshIndices, csDirtyAccessArray<uint>, ());
+CS_IMPLEMENT_STATIC_VAR (GetMeshVertices, csDirtyAccessArray<csVector3>, ());
+CS_IMPLEMENT_STATIC_VAR (GetMeshTexels, csDirtyAccessArray<csVector2>, ());
+CS_IMPLEMENT_STATIC_VAR (GetMeshColors, csDirtyAccessArray<csVector4>, ());
+
+csRenderMesh** csImposterMesh::GetRenderMesh(iRenderView *rview)
 {
-#if 0  
-  iGraphics3D *g3d = rview->GetG3D();
-  G3DPolygonDP poly;
-  memset (&poly, 0, sizeof(poly));
+  //Get an unused mesh
+  bool rmCreated;
+  csRenderMesh*& mesh = rmHolder.GetUnusedMesh (rmCreated,
+    rview->GetCurrentFrameNumber ());
 
-  csMatrix3 m_cam2tex;
-  csVector3 v_cam2tex;
+  csDirtyAccessArray<uint>& mesh_indices = *GetMeshIndices ();
+  csDirtyAccessArray<csVector2>& mesh_texels = *GetMeshTexels ();
+  csDirtyAccessArray<csVector4>& mesh_colors = *GetMeshColors ();
 
-  poly.mixmode = CS_FX_COPY;
-  poly.use_fog = false;
-  poly.do_fullbright = false;
-  poly.plane.m_cam2tex = &m_cam2tex;
-  poly.plane.v_cam2tex = &v_cam2tex;
+  if (rmCreated)
+  {
+    //Initialize mesh
+    mesh->meshtype = CS_MESHTYPE_TRIANGLES;
+    mesh->flipCulling = false;
+    mesh->supports_pseudoinstancing = false;
+    mesh->do_mirror = rview->GetCamera ()->IsMirrored ();
+    mesh->object2world = csReversibleTransform ();
+    mesh->worldspace_origin = csVector3 (0,0,0);
+    mesh->mixmode = CS_FX_ALPHA;
+    mesh->alphaType = csAlphaMode::alphaBinary;
+    mesh->z_buf_mode = CS_ZBUF_TEST;
+    mesh->material = impostermat;
 
-  //  poly.mat_handle = tex->GetMaterial ();
-  poly.flat_color_r = 128;
-  poly.flat_color_g = 128;
-  poly.flat_color_b = 128;
+    mesh_indices.Push (0);
+    mesh_indices.Push (1);
+    mesh_indices.Push (2);
+    mesh_indices.Push (2);
+    mesh_indices.Push (3);
+    mesh_indices.Push (0);
 
-  m_cam2tex = pol.m_obj2tex * o2c.GetT2O ();
-  v_cam2tex = o2c.Other2This (pol.v_obj2tex);
+    mesh->indexstart = 0;
+    mesh->indexend = 6;
 
-  poly.poly_texture = 0; // pol.poly_texture; when imposter is rendered correctly
+    csRef<csRenderBuffer> indexBuffer = 
+      csRenderBuffer::CreateIndexRenderBuffer(
+      6, CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 0, 3);
+    indexBuffer->CopyInto (mesh_indices.GetArray(), 6);
 
-  // project screen bounding box into poly vertex list here
+    GetMeshColors ()->Empty ();
 
-  // ok now actually draw it
-  g3d->DrawPolygon (poly);
-#endif
+    csVector4 c (1, 1, 1, 1.0);
+    mesh_colors.Push (c);
+    mesh_colors.Push (c);
+    mesh_colors.Push (c);
+    mesh_colors.Push (c);
+
+    csRef<csRenderBuffer> colBuffer = csRenderBuffer::CreateRenderBuffer(
+      4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 4);
+    colBuffer->CopyInto (mesh_colors.GetArray(), 4);
+
+    csRef<csRenderBufferHolder> buffer = new csRenderBufferHolder();
+    buffer->SetRenderBuffer (CS_BUFFER_INDEX, indexBuffer);
+    buffer->SetRenderBuffer (CS_BUFFER_COLOR, colBuffer);
+    mesh->buffers = buffer;
+    mesh->variablecontext = new csShaderVariableContext();
+  }
+
+  //mesh changed
+  if (dirty)
+  {
+    GetMeshVertices ()->Empty ();
+    GetMeshTexels ()->Empty ();
+
+    float x = 1;
+    float y = 1;
+
+    // correct textels for imposter heigth/width ratio
+    // since r2t texture is square, but billboard might not
+    if (height > width)
+    {
+      x -= (1 - width/height)/2;
+    } else {
+      y -= (1 - height/width)/2;
+    }
+
+    mesh_texels.Push (csVector2 (1-x,y));  //0 1
+    mesh_texels.Push (csVector2 (1-x,1-y));  //0 0
+    mesh_texels.Push (csVector2 (x,1-y));  //1 0
+    mesh_texels.Push (csVector2 (x,y));    //1 1
+
+    csRef<csRenderBuffer> vertBuffer = csRenderBuffer::CreateRenderBuffer(
+      4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+    vertBuffer->CopyInto (cutout.GetVertices (), 4);
+
+    csRef<csRenderBuffer> texBuffer = csRenderBuffer::CreateRenderBuffer(
+      4, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
+    texBuffer->CopyInto (mesh_texels.GetArray(), 4);
+
+    mesh->buffers->SetRenderBuffer (CS_BUFFER_POSITION, vertBuffer);
+    mesh->buffers->SetRenderBuffer (CS_BUFFER_TEXCOORD0, texBuffer);
+
+    dirty = false;
+  }
+
+  return &mesh;
 }

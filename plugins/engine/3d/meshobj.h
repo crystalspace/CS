@@ -613,9 +613,9 @@ public:
   { /* implement later */ }
 
   /**
-   * Renders the imposter on the screen.
+   * Gets the imposters rendermesh
    */
-  bool DrawImposter (iRenderView *rview);
+  csRenderMesh** GetImposter (iRenderView *rview);
 
   /// Determine if imposter or true rendering will be used.
   virtual bool WouldUseImposter (csReversibleTransform& /*pov*/) const
@@ -672,8 +672,8 @@ public:
   virtual void GetWorldBoundingBox (csBox3& cbox);
   virtual void GetTransformedBoundingBox (const csReversibleTransform& trans,
   	csBox3& cbox);
-  virtual float GetScreenBoundingBox (iCamera *camera, csBox2& sbox,
-  	csBox3& cbox);
+  virtual float GetScreenBoundingBox (iCamera *camera,
+         csBox2& sbox, csBox3& cbox);
   virtual const csBox3& GetWorldBoundingBox ();
   virtual csBox3 GetTransformedBoundingBox (const csReversibleTransform& trans);
   virtual csScreenBoxResult GetScreenBoundingBox (iCamera *camera);
