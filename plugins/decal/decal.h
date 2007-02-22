@@ -55,17 +55,18 @@ private:
   csDecalManager *		decalManager;
 
   // buffers and rendermesh to hold the rendering data
-  csRef<csRenderBuffer>         	vertexBuffer;
-  csRef<csRenderBuffer>         	texCoordBuffer;
-  csRef<csRenderBuffer>         	normalBuffer;
-  csRef<csRenderBuffer>         	indexBuffer;
-  csRef<csRenderBufferHolder>   	bufferHolder;
-  csArray<csRenderMesh*>        	renderMeshes;
-  csArray<csDecalRenderMeshInfo>	renderMeshInfos;
+  csRef<csRenderBuffer>             vertexBuffer;
+  csRef<csRenderBuffer>             texCoordBuffer;
+  csRef<csRenderBuffer>             normalBuffer;
+  csRef<csRenderBuffer>             colorBuffer;
+  csRef<csRenderBuffer>             indexBuffer;
+  csRef<csRenderBufferHolder>       bufferHolder;
+  csArray<csRenderMesh*>            renderMeshes;
+  csArray<csDecalRenderMeshInfo>    renderMeshInfos;
 
-  csRef<iDecalTemplate>         	decalTemplate;
+  csRef<iDecalTemplate>             decalTemplate;
 
-  float					life;
+  float                             life;
 
   // used to keep track of the next open slot in our buffers and what to render
   uint                          indexCount;
@@ -95,7 +96,9 @@ private:
   csVector3                     vertOffset;
   csVector3                     relPos;
   csPlane3                      clipPlanes[6];
-  size_t			numClipPlanes;
+  size_t                        numClipPlanes;
+  float                         topPlaneDist;
+  float                         bottomPlaneDist;
   
 public:
   csDecal(iObjectRegistry * objectReg, csDecalManager * decalManager);

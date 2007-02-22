@@ -13,6 +13,7 @@ chronological order.
 	- res made nested snippets work right in shaderweaver.
 	- res added a few additional weaver types and coercions, and made
 	  shader use them.
+	- Andrew Robberts added a colour falloff to decals.
 21-Feb-2007
 	- res added a missing export marker for csExpandPlatformFilename().
 	- res changed the way plugins are statically linked when shared

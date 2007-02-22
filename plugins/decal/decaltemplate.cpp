@@ -35,7 +35,10 @@ csDecalTemplate::csDecalTemplate()
       bottomClipScale(CS_DECAL_DEFAULT_BOTTOM_CLIP_SCALE),
       minTexCoord(0,0),
       maxTexCoord(1,1),
-      mixMode(CS_FX_COPY)
+      mixMode(CS_FX_COPY),
+      mainColor(1,1,1,1),
+      topColor(1,1,1,1),
+      bottomColor(1,1,1,1)
 {
 }
 
@@ -123,6 +126,21 @@ float csDecalTemplate::GetPerpendicularFaceOffset() const
   return perpendicularFaceOffset;
 }
 
+const csColor4 & csDecalTemplate::GetMainColor() const
+{
+	return mainColor;
+}
+
+const csColor4 & csDecalTemplate::GetTopColor() const
+{
+	return topColor;
+}
+
+const csColor4 & csDecalTemplate::GetBottomColor() const
+{
+	return bottomColor;
+}
+
 void csDecalTemplate::SetTimeToLive(float timeToLive)
 {
     this->timeToLive = timeToLive;
@@ -185,5 +203,20 @@ void csDecalTemplate::SetPerpendicularFaceThreshold(float threshold)
 void csDecalTemplate::SetPerpendicularFaceOffset(float offset)
 {
   perpendicularFaceOffset = offset;
+}
+
+void csDecalTemplate::SetMainColor(const csColor4 & color)
+{
+	mainColor = color;
+}
+
+void csDecalTemplate::SetTopColor(const csColor4 & color)
+{
+	topColor = color;
+}
+
+void csDecalTemplate::SetBottomColor(const csColor4 & color)
+{
+	bottomColor = color;
 }
 

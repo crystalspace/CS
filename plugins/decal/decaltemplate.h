@@ -22,6 +22,7 @@
 #include "igeom/decal.h"
 #include "csutil/scf_implementation.h"
 #include "csgeom/vector2.h"
+#include "csutil/cscolor.h"
 
 #define CS_DECAL_DEFAULT_TIME_TO_LIVE               -1.0f
 #define CS_DECAL_DEFAULT_RENDER_PRIORITY            0
@@ -53,6 +54,9 @@ private:
   uint                  mixMode;
   float                 perpendicularFaceThreshold;
   float                 perpendicularFaceOffset;
+  csColor4              mainColor;
+  csColor4              topColor;
+  csColor4              bottomColor;
 
 public:
 
@@ -75,6 +79,9 @@ public:
   virtual const uint GetMixMode() const;
   virtual float GetPerpendicularFaceThreshold() const;
   virtual float GetPerpendicularFaceOffset() const;
+  virtual const csColor4 & GetMainColor() const;
+  virtual const csColor4 & GetTopColor() const;
+  virtual const csColor4 & GetBottomColor() const;
 
   virtual void SetTimeToLive(float timeToLive);
   virtual void SetMaterialWrapper(iMaterialWrapper* material);
@@ -88,6 +95,9 @@ public:
   virtual void SetMixMode(uint mixMode);
   virtual void SetPerpendicularFaceThreshold(float threshold);
   virtual void SetPerpendicularFaceOffset(float offset);
+  virtual void SetMainColor(const csColor4 & color);
+  virtual void SetTopColor(const csColor4 & color);
+  virtual void SetBottomColor(const csColor4 & color);
 };
 
 #endif // __CS_DECAL_TEMPLATE_H__
