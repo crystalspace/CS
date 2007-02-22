@@ -188,6 +188,8 @@
   INTERFACE_APPLY(iConfigIterator)
   INTERFACE_APPLY(iConfigManager)
   INTERFACE_APPLY(iDataBuffer)
+  INTERFACE_APPLY(iDecalManager)
+  INTERFACE_APPLY(iDecalTemplate)
   INTERFACE_APPLY(iDebugHelper)
   INTERFACE_APPLY(iDocument)
   INTERFACE_APPLY(iDocumentAttribute)
@@ -280,6 +282,7 @@
   INTERFACE_APPLY(iSimpleFormerState)
   INTERFACE_APPLY(iSector)
   INTERFACE_APPLY(iSectorList)
+  INTERFACE_APPLY(iShader)
   INTERFACE_APPLY(iShaderManager)
   INTERFACE_APPLY(iShaderVariableContext)
   INTERFACE_APPLY(iSkeleton)
@@ -516,6 +519,8 @@
   %include "bindings/tcl/tclpre.i"
 #elif defined(SWIGJAVA)
   %include "bindings/java/javapre.i"
+#elif defined(SWIGLUA)
+  %include "bindings/lua/luapre.i"
 #endif
 
 // Handle arrays as input arguments.
@@ -1007,6 +1012,7 @@ iArrayChangeElements<csShaderVariable * >;
 %include "iaws/aws.h"
 
 %include "igeom/clip2d.h"
+%include "igeom/decal.h"
 %include "imesh/objmodel.h"
 %include "igeom/path.h"
 %template(scfPath) scfImplementation1<csPath,iPath >;
@@ -1833,4 +1839,6 @@ csWrapPtr CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
   %include "bindings/tcl/tclpost.i"
 #elif defined(SWIGJAVA)
   %include "bindings/java/javapost.i"
+#elif defined(SWIGLUA)
+  %include "bindings/lua/luapost.i"
 #endif

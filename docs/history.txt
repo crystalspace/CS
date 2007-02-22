@@ -22,6 +22,11 @@ chronological order.
 	  a separate update queue for every camera.
 	- Jorrit moved the simple2 imposter test code to a new imptest app
 	  in CS. This clearly shows that imposters are not yet working.
+	- caedes did the following changes to cspace.i:
+	  - added igeom/decal.h to swig includes.
+	  - added iShader, iDecalManager and iDecalTemplate to
+	    interface_apply's.
+	  - added SWIGLUA test for language pre/post files.
 21-Feb-2007
 	- res added a missing export marker for csExpandPlatformFilename().
 	- res changed the way plugins are statically linked when shared
