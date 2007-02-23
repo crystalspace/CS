@@ -70,7 +70,7 @@ private:
   //convenience shortcut
   csEngine *engine;
 
-  void csImposterMesh::UpdateValues (iCamera *cam,
+  void UpdateValues (iCamera *cam,
     float &camangle, float &objangle);
 
   void FindImposterRectangle (iCamera *camera);
