@@ -2964,6 +2964,106 @@ class iClipper2D(iBase):
 iClipper2D_swigregister = _cspace.iClipper2D_swigregister
 iClipper2D_swigregister(iClipper2D)
 
+class iDecal(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iDecal, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, iDecal, name)
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _cspace.new_iDecal(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_iDecal
+    __del__ = lambda self : None;
+iDecal_swigregister = _cspace.iDecal_swigregister
+iDecal_swigregister(iDecal)
+
+class iDecalTemplate(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iDecalTemplate, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iDecalTemplate, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetTimeToLive(*args): return _cspace.iDecalTemplate_GetTimeToLive(*args)
+    def GetMaterialWrapper(*args): return _cspace.iDecalTemplate_GetMaterialWrapper(*args)
+    def GetRenderPriority(*args): return _cspace.iDecalTemplate_GetRenderPriority(*args)
+    def GetZBufMode(*args): return _cspace.iDecalTemplate_GetZBufMode(*args)
+    def GetPolygonNormalThreshold(*args): return _cspace.iDecalTemplate_GetPolygonNormalThreshold(*args)
+    def GetDecalOffset(*args): return _cspace.iDecalTemplate_GetDecalOffset(*args)
+    def HasTopClipping(*args): return _cspace.iDecalTemplate_HasTopClipping(*args)
+    def GetTopClippingScale(*args): return _cspace.iDecalTemplate_GetTopClippingScale(*args)
+    def HasBottomClipping(*args): return _cspace.iDecalTemplate_HasBottomClipping(*args)
+    def GetBottomClippingScale(*args): return _cspace.iDecalTemplate_GetBottomClippingScale(*args)
+    def GetMinTexCoord(*args): return _cspace.iDecalTemplate_GetMinTexCoord(*args)
+    def GetMainColor(*args): return _cspace.iDecalTemplate_GetMainColor(*args)
+    def GetTopColor(*args): return _cspace.iDecalTemplate_GetTopColor(*args)
+    def GetBottomColor(*args): return _cspace.iDecalTemplate_GetBottomColor(*args)
+    def GetMaxTexCoord(*args): return _cspace.iDecalTemplate_GetMaxTexCoord(*args)
+    def GetMixMode(*args): return _cspace.iDecalTemplate_GetMixMode(*args)
+    def GetPerpendicularFaceThreshold(*args): return _cspace.iDecalTemplate_GetPerpendicularFaceThreshold(*args)
+    def GetPerpendicularFaceOffset(*args): return _cspace.iDecalTemplate_GetPerpendicularFaceOffset(*args)
+    def SetTimeToLive(*args): return _cspace.iDecalTemplate_SetTimeToLive(*args)
+    def SetMaterialWrapper(*args): return _cspace.iDecalTemplate_SetMaterialWrapper(*args)
+    def SetRenderPriority(*args): return _cspace.iDecalTemplate_SetRenderPriority(*args)
+    def SetZBufMode(*args): return _cspace.iDecalTemplate_SetZBufMode(*args)
+    def SetPolygonNormalThreshold(*args): return _cspace.iDecalTemplate_SetPolygonNormalThreshold(*args)
+    def SetDecalOffset(*args): return _cspace.iDecalTemplate_SetDecalOffset(*args)
+    def SetTopClipping(*args): return _cspace.iDecalTemplate_SetTopClipping(*args)
+    def SetBottomClipping(*args): return _cspace.iDecalTemplate_SetBottomClipping(*args)
+    def SetTexCoords(*args): return _cspace.iDecalTemplate_SetTexCoords(*args)
+    def SetMixMode(*args): return _cspace.iDecalTemplate_SetMixMode(*args)
+    def SetPerpendicularFaceThreshold(*args): return _cspace.iDecalTemplate_SetPerpendicularFaceThreshold(*args)
+    def SetPerpendicularFaceOffset(*args): return _cspace.iDecalTemplate_SetPerpendicularFaceOffset(*args)
+    def SetMainColor(*args): return _cspace.iDecalTemplate_SetMainColor(*args)
+    def SetTopColor(*args): return _cspace.iDecalTemplate_SetTopColor(*args)
+    def SetBottomColor(*args): return _cspace.iDecalTemplate_SetBottomColor(*args)
+    __swig_destroy__ = _cspace.delete_iDecalTemplate
+    __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iDecalTemplate_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iDecalTemplate_scfGetVersion)
+iDecalTemplate_swigregister = _cspace.iDecalTemplate_swigregister
+iDecalTemplate_swigregister(iDecalTemplate)
+iDecalTemplate_scfGetVersion = _cspace.iDecalTemplate_scfGetVersion
+
+class iDecalBuilder(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iDecalBuilder, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, iDecalBuilder, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    __swig_destroy__ = _cspace.delete_iDecalBuilder
+    __del__ = lambda self : None;
+    def AddStaticPoly(*args): return _cspace.iDecalBuilder_AddStaticPoly(*args)
+iDecalBuilder_swigregister = _cspace.iDecalBuilder_swigregister
+iDecalBuilder_swigregister(iDecalBuilder)
+
+class iDecalManager(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iDecalManager, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iDecalManager, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def CreateDecal(*args): return _cspace.iDecalManager_CreateDecal(*args)
+    def CreateDecalTemplate(*args): return _cspace.iDecalManager_CreateDecalTemplate(*args)
+    def DeleteDecal(*args): return _cspace.iDecalManager_DeleteDecal(*args)
+    def GetDecalCount(*args): return _cspace.iDecalManager_GetDecalCount(*args)
+    def GetDecal(*args): return _cspace.iDecalManager_GetDecal(*args)
+    __swig_destroy__ = _cspace.delete_iDecalManager
+    __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iDecalManager_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iDecalManager_scfGetVersion)
+iDecalManager_swigregister = _cspace.iDecalManager_swigregister
+iDecalManager_swigregister(iDecalManager)
+iDecalManager_scfGetVersion = _cspace.iDecalManager_scfGetVersion
+
 class iObjectModelListener(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -9877,8 +9977,11 @@ class iShader(iShaderVariableContext):
     def GetMetadata(*args): return _cspace.iShader_GetMetadata(*args)
     __swig_destroy__ = _cspace.delete_iShader
     __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iShader_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iShader_scfGetVersion)
 iShader_swigregister = _cspace.iShader_swigregister
 iShader_swigregister(iShader)
+iShader_scfGetVersion = _cspace.iShader_scfGetVersion
 
 class iShaderPriorityList(iBase):
     __swig_setmethods__ = {}

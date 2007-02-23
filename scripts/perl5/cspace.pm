@@ -4646,6 +4646,177 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iDecal ##############
+
+package cspace::iDecal;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_iDecal(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iDecal($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iDecalTemplate ##############
+
+package cspace::iDecalTemplate;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*GetTimeToLive = *cspacec::iDecalTemplate_GetTimeToLive;
+*GetMaterialWrapper = *cspacec::iDecalTemplate_GetMaterialWrapper;
+*GetRenderPriority = *cspacec::iDecalTemplate_GetRenderPriority;
+*GetZBufMode = *cspacec::iDecalTemplate_GetZBufMode;
+*GetPolygonNormalThreshold = *cspacec::iDecalTemplate_GetPolygonNormalThreshold;
+*GetDecalOffset = *cspacec::iDecalTemplate_GetDecalOffset;
+*HasTopClipping = *cspacec::iDecalTemplate_HasTopClipping;
+*GetTopClippingScale = *cspacec::iDecalTemplate_GetTopClippingScale;
+*HasBottomClipping = *cspacec::iDecalTemplate_HasBottomClipping;
+*GetBottomClippingScale = *cspacec::iDecalTemplate_GetBottomClippingScale;
+*GetMinTexCoord = *cspacec::iDecalTemplate_GetMinTexCoord;
+*GetMainColor = *cspacec::iDecalTemplate_GetMainColor;
+*GetTopColor = *cspacec::iDecalTemplate_GetTopColor;
+*GetBottomColor = *cspacec::iDecalTemplate_GetBottomColor;
+*GetMaxTexCoord = *cspacec::iDecalTemplate_GetMaxTexCoord;
+*GetMixMode = *cspacec::iDecalTemplate_GetMixMode;
+*GetPerpendicularFaceThreshold = *cspacec::iDecalTemplate_GetPerpendicularFaceThreshold;
+*GetPerpendicularFaceOffset = *cspacec::iDecalTemplate_GetPerpendicularFaceOffset;
+*SetTimeToLive = *cspacec::iDecalTemplate_SetTimeToLive;
+*SetMaterialWrapper = *cspacec::iDecalTemplate_SetMaterialWrapper;
+*SetRenderPriority = *cspacec::iDecalTemplate_SetRenderPriority;
+*SetZBufMode = *cspacec::iDecalTemplate_SetZBufMode;
+*SetPolygonNormalThreshold = *cspacec::iDecalTemplate_SetPolygonNormalThreshold;
+*SetDecalOffset = *cspacec::iDecalTemplate_SetDecalOffset;
+*SetTopClipping = *cspacec::iDecalTemplate_SetTopClipping;
+*SetBottomClipping = *cspacec::iDecalTemplate_SetBottomClipping;
+*SetTexCoords = *cspacec::iDecalTemplate_SetTexCoords;
+*SetMixMode = *cspacec::iDecalTemplate_SetMixMode;
+*SetPerpendicularFaceThreshold = *cspacec::iDecalTemplate_SetPerpendicularFaceThreshold;
+*SetPerpendicularFaceOffset = *cspacec::iDecalTemplate_SetPerpendicularFaceOffset;
+*SetMainColor = *cspacec::iDecalTemplate_SetMainColor;
+*SetTopColor = *cspacec::iDecalTemplate_SetTopColor;
+*SetBottomColor = *cspacec::iDecalTemplate_SetBottomColor;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iDecalTemplate($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iDecalTemplate_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iDecalBuilder ##############
+
+package cspace::iDecalBuilder;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iDecalBuilder($self);
+        delete $OWNER{$self};
+    }
+}
+
+*AddStaticPoly = *cspacec::iDecalBuilder_AddStaticPoly;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iDecalManager ##############
+
+package cspace::iDecalManager;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*CreateDecal = *cspacec::iDecalManager_CreateDecal;
+*CreateDecalTemplate = *cspacec::iDecalManager_CreateDecalTemplate;
+*DeleteDecal = *cspacec::iDecalManager_DeleteDecal;
+*GetDecalCount = *cspacec::iDecalManager_GetDecalCount;
+*GetDecal = *cspacec::iDecalManager_GetDecal;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iDecalManager($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iDecalManager_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iObjectModelListener ##############
 
 package cspace::iObjectModelListener;
@@ -14740,6 +14911,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iShader_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
