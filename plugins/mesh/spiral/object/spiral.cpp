@@ -29,14 +29,6 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE_EXT (csSpiralMeshObject)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSpiralState)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSpiralMeshObject::SpiralState)
-  SCF_IMPLEMENTS_INTERFACE (iSpiralState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 void csSpiralMeshObject::SetupObject ()
 {
   if (!initialized)
@@ -79,9 +71,9 @@ void csSpiralMeshObject::SetupObject ()
 }
 
 csSpiralMeshObject::csSpiralMeshObject (iObjectRegistry* object_reg,
-  iMeshObjectFactory* factory) : csParticleSystem (object_reg, factory)
+  iMeshObjectFactory* factory) :
+  scfImplementationType(this, object_reg, factory)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSpiralState);
   number = 50;
   source.Set (0, 0, 0);
   part_source.Set (0, 0, 0);
@@ -97,7 +89,6 @@ csSpiralMeshObject::csSpiralMeshObject (iObjectRegistry* object_reg,
 
 csSpiralMeshObject::~csSpiralMeshObject()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSpiralState);
 }
 
 void csSpiralMeshObject::SetPosition(int index)
@@ -185,14 +176,10 @@ void csSpiralMeshObject::HardTransform (const csReversibleTransform& t)
 
 //----------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csSpiralMeshObjectFactory)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-SCF_IMPLEMENT_IBASE_END
-
 csSpiralMeshObjectFactory::csSpiralMeshObjectFactory (iMeshObjectType* p,
-	iObjectRegistry* s)
+  iObjectRegistry* s) :
+  scfImplementationType(this, p)
 {
-  SCF_CONSTRUCT_IBASE (p);
   object_reg = s;
   logparent = 0;
   spiral_type = p;
@@ -200,7 +187,6 @@ csSpiralMeshObjectFactory::csSpiralMeshObjectFactory (iMeshObjectType* p,
 
 csSpiralMeshObjectFactory::~csSpiralMeshObjectFactory ()
 {
-  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObject> csSpiralMeshObjectFactory::NewInstance ()
@@ -214,28 +200,15 @@ csPtr<iMeshObject> csSpiralMeshObjectFactory::NewInstance ()
 
 //----------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csSpiralMeshObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSpiralMeshObjectType::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csSpiralMeshObjectType)
 
-
-csSpiralMeshObjectType::csSpiralMeshObjectType (iBase* pParent)
+csSpiralMeshObjectType::csSpiralMeshObjectType (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSpiralMeshObjectType::~csSpiralMeshObjectType ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csSpiralMeshObjectType::NewFactory ()

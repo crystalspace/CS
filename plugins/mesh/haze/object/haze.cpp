@@ -44,13 +44,8 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csHazeHull)
-  SCF_IMPLEMENTS_INTERFACE (iHazeHull)
-SCF_IMPLEMENT_IBASE_END
-
-csHazeHull::csHazeHull()
+csHazeHull::csHazeHull() : scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   total_poly = 0;
   total_vert = 0;
   total_edge = 0;
@@ -80,7 +75,6 @@ csHazeHull::~csHazeHull()
   total_poly = 0;
   total_vert = 0;
   total_edge = 0;
-  SCF_DESTRUCT_IBASE ();
 }
 
 
@@ -266,18 +260,9 @@ void csHazeHull::ComputeOutline(iHazeHull *hull, const csVector3& campos,
 
 //------------ csHazeHullBox -----------------------------------
 
-SCF_IMPLEMENT_IBASE_EXT (csHazeHullBox)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iHazeHullBox)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csHazeHullBox::HazeHullBox)
-  SCF_IMPLEMENTS_INTERFACE (iHazeHullBox)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csHazeHullBox::csHazeHullBox(const csVector3& a, const csVector3& b)
-  : csHazeHull()
+csHazeHullBox::csHazeHullBox(const csVector3& a, const csVector3& b) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiHazeHullBox);
   min = a;
   max = b;
   /// fill with data
@@ -320,18 +305,9 @@ csHazeHullBox::csHazeHullBox(const csVector3& a, const csVector3& b)
 
 csHazeHullBox::~csHazeHullBox()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiHazeHullBox);
 }
 
 //------------ csHazeHullCone -----------------------------------
-
-SCF_IMPLEMENT_IBASE_EXT (csHazeHullCone)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iHazeHullCone)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csHazeHullCone::HazeHullCone)
-  SCF_IMPLEMENTS_INTERFACE (iHazeHullCone)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 /// static helper to fill
 static void ConeFillVerts(csVector3 *verts, int nr_sides,
@@ -348,10 +324,9 @@ static void ConeFillVerts(csVector3 *verts, int nr_sides,
 }
 
 csHazeHullCone::csHazeHullCone(int nr_sides, const csVector3& start,
-    const csVector3& end, float srad, float erad)
-  : csHazeHull()
+  const csVector3& end, float srad, float erad) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiHazeHullCone);
   csHazeHullCone::nr_sides = nr_sides;
   csHazeHullCone::start = start;
   csHazeHullCone::end = end;
@@ -417,34 +392,17 @@ csHazeHullCone::csHazeHullCone(int nr_sides, const csVector3& start,
 
 csHazeHullCone::~csHazeHullCone()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiHazeHullCone);
 }
 
 //------------ csHazeMeshObject -------------------------------
-
-SCF_IMPLEMENT_IBASE (csHazeMeshObject)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObject)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iHazeState)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csHazeMeshObject::ObjectModel)
-  SCF_IMPLEMENTS_INTERFACE (iObjectModel)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csHazeMeshObject::HazeState)
-  SCF_IMPLEMENTS_INTERFACE (iHazeState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csStringID csHazeMeshObject::vertex_name = csInvalidStringID;
 csStringID csHazeMeshObject::texel_name = csInvalidStringID;
 csStringID csHazeMeshObject::index_name = csInvalidStringID;
 
-csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory)
+csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiHazeState);
   csHazeMeshObject::factory = factory;
   logparent = 0;
   ifactory = SCF_QUERY_INTERFACE (factory, iMeshObjectFactory);
@@ -487,10 +445,6 @@ csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory)
 csHazeMeshObject::~csHazeMeshObject ()
 {
   if (vis_cb) vis_cb->DecRef ();
-
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiHazeState);
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csHazeMeshObject::SetupObject ()
@@ -889,7 +843,7 @@ void csHazeMeshObject::GetObjectBoundingBox (csBox3& retbbox)
 void csHazeMeshObject::SetObjectBoundingBox (const csBox3& inbbox)
 {
   bbox = inbbox;
-  scfiObjectModel.ShapeChanged ();
+  this->ShapeChanged ();
 }
 
 void csHazeMeshObject::HardTransform (const csReversibleTransform& t)
@@ -906,25 +860,10 @@ void csHazeMeshObject::NextFrame (csTicks /*current_time*/,
 
 //----------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csHazeMeshObjectFactory)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iHazeFactoryState)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iHazeHullCreation)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csHazeMeshObjectFactory::HazeFactoryState)
-  SCF_IMPLEMENTS_INTERFACE (iHazeFactoryState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csHazeMeshObjectFactory::HazeHullCreation)
-  SCF_IMPLEMENTS_INTERFACE (iHazeHullCreation)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csHazeMeshObjectFactory::csHazeMeshObjectFactory (csHazeMeshObjectType* pParent)
+csHazeMeshObjectFactory::csHazeMeshObjectFactory (
+  csHazeMeshObjectType* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiHazeFactoryState);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiHazeHullCreation);
   material = 0;
   MixMode = 0;
   origin.Set(0,0,0);
@@ -936,9 +875,6 @@ csHazeMeshObjectFactory::csHazeMeshObjectFactory (csHazeMeshObjectType* pParent)
 
 csHazeMeshObjectFactory::~csHazeMeshObjectFactory ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiHazeFactoryState);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiHazeHullCreation);
-  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObject> csHazeMeshObjectFactory::NewInstance ()
@@ -951,28 +887,15 @@ csPtr<iMeshObject> csHazeMeshObjectFactory::NewInstance ()
 
 //----------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csHazeMeshObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csHazeMeshObjectType::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csHazeMeshObjectType)
 
-
-csHazeMeshObjectType::csHazeMeshObjectType (iBase* pParent)
+csHazeMeshObjectType::csHazeMeshObjectType (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csHazeMeshObjectType::~csHazeMeshObjectType ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csHazeMeshObjectType::NewFactory ()

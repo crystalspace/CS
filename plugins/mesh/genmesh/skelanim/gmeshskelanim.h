@@ -36,6 +36,7 @@
 #include "csutil/strhash.h"
 #include "csutil/stringarray.h"
 #include "csutil/eventnames.h"
+#include "csutil/scf_implementation.h"
 #include "imesh/genmesh.h"
 #include "imesh/gmeshskel.h"
 #include "iutil/comp.h"
@@ -79,7 +80,8 @@ struct sac_bone_data
  * a set of vertices (with weights), children, and a transform
  * relative to a parent. Script operations operate on bones of vertices.
  */
-class csSkelBone : public iGenMeshSkeletonBone
+class csSkelBone :
+  public scfImplementation1<csSkelBone, iGenMeshSkeletonBone>
 {
 private:
   char* name;
@@ -119,7 +121,6 @@ public:
   csSkelBone (csGenmeshSkelAnimationControl *animation_control);
   virtual ~csSkelBone ();
 
-  SCF_DECLARE_IBASE;
   virtual const char* GetName () const { return name; }
   virtual void SetName (const char* name) {csSkelBone::name = csStrNew (name); }
   virtual csReversibleTransform &GetTransform () { return transform; }
@@ -150,19 +151,12 @@ public:
 };
 
 class csSkelBoneDefaultUpdateCallback :
-	public iGenMeshSkeletonBoneUpdateCallback
+  public scfImplementation1<csSkelBoneDefaultUpdateCallback,
+    iGenMeshSkeletonBoneUpdateCallback>
 {
 public:
-  SCF_DECLARE_IBASE;
-  csSkelBoneDefaultUpdateCallback()
-  {
-    SCF_CONSTRUCT_IBASE(0);
-  }
-  
-  virtual ~csSkelBoneDefaultUpdateCallback()
-  {
-    SCF_DESTRUCT_IBASE();
-  }
+  csSkelBoneDefaultUpdateCallback() : scfImplementationType(this) { }
+  virtual ~csSkelBoneDefaultUpdateCallback() { }
 
   virtual void UpdateTransform(iGenMeshSkeletonBone *bone,
   	const csReversibleTransform & transform)
@@ -318,7 +312,9 @@ struct sac_move_execution
  * the actual operations in the script in a time based fashion.
  */
 
-class csSkelAnimControlRunnable : public iGenMeshSkeletonScript
+class csSkelAnimControlRunnable :
+  public scfImplementation1<csSkelAnimControlRunnable,
+    iGenMeshSkeletonScript>
 {
 public:
   typedef csHash<bone_transform_data*, csPtrKey<csSkelBone> > 
@@ -383,7 +379,6 @@ public:
     csGenmeshSkelAnimationControl* anim_control);
   virtual ~csSkelAnimControlRunnable ();
 
-  SCF_DECLARE_IBASE;
   virtual const char *GetName () { return script ? script->GetName () : 0; }
   virtual float GetFactor () { return morph_factor; }
   virtual void SetFactor (float factor) { morph_factor = factor; }
@@ -424,8 +419,8 @@ enum CalcNormsMethod
  */
 
 class csGenmeshSkelAnimationControl :
-  public iGenMeshAnimationControl,
-  public iGenMeshSkeletonControlState
+  public scfImplementation2<csGenmeshSkelAnimationControl,
+    iGenMeshAnimationControl, iGenMeshSkeletonControlState>
 {
 private:
   iObjectRegistry* object_reg;
@@ -529,8 +524,6 @@ public:
   /// Destructor.
   virtual ~csGenmeshSkelAnimationControl ();
 
-  SCF_DECLARE_IBASE;
-
   // --- For iGenMeshAnimationControl --------------------------------
   virtual bool AnimatesVertices () const { return animates_vertices; }
   virtual bool AnimatesTexels () const { return animates_texels; }
@@ -594,7 +587,8 @@ public:
  * Genmesh animation control factory.
  */
 class csGenmeshSkelAnimationControlFactory :
-	public iGenMeshSkeletonControlFactory
+  public scfImplementation1<csGenmeshSkelAnimationControlFactory,
+    iGenMeshSkeletonControlFactory>
 {
 private:
   csGenmeshSkelAnimationControlType* type;
@@ -670,8 +664,6 @@ public:
     return bones_vertices;
   }
 
-  SCF_DECLARE_IBASE;
-
   // --- For iGenMeshAnimationControlFactory -------------------------
   virtual const char* Load (iDocumentNode* node);
   virtual const char* Save (iDocumentNode* parent);
@@ -685,7 +677,9 @@ public:
 /**
  * Genmesh animation control type.
  */
-class csGenmeshSkelAnimationControlType : public iGenMeshAnimationControlType
+class csGenmeshSkelAnimationControlType :
+  public scfImplementation3<csGenmeshSkelAnimationControlType,
+    iGenMeshAnimationControlType, iComponent, iEventHandler>
 {
 private:
   iObjectRegistry* object_reg;
@@ -722,42 +716,11 @@ public:
   /// Event handler.
   bool HandleEvent (iEvent& ev);
 
-  virtual csPtr<iGenMeshAnimationControlFactory> CreateAnimationControlFactory (
-  	);
+  virtual csPtr<iGenMeshAnimationControlFactory>
+    CreateAnimationControlFactory ();
 
-  SCF_DECLARE_IBASE;
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csGenmeshSkelAnimationControlType);
-    virtual bool Initialize (iObjectRegistry* object_reg)
-    {
-      return scfParent->Initialize (object_reg);
-    }
-  } scfiComponent;
-
-  class EventHandler : public iEventHandler
-  {
-  private:
-    csGenmeshSkelAnimationControlType* parent;
-  public:
-    EventHandler (csGenmeshSkelAnimationControlType* parent)
-    {
-      SCF_CONSTRUCT_IBASE (0);
-      EventHandler::parent = parent;
-    }
-    virtual ~EventHandler ()
-    {
-      SCF_DESTRUCT_IBASE();
-    }
-    SCF_DECLARE_IBASE;
-    virtual bool HandleEvent (iEvent& ev)
-    {
-      return parent->HandleEvent (ev);
-    }
-    CS_EVENTHANDLER_NAMES("crystalspace.mesh.genmesh.skelanim")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
-  } *scfiEventHandler;
+  CS_EVENTHANDLER_NAMES("crystalspace.mesh.genmesh.skelanim")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
 
   csEventID PreProcess;
 };

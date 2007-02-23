@@ -23,11 +23,7 @@
  * Sequences
  */
 
-#include "csutil/scf.h"
-
-struct iSequenceManager;
-
-SCF_VERSION (iSequenceOperation, 0, 2, 0);
+#include "csutil/scf_interface.h"
 
 /**
  * A sequence operation. This is effectively a callback
@@ -40,8 +36,9 @@ SCF_VERSION (iSequenceOperation, 0, 2, 0);
  * - iSequence
  *   
  */
-struct iSequenceOperation : public iBase
+struct iSequenceOperation : public virtual iBase
 {
+  SCF_INTERFACE (iSequenceOperation, 2, 0, 0);
   /**
    * Do the operation. The dt parameter is the difference between
    * the time the sequence manager is at now and the time this operation

@@ -228,21 +228,6 @@ void InfiniteMaze::connect_infinite (int x1, int y1, int z1, int x2, int y2,
   delete[] vertices;
 }
 
-SCF_IMPLEMENT_IBASE (InfPortalCS)
-  SCF_IMPLEMENTS_INTERFACE (iPortalCallback)
-SCF_IMPLEMENT_IBASE_END
-
-InfPortalCS::InfPortalCS ()
-{
-  SCF_CONSTRUCT_IBASE (0);
-  lviews = 0;
-}
-
-InfPortalCS::~InfPortalCS ()
-{
-  SCF_DESTRUCT_IBASE ();
-}
-
 bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
 {
   csRef<iFrustumView> fv;

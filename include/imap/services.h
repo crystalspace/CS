@@ -32,7 +32,6 @@
 class csBox3;
 class csColor;
 class csColor4;
-class csGradient;
 class csMatrix3;
 class csPlane3;
 class csShaderVariable;
@@ -42,6 +41,7 @@ class csVector3;
 struct csAlphaMode;
 
 struct iDocumentNode;
+struct iGradient;
 struct iKeyValuePair;
 struct iLoaderContext;
 struct iMaterialWrapper;
@@ -71,7 +71,7 @@ struct iThingFactoryState;
  */
 struct iSyntaxService : public virtual iBase
 {
-  SCF_INTERFACE (iSyntaxService, 2, 0, 0);
+  SCF_INTERFACE (iSyntaxService, 2, 1, 0);
   
   /**\name Parse reporting helpers
    * @{ */
@@ -253,15 +253,18 @@ struct iSyntaxService : public virtual iBase
 
   /**
    * Parse a color gradient.
+   * \param node Document node containing the gradient data.
+   * \param gradient Valid pointer to a gradient interface which is filled 
+   *   with the data from the document node.
    */
   virtual bool ParseGradient (iDocumentNode* node,
-			      csGradient& gradient) = 0;
+			      iGradient* gradient) = 0;
 
   /**
    * Write a color gradient.
    */
   virtual bool WriteGradient (iDocumentNode* node,
-			      const csGradient& gradient) = 0;
+			      iGradient* gradient) = 0;
 
   /**
    * Parse a shader variable declaration

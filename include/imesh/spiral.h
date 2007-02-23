@@ -24,21 +24,20 @@
  * Spiral particle mesh object
  */ 
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 /**\addtogroup meshplugins
  * @{ */
 
-class csColor;
 class csVector3;
-
-SCF_VERSION (iSpiralState, 0, 0, 2);
 
 /**
  * This interface describes the API for the spiral mesh object.
  */
-struct iSpiralState : public iBase
+struct iSpiralState : public virtual iBase
 {
+  SCF_INTERFACE(iSpiralState, 2, 0, 0);
+
   /// Set the number of particles to use.
   virtual void SetParticleCount (int num) = 0;
   /// Get the number of particles.

@@ -23,7 +23,9 @@
 #include "csutil/event.h"
 #include "csutil/csinput.h"
 
-#include "CEGUI.h"
+#include "csutil/custom_new_disable.h"
+#include <CEGUI.h>
+#include "csutil/custom_new_enable.h"
 
 #include "ceguievthandler.h"
 #include "ceguirenderer.h"

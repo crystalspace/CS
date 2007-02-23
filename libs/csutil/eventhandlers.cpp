@@ -43,7 +43,7 @@ csEventHandlerRegistry::~csEventHandlerRegistry()
 {
 }
 
-csHandlerID csEventHandlerRegistry::GetGenericID (const csString &name)
+csHandlerID csEventHandlerRegistry::GetGenericID (const char *name)
 {
   CS_ASSERT (name.FindFirst(':') == (size_t)-1);
   csHandlerID res;
@@ -97,7 +97,7 @@ csHandlerID csEventHandlerRegistry::GetID (iEventHandler *handler)
   return res;
 }
 
-csHandlerID csEventHandlerRegistry::GetID (csString &name)
+csHandlerID csEventHandlerRegistry::GetID (const char *name)
 {
   return names.Request (name);
 }
@@ -196,7 +196,7 @@ FrameSignpost_Logic3D::GenericSucc(csRef<iEventHandlerRegistry> &r1,
 CS_CONST_METHOD const csHandlerID * 
 FrameSignpost_3D2D::GenericPrec(csRef<iEventHandlerRegistry> &,
 				csRef<iEventNameRegistry> &,
-				csEventID e) const
+				csEventID) const
 {
   return 0;
 }

@@ -40,25 +40,10 @@ CS_IMPLEMENT_PLUGIN
 
 //------------ csLightningMeshObject -------------------------------
 
-SCF_IMPLEMENT_IBASE (csLightningMeshObject)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObject)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLightningState)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csLightningMeshObject::ObjectModel)
-  SCF_IMPLEMENTS_INTERFACE (iObjectModel)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csLightningMeshObject::LightningState)
-  SCF_IMPLEMENTS_INTERFACE (iLightningState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csLightningMeshObject::csLightningMeshObject (csLightningMeshObjectFactory* factory)
+csLightningMeshObject::csLightningMeshObject (
+  csLightningMeshObjectFactory* factory) :
+  scfImplementationType(this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightningState);
   csLightningMeshObject::factory = factory;
   logparent = 0;
   ifactory = SCF_QUERY_INTERFACE (factory, iMeshObjectFactory);
@@ -93,9 +78,6 @@ csLightningMeshObject::csLightningMeshObject (csLightningMeshObjectFactory* fact
 csLightningMeshObject::~csLightningMeshObject ()
 {
   if (vis_cb) vis_cb->DecRef ();
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiLightningState);
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csLightningMeshObject::SetupObject ()
@@ -131,7 +113,7 @@ void csLightningMeshObject::GetObjectBoundingBox (csBox3& retbbox)
 void csLightningMeshObject::SetObjectBoundingBox (const csBox3& inbbox)
 {
   GenMesh->GetObjectModel ()->SetObjectBoundingBox (inbbox);
-  scfiObjectModel.ShapeChanged ();
+  this->ShapeChanged ();
 }
 
 void csLightningMeshObject::GetRadius (float& rad, csVector3& cent)
@@ -152,17 +134,9 @@ void csLightningMeshObject::NextFrame (csTicks current_time,
 
 //----------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csLightningMeshObjectFactory)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLightningFactoryState)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csLightningMeshObjectFactory::LightningFactoryState)
-  SCF_IMPLEMENTS_INTERFACE (iLightningFactoryState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csLightningMeshObjectFactory::csLightningMeshObjectFactory (iMeshObjectType *pParent,
-                                                            iObjectRegistry *object_registry)
+csLightningMeshObjectFactory::csLightningMeshObjectFactory (
+  iMeshObjectType *pParent, iObjectRegistry *object_registry) :
+  scfImplementationType(this, pParent)
 {
   MaxPoints = 20;
   wildness = 0.02f;
@@ -173,8 +147,6 @@ csLightningMeshObjectFactory::csLightningMeshObjectFactory (iMeshObjectType *pPa
   update_interval = 60;
   update_counter = 0;
   
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightningFactoryState);
   material = 0;
   MixMode = 0;
   origin.Set (0, 0, 0);
@@ -195,8 +167,6 @@ csLightningMeshObjectFactory::csLightningMeshObjectFactory (iMeshObjectType *pPa
 
 csLightningMeshObjectFactory::~csLightningMeshObjectFactory ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiLightningFactoryState);
-  SCF_DESTRUCT_IBASE ();
 }
 
 void csLightningMeshObjectFactory::CalculateFractal (int left, int right,
@@ -275,28 +245,15 @@ csPtr<iMeshObject> csLightningMeshObjectFactory::NewInstance ()
 
 //----------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csLightningMeshObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csLightningMeshObjectType::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csLightningMeshObjectType)
 
-
-csLightningMeshObjectType::csLightningMeshObjectType (iBase* pParent)
+csLightningMeshObjectType::csLightningMeshObjectType (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csLightningMeshObjectType::~csLightningMeshObjectType ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iMeshObjectFactory> csLightningMeshObjectType::NewFactory ()

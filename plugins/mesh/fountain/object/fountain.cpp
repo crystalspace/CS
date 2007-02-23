@@ -29,14 +29,6 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE_EXT (csFountainMeshObject)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iFountainState)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csFountainMeshObject::FountainState)
-  SCF_IMPLEMENTS_INTERFACE (iFountainState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 void csFountainMeshObject::SetupObject ()
 {
   if (!initialized)
@@ -61,10 +53,9 @@ void csFountainMeshObject::SetupObject ()
 }
 
 csFountainMeshObject::csFountainMeshObject (iEngine* engine,
-	iMeshObjectFactory* factory)
-	: csNewParticleSystem (engine, factory, CS_PARTICLE_SCALE)
+  iMeshObjectFactory* factory) :
+  scfImplementationType(this, engine, factory, CS_PARTICLE_SCALE)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiFountainState);
   part_speed = 0;
   part_age = 0;
   accel.Set (0, -1, 0);
@@ -83,7 +74,6 @@ csFountainMeshObject::~csFountainMeshObject()
 {
   delete[] part_speed;
   delete[] part_age;
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiFountainState);
 }
 
 

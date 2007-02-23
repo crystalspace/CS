@@ -753,8 +753,11 @@ AS_IF([test $enable_cpu_specific_optimizations != no],
 	AS_IF([test $host_vendor = apple],
 	    [# Work around issue on intel macs, where "-fpmath=sse" is on by
 	     # default, but this breaks compilation when combined with 
-	     # the "-march=i586" selected below. So the "minimum" optimization
-	     # on x86 Apples is -march=i686.
+	     # the "-march=i586" selected below. Furthermore, -march=i686 was
+	     # reported to not work, but -march=prescott so, so try to use 
+	     # that as the "minimum" optimization on x86 Apples, followed by
+	     # -march=i686.
+	    CS_CHECK_CODE_GEN_FLAG([[*[3-9]86]], [-march=prescott])
 	    CS_CHECK_CODE_GEN_FLAG([[*[3-9]86]], [-march=i686])])
 	CS_CHECK_CODE_GEN_FLAG([x86_64], [-march=k8])
 	CS_CHECK_CODE_GEN_FLAG([x86_64], [-mtune=k8])
