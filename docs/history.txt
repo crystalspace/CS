@@ -40,6 +40,7 @@ chronological order.
 	  to strafe. With 'space' you can reset the view so that it looks
 	  at sprite again.
 	- Jorrit increased imposter distance in imptest from 1 to 3.
+        - Piotr changed "Script" to "Animation" in iSkeleton related interfaces.
 22-Feb-2007
 	- res fixed shaderweaver to not crash when a snippet lacks a 
 	  <combiner> node.

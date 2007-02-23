@@ -54,7 +54,7 @@ public:
 
   const char *ParseScript (iDocumentNode* node, iSkeletonFactory *skel_fact);
   const char *ParseFrame (iDocumentNode* node, iSkeletonFactory *skel_fact, 
-    iSkeletonScript *script);
+    iSkeletonAnimation *script);
 };
 
 #endif // __CS_GMESHLDR_H__
