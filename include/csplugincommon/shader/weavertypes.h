@@ -38,8 +38,12 @@ namespace CS
         /// Base type (sampler or vector)
         enum 
         {
-          /// Type is a vector type
+          /// Type is a (float) vector type
           Vector, 
+          /// Type is a (bool) vector type
+          VectorB, 
+          /// Type is a (integer) vector type
+          VectorI, 
           /// Type is a texture sampler type
           Sampler
         } baseType;

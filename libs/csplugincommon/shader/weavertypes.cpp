@@ -34,6 +34,8 @@ namespace CS
           TypeInfo typeInfo;
         };
         static const TypeInfoMap typeInfoMap[] = {
+          {"bool", 
+            {TypeInfo::Vector,  false, 1, TypeInfo::NoSemantics, TypeInfo::NoSpace, false}},
           {"direction",
             {TypeInfo::Vector,  false, 3, TypeInfo::Direction,   TypeInfo::NoSpace, false}},
           {"direction_camera",

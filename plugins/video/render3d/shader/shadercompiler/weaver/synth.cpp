@@ -25,6 +25,7 @@
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 
+#include "csplugincommon/shader/weavertypes.h"
 #include "csutil/csstring.h"
 #include "csutil/documenthelper.h"
 #include "csutil/fifo.h"
@@ -239,6 +240,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       while (nodeIt->HasNext())
       {
         const SynthesizeNodeTree::Node& node = nodeIt->Next();
+        /* For new connections introduced by input merging.
+         * Connections are added delayed to avoid interference with
+         * input resolution. */
+        csArray<TechniqueGraph::Connection> newConnections;
         
         UsedOutputsHash usedOutputs;
 	CS::ScopedDelete<BasicIterator<const Snippet::Technique::Input> > 
@@ -299,6 +304,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	      // Ugly?
 	      Snippet::Technique::CombinerPlugin tempComb (*comb);
 	      tempComb.name = "combiner";
+              // Subtle: may add nodes to the node tree
               synthTree.AugmentCoerceChain (compiler, tempComb, combiner, coerceChain, 
 	        graph, node.tech, inp.name, sourceTech, links);
 	    }
@@ -325,6 +331,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	            CS_ASSERT(!link.toName.IsEmpty());
       	    
   	            links.Put (prevInput->node->tech, link);
+
+                    // There's now a dependency on the node providing prevInput.
+                    TechniqueGraph::Connection conn;
+                    conn.from = prevInput->node->tech;
+                    conn.to = node.tech;
+                    newConnections.Push (conn);
                   }
                   else
                   {
@@ -357,6 +369,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
             }
           }
         }
+
+        for (size_t c = 0; c < newConnections.GetSize(); c++)
+          graph.AddConnection (newConnections[c]);
       }
 
       for (size_t i = 0; i < emitInputs.GetSize(); i++)
@@ -585,6 +600,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     const Snippet::Technique::Output*& output,
     UsedOutputsHash& usedOutputs)
   {
+    const WeaverCommon::TypeInfo* inputTypeInfo = 
+      WeaverCommon::QueryTypeInfo (input.type);
     csSet<csConstPtrKey<const Snippet::Technique> > checkedTechs;
     
     csFIFO<const Snippet::Technique*> techsToTry;
@@ -631,6 +648,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	    }
 	    coerceCost = cost;
 	  }
+          // See if maybe we can just drop a property.
+          const WeaverCommon::TypeInfo* outputTypeInfo = 
+            WeaverCommon::QueryTypeInfo (outp.type);
+          if (inputTypeInfo && outputTypeInfo
+            && (outputTypeInfo->baseType == inputTypeInfo->baseType)
+            && (outputTypeInfo->samplerIsCube == inputTypeInfo->samplerIsCube)
+            && (outputTypeInfo->dimensions == inputTypeInfo->dimensions)
+            && ((outputTypeInfo->semantics == inputTypeInfo->semantics)
+              || (inputTypeInfo->semantics == WeaverCommon::TypeInfo::NoSemantics))
+            && ((outputTypeInfo->space == inputTypeInfo->space)
+              || (inputTypeInfo->space == WeaverCommon::TypeInfo::NoSpace))
+            && ((outputTypeInfo->unit == inputTypeInfo->unit)
+              || (!inputTypeInfo->unit)))
+          {
+	    sourceTech = tech;
+	    output = &outp;
+            usedOutputs.AddNoTest (output);
+            return true;
+          }
 	}
 	
 	csArray<const Snippet::Technique*> deps;
@@ -751,9 +787,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       size_t oldIndex = techToNode.Get (tech, csArrayItemNotFound);
       if (oldIndex == csArrayItemNotFound)
       {
-        Node node;
-        node.tech = tech;
-        ComputeRenames (node, combiner);
+        Node* node = nodeAlloc.Alloc();
+        node->tech = tech;
+        ComputeRenames (*node, combiner);
         techToNode.Put (tech, nodes.Push (node));
       }
       else
@@ -761,10 +797,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         /* A dependency was added earlier. However, dependencies of a node
            must come after the depending node in the array; so push the
            node back. */
-        Node node (nodes[oldIndex]);
-        nodes[oldIndex].tech = 0;
-        nodes[oldIndex].inputRenames.DeleteAll();
-        nodes[oldIndex].outputRenames.DeleteAll();
+        Node* node = nodeAlloc.Alloc();
+        *node = *nodes[oldIndex];
+        nodes[oldIndex]->tech = 0;
+        nodes[oldIndex]->inputRenames.DeleteAll();
+        nodes[oldIndex]->outputRenames.DeleteAll();
         techToNode.PutUnique (tech, nodes.Push (node));
       }
       
@@ -808,9 +845,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       graph.AddConnection (conn);
       lastTech = tech;
       
-      Node node;
-      node.tech = tech;
-      ComputeRenames (node, combiner);
+      Node* node = nodeAlloc.Alloc();
+      node->tech = tech;
+      ComputeRenames (*node, combiner);
       techToNode.Put (tech, nodes.Push (node));
     }
     TechniqueGraph::Connection conn;
@@ -844,7 +881,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     const size_t maxIndex = nodes.GetSize()-1;
     for (size_t n = 0, n2 = maxIndex; n < nodes.GetSize() / 2; n++, n2--)
     {
-      Node tmp = nodes[n];
+      Node* tmp = nodes[n];
       nodes[n] = nodes[n2];
       nodes[n2] = tmp;
     }
@@ -876,7 +913,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       size_t oldIndex = newTechToNode.Get (tech, csArrayItemNotFound);
       if (oldIndex == csArrayItemNotFound)
       {
-        Node node = GetNodeForTech (tech);
+        Node* node = nodeAlloc.Alloc();
+        *node = GetNodeForTech (tech);
         newTechToNode.Put (tech, newNodes.Push (node));
       }
       else
@@ -884,10 +922,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         /* A dependency was added earlier. However, dependencies of a node
            must come after the depending node in the array; so push the
            node back. */
-        Node node (newNodes[oldIndex]);
-        newNodes[oldIndex].tech = 0;
-        newNodes[oldIndex].inputRenames.DeleteAll();
-        newNodes[oldIndex].outputRenames.DeleteAll();
+        Node* node = nodeAlloc.Alloc();
+        *node = *newNodes[oldIndex];
+        newNodes[oldIndex]->tech = 0;
+        newNodes[oldIndex]->inputRenames.DeleteAll();
+        newNodes[oldIndex]->outputRenames.DeleteAll();
         newTechToNode.PutUnique (tech, newNodes.Push (node));
       }
       

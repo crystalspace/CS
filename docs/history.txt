@@ -7,6 +7,14 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 
+23-Feb-2007
+	- res added some groundwork for weaver int+bool support.
+	- res fixed a crash in shaderweaver when too many coercions were added
+	  to the internal tree.
+	- res fixed a problem with merged input were the generating snippet
+	  would be emitted after the requiring input.
+	- res augmented the shaderweaver to also match an output to an input
+	  if the input is more "general" than the output.
 22-Feb-2007
 	- res fixed shaderweaver to not crash when a snippet lacks a 
 	  <combiner> node.
