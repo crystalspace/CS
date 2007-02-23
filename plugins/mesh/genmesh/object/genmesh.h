@@ -147,6 +147,7 @@ private:
   csRef<csRenderBufferHolder> bufferHolder;
   csWeakRef<iGraphics3D> g3d;
   bool mesh_colors_dirty_flag;
+  bool mesh_user_rb_dirty_flag;
 
   uint buffers_version;
   csRef<iRenderBuffer> sorted_index_buffer;	// Only if factory back2front

@@ -104,6 +104,7 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
   lighting_dirty = true;
   shadow_caps = false;
   factory_user_rb_state = 0;
+  mesh_user_rb_dirty_flag = false;
 
   dynamic_ambient_version = 0;
 
@@ -632,8 +633,9 @@ void csGenmeshMeshObject::SetupObject ()
     material_needs_visit = mater ? mater->IsVisitRequired () : false;
     SetupShaderVariableContext ();
   }
-  if (factory->user_buffer_change != factory_user_rb_state)
+  if (factory->user_buffer_change != factory_user_rb_state || mesh_user_rb_dirty_flag)
   {
+    mesh_user_rb_dirty_flag = false;
     factory_user_rb_state = factory->user_buffer_change;
     SetupShaderVariableContext ();
   }
@@ -1527,7 +1529,7 @@ bool csGenmeshMeshObject::AddRenderBuffer (const char *name,
   if (userBuffers.AddRenderBuffer (bufID, buffer))
   {
     user_buffer_names.Push (bufID);
-    SetupShaderVariableContext ();
+    mesh_user_rb_dirty_flag = true;
     return true;
   }
   return false;
@@ -1539,7 +1541,7 @@ bool csGenmeshMeshObject::RemoveRenderBuffer (const char *name)
   if (userBuffers.RemoveRenderBuffer (bufID))
   {
     user_buffer_names.Delete (bufID);
-    SetupShaderVariableContext ();
+    mesh_user_rb_dirty_flag = true;
     return true;
   }
   return false;

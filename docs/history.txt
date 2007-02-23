@@ -29,6 +29,9 @@ chronological order.
 	- res re-created the "reflectsphere" shader as a weaved shader. Made
 	  flarge use this new shader, and added a normal map to the teapot's
 	  material to show off a bit.
+        - Piotr is following res suggestion and makes the genmesh object 
+          reset its user render buffer only in 'SetupObject' (instead of
+          reseting right after any change). 
 22-Feb-2007
 	- res fixed shaderweaver to not crash when a snippet lacks a 
 	  <combiner> node.
