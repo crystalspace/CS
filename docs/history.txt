@@ -15,6 +15,11 @@ chronological order.
 	  would be emitted after the requiring input.
 	- res augmented the shaderweaver to also match an output to an input
 	  if the input is more "general" than the output.
+	- res fixed a crash in the Cg weaver combiner when generating a more 
+	  complex coercion chain.
+	- res augmented the Cg weaver combiner to also check <variablemap>
+	  nodes for "input tags" (a part of weaver's input merging).
+	- res made the Cg dump output used and reference flags for parameters.
 22-Feb-2007
 	- res fixed shaderweaver to not crash when a snippet lacks a 
 	  <combiner> node.
