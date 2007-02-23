@@ -45,19 +45,20 @@ csEventHandlerRegistry::~csEventHandlerRegistry()
 
 csHandlerID csEventHandlerRegistry::GetGenericID (const char *name)
 {
-  CS_ASSERT (name.FindFirst(':') == (size_t)-1);
+  csString nameStr = name;
+  CS_ASSERT (nameStr.FindFirst(':') == (size_t)-1);
   csHandlerID res;
-  if (names.Contains(name)) 
+  if (names.Contains(nameStr)) 
   {
-    res = names.Request(name);
+    res = names.Request(nameStr);
   } 
   else 
   {
-    res = names.Request(name);
+    res = names.Request(nameStr);
     csString p;
-    p = name + csString(":pre");
+    p = nameStr + ":pre";
     handlerPres.PutUnique(res, names.Request((const char *)p));
-    p = name + csString(":post");
+    p = nameStr + ":post";
     handlerPosts.PutUnique(res, names.Request((const char *)p));
   }
   return res;

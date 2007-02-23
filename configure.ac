@@ -163,6 +163,8 @@ CS_EMIT_BUILD_RESULT([cs_cv_sys_pthread], [PTHREAD])
 AS_IF([test $cs_cv_sys_pthread_mutex_recursive != no],
     [CS_HEADER_PROPERTY([CS_PTHREAD_MUTEX_RECURSIVE],
 	[$cs_cv_sys_pthread_mutex_recursive])])
+CS_CHECK_PTHREAD_ATFORK([cs_cv_sys_pthread_atfork])
+CS_EMIT_BUILD_PROPERTY([PTHREAD.ATFORK.AVAILABLE], [$cs_cv_sys_pthread_atfork])
 
 
 
@@ -1397,35 +1399,6 @@ AS_IF([test $cs_cv_libsdl = yes],
 	[$cs_cv_libsdl_cflags], [$cs_cv_libsdl_lflags], [$cs_cv_libsdl_libs])])
 
 
-
-#------------------------------------------------------------------------------
-# Check for VOS.
-#------------------------------------------------------------------------------
-CS_CHECK_LIB_WITH([metaobject_a3dl],
-    [AC_LANG_PROGRAM(
-	[[#include <vos/metaobjects/a3dl/object3d.hh>]],
-	[A3DL::Object3D o(0); o.setPosition(0,0,0);])],
-    [], [C++], [], [], [], [], 
-    [-lboost_thread -lvutil -lvip -lvos], 
-    [libmetaobject_a3dl])
-
-AS_IF([test $cs_cv_libmetaobject_a3dl = yes],
-    [CS_CHECK_LIB_WITH([metaobject_misc],
-	[AC_LANG_PROGRAM(
-	    [[#include <vos/metaobjects/misc/metadata.hh>]],
-	    [VOS::Metadata m(0); m.setCreationTime(0);])],
-	[], [C++], [], [],
-	[$cs_cv_libmetaobject_a3dl_cflags],
-	[$cs_cv_libmetaobject_a3dl_lflags],
-	[$cs_cv_libmetaobject_a3dl_libs -lircclient],
-	[libmetaobject_misc])],
-    [cs_cv_libmetaobject_misc=no])
-
-AS_IF([test $cs_cv_libmetaobject_misc = yes],
-    [CS_EMIT_BUILD_RESULT([cs_cv_libmetaobject_misc], [VOS])])
-
-
-
 #------------------------------------------------------------------------------
 # Check for wxWidgets. Also check if it was built with OpenGL support since it
 # is required by the Crystal Space wxWidgets canvas.
@@ -1709,6 +1682,18 @@ CS_CHECK_BUILD([for _aligned_malloc], [cs_cv__aligned_malloc],
 	[_aligned_malloc(0, 0);])],
     [], [],
     [CS_HEADER_PROPERTY([CS_HAVE__ALIGNED_MALLOC])])
+
+
+
+#------------------------------------------------------------------------------
+# Check whether malloc.h can be included without a warning.
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD([if <malloc.h> can be included], [cs_cv_malloc_h_includeable],
+    [AC_LANG_PROGRAM(
+        [[#include <malloc.h>]])],
+    [], [C++], 
+    [CS_HEADER_PROPERTY([CS_HAVE_MALLOC_H])], [],
+    [$cs_cv_prog_cxx_enable_warnings $cs_cv_prog_cxx_enable_errors])
 
 
 
@@ -2245,6 +2230,21 @@ AS_IF([test $cs_build_mode = debug],
 	*) cs_debug_libbfd=no ;;
     esac],
     [cs_debug_libbfd=no])
+
+
+
+#------------------------------------------------------------------------------
+# Determine whether ptmalloc should be disabled.
+#------------------------------------------------------------------------------
+AC_MSG_CHECKING([whether to enable ptmalloc])
+AC_ARG_ENABLE([ptmalloc],
+    [AC_HELP_STRING([--enable-ptmalloc],
+	[enable the built-in ptmalloc which provides fast memory allocations,
+	but may cause problems in rare cases. (default YES)])],
+    [], [enable_ptmalloc=yes])
+AC_MSG_RESULT([$enable_ptmalloc])
+AS_IF([test $enable_ptmalloc != yes],
+    [CS_HEADER_PROPERTY([CS_NO_PTMALLOC])])
 
 
 

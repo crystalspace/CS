@@ -419,7 +419,10 @@ protected:
 	for (size_t i3=0 ; i3<Nodes[Nodes[i1].pre[i2]].post.Length() ; i3++)
 	{
 	  if (Nodes[Nodes[i1].pre[i2]].post[i3] == i1)
+          {
 	    reciprocal_post_exists = true;
+            break;
+          }
 	}
 	CS_ASSERT_MSG ("Node prefix does not have reciprocal postfix", 
 		       reciprocal_post_exists);
@@ -434,7 +437,10 @@ protected:
 	for (size_t i3=0 ; i3<Nodes[Nodes[i1].post[i2]].pre.Length() ; i3++)
 	{
 	  if (Nodes[Nodes[i1].post[i2]].pre[i3] == i1)
+          {
 	    reciprocal_pre_exists = true;
+            break;
+          }
 	}
 	CS_ASSERT_MSG ("Node postfix does not have reciprocal prefix",
 		       reciprocal_pre_exists);

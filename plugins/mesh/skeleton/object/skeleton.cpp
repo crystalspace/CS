@@ -61,6 +61,11 @@ csSkeletonBone::~csSkeletonBone ()
 {
 }
 
+iSkeletonBoneFactory *csSkeletonBone::GetFactory() 
+{
+  return static_cast<iSkeletonBoneFactory*> (factory_bone);
+}
+
 void csSkeletonBone::SetParent (iSkeletonBone *par)
 {
   if (parent && (par != parent))
@@ -357,6 +362,11 @@ csSkeletonSocket::~csSkeletonSocket ()
 {
 }
 
+iSkeletonSocketFactory *csSkeletonSocket::GetFactory ()
+{
+  return static_cast<iSkeletonSocketFactory*> (factory);
+}
+
 //--------------------------iSkeletonSocketFactory-----------------------------------
 
 csSkeletonSocketFactory::csSkeletonSocketFactory (const char *name,
@@ -488,7 +498,7 @@ void csSkeletonRunnable::ParseFrame(csSkeletonScriptKeyFrame *frame)
       m.position = bone_transform->pos;
       m.type = 1;
       //m.quat = csQuaternion (transform.GetT2O());
-      m.quat.SetMatrix (transform.GetT2O());
+      m.quat.SetMatrix (transform.GetO2T());
       m.final_position = transform.GetOrigin();
 
       csVector3 delta;
@@ -731,6 +741,11 @@ csSkeleton::~csSkeleton ()
   {
     delete script_callback;
   }
+}
+
+iSkeletonFactory *csSkeleton::GetFactory() 
+{
+  return static_cast<iSkeletonFactory*> (factory);
 }
 
 void csSkeleton::UpdateBones ()
@@ -1106,6 +1121,11 @@ iSkeletonBoneFactory *csSkeletonFactory::CreateBone(const char *name)
 
 csSkeletonFactory::~csSkeletonFactory ()
 {
+}
+
+iSkeletonGraveyard *csSkeletonFactory::GetGraveyard  ()
+{
+  return static_cast<iSkeletonGraveyard*> (graveyard);
 }
 
 iSkeletonScript* csSkeletonFactory::FindScript (const char* scriptname)

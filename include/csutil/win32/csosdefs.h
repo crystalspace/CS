@@ -45,6 +45,7 @@
   //				   * used by clients */
   //#pragma warning(disable:4275)   /* non-DLL-interface used as base for
   //                                 * DLL-interface */
+  #pragma warning(disable:4290)   // C++ exception specification ignored
   //#pragma warning(disable:4291)   // no matching operator delete found
   #pragma warning(disable:4312)	  /* 'variable' : conversion from 'type' to 
 				   * 'type' of greater size */
@@ -80,6 +81,13 @@
   #pragma intrinsic (strcpy, strcmp, strlen, strcat)
   #pragma intrinsic (abs, fabs)
   #pragma intrinsic (_byteswap_ushort, _byteswap_ulong, _byteswap_uint64)
+  
+  #if _MSC_VER >= 1400
+    #include <intrin.h>
+  #else
+    extern "C" long _InterlockedExchange (long volatile *, long);
+  #endif
+  #pragma intrinsic (_InterlockedExchange)
 
   #if defined(__CRYSTAL_SPACE__) && !defined(CS_DEBUG)
     #pragma code_seg("CSpace")	  // Just for fun :)

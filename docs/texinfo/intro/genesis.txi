@@ -24,9 +24,9 @@ months had to get out of my head.  In a bit more than one month I wrote the
 first version of Crystal Space (during my free time).  At that point I had a
 portal engine with 6@sc{dof}, colored static lighting with shadows, primitive
 scripting, mipmapping and moving objects.  Since time became a precious
-resource I decided to release Crystal Space to the general public and I put an
-announcement in comp.graphics.algorithms.  And this was the start of the
-Crystal Space project.
+resource I decided to release Crystal Space to the general public and put an
+announcement on the newsgroup @samp{comp.graphics.algorithms}.  And this was
+the start of the Crystal Space project.
 
 I must say that I didn't expect the kind of response that I got (I received
 mails from hundreds of people and all were very positive).  Many thanks to all

@@ -23,17 +23,30 @@
 #include "csutil/parasiticdatabuffer.h"
 #include "csgeom/math.h"
 
-class csFreeDataBuffer : public csDataBuffer
+namespace
 {
-public:
-  csFreeDataBuffer (char* data, size_t size) : 
-    csDataBuffer (data, size, false) { }
-  virtual ~csFreeDataBuffer()
+  class DataBufferFreeCS : public csDataBuffer
   {
-    free (csDataBuffer::GetData ());
-  }
-};
+  public:
+    DataBufferFreeCS (char* data, size_t size) : 
+      csDataBuffer (data, size, false) { }
+    virtual ~DataBufferFreeCS()
+    {
+      cs_free (csDataBuffer::GetData ());
+    }
+  };
 
+  class DataBufferFreePlatform : public csDataBuffer
+  {
+  public:
+    DataBufferFreePlatform (char* data, size_t size) : 
+      csDataBuffer (data, size, false) { }
+    virtual ~DataBufferFreePlatform()
+    {
+      platform_free (csDataBuffer::GetData ());
+    }
+  };
+}
 
 const char* csMemFile::GetName() { return "#csMemFile"; }
 const char* csMemFile::GetData() const 
@@ -62,8 +75,10 @@ csMemFile::csMemFile(char* p, size_t s, Disposition d)
   : scfImplementationType (this),
   size(s), cursor(0)
 { 
-  if (d == DISPOSITION_FREE)
-    buffer.AttachNew (new csFreeDataBuffer (p, s));
+  if (d == DISPOSITION_CS_FREE)
+    buffer.AttachNew (new DataBufferFreeCS (p, s));
+  else if (d == DISPOSITION_PLATFORM_FREE)
+    buffer.AttachNew (new DataBufferFreePlatform (p, s));
   else
     buffer.AttachNew (new csDataBuffer ((char*)p, s, 
       d == DISPOSITION_DELETE));

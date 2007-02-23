@@ -467,7 +467,7 @@ IMPLEMENT_APP(MyApp)
 {
 #if defined(wxUSE_UNICODE) && wxUSE_UNICODE
   char** csargv;
-  csargv = (char**)malloc(sizeof(char*) * argc);
+  csargv = (char**)cs_malloc(sizeof(char*) * argc);
   for(int i = 0; i < argc; i++) 
   {
     csargv[i] = strdup (wxString(argv[i]).mb_str().data());

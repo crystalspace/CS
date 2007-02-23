@@ -52,13 +52,9 @@
 #include "ivideo/rendermesh.h"
 #include "ivideo/rndbuf.h"
 
-// Hack: work around problems caused by #defining 'new'
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-# undef new
-#endif
-#include <new>
-
+#include "csutil/custom_new_disable.h"
 #include <cal3d/cal3d.h>
+#include "csutil/custom_new_enable.h"
 
 struct iObjectRegistry;
 struct iEngine;
@@ -66,11 +62,7 @@ struct iMaterialWrapper;
 
 #define ALL_LOD_FEATURES (CS_LOD_TRIANGLE_REDUCTION|CS_LOD_DISTANCE_REDUCTION)
 
-namespace CS
-{
-namespace Plugins
-{
-namespace SprCal3d
+CS_PLUGIN_NAMESPACE_BEGIN(SprCal3d)
 {
 
 class csSpriteCal3DMeshObjectType;
@@ -834,8 +826,7 @@ public:
   csRef<iPolygonMesh> nullPolyMesh;
 };
 
-} // namespace SprCal3d
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(SprCal3d)
 
 #endif // __CS_SPRCAL3D_H__

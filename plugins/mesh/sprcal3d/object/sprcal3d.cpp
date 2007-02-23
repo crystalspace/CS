@@ -59,7 +59,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 CS_IMPLEMENT_PLUGIN
 
-using namespace CS::Plugins::SprCal3d;
+CS_PLUGIN_NAMESPACE_BEGIN(SprCal3d)
+{
 
 CS_LEAKGUARD_IMPLEMENT (csCal3DMesh);
 CS_LEAKGUARD_IMPLEMENT (csSpriteCal3DMeshObject);
@@ -354,7 +355,8 @@ void csSpriteCal3DMeshObjectFactory::CalculateAllBoneBoundingBoxes()
 
 int csSpriteCal3DMeshObjectFactory::AddMorphAnimation(const char *name)
 {
-  int id = calCoreModel.addCoreMorphAnimation(new CalCoreMorphAnimation());
+  int id = calCoreModel.addCoreMorphAnimation(new (allocPlatform)
+    CalCoreMorphAnimation());
   morph_animation_names.Push(name);
   return id;
 }
@@ -556,7 +558,7 @@ int csSpriteCal3DMeshObjectFactory::FindMorphAnimationName (
 
 bool csSpriteCal3DMeshObjectFactory::AddCoreMaterial(iMaterialWrapper *mat)
 {
-  CalCoreMaterial *newmat = new CalCoreMaterial;
+  CalCoreMaterial *newmat = new (allocPlatform) CalCoreMaterial;
   CalCoreMaterial::Map newmap;
   newmap.userData = mat;
 
@@ -2245,3 +2247,6 @@ csPtr<iMeshObjectFactory> csSpriteCal3DMeshObjectType::NewFactory ()
   return csPtr<iMeshObjectFactory> (cm);
 }
 
+
+}
+CS_PLUGIN_NAMESPACE_END(SprCal3d)

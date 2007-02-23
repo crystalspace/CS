@@ -916,7 +916,7 @@ csArchive::ArchiveEntry::~ArchiveEntry ()
 
 void csArchive::ArchiveEntry::FreeBuffer ()
 {
-  if (buffer) free (buffer);
+  if (buffer) cs_free (buffer);
   buffer = 0;
   buffer_pos = 0;
   buffer_size = 0;
@@ -931,7 +931,7 @@ bool csArchive::ArchiveEntry::Append (const void *data, size_t size)
     // If the user has defined the uncompressed file size, take it
     if (buffer_size < info.ucsize)
       buffer_size = info.ucsize;
-    buffer = (char *)realloc (buffer, buffer_size);
+    buffer = (char *)cs_realloc (buffer, buffer_size);
     if (!buffer)
     {
       buffer_pos = buffer_size = info.ucsize = 0;

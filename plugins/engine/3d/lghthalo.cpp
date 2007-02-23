@@ -90,7 +90,7 @@ uint8 *csNovaHalo::Generate (int Size)
 
 
 csFlareHalo::csFlareHalo () 
-  : scfImplementationType (this, cshtFlare), components (0), last (0)
+: scfImplementationType (this, cshtFlare), components (0), last (0), cmp_cnt (0)
 {
 }
 
@@ -105,8 +105,17 @@ csFlareHalo::~csFlareHalo ()
     p = np;
   }
 }
+void csFlareHalo::SetComponentColor (uint component, const csVector4& color)
+{
+  csFlareComponent *pcomp = components;
+  for (int i = 0; i < cmp_cnt && i < component; i++)
+  {
+    pcomp = pcomp->next;
+  }
+  pcomp->color = color;
+}
 
-void csFlareHalo::AddComponent (
+uint csFlareHalo::AddComponent (
   float pos,
   float w,
   float h,
@@ -121,12 +130,14 @@ void csFlareHalo::AddComponent (
     last->next = comp;
   last = comp;
 
+  comp->color = csVector4 (1,1,1,1);
   comp->position = pos;
   comp->width = w;
   comp->height = h;
   comp->mixmode = mode;
   comp->image = image;
   if (comp->image) comp->image->IncRef ();
+  return cmp_cnt++;
 }
 
 uint8 *csFlareHalo::Generate (int /*Size*/ )
@@ -363,8 +374,10 @@ void csLightFlareHalo::ProcessFlareComponent (
   }
 
   static uint indices[4] = {0, 1, 2, 3};
-  csVector4 colors[4] = {csVector4 (intensity), csVector4 (intensity), 
-    csVector4 (intensity), csVector4 (intensity)};
+  csVector4 c = comp->color;
+  c *= intensity;
+  csVector4 colors[4] = {c, c, 
+    c, c};
 
   pos.y = ((float)engine->G3D->GetHeight()) - pos.y;
 
