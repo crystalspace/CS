@@ -55,40 +55,29 @@ CS_IMPLEMENT_PLUGIN
 
 //---------------------------------------------------------------------------
 
+CS_PLUGIN_NAMESPACE_BEGIN(EngSeq)
+{
+
 /**
  * The superclass of all sequence operations.
  */
-class OpStandard : public iSequenceOperation
+class OpStandard : 
+  public scfImplementation1<OpStandard, iSequenceOperation>
 {
-protected:
-  virtual ~OpStandard() { SCF_DESTRUCT_IBASE(); }
-
 public:
-  SCF_DECLARE_IBASE;
-  OpStandard () { SCF_CONSTRUCT_IBASE (0); }
+  OpStandard () : scfImplementationType (this) { }
   virtual void CleanupSequences () { }
 };
-
-SCF_IMPLEMENT_IBASE (OpStandard)
-  SCF_IMPLEMENTS_INTERFACE (iSequenceOperation)
-SCF_IMPLEMENT_IBASE_END
 
 /**
  * The superclass of all sequence conditions.
  */
-class CondStandard : public iSequenceCondition
+class CondStandard : 
+  public scfImplementation1<CondStandard, iSequenceCondition>
 {
-protected:
-  virtual ~CondStandard() { SCF_DESTRUCT_IBASE(); }
-
 public:
-  SCF_DECLARE_IBASE;
-  CondStandard () { SCF_CONSTRUCT_IBASE (0); }
+  CondStandard () : scfImplementationType (this) { }
 };
-
-SCF_IMPLEMENT_IBASE (CondStandard)
-  SCF_IMPLEMENTS_INTERFACE (iSequenceCondition)
-SCF_IMPLEMENT_IBASE_END
 
 //---------------------------------------------------------------------------
 
@@ -127,18 +116,18 @@ public:
   }
 };
 
-class FadeFogInfo : public iSequenceTimedOperation
+class FadeFogInfo : 
+  public scfImplementation1<FadeFogInfo, iSequenceTimedOperation>
 {
 public:
   csRef<iSector> sector;
   csColor start_col, end_col;
   float start_density, end_density;
 
-  SCF_DECLARE_IBASE;
-  FadeFogInfo ()
-  { SCF_CONSTRUCT_IBASE (0); }
+  FadeFogInfo () : scfImplementationType (this)
+  { }
   virtual ~FadeFogInfo ()
-  { SCF_DESTRUCT_IBASE(); }
+  { }
 
   virtual void Do (float time, iBase*)
   {
@@ -156,10 +145,6 @@ public:
   }
 };
 
-SCF_IMPLEMENT_IBASE (FadeFogInfo)
-  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
-SCF_IMPLEMENT_IBASE_END
-
 /**
  * Fade fog operation.
  */
@@ -172,19 +157,18 @@ private:
   float end_density;
   csTicks duration;
   iEngineSequenceManager* eseqmgr;
+  uint sequence_id;
 
 public:
   OpFadeFog (iParameterESM* sectorpar, const csColor& color, float density,
-  	csTicks duration, iEngineSequenceManager* eseqmgr)
+  	csTicks duration, iEngineSequenceManager* eseqmgr, uint sequence_id) :
+    end_col (color), end_density (density), duration (duration),
+    eseqmgr (eseqmgr), sequence_id (sequence_id)
   {
     if (sectorpar->IsConstant ())
       sector = SCF_QUERY_INTERFACE (sectorpar->GetValue (), iSector);
     else
       OpFadeFog::sectorpar = sectorpar;
-    OpFadeFog::end_col = color;
-    OpFadeFog::end_density = density;
-    OpFadeFog::duration = duration;
-    OpFadeFog::eseqmgr = eseqmgr;
   }
 
   virtual void Do (csTicks dt, iBase* params)
@@ -201,7 +185,7 @@ public:
     fi->end_col = end_col;
     fi->end_density = end_density;
     fi->sector = sector;
-    eseqmgr->FireTimedOperation (dt, duration, fi);
+    eseqmgr->FireTimedOperation (dt, duration, fi, 0, sequence_id);
     fi->DecRef ();
     if (sectorpar)
       sector = 0;
@@ -413,17 +397,17 @@ public:
   }
 };
 
-class FadeLightInfo : public iSequenceTimedOperation
+class FadeLightInfo : 
+  public scfImplementation1<FadeLightInfo, iSequenceTimedOperation>
 {
 public:
   csRef<iLight> light;
   csColor start_col, end_col;
 
-  SCF_DECLARE_IBASE;
-  FadeLightInfo ()
-  { SCF_CONSTRUCT_IBASE (0); }
+  FadeLightInfo () : scfImplementationType (this)
+  { }
   virtual ~FadeLightInfo ()
-  { SCF_DESTRUCT_IBASE(); }
+  { }
 
   virtual void Do (float time, iBase*)
   {
@@ -434,10 +418,6 @@ public:
     light->SetColor (color);
   }
 };
-
-SCF_IMPLEMENT_IBASE (FadeLightInfo)
-  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
-SCF_IMPLEMENT_IBASE_END
 
 /**
  * Fade light operation.
@@ -450,18 +430,19 @@ private:
   csColor end_col;
   csTicks duration;
   iEngineSequenceManager* eseqmgr;
+  uint sequence_id;
 
 public:
   OpFadeLight (iParameterESM* lightpar, const csColor& color,
-  	csTicks duration, iEngineSequenceManager* eseqmgr)
+  	csTicks duration, iEngineSequenceManager* eseqmgr,
+	uint sequence_id) :
+    end_col (color), duration (duration), eseqmgr (eseqmgr),
+    sequence_id (sequence_id)
   {
     if (lightpar->IsConstant ())
       light = SCF_QUERY_INTERFACE (lightpar->GetValue (), iLight);
     else
       OpFadeLight::lightpar = lightpar;
-    OpFadeLight::end_col = color;
-    OpFadeLight::duration = duration;
-    OpFadeLight::eseqmgr = eseqmgr;
   }
 
   virtual void Do (csTicks dt, iBase* params)
@@ -472,7 +453,7 @@ public:
     fl->light = light;
     fl->start_col = light->GetColor ();
     fl->end_col = end_col;
-    eseqmgr->FireTimedOperation (dt, duration, fl);
+    eseqmgr->FireTimedOperation (dt, duration, fl, 0, sequence_id);
     fl->DecRef ();
     if (lightpar)
       light = 0;
@@ -513,17 +494,17 @@ public:
   }
 };
 
-class FadeAmbientLightInfo : public iSequenceTimedOperation
+class FadeAmbientLightInfo : 
+  public scfImplementation1<FadeAmbientLightInfo, iSequenceTimedOperation>
 {
 public:
   csRef<iSector> sector;
   csColor start_col, end_col;
 
-  SCF_DECLARE_IBASE;
-  FadeAmbientLightInfo ()
-  { SCF_CONSTRUCT_IBASE (0); }
+  FadeAmbientLightInfo () : scfImplementationType (this)
+  { }
   virtual ~FadeAmbientLightInfo ()
-  { SCF_DESTRUCT_IBASE(); }
+  { }
 
   virtual void Do (float time, iBase*)
   {
@@ -535,10 +516,6 @@ public:
   }
 };
 
-SCF_IMPLEMENT_IBASE (FadeAmbientLightInfo)
-  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
-SCF_IMPLEMENT_IBASE_END
-
 /**
  * Fade light operation.
  */
@@ -549,15 +526,16 @@ private:
   csColor end_col;
   csTicks duration;
   iEngineSequenceManager* eseqmgr;
+  uint sequence_id;
 
 public:
   OpFadeAmbientLight (iParameterESM* sectorpar, const csColor& color,
-  	csTicks duration, iEngineSequenceManager* eseqmgr)
+  	csTicks duration, iEngineSequenceManager* eseqmgr,
+	uint sequence_id) :
+    end_col (end_col), duration (duration), eseqmgr (eseqmgr),
+    sequence_id (sequence_id)
   {
     sector = SCF_QUERY_INTERFACE (sectorpar->GetValue (), iSector);
-    OpFadeAmbientLight::end_col = color;
-    OpFadeAmbientLight::duration = duration;
-    OpFadeAmbientLight::eseqmgr = eseqmgr;
   }
 
   virtual void Do (csTicks dt, iBase* /*params*/)
@@ -566,7 +544,7 @@ public:
     fl->sector = sector;
     fl->start_col = sector->GetDynamicAmbientLight ();
     fl->end_col = end_col;
-    eseqmgr->FireTimedOperation (dt, duration, fl);
+    eseqmgr->FireTimedOperation (dt, duration, fl, 0, sequence_id);
     fl->DecRef ();
   }
 };
@@ -603,18 +581,18 @@ public:
   }
 };
 
-class FadeMeshColorInfo : public iSequenceTimedOperation
+class FadeMeshColorInfo : 
+  public scfImplementation1<FadeMeshColorInfo, iSequenceTimedOperation>
 {
 public:
   csRef<iMeshWrapper> mesh;
   csColor start_col, end_col;
   float start_density, end_density;
 
-  SCF_DECLARE_IBASE;
-  FadeMeshColorInfo ()
-  { SCF_CONSTRUCT_IBASE (0); }
+  FadeMeshColorInfo () : scfImplementationType (this)
+  { }
   virtual ~FadeMeshColorInfo ()
-  { SCF_DESTRUCT_IBASE(); }
+  { }
 
   virtual void Do (float time, iBase*)
   {
@@ -625,10 +603,6 @@ public:
     mesh->GetMeshObject ()->SetColor (color);
   }
 };
-
-SCF_IMPLEMENT_IBASE (FadeMeshColorInfo)
-  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
-SCF_IMPLEMENT_IBASE_END
 
 /**
  * Fade mesh operation.
@@ -641,18 +615,19 @@ private:
   csColor end_col;
   csTicks duration;
   iEngineSequenceManager* eseqmgr;
+  uint sequence_id;
 
 public:
   OpFadeMeshColor (iParameterESM* meshpar, const csColor& color,
-  	csTicks duration, iEngineSequenceManager* eseqmgr)
+  	csTicks duration, iEngineSequenceManager* eseqmgr,
+	uint sequence_id) :
+    end_col (color), duration (duration), eseqmgr (eseqmgr),
+    sequence_id (sequence_id)
   {
     if (meshpar->IsConstant ())
       mesh = SCF_QUERY_INTERFACE (meshpar->GetValue (), iMeshWrapper);
     else
       OpFadeMeshColor::meshpar = meshpar;
-    OpFadeMeshColor::end_col = color;
-    OpFadeMeshColor::duration = duration;
-    OpFadeMeshColor::eseqmgr = eseqmgr;
   }
 
   virtual void Do (csTicks dt, iBase* params)
@@ -663,7 +638,7 @@ public:
     fm->mesh = mesh;
     mesh->GetMeshObject ()->GetColor (fm->start_col);
     fm->end_col = end_col;
-    eseqmgr->FireTimedOperation (dt, duration, fm);
+    eseqmgr->FireTimedOperation (dt, duration, fm, 0, sequence_id);
     fm->DecRef ();
     if (meshpar)
       mesh = 0;
@@ -672,7 +647,8 @@ public:
 
 //---------------------------------------------------------------------------
 
-class RotateInfo : public iSequenceTimedOperation
+class RotateInfo : 
+  public scfImplementation1<RotateInfo, iSequenceTimedOperation>
 {
 public:
   csRef<iMovable> movable;
@@ -681,11 +657,10 @@ public:
   csVector3 offset;
   csReversibleTransform start_transform;
 
-  SCF_DECLARE_IBASE;
-  RotateInfo ()
-  { SCF_CONSTRUCT_IBASE (0); }
+  RotateInfo () : scfImplementationType (this)
+  { }
   virtual ~RotateInfo ()
-  { SCF_DESTRUCT_IBASE(); }
+  { }
 
   virtual void Do (float time, iBase*)
   {
@@ -740,10 +715,6 @@ public:
   }
 };
 
-SCF_IMPLEMENT_IBASE (RotateInfo)
-  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
-SCF_IMPLEMENT_IBASE_END
-
 /**
  * Rotate operation.
  */
@@ -758,6 +729,7 @@ private:
   csVector3 offset;
   csTicks duration;
   iEngineSequenceManager* eseqmgr;
+  uint sequence_id;
 
 public:
   OpRotate (iParameterESM* meshpar,
@@ -765,7 +737,12 @@ public:
   	int axis2, float tot_angle2,
   	int axis3, float tot_angle3,
 	const csVector3& offset,
-  	csTicks duration, iEngineSequenceManager* eseqmgr)
+  	csTicks duration, iEngineSequenceManager* eseqmgr,
+	uint sequence_id) :
+    axis1 (axis1), axis2 (axis2), axis3 (axis3),
+    tot_angle1 (tot_angle1), tot_angle2 (tot_angle2), tot_angle3 (tot_angle3),
+    offset (offset), duration (duration),
+    eseqmgr (eseqmgr), sequence_id (sequence_id)
   {
     if (meshpar->IsConstant ())
     {
@@ -775,15 +752,6 @@ public:
     }
     else
       OpRotate::meshpar = meshpar;
-    OpRotate::axis1 = axis1;
-    OpRotate::tot_angle1 = tot_angle1;
-    OpRotate::axis2 = axis2;
-    OpRotate::tot_angle2 = tot_angle2;
-    OpRotate::axis3 = axis3;
-    OpRotate::tot_angle3 = tot_angle3;
-    OpRotate::offset = offset;
-    OpRotate::duration = duration;
-    OpRotate::eseqmgr = eseqmgr;
   }
 
   virtual void Do (csTicks dt, iBase* params)
@@ -811,7 +779,7 @@ public:
       ri->tot_angle2 = tot_angle2;
       ri->tot_angle3 = tot_angle3;
       ri->offset = offset;
-      eseqmgr->FireTimedOperation (dt, duration, ri);
+      eseqmgr->FireTimedOperation (dt, duration, ri, 0, sequence_id);
       ri->DecRef ();
     }
 
@@ -825,18 +793,18 @@ public:
 
 //---------------------------------------------------------------------------
 
-class MoveLightInfo : public iSequenceTimedOperation
+class MoveLightInfo : 
+  public scfImplementation1<MoveLightInfo, iSequenceTimedOperation>
 {
 public:
   csRef<iLight> light;
   csVector3 start_pos;
   csVector3 offset;
 
-  SCF_DECLARE_IBASE;
-  MoveLightInfo ()
-  { SCF_CONSTRUCT_IBASE (0); }
+  MoveLightInfo () : scfImplementationType (this)
+  { }
   virtual ~MoveLightInfo ()
-  { SCF_DESTRUCT_IBASE(); }
+  { }
 
   virtual void Do (float time, iBase*)
   {
@@ -845,22 +813,18 @@ public:
   }
 };
 
-SCF_IMPLEMENT_IBASE (MoveLightInfo)
-  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
-SCF_IMPLEMENT_IBASE_END
-
-class MoveInfo : public iSequenceTimedOperation
+class MoveInfo : 
+  public scfImplementation1<MoveInfo, iSequenceTimedOperation>
 {
 public:
   csRef<iMeshWrapper> mesh;
   csVector3 start_pos;
   csVector3 offset;
 
-  SCF_DECLARE_IBASE;
-  MoveInfo ()
-  { SCF_CONSTRUCT_IBASE (0); }
+  MoveInfo () : scfImplementationType (this)
+  { }
   virtual ~MoveInfo ()
-  { SCF_DESTRUCT_IBASE(); }
+  { }
 
   virtual void Do (float time, iBase*)
   {
@@ -869,10 +833,6 @@ public:
     mesh->GetMovable ()->UpdateMove ();
   }
 };
-
-SCF_IMPLEMENT_IBASE (MoveInfo)
-  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
-SCF_IMPLEMENT_IBASE_END
 
 /**
  * Move operation.
@@ -886,11 +846,15 @@ private:
   csVector3 offset;
   csTicks duration;
   iEngineSequenceManager* eseqmgr;
+  uint sequence_id;
 
 public:
   OpMove (iParameterESM* meshpar,
 	const csVector3& offset,
-  	csTicks duration, iEngineSequenceManager* eseqmgr)
+  	csTicks duration, iEngineSequenceManager* eseqmgr,
+	uint sequence_id) :
+    offset (offset), duration (duration), eseqmgr (eseqmgr),
+    sequence_id (sequence_id)
   {
     if (meshpar->IsConstant ())
     {
@@ -902,9 +866,6 @@ public:
     {
       OpMove::meshpar = meshpar;
     }
-    OpMove::offset = offset;
-    OpMove::duration = duration;
-    OpMove::eseqmgr = eseqmgr;
   }
 
   virtual void Do (csTicks dt, iBase* params)
@@ -922,7 +883,7 @@ public:
       mi->mesh = mesh;
       mi->start_pos = movable->GetTransform ().GetOrigin ();
       mi->offset = offset;
-      eseqmgr->FireTimedOperation (dt, duration, mi);
+      eseqmgr->FireTimedOperation (dt, duration, mi, 0, sequence_id);
       mi->DecRef ();
     }
     else if (light)
@@ -931,7 +892,7 @@ public:
       mi->light = light;
       mi->start_pos = light->GetCenter ();
       mi->offset = offset;
-      eseqmgr->FireTimedOperation (dt, duration, mi);
+      eseqmgr->FireTimedOperation (dt, duration, mi, 0, sequence_id);
       mi->DecRef ();
     }
     if (meshpar)
@@ -1078,28 +1039,24 @@ public:
 
 //---------------------------------------------------------------------------
 
-class esmPar : public iParameterESM
+class esmPar : public scfImplementation1<esmPar, iParameterESM>
 {
 private:
   size_t idx;
 
 public:
-  SCF_DECLARE_IBASE;
-  esmPar (size_t idx)
+  esmPar (size_t idx) : scfImplementationType (this)
   {
-    SCF_CONSTRUCT_IBASE (0);
     esmPar::idx = idx;
   }
   virtual ~esmPar ()
   {
-    SCF_DESTRUCT_IBASE();
   }
   virtual iBase* GetValue (iBase* params = 0) const
   {
-    // The following cast is in theory unsafe but in this case it is
-    // ok since there is no way some other 'params' instance could get
-    // here.
-    iEngineSequenceParameters* par = (iEngineSequenceParameters*)params;
+    if (!params) return 0;
+    csRef<iEngineSequenceParameters> par = 
+      scfQueryInterface<iEngineSequenceParameters> (params);
     return par->GetParameter (idx);
   }
   virtual bool IsConstant () const
@@ -1108,25 +1065,18 @@ public:
   }
 };
 
-SCF_IMPLEMENT_IBASE (esmPar)
-  SCF_IMPLEMENTS_INTERFACE (iParameterESM)
-SCF_IMPLEMENT_IBASE_END
-
-class constantPar : public iParameterESM
+class constantPar : public scfImplementation1<constantPar, iParameterESM>
 {
 private:
   csWeakRef<iBase> value;
 
 public:
-  SCF_DECLARE_IBASE;
-  constantPar (iBase* value)
+  constantPar (iBase* value) : scfImplementationType (this)
   {
-    SCF_CONSTRUCT_IBASE (0);
     constantPar::value = value;
   }
   virtual ~constantPar ()
   {
-    SCF_DESTRUCT_IBASE();
   }
   virtual iBase* GetValue (iBase* params = 0) const
   {
@@ -1139,15 +1089,7 @@ public:
   }
 };
 
-SCF_IMPLEMENT_IBASE (constantPar)
-  SCF_IMPLEMENTS_INTERFACE (iParameterESM)
-SCF_IMPLEMENT_IBASE_END
-
 //---------------------------------------------------------------------------
-
-SCF_IMPLEMENT_IBASE (csEngineSequenceParameters)
-  SCF_IMPLEMENTS_INTERFACE (iEngineSequenceParameters)
-SCF_IMPLEMENT_IBASE_END
 
 csPtr<iParameterESM> csEngineSequenceParameters::CreateParameterESM (
 	const char* name)
@@ -1168,13 +1110,14 @@ csSequenceWrapper::csSequenceWrapper (csEngineSequenceManager* eseqmgr,
 
 csSequenceWrapper::~csSequenceWrapper ()
 {
+  eseqmgr->DestroyTimedOperations (sequence_id);
   if (eseqmgr->GetSequenceManager ())
     eseqmgr->GetSequenceManager ()->DestroySequenceOperations (sequence_id);
 }
 
 void csSequenceWrapper::SelfDestruct ()
 {
-  eseqmgr->RemoveSequence ((iSequenceWrapper*)this);
+  eseqmgr->RemoveSequence (static_cast<iSequenceWrapper*> (this));
 }
 
 iEngineSequenceParameters* csSequenceWrapper::CreateBaseParameterBlock ()
@@ -1265,7 +1208,8 @@ void csSequenceWrapper::AddOperationSetLight (csTicks time,
 void csSequenceWrapper::AddOperationFadeLight (csTicks time,
 	iParameterESM* light, const csColor& color, csTicks duration)
 {
-  OpFadeLight* op = new OpFadeLight (light, color, duration, eseqmgr);
+  OpFadeLight* op = new OpFadeLight (light, color, duration, eseqmgr,
+      sequence_id);
   sequence->AddOperation (time, op, 0, sequence_id);
   op->DecRef ();
 }
@@ -1282,7 +1226,7 @@ void csSequenceWrapper::AddOperationFadeAmbient (csTicks time,
 	iParameterESM* sector, const csColor& color, csTicks duration)
 {
   OpFadeAmbientLight* op = new OpFadeAmbientLight (sector, color, duration,
-  	eseqmgr);
+  	eseqmgr, sequence_id);
   sequence->AddOperation (time, op, 0, sequence_id);
   op->DecRef ();
 }
@@ -1305,7 +1249,8 @@ void csSequenceWrapper::AddOperationSetMeshColor (csTicks time,
 void csSequenceWrapper::AddOperationFadeMeshColor (csTicks time,
 	iParameterESM* mesh, const csColor& color, csTicks duration)
 {
-  OpFadeMeshColor* op = new OpFadeMeshColor (mesh, color, duration, eseqmgr);
+  OpFadeMeshColor* op = new OpFadeMeshColor (mesh, color, duration, eseqmgr,
+      sequence_id);
   sequence->AddOperation (time, op, 0, sequence_id);
   op->DecRef ();
 }
@@ -1322,7 +1267,8 @@ void csSequenceWrapper::AddOperationFadeFog (csTicks time,
 	iParameterESM* sector, const csColor& color, float density,
 	csTicks duration)
 {
-  OpFadeFog* op = new OpFadeFog (sector, color, density, duration, eseqmgr);
+  OpFadeFog* op = new OpFadeFog (sector, color, density, duration, eseqmgr,
+      sequence_id);
   sequence->AddOperation (time, op, 0, sequence_id);
   op->DecRef ();
 }
@@ -1336,7 +1282,7 @@ void csSequenceWrapper::AddOperationRotateDuration (csTicks time,
 {
   OpRotate* op = new OpRotate (mesh,
   	axis1, tot_angle1, axis2, tot_angle2, axis3, tot_angle3,
-	offset, duration, eseqmgr);
+	offset, duration, eseqmgr, sequence_id);
   sequence->AddOperation (time, op, 0, sequence_id);
   op->DecRef ();
 }
@@ -1346,7 +1292,7 @@ void csSequenceWrapper::AddOperationMoveDuration (csTicks time,
 	csTicks duration)
 {
   OpMove* op = new OpMove (mesh, offset,
-	duration, eseqmgr);
+	duration, eseqmgr, sequence_id);
   sequence->AddOperation (time, op, 0, sequence_id);
   op->DecRef ();
 }
@@ -1486,7 +1432,8 @@ public:
 /**
  * Callback that will activate trigger when light crosses threshold value.
  */
-class csTriggerLightCallback : public iLightCallback
+class csTriggerLightCallback : 
+  public scfImplementation1<csTriggerLightCallback, iLightCallback>
 {
 private:
   csSequenceTrigger* trigger;
@@ -1495,12 +1442,9 @@ private:
   unsigned int framenr;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csTriggerLightCallback (csSequenceTrigger* trigger,
-	int oper, const csColor& col)
+    int oper, const csColor& col) : scfImplementationType (this)
   {
-    SCF_CONSTRUCT_IBASE (0);
     csTriggerLightCallback::trigger = trigger;
     operation = oper;
     trigger_color = col;
@@ -1508,7 +1452,6 @@ public:
   }
   virtual ~csTriggerLightCallback ()
   {
-    SCF_DESTRUCT_IBASE();
   }
 
   float AverageColor (const csColor& col)
@@ -1543,10 +1486,6 @@ public:
   virtual void OnDestroy (iLight*) { }
   virtual void OnAttenuationChange (iLight* /*light*/, int /*newatt*/) { }
 };
-
-SCF_IMPLEMENT_IBASE (csTriggerLightCallback)
-  SCF_IMPLEMENTS_INTERFACE (iLightCallback)
-SCF_IMPLEMENT_IBASE_END
 
 //---------------------------------------------------------------------------
 
@@ -1623,7 +1562,7 @@ csSequenceTrigger::~csSequenceTrigger ()
 
 void csSequenceTrigger::SelfDestruct ()
 {
-  eseqmgr->RemoveTrigger ((iSequenceTrigger*)this);
+  eseqmgr->RemoveTrigger (static_cast<iSequenceTrigger*> (this));
 }
 
 void csSequenceTrigger::AddConditionInSector (iSector* sector,
@@ -1728,7 +1667,7 @@ void csSequenceTrigger::Fire ()
       last_trigger_state = true;
       // Only fire if trigger is enabled. Otherwise we are only
       // doing the test.
-      csSequenceWrapper* wf = (csSequenceWrapper*)fire_sequence;
+      csSequenceWrapper* wf = static_cast<csSequenceWrapper*> (fire_sequence);
       eseqmgr->GetSequenceManager ()->RunSequence (fire_delay,
     	  fire_sequence->GetSequence (), params, wf->GetSequenceID ());
       enabled = false;
@@ -1767,7 +1706,7 @@ void csSequenceTrigger::Fire ()
 
 void csSequenceTrigger::ForceFire (bool now)
 {
-  csSequenceWrapper* wf = (csSequenceWrapper*)fire_sequence;
+  csSequenceWrapper* wf = static_cast<csSequenceWrapper*> (fire_sequence);
   eseqmgr->GetSequenceManager ()->RunSequence (now ? 0 : fire_delay,
     	  fire_sequence->GetSequence (), params, wf->GetSequenceID ());
 }
@@ -1829,24 +1768,9 @@ void csSequenceTrigger::TestConditions (csTicks delay)
 SCF_IMPLEMENT_FACTORY (csEngineSequenceManager)
 
 
-SCF_IMPLEMENT_IBASE (csEngineSequenceManager)
-  SCF_IMPLEMENTS_INTERFACE (iEngineSequenceManager)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csEngineSequenceManager::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csEngineSequenceManager::EventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-csEngineSequenceManager::csEngineSequenceManager (iBase *iParent)
+csEngineSequenceManager::csEngineSequenceManager (iBase *iParent) :
+  scfImplementationType (this, iParent)
 {
-  SCF_CONSTRUCT_IBASE (iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  scfiEventHandler = 0;
   object_reg = 0;
   global_framenr = 1;
   debug_eseqmgr = this;//@@@@@@@@@@@@@
@@ -1854,29 +1778,25 @@ csEngineSequenceManager::csEngineSequenceManager (iBase *iParent)
 
 csEngineSequenceManager::~csEngineSequenceManager ()
 {
-  if (scfiEventHandler)
+  if (eventHandler.IsValid())
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
     if (q != 0)
-      q->RemoveListener (scfiEventHandler);
-    scfiEventHandler->DecRef ();
+      q->RemoveListener (eventHandler);
   }
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csEngineSequenceManager::Initialize (iObjectRegistry *r)
 {
   object_reg = r;
-  if (!scfiEventHandler)
-    scfiEventHandler = new EventHandler (this);
+  eventHandler.AttachNew (new EventHandler (this));
   PostProcess = csevPostProcess (object_reg);
   MouseEvent = csevMouseEvent (object_reg);
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
   {
     csEventID events[3] = { PostProcess, MouseEvent, CS_EVENTLIST_END };
-    q->RegisterListener (scfiEventHandler, events);
+    q->RegisterListener (eventHandler, events);
   }
 
   csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
@@ -1988,8 +1908,8 @@ csPtr<iSequenceTrigger> csEngineSequenceManager::CreateTrigger (
 {
   csSequenceTrigger* trig = new csSequenceTrigger (this);
   trig->SetName (name);
-  triggers.Push ((iSequenceTrigger*)trig);
-  return (iSequenceTrigger*)trig;
+  triggers.Push (static_cast<iSequenceTrigger*> (trig));
+  return static_cast<iSequenceTrigger*> (trig);
 }
 
 csPtr<iParameterESM> csEngineSequenceManager::CreateParameterESM (iBase* value)
@@ -1999,7 +1919,7 @@ csPtr<iParameterESM> csEngineSequenceManager::CreateParameterESM (iBase* value)
 
 void csEngineSequenceManager::RemoveTrigger (iSequenceTrigger* trigger)
 {
-  mesh_triggers.Delete ((csSequenceTrigger*)trigger);
+  mesh_triggers.Delete (static_cast<csSequenceTrigger*> (trigger));
   triggers.Delete (trigger);
 }
 
@@ -2050,8 +1970,8 @@ csPtr<iSequenceWrapper> csEngineSequenceManager::CreateSequence (
   csSequenceWrapper* seqwrap = new csSequenceWrapper (this, seq,
       seqmgr->GetUniqueID ());
   seqwrap->SetName (name);
-  sequences.Push ((iSequenceWrapper*)seqwrap);
-  return (iSequenceWrapper*)seqwrap;
+  sequences.Push (static_cast<iSequenceWrapper*> (seqwrap));
+  return static_cast<iSequenceWrapper*> (seqwrap);
 }
 
 void csEngineSequenceManager::RemoveSequence (iSequenceWrapper* seq)
@@ -2092,7 +2012,7 @@ bool csEngineSequenceManager::RunSequenceByName (
   iSequenceWrapper *seq = FindSequenceByName(name);
   if (seq)
   {
-    csSequenceWrapper* wf = (csSequenceWrapper*)seq;
+    csSequenceWrapper* wf = static_cast<csSequenceWrapper*> (seq);
     seqmgr->RunSequence (delay, seq->GetSequence (), 0,
 	wf->GetSequenceID ());
     return true;
@@ -2101,7 +2021,8 @@ bool csEngineSequenceManager::RunSequenceByName (
 }
 
 void csEngineSequenceManager::FireTimedOperation (csTicks delta,
-	csTicks duration, iSequenceTimedOperation* op, iBase* params)
+	csTicks duration, iSequenceTimedOperation* op, iBase* params,
+	uint sequence_id)
 {
   csTicks curtime = seqmgr->GetMainTime ();
   if (delta >= duration)
@@ -2110,7 +2031,8 @@ void csEngineSequenceManager::FireTimedOperation (csTicks delta,
     return;	// Already done.
   }
 
-  csTimedOperation* top = new csTimedOperation (op, params);
+  csTimedOperation* top = new csTimedOperation (op, params,
+      sequence_id);
   top->start = curtime-delta;
   top->end = top->start + duration;
 
@@ -2118,4 +2040,22 @@ void csEngineSequenceManager::FireTimedOperation (csTicks delta,
   top->DecRef ();
 }
 
+void csEngineSequenceManager::DestroyTimedOperations (uint sequence_id)
+{
+  size_t i = 0;
+  while (i < timed_operations.Length ())
+  {
+    csTimedOperation* top = timed_operations[i];
+    if (top->GetSequenceID () == sequence_id)
+    {
+      timed_operations.DeleteIndex (i);
+    }
+    else
+    {
+      i++;
+    }
+  }
+}
 
+}
+CS_PLUGIN_NAMESPACE_END(EngSeq)

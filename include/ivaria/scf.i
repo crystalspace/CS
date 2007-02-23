@@ -31,3 +31,15 @@ template <class T,class K> class scfImplementationExt0 : public K
 	SWIG_SCF_IMPL(scfImplementationExt0)
 };
 
+/* This ones are known (and chosen) not to be wrapped for the moment 
+   if you need to use any of these delete the warnfilter and add the
+   necessary %template directive. */
+%warnfilter(401) csView; 		// iView
+%warnfilter(401) csObject; 		// iObject
+%warnfilter(401) csGeomDebugHelper;  	// iDebugHelper
+%warnfilter(401) csPolygonMesh;  	// iPolygonMesh
+%warnfilter(401) csPolygonMeshBox;  	// iPolygonMesh
+%warnfilter(401) csEventNameRegistry; 	// iEventNameRegistry
+%warnfilter(401) csTinyDocumentSystem; 	// iDocumentSystem
+%warnfilter(401) csColliderWrapper; 	// csObject
+

@@ -71,10 +71,14 @@ csEventQueue::csEventQueue (iObjectRegistry* r, size_t iLength) :
   FinalProcessEventDispatcher.AttachNew (
     new FinalProcessFrameEventDispatcher (this));
 
-  if (!Subscribe (PreProcessEventDispatcher, Frame) ||
-      !Subscribe (ProcessEventDispatcher, Frame) ||
-      !Subscribe (PostProcessEventDispatcher, Frame) ||
-      !Subscribe (FinalProcessEventDispatcher, Frame)) 
+  if (!RegisterListener (PreProcessEventDispatcher)
+    || !Subscribe (PreProcessEventDispatcher, Frame) 
+    || !RegisterListener (ProcessEventDispatcher)
+    || !Subscribe (ProcessEventDispatcher, Frame) 
+    || !RegisterListener (PostProcessEventDispatcher)
+    || !Subscribe (PostProcessEventDispatcher, Frame) 
+    || !RegisterListener (FinalProcessEventDispatcher)
+    || !Subscribe (FinalProcessEventDispatcher, Frame))
   {
     CS_ASSERT(0);
   }
@@ -318,7 +322,10 @@ csHandlerID csEventQueue::RegisterListener (iEventHandler * listener)
   std::cerr << "Registering listener (no events) " <<
   	listener->GenericName() << std::endl;
 #endif
-  return HandlerRegistry->GetID(listener);
+  size_t index = handlers.FindSortedKey (
+    csArrayCmp<iEventHandler*, iEventHandler*> (listener));
+  if (index == csArrayItemNotFound) handlers.InsertSorted (listener);
+  return HandlerRegistry->RegisterID (listener);
 }
 
 bool csEventQueue::Subscribe (iEventHandler *listener, const csEventID &ename)
@@ -327,8 +334,10 @@ bool csEventQueue::Subscribe (iEventHandler *listener, const csEventID &ename)
   std::cerr << "Registering listener " << listener->GenericName()
 	    << " to " << NameRegistry->GetString(ename) <<  std::endl;
 #endif
-  bool ret = EventTree->Subscribe (HandlerRegistry->GetID(listener), 
-				   ename, this);
+  csHandlerID handler = HandlerRegistry->GetID (listener);
+  CS_ASSERT_MSG("Event listener not registered prior to subscription",
+    handler != CS_HANDLER_INVALID);
+  bool ret = EventTree->Subscribe (handler, ename, this);
 #ifdef ADB_DEBUG
   EventTree->Dump();
 #endif
@@ -340,7 +349,9 @@ bool csEventQueue::Subscribe (iEventHandler *listener, const csEventID ename[])
 #ifdef ADB_DEBUG
   std::cerr << "Registering listener " << listener->GenericName() << " to:";
 #endif
-  csHandlerID handler = HandlerRegistry->GetID(listener);
+  csHandlerID handler = HandlerRegistry->GetID (listener);
+  CS_ASSERT_MSG("Event listenere not registered prior to subscription",
+    handler != CS_HANDLER_INVALID);
   for (int ecount=0 ; ename[ecount]!=CS_EVENTLIST_END ; ecount++)
   {
 #ifdef ADB_DEBUG
@@ -374,14 +385,16 @@ void csEventQueue::Unsubscribe (iEventHandler *listener, const csEventID ename[]
 	    << listener->GenericName() 
 	    << " from:";
 #endif
+  csHandlerID handler = HandlerRegistry->GetID (listener);
+  if (handler == CS_HANDLER_INVALID) return;
   for (int iter=0 ; ename[iter] != CS_EVENTLIST_END ; iter++)
   {
 #ifdef ADB_DEBUG
     std::cerr << " " << NameRegistry->GetString(ename[iter]);
 #endif
-    EventTree->Unsubscribe(HandlerRegistry->GetID(listener), 
-			   ename[iter], this);
+    EventTree->Unsubscribe(handler, ename[iter], this);
   }
+  HandlerRegistry->ReleaseID (handler);
 #ifdef ADB_DEBUG
   std::cerr << std::endl;
 #endif
@@ -393,7 +406,10 @@ void csEventQueue::Unsubscribe (iEventHandler *listener, const csEventID &ename)
   std::cerr << "Unregistering listener " << listener->GenericName() 
 	    << " from " << NameRegistry->GetString(ename) << std::endl;
 #endif
-  EventTree->Unsubscribe (HandlerRegistry->GetID(listener), ename, this);
+  csHandlerID handler = HandlerRegistry->GetID (listener);
+  if (handler == CS_HANDLER_INVALID) return;
+  EventTree->Unsubscribe (handler, ename, this);
+  HandlerRegistry->ReleaseID (handler);
 }
 
 void csEventQueue::RemoveListener (iEventHandler* listener)
@@ -402,7 +418,13 @@ void csEventQueue::RemoveListener (iEventHandler* listener)
   std::cerr << "Unregistering listener " << listener->GenericName()
 	    << " (all events)" << std::endl;
 #endif
-  EventTree->Unsubscribe(HandlerRegistry->GetID(listener), CS_EVENT_INVALID, this);
+  csHandlerID handler = HandlerRegistry->GetID (listener);
+  if (handler == CS_HANDLER_INVALID) return;
+  EventTree->Unsubscribe (handler, CS_EVENT_INVALID, this);
+  HandlerRegistry->ReleaseID (handler);
+  size_t index = handlers.FindSortedKey (
+    csArrayCmp<iEventHandler*, iEventHandler*> (listener));
+  handlers.DeleteIndex (index);
 }
 
 void csEventQueue::RemoveAllListeners ()
@@ -411,8 +433,15 @@ void csEventQueue::RemoveAllListeners ()
   std::cerr << "Unregistering all listeners" << std::endl;
 #endif
   CS_ASSERT(EventTree != 0);
-  csEventTree::DeleteRootNode(EventTree); // Magic!
-  EventTree = csEventTree::CreateRootNode(HandlerRegistry, NameRegistry, this);
+  /* Release all handler IDs */
+  for (size_t i = 0; i < handlers.GetSize(); i++)
+  {
+    iEventHandler* handler = handlers[i];
+    HandlerRegistry->ReleaseID (handler);
+  }
+  handlers.DeleteAll();
+  csEventTree::DeleteRootNode (EventTree); // Magic!
+  EventTree = csEventTree::CreateRootNode (HandlerRegistry, NameRegistry, this);
 }
 
 csPtr<iEventOutlet> csEventQueue::CreateEventOutlet (iEventPlug* plug)

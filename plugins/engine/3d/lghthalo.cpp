@@ -108,7 +108,7 @@ csFlareHalo::~csFlareHalo ()
 void csFlareHalo::SetComponentColor (uint component, const csVector4& color)
 {
   csFlareComponent *pcomp = components;
-  for (int i = 0; i < cmp_cnt && i < component; i++)
+  for (size_t i = 0; i < cmp_cnt && i < component; i++)
   {
     pcomp = pcomp->next;
   }

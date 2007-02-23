@@ -71,12 +71,14 @@ class ConditionTree
     }
     ~Node ()
     {
+      if (branches[0]) branches[0]->~Node();
       owner->nodeAlloc.Free (branches[0]);
+      if (branches[1]) branches[1]->~Node();
       owner->nodeAlloc.Free (branches[1]);
     }
   };
 
-  csBlockAllocator<Node, TempHeapAlloc> nodeAlloc;
+  csFixedSizeAllocator<sizeof (Node), TempHeapAlloc> nodeAlloc;
   Node* root;
   int currentBranch;
   typedef csArray<Node*, csArrayElementHandler<Node*>, TempHeapAlloc> 
@@ -102,7 +104,7 @@ class ConditionTree
 public:
   ConditionTree (csConditionEvaluator& evaluator) : nodeAlloc (256), evaluator (evaluator)
   {
-    root = (Node*)nodeAlloc.AllocUninit();
+    root = (Node*)nodeAlloc.Alloc();
     new (root) Node (0, this);
     currentBranch = 0;
     NodeStackEntry newPair;
@@ -111,6 +113,7 @@ public:
   }
   ~ConditionTree ()
   {
+    root->~Node();
     nodeAlloc.Free (root);
   }
 
@@ -211,7 +214,7 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
         }
         for (int b = 0; b < 2; b++)
         {
-          Node* nn = (Node*)nodeAlloc.AllocUninit();
+          Node* nn = (Node*)nodeAlloc.Alloc();
           new (nn) Node (node, this);
           if (hasContainer)
           {
@@ -344,11 +347,22 @@ bool ConditionTree::HasContainingCondition (Node* node,
 
 //---------------------------------------------------------------------------
 
-CS_LEAKGUARD_IMPLEMENT(csWrappedDocumentNode);
+typedef csFixedSizeAllocator<sizeof (csWrappedDocumentNode::WrappedChild)> 
+  WrappedChildAlloc;
+CS_IMPLEMENT_STATIC_VAR (ChildAlloc, WrappedChildAlloc, (256));
 
-CS_IMPLEMENT_STATIC_CLASSVAR_REF(csWrappedDocumentNode::WrappedChild, 
-  childAlloc, ChildAlloc, 
-  csWrappedDocumentNode::WrappedChild::WrappedChildAlloc, (256));
+void* csWrappedDocumentNode::WrappedChild::operator new (size_t n)
+{
+  return ChildAlloc()->Alloc (n);
+}
+void csWrappedDocumentNode::WrappedChild::operator delete (void* p)
+{
+  ChildAlloc()->Free (p);
+}
+
+//---------------------------------------------------------------------------
+
+CS_LEAKGUARD_IMPLEMENT(csWrappedDocumentNode);
 
 template<typename ConditionEval>
 csWrappedDocumentNode::csWrappedDocumentNode (ConditionEval& eval,

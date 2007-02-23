@@ -279,7 +279,7 @@ bool csHazeFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
     origNode->SetValue("origin");
     synldr->WriteVector(origNode, orig);
 
-    for (int i=0; i<haze->GetLayerCount(); i++)
+    for (int i=0; i<(int)haze->GetLayerCount(); i++)
     {
       csRef<iDocumentNode> layerNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       layerNode->SetValue("layer");
@@ -532,7 +532,7 @@ bool csHazeSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     origNode->SetValue("origin");
     synldr->WriteVector(origNode, orig);
 
-    for (int i=0; i<haze->GetLayerCount(); i++)
+    for (int i=0; i<(int)haze->GetLayerCount(); i++)
     {
       csRef<iDocumentNode> layerNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
       layerNode->SetValue("layer");

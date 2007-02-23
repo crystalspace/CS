@@ -24,9 +24,10 @@
  * Mesh collider interfaces
  */
 
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 #include "csgeom/vector3.h"
 #include "csutil/array.h"
+#include "csutil/ref.h"
 
 struct iPolygonMesh;
 struct iTerraFormer;
@@ -83,8 +84,6 @@ struct iCollider : public virtual iBase
   virtual csColliderType GetColliderType () = 0;
 };
 
-SCF_VERSION (iCollideSystem, 0, 0, 4);
-
 /**
  * This is the Collide plug-in. This plugin is a factory for creating
  * iCollider entities. A collider represents an entity in the
@@ -101,8 +100,9 @@ SCF_VERSION (iCollideSystem, 0, 0, 4);
  * - csColliderWrapper
  * - csColliderHelper
  */
-struct iCollideSystem : public iBase
+struct iCollideSystem : public virtual iBase
 {
+  SCF_INTERFACE (iCollideSystem, 2, 0, 0);
   /**
    * Create a iCollider for the given mesh geometry.
    * \param mesh is a structure describing the geometry from which the

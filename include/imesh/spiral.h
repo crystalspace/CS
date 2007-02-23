@@ -41,7 +41,7 @@ struct iSpiralState : public virtual iBase
   /// Set the number of particles to use.
   virtual void SetParticleCount (int num) = 0;
   /// Get the number of particles.
-  virtual int GetParticleCount () const = 0;
+  virtual size_t GetParticleCount () const = 0;
   /// Set the size of the spiral particles.
   virtual void SetParticleSize (float partwidth, float partheight) = 0;
   /// Get the size of the spiral particles.

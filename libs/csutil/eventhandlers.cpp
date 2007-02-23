@@ -78,11 +78,15 @@ csHandlerID csEventHandlerRegistry::GetGenericPostBoundID (csHandlerID id)
   return handlerPosts.Get(id, CS_HANDLER_INVALID);
 }
 
-csHandlerID csEventHandlerRegistry::GetID (iEventHandler *handler)
+csHandlerID csEventHandlerRegistry::RegisterID (iEventHandler *handler)
 {
   csHandlerID res = handlerToID.Get (handler, CS_HANDLER_INVALID);
   if (res != CS_HANDLER_INVALID)
+  {
+    KnownEventHandler* knownHandler = idToHandler.GetElementPointer (res);
+    knownHandler->refcount++;
     return res;
+  }
 
   csHandlerID generic = GetGenericID (handler->GenericName());
 
@@ -98,6 +102,12 @@ csHandlerID csEventHandlerRegistry::GetID (iEventHandler *handler)
   return res;
 }
 
+csHandlerID csEventHandlerRegistry::GetID (iEventHandler *handler)
+{
+  csHandlerID res = handlerToID.Get (handler, CS_HANDLER_INVALID);
+  return res;
+}
+
 csHandlerID csEventHandlerRegistry::GetID (const char *name)
 {
   return names.Request (name);
@@ -106,18 +116,21 @@ csHandlerID csEventHandlerRegistry::GetID (const char *name)
 void csEventHandlerRegistry::ReleaseID (csHandlerID id)
 {
   CS_ASSERT (IsInstance (id));
-  iEventHandler *h = idToHandler.Get (id, 0);
-  CS_ASSERT (h);
-  handlerToID.DeleteAll (h);
-  idToHandler.DeleteAll (id);
-  instantiation.DeleteAll (id);
+  KnownEventHandler* knownHandler = idToHandler.GetElementPointer (id);
+  CS_ASSERT (knownHandler);
+  if ((--knownHandler->refcount) == 0)
+  {
+    handlerToID.DeleteAll (
+      static_cast<iEventHandler*> (knownHandler->handler));
+    idToHandler.DeleteAll (id);
+    instantiation.DeleteAll (id);
+  }
 }
 
 void csEventHandlerRegistry::ReleaseID (iEventHandler *handler)
 {
-  CS_ASSERT(handlerToID.Get (handler, CS_HANDLER_INVALID) !=
-  	CS_HANDLER_INVALID);
   csHandlerID id = handlerToID.Get (handler, CS_HANDLER_INVALID);
+  CS_ASSERT(id != CS_HANDLER_INVALID);
   handlerToID.DeleteAll (handler);
   idToHandler.DeleteAll (id);
   instantiation.DeleteAll (id);
@@ -131,7 +144,8 @@ const char * csEventHandlerRegistry::GetString (csHandlerID id)
 iEventHandler *csEventHandlerRegistry::GetHandler (csHandlerID id)
 {
   CS_ASSERT(IsInstance(id));
-  return idToHandler.Get (id, 0);
+  const KnownEventHandler* knownHandler = idToHandler.GetElementPointer (id);
+  return knownHandler ? knownHandler->handler : 0;
 }
 
 bool const csEventHandlerRegistry::IsInstanceOf (csHandlerID instanceid,

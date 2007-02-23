@@ -135,7 +135,8 @@ struct csNoAttenuation
   csNoAttenuation (const csLightProperties& /*light*/)
   {}
 
-  CS_FORCEINLINE void operator() (float /*distance*/, float & /*dp*/) const
+  CS_FORCEINLINE_TEMPLATEMETHOD 
+  void operator() (float /*distance*/, float & /*dp*/) const
   {}
 };
 
@@ -150,7 +151,8 @@ struct csLinearAttenuation
     invrad = 1/light.attenuationConsts.x;
   }
 
-  CS_FORCEINLINE void operator() (float distance, float& dp) const
+  CS_FORCEINLINE_TEMPLATEMETHOD 
+  void operator() (float distance, float& dp) const
   {
     dp = csMax (dp * (1 - distance * invrad), 0.0f);
   }
@@ -167,7 +169,8 @@ struct csInverseAttenuation
   csInverseAttenuation (const csLightProperties& /*light*/)
   {}
 
-  CS_FORCEINLINE void operator() (float distance, float& dp) const
+  CS_FORCEINLINE_TEMPLATEMETHOD
+  void operator() (float distance, float& dp) const
   {
     dp = dp / distance;
   }
@@ -183,7 +186,8 @@ struct csRealisticAttenuation
   csRealisticAttenuation (const csLightProperties& /*light*/)
   {}
 
-  CS_FORCEINLINE void operator() (float distance, float& dp) const
+  CS_FORCEINLINE_TEMPLATEMETHOD
+  void operator() (float distance, float& dp) const
   {
     dp = dp / (distance*distance);
   }
@@ -199,7 +203,8 @@ struct csCLQAttenuation
     : attnVec (light.attenuationConsts)
   {}
 
-  CS_FORCEINLINE void operator() (float distance, float& dp) const
+  CS_FORCEINLINE_TEMPLATEMETHOD
+  void operator() (float distance, float& dp) const
   {
     dp = dp/(csVector3 (1.0, distance, distance*distance)*attnVec);
   }
@@ -230,7 +235,7 @@ public:
     float dp;
     bool vertexLit;
   public:
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     PerVertex (const csPointLightProc& parent, const csVector3 &v,
       const csVector3 &n)
     {
@@ -280,7 +285,7 @@ public:
     float dp;
     bool vertexLit;
   public:
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     PerVertex (const csDirectionalLightProc& parent, const csVector3 &v,
       const csVector3 &n)
     {
@@ -336,7 +341,7 @@ public:
     float cosfact;
     bool vertexLit;
   public:
-    CS_FORCEINLINE
+    CS_FORCEINLINE_TEMPLATEMETHOD
     PerVertex (const csSpotLightProc& parent, const csVector3 &v,
       const csVector3 &n)
     {
