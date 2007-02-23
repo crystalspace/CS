@@ -109,7 +109,7 @@ csString csFileSystem::ExtractFileName(const char *path) const
 SCF_IMPLEMENT_FACTORY (csNativeFileSystem)
 
 csNativeFileSystem::csNativeFileSystem(iBase *iParent) :
-	scfImplementationExt0(this, iParent)
+	scfImplementationType(this, iParent)
 {
 
 }
@@ -212,6 +212,10 @@ bool csNativeFileSystem::Delete(const char * FileName)
 {
   return (unlink (FileName) == 0);
 }
+
+#ifndef _S_IFDIR
+#define _S_IFDIR S_IFDIR
+#endif
 
 csVFSFileKind csNativeFileSystem::Exists(const char * FileName)
 {
@@ -396,7 +400,7 @@ static VfsArchiveCache *ArchiveCache = 0;
 SCF_IMPLEMENT_FACTORY (csArchiveFileSystem)
 
 csArchiveFileSystem::csArchiveFileSystem(iBase *iParent) :
-	scfImplementationExt0(this, iParent)
+	scfImplementationType (this, iParent)
 {
   ArchiveCache = new VfsArchiveCache ();
 }
@@ -533,15 +537,13 @@ void csArchiveFileSystem::GetFilenames(const char *Path, const char *Mask,
   if (a->Writing == 0)
      a->Flush ();
   void *iterator;
-  size_t sl = strlen (Mask);
   int no = 0;
 
   while ((iterator = a->GetFile(no++)))
   {
     char *fname = a->GetFileName(iterator);
-	  size_t fnl = strlen (fname);
-	  if (csGlobMatches (fname, Mask))
-	  {
+    if (csGlobMatches (fname, Mask))
+    {
       if (Names->Find(fname) == csArrayItemNotFound)
         Names->Push(fname);
     }

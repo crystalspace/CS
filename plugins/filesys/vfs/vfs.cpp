@@ -30,6 +30,7 @@
 #include "csutil/databuf.h"
 #include "csutil/scfstringarray.h"
 #include "csutil/csstring.h"
+#include "csutil/strset.h"
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
 #include "csutil/vfsplat.h"
@@ -750,11 +751,11 @@ SCF_IMPLEMENT_FACTORY (csVFS)
 // csVFS contructor
 csVFS::csVFS (iBase *iParent) :
   scfImplementationType(this, iParent),
+  object_reg(0),
   RootNode(0),
   CwdNode(0),
   StaleCwd(0),
-  auto_name_counter(0),
-  object_reg(0)
+  auto_name_counter(0)
 {
   // We need a recursive mutex.
   mutex = csMutex::Create (true); 
@@ -1946,6 +1947,10 @@ VfsNode* csVFS::GetParentDirectoryNode(const char *path, bool create, bool mount
   return node;
 }
 
+#ifndef _S_IFDIR
+#define _S_IFDIR S_IFDIR
+#endif
+
 bool csVFS::isDirectory(const char *path)
 {
   if (!path)
@@ -1974,7 +1979,7 @@ csVFS::AutoConfigPlugin::~AutoConfigPlugin()
 {
 
 }
-#include "csutil/strset.h"
+
 /*
  * This method will attempt to auto-configure the VFS.
  * It will mount the relevant resource directories, and map them to symbolic
