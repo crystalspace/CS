@@ -33,6 +33,13 @@ chronological order.
           reset its user render buffer only in 'SetupObject' (instead of
           reseting right after any change). 
 	- res added shaderweaver to the walktest plugin list.
+	- Jorrit fixed imposter rendering so that it works a lot better
+	  now.
+	- Jorrit changed imptest so that it pans by default around the
+	  sprite now. Easier to debug that way. Shift-move still works
+	  to strafe. With 'space' you can reset the view so that it looks
+	  at sprite again.
+	- Jorrit increased imposter distance in imptest from 1 to 3.
 22-Feb-2007
 	- res fixed shaderweaver to not crash when a snippet lacks a 
 	  <combiner> node.

@@ -41,7 +41,16 @@ void ImposterTest::ProcessFrame ()
 
   iCamera* c = view->GetCamera();
 
-  if (kbd->GetKeyState (CSKEY_SHIFT))
+  if (kbd->GetKeyState (CSKEY_SPACE))
+  {
+    // Reset.
+    csVector3 orig = c->GetTransform().GetOrigin();
+    csVector3 look_point = sprite->GetMovable ()->GetTransform ().GetOrigin ();
+    c->GetTransform ().SetOrigin (look_point
+	+ (orig - look_point).Unit () * distance);
+    c->GetTransform ().LookAt (look_point-orig, csVector3(0,1,0) );
+  }
+  else if (kbd->GetKeyState (CSKEY_SHIFT))
   {
     // If the user is holding down shift, the arrow keys will cause
     // the camera to strafe up, down, left or right from it's
@@ -57,35 +66,38 @@ void ImposterTest::ProcessFrame ()
   }
   else
   {
-    // left and right cause the camera to rotate on the global Y
-    // axis; page up and page down cause the camera to rotate on the
-    // _camera's_ X axis (more on this in a second) and up and down
-    // arrows cause the camera to go forwards and backwards.
-    if (kbd->GetKeyState (CSKEY_RIGHT))
-      rotY += speed;
+    // Pan around the object.
+    csVector3 orig = c->GetTransform().GetOrigin();
+    csVector3 look_point = c->GetTransform ().This2Other (
+	csVector3 (0, 0, distance));
+    
     if (kbd->GetKeyState (CSKEY_LEFT))
-      rotY -= speed;
-    if (kbd->GetKeyState (CSKEY_PGUP))
-      rotX += speed;
-    if (kbd->GetKeyState (CSKEY_PGDN))
-      rotX -= speed;
+      orig = csYRotMatrix3(-speed) * (orig-look_point) + look_point;
+    if (kbd->GetKeyState (CSKEY_RIGHT))
+      orig = csYRotMatrix3(speed) * (orig-look_point) + look_point;
     if (kbd->GetKeyState (CSKEY_UP))
-      c->Move (CS_VEC_FORWARD * 4 * speed);
+      orig = csXRotMatrix3(speed) * (orig-look_point) + look_point;
     if (kbd->GetKeyState (CSKEY_DOWN))
-      c->Move (CS_VEC_BACKWARD * 4 * speed);
-  }
+      orig = csXRotMatrix3(-speed) * (orig-look_point) + look_point;
 
-  // We now assign a new rotation transformation to the camera.  You
-  // can think of the rotation this way: starting from the zero
-  // position, you first rotate "rotY" radians on your Y axis to get
-  // the first rotation.  From there you rotate "rotX" radians on the
-  // your X axis to get the final rotation.  We multiply the
-  // individual rotations on each axis together to get a single
-  // rotation matrix.  The rotations are applied in right to left
-  // order .
-  csMatrix3 rot = csXRotMatrix3 (rotX) * csYRotMatrix3 (rotY);
-  csOrthoTransform ot (rot, c->GetTransform().GetOrigin ());
-  c->SetTransform (ot);
+    c->GetTransform().SetOrigin(orig);
+
+    if (kbd->GetKeyState (CSKEY_PGUP))
+    {
+      distance -= speed * 5.0f;
+      if (distance < 0.5f) distance = 0.5f;
+      c->GetTransform ().SetOrigin (look_point
+	+ (orig - look_point).Unit () * distance);
+    }
+    if (kbd->GetKeyState (CSKEY_PGDN))
+    {
+      distance += speed * 5.0f;
+      c->GetTransform ().SetOrigin (look_point
+	+ (orig - look_point).Unit () * distance);
+    }
+
+    c->GetTransform().LookAt (look_point-orig, csVector3(0,1,0) );
+  }
 
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
@@ -217,12 +229,16 @@ bool ImposterTest::SetupModules()
   // that were loaded for the texture manager.
   engine->Prepare ();
 
-  // these are used store the current orientation of the camera
-  rotY = .7 ;rotX = .7;
+  distance = 5.0f;
 
   // Now we need to position the camera in our world.
-  view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0,0,0));
+  iCamera* c = view->GetCamera ();
+  c->SetSector (room);
+  csVector3 orig = csVector3 (0, 0, 0);
+  csVector3 look_point = sprite->GetMovable ()->GetTransform ().GetOrigin ();
+  c->GetTransform ().SetOrigin (look_point
+	+ (orig - look_point).Unit () * distance);
+  c->GetTransform ().LookAt (look_point-orig, csVector3(0,1,0) );
 
   return true;
 }
@@ -248,17 +264,6 @@ void ImposterTest::CreateRoom ()
   walls_state->AddInsideBox (csVector3 (-5, -5, -5), csVector3 (5, 5, 5));
   walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
   walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
-
-#if 1
-  csRef<iImposter> i = scfQueryInterface<iImposter> (walls);
-//  i->SetImposterActive(true);
-  iSharedVariableList* varlist = engine->GetVariableList();
-  csRef<iSharedVariable> distvar = varlist->New();
-  distvar->Set(1.0f);
-  varlist->Add(distvar);
-  i->SetMinDistance(distvar);
-  i->SetRotationTolerance(distvar);
-#endif
 
   // Now we need light to see something.
   csRef<iLight> light;
@@ -289,9 +294,9 @@ void ImposterTest::CreateSprites ()
     ReportError("Error loading mesh object factory!");
 
   // Create the sprite and add it to the engine.
-  csRef<iMeshWrapper> sprite (engine->CreateMeshWrapper (
+  sprite = engine->CreateMeshWrapper (
     imeshfact, "MySprite", room,
-    csVector3 (1, 1, 1)));
+    csVector3 (1, 1, 1));
   csMatrix3 m; m.Identity ();
   sprite->GetMovable ()->SetTransform (m);
   sprite->GetMovable ()->UpdateMove ();
@@ -306,21 +311,18 @@ void ImposterTest::CreateSprites ()
   sprite->SetZBufMode (CS_ZBUF_USE);
   sprite->SetRenderPriority (engine->GetObjectRenderPriority ());
 
-  //iMeshObject* test = sprite->GetMeshObject();
-#if 1 
   csRef<iImposter> i = scfQueryInterface<iImposter> (sprite);
   i->SetImposterActive(true);
 
   iSharedVariableList* varlist = engine->GetVariableList();
   csRef<iSharedVariable> distvar = varlist->New();
-  distvar->Set(1.0f);
+  distvar->Set(3.0f);
   varlist->Add(distvar);
   i->SetMinDistance(distvar);
 
   csRef<iSharedVariable> rotvar = varlist->New();
-  rotvar->Set(0.90f);
+  rotvar->Set(0.40f);
   i->SetRotationTolerance(rotvar);
-#endif
 
   printf("done...\n");
 }

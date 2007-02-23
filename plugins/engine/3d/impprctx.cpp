@@ -122,10 +122,8 @@ void csImposterProcTex::RenderToTexture (iRenderView *rview, iSector *s)
   mesh->FindImposterRectangle (cam);
 
   //save camerastate for later
-  const csOrthoTransform oldt = cam->GetTransform ();
   int persx, persy;
   g3d->GetPerspectiveCenter ( persx, persy );
-  int oldFOV = cam->GetFOV ();
 
   //Calculate camera position for imposter rendering
   const csVector3& cam_pos = cam->GetTransform ().GetOrigin ();
@@ -220,10 +218,9 @@ void csImposterProcTex::RenderToTexture (iRenderView *rview, iSector *s)
 
   //restore old camera values
   g3d->SetPerspectiveCenter (persx, persy);
-  cam->SetFOV (oldFOV, engine->frameHeight);
-  cam->SetTransform (oldt);
-
+  g3d->SetClipper (0, CS_CLIPPER_NONE);
   g3d->FinishDraw ();
+
   mesh->SetImposterReady (true, 0);
   updating = false;
 }

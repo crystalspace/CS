@@ -55,7 +55,11 @@ private:
   /// A pointer to the sector the camera will be in.
   iSector* room;
 
-  float rotX, rotY;
+  /// The sprite.
+  csRef<iMeshWrapper> sprite;
+
+  /// Distance from sprite.
+  float distance;
 
   /**
    * Handle keyboard events - ie key presses and releases.
