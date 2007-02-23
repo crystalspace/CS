@@ -20,6 +20,15 @@ chronological order.
 	- res augmented the Cg weaver combiner to also check <variablemap>
 	  nodes for "input tags" (a part of weaver's input merging).
 	- res made the Cg dump output used and reference flags for parameters.
+	- res moved the "reflectsphere" material from teapot.lib to the flarge
+	  level. (The teapot.lib file should only provide a basic mesh and
+	  material, "special effects" are more appropriately assigned by the
+	  "client" of the library mesh.)
+	- res added normal+height map for the teapot xygyw texture.
+	- res added a bunch of weaver snippets and weaver Cg coercions.
+	- res re-created the "reflectsphere" shader as a weaved shader. Made
+	  flarge use this new shader, and added a normal map to the teapot's
+	  material to show off a bit.
 22-Feb-2007
 	- res fixed shaderweaver to not crash when a snippet lacks a 
 	  <combiner> node.

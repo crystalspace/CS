@@ -21,10 +21,6 @@
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
     <input name="Hposition" type="position4_world" default="complex">
-      <block location="cg:vertexToFragment">
-	<varying type="position4" name="position" binding="POSITION" />
-      </block>
-      
       <block location="cg:vertexIn">
 	<varying type="position4" name="Hposition" binding="POSITION" />
       </block>
@@ -45,11 +41,23 @@
 	ModelViewProj = vertexIn.ModelViewProj;
       </block>
     </input>
-      
+
+    <block location="cg:vertexToFragment">
+      <varying type="position4" name="position" binding="POSITION" />
+      <varying type="position4" name="position_screen"/>
+      <varying type="position4" name="position_world"/>
+    </block>
+    
     <block location="cg:vertexMain">
-      position_world = Hposition;
+      vertexToFragment.position_world = position_world = Hposition;
       position = mul (ModelViewProj, position_world);
       vertexToFragment.position = position;
+      vertexToFragment.position_screen = position;
+    </block>
+    
+    <block location="cg:fragmentMain">
+      position = vertexToFragment.position_screen;
+      position_world = vertexToFragment.position_world;
     </block>
     
     <output name="position" type="position4_screen" />
