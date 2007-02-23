@@ -62,6 +62,7 @@ WALKALL.PLUGINLIST =
   simpleformerldr
   bruteblock
   terrainldr
+  shaderweaver
   spr2d
   spr2dldr
   spr3d
