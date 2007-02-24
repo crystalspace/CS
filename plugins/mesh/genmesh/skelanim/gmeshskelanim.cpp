@@ -1127,7 +1127,7 @@ void csGenmeshSkelAnimationControl::Stop (const char* scriptname)
 
 void csGenmeshSkelAnimationControl::Stop (iGenMeshSkeletonScript *script)
 {
-  running_scripts.DeleteFast ( (csSkelAnimControlRunnable *)script);
+  running_scripts.Delete ( (csSkelAnimControlRunnable *)script);
 }
 
 size_t csGenmeshSkelAnimationControl::GetScriptsCount ()
@@ -1671,7 +1671,7 @@ csGenmeshSkelAnimationControlTypeOld::~csGenmeshSkelAnimationControlTypeOld ()
   {
     csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q)
-      RemoveWeakListener (q, weakEventHandler);
+      CS::RemoveWeakListener (q, weakEventHandler);
   }
 }
 
@@ -1682,7 +1682,7 @@ bool csGenmeshSkelAnimationControlTypeOld::Initialize (iObjectRegistry* object_r
   csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   if (q != 0)
-    RegisterWeakListener (q, this, PreProcess, weakEventHandler);
+    CS::RegisterWeakListener (q, this, PreProcess, weakEventHandler);
   return true;
 }
 

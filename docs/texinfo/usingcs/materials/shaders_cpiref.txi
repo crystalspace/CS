@@ -1,0 +1,285 @@
+@c -*-texinfo-*-
+@node Shader Conditions and Processing Instructions Reference, , Shader Variables, Shaders
+@subsubsection Shader Conditions and Processing Instructions Reference
+
+@subheading General Syntax
+
+Shader conditions and processing instructions are specified via @sc{xml} 
+processing instructions, that is @code{<?...?>}.  Some instructions only
+consist of a single instruction, others consist of a pair and enclose a
+block of @sc{xml}.  All tags opened in such a block must be properly closed
+according to the node hierarchy, and all closing tags must be matched by
+an opening tag inside such a block.
+
+In an instruction string, `@code{<}' can be replaced with `@code{&lt;}'
+and `@code{>}' can be replaced with `@code{&gt;}'.
+
+@subheading Shader Processing Instructions
+
+Shader processing instructions are evaluated at parse time; notably, a shader
+condition as described below does @emph{not} influence whether a processing
+instruction is processed or not.  In order to visually distinguish the 
+parse-time evaluated processing instructions from the run-time evaluated
+conditions, all processing instructions start with an uppercase letter by
+convention.
+
+@subsubheading Templates
+
+Syntax for template definition:
+@example
+<?Template [TemplateName] @{ParameterName@} @{ParameterName@} ...?>
+@{@sc{xml}@}
+<?Endtemplate?>
+@end example
+
+Syntax for template invokation:
+@example
+<?[TemplateName] @{Parameter@} @{Parameter@} ...?>
+@end example  
+
+A template is available for invokation after the closing @code{Endtemplate}.
+
+If a template is defined with a name of an already existing definition, the
+new definition overrides the old definition after the closing @code{Endtemplate}.
+
+If a template definition is parsed. template invokations inside template 
+definitions are immediately expanded.  However, note that @emph{nested} 
+template definitions are not parsed unless the containing template is invoked.
+This means that nested template invokations are not immediately expanded.
+
+Templates support parameters.  Each parameter has a name, and placeholders in 
+the template contents block are substituted with the parameter's values.
+A placeholder has the form @samp{$Parameter$} or @samp{$"Parameter$}.  The
+first form substitutes the placeholders with the verbatim parameter value.
+The second form substitutes the placeholders with a ``quoted'' string:
+it is formatted such that it can be passed as a parameter to a template
+invokation, preserving contained spaces (see below).  
+To specify a single dollar sign in the contents block use @samp{$$}.
+
+The parameter values specified in the template invokation are associated with
+the definition's parameter names by position.  Parameter values are 
+space-separated.  To specify a parameter that contains spaces, the string
+must be surrounded by quotes.  A quote character in such a quoted string is
+represented as @samp{\"}, a backslash character as @samp{\\}.
+
+Syntax for weak template definition:
+@example
+<?TemplateWeak [TemplateName] @{ParameterName@} @{ParameterName@} ...?>
+@{@sc{xml}@}
+<?Endtemplate?>
+@end example
+
+Weak templates behave the same way as ``normal'' templates, except in the case
+of a definition with the name as an already existing definition: the new
+definition is ignored.
+
+@subsubheading Generators
+
+Syntax for generation:
+@example
+<?Generate [Variable] [Start] [End] @{Step@} ?>
+@{@sc{xml}@}
+<?Endgenerate?>
+@end example
+
+@samp{Generate} instructions let internally run an integer counter, starting 
+at @samp{Start}, adding @samp{Step} on each iteration, until the counter
+is greater (for a positive @samp{Step}) respectively smaller (for a 
+negative @samp{Step}) than @samp{End}. Each iteration replicates the
+contents block.
+
+If @samp{Step} is not specified, it defaults to @code{1} if 
+@samp{Start} <= @samp{End} or to @code{-1} if @samp{Start} > @samp{End}.
+@samp{Step} = @code{0}, @samp{Step} > @code{0} and @samp{Start} > @samp{End},
+@samp{Step} < @code{0} and @samp{Start} <= @samp{End} result in an error. 
+
+Certain placeholders in the contents block, in the same form as placeholders
+for a @samp{Template} parameter with the name of @samp{Variable} will be
+replaced with the counter value of an iteration.
+
+(Semantically, using a @samp{Generate} instruction is equivalent to defining
+a template with a single parameter named @samp{Variable}, with the same 
+contents as the @samp{Generate} instruction, and invoking it once for each 
+value of the counter, iterating as described above.) 
+
+@subsubheading Inclusions
+
+Syntax for inclusion:
+@example
+<?Include [Filename] ?>
+@end example  
+
+@samp{Filename} is the @sc{vfs} path to the file to be included.  The file
+needs to be an @sc{xml} file with a node @code{include} at the root.  All
+contents of this @code{include} node will treated as if appearing in the 
+including document at the point of the @samp{Include} processing instruction.
+Shader processing instructions and shader conditions will be handled normally.
+
+@subsubheading Static Conditions
+
+Syntax for a symbol definition:
+@example
+<?Define [Symbol] ?>
+@end example  
+
+Syntax for a symbol undefinition:
+@example
+<?Undef [Symbol] ?>
+@end example  
+
+@samp{Define} adds @samp{Symbol} to a global symbol table.  @samp{Undef} 
+removes @samp{Symbol} from that table.  The presence of a symbol in that 
+table can be tested with the statements below.
+
+Syntax for symbol testing:
+@example
+<?SIfDef|SIfNDef [Symbol] ?>
+@{@sc{xml}@}
+@{<?SElsIfDef|SElsIfNDef [Symbol] ?>@}
+@{@sc{xml}@}
+@{<?SElsIfDef|SElsIfNDef [Symbol] ?>@}
+@{@sc{xml}@}
+...
+@{<?SElse ?>@}
+@{@sc{xml}@}
+<?SEndIf ?>
+@end example
+
+@samp{SIfDef} tests for the presence of a symbol in the global symbol table,
+@samp{SIfNDef} for the absence.  If the test succeeds, the contents of the 
+block up to the next @samp{SElsIfDef}, @samp{SElsIfNDef}, @samp{SElse} or 
+@samp{SEndIf} are used in the document.  If the test does not succeed, the 
+behaviour depends on the instruction that follows: if it is the @samp{SEndIf}, 
+nothing will be used in the document.  If it is the @samp{SElse}, the contents
+of the block from  @samp{SElse} to @samp{SEndIf} will be used.  If the next
+instruction is @samp{SElsIfDef} or @samp{SElsIfNDef}, the @samp{Symbol}
+specified there will be tested for presence or absence again; which block is
+used in the document depends on the result of the test and the following
+instruction in the same way as for @samp{SIfDef} or @samp{SIfNDef}.
+
+Every @samp{SIfDef} or @samp{SIfNDef} is matched by one @samp{SEndIf}.
+An @samp{SElse} instruction is optional and must only be followed by the
+@samp{SEndIf}. 
+
+@subheading Shader Conditions
+
+Shader conditions are evaluated at run time.  They can be treated as if
+re-evaluated every time a shader is used.  In order to visually distinguish 
+the run-time evaluated conditions from the parse-time evaluated processing 
+instructions, all conditions start with a lowercase letter by convention.
+
+Syntax for conditons:
+@example
+<?if [Expression] ?>
+@{@sc{xml}@}
+@{<?elsif [Expression] ?>@}
+@{@sc{xml}@}
+@{<?elsif [Expression] ?>@}
+@{@sc{xml}@}
+...
+@{<?else ?>@}
+@{@sc{xml}@}
+<?endif ?>
+@end example
+
+@samp{if} tests whether @samp{Expression} evaluates to the boolean value 
+@code{true}.  @samp{Expression} not evaluating to a boolean value results in 
+an error.  (Expressions can evaluate to different types, see below.) 
+If the test succeeds, the contents of the block up to the next @samp{elsif}, 
+@samp{else}, or @samp{endif} are used in the document.  If the test does not 
+succeed, the behaviour depends on the instruction that follows: if it is the 
+@samp{endif}, nothing will be used in the shader.  If it is the @samp{else}, 
+the contents of the block from @samp{else} to @samp{endif} will be used.  
+If the next instruction is @samp{elsif}, the @samp{Expression} specified there
+will be evaluated and tested the same way as it would for an @samp{if}; 
+which block is used in the document depends on the result of the test and the 
+following instruction in the same way as for @samp{if}.
+
+Every @samp{ifdef} is matched by one @samp{endif}.  An @samp{else} instruction 
+is optional and must only be followed by the @samp{endif}. 
+
+@subsubheading Expression Syntax
+
+@example
+      expr ::= (expr) | expr op expr | '!' expr | identifier | number
+        op ::= '||' | '&&' | '==' | '!=' | '<' | '>' | '<=' | '>='
+identifier ::= ident-string | ident-string '.' identifier
+@end example
+
+@samp{ident-string} can be an arbitrary character string.  To specify a string 
+with spaces double quotes must be put around the string.
+
+@samp{number} can be an integer or float number.
+
+@subsubheading Expression Operators
+
+@multitable {Operator} {Priority} {Binary greater equal} {integer, float, boolean}
+@item Operator @tab Priority @tab Description @tab Operand type(s)
+@item @code{!} @tab 1 @tab Unary logical @sc{not} @tab boolean
+@item @code{>=} @tab 2 @tab Binary greater equal @tab integer, float
+@item @code{<=} @tab 2 @tab Binary lesser equal @tab integer, float
+@item @code{>} @tab 2 @tab Binary greater @tab integer, float
+@item @code{<} @tab 2 @tab Binary lesser @tab integer, float
+@item @code{==} @tab 3 @tab Binary equal @tab integer, float, boolean
+@item @code{!=} @tab 3 @tab Binary not equal @tab integer, float, boolean
+@item @code{&&} @tab 4 @tab Binary logical @sc{and} @tab boolean
+@item @code{||} @tab 5 @tab Binary logical @sc{or} @tab boolean
+@end multitable
+
+Lower priority means higher precedence.
+
+Both operands must have types compatible to each others.  The type `boolean'
+is only compatible to `boolean' itself. `integer', `float' are compatible
+to each other.  If one operand is a `float' but the other is not, this other
+operand gets converted to `float' before evaluation of the operation.
+
+@subsubheading Expression Identifiers
+
+@samp{identifier} identifies a built-in constant or shader variable.
+
+Identifiers are build of names separated by dots, forming a hierarchy.  The
+leftmost name is the top-level name.  Subsequent names are also called 
+``members'' of the name left of them.
+
+Top-level names are:
+
+@table @code
+@item consts
+Constants.  Available members are the boolean constants @samp{true} and 
+@samp{false}, as well as integer constants consisting of the enumerants of
+the @code{csLightType} enum, the @code{csLightAttenuationMode} enum and the
+@code{csFogMode} enum.
+@item vars
+Shader variables.  Members are all possible names of shader variables.
+Each such member will evaluate to a boolean value, which is @code{true} if
+a shader variable of the specified name exists in the set of shader variables
+used for rendering, or @code{false} if not.
+@end table
+
+Furthermore, shader variable names have members themselves:
+@table @code
+@item int
+The integer value of the shader variable, or @code{0} if the variable doesn't 
+exist.
+@item float
+The float value of the shader variable, or @code{0.0} if the variable doesn't 
+exist.
+@item x
+The `x' component of the vector value of the shader variable, or @code{0.0} 
+the variable doesn't exist.
+@item y
+The `y' component of the vector value of the shader variable, or @code{0.0} 
+the variable doesn't exist.
+@item z
+The `z' component of the vector value of the shader variable, or @code{0.0} 
+the variable doesn't exist.
+@item w
+The `w' component of the vector value of the shader variable, or @code{0.0} 
+the variable doesn't exist.
+@item buffer
+A boolean value indicating whether the variable contains a buffer, or 
+@code{false} if the variable doesn't exist. 
+@item texture
+A boolean value indicating whether the variable contains a buffer, or 
+@code{false} if the variable doesn't exist. 
+@end table

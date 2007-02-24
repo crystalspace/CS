@@ -22,11 +22,12 @@ m4_define([cs_version_number], [1.1])
 AC_INIT([crystalspace], [cs_version_number],
         [crystal-main@lists.sourceforge.net])
 CS_PACKAGEINFO([Crystal Space],
-    [Copyright (C)1998-2005 Jorrit Tyberghein and others],
+    [Copyright (C)1998-2006 Jorrit Tyberghein and others],
     [http://www.crystalspace3d.org/])
 AC_CONFIG_SRCDIR([libs/Jamfile])
 AC_CONFIG_AUX_DIR([mk/autoconf])
 AC_CANONICAL_HOST
+CS_CHECK_MNO_CYGWIN
 
 
 
@@ -702,7 +703,7 @@ CS_CHECK_BUILD_FLAGS([for "hidden" symbol visibility flag],
 AS_IF([test -n "$cs_cv_prog_cc_visibility_hidden"],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], 
 	[$cs_cv_prog_cc_visibility_hidden], [+])])
-	
+
 CS_CHECK_BUILD_FLAGS([for "default" symbol visibility flag],
     [cs_cv_prog_cc_visibility_default],
     [CS_CREATE_TUPLE([-fvisibility=default])])
@@ -1033,8 +1034,8 @@ AS_IF([test "$no_x" != yes],
 #------------------------------------------------------------------------------
 # Check for OpenGL and companions.  Also check if GLX extensions are supported
 # and define the (backward) header property CSGL_EXT_STATIC_ASSERTION if they
-# are _not_ supported. Finally, check if the type GLhandleARB is exported by
-# the GL headers. It is starting to show up in very modern headers, but is
+# are _not_ supported. Finally, check if the some GL types are exported by
+# the GL headers. Some are starting to show up in very modern headers, but are
 # absent from most.
 #
 # IMPLEMENTATION NOTES
@@ -1043,14 +1044,17 @@ AS_IF([test "$no_x" != yes],
 # libraries may depend on it (notably Cg).
 #------------------------------------------------------------------------------
 CS_CHECK_OPENGL
-AS_IF([test $cs_cv_libgl = yes],
-    [# Check for GLhandleARB.
-    CS_CHECK_BUILD([for GLhandleARB], [cs_cv_libgl_glhandlearb],
+AC_DEFUN([CS_CHECK_OPENGL_TYPE],
+    [CS_CHECK_BUILD([for $1], [cs_cv_libgl_$1],
 	[AC_LANG_PROGRAM(
 	    [CS_GL_INCLUDE([CS_OPENGL_PATH],[GL],[gl.h])],
-	    [GLhandleARB x; (void)x;])],
-	[], [],	[CS_HEADER_PROPERTY([CS_HAVE_GLHANDLEARB_T])], [], [],
+		[$1 x; (void)x;])],
+	[], [], [$2], [], [],
 	[$cs_cv_libgl_cflags], [$cs_cv_libgl_lflags], [$cs_cv_libgl_libs])])
+AS_IF([test $cs_cv_libgl = yes],
+    [CS_CHECK_OPENGL_TYPE([GLhandleARB], [CS_HEADER_PROPERTY([CS_HAVE_GLHANDLEARB_T])])
+    CS_CHECK_OPENGL_TYPE([GLcharARB], [CS_HEADER_PROPERTY([CS_HAVE_GLCHARARB_T])]) 
+    CS_CHECK_OPENGL_TYPE([GLchar], [CS_HEADER_PROPERTY([CS_HAVE_GLCHAR_T])])])
 CS_CHECK_GLU
 CS_CHECK_GLX
 # Check for GLX extensions.  Define CSGL_EXT_STATIC_ASSERTION if _not_
@@ -1518,7 +1522,51 @@ AS_IF([test $cs_cv_libCEGUI = yes],
 	[$cs_cv_libCEGUI_lflags],
 	[$cs_cv_libCEGUI_libs])])
 
+#------------------------------------------------------------------------------
+# Check if cegui.i is available, cegui.py compatible and cegui new enough
+#------------------------------------------------------------------------------
+m4_define([pycegui_paths_default],
+	  [/usr/local/include/CEGUI/bindings /usr/include/CEGUI/bindings /sw/include/CEGUI/bindings /opt/local/include/CEGUI/bindings /opt/include/CEGUI/bindings])
+pyceguitest="
+import os.path
+try:
+	import cegui
+	pyfile=getattr(cegui,'__'+'file__')
+	print pyfile.replace('.pyc','.py')
+except:
+	pass
+"
+AC_ARG_WITH([pycegui], [AC_HELP_STRING([--with-pycegui],
+    [use pycegui scripting interface (default YES)])])
+AS_IF([test -z "$with_pycegui"], [with_pycegui=yes])
 
+AS_IF([test -n "$PYTHON" && test -n "$SWIG"],[
+
+  AS_IF([test "$with_pycegui" != no && test $cs_cv_libCEGUI = yes], [
+
+    CS_CHECK_BUILD([if CEGUI is bleeding edge], [cs_cv_CEGUI_bleeding],
+      [AC_LANG_PROGRAM(
+	[[#include <CEGUIWindow.h>]],
+	[CEGUI::Window *w=new CEGUI::Window("","");w->getXPosition();])],
+      [], [C++],[
+      AS_IF([test "$with_pycegui" != yes],
+          [PYCEGUI_I_FILE="$with_pycegui/package/cegui.i"
+           PYCEGUI_PY_FILE="$with_pycegui/src/cegui.py"],
+          [AC_PATH_PROGS([PYCEGUI_I_FILE],[cegui.i],[],[pycegui_paths_default])
+	   PYCEGUI_PY_FILE=`$PYTHON -c "$pyceguitest"`])
+      m4_define([PYCEGUI_EXPECTED_SWIG_VERSION],[$cs_prog_swig_is_version])
+      AS_IF([test -f "$PYCEGUI_PY_FILE" && test -f "$PYCEGUI_I_FILE"],[
+	CS_CHECK_PROG_VERSION([cegui.py was generated with same swig],
+		[sed -n -e '1p' "$PYCEGUI_PY_FILE"],
+		[PYCEGUI_EXPECTED_SWIG_VERSION],[9.9|.9],
+		[PYCEGUI_I_DIR=`dirname "$PYCEGUI_I_FILE"`
+		 CS_EMIT_BUILD_PROPERTY([PYCEGUI.SWIGOK], [yes])
+		 CS_EMIT_BUILD_PROPERTY([PYCEGUI.SWIGFLAGS], [-I$PYCEGUI_I_DIR])
+		],[],[=])
+      ]) # AS_IF
+    ],[],[],[$cs_cv_libCEGUI_cflags],[$cs_cv_libCEGUI_lflags],[$cs_cv_libCEGUI_libs])
+  ],[]) # AS_IF ["$with_pycegui" != no && test $cs_cv_libCEGUI = yes]
+],[]) # AS_IF([test -n "$PYTHON" && test -n "$SWIG"],[
 
 #------------------------------------------------------------------------------
 # Check if GNU/Linux joystick API is present.

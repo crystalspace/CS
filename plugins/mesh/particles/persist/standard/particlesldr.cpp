@@ -171,14 +171,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
         baseObject->SetCommonDirection (dir);
       }
       break;
-    case XMLTOKEN_LOCALMODE:
+    case XMLTOKEN_TRANSFORMMODE:
       {
-        bool local;
-        if (!synldr->ParseBool (node, local, true))
+        const char* transm = node->GetContentsValue ();
+        csParticleTransformMode m = CS_PARTICLE_LOCAL_MODE;
+
+        if (!strcasecmp (transm, "local"))
+          m = CS_PARTICLE_LOCAL_MODE;
+        else if (!strcasecmp (transm, "localemitter"))
+          m = CS_PARTICLE_LOCAL_EMITTER;
+        else if (!strcasecmp (transm, "world"))
+          m = CS_PARTICLE_WORLD_MODE;
+        else
         {
+          synldr->ReportError ("crystalspace.particleloader.parsebase", node,
+            "Unknown transform mode (%s)!", transm);
           return false;
         }
-        baseObject->SetLocalMode (local);
+
+        baseObject->SetTransformMode (m);
       }
       break;
     case XMLTOKEN_INDIVIDUALSIZE:
@@ -271,7 +282,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
     float radius = 1.0f, coneAngle = PI/4;
     csVector3 position (0.0f), extent (0.0f), initialVelocity (0.0f);
     bool enabled = true;
-    float startTime = -1.0f, duration = FLT_MAX, emissionRate = 0.0f, 
+    float startTime = 0.0f, duration = FLT_MAX, emissionRate = 0.0f, 
       minTTL = FLT_MAX, maxTTL = FLT_MAX, minMass = 1.0f, maxMass = 1.0f;
     csOBB box;
     csParticleBuiltinEmitterPlacement placement = CS_PARTICLE_BUILTIN_CENTER;
@@ -871,6 +882,32 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
     return true;
   }
 
+  bool ParticlesBaseSaver::WriteTransform(iDocumentNode *paramsNode, 
+    csParticleTransformMode mode)
+  {
+    csRef<iDocumentNode> transMode = paramsNode->CreateNodeBefore (
+      CS_NODE_ELEMENT, 0);
+    transMode->SetValue ("transformmode");
+    csRef<iDocumentNode> valueNode = transMode->CreateNodeBefore (CS_NODE_TEXT, 0);
+
+    switch (mode)
+    {
+    case CS_PARTICLE_LOCAL_MODE:
+      valueNode->SetValue ("local");
+      break;
+    case CS_PARTICLE_LOCAL_EMITTER:
+      valueNode->SetValue ("localemitter");
+      break;
+    case CS_PARTICLE_WORLD_MODE:
+      valueNode->SetValue ("world");
+      break;
+    default:
+      valueNode->SetValue ("local");
+    }
+
+    return true;
+  }
+
   bool ParticlesBaseSaver::WriteEmitter(iDocumentNode *paramsNode, 
     iParticleEmitter *emitter)
   {
@@ -1141,15 +1178,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
       //Integration mode
       WriteIntegration (paramsNode, partFact->GetIntegrationMode ());
 
+      //Transform mode
+      WriteTransform (paramsNode, partFact->GetTransformMode ());
 
       //Common direction
       csRef<iDocumentNode> comdirNode = paramsNode->CreateNodeBefore (
         CS_NODE_ELEMENT, 0);
       comdirNode->SetValue ("commondirection");
       synldr->WriteVector (comdirNode, partFact->GetCommonDirection ());
-
-      //Local mode
-      synldr->WriteBool (paramsNode, "localmode", partFact->GetLocalMode ());
 
       //Individual size
       synldr->WriteBool (paramsNode, "individualsize", 
@@ -1234,6 +1270,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
       if (factObj->GetIntegrationMode () != partObj->GetIntegrationMode ())
         WriteIntegration (paramsNode, partObj->GetIntegrationMode ());
 
+      //Transform mode
+      if (factObj->GetTransformMode () != partObj->GetTransformMode ())
+        WriteTransform (paramsNode, partObj->GetTransformMode ());
 
       //Common direction
       csVector3 commonDir = partObj->GetCommonDirection ();
@@ -1245,10 +1284,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
         comdirNode->SetValue ("commondirection");
         synldr->WriteVector (comdirNode, commonDir);
       }
-
-      //Local mode
-      if (factObj->GetLocalMode () != partObj->GetLocalMode ())
-        synldr->WriteBool (paramsNode, "localmode", partObj->GetLocalMode ());
 
       //Individual size
       if (factObj->GetUseIndividualSize () != partObj->GetUseIndividualSize ())

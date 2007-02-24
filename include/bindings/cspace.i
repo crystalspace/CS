@@ -245,10 +245,20 @@
   INTERFACE_APPLY(iObjectModelListener)
   INTERFACE_APPLY(iObjectRegistry)
   INTERFACE_APPLY(iPath)
-  INTERFACE_APPLY(iParticlesFactoryState)
-  INTERFACE_APPLY(iParticlesObjectState)
-  INTERFACE_APPLY(iParticlesPhysics)
-  INTERFACE_APPLY(iParticlesStateBase)
+  INTERFACE_APPLY(iParticleEmitter)
+  INTERFACE_APPLY(iParticleEffector)
+  INTERFACE_APPLY(iParticleSystemBase)
+  INTERFACE_APPLY(iParticleSystemFactory)
+  INTERFACE_APPLY(iParticleSystem)
+  INTERFACE_APPLY(iParticleBuiltinEmitterBase)
+  INTERFACE_APPLY(iParticleBuiltinEmitterSphere)
+  INTERFACE_APPLY(iParticleBuiltinEmitterCone)
+  INTERFACE_APPLY(iParticleBuiltinEmitterBox)
+  INTERFACE_APPLY(iParticleBuiltinEmitterCylinder)
+  INTERFACE_APPLY(iParticleBuiltinEmitterFactory)
+  INTERFACE_APPLY(iParticleBuiltinEffectorForce)
+  INTERFACE_APPLY(iParticleBuiltinEffectorLinColor)
+  INTERFACE_APPLY(iParticleBuiltinEffectorFactory)
   INTERFACE_APPLY(iPluginManager)
   INTERFACE_APPLY(iPolygonMesh)
   INTERFACE_APPLY(iPortal)
@@ -421,6 +431,8 @@
 %apply float * OUTPUT { float & ra };
 %apply float * OUTPUT { float & rb };
 %apply float * OUTPUT { float * pr }; // iMeshObject::HitBeam*().
+%apply float * OUTPUT { float & max };
+%apply float * OUTPUT { float & min };
 
 // input/output arguments
 %apply bool * INOUT { bool & mirror };
@@ -892,6 +904,7 @@ SET_HELPER(csStringID)
 
 %rename(asRGBcolor) csRGBpixel::operator csRGBcolor;
 %include "csgfx/rgbpixel.h"
+%ignore ShaderVarName;
 %include "csgfx/shadervar.h"
 %template(csShaderVariableArrayReadOnly) iArrayReadOnly<csShaderVariable * >;
 %template(csShaderVariableArrayChangeElements) 
@@ -977,6 +990,7 @@ iArrayChangeElements<csShaderVariable * >;
 %include "iengine/campos.h"
 %include "iengine/texture.h"
 %include "iengine/material.h"
+%template(iSceneNodeArrayReadOnly) iArrayReadOnly<iSceneNode * >;
 %include "iengine/scenenode.h"
 
 // Swig 1.3.24 doesn't handle pointer default args well unless we tell it

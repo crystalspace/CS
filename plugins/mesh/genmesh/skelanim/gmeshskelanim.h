@@ -529,6 +529,7 @@ public:
   virtual bool AnimatesTexels () const { return animates_texels; }
   virtual bool AnimatesNormals () const { return animates_normals; }
   virtual bool AnimatesColors () const { return animates_colors; }
+  virtual void Update (csTicks current) { }
   virtual const csVector3* UpdateVertices (csTicks current,
     const csVector3* verts, int num_verts, uint32 version_id);
   virtual const csVector2* UpdateTexels (csTicks current,

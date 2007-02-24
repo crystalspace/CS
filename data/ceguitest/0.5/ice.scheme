@@ -26,7 +26,8 @@
 	<FalagardMapping WindowType="ice/LargeVerticalScrollbarThumb" TargetType="CEGUI/Thumb"     Renderer="Falagard/Button"    LookNFeel="ice/LargeVerticalScrollbarThumb" />
 	<FalagardMapping WindowType="ice/TabButton"  TargetType="CEGUI/TabButton"  Renderer="Falagard/TabButton"  LookNFeel="ice/TabButton" />
 	<FalagardMapping WindowType="ice/TabControl" TargetType="CEGUI/TabControl" Renderer="Falagard/TabControl" LookNFeel="ice/TabControl" />
-	<FalagardMapping WindowType="ice/TabPane"    TargetType="DefaultWindow"    Renderer="Falagard/Default"    LookNFeel="ice/TabPane" />
+	<FalagardMapping WindowType="ice/TabContentPane"    TargetType="DefaultWindow"    Renderer="Falagard/Default"    LookNFeel="ice/TabContentPane" />
+	<FalagardMapping WindowType="ice/TabButtonPane"    TargetType="DefaultWindow"    Renderer="Falagard/Default"    LookNFeel="ice/TabButtonPane" />
 	<FalagardMapping WindowType="ice/ComboDropList" TargetType="CEGUI/ComboDropList" Renderer="Falagard/Listbox" LookNFeel="ice/ComboDropList" />
 	<FalagardMapping WindowType="ice/ComboEditbox"  TargetType="CEGUI/Editbox"	 Renderer="Falagard/Editbox" LookNFeel="ice/ComboEditbox" />
 	<FalagardMapping WindowType="ice/Combobox"	TargetType="CEGUI/Combobox"	 Renderer="Falagard/Default" LookNFeel="ice/Combobox" />

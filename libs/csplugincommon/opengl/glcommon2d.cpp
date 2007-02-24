@@ -1079,8 +1079,6 @@ void csGraphics2DGLCommon::csGLPixelFormatPicker::SetupIndexTable (
 
 bool csGraphics2DGLCommon::csGLPixelFormatPicker::PickNextFormat ()
 {
-  bool formatPicked = false;
-
   for (size_t i = 0; i < glpfvValueCount; ++i)
   {
     currentValues[pixelFormats[i].valueType] = 

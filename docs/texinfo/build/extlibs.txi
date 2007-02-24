@@ -54,11 +54,11 @@ libraries in pre-compiled form from the following location:
 
 @noindent
 @ifnottex
-@uref{http://www.crystalspace3d.org/downloads/cs-win32libs/cs-win32libs-0.99r0_022.exe}
+@uref{http://www.crystalspace3d.org/downloads/cs-win32libs/cs-win32libs-1.0rc1_001.exe}
 @end ifnottex
 @iftex
 @code{http://www.crystalspace3d.org/downloads/cs-win32libs/}@*
-@code{cs-win32libs-0.99r0_022.exe}
+@code{cs-win32libs-1.0rc1_001.exe}
 @end iftex
 
 @subheading zlib

@@ -20,7 +20,7 @@
 #ifndef __CS_MATH3D_H__
 #define __CS_MATH3D_H__
 
-/**\file 
+/**\file
  * 3D mathematic utility functions.
  */
 /**
@@ -230,7 +230,7 @@ class CS_CRYSTALSPACE_EXPORT csSquaredDist
 public:
   /// Returns the squared distance between two points.
   static float PointPoint (const csVector3& p1, const csVector3& p2)
-  { 
+  {
     csVector3 d = (p1-p2);
     return d*d;
   }
@@ -345,12 +345,12 @@ public:
    *   then 'isect's value is (0, 0, 0).
    *
    * \remarks
-   * 'p' is the plane, expressed as: A x + B y + C z + D = 0 , where (A,B,C) is 
+   * 'p' is the plane, expressed as: A x + B y + C z + D = 0 , where (A,B,C) is
    * the normal vector of the plane.
    * 'u' and 'v' are the start (U point) and the end (V point) of the segment.
    * 'isect' is searched along the segment U + x (V - U); the unknown 'x' value
-   * is got by: x = [(A,B,C) * U + D ] / (A,B,C) * (U - V), where * is the dot 
-   * product.  
+   * is got by: x = [(A,B,C) * U + D ] / (A,B,C) * (U - V), where * is the dot
+   * product.
    */
   static bool SegmentPlane (
     const csVector3& u, const csVector3& v,
@@ -561,6 +561,8 @@ public:
 
   /**
    * Intersect a segment with a box.
+   * If the segment starts inside the box then isect will return
+   * the start of the segment.
    * \param box The box with which to perform the intersection.
    * \param segment The intersection candidate.
    * \param isect The returned intersection point.

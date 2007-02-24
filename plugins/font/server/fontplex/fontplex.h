@@ -146,7 +146,7 @@ private:
     FontServerMapEntry (const FontServerMapEntry& source);
     ~FontServerMapEntry ();
   };
-  csHash<FontServerMapEntry, csStrKey> fontServerMap;
+  csHash<FontServerMapEntry, csString> fontServerMap;
   csHash<iFont*, csString> loadedFonts;
 
   csFontLoaderOrder fallbackOrder;

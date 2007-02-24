@@ -309,7 +309,7 @@ bool csPlatformShutdown(iObjectRegistry* r)
     r->Unregister(assi, "iWin32Assistant");
     Win32Assistant* a = (Win32Assistant*)((iWin32Assistant*)assi);
     a->Shutdown();
-    assistants.DeleteFast (a);
+    assistants.Delete (a);
     return true;
   }
   return false;
