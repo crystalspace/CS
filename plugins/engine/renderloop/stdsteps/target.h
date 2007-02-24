@@ -21,7 +21,7 @@
 #ifndef __CS_TARGET_H__
 #define __CS_TARGET_H__
 
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/csstring.h"
 #include "csutil/weakref.h"
 #include "iengine/renderloop.h"
@@ -33,7 +33,8 @@
 #include "csplugincommon/renderstep/basesteploader.h"
 #include "csplugincommon/renderstep/parserenderstep.h"
 
-class csTargetRSType : public csBaseRenderStepType
+class csTargetRSType :
+  public scfImplementationExt0<csTargetRSType, csBaseRenderStepType>
 {
 public:
   csTargetRSType (iBase* p);
@@ -41,7 +42,8 @@ public:
   virtual csPtr<iRenderStepFactory> NewFactory();
 };
 
-class csTargetRSLoader : public csBaseRenderStepLoader
+class csTargetRSLoader :
+  public scfImplementationExt0<csTargetRSLoader, csBaseRenderStepLoader>
 {
   csRenderStepParser rsp;
 
@@ -59,22 +61,22 @@ public:
     iBase* context);
 };
 
-class csTargetRenderStepFactory : public iRenderStepFactory
+class csTargetRenderStepFactory :
+  public scfImplementation1<csTargetRenderStepFactory, iRenderStepFactory>
 {
 private:
   iObjectRegistry* object_reg;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csTargetRenderStepFactory (iObjectRegistry* object_reg);
   virtual ~csTargetRenderStepFactory ();
 
   virtual csPtr<iRenderStep> Create ();
 };
 
-class csTargetRenderStep : public iRenderStep, 
-		           public iRenderStepContainer
+class csTargetRenderStep :
+  public scfImplementation2<csTargetRenderStep,
+    iRenderStep, iRenderStepContainer>
 {
 private:
   csRefArray<iRenderStep> steps;
@@ -83,9 +85,8 @@ private:
   bool doCreate;
   int newW, newH;
   bool persistent;
-public:
-  SCF_DECLARE_IBASE;
 
+public:
   csTargetRenderStep (iObjectRegistry* object_reg);
   virtual ~csTargetRenderStep ();
 
@@ -105,6 +106,5 @@ public:
   void SetPersistent (bool p)
   { persistent = p; }
 };
-
 
 #endif // __CS_TARGET_H__

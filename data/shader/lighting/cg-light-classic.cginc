@@ -17,83 +17,65 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
 <include>
+
+<?CgUseShared primaryColor ?>
+<?CgUseShared primaryColorV2F?>
+
+<?Template LightingClassic_Code?>
 #ifndef __CS_SHADER_LIGHT_CLASSIC_CG__
 #define __CS_SHADER_LIGHT_CLASSIC_CG__
-
-<?Include /shader/snippets/cg-i-surface.cginc ?>
-
-struct AppToVert_Lighting_Classic
+  
+struct Vert_LightingClassic
 {
-  varying float4 color : COLOR;
-<?if vars."tex lightmap".texture ?>
   varying float2 texCoordLM;
-<?endif?>
 };
+Vert_LightingClassic lightingClassicVert;
 
-AppToVert_Lighting_Classic lightingClassicA2V;
-
-struct VertToFrag_Lighting_Classic
+struct Frag_LightingClassic
 {
-  float4 color : COLOR;
-<?if vars."tex lightmap".texture ?>
-  float2 texCoordLM;
-<?endif?>
-
-  void Setup ()
-  {
-    color = lightingClassicA2V.color;
-  <?if vars."tex lightmap".texture ?>
-    texCoordLM = lightingClassicA2V.texCoordLM;
-  <?endif?>
-  }
-};
-
-struct AppToFrag_Lighting_Classic
-{
-  void _dummy_struct_non_empty() {}
-<?if vars."tex lightmap".texture ?>
   uniform sampler2D lightmap;
-<?endif?>
 };
+Frag_LightingClassic lightingClassicFrag;
 
-AppToFrag_Lighting_Classic lightingClassicA2F;
-
-struct Frag_Lighting_Classic
+struct LightingClassic
 {
 <?if vars."tex lightmap".texture ?>
   float2 texCoordLM;
 <?endif?>
-  float4 color;
 
-  void Setup (VertToFrag_Lighting_Classic V2F)
+  void SetupVert ()
   {
-    color = V2F.color;
   <?if vars."tex lightmap".texture ?>
-    texCoordLM = V2F.texCoordLM;
+    texCoordLM = lightingClassicVert.texCoordLM;
   <?endif?>
   }
   
-  float4 Illuminate (iSurface surface)
+  float3 IllumDiffuse ()
   {
-    float4 result;
-    
-    float4 light_diffuse;
+    float3 light_diffuse;
   <?if vars."tex lightmap".texture ?>
-    light_diffuse = 2 * tex2D (lightingClassicA2F.lightmap, 
-      texCoordLM /*+ surface.GetTexCoordOffset ()*/);
-    light_diffuse.a = color.a;
+    light_diffuse = 2 * tex2D (lightingClassicFrag.lightmap, 
+      texCoordLM).rgb;
   <?else?>
-    light_diffuse = color;
+    light_diffuse = primaryColor.rgb;
   <?endif?>
-    result = light_diffuse * surface.GetDiffuse();
-  
-    result.rgb = result.rgb + surface.GetEmissive ();
-  
-    return result;
+    return light_diffuse;
   }
 };
-
-<?SetSnippet Lighting Lighting_Classic?>
 
 #endif // __CS_SHADER_LIGHT_CLASSIC_CG__
+<?Endtemplate?>
+
+<?CgAddSnippet LightingClassic_Code?>
+
+<?BeginGlue LightingClassic?>
+  <?Template Pass_LightingClassic ?>
+    <?if vars."tex lightmap".texture?>
+      <texture name="tex lightmap" destination="lightingClassicFrag.lightmap" />
+      <buffer source="texture coordinate lightmap" 
+	destination="lightingClassicVert.texCoordLM" />
+    <?endif?>
+  <?Endtemplate?>
+  <?AddToList PassMappings Pass_LightingClassic ?>
+<?EndGlue?>
 </include>

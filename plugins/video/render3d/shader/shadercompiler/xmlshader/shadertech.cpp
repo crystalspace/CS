@@ -465,6 +465,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
 	{
 	  pass->custommapping_attrib.Push (attrib);
 	  pass->custommapping_buffer.Push (sourceName);
+          pass->custommapping_id.Push (csInvalidStringID);
 	  /* Those buffers are mapped by default to some specific vattribs; 
 	   * since they are now to be mapped to some generic vattrib,
 	   * turn off the default map. */

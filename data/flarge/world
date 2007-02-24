@@ -190,7 +190,7 @@
             <texture>mosholes.gif</texture>
 	    <shader type="standard">std_lighting_detail</shader>
 	    <shadervar name="tex detail" type="texture">mosaic-detail</shadervar>
-	    <shadervar name="detail texture scale" type="vector2">10,10</shadervar>
+	    <shadervar name="tex detail scale" type="vector2">10,10</shadervar>
         </material>
         <material name="robot">
             <texture>oldmetal.gif</texture>
@@ -199,7 +199,7 @@
             <texture>oldmetal.gif</texture>
 	    <shader type="standard">std_lighting_detail_add</shader>
 	    <shadervar name="tex detail" type="texture">spark</shadervar>
-	    <shadervar name="detail texture scale" type="vector2">20,20</shadervar>
+	    <shadervar name="tex detail scale" type="vector2">20,20</shadervar>
         </material>
         <material name="raindrop">
             <texture>raindrop</texture>
@@ -211,14 +211,14 @@
             <texture>bricks.gif</texture>
 	    <shader type="standard">std_lighting_detail_alpha_scroll</shader>
 	    <shadervar name="tex detail" type="texture">spark</shadervar>
-	    <shadervar name="detail texture scale" type="vector2">10,10</shadervar>
-	    <shadervar name="detail texture color" type="vector4">1,1,1,0.25</shadervar>
+	    <shadervar name="tex detail scale" type="vector2">10,10</shadervar>
+	    <shadervar name="tex detail color" type="vector4">1,1,1,0.25</shadervar>
         </material>
         <material name="bricks2">
             <texture>bricks.gif</texture>
 	    <shader type="standard">std_lighting_detail_alpha</shader>
 	    <shadervar name="tex detail" type="texture">spark</shadervar>
-	    <shadervar name="detail texture scale" type="expression">
+	    <shadervar name="tex detail scale" type="expression">
 		<make-vector>
 		    <add>
 			<atom type="num">6</atom>
@@ -230,13 +230,13 @@
 		    <atom type="num">10</atom>
 		</make-vector>
 	    </shadervar>
-	    <shadervar name="detail texture color" type="vector4">1,1,1,0.25</shadervar>
+	    <shadervar name="tex detail color" type="vector4">1,1,1,0.25</shadervar>
         </material>
         <material name="mosaic">
             <texture>mosaic.gif</texture>
 	    <shader type="standard">std_lighting_detail</shader>
 	    <shadervar name="tex detail" type="texture">mosaic-detail</shadervar>
-	    <shadervar name="detail texture scale" type="vector2">10,10</shadervar>
+	    <shadervar name="tex detail scale" type="vector2">10,10</shadervar>
         </material>
         <material name="oldmetal">
             <texture>oldmetal.gif</texture>

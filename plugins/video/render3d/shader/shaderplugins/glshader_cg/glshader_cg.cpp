@@ -115,8 +115,9 @@ void csGLShader_CG::SplitArgsString (const char* str, ArgumentArray& args)
       case ' ':
         if (!quote)
         {
-          if (!s.IsEmpty()) args.Push (str);
-          args.Empty();
+          if (!s.IsEmpty()) args.Push (s);
+          s.Empty();
+          break;
         }
         // else fall through
       default:

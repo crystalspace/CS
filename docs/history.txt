@@ -6,6 +6,40 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Jul-2006
+	- res augmented xmlshader to support template arguments with spaces.
+	- res fixed an assertion in xmlshader when using buffer mappings with 
+	  custom variable names.
+	- res fixed some assorted xmlshader issues.
+	- res fixed the standard shader loading in the engine to conserve
+	  whitespaces.
+	- res added support for the TEXCOORD instruction to the glshader_ps1
+	  PS1.x-to-1.4 converter.
+	- res fixed compiler argument parsing for the glshader_cg plugin.
+	- res updated the contained DejaVu fonts to version 2.8.
+	- res started work to improve the shader snippets.
+27-Jul-2006
+	- res changed an array in glshader_ps1 that is never changed from 
+	  dynamic to compile-time creation.
+	- res added some true static conditionals to xmlshader.
+	- caedes changed the scattering shaders so they keep their nice 
+	  previous defaults while preserving xotic's changes.
+25-Jul-2006
+	- mdmkolbe converted the following plugins to the new SCF:
+	    - plugins/physics/loader/
+	    - plugins/culling/frustvis/
+	    - plugins/engine/3d/
+	    - plugins/engine/renderloop/
+	    - plugins/sequence/
+	- res reworked the "Mesa DRI DXT upload only" support.
+	- res unmerged the changes from r24885:24886 ("res disabled 
+	  RTLD_GLOBAL for unix plugin loading again...") since the original
+	  issue was solved in a different way. RTLD_GLOBAL is at least needed
+	  for python as well.
+	- mdmkolbe converted plugins/culling/dynavis/ to the new SCF.
+	- David Bronke added a patch from contingencyplan (Brian DeVries) which
+	  adds a copy constructor and an assignment operator to csVariant, which
+	  allows it to be used in a csHash, among other things.
 24-Jul-2006
 	- Jorrit documented the new -cfgfile and -cfgset commandline
 	  options and also added documentation for a few other commonly

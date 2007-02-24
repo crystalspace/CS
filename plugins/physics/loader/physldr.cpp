@@ -77,28 +77,16 @@ enum
   XMLTOKEN_QUICKSTEP
 };
 
-SCF_IMPLEMENT_IBASE (csPhysicsLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csPhysicsLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csPhysicsLoader)
 
 
-csPhysicsLoader::csPhysicsLoader (iBase* pParent)
+csPhysicsLoader::csPhysicsLoader (iBase* pParent) :
+  scfImplementationType(this, pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csPhysicsLoader::~csPhysicsLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csPhysicsLoader::Initialize (iObjectRegistry* object_reg)

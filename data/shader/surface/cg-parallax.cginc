@@ -17,13 +17,18 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
 <include>
+
+<?CgUseShared texCoord?>
+<?CgUseShared texCoordV2F?>
+  
+<?Template Parallax_Code?>
 #ifndef __CS_SHADER_PARALLAX_CGINC__
 #define __CS_SHADER_PARALLAX_CGINC__
 
-struct AppToVert_Parallax
+<?Include /shader/snippets/cg-common.cginc?>
+  
+struct Vert_Parallax
 {
-  void _dummy_struct_non_empty() {}
-<?if vars."tex height".texture ?>
   varying float4 Position : POSITION;
   uniform float4x4 ModelViewIT : state.matrix.modelview.invtrans;
   /* @@@ FIXME Question: Undoubtedly, other components will use the 
@@ -32,52 +37,72 @@ struct AppToVert_Parallax
   varying float3 Normal;
   varying float3 Tangent;
   varying float3 BiNormal;
-<?endif?>
 };
+Vert_Parallax parallaxVert;
 
-AppToVert_Parallax parallaxA2V;
+struct Frag_Parallax
+{
+  uniform sampler2D heightTex;
+  uniform float2 tcScale;
+};
+Frag_Parallax parallaxFrag;
 
-struct VertToFrag_Parallax
+struct Parallax
 {
 <?if vars."tex height".texture ?>
   float3 eyeVec;
 <?endif?>
 
-  void Setup ()
+  void SetupVert ()
   {
   <?if vars."tex height".texture ?>
     float3x3 obj2tang;
-    obj2tang[0] = parallaxA2V.Tangent;
-    obj2tang[1] = parallaxA2V.BiNormal;
-    obj2tang[2] = parallaxA2V.Normal;
-    float3 eyeVecObj = parallaxA2V.ModelViewIT[3] - parallaxA2V.Position;
+    obj2tang[0] = parallaxVert.Tangent;
+    obj2tang[1] = parallaxVert.BiNormal;
+    obj2tang[2] = parallaxVert.Normal;
+    float3 eyeVecObj = parallaxVert.ModelViewIT[3] - parallaxVert.Position;
     eyeVec =  mul (obj2tang, eyeVecObj);
   <?endif?>
   }
-};
-
-struct AppToFrag_Parallax
-{
-  void _dummy_struct_non_empty() {}
-<?if vars."tex height".texture ?>
-  uniform sampler2D heightTex;
-<?endif?>
-};
-
-AppToFrag_Parallax parallaxA2F;
-
-struct Frag_Parallax
-{
-  float2 GetTCOffset (VertToFrag_Parallax V2F, float2 texCoord)
+  float2 GetTCOffset ()
   {
+    float2 offset = float2 (0, 0);
   <?if vars."tex height".texture ?>
-    float4 height = 0.04 * tex2D(parallaxA2F.heightTex, texCoord) - 0.02;
-    return (height * normalize (V2F.eyeVec)).xy;
-  <?else?>
-    return float2 (0, 0);
+    float2 tc = texCoord * parallaxFrag.tcScale;
+    offset = ComputeParallaxOffset (parallaxFrag.heightTex, tc, 
+      normalize (eyeVec), 0.04);
   <?endif?>
+    return offset;
   }
 };
 
 #endif // __CS_SHADER_PARALLAX_CGINC__
+<?Endtemplate?>
+
+<?CgAddSnippet Parallax_Code?>
+
+<?BeginGlue Parallax?>
+  <?Template Pass_Parallax?>
+    <?if vars."tex height".texture ?>
+      <texture name="tex height" destination="parallaxFrag.heightTex" />
+      <buffer source="normal" destination="parallaxVert.Normal" />
+      <buffer source="tangent" destination="parallaxVert.Tangent" />
+      <buffer source="binormal" destination="parallaxVert.BiNormal" />
+    <?endif?>
+  <?Endtemplate?>
+  <?AddToList PassMappings Pass_Parallax?>
+  
+  <?Template VariableMap_Parallax ?>
+    <?if vars."tex height".texture?>
+      <variablemap variable="tex height scale" 
+	destination="parallaxFrag.tcScale" />
+    <?endif?>
+  <?Endtemplate?>
+  <?AddToList ProgramMappings VariableMap_Parallax?>
+  
+  <?Template ShaderVar_Parallax?>
+    <shadervar name="tex height scale" type="vector2">1,1</shadervar>
+  <?Endtemplate?>
+  <?AddToList ShaderVars ShaderVar_Parallax?>
+<?EndGlue?>
 </include>

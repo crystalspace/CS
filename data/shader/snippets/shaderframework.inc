@@ -1,0 +1,65 @@
+<!--
+  Copyright (C) 2006 by Frank Richter
+	    (C) 2006 by Jorrit Tyberghein
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<include>
+  <?SIfNDef __SHADERFRAMEWORK_INC__ ?>
+  <?Define __SHADERFRAMEWORK_INC__ ?>
+  
+  <?Include /shader/snippets/shadercond-tools.inc ?>
+  
+  <?Template BeginGlue component?>
+    <?SIfNDef _glue_$component$?>
+    <?Define _glue_$component$?>
+  <?Endtemplate?>
+  <?Template EndGlue?>
+    <?SEndIf?>
+  <?Endtemplate?>
+  
+  <?Template ShareResource NAME STATEMENT PASS VARIABLEMAP ?>
+    $STATEMENT$
+    <?SIfNDef _resshared_$NAME$?>
+      <?Define _resshared_$NAME$?>
+      <?BeginGlue _resshared_$NAME$?>
+	<?$PASS$?>
+	<?$VARIABLEMAP$?>
+      <?EndGlue?>
+    <?SEndIf?>
+  <?Endtemplate?>
+  
+  <?CreateList PassMappings ?>
+  <?CreateList ProgramMappings ?>
+  <?CreateList ShaderVars ?>
+  
+  <?Template WriteShaderTechniques PRIO?>
+    <technique priority="$PRIO$">
+      <pass>
+	<?TemplateWeak WriteVertexProgram?><?Endtemplate?>
+	<?WriteVertexProgram?>
+	<?TemplateWeak WriteFragmentProgram?><?Endtemplate?>
+	<?WriteFragmentProgram?>
+	<?InsertList PassMappings?>
+      </pass>
+    </technique>
+  <?Endtemplate?>
+  
+  <?Template WriteShaderVars?>
+    <shadervars><?InsertList ShaderVars?></shadervars>
+  <?Endtemplate?>
+
+  <?SEndIf?>
+</include>

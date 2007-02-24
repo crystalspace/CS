@@ -17,6 +17,8 @@
 		0)
 	  </sexp>
       </shadervar> 
+    <?else?>
+    <shadervar name="beta' 1" type="vector3">8.3215e-06, 1.4072e-05, 2.9180e-05</shadervar>
     <?endif?>
 
     <!-- beta2 = Mie -->
@@ -36,6 +38,8 @@
 		0)
 	  </sexp>
       </shadervar>
+    <?else?>
+    <shadervar name="beta' 2" type="vector3">1.3338e-05, 1.7345e-05, 2.4976e-05</shadervar>
     <?endif?>
 
     <!--
@@ -53,10 +57,12 @@
 		0)
 	  </sexp>
       </shadervar>
+    <?else?>
+    <shadervar name="beta1 + beta2" type="vector3">0.00019683, 0.00030978, 0.00059405</shadervar>
     <?endif?> 
 
     <!-- g = 0.8, hg = 1-g^2, 1+g, 2g -->
-    <shadervar name="hg" type="vector3">0.9,0.9,0.9</shadervar>
+    <shadervar name="hg" type="vector3">0.36, 1.8, 1.6</shadervar>
     <!-- inscatter = .3 -->
 
     <?if vars."scatter sun color".w &gt; 0 ?>
@@ -69,6 +75,8 @@
 		0)
 	  </sexp>
       </shadervar>
+    <?else?>
+    <shadervar name="inscattering term" type="vector3">0.3, 0.3, 0.3</shadervar>
     <?endif?>
   </shadervars>
 

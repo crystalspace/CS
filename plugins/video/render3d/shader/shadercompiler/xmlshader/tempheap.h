@@ -128,6 +128,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
     virtual ~TempStringBase() { Free (); }
     virtual void Free () { TempHeapAlloc::Free (Data); Data = 0; }
+
+    using csStringBase::Trim;
   };
 
   /**
@@ -223,6 +225,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
     /// Assign a value to this string.
     const TempString& operator = (const TempStringBase& copy)
+    { Replace(copy); return *this; }
+    const TempString& operator = (const TempString& copy)
     { Replace(copy); return *this; }
 
     /// Assign a formatted value to this string.

@@ -85,6 +85,7 @@ const char* csPS1xTo14Converter::SetLastError (const char* fmt, ...)
 
 void csPS1xTo14Converter::ResetState()
 {
+  texInsertPos = 0;
   newInstructions.Empty();
 
   int i;
@@ -255,6 +256,8 @@ const char* csPS1xTo14Converter::AddInstruction (
 
     case CS_PS_INS_TEX:
       return AddTEX (instr, instrIndex);
+    case CS_PS_INS_TEXCOORD:
+      return AddTEXCOORD (instr, instrIndex);
 
     default:
       return SetLastError ("Instruction '%s'(%zu) not supported yet",
@@ -367,6 +370,45 @@ const char* csPS1xTo14Converter::AddTEX (const csPSProgramInstruction &instr,
   newInstr.src_reg[0] = CS_PS_REG_TEX;
   newInstr.src_reg_num[0] = instr.dest_reg_num;
   newInstr.src_reg_mods[0] = instr.src_reg_mods[0];
+
+  newInstructions.Insert (texInsertPos, newInstr);
+  texInsertPos++;
+
+  return 0;
+}
+
+const char* csPS1xTo14Converter::AddTEXCOORD (const csPSProgramInstruction &instr, 
+					      size_t instrIndex)
+{
+  if (instr.dest_reg != CS_PS_REG_TEX)
+  {
+    return SetLastError ("%s (%zu): Destination is not a texture register",
+      GetInstructionName (instr.instruction), instrIndex);
+  }
+
+  csPSProgramInstruction newInstr;
+
+  newInstr.instruction = CS_PS_INS_TEXCRD;
+  newInstr.inst_mods = instr.inst_mods;
+  newInstr.dest_reg = CS_PS_REG_TEMP;
+  newInstr.dest_reg_num = instr.dest_reg_num;
+  newInstr.dest_reg_mods = instr.dest_reg_mods;
+  newInstr.src_reg[0] = CS_PS_REG_TEX;
+  newInstr.src_reg_num[0] = instr.dest_reg_num;
+  newInstr.src_reg_mods[0] = instr.src_reg_mods[0];
+
+  newInstructions.Insert (texInsertPos, newInstr);
+  texInsertPos++;
+
+  // TEXCOORD clamps, emulate that
+  newInstr.instruction = CS_PS_INS_MOV;
+  newInstr.inst_mods = instr.inst_mods | CS_PS_IMOD_SAT;
+  newInstr.dest_reg = CS_PS_REG_TEMP;
+  newInstr.dest_reg_num = instr.dest_reg_num;
+  newInstr.dest_reg_mods = instr.dest_reg_mods;
+  newInstr.src_reg[0] = CS_PS_REG_TEMP;
+  newInstr.src_reg_num[0] = instr.dest_reg_num;
+  newInstr.src_reg_mods[0] = CS_PS_RMOD_NONE;
 
   newInstructions.Push (newInstr);
 

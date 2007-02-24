@@ -26,9 +26,6 @@
 
 CS_LEAKGUARD_IMPLEMENT (csGLVBOBufferManager);
 
-SCF_IMPLEMENT_IBASE (csGLVBOBufferManager)
-SCF_IMPLEMENT_IBASE_END
-
 //-----------------------------------------------------------------
 
 void csGLVBOBufferManager::ParseByteSize (const char* sizeStr, size_t& size)
@@ -74,12 +71,11 @@ static csString ByteFormat (size_t n)
 
 csGLVBOBufferManager::csGLVBOBufferManager (csGLExtensionManager *ext, 
 					    csGLStateCache *state,
-                                            iObjectRegistry* p)
-  : ext (ext), statecache (state), config(p), object_reg (p),
-    verbose (false), superVerbose (false)
+                                            iObjectRegistry* p) :
+  scfImplementationType (this),
+  ext (ext), statecache (state), config(p), object_reg (p),
+  verbose (false), superVerbose (false)
 {
-  SCF_CONSTRUCT_IBASE(0);
-  
   csRef<iVerbosityManager> verbosemgr (
     CS_QUERY_REGISTRY (p, iVerbosityManager));
   if (verbosemgr)
@@ -105,7 +101,6 @@ csGLVBOBufferManager::csGLVBOBufferManager (csGLExtensionManager *ext,
 
 csGLVBOBufferManager::~csGLVBOBufferManager ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csGLVBOBufferManager::ActivateBuffer (iRenderBuffer *buffer)

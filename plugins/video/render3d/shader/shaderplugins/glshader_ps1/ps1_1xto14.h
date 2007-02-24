@@ -31,6 +31,8 @@ class csPS1xTo14Converter
 {
 protected:
   csArray<csPSProgramInstruction> newInstructions;
+  /// Index at which new texture instrs are inserted
+  size_t texInsertPos;
   csString lastError;
   csArray<uint> neededRegs;
 
@@ -50,6 +52,8 @@ protected:
   const char* AddArithmetic (const csPSProgramInstruction &instr,
     size_t instrIndex);
   const char* AddTEX (const csPSProgramInstruction &instr,
+    size_t instrIndex);
+  const char* AddTEXCOORD (const csPSProgramInstruction &instr,
     size_t instrIndex);
 
   const char* CollectUsage (const csArray<csPSProgramInstruction>*& instrs);

@@ -48,7 +48,8 @@ SCF_IMPLEMENT_FACTORY(csLightIterRSLoader)
 
 //---------------------------------------------------------------------------
 
-csLightIterRSType::csLightIterRSType (iBase* p) : csBaseRenderStepType (p)
+csLightIterRSType::csLightIterRSType (iBase* p) :
+  scfImplementationType (this, p)
 {
 }
 
@@ -60,7 +61,8 @@ csPtr<iRenderStepFactory> csLightIterRSType::NewFactory()
 
 //---------------------------------------------------------------------------
 
-csLightIterRSLoader::csLightIterRSLoader (iBase* p) : csBaseRenderStepLoader (p)
+csLightIterRSLoader::csLightIterRSLoader (iBase* p) :
+  scfImplementationType (this, p)
 {
   InitTokenTable (tokens);
 }
@@ -112,20 +114,15 @@ csPtr<iBase> csLightIterRSLoader::Parse (iDocumentNode* node,
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csLightIterRenderStepFactory);
-  SCF_IMPLEMENTS_INTERFACE(iRenderStepFactory);
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csLightIterRenderStepFactory::csLightIterRenderStepFactory (
-  iObjectRegistry* object_reg)
+  iObjectRegistry* object_reg) :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
   csLightIterRenderStepFactory::object_reg = object_reg;
 }
 
 csLightIterRenderStepFactory::~csLightIterRenderStepFactory ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 csPtr<iRenderStep> csLightIterRenderStepFactory::Create ()
@@ -136,16 +133,10 @@ csPtr<iRenderStep> csLightIterRenderStepFactory::Create ()
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csLightIterRenderStep);
-  SCF_IMPLEMENTS_INTERFACE(iRenderStep);
-  SCF_IMPLEMENTS_INTERFACE(iRenderStepContainer);
-  SCF_IMPLEMENTS_INTERFACE(iLightIterRenderStep);
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csLightIterRenderStep::csLightIterRenderStep (
-  iObjectRegistry* object_reg)
+  iObjectRegistry* object_reg) :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
   csLightIterRenderStep::object_reg = object_reg;
   initialized = false;
 }
@@ -161,8 +152,6 @@ csLightIterRenderStep::~csLightIterRenderStep ()
     LightSVAccessor* cb = it.Next (light);
     light->RemoveLightCallback (cb);
   }
-
-  SCF_DESTRUCT_IBASE();
 }
 
 void csLightIterRenderStep::Init ()
@@ -439,16 +428,10 @@ csPtr<iTextureHandle> csLightIterRenderStep::GetAttenuationTexture (
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csLightIterRenderStep::LightSVAccessor)
-  SCF_IMPLEMENTS_INTERFACE(iLightCallback)
-  SCF_IMPLEMENTS_INTERFACE(iShaderVariableAccessor)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csLightIterRenderStep::LightSVAccessor::LightSVAccessor (iLight* light,
-  csLightIterRenderStep* parent)
+  csLightIterRenderStep* parent) :
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE(0);
-
   LightSVAccessor::light = light;
   LightSVAccessor::parent = parent;
 
@@ -458,7 +441,6 @@ csLightIterRenderStep::LightSVAccessor::LightSVAccessor (iLight* light,
 
 csLightIterRenderStep::LightSVAccessor::~LightSVAccessor ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 void csLightIterRenderStep::LightSVAccessor::OnColorChange (iLight* /*light*/,

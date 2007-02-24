@@ -29,9 +29,7 @@
 
 #include "iogldisp.h"
 
-#ifndef XK_MISCELLANY
 #define XK_MISCELLANY 1
-#endif
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
@@ -50,9 +48,6 @@ class csGraphics2DGLX : public scfImplementationExt1<csGraphics2DGLX ,
   Colormap cmap;
   GLXContext active_GLContext;
   bool hardwareaccelerated;
-  
-  // Handle to loaded libGL.so (see remark in Initialize())
-  void* libGL;
 
   // we are using a specific displaydriver
   csRef<iOpenGLDisp> dispdriver;
