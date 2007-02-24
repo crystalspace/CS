@@ -80,8 +80,10 @@ public:
    */
   void SetBool (uint32 mask, bool value)
   {
-    if (value) flags = (flags & ~mask) | mask;
-    else flags = (flags & ~mask);
+    if (value) 
+      flags |= mask;
+    else 
+      flags &= ~mask;
   }
 
   /// Get flags.

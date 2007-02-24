@@ -29,10 +29,22 @@
 #include "csutil/scf.h"
 #include "csutil/refarr.h"
 
+#include "iutil/array.h"
+
 struct iMovable;
 struct iLight;
 struct iMeshWrapper;
 struct iCamera;
+
+struct iSceneNode;
+
+/**
+ * An array of scene node interfaces.
+ */
+struct iSceneNodeArray : public iArrayReadOnly<iSceneNode*>
+{
+  SCF_IARRAYREADONLY_INTERFACE(iSceneNodeArray);
+};
 
 /**
  * This interface represents a node in the scene graph. It basically
@@ -50,7 +62,7 @@ struct iCamera;
  */
 struct iSceneNode : public virtual iBase
 {
-  SCF_INTERFACE(iSceneNode, 2,0,0);
+  SCF_INTERFACE(iSceneNode, 2,0,1);
 
   /**
    * Get the movable for this scene node.
@@ -85,7 +97,13 @@ struct iSceneNode : public virtual iBase
   /**
    * The children of this scene node.
    */
+  CS_DEPRECATED_METHOD_MSG("Use csPtr<iSceneNodeArray> GetChildren() const")
   virtual const csRefArray<iSceneNode>& GetChildren () const = 0;
+
+  /**
+   * The children of this scene node.
+   */
+  virtual csPtr<iSceneNodeArray> GetChildrenArray () const = 0;
 };
 
 /** @} */

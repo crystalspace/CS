@@ -152,18 +152,21 @@ bool csReporterListener::Initialize (iObjectRegistry* r)
   if (q != 0)
     q->RegisterListener (eventHandler, PostProcess);
 
-  csRef<iConfigManager> cfg(csQueryRegistry<iConfigManager> (r));
-  if ( cfg )
+  csRef<iConfigManager> cfg = csQueryRegistry<iConfigManager> (r);
+  if (cfg)
   {
-    append = cfg->GetBool("Reporter.FileAppend", false );
+    append = cfg->GetBool ("Reporter.FileAppend", false);
+    silent = cfg->GetBool ("Reporter.Silent", silent);
   }
 
   csRef<iCommandLineParser> cmdline = 
     csQueryRegistry<iCommandLineParser> (object_reg);
   if (cmdline)
   {
-    silent = cmdline->GetOption ("silent") != 0;
-    append = cmdline->GetOption ("append") != 0;
+    if (cmdline->GetOption ("silent"))
+      silent = true;
+    if (cmdline->GetOption ("append"))
+      append = true;
   }
   csRef<iVerbosityManager> verbosemgr (
     csQueryRegistry<iVerbosityManager> (object_reg));

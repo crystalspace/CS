@@ -6026,12 +6026,19 @@ class iGeneralMeshCommonState(iBase):
     def SetShadowReceiving(*args): return _cspace.iGeneralMeshCommonState_SetShadowReceiving(*args)
     def IsShadowReceiving(*args): return _cspace.iGeneralMeshCommonState_IsShadowReceiving(*args)
     def ClearSubMeshes(*args): return _cspace.iGeneralMeshCommonState_ClearSubMeshes(*args)
-    def AddSubMesh(*args): return _cspace.iGeneralMeshCommonState_AddSubMesh(*args)
     def AddRenderBuffer(*args): return _cspace.iGeneralMeshCommonState_AddRenderBuffer(*args)
     def RemoveRenderBuffer(*args): return _cspace.iGeneralMeshCommonState_RemoveRenderBuffer(*args)
     def GetRenderBufferCount(*args): return _cspace.iGeneralMeshCommonState_GetRenderBufferCount(*args)
     def GetRenderBuffer(*args): return _cspace.iGeneralMeshCommonState_GetRenderBuffer(*args)
     def GetRenderBufferName(*args): return _cspace.iGeneralMeshCommonState_GetRenderBufferName(*args)
+    def AddSubMesh(*args): return _cspace.iGeneralMeshCommonState_AddSubMesh(*args)
+    def FindSubMesh(*args): return _cspace.iGeneralMeshCommonState_FindSubMesh(*args)
+    def DeleteSubMesh(*args): return _cspace.iGeneralMeshCommonState_DeleteSubMesh(*args)
+    def GetSubMeshCount(*args): return _cspace.iGeneralMeshCommonState_GetSubMeshCount(*args)
+    def GetSubMeshIndices(*args): return _cspace.iGeneralMeshCommonState_GetSubMeshIndices(*args)
+    def GetSubMeshMaterial(*args): return _cspace.iGeneralMeshCommonState_GetSubMeshMaterial(*args)
+    def GetSubMeshName(*args): return _cspace.iGeneralMeshCommonState_GetSubMeshName(*args)
+    def GetSubMeshMixmode(*args): return _cspace.iGeneralMeshCommonState_GetSubMeshMixmode(*args)
     def __del__(self, destroy=_cspace.delete_iGeneralMeshCommonState):
         try:
             if self.thisown: destroy(self)
@@ -6057,6 +6064,7 @@ class iGeneralMeshState(iGeneralMeshCommonState):
         return "<%s.%s; proxy of C++ iGeneralMeshState instance at %s>" % (self.__class__.__module__, self.__class__.__name__, self.this,)
     def SetAnimationControl(*args): return _cspace.iGeneralMeshState_SetAnimationControl(*args)
     def GetAnimationControl(*args): return _cspace.iGeneralMeshState_GetAnimationControl(*args)
+    def CopySubMeshesFromFactory(*args): return _cspace.iGeneralMeshState_CopySubMeshesFromFactory(*args)
     def __del__(self, destroy=_cspace.delete_iGeneralMeshState):
         try:
             if self.thisown: destroy(self)
@@ -10647,6 +10655,7 @@ CS_VATTRIB_SPECIFIC_FIRST = _cspace.CS_VATTRIB_SPECIFIC_FIRST
 CS_VATTRIB_SPECIFIC_LAST = _cspace.CS_VATTRIB_SPECIFIC_LAST
 CS_VATTRIB_GENERIC_FIRST = _cspace.CS_VATTRIB_GENERIC_FIRST
 CS_VATTRIB_GENERIC_LAST = _cspace.CS_VATTRIB_GENERIC_LAST
+CS_VATTRIB_UNUSED = _cspace.CS_VATTRIB_UNUSED
 CS_VATTRIB_INVALID = _cspace.CS_VATTRIB_INVALID
 CS_VATTRIB_POSITION = _cspace.CS_VATTRIB_POSITION
 CS_VATTRIB_WEIGHT = _cspace.CS_VATTRIB_WEIGHT

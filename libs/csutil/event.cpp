@@ -346,7 +346,7 @@ uint csJoystickEventHelper::GetButton (const iEvent *event)
 bool csJoystickEventHelper::GetButtonState(const iEvent *event)
 {
   bool res = false;
-  event->Retrieve("jsButton", res);
+  event->Retrieve("jsButtonState", res);
   return res;
 }
 

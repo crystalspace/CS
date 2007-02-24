@@ -148,32 +148,34 @@ typedef unsigned int GLhandleARB;
 #  define REPORT_MISSING_ENTRIES false
 #endif
 
-#define EXTMGR_FUNC_INIT(nameNC, nameUC) \
-      funcTest = ((nameNC = (cs##nameUC) gl->GetProcAddress (#nameNC)) != 0); \
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", \
-	REPORT_MISSING_ENTRIES)) \
-      { \
-	Report (msgExtRetrieveFail, #nameNC); \
-      } \
-      allclear &= funcTest; \
+#define EXTMGR_FUNC_INIT(nameNC, nameUC)				\
+      funcTest =							\
+	((nameNC = (cs##nameUC) gl->GetProcAddress (#nameNC)) != 0);	\
+      if (!funcTest && config->GetBool (				\
+	"Video.OpenGL.ReportMissingEntries",				\
+	REPORT_MISSING_ENTRIES))					\
+      {									\
+	Report (msgExtRetrieveFail, #nameNC); 				\
+      }									\
+      allclear &= funcTest;
 
-#define EXTMGR_REPORT_INIT_RESULT(exttype, nameNC) \
-      if (CS_##nameNC = allclear) \
-      { \
-        CS_##nameNC &= config->GetBool (cfgkey, true); \
-        if (CS_##nameNC) \
-        { \
-          Report (msgExtFoundAndUsed, exttype, ext); \
-        } \
-        else \
-        { \
-          Report (msgExtFoundAndNotUsed, exttype, ext); \
-        } \
-      } \
-      else \
-      { \
-        Report (msgExtInitFail, exttype, ext); \
-      } 
+#define EXTMGR_REPORT_INIT_RESULT(exttype, nameNC)			\
+      if (CS_##nameNC = allclear) 					\
+      {									\
+        CS_##nameNC &= config->GetBool (cfgkey, defaultUse);		\
+        if (CS_##nameNC)						\
+        {								\
+          Report (msgExtFoundAndUsed, exttype, ext);			\
+        }								\
+        else								\
+        {								\
+          Report (msgExtFoundAndNotUsed, exttype, ext);			\
+        }								\
+      }									\
+      else								\
+      {									\
+        Report (msgExtInitFail, exttype, ext);				\
+      }
 
 /// Struct containing all GL extension functions.
 struct csGLExtensionFunctions
@@ -203,6 +205,8 @@ private:
   iObjectRegistry* object_reg;
   csConfigAccess config;
   iOpenGLInterface* gl;
+  bool doVerbose;
+  bool defaultUse;
   
   const char* extstrGL;
   const char* msgExtRetrieveFail;
@@ -232,23 +236,13 @@ private:
 
   void Report (const char* msg, ...)
   {
-    csRef<iVerbosityManager> verbosemgr (
-      CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
-    
-    if (!verbosemgr->Enabled ("renderer"))
+    if (!doVerbose)
       return;
     
     va_list arg;
     va_start (arg, msg);
-    csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
-    if (rep)
-      rep->ReportV (CS_REPORTER_SEVERITY_NOTIFY,
-         "crystalspace.canvas.opengl.extmgr", msg, arg);
-    else
-    {
-      csPrintfV (msg, arg);
-      csPrintf ("\n");
-    }
+    csReportV (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+      "crystalspace.canvas.opengl.extmgr", msg, arg);
     va_end (arg);
   }
 
@@ -256,16 +250,22 @@ public:
   void Initialize (iObjectRegistry* object_reg, iGraphics2D* g2d)
   {
     csGLExtensionManager::object_reg = object_reg;
-    gl = csRef<iOpenGLInterface>
-      (SCF_QUERY_INTERFACE (g2d, iOpenGLInterface));
+    gl = csRef<iOpenGLInterface> (scfQueryInterface<iOpenGLInterface> (g2d));
     // Low priority so canvas/renderer cfgs may override the settings
     config.AddConfig (object_reg, "/config/glext.cfg", true,
       iConfigManager::ConfigPriorityPlugin - 1);
+
+    csRef<iVerbosityManager> verbosemgr (csQueryRegistry<iVerbosityManager> (
+      object_reg));
+    doVerbose = verbosemgr->Enabled ("renderer");
   }
   
   void Open () 
   { 
     extstrGL = (const char*)glGetString (GL_EXTENSIONS);
+    defaultUse = config->GetBool ("Video.OpenGL.UseExtension.ALL", true);
+    if (!defaultUse)
+      Report ("ALL extensions are disabled by default");
   }
   
   void Close () { }
@@ -282,7 +282,8 @@ public:
     memset ((csGLExtensionFlags*)this, 0, sizeof (csGLExtensionFlags));
   }
   
-  csGLExtensionManager () : object_reg (0), gl (0)
+  csGLExtensionManager () : object_reg (0), gl (0), doVerbose (false),
+    defaultUse (true)
   {
     msgExtRetrieveFail = "Failed to retrieve %%s";
     msgExtFoundAndUsed = "%%s Extension '%%s' found and used.";

@@ -34,11 +34,7 @@ struct iReporter;
 struct iPluginManager;
 struct iObjectRegistry;
 
-namespace CS
-{
-namespace Plugins
-{
-namespace Genmesh3DS
+CS_PLUGIN_NAMESPACE_BEGIN(Genmesh3DS)
 {
 
 struct csMatAndTris
@@ -92,8 +88,7 @@ public:
   virtual bool IsRecognized (iDataBuffer* buffer);
 };
 
-} // namespace Genmesh3DS
-} // namespace Plugins
-} // namespace CS
+}
+CS_PLUGIN_NAMESPACE_END(Genmesh3DS)
 
 #endif // __CS_GMESH3DSLDR_H__

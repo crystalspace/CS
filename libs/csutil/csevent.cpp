@@ -88,7 +88,7 @@ csEvent::csEvent (csEvent const& e) : iBase(), scfImplementationType (this),
   Name = e.Name;
   Broadcast = e.Broadcast;
   Time = e.Time;
-  csHash<attribute*, csStringID>::GlobalIterator it = e.attributes.GetIterator();
+  csHash<attribute*, csStringID>::ConstGlobalIterator it = e.attributes.GetIterator();
   csStringID key;
   while (it.HasNext())
   {

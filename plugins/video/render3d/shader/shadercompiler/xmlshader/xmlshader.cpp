@@ -46,7 +46,7 @@ CS_LEAKGUARD_IMPLEMENT (csXMLShaderCompiler);
 SCF_IMPLEMENT_FACTORY (csXMLShaderCompiler)
 
 csXMLShaderCompiler::csXMLShaderCompiler(iBase* parent) : 
-  scfImplementationType (this, parent)
+  scfImplementationType (this, parent), debugInstrProcessing (false)
 {
   wrapperFact = 0;
   InitTokenTable (xmltokens);
@@ -102,6 +102,8 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
   csConfigAccess config (object_reg);
   doDumpXML = config->GetBool ("Video.XMLShader.DumpVariantXML");
   doDumpConds = config->GetBool ("Video.XMLShader.DumpConditions");
+  debugInstrProcessing = 
+    config->GetBool ("Video.XMLShader.DebugInstructionProcessing");
 
   return true;
 }

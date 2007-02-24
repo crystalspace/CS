@@ -601,17 +601,14 @@ csPtr<iBase> csSkeletonFactoryLoader::Parse (iDocumentNode* node,
     switch (id)
     {
       case XMLTOKEN_BONE:
-    {
-      ParseBone (child, skel_fact, 0);
-    }
-    break;
+        ParseBone (child, skel_fact, 0);
+        break;
       case XMLTOKEN_SCRIPT:
-    {
-      ParseScript (child, skel_fact);
+        ParseScript (child, skel_fact);
+        break;
     }
-    break;
-  }
   }
 
-  return csPtr<iBase> (skel_fact);
+  skel_fact->IncRef ();
+  return csPtr<iBase> ((iBase*)skel_fact);
 }

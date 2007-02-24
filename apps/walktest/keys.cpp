@@ -35,6 +35,7 @@
 #include "csgeom/math3d.h"
 #include "cstool/collider.h"
 #include "cstool/cspixmap.h"
+#include "cstool/enginetools.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivaria/reporter.h"
@@ -555,22 +556,15 @@ void WalkTest::MouseClick1Handler(iEvent &Event)
 // right mouse button
 void WalkTest::MouseClick2Handler(iEvent &Event)
 {
-  csVector3 v;
-  csVector2 p (csMouseEventHelper::GetX(&Event), 
-	       FRAME_HEIGHT-csMouseEventHelper::GetY(&Event));
+  int mx = csMouseEventHelper::GetX (&Event);
+  int my = csMouseEventHelper::GetY (&Event);
+  csScreenTargetResult result = csEngineTools::FindScreenTarget (
+      csVector2 (mx, my), 100.0f, view->GetCamera ());
+  iMeshWrapper* mesh = result.mesh;
+  int sel = result.polygon_idx;
 
-  v = view->GetCamera ()->InvPerspective (p, 1);
-  csVector3 vw = view->GetCamera ()->GetTransform ().This2Other (v);
-
-  iSector* sector = view->GetCamera ()->GetSector ();
-  csVector3 origin = view->GetCamera ()->GetTransform ().GetO2TTranslation ();
-  csSectorHitBeamResult rc = sector->HitBeamPortals (origin,
-  	origin + (vw-origin) * 20);
-  iMeshWrapper* mesh = rc.mesh;
-  int sel = rc.polygon_idx;
-
-  vw = rc.isect;
-  v = view->GetCamera ()->GetTransform ().Other2This (vw);
+  csVector3 vw = result.isect;
+  csVector3 v = view->GetCamera ()->GetTransform ().Other2This (vw);
   Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
   	"RMB down : cam:(%f,%f,%f) world:(%f,%f,%f)",
 	v.x, v.y, v.z, vw.x, vw.y, vw.z);

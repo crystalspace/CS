@@ -31,7 +31,7 @@
 	      </make-vector>
 	    </translate>
           </texmatrix>
-          <constantcolor layer="1" type="shadervar">detail texture color</constantcolor>
+          <constantcolor layer="1" type="shadervar">tex detail color</constantcolor>
         </fixedvp>
       </vp>
       <fp plugin="glfixed">
@@ -118,7 +118,7 @@
 				      </make-vector>
 				    </translate>
           </texmatrix>
-          <constantcolor layer="0" type="shadervar">detail texture color</constantcolor>
+          <constantcolor layer="0" type="shadervar">tex detail color</constantcolor>
         </fixedvp>
       </vp>
       <fp plugin="glfixed">

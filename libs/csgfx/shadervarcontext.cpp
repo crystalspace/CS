@@ -20,22 +20,14 @@
 #include "cssysdef.h"
 #include "csgfx/shadervarcontext.h"
 
-CS_LEAKGUARD_IMPLEMENT (csShaderVariableContext);
-
-csShaderVariableContext::csShaderVariableContext () :
-  scfImplementationType(this, 0)
-{}
-
-csShaderVariableContext::~csShaderVariableContext ()
-{}
-
-csShaderVariableContext::csShaderVariableContext (
-  const csShaderVariableContext& other) :
-  iBase(), scfImplementationType(this)
+namespace CS
 {
-  variables = other.variables;
-}
 
+ShaderVariableContextImpl::~ShaderVariableContextImpl ()
+{}
+
+namespace
+{
 class SvVarArrayCmp : public csArrayCmp<csShaderVariable*, csStringID>
 {
   static int SvKeyCompare (csShaderVariable* const& r, csStringID const& k)
@@ -53,9 +45,9 @@ static int SvCompare (csShaderVariable* const& r, csShaderVariable* const& k)
 { 
   return r->GetName() - k->GetName();
 }
+}
 
-void csShaderVariableContext::AddVariable 
-  (csShaderVariable *variable) 
+void ShaderVariableContextImpl::AddVariable (csShaderVariable *variable) 
 {
   csShaderVariable* var = GetVariable (variable->GetName());
   if (var == 0)
@@ -64,8 +56,8 @@ void csShaderVariableContext::AddVariable
     *var = *variable;
 }
 
-csShaderVariable* csShaderVariableContext::GetVariable 
-  (csStringID name) const 
+csShaderVariable* ShaderVariableContextImpl::GetVariable (
+  csStringID name) const 
 {
   size_t index = variables.FindSortedKey (SvVarArrayCmp (name));
   if (index != csArrayItemNotFound)
@@ -73,8 +65,8 @@ csShaderVariable* csShaderVariableContext::GetVariable
   return 0;
 }
 
-void csShaderVariableContext::PushVariables 
-  (iShaderVarStack* stacks) const
+void ShaderVariableContextImpl::PushVariables (
+  iShaderVarStack* stacks) const
 {
   for (size_t i=0; i<variables.GetSize (); ++i)
   {
@@ -85,8 +77,7 @@ void csShaderVariableContext::PushVariables
   }
 }
 
-void csShaderVariableContext::ReplaceVariable 
-  (csShaderVariable *variable) 
+void ShaderVariableContextImpl::ReplaceVariable (csShaderVariable *variable) 
 {
   size_t index = variables.FindSortedKey (SvVarArrayCmp (
     variable->GetName()));
@@ -95,3 +86,22 @@ void csShaderVariableContext::ReplaceVariable
   else
     variables.InsertSorted (variable, SvCompare);
 }
+
+} // namespace CS
+
+//---------------------------------------------------------------------------
+
+CS_LEAKGUARD_IMPLEMENT (csShaderVariableContext);
+
+csShaderVariableContext::csShaderVariableContext () :
+  scfImplementationType(this, 0)
+{}
+
+csShaderVariableContext::csShaderVariableContext (
+  const csShaderVariableContext& other) : scfImplementationType(this)
+{
+  variables = other.variables;
+}
+
+csShaderVariableContext::~csShaderVariableContext ()
+{}

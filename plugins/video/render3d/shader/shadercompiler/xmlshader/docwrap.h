@@ -378,6 +378,8 @@ class csWrappedDocumentNodeFactory
 
   csString* currentOut;
   void DumpCondition (size_t id, const char* condStr, size_t condLen);
+
+  void DebugProcessing (const char* msg, ...) CS_GNUC_PRINTF (2, 3);
 public:
   csWrappedDocumentNodeFactory (csXMLShaderCompiler* plugin);
 

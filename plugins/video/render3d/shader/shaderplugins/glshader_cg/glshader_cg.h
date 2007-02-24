@@ -65,6 +65,7 @@ public:
   char* dumpDir;
   bool doVerbose;
 
+  bool enableVP, enableFP;
   CGprofile maxProfileVertex;
   CGprofile maxProfileFragment;
 

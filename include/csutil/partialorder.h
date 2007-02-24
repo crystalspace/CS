@@ -451,8 +451,6 @@ protected:
     while (iter.HasNext())
     {
       size_t idx = iter.Next();
-      CS_ASSERT_MSG ("NodeMap contains a negative index",
-		     idx >= 0);
       CS_ASSERT_MSG ("NodeMap contains an index larger than Nodes list",
 		     idx < Nodes.Length());
     }

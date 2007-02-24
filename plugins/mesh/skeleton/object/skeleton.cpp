@@ -661,15 +661,18 @@ bool csSkeletonRunnable::Do (csTicks elapsed, bool& stop, csTicks & left)
   return mod;
 }
 
-bone_transform_data *csSkeletonRunnable::GetBoneTransform(csSkeletonBoneFactory *bone_fact)
+bone_transform_data *csSkeletonRunnable::GetBoneTransform(
+    csSkeletonBoneFactory *bone_fact)
 {
   bone_transform_data *b_tr = transforms.Get (bone_fact, 0);
   if (!b_tr) 
   {
-    size_t index = ((csSkeletonFactory *)skeleton->GetFactory())->FindBoneIndex(bone_fact);
+    size_t index = (static_cast<csSkeletonFactory*>(skeleton->GetFactory()))
+      ->FindBoneIndex(bone_fact);
     b_tr = new bone_transform_data ();
     b_tr->quat = ((csSkeletonBone *)skeleton->GetBone(index))->GetQuaternion ();
-    b_tr->pos = ((csSkeletonBone *)skeleton->GetBone(index))->GetTransform ().GetOrigin ();
+    b_tr->pos = ((csSkeletonBone *)skeleton->GetBone(index))
+      ->GetTransform ().GetOrigin ();
     transforms.Put (bone_fact, b_tr);
   }
   return b_tr;
@@ -695,10 +698,12 @@ csSkeleton::csSkeleton(csSkeletonFactory* fact) :
 
   for (size_t i = 0; i < bones.Length(); i++ )
   {
-    iSkeletonBoneFactory *fact_parent_bone = bones[i]->GetFactory()->GetParent();
+    iSkeletonBoneFactory *fact_parent_bone = bones[i]->GetFactory()
+      ->GetParent();
     if (fact_parent_bone)
     {
-      size_t index = fact->FindBoneIndex((csSkeletonBoneFactory *)fact_parent_bone);
+      size_t index = fact->FindBoneIndex((csSkeletonBoneFactory *)
+	  fact_parent_bone);
       if (index != csArrayItemNotFound)
       {
         bones[i]->SetParent(bones[index]);
@@ -712,7 +717,8 @@ csSkeleton::csSkeleton(csSkeletonFactory* fact) :
     csRef<csSkeletonSocket> socket;
     socket.AttachNew(new csSkeletonSocket (this, fact_sockets[i]));
 
-    size_t index = fact->FindBoneIndex((csSkeletonBoneFactory *)fact_sockets[i]->GetBone());
+    size_t index = fact->FindBoneIndex((csSkeletonBoneFactory *)
+	fact_sockets[i]->GetBone());
     if (index != csArrayItemNotFound)
     {
       socket->SetBone(bones[index]);
@@ -1233,11 +1239,12 @@ csSkeletonGraveyard::csSkeletonGraveyard (iBase* pParent) :
 csSkeletonGraveyard::~csSkeletonGraveyard ()
 {
   skeletons.DeleteAll();
-  if (object_reg)
+  if (object_reg && evhandler)
   {
     csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q)
-      q->RemoveListener (this);
+      q->RemoveListener (evhandler);
+    evhandler = 0;
   }
 }
 
@@ -1248,7 +1255,8 @@ bool csSkeletonGraveyard::Initialize (iObjectRegistry* object_reg)
   PreProcess = csevPreProcess (object_reg);
   csRef<iEventQueue> eq (CS_QUERY_REGISTRY (object_reg, iEventQueue));
   if (eq == 0) return false;
-  eq->RegisterListener (this, PreProcess);
+  evhandler.AttachNew (new csSkelEventHandler (this));
+  eq->RegisterListener (evhandler, PreProcess);
 
   return true;
 }
@@ -1262,7 +1270,8 @@ iSkeletonFactory* csSkeletonGraveyard::CreateFactory(const char *name)
   return fact;
 }
 
-iSkeleton *csSkeletonGraveyard::CreateSkeleton(iSkeletonFactory *fact, const char *name)
+iSkeleton *csSkeletonGraveyard::CreateSkeleton(iSkeletonFactory *fact,
+    const char *name)
 {
   csSkeletonFactory *cs_skel_fact = static_cast<csSkeletonFactory*> (fact);
   cs_skel_fact->UpdateParentBones();
