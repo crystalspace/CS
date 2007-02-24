@@ -89,8 +89,9 @@ bool csCursor::ParseConfigFile (iConfigFile* ini)
   // Get all the cursor definitions in an iterator
   csString prefix = "CursorSystem.Cursors.";
   csRef<iConfigIterator> params = ini->Enumerate (prefix);
-  while (params && params->Next())
+  while (params && params->HasNext())
   {
+    params->Next();
     // Work out the name of the cursor
     csString key = params->GetKey() + strlen(params->GetSubsection());
     csString name;

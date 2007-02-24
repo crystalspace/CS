@@ -305,6 +305,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     csRefArray<iParticleEffector> effectors;
   };
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
   /**
   * Particle mesh object
   */
@@ -693,6 +695,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     csRef<RenderBufferAccessor> renderBufferAccessor;
 
   };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
+
 }
 CS_PLUGIN_NAMESPACE_END(Particles)
 

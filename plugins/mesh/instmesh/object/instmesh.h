@@ -92,6 +92,9 @@ public:
     delete[] shadowmap;
   }
 };
+
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
 * Instmesh version of mesh object.
 */
@@ -352,6 +355,8 @@ public:
   csRef<PolyMesh> polygonMesh;
   friend struct PolyMesh;
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
 * Factory for general meshes.

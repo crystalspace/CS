@@ -1,0 +1,4 @@
+SubDir TOP data castle ;
+
+InstallData world [ Wildcard *.txt ] : data maps castle ;
+InstallData [ Wildcard factories : thing* gen* ] : data maps castle factories ;

@@ -102,10 +102,12 @@ namespace lighter
     loader = csQueryRegistry<iLoader> (objectRegistry);
     if (!loader) return Report ("No iLoader!");
 
-    
-
     vfs = csQueryRegistry<iVFS> (objectRegistry);
     if (!vfs) return Report ("No iVFS!");
+
+    strings = csQueryRegistryTagInterface<iStringSet> (
+      objectRegistry, "crystalspace.shared.stringset");
+    if (!strings) return Report ("No shared string set!");
 
     // Open the systems
     if (!csInitializer::OpenApplication (objectRegistry))
@@ -132,27 +134,38 @@ namespace lighter
 
     unsigned int taskI = 0;
     // Calculate lightmapping coordinates
-    LightmapUVLayouter *uvLayout = new SimpleUVLayouter;
+    LightmapUVLayouter *uvLayout = new SimpleUVLayouter (scene->GetLightmaps());
 
+    float factoryProgress = 100.0f / scene->GetFactories ().GetSize ();
     RadObjectFactoryHash::GlobalIterator factIt = 
       scene->GetFactories ().GetIterator ();
     while (factIt.HasNext ())
     {
-      globalStats.SetTaskProgress ("Lightmap layout", (100.0f * taskI) / 
-        scene->GetFactories ().GetSize ());
+      globalStats.SetTaskProgress ("Lightmap layout", taskI * factoryProgress);
       csRef<RadObjectFactory> fact = factIt.Next ();
-      fact->ComputeLightmapUV (uvLayout);
+      fact->PrepareLightmapUV (uvLayout);
       taskI++;
     }
 
-
     // Initialize all objects
+    taskI = 0;
+    float sectorProgress = 100.0f / scene->GetSectors ().GetSize();
     SectorHash::GlobalIterator sectIt = 
       scene->GetSectors ().GetIterator ();
     while (sectIt.HasNext ())
     {
+      float thisSectorProgress = taskI * sectorProgress;
+      globalStats.SetTaskProgress ("Initialize objects", 
+        thisSectorProgress);
       csRef<Sector> sect = sectIt.Next ();
       sect->Initialize ();
+      taskI++;
+    }
+
+    for (size_t i = 0; i < scene->GetLightmaps().GetSize(); i++)
+    {
+      Lightmap * lm = scene->GetLightmaps ()[i];
+      lm->Initialize();
     }
 
     globalStats.SetTotalProgress (20);
@@ -191,7 +204,7 @@ namespace lighter
       while (objIt.HasNext ())
       {
         csRef<RadObject> obj = objIt.Next ();
-        obj->FixupLightmaps ();
+        obj->FixupLightmaps (scene->GetLightmaps());
       }
     }
 
@@ -245,6 +258,14 @@ namespace lighter
     
     // Load the files
     return scene->LoadFiles ();
+  }
+
+  void Lighter::LoadSettings ()
+  {
+    csRef<iCommandLineParser> cmdline = 
+      csQueryRegistry<iCommandLineParser> (objectRegistry);
+
+    settings.keepGenmeshSubmeshes = cmdline->GetBoolOption ("keepsubmeshes");
   }
 
 }

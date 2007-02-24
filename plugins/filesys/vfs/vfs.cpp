@@ -34,6 +34,7 @@
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
 #include "csutil/vfsplat.h"
+#include "iutil/databuff.h"
 #include "iutil/objreg.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -1218,6 +1219,15 @@ bool csVFS::Sync ()
 	return true;	
 }
 
+bool csVFS::SymbolicLink(const char *Target, const char *Link, int priority)
+{
+  csRef<iDataBuffer> rpath = GetRealPath (Link);
+  if (!rpath->GetSize ())
+    return false;
+  Mount (Target, rpath->GetData ());
+  return true;
+}
+
 bool csVFS::Mount (const char *VirtualPath, const char *RealPath)
 {
   // Mount without priority and autodetect plugin
@@ -1487,8 +1497,9 @@ bool csVFS::LoadMountsFromFile (iConfigFile* file)
 
   /// Get iterator to all mount sections
   csRef<iConfigIterator> iter = file->Enumerate ("VFS.Mount.");
-  while (iter->Next ())
+  while (iter->HasNext ())
   {
+	iter->Next();
     const char *rpath = iter->GetKey (true);
     const char *vpath = iter->GetStr ();
     // Mount the path

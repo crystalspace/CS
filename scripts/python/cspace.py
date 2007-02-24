@@ -6132,6 +6132,30 @@ iParticleBuiltinEffectorLinColor_swigregister = _cspace.iParticleBuiltinEffector
 iParticleBuiltinEffectorLinColor_swigregister(iParticleBuiltinEffectorLinColor)
 iParticleBuiltinEffectorLinColor_scfGetVersion = _cspace.iParticleBuiltinEffectorLinColor_scfGetVersion
 
+CS_PARTICLE_BUILTIN_SPIRAL = _cspace.CS_PARTICLE_BUILTIN_SPIRAL
+CS_PARTICLE_BUILTIN_RADIALPOINT = _cspace.CS_PARTICLE_BUILTIN_RADIALPOINT
+class iParticleBuiltinEffectorVelocityField(iParticleEffector):
+    __swig_setmethods__ = {}
+    for _s in [iParticleEffector]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iParticleBuiltinEffectorVelocityField, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iParticleEffector]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iParticleBuiltinEffectorVelocityField, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetType(*args): return _cspace.iParticleBuiltinEffectorVelocityField_SetType(*args)
+    def GetType(*args): return _cspace.iParticleBuiltinEffectorVelocityField_GetType(*args)
+    def SetFParameter(*args): return _cspace.iParticleBuiltinEffectorVelocityField_SetFParameter(*args)
+    def GetFParameter(*args): return _cspace.iParticleBuiltinEffectorVelocityField_GetFParameter(*args)
+    def GetFParameterCount(*args): return _cspace.iParticleBuiltinEffectorVelocityField_GetFParameterCount(*args)
+    def SetVParameter(*args): return _cspace.iParticleBuiltinEffectorVelocityField_SetVParameter(*args)
+    def GetVParameter(*args): return _cspace.iParticleBuiltinEffectorVelocityField_GetVParameter(*args)
+    def GetVParameterCount(*args): return _cspace.iParticleBuiltinEffectorVelocityField_GetVParameterCount(*args)
+    __swig_destroy__ = _cspace.delete_iParticleBuiltinEffectorVelocityField
+    __del__ = lambda self : None;
+iParticleBuiltinEffectorVelocityField_swigregister = _cspace.iParticleBuiltinEffectorVelocityField_swigregister
+iParticleBuiltinEffectorVelocityField_swigregister(iParticleBuiltinEffectorVelocityField)
+
 class iParticleBuiltinEffectorFactory(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -6143,6 +6167,7 @@ class iParticleBuiltinEffectorFactory(iBase):
     __repr__ = _swig_repr
     def CreateForce(*args): return _cspace.iParticleBuiltinEffectorFactory_CreateForce(*args)
     def CreateLinColor(*args): return _cspace.iParticleBuiltinEffectorFactory_CreateLinColor(*args)
+    def CreateVelocityField(*args): return _cspace.iParticleBuiltinEffectorFactory_CreateVelocityField(*args)
     __swig_destroy__ = _cspace.delete_iParticleBuiltinEffectorFactory
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleBuiltinEffectorFactory_scfGetVersion
@@ -6855,6 +6880,7 @@ class iVFS(iBase):
     def WriteFile(*args): return _cspace.iVFS_WriteFile(*args)
     def DeleteFile(*args): return _cspace.iVFS_DeleteFile(*args)
     def Sync(*args): return _cspace.iVFS_Sync(*args)
+    def SymbolicLink(*args): return _cspace.iVFS_SymbolicLink(*args)
     def Mount(*args): return _cspace.iVFS_Mount(*args)
     def Unmount(*args): return _cspace.iVFS_Unmount(*args)
     def MountRoot(*args): return _cspace.iVFS_MountRoot(*args)
@@ -7885,6 +7911,7 @@ class iConfigIterator(iBase):
     def GetSubsection(*args): return _cspace.iConfigIterator_GetSubsection(*args)
     def Rewind(*args): return _cspace.iConfigIterator_Rewind(*args)
     def Next(*args): return _cspace.iConfigIterator_Next(*args)
+    def HasNext(*args): return _cspace.iConfigIterator_HasNext(*args)
     def GetKey(*args): return _cspace.iConfigIterator_GetKey(*args)
     def GetInt(*args): return _cspace.iConfigIterator_GetInt(*args)
     def GetFloat(*args): return _cspace.iConfigIterator_GetFloat(*args)
@@ -8863,6 +8890,7 @@ class iShaderVariableContext(iBase):
     def IsEmpty(*args): return _cspace.iShaderVariableContext_IsEmpty(*args)
     def ReplaceVariable(*args): return _cspace.iShaderVariableContext_ReplaceVariable(*args)
     def Clear(*args): return _cspace.iShaderVariableContext_Clear(*args)
+    def RemoveVariable(*args): return _cspace.iShaderVariableContext_RemoveVariable(*args)
     __swig_destroy__ = _cspace.delete_iShaderVariableContext
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iShaderVariableContext_scfGetVersion
@@ -9846,6 +9874,8 @@ class iJoint(iBase):
     def GetDesiredVelocity(*args): return _cspace.iJoint_GetDesiredVelocity(*args)
     def SetMaxForce(*args): return _cspace.iJoint_SetMaxForce(*args)
     def GetMaxForce(*args): return _cspace.iJoint_GetMaxForce(*args)
+    def SetAngularConstraintAxis(*args): return _cspace.iJoint_SetAngularConstraintAxis(*args)
+    def GetAngularConstraintAxis(*args): return _cspace.iJoint_GetAngularConstraintAxis(*args)
     __swig_destroy__ = _cspace.delete_iJoint
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iJoint_scfGetVersion
@@ -9993,32 +10023,10 @@ class iODEJointState(iBase):
     def SetStopCFM(*args): return _cspace.iODEJointState_SetStopCFM(*args)
     def SetSuspensionERP(*args): return _cspace.iODEJointState_SetSuspensionERP(*args)
     def SetSuspensionCFM(*args): return _cspace.iODEJointState_SetSuspensionCFM(*args)
-    def SetLoStop2(*args): return _cspace.iODEJointState_SetLoStop2(*args)
-    def SetHiStop2(*args): return _cspace.iODEJointState_SetHiStop2(*args)
-    def SetVel2(*args): return _cspace.iODEJointState_SetVel2(*args)
-    def SetFMax2(*args): return _cspace.iODEJointState_SetFMax2(*args)
-    def SetFudgeFactor2(*args): return _cspace.iODEJointState_SetFudgeFactor2(*args)
-    def SetBounce2(*args): return _cspace.iODEJointState_SetBounce2(*args)
-    def SetCFM2(*args): return _cspace.iODEJointState_SetCFM2(*args)
-    def SetStopERP2(*args): return _cspace.iODEJointState_SetStopERP2(*args)
-    def SetStopCFM2(*args): return _cspace.iODEJointState_SetStopCFM2(*args)
-    def SetSuspensionERP2(*args): return _cspace.iODEJointState_SetSuspensionERP2(*args)
-    def SetSuspensionCFM2(*args): return _cspace.iODEJointState_SetSuspensionCFM2(*args)
-    def SetLoStop3(*args): return _cspace.iODEJointState_SetLoStop3(*args)
-    def SetHiStop3(*args): return _cspace.iODEJointState_SetHiStop3(*args)
-    def SetVel3(*args): return _cspace.iODEJointState_SetVel3(*args)
-    def SetFMax3(*args): return _cspace.iODEJointState_SetFMax3(*args)
-    def SetFudgeFactor3(*args): return _cspace.iODEJointState_SetFudgeFactor3(*args)
-    def SetBounce3(*args): return _cspace.iODEJointState_SetBounce3(*args)
-    def SetCFM3(*args): return _cspace.iODEJointState_SetCFM3(*args)
-    def SetStopERP3(*args): return _cspace.iODEJointState_SetStopERP3(*args)
-    def SetStopCFM3(*args): return _cspace.iODEJointState_SetStopCFM3(*args)
-    def SetSuspensionERP3(*args): return _cspace.iODEJointState_SetSuspensionERP3(*args)
-    def SetSuspensionCFM3(*args): return _cspace.iODEJointState_SetSuspensionCFM3(*args)
-    def GetLoStop(*args): return _cspace.iODEJointState_GetLoStop(*args)
-    def GetHiStop(*args): return _cspace.iODEJointState_GetHiStop(*args)
+    def GetLowStop(*args): return _cspace.iODEJointState_GetLowStop(*args)
+    def GetHighStop(*args): return _cspace.iODEJointState_GetHighStop(*args)
     def GetVel(*args): return _cspace.iODEJointState_GetVel(*args)
-    def GetFMax(*args): return _cspace.iODEJointState_GetFMax(*args)
+    def GetMaxForce(*args): return _cspace.iODEJointState_GetMaxForce(*args)
     def GetFudgeFactor(*args): return _cspace.iODEJointState_GetFudgeFactor(*args)
     def GetBounce(*args): return _cspace.iODEJointState_GetBounce(*args)
     def GetCFM(*args): return _cspace.iODEJointState_GetCFM(*args)
@@ -10026,31 +10034,6 @@ class iODEJointState(iBase):
     def GetStopCFM(*args): return _cspace.iODEJointState_GetStopCFM(*args)
     def GetSuspensionERP(*args): return _cspace.iODEJointState_GetSuspensionERP(*args)
     def GetSuspensionCFM(*args): return _cspace.iODEJointState_GetSuspensionCFM(*args)
-    def GetLoStop2(*args): return _cspace.iODEJointState_GetLoStop2(*args)
-    def GetHiStop2(*args): return _cspace.iODEJointState_GetHiStop2(*args)
-    def GetVel2(*args): return _cspace.iODEJointState_GetVel2(*args)
-    def GetFMax2(*args): return _cspace.iODEJointState_GetFMax2(*args)
-    def GetFudgeFactor2(*args): return _cspace.iODEJointState_GetFudgeFactor2(*args)
-    def GetBounce2(*args): return _cspace.iODEJointState_GetBounce2(*args)
-    def GetCFM2(*args): return _cspace.iODEJointState_GetCFM2(*args)
-    def GetStopERP2(*args): return _cspace.iODEJointState_GetStopERP2(*args)
-    def GetStopCFM2(*args): return _cspace.iODEJointState_GetStopCFM2(*args)
-    def GetSuspensionERP2(*args): return _cspace.iODEJointState_GetSuspensionERP2(*args)
-    def GetSuspensionCFM2(*args): return _cspace.iODEJointState_GetSuspensionCFM2(*args)
-    def GetLoStop3(*args): return _cspace.iODEJointState_GetLoStop3(*args)
-    def GetHiStop3(*args): return _cspace.iODEJointState_GetHiStop3(*args)
-    def GetVel3(*args): return _cspace.iODEJointState_GetVel3(*args)
-    def GetFMax3(*args): return _cspace.iODEJointState_GetFMax3(*args)
-    def GetFudgeFactor3(*args): return _cspace.iODEJointState_GetFudgeFactor3(*args)
-    def GetBounce3(*args): return _cspace.iODEJointState_GetBounce3(*args)
-    def GetCFM3(*args): return _cspace.iODEJointState_GetCFM3(*args)
-    def GetStopERP3(*args): return _cspace.iODEJointState_GetStopERP3(*args)
-    def GetStopCFM3(*args): return _cspace.iODEJointState_GetStopCFM3(*args)
-    def GetSuspensionERP3(*args): return _cspace.iODEJointState_GetSuspensionERP3(*args)
-    def GetSuspensionCFM3(*args): return _cspace.iODEJointState_GetSuspensionCFM3(*args)
-    def SetHinge2Axis1(*args): return _cspace.iODEJointState_SetHinge2Axis1(*args)
-    def SetHinge2Axis2(*args): return _cspace.iODEJointState_SetHinge2Axis2(*args)
-    def SetHinge2Anchor(*args): return _cspace.iODEJointState_SetHinge2Anchor(*args)
     __swig_destroy__ = _cspace.delete_iODEJointState
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iODEJointState_scfGetVersion

@@ -245,9 +245,9 @@ namespace Threading
       int32 result;
       __asm__ __volatile__
       (
-      "lock; xaddl"
+      "lock; xaddl %0, %1"
       : "=r" (result), "=m" (*target)
-      : "0" (incr), "=m" (*target)
+      : "0" (incr), "m" (*target)
       : "memory"
       );
       return result;

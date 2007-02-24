@@ -131,6 +131,10 @@ public:
   /// Close all opened archives, free temporary storage etc.
   virtual bool Sync ();
 
+  /// Create or add a symbolic link
+  virtual bool SymbolicLink(const char *Target, const char *Link = 0, 
+    int priority = 0);
+
   /// Mount an VFS path on a "real-world-filesystem" path
   virtual bool Mount (const char *VirtualPath, const char *RealPath);
   /// Unmount an VFS path; if RealPath is 0, entire VirtualPath is unmounted

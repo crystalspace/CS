@@ -478,99 +478,179 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
     }
 
     csRef<iParticleEffector> effector;
-    csVector3 force (0.0f), acceleration (0.0f);
-    csVector3 randomAcc (0.0f, 0.0f, 0.0f);
-    csArray<float> timeList;
-    csArray<csColor> colorList;
-
-    csRef<iDocumentNodeIterator> it = node->GetNodes ();
-    while (it->HasNext ())
-    {
-      csRef<iDocumentNode> child = it->Next ();
-
-      if (child->GetType () != CS_NODE_ELEMENT) 
-        continue;
-
-      const char* value = child->GetValue ();
-      csStringID id = xmltokens.Request (value);
-      switch(id)
-      {
-      case XMLTOKEN_ACCELERATION:
-        {
-          if (!synldr->ParseVector (child, acceleration))
-          {
-            synldr->ReportError ("crystalspace.particleloader.parseeffector", child,
-              "Error parsing acceleration!");
-          }
-        }
-        break;
-      case XMLTOKEN_FORCE:
-        {
-          if (!synldr->ParseVector (child, force))
-          {
-            synldr->ReportError ("crystalspace.particleloader.parseeffector", child,
-              "Error parsing force!");
-          }
-        }
-        break;
-      case XMLTOKEN_RANDOMACCELERATION:
-	{
-	  csRef<iDocumentAttribute> attr = child->GetAttribute ("x");
-	  if (attr)
-	  {
-            if (!synldr->ParseVector (child, randomAcc))
-            {
-              synldr->ReportError ("crystalspace.particleloader.parseeffector", child,
-                "Error parsing randomacceleration!");
-            }
-	  }
-	  else
-	  {
-            float r = child->GetContentsValueAsFloat ();
-	    randomAcc.Set (r, r, r);
-	  }
-	}
-        break;
-      case XMLTOKEN_COLOR:
-        {
-          csColor c;
-          float t (0.0f);
-          
-          if (!synldr->ParseColor (child, c))
-          {
-            synldr->ReportError ("crystalspace.particleloader.parseeffector", child,
-              "Error parsing color!");
-          }
-          
-          t = child->GetAttributeValueAsFloat ("time");
-          colorList.Push (c);
-          timeList.Push (t);
-        }
-        break;
-      default:
-        synldr->ReportBadToken (child);
-        return 0;
-      }
-    }
-
 
     if (!strcasecmp (effectorType, "force"))
     {
       csRef<iParticleBuiltinEffectorForce> forceEffector = factory->CreateForce ();
       effector = forceEffector;
-      forceEffector->SetAcceleration (acceleration);
-      forceEffector->SetForce (force);
-      forceEffector->SetRandomAcceleration (randomAcc);
+
+      csRef<iDocumentNodeIterator> it = node->GetNodes ();
+      while (it->HasNext ())
+      {
+        csRef<iDocumentNode> child = it->Next ();
+
+        if (child->GetType () != CS_NODE_ELEMENT) 
+          continue;
+
+        const char* value = child->GetValue ();
+        csStringID id = xmltokens.Request (value);
+        switch(id)
+        {
+        case XMLTOKEN_ACCELERATION:
+          {
+            csVector3 acceleration;
+            if (!synldr->ParseVector (child, acceleration))
+            {
+              synldr->ReportError ("crystalspace.particleloader.parseeffector", child,
+                "Error parsing acceleration!");
+            }
+
+            forceEffector->SetAcceleration (acceleration);
+          }
+          break;
+        case XMLTOKEN_FORCE:
+          {
+            csVector3 force;
+            if (!synldr->ParseVector (child, force))
+            {
+              synldr->ReportError ("crystalspace.particleloader.parseeffector", child,
+                "Error parsing force!");
+            }
+            forceEffector->SetForce (force);
+          }
+          break;
+        case XMLTOKEN_RANDOMACCELERATION:
+          {
+            csVector3 randomAcc;
+            csRef<iDocumentAttribute> attr = child->GetAttribute ("x");
+            if (attr)
+            {
+              if (!synldr->ParseVector (child, randomAcc))
+              {
+                synldr->ReportError ("crystalspace.particleloader.parseeffector", child,
+                  "Error parsing randomacceleration!");
+              }
+            }
+            else
+            {
+              float r = child->GetContentsValueAsFloat ();
+              randomAcc.Set (r, r, r);
+            }
+
+            forceEffector->SetRandomAcceleration (randomAcc);
+          }
+          break;
+        default:
+          synldr->ReportBadToken (child); 
+          return 0;
+        }
+      }
     }
     else if (!strcasecmp (effectorType, "lincolor"))
     {
       csRef<iParticleBuiltinEffectorLinColor> colorEffector = 
         factory->CreateLinColor ();
       effector = colorEffector;
-      for (size_t i = 0; i < colorList.GetSize (); ++i)
+
+      csRef<iDocumentNodeIterator> it = node->GetNodes ();
+      while (it->HasNext ())
       {
-        colorEffector->AddColor (colorList[i], timeList[i]);
+        csRef<iDocumentNode> child = it->Next ();
+
+        if (child->GetType () != CS_NODE_ELEMENT) 
+          continue;
+
+        const char* value = child->GetValue ();
+        csStringID id = xmltokens.Request (value);
+        switch(id)
+        {
+        case XMLTOKEN_COLOR:
+          {
+            csColor c;
+            float t (0.0f);
+
+            if (!synldr->ParseColor (child, c))
+            {
+              synldr->ReportError ("crystalspace.particleloader.parseeffector", child,
+                "Error parsing color!");
+            }
+
+            t = child->GetAttributeValueAsFloat ("time");
+            colorEffector->AddColor (c, t);
+          }
+          break;
+        default:
+          synldr->ReportBadToken (child);
+          return 0;
+        }
       }
+
+    }
+    else if (!strcasecmp (effectorType, "velocityfield"))
+    {
+      csRef<iParticleBuiltinEffectorVelocityField> vfEffector = 
+        factory->CreateVelocityField ();
+      effector = vfEffector;
+      
+      size_t vparamID = 0, fparamID = 0;
+
+      csRef<iDocumentNodeIterator> it = node->GetNodes ();
+      while (it->HasNext ())
+      {
+        csRef<iDocumentNode> child = it->Next ();
+
+        if (child->GetType () != CS_NODE_ELEMENT) 
+          continue;
+
+        const char* value = child->GetValue ();
+        csStringID id = xmltokens.Request (value);
+        switch(id)
+        {
+        case XMLTOKEN_TYPE:
+          {
+            const char* type = child->GetContentsValue ();
+
+            if (!strcasecmp (type, "spiral"))
+            {
+              vfEffector->SetType (CS_PARTICLE_BUILTIN_SPIRAL);
+            }
+            else if (!strcasecmp (type, "radialpoint"))
+            {
+              vfEffector->SetType (CS_PARTICLE_BUILTIN_RADIALPOINT);
+            }
+            else
+            {
+              synldr->ReportError ("crystalspace.particleloader.parseeffector", node,
+                "Unknown force field type (%s)!", type);
+            }
+          }
+          break;
+        case XMLTOKEN_VPARAM:
+          {
+            csVector3 v;
+
+            if (!synldr->ParseVector (child, v))
+            {
+              synldr->ReportError ("crystalspace.particleloader.parseeffector", child,
+                "Error parsing vparam!");
+            }
+            vfEffector->SetVParameter (vparamID++, v);
+          }
+          break;
+        case XMLTOKEN_FPARAM:
+          {
+            float f = child->GetContentsValueAsFloat ();
+
+            vfEffector->SetFParameter (fparamID++, f);
+          }
+          break;
+        default:
+          synldr->ReportBadToken (child);
+          return 0;
+        }
+      }
+
+      
     }
     else
     {
@@ -1151,9 +1231,57 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
         synldr->WriteColor (colorNode, c);
         colorNode->SetAttributeAsFloat ("time", t);
       }
+
+      return true;
     }
 
-    return true;
+    csRef<iParticleBuiltinEffectorVelocityField> vfEffector =
+      scfQueryInterface<iParticleBuiltinEffectorVelocityField> (effector);
+
+    if (vfEffector)
+    {
+      effectorNode->SetAttribute ("type", "velocityfield");
+
+      csRef<iDocumentNode> typeNode = effectorNode->CreateNodeBefore (
+        CS_NODE_ELEMENT);
+      typeNode->SetValue ("type");
+      switch (vfEffector->GetType ())
+      {
+      case CS_PARTICLE_BUILTIN_SPIRAL:
+        typeNode->CreateNodeBefore (CS_NODE_TEXT)->SetValue ("spiral");
+        break;
+      case CS_PARTICLE_BUILTIN_RADIALPOINT:
+        typeNode->CreateNodeBefore (CS_NODE_TEXT)->SetValue ("radialpoint");
+        break;
+      default:
+        typeNode->CreateNodeBefore (CS_NODE_TEXT)->SetValue ("spiral");
+      }
+
+      for (size_t i = 0; i < vfEffector->GetFParameterCount (); ++i)
+      {
+        float value = vfEffector->GetFParameter (i);
+        csRef<iDocumentNode> fvNode = effectorNode->CreateNodeBefore (
+          CS_NODE_ELEMENT);
+
+        fvNode->SetValue ("fparam");
+        fvNode->CreateNodeBefore (CS_NODE_TEXT)->SetValueAsFloat (value);
+      }
+
+      for (size_t i = 0; i < vfEffector->GetVParameterCount (); ++i)
+      {
+        csVector3 value = vfEffector->GetVParameter (i);
+        csRef<iDocumentNode> vvNode = effectorNode->CreateNodeBefore (
+          CS_NODE_ELEMENT);
+
+        vvNode->SetValue ("vparam");
+        synldr->WriteVector (vvNode, value);
+      }
+
+
+      return true;
+    }
+
+    return false;
   }
 
 

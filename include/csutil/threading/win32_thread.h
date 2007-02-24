@@ -43,6 +43,8 @@ namespace Implementation
   public:
     ThreadBase (Runnable* runnable);
 
+    ~ThreadBase ();
+
     void Start ();
 
     void Stop ();
@@ -64,7 +66,7 @@ namespace Implementation
     mutable void* threadHandle;
     uint threadId;
 
-    bool isRunning;
+    int32 isRunning;
   };
 
 

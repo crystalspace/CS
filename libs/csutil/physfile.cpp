@@ -20,6 +20,7 @@
 #include "csutil/physfile.h"
 #include "csutil/databuf.h"
 #include <stdlib.h>
+#include <sys/stat.h>
 
 
 int csPhysicalFile::GetStatus() { return last_error; }
@@ -28,6 +29,17 @@ csPhysicalFile::csPhysicalFile(char const* apath, char const* mode)
   : scfImplementationType (this), fp(0), path(apath), owner(true), 
   last_error(VFS_STATUS_OK)
 {
+  struct stat buf;
+  if (stat (apath, &buf))
+  {
+    last_error = VFS_STATUS_OTHER;
+    return;
+  }
+  if (!(buf.st_mode & S_IFREG))
+  {
+    last_error = VFS_STATUS_OTHER;
+    return;
+  }
   fp = fopen(apath, mode);
   if (fp == 0)
     last_error = VFS_STATUS_ACCESSDENIED;

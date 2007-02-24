@@ -25,6 +25,49 @@
 
 #include "csutil/threading/mutex.h"
 
+namespace CS
+{
+namespace Threading
+{
+/**
+ * Priority values indicate how frequently a thread runs compared to other threads.
+ * Thread scheduling is handled by the underlying OS, and so the true meaning of these
+ * values will vary depending on platform.  A minimal set of values is defined for CS
+ * so that chances of support of the full range of values by the platform are greater.
+ */
+enum ThreadPriority
+{
+  /// Reduced thread priority. Useful for background tasks.
+  THREAD_PRIO_LOW,
+
+  /// Normal thread priority.
+  THREAD_PRIO_NORMAL,
+
+  /**
+   * Increased thread priority. Useful for tasks that needs precedence over
+   * all other.
+   */
+  THREAD_PRIO_HIGH
+};
+
+/**
+ * Abstract base class for objects to be run in threads.
+ * The lifetime of the Runnable object must at least be as long as the thread
+ * object.
+ */
+class Runnable : public csRefCount, private CS::NonCopyable
+{
+public:
+  /**
+   * Main method for thread.
+   * Will be called as soon as the thread is started and thread will be active
+   * until it returns.
+   */
+  virtual void Run () = 0;
+};
+
+}
+}
 
 // Include implementation specific versions
 #if defined(CS_PLATFORM_WIN32)
@@ -41,43 +84,6 @@ namespace CS
 {
 namespace Threading
 {
-
-  /**
-   * Priority values indicate how frequently a thread runs compared to other threads.
-   * Thread scheduling is handled by the underlying OS, and so the true meaning of these
-   * values will vary depending on platform.  A minimal set of values is defined for CS
-   * so that chances of support of the full range of values by the platform are greater.
-   */
-  enum ThreadPriority
-  {
-    /// Reduced thread priority. Useful for background tasks.
-    THREAD_PRIO_LOW,
-
-    /// Normal thread priority.
-    THREAD_PRIO_NORMAL,
-
-    /**
-     * Increased thread priority. Useful for tasks that needs precedence over
-     * all other.
-     */
-    THREAD_PRIO_HIGH
-  };
-
-  /**
-   * Abstract base class for objects to be run in threads.
-   * The lifetime of the Runnable object must at least be as long as the thread
-   * object.
-   */
-  class Runnable : public csRefCount, private CS::NonCopyable
-  {
-  public:
-    /**
-     * Main method for thread.
-     * Will be called as soon as the thread is started and thread will be active
-     * until it returns.
-     */
-    virtual void Run () = 0;
-  };
   
   /**
    * Object representing a separate execution thread.
@@ -126,6 +132,12 @@ namespace Threading
 
       if (start)
         Start ();
+    }
+  
+    ~Thread ()
+    {
+      if (IsRunning ())
+        Stop ();
     }
 
     /**

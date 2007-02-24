@@ -39,9 +39,6 @@ namespace Implementation
   {
   }  
 
-  /**
-   *
-   */
   class ConditionBase
   {
   public:

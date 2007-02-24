@@ -39,16 +39,15 @@ struct ThreadProxyData
 
 DWORD WINAPI ThreadProxy (LPVOID args)
 {
-  ThreadProxyData* data = reinterpret_cast<ThreadProxyData*>(args);
+  ThreadProxyData* data = static_cast<ThreadProxyData*>(args);
   DWORD ret = data->startAddress (data->arglist);
   delete data;
   return ret;
 }
 
-inline unsigned _beginthreadex (void* security, unsigned stack_size, 
-                                unsigned (__stdcall* start_address)(void*),
-                                void* arglist, unsigned initflag,
-                                unsigned* thrdaddr)
+inline HANDLE _beginthreadex (void* security, unsigned stack_size, 
+ unsigned (__stdcall* start_address)(void*), void* arglist,
+ unsigned initflag, unsigned* thrdaddr)
 {
   DWORD threadID;
   HANDLE hthread  = CreateThread  (static_cast<LPSECURITY_ATTRIBUTES> (security),
@@ -58,7 +57,7 @@ inline unsigned _beginthreadex (void* security, unsigned stack_size,
   if (hthread!=0)
     *thrdaddr=threadID;
 
-  return reinterpret_cast<unsigned> (hthread);
+  return hthread;
 }
 
 #endif
@@ -76,7 +75,7 @@ namespace Implementation
     class ThreadStartParams
     {
     public:
-      ThreadStartParams (Runnable* runner, bool& isRunningFlag)
+      ThreadStartParams (Runnable* runner, int32& isRunningFlag)
         : runnable (runner), isRunning (isRunningFlag)
       {
       }
@@ -92,14 +91,13 @@ namespace Implementation
       void Started ()
       {
         ScopedLock<Mutex> lock (mutex);
-        isRunning = true;
+        AtomicOperations::Set (&isRunning, 1);
         startCondition.NotifyOne ();
       }
 
       void Stopped ()
       {
-        ScopedLock<Mutex> lock (mutex);
-        isRunning = false;
+        AtomicOperations::Set (&isRunning, 0);
       }
 
     
@@ -107,13 +105,12 @@ namespace Implementation
       Condition startCondition;
 
       Runnable* runnable;
-      bool& isRunning;
+      int32& isRunning;
     };
 
     unsigned int __stdcall proxyFunc (void* param)
     {
-      ThreadStartParams* tp = reinterpret_cast<ThreadStartParams*>
-        (param);
+      ThreadStartParams* tp = static_cast<ThreadStartParams*> (param);
 
       tp->Started ();
 
@@ -138,8 +135,11 @@ namespace Implementation
     {
       ThreadStartParams param (runnable, isRunning);
 
-      threadHandle = reinterpret_cast<void*> (_beginthreadex (0, 0, 
-        &proxyFunc, &param, CREATE_SUSPENDED, &threadId));
+      // _beginthreadex does not always return a void*,
+      // on some versions of MSVC it gives uintptr_t
+      // and therefor needs a reinterpret_cast.
+      threadHandle = reinterpret_cast<void*> (_beginthreadex (0, 0, &proxyFunc, 
+        &param, 0, &threadId));
 
       if (threadHandle == 0)
         return;
@@ -156,14 +156,14 @@ namespace Implementation
       if (res == 0)
       {
         threadHandle = 0;
-        isRunning = false;
+        AtomicOperations::Set (&isRunning, 0);
       }
     }
   }
 
   bool ThreadBase::IsRunning () const
   {
-    return isRunning;
+    return (AtomicOperations::Read ((int32*)&isRunning) != 0);
   }
 
   bool ThreadBase::SetPriority (ThreadPriority prio)

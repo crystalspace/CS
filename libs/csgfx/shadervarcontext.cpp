@@ -87,6 +87,11 @@ void ShaderVariableContextImpl::ReplaceVariable (csShaderVariable *variable)
     variables.InsertSorted (variable, SvCompare);
 }
 
+bool ShaderVariableContextImpl::RemoveVariable (csShaderVariable* variable)
+{
+  return variables.Delete (variable);
+}
+
 } // namespace CS
 
 //---------------------------------------------------------------------------
