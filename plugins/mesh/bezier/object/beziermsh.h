@@ -537,7 +537,7 @@ public:
    * Get the bounding box in object space for this polygon set.
    * This is calculated based on the oriented bounding box.
    */
-  void GetBoundingBox (csBox3& box);
+  const csBox3& GetBoundingBox ();
 
   /**
    * Set the bounding box in object space for this polygon set.
@@ -672,7 +672,8 @@ public:
 
   /** \name iObjectModel implementation
    * @{ */
-  void GetObjectBoundingBox (csBox3& box) { GetBoundingBox (box); }
+  void GetObjectBoundingBox (csBox3& box) { box = GetBoundingBox (); }
+  const csBox3& GetObjectBoundingBox () { return GetBoundingBox (); }
   void SetObjectBoundingBox (const csBox3& box) { SetBoundingBox (box); }
   /** @} */
 

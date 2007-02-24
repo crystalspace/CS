@@ -225,6 +225,7 @@ private:
   csString basePath;
   csPDelArray<csSpriteCal3DSocket> sockets;
   csFlags flags;
+  csBox3 obj_bbox;
 
   struct MeshBuffers
   {
@@ -348,6 +349,7 @@ public:
    * @{ */
   void GetObjectBoundingBox (csBox3& bbox, csVector3 *verts,int vertCount);
   void GetObjectBoundingBox (csBox3& bbox);
+  const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent);
   virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
@@ -756,6 +758,7 @@ public:
    * @{ */
   void GetObjectBoundingBox (csBox3& bbox, csVector3 *verts, int vertCount);
   void GetObjectBoundingBox (csBox3& bbox);
+  const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent);
   virtual iTerraFormer* GetTerraFormerColldet () { return 0; }

@@ -132,12 +132,12 @@
       <fp plugin="glfixed">
         <fixedfp>
           <layer>
-            <alphasource num="0" source="texture" modifier="color" />
+            <alphasource num="0" source="texture" modifier="alpha" />
             <alphaoperation operation="replace" />
           </layer>
           <layer>
-            <alphasource num="0" source="texture" modifier="color" />
-            <alphasource num="1" source="previous layer" modifier="color" />
+            <alphasource num="0" source="texture" modifier="alpha" />
+            <alphasource num="1" source="previous layer" modifier="alpha" />
             <alphaoperation operation="modulate" scale="2" />
           </layer>
         </fixedfp>
@@ -200,12 +200,12 @@
       <fp plugin="glfixed">
         <fixedfp>
           <layer>
-            <alphasource num="0" source="texture" modifier="color" />
+            <alphasource num="0" source="texture" modifier="alpha" />
             <alphaoperation operation="replace" />
           </layer>
           <layer>
-            <alphasource num="0" source="texture" modifier="color" />
-            <alphasource num="1" source="previous layer" modifier="color" />
+            <alphasource num="0" source="texture" modifier="alpha" />
+            <alphasource num="1" source="previous layer" modifier="alpha" />
             <alphaoperation operation="modulate" scale="2" />
           </layer>
         </fixedfp>
@@ -328,12 +328,12 @@
       <fp plugin="glfixed">
         <fixedfp>
           <layer>
-            <alphasource num="0" source="texture" modifier="color" />
+            <alphasource num="0" source="texture" modifier="alpha" />
             <alphaoperation operation="replace" />
           </layer>
           <layer>
-            <alphasource num="0" source="texture" modifier="color" />
-            <alphasource num="1" source="previous layer" modifier="color" />
+            <alphasource num="0" source="texture" modifier="alpha" />
+            <alphasource num="1" source="previous layer" modifier="alpha" />
             <alphaoperation operation="modulate" scale="2" />
           </layer>
         </fixedfp>

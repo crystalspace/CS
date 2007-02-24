@@ -85,9 +85,9 @@ AC_DEFUN([CS_CHECK_PYTHON],
 		[cs_cv_pybase_syslib])
 	    _CS_CHECK_PYTHON_LIBDIR([cs_cv_pybase_lflags],
 		[cs_cv_pybase_syslib], [config])
-	    _CS_CHECK_PYTHON_LIBDIR([cs_cv_pybase_lflags],
+	    _CS_CHECK_PYTHON_LIBDIR([cs_cv_pybase_sysprefix_lflags],
 		[cs_cv_pybase_sysprefix], [lib])
-	    _CS_CHECK_PYTHON_LIBDIR([cs_cv_pybase_lflags],
+	    _CS_CHECK_PYTHON_LIBDIR([cs_cv_pybase_sysprefix_lflags],
 		[cs_cv_pybase_sysprefix], [libs])
 
 	    cs_cv_pybase_libs=CS_RUN_PATH_NORMALIZE([$PYTHON -c \
@@ -101,7 +101,7 @@ AC_DEFUN([CS_CHECK_PYTHON],
 
 	    AS_IF([test -n "$cs_pyver" &&
 		   test -n "$cs_cv_pybase_cflags" &&
-		   test -n "$cs_cv_pybase_lflags"],
+		   test -n "$cs_cv_pybase_lflags$cs_cv_pybase_sysprefix_lflags"],
 		[cs_cv_python_sdk=yes], [cs_cv_python_sdk=no])])
 
 	# Check if Python SDK is usable.  The most common library name is the
@@ -121,11 +121,24 @@ AC_DEFUN([CS_CHECK_PYTHON],
 	    [CS_EMIT_BUILD_PROPERTY([PYTHON.MODULE_EXT], [$cs_cv_python_ext],
 		[], [], CS_EMITTER_OPTIONAL([$1]))
 	    cs_pywinlib=`echo "$cs_cv_pybase" | sed 's/\.//g'`
-	    cs_pyflags="$cs_pyflags CS_CREATE_TUPLE([],[],[-framework Python])"
-	    cs_pyflags="$cs_pyflags CS_CREATE_TUPLE([],[],[-l$cs_cv_pybase])"
-	    cs_pyflags="$cs_pyflags CS_CREATE_TUPLE([],[],[-l$cs_pywinlib])"
+	    cs_pyflags="$cs_pyflags CS_CREATE_TUPLE([],[],
+	       [$cs_cv_pybase_lflags -framework Python])"
+	    cs_pyflags="$cs_pyflags CS_CREATE_TUPLE([],[],
+	       [$cs_cv_pybase_sysprefix_lflags -framework Python])"
+	    cs_pyflags="$cs_pyflags CS_CREATE_TUPLE([],[],
+	       [$cs_cv_pybase_lflags -l$cs_cv_pybase])"
+	    cs_pyflags="$cs_pyflags CS_CREATE_TUPLE([],[],
+	       [$cs_cv_pybase_sysprefix_lflags -l$cs_cv_pybase])"
+	    cs_pyflags="$cs_pyflags CS_CREATE_TUPLE([],[],
+	       [$cs_cv_pybase_lflags -l$cs_pywinlib])"
+	    cs_pyflags="$cs_pyflags CS_CREATE_TUPLE([],[],
+	       [$cs_cv_pybase_sysprefix_lflags -l$cs_pywinlib])"
 	    cs_pyflags="$cs_pyflags CS_CREATE_TUPLE(
-	    [],[-bundle -flat_namespace -undefined suppress])"
+	       [],[-bundle -flat_namespace -undefined suppress],
+	       [$cs_cv_pybase_lflags])"
+	    cs_pyflags="$cs_pyflags CS_CREATE_TUPLE(
+	       [],[-bundle -flat_namespace -undefined suppress],
+	       [$cs_cv_pybase_sysprefix_lflags])"
 	    CS_CHECK_BUILD([if python SDK is usable], [cs_cv_python],
 		[AC_LANG_PROGRAM([[#include <Python.h>]],
 		    [Py_Initialize(); Py_Finalize();])],
@@ -133,7 +146,7 @@ AC_DEFUN([CS_CHECK_PYTHON],
 		[CS_EMIT_BUILD_RESULT([cs_cv_python], [PYTHON],
 		    CS_EMITTER_OPTIONAL([$1]))], [], [],
 		[$cs_cv_pybase_cflags $cs_cv_sys_pthread_cflags],
-		[$cs_cv_pybase_lflags $cs_cv_sys_pthread_lflags],
+		[                     $cs_cv_sys_pthread_lflags],
 		[$cs_cv_pybase_libs   $cs_cv_sys_pthread_libs])],
 	    [cs_cv_python=no])],
 	[cs_cv_python=no])])

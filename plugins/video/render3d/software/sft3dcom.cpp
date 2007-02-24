@@ -52,6 +52,7 @@
 #include "sft3dcom.h"
 #include "soft_txt.h"
 #include "clip_znear.h"
+#include "vertextransform.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 {
@@ -215,6 +216,8 @@ bool csSoftwareGraphics3DCommon::Open ()
 
   SetupSpecifica();
 
+  vertexTransform = new VertexTransform;
+
   csRef<iDefaultShader> shaderPlugin = csLoadPlugin<iDefaultShader> (
     plugin_mgr, "crystalspace.graphics3d.shader.software");
   if (!shaderPlugin.IsValid())
@@ -272,6 +275,7 @@ void csSoftwareGraphics3DCommon::Close ()
   memset (triDraw, 0, sizeof (triDraw));
   delete specifica; specifica = 0;
   delete[] ilaceSaveBuf; ilaceSaveBuf = 0;
+  delete vertexTransform; vertexTransform = 0;
 
   G2D->Close ();
   width = height = -1;
@@ -1061,45 +1065,10 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
 
   csRenderBufferLock<uint8, iRenderBuffer*> indices (indexbuf, CS_BUF_LOCK_READ);
 
-  const csMatrix3& w2c_m = w2c.GetO2T();
-  const csMatrix3& o2w_m = mesh->object2world.GetO2T();
-  const csVector3& w2c_t = w2c.GetO2TTranslation();
-  const csVector3& o2w_t = mesh->object2world.GetO2TTranslation();
-  csReversibleTransform object2camera (
-    o2w_m * w2c_m,
-    w2c_t + w2c_m.GetTranspose()*o2w_t);
+  size_t rangeStart = indexbuf->GetRangeStart();
+  size_t rangeEnd = indexbuf->GetRangeEnd();
 
-  const size_t rangeStart = indexbuf->GetRangeStart();
-  const size_t rangeEnd = indexbuf->GetRangeEnd();
-
-  if (!object2camera.IsIdentity())
-  {
-    if (!translatedVerts.IsValid()
-      || (translatedVerts->GetElementCount() <= rangeEnd))
-    {
-      translatedVerts = csRenderBuffer::CreateRenderBuffer (
-	rangeEnd + 1, CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
-    }
-
-    iRenderBuffer* vbuf = activebuffers[VATTR_SPEC(POSITION)];
-    csRenderBufferLock<csVector3, iRenderBuffer*> f1 (vbuf, CS_BUF_LOCK_READ);
-    if (!f1) return; 
-    csVector3* tr_verts = 
-      (csVector3*)translatedVerts->Lock (CS_BUF_LOCK_NORMAL);
-
-    size_t i;
-    const size_t maxVert = csMin (rangeEnd, vbuf->GetElementCount());
-    // Make sure we don't process too many vertices;
-    for (i = rangeStart; i <= maxVert; i++)
-    {
-      tr_verts[i] = object2camera.This2Other (f1[i]);
-    }
-
-    translatedVerts->Release();
-
-    activebuffers[VATTR_SPEC(POSITION)] = translatedVerts;
-  }
-
+  // @@@ Hm... color processing, probably *after* TransformVertices()...
   const bool alphaScale = ((modes.mixmode & CS_FX_MASK_ALPHA) != 0);
   if (pixelBGR || alphaScale)
   {
@@ -1125,21 +1094,44 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     }
   }
 
+  VerticesLTN inBuffers;
+  VerticesLTN outBuffers;
+  size_t useCompNum[activeBufferCount];
+  size_t* compPtr = useCompNum;
+  const size_t* compNum = renderInfoMesh.bufferComps;
+  for (size_t b = 0; b < activeBufferCount; b++)
+  {
+    if (renderInfoMesh.desiredBuffers & (1 << b))
+    {
+      *compPtr++ = *compNum++;
+    }
+    else if (b == CS_SOFT3D_VA_BUFINDEX(POSITION))
+    {
+      *compPtr++ = 3;
+    }
+  }
+  uint useBuffers = 
+    renderInfoMesh.desiredBuffers | CS_SOFT3D_BUFFERFLAG(POSITION);
+  inBuffers.Linearize (activebuffers, useCompNum, useBuffers);
+  outBuffers.SetupEmpty (useCompNum, useBuffers);
+
+  csTriangle* triangles;
+  size_t trianglesCount;
+  vertexTransform->TransformVertices (mesh->object2world, w2c,
+    indexbuf, mesh->meshtype, inBuffers, 
+    mesh->indexstart, mesh->indexend, triangles, trianglesCount,
+    outBuffers, rangeStart, rangeEnd);
+
   const csRenderMeshType meshtype = mesh->meshtype;
   if ((meshtype >= CS_MESHTYPE_TRIANGLES) 
     && (meshtype <= CS_MESHTYPE_TRIANGLEFAN))
   {
-    size_t stride = indexbuf->GetElementDistance();
-    uint8* tri = indices + mesh->indexstart*stride;
-    const uint8* triEnd = indices + mesh->indexend*stride;
-
     const uint triDrawIndex = 
       CS_MIXMODE_BLENDOP_SRC(usedModes.mixmode)*CS_MIXMODE_FACT_COUNT
       + CS_MIXMODE_BLENDOP_DST(usedModes.mixmode);
 
-    triDraw[triDrawIndex]->DrawMesh (activebuffers, rangeStart, rangeEnd, mesh, 
-      renderInfoMesh, meshtype, tri, triEnd, stride, 
-      indexbuf->GetComponentType());
+    triDraw[triDrawIndex]->DrawMesh (outBuffers, rangeStart, rangeEnd, mesh, 
+      renderInfoMesh, triangles, trianglesCount);
   }
 }
 

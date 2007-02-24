@@ -32,7 +32,6 @@ WALKALL.PLUGINLIST =
   dynavis
   particles
   particlesldr
-  partphys_simple
   emit
   emitldr
   engine

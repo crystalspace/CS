@@ -865,7 +865,7 @@ void csGenmeshSkelAnimationControl::TransformVerticesToBones (const csVector3* v
     {
       csSkelBone *p = static_cast<csSkelBone*> (f_bones[i]->GetParent ());
       size_t parent_index = f_bones.Find (p);
-      csRef<csSkelBone> child = bones[i];
+      csRef<csSkelBone> child (bones[i]);
       bones[parent_index]->AddBone (child);
       child->SetParent (bones[parent_index]);
     }
@@ -904,7 +904,7 @@ void csGenmeshSkelAnimationControl::TransformVerticesToBones (const csVector3* v
         for (size_t j = 0 ; j < vtgr.Length () ; j++)
         {
           sac_bone_data & g_data = vtgr[j];
-          csRef<csSkelBone> bone = bones[vtgr[j].idx];
+          csRef<csSkelBone> bone (bones[vtgr[j].idx]);
           sac_vertex_data & v_data = bone->GetVertexData ()[g_data.v_idx];
           csReversibleTransform& transform = bone->GetFullTransform ();
           v_data.pos = transform.Other2This (verts[i]);
@@ -927,7 +927,7 @@ void csGenmeshSkelAnimationControl::UpdateBones ()
 
   for (i = 0 ; i < parent_bones.Length () ; i++)
   {
-    csRef<csSkelBone> parent_bone = bones[parent_bones[i]];
+    csRef<csSkelBone> parent_bone (bones[parent_bones[i]]);
     switch (parent_bone->GetMode ())
     {
       case BM_NONE:
@@ -975,7 +975,7 @@ void csGenmeshSkelAnimationControl::UpdateAnimatedVertices (csTicks current,
           for (size_t j = 0 ; j < vtgr.Length () ; j++)
           {
             sac_bone_data & g_data = vtgr[j];
-            csRef<csSkelBone> bone = bones[g_data.idx];
+            csRef<csSkelBone> bone (bones[g_data.idx]);
             sac_vertex_data & v_data = bone->GetVertexData ()[g_data.v_idx];
             csReversibleTransform& transform = bone->GetFullTransform ();
             total_weight += v_data.weight;

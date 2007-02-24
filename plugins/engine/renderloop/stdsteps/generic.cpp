@@ -215,7 +215,8 @@ struct ShaderVarPusher
 };
 
 void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
-                                        const ShaderVarPusher& Pusher, size_t ticket,
+                                        const ShaderVarPusher& Pusher,
+					size_t ticket,
 					meshInfo* meshContexts,
                                         csRenderMesh** meshes, 
                                         size_t num,
@@ -245,6 +246,7 @@ void csGenericRenderStep::RenderMeshes (iRenderView* rview, iGraphics3D* g3d,
     size_t j;
     for (j = 0; j < num; j++)
     {
+      if (!meshContexts[j].render) continue;
       csRenderMesh* mesh = meshes[j];
       iShaderVariableContext* meshContext = meshContexts[j].svc;
       if (meshContext->IsEmpty())
@@ -406,19 +408,29 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
     iMeshWrapper* m = imeshes_scratch[i];
     sameShaderMeshInfo[i].svc = m->GetSVContext();
     sameShaderMeshInfo[i].noclip = m->GetFlags ().Check (CS_ENTITY_NOCLIP);
+    sameShaderMeshInfo[i].render = true;
     // Only get this information if we have a light. Otherwise it is not
     // useful.
     if (light)
     {
-      csVector3 obj_center;
-      m->GetMeshObject ()->GetObjectModel ()->GetRadius (
-      	sameShaderMeshInfo[i].radius, obj_center);
+      iObjectModel* objmodel = m->GetMeshObject ()->GetObjectModel ();
       iMovable* mov = m->GetMovable ();
+#if USE_BOX
+      sameShaderMeshInfo[i].obj_model = objmodel;
+      sameShaderMeshInfo[i].movable = mov;
+#else
+      csVector3 obj_center;
+      objmodel->GetRadius (sameShaderMeshInfo[i].radius, obj_center);
       if (mov->IsFullTransformIdentity ())
+      {
         sameShaderMeshInfo[i].wor_center = obj_center;
+      }
       else
-        sameShaderMeshInfo[i].wor_center = mov->GetFullTransform ().
-		This2Other (obj_center);
+      {
+	csReversibleTransform trans = mov->GetFullTransform ();
+        sameShaderMeshInfo[i].wor_center = trans.This2Other (obj_center);
+      }
+#endif
     }
   }
  
@@ -485,10 +497,34 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
     if (light)
     {
       // @@@ TODO: Better test for DIRECTIONAL and SPOTLIGHT
+#if USE_BOX
+      // We transform the light center to object space and then
+      // we test if the transformed light affects the bounding box.
+      iMovable* mov = sameShaderMeshInfo[n].movable;
+      iObjectModel* obj_model = sameShaderMeshInfo[n].obj_model;
+      const csBox3& obj_bbox = obj_model->GetObjectBoundingBox ();
+      bool isect;
+      if (mov->IsFullTransformIdentity ())
+      {
+        isect = csIntersect3::BoxSphere (obj_bbox,
+	    light_center, cutoff_distance * cutoff_distance);
+      }
+      else
+      {
+        csReversibleTransform trans = mov->GetFullTransform ();
+        csVector3 obj_light_center = trans.Other2This (light_center);
+        isect = csIntersect3::BoxSphere (obj_bbox,
+	    obj_light_center, cutoff_distance * cutoff_distance);
+      }
+      if (!isect)
+	sameShaderMeshInfo[n].render = false;
+#else
       float dist = sqrt (csSquaredDist::PointPoint (
 	sameShaderMeshInfo[n].wor_center, //mesh->worldspace_origin,
       	light_center));
-      if (dist-sameShaderMeshInfo[n].radius > cutoff_distance) continue;
+      if (dist-sameShaderMeshInfo[n].radius > cutoff_distance)
+	sameShaderMeshInfo[n].render = false;
+#endif
     }
     pusher.mesh = mesh;
 
@@ -582,9 +618,9 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   if (numSSM != 0)
   {
     // @@@ Need error reporter
+    pusher.shader = shader;
     if (shader != 0)
     {
-      pusher.shader = shader;
       g3d->SetWorldToCamera (camt.GetInverse ());
       RenderMeshes (rview, g3d, pusher, currentTicket,
       	sameShaderMeshInfo + lastidx,

@@ -230,6 +230,11 @@ public:
     SetupObject ();
     bbox = Bounds;
   }
+  virtual const csBox3& GetObjectBoundingBox ()
+  {
+    SetupObject ();
+    return Bounds;
+  }
   virtual void SetObjectBoundingBox (const csBox3& bbox)
   {
     Bounds = bbox;

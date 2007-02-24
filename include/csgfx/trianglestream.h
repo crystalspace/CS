@@ -23,6 +23,9 @@
 /**\file
  */
 
+#include "ivideo/graph3d.h"
+#include "ivideo/rndbuf.h"
+
 namespace CS
 {
   

@@ -34,11 +34,11 @@ class ClipMeatZNear
   int height2;
   float aspect;
 
-  CS_FORCEINLINE void Project (csVector4& v, const float com_iz)
+  CS_FORCEINLINE void Project (csVector3& v, const float com_iz)
   {
     const float clipPos = Z_NEAR;
     const float com_zv = 1.0f / clipPos;
-    v.Set (v.x * com_iz + width2, v.y * com_iz + height2, com_zv, 1.0f);
+    v.Set (v.x * com_iz + width2, v.y * com_iz + height2, com_zv);
   }
 public:
   void Init (int w2, int h2, float a)
@@ -49,21 +49,22 @@ public:
   }
 
   size_t DoClip (const csTriangle& tri, const csVector3* inPersp,
-    VertexOutputBase& voutPersp, const VertexBuffer* inBuffers, 
-    const size_t* inStrides, BuffersMask buffersMask, 
-    VertexOutputBase* vout)
+    VertexOutputPersp& voutPersp, 
+    const VerticesLTN* inBuffers, VerticesLTN* outBuffers)
   {
     const float clipPos = Z_NEAR;
     const float com_zv = 1.0f / clipPos;
     const float com_iz = aspect * com_zv;
-    csVector4 v;
+    csVector3 v;
 
-    const VertexBuffer& bPos = inBuffers[CS_SOFT3D_VA_BUFINDEX(POSITION)];
-    const size_t bPosStride = inStrides[CS_SOFT3D_VA_BUFINDEX(POSITION)];
-    VertexOutputBase& voutPos = vout[CS_SOFT3D_VA_BUFINDEX(POSITION)];
-    const csVector3& va = *(csVector3*)(bPos.data + tri.a * bPosStride);
-    const csVector3& vb = *(csVector3*)(bPos.data + tri.b * bPosStride);
-    const csVector3& vc = *(csVector3*)(bPos.data + tri.c * bPosStride);
+    const float* inData = inBuffers->GetData();
+    const size_t posOffs = 
+      inBuffers->GetOffset (CS_SOFT3D_VA_BUFINDEX(POSITION));
+    const float* bPos = inData + posOffs;
+    const size_t stride = inBuffers->GetStride();
+    const csVector3& va = *(csVector3*)(bPos + tri.a * stride);
+    const csVector3& vb = *(csVector3*)(bPos + tri.b * stride);
+    const csVector3& vc = *(csVector3*)(bPos + tri.c * stride);
     int cnt_vis = int (va.z >= Z_NEAR) +
                   int (vb.z >= Z_NEAR) +
                   int (vc.z >= Z_NEAR);
@@ -74,27 +75,18 @@ public:
       //=====
       return 0;
     }
-    else if (cnt_vis == 3/* || lazyclip*/)
+    else if (cnt_vis == 3)
     {
       //=====
       // Another easy case: all vertices are visible or we are using
       // lazy clipping in which case we draw the triangle completely.
       //=====
-      voutPersp.Write ((float*)&inPersp[tri.a]);
-      voutPersp.Write ((float*)&inPersp[tri.b]);
-      voutPersp.Write ((float*)&inPersp[tri.c]);
-      int n = 0;
-      while (buffersMask != 0)
-      {
-        if (buffersMask & 1)
-        {
-	  vout[n].Copy (tri.a);
-	  vout[n].Copy (tri.b);
-	  vout[n].Copy (tri.c);
-        }
-        buffersMask >>= 1;
-        n++;
-      }
+      voutPersp.Write (inPersp[tri.a]);
+      voutPersp.Write (inPersp[tri.b]);
+      voutPersp.Write (inPersp[tri.c]);
+      outBuffers->AddVertex (inData + tri.a * stride);
+      outBuffers->AddVertex (inData + tri.b * stride);
+      outBuffers->AddVertex (inData + tri.c * stride);
       return 3;
     }
     else if (cnt_vis == 1)
@@ -113,29 +105,22 @@ public:
         // Calculate intersection between a-c and Z=clipPos.
         const float r2 = (clipPos-va.z)/(vc.z-va.z);
 
-	voutPersp.Write ((float*)&inPersp[tri.a]);
+	voutPersp.Write (inPersp[tri.a]);
+        outBuffers->AddVertex (inData + tri.a * stride);
 
-	voutPos.LerpTo ((float*)&v, tri.a, tri.b, r1);
+        CS_ALLOC_STACK_ARRAY(float, v2, inBuffers->GetStride());
+
+        inBuffers->LerpTo (v2, tri.a, tri.b, r1);
+        v.Set (v2[posOffs + 0], v2[posOffs + 1], v2[posOffs + 2]);
 	Project (v, com_iz);
-	voutPersp.Write ((float*)&v);
+	voutPersp.Write (v);
+        outBuffers->AddVertex (v2);
 
-	voutPos.LerpTo ((float*)&v, tri.a, tri.c, r2);
+        inBuffers->LerpTo (v2, tri.a, tri.c, r2);
+        v.Set (v2[posOffs + 0], v2[posOffs + 1], v2[posOffs + 2]);
 	Project (v, com_iz);
-	voutPersp.Write ((float*)&v);
-
-        int n = 0;
-        while (buffersMask != 0)
-        {
-          if (buffersMask & 1)
-          {
-	    // Point a is visible.
-	    vout[n].Copy (tri.a);
-	    vout[n].Lerp (tri.a, tri.b, r1);
-	    vout[n].Lerp (tri.a, tri.c, r2);
-          }
-          buffersMask >>= 1;
-          n++;
-        }
+	voutPersp.Write (v);
+        outBuffers->AddVertex (v2);
       }
       else if (vb.z >= Z_NEAR)
       {
@@ -144,29 +129,22 @@ public:
         // Calculate intersection between b-c and Z=clipPos.
         const float r2 = (clipPos-vb.z)/(vc.z-vb.z);
 
-	voutPos.LerpTo ((float*)&v, tri.b, tri.a, r1);
+        CS_ALLOC_STACK_ARRAY(float, v2, inBuffers->GetStride());
+
+        inBuffers->LerpTo (v2, tri.b, tri.a, r1);
+        v.Set (v2[posOffs + 0], v2[posOffs + 1], v2[posOffs + 2]);
 	Project (v, com_iz);
-	voutPersp.Write ((float*)&v);
+	voutPersp.Write (v);
+        outBuffers->AddVertex (v2);
 
-	voutPersp.Write ((float*)&inPersp[tri.b]);
+	voutPersp.Write (inPersp[tri.b]);
+        outBuffers->AddVertex (inData + tri.b * stride);
 
-	voutPos.LerpTo ((float*)&v, tri.b, tri.c, r2);
+        inBuffers->LerpTo (v2, tri.b, tri.c, r2);
+        v.Set (v2[posOffs + 0], v2[posOffs + 1], v2[posOffs + 2]);
 	Project (v, com_iz);
-	voutPersp.Write ((float*)&v);
-
-        int n = 0;
-        while (buffersMask != 0)
-        {
-          if (buffersMask & 1)
-          {
-	    vout[n].Lerp (tri.b, tri.a, r1);
-	    // Point b is visible
-	    vout[n].Copy (tri.b);
-	    vout[n].Lerp (tri.b, tri.c, r2);
-          }
-          buffersMask >>= 1;
-          n++;
-        }
+	voutPersp.Write (v);
+        outBuffers->AddVertex (v2);
       }
       else
       {
@@ -175,29 +153,22 @@ public:
         // Calculate intersection between c-b and Z=clipPos.
         const float r2 = (clipPos-vc.z)/(vb.z-vc.z);
 
-	voutPos.LerpTo ((float*)&v, tri.c, tri.a, r1);
+        CS_ALLOC_STACK_ARRAY(float, v2, inBuffers->GetStride());
+
+        inBuffers->LerpTo (v2, tri.c, tri.a, r1);
+        v.Set (v2[posOffs + 0], v2[posOffs + 1], v2[posOffs + 2]);
 	Project (v, com_iz);
-	voutPersp.Write ((float*)&v);
+	voutPersp.Write (v);
+        outBuffers->AddVertex (v2);
 
-	voutPos.LerpTo ((float*)&v, tri.c, tri.b, r2);
+        inBuffers->LerpTo (v2, tri.c, tri.b, r2);
+        v.Set (v2[posOffs + 0], v2[posOffs + 1], v2[posOffs + 2]);
 	Project (v, com_iz);
-	voutPersp.Write ((float*)&v);
+	voutPersp.Write (v);
+        outBuffers->AddVertex (v2);
 
-	voutPersp.Write ((float*)&inPersp[tri.c]);
-
-        int n = 0;
-        while (buffersMask != 0)
-        {
-          if (buffersMask & 1)
-          {
-	    vout[n].Lerp (tri.c, tri.a, r1);
-	    vout[n].Lerp (tri.c, tri.b, r2);
-	    // Point c is visible
-	    vout[n].Copy (tri.c);
-          }
-          buffersMask >>= 1;
-          n++;
-        }
+	voutPersp.Write (inPersp[tri.c]);
+        outBuffers->AddVertex (inData + tri.c * stride);
       }
       return 3;
     }
@@ -218,31 +189,24 @@ public:
         // Calculate intersection between a-c and Z=.
         const float r2 = (clipPos-va.z)/(vc.z-va.z);
 
-	voutPos.LerpTo ((float*)&v, tri.a, tri.b, r1);
+        CS_ALLOC_STACK_ARRAY(float, v2, inBuffers->GetStride());
+
+        inBuffers->LerpTo (v2, tri.a, tri.b, r1);
+        v.Set (v2[posOffs + 0], v2[posOffs + 1], v2[posOffs + 2]);
 	Project (v, com_iz);
-	voutPersp.Write ((float*)&v);
+	voutPersp.Write (v);
+        outBuffers->AddVertex (v2);
 
-	voutPersp.Write ((float*)&inPersp[tri.b]);
-	voutPersp.Write ((float*)&inPersp[tri.c]);
+	voutPersp.Write (inPersp[tri.b]);
+        outBuffers->AddVertex (inData + tri.b * stride);
+	voutPersp.Write (inPersp[tri.c]);
+        outBuffers->AddVertex (inData + tri.c * stride);
 
-	voutPos.LerpTo ((float*)&v, tri.a, tri.c, r2);
+        inBuffers->LerpTo (v2, tri.a, tri.c, r2);
+        v.Set (v2[posOffs + 0], v2[posOffs + 1], v2[posOffs + 2]);
 	Project (v, com_iz);
-	voutPersp.Write ((float*)&v);
-
-        int n = 0;
-        while (buffersMask != 0)
-        {
-          if (buffersMask & 1)
-          {
-	    vout[n].Lerp (tri.a, tri.b, r1);
-	    // Point a is not visible.
-	    vout[n].Copy (tri.b);
-	    vout[n].Copy (tri.c);
-	    vout[n].Lerp (tri.a, tri.c, r2);
-          }
-          buffersMask >>= 1;
-          n++;
-        }
+	voutPersp.Write (v);
+        outBuffers->AddVertex (v2);
       }
       else if (vb.z < Z_NEAR)
       {
@@ -251,68 +215,51 @@ public:
         // Calculate intersection between b-c and Z=clipPos.
         const float r2 = (clipPos-vb.z)/(vc.z-vb.z);
 
-	voutPersp.Write ((float*)&inPersp[tri.a]);
+        CS_ALLOC_STACK_ARRAY(float, v2, inBuffers->GetStride());
 
-	voutPos.LerpTo ((float*)&v, tri.b, tri.a, r1);
+	voutPersp.Write (inPersp[tri.a]);
+        outBuffers->AddVertex (inData + tri.a * stride);
+
+        inBuffers->LerpTo (v2, tri.b, tri.a, r1);
+        v.Set (v2[posOffs + 0], v2[posOffs + 1], v2[posOffs + 2]);
 	Project (v, com_iz);
-	voutPersp.Write ((float*)&v);
+	voutPersp.Write (v);
+        outBuffers->AddVertex (v2);
 
-	voutPos.LerpTo ((float*)&v, tri.b, tri.c, r2);
+        inBuffers->LerpTo (v2, tri.b, tri.c, r2);
+        v.Set (v2[posOffs + 0], v2[posOffs + 1], v2[posOffs + 2]);
 	Project (v, com_iz);
-	voutPersp.Write ((float*)&v);
+	voutPersp.Write (v);
+        outBuffers->AddVertex (v2);
 
-	voutPersp.Write ((float*)&inPersp[tri.c]);
-
-        int n = 0;
-        while (buffersMask != 0)
-        {
-          if (buffersMask & 1)
-          {
-	    // Point b is not visible.
-	    vout[n].Copy (tri.a);
-            
-	    vout[n].Lerp (tri.b, tri.a, r1);
-	    vout[n].Lerp (tri.b, tri.c, r2);
-            
-	    vout[n].Copy (tri.c);
-          }
-          buffersMask >>= 1;
-          n++;
-        }
+	voutPersp.Write (inPersp[tri.c]);
+        outBuffers->AddVertex (inData + tri.c * stride);
       }
       else
       {
-        // Calculate intersection between c-a and Z=clipPos.
-        const float r1 = (clipPos-vc.z)/(va.z-vc.z);
         // Calculate intersection between c-b and Z=clipPos.
-        const float r2 = (clipPos-vc.z)/(vb.z-vc.z);
+        const float r1 = (clipPos-vc.z)/(vb.z-vc.z);
+        // Calculate intersection between c-a and Z=clipPos.
+        const float r2 = (clipPos-vc.z)/(va.z-vc.z);
 
-	voutPersp.Write ((float*)&inPersp[tri.a]);
-	voutPersp.Write ((float*)&inPersp[tri.b]);
+        CS_ALLOC_STACK_ARRAY(float, v2, inBuffers->GetStride());
 
-	voutPos.LerpTo ((float*)&v, tri.c, tri.b, r2);
+	voutPersp.Write (inPersp[tri.a]);
+        outBuffers->AddVertex (inData + tri.a * stride);
+	voutPersp.Write (inPersp[tri.b]);
+        outBuffers->AddVertex (inData + tri.b * stride);
+
+        inBuffers->LerpTo (v2, tri.c, tri.b, r1);
+        v.Set (v2[posOffs + 0], v2[posOffs + 1], v2[posOffs + 2]);
 	Project (v, com_iz);
-	voutPersp.Write ((float*)&v);
+	voutPersp.Write (v);
+        outBuffers->AddVertex (v2);
 
-	voutPos.LerpTo ((float*)&v, tri.c, tri.a, r1);
+        inBuffers->LerpTo (v2, tri.c, tri.a, r2);
+        v.Set (v2[posOffs + 0], v2[posOffs + 1], v2[posOffs + 2]);
 	Project (v, com_iz);
-	voutPersp.Write ((float*)&v);
-
-        int n = 0;
-        while (buffersMask != 0)
-        {
-          if (buffersMask & 1)
-          {
-	    // Point c is not visible.
-	    vout[n].Copy (tri.a);
-	    vout[n].Copy (tri.b);
-            
-	    vout[n].Lerp (tri.c, tri.b, r2);
-	    vout[n].Lerp (tri.c, tri.a, r1);
-          }
-          buffersMask >>= 1;
-          n++;
-        }
+	voutPersp.Write (v);
+        outBuffers->AddVertex (v2);
       }
       return 4;
     }

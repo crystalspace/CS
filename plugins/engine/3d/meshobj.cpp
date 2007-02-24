@@ -1018,8 +1018,7 @@ float csMeshWrapper::GetSquaredDistance (iRenderView *rview)
 float csMeshWrapper::GetSquaredDistance (const csVector3& pos)
 {
   // calculate distance from pos to mesh
-  csBox3 obox;
-  GetObjectModel ()->GetObjectBoundingBox (obox);
+  const csBox3& obox = GetObjectModel ()->GetObjectBoundingBox ();
   csVector3 obj_center = (obox.Min () + obox.Max ()) / 2;
   csVector3 wor_center;
   if (movable.IsFullTransformIdentity ())
@@ -1032,7 +1031,7 @@ float csMeshWrapper::GetSquaredDistance (const csVector3& pos)
 
 void csMeshWrapper::GetFullBBox (csBox3& box)
 {
-  GetObjectModel ()->GetObjectBoundingBox (box);
+  box = GetObjectModel ()->GetObjectBoundingBox ();
   csMovable* mov = &movable;
   while (mov)
   {
@@ -1112,8 +1111,7 @@ csHitBeamResult csMeshWrapper::HitBeamBBox (
   const csVector3 &end)
 {
   csHitBeamResult rc;
-  csBox3 b;
-  GetObjectModel ()->GetObjectBoundingBox (b);
+  const csBox3& b = GetObjectModel ()->GetObjectBoundingBox ();
 
   csSegment3 seg (start, end);
   rc.facehit = csIntersect3::BoxSegment (b, seg, rc.isect, &rc.r);
@@ -1126,8 +1124,7 @@ int csMeshWrapper::HitBeamBBox (
   csVector3 &isect,
   float *pr)
 {
-  csBox3 b;
-  GetObjectModel ()->GetObjectBoundingBox (b);
+  const csBox3& b = GetObjectModel ()->GetObjectBoundingBox ();
 
   csSegment3 seg (start, end);
   return csIntersect3::BoxSegment (b, seg, isect, pr);
@@ -1140,11 +1137,10 @@ const csBox3& csMeshWrapper::GetWorldBoundingBox ()
     wor_bbox_movablenr = movable.GetUpdateNumber ();
 
     if (movable.IsFullTransformIdentity ())
-      GetObjectModel ()->GetObjectBoundingBox (wor_bbox);
+      wor_bbox = GetObjectModel ()->GetObjectBoundingBox ();
     else
     {
-      csBox3 obj_bbox;
-      GetObjectModel ()->GetObjectBoundingBox (obj_bbox);
+      const csBox3& obj_bbox = GetObjectModel ()->GetObjectBoundingBox ();
 
       // @@@ Maybe it would be better to really calculate the bounding box
       // here instead of just transforming the object space bounding box?
@@ -1170,8 +1166,8 @@ void csMeshWrapper::GetWorldBoundingBox (csBox3 &cbox)
 csBox3 csMeshWrapper::GetTransformedBoundingBox (
   const csReversibleTransform &trans)
 {
-  csBox3 cbox, box;
-  GetObjectModel ()->GetObjectBoundingBox (box);
+  csBox3 cbox;
+  const csBox3& box = GetObjectModel ()->GetObjectBoundingBox ();
   cbox.StartBoundingBox (trans * box.GetCorner (0));
   cbox.AddBoundingVertexSmart (trans * box.GetCorner (1));
   cbox.AddBoundingVertexSmart (trans * box.GetCorner (2));
