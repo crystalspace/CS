@@ -5487,6 +5487,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *AddLightVisibleCallback = *cspacec::iSector_AddLightVisibleCallback;
 *RemoveLightVisibleCallback = *cspacec::iSector_RemoveLightVisibleCallback;
 *GetSVContext = *cspacec::iSector_GetSVContext;
+*PrecacheDraw = *cspacec::iSector_PrecacheDraw;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -7281,6 +7282,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *DeleteSubMesh = *cspacec::iGeneralFactoryState_DeleteSubMesh;
 *GetSubMeshCount = *cspacec::iGeneralFactoryState_GetSubMeshCount;
 *GetSubMesh = *cspacec::iGeneralFactoryState_GetSubMesh;
+*DisableAutoNormals = *cspacec::iGeneralFactoryState_DisableAutoNormals;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});

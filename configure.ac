@@ -984,8 +984,35 @@ AC_DEFUN([CS_X_CHECK_PREPARE],
     AS_IF([test x$cs_host_macosx = xyes], [with_x=no])])
 
 CS_X_CHECK_PREPARE
-AC_PATH_X
-AC_PATH_XTRA
+# Compatiblity: use --with-x param for individual X lib checks
+AS_IF([test -z "$with_x11"], [with_x11=$with_x])
+# Newer X.org versions ship with pkgconfig packages, which will be picked up
+# by this check
+CS_CHECK_LIB_WITH([x11],
+    [AC_LANG_PROGRAM(
+	[[#include <X11/Xlib.h>]],
+	[XOpenDisplay (0)])])
+AS_IF([test $cs_cv_libx11 = yes],
+    [# Probably "new" X.org
+    AS_IF([test -z "$with_xext"], [with_xext=$with_x])
+    CS_CHECK_LIB_WITH([xext],
+	[AC_LANG_PROGRAM(
+	    [[#include <X11/Xlib.h>
+	    #include <X11/extensions/XShm.h>]],
+	    [XShmCreateImage(0, 0, 0, 0, 0, 0, 0, 0)])], [], [], [],
+	    [$cs_cv_libx11_cflags], 
+	    [$cs_cv_libx11_lflags], 
+	    [$cs_cv_libx11_libs])
+    no_x=no
+    X_CFLAGS="$cs_cv_libxext_cflags $cs_cv_libx11_cflags"
+    X_LFLAGS="$cs_cv_libxext_lflags $cs_cv_libx11_lflags"
+    X_LIBS="$cs_cv_libxext_libs $cs_cv_libx11_libs"
+    ],
+    [# Use "old" autoconf X11 macros
+    AC_PATH_X
+    AC_PATH_XTRA
+    X_LFLAGS=$(X_PRE_LIBS) $(X_LIBS) -lXext -lX11 $(X_EXTRA_LIBS)])
+
 
 AS_IF([test "$no_x" != yes],
     [# We must be especially careful to instruct CS_EMIT_BUILD_PROPERTY() to
@@ -998,15 +1025,10 @@ AS_IF([test "$no_x" != yes],
     # must ensure that those other variables are defined (even if only with an
     # empty string).
     CS_EMIT_BUILD_PROPERTY([X11.AVAILABLE], [yes])
-    CS_EMIT_BUILD_PROPERTY([X_CFLAGS], [$X_CFLAGS], [], [Y])
-    CS_EMIT_BUILD_PROPERTY([X_LIBS], [$X_LIBS], [], [Y])
-    CS_EMIT_BUILD_PROPERTY([X_PRE_LIBS], [$X_PRE_LIBS], [], [Y])
-    CS_EMIT_BUILD_PROPERTY([X_EXTRA_LIBS], [$X_EXTRA_LIBS], [], [Y])
-    CS_EMIT_BUILD_PROPERTY([X11.CFLAGS], [AS_ESCAPE([$(X_CFLAGS)])])
-    CS_EMIT_BUILD_PROPERTY([X11.LFLAGS],
-      [AS_ESCAPE([$(X_PRE_LIBS) $(X_LIBS) -lXext -lX11 $(X_EXTRA_LIBS)])])
+    CS_EMIT_BUILD_PROPERTY([X11.CFLAGS], [$X_CFLAGS])
+    CS_EMIT_BUILD_PROPERTY([X11.LFLAGS], [$X_LIBS $X_LFLAGS])
 
-    CS_CHECK_LIB_WITH([Xxf86vm],
+    CS_CHECK_LIB_WITH([xxf86vm],
 	[AC_LANG_PROGRAM(
 	    [[#define XK_MISCELLANY 1
 	    #include <X11/Xlib.h>
@@ -1015,19 +1037,24 @@ AS_IF([test "$no_x" != yes],
 	    #include <X11/extensions/xf86vmode.h>]],
 	    [XF86VidModeLockModeSwitch(0, 0, 0)])], [], [],
 	[CS_EMIT_BUILD_PROPERTY([XFREE86VM.AVAILABLE], [yes])
-	CS_EMIT_BUILD_PROPERTY([XFREE86VM.CFLAGS], [AS_ESCAPE([$(X_CFLAGS)])])
-	CS_EMIT_BUILD_PROPERTY([XFREE86VM.LFLAGS],
-	    [AS_ESCAPE([$(X_PRE_LIBS) $(X_LIBS) -lXxf86vm -lXext -lX11
-	    $(X_EXTRA_LIBS)])])], [],
-	[$X_CFLAGS], [], [$X_PRE_LIBS $X_LIBS -lX11 -lXext $X_EXTRA_LIBS])
+	CS_EMIT_BUILD_PROPERTY([XFREE86VM.CFLAGS], [$cs_cv_libxxf86vm_cflags])
+	CS_EMIT_BUILD_PROPERTY([XFREE86VM.LFLAGS], 
+	    [$cs_cv_libxxf86vm_libs $cs_cv_libxxf86vm_lflags])], [],
+	[$X_CFLAGS], 
+	[$X_LFLAGS], 
+	[$X_PRE_LIBS $X_LIBS -lX11 -lXext $X_EXTRA_LIBS],
+	[Xxf86vm])
 
-    CS_CHECK_LIB_WITH([Xaw],
+    CS_CHECK_LIB_WITH([xaw7],
 	[AC_LANG_PROGRAM(
 	    [[#include <X11/Shell.h>
 	    #include <X11/Xaw/Form.h>]],
 	    [XtVaGetValues(0,0,0,0)])],
-	[], [],	[CS_EMIT_BUILD_RESULT([cs_cv_libXaw], [XAW])], [],
-	[$X_CFLAGS], [], [$X_PRE_LIBS $X_LIBS -lXt -lX11 $X_EXTRA_LIBS])])
+	[], [],	[CS_EMIT_BUILD_RESULT([cs_cv_libxaw7], [XAW])], [],
+	[$X_CFLAGS], 
+	[$X_LFLAGS], 
+	[$X_PRE_LIBS $X_LIBS -lXt -lX11 $X_EXTRA_LIBS],
+	[Xaw])])
 
 
 

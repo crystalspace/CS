@@ -29,6 +29,7 @@
 #include "csgeom/trimesh.h"
 #include "csgfx/normalmaptools.h"
 #include "csgfx/renderbuffer.h"
+#include "csgfx/trianglestream.h"
 #include "csutil/csendian.h"
 #include "csutil/csmd5.h"
 #include "csutil/memfile.h"
@@ -1250,7 +1251,7 @@ bool csGenmeshMeshObject::HitBeamOutline (const csVector3& start,
     for (size_t s = 0; s < sm.GetSize(); s++)
     {
       iRenderBuffer* indexBuffer = sm[s]->GetIndices();
-      csRenderBufferLock<uint, iRenderBuffer*> indices (indexBuffer);
+      csRenderBufferLock<uint, iRenderBuffer*> indices (indexBuffer, CS_BUF_LOCK_READ);
       size_t n = indexBuffer->GetElementCount();
       size_t idx = 0;
       while (n > 0)
@@ -1326,7 +1327,7 @@ bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
     for (size_t s = 0; s < sm.GetSize(); s++)
     {
       iRenderBuffer* indexBuffer = sm[s]->GetIndices();
-      csRenderBufferLock<uint> indices (indexBuffer);
+      csRenderBufferLock<uint> indices (indexBuffer, CS_BUF_LOCK_READ);
       size_t n = indexBuffer->GetElementCount();
       size_t idx = 0;
       while (n > 0)
@@ -1709,16 +1710,39 @@ void csGenmeshMeshObjectFactory::SetupFactory ()
   }
 }
 
+template<typename T>
+static void RemapIndexBuffer (csRef<iRenderBuffer>& index_buffer,
+                              csCompressVertexInfo* vt)
+{
+  csRef<iRenderBuffer> newBuffer;
+  {
+    csRenderBufferLock<T> indices (index_buffer, CS_BUF_LOCK_READ);
+    size_t rangeMin = (size_t)~0, rangeMax = 0;
+    for (size_t n = 0; n < indices.GetSize(); n++)
+    {
+      size_t index = size_t (indices[n]);
+      size_t newIndex = vt[index].new_idx;
+      if (newIndex < rangeMin)
+        rangeMin = newIndex;
+      else if (newIndex > rangeMax)
+        rangeMax = newIndex;
+    }
+    newBuffer = csRenderBuffer::CreateIndexRenderBuffer (
+      index_buffer->GetElementCount(), index_buffer->GetBufferType(), 
+      index_buffer->GetComponentType(), rangeMin, rangeMax);
+    csRenderBufferLock<T> newIndices (newBuffer);
+    for (size_t n = 0; n < indices.GetSize(); n++)
+    {
+      size_t index = size_t (indices[n]);
+      size_t newIndex = vt[index].new_idx;
+      newIndices[n] = T (newIndex);
+    }
+  }
+  index_buffer = newBuffer;
+}
+
 void csGenmeshMeshObjectFactory::Compress ()
 {
-  if (subMeshes.GetSize () > 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-    	"crystalspace.genmesh.compress",
-	"WARNING! Compress ignored because there are subMeshes!");
-    return;
-  }
-
   size_t old_num = mesh_vertices.Length ();
   csCompressVertexInfo* vt = csVertexCompressor::Compress (
     	mesh_vertices, mesh_texels, mesh_normals, mesh_colors);
@@ -1727,13 +1751,52 @@ void csGenmeshMeshObjectFactory::Compress ()
     printf ("From %d to %d\n", int (old_num), int (mesh_vertices.Length ()));
     fflush (stdout);
 
-    // Now we can remap the vertices in all triangles.
-    size_t i;
-    for (i = 0 ; i < mesh_triangles.Length () ; i++)
+    if (subMeshes.GetSize () == 0)
     {
-      mesh_triangles[i].a = (int)vt[mesh_triangles[i].a].new_idx;
-      mesh_triangles[i].b = (int)vt[mesh_triangles[i].b].new_idx;
-      mesh_triangles[i].c = (int)vt[mesh_triangles[i].c].new_idx;
+      // Now we can remap the vertices in all triangles.
+      size_t i;
+      for (i = 0 ; i < mesh_triangles.Length () ; i++)
+      {
+        mesh_triangles[i].a = (int)vt[mesh_triangles[i].a].new_idx;
+        mesh_triangles[i].b = (int)vt[mesh_triangles[i].b].new_idx;
+        mesh_triangles[i].c = (int)vt[mesh_triangles[i].c].new_idx;
+      }
+    }
+    else
+    {
+      for (size_t s = 0; s < subMeshes.GetSize(); s++)
+      {
+        SubMesh* subMesh = subMeshes[s];
+        csRenderBufferComponentType compType = 
+          subMesh->index_buffer->GetComponentType ();
+        switch (compType)
+        {
+          case CS_BUFCOMP_BYTE:
+            RemapIndexBuffer<char> (subMesh->index_buffer, vt);
+            break;
+          case CS_BUFCOMP_UNSIGNED_BYTE:
+            RemapIndexBuffer<unsigned char> (subMesh->index_buffer, vt);
+            break;
+          case CS_BUFCOMP_SHORT:
+            RemapIndexBuffer<short> (subMesh->index_buffer, vt);
+            break;
+          case CS_BUFCOMP_UNSIGNED_SHORT:
+            RemapIndexBuffer<unsigned short> (subMesh->index_buffer, vt);
+            break;
+          case CS_BUFCOMP_INT:
+            RemapIndexBuffer<int> (subMesh->index_buffer, vt);
+            break;
+          case CS_BUFCOMP_UNSIGNED_INT:
+            RemapIndexBuffer<unsigned int> (subMesh->index_buffer, vt);
+            break;
+          case CS_BUFCOMP_FLOAT:
+            RemapIndexBuffer<float> (subMesh->index_buffer, vt);
+            break;
+          case CS_BUFCOMP_DOUBLE:
+            RemapIndexBuffer<double> (subMesh->index_buffer, vt);
+            break;
+        }
+      }
     }
     delete[] vt;
   }
@@ -1859,7 +1922,7 @@ void csGenmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder,
           iRenderBuffer* indexBuffer = subMeshes[i]->SubMesh::GetIndices();
           size_t indexTris = indexBuffer->GetElementCount() / 3;
           triangleScratch.SetLength (scratchPos + indexTris);
-          csRenderBufferLock<uint8> indexLock (indexBuffer);
+          csRenderBufferLock<uint8> indexLock (indexBuffer, CS_BUF_LOCK_READ);
           memcpy (triangleScratch.GetArray() + scratchPos,
             indexLock.Lock(), indexTris * sizeof (csTriangle));
         }
@@ -1955,10 +2018,115 @@ void csGenmeshMeshObjectFactory::SetTriangleCount (int n)
 
 void csGenmeshMeshObjectFactory::CalculateNormals (bool compress)
 {
-  csNormalCalculator::CalculateNormals (
-      mesh_vertices, mesh_triangles, mesh_normals, compress);
-  autonormals = true;
-  autonormals_compress = compress;
+  if (subMeshes.GetSize () > 0)
+  {
+    csDirtyAccessArray<csTriangle> newTriangles;
+    csArray<size_t> submeshTriangleStarts;
+    for (size_t s = 0; s < subMeshes.GetSize (); s++)
+    {
+      submeshTriangleStarts.Push (newTriangles.GetSize());
+
+      SubMesh* subMesh (subMeshes[s]);
+      csRef<iRenderBuffer> indices (subMesh->GetIndices());
+      csRenderBufferLock<uint8> indexLock (indices, CS_BUF_LOCK_READ);
+
+      size_t stride = indices->GetElementDistance();
+      const uint8* tri = indexLock;
+      const uint8* triEnd = tri + indices->GetElementCount()*stride;
+
+      CS::TriangleIndicesStream<int> triangles;
+      triangles.BeginTriangulate (tri, triEnd, stride, 
+        indices->GetComponentType(), CS_MESHTYPE_TRIANGLES);
+      while (triangles.HasNextTri ())
+      {
+        csTriangle tri;
+        triangles.NextTriangle (tri.a, tri.b, tri.c);
+        newTriangles.Push (tri);
+      }
+    }
+    submeshTriangleStarts.Push (newTriangles.GetSize());
+    csNormalCalculator::CalculateNormals (
+      mesh_vertices, newTriangles, mesh_normals, compress);
+    if (compress)
+    {
+      /* When compression is enabled, indices in the triangles may have 
+       * changed. Thus, refill the submesh index buffers with the new
+       * data. */
+      for (size_t s = 0; s < subMeshes.GetSize (); s++)
+      {
+        size_t smTriStart = submeshTriangleStarts[s]; 
+        size_t smTriEnd = submeshTriangleStarts[s+1]; 
+        size_t rangeMin = (size_t)~0, rangeMax = 0;
+        for (size_t t = smTriStart; t < smTriEnd; t++)
+        {
+          const csTriangle& tri = newTriangles[t];
+          int lowestIndex, highestIndex;
+          if (tri.a > tri.b)
+          {
+            if (tri.b > tri.c)
+            {
+              // a > b > c
+              highestIndex = tri.a;
+              lowestIndex = tri.c;
+            }
+            else if (tri.a > tri.c)
+            {
+              // a > c > b
+              highestIndex = tri.a;
+              lowestIndex = tri.b;
+            }
+            else
+            {
+              // c > a > b
+              highestIndex = tri.c;
+              lowestIndex = tri.b;
+            }
+          }
+          else
+          {
+            if (tri.a > tri.c)
+            {
+              // b > a > c
+              highestIndex = tri.b;
+              lowestIndex = tri.c;
+            }
+            else if (tri.b > tri.c)
+            {
+              // b > c > a
+              highestIndex = tri.b;
+              lowestIndex = tri.a;
+            }
+            else
+            {
+              // c > b > a
+              highestIndex = tri.c;
+              lowestIndex = tri.a;
+            }
+          }
+          rangeMin = csMin (rangeMin, size_t (lowestIndex));
+          rangeMax = csMax (rangeMax, size_t (highestIndex));
+        }
+        csRef<iRenderBuffer> newBuffer;
+        // FIXME: try to take original component type into account.
+        size_t triNum = smTriEnd - smTriStart;
+        newBuffer = csRenderBuffer::CreateIndexRenderBuffer (
+          triNum * 3, CS_BUF_STATIC, 
+          CS_BUFCOMP_UNSIGNED_INT, rangeMin, rangeMax);
+        newBuffer->CopyInto (newTriangles.GetArray() + smTriStart, triNum*3);
+        SubMesh* subMesh (subMeshes[s]);
+        subMesh->index_buffer = newBuffer;
+      }
+    }
+    autonormals = true;
+    autonormals_compress = compress;
+  }
+  else
+  {
+    csNormalCalculator::CalculateNormals (
+        mesh_vertices, mesh_triangles, mesh_normals, compress);
+    autonormals = true;
+    autonormals_compress = compress;
+  }
 }
 
 void csGenmeshMeshObjectFactory::GenerateSphere (const csEllipsoid& ellips,

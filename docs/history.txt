@@ -6,6 +6,111 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-Oct-2006
+	- Jorrit fixed a bug in iSector->HitBeamPortals(). If it would
+	  traverse a portal then the returned intersection point would not be
+	  correct.
+	- res adjusted the X11 detection such that the pkgconfig packages, as
+	  provided by newer X.org versions, are looked for first before
+	  falling back to the autoconf X detection macro.
+24-Oct-2006
+	- res bumped the version numbers for the CS and CEL version checks in
+	  jamtemplate's configure template to 1.1.
+	- res fixed install.jam to support file names with spaces.
+	- res updated the "external libraries" section in the manual to also
+	  state versions of the dependencies.
+	- Vincent updated rpm/cs.spec. Also added missing files to be
+	  installed.
+23-Oct-2006
+	- dfryer fixed some OS X / PowerPC specific compile problems in 
+	  threading support stuff.
+	- Jorrit added iSector->PrecacheDraw(). This function will
+	  precache the visibility culler. In addition it will also render
+	  one frame of that sector with as much visible as possible.
+	  This also helps precaching the shaders. iEngine->PrecacheDraw()
+	  will now call iSector->PrecacheDraw().
+	- Jorrit fixed a bug in the skeletal animation loader. It would
+	  incorrectly test if it could load the skeleton file and if it
+	  couldn't load it it would not give an error.
+	- res fixed the genmesh autonormals support to properly support 
+	  submeshes.
+	- res changed the genmesh saver to not write out triangles when
+	  a factory has submeshes.
+	- res added iGeneralFactoryState::DisableAutoNormals().
+	- res added normal interpolation for primitives to lighter2.
+20-Oct-2006
+	- PK fixed a small bug in the parallax shaders.
+	- res added some issue reporting to the static plugin linking Jam
+	  code.
+	- res changed the python detection code to separately check whether 
+	  the pythonX.X/config dir must be specified to link the python lib.
+	  The reason is that this directory seems to contain a static library
+	  which gets preferred over the shared version, however, this static
+	  lib seems to work somewhat worse than the shared version. Hence,
+	  adjust the lib dir search strategy such that a path with a shared
+	  version is preferred.
+18-Oct-2006
+	- Jorrit forced the character2 shaders to use software animation
+	  since that works better on all hardware and also is faster
+	  in most cases.
+	- Eric Sunshine updated CS manual to refer to new Trac bug database
+	  rather than the deprecated SourceForge bug tracker. Also updated URL
+	  in manual for browsing sources in SVN rather than CVS.
+	- res removed some leftovers from the earlier "compatibilisms"
+	  cleanup.
+	- res changed the "Resources" manual page to point to the trac SVN
+	  browser and not the SF one.
+17-Oct-2006
+	- Jorrit fixed a memory leak in the engine (with camera
+	  positions).
+	- res fixed a compile error in ptpdlight.
+	- res fixed compile errors with memtracker enabled (fixes trac #135,
+	  #173).
+	- res fixed lighter2 compile errors and warnings.
+13-Oct-2006
+	- res added PD light support to lighter2.
+	- mdmkolbe fixed a few warnings.
+	- res changed lighter2 to disable mipmaps for lightmap textures.
+	- res changed ptpdlight to use fixed point math and to upload textures
+	  as BGRA (faster on NV).
+12-Oct-2006
+	- mdmkolbe commited part of the Cygwin path patch forgotten before.
+	- mdmkolbe added support for Cygwin mount points to VFS.
+	- mdmkolbe forced vfs.cfg to always be regenerated on install
+	  since they may be overridden at install time (e.g. using GNU stow)
+	  and to prevent old "$(appdatadir)" and "$(appconfdir)" being used.
+	- Jorrit changed the spiral particle system in partsys to use
+	  the new particles plugin.
+	- Jorrit removed the spiral mesh object plugin.
+	- Jorrit fixed walktest for the removal of spiral. Simply removed
+	  the spiral command. It isn't that useful.
+	- res made the following changes to lighter2:
+	    - Fixed a copy'n'paste mistake in the primitive min/max UV coord
+	      computation.
+	    - Fixed the light bounding boxes having incorrect dimensions
+	      (influence radius was used for the box size when diameter is
+	      correct).
+	    - Change the lumel visibility testing to only take sampling points
+	      into account that lie on the primitive. This fixes dark borders
+	      that can occur when adjacent geometry occludes some sampling 
+	      points which cause a darker than correct light value to be used,
+	      even though the occluded sampling points should not be used 
+	      since they don't lie on the primitive.
+	- res changed genmeshify to detect when a level name passed is a
+	  directory.
+	- res (blindly) augmented the import kit to support Thing mesh 
+	  objects.
+11-Oct-2006
+	- res fixed genmesh to also support Compress() when submeshes are
+	  present.
+	- res changed lighter2 to more efficiently layout primitives. Instead
+	  of layouting every primitive on its own, coplanar neighbouring
+	  primitives are laid out adjacently on the lightmap.
+	- res fixed csConfigIterator::Rewind() not working properly.
+10-Oct-2006
+	- mdmkolbe fixed searching of Cygwin paths.
+	- mdmkolbe added CS_CONFIGDIR to configuration search paths on Cygwin.
+	- Marten added a "outward spiral" term to spiral particle effector.
 9-Oct-2006
 	- res fixed a problem in the iConfigIterator::HasNext() which
 	  manifested itself in scrambled "could not load plugin" messages

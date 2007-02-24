@@ -59,8 +59,8 @@ namespace lighter
       ComputeMinMaxUV (min, max);
       minU = (int)floor (min.x);
       minV = (int)floor (min.y);
-      maxU = (int)floor (max.x);
-      maxV = (int)floor (max.y);
+      maxU = (int)ceil (max.x);
+      maxV = (int)ceil (max.y);
     }
 
     /// Fix down the min/max to ints..
@@ -74,9 +74,6 @@ namespace lighter
         uv.y = int(uv.y+0.5);
       }
     }*/
-
-    /// Remap (in linear fashion) the UVs
-    void RemapUVs (csVector2 &move);
 
     /// Calculate and save primitive plane
     void ComputePlane ();
@@ -93,11 +90,11 @@ namespace lighter
     /// Calculate the u/v form vectors
     void ComputeUVTransform ();
 
-    /// Prepare the primitive, create patches and elements
+    /**
+     * Prepare the primitive, create patches and elements.
+     * Specifying a resolution of 0 disables patch creation.
+     */
     void Prepare (uint uResolution, uint vResolution);
-
-    /// Prepare the primitive wihtout creating new patches (just make sure elements are right)
-    void PrepareNoPatches ();
 
     /// Build a 
     csPoly3D BuildPoly3D () const;
@@ -107,6 +104,8 @@ namespace lighter
 
     /// Return triangles (triangulated version)
     csArray<csTriangle> BuildTriangulated() const;
+
+    bool PointInside (const csVector3& pt) const;
 
     // Data accessors
     /*
@@ -153,6 +152,8 @@ namespace lighter
 
     inline uint GetGlobalLightmapID () const { return globalLightmapID; }
     inline void SetGlobalLightmapID (uint id) { globalLightmapID = id; }
+
+    void ComputeBaryCoords (const csVector3& v, float& lambda, float& my) const;
   protected:
     // Lightmap texture coordinates
     //Vector2DArray lightmapUVs;
@@ -167,6 +168,8 @@ namespace lighter
     SizeTDArray indexArray;
 
     /// Computed plane
+    /* Plane normal seems to point into opposite direction compared to e.g.
+     * auto-computed vertex normals. (FIXME?) */
     csPlane3 plane;
 
     /// Mapping vectors
@@ -199,6 +202,18 @@ namespace lighter
     /// GLobal lightmap id
     // @@@ Only meaningful for object primitives
     uint globalLightmapID;
+
+    /* Coefficients to computer barycentric coordinates for a point on the
+     * primitive. 
+     * \remarks
+     * Also see http://en.wikipedia.org/wiki/Barycentric_coordinates_%28mathematics%29
+     *
+     * Tho, the formulae used in this code are, in comparison to those given,
+     * in the above article, quite mangled.
+     */
+    csVector3 lambdaCoeffTV, myCoeffTV;
+
+    void ComputeBaryCoeffs ();
   };
 
   typedef csArray<RadPrimitive> RadPrimitiveArray;

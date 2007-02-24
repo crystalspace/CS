@@ -48,8 +48,10 @@ namespace lighter
     filename = fname;
     //write it out
 
+#ifndef DUMP_NORMALS
     // 0.5 to account for the fact that the shader does *2
     ApplyExposureFunction (1.8f, 0.5f); 
+#endif
 
     // first we downsample to LDR csRGBpixel RGBA
     csRGBpixel *pixelData = new csRGBpixel[width*height];
@@ -83,6 +85,14 @@ namespace lighter
         GetTextureName(), 1, 1, 0, CS_TEXTURE_3D);
     }
     return texture;
+  }
+
+  bool Lightmap::IsNull () const
+  {
+    for (uint i = 0; i < data.GetSize (); i++)
+      if ((data[i].red != 0) || (data[i].green != 0) || (data[i].blue != 0))
+        return false;
+    return true;
   }
 
   csString Lightmap::GetTextureNameFromFilename (const csString& file)

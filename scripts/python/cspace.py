@@ -3526,6 +3526,7 @@ class iSector(iBase):
     def AddLightVisibleCallback(*args): return _cspace.iSector_AddLightVisibleCallback(*args)
     def RemoveLightVisibleCallback(*args): return _cspace.iSector_RemoveLightVisibleCallback(*args)
     def GetSVContext(*args): return _cspace.iSector_GetSVContext(*args)
+    def PrecacheDraw(*args): return _cspace.iSector_PrecacheDraw(*args)
     __swig_destroy__ = _cspace.delete_iSector
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSector_scfGetVersion
@@ -4770,6 +4771,7 @@ class iGeneralFactoryState(iGeneralMeshCommonState):
     def DeleteSubMesh(*args): return _cspace.iGeneralFactoryState_DeleteSubMesh(*args)
     def GetSubMeshCount(*args): return _cspace.iGeneralFactoryState_GetSubMeshCount(*args)
     def GetSubMesh(*args): return _cspace.iGeneralFactoryState_GetSubMesh(*args)
+    def DisableAutoNormals(*args): return _cspace.iGeneralFactoryState_DisableAutoNormals(*args)
     __swig_destroy__ = _cspace.delete_iGeneralFactoryState
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iGeneralFactoryState_scfGetVersion

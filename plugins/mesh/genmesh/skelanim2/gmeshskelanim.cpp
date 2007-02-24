@@ -368,8 +368,9 @@ const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
     case XMLTOKEN_SKELFILE:
       {
         csRef<iVFS> vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
-        csRef<iDataBuffer> buf (vfs->ReadFile(child->GetContentsValue()));
-        if (buf || buf->GetSize())
+	const char* filename = child->GetContentsValue ();
+        csRef<iDataBuffer> buf (vfs->ReadFile(filename));
+        if (buf && buf->GetSize())
         {
           csRef<iDocument> doc;
 
@@ -394,6 +395,12 @@ const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
             return error;
           }
         }
+	else
+	{
+          error_buf.Format (
+            "Can't load skeleton file '%s'!", filename);
+          return error_buf;
+	}
       }
       break;
     case XMLTOKEN_USE_BONES:

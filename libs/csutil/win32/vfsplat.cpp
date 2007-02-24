@@ -20,6 +20,9 @@
 #include "cssysdef.h"
 #include "csutil/vfsplat.h"
 #include <windows.h>
+#ifdef __CYGWIN__
+#include <sys/cygwin.h>
+#endif
 
 #include "shellstuff.h"
 
@@ -52,3 +55,12 @@ const char* csCheckPlatformVFSVar(const char* VarName)
   return 0;
 }
 
+void csExpandPlatformFilename(const char *inputFilename, char *outputFilename)
+{
+#ifdef __CYGWIN__
+  // Convert any cygwin paths to win32 paths
+  if (cygwin_conv_to_win32_path(inputFilename, outputFilename) == 0)
+    return;
+#endif
+  strcpy(outputFilename, inputFilename);
+}
