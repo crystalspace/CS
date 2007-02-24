@@ -400,21 +400,6 @@ struct iVFS : public virtual iBase
   virtual bool Sync () = 0;
 
   /**
-   * Create or add a symbolic link within the VFS 
-   *  (works like unix 'ln -s' command)
-   * If the link already exists, then the target will be added to the link
-   * At the moment just remounts it at `Target'.
-   * \param Target The target that the link will point to
-   * \param Link The path of the link within the VFS, if this is 0 then the 
-   *  link will be created in the current directory with the same name as 
-   *  the target
-   * \param priority Currently unused
-   * \return True if successful, else false.
-   */
-  virtual bool SymbolicLink(const char *Target, const char *Link = 0, 
-    int priority = 0) = 0;
-
-  /**
    * Mount an VFS path on a "real-world-filesystem" path.
    * \param VirtualPath The location in the virtual filesystem in which to
    *   mount RealPath.

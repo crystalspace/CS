@@ -839,8 +839,9 @@ bool csVFS::MountConfigFile(csConfigFile* conf)
 
   csRef<iConfigIterator> iterator (conf->Enumerate ("VFS.Mount."));
   csStringArray realPaths;
-  while (iterator->Next())
+  while (iterator->HasNext())
   {
+    iterator->Next();
     csString vp = iterator->GetKey (true);
     csString rp = iterator->GetStr ();
 
@@ -1217,15 +1218,6 @@ bool csVFS::Sync ()
     fsPlugins[i]->Sync();
 
 	return true;	
-}
-
-bool csVFS::SymbolicLink(const char *Target, const char *Link, int priority)
-{
-  csRef<iDataBuffer> rpath = GetRealPath (Link);
-  if (!rpath->GetSize ())
-    return false;
-  Mount (Target, rpath->GetData ());
-  return true;
 }
 
 bool csVFS::Mount (const char *VirtualPath, const char *RealPath)
