@@ -464,7 +464,7 @@ class csVertexLightCalculator : public iVertexLightCalculator
     {
       const csVector3 v (*vbLock);
       const csVector3 n (*nbLock);
-      typename_qualifier LightProc::PerVertex pv (lighter, v, n);
+      typename LightProc::PerVertex pv (lighter, v, n);
       if (pv.IsLit())
       {
         if (diffuse)

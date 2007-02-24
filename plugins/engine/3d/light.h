@@ -49,6 +49,8 @@ struct iMeshWrapper;
 struct iLightingInfo;
 struct iSector;
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 class csLightObjectModel : public scfImplementationExt0<csLightObjectModel,
                                                         csObjectModel>
 {
@@ -83,6 +85,8 @@ public:
   }
   virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * Class that represents the influence that a certain light

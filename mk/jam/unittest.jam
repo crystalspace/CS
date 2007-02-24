@@ -477,12 +477,14 @@ actions UnitTestSource
 {
   cat <<EOF > $(<)
 // Automatically generated; do not edit.
+$(UNITTEST_BOILERPLATE_TEST_PRE)
+
 #include <string>
 #include <cppunit/TestCaller.h>
 #include <cppunit/TestFixture.h>
 #include <cppunit/TestSuite.h>
 #include <cppunit/extensions/HelperMacros.h>
-$(UNITTEST_BOILERPLATE_TEST_PRE)
+
 EOF
   for i in $(>:BS); do
     echo '#include "'$i'"' >> $(<)
@@ -508,12 +510,14 @@ actions UnitTestMain
 {
   cat <<EOF > $(<)
 // Automatically generated; do not edit.
+$(UNITTEST_BOILERPLATE_MAIN_PRE)
+
 #include <string>
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/TestResult.h>
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/ui/text/TestRunner.h>
-$(UNITTEST_BOILERPLATE_MAIN_PRE)
+
 int main(int argc, char** argv)
 {
   bool verbose = false;
@@ -529,7 +533,7 @@ int main(int argc, char** argv)
     }
   }
 
-  CppUnit::TextUi::TestRunner runner;
+  CppUnit::TextTestRunner runner;
   CppUnit::TestFactoryRegistry& registry =
     CppUnit::TestFactoryRegistry::getRegistry();
   CppUnit::BriefTestProgressListener listener;

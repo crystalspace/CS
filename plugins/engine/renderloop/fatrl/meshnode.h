@@ -37,7 +37,7 @@ struct ShaderTicketKey
   size_t realTicket, sortTicket;
 };
 
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csComparator<ShaderTicketKey, ShaderTicketKey>
 {
 public:

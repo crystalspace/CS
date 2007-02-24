@@ -1097,7 +1097,7 @@ public:
   }
 };
 
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csStringFast<0> : public csStringBase
 {
 public:

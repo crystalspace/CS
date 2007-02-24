@@ -65,7 +65,7 @@ struct ValueSetArray
   }
 };
 
-CS_SPECIALIZE_TEMPLATE
+template<>
 struct ValueSetArray<1>
 {
   ValueSet x;
@@ -537,7 +537,7 @@ class csConditionEvaluator
   };
 public:
   template<typename Evaluator>
-  typename_qualifier Evaluator::EvalResult Evaluate (Evaluator& eval, csConditionID condition);
+  typename Evaluator::EvalResult Evaluate (Evaluator& eval, csConditionID condition);
 
   csConditionEvaluator (iStringSet* strings, 
     const csConditionConstants& constants);

@@ -37,6 +37,7 @@
 #include "imap/loader.h"
 #include "imesh/object.h"
 #include "imesh/sprite3d.h"
+#include "imesh/skeleton.h"
 #include "iutil/csinput.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
@@ -52,7 +53,7 @@
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
 #include "imesh/genmesh.h"
-#include "imesh/gmeshskel.h"
+#include "imesh/gmeshskel2.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -148,15 +149,16 @@ void IsoTest::SetupFrame ()
     csRef<iGenMeshSkeletonControlState> animcontrol (
       SCF_QUERY_INTERFACE (spstate->GetAnimationControl (), 
       iGenMeshSkeletonControlState));
+    iSkeleton* skeleton = animcontrol->GetSkeleton ();
     if(actor_is_walking && !moved)
     {
-      animcontrol->StopAll();
-      animcontrol->Execute("idle");
+      skeleton->StopAll();
+      skeleton->Execute("idle");
     }
     if(!actor_is_walking && moved)
     {
-      animcontrol->StopAll();
-      animcontrol->Execute("walk");
+      skeleton->StopAll();
+      skeleton->Execute("run");
     }
     actor_is_walking = moved;
   }
@@ -167,7 +169,7 @@ void IsoTest::SetupFrame ()
   csVector3 end_pos, isect;
   end_pos = actor_pos; end_pos.y -= 100.0;
   csHitBeamResult rc = plane->HitBeamObject (actor_pos, end_pos);
-  actor_pos.y = rc.isect.y + .8;
+  actor_pos.y = rc.isect.y;
 
   actor->GetMovable ()->SetPosition (actor_pos);
   actor->GetMovable ()->UpdateMove ();
@@ -353,67 +355,35 @@ bool IsoTest::LoadMap ()
 
 bool IsoTest::CreateActor ()
 {
-  // Load a texture for our sprite.
-  iTextureManager* txtmgr = g3d->GetTextureManager ();
-  iTextureWrapper* txt = loader->LoadTexture ("vedette_fashion",
-    "/lib/std/ugly_woman.jpg", CS_TEXTURE_3D, txtmgr, false, false);
-  if (txt == 0)
+  csRef<iVFS> vfs (CS_QUERY_REGISTRY (object_reg, iVFS));
+  vfs->PushDir ();
+  vfs->ChDir ("/lib/kwartz");
+  if (!loader->LoadLibraryFile ("kwartz.lib"))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
         "crystalspace.application.isotest",
-        "Error loading texture!");
+        "Error loading kwartz!");
     return false;
   }
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
-  csRef<iShaderManager> shader_mgr = CS_QUERY_REGISTRY (object_reg,
-  	iShaderManager);
-  if (shader_mgr == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.isotest",
-        "Couldn't find shader manager! This application requires new renderer!"
-	);
-    return false;
-  }
-  iShader* ambient_shader = shader_mgr->GetShader ("ambient");
-  iShader* light_shader = shader_mgr->GetShader ("light");
-  if (ambient_shader == 0 || light_shader == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.isotest",
-        "Couldn't find shaders!");
-    return false;
-  }
-  csRef<iMaterial> fash_material = engine->CreateBaseMaterial (txt);
-  fash_material->SetShader (strings->Request ("ambient"), ambient_shader);
-  fash_material->SetShader (strings->Request ("diffuse"), light_shader);
-  engine->GetMaterialList ()->NewMaterial (fash_material, "vedette_fashion");
+  vfs->PopDir ();
 
-  // Load a sprite template from disk.
-  csRef<iMeshFactoryWrapper> imeshfact (
-    loader->LoadMeshObjectFactory ("/lev/isomap/vedette.spr"));
-  if (imeshfact == 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.isotest",
-        "Error loading mesh object factory!");
-    return false;
-  }
-  csMatrix3 m; m.Identity (); m *= 1.10f; // scaling factor
-  imeshfact->HardTransform (csReversibleTransform (m, csVector3 (0)));
+  iMeshFactoryWrapper* imeshfact = engine->FindMeshFactory ("kwartz_fact");
+
+  //csMatrix3 m; m.Identity ();
+  //imeshfact->HardTransform (csReversibleTransform (m, csVector3 (0, -1, 0)));
 
   // Create the sprite and add it to the engine.
   actor = engine->CreateMeshWrapper (
-    imeshfact, "MySprite", room, csVector3 (-3, 2, 3));
+    imeshfact, "MySprite", room, csVector3 (-3, 1, 3));
   actor->GetMovable ()->UpdateMove ();
   csRef<iGeneralMeshState> spstate (
     SCF_QUERY_INTERFACE (actor->GetMeshObject (), iGeneralMeshState));
   csRef<iGenMeshSkeletonControlState> animcontrol (
     SCF_QUERY_INTERFACE (spstate->GetAnimationControl (), 
     iGenMeshSkeletonControlState));
-  animcontrol->StopAll();
-  animcontrol->Execute("idle");
+  iSkeleton* skel = animcontrol->GetSkeleton ();
+  skel->StopAll();
+  skel->Execute("idle");
 
   // The following two calls are not needed since CS_ZBUF_USE and
   // Object render priority are the default but they show how you

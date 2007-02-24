@@ -1,0 +1,12 @@
+SubDir TOP libs csutil threading ;
+
+
+switch $(TARGET.OS)
+{
+case WIN32 :				# Windows 
+  CSUTIL.GENERIC += ;
+case * :					# MacOS/X, Posix, Unix, GNU/Linux, etc.
+  CSUTIL.GENERIC += ;
+  CSLIB.EXTERNAL_LIBS += PTHREAD ;
+}
+

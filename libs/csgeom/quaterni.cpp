@@ -260,3 +260,44 @@ csQuaternion csQuaternion::SLerp (const csQuaternion& q2, float t) const
     scale0 * v.z + scale1 * -quato.w,
     scale0 * w + scale1 * quato.v.z);
 }
+
+csQuaternion csQuaternion::Log () const
+{
+  csVector3 _v;
+  if (fabs(w) < 1.0f)
+  {
+    float angle = acos(w);
+    float sin_angle = sin(angle);
+    if (fabs(sin_angle) >= SMALL_EPSILON)
+    {
+      float coef = angle/sin_angle;
+      _v = v*coef;
+      return csQuaternion (_v, 0);
+    }
+  }
+  _v = v;
+  return csQuaternion (_v, 0);
+}
+
+csQuaternion csQuaternion::Exp () const
+{
+  float angle = sqrt(v.x*v.x+v.y*v.y+v.z*v.z);
+  float sin_angle = sin(angle);
+  csVector3 _v;
+  if (fabs(angle) >= SMALL_EPSILON )
+  {
+    float coef = sin_angle/angle;
+    _v = v*coef;
+  }
+  else
+  {
+    _v = v;
+  }
+  return csQuaternion (_v, cosf(angle));
+}
+
+csQuaternion csQuaternion::Squad (const csQuaternion & t1, const csQuaternion & t2,
+  const csQuaternion & q, float t) const
+{
+  return SLerp(q, t).SLerp(t1.SLerp(t2, t), 2.0f*t*(1.0f-t));
+}

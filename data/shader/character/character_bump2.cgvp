@@ -11,7 +11,6 @@ struct app2vertex {
 	float3 Position : POSITION;
 	float3 TexCoord : TEXCOORD0;
 	float3 Tangent : TEXCOORD1;
-	float3 BiTangent : TEXCOORD2;
 	int4 BonesIndices;
 	float4 BonesWeights;
 };
@@ -59,8 +58,7 @@ vertex2fragment main (app2vertex IN,
 	float3 tangent = (QuatMultVert(Bones[idx1], IN.Tangent))*IN.BonesWeights.x;
 	tangent.xyz += (QuatMultVert(Bones[idx2], IN.Tangent))*IN.BonesWeights.y;
 
-	float3 bitangent = (QuatMultVert(Bones[idx1], IN.BiTangent))*IN.BonesWeights.x;
-	bitangent.xyz += (QuatMultVert(Bones[idx2], IN.BiTangent))*IN.BonesWeights.y;
+	float3 bitangent = cross(norm, tangent);
 
 	float4 obLight = mul(ModelViewI, LightPos);
 	float4 objLight = obLight - position;

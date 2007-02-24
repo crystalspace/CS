@@ -59,9 +59,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 	temp, len, zbuff);
 
       // Blend
-      typename_qualifier Pix::PixType* _dest = 
-	(typename_qualifier Pix::PixType*)dest;
-      typename_qualifier Pix::PixType* _destend = _dest + len;
+      typename Pix::PixType* _dest = (typename Pix::PixType*)dest;
+      typename Pix::PixType* _destend = _dest + len;
 
       uint32* src = temp;
       while (_dest < _destend)

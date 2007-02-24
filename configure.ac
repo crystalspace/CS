@@ -871,11 +871,11 @@ AC_MSG_CHECKING([whether to split debug information])
 AC_ARG_ENABLE([separate-debug-info], 
     [AC_HELP_STRING([--enable-separate-debug-info],
         [split debug information into separate files. (default YES if 
-        binutils >= 2.17 detected and not on Cygwin, otherwise default NO)])])
+        binutils >= 2.17, otherwise default NO)])])
 AS_IF([test -z "$enable_separate_debug_info"], 
     AS_IF([test -z `uname | grep -i CYGWIN`],
         [enable_separate_debug_info=$cs_cv_binutils_2_17],
-        [enable_separate_debug_info=no]))
+        [enable_separate_debug_info=$cs_cv_binutils_true_2_17]))
 AC_MSG_RESULT([$enable_separate_debug_info])
 
 CS_EMIT_BUILD_PROPERTY([LINK.DEBUG.INFO.SEPARATE], [$enable_separate_debug_info])
@@ -1553,13 +1553,13 @@ AS_IF([test -n "$PYTHON" && test -n "$SWIG"],[
           [PYCEGUI_I_FILE="$with_pycegui/package/cegui.i"
            PYCEGUI_PY_FILE="$with_pycegui/src/cegui.py"],
           [AC_PATH_PROGS([PYCEGUI_I_FILE],[cegui.i],[],[pycegui_paths_default])
-	   PYCEGUI_PY_FILE=`$PYTHON -c "$pyceguitest"`])
-      m4_define([PYCEGUI_EXPECTED_SWIG_VERSION],[$cs_prog_swig_is_version])
+	   PYCEGUI_PY_FILE=CS_RUN_PATH_NORMALIZE([$PYTHON -c "$pyceguitest"])])
+      m4_define([PYCEGUI_EXPECTED_SWIG_VERSION],[cs_prog_swig_version])
       AS_IF([test -f "$PYCEGUI_PY_FILE" && test -f "$PYCEGUI_I_FILE"],[
 	CS_CHECK_PROG_VERSION([cegui.py was generated with same swig],
 		[sed -n -e '1p' "$PYCEGUI_PY_FILE"],
 		[PYCEGUI_EXPECTED_SWIG_VERSION],[9.9|.9],
-		[PYCEGUI_I_DIR=`dirname "$PYCEGUI_I_FILE"`
+		[PYCEGUI_I_DIR=`AS_DIRNAME([$PYCEGUI_I_FILE])`
 		 CS_EMIT_BUILD_PROPERTY([PYCEGUI.SWIGOK], [yes])
 		 CS_EMIT_BUILD_PROPERTY([PYCEGUI.SWIGFLAGS], [-I$PYCEGUI_I_DIR])
 		],[],[=])
@@ -1873,6 +1873,7 @@ AC_DEFUN([CS_CHECK_HOST_CPU],
     [AC_REQUIRE([AC_CANONICAL_HOST])
     case $host_cpu in
 	[[Ii][3-9]86*|[Xx]86*]) cs_host_cpu=x86 ;;
+	powerpc*) cs_host_cpu=powerpc ;;
 	*) cs_host_cpu=$host_cpu ;;
     esac
     cs_host_cpu_normalized="AS_TR_CPP([$cs_host_cpu])"])
@@ -2129,45 +2130,6 @@ CS_SYMBOL_QUALIFIER([how to declare pure functions],
     [__attribute__((pure))], [], [C++],
     [CS_HEADER_PROPERTY([CS_PURE_METHOD],
 	[$cs_cv_prog_cxx_declare_pure])])
-
-
-
-#------------------------------------------------------------------------------
-# Check if C++ compiler understands new C++ `explicit' and 'typename' keywords.
-#------------------------------------------------------------------------------
-AC_CACHE_CHECK([for C++ `explicit' keyword], [cs_cv_cxx_explicit],
-    [CS_BUILD_IFELSE(
-	[AC_LANG_PROGRAM([class A { public: explicit A(int); };], [])],
-	[], [C++], [cs_cv_cxx_explicit=yes], [cs_cv_cxx_explicit=no])])
-AS_IF([test $cs_cv_cxx_explicit != no],
-    [CS_HEADER_PROPERTY([CS_HAVE_CXX_KEYWORD_EXPLICIT])])
-
-AC_CACHE_CHECK([for C++ `typename' keyword], [cs_cv_cxx_typename],
-    [CS_BUILD_IFELSE(
-	[AC_LANG_PROGRAM(
-	    [template <typename T> class A { public: T a; };], [])],
-	[], [C++], [cs_cv_cxx_typename=yes], [cs_cv_cxx_typename=no])])
-AS_IF([test $cs_cv_cxx_typename != no],
-    [CS_HEADER_PROPERTY([CS_HAVE_CXX_KEYWORD_TYPENAME])])
-
-
-
-#------------------------------------------------------------------------------
-# Check if C++ compiler understands new explicit template specialization
-# syntax `template<> class Foo<Bar>'.  Older compiler allows specializations
-# without the `template<>' prefix.
-#------------------------------------------------------------------------------
-AC_CACHE_CHECK([for C++ explicit template<> specialization],
-    [cs_cv_cxx_explicit_template_specialization],
-    [CS_BUILD_IFELSE(
-	[AC_LANG_PROGRAM(
-	    [template <class T> class A {}; template<> class A<int> {};], [])],
-	[], [C++],
-	[cs_cv_cxx_explicit_template_specialization=yes],
-	[cs_cv_cxx_explicit_template_specialization=no])])
-
-AS_IF([test $cs_cv_cxx_explicit_template_specialization = no],
-    [CS_HEADER_PROPERTY([CS_USE_OLD_TEMPLATE_SPECIALIZATION])])
 
 
 

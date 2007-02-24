@@ -40,9 +40,10 @@ vectors. They will be explained in the next sections.
 
 @menu
 * Typed Arrays::
+* Threading:: Threading library
 @end menu
 
-@node Typed Arrays, , csUtil, csUtil
+@node Typed Arrays, Threading, csUtil, csUtil
 @subsubsection Typed Arrays
 @cindex Typed Arrays
 
@@ -98,3 +99,5 @@ destroyed. In other cases where you need to store raw object pointers but don't
 want them deleted upon removal from the array, just use the normal
 @code{csArray<T*>}. See @file{csutil/parray.h}.
 @end itemize
+
+@importss{usingcs,libs,threading.txi}

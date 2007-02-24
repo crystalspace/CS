@@ -128,17 +128,52 @@ void csGLShader_CG::SplitArgsString (const char* str, ArgumentArray& args)
   if (!s.IsEmpty()) args.Push (s);
 }
 
+/// Assign a number to a Cg profile so DX and GL profiles can be compared.
+static int GetProfileLevel (CGprofile profile)
+{
+  switch (profile)
+  {
+    case CG_PROFILE_FP20:
+    case CG_PROFILE_PS_1_1:
+      return 0x101;
+    case CG_PROFILE_PS_1_2:
+      return 0x102;
+    case CG_PROFILE_PS_1_3:
+      return 0x103;
+    case CG_PROFILE_ARBFP1:
+      return 0x200;
+    case CG_PROFILE_FP30:
+      return 0x20a;
+    case CG_PROFILE_FP40:
+      return 0x300;
+    default:
+      return 0;
+  }
+}
+
 void csGLShader_CG::GetProfileCompilerArgs (const char* type, 
                                             CGprofile profile, 
                                             ArgumentArray& args)
 {
+  csString profileStr (cgGetProfileString (profile));
   csConfigAccess cfg (object_reg);
   csString key ("Video.OpenGL.Shader.Cg.CompilerOptions");
   SplitArgsString (cfg->GetStr (key), args);
   key << "." << type;
   SplitArgsString (cfg->GetStr (key), args);
-  key << "." << cgGetProfileString (profile);
+  key << "." << profileStr;
   SplitArgsString (cfg->GetStr (key), args);
+
+  profileStr.Upcase();
+  csString profileMacroArg ("-DPROFILE_");
+  profileMacroArg += profileStr;
+  args.Push (profileMacroArg);
+  int profileLevel = GetProfileLevel (profile);
+  if (profileLevel != 0)
+  {
+    profileMacroArg.Format ("-DFRAGMENT_PROGRAM_LEVEL=0x%x", profileLevel);
+    args.Push (profileMacroArg);
+  }
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -200,29 +235,6 @@ static CGprofile ProfileUnrouted (CGprofile profile)
       return CG_PROFILE_FP30;
     default:
       return profile;
-  }
-}
-
-/// Assign a number to a Cg profile so DX and GL profiles can be compared.
-static int GetProfileLevel (CGprofile profile)
-{
-  switch (profile)
-  {
-    case CG_PROFILE_FP20:
-    case CG_PROFILE_PS_1_1:
-      return 0x101;
-    case CG_PROFILE_PS_1_2:
-      return 0x102;
-    case CG_PROFILE_PS_1_3:
-      return 0x103;
-    case CG_PROFILE_ARBFP1:
-      return 0x200;
-    case CG_PROFILE_FP30:
-      return 0x20a;
-    case CG_PROFILE_FP40:
-      return 0x300;
-    default:
-      return 0;
   }
 }
 
