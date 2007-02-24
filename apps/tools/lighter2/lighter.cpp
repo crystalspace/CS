@@ -132,6 +132,7 @@ namespace lighter
     if (!scene->ParseEngine ()) 
       return false;
     globalStats.SetTotalProgress (10);
+    
 
     unsigned int taskI = 0;
     // Calculate lightmapping coordinates
@@ -170,6 +171,32 @@ namespace lighter
     }
 
     globalStats.SetTotalProgress (20);
+
+    // Run performance benchmark
+  
+    /*
+    size_t numRays = 2000000;
+    RandomRayListGenerator<PseudoRandomRaygenerator> rayGen;
+    csArray<Ray> rays = rayGen(numRays, csVector3 (0));
+    Raytracer tracer (scene->GetSectors ().GetIterator ().Next ()->kdTree);
+    for (size_t i = 0; i < numRays; ++i)
+    {
+      Ray& r = rays[i];
+      HitPoint h;
+
+      tracer.TraceClosestHit (r, h);
+
+      if ((i % 1000) == 0)
+      {
+        globalTUI.Redraw (TUI::TUI_DRAW_RAYCORE);
+      }
+    }
+
+    int a = 0;
+    return true;
+*/
+    
+    
 
     // Progress 20
 

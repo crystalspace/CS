@@ -66,6 +66,15 @@ class csWrapPtr(_object):
 csWrapPtr_swigregister = _cspace.csWrapPtr_swigregister
 csWrapPtr_swigregister(csWrapPtr)
 
+def fix_args(funct):
+    def _inner(self, args):
+        if type(args) == tuple:
+            args = (self,) + args
+        else:
+            args = (self, args)
+        return funct(*args)
+    return _inner
+
 class csArrayThresholdVariable(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csArrayThresholdVariable, name, value)
@@ -564,6 +573,64 @@ class csVector3(_object):
     __del__ = lambda self : None;
 csVector3_swigregister = _cspace.csVector3_swigregister
 csVector3_swigregister(csVector3)
+
+class csVector4Float(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csVector4Float, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csVector4Float, name)
+    __repr__ = _swig_repr
+    __swig_setmethods__["x"] = _cspace.csVector4Float_x_set
+    __swig_getmethods__["x"] = _cspace.csVector4Float_x_get
+    if _newclass:x = property(_cspace.csVector4Float_x_get, _cspace.csVector4Float_x_set)
+    __swig_setmethods__["y"] = _cspace.csVector4Float_y_set
+    __swig_getmethods__["y"] = _cspace.csVector4Float_y_get
+    if _newclass:y = property(_cspace.csVector4Float_y_get, _cspace.csVector4Float_y_set)
+    __swig_setmethods__["z"] = _cspace.csVector4Float_z_set
+    __swig_getmethods__["z"] = _cspace.csVector4Float_z_get
+    if _newclass:z = property(_cspace.csVector4Float_z_get, _cspace.csVector4Float_z_set)
+    __swig_setmethods__["w"] = _cspace.csVector4Float_w_set
+    __swig_getmethods__["w"] = _cspace.csVector4Float_w_get
+    if _newclass:w = property(_cspace.csVector4Float_w_get, _cspace.csVector4Float_w_set)
+    def __init__(self, *args): 
+        this = _cspace.new_csVector4Float(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_csVector4Float
+    __del__ = lambda self : None;
+csVector4Float_swigregister = _cspace.csVector4Float_swigregister
+csVector4Float_swigregister(csVector4Float)
+
+class csVector4(csVector4Float):
+    __swig_setmethods__ = {}
+    for _s in [csVector4Float]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csVector4, name, value)
+    __swig_getmethods__ = {}
+    for _s in [csVector4Float]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, csVector4, name)
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _cspace.new_csVector4(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def assign(*args): return _cspace.csVector4_assign(*args)
+    def __add__(*args): return _cspace.csVector4___add__(*args)
+    def __sub__(*args): return _cspace.csVector4___sub__(*args)
+    def __mul__(*args): return _cspace.csVector4___mul__(*args)
+    def __div__(*args): return _cspace.csVector4___div__(*args)
+    def __eq__(*args): return _cspace.csVector4___eq__(*args)
+    def __ne__(*args): return _cspace.csVector4___ne__(*args)
+    def __lt__(*args): return _cspace.csVector4___lt__(*args)
+    def __gt__(*args): return _cspace.csVector4___gt__(*args)
+    def __rmul__(*args): return _cspace.csVector4___rmul__(*args)
+    def __abs__(*args): return _cspace.csVector4___abs__(*args)
+    def __getitem__(*args): return _cspace.csVector4___getitem__(*args)
+    def __setitem__(*args): return _cspace.csVector4___setitem__(*args)
+    def __nonzero__(*args): return _cspace.csVector4___nonzero__(*args)
+    __swig_destroy__ = _cspace.delete_csVector4
+    __del__ = lambda self : None;
+csVector4_swigregister = _cspace.csVector4_swigregister
+csVector4_swigregister(csVector4)
 
 class csMatrix2(_object):
     __swig_setmethods__ = {}
@@ -1425,10 +1492,37 @@ csVector3Array_swigregister = _cspace.csVector3Array_swigregister
 csVector3Array_swigregister(csVector3Array)
 csVector3Array_CompressVertices = _cspace.csVector3Array_CompressVertices
 
-class csTriangle(_object):
+class TriangleInt(_object):
     __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, TriangleInt, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, TriangleInt, name)
+    __repr__ = _swig_repr
+    __swig_setmethods__["a"] = _cspace.TriangleInt_a_set
+    __swig_getmethods__["a"] = _cspace.TriangleInt_a_get
+    if _newclass:a = property(_cspace.TriangleInt_a_get, _cspace.TriangleInt_a_set)
+    __swig_setmethods__["b"] = _cspace.TriangleInt_b_set
+    __swig_getmethods__["b"] = _cspace.TriangleInt_b_get
+    if _newclass:b = property(_cspace.TriangleInt_b_get, _cspace.TriangleInt_b_set)
+    __swig_setmethods__["c"] = _cspace.TriangleInt_c_set
+    __swig_getmethods__["c"] = _cspace.TriangleInt_c_get
+    if _newclass:c = property(_cspace.TriangleInt_c_get, _cspace.TriangleInt_c_set)
+    def Set(*args): return _cspace.TriangleInt_Set(*args)
+    def __init__(self, *args): 
+        this = _cspace.new_TriangleInt(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_TriangleInt
+    __del__ = lambda self : None;
+TriangleInt_swigregister = _cspace.TriangleInt_swigregister
+TriangleInt_swigregister(TriangleInt)
+
+class csTriangle(TriangleInt):
+    __swig_setmethods__ = {}
+    for _s in [TriangleInt]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, csTriangle, name, value)
     __swig_getmethods__ = {}
+    for _s in [TriangleInt]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csTriangle, name)
     __repr__ = _swig_repr
     def __init__(self, *args): 
@@ -1801,6 +1895,8 @@ class csBox3(_object):
     def Set(*args): return _cspace.csBox3_Set(*args)
     def SetMin(*args): return _cspace.csBox3_SetMin(*args)
     def SetMax(*args): return _cspace.csBox3_SetMax(*args)
+    def GetMin(*args): return _cspace.csBox3_GetMin(*args)
+    def GetMax(*args): return _cspace.csBox3_GetMax(*args)
     def Description(*args): return _cspace.csBox3_Description(*args)
     def Split(*args): return _cspace.csBox3_Split(*args)
     def TestSplit(*args): return _cspace.csBox3_TestSplit(*args)
@@ -1993,7 +2089,6 @@ class csShaderVariable(csRefCount):
     def SetAccessor(*args): return _cspace.csShaderVariable_SetAccessor(*args)
     def SetName(*args): return _cspace.csShaderVariable_SetName(*args)
     def GetName(*args): return _cspace.csShaderVariable_GetName(*args)
-    def GetValue(*args): return _cspace.csShaderVariable_GetValue(*args)
     def SetValue(*args): return _cspace.csShaderVariable_SetValue(*args)
     def AddVariableToArray(*args): return _cspace.csShaderVariable_AddVariableToArray(*args)
     def RemoveFromArray(*args): return _cspace.csShaderVariable_RemoveFromArray(*args)
@@ -2001,6 +2096,7 @@ class csShaderVariable(csRefCount):
     def GetArraySize(*args): return _cspace.csShaderVariable_GetArraySize(*args)
     def GetArrayElement(*args): return _cspace.csShaderVariable_GetArrayElement(*args)
     def SetArrayElement(*args): return _cspace.csShaderVariable_SetArrayElement(*args)
+    def GetValue(*args): return _cspace.csShaderVariable_GetValue(*args)
 csShaderVariable_swigregister = _cspace.csShaderVariable_swigregister
 csShaderVariable_swigregister(csShaderVariable)
 
@@ -6334,6 +6430,7 @@ class iParticleSystem(iParticleSystemBase):
     def GetParticle(*args): return _cspace.iParticleSystem_GetParticle(*args)
     def GetParticleAux(*args): return _cspace.iParticleSystem_GetParticleAux(*args)
     def LockForExternalControl(*args): return _cspace.iParticleSystem_LockForExternalControl(*args)
+    def Advance(*args): return _cspace.iParticleSystem_Advance(*args)
     __swig_destroy__ = _cspace.delete_iParticleSystem
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleSystem_scfGetVersion
@@ -6848,6 +6945,8 @@ class iSndSysWrapper(iBase):
     def QueryObject(*args): return _cspace.iSndSysWrapper_QueryObject(*args)
     def GetStream(*args): return _cspace.iSndSysWrapper_GetStream(*args)
     def SetStream(*args): return _cspace.iSndSysWrapper_SetStream(*args)
+    def GetData(*args): return _cspace.iSndSysWrapper_GetData(*args)
+    def SetData(*args): return _cspace.iSndSysWrapper_SetData(*args)
     __swig_destroy__ = _cspace.delete_iSndSysWrapper
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSndSysWrapper_scfGetVersion
@@ -7927,6 +8026,7 @@ class csKeyModifiers(_object):
     __swig_setmethods__["modifiers"] = _cspace.csKeyModifiers_modifiers_set
     __swig_getmethods__["modifiers"] = _cspace.csKeyModifiers_modifiers_get
     if _newclass:modifiers = property(_cspace.csKeyModifiers_modifiers_get, _cspace.csKeyModifiers_modifiers_set)
+    def __getitem__(*args): return _cspace.csKeyModifiers___getitem__(*args)
     def __init__(self, *args): 
         this = _cspace.new_csKeyModifiers(*args)
         try: self.this.append(this)
@@ -8237,8 +8337,11 @@ class iJoystickDriver(iBase):
     def DoMotion(*args): return _cspace.iJoystickDriver_DoMotion(*args)
     __swig_destroy__ = _cspace.delete_iJoystickDriver
     __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iJoystickDriver_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iJoystickDriver_scfGetVersion)
 iJoystickDriver_swigregister = _cspace.iJoystickDriver_swigregister
 iJoystickDriver_swigregister(iJoystickDriver)
+iJoystickDriver_scfGetVersion = _cspace.iJoystickDriver_scfGetVersion
 
 class iConfigFile(iBase):
     __swig_setmethods__ = {}
@@ -8987,6 +9090,7 @@ class csSimpleRenderMesh(_object):
         this = _cspace.new_csSimpleRenderMesh(*args)
         try: self.this.append(this)
         except: self.this = this
+    def SetWithGenmeshFactory(*args): return _cspace.csSimpleRenderMesh_SetWithGenmeshFactory(*args)
     __swig_destroy__ = _cspace.delete_csSimpleRenderMesh
     __del__ = lambda self : None;
 csSimpleRenderMesh_swigregister = _cspace.csSimpleRenderMesh_swigregister
@@ -9575,6 +9679,120 @@ class iImage(iBase):
 iImage_swigregister = _cspace.iImage_swigregister
 iImage_swigregister(iImage)
 iImage_scfGetVersion = _cspace.iImage_scfGetVersion
+
+class csImageBaseBase(iImage):
+    __swig_setmethods__ = {}
+    for _s in [iImage]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csImageBaseBase, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iImage]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, csImageBaseBase, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def IncRef(*args): return _cspace.csImageBaseBase_IncRef(*args)
+    def DecRef(*args): return _cspace.csImageBaseBase_DecRef(*args)
+    def GetRefCount(*args): return _cspace.csImageBaseBase_GetRefCount(*args)
+    def QueryInterface(*args): return _cspace.csImageBaseBase_QueryInterface(*args)
+    def AddRefOwner(*args): return _cspace.csImageBaseBase_AddRefOwner(*args)
+    def RemoveRefOwner(*args): return _cspace.csImageBaseBase_RemoveRefOwner(*args)
+csImageBaseBase_swigregister = _cspace.csImageBaseBase_swigregister
+csImageBaseBase_swigregister(csImageBaseBase)
+
+class csImageBase(csImageBaseBase):
+    __swig_setmethods__ = {}
+    for _s in [csImageBaseBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csImageBase, name, value)
+    __swig_getmethods__ = {}
+    for _s in [csImageBaseBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, csImageBase, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    __swig_destroy__ = _cspace.delete_csImageBase
+    __del__ = lambda self : None;
+    def GetDepth(*args): return _cspace.csImageBase_GetDepth(*args)
+    def SetName(*args): return _cspace.csImageBase_SetName(*args)
+    def GetName(*args): return _cspace.csImageBase_GetName(*args)
+    def GetPalette(*args): return _cspace.csImageBase_GetPalette(*args)
+    def GetAlpha(*args): return _cspace.csImageBase_GetAlpha(*args)
+    def HasKeyColor(*args): return _cspace.csImageBase_HasKeyColor(*args)
+    def HasKeycolor(*args): return _cspace.csImageBase_HasKeycolor(*args)
+    def GetKeyColor(*args): return _cspace.csImageBase_GetKeyColor(*args)
+    def GetKeycolor(*args): return _cspace.csImageBase_GetKeycolor(*args)
+    def HasMipmaps(*args): return _cspace.csImageBase_HasMipmaps(*args)
+    def GetMipmap(*args): return _cspace.csImageBase_GetMipmap(*args)
+    def GetRawFormat(*args): return _cspace.csImageBase_GetRawFormat(*args)
+    def GetRawData(*args): return _cspace.csImageBase_GetRawData(*args)
+    def GetImageType(*args): return _cspace.csImageBase_GetImageType(*args)
+    def HasSubImages(*args): return _cspace.csImageBase_HasSubImages(*args)
+    def GetSubImage(*args): return _cspace.csImageBase_GetSubImage(*args)
+csImageBase_swigregister = _cspace.csImageBase_swigregister
+csImageBase_swigregister(csImageBase)
+
+class csImageMemoryBase(csImageBase):
+    __swig_setmethods__ = {}
+    for _s in [csImageBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csImageMemoryBase, name, value)
+    __swig_getmethods__ = {}
+    for _s in [csImageBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, csImageMemoryBase, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def IncRef(*args): return _cspace.csImageMemoryBase_IncRef(*args)
+    def DecRef(*args): return _cspace.csImageMemoryBase_DecRef(*args)
+    def GetRefCount(*args): return _cspace.csImageMemoryBase_GetRefCount(*args)
+    def QueryInterface(*args): return _cspace.csImageMemoryBase_QueryInterface(*args)
+    def AddRefOwner(*args): return _cspace.csImageMemoryBase_AddRefOwner(*args)
+    def RemoveRefOwner(*args): return _cspace.csImageMemoryBase_RemoveRefOwner(*args)
+csImageMemoryBase_swigregister = _cspace.csImageMemoryBase_swigregister
+csImageMemoryBase_swigregister(csImageMemoryBase)
+
+class csImageMemory(csImageMemoryBase):
+    __swig_setmethods__ = {}
+    for _s in [csImageMemoryBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csImageMemory, name, value)
+    __swig_getmethods__ = {}
+    for _s in [csImageMemoryBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, csImageMemory, name)
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _cspace.new_csImageMemory(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_csImageMemory
+    __del__ = lambda self : None;
+    def GetImagePtr(*args): return _cspace.csImageMemory_GetImagePtr(*args)
+    def GetPalettePtr(*args): return _cspace.csImageMemory_GetPalettePtr(*args)
+    def GetAlphaPtr(*args): return _cspace.csImageMemory_GetAlphaPtr(*args)
+    def GetImageData(*args): return _cspace.csImageMemory_GetImageData(*args)
+    def GetWidth(*args): return _cspace.csImageMemory_GetWidth(*args)
+    def GetHeight(*args): return _cspace.csImageMemory_GetHeight(*args)
+    def GetDepth(*args): return _cspace.csImageMemory_GetDepth(*args)
+    def GetFormat(*args): return _cspace.csImageMemory_GetFormat(*args)
+    def GetPalette(*args): return _cspace.csImageMemory_GetPalette(*args)
+    def GetAlpha(*args): return _cspace.csImageMemory_GetAlpha(*args)
+    def HasKeyColor(*args): return _cspace.csImageMemory_HasKeyColor(*args)
+    def GetKeyColor(*args): return _cspace.csImageMemory_GetKeyColor(*args)
+    def Clear(*args): return _cspace.csImageMemory_Clear(*args)
+    def CheckAlpha(*args): return _cspace.csImageMemory_CheckAlpha(*args)
+    def SetFormat(*args): return _cspace.csImageMemory_SetFormat(*args)
+    def SetKeyColor(*args): return _cspace.csImageMemory_SetKeyColor(*args)
+    def SetKeycolor(*args): return _cspace.csImageMemory_SetKeycolor(*args)
+    def ClearKeyColor(*args): return _cspace.csImageMemory_ClearKeyColor(*args)
+    def ClearKeycolor(*args): return _cspace.csImageMemory_ClearKeycolor(*args)
+    def ApplyKeyColor(*args): return _cspace.csImageMemory_ApplyKeyColor(*args)
+    def ApplyKeycolor(*args): return _cspace.csImageMemory_ApplyKeycolor(*args)
+    def GetImageType(*args): return _cspace.csImageMemory_GetImageType(*args)
+    def SetImageType(*args): return _cspace.csImageMemory_SetImageType(*args)
+    def HasMipmaps(*args): return _cspace.csImageMemory_HasMipmaps(*args)
+    def GetMipmap(*args): return _cspace.csImageMemory_GetMipmap(*args)
+    def SetMipmap(*args): return _cspace.csImageMemory_SetMipmap(*args)
+    def Copy(*args): return _cspace.csImageMemory_Copy(*args)
+    def CopyScale(*args): return _cspace.csImageMemory_CopyScale(*args)
+    def CopyTile(*args): return _cspace.csImageMemory_CopyTile(*args)
+    def ConvertFromRGBA(*args): return _cspace.csImageMemory_ConvertFromRGBA(*args)
+    def ConvertFromPal8(*args): return _cspace.csImageMemory_ConvertFromPal8(*args)
+csImageMemory_swigregister = _cspace.csImageMemory_swigregister
+csImageMemory_swigregister(csImageMemory)
 
 class csImageIOFileFormatDescriptions(_object):
     __swig_setmethods__ = {}
@@ -10565,8 +10783,11 @@ class iODEHinge2Joint(iODEGeneralJointState):
     def GetAnchorError(*args): return _cspace.iODEHinge2Joint_GetAnchorError(*args)
     __swig_destroy__ = _cspace.delete_iODEHinge2Joint
     __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iODEHinge2Joint_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iODEHinge2Joint_scfGetVersion)
 iODEHinge2Joint_swigregister = _cspace.iODEHinge2Joint_swigregister
 iODEHinge2Joint_swigregister(iODEHinge2Joint)
+iODEHinge2Joint_scfGetVersion = _cspace.iODEHinge2Joint_scfGetVersion
 
 class iODEHingeJoint(iODEGeneralJointState):
     __swig_setmethods__ = {}
@@ -11156,24 +11377,47 @@ class csPixmap(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csPixmap, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csPixmap, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _cspace.new_csPixmap(*args)
-        try: self.this.append(this)
-        except: self.this = this
     __swig_destroy__ = _cspace.delete_csPixmap
     __del__ = lambda self : None;
-    def SetTextureHandle(*args): return _cspace.csPixmap_SetTextureHandle(*args)
-    def SetTextureRectangle(*args): return _cspace.csPixmap_SetTextureRectangle(*args)
-    def DrawScaled(*args): return _cspace.csPixmap_DrawScaled(*args)
-    def DrawTiled(*args): return _cspace.csPixmap_DrawTiled(*args)
     def Width(*args): return _cspace.csPixmap_Width(*args)
     def Height(*args): return _cspace.csPixmap_Height(*args)
     def Advance(*args): return _cspace.csPixmap_Advance(*args)
     def GetTextureHandle(*args): return _cspace.csPixmap_GetTextureHandle(*args)
+    def DrawScaled(*args): return _cspace.csPixmap_DrawScaled(*args)
+    def DrawScaledAlign(*args): return _cspace.csPixmap_DrawScaledAlign(*args)
+    def Draw(*args): return _cspace.csPixmap_Draw(*args)
+    def DrawAlign(*args): return _cspace.csPixmap_DrawAlign(*args)
+    def DrawTiled(*args): return _cspace.csPixmap_DrawTiled(*args)
 csPixmap_swigregister = _cspace.csPixmap_swigregister
 csPixmap_swigregister(csPixmap)
 csfxShadeVert = _cspace.csfxShadeVert
+
+class csSimplePixmap(csPixmap):
+    __swig_setmethods__ = {}
+    for _s in [csPixmap]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csSimplePixmap, name, value)
+    __swig_getmethods__ = {}
+    for _s in [csPixmap]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, csSimplePixmap, name)
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _cspace.new_csSimplePixmap(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_csSimplePixmap
+    __del__ = lambda self : None;
+    def SetTextureHandle(*args): return _cspace.csSimplePixmap_SetTextureHandle(*args)
+    def SetTextureRectangle(*args): return _cspace.csSimplePixmap_SetTextureRectangle(*args)
+    def DrawScaled(*args): return _cspace.csSimplePixmap_DrawScaled(*args)
+    def DrawTiled(*args): return _cspace.csSimplePixmap_DrawTiled(*args)
+    def Width(*args): return _cspace.csSimplePixmap_Width(*args)
+    def Height(*args): return _cspace.csSimplePixmap_Height(*args)
+    def Advance(*args): return _cspace.csSimplePixmap_Advance(*args)
+    def GetTextureHandle(*args): return _cspace.csSimplePixmap_GetTextureHandle(*args)
+csSimplePixmap_swigregister = _cspace.csSimplePixmap_swigregister
+csSimplePixmap_swigregister(csSimplePixmap)
 
 CS_IS_KEYBOARD_EVENT = _cspace.CS_IS_KEYBOARD_EVENT
 CS_IS_MOUSE_EVENT = _cspace.CS_IS_MOUSE_EVENT
@@ -11198,6 +11442,30 @@ CS_QUERY_REGISTRY_TAG = _cspace.CS_QUERY_REGISTRY_TAG
 CS_LOAD_PLUGIN_ALWAYS = _cspace.CS_LOAD_PLUGIN_ALWAYS
 CS_FX_SETALPHA = _cspace.CS_FX_SETALPHA
 CS_FX_SETALPHA_INT = _cspace.CS_FX_SETALPHA_INT
+class csPrimitives(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csPrimitives, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csPrimitives, name)
+    __repr__ = _swig_repr
+    __swig_getmethods__["GenerateBox"] = lambda x: _cspace.csPrimitives_GenerateBox
+    if _newclass:GenerateBox = staticmethod(_cspace.csPrimitives_GenerateBox)
+    __swig_getmethods__["GenerateQuad"] = lambda x: _cspace.csPrimitives_GenerateQuad
+    if _newclass:GenerateQuad = staticmethod(_cspace.csPrimitives_GenerateQuad)
+    __swig_getmethods__["GenerateSphere"] = lambda x: _cspace.csPrimitives_GenerateSphere
+    if _newclass:GenerateSphere = staticmethod(_cspace.csPrimitives_GenerateSphere)
+    def __init__(self, *args): 
+        this = _cspace.new_csPrimitives(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_csPrimitives
+    __del__ = lambda self : None;
+csPrimitives_swigregister = _cspace.csPrimitives_swigregister
+csPrimitives_swigregister(csPrimitives)
+csPrimitives_GenerateBox = _cspace.csPrimitives_GenerateBox
+csPrimitives_GenerateQuad = _cspace.csPrimitives_GenerateQuad
+csPrimitives_GenerateSphere = _cspace.csPrimitives_GenerateSphere
+
 CS_QUERY_REGISTRY = _cspace.CS_QUERY_REGISTRY
 CS_QUERY_REGISTRY_TAG_INTERFACE = _cspace.CS_QUERY_REGISTRY_TAG_INTERFACE
 SCF_QUERY_INTERFACE = _cspace.SCF_QUERY_INTERFACE
@@ -11253,11 +11521,6 @@ _csPyEventHandler_swigregister(_csPyEventHandler)
 _csPyEventHandler_StaticHandlerName = _cspace._csPyEventHandler_StaticHandlerName
 _csPyEventHandler_StaticID = _cspace._csPyEventHandler_StaticID
 
-def csevCommandLineHelp(reg):
-  csEventNameRegistry.GetID(reg, "crystalspace.application.commandlinehelp")
-  
-CS_EVENTLIST_END = csInvalidStringID
-
 class csPyEventHandler (_csPyEventHandler):
   """Python version of iEventHandler implementation.
      This class can be used as base class for event handlers in Python.
@@ -11293,6 +11556,11 @@ def _csInitializer_SetupEventHandler (reg, obj,
 csInitializer.SetupEventHandler = \
   staticmethod(_csInitializer_SetupEventHandler)
 
+
+def csevCommandLineHelp(reg):
+  csEventNameRegistry.GetID(reg, "crystalspace.application.commandlinehelp")
+  
+CS_EVENTLIST_END = csInvalidStringID
 
 def _csInitializer_RequestPlugins (reg, plugins):
   """Replacement of C++ version."""

@@ -32,7 +32,7 @@ namespace lighter
   struct Shade
   {
     // Shade a single rad primitive
-    static void RadPrimitive (Sector* sector, const Attenuation& attn, 
+    static void Primitive (Sector* sector, const Attenuation& attn, 
       Raytracer &tracer, RadPrimitive &prim, Light* light)
     {
       // Compute shading for each point on the primitive, using normal Phong shading
@@ -149,7 +149,7 @@ namespace lighter
     }
 
     // Shade a number of primitives
-    static void RadPrimitives (Sector* sector, const Attenuation& attn, 
+    static void Primitives (Sector* sector, const Attenuation& attn, 
       Raytracer &tracer, RadPrimitivePtrArray& prims, Light* light, 
       float progressStep)
     {
@@ -157,7 +157,7 @@ namespace lighter
       for (unsigned i = 0; i < prims.GetSize (); i++)
       {
 	globalStats.IncTaskProgress (primProgressStep);
-	RadPrimitive (sector, attn, tracer, *prims[i], light);
+	Primitive (sector, attn, tracer, *prims[i], light);
 	globalTUI.Redraw (TUI::TUI_DRAW_RAYCORE | TUI::TUI_DRAW_PROGRESS);
       }
     }
@@ -183,6 +183,7 @@ namespace lighter
 
       // Get all primitives
       RadPrimitivePtrArray prims;
+
       if (!KDTreeHelper::CollectPrimitives (sector->kdTree, prims, radLight->boundingBox))
         continue;
 
@@ -193,35 +194,35 @@ namespace lighter
         case CS_ATTN_NONE:
           {
             NoAttenuation attn (*radLight);
-	    Shade<NoAttenuation>::RadPrimitives (sector, attn, rayTracer, 
+	    Shade<NoAttenuation>::Primitives (sector, attn, rayTracer, 
 	      prims, radLight, lightProgressStep);
           }
           break;
         case CS_ATTN_LINEAR:
           {
             LinearAttenuation attn (*radLight);
-            Shade<LinearAttenuation>::RadPrimitives (sector, attn, rayTracer, 
+            Shade<LinearAttenuation>::Primitives (sector, attn, rayTracer, 
 	      prims, radLight, lightProgressStep);
           }
           break;
         case CS_ATTN_INVERSE:
           {
             InverseAttenuation attn (*radLight);
-            Shade<InverseAttenuation>::RadPrimitives (sector, attn, rayTracer, 
+            Shade<InverseAttenuation>::Primitives (sector, attn, rayTracer, 
 	      prims, radLight, lightProgressStep);
           }
           break;
         case CS_ATTN_REALISTIC:
           {
             RealisticAttenuation attn (*radLight);
-            Shade<RealisticAttenuation>::RadPrimitives (sector, attn, 
+            Shade<RealisticAttenuation>::Primitives (sector, attn, 
 	      rayTracer, prims, radLight, lightProgressStep);
           }
           break;
         case CS_ATTN_CLQ:
           {
             CLQAttenuation attn (*radLight);
-	    Shade<CLQAttenuation>::RadPrimitives (sector, attn, rayTracer, 
+	    Shade<CLQAttenuation>::Primitives (sector, attn, rayTracer, 
 	      prims, radLight, lightProgressStep);
           }
           break;

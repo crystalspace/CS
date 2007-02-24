@@ -85,7 +85,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   #--------
   # pythmod -- Pure Python module
   #--------
-  PythMod pythmod : _cspace : pythmod.cpp : crystalspace_python : 
+  PythMod pythmod : _cspace : pythmod.cpp : crystalspace crystalspace_python : 
 		: "pure Python module" ;
   Depends pythmod : $(cspacepy) ;
     

@@ -24,7 +24,7 @@
 
 namespace lighter
 {
-  struct KDTree;
+  class KDTree;
 
   // A lightsource
   class Light : public csRefCount

@@ -1,6 +1,6 @@
 # checklib.m4                                                  -*- Autoconf -*-
 #==============================================================================
-# Copyright (C)2003-2005 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C)2003-2006 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or modify it
 #    under the terms of the GNU Library General Public License as published by
@@ -123,18 +123,19 @@ AC_DEFUN([CS_CHECK_LIB_WITH],
 	dir/include, dir/lib, and dir])])
 
     # Backward compatibility: Recognize --with-lib$1 as alias for --with-$1.
-    AS_IF([test -n "$with_lib$1" && test -z "$with_$1"],
-	[with_$1="$with_lib$1"])
+    AS_IF([test -n "$_CS_CLW_WITH_DEPRECATED([$1])" &&
+           test -z "$_CS_CLW_WITH([$1])"],
+	[_CS_CLW_WITH([$1])="$_CS_CLW_WITH_DEPRECATED([$1])"])
 
-    AS_IF([test -z "$with_$1"], [with_$1=yes])
-    AS_IF([test "$with_$1" != no],
+    AS_IF([test -z "$_CS_CLW_WITH([$1])"], [_CS_CLW_WITH([$1])=yes])
+    AS_IF([test "$_CS_CLW_WITH([$1])" != no],
 	[# If --with-$1 value is same as cached value, then assume other
 	 # cached values are also valid; otherwise, ignore all cached values.
-	AS_IF([test "$with_$1" != "$cs_cv_with_$1"],
+	AS_IF([test "$_CS_CLW_WITH([$1])" != "$_CS_CLW_WITH_CVAR([$1])"],
 	    [cs_ignore_cache=yes], [cs_ignore_cache=no])
 
 	cs_check_lib_flags=''
-	AS_IF([test $with_$1 = yes],
+	AS_IF([test $_CS_CLW_WITH([$1]) = yes],
 	    [m4_foreach([cs_check_lib_alias], 
 		[m4_ifval([$10], [$1, $10], [$1])],
 		[_CS_CHECK_LIB_PKG_CONFIG_FLAGS([cs_check_lib_flags],
@@ -143,8 +144,8 @@ AC_DEFUN([CS_CHECK_LIB_WITH],
 		    cs_check_lib_alias)
 		])])
 
-	AS_IF([test $with_$1 != yes],
-	    [cs_check_lib_paths=$with_$1],
+	AS_IF([test $_CS_CLW_WITH([$1]) != yes],
+	    [cs_check_lib_paths=$_CS_CLW_WITH([$1])],
 	    [cs_check_lib_paths="| cs_lib_paths_default $3"])
 	m4_foreach([cs_check_lib_alias], 
 	    [m4_ifval([$10], [$1, $10], [$1])],
@@ -152,12 +153,18 @@ AC_DEFUN([CS_CHECK_LIB_WITH],
 		cs_check_lib_alias, [$cs_check_lib_paths])
 	    ])
 
-	CS_CHECK_BUILD([for lib$1], [cs_cv_lib$1], [$2], [$cs_check_lib_flags],
-	    [$4], [], [], [$cs_ignore_cache], [$7], [$8], [$9])],
-	[cs_cv_lib$1=no])
+	CS_CHECK_BUILD([for lib$1], [_CS_CLW_LIB_CVAR([$1])], [$2],
+            [$cs_check_lib_flags], [$4], [], [], [$cs_ignore_cache],
+            [$7], [$8], [$9])],
+	[_CS_CLW_LIB_CVAR([$1])=no])
 
-    cs_cv_with_$1="$with_$1"
-    AS_IF([test "$cs_cv_lib$1" = yes], [$5], [$6])])
+    _CS_CLW_WITH_CVAR([$1])="$_CS_CLW_WITH([$1])"
+    AS_IF([test "$_CS_CLW_LIB_CVAR([$1])" = yes], [$5], [$6])])
+
+AC_DEFUN([_CS_CLW_WITH], [AS_TR_SH([with_$1])])
+AC_DEFUN([_CS_CLW_WITH_DEPRECATED], [AS_TR_SH([with_lib$1])])
+AC_DEFUN([_CS_CLW_WITH_CVAR], [AS_TR_SH([cs_cv_with_$1])])
+AC_DEFUN([_CS_CLW_LIB_CVAR], [AS_TR_SH([cs_cv_lib$1])])
 
 
 

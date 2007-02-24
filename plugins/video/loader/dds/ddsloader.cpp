@@ -440,7 +440,7 @@ const char* csDDSImageFile::GetRawFormat() const
 
 csRef<iDataBuffer> csDDSImageFile::GetRawData() const
 {
-  return rawInfo ? (rawInfo->rawData) : (iDataBuffer*)0;
+  return rawInfo ? (rawInfo->rawData) : csRef<iDataBuffer> (0);
 }
 
 void csDDSImageFile::Report (int severity, const char* msg, ...)

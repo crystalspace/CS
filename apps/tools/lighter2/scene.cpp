@@ -40,7 +40,8 @@ namespace lighter
 
     // Build KD-tree
     objIt.Reset ();
-    kdTree = KDTreeBuilder::BuildTree (objIt);
+    KDTreeBuilder builder;
+    kdTree = builder.BuildTree (objIt);
   }
 
 

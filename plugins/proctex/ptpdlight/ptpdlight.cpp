@@ -91,7 +91,7 @@ csPtr<iBase> ProctexPDLightLoader::Parse (iDocumentNode* node,
   if (!img)
   {
     csRef<iDocumentNode> file = 
-      node ? node->GetNode ("file") : (iDocumentNode*)0;
+      node ? node->GetNode ("file") : csRef<iDocumentNode> (0);
     if (!file) 
     {
       Report (CS_REPORTER_SEVERITY_WARNING, node, 

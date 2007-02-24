@@ -600,6 +600,7 @@ public:
   	int mode3d);
   virtual iSndSysWrapper* LoadSoundWrapper (const char *name, const char *fname,
   	int mode3d);
+  virtual iSndSysWrapper* LoadSoundWrapper (const char *name, const char *fname);
 
   virtual csPtr<iLoaderStatus> ThreadedLoadMapFile (const char* filename,
 	iRegion* region, bool curRegOnly, bool checkDupes);

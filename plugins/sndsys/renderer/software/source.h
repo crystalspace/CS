@@ -118,27 +118,37 @@ public:
   /// Retrieve a direct pointer to this object
   virtual iSndSysSource *GetPtr() { return this; }
 
-  /// Add an output filter at the specified location.
-  //  Output filters can only receive sound data and cannot modify it.  They will receive data
-  //   from the same thread that the CS event handler executes in, once per frame.
-  //
-  //  Valid Locations:  SS_FILTER_LOC_SOURCEOUT, SS_FILTER_LOC_SOURCEIN
-  //  
-  //  Returns FALSE if the filter could not be added.
-  virtual bool AddOutputFilter(SndSysFilterLocation Location, iSndSysSoftwareOutputFilter *pFilter);
+  /**
+   * Add an output filter at the specified location.
+   * Output filters can only receive sound data and cannot modify it.
+   * They will receive data from the same thread that the CS event handler
+   * executes in, once per frame.
+   *
+   *  Valid Locations:  SS_FILTER_LOC_SOURCEOUT, SS_FILTER_LOC_SOURCEIN
+   *  
+   * Returns FALSE if the filter could not be added.
+   */
+  virtual bool AddOutputFilter(SndSysFilterLocation Location,
+      iSndSysSoftwareOutputFilter *pFilter);
 
-  /// Remove an output filter from the registered list
-  //
-  //  Valid Locations:  SS_FILTER_LOC_SOURCEOUT, SS_FILTER_LOC_SOURCEIN
-  //
-  // Returns FALSE if the filter is not in the list at the time of the call.
-  virtual bool RemoveOutputFilter(SndSysFilterLocation Location, iSndSysSoftwareOutputFilter *pFilter);
+  /**
+   * Remove an output filter from the registered list
+   * 
+   * Valid Locations:  SS_FILTER_LOC_SOURCEOUT, SS_FILTER_LOC_SOURCEIN
+   * 
+   * Returns FALSE if the filter is not in the list at the time of the call.
+   */
+  virtual bool RemoveOutputFilter(SndSysFilterLocation Location,
+      iSndSysSoftwareOutputFilter *pFilter);
 
 
   virtual size_t MergeIntoBuffer(csSoundSample *frame_buffer,
     size_t frame_count);
 
-  /// Renderer convenience interface - Called to provide processing of output filters
+  /**
+   * Renderer convenience interface - Called to provide processing of
+   * output filters
+   */
   virtual void ProcessOutputFilters();
 
 protected:
@@ -161,9 +171,10 @@ protected:
 };
 
 class SndSysSourceSoftware3D :
-  public scfImplementation2<SndSysSourceSoftware3D, 
+  public scfImplementation3<SndSysSourceSoftware3D, 
                             iSndSysSourceSoftware3D,
-                            scfFakeInterface<iSndSysSource> >
+                            scfFakeInterface<iSndSysSource>,
+			    scfFakeInterface<iSndSysSourceSoftware> >
 {
 public:
 
