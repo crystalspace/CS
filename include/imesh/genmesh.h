@@ -46,7 +46,7 @@ class csEllipsoid;
 
 struct iGeneralMeshSubMesh : public virtual iBase
 {
-  SCF_INTERFACE (iGeneralMeshSubMesh, 1, 0, 0);
+  SCF_INTERFACE (iGeneralMeshSubMesh, 1, 0, 1);
   
   /// Get the index render buffer
   virtual iRenderBuffer* GetIndices () const = 0;
@@ -59,6 +59,9 @@ struct iGeneralMeshSubMesh : public virtual iBase
   
   /// Get the mixmode (or (uint)~0 if none was specified)
   virtual uint GetMixmode () const = 0;
+
+  /// Set the material, or 0 to use default.
+  virtual void SetMaterial (iMaterialWrapper* material) = 0;
 };
 
 /**

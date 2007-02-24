@@ -19,7 +19,7 @@
 
 #include "cssysdef.h"
 
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csgfx/quantize.h"
 #include "csplugincommon/canvas/cursorconvert.h"
 #include "cstool/debugimagewriter.h"

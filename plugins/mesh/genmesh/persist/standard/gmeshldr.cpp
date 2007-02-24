@@ -1071,10 +1071,12 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
         subMesh->SetMixMode (mixmode);
       }
       break;
+#endif
     case XMLTOKEN_MATERIAL:
       {
         const char* matname = child->GetContentsValue ();
-        material = ldr_context->FindMaterial (matname);
+        csRef<iMaterialWrapper> material = 
+          ldr_context->FindMaterial (matname);
         if (!material.IsValid ())
         {
           synldr->ReportError (
@@ -1082,10 +1084,9 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
             node, "Couldn't find material '%s'!", matname);
           return false;
         }
-        subMesh->SetMaterial (mixmode);
+        subMesh->SetMaterial (material);
         break;
       }
-#endif
     case XMLTOKEN_SHADERVAR:
       {
         csRef<csShaderVariable> sv;
@@ -1351,23 +1352,46 @@ bool csGeneralMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
           gmesh->FindSubMesh (factSubMesh->GetName());
         if (objSubMesh)
         {
-          csRef<iDocumentNode> submeshNode = 
-            paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-          submeshNode->SetValue("submesh");
-          submeshNode->SetAttribute ("name", objSubMesh->GetName ());
-
-          /* @@@ FIXME: This loop only works b/c GetShaderVariables() does not
-           * return parent's SVs. Once it does, this code needs to change, since
-           * only really the different SVs should be written out. */
           csRef<iShaderVariableContext> svc = 
             scfQueryInterface<iShaderVariableContext> (objSubMesh);
-          const csRefArray<csShaderVariable>& shadervars = svc->GetShaderVariables ();
-          for (size_t i = 0; i < shadervars.GetSize(); i++)
+          const csRefArray<csShaderVariable>& shadervars = 
+            svc->GetShaderVariables ();
+
+          iMaterialWrapper* smMaterial = objSubMesh->GetMaterial();
+          /* @@@ FIXME: shadervars.IsEmpty() only works for same reasons as 
+           * below */
+          bool interesting = !shadervars.IsEmpty() 
+            || (smMaterial != factSubMesh->GetMaterial());
+
+          if (interesting)
           {
-            csRef<iDocumentNode> shadervarNode = 
-              submeshNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-            shadervarNode->SetValue ("shadervar");
-            synldr->WriteShaderVar (shadervarNode, *(shadervars[i]));
+            csRef<iDocumentNode> submeshNode = 
+              paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+            submeshNode->SetValue("submesh");
+            submeshNode->SetAttribute ("name", objSubMesh->GetName ());
+
+            if (smMaterial != 0)
+            {
+              csRef<iDocumentNode> materialNode = 
+                submeshNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+              materialNode->SetValue ("material");
+              csRef<iDocumentNode> materialContents = 
+                materialNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+              materialContents->SetValue (
+                smMaterial->QueryObject()->GetName());
+            }
+
+            /* @@@ FIXME: This loop only works b/c GetShaderVariables() does 
+             * not return parent's SVs. Once it does, this code needs to 
+             * change, since only really the different SVs should be written 
+             * out. */
+            for (size_t i = 0; i < shadervars.GetSize(); i++)
+            {
+              csRef<iDocumentNode> shadervarNode = 
+                submeshNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+              shadervarNode->SetValue ("shadervar");
+              synldr->WriteShaderVar (shadervarNode, *(shadervars[i]));
+            }
           }
         }
       }

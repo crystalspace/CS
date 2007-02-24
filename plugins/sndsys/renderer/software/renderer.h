@@ -243,6 +243,8 @@ protected:
   /// Stores the list of components that have registered for callback notification
   csRefArray<iSndSysRendererCallback> m_CallbackList;
 
+  csRef<iEventHandler> weakEventHandler;
+
 protected:
   // Called when the renderer plugin is opened from the HandleEvent function
   bool Open();

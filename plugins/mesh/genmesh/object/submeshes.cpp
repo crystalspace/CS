@@ -158,13 +158,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     {
       SubMesh* subMesh = subMeshes.GetSubMesh (s);
       iRenderBuffer* buffer = subMesh->GetIndices();
-      size_t bufferTris = buffer->GetElementCount() / 3;
-      csRenderBufferLock<uint, iRenderBuffer*> indices (buffer);
+      size_t bufferTris = triangleCache.GetSize();
       for (size_t t = 0; t < bufferTris; t++)
       {
         csMeshedPolygon poly;
         poly.num_vertices = 3;
-        poly.vertices = (int*)(indices.Get (t*3));
+        poly.vertices = (int*)(&triangleCache[t]);
         polygonCache.Push (poly);
       }
     }

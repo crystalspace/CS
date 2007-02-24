@@ -6,7 +6,95 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-9-Aug-2005
+21-Aug-2006
+	- caedes added SCF_IMPLEMENT_FACTORY to movierecorder plugin.
+	- res added a helper to iterate over triangles from an index buffer
+	  (also supporting e.g. strips and quads).
+	- res changed the software renderer to use aforementioned helper.
+	- Jorrit fixed the bullet plugin so that it compiles again.
+	- caedes added pythmod.jam file with a rule for building python
+	  modules for crystalspace and made cspython use it.
+	- caedes added tooltip skin to the ice cegui theme (only for 0.5+).
+	- res made the xmlshader wrapper document properly keep track of node
+	  parents.
+20-Aug-2006
+	- res added texture crossbar support to glshader_fixed.
+	- res fixed an initialization bug in engseq.
+	- res moved the dynamic ambient application in case of lightmapping
+	  from code to shaders.
+18-Aug-2006
+        - res worked around some issues with wx in wxtest.
+	- Jorrit augmented the iDynamicsCollisionCallback with a position
+	  of collision, the normal of the collision and the penetration
+	  depth.
+	- res removed the legacy diffuse/ambient/reflection options from
+	  iMaterial.
+	- res made sectors be shader variable contexts as well. Fog and 
+	  dynamic ambient SVs are now provided by the sector itself. Also 
+	  streamlined csFog.
+15-Aug-2006
+	- res committed a patch from Timothy Whitfield <whitfieldts@gmail.com>
+	  to add csBaseEventHandler::UnregisterQueue ().
+14-Aug-2006
+	- res changed the way libraries are handled by genmeshify: instead
+	  of collecting them first and converting them after the main file
+	  was converted they're now converted as encountered, as this seems
+	  more robust.
+	- res re-used the standard loader context from genmeshify to better
+	  deal with "sloppy" maps that rely on the "try to load texture with
+	  name" and "create material from texture with name" features.
+	- res added the ability to override submesh materials in the mesh
+	  object to genmesh.
+	- res added a method to query material replacements from a Thing 
+	  object.
+	- res added support for material replacements to genmeshify.
+	- res fixed tangent + bitangent generation for genmeshes with 
+	  submeshes.
+13-Aug-2006
+	- res added CS_REQUEST_PLUGIN_TAG.
+	- res made genmeshify use the document plexer plugin.
+	- res made genmeshify properly handle the <settings> tag (fixes
+	  conversion of maps with custom lightmap cell sizes).
+12-Aug-2006
+	- res changed ptpdlight to not just update the light map the next
+	  frame after it's initially needed.
+	- res fixed some flaws in ptpdlight.
+	- res fixed genmeshify to always write a new factory for 
+	  hardtransformed meshes.
+	- res added PD light support to genmeshify.
+	- res fixed csRect::Extend() to truly ensure that the given point is
+	  inside the rectangle (it didn't adhere to csRect's exclusivity of 
+	  xmax/ymax).
+	- res fixed a crash when polygons from a polygonmesh of a genmesh with
+	  submeshes are requested.
+	- res csODECollider::CreateMeshGeometry() to use the polymesh 
+	  triangles directly instead of csPolygonMeshTools::Triangulate().
+	- Jorrit fixed compilation of the DDS image loader.
+	- Jorrit fixed compilation of walktest.
+	- Vincent fixed compilation of a few apps with GCC (GNU/Linux).
+	- res fixed some more XK_MISCELLANY warnings.
+	- res changed the way the TinyXML classes are wrapped: instead of 
+	  defining a set of macros to change their classnames put them into
+	  the CS namespace instead. 
+11-Aug-2006
+	- mdmkolbe fixed some minor warnings.
+	- mdmkolbe tweaked the signature of RemoveWeakListener.
+	- mdmkolbe mass converted to RegisterWeakListener.
+	- mdmkolbe fixed compilation problems in x2d and sdl2d due to the
+	  RemoveWeakListener conversion of csGraphics2D.  Reported by vknecht.
+	- res added the ability to query lightmaps for PD lights to Thing.
+	- res fixed the proctex event handler to properly work across modules.
+	- res renamed csgfx/memimage.h to csgfx/imagememory.h; this better
+	  reflects the name of the class defined withing and is in line with
+	  the other image-related image*.h headers.
+	- res added a plugin namespace to the ptanimimg sources.
+	- res fixed a potential crasher in ptanimimg.
+	- res added a texture plugin for lightmaps that are affected by PD
+	  lights.
+10-Aug-2006
+	- caedes changed CS_REQUEST_PLUGIN wrapper in pythpost.i so it works
+	  also with interfaces provided by other python modules.
+9-Aug-2006
 	- Jorrit extended parallaxAtt with a technique at priority 130.
 	  This technique is exactly the same as priority 150 but it
 	  doesn't handle attenuation correctly. This is useful on
@@ -17,7 +105,12 @@ chronological order.
 	  the technique 150 of parallaxAtt can disable itself.
 	- caedes fixed a problem that would make the python tutorials fail.
 	- mdmkolbe cleaned up miscellaneous warnings.
-8-Aug-2005
+	- mdmkolbe added RegisterWeakListener and RemoveWeakListener to
+	  handle registration and removal of event handlers that should
+	  be proxied through a weak reference.
+	- mdmkolbe converted libs/csplugincommon/canvas/graph2d.cpp and
+	  plugins/engine/3d/engine.cpp to use RegisterWeakListener.
+8-Aug-2006
 	- res re-added support for triangle-based submeshes in genmesh objects 
 	  in order to provide backwards compatibility.
 	- Jorrit renamed the type class in the old gmeshanim so that it no
@@ -26,14 +119,14 @@ chronological order.
 	  the maximum distance was very large it wouldn't work very well
 	  due to inaccuracy problems.
 	- caedes moved all swig interface files to include/bindings.
-7-Aug-2005
+7-Aug-2006
 	- res added ability to convert referenced libraries to genmeshify.
 	- Jorrit fixed a bug in the skeleton loader. It would return a
 	  reference to a factory (as a csPtr) without doing an IncRef.
 	  That would cause crashes at exit.
 	- Jorrit also made the event handler in the skeleton graveyard
 	  embedded to try to fix a leak there.
-6-Aug-2005
+6-Aug-2006
 	- Anders separated csHash iterators into const and non-const, like 
 	  csArray. This may lead to compile errors in user code. In most
 	  cases the solution to these is to change "GlobalIterator" to
@@ -48,7 +141,7 @@ chronological order.
 	- res changed genmesh to preserve user-set poly meshes when switching
 	  between "standard"/"submesh" poly meshes.
 	- res added writing of of polymeshes to genmeshify.
-5-Aug-2005
+5-Aug-2006
 	- mdmkolbe removed a redundant check of do_infinite in walktest.
 	- res added the iSelfDestruct interface to the csSaverFile, 
 	  csLibraryReference and csAddonReference so they can be removed from

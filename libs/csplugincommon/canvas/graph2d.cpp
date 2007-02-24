@@ -45,7 +45,6 @@ csGraphics2D::csGraphics2D (iBase* parent) :
 {
   static uint g2d_count = 0;
 
-  scfiEventHandler = 0;
   Memory = 0;
   LineAddress = 0;
   Palette = 0;
@@ -60,6 +59,7 @@ csGraphics2D::csGraphics2D (iBase* parent) :
   AllowResizing = false;
   refreshRate = 0;
   vsync = false;
+  weakEventHandler = 0;
 
   name.Format ("graph2d.%x", g2d_count++);
 
@@ -68,12 +68,11 @@ csGraphics2D::csGraphics2D (iBase* parent) :
 
 csGraphics2D::~csGraphics2D ()
 {
-  if (scfiEventHandler)
+  if (weakEventHandler != 0)
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
     if (q != 0)
-      q->RemoveListener (scfiEventHandler);
-    scfiEventHandler->DecRef ();
+      RemoveWeakListener (q, weakEventHandler);
   }
   Close ();
   delete [] Palette;
@@ -126,15 +125,13 @@ bool csGraphics2D::Initialize (iObjectRegistry* r)
     Palette [i].blue = 0;
   }
 
-  if (!scfiEventHandler)
-    scfiEventHandler = new EventHandler (this);
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
   {
     csEventID events[3] = { csevSystemOpen (object_reg), 
 			    csevSystemClose (object_reg), 
 			    CS_EVENTLIST_END };
-    q->RegisterListener (scfiEventHandler, events);
+    RegisterWeakListener (q, this, events, weakEventHandler);
   }
   return true;
 }
@@ -210,7 +207,7 @@ bool csGraphics2D::Initialize (iObjectRegistry* r, int width, int height,
     Palette [i].blue = 0;
   }
 
-  scfiEventHandler = 0;
+  weakEventHandler = 0;
 
   csGraphics2D::ofscb = ofscb;
 

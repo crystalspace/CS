@@ -31,6 +31,9 @@
 
 class csProcTexture;
 
+CS_PLUGIN_NAMESPACE_BEGIN(PTAnimImg)
+{
+
 class csAnimateProctexLoader :
   public scfImplementation2<csAnimateProctexLoader,
     iLoaderPlugin, iComponent>
@@ -50,5 +53,8 @@ public:
   	iStreamSource*, iLoaderContext* ldr_context,
   	iBase* context);
 };  
+
+}
+CS_PLUGIN_NAMESPACE_END(PTAnimImg)
 
 #endif

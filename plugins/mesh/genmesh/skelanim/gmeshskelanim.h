@@ -684,6 +684,7 @@ class csGenmeshSkelAnimationControlTypeOld :
 private:
   iObjectRegistry* object_reg;
   csRef<iVirtualClock> vc;
+  csRef<iEventHandler> weakEventHandler;
   csArray<csGenmeshSkelAnimationControl*> always_update_animations;
 
   void UpdateAUAnimations(csTicks current_ticks)

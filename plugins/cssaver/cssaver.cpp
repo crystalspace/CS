@@ -322,10 +322,6 @@ bool csSaver::SaveMaterials(iDocumentNode *parent)
     "crystalspace.shared.stringset", iStringSet);
 
   csStringID texdiffID = stringset->Request("tex diffuse");
-  csStringID matdiffID = stringset->Request("mat diffuse");
-  csStringID matambiID = stringset->Request("mat ambient");
-  csStringID matreflID = stringset->Request("mat reflection");
-  csStringID matflatcolID = stringset->Request("mat flatcolor");
   csStringID orlightID = stringset->Request("std_lighting");
   csStringID orcompatID = stringset->Request("standard");
 
@@ -351,15 +347,6 @@ bool csSaver::SaveMaterials(iDocumentNode *parent)
     if (name && *name)
       child->SetAttribute ("name", name);
 
-    csRGBpixel color;
-    matWrap->GetMaterial()->GetFlatColor(color, 0);
-    if (color.red != 255 || color.green != 255 || color.blue != 255)
-    {
-      csColor col (color.red * ONE_OVER_255, color.green * ONE_OVER_255,
-	      color.blue * ONE_OVER_255);
-      synldr->WriteColor (CreateNode (child, "color"), col);     
-    }
-
     if(texWrap)
     {
       const char* texname = texWrap->QueryObject()->GetName();
@@ -369,18 +356,6 @@ bool csSaver::SaveMaterials(iDocumentNode *parent)
 
     // Save Keys
     SaveKeys (child, matWrap->QueryObject ());
-
-    float diffuse,ambient,reflection;
-    matWrap->GetMaterial ()->GetReflection (diffuse, ambient, reflection);
-    if (diffuse && diffuse != CS_DEFMAT_DIFFUSE)
-      CreateNode (child, "diffuse")->CreateNodeBefore (CS_NODE_TEXT)->
-        SetValueAsFloat (diffuse);
-    if (ambient && ambient != CS_DEFMAT_AMBIENT)
-      CreateNode (child, "ambient")->CreateNodeBefore (CS_NODE_TEXT)->
-        SetValueAsFloat (ambient);
-    if (reflection && reflection != CS_DEFMAT_REFLECTION)
-      CreateNode (child, "reflection")->CreateNodeBefore (CS_NODE_TEXT)->
-        SetValueAsFloat (reflection);
 
     csHash<csRef<iShader>, csStringID> shaders = mat->GetShaders();
     csHash<csRef<iShader>, csStringID>::GlobalIterator shaderIter = 
@@ -431,13 +406,6 @@ bool csSaver::SaveMaterials(iDocumentNode *parent)
             float fval;
             if(shaderVar->GetValue(fval))
             {
-              if ((varnameid == matdiffID && fval == 0) ||
-                  (varnameid == matambiID && fval == 0) ||
-                  (varnameid == matreflID && fval == 0) )
-              {
-                child->RemoveNode(shadervarNode);
-                break;
-              }
               shadervarNode->SetAttribute("type", "float");
               shadervarNode->CreateNodeBefore(CS_NODE_TEXT)->
                 SetValueAsFloat(fval);
@@ -462,13 +430,6 @@ bool csSaver::SaveMaterials(iDocumentNode *parent)
             csVector3 v3;
             if(shaderVar->GetValue(v3))
             {
-              if (varnameid == matflatcolID && (v3 == 1 || v3.x*255 == color.red
-                  && v3.y *255 == color.green && v3.z *255 == color.blue))
-              {
-                child->RemoveNode(shadervarNode);
-                break;
-              }
-
               shadervarNode->SetAttribute("type", "vector3");
               csString value;
               value.Format("%f,%f,%f",v3.x,v3.y,v3.z);
@@ -745,12 +706,28 @@ bool csSaver::SaveSectors(iDocumentNode *parent)
 
     if (sector->HasFog ())
     {
-      csFog* fog = sector->GetFog ();
+      const csFog& fog = sector->GetFog ();
       csRef<iDocumentNode> fogNode = CreateNode (sectorNode, "fog");
-      fogNode->SetAttributeAsFloat ("red", fog->red);
-      fogNode->SetAttributeAsFloat ("green", fog->green);
-      fogNode->SetAttributeAsFloat ("blue", fog->blue);
-      fogNode->SetAttributeAsFloat ("density", fog->density);
+      fogNode->SetAttributeAsFloat ("red", fog.color.red);
+      fogNode->SetAttributeAsFloat ("green", fog.color.green);
+      fogNode->SetAttributeAsFloat ("blue", fog.color.blue);
+      switch (fog.mode)
+      {
+        case CS_FOG_MODE_EXP:
+        case CS_FOG_MODE_EXP2:
+          fogNode->SetAttribute ("mode", 
+            fog.mode == CS_FOG_MODE_EXP ? "exp" : "exp2");
+        case CS_FOG_MODE_CRYSTALSPACE:
+          fogNode->SetAttributeAsFloat ("density", fog.density);
+          break;
+        case CS_FOG_MODE_LINEAR:
+          fogNode->SetAttribute ("mode", "linear");
+          fogNode->SetAttributeAsFloat ("start", fog.start);
+          fogNode->SetAttributeAsFloat ("end", fog.end);
+          break;
+        default:
+          CS_ASSERT(false);
+      }
     }
     
     if (!SaveKeys (sectorNode, sector->QueryObject ())) return false;

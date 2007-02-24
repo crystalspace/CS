@@ -50,7 +50,8 @@
     V2F.framework.SetupFrag();
     
     float4 color = V2F.surfClassic.GetDiffuse (V2F.parallax.GetTCOffset()) * 
-      float4 (V2F.lightClassic.IllumDiffuse(), GetMixmodeAlpha());
+      float4 (V2F.lightClassic.IllumAmbient()+V2F.lightClassic.IllumDiffuse(), 
+	  GetMixmodeAlpha());
     // Apply detail
     color.rgb *= 2 * tex2D (texDetail, 
       V2F.tcDetail + V2F.parallax.GetTCOffset()).rgb;
@@ -125,7 +126,8 @@
     V2F.framework.SetupFrag();
 
     float4 color = V2F.surfClassic.GetDiffuse () * 
-      float4 (V2F.lightClassic.IllumDiffuse(), GetMixmodeAlpha());
+      float4 (V2F.lightClassic.IllumAmbient()+V2F.lightClassic.IllumDiffuse(), 
+	GetMixmodeAlpha());
     // Apply detail
     color.rgb *= 2 * tex2D (texDetail, V2F.tcDetail).rgb;
     

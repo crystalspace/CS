@@ -123,6 +123,7 @@ protected:
   virtual void SetAlwaysAnimate (bool enable);
   virtual iTextureFactory* GetFactory();
 
+  virtual void UseTexture ();
 public:
   // The current time the previous time the callback was called.
   // This is used to detect if the callback is called multiple times

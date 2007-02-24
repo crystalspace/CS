@@ -44,6 +44,12 @@ csODEParticlePhysics::csODEParticlePhysics (iBase *p) :
 csODEParticlePhysics::~csODEParticlePhysics ()
 {
   odestate->RemoveFrameUpdateCallback (this);
+  if (weakEventHandler)
+  {
+    csRef<iEventQueue> q = CS_QUERY_REGISTRY (objreg, iEventQueue);
+    if (q)
+      RemoveWeakListener (q, weakEventHandler);
+  }
 }
 
 
@@ -115,7 +121,7 @@ bool csODEParticlePhysics::Initialize (iObjectRegistry* reg)
 	"No event queue available");
       return false;
   }
-  eq->RegisterListener (this, PreProcess);
+  RegisterWeakListener (eq, this, PreProcess, weakEventHandler);
 
   clock = CS_QUERY_REGISTRY (objreg, iVirtualClock);
   if (clock == 0) 

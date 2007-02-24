@@ -34,6 +34,7 @@ Vert_LightingClassic lightingClassicVert;
 struct Frag_LightingClassic
 {
   uniform sampler2D lightmap;
+  uniform float3 ambient;
 };
 Frag_LightingClassic lightingClassicFrag;
 
@@ -47,6 +48,15 @@ struct LightingClassic
   {
   <?if vars."tex lightmap".texture ?>
     texCoordLM = lightingClassicVert.texCoordLM;
+  <?endif?>
+  }
+  
+  float3 IllumAmbient ()
+  {
+  <?if vars."tex lightmap".texture ?>
+    return lightingClassicFrag.ambient;
+  <?else?>
+    return float3 (0, 0, 0);
   <?endif?>
   }
   
@@ -77,5 +87,11 @@ struct LightingClassic
     <?endif?>
   <?Endtemplate?>
   <?AddToList PassMappings Pass_LightingClassic ?>
+
+  <?Template VariableMap_LightingClassic ?>
+    <variablemap variable="dynamic ambient" 
+      destination="lightingClassicFrag.ambient" />
+  <?Endtemplate?>
+  <?AddToList ProgramMappings VariableMap_LightingClassic ?>
 <?EndGlue?>
 </include>

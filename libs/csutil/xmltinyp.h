@@ -36,10 +36,10 @@ struct CS_CRYSTALSPACE_EXPORT csTinyXmlAttributeIterator :
 private:
   size_t current;
   size_t count;
-  TiXmlElement* parent;
+  CS::TiXmlElement* parent;
 
 public:
-  csTinyXmlAttributeIterator (TiDocumentNode* parent);
+  csTinyXmlAttributeIterator (CS::TiDocumentNode* parent);
   virtual ~csTinyXmlAttributeIterator ();
 
   virtual bool HasNext ();
@@ -53,7 +53,7 @@ struct CS_CRYSTALSPACE_EXPORT csTinyXmlAttribute :
   public scfImplementation1<csTinyXmlAttribute, iDocumentAttribute>
 {
 private:
-  TiDocumentAttribute* attr;
+  CS::TiDocumentAttribute* attr;
 
 public:
   csTinyXmlAttribute ()
@@ -61,7 +61,7 @@ public:
   {
   }
 
-  csTinyXmlAttribute (TiDocumentAttribute* attr)
+  csTinyXmlAttribute (CS::TiDocumentAttribute* attr)
     : scfImplementationType (this), attr (attr)
   {
   }
@@ -138,13 +138,13 @@ struct CS_CRYSTALSPACE_EXPORT csTinyXmlNodeIterator :
 {
 private:
   csTinyXmlDocument* doc;
-  TiDocumentNode* current;
-  TiDocumentNodeChildren* parent;
+  CS::TiDocumentNode* current;
+  CS::TiDocumentNodeChildren* parent;
   char* value;
 
 public:
   csTinyXmlNodeIterator (csTinyXmlDocument* doc,
-	TiDocumentNodeChildren* parent, const char* value);
+	CS::TiDocumentNodeChildren* parent, const char* value);
   virtual ~csTinyXmlNodeIterator ();
 
   virtual bool HasNext ();
@@ -159,8 +159,8 @@ struct CS_CRYSTALSPACE_EXPORT csTinyXmlNode :
 {
 private:
   friend class csTinyXmlDocument;
-  TiDocumentNode* node;
-  TiDocumentNodeChildren* node_children;
+  CS::TiDocumentNode* node;
+  CS::TiDocumentNodeChildren* node_children;
   // We keep a reference to 'doc' to avoid it being cleaned up too early.
   // We need 'doc' for the pool.
   csRef<csTinyXmlDocument> doc;
@@ -168,15 +168,15 @@ private:
 
   csTinyXmlNode (csTinyXmlDocument* doc);
 
-  TiDocumentAttribute* GetAttributeInternal (const char* name);
+  CS::TiDocumentAttribute* GetAttributeInternal (const char* name);
 
 public:
   virtual ~csTinyXmlNode ();
 
   virtual void DecRef ();
 
-  TiDocumentNode* GetTiNode () { return node; }
-  void SetTiNode (TiDocumentNode* node)
+  CS::TiDocumentNode* GetTiNode () { return node; }
+  void SetTiNode (CS::TiDocumentNode* node)
   {
     csTinyXmlNode::node = node;
     node_children = node->ToDocumentNodeChildren ();
@@ -227,7 +227,7 @@ class CS_CRYSTALSPACE_EXPORT csTinyXmlDocument :
   public scfImplementation1<csTinyXmlDocument, iDocument>
 {
 private:
-  TiDocument* root;
+  CS::TiDocument* root;
   // We keep a reference to 'sys' to avoid it being cleaned up too early.
   csRef<csTinyDocumentSystem> sys;
 
@@ -240,7 +240,7 @@ public:
   /// Internal function: don't use!
   csTinyXmlNode* Alloc ();
   /// Internal function: don't use!
-  csTinyXmlNode* Alloc (TiDocumentNode*);
+  csTinyXmlNode* Alloc (CS::TiDocumentNode*);
   /// Internal function: don't use!
   void Free (csTinyXmlNode* n);
 

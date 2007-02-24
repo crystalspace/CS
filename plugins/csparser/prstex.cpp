@@ -498,11 +498,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
 
   iTextureWrapper* texh = 0;
   bool col_set = false;
-  csRGBcolor col;
-  float diffuse = CS_DEFMAT_DIFFUSE;
-  float ambient = CS_DEFMAT_AMBIENT;
-  float reflection = CS_DEFMAT_REFLECTION;
-
+  csColor col;
   
   bool shaders_mentioned = false;	// If true there were shaders.
   csArray<csStringID> shadertypes;
@@ -539,22 +535,15 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
       case XMLTOKEN_COLOR:
 	{
           col_set = true;
-	  csColor color;
-          if (!SyntaxService->ParseColor (child, color))
+          if (!SyntaxService->ParseColor (child, col))
 	    return 0;
-	  col.red = csQint (color.red * 255.99f);
-	  col.green = csQint (color.green * 255.99f);
-	  col.blue = csQint (color.blue * 255.99f);
 	}
         break;
       case XMLTOKEN_DIFFUSE:
-	diffuse = child->GetContentsValueAsFloat ();
-        break;
       case XMLTOKEN_AMBIENT:
-	ambient = child->GetContentsValueAsFloat ();
-        break;
       case XMLTOKEN_REFLECTION:
-	reflection = child->GetContentsValueAsFloat ();
+        ReportWarning ("crystalspace.maploader.parse.material",
+          child, "Syntax not supported any more. Use shader variables instead");
         break;
       case XMLTOKEN_SHADER:
         {
@@ -611,8 +600,11 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   csRef<iMaterial> material = Engine->CreateBaseMaterial (texh);
 
   if (col_set)
-    material->SetFlatColor (col);
-  material->SetReflection (diffuse, ambient, reflection);
+  {
+    csShaderVariable* flatSV = material->GetVariableAdd (
+      stringSet->Request (CS_MATERIAL_VARNAME_FLATCOLOR));
+    flatSV->SetValue (col);
+  }
 
   iMaterialWrapper *mat;
  

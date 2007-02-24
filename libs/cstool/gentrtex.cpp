@@ -22,7 +22,7 @@
 #include "csutil/sysfunc.h"
 #include "igraphic/image.h"
 #include "csgfx/rgbpixel.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "csqint.h"
 
 

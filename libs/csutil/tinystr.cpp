@@ -31,6 +31,9 @@ distribution.
 
 #include "tinystr.h"
 
+namespace CS
+{
+
 // TiXmlString constructor, based on a C string
 TiXmlString::TiXmlString (const char* instring)
 {
@@ -261,3 +264,4 @@ bool TiXmlString::operator > (const TiXmlString & compare) const
   return false;
 }
 
+} // namespace CS

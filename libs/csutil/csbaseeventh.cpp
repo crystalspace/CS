@@ -98,6 +98,13 @@ bool csBaseEventHandler::RegisterQueue (iObjectRegistry* registry,
   return RegisterQueue (q, events);
 }
 
+void csBaseEventHandler::UnregisterQueue ()
+{
+  if (queue)
+    queue->RemoveListener (eventh);
+  queue = 0;
+}
+
 bool csBaseEventHandler::HandleEvent (iEvent &event)
 {
   CS_ASSERT_MSG("You need to call Initialize() with a valid object registry "

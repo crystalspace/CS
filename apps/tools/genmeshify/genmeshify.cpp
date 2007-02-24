@@ -43,6 +43,10 @@ namespace genmeshify
 
     // Get plugins
     if (!csInitializer::RequestPlugins (objectRegistry,
+            CS_REQUEST_PLUGIN("crystalspace.documentsystem.multiplexer", 
+              iDocumentSystem),
+            CS_REQUEST_PLUGIN_TAG("crystalspace.documentsystem.tinyxml", 
+              iDocumentSystem, "iDocumentSystem.1"),
             CS_REQUEST_ENGINE,
             CS_REQUEST_IMAGELOADER,
             CS_REQUEST_LEVELLOADER,
@@ -88,7 +92,12 @@ namespace genmeshify
       return Report ("Error opening system!");
 
     // For now, force the use of TinyXML to be able to write
-    docSystem.AttachNew (new csTinyDocumentSystem);
+    docSystem = csQueryRegistry<iDocumentSystem> (objectRegistry);
+    if (!vfs) 
+    {
+      Report ("No iDocumentSystem!");
+      return false;
+    }
 
     return true;
   }
@@ -101,6 +110,15 @@ namespace genmeshify
         "crystalspace.application.genmeshify", msg, arg);
     va_end (arg);
     return false;
+  }
+
+  void App::Report (int severity, const char* msg, ...)
+  {
+    va_list arg;
+    va_start (arg, msg);
+    csReportV (objectRegistry, severity, 
+        "crystalspace.application.genmeshify", msg, arg);
+    va_end (arg);
   }
 
   bool App::ProcessFiles ()
@@ -138,22 +156,8 @@ namespace genmeshify
       }
 
       map_idx++;
-      csStringArray files;
       Processor processor (this);
-      files.Push (val);
-      while (files.GetSize() > 0)
-      {
-        bool ret;
-        if (shallow)
-        {
-          csStringArray dummy;
-          ret = processor.Process (files[0], dummy);
-        }
-        else
-          ret = processor.Process (files[0], files);
-        if (!ret) return false;
-        files.DeleteIndex (0);
-      }
+      if (!processor.Process (val, shallow)) return false;
     }
 
     return true;

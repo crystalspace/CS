@@ -19,7 +19,6 @@
 #ifndef __CS_JPGIMAGE_H__
 #define __CS_JPGIMAGE_H__
 
-#include "csgfx/memimage.h"
 #include "igraphic/imageio.h"
 #include "csutil/leakguard.h"
 #include "iutil/eventh.h"

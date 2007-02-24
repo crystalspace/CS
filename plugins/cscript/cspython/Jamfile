@@ -82,77 +82,13 @@ if $(PYTHON.AVAILABLE) = "yes"
   CFlags cspython : $(CSPYTHON.CFLAGS) ;
   Depends cspython : $(cspacepy) ;
 
-
   #--------
   # pythmod -- Pure Python module
   #--------
-  local desc = "pure Python module" ;
-  local pythmod = _cspace ;
-  local pythmodclean ;
-
-  if [ Property build : projgen ]
-  {
-    Description _cspace : $(desc) ;
-    MSVCGEN.PLUGIN_EXT._cspace = .pyd ;
-    Plugin _cspace : pythmod.cpp ;
-    LinkWith _cspace : crystalspace_python crystalspace ;
-    ExternalLibs _cspace : PYTHON ;
-    Depends _cspace : pythmod ;
-  }
-  else
-  {
-    Description pythmod : $(desc) ;
-    Help pythmod : "Build the $(desc)" ;
-    local pythmodsrc = [ DoSourceGrist pythmod.cpp ] ;
-    local pythmodobj = [ CompileObjects $(pythmodsrc) ] ;
-    if $(PYTHON.MODULE_EXT)
-    {
-      pythmod = $(pythmod:S=$(PYTHON.MODULE_EXT)) ;
-    }
-    else
-    {
-      pythmod = [ ConstructPluginTarget $(pythmod) ] ;
-    }
-  
-    pythmod_TARGET = $(pythmod) ;
-    pythmod_SOURCES = $(pythmodsrc) ;
-    pythmod_OBJECTS = $(pythmodobj) ;
-    LinkWith pythmod : crystalspace_python crystalspace ;
-    ExternalLibs pythmod : PYTHON ;
-    CFlags pythmod : $(PLUGIN.CFLAGS) ;
-    LFlags pythmod : $(PLUGIN.LFLAGS) $(LINKLIBS) ;
-    NotFile pythmod ;
-    Depends pythmod : $(cspacepy) ;
-    Depends pythmod : $(pythmod) ;
-    Depends plugins : pythmod ;
-    MakeLocate $(pythmod) : $(LOCATE.TARGETS) ;
-    Depends $(pythmod) : $(pythmodobj) ;
-    LinkPlugin $(pythmod) : $(pythmodobj) ;
+  PythMod pythmod : _cspace : pythmod.cpp : crystalspace_python : 
+		: "pure Python module" ;
+  Depends pythmod : $(cspacepy) ;
     
-    if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
-    {
-      local debugfile = [ SplitDebugInfo $(pythmod) ] ;
-      pythmodclean += $(debugfile) ;
-      NoCare $(debugfile) ;
-      Depends install_plugin : [ DoInstall $(debugfile) : 
-				  $(appdatadir) bindings python : 
-				  $(INSTALL_DATA) ] ;
-    }
-  }
-
-  rule InstallPythmod
-  {
-    local plugindir = $(appdatadir) ; # Temporary override of global plugindir.
-    SystemInstallPlugin $(1) : $(2) ;
-  }
-  InstallPythmod $(pythmod) : bindings python ;
-
-  Always pythmodclean ;
-  NotFile pythmodclean ;
-  Clean pythmodclean : $(pythmod) $(pythmodobj) $(pythmodclean) ;
-  Depends clean : pythmodclean ;
-
-
   #--------
   # python.cex -- cs-config extension
   #--------

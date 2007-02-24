@@ -1462,12 +1462,12 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!csStrCaseCmp (cmd, "s_fog"))
   {
-    csFog* f = Sys->view->GetCamera ()->GetSector ()->GetFog ();
     if (!arg)
     {
+      const csFog& f = Sys->view->GetCamera ()->GetSector ()->GetFog ();
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
       	"Fog in current sector (%f,%f,%f) density=%f",
-      	f->red, f->green, f->blue, f->density);
+      	f.color.red, f.color.green, f.color.blue, f.density);
     }
     else
     {
@@ -1478,11 +1478,13 @@ bool CommandHandler (const char *cmd, const char *arg)
 		"Expected r,g,b,density. Got something else!");
         return false;
       }
-      f->enabled = true;
-      f->density = dens;
-      f->red = r;
-      f->green = g;
-      f->blue = b;
+      csFog f;
+      f.density = dens;
+      f.color.red = r;
+      f.color.green = g;
+      f.color.blue = b;
+      f.mode = CS_FOG_MODE_CRYSTALSPACE;
+      Sys->view->GetCamera ()->GetSector ()->SetFog (f);
     }
   }
   else if (!csStrCaseCmp (cmd, "portal"))

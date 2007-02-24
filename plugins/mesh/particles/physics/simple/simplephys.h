@@ -37,6 +37,7 @@ class csParticlesPhysicsSimple :
 {
   /// Object registry.
   iObjectRegistry* object_reg;
+  csRef<iEventHandler> weakEventHandler;
 
   struct particles_object
   {
