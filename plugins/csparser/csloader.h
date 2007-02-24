@@ -68,6 +68,7 @@ struct iShaderManager;
 struct iMeshGenerator;
 struct iSceneNode;
 struct iRenderLoop;
+struct iImposter;
 
 struct iObject;
 struct iThingState;
@@ -331,7 +332,7 @@ private:
   /// Process the attributes of one shared variable
   bool ParseSharedVariable (iLoaderContext* ldr_context, iDocumentNode* node);
   /// Process the attributes of an <imposter> tag in a mesh specification.
-  bool ParseImposterSettings(iMeshWrapper* mesh,iDocumentNode *node);
+  bool ParseImposterSettings(iImposter* mesh, iDocumentNode *node);
 
   /// Parse a texture definition and add the texture to the engine
   iTextureWrapper* ParseTexture (iLoaderContext* ldr_context,

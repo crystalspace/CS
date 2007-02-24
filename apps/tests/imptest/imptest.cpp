@@ -25,7 +25,7 @@ CS_IMPLEMENT_APPLICATION
 
 ImposterTest::ImposterTest ()
 {
-  SetApplicationName ("CrystalSpace.ImposterTest2");
+  SetApplicationName ("CrystalSpace.ImposterTest");
 }
 
 ImposterTest::~ImposterTest ()

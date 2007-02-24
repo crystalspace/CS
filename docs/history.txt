@@ -8,11 +8,19 @@ chronological order.
 
 24-Feb-2007
 	- Andrew Robberts fixed top and bottom clipping in decals
-
+	- Jorrit did some imposter work:
+	    - Removed CreateImposter() from iImposter. That function doesn't
+	      really make sense there and isn't needed either.
+	    - Mesh factories now also implement iImposter. This is currently
+	      only used as a default imposter setting for meshes created
+	      from the factory. In the future it might be used for sharing
+	      imposter actual imposters.
+	    - Changed the loader so that you can now also set imposter
+	      settings on the mesh factory.
 23-Feb-2007
 	- res added some groundwork for weaver int+bool support.
-	- res fixed a crash in shaderweaver when too many coercions were added
-	  to the internal tree.
+	- res fixed a crash in shaderweaver when too many coercions were
+	  added to the internal tree.
 	- res fixed a problem with merged input were the generating snippet
 	  would be emitted after the requiring input.
 	- res augmented the shaderweaver to also match an output to an input

@@ -1396,6 +1396,7 @@ csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine,
   children.SetMeshFactory (this);
 
   render_priority = engine->GetObjectRenderPriority ();
+  imposter_active = false;
 }
 
 csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine)
@@ -1405,6 +1406,7 @@ csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine)
   children.SetMeshFactory (this);
 
   render_priority = engine->GetObjectRenderPriority ();
+  imposter_active = false;
 }
 
 csMeshFactoryWrapper::~csMeshFactoryWrapper ()
@@ -1453,8 +1455,8 @@ void csMeshFactoryWrapper::SetMeshObjectFactory (iMeshObjectFactory *meshFact)
 csPtr<iMeshWrapper> csMeshFactoryWrapper::CreateMeshWrapper ()
 {
   csRef<iMeshObject> basemesh = meshFact->NewInstance ();
-  iMeshWrapper* mesh = 
-    static_cast<iMeshWrapper*> (new csMeshWrapper (engine, basemesh));
+  csMeshWrapper* cmesh = new csMeshWrapper (engine, basemesh);
+  iMeshWrapper* mesh = static_cast<iMeshWrapper*> (cmesh);
   basemesh->SetMeshWrapper (mesh);
 
   if (GetName ()) mesh->QueryObject ()->SetName (GetName ());
@@ -1462,6 +1464,9 @@ csPtr<iMeshWrapper> csMeshFactoryWrapper::CreateMeshWrapper ()
   mesh->SetRenderPriority (render_priority);
   mesh->SetZBufMode (zbufMode);
   mesh->GetFlags ().Set (flags.Get (), flags.Get ());
+  cmesh->SetImposterActive (imposter_active);
+  cmesh->SetMinDistance (min_imposter_distance);
+  cmesh->SetRotationTolerance (imposter_rotation_tolerance);
 
   if (static_lod)
   {
@@ -1569,6 +1574,12 @@ void csMeshFactoryWrapper::AddFactoryToStaticLOD (int lod,
   	static_lod->GetMeshesForLOD (lod);
   meshes_for_lod.Push (fact);
 }
+
+void csMeshFactoryWrapper::SetImposterActive (bool flag)
+{
+  imposter_active = flag;
+}
+
 
 //--------------------------------------------------------------------------
 // csMeshList
