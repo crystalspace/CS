@@ -8156,34 +8156,33 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::iSkeletonScriptKeyFrame ##############
+############# Class : cspace::iSkeletonAnimationKeyFrame ##############
 
-package cspace::iSkeletonScriptKeyFrame;
+package cspace::iSkeletonAnimationKeyFrame;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::iBase cspace );
 %OWNER = ();
 %ITERATORS = ();
-*GetName = *cspacec::iSkeletonScriptKeyFrame_GetName;
-*SetName = *cspacec::iSkeletonScriptKeyFrame_SetName;
-*GetDuration = *cspacec::iSkeletonScriptKeyFrame_GetDuration;
-*SetDuration = *cspacec::iSkeletonScriptKeyFrame_SetDuration;
-*GetTransformsCount = *cspacec::iSkeletonScriptKeyFrame_GetTransformsCount;
-*AddTransform = *cspacec::iSkeletonScriptKeyFrame_AddTransform;
-*GetTransform = *cspacec::iSkeletonScriptKeyFrame_GetTransform;
-*SetTransform = *cspacec::iSkeletonScriptKeyFrame_SetTransform;
-*GetKeyFrameData = *cspacec::iSkeletonScriptKeyFrame_GetKeyFrameData;
+*GetName = *cspacec::iSkeletonAnimationKeyFrame_GetName;
+*SetName = *cspacec::iSkeletonAnimationKeyFrame_SetName;
+*GetDuration = *cspacec::iSkeletonAnimationKeyFrame_GetDuration;
+*SetDuration = *cspacec::iSkeletonAnimationKeyFrame_SetDuration;
+*GetTransformsCount = *cspacec::iSkeletonAnimationKeyFrame_GetTransformsCount;
+*AddTransform = *cspacec::iSkeletonAnimationKeyFrame_AddTransform;
+*GetTransform = *cspacec::iSkeletonAnimationKeyFrame_GetTransform;
+*SetTransform = *cspacec::iSkeletonAnimationKeyFrame_SetTransform;
+*GetKeyFrameData = *cspacec::iSkeletonAnimationKeyFrame_GetKeyFrameData;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
     return unless defined $self;
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
-        cspacec::delete_iSkeletonScriptKeyFrame($self);
+        cspacec::delete_iSkeletonAnimationKeyFrame($self);
         delete $OWNER{$self};
     }
 }
 
-*scfGetVersion = *cspacec::iSkeletonScriptKeyFrame_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -8197,41 +8196,40 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::iSkeletonScript ##############
+############# Class : cspace::iSkeletonAnimation ##############
 
-package cspace::iSkeletonScript;
+package cspace::iSkeletonAnimation;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::iBase cspace );
 %OWNER = ();
 %ITERATORS = ();
-*GetName = *cspacec::iSkeletonScript_GetName;
-*SetName = *cspacec::iSkeletonScript_SetName;
-*GetTime = *cspacec::iSkeletonScript_GetTime;
-*SetTime = *cspacec::iSkeletonScript_SetTime;
-*GetSpeed = *cspacec::iSkeletonScript_GetSpeed;
-*SetSpeed = *cspacec::iSkeletonScript_SetSpeed;
-*SetFactor = *cspacec::iSkeletonScript_SetFactor;
-*GetFactor = *cspacec::iSkeletonScript_GetFactor;
-*SetLoop = *cspacec::iSkeletonScript_SetLoop;
-*GetLoop = *cspacec::iSkeletonScript_GetLoop;
-*CreateFrame = *cspacec::iSkeletonScript_CreateFrame;
-*GetFramesCount = *cspacec::iSkeletonScript_GetFramesCount;
-*GetFrame = *cspacec::iSkeletonScript_GetFrame;
-*FindFrameIndex = *cspacec::iSkeletonScript_FindFrameIndex;
-*RemoveFrame = *cspacec::iSkeletonScript_RemoveFrame;
-*RecalcSpline = *cspacec::iSkeletonScript_RecalcSpline;
+*GetName = *cspacec::iSkeletonAnimation_GetName;
+*SetName = *cspacec::iSkeletonAnimation_SetName;
+*GetTime = *cspacec::iSkeletonAnimation_GetTime;
+*SetTime = *cspacec::iSkeletonAnimation_SetTime;
+*GetSpeed = *cspacec::iSkeletonAnimation_GetSpeed;
+*SetSpeed = *cspacec::iSkeletonAnimation_SetSpeed;
+*SetFactor = *cspacec::iSkeletonAnimation_SetFactor;
+*GetFactor = *cspacec::iSkeletonAnimation_GetFactor;
+*SetLoop = *cspacec::iSkeletonAnimation_SetLoop;
+*GetLoop = *cspacec::iSkeletonAnimation_GetLoop;
+*CreateFrame = *cspacec::iSkeletonAnimation_CreateFrame;
+*GetFramesCount = *cspacec::iSkeletonAnimation_GetFramesCount;
+*GetFrame = *cspacec::iSkeletonAnimation_GetFrame;
+*FindFrameIndex = *cspacec::iSkeletonAnimation_FindFrameIndex;
+*RemoveFrame = *cspacec::iSkeletonAnimation_RemoveFrame;
+*RecalcSpline = *cspacec::iSkeletonAnimation_RecalcSpline;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
     return unless defined $self;
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
-        cspacec::delete_iSkeletonScript($self);
+        cspacec::delete_iSkeletonAnimation($self);
         delete $OWNER{$self};
     }
 }
 
-*scfGetVersion = *cspacec::iSkeletonScript_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -8245,22 +8243,22 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::iSkeletonScriptCallback ##############
+############# Class : cspace::iSkeletonAnimationCallback ##############
 
-package cspace::iSkeletonScriptCallback;
+package cspace::iSkeletonAnimationCallback;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::iBase cspace );
 %OWNER = ();
 %ITERATORS = ();
-*Execute = *cspacec::iSkeletonScriptCallback_Execute;
-*OnFinish = *cspacec::iSkeletonScriptCallback_OnFinish;
+*Execute = *cspacec::iSkeletonAnimationCallback_Execute;
+*OnFinish = *cspacec::iSkeletonAnimationCallback_OnFinish;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
     return unless defined $self;
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
-        cspacec::delete_iSkeletonScriptCallback($self);
+        cspacec::delete_iSkeletonAnimationCallback($self);
         delete $OWNER{$self};
     }
 }
@@ -8325,15 +8323,20 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *FindBoneIndex = *cspacec::iSkeleton_FindBoneIndex;
 *Execute = *cspacec::iSkeleton_Execute;
 *Append = *cspacec::iSkeleton_Append;
+*ClearPendingAnimations = *cspacec::iSkeleton_ClearPendingAnimations;
 *ClearPendingScripts = *cspacec::iSkeleton_ClearPendingScripts;
+*GetAnimationsCount = *cspacec::iSkeleton_GetAnimationsCount;
 *GetScriptsCount = *cspacec::iSkeleton_GetScriptsCount;
+*GetAnimation = *cspacec::iSkeleton_GetAnimation;
 *GetScript = *cspacec::iSkeleton_GetScript;
+*FindAnimation = *cspacec::iSkeleton_FindAnimation;
 *FindScript = *cspacec::iSkeleton_FindScript;
 *FindSocket = *cspacec::iSkeleton_FindSocket;
 *StopAll = *cspacec::iSkeleton_StopAll;
 *Stop = *cspacec::iSkeleton_Stop;
 *GetFactory = *cspacec::iSkeleton_GetFactory;
 *SetScriptCallback = *cspacec::iSkeleton_SetScriptCallback;
+*SetAnimationCallback = *cspacec::iSkeleton_SetAnimationCallback;
 *AddUpdateCallback = *cspacec::iSkeleton_AddUpdateCallback;
 *GetUpdateCallbacksCount = *cspacec::iSkeleton_GetUpdateCallbacksCount;
 *GetUpdateCallback = *cspacec::iSkeleton_GetUpdateCallback;
@@ -8566,7 +8569,9 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetName = *cspacec::iSkeletonFactory_GetName;
 *SetName = *cspacec::iSkeletonFactory_SetName;
 *CreateBone = *cspacec::iSkeletonFactory_CreateBone;
+*CreateAnimation = *cspacec::iSkeletonFactory_CreateAnimation;
 *CreateScript = *cspacec::iSkeletonFactory_CreateScript;
+*FindAnimation = *cspacec::iSkeletonFactory_FindAnimation;
 *FindScript = *cspacec::iSkeletonFactory_FindScript;
 *FindBone = *cspacec::iSkeletonFactory_FindBone;
 *FindBoneIndex = *cspacec::iSkeletonFactory_FindBoneIndex;

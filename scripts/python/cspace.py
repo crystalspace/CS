@@ -5392,80 +5392,74 @@ class iSkeletonBoneUpdateCallback(iBase):
 iSkeletonBoneUpdateCallback_swigregister = _cspace.iSkeletonBoneUpdateCallback_swigregister
 iSkeletonBoneUpdateCallback_swigregister(iSkeletonBoneUpdateCallback)
 
-class iSkeletonScriptKeyFrame(iBase):
+class iSkeletonAnimationKeyFrame(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonScriptKeyFrame, name, value)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonAnimationKeyFrame, name, value)
     __swig_getmethods__ = {}
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonScriptKeyFrame, name)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonAnimationKeyFrame, name)
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def GetName(*args): return _cspace.iSkeletonScriptKeyFrame_GetName(*args)
-    def SetName(*args): return _cspace.iSkeletonScriptKeyFrame_SetName(*args)
-    def GetDuration(*args): return _cspace.iSkeletonScriptKeyFrame_GetDuration(*args)
-    def SetDuration(*args): return _cspace.iSkeletonScriptKeyFrame_SetDuration(*args)
-    def GetTransformsCount(*args): return _cspace.iSkeletonScriptKeyFrame_GetTransformsCount(*args)
-    def AddTransform(*args): return _cspace.iSkeletonScriptKeyFrame_AddTransform(*args)
-    def GetTransform(*args): return _cspace.iSkeletonScriptKeyFrame_GetTransform(*args)
-    def SetTransform(*args): return _cspace.iSkeletonScriptKeyFrame_SetTransform(*args)
-    def GetKeyFrameData(*args): return _cspace.iSkeletonScriptKeyFrame_GetKeyFrameData(*args)
-    __swig_destroy__ = _cspace.delete_iSkeletonScriptKeyFrame
+    def GetName(*args): return _cspace.iSkeletonAnimationKeyFrame_GetName(*args)
+    def SetName(*args): return _cspace.iSkeletonAnimationKeyFrame_SetName(*args)
+    def GetDuration(*args): return _cspace.iSkeletonAnimationKeyFrame_GetDuration(*args)
+    def SetDuration(*args): return _cspace.iSkeletonAnimationKeyFrame_SetDuration(*args)
+    def GetTransformsCount(*args): return _cspace.iSkeletonAnimationKeyFrame_GetTransformsCount(*args)
+    def AddTransform(*args): return _cspace.iSkeletonAnimationKeyFrame_AddTransform(*args)
+    def GetTransform(*args): return _cspace.iSkeletonAnimationKeyFrame_GetTransform(*args)
+    def SetTransform(*args): return _cspace.iSkeletonAnimationKeyFrame_SetTransform(*args)
+    def GetKeyFrameData(*args): return _cspace.iSkeletonAnimationKeyFrame_GetKeyFrameData(*args)
+    __swig_destroy__ = _cspace.delete_iSkeletonAnimationKeyFrame
     __del__ = lambda self : None;
-    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSkeletonScriptKeyFrame_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_cspace.iSkeletonScriptKeyFrame_scfGetVersion)
-iSkeletonScriptKeyFrame_swigregister = _cspace.iSkeletonScriptKeyFrame_swigregister
-iSkeletonScriptKeyFrame_swigregister(iSkeletonScriptKeyFrame)
-iSkeletonScriptKeyFrame_scfGetVersion = _cspace.iSkeletonScriptKeyFrame_scfGetVersion
+iSkeletonAnimationKeyFrame_swigregister = _cspace.iSkeletonAnimationKeyFrame_swigregister
+iSkeletonAnimationKeyFrame_swigregister(iSkeletonAnimationKeyFrame)
 
-class iSkeletonScript(iBase):
+class iSkeletonAnimation(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonScript, name, value)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonAnimation, name, value)
     __swig_getmethods__ = {}
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonScript, name)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonAnimation, name)
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def GetName(*args): return _cspace.iSkeletonScript_GetName(*args)
-    def SetName(*args): return _cspace.iSkeletonScript_SetName(*args)
-    def GetTime(*args): return _cspace.iSkeletonScript_GetTime(*args)
-    def SetTime(*args): return _cspace.iSkeletonScript_SetTime(*args)
-    def GetSpeed(*args): return _cspace.iSkeletonScript_GetSpeed(*args)
-    def SetSpeed(*args): return _cspace.iSkeletonScript_SetSpeed(*args)
-    def SetFactor(*args): return _cspace.iSkeletonScript_SetFactor(*args)
-    def GetFactor(*args): return _cspace.iSkeletonScript_GetFactor(*args)
-    def SetLoop(*args): return _cspace.iSkeletonScript_SetLoop(*args)
-    def GetLoop(*args): return _cspace.iSkeletonScript_GetLoop(*args)
-    def CreateFrame(*args): return _cspace.iSkeletonScript_CreateFrame(*args)
-    def GetFramesCount(*args): return _cspace.iSkeletonScript_GetFramesCount(*args)
-    def GetFrame(*args): return _cspace.iSkeletonScript_GetFrame(*args)
-    def FindFrameIndex(*args): return _cspace.iSkeletonScript_FindFrameIndex(*args)
-    def RemoveFrame(*args): return _cspace.iSkeletonScript_RemoveFrame(*args)
-    def RecalcSpline(*args): return _cspace.iSkeletonScript_RecalcSpline(*args)
-    __swig_destroy__ = _cspace.delete_iSkeletonScript
+    def GetName(*args): return _cspace.iSkeletonAnimation_GetName(*args)
+    def SetName(*args): return _cspace.iSkeletonAnimation_SetName(*args)
+    def GetTime(*args): return _cspace.iSkeletonAnimation_GetTime(*args)
+    def SetTime(*args): return _cspace.iSkeletonAnimation_SetTime(*args)
+    def GetSpeed(*args): return _cspace.iSkeletonAnimation_GetSpeed(*args)
+    def SetSpeed(*args): return _cspace.iSkeletonAnimation_SetSpeed(*args)
+    def SetFactor(*args): return _cspace.iSkeletonAnimation_SetFactor(*args)
+    def GetFactor(*args): return _cspace.iSkeletonAnimation_GetFactor(*args)
+    def SetLoop(*args): return _cspace.iSkeletonAnimation_SetLoop(*args)
+    def GetLoop(*args): return _cspace.iSkeletonAnimation_GetLoop(*args)
+    def CreateFrame(*args): return _cspace.iSkeletonAnimation_CreateFrame(*args)
+    def GetFramesCount(*args): return _cspace.iSkeletonAnimation_GetFramesCount(*args)
+    def GetFrame(*args): return _cspace.iSkeletonAnimation_GetFrame(*args)
+    def FindFrameIndex(*args): return _cspace.iSkeletonAnimation_FindFrameIndex(*args)
+    def RemoveFrame(*args): return _cspace.iSkeletonAnimation_RemoveFrame(*args)
+    def RecalcSpline(*args): return _cspace.iSkeletonAnimation_RecalcSpline(*args)
+    __swig_destroy__ = _cspace.delete_iSkeletonAnimation
     __del__ = lambda self : None;
-    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSkeletonScript_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_cspace.iSkeletonScript_scfGetVersion)
-iSkeletonScript_swigregister = _cspace.iSkeletonScript_swigregister
-iSkeletonScript_swigregister(iSkeletonScript)
-iSkeletonScript_scfGetVersion = _cspace.iSkeletonScript_scfGetVersion
+iSkeletonAnimation_swigregister = _cspace.iSkeletonAnimation_swigregister
+iSkeletonAnimation_swigregister(iSkeletonAnimation)
 
-class iSkeletonScriptCallback(iBase):
+class iSkeletonAnimationCallback(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonScriptCallback, name, value)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonAnimationCallback, name, value)
     __swig_getmethods__ = {}
     for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonScriptCallback, name)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonAnimationCallback, name)
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def Execute(*args): return _cspace.iSkeletonScriptCallback_Execute(*args)
-    def OnFinish(*args): return _cspace.iSkeletonScriptCallback_OnFinish(*args)
-    __swig_destroy__ = _cspace.delete_iSkeletonScriptCallback
+    def Execute(*args): return _cspace.iSkeletonAnimationCallback_Execute(*args)
+    def OnFinish(*args): return _cspace.iSkeletonAnimationCallback_OnFinish(*args)
+    __swig_destroy__ = _cspace.delete_iSkeletonAnimationCallback
     __del__ = lambda self : None;
-iSkeletonScriptCallback_swigregister = _cspace.iSkeletonScriptCallback_swigregister
-iSkeletonScriptCallback_swigregister(iSkeletonScriptCallback)
+iSkeletonAnimationCallback_swigregister = _cspace.iSkeletonAnimationCallback_swigregister
+iSkeletonAnimationCallback_swigregister(iSkeletonAnimationCallback)
 
 class iSkeletonUpdateCallback(iBase):
     __swig_setmethods__ = {}
@@ -5499,15 +5493,20 @@ class iSkeleton(iBase):
     def FindBoneIndex(*args): return _cspace.iSkeleton_FindBoneIndex(*args)
     def Execute(*args): return _cspace.iSkeleton_Execute(*args)
     def Append(*args): return _cspace.iSkeleton_Append(*args)
+    def ClearPendingAnimations(*args): return _cspace.iSkeleton_ClearPendingAnimations(*args)
     def ClearPendingScripts(*args): return _cspace.iSkeleton_ClearPendingScripts(*args)
+    def GetAnimationsCount(*args): return _cspace.iSkeleton_GetAnimationsCount(*args)
     def GetScriptsCount(*args): return _cspace.iSkeleton_GetScriptsCount(*args)
+    def GetAnimation(*args): return _cspace.iSkeleton_GetAnimation(*args)
     def GetScript(*args): return _cspace.iSkeleton_GetScript(*args)
+    def FindAnimation(*args): return _cspace.iSkeleton_FindAnimation(*args)
     def FindScript(*args): return _cspace.iSkeleton_FindScript(*args)
     def FindSocket(*args): return _cspace.iSkeleton_FindSocket(*args)
     def StopAll(*args): return _cspace.iSkeleton_StopAll(*args)
     def Stop(*args): return _cspace.iSkeleton_Stop(*args)
     def GetFactory(*args): return _cspace.iSkeleton_GetFactory(*args)
     def SetScriptCallback(*args): return _cspace.iSkeleton_SetScriptCallback(*args)
+    def SetAnimationCallback(*args): return _cspace.iSkeleton_SetAnimationCallback(*args)
     def AddUpdateCallback(*args): return _cspace.iSkeleton_AddUpdateCallback(*args)
     def GetUpdateCallbacksCount(*args): return _cspace.iSkeleton_GetUpdateCallbacksCount(*args)
     def GetUpdateCallback(*args): return _cspace.iSkeleton_GetUpdateCallback(*args)
@@ -5665,7 +5664,9 @@ class iSkeletonFactory(iBase):
     def GetName(*args): return _cspace.iSkeletonFactory_GetName(*args)
     def SetName(*args): return _cspace.iSkeletonFactory_SetName(*args)
     def CreateBone(*args): return _cspace.iSkeletonFactory_CreateBone(*args)
+    def CreateAnimation(*args): return _cspace.iSkeletonFactory_CreateAnimation(*args)
     def CreateScript(*args): return _cspace.iSkeletonFactory_CreateScript(*args)
+    def FindAnimation(*args): return _cspace.iSkeletonFactory_FindAnimation(*args)
     def FindScript(*args): return _cspace.iSkeletonFactory_FindScript(*args)
     def FindBone(*args): return _cspace.iSkeletonFactory_FindBone(*args)
     def FindBoneIndex(*args): return _cspace.iSkeletonFactory_FindBoneIndex(*args)
