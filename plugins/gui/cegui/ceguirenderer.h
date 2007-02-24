@@ -133,7 +133,6 @@ public:
 private:
   iObjectRegistry* obj_reg;
   csCEGUIEventHandler* events;
-  csCEGUIResourceProvider* resourceProvider;
   csCEGUIScriptModule* scriptModule;
 
   csRef<iGraphics3D> g3d;

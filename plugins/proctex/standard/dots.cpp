@@ -26,6 +26,7 @@
 #include "imap/services.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
+#include "csutil/scf.h"
 
 #include "prdots.h"
 #include "stdproctex.h"
@@ -37,7 +38,8 @@ SCF_IMPLEMENT_FACTORY(csPtDotsSaver)
 
 #define CLASSID_DOTSTYPE "crystalspace.texture.type.dots"
 
-csPtDotsType::csPtDotsType (iBase* p) : csBaseProctexType(p)
+csPtDotsType::csPtDotsType (iBase* p) :
+  scfImplementationType(this, p)
 {
 }
 
@@ -50,8 +52,9 @@ csPtr<iTextureFactory> csPtDotsType::NewFactory()
 //---------------------------------------------------------------------------
 // 'Dots' PT factory
 
-csPtDotsFactory::csPtDotsFactory (iTextureType* p, iObjectRegistry* object_reg) : 
-    csBaseTextureFactory (p, object_reg)
+csPtDotsFactory::csPtDotsFactory (iTextureType* p,
+  iObjectRegistry* object_reg) : 
+  scfImplementationType(this, p, object_reg)
 {
 }
 
@@ -72,7 +75,8 @@ csPtr<iTextureWrapper> csPtDotsFactory::Generate ()
 //---------------------------------------------------------------------------
 // 'Dots' loader.
 
-csPtDotsLoader::csPtDotsLoader(iBase *p) : csBaseProctexLoader(p)
+csPtDotsLoader::csPtDotsLoader(iBase *p) :
+  scfImplementationType(this, p)
 {
 //  init_token_table (tokens);
 }
@@ -124,7 +128,8 @@ csPtr<iBase> csPtDotsLoader::Parse (iDocumentNode* /*node*/,
 //---------------------------------------------------------------------------
 // 'Dots' saver.
 
-csPtDotsSaver::csPtDotsSaver (iBase* p) : csBaseProctexSaver(p)
+csPtDotsSaver::csPtDotsSaver (iBase* p) :
+  scfImplementationType(this, p)
 {
 }
 

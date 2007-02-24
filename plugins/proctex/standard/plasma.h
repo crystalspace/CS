@@ -24,21 +24,24 @@
 #include "csutil/strhash.h"
 #include "csutil/csstring.h"
 
-class csPtPlasmaType : public csBaseProctexType
+class csPtPlasmaType :
+  public scfImplementationExt0<csPtPlasmaType, csBaseProctexType>
 {
 public:
   csPtPlasmaType (iBase *p);
   virtual csPtr<iTextureFactory> NewFactory();
 };
 
-class csPtPlasmaFactory : public csBaseTextureFactory
+class csPtPlasmaFactory :
+  public scfImplementationExt0<csPtPlasmaFactory, csBaseTextureFactory>
 {
 public:
   csPtPlasmaFactory (iTextureType* p, iObjectRegistry* object_reg);
   virtual csPtr<iTextureWrapper> Generate ();
 };
 
-class csPtPlasmaLoader : public csBaseProctexLoader
+class csPtPlasmaLoader :
+  public scfImplementationExt0<csPtPlasmaLoader, csBaseProctexLoader>
 {
   csStringHash tokens;
 //#define CS_TOKEN_ITEM_FILE "plugins/proctex/standard/plasma.tok"
@@ -50,7 +53,8 @@ public:
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
 };
 
-class csPtPlasmaSaver : public csBaseProctexSaver
+class csPtPlasmaSaver :
+  public scfImplementationExt0<csPtPlasmaSaver, csBaseProctexSaver>
 {
 public:
   csPtPlasmaSaver(iBase *p);

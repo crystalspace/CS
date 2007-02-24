@@ -131,9 +131,7 @@ void csEventHandlerRegistry::ReleaseID (iEventHandler *handler)
 {
   csHandlerID id = handlerToID.Get (handler, CS_HANDLER_INVALID);
   CS_ASSERT(id != CS_HANDLER_INVALID);
-  handlerToID.DeleteAll (handler);
-  idToHandler.DeleteAll (id);
-  instantiation.DeleteAll (id);
+  ReleaseID (id);
 }
 
 const char * csEventHandlerRegistry::GetString (csHandlerID id)

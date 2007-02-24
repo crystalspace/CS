@@ -1340,7 +1340,6 @@ AS_IF([test $cs_cv_libfreetype2 = yes],
 	[cs_cv_freetype2_recent],
 	[AC_LANG_PROGRAM(
 	    [[#include <ft2build.h>
-	    #include FT_INTERNAL_OBJECTS_H
 	    #include FT_FREETYPE_H
 	    #include FT_GLYPH_H
 	    #include FT_MODULE_H]], [return

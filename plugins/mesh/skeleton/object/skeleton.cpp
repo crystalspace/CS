@@ -1116,7 +1116,7 @@ iSkeletonBoneFactory *csSkeletonFactory::CreateBone(const char *name)
   bone.AttachNew(new csSkeletonBoneFactory(this));
   bone->SetName(name);
   bones.Push(bone);
-  return bone; 
+  return bone;
 }
 
 csSkeletonFactory::~csSkeletonFactory ()

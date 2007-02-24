@@ -6,6 +6,104 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Jul-2006
+	- Jorrit documented the new -cfgfile and -cfgset commandline
+	  options and also added documentation for a few other commonly
+	  used options.
+	- Jorrit fixed a crash in the handling of the new -cfgfile
+	  option. If you didn't use that option then applications would
+	  crash.
+23-Jul-2006
+	- mdmkolbe converted the following plugins to the new SCF:
+	    - plugins/csparser/
+	    - plugins/documentsystem/
+	    - plugins/proctex/standard/
+	    - plugins/terraformer/
+	    - plugins/reporter/
+	- res added the ability to specify configuration settings via the
+	  command line. Accepted are two new switches, -cfgset=<key=value>,
+	  which adds a single setting to the configuration manager, and
+	  -cfgfile=<file>, which adds a complete file to the configuration
+	  manager.
+	- res fixed a crash on VC due ptmalloc being shut down before some
+	  global variables were destructed.
+	- res fixed a destruction issue of xmlshader's TempString.
+	- res augmented the shader conditionaly to support "weak templates" 
+	  which don't override existing templates of the same name. 
+	  Instruction is <?TemplateWeak ...?>.
+	- res fixed xmlshader to correctly deal with sub-conditions of 
+	  conditions always being false.
+	- res fixed a bug in the PS1.x to 1.4 where texture registers as the
+	  destination were not handled correctly.
+	- res enhanced the PS1.x to 1.4 converter to track register usage more
+	  finely.
+	- res added the ability to specify an upper cap for program profiles 
+	  to the Cg plugin.
+	- res committed a patch from Gellule <gellule.xg@free.fr> to add
+	  csStringBase::FindLast (const char*, size_t).
+22-Jul-2006
+	- Oktal fixed the order of some declaration qualifiers in spinlock.h;
+	  CS_FORCEINLINE must come *before* the method's return type, at least
+	  on gcc3. This is my first commit by SVN, so I hope it doesn't break.
+	- res fixed the configure freetype check to not reference an internal
+	  header (doesn't work with FreeType2.2 any more).
+	- mdmkolbe applied a (modified) patch from res2k that fixes a crash
+	  caused by the interaction between ptmalloc and Cygwin.
+21-Jul-2006
+	- res fixed an assertion triggered by csBaseEventHandler that could
+	  occur when the destruction occured after 
+	  iEventQueue->RemoveAllListeners() was already called.
+	- res fixed csEventHandlerRegistry::ReleaseID(iEventHandler*) to
+	  not ignore the "refcount" of an ID (and thus prematurely releasing
+	  an ID even though not all RegisterID() calls are balanced with a
+	  ReleaseID() call).
+	- res changed the CEGUI resource provider to use platform new (since
+	  it sometimes is freed with the platform delete).
+20-Jul-2006
+	- Andres added the svn:eol-style property to all text files lacking
+	  it (set to native). This is needed to have the eol set to the
+	  native version of the platform (eg \r\n on win, \n on linux).
+	  Without it eg. cross building and manual generation doesnt work
+	  properly. All people adding new text files should look that the
+	  property is set to native. (There is a mechanism called autoprops
+	  which does this for you)
+	- Jorrit added a section in the manual explaining several tricks
+	  you can use to speed up map loading and runtime performance.
+	- iceeey added "normal scale" shadervar to splatting_scattering.
+	  This can be used to separately scale the normal texture on terrain.
+	  When not specified, the "texture scale" is used by default.
+	  The Marble material in 'terrain' level demonstrates this.
+	- iceeey updated cegui plugin to work with CEGUI 0.5.0 while
+	  retaining compatibility with older versions.
+	- iceeey added a CEGUI 0.5.0 compatible version of the 'ice' skin which
+	  ceguitest will use depending on which version of CEGUI you have.
+	- res worked around a FreeType2.2.1 issue where it would return an
+	  error when rendering an empty glyph (e.g SPACE).
+19-Jul-2006
+	- Jorrit simplified viewmesh a lot. It no longer attempts to do
+	  any path handling automatically. So the ':' notation is gone
+	  and it no longer attempts to automatically guess the VFS dir
+	  to use as the current directory. Instead there are two new
+	  commandline options:
+	      -R: this option takes a real path and it will mount it to
+	          /tmp/viewmesh. Then it makes that directory the current
+		  directory.
+	      -C: this option takes a VFS path and it will make that directory
+	          the current directory. If this option is used together
+		  with -R then you can change the VFS dir to be relative
+		  to the location mounted with -R.
+	  The filename itself will be used as-is.
+	- Jorrit added a documentation section for viewmesh (under the new
+	  'rule' that every new feature that is added to CS should now
+	  be immediatelly documented :-)
+	- Jorrit updated the documentation about Blender (removed the
+	  mention of the obsolete old blend2cs tool).
+	- Jorrit added a reference to the new ViewMesh documentation
+	  from the overview.
+17-Jul-2006
+	- res changed csSpinLock to use a non-volatile pthread_mutex_t.
+	- res applied a patch from Joerg Fischer to fix the offsets in
+	  plugins/device/joystick/windows/dinputdefs.h.
 12-Jul-2006
         - res added a check for the -Bsymbolic linker option to configure.
           This binds "references to global symbols to the definition within 

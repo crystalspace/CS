@@ -26,47 +26,24 @@
 #include "iengine/material.h"
 #include "iengine/texture.h"
 #include "cstool/proctex.h"
+#include "csutil/scf.h"
 
 #include "stdproctex.h"
 
 // Plugin stuff
-
-SCF_IMPLEMENT_IBASE(csBaseProctexType);
-  SCF_IMPLEMENTS_INTERFACE(iTextureType);
-  SCF_IMPLEMENTS_INTERFACE(iComponent);
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE(csBaseProctexLoader);
-  SCF_IMPLEMENTS_INTERFACE(iLoaderPlugin);
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent);
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csBaseProctexLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csBaseProctexSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csBaseProctexSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 CS_IMPLEMENT_PLUGIN
 
 //---------------------------------------------------------------------------
 // Base for all PT types
 
-csBaseProctexType::csBaseProctexType (iBase *p)
+csBaseProctexType::csBaseProctexType (iBase *p) :
+  scfImplementationType(this, p)
 {
-  SCF_CONSTRUCT_IBASE (p);
 }
 
 csBaseProctexType::~csBaseProctexType ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csBaseProctexType::Initialize(iObjectRegistry *object_reg)
@@ -79,16 +56,13 @@ bool csBaseProctexType::Initialize(iObjectRegistry *object_reg)
 //---------------------------------------------------------------------------
 // Base for all PT loaders
 
-csBaseProctexLoader::csBaseProctexLoader(iBase *p)
+csBaseProctexLoader::csBaseProctexLoader(iBase *p) :
+  scfImplementationType(this, p)
 {
-  SCF_CONSTRUCT_IBASE (p);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
 }
 
 csBaseProctexLoader::~csBaseProctexLoader ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csBaseProctexLoader::Initialize(iObjectRegistry *object_reg)
@@ -114,16 +88,13 @@ csPtr<iBase> csBaseProctexLoader::PrepareProcTex (csProcTexture* pt)
 //---------------------------------------------------------------------------
 // Base for all PT Savers
 
-csBaseProctexSaver::csBaseProctexSaver (iBase* p)
+csBaseProctexSaver::csBaseProctexSaver (iBase* p) :
+  scfImplementationType(this, p)
 {
-  SCF_CONSTRUCT_IBASE (p);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csBaseProctexSaver::~csBaseProctexSaver ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csBaseProctexSaver::Initialize (iObjectRegistry* object_reg)

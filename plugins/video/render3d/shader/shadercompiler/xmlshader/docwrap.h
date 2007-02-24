@@ -222,6 +222,11 @@ protected:
   void ParseTemplateArguments (const char* str, 
     Template::Params& strings);
 
+  /// Parse a "Template" or "TemplateWeak" processing instruction
+  bool ProcessInstrTemplate (NodeProcessingState* state, iDocumentNode* node, 
+    const char* valStart, size_t valLen, size_t cmdLen, const char* space, 
+    bool weak);
+
   template<typename ConditionEval>
   void ProcessSingleWrappedNode (ConditionEval& eval, 
     NodeProcessingState* state, iDocumentNode* wrappedNode);
@@ -333,6 +338,7 @@ class csWrappedDocumentNodeFactory
   enum
   {
     PITOKEN_TEMPLATE_NEW = 0xfeeb1e,
+    PITOKEN_TEMPLATEWEAK,
     PITOKEN_ENDTEMPLATE_NEW,
     PITOKEN_INCLUDE_NEW,
     PITOKEN_GENERATE,

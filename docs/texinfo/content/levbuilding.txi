@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Map Creation, Simple Map Example, Working with Engine Content, Working with Engine Content
+@node Map Creation, Map Creation Tips, Working with Engine Content, Working with Engine Content
 @section How to Create Optimal Maps for Crystal Space
 @cindex Visibility Culling
 @cindex Culling, Visibility
@@ -15,10 +15,14 @@ a lot of factors to consider. Crystal Space has a lot of tools to offer
 effectively is an art. In this chapter we will not talk about how to create
 maps. For that you use external tools like Blender, Quark, or some other
 suitable tool.  This chapter focuses on how you should partition your map into
-sectors, the kind of mesh objects you should use, the visibility cullers, etc.
+sectors, the kind of mesh objects you should use, the visibility cullers,
+packing textures for more efficient rendering, combining objects,
+lighting considerations, etc.
 
 For a good discussion about sectors and visibility cullers, see
 @ref{Visibility Culling}.
+
+For more tips about efficient maps, see @ref{Map Creation Tips}.
 
 @subsubheading Sectors and Portals
 @cindex portals
@@ -70,7 +74,9 @@ sectors is hard to say and really depends on the complexity of the map.
 
 Every sector has its own visibility culler.
 Crystal Space currently supports two kinds of visibility cullers:
-@dfn{Frustvis} and @dfn{Dynavis}. Dynavis attempts to work more
+@dfn{Frustvis} and @dfn{Dynavis}. In the future we will have a
+@sc{pvs} culler as well (potentially visible set) which basically precalculates
+visibility in a separate tool. Dynavis attempts to work more
 on culling but it also has more overhead. So, you should use Frustvis in
 cases when you have the following kinds of maps:
 
@@ -359,7 +365,11 @@ It is harder for the artist to create models with this technique.
 
 @item
 This technique is not possible if you have a tiling texture; i.e. a wall
-texture that is repeated accross a large surface.
+texture that is repeated accross a large surface. There are a few
+workarounds for this problem. For example you can pretile the texture on
+the super-material but that only works if there are not too many tiles
+required. Also you can split the polygons so that tiling is no longer
+required.
 @end enumerate
 
 @subsubheading Lighting Considerations

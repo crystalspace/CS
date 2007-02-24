@@ -24,10 +24,12 @@
 #include "csutil/strhash.h"
 #include "csutil/csstring.h"
 #include "csutil/leakguard.h"
+#include "csutil/scf_implementation.h"
 
 #include "iutil/comp.h"
 
-class csFuncTexLoader : public iLoaderPlugin
+class csFuncTexLoader :
+  public scfImplementation2<csFuncTexLoader, iLoaderPlugin, iComponent>
 {
 protected:
   iObjectRegistry* object_reg;
@@ -38,8 +40,6 @@ protected:
 public:
   CS_LEAKGUARD_DECLARE (csFuncTexLoader);
 
-  SCF_DECLARE_IBASE;
-
   csFuncTexLoader (iBase *p);
   virtual ~csFuncTexLoader();
 
@@ -47,14 +47,6 @@ public:
 
   virtual csPtr<iBase> Parse (iDocumentNode* node, 
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csFuncTexLoader);
-
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
 };
 
 #endif // __CS_TLFUNC_H__

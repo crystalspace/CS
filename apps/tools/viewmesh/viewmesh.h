@@ -101,11 +101,11 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
 
   void CreateRoom ();
   void CreateGui ();
-  void LoadLibrary(const char* path, const char* file);
-  void LoadTexture(const char* path, const char* file, const char* name);
-  void LoadSprite (const char* path, const char* file);
-  void SaveSprite (const char* path, const char* file, bool binary);
-  void AttachMesh (const char* path, const char* file);
+  void LoadLibrary(const char* file);
+  void LoadTexture(const char* file, const char* name);
+  void LoadSprite (const char* file);
+  void SaveSprite (const char* file, bool binary);
+  void AttachMesh (const char* file);
   void SelectSocket (const char* newsocket);
   void ScaleSprite (float newScale);
   void UpdateSocketList ();
@@ -160,7 +160,6 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
 
 private:
 
-  bool ParseDir(const char* filename);
   void StdDlgUpdateLists(const char* filename);
 
   static void StdDlgOkButton (unsigned long, intptr_t awst, iAwsSource *s);

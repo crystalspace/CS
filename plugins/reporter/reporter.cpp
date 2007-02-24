@@ -32,24 +32,21 @@ SCF_IMPLEMENT_FACTORY (csReporter)
 
 //-----------------------------------------------------------------------
 
-class csReporterIterator : public iReporterIterator
+class csReporterIterator :
+  public scfImplementation1<csReporterIterator, iReporterIterator>
 {
 public:
   csPDelArray<csReporterMessage> messages;
   size_t idx;
 
 public:
-  SCF_DECLARE_IBASE;
-
-  csReporterIterator ()
+  csReporterIterator () : scfImplementationType(this)
   {
-    SCF_CONSTRUCT_IBASE (0);
     idx = 0;
   }
 
   virtual ~csReporterIterator ()
   {
-    SCF_DESTRUCT_IBASE();
   }
 
   virtual bool HasNext ()
@@ -78,25 +75,11 @@ public:
   }
 };
 
-SCF_IMPLEMENT_IBASE (csReporterIterator)
-  SCF_IMPLEMENTS_INTERFACE (iReporterIterator)
-SCF_IMPLEMENT_IBASE_END
-
 //-----------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csReporter)
-  SCF_IMPLEMENTS_INTERFACE (iReporter)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csReporter::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csReporter::csReporter (iBase *iParent)
+csReporter::csReporter (iBase *iParent) :
+  scfImplementationType(this, iParent)
 {
-  SCF_CONSTRUCT_IBASE (iParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   object_reg = 0;
   mutex = csMutex::Create (true);
 }
@@ -104,8 +87,6 @@ csReporter::csReporter (iBase *iParent)
 csReporter::~csReporter ()
 {
   Clear (-1);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csReporter::Initialize (iObjectRegistry *object_reg)

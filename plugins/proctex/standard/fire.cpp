@@ -28,6 +28,7 @@
 #include "ivideo/texture.h"
 
 #include "csgfx/gradient.h"
+#include "csutil/scf.h"
 
 #include "prfire.h"
 #include "stdproctex.h"
@@ -39,7 +40,8 @@ SCF_IMPLEMENT_FACTORY(csPtFireSaver)
 
 #define CLASSID_FIRETYPE "crystalspace.texture.type.fire"
 
-csPtFireType::csPtFireType (iBase* p) : csBaseProctexType(p)
+csPtFireType::csPtFireType (iBase* p) :
+  scfImplementationType(this, p)
 {
 }
 
@@ -52,8 +54,8 @@ csPtr<iTextureFactory> csPtFireType::NewFactory()
 //---------------------------------------------------------------------------
 // 'Fire' PT factory
 
-csPtFireFactory::csPtFireFactory (iTextureType* p, iObjectRegistry* object_reg) : 
-    csBaseTextureFactory (p, object_reg)
+csPtFireFactory::csPtFireFactory (iTextureType* p, iObjectRegistry* object_reg) :
+  scfImplementationType(this, p, object_reg)
 {
 }
 
@@ -74,7 +76,8 @@ csPtr<iTextureWrapper> csPtFireFactory::Generate ()
 //---------------------------------------------------------------------------
 // 'Fire' loader.
 
-csPtFireLoader::csPtFireLoader(iBase *p) : csBaseProctexLoader(p)
+csPtFireLoader::csPtFireLoader(iBase *p) :
+  scfImplementationType(this, p)
 {
   InitTokenTable (tokens);
 }
@@ -183,7 +186,8 @@ csPtr<iBase> csPtFireLoader::Parse (iDocumentNode* node,
 //---------------------------------------------------------------------------
 // 'Fire' saver.
 
-csPtFireSaver::csPtFireSaver (iBase* p) : csBaseProctexSaver(p)
+csPtFireSaver::csPtFireSaver (iBase* p) :
+  scfImplementationType(this, p)
 {
 }
 

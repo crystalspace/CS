@@ -20,6 +20,7 @@
 #define __CS_DIRECTDETECTION_H__
 
 #include "csextern_dx.h"
+#include "csutil/array.h"
 
 #include <windows.h>
 #include <ddraw.h>

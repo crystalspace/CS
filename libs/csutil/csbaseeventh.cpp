@@ -53,10 +53,10 @@ void csBaseEventHandler::Initialize (iObjectRegistry *r)
 
 csBaseEventHandler::~csBaseEventHandler()
 {
-  if (queue)
-    queue->RemoveListener (eventh);
   if (object_registry)
     csEventHandlerRegistry::ReleaseID (object_registry, eventh);
+  if (queue)
+    queue->RemoveListener (eventh);
   eventh->parent = 0;
 }
 
