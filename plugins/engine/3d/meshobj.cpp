@@ -161,6 +161,12 @@ csMeshWrapper::csMeshWrapper (csEngine* engine, iMeshObject *meshobj)
 
   last_camera = 0;
   last_frame_number = 0;
+
+  // Set creation time on the mesh
+  csRef<csShaderVariable> sv_creation_time;
+  sv_creation_time.AttachNew(new csShaderVariable(engine->id_creation_time));
+  sv_creation_time->SetValue((float)engine->virtualClock->GetCurrentTicks() / 1000.0f);
+  GetSVContext()->AddVariable(sv_creation_time);
 }
 
 void csMeshWrapper::SelfDestruct ()

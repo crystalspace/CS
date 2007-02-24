@@ -2001,8 +2001,6 @@ void csGenmeshMeshObjectFactory::SetVertexCount (int n)
   mesh_normals_dirty_flag = true;
   mesh_colors_dirty_flag = true;
   mesh_tangents_dirty_flag = true;
-
-  ShapeChanged ();
 }
 
 void csGenmeshMeshObjectFactory::SetTriangleCount (int n)
@@ -2013,7 +2011,6 @@ void csGenmeshMeshObjectFactory::SetTriangleCount (int n)
   mesh_triangle_dirty_flag = true;
 
   initialized = false;
-  ShapeChanged ();
 }
 
 void csGenmeshMeshObjectFactory::CalculateNormals (bool compress)
@@ -2028,19 +2025,12 @@ void csGenmeshMeshObjectFactory::CalculateNormals (bool compress)
 
       SubMesh* subMesh (subMeshes[s]);
       csRef<iRenderBuffer> indices (subMesh->GetIndices());
-      csRenderBufferLock<uint8> indexLock (indices, CS_BUF_LOCK_READ);
-
-      size_t stride = indices->GetElementDistance();
-      const uint8* tri = indexLock;
-      const uint8* triEnd = tri + indices->GetElementCount()*stride;
 
       CS::TriangleIndicesStream<int> triangles;
-      triangles.BeginTriangulate (tri, triEnd, stride, 
-        indices->GetComponentType(), CS_MESHTYPE_TRIANGLES);
-      while (triangles.HasNextTri ())
+      triangles.BeginTriangulate (indices, CS_MESHTYPE_TRIANGLES);
+      while (triangles.HasNext ())
       {
-        csTriangle tri;
-        triangles.NextTriangle (tri.a, tri.b, tri.c);
+        csTriangle tri (triangles.Next ());
         newTriangles.Push (tri);
       }
     }

@@ -85,9 +85,15 @@
   #if _MSC_VER >= 1400
     #include <intrin.h>
   #else
+    extern "C" long _InterlockedCompareExchange (long volatile *, long, long);
+    extern "C" long _InterlockedDecrement (long volatile *);
     extern "C" long _InterlockedExchange (long volatile *, long);
+    extern "C" long _InterlockedIncrement (long volatile *);
   #endif
+  #pragma intrinsic (_InterlockedCompareExchange)
+  #pragma intrinsic (_InterlockedDecrement)
   #pragma intrinsic (_InterlockedExchange)
+  #pragma intrinsic (_InterlockedIncrement)
 
   #if defined(__CRYSTAL_SPACE__) && !defined(CS_DEBUG)
     #pragma code_seg("CSpace")	  // Just for fun :)

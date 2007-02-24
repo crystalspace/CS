@@ -71,9 +71,9 @@ namespace lighter
     }
 
     RadPrimitive newPrim (vertexData);
-    newPrim.GetIndexArray ().Push (a);
-    newPrim.GetIndexArray ().Push (b);
-    newPrim.GetIndexArray ().Push (c);
+    newPrim.GetIndexArray()[0] = a;
+    newPrim.GetIndexArray()[1] = b;
+    newPrim.GetIndexArray()[2] = c;
 
     newPrim.ComputePlane ();
     
@@ -97,9 +97,9 @@ namespace lighter
     }
 
     RadPrimitive newPrim (vertexData);
-    newPrim.GetIndexArray ().Push (a);
-    newPrim.GetIndexArray ().Push (b);
-    newPrim.GetIndexArray ().Push (c);
+    newPrim.GetIndexArray()[0] = a;
+    newPrim.GetIndexArray()[1] = b;
+    newPrim.GetIndexArray()[2] = c;
 
     newPrim.ComputePlane ();
     
@@ -144,18 +144,14 @@ namespace lighter
         iGeneralMeshSubMesh* subMesh = genFact->GetSubMesh (s);
         iRenderBuffer* indices = subMesh->GetIndices();
 
-        CS::TriangleIndicesStream<size_t> tris;
-        csRenderBufferLock<uint8> indexLock (indices);
-        const uint8* indexEnd = indexLock + indices->GetSize();
-        tris.BeginTriangulate (indexLock, indexEnd, indices->GetElementDistance(),
-          indices->GetComponentType(), CS_MESHTYPE_TRIANGLES);
+        CS::TriangleIndicesStream<size_t> tris (indices, 
+          CS_MESHTYPE_TRIANGLES);
 
-        while (tris.HasNextTri())
+        while (tris.HasNext())
         {
-          size_t a = 0, b = 0, c = 0;
-          tris.NextTriangle (a, b, c);
+          CS::TriangleT<size_t> tri (tris.Next ());
 
-          AddPrimitive (a, b, c, subMesh);
+          AddPrimitive (tri.a, tri.b, tri.c, subMesh);
         }
       }
     }
@@ -210,20 +206,11 @@ namespace lighter
       indexArray->SetCapacity (meshPrims.GetSize()*3);
       for (size_t p = 0; p < meshPrims.GetSize(); p++)
       {
-        const SizeTDArray& indices = meshPrims[p].GetIndexArray ();
-        if (indices.GetSize () == 3)
+        const size_t* indices = meshPrims[p].GetIndexArray ();
+        for (int i = 0; i < 3; i++)
         {
-          //Triangle, easy case
-          for (int i = 0; i < 3; i++)
-          {
-            size_t idx = indices[i];
-            indexArray->Push ((int)idx);
-          }
-        }
-        else
-        {
-          //TODO: Implement this case, use a triangulator
-          // @@@ RadObject_Genmesh atm only delivers triangles
+          size_t idx = indices[i];
+          indexArray->Push ((int)idx);
         }
       }
     }

@@ -24,6 +24,7 @@
 #include "ivideo/fontserv.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "csutil/csstring.h"
 #include "csutil/hash.h"
 #include "csutil/refarr.h"
 #include "csutil/parray.h"

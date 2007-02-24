@@ -6,6 +6,101 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+3-Nov-2006
+	- Jorrit fixed nullmesh factory so that it has a sensible
+	  default bounding box (from -1,-1,-1 to 1,1,1). That prevents
+	  crashes in the kdtree when people forget to initialize this.
+	- Jorrit fixed nullmesh factory SetRadius() call so that it
+	  actually calculates the bounding box correctly from the radius.
+	- Jorrit worked around a very old problem with the kdtree when
+	  it receives objects with empty or illegal bounding boxes. This
+	  could cause assertion errors (i.e. leaf_replaced and such). The
+	  work around simply tests for illegal bounding boxes and replaces
+	  that box internally with a very small legal one.
+	- Genjix fixed dodgy referencing of pointer in WeakReferenced destructor.
+	- caedes fixed an mistype in csgeom/vector4.h (csVector4 incorrectly
+	  referenced from inside csVector4T).
+	- caedes made the engine add a "mesh creation time" shvar to all
+	  created meshobjects.
+	- res fixed a couple of VC7 errors and warnings.
+2-Nov-2006
+	- res tweaked lighter2 to also use the primitive's normal for backface
+	  culling and not just the interpolated normal.
+	- Genjix added CS::WeakReferenced class for objects implementing
+	  AddRefOwner/RemoveRefOwner, enabling simple objects with csWeakRef.
+	- res made the following changes to CS::WeakReferenced:
+	    - Renamed header to weakreferenced.h to match class name.
+	    - Added destructor that sets all references tracked to 0.
+	    - Removed inheritance from csRefCount (might interfere in cases of
+	      multiple inheritance; also, it might be possible that weak ref
+	      support without refcounting support is desired in some 
+	      circumstances).
+1-Nov-2006
+	- Genjix removed redundant ShapeChanged () calls in
+	  iGeneralFactoryState::SetTriangle/VertexCount ().
+30-Oct-2006
+	- dfryer added GetTuple, SetTuple, and HasNext() functionality
+	  to OS X specific 'defaultsconfig' implementations of iConfigFile
+	  and iConfigFileIterator
+	- caedes added some %ignore directives in cspace.i to avoid wrapping
+	  deprecated members from cspath.
+	- caedes removed the exclusion of gmeshskel2.h from master headers,
+          as the old conflicting gmeshskel.h is already gone.
+	- res tweaked the CS_CHECK_LIB_WITH autoconf macro to fix the
+	  m4_foreach invocations to not have an empty entry in the list if no
+	  lib aliases were given. Apparently, earlier m4 versions skipped the
+	  empty entry. Newer versions don't and caused weird checks for the
+	  "empty lib" in configure.
+	- res augmented vproc_std to deal with the absence of a "light 
+	  position object" SV which is not provided by the standard render 
+	  steps. Fixes occuring floating point exceptions and also probably
+	  makes lighting actually work right.
+	- res added a templated variant of csTriangle, CS::TriangleT<>.
+	- res changed CS::TriangleStream to be more like the other CS 
+	  iterators (ie use HasNext() and Next()).
+	- res deprecated the COLOR shader variable type. It does not provide
+	  a significant benefit over VECTOR4. In fact, it's the same as 
+	  VECTOR4 now.
+	- res updated lighter2 for the CS::TriangleStream change.
+	- res fixed some VC warnings.
+	- caedes added gmeshkel2.h and skeleton.h interfaces to cspace.i.
+29-Oct-2006
+	- res changed lighter2 to store primitives as triangles instead of
+	  polygons.
+	- res changed scfFactory::IncRef() to always get the symbol for the
+	  factory function after the plugin shared lib has been loaded. The
+	  reasons is that the address of that symbol may change if the shared
+	  lib happens to be unloaded in between attempts to get an instance
+	  of the component.
+	- res changed the plugin manager to use csRef<>s instead of explicit
+	  reference counting for retaining iComponent references. Also
+	  simplified some code in LoadPlugin().
+	- res augmented the lightiter render step to provide a "light count"
+	  SV with constant value 1. (This makes it possible to use vproc_std
+	  with it.)
+	- res fixed some crashes in the software renderer occuring when 
+	  drawing without BeginDraw() being called (occurs when the engine 
+	  does PrecacheDraw()).
+	- res augmented the software shader plugin to also support 
+	  multiplication by a constant color in addition to multiplication by 
+	  the interpolated vertex color.
+	- res added software renderer techniques to the ambient, light, 
+	  light_spec_bumpmap shaders.
+	- res made the light_bumpmap shader fall back to light.
+	- res changed the "castle" level to have Z buffer clearing enabled
+	  (needed for SR).
+	- Eric Sunshine fixed a quoting problem in configure.ac which caused
+	  X11 check to barf for old-style installations.
+27-Oct-2006
+	- res updated the docs for the new winlibs version.
+26-Oct-2006
+	- Genjix added a flat 1px X 1px normalmap texture inside standard.zip
+	- Jorrit fixed a problem with physics plugin. The iODEJointState
+	  interface was defined wrong (GetLowStop() instead of GetLoStop()
+	  for example) and also the odedynam plugin was no longer
+	  implementing that interface.
+	- res fixed the bullet plugin to build with somewhat newer bullet
+	  versions.
 25-Oct-2006
 	- Jorrit fixed a bug in iSector->HitBeamPortals(). If it would
 	  traverse a portal then the returned intersection point would not be

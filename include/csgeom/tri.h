@@ -28,45 +28,66 @@
 
 #include "csextern.h"
 
+namespace CS
+{
+  /**
+   * A templated triangle. Note that this structure is only sensible if used
+   * in combination with a vertex or edge table. 'a', 'b', and 'c' are then
+   * indices in that table (either vertices or edges).
+   */
+  template<typename T>
+  struct TriangleT
+  {
+    /// Triangle vertices or edges.
+    T a, b, c;
+
+    /// Empty default constructor
+    TriangleT () {}
+
+    /// Convenience constructor, builds a triangle with initializers
+    TriangleT (const T& _a, const T& _b, const T& _c) : a(_a), b(_b), c(_c) {}
+
+    /// Copy constructor.
+    TriangleT (const TriangleT& t)
+    {
+      a = t.a;
+      b = t.b;
+      c = t.c;
+    }
+
+    /// Assignment.
+    TriangleT& operator= (const TriangleT& t)
+    {
+      a = t.a;
+      b = t.b;
+      c = t.c;
+      return *this;
+    }
+
+    /// Set the values.
+    void Set (const T& _a, const T& _b, const T& _c)
+    {
+      a = _a;
+      b = _b;
+      c = _c;
+    }
+  };
+}
+
 /**
  * A triangle. Note that this structure is only valid if used
  * in combination with a vertex or edge table. 'a', 'b', and 'c' are then
  * indices in that table (either vertices or edges).
  */
-struct csTriangle
+struct csTriangle : public CS::TriangleT<int>
 {
-  int a, b, c;
-
-  /// Empty default constructor
   csTriangle () {}
 
   /// Convenience constructor, builds a triangle with initializers
-  csTriangle (int _a, int _b, int _c) : a(_a), b(_b), c(_c) {}
+  csTriangle (int _a, int _b, int _c) : CS::TriangleT<int> (_a, _b, _c) {}
 
   /// Copy constructor.
-  csTriangle (const csTriangle& t)
-  {
-    a = t.a;
-    b = t.b;
-    c = t.c;
-  }
-
-  /// Assignment.
-  csTriangle& operator= (const csTriangle& t)
-  {
-    a = t.a;
-    b = t.b;
-    c = t.c;
-    return *this;
-  }
-
-  /// Set the values.
-  void Set (int _a, int _b, int _c)
-  {
-    a = _a;
-    b = _b;
-    c = _c;
-  }
+  csTriangle (const CS::TriangleT<int>& t) : CS::TriangleT<int> (t) {}
 };
 
 /** @} */

@@ -410,15 +410,12 @@ void scfFactory::IncRef ()
 
     if (Library->ok ())
     {
+      csString sym;
+      sym << FactoryClass << "_Create";
+      CreateFunc =
+        (scfFactoryFunc)csGetLibrarySymbol(Library->LibraryHandle, sym);
       if (CreateFunc == 0)
-      {
-        csString sym;
-	sym << FactoryClass << "_Create";
-	CreateFunc =
-	  (scfFactoryFunc)csGetLibrarySymbol(Library->LibraryHandle, sym);
-	if (CreateFunc == 0)
-	  csPrintLibraryError(sym);
-      }
+        csPrintLibraryError(sym);
     }
 
     if (!Library->ok () || CreateFunc == 0)

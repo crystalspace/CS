@@ -95,24 +95,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
       }
     }
 
-    csRenderBufferLock<uint8> indices (inIndices, CS_BUF_LOCK_READ);
-
-    size_t stride = inIndices->GetElementDistance();
-    uint8* tri = indices + inIndexStart*stride;
-    const uint8* triEnd = indices + inIndexEnd*stride;
-
-    CS::TriangleIndicesStream<int> triangles;
-    triangles.BeginTriangulate (tri, triEnd, stride, 
-      inIndices->GetComponentType(), meshType);
+    CS::TriangleIndicesStream<int> triangles (inIndices, meshType, 
+      inIndexStart, inIndexEnd);
     trisArray.Empty();
 
     if (do_near_plane)
     {
       inData = outBuffers.GetData ();
-      while (triangles.HasNextTri())
+      while (triangles.HasNext())
       {
-        csTriangle tri;
-        triangles.NextTriangle (tri.a, tri.b, tri.c);
+        CS::TriangleT<int> tri (triangles.Next ());
         const size_t Tri[3] = {tri.a, tri.b, tri.c};
 
         csVector3 inVert[3];
@@ -176,10 +168,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
     }
     else
     {
-      while (triangles.HasNextTri())
+      while (triangles.HasNext())
       {
-        csTriangle tri;
-        triangles.NextTriangle (tri.a, tri.b, tri.c);
+        CS::TriangleT<int> tri (triangles.Next ());
         trisArray.Push (tri);
       }
     }

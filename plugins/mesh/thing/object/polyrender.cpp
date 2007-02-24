@@ -195,7 +195,8 @@ void csPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
 	{
 	  csRef<iRenderBuffer> srcBuf;
 	  csStringID name = extraBuffers[i]->Next (&srcBuf);
-	  csRef<iRenderBuffer> dstBuf = extraBufferData.Get (name, 0);
+	  csRef<iRenderBuffer> dstBuf = extraBufferData.Get (name, 
+	    (iRenderBuffer*)0);
 	  if (dstBuf == 0)
 	  {
 	    dstBuf = csRenderBuffer::CreateRenderBuffer (num_verts, CS_BUF_STATIC,

@@ -37,17 +37,6 @@ namespace lighter
     static void ShootDirectLighting (Sector* sector, float progressStep);
 
   private:
-
-    // Shade a number of primitives
-    template<class Attenuation>
-    static void ShadeRadPrimitives (Sector* sector, const Attenuation& attn, 
-      Raytracer &tracer, RadPrimitivePtrArray& prims, Light* light, 
-      float progressStep);
-    // Shade a single rad primitive
-    template<class Attenuation>
-    static void ShadeRadPrimitive (Sector* sector, const Attenuation& attn, 
-      Raytracer &tracer, RadPrimitive &prim, Light* light);
-
     //Make sure we don't instance it
     DirectLighting ();
     DirectLighting (const DirectLighting& o);

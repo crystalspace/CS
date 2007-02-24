@@ -222,7 +222,7 @@ private:
   /**
    * Add an object to this kd-tree node.
    */
-  void AddObject (const csBox3& bbox, csKDTreeChild* obj);
+  void AddObjectInt (csKDTreeChild* obj);
 
   /**
    * Find the best split position for a given axis. This will

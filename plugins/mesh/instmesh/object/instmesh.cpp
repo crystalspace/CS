@@ -130,7 +130,6 @@ csArray<csVector4> csInstmeshMeshObject::Variable2Vectors (csShaderVariable& par
   csArray<csVector4> vectors;
   switch (parameter.GetType ())
   {
-  case csShaderVariable::COLOR:
   case csShaderVariable::VECTOR2:
   case csShaderVariable::VECTOR3:
   case csShaderVariable::VECTOR4:
@@ -202,7 +201,10 @@ void csInstmeshMeshObject::SetInstanceVariable (size_t instance_id, csShaderVari
   }
   if (var_id != -1)
   {
-    csArray<csInstance*> inst = instances.GetAll (instance_id);
+    typedef csArray<csInstance*> InstArray;
+    InstArray inst = 
+      instances.GetAll<InstArray::ElementHandlerType, 
+      InstArray::AllocatorType> (instance_id);
 
     for (size_t i = 0; i < inst.GetSize (); i++)
       if (inst[i]->id == instance_id) 
@@ -242,7 +244,6 @@ const csShaderVariable& csInstmeshMeshObject::GetInstanceVariable (
       csShaderVariable* variable = instance_template->GetArrayElement (variable_id);
       switch (variable->GetType ())
       {
-      case csShaderVariable::COLOR:
       case csShaderVariable::VECTOR2:
       case csShaderVariable::VECTOR3:
         dummy_variable.SetValue (csVector3 (variables[0].x, variables[0].y, variables[0].z));
