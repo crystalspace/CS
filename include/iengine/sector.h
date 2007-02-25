@@ -39,6 +39,7 @@ struct iMeshList;
 struct iLightList;
 struct iLight;
 struct iVisibilityCuller;
+struct iLightSectorInfluence;
 
 struct iObject;
 

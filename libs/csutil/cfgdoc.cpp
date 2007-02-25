@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "iutil/vfs.h"
+#include "iutil/stringarray.h"
 #include "csutil/cfgdoc.h"
 #include "csutil/physfile.h"
 #include "csutil/util.h"

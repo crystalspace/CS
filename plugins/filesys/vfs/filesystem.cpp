@@ -680,9 +680,6 @@ csArchiveFileSystem::VfsArchive::VfsArchive (const char *filename)
   VfsArchive::object_reg = object_reg;
 
   UpdateTime ();
- 
-  // We need a recursive mutex.
-  archive_mutex = csMutex::Create (true);
 }
 
 csArchiveFileSystem::VfsArchive::~VfsArchive ()
@@ -704,7 +701,7 @@ csArchiveFileSystem::csArchiveFile::csArchiveFile (int Mode,
   FileData = 0;
   fpos = 0;
 
-  csScopedMutexLock lock (Archive->archive_mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (Archive->archive_mutex);
 
   Archive->UpdateTime ();
 
@@ -735,7 +732,7 @@ csArchiveFileSystem::csArchiveFile::csArchiveFile (int Mode,
 
 csArchiveFileSystem::csArchiveFile::~csArchiveFile ()
 {
-  csScopedMutexLock lock (Archive->archive_mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (Archive->archive_mutex);
   if (FileHandle)
     Archive->Writing--;
   Archive->DecRef ();
@@ -767,7 +764,7 @@ size_t csArchiveFileSystem::csArchiveFile::Write (const char *Data,
     Error = VFS_STATUS_ACCESSDENIED;
     return 0;
   }
-  csScopedMutexLock lock (Archive->archive_mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (Archive->archive_mutex);
   if (!Archive->Write (FileHandle, Data, DataSize))
   {
     Error = VFS_STATUS_NOSPACE;
@@ -780,7 +777,7 @@ void csArchiveFileSystem::csArchiveFile::Flush ()
 {
   if (Archive)
   {
-    csScopedMutexLock lock (Archive->archive_mutex);
+    CS::Threading::RecursiveMutexScopedLock lock (Archive->archive_mutex);
     Archive->Flush ();
   }
 }

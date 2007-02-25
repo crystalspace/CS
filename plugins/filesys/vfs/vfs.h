@@ -24,9 +24,9 @@
 #include "csutil/refarr.h"
 #include "csutil/parray.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/threading/mutex.h"
 #include "csutil/csstring.h"
 #include "csutil/cfgfile.h"
-#include "csutil/scopedmutexlock.h"
 #include "iutil/vfs.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -194,7 +194,7 @@ public:
 protected:
 
   /// Mutex to make VFS thread-safe.
-  csRef<csMutex> mutex;
+  mutable CS::Threading::RecursiveMutex mutex;
 
   /// Currently registered FileSystem plugins
   csRefArray<iFileSystem> fsPlugins;

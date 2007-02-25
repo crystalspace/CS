@@ -27,32 +27,33 @@ namespace lighter
 
   struct ObjectVertexData;
   
-  class LightmapUVLayoutFactory;
+  class LightmapUVObjectLayouter;
+  class ObjectFactory;
 
-  class LightmapUVLayouter 
+  class LightmapUVFactoryLayouter 
   {
   public:
-    virtual ~LightmapUVLayouter() {}
+    virtual ~LightmapUVFactoryLayouter () {}
     /**
      * Lay out lightmaps for a factory.
      * This should split vertices as necessary and assign primitives
      * to lightmaps.
      * \param inPrims Input primitives.
      * \param inPrims Input vertex data.
+     * \param factory Factory object primitives are part of
      * \param outPrims Output primitives. A number of primitive arrays. All
      *   primitives of a sub-array would fit on a single lightmap.
      */
-    virtual LightmapUVLayoutFactory* LayoutFactory (
+    virtual csPtr<LightmapUVObjectLayouter> LayoutFactory (
       const PrimitiveArray& inPrims, ObjectVertexData& vertexData,
-      csArray<PrimitiveArray>& outPrims) = 0;
+      const ObjectFactory* factory, csArray<PrimitiveArray>& outPrims) = 0;
   };
 
-  class LightmapUVLayoutFactory
+  class LightmapUVObjectLayouter : public csRefCount
   {
   public:
-    virtual ~LightmapUVLayoutFactory() {}
     /**
-     * Lay out lightmaps for primitives of ab object.
+     * Lay out lightmaps for primitives of an object.
      * \param prims Input primitives.
      * \param groupNum Index of the primitive arrays as returned by 
      *   LightmapUVLayouter::LayoutFactory.

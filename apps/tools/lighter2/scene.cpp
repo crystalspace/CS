@@ -44,8 +44,11 @@ namespace lighter
     kdTree = builder.BuildTree (objIt);
   }
 
-
   Scene::Scene ()
+  {
+  }
+
+  Scene::~Scene ()
   {
     PDLightmapsHash::GlobalIterator pdlIt = pdLightmaps.GetIterator();
     while (pdlIt.HasNext())
@@ -161,9 +164,10 @@ namespace lighter
     return true;
   }
 
-  Lightmap* Scene::GetLightmap (uint lightmapID, Light_old* light)
+
+  Lightmap* Scene::GetLightmap (uint lightmapID, Light* light)
   {
-    if (!light->pseudoDynamic)
+    if (!light || !light->IsPDLight ())
       return lightmaps[lightmapID];
 
     LightmapPtrDelArray* pdLights = pdLightmaps.Get (light, 0);
@@ -223,6 +227,29 @@ namespace lighter
     {
       iLight *light = lightList->Get (i);
       if (light->GetDynamicType() == CS_LIGHT_DYNAMICTYPE_DYNAMIC) continue;
+
+      bool isPD = light->GetDynamicType() == CS_LIGHT_DYNAMICTYPE_PSEUDO;
+
+      // Atm, only point light
+      csRef<PointLight> intLight;
+      intLight.AttachNew (new PointLight);
+
+      intLight->SetPosition (light->GetMovable ()->GetFullPosition ());
+      intLight->SetColor (isPD ? csColor (1.0f) : light->GetColor ());
+
+      intLight->SetAttenuation (light->GetAttenuationMode (),
+        light->GetAttenuationConstants ());
+      intLight->SetPDLight (isPD);
+      intLight->SetLightID (light->GetLightID());
+
+      intLight->SetRadius (light->GetCutoffDistance ());
+
+      if (isPD)
+        radSector->allPDLights.Push (intLight);
+      else
+        radSector->allNonPDLights.Push (intLight);
+
+#if 0
       csRef<Light_old> radLight; radLight.AttachNew (new Light_old);
       radLight->position = light->GetMovable ()->GetFullPosition ();
       radLight->attenuation = light->GetAttenuationMode ();
@@ -241,6 +268,7 @@ namespace lighter
      
       //add more
       radSector->allLightsOld.Push (radLight);
+#endif
     }
   }
 
@@ -295,15 +323,47 @@ namespace lighter
     return Success;
   }
 
+  void Scene::CollectDeleteTextures (iDocumentNode* textureNode,
+                                     csSet<csString>& filesToDelete)
+  {
+    csRef<iDocumentNode> fileNode = textureNode->GetNode ("file");
+    if (fileNode.IsValid())
+      filesToDelete.Add (fileNode->GetContentsValue());
+    csRef<iDocumentNode> typeNode = textureNode->GetNode ("type");
+    if (typeNode.IsValid())
+    {
+      const char* typeStr = typeNode->GetContentsValue();
+      if (typeStr && (strcmp (typeStr,
+          "crystalspace.texture.loader.pdlight") == 0))
+      {
+        csRef<iDocumentNode> paramsNode = textureNode->GetNode ("params");
+        if (paramsNode.IsValid())
+        {
+          csRef<iDocumentNodeIterator> mapNodes = 
+            paramsNode->GetNodes ("map");
+          while (mapNodes->HasNext())
+          {
+            csRef<iDocumentNode> mapNode = mapNodes->Next();
+            if (mapNode->GetType() != CS_NODE_ELEMENT) continue;
+            const char* mapName = mapNode->GetContentsValue();
+            if (mapName != 0)
+              filesToDelete.Add (mapName);
+          }
+        }
+      }
+    }
+  }
+
   void Scene::CleanOldLightmaps (LoadedFile* fileInfo, 
-                                 const csStringArray& texFileNames)
+                                 const csSet<csString>& texFileNames)
   {
     csVfsDirectoryChanger chdir (globalLighter->vfs);
     chdir.ChangeTo (fileInfo->directory);
 
-    for (size_t i = 0; i < texFileNames.GetSize(); i++)
+    csSet<csString>::GlobalIterator iter = texFileNames.GetIterator();
+    while (iter.HasNext ())
     {
-      globalLighter->vfs->DeleteFile (texFileNames[i]);
+      globalLighter->vfs->DeleteFile (iter.Next());
     }
   }
 
@@ -330,11 +390,11 @@ namespace lighter
       PDLightmapsHash::GlobalIterator pdlIt = pdLightmaps.GetIterator();
       while (pdlIt.HasNext())
       {
-        csPtrKey<Light_old> key;
+        csPtrKey<Light> key;
         LightmapPtrDelArray* lm = pdlIt.Next(key);
         if (lm->Get (i)->IsNull()) continue;
 
-        csString lmID (key->lightId.HexString());
+        csString lmID (key->GetLightID ().HexString());
         textureFilename = "lightmaps/";
         textureFilename += i;
         textureFilename += "_";
@@ -364,7 +424,11 @@ namespace lighter
       
       const char* nodeName = node->GetValue ();
 
-      if (!strcasecmp (nodeName, "meshfact"))
+      if (!strcasecmp (nodeName, "library"))
+      {
+        HandleLibraryNode (node, fileInfo);
+      }
+      else if (!strcasecmp (nodeName, "meshfact"))
       {
         SaveMeshFactoryToDom (node, fileInfo);
       }
@@ -389,9 +453,11 @@ namespace lighter
       texturesNode->SetValue ("textures");
     }
 
+    csSet<csString> texFileNamesToDelete;
     for (unsigned int i = 0; i < texturesToSave.GetSize (); i++)
     {
       const SaveTexture& textureToSave = texturesToSave[i];
+
       csRef<iDocumentNode> textureNode;
       {
         csRef<iDocumentNodeIterator> textureNodes = 
@@ -415,7 +481,10 @@ namespace lighter
         textureNode->SetValue ("texture");
       }
       else
+      {
+        CollectDeleteTextures (textureNode, texFileNamesToDelete);
         textureNode->RemoveNodes ();
+      }
       textureNode->SetAttribute ("name", textureToSave.texname.GetData ());
            
       csRef<iDocumentNode> classNode = 
@@ -432,6 +501,7 @@ namespace lighter
       csRef<iDocumentNode> filenameNode =
         fileNode->CreateNodeBefore (CS_NODE_TEXT);
       filenameNode->SetValue (textureToSave.filename.GetData ());
+      texFileNamesToDelete.Delete (textureToSave.filename);
 
       csRef<iDocumentNode> mipmapNode = 
         textureNode->CreateNodeBefore (CS_NODE_ELEMENT);
@@ -464,6 +534,7 @@ namespace lighter
           csRef<iDocumentNode> mapContents = 
             mapNode->CreateNodeBefore (CS_NODE_TEXT, 0);
           mapContents->SetValue (textureToSave.pdLightmapFiles[p]);
+          texFileNamesToDelete.Delete (textureToSave.pdLightmapFiles[p]);
         }
       }
 
@@ -472,7 +543,6 @@ namespace lighter
 
     // Clean out old lightmap textures
     {
-      csStringArray texFileNames;
       csRefArray<iDocumentNode> nodesToDelete;
       csRef<iDocumentNodeIterator> it = texturesNode->GetNodes ("texture");
       while (it->HasNext())
@@ -483,44 +553,100 @@ namespace lighter
         const char* name = child->GetAttributeValue ("name");
         if ((name != 0) && texturesToClean.Contains (name))
         {
-          csRef<iDocumentNode> fileNode = child->GetNode ("file");
-          if (fileNode.IsValid())
-            texFileNames.Push (fileNode->GetContentsValue());
-          csRef<iDocumentNode> typeNode = child->GetNode ("type");
-          if (typeNode.IsValid())
-          {
-            const char* typeStr = typeNode->GetContentsValue();
-            if (typeStr && (strcmp (typeStr,
-                "crystalspace.texture.loader.pdlight") == 0))
-            {
-              csRef<iDocumentNode> paramsNode = child->GetNode ("params");
-              if (paramsNode.IsValid())
-              {
-                csRef<iDocumentNodeIterator> mapNodes = 
-                  paramsNode->GetNodes ("maps");
-                while (mapNodes->HasNext())
-                {
-                  csRef<iDocumentNode> mapNode = mapNodes->Next();
-                  if (mapNode->GetType() != CS_NODE_ELEMENT) continue;
-                  const char* mapName = mapNode->GetContentsValue();
-                  if (mapName != 0)
-                    texFileNames.Push (mapName);
-                }
-              }
-            }
-          }
+          CollectDeleteTextures (child, texFileNamesToDelete);
           nodesToDelete.Push (child);
         }
       }
       for (size_t i = 0; i < nodesToDelete.GetSize(); i++)
         texturesNode->RemoveNode (nodesToDelete[i]);
 
-      CleanOldLightmaps (fileInfo, texFileNames);
+      CleanOldLightmaps (fileInfo, texFileNamesToDelete);
     }
 
     DocumentHelper::RemoveDuplicateChildren(texturesNode, 
       texturesNode->GetNodes ("texture"),
       DocumentHelper::NodeAttributeCompare("name"));
+  }
+
+  bool Scene::SaveSceneLibrary (const char* libFile, LoadedFile* fileInfo)
+  {
+    csRef<iFile> buf = globalLighter->vfs->Open (libFile, VFS_FILE_READ);
+    if (!buf) 
+    {
+      globalLighter->Report ("Error opening file '%s'!", libFile);
+      return false;
+    }
+
+    csRef<iDocument> doc = globalLighter->docSystem->CreateDocument ();
+    const char* error = doc->Parse (buf, true);
+    if (error != 0)
+    {
+      globalLighter->Report ("Document system error: %s!", error);
+      return false;
+    }
+
+    csRef<iDocumentNode> docRoot = doc->GetRoot();
+
+    csRef<iDocumentNode> libRoot = docRoot->GetNode ("library");
+    if (!libRoot)
+    {
+      globalLighter->Report ("'%s' is not a library", libFile);
+      return false;
+    }
+
+    csRef<iDocumentNodeIterator> it = libRoot->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> node = it->Next ();
+      if (node->GetType () != CS_NODE_ELEMENT) continue;
+      
+      const char* nodeName = node->GetValue ();
+
+      if (!strcasecmp (nodeName, "library"))
+      {
+        HandleLibraryNode (node, fileInfo);
+      }
+      else if (!strcasecmp (nodeName, "meshfact"))
+      {
+        SaveMeshFactoryToDom (node, fileInfo);
+      }
+    }
+
+    buf = globalLighter->vfs->Open (libFile, VFS_FILE_WRITE);
+    if (!buf) 
+    {
+      globalLighter->Report ("Error opening file '%s' for writing!", libFile);
+      return false;
+    }
+    error = doc->Write (buf);
+    if (error != 0)
+    {
+      globalLighter->Report ("Document system error: %s!", error);
+      return false;
+    }
+
+    return true;
+  }
+
+  void Scene::HandleLibraryNode (iDocumentNode* node, LoadedFile* fileInfo)
+  {
+    const char* file = node->GetAttributeValue ("file");
+    if (file)
+    {
+      csVfsDirectoryChanger changer (globalLighter->vfs);
+      const char* path = node->GetAttributeValue ("path");
+
+      if (path)
+      {
+        changer.PushDir ();
+        globalLighter->vfs->ChDir (path);
+      }
+      SaveSceneLibrary (file, fileInfo);
+    }
+    else
+    {
+      SaveSceneLibrary (node->GetContentsValue (), fileInfo);
+    }
   }
 
   void Scene::SaveMeshFactoryToDom (iDocumentNode* factNode, LoadedFile* fileInfo)

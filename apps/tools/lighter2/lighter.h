@@ -38,6 +38,9 @@ namespace lighter
     // Initialize and load plugins we want
     bool Initialize ();
 
+    // Cleanup and prepare for shutdown
+    void CleanUp ();
+
     // Do the fancy lighting
     bool LightEmUp ();
 
@@ -52,21 +55,18 @@ namespace lighter
     csRef<iPluginManager> pluginManager;
     csRef<iReporter> reporter;
     csRef<iVFS> vfs;
+    csRef<iCommandLineParser> cmdLine;
+    csRef<iConfigManager> configMgr;
     iObjectRegistry *objectRegistry;
     csRef<iStringSet> strings;
-
-    // FIXME: move to class Configuration
-    struct Settings
-    {
-      bool keepGenmeshSubmeshes;
-    };
-    Settings settings;
 
   protected:
     // Parse the commandline and load any files specified
     bool LoadFiles ();
 
-    void LoadSettings ();
+    void LoadConfiguration ();
+
+    void CommandLineHelp () const;
 
     Scene *scene;
   };

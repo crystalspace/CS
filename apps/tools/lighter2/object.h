@@ -21,14 +21,22 @@
 
 #include "primitive.h"
 #include "lightmap.h"
+#include "lightmapuv.h"
 #include "csgeom/transfrm.h"
 
 namespace lighter
 {
-  class LightmapUVLayouter;
-  class LightmapUVLayoutFactory;
+  class LightmapUVFactoryLayouter;
+  class LightmapUVObjectLayouter;
   class Object;
   class Scene;
+
+  enum ObjectFlags
+  {
+    OBJECT_FLAG_NOLIGHT = 1,
+    OBJECT_FLAG_NOSHADOW = 2
+  };
+
 
   /**
    * Hold per object vertex data
@@ -103,7 +111,7 @@ namespace lighter
   public:
     ObjectFactory ();
 
-    virtual bool PrepareLightmapUV (LightmapUVLayouter* uvlayout);
+    virtual bool PrepareLightmapUV (LightmapUVFactoryLayouter* uvlayout);
 
     // Get a new object
     virtual Object* CreateObject ();
@@ -114,6 +122,14 @@ namespace lighter
     // Write out the data again
     virtual void SaveFactory (iDocumentNode *node);
 
+    // Getters
+    inline float GetLMuTexelPerUnit () const
+    { return lmuScale; }
+
+    inline float GetLMvTexelPerUnit () const
+    { return lmvScale; }
+
+
     // Name of the factory
     csString factoryName;
 
@@ -121,15 +137,38 @@ namespace lighter
     bool lightPerVertex;
   protected:
 
+    // Begin remapping of submeshes
+    virtual void BeginSubmeshRemap ()
+    {}
+
+    // Add a new mapping between old index and new index
+    virtual void AddSubmeshRemap (size_t oldIndex, size_t newIndex)
+    {}
+
+    // Finish remapping of submeshes
+    virtual void FinishSubmeshRemap ()
+    {}
+
     // All faces, untransformed
-    csArray<PrimitiveArray> allPrimitives;
+    csArray<PrimitiveArray> unlayoutedPrimitives;
+    struct LayoutedPrimitives
+    {
+      PrimitiveArray primitives;
+      csRef<LightmapUVObjectLayouter> factory;
+      size_t group;
+
+      LayoutedPrimitives (const PrimitiveArray& primitives, 
+                          LightmapUVObjectLayouter* factory, size_t group) :
+        primitives (primitives), factory (factory), group (group) {}
+    };
+    csArray<LayoutedPrimitives> layoutedPrimitives;
 
     // Vertex data for above faces
     ObjectVertexData vertexData;
 
-    // Lightmap masks
-    LightmapMaskArray lightmapMasks;
-    bool lightmapMaskArrayValid;
+    // Lightmap settings
+    float lmuScale;
+    float lmvScale;
 
     // Factory created from
     iMeshFactoryWrapper *factoryWrapper;
@@ -137,9 +176,6 @@ namespace lighter
     // String identifying the saver plugin. Should be set from derived
     // classes
     const char* saverPluginName;
-
-    csPDelArray<LightmapUVLayoutFactory> lightmaplayouts;
-    csArray<size_t> lightmaplayoutGroups;
 
     friend class Object;
   };
@@ -175,24 +211,28 @@ namespace lighter
     // Write out the data again
     virtual void SaveMesh (Scene* scene, iDocumentNode *node);
 
-    // Fixup the lightmap borders
-    virtual void FixupLightmaps (csArray<LightmapPtrDelArray*>& lightmaps);
+    // Fill lightmap mask with primitive sub-pixel area coverage
+    virtual void FillLightmapMask (LightmapMaskArray& masks);
 
-    const csArray<PrimitiveArray>& GetPrimitives () const
+    //-- Getters for data
+    inline const csArray<PrimitiveArray>& GetPrimitives () const
     { return allPrimitives; }
 
-    csArray<PrimitiveArray>& GetPrimitives ()
+    inline csArray<PrimitiveArray>& GetPrimitives ()
     { return allPrimitives; }
     
-    const ObjectVertexData& GetVertexData () const
+    inline const ObjectVertexData& GetVertexData () const
     { return vertexData; }
 
-    ObjectVertexData& GetVertexData ()
+    inline ObjectVertexData& GetVertexData ()
     { return vertexData; }
 
     typedef csDirtyAccessArray<csColor> LitColorArray;
-    LitColorArray* GetLitColors ()
+    inline LitColorArray* GetLitColors ()
     { return litColors; }
+
+    inline const csFlags& GetFlags () const
+    { return objFlags; }
 
     // Name
     csString meshName;
@@ -218,6 +258,9 @@ namespace lighter
     // String identifying the saver plugin. Should be set from derived
     // classes
     const char* saverPluginName;
+
+    // Internal flags
+    csFlags objFlags;
 
     friend class  ObjectFactory;
   };

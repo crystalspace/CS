@@ -31,6 +31,9 @@ namespace lighter
   public:
     TUI ();
 
+    // Setup
+    void Initialize ();
+
     enum RedrawFlag
     {
       TUI_DRAW_CLEAR = (1<<0),
@@ -43,8 +46,9 @@ namespace lighter
       TUI_DRAW_ALL = 0xFFFFFFFF
     };
 
+
     /// Redraw the TUI
-    void Redraw (int drawFlags = TUI_DRAW_ALL) const;
+    void Redraw (int drawFlags = TUI_DRAW_ALL);
 
     /// iReporterListener
     virtual bool Report (iReporter* reporter, int severity, const char* msgId,
@@ -70,9 +74,21 @@ namespace lighter
     //Draw stats
     void DrawStats () const;
 
+    //Update simple output, if anything to update
+    void DrawSimple ();
+
     // Reporting stuff
     csString messageBuffer[4];
     uint messageBufferEnd;
+
+    // Setting determining simple output mode instead of full TUI
+    bool simpleMode, prevWasReporter;
+
+    // Last drawn stuff in simple-mode
+    size_t kdLastNumNudes;
+
+    // Last printed task
+    csString lastTask; float lastTaskProgress;
   };
 
   extern TUI globalTUI;

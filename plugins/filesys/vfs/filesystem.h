@@ -21,9 +21,9 @@
 #define __CS_FILESYSTEM_H__
 
 #include "csutil/scf_implementation.h"
+#include "csutil/threading/mutex.h"
 #include "csutil/archive.h"
 #include "csutil/physfile.h"
-#include "csutil/scopedmutexlock.h"
 #include "iutil/vfs.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -252,7 +252,7 @@ public:
   {
     public:
       /// Mutex to make VFS thread-safe.
-      csRef<csMutex> archive_mutex;
+      mutable CS::Threading::RecursiveMutex archive_mutex;
 
       // Last time this archive was used
       long LastUseTime;

@@ -289,6 +289,11 @@ public:
   void AddLSI (csLightSectorInfluence* inf);
   void RemoveLSI (csLightSectorInfluence* inf);
   const csLightSectorInfluences& GetLSI () const { return influences; }
+  /**
+   * Get the array of relevant lights for this sector.
+   */
+  const csArray<iLightSectorInfluence*>& GetRelevantLights (
+  	int maxLights, bool desireSorting);
   /** @} */
 
   /**\name Mesh generators
@@ -476,6 +481,12 @@ private:
 
   /// List of light/sector influences.
   csLightSectorInfluences influences;
+  /**
+   * Array of lights affecting this mesh object. This is calculated
+   * by the csLightManager class.
+   */
+  csDirtyAccessArray<iLightSectorInfluence*> relevant_lights;
+  bool relevant_lights_dirty;
 
   /**
    * The visibility culler for this sector or 0 if none.

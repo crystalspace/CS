@@ -151,6 +151,13 @@
   bool __nonzero__ () const { return !self->IsZero(); }
 }
 
+%extend csTriangle
+{
+  int __getitem__ (int i) const { return self->operator[](i); }
+  void __setitem__ (int i, int v) { self->operator[](i) = v; }
+  bool __nonzero__ () const { return !(self->a||self->b||self->c); }
+}
+
 %extend csMatrix3
 {
   csMatrix3 __rmul__ (float f) { return f * *self; }

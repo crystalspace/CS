@@ -166,6 +166,13 @@
       <color red="0" green="0" blue="0" />
     </variable>
   </variables>
+
+  <shaderexpressions>
+    <shaderexpression name="sinus">
+      <sexp> (+ 1 (/ (sin "standard time") 2)) </sexp>
+    </shaderexpression>
+  </shaderexpressions>
+
   <shaders>
     <shader>
       <file>/shader/reflect.xml</file>
@@ -17812,6 +17819,7 @@
         </p>
         <smooth />
       </params>
+      <!--<shadervar name="reflection opacity" type="libexpr" exprname="sinus" />-->
       <move>
         <matrix>
           <m11>1</m11>

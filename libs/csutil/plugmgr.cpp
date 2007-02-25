@@ -88,8 +88,6 @@ csPluginManager::csPluginManager (iObjectRegistry* object_reg)
   : scfImplementationType (this), object_reg (object_reg),
   Plugins (8, 8), OptionList (16, 16)
 {
-  // We need a recursive mutex.
-  mutex = csMutex::Create (true);
 }
 
 csPluginManager::~csPluginManager ()
@@ -99,7 +97,8 @@ csPluginManager::~csPluginManager ()
 
 void csPluginManager::Clear ()
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
+ 
   OptionList.DeleteAll ();
 
   // Free all plugins.
@@ -181,7 +180,7 @@ iBase *csPluginManager::LoadPlugin (const char *classID, bool init)
   }
   else
   {
-    csScopedMutexLock lock (mutex);
+    CS::Threading::RecursiveMutexScopedLock lock (mutex);
     size_t index = csArrayItemNotFound;
     // See if the plugin is already in our plugin list.
     for (size_t i = 0 ; i < Plugins.Length () ; i++)
@@ -220,7 +219,7 @@ iBase *csPluginManager::LoadPlugin (const char *classID, bool init)
 bool csPluginManager::RegisterPlugin (const char *classID,
   iComponent *obj)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   size_t index = Plugins.Push (new csPlugin (obj, classID));
   if (obj->Initialize (object_reg))
   {
@@ -239,7 +238,7 @@ bool csPluginManager::RegisterPlugin (const char *classID,
 
 csPtr<iPluginIterator> csPluginManager::GetPlugins ()
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   csPluginIterator* it = new csPluginIterator ();
   size_t i;
   for (i = 0 ; i < Plugins.Length () ; i++)
@@ -252,7 +251,7 @@ csPtr<iPluginIterator> csPluginManager::GetPlugins ()
 iBase *csPluginManager::QueryPlugin (const char *iInterface, int iVersion)
 {
   scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   for (size_t i = 0; i < Plugins.Length (); i++)
   {
     iBase *ret = Plugins.Get (i)->Plugin;
@@ -267,7 +266,7 @@ iBase *csPluginManager::QueryPlugin (const char* classID,
                                      int iVersion)
 {
   scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   for (size_t i = 0 ; i < Plugins.Length () ; i++)
   {
     csPlugin* pl = Plugins.Get (i);
@@ -284,7 +283,7 @@ iBase *csPluginManager::QueryPlugin (const char* classID,
 
 bool csPluginManager::UnloadPlugin (iComponent* obj)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   size_t idx = Plugins.FindKey (
     csArrayCmp<csPlugin*,iComponent*>(obj, csPluginsVector::CompareAddress));
   if (idx == csArrayItemNotFound)

@@ -66,7 +66,6 @@ csString csReporterListener::DefaultDebugFilename()
 csReporterListener::csReporterListener (iBase *iParent) : 
 scfImplementationType (this, iParent)
 {
-  mutex = csMutex::Create (true);
   object_reg = 0;
   reporter = 0;
   silent = false;
@@ -302,7 +301,7 @@ void csReporterListener::WriteLine (int severity, const char* msgID,
   {
     if (!silent)
     {
-      csScopedMutexLock lock (mutex);
+      CS::Threading::RecursiveMutexScopedLock lock (mutex);
       csString popmsg;
       if (!repeatedID)
       {
@@ -345,7 +344,7 @@ bool csReporterListener::HandleEvent (iEvent& event)
 {
   if (event.Name == PostProcess)
   {
-    csScopedMutexLock lock (mutex);
+    CS::Threading::RecursiveMutexScopedLock lock (mutex);
     size_t l = messages.Length ();
     if (l > 0)
     {

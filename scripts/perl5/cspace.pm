@@ -71,6 +71,7 @@ package cspace;
 *csGetUsername = *cspacec::csGetUsername;
 *csGetPlatformConfigPath = *cspacec::csGetPlatformConfigPath;
 *csQueryRegistryTag = *cspacec::csQueryRegistryTag;
+*CS_QUERY_REGISTRY_TAG_is_deprecated = *cspacec::CS_QUERY_REGISTRY_TAG_is_deprecated;
 *RegisterWeakListener = *cspacec::RegisterWeakListener;
 *RemoveWeakListener = *cspacec::RemoveWeakListener;
 *csHashCompute = *cspacec::csHashCompute;
@@ -475,7 +476,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %ITERATORS = ();
 *Initialize = *cspacec::iCommandLineParser_Initialize;
 *Reset = *cspacec::iCommandLineParser_Reset;
-*GetOption = *cspacec::iCommandLineParser_GetOption;
 *GetName = *cspacec::iCommandLineParser_GetName;
 *AddOption = *cspacec::iCommandLineParser_AddOption;
 *AddName = *cspacec::iCommandLineParser_AddName;
@@ -486,6 +486,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetAppDir = *cspacec::iCommandLineParser_GetAppDir;
 *GetAppPath = *cspacec::iCommandLineParser_GetAppPath;
 *GetOptionName = *cspacec::iCommandLineParser_GetOptionName;
+*GetOption = *cspacec::iCommandLineParser_GetOption;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -540,6 +541,7 @@ sub new {
 *Set = *cspacec::csColor_Set;
 *Clamp = *cspacec::csColor_Clamp;
 *ClampDown = *cspacec::csColor_ClampDown;
+*IsBlack = *cspacec::csColor_IsBlack;
 *__copy__ = *cspacec::csColor___copy__;
 *__add_ass__ = *cspacec::csColor___add_ass__;
 *__subtr_ass__ = *cspacec::csColor___subtr_ass__;
@@ -2623,6 +2625,7 @@ sub new {
     bless $self, $pkg if defined($self);
 }
 
+*Set = *cspacec::csQuaternion_Set;
 *SetIdentity = *cspacec::csQuaternion_SetIdentity;
 *__add_ass__ = *cspacec::csQuaternion___add_ass__;
 *__subtr_ass__ = *cspacec::csQuaternion___subtr_ass__;
@@ -12970,6 +12973,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iDocumentAttributeIterator_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -13010,6 +13014,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iDocumentAttribute_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -13043,6 +13048,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iDocumentNodeIterator_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -13100,6 +13106,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iDocumentNode_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -14148,10 +14155,15 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %ITERATORS = ();
 *RegisterShader = *cspacec::iShaderManager_RegisterShader;
 *UnregisterShader = *cspacec::iShaderManager_UnregisterShader;
+*UnregisterShaders = *cspacec::iShaderManager_UnregisterShaders;
 *GetShader = *cspacec::iShaderManager_GetShader;
 *GetShaders = *cspacec::iShaderManager_GetShaders;
 *RegisterCompiler = *cspacec::iShaderManager_RegisterCompiler;
 *GetCompiler = *cspacec::iShaderManager_GetCompiler;
+*RegisterShaderVariableAccessor = *cspacec::iShaderManager_RegisterShaderVariableAccessor;
+*UnregisterShaderVariableAccessor = *cspacec::iShaderManager_UnregisterShaderVariableAccessor;
+*GetShaderVariableAccessor = *cspacec::iShaderManager_GetShaderVariableAccessor;
+*UnregisterShaderVariableAcessors = *cspacec::iShaderManager_UnregisterShaderVariableAcessors;
 *GetShaderVariableStack = *cspacec::iShaderManager_GetShaderVariableStack;
 *SetTagOptions = *cspacec::iShaderManager_SetTagOptions;
 *GetTagOptions = *cspacec::iShaderManager_GetTagOptions;
@@ -14471,6 +14483,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *RegisterTexture = *cspacec::iTextureManager_RegisterTexture;
+*CreateTexture = *cspacec::iTextureManager_CreateTexture;
 *GetTextureFormat = *cspacec::iTextureManager_GetTextureFormat;
 *CreateSuperLightmap = *cspacec::iTextureManager_CreateSuperLightmap;
 *GetMaxTextureSize = *cspacec::iTextureManager_GetMaxTextureSize;
@@ -14717,6 +14730,7 @@ sub DESTROY {
 *GetWidth = *cspacec::csImageMemory_GetWidth;
 *GetHeight = *cspacec::csImageMemory_GetHeight;
 *GetDepth = *cspacec::csImageMemory_GetDepth;
+*GetRawFormat = *cspacec::csImageMemory_GetRawFormat;
 *GetFormat = *cspacec::csImageMemory_GetFormat;
 *GetPalette = *cspacec::csImageMemory_GetPalette;
 *GetAlpha = *cspacec::csImageMemory_GetAlpha;
@@ -16569,6 +16583,7 @@ sub DESTROY {
     }
 }
 
+*scfGetVersion = *cspacec::iEngineSequenceManager_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);

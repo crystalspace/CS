@@ -758,9 +758,6 @@ csVFS::csVFS (iBase *iParent) :
   StaleCwd(0),
   auto_name_counter(0)
 {
-  // We need a recursive mutex.
-  mutex = csMutex::Create (true); 
-
   // Always register native filesystem plugin at index 0;
   fsPlugins.Push(new csNativeFileSystem(this));
 
@@ -865,7 +862,7 @@ bool csVFS::ChDir (const char *Path)
   if (!Path || strlen(Path) == 0)
     return false;
 
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   csString fullPath = _ExpandPath(Path);
   
@@ -936,7 +933,7 @@ bool csVFS::PopDir ()
 	if (DirectoryStack.Length() < 1)
 		return false;
 
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
 	// Pop the stack and change the cwd
 	CwdNode = DirectoryStack.Pop();
@@ -966,7 +963,7 @@ csString csVFS::_ExpandPath (const char *Path) const
 
   size_t loop = 1;
 
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   if (Path[0] != VFS_PATH_SEPARATOR)
   {
@@ -1020,7 +1017,7 @@ bool csVFS::Exists (const char *Path)
   if (!Path)
     return false;
 
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   csString fullPath = _ExpandPath(Path);
   
@@ -1056,7 +1053,7 @@ csPtr<iStringArray> csVFS::FindFiles (const char *Path)
   if (fullPath.IsEmpty())
     fullPath = "/";
 
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   // Get directory node
 	VfsNode *node = GetDirectoryNode(fullPath);
@@ -1099,7 +1096,7 @@ csPtr<iFile> csVFS::Open (const char *FileName, int Mode)
     return csPtr<iFile> (f);
   }
 
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   csString fullPath = _ExpandPath(FileName);
     
@@ -1144,7 +1141,7 @@ csPtr<iDataBuffer> csVFS::ReadFile (const char *FileName, bool nullterm)
     return csPtr<iDataBuffer> (0);
 
   // Acquire Lock
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   // Open File for reading
   csRef<iFile> F (Open (FileName, VFS_FILE_READ));
@@ -1181,7 +1178,7 @@ csPtr<iDataBuffer> csVFS::ReadFile (const char *FileName, bool nullterm)
 bool csVFS::WriteFile (const char *FileName, const char *Data, size_t Size)
 {
   // Acquire Lock
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   // Open File for writing
   csRef<iFile> F (Open (FileName, VFS_FILE_WRITE));
@@ -1197,7 +1194,7 @@ bool csVFS::DeleteFile (const char *FileName)
   if (!FileName)
     return false;
 
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   // Get the parent directory node
   VfsNode *node = GetParentDirectoryNode(FileName, false);
@@ -1211,7 +1208,7 @@ bool csVFS::DeleteFile (const char *FileName)
 bool csVFS::Sync ()
 {
   // Acquire lock
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   // Sync all iFileSystem plugins
   for (size_t i = 0; i < fsPlugins.Length(); i++)
@@ -1241,7 +1238,7 @@ bool csVFS::Mount(const char *VirtualPath, const char *RealPath,
 
   tmp.Append("/tmp");
 
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   VfsNode *node;
 
@@ -1326,7 +1323,7 @@ bool csVFS::Unmount (const char *VirtualPath, const char *RealPath)
   if (!VirtualPath)
 	  return false;
 
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   csString fullPath = _ExpandPath(VirtualPath);
   
@@ -1392,7 +1389,7 @@ csRef<iStringArray> csVFS::MountRoot (const char *VirtualPath)
   scfStringArray* outv = new scfStringArray;
 
   // Get a lock on the file system
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   // Fin dht esystem roots
   csRef<iStringArray> roots = csInstallationPathsHelper::FindSystemRoots();
@@ -1466,7 +1463,7 @@ csRef<iStringArray> csVFS::MountRoot (const char *VirtualPath)
 bool csVFS::SaveMounts (const char *FileName)
 {
   // Get a lock on the VFS
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   
   // Create a config file
   csConfigFile * tmpConfig = new csConfigFile;
@@ -1525,7 +1522,7 @@ bool csVFS::Clean()
 bool csVFS::TryChDirAuto(const char *Path, const char *FileName)
 {
   // Acquire lock
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   // Check if the VFS Path exists
   VfsNode *node = GetDirectoryNode(Path);
@@ -1606,7 +1603,7 @@ bool csVFS::GetFileTime (const char *FileName, csFileTime &oTime)
   if (!FileName)
     return false;
 
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   csString fullPath = _ExpandPath(FileName);
   
@@ -1626,7 +1623,7 @@ bool csVFS::SetFileTime (const char *FileName, const csFileTime &iTime)
   if (!FileName)
     return false;
 
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   csString fullPath = _ExpandPath(FileName);
   
@@ -1646,7 +1643,7 @@ bool csVFS::GetFileSize (const char *FileName, size_t &oSize)
   if (!FileName)
     return false;
 
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   csString fullPath = _ExpandPath(FileName);
   
@@ -1666,7 +1663,7 @@ csPtr<iDataBuffer> csVFS::GetRealPath (const char *FileName)
   if (!FileName)
     csPtr<iDataBuffer> (0);
 
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   csString fullPath = _ExpandPath(FileName);
   
@@ -1708,7 +1705,7 @@ csRef<iStringArray> csVFS::GetMounts ()
   // An array to hold the mounts
   scfStringArray* mounts = new scfStringArray;
 
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   // Get all mounted nodes
   RootNode->GetMounts(mounts);  
@@ -1726,7 +1723,7 @@ csRef<iStringArray> csVFS::GetRealMountPaths (const char *VirtualPath)
 
   if (VirtualPath)
   {
-    csScopedMutexLock lock (mutex);
+    CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
     csString fullPath = _ExpandPath(VirtualPath);
   
@@ -1757,7 +1754,7 @@ csRef<iStringArray> csVFS::GetRealMountPaths (const char *VirtualPath)
 // Register a filesystem plugin
 size_t csVFS::RegisterPlugin(iFileSystem *FileSystem)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
 	// Add the plugin
 	return fsPlugins.PushSmart(FileSystem);
@@ -1766,7 +1763,7 @@ size_t csVFS::RegisterPlugin(iFileSystem *FileSystem)
 // Create or add a symbolic link
 bool csVFS::SymbolicLink(const char *Target, const char *Link, int priority)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   VfsNode *node = GetDirectoryNode(Link);
 
@@ -2047,7 +2044,7 @@ bool csVFS::AutoConfigPlugin::Configure(iVFS *vfs,
 
   // Get the command line parser plugin
   csRef<iCommandLineParser> cmdline =
-    CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
+    csQueryRegistry<iCommandLineParser> (object_reg);
   if (cmdline)
   {
     ResourceDirectory = cmdline->GetResourceDir();

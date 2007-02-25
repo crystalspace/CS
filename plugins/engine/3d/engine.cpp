@@ -550,7 +550,7 @@ csEngine::~csEngine ()
       CS::RemoveWeakListener (q, weakEventHandler);
   }
 
-  DeleteAll ();
+  DeleteAllForce ();
 
   renderPriorities.DeleteAll ();
 
@@ -650,66 +650,7 @@ bool csEngine::HandleEvent (iEvent &Event)
 
     id_creation_time = globalStringSet->Request("mesh creation time");
 
-    csConfigAccess cfg (objectRegistry, "/config/engine.cfg");
-
     maxAspectRatio = 4096;
-    shaderManager = csQueryRegistryOrLoad<iShaderManager> (objectRegistry,
-    	"crystalspace.graphics3d.shadermanager");
-    if (!shaderManager) return false;
-
-    csRef<iShaderCompiler> shcom (shaderManager->
-      GetCompiler ("XMLShader"));
-
-    if (!shcom.IsValid())
-    {
-      Warn ("'XMLShader' shader compiler not available - "
-	"default shaders are unavailable.");
-    }
-    else
-    {
-      // Load default shaders
-      csRef<iDocumentSystem> docsys (
-	csQueryRegistry<iDocumentSystem> (objectRegistry));
-      if (!docsys.IsValid())
-	docsys.AttachNew (new csTinyDocumentSystem ());
-
-      const char* shaderPath;
-      shaderPath = cfg->GetStr ("Engine.Shader.Default", 
-        "/shader/std_lighting.xml");
-      defaultShader = LoadShader (docsys, shcom, shaderPath);
-      if (!defaultShader.IsValid())
-	Warn ("Shader %s not available", shaderPath);
-
-      shaderPath = cfg->GetStr ("Engine.Shader.Portal", 
-        "/shader/std_lighting_portal.xml");
-      csRef<iShader> portal_shader = LoadShader (docsys, shcom, shaderPath);
-      if (!portal_shader.IsValid())
-	Warn ("Shader %s not available", shaderPath);
-    }
-
-    // Now, try to load the user-specified default render loop.
-    const char* configLoop = cfg->GetStr ("Engine.RenderLoop.Default", 0);
-    if (!override_renderloop.IsEmpty ())
-    {
-      defaultRenderLoop = renderLoopManager->Load (override_renderloop);
-      if (!defaultRenderLoop)
-	return false;
-    }
-    else if (!configLoop)
-    {
-      defaultRenderLoop = CreateDefaultRenderLoop ();
-    }
-    else
-    {
-      defaultRenderLoop = renderLoopManager->Load (configLoop);
-      if (!defaultRenderLoop)
-	return false;
-    }
-
-    // Register it.
-    renderLoopManager->Register (CS_DEFAULT_RENDERLOOP_NAME, 
-      defaultRenderLoop);
-
     frameWidth = G3D->GetWidth ();
     frameHeight = G3D->GetHeight ();
   }
@@ -766,7 +707,7 @@ iMeshObjectType* csEngine::GetThingType ()
   return (iMeshObjectType*)thingMeshType;
 }
 
-void csEngine::DeleteAll ()
+void csEngine::DeleteAllForce ()
 {
   // First notify all sector removal callbacks.
   int i;
@@ -791,6 +732,12 @@ void csEngine::DeleteAll ()
   delete sharedVariables;
   sharedVariables = new csSharedVariableList();
 
+  if (shaderManager)
+  {
+    shaderManager->UnregisterShaderVariableAcessors ();
+    shaderManager->UnregisterShaders ();
+  }
+
   if (thingMeshType != 0)
   {
     csRef<iThingEnvironment> te (
@@ -809,6 +756,83 @@ void csEngine::DeleteAll ()
 
   // remove objects
   QueryObject ()->ObjRemoveAll ();
+}
+
+void csEngine::DeleteAll ()
+{
+  DeleteAllForce ();
+
+  // Initialize some of the standard shaders again.
+  if (G3D)
+  {
+    csConfigAccess cfg (objectRegistry, "/config/engine.cfg");
+    shaderManager = csQueryRegistryOrLoad<iShaderManager> (objectRegistry,
+    	"crystalspace.graphics3d.shadermanager");
+    if (!shaderManager)
+    {
+      Warn ("Shader manager is missing!");
+      return;
+    }
+
+    csRef<iShaderCompiler> shcom (shaderManager->
+      GetCompiler ("XMLShader"));
+
+    if (!shcom.IsValid())
+    {
+      Warn ("'XMLShader' shader compiler not available - "
+	"default shaders are unavailable.");
+    }
+    else
+    {
+      // Load default shaders
+      csRef<iDocumentSystem> docsys (
+	csQueryRegistry<iDocumentSystem> (objectRegistry));
+      if (!docsys.IsValid())
+	docsys.AttachNew (new csTinyDocumentSystem ());
+
+      const char* shaderPath;
+      shaderPath = cfg->GetStr ("Engine.Shader.Default", 
+        "/shader/std_lighting.xml");
+      defaultShader = LoadShader (docsys, shcom, shaderPath);
+      if (!defaultShader.IsValid())
+	Warn ("Shader %s not available", shaderPath);
+
+      shaderPath = cfg->GetStr ("Engine.Shader.Portal", 
+        "/shader/std_lighting_portal.xml");
+      csRef<iShader> portal_shader = LoadShader (docsys, shcom, shaderPath);
+      if (!portal_shader.IsValid())
+	Warn ("Shader %s not available", shaderPath);
+    }
+
+    // Now, try to load the user-specified default render loop.
+    const char* configLoop = cfg->GetStr ("Engine.RenderLoop.Default", 0);
+    if (!override_renderloop.IsEmpty ())
+    {
+      defaultRenderLoop = renderLoopManager->Load (override_renderloop);
+      if (!defaultRenderLoop)
+      {
+	Warn ("Default renderloop couldn't be created!");
+	return;
+      }
+    }
+    else if (!configLoop)
+    {
+      defaultRenderLoop = CreateDefaultRenderLoop ();
+    }
+    else
+    {
+      defaultRenderLoop = renderLoopManager->Load (configLoop);
+      if (!defaultRenderLoop)
+      {
+	Warn ("Default renderloop couldn't be created!");
+	return;
+      }
+    }
+
+    // Register it.
+    renderLoopManager->Register (CS_DEFAULT_RENDERLOOP_NAME, 
+      defaultRenderLoop);
+  }
 }
 
 iObject *csEngine::QueryObject ()
@@ -2679,6 +2703,9 @@ iTextureWrapper *csEngine::CreateBlackTexture (
   csColor *iTransp,
   int iFlags)
 {
+  if (!name)
+    return 0;
+
   csRef<iImage> ifile = csPtr<iImage>(new csImageMemory (w, h));
   ifile->SetName (name);
 
@@ -3145,11 +3172,11 @@ csPtr<iMeshWrapper> csEngine::CreatePortal (
 	csVector3* vertices, int num_vertices,
 	iPortal*& portal)
 {
-  csRef<iMeshWrapper> mesh;
+  csRef<iMeshWrapper> portal_mesh;
   csRef<iPortalContainer> pc;
   if (name)
   {
-    const csRef<iSceneNodeArray> children = mesh->QuerySceneNode ()
+    const csRef<iSceneNodeArray> children = parentMesh->QuerySceneNode ()
       ->GetChildrenArray ();
     size_t i;
     for (i = 0 ; i < children->GetSize(); i++)
@@ -3162,22 +3189,22 @@ csPtr<iMeshWrapper> csEngine::CreatePortal (
 	{
 	  pc = 
   	    scfQueryInterface<iPortalContainer> (mesh->GetMeshObject ());
-          if (!pc) mesh = 0;
+          if (pc) portal_mesh = mesh;
 	  break;
 	}
       }
     }
   }
-  if (!mesh)
+  if (!portal_mesh)
   {
-    mesh = CreatePortalContainer (name);
-    mesh->QuerySceneNode ()->SetParent (parentMesh->QuerySceneNode ());
+    portal_mesh = CreatePortalContainer (name);
+    portal_mesh->QuerySceneNode ()->SetParent (parentMesh->QuerySceneNode ());
     pc = 
-  	scfQueryInterface<iPortalContainer> (mesh->GetMeshObject ());
+  	scfQueryInterface<iPortalContainer> (portal_mesh->GetMeshObject ());
   }
   portal = pc->CreatePortal (vertices, num_vertices);
   portal->SetSector (destSector);
-  return csPtr<iMeshWrapper> (mesh);
+  return csPtr<iMeshWrapper> (portal_mesh);
 }
 
 csPtr<iMeshWrapper> csEngine::CreatePortal (

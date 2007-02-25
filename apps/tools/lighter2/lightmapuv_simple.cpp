@@ -26,14 +26,15 @@
 namespace lighter
 {
 
-  // Very simple layouter.. just map "flat" on the lightmap
-  LightmapUVLayoutFactory* SimpleUVLayouter::LayoutFactory (
+  // Very simple FactoryLayouter.. just map "flat" on the lightmap
+  csPtr<LightmapUVObjectLayouter> SimpleUVFactoryLayouter::LayoutFactory (
     const PrimitiveArray& inPrims, ObjectVertexData& vertexData,
+    const ObjectFactory* factory,
     csArray<PrimitiveArray>& outPrims)
   {
     if (inPrims.GetSize () == 0) return 0;
 
-    SimpleUVLayoutFactory* newFactory = new SimpleUVLayoutFactory (this);
+    SimpleUVObjectLayouter* newFactory = new SimpleUVObjectLayouter (this);
 
     outPrims.Empty();
 
@@ -48,13 +49,13 @@ namespace lighter
     BoolDArray vused;
     vused.SetSize (vertexData.vertexArray.GetSize (), false);
 
-    //TODO Reimplement simple UV-layouter
+    //TODO Reimplement simple UV-FactoryLayouter
     
     // Layout every primitive by itself    
     for (i = 0; i < coplanarPrims.GetSize (); i++)
     {
       PrimitiveArray& prims = coplanarPrims[i];
-      //Primitive prim (inPrims[i]);
+      
       bool lmCoordsGood = false;
       int its = 0; //number of iterations
       
@@ -62,14 +63,9 @@ namespace lighter
       while (!lmCoordsGood && its < 5)
       {
         // Compute lightmapping
-
-        /*prim.SetLightmapMapping (globalSettings.uTexelPerUnit / (1<<its), 
-                                 globalSettings.vTexelPerUnit / (1<<its));*/
-
-
         ProjectPrimitives (prims, vused,
-                           globalConfig.GetLMProperties ().uTexelPerUnit / (1<<its), 
-                           globalConfig.GetLMProperties ().vTexelPerUnit / (1<<its));
+                           factory->GetLMuTexelPerUnit () / (1<<its), 
+                           factory->GetLMvTexelPerUnit () / (1<<its));
 
         // Compute uv-size  
         prims[0].ComputeMinMaxUV (minuv, maxuv);
@@ -128,7 +124,7 @@ namespace lighter
       lm->SetSize (newWidth, newHeight);
     }*/
 
-    return newFactory;
+    return csPtr<LightmapUVObjectLayouter> (newFactory);
   }
 
   static int SortPrimByD (const Primitive& prim1, const Primitive& prim2)
@@ -211,7 +207,7 @@ namespace lighter
     }
   }
 
-  void SimpleUVLayouter::DetermineNeighbouringPrims (
+  void SimpleUVFactoryLayouter::DetermineNeighbouringPrims (
     const PrimitiveArray& inPrims, ObjectVertexData& vertexData,
     csArray<PrimitiveArray>& outPrims)
   {
@@ -283,7 +279,7 @@ namespace lighter
     }
   }
 
-  bool SimpleUVLayouter::AllocLightmap (LightmapPtrDelArray& lightmaps, 
+  bool SimpleUVFactoryLayouter::AllocLightmap (LightmapPtrDelArray& lightmaps, 
     int u, int v, csRect &lightmapArea, int &lightmapID)
   {
     // Now see if we can get some space in the already allocated lightmaps
@@ -315,7 +311,7 @@ namespace lighter
     return false;
   }
 
-  bool SimpleUVLayouter::ProjectPrimitives (PrimitiveArray& prims, 
+  bool SimpleUVFactoryLayouter::ProjectPrimitives (PrimitiveArray& prims, 
                                             BoolDArray &usedVerts,
                                             float uscale, float vscale)
   {
@@ -393,7 +389,7 @@ namespace lighter
 
   //-------------------------------------------------------------------------
 
-  bool SimpleUVLayoutFactory::LayoutUVOnPrimitives (PrimitiveArray &prims, 
+  bool SimpleUVObjectLayouter::LayoutUVOnPrimitives (PrimitiveArray &prims, 
     size_t groupNum, ObjectVertexData& vertexData, uint& lmID)
   {
     const csArray<csArray<size_t> >& coplanarGroup = coplanarGroups[groupNum];
@@ -452,7 +448,7 @@ namespace lighter
     return true;
   }
 
-  void SimpleUVLayoutFactory::MapComplete (const csArray<csVector2>& sizes, 
+  void SimpleUVObjectLayouter::MapComplete (const csArray<csVector2>& sizes, 
                                            const csArray<csVector2>& minuvs,  
                                            csArray<csVector2>& remaps, 
                                            uint& lmID)

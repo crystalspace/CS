@@ -107,10 +107,23 @@ namespace lighter
     /// Get an element proxy given point
     ElementProxy GetElement (const csVector3& pt);
 
+    /// Get number of elements
     size_t GetElementCount () const
     {
       return elementAreas.GetSize ();
     }
+
+    /// Get u/v offset of element
+    inline void GetElementUV (size_t elementIndex, size_t &u, size_t &v) const
+    {
+      size_t uWidth = (maxUV.x - minUV.x + 1);
+
+      u = (elementIndex % uWidth);
+      v = (elementIndex / uWidth);
+    }
+
+    /// Get interpolated normal at point
+    csVector3 ComputeNormal (const csVector3& point) const;
 
     inline TriangleType& GetTriangle () { return triangle; }
     inline const TriangleType& GetTriangle () const { return triangle; }

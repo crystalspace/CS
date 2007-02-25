@@ -19,18 +19,25 @@
 #ifndef __LIGHT_H__
 #define __LIGHT_H__
 
+#include "raytracer.h"
 
 namespace lighter
 {
   class Raytracer;
-
+  
   class VisibilityTester
   {
   public:
+    VisibilityTester ();
 
     /// Test if we have visibility within given raytracer
-    bool Unoccluded (Raytracer& rt);
+    bool Unoccluded (Raytracer& rt, const Primitive* ignorePrim = 0);
 
+    void SetSegment (const csVector3& start, const csVector3& end);
+    void SetSegment (const csVector3& start, const csVector3& dir, float maxL);
+
+  private:
+    Ray testRay;
   };
 
   typedef float(*LightAttenuationFunc)(float squaredDistance, 
@@ -64,8 +71,47 @@ namespace lighter
     // Properties
     void SetAttenuation (csLightAttenuationMode mode, const csVector3& constants);
 
-
     // Getters/setters
+    
+    inline bool IsPDLight () const 
+    { 
+      return pseudoDynamic;
+    }
+
+    inline void SetPDLight (bool pd)
+    {
+      pseudoDynamic = pd;
+    }
+
+    inline const csVector3& GetPosition () const
+    {
+      return position;
+    }
+
+    inline void SetPosition (const csVector3& p)
+    {
+      position = p;
+    }
+
+    inline const csColor& GetColor () const
+    {
+      return color;
+    }
+
+    inline void SetColor (const csColor& c)
+    {
+      color = c;
+    }
+
+    inline const csMD5::Digest& GetLightID () const
+    {
+      return lightId;
+    }
+
+    inline void SetLightID (const char* id)
+    {
+      memcpy (lightId.data, id, csMD5::Digest::DigestLen);
+    }
 
   protected:
     /// Constructor
@@ -91,10 +137,38 @@ namespace lighter
 
     // Type
     bool deltaDistribution;
+    bool pseudoDynamic;
   };
-
   typedef csRefArray<Light> LightRefArray;
 
+
+  // Point light source
+  class PointLight : public Light
+  {
+  public:
+    PointLight ();
+
+    virtual ~PointLight();
+
+    virtual csColor SampleLight (const csVector3& point, const csVector3& n,
+      float u1, float u2, csVector3& lightVec, float& pdf, VisibilityTester& vistest);
+
+    /**
+     * Return light power over S2 sphere
+    */
+    virtual csColor GetPower () const;
+
+    inline float GetRadius () const
+    {
+      return radius;
+    }
+
+    void SetRadius (float radius);
+
+  protected:
+    float radius;
+
+  };
 }
 
 #endif

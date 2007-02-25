@@ -52,7 +52,7 @@ namespace lighter
   {
     if (!tree || !tree->nodeList) return false;
 
-    RaytraceProfiler prof(1);
+    //RaytraceProfiler prof(1);
 
     //Copy and clip the ray
     Ray myRay = ray;
@@ -94,17 +94,19 @@ namespace lighter
         //float thit = (node->inner.splitLocation - ray.origin[dim]) / ray.direction[dim];
         float thit = (node->inner.splitLocation - ray.origin[dim]) * invD[dim];
 
+        csVector3 hitPoint = myRay.origin + myRay.direction * thit;
+
         KDTreeNode *nearNode, *farNode, *leftNode;
         leftNode = KDTreeNode_Op::GetLeft (node);
 
         nearNode = leftNode + nodeOffset[dim][0];
         farNode = leftNode + nodeOffset[dim][1];        
 
-        if (thit <= tmin)
+        if (thit < tmin)
         {
           node = farNode;
         }
-        else if (thit >= tmax)
+        else if (thit > tmax)
         {
           node = nearNode;
         }
@@ -140,7 +142,7 @@ namespace lighter
   {
     if (!tree || !tree->nodeList) return false;
 
-    RaytraceProfiler prof(1);
+    //RaytraceProfiler prof(1);
 
     //Copy and clip the ray
     Ray myRay = ray;
@@ -189,11 +191,11 @@ namespace lighter
         nearNode = leftNode + nodeOffset[dim][0];
         farNode = leftNode + nodeOffset[dim][1];        
 
-        if (thit <= tmin)
+        if (thit < tmin)
         {
           node = farNode;
         }
-        else if (thit >= tmax)
+        else if (thit > tmax)
         {
           node = nearNode;
         }
@@ -230,9 +232,9 @@ namespace lighter
   static bool IntersectPrimitiveRay (const KDTreePrimitive &primitive, const Ray &ray,
     HitPoint &hit)
   {
-    const uint k = primitive.normal_K;
-    const uint ku = mod5[primitive.normal_K+1];
-    const uint kv = mod5[primitive.normal_K+2];
+    const uint k = primitive.normal_K & ~KDPRIM_FLAG_MASK;
+    const uint ku = mod5[k+1];
+    const uint kv = mod5[k+2];
 
     // prefetch?
 
@@ -275,7 +277,6 @@ namespace lighter
   bool Raytracer::IntersectPrimitives (const KDTreeNode* node, const Ray &ray, 
     HitPoint &hit)
   {
-
     size_t nIdx, nMax;
     nMax = KDTreeNode_Op::GetPrimitiveListSize (node);;
     bool haveHit = false;
@@ -289,7 +290,11 @@ namespace lighter
     {
       KDTreePrimitive* prim = primList + nIdx;
 
-      if (mailboxes.PutPrimitiveRay (prim->primPointer, ray.rayID))
+      if (prim->primPointer == ray.ignorePrimitive ||
+        mailboxes.PutPrimitiveRay (prim->primPointer, ray.rayID))
+        continue;
+
+      if (ray.ignoreFlags & (prim->normal_K & KDPRIM_FLAG_MASK))
         continue;
 
       haveHit = IntersectPrimitiveRay (*prim, ray, thisHit);

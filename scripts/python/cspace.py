@@ -256,7 +256,6 @@ class iCommandLineParser(iBase):
     __repr__ = _swig_repr
     def Initialize(*args): return _cspace.iCommandLineParser_Initialize(*args)
     def Reset(*args): return _cspace.iCommandLineParser_Reset(*args)
-    def GetOption(*args): return _cspace.iCommandLineParser_GetOption(*args)
     def GetName(*args): return _cspace.iCommandLineParser_GetName(*args)
     def AddOption(*args): return _cspace.iCommandLineParser_AddOption(*args)
     def AddName(*args): return _cspace.iCommandLineParser_AddName(*args)
@@ -267,6 +266,7 @@ class iCommandLineParser(iBase):
     def GetAppDir(*args): return _cspace.iCommandLineParser_GetAppDir(*args)
     def GetAppPath(*args): return _cspace.iCommandLineParser_GetAppPath(*args)
     def GetOptionName(*args): return _cspace.iCommandLineParser_GetOptionName(*args)
+    def GetOption(*args): return _cspace.iCommandLineParser_GetOption(*args)
     __swig_destroy__ = _cspace.delete_iCommandLineParser
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iCommandLineParser_scfGetVersion
@@ -297,6 +297,7 @@ class csColor(_object):
     def Set(*args): return _cspace.csColor_Set(*args)
     def Clamp(*args): return _cspace.csColor_Clamp(*args)
     def ClampDown(*args): return _cspace.csColor_ClampDown(*args)
+    def IsBlack(*args): return _cspace.csColor_IsBlack(*args)
     def assign(*args): return _cspace.csColor_assign(*args)
     def __iadd__(*args): return _cspace.csColor___iadd__(*args)
     def __isub__(*args): return _cspace.csColor___isub__(*args)
@@ -1529,6 +1530,9 @@ class csTriangle(TriangleInt):
         this = _cspace.new_csTriangle(*args)
         try: self.this.append(this)
         except: self.this = this
+    def __getitem__(*args): return _cspace.csTriangle___getitem__(*args)
+    def __setitem__(*args): return _cspace.csTriangle___setitem__(*args)
+    def __nonzero__(*args): return _cspace.csTriangle___nonzero__(*args)
     __swig_destroy__ = _cspace.delete_csTriangle
     __del__ = lambda self : None;
 csTriangle_swigregister = _cspace.csTriangle_swigregister
@@ -1620,6 +1624,7 @@ class csQuaternion(_object):
         this = _cspace.new_csQuaternion(*args)
         try: self.this.append(this)
         except: self.this = this
+    def Set(*args): return _cspace.csQuaternion_Set(*args)
     def SetIdentity(*args): return _cspace.csQuaternion_SetIdentity(*args)
     def __iadd__(*args): return _cspace.csQuaternion___iadd__(*args)
     def __isub__(*args): return _cspace.csQuaternion___isub__(*args)
@@ -3440,6 +3445,9 @@ class iLightIterator(iBase):
     def Next(*args): return _cspace.iLightIterator_Next(*args)
     def GetLastSector(*args): return _cspace.iLightIterator_GetLastSector(*args)
     def Reset(*args): return _cspace.iLightIterator_Reset(*args)
+    def __iter__(self):
+        while self.HasNext():
+            yield self.Next() 
     __swig_destroy__ = _cspace.delete_iLightIterator
     __del__ = lambda self : None;
 iLightIterator_swigregister = _cspace.iLightIterator_swigregister
@@ -3662,6 +3670,9 @@ class iSectorIterator(iBase):
     def Next(*args): return _cspace.iSectorIterator_Next(*args)
     def GetLastPosition(*args): return _cspace.iSectorIterator_GetLastPosition(*args)
     def Reset(*args): return _cspace.iSectorIterator_Reset(*args)
+    def __iter__(self):
+        while self.HasNext():
+            yield self.Next() 
     __swig_destroy__ = _cspace.delete_iSectorIterator
     __del__ = lambda self : None;
 iSectorIterator_swigregister = _cspace.iSectorIterator_swigregister
@@ -4429,6 +4440,9 @@ class iMeshWrapperIterator(iBase):
     def Next(*args): return _cspace.iMeshWrapperIterator_Next(*args)
     def Reset(*args): return _cspace.iMeshWrapperIterator_Reset(*args)
     def HasNext(*args): return _cspace.iMeshWrapperIterator_HasNext(*args)
+    def __iter__(self):
+        while self.HasNext():
+            yield self.Next() 
     __swig_destroy__ = _cspace.delete_iMeshWrapperIterator
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iMeshWrapperIterator_scfGetVersion
@@ -4565,6 +4579,9 @@ class iVisibilityObjectIterator(iBase):
     def HasNext(*args): return _cspace.iVisibilityObjectIterator_HasNext(*args)
     def Next(*args): return _cspace.iVisibilityObjectIterator_Next(*args)
     def Reset(*args): return _cspace.iVisibilityObjectIterator_Reset(*args)
+    def __iter__(self):
+        while self.HasNext():
+            yield self.Next() 
     __swig_destroy__ = _cspace.delete_iVisibilityObjectIterator
     __del__ = lambda self : None;
 iVisibilityObjectIterator_swigregister = _cspace.iVisibilityObjectIterator_swigregister
@@ -7513,6 +7530,7 @@ iObjectRegistryIterator_swigregister = _cspace.iObjectRegistryIterator_swigregis
 iObjectRegistryIterator_swigregister(iObjectRegistryIterator)
 
 csQueryRegistryTag = _cspace.csQueryRegistryTag
+CS_QUERY_REGISTRY_TAG_is_deprecated = _cspace.CS_QUERY_REGISTRY_TAG_is_deprecated
 class iVirtualClock(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -8504,10 +8522,16 @@ class iDocumentAttributeIterator(iBase):
     __repr__ = _swig_repr
     def HasNext(*args): return _cspace.iDocumentAttributeIterator_HasNext(*args)
     def Next(*args): return _cspace.iDocumentAttributeIterator_Next(*args)
+    def __iter__(self):
+        while self.HasNext():
+            yield self.Next() 
     __swig_destroy__ = _cspace.delete_iDocumentAttributeIterator
     __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iDocumentAttributeIterator_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iDocumentAttributeIterator_scfGetVersion)
 iDocumentAttributeIterator_swigregister = _cspace.iDocumentAttributeIterator_swigregister
 iDocumentAttributeIterator_swigregister(iDocumentAttributeIterator)
+iDocumentAttributeIterator_scfGetVersion = _cspace.iDocumentAttributeIterator_scfGetVersion
 
 class iDocumentAttribute(iBase):
     __swig_setmethods__ = {}
@@ -8529,8 +8553,11 @@ class iDocumentAttribute(iBase):
     def SetValueAsFloat(*args): return _cspace.iDocumentAttribute_SetValueAsFloat(*args)
     __swig_destroy__ = _cspace.delete_iDocumentAttribute
     __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iDocumentAttribute_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iDocumentAttribute_scfGetVersion)
 iDocumentAttribute_swigregister = _cspace.iDocumentAttribute_swigregister
 iDocumentAttribute_swigregister(iDocumentAttribute)
+iDocumentAttribute_scfGetVersion = _cspace.iDocumentAttribute_scfGetVersion
 
 class iDocumentNodeIterator(iBase):
     __swig_setmethods__ = {}
@@ -8543,10 +8570,16 @@ class iDocumentNodeIterator(iBase):
     __repr__ = _swig_repr
     def HasNext(*args): return _cspace.iDocumentNodeIterator_HasNext(*args)
     def Next(*args): return _cspace.iDocumentNodeIterator_Next(*args)
+    def __iter__(self):
+        while self.HasNext():
+            yield self.Next() 
     __swig_destroy__ = _cspace.delete_iDocumentNodeIterator
     __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iDocumentNodeIterator_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iDocumentNodeIterator_scfGetVersion)
 iDocumentNodeIterator_swigregister = _cspace.iDocumentNodeIterator_swigregister
 iDocumentNodeIterator_swigregister(iDocumentNodeIterator)
+iDocumentNodeIterator_scfGetVersion = _cspace.iDocumentNodeIterator_scfGetVersion
 
 class iDocumentNode(iBase):
     __swig_setmethods__ = {}
@@ -8585,8 +8618,11 @@ class iDocumentNode(iBase):
     def SetAttributeAsFloat(*args): return _cspace.iDocumentNode_SetAttributeAsFloat(*args)
     __swig_destroy__ = _cspace.delete_iDocumentNode
     __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iDocumentNode_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iDocumentNode_scfGetVersion)
 iDocumentNode_swigregister = _cspace.iDocumentNode_swigregister
 iDocumentNode_swigregister(iDocumentNode)
+iDocumentNode_scfGetVersion = _cspace.iDocumentNode_scfGetVersion
 
 class iDocument(iBase):
     __swig_setmethods__ = {}
@@ -9401,10 +9437,15 @@ class iShaderManager(iShaderVariableContext):
     __repr__ = _swig_repr
     def RegisterShader(*args): return _cspace.iShaderManager_RegisterShader(*args)
     def UnregisterShader(*args): return _cspace.iShaderManager_UnregisterShader(*args)
+    def UnregisterShaders(*args): return _cspace.iShaderManager_UnregisterShaders(*args)
     def GetShader(*args): return _cspace.iShaderManager_GetShader(*args)
     def GetShaders(*args): return _cspace.iShaderManager_GetShaders(*args)
     def RegisterCompiler(*args): return _cspace.iShaderManager_RegisterCompiler(*args)
     def GetCompiler(*args): return _cspace.iShaderManager_GetCompiler(*args)
+    def RegisterShaderVariableAccessor(*args): return _cspace.iShaderManager_RegisterShaderVariableAccessor(*args)
+    def UnregisterShaderVariableAccessor(*args): return _cspace.iShaderManager_UnregisterShaderVariableAccessor(*args)
+    def GetShaderVariableAccessor(*args): return _cspace.iShaderManager_GetShaderVariableAccessor(*args)
+    def UnregisterShaderVariableAcessors(*args): return _cspace.iShaderManager_UnregisterShaderVariableAcessors(*args)
     def GetShaderVariableStack(*args): return _cspace.iShaderManager_GetShaderVariableStack(*args)
     def SetTagOptions(*args): return _cspace.iShaderManager_SetTagOptions(*args)
     def GetTagOptions(*args): return _cspace.iShaderManager_GetTagOptions(*args)
@@ -9597,6 +9638,7 @@ class iTextureManager(iBase):
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def RegisterTexture(*args): return _cspace.iTextureManager_RegisterTexture(*args)
+    def CreateTexture(*args): return _cspace.iTextureManager_CreateTexture(*args)
     def GetTextureFormat(*args): return _cspace.iTextureManager_GetTextureFormat(*args)
     def CreateSuperLightmap(*args): return _cspace.iTextureManager_CreateSuperLightmap(*args)
     def GetMaxTextureSize(*args): return _cspace.iTextureManager_GetMaxTextureSize(*args)
@@ -9767,6 +9809,7 @@ class csImageMemory(csImageMemoryBase):
     def GetWidth(*args): return _cspace.csImageMemory_GetWidth(*args)
     def GetHeight(*args): return _cspace.csImageMemory_GetHeight(*args)
     def GetDepth(*args): return _cspace.csImageMemory_GetDepth(*args)
+    def GetRawFormat(*args): return _cspace.csImageMemory_GetRawFormat(*args)
     def GetFormat(*args): return _cspace.csImageMemory_GetFormat(*args)
     def GetPalette(*args): return _cspace.csImageMemory_GetPalette(*args)
     def GetAlpha(*args): return _cspace.csImageMemory_GetAlpha(*args)
@@ -10992,8 +11035,11 @@ class iEngineSequenceManager(iBase):
     def DestroyTimedOperations(*args): return _cspace.iEngineSequenceManager_DestroyTimedOperations(*args)
     __swig_destroy__ = _cspace.delete_iEngineSequenceManager
     __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iEngineSequenceManager_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iEngineSequenceManager_scfGetVersion)
 iEngineSequenceManager_swigregister = _cspace.iEngineSequenceManager_swigregister
 iEngineSequenceManager_swigregister(iEngineSequenceManager)
+iEngineSequenceManager_scfGetVersion = _cspace.iEngineSequenceManager_scfGetVersion
 
 class iMovieRecorder(iBase):
     __swig_setmethods__ = {}

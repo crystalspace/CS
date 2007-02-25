@@ -166,6 +166,32 @@ namespace CS
       }
     }
 
+    /**
+     * Recursively clone a node with all its attributes and child-nodes.
+     * \param from
+     * Source root node
+     * \param to
+     * Destination root node
+     */
+    inline void CloneNode (iDocumentNode* from, iDocumentNode* to)
+    {
+      to->SetValue (from->GetValue ());
+      csRef<iDocumentNodeIterator> it = from->GetNodes ();
+      while (it->HasNext ())
+      {
+        csRef<iDocumentNode> child = it->Next ();
+        csRef<iDocumentNode> child_clone = to->CreateNodeBefore (
+          child->GetType (), 0);
+        CloneNode (child, child_clone);
+      }
+      csRef<iDocumentAttributeIterator> atit = from->GetAttributes ();
+      while (atit->HasNext ())
+      {
+        csRef<iDocumentAttribute> attr = atit->Next ();
+        to->SetAttribute (attr->GetName (), attr->GetValue ());
+      }
+    }
+
     /**\name Functors 
      * @{ */
 

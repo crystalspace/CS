@@ -469,6 +469,19 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
 %apply Type * ARGOUT { Args };
 %enddef
 
+/*
+ * Macro for implementing the python iterator protocol for objects
+ * with Next and HasNext functions.
+ * Must be used inside an %extend block for ClassName.
+*/
+#undef ITERATOR_FUNCTIONS
+%define ITERATOR_FUNCTIONS(ClassName)
+%pythoncode %{
+def __iter__(self):
+    while self.HasNext():
+        yield self.Next() %}
+%enddef
+
 #endif // ifndef CS_MINI_SWIG
 
 #endif // SWIGPYTHON

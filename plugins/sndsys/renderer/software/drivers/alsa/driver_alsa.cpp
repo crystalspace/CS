@@ -410,7 +410,7 @@ bool SndSysDriverALSA::StartThread()
 
   m_bRunning=true;
   SndSysDriverRunnable* runnable = new SndSysDriverRunnable (this);
-  m_pBGThread = csThread::Create(runnable);
+  m_pBGThread.AttachNew (new CS::Threading::Thread (runnable, false));  
   runnable->DecRef ();
 
   m_pBGThread->Start();

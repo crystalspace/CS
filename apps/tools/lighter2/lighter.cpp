@@ -21,6 +21,7 @@
 #include "common.h"
 #include "config.h"
 #include "lighter.h"
+#include "lightmap.h"
 #include "lightmapuv.h"
 #include "lightmapuv_simple.h"
 #include "primitive.h"
@@ -47,17 +48,38 @@ namespace lighter
 
   Lighter::~Lighter ()
   {
-    delete scene;
   }
 
   bool Lighter::Initialize ()
   {
+    cmdLine = csQueryRegistry<iCommandLineParser> (objectRegistry);
+    if (!cmdLine) return Report ("Cannot get a commandline helper");
+
+    // Check for commandline help.
+    if (csCommandLineHelper::CheckHelp (objectRegistry, cmdLine))
+    {
+      CommandLineHelp ();
+      return true;
+    }
+
     // Load config
-    if (!csInitializer::SetupConfigManager (objectRegistry,0))
+    const char* configFile = cmdLine->GetOption ("config");
+
+    if (!csInitializer::SetupConfigManager (objectRegistry,
+      configFile ? configFile : "/config/lighter2.cfg", "crystalspace.lighter2"))
       return Report ("Cannot setup config manager!");
+
+    configMgr = csQueryRegistry<iConfigManager> (objectRegistry);
+    if (!configMgr) return Report ("Cannot get a configuration manager");
+
+    LoadConfiguration ();
+    globalConfig.Initialize ();
+    globalTUI.Initialize ();
+    LightmapCache::Initialize ();
 
     // Initialize the TUI
     globalTUI.Redraw ();
+    globalStats.SetTaskProgress ("Starting up", 0);
 
     // Setup reporter
     {
@@ -83,13 +105,6 @@ namespace lighter
       return Report ("Cannot load plugins!");
 
     lighter::globalStats.SetTaskProgress ("Starting up", 60);
-
-    // Check for commandline help.
-    if (csCommandLineHelper::CheckHelp (objectRegistry))
-    {
-      csCommandLineHelper::Help (objectRegistry);
-      return true;
-    }
 
     // Get the plugins wants to use
     reporter = csQueryRegistry<iReporter> (objectRegistry);
@@ -124,6 +139,11 @@ namespace lighter
     return true;
   }
 
+  void Lighter::CleanUp ()
+  {
+    delete scene;
+  }
+
   bool Lighter::LightEmUp ()
   {
     // Have to load to have anything to light
@@ -136,89 +156,53 @@ namespace lighter
     globalStats.SetTotalProgress (10);
     
 
-    unsigned int taskI = 0;
+    globalStats.SetTaskProgress ("Lightmap layout", 0);
     // Calculate lightmapping coordinates
-    LightmapUVLayouter *uvLayout = new SimpleUVLayouter (scene->GetLightmaps());
+    LightmapUVFactoryLayouter *uvLayout = new SimpleUVFactoryLayouter (scene->GetLightmaps());
 
     float factoryProgress = 100.0f / scene->GetFactories ().GetSize ();
     ObjectFactoryHash::GlobalIterator factIt = 
       scene->GetFactories ().GetIterator ();
     while (factIt.HasNext ())
     {
-      globalStats.SetTaskProgress ("Lightmap layout", taskI * factoryProgress);
       csRef<ObjectFactory> fact = factIt.Next ();
       fact->PrepareLightmapUV (uvLayout);
-      taskI++;
+      globalStats.IncTaskProgress (factoryProgress);
     }
 
     // Initialize all objects
-    taskI = 0;
+    globalStats.SetTotalProgress (15);
+    globalStats.SetTaskProgress ("Initialize objects", 0);
     float sectorProgress = 100.0f / scene->GetSectors ().GetSize();
     SectorHash::GlobalIterator sectIt = 
       scene->GetSectors ().GetIterator ();
     while (sectIt.HasNext ())
     {
-      float thisSectorProgress = taskI * sectorProgress;
-      globalStats.SetTaskProgress ("Initialize objects", 
-        thisSectorProgress);
       csRef<Sector> sect = sectIt.Next ();
       sect->Initialize ();
-      taskI++;
+      globalStats.IncTaskProgress (sectorProgress);
     }
 
     for (size_t i = 0; i < scene->GetLightmaps().GetSize(); i++)
     {
       Lightmap * lm = scene->GetLightmaps ()[i];
       lm->Initialize();
-    }
-
-    globalStats.SetTotalProgress (20);
-
-    // Run performance benchmark
-  
-    /*
-    size_t numRays = 2000000;
-    RandomRayListGenerator<PseudoRandomRaygenerator> rayGen;
-    csArray<Ray> rays = rayGen(numRays, csVector3 (0));
-    Raytracer tracer (scene->GetSectors ().GetIterator ().Next ()->kdTree);
-    for (size_t i = 0; i < numRays; ++i)
-    {
-      Ray& r = rays[i];
-      HitPoint h;
-
-      tracer.TraceClosestHit (r, h);
-
-      if ((i % 1000) == 0)
-      {
-        globalTUI.Redraw (TUI::TUI_DRAW_RAYCORE);
-      }
-    }
-
-    int a = 0;
-    return true;
-*/
+    }    
     
-    
-
     // Progress 20
+    globalStats.SetTotalProgress (20);
 
     // Shoot direct lighting
     if (globalConfig.GetLighterProperties ().doDirectLight)
     {
+      DirectLighting::Initialize ();
       globalStats.SetTaskProgress ("Direct lighting", 0);
       sectIt.Reset ();
       while (sectIt.HasNext ())
       {
         csRef<Sector> sect = sectIt.Next ();
-        DirectLighting::ShootDirectLighting (sect, 100.0f / scene->GetSectors ().GetSize ());
+        DirectLighting::ShadeDirectLighting (sect, sectorProgress);
       }
-    }
-    
-    globalStats.SetTotalProgress (40);
-
-    if (globalConfig.GetLighterProperties ().doiosity)
-    {
-
     }
 
     globalStats.SetTotalProgress (80);
@@ -226,23 +210,52 @@ namespace lighter
     //@@ DO OTHER LIGHTING
 
     // De-antialias the lightmaps
-    sectIt.Reset ();
-    while (sectIt.HasNext ())
     {
-      csRef<Sector> sect = sectIt.Next ();
-      ObjectHash::GlobalIterator objIt = sect->allObjects.GetIterator ();
-      while (objIt.HasNext ())
+      LightmapMaskArray lmMasks;
+      LightmapPtrDelArray::Iterator lmIt = scene->GetLightmaps ().GetIterator ();
+      while (lmIt.HasNext ())
       {
-        csRef<Object> obj = objIt.Next ();
-        csArray<LightmapPtrDelArray*> allLightmaps (scene->GetAllLightmaps());
-        obj->FixupLightmaps (allLightmaps);
+        const Lightmap* lm = lmIt.Next ();
+        lmMasks.Push (LightmapMask (*lm));
+      }
+
+      sectIt.Reset ();
+      globalStats.SetTaskProgress ("Postprocessing lightmaps", 0);
+      while (sectIt.HasNext ())
+      {
+        csRef<Sector> sect = sectIt.Next ();
+        float objProgress = 0.5 * sectorProgress / sect->allObjects.GetSize ();
+        ObjectHash::GlobalIterator objIt = sect->allObjects.GetIterator ();
+        while (objIt.HasNext ())
+        {
+          csRef<Object> obj = objIt.Next ();
+          //csArray<LightmapPtrDelArray*> allLightmaps (scene->GetAllLightmaps());
+          //obj->FixupLightmaps (allLightmaps);
+          obj->FillLightmapMask (lmMasks);
+          globalStats.IncTaskProgress (objProgress);
+        }
+      }
+
+      csArray<LightmapPtrDelArray*> allLightmaps (scene->GetAllLightmaps());
+      for (size_t li = 0; li < allLightmaps.GetSize (); ++li)
+      {
+        LightmapPtrDelArray& lightmaps = *allLightmaps[li];
+        float lmProgress = 50.0f / (allLightmaps.GetSize () * lightmaps.GetSize ());
+
+        for (size_t lmI = 0; lmI < lightmaps.GetSize (); ++lmI)
+        {
+          lightmaps[lmI]->FixupLightmap (lmMasks[lmI]);
+          globalStats.IncTaskProgress (lmProgress);
+        }
       }
     }
 
     globalStats.SetTotalProgress (90);
+    globalStats.SetTaskProgress ("Saving result", 0);
     //Save the result
     if (!scene->SaveFiles ()) return false;
     globalStats.SetTotalProgress (100);
+    globalStats.SetTaskProgress ("Finished!", 0);
 
     return true;  
   }
@@ -291,12 +304,76 @@ namespace lighter
     return scene->LoadFiles ();
   }
 
-  void Lighter::LoadSettings ()
+  void Lighter::LoadConfiguration ()
   {
-    csRef<iCommandLineParser> cmdline = 
-      csQueryRegistry<iCommandLineParser> (objectRegistry);
+    //Merge configuration settings from command line into config
+    csRef<csConfigFile> cmdLineConfig;
+    cmdLineConfig.AttachNew (new csConfigFile);
 
-    settings.keepGenmeshSubmeshes = cmdline->GetBoolOption ("keepsubmeshes");
+    const char* option;
+    const char* optionValue;
+    size_t index = 0;
+    csString buffer;
+    while ((option = cmdLine->GetOptionName (index)) != 0)
+    {
+      optionValue = cmdLine->GetOption (index);
+
+      if (!optionValue)
+      {
+        // No option value, a boolean setting, either true or false
+        if (option[0] == 'n' && option[1] == 'o')
+        {
+          option += 2;
+          optionValue = "false";
+        }
+        else
+        {
+          optionValue = "true";
+        }
+      }
+
+      buffer << "lighter2." << option << " = " << optionValue << "\n";
+
+      index++;
+    }
+
+    cmdLineConfig->LoadFromBuffer (buffer.GetDataSafe (), true);
+    configMgr->AddDomain (cmdLineConfig, iConfigManager::ConfigPriorityUserApp);
+  }
+
+  void Lighter::CommandLineHelp () const
+  {
+    csPrintf ("Syntax:\n");
+    csPrintf ("  lighter2 [options] <file> [file] [file] ...\n\n");
+    csPrintf ("Options:\n");
+    
+    csPrintf (" --[no]simpletui\n");
+    csPrintf ("  Use simplified text ui for output. Recommended/needed\n"
+              "  for platforms without ANSI console handling such as msys.\n");
+
+    csPrintf (" --lmcachesize=<byte>\n");
+    csPrintf ("  Set the size of the in memory lightmap cache in number of bytes\n");
+
+    csPrintf (" --[no]directlight\n");
+    csPrintf ("  Calculate direct lighting using per lumel/vertex sampling\n");
+
+    csPrintf (" --[no]directlightrandom\n");
+    csPrintf ("  Use random sampling for direct lighting instead of sampling\n"
+              "  every light source.\n");
+
+    csPrintf (" --utexelperunit=<number>\n");
+    csPrintf ("  Set scaling between world space units and lightmap pixels\n"
+              "  in lightmap u-mapping direction\n");
+
+    csPrintf (" --vtexelperunit=<number>\n");
+    csPrintf ("  Set scaling between world space units and lightmap pixels\n"
+              "  in lightmap v-mapping direction\n");
+   
+    csPrintf (" --maxlightmapu=<number>\n");
+    csPrintf ("  Set maximum lightmap size in u-mapping direction\n");
+
+    csPrintf (" --maxlightmapv=<number>\n");
+    csPrintf ("  Set maximum lightmap size in v-mapping direction\n\n");
   }
 
 }
@@ -305,8 +382,6 @@ int main (int argc, char* argv[])
 {
   iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
   if (!object_reg) return 1;
-
-  lighter::globalStats.SetTaskProgress ("Starting up", 20);
 
   // Load up the global object
   csRef<lighter::Lighter> localLighter;
@@ -319,11 +394,15 @@ int main (int argc, char* argv[])
   // Light em up!
   if (!lighter::globalLighter->LightEmUp ()) return 1;
 
+  // Clean up
+  localLighter->CleanUp ();
+  lighter::LightmapCache::CleanUp ();
+
   localLighter = 0;
+  lighter::globalLighter = 0;
 
   // Remove it
   csInitializer::DestroyApplication (object_reg);
-  csPrintf (CS_ANSI_CLEAR_SCREEN);
 
   return 0;
 }
