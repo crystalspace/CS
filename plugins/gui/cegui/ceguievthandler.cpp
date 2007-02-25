@@ -57,7 +57,7 @@ bool csCEGUIEventHandler::OnUnhandledEvent (iEvent &event)
 {
   if (event.GetName() == CanvasResize)
   {
-    csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY (obj_reg, iGraphics2D);
+    csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (obj_reg);
     renderer->setDisplaySize (CEGUI::Size (g2d->GetWidth (), g2d->GetHeight ()));
     return true;
   }

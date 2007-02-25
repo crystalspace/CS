@@ -1048,8 +1048,8 @@ bool csTextSyntaxService::WriteGradient (iDocumentNode* node,
   return true;
 }
 
-bool csTextSyntaxService::ParseShaderVar (iDocumentNode* node,
-					  csShaderVariable& var)
+bool csTextSyntaxService::ParseShaderVar (iLoaderContext* ldr_context,
+    	iDocumentNode* node, csShaderVariable& var)
 {
   const char *name = node->GetAttributeValue("name");
   if (name != 0)
@@ -1104,27 +1104,15 @@ bool csTextSyntaxService::ParseShaderVar (iDocumentNode* node,
 	csRef<iTextureWrapper> tex;
         // @@@ This should be done in a better way...
 	//  @@@ E.g. lazy retrieval of the texture with an accessor?
-        csRef<iEngine> eng = CS_QUERY_REGISTRY (object_reg, iEngine);
-        if (eng)
-        {
-          const char* texname = node->GetContentsValue ();
-          tex = eng->FindTexture (texname);
-          if (!tex)
-	  {
-            Report (
+        const char* texname = node->GetContentsValue ();
+        tex = ldr_context->FindTexture (texname);
+        if (!tex)
+	{
+          Report (
               "crystalspace.syntax.shadervariable",
               CS_REPORTER_SEVERITY_WARNING,
               node,
               "Texture '%s' not found.", texname);
-          }
-        }
-        else
-        {
-          Report (
-            "crystalspace.syntax.shadervariable",
-            CS_REPORTER_SEVERITY_WARNING,
-            node,
-            "Engine not found.");
         }
         var.SetValue (tex);
       }
@@ -1160,7 +1148,7 @@ bool csTextSyntaxService::ParseShaderVar (iDocumentNode* node,
           csRef<csShaderVariable> elementVar = 
             csPtr<csShaderVariable> (new csShaderVariable (csInvalidStringID));
           var.SetArrayElement (varCount, elementVar);
-          ParseShaderVar (varNode, *elementVar);
+          ParseShaderVar (ldr_context, varNode, *elementVar);
           varCount++;
         }
       }
@@ -1473,31 +1461,46 @@ bool csTextSyntaxService::WriteZMode (iDocumentNode* node,
   return true;
 }
 
-bool csTextSyntaxService::ParseKey (iDocumentNode *node, iKeyValuePair* &keyvalue)
+csPtr<iKeyValuePair> csTextSyntaxService::ParseKey (iDocumentNode* node)
 {
   const char* name = node->GetAttributeValue ("name");
   if (!name)
   {
     ReportError ("crystalspace.syntax.key",
     	        node, "Missing 'name' attribute for 'key'!");
-    return false;
+    return 0;
   }
-  csKeyValuePair* cskvp = new csKeyValuePair (name);
+  csRef<csKeyValuePair> cskvp;
+  cskvp.AttachNew (new csKeyValuePair (name));
+
+  bool editoronly = node->GetAttributeValueAsBool ("editoronly");
+  cskvp->SetEditorOnly (editoronly);
+
   csRef<iDocumentAttributeIterator> atit = node->GetAttributes ();
   while (atit->HasNext ())
   {
     csRef<iDocumentAttribute> at = atit->Next ();
-    cskvp->SetValue (at->GetName (), at->GetValue ());
+    const char* attrName = at->GetName ();
+    if (strcmp (attrName, "editoronly") == 0) continue;
+    cskvp->SetValue (attrName, at->GetValue ());
   }
-  csRef<iKeyValuePair> kvp = SCF_QUERY_INTERFACE (cskvp, iKeyValuePair);
-  
+  return scfQueryInterface<iKeyValuePair> (cskvp);
+}
+
+bool csTextSyntaxService::ParseKey (iDocumentNode *node, iKeyValuePair* &keyvalue)
+{
+  csRef<iKeyValuePair> kvp = ParseKey (node);
+  if (!kvp.IsValid()) return false;
   keyvalue = kvp;
+  keyvalue->IncRef();
   return true;
 }
 
 bool csTextSyntaxService::WriteKey (iDocumentNode *node, iKeyValuePair *keyvalue)
 {
   node->SetAttribute ("name", keyvalue->GetKey ());
+  if (keyvalue->GetEditorOnly ())
+    node->SetAttribute ("editoronly", "yes");
   csRef<iStringArray> vnames = keyvalue->GetValueNames ();
   for (size_t i=0; i<vnames->Length (); i++)
   {
@@ -1873,7 +1876,8 @@ bool csTextSyntaxService::WriteRenderBuffer (iDocumentNode* node, iRenderBuffer*
   return true;
 }
 
-csRef<iShader> csTextSyntaxService::ParseShaderRef (iDocumentNode* node)
+csRef<iShader> csTextSyntaxService::ParseShaderRef (
+    iLoaderContext* ldr_context, iDocumentNode* node)
 {
   // @@@ FIXME: unify with csLoader::ParseShader()?
   static const char* msgid = "crystalspace.syntax.shaderred";
@@ -1885,14 +1889,14 @@ csRef<iShader> csTextSyntaxService::ParseShaderRef (iDocumentNode* node)
     return 0;
   }
 
-  csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY(object_reg, iShaderManager);
+  csRef<iShaderManager> shmgr = csQueryRegistry<iShaderManager> (object_reg);
   csRef<iShader> shader = shmgr->GetShader (shaderName);
   if (shader.IsValid()) return shader;
 
   const char* shaderFileName = node->GetAttributeValue ("file");
   if (shaderFileName != 0)
   {
-    csRef<iVFS> vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
+    csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
     csVfsDirectoryChanger dirChanger (vfs);
     csString filename (shaderFileName);
     csRef<iFile> shaderFile = vfs->Open (filename, VFS_FILE_READ);
@@ -1905,7 +1909,7 @@ csRef<iShader> csTextSyntaxService::ParseShaderRef (iDocumentNode* node)
     }
 
     csRef<iDocumentSystem> docsys =
-      CS_QUERY_REGISTRY(object_reg, iDocumentSystem);
+      csQueryRegistry<iDocumentSystem> (object_reg);
     if (docsys == 0)
       docsys.AttachNew (new csTinyDocumentSystem ());
     csRef<iDocument> shaderDoc = docsys->CreateDocument ();
@@ -1937,7 +1941,7 @@ csRef<iShader> csTextSyntaxService::ParseShaderRef (iDocumentNode* node)
         "Could not get shader compiler '%s'", type);
       return false;
     }
-    shader = shcom->CompileShader (shaderNode);
+    shader = shcom->CompileShader (ldr_context, shaderNode);
     if (shader && (strcmp (shader->QueryObject()->GetName(), shaderName) == 0))
     {
       shader->SetFileName (shaderFileName);

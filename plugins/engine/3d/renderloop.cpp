@@ -60,7 +60,7 @@ void csRenderLoop::SelfDestruct ()
 void csRenderLoop::Draw (iRenderView *rview, iSector *s, iMeshWrapper* mesh)
 {
   if (!shadermanager)
-    shadermanager = CS_QUERY_REGISTRY (engine->objectRegistry, iShaderManager);
+    shadermanager = csQueryRegistry<iShaderManager> (engine->objectRegistry);
 
   if (s)
   {
@@ -177,7 +177,7 @@ bool csRenderLoopManager::Unregister (iRenderLoop* loop)
 csPtr<iRenderLoop> csRenderLoopManager::Load (const char* fileName)
 {
   csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (engine->objectRegistry, iPluginManager));
+  	csQueryRegistry<iPluginManager> (engine->objectRegistry));
 
   csRef<iLoaderPlugin> rlLoader =
     CS_LOAD_PLUGIN (plugin_mgr,
@@ -198,8 +198,8 @@ csPtr<iRenderLoop> csRenderLoopManager::Load (const char* fileName)
     return 0;
   }
 
-  csRef<iDocumentSystem> xml/* (CS_QUERY_REGISTRY (engine->object_reg, 
-    iDocumentSystem))*/;  
+  csRef<iDocumentSystem> xml/* ( 
+    csQueryRegistry<iDocumentSystem> (engine->object_reg))*/;  
       /* @@@ Eeek. The iDocumentSystem may not be initialized. */
   if (!xml) xml.AttachNew (new csTinyDocumentSystem ());
   csRef<iDocument> doc = xml->CreateDocument ();
@@ -224,7 +224,7 @@ csPtr<iRenderLoop> csRenderLoopManager::Load (const char* fileName)
     // Error already reported.
     return 0;
   }
-  csRef<iRenderLoop> rl = SCF_QUERY_INTERFACE (b, iRenderLoop);
+  csRef<iRenderLoop> rl = scfQueryInterface<iRenderLoop> (b);
   if (rl == 0)
   {
     engine->ReportBug (

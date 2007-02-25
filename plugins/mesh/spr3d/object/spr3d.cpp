@@ -139,7 +139,7 @@ void csSprite3DMeshObjectFactory::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
+  csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
   if (rep)
     rep->ReportV (severity, "crystalspace.mesh.sprite.3d", msg, arg);
   else
@@ -234,7 +234,7 @@ csPtr<iMeshObject> csSprite3DMeshObjectFactory::NewInstance ()
   spr->SetLightingQualityConfig (GetLightingQualityConfig());
   spr->SetAction ("default");
   spr->InitSprite ();
-  csRef<iMeshObject> im (SCF_QUERY_INTERFACE (spr, iMeshObject));
+  csRef<iMeshObject> im (scfQueryInterface<iMeshObject> (spr));
   spr->DecRef ();
   return csPtr<iMeshObject> (im);
 }

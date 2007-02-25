@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2005 by Marten Svanfeldt
+  Copyright (C) 2005-2006 by Marten Svanfeldt
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -25,8 +25,8 @@ namespace lighter
 {
   class Scene;
   class Sector;
-  class Light;
-  class RadPrimitive;
+  class Light_old;
+  class Primitive;
   class Raytracer;
 
   class Lighter : public csRefCount

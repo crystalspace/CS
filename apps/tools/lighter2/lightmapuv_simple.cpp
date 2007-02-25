@@ -20,7 +20,7 @@
 
 #include "common.h"
 #include "lightmapuv_simple.h"
-#include "radobject.h"
+#include "object.h"
 #include "config.h"
 
 namespace lighter
@@ -28,8 +28,8 @@ namespace lighter
 
   // Very simple layouter.. just map "flat" on the lightmap
   LightmapUVLayoutFactory* SimpleUVLayouter::LayoutFactory (
-    const RadPrimitiveArray& inPrims, RadObjectVertexData& vertexData,
-    csArray<RadPrimitiveArray>& outPrims)
+    const PrimitiveArray& inPrims, ObjectVertexData& vertexData,
+    csArray<PrimitiveArray>& outPrims)
   {
     if (inPrims.GetSize () == 0) return 0;
 
@@ -39,7 +39,7 @@ namespace lighter
 
     LightmapPtrDelArray localLightmaps;
 
-    csArray<RadPrimitiveArray> coplanarPrims;
+    csArray<PrimitiveArray> coplanarPrims;
     DetermineNeighbouringPrims (inPrims, vertexData, coplanarPrims);
 
     // This is really dumb.. make sure every vertex have unqiue UV
@@ -53,8 +53,8 @@ namespace lighter
     // Layout every primitive by itself    
     for (i = 0; i < coplanarPrims.GetSize (); i++)
     {
-      RadPrimitiveArray& prims = coplanarPrims[i];
-      //RadPrimitive prim (inPrims[i]);
+      PrimitiveArray& prims = coplanarPrims[i];
+      //Primitive prim (inPrims[i]);
       bool lmCoordsGood = false;
       int its = 0; //number of iterations
       
@@ -75,7 +75,7 @@ namespace lighter
         prims[0].ComputeMinMaxUV (minuv, maxuv);
         for (size_t p = 1; p < prims.GetSize(); p++)
         {
-          RadPrimitive& prim (prims[p]);
+          Primitive& prim (prims[p]);
           csVector2 pminuv, pmaxuv;
           prim.ComputeMinMaxUV (pminuv, pmaxuv);
           minuv.x = csMin (minuv.x, pminuv.x);
@@ -102,7 +102,7 @@ namespace lighter
 	  (int)ceilf (uvSize.y), lmArea, lmID);
         if (!res) continue; 
 
-        RadPrimitiveArray& outArray = outPrims.GetExtend (lmID);
+        PrimitiveArray& outArray = outPrims.GetExtend (lmID);
         csArray<csArray<size_t> >& coplanarGroup = 
           newFactory->coplanarGroups.GetExtend (lmID);
         csArray<size_t>& thisGroup = 
@@ -131,7 +131,7 @@ namespace lighter
     return newFactory;
   }
 
-  static int SortPrimByD (const RadPrimitive& prim1, const RadPrimitive& prim2)
+  static int SortPrimByD (const Primitive& prim1, const Primitive& prim2)
   {
     const float D1 = prim1.GetPlane().DD;
     const float D2 = prim2.GetPlane().DD;
@@ -157,23 +157,24 @@ namespace lighter
 
   struct UberPrimitive
   {
-    RadPrimitiveArray prims;
+    PrimitiveArray prims;
     csArray<Edge> outsideEdges;
 
-    UberPrimitive (const RadPrimitive& startPrim);
+    UberPrimitive (const Primitive& startPrim);
 
     bool UsesEdge (const Edge& edge);
-    void AddPrimitive (const RadPrimitive& prim);
+    void AddPrimitive (const Primitive& prim);
   };
 
-  UberPrimitive::UberPrimitive (const RadPrimitive& startPrim)
+  UberPrimitive::UberPrimitive (const Primitive& startPrim)
   {
     prims.Push (startPrim);
-    const size_t* primIndices = startPrim.GetIndexArray();
+
+    const Primitive::TriangleType& t = startPrim.GetTriangle ();
+    
     for (size_t e = 0; e < 3; e++)
     {
-      Edge edge (primIndices[e], 
-        primIndices[(e+1) % 3]);
+      Edge edge (t[e], t[(e+1) % 3]);
       outsideEdges.Push (edge);
     }
   }
@@ -187,14 +188,13 @@ namespace lighter
     return false;
   }
 
-  void UberPrimitive::AddPrimitive (const RadPrimitive& prim)
+  void UberPrimitive::AddPrimitive (const Primitive& prim)
   {
     prims.Push (prim);
-    const size_t* primIndices = prim.GetIndexArray();
+    const Primitive::TriangleType& t = prim.GetTriangle ();
     for (size_t e = 0; e < 3; e++)
     {
-      Edge edge (primIndices[e], 
-        primIndices[(e+1) % 3]);
+      Edge edge (t[e], t[(e+1) % 3]);
       bool found = false;
       /* If edge is an "outside edge", remove from the outside list
        * Otherwise add it */
@@ -212,13 +212,13 @@ namespace lighter
   }
 
   void SimpleUVLayouter::DetermineNeighbouringPrims (
-    const RadPrimitiveArray& inPrims, RadObjectVertexData& vertexData,
-    csArray<RadPrimitiveArray>& outPrims)
+    const PrimitiveArray& inPrims, ObjectVertexData& vertexData,
+    csArray<PrimitiveArray>& outPrims)
   {
-    RadPrimitiveArray primsByD;
+    PrimitiveArray primsByD;
     for (size_t i = 0; i < inPrims.GetSize (); i++)
     {
-      const RadPrimitive& prim (inPrims[i]);
+      const Primitive& prim (inPrims[i]);
       primsByD.InsertSorted (prim, SortPrimByD);
     }
     // Takes all neighbouring primitives
@@ -226,14 +226,14 @@ namespace lighter
     while (primsByD.GetSize() > 0)
     {
       // Primitives are sorted by D, look for actual coplanar ones
-      RadPrimitiveArray coplanarPrims;
-      const RadPrimitive& prim0 (primsByD[0]);
+      PrimitiveArray coplanarPrims;
+      const Primitive& prim0 (primsByD[0]);
       float lastD = prim0.GetPlane().DD;
       const csVector3& lastNormal = prim0.GetPlane().GetNormal();
       
       for (size_t i = 1; i < primsByD.GetSize(); )
       {
-        const RadPrimitive& prim (primsByD[i]);
+        const Primitive& prim (primsByD[i]);
         if (fabsf (prim.GetPlane().DD - lastD) > EPSILON) break;
         if (((prim.GetPlane().GetNormal() * lastNormal)) > (1.0f - EPSILON))
         {
@@ -249,7 +249,7 @@ namespace lighter
       // In the coplanar ones, look for neighbouring ones
       while (coplanarPrims.GetSize() > 0)
       {
-        const RadPrimitive& prim (coplanarPrims[0]);
+        const Primitive& prim (coplanarPrims[0]);
         UberPrimitive& ubp = uberPrims[uberPrims.Push (UberPrimitive (prim))];
         coplanarPrims.DeleteIndexFast (0);
 
@@ -259,12 +259,11 @@ namespace lighter
           primAdded = false;
           for (size_t p = 0; (p < coplanarPrims.GetSize()) && !primAdded; p++)
           {
-            const RadPrimitive& prim (coplanarPrims[p]);
-            const size_t* primIndices = prim.GetIndexArray();
+            const Primitive& prim (coplanarPrims[p]);
+            const Primitive::TriangleType& t = prim.GetTriangle ();
             for (size_t e = 0; e < 3; e++)
             {
-              Edge edge (primIndices[e], 
-                primIndices[(e+1) % 3]);
+              Edge edge (t[e], t[(e+1) % 3]);
               if (ubp.UsesEdge (edge))
               {
                 ubp.AddPrimitive (prim);
@@ -316,12 +315,12 @@ namespace lighter
     return false;
   }
 
-  bool SimpleUVLayouter::ProjectPrimitives (RadPrimitiveArray& prims, 
+  bool SimpleUVLayouter::ProjectPrimitives (PrimitiveArray& prims, 
                                             BoolDArray &usedVerts,
                                             float uscale, float vscale)
   {
     size_t i;
-    const RadPrimitive& prim = prims[0];
+    const Primitive& prim = prims[0];
 
     // Select projection dimension to be biggest component of plane normal
     //if (prim.GetPlane ().GetNormal ().SquaredNorm () == 0.0f)
@@ -344,15 +343,15 @@ namespace lighter
 
     for (size_t p = 0; p < prims.GetSize(); p++)
     {
-      RadPrimitive& prim = prims[p];
+      Primitive& prim = prims[p];
 
-      RadObjectVertexData &vdata = prim.GetVertexData ();
+      ObjectVertexData &vdata = prim.GetVertexData ();
 
-      size_t* indexArray = prim.GetIndexArray ();
+      Primitive::TriangleType& t = prim.GetTriangle ();
 
       for (i = 0; i < 3; ++i)
       {
-        size_t index = indexArray[i]; 
+        size_t index = t[i]; 
         if (usedVerts[index])
         {
           //need to duplicate
@@ -367,14 +366,14 @@ namespace lighter
           }
           else
             index = indexMap[index];
-          indexArray[i] = index;
+          t[i] = index;
         }
         primsUsedVerts.Add (index);
       }
 
       for (i = 0; i < 3; ++i)
       {
-        size_t index = indexArray[i];
+        size_t index = t[i];
         const csVector3 &position = vdata.vertexArray[index].position;
         csVector2 &lightmapUV = vdata.vertexArray[index].lightmapUV;
 
@@ -394,8 +393,8 @@ namespace lighter
 
   //-------------------------------------------------------------------------
 
-  bool SimpleUVLayoutFactory::LayoutUVOnPrimitives (RadPrimitiveArray &prims, 
-    size_t groupNum, RadObjectVertexData& vertexData, uint& lmID)
+  bool SimpleUVLayoutFactory::LayoutUVOnPrimitives (PrimitiveArray &prims, 
+    size_t groupNum, ObjectVertexData& vertexData, uint& lmID)
   {
     const csArray<csArray<size_t> >& coplanarGroup = coplanarGroups[groupNum];
 
@@ -410,7 +409,7 @@ namespace lighter
       prims[coPrim[0]].ComputeMinMaxUV (minuv, maxuv);
       for (size_t p = 1; p < coPrim.GetSize(); p++)
       {
-        RadPrimitive& prim (prims[coPrim[p]]);
+        Primitive& prim (prims[coPrim[p]]);
         csVector2 pminuv, pmaxuv;
         prim.ComputeMinMaxUV (pminuv, pmaxuv);
         minuv.x = csMin (minuv.x, pminuv.x);
@@ -431,13 +430,13 @@ namespace lighter
       const csArray<size_t>& coPrim = coplanarGroup[c];
       for (size_t p = 0; p < coPrim.GetSize(); p++)
       {
-        RadPrimitive& prim (prims[coPrim[p]]);
-        const size_t* indexData = prim.GetIndexArray();
+        Primitive& prim (prims[coPrim[p]]);
+        const Primitive::TriangleType& t = prim.GetTriangle ();
         // Be careful to remap each distinct vertex only once
         const csVector2& move = remaps[c];
         for (size_t v = 0; v < 3; v++)
         {
-          size_t index = indexData [v];
+          size_t index = t [v];
           if (!remapped.Contains (index))
           {
             csVector2 &uv = vertexData.vertexArray[index].lightmapUV;

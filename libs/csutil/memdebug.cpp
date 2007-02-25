@@ -903,9 +903,8 @@ void mtiRegisterModule (char* Class)
 
   if (iSCF::SCF->object_reg)
   {
-    csRef<iMemoryTracker> mtiTR = CS_QUERY_REGISTRY_TAG_INTERFACE (
-        iSCF::SCF->object_reg, "crystalspace.utilities.memorytracker",
-        iMemoryTracker);
+    csRef<iMemoryTracker> mtiTR = csQueryRegistryTagInterface<iMemoryTracker> (
+        iSCF::SCF->object_reg, "crystalspace.utilities.memorytracker");
     if (!mtiTR)
     {
       mtiTR.AttachNew (new csMemTrackerRegistry);

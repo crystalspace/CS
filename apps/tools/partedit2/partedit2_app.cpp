@@ -174,7 +174,7 @@ bool PartEdit2::OnInitialize(int /*argc*/, char* /*argv*/ [])
     
   // Load AWS2 the "hard" way. 
   csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+  	csQueryRegistry<iPluginManager> (object_reg));
   	
   aws = CS_LOAD_PLUGIN(plugin_mgr,
   	"crystalspace.window.alternatemanager2", iAws2);

@@ -175,7 +175,7 @@ csSpriteCal3DMeshObjectFactory::csSpriteCal3DMeshObjectFactory (
 
   csSpriteCal3DMeshObjectFactory::object_reg = object_reg;
 
-  light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
+  light_mgr = csQueryRegistry<iLightManager> (object_reg);
 }
 
 csSpriteCal3DMeshObjectFactory::~csSpriteCal3DMeshObjectFactory ()
@@ -611,7 +611,7 @@ csPtr<iMeshObject> csSpriteCal3DMeshObjectFactory::NewInstance ()
   spr->updateanim_sqdistance3 = sprcal3d_type->updateanim_sqdistance3;
   spr->updateanim_skip3 = sprcal3d_type->updateanim_skip3;
 
-  csRef<iMeshObject> im (SCF_QUERY_INTERFACE (spr, iMeshObject));
+  csRef<iMeshObject> im (scfQueryInterface<iMeshObject> (spr));
   spr->DecRef ();
   return csPtr<iMeshObject> (im);
 }

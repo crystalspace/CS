@@ -614,8 +614,8 @@ bool csPolygon3DStatic::Finish (iBase* thing_logparent)
       const char* mname = 0;
       if (thing_logparent)
       {
-        csRef<iMeshWrapper> m = SCF_QUERY_INTERFACE (thing_logparent,
-          iMeshWrapper);
+        csRef<iMeshWrapper> m = 
+          scfQueryInterface<iMeshWrapper> (thing_logparent);
         if (m) mname = m->QueryObject ()->GetName ();
         else mname = "<unknown>";
       }

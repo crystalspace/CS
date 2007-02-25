@@ -147,7 +147,7 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent) :
 
 csGLGraphics3D::~csGLGraphics3D()
 {
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q)
     q->RemoveListener (scfiEventHandler);
 }
@@ -733,11 +733,11 @@ bool csGLGraphics3D::Open ()
 {
   if (isOpen) return true;
   isOpen = true;
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
-  	object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr = 
+  	csQueryRegistry<iPluginManager> (object_reg);
 
   csRef<iVerbosityManager> verbosemgr (
-    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+    csQueryRegistry<iVerbosityManager> (object_reg));
   if (verbosemgr) verbose = verbosemgr->Enabled ("renderer");
   if (!verbose) bugplug = 0;
 
@@ -3472,7 +3472,7 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
   SystemOpen = csevSystemOpen(object_reg);
   SystemClose = csevSystemClose(object_reg);
 
-  csRef<iEventQueue> q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
   if (q)
   {
     csEventID events[] = { SystemOpen, SystemClose, 
@@ -3481,15 +3481,15 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
   }
   // We subscribe to csevCanvasResize after G2D has been created
   
-  bugplug = CS_QUERY_REGISTRY (object_reg, iBugPlug);
+  bugplug = csQueryRegistry<iBugPlug> (object_reg);
 
-  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
+  strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
 
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
-  	object_reg, iPluginManager);
-  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
-  	object_reg, iCommandLineParser);
+  csRef<iPluginManager> plugin_mgr = 
+  	csQueryRegistry<iPluginManager> (object_reg);
+  csRef<iCommandLineParser> cmdline = 
+  	csQueryRegistry<iCommandLineParser> (object_reg);
 
   /* Note: r3dopengl.cfg is also added by the canvases. This is done because
    * either the canvas or the renderer may be loaded before the other, but
@@ -3579,7 +3579,7 @@ bool csGLGraphics3D::DebugCommand (const char* cmdstr)
 
   if (strcasecmp (cmd, "dump_slms") == 0)
   {
-    csRef<iImageIO> imgsaver = CS_QUERY_REGISTRY (object_reg, iImageIO);
+    csRef<iImageIO> imgsaver = csQueryRegistry<iImageIO> (object_reg);
     if (!imgsaver)
     {
       Report (CS_REPORTER_SEVERITY_WARNING,
@@ -3587,7 +3587,7 @@ bool csGLGraphics3D::DebugCommand (const char* cmdstr)
       return false;
     }
 
-    csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+    csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
     if (!vfs)
     {
       Report (CS_REPORTER_SEVERITY_WARNING, 
@@ -3622,7 +3622,7 @@ bool csGLGraphics3D::DebugCommand (const char* cmdstr)
 
 void csGLGraphics3D::DumpZBuffer (const char* path)
 {
-  csRef<iImageIO> imgsaver = CS_QUERY_REGISTRY (object_reg, iImageIO);
+  csRef<iImageIO> imgsaver = csQueryRegistry<iImageIO> (object_reg);
   if (!imgsaver)
   {
     Report (CS_REPORTER_SEVERITY_WARNING,
@@ -3630,7 +3630,7 @@ void csGLGraphics3D::DumpZBuffer (const char* path)
     return;
   }
 
-  csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
   if (!vfs)
   {
     Report (CS_REPORTER_SEVERITY_WARNING, 

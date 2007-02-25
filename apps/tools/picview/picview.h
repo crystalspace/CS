@@ -65,7 +65,7 @@ class PicView : public csApplicationFramework, public csBaseEventHandler
   /** Posts a quit message. */
   void Quit()
   {
-	csRef<iEventQueue> q = CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
+	csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (GetObjectRegistry());
   	if (q.IsValid()) q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));	  
   }
 

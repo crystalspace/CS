@@ -38,6 +38,7 @@
 struct iDocumentNode;
 struct iLight;
 struct iObject;
+struct iLoaderContext;
 
 struct csRenderMesh;
 class csShaderVariable;
@@ -339,8 +340,9 @@ struct iShaderCompiler : public virtual iBase
    * If no priority is forced then the highest priority technique
    * that works will be selected.
    */
-  virtual csPtr<iShader> CompileShader (iDocumentNode *templ,
-		  int forcepriority = -1) = 0;
+  virtual csPtr<iShader> CompileShader (
+	iLoaderContext* ldr_context, iDocumentNode *templ,
+	int forcepriority = -1) = 0;
 
   /// Validate if a template is a valid shader to this compiler
   virtual bool ValidateTemplate (iDocumentNode *templ) = 0;

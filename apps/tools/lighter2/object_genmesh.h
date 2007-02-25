@@ -16,34 +16,34 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __RADOBJECT_GENMESH_H__
-#define __RADOBJECT_GENMESH_H__
+#ifndef __OBJECT_GENMESH_H__
+#define __OBJECT_GENMESH_H__
 
 #include "csgeom/transfrm.h"
 
 #include "lightmap.h"
-#include "radobject.h"
-#include "radprimitive.h"
+#include "object.h"
+#include "primitive.h"
 
 namespace lighter
 {
-  class RadObject_Genmesh : public RadObject
+  class Object_Genmesh : public Object
   {
   public:
-    RadObject_Genmesh (RadObjectFactory* factory);
+    Object_Genmesh (ObjectFactory* factory);
 
     virtual void SaveMesh (Scene* scene, iDocumentNode *node);
 
     virtual void StripLightmaps (csSet<csString>& lms);
   };
 
-  class RadObjectFactory_Genmesh : public RadObjectFactory
+  class ObjectFactory_Genmesh : public ObjectFactory
   {
   public:
-    RadObjectFactory_Genmesh ();
+    ObjectFactory_Genmesh ();
 
     // Get a new object
-    virtual RadObject* CreateObject ();
+    virtual Object* CreateObject ();
 
     // Parse data
     virtual void ParseFactory (iMeshFactoryWrapper *factory);
@@ -59,7 +59,7 @@ namespace lighter
       Submesh() : material (0) {}
     };
   protected:
-    friend class RadObject_Genmesh;
+    friend class Object_Genmesh;
 
     // Extra data saved
     csVector3 *normals;
@@ -78,14 +78,14 @@ namespace lighter
 
     struct SubmeshFindHelper
     {
-      SubmeshFindHelper (RadObjectFactory_Genmesh* factory) : 
+      SubmeshFindHelper (ObjectFactory_Genmesh* factory) : 
         factory (factory)
       { }
 
       IntDArray* FindSubmesh (size_t submeshIndex);
       void CommitSubmeshes (iGeneralFactoryState* genFact);
     protected:
-      RadObjectFactory_Genmesh* factory;
+      ObjectFactory_Genmesh* factory;
 
       struct AllocatedSubmeshKey
       {
@@ -109,12 +109,12 @@ namespace lighter
 }
 
 template<>
-class csHashComputer<lighter::RadObjectFactory_Genmesh::Submesh> :
-  public csHashComputerStruct<lighter::RadObjectFactory_Genmesh::Submesh> { };
+class csHashComputer<lighter::ObjectFactory_Genmesh::Submesh> :
+  public csHashComputerStruct<lighter::ObjectFactory_Genmesh::Submesh> { };
 
 template<>
-class csComparator<lighter::RadObjectFactory_Genmesh::Submesh, 
-  lighter::RadObjectFactory_Genmesh::Submesh> : 
-public csComparatorStruct<lighter::RadObjectFactory_Genmesh::Submesh> { };
+class csComparator<lighter::ObjectFactory_Genmesh::Submesh, 
+  lighter::ObjectFactory_Genmesh::Submesh> : 
+public csComparatorStruct<lighter::ObjectFactory_Genmesh::Submesh> { };
 
-#endif // __RADOBJECT_GENMESH_H__
+#endif // __OBJECT_GENMESH_H__

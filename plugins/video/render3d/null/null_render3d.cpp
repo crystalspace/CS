@@ -67,7 +67,7 @@ csNullGraphics3D::~csNullGraphics3D ()
   txtmgr->DecRef (); txtmgr = 0;
   if (scfiEventHandler)
   {
-    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
     if (q != 0) 
       q->RemoveListener (scfiEventHandler);
     scfiEventHandler = 0;
@@ -80,7 +80,7 @@ bool csNullGraphics3D::Initialize (iObjectRegistry* objreg)
   object_reg = objreg;
   if (!scfiEventHandler)
     scfiEventHandler = csPtr<EventHandler> (new EventHandler (this));
-  csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
   if (q)
   {
     csEventID events[3] = { csevSystemOpen(object_reg), 
@@ -89,22 +89,22 @@ bool csNullGraphics3D::Initialize (iObjectRegistry* objreg)
     q->RegisterListener (scfiEventHandler, events);
   }
 
-  bugplug = CS_QUERY_REGISTRY (object_reg, iBugPlug);
+  bugplug = csQueryRegistry<iBugPlug> (object_reg);
 
-  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.renderer.stringset", iStringSet);
+  strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.renderer.stringset");
   if (!strings)
   { 
     strings = csPtr<iStringSet> (new csScfStringSet ());
     object_reg->Register (strings, "crystalspace.renderer.stringset");
   }
 
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
-  	object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr = 
+  	csQueryRegistry<iPluginManager> (object_reg);
   if (!plugin_mgr) 
     return false;
-  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
-  	object_reg, iCommandLineParser);
+  csRef<iCommandLineParser> cmdline = 
+  	csQueryRegistry<iCommandLineParser> (object_reg);
 
   config.AddConfig (object_reg, "/config/null3d.cfg");
 
@@ -145,8 +145,8 @@ bool csNullGraphics3D::HandleEvent (iEvent& e)
 
 bool csNullGraphics3D::Open ()
 {
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
-  	object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr = 
+  	csQueryRegistry<iPluginManager> (object_reg);
   if (!plugin_mgr)
     return false;
   if (!G2D->Open ())

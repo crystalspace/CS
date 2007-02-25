@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2005 by Marten Svanfeldt
+  Copyright (C) 2005-2006 by Marten Svanfeldt
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -19,15 +19,16 @@
 #ifndef __SCENE_H__
 #define __SCENE_H__
 
-#include "radobject.h"
+#include "object.h"
 #include "kdtree.h"
+#include "light.h"
 
 namespace lighter
 {
   class KDTree;
 
   // A lightsource
-  class Light : public csRefCount
+  class Light_old : public csRefCount
   {
   public:
     csVector3 position;
@@ -41,7 +42,7 @@ namespace lighter
 
     csBox3 boundingBox;
   };
-  typedef csRefArray<Light> LightRefArray;
+  typedef csRefArray<Light_old> LightOldRefArray;
 
   class Scene;
 
@@ -62,9 +63,12 @@ namespace lighter
     void Initialize ();
 
     // All objects in sector
-    RadObjectHash allObjects;
+    ObjectHash allObjects;
 
-    // All lightsources
+    // All lightsources (old)
+    LightOldRefArray allLightsOld;
+
+    // All light sources
     LightRefArray allLights;
 
     // KD-tree of all primitives in sector
@@ -95,10 +99,10 @@ namespace lighter
     bool ParseEngine ();
 
     // Data access
-    inline RadObjectFactoryHash& GetFactories () 
+    inline ObjectFactoryHash& GetFactories () 
     { return radFactories; }
 
-    inline const RadObjectFactoryHash& GetFactories () const
+    inline const ObjectFactoryHash& GetFactories () const
     { return radFactories; }
 
     inline SectorHash& GetSectors () { return sectors; }
@@ -111,18 +115,18 @@ namespace lighter
     LightmapPtrDelArray& GetLightmaps () 
     { return lightmaps; }
 
-    Lightmap* GetLightmap (uint lightmapID, Light* light);
+    Lightmap* GetLightmap (uint lightmapID, Light_old* light);
     csArray<LightmapPtrDelArray*> GetAllLightmaps ();
   protected:
     
-    // Rad factories
-    RadObjectFactoryHash radFactories;
+    //  factories
+    ObjectFactoryHash radFactories;
  
     // All sectors
     SectorHash sectors;
 
     LightmapPtrDelArray lightmaps;
-    typedef csHash<LightmapPtrDelArray*, csPtrKey<Light> > PDLightmapsHash;
+    typedef csHash<LightmapPtrDelArray*, csPtrKey<Light_old> > PDLightmapsHash;
     PDLightmapsHash pdLightmaps;
 
     struct LoadedFile
@@ -161,7 +165,7 @@ namespace lighter
     };
     MeshParseResult ParseMesh (Sector *sector, iMeshWrapper *mesh);
     MeshParseResult ParseMeshFactory (iMeshFactoryWrapper *factory, 
-      RadObjectFactory*& radFact);
+      ObjectFactory*& radFact);
 
   };
 }

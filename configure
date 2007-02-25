@@ -695,6 +695,8 @@ BISON
 HHC
 ac_ct_HHC
 SWIG
+RSVG
+CONVERT
 JAM
 MAKE
 CSLIBS_CONFIG
@@ -773,7 +775,6 @@ CONFIG_CEGUI
 ac_ct_CONFIG_CEGUI
 CONFIG_CEGUIBASE
 ac_ct_CONFIG_CEGUIBASE
-cs_cv_pycegui_i_file
 CONFIG_CG
 ac_ct_CONFIG_CG
 CONFIG_CGGL
@@ -8553,6 +8554,119 @@ fi
 
 fi
 
+
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in rsvg
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_prog_RSVG+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$RSVG"; then
+  ac_cv_prog_RSVG="$RSVG" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_RSVG="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+fi
+fi
+RSVG=$ac_cv_prog_RSVG
+if test -n "$RSVG"; then
+  { echo "$as_me:$LINENO: result: $RSVG" >&5
+echo "${ECHO_T}$RSVG" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+  test -n "$RSVG" && break
+done
+
+cs_build_prop_val="$RSVG"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.RSVG ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in convert
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_prog_CONVERT+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$CONVERT"; then
+  ac_cv_prog_CONVERT="$CONVERT" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_CONVERT="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+fi
+fi
+CONVERT=$ac_cv_prog_CONVERT
+if test -n "$CONVERT"; then
+  { echo "$as_me:$LINENO: result: $CONVERT" >&5
+echo "${ECHO_T}$CONVERT" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+  test -n "$CONVERT" && break
+done
+
+cs_build_prop_val="$CONVERT"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.CONVERT ?= \"$cs_build_prop_val\" ;
+"
+fi
 
 
 
@@ -56398,8 +56512,6 @@ fi
 
 
 
-
-
 # Check whether --with-pycegui was given.
 if test "${with_pycegui+set}" = set; then
   withval=$with_pycegui;
@@ -56765,55 +56877,9 @@ if test "${cs_cv_pycegui+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   if test "$with_pycegui" != yes; then
-  cs_cv_pycegui_i_file="$with_pycegui/package/cegui.i"
-            cs_cv_pycegui_py_file="$with_pycegui/src/cegui.py"
+  cs_cv_pycegui_py_file="$with_pycegui"
 else
-  for ac_prog in cegui.i
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-{ echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
-if test "${ac_cv_path_cs_cv_pycegui_i_file+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  case $cs_cv_pycegui_i_file in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_cs_cv_pycegui_i_file="$cs_cv_pycegui_i_file" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in /usr/local/include/CEGUI/bindings$PATH_SEPARATOR/usr/include/CEGUI/bindings$PATH_SEPARATOR/sw/include/CEGUI/bindings$PATH_SEPARATOR/opt/local/include/CEGUI/bindings$PATH_SEPARATOR/opt/include/CEGUI/bindings$PATH_SEPARATOR$cs_cv_cslibs_incpath
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_path_cs_cv_pycegui_i_file="$as_dir/$ac_word$ac_exec_ext"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-IFS=$as_save_IFS
-
-  ;;
-esac
-fi
-cs_cv_pycegui_i_file=$ac_cv_path_cs_cv_pycegui_i_file
-if test -n "$cs_cv_pycegui_i_file"; then
-  { echo "$as_me:$LINENO: result: $cs_cv_pycegui_i_file" >&5
-echo "${ECHO_T}$cs_cv_pycegui_i_file" >&6; }
-else
-  { echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6; }
-fi
-
-
-  test -n "$cs_cv_pycegui_i_file" && break
-done
-
-	        cs_cv_pycegui_py_file=`{ (echo "$as_me:$LINENO: \$PYTHON -c \"import os.path
+  cs_cv_pycegui_py_file=`{ (echo "$as_me:$LINENO: \$PYTHON -c \"import os.path
 try:
     import cegui
     f=getattr(cegui,'__file__')
@@ -56834,8 +56900,7 @@ except:
   (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 fi
 
-        if test -f "$cs_cv_pycegui_py_file" &&
-            test -f "$cs_cv_pycegui_i_file"; then
+        if test -f "$cs_cv_pycegui_py_file"; then
   cs_cv_pycegui=yes
 else
   cs_cv_pycegui=no
@@ -56891,40 +56956,10 @@ fi
 
 
 if test "$cs_cv_pycegui_swig_ok" = yes; then
-  pycegui_i_dir=`$as_dirname -- $cs_cv_pycegui_i_file ||
-$as_expr X$cs_cv_pycegui_i_file : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
-	 X$cs_cv_pycegui_i_file : 'X\(//\)[^/]' \| \
-	 X$cs_cv_pycegui_i_file : 'X\(//\)$' \| \
-	 X$cs_cv_pycegui_i_file : 'X\(/\)' \| . 2>/dev/null ||
-echo X$cs_cv_pycegui_i_file |
-    sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{
-	    s//\1/
-	    q
-	  }
-	  /^X\(\/\/\)[^/].*/{
-	    s//\1/
-	    q
-	  }
-	  /^X\(\/\/\)$/{
-	    s//\1/
-	    q
-	  }
-	  /^X\(\/\).*/{
-	    s//\1/
-	    q
-	  }
-	  s/.*/./; q'`
-    cs_build_prop_val="yes"
+  cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}PYCEGUI.SWIGOK ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-    cs_build_prop_val="-I$pycegui_i_dir"
-    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}PYCEGUI.SWIGFLAGS ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -82764,10 +82799,10 @@ BISON!$BISON$ac_delim
 HHC!$HHC$ac_delim
 ac_ct_HHC!$ac_ct_HHC$ac_delim
 SWIG!$SWIG$ac_delim
+RSVG!$RSVG$ac_delim
+CONVERT!$CONVERT$ac_delim
 JAM!$JAM$ac_delim
 MAKE!$MAKE$ac_delim
-CSLIBS_CONFIG!$CSLIBS_CONFIG$ac_delim
-ac_ct_CSLIBS_CONFIG!$ac_ct_CSLIBS_CONFIG$ac_delim
 _ACEOF
 
   if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 97; then
@@ -82809,6 +82844,8 @@ _ACEOF
 ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   cat >conf$$subs.sed <<_ACEOF
+CSLIBS_CONFIG!$CSLIBS_CONFIG$ac_delim
+ac_ct_CSLIBS_CONFIG!$ac_ct_CSLIBS_CONFIG$ac_delim
 GREP!$GREP$ac_delim
 EGREP!$EGREP$ac_delim
 PERL!$PERL$ac_delim
@@ -82883,7 +82920,6 @@ CONFIG_CEGUI!$CONFIG_CEGUI$ac_delim
 ac_ct_CONFIG_CEGUI!$ac_ct_CONFIG_CEGUI$ac_delim
 CONFIG_CEGUIBASE!$CONFIG_CEGUIBASE$ac_delim
 ac_ct_CONFIG_CEGUIBASE!$ac_ct_CONFIG_CEGUIBASE$ac_delim
-cs_cv_pycegui_i_file!$cs_cv_pycegui_i_file$ac_delim
 CONFIG_CG!$CONFIG_CG$ac_delim
 ac_ct_CONFIG_CG!$ac_ct_CONFIG_CG$ac_delim
 CONFIG_CGGL!$CONFIG_CGGL$ac_delim
@@ -82907,7 +82943,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 96; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 97; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

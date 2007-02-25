@@ -235,7 +235,7 @@ bool PartEdit::HandleEvent (iEvent& ev)
   if ((ev.Name == csevKeyboardDown (object_reg)) &&
     (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
     if (q)
       q->GetEventOutlet()->Broadcast (csevQuit(object_reg));
     return true;
@@ -506,7 +506,7 @@ bool PartEdit::RecreateParticleSystem()
   csRef<iMeshObject> mesh = EmitObjectFactory->NewInstance();  
   mesh->SetMaterialWrapper(mat_wrap);
 
-  emitState = SCF_QUERY_INTERFACE (mesh, iEmitState);
+  emitState = scfQueryInterface<iEmitState> (mesh);
 
   /* Clear out the current emitter settings since we're going to ditch them all
    *  and start fresh.  Don't worry, the state_* structures are still intact
@@ -859,7 +859,7 @@ bool PartEdit::Initialize ()
   }
 
   // The virtual clock.
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
   if (vc == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -869,7 +869,7 @@ bool PartEdit::Initialize ()
   }
 
   // Find the pointer to engine plugin
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = csQueryRegistry<iEngine> (object_reg);
   if (engine == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -878,7 +878,7 @@ bool PartEdit::Initialize ()
     return false;
   }
 
-  vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+  vfs = csQueryRegistry<iVFS> (object_reg);
   if (vfs == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -887,7 +887,7 @@ bool PartEdit::Initialize ()
     return false;
   }
 
-  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  loader = csQueryRegistry<iLoader> (object_reg);
   if (loader == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -896,7 +896,7 @@ bool PartEdit::Initialize ()
     return false;
   }
 
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
   if (g3d == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -904,7 +904,7 @@ bool PartEdit::Initialize ()
     	"No iGraphics3D plugin!");
     return false;
   }
-  g2d = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
+  g2d = csQueryRegistry<iGraphics2D> (object_reg);
   if (g2d == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -913,7 +913,7 @@ bool PartEdit::Initialize ()
     return false;
   }
 
-  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  kbd = csQueryRegistry<iKeyboardDriver> (object_reg);
   if (kbd == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -922,7 +922,7 @@ bool PartEdit::Initialize ()
     return false;
   }
 
-  aws = CS_QUERY_REGISTRY (object_reg, iAws);
+  aws = csQueryRegistry<iAws> (object_reg);
   if (aws == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -951,7 +951,7 @@ bool PartEdit::Initialize ()
     return false;
   }  
 
-  PluginManager = CS_QUERY_REGISTRY(object_reg, iPluginManager);
+  PluginManager = csQueryRegistry<iPluginManager> (object_reg);
   if (!PluginManager)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -1003,7 +1003,7 @@ bool PartEdit::Initialize ()
 
    // Emit
   EmitObjectFactory = emit_type->NewFactory();
-  EmitFactoryState = SCF_QUERY_INTERFACE(EmitObjectFactory, iEmitFactoryState);
+  EmitFactoryState = scfQueryInterface<iEmitFactoryState> (EmitObjectFactory);
 
   state_emitter.particle_count=25;
   state_emitter.lighting=false;

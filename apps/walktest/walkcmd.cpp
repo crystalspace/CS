@@ -402,7 +402,7 @@ void list_meshes (void)
 
 void SetConfigOption (iBase* plugin, const char* optName, const char* optValue)
 {
-  csRef<iPluginConfig> config (SCF_QUERY_INTERFACE (plugin, iPluginConfig));
+  csRef<iPluginConfig> config (scfQueryInterface<iPluginConfig> (plugin));
   if (!config)
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
     	"No config interface for this plugin.");
@@ -453,7 +453,7 @@ void SetConfigOption (iBase* plugin, const char* optName, const char* optValue)
 
 void SetConfigOption (iBase* plugin, const char* optName, csVariant& optValue)
 {
-  csRef<iPluginConfig> config (SCF_QUERY_INTERFACE (plugin, iPluginConfig));
+  csRef<iPluginConfig> config (scfQueryInterface<iPluginConfig> (plugin));
   if (!config)
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
     	"No config interface for this plugin.");
@@ -475,7 +475,7 @@ void SetConfigOption (iBase* plugin, const char* optName, csVariant& optValue)
 
 bool GetConfigOption (iBase* plugin, const char* optName, csVariant& optValue)
 {
-  csRef<iPluginConfig> config (SCF_QUERY_INTERFACE (plugin, iPluginConfig));
+  csRef<iPluginConfig> config (scfQueryInterface<iPluginConfig> (plugin));
   if (!config)
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
     	"No config interface for this plugin.");
@@ -504,7 +504,7 @@ csString LookForKeyValue (iObjectIterator* it,const char* key)
   it->Reset();
   while (it->HasNext())
   {
-    csRef<iKeyValuePair> kp = SCF_QUERY_INTERFACE(it->Next(),iKeyValuePair);
+    csRef<iKeyValuePair> kp = scfQueryInterface<iKeyValuePair> (it->Next());
     if(!kp)
       continue;
     if(!strcmp(key,kp->GetKey()))
@@ -606,7 +606,7 @@ void RegisterMaterials(iObjectIterator* it,iEngine* Engine,
 
   while(it->HasNext())
   {
-    kp = SCF_QUERY_INTERFACE(it->Next(),iKeyValuePair);
+    kp = scfQueryInterface<iKeyValuePair> (it->Next());
     if(!kp)
     {
       continue;
@@ -676,8 +676,8 @@ void BuildSprite(iSector * sector, iObjectIterator* it, csVector3 position)
   iMeshWrapper* sprite = GenerateSprite((char*)(const char*)factName,
   	(char*)(const char*)sprName,sector,position);
 
-  csRef<iSprite3DState> state (SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
-                          iSprite3DState));
+  csRef<iSprite3DState> state (
+                          scfQueryInterface<iSprite3DState> (sprite->GetMeshObject()));
   state->SetAction("default");
 }
 
@@ -706,12 +706,12 @@ void BuildObject(iSector * sector,
 void WalkTest::ParseKeyNodes(iObject* src)
 {
   csRef<iObjectIterator> it (src->GetIterator());
-  csRef<iSector> sector (SCF_QUERY_INTERFACE(src,iSector));
+  csRef<iSector> sector (scfQueryInterface<iSector> (src));
 
   while(it->HasNext())
   {
     iObject* node_obj = it->Next ();
-    csRef<iMapNode> node (SCF_QUERY_INTERFACE(node_obj, iMapNode));
+    csRef<iMapNode> node (scfQueryInterface<iMapNode> (node_obj));
     if(!node)
     {
       continue;
@@ -729,14 +729,14 @@ void WalkTest::ParseKeyCmds (iObject* src)
   while (it->HasNext ())
   {
     csRef<iKeyValuePair> kp (
-    	SCF_QUERY_INTERFACE (it->Next (), iKeyValuePair));
+    	scfQueryInterface<iKeyValuePair> (it->Next ()));
     if (!kp)
     {
       continue;
     }
     if (!strcmp (kp->GetKey (), "cmd_AnimateSky"))
     {
-      csRef<iSector> Sector (SCF_QUERY_INTERFACE (src, iSector));
+      csRef<iSector> Sector (scfQueryInterface<iSector> (src));
       if (Sector)
       {
         char name[100], rot[100];
@@ -862,8 +862,8 @@ void WalkTest::ActivateObject (iObject* src)
   csRef<iObjectIterator> it (src->GetIterator ());
   while (it->HasNext ())
   {
-    csRef<csWalkEntity> wentity (SCF_QUERY_INTERFACE (it->Next (),
-    	csWalkEntity));
+    csRef<csWalkEntity> wentity (
+    	scfQueryInterface<csWalkEntity> (it->Next ()));
     if (wentity)
       wentity->Activate ();
   }
@@ -962,7 +962,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     while (it->HasNext ())
     {
       iBase* plugin = it->Next ();
-      csRef<iFactory> fact (SCF_QUERY_INTERFACE (plugin, iFactory));
+      csRef<iFactory> fact (scfQueryInterface<iFactory> (plugin));
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
       	"%d: %s", i, fact->QueryDescription ());
       i++;
@@ -1132,7 +1132,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 		"Bad value for plugin (see 'plugins' command)!");
       else
       {
-        csRef<iPluginConfig> config (SCF_QUERY_INTERFACE (plugin, iPluginConfig));
+        csRef<iPluginConfig> config (scfQueryInterface<iPluginConfig> (plugin));
 	if (!config)
 	  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
 	  	"No config interface for this plugin.");
@@ -1401,8 +1401,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     csEngine* engine = (csEngine*)(iEngine*)(Sys->Engine);
     if ((rad = engine->GetRadiosity ()) != 0)
     {
-      csRef<iPolygon3D> p (SCF_QUERY_INTERFACE (rad->GetNextPolygon (),
-      	iPolygon3D));
+      csRef<iPolygon3D> p (
+      	scfQueryInterface<iPolygon3D> (rad->GetNextPolygon ()));
       Sys->selected_polygon = p;
     }
 #endif
@@ -1929,9 +1929,9 @@ bool CommandHandler (const char *cmd, const char *arg)
       iMeshWrapper *wrap = Sys->Engine->GetMeshes ()->FindByName (name);
       if (wrap)
       {
-	csRef<iSprite3DFactoryState> fstate (SCF_QUERY_INTERFACE (
-		wrap->GetMeshObject ()->GetFactory (),
-		iSprite3DFactoryState));
+        csRef<iSprite3DFactoryState> fstate (
+          scfQueryInterface<iSprite3DFactoryState> (
+            wrap->GetMeshObject ()->GetFactory ()));
 	iSpriteAction* aspr_act;
 	int i;
 
@@ -1973,8 +1973,8 @@ bool CommandHandler (const char *cmd, const char *arg)
       else
       {
         csRef<iSprite3DState> state (
-		SCF_QUERY_INTERFACE (wrap->GetMeshObject (),
-		iSprite3DState));
+		
+		scfQueryInterface<iSprite3DState> (wrap->GetMeshObject ()));
         if (state)
         {
           // Test to see if the action exists for that sprite.
@@ -2173,7 +2173,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!csStrCaseCmp (cmd, "relight"))
   {
-    csRef<iConsoleOutput> console = CS_QUERY_REGISTRY(Sys->object_reg, iConsoleOutput);
+    csRef<iConsoleOutput> console = csQueryRegistry<iConsoleOutput> (Sys->object_reg);
     if(console.IsValid())
     {
       csTextProgressMeter* meter = new csTextProgressMeter(console);
@@ -2299,7 +2299,7 @@ bool CommandHandler (const char *cmd, const char *arg)
         "saveworld: Specified file `%s' already exists.", arg);
       return true;
     }
-    csRef<iSaver> saver = CS_QUERY_REGISTRY(Sys->object_reg, iSaver);
+    csRef<iSaver> saver = csQueryRegistry<iSaver> (Sys->object_reg);
     if (!saver.IsValid ())
     {
       saver = CS_LOAD_PLUGIN(Sys->plugin_mgr, "crystalspace.level.saver", iSaver);
@@ -2318,7 +2318,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!csStrCaseCmp (cmd, "cubemapshots"))
   {
-    csRef<iImageIO> iio = CS_QUERY_REGISTRY (Sys->object_reg, iImageIO);
+    csRef<iImageIO> iio = csQueryRegistry<iImageIO> (Sys->object_reg);
     int dim = MIN (Sys->myG3D->GetWidth (), Sys->myG3D->GetHeight ());
     dim = csFindNearestPowerOf2 (dim + 1) >> 1;
     int g2dh = Sys->myG3D->GetHeight ();

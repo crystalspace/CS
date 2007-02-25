@@ -38,8 +38,22 @@ namespace CS
   template<typename T>
   struct TriangleT
   {
-    /// Triangle vertices or edges.
-    T a, b, c;
+#if !defined(__STRICT_ANSI__) && !defined(SWIG)
+    union
+    {
+      struct 
+      {
+#endif
+        //@{
+        /// Triangle vertices or edges.
+        T a, b, c;
+        //@}
+#if !defined(__STRICT_ANSI__) && !defined(SWIG)
+      };
+      /// All components
+      T components[3];
+    };
+#endif
 
     /// Empty default constructor
     TriangleT () {}
@@ -71,6 +85,21 @@ namespace CS
       b = _b;
       c = _c;
     }
+
+    /// Returns n-th component of the triangle.
+#ifdef __STRICT_ANSI__
+    inline const T& operator[] (size_t n) const { return !n?a:n&1?b:c; }
+#else
+    inline const T& operator[] (size_t n) const { return components[n]; }
+#endif
+
+    /// Returns n-th component of the triangle.
+#ifdef __STRICT_ANSI__
+    inline T& operator[] (size_t n) { return !n?a:n&1?b:c; }
+#else
+    inline T& operator[] (size_t n) { return components[n]; }
+#endif
+
   };
 }
 

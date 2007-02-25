@@ -6,9 +6,143 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+28-Nov-2006
+	- Andrew Dai fixed a bug that's been lurking in csColliderActor::Move
+	  from the beginning of time. This occasionally allowed actors to pass
+	  through walls. This should now be impossible no matter what the
+	  framerate is.
+	- Andrew Dai made improvements to the collision response algorithm to
+	  prevent actors occasionally becoming stuck on sharp inclines.
+	- res added a dummy _pycscegui.csplugin so the MSVC generation can
+	  generate a project for _pycscegui.
+	- res replaced some CS_QUERY_REGISTRYs with csQueryRegistry<> and
+	  SCF_QUERY_INTERFACEs with scfQueryInterface<>.
+	- res replaced some CS_QUERY_REGISTRY_TAG_INTERFACEs with 
+	  csQueryRegistryTagInterface<>s.
+	- res replaced CS_QUERY_REGISTRY_TAGs with csQueryRegistryTag.
+	- Jorrit fixed a memory leak with the graveyard plugin leaking.
+	- Jorrit fixed iEngine->RemoveLight() so that it also works
+	  if the light is not yet in a sector.
+	- Jorrit fixed lights so that they work slightly better if they
+	  are parented. Not perfect yet though.
+	- Jorrit changed the license on the castle level in CS from
+	  Creative Commons by-nc to by-sa which is a less restrictive
+	  license and allows commercial usage. This is done with permission
+	  from Anders Wisur.
+	- Jorrit fixed a bug in the glx2d canvas. It used 'putenv' to
+	  change the force_s3tc_enable environment variable. However
+	  'putenv' directly puts the given input string into the environment
+	  (it doesn't make a copy). So when later the glx2d canvas is
+	  unloaded the environment still points to that string (which
+	  is now unloaded and pointing to invalid memory). Replaced the
+	  'putenv' with a 'setenv'. 'setenv' makes an actual copy of the
+	  string so when the glx2d plugin is unloaded the environment
+	  is not corrupted. This fixes a problem in celstart which would
+	  crash after CS is destroyed and created again.
+	- Marten added a method to csColor to check if it is all 0.
+	- Marten made various fixes to lighter2 as well as the beginning
+	  of new code to compute direct lighting (not used yet).
+	- res updated the docs for the new winlibs version.
+	- res fixed a couple of VC deprecation warnings (collection and scene
+	  node array related).
+	- res made the (supposed to be legacy) CS_QUERY_REGISTRY* and 
+	  SCF_QUERY_INTERFACE* macros emit compiler warnings.
+27-Nov-2006
+	- Jorrit reverted a threading change (revision 25929) because
+	  it caused programs to hang on mingw and crash on linux.
+	- Jorrit fixed a bug in the terrain engine. It would incorrectly
+	  try to get the size from the alphamaps by using 'alphamap '
+	  as string ID instead of 'alphamap 0'.
+	- Marten reapplied threading bugfixes and changes to 
+	  ThreadedJobQueue (r25929). Correct bugfix is to fix the bug, not
+	  remove bugfixes in the threading and code changes in job queue.
+	- Marten fixed a bug in AtomicOperations::Increment on x86+gcc.
+	  The xadd instruction returns the value prior to increment, not 
+	  after. This fixes the problems with ThreadedJobQueue on mingw and
+	  probably linux.
+	- caedes removed the pycegui configure test and added a runtime test
+	  in pycscegui instead, this makes it possible to build the module 
+	  with no knowledge about pycegui.
+	- caedes changed the pycscegui jamfile so only the build target
+	  depends on cegui now, instead of the generation and freeze
+	  targets also depending on it.
+	- caedes added initial version of the frozen swig generated files
+	  for pycscegui.
+	- Marten fixed a build error in lighter2 on gcc.
+	- Marten made one more fix to the threading, removing a very apparent
+	  race condition.
+26-Nov-2006
+	- res added a Jam rule to generate icon .pngs from an SVG file. The
+	  generation can be invoked with "jam generateicons". Added a test icon
+	  for startme from Dentoid.
+25-Nov-2006
+	- res disabled RECT textures for NVIDIA cards completely since they
+	  seem to cause a lot of crashes.
+	- res updated the dejavu fonts to version 2.12.
+24-Nov-2006
+	- Jorrit fixed some compile errors caused by yesterday's
+	  commit.
+	- res added tweaks to the GL driver database to disable texture
+	  compression and AFP for the Intel DRI driver, since both are broken
+	  there.
+	- Marten updated the documentation for the new threading to actually
+	  say anything useful.
+	- caedes modified the pycscegui swig interface file so it doesnt
+	  import cegui interface files any more as it was not really needed.
+	- caedes simplified the configure test for pycscegui a bit as it 
+	  doesnt need to test for cegui.i file any more, also now 
+	  only cegui.py file path must be passed to --with-pycegui, instead of
+	  having to point to the whole pycegui sources.
+	- caedes fixed ice.looknfeel for cegui 0.5 since it was broken from
+	  last update (at least on linux), due to not updated Falagard.xsd and
+	  some incorrect elements on xml. All apps using this looknfeel would 
+	  crash.
+23-Nov-2006
+	- Jorrit added iLoaderContext parameter to shader and shader
+	  variable loading functions. That way shader variables will
+	  correctly find textures using the loader context.
+        - Piotr fixed track Ticket #193 (terrain collision problem)
+	- Marten rewrote the ThreadedJobQueue to not have any internal
+	  deadlocks and in the process rewrote it to use the new threading
+	  subsystem.
+	- Marten fixed a few bugs in lighter2 (it now works again) as well
+	  as some more preparation for new ligth computation algorithm.
+22-Nov-2006
+	- Jorrit marked collections as deprecated and obsolete. They are
+	  never used and are also not useful.
+	- Jorrit made the warnings when lightmaps are not up-to-date a
+	  little bit less verbose.
+	- res made the csDog SCF example code in the manual a bit nicer.
+	- res changed the Win32 window proc to set the requested mouse cursor 
+	  upon the WM_SETCURSOR message and not WM_MOUSEMOVE.
+	- res fixed a deprecation warning in sndmanager.
+	- res fixed a cut'n'paste error in xmlshader, likely causing memory
+	  corruption. Reportedly fixes trac #194.
+	- caedes fixed csVFS::LoadMountsFromFile so it allows variable
+	  assignments in the loaded file to function correctly (rather than
+	  being ignored).
+	- res fixed a deprecation warning in 
+	  csColliderHelper::InitializeCollisionWrapper().
+21-Nov-2006
+	- Jorrit fixed a bug in csSector::PrecacheDraw(). It forgot to
+	  do BeginDraw() with the result that some essential variables were
+	  not initialized.
 20-Nov-2006
+        - Piotr made the amotors start working on wiser conditions.
 	- Jorrit changed the mingw building doc to use 'jam' by default
 	  instead of 'make'.
+	- res augmented key/value pairs for a "editoronly" flag. If this flag
+	  is set, the key/value pairs aren't stored in memory unless the 
+	  engine's "saveable" flag is set.
+	- res sanitized key/value parsing in the syntax services.
+	- res changed the loader to use iSceneNodeArray.
+	- res added some initial support for per-vertex lighting to lighter2.
+	- Marten made first step of a refactor of lighter2 by:
+	    - Removing the Rad prefix on objects and primitives.
+	    - Removing "patches" as they are radiosity specific.
+	    - Changed Primitive to use a triangle instead of a size_t[3]
+	      array for indices.
+	    - Removed some dead code.
 19-Nov-2006
 	- Marten made a number of optimizations to the lighter2 ray tracer.
 	- caedes added iJoystickDriver to cspace.i.

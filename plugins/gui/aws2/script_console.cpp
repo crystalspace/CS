@@ -54,7 +54,7 @@ void scriptConsole::Message (const csString &txt)
 void scriptConsole::Initialize (iObjectRegistry *obj_reg)
 {
   csRef<iKeyboardDriver> currentKbd = 
-    CS_QUERY_REGISTRY (obj_reg, iKeyboardDriver);
+    csQueryRegistry<iKeyboardDriver> (obj_reg);
 
   if (currentKbd == 0)
   {

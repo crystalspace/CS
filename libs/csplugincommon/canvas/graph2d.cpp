@@ -70,7 +70,7 @@ csGraphics2D::~csGraphics2D ()
 {
   if (weakEventHandler != 0)
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
     if (q != 0)
       CS::RemoveWeakListener (q, weakEventHandler);
   }
@@ -82,7 +82,7 @@ bool csGraphics2D::Initialize (iObjectRegistry* r)
 {
   CS_ASSERT (r != 0);
   object_reg = r;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  plugin_mgr = csQueryRegistry<iPluginManager> (object_reg);
   // Get the system parameters
   config.AddConfig (object_reg, "/config/video.cfg");
   Width = config->GetInt ("Video.ScreenWidth", Width);
@@ -96,7 +96,7 @@ bool csGraphics2D::Initialize (iObjectRegistry* r)
   // Get the font server: A missing font server is NOT an error
   if (!FontServer)
   {
-    FontServer = CS_QUERY_REGISTRY (object_reg, iFontServer);
+    FontServer = csQueryRegistry<iFontServer> (object_reg);
   }
 #ifdef CS_DEBUG
   if (!FontServer)
@@ -125,7 +125,7 @@ bool csGraphics2D::Initialize (iObjectRegistry* r)
     Palette [i].blue = 0;
   }
 
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0)
   {
     csEventID events[3] = { csevSystemOpen (object_reg), 
@@ -141,7 +141,7 @@ bool csGraphics2D::Initialize (iObjectRegistry* r, int width, int height,
 {
   CS_ASSERT (r != 0);
   object_reg = r;
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  plugin_mgr = csQueryRegistry<iPluginManager> (object_reg);
   // Get the system parameters
   config.AddConfig (object_reg, "/config/video.cfg");
   Width = width;
@@ -153,7 +153,7 @@ bool csGraphics2D::Initialize (iObjectRegistry* r, int width, int height,
   // Get the font server: A missing font server is NOT an error
   if (!FontServer)
   {
-    FontServer = CS_QUERY_REGISTRY (object_reg, iFontServer);
+    FontServer = csQueryRegistry<iFontServer> (object_reg);
   }
 
   // Initialize pointers to default drawing methods

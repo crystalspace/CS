@@ -38,8 +38,8 @@ bool csRenderStepParser::Initialize(iObjectRegistry *object_reg)
   tokens.Register ("step", XMLTOKEN_STEP);
 
   csRenderStepParser::object_reg = object_reg;
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  plugmgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
+  plugmgr = csQueryRegistry<iPluginManager> (object_reg);
 
   return (plugmgr != 0);
 }
@@ -89,7 +89,7 @@ csPtr<iRenderStep> csRenderStepParser::Parse (
     return 0;
   }
   csRef<iRenderStep> step =
-    SCF_QUERY_INTERFACE (b, iRenderStep);
+    scfQueryInterface<iRenderStep> (b);
   if (!step)
   {
     if (synldr)

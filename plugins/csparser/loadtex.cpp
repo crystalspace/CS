@@ -372,16 +372,16 @@ csPtr<iBase> csImageTextureLoader::Parse (iDocumentNode* /*node*/,
 {
   if (!context) return 0;
   csRef<iTextureLoaderContext> ctx = csPtr<iTextureLoaderContext>
-    (SCF_QUERY_INTERFACE (context, iTextureLoaderContext));
+    (scfQueryInterface<iTextureLoaderContext> (context));
   if (!ctx) return 0;
   if (!ctx->HasImage() || !ctx->GetImage())
     return 0;
 
-  csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> G3D = csQueryRegistry<iGraphics3D> (object_reg);
   if (!G3D) return 0;
   csRef<iTextureManager> tm = G3D->GetTextureManager();
   if (!tm) return 0;
-  csRef<iEngine> Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iEngine> Engine = csQueryRegistry<iEngine> (object_reg);
   if (!Engine)
     return 0;
 
@@ -415,7 +415,7 @@ csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node,
   csRef<iTextureLoaderContext> ctx;
   if (context)
   {
-    ctx = SCF_QUERY_INTERFACE (context, iTextureLoaderContext);
+    ctx = scfQueryInterface<iTextureLoaderContext> (context);
     if (ctx)
     {
       if (ctx->HasSize())
@@ -438,7 +438,7 @@ csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node,
     if (colorNode)
     {
       csRef<iSyntaxService> synserv = 
-	CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+	csQueryRegistry<iSyntaxService> (object_reg);
       if (synserv)
       {
 	synserv->ParseColor (colorNode, color);
@@ -449,11 +449,11 @@ csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node,
   csRef<iImage> Image = csCreateXORPatternImage (w, h, depth, color.red,
   	color.green, color.blue);
 
-  csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> G3D = csQueryRegistry<iGraphics3D> (object_reg);
   if (!G3D) return 0;
   csRef<iTextureManager> tm = G3D->GetTextureManager();
   if (!tm) return 0;
-  csRef<iEngine> Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iEngine> Engine = csQueryRegistry<iEngine> (object_reg);
   if (!Engine)
     return 0;
 
@@ -486,15 +486,15 @@ csPtr<iBase> csCubemapTextureLoader::Parse (iDocumentNode* node,
 {
   if (!context) return 0;
   csRef<iTextureLoaderContext> ctx = csPtr<iTextureLoaderContext>
-    (SCF_QUERY_INTERFACE (context, iTextureLoaderContext));
+    (scfQueryInterface<iTextureLoaderContext> (context));
   if (!ctx) return 0;
   
-  csRef<iEngine> Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
-  csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iEngine> Engine = csQueryRegistry<iEngine> (object_reg);
+  csRef<iGraphics3D> G3D = csQueryRegistry<iGraphics3D> (object_reg);
   csRef<iTextureManager> tm = G3D->GetTextureManager();
-  csRef<iLoader> loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  csRef<iLoader> loader = csQueryRegistry<iLoader> (object_reg);
   csRef<iSyntaxService> SyntaxService = 
-    CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+    csQueryRegistry<iSyntaxService> (object_reg);
 
   csRef<csImageCubeMapMaker> cube;
   cube.AttachNew (new csImageCubeMapMaker (ctx->GetImage()));
@@ -628,15 +628,15 @@ csPtr<iBase> csTexture3DLoader::Parse (iDocumentNode* node,
 {
   if (!context) return 0;
   csRef<iTextureLoaderContext> ctx = csPtr<iTextureLoaderContext>
-    (SCF_QUERY_INTERFACE (context, iTextureLoaderContext));
+    (scfQueryInterface<iTextureLoaderContext> (context));
   if (!ctx) return 0;
   
-  csRef<iEngine> Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
-  csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iEngine> Engine = csQueryRegistry<iEngine> (object_reg);
+  csRef<iGraphics3D> G3D = csQueryRegistry<iGraphics3D> (object_reg);
   csRef<iTextureManager> tm = G3D->GetTextureManager();
-  csRef<iLoader> loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  csRef<iLoader> loader = csQueryRegistry<iLoader> (object_reg);
   csRef<iSyntaxService> SyntaxService = 
-    CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+    csQueryRegistry<iSyntaxService> (object_reg);
 
   int Format = tm->GetTextureFormat ();
   csRef<csImageVolumeMaker> vol;

@@ -94,8 +94,8 @@ csSkeletonFactoryLoader::~csSkeletonFactoryLoader ()
 bool csSkeletonFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csSkeletonFactoryLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
   xmltokens.Register ("bone", XMLTOKEN_BONE);
   xmltokens.Register ("move", XMLTOKEN_MOVE);
@@ -151,7 +151,7 @@ const char *csSkeletonFactoryLoader::ParseBone (iDocumentNode* node,
     {
       case XMLTOKEN_MOVE:
         {
-          csRef<iSyntaxService> SyntaxService = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+          csRef<iSyntaxService> SyntaxService = csQueryRegistry<iSyntaxService> (object_reg);
           csRef<iDocumentNode> vector_node = child->GetNode ("v");
           if (vector_node)
           {
@@ -195,7 +195,7 @@ const char *csSkeletonFactoryLoader::ParseBone (iDocumentNode* node,
           case XMLTOKEN_MOVE:
           {
             csReversibleTransform socket_transform;
-            csRef<iSyntaxService> SyntaxService = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+            csRef<iSyntaxService> SyntaxService = csQueryRegistry<iSyntaxService> (object_reg);
             csRef<iDocumentNode> vector_node = child->GetNode ("v");
             if (vector_node)
             {
@@ -544,7 +544,7 @@ const char *csSkeletonFactoryLoader::ParseFrame (iDocumentNode* node,
         break;
         case XMLTOKEN_MOVE:
         {
-          csRef<iSyntaxService> SyntaxService = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+          csRef<iSyntaxService> SyntaxService = csQueryRegistry<iSyntaxService> (object_reg);
           csRef<iDocumentNode> vector_node = child->GetNode ("v");
           if (vector_node)
           {

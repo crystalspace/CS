@@ -1487,11 +1487,19 @@ bool csVFS::LoadMountsFromFile (iConfigFile* file)
   // Flag to indicate success
   bool success = true;
 
-  /// Get iterator to all mount sections
-  csRef<iConfigIterator> iter = file->Enumerate ("VFS.Mount.");
+  // Merge options from new file to ensure that new
+  // variable assignments are available for mounts.
+  csRef<iConfigIterator> iter = file->Enumerate ();
   while (iter->HasNext ())
   {
-	iter->Next();
+    iter->Next();
+    config.SetStr(iter->GetKey(true),iter->GetStr());
+  }
+  // Now mount the paths in the file.
+  iter = file->Enumerate ("VFS.Mount.");
+  while (iter->HasNext ())
+  {
+    iter->Next();
     const char *rpath = iter->GetKey (true);
     const char *vpath = iter->GetStr ();
     // Mount the path

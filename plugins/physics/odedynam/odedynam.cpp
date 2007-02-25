@@ -185,7 +185,7 @@ csODEDynamics::~csODEDynamics ()
 {
   if (scfiEventHandler)
   {
-    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
     if (q)
       q->RemoveListener (scfiEventHandler);
   }
@@ -198,7 +198,7 @@ bool csODEDynamics::Initialize (iObjectRegistry* object_reg)
 {
   csODEDynamics::object_reg = object_reg;
 
-  clock = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  clock = csQueryRegistry<iVirtualClock> (object_reg);
   if (!clock)
     return false;
 
@@ -210,7 +210,7 @@ bool csODEDynamics::Initialize (iObjectRegistry* object_reg)
 csPtr<iDynamicSystem> csODEDynamics::CreateSystem ()
 {
   csODEDynamicSystem* system = new csODEDynamicSystem (erp, cfm);
-  csRef<iDynamicSystem> isystem (SCF_QUERY_INTERFACE (system, iDynamicSystem));
+  csRef<iDynamicSystem> isystem (scfQueryInterface<iDynamicSystem> (system));
   systems.Push (isystem);
   isystem->DecRef ();
   if(stepfast) system->EnableStepFast(true);
@@ -401,8 +401,8 @@ void csODEDynamics::SetGlobalERP (float erp)
 
   for (size_t i = 0; i < systems.Length(); i ++)
   {
-    csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-      iODEDynamicSystemState);
+    csRef<iODEDynamicSystemState> sys = 
+      scfQueryInterface<iODEDynamicSystemState> (systems[i]);
     sys->SetERP (erp);
   }
 }
@@ -412,8 +412,8 @@ void csODEDynamics::SetGlobalCFM (float cfm)
   csODEDynamics::cfm = cfm;
   for (size_t i = 0; i < systems.Length(); i ++)
   {
-    csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-      iODEDynamicSystemState);
+    csRef<iODEDynamicSystemState> sys = 
+      scfQueryInterface<iODEDynamicSystemState> (systems[i]);
     sys->SetCFM (cfm);
   }
 }
@@ -425,8 +425,8 @@ void csODEDynamics::EnableStepFast (bool enable)
 
   for (size_t i = 0; i < systems.Length(); i ++)
   {
-    csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-      iODEDynamicSystemState);
+    csRef<iODEDynamicSystemState> sys = 
+      scfQueryInterface<iODEDynamicSystemState> (systems[i]);
     sys->EnableStepFast (enable);
   }
 }
@@ -437,8 +437,8 @@ void csODEDynamics::SetStepFastIterations (int iter)
 
   for (size_t i = 0; i < systems.Length(); i ++)
   {
-    csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-      iODEDynamicSystemState);
+    csRef<iODEDynamicSystemState> sys = 
+      scfQueryInterface<iODEDynamicSystemState> (systems[i]);
     sys->SetStepFastIterations (iter);
   }
 }
@@ -450,8 +450,8 @@ void csODEDynamics::EnableQuickStep (bool enable)
 
   for (size_t i = 0; i < systems.Length(); i ++)
   {
-    csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-      iODEDynamicSystemState);
+    csRef<iODEDynamicSystemState> sys = 
+      scfQueryInterface<iODEDynamicSystemState> (systems[i]);
     sys->EnableQuickStep (enable);
   }
 }
@@ -462,8 +462,8 @@ void csODEDynamics::SetQuickStepIterations (int iter)
 
   for (size_t i = 0; i < systems.Length(); i ++)
   {
-    csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
-      iODEDynamicSystemState);
+    csRef<iODEDynamicSystemState> sys = 
+      scfQueryInterface<iODEDynamicSystemState> (systems[i]);
     sys->SetQuickStepIterations (iter);
   }
 }
@@ -476,7 +476,7 @@ void csODEDynamics::EnableEventProcessing (bool enable)
 
     if (!scfiEventHandler)
       scfiEventHandler = csPtr<EventHandler> (new EventHandler (this));
-    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
     if (q)
       q->RegisterListener (scfiEventHandler, PreProcess);
   }
@@ -486,7 +486,7 @@ void csODEDynamics::EnableEventProcessing (bool enable)
 
     if (scfiEventHandler)
     {
-      csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+      csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
       if (q)
         q->RemoveListener (scfiEventHandler);
       scfiEventHandler = 0;
@@ -2409,7 +2409,6 @@ csODEJoint::csODEJoint (csODEDynamicSystem *sys) : scfImplementationType (this, 
 {
   jointID = 0;
   motor_jointID = 0;
-  custom_aconstraint_axis = false;
 
   body[0] = body[1] = 0;
   bodyID[0] = bodyID[1] = 0;
@@ -2421,8 +2420,11 @@ csODEJoint::csODEJoint (csODEDynamicSystem *sys) : scfImplementationType (this, 
   rotConstraint[1] = 1;
   rotConstraint[2] = 1;
 
-  lo_stop = csVector3 (-dInfinity, -dInfinity, -dInfinity);
-  hi_stop = csVector3 (dInfinity, dInfinity, dInfinity); 
+  aconstraint_axis[0] = csVector3 (0,1,0);
+  aconstraint_axis[1] = csVector3 (0,0,1);
+
+  lo_stop = csVector3 (dInfinity, dInfinity, dInfinity);
+  hi_stop = csVector3 (-dInfinity, -dInfinity, -dInfinity); 
   vel = csVector3 (0);
   fmax = csVector3 (0);
   fudge_factor = csVector3 (1);
@@ -2432,6 +2434,7 @@ csODEJoint::csODEJoint (csODEDynamicSystem *sys) : scfImplementationType (this, 
   stop_cfm = csVector3 (9.9999997e-006f);
   suspension_erp = csVector3 (0.0f);
   suspension_cfm = csVector3 (0.0f);
+  custom_aconstraint_axis = false;
 
   dynsys = sys;
 }
@@ -2565,8 +2568,8 @@ void csODEJoint::BuildSlider (const csVector3 &axis)
 
 void csODEJoint::SetAngularConstraintAxis (const csVector3 &axis, int body)
 {
-  aconstraint_axis[body] = axis; 
   custom_aconstraint_axis = true;
+  aconstraint_axis[body] = axis; 
   BuildJoint ();
 }
 csVector3 csODEJoint::GetAngularConstraintAxis (int body)
@@ -2616,14 +2619,14 @@ void csODEJoint::ApplyJointProperty (int parameter, const csVector3 &values)
     dJointSetHinge2Param (jointID, parameter, values.x);
     dJointSetHinge2Param (jointID, parameter + dParamGroup, values.y);
     //dParamXi = dParamX + dParamGroup * (i-1)
+  case dJointTypeBall:       
+    if (motor_jointID)
+    {
+      dJointSetAMotorParam (motor_jointID, parameter, values.x);
+      //We use only euler mode, se we only need to setup parameter for 2 axes
+      dJointSetAMotorParam (motor_jointID, parameter + 2*dParamGroup, values.z);
+    }
   default:
-    case dJointTypeBall:       
-      if (motor_jointID)
-      {
-        dJointSetAMotorParam (motor_jointID, parameter, values.x);
-        //We use only euler mode, se we only need to setup parameter for 2 axes
-        dJointSetAMotorParam (motor_jointID, parameter + 2*dParamGroup, values.z);
-      }
     //case dJointTypeAMotor:     // not supported here
     //case dJointTypeUniversal:  // not sure if that's supported in here
     break;
@@ -2728,7 +2731,7 @@ void csODEJoint::BuildJoint ()
       dJointAttach (jointID, bodyID[0], bodyID[1]);
       pos = transform.GetOrigin();
       dJointSetBallAnchor (jointID, pos.x, pos.y, pos.z);
-      if (custom_aconstraint_axis)
+      if (hi_stop.x > lo_stop.x || hi_stop.y > lo_stop.y || hi_stop.z > lo_stop.z )
       {
         motor_jointID = dJointCreateAMotor (dynsys->GetWorldID(), 0);
         dJointAttach (jointID, bodyID[0], bodyID[1]);

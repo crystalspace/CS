@@ -211,22 +211,20 @@ void csTerrBlock::SetupMesh ()
   
     if (size <= cullsize * 1.5 + 0.5) //only for the smallest culled
     {
-  //printf("culled %f\n",size);
-  
-	csVector2 mapRes;
+      csVector2 mapRes;
 
-        csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
- 	  terr->object_reg, "crystalspace.shared.stringset", iStringSet);
+      csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+ 	  terr->object_reg, "crystalspace.shared.stringset");
 
-	if(terr->materialAlphaMaps)
-	  mapRes = terr->terraformer->GetIntegerMapSize(
-	      strings->Request("alphamap "));
-	else
-      mapRes = terr->terraformer->GetIntegerMapSize(
-	  strings->Request("materialmap"));
-  //@@@
-  //    res = (int)(size / (terr->block_maxsize /
-  //                  terr->block_minsize)) * terr->GetBlockResolution();
+      if (terr->materialAlphaMaps)
+	mapRes = terr->terraformer->GetIntegerMapSize(
+	      strings->Request("alphamap 0"));
+      else
+        mapRes = terr->terraformer->GetIntegerMapSize(
+	      strings->Request("materialmap"));
+      //@@@
+      //    res = (int)(size / (terr->block_maxsize /
+      //                  terr->block_minsize)) * terr->GetBlockResolution();
     
       csRef<iTerraSampler> mapsampler = terr->terraformer->GetSampler (
 	csBox2 (center.x - size / 2.0, center.z - size / 2.0, 
@@ -939,8 +937,8 @@ public:
 
 bool csTerrainObject::ReadCDLODFromCache ()
 {
-  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
-  	object_reg, iCommandLineParser);
+  csRef<iCommandLineParser> cmdline = 
+  	csQueryRegistry<iCommandLineParser> (object_reg);
   if (cmdline->GetOption ("recalc"))
   {
     static bool reportit = true;
@@ -954,7 +952,7 @@ bool csTerrainObject::ReadCDLODFromCache ()
     return false;
   }
 
-  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
   if (!engine) return false;
   iCacheManager* cache_mgr = engine->GetCacheManager ();
 
@@ -1012,7 +1010,7 @@ bool csTerrainObject::ReadCDLODFromCache ()
 
 void csTerrainObject::WriteCDLODToCache ()
 {
-  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
   if (!engine) return;
   iCacheManager* cache_mgr = engine->GetCacheManager ();
   if (!cache_mgr) return;
@@ -1020,7 +1018,7 @@ void csTerrainObject::WriteCDLODToCache ()
   char* cachename = GenerateCacheName ();
 
   csMemFile m;
-  csRef<iFile> mf = SCF_QUERY_INTERFACE ((&m), iFile);
+  csRef<iFile> mf = scfQueryInterface<iFile> ((&m));
 
   char header[5];
   strcpy (header, CDLODMAGIC);
@@ -1357,8 +1355,8 @@ void csTerrainObject::SetBottomNeighbor(iTerrainObjectState *bottom)
 
 void csTerrainObject::SetStaticLighting (bool enable)
 {
-  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
-  	object_reg, iCommandLineParser);
+  csRef<iCommandLineParser> cmdline = 
+  	csQueryRegistry<iCommandLineParser> (object_reg);
   if (cmdline->GetOption ("fullbright"))
   {
     staticlighting = false;
@@ -1461,8 +1459,8 @@ void csTerrainObject::SetupObject ()
     }
 
     csRef<iStringSet> strings =
-      CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
-      "crystalspace.shared.stringset", iStringSet);
+      csQueryRegistryTagInterface<iStringSet>
+      (object_reg, "crystalspace.shared.stringset");
 
     int a;
     materialAlphaMaps = !terraformer->SampleInteger(
@@ -1772,7 +1770,7 @@ void csTerrainObject::CastShadows (iMovable* movable, iFrustumView* fview)
 {
   SetupObject ();
   iBase* b = (iBase *)fview->GetUserdata ();
-  csRef<iLightingProcessInfo> lpi = SCF_QUERY_INTERFACE(b,iLightingProcessInfo);
+  csRef<iLightingProcessInfo> lpi = scfQueryInterface<iLightingProcessInfo> (b);
   CS_ASSERT (lpi != 0);
 
   iLight* li = lpi->GetLight ();
@@ -1934,8 +1932,8 @@ CS_DEPRECATED_METHOD bool csTerrainObject::SetMaterialAlphaMaps (
              " Use adequate method in the formers for others.");
     return false;
   }
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
 
   for (uint a = 0; a < data.GetSize(); a++)
   {
@@ -1978,10 +1976,10 @@ bool csTerrainObject::SetCurrentMaterialAlphaMaps (
   hm = ((float)(materialMapH - 1)) / (region.MaxY() - region.MinY());
 
   csRef<iGraphics3D> g3d = 
-    CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+    csQueryRegistry<iGraphics3D> (object_reg);
   csRef<iStringSet> strings = 
-    CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
-    "crystalspace.shared.stringset", iStringSet);
+    csQueryRegistryTagInterface<iStringSet>
+    (object_reg, "crystalspace.shared.stringset");
   csRef<iTextureManager> mgr = g3d->GetTextureManager ();
 
   csRef<csShaderVariable> lod_var = 
@@ -2083,8 +2081,8 @@ csArray<iImage*>& maps)
              " Use adequate method in the formers for others.");
     return false;
   }
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
 
   if (maps.Length () != palette.Length ()-1)
   {
@@ -2161,8 +2159,8 @@ csArray<char>& data, int w, int h)
              " Use adequate method in the formers for others.");
     return false;
   }
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
 
   csRef<iImage> material = csPtr<iImage> (new csImageMemory (w, h,
     CS_IMGFMT_PALETTED8));
@@ -2192,10 +2190,10 @@ bool csTerrainObject::SetCurrentMaterialMap (const csArray<char>& data,
   hm = ((float)(materialMapH - 1)) / (region.MaxY() - region.MinY());
 
   csRef<iGraphics3D> g3d = 
-    CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+    csQueryRegistry<iGraphics3D> (object_reg);
   csRef<iStringSet> strings = 
-    CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
-    "crystalspace.shared.stringset", iStringSet);
+    csQueryRegistryTagInterface<iStringSet>
+    (object_reg, "crystalspace.shared.stringset");
   iTextureManager* mgr = g3d->GetTextureManager ();
 
   csRef<csShaderVariable> lod_var = 
@@ -2268,8 +2266,8 @@ CS_DEPRECATED_METHOD bool csTerrainObject::SetMaterialMap (iImage* map)
              " Use adequate method in the formers for others.");
     return false;
   }
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
 
   const size_t mapSize = map->GetWidth() * map->GetHeight();
   csArray<char> image_data;
@@ -2840,7 +2838,7 @@ csTerrainFactory::csTerrainFactory (iObjectRegistry* object_reg,
   brute_type = parent;
 				
   /*terraformer = 
-    CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, "terrain", iTerraFormer);*/
+    csQueryRegistryTagInterface<iTerraFormer> (object_reg, "terrain");*/
 
   scale = csVector3(1);
   light_mgr = csQueryRegistry<iLightManager> (object_reg);

@@ -124,7 +124,7 @@ bool Simple::HandleEvent (iEvent& ev)
   else if ((ev.Name == KeyboardDown) &&
 	   (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
     if (q) q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
     return true;
   }
@@ -180,7 +180,7 @@ bool Simple::Initialize ()
   }
 
   // The virtual clock.
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
   if (vc == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -190,7 +190,7 @@ bool Simple::Initialize ()
   }
 
   // Find the pointer to engine plugin
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = csQueryRegistry<iEngine> (object_reg);
   if (engine == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -199,7 +199,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  loader = csQueryRegistry<iLoader> (object_reg);
   if (loader == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -208,7 +208,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
   if (g3d == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -217,7 +217,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  kbd = csQueryRegistry<iKeyboardDriver> (object_reg);
   if (kbd == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -235,7 +235,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  PluginManager = CS_QUERY_REGISTRY(object_reg, iPluginManager);
+  PluginManager = csQueryRegistry<iPluginManager> (object_reg);
   if (!PluginManager)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -295,7 +295,7 @@ bool Simple::Initialize ()
 
   /// Lightning 1
   csRef<iMeshObjectFactory> LightningObjectFactory1 = type->NewFactory();
-  csRef<iLightningFactoryState> LightningFactoryState1 = SCF_QUERY_INTERFACE(LightningObjectFactory1, iLightningFactoryState);
+  csRef<iLightningFactoryState> LightningFactoryState1 = scfQueryInterface<iLightningFactoryState> (LightningObjectFactory1);
 
   LightningObjectFactory1->SetMaterialWrapper(engine->GetMaterialList()->FindByName("energy"));
   LightningObjectFactory1->SetMixMode(CS_FX_ADD);
@@ -313,7 +313,7 @@ bool Simple::Initialize ()
 
   /// Lightning 2
   csRef<iMeshObjectFactory> LightningObjectFactory2 = type->NewFactory();
-  csRef<iLightningFactoryState> LightningFactoryState2 = SCF_QUERY_INTERFACE(LightningObjectFactory2, iLightningFactoryState);
+  csRef<iLightningFactoryState> LightningFactoryState2 = scfQueryInterface<iLightningFactoryState> (LightningObjectFactory2);
 
   LightningObjectFactory2->SetMaterialWrapper(engine->GetMaterialList()->FindByName("energy"));
   LightningObjectFactory2->SetMixMode(CS_FX_ADD);
@@ -331,7 +331,7 @@ bool Simple::Initialize ()
 
   ///Lightning 3
   csRef<iMeshObjectFactory> LightningObjectFactory3 = type->NewFactory();
-  csRef<iLightningFactoryState> LightningFactoryState3 = SCF_QUERY_INTERFACE(LightningObjectFactory3, iLightningFactoryState);
+  csRef<iLightningFactoryState> LightningFactoryState3 = scfQueryInterface<iLightningFactoryState> (LightningObjectFactory3);
 
   LightningObjectFactory3->SetMaterialWrapper(engine->GetMaterialList()->FindByName("energy"));
   LightningObjectFactory3->SetMixMode(CS_FX_ADD);

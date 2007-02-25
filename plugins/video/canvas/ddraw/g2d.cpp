@@ -91,7 +91,7 @@ bool csGraphics2DDDraw3::Initialize (iObjectRegistry *object_reg)
   if (!csGraphics2D::Initialize (object_reg))
     return false;
 
-  m_piWin32Assistant = CS_QUERY_REGISTRY (object_reg, iWin32Assistant);
+  m_piWin32Assistant = csQueryRegistry<iWin32Assistant> (object_reg);
   if (!m_piWin32Assistant)
   {
     MessageBox (0, 
@@ -103,8 +103,8 @@ bool csGraphics2DDDraw3::Initialize (iObjectRegistry *object_reg)
 
   DDetection.object_reg = object_reg;
 
-  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (object_reg,
-						   iCommandLineParser);
+  csRef<iCommandLineParser> cmdline = 
+						   csQueryRegistry<iCommandLineParser> (object_reg);
   m_bHardwareCursor = config->GetBool ("Video.SystemMouseCursor", true);
   if (cmdline->GetOption ("sysmouse")) m_bHardwareCursor = true;
   if (cmdline->GetOption ("nosysmouse")) m_bHardwareCursor = false;

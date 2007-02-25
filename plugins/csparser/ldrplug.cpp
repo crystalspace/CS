@@ -71,7 +71,7 @@ void csLoader::csLoadedPluginVector::DeleteAll ()
     csLoaderPluginRec* rec = vector[i];
     if (rec->Component && plugin_mgr)
     {
-      csRef<iComponent> comp = SCF_QUERY_INTERFACE (rec->Component, iComponent);
+      csRef<iComponent> comp = scfQueryInterface<iComponent> (rec->Component);
       if (comp)
         plugin_mgr->UnloadPlugin (comp);
     }
@@ -102,7 +102,7 @@ bool csLoader::csLoadedPluginVector::GetPluginFromRec (
 {
   if (!rec->Component)
   {
-    rec->Component = CS_QUERY_REGISTRY_TAG (object_reg, rec->ClassID);
+    rec->Component = csQueryRegistryTag (object_reg, rec->ClassID);
     if (!rec->Component)
     {
       csRef<iComponent> comp = CS_LOAD_PLUGIN (plugin_mgr,
@@ -111,9 +111,9 @@ bool csLoader::csLoadedPluginVector::GetPluginFromRec (
     }
     if (rec->Component)
     {
-      rec->Plugin = SCF_QUERY_INTERFACE (rec->Component, iLoaderPlugin);
-      rec->BinPlugin = SCF_QUERY_INTERFACE (rec->Component,
-      	iBinaryLoaderPlugin);
+      rec->Plugin = scfQueryInterface<iLoaderPlugin> (rec->Component);
+      rec->BinPlugin = 
+      	scfQueryInterface<iBinaryLoaderPlugin> (rec->Component);
     }
   }
   plug = rec->Plugin;

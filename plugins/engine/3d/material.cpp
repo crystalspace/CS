@@ -195,7 +195,7 @@ csMaterialWrapper::csMaterialWrapper (iMaterialList* materials,
   scfImplementationType (this), materials (materials)
 {
   material = m;
-  matEngine = SCF_QUERY_INTERFACE (material, iMaterialEngine);
+  matEngine = scfQueryInterface<iMaterialEngine> (material);
 }
 
 csMaterialWrapper::~csMaterialWrapper ()
@@ -210,7 +210,7 @@ void csMaterialWrapper::SelfDestruct ()
 void csMaterialWrapper::SetMaterial (iMaterial *m)
 {
   material = m;
-  matEngine = SCF_QUERY_INTERFACE (material, iMaterialEngine);
+  matEngine = scfQueryInterface<iMaterialEngine> (material);
 }
 
 void csMaterialWrapper::Visit ()

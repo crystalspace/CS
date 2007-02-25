@@ -1411,8 +1411,8 @@ public:
    * @{ */
   virtual iMeshObjectFactory* GetFactory () const
   {
-    csRef<iMeshObjectFactory> ifact (SCF_QUERY_INTERFACE (factory,
-    	iMeshObjectFactory));
+    csRef<iMeshObjectFactory> ifact (
+    	scfQueryInterface<iMeshObjectFactory> (factory));
     return ifact;	// DecRef is ok here.
   }
   virtual csFlags& GetFlags () { return flags; }

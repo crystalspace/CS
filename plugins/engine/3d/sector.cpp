@@ -164,15 +164,15 @@ void csSector::SelfDestruct ()
 void csSector::RegisterLightToCuller (csLight* light)
 {
   light->UseAsCullingObject ();
-  csRef<iVisibilityObject> vo = SCF_QUERY_INTERFACE (light,
-        iVisibilityObject);
+  csRef<iVisibilityObject> vo = 
+        scfQueryInterface<iVisibilityObject> (light);
   culler->RegisterVisObject (vo);
 }
 
 void csSector::UnregisterLightToCuller (csLight* light)
 {
-  csRef<iVisibilityObject> vo = SCF_QUERY_INTERFACE (light,
-        iVisibilityObject);
+  csRef<iVisibilityObject> vo = 
+        scfQueryInterface<iVisibilityObject> (light);
   culler->UnregisterVisObject (vo);
   light->StopUsingAsCullingObject ();
 }
@@ -248,8 +248,8 @@ void csSector::RegisterEntireMeshToCuller (iMeshWrapper* mesh)
   csMeshWrapper* cmesh = (csMeshWrapper*)mesh;
   if (cmesh->SomeParentHasStaticLOD ()) return;
 
-  csRef<iVisibilityObject> vo = SCF_QUERY_INTERFACE (mesh,
-        iVisibilityObject);
+  csRef<iVisibilityObject> vo = 
+        scfQueryInterface<iVisibilityObject> (mesh);
   culler->RegisterVisObject (vo);
 
   if (cmesh->GetStaticLODMesh ()) return;
@@ -268,15 +268,15 @@ void csSector::RegisterMeshToCuller (iMeshWrapper* mesh)
   csMeshWrapper* cmesh = (csMeshWrapper*)mesh;
   if (cmesh->SomeParentHasStaticLOD ()) return;
 
-  csRef<iVisibilityObject> vo = SCF_QUERY_INTERFACE (mesh,
-        iVisibilityObject);
+  csRef<iVisibilityObject> vo = 
+        scfQueryInterface<iVisibilityObject> (mesh);
   culler->RegisterVisObject (vo);
 }
 
 void csSector::UnregisterMeshToCuller (iMeshWrapper* mesh)
 {
-  csRef<iVisibilityObject> vo = SCF_QUERY_INTERFACE (mesh,
-        iVisibilityObject);
+  csRef<iVisibilityObject> vo = 
+        scfQueryInterface<iVisibilityObject> (mesh);
   culler->UnregisterVisObject (vo);
 }
 
@@ -363,7 +363,9 @@ void csSector::PrecacheDraw ()
 
   // @@@ Ideally we would want to disable visibility culling
   // here so that all objects are visible.
+  g3d->BeginDraw (CSDRAW_3DGRAPHICS);
   view->Draw ();
+  g3d->FinishDraw ();
 }
 
 //----------------------------------------------------------------------
@@ -385,8 +387,8 @@ bool csSector::SetVisibilityCullerPlugin (const char *plugname,
   culler = 0;
 
   // Load the culler plugin.
-  csRef<iPluginManager> plugmgr = CS_QUERY_REGISTRY (engine->objectRegistry,
-  	iPluginManager);
+  csRef<iPluginManager> plugmgr = 
+  	csQueryRegistry<iPluginManager> (engine->objectRegistry);
   culler = CS_LOAD_PLUGIN (plugmgr, plugname, iVisibilityCuller);
 
   if (!culler)
@@ -523,7 +525,7 @@ public:
     }
     else
     {
-      csRef<iLight> light = SCF_QUERY_INTERFACE (visobj, iLight);
+      csRef<iLight> light = scfQueryInterface<iLight> (visobj);
       if (light)
       {
         csSector* csector = (csSector*)sector;
@@ -1234,7 +1236,7 @@ csSectorList::~csSectorList ()
 void csSectorList::NameChanged (iObject* object, const char* oldname,
   	const char* newname)
 {
-  csRef<iSector> sector = SCF_QUERY_INTERFACE (object, iSector);
+  csRef<iSector> sector = scfQueryInterface<iSector> (object);
   CS_ASSERT (sector != 0);
   if (oldname) sectors_hash.Delete (oldname, sector);
   if (newname) sectors_hash.Put (newname, sector);

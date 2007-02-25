@@ -22,7 +22,7 @@
 #include "lighter.h"
 #include "kdtree.h"
 #include "statistics.h"
-#include "radobject_genmesh.h"
+#include "object_genmesh.h"
 
 using namespace CS;
 
@@ -31,10 +31,10 @@ namespace lighter
   void Sector::Initialize ()
   {
     // Initialize objects
-    RadObjectHash::GlobalIterator objIt = allObjects.GetIterator ();
+    ObjectHash::GlobalIterator objIt = allObjects.GetIterator ();
     while (objIt.HasNext ())
     {
-      csRef<RadObject> obj = objIt.Next ();
+      csRef<Object> obj = objIt.Next ();
       obj->Initialize ();
     }
 
@@ -161,7 +161,7 @@ namespace lighter
     return true;
   }
 
-  Lightmap* Scene::GetLightmap (uint lightmapID, Light* light)
+  Lightmap* Scene::GetLightmap (uint lightmapID, Light_old* light)
   {
     if (!light->pseudoDynamic)
       return lightmaps[lightmapID];
@@ -223,7 +223,7 @@ namespace lighter
     {
       iLight *light = lightList->Get (i);
       if (light->GetDynamicType() == CS_LIGHT_DYNAMICTYPE_DYNAMIC) continue;
-      csRef<Light> radLight; radLight.AttachNew (new Light);
+      csRef<Light_old> radLight; radLight.AttachNew (new Light_old);
       radLight->position = light->GetMovable ()->GetFullPosition ();
       radLight->attenuation = light->GetAttenuationMode ();
       radLight->attenuationConsts = light->GetAttenuationConstants();
@@ -240,7 +240,7 @@ namespace lighter
       radLight->boundingBox.SetCenter (radLight->position);
      
       //add more
-      radSector->allLights.Push (radLight);
+      radSector->allLightsOld.Push (radLight);
     }
   }
 
@@ -249,13 +249,13 @@ namespace lighter
     if (!sector || !mesh) return Failure;
 
     // Get the factory
-    RadObjectFactory *factory = 0;
+    ObjectFactory *factory = 0;
     MeshParseResult parseFact = ParseMeshFactory (mesh->GetFactory (), factory);
     if (parseFact != Success) return parseFact;
     if (!factory) return Failure;
 
     // Construct a new mesh
-    RadObject* obj = factory->CreateObject ();
+    Object* obj = factory->CreateObject ();
     if (!obj) return Failure;
 
     obj->ParseMesh (mesh);
@@ -268,13 +268,13 @@ namespace lighter
   }
 
   Scene::MeshParseResult Scene::ParseMeshFactory (iMeshFactoryWrapper *factory,
-                                                  RadObjectFactory*& radFact)
+                                                  ObjectFactory*& radFact)
   {
     if (!factory) return Failure;
 
     // Check for duplicate
     csString factName = factory->QueryObject ()->GetName ();
-    radFact = radFactories.Get (factName, (RadObjectFactory*)0);
+    radFact = radFactories.Get (factName, (ObjectFactory*)0);
     if (radFact) return Success;
 
     csRef<iFactory> ifact = scfQueryInterface<iFactory> (
@@ -285,7 +285,7 @@ namespace lighter
     if (!strcasecmp (type, "crystalspace.mesh.object.genmesh"))
     {
       // Genmesh
-      radFact = new RadObjectFactory_Genmesh ();
+      radFact = new ObjectFactory_Genmesh ();
     }
     else
       return NotAGenMesh;
@@ -330,7 +330,7 @@ namespace lighter
       PDLightmapsHash::GlobalIterator pdlIt = pdLightmaps.GetIterator();
       while (pdlIt.HasNext())
       {
-        csPtrKey<Light> key;
+        csPtrKey<Light_old> key;
         LightmapPtrDelArray* lm = pdlIt.Next(key);
         if (lm->Get (i)->IsNull()) continue;
 
@@ -527,8 +527,8 @@ namespace lighter
   {
     // Save a single factory to the dom
     csString name = factNode->GetAttributeValue ("name");
-    csRef<RadObjectFactory> radFact = radFactories.Get (name, 
-      (RadObjectFactory*)0);
+    csRef<ObjectFactory> radFact = radFactories.Get (name, 
+      (ObjectFactory*)0);
     if (radFact)
     {
       // We do have one
@@ -564,7 +564,7 @@ namespace lighter
   {
     // Save the mesh
     csString name = objNode->GetAttributeValue ("name");
-    csRef<RadObject> radObj = sect->allObjects.Get (name, (RadObject*)0);
+    csRef<Object> radObj = sect->allObjects.Get (name, (Object*)0);
     if (radObj)
     {
       // We do have one
