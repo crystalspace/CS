@@ -426,11 +426,11 @@ csRef<iDocumentNode> csXmlReadDocument::GetRoot ()
 const char* csXmlReadDocument::Parse (iFile* file, bool collapse)
 {
   size_t want_size = file->GetSize ();
-  char *data = new char [want_size + 1];
+  char *data = (char*)cs_malloc (want_size + 1);
   size_t real_size = file->Read (data, want_size);
   if (want_size != real_size)
   {
-    delete[] data;
+    cs_free (data);
     return "Unexpected EOF encountered";
   }
   data[real_size] = '\0';
@@ -442,7 +442,7 @@ const char* csXmlReadDocument::Parse (iFile* file, bool collapse)
   }
 #endif
   const char *error = Parse (data, collapse);
-  delete[] data;
+  cs_free (data);
   return error;
 }
 
@@ -459,10 +459,9 @@ const char* csXmlReadDocument::Parse (iString* str, bool collapse)
 const char* csXmlReadDocument::Parse (const char* buf, bool collapse)
 {
   CreateRoot (csStrNew (buf));
-  bool const old_collapse = root->IsWhiteSpaceCondensed();
   root->SetCondenseWhiteSpace(collapse);
-  root->Parse (root, root->input_data);
-  root->SetCondenseWhiteSpace(old_collapse);
+  ParseInfo parse;
+  root->Parse (parse, root->input_data);
   if (root->Error ())
     return root->ErrorDesc ();
   return 0;
@@ -471,10 +470,9 @@ const char* csXmlReadDocument::Parse (const char* buf, bool collapse)
 const char* csXmlReadDocument::ParseInPlace (char* buf, bool collapse)
 {
   CreateRoot (buf);
-  bool const old_collapse = root->IsWhiteSpaceCondensed();
   root->SetCondenseWhiteSpace(collapse);
-  root->Parse (root, root->input_data);
-  root->SetCondenseWhiteSpace(old_collapse);
+  ParseInfo parse;
+  root->Parse (parse, root->input_data);
   if (root->Error ())
     return root->ErrorDesc ();
   return 0;

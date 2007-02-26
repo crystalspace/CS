@@ -70,6 +70,18 @@ enum
   TIXML_ERROR_STRING_COUNT
 };
 
+typedef char* (ReadNameFunc)(char* p);
+typedef bool (IsNameStartFunc)(const char* p);
+
+struct ParseInfo
+{
+  TrDocument* document;
+  bool condenseWhiteSpace;
+
+  ReadNameFunc* ReadName;
+  IsNameStartFunc* IsNameStart;
+};
+
 /**
  * TrXmlBase is a base class for every class in TinyXml.
  * It does little except to establish that TinyXml classes
@@ -103,20 +115,6 @@ public:
   TrXmlBase () {}
   virtual ~TrXmlBase () {}
 
-  /**
-   * The world does not agree on whether white space should be kept or
-   * not. In order to make everyone happy, these global, static functions
-   * are provided to set whether or not TinyXml will condense all white space
-   * into a single space or not. The default is to condense. Note changing these
-   * values is not thread safe.
-   */
-  static void SetCondenseWhiteSpace( bool condense )
-  { condenseWhiteSpace = condense; }
-
-  /// Return the current white space setting.
-  static bool IsWhiteSpaceCondensed()
-  { return condenseWhiteSpace; }
-
   static const char* SkipWhiteSpace( const char* );
   static char* SkipWhiteSpace( char* );
 
@@ -126,19 +124,18 @@ public:
    * or 0 if the function has an error.
    * This version reads the name in place.
    */
-  static char* ReadName( char* p );
+  //static char* ReadName( char* p );
 
   /**
    * Reads text. Returns a pointer past the given end tag.
    * This version parses in place (i.e. it modifies the in buffer and
    * returns a pointer inside that).
    */
-  static char* ReadText(  char* in, char*& buf, int& buflen,
-        bool ignoreWhiteSpace,
-        const char* endTag);
+  static char* ReadText(char* in, char*& buf, 
+    int& buflen, bool ignoreWhiteSpace, const char* endTag);
 
 protected:
-  virtual char* Parse( TrDocument* document, char* p ) = 0;
+  virtual char* Parse( const ParseInfo& parse, char* p ) = 0;
 
   // If an entity has been found, transform it into a character.
   static char* GetEntity( char* in, char* value );
@@ -177,7 +174,6 @@ private:
     MAX_ENTITY_LENGTH = 6
   };
   static Entity entity[ NUM_ENTITY ];
-  static bool condenseWhiteSpace;
 };
 
 
@@ -293,7 +289,7 @@ public:
 protected:
   // Figure out what is at *p, and parse it. Returns null if it is not an xml
   // node.
-  TrDocumentNode* Identify( TrDocument* document, const char* start );
+  TrDocumentNode* Identify( const ParseInfo& parse, const char* start );
 
   // The node is passed in by ownership. This object will delete it.
   TrDocumentNode* LinkEndChild( TrDocumentNode* lastChild,
@@ -351,7 +347,7 @@ public:
    * Attribute parsing starts: first letter of the name
    * returns: the next char after the value end quote
    */
-  char* Parse( TrDocument* document, char* p );
+  char* Parse( const ParseInfo& parse, char* p );
 
 private:
   const char* name;
@@ -440,13 +436,13 @@ protected:
    * Attribtue parsing starts: next char past '<'
    * returns: next char past '>'
    */
-  virtual char* Parse( TrDocument* document, char* p );
+  virtual char* Parse( const ParseInfo& parse, char* p );
 
   /*  [internal use]
    * Reads the "value" of the element -- another element, or text.
    * This should terminate with the current end tag.
    */
-  char* ReadValue( TrDocument* document, char* in );
+  char* ReadValue( const ParseInfo& parse, char* in );
 
 private:
   TrDocumentAttributeSet attributeSet;
@@ -476,7 +472,7 @@ protected:
    * Attribtue parsing starts: at the ! of the !--
    * returns: next char past '>'
    */
-  virtual char* Parse( TrDocument* document, char* p );
+  virtual char* Parse( const ParseInfo& parse, char* p );
 
   char* value;
   int vallen;
@@ -508,7 +504,7 @@ protected :
    * Attribtue parsing starts: First char of the text
    * returns: next char past '>'
    */
-  virtual char* Parse( TrDocument* document,  char* p );
+  virtual char* Parse( const ParseInfo& parse,  char* p );
 
   char* value;
   int vallen;
@@ -531,7 +527,7 @@ public:
   virtual ~TrXmlCData() {}
 
 protected :
-  virtual char* Parse( TrDocument* document,  char* p );
+  virtual char* Parse( const ParseInfo& parse,  char* p );
 };
 
 /**
@@ -580,7 +576,7 @@ protected:
   //  [internal use]
   //  Attribtue parsing starts: next char past '<'
   //           returns: next char past '>'
-  virtual char* Parse( TrDocument* document,  char* p );
+  virtual char* Parse( const ParseInfo& parse,  char* p );
 
 private:
   const char* version;
@@ -608,7 +604,7 @@ protected:
    * Attribute parsing starts: First char of the text
    * returns: next char past '>'
    */
-  virtual char* Parse( TrDocument* document,  char* p );
+  virtual char* Parse( const ParseInfo& parse,  char* p );
 
   char* value;
   int vallen;
@@ -652,7 +648,7 @@ public:
   virtual const char * Value () { return 0; }
 
   /// Parse the given null terminated block of xml data.
-  virtual char* Parse( TrDocument* document,  char* p );
+  virtual char* Parse( const ParseInfo& parse,  char* p );
 
   /// If, during parsing, a error occurs, Error will be set to true.
   bool Error() const { return error; }
@@ -677,10 +673,26 @@ public:
     errorDesc = errorString[ errorId ];
   }
 
+  /**
+   * The world does not agree on whether white space should be kept or
+   * not. In order to make everyone happy, these functions are provided 
+   * to set whether or not TinyXml will condense all white space into a 
+   * single space or not. The default is to condense. 
+   */
+  void SetCondenseWhiteSpace( bool condense )
+  { parse.condenseWhiteSpace = condense; }
+
+  /// Return the current white space setting.
+  bool IsWhiteSpaceCondensed()
+  { return parse.condenseWhiteSpace; }
 private:
   bool error;
   int  errorId;
   const char* errorDesc;
+  ParseInfo parse;
+
+  static char* ReadName_ISO_8859_1 (char* p);
+  static bool IsNameStart_ISO_8859_1 (const char* p);
 };
 
 #endif
