@@ -8,6 +8,11 @@
         <implementation>csLinuxJoystick</implementation>
         <description>Crystal Space Joystick plugin for GNU/Linux</description>
       </class>
+      <class>
+        <name>crystalspace.device.joystick</name>
+        <implementation>csLinuxJoystick</implementation>
+        <description>Crystal Space Joystick plugin for GNU/Linux</description>
+      </class>
     </classes>
   </scf>
 </plugin>

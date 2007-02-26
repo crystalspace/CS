@@ -6,6 +6,148 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Jan-2007
+	- res committed a number of patches from Ryan Thorik to allow building
+	  on Solaris and IRIX:
+	    * finite() is declared in ieeefp.h on Solaris 10.
+	    * Add MIPS, SPARC, and Alpha to the IEEE float arch list.
+	    * Allow dlmalloc to get IRIX's pagesize (otherwise it would be 
+	      complaining about _PAGESZ being undefined).
+	    * Fix "va_list' has not been declared" issue on Solaris.
+	- caedes made the following changes to swig interface files:
+	    - added cstool/enginetools, cstool/pen and csgeom/pmtools.
+	    - added a macro called ARRAY_OBJECT_FUNCTIONS to add language
+	      specific array functions to interfaces.
+	    - added a helper function to csMeshedPolygon so vertex indexes
+	      can be retrieved (GetVertexByIndex).
+	    - removed warnings from CS_QUERY_REGISTRY_TAG by removing all
+	      mentions to these macro and also ignoring 
+	      CS_QUERY_REGISTRY_TAG_is_deprecated;
+	- caedes made the following changes to python swig interface files:
+	    - added wrappers for iPolygonMesh GetTriangles, GetVertices and
+	      GetPolygons so these can be used from python.
+	    - implemented ARRAY_OBJECT_FUNCTIONS for python by using some
+	      older macros.
+	    - changed PYLIST_* macros a bit so they can be used for non
+	      pointer types (like int).
+	    - added a workaround for iPen::Rotate giving problems with
+	      swig .28.
+	    - added iterator to the genmesh and polymesh array helpers.
+	    - added list protocol to csMeshedPolygon so it can be handled like
+	      a vert index python list.
+	    - updated python event handler for new scf.
+	- caedes added csPolygonMeshTools::CalculateVertexConnections to get
+	  vertex connection information from a polymesh.
+	- caedes added csArray<csArray<int> > template declaration to swig
+	  interface files so it can be handled.
+	- caedes added added %newobject declaration in swig interface files
+	  for csPolygonMeshTools::CalculateVertexConnections so it will be
+	  cleaned up by python.
+9-Jan-2007
+	- Marten added a timeout parameter to CS::Threading::Condition::Wait.
+	- res fixed the clipping rectangle for walktest's "cubemapshots"
+	  command.
+	- res made CS::Threading::Condition::Wait() return whether the wait
+	  timed out or ended due a change of the condition.
+	- res fixed compilation of the pthreads CS::Threading::Condition::Wait().
+	- res added a simple translator plugin from Darek Dawidowski.
+	- Anders Stenberg added a halfassed water test level (water.zip). 
+	  It's not very good right now, but could be a test bed for further
+	  testing.
+8-Jan-2007
+	- Marten did various optimizations and cleanups in lighter2.
+	- Marten made sure the core parts of lighter2 are thread safe to
+	  later make it mutli-threaded.
+	- res fixed some gcc compiler errors and warnings in lighter2.
+7-Jan-2007
+	- David Bronke fixed the windows joystick plugin and corrected his
+	  previous history.txt entry.
+6-Jan-2007
+	- David Bronke added functions to iCEGUI to enable and disable
+	  capturing of mouse and keyboard input events.
+4-Jan-2007
+	- res made lighter2 add an ambient term to the lightmaps.
+	- res moved lighter2's cleanup code from an explicitly called method
+	  to the app class destructor.
+	- res fixed lighter2 to properly add the ambient term for vertex-lit
+	  meshes affected by PD lights.
+	- res changed the way lighter2 stores element areas to take less
+	  memory. Now, a bit array stores whether an element is empty or full,
+	  and only the area of neither empty not full elements is stored.
+3-Jan-2007
+	- res tweaked ptpdlight to not store light IDs as hex strings
+	  internally but as raw data.
+	- res augmented the genmesh loader to also take anim controls in
+	  objects: it loads the anim control factory, creates a single control,
+	  and sets that on the mesh object.
+	- res added a genmesh animation plugin for per-vertex PD lighting.
+	- res added support for per-vertex PD lighting to lighter2.
+	- res tweaked the MSVC build guide to reflect that multiple 
+	  directories for projects for different VC versions exist.
+2-Jan-2007
+	- res renamed 'imagetool' to 'csimagetool', as suggested by Eric
+	  (Since the pretty generic name 'imagetool' can easily collide with 
+	  other packages when installed in locations like /usr/bin).
+1-Jan-2007
+	- res changed genmeshify to better handle smoothed Things.
+31-Dec-2006
+	- res added csConstPtrKey (so const pointers can be used in hashes).
+	- res fixed VC8 deprecation warnings in textureformatstrings.cpp.
+	- res changed walktest to show the mesh name of hit objects for 
+	  non-things as well.
+	- res made the "VFS not found" message a wee tad more helpful.
+	- res changed the lighter2 lightmap layouter to consider vertices as
+	  "equal" that have the same position. That makes it possible that
+	  neighbouring coplanar primitives, but whose adjacent vertices have
+	  different indices, are still layouted next to each other on the 
+	  lightmap.
+	- res added a small hack to the lightmap layouter so that the lightmap 
+	  coordinates for vertices for two adjacent faces are lined up nicely.
+	- res changed lighter2 to only check key/value pairs with the name 
+	  "lighter2" for lighter2-specific object/factory settings.
+	- res tweaked lighter2 to better handle "unwanted occlusion" that can
+	  occur on lightmap elements that straddle the edge of a primitive.
+	  Now, for outside samples, ignored are hits against primitives that
+	  are neighbours to the originating primitives, or primitives that 
+	  were not hit for any inside sample.
+	- res changed lighter2's default ignore strategy for primtives back to
+	  only ignore the originating primitve, not all coplanar primitives.
+	  (This should suffice for "inside" samples; "outside" samples use a
+	  more complex ignore strategy anyway, which also includes coplanar
+	  faces.)
+	- res made lighter2 force per-vertex lighting for an object if the 
+	  factory has per-vertex lightng enabled. Previously, PVL for an 
+	  object could be disabled even if the factory had it enabled. 
+	  However, with the new restriction, lightmap layouting on the factory 
+	  can be saved when the factory is set for PVL.
+	- res changed lighter2's ObjectVertexData::Transform() to also
+	  transform the normal.
+	- Eric Sunshine made minor grammatical and mark-up corrections to the
+	  new event system documentation (CS/docs/texinfo/usingcs/events).
+	  Also fixed some other mark-up errors reported by 'makeinfo'.
+28-Dec-2006
+	- res dropped CEGUI 0.4 support.
+27-Dec-2006
+	- res added some documentation on the new event system (essentially the
+	  appendix entry on the event system changes, somewhat reworded).
+	- res made some doxygen settings tweaks.
+	- res renamed "gfxtest" to "imagetool".
+	- res made some tweaks to the lighter2 TUI to better work on Linux.
+	- res fixed the lighter2 tui and Win32 ANSI support for the fact that
+	  cursor positions are 1-based, not 0-based.
+	- res made a number of warning fixes.
+26-Dec-2006
+	- Luca corrected some typos in the section 4.5.2.2 (Threading library)
+	  of the manual.
+25-Dec-2006
+	- Genjix fixed Andrew Dai's history.txt entry.
+23-Dec-2006
+	- Andrew Dai made the constant used in testing for leg collisions with
+	  the actor larger to prevent infinite loops from math inaccuracies
+	  when testing against artifact triangles in the world.
+21-Dec-2006
+	- Genjix made a common plugin name for both implementations of joystick
+	  driver. Old method of loading them should slowly be deprecated.
 19-Dec-2006
 	- Genjix added fix to iEngine::CreateBlackTexture where it will return 0
 	  when a null pointer is passed for its name parameter.

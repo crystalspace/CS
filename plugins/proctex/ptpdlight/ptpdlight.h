@@ -47,7 +47,7 @@ protected:
   iObjectRegistry* object_reg;
 
   void Report (int severity, iDocumentNode* node, const char* msg, ...);
-
+  bool HexToLightID (char* lightID, const char* lightIDHex);
 public:
   ProctexPDLightLoader (iBase *p);
   virtual ~ProctexPDLightLoader ();
@@ -133,8 +133,23 @@ public:
   struct MappedLight
   {
     PDMap map;
-    csString* lightId;
+    char* lightId;
     csWeakRef<iLight> light;
+
+    MappedLight() : lightId (0) {}
+    MappedLight (const MappedLight& other)
+    {
+      map = other.map;
+      if (other.lightId != 0)
+      {
+        lightId = new char[16];
+        memcpy (lightId, other.lightId, 16);
+      }
+      else
+        lightId = 0;
+      light = other.light;
+    }
+    ~MappedLight() { delete[] lightId; }
   };
 private:
   typedef csDirtyAccessArray<Lumel> LightmapScratch;
@@ -153,7 +168,6 @@ private:
   csFlags state;
 
   void Report (int severity, const char* msg, ...);
-  bool HexToLightID (char* lightID, const csString& lightIDHex);
   void UpdateAffectedArea ();
 public:
   const char* AddLight (const MappedLight& light);

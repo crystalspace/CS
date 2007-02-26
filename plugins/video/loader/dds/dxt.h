@@ -100,7 +100,6 @@ namespace dds
         colours[3].a = 0x00;
       }
       
-      Color8888* colorPtr = outColor;
       for (int j = 0, k = 0; j < 4; j++) 
       {
         for (int i = 0; i < 4; i++, k++) 

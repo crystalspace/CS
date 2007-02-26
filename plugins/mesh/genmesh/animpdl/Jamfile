@@ -1,0 +1,12 @@
+SubDir TOP plugins mesh genmesh animpdl ;
+
+Description gmeshanimpdl : "Genmesh animation plugin for PD lights" ;
+
+Plugin gmeshanimpdl
+	: [ Wildcard *.cpp *.h ]
+;
+Includes gmeshanimpdl.h : $(SUBDIR)/gmeshanimpdl.tok ;
+MsvcExtraFile gmeshanimpdl : $(SUBDIR)/gmeshanimpdl.tok ;
+LinkWith gmeshanimpdl : crystalspace ;
+
+CompileGroups gmeshanimpdl :  meshes ;

@@ -82,7 +82,7 @@ protected:
    * Needed for GCC4. Otherwise emits a flood of "virtual functions but
    * non-virtual destructor" warnings.
    */
-//  virtual ~csRunnable() {}
+  virtual ~csRunnable() {}
 public:
   /// Implement this method to allow your object to be run in a thread.
   virtual void Run () = 0;

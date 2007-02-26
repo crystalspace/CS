@@ -1028,7 +1028,9 @@ bool csColliderActor::AdjustForCollisions (
       csPlane3 obstacle (cd.a2, cd.b2, cd.c2);
       csVector3 normal = obstacle.Normal();
       float norm = normal.Norm ();
-      if (fabs (norm) < SMALL_EPSILON) continue;
+
+      // Ensure this is a big-enough triangle to count as a collision.
+      if (fabs (norm) < 1e-4f ) continue;
 
       csVector3 n = normal / norm;
 

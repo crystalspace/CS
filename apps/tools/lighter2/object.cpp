@@ -29,32 +29,47 @@ namespace lighter
 {
 
   ObjectFactory::ObjectFactory ()
-    : factoryWrapper (0), lightPerVertex (false),
+    : lightPerVertex (false),
     lmuScale (globalConfig.GetLMProperties ().uTexelPerUnit),
-    lmvScale (globalConfig.GetLMProperties ().vTexelPerUnit)
+    lmvScale (globalConfig.GetLMProperties ().vTexelPerUnit), 
+    factoryWrapper (0)
   {
   }
 
   bool ObjectFactory::PrepareLightmapUV (LightmapUVFactoryLayouter* uvlayout)
   {
     BeginSubmeshRemap ();
-    size_t oldSize = unlayoutedPrimitives.GetSize();
-    for (size_t i = 0; i < oldSize; i++)
+    if (lightPerVertex)
     {
-      csArray<PrimitiveArray> newPrims;
-      csRef<LightmapUVObjectLayouter> lightmaplayout = 
-        uvlayout->LayoutFactory (unlayoutedPrimitives[i], vertexData, this, newPrims);
-      if (!lightmaplayout) return false;
-
-      for (size_t n = 0; n < newPrims.GetSize(); n++)
+      size_t oldSize = unlayoutedPrimitives.GetSize();
+      for (size_t i = 0; i < oldSize; i++)
       {
-        layoutedPrimitives.Push (LayoutedPrimitives (newPrims[n],
-          lightmaplayout, n));
-
-        AddSubmeshRemap (i, layoutedPrimitives.GetSize () - 1);
+        layoutedPrimitives.Push (LayoutedPrimitives (unlayoutedPrimitives[i],
+          0, 0));
+        AddSubmeshRemap (i, i);
       }
+      unlayoutedPrimitives.DeleteAll();
     }
-    unlayoutedPrimitives.DeleteAll();
+    else
+    {
+      size_t oldSize = unlayoutedPrimitives.GetSize();
+      for (size_t i = 0; i < oldSize; i++)
+      {
+        csArray<PrimitiveArray> newPrims;
+        csRef<LightmapUVObjectLayouter> lightmaplayout = 
+          uvlayout->LayoutFactory (unlayoutedPrimitives[i], vertexData, this, newPrims);
+        if (!lightmaplayout) return false;
+
+        for (size_t n = 0; n < newPrims.GetSize(); n++)
+        {
+          layoutedPrimitives.Push (LayoutedPrimitives (newPrims[n],
+            lightmaplayout, n));
+
+          AddSubmeshRemap (i, layoutedPrimitives.GetSize () - 1);
+        }
+      }
+      unlayoutedPrimitives.DeleteAll();
+    }
     FinishSubmeshRemap ();
 
     return true;
@@ -79,7 +94,7 @@ namespace lighter
       iObject* obj = objiter->Next();
       csRef<iKeyValuePair> kvp = 
         scfQueryInterface<iKeyValuePair> (obj);
-      if (kvp.IsValid())
+      if (kvp.IsValid() && (strcmp (kvp->GetKey(), "lighter2") == 0))
       {
         const char* vVertexlight = kvp->GetValue ("vertexlight");
         if (vVertexlight != 0)
@@ -147,13 +162,15 @@ namespace lighter
   //-------------------------------------------------------------------------
 
   Object::Object (ObjectFactory* fact)
-    : factory (fact), lightPerVertex (fact->lightPerVertex), litColors (0)
+    : lightPerVertex (fact->lightPerVertex), litColors (0), litColorsPD (0), 
+      factory (fact)
   {
   }
   
   Object::~Object ()
   {
     delete litColors;
+    delete litColorsPD;
   }
 
   bool Object::Initialize ()
@@ -207,6 +224,7 @@ namespace lighter
       litColors = new LitColorArray();
       litColors->SetSize (vertexData.vertexArray.GetSize(), 
         csColor (0.0f, 0.0f, 0.0f));
+      litColorsPD = new LitColorsPDHash();
     }
 
     return true;
@@ -280,11 +298,16 @@ namespace lighter
       iObject* obj = objiter->Next();
       csRef<iKeyValuePair> kvp = 
         scfQueryInterface<iKeyValuePair> (obj);
-      if (kvp.IsValid())
+      if (kvp.IsValid() && (strcmp (kvp->GetKey(), "lighter2") == 0))
       {
-        const char* vVertexlight = kvp->GetValue ("vertexlight");
-        if (vVertexlight != 0)
-          lightPerVertex = (strcmp (vVertexlight, "yes") == 0);
+        if (!factory->lightPerVertex)
+        {
+          /* Disallow "disabling" of per-vertex lighting in an object when
+           * it's enabled for the factory. */
+          const char* vVertexlight = kvp->GetValue ("vertexlight");
+          if (vVertexlight != 0)
+            lightPerVertex = (strcmp (vVertexlight, "yes") == 0);
+        }
       }
     }
   }
@@ -360,7 +383,7 @@ namespace lighter
           uint vindex = v * mask.width;
           for (uint u = minu; u <= (uint)maxu; u++, findex++)
           {
-            const float elemArea = prim.GetElementAreas ()[findex];
+            const float elemArea = prim.GetElementAreas ().GetElementArea (findex);
             if (elemArea == 0) continue; // No area, skip
 
             mask.maskData[vindex+u] += elemArea * area2pixel; //Accumulate
@@ -371,5 +394,15 @@ namespace lighter
 
   }
 
+  Object::LitColorArray* Object::GetLitColorsPD (Light* light)
+  {
+    LitColorArray* colors = litColorsPD->GetElementPointer (light);
+    if (colors != 0) return colors;
+
+    LitColorArray newArray;
+    newArray.SetSize (litColors->GetSize(), csColor (0));
+    litColorsPD->Put (light, newArray);
+    return litColorsPD->GetElementPointer (light);
+  }
 
 }

@@ -158,12 +158,20 @@ csPtr<iBase> ProctexPDLightLoader::Parse (iDocumentNode* node,
           }
           ProctexPDLight::MappedLight light;
           light.map = map;
-          light.lightId = new csString (lightId);
-          const char* err = pt->AddLight (light);
-          if (err != 0)
+          light.lightId = new char[16];
+          if (!HexToLightID (light.lightId, lightId))
           {
             Report (CS_REPORTER_SEVERITY_WARNING, child, 
-              "Couldn't add map '%s' for light '%s': %s", image, lightId, err);
+              "Invalid light ID '%s'", lightId);
+          }
+          else
+          {
+            const char* err = pt->AddLight (light);
+            if (err != 0)
+            {
+              Report (CS_REPORTER_SEVERITY_WARNING, child, 
+                "Couldn't add map '%s' for light '%s': %s", image, lightId, err);
+            }
           }
         }
       }
@@ -200,6 +208,46 @@ void ProctexPDLightLoader::Report (int severity, iDocumentNode* node,
   }
 
   va_end (arg);
+}
+
+bool ProctexPDLightLoader::HexToLightID (char* lightID, const char* lightIDHex)
+{
+  bool valid = strlen (lightIDHex) == 32;
+  if (valid)
+  {
+    for (size_t i = 0; i < 16; i++)
+    {
+      uint8 v;
+      char digit16 = lightIDHex[i*2];
+      char digit1 = lightIDHex[i*2+1];
+
+      if ((digit16 >= '0') && (digit16 <= '9'))
+        v = 16*(digit16-'0');
+      else if ((digit16 >= 'a') && (digit16 <= 'f'))
+        v = 16*(digit16-'a'+10);
+      else if ((digit16 >= 'A') && (digit16 <= 'F'))
+        v = 16*(digit16-'A'+10);
+      else
+      {
+        valid = false; 
+        break;
+      }
+
+      if ((digit1 >= '0') && (digit1 <= '9'))
+        v += (digit1-'0');
+      else if ((digit1 >= 'a') && (digit1 <= 'f'))
+        v += (digit1-'a'+10);
+      else if ((digit1 >= 'A') && (digit1 <= 'F'))
+        v += (digit1-'A'+10);
+      else
+      {
+        valid = false; 
+        break;
+      }
+      lightID[i] = char (v);
+    }
+  }
+  return valid;
 }
 
 //---------------------------------------------------------------------------
@@ -275,53 +323,6 @@ void ProctexPDLight::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-bool ProctexPDLight::HexToLightID (char* lightID, const csString& lightIDHex)
-{
-  bool valid = lightIDHex.Length() == 32;
-  if (valid)
-  {
-    for (size_t i = 0; i < 16; i++)
-    {
-      uint8 v;
-      char digit16 = lightIDHex[i*2];
-      char digit1 = lightIDHex[i*2+1];
-
-      if ((digit16 >= '0') && (digit16 <= '9'))
-        v = 16*(digit16-'0');
-      else if ((digit16 >= 'a') && (digit16 <= 'f'))
-        v = 16*(digit16-'a'+10);
-      else if ((digit16 >= 'A') && (digit16 <= 'F'))
-        v = 16*(digit16-'A'+10);
-      else
-      {
-        valid = false; 
-        break;
-      }
-
-      if ((digit1 >= '0') && (digit1 <= '9'))
-        v += (digit1-'0');
-      else if ((digit1 >= 'a') && (digit1 <= 'f'))
-        v += (digit1-'a'+10);
-      else if ((digit1 >= 'A') && (digit1 <= 'F'))
-        v += (digit1-'A'+10);
-      else
-      {
-        valid = false; 
-        break;
-      }
-      lightID[i] = char (v);
-    }
-  }
-  if (valid)
-    return true;
-  else
-  {
-    Report (CS_REPORTER_SEVERITY_WARNING, 
-      "Invalid light ID: '%s'", lightIDHex.GetData());
-    return false;
-  }
-}
-
 void ProctexPDLight::UpdateAffectedArea ()
 {
   if (!state.Check (stateAffectedAreaDirty)) return;
@@ -382,24 +383,23 @@ bool ProctexPDLight::PrepareAnim ()
   for (size_t i = 0; i < lights.GetSize(); )
   {
     MappedLight& light = lights[i];
-    char lightID[16];
     bool success = false;
-    if (HexToLightID (lightID, *light.lightId))
+    light.light = engine->FindLightID (light.lightId);
+    if (light.light)
     {
-      light.light = engine->FindLightID (lightID);
-      if (light.light)
-      {
-        success = true;
-        light.light->AddAffectedLightingInfo (
-          static_cast<iLightingInfo*> (this));
-      }
-      else
-      {
-        Report (CS_REPORTER_SEVERITY_WARNING, 
-          "Could not find light with ID '%s'", light.lightId->GetData());
-      }
+      success = true;
+      light.light->AddAffectedLightingInfo (
+        static_cast<iLightingInfo*> (this));
     }
-    delete light.lightId;
+    else
+    {
+      csString hexId;
+      for (int i = 0; i < 16; i++)
+        hexId.AppendFmt ("%02x", light.lightId[i]);
+      Report (CS_REPORTER_SEVERITY_WARNING, 
+        "Could not find light with ID '%s'", hexId.GetData());
+    }
+    delete[] light.lightId; light.lightId = 0;
     if (success)
     {
       i++;
@@ -526,7 +526,7 @@ void ProctexPDLight::LightDisconnect (iLight* light)
     if (lights[i].light == light)
     {
       lights.DeleteIndexFast (i);
-      state.Set (stateAffectedAreaDirty);
+      state.Set (stateDirty);
       return;
     }
   }

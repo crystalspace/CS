@@ -368,20 +368,26 @@ namespace lighter
 
     ObjectFactory_Genmesh* factory = 
       static_cast<ObjectFactory_Genmesh*> (this->factory);
-
+    
     genMesh->RemoveRenderBuffer ("colors");
     genMesh->RemoveRenderBuffer ("texture coordinate lightmap");
 
     if (lightPerVertex)
     {
-      csRef<csRenderBuffer> colorsBuffer = csRenderBuffer::CreateRenderBuffer (
-        vertexData.vertexArray.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
-      genMesh->AddRenderBuffer ("colors", colorsBuffer);
-      // @@@ FIXME: Use global options, when we have them
-      LightmapPostProcess::ApplyExposureFunction (litColors->GetArray(),
-        vertexData.vertexArray.GetSize(), 1.8f, 1.0f); 
-      colorsBuffer->CopyInto (litColors->GetArray(),
-        vertexData.vertexArray.GetSize());
+      scene->lightmapPostProc.ApplyAmbient (litColors->GetArray(),
+        vertexData.vertexArray.GetSize()); 
+      scene->lightmapPostProc.ApplyExposure (litColors->GetArray(),
+        vertexData.vertexArray.GetSize()); 
+
+      if (!litColorsPD)
+      {
+        csRef<csRenderBuffer> colorsBuffer = csRenderBuffer::CreateRenderBuffer (
+          vertexData.vertexArray.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+        genMesh->AddRenderBuffer ("colors", colorsBuffer);
+
+        colorsBuffer->CopyInto (litColors->GetArray(),
+          vertexData.vertexArray.GetSize());
+      }
     }
 
     // Still may need to fix up submesh materials...
@@ -436,6 +442,55 @@ namespace lighter
     }
 
     Object::SaveMesh (scene, node);
+
+    // Tack on animation control for PD lights
+    if (lightPerVertex && litColorsPD)
+    {
+      csRef<iSyntaxService> synsrv = 
+        csQueryRegistry<iSyntaxService> (globalLighter->objectRegistry);
+
+      csRef<iDocumentNode> paramChild = node->GetNode ("params");
+
+      csRef<iDocumentNode> animcontrolChild = 
+        paramChild->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+      animcontrolChild->SetValue ("animcontrol");
+      animcontrolChild->SetAttribute ("plugin", "crystalspace.mesh.anim.pdlight");
+
+      {
+        csRef<iDocumentNode> staticColorsChild =
+          animcontrolChild->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+        staticColorsChild->SetValue ("staticcolors");
+
+        csRef<iRenderBuffer> colorsBuf = 
+          csRenderBuffer::CreateRenderBuffer (litColors->GetSize(), 
+            CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
+        colorsBuf->CopyInto (litColors->GetArray(), litColors->GetSize());
+
+        synsrv->WriteRenderBuffer (staticColorsChild, colorsBuf);
+      }
+
+      LitColorsPDHash::GlobalIterator pdIter (litColorsPD->GetIterator ());
+      while (pdIter.HasNext ())
+      {
+        csPtrKey<Light> light;
+        LitColorArray& colors = pdIter.Next (light);
+
+        csRef<iDocumentNode> lightChild =
+          animcontrolChild->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+        lightChild->SetValue ("light");
+        lightChild->SetAttribute ("lightid", light->GetLightID().HexString());
+
+        scene->lightmapPostProc.ApplyExposure (colors.GetArray(),
+          colors.GetSize()); 
+
+        csRef<iRenderBuffer> colorsBuf = 
+          csRenderBuffer::CreateRenderBuffer (colors.GetSize(), 
+            CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
+        colorsBuf->CopyInto (colors.GetArray(), colors.GetSize());
+
+        synsrv->WriteRenderBuffer (lightChild, colorsBuf);
+      }
+    }
   }
 
   void Object_Genmesh::StripLightmaps (csSet<csString>& lms)

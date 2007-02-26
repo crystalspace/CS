@@ -30,6 +30,38 @@ namespace lighter
   struct ObjectVertexData;
   struct ElementProxy;
 
+  class Primitive;
+
+  class ElementAreas
+  {
+    friend class Primitive;
+    
+    float fullArea;
+    size_t elementCount;
+
+    csBitArray elementsBits;
+    struct ElementFloatPair
+    {
+      size_t element;
+      float area;
+    };
+    csArray<ElementFloatPair> fractionalElements;
+
+    void DeleteAll();
+    void SetFullArea (float fullArea) { this->fullArea = fullArea; }
+    void SetSize (size_t count);
+    void SetElementArea (size_t element, float area);
+    void ShrinkBestFit ();
+
+    static int ElementFloatPairCompare (const ElementFloatPair& i1,
+      const ElementFloatPair& i2);
+    static int ElementFloatPairSearch (const ElementFloatPair& item,
+      const size_t& key);
+  public:
+    float GetElementArea (size_t element) const;
+    size_t GetSize() const { return elementCount; }
+  };
+
   /**
   * Primitive in the radiosity world.
   * Represents a single primitive (face) in the radiosity world.
@@ -116,7 +148,7 @@ namespace lighter
     /// Get u/v offset of element
     inline void GetElementUV (size_t elementIndex, size_t &u, size_t &v) const
     {
-      size_t uWidth = (maxUV.x - minUV.x + 1);
+      size_t uWidth = size_t (maxUV.x - minUV.x + 1);
 
       u = (elementIndex % uWidth);
       v = (elementIndex / uWidth);
@@ -140,7 +172,7 @@ namespace lighter
     inline const csColor& GetIlluminationColor () const { return illuminationColor; }
     inline const csColor& GetReflectanceColor () const { return reflectanceColor; }
 
-    inline const FloatDArray& GetElementAreas () const { return elementAreas; }
+    inline const ElementAreas& GetElementAreas () const { return elementAreas; }
 
     inline const csVector3& GetMinCoord () const { return minCoord; }
     inline const csVector2& GetMinUV () const { return minUV; }
@@ -177,8 +209,11 @@ namespace lighter
     csColor illuminationColor;
     csColor reflectanceColor;
 
+    //@{
     /// Elements
-    FloatDArray elementAreas;
+    size_t elementCount;
+    ElementAreas elementAreas;
+    //@}
 
     /// Min/max data
     csVector3 minCoord;

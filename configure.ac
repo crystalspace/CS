@@ -143,6 +143,7 @@ CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [$LDFLAGS], [+])
 AC_LANG_PUSH([C++])
 AC_CHECK_HEADERS([cmath], [CS_HEADER_PROPERTY([CS_HAVE_CMATH_H])])
 AC_CHECK_HEADERS([math.h], [CS_HEADER_PROPERTY([CS_HAVE_MATH_H])])
+AC_CHECK_HEADERS([ieeefp.h], [CS_HEADER_PROPERTY([CS_HAVE_IEEEFP_H])])
 AC_LANG_POP([C++])
 
 CS_CHECK_COMMON_LIBS
@@ -1585,7 +1586,11 @@ AS_IF([test $cs_cv_libCEGUI = yes],
     [CS_CHECK_BUILD([if CEGUI is sufficiently recent], [cs_cv_CEGUI_recent],
 	[AC_LANG_PROGRAM(
 	    [[#include <falagard/CEGUIFalWidgetLookManager.h>]],
-	    [CEGUI::WidgetLookManager::getSingleton();])],
+	    [CEGUI::WidgetLookManager::getSingleton();
+	    #if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR < 5)
+	    who took the ram from the ramalamadingdong?
+	    #endif
+	    ])],
 	[], [C++],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libCEGUI], [CEGUI])], [], [],
 	[$cs_cv_libCEGUI_cflags],
@@ -2226,6 +2231,9 @@ AC_DEFUN([CS_CHECK_FINITE],
 	    #endif
 	    #if HAVE_MATH_H
 	    #include <math.h>
+	    #endif
+	    #if HAVE_IEEEFP_H
+	    #include <ieeefp.h>
 	    #endif]],
 	    [float f; $1(f)])],
 	[], [C++], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_HAVE_$1]))], [], [],
@@ -2238,6 +2246,9 @@ CS_CHECK_BUILD([for std::isfinite], [cs_cv_func_std__isfinite],
 	#endif
 	#if HAVE_MATH_H
 	#include <math.h>
+	#endif
+	#if HAVE_IEEEFP_H
+	#include <ieeefp.h>
 	#endif]],
 	[float f; std::isfinite(f)])],
     [], [C++], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_HAVE_STD__ISFINITE]))],

@@ -227,7 +227,10 @@ class CSMutableArrayHelper:
       raise IndexError('Length is ' + str(arrlen) + ', you asked for ' +
         str(key))
     return self.getFunc(key)
-
+  def content_iterator(self):
+    for idx in xrange(len(self)):
+      yield self.__getitem__(idx)
+  def __iter__(self): return self.content_iterator() 
   # We do not implement __setitem__ because the only legal action is to
   #  overwrite the object at the given location.  (The contents of the
   #  array are mutable, but the array is a single allocation of a single
@@ -268,6 +271,25 @@ class CSMutableArrayHelper:
 %pythoncode %{
   CS_POLYRANGE_LAST = csPolygonRange (-1, -1)
 %}
+
+/* allow using csMeshedPolygon as a (vert index) list */
+%extend csMeshedPolygon {
+  int __getitem__(int index)
+  { return self->vertices[index]; }
+  int __len__()
+  { return self->num_vertices; }
+}
+PYITERATOR_PROTOCOL(csMeshedPolygon)
+
+/* work around broken Rotate function with swig 1.3.28 */
+%extend iPen {
+        void _Rotate(float a)
+        { self->Rotate(a); }
+    %pythoncode %{
+    def Rotate(self,a):
+         return _cspace.iPen__Rotate(a)
+    %}
+}
 #endif // CS_MINI_SWIG
 
 /*
