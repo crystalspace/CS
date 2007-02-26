@@ -143,6 +143,13 @@ public:
    * Otherwise 0 is returned.
    */
   static csColliderWrapper* GetColliderWrapper (iObject* object);
+
+  /// Update collider from a polymesh.
+  void UpdateCollider(iPolygonMesh* mesh);
+
+  /// Update collider from a terraformer.
+  void UpdateCollider(iTerraFormer* terrain);
+
 };
 
 /**

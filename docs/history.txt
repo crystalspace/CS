@@ -6,6 +6,31 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Jan-2007
+	- caedes did the following changes to cspace.i:
+	    - removed ignore for csStringFast.
+	    - added some ignores for csHash members and methods that cant
+	      be wrapped.
+	- caedes did the following changes to python swig files:
+	    - added in and out typemaps for csStringFast to python string 
+	      conversion.
+	    - added dict like interface for csHash (no iterator yet though).
+16-Jan-2007
+	- caedes did the following changes to cspace.i:
+	    - fixed vector division, was misimplemented as multiplication.
+	    - added declaration for some key event macros which are not
+	      found automatically by swig.
+12-Jan-2007
+	- caedes added scfImplementationExt1 template to scf.i swig file so
+	  this template can be wrapped.
+	- caedes added %template declarations in swig files for csPolygonMesh,
+	  csPolygonMeshBox, csObject and csColliderWrapper implementations so
+	  class inheritance info is preserved in scripting languages,
+	- caedes added csColliderWrapper::UpdateCollider functions to allow
+	  updating collider info for a collider wrapper.
+	- caedes removed the incref and decref in python event handler ctor and
+	  dtor inside swig files as it would cause a memory leak (due to decref
+	  in dtor never being called).
 11-Jan-2007
 	- res committed a number of patches from Ryan Thorik to allow building
 	  on Solaris and IRIX:

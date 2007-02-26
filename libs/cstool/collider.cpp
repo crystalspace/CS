@@ -139,6 +139,15 @@ csColliderWrapper* csColliderWrapper::GetColliderWrapper (iObject* object)
   return w;	// This will DecRef() but that's ok in this case.
 }
 
+void csColliderWrapper::UpdateCollider (iPolygonMesh* mesh)
+{
+  collider = collide_system->CreateCollider (mesh);
+}
+
+void csColliderWrapper::UpdateCollider (iTerraFormer* terrain)
+{
+  collider = collide_system->CreateCollider (terrain);
+}
 //----------------------------------------------------------------------
 
 csColliderWrapper* csColliderHelper::InitializeCollisionWrapper (

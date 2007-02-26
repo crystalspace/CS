@@ -250,6 +250,19 @@ class CSMutableArrayHelper:
   void __delitem__ (size_t i) { self->DeleteAt(i); }
 }
 
+// csutil/hash.h
+%extend csHash
+{
+  const T& __getitem__(const K& key) { return self->Get(key,T()); }
+  bool __delitem__(const K& key)
+  { return self->DeleteAll(key); }
+  void clear() { self->Empty(); }
+  bool __nonzero__ () { return self->IsEmpty(); }
+  void __setitem__(const K& key, const T &value) 
+  { self->PutUnique(key,value); }
+  size_t __len__() { return self->GetSize(); }
+}
+
 #ifndef CS_MINI_SWIG
 %pythoncode %{
 

@@ -28,13 +28,9 @@
   struct _csPyEventHandler : public scfImplementation1<_csPyEventHandler, iEventHandler>
   {
     _csPyEventHandler (PyObject * obj) : scfImplementationType(this), _pySelf(obj)
-    {
-      IncRef();
-    }
+    { }
     virtual ~_csPyEventHandler ()
-    {
-      DecRef();
-    }
+    { }
     virtual bool HandleEvent (iEvent & event)
     {
       PyObject * event_obj = SWIG_NewPointerObj(

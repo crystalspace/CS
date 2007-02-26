@@ -690,7 +690,6 @@ SET_HELPER(csStringID)
 %ignore csStringBase;
 %ignore csStringBase::operator [] (size_t);
 %ignore csStringBase::operator [] (size_t) const;
-%ignore csStringFast;
 %ignore csString::csString (size_t);
 %ignore csString::csString (char);
 %ignore csString::csString (unsigned char);
@@ -1023,6 +1022,8 @@ iArrayChangeElements<csShaderVariable * >;
 %ignore csPath::SetTimeValues;
 %ignore csPath::GetTimeValues;
 %include "csgeom/path.h"
+%template(pycsPolygonMesh) scfImplementation1<csPolygonMesh, iPolygonMesh>;
+%template(pycsPolygonMeshBox) scfImplementation1<csPolygonMeshBox, iPolygonMesh>;
 %include "csgeom/polymesh.h"
 
 %ignore csArray<csArray<int> >::Contains;
@@ -1198,6 +1199,14 @@ APPLY_TYPEMAP_ARGOUT_PTR(csKeyModifiers,csKeyModifiers& modifiers)
 %include "iutil/evdefs.h"
 %include "iutil/eventq.h"
 %ignore csStrKey::operator const char*;
+%ignore csHash::ConstGlobalIterator;
+%ignore csHash::GlobalIterator;
+%ignore csHash::Iterator;
+%ignore csHash::PutFirst;
+%ignore csHash::GetIterator;
+%ignore csHash::DeleteElement;
+%ignore csHash::Get (const K& key, T& fallback);
+%ignore csHash::csHash (const csHash<T> &o);
 %include "csutil/hash.h"
 %include "iutil/eventnames.h"
 %include "csutil/eventnames.h"
@@ -1312,11 +1321,13 @@ APPLY_TYPEMAP_ARGOUT_PTR(csKeyModifiers,csKeyModifiers& modifiers)
 %include "ivaria/simpleformer.h"
 %include "ivaria/terraform.h"
 
+%template(pycsObject) scfImplementation1<csObject,iObject >;
 %include "csutil/csobject.h"
 
 %ignore csColliderHelper::TraceBeam (iCollideSystem*, iSector*,
   const csVector3&, const csVector3&, bool, csIntersectingTriangle&,
   csVector3&, iMeshWrapper**);
+%template(pycsColliderWrapper) scfImplementationExt1<csColliderWrapper,csObject,scfFakeInterface<csColliderWrapper> >;
 %include "cstool/collider.h"
 %include "cstool/csview.h"
 %include "cstool/csfxscr.h"
@@ -1434,6 +1445,24 @@ APPLY_FOR_EACH_INTERFACE
   }
 %}
 
+
+// iutil/evdefs.h
+#define _CSKEY_SHIFT_NUM(n) CSKEY_SHIFT_NUM(n)
+#undef CSKEY_SHIFT_NUM
+int CSKEY_SHIFT_NUM(int n);
+
+#define _CSKEY_SPECIAL(n) CSKEY_SPECIAL(n)
+#undef CSKEY_SPECIAL
+int CSKEY_SPECIAL(int n);
+
+#define _CSKEY_SPECIAL_NUM(code) CSKEY_SPECIAL_NUM(code)
+#undef CSKEY_SPECIAL_NUM
+int CSKEY_SPECIAL_NUM(int code);
+
+#define _CSKEY_MODIFIER(type,num) CSKEY_MODIFIER(type,num)
+#undef CSKEY_MODIFIER
+int CSKEY_MODIFIER(int type,int num);
+
 // csutil/eventnames.h
 #define _CS_IS_KEYBOARD_EVENT(reg,e) CS_IS_KEYBOARD_EVENT(reg,e)
 #undef CS_IS_KEYBOARD_EVENT
@@ -1447,6 +1476,7 @@ bool _CS_IS_JOYSTICK_EVENT (iObjectRegistry *,const iEvent &);
 #define _CS_IS_INPUT_EVENT(reg,e) CS_IS_INPUT_EVENT(reg,e)
 #undef CS_IS_INPUT_EVENT
 bool _CS_IS_INPUT_EVENT (iObjectRegistry *,const iEvent &);
+
 
 /*
  New Macros for to use instead of event type masks
@@ -1550,7 +1580,7 @@ uint _CS_FX_SETALPHA_INT (uint);
   V operator - (const V & v) const { return *self - v; }
   float operator * (const V & v) const { return *self * v; }
   V operator * (float f) const { return *self * f; }
-  V operator / (float f) const { return *self * f; }
+  V operator / (float f) const { return *self / f; }
   bool operator == (const V & v) const { return *self == v; }
   bool operator != (const V & v) const { return *self != v; }
   bool operator < (float f) const { return *self < f; }
