@@ -24,7 +24,9 @@ rule SplitDebugInfo
 {
   local binary = $(1) ;
   DoSplitDebugInfo $(binary) ;
-  return $(binary).dbg ;
+  local debugfile = $(binary).dbg ;
+  LOCATE on $(debugfile) = [ on $(binary) GetVar LOCATE ] ;
+  return $(debugfile) ;
 }
 
 actions DoSplitDebugInfo

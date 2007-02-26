@@ -43,7 +43,7 @@ namespace
       csDataBuffer (data, size, false) { }
     virtual ~DataBufferFreePlatform()
     {
-      platform_free (csDataBuffer::GetData ());
+      free (csDataBuffer::GetData ());
     }
   };
 }
