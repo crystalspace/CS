@@ -9,6 +9,9 @@ chronological order.
 26-Feb-2007
 	- res slightly optimized xmlread by replacing uses of isspace(),
 	  isalpha() and isalnum() with custom implementations.
+	- res made some tweaks to AllocatorHeap.
+	- res added an optional "Allocator" template argument to 
+	  scfImplementationPooled.
 24-Feb-2007
 	- Andrew Robberts fixed top and bottom clipping in decals
 	- Jorrit did some imposter work:
