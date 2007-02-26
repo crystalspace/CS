@@ -20,7 +20,6 @@
 #include "csqint.h"
 #include "plugins/engine/3d/movable.h"
 #include "plugins/engine/3d/sector.h"
-#include "plugins/engine/3d/cscoll.h"
 #include "plugins/engine/3d/engine.h"
 #include "plugins/engine/3d/light.h"
 #include "plugins/engine/3d/meshobj.h"

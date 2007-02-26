@@ -31,7 +31,7 @@
 
 #include "csutil/cfgacc.h"
 
-#include "docwrap.h"
+#include "cpi/docwrap.h"
 #include "shader.h"
 #include "xmlshader.h"
 
@@ -55,7 +55,7 @@ csXMLShaderCompiler::csXMLShaderCompiler(iBase* parent) :
   // Set up builtin constants
 #define BUILTIN_CONSTANT(Type, Value)					    \
   condConstants.AddConstant (#Value, (Type)Value);
-#include "condconstbuiltin.inc"
+#include "cpi/condconstbuiltin.inc"
 #undef BUILTIN_CONSTANT
 }
 

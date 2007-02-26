@@ -21,7 +21,6 @@
 #include "plugins/engine/3d/region.h"
 #include "plugins/engine/3d/engine.h"
 #include "iengine/sector.h"
-#include "iengine/collectn.h"
 #include "iengine/campos.h"
 #include "iengine/texture.h"
 #include "iengine/material.h"
@@ -216,17 +215,6 @@ iCameraPosition *csRegion::FindCameraPosition (const char *iName)
       this, iCameraPosition, iName));
   return cp;	// DecRef is ok here.
 }
-
-#include "csutil/win32/msvc_deprecated_warn_off.h"
-
-iCollection *csRegion::FindCollection (const char *iName)
-{
-  csRef<iCollection> col (CS_GET_NAMED_CHILD_OBJECT (
-      this, iCollection, iName));
-  return col;	// DecRef is ok here.
-}
-
-#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 bool csRegion::IsInRegion (iObject *iobj)
 {

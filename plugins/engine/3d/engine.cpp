@@ -26,7 +26,6 @@
 #include "csqint.h"
 #include "csutil/cfgacc.h"
 #include "csutil/databuf.h"
-#include "csutil/debug.h"
 #include "csutil/scf.h"
 #include "csutil/scfstrset.h"
 #include "csutil/sysfunc.h"
@@ -65,7 +64,6 @@
 #include "ivideo/txtmgr.h"
 #include "plugins/engine/3d/camera.h"
 #include "plugins/engine/3d/campos.h"
-#include "plugins/engine/3d/cscoll.h"
 #include "plugins/engine/3d/engine.h"
 #include "plugins/engine/3d/halo.h"
 #include "plugins/engine/3d/light.h"
@@ -242,71 +240,6 @@ iCameraPosition *csCameraPositionList::FindByName (
 {
   return positions.FindByName (Name);
 }
-
-//---------------------------------------------------------------------------
-
-#include "csutil/win32/msvc_deprecated_warn_off.h"
-
-csCollectionList::csCollectionList ()
-  : scfImplementationType (this)
-{
-}
-
-csCollectionList::~csCollectionList ()
-{
-}
-
-iCollection *csCollectionList::NewCollection (const char *name)
-{
-  csRef<csCollection> c;
-  c.AttachNew (new csCollection (this));
-  c->SetName (name);
-  collections.Push (c);
-  return c;
-}
-
-int csCollectionList::GetCount () const
-{
-  return (int)collections.Length ();
-}
-
-iCollection *csCollectionList::Get (int n) const
-{
-  return collections.Get (n);
-}
-
-int csCollectionList::Add (iCollection *obj)
-{
-  return (int)collections.Push (obj);
-}
-
-bool csCollectionList::Remove (iCollection *obj)
-{
-  return collections.Delete (obj);
-}
-
-bool csCollectionList::Remove (int n)
-{
-  return collections.DeleteIndex (n);
-}
-
-void csCollectionList::RemoveAll ()
-{
-  collections.DeleteAll ();
-}
-
-int csCollectionList::Find (iCollection *obj) const
-{
-  return (int)collections.Find (obj);
-}
-
-iCollection *csCollectionList::FindByName (
-  const char *Name) const
-{
-  return collections.FindByName (Name);
-}
-
-#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 //---------------------------------------------------------------------------
 
@@ -536,8 +469,6 @@ csEngine::csEngine (iBase *iParent) :
   defaultMaxLightmapWidth (256), defaultMaxLightmapHeight (256),
   currentRenderContext (0), weakEventHandler(0)
 {
-  DG_TYPE (this, "csEngine");
-
   ClearRenderPriorities ();
 }
 
@@ -716,7 +647,6 @@ void csEngine::DeleteAllForce ()
 
   nextframePending = 0;
   halos.DeleteAll ();
-  collections.RemoveAll ();
   wantToDieSet.Empty ();
   RemoveDelayedRemoves (false);
 
@@ -774,35 +704,24 @@ void csEngine::DeleteAll ()
       return;
     }
 
-    csRef<iShaderCompiler> shcom (shaderManager->
-      GetCompiler ("XMLShader"));
+    // Load default shaders
+    csRef<iDocumentSystem> docsys (
+      csQueryRegistry<iDocumentSystem> (objectRegistry));
+    if (!docsys.IsValid())
+      docsys.AttachNew (new csTinyDocumentSystem ());
 
-    if (!shcom.IsValid())
-    {
-      Warn ("'XMLShader' shader compiler not available - "
-	"default shaders are unavailable.");
-    }
-    else
-    {
-      // Load default shaders
-      csRef<iDocumentSystem> docsys (
-	csQueryRegistry<iDocumentSystem> (objectRegistry));
-      if (!docsys.IsValid())
-	docsys.AttachNew (new csTinyDocumentSystem ());
+    const char* shaderPath;
+    shaderPath = cfg->GetStr ("Engine.Shader.Default", 
+      "/shader/std_lighting.xml");
+    defaultShader = LoadShader (docsys, shaderPath);
+    if (!defaultShader.IsValid())
+      Warn ("Default shader %s not available", shaderPath);
 
-      const char* shaderPath;
-      shaderPath = cfg->GetStr ("Engine.Shader.Default", 
-        "/shader/std_lighting.xml");
-      defaultShader = LoadShader (docsys, shcom, shaderPath);
-      if (!defaultShader.IsValid())
-	Warn ("Shader %s not available", shaderPath);
-
-      shaderPath = cfg->GetStr ("Engine.Shader.Portal", 
-        "/shader/std_lighting_portal.xml");
-      csRef<iShader> portal_shader = LoadShader (docsys, shcom, shaderPath);
-      if (!portal_shader.IsValid())
-	Warn ("Shader %s not available", shaderPath);
-    }
+    shaderPath = cfg->GetStr ("Engine.Shader.Portal", 
+      "/shader/std_lighting_portal.xml");
+    csRef<iShader> portal_shader = LoadShader (docsys, shaderPath);
+    if (!portal_shader.IsValid())
+      Warn ("Default shader %s not available", shaderPath);
 
     // Now, try to load the user-specified default render loop.
     const char* configLoop = cfg->GetStr ("Engine.RenderLoop.Default", 0);
@@ -1556,7 +1475,6 @@ void csEngine::LoadDefaultRenderLoop (const char* fileName)
 }
 
 csRef<iShader> csEngine::LoadShader (iDocumentSystem* docsys,
-                                     iShaderCompiler* shcom,
                                      const char* filename)
 {
   csRef<iDocument> shaderDoc = docsys->CreateDocument ();
@@ -1578,10 +1496,36 @@ csRef<iShader> csEngine::LoadShader (iDocumentSystem* docsys,
   csRef<iFile> shaderFile = VFS->Open (shaderFn, VFS_FILE_READ);
   if (shaderFile.IsValid())
   {
-    shaderDoc->Parse (shaderFile, false);
+    const char* err = shaderDoc->Parse (shaderFile, false);
+    if (err != 0)
+    {
+      Warn ("Error parsing %s: %s", filename, err);
+      return 0;
+    }
+    
+    csRef<iDocumentNode> shaderNode = shaderDoc->GetRoot ()->
+      GetNode ("shader");
+    if (!shaderNode)
+    {
+      Warn ("%s has no 'shader' node", filename);
+      return 0;
+    }
+    
+    const char* compilerAttr = shaderNode->GetAttributeValue ("compiler");
+    if (!compilerAttr)
+    {
+      Warn ("%s: 'shader' node has no 'compiler' attribute", filename);
+      return 0;
+    }
+    
+    csRef<iShaderCompiler> shcom (shaderManager->GetCompiler (compilerAttr));
+    if (!shcom.IsValid())
+    {
+      Warn ("%s: '%s' shader compiler not available", filename, compilerAttr);
+    }
+    
     csRef<iLoaderContext> elctxt (CreateLoaderContext (0, true));
-    shader = shcom->CompileShader (elctxt, shaderDoc->GetRoot ()->
-      GetNode ("shader"));
+    shader = shcom->CompileShader (elctxt, shaderNode);
     if (shader.IsValid()) shaderManager->RegisterShader (shader);
   }
   VFS->PopDir();
@@ -1840,28 +1784,6 @@ iCameraPosition* csEngine::FindCameraPosition (const char* name,
     campos = GetCameraPositions ()->FindByName (n);
   return campos;
 }
-
-#include "csutil/win32/msvc_deprecated_warn_off.h"
-
-iCollection* csEngine::FindCollection (const char* name,
-	iRegion* reg)
-{
-  iRegion* region;
-  bool global;
-  char* n = SplitRegionName (name, region, global);
-  if (!n) return 0;
-
-  iCollection* col;
-  if (region)
-    col = region->FindCollection (n);
-  else if (!global && reg)
-    col = reg->FindCollection (n);
-  else
-    col = GetCollections ()->FindByName (n);
-  return col;
-}
-
-#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 void csEngine::ReadConfig (iConfigFile *Config)
 {

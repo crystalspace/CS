@@ -23,7 +23,6 @@
 #include "csgeom/polymesh.h"
 #include "csutil/csendian.h"
 #include "csutil/csmd5.h"
-#include "csutil/debug.h"
 #include "csutil/memfile.h"
 
 #include "engine.h"

@@ -22,16 +22,12 @@
 #include "csgfx/quantize.h"
 #include "csgfx/imagememory.h"
 #include "csgfx/rgbpixel.h"
-#include "csutil/debug.h"
 #include "csutil/util.h"
 
 CS_LEAKGUARD_IMPLEMENT (csImageMemory);
 
 void csImageMemory::ConstructCommon()
 {
-  DG_ADDI (this, 0);
-  DG_TYPE (this, "csImageMemory");
-
   Image = 0;
   Palette = 0;
   Alpha = 0;
@@ -197,7 +193,6 @@ csImageMemory::~csImageMemory ()
     Palette = 0;
   }
   FreeImage();
-  DG_REM (this);
 }
 
 void* csImageMemory::GetImagePtr ()

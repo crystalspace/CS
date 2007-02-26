@@ -435,10 +435,33 @@ iString_swigregister = _cspace.iString_swigregister
 iString_swigregister(iString)
 iString_scfGetVersion = _cspace.iString_scfGetVersion
 
-class csString(_object):
+class csStringParent(_object):
     __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csStringParent, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csStringParent, name)
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _cspace.new_csStringParent(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_csStringParent
+    __del__ = lambda self : None;
+    def assign(*args): return _cspace.csStringParent_assign(*args)
+    def GetData(*args): return _cspace.csStringParent_GetData(*args)
+    def GetCapacity(*args): return _cspace.csStringParent_GetCapacity(*args)
+    def ShrinkBestFit(*args): return _cspace.csStringParent_ShrinkBestFit(*args)
+    def Free(*args): return _cspace.csStringParent_Free(*args)
+    def Detach(*args): return _cspace.csStringParent_Detach(*args)
+csStringParent_swigregister = _cspace.csStringParent_swigregister
+csStringParent_swigregister(csStringParent)
+
+class csString(csStringParent):
+    __swig_setmethods__ = {}
+    for _s in [csStringParent]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, csString, name, value)
     __swig_getmethods__ = {}
+    for _s in [csStringParent]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csString, name)
     __repr__ = _swig_repr
     def __init__(self, *args): 
@@ -2164,7 +2187,6 @@ class csShaderVariableArray(csShaderVariableArrayChangeElements):
     def DeleteIndex(*args): return _cspace.csShaderVariableArray_DeleteIndex(*args)
     def DeleteIndexFast(*args): return _cspace.csShaderVariableArray_DeleteIndexFast(*args)
     def Delete(*args): return _cspace.csShaderVariableArray_Delete(*args)
-    def DeleteFast(*args): return _cspace.csShaderVariableArray_DeleteFast(*args)
     __swig_destroy__ = _cspace.delete_csShaderVariableArray
     __del__ = lambda self : None;
 csShaderVariableArray_swigregister = _cspace.csShaderVariableArray_swigregister
@@ -4096,8 +4118,6 @@ class iEngine(iBase):
     def CreateFrustumView(*args): return _cspace.iEngine_CreateFrustumView(*args)
     def CreateObjectWatcher(*args): return _cspace.iEngine_CreateObjectWatcher(*args)
     def GetVariableList(*args): return _cspace.iEngine_GetVariableList(*args)
-    def GetCollections(*args): return _cspace.iEngine_GetCollections(*args)
-    def FindCollection(*args): return _cspace.iEngine_FindCollection(*args)
     def RemoveObject(*args): return _cspace.iEngine_RemoveObject(*args)
     def DelayedRemoveObject(*args): return _cspace.iEngine_DelayedRemoveObject(*args)
     def RemoveDelayedRemoves(*args): return _cspace.iEngine_RemoveDelayedRemoves(*args)
@@ -4805,7 +4825,6 @@ class iRegion(iBase):
     def FindTexture(*args): return _cspace.iRegion_FindTexture(*args)
     def FindMaterial(*args): return _cspace.iRegion_FindMaterial(*args)
     def FindCameraPosition(*args): return _cspace.iRegion_FindCameraPosition(*args)
-    def FindCollection(*args): return _cspace.iRegion_FindCollection(*args)
     def IsInRegion(*args): return _cspace.iRegion_IsInRegion(*args)
     __swig_destroy__ = _cspace.delete_iRegion
     __del__ = lambda self : None;
@@ -5668,7 +5687,6 @@ class csSprite2DVertexArrayChangeAll(csSprite2DVertexArrayChangeElements):
     def DeleteIndex(*args): return _cspace.csSprite2DVertexArrayChangeAll_DeleteIndex(*args)
     def DeleteIndexFast(*args): return _cspace.csSprite2DVertexArrayChangeAll_DeleteIndexFast(*args)
     def Delete(*args): return _cspace.csSprite2DVertexArrayChangeAll_Delete(*args)
-    def DeleteFast(*args): return _cspace.csSprite2DVertexArrayChangeAll_DeleteFast(*args)
     __swig_destroy__ = _cspace.delete_csSprite2DVertexArrayChangeAll
     __del__ = lambda self : None;
 csSprite2DVertexArrayChangeAll_swigregister = _cspace.csSprite2DVertexArrayChangeAll_swigregister
@@ -8938,6 +8956,85 @@ class iDocumentSystem(iBase):
 iDocumentSystem_swigregister = _cspace.iDocumentSystem_swigregister
 iDocumentSystem_swigregister(iDocumentSystem)
 iDocumentSystem_scfGetVersion = _cspace.iDocumentSystem_scfGetVersion
+
+class scfConfigFile(iConfigFile):
+    __swig_setmethods__ = {}
+    for _s in [iConfigFile]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, scfConfigFile, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iConfigFile]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, scfConfigFile, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def IncRef(*args): return _cspace.scfConfigFile_IncRef(*args)
+    def DecRef(*args): return _cspace.scfConfigFile_DecRef(*args)
+    def GetRefCount(*args): return _cspace.scfConfigFile_GetRefCount(*args)
+    def QueryInterface(*args): return _cspace.scfConfigFile_QueryInterface(*args)
+    def AddRefOwner(*args): return _cspace.scfConfigFile_AddRefOwner(*args)
+    def RemoveRefOwner(*args): return _cspace.scfConfigFile_RemoveRefOwner(*args)
+scfConfigFile_swigregister = _cspace.scfConfigFile_swigregister
+scfConfigFile_swigregister(scfConfigFile)
+
+class csConfigFile(scfConfigFile):
+    __swig_setmethods__ = {}
+    for _s in [scfConfigFile]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csConfigFile, name, value)
+    __swig_getmethods__ = {}
+    for _s in [scfConfigFile]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, csConfigFile, name)
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _cspace.new_csConfigFile(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_csConfigFile
+    __del__ = lambda self : None;
+    def IsEmpty(*args): return _cspace.csConfigFile_IsEmpty(*args)
+    def GetFileName(*args): return _cspace.csConfigFile_GetFileName(*args)
+    def GetVFS(*args): return _cspace.csConfigFile_GetVFS(*args)
+    def SetFileName(*args): return _cspace.csConfigFile_SetFileName(*args)
+    def Load(*args): return _cspace.csConfigFile_Load(*args)
+    def LoadFromBuffer(*args): return _cspace.csConfigFile_LoadFromBuffer(*args)
+    def Save(*args): return _cspace.csConfigFile_Save(*args)
+    def Clear(*args): return _cspace.csConfigFile_Clear(*args)
+    def Enumerate(*args): return _cspace.csConfigFile_Enumerate(*args)
+    def KeyExists(*args): return _cspace.csConfigFile_KeyExists(*args)
+    def SubsectionExists(*args): return _cspace.csConfigFile_SubsectionExists(*args)
+    def GetInt(*args): return _cspace.csConfigFile_GetInt(*args)
+    def GetFloat(*args): return _cspace.csConfigFile_GetFloat(*args)
+    def GetStr(*args): return _cspace.csConfigFile_GetStr(*args)
+    def GetBool(*args): return _cspace.csConfigFile_GetBool(*args)
+    def GetTuple(*args): return _cspace.csConfigFile_GetTuple(*args)
+    def GetComment(*args): return _cspace.csConfigFile_GetComment(*args)
+    def SetStr(*args): return _cspace.csConfigFile_SetStr(*args)
+    def SetInt(*args): return _cspace.csConfigFile_SetInt(*args)
+    def SetFloat(*args): return _cspace.csConfigFile_SetFloat(*args)
+    def SetBool(*args): return _cspace.csConfigFile_SetBool(*args)
+    def SetTuple(*args): return _cspace.csConfigFile_SetTuple(*args)
+    def SetComment(*args): return _cspace.csConfigFile_SetComment(*args)
+    def DeleteKey(*args): return _cspace.csConfigFile_DeleteKey(*args)
+    def SetEOFComment(*args): return _cspace.csConfigFile_SetEOFComment(*args)
+    def GetEOFComment(*args): return _cspace.csConfigFile_GetEOFComment(*args)
+    def ParseCommandLine(*args): return _cspace.csConfigFile_ParseCommandLine(*args)
+csConfigFile_swigregister = _cspace.csConfigFile_swigregister
+csConfigFile_swigregister(csConfigFile)
+
+class csRadixSorter(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csRadixSorter, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csRadixSorter, name)
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _cspace.new_csRadixSorter(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_csRadixSorter
+    __del__ = lambda self : None;
+    def Sort(*args): return _cspace.csRadixSorter_Sort(*args)
+    def GetRanks(*args): return _cspace.csRadixSorter_GetRanks(*args)
+csRadixSorter_swigregister = _cspace.csRadixSorter_swigregister
+csRadixSorter_swigregister(csRadixSorter)
 
 class csTinyDocumentSystem(_object):
     __swig_setmethods__ = {}

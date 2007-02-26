@@ -1,8 +1,8 @@
-SubDir TOP apps bproctest ;
+SubDir TOP apps tutorial simple1 ;
 
-Description bproctest : "Blender procedural texture test" ;
-Application bproctest : [ Wildcard *.cpp *.h ] : noinstall ;
-ExternalLibs bproctest : CRYSTAL ;
+Description simple1 : "tutorial part one" ;
+Application simple1 : [ Wildcard *.cpp *.h ] : noinstall ;
+LinkWith simple1 : crystalspace ;
 
 # Some external projects use gcc's -ansi and -pedantic options. We need to
 # ensure that CS's public headers are usable when these options are enabled,
@@ -11,7 +11,7 @@ ExternalLibs bproctest : CRYSTAL ;
 # language standard. As a compromise, we enable these restrictions on an
 # individual module basis so as to ensure that the CS headers are tested
 # against these options on a regular basis.
-#if $(COMPILER.C++FLAGS.PEDANTIC.ENABLE)
-#{
-#  CFlags bproctest : $(COMPILER.C++FLAGS.PEDANTIC.ENABLE) ;
-#}
+if $(COMPILER.C++FLAGS.PEDANTIC.ENABLE)
+{
+  CFlags simple1 : $(COMPILER.C++FLAGS.PEDANTIC.ENABLE) ;
+}

@@ -19,7 +19,6 @@
 #include "cssysdef.h"
 #include "csqint.h"
 
-#include "csutil/debug.h"
 #include "iengine/texture.h"
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"

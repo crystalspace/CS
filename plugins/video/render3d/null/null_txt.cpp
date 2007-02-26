@@ -21,7 +21,6 @@
 #include "csgfx/inv_cmap.h"
 #include "csgfx/quantize.h"
 #include "csutil/scanstr.h"
-#include "csutil/debug.h"
 #include "iutil/cfgfile.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"

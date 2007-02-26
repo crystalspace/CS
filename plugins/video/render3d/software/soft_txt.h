@@ -24,7 +24,6 @@
 #include "csplugincommon/render3d/txtmgr.h"
 #include "csplugincommon/softshader/texture.h"
 #include "csutil/blockallocator.h"
-#include "csutil/debug.h"
 #include "csutil/hashr.h"
 #include "igraphic/image.h"
 #include "ivideo/graph2d.h"

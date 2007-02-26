@@ -1221,6 +1221,10 @@ APPLY_TYPEMAP_ARGOUT_PTR(csKeyModifiers,csKeyModifiers& modifiers)
 %include "iutil/stringarray.h"
 %include "iutil/document.h"
 
+%template(scfConfigFile) scfImplementation1<csConfigFile,iConfigFile >;
+%include "csutil/cfgfile.h"
+%include "csutil/radixsort.h"
+
 %extend iDocumentAttributeIterator
 {
   ITERATOR_FUNCTIONS(iDocumentAttributeIterator)

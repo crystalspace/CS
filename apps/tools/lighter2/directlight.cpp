@@ -284,7 +284,10 @@ namespace lighter
       const csVector3 normal = element.primitive.ComputeNormal (pos);
 
       if (ignoreCB)
+      {
+        ignoreCB->SetSampleInside (element.primitive.PointInside (pos));
         res += ShadeLight (light, pos, normal, sampler, ignoreCB);
+      }
       else
         res += ShadeLight (light, pos, normal, sampler, &element.primitive);
     }
@@ -357,8 +360,7 @@ namespace lighter
   }
 
   void DirectLighting::CollectShadowAllLightsNonPD(Sector* sector, ElementProxy element,
-    SamplerSequence<2>& lightSampler, PartialElementIgnoreCallback* ignoreCB,
-    csSet<csConstPtrKey<Primitive> > &primitives)
+    SamplerSequence<2>& lightSampler, PartialElementIgnoreCallback* ignoreCB)
   {
     const LightRefArray& allLights = sector->allNonPDLights;
 
@@ -374,18 +376,18 @@ namespace lighter
         vVec * ElementQuadrantConstants[qi][1];
 
       const csVector3 pos = elementC + offsetVector;
+      const csVector3 normal = element.primitive.ComputeNormal (pos);
 
       ignoreCB->SetSampleInside (element.primitive.PointInside (pos));
       for (size_t i = 0; i < allLights.GetSize (); ++i)
       {
-        CollectShadowLight (allLights[i], pos, lightSampler, ignoreCB, primitives);
+        CollectShadowLight (allLights[i], pos, normal, lightSampler, ignoreCB);
       }
     }
   }
 
   void DirectLighting::CollectShadowRndLightNonPD(Sector* sector, ElementProxy element,
-    SamplerSequence<2>& sampler, PartialElementIgnoreCallback* ignoreCB,
-    csSet<csConstPtrKey<Primitive> > &primitives)
+    SamplerSequence<2>& sampler, PartialElementIgnoreCallback* ignoreCB)
   {
     SamplerSequence<3> lightSampler (sampler);
 
@@ -408,17 +410,17 @@ namespace lighter
         vVec * ElementQuadrantConstants[qi][1];
 
       const csVector3 pos = elementC + offsetVector;
+      const csVector3 normal = element.primitive.ComputeNormal (pos);
 
       size_t lightIdx = (size_t) floorf (allLights.GetSize () * rndValues[2]);
 
       ignoreCB->SetSampleInside (element.primitive.PointInside (pos));
-      CollectShadowLight (allLights[lightIdx], pos, sampler, ignoreCB, primitives);
+      CollectShadowLight (allLights[lightIdx], pos, normal, sampler, ignoreCB);
     }
   }
 
   void DirectLighting::CollectShadowOneLight(Sector* sector, ElementProxy element,
-    Light* light, SamplerSequence<2>& lightSampler, PartialElementIgnoreCallback* ignoreCB,
-    csSet<csConstPtrKey<Primitive> > &primitives)
+    Light* light, SamplerSequence<2>& lightSampler, PartialElementIgnoreCallback* ignoreCB)
   {
     const csVector3& uVec = element.primitive.GetuFormVector ();
     const csVector3& vVec = element.primitive.GetvFormVector ();
@@ -430,15 +432,16 @@ namespace lighter
         vVec * ElementQuadrantConstants[qi][1];
 
       const csVector3 pos = elementC + offsetVector;
+      const csVector3 normal = element.primitive.ComputeNormal (pos);
 
       ignoreCB->SetSampleInside (element.primitive.PointInside (pos));
-      CollectShadowLight (light, pos, lightSampler, ignoreCB, primitives);
+      CollectShadowLight (light, pos, normal, lightSampler, ignoreCB);
     }
   }
 
   void DirectLighting::CollectShadowLight (Light* light, const csVector3& point,
-    SamplerSequence<2>& lightSampler, PartialElementIgnoreCallback* ignoreCB, 
-    csSet<csConstPtrKey<Primitive> > &primitives)
+    const csVector3& normal, SamplerSequence<2>& lightSampler, 
+    PartialElementIgnoreCallback* ignoreCB)
   {
     // Some variables..
     VisibilityTester visTester;
@@ -449,9 +452,14 @@ namespace lighter
     lightSampler.GetNext (lightSamples);
 
     //@@TODO: Change to real sampling for visibility
-    csColor lightColor = light->SampleLight (point, csVector3 (0), lightSamples[0],
+    csColor lightColor = light->SampleLight (point, normal, lightSamples[0],
       lightSamples[1], lightVec, lightPdf, visTester);
-    visTester.CollectHits (primitives, ignoreCB);
+
+    if (lightPdf > 0.0f && !lightColor.IsBlack () &&
+      (normal * lightVec) > 0)
+    {
+      visTester.CollectHits (ignoreCB, ignoreCB);
+    }
   }
 
   //--------------------------------------------------------------------------
@@ -541,7 +549,7 @@ namespace lighter
             PartialElementIgnoreCallback callback (&prim);
             // Pass 1: collect inside hits
             //lmElementShader (sector, ep, masterSampler, &callback);
-            lmElementCollect (sector, ep, masterSampler, &callback, callback.GetSet ());
+            lmElementCollect (sector, ep, masterSampler, &callback);
             // Pass 2: "real" lighting
             callback.SetPass2 ();
             c = lmElementShader (sector, ep, masterSampler, &callback);
@@ -565,9 +573,9 @@ namespace lighter
               PartialElementIgnoreCallback callback (&prim);
               // Pass 1: collect inside hits
               CollectShadowOneLight (sector, ep, allPDLights[pdli],
-                masterSampler, &callback, callback.GetSet ());
+                masterSampler, &callback);
               //UniformShadeOneLight (sector, ep, allPDLights[pdli],
-              //  masterSampler, &callback);
+                //masterSampler, &callback);
               // Pass 2: "real" lighting
               callback.SetPass2 ();
               c = UniformShadeOneLight (sector, ep, allPDLights[pdli],

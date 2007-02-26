@@ -52,6 +52,17 @@ namespace lighter
     LightmapCache::CleanUp ();
   }
 
+  int Lighter::Run ()
+  {
+    // Initialize it
+    if (!Initialize ()) return 1;
+
+    // Light em up!
+    if (!LightEmUp ()) return 1;
+
+    return 0;
+  }
+
   bool Lighter::Initialize ()
   {
     cmdLine = csQueryRegistry<iCommandLineParser> (objectRegistry);
@@ -390,11 +401,7 @@ int main (int argc, char* argv[])
   localLighter.AttachNew (new lighter::Lighter (object_reg));
   lighter::globalLighter = localLighter;
 
-  // Initialize it
-  if (!lighter::globalLighter->Initialize ()) return 1;
-
-  // Light em up!
-  if (!lighter::globalLighter->LightEmUp ()) return 1;
+  int ret = lighter::globalLighter->Run ();
 
   localLighter = 0;
   lighter::globalLighter = 0;
@@ -402,5 +409,5 @@ int main (int argc, char* argv[])
   // Remove it
   csInitializer::DestroyApplication (object_reg);
 
-  return 0;
+  return ret;
 }

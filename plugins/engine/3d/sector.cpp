@@ -23,7 +23,6 @@
 #include "csgeom/kdtree.h"
 #include "csutil/csppulse.h"
 #include "csutil/csstring.h"
-#include "csutil/debug.h"
 #include "cstool/csview.h"
 #include "iengine/portal.h"
 #include "iengine/rview.h"
@@ -121,7 +120,6 @@ void csSectorMeshList::FreeMesh (iMeshWrapper* item)
 csSector::csSector (csEngine *engine) :
   scfImplementationType (this), engine (engine)
 {
-  DG_TYPE (this, "csSector");
   drawBusy = 0;
   dynamicAmbientLightColor.Set (0,0,0);
   dynamicAmbientLightVersion = (uint)~0;

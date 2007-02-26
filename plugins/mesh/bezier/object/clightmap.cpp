@@ -20,7 +20,6 @@
 
 #include "csgeom/tri.h"
 #include "csutil/csendian.h"
-#include "csutil/debug.h"
 #include "csutil/memfile.h"
 #include "csutil/util.h"
 #include "iengine/engine.h"
