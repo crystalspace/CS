@@ -621,7 +621,7 @@ public:
   { pending_scripts.DeleteAll(); }
   virtual void ClearPendingScripts () {ClearPendingAnimations (); }
   virtual size_t GetAnimationsCount () { return running_scripts.GetSize (); }
-  virtual size_t GetScriptsCount () { return GetScriptsCount (); }
+  virtual size_t GetScriptsCount () { return GetAnimationsCount (); }
   virtual iSkeletonAnimation* GetAnimation (size_t i);
   virtual iSkeletonAnimation* GetScript (size_t i) {return GetAnimation (i);}
   virtual iSkeletonAnimation* FindAnimation (const char *scriptname);

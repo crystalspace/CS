@@ -12,6 +12,8 @@ chronological order.
 	- res made some tweaks to AllocatorHeap.
 	- res added an optional "Allocator" template argument to 
 	  scfImplementationPooled.
+	- caedes fixed iSkeleton::GetScriptsCount. It was broken after
+	  latest changes to iSkeleton interface.
 24-Feb-2007
 	- Andrew Robberts fixed top and bottom clipping in decals
 	- Jorrit did some imposter work:
