@@ -91,6 +91,33 @@ csRef<iSprite3DState> state (scfQueryInterface<iSprite3DState> (
 state->SetAction ("default");
 @end example
 
+@subsubheading Transitioning between Smart Pointers and Normal Pointers
+
+Smart pointers can be assigned to normal pointers and vice versa. However, you
+need to be aware of the interactions with reference counting.
+
+Assigning a smart pointer to a normal pointer \emph{does not} change the 
+reference count of the object.  This can be beneficial as the reference 
+counting overhead is avoided.  It can also be dangerous, as the normal pointer 
+will become dangling when the referenced object is destroyed!  This means that
+storing in a normal pointer is suitable for short-term storage, when it's 
+certain that the referenced object won't be released durign the lifetime of
+the normal pointer.  If that's not guaranteed use a @code{csRef<>} instead.
+
+Assigning a normal pointer to a smart pointer \emph{does} change the reference
+count: ownership is taken, ie the reference count is increased.  This can 
+cause a leaked reference in certain circumstances.  One notable instance is 
+the assignment of an object just allocated with @samp{new} to a smart pointer:
+the object will start with a reference count of 1, but the assignment to the
+smart pointer will also increase the reference count, which errorneously 
+becomes 2. The last ``phantom'' reference will never be release, causing a 
+leak.
+
+The recommend way to deal with that is to \emph{never} assign an object 
+allocated with @samp{new} to a smart pointer directly.  Instead use it's
+@code{AttachNew()} method which will take care of the proper reference
+counting.
+
 @subsubheading When to Use csRef<>?
 
 Use @code{csRef<>} wherever you need to own a reference to a reference-counted
@@ -122,6 +149,55 @@ csRef<iFoo> MyFunction ()
 The reason that this is 100% safe is that the newly created object is correctly
 destroyed (not leaked) even if the caller of @code{MyFunction()} forgets or
 neglects to assign it to a variable.
+
+@subsubheading When to Use csWeakRef<>?
+
+Another smart pointer class is @code{csWeakRef<>}.  The significant difference
+to @code{csRef<>} is that a ``weak'' reference is @emph{not} owning.  However,
+unlike raw pointers, @code{csWeakRef<>} prevents the risk of a ``dangling
+pointer'' (a pointer referencing a freed, thus invalid, object): when the
+referenced object gets destroyed, all weak references to it are automatically
+set to null.
+
+A common application of weak references is the prevention of circular 
+references.  When two objects reference each other with @code{csRef<>}s 
+neither will be destructed as long as the references are held: Destruction 
+happens when the reference count of an object drops to zero -
+however, object @samp{A} is owned by object @samp{B}, thus it's reference
+count will not be decreased until object @samp{B} is destructed. But object
+@samp{B} in turn is owned by object @samp{A}, and that reference is not 
+released until object @samp{A} is destructed.  This circular dependency leads
+to neither objects being released automatically.
+
+To prevent this scenario one reference can be made a @code{csWeakRef<>} 
+instead.  If object @samp{B} holds only a weak reference to object @samp{A}, 
+this reference will become null when @samp{A} is destroyed, and @samp{B} may 
+also be destroyed if @samp{A} held the last reference to it.
+
+As all weak references to an object are automatically set to null when the
+object gets destroyed care must be taken when accessing a weak referenced
+object: the reference may become null at any time, after all.  In practice
+that means that before dereferencing a weak reference you should check whether
+it still points to a valid object (with the @code{IsValid()} method or a
+comparison with @code{0}):
+@example
+class MyClass
+@{
+  csWeakRef<iFoo> foo;
+  ...
+  void MyFunction ();
+@}
+
+void MyClass::MyFunction ()
+@{
+  // WRONG: Weak references may become 0 at any time!
+  foo->BarMethod(@dots{});
+  // CORRECT: Check whether weak reference is valid before use
+  if (foo.IsValid())
+    foo->FooMethod(@dots{});
+  @dots{}
+@}
+@end example
 
 @subsubheading What About csPtr<>?
 
@@ -307,6 +383,20 @@ count will be decremented properly.  It is @emph{never} safe to ignore the
 return value from a function returning a @code{csPtr<>} since doing so would
 result in a resource leak.
 @end itemize
+
+@subsubheading What to do With a Function Parameter?
+
+It's not uncommon that a reference to an object is to be taken as a function
+parameter.  Using a smart pointer for that is usually not necessary: consider
+that you can usually assume that an object passed in as a parameter stays 
+valid during the function execution (a scenario where this is not the case can
+even be considered pathological). This means that having the parameter keep a 
+reference to the object passed in is unnecessary (and, considering that 
+reference keeping incurs a small overhead, possibly even undesireable).
+As smart pointers automatically convert to normal pointers it's not a problem
+to declare parameters for references as normal pointers.  Likewise, when the
+reference passed in is to be retained it's no problem to assign them to a
+@code{csRef<>} object to take ownership.
 
 @subsubheading Warnings About csPtr<>!
 

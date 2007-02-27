@@ -280,7 +280,7 @@ public:
    */
   inline csVector3& GetVertex (size_t idx)
   {
-    CS_ASSERT (idx >= 0 && idx < num_vertices);
+    CS_ASSERT (idx < num_vertices);
     return vertices[idx];
   }
 
@@ -289,7 +289,7 @@ public:
    */
   inline const csVector3& GetVertex (size_t idx) const
   {
-    CS_ASSERT (idx >= 0 && idx < num_vertices);
+    CS_ASSERT (idx < num_vertices);
     return vertices[idx];
   }
 

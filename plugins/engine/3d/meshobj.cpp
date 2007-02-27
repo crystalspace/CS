@@ -28,6 +28,7 @@
 #include "iengine/portal.h"
 #include "iengine/rview.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/rendermesh.h"
 
 
 CS_LEAKGUARD_IMPLEMENT (csMeshWrapper);
@@ -279,7 +280,7 @@ csMeshWrapper::~csMeshWrapper ()
   // Copy the array because we are going to unlink the children.
   csRefArray<iSceneNode> children = movable.GetChildren ();
   size_t i;
-  for (i = 0 ; i < children.Length () ; i++)
+  for (i = 0 ; i < children.GetSize () ; i++)
     children[i]->SetParent (0);
   delete imposter_mesh;
   ClearFromSectorPortalLists ();
@@ -322,7 +323,7 @@ void csMeshWrapper::MoveToSector (iSector *s)
 
   const csRefArray<iSceneNode>& children = movable.GetChildren ();
   size_t i;
-  for (i = 0; i < children.Length (); i++)
+  for (i = 0; i < children.GetSize (); i++)
   {
     iMeshWrapper* spr = children[i]->QueryMesh ();
     // @@@ What for other types of objects like lights and camera???
@@ -350,7 +351,7 @@ void csMeshWrapper::RemoveFromSectors (iSector* sector)
   ClearFromSectorPortalLists (sector);
   const csRefArray<iSceneNode>& children = movable.GetChildren ();
   size_t i;
-  for (i = 0; i < children.Length (); i++)
+  for (i = 0; i < children.GetSize (); i++)
   {
     iMeshWrapper* spr = children[i]->QueryMesh ();
     // @@@ What to do in case of light!
@@ -390,7 +391,7 @@ void csMeshWrapper::SetFlagsRecursive (uint32 mask, uint32 value)
   flags.Set (mask, value);
   const csRefArray<iSceneNode>& children = movable.GetChildren ();
   size_t i;
-  for (i = 0 ; i < children.Length () ; i++)
+  for (i = 0 ; i < children.GetSize () ; i++)
   {
     iMeshWrapper* mesh = children[i]->QueryMesh ();
     if (mesh)
@@ -403,7 +404,7 @@ void csMeshWrapper::SetZBufModeRecursive (csZBufMode mode)
   SetZBufMode (mode);
   const csRefArray<iSceneNode>& children = movable.GetChildren ();
   size_t i;
-  for (i = 0 ; i < children.Length () ; i++)
+  for (i = 0 ; i < children.GetSize () ; i++)
   {
     iMeshWrapper* mesh = children[i]->QueryMesh ();
     if (mesh)
@@ -416,7 +417,7 @@ void csMeshWrapper::SetRenderPriorityRecursive (long rp)
   SetRenderPriority (rp);
   const csRefArray<iSceneNode>& children = movable.GetChildren ();
   size_t i;
-  for (i = 0 ; i < children.Length () ; i++)
+  for (i = 0 ; i < children.GetSize () ; i++)
   {
     iMeshWrapper* mesh = children[i]->QueryMesh ();
     if (mesh)
@@ -474,7 +475,7 @@ const csArray<iLightSectorInfluence*>& csMeshWrapper::GetRelevantLights (
       // Object didn't move. Now check lights (moved or destroyed).
       bool relevant = true;
       size_t i;
-      for (i = 0 ; i < relevant_lights.Length () ; i++)
+      for (i = 0 ; i < relevant_lights.GetSize () ; i++)
       {
 	if (!relevant_lights_ref[i].lsi)
 	{
@@ -504,8 +505,8 @@ const csArray<iLightSectorInfluence*>& csMeshWrapper::GetRelevantLights (
     csBox3 box;
     GetFullBBox (box);
 
-    if (relevant_lights_max > relevant_lights.Length ())
-      relevant_lights.SetLength (relevant_lights_max);
+    if (relevant_lights_max > relevant_lights.GetSize ())
+      relevant_lights.SetSize (relevant_lights_max);
 
     iSector *sect = movable_sectors->Get (0);
     csVector3 pos = movable.GetFullPosition ();
@@ -561,8 +562,8 @@ const csArray<iLightSectorInfluence*>& csMeshWrapper::GetRelevantLights (
     }
     if (cnt > relevant_lights_max) cnt = relevant_lights_max;
     if (maxLights != -1 && int (cnt) > maxLights) cnt = maxLights;
-    relevant_lights.SetLength (cnt);
-    relevant_lights_ref.SetLength (cnt);
+    relevant_lights.SetSize (cnt);
+    relevant_lights_ref.SetSize (cnt);
     size_t i;
     for (i = 0 ; i < cnt ; i++)
     {
@@ -592,7 +593,7 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
 
   // Callback are traversed in reverse order so that they can safely
   // delete themselves.
-  size_t i = draw_cb_vector.Length ();
+  size_t i = draw_cb_vector.GetSize ();
   while (i > 0)
   {
     i--;
@@ -658,6 +659,97 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
     csrview->SetCsRenderContext (old_ctxt);
   }
   return rmeshes;
+}
+
+void csMeshWrapper::AddExtraRenderMesh(csRenderMesh* renderMesh, long priority,
+        csZBufMode zBufMode)
+{
+  ExtraRenderMeshData data;
+  extraRenderMeshes.Push(renderMesh);
+
+  data.priority = priority;
+  data.zBufMode = zBufMode;
+  extraRenderMeshData.Push(data);
+}
+
+csRenderMesh** csMeshWrapper::GetExtraRenderMeshes (size_t& num, 
+                    iRenderView* rview, uint32 frustum_mask)
+{
+  // Here we check the CS_ENTITY_NOCLIP flag. If that flag is set
+  // we will only render the object once in a give frame/camera combination.
+  // So if multiple portals arrive in a sector containing this object the
+  // object will be rendered at the first portal and not clipped to that
+  // portal (as is usually the case).
+  csRenderContext* old_ctxt = 0;
+
+  if (flags.Check (CS_ENTITY_NOCLIP))
+  {
+    csRenderView* csrview = (csRenderView*)rview;
+    csRenderContext* ctxt = csrview->GetCsRenderContext ();
+
+    if (last_frame_number == rview->GetCurrentFrameNumber () &&
+    	last_camera == ctxt->icamera)
+    {
+      num = 0;
+      return 0;
+    }
+    last_camera = ctxt->icamera;
+    last_frame_number = rview->GetCurrentFrameNumber ();
+    old_ctxt = ctxt;
+    // Go back to top-level context.
+    while (ctxt->previous) ctxt = ctxt->previous;
+    csrview->SetCsRenderContext (ctxt);
+  }
+
+  int clip_portal, clip_plane, clip_z_plane;
+  rview->CalculateClipSettings(frustum_mask, clip_portal, clip_plane,
+          clip_z_plane);
+
+  iCamera* pCamera = rview->GetCamera();
+  const csReversibleTransform& o2wt = movable.GetFullTransform();
+  const csVector3& wo = o2wt.GetOrigin();
+  num = extraRenderMeshes.GetSize();
+  for (size_t a = 0; a < num; a++)
+  {
+    extraRenderMeshes[a]->clip_portal = clip_portal;
+    extraRenderMeshes[a]->clip_plane = clip_plane;
+    extraRenderMeshes[a]->clip_z_plane = clip_z_plane;
+    extraRenderMeshes[a]->do_mirror = pCamera->IsMirrored();
+    extraRenderMeshes[a]->worldspace_origin = wo;
+    extraRenderMeshes[a]->object2world = o2wt;
+  }
+
+  return extraRenderMeshes.GetArray();
+}
+
+long csMeshWrapper::GetExtraRenderMeshPriority(size_t idx) const
+{
+    return extraRenderMeshData[idx].priority;
+}
+
+csZBufMode csMeshWrapper::GetExtraRenderMeshZBufMode(size_t idx) const
+{
+    return extraRenderMeshData[idx].zBufMode;
+}
+
+void csMeshWrapper::RemoveExtraRenderMesh(csRenderMesh* renderMesh)
+{
+    size_t len = extraRenderMeshes.GetSize();
+    for (size_t a=0; a<len; ++a)
+    {
+        if (extraRenderMeshes[a] != renderMesh)
+            continue;
+
+        // copy last value in list over top of the one we're removing
+        extraRenderMeshes[a] = extraRenderMeshes[len-1];
+        extraRenderMeshData[a] = extraRenderMeshData[len-1];
+
+        // remove the last one
+        extraRenderMeshes.DeleteIndexFast(len-1);
+        extraRenderMeshData.DeleteIndexFast(len-1);
+
+        return;
+    }
 }
 
 //----- Min/Max Distance Range ----------------------------------------------
@@ -970,7 +1062,7 @@ void csMeshWrapper::HardTransform (const csReversibleTransform &t)
 
   const csRefArray<iSceneNode>& children = movable.GetChildren ();
   size_t i;
-  for (i = 0 ; i < children.Length () ; i++)
+  for (i = 0 ; i < children.GetSize () ; i++)
   {
     iMeshWrapper* mesh = children[i]->QueryMesh ();
     if (mesh)
@@ -990,11 +1082,11 @@ void csMeshWrapper::GetRadius (float &rad, csVector3 &cent) const
 {
   meshobj->GetObjectModel ()->GetRadius (rad, cent);
   const csRefArray<iSceneNode>& children = movable.GetChildren ();
-  if (children.Length () > 0)
+  if (children.GetSize () > 0)
   {
     csSphere sphere (cent, rad);
     size_t i;
-    for (i = 0; i < children.Length (); i++)
+    for (i = 0; i < children.GetSize (); i++)
     {
       iMeshWrapper *spr = children[i]->QueryMesh ();
       if (spr)
@@ -1246,7 +1338,7 @@ iMeshWrapper* csMeshWrapper::FindChildByName (const char* name)
   char const* p = strchr (name, ':');
   if (!p)
   {
-    for (i = 0 ; i < children.Length () ; i++)
+    for (i = 0 ; i < children.GetSize () ; i++)
     {
       iMeshWrapper* m = children[i]->QueryMesh ();
       if (m && !strcmp (name, m->QueryObject ()->GetName ()))
@@ -1259,7 +1351,7 @@ iMeshWrapper* csMeshWrapper::FindChildByName (const char* name)
   csString firstName;
   firstName.Append (name, firstsize);
 
-  for (i = 0 ; i < children.Length () ; i++)
+  for (i = 0 ; i < children.GetSize () ; i++)
   {
     iMeshWrapper* m = children[i]->QueryMesh ();
     if (m && !strcmp (firstName, m->QueryObject ()->GetName ()))
@@ -1386,7 +1478,7 @@ csPtr<iMeshWrapper> csMeshFactoryWrapper::CreateMeshWrapper ()
         csArray<iMeshFactoryWrapper*>& facts_for_lod =
       	  static_lod->GetMeshesForLOD (l);
         size_t j;
-	for (j = 0 ; j < facts_for_lod.Length () ; j++)
+	for (j = 0 ; j < facts_for_lod.GetSize () ; j++)
 	{
 	  if (facts_for_lod[j] == childfact)
 	    mesh->AddMeshToStaticLOD (l, child);
@@ -1531,7 +1623,7 @@ bool csMeshList::Remove (int n)
 void csMeshList::RemoveAll ()
 {
   size_t i;
-  for (i = 0 ; i < list.Length () ; i++)
+  for (i = 0 ; i < list.GetSize () ; i++)
   {
     list[i]->QueryObject ()->RemoveNameChangeListener (listener);
     FreeMesh (list[i]);
@@ -1673,7 +1765,7 @@ bool csMeshFactoryList::Remove (int n)
 void csMeshFactoryList::RemoveAll ()
 {
   size_t i;
-  for (i = 0 ; i < list.Length () ; i++)
+  for (i = 0 ; i < list.GetSize () ; i++)
   {
     list[i]->QueryObject ()->RemoveNameChangeListener (listener);
     FreeFactory (list[i]);

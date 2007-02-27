@@ -118,7 +118,7 @@ namespace CS
 	  size_t GetMaterial () const { return material; }
 	};
 	/// Get number of meshes in this model.
-	size_t GetMeshCount () const { return meshes.Length(); }
+	size_t GetMeshCount () const { return meshes.GetSize (); }
 	/// Get a mesh.
 	const Mesh& GetMesh (size_t index) const { return meshes[index]; }
         /// Type of this model
@@ -144,7 +144,7 @@ namespace CS
         Model () : type (Factory) {}
       };
       /// Return number of models.
-      size_t GetModelCount () const { return models.Length(); }
+      size_t GetModelCount () const { return models.GetSize (); }
       /// Get a model.
       const Model& GetModel (size_t index) const { return models[index]; }
     
@@ -174,7 +174,7 @@ namespace CS
 	Material (const Material& other);
       };
       /// Get number of materials.
-      size_t GetMaterialCount () { return materials.Length(); }
+      size_t GetMaterialCount () { return materials.GetSize (); }
       /// Get a material.
       const Material& GetMaterial (size_t index) { return materials[index]; }
     protected:

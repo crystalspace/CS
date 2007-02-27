@@ -62,6 +62,8 @@
 #include "cstool/vertexcompress.h"
 #include "cstool/normalcalc.h"
 #include "cstool/primitives.h"
+#include "csgeom/poly3d.h"
+#include "igeom/decal.h"
 
 #include "genmesh.h"
 
@@ -565,7 +567,7 @@ void csGenmeshMeshObject::SetupShaderVariableContext ()
   iStringSet* strings = factory->GetStrings();
   const csArray<csStringID>& factoryUBNs = factory->GetUserBufferNames();
   // Set up factorys user buffers...
-  for (i = 0; i < factoryUBNs.Length(); i++)
+  for (i = 0; i < factoryUBNs.GetSize (); i++)
   {
     const csStringID userBuf = factoryUBNs.Get(i);
     const char* bufName = strings->Request (userBuf);
@@ -584,7 +586,7 @@ void csGenmeshMeshObject::SetupShaderVariableContext ()
     }
   }
   // Set up meshs user buffers...
-  for (i = 0; i < user_buffer_names.Length(); i++)
+  for (i = 0; i < user_buffer_names.GetSize (); i++)
   {
     const csStringID userBuf = user_buffer_names.Get(i);
     const char* bufName = strings->Request (userBuf);
@@ -938,7 +940,7 @@ void csGenmeshMeshObject::UpdateLighting (
       csReversibleTransform trans = movable->GetFullTransform ();
       // the object center in world coordinates. "0" because the object
       // center in object space is obviously at (0,0,0).
-      int num_lights = (int)lights.Length ();
+      int num_lights = (int)lights.GetSize ();
       for (int l = 0 ; l < num_lights ; l++)
       {
         iLight* li = lights[l]->GetLight ();
@@ -999,9 +1001,11 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   UpdateSubMeshProxies ();
   SubMeshProxiesContainer& sm = subMeshes;
 
-  if ((sm.GetSize () == 0) && (legacySubmeshes.GetSize() == 0))
+  if (sm.GetSize () == 0 && 
+      legacySubmeshes.GetSize () == 0 &&
+      factory->GetTriangleCount () > 0)
   {
-    renderMeshes.SetLength (1);
+    renderMeshes.SetSize (1);
 
     iMaterialWrapper* mater = material;
     if (!mater) mater = factory->GetMaterialWrapper ();
@@ -1038,7 +1042,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
       }
       const csDirtyAccessArray<int>& triidx = back2front_tree->Back2Front (
         camera->GetTransform ().Other2This (wo));
-      CS_ASSERT (triidx.Length () == (size_t)num_sorted_mesh_triangles);
+      CS_ASSERT (triidx.GetSize () == (size_t)num_sorted_mesh_triangles);
 
       csTriangle* factory_triangles = factory->GetTriangles ();
       int i;
@@ -1074,7 +1078,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   }
   else if (legacySubmeshes.GetSize() != 0)
   {
-    renderMeshes.SetLength (legacySubmeshes.GetSize ());
+    renderMeshes.SetSize (legacySubmeshes.GetSize ());
 
     for (size_t i = 0; i<legacySubmeshes.GetSize (); ++i)
     {
@@ -1132,7 +1136,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   }
   else
   {
-    renderMeshes.SetLength (sm.GetSize ());
+    renderMeshes.SetSize (sm.GetSize ());
 
     for (size_t i = 0; i<sm.GetSize (); ++i)
     {
@@ -1199,7 +1203,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     }
   }
 
-  n = (int)renderMeshes.Length ();
+  n = (int)renderMeshes.GetSize ();
   return renderMeshes.GetArray ();
 }
 
@@ -1364,6 +1368,27 @@ bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
   }
 
   return true;
+}
+
+void csGenmeshMeshObject::BuildDecal(const csVector3* pos, float decalRadius,
+          iDecalBuilder* decalBuilder)
+{
+  size_t a;
+  size_t triCount = factory->GetTriangleCount();
+  csTriangle* tris = factory->GetTriangles();
+  csVector3* vertices = factory->GetVertices();
+  csPoly3D poly;
+  poly.SetVertexCount(3);
+  
+  for (a=0; a<triCount; ++a)
+  {
+    poly[0] = vertices[tris[a].a];
+    poly[1] = vertices[tris[a].b];
+    poly[2] = vertices[tris[a].c];
+
+    if (poly.InSphere(*pos, decalRadius))
+        decalBuilder->AddStaticPoly(poly);
+  }
 }
 
 iObjectModel* csGenmeshMeshObject::GetObjectModel ()
@@ -1658,7 +1683,7 @@ void csGenmeshMeshObjectFactory::BuildBack2FrontTree ()
 void csGenmeshMeshObjectFactory::CalculateBBoxRadius ()
 {
   object_bbox_valid = true;
-  if (mesh_vertices.Length () == 0)
+  if (mesh_vertices.GetSize () == 0)
   {
     object_bbox.Set (0, 0, 0, 0, 0, 0);
     radius = 0.0f;
@@ -1667,7 +1692,7 @@ void csGenmeshMeshObjectFactory::CalculateBBoxRadius ()
   csVector3& v0 = mesh_vertices[0];
   object_bbox.StartBoundingBox (v0);
   size_t i;
-  for (i = 1 ; i < mesh_vertices.Length () ; i++)
+  for (i = 1 ; i < mesh_vertices.GetSize () ; i++)
   {
     csVector3& v = mesh_vertices[i];
     object_bbox.AddBoundingVertexSmart (v);
@@ -1675,7 +1700,7 @@ void csGenmeshMeshObjectFactory::CalculateBBoxRadius ()
 
   const csVector3& center = object_bbox.GetCenter ();
   float max_sqradius = 0.0f;
-  for (i = 0 ; i < mesh_vertices.Length () ; i++)
+  for (i = 0 ; i < mesh_vertices.GetSize () ; i++)
   {
     csVector3& v = mesh_vertices[i];
     float sqradius = csSquaredDist::PointPoint (center, v);
@@ -1749,19 +1774,19 @@ static void RemapIndexBuffer (csRef<iRenderBuffer>& index_buffer,
 
 void csGenmeshMeshObjectFactory::Compress ()
 {
-  //size_t old_num = mesh_vertices.Length ();
+  //size_t old_num = mesh_vertices.GetSize ();
   csCompressVertexInfo* vt = csVertexCompressor::Compress (
     	mesh_vertices, mesh_texels, mesh_normals, mesh_colors);
   if (vt)
   {
-    //printf ("From %d to %d\n", int (old_num), int (mesh_vertices.Length ()));
+    //printf ("From %d to %d\n", int (old_num), int (mesh_vertices.GetSize ()));
     //fflush (stdout);
 
     if (subMeshes.GetSize () == 0)
     {
       // Now we can remap the vertices in all triangles.
       size_t i;
-      for (i = 0 ; i < mesh_triangles.Length () ; i++)
+      for (i = 0 ; i < mesh_triangles.GetSize () ; i++)
       {
         mesh_triangles[i].a = (int)vt[mesh_triangles[i].a].new_idx;
         mesh_triangles[i].b = (int)vt[mesh_triangles[i].b].new_idx;
@@ -1862,11 +1887,11 @@ void csGenmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder,
     {
       if (!vertex_buffer)
         vertex_buffer = csRenderBuffer::CreateRenderBuffer (
-          mesh_vertices.Length (), CS_BUF_STATIC,
+          mesh_vertices.GetSize (), CS_BUF_STATIC,
           CS_BUFCOMP_FLOAT, 3, false);
       mesh_vertices_dirty_flag = false;
       vertex_buffer->CopyInto (mesh_vertices.GetArray (),
-	  mesh_vertices.Length ());
+	  mesh_vertices.GetSize ());
     }
     holder->SetRenderBuffer (buffer, vertex_buffer);
     return;
@@ -1877,10 +1902,10 @@ void csGenmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder,
     {
       if (!texel_buffer)
         texel_buffer = csRenderBuffer::CreateRenderBuffer (
-          mesh_texels.Length (), CS_BUF_STATIC,
+          mesh_texels.GetSize (), CS_BUF_STATIC,
           CS_BUFCOMP_FLOAT, 2, false);
       mesh_texels_dirty_flag = false;
-      texel_buffer->CopyInto (mesh_texels.GetArray (), mesh_texels.Length ());
+      texel_buffer->CopyInto (mesh_texels.GetArray (), mesh_texels.GetSize ());
     }
     holder->SetRenderBuffer (buffer, texel_buffer);
     return;
@@ -1891,11 +1916,11 @@ void csGenmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder,
     {
       if (!normal_buffer)
         normal_buffer = csRenderBuffer::CreateRenderBuffer (
-          mesh_normals.Length (), CS_BUF_STATIC,
+          mesh_normals.GetSize (), CS_BUF_STATIC,
           CS_BUFCOMP_FLOAT, 3, false);
       mesh_normals_dirty_flag = false;
       normal_buffer->CopyInto (mesh_normals.GetArray (),
-	  mesh_normals.Length ());
+	  mesh_normals.GetSize ());
     }
     holder->SetRenderBuffer (buffer, normal_buffer);
     return;
@@ -1906,11 +1931,11 @@ void csGenmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder,
     {
       if (!tangent_buffer)
         tangent_buffer = csRenderBuffer::CreateRenderBuffer (
-          mesh_vertices.Length (), CS_BUF_STATIC,
+          mesh_vertices.GetSize (), CS_BUF_STATIC,
           CS_BUFCOMP_FLOAT, 3);
       if (!binormal_buffer)
         binormal_buffer = csRenderBuffer::CreateRenderBuffer (
-          mesh_vertices.Length (), CS_BUF_STATIC,
+          mesh_vertices.GetSize (), CS_BUF_STATIC,
           CS_BUFCOMP_FLOAT, 3);
       mesh_tangents_dirty_flag = false;
 
@@ -1919,7 +1944,7 @@ void csGenmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder,
       csDirtyAccessArray<csTriangle> triangleScratch;
       if (subMeshes.GetSize() == 0)
       {
-        triNum = mesh_triangles.Length ();
+        triNum = mesh_triangles.GetSize ();
         tris = mesh_triangles.GetArray ();
       }
       else
@@ -1929,23 +1954,23 @@ void csGenmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder,
           size_t scratchPos = triangleScratch.GetSize();
           iRenderBuffer* indexBuffer = subMeshes[i]->SubMesh::GetIndices();
           size_t indexTris = indexBuffer->GetElementCount() / 3;
-          triangleScratch.SetLength (scratchPos + indexTris);
+          triangleScratch.SetSize (scratchPos + indexTris);
           csRenderBufferLock<uint8> indexLock (indexBuffer, CS_BUF_LOCK_READ);
           memcpy (triangleScratch.GetArray() + scratchPos,
             indexLock.Lock(), indexTris * sizeof (csTriangle));
         }
-        triNum = triangleScratch.Length ();
+        triNum = triangleScratch.GetSize ();
         tris = triangleScratch.GetArray ();
       }
-      csVector3* tangentData = new csVector3[mesh_vertices.Length () * 2];
-      csVector3* bitangentData = tangentData + mesh_vertices.Length ();
+      csVector3* tangentData = new csVector3[mesh_vertices.GetSize () * 2];
+      csVector3* bitangentData = tangentData + mesh_vertices.GetSize ();
       csNormalMappingTools::CalculateTangents (triNum, tris, 
-        mesh_vertices.Length (), mesh_vertices.GetArray (), 
+        mesh_vertices.GetSize (), mesh_vertices.GetArray (), 
         mesh_normals.GetArray (), mesh_texels.GetArray (), 
         tangentData, bitangentData);
 
-      tangent_buffer->CopyInto (tangentData, mesh_vertices.Length ());
-      binormal_buffer->CopyInto (bitangentData, mesh_vertices.Length ());
+      tangent_buffer->CopyInto (tangentData, mesh_vertices.GetSize ());
+      binormal_buffer->CopyInto (bitangentData, mesh_vertices.GetSize ());
 
       delete[] tangentData;
     }
@@ -1959,11 +1984,11 @@ void csGenmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder,
     {
       if (!index_buffer)
         index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
-          mesh_triangles.Length ()*3, CS_BUF_STATIC,
-          CS_BUFCOMP_UNSIGNED_INT, 0, mesh_vertices.Length () - 1);
+          mesh_triangles.GetSize ()*3, CS_BUF_STATIC,
+          CS_BUFCOMP_UNSIGNED_INT, 0, mesh_vertices.GetSize () - 1);
       mesh_triangle_dirty_flag = false;
       index_buffer->CopyInto (mesh_triangles.GetArray (),
-	  mesh_triangles.Length ()*3);
+	  mesh_triangles.GetSize ()*3);
     }
     holder->SetRenderBuffer (buffer, index_buffer);
     return;
@@ -1991,10 +2016,10 @@ void csGenmeshMeshObjectFactory::AddTriangle (const csTriangle& tri)
 void csGenmeshMeshObjectFactory::SetVertexCount (int n)
 {
   size_t oldN = mesh_vertices.GetSize ();
-  mesh_vertices.SetLength (n);
-  mesh_texels.SetLength (n);
-  mesh_colors.SetLength (n);
-  mesh_normals.SetLength (n);
+  mesh_vertices.SetSize (n);
+  mesh_texels.SetSize (n);
+  mesh_colors.SetSize (n);
+  mesh_normals.SetSize (n);
   initialized = false;
 
   if (size_t (n) > oldN)
@@ -2019,7 +2044,7 @@ void csGenmeshMeshObjectFactory::SetVertexCount (int n)
 
 void csGenmeshMeshObjectFactory::SetTriangleCount (int n)
 {
-  mesh_triangles.SetLength (n);
+  mesh_triangles.SetSize (n);
 
   index_buffer = 0;
   mesh_triangle_dirty_flag = true;
@@ -2138,9 +2163,9 @@ void csGenmeshMeshObjectFactory::GenerateSphere (const csEllipsoid& ellips,
 {
   csPrimitives::GenerateSphere (ellips, num, mesh_vertices, mesh_texels,
       mesh_normals, mesh_triangles, cyl_mapping, toponly, reversed);
-  mesh_colors.SetLength (mesh_vertices.Length ());
+  mesh_colors.SetSize (mesh_vertices.GetSize ());
   memset (mesh_colors.GetArray (), 0,
-      sizeof (csColor4)*mesh_vertices.Length ());
+      sizeof (csColor4)*mesh_vertices.GetSize ());
   Invalidate();
 }
 
@@ -2152,8 +2177,8 @@ void csGenmeshMeshObjectFactory::GenerateBox (const csBox3& box)
 {
   csPrimitives::GenerateBox (box, mesh_vertices, mesh_texels,
       mesh_normals, mesh_triangles);
-  mesh_colors.SetLength (mesh_vertices.Length ());
-  memset (mesh_colors.GetArray (), 0, sizeof (csColor4)*mesh_vertices.Length ());
+  mesh_colors.SetSize (mesh_vertices.GetSize ());
+  memset (mesh_colors.GetArray (), 0, sizeof (csColor4)*mesh_vertices.GetSize ());
   Invalidate();
 
 #if 0
@@ -2278,7 +2303,7 @@ void csGenmeshMeshObjectFactory::HardTransform (
     const csReversibleTransform& t)
 {
   size_t i;
-  for (i = 0 ; i < mesh_vertices.Length () ; i++)
+  for (i = 0 ; i < mesh_vertices.GetSize () ; i++)
   {
     mesh_vertices[i] = t.This2Other (mesh_vertices[i]);
     mesh_normals[i] = t.This2OtherRelative (mesh_normals[i]);
@@ -2323,9 +2348,9 @@ csMeshedPolygon* csGenmeshMeshObjectFactory::GetPolygons ()
   {
 
     csTriangle* triangles = mesh_triangles.GetArray ();
-    polygons = new csMeshedPolygon [mesh_triangles.Length ()];
+    polygons = new csMeshedPolygon [mesh_triangles.GetSize ()];
     size_t i;
-    for (i = 0 ; i < mesh_triangles.Length () ; i++)
+    for (i = 0 ; i < mesh_triangles.GetSize () ; i++)
     {
       polygons[i].num_vertices = 3;
       polygons[i].vertices = &triangles[i].a;

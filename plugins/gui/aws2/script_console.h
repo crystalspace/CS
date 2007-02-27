@@ -85,7 +85,7 @@ public:
   void FlipActiveState () 
   { 
     active = (active ? false : true); 
-    if (active==true && cmds.Length ()==0)
+    if (active==true && cmds.GetSize ()==0)
     {
       cmd.Clear ();	
     }

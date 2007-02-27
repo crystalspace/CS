@@ -117,7 +117,7 @@ bool csEventTimer::HandleEvent (iEvent& event)
 
   minimum_time = 2000000000;
   size_t i;
-  for (i = timerevents.Length() ; i > 0 ; i--)
+  for (i = timerevents.GetSize () ; i > 0 ; i--)
   {
     const size_t idx = i - 1;
     timerevent& te = timerevents[idx];
@@ -153,7 +153,7 @@ csTicks csEventTimer::GetTimeLeft (size_t idx) const
 size_t csEventTimer::FindTimerEvent (iTimerEvent* ev)
 {
   size_t i;
-  for (i = 0 ; i < timerevents.Length () ; i++)
+  for (i = 0 ; i < timerevents.GetSize () ; i++)
   {
     if (timerevents[i].event == ev)
       return i;

@@ -56,7 +56,7 @@ public:
    */
   void Compact ()
   {
-    size_t i = this->Length (); // see *1*
+    size_t i = this->GetSize (); // see *1*
     while (i > 0)
     {
       i--;

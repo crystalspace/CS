@@ -1,6 +1,6 @@
 /*
-  Copyright (C) 2003 by Marten Svanfeldt
-                        Anders Stenberg
+  Copyright (C) 2003, 2007 by Marten Svanfeldt
+                2003 by Anders Stenberg
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -22,6 +22,8 @@
 
 #include "ivideo/rndbuf.h"
 #include "csutil/leakguard.h"
+#include "csutil/bitops.h"
+#include "csutil/scf_implementation.h"
 
 static const GLenum compGLtypes[CS_BUFCOMP_TYPECOUNT] =
 {
@@ -32,315 +34,252 @@ static const GLenum compGLtypes[CS_BUFCOMP_TYPECOUNT] =
   GL_DOUBLE
 };
 
-struct csGLVBOBufferSlot;
-class csGLVBOBufferManager;
-
-#undef min
-#undef max
-template<typename T>
-T min(T a, T b)
-{
-  return (a<b?a:b);
-}
-
-template<typename T>
-T max(T a, T b)
-{
-  return (a>b?a:b);
-}
-
 enum csGLRenderBufferLockType
 {
-  CS_GLBUF_RENDERLOCK_ARRAY,
-  CS_GLBUF_RENDERLOCK_ELEMENTS
+  CS_GLBUF_RENDERLOCK_ARRAY = 0,
+  CS_GLBUF_RENDERLOCK_ELEMENTS = 1
 };
 
-#if 0
-class csGLRenderBufferSub;
-
-class csGLRenderBufferSub : public csGLRenderBuffer
+class csGLVBOBufferManager : public scfImplementation1<csGLVBOBufferManager,
+  iRenderBufferCallback>
 {
-public:
-  csGLRenderBufferSub (csGLRenderBuffer *buffer);
-
-  /// Copy data to the render buffer.
-  virtual void CopyToBuffer(const void *data, size_t length)
-  {
-    csGLRenderBuffer::CopyToBuffer (data, length);
-    owner->version++;
-  }
-
-  virtual void Release()
-  {
-    if (lastLock == CS_BUF_LOCK_NORMAL)
-    {
-      version++;
-      owner->version++;
-    }
-    isLocked = false;
-  }
-
-  virtual bool IsMasterBuffer ()
-  {
-    return false;
-  }
-
-protected:
-  csGLRenderBuffer *owner;
-  friend class csGLVBOBufferManager;
-};
-#endif
-
-/**
- * Single slot in a VBO buffer. Holds content of precisely 0 or 1 renderbuffers.
- */
-struct csGLVBOBufferSlot
-{
-public:
-  csGLVBOBufferSlot()
-    : vboTarget (GL_ARRAY_BUFFER_ARB), vboID (0), lastCachedVersion (0),
-      offset (0), listIdx (0), renderBufferPtr(0), next (0), prev (0),
-      inUse (false), locked (false), 
-      indexBuffer (false), separateVBO (false)
-  {
-  }
-
-  // opengl type, GL_ARRAY_BUFFER_ARB or GL_ELEMENT_ARRAY_BUFFER_ARB
-  GLenum vboTarget;
-  GLuint vboID;       // id of buffer
-
-  // last version of the associated buffer we cached
-  unsigned int lastCachedVersion;
-  size_t offset;                  // offset from start of buffer
-  unsigned int listIdx; 
-
-  csWeakRef<iRenderBuffer> renderBuffer;
-  iRenderBuffer* renderBufferPtr; // Needed to find hash entry
-
-  csGLVBOBufferSlot *next, *prev;
-
-  bool inUse;         //Currently allocated to some buffer
-  bool locked;        //Locked due to active renderering
-  bool indexBuffer;   //if this slot contains indexbuffer
-  bool separateVBO;   //this slot have a separate VBO buffer
-};
-
-/**
- * Manager responsible for allocation and management of VBO buffers
- * and buffer slots
- */
-class csGLVBOBufferManager :
-  public scfImplementation0<csGLVBOBufferManager>
-{
-public:
+public:  
   CS_LEAKGUARD_DECLARE (csGLVBOBufferManager);
   csGLVBOBufferManager (csGLExtensionManager *ext, csGLStateCache *state, 
-    iObjectRegistry* p);
+    size_t maxAlloction = 64*1024*1024);
   virtual ~csGLVBOBufferManager ();
 
   /**
-   * Activate a buffer before rendering. Make sure it is cached and the
-   * VBObuffer is activated
+   * Called when render buffer is about to be destroyed and removed
    */
-  bool ActivateBuffer (iRenderBuffer* buffer);
+  virtual void RenderBufferDestroyed (iRenderBuffer* buffer);
 
   /**
-   * Deactivate a buffer
+   * Lock buffer for rendering
    */
-  bool DeactivateBuffer (iRenderBuffer *buffer);
+  void* RenderLock (iRenderBuffer* buffer, csGLRenderBufferLockType type);
 
   /**
-   * Buffer removed
+   * Unlock buffer after rendering
    */
-  void BufferRemoved (iRenderBuffer *buffer);
+  void RenderRelease (iRenderBuffer* buffer);
 
   /**
    * Make sure no VBO-buffer is activated
    */
   void DeactivateVBO ();
 
-  void* RenderLock (iRenderBuffer* buffer, csGLRenderBufferLockType type);
-  void RenderRelease (iRenderBuffer* buffer);
-
-  // Dump stats about buffers to console
+  // Dump internal data
   void DumpStats ();
+private:
 
-  // Reset frame stats
-  void ResetFrameStats ();
-
-protected:
-  struct RenderBufferAux
-  {
-    size_t vbooffset; //offset from VBO-start
-    //"cached" values to speed up usage
-    csGLVBOBufferSlot* vboSlot;
-  };
-  csGLExtensionManager *ext; //extension manager
-  csGLStateCache *statecache;
-  csConfigAccess config;
-  iObjectRegistry *object_reg;
-  bool verbose, superVerbose;
-  csHash<RenderBufferAux, csPtrKey<iRenderBuffer> > bufferData;
-
+  // Internal constants
   enum
   {
-    VBO_NUMBER_OF_SLOTS = 12,
-    VBO_BIGGEST_SLOT_SIZE = 512*1024
+    VBO_BUFFER_VERTEX = 0,
+    VBO_BUFFER_INDEX = 1,
+    VBO_BUFFER_TYPE_COUNT = 2,
+
+    // Smallest allocation slot is 256 byte
+    VBO_MIN_SLOT_SIZE_PO2 = 8,
+    // Biggest allocation slots are 1MB
+    VBO_MAX_SLOT_SIZE_PO2 = 20,
+    VBO_NUM_SLOT_SIZES = VBO_MAX_SLOT_SIZE_PO2 - VBO_MIN_SLOT_SIZE_PO2 + 1,
+
+    VBO_MAX_SLOT_SIZE = (1 << VBO_MAX_SLOT_SIZE_PO2)
   };
 
-  // Precache buffer to specific slot
-  void Precache (iRenderBuffer* buffer, csGLVBOBufferSlot* slot);
+  // Preset number of slots per buffer
+  static const size_t VBO_SLOT_PER_BUFFER[VBO_NUM_SLOT_SIZES];
 
-  // Activate bufferslot
-  void ActivateVBOSlot (csGLVBOBufferSlot *slot);
+  // Global state
+  csGLExtensionManager *extensionManager; 
+  csGLStateCache *stateCache;
 
-  // Deactivate slot
-  void DeactivateVBOSlot (csGLVBOBufferSlot *slot);
+  size_t currentVBOAllocation;
+  size_t maxVBOAllocation;
 
-  // Find or allocate a new slot big enough, of given type
-  // indexBuffer indicates if it is indexbuffer (true) or normal
-  // render buffer (false)
-  csGLVBOBufferSlot* FindEmptySlot (size_t size, bool ib);
+  struct VBOSlot;
 
-  // allocate a vbo-buffer of given size
-  GLuint AllocateVBOBuffer (size_t size, bool ib);
-
-  // Touch slot as used
-  void TouchSlot (csGLVBOBufferSlot *slot)
+  // A single VBO buffer
+  struct VBOBuffer
   {
-    if (slot->separateVBO) return;
-    if (slot->indexBuffer) indexBuffer.TouchSlot (slot);
-    else vertexBuffer.TouchSlot (slot);
-  }
-
-  void DetachBuffer (csGLVBOBufferSlot *slot);
-  void AttachBuffer (csGLVBOBufferSlot *slot, iRenderBuffer* buffer);
- 
-  struct csGLVBOBuffer;
-  friend struct csGLVBOBuffer; // Borland/VC6: For access to VBO_NUMBER_OF_SLOTS.
-  struct csGLVBOBuffer
-  {
-    ~csGLVBOBuffer();
-
-    csGLVBOBufferManager* bufmgr;
+    // OpenGL id of buffer
     GLuint vboID;
-    // opengl type, GL_ARRAY_BUFFER_ARB or GL_ELEMENT_ARRAY_BUFFER_ARB
-    GLenum vboTarget;
-    size_t size; // total size (in bytes);
 
-    // Find an empty slot
-    csGLVBOBufferSlot* FindEmptySlot (size_t size, bool splitStarted = false);
+    // Size per slot
+    size_t slotSize;
 
-    // Setup, create VBO buffers and initial slots
-    void Setup (GLenum usage, size_t totalSize, csGLExtensionManager *ext);
+    // Number of slots
+    size_t numberOfSlots;
 
+    // Buffer type
+    size_t bufferType;
 
-    // Touch a slot (say it is in use)
-    void TouchSlot (csGLVBOBufferSlot *slot)
-    {
-      slots[slot->listIdx].MoveToBack (slot);
-    }
+    // Link to next buffer
+    VBOBuffer *nextBuffer, *prevBuffer;
 
-    //helper for listmanagement
-    size_t GetSizeFromIndex (uint index) { return max(1<<(index+8), 256); }
-    uint GetIndexFromSize (size_t size)
-    {
-      return max(csLog2 ((int)size-1)-7, 0);
-    }
+    // Bitmap of free slots, stored 4 bytes at a time, LSB to MSB 
+    // (bit 0 of first byte is first slot, bit 1 of first byte second etc)
+    uint32* freeBitmap;
 
-    struct slotList
-    {
-      slotList () : head (0), tail (0), usedSlots (0),
-      	slotsActivatedLastFrame (0),
-        slotsActivatedThisFrame(0), slotSize (0), totalCount (0),
-        slotsReusedLastFrame (0), slotsReusedThisFrame (0)
-      {}
-      csGLVBOBufferSlot *head, *tail;
-      
-      // Statistical data
-      uint usedSlots;
-      uint slotsActivatedLastFrame, slotsActivatedThisFrame;
-      size_t slotSize;
-      uint totalCount;
-      uint slotsReusedLastFrame, slotsReusedThisFrame;
-
-      //listmanagements
-      void PushFront (csGLVBOBufferSlot *slot)
-      {
-        slot->next = head;
-        if (head)
-          head->prev = slot;
-        else
-          tail = slot;
-        head = slot;
-      }
-
-      void MoveToBack (csGLVBOBufferSlot *slot)
-      {
-        if (slot == tail) return;
-        //unlink
-        Remove (slot);
-        slot->next = 0;
-
-        slot->prev = tail;
-        if (tail)
-          tail->next = slot;
-        else
-          head = slot;
-        tail = slot;
-      }
-
-      void Remove (csGLVBOBufferSlot *slot)
-      {
-        if (slot->prev)
-          slot->prev->next = slot->next;
-        else
-          head = slot->next;
-
-        if (slot->next)
-          slot->next->prev = slot->prev;
-        else
-          tail = slot->prev;
-
-        slot->next = slot->prev = 0;
-      }
-      void VerifyList ()
-      {
-        csGLVBOBufferSlot *slot = head; 
-        csGLVBOBufferSlot *prevSlot = 0;
-        while (slot && slot!=tail)
-        {
-          CS_ASSERT(slot->prev == prevSlot);
-          if (prevSlot) CS_ASSERT(prevSlot->next == slot);
-
-          if (!slot->prev) CS_ASSERT(slot == head);
-          if (!slot->next) CS_ASSERT(slot == tail);
-
-          prevSlot = slot;
-          slot = slot->next;
-        }
-
-        CS_ASSERT (slot==tail);
-      }
-    };
-    // List of slots
-    slotList slots[VBO_NUMBER_OF_SLOTS];
+    // The VBO slots
+    VBOSlot* vboSlots;
   };
 
-  csGLVBOBuffer vertexBuffer; // List of all VBO buffers for VB storage.
-  csGLVBOBuffer indexBuffer;  // List of all VBO buffers for IB storage.
-
-  void ParseByteSize (const char* sizeStr, size_t& size);
-
-  void Report (int severity, const char* msg, ...)
+  // Single slot in the VBO buffer
+  struct VBOSlot
   {
-    va_list arg;
-    va_start (arg, msg);
-    csReportV (object_reg, severity, "crystalspace.graphics3d.opengl.vbo", 
-      msg, arg);
-    va_end (arg);
+    VBOBuffer* vboBuffer;
+    iRenderBuffer* renderBuffer;
+    uint32 bufferVersion;
+    uint32 slotAge;
+  };
+
+  // Hold linked list (per size) of VBO buffers for smaller ones
+  VBOBuffer* vboBufferList[VBO_BUFFER_TYPE_COUNT][VBO_NUM_SLOT_SIZES];
+
+  // Array of bigger buffers
+  csArray<VBOBuffer*> vboBigBuffers[VBO_BUFFER_TYPE_COUNT];
+
+  // Contains all iRenderBuffer<->VBOSlot mappings
+  csHash<VBOSlot*, csPtrKey<iRenderBuffer> > renderBufferMappings;
+
+  // Contains all locked render buffers
+  csSet<csPtrKey<iRenderBuffer> > lockedRenderBuffers;
+
+  // Slot functions
+  // Get VBO Id and pointer offset from slot
+  inline void GetSlotIdAndOffset (const VBOSlot* slot, GLuint& id, size_t& offset) const
+  {
+    const VBOBuffer* vbob = slot->vboBuffer;
+
+    id = vbob->vboID;
+
+    const size_t slotIndex = size_t(slot - vbob->vboSlots);
+    offset = slotIndex * vbob->slotSize;
   }
 
+  // Given a size, get the next bigger slot-size as power of 2
+  inline size_t GetSlotSizePO2 (size_t size) const
+  {
+    return csMax<size_t> (csLog2 (csFindNearestPowerOf2 ((int)size)), VBO_MIN_SLOT_SIZE_PO2);
+  }
+
+  // Given a renderbuffer, get a VBO slot if possible, otherwise 0
+  VBOSlot* GetVBOSlot (iRenderBuffer* buffer);
+
+  // Given slot size and type, find a free slot
+  VBOSlot* GetFreeVBOSlot (size_t slotSizePO2, size_t slotType);
+
+  // Try to release a vbo-slot of given type
+  VBOSlot* TryFreeVBOSlot (size_t slotSizePO2, size_t slotType);
+
+  // Release (and optionally deallocate) a VBO slot
+  void ReleaseVBOSlot (VBOSlot* slot, bool deallocate = true);
+
+  // Mark slot as used
+  inline void SetSlotUsed (VBOSlot* slot) const
+  {
+    const size_t slotIndex = (slot - slot->vboBuffer->vboSlots);
+    const size_t slotBitmapIdx = slotIndex >> 5;
+    const size_t slotBitIdx = slotIndex & 31;
+
+    slot->vboBuffer->freeBitmap[slotBitmapIdx] &= ~(1 << slotBitIdx);    
+  }
+
+  // Mark slot as not used
+  inline void ClearSlotUsed (VBOSlot* slot) const
+  {
+    const size_t slotIndex = (slot - slot->vboBuffer->vboSlots);
+    const size_t slotBitmapIdx = slotIndex >> 5;
+    const size_t slotBitIdx = slotIndex & 31;
+
+    slot->vboBuffer->freeBitmap[slotBitmapIdx] |= 1 << slotBitIdx;
+  }
+
+  // Buffer functions
+  // Allocate a new VBO buffer and add it into internal lists
+  VBOBuffer* GetNewVBOBuffer (size_t slotSize, size_t slotSizePO2, size_t slotType);
+
+  // Release a VBO buffer
+  void FreeVBOBuffer (VBOBuffer* buffer);
+
+  // Other functions
+  void DumpStatsBufferType (size_t type);
+
+  /*
+
+  VBOBuffer* AllocateVBOBuffer (size_t slotSize, size_t slotSizePO2, 
+    bool& bigBuffer) const;
+
+  inline void FreeVBOBuffer (VBOBuffer* buffer) const
+  {
+    void* end = buffer + sizeof(VBOBuffer) + sizeof(VBOSlot) * buffer->numberOfSlots +
+      sizeof(uint32) * (buffer->numberOfSlots+31)/32;
+    csPrintf ("Freeing: %p - %p\n", buffer, end);
+    cs_free (buffer);
+  }
+
+  void SetupVBOBuffer (VBOBuffer* buffer, size_t bufferType);
+
+  VBOBuffer* GetVBOBufferForSlot (size_t bufferSize, size_t bufferType, size_t& slotIndex);
+
+  inline VBOBuffer* GetVBOBufferWithFreeSlot (size_t slotSizePO2, size_t bufferType, size_t& slotIndex) const
+  {
+    if (slotSizePO2 > VBO_MAX_SLOT_SIZE_PO2)
+      return 0;
+
+    // Scan VBO buffers of given type for one with free slots
+    const size_t slotSizeIdx = slotSizePO2 - VBO_MIN_SLOT_SIZE_PO2;
+    const size_t numSlots = VBO_SLOT_PER_BUFFER[slotSizeIdx];
+    const size_t numSlotBitmap = (numSlots + 31) / 32;
+    
+    VBOBuffer* buffer = vboBufferList[bufferType][slotSizeIdx];
+
+    // Scan over the buffers to find one with slots
+    while (buffer)
+    {
+      uint32* bitmap = buffer->freeBitmap;
+      // Scan the bitmap to find empty slots
+      // Scan 32 bits at a time
+      for (size_t bunchIdx = 0; bunchIdx < numSlotBitmap; bunchIdx++, bitmap++)
+      {
+        size_t localIndex;
+        bool foundSlot = CS::Math::BitOps::ScanBitForward (*bitmap, localIndex);
+        if (foundSlot)
+        {
+          slotIndex = 32*bunchIdx + localIndex;
+          return buffer;
+        }
+      }
+      
+      buffer = buffer->nextBuffer;
+    }
+
+    return 0;//none found..let caller allocate one
+  }
+
+  // Age all slots in a buffer(chain), return index of oldest slot
+  VBOSlot* AgeVBOBufferChain (VBOBuffer* bufferChain);
+
+  // Try to evict a slot fromg given buffer chain
+  VBOSlot* TryEvictVBOSlotFromChain (VBOBuffer* bufferChain);
+
+  // Given a size, get the next bigger slot-size as power of 2
+  inline size_t GetSlotSizePO2 (size_t size) const
+  {
+    return csMax<size_t> (csLog2 (csFindNearestPowerOf2 ((int)size)), VBO_MIN_SLOT_SIZE_PO2);
+  }
+
+  // Given a renderbuffer, get a VBO slot 
+  VBOSlot* GetVBOSlot (iRenderBuffer* buffer);
+
+  // Release a VBO slot
+  void ReleaseVBOSlot (VBOSlot* slot, bool doRelease = true);
+
+  // Helper when dumping statistics
+  */
 };
 
 #endif //__CS_GL_RENDERBUFFER_H__

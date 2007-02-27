@@ -154,8 +154,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(BugPlug)
 #define DEBUGCMD_MESH_ZPLUS	1063	// Move mesh
 #define DEBUGCMD_SAVEMAP	1064	// SaveMap
 #define DEBUGCMD_LISTPLUGINS	1065	// List all loaded plugins
-#define DEBUGCMD_PROFDUMP	1066	// Dump profile info (CS_PROFSTART).
-#define DEBUGCMD_PROFRESET	1067	// Reset profile info (CS_PROFRESET).
+#define DEBUGCMD_PROFTOGGLELOG	1066	// Start/stop profiler logging
+#define DEBUGCMD_PROFAUTORESET	1067	// Reset profiler automagically at end of every frame
 #define DEBUGCMD_UBERSCREENSHOT 1068    // Create an "uberscreenshot"
 
 // For showing of polygon meshes.
@@ -265,6 +265,10 @@ private:
   // For 'clear' command.
   bool do_clear;
 
+  // For profiling
+  bool do_profiler_reset;
+  bool do_profiler_log;
+
   // Dump various structures.
   void Dump (iEngine* engine);
   void Dump (iSector* sector);
@@ -291,7 +295,7 @@ private:
   csWeakRefArray<iMeshWrapper> selected_meshes;
   void AddSelectedMesh (iMeshWrapper* m);
   void RemoveSelectedMesh (iMeshWrapper* m);
-  bool HasSelectedMeshes () const { return selected_meshes.Length () > 0; }
+  bool HasSelectedMeshes () const { return selected_meshes.GetSize () > 0; }
   void MoveSelectedMeshes (const csVector3& offset);
 
   // Shadow!

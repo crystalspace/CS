@@ -244,7 +244,7 @@ void csSequenceManager::Clear ()
   main_time = 0;
   previous_time_valid = false;
   size_t i;
-  for (i = 0 ; i < sequences.Length () ; i++)
+  for (i = 0 ; i < sequences.GetSize () ; i++)
   {
     csWeakRef<csSequence>* seq = sequences[i];
     if (seq->IsValid())
@@ -312,11 +312,11 @@ csPtr<iSequence> csSequenceManager::NewSequence ()
   if (cnt >= 100)
   {
     cnt = 0;
-    if (sequences.Length () > 100)
+    if (sequences.GetSize () > 100)
     {
       size_t i;
       csArray<csWeakRef<csSequence>* > copy;
-      for (i = 0 ; i < sequences.Length () ; i++)
+      for (i = 0 ; i < sequences.GetSize () ; i++)
       {
         csWeakRef<csSequence>* seq = sequences[i];
 	if ((*seq) != 0) copy.Push (seq);

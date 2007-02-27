@@ -1884,7 +1884,7 @@ void csLightingPolyTexQueue::UpdateMaps (
     return; // No update maps for dynamic lights.
 
   size_t i;
-  for (i = 0; i < polytxts.Length (); i++)
+  for (i = 0; i < polytxts.GetSize (); i++)
   {
     csPolyTexture *pt = polytxts[i];
     csPolygon3D* pol = polygons[i];

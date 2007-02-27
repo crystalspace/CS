@@ -505,7 +505,7 @@ void TiXmlElement::Print( iString* cfile, int depth ) const
 
   StrPrintf ( cfile, "<%s", value );
 
-  for (size_t i = 0 ; i < attributeSet.set.Length () ; i++)
+  for (size_t i = 0 ; i < attributeSet.set.GetSize () ; i++)
   {
     const TiDocumentAttribute& attrib = attributeSet.set[i];
     StrPrintf ( cfile, " " );
@@ -557,7 +557,7 @@ TiDocumentNode* TiXmlElement::Clone(TiDocument* document) const
 
   // Clone the attributes, then clone the children.
   size_t i;
-  for (i = 0 ; i < attributeSet.set.Length () ; i++)
+  for (i = 0 ; i < attributeSet.set.GetSize () ; i++)
   {
     const TiDocumentAttribute& attrib = attributeSet.set[i];
     clone->GetAttributeRegistered (attrib.Name ()).
@@ -797,7 +797,7 @@ TiDocumentNode* TiXmlUnknown::Clone(TiDocument* /*document*/) const
 size_t TiDocumentAttributeSet::Find (const char * name) const
 {
   size_t i;
-  for (i = 0 ; i < set.Length () ; i++)
+  for (i = 0 ; i < set.GetSize () ; i++)
   {
     if (strcmp (set[i].name, name) == 0) return i;
   }
@@ -807,7 +807,7 @@ size_t TiDocumentAttributeSet::Find (const char * name) const
 size_t TiDocumentAttributeSet::FindExact (const char * reg_name) const
 {
   size_t i;
-  for (i = 0 ; i < set.Length () ; i++)
+  for (i = 0 ; i < set.GetSize () ; i++)
   {
     if (set[i].name == reg_name) return i;
   }

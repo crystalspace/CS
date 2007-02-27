@@ -424,7 +424,7 @@ void awsTabCtrl::DoLayout ()
 
   r = Frame ();
 
-  for (i = MAX (first, 0); i < vTabs.Length (); i++)
+  for (i = MAX (first, 0); i < vTabs.GetSize (); i++)
   {
     awsTab *btn = vTabs.Get (i);
     csRect br =  btn->Frame ();
@@ -470,7 +470,7 @@ iAwsSource* awsTabCtrl::AddTab (iString* caption, intptr_t user_param)
   csRef<iString> theCap;
   theCap.AttachNew (new scfString (""));
   if (!caption || !caption->GetData ())
-    theCap->Format ("Tab%d", (uint)vTabs.Length () + 1);
+    theCap->Format ("Tab%d", (uint)vTabs.GetSize () + 1);
   else
     theCap = caption;
 
@@ -491,7 +491,7 @@ iAwsSource* awsTabCtrl::AddTab (iString* caption, intptr_t user_param)
 
   // Resize button.
   csRect r (btn->getPreferredSize ());
-  int last = (int)vTabs.Length ();
+  int last = (int)vTabs.GetSize ();
   if (r.Height () > Frame ().Height ())
   {
     int delta = r.Height () - Frame ().Height ();
@@ -539,14 +539,14 @@ void awsTabCtrl::RemoveTabIndex (int index)
   {
     if (index == active)
     {
-      if (vTabs.Length () - 1 == (size_t)active)
+      if (vTabs.GetSize () - 1 == (size_t)active)
         ActivateTabIndex (active - 1);
       else
         ActivateTabIndex (active + 1);
     }
 
     vTabs.Get (first)->SetFirst (false);
-    if ((index < first) || (index == first && (first > 0 || vTabs.Length () < 2)))
+    if ((index < first) || (index == first && (first > 0 || vTabs.GetSize () < 2)))
       first--;
 
     if (first > -1)
@@ -600,13 +600,13 @@ void awsTabCtrl::OnDraw (csRect /*clip*/)
 
 void awsTabCtrl::ScrollLeft ()
 {
-  if (vTabs.Length () && (size_t)first != vTabs.Length () - 1)
+  if (vTabs.GetSize () && (size_t)first != vTabs.GetSize () - 1)
   {
     int xdelta = vTabs.Get (first)->Frame ().Width () + 1;
     vTabs.Get (first)->SetFirst (false);
     
     size_t i;
-    for (i = 0; i < vTabs.Length (); i++)
+    for (i = 0; i < vTabs.GetSize (); i++)
       vTabs.Get (i)->Move (-xdelta, 0);
     first++;
     vTabs.Get (first)->SetFirst (true);
@@ -616,13 +616,13 @@ void awsTabCtrl::ScrollLeft ()
 
 void awsTabCtrl::ScrollRight ()
 {
-  if (vTabs.Length () && first != 0)
+  if (vTabs.GetSize () && first != 0)
   {
     int xdelta = vTabs.Get (first - 1)->Frame ().Width () + 1;
     vTabs.Get (first)->SetFirst (false);
     
     size_t i;
-    for (i = 0; i < vTabs.Length (); i++)
+    for (i = 0; i < vTabs.GetSize (); i++)
       vTabs.Get (i)->Move (xdelta, 0);
     first--;
     vTabs.Get (first)->SetFirst (true);
@@ -652,7 +652,7 @@ void awsTabCtrl::MakeVisible (int idx)
 int awsTabCtrl::FindTab (intptr_t user_param)
 {
   size_t i;
-  for (i = 0; i < vTabs.Length (); i++)
+  for (i = 0; i < vTabs.GetSize (); i++)
   {
     intptr_t p;
     vTabs.Get (i)->GetProperty ("User Param", &p);
@@ -694,7 +694,7 @@ csRect awsTabCtrl::getPreferredSize ()
     return preferred_size;
   size_t i;
   int width = 0;
-  for(i = 0; i < vTabs.Length (); i++)
+  for(i = 0; i < vTabs.GetSize (); i++)
   {
     width += vTabs.Get (i)->getPreferredSize ().Width ();
   }

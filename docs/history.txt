@@ -2,14 +2,149 @@ Crystal Space detailed change log.
 http://www.crystalspace3d.org/
 
 The overall history is in reverse (descending) chronological order, so that
-each new day's entries apears before the previous day's entries.  The
+each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Feb-2007
+	- Andrew Robberts updated decals so reduce z-fighting and seams.
+	- Marten rewrote the VBO buffer handling to be more robust, contain
+	  less cruft and be a bit faster.
+	- Andrew Robberts updated decals to better specify a top and
+	  bottom clipping plane for decals.
+	- res slightly expanded the manual section on smart pointers with
+	  information on translation to and from normal pointers as well as
+	  information on csWeakRef<> and how to deal with references in
+	  function parameters.
+	- res replaced the csPtr<> API docs with an excerpt from the user
+	  manual description. Also added pointer to section in manual.
+	- res made csRenderBuffer use cs_malloc() for buffer data allocation.
+	- res marked the new temp file/dir functions for DLL exporting.
+	- res fixed an inclusion of a non-existant header in the bullet 
+	  plugin. (Probably went undetected due a blunder in cs-win32libs 
+	  which actually ships this header [which was removed between bullet 
+	  versions]...)
+	- res made more Windows SDK 6.0 compatibility fixes.
+	- Marten added CSV logging to the profiling plugin. Also added a
+	  command to start and stop logging as well as activating automatic
+	  reset (and writing) of data once per frame.
+	- Marten removed some left-over debugging code in lighter2. Fixes
+	  trac #237.
+10-Feb-2007
+	- Marten hopefully fixed lighter2 compiled with MSVC on win64.
+	- res changed csjpgimg to not use setjmp() but exceptions for error
+	  handling (setjmp doesn't work right on Win64 MSVC). Also added some
+	  wrappers around the JPEG structs so the client code more feels like
+	  C++ and less like C.
+9-Feb-2007
+        - Piotr started implementation of iSkeleton related interfaces in
+          Cal3d plugin.
+	- res added a csPackRGB::PackRGBpixelToRGB() variant that packs to a
+	  given buffer.
+	- res fixed a couple of compile errors with VC7.0.
+8-Feb-2007
+	- Marten added (untested) code for atomic operations on SPARC.
+	- Piotr improved choosing pixelformat in wxgl plugin (on win32 only).
+        - Piotr made wxgl plugin compilable and working with wxwidgets 2.8
+	- Marten made two tweaks to particles:
+	    - Exposed initial angular velocity setting on emitters to xml.
+	    - Made sure rotation-mode resets the texcoord vectors. Fixes
+	      problem when switching from texcoord rotation to none.
+	- res split csutil/threading/atomicops.h up into multiple files (one
+	  per implementation).
+        - Piotr made more backward compatibility safe and improved code quality
+          (removed not valid comments and unecesery method) in his latest commit.
+	- Andrew Robberts made decals a bit more efficient sharing memory and
+	  adding the ability to reuse/change existing decals
+7-Feb-2007
+	- Genjix changed csWeakRefArray to not use deprecated Length ().
+	- res changed configure to normalize sparc* cpu names to sparc (so
+	  e.g. sparc64 is treated as sparc).
+6-Feb-2007
+	- res added CS::ScopedDelete<>, a helper class to delete a pointer 
+	  when leaving a scope.
+4-Feb-2007
+	- res worked around an apparent incompatibility between one of VC8's
+	  headers and a header from the latest Windows SDK 6.0.
+	- res fixed a couple of compile warnings.
+	- res changed the CS_REQUEST_FONTSERVER macro to pull in the font
+	  multiplexer plugin instead of the "default" font plugin. (The idea
+	  is that nowadays most people would probably like to use TrueType
+	  fonts instead of the built-in bitmap fonts; using the font plexer
+	  by default this will work out of the box.)
+	- Luca fixed the source code of the examples in the Threading 
+	  Library section of the manual.
+	- res fixed the static plugin dependencies file to contain the correct
+	  library names.
+3-Feb-2007
+	- Jorrit added 'decal_test' to the online help for walktest.
+	- Marten fixed a compilation error in sector.cpp that only showed
+	  in release mode.
+2-Feb-2007
+	- res worked around Cg not being properly detected on Linux when
+	  -Wl,--as-needed was passed in LDFLAGS.
+	- res correctly placed a comment in compiler.m4 and fixed the response
+	  file support test. (Previously it didn't work - the used @ sign
+	  is internally used by the CS build test macros as a separator.
+	  Worked around by not using the CS build macros but the relevant AC_
+	  macros directly.)
+	- res fixed a couple of warnings and errors after the temp file name
+	  stuff change. Also removed an (actually inappropriate) use of
+	  GetTempFilename in importkit_glue.cpp.
+	- res slightly changed CS_TEMP_DIR and CS_TEMP_FILE to emit a warning
+	  when employed.
+	- Marten removed deprecated methods from:
+	    - csArray and derived types
+	    - csPath
+	    - csImageBase
+	- Marten put back csArray::Length and csArray::SetLength but properly
+	  marked them deprecated.
+	- Andrew Robberts added the ability to attach arbitrary rendermeshes 
+	  with priority and zbufmodes to any iMeshWrapper.
+	- Andrew Robberts added an InSphere function to poly3d to test 
+  	  if the poly is within a sphere.
+	- Andrew Robberts added decal support and a decalmanager plugin
+	  to CS.  Decals are currently supported by thing and static
+	  genmeshes.
+        - Andrew Robberts fixed copyright, interface versions, and comments
+        - Andrew Robberts added missing include/igeom/decal.h
+	- Andrew Robberts fixed pointer and csRef references in decals.
+1-Feb-2007
+	- Marten fixed compilation of CS::DataBuffer on gcc.
+	- Marten made sure genmesh doesn't return any rendermeshes when
+	  there is no triangles. Fix bug #224.
+	- Marten implemented functions to get temporary directory and
+	  file in CS::Platform / syspath.h. These functions make
+	  CS_TEMP_DIR and CS_TEMP_FILE deprecated.
+31-Jan-2007
+	- Jorrit changed csImageMemory to use a csDataBuffer to keep track
+	  of its image memory. That way it can also implement GetRawData().
+	- Jorrit changed the png loader to use rawData instead
+	  of dataSource.
+	- Jorrit reverted the png loader change as it was assigning the raw
+	  file data to rawData but rawData is supposed to contain the
+	  decoded image data.
+	- Jorrit changed the png loader again so that it now correctly sets
+	  up the rawData from the decoded image data.
+	- res added a memory allocator mixin using new char[].
+	- res turned csDataBuffer into template<Allocator> CS::DataBuffer. 
+	  This allows to use different allocators for data buffers. (The
+	  default DataBuffer now uses cs_malloc(); csDataBuffer still uses
+	  new char[].)
+	- res fixed the JNG plugin for the change in the way csImageMemory 
+	  stores image data.
+	- res fixed some deprecation warnings caused by r26260.
+30-Jan-2007
+	- res rigged (the deprecated) csutil/debug.h to emit a warning when
+	  included.
+29-Jan-2007
+	- Andrew Robberts fixed a warning from checking if an unsigned is >= 0.
 	- Jorrit reverted a change from Genjix yesterday. /bin/bash doesn't
 	  exist on mingw.
 	- res rigged (the deprecated) csutil/profile.h to emit a warning when
 	  included.
+	- Genjix added fix to cs-config where a switch case is autogenerated for
+	  variable indirection for systems like ubuntu.
 28-Jan-2007
 	- Eric Sunshine made some minor clarifications to the Dev-CPP tutorial
 	  suggested by Johannes Schoen <schoen.johannes@arcor.de>.

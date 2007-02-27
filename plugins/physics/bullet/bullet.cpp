@@ -31,7 +31,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <CcdPhysics/CcdPhysicsController.h>
 #include <Dynamics/RigidBody.h>
 #include <CcdPhysics/CcdPhysicsEnvironment.h>
-#include <ConstraintSolver/SimpleConstraintSolver.h>
 #include <BroadphaseCollision/SimpleBroadphase.h>
 #include <CollisionShapes/BoxShape.h>
 #include <CollisionShapes/EmptyShape.h>

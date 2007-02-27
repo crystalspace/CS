@@ -86,7 +86,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 
   ValueSet ValueSet::operator!() const
   {
-    if (intervals.Length() == 0) return ValueSet ();
+    if (intervals.GetSize () == 0) return ValueSet ();
 
     csArray<Interval::Side,
       csArrayElementHandler<Interval::Side>,

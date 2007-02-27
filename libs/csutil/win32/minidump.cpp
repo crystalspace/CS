@@ -455,8 +455,6 @@ const char* cswinMinidumpWriter::WriteWrappedMinidump (
 
 //#define TEST_EXCEPTION_HANDLER
 
-extern "C" BOOL WINAPI IsDebuggerPresent();
-
 LONG WINAPI cswinMinidumpWriter::ExceptionFilter (
   struct _EXCEPTION_POINTERS* ExceptionInfo)
 {

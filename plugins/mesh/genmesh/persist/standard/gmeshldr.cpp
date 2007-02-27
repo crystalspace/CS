@@ -1165,10 +1165,10 @@ bool csGeneralMeshLoader::ParseLegacySubMesh(iDocumentNode *node,
   }
 
   if (do_mixmode)
-    state->AddSubMesh (triangles.GetArray (), (int)triangles.Length (),
+    state->AddSubMesh (triangles.GetArray (), (int)triangles.GetSize (),
   	  material, mixmode);
   else
-    state->AddSubMesh (triangles.GetArray (), (int)triangles.Length (),
+    state->AddSubMesh (triangles.GetArray (), (int)triangles.GetSize (),
   	  material);
 
   return true;

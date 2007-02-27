@@ -442,7 +442,7 @@ float csColliderHelper::TraceBeam (iCollideSystem* cdsys, iSector* sector,
 	const csArray<csIntersectingTriangle>& tris = cdsys->
 		GetIntersectingTriangles ();
 	size_t i;
-	for (i = 0 ; i < tris.Length () ; i++)
+	for (i = 0 ; i < tris.GetSize () ; i++)
 	{
 	  csVector3 isect;
 	  csIntersectingTriangle tri;
@@ -961,7 +961,7 @@ bool csColliderActor::AdjustForCollisions (
   localvel -= maxmove - oldpos;
   csVector3 correctedVel(localvel);
 
-  for (i = 0; i < our_cd_contact.Length () ; i++ )
+  for (i = 0; i < our_cd_contact.GetSize () ; i++ )
   {
     csCollisionPair& cd = our_cd_contact[i];
     csPlane3 obstacle (cd.a2, cd.b2, cd.c2);
@@ -1031,7 +1031,7 @@ bool csColliderActor::AdjustForCollisions (
   while (hits > 0 && newpos.y < maxJump)
   {
     bool adjust = false;
-    for (i = 0; i < our_cd_contact.Length (); i++ )
+    for (i = 0; i < our_cd_contact.GetSize (); i++ )
     {
       csCollisionPair cd = our_cd_contact[i];
       csPlane3 obstacle (cd.a2, cd.b2, cd.c2);
@@ -1117,7 +1117,7 @@ bool csColliderActor::AdjustForCollisions (
     cd = 0;
 
   hits = 0;
-  for (i = 0; i < our_cd_contact.Length () ; i++ )
+  for (i = 0; i < our_cd_contact.GetSize () ; i++ )
   {
     csCollisionPair& cd = our_cd_contact[i];
     csPlane3 obstacle (cd.a2, cd.b2, cd.c2);

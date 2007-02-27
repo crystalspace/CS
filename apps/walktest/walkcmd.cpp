@@ -88,13 +88,13 @@ void SaveRecording (iVFS* vfs, const char* fName)
 {
   csRef<iFile> cf;
   cf = vfs->Open (fName, VFS_FILE_WRITE);
-  uint32 l = (int32)Sys->recording.Length();
+  uint32 l = (int32)Sys->recording.GetSize ();
   l = csLittleEndian::Convert (l);
   cf->Write ((char*)&l, sizeof (l));
   size_t i;
   csRecordedCameraFile camint;
   iSector* prev_sector = 0;
-  for (i = 0 ; i < Sys->recording.Length () ; i++)
+  for (i = 0 ; i < Sys->recording.GetSize () ; i++)
   {
     csRecordedCamera* reccam = (csRecordedCamera*)Sys->recording[i];
     camint.m11 = csLittleEndian::Convert (csFloatToLong (reccam->mat.m11));
@@ -160,7 +160,7 @@ void LoadRecording (iVFS* vfs, const char* fName)
   cf = vfs->Open (fName, VFS_FILE_READ);
   if (!cf) return;
   Sys->recording.DeleteAll ();
-  Sys->recording.SetLength (0);
+  Sys->recording.SetSize (0);
   int32 l;
   cf->Read ((char*)&l, sizeof (l));
   l = csLittleEndian::Convert (l);
@@ -247,7 +247,7 @@ void WalkTest::SaveCamera (const char *fName)
     c->GetSector ()->QueryObject ()->GetName (), 
     int(c->IsMirrored ()));
 
-  myVFS->WriteFile (fName, s.GetData(), s.Length());
+  myVFS->WriteFile (fName, s.GetData(), s.Length ());
 }
 
 bool WalkTest::LoadCamera (const char *fName)
@@ -924,7 +924,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("Statistics:");
     CONPRI("  stats perftest coordshow");
     CONPRI("Special effects:");
-    CONPRI("  addmbot delmbot addbot delbot fire explosion frain");
+    CONPRI("  addmbot delmbot addbot delbot fire explosion frain decal_test");
     CONPRI("  rain snow fountain flame portal fs_inter fs_fadeout fs_fadecol");
     CONPRI("  fs_fadetxt fs_red fs_green fs_blue fs_whiteout fs_shadevert");
     CONPRI("Debugging:");
@@ -1254,7 +1254,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!csStrCaseCmp (cmd, "clrrec"))
   {
     Sys->recording.DeleteAll ();
-    Sys->recording.SetLength (0);
+    Sys->recording.SetSize (0);
   }
   else if (!csStrCaseCmp (cmd, "record"))
   {
@@ -1818,6 +1818,11 @@ bool CommandHandler (const char *cmd, const char *arg)
     extern void fire_missile ();
     fire_missile ();
   }
+  else if (!csStrCaseCmp (cmd, "decal_test"))
+  {
+    extern void test_decal();
+    test_decal ();
+  }
   else if (!csStrCaseCmp (cmd, "lightning"))
   {
     extern void show_lightning ();
@@ -2196,7 +2201,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       {
         ll->Remove (l);
 	size_t j;
-	for (j = 0 ; j < Sys->dynamic_lights.Length () ; j++)
+	for (j = 0 ; j < Sys->dynamic_lights.GetSize () ; j++)
 	{
 	  if (Sys->dynamic_lights[j] == l)
 	  {
@@ -2221,7 +2226,7 @@ bool CommandHandler (const char *cmd, const char *arg)
       {
         ll->Remove (l);
 	size_t j;
-	for (j = 0 ; j < Sys->dynamic_lights.Length () ; j++)
+	for (j = 0 ; j < Sys->dynamic_lights.GetSize () ; j++)
 	{
 	  if (Sys->dynamic_lights[j] == l)
 	  {

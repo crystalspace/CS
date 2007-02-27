@@ -76,7 +76,7 @@ public:
   /**
    * Get the number of vertices.
    */
-  inline size_t GetVertexCount () const { return vertices.Length (); }
+  inline size_t GetVertexCount () const { return vertices.GetSize (); }
 
   /**
    * Get the array with all vertices.
@@ -93,7 +93,7 @@ public:
    */
   inline const csVector3* GetVertex (size_t i) const
   {
-    if (i >= vertices.Length ()) return 0;
+    if (i >= vertices.GetSize ()) return 0;
     return &(vertices.GetArray ()[i]);
   }
 
@@ -118,7 +118,7 @@ public:
    */
   inline const csVector3* GetFirst () const
   { 
-    if (vertices.Length ()<=0) return 0;  
+    if (vertices.GetSize ()<=0) return 0;  
     else return vertices.GetArray ();
   }
 
@@ -127,9 +127,9 @@ public:
    */
   inline const csVector3* GetLast () const
   { 
-    if (vertices.Length ()<=0) return 0; 
+    if (vertices.GetSize ()<=0) return 0; 
     else return 
-      &(vertices.GetArray ())[vertices.Length ()-1]; 
+      &(vertices.GetArray ())[vertices.GetSize ()-1]; 
   }
 
   /**
@@ -153,7 +153,7 @@ public:
   inline void SetVertexCount (size_t n) 
   { 
     MakeRoom (n);
-    vertices.SetLength (n); 
+    vertices.SetSize (n); 
   }
 
   /**
@@ -248,7 +248,7 @@ public:
    */
   inline int Classify (const csPlane3& pl) const
   {
-    return Classify (pl, vertices.GetArray (), vertices.Length ());
+    return Classify (pl, vertices.GetArray (), vertices.GetSize ());
   }
 
   /// Same as Classify() but for X plane only.
@@ -315,7 +315,7 @@ public:
   /// Compute the normal of this polygon.
   inline csVector3 ComputeNormal () const
   {
-    return ComputeNormal (vertices.GetArray (), vertices.Length ());
+    return ComputeNormal (vertices.GetArray (), vertices.GetSize ());
   }
 
   /// Compute the plane of a polygon.
@@ -330,7 +330,7 @@ public:
   /// Compute the plane of this polygon.
   inline csPlane3 ComputePlane () const
   {
-    return ComputePlane (vertices.GetArray (), vertices.Length ());
+    return ComputePlane (vertices.GetArray (), vertices.GetSize ());
   }
 
   /**
@@ -342,6 +342,9 @@ public:
    * Compute and get the central vertex of this polygon.
    */
   csVector3 GetCenter () const;
+
+  /// Figure out if this polygon is inside or intersecting a sphere
+  bool InSphere(const csVector3& center, float radius);
 };
 
 /// This structure is used by csVector3Array::CompressVertices().

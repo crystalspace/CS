@@ -36,11 +36,15 @@ struct iBase;
  * all weak references pointing to that object are cleared. This kind of
  * reference is useful if you want to maintain some kind of cached objects
  * that can safely be removed as soon as the last reference to it is gone.
- * <p>
+ * 
  * Note: this class assumes that the T type implements at least the following
  * functions:
  * - AddRefOwner()
  * - RemoveRefOwner()
+ *
+ * \remarks An extended explanation on smart pointers - how they work and what
+ *   type to use in what scenario - is contained in the User's manual, 
+ *   section "Correctly Using Smart Pointers".
  */
 template <class T>
 class csWeakRef

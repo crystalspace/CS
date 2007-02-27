@@ -674,7 +674,7 @@ private:
   }
 public:
   ~StaticArrayWrapper() { delete array; }
-  size_t Length() { return array ? array->Length() : 0; }
+  size_t Length() { return array ? array->GetSize () : 0; }
   T& operator [] (size_t n) { return GetArray()[n]; }
   size_t Push (T const& what) { return GetArray().Push (what); }
 };
@@ -912,7 +912,7 @@ iBase *csSCF::CreateInstance (const char *iClassID)
 void csSCF::UnloadUnusedModules ()
 {
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
-  for (size_t i = LibraryRegistry->Length (); i > 0; i--)
+  for (size_t i = LibraryRegistry->GetSize (); i > 0; i--)
   {
     scfSharedLibrary *sl = (scfSharedLibrary *)LibraryRegistry->Get (i - 1);
     sl->TryUnload ();
@@ -1037,7 +1037,7 @@ bool csSCF::RegisterFactoryFunc (scfFactoryFunc Func, const char *FactClass)
 {
   bool ok = false;
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
-  for (size_t i = 0, n = ClassRegistry->Length(); i < n; i++)
+  for (size_t i = 0, n = ClassRegistry->GetSize (); i < n; i++)
   {
     scfFactory* fact = (scfFactory*)ClassRegistry->Get(i);
     if (fact->FactoryClass != 0 && strcmp(fact->FactoryClass, FactClass) == 0)
@@ -1180,7 +1180,7 @@ csRef<iStringArray> csSCF::QueryClassList (char const* pattern)
   iStringArray* v = new scfStringArray();
 
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
-  size_t const rlen = ClassRegistry->Length();
+  size_t const rlen = ClassRegistry->GetSize ();
   if (rlen != 0)
   {
     size_t const plen = (pattern ? strlen(pattern) : 0);

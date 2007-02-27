@@ -461,7 +461,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     AddToRegion (ldr_context, tex->QueryObject ());
 
     size_t i;
-    for (i = 0 ; i < key_nodes.Length () ; i++)
+    for (i = 0 ; i < key_nodes.GetSize () ; i++)
     {
       if (!ParseKey (key_nodes[i], tex->QueryObject()))
 	return 0;
@@ -616,15 +616,15 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   }
   
   size_t i;
-  for (i=0; i<shaders.Length (); i++)
+  for (i=0; i<shaders.GetSize (); i++)
     //if (shaders[i]->Prepare ())
       material->SetShader (shadertypes[i], shaders[i]);
-  for (i=0; i<shadervars.Length (); i++)
+  for (i=0; i<shadervars.GetSize (); i++)
     material->AddVariable (shadervars[i]);
 
   // dereference material since mat already incremented it
 
-  for (i = 0 ; i < key_nodes.Length () ; i++)
+  for (i = 0 ; i < key_nodes.GetSize () ; i++)
   {
     if (!ParseKey (key_nodes[i], mat->QueryObject()))
       return 0;

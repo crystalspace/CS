@@ -57,7 +57,7 @@ void csPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
     int num_verts = 0, num_indices = 0, max_vc = 0;
     size_t i;
 
-    for (i = 0; i < polys.Length(); i++)
+    for (i = 0; i < polys.GetSize (); i++)
     {
       csPolygonRenderData* poly = polys[i];
 
@@ -105,7 +105,7 @@ void csPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
 
     CS_ALLOC_STACK_ARRAY (int, pvIndices, max_vc);
 
-    for (i = 0; i < polys.Length(); i++)
+    for (i = 0; i < polys.GetSize (); i++)
     {
       csPolygonRenderData* static_data = polys[i];
 
@@ -257,7 +257,7 @@ void csPolygonRenderer::PrepareRenderMesh (csRenderMesh& mesh)
     {
       const csRefArray<csShaderVariable>& svcVars = 
 	svcontext->GetShaderVariables();
-      for (size_t i = 0; i < svcVars.Length(); i++)
+      for (size_t i = 0; i < svcVars.GetSize (); i++)
       {
 	mesh.variablecontext->AddVariable (svcVars[i]);
       }
@@ -356,7 +356,7 @@ bool csPolygonRenderer::UpdateNormals ()
     int num_verts = 0;
     size_t i;
 
-    for (i = 0; i < polys.Length(); i++)
+    for (i = 0; i < polys.GetSize (); i++)
     {
       csPolygonRenderData* poly = polys[i];
       num_verts += poly->num_vertices;
@@ -369,7 +369,7 @@ bool csPolygonRenderer::UpdateNormals ()
 
     csVector3* normals = (csVector3*)normal_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
-    for (size_t i = 0; i < polys.Length(); i++)
+    for (size_t i = 0; i < polys.GetSize (); i++)
     {
       csPolygonRenderData* static_data = polys[i];
       bool smoothed = static_data->objNormals && *static_data->objNormals;
@@ -408,7 +408,7 @@ bool csPolygonRenderer::UpdateBinormals ()
     int num_verts = 0;
     size_t i;
 
-    for (i = 0; i < polys.Length(); i++)
+    for (i = 0; i < polys.GetSize (); i++)
     {
       csPolygonRenderData* poly = polys[i];
       num_verts += poly->num_vertices;
@@ -421,7 +421,7 @@ bool csPolygonRenderer::UpdateBinormals ()
 
     csVector3* binormals = (csVector3*)binormal_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
-    for (size_t i = 0; i < polys.Length(); i++)
+    for (size_t i = 0; i < polys.GetSize (); i++)
     {
       csPolygonRenderData* static_data = polys[i];
 
@@ -483,7 +483,7 @@ bool csPolygonRenderer::UpdateTangents ()
     int num_verts = 0;
     size_t i;
 
-    for (i = 0; i < polys.Length(); i++)
+    for (i = 0; i < polys.GetSize (); i++)
     {
       csPolygonRenderData* poly = polys[i];
       num_verts += poly->num_vertices;
@@ -496,7 +496,7 @@ bool csPolygonRenderer::UpdateTangents ()
 
     csVector3* tangents = (csVector3*)tangent_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
-    for (size_t i = 0; i < polys.Length(); i++)
+    for (size_t i = 0; i < polys.GetSize (); i++)
     {
       csPolygonRenderData* static_data = polys[i];
 
@@ -567,7 +567,7 @@ void csPolygonRenderer::BufferAccessor::PreGetBuffer (
       int num_verts = 0;
       size_t i;
 
-      for (i = 0; i < renderer->polys.Length(); i++)
+      for (i = 0; i < renderer->polys.GetSize (); i++)
       {
 	csPolygonRenderData* poly = renderer->polys[i];
 	num_verts += poly->num_vertices;
@@ -581,7 +581,7 @@ void csPolygonRenderer::BufferAccessor::PreGetBuffer (
       csRenderBufferLock<csColor, iRenderBuffer*> colorLock (color_buffer);
       csColor* colors = colorLock;
 
-      for (size_t i = 0; i < renderer->polys.Length(); i++)
+      for (size_t i = 0; i < renderer->polys.GetSize (); i++)
       {
 	csPolygonRenderData* static_data = renderer->polys[i];
 	const csPolyTextureMapping& tmapping = *static_data->tmapping;

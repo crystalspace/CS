@@ -56,7 +56,7 @@ awsParmList::parmItem * awsParmList::FindParm (const char *n, int type) const
   unsigned long name = NameToID (n);
 
   size_t i;
-  for (i = 0; i < parms.Length (); ++i)
+  for (i = 0; i < parms.GetSize (); ++i)
   {
     parmItem *item = parms[i];
 

@@ -450,7 +450,7 @@ void Demo::SetupFrame ()
 
     ty += 10;
 
-    if (demos.Length () == 0)
+    if (demos.GetSize () == 0)
     {
       GfxWrite (tx, ty, col_black, col_bg,
     	"I could not find any data files in this and the data directory!");
@@ -468,7 +468,7 @@ void Demo::SetupFrame ()
       ty += 10;
       first_y = ty;
       size_t i;
-      for (i = 0 ; i < demos.Length () ; i++)
+      for (i = 0 ; i < demos.GetSize () ; i++)
       {
 	int bg = col_bg;
 	int fg = col_fgdata;
@@ -1293,7 +1293,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
     if (do_demo == 0)
     {
       selected_demo = (csMouseEventHelper::GetY(&Event) - first_y) / 10;
-      if ((selected_demo != (size_t)-1) && selected_demo < demos.Length ())
+      if ((selected_demo != (size_t)-1) && selected_demo < demos.GetSize ())
 	do_demo = 1;
     }
     else if (do_demo < 3)
@@ -1339,7 +1339,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
     if (do_demo == 0)
     {
       selected_demo = (csMouseEventHelper::GetY(&Event) - first_y) / 10;
-      if (!((selected_demo != (size_t)-1) && selected_demo < demos.Length ()))
+      if (!((selected_demo != (size_t)-1) && selected_demo < demos.GetSize ()))
         selected_demo = (size_t)-1;
     }
   }

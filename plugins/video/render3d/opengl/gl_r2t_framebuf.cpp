@@ -132,7 +132,7 @@ void csGLRender2TextureFramebuf::FinishDraw ()
     {
       // @@@ Processing sucks, but how else to handle keycolor?
       const size_t numPix = txt_w * txt_h;
-      pixelScratch.SetLength (numPix * 4);
+      pixelScratch.SetSize (numPix * 4);
       glReadPixels (0, 0, txt_w, txt_h, GL_RGBA, 
 	GL_UNSIGNED_BYTE, pixelScratch.GetArray());
       csRGBpixel key;

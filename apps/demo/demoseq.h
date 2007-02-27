@@ -260,7 +260,7 @@ public:
   csNamedPath* FindPath (const char* name)
   {
     size_t i;
-    for (i = 0 ; i < paths.Length () ; i++)
+    for (i = 0 ; i < paths.GetSize () ; i++)
     {
       csNamedPath* p = paths[i];
       if (!strcmp (p->GetName (), name)) return p;

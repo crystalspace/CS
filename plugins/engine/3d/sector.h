@@ -260,7 +260,7 @@ public:
   { sectorCallbackList.Delete (cb); }
 
   virtual int GetSectorCallbackCount () const 
-  { return (int) sectorCallbackList.Length (); }
+  { return (int) sectorCallbackList.GetSize (); }
 
   virtual iSectorCallback* GetSectorCallback (int idx) const
   { return sectorCallbackList.Get (idx); }
@@ -301,7 +301,7 @@ public:
   iMeshGenerator* CreateMeshGenerator (const char* name);
   size_t GetMeshGeneratorCount () const
   {
-    return meshGenerators.Length ();
+    return meshGenerators.GetSize ();
   }
   iMeshGenerator* GetMeshGenerator (size_t idx)
   {
@@ -598,7 +598,7 @@ public:
   /// Override FreeSector.
   virtual void FreeSector (iSector* item);
 
-  virtual int GetCount () const { return (int)list.Length (); }
+  virtual int GetCount () const { return (int)list.GetSize (); }
   virtual iSector *Get (int n) const { return list.Get (n); }
   virtual int Add (iSector *obj);
   virtual bool Remove (iSector *obj);

@@ -55,10 +55,10 @@ public:
    */
   T PopTop ()
   {
-    CS_ASSERT ((a1.Length() > 0) || (a2.Length() > 0));
-    if (a2.Length() == 0)
+    CS_ASSERT ((a1.GetSize () > 0) || (a2.GetSize () > 0));
+    if (a2.GetSize () == 0)
     {
-      size_t n = a1.Length();
+      size_t n = a1.GetSize ();
       while (n-- > 0)
       {
 	a2.Push (a1[n]);

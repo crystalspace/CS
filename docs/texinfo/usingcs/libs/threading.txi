@@ -118,13 +118,13 @@ int main (int argc, char* argv[])
   csRef<Thread> thread; thread.AttachNew (new Thread (r));
   
   // Start the thread
-  thread.Start ();
+  thread->Start ();
   
   // Wait for a while to let it run
   csSleep (500);
   
   // Wait for the thread to finish running
-  thread.End ();
+  thread->Wait ();
 @}
 @end example
 
@@ -211,7 +211,7 @@ int main (int argc, char* argv[])
   csRef<Thread> thread; thread.AttachNew (new Thread (r));
   
   // Start the thread
-  thread.Start ();
+  thread->Start ();
   
   // Give it some data
   for (int i = 0; i < 100; ++i)

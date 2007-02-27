@@ -222,7 +222,7 @@ bool VfsNode::AddSubDirectory(VfsNode *SubDir)
   // Find the index to place the subdirectory
   size_t m = 0;
   size_t l = 0;
-  size_t r = SubDirectories.Length ();
+  size_t r = SubDirectories.GetSize ();
 
   while (l < r)
   {
@@ -258,7 +258,7 @@ bool VfsNode::RemoveSubDirectory(VfsNode *SubDir)
 
   size_t m = 0;
   size_t l = 0;
-  size_t r = SubDirectories.Length();
+  size_t r = SubDirectories.GetSize();
   
   while (l < r)
   {
@@ -293,7 +293,7 @@ VfsNode * VfsNode::FindNode(const char *VirtualPath)
 
   size_t m = 0;
   size_t l = 0;
-  size_t r = SubDirectories.Length();
+  size_t r = SubDirectories.GetSize();
   int cmp = 0;
   
   // Use a binary search to find subdirectory
@@ -323,7 +323,7 @@ void VfsNode::GetMounts(scfStringArray * MountArray)
   MountArray->Push((const char *) VirtualPathname);
 
   // Add all subdirectories
-  for (size_t i =0; i < SubDirectories.Length(); i++)
+  for (size_t i =0; i < SubDirectories.GetSize(); i++)
   {
 	  SubDirectories[i]->GetMounts(MountArray);  
   }
@@ -340,7 +340,7 @@ iFile* VfsNode::Open (const char *FileName, int Mode)
   iFile* file = 0;
 
   // Find the file within the node mappings
-  for (size_t i = 0; i < MappedPaths.Length(); i++)
+  for (size_t i = 0; i < MappedPaths.GetSize(); i++)
   {
     if (MappedPaths[i].symlink)
     {
@@ -395,7 +395,7 @@ bool VfsNode::ContainsFile(const char *FileName) const
     return false;
 
   csString FileToFind;
-  for (size_t i = 0; i < MappedPaths.Length(); i++)
+  for (size_t i = 0; i < MappedPaths.GetSize(); i++)
   {
     if (MappedPaths[i].symlink)
     {
@@ -441,7 +441,7 @@ bool VfsNode::GetRealPath(const char *FileName, csString &path) const
   }
 
   csString FileToFind;
-  for (size_t i = 0; i < MappedPaths.Length(); i++)
+  for (size_t i = 0; i < MappedPaths.GetSize(); i++)
   {
     if (MappedPaths[i].symlink)
     {
@@ -489,7 +489,7 @@ bool VfsNode::Delete(const char *FileName)
     return false;
 
   csString FileToFind;
-  for (size_t i = 0; i < MappedPaths.Length(); i++)
+  for (size_t i = 0; i < MappedPaths.GetSize(); i++)
   {
     if (MappedPaths[i].symlink)
     {
@@ -532,7 +532,7 @@ void VfsNode::FindFiles(const char *Mask, iStringArray *FileList)
 
   int counter = 0;
   // First add names of all subdirectories
-  for (size_t i = 0; i < SubDirectories.Length(); i++)
+  for (size_t i = 0; i < SubDirectories.GetSize(); i++)
   {
     if (FileList->Find(
       (const char *) ExtractFileName(SubDirectories[i]->VirtualPathname))
@@ -545,7 +545,7 @@ void VfsNode::FindFiles(const char *Mask, iStringArray *FileList)
   }
 
   // Add names from the paths
-  for (size_t j = 0; j < MappedPaths.Length(); j++)
+  for (size_t j = 0; j < MappedPaths.GetSize(); j++)
   {
     // Add names in symbolic links
     if (MappedPaths[j].symlink)
@@ -575,7 +575,7 @@ bool VfsNode::GetFileTime (const char *FileName, csFileTime &oTime) const
     return false;
 
   csString FileToFind;
-  for (size_t i = 0; i < MappedPaths.Length(); i++)
+  for (size_t i = 0; i < MappedPaths.GetSize(); i++)
   {
     if (MappedPaths[i].symlink)
     {
@@ -618,7 +618,7 @@ bool VfsNode::SetFileTime (const char *FileName, const csFileTime &iTime)
     return false;
 
   csString FileToFind;
-  for (size_t i = 0; i < MappedPaths.Length(); i++)
+  for (size_t i = 0; i < MappedPaths.GetSize(); i++)
   {
     if (MappedPaths[i].symlink)
     {
@@ -660,7 +660,7 @@ bool VfsNode::GetFileSize (const char *FileName, size_t &oSize)
     return false;
 
   csString FileToFind;
-  for (size_t i = 0; i < MappedPaths.Length(); i++)
+  for (size_t i = 0; i < MappedPaths.GetSize(); i++)
   {
     if (MappedPaths[i].symlink)
     {
@@ -698,7 +698,7 @@ bool VfsNode::GetFileSize (const char *FileName, size_t &oSize)
 
 bool VfsNode::IsMapped(const char *Path)
 {
-  for (size_t i = 0; i < MappedPaths.Length(); i++)
+  for (size_t i = 0; i < MappedPaths.GetSize(); i++)
   {
     if (MappedPaths[i].name.Compare(Path))
     {
@@ -713,12 +713,12 @@ void VfsNode::WriteMounts(iConfigFile  *config)
 {
   // Write all real paths to a string
   csString realPaths;
-  for (size_t i = 0; i < MappedPaths.Length(); i++)
+  for (size_t i = 0; i < MappedPaths.GetSize(); i++)
   {
     if (!MappedPaths[i].symlink)
     {
       realPaths.Append(MappedPaths[i].name);
-      if (i != MappedPaths.Length() -1)
+      if (i != MappedPaths.GetSize() -1)
       {
         realPaths.Append(", ");
       }
@@ -731,7 +731,7 @@ void VfsNode::WriteMounts(iConfigFile  *config)
   config->SetStr (s, realPaths);
 
   // Write all the mounts of the subdirectories
-  for (size_t j = 0; j < SubDirectories.Length(); j++)
+  for (size_t j = 0; j < SubDirectories.GetSize(); j++)
   {
     SubDirectories[j]->WriteMounts(config);
   }
@@ -845,7 +845,7 @@ bool csVFS::MountConfigFile(csConfigFile* conf)
      // Mount each entry
     realPaths.Empty();
     realPaths.SplitString(rp, ", ");
-    for (size_t i= 0; i < realPaths.Length(); i++)
+    for (size_t i= 0; i < realPaths.GetSize(); i++)
     {
       if (!realPaths[i] || strlen(realPaths[i]) == 0)
         continue;
@@ -930,7 +930,7 @@ void csVFS::PushDir (char const* Path)
 bool csVFS::PopDir ()
 {
 	// Check that the stack is not empty
-	if (DirectoryStack.Length() < 1)
+	if (DirectoryStack.GetSize() < 1)
 		return false;
 
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
@@ -974,7 +974,7 @@ csString csVFS::_ExpandPath (const char *Path) const
     loop = 0;
   }
 
-  while(loop < directories.Length() && directories[loop])
+  while(loop < directories.GetSize() && directories[loop])
   {
     // Parent directory
     if (strcmp(directories[loop], "..") == 0)
@@ -1211,7 +1211,7 @@ bool csVFS::Sync ()
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   // Sync all iFileSystem plugins
-  for (size_t i = 0; i < fsPlugins.Length(); i++)
+  for (size_t i = 0; i < fsPlugins.GetSize(); i++)
     fsPlugins[i]->Sync();
 
 	return true;	
@@ -1287,7 +1287,7 @@ bool csVFS::Mount(const char *VirtualPath, const char *RealPath,
 
   csString mountName = "";
   // Find the correct plugin for handling the RealPath
-  for (size_t i = 1; i < fsPlugins.Length(); i++)
+  for (size_t i = 1; i < fsPlugins.GetSize(); i++)
   {
     // Start from 1 because we don't want to 
     // check the NativeFileSystem first
@@ -1348,7 +1348,7 @@ bool csVFS::Unmount (const char *VirtualPath, const char *RealPath)
     // Delete the node
     if (node->ParentNode)
     {
-      if (node->MappedPaths.Length() > 0)
+      if (node->MappedPaths.GetSize() > 0)
       {
         node->ParentNode->RemoveSubDirectory(node);
       }
@@ -1365,7 +1365,7 @@ bool csVFS::Unmount (const char *VirtualPath, const char *RealPath)
   }
 
   // Find the path within the node
-  for (size_t i = 0; i < node->MappedPaths.Length(); i++)
+  for (size_t i = 0; i < node->MappedPaths.GetSize(); i++)
   {
     if (node->MappedPaths[i].name.Compare(ExpandRealPath(RealPath)))
     {
@@ -1394,7 +1394,7 @@ csRef<iStringArray> csVFS::MountRoot (const char *VirtualPath)
   // Fin dht esystem roots
   csRef<iStringArray> roots = csInstallationPathsHelper::FindSystemRoots();
   size_t i;
-  size_t n = roots->Length ();
+  size_t n = roots->GetSize ();
 
   // Go through each root
   VfsNode *node;
@@ -1563,7 +1563,7 @@ bool csVFS::ChDirAuto (const char* path, const csStringArray* paths,
   // Check the paths
   if (paths)
   {
-    for (size_t i = 0; i < paths->Length(); i++)
+    for (size_t i = 0; i < paths->GetSize (); i++)
     {
       csString testpath = paths->Get(i);
       if (testpath.GetAt(testpath.Length() - 1) == VFS_PATH_SEPARATOR)
@@ -1736,7 +1736,7 @@ csRef<iStringArray> csVFS::GetRealMountPaths (const char *VirtualPath)
     if (node)
     {
       // Add only the real paths
-      for (size_t i = 0; i < node->MappedPaths.Length(); i++)
+      for (size_t i = 0; i < node->MappedPaths.GetSize(); i++)
       {
         if (!node->MappedPaths[i].symlink)
 	        rmounts->Push(node->MappedPaths[i].name);
@@ -1855,7 +1855,7 @@ VfsNode* csVFS::GetClosestDirectoryNode(const char *path)
   }
 
   bool exists = true;
-  while(exists && counter < directories.Length() - 1)
+  while(exists && counter < directories.GetSize() - 1)
   {
     currentDir.Append(VFS_PATH_SEPARATOR);
 	  currentDir.Append(directories[counter]);
@@ -1919,7 +1919,7 @@ VfsNode* csVFS::GetParentDirectoryNode(const char *path, bool create, bool mount
     }
   }
 
-  while(counter < directories.Length() - 1)
+  while(counter < directories.GetSize() - 1)
   {
     currentDir.Append(VFS_PATH_SEPARATOR);
 	  currentDir.Append(directories[counter]);
@@ -1975,7 +1975,7 @@ bool csVFS::isDirectory(const char *path)
 
 iFileSystem* csVFS::GetPlugin(size_t index) const
 {
-  if (index >= fsPlugins.Length())
+  if (index >= fsPlugins.GetSize())
     return 0;
 
   // Return a pointer to the plugin
@@ -2067,7 +2067,7 @@ bool csVFS::AutoConfigPlugin::Configure(iVFS *vfs,
   }
 
   bool mountedInstall = false;
-  for (size_t i = 0; i < configPaths.Length(); i++)
+  for (size_t i = 0; i < configPaths.GetSize(); i++)
   {
     if (vfs->Mount("/mnt/install", configPaths[i].path))
     {
@@ -2107,7 +2107,7 @@ bool csVFS::AutoConfigPlugin::Configure(iVFS *vfs,
 	  Contents = vfs->FindFiles(DirectoryName);
 
     // Go through each file in the directory contents
-    for (size_t ctCounter = 0; ctCounter < Contents->Length(); 
+    for (size_t ctCounter = 0; ctCounter < Contents->GetSize(); 
       ctCounter++)
 	  {
       // Flag to indicate if symbolic link was created
@@ -2121,7 +2121,7 @@ bool csVFS::AutoConfigPlugin::Configure(iVFS *vfs,
 
       // Get the real paths mapped to the directory
       RealPaths = vfs->GetRealMountPaths(DirectoryName);
-      for (size_t rpCounter = 0; rpCounter < RealPaths->Length(); 
+      for (size_t rpCounter = 0; rpCounter < RealPaths->GetSize(); 
         rpCounter++)
 	    {
         // Construct the real path name for the directory contents

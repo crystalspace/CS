@@ -67,7 +67,7 @@ static inline csShaderVariable* csGetShaderVariableFromStack
   (const csShaderVarStack& stack, const csStringID &name)
 {
   if ((name != csInvalidStringID) &&
-      (name < (csStringID)stack.Length ()))
+      (name < (csStringID)stack.GetSize ()))
   {
     return stack[name];
   }

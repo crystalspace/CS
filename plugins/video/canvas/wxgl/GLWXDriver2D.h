@@ -34,7 +34,15 @@ class csGraphics2DWX : public scfImplementationExt2<csGraphics2DWX,
 {
   wxWindow* myParent;
   csGLCanvas* theCanvas;
+
+#ifdef WIN32
+  int FindPixelFormat (csGLPixelFormatPicker& picker, PIXELFORMATDESCRIPTOR& pfd);
+  int FindPixelFormatGDI (HDC hDC, csGLPixelFormatPicker& picker);
+  csGraphics2DGLCommon::csGLPixelFormatPicker* picker;
+#endif
+
 public:
+
   csGraphics2DWX (iBase *iParent);
   virtual ~csGraphics2DWX ();
 

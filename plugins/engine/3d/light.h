@@ -516,7 +516,7 @@ public:
 
   int GetLightCallbackCount () const
   {
-    return (int)light_cb_vector.Length ();
+    return (int)light_cb_vector.GetSize ();
   }
   
   iLightCallback* GetLightCallback (int idx) const
@@ -647,7 +647,7 @@ public:
   /// Override FreeLight
   virtual void FreeLight (iLight*) { }
 
-  virtual int GetCount () const { return (int)list.Length (); }
+  virtual int GetCount () const { return (int)list.GetSize (); }
   virtual iLight *Get (int n) const { return list.Get (n); }
   virtual int Add (iLight *obj);
   virtual bool Remove (iLight *obj);

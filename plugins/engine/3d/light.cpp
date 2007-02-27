@@ -101,12 +101,12 @@ csLight::~csLight ()
   // Copy the array because we are going to unlink the children.
   csRefArray<iSceneNode> children = movable.GetChildren ();
   size_t j;
-  for (j = 0 ; j < children.Length () ; j++)
+  for (j = 0 ; j < children.GetSize () ; j++)
     children[j]->SetParent (0);
 
   CleanupLSI ();
 
-  int i = (int)light_cb_vector.Length ()-1;
+  int i = (int)light_cb_vector.GetSize ()-1;
   while (i >= 0)
   {
     iLightCallback* cb = light_cb_vector[i];
@@ -421,7 +421,7 @@ void csLight::OnSetPosition ()
 {
   FindLSI ();
   csVector3 pos = GetFullCenter ();
-  size_t i = light_cb_vector.Length ();
+  size_t i = light_cb_vector.GetSize ();
   while (i-- > 0)
   {
     iLightCallback* cb = light_cb_vector[i];
@@ -433,7 +433,7 @@ void csLight::OnSetPosition ()
 
 void csLight::OnSetSector (iSector *sector)
 {
-  size_t i = light_cb_vector.Length ();
+  size_t i = light_cb_vector.GetSize ();
   while (i-- > 0)
   {
     iLightCallback* cb = light_cb_vector[i];
@@ -445,7 +445,7 @@ void csLight::OnSetSector (iSector *sector)
 
 void csLight::SetColor (const csColor& col) 
 {
-  size_t i = light_cb_vector.Length ();
+  size_t i = light_cb_vector.GetSize ();
   while (i-- > 0)
   {
     iLightCallback* cb = light_cb_vector[i];
@@ -482,7 +482,7 @@ void csLight::SetAttenuationMode (csLightAttenuationMode a)
   attenuation = a;
   CalculateAttenuationVector();
 
-  size_t i = light_cb_vector.Length ();
+  size_t i = light_cb_vector.GetSize ();
   while (i-- > 0)
   {
     iLightCallback* cb = light_cb_vector[i];
@@ -498,7 +498,7 @@ void csLight::SetAttenuationConstants (const csVector3& attenv)
   influenceValid = false;*/
   attenuationConstants = attenv;
 
-  size_t i = light_cb_vector.Length ();
+  size_t i = light_cb_vector.GetSize ();
   while (i-- > 0)
   {
     iLightCallback* cb = light_cb_vector[i];
@@ -509,7 +509,7 @@ void csLight::SetAttenuationConstants (const csVector3& attenv)
 void csLight::SetCutoffDistance (float radius)
 {
   if (radius <= 0) return;
-  size_t i = light_cb_vector.Length ();
+  size_t i = light_cb_vector.GetSize ();
   while (i-- > 0)
   {
     iLightCallback* cb = light_cb_vector[i];
@@ -687,7 +687,7 @@ void csLightList::NameChanged (iObject* object, const char* oldname,
 iLight *csLightList::FindByID (const char* id) const
 {
   size_t i;
-  for (i = 0; i < list.Length (); i++)
+  for (i = 0; i < list.GetSize (); i++)
   {
     iLight *l = list.Get (i);
     if (memcmp (l->GetLightID (), id, 16) == 0) return l;
@@ -730,7 +730,7 @@ bool csLightList::Remove (int n)
 void csLightList::RemoveAll ()
 {
   size_t i;
-  for (i = 0 ; i < list.Length () ; i++)
+  for (i = 0 ; i < list.GetSize () ; i++)
   {
     list[i]->QueryObject ()->RemoveNameChangeListener (listener);
     FreeLight (list[i]);
@@ -770,7 +770,7 @@ csPtr<iLightingProcessData> csLightingProcessInfo::QueryUserdata (
   scfInterfaceID id, int version)
 {
   size_t i;
-  for (i = 0 ; i < userdatas.Length () ; i++)
+  for (i = 0 ; i < userdatas.GetSize () ; i++)
   {
     iLightingProcessData* ptr = (iLightingProcessData*)(
       userdatas[i]->QueryInterface (id, version));
@@ -785,7 +785,7 @@ csPtr<iLightingProcessData> csLightingProcessInfo::QueryUserdata (
 void csLightingProcessInfo::FinalizeLighting ()
 {
   size_t i;
-  for (i = 0 ; i < userdatas.Length () ; i++)
+  for (i = 0 ; i < userdatas.GetSize () ; i++)
   {
     userdatas[i]->FinalizeLighting ();
   }

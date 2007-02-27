@@ -35,8 +35,8 @@ void* csMemoryPool::Alloc(size_t n)
       blocks.Push(new uint8[granularity]);
       remaining = granularity;
     }
-    CS_ASSERT(blocks.Length() > 0);
-    p = blocks[blocks.Length() - 1] + granularity - remaining;
+    CS_ASSERT(blocks.GetSize () > 0);
+    p = blocks[blocks.GetSize () - 1] + granularity - remaining;
     remaining -= n;
   }
   return p;
@@ -44,7 +44,7 @@ void* csMemoryPool::Alloc(size_t n)
 
 void csMemoryPool::Empty()
 {
-  for (size_t i = blocks.Length(); i-- > 0; )
+  for (size_t i = blocks.GetSize (); i-- > 0; )
     delete[] blocks[i];
   blocks.Empty();
   remaining = 0;

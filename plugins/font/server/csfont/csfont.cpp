@@ -129,9 +129,9 @@ csPtr<iFont> csDefaultFontServer::LoadFont (const char *filename, float /*size*/
 	  numRanges++;
 	}
 	csDirtyAccessArray<csBitmapMetrics> bMetrics;
-	bMetrics.SetLength (numGlyphs);
+	bMetrics.SetSize (numGlyphs);
 	csDirtyAccessArray<csGlyphMetrics> gMetrics;
-	gMetrics.SetLength (numGlyphs);
+	gMetrics.SetSize (numGlyphs);
 
 	for (int j = 0; j < numGlyphs; j++)
 	{
@@ -360,7 +360,7 @@ error:
 	  fontdef.Name);
 	return 0;
       }
-      ranges.SetLength (2);
+      ranges.SetSize (2);
       ranges[0].startChar = fontdefFirst;
       ranges[0].charCount = fontdefGlyphs;
       ranges[1].startChar = 0;
@@ -370,8 +370,8 @@ error:
 
     size_t bitmapSize = 0;
     size_t alphaSize = 0;
-    bMetrics.SetLength (numGlyphs);
-    aMetrics.SetLength (numGlyphs);
+    bMetrics.SetSize (numGlyphs);
+    aMetrics.SetSize (numGlyphs);
     if (hasBitmapMetrics)
     {
       int j;
@@ -432,7 +432,7 @@ error:
       binary += numGlyphs;
     }
 
-    gMetrics.SetLength (numGlyphs);
+    gMetrics.SetSize (numGlyphs);
     if (hasGlyphAdvance)
     {
       for (int j = 0; j < numGlyphs; j++)
@@ -482,9 +482,9 @@ error:
 
     uint8* individualWidths = (uint8*)binary;
     csDirtyAccessArray<csBitmapMetrics> bMetrics;
-    bMetrics.SetLength (fontdefGlyphs);
+    bMetrics.SetSize (fontdefGlyphs);
     csDirtyAccessArray<csGlyphMetrics> gMetrics;
-    gMetrics.SetLength (fontdefGlyphs);
+    gMetrics.SetSize (fontdefGlyphs);
     for (int j = 0; j < fontdefGlyphs; j++)
     {
       bMetrics[j].width = individualWidths[j];
@@ -604,7 +604,7 @@ csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
 
 csDefaultFont::~csDefaultFont ()
 {
-  size_t i = DeleteCallbacks.Length();
+  size_t i = DeleteCallbacks.GetSize ();
   while (i-- > 0)
   {
     iFontDeleteNotify* delnot = DeleteCallbacks[i];

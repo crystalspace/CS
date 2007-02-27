@@ -20,6 +20,7 @@
 #define __CS_JPGIMAGE_H__
 
 #include "igraphic/imageio.h"
+#include "csutil/csstring.h"
 #include "csutil/leakguard.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -36,8 +37,19 @@ extern "C"
 #undef INT32
 }
 
+#include "jpegcxxwrapper.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(JPGImageIO)
 {
+
+/* ==== Error mgmnt ==== */
+struct JpegError : public jpeg_error_mgr
+{
+  static void ErrorExit (j_common_ptr cinfo);
+public:
+  JpegError();
+  csString ErrorMessage (Jpeg::Common& common) const;
+};
 
 /**
  * The JPG image file format loader.
@@ -50,6 +62,7 @@ protected:
   csImageIOFileFormatDescriptions formats;
   iObjectRegistry* object_reg;
 
+  bool CheckError (const JpegError& jerr, Jpeg::Common& common) const;
 public:
   csJPGImageIO (iBase *pParent);
   virtual ~csJPGImageIO ();
@@ -67,15 +80,6 @@ public:
   { object_reg = p; return true; }
 };
 
-/* ==== Error mgmnt ==== */
-struct my_error_mgr
-{
-  struct jpeg_error_mgr pub;	/* "public" fields */
-  jmp_buf setjmp_buffer;	/* for return to caller */
-};
-
-typedef struct my_error_mgr *my_error_ptr;
-
 /**
  * An csImageFile subclass for reading JPG files.<p>
  * This implementation needs libjpeg to read JFIF files.
@@ -92,13 +96,43 @@ private:
     iObjectRegistry* object_reg;
     csRef<iDataBuffer> dataSource;
 
-    struct my_error_mgr jerr;
-    struct jpeg_decompress_struct cinfo;
-    bool decompCreated;
+    class MySourceManager : public Jpeg::SourceManager
+    {
+    public:
+      MySourceManager (iDataBuffer* source)
+      {
+        bytes_in_buffer = source->GetSize ();		/* sets to entire file len */
+        next_input_byte = (JOCTET *)source->GetData();	/* at start of buffer */
+      }
+      virtual void Init (Jpeg::Decompress& cinfo) {}
+      virtual bool FillInputBuffer (Jpeg::Decompress& cinfo) 
+      {
+        /*
+         * Fill the input buffer --- called whenever buffer is emptied.
+         * should never happen except in jpg files with errors :)
+         */
+        return false;
+      }
+      virtual void SkipInputData (Jpeg::Decompress& cinfo, long numBytes) 
+      {
+        if (numBytes > 0)
+        {
+          next_input_byte += (size_t)numBytes;
+          bytes_in_buffer -= (size_t)numBytes;
+        }
+      }
+      virtual void Term (Jpeg::Decompress& cinfo) {}
+    };
+
+    JpegError jerr;
+    Jpeg::Decompress* cinfo;
+    MySourceManager srcMgr;
+
+    bool CheckError ();
   public:
     JpegLoader (int Format, iObjectRegistry* p, iDataBuffer* source) 
-      : csCommonImageFileLoader (Format), dataSource (source),
-      decompCreated (false)
+      : csCommonImageFileLoader (Format), dataSource (source), cinfo (0), 
+        srcMgr (dataSource)
     { object_reg = p; };
     virtual ~JpegLoader();
     bool InitOk();

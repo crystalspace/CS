@@ -96,8 +96,8 @@ void csStencil2ShadowCacheEntry::UpdateRenderBuffers(
 	csArray<csVector3> & shadow_vertices,
 	csArray<int> & shadow_indeces)
 {
-  int vertex_count = (int)shadow_vertices.Length();
-  int index_count = (int)shadow_indeces.Length();
+  int vertex_count = (int)shadow_vertices.GetSize ();
+  int index_count = (int)shadow_indeces.GetSize ();
 
   shadow_vertex_buffer = csRenderBuffer::CreateRenderBuffer (
     vertex_count, CS_BUF_DYNAMIC,
@@ -200,7 +200,7 @@ bool csStencil2ShadowCacheEntry::CalculateEdges()
   bool result = true;
 
   int errors_count = 0;
-  for (i = 0; i < edges.Length(); i++)
+  for (i = 0; i < edges.GetSize (); i++)
   {
     if ((edges[i]->face_2 == -1) || (edges[i]->face_1 == edges[i]->face_2))
     {
@@ -208,7 +208,7 @@ bool csStencil2ShadowCacheEntry::CalculateEdges()
       result = false;
       errors_count++;
       /*
-      for (j = 0; j < edges.Length(); j++)
+      for (j = 0; j < edges.GetSize (); j++)
       {
       if ((((edges[j]->v1 == edges[i]->v1) && (edges[j]->v2 == edges[i]->v2)) ||
       ((edges[j]->v1 == edges[i]->v2) && (edges[j]->v2 == edges[i]->v1))) && (i != j))
@@ -231,7 +231,7 @@ void csStencil2ShadowCacheEntry::AddEdge(int index_v1, int index_v2, int face_in
 {
   size_t i;
   bool found = false;
-  for (i = 0; i < edges.Length(); i++)
+  for (i = 0; i < edges.GetSize (); i++)
   {
     if ((((edges[i]->v1 == index_v1) && (edges[i]->v2 == index_v2)) || 
       ((edges[i]->v1 == index_v2) && (edges[i]->v2 == index_v1))) && 
@@ -294,9 +294,9 @@ bool csStencil2ShadowCacheEntry::GetShadow(
   if (extrusion || back_cap)
   {
     //first calculate silhouette 
-    silhouette_edges.SetLength(0);
-    silhouette_edges.SetCapacity (edges.Length ());
-    for (i = 0; i < edges.Length(); i++)
+    silhouette_edges.SetSize (0);
+    silhouette_edges.SetCapacity (edges.GetSize ());
+    for (i = 0; i < edges.GetSize (); i++)
     {
       //if (edges[i]->face_2 > -1)
       //{
@@ -310,12 +310,12 @@ bool csStencil2ShadowCacheEntry::GetShadow(
 
     if (extrusion) // building indexed triangles for shadow sides (using quads should be wiser!)
     {
-      shadow_vertices.SetMinimalCapacity (shadow_vertices.Length () +
-      	silhouette_edges.Length () * 4);
-      shadow_indeces.SetMinimalCapacity (shadow_indeces.Length () +
-      	silhouette_edges.Length () * 6);
+      shadow_vertices.SetMinimalCapacity (shadow_vertices.GetSize () +
+      	silhouette_edges.GetSize () * 4);
+      shadow_indeces.SetMinimalCapacity (shadow_indeces.GetSize () +
+      	silhouette_edges.GetSize () * 6);
 
-      for (i = 0; i < silhouette_edges.Length(); i++ )
+      for (i = 0; i < silhouette_edges.GetSize (); i++ )
       {
         int index = silhouette_edges[i];
         csVector3 v0 = vertices[edges[index]->v1];
@@ -351,18 +351,18 @@ bool csStencil2ShadowCacheEntry::GetShadow(
     }
 
     // optimization for dark cap - building dark cap from silhouette edges
-    if (back_cap && (silhouette_edges.Length() > 0)) 
+    if (back_cap && (silhouette_edges.GetSize () > 0)) 
     {
       csVector3 first_point = ((vertices[edges[silhouette_edges[0]]->v1]
       	- light_pos))*shadow_length
         + vertices[edges[silhouette_edges[0]]->v1];
 
-      shadow_vertices.SetMinimalCapacity (shadow_vertices.Length () +
-      	silhouette_edges.Length () * 3);
-      shadow_indeces.SetMinimalCapacity (shadow_indeces.Length () +
-      	silhouette_edges.Length () * 3);
+      shadow_vertices.SetMinimalCapacity (shadow_vertices.GetSize () +
+      	silhouette_edges.GetSize () * 3);
+      shadow_indeces.SetMinimalCapacity (shadow_indeces.GetSize () +
+      	silhouette_edges.GetSize () * 3);
 
-      for (i = 1; i < silhouette_edges.Length(); i++)
+      for (i = 1; i < silhouette_edges.GetSize (); i++)
       {
         shadow_vertices.Push(first_point);
 
@@ -389,7 +389,7 @@ bool csStencil2ShadowCacheEntry::GetShadow(
     }
   }
 
-  return shadow_vertices.Length() && shadow_indeces.Length();
+  return shadow_vertices.GetSize () && shadow_indeces.GetSize ();
 }
 
 
@@ -483,7 +483,7 @@ void csStencil2ShadowStep::ModelInFrustum(
     {
       bool behind_plane = true;
       size_t v = 0;
-      while ((v < projected_points.Length()) && behind_plane) 
+      while ((v < projected_points.GetSize ()) && behind_plane) 
       {
         behind_plane = (frustum_planes[i].Classify(projected_points[v]) < 0);
         v++;
@@ -507,7 +507,7 @@ void csStencil2ShadowStep::ModelInFrustum(
     {
       bool behind_plane = true;
       size_t v = 0;
-      while ((v < projected_points.Length()) && behind_plane) 
+      while ((v < projected_points.GetSize ()) && behind_plane) 
       {
         behind_plane = (frustum_planes[i].Classify(projected_points[v]) < 0);
         v++;
@@ -566,7 +566,7 @@ int csStencil2ShadowStep::CalculateShadowMethod(
   size_t i;
   if ((light_dir*forward_view_vector) > 0)
   {
-    for (i = 0; i < oclusion_pyramid.Length() ; i++)
+    for (i = 0; i < oclusion_pyramid.GetSize () ; i++)
     {
       oclusion_pyramid[i].Invert();
     }
@@ -574,7 +574,7 @@ int csStencil2ShadowStep::CalculateShadowMethod(
 
   oclusion_pyramid.Push(csPlane3(light_dir, -(light_dir*light_pos)));
 
-  for (i = 0; i < oclusion_pyramid.Length(); i++) 
+  for (i = 0; i < oclusion_pyramid.GetSize (); i++) 
   {
     bool behind_plane = true;
     int v = 0;
@@ -617,7 +617,7 @@ void csStencil2ShadowStep::DrawShadow(
   rmesh.buffers = cache_entry->bufferHolder;
   rmesh.meshtype = CS_MESHTYPE_TRIANGLES;
   rmesh.indexstart = 0;
-  rmesh.indexend = (uint)shadow_indeces.Length();
+  rmesh.indexend = (uint)shadow_indeces.GetSize ();
 
   cache_entry->UpdateRenderBuffers(shadow_vertices, shadow_indeces);
 
@@ -657,7 +657,7 @@ void csStencil2ShadowStep::Perform (iRenderView* rview, iSector* sector,
   iShader* shadow;
   if (!enableShadows || ((shadow = type->GetShadow ()) == 0))
   {
-    for (size_t i = 0; i < steps.Length (); i++)
+    for (size_t i = 0; i < steps.GetSize (); i++)
     {
       steps[i]->Perform (rview, sector, light, stacks);
     }
@@ -670,7 +670,7 @@ void csStencil2ShadowStep::Perform (iRenderView* rview, iSector* sector,
   shadowMeshes.Truncate (0);
   culler->VisTest (lightSphere, this);
   size_t numShadowMeshes;
-  if ((numShadowMeshes = shadowMeshes.Length ()) > 0)
+  if ((numShadowMeshes = shadowMeshes.GetSize ()) > 0)
   {
     g3d->SetZMode (CS_ZBUF_TEST);
     g3d->SetShadowState (CS_SHADOW_VOLUME_BEGIN);
@@ -759,7 +759,7 @@ void csStencil2ShadowStep::Perform (iRenderView* rview, iSector* sector,
 
     g3d->SetShadowState (CS_SHADOW_VOLUME_USE);
 
-    for (size_t i = 0; i < steps.Length (); i++)
+    for (size_t i = 0; i < steps.GetSize (); i++)
     {
       steps[i]->Perform (rview, sector, light, stacks);
     }
@@ -799,7 +799,7 @@ size_t csStencil2ShadowStep::Find (iRenderStep* step) const
 
 size_t csStencil2ShadowStep::GetStepCount () const
 {
-  return steps.Length();
+  return steps.GetSize ();
 }
 
 void csStencil2ShadowStep::ObjectVisible (

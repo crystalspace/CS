@@ -16,6 +16,15 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifdef CS_COMPILER_GCC
+  #warning Debugging graph has been discontinued. Please remove \
+csutil/debug.h inclusions.
+#endif
+#ifdef CS_COMPILER_MSVC
+  #pragma message ("Debugging graph has been discontinued. Please remove \
+csutil/debug.h inclusions.")
+#endif
+
 #ifndef __CS_UTIL_DEBUG_H__
 #define __CS_UTIL_DEBUG_H__
 
@@ -106,19 +115,31 @@ namespace CS
 class CS_DEPRECATED_TYPE_MSG("Discontinued cruft") csDebuggingGraph
 {
 public:
+  CS_DEPRECATED_METHOD_MSG ("Discontinued cruft") 
   static void SetupGraph (iObjectRegistry*) {}
+  CS_DEPRECATED_METHOD_MSG ("Discontinued cruft") 
   static void AddObject (iObjectRegistry*, void*, bool, char*, int, 
         char*, ...) {}
+  CS_DEPRECATED_METHOD_MSG ("Discontinued cruft") 
   static void AttachDescription (iObjectRegistry*, void*t, char*, ...) 
         CS_GNUC_PRINTF (3, 4) {}
+  CS_DEPRECATED_METHOD_MSG ("Discontinued cruft") 
   static void AttachType (iObjectRegistry*, void*, char*) {}
+  CS_DEPRECATED_METHOD_MSG ("Discontinued cruft") 
   static void RemoveObject (iObjectRegistry*, void*, char*, int) {}
+  CS_DEPRECATED_METHOD_MSG ("Discontinued cruft") 
   static void AddChild (iObjectRegistry*, void*, void*) {}
+  CS_DEPRECATED_METHOD_MSG ("Discontinued cruft") 
   static void AddParent (iObjectRegistry*, void*, void*) {}
+  CS_DEPRECATED_METHOD_MSG ("Discontinued cruft") 
   static void RemoveChild (iObjectRegistry*, void*, void*) {}
+  CS_DEPRECATED_METHOD_MSG ("Discontinued cruft") 
   static void RemoveParent (iObjectRegistry*, void*, void*) {}
+  CS_DEPRECATED_METHOD_MSG ("Discontinued cruft") 
   static void Clear (iObjectRegistry*) {}
+  CS_DEPRECATED_METHOD_MSG ("Discontinued cruft") 
   static void Dump (iObjectRegistry*) {}
+  CS_DEPRECATED_METHOD_MSG ("Discontinued cruft") 
   static void Dump (iObjectRegistry*, void*, bool reset_mark = true) {}
 };
 

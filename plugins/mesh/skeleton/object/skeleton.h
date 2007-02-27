@@ -99,7 +99,7 @@ public:
     { return full_transform; }
   virtual void SetParent (iSkeletonBone* par);
   virtual iSkeletonBone* GetParent () { return parent; }
-  virtual int GetChildrenCount () { return (int)bones.Length () ;}
+  virtual int GetChildrenCount () { return (int)bones.GetSize () ;}
   virtual iSkeletonBone *GetChild (size_t i) { return bones[i]; }
   virtual iSkeletonBone *FindChild (const char *name);
   virtual void SetUpdateCallback (iSkeletonBoneUpdateCallback *callback) 
@@ -216,7 +216,7 @@ public:
   virtual csReversibleTransform &GetFullTransform () { return full_transform; }
   virtual  void SetParent (iSkeletonBoneFactory *par);
   virtual iSkeletonBoneFactory* GetParent () { return parent; }
-  virtual int GetChildrenCount () { return (int)bones.Length (); }
+  virtual int GetChildrenCount () { return (int)bones.GetSize (); }
   virtual iSkeletonBoneFactory *GetChild (size_t i) { return bones[i]; }
   virtual iSkeletonBoneFactory *FindChild (const char *name);
   virtual size_t FindChildIndex (iSkeletonBoneFactory *child);
@@ -382,7 +382,7 @@ class csSkeletonScriptKeyFrame :
     virtual csReversibleTransform & GetTransform(iSkeletonBoneFactory *bone)
     {
       /*
-      for (size_t i = 0; i < bones_frame_transforms.Length() ; i++ )
+      for (size_t i = 0; i < bones_frame_transforms.GetSize () ; i++ )
       {
         if (bones_frame_transforms[i].bone == bone)
         {
@@ -397,7 +397,7 @@ class csSkeletonScriptKeyFrame :
       csReversibleTransform &transform)
     {
       /*
-      for (size_t i = 0; i < bones_frame_transforms.Length() ; i++ )
+      for (size_t i = 0; i < bones_frame_transforms.GetSize () ; i++ )
       {
         if (bones_frame_transforms[i].bone == bone)
         {
@@ -463,7 +463,7 @@ public:
 
 
   virtual iSkeletonScriptKeyFrame *CreateFrame(const char* name);
-  virtual size_t GetFramesCount()  { return key_frames.Length(); }
+  virtual size_t GetFramesCount()  { return key_frames.GetSize (); }
   virtual iSkeletonScriptKeyFrame *GetFrame(size_t i)  { return key_frames[i]; }
   virtual size_t FindFrameIndex(const char * /*name*/)  { return 0; }
   virtual void RemoveFrame(size_t i) 
@@ -611,7 +611,7 @@ public:
   virtual const char* GetName () const { return name; }
   virtual void SetName (const char* name) 
     { csSkeleton::name = name; }
-  virtual size_t GetBonesCount () { return bones.Length (); }
+  virtual size_t GetBonesCount () { return bones.GetSize (); }
   virtual iSkeletonBone *GetBone (size_t i) { return bones[i]; }
   virtual iSkeletonBone *FindBone (const char *name);
 
@@ -619,7 +619,7 @@ public:
   virtual iSkeletonScript* Append (const char *scriptname);
   virtual void ClearPendingScripts ()
   { pending_scripts.DeleteAll(); }
-  virtual size_t GetScriptsCount () { return running_scripts.Length (); }
+  virtual size_t GetScriptsCount () { return running_scripts.GetSize (); }
   virtual iSkeletonScript* GetScript (size_t i);
   virtual iSkeletonScript* FindScript (const char *scriptname);
   virtual void StopAll ();
@@ -637,7 +637,7 @@ public:
   virtual size_t AddUpdateCallback(iSkeletonUpdateCallback *update_callback)
   { return update_callbacks.Push(update_callback); }
     virtual size_t GetUpdateCallbacksCount()
-  { return update_callbacks.Length(); }
+  { return update_callbacks.GetSize (); }
   virtual iSkeletonUpdateCallback *GetUpdateCallback(size_t callback_idx)
   { return update_callbacks[callback_idx]; }
   virtual void RemoveUpdateCallback(size_t callback_idx)
@@ -677,7 +677,7 @@ public:
   csArray<size_t>& GetParentBones () { return parent_bones; }
 
   virtual size_t GetBonesCount() const
-    { return bones.Length(); }
+    { return bones.GetSize (); }
   virtual iSkeletonBoneFactory * GetBone(size_t i)
     { return bones[i]; }
   virtual size_t FindBoneIndex (const char* bonename);
@@ -738,7 +738,7 @@ public:
   bool Initialize (iObjectRegistry* object_reg);
   bool HandleEvent (iEvent& ev);
 
-  virtual size_t GetFactoriesCount() { return factories.Length(); }
+  virtual size_t GetFactoriesCount() { return factories.GetSize (); }
   virtual iSkeletonFactory *CreateFactory(const char *name);
   virtual iSkeletonFactory *LoadFactory(const char * /*file_name*/) { return 0; }
   virtual iSkeletonFactory *FindFactory(const char * /*name*/) { return 0; }

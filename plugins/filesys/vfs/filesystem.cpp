@@ -178,7 +178,7 @@ bool csNativeFileSystem::MakeDirectory(const char *DirName)
   static char path_separator [] = {CS_PATH_SEPARATOR, 0};
   DirectoryTree.SplitString(DirName, path_separator);
 
-  if (DirectoryTree.Length() == 0)
+  if (DirectoryTree.GetSize() == 0)
     return false;
 
   // Check if the path start with the separator
@@ -188,7 +188,7 @@ bool csNativeFileSystem::MakeDirectory(const char *DirName)
   }
 
   // Go through all the directories
-  for (size_t i = 1; i < DirectoryTree.Length(); i++)
+  for (size_t i = 1; i < DirectoryTree.GetSize(); i++)
   {
     // Make sure it is not null
     if (!DirectoryTree[i])
@@ -337,7 +337,7 @@ public:
   size_t FindKey (const char* Key) const
   {
     size_t i;
-    for (i = 0; i < array.Length (); i++)
+    for (i = 0; i < array.GetSize (); i++)
       if (strcmp (array[i]->GetName (), Key) == 0)
         return i;
     return (size_t)-1;
@@ -348,9 +348,9 @@ public:
     return array.Get (iIndex);
   }
 
-  size_t Length () const
+  size_t GetSize () const
   {
-    return array.Length ();
+    return array.GetSize ();
   }
 
   void Push (csArchiveFileSystem::VfsArchive* ar)
@@ -366,7 +366,7 @@ public:
   void FlushAll ()
   {
     size_t i = 0;
-    while (i < array.Length ())
+    while (i < array.GetSize ())
     {
       array[i]->Flush ();
       if (array[i]->RefCount == 0)
@@ -382,7 +382,7 @@ public:
 
   void CheckUp ()
   {
-    size_t i = array.Length ();
+    size_t i = array.GetSize ();
     while (i > 0)
     {
       i--;
@@ -425,7 +425,7 @@ csArchiveFileSystem::VfsArchive * csArchiveFileSystem::FindFile(
      if (access (archiveName, F_OK) != 0)
        return 0;
 
-     idx = ArchiveCache->Length ();
+     idx = ArchiveCache->GetSize ();
      ArchiveCache->Push (new VfsArchive (archiveName));
   }
 
@@ -460,7 +460,7 @@ iFile* csArchiveFileSystem::Open(const char * FileName, int mode)
             return 0;
 	  }
 
-    idx = ArchiveCache->Length ();
+    idx = ArchiveCache->GetSize ();
     ArchiveCache->Push (new VfsArchive (strPath));
   }
 
@@ -527,7 +527,7 @@ void csArchiveFileSystem::GetFilenames(const char *Path, const char *Mask,
     if (access ((const char *) strPath, F_OK) != 0)
       return;
 
-    idx = ArchiveCache->Length ();
+    idx = ArchiveCache->GetSize ();
     ArchiveCache->Push (new VfsArchive (strPath));
   }
 

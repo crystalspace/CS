@@ -393,8 +393,8 @@ private:
   void CopyFrom (const csArray& source)
   {
     capacity.CopyFrom (source.capacity);
-    SetSizeUnsafe (source.Length ());
-    for (size_t i=0 ; i<source.Length() ; i++)
+    SetSizeUnsafe (source.GetSize ());
+    for (size_t i=0 ; i<source.GetSize () ; i++)
       ElementHandler::Construct (root.p + i, source[i]);
   }
 
@@ -531,16 +531,6 @@ public:
     return count;
   }
 
-  /**
-   * Return the number of elements in the array.
-   * \deprecated Use GetSize() instead.
-   */
-  /*CS_DEPRECATED_METHOD_MSG("Use GetSize() instead.")*/
-  size_t Length () const
-  {
-    return GetSize();
-  }
-
   /// Query vector capacity.  Note that you should rarely need to do this.
   size_t Capacity () const
   {
@@ -584,7 +574,7 @@ public:
     }
     else
     {
-      size_t old_len = Length ();
+      size_t old_len = GetSize ();
       SetSizeUnsafe (n);
       for (size_t i = old_len ; i < n ; i++)
         ElementHandler::Construct (root.p + i, what);
@@ -606,22 +596,12 @@ public:
     }
     else
     {
-      size_t old_len = Length ();
+      size_t old_len = GetSize ();
       SetSizeUnsafe (n);
       ElementHandler::InitRegion (root.p + old_len, n-old_len);
     }
   }
 
-  /** @{ */
-  /**
-   * Set the actual number of items in this array.
-   * \deprecated Use SetSize() instead.
-   */
-  /*CS_DEPRECATED_METHOD_MSG("Use SetSize() instead.")*/
-  void SetLength (size_t n, T const& what) { SetSize(n, what); }
-  /*CS_DEPRECATED_METHOD_MSG("Use SetSize() instead.")*/
-  void SetLength (size_t n) { SetSize(n); }
-  /** @} */
 
   /// Get an element (non-const).
   T& Get (size_t n)
@@ -680,7 +660,7 @@ public:
   template <class K>
   size_t FindKey (csArrayCmp<T,K> comparekey) const
   {
-    for (size_t i = 0 ; i < Length () ; i++)
+    for (size_t i = 0 ; i < GetSize () ; i++)
       if (comparekey (root.p[i]) == 0)
         return i;
     return csArrayItemNotFound;
@@ -692,7 +672,7 @@ public:
    */
   size_t Push (T const& what)
   {
-    if (((&what >= root.p) && (&what < root.p + Length())) &&
+    if (((&what >= root.p) && (&what < root.p + GetSize())) &&
       (capacity.c < count + 1))
     {
       /*
@@ -783,7 +763,7 @@ public:
   size_t FindSortedKey (csArrayCmp<T,K> comparekey,
                         size_t* candidate = 0) const
   {
-    size_t m = 0, l = 0, r = Length ();
+    size_t m = 0, l = 0, r = GetSize ();
     while (l < r)
     {
       m = (l + r) / 2;
@@ -818,7 +798,7 @@ public:
     int (*compare)(T const&, T const&) = DefaultCompare,
     size_t* equal_index = 0)
   {
-    size_t m = 0, l = 0, r = Length ();
+    size_t m = 0, l = 0, r = GetSize ();
     while (l < r)
     {
       m = (l + r) / 2;
@@ -850,7 +830,7 @@ public:
    */
   size_t Find (T const& which) const
   {
-    for (size_t i = 0 ; i < Length () ; i++)
+    for (size_t i = 0 ; i < GetSize () ; i++)
       if (root.p[i] == which)
         return i;
     return csArrayItemNotFound;
@@ -878,7 +858,7 @@ public:
    */
   void Sort (int (*compare)(T const&, T const&) = DefaultCompare)
   {
-    qsort (root.p, Length(), sizeof(T),
+    qsort (root.p, GetSize (), sizeof(T),
       (int (*)(void const*, void const*))compare);
   }
 
@@ -948,7 +928,7 @@ public:
    */
   void SetCapacity (size_t n)
   {
-    if (n > Length ())
+    if (n > GetSize ())
       InternalSetCapacity (n);
   }
 
@@ -962,7 +942,7 @@ public:
   void SetMinimalCapacity (size_t n)
   {
     if (n < Capacity ()) return;
-    if (n > Length ())
+    if (n > GetSize ())
       InternalSetCapacity (n);
   }
 
@@ -1086,7 +1066,7 @@ public:
 
     /** Returns true if the next Next() call will return an element */
     bool HasNext() const
-    { return currentelem < array.Length(); }
+    { return currentelem < array.GetSize (); }
 
     /** Returns the next element in the array. */
     T& Next()
@@ -1120,7 +1100,7 @@ public:
 
     /** Returns true if the next Next() call will return an element */
     bool HasNext() const
-    { return currentelem < array.Length(); }
+    { return currentelem < array.GetSize (); }
 
     /** Returns the next element in the array. */
     const T& Next()
@@ -1164,6 +1144,28 @@ public:
   {
     return root;
   }
+
+  /**
+  * Return the number of elements in the array.
+  * \deprecated Use GetSize() instead.
+  */
+  CS_DEPRECATED_METHOD_MSG("Use GetSize() instead.")
+  size_t Length () const
+  {
+    return GetSize();
+  }
+
+  /** @{ */
+  /**
+  * Set the actual number of items in this array.
+  * \deprecated Use SetSize() instead.
+  */
+  CS_DEPRECATED_METHOD_MSG("Use SetSize() instead.")
+  void SetLength (size_t n, T const& what) { SetSize(n, what); }
+  CS_DEPRECATED_METHOD_MSG("Use SetSize() instead.")
+  void SetLength (size_t n) { SetSize(n); }
+  /** @} */
+
 };
 
 /**

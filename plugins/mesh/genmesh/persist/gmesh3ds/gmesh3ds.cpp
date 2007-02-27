@@ -154,7 +154,7 @@ bool csGenmesh3DSFactoryLoader::LoadMeshObjectData (
     }
     size_t j;
     bool found = false;
-    for (j = 0 ; j < materials_and_tris.Length () ; j++)
+    for (j = 0 ; j < materials_and_tris.GetSize () ; j++)
     {
       csMatAndTris& mt = materials_and_tris[j];
       if (mt.material == mat)
@@ -382,8 +382,8 @@ csPtr<iBase> csGenmesh3DSFactoryLoader::Parse (iDataBuffer* buf,
   fact->SetMaterialWrapper (materials_and_tris[0].material);
   gmstate->Compress ();
   gmstate->CalculateNormals ();
-  if (materials_and_tris.Length () > 1)
-    for (j = 0 ; j < materials_and_tris.Length () ; j++)
+  if (materials_and_tris.GetSize () > 1)
+    for (j = 0 ; j < materials_and_tris.GetSize () ; j++)
     {
       csRef<iRenderBuffer> indexBuffer = csRenderBuffer::CreateIndexRenderBuffer (
         materials_and_tris[j].tris.GetSize()*3, CS_BUF_STATIC, 

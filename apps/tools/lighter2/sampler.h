@@ -114,10 +114,21 @@ namespace lighter
       seqIndexHolder.AttachNew (new SampleSequenceIndex);
     }
 
+    SamplerSequence (const SamplerSequence& other)
+    {
+      seqIndexHolder = other.GetIndexHolder ();
+    }
+
     template<int M>
     SamplerSequence (const SamplerSequence<M>& other)
     {
       seqIndexHolder = other.GetIndexHolder ();
+    }
+
+    SamplerSequence& operator= (const SamplerSequence& other)
+    {
+      seqIndexHolder = other.GetIndexHolder ();
+      return *this;
     }
 
     template<int M>

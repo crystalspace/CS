@@ -277,21 +277,26 @@ rule WriteDependencies
   local depfile = $(<) ;
   local plugin = $(>) ;
   local name = $(3) ;
+  local libname = [ LibraryBaseName $(name) ] ;
   local depfile_gristed = $(depfile:G=$(plugin)) ;
   MakeLocate $(depfile_gristed) : [ on $(depfile) GetVar LOCATE ] ;
   
   # Collect flags
-  lflags += -l$(name) ;
+  lflags = -l$(libname) ;
   local libs = [ ResolveLibs $($(plugin).NEEDLIBS) ] ;
-  lflags += -l$(libs) ;
-  
   local l ;
+  for l in $(libs)
+  {
+    libname = [ LibraryBaseName $(l) ] ;
+    lflags = [ MergeLFlags $(lflags) : -l$(libname) ] ;
+  }
+  
   for l in $($(plugin).EXTERNALLIBS)
   {
     cflags += $($(l).CFLAGS) ;
-    lflags += [ Filter $($(l).LFLAGS) : $(LINKLIBS) $(PLUGIN.LFLAGS) ] ;
+    lflags = [ MergeLFlags $(lflags) : [ Filter $($(l).LFLAGS) : $(LINKLIBS) $(PLUGIN.LFLAGS) ] ] ;
   }
-  lflags += [ Filter $($(plugin).LFLAGS) : $(LINKLIBS) $(PLUGIN.LFLAGS) ] ;
+  lflags = [ MergeLFlags $(lflags) : [ Filter $($(plugin).LFLAGS) : $(LINKLIBS) $(PLUGIN.LFLAGS) ] ] ;
   CFLAGS on $(depfile_gristed) = "$(cflags)" ;
   LFLAGS on $(depfile_gristed) = "$(lflags)" ;
   

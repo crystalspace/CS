@@ -18,11 +18,11 @@
 
 #ifdef CS_COMPILER_GCC
   #warning Profiler support from csutil/profile.h has been deprecated. \
-Check ivaria/profile.h for new interfacce.
+Check ivaria/profile.h for new interface.
 #endif
 #ifdef CS_COMPILER_MSVC
   #pragma message ("Profiler support from csutil/profile.h has been deprecated. \
-Check ivaria/profile.h for new interfacce.")
+Check ivaria/profile.h for new interface.")
 #endif
 
 #ifndef __CS_UTIL_PROFILE_H__
