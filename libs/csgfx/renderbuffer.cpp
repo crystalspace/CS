@@ -229,6 +229,8 @@ const char* csRenderBuffer::GetDescrFromBufferName (csRenderBufferName bufferNam
 
 csRenderBufferName csRenderBuffer::GetBufferNameFromDescr (const char* name)
 {
+  if (name == 0) return CS_BUFFER_NONE; 
+  
   struct StrToName
   {
     const char* descr;

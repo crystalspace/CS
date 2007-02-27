@@ -55,7 +55,7 @@ class csFrustVisObjectWrapper :
 {
 public:
   csFrustumVis* frustvis;
-  iVisibilityObject* visobj;
+  csRef<iVisibilityObject> visobj;
   csKDTreeChild* child;
   long update_number;	// Last used update_number from movable.
   long shape_number;	// Last used shape_number from model.
@@ -97,7 +97,7 @@ private:
   // This puts an upper limit of all boxes in the kdtree itself because
   // those go off to infinity.
   csBox3 kdtree_box;
-  csPDelArray<csFrustVisObjectWrapper> visobj_vector;
+  csRefArray<csFrustVisObjectWrapper> visobj_vector;
   int scr_width, scr_height;	// Screen dimensions.
   uint32 current_vistest_nr;
 

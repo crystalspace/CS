@@ -50,7 +50,7 @@ struct iDecal
  */
 struct iDecalTemplate : public virtual iBase
 {
-  SCF_INTERFACE(iDecalTemplate, 1, 1, 0);
+  SCF_INTERFACE(iDecalTemplate, 1, 2, 0);
 
   /**
    * Retrieves the time the decal will have to live in seconds before it is 
@@ -138,6 +138,28 @@ struct iDecalTemplate : public virtual iBase
   virtual const csVector2 & GetMinTexCoord() const = 0;
 
   /**
+   * The main color of the decal.
+   *  \return The main color of the decal.
+   */
+  virtual const csColor4 & GetMainColor() const = 0;
+
+  /**
+   * The color to give vertices close to the top of the decal.  The color of
+   * a vertex between the decal position and the top plane will be interpolated
+   * between this color and the main color based on distance from the top plane.
+   *  \return The top color of the decal.
+   */
+  virtual const csColor4 & GetTopColor() const = 0;
+
+  /**
+   * The color to give vertices close to the bottom of the decal.  The color of
+   * a vertex between the decal position and the bottom plane will be interpolated
+   * between this color and the main color based on distance from the bottom plane.
+   *  \return The top color of the decal.
+   */
+  virtual const csColor4 & GetBottomColor() const = 0;
+
+  /**
    * The max tex coord is the uv coordinate of the bottom-right corner of the
    * decal.
    *  \return The max tex coordinate.
@@ -150,6 +172,23 @@ struct iDecalTemplate : public virtual iBase
    */
   virtual const uint GetMixMode() const = 0;
   
+  /**
+   * The perpendicular face threshold specifies which faces are considered
+   * to be perpendicular in the decal.  Perpendicular faces will be tapered
+   * outwards by an amount relative to the perpendicular face offset.
+   *  \return The perpendicular face threshold.
+   */
+  virtual float GetPerpendicularFaceThreshold() const = 0;
+
+  /**
+   * The perpendicular face offset specifies how much perpendicular faces in
+   * the decal will taper out.  The bottom of the perpendicular face will
+   * taper out by the amount given, but the top of the perpendicular face
+   * will not taper at all.
+   *  \return The perpendicular face offset.
+   */
+  virtual float GetPerpendicularFaceOffset() const = 0;
+      
   /**
    * Sets the time the decal will have to live in seconds before it is 
    * killed.
@@ -227,6 +266,45 @@ struct iDecalTemplate : public virtual iBase
    *  \param mixMode	 The mixmode of the decal.
    */
   virtual void SetMixMode(uint mixMode) = 0;
+  
+  /**
+   * The perpendicular face threshold specifies which faces are considered
+   * to be perpendicular in the decal.  Perpendicular faces will be tapered
+   * outwards by an amount relative to the perpendicular face offset.
+   *  \param threshold The new perpendicular face threshold.
+   */
+  virtual void SetPerpendicularFaceThreshold(float threshold) = 0;
+
+  /**
+   * The perpendicular face offset specifies how much perpendicular faces in
+   * the decal will taper out.  The bottom of the perpendicular face will
+   * taper out by the amount given, but the top of the perpendicular face
+   * will not taper at all.
+   *  \param offset The new perpendicular face offset.
+   */
+  virtual void SetPerpendicularFaceOffset(float offset) = 0;
+
+  /**
+  * The main color of the decal.
+  *  \param color The main color of the decal.
+  */
+  virtual void SetMainColor(const csColor4 & color) = 0;
+
+  /**
+  * The color to give vertices close to the top of the decal.  The color of
+  * a vertex between the decal position and the top plane will be interpolated
+  * between this color and the main color based on distance from the top plane.
+  *  \param color The top color of the decal.
+  */
+  virtual void SetTopColor(const csColor4 & color) = 0;
+
+  /**
+  * The color to give vertices close to the bottom of the decal.  The color of
+  * a vertex between the decal position and the bottom plane will be interpolated
+  * between this color and the main color based on distance from the bottom plane.
+  *  \param color The top color of the decal.
+  */
+  virtual void SetBottomColor(const csColor4 & color) = 0;
 };
 
 /**

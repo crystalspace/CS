@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2002 by Keith Fulton and Jorrit Tyberghein
+  Rewritten during Sommer of Code 2006 by Christoph "Fossi" Mewes
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -23,6 +24,9 @@
 #include "iengine/sector.h"
 #include "csgeom/poly3d.h"
 #include "csgeom/box.h"
+#include "ivideo/rendermesh.h"
+#include "cstool/rendermeshholder.h"
+#include "iengine/mesh.h"
 
 #include "impprctx.h"
 
@@ -40,25 +44,50 @@ private:
   csImposterProcTex *tex;    // Texture which is drawn on rect
   csPoly3D cutout;           // Rect for cardboard cutout version
   bool     ready;            // Whether texture must be redrawn
-  float    incidence_dist;   // Angle of incidence to camera last time rendered
-  csBox2   screen_rect;      // Rectangle occupied by imposter on screen
-  csBox3   camera_box;       // Bounding box of object being impostered
+
+  //saved values for update checking
+  float anglecamera;
+  float angleobject;
+
+  //screen bounding box helper
+  csScreenBoxResult res;
+
+  //rendermeshholder for this mesh
+  csRenderMeshHolder rmHolder;
+
+  //flag that indices have been updated
+  bool dirty;
+
+  //current height and width of the billboard
+  float height, width;
+
+  //imposter material
+  iMaterialWrapper *impostermat;
+
+  //direction the imposter is facing in world coordinates
+  csVector3 imposterDir;
+
+  //convenience shortcut
+  csEngine *engine;
+
+  void UpdateValues (iCamera *cam,
+    float &camangle, float &objangle);
+
+  void FindImposterRectangle (iCamera *camera);
+  void SetImposterReady (bool r, iRenderView* rview);
+
+  friend class csImposterProcTex;
 
 public:
   csImposterMesh (csEngine* engine, csMeshWrapper *parent);
+  ~csImposterMesh ();
 
-  float CalcIncidenceAngleDist (iRenderView *rview);
-  bool CheckIncidenceAngle (iRenderView *rview,float tolerance);
-  void FindImposterRectangle (const iCamera *camera);
-  void Draw (iRenderView *rview);
+  bool CheckUpdateNeeded (iRenderView *rview, float tolerance);
 
-  bool GetImposterReady () { return ready; }
-  void SetImposterReady (bool r) { ready=r; }
+  //returns the imposter billboard
+  csRenderMesh** GetRenderMesh (iRenderView *rview);
 
-  void SetIncidenceDist (float d) { incidence_dist=d; }
-  float GetIncidenceDist () { return incidence_dist;  }
-
-  csMeshWrapper *GetParent () { return parent_mesh; }
+  bool GetImposterReady (iRenderView* rview);
 };
 
 #endif // __CS_IMPMESH_H__

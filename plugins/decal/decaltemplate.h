@@ -22,13 +22,18 @@
 #include "igeom/decal.h"
 #include "csutil/scf_implementation.h"
 #include "csgeom/vector2.h"
+#include "csutil/cscolor.h"
 
-#define CS_DECAL_DEFAULT_TIME_TO_LIVE       -1.0f
-#define CS_DECAL_DEFAULT_RENDER_PRIORITY    0
-#define CS_DECAL_DEFAULT_NORMAL_THRESHOLD   0.01f
-#define CS_DECAL_DEFAULT_OFFSET             0.05f
-#define CS_DECAL_DEFAULT_NEAR_FAR_DIST      1.5f
-#define CS_DECAL_DEFAULT_CLIP_NEAR_FAR      false
+#define CS_DECAL_DEFAULT_TIME_TO_LIVE               -1.0f
+#define CS_DECAL_DEFAULT_RENDER_PRIORITY            0
+#define CS_DECAL_DEFAULT_NORMAL_THRESHOLD           0.01f
+#define CS_DECAL_DEFAULT_OFFSET                     0.05f
+#define CS_DECAL_DEFAULT_TOP_CLIP_ON                true
+#define CS_DECAL_DEFAULT_TOP_CLIP_SCALE             0.5f
+#define CS_DECAL_DEFAULT_BOTTOM_CLIP_ON             true
+#define CS_DECAL_DEFAULT_BOTTOM_CLIP_SCALE          0.5f
+#define CS_DECAL_DEFAULT_PERPENDICULAR_THRESHOLD    0.05
+#define CS_DECAL_DEFAULT_PERPENDICULAR_OFFSET       0.01
 
 class csDecalTemplate : public scfImplementation1<csDecalTemplate,
                                                  iDecalTemplate>
@@ -40,13 +45,18 @@ private:
   csZBufMode            zBufMode;
   float                 polygonNormalThreshold;
   float                 decalOffset;
-  bool			hasTopClip;
-  float			topClipScale;
-  bool			hasBottomClip;
-  float			bottomClipScale;
+  bool                  hasTopClip;
+  float                 topClipScale;
+  bool                  hasBottomClip;
+  float                 bottomClipScale;
   csVector2             minTexCoord;
   csVector2             maxTexCoord;
-  uint			mixMode;
+  uint                  mixMode;
+  float                 perpendicularFaceThreshold;
+  float                 perpendicularFaceOffset;
+  csColor4              mainColor;
+  csColor4              topColor;
+  csColor4              bottomColor;
 
 public:
 
@@ -67,6 +77,12 @@ public:
   virtual const csVector2 & GetMinTexCoord() const;
   virtual const csVector2 & GetMaxTexCoord() const;
   virtual const uint GetMixMode() const;
+  virtual float GetPerpendicularFaceThreshold() const;
+  virtual float GetPerpendicularFaceOffset() const;
+  virtual const csColor4 & GetMainColor() const;
+  virtual const csColor4 & GetTopColor() const;
+  virtual const csColor4 & GetBottomColor() const;
+
   virtual void SetTimeToLive(float timeToLive);
   virtual void SetMaterialWrapper(iMaterialWrapper* material);
   virtual void SetRenderPriority(long renderPriority);
@@ -77,6 +93,11 @@ public:
   virtual void SetBottomClipping(bool enabled, float bottomPlaneScale);
   virtual void SetTexCoords(const csVector2 & min, const csVector2 & max);
   virtual void SetMixMode(uint mixMode);
+  virtual void SetPerpendicularFaceThreshold(float threshold);
+  virtual void SetPerpendicularFaceOffset(float offset);
+  virtual void SetMainColor(const csColor4 & color);
+  virtual void SetTopColor(const csColor4 & color);
+  virtual void SetBottomColor(const csColor4 & color);
 };
 
 #endif // __CS_DECAL_TEMPLATE_H__

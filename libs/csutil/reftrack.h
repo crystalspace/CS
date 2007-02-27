@@ -56,10 +56,16 @@ class CS_CRYSTALSPACE_EXPORT csRefTracker :
   {
     csArray<RefAction> actions;
     int refCount;
-    bool destructed;
+    uint flags;
     const char* descr;
 
-    RefInfo() : destructed (false), descr(0) { }
+    enum 
+    { 
+      /// Object was destructed (ie TrackDestruction() called)
+      flagDestructed = 1
+    };
+
+    RefInfo() : refCount (0), flags (0), descr(0) { }
   };
   csBlockAllocator<RefInfo> riAlloc;
   csHash<void*, void*> aliases;
@@ -92,6 +98,7 @@ public:
   virtual void RemoveAlias (void* obj, void* mapTo);
 
   virtual void SetDescription (void* obj, const char* description);
+  virtual void SetDescriptionWeak (void* obj, const char* description);
 
   void Report ();
 };

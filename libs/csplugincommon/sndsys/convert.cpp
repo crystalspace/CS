@@ -18,10 +18,9 @@
 
 #include "cssysdef.h"
 #include "csplugincommon/sndsys/convert.h"
+#include "csutil/csendian.h"
 
 using namespace CS::SndSys;
-
-#define SWAP16(x) ((x)<<8 | (x)>>8)
 
 /*
   A series of samples must be converted from one frequency to another.
@@ -141,7 +140,7 @@ bool PCMSampleConverter::ReadFullSample16(const void **source,
   if(swap_16)
   {
     for (channel = 0; channel < max_channels; channel++, src++)
-      sample_buffer[channel]=SWAP16(*src);
+      sample_buffer[channel] = csSwapBytes::Swap(*src);
   }
   else
   {

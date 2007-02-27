@@ -18,10 +18,6 @@
 */
 
 #include "cssysdef.h"
-#if defined(CS_REF_TRACKER) && !defined(CS_REF_TRACKER_EXTENSIVE)
-  // Performance hack
-  #undef CS_REF_TRACKER
-#endif
 #include <ctype.h>
 
 #include "csgeom/math.h"
@@ -43,11 +39,7 @@
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
 
-// Hack: Work around problems caused by #defining 'new'.
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-# undef new
-#endif
-#include <new>
+#include "csutil/custom_new_disable.h"
 
 class ConditionTree
 {
@@ -98,9 +90,10 @@ class ConditionTree
     csConditionNode* parent);
 
   bool HasContainingCondition (Node* node, csConditionID containedCondition,
-    csConditionID& condition);
+    csConditionID& condition, int& branch);
 
   csConditionEvaluator& evaluator;
+  void DumpNode (csString& out, const Node* node, int level);
 public:
   ConditionTree (csConditionEvaluator& evaluator) : nodeAlloc (256), evaluator (evaluator)
   {
@@ -124,6 +117,8 @@ public:
   int GetBranch() const { return currentBranch; }
 
   void ToResolver (iConditionResolver* resolver);
+
+  void Dump (csString& out);
 };
 
 
@@ -194,8 +189,9 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
       if (node->condition == Node::csCondUnknown)
       {
         csConditionID containerCondition;
+        int containingBranch;
         bool hasContainer = HasContainingCondition (node, condition,
-          containerCondition);
+          containerCondition, containingBranch);
 
         node->condition = condition;
         node->conditionAffectedSVs = affectedSVs;
@@ -232,14 +228,18 @@ void ConditionTree::RecursiveAdd (csConditionID condition, Node* node,
             {
               evaluator.CheckConditionResults (containerCondition, 
                 trueVals, newTrueVals, newFalseVals);
-              nn->values = newTrueVals;
             }
             else
             {
               evaluator.CheckConditionResults (containerCondition, 
                 falseVals, newTrueVals, newFalseVals);
-              nn->values = newFalseVals;
             }
+            /* Pick the results for the branch of the containing condition
+             * the contained one appears in. */
+            if (containingBranch == 0)
+              nn->values = newTrueVals;
+            else
+              nn->values = newFalseVals;
           }
           else
           {
@@ -331,14 +331,42 @@ void ConditionTree::ToResolver (iConditionResolver* resolver)
 
 bool ConditionTree::HasContainingCondition (Node* node, 
                                             csConditionID containedCondition,
-                                            csConditionID& condition)
+                                            csConditionID& condition,
+                                            int& branch)
 {
   if (node->parent == 0) return false;
   condition = node->parent->condition;
   if (evaluator.IsConditionPartOf (containedCondition, condition)
     && (containedCondition != condition))
+  {
+    branch = (node == node->parent->branches[0]) ? 0 : 1;
     return true;
-  return HasContainingCondition (node->parent, containedCondition, condition);
+  }
+  return HasContainingCondition (node->parent, containedCondition, condition, 
+    branch);
+}
+
+void ConditionTree::DumpNode (csString& out, const Node* node, int level)
+{
+  csString indent;
+  for (int l = 0; l < level; l++) indent += " |";
+  if (node != 0)
+  {
+    out += indent;
+    node->values.Dump (out);
+    out += '\n';
+    out += indent;
+    out += ' ';
+    out.AppendFmt ("condition %zu", node->condition);
+    out += '\n';
+    DumpNode (out, node->branches[0], level+1);
+    DumpNode (out, node->branches[1], level+1);
+  }
+}
+
+void ConditionTree::Dump (csString& out)
+{
+  DumpNode (out, root, 0);
 }
 
 //---------------------------------------------------------------------------
@@ -1864,6 +1892,11 @@ csWrappedDocumentNode* csWrappedDocumentNodeFactory::CreateWrapper (
     node = new csWrappedDocumentNode (eval, 0, wrappedNode, resolver, this,
       globalState);
     eval.condTree.ToResolver (resolver);
+    if (plugin->doDumpValues && dumpOut)
+    {
+      *dumpOut << "\n\n";
+      eval.condTree.Dump (*dumpOut);
+    }
     CS_ASSERT(globalState->GetRefCount() == 1);
   }
   evaluator.CompactMemory();

@@ -93,7 +93,8 @@ iDecal * csDecalManager::CreateDecal(iDecalTemplate * decalTemplate,
 
   // calculate a valid orientation for the decal
   csVector3 n = normal.Unit();
-  csVector3 right = n % up;
+  csVector3 u = up.Unit();
+  csVector3 right = n % u;
   csVector3 correctUp = right % n;
 
   // create the decal and fill it with mesh geometry
@@ -109,6 +110,7 @@ iDecal * csDecalManager::CreateDecal(iDecalTemplate * decalTemplate,
 
       decal = decals[a];
       decals.DeleteIndexFast(a);
+      break;
     }
   }
   if (!decal)

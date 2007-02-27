@@ -45,6 +45,8 @@
 #include "csplugincommon/renderstep/parserenderstep.h"
 #include "csplugincommon/shader/shaderplugin.h"
 #include "csplugincommon/shader/shaderprogram.h"
+#include "csplugincommon/shader/weavercombiner.h"
+#include "csplugincommon/shader/weavertypes.h"
 #include "csplugincommon/sndsys/convert.h"
 #include "csplugincommon/sndsys/cyclicbuf.h"
 #include "csplugincommon/sndsys/queue.h"

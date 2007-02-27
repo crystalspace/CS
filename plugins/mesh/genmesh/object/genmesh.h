@@ -28,7 +28,7 @@
 #include "csgfx/shadervarcontext.h"
 #include "cstool/rendermeshholder.h"
 #include "cstool/userrndbuf.h"
-#include "csutil/cscolor.h"
+#include "csutil/cscolor.h" 
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/flags.h"
 #include "csutil/hash.h"
@@ -141,11 +141,13 @@ class csGenmeshMeshObject : public scfImplementation5<csGenmeshMeshObject,
 						      iGeneralMeshState>
 {
 private:
+
   csRenderMeshHolder rmHolder;
   csRef<csShaderVariableContext> svcontext;
   csRef<csRenderBufferHolder> bufferHolder;
   csWeakRef<iGraphics3D> g3d;
   bool mesh_colors_dirty_flag;
+  bool mesh_user_rb_dirty_flag;
 
   uint buffers_version;
   csRef<iRenderBuffer> sorted_index_buffer;	// Only if factory back2front
@@ -156,6 +158,8 @@ private:
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
   csRef<iRenderBuffer> normal_buffer;
+
+  size_t factory_user_rb_state;
 
   csRef<iRenderBuffer> color_buffer;
   iMovable* lighting_movable;
@@ -449,6 +453,9 @@ class csGenmeshMeshObjectFactory :
                                iGeneralFactoryState>
 {
 private:
+
+  friend class csGenmeshMeshObject;
+
   csRef<iMaterialWrapper> material;
   csDirtyAccessArray<csVector3> mesh_vertices;
   csDirtyAccessArray<csVector2> mesh_texels;
@@ -490,6 +497,8 @@ private:
   bool default_manualcolors;
   bool default_shadowcasting;
   bool default_shadowreceiving;
+
+  size_t user_buffer_change;
 
   float radius;
   csBox3 object_bbox;

@@ -158,6 +158,7 @@
     <texture name="oldbrick_h.png">
       <file>oldbrick_h.png</file>
     </texture>
+    <texture name="bricks_n.png" file="/lev/stenciltest/bricks_n.png" />
   </textures>
   <variables>
     <variable name="Std Thing Angle" value="0.54321" />
@@ -176,6 +177,9 @@
   <shaders>
     <shader>
       <file>/shader/reflect.xml</file>
+    </shader>
+    <shader>
+      <file>/shader/reflect/reflectsphere.xml</file>
     </shader>
     <shader>
       <file>/shader/std_lighting_detail.xml</file>
@@ -264,9 +268,6 @@
     </material>
     <material name="asphalt">
       <texture>asphalt.gif</texture>
-    </material>
-    <material name="mosholes">
-      <texture>mosholes.gif</texture>
     </material>
     <material name="oldbrick">
       <texture>oldbrick.gif</texture>
@@ -358,8 +359,19 @@
     <position x="0" y="0" z="0" />
     <!-- <farplane a="0" b="0" c="1" d="10" /> -->
   </start>
-  <library>/lib/teapot/teapot.lib</library>
+  
   <library path="/lib/kwartz" file="kwartz.lib" />
+  
+  <library>/lib/teapot/teapot.lib</library>
+  <materials>
+    <material name="Teapot_reflect">
+	<texture>xygyw.tga</texture>
+	<shader type="standard">reflectsphere</shader>
+	<shadervar name="tex reflection" type="texture">xygyw.tga</shadervar>
+	<shadervar name="reflection opacity" type="float">0.9</shadervar>
+	<shadervar name="tex normal" type="texture">bricks_n.png</shadervar>
+    </material>
+  </materials>
 
   <addon>
     <plugin>crystalspace.renderloop.loop.loader</plugin>
@@ -5638,6 +5650,7 @@
       <plugin>mesh</plugin>
       <params>
         <factory>Teapot</factory>
+	<material>Teapot_reflect</material>
         <localshadows />
         <mixmode>
           <add/>

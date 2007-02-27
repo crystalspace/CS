@@ -162,7 +162,8 @@ bool Simple::OnKeyboard(iEvent& ev)
     @{
       csRef<iEventQueue> q = 
         csQueryRegistry<iEventQueue> (GetObjectRegistry());
-      if (q.IsValid()) q->GetEventOutlet()->Broadcast(cscmdQuit);
+      if (q.IsValid()) 
+	q->GetEventOutlet()->Broadcast(csevQuit (GetObjectRegistry ()));
     @}
   @}
   return false;

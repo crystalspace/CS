@@ -1,0 +1,10 @@
+SubDir TOP plugins video render3d shader shadercompiler weaver ;
+
+Description shaderweaver : "shader weaver" ;
+Plugin shaderweaver : [ Wildcard *.cpp *.h ] ;
+
+Includes weaver.h : $(SUBDIR)/weaver.tok ;
+MsvcExtraFile shaderweaver : $(SUBDIR)/weaver.tok ;
+LinkWith shaderweaver : crystalspace ;
+CompileGroups shaderweaver : shaders renderers renderall openglrenderer ;
+

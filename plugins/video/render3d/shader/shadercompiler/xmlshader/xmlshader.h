@@ -79,6 +79,7 @@ public:
   bool do_verbose;
   bool doDumpXML;
   bool doDumpConds;
+  bool doDumpValues;
   /// XML Token and management
   csStringHash xmltokens;
   bool debugInstrProcessing;

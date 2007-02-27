@@ -53,11 +53,15 @@ namespace lighter
     else
     {
       size_t oldSize = unlayoutedPrimitives.GetSize();
+      BoolDArray usedVertices;
+      usedVertices.SetSize (vertexData.vertexArray.GetSize (), true);
+
       for (size_t i = 0; i < oldSize; i++)
       {
         csArray<PrimitiveArray> newPrims;
         csRef<LightmapUVObjectLayouter> lightmaplayout = 
-          uvlayout->LayoutFactory (unlayoutedPrimitives[i], vertexData, this, newPrims);
+          uvlayout->LayoutFactory (unlayoutedPrimitives[i], vertexData, this, 
+          newPrims, usedVertices);
         if (!lightmaplayout) return false;
 
         for (size_t n = 0; n < newPrims.GetSize(); n++)

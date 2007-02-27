@@ -451,6 +451,8 @@ void csShaderGLCGCommon::DoDebugDump ()
 	output << "\n";
       }
     }
+    if (!cgIsParameterUsed (param, program)) output << "  not used\n";
+    if (!cgIsParameterReferenced (param)) output << "  not referenced\n";
 
     param = cgGetNextLeafParameter (param);
   }

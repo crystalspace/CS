@@ -25,14 +25,14 @@ void* csMemoryPool::Alloc(size_t n)
   uint8* p;
   if (n > granularity) // Too big for any block, allocate a big one specially.
   {
-    p = new uint8[n];
+    p = (uint8*)cs_malloc (n);
     blocks.Insert(0,p); // Don't disturb `remaining' which refers to end block.
   }
   else
   {
     if (n > remaining) // Last block has insufficient free, so allocate new.
     {
-      blocks.Push(new uint8[granularity]);
+      blocks.Push((uint8*)cs_malloc (granularity));
       remaining = granularity;
     }
     CS_ASSERT(blocks.GetSize () > 0);
@@ -45,7 +45,7 @@ void* csMemoryPool::Alloc(size_t n)
 void csMemoryPool::Empty()
 {
   for (size_t i = blocks.GetSize (); i-- > 0; )
-    delete[] blocks[i];
+    cs_free (blocks[i]);
   blocks.Empty();
   remaining = 0;
 }

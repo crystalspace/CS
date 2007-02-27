@@ -5,6 +5,7 @@ SubInclude TOP apps tests ceguitest ;
 SubInclude TOP apps tests consoletest ;
 SubInclude TOP apps tests eventtest ;
 SubInclude TOP apps tests g2dtest ;
+SubInclude TOP apps tests imptest ;
 SubInclude TOP apps tests joytest ;
 SubInclude TOP apps tests lghtngtest ;
 SubInclude TOP apps tests perl5tst ;

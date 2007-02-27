@@ -462,7 +462,8 @@ static int compare_light (const void *p1, const void *p2)
   return 0;
 }
 
-const csArray<iLightSectorInfluence*>& csMeshWrapper::GetRelevantLights (
+const csArray<iLightSectorInfluence*>& csMeshWrapper::GetRelevantLights 
+(
     	int maxLights, bool desireSorting)
 {
   bool always_update = relevant_lights_flags.Check (
@@ -587,9 +588,22 @@ const csArray<iLightSectorInfluence*>& csMeshWrapper::GetRelevantLights (
 csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview, 
 					       uint32 frustum_mask)
 {
-  //if (imposter_active && CheckImposterRelevant (rview))
-    //if (DrawImposter (rview))
-      //return;
+  //printf("imposter active: %i\n",imposter_active);
+  if (imposter_active)
+    //printf("imposter releva: %i\n",CheckImposterRelevant (rview));
+
+  if (imposter_active && CheckImposterRelevant (rview))
+  {
+    //printf("trying imposter... ");
+    csRenderMesh** imposter = GetImposter (rview);
+    if (imposter)
+    {
+      //printf("drawn\n");
+      n = 1;
+      return imposter;
+    }
+  }
+  //printf("normal mesh\n");
 
   // Callback are traversed in reverse order so that they can safely
   // delete themselves.
@@ -936,26 +950,33 @@ bool csMeshWrapper::CheckImposterRelevant (iRenderView *rview)
   return (wor_sq_dist > dist*dist);
 }
 
-bool csMeshWrapper::DrawImposter (iRenderView *rview)
+csRenderMesh** csMeshWrapper::GetImposter (iRenderView *rview)
 {
   // Check for imposter existence.  If not, create it.
   if (!imposter_mesh)
   {
-    return false;
+    printf("Imposter doesn't exist!\n"); fflush (stdout);
+    return 0;
   }
 
   // Check for imposter already ready
-  if (!imposter_mesh->GetImposterReady ())
-    return false;
+  if (!imposter_mesh->GetImposterReady (rview))
+  {
+    printf("not ready\n"); fflush (stdout);
+    return 0;
+  }
 
   // Check for too much camera movement since last imposter render
-  if (!imposter_mesh->CheckIncidenceAngle (rview,
+  if (!imposter_mesh->CheckUpdateNeeded (rview,
 	imposter_rotation_tolerance->Get ()))
-    return false;
+  {
 
-  // Else draw imposter as-is.
-  imposter_mesh->Draw (rview);
-  return true;
+    printf(" (needs update) "); fflush (stdout);
+//    return 0;
+  }
+
+  // Get imposter rendermesh
+  return imposter_mesh->GetRenderMesh (rview);
 }
 
 void csMeshWrapper::SetImposterActive (bool flag)
@@ -963,8 +984,8 @@ void csMeshWrapper::SetImposterActive (bool flag)
   imposter_active = flag;
   if (flag)
   {
+    printf("setting imposter active\n");
     imposter_mesh = new csImposterMesh (engine, this);
-    imposter_mesh->SetImposterReady (false);
   }
 }
 
@@ -1375,6 +1396,7 @@ csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine,
   children.SetMeshFactory (this);
 
   render_priority = engine->GetObjectRenderPriority ();
+  imposter_active = false;
 }
 
 csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine)
@@ -1384,6 +1406,7 @@ csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine)
   children.SetMeshFactory (this);
 
   render_priority = engine->GetObjectRenderPriority ();
+  imposter_active = false;
 }
 
 csMeshFactoryWrapper::~csMeshFactoryWrapper ()
@@ -1432,8 +1455,8 @@ void csMeshFactoryWrapper::SetMeshObjectFactory (iMeshObjectFactory *meshFact)
 csPtr<iMeshWrapper> csMeshFactoryWrapper::CreateMeshWrapper ()
 {
   csRef<iMeshObject> basemesh = meshFact->NewInstance ();
-  iMeshWrapper* mesh = 
-    static_cast<iMeshWrapper*> (new csMeshWrapper (engine, basemesh));
+  csMeshWrapper* cmesh = new csMeshWrapper (engine, basemesh);
+  iMeshWrapper* mesh = static_cast<iMeshWrapper*> (cmesh);
   basemesh->SetMeshWrapper (mesh);
 
   if (GetName ()) mesh->QueryObject ()->SetName (GetName ());
@@ -1441,6 +1464,9 @@ csPtr<iMeshWrapper> csMeshFactoryWrapper::CreateMeshWrapper ()
   mesh->SetRenderPriority (render_priority);
   mesh->SetZBufMode (zbufMode);
   mesh->GetFlags ().Set (flags.Get (), flags.Get ());
+  cmesh->SetImposterActive (imposter_active);
+  cmesh->SetMinDistance (min_imposter_distance);
+  cmesh->SetRotationTolerance (imposter_rotation_tolerance);
 
   if (static_lod)
   {
@@ -1548,6 +1574,12 @@ void csMeshFactoryWrapper::AddFactoryToStaticLOD (int lod,
   	static_lod->GetMeshesForLOD (lod);
   meshes_for_lod.Push (fact);
 }
+
+void csMeshFactoryWrapper::SetImposterActive (bool flag)
+{
+  imposter_active = flag;
+}
+
 
 //--------------------------------------------------------------------------
 // csMeshList

@@ -46,6 +46,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Profiler)
   ProfilerFactory::ProfilerFactory (iBase* parent)
     : scfImplementationType (this, parent)
   {
+    // Force us to be kept
+    parent->IncRef ();
   }
   
   ProfilerFactory::~ProfilerFactory ()
@@ -59,8 +61,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Profiler)
 
 
   Profiler::Profiler ()
-    : scfImplementationType (this), isLogging (false), nativeLogfile (0),
-    logfileNameHelper ("profile_log0000.csv")
+    : scfImplementationType (this), nativeLogfile (0),
+    logfileNameHelper ("profile_log0000.csv"), isLogging (false)
   {    
   }
 

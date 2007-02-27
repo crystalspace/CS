@@ -33,7 +33,7 @@ namespace CS
   template<class T>
   class ScopedDelete : private NonCopyable
   {
-    T* ptr;
+    T* const ptr;
   public:
     /// Construct from given pointer
     ScopedDelete (T* ptr) : ptr (ptr) {}

@@ -38,7 +38,7 @@ class csReversibleTransform;
  */
 struct iImposter : public virtual iBase
 {
-  SCF_INTERFACE(iImposter, 2, 0, 0);
+  SCF_INTERFACE(iImposter, 4, 0, 0);
 
   /// Self explanatory
   virtual void SetImposterActive (bool flag)=0;
@@ -52,7 +52,7 @@ struct iImposter : public virtual iBase
    */
   virtual void SetMinDistance (iSharedVariable* dist) = 0;
 
-  /** 
+  /**
    * Rotation Tolerance is the maximum allowable 
    * angle difference between when the imposter was 
    * created and the current position of the camera.
@@ -60,15 +60,6 @@ struct iImposter : public virtual iBase
    * the imposter.
    */
   virtual void SetRotationTolerance (iSharedVariable* angle) = 0;
-
-  /**
-   * Tells the object to create its proctex and polygon
-   * for use by main render process later.
-   */
-  virtual void CreateImposter (csReversibleTransform& pov) = 0;
-
-  /// Draw imposter on screen.
-  /// private: virtual void Draw(iRenderView* rview) = 0;
 
   /// Determine if imposter or true rendering will be used
   virtual bool WouldUseImposter (csReversibleTransform& pov) const = 0;

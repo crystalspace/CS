@@ -72,7 +72,7 @@ namespace CS
 
     /**
      * A memory allocator that allocates from a heap.
-     * The \p HeapAccess template argument should behave like the Heap
+     * The \p HeapAccess template argument must behave like the Heap
      * class. \sa HeapAccessPointer
      */
     template<class HeapAccess>
@@ -157,13 +157,18 @@ namespace CS
 
     /**
      * Heap accessor for AllocatorHeapBase.
-     * The \p HeapContainer template argument should behave like a pointer to
+     * The \p HeapContainer template argument must behave like a pointer to
      * an object of type Heap* or compatible interface.
      */
     template<class HeapContainer = Heap*>
     struct HeapAccessPointer
     {
       HeapContainer heap;
+
+      CS_DEPRECATED_METHOD_MSG ("HeapAccessPointer instance uninitialized")
+      HeapAccessPointer () {}
+      HeapAccessPointer (HeapContainer heap) : heap (heap) {}
+
       void* Alloc (const size_t n)
       {
         return heap->Alloc (n);
@@ -184,13 +189,19 @@ namespace CS
 
     /**
      * A memory allocator that allocates from a heap.
-     * The \p HeapContainer template argument should behave like a pointer to
-     * an object of type Heap* or compatible interface.
+     * The \p HeapPtr template argument must be a type that can be converted
+     * to Heap*.
      */
     template<class HeapPtr = Heap*>
     class AllocatorHeap : public AllocatorHeapBase<HeapAccessPointer<HeapPtr> >
     {
     public:
+      CS_DEPRECATED_METHOD_MSG ("AllocatorHeap instance uninitialized")
+      AllocatorHeap () {}
+
+      AllocatorHeap (HeapPtr heap) : 
+        AllocatorHeapBase<HeapAccessPointer<HeapPtr> > (
+          HeapAccessPointer<HeapPtr> (heap)) {}
     };
   } // namespace Memory
 } // namespace CS

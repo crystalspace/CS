@@ -2506,6 +2506,20 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
       case XMLTOKEN_DETAIL:
         stemp->GetFlags ().Set (CS_ENTITY_DETAIL, CS_ENTITY_DETAIL);
         break;
+      case XMLTOKEN_IMPOSTER:
+        {
+          csRef<iImposter> imposter = scfQueryInterface<iImposter> (stemp);
+          if (!imposter)
+          {
+            SyntaxService->ReportError (
+	      "crystalspace.maploader.parse.meshfactory",
+	      node, "This factory doesn't implement impostering!");
+            return false;
+          }
+          if (!ParseImposterSettings (imposter, child))
+            return false;
+        }
+        break;
       default:
 	SyntaxService->ReportBadToken (child);
         return false;
@@ -2754,15 +2768,26 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       break;
     case XMLTOKEN_IMPOSTER:
       TEST_MISSING_MESH
-      if (!ParseImposterSettings (mesh, child))
-        return false;
+      {
+        csRef<iImposter> imposter = scfQueryInterface<iImposter> (mesh);
+        if (!imposter)
+        {
+          SyntaxService->ReportError (
+	    "crystalspace.maploader.parse.meshobject",
+	    child, "This mesh doesn't implement impostering!");
+          return false;
+        }
+        if (!ParseImposterSettings (imposter, child))
+          return false;
+      }
       break;
     case XMLTOKEN_ZFILL:
       TEST_MISSING_MESH
       if (priority.IsEmpty ()) priority = "wall";
       if (recursive)
       {
-        mesh->SetRenderPriorityRecursive (Engine->GetRenderPriority (priority));
+        mesh->SetRenderPriorityRecursive (
+		Engine->GetRenderPriority (priority));
         mesh->SetZBufModeRecursive (CS_ZBUF_FILL);
       }
       else
@@ -3613,16 +3638,9 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
   return true;
 }
 
-bool csLoader::ParseImposterSettings (iMeshWrapper* mesh, iDocumentNode *node)
+bool csLoader::ParseImposterSettings (iImposter* imposter,
+    iDocumentNode *node)
 {
-  csRef<iImposter> imposter = scfQueryInterface<iImposter> (mesh);
-  if (!imposter)
-  {
-    SyntaxService->ReportError (
-	    "crystalspace.maploader.parse.meshobject",
-	    node, "This mesh doesn't implement impostering!");
-    return false;
-  }
   const char *s = node->GetAttributeValue ("active");
   if (s && !strcmp (s, "no"))
     imposter->SetImposterActive (false);
@@ -3651,16 +3669,12 @@ bool csLoader::ParseImposterSettings (iMeshWrapper* mesh, iDocumentNode *node)
     return false;
   }
   imposter->SetRotationTolerance (var2);
-  char const* const name = mesh->QueryObject()->GetName ();
-  ReportWarning ("crystalspace.maploader.parse.meshobject", node, 
-    "Set mesh %s to imposter active=%s, range=%f, tolerance=%f", 
-    name ? name : "<noname>", imposter->GetImposterActive () ? "yes" : "no", 
-    var->Get (), var2->Get ());
   return true;
 }
 
 bool csLoader::LoadMeshGenGeometry (iLoaderContext* ldr_context,
-                                    iDocumentNode* node, iMeshGenerator* meshgen)
+                                    iDocumentNode* node,
+				    iMeshGenerator* meshgen)
 {
   iMeshGeneratorGeometry* geom = meshgen->CreateGeometry ();
 
@@ -5441,7 +5455,7 @@ bool csLoader::ParseShaderList (iLoaderContext* ldr_context,
   return true;
 }
 
-bool csLoader::LoadShader (const char* filename)
+csRef<iShader> csLoader::LoadShader (const char* filename, bool registerShader)
 {
   csRef<iShaderManager> shaderMgr = csQueryRegistry<iShaderManager> (
   	object_reg);
@@ -5454,7 +5468,7 @@ bool csLoader::LoadShader (const char* filename)
   {
     ReportError ("crystalspace.maploader",
 	"Unable to open shader file '%s'!", filename);
-    return false;
+    return 0;
   }
 
   csRef<iDocumentSystem> docsys = csQueryRegistry<iDocumentSystem> (
@@ -5469,14 +5483,14 @@ bool csLoader::LoadShader (const char* filename)
     ReportError ("crystalspace.maploader",
 	"Could not parse shader file '%s': %s",
 	filename, err);
-    return false;
+    return 0;
   }
   csRef<iDocumentNode> shaderNode = shaderDoc->GetRoot ()->GetNode ("shader");
   if (!shaderNode)
   {
     ReportError ("crystalspace.maploader",
         "Shader file '%s' is not a valid shader XML file!", filename);
-    return false;
+    return 0;
   }
 
   dirChanger.ChangeTo (filename);
@@ -5495,12 +5509,13 @@ bool csLoader::LoadShader (const char* filename)
   if (shader)
   {
     shader->SetFileName (filename);
-    shaderMgr->RegisterShader (shader);
-    return true;
+    if (registerShader)
+      shaderMgr->RegisterShader (shader);
+    return shader;
   }
   else 
   {
-    return false;
+    return 0;
   }
 }
 

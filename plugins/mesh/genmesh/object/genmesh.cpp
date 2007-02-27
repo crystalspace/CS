@@ -103,6 +103,8 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
   do_shadow_rec = false;
   lighting_dirty = true;
   shadow_caps = false;
+  factory_user_rb_state = 0;
+  mesh_user_rb_dirty_flag = false;
 
   dynamic_ambient_version = 0;
 
@@ -629,7 +631,12 @@ void csGenmeshMeshObject::SetupObject ()
     iMaterialWrapper* mater = material;
     if (!mater) mater = factory->GetMaterialWrapper ();
     material_needs_visit = mater ? mater->IsVisitRequired () : false;
-
+    SetupShaderVariableContext ();
+  }
+  if (factory->user_buffer_change != factory_user_rb_state || mesh_user_rb_dirty_flag)
+  {
+    mesh_user_rb_dirty_flag = false;
+    factory_user_rb_state = factory->user_buffer_change;
     SetupShaderVariableContext ();
   }
 }
@@ -1522,6 +1529,7 @@ bool csGenmeshMeshObject::AddRenderBuffer (const char *name,
   if (userBuffers.AddRenderBuffer (bufID, buffer))
   {
     user_buffer_names.Push (bufID);
+    mesh_user_rb_dirty_flag = true;
     return true;
   }
   return false;
@@ -1533,6 +1541,7 @@ bool csGenmeshMeshObject::RemoveRenderBuffer (const char *name)
   if (userBuffers.RemoveRenderBuffer (bufID))
   {
     user_buffer_names.Delete (bufID);
+    mesh_user_rb_dirty_flag = true;
     return true;
   }
   return false;
@@ -1591,6 +1600,8 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (
   mesh_colors_dirty_flag = false;
   mesh_triangle_dirty_flag = false;
   mesh_tangents_dirty_flag = false;
+
+  user_buffer_change = 0;
 
   buffers_version = 0;
 
@@ -2222,6 +2233,7 @@ bool csGenmeshMeshObjectFactory::AddRenderBuffer (const char *name,
   if (userBuffers.AddRenderBuffer (bufID, buffer))
   {
     user_buffer_names.Push (bufID);
+    user_buffer_change++;
     return true;
   }
   return false;
@@ -2233,6 +2245,7 @@ bool csGenmeshMeshObjectFactory::RemoveRenderBuffer (const char *name)
   if (userBuffers.RemoveRenderBuffer (bufID))
   {
     user_buffer_names.Delete (bufID);
+    user_buffer_change++;
     return true;
   }
   return false;

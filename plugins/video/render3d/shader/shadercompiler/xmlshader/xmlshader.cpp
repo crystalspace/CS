@@ -103,6 +103,7 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
   csConfigAccess config (object_reg);
   doDumpXML = config->GetBool ("Video.XMLShader.DumpVariantXML");
   doDumpConds = config->GetBool ("Video.XMLShader.DumpConditions");
+  doDumpValues = config->GetBool ("Video.XMLShader.DumpPossibleValues");
   debugInstrProcessing = 
     config->GetBool ("Video.XMLShader.DebugInstructionProcessing");
 

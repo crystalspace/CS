@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+  Copyright (C) 2007 by Frank Richter
+	    (C) 2007 by Jorrit Tyberghein
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+-->
+<combinerlibrary>
+  <coercion from="rgb" to="rgba" cost="1">
+    <input name="input" type="rgb" />
+
+    <block location="fragmentMain">
+      output = float4 (input, 1);
+    </block>
+
+    <block location="vertexMain">
+      output = float4 (input, 1);
+    </block>
+    
+    <output name="output" type="rgba" />
+  </coercion>
+  
+  <!------------------------------------------------------------------------->
+  
+  <coercion from="position4_world" to="position4_screen" cost="4">
+    <input name="input" type="position4_world" />
+
+    <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
+	 verbatim -->
+    <input name="ModelViewProj" type="float4x4" default="complex"
+	private="yes">
+      <block location="vertexIn">
+	<uniform type="float4x4" name="ModelViewProj" binding="state.matrix.mvp" />
+      </block>
+      
+      <block location="vertexMain">
+	ModelViewProj = vertexIn.ModelViewProj;
+      </block>
+    </input>
+    
+    <block location="vertexMain">
+      output = mul (ModelViewProj, input);
+    </block>
+    
+    <output name="output" type="position4_screen" />
+  </coercion>
+  
+  <coercion from="position4_world" to="position4_camera" cost="4">
+    <input name="input" type="position4_world" />
+
+    <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
+	 verbatim -->
+    <input name="ModelView" type="float4x4" default="complex"
+	private="yes">
+      <block location="vertexIn">
+	<uniform type="float4x4" name="ModelView" binding="state.matrix.modelview" />
+      </block>
+      <block location="fragmentIn">
+	<uniform type="float4x4" name="ModelView" binding="state.matrix.modelview" />
+      </block>
+      
+      <block location="vertexMain">
+	ModelView = vertexIn.ModelView;
+      </block>
+      <block location="fragmentMain">
+	ModelView = fragmentIn.ModelView;
+      </block>
+    </input>
+    
+    <block location="vertexMain">
+      output = mul (ModelView, input);
+    </block>
+    
+    <block location="fragmentMain">
+      output = mul (ModelView, input);
+    </block>
+    
+    <output name="output" type="position4_camera" />
+  </coercion>
+  
+  <!------------------------------------------------------------------------->
+  
+  <coercion from="direction_object" to="direction_tangent" cost="3">
+    <input name="input" type="direction_object" />
+
+    <input file="/shader/combiner-cg/Normal.inp" private="yes" />
+    <input file="/shader/combiner-cg/Tangent.inp" private="yes" />
+    <input file="/shader/combiner-cg/Bitangent.inp" private="yes" />
+    
+    <block location="vertexMain">
+      float3x3 obj2tang;
+      obj2tang[0] = Tangent;
+      obj2tang[1] = Bitangent;
+      obj2tang[2] = Normal;
+      output =  mul (obj2tang, input);
+    </block>
+    
+    <block location="fragmentMain">
+      float3x3 obj2tang;
+      obj2tang[0] = Tangent;
+      obj2tang[1] = Bitangent;
+      obj2tang[2] = Normal;
+      output =  mul (obj2tang, input);
+    </block>
+    
+    <output name="output" type="direction_tangent" />
+  </coercion>
+  
+  <coercion from="direction_world" to="direction_camera" cost="3">
+    <input name="input" type="direction_world" />
+
+    <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
+	 verbatim -->
+    <input name="ModelView" type="float4x4" default="complex"
+	private="yes">
+      <block location="vertexIn">
+	<uniform type="float4x4" name="ModelView" binding="state.matrix.modelview" />
+      </block>
+      
+      <block location="vertexMain">
+	ModelView = vertexIn.ModelView;
+      </block>
+    </input>
+    
+    <block location="vertexMain">
+      output = mul (ModelView, float4 (input, 0)).xyz;
+    </block>
+    
+    <output name="output" type="direction_camera" />
+  </coercion>
+  
+  <!------------------------------------------------------------------------->
+  
+  <coercion from="normal_object" to="normal_tangent" cost="3">
+    <input name="input" type="normal_object" />
+
+    <input file="/shader/combiner-cg/Normal.inp" private="yes" />
+    <input file="/shader/combiner-cg/Tangent.inp" private="yes" />
+    <input file="/shader/combiner-cg/Bitangent.inp" private="yes" />
+    
+    <block location="vertexMain">
+      float3x3 obj2tang;
+      obj2tang[0] = Tangent;
+      obj2tang[1] = Bitangent;
+      obj2tang[2] = Normal;
+      output =  mul (obj2tang, input);
+    </block>
+    
+    <block location="fragmentMain">
+      float3x3 obj2tang;
+      obj2tang[0] = Tangent;
+      obj2tang[1] = Bitangent;
+      obj2tang[2] = Normal;
+      output =  mul (obj2tang, input);
+    </block>
+    
+    <output name="output" type="normal_tangent" />
+  </coercion>
+  
+  <coercion from="normal_tangent" to="normal_object" cost="3">
+    <input name="input" type="normal_tangent" />
+
+    <input file="/shader/combiner-cg/Normal.inp" private="yes" />
+    <input file="/shader/combiner-cg/Tangent.inp" private="yes" />
+    <input file="/shader/combiner-cg/Bitangent.inp" private="yes" />
+    
+    <block location="vertexMain">
+      float3x3 obj2tang;
+      obj2tang[0] = Tangent;
+      obj2tang[1] = Bitangent;
+      obj2tang[2] = Normal;
+      /* NOTE: This assumes the Normal/Tangent/Bitangent are orthonormal.
+         Only then we the transposed matrix is conveniently equal to the
+	 inverse. Lastly, multiplying with the matrix on theright is the same
+	 as multiplying with the transpose on the left. */
+      output = mul (input, obj2tang);
+    </block>
+    
+    <block location="fragmentMain">
+      float3x3 obj2tang;
+      obj2tang[0] = Tangent;
+      obj2tang[1] = Bitangent;
+      obj2tang[2] = Normal;
+      output = mul (input, obj2tang);
+    </block>
+    
+    <output name="output" type="normal_object" />
+  </coercion>
+  
+  <coercion from="normal_object" to="normal_world" cost="3">
+    <input name="input" type="normal_object" />
+
+    <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
+	 verbatim -->
+    <input name="objectToWorld" type="float4x4" default="complex" 
+	private="yes">
+      <block location="vertexIn">
+	<uniform type="float4x4" name="objectToWorld" />
+      </block>
+      
+      <block location="fragmentIn">
+	<uniform type="float4x4" name="objectToWorld" />
+      </block>
+      
+      <block location="vertexMain">
+	objectToWorld = vertexIn.objectToWorld;
+      </block>
+
+      <block location="fragmentMain">
+	objectToWorld = fragmentIn.objectToWorld;
+      </block>
+
+      <block location="variablemap">
+	<variablemap variable="object2world transform" 
+	  destination="vertexIn.objectToWorld" />
+	<variablemap variable="object2world transform" 
+	  destination="fragmentIn.objectToWorld" />
+      </block>
+    </input>
+    
+    <block location="vertexMain">
+      output =  mul (objectToWorld, float4 (input, 0)).xyz;
+    </block>
+    
+    <block location="fragmentMain">
+      output =  mul (objectToWorld, float4 (input, 0)).xyz;
+    </block>
+    
+    <output name="output" type="normal_world" />
+  </coercion>
+  
+  <coercion from="normal_world" to="normal_camera" cost="3">
+    <input name="input" type="normal_object" />
+
+    <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
+	 verbatim -->
+    <input name="worldToCamera" type="float4x4" default="complex" 
+	private="yes">
+      <block location="vertexIn">
+	<uniform type="float4x4" name="worldToCamera" />
+      </block>
+      
+      <block location="fragmentIn">
+	<uniform type="float4x4" name="worldToCamera" />
+      </block>
+      
+      <block location="vertexMain">
+	worldToCamera = vertexIn.worldToCamera;
+      </block>
+
+      <block location="fragmentMain">
+	worldToCamera = fragmentIn.worldToCamera;
+      </block>
+
+      <block location="variablemap">
+	<variablemap variable="world2camera transform" 
+	  destination="vertexIn.world2camera" />
+	<variablemap variable="world2camera transform" 
+	  destination="fragmentIn.world2camera" />
+      </block>
+    </input>
+    
+    <block location="vertexMain">
+      output =  mul (worldToCamera, float4 (input, 0)).xyz;
+    </block>
+    
+    <block location="fragmentMain">
+      output =  mul (worldToCamera, float4 (input, 0)).xyz;
+    </block>
+    
+    <output name="output" type="normal_camera" />
+  </coercion>
+  
+  <coercion from="normal_object" to="normal_camera" cost="3">
+    <input name="input" type="normal_object" />
+
+    <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
+	 verbatim -->
+    <input name="ModelView" type="float4x4" default="complex"
+	private="yes">
+      <block location="vertexIn">
+	<uniform type="float4x4" name="ModelView" binding="state.matrix.modelview" />
+      </block>
+      
+      <block location="fragmentIn">
+	<uniform type="float4x4" name="ModelView" binding="state.matrix.modelview" />
+      </block>
+      
+      <block location="vertexMain">
+	ModelView = vertexIn.ModelView;
+      </block>
+      
+      <block location="fragmentMain">
+	ModelView = fragmentIn.ModelView;
+      </block>
+    </input>
+    
+    <block location="vertexMain">
+      output = mul (ModelView, float4 (input, 0)).xyz;
+    </block>
+    
+    <block location="fragmentMain">
+      output = mul (ModelView, float4 (input, 0)).xyz;
+    </block>
+    
+    <output name="output" type="normal_camera" />
+  </coercion>
+  
+  <!------------------------------------------------------------------------->
+  
+  <coercion from="direction" to="normal" cost="1">
+    <input name="input" type="direction" />
+
+    <block location="vertexMain">
+      output = normalize (input);
+    </block>
+    
+    <block location="fragmentMain">
+      output = normalize (input);
+    </block>
+    
+    <output name="output" type="normal" />
+  </coercion>
+  
+  <coercion from="direction_tangent" to="normal_tangent" cost="1">
+    <input name="input" type="direction_tangent" />
+
+    <block location="vertexMain">
+      output = normalize (input);
+    </block>
+    
+    <block location="fragmentMain">
+      output = normalize (input);
+    </block>
+    
+    <output name="output" type="normal_tangent" />
+  </coercion>
+  
+</combinerlibrary>

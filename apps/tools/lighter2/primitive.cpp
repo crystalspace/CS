@@ -20,10 +20,85 @@
 #include "primitive.h"
 #include "object.h"
 
-static size_t numElementsTotal = 0;
-
 namespace lighter
 {
+  // Helpers for element calculations
+
+  // Cut a polygon in two parts
+  static void PolygonSplitWithPlane (const csPlane3& plane, 
+    const csVector3* inPoly, size_t inPolySize,
+    csVector3* outPoly1, size_t& outPoly1Size,
+    csVector3* outPoly2, size_t& outPoly2Size)
+  {
+    outPoly1Size = 0;
+    outPoly2Size = 0;
+
+    if (inPolySize == 0)
+      return;
+
+    csVector3 ptA, ptB;
+    float sideA, sideB;
+
+    ptA = inPoly[inPolySize - 1];
+    sideA = plane.Classify (ptA);
+    if (fabsf (sideA) < SMALL_EPSILON)
+      sideA = 0;
+
+    for (size_t i = 0; i < inPolySize; ++i)
+    {
+      ptB = inPoly[i];
+      sideB = plane.Classify (ptB);
+
+      if (fabsf (sideB) < SMALL_EPSILON)
+        sideB = 0;
+
+      if (((sideB > 0) && (sideA < 0)) ||
+          ((sideB < 0) && (sideA > 0))) 
+      {
+        //Opposite sides, split
+        const csVector3 d = ptB - ptA;
+
+        float sect = -plane.Classify (ptA) / (plane.norm * d);
+
+        const csVector3 v = ptA + d*sect;
+
+        outPoly1[outPoly1Size++] = v;
+        outPoly2[outPoly2Size++] = v;
+      }
+     
+      if (sideB > 0)
+      {
+        outPoly2[outPoly2Size++] = ptB;
+      }
+      else if (sideB < 0)
+      {
+        outPoly1[outPoly1Size++] = ptB;
+      }
+      else
+      {
+        outPoly1[outPoly1Size++] = ptB;
+        outPoly2[outPoly2Size++] = ptB;
+      }
+
+      ptA = ptB;
+      sideA = sideB;
+    }
+  }
+
+  static float PolygonArea (const csVector3* vertices, size_t verticesCount)
+  {
+    if (verticesCount < 3)
+      return 0;
+
+    float area = 0.0f;
+    for (size_t i = 0; i < verticesCount-2; ++i)
+    {
+      area += csMath3::DoubleArea3 (vertices[0], vertices[i+1], vertices[i+2]);
+    }
+
+    return area / 2.0f;
+  }
+
 
   void ElementAreas::DeleteAll()
   {
@@ -159,161 +234,6 @@ namespace lighter
       max = csMax(max, val);
     }
   }
-
-
-  bool Primitive::Split (const csPlane3& splitPlane, 
-                            csArray<Primitive>& front,
-                            csArray<Primitive>& back) const
-  {
-    // Do a split
-    
-    // Classify all points
-    float classification[3];
-    
-    bool n = false, p = false;
-    uint i;
-
-    for (i = 0; i < 3; i++)
-    {
-      float c = splitPlane.Classify (vertexData.vertexArray[triangle[i]].position);
-      if (c > LITEPSILON) p = true;
-      else if (c < LITEPSILON) n = true;
-
-      classification[i] = c;
-    }
-
-    // Handle special cases
-    if (!p && !n)
-    {
-      if ((plane.Normal () * splitPlane.Normal ()))
-      {
-        p = true;
-      }
-      else
-      {
-        n = true;
-      }
-    }
-
-    if (!n)
-    {
-      //No negative, back is empty
-      front.Push (*this);
-      back.DeleteAll ();
-      return true;
-    }
-    else if (!p)
-    {
-      //No positive, current is back
-      front.DeleteAll ();
-      back.Push (*this);
-    }
-    else
-    {
-      // Split-time! :)
-      SizeTDArray negIndex;
-      SizeTDArray posIndex;
-
-      negIndex.SetCapacity (3);
-      posIndex.SetCapacity (3);
-
-      // Visit all edges, add vertices to back/front as needed. Add intersection-points
-      // if needed
-      size_t i0 = 2;
-      for (size_t i1 = 0; i1 < 3; ++i1)
-      {
-        size_t v0 = triangle[i0];
-        size_t v1 = triangle[i1];
-        
-        float d0 = classification[i0];
-        float d1 = classification[i1];
-
-        if (d0 < 0 && d1 < 0)
-        {
-          // neg-neg
-          negIndex.Push (v1);
-        }
-        else if (d0 < 0 && d1 == 0)
-        {
-          // neg-zero
-          negIndex.Push (v1);
-          posIndex.Push (v1);
-        }
-        else if (d0 < 0 && d1 > 0)
-        {
-          // neg-pos xing
-          float D = d0 / (d1 - d0);
-
-          ObjectVertexData::Vertex isec = 
-            vertexData.InterpolateVertex (v0, v1, D);
-
-          size_t vi = vertexData.vertexArray.Push (isec);
-
-          negIndex.Push (vi);
-          posIndex.Push (vi);
-        }
-        else if (d0 == 0 && d1 > 0)
-        {
-          // zero-pos
-          posIndex.Push (v1);
-        }
-        else if (d0 == 0 && d1 < 0)
-        {
-          // zero-neg
-          negIndex.Push (v1);
-        }
-        else if (d0 > 0 && d1 > 0)
-        {
-          // pos-pos
-          posIndex.Push (v1);
-        }
-        else if (d0 > 0 && d1 < 0)
-        {
-          // pos-neg
-          float D = d1 / (d0 - d1);
-          ObjectVertexData::Vertex isec = 
-            vertexData.InterpolateVertex (v0, v1, D);
-
-          size_t vi = vertexData.vertexArray.Push (isec);
-
-          negIndex.Push (vi);
-          posIndex.Push (vi);
-        }
-        else if (d0 > 0 && d1 == 0)
-        {
-          //pos-zero
-          negIndex.Push (v1);
-          posIndex.Push (v1);
-        }
-        else if (d0 == 0 && d1 == 0)
-        {
-          //zero-zero.. bad case.. shouldn't really happen
-          //do nothing..
-        }
-        //next
-        v0 = v1;
-      }
-      for(uint i = 2; i < posIndex.GetSize(); ++i)
-      {
-        Primitive newPrim (*this);
-        newPrim.triangle.a = posIndex[i-2];
-        newPrim.triangle.b = posIndex[i-1];
-        newPrim.triangle.c = posIndex[i];
-        front.Push (newPrim);
-      }
-      for(uint i = 2; i < negIndex.GetSize(); ++i)
-      {
-        Primitive newPrim (*this);
-        newPrim.triangle.a = negIndex[i-2];
-        newPrim.triangle.b = negIndex[i-1];
-        newPrim.triangle.c = negIndex[i];
-        back.Push (newPrim);
-      }
-    }
-
-    return true;
-  }
-
 
   /* Ok, this is a very strange method.. it is fetched from FSrad
    * and basically computes the world->uv-transform. Check following 
@@ -562,14 +482,22 @@ namespace lighter
     if (vCut.Classify (primCenter) < 0) vCut.Normal () = -vCut.Normal ();
 
     // Start slicing
-    csPoly3D poly;
-    poly.AddVertex (vertexData.vertexArray[triangle.a].position);
-    poly.AddVertex (vertexData.vertexArray[triangle.b].position);
-    poly.AddVertex (vertexData.vertexArray[triangle.c].position);
-
     csPlane3 evCut = vCut;
-    csPoly3D elRow(4), rest(4);
-    csPoly3D el(4), restRow (4);
+
+    csVector3 tmpArray[40];
+    csVector3* fullPoly = &tmpArray[0];
+    csVector3* rest = &tmpArray[10];
+    csVector3* elementRow = &tmpArray[20];
+    csVector3* element = &tmpArray[30];
+
+    size_t polygonSize = 0, restSize, elementRowSize, elementSize;
+    
+    // Add the originalpoly
+    fullPoly[polygonSize++] = vertexData.vertexArray[triangle.a].position;
+    fullPoly[polygonSize++] = vertexData.vertexArray[triangle.b].position;
+    fullPoly[polygonSize++] = vertexData.vertexArray[triangle.c].position;
+
+
     size_t elNum = 0;
     for (uint v = 0; v  < vc; v++)
     {
@@ -579,12 +507,20 @@ namespace lighter
       // Cut of a row      
       if (v < (vc-1)) 
       {
-        poly.SplitWithPlane (elRow, rest, evCut);
-        poly = rest;
+        PolygonSplitWithPlane (evCut,
+          fullPoly, polygonSize,
+          elementRow, elementRowSize, 
+          rest, restSize);
+
+        // make rest into new poly
+        csVector3* tmp = rest; rest = fullPoly; fullPoly = tmp;
+        polygonSize = restSize;
       }
       else
       {
-        elRow = rest;
+        // Row is rest of polygon
+        csVector3* tmp = elementRow; elementRow = fullPoly; fullPoly = tmp;
+        elementRowSize = polygonSize;
       }
 
       // Cut into elements
@@ -598,23 +534,27 @@ namespace lighter
         
         if (u < (uc-1))
         {
-          elRow.SplitWithPlane (el, restRow, euCut);
-          elRow = restRow;
+          PolygonSplitWithPlane (euCut,
+            elementRow, elementRowSize,
+            element, elementSize,
+            rest, restSize);
+
+          // make rest into new row
+          csVector3* tmp = rest; rest = elementRow; elementRow = tmp;
+          elementRowSize = restSize;
         }
         else
         {
-          el = elRow;
+          csVector3* tmp = element; element = elementRow; elementRow = tmp;
+          elementSize = elementRowSize;          
         }
-
-        float elArea = el.GetArea ();
+        
+        float elArea = PolygonArea (element, elementSize);
         elementAreas.SetElementArea (elNum++, elArea);
-
       }
     }
 
     elementAreas.ShrinkBestFit ();
-
-    numElementsTotal += elementAreas.GetSize ();
 
     ComputeBaryCoeffs();
   }

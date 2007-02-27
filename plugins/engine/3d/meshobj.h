@@ -605,17 +605,9 @@ public:
   { imposter_rotation_tolerance = angle; }
 
   /**
-   * Tells the object to create its proctex and polygon
-   * for use by main render process later, relative to
-   * the specified Point Of View.
+   * Gets the imposters rendermesh
    */
-  virtual void CreateImposter (csReversibleTransform& /*pov*/)
-  { /* implement later */ }
-
-  /**
-   * Renders the imposter on the screen.
-   */
-  bool DrawImposter (iRenderView *rview);
+  csRenderMesh** GetImposter (iRenderView *rview);
 
   /// Determine if imposter or true rendering will be used.
   virtual bool WouldUseImposter (csReversibleTransform& /*pov*/) const
@@ -672,8 +664,8 @@ public:
   virtual void GetWorldBoundingBox (csBox3& cbox);
   virtual void GetTransformedBoundingBox (const csReversibleTransform& trans,
   	csBox3& cbox);
-  virtual float GetScreenBoundingBox (iCamera *camera, csBox2& sbox,
-  	csBox3& cbox);
+  virtual float GetScreenBoundingBox (iCamera *camera,
+         csBox2& sbox, csBox3& cbox);
   virtual const csBox3& GetWorldBoundingBox ();
   virtual csBox3 GetTransformedBoundingBox (const csReversibleTransform& trans);
   virtual csScreenBoxResult GetScreenBoundingBox (iCamera *camera);
@@ -807,9 +799,10 @@ public:
  * The holder class for all implementations of iMeshObjectFactory.
  */
 class csMeshFactoryWrapper : 
-  public scfImplementationExt3<csMeshFactoryWrapper,
+  public scfImplementationExt4<csMeshFactoryWrapper,
                                csObject, 
                                iMeshFactoryWrapper,
+			       iImposter,
                                scfFakeInterface<iShaderVariableContext>,
 			       iSelfDestruct>,
   public CS::ShaderVariableContextImpl
@@ -841,6 +834,14 @@ private:
   csFlags flags;
 
   csEngine* engine;
+
+  /// Flag indicating whether this factory should try to imposter or not.
+  bool imposter_active;
+  /// Imposter Threshold Range.
+  csRef<iSharedVariable> min_imposter_distance;
+  /// Imposter Redo Threshold angle change.
+  csRef<iSharedVariable> imposter_rotation_tolerance;
+
 public:
   /// Constructor.
   csMeshFactoryWrapper (csEngine* engine, iMeshObjectFactory* meshFact);
@@ -924,6 +925,53 @@ public:
     return render_priority;
   }
   void SetRenderPriorityRecursive (long rp);
+
+  //---------- iImposter Functions -----------------//
+
+  /**
+   * Set true if this meshes created from this
+   * factory should use Impostering. Note that this only
+   * affects meshes created from this factory after this
+   * has been called.
+   */
+  virtual void SetImposterActive (bool flag);
+
+  /**
+   * Determine if impostering is enabled for this factory
+   * (not if Imposter is being drawn, but simply considered).
+   */
+  virtual bool GetImposterActive () const { return imposter_active; }
+
+  /**
+   * Minimum Imposter Distance is the distance from camera 
+   * beyond which imposter is used. Imposter gets a 
+   * ptr here because value is a shared variable 
+   * which can be changed at runtime for many objects.
+   *
+   * All meshes created from this factory after this function
+   * is called will get this variable. Meshes created before
+   * calling this function will get the previous value.
+   */
+  virtual void SetMinDistance (iSharedVariable* dist)
+  { min_imposter_distance = dist; }
+
+  /** 
+   * Rotation Tolerance is the maximum allowable 
+   * angle difference between when the imposter was 
+   * created and the current position of the camera.
+   * Angle greater than this triggers a re-render of
+   * the imposter.
+   *
+   * All meshes created from this factory after this function
+   * is called will get this variable. Meshes created before
+   * calling this function will get the previous value.
+   */
+  virtual void SetRotationTolerance (iSharedVariable* angle)
+  { imposter_rotation_tolerance = angle; }
+
+  /// Determine if imposter or true rendering will be used.
+  virtual bool WouldUseImposter (csReversibleTransform& /*pov*/) const
+  { /* implement later */ return false; }
 
   //--------------------- iSelfDestruct implementation -------------------//
 

@@ -293,6 +293,25 @@ public:
     friend Logic3 operator< (const Values& a, const Values& b);
     friend Logic3 operator<= (const Values& a, const Values& b);
 
+    void Dump (csString& str) const
+    {
+      static const char* const valueNames[] = {
+        "var", "v0", "v1", "v2", "v3", "tex", "buf"
+      };
+      for (uint v = valueFirst; v <= valueLast; v++)
+      {
+        if (valueFlags & (1 << v))
+        {
+          str << valueNames[v-valueFirst];
+          str << ": ";
+          csString valuesStr;
+          GetValue (v).Dump (valuesStr);
+          str << valuesStr;
+          str << "; ";
+        }
+      }
+    }
+
     static void CompactAllocator()
     {
       ValAlloc().Compact();
@@ -358,6 +377,8 @@ protected:
     }
     inline size_t GetSize () const { return _array.GetSize (); }
     inline ValuesWrapper& GetIndex (size_t n) { return _array.Get (n).v; }
+    inline const ValuesWrapper& GetIndex (size_t n) const { return _array.Get (n).v; }
+    inline csStringID GetIndexName (size_t n) const { return _array.Get (n).n; }
     inline const ValuesWrapper& Get (csStringID n) const 
     { 
       size_t index = _array.FindSortedKey (csArrayCmp<Entry, csStringID> (n));
@@ -431,6 +452,17 @@ public:
       return vals;
     else
       return Def();
+  }
+  void Dump (csString& out) const
+  {
+    for (size_t n = 0; n < possibleValues->GetSize(); n++)
+    {
+      const Values* vals = possibleValues->GetIndex (n);
+      if (vals == 0) continue;
+      out.AppendFmt ("var %lu: ", 
+	(unsigned long)possibleValues->GetIndexName (n));
+      vals->Dump (out);
+    }
   }
   friend Variables operator| (const Variables& a, const Variables& b)
   {

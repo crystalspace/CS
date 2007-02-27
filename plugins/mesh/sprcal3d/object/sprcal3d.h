@@ -800,8 +800,10 @@ public:
   const char* GetName () const {return name.GetData ();}
   void SetName (const char* name) {csCal3dSkeletonFactory::name = name;}
   iSkeletonBoneFactory *CreateBone (const char *name) {return 0;}
-  iSkeletonScript *CreateScript(const char *name) {return 0;}
-  iSkeletonScript *FindScript(const char *name) {return 0;}
+  iSkeletonAnimation *CreateAnimation (const char *name) {return 0;}
+  iSkeletonAnimation *CreateScript(const char *name) {return CreateAnimation (name);}
+  iSkeletonAnimation *FindAnimation (const char *name) {return 0;}
+  iSkeletonAnimation *FindScript (const char *name) {return FindAnimation (name);}
   iSkeletonBoneFactory *FindBone (const char *name) {return 0;}
   size_t FindBoneIndex (const char *name) {return 0;}
   size_t GetBonesCount () const {return bones_factories.GetSize ();}
@@ -910,17 +912,22 @@ public:
   iSkeletonBone *GetBone (size_t i) {return 0;}
   iSkeletonBone *FindBone (const char *name) {return 0;}
   size_t FindBoneIndex (const char *name) {return 0;}
-  iSkeletonScript* Execute (const char *scriptname) {return 0;}
-  iSkeletonScript* Append (const char *scriptname) {return 0;}
-  void ClearPendingScripts () {;}
-  size_t GetScriptsCount () {return 0;}
-  iSkeletonScript* GetScript (size_t i) {return 0;}
-  iSkeletonScript* FindScript (const char *scriptname) {return 0;}
+  iSkeletonAnimation* Execute (const char *scriptname) {return 0;}
+  iSkeletonAnimation* Append (const char *scriptname) {return 0;}
+  void ClearPendingAnimations () {;}
+  void ClearPendingScripts () {ClearPendingAnimations ();}
+  size_t GetAnimationsCount () {return 0;}
+  size_t GetScriptsCount () {return GetAnimationsCount ();}
+  iSkeletonAnimation* GetAnimation (size_t i) {return 0;}
+  iSkeletonAnimation* GetScript (size_t i) {return GetAnimation (i);}
+  iSkeletonAnimation* FindAnimation (const char *scriptname) {return 0;}
+  iSkeletonAnimation* FindScript (const char *scriptname) {return FindAnimation (scriptname);}
   iSkeletonSocket* FindSocket (const char *socketname) {return 0;}
   void StopAll () {;}
   void Stop (const char* scriptname) {;}
   iSkeletonFactory *GetFactory () {return 0;}
-  void SetScriptCallback(iSkeletonScriptCallback *cb) {;}
+  void SetAnimationCallback (iSkeletonAnimationCallback *cb) {;}
+  void SetScriptCallback (iSkeletonAnimationCallback *cb) {SetAnimationCallback (cb);}
   size_t AddUpdateCallback(iSkeletonUpdateCallback *update_callback) {return 0;}
   size_t GetUpdateCallbacksCount () {return 0;}
   iSkeletonUpdateCallback *GetUpdateCallback (size_t callback_idx) {return 0;}

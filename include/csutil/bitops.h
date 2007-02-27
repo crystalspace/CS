@@ -19,11 +19,6 @@
 #ifndef __CSUTIL_BITOPS_H__
 #define __CSUTIL_BITOPS_H__
 
-#ifdef CS_COMPILER_MSVC
-#include <intrin.h>
-#pragma intrinsic(_BitScanForward)
-#pragma intrinsic(_BitScanReverse)
-#endif
 
 namespace CS
 {
@@ -41,7 +36,7 @@ namespace CS
      */
     CS_FORCEINLINE bool ScanBitForward (uint32 value, size_t& index)
     {
-#ifdef CS_COMPILER_MSVC
+#ifdef CS_HAVE_BITSCAN_INTRINSICS
       return _BitScanForward ((unsigned long*)&index, value) != 0;
 #else
       // Generic c++ version
@@ -69,7 +64,7 @@ namespace CS
      */
     CS_FORCEINLINE bool ScanBitReverse (uint32 value, size_t& index)
     {
-#ifdef CS_COMPILER_MSVC
+#ifdef CS_HAVE_BITSCAN_INTRINSICS
       return _BitScanReverse ((unsigned long*)&index, value) != 0;
 #else
       index = 0;

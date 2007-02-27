@@ -80,10 +80,6 @@ namespace lighter
     {
     }
 
-    /// Split primitive into two.
-    bool Split (const csPlane3& splitPlane, csArray<Primitive>& front,
-      csArray<Primitive>& back) const;
-
     /// Calculate min-max UV-coords
     void ComputeMinMaxUV (csVector2 &min, csVector2 &max) const;
 
@@ -211,7 +207,7 @@ namespace lighter
 
     //@{
     /// Elements
-    size_t elementCount;
+    //size_t elementCount;
     ElementAreas elementAreas;
     //@}
 

@@ -381,7 +381,7 @@ csSkeletonSocketFactory::~csSkeletonSocketFactory ()
 }
 
 
-//--------------------------iSkeletonScriptKeyFrame-----------------------------------
+//--------------------------iSkeletonAnimationKeyFrame-----------------------------------
 
 csSkeletonScriptKeyFrame::csSkeletonScriptKeyFrame (const char* name) :
   scfImplementationType(this)
@@ -393,7 +393,7 @@ csSkeletonScriptKeyFrame::~csSkeletonScriptKeyFrame ()
 {
 }
 
-//--------------------------iSkeletonScript-----------------------------------
+//--------------------------iSkeletonAnimation-----------------------------------
 
 csSkeletonScript::csSkeletonScript (csSkeletonFactory *factory, const char* name) :
   scfImplementationType(this)
@@ -410,7 +410,7 @@ csSkeletonScript::~csSkeletonScript ()
 {
 }
 
-iSkeletonScriptKeyFrame *csSkeletonScript::CreateFrame(const char* name)
+iSkeletonAnimationKeyFrame *csSkeletonScript::CreateFrame(const char* name)
 {
   csRef<csSkeletonScriptKeyFrame> key_frame;
   key_frame.AttachNew(new csSkeletonScriptKeyFrame (name));
@@ -930,7 +930,7 @@ iSkeletonBone *csSkeleton::FindBone (const char *name)
   return 0;
 }
 
-iSkeletonScript* csSkeleton::Execute (const char *scriptname)
+iSkeletonAnimation* csSkeleton::Execute (const char *scriptname)
 {
   csSkeletonScript* script = (csSkeletonScript*)(factory->FindScript (scriptname));
   if (!script) 
@@ -944,7 +944,7 @@ iSkeletonScript* csSkeleton::Execute (const char *scriptname)
   return script;
 }
 
-iSkeletonScript* csSkeleton::Append (const char *scriptname)
+iSkeletonAnimation* csSkeleton::Append (const char *scriptname)
 {
   csSkeletonScript* script = (csSkeletonScript*)(
     factory->FindScript (scriptname));
@@ -958,7 +958,7 @@ iSkeletonScript* csSkeleton::Append (const char *scriptname)
 }
 
 
-iSkeletonScript* csSkeleton::FindScript (const char *scriptname)
+iSkeletonAnimation* csSkeleton::FindAnimation (const char *scriptname)
 {
   size_t i;
   for (i = 0 ; i < running_scripts.GetSize () ; i++)
@@ -989,13 +989,13 @@ void csSkeleton::Stop (const char* scriptname)
       running_scripts.DeleteIndexFast (i);
 }
 
-void csSkeleton::Stop (iSkeletonScript *script)
+void csSkeleton::Stop (iSkeletonAnimation *script)
 {
   //csSkeletonRunnable *cs_skel_runnable = static_cast<csSkeletonRunnable *> (script);
   //running_scripts.DeleteFast ( cs_skel_runnable );
 }
 
-iSkeletonScript* csSkeleton::GetScript (size_t i)
+iSkeletonAnimation* csSkeleton::GetAnimation (size_t i)
 {
   if (i < running_scripts.GetSize ())
   {
@@ -1187,7 +1187,7 @@ iSkeletonGraveyard *csSkeletonFactory::GetGraveyard  ()
   return static_cast<iSkeletonGraveyard*> (graveyard);
 }
 
-iSkeletonScript* csSkeletonFactory::FindScript (const char* scriptname)
+iSkeletonAnimation* csSkeletonFactory::FindAnimation (const char* scriptname)
 {
   size_t i;
   for (i = 0 ; i < scripts.GetSize () ; i++)
@@ -1242,7 +1242,7 @@ void csSkeletonFactory::UpdateParentBones ()
   }
 }
 
-iSkeletonScript *csSkeletonFactory::CreateScript(const char *name)
+iSkeletonAnimation *csSkeletonFactory::CreateAnimation (const char *name)
 {
   csRef<csSkeletonScript> script;
   script.AttachNew(new csSkeletonScript (this, name));

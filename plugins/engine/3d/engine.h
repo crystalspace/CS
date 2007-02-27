@@ -32,6 +32,7 @@
 #include "csutil/scf_implementation.h"
 #include "csutil/stringarray.h"
 #include "csutil/weakref.h"
+#include "csutil/weakrefarr.h"
 #include "csutil/eventnames.h"
 #include "iengine/campos.h"
 #include "iengine/engine.h"
@@ -176,6 +177,12 @@ public:
 
 
 #include "csutil/win32/msvc_deprecated_warn_off.h"
+
+struct csImposterUpdateQueue
+{
+  csRef<iRenderView> rview;
+  csWeakRefArray<csImposterProcTex> queue;
+};
 
 /**
  * The 3D engine.
@@ -624,6 +631,17 @@ public:
     return renderLoopManager;
   }
 
+  /**
+   * Add an imposter to the update queue.
+   */
+  void AddImposterToUpdateQueue (csImposterProcTex* imptex,
+      iRenderView* rview);
+
+  /**
+   * Handle imposters.
+   */
+  void HandleImposters ();
+
 private:
   // -- PRIVATE METHODS
 
@@ -769,6 +787,10 @@ public:
    */
   int lightAmbientBlue;
 
+  /// Default shader to attach to all materials
+  // \todo move back to private and make accessible
+  csRef<iShader> defaultShader;
+
 private:
 
   // -- PRIVATE MEMBERS
@@ -874,9 +896,6 @@ private:
   /// Flag set when window requires resizing.
   bool resize;
 
-  /// Default shader to attach to all materials
-  csRef<iShader> defaultShader;
-
   /// 'Saveable' flag
   bool worldSaveable;
 
@@ -948,6 +967,12 @@ private:
   
   /// Current render context (proc texture) or 0 if global.
   iTextureHandle* currentRenderContext; 
+
+  /**
+   * List of imposters that need to be rendered to texture.
+   * There is a different list for every distinct camera instance.
+   */
+  csHash<csImposterUpdateQueue,long> imposterUpdateQueue;
 
   CS_DECLARE_SYSTEM_EVENT_SHORTCUTS;
   csEventID CanvasResize;

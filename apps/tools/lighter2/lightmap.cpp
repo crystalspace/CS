@@ -59,6 +59,13 @@ namespace lighter
       data->colorArraySize,  expConstant, expMax);
   }
 
+  void Lightmap::ApplyScaleClampFunction (float scaleVal, float maxValue)
+  {
+    LightmapCacheLock l (this);
+    LightmapPostProcess::ApplyScaleClampFunction (data->colorArray,
+      data->colorArraySize,  scaleVal, maxValue);
+  }
+
   void Lightmap::SaveLightmap (const csString& fname)
   {
     LightmapCacheLock l (this);
@@ -208,6 +215,18 @@ namespace lighter
       c.red = expMax * (1 - expf (-c.red * expConstant));
       c.green = expMax * (1 - expf (-c.green * expConstant));
       c.blue = expMax * (1 - expf (-c.blue * expConstant));
+    }
+  }
+
+  void LightmapPostProcess::ApplyScaleClampFunction (csColor* colors, size_t numColors, 
+    float scaleValue, float maxValue)
+  {
+    for (uint i = 0; i < numColors; i++)
+    {
+      csColor &c = colors[i];
+      c.red = csClamp (c.red * scaleValue, maxValue, 0.0f);
+      c.green = csClamp (c.green * scaleValue, maxValue, 0.0f);
+      c.blue = csClamp (c.blue * scaleValue, maxValue, 0.0f);
     }
   }
 

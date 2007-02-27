@@ -39,11 +39,6 @@
 #define CS_DECAL_MAX_TRIS_PER_DECAL         64 
 #define CS_DECAL_MAX_VERTS_PER_DECAL        128 
 
-// these two settings kind of screw up the decal, but the z-fighting is 
-// too much otherwise
-#define CS_DECAL_FACE_OFFSET_THRESHOLD		0.05
-#define CS_DECAL_FACE_MAX_OFFSET		0.01
-
 class csDecalManager;
 
 struct csDecalRenderMeshInfo
@@ -60,17 +55,18 @@ private:
   csDecalManager *		decalManager;
 
   // buffers and rendermesh to hold the rendering data
-  csRef<csRenderBuffer>         	vertexBuffer;
-  csRef<csRenderBuffer>         	texCoordBuffer;
-  csRef<csRenderBuffer>         	normalBuffer;
-  csRef<csRenderBuffer>         	indexBuffer;
-  csRef<csRenderBufferHolder>   	bufferHolder;
-  csArray<csRenderMesh*>        	renderMeshes;
-  csArray<csDecalRenderMeshInfo>	renderMeshInfos;
+  csRef<csRenderBuffer>             vertexBuffer;
+  csRef<csRenderBuffer>             texCoordBuffer;
+  csRef<csRenderBuffer>             normalBuffer;
+  csRef<csRenderBuffer>             colorBuffer;
+  csRef<csRenderBuffer>             indexBuffer;
+  csRef<csRenderBufferHolder>       bufferHolder;
+  csArray<csRenderMesh*>            renderMeshes;
+  csArray<csDecalRenderMeshInfo>    renderMeshInfos;
 
-  csRef<iDecalTemplate>         	decalTemplate;
+  csRef<iDecalTemplate>             decalTemplate;
 
-  float					life;
+  float                             life;
 
   // used to keep track of the next open slot in our buffers and what to render
   uint                          indexCount;
@@ -100,7 +96,9 @@ private:
   csVector3                     vertOffset;
   csVector3                     relPos;
   csPlane3                      clipPlanes[6];
-  size_t			numClipPlanes;
+  size_t                        numClipPlanes;
+  float                         topPlaneDist;
+  float                         bottomPlaneDist;
   
 public:
   csDecal(iObjectRegistry * objectReg, csDecalManager * decalManager);

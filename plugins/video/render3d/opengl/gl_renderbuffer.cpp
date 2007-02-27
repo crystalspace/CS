@@ -89,8 +89,9 @@ csGLVBOBufferManager::~csGLVBOBufferManager ()
 
       while (buffer)
       {
+        VBOBuffer* next = buffer->nextBuffer;
         FreeVBOBuffer (buffer);
-        buffer = buffer->nextBuffer;
+        buffer = next;
       }
     }
 
@@ -133,7 +134,7 @@ void* csGLVBOBufferManager::RenderLock (iRenderBuffer* buffer,
     CS_ASSERT (slot->renderBuffer == effectiveBuffer);
     CS_ASSERT (slot->vboBuffer->slotSize >= effectiveBuffer->GetSize ());
 
-    return (void*)(((uint8*)offset) + effectiveBuffer->GetOffset ());
+    return (void*)(((uint8*)offset) + buffer->GetOffset ());
   }
   else
   {
@@ -142,7 +143,7 @@ void* csGLVBOBufferManager::RenderLock (iRenderBuffer* buffer,
 
     uint8* data = (uint8*)effectiveBuffer->Lock (CS_BUF_LOCK_READ);
     if (data != (uint8*)-1)
-      return data + effectiveBuffer->GetOffset ();
+      return data + buffer->GetOffset ();
     else
       return (void*)-1;
   }
@@ -207,7 +208,7 @@ csGLVBOBufferManager::VBOSlot* csGLVBOBufferManager::GetVBOSlot (
     if (slot)
     {
       slot->renderBuffer = buffer;
-      slot->bufferVersion = 0;
+      slot->bufferVersion = ~0;
       slot->slotAge = ~0;
       SetSlotUsed (slot);
 
@@ -327,7 +328,6 @@ void csGLVBOBufferManager::ReleaseVBOSlot (VBOSlot* slot, bool deallocate /* = t
 {
   // Mark it as free
   VBOBuffer* buffer = slot->vboBuffer;
-  size_t slotIndex = (slot - buffer->vboSlots);
 
   ClearSlotUsed (slot);
 
@@ -492,10 +492,9 @@ void csGLVBOBufferManager::RenderBufferDestroyed (iRenderBuffer* buffer)
   }
 }
 
-static csString ByteFormat (size_t n)
+static csString ByteFormat (size_t size)
 {
   csString str;
-  unsigned long size = (unsigned long)n;
   if (size >= 1024*1024)
     str.Format ("%4zu MB", size / (1024*1024));
   else if (size >= 1024)
@@ -544,7 +543,7 @@ namespace
 void csGLVBOBufferManager::DumpStatsBufferType (size_t type)
 {
   csPrintf ("Fixed size buffers\n");
-  csPrintf ("SS            NB       NS       SU      SU%\n");
+  csPrintf ("SS            NB       NS       SU      SU%%\n");
 
   size_t vboSize = 0;
   size_t sysmemSize = 0;
