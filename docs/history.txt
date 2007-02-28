@@ -21,6 +21,9 @@ chronological order.
 	      to 0.2.
 	    - Extended the loader to handle the new camera_tolerance
 	      attribute.
+	- res un-botched CDATA parsing in xmlread. (It should never condense
+	  whitespace. Was errorneously changed to respect the "condense
+	  whitespace" flag earlier.)
 26-Feb-2007
 	- res slightly optimized xmlread by replacing uses of isspace(),
 	  isalpha() and isalnum() with custom implementations.

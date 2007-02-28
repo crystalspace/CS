@@ -582,13 +582,10 @@ char* TrXmlText::Parse( const ParseInfo& parse, char* p )
 
 char* TrXmlCData::Parse( const ParseInfo& parse, char* p )
 {
-  //TrDocument* doc = GetDocument();
-  bool ignoreWhite = false;
-//  if ( doc && !doc->IgnoreWhiteSpace() ) ignoreWhite = false;
-        //skip the <![CDATA[ 
-        p += 9;
+  //skip the <![CDATA[ 
+  p += 9;
   const char* end = "]]>";
-  p = ReadText( p, value, vallen, parse.condenseWhiteSpace, end);
+  p = ReadText( p, value, vallen, false, end);
 
   if ( p )
     return p;
