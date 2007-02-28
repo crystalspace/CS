@@ -47,8 +47,8 @@ csImposterMesh::csImposterMesh (csEngine* engine, csMeshWrapper *parent)
 
   SetImposterReady (false, 0);
   dirty = true;
-  anglecamera = PI;
-  angleobject = PI;
+  meshLocalDir.Set (0, 0, 0); //@@@
+  cameraLocalDir.Set (0, 0, 0); //@@@
 }
 
 csImposterMesh::~csImposterMesh ()
@@ -56,39 +56,52 @@ csImposterMesh::~csImposterMesh ()
   delete tex;
 }
 
-void csImposterMesh::UpdateValues (iCamera *cam,
-  float &camangle, float &objangle)
+void csImposterMesh::GetLocalViewVectors (iCamera *cam)
 {
   csReversibleTransform objt = 
-    (parent_mesh->GetCsMovable ()).csMovable::GetTransform ();
-  csReversibleTransform camt = cam->GetTransform ();
+    (parent_mesh->GetCsMovable ()).csMovable::GetFullTransform ();
+  csOrthoTransform& camt = cam->GetTransform ();
 
-  csVector3 m2c = (
+  csVector3 relativeDir = (
     parent_mesh->GetWorldBoundingBox ().GetCenter ()
     - camt.GetOrigin ()
   ).Unit ();
 
-  csVector3 objf = objt.GetT2O ().Col3 ();
-  csVector3 camf = camt.GetT2O ().Col3 ();
-
-  camangle = acosf (camf * m2c);
-  objangle = acosf (objf * m2c);
+  meshLocalDir = objt.Other2ThisRelative (relativeDir);
+  cameraLocalDir = camt.Other2ThisRelative (relativeDir);
 }
 
-bool csImposterMesh::CheckUpdateNeeded (iRenderView *rview, float tolerance)
+bool csImposterMesh::CheckUpdateNeeded (iRenderView *rview, float tolerance,
+    float camtolerance)
 {
-  float curangle_cam;
-  float curangle_obj;
+  csReversibleTransform objt = 
+    (parent_mesh->GetCsMovable ()).csMovable::GetFullTransform ();
+  csOrthoTransform& camt = rview->GetCamera ()->GetTransform ();
 
-  UpdateValues (rview->GetCamera (), curangle_cam, curangle_obj);
+  csVector3 relativeDir = (
+    parent_mesh->GetWorldBoundingBox ().GetCenter ()
+    - camt.GetOrigin ()
+  ).Unit ();
 
-  float camdiff = fabsf (curangle_cam - anglecamera);
-  float objdiff = fabsf (curangle_obj - angleobject);
-
-  float diff = camdiff + objdiff;
+  csVector3 meshDir = objt.This2OtherRelative (meshLocalDir);
 
   // If not ok, mark for redraw of imposter
-  if (diff > tolerance)
+  // @@@ todo: use a listener system on the tolerance variable
+  // so we can precalc the cos(tolerance).
+  bool updateneeded = false;
+  if (meshDir * relativeDir < cosf (tolerance))
+  {
+    updateneeded = true;
+  }
+  else
+  {
+    csVector3 cameraDir = camt.This2OtherRelative (cameraLocalDir);
+    if (cameraDir * relativeDir < cosf (camtolerance))
+    {
+      updateneeded = true;
+    }
+  }
+  if (updateneeded)
   {
     SetImposterReady (false, rview);
     return false;
@@ -98,7 +111,6 @@ bool csImposterMesh::CheckUpdateNeeded (iRenderView *rview, float tolerance)
 
 void csImposterMesh::SetImposterReady (bool r, iRenderView* rview)
 {
-printf("setting ready: %i\n", ready);
   ready = r;
   if (!ready) tex->Update (rview);
 }
@@ -157,7 +169,7 @@ void csImposterMesh::FindImposterRectangle (iCamera* c)
   c->SetTransform (oldt);
 
   // save current facing for angle checking
-  UpdateValues (c, anglecamera, angleobject);
+  GetLocalViewVectors (c);
 
   dirty = true;
 }

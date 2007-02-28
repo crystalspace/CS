@@ -3659,8 +3659,8 @@ bool csLoader::ParseImposterSettings (iImposter* imposter,
   imposter->SetMinDistance (var);
 
   s = node->GetAttributeValue ("tolerance");
-  iSharedVariable* var2 = Engine->GetVariableList ()->FindByName (s);
-  if (!var2)
+  var = Engine->GetVariableList ()->FindByName (s);
+  if (!var)
   {
     SyntaxService->ReportError (
 	    "crystalspace.maploader.parse.meshobject", node,
@@ -3668,7 +3668,19 @@ bool csLoader::ParseImposterSettings (iImposter* imposter,
 	    s);
     return false;
   }
-  imposter->SetRotationTolerance (var2);
+  imposter->SetRotationTolerance (var);
+
+  s = node->GetAttributeValue ("camera_tolerance");
+  var = Engine->GetVariableList ()->FindByName (s);
+  if (!var)
+  {
+    SyntaxService->ReportError (
+	    "crystalspace.maploader.parse.meshobject", node,
+	    "Imposter camera rotation tolerance variable (%s) doesn't exist!",
+	    s);
+    return false;
+  }
+  imposter->SetCameraRotationTolerance (var);
   return true;
 }
 

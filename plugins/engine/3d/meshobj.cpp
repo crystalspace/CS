@@ -588,22 +588,15 @@ const csArray<iLightSectorInfluence*>& csMeshWrapper::GetRelevantLights
 csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview, 
 					       uint32 frustum_mask)
 {
-  //printf("imposter active: %i\n",imposter_active);
-  if (imposter_active)
-    //printf("imposter releva: %i\n",CheckImposterRelevant (rview));
-
   if (imposter_active && CheckImposterRelevant (rview))
   {
-    //printf("trying imposter... ");
     csRenderMesh** imposter = GetImposter (rview);
     if (imposter)
     {
-      //printf("drawn\n");
       n = 1;
       return imposter;
     }
   }
-  //printf("normal mesh\n");
 
   // Callback are traversed in reverse order so that they can safely
   // delete themselves.
@@ -955,24 +948,22 @@ csRenderMesh** csMeshWrapper::GetImposter (iRenderView *rview)
   // Check for imposter existence.  If not, create it.
   if (!imposter_mesh)
   {
-    printf("Imposter doesn't exist!\n"); fflush (stdout);
     return 0;
   }
 
   // Check for imposter already ready
   if (!imposter_mesh->GetImposterReady (rview))
   {
-    printf("not ready\n"); fflush (stdout);
     return 0;
   }
 
   // Check for too much camera movement since last imposter render
   if (!imposter_mesh->CheckUpdateNeeded (rview,
-	imposter_rotation_tolerance->Get ()))
+	imposter_rotation_tolerance
+		? imposter_rotation_tolerance->Get () : 0.4f,
+	imposter_camera_rotation_tolerance
+		? imposter_camera_rotation_tolerance->Get () : 0.2f))
   {
-
-    printf(" (needs update) "); fflush (stdout);
-//    return 0;
   }
 
   // Get imposter rendermesh
@@ -984,7 +975,6 @@ void csMeshWrapper::SetImposterActive (bool flag)
   imposter_active = flag;
   if (flag)
   {
-    printf("setting imposter active\n");
     imposter_mesh = new csImposterMesh (engine, this);
   }
 }
@@ -1467,6 +1457,7 @@ csPtr<iMeshWrapper> csMeshFactoryWrapper::CreateMeshWrapper ()
   cmesh->SetImposterActive (imposter_active);
   cmesh->SetMinDistance (min_imposter_distance);
   cmesh->SetRotationTolerance (imposter_rotation_tolerance);
+  cmesh->SetCameraRotationTolerance (imposter_camera_rotation_tolerance);
 
   if (static_lod)
   {

@@ -14,6 +14,13 @@ chronological order.
 	  allocation.
 	- res fixed mixing of new char[] and cs_malloc() in xmlread.
 	- res fixed a deprecation warning on VC in the skeleton plugin.
+	- Jorrit did some work on imposters:
+	    - Fixed checking on imposter tolerance (thanks to Marten).
+	    - Added a separate camera_tolerance factor.
+	    - Made tolerance default to 0.4 and camera_tolerance default
+	      to 0.2.
+	    - Extended the loader to handle the new camera_tolerance
+	      attribute.
 26-Feb-2007
 	- res slightly optimized xmlread by replacing uses of isspace(),
 	  isalpha() and isalnum() with custom implementations.

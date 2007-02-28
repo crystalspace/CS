@@ -46,8 +46,8 @@ private:
   bool     ready;            // Whether texture must be redrawn
 
   //saved values for update checking
-  float anglecamera;
-  float angleobject;
+  csVector3 meshLocalDir;
+  csVector3 cameraLocalDir;
 
   //screen bounding box helper
   csScreenBoxResult res;
@@ -70,8 +70,8 @@ private:
   //convenience shortcut
   csEngine *engine;
 
-  void UpdateValues (iCamera *cam,
-    float &camangle, float &objangle);
+  // Get the current rotation vectors.
+  void GetLocalViewVectors (iCamera *cam);
 
   void FindImposterRectangle (iCamera *camera);
   void SetImposterReady (bool r, iRenderView* rview);
@@ -82,7 +82,8 @@ public:
   csImposterMesh (csEngine* engine, csMeshWrapper *parent);
   ~csImposterMesh ();
 
-  bool CheckUpdateNeeded (iRenderView *rview, float tolerance);
+  bool CheckUpdateNeeded (iRenderView *rview, float tolerance,
+      	float camtolerance);
 
   //returns the imposter billboard
   csRenderMesh** GetRenderMesh (iRenderView *rview);

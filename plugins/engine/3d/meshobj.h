@@ -322,6 +322,7 @@ private:
   csRef<iSharedVariable> min_imposter_distance;
   /// Imposter Redo Threshold angle change.
   csRef<iSharedVariable> imposter_rotation_tolerance;
+  csRef<iSharedVariable> imposter_camera_rotation_tolerance;
   csImposterMesh *imposter_mesh;
 
   /**
@@ -599,10 +600,20 @@ public:
    * angle difference between when the imposter was 
    * created and the current position of the camera.
    * Angle greater than this triggers a re-render of
-   * the imposter.
+   * the imposter. Default angle is 0.4f.
    */
   virtual void SetRotationTolerance (iSharedVariable* angle)
   { imposter_rotation_tolerance = angle; }
+
+  /** 
+   * Camera Rotation Tolerance is the tolerance angle
+   * between z->1 vector and object on screen. Exceeding this
+   * value triggers updating of the imposter whenever the
+   * object slides too much away from the center of screen.
+   * Default angle is 0.2f.
+   */
+  virtual void SetCameraRotationTolerance (iSharedVariable* angle)
+  { imposter_camera_rotation_tolerance = angle; }
 
   /**
    * Gets the imposters rendermesh
@@ -841,6 +852,7 @@ private:
   csRef<iSharedVariable> min_imposter_distance;
   /// Imposter Redo Threshold angle change.
   csRef<iSharedVariable> imposter_rotation_tolerance;
+  csRef<iSharedVariable> imposter_camera_rotation_tolerance;
 
 public:
   /// Constructor.
@@ -968,6 +980,19 @@ public:
    */
   virtual void SetRotationTolerance (iSharedVariable* angle)
   { imposter_rotation_tolerance = angle; }
+
+  /** 
+   * Camera Rotation Tolerance is the tolerance angle
+   * between z->1 vector and object on screen. Exceeding this
+   * value triggers updating of the imposter whenever the
+   * object slides too much away from the center of screen.
+   *
+   * All meshes created from this factory after this function
+   * is called will get this variable. Meshes created before
+   * calling this function will get the previous value.
+   */
+  virtual void SetCameraRotationTolerance (iSharedVariable* angle)
+  { imposter_camera_rotation_tolerance = angle; }
 
   /// Determine if imposter or true rendering will be used.
   virtual bool WouldUseImposter (csReversibleTransform& /*pov*/) const

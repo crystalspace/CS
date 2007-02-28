@@ -323,6 +323,9 @@ void ImposterTest::CreateSprites ()
   csRef<iSharedVariable> rotvar = varlist->New();
   rotvar->Set(0.40f);
   i->SetRotationTolerance(rotvar);
+  csRef<iSharedVariable> camrotvar = varlist->New();
+  camrotvar->Set(0.2f);
+  i->SetCameraRotationTolerance(camrotvar);
 
   printf("done...\n");
 }

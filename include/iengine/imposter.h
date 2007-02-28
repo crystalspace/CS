@@ -61,6 +61,14 @@ struct iImposter : public virtual iBase
    */
   virtual void SetRotationTolerance (iSharedVariable* angle) = 0;
 
+  /**
+   * Camera Rotation Tolerance is the tolerance angle
+   * between z->1 vector and object on screen. Exceeding this
+   * value triggers updating of the imposter whenever the
+   * object slides too much away from the center of screen.
+   */
+  virtual void SetCameraRotationTolerance (iSharedVariable* angle) = 0;
+
   /// Determine if imposter or true rendering will be used
   virtual bool WouldUseImposter (csReversibleTransform& pov) const = 0;
 };
