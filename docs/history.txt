@@ -9,6 +9,9 @@ chronological order.
 28-Feb-2007
 	- Marten fixed the particle loader/saver to properly expose the
 	  saver interface.
+	- res added CS::StrDup*(), versions of csStrNew*() (or strdup(),
+	  depending how you look at it) that use cs_malloc() for memory
+	  allocation.
 26-Feb-2007
 	- res slightly optimized xmlread by replacing uses of isspace(),
 	  isalpha() and isalnum() with custom implementations.

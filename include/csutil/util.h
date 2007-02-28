@@ -41,17 +41,52 @@ CS_CRYSTALSPACE_EXPORT char *csStrNew (const char *s);
 /**
  * Allocate a new char [] and copy an UTF-8 version of the string into 
  * the newly allocated storage.
+ * \sa csStrNew(const char*)
  */
 CS_CRYSTALSPACE_EXPORT char *csStrNew (const wchar_t *s);
 /**
- * Allocate a new widechar [] and the string into the newly allocated storage.
+ * Allocate a new widechar [] and copy the string into the newly allocated 
+ * storage.
+ * \sa csStrNew(const char*)
  */
 CS_CRYSTALSPACE_EXPORT wchar_t* csStrNewW (const wchar_t *s);
 /**
  * Allocate a new widechar [] and copy the string converted from UTF-8 into 
  * the newly allocated storage.
+ * \sa csStrNew(const char*)
  */
 CS_CRYSTALSPACE_EXPORT wchar_t* csStrNewW (const char *s);
+
+namespace CS
+{
+  /**
+   * Allocate a char string with cs_malloc() and copy the string into the 
+   * newly allocated storage.
+   * This is a handy method for copying strings, in fact it is an analogue
+   * of the strdup() function from string.h, but using cs_malloc(). (Also,
+   * strdup() is not present on some platforms). To free the pointer the 
+   * caller should call cs_free().
+   */
+  CS_CRYSTALSPACE_EXPORT char* StrDup (const char *s);
+  /**
+   * Allocate a char string with cs_malloc() and copy an UTF-8 version of the 
+   * string into the newly allocated storage.
+   * \sa StrDup(const char*)
+   */
+  CS_CRYSTALSPACE_EXPORT char* StrDup (const wchar_t *s);
+  /**
+   * Allocate a wide char string with cs_malloc() and copy the string into 
+   * the newly allocated storage.
+   * \sa StrDup(const char*)
+   */
+  CS_CRYSTALSPACE_EXPORT wchar_t* StrDupW (const wchar_t *s);
+  /**
+   * Allocate a wide char string with cs_malloc() and copy the string 
+   * converted from UTF-8 into the newly allocated storage.
+   * \sa StrDup(const char*)
+   */
+  CS_CRYSTALSPACE_EXPORT wchar_t* StrDupW (const char *s);
+}
 
 /**
  * Perform case-insensitive string comparison. Returns a negative number if \p
