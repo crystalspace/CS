@@ -557,6 +557,8 @@ public:
   void SetSpeed (float speed) { return script->SetSpeed (speed); }
 };
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 class csSkeleton :
   public scfImplementation1<csSkeleton, iSkeleton>
 {
@@ -702,6 +704,8 @@ public:
   virtual void RemoveSocket (int i);
   virtual size_t GetSocketsCount();
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 class csSkeletonSocketFactory :
   public scfImplementation1<csSkeletonSocketFactory, iSkeletonSocketFactory>

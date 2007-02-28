@@ -13,6 +13,7 @@ chronological order.
 	  depending how you look at it) that use cs_malloc() for memory
 	  allocation.
 	- res fixed mixing of new char[] and cs_malloc() in xmlread.
+	- res fixed a deprecation warning on VC in the skeleton plugin.
 26-Feb-2007
 	- res slightly optimized xmlread by replacing uses of isspace(),
 	  isalpha() and isalnum() with custom implementations.
