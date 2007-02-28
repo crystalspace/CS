@@ -437,7 +437,7 @@ const char* csXmlReadDocument::Parse (iFile* file, bool collapse)
 #ifdef CS_DEBUG
   if (strlen (data) != real_size)
   {
-    delete[] data;
+    cs_free (data);
     return "File contains one or more null characters";
   }
 #endif
@@ -458,7 +458,7 @@ const char* csXmlReadDocument::Parse (iString* str, bool collapse)
 
 const char* csXmlReadDocument::Parse (const char* buf, bool collapse)
 {
-  CreateRoot (csStrNew (buf));
+  CreateRoot (CS::StrDup (buf));
   root->SetCondenseWhiteSpace(collapse);
   ParseInfo parse;
   root->Parse (parse, root->input_data);

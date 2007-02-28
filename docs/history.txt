@@ -12,6 +12,7 @@ chronological order.
 	- res added CS::StrDup*(), versions of csStrNew*() (or strdup(),
 	  depending how you look at it) that use cs_malloc() for memory
 	  allocation.
+	- res fixed mixing of new char[] and cs_malloc() in xmlread.
 26-Feb-2007
 	- res slightly optimized xmlread by replacing uses of isspace(),
 	  isalpha() and isalnum() with custom implementations.
