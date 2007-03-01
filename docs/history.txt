@@ -13,6 +13,8 @@ chronological order.
 	- Jorrit split plugins/engine/3d/meshobj.* into meshobj.* and
 	  meshfact.* (i.e. keep mesh objects and mesh factories as separate
 	  files).
+	- Marten fixed a serious bug in bruteblock terrain where it would
+	  never cull any terrain blocks.
 28-Feb-2007
 	- Marten fixed the particle loader/saver to properly expose the
 	  saver interface.
