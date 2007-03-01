@@ -169,29 +169,29 @@ CS_CRYSTALSPACE_EXPORT bool csGlobMatches (const char *fName,
  * Finds the smallest number that is a power of two and is larger or
  * equal to n.
  */
-CS_CRYSTALSPACE_EXPORT int csFindNearestPowerOf2 (int n);
+static inline int csFindNearestPowerOf2 (int n)
+{
+  int v=n;
+
+  v--;
+  v |= v >> 1;
+  v |= v >> 2;
+  v |= v >> 4;
+  v |= v >> 8;
+  v |= v >> 16;
+  v++;
+
+  return v;
+}
 
 /// Returns true if n is a power of two.
-CS_CRYSTALSPACE_EXPORT bool csIsPowerOf2 (int n);
+static inline bool csIsPowerOf2 (int n)
+{
+  return !(n & (n - 1)) && n;	// (n-1) ^ n >= n;
+}
 
 /// Find the log2 of 32bit argument.
-static inline int csLog2 (int n)
-{
-  const unsigned int b[] = {0x2, 0xC, 0xF0, 0xFF00, 0xFFFF0000};
-  const unsigned int S[] = {1, 2, 4, 8, 16};
-  int i;
-
-  register unsigned int c = 0; // result of log2(v) will go here
-  for (i = 4; i >= 0; i--) // unroll for speed...
-  {
-    if (n & b[i])
-    {
-      n >>= S[i];
-      c |= S[i];
-    } 
-  }
-  return c;
-}
+CS_CRYSTALSPACE_EXPORT int csLog2 (int n);
 
 /**
  * Given \p src and \p dest, which are already allocated, copy \p source to \p

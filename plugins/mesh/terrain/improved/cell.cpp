@@ -20,16 +20,15 @@
 
 #include "cell.h"
 
+#include "csgeom/csrect.h"
+#include "csgeom/vector3.h"
+#include "csgfx/imagebase.h"
+#include "csgfx/imagemanipulate.h"
+#include "csgfx/imagememory.h"
+
+#include "iterrain/terraincollider.h"
 #include "iterrain/terrainrenderer.h"
 #include "iterrain/terrainsystem.h"
-#include "iterrain/terraincollider.h"
-
-#include "csgeom/vector3.h"
-#include "csgeom/csrect.h"
-
-#include "csgfx/imagebase.h"
-#include "csgfx/imagememory.h"
-#include "csgfx/imagemanipulate.h"
 
 #include "debug.h"
 
@@ -37,54 +36,30 @@ CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
 {
 
 csTerrainCell::csTerrainCell (iTerrainSystem* parent, const char* name,
-int grid_width,
-int grid_height, int material_width, int material_height,
-bool material_persistent,
-const csVector2& position, const csVector3& size, iTerrainDataFeeder* feeder,
-iTerrainCellRenderProperties* render_properties,
-iTerrainCellCollisionProperties* collision_properties,
-iTerrainRenderer* renderer, iTerrainCollider* collider)
-  : scfImplementationType (this)
+  int grid_width, int grid_height, int material_width, int material_height,
+  bool material_persistent, 
+  const csVector2& position, const csVector3& size, iTerrainDataFeeder* feeder,
+  iTerrainCellRenderProperties* render_properties,
+  iTerrainCellCollisionProperties* collision_properties,
+  iTerrainRenderer* renderer, iTerrainCollider* collider)
+  : scfImplementationType (this), parent (parent), name (name), 
+  material_width (material_width), material_height (material_height),
+  material_persistent (material_persistent), position (position), size (size),
+  feeder (feeder), render_properties (render_properties), 
+  collision_properties (collision_properties), renderer (renderer), collider (collider),
+  state (NotLoaded), render_data (0), last_colorVersion (0)
 {
-  this->parent = parent;
-  
-  this->name = name;
-
   // Here we do grid width/height correction. The height map will be a
   // square with size 2^n + 1
 
   int maxsize = MAX(grid_width, grid_height) - 1;
   int temp = 1;
-
-  while (temp < maxsize) temp *= 2;
-  
+  while (temp < maxsize) temp *= 2;  
   this->grid_width = temp + 1;
   this->grid_height = temp + 1;
   
-  this->material_width = material_width;
-  this->material_height = material_height;
-
-  this->material_persistent = material_persistent;
-  
-  this->position = position;
-  this->size = size;
-  
-  this->feeder = feeder;
-  
-  this->render_properties = render_properties;
-  this->collision_properties = collision_properties;
-
-  this->renderer = renderer;
-  this->collider = collider;
-
   step_x = size.x / (grid_width - 1);
   step_z = size.y / (grid_height - 1);
-
-  state = NotLoaded;
-
-  render_data = NULL;
-
-  last_colorVersion = 0;
 }
 
 csTerrainCell::~csTerrainCell ()
@@ -111,7 +86,8 @@ void csTerrainCell::SetLoadState(LoadState state)
     {
       switch (state)
       {
-        case NotLoaded: break;
+        case NotLoaded: 
+          break;
         case PreLoaded:
         {
           heightmap.SetSize (grid_width * grid_height, 0);
@@ -145,8 +121,10 @@ void csTerrainCell::SetLoadState(LoadState state)
     {
       switch (state)
       {
-        case NotLoaded: break;
-        case PreLoaded: break;
+        case NotLoaded: 
+          break;
+        case PreLoaded: 
+          break;
         case Loaded:
         {
           this->state = feeder->Load (this) ? Loaded : NotLoaded;
@@ -178,8 +156,10 @@ void csTerrainCell::SetLoadState(LoadState state)
 
           break;
         }
-        case PreLoaded: break;
-        case Loaded: break;
+        case PreLoaded: 
+          break;
+        case Loaded: 
+          break;
       }
 
       break; 
@@ -424,13 +404,13 @@ bool csTerrainCell::Collide (iCollider* collider, float radius,
     pairs);
 }
 
-static inline float Lerp (const float x, const float y, const float t)
+static inline float Lerp (const float x1, const float x2, const float t)
 {
-  return x + (y - x) * t;
+  return x1 + (x2 - x1) * t;
 }
 
 void csTerrainCell::LerpHelper (const csVector2& pos, int& x1, int& x2,
-float& xfrac, int& y1, int& y2, float& yfrac) const
+  float& xfrac, int& y1, int& y2, float& yfrac) const
 {
   float x = (pos.x / size.x) * (grid_width - 1);
   float y = (pos.y / size.y) * (grid_height - 1);

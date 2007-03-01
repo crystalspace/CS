@@ -37,34 +37,56 @@
 CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
 {
 
+struct csBruteBlockTerrainRenderData;
+
 class csTerrainBruteBlockCellRenderProperties :
   public scfImplementation1<csTerrainBruteBlockCellRenderProperties,
                           iTerrainCellRenderProperties>
 {
-private:
-  bool visible;
-  int block_res;
-  float lod_lcoeff;
-
 public:
-  csTerrainBruteBlockCellRenderProperties (iBase* parent);
+  csTerrainBruteBlockCellRenderProperties ();
 
   virtual ~csTerrainBruteBlockCellRenderProperties ();
 
-  virtual bool GetVisible () const;
-  virtual void SetVisible (bool value);
+  virtual bool GetVisible () const
+  {
+    return visible;
+  }
 
-  int GetBlockResolution() const {return block_res;}
+  virtual void SetVisible (bool value)
+  {
+    visible = value;
+  }
+
+  int GetBlockResolution() const 
+  {
+    return block_res;
+  }
   void SetBlockResolution(int value)
   {
-    block_res = csLog2 (value);
-    block_res = (int) ((float)pow (2.0f, block_res));
+    block_res = 1 << csLog2 (value);
   }
   
-  float GetLODLCoeff() const {return lod_lcoeff;}
-  void SetLODLCoeff(float value) {lod_lcoeff = value;}
+  float GetLODLCoeff() const 
+  {
+    return lod_lcoeff;
+  }
+  void SetLODLCoeff(float value) 
+  {
+    lod_lcoeff = value;
+  }
 
   virtual void SetParam (const char* name, const char* value);
+
+private:
+  // Per cell properties
+  bool visible;
+
+  // Block resolution in "gaps".. should be 2^n
+  int block_res;
+
+  // Lod splitting coefficient
+  float lod_lcoeff;
 };
 
 class csTerrainBruteBlockRenderer :
@@ -72,23 +94,12 @@ class csTerrainBruteBlockRenderer :
                             iTerrainRenderer,
                             iComponent>
 {
-  csDirtyAccessArray<csRenderMesh*> meshes;
-  
-  csRenderMeshHolder rm_holder;
-
-  csRefArray<iMaterialWrapper> material_palette;
-
-  iObjectRegistry* object_reg;
-
-  csRef<iGraphics3D> g3d;
-  csRef<iStringSet> strings;
 public:
   csTerrainBruteBlockRenderer (iBase* parent);
 
   virtual ~csTerrainBruteBlockRenderer ();
 
   // ------------ iTerrainRenderer implementation ------------
-
   virtual csPtr<iTerrainCellRenderProperties> CreateProperties ();
 
   virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview,
@@ -107,6 +118,28 @@ public:
   
   // ------------ iComponent implementation ------------
   virtual bool Initialize (iObjectRegistry* object_reg);
+
+  // Get index buffer with given resolution and index
+  iRenderBuffer* GetIndexBuffer (int block_res_log2, int index, int& numIndices);
+
+private:
+  csRef<csBruteBlockTerrainRenderData> SetupCellRenderData (iTerrainCell* cell);
+
+  csDirtyAccessArray<csRenderMesh*> meshes;
+  csRenderMeshHolder rm_holder;
+
+  csRefArray<iMaterialWrapper> material_palette;
+  iObjectRegistry* object_reg;
+
+  csRef<iGraphics3D> g3d;
+  csRef<iStringSet> strings;
+
+  struct IndexBufferSet : public csRefCount
+  {
+    csRef<iRenderBuffer> mesh_indices[16];
+    int numindices[16];
+  };
+  csRefArray<IndexBufferSet> indexBufferList;
 };
 
 }

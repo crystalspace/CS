@@ -7,6 +7,15 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 
+1-Mar-2007
+	- Marten fixed csLog2 to give correct result when a power of 2
+	  was given.
+	- Marten made a number of fixes to improved terrain plugin:
+	    - Rewrote the LOD level selection algorithm to use projected
+	      area instead of just maximum component.
+	    - Moved the index buffer generation to be done per terrain
+	      renderer instance, not per terrain cell instance.
+	    - Did some general stylistic fixes.
 19-Feb-2007
 	- Marten made a few changes in lighter2:
 	   - Disabled the use of the exposure function and use a simple
@@ -331,7 +340,7 @@ chronological order.
 	    - added declaration for some key event macros which are not
 	      found automatically by swig.
 	- Genjix added fix for iGeneralFactory::AddTriangle() crash in
-          Invalidate().
+          Invalidate()
 13-Jan-2007
 	- Jorrit fixed a problem in the segmentcell header of opcode
 	  which handles collision detection for new terrain. It was

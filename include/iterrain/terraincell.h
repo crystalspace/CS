@@ -25,7 +25,6 @@
 
 #include "terrainarray.h"
 
-struct iRenderView;
 struct iTerrainCellRenderProperties;
 struct iTerrainCellCollisionProperties;
 struct iImage;
