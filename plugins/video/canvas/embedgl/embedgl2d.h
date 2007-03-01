@@ -39,7 +39,11 @@
 #include <GL/glx.h>
 #endif
 
+#if defined(CS_OPENGL_PATH)
+#include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
+#else
 #include <GL/gl.h>
+#endif
 
 class csGraphics2DGLEmbed : public scfImplementationExt1<
 			      				csGraphics2DGLEmbed,

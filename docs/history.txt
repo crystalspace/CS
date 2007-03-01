@@ -6,6 +6,10 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-Mar-2007
+	- res fixed embedgl to properly include gl.h. (<GL/gl.h> doesn't work
+	  on all platforms, the CS_OPENGL_PATH construct takes care of the
+	  proper path.)
 28-Feb-2007
 	- Marten fixed the particle loader/saver to properly expose the
 	  saver interface.
