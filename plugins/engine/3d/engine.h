@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2001 by Jorrit Tyberghein
+    Copyright (C) 1998-2001,2007 by Jorrit Tyberghein
               (C) 2005 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
@@ -54,6 +54,7 @@
 #include "ivideo/shader/shader.h"
 #include "plugins/engine/3d/halo.h"
 #include "plugins/engine/3d/meshobj.h"
+#include "plugins/engine/3d/meshfact.h"
 #include "plugins/engine/3d/region.h"
 #include "plugins/engine/3d/renderloop.h"
 #include "plugins/engine/3d/rview.h"

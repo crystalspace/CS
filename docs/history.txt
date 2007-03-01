@@ -10,6 +10,9 @@ chronological order.
 	- res fixed embedgl to properly include gl.h. (<GL/gl.h> doesn't work
 	  on all platforms, the CS_OPENGL_PATH construct takes care of the
 	  proper path.)
+	- Jorrit split plugins/engine/3d/meshobj.* into meshobj.* and
+	  meshfact.* (i.e. keep mesh objects and mesh factories as separate
+	  files).
 28-Feb-2007
 	- Marten fixed the particle loader/saver to properly expose the
 	  saver interface.
