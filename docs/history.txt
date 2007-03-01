@@ -7,6 +7,11 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 
+2-Mar-2007
+	- Marten made a number of fixes to improved terrain:
+	    - Changed the cell lru to be a bit more efficient.
+	    - Removed all usage of csArray::Length/SetLength
+	    - Fixed a block culling bug.
 1-Mar-2007
 	- Marten fixed csLog2 to give correct result when a power of 2
 	  was given.

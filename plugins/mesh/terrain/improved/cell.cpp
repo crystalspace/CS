@@ -320,7 +320,7 @@ void csTerrainCell::UnlockMaterialMap ()
   csDirtyAccessArray<unsigned char> alpha;
   alpha.SetSize (mm_rect.Width () * mm_rect.Height ());
   
-  for (unsigned int i = 0; i < parent->GetMaterialPalette ().Length (); ++i)
+  for (unsigned int i = 0; i < parent->GetMaterialPalette ().GetSize (); ++i)
   {
     for (int y = 0; y < mm_rect.Height (); ++y)
     {
@@ -542,17 +542,17 @@ void csTerrainCell::UpdateColors (iMovable* movable, unsigned int colorVersion,
 
   if (last_colorVersion == 0)
   {
-    staticLights.SetLength (lmres * lmres);
+    staticLights.SetSize (lmres * lmres);
 
-    for (size_t i = 0; i < staticLights.Length (); ++i)
+    for (size_t i = 0; i < staticLights.GetSize (); ++i)
       staticLights[i] = ambient;
   }
 
   last_colorVersion = colorVersion;
 
-  staticColors.SetLength (staticLights.Length ());
+  staticColors.SetSize (staticLights.GetSize ());
   
-  for (size_t i = 0; i < staticLights.Length(); i++)
+  for (size_t i = 0; i < staticLights.GetSize (); i++)
   {
     staticColors[i] = staticLights[i] + baseColor;
   }

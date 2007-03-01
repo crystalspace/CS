@@ -144,14 +144,13 @@ iTerrainCell* csTerrainSystem::GetCellNL (const csVector2& pos)
   return NULL;
 }
 
-const csRefArray<iMaterialWrapper>& csTerrainSystem::GetMaterialPalette ()
-                                                                       const
+const csRefArray<iMaterialWrapper>& csTerrainSystem::GetMaterialPalette () const
 {
   return material_palette;
 }
 
-void csTerrainSystem::SetMaterialPalette (const csRefArray<iMaterialWrapper>&
-                                          array)
+void csTerrainSystem::SetMaterialPalette (
+  const csRefArray<iMaterialWrapper>& array)
 {
   material_palette = array;
 
@@ -377,30 +376,32 @@ void csTerrainSystem::SetMaxLoadedCells (unsigned int value)
   max_loaded_cells = value;
 }
 
+static int CellLRUCompare (csTerrainCell* const& r1, csTerrainCell* const& r2)
+{
+  return r1->GetLRU () - r2->GetLRU ();
+}
+
 void csTerrainSystem::UnloadLRUCells ()
 {
   // count loaded cells
-  unsigned int count = 0;
+  csArray<csTerrainCell*> loadedCells;
 
-  for (size_t i = 0; i < cells.Length (); ++i)
-    if (cells[i]->GetLoadState () == iTerrainCell::Loaded)
-      ++count;
-
-  if (count <= max_loaded_cells) return;
-
-  unsigned int to_delete = count - max_loaded_cells;
-
-  for (unsigned int i = 0; i < to_delete; ++i)
+  for (size_t i = 0; i < cells.GetSize (); ++i)
   {
-    csTerrainCell* min_cell = 0;
+    if (cells[i]->GetLoadState () == iTerrainCell::Loaded)
+    {
+      loadedCells.InsertSorted (cells[i], CellLRUCompare);
+    }
+  }
 
-    for (size_t i = 0; i < cells.Length (); ++i)
-      if (cells[i]->GetLoadState () == iTerrainCell::Loaded)
-        if (!min_cell || cells[i]->GetLRU() < min_cell->GetLRU())
-          min_cell = cells[i];
-    
-    // something went wrong
-    if (!min_cell) return;
+  if (loadedCells.GetSize () <= max_loaded_cells) 
+    return;
+
+  size_t to_delete = loadedCells.GetSize () - max_loaded_cells;
+
+  for (size_t i = 0; i < to_delete; ++i)
+  {
+    csTerrainCell* min_cell = loadedCells[i];    
 
     min_cell->SetLoadState (iTerrainCell::NotLoaded);
     for (size_t i = 0; i < cell_listeners.GetSize (); i++)
@@ -663,7 +664,7 @@ void csTerrainSystem::InitializeDefault (bool clear)
   {
     csColor amb(1, 1, 1);
     
-    for (size_t i = 0 ; i < cells.Length(); ++i)
+    for (size_t i = 0 ; i < cells.GetSize (); ++i)
     {
       cells[i]->ambient = amb;
     }
@@ -687,7 +688,7 @@ void csTerrainSystem::PrepareLighting ()
   {
     const csArray<iLightSectorInfluence*>& relevant_lights = light_mgr
       ->GetRelevantLights (logparent, -1, false);
-    for (size_t i = 0; i < relevant_lights.Length(); i++)
+    for (size_t i = 0; i < relevant_lights.GetSize (); i++)
       affecting_lights.Add (relevant_lights[i]->GetLight ());
   }
 }

@@ -60,8 +60,8 @@ bool csTerrainTerraFormerDataFeeder::PreLoad (iTerrainCell* cell)
 
 bool csTerrainTerraFormerDataFeeder::Load (iTerrainCell* cell)
 {
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-	object_reg, "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+	object_reg, "crystalspace.shared.stringset");
 
   int width = cell->GetGridWidth ();
   int height = cell->GetGridHeight ();
@@ -127,7 +127,7 @@ void csTerrainTerraFormerDataFeeder::SetParam(const char* param, const char* val
 {
   if (!strcmp (param, "terraformer"))
   {
-    former = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, value, iTerraFormer);
+    former == csQueryRegistryTagInterface<iTerraFormer> (object_reg, value);
   }
   else if (!strcmp (param, "sampleregion min"))
   {

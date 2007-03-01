@@ -21,6 +21,7 @@
 
 #include "csutil/scf_implementation.h"
 #include "csutil/refcount.h"
+#include "csutil/sysfunc.h"
 
 #include "iterrain/terrainsystem.h"
 #include "iterrain/terraincell.h"
@@ -82,7 +83,7 @@ private:
   void LerpHelper (const csVector2& pos, int& x1, int& x2, float& xfrac,
                                     int& y1, int& y2, float& yfrac) const;
 
-  clock_t lru;
+  csTicks lruTicks;
 
 public:
   csTerrainCell (iTerrainSystem* parent, const char* name, int grid_width,
@@ -170,8 +171,14 @@ public:
   csColor ambient;
 
   // unloading
-  clock_t GetLRU () const {return lru;}
-  void Touch () {lru = clock();}
+  csTicks GetLRU () const
+  {
+    return lruTicks;
+  }
+  void Touch () 
+  {
+    lruTicks = csGetTicks ();
+  }
 };
 
 }

@@ -578,6 +578,11 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
                             iMovable *movable,
                             csDirtyAccessArray<csRenderMesh*>& meshes)
 {
+  int clip_portal, clip_plane, clip_z_plane;
+  if (!rview->ClipBBox (rdata->planes, frustum_mask,
+    bbox, clip_portal, clip_plane, clip_z_plane))
+    return;
+
   if (!IsLeaf () && children[0]->built &&
     children[1]->built &&
     children[2]->built &&
@@ -599,11 +604,6 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
 
   //csVector3 cam = rview->GetCamera ()->GetTransform ().GetOrigin ();
   csVector3 cam = transform.GetOrigin ();
-
-  int clip_portal, clip_plane, clip_z_plane;
-  if (!rview->ClipBBox (rdata->planes, frustum_mask,
-    bbox, clip_portal, clip_plane, clip_z_plane))
-    return;
 
   // left & top sides are covered with additional triangles
   int idx = ((!neighbours[0] || neighbours[0]->step>step)?1:0)+
@@ -723,7 +723,7 @@ csRenderMesh** csTerrainBruteBlockRenderer::GetRenderMeshes (int& n,
 
     rdata->tr_o2c = tr_o2c;
 
-    rdata->rootblock->DrawTest (g3d, rview, 0, tr_o2c, movable, meshes);
+    rdata->rootblock->DrawTest (g3d, rview, frustum_mask, tr_o2c, movable, meshes);
   }
 
   n = (int)meshes.GetSize ();
