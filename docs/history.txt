@@ -20,6 +20,8 @@ chronological order.
 	      flag from GMs.
 	    - Fixed a lightmap layouting having marked all vertices as "used"
 	      initially, thus essentially doubling all vertices of a mesh.
+	- res made tinyxml use cs_malloc() instead of new char[] for some
+	  allocations.
 1-Mar-2007
 	- res fixed embedgl to properly include gl.h. (<GL/gl.h> doesn't work
 	  on all platforms, the CS_OPENGL_PATH construct takes care of the

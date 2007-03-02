@@ -180,7 +180,7 @@ public:
   }
   ~GrowString ()
   {
-    if (curbuf != buf) delete[] curbuf;
+    if (curbuf != buf) cs_free (curbuf);
   }
 
   void AddChar (char c)
@@ -190,9 +190,9 @@ public:
     if (len >= max)
     {
       max += BUFSIZE;
-      char* newbuf = new char[max];
+      char* newbuf = (char*)cs_malloc (max);
       memcpy (newbuf, curbuf, len);
-      if (curbuf != buf) delete[] curbuf;
+      if (curbuf != buf) cs_free (curbuf);
       curbuf = newbuf;
       ptext = curbuf+len;
     }
@@ -200,7 +200,7 @@ public:
 
   char* GetNewCopy ()
   {
-    char* copy = new char[len+1];
+    char* copy = (char*)cs_malloc (len+1);
     strcpy (copy, curbuf);
     return copy;
   }
@@ -526,7 +526,7 @@ const char* TiXmlComment::Parse( TiDocument* document, const char* p )
     return 0;
   }
   p += strlen( startTag );
-  delete[] value;
+  cs_free (value);
   GrowString buf;
   p = ReadText( p, buf, false, endTag);
   value = buf.GetNewCopy ();
@@ -569,7 +569,7 @@ const char* TiDocumentAttribute::Parse( TiDocument* document, const char* p )
   
   const char* end;
 
-  delete[] value;
+  cs_free (value);
   GrowString buf;
   if ( *p == '\'' )
   {

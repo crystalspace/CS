@@ -381,7 +381,7 @@ class TiDocumentAttribute
 public:
   /// Construct an empty attribute.
   TiDocumentAttribute() { name = 0; value = 0; }
-  ~TiDocumentAttribute () { delete[] value; }
+  ~TiDocumentAttribute () { cs_free (value); }
 
   const char* Name()  const { return name; }
   const char* Value() const { return value; }
@@ -392,8 +392,8 @@ public:
   void SetName( const char* _name )  { name = _name; }
   void SetValue( const char* _value )
   {
-    delete[] value;
-    value = csStrNew (_value);
+    cs_free (value);
+    value = CS::StrDup (_value);
   }
   /// Take over value so that this attribute has ownership.
   void TakeOverValue( char* _value )
@@ -552,7 +552,7 @@ class TiXmlComment : public TiDocumentNode
 public:
   /// Constructs an empty comment.
   TiXmlComment() { value = 0; type = COMMENT; }
-  virtual ~TiXmlComment() { delete[] value; }
+  virtual ~TiXmlComment() { cs_free (value); }
 
   // [internal use] Creates a new Element and returs it.
   virtual TiDocumentNode* Clone(TiDocument* document) const;
@@ -561,11 +561,8 @@ public:
   virtual const char * Value () const { return value; }
   virtual void SetValue (const char * _value)
   {
-    delete[] value;
-    if (_value)
-      value = csStrNew (_value);
-    else
-      value = 0;
+    cs_free (value);
+    value = CS::StrDup (_value);
   }
 
 protected:
