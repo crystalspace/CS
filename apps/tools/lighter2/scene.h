@@ -93,8 +93,13 @@ namespace lighter
     // Load all files, and parse the loaded info
     bool LoadFiles ();
 
-    // Save all files we've loaded. Will save any changed factory and mesh
-    bool SaveFiles ();
+    /* Save all files we've loaded. Will save any changed factory and mesh (to
+     * a temporary file). */
+    bool SaveWorld ();
+    // Copy the temporary file created in SaveWorld() over the actual world file.
+    bool ApplyWorldChanges ();
+    // Write the generated lightmaps out.
+    bool SaveLightmaps ();
 
     // Parse in our scene from the engine
     bool ParseEngine ();
@@ -169,32 +174,26 @@ namespace lighter
       csRef<iDocumentNode> rootNode;
       csRef<iDocument> document;
       csString directory; //VFS name, full path
+      csSet<csString> texturesToClean;
+      csSet<csString> texFileNamesToDelete;
     };
 
     // All files loaded into scene
     csArray<LoadedFile> sceneFiles;
-    // Helper variable
-    struct SaveTexture
-    {
-      csString filename;
-      csString texname;
-      csStringArray pdLightmapFiles;
-      csStringArray pdLightIDs;
-    };
-    csArray<SaveTexture> texturesToSave;
-    csSet<csString> texturesToClean;
 
     // Save functions
     void CollectDeleteTextures (iDocumentNode* textureNode,
       csSet<csString>& filesToDelete);
-    void CleanOldLightmaps (LoadedFile* fileInfo, 
-      const csSet<csString>& texFileNames);
+    void BuildLightmapTextureList (csStringArray& texturesToSave);
+    void CleanOldLightmaps (LoadedFile* fileInfo);
     void SaveSceneToDom (iDocumentNode* root, LoadedFile* fileInfo);
     bool SaveSceneLibrary (const char* libFile, LoadedFile* fileInfo);
     void HandleLibraryNode (iDocumentNode* node, LoadedFile* fileInfo);
     void SaveMeshFactoryToDom (iDocumentNode* factNode, LoadedFile* fileInfo);
     void SaveSectorToDom (iDocumentNode* sectorNode, LoadedFile* fileInfo);
     void SaveMeshObjectToDom (iDocumentNode *objNode, Sector* sect, LoadedFile* fileInfo);
+
+    void SaveLightmapsToDom (iDocumentNode* root, LoadedFile* fileInfo);
     
     // Load functions
     void ParseSector (iSector *sector);
@@ -203,7 +202,7 @@ namespace lighter
     {
       Failure, Success, NotAGenMesh
     };
-    MeshParseResult ParseMesh (Sector *sector, iMeshWrapper *mesh);
+    MeshParseResult ParseMesh (Sector *sector,  iMeshWrapper *mesh);
     MeshParseResult ParseMeshFactory (iMeshFactoryWrapper *factory, 
       ObjectFactory*& radFact);
     void PropagateLight (Light* light, const csFrustum& lightFrustum);

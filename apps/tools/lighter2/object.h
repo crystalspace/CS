@@ -204,9 +204,6 @@ namespace lighter
     // constructor and ParseMesh have been called
     virtual bool Initialize ();
 
-    // Renormalize lightmap UVs
-    virtual void RenormalizeLightmapUVs (const LightmapPtrDelArray& lightmaps);
-
     // Remove lightmap SVs. Add names of used lightmap textures to set
     virtual void StripLightmaps (csSet<csString>& lms);
 
@@ -276,6 +273,10 @@ namespace lighter
 
     // Internal flags
     csFlags objFlags;
+
+    // Renormalize lightmap UVs into buffer \a lmcoords.
+    virtual void RenormalizeLightmapUVs (const LightmapPtrDelArray& lightmaps,
+      csVector2* lmcoords);
 
     friend class  ObjectFactory;
   };

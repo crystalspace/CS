@@ -106,7 +106,8 @@ namespace lighter
     inline csSubRectangles& GetAllocator () { return lightmapAllocator; }
     inline const csSubRectangles& GetAllocator () const { return lightmapAllocator; }
 
-    inline const csString& GetFilename () { return filename; }
+    inline void SetFilename (const csString& fn) { filename = fn; }
+    inline const csString& GetFilename () const { return filename; }
     inline csString GetTextureName () 
     { return GetTextureNameFromFilename (filename); }
 

@@ -6,6 +6,20 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+2-Mar-2007
+	- res made the following changes to lighter2:
+	    - Changed the order of how things are saved: the new world file is
+	      now written after the meshes are initialized (lightmaps 
+	      layouted, necessary submesh splitting done) instead at the very
+	      end of the lighting. This should make it possible to discard the
+	      CS meshes and factories much earlier (since they're not needed
+	      for saving any more) and thus memory to be conserved. 
+	      (Caveat: currently breaks per-vertex lighting.)
+	    - Made it delete the cache/genmesh_lm directory.
+	    - Made it strip the (after lighting irrelevant) "localshadows" 
+	      flag from GMs.
+	    - Fixed a lightmap layouting having marked all vertices as "used"
+	      initially, thus essentially doubling all vertices of a mesh.
 1-Mar-2007
 	- res fixed embedgl to properly include gl.h. (<GL/gl.h> doesn't work
 	  on all platforms, the CS_OPENGL_PATH construct takes care of the

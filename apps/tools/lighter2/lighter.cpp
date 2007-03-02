@@ -200,7 +200,10 @@ namespace lighter
     {
       Lightmap * lm = scene->GetLightmaps ()[i];
       lm->Initialize();
-    }    
+    }
+
+    globalStats.SetTaskProgress ("Updating world files", 0);
+    if (!scene->SaveWorld ()) return false;
     
     // Progress 20
     globalStats.SetTotalProgress (20);
@@ -266,7 +269,8 @@ namespace lighter
     globalStats.SetTotalProgress (90);
     globalStats.SetTaskProgress ("Saving result", 0);
     //Save the result
-    if (!scene->SaveFiles ()) return false;
+    if (!scene->SaveLightmaps ()) return false;
+    if (!scene->ApplyWorldChanges ()) return false;
     globalStats.SetTotalProgress (100);
     globalStats.SetTaskProgress ("Finished!", 0);
 

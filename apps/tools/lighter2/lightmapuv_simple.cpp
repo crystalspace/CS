@@ -31,7 +31,7 @@ namespace lighter
     const PrimitiveArray& inPrims, ObjectVertexData& vertexData,
     const ObjectFactory* factory,
     csArray<PrimitiveArray>& outPrims,
-    BoolDArray& usedVerts)
+    csBitArray& usedVerts)
   {
     if (inPrims.GetSize () == 0) return 0;
 
@@ -327,8 +327,8 @@ namespace lighter
   }
 
   bool SimpleUVFactoryLayouter::ProjectPrimitives (PrimitiveArray& prims, 
-                                            BoolDArray &usedVerts,
-                                            float uscale, float vscale)
+                                                   csBitArray &usedVerts,
+                                                   float uscale, float vscale)
   {
     size_t i;
     const Primitive& prim = prims[0];
@@ -370,7 +370,7 @@ namespace lighter
             || (indexMap[index] == (size_t)~0))
           {
             size_t newIndex = vdata.SplitVertex (index);
-            usedVerts.SetSize (newIndex+1, false);
+            usedVerts.SetSize (newIndex+1);
             indexMap.SetSize (newIndex+1, (size_t)~0);
             indexMap[index] = newIndex;
             index = newIndex;

@@ -121,12 +121,15 @@ namespace lighter
     return true;
   }
 
-  bool Scene::SaveFiles ()
+  bool Scene::SaveWorld ()
   {
-    if (sceneFiles.GetSize () == 0) 
-      return globalLighter->Report ("No files to save!");
+    if (sceneFiles.GetSize () == 0)
+    {
+      globalLighter->Report ("No files to save!");
+      return false;
+    }
 
-    for (unsigned int i = 0; i < sceneFiles.GetSize (); i++)
+    for (size_t i = 0; i < sceneFiles.GetSize (); i++)
     {
       //Traverse the DOM, save any factory we encounter
       SaveSceneToDom (sceneFiles[i].rootNode, &sceneFiles[i]);
@@ -135,17 +138,165 @@ namespace lighter
       csStringArray paths;
       paths.Push ("/lev/");
       if (!globalLighter->vfs->ChDirAuto (sceneFiles[i].directory, &paths, 0, "world"))
-        return globalLighter->Report ("Error setting directory '%s'!", 
+      {
+        globalLighter->Report ("Error setting directory '%s'!", 
           sceneFiles[i].directory.GetData());
+        return false;
+      }
 
       // Save it
-      csRef<iFile> buf = globalLighter->vfs->Open ("world", VFS_FILE_WRITE);
-      if (!buf) return globalLighter->Report ("Error opening file 'world'!");
+      csRef<iFile> buf = globalLighter->vfs->Open (".lighter2.world", VFS_FILE_WRITE);
+      if (!buf) 
+      {
+        globalLighter->Report (
+          "Error opening file '.lighter2.world' for writing!");
+        return false;
+      }
 
       const char *err = sceneFiles[i].document->Write (buf);
       if (err)
-        return globalLighter->Report ("Error writing file 'world': %s", err);
+      {
+        globalLighter->Report ("Error writing file '.lighter2.world': %s", err);
+        return false;
+      }
+    }
 
+    // Ensure no archives are cached in memory (for memory consumption reasons)
+    if (!globalLighter->vfs->Sync())
+    {
+      globalLighter->Report ("Could not synchronize VFS.");
+      return false;
+    }
+
+    return true;
+  }
+
+  bool Scene::ApplyWorldChanges ()
+  {
+    if (sceneFiles.GetSize () == 0)
+    {
+      globalLighter->Report ("No files to save!");
+      return false;
+    }
+
+    for (size_t i = 0; i < sceneFiles.GetSize (); i++)
+    {
+      //Change path
+      csStringArray paths;
+      paths.Push ("/lev/");
+      if (!globalLighter->vfs->ChDirAuto (sceneFiles[i].directory, &paths, 0, "world"))
+      {
+        globalLighter->Report ("Error setting directory '%s'!", 
+          sceneFiles[i].directory.GetData());
+        return false;
+      }
+
+      // Read temp file...
+      csRef<iDataBuffer> buf = globalLighter->vfs->ReadFile (".lighter2.world", false);
+      if (!buf) 
+      {
+        globalLighter->Report ("Error reading file '.lighter2.world'!");
+        return false;
+      }
+
+      // ... write to 'world' ...
+      if (!globalLighter->vfs->WriteFile ("world", buf->GetData(), 
+        buf->GetSize()))
+      {
+        globalLighter->Report ("Error writing to 'world'!");
+        return false;
+      }
+
+      // ... and remove the backup.
+      buf.Invalidate();
+      if (!globalLighter->vfs->DeleteFile (".lighter2.world"))
+      {
+        globalLighter->Report ("Error deleting file '.lighter2.world'!");
+        return false;
+      }
+
+      // Also clear out genmesh cache.
+      {
+        static const char gmCacheDir[] = "cache/genmesh_lm";
+        csRef<iStringArray> cacheFiles = 
+          globalLighter->vfs->FindFiles (csString (gmCacheDir) + "/*");
+        if (cacheFiles.IsValid())
+        {
+          for (size_t i = 0; i < cacheFiles->GetSize(); i++)
+            globalLighter->vfs->DeleteFile (cacheFiles->Get (i));
+        }
+        globalLighter->vfs->DeleteFile (gmCacheDir);
+      }
+    }
+
+    return true;
+  }
+
+  static const char lightmapLibraryName[] = "lightmaps.cslib";
+
+  bool Scene::SaveLightmaps ()
+  {
+    if (sceneFiles.GetSize () == 0)
+    {
+      globalLighter->Report ("No files to save!");
+      return false;
+    }
+
+    for (size_t i = 0; i < sceneFiles.GetSize (); i++)
+    {
+      //Change path
+      csStringArray paths;
+      paths.Push ("/lev/");
+      if (!globalLighter->vfs->ChDirAuto (sceneFiles[i].directory, &paths, 0, "world"))
+      {
+        globalLighter->Report ("Error setting directory '%s'!", 
+          sceneFiles[i].directory.GetData());
+        return false;
+      }
+
+      csRef<iDocument> doc = globalLighter->docSystem->CreateDocument ();
+      csRef<iFile> buf = globalLighter->vfs->Open (lightmapLibraryName, 
+        VFS_FILE_READ);
+      if (buf.IsValid())
+      {
+        // Open lightmaps lib if it exists...
+        const char* err = doc->Parse (buf);
+        if (err != 0)
+        {
+          globalLighter->Report ("Error parsing file '%s': %s", 
+            lightmapLibraryName, err);
+          return false;
+        }
+      }
+      else
+      {
+        // ... create empty otherwise
+        csRef<iDocumentNode> root = doc->CreateRoot ();
+        csRef<iDocumentNode> libNode = root->CreateNodeBefore (
+          CS_NODE_ELEMENT);
+        libNode->SetValue ("library");
+      }
+      SaveLightmapsToDom (doc->GetRoot (), &sceneFiles[i]);
+
+      // Save it
+      buf.Invalidate();
+      buf = globalLighter->vfs->Open (lightmapLibraryName, VFS_FILE_WRITE);
+      if (!buf) 
+      {
+        globalLighter->Report ("Error opening file '%s' for writing!", 
+          lightmapLibraryName);
+        return false;
+      }
+
+      const char *err = doc->Write (buf);
+      if (err)
+      {
+        globalLighter->Report ("Error writing file '%s': %s", lightmapLibraryName, err);
+        return false;
+      }
+
+      // Finally delete any leftover lightmap files
+      CleanOldLightmaps (&sceneFiles[i]);
     }
 
     return true;
@@ -384,7 +535,8 @@ namespace lighter
     }
   }
 
-  Scene::MeshParseResult Scene::ParseMesh (Sector *sector, iMeshWrapper *mesh)
+  Scene::MeshParseResult Scene::ParseMesh (Sector *sector, 
+                                           iMeshWrapper *mesh)
   {
     if (!sector || !mesh) return Failure;
 
@@ -399,7 +551,6 @@ namespace lighter
     if (!obj) return Failure;
 
     obj->ParseMesh (mesh);
-    obj->StripLightmaps (texturesToClean);
 
     // Save it
     sector->allObjects.Put (obj->meshName, obj);
@@ -466,13 +617,27 @@ namespace lighter
     }
   }
 
-  void Scene::CleanOldLightmaps (LoadedFile* fileInfo, 
-                                 const csSet<csString>& texFileNames)
+  void Scene::BuildLightmapTextureList (csStringArray& texturesToSave)
+  {
+    for (size_t i = 0; i < lightmaps.GetSize (); i++)
+    {
+      csString textureFilename;
+      textureFilename = "lightmaps/";
+      textureFilename += (uint)i;
+      textureFilename += ".png";
+      lightmaps[i]->SetFilename (textureFilename);
+
+      texturesToSave.Push (lightmaps[i]->GetTextureName());
+    }
+  }
+
+  void Scene::CleanOldLightmaps (LoadedFile* fileInfo)
   {
     csVfsDirectoryChanger chdir (globalLighter->vfs);
     chdir.ChangeTo (fileInfo->directory);
 
-    csSet<csString>::GlobalIterator iter = texFileNames.GetIterator();
+    csSet<csString>::GlobalIterator iter = 
+      fileInfo->texFileNamesToDelete.GetIterator();
     while (iter.HasNext ())
     {
       globalLighter->vfs->DeleteFile (iter.Next());
@@ -481,57 +646,10 @@ namespace lighter
 
   void Scene::SaveSceneToDom (iDocumentNode* r, LoadedFile* fileInfo)
   {
-    csStringSet pdlightNums;
-    for (unsigned int i = 0; i < lightmaps.GetSize (); i++)
-    {
-      csString textureFilename;
-      // Save the lightmap
-      textureFilename = "lightmaps/";
-      textureFilename += i;
-      textureFilename += ".png";
-      {
-        // Texture file name is relative to world file
-        csVfsDirectoryChanger chdir (globalLighter->vfs);
-        chdir.ChangeTo (fileInfo->directory);
-      #ifndef DUMP_NORMALS
-        lightmapPostProc.ApplyAmbient (lightmaps[i]);
-        lightmapPostProc.ApplyExposure (lightmaps[i]);
-      #endif
-        lightmaps[i]->SaveLightmap (textureFilename);
-      }
-      SaveTexture savetex;
-      savetex.filename = textureFilename;
-      savetex.texname = lightmaps[i]->GetTextureName();
-
-      PDLightmapsHash::GlobalIterator pdlIt = pdLightmaps.GetIterator();
-      while (pdlIt.HasNext())
-      {
-        csPtrKey<Light> key;
-        LightmapPtrDelArray* lm = pdlIt.Next(key);
-        if (lm->Get (i)->IsNull()) continue;
-
-        csString lmID (key->GetLightID ().HexString());
-        textureFilename = "lightmaps/";
-        textureFilename += i;
-        textureFilename += "_";
-        textureFilename += pdlightNums.Request (lmID);
-        textureFilename += ".png";
-
-        {
-          // Texture file name is relative to world file
-          csVfsDirectoryChanger chdir (globalLighter->vfs);
-          chdir.ChangeTo (fileInfo->directory);
-        #ifndef DUMP_NORMALS
-          lightmapPostProc.ApplyExposure (lm->Get (i));
-        #endif
-          lm->Get (i)->SaveLightmap (textureFilename);
-        }
-        savetex.pdLightmapFiles.Push (textureFilename);
-        savetex.pdLightIDs.Push (lmID);
-      }
-
-      texturesToSave.Push (savetex);
-    }
+    bool hasLightmapsLibrary = false;
+    csStringArray texturesToSave;
+    
+    BuildLightmapTextureList (texturesToSave);
 
     csRef <iDocumentNode> worldRoot = r->GetNode ("world");
 
@@ -545,7 +663,12 @@ namespace lighter
 
       if (!strcasecmp (nodeName, "library"))
       {
-        HandleLibraryNode (node, fileInfo);
+        const char* libFile = node->GetAttributeValue ("file");
+        if (!libFile) libFile = node->GetContentsValue();
+        if ((libFile != 0) && (strcmp (libFile, lightmapLibraryName) == 0))
+          hasLightmapsLibrary = true;
+        else
+          HandleLibraryNode (node, fileInfo);
       }
       else if (!strcasecmp (nodeName, "meshfact"))
       {
@@ -557,134 +680,54 @@ namespace lighter
       }
     }
 
-    // And now save the textures
     // see if we have any <textures> node
     csRef<iDocumentNode> texturesNode = worldRoot->GetNode ("textures");
-    if (!texturesNode)
+    if (texturesNode)
     {
-      csRef<iDocumentNode> firstNode;
-      csRef<iDocumentNodeIterator> it = worldRoot->GetNodes ();
-      if (it->HasNext ())
-        firstNode = it->Next ();
-
-      //Create one
-      texturesNode = worldRoot->CreateNodeBefore (CS_NODE_ELEMENT, firstNode);
-      texturesNode->SetValue ("textures");
-    }
-
-    csSet<csString> texFileNamesToDelete;
-    for (unsigned int i = 0; i < texturesToSave.GetSize (); i++)
-    {
-      const SaveTexture& textureToSave = texturesToSave[i];
-
-      csRef<iDocumentNode> textureNode;
+      csSet<csString> texFileNamesToDelete;
+      // Clean out old lightmap textures
       {
-        csRef<iDocumentNodeIterator> textureNodes = 
-          texturesNode->GetNodes ("texture");
-        while (textureNodes->HasNext())
+        csRefArray<iDocumentNode> nodesToDelete;
+        csRef<iDocumentNodeIterator> it = texturesNode->GetNodes ("texture");
+        while (it->HasNext())
         {
-          csRef<iDocumentNode> texNode = textureNodes->Next();
-          if (texNode->GetType() != CS_NODE_ELEMENT) continue;
-          const char* texName = texNode->GetAttributeValue ("name");
-          if (texName 
-            && (strcmp (texName, textureToSave.texname.GetData ()) == 0))
+          csRef<iDocumentNode> child = it->Next();
+          if (child->GetType() != CS_NODE_ELEMENT) continue;
+
+          const char* name = child->GetAttributeValue ("name");
+          if ((name != 0) && fileInfo->texturesToClean.Contains (name))
           {
-            textureNode = texNode;
-            break;
+            CollectDeleteTextures (child, texFileNamesToDelete);
+            nodesToDelete.Push (child);
           }
         }
+        for (size_t i = 0; i < nodesToDelete.GetSize(); i++)
+          texturesNode->RemoveNode (nodesToDelete[i]);
+
+        CleanOldLightmaps (fileInfo);
       }
-      if (!textureNode.IsValid())
-      {
-        textureNode = texturesNode->CreateNodeBefore (CS_NODE_ELEMENT);
-        textureNode->SetValue ("texture");
-      }
-      else
-      {
-        CollectDeleteTextures (textureNode, texFileNamesToDelete);
-        textureNode->RemoveNodes ();
-      }
-      textureNode->SetAttribute ("name", textureToSave.texname.GetData ());
-           
-      csRef<iDocumentNode> classNode = 
-        textureNode->CreateNodeBefore (CS_NODE_ELEMENT);
-      classNode->SetValue ("class");
-      csRef<iDocumentNode> classContNode = 
-        classNode->CreateNodeBefore (CS_NODE_TEXT);
-      classContNode->SetValue ("lightmap");
-
-      csRef<iDocumentNode> fileNode = 
-        textureNode->CreateNodeBefore (CS_NODE_ELEMENT);
-      fileNode->SetValue ("file");
-
-      csRef<iDocumentNode> filenameNode =
-        fileNode->CreateNodeBefore (CS_NODE_TEXT);
-      filenameNode->SetValue (textureToSave.filename.GetData ());
-      texFileNamesToDelete.Delete (textureToSave.filename);
-
-      csRef<iDocumentNode> mipmapNode = 
-        textureNode->CreateNodeBefore (CS_NODE_ELEMENT);
-      mipmapNode->SetValue ("mipmap");
-
-      csRef<iDocumentNode> mipmapContents =
-        mipmapNode->CreateNodeBefore (CS_NODE_TEXT);
-      mipmapContents->SetValue ("no");
-
-      if (textureToSave.pdLightmapFiles.GetSize() > 0)
-      {
-        csRef<iDocumentNode> typeNode = 
-          textureNode->CreateNodeBefore (CS_NODE_ELEMENT, fileNode);
-        typeNode->SetValue ("type");
-        csRef<iDocumentNode> typeContent = 
-          typeNode->CreateNodeBefore (CS_NODE_TEXT, 0);
-        typeContent->SetValue ("crystalspace.texture.loader.pdlight");
-
-        csRef<iDocumentNode> pdlightParamsNode = 
-          textureNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-        pdlightParamsNode->SetValue ("params");
-
-        for (size_t p = 0; p < textureToSave.pdLightmapFiles.GetSize(); p++)
-        {
-          csRef<iDocumentNode> mapNode = 
-            pdlightParamsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-          mapNode->SetValue ("map");
-          mapNode->SetAttribute ("lightid", textureToSave.pdLightIDs[p]);
-
-          csRef<iDocumentNode> mapContents = 
-            mapNode->CreateNodeBefore (CS_NODE_TEXT, 0);
-          mapContents->SetValue (textureToSave.pdLightmapFiles[p]);
-          texFileNamesToDelete.Delete (textureToSave.pdLightmapFiles[p]);
-        }
-      }
-
-      texturesToClean.Delete (textureToSave.texname.GetData ());
     }
 
-    // Clean out old lightmap textures
+    // Generate a <library> node for the external lightmaps library
+    if (!hasLightmapsLibrary)
     {
-      csRefArray<iDocumentNode> nodesToDelete;
-      csRef<iDocumentNodeIterator> it = texturesNode->GetNodes ("texture");
-      while (it->HasNext())
+      const char* const createNodeBeforeNames[] = { "materials", "meshfact", "sector" };
+
+      csRef<iDocumentNode> createBefore;
+      for (size_t n = 0; n < sizeof(createNodeBeforeNames)/sizeof(const char*); 
+        n++)
       {
-        csRef<iDocumentNode> child = it->Next();
-        if (child->GetType() != CS_NODE_ELEMENT) continue;
-
-        const char* name = child->GetAttributeValue ("name");
-        if ((name != 0) && texturesToClean.Contains (name))
-        {
-          CollectDeleteTextures (child, texFileNamesToDelete);
-          nodesToDelete.Push (child);
-        }
+        createBefore = worldRoot->GetNode (createNodeBeforeNames[n]);
+        if (createBefore.IsValid ()) break;
       }
-      for (size_t i = 0; i < nodesToDelete.GetSize(); i++)
-        texturesNode->RemoveNode (nodesToDelete[i]);
+      csRef<iDocumentNode> libraryNode = 
+        worldRoot->CreateNodeBefore (CS_NODE_ELEMENT, createBefore);
+      libraryNode->SetValue ("library");
 
-      CleanOldLightmaps (fileInfo, texFileNamesToDelete);
+      csRef<iDocumentNode> libraryContentsNode = 
+        libraryNode->CreateNodeBefore (CS_NODE_TEXT);
+      libraryContentsNode->SetValue (lightmapLibraryName);
     }
-
-    DocumentHelper::RemoveDuplicateChildren(texturesNode, 
-      texturesNode->GetNodes ("texture"),
-      DocumentHelper::NodeAttributeCompare("name"));
   }
 
   bool Scene::SaveSceneLibrary (const char* libFile, LoadedFile* fileInfo)
@@ -813,7 +856,7 @@ namespace lighter
     if (radObj)
     {
       // We do have one
-      radObj->RenormalizeLightmapUVs (lightmaps);
+      radObj->StripLightmaps (fileInfo->texturesToClean);
       radObj->SaveMesh (this, objNode);
 
       // Remove any old lightmap svs
@@ -830,6 +873,195 @@ namespace lighter
       csRef<iDocumentNode> node = it->Next ();
       SaveMeshObjectToDom (node, sect, fileInfo);
     }
+  }
+
+  struct SaveTexture
+  {
+    csString filename;
+    csString texname;
+    csStringArray pdLightmapFiles;
+    csStringArray pdLightIDs;
+  };
+
+  void Scene::SaveLightmapsToDom (iDocumentNode* r, LoadedFile* fileInfo)
+  {
+    csArray<SaveTexture> texturesToSave;
+    csStringSet pdlightNums;
+    for (unsigned int i = 0; i < lightmaps.GetSize (); i++)
+    {
+      const char* textureFilename = lightmaps[i]->GetFilename ();
+      // Save the lightmap
+      {
+        // Texture file name is relative to world file
+        csVfsDirectoryChanger chdir (globalLighter->vfs);
+        chdir.ChangeTo (fileInfo->directory);
+      #ifndef DUMP_NORMALS
+        lightmapPostProc.ApplyAmbient (lightmaps[i]);
+        lightmapPostProc.ApplyExposure (lightmaps[i]);
+      #endif
+        lightmaps[i]->SaveLightmap (textureFilename);
+      }
+      SaveTexture savetex;
+      savetex.filename = textureFilename;
+      savetex.texname = lightmaps[i]->GetTextureName();
+
+      PDLightmapsHash::GlobalIterator pdlIt = pdLightmaps.GetIterator();
+      while (pdlIt.HasNext())
+      {
+        csPtrKey<Light> key;
+        LightmapPtrDelArray* lm = pdlIt.Next(key);
+        if (lm->Get (i)->IsNull()) continue;
+
+        csString lmID (key->GetLightID ().HexString());
+        csString textureFilename = "lightmaps/";
+        textureFilename += i;
+        textureFilename += "_";
+        textureFilename += pdlightNums.Request (lmID);
+        textureFilename += ".png";
+
+        {
+          // Texture file name is relative to world file
+          csVfsDirectoryChanger chdir (globalLighter->vfs);
+          chdir.ChangeTo (fileInfo->directory);
+        #ifndef DUMP_NORMALS
+          lightmapPostProc.ApplyExposure (lm->Get (i));
+        #endif
+          lm->Get (i)->SaveLightmap (textureFilename);
+        }
+        savetex.pdLightmapFiles.Push (textureFilename);
+        savetex.pdLightIDs.Push (lmID);
+      }
+
+      texturesToSave.Push (savetex);
+    }
+
+    csRef <iDocumentNode> libRoot = r->GetNode ("library");
+
+    // And now save the textures
+    // see if we have any <textures> node
+    csRef<iDocumentNode> texturesNode = libRoot->GetNode ("textures");
+    if (!texturesNode)
+    {
+      csRef<iDocumentNode> firstNode;
+      csRef<iDocumentNodeIterator> it = libRoot->GetNodes ();
+      if (it->HasNext ())
+        firstNode = it->Next ();
+
+      //Create one
+      texturesNode = libRoot->CreateNodeBefore (CS_NODE_ELEMENT, firstNode);
+      texturesNode->SetValue ("textures");
+    }
+
+    for (unsigned int i = 0; i < texturesToSave.GetSize (); i++)
+    {
+      const SaveTexture& textureToSave = texturesToSave[i];
+
+      csRef<iDocumentNode> textureNode;
+      {
+        csRef<iDocumentNodeIterator> textureNodes = 
+          texturesNode->GetNodes ("texture");
+        while (textureNodes->HasNext())
+        {
+          csRef<iDocumentNode> texNode = textureNodes->Next();
+          if (texNode->GetType() != CS_NODE_ELEMENT) continue;
+          const char* texName = texNode->GetAttributeValue ("name");
+          if (texName 
+            && (strcmp (texName, textureToSave.texname.GetData ()) == 0))
+          {
+            textureNode = texNode;
+            break;
+          }
+        }
+      }
+      if (!textureNode.IsValid())
+      {
+        textureNode = texturesNode->CreateNodeBefore (CS_NODE_ELEMENT);
+        textureNode->SetValue ("texture");
+      }
+      else
+      {
+        CollectDeleteTextures (textureNode, fileInfo->texFileNamesToDelete);
+        textureNode->RemoveNodes ();
+      }
+      textureNode->SetAttribute ("name", textureToSave.texname.GetData ());
+           
+      csRef<iDocumentNode> classNode = 
+        textureNode->CreateNodeBefore (CS_NODE_ELEMENT);
+      classNode->SetValue ("class");
+      csRef<iDocumentNode> classContNode = 
+        classNode->CreateNodeBefore (CS_NODE_TEXT);
+      classContNode->SetValue ("lightmap");
+
+      csRef<iDocumentNode> fileNode = 
+        textureNode->CreateNodeBefore (CS_NODE_ELEMENT);
+      fileNode->SetValue ("file");
+
+      csRef<iDocumentNode> filenameNode =
+        fileNode->CreateNodeBefore (CS_NODE_TEXT);
+      filenameNode->SetValue (textureToSave.filename.GetData ());
+      fileInfo->texFileNamesToDelete.Delete (textureToSave.filename);
+
+      csRef<iDocumentNode> mipmapNode = 
+        textureNode->CreateNodeBefore (CS_NODE_ELEMENT);
+      mipmapNode->SetValue ("mipmap");
+
+      csRef<iDocumentNode> mipmapContents =
+        mipmapNode->CreateNodeBefore (CS_NODE_TEXT);
+      mipmapContents->SetValue ("no");
+
+      if (textureToSave.pdLightmapFiles.GetSize() > 0)
+      {
+        csRef<iDocumentNode> typeNode = 
+          textureNode->CreateNodeBefore (CS_NODE_ELEMENT, fileNode);
+        typeNode->SetValue ("type");
+        csRef<iDocumentNode> typeContent = 
+          typeNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+        typeContent->SetValue ("crystalspace.texture.loader.pdlight");
+
+        csRef<iDocumentNode> pdlightParamsNode = 
+          textureNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+        pdlightParamsNode->SetValue ("params");
+
+        for (size_t p = 0; p < textureToSave.pdLightmapFiles.GetSize(); p++)
+        {
+          csRef<iDocumentNode> mapNode = 
+            pdlightParamsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+          mapNode->SetValue ("map");
+          mapNode->SetAttribute ("lightid", textureToSave.pdLightIDs[p]);
+
+          csRef<iDocumentNode> mapContents = 
+            mapNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+          mapContents->SetValue (textureToSave.pdLightmapFiles[p]);
+          fileInfo->texFileNamesToDelete.Delete (textureToSave.pdLightmapFiles[p]);
+        }
+      }
+
+      fileInfo->texturesToClean.Delete (textureToSave.texname.GetData ());
+    }
+
+    // Clean out old lightmap textures
+    {
+      csRefArray<iDocumentNode> nodesToDelete;
+      csRef<iDocumentNodeIterator> it = texturesNode->GetNodes ("texture");
+      while (it->HasNext())
+      {
+        csRef<iDocumentNode> child = it->Next();
+        if (child->GetType() != CS_NODE_ELEMENT) continue;
+
+        const char* name = child->GetAttributeValue ("name");
+        if ((name != 0) && fileInfo->texturesToClean.Contains (name))
+        {
+          CollectDeleteTextures (child, fileInfo->texFileNamesToDelete);
+          nodesToDelete.Push (child);
+        }
+      }
+      for (size_t i = 0; i < nodesToDelete.GetSize(); i++)
+        texturesNode->RemoveNode (nodesToDelete[i]);
+    }
+
+    DocumentHelper::RemoveDuplicateChildren(texturesNode, 
+      texturesNode->GetNodes ("texture"),
+      DocumentHelper::NodeAttributeCompare("name"));
   }
 
   //-------------------------------------------------------------------------

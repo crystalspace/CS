@@ -53,8 +53,8 @@ namespace lighter
     else
     {
       size_t oldSize = unlayoutedPrimitives.GetSize();
-      BoolDArray usedVertices;
-      usedVertices.SetSize (vertexData.vertexArray.GetSize (), true);
+      csBitArray usedVertices;
+      usedVertices.SetSize (vertexData.vertexArray.GetSize ());
 
       for (size_t i = 0; i < oldSize; i++)
       {
@@ -234,41 +234,6 @@ namespace lighter
     return true;
   }
 
-  void Object::RenormalizeLightmapUVs (const LightmapPtrDelArray& lightmaps)
-  {
-    if (lightPerVertex) return;
-
-    BoolArray vertexProcessed;
-    vertexProcessed.SetSize (vertexData.vertexArray.GetSize (),false);
-
-    for (size_t p = 0; p < allPrimitives.GetSize (); p++)
-    {
-      const Lightmap* lm = lightmaps[lightmapIDs[p]];
-      const float factorX = 1.0f / lm->GetWidth ();
-      const float factorY = 1.0f / lm->GetHeight ();
-      const PrimitiveArray& prims = allPrimitives[p];
-      csSet<size_t> indicesRemapped;
-      // Iterate over lightmaps and renormalize UVs
-      for (size_t j = 0; j < prims.GetSize (); ++j)
-      {
-        //TODO make sure no vertex is used in several lightmaps.. 
-        const Primitive &prim = prims.Get (j);
-        const Primitive::TriangleType& t = prim.GetTriangle ();
-        for (size_t i = 0; i < 3; ++i)
-        {
-          size_t index = t[i];
-          if (!indicesRemapped.Contains (index))
-          {
-            csVector2 &lmUV = vertexData.vertexArray[index].lightmapUV;
-            lmUV.x = (lmUV.x + 0.5f) * factorX;
-            lmUV.y = (lmUV.y + 0.5f) * factorY;
-            indicesRemapped.AddNoTest (index);
-          }
-        }
-      }
-    }
-  }
-
   void Object::StripLightmaps (csSet<csString>& lms)
   {
     iShaderVariableContext* svc = meshWrapper->GetSVContext();
@@ -407,6 +372,43 @@ namespace lighter
     newArray.SetSize (litColors->GetSize(), csColor (0));
     litColorsPD->Put (light, newArray);
     return litColorsPD->GetElementPointer (light);
+  }
+
+  void Object::RenormalizeLightmapUVs (const LightmapPtrDelArray& lightmaps,
+                                       csVector2* lmcoords)
+  {
+    if (lightPerVertex) return;
+
+    BoolArray vertexProcessed;
+    vertexProcessed.SetSize (vertexData.vertexArray.GetSize (),false);
+
+    for (size_t p = 0; p < allPrimitives.GetSize (); p++)
+    {
+      const Lightmap* lm = lightmaps[lightmapIDs[p]];
+      const float factorX = 1.0f / lm->GetWidth ();
+      const float factorY = 1.0f / lm->GetHeight ();
+      const PrimitiveArray& prims = allPrimitives[p];
+      csSet<size_t> indicesRemapped;
+      // Iterate over lightmaps and renormalize UVs
+      for (size_t j = 0; j < prims.GetSize (); ++j)
+      {
+        //TODO make sure no vertex is used in several lightmaps.. 
+        const Primitive &prim = prims.Get (j);
+        const Primitive::TriangleType& t = prim.GetTriangle ();
+        for (size_t i = 0; i < 3; ++i)
+        {
+          size_t index = t[i];
+          if (!indicesRemapped.Contains (index))
+          {
+            const csVector2 &lmUV = vertexData.vertexArray[index].lightmapUV;
+            csVector2& outUV = lmcoords[index];
+            outUV.x = (lmUV.x + 0.5f) * factorX;
+            outUV.y = (lmUV.y + 0.5f) * factorY;
+            indicesRemapped.AddNoTest (index);
+          }
+        }
+      }
+    }
   }
 
 }

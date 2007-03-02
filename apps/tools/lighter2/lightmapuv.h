@@ -47,7 +47,7 @@ namespace lighter
     virtual csPtr<LightmapUVObjectLayouter> LayoutFactory (
       const PrimitiveArray& inPrims, ObjectVertexData& vertexData,
       const ObjectFactory* factory, csArray<PrimitiveArray>& outPrims,
-      BoolDArray& usedVerts) = 0;
+      csBitArray& usedVerts) = 0;
   };
 
   class LightmapUVObjectLayouter : public csRefCount

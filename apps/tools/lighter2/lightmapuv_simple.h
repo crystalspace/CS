@@ -38,7 +38,7 @@ namespace lighter
       const PrimitiveArray& inPrims, ObjectVertexData& vertexData,
       const ObjectFactory* factory,
       csArray<PrimitiveArray>& outPrims,
-      BoolDArray& usedVerts);
+      csBitArray& usedVerts);
   protected:
     friend class SimpleUVObjectLayouter;
 
@@ -90,7 +90,7 @@ namespace lighter
       csRect &lightmapArea, int &lightmapID);
 
     bool ProjectPrimitives (PrimitiveArray& prims, 
-      BoolDArray &usedVerts, float uscale, float vscale);
+      csBitArray &usedVerts, float uscale, float vscale);
   };
 
   class SimpleUVObjectLayouter : public LightmapUVObjectLayouter

@@ -369,6 +369,7 @@ namespace lighter
     ObjectFactory_Genmesh* factory = 
       static_cast<ObjectFactory_Genmesh*> (this->factory);
     
+    genMesh->SetShadowReceiving (false);
     genMesh->RemoveRenderBuffer ("colors");
     genMesh->RemoveRenderBuffer ("texture coordinate lightmap");
 
@@ -403,6 +404,8 @@ namespace lighter
 
       /* Fix up material (factory may not have a material set, but mesh object
        * material does not "propagate" to submeshes) */
+      // FIXME: Should detect when this is necessary
+      // FIXME: also can remove mesh object material then
       if (subMesh->GetMaterial() == 0)
       {
         csRef<iMeshObject> mo = 
@@ -430,14 +433,9 @@ namespace lighter
         vertexData.vertexArray.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
       genMesh->AddRenderBuffer ("texture coordinate lightmap", lightmapBuffer);
       {
-        csRenderBufferLock<csVector2> bufferLock(lightmapBuffer);
-        csVector2 *lightmapUV = bufferLock.Lock ();
+        csRenderBufferLock<csVector2> bufferLock (lightmapBuffer);
         // Save vertex-data
-        for (size_t i = 0; i < vertexData.vertexArray.GetSize(); ++i)
-        {
-          const ObjectVertexData::Vertex &vertex = vertexData.vertexArray[i];
-          lightmapUV[i] = vertex.lightmapUV;
-        }
+        RenormalizeLightmapUVs (scene->GetLightmaps(), bufferLock);
       }
     }
 
