@@ -91,18 +91,18 @@ namespace lighter
     void AddFile (const char* directory);
 
     // Load all files, and parse the loaded info
-    bool LoadFiles ();
+    bool LoadFiles (Statistics::SubProgress& progress);
 
     /* Save all files we've loaded. Will save any changed factory and mesh (to
      * a temporary file). */
-    bool SaveWorld ();
+    bool SaveWorld (Statistics::SubProgress& progress);
     // Copy the temporary file created in SaveWorld() over the actual world file.
-    bool ApplyWorldChanges ();
+    bool ApplyWorldChanges (Statistics::SubProgress& progress);
     // Write the generated lightmaps out.
-    bool SaveLightmaps ();
+    bool SaveLightmaps (Statistics::SubProgress& progress);
 
     // Parse in our scene from the engine
-    bool ParseEngine ();
+    bool ParseEngine (Statistics::SubProgress& progress);
 
     // Data access
     inline ObjectFactoryHash& GetFactories () 

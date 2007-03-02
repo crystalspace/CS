@@ -32,7 +32,7 @@ namespace lighter
   TUI::TUI ()
     : scfImplementationType (this), messageBufferEnd (0),
     simpleMode (false), prevWasReporter (false), 
-    kdLastNumNudes (0), lastTaskProgress (0.0f)
+    kdLastNumNodes (0), lastTaskProgress (0.0f)
   {
   }
 
@@ -236,20 +236,28 @@ namespace lighter
 
   void TUI::DrawProgress () const
   {
+    const uint overallProg = (uint)floor (globalStats.progress.GetOverallProgress());
+    const uint taskProg = (uint)floor (globalStats.progress.GetTaskProgress());
+
+    csString taskName = globalStats.progress.GetTaskName();
+    static const size_t maxTaskNameLen = 40;
+    if (taskName.Length() > maxTaskNameLen)
+      taskName = taskName.Slice (0, maxTaskNameLen-3) + "...";
+
     csPrintf (CS_ANSI_CURSOR(71, 2));
-    csPrintf ("%3d%%", (uint)globalStats.progress.overallProgress);
+    csPrintf ("%3d%%", overallProg);
     
     csPrintf (CS_ANSI_CURSOR(3, 3));
-    csPrintf ("%s", GetProgressBar ((uint)globalStats.progress.overallProgress).GetDataSafe ());
+    csPrintf ("%s", GetProgressBar (overallProg).GetDataSafe ());
 
     csPrintf (CS_ANSI_CURSOR(18, 4));
-    csPrintf ("%s", globalStats.progress.taskName.Slice (0, 40).GetDataSafe ());
+    csPrintf ("%s", taskName.GetDataSafe ());
 
     csPrintf (CS_ANSI_CURSOR(71, 4));
-    csPrintf ("%3d%%", (uint)globalStats.progress.taskProgress);
+    csPrintf ("%3d%%", taskProg);
 
     csPrintf (CS_ANSI_CURSOR(3, 5));
-    csPrintf ("%s", GetProgressBar ((uint)globalStats.progress.taskProgress).GetDataSafe ());
+    csPrintf ("%s", GetProgressBar (taskProg).GetDataSafe ());
     csPrintf (CS_ANSI_CURSOR(1,1));
   }
 
@@ -309,7 +317,7 @@ namespace lighter
   void TUI::DrawSimple ()
   {
     // Check if kd-tree haven't been printed but now have been created
-    if (globalStats.kdtree.numNodes != kdLastNumNudes)
+    if (globalStats.kdtree.numNodes != kdLastNumNodes)
     {
       prevWasReporter = false;
       // Print KD-tree stats
@@ -320,22 +328,24 @@ namespace lighter
       csPrintf ("P: % 8d / % 8.03f\n", globalStats.kdtree.numPrimitives, 
         (float)globalStats.kdtree.numPrimitives / (float)globalStats.kdtree.leafNodes);
 
-      kdLastNumNudes = globalStats.kdtree.numNodes;
+      kdLastNumNodes = globalStats.kdtree.numNodes;
     }
 
-    if (globalStats.progress.taskName != lastTask)
+    if (lastTask != globalStats.progress.GetTaskName())
     {
+      lastTask = globalStats.progress.GetTaskName();
+
       prevWasReporter = false;
-      csPrintf ("\n% 4d %% - %s ", (int)globalStats.progress.overallProgress,
-        globalStats.progress.taskName.GetDataSafe ());
+      csPrintf ("\n% 4d %% - %s ", 
+        (int)floor (globalStats.progress.GetOverallProgress()),
+        lastTask.GetDataSafe());
 
       // Print new task and global progress
       lastTaskProgress = 0;
-      lastTask = globalStats.progress.taskName;
     }
     else
     {
-      while (lastTaskProgress + 10 < globalStats.progress.taskProgress)
+      while (lastTaskProgress + 10 < globalStats.progress.GetTaskProgress())
       {
         prevWasReporter = false;
         csPrintf (".");

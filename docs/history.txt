@@ -23,6 +23,11 @@ chronological order.
 	- res made tinyxml use cs_malloc() instead of new char[] for some
 	  allocations.
 	- res made VFS' DeleteFile() support directories.
+	- res changed the way lighter2 handles progress display. Instead of
+	  setting the progress directly, a number of "sub-progress" objects
+	  are created (each representing a task). Code that "does something"
+	  then sets the progress on one of such progress objects, which takes
+	  care of updating the display and updating the overall progress.
 1-Mar-2007
 	- res fixed embedgl to properly include gl.h. (<GL/gl.h> doesn't work
 	  on all platforms, the CS_OPENGL_PATH construct takes care of the

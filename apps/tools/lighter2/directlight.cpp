@@ -463,7 +463,9 @@ namespace lighter
   }
 
   //--------------------------------------------------------------------------
-  void DirectLighting::ShadeDirectLighting (Sector* sector, float progressStep)
+  void DirectLighting::ShadeDirectLighting (Sector* sector, 
+                                            Statistics::SubProgress& progress,
+                                            float progressStep)
   {
     // Setup some common stuff
     SamplerSequence<2> masterSampler;
@@ -484,7 +486,7 @@ namespace lighter
           ShadeLightmap (sector, obj, masterSampler);
       }
 
-      globalStats.IncTaskProgress (progressPerObject);
+      progress.IncProgress (progressPerObject);
       globalTUI.Redraw (TUI::TUI_DRAW_RAYCORE);
     }
 

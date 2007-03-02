@@ -75,14 +75,14 @@ namespace lighter
     sceneFiles.Push (newFile);
   }
 
-  bool Scene::LoadFiles ()
+  bool Scene::LoadFiles (Statistics::SubProgress& progress)
   {
+    progress.SetProgress (0);
+
     if (sceneFiles.GetSize () == 0) 
       return globalLighter->Report ("No files to load!");
 
-    globalStats.SetTaskProgress ("Loading files", 5);
-
-    const float div = 90.0f / sceneFiles.GetSize ();
+    const float div = 100.0f / sceneFiles.GetSize ();
 
     for (unsigned int i = 0; i < sceneFiles.GetSize (); i++)
     {
@@ -114,21 +114,24 @@ namespace lighter
       if (!globalLighter->loader->Load (sceneFiles[i].rootNode, res))
         return globalLighter->Report ("Error loading file 'world'!");
 
-      globalStats.SetTaskProgress ("Loading files", 5+(unsigned int)(div*(i+1)));
+      progress.IncProgress (div);
     }
 
-    globalStats.SetTaskProgress ("Loading files", 100);
+    progress.SetProgress (100);
     return true;
   }
 
-  bool Scene::SaveWorld ()
+  bool Scene::SaveWorld (Statistics::SubProgress& progress)
   {
+    progress.SetProgress (0);
+
     if (sceneFiles.GetSize () == 0)
     {
       globalLighter->Report ("No files to save!");
       return false;
     }
 
+    float fileProgress = 100.0f / sceneFiles.GetSize ();
     for (size_t i = 0; i < sceneFiles.GetSize (); i++)
     {
       //Traverse the DOM, save any factory we encounter
@@ -159,6 +162,8 @@ namespace lighter
         globalLighter->Report ("Error writing file '.lighter2.world': %s", err);
         return false;
       }
+
+      progress.IncProgress (fileProgress);
     }
 
     // Ensure no archives are cached in memory (for memory consumption reasons)
@@ -168,17 +173,21 @@ namespace lighter
       return false;
     }
 
+    progress.SetProgress (100);
     return true;
   }
 
-  bool Scene::ApplyWorldChanges ()
+  bool Scene::ApplyWorldChanges (Statistics::SubProgress& progress)
   {
+    progress.SetProgress (0);
+
     if (sceneFiles.GetSize () == 0)
     {
       globalLighter->Report ("No files to save!");
       return false;
     }
 
+    float fileProgress = 100.0f / sceneFiles.GetSize ();
     for (size_t i = 0; i < sceneFiles.GetSize (); i++)
     {
       //Change path
@@ -227,21 +236,27 @@ namespace lighter
         }
         globalLighter->vfs->DeleteFile (gmCacheDir);
       }
+
+      progress.IncProgress (fileProgress);
     }
 
+    progress.SetProgress (100);
     return true;
   }
 
   static const char lightmapLibraryName[] = "lightmaps.cslib";
 
-  bool Scene::SaveLightmaps ()
+  bool Scene::SaveLightmaps (Statistics::SubProgress& progress)
   {
+    progress.SetProgress (0);
+
     if (sceneFiles.GetSize () == 0)
     {
       globalLighter->Report ("No files to save!");
       return false;
     }
 
+    float fileProgress = 100.0f / sceneFiles.GetSize ();
     for (size_t i = 0; i < sceneFiles.GetSize (); i++)
     {
       //Change path
@@ -297,13 +312,19 @@ namespace lighter
 
       // Finally delete any leftover lightmap files
       CleanOldLightmaps (&sceneFiles[i]);
+
+      progress.IncProgress (fileProgress);
     }
+
+    progress.SetProgress (100);
 
     return true;
   }
 
-  bool Scene::ParseEngine ()
+  bool Scene::ParseEngine (Statistics::SubProgress& progress)
   {
+    progress.SetProgress (0);
+
     // Parse sectors
     iSectorList *sectorList = globalLighter->engine->GetSectors ();
     for (int i = 0; i < sectorList->GetCount (); i++)
@@ -348,6 +369,7 @@ namespace lighter
       }
     }
 
+    progress.SetProgress (100);
     return true;
   }
 

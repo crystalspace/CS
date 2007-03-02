@@ -28,43 +28,84 @@ namespace lighter
   class Statistics
   {
   public:
-    // Some helpers
-    inline void SetTaskProgress (const char* task, float taskProgress)
-    {
-      progress.taskProgress = taskProgress;
-      progress.taskName = task;
+    class SubProgress;
 
-      globalTUI.Redraw ();
-    }
-
-    inline void IncTaskProgress (float inc)
+    class Progress
     {
-      progress.taskProgress += inc;
-      globalTUI.Redraw (TUI::TUI_DRAW_PROGRESS);
-    }
+      friend class SubProgress;
 
-    inline void SetTotalProgress (float totalProgress)
-    {
-      progress.overallProgress = totalProgress;
-      globalTUI.Redraw ();
-    }
+      /// Total amount of all sub-progress objects
+      float totalAmount;
+      /// Task name
+      const char* taskName;
 
-    struct Progress
-    {
-      Progress () 
-        : overallProgress (0), taskProgress (0)
+      inline void SetTaskName (const char* taskName)
       {
+        this->taskName = taskName;
+        globalTUI.Redraw ();
       }
+      inline void SetProgress (const char* task, float overallProgress, 
+                               float taskProgress)
+      {
+        this->overallProgress = 100.0f * (overallProgress / totalAmount);
+        this->taskProgress = taskProgress;
+        int redrawFlags;
+        if (taskName != task)
+        {
+          taskName = task;
+          redrawFlags = TUI::TUI_DRAW_ALL;
+        }
+        else
+          redrawFlags = TUI::TUI_DRAW_PROGRESS;
 
+        globalTUI.Redraw (redrawFlags);
+      }
       /// Overall progress  0-1000
       float overallProgress;
 
       /// Current task progress 0-1000
       float taskProgress;
+    public:
+      Progress () 
+        : totalAmount (0), taskName (0), overallProgress (0), taskProgress (0)
+      {
+      }
 
+      const char* GetTaskName() const { return taskName; }
+      float GetOverallProgress() const { return overallProgress; }
+      float GetTaskProgress() const { return taskProgress; }
+    } progress;
+
+    /// Progress for a single task.
+    class SubProgress
+    {
       /// Task description
       csString taskName;
-    } progress;
+
+      float subProgressStart, subProgressAmount, progress;
+    public:
+      /**
+       * Create a "sub-progress" object for a task. \a name is the 
+       * description of the task and \a amount a relavive value for the
+       * amount of work this task needs. It doesn't have a unit and doesn't
+       * need to sum up to some special value; it can be completely arbitrary,
+       * but the amounts of different tasks should be roughly in relation to
+       * the time usually takes to complete them.
+       */
+      SubProgress (const char* name, float amount);
+
+      /// Set complete progress, in percent.
+      void SetProgress (float progress);
+
+      /// Increment progress
+      inline void IncProgress (float inc)
+      {
+        SetProgress (progress + inc);
+      }
+
+      /// Set description
+      void SetTaskName (const char* taskName);
+    };
 
     struct Raytracer
     {
