@@ -22,6 +22,7 @@ chronological order.
 	      initially, thus essentially doubling all vertices of a mesh.
 	- res made tinyxml use cs_malloc() instead of new char[] for some
 	  allocations.
+	- res made VFS' DeleteFile() support directories.
 1-Mar-2007
 	- res fixed embedgl to properly include gl.h. (<GL/gl.h> doesn't work
 	  on all platforms, the CS_OPENGL_PATH construct takes care of the

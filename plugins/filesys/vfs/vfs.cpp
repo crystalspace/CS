@@ -1344,6 +1344,10 @@ bool VfsNode::FindFile (const char *Suffix, char *RealPath,
   return false;
 }
 
+#ifndef _S_IFDIR
+#define _S_IFDIR S_IFDIR
+#endif
+
 bool VfsNode::Delete (const char *Suffix)
 {
   char fname [CS_MAXPATHLEN + 1];
@@ -1354,7 +1358,14 @@ bool VfsNode::Delete (const char *Suffix)
   if (a)
     return a->DeleteFile (fname);
   else
-    return (unlink (fname) == 0);
+  {
+    struct stat s;
+    if (stat (fname, &s) != 0) return false;
+    if (s.st_mode & _S_IFDIR)
+      return rmdir (fname) == 0;
+    else
+      return (unlink (fname) == 0);
+  }
 }
 
 bool VfsNode::Exists (const char *Suffix)
