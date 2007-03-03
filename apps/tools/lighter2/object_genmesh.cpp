@@ -370,28 +370,11 @@ namespace lighter
       static_cast<ObjectFactory_Genmesh*> (this->factory);
     
     genMesh->SetShadowReceiving (false);
+    genMesh->SetManualColors (true);
     genMesh->RemoveRenderBuffer ("colors");
     genMesh->RemoveRenderBuffer ("texture coordinate lightmap");
 
-    if (lightPerVertex)
-    {
-      scene->lightmapPostProc.ApplyAmbient (litColors->GetArray(),
-        vertexData.vertexArray.GetSize()); 
-      scene->lightmapPostProc.ApplyExposure (litColors->GetArray(),
-        vertexData.vertexArray.GetSize()); 
-
-      if (!litColorsPD)
-      {
-        csRef<csRenderBuffer> colorsBuffer = csRenderBuffer::CreateRenderBuffer (
-          vertexData.vertexArray.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
-        genMesh->AddRenderBuffer ("colors", colorsBuffer);
-
-        colorsBuffer->CopyInto (litColors->GetArray(),
-          vertexData.vertexArray.GetSize());
-      }
-    }
-
-    // Still may need to fix up submesh materials...
+   // Still may need to fix up submesh materials...
     CS::ShaderVarName lightmapName (globalLighter->strings, "tex lightmap");
 
     for (uint i = 0; i < allPrimitives.GetSize (); ++i)
@@ -441,13 +424,84 @@ namespace lighter
 
     Object::SaveMesh (scene, node);
 
-    // Tack on animation control for PD lights
-    if (lightPerVertex && litColorsPD)
+    if (lightPerVertex)
     {
+      /* For per-vertex lit objects we need to store the params in an external
+         file as the complete data is only available after lighting. */
+      csRef<iDocumentNode> srcParams = node->GetNode ("params");
+      if (srcParams.IsValid())
+      {
+        csRef<iDocument> paramsDoc = globalLighter->docSystem->CreateDocument();
+        csRef<iDocumentNode> root = paramsDoc->CreateRoot ();
+        csRef<iDocumentNode> params = root->CreateNodeBefore (CS_NODE_ELEMENT);
+        params->SetValue ("params");
+        CS::DocumentHelper::CloneNode (srcParams, params);
+
+        csString paramsFile;
+        paramsFile.Format ("%s.params", GetFileName().GetData());
+        paramsDoc->Write (globalLighter->vfs, paramsFile);
+
+        csRef<iDocumentNode> srcParamsFile = node->GetNode ("paramsfile");
+        csRef<iDocumentNode> srcParamsFileContent;
+        if (!srcParamsFile.IsValid())
+        {
+          srcParamsFile = node->CreateNodeBefore (CS_NODE_ELEMENT, srcParams);
+          srcParamsFile->SetValue ("paramsfile");
+        }
+        else
+        {
+          csRef<iDocumentNodeIterator> nodes = srcParamsFile->GetNodes();
+          while (nodes->HasNext())
+          {
+            csRef<iDocumentNode> child = nodes->Next();
+            if (child->GetType() != CS_NODE_TEXT) continue;
+            srcParamsFileContent = child;
+            break;
+          }
+        }
+        if (!srcParamsFileContent.IsValid())
+          srcParamsFileContent =
+            srcParamsFile->CreateNodeBefore (CS_NODE_TEXT);
+        srcParamsFileContent->SetValue (paramsFile);
+
+        node->RemoveNode (srcParams);
+      }
+    }
+  }
+
+  void Object_Genmesh::SaveMeshPostLighting (Scene* scene)
+  {
+    // Tack on animation control for PD lights
+    if (lightPerVertex)
+    {
+      scene->lightmapPostProc.ApplyAmbient (litColors->GetArray(),
+        vertexData.vertexArray.GetSize()); 
+      scene->lightmapPostProc.ApplyExposure (litColors->GetArray(),
+        vertexData.vertexArray.GetSize()); 
+
       csRef<iSyntaxService> synsrv = 
         csQueryRegistry<iSyntaxService> (globalLighter->objectRegistry);
 
-      csRef<iDocumentNode> paramChild = node->GetNode ("params");
+      csString paramsFile;
+      paramsFile.Format ("%s.params", GetFileName().GetData());
+      csRef<iFile> paramsData = globalLighter->vfs->Open (paramsFile, 
+        VFS_FILE_READ);
+      if (!paramsData.IsValid())
+      {
+        globalLighter->Report ("Error reading '%s'", 
+          paramsFile.GetData());
+        return;
+      }
+      csRef<iDocument> paramsDoc = globalLighter->docSystem->CreateDocument();
+      const char* err = paramsDoc->Parse (paramsData);
+      if (err != 0)
+      {
+        globalLighter->Report ("Error reading '%s': %s", 
+          paramsFile.GetData(), err);
+        return;
+      }
+
+      csRef<iDocumentNode> paramChild = paramsDoc->GetRoot()->GetNode ("params");
 
       csRef<iDocumentNode> animcontrolChild = 
         paramChild->CreateNodeBefore (CS_NODE_ELEMENT, 0);
@@ -487,6 +541,13 @@ namespace lighter
         colorsBuf->CopyInto (colors.GetArray(), colors.GetSize());
 
         synsrv->WriteRenderBuffer (lightChild, colorsBuf);
+      }
+
+      err = paramsDoc->Write (globalLighter->vfs, paramsFile);
+      if (err != 0)
+      {
+        globalLighter->Report ("Error writing '%s': %s", 
+          paramsFile.GetData(), err);
       }
     }
   }
@@ -529,6 +590,10 @@ namespace lighter
         }
       }
     }
+
+    /* FIXME: Also return external color buffer/params file.
+     * -> That then needs a mechanism to tell the scene that these file 
+     *    should not always be cleaned up. */
   }
 
 }

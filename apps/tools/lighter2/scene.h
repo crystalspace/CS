@@ -100,6 +100,8 @@ namespace lighter
     bool ApplyWorldChanges (Statistics::SubProgress& progress);
     // Write the generated lightmaps out.
     bool SaveLightmaps (Statistics::SubProgress& progress);
+    // Save any mesh data that can only be saved after lighting.
+    bool SaveMeshesPostLighting (Statistics::SubProgress& progress);
 
     // Parse in our scene from the engine
     bool ParseEngine (Statistics::SubProgress& progress);
@@ -176,6 +178,7 @@ namespace lighter
       csString directory; //VFS name, full path
       csSet<csString> texturesToClean;
       csSet<csString> texFileNamesToDelete;
+      csArray<Object*> fileObjects;
     };
 
     // All files loaded into scene

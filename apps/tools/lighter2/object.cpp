@@ -411,4 +411,13 @@ namespace lighter
     }
   }
 
+  csString Object::GetFileName() const
+  {
+    csString filename (meshName);
+    filename.ReplaceAll ("\\", "_");
+    filename.ReplaceAll ("/", "_"); 
+    filename.ReplaceAll (" ", "_"); 
+    filename.ReplaceAll (".", "_"); 
+    return filename;
+  }
 }

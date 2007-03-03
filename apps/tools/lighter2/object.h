@@ -213,6 +213,9 @@ namespace lighter
     // Write out the data again
     virtual void SaveMesh (Scene* scene, iDocumentNode *node);
 
+    // Write out data that must be written after lighting.
+    virtual void SaveMeshPostLighting (Scene* scene) { }
+
     // Fill lightmap mask with primitive sub-pixel area coverage
     virtual void FillLightmapMask (LightmapMaskArray& masks);
 
@@ -278,7 +281,10 @@ namespace lighter
     virtual void RenormalizeLightmapUVs (const LightmapPtrDelArray& lightmaps,
       csVector2* lmcoords);
 
-    friend class  ObjectFactory;
+    // Helper function: get a filename prefix for this mesh
+    csString GetFileName() const;
+
+    friend class ObjectFactory;
   };
   typedef csRefArray<Object> ObjectRefArray;
   typedef csHash<csRef<Object>, csString> ObjectHash;

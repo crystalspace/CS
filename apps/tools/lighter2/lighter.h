@@ -83,6 +83,7 @@ namespace lighter
     Statistics::SubProgress progDirectLighting;
     Statistics::SubProgress progPostproc;
     Statistics::SubProgress progSaveResult;
+    Statistics::SubProgress progSaveMeshesPostLight;
     Statistics::SubProgress progApplyWorldChanges;
     Statistics::SubProgress progFinished;
   };

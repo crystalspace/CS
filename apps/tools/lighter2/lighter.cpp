@@ -51,6 +51,7 @@ namespace lighter
       progDirectLighting ("Direct lighting", 60),
       progPostproc ("Postprocessing lightmaps", 10),
       progSaveResult ("Saving result", 2),
+      progSaveMeshesPostLight ("Updating meshes", 1),
       progApplyWorldChanges ("Updating world files", 1),
       progFinished ("Finished!", 0)
   {
@@ -268,6 +269,7 @@ namespace lighter
 
     //Save the result
     if (!scene->SaveLightmaps (progSaveResult)) return false;
+    if (!scene->SaveMeshesPostLighting (progSaveMeshesPostLight)) return false;
     if (!scene->ApplyWorldChanges (progApplyWorldChanges)) return false;
     progFinished.SetProgress (100);
 

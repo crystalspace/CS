@@ -321,6 +321,50 @@ namespace lighter
     return true;
   }
 
+  bool Scene::SaveMeshesPostLighting (Statistics::SubProgress& progress)
+  {
+    progress.SetProgress (0);
+
+    if (sceneFiles.GetSize () == 0)
+    {
+      globalLighter->Report ("No files to save!");
+      return false;
+    }
+
+    float fileProgress = 100.0f / sceneFiles.GetSize ();
+    for (size_t i = 0; i < sceneFiles.GetSize (); i++)
+    {
+      //Change path
+      csStringArray paths;
+      paths.Push ("/lev/");
+      if (!globalLighter->vfs->ChDirAuto (sceneFiles[i].directory, &paths, 0, "world"))
+      {
+        globalLighter->Report ("Error setting directory '%s'!", 
+          sceneFiles[i].directory.GetData());
+        return false;
+      }
+
+      size_t meshObjNum = sceneFiles[i].fileObjects.GetSize();
+      if (meshObjNum == 0)
+      {
+        progress.IncProgress (fileProgress);
+        continue;
+      }
+      float meshProgress = fileProgress / meshObjNum;
+      for (size_t o = 0; o < meshObjNum; o++)
+      {
+        Object* obj = sceneFiles[i].fileObjects[o];
+        obj->SaveMeshPostLighting (this);
+        progress.IncProgress (meshProgress);
+      }
+      
+    }
+
+    progress.SetProgress (100);
+
+    return true;
+  }
+
   bool Scene::ParseEngine (Statistics::SubProgress& progress)
   {
     progress.SetProgress (0);
@@ -366,6 +410,37 @@ namespace lighter
         
         if (l->IsRealLight ())
           PropagateLight (l, l->GetFrustum ());
+      }
+    }
+
+    // Map mesh objects loaded from each scene file to it
+    for (size_t i = 0; i < sceneFiles.GetSize (); i++)
+    {
+      csRef<iDocumentNode> worldNode = 
+        sceneFiles[i].rootNode->GetNode ("world");
+
+      csRef<iDocumentNodeIterator> sectorNodeIt = 
+        worldNode->GetNodes ("sector");
+      while (sectorNodeIt->HasNext())
+      {
+        csRef<iDocumentNode> sectorNode = sectorNodeIt->Next ();
+        const char* sectorName = sectorNode->GetAttributeValue ("name");
+        if (!sectorName) continue;
+        const Sector* sector = sectors.Get (sectorName, (Sector*)0);
+        if (!sector) continue;
+
+        csRef<iDocumentNodeIterator> meshObjNodeIt = 
+          sectorNode->GetNodes ("meshobj");
+        while (meshObjNodeIt->HasNext())
+        {
+          csRef<iDocumentNode> meshObjNode = meshObjNodeIt->Next ();
+          const char* meshName = meshObjNode->GetAttributeValue ("name");
+          if (!meshName) continue;
+
+          Object* obj = sector->allObjects.Get (meshName, (Object*)0);
+          if (!obj) continue;
+          sceneFiles[i].fileObjects.Push (obj);
+        }
       }
     }
 

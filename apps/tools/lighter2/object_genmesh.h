@@ -34,6 +34,8 @@ namespace lighter
 
     virtual void SaveMesh (Scene* scene, iDocumentNode *node);
 
+    virtual void SaveMeshPostLighting (Scene* scene);
+
     virtual void StripLightmaps (csSet<csString>& lms);
   };
 
