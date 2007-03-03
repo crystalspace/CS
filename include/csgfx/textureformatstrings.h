@@ -65,6 +65,7 @@ namespace CS
    * \subsection tfs_g_format Format
    * Format optionally specifies how the data is encoded.
    * \li \c f Float
+   * \li \c i Unsigned integer
    *
    * Examples:
    * \li \c abgr32_f: Red, green, blue, alpha are stored as 32-bit floats. 
@@ -98,6 +99,21 @@ namespace CS
    *        byte, green in the 3 least significant bits of the second byte and 
    *        3 most significant bits of the first byte, blue in the 5 least 
    *        significant bits of the first byte. 
+   *
+   * \subsection tfs_g_canonical Canonical Format
+   * Canonical format strings, in comparison to "normal" format strings, 
+   * require all "optional" parts to be present. That is,
+   * \li after each component a size must appear,
+   * \li a format specifier must appear.
+   *
+   * Examples:
+   * \li \c rgba32_f becomes \c r32g32b32a32_f
+   * \li \c r5g6b5 becomes \c r5g6b6_i
+   * \li \c b8g8r8_i becomes \c b8g8r8_i
+   * \li \c d24 becomes \c  d24_i
+   * \li \c d24s8 becomes \c d24s8_i
+   * \li \c *dxt1, as a special format, stays \c *dxt1
+   * \li Any invalid format becomes \c -
    * 
    * \subsection tfs_g_moreexamples More examples
    * \li \c d24: 24-bit depth texture.
@@ -165,6 +181,7 @@ namespace CS
 
     /**
      * Convert this structured format to canonical format.
+     * \sa \ref tfs_g_canonical
      */
     csString GetCanonical ();
 
@@ -175,6 +192,7 @@ namespace CS
       return (special == other.special);
     }
 
+    /// Returns whether the contained format is a valid texture format.
     bool IsValid () { return format != Invalid; }
   };
 
@@ -185,21 +203,14 @@ namespace CS
   {
   public:
     /**
-     * Convert a texture format to a canonical form. Here are a few examples:
-     *    - rgba32_f -> r32g32b32a32_f
-     *    - r5g6b5   -> r5g6b6_i
-     *    - b8g8r8_i -> b8g8r8_i
-     *    - d24      -> d24_i
-     *    - d24s8    -> d24s8_i
-     *    - *dxt1    -> *dxt1 (everything after '*' is unchanged)
-     *    - invalid  -> -
-     *
-     * \sa \ref TextureFormatStrings 
+     * Convert a texture format to a canonical form. 
+     * \sa \ref TextureFormatStrings, \ref tfs_g_canonical
      */
     static csString ConvertCanonical (const char* in);
 
     /**
      * Convert a (canonical of not) texture format to a structured form.
+     * \sa \ref TextureFormatStrings
      */
     static StructuredTextureFormat ConvertStructured (const char* in);
   };
