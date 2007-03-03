@@ -169,6 +169,7 @@ struct csIEEEfloat
   /* \todo It would be even better if we also check for sizeof (float)
    * in configure or so. */
 #ifdef CS_IEEE_DOUBLE_FORMAT
+  //@{
   /// Convert native to IEEE
   static CS_FORCEINLINE uint32 FromNative (float f)
   { 
@@ -180,6 +181,19 @@ struct csIEEEfloat
     u.f = f;
     return u.ui32; 
   }
+  static CS_FORCEINLINE uint64 FromNative (double f)
+  { 
+    union
+    {
+      double f;
+      uint64 ui64;
+    } u;
+    u.f = f;
+    return u.ui64; 
+  }
+  //@}
+
+  //@{
   /// Convert IEEE to native
   static CS_FORCEINLINE float ToNative (uint32 f)
   { 
@@ -191,6 +205,17 @@ struct csIEEEfloat
     u.ui32 = f;
     return u.f; 
   }
+  static CS_FORCEINLINE double ToNative (uint64 f)
+  { 
+    union
+    {
+      double f;
+      uint64 ui64;
+    } u;
+    u.ui64 = f;
+    return u.f; 
+  }
+  //@}
 #else
   #error Do not know how to convert to IEEE floats
 #endif
