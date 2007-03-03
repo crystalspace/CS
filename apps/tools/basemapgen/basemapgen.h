@@ -19,8 +19,8 @@
 #ifndef __BASEMAPGEN_H__
 #define __BASEMAPGEN_H__
 
-#include <stdarg.h>
-#include <crystalspace.h>
+#include "crystalspace.h"
+#include "stdarg.h"
 
 class BaseMapGen
 {
@@ -84,6 +84,7 @@ public:
   bool Initialize ();
   void Start ();
   void OnCommandLineHelp();
+  void BaseMapGen::Report(const char* msg, ...);
 };
 
 #endif // __BASEMAPGEN_H__

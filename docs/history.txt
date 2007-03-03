@@ -23,6 +23,8 @@ chronological order.
           plugin.
 	- res changed CS_VERSION_NUMBER to properly contain a version
 	  number in the "x.y.z" scheme (and not "x.yz").
+	- sueastside added a new application 'basemapgen', this generates
+          a basemap, to be used with terrain, from the used materials.
 2-Mar-2007
 	- res made the following changes to lighter2:
 	    - Changed the order of how things are saved: the new world file is

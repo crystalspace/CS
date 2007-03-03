@@ -86,6 +86,23 @@ bool BaseMapGen::Initialize ()
   return true;
 }
 
+void BaseMapGen::Report(const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
+  if (rep)
+  {
+    rep->ReportV (CS_REPORTER_SEVERITY_ERROR, "crystalspace.application.basemapgen", msg, arg);
+  }
+  else
+  {
+    csPrintfV (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
+
 void BaseMapGen::OnCommandLineHelp()
 {
   printf("\n");
@@ -114,18 +131,14 @@ bool BaseMapGen::LoadMap ()
   paths.Push ("/lev/");
   if (!vfs->ChDirAuto(path.GetData(), &paths, 0, "world"))
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.basemapgen",
-      "Error setting directory '%s'!", path.GetData ());
+    Report("Error setting directory '%s'!", path.GetData ());
     return false;
   }
 
   csRef<iFile> buf = vfs->Open(world.GetData(), VFS_FILE_READ);
   if (!buf)
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.basemapgen",
-      "Failed to open file '%s'!", world.GetData());
+    Report("Failed to open file '%s'!", world.GetData());
     return false;
   }
 
@@ -218,9 +231,7 @@ csRef<iDocumentNode> BaseMapGen::GetTerrainNode ()
 
   if (!terrainnode.IsValid())
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.basemapgen",
-      "Couldn't find terrain node!");
+    Report("Couldn't find terrain node!");
   }
 
   return terrainnode;
@@ -242,7 +253,9 @@ csString BaseMapGen::GetTextureFile (const csString& texturename)
     }
   } // while
 
-  printf("Texture '%s' not found!", texturename.GetData());
+
+  Report("Texture '%s' not found!", texturename.GetData());
+
   return "";
 }
 
@@ -327,9 +340,7 @@ BaseMapGen::ImageMap BaseMapGen::GetMaterialMap ()
   } // while
 
 
-  csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    "crystalspace.application.basemapgen",
-    "Couldn't find terraformer node for '%s'!", terrname.GetData());
+  Report("Couldn't find terraformer node for '%s'!", terrname.GetData());
 
 
   return imagemap;
@@ -373,9 +384,7 @@ csRef<iImage> BaseMapGen::LoadImage (const csString& filename, int format)
   csRef<iDataBuffer> buf = VFS->ReadFile (filename.GetData(), false);
   if (!buf)
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.basemapgen",
-      "Failed to load image file '%s'!", filename.GetData());
+    Report("Failed to load image file '%s'!", filename.GetData());
     return image;
   }
   image = imageio->Load (buf, format);
@@ -394,17 +403,13 @@ void BaseMapGen::SaveImage (BaseMapGen::ImageMap image)
   {
     if (!VFS->WriteFile (image.texture_file.GetData (), (const char*)db->GetData (), db->GetSize ()))
     {
-      csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.basemapgen",
-        "Failed to write file '%s'!", image.texture_file.GetData ());
+      Report("Failed to write file '%s'!", image.texture_file.GetData ());
       return;
     }
   }
   else
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.basemapgen",
-      "Failed to save png image for basemap!");
+    Report("Failed to save png image for basemap!");
     return;
   }
 }
@@ -475,9 +480,7 @@ void BaseMapGen::Start ()
   // Load the world.
   if (!LoadMap ())
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.basemapgen",
-      "Error opening world file!");
+    Report("Error opening world file!");
     return;
   }
 
@@ -493,9 +496,7 @@ void BaseMapGen::Start ()
   ImageMap materialmap_img = GetMaterialMap();
   if (!materialmap_img.image)
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.basemapgen",
-      "Failed to load Material Map!");
+    Report("Failed to load Material Map!");
     return;
   }
 
@@ -503,9 +504,7 @@ void BaseMapGen::Start ()
   ImageMap basetexture_img = GetBaseMap();
   if (!basetexture_img.image)
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.basemapgen",
-      "Failed to load Base Map!");
+    Report("Failed to load Base Map!");
     return;
   }
 
