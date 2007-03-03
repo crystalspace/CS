@@ -25,9 +25,11 @@
  */
 
 #include "csextern.h"
+#include "csutil/csstring.h"
 #include "csutil/leakguard.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/weakref.h"
+#include "imap/renderbufferpersistence.h"
 #include "ivideo/rndbuf.h"
 
 /**\addtogroup gfx
@@ -120,7 +122,7 @@ public:
     return version;
   }
 
-  virtual bool IsMasterBuffer ()
+  bool IsMasterBuffer ()
   {
     return !masterBuffer.IsValid();
   }
@@ -311,5 +313,68 @@ protected:
 };
 
 /** @} */
+
+namespace CS
+{
+  /**\addtogroup gfx
+   * @{ 
+   */
+
+  /// Render buffer wrapper with additional persistence information.
+  class RenderBufferPersistent : 
+    public scfImplementation2<RenderBufferPersistent,
+                              iRenderBuffer,
+                              iRenderBufferPersistence>
+  {
+    csRef<iRenderBuffer> wrappedBuffer;
+    csString filename;
+  public:
+    RenderBufferPersistent (iRenderBuffer* wrappedBuffer) : 
+      scfImplementationType (this), wrappedBuffer (wrappedBuffer) {}
+
+    void SetFileName (const char* filename) { this->filename = filename; }
+    const char* GetFileName () { return filename; }
+
+    /**\name iRenderBuffer implementation
+     * @{ */
+    void* Lock (csRenderBufferLockType lockType)
+    { return wrappedBuffer->Lock (lockType); }
+    void Release() { wrappedBuffer->Release (); }
+    void CopyInto (const void *data, size_t elementCount,
+      size_t elemOffset = 0) 
+    { wrappedBuffer->CopyInto (data, elementCount, elemOffset); }
+    int GetComponentCount () const
+    { return wrappedBuffer->GetComponentCount(); }
+    csRenderBufferComponentType GetComponentType () const 
+    { return wrappedBuffer->GetComponentType(); }
+    csRenderBufferType GetBufferType() const
+    { return wrappedBuffer->GetBufferType(); }
+    size_t GetSize() const
+    { return wrappedBuffer->GetSize(); }
+    size_t GetStride() const 
+    { return wrappedBuffer->GetStride(); }
+    size_t GetElementDistance() const
+    { return wrappedBuffer->GetElementDistance(); }
+    size_t GetOffset() const
+    { return wrappedBuffer->GetOffset(); }
+    uint GetVersion ()
+    { return wrappedBuffer->GetVersion (); }
+    iRenderBuffer* GetMasterBuffer () const
+    { return wrappedBuffer->GetMasterBuffer (); }
+    bool IsIndexBuffer() const
+    { return wrappedBuffer->IsIndexBuffer (); }
+    size_t GetRangeStart() const
+    { return wrappedBuffer->GetRangeStart (); }
+    size_t GetRangeEnd() const
+    { return wrappedBuffer->GetRangeEnd (); }
+    size_t GetElementCount() const
+    { return wrappedBuffer->GetElementCount (); }
+    void SetCallback (iRenderBufferCallback *cb)
+    { wrappedBuffer->SetCallback (cb); }
+    /** @} */
+  };
+
+  /** @} */
+} // namespace CS
 
 #endif // __CS_CSGFX_RENDERBUFFER_H__

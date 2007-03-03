@@ -28,6 +28,8 @@ chronological order.
 	- res changed lighter2 to properly save per-vertex lighting 
 	  information again.
 	- res added methods to csIEEEFloat to deal with doubles.
+	- res added the ability to load and save render buffers to external
+	  files to cssynldr.
 2-Mar-2007
 	- res made the following changes to lighter2:
 	    - Changed the order of how things are saved: the new world file is

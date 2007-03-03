@@ -22,44 +22,27 @@
 #include <limits.h>
 
 #include "csgeom/box.h"
-#include "csgeom/math.h"
-#include "csgeom/matrix3.h"
 #include "csgeom/obb.h"
 #include "csgeom/plane3.h"
-#include "csgeom/transfrm.h"
 #include "csgeom/vector2.h"
-#include "csgeom/vector3.h"
 #include "csgfx/gradient.h"
-#include "csgfx/renderbuffer.h"
 #include "csgfx/shaderexp.h"
 #include "csgfx/shaderexpaccessor.h"
+#include "csgfx/shadervar.h"
 #include "cstool/keyval.h"
-#include "cstool/rbuflock.h"
 #include "cstool/vfsdirchange.h"
 #include "csutil/cscolor.h"
-#include "csutil/dirtyaccessarray.h"
-#include "csutil/ref.h"
-#include "csutil/scanstr.h"
 #include "csutil/scfstr.h"
-#include "csutil/util.h"
 
 #include "iengine/engine.h"
-#include "iengine/material.h"
 #include "iengine/portal.h"
-#include "iengine/texture.h"
 #include "imap/ldrctxt.h"
-#include "imap/loader.h"
-#include "imesh/object.h"
-#include "imesh/thing.h"
-#include "iutil/document.h"
-#include "iutil/object.h"
-#include "iutil/plugin.h"
+#include "iutil/objreg.h"
 #include "iutil/stringarray.h"
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
-#include "ivideo/graph3d.h"
 #include "ivideo/material.h"
-#include "ivideo/texture.h"
+#include "ivideo/shader/shader.h"
 
 #include "syntxldr.h"
 
@@ -73,6 +56,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(SyntaxService)
 {
 
 SCF_IMPLEMENT_FACTORY (csTextSyntaxService)
+
+bool csTextSyntaxService::KeepSaveInfo ()
+{
+  csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
+  if (!engine.IsValid()) return false;
+  return engine->GetSaveableFlag();
+}
 
 csTextSyntaxService::csTextSyntaxService (iBase *parent) : 
   scfImplementationType (this, parent)
@@ -1534,372 +1524,6 @@ bool csTextSyntaxService::WriteKey (iDocumentNode *node, iKeyValuePair *keyvalue
     const char* name = vnames->Get (i);
     node->SetAttribute (name, keyvalue->GetValue (name));
   }
-  return true;
-}
-
-CS_IMPLEMENT_STATIC_VAR (GetBufferParseError, csString, ())
-
-struct vhInt
-{
-  template <class T>
-  static void Get (T& v, iDocumentNode* node, const char* attr)
-  { v = node->GetAttributeValueAsInt (attr); }
-
-  template <class T>
-  static void Set (const T& v, iDocumentNode* node, const char* attr)
-  { node->SetAttributeAsInt (attr, (int)v); }
-};
-
-
-struct vhFloat
-{
-  template <class T>
-  static void Get (T& v, iDocumentNode* node, const char* attr)
-  { v = node->GetAttributeValueAsFloat (attr); }
-
-  template <class T>
-  static void Set (const T& v, iDocumentNode* node, const char* attr)
-  { node->SetAttributeAsFloat (attr, v); }  
-};
-
-template <class ValGetter>
-struct BufferParser
-{
-  template <class T>
-  static const char* Parse (iDocumentNode* node, int compNum,
-    csDirtyAccessArray<T>& buf)
-  {
-    csString compAttrName;
-
-    csRef<iDocumentNodeIterator> it = node->GetNodes();
-    while (it->HasNext())
-    {
-      csRef<iDocumentNode> child = it->Next();
-      if (child->GetType() != CS_NODE_ELEMENT) continue;
-      if ((strcmp (child->GetValue(), "element") != 0)
-	&& (strcmp (child->GetValue(), "e") != 0)
-	&& (strcmp (child->GetValue(), "dongledome") != 0))
-      {
-	GetBufferParseError()->Format ("unexpected node '%s'", 
-	  child->GetValue());
-	return GetBufferParseError()->GetData();
-      }
-      for (int c = 0; c < compNum; c++)
-      {
-	compAttrName.Format ("c%d", c);
-	T v;
-	ValGetter::Get (v, child, compAttrName);
-	buf.Push (v);
-      }
-    }
-    return 0;
-  }
-};
-
-
-
-template<typename T>
-static csRef<iRenderBuffer> FillBuffer (const csDirtyAccessArray<T>& buf,
-                                        csRenderBufferComponentType compType,
-                                        int componentNum,
-                                        bool indexBuf)
-{
-  csRef<iRenderBuffer> buffer;
-  size_t bufElems = buf.GetSize() / componentNum;
-  if (indexBuf)
-  {
-    T min;
-    T max;
-    size_t i = 0;
-    size_t n = buf.GetSize(); 
-    if (n & 1)
-    {
-      min = max = csMax (buf[0], T (0));
-      i++;
-    }
-    else
-    {
-      min = T (INT_MAX);
-      max = 0;
-    }
-    for (; i < n; i += 2)
-    {
-      T a = buf[i]; T b = buf[i+1];
-      if (a < b)
-      {
-        min = csMin (min, a);
-        max = csMax (max, b);
-      }
-      else
-      {
-        min = csMin (min, b);
-        max = csMax (max, a);
-      }
-    }
-    buffer = csRenderBuffer::CreateIndexRenderBuffer (bufElems, CS_BUF_STATIC,
-      compType, size_t (min), size_t (max));
-  }
-  else
-  {
-    buffer = csRenderBuffer::CreateRenderBuffer (bufElems,
-	  CS_BUF_STATIC, compType, (uint)componentNum);
-  }
-  buffer->CopyInto (buf.GetArray(), bufElems);
-  return buffer;
-}
-
-
-template <class ValSetter>
-struct BufferWriter
-{
-  template<class T>
-  static const char* Write (iDocumentNode* node, int compNum,
-    const T* buf, size_t bufferSize)
-  {
-    csString compAttrName;
-    for (size_t i = 0; i < bufferSize / compNum; ++i)
-    {
-      csRef<iDocumentNode> child = node->CreateNodeBefore (CS_NODE_ELEMENT);
-      child->SetValue ("e");
-      for (int c = 0; c < compNum; ++c)
-      {
-        compAttrName.Format ("c%d", c);
-        ValSetter::Set (buf[i*compNum + c], child, compAttrName);
-      }
-    }
-    return 0;
-  }
-};
-
-csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node)
-{
-  static const char* msgid = "crystalspace.syntax.renderbuffer";
-
-  const char* componentType = node->GetAttributeValue ("type");
-  if (componentType == 0)
-  {
-    ReportError (msgid, node, "no 'type' attribute");
-    return 0;
-  }
-  int componentNum = node->GetAttributeValueAsInt ("components");
-  if (componentNum <= 0)
-  {
-    ReportError (msgid, node, "bogus 'components' attribute: %d", componentNum);
-    return 0;
-  }
-
-  bool indexBuf = false;
-  {
-    const char* index = node->GetAttributeValue("indices");
-    if (index && *index)
-    {
-      indexBuf = ((strcmp (index, "yes") == 0)
-		  || (strcmp (index, "true") == 0)
-		  || (strcmp (index, "on") == 0));
-    }
-  }
-
-  if (indexBuf && (componentNum != 1))
-  {
-    ReportError (msgid, node, "index buffers are required to have 1 component", componentNum);
-    return 0;
-  }
-  
-  const char* err;
-  csRef<iRenderBuffer> buffer;
-  if ((strcmp (componentType, "int") == 0) 
-    || (strcmp (componentType, "i") == 0))
-  {
-    csDirtyAccessArray<int> buf;
-    err = BufferParser<vhInt>::Parse (node, componentNum, buf);
-    if (err == 0)
-    {
-      buffer = FillBuffer<int> (buf, CS_BUFCOMP_INT, componentNum, indexBuf);
-    }
-  }
-  else if ((strcmp (componentType, "uint") == 0) 
-    || (strcmp (componentType, "ui") == 0))
-  {
-    csDirtyAccessArray<uint> buf;
-    err = BufferParser<vhInt>::Parse (node, componentNum, buf);
-    if (err == 0)
-    {
-      buffer = FillBuffer<uint> (buf, CS_BUFCOMP_UNSIGNED_INT, componentNum, indexBuf);
-    }
-  }
-  else if ((strcmp (componentType, "byte") == 0) 
-    || (strcmp (componentType, "b") == 0))
-  {
-    csDirtyAccessArray<char> buf;
-    err = BufferParser<vhInt>::Parse (node, componentNum, buf);
-    if (err == 0)
-    {
-      buffer = FillBuffer<char> (buf, CS_BUFCOMP_BYTE, componentNum, indexBuf);
-    }
-  }
-  else if ((strcmp (componentType, "ubyte") == 0) 
-    || (strcmp (componentType, "ub") == 0))
-  {
-    csDirtyAccessArray<unsigned char> buf;
-    err = BufferParser<vhInt>::Parse (node, componentNum, buf);
-    if (err == 0)
-    {
-      buffer = FillBuffer<unsigned char> (buf, CS_BUFCOMP_UNSIGNED_BYTE, componentNum, indexBuf);
-    }
-  }
-  else if ((strcmp (componentType, "short") == 0) 
-    || (strcmp (componentType, "s") == 0))
-  {
-    csDirtyAccessArray<short> buf;
-    err = BufferParser<vhInt>::Parse (node, componentNum, buf);
-    if (err == 0)
-    {
-      buffer = FillBuffer<short> (buf, CS_BUFCOMP_SHORT, componentNum, indexBuf);
-    }
-  }
-  else if ((strcmp (componentType, "ushort") == 0) 
-    || (strcmp (componentType, "us") == 0))
-  {
-    csDirtyAccessArray<unsigned short> buf;
-    err = BufferParser<vhInt>::Parse (node, componentNum, buf);
-    if (err == 0)
-    {
-      buffer = FillBuffer<unsigned short> (buf, CS_BUFCOMP_UNSIGNED_SHORT, componentNum, indexBuf);
-    }
-  }
-  else if ((strcmp (componentType, "float") == 0) 
-    || (strcmp (componentType, "f") == 0))
-  {
-    csDirtyAccessArray<float> buf;
-    err = BufferParser<vhFloat>::Parse (node, componentNum, buf);
-    if (err == 0)
-    {
-      buffer = FillBuffer<float> (buf, CS_BUFCOMP_FLOAT, componentNum, indexBuf);
-    }
-  }
-  else if ((strcmp (componentType, "double") == 0) 
-    || (strcmp (componentType, "d") == 0))
-  {
-    csDirtyAccessArray<double> buf;
-    err = BufferParser<vhFloat>::Parse (node, componentNum, buf);
-    if (err == 0)
-    {
-      buffer = FillBuffer<double> (buf, CS_BUFCOMP_DOUBLE, componentNum, indexBuf);
-    }
-  }
-  else
-  {
-    ReportError (msgid, node, "unknown value for 'type': %s", componentType);
-    return 0;
-  }
-  if (err != 0)
-  {
-    ReportError (msgid, node, "%s", err);
-    return 0;
-  }
-  return buffer;
-}
-
-
-bool csTextSyntaxService::WriteRenderBuffer (iDocumentNode* node, iRenderBuffer* buffer)
-{
-  static const char* msgid = "crystalspace.syntax.renderbuffer";
-
-  if (buffer == 0)
-  {
-    ReportError (msgid, node, "no buffer specified");
-    return false;
-  }
-
-  if (buffer->GetMasterBuffer () != 0)
-  {
-    ReportError (msgid, node, "cannot save child-buffer");
-    return false;
-  }
-
-  const char* err = 0;
-
-  // Common attribute
-  int componentCount = buffer->GetComponentCount ();
-  node->SetAttributeAsInt ("components", componentCount);
-
-  switch (buffer->GetComponentType ())
-  {
-  case CS_BUFCOMP_BYTE:
-    {
-      node->SetAttribute ("type", "byte");
-      csRenderBufferLock<int8> lock (buffer, CS_BUF_LOCK_READ);
-      err = BufferWriter<vhInt>::Write (node, componentCount, (int8*)lock, 
-        lock.GetSize ()*componentCount);
-      break;
-    }
-  case CS_BUFCOMP_UNSIGNED_BYTE:
-    {
-      node->SetAttribute ("type", "ubyte");
-      csRenderBufferLock<uint8> lock (buffer, CS_BUF_LOCK_READ);
-      err = BufferWriter<vhInt>::Write (node, componentCount, (uint8*)lock, 
-        lock.GetSize ()*componentCount);
-      break;
-    }
-
-  case CS_BUFCOMP_SHORT:
-    {
-      node->SetAttribute ("type", "short");
-      csRenderBufferLock<int16> lock (buffer, CS_BUF_LOCK_READ);
-      err = BufferWriter<vhInt>::Write (node, componentCount, (int16*)lock, 
-        lock.GetSize ()*componentCount);
-      break;
-    }
-  case CS_BUFCOMP_UNSIGNED_SHORT:
-    {
-      node->SetAttribute ("type", "ushort");
-      csRenderBufferLock<uint16> lock (buffer, CS_BUF_LOCK_READ);
-      err = BufferWriter<vhInt>::Write (node, componentCount, (uint16*)lock, 
-        lock.GetSize ()*componentCount);
-      break;
-    }
-    
-  case CS_BUFCOMP_INT:
-    {
-      node->SetAttribute ("type", "int");
-      csRenderBufferLock<int32> lock (buffer, CS_BUF_LOCK_READ);
-      err = BufferWriter<vhInt>::Write (node, componentCount, (int32*)lock, 
-        lock.GetSize ()*componentCount);
-      break;
-    }
-  case CS_BUFCOMP_UNSIGNED_INT:
-    {
-      node->SetAttribute ("type", "uint");
-      csRenderBufferLock<uint32> lock (buffer, CS_BUF_LOCK_READ);
-      err = BufferWriter<vhInt>::Write (node, componentCount, (uint32*)lock, 
-        lock.GetSize ()*componentCount);
-      break;
-    }
-
-  case CS_BUFCOMP_FLOAT:
-    {
-      node->SetAttribute ("type", "float");
-      csRenderBufferLock<float> lock (buffer, CS_BUF_LOCK_READ);
-      err = BufferWriter<vhFloat>::Write (node, componentCount, (float*)lock, 
-        lock.GetSize ()*componentCount);
-      break;
-    }
-  case CS_BUFCOMP_DOUBLE:
-    {
-      node->SetAttribute ("type", "double");
-      csRenderBufferLock<double> lock (buffer, CS_BUF_LOCK_READ);
-      err = BufferWriter<vhFloat>::Write (node, componentCount, (double*)lock, 
-        lock.GetSize ()*componentCount);
-      break;
-    }
-    
-  default:
-    return false;
-  }
-
-  if (buffer->IsIndexBuffer())
-    node->SetAttribute ("indices", "yes");
-
   return true;
 }
 

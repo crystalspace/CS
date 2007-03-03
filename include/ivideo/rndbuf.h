@@ -56,6 +56,7 @@ enum csRenderBufferType
 };
 
 /// Type of components
+// NOTE: this is stored on disk by cssynldr! *Modify with care!*
 enum csRenderBufferComponentType
 {
   CS_BUFCOMP_BYTE = 0,
@@ -78,7 +79,7 @@ enum csRenderBufferLockType
   CS_BUF_LOCK_NOLOCK = 0,
   /// Lock used for reading only from the buffer
   CS_BUF_LOCK_READ,
-  /// Just get a point to the buffer, nothing special
+  /// Get a (writeable) pointer to the buffer
   CS_BUF_LOCK_NORMAL
 };
 
