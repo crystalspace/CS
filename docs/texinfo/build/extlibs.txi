@@ -142,7 +142,7 @@ if you have permission to do so, it is best to install the library.
 @cindex Libraries, X Window System
 
 This is needed to enable graphical output on a number of Unix-like operating 
-systems, most prominently @sc{gnu}/Linux.  It is \emph{not} needed for Windows
+systems, most prominently @sc{gnu}/Linux.  It is @emph{not} needed for Windows
 or MacOS/X.
 
 The exact installation procedure depends on the operating system/distribution 
@@ -157,7 +157,7 @@ other resources for that.
 @cindex OpenGL
 @cindex Libraries, OpenGL
 
-OpenGL is needed to provide accelerated 3D graphics \emph{on all platforms}.
+OpenGL is needed to provide accelerated 3D graphics @emph{on all platforms}.
 
 No special effort is usually needed to install the development components on
 Windows or MacOS/X, as the various Development Kits for that platform 

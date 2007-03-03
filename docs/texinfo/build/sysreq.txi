@@ -71,11 +71,11 @@ files.
 
 @item X Window System
 This is needed to enable graphical output on a number of Unix-like operating 
-systems, most prominently @sc{gnu}/Linux. It is \emph{not} needed for Windows
+systems, most prominently @sc{gnu}/Linux. It is @emph{not} needed for Windows
 or MacOS/X.
 
 @item OpenGL
-OpenGL is needed to provide accelerated 3D graphics \emph{on all platforms}.
+OpenGL is needed to provide accelerated 3D graphics @emph{on all platforms}.
 
 Note that no special effort is usually needed to install the development 
 components on Windows or MacOS/X.
