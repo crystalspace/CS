@@ -29,19 +29,102 @@
 
 namespace CS
 {
-#define CS_TEXTUREFORMAT_INVALID '-'
-#define CS_TEXTUREFORMAT_SPECIAL '*'
-#define CS_TEXTUREFORMAT_INTEGER 'i'
-#define CS_TEXTUREFORMAT_FLOAT 'f'
-
+  /**\addtogroup gfx3d
+   * @{ */
+  
+  /**\page TextureFormatStrings Texture format strings
+   * \section tfs_s Special formats
+   * Special formats are simple: they're designated by a string starting with 
+   * <tt>*</tt>,  everything else afterwards is arbitrary.
+   *
+   * Examples:
+   * \li \c *dxt1 DXT1 compressed texture
+   * \li \c *3dc 3Dc compressed texture 
+   *
+   * \section tsf_g General formats
+   * The general syntax is (in dog EBNF): 
+   * <pre>
+   * format := components {components} [_ format] 
+   * components := component {component} size
+   * </pre>
+   * whereas <tt>component</tt> is the component type, summarized below, 
+   * <tt>size</tt> is the width of the component, in bit, and <tt>format</tt> is 
+   * an optional specifier for the component format.
+   *
+   *
+   * \subsection tfs_g_comptypes Component types
+   * \li \c r Red
+   * \li \c g Green
+   * \li \c b Blue
+   * \li \c a Alpha
+   * \li \c x Junk (unused)
+   * \li \c l Luminance
+   * \li \c d Depth
+   * \li \c s Stencil
+   *
+   * \subsection tfs_g_format Format
+   * Format optionally specifies how the data is encoded.
+   * \li \c f Float
+   *
+   * Examples:
+   * \li \c abgr32_f: Red, green, blue, alpha are stored as 32-bit floats. 
+   *
+   * \subsection tfs_g_matching Matching components and sizes
+   * A component has the size as specified by the next size specifier right of 
+   * it.
+   *
+   * Examples:
+   * \li <tt>argb8, a8r8g8b8:</tt> Red, green, blue, alpha are all 8 bit wide.
+   * \li \c r5g6b5: Red is 5 bit wide, green 6 bit, blue 5bit.
+   * \li <tt>x1rgb5, x1r5g5b5:</tt> Red, green, blue are all 5 bit wide. One 
+   *   bit is unused. 
+   * 
+   * \subsection tfs_g_storage Storage
+   * The leftmost component is stored in the most significant bits; the 
+   * rightmost component in the least significant bits. A tuple of components 
+   * is interpreted as a word with the size being the sum of all component 
+   * sizes, rounded up to the next multiple of 8. These words are then stored 
+   * in little-endian.
+   * 
+   * This means that for formats with 8-bit components, the bytes in memory are 
+   * swapped in comparison to their order in the format string. See the examples.
+   * 
+   * Examples:
+   * \li \c argb8 When interpreted as 32-bit words, blue is in bits 0-7, 
+   *        green in 8-15, red in 16-23, alpha 24-31. When interpreted as 
+   *        bytes, it's four bytes, the first stores blue, the second green, 
+   *        the third red, the fourth alpha.
+   * \li \c r5g6b5: Red is stored in the 5 most significant bits of the second 
+   *        byte, green in the 3 least significant bits of the second byte and 
+   *        3 most significant bits of the first byte, blue in the 5 least 
+   *        significant bits of the first byte. 
+   * 
+   * \subsection tfs_g_moreexamples More examples
+   * \li \c d24: 24-bit depth texture.
+   * \li \c d24s8: Combined 24-bit depth and 8-bit stencil texture. 
+   */
+ 
   /**
    * Structured representation of a texture format.
    */
   class CS_CRYSTALSPACE_EXPORT StructuredTextureFormat
   {
+  public:
+    /// Texture storage format.
+    enum TextureFormat
+    {
+      /// Invalid format
+      Invalid = '-',
+      /// Components are stored as integer tuples
+      Integer = 'i',
+      /// Components are stored as float tuples
+      Float = 'f',
+      /// "Special" format (e.g. compressed formats)
+      Special = '*'
+    };
   private:
     uint64 coded_components;
-    char format;
+    TextureFormat format;
     csString special;
 
   public:
@@ -54,22 +137,22 @@ namespace CS
     void SetSpecial (const char* special)
     {
       StructuredTextureFormat::special = special;
-      format = CS_TEXTUREFORMAT_SPECIAL;
+      format = Special;
     }
 
     /**
      * Add a new component to the texture format.
-     * \param cmp is one of 'r', 'g', 'b', 'a', 'd', 's', or 'l'
-     * \param size is the size of that component. If 0 then it will have
-     *  to be set later using FixSizes().
-     * \return false if the component couldn't be added.
+     * \param cmp One of the 'Component types' listed in \ref tfs_g_comptypes.
+     * \param size Size of that component. Can be 0, but then it will have to 
+     *   be set later using FixSizes().
+     * \return Whether the component could be added or not.
      */
     bool AddComponent (char cmp, int size);
 
     /**
-     * Set the format (one of the CS_TEXTUREFORMAT_ constants).
+     * Set the format.
      */
-    void SetFormat (uint format)
+    void SetFormat (TextureFormat format)
     {
       StructuredTextureFormat::format = format;
     }
@@ -92,7 +175,7 @@ namespace CS
       return (special == other.special);
     }
 
-    bool IsValid () { return format != CS_TEXTUREFORMAT_INVALID; }
+    bool IsValid () { return format != Invalid; }
   };
 
   /**
@@ -110,6 +193,8 @@ namespace CS
      *    - d24s8    -> d24s8_i
      *    - *dxt1    -> *dxt1 (everything after '*' is unchanged)
      *    - invalid  -> -
+     *
+     * \sa \ref TextureFormatStrings 
      */
     static csString ConvertCanonical (const char* in);
 
@@ -119,6 +204,8 @@ namespace CS
     static StructuredTextureFormat ConvertStructured (const char* in);
   };
 }
+
+/** @} */
 
 #endif // __CS_CSGFX_TEXTUREFORMATSTRINGS_H__
 

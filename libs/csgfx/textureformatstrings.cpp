@@ -34,7 +34,7 @@ csString TextureFormatStrings::ConvertCanonical (const char* in)
 StructuredTextureFormat::StructuredTextureFormat ()
 {
   coded_components = CONST_UINT64 (0);
-  format = CS_TEXTUREFORMAT_INVALID;
+  format = Invalid;
 }
 
 bool StructuredTextureFormat::AddComponent (char cmp, int size)
@@ -61,8 +61,8 @@ void StructuredTextureFormat::FixSizes (int size)
 
 csString StructuredTextureFormat::GetCanonical ()
 {
-  if (format == CS_TEXTUREFORMAT_INVALID) return csString ();
-  if (format == CS_TEXTUREFORMAT_SPECIAL) return special;
+  if (format == Invalid) return csString ();
+  if (format == Special) return special;
   csString out;
   uint16 p1 = (coded_components >> 48) & 65535;
   uint16 p2 = (coded_components >> 32) & 65535;
@@ -112,13 +112,16 @@ StructuredTextureFormat TextureFormatStrings::ConvertStructured (const char* in)
   }
   while (*in && *in != '_');
 
-  char format = CS_TEXTUREFORMAT_INTEGER;
+  StructuredTextureFormat::TextureFormat format = 
+    StructuredTextureFormat::Integer;
   if (*in == '_')
   {
     // There is a format that follows.
     in++;
-    if ((*in == CS_TEXTUREFORMAT_FLOAT || *in == CS_TEXTUREFORMAT_INTEGER) && *(in+1) == 0)
-      format = *in;
+    if ((*in == StructuredTextureFormat::Float 
+        || *in == StructuredTextureFormat::Integer) 
+      && *(in+1) == 0)
+      format = (StructuredTextureFormat::TextureFormat)*in;
     else
       return StructuredTextureFormat ();
   }

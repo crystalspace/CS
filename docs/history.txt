@@ -9,6 +9,10 @@ chronological order.
 3-Mar-2007
 	- res added the X Window System and OpenGL to the list of "External
 	  Libraries" in the manual.
+	- res changed some #defines used for texture format strings and
+	  structured texture formats to an enum.
+	- res added the texture format string description from the dev wiki
+	  to the API docs.
 2-Mar-2007
 	- res made the following changes to lighter2:
 	    - Changed the order of how things are saved: the new world file is
