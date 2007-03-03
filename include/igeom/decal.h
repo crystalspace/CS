@@ -37,6 +37,8 @@ class csColor4;
  * \addtogroup geom_utils
  * @{ */
 
+/**\name Decals
+ * @{ */
 /**
  * A decal created by the decal manager.
  */
@@ -128,7 +130,7 @@ struct iDecalTemplate : public virtual iBase
    * plane as a multiple of decal size.
    *  \return The bottom clipping plane scale.
    */
-  virtual bool GetBottomClippingScale() const = 0;
+  virtual float GetBottomClippingScale() const = 0;
   
   /**
    * The min tex coord is the uv coordinate of the top-left corner of the
@@ -357,7 +359,7 @@ struct iDecalManager : public virtual iBase
 
   /**
    * Creates a decal template and fills it with default values.
-   *  \param The material wrapper for this decal template.
+   *  \param material The material wrapper for this decal template.
    *  \return The newly created decal template.
    */
   virtual csRef<iDecalTemplate> CreateDecalTemplate(
@@ -382,5 +384,8 @@ struct iDecalManager : public virtual iBase
    */
   virtual iDecal * GetDecal(size_t idx) const = 0;
 };
+/** @} */
+
+/** @} */
 
 #endif // __CS_IGEOM_DECAL_H__

@@ -13,6 +13,11 @@ chronological order.
 	  structured texture formats to an enum.
 	- res added the texture format string description from the dev wiki
 	  to the API docs.
+	- res fixed the return value of 
+	  iDecalTemplate::GetBottomClippingScale(). Also removed the #defines 
+	  for the decal template default values (the initializers in the
+	  constructor make it quite clear already which value gets initialized
+	  to what).
 2-Mar-2007
 	- res made the following changes to lighter2:
 	    - Changed the order of how things are saved: the new world file is

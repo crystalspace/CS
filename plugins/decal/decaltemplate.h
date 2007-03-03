@@ -24,17 +24,6 @@
 #include "csgeom/vector2.h"
 #include "csutil/cscolor.h"
 
-#define CS_DECAL_DEFAULT_TIME_TO_LIVE               -1.0f
-#define CS_DECAL_DEFAULT_RENDER_PRIORITY            0
-#define CS_DECAL_DEFAULT_NORMAL_THRESHOLD           0.01f
-#define CS_DECAL_DEFAULT_OFFSET                     0.05f
-#define CS_DECAL_DEFAULT_TOP_CLIP_ON                true
-#define CS_DECAL_DEFAULT_TOP_CLIP_SCALE             0.5f
-#define CS_DECAL_DEFAULT_BOTTOM_CLIP_ON             true
-#define CS_DECAL_DEFAULT_BOTTOM_CLIP_SCALE          0.5f
-#define CS_DECAL_DEFAULT_PERPENDICULAR_THRESHOLD    0.05
-#define CS_DECAL_DEFAULT_PERPENDICULAR_OFFSET       0.01
-
 class csDecalTemplate : public scfImplementation1<csDecalTemplate,
                                                  iDecalTemplate>
 {
@@ -73,7 +62,7 @@ public:
   virtual bool HasTopClipping() const;
   virtual float GetTopClippingScale() const;
   virtual bool HasBottomClipping() const;
-  virtual bool GetBottomClippingScale() const;
+  virtual float GetBottomClippingScale() const;
   virtual const csVector2 & GetMinTexCoord() const;
   virtual const csVector2 & GetMaxTexCoord() const;
   virtual const uint GetMixMode() const;
