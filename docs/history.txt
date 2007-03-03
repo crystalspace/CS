@@ -18,6 +18,7 @@ chronological order.
 	  for the decal template default values (the initializers in the
 	  constructor make it quite clear already which value gets initialized
 	  to what).
+	- res made a couple of tweaks to the API docs.
 2-Mar-2007
 	- res made the following changes to lighter2:
 	    - Changed the order of how things are saved: the new world file is

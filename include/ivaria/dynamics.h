@@ -306,6 +306,8 @@ struct iDynamicsCollisionCallback : public iBase
 {
   /**
    * A collision occured.
+   * \param thisbody The body that received a collision.
+   * \param otherbody The body that collided with \a thisBody.
    * \param pos is the position on which the collision occured.
    * \param normal is the collision normal.
    * \param depth is the penetration depth.
@@ -605,6 +607,7 @@ struct iRigidBody : public virtual iBase
 
   /**
    * If there's a collision callback with this body, execute it
+   * \param other The body that collided.
    * \param pos is the position on which the collision occured.
    * \param normal is the collision normal.
    * \param depth is the penetration depth.
