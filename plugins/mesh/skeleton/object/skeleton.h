@@ -99,7 +99,7 @@ public:
     { return full_transform; }
   virtual void SetParent (iSkeletonBone* par);
   virtual iSkeletonBone* GetParent () { return parent; }
-  virtual int GetChildrenCount () { return (int)bones.GetSize () ;}
+  virtual size_t GetChildrenCount () { return bones.GetSize () ;}
   virtual iSkeletonBone *GetChild (size_t i) { return bones[i]; }
   virtual iSkeletonBone *FindChild (const char *name);
   virtual void SetUpdateCallback (iSkeletonBoneUpdateCallback *callback) 
@@ -216,7 +216,7 @@ public:
   virtual csReversibleTransform &GetFullTransform () { return full_transform; }
   virtual  void SetParent (iSkeletonBoneFactory *par);
   virtual iSkeletonBoneFactory* GetParent () { return parent; }
-  virtual int GetChildrenCount () { return (int)bones.GetSize (); }
+  virtual size_t GetChildrenCount () { return bones.GetSize (); }
   virtual iSkeletonBoneFactory *GetChild (size_t i) { return bones[i]; }
   virtual iSkeletonBoneFactory *FindChild (const char *name);
   virtual size_t FindChildIndex (iSkeletonBoneFactory *child);

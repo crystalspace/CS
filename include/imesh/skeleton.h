@@ -99,7 +99,7 @@ struct iSkeletonBone : public virtual iBase
   /**
    * Get number of children bones.
    */
-  virtual int GetChildrenCount () = 0;
+  virtual size_t GetChildrenCount () = 0;
 
   /**
    * Set child bone by index.
@@ -168,6 +168,8 @@ struct iSkeletonBoneUpdateCallback : public virtual iBase
 	virtual void UpdateTransform(iSkeletonBone *bone, const csReversibleTransform & transform) = 0;
 };
 
+class csQuaternion;
+
 /**
  * The script key frame contains all bones that will be transformed in 
  * a specific time of a skeleton script.
@@ -204,13 +206,13 @@ struct iSkeletonAnimationKeyFrame : public virtual iBase
   /**
    * Add new bone transform to the key frame.
    */
-  virtual void AddTransform(iSkeletonBoneFactory *bone, 
+  virtual void AddTransform (iSkeletonBoneFactory *bone, 
 	  csReversibleTransform &transform, bool relative = false) = 0;
 
   /**
    * Get the transform of a bone.
    */
-  virtual csReversibleTransform & GetTransform(iSkeletonBoneFactory *bone) = 0;
+  virtual csReversibleTransform & GetTransform (iSkeletonBoneFactory *bone) = 0;
 
   /**
    * Set the transform of a bone.
@@ -364,13 +366,13 @@ struct iSkeletonUpdateCallback : public virtual iBase
  * of a skeleton animation. It holds bones, sockets and scripts.
  * Skeleton is an independend object and it is not realted to a mesh.
  * Genmesh Skelton Animation 2 plugin makes the connection between
- * mesh and skeleton.Users can query the iSkeleton from genmeshes as follows:
+ * mesh and skeleton. Users can query the iSkeleton from genmeshes as follows:
  *
  *   csRef<iGeneralMeshState> genmesh_state (
- *     SCF_QUERY_INTERFACE (mesh_wrapper->GetMeshObject (), iGeneralMeshState));
+ *     scfQueryInterface<iGeneralMeshState> (mesh_wrapper->GetMeshObject ()));
  *   csRef<iGenMeshSkeletonControlState> animcontrol (
- *     SCF_QUERY_INTERFACE (genmesh_state->GetAnimationControl (), 
- *           iGenMeshSkeletonControlState));
+ *     scfQueryInterface<iGenMeshSkeletonControlState> (
+ *     genmesh_state->GetAnimationControl ()));
  *   iSkeleton* skeleton = animcontrol->GetSkeleton ();
  */
 struct iSkeleton : public virtual iBase
@@ -667,7 +669,7 @@ struct iSkeletonBoneFactory : public virtual iBase
   /**
    * Get number of children factories.
    */
-  virtual int GetChildrenCount () = 0;
+  virtual size_t GetChildrenCount () = 0;
 
   /**
    * Get factory child by index.
