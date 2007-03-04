@@ -31,6 +31,8 @@ chronological order.
 	- res changed lighter2 to disable the "lighting" flag on the genmesh
 	  objects and to only write a PDL animation control if a mesh is 
 	  really affected by some PDLs.
+	- res did a quick fix to csVertexCompressor to make input of colors
+	  optional.
 3-Mar-2007
 	- res added the X Window System and OpenGL to the list of "External
 	  Libraries" in the manual.
