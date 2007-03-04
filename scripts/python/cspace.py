@@ -6248,6 +6248,7 @@ class iSpriteCal3DState(iBase):
     def SetAnimTimeUpdateHandler(*args): return _cspace.iSpriteCal3DState_SetAnimTimeUpdateHandler(*args)
     def SetUserData(*args): return _cspace.iSpriteCal3DState_SetUserData(*args)
     def GetCoreMeshShaderVarContext(*args): return _cspace.iSpriteCal3DState_GetCoreMeshShaderVarContext(*args)
+    def GetSkeleton(*args): return _cspace.iSpriteCal3DState_GetSkeleton(*args)
     def GetCal3DModel(*args): return _cspace.iSpriteCal3DState_GetCal3DModel(*args)
     __swig_destroy__ = _cspace.delete_iSpriteCal3DState
     __del__ = lambda self : None;

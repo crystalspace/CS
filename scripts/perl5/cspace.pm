@@ -9496,6 +9496,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetAnimTimeUpdateHandler = *cspacec::iSpriteCal3DState_SetAnimTimeUpdateHandler;
 *SetUserData = *cspacec::iSpriteCal3DState_SetUserData;
 *GetCoreMeshShaderVarContext = *cspacec::iSpriteCal3DState_GetCoreMeshShaderVarContext;
+*GetSkeleton = *cspacec::iSpriteCal3DState_GetSkeleton;
 *GetCal3DModel = *cspacec::iSpriteCal3DState_GetCal3DModel;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
