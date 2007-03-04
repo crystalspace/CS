@@ -12,6 +12,10 @@ chronological order.
         - Piotr implemented [Set/Get]Transform in csCal3dSkeletonBone. 
 	- sueastside changed the application Report functions to use 
 	  csReportV() macro.
+	- res changed gmeshldr to save the "manualcolors" flag for objects
+	  if it differs from the factory's setting. Also, previously it was
+	  only written when manualcolors was disabled - which was wrong since
+	  the default is exactly that.
 3-Mar-2007
 	- res added the X Window System and OpenGL to the list of "External
 	  Libraries" in the manual.
