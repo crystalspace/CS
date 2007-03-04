@@ -7,6 +7,10 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 4-Mar-2007
+	- Jorrit worked on imposters:
+	    - Removed the ability to set imposter settings on meshes.
+	      Imposter settings are done on the factory now.
+	    - iMeshWrapper no longer implements iImposter.
         - Piotr implemented skeleton update callbacks handling from 
           iSkeleton interface.
         - Piotr implemented [Set/Get]Transform in csCal3dSkeletonBone. 

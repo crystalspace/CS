@@ -515,7 +515,6 @@ void csEngine::HandleImposters ()
     iCamera* c = rview->GetCamera ();
     while (it.HasNext ())
     {
-printf ("Handling imposters!\n"); fflush (stdout);
       it.Next ()->RenderToTexture (rview, c->GetSector ());
     }
   }

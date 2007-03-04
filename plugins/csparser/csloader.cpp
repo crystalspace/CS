@@ -2766,21 +2766,6 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       else
         mesh->GetFlags ().Set (CS_ENTITY_DETAIL, CS_ENTITY_DETAIL);
       break;
-    case XMLTOKEN_IMPOSTER:
-      TEST_MISSING_MESH
-      {
-        csRef<iImposter> imposter = scfQueryInterface<iImposter> (mesh);
-        if (!imposter)
-        {
-          SyntaxService->ReportError (
-	    "crystalspace.maploader.parse.meshobject",
-	    child, "This mesh doesn't implement impostering!");
-          return false;
-        }
-        if (!ParseImposterSettings (imposter, child))
-          return false;
-      }
-      break;
     case XMLTOKEN_ZFILL:
       TEST_MISSING_MESH
       if (priority.IsEmpty ()) priority = "wall";

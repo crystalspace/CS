@@ -131,12 +131,11 @@ struct ExtraRenderMeshData
 /**
  * The holder class for all implementations of iMeshObject.
  */
-class csMeshWrapper : public scfImplementationExt6<csMeshWrapper,
+class csMeshWrapper : public scfImplementationExt5<csMeshWrapper,
                                                    csObject,
                                                    iMeshWrapper,
                                                    iShaderVariableContext,
                                                    iVisibilityObject,
-                                                   iImposter,
 						   iSceneNode,
 						   iSelfDestruct>
 {
@@ -246,12 +245,12 @@ private:
   csZBufMode zbufMode;
 
   /// Flag indicating whether this mesh should try to imposter or not.
-  bool imposter_active;
-  /// Imposter Threshold Range.
-  csRef<iSharedVariable> min_imposter_distance;
-  /// Imposter Redo Threshold angle change.
-  csRef<iSharedVariable> imposter_rotation_tolerance;
-  csRef<iSharedVariable> imposter_camera_rotation_tolerance;
+  //bool imposter_active;
+  ///// Imposter Threshold Range.
+  //csRef<iSharedVariable> min_imposter_distance;
+  ///// Imposter Redo Threshold angle change.
+  //csRef<iSharedVariable> imposter_rotation_tolerance;
+  //csRef<iSharedVariable> imposter_camera_rotation_tolerance;
   csImposterMesh *imposter_mesh;
 
   /**
@@ -504,58 +503,14 @@ public:
    */
   virtual void HardTransform (const csReversibleTransform& t);
 
-  //---------- iImposter Functions -----------------//
-
-  /// Set true if this Mesh should use Impostering.
-  virtual void SetImposterActive (bool flag);
-
-  /**
-   * Determine if this mesh is using Impostering
-   * (not if Imposter is being drawn, but simply considered).
-   */
-  virtual bool GetImposterActive () const { return imposter_active; }
-
-  /**
-   * Minimum Imposter Distance is the distance from camera 
-   * beyond which imposter is used. Imposter gets a 
-   * ptr here because value is a shared variable 
-   * which can be changed at runtime for many objects.
-   */
-  virtual void SetMinDistance (iSharedVariable* dist)
-  { min_imposter_distance = dist; }
-
-  /** 
-   * Rotation Tolerance is the maximum allowable 
-   * angle difference between when the imposter was 
-   * created and the current position of the camera.
-   * Angle greater than this triggers a re-render of
-   * the imposter. Default angle is 0.4f.
-   */
-  virtual void SetRotationTolerance (iSharedVariable* angle)
-  { imposter_rotation_tolerance = angle; }
-
-  /** 
-   * Camera Rotation Tolerance is the tolerance angle
-   * between z->1 vector and object on screen. Exceeding this
-   * value triggers updating of the imposter whenever the
-   * object slides too much away from the center of screen.
-   * Default angle is 0.2f.
-   */
-  virtual void SetCameraRotationTolerance (iSharedVariable* angle)
-  { imposter_camera_rotation_tolerance = angle; }
+  /// This is the function to check distances.  Fn above may not be needed.
+  bool CheckImposterRelevant (iRenderView *rview);
 
   /**
    * Gets the imposters rendermesh
    */
   csRenderMesh** GetImposter (iRenderView *rview);
 
-  /// Determine if imposter or true rendering will be used.
-  virtual bool WouldUseImposter (csReversibleTransform& /*pov*/) const
-  { /* implement later */ return false; }
-
-  /// This is the function to check distances.  Fn above may not be needed.
-  bool CheckImposterRelevant (iRenderView *rview);
-  
   //---------- Bounding volume and beam functions -----------------//
 
   virtual void GetRadius (float& rad, csVector3& cent) const;

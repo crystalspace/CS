@@ -114,10 +114,6 @@ csPtr<iMeshWrapper> csMeshFactoryWrapper::CreateMeshWrapper ()
   mesh->SetRenderPriority (render_priority);
   mesh->SetZBufMode (zbufMode);
   mesh->GetFlags ().Set (flags.Get (), flags.Get ());
-  cmesh->SetImposterActive (imposter_active);
-  cmesh->SetMinDistance (min_imposter_distance);
-  cmesh->SetRotationTolerance (imposter_rotation_tolerance);
-  cmesh->SetCameraRotationTolerance (imposter_camera_rotation_tolerance);
 
   if (static_lod)
   {

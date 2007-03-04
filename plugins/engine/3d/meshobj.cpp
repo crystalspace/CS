@@ -22,6 +22,7 @@
 #include "igeom/clip2d.h"
 #include "plugins/engine/3d/sector.h"
 #include "plugins/engine/3d/meshobj.h"
+#include "plugins/engine/3d/meshfact.h"
 #include "plugins/engine/3d/meshlod.h"
 #include "plugins/engine/3d/light.h"
 #include "plugins/engine/3d/engine.h"
@@ -143,7 +144,7 @@ csMeshWrapper::csMeshWrapper (csEngine* engine, iMeshObject *meshobj)
   }
   factory = 0;
   zbufMode = CS_ZBUF_USE;
-  imposter_active = false;
+  //imposter_active = false;
   imposter_mesh = 0;
   cast_hardware_shadow = true;
   draw_after_fancy_stuff = false;
@@ -587,13 +588,18 @@ const csArray<iLightSectorInfluence*>& csMeshWrapper::GetRelevantLights
 csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview, 
 					       uint32 frustum_mask)
 {
-  if (imposter_active && CheckImposterRelevant (rview))
+  if (factory)
   {
-    csRenderMesh** imposter = GetImposter (rview);
-    if (imposter)
+    csMeshFactoryWrapper* factwrap = static_cast<csMeshFactoryWrapper*> (
+  	factory);
+    if (factwrap->imposter_active && CheckImposterRelevant (rview))
     {
-      n = 1;
-      return imposter;
+      csRenderMesh** imposter = GetImposter (rview);
+      if (imposter)
+      {
+        n = 1;
+        return imposter;
+      }
     }
   }
 
@@ -937,17 +943,20 @@ void csMeshWrapper::AddMeshToStaticLOD (int lod, iMeshWrapper* mesh)
 
 bool csMeshWrapper::CheckImposterRelevant (iRenderView *rview)
 {
+  if (!factory) return false;
+  csMeshFactoryWrapper* factwrap = static_cast<csMeshFactoryWrapper*> (
+  	factory);
   float wor_sq_dist = GetSquaredDistance (rview);
-  float dist = min_imposter_distance->Get ();
+  float dist = factwrap->min_imposter_distance->Get ();
   return (wor_sq_dist > dist*dist);
 }
 
 csRenderMesh** csMeshWrapper::GetImposter (iRenderView *rview)
 {
-  // Check for imposter existence.  If not, create it.
+  // Check for imposter existence. If not create it.
   if (!imposter_mesh)
   {
-    return 0;
+    imposter_mesh = new csImposterMesh (engine, this);
   }
 
   // Check for imposter already ready
@@ -956,12 +965,17 @@ csRenderMesh** csMeshWrapper::GetImposter (iRenderView *rview)
     return 0;
   }
 
+  csMeshFactoryWrapper* factwrap = static_cast<csMeshFactoryWrapper*> (
+  	factory);
+
   // Check for too much camera movement since last imposter render
   if (!imposter_mesh->CheckUpdateNeeded (rview,
-	imposter_rotation_tolerance
-		? imposter_rotation_tolerance->Get () : 0.4f,
-	imposter_camera_rotation_tolerance
-		? imposter_camera_rotation_tolerance->Get () : 0.2f))
+	factwrap->imposter_rotation_tolerance
+		? factwrap->imposter_rotation_tolerance->Get ()
+		: 0.4f,
+	factwrap->imposter_camera_rotation_tolerance
+		? factwrap->imposter_camera_rotation_tolerance->Get ()
+		: 0.2f))
   {
   }
 
@@ -969,6 +983,7 @@ csRenderMesh** csMeshWrapper::GetImposter (iRenderView *rview)
   return imposter_mesh->GetRenderMesh (rview);
 }
 
+#if 0
 void csMeshWrapper::SetImposterActive (bool flag)
 {
   imposter_active = flag;
@@ -977,6 +992,7 @@ void csMeshWrapper::SetImposterActive (bool flag)
     imposter_mesh = new csImposterMesh (engine, this);
   }
 }
+#endif
 
 csHitBeamResult csMeshWrapper::HitBeamOutline (
   const csVector3 &start,

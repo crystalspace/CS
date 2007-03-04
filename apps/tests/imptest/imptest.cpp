@@ -311,7 +311,7 @@ void ImposterTest::CreateSprites ()
   sprite->SetZBufMode (CS_ZBUF_USE);
   sprite->SetRenderPriority (engine->GetObjectRenderPriority ());
 
-  csRef<iImposter> i = scfQueryInterface<iImposter> (sprite);
+  csRef<iImposter> i = scfQueryInterface<iImposter> (imeshfact);
   i->SetImposterActive(true);
 
   iSharedVariableList* varlist = engine->GetVariableList();

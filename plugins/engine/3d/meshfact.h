@@ -165,6 +165,7 @@ private:
 
   csEngine* engine;
 
+public:
   /// Flag indicating whether this factory should try to imposter or not.
   bool imposter_active;
   /// Imposter Threshold Range.

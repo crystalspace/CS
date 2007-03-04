@@ -93,7 +93,6 @@ void csImposterProcTex::Update (iRenderView* rview)
   // other rview update queues in the engine.
   if (!updating && rview)
   {
-    printf ("Requesting update!\n"); fflush (stdout);
     engine->AddImposterToUpdateQueue (this, rview);
     //engine->imposterUpdateList.Push (csWeakRef<csImposterProcTex> (this));
     updating = true;
