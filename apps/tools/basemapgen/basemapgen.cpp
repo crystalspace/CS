@@ -90,16 +90,7 @@ void BaseMapGen::Report(const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
-  if (rep)
-  {
-    rep->ReportV (CS_REPORTER_SEVERITY_ERROR, "crystalspace.application.basemapgen", msg, arg);
-  }
-  else
-  {
-    csPrintfV (msg, arg);
-    csPrintf ("\n");
-  }
+  csReportV(object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.application.basemapgen", msg, arg);
   va_end (arg);
 }
 

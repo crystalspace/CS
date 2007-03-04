@@ -10,6 +10,8 @@ chronological order.
         - Piotr implemented skeleton update callbacks handling from 
           iSkeleton interface.
         - Piotr implemented [Set/Get]Transform in csCal3dSkeletonBone. 
+	- sueastside changed the application Report functions to use 
+	  csReportV() macro.
 3-Mar-2007
 	- res added the X Window System and OpenGL to the list of "External
 	  Libraries" in the manual.

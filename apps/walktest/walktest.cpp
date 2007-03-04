@@ -141,16 +141,7 @@ void WalkTest::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
-  if (rep)
-  {
-    rep->ReportV (severity, "crystalspace.system", msg, arg);
-  }
-  else
-  {
-    csPrintfV (msg, arg);
-    csPrintf ("\n");
-  }
+  csReportV(object_reg, severity, "crystalspace.system", msg, arg);
   va_end (arg);
 }
 

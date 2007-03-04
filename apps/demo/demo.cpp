@@ -86,16 +86,7 @@ void Demo::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (csQueryRegistry<iReporter> (System->object_reg));
-  if (rep)
-  {
-    rep->ReportV (severity, "crystalspace.application.demo", msg, arg);
-  }
-  else
-  {
-    csPrintfV (msg, arg);
-    csPrintf ("\n");
-  }
+  csReportV(object_reg, severity, "crystalspace.application.demo", msg, arg);
   va_end (arg);
 }
 

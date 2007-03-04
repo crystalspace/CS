@@ -280,16 +280,9 @@ namespace lighter
   {
     va_list arg;
     va_start (arg, msg);
-    if (reporter)
-    {
-      reporter->ReportV (CS_REPORTER_SEVERITY_ERROR, 
-        "crystalspace.application.lighter2", msg, arg);
-    }
-    else
-    {
-      csPrintfV (msg, arg);
-      csPrintf ("\n");
-    }
+    csReportV(objectRegistry, CS_REPORTER_SEVERITY_ERROR, 
+      "crystalspace.application.lighter2", msg, arg);
+    va_end (arg);
     return false;
   }
 
