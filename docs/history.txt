@@ -24,6 +24,9 @@ chronological order.
 	  anyway.
 	  Note: that means genmesh animation plugins may get a 0 pointer 
 	  passed in as factory colors!
+	- res changed lighter2 to disable the "lighting" flag on the genmesh
+	  objects and to only write a PDL animation control if a mesh is 
+	  really affected by some PDLs.
 3-Mar-2007
 	- res added the X Window System and OpenGL to the list of "External
 	  Libraries" in the manual.

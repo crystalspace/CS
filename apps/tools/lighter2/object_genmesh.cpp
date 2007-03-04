@@ -371,6 +371,7 @@ namespace lighter
     
     genMesh->SetShadowReceiving (false);
     genMesh->SetManualColors (true);
+    genMesh->SetLighting (false);
     genMesh->RemoveRenderBuffer ("colors");
     genMesh->RemoveRenderBuffer ("texture coordinate lightmap");
 
@@ -479,6 +480,11 @@ namespace lighter
       scene->lightmapPostProc.ApplyExposure (litColors->GetArray(),
         vertexData.vertexArray.GetSize()); 
 
+      csRef<iRenderBuffer> staticColorsBuf = 
+        csRenderBuffer::CreateRenderBuffer (litColors->GetSize(), 
+          CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
+      staticColorsBuf->CopyInto (litColors->GetArray(), litColors->GetSize());
+
       csRef<iSyntaxService> synsrv = 
         csQueryRegistry<iSyntaxService> (globalLighter->objectRegistry);
 
@@ -503,44 +509,52 @@ namespace lighter
 
       csRef<iDocumentNode> paramChild = paramsDoc->GetRoot()->GetNode ("params");
 
-      csRef<iDocumentNode> animcontrolChild = 
-        paramChild->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-      animcontrolChild->SetValue ("animcontrol");
-      animcontrolChild->SetAttribute ("plugin", "crystalspace.mesh.anim.pdlight");
-
+      if (litColorsPD && litColorsPD->GetSize() > 0)
       {
-        csRef<iDocumentNode> staticColorsChild =
-          animcontrolChild->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-        staticColorsChild->SetValue ("staticcolors");
+        csRef<iDocumentNode> animcontrolChild = 
+          paramChild->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+        animcontrolChild->SetValue ("animcontrol");
+        animcontrolChild->SetAttribute ("plugin", "crystalspace.mesh.anim.pdlight");
 
-        csRef<iRenderBuffer> colorsBuf = 
-          csRenderBuffer::CreateRenderBuffer (litColors->GetSize(), 
-            CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
-        colorsBuf->CopyInto (litColors->GetArray(), litColors->GetSize());
+        {
+          csRef<iDocumentNode> staticColorsChild =
+            animcontrolChild->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+          staticColorsChild->SetValue ("staticcolors");
 
-        synsrv->WriteRenderBuffer (staticColorsChild, colorsBuf);
+          synsrv->WriteRenderBuffer (staticColorsChild, staticColorsBuf);
+        }
+
+        LitColorsPDHash::GlobalIterator pdIter (litColorsPD->GetIterator ());
+        while (pdIter.HasNext ())
+        {
+          csPtrKey<Light> light;
+          LitColorArray& colors = pdIter.Next (light);
+
+          csRef<iDocumentNode> lightChild =
+            animcontrolChild->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+          lightChild->SetValue ("light");
+          lightChild->SetAttribute ("lightid", light->GetLightID().HexString());
+
+          scene->lightmapPostProc.ApplyExposure (colors.GetArray(),
+            colors.GetSize()); 
+
+          csRef<iRenderBuffer> colorsBuf = 
+            csRenderBuffer::CreateRenderBuffer (colors.GetSize(), 
+              CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
+          colorsBuf->CopyInto (colors.GetArray(), colors.GetSize());
+
+          synsrv->WriteRenderBuffer (lightChild, colorsBuf);
+        }
       }
-
-      LitColorsPDHash::GlobalIterator pdIter (litColorsPD->GetIterator ());
-      while (pdIter.HasNext ())
+      else
       {
-        csPtrKey<Light> light;
-        LitColorArray& colors = pdIter.Next (light);
+        csRef<iDocumentNode> renderbufferChild = 
+          paramChild->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+        renderbufferChild->SetValue ("renderbuffer");
 
-        csRef<iDocumentNode> lightChild =
-          animcontrolChild->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-        lightChild->SetValue ("light");
-        lightChild->SetAttribute ("lightid", light->GetLightID().HexString());
+        renderbufferChild->SetAttribute ("name", "colors");
 
-        scene->lightmapPostProc.ApplyExposure (colors.GetArray(),
-          colors.GetSize()); 
-
-        csRef<iRenderBuffer> colorsBuf = 
-          csRenderBuffer::CreateRenderBuffer (colors.GetSize(), 
-            CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
-        colorsBuf->CopyInto (colors.GetArray(), colors.GetSize());
-
-        synsrv->WriteRenderBuffer (lightChild, colorsBuf);
+        synsrv->WriteRenderBuffer (renderbufferChild, staticColorsBuf);
       }
 
       err = paramsDoc->Write (globalLighter->vfs, paramsFile);
