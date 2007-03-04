@@ -16,6 +16,14 @@ chronological order.
 	  if it differs from the factory's setting. Also, previously it was
 	  only written when manualcolors was disabled - which was wrong since
 	  the default is exactly that.
+	- res changed genmesh mesh colors to default to 0,0,0,1 and not 
+	  0,0,0,0.
+	- res changed the behaviour of factory genmesh colors somewhat: now
+	  colors are no allocated until needed (ie requested by code). This
+	  means some memory is saved if the factory colors are never changed
+	  anyway.
+	  Note: that means genmesh animation plugins may get a 0 pointer 
+	  passed in as factory colors!
 3-Mar-2007
 	- res added the X Window System and OpenGL to the list of "External
 	  Libraries" in the manual.

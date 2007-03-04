@@ -452,15 +452,11 @@ class csGenmeshMeshObjectFactory :
                                iMeshObjectFactory,
                                iGeneralFactoryState>
 {
-private:
-
-  friend class csGenmeshMeshObject;
-
+public:
   csRef<iMaterialWrapper> material;
   csDirtyAccessArray<csVector3> mesh_vertices;
   csDirtyAccessArray<csVector2> mesh_texels;
   csDirtyAccessArray<csVector3> mesh_normals;
-  csDirtyAccessArray<csColor4> mesh_colors;
 
   bool autonormals;
   bool autonormals_compress;
@@ -523,7 +519,8 @@ private:
    * Setup this factory. This function will check if setup is needed.
    */
   void SetupFactory ();
-
+private:
+  csDirtyAccessArray<csColor4> mesh_colors;
 public:
   CS_LEAKGUARD_DECLARE (csGenmeshMeshObjectFactory);
 
@@ -583,10 +580,19 @@ public:
     SetupFactory ();
     return mesh_normals.GetArray ();
   }
+  csColor4* GetColors (bool ensureValid)
+  {
+    if (ensureValid && (mesh_colors.GetSize() == 0))
+    {
+      mesh_colors.SetCapacity (mesh_vertices.GetSize());
+      mesh_colors.SetSize (mesh_vertices.GetSize(), csColor4 (0, 0, 0, 1));
+    }
+    return mesh_colors.GetArray();
+  }
   csColor4* GetColors ()
   {
     SetupFactory ();
-    return mesh_colors.GetArray ();
+    return GetColors (true);
   }
 
   void AddTriangle (const csTriangle& tri);

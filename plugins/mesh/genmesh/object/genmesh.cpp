@@ -882,7 +882,7 @@ void csGenmeshMeshObject::UpdateLighting (
 
   if (do_manual_colors) return;
 
-  csColor4* factory_colors = factory->GetColors ();
+  csColor4* factory_colors = factory->GetColors (false);
 
   if (do_lighting)
   {
@@ -909,9 +909,19 @@ void csGenmeshMeshObject::UpdateLighting (
     {
       col = base_color;
     }
-    for (i = 0 ; i < factory->GetVertexCount () ; i++)
+    if (factory_colors) 
     {
-      lit_mesh_colors[i] = col + static_mesh_colors[i] + factory_colors[i];
+      for (i = 0 ; i < factory->GetVertexCount () ; i++)
+      {
+        lit_mesh_colors[i] = col + static_mesh_colors[i] + factory_colors[i];
+      }
+    }
+    else
+    {
+      for (i = 0 ; i < factory->GetVertexCount () ; i++)
+      {
+        lit_mesh_colors[i] = col + static_mesh_colors[i];
+      }
     }
     if (do_shadow_rec)
     {
@@ -1490,23 +1500,26 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
       }
       else
       {
-        if (!color_buffer || 
-          (color_buffer->GetSize() != (sizeof (csColor4) * 
-          factory->GetVertexCount())))
-        {
-          // Recreate the render buffer only if the new data cannot fit inside
-          //  the existing buffer.
-          color_buffer = csRenderBuffer::CreateRenderBuffer (
-            factory->GetVertexCount(), CS_BUF_STATIC,
-            CS_BUFCOMP_FLOAT, 4, false);
-        }
         mesh_colors_dirty_flag = false;
         const csColor4* mesh_colors = 0;
         if (anim_ctrl_colors)
-          mesh_colors = AnimControlGetColors (factory->GetColors ());
+          mesh_colors = AnimControlGetColors (factory->GetColors (false));
         else
-          mesh_colors = factory->GetColors ();
-        color_buffer->CopyInto (mesh_colors, factory->GetVertexCount());        
+          mesh_colors = factory->GetColors (false);
+        if (mesh_colors)
+        {
+          if (!color_buffer || 
+            (color_buffer->GetSize() != (sizeof (csColor4) * 
+            factory->GetVertexCount())))
+          {
+            // Recreate the render buffer only if the new data cannot fit inside
+            //  the existing buffer.
+            color_buffer = csRenderBuffer::CreateRenderBuffer (
+              factory->GetVertexCount(), CS_BUF_STATIC,
+              CS_BUFCOMP_FLOAT, 4, false);
+          }
+          color_buffer->CopyInto (mesh_colors, factory->GetVertexCount());
+        }
       }
     }
     holder->SetRenderBuffer (buffer, color_buffer);
@@ -2013,6 +2026,7 @@ void csGenmeshMeshObjectFactory::AddVertex (const csVector3& v,
   mesh_vertices.Push (v);
   mesh_texels.Push (uv);
   mesh_normals.Push (normal);
+  GetColors (true);
   mesh_colors.Push (color);
   Invalidate ();
 }
@@ -2027,18 +2041,15 @@ void csGenmeshMeshObjectFactory::AddTriangle (const csTriangle& tri)
 void csGenmeshMeshObjectFactory::SetVertexCount (int n)
 {
   size_t oldN = mesh_vertices.GetSize ();
-  mesh_vertices.SetSize (n);
-  mesh_texels.SetSize (n);
-  mesh_colors.SetSize (n);
-  mesh_normals.SetSize (n);
-  initialized = false;
-
-  if (size_t (n) > oldN)
+  mesh_vertices.SetCapacity (n); mesh_vertices.SetSize (n);
+  mesh_texels.SetCapacity (n); mesh_texels.SetSize (n);
+  if (mesh_colors.GetSize () > 0)
   {
-    size_t newN = n - oldN;
-    memset (mesh_normals.GetArray () + oldN, 0, sizeof (csVector3)*newN);
-    memset (mesh_colors.GetArray () + oldN, 0, sizeof (csColor4)*newN);
+    mesh_colors.SetCapacity (n); 
+    mesh_colors.SetSize (n, csColor4 (0, 0, 0, 1));
   }
+  mesh_normals.SetCapacity (n); mesh_normals.SetSize (n, csVector3 (0));
+  initialized = false;
 
   vertex_buffer = 0;
   normal_buffer = 0;
@@ -2174,9 +2185,7 @@ void csGenmeshMeshObjectFactory::GenerateSphere (const csEllipsoid& ellips,
 {
   csPrimitives::GenerateSphere (ellips, num, mesh_vertices, mesh_texels,
       mesh_normals, mesh_triangles, cyl_mapping, toponly, reversed);
-  mesh_colors.SetSize (mesh_vertices.GetSize ());
-  memset (mesh_colors.GetArray (), 0,
-      sizeof (csColor4)*mesh_vertices.GetSize ());
+  mesh_colors.DeleteAll();
   Invalidate();
 }
 
@@ -2188,8 +2197,7 @@ void csGenmeshMeshObjectFactory::GenerateBox (const csBox3& box)
 {
   csPrimitives::GenerateBox (box, mesh_vertices, mesh_texels,
       mesh_normals, mesh_triangles);
-  mesh_colors.SetSize (mesh_vertices.GetSize ());
-  memset (mesh_colors.GetArray (), 0, sizeof (csColor4)*mesh_vertices.GetSize ());
+  mesh_colors.DeleteAll();
   Invalidate();
 
 #if 0
