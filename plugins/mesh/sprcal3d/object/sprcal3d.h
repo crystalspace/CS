@@ -907,9 +907,9 @@ class csCal3dSkeleton : public scfImplementation1<csCal3dSkeleton, iSkeleton>
 {
   CalSkeleton* skeleton;
   csString name;
-
   csRefArray<csCal3dSkeletonBone> bones;
   csWeakRef<csCal3dSkeletonFactory> skeleton_factory;
+  csRefArray<iSkeletonUpdateCallback> update_callbacks;
 
 public:
 
@@ -939,11 +939,18 @@ public:
   iSkeletonFactory *GetFactory () {return 0;}
   void SetAnimationCallback (iSkeletonAnimationCallback *cb) {;}
   void SetScriptCallback (iSkeletonAnimationCallback *cb) {SetAnimationCallback (cb);}
-  size_t AddUpdateCallback(iSkeletonUpdateCallback *update_callback) {return 0;}
-  size_t GetUpdateCallbacksCount () {return 0;}
-  iSkeletonUpdateCallback *GetUpdateCallback (size_t callback_idx) {return 0;}
-  void RemoveUpdateCallback(size_t callback_idx) {;}
+  size_t AddUpdateCallback(iSkeletonUpdateCallback *update_callback) 
+  {return update_callbacks.Push (update_callback);}
+  size_t GetUpdateCallbacksCount () 
+  {return update_callbacks.GetSize ();}
+  iSkeletonUpdateCallback *GetUpdateCallback (size_t callback_idx) 
+  {return update_callbacks[callback_idx];}
+  void RemoveUpdateCallback(size_t callback_idx) 
+  {update_callbacks.DeleteIndex (callback_idx);}
   /** @} */
+
+  void UpdateNotify (const csTicks &current_ticks);
+
 };
 
 #include "csutil/win32/msvc_deprecated_warn_on.h"

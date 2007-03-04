@@ -1530,6 +1530,8 @@ bool csSpriteCal3DMeshObject::Advance (csTicks current_time)
   if (anim_time_handler.IsValid())
     anim_time_handler->UpdatePosition (delta, &calModel);
 
+  skeleton->UpdateNotify (current_time);
+
   if (current_time)
     last_update_time = current_time;
 
@@ -2264,6 +2266,14 @@ scfImplementationType(this), skeleton(skeleton), skeleton_factory (skel_factory)
   for (size_t i = 0; i < cal_bones.size (); i++)
   {
     bones[i]->Initialize ();
+  }
+}
+
+void csCal3dSkeleton::UpdateNotify (const csTicks &current_ticks)
+{
+  for (size_t i = 0; i < update_callbacks.GetSize (); i++)
+  {
+    update_callbacks[i]->Execute (this, current_ticks);
   }
 }
 
