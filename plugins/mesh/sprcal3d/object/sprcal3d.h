@@ -884,9 +884,9 @@ public:
    * @{ */
   const char* GetName () const {return name.GetData ();}
   void SetName (const char* name) {csCal3dSkeletonBone::name = name;}
-  csReversibleTransform &GetTransform () {return local_transform;}
-  void SetTransform (const csReversibleTransform &transform) {local_transform = transform;}
-  csReversibleTransform &GetFullTransform () {return global_transform;}
+  csReversibleTransform &GetTransform ();
+  void SetTransform (const csReversibleTransform &transform);
+  csReversibleTransform &GetFullTransform ();
   void SetParent (iSkeletonBone *parent) {;} 
   iSkeletonBone *GetParent () {return parent;}
   size_t GetChildrenCount () {return children.GetSize ();}

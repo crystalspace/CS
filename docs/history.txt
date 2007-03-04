@@ -9,6 +9,7 @@ chronological order.
 4-Mar-2007
         - Piotr implemented skeleton update callbacks handling from 
           iSkeleton interface.
+        - Piotr implemented [Set/Get]Transform in csCal3dSkeletonBone. 
 3-Mar-2007
 	- res added the X Window System and OpenGL to the list of "External
 	  Libraries" in the manual.

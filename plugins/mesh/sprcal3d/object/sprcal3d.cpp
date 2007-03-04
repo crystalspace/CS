@@ -2278,6 +2278,121 @@ void csCal3dSkeleton::UpdateNotify (const csTicks &current_ticks)
 }
 
 //---------------------------csCal3dSkeletonBone---------------------------
+
+csMatrix3 get_cs_rot_matrix (const CalQuaternion& quat)
+{
+	float rx, ry, rz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
+
+	// calculate coefficients 
+
+	x2 = quat.x + quat.x;
+	y2 = quat.y + quat.y;
+	z2 = quat.z + quat.z;
+	xx = quat.x * x2;   xy = quat.x * y2;   xz = quat.x * z2;
+	yy = quat.y * y2;   yz = quat.y * z2;   zz = quat.z * z2;
+	rx = quat.w * x2;   ry = quat.w * y2;   rz = quat.w * z2;
+
+	float m11 = 1.0 - (yy + zz);
+	float m12 = xy - rz;
+	float m13 = xz + ry;
+
+	float m21 = xy + rz;
+	float m22 = 1.0 - (xx + zz);
+	float m23 = yz - rx;
+
+	float m31 = xz - ry;
+	float m32 = yz + rx;
+	float m33 = 1.0 - (xx + yy);
+
+	return csMatrix3(m11, m12, m13, m21, m22, m23, m31, m32, m33);
+}
+
+CalQuaternion get_cal_quaternion (const csMatrix3& mat)
+{
+	CalQuaternion quat;
+
+	float tr, s;
+	int i;
+
+	tr = mat.m11 + mat.m22 + mat.m33 + 1.0;
+
+	// check the diagonal
+	if (tr > 0.0)
+	{
+		s = 0.5 / sqrt(tr);
+		quat[3] = 0.25 / s;
+		quat[0] = (mat.m32 - mat.m23) * s;
+		quat[1] = (mat.m13 - mat.m31) * s;
+		quat[2] = (mat.m21 - mat.m12) * s;
+	}
+	else
+	{
+		// diagonal is negative
+		i = 1;
+		if (mat.m22 > mat.m11)
+			i = 2;
+		if ((i == 1 && mat.m33 > mat.m11) || (i == 2 && mat.m33 > mat.m22))
+			i = 3;
+
+		switch (i)
+		{
+		case 1:
+			s = sqrt((mat.m11 - (mat.m22 + mat.m33)) + 1.0);
+
+			quat[0] = s * 0.5;
+
+			if (s != 0.0)
+				s = 0.5 / s;
+
+			quat[1] = (mat.m12 + mat.m21) * s;
+			quat[2] = (mat.m13 + mat.m31) * s;
+			quat[3] = (mat.m23 - mat.m32) * s;
+			break;
+		case 2:
+			s = sqrt((mat.m22 - (mat.m33 + mat.m11)) + 1.0);
+
+			quat[1] = 0.5 * s;
+
+			if (s != 0.0)
+				s = 0.5 / s;
+
+			quat[0] = (mat.m12 + mat.m21) * s;
+			quat[2] = (mat.m23 + mat.m32) * s;
+			quat[3] = (mat.m13 - mat.m31) * s;
+
+			break;
+		case 3:
+			s = sqrt((mat.m33 - (mat.m11 + mat.m22)) + 1.0);
+
+			quat[2] = 0.5 * s;
+
+			if (s != 0.0)
+				s = 0.5 / s;
+
+			quat[0] = (mat.m13 + mat.m31) * s;
+			quat[1] = (mat.m23 + mat.m32) * s;
+			quat[3] = (mat.m12 - mat.m21) * s;
+			break;
+		}
+	}
+
+	//Normalize 
+	float dist, square;
+	square = quat[0] * quat[0] + quat[1] * quat[1] + quat[2] * quat[2] + quat[3] * quat[3];
+
+	if (square > 0.0)
+		dist = (float)csQisqrt(square);
+	else
+		dist = 1;
+
+	quat[0] *= dist;
+	quat[1] *= dist;
+	quat[2] *= dist;
+	quat[3] *= dist;
+
+	return quat;
+}
+
 csCal3dSkeletonBone::csCal3dSkeletonBone (CalBone *bone, iSkeletonBoneFactory *factory,
                                           csCal3dSkeleton *skeleton) :
 scfImplementationType(this), bone(bone), factory(factory), skeleton(skeleton) 
@@ -2298,6 +2413,34 @@ bool csCal3dSkeletonBone::Initialize ()
   name = bone->getCoreBone ()->getName ().c_str ();
 
   return true;
+}
+csReversibleTransform &csCal3dSkeletonBone::GetFullTransform ()
+{
+  csMatrix3 mat = get_cs_rot_matrix (bone->getRotationAbsolute ());
+
+  CalVector calv = bone->getTranslationAbsolute (); 
+  csVector3 csv (calv[0], calv[1], calv[2]); 
+
+  global_transform = csReversibleTransform (mat, csv); 
+  return global_transform;
+}
+csReversibleTransform &csCal3dSkeletonBone::GetTransform ()
+{
+  csMatrix3 mat = get_cs_rot_matrix (bone->getRotation());
+  CalVector calv = bone->getTranslation(); 
+	csVector3 csv (calv[0], calv[1], calv[2]); 
+  
+  local_transform = csReversibleTransform (mat, csv);
+  
+  return local_transform;
+}
+
+void csCal3dSkeletonBone::SetTransform (const csReversibleTransform &transform)
+{
+  bone->setRotation (get_cal_quaternion (transform.GetO2T ()));
+  csVector3 vect = transform.GetOrigin();
+  bone->setTranslation (CalVector (vect[0], vect[1], vect[2]));
+  global_transform = transform;
 }
 
 //----------------------------------------------------------------------
