@@ -69,7 +69,7 @@ private:
 
   csRef<iImage> LoadImage (const csString& filename, int format);
 
-  void BaseMapGen::SaveImage (ImageMap image);
+  void SaveImage (ImageMap image);
 
   void CreateBasemap (int basemap_res, 
                       csRGBpixel* basemap_dst, 
@@ -84,7 +84,7 @@ public:
   bool Initialize ();
   void Start ();
   void OnCommandLineHelp();
-  void BaseMapGen::Report(const char* msg, ...);
+  void Report(const char* msg, ...);
 };
 
 #endif // __BASEMAPGEN_H__

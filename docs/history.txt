@@ -6,6 +6,9 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+5-Mar-2007
+	- iceeey fixed some errors and warnings in basemapgen on GCC.
+
 4-Mar-2007
 	- Jorrit worked on imposters:
 	    - Removed the ability to set imposter settings on meshes.

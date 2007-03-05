@@ -425,9 +425,9 @@ void BaseMapGen::CreateBasemap (int basemap_res,
       for (int x = 0 ; x < basemap_res ; x++)
       {
         // Get the layer index.
-        layercoord_x =  x * inv_basemap_res * matmap_res;
-        layercoord_y =  y * inv_basemap_res * matmap_res;
-        int layer = *(matmap_dst + layercoord_x + (layercoord_y * matmap_res));
+        layercoord_x =  (int) (x * inv_basemap_res * matmap_res);
+        layercoord_y =  (int) (y * inv_basemap_res * matmap_res);
+        unsigned int layer = *(matmap_dst + layercoord_x + (layercoord_y * matmap_res));
         if (layer > mat_layers.GetSize())
         {
           bm_dst->Set (255, 0, 0);
@@ -436,14 +436,14 @@ void BaseMapGen::CreateBasemap (int basemap_res,
 
         // Calculate the material/destination coordinates.
         coord_x    = x * inv_basemap_res;
-        matcoord_x =  coord_x * mat_layers[layer].image->GetWidth();
+        matcoord_x =  (int) (coord_x * mat_layers[layer].image->GetWidth());
         coord_y    = y * inv_basemap_res;
-        matcoord_y =  coord_y * mat_layers[layer].image->GetHeight();
+        matcoord_y =  (int) (coord_y * mat_layers[layer].image->GetHeight());
 
         // Scale the texture corrdinates.
         float factor = 1;
-        matcoord_x *= mat_layers[layer].texture_scale.x * factor;
-        matcoord_y *= mat_layers[layer].texture_scale.y * factor;
+        matcoord_x *= (int) (mat_layers[layer].texture_scale.x * factor);
+        matcoord_y *= (int) (mat_layers[layer].texture_scale.y * factor);
 
         // Wrap around the texture coordinates.
         matcoord_x = matcoord_x % mat_layers[layer].image->GetWidth();
@@ -478,7 +478,7 @@ void BaseMapGen::Start ()
   // Iterate the materials on the terrain.
   csArray<MaterialLayer> mat_layers;
   csRefArray<iDocumentNode> materials = GetMaterialNodes();
-  for (int i = 0 ; i < materials.GetSize() ; i++)
+  for (unsigned int i = 0 ; i < materials.GetSize() ; i++)
   {
     AddMaterialLayer (mat_layers, materials.Get(i));
   }
