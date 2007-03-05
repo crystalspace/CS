@@ -38,9 +38,7 @@ bool BaseMapGen::Initialize ()
 {
   if (0 != 0)
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.basemapgen",
-      "Not enough chickens sacrificed for cthulhu!");
+    Report("Not enough chickens sacrificed for cthulhu!");
     return false;
   }
 
@@ -52,9 +50,7 @@ bool BaseMapGen::Initialize ()
 	CS_REQUEST_REPORTERLISTENER,
 	CS_REQUEST_END))
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.basemapgen",
-      "Can't initialize plugins!");
+    Report("Can't initialize plugins!");
     return false;
   }
 
@@ -68,18 +64,14 @@ bool BaseMapGen::Initialize ()
   cmdline = csQueryRegistry<iCommandLineParser> (object_reg);
   if (!cmdline)
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.application.basemapgen",
-      "No iCommandLineParser plugin!");
+    Report("No iCommandLineParser plugin!");
     return false;
   }
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!csInitializer::OpenApplication (object_reg))
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.basemapgen",
-    	"Error opening system!");
+    Report("Error opening system!");
     return false;
   }
 
@@ -511,7 +503,7 @@ void BaseMapGen::Start ()
   // Get the upscale factor from the commandline.
   csString factorstr = cmdline->GetOption("factor");
   int factor = 1;
-  if (!res.IsEmpty())
+  if (!factorstr.IsEmpty())
     factor = atoi(factorstr);
 
   // Make it bigger.

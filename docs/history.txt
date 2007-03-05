@@ -8,6 +8,7 @@ chronological order.
 
 5-Mar-2007
 	- iceeey fixed some errors and warnings in basemapgen on GCC.
+	- sueastside fixed a crash in basemapgen caused by a copy/paste error.
 
 4-Mar-2007
 	- Jorrit worked on imposters:
