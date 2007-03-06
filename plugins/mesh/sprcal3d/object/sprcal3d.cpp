@@ -2329,7 +2329,7 @@ void csCal3dSkeletonBone::SetTransform (const csReversibleTransform &transform)
 {
   csQuaternion csquat;
   csquat.SetMatrix (transform.GetO2T ());
-  csquat.SetIdentity ();
+  csquat = csquat.Unit ();
   CalQuaternion quat (csquat.v.x, csquat.v.y, csquat.v.z, csquat.w);
   bone->setRotation (quat);
   csVector3 vect = transform.GetOrigin();
