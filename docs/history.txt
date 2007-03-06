@@ -8,10 +8,14 @@ chronological order.
 
 6-Mar-2007
         - Piotr did cleaning in his last changes in csCal3dSkeletonBone.
+	- Jorrit made csImposterProcTex a bit more efficient by not storing
+	  pointers to engine, g3d, g2d, shader manager (they are easily
+	  obtained from the given iRenderView) and also made the
+	  cached string id's static so that they are *really* cached
+	  now.
 5-Mar-2007
 	- iceeey fixed some errors and warnings in basemapgen on GCC.
 	- sueastside fixed a crash in basemapgen caused by a copy/paste error.
-
 4-Mar-2007
 	- Jorrit worked on imposters:
 	    - Removed the ability to set imposter settings on meshes.

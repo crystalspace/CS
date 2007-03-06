@@ -44,9 +44,11 @@
 #include "cstool/debugimagewriter.h"
 #include "csgfx/imagememory.h"
 
+csStringID csImposterProcTex::stringid_standard = csInvalidStringID;
+csStringID csImposterProcTex::stringid_light_ambient = csInvalidStringID;
 
 csImposterProcTex::csImposterProcTex  (csEngine* engine,  
-  csImposterMesh *parent) : scfImplementationType(this), engine(engine)
+  csImposterMesh *parent) : scfImplementationType(this)
 {
   mesh = parent;
 
@@ -55,23 +57,19 @@ csImposterProcTex::csImposterProcTex  (csEngine* engine,
 
   int texFlags = CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;
 
-  //initialize shortcuts
-  g3d = engine->G3D;
-  g2d = g3d->GetDriver2D ();
-  shadermanager = csQueryRegistryOrLoad<iShaderManager>
-    (engine->objectRegistry, "crystalspace.graphics3d.shadermanager");
-
-  
   csRef<iImage> thisImage = new csImageMemory (w, h,
     CS_IMGFMT_ALPHA && CS_IMGFMT_TRUECOLOR );
   tex = engine->GetTextureList ()->NewTexture (thisImage);
   tex->SetFlags (tex->GetFlags() | texFlags);
-  tex->Register(g3d->GetTextureManager());
+  tex->Register (engine->G3D->GetTextureManager());
   thisImage = 0;
 
-  csRef<iStringSet> stringSet = engine->globalStringSet;
-  stringid_standard = stringSet->Request("standard");
-  stringid_light_ambient = stringSet->Request("light ambient");
+  if (stringid_standard == csInvalidStringID)
+  {
+    csRef<iStringSet> stringSet = engine->globalStringSet;
+    stringid_standard = stringSet->Request("standard");
+    stringid_light_ambient = stringSet->Request("light ambient");
+  }
 
   clip = new csBoxClipper (0, 0, w, h);
 
@@ -93,6 +91,7 @@ void csImposterProcTex::Update (iRenderView* rview)
   // other rview update queues in the engine.
   if (!updating && rview)
   {
+    csEngine* engine = static_cast<csEngine*> (rview->GetEngine ());
     engine->AddImposterToUpdateQueue (this, rview);
     //engine->imposterUpdateList.Push (csWeakRef<csImposterProcTex> (this));
     updating = true;
@@ -103,6 +102,10 @@ void csImposterProcTex::Update (iRenderView* rview)
 void csImposterProcTex::RenderToTexture (iRenderView *rview, iSector *s)
 {
   if (!mesh) return;
+
+  csEngine* engine = static_cast<csEngine*> (rview->GetEngine ());
+  iGraphics3D* g3d = engine->G3D;
+  iShaderManager* shadermanager = engine->shaderManager;
 
   //start r2t
   csRef<iTextureHandle> handle = tex->GetTextureHandle ();

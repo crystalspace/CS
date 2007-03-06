@@ -47,14 +47,8 @@ private:
   iClipper2D *clip;
 
   //cached csStringID values
-  csStringID stringid_standard;
-  csStringID stringid_light_ambient;
-
-  //convenience shortcuts
-  csEngine *engine;
-  csRef<iGraphics3D> g3d;
-  csRef<iGraphics2D> g2d;
-  csRef<iShaderManager> shadermanager;
+  static csStringID stringid_standard;
+  static csStringID stringid_light_ambient;
 
   void SetImposterReady (bool r);
 
