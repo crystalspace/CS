@@ -271,12 +271,9 @@ void csProtoMeshObject::PreGetBuffer (csRenderBufferHolder *holder,
     {
       if (!color_buffer)
       {
-        // Here we create a render buffer that copies the data
-        // since we don't keep a local copy of the color buffer here.
-        // (final 'true' parameter).
         color_buffer = csRenderBuffer::CreateRenderBuffer (
           PROTO_VERTS, CS_BUF_STATIC,
-          CS_BUFCOMP_FLOAT, 3, true);
+          CS_BUFCOMP_FLOAT, 3);
       }
       mesh_colors_dirty_flag = false;
       const csColor* factory_colors = factory->colors;
@@ -284,6 +281,8 @@ void csProtoMeshObject::PreGetBuffer (csRenderBufferHolder *holder,
       csColor colors[PROTO_VERTS];
       for (i = 0 ; i < PROTO_VERTS ; i++)
         colors[i] = factory_colors[i]+color;
+      // Copy the data into the render buffer
+      // since we don't keep a local copy of the color buffer here.
       color_buffer->CopyInto (colors, PROTO_VERTS);
     }
     holder->SetRenderBuffer (CS_BUFFER_COLOR, color_buffer);
@@ -401,12 +400,12 @@ void csProtoMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder,
       mesh_normals_dirty_flag = false;
       if (!normal_buffer)
       {
-        // Create a buffer that doesn't copy the data.
         normal_buffer = csRenderBuffer::CreateRenderBuffer (
           PROTO_VERTS, CS_BUF_STATIC,
-          CS_BUFCOMP_FLOAT, 3, false);
+          CS_BUFCOMP_FLOAT, 3);
       }
-      normal_buffer->CopyInto (normals, PROTO_VERTS);
+      // Don't copy the data, have the buffer store a pointer instead.
+      normal_buffer->SetData (normals);
     }
     holder->SetRenderBuffer (CS_BUFFER_NORMAL, normal_buffer);
   }

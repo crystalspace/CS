@@ -107,11 +107,11 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
 
   size_t elements_count = vbuf->GetElementCount ();
 
-    csRef<iRenderBuffer> spbuf = modes.buffers->GetRenderBuffer (skinnedPositionOutputBuffer);
+  csRef<iRenderBuffer> spbuf = modes.buffers->GetRenderBuffer (skinnedPositionOutputBuffer);
   if (!spbuf.IsValid())
   {
       spbuf = csRenderBuffer::CreateRenderBuffer (elements_count, CS_BUF_STREAM,
-      CS_BUFCOMP_FLOAT, 3, true);
+      CS_BUFCOMP_FLOAT, 3);
   }
 
     csRef<iRenderBuffer> snbuf;
@@ -121,7 +121,7 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
     if (!snbuf.IsValid())
     {
       snbuf = csRenderBuffer::CreateRenderBuffer (elements_count, CS_BUF_STREAM,
-      CS_BUFCOMP_FLOAT, 3, true);
+      CS_BUFCOMP_FLOAT, 3);
     }
   }
 
@@ -132,7 +132,7 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
     if (!tnbuf.IsValid())
     {
       tnbuf = csRenderBuffer::CreateRenderBuffer (elements_count, CS_BUF_STREAM,
-      CS_BUFCOMP_FLOAT, 3, true);
+      CS_BUFCOMP_FLOAT, 3);
     }
   }
 
@@ -143,7 +143,7 @@ bool csVProcStandardProgram::UpdateSkinnedVertices (csRenderMeshModes& modes,
     if (!btnbuf.IsValid())
     {
       btnbuf = csRenderBuffer::CreateRenderBuffer (elements_count, CS_BUF_STREAM,
-      CS_BUFCOMP_FLOAT, 3, true);
+      CS_BUFCOMP_FLOAT, 3);
     }
   }
 
@@ -387,12 +387,12 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
     size_t elementCount = vbuf->GetElementCount ();
     csRef<iRenderBuffer> clbuf = 
       csRenderBuffer::CreateRenderBuffer (elementCount, CS_BUF_STREAM,
-      CS_BUFCOMP_FLOAT, hasAlpha ? 4 : 3, true);
+      CS_BUFCOMP_FLOAT, hasAlpha ? 4 : 3);
     csRef<iRenderBuffer> specBuf;
     if (doSpecular)
     {
       specBuf = csRenderBuffer::CreateRenderBuffer (elementCount, 
-        CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3, true);
+        CS_BUF_STREAM, CS_BUFCOMP_FLOAT, 3);
       csRenderBufferLock<float> tmpColor (specBuf);
       memset (tmpColor, 0, sizeof(csColor) * elementCount);
     }

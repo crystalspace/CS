@@ -64,7 +64,7 @@ protected:
    */
   csRenderBuffer (size_t size, csRenderBufferType type, 
     csRenderBufferComponentType componentType, uint componentCount, 
-    size_t rangeStart, size_t rangeEnd, bool copy);
+    size_t rangeStart, size_t rangeEnd, bool copy = true);
 public:
   CS_LEAKGUARD_DECLARE (csRenderBuffer);
 
@@ -146,6 +146,7 @@ public:
   {
     callback = cb;
   }
+  virtual void SetData (const void *data);
   /** @} */
 
   /**\name Render buffer creation
@@ -167,7 +168,14 @@ public:
    */
   static csRef<csRenderBuffer> CreateRenderBuffer (size_t elementCount, 
     csRenderBufferType type, csRenderBufferComponentType componentType, 
-    uint componentCount, bool copy = true);
+    uint componentCount);
+    
+  CS_DEPRECATED_METHOD_MSG("Using the 'copy' flag is deprecated; "
+    "use SetData() instead if data copying is not desired") 
+  static csRef<csRenderBuffer> CreateRenderBuffer (size_t elementCount, 
+    csRenderBufferType type, csRenderBufferComponentType componentType, 
+    uint componentCount, bool copy);
+    
   /**
    * Create an index buffer.
    * \param elementCount Number of elements in the buffer.
@@ -187,7 +195,14 @@ public:
    */
   static csRef<csRenderBuffer> CreateIndexRenderBuffer (size_t elementCount, 
     csRenderBufferType type, csRenderBufferComponentType componentType,
-    size_t rangeStart, size_t rangeEnd, bool copy = true);
+    size_t rangeStart, size_t rangeEnd);
+
+  CS_DEPRECATED_METHOD_MSG("Using the 'copy' flag is deprecated; "
+    "use SetData() instead of data copying is not desired") 
+  static csRef<csRenderBuffer> CreateIndexRenderBuffer (size_t elementCount, 
+    csRenderBufferType type, csRenderBufferComponentType componentType,
+    size_t rangeStart, size_t rangeEnd, bool copy);
+    
   /**
    * Create an interleaved renderbuffer (You would use this then set stride to
    * determine offset and stride of the interleaved buffer
@@ -286,7 +301,7 @@ protected:
       uint componentCount, bool copy) : bufferType (type), 
       comptype (componentType), compCount (componentCount), stride(0), 
       offset (0), doCopy (copy), doDelete (false), isLocked (false), 
-      isIndex (false), lastLock (CS_BUF_LOCK_NOLOCK)
+      isIndex (false), lastLock (0)
     {
       CS_ASSERT(componentCount <= 255); // Just to be sure...
     }
@@ -371,6 +386,8 @@ namespace CS
     { return wrappedBuffer->GetElementCount (); }
     void SetCallback (iRenderBufferCallback *cb)
     { wrappedBuffer->SetCallback (cb); }
+    void SetData (const void *data)
+    { wrappedBuffer->SetData (data); }
     /** @} */
   };
 

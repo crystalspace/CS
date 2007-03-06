@@ -24,6 +24,12 @@ chronological order.
 	  cached string id's static so that they are *really* cached
 	  now.
 	- res fixed some more r26546 fallout.
+	- res changed how "copy data vs. set pointer" is handled for render
+	  buffers: instead of being controlled by a flag set at creation time,
+	  a new method "SetData()" was added that just sets the render 
+	  buffer's pointer. (The old way is still supported, but deprecated.)
+	- res deprecated the (only intended for internal use anyway) 
+	  CS_BUF_LOCK_NOLOCK render buffer lock mode.
 5-Mar-2007
 	- iceeey fixed some errors and warnings in basemapgen on GCC.
 	- sueastside fixed a crash in basemapgen caused by a copy/paste error.

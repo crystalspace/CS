@@ -1448,10 +1448,10 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
       if (!vertex_buffer)
         vertex_buffer = csRenderBuffer::CreateRenderBuffer (
           num_mesh_vertices, CS_BUF_STATIC,
-          CS_BUFCOMP_FLOAT, 3, false);
+          CS_BUFCOMP_FLOAT, 3);
       const csVector3* mesh_vertices = AnimControlGetVertices ();
       if (!mesh_vertices) mesh_vertices = factory->GetVertices ();
-      vertex_buffer->CopyInto (mesh_vertices, num_mesh_vertices);
+      vertex_buffer->SetData (mesh_vertices);
       holder->SetRenderBuffer (buffer, vertex_buffer);
       return;
     }
@@ -1460,10 +1460,10 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
       if (!texel_buffer)
         texel_buffer = csRenderBuffer::CreateRenderBuffer (
           num_mesh_vertices, CS_BUF_STATIC,
-          CS_BUFCOMP_FLOAT, 2, false);
+          CS_BUFCOMP_FLOAT, 2);
       const csVector2* mesh_texels = AnimControlGetTexels ();
       if (!mesh_texels) mesh_texels = factory->GetTexels ();
-      texel_buffer->CopyInto (mesh_texels, num_mesh_vertices);
+      texel_buffer->SetData (mesh_texels);
       holder->SetRenderBuffer (buffer, texel_buffer);
       return;
     }
@@ -1472,10 +1472,10 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
       if (!normal_buffer)
         normal_buffer = csRenderBuffer::CreateRenderBuffer (
           num_mesh_vertices, CS_BUF_STATIC,
-          CS_BUFCOMP_FLOAT, 3, false);
+          CS_BUFCOMP_FLOAT, 3);
       const csVector3* mesh_normals = AnimControlGetNormals ();
       if (!mesh_normals) mesh_normals = factory->GetNormals ();
-      normal_buffer->CopyInto (mesh_normals, num_mesh_vertices);
+      normal_buffer->SetData (mesh_normals);
       holder->SetRenderBuffer (buffer, normal_buffer);
       return;
     }
@@ -1500,7 +1500,7 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
           color_buffer = csRenderBuffer::CreateRenderBuffer (
               num_lit_mesh_colors, 
               do_lighting ? CS_BUF_DYNAMIC : CS_BUF_STATIC,
-              CS_BUFCOMP_FLOAT, 4, false);
+              CS_BUFCOMP_FLOAT, 4);
         }
         mesh_colors_dirty_flag = false;
         const csColor4* mesh_colors = 0;
@@ -1508,7 +1508,7 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
           mesh_colors = AnimControlGetColors (lit_mesh_colors);
         else
           mesh_colors = lit_mesh_colors;
-        color_buffer->CopyInto (mesh_colors, num_lit_mesh_colors);
+        color_buffer->SetData (mesh_colors);
       }
       else
       {
@@ -1528,9 +1528,9 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
             //  the existing buffer.
             color_buffer = csRenderBuffer::CreateRenderBuffer (
               factory->GetVertexCount(), CS_BUF_STATIC,
-              CS_BUFCOMP_FLOAT, 4, false);
+              CS_BUFCOMP_FLOAT, 4);
           }
-          color_buffer->CopyInto (mesh_colors, factory->GetVertexCount());
+          color_buffer->SetData (mesh_colors);
         }
       }
     }
@@ -1924,10 +1924,9 @@ void csGenmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder,
       if (!vertex_buffer)
         vertex_buffer = csRenderBuffer::CreateRenderBuffer (
           mesh_vertices.GetSize (), CS_BUF_STATIC,
-          CS_BUFCOMP_FLOAT, 3, false);
+          CS_BUFCOMP_FLOAT, 3);
       mesh_vertices_dirty_flag = false;
-      vertex_buffer->CopyInto (mesh_vertices.GetArray (),
-	  mesh_vertices.GetSize ());
+      vertex_buffer->SetData (mesh_vertices.GetArray ());
     }
     holder->SetRenderBuffer (buffer, vertex_buffer);
     return;
@@ -1939,9 +1938,9 @@ void csGenmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder,
       if (!texel_buffer)
         texel_buffer = csRenderBuffer::CreateRenderBuffer (
           mesh_texels.GetSize (), CS_BUF_STATIC,
-          CS_BUFCOMP_FLOAT, 2, false);
+          CS_BUFCOMP_FLOAT, 2);
       mesh_texels_dirty_flag = false;
-      texel_buffer->CopyInto (mesh_texels.GetArray (), mesh_texels.GetSize ());
+      texel_buffer->SetData (mesh_texels.GetArray ());
     }
     holder->SetRenderBuffer (buffer, texel_buffer);
     return;
@@ -1953,10 +1952,9 @@ void csGenmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder,
       if (!normal_buffer)
         normal_buffer = csRenderBuffer::CreateRenderBuffer (
           mesh_normals.GetSize (), CS_BUF_STATIC,
-          CS_BUFCOMP_FLOAT, 3, false);
+          CS_BUFCOMP_FLOAT, 3);
       mesh_normals_dirty_flag = false;
-      normal_buffer->CopyInto (mesh_normals.GetArray (),
-	  mesh_normals.GetSize ());
+      normal_buffer->SetData (mesh_normals.GetArray ());
     }
     holder->SetRenderBuffer (buffer, normal_buffer);
     return;

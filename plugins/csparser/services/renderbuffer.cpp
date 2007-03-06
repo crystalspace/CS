@@ -563,7 +563,7 @@ public:
   void CopyInto (const void *data, size_t elementCount,
     size_t elemOffset = 0)
   {
-    MakeEditable (false);
+    MakeEditable ((elemOffset == 0) && (elementCount >= GetElementCount()));
     GetWrappedBuffer()->CopyInto (data, elementCount, elemOffset);
   }
 
@@ -653,6 +653,13 @@ public:
     else
       callback = cb;
   }
+
+  void SetData (const void *data)
+  {
+    MakeEditable (false);
+    GetWrappedBuffer()->SetData (data);
+  }
+
   /** @} */
 };
 

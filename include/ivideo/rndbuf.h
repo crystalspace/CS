@@ -76,12 +76,30 @@ enum csRenderBufferComponentType
  */
 enum csRenderBufferLockType
 {
-  CS_BUF_LOCK_NOLOCK = 0,
   /// Lock used for reading only from the buffer
-  CS_BUF_LOCK_READ,
+  CS_BUF_LOCK_READ = 1,
   /// Get a (writeable) pointer to the buffer
   CS_BUF_LOCK_NORMAL
 };
+
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
+namespace CS
+{
+  namespace Deprecated
+  {
+    struct CS_DEPRECATED_TYPE_MSG("You shouldn't use CS_BUF_LOCK_NOLOCK in "
+      "the first place")
+      CS_BUF_LOCK_NOLOCK
+    {
+      static const uint value = 0;
+    };
+  };
+};
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
+
+#define CS_BUF_LOCK_NOLOCK	CS::Deprecated::CS_BUF_LOCK_NOLOCK::value
 
 /**
  * Sizes of individual buffer components in bytes.
@@ -122,13 +140,14 @@ struct iRenderBufferCallback : public virtual iBase
  */
 struct iRenderBuffer : public virtual iBase
 {
-  SCF_INTERFACE (iRenderBuffer, 2, 1, 0);
+  SCF_INTERFACE (iRenderBuffer, 2, 1, 1);
 
   /**
-   * Lock the buffer to allow writing and return a pointer to the first 
-   * element.
-   * The pointer will be (void*)-1 if there was some error.
+   * Lock the buffer to allow reading or writing to it directly.
    * \param lockType The type of lock desired.
+   * \return A pointer to the first element or (void*)-1 if there was some 
+   *   error.
+   * \remarks After the data was used as desired Release() \b must be called.
    */
   virtual void* Lock(csRenderBufferLockType lockType) = 0;
 
@@ -140,11 +159,9 @@ struct iRenderBuffer : public virtual iBase
 
   /**
    * Copy data to the render buffer.
-   * \remarks Does not work with interleaved buffer, copy to master buffer
-   *  instead.
-   *  A buffer may actually not make a copy of the data but only store a
-   *  pointer to it. Whether this is the case depends on the actual
-   *  implementation and/or parameters to the buffer creation.
+   * \remarks 
+   *   Do not call on a locked buffer.
+   *   Does not work with interleaved buffer, copy to master buffer instead.
    */
   virtual void CopyInto (const void *data, size_t elementCount,
     size_t elemOffset = 0) = 0;
@@ -193,6 +210,18 @@ struct iRenderBuffer : public virtual iBase
 
   /// Set callback object to use
   virtual void SetCallback (iRenderBufferCallback* cb) = 0;
+
+  /**
+   * Set the buffer data. This changes the internal pointer to the buffer data 
+   * to \a buffer instead. It will also be returned by Lock(). It is the
+   * responsibility of the caller to ensure that the memory pointed to by
+   * \a data is valid for as long as the render buffer is used.
+   * \remarks 
+   *   Do not call on a locked buffer.
+   *   Does not work with interleaved buffer, set data on master buffer
+   *   instead.
+   */
+  virtual void SetData (const void *data) = 0;
 };
 
 /**
