@@ -978,10 +978,22 @@ void csGenmeshMeshObject::UpdateLighting (
     lighting_dirty = false;
     mesh_colors_dirty_flag = true;
 
-    for (i = 0 ; i < factory->GetVertexCount () ; i++)
+    if (factory_colors)
     {
-      lit_mesh_colors[i] = base_color + factory_colors[i];
-      lit_mesh_colors[i].Clamp (2., 2., 2.);
+      for (i = 0 ; i < factory->GetVertexCount () ; i++)
+      {
+        lit_mesh_colors[i] = base_color + factory_colors[i];
+        lit_mesh_colors[i].Clamp (2., 2., 2.);
+      }
+    }
+    else
+    {
+      csColor4 base_color_clamped (base_color);
+      base_color_clamped.Clamp (2., 2., 2.);
+      for (i = 0 ; i < factory->GetVertexCount () ; i++)
+      {
+        lit_mesh_colors[i] = base_color_clamped;
+      }
     }
   }
 }
