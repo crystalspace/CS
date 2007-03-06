@@ -519,7 +519,6 @@ bool csIntersect3::SegmentPlane (
   csVector3 &isect,
   float &dist)
 {
-  float counter = normal * (u - a);
   float divider = normal * (v - u);
   if (divider == 0)
   {
@@ -527,6 +526,7 @@ bool csIntersect3::SegmentPlane (
     return false;
   }
 
+  float counter = normal * (u - a);
   dist = -counter / divider;
   isect = u + dist * (v - u);
   return true;

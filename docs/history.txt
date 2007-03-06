@@ -30,6 +30,8 @@ chronological order.
 	  buffer's pointer. (The old way is still supported, but deprecated.)
 	- res deprecated the (only intended for internal use anyway) 
 	  CS_BUF_LOCK_NOLOCK render buffer lock mode.
+	- Jorrit did a small optimization to csIntersect3::SegmentPlane()
+	  as suggested by Erroroman.
 5-Mar-2007
 	- iceeey fixed some errors and warnings in basemapgen on GCC.
 	- sueastside fixed a crash in basemapgen caused by a copy/paste error.
