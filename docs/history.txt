@@ -7,6 +7,16 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 6-Mar-2007
+	- res changed csStringBase::Upcase() and Downcase() to not use
+	  toupper()/tolower() but csUnicodeTransform::MapToLower() and 
+	  MapToUpper(). An issue with the to*() functions is that they respect
+	  locale; this led to problems on systems that have a Turkish locale
+	  set - there, the lower case of I (U+0049) 'i dotless' (U+0131) which
+	  caused problems with XML parsing. Also, these strings now accept
+	  UTF-8 (like most of CS) instead of the system's codepage. On the
+	  downside, locale-aware casing is lost - however, support for this 
+	  can (and should) be added to the csUnicodeTransform Map*() functions
+	  once a need arises.
         - Piotr did cleaning in his last changes in csCal3dSkeletonBone.
 	- Jorrit made csImposterProcTex a bit more efficient by not storing
 	  pointers to engine, g3d, g2d, shader manager (they are easily
