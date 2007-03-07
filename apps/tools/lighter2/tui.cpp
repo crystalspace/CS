@@ -331,7 +331,9 @@ namespace lighter
       kdLastNumNodes = globalStats.kdtree.numNodes;
     }
 
-    if (lastTask != globalStats.progress.GetTaskName())
+    const char* lt = (const char*)lastTask;
+    const char* tn = globalStats.progress.GetTaskName ();
+    if ((lt == 0 && tn != 0) || (lt != 0 && lastTask != tn))
     {
       lastTask = globalStats.progress.GetTaskName();
 
