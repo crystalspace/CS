@@ -54,6 +54,8 @@ enum csBoneGeomType
 	CS_BGT_CYLINDER
 };
 
+class csReversibleTransform;
+
 /**
  * The skeleton bone class.
  */
