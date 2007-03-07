@@ -24,6 +24,7 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
 #include "csutil/dirtyaccessarray.h"
+#include "csutil/weakrefarr.h"
 #include "csutil/nobjvec.h"
 #include "csutil/refarr.h"
 #include "csutil/csstring.h"
@@ -120,6 +121,8 @@ private:
   float total_elapsed;
   csRefArrayObject<iODEFrameUpdateCallback> updates;
 
+  csWeakRefArray<iDynamicsStepCallback> step_callbacks;
+
   bool stepfast;
   int sfiter;
   bool quickstep;
@@ -142,6 +145,11 @@ public:
   virtual void RemoveSystems ();
 
   virtual void Step (float stepsize);
+
+  void AddStepCallback (iDynamicsStepCallback *callback)
+  {step_callbacks.Push (callback);}
+  void RemoveStepCallback (iDynamicsStepCallback *callback)
+  {step_callbacks.Delete (callback);}
 
   static void NearCallback (void *data, dGeomID o1, dGeomID o2);
   static int CollideMeshMesh (dGeomID mesh1, dGeomID mesh2, int flags,

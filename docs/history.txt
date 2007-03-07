@@ -11,6 +11,8 @@ chronological order.
 	  started as an empty null string and comparing that with GetTaskName()
 	  (which was recently changed to return a const char* instead of
 	  a csString) crashes inside strcmp.
+        - Piotr adds 'RemoveAllFrames' to 'iSkeletonScript'.
+        - Piotr adds iDynamics step callback.
 6-Mar-2007
 	- res changed csStringBase::Upcase() and Downcase() to not use
 	  toupper()/tolower() but csUnicodeTransform::MapToLower() and 

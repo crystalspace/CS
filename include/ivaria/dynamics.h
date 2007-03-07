@@ -45,6 +45,17 @@ struct iDynamicsCollisionCallback;
 struct iDynamicsMoveCallback;
 struct iDynamicSystem;
 
+
+/**
+ * This is the interface for a dynamics step callback.
+ */
+struct iDynamicsStepCallback : public virtual iBase
+{
+  SCF_INTERFACE (iDynamicsStepCallback, 0, 0, 1);
+
+  virtual void Step (float stepsize) = 0;
+};
+
 /**
  * This is the interface for the actual plugin.
  * It is responsible for creating iDynamicSystem.
@@ -75,6 +86,16 @@ struct iDynamics : public virtual iBase
 
   /// Step the simulation forward by stepsize.
   virtual void Step (float stepsize) = 0;
+
+  /**
+   * Add a callback to be executed dynamics is being stepped.
+   */
+  virtual void AddStepCallback (iDynamicsStepCallback *callback) = 0;
+
+  /**
+   * Remove dynamics step callback.
+   */
+  virtual void RemoveStepCallback (iDynamicsStepCallback *callback) = 0;
 };
 
 struct iDynamicsSystemCollider;

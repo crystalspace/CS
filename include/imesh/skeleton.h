@@ -316,6 +316,11 @@ struct iSkeletonAnimation : public virtual iBase
   virtual void RemoveFrame (size_t i) = 0;
 
   /**
+   * Remove all frames.
+   */
+  virtual void RemoveAllFrames () = 0;
+
+  /**
    * Recalculates spline for bones rotations.
    * Needs to be called every time when new 
    * frames are added or removed.

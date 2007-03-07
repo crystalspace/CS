@@ -467,7 +467,9 @@ public:
   virtual iSkeletonAnimationKeyFrame *GetFrame(size_t i)  { return key_frames[i]; }
   virtual size_t FindFrameIndex(const char * /*name*/)  { return 0; }
   virtual void RemoveFrame(size_t i) 
-    { key_frames.DeleteIndexFast(i); }
+  { key_frames.DeleteIndexFast(i); }
+  void RemoveAllFrames () 
+  { key_frames.DeleteAll (); }
   virtual void RecalcSpline();
 };
 
