@@ -95,7 +95,7 @@ namespace CS
       static const uint value = 0;
     };
   }
-};
+}
 
 #include "csutil/win32/msvc_deprecated_warn_on.h"
 
