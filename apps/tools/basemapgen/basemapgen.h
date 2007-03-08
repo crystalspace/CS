@@ -26,13 +26,11 @@ class BaseMapGen
 {
 private:
   iObjectRegistry* object_reg;
-  csRef<iEngine> engine;
   csRef<iLoader> loader;
   csRef<iGraphics3D> g3d;
   csRef<iKeyboardDriver> kbd;
   csRef<iVirtualClock> vc;
   csRef<iCommandLineParser> cmdline;
-  csConfigAccess config;
 
   // The worldfile
   csRef<iDocumentNode> rootnode;

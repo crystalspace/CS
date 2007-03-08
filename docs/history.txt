@@ -15,6 +15,11 @@ chronological order.
 	      first one rendered wrong.
 	    - Changed the imposter textures to use binary alpha so that
 	      they don't have to be sorted back to front.
+	- Sueastside worked on basemapgen: added the ability to specify 
+	  VFS mounts in a config file (VFS.Mount.[...] = [...]) and
+	  fixed a possible crash when a texture file couldn't be found.
+	  (Thank you vknecht!)
+
 7-Mar-2007
 	- Jorrit fixed a crash bug in lighter2. In the simple TUI lastTask
 	  started as an empty null string and comparing that with GetTaskName()

@@ -103,7 +103,12 @@ void BaseMapGen::OnCommandLineHelp()
 bool BaseMapGen::LoadMap ()
 {
   csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+  csRef<iConfigManager> cfgmgr = csQueryRegistry<iConfigManager> (object_reg);
 
+  csRef<iConfigFile> cfgfile = cfgmgr->GetDynamicDomain ();
+  csPrintf("Loading custom VFS mounts from:\n%s\n", cfgfile->GetFileName ());
+  vfs->LoadMountsFromFile(cfgfile);
+  
   csString path = cmdline->GetName(0);
   csString world = cmdline->GetName(1);
 
@@ -426,13 +431,19 @@ void BaseMapGen::CreateBasemap (int basemap_res,
           continue;
         }
 
+        if (!mat_layers[layer].image.IsValid())
+        {
+          bm_dst->Set (255, 0, 0);
+          continue;
+        }
+
         // Calculate the material/destination coordinates.
         coord_x    = x * inv_basemap_res;
         matcoord_x =  (int) (coord_x * mat_layers[layer].image->GetWidth());
         coord_y    = y * inv_basemap_res;
         matcoord_y =  (int) (coord_y * mat_layers[layer].image->GetHeight());
 
-        // Scale the texture corrdinates.
+        // Scale the texture coordinates.
         float factor = 1;
         matcoord_x *= (int) (mat_layers[layer].texture_scale.x * factor);
         matcoord_y *= (int) (mat_layers[layer].texture_scale.y * factor);
