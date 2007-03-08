@@ -45,7 +45,6 @@ void ImposterTest::ProcessFrame ()
   {
     // Reset.
     csVector3 orig = c->GetTransform().GetOrigin();
-    csVector3 look_point = sprite->GetMovable ()->GetTransform ().GetOrigin ();
     c->GetTransform ().SetOrigin (look_point
 	+ (orig - look_point).Unit () * distance);
     c->GetTransform ().LookAt (look_point-orig, csVector3(0,1,0) );
@@ -68,17 +67,17 @@ void ImposterTest::ProcessFrame ()
   {
     // Pan around the object.
     csVector3 orig = c->GetTransform().GetOrigin();
-    csVector3 look_point = c->GetTransform ().This2Other (
+    csVector3 new_look_point = c->GetTransform ().This2Other (
 	csVector3 (0, 0, distance));
     
     if (kbd->GetKeyState (CSKEY_LEFT))
-      orig = csYRotMatrix3(-speed) * (orig-look_point) + look_point;
+      orig = csYRotMatrix3(-speed) * (orig-new_look_point) + new_look_point;
     if (kbd->GetKeyState (CSKEY_RIGHT))
-      orig = csYRotMatrix3(speed) * (orig-look_point) + look_point;
+      orig = csYRotMatrix3(speed) * (orig-new_look_point) + new_look_point;
     if (kbd->GetKeyState (CSKEY_UP))
-      orig = csXRotMatrix3(speed) * (orig-look_point) + look_point;
+      orig = csXRotMatrix3(speed) * (orig-new_look_point) + new_look_point;
     if (kbd->GetKeyState (CSKEY_DOWN))
-      orig = csXRotMatrix3(-speed) * (orig-look_point) + look_point;
+      orig = csXRotMatrix3(-speed) * (orig-new_look_point) + new_look_point;
 
     c->GetTransform().SetOrigin(orig);
 
@@ -235,7 +234,6 @@ bool ImposterTest::SetupModules()
   iCamera* c = view->GetCamera ();
   c->SetSector (room);
   csVector3 orig = csVector3 (0, 0, 0);
-  csVector3 look_point = sprite->GetMovable ()->GetTransform ().GetOrigin ();
   c->GetTransform ().SetOrigin (look_point
 	+ (orig - look_point).Unit () * distance);
   c->GetTransform ().LookAt (look_point-orig, csVector3(0,1,0) );
@@ -279,6 +277,31 @@ void ImposterTest::CreateRoom ()
   ll->Add (light);
 }
 
+void ImposterTest::CreateSprite (iMeshFactoryWrapper* imeshfact,
+    const csVector3& pos)
+{
+  static int cnt = 0;
+  cnt++;
+  csString spname = "MySprite";
+  spname += cnt;
+  // Create the sprite and add it to the engine.
+  csRef<iMeshWrapper> sprite = engine->CreateMeshWrapper (
+    imeshfact, spname, room, pos);
+  csMatrix3 m; m.Identity ();
+  sprite->GetMovable ()->SetTransform (m);
+  sprite->GetMovable ()->UpdateMove ();
+  csRef<iSprite3DState> spstate (
+    scfQueryInterface<iSprite3DState> (sprite->GetMeshObject ()));
+  spstate->SetAction ("default");
+  //spstate->SetMixMode (CS_FX_SETALPHA (.5));
+
+  // The following two calls are not needed since CS_ZBUF_USE and
+  // Object render priority are the default but they show how you
+  // can do this.
+  sprite->SetZBufMode (CS_ZBUF_USE);
+  sprite->SetRenderPriority (engine->GetObjectRenderPriority ());
+}
+
 void ImposterTest::CreateSprites ()
 {
   // Load a texture for our sprite.
@@ -293,39 +316,27 @@ void ImposterTest::CreateSprites ()
   if (imeshfact == 0)
     ReportError("Error loading mesh object factory!");
 
-  // Create the sprite and add it to the engine.
-  sprite = engine->CreateMeshWrapper (
-    imeshfact, "MySprite", room,
-    csVector3 (1, 1, 1));
-  csMatrix3 m; m.Identity ();
-  sprite->GetMovable ()->SetTransform (m);
-  sprite->GetMovable ()->UpdateMove ();
-  csRef<iSprite3DState> spstate (
-    scfQueryInterface<iSprite3DState> (sprite->GetMeshObject ()));
-  spstate->SetAction ("default");
-  //spstate->SetMixMode (CS_FX_SETALPHA (.5));
-
-  // The following two calls are not needed since CS_ZBUF_USE and
-  // Object render priority are the default but they show how you
-  // can do this.
-  sprite->SetZBufMode (CS_ZBUF_USE);
-  sprite->SetRenderPriority (engine->GetObjectRenderPriority ());
-
-  csRef<iImposter> i = scfQueryInterface<iImposter> (imeshfact);
-  i->SetImposterActive(true);
-
   iSharedVariableList* varlist = engine->GetVariableList();
   csRef<iSharedVariable> distvar = varlist->New();
   distvar->Set(3.0f);
-  varlist->Add(distvar);
-  i->SetMinDistance(distvar);
-
   csRef<iSharedVariable> rotvar = varlist->New();
   rotvar->Set(0.40f);
-  i->SetRotationTolerance(rotvar);
   csRef<iSharedVariable> camrotvar = varlist->New();
   camrotvar->Set(0.2f);
+
+  csRef<iImposter> i = scfQueryInterface<iImposter> (imeshfact);
+  i->SetImposterActive(true);
+  i->SetMinDistance(distvar);
+  i->SetRotationTolerance(rotvar);
   i->SetCameraRotationTolerance(camrotvar);
+
+  look_point = csVector3 (1, 1, 1);
+
+  float x, y, z;
+  for (x = 0 ; x <= 1.1 ; x += .5)
+    for (y = 0 ; y <= 1.1 ; y += .5)
+      for (z = 0 ; z <= 1.1 ; z += .5)
+        CreateSprite (imeshfact, csVector3 (x, y, z));
 
   printf("done...\n");
 }

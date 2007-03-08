@@ -37,6 +37,16 @@ class csMeshWrapper;
 struct iRenderView;
 struct iCamera;
 
+/**
+ * Class representing the factory/imposter relation.
+ */
+class csImposterFactory
+{
+};
+
+/**
+ * Class representing the mesh/imposter relation.
+ */
 class csImposterMesh
 {
 private:
@@ -84,6 +94,8 @@ public:
 
   bool CheckUpdateNeeded (iRenderView *rview, float tolerance,
       	float camtolerance);
+
+  csMeshWrapper* GetParentMesh () const { return parent_mesh; }
 
   //returns the imposter billboard
   csRenderMesh** GetRenderMesh (iRenderView *rview);

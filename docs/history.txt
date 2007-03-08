@@ -6,6 +6,15 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Mar-2007
+	- Jorrit did the following imposter updates:
+	    - Changed imptest to show multiple meshes from the same factory.
+	    - Fixed a bug in the rendering in case of multiple imposters.
+	      The camera was not correctly restored (I thought this was
+	      not needed) with the result that all imposters except the
+	      first one rendered wrong.
+	    - Changed the imposter textures to use binary alpha so that
+	      they don't have to be sorted back to front.
 7-Mar-2007
 	- Jorrit fixed a crash bug in lighter2. In the simple TUI lastTask
 	  started as an empty null string and comparing that with GetTaskName()

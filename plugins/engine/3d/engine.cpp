@@ -515,7 +515,8 @@ void csEngine::HandleImposters ()
     iCamera* c = rview->GetCamera ();
     while (it.HasNext ())
     {
-      it.Next ()->RenderToTexture (rview, c->GetSector ());
+      csImposterProcTex* pt = it.Next ();
+      pt->RenderToTexture (rview, c->GetSector ());
     }
   }
 

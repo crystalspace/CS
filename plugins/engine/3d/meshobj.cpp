@@ -983,17 +983,6 @@ csRenderMesh** csMeshWrapper::GetImposter (iRenderView *rview)
   return imposter_mesh->GetRenderMesh (rview);
 }
 
-#if 0
-void csMeshWrapper::SetImposterActive (bool flag)
-{
-  imposter_active = flag;
-  if (flag)
-  {
-    imposter_mesh = new csImposterMesh (engine, this);
-  }
-}
-#endif
-
 csHitBeamResult csMeshWrapper::HitBeamOutline (
   const csVector3 &start,
   const csVector3 &end)

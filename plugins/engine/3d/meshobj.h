@@ -244,13 +244,6 @@ private:
   /// Z-buf mode to use for drawing this object.
   csZBufMode zbufMode;
 
-  /// Flag indicating whether this mesh should try to imposter or not.
-  //bool imposter_active;
-  ///// Imposter Threshold Range.
-  //csRef<iSharedVariable> min_imposter_distance;
-  ///// Imposter Redo Threshold angle change.
-  //csRef<iSharedVariable> imposter_rotation_tolerance;
-  //csRef<iSharedVariable> imposter_camera_rotation_tolerance;
   csImposterMesh *imposter_mesh;
 
   /**

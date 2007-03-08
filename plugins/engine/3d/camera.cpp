@@ -65,7 +65,7 @@ csCamera::csCamera (const csCamera &c) :
     // Make a copy of the plane.
     fp = new csPlane3 (*fp);
   }
-  
+ 
   cameranr = cur_cameranr++;
 }
 

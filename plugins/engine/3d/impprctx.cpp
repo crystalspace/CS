@@ -62,6 +62,7 @@ csImposterProcTex::csImposterProcTex  (csEngine* engine,
   tex = engine->GetTextureList ()->NewTexture (thisImage);
   tex->SetFlags (tex->GetFlags() | texFlags);
   tex->Register (engine->G3D->GetTextureManager());
+  tex->GetTextureHandle ()->SetAlphaType (csAlphaMode::alphaBinary);
   thisImage = 0;
 
   if (stringid_standard == csInvalidStringID)
@@ -121,6 +122,7 @@ void csImposterProcTex::RenderToTexture (iRenderView *rview, iSector *s)
 
   //update imposter billbord
   iCamera* cam = rview->GetCamera ();
+  csOrthoTransform old_cam_transform = cam->GetTransform ();
   mesh->FindImposterRectangle (cam);
 
   //save camerastate for later
@@ -222,6 +224,7 @@ void csImposterProcTex::RenderToTexture (iRenderView *rview, iSector *s)
   g3d->SetPerspectiveCenter (persx, persy);
   g3d->SetClipper (0, CS_CLIPPER_NONE);
   g3d->FinishDraw ();
+  cam->SetTransform (old_cam_transform);
 
   mesh->SetImposterReady (true, 0);
   updating = false;

@@ -39,11 +39,7 @@ csImposterMesh::csImposterMesh (csEngine* engine, csMeshWrapper *parent)
   tex = new csImposterProcTex (engine, this);
   impostermat = engine->CreateMaterial ("Imposter", tex->GetTexture ());
 
-  //@@@ Add four to initialise array because of bug in csPoly3D
-  cutout.AddVertex (csVector3 ());
-  cutout.AddVertex (csVector3 ());
-  cutout.AddVertex (csVector3 ());
-  cutout.AddVertex (csVector3 ());
+  cutout.SetVertexCount (4);
 
   SetImposterReady (false, 0);
   dirty = true;
@@ -117,7 +113,7 @@ void csImposterMesh::SetImposterReady (bool r, iRenderView* rview)
 
 bool csImposterMesh::GetImposterReady (iRenderView* rview)
 {
-  if (!ready) tex->Update (rview);
+  //if (!ready) tex->Update (rview);
   return tex->GetImposterReady();
 }
 

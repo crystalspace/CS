@@ -76,25 +76,21 @@ csRenderView::csRenderView (
 csRenderView::csRenderView (const csRenderView& other) :
   scfImplementationType (this)
 {
-  csRenderContext* other_ctxt = other.ctxt;
-
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));
 
-  csRef<iCamera> newcam;
-  newcam.AttachNew (other_ctxt->icamera->Clone ());
-  ctxt->icamera = newcam;
-  ctxt->iview = other_ctxt->iview;	// @@@ Is this right?
-  memcpy (ctxt->frustum, other_ctxt->frustum, sizeof (other_ctxt->frustum));
-  memcpy (ctxt->clip_planes, other_ctxt->clip_planes,
-      sizeof (other_ctxt->clip_planes));
-  ctxt->clip_planes_mask = other_ctxt->clip_planes_mask;
-  ctxt->last_portal = other_ctxt->last_portal;
-  ctxt->previous_sector = other_ctxt->previous_sector;
-  ctxt->this_sector = other_ctxt->this_sector;
-  ctxt->clip_plane = other_ctxt->clip_plane;
-  ctxt->do_clip_plane = other_ctxt->do_clip_plane;
-  ctxt->do_clip_frustum = other_ctxt->do_clip_frustum;
+  ctxt->icamera.AttachNew (other.ctxt->icamera->Clone ());
+  ctxt->iview = other.ctxt->iview;	// @@@ Is this right?
+  memcpy (ctxt->frustum, other.ctxt->frustum, sizeof (other.ctxt->frustum));
+  memcpy (ctxt->clip_planes, other.ctxt->clip_planes,
+      sizeof (other.ctxt->clip_planes));
+  ctxt->clip_planes_mask = other.ctxt->clip_planes_mask;
+  ctxt->last_portal = other.ctxt->last_portal;
+  ctxt->previous_sector = other.ctxt->previous_sector;
+  ctxt->this_sector = other.ctxt->this_sector;
+  ctxt->clip_plane = other.ctxt->clip_plane;
+  ctxt->do_clip_plane = other.ctxt->do_clip_plane;
+  ctxt->do_clip_frustum = other.ctxt->do_clip_frustum;
   // @@@ fog_info and added_fog_info?
 
   context_id = 0;

@@ -55,11 +55,9 @@ private:
   /// A pointer to the sector the camera will be in.
   iSector* room;
 
-  /// The sprite.
-  csRef<iMeshWrapper> sprite;
-
   /// Distance from sprite.
   float distance;
+  csVector3 look_point;
 
   /**
    * Handle keyboard events - ie key presses and releases.
@@ -86,6 +84,7 @@ private:
 
   /// Here we will create our sprites.
   void CreateSprites();
+  void CreateSprite (iMeshFactoryWrapper* imeshfact, const csVector3& pos);
 
   bool SetupModules ();
 
