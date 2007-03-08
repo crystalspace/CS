@@ -140,6 +140,8 @@ private:
     int numindices[16];
   };
   csRefArray<IndexBufferSet> indexBufferList;
+
+  friend struct csBruteBlockTerrainRenderData;
 };
 
 }

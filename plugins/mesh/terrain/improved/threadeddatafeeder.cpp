@@ -97,7 +97,7 @@ public:
   
     const unsigned char* imagedata = (const unsigned char*)map->GetImageData ();
 
-    float size_z = cell->GetSize ().z;
+    float size_y = cell->GetSize ().y;
 
     for (int y = 0; y < height; ++y)
     {
@@ -106,7 +106,7 @@ public:
         float xd = float(x - width/2) / width;
         float yd = float(y - height/2) / height;
 
-        *h_data++ = *imagedata++ / 255.0f * size_z;
+        *h_data++ = *imagedata++ / 255.0f * size_y;
       }
     }
   

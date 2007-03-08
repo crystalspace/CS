@@ -58,6 +58,7 @@ enum
   XMLTOKEN_MATERIALSIZE,
   XMLTOKEN_POSITION,
   XMLTOKEN_SIZE,
+  XMLTOKEN_BASEMATERIAL,
   XMLTOKEN_FEEDER,
   XMLTOKEN_PLUGIN,
   XMLTOKEN_PARAM,
@@ -106,6 +107,7 @@ bool csTerrainFactoryLoader::Initialize (iObjectRegistry* objreg)
   xmltokens.Register ("material_size", XMLTOKEN_MATERIALSIZE);
   xmltokens.Register ("position", XMLTOKEN_POSITION);
   xmltokens.Register ("size", XMLTOKEN_SIZE);
+  xmltokens.Register ("basematerial", XMLTOKEN_BASEMATERIAL);
   xmltokens.Register ("feeder", XMLTOKEN_FEEDER);
   xmltokens.Register ("plugin", XMLTOKEN_PLUGIN);
   xmltokens.Register ("param", XMLTOKEN_PARAM);
@@ -118,7 +120,7 @@ bool csTerrainFactoryLoader::Initialize (iObjectRegistry* objreg)
 }
 
 csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
-  iStreamSource*, iLoaderContext* /*ldr_context*/, iBase* /*context*/)
+  iStreamSource*, iLoaderContext* ldr_context, iBase* /*context*/)
 {
   csRef<iPluginManager> plugin_mgr = csQueryRegistry<iPluginManager> (
     object_reg);
@@ -202,6 +204,8 @@ csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
               csVector3 size;
               csRef<iTerrainDataFeeder> feeder;
 
+              csRef<iMaterialWrapper> basematerial;
+
               render_properties.SetSize (0);
               collision_properties.SetSize (0);
               
@@ -241,10 +245,23 @@ csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
                     break;
                   }
                   case XMLTOKEN_SIZE:
-                  {
+                  {                    
                     size.x = child->GetAttributeValueAsFloat ("x");
                     size.y = child->GetAttributeValueAsFloat ("y");
                     size.z = child->GetAttributeValueAsFloat ("z");
+                    break;
+                  }
+                  case XMLTOKEN_BASEMATERIAL:
+                  {
+                    const char* matname = child->GetContentsValue ();
+                    basematerial = ldr_context->FindMaterial (matname);
+                    if (!basematerial)
+                    {
+                      synldr->ReportError (
+                        "crystalspace.terrain.object.loader.basematerial",
+                        child, "Couldn't find material '%s'!", matname);
+                      return 0;
+                    }
                     break;
                   }
                   case XMLTOKEN_FEEDER:
@@ -378,6 +395,8 @@ csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
                   collision_p->SetParam (collision_properties[i].name,
                                          collision_properties[i].value);
 
+              cell->SetBaseMaterial (basematerial);
+
               break;
             }
             default:
@@ -449,7 +468,7 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
           return 0;
         }
         mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-        terrain = SCF_QUERY_INTERFACE (mesh, iTerrainSystem);
+        terrain = scfQueryInterface<iTerrainSystem> (mesh);
             
         if (!terrain)
         {

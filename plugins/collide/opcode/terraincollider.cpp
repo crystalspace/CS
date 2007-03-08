@@ -136,7 +136,7 @@ bool csTerrainCollider::CollideTriangles (iTerrainCell* cell,
   const csVector3& size = cell->GetSize ();
 
   float scale_u = size.x / (width - 1);
-  float scale_v = size.y / (height - 1);
+  float scale_v = size.z / (height - 1);
 
   for (unsigned int i = 0; i < tri_count; ++i)
   {
@@ -294,7 +294,7 @@ public:
     float offset_y = cell->GetPosition ().y;
 
     float scale_x = cell->GetSize ().x / (width - 1);
-    float scale_y = cell->GetSize ().y / (height - 1);
+    float scale_z = cell->GetSize ().z / (height - 1);
 
     for (unsigned int y = 0 ; y < height ; y++)
     {
@@ -304,7 +304,7 @@ public:
         
         vertices[index].Set (x * scale_x + offset_x,
                              cell->GetHeight(x, y),
-                             y * scale_y + offset_y);
+                             y * scale_z + offset_y);
       }
     }
   

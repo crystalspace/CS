@@ -31,6 +31,7 @@ struct iImage;
 
 struct iCollider;
 struct iTerrainSystem;
+struct iMaterialWrapper;
 
 class csVector2;
 class csVector3;
@@ -111,7 +112,7 @@ struct iTerrainCell : public virtual iBase
    * preloading, you'll have to finish it (SetLoadState (Loaded)) and then
    * unload the cell (SetLoadState (NotLoaded)).)
    *
-   * \param state - cell's new loading state
+   * \param state cell's new loading state
    */
   virtual void SetLoadState (LoadState state) = 0;
 
@@ -192,7 +193,7 @@ struct iTerrainCell : public virtual iBase
    * Only one area may be locked at a time, locking more than once results in
    * undefined behaviour.
    *
-   * \param rectangle - the rectangle which you want to lock.
+   * \param rectangle the rectangle which you want to lock.
    *
    * \return cell height data
    */
@@ -249,7 +250,7 @@ struct iTerrainCell : public virtual iBase
   /**
    * Lock an area of material map (practically write-only, reading the
    * values will not produce sensible values if you did not just write
-   * them - that is, the returned block memory is a read-write one, but
+   * them that is, the returned block memory is a read-write one, but
    * it is a temporary block of memory filled with garbage).
    * Note, that if you created cell with 'material_persistent' flag, the
    * lock is read/write.
@@ -260,7 +261,7 @@ struct iTerrainCell : public virtual iBase
    * Only one area may be locked at a time, locking more than once results in
    * undefined behaviour.
    *
-   * \param rectangle - the rectangle which you want to lock.
+   * \param rectangle the rectangle which you want to lock.
    *
    * \return cell material data
    */
@@ -282,8 +283,8 @@ struct iTerrainCell : public virtual iBase
    * This function will do image rescaling if needed (i.e. if material map
    * dimensions and image dimensions do not match).
    *
-   * \param material - material index
-   * \param image - an image of format CS_IMGFMT_PALETTED8
+   * \param material material index
+   * \param image an image of format CS_IMGFMT_PALETTED8
    */
   virtual void SetMaterialMask (unsigned int material, iImage* image) = 0;
   
@@ -293,23 +294,35 @@ struct iTerrainCell : public virtual iBase
    * This function will do image rescaling if needed (i.e. if material map
    * dimensions and image dimensions do not match).
    *
-   * \param material - material index
-   * \param data - linearized array with material indices
-   * \param width - image width
-   * \param height - image height
+   * \param material material index
+   * \param data linearized array with material indices
+   * \param width image width
+   * \param height image height
    */
   virtual void SetMaterialMask (unsigned int material, const unsigned char*
                           data, unsigned int width, unsigned int height) = 0;
   
   /**
+   * Set base material for the cell.
+   *
+   * \param material material handle of base material
+   */
+  virtual void SetBaseMaterial (iMaterialWrapper* material) = 0;
+
+  /**
+   * Get base material for the cell
+   */
+  virtual iMaterialWrapper* GetBaseMaterial () const = 0;
+
+  /**
    * Collide segment with cell (using the collider)
    *
-   * \param start - segment start (specified in object space)
-   * \param end - segment end (specified in object space)
-   * \param oneHit - if this is true, than stop on finding the first
+   * \param start segment start (specified in object space)
+   * \param end segment end (specified in object space)
+   * \param oneHit if this is true, than stop on finding the first
    * intersection point (the closest to the segment start); otherwise, detect
    * all intersections
-   * \param points - destination point array
+   * \param points destination point array
    * 
    * \return true if there were any intersections, false if there were none
    */
@@ -319,16 +332,16 @@ struct iTerrainCell : public virtual iBase
   /**
    * Collide set of triangles with cell (using the collider)
    *
-   * \param vertices - vertex array
-   * \param tri_count - triangle count
-   * \param indices - vertex indices, 3 indices for each triangle
-   * \param radius - radius of the bounding sphere surrounding the given set
+   * \param vertices vertex array
+   * \param tri_count triangle count
+   * \param indices vertex indices, 3 indices for each triangle
+   * \param radius radius of the bounding sphere surrounding the given set
    * of triangles (used for fast rejection)
-   * \param trans - triangle set transformation (vertices' coordinates are
+   * \param trans triangle set transformation (vertices' coordinates are
    * specified in the space defined by this transformation)
-   * \param oneHit - if this is true, than stop on finding the first
+   * \param oneHit if this is true, than stop on finding the first
    * collision pair; otherwise, detect all collisions
-   * \param points - destination collision pair array
+   * \param points destination collision pair array
    * 
    * \return true if there were any collisions, false if there were none
    */
@@ -341,14 +354,14 @@ struct iTerrainCell : public virtual iBase
   /**
    * Collide collider with cell (using the collider)
    *
-   * \param collider - collider
-   * \param radius - radius of the bounding sphere surrounding the given set
+   * \param collider collider
+   * \param radius radius of the bounding sphere surrounding the given set
    * of triangles (used for fast rejection)
-   * \param trans - triangle set transformation (vertices' coordinates are
+   * \param trans triangle set transformation (vertices' coordinates are
    * specified in the space defined by this transformation)
-   * \param oneHit - if this is true, than stop on finding the first
+   * \param oneHit if this is true, than stop on finding the first
    * collision pair; otherwise, detect all collisions
-   * \param points - destination collision pair array
+   * \param points destination collision pair array
    * 
    * \return true if there were any collisions, false if there were none
    */
@@ -360,8 +373,8 @@ struct iTerrainCell : public virtual iBase
    * Query height, that is, do a lookup on height table. For a set of
    * lookups, use GetHeightData for efficiency reasons.
    *
-   * \param x - x coordinate (from 0 to grid width - 1 all inclusive)
-   * \param y - y coordinate (from 0 to grid height - 1 all inclusive)
+   * \param x x coordinate (from 0 to grid width 1 all inclusive)
+   * \param y y coordinate (from 0 to grid height 1 all inclusive)
    *
    * \return height value
    */
@@ -371,7 +384,7 @@ struct iTerrainCell : public virtual iBase
    * Query height doing bilinear interpolation. This is equivalent to doing
    * an intersection with vertical ray, except that it is faster.
    *
-   * \param pos - object-space position.
+   * \param pos object-space position.
    *
    * \return height value
    */
@@ -380,8 +393,8 @@ struct iTerrainCell : public virtual iBase
   /**
    * Get tangent value.
    *
-   * \param x - x coordinate (from 0 to grid width - 1 all inclusive)
-   * \param y - y coordinate (from 0 to grid height - 1 all inclusive)
+   * \param x x coordinate (from 0 to grid width 1 all inclusive)
+   * \param y y coordinate (from 0 to grid height 1 all inclusive)
    *
    * \return tangent value
    */
@@ -390,7 +403,7 @@ struct iTerrainCell : public virtual iBase
   /**
    * Get tangent with bilinear interpolation.
    *
-   * \param pos - object-space position.
+   * \param pos object-space position.
    *
    * \return tangent value
    */
@@ -399,8 +412,8 @@ struct iTerrainCell : public virtual iBase
   /**
    * Get binormal value.
    *
-   * \param x - x coordinate (from 0 to grid width - 1 all inclusive)
-   * \param y - y coordinate (from 0 to grid height - 1 all inclusive)
+   * \param x x coordinate (from 0 to grid width 1 all inclusive)
+   * \param y y coordinate (from 0 to grid height 1 all inclusive)
    *
    * \return binormal value
    */
@@ -409,7 +422,7 @@ struct iTerrainCell : public virtual iBase
   /**
    * Get binormal with bilinear interpolation.
    *
-   * \param pos - object-space position.
+   * \param pos object-space position.
    *
    * \return binormal value
    */
@@ -418,8 +431,8 @@ struct iTerrainCell : public virtual iBase
   /**
    * Get normal value.
    *
-   * \param x - x coordinate (from 0 to grid width - 1 all inclusive)
-   * \param y - y coordinate (from 0 to grid height - 1 all inclusive)
+   * \param x x coordinate (from 0 to grid width 1 all inclusive)
+   * \param y y coordinate (from 0 to grid height 1 all inclusive)
    *
    * \return normal value
    */
@@ -428,7 +441,7 @@ struct iTerrainCell : public virtual iBase
   /**
    * Get normal with bilinear interpolation.
    *
-   * \param pos - object-space position.
+   * \param pos object-space position.
    *
    * \return normal value
    */

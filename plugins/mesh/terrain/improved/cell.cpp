@@ -26,6 +26,8 @@
 #include "csgfx/imagemanipulate.h"
 #include "csgfx/imagememory.h"
 
+#include "iengine/material.h"
+
 #include "iterrain/terraincollider.h"
 #include "iterrain/terrainrenderer.h"
 #include "iterrain/terrainsystem.h"
@@ -59,7 +61,7 @@ csTerrainCell::csTerrainCell (iTerrainSystem* parent, const char* name,
   this->grid_height = temp + 1;
   
   step_x = size.x / (grid_width - 1);
-  step_z = size.y / (grid_height - 1);
+  step_z = size.z / (grid_height - 1);
 }
 
 csTerrainCell::~csTerrainCell ()
@@ -171,7 +173,7 @@ csBox3 csTerrainCell::GetBBox () const
 {
   csBox3 box;
   box.Set (position.x, 0, position.y,
-  position.x + size.x, size.z, position.y + size.y);
+  position.x + size.x, size.y, position.y + size.z);
 
   return box;
 }
@@ -369,6 +371,18 @@ const unsigned char* data, unsigned int width, unsigned int height)
   SetMaterialMask (material, &image);
 }
 
+void csTerrainCell::SetBaseMaterial (iMaterialWrapper* material)
+{
+  Touch ();
+
+  baseMaterial = material;
+}
+
+iMaterialWrapper* csTerrainCell::GetBaseMaterial () const
+{
+  return baseMaterial;
+}
+
 bool csTerrainCell::CollideSegment (const csVector3& start, const csVector3&
 end, bool oneHit, iTerrainVector3Array& points)
 {
@@ -413,7 +427,7 @@ void csTerrainCell::LerpHelper (const csVector2& pos, int& x1, int& x2,
   float& xfrac, int& y1, int& y2, float& yfrac) const
 {
   float x = (pos.x / size.x) * (grid_width - 1);
-  float y = (pos.y / size.y) * (grid_height - 1);
+  float y = (pos.y / size.z) * (grid_height - 1);
 
   if (x < 0) x = 0;
   if (y < 0) y = 0;

@@ -133,13 +133,12 @@ struct csBruteBlockTerrainRenderData: public csRefCount
 
   csArray<csRef<iTextureHandle> > alpha_map;
 
-  csRef<csShaderVariableContext> light_context;
-  csRef<iTextureHandle> light_map;
+  csRef<csShaderVariableContext> baseContext;
 
   unsigned int primitive_count;
 
   int block_res_log2;
-  float lod_lcoeff;
+  float lod_lcoeff, lod_distance;
 
 
   csReversibleTransform tr_o2c;
@@ -152,11 +151,22 @@ struct csBruteBlockTerrainRenderData: public csRefCount
   csBruteBlockTerrainRenderData(iTerrainCell* cell, csTerrainBruteBlockRenderer* renderer)
     : cell (cell), renderer (renderer), initialized (false)
   {
-    block_res_log2 = csLog2 (((csTerrainBruteBlockCellRenderProperties*)
-      cell->GetRenderProperties ())->GetBlockResolution ());
+    csTerrainBruteBlockCellRenderProperties* prop = (csTerrainBruteBlockCellRenderProperties*)
+      cell->GetRenderProperties ();
 
-    lod_lcoeff = ((csTerrainBruteBlockCellRenderProperties*)
-      cell->GetRenderProperties ())->GetLODLCoeff ();
+    block_res_log2 = csLog2 (prop->GetBlockResolution ());
+
+    lod_lcoeff = prop->GetLODLCoeff ();
+
+    lod_distance = 200;
+
+    baseContext.AttachNew (new csShaderVariableContext);
+
+    csRef<csShaderVariable> lod_var = 
+      new csShaderVariable (renderer->strings->Request ("texture lod distance"));
+    lod_var->SetType (csShaderVariable::VECTOR3);
+    lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
+    baseContext->AddVariable (lod_var);
   }
 
   void SetupObject()
@@ -167,9 +177,9 @@ struct csBruteBlockTerrainRenderData: public csRefCount
 
       rootblock.AttachNew (new csTerrBlock (this));
       csVector2 center = cell->GetPosition () + csVector2 (cell->GetSize ().x,
-        cell->GetSize ().y)/2;
+        cell->GetSize ().z)/2;
       rootblock->center = center;
-      rootblock->size = csVector2(cell->GetSize ().x, cell->GetSize ().y);
+      rootblock->size = csVector2(cell->GetSize ().x, cell->GetSize ().z);
 
       rootblock->left = rootblock->top = 0;
       rootblock->right = cell->GetGridWidth () - 1;
@@ -328,8 +338,8 @@ void csTerrBlock::LoadData ()
     float min_u = (center.x - size.x/2 - pos.x) / cell_size.x;
     float max_u = (center.x + size.x/2 - pos.x) / cell_size.x;
 
-    float min_v = (center.y - size.y/2 - pos.y) / cell_size.y;
-    float max_v = (center.y + size.y/2 - pos.y) / cell_size.y;
+    float min_v = (center.y - size.y/2 - pos.y) / cell_size.z;
+    float max_v = (center.y + size.y/2 - pos.y) / cell_size.z;
 
     float u_offset = (max_u - min_u) / (float)(res - 1);
     float v_offset = (max_v - min_v) / (float)(res - 1);
@@ -624,9 +634,26 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
   const csVector3& wo = o2wt.GetOrigin ();
   bool isMirrored = rview->GetCamera()->IsMirrored();
 
-  for (unsigned int j = 0; j < rdata->material_palette->GetSize (); ++j)
+  for (int j = -1; j < (int)rdata->material_palette->GetSize (); ++j)
   {
     bool created;
+
+    iMaterialWrapper* mat = 0;
+    iShaderVariableContext* svContext;
+
+    if (j < 0)
+    {
+      mat = rdata->cell->GetBaseMaterial ();
+      svContext = rdata->baseContext;
+    }
+    else
+    {
+      mat = rdata->material_palette->Get (j);
+      svContext = rdata->sv_context[j];
+    }
+
+    if (!mat)
+      continue;
 
     csRenderMesh*& mesh = rdata->rm_holder->GetUnusedMesh (created,
       rview->GetCurrentFrameNumber ());
@@ -640,9 +667,8 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
     mesh->clip_z_plane = clip_z_plane;
     mesh->indexstart = 0;
     mesh->indexend = numIndices;
-    mesh->material = rdata->material_palette->Get (j);
-    mesh->variablecontext = j < rdata->material_palette->GetSize () - 1 ?
-      rdata->sv_context[j] : rdata->light_context;
+    mesh->material = mat;
+    mesh->variablecontext = svContext;
 
     mesh->object2world = o2wt;
     mesh->worldspace_origin = wo;
@@ -767,6 +793,13 @@ void csTerrainBruteBlockRenderer::OnMaterialMaskUpdate (iTerrainCell* cell,
   if (!rdata->sv_context[material])
   {
     rdata->sv_context[material].AttachNew (new csShaderVariableContext);
+
+    float lod_distance = rdata->lod_distance;
+    csRef<csShaderVariable> lod_var = 
+      new csShaderVariable (strings->Request ("texture lod distance"));
+    lod_var->SetType (csShaderVariable::VECTOR3);
+    lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
+    rdata->sv_context[material]->AddVariable (lod_var);
   }
 
   if (rdata->alpha_map.GetSize () <= material)
@@ -815,7 +848,7 @@ void csTerrainBruteBlockRenderer::OnColorUpdate (iTerrainCell* cell, const
 {
   if (!data)
     return;
-
+/*
   csRef<csBruteBlockTerrainRenderData> rdata = SetupCellRenderData (cell);    
 
   if (!rdata->light_map)
@@ -851,7 +884,7 @@ void csTerrainBruteBlockRenderer::OnColorUpdate (iTerrainCell* cell, const
   }
 
   rdata->light_map->Blit (0, 0, res, res, (unsigned char*)
-    image_data.GetArray (), iTextureHandle::RGBA8888);
+    image_data.GetArray (), iTextureHandle::RGBA8888);*/
 }
 
 bool csTerrainBruteBlockRenderer::Initialize (iObjectRegistry* object_reg)

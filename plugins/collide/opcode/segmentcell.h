@@ -65,7 +65,7 @@ public:
     height = cell->GetGridHeight ();
     
     scale_u = size.x / (width - 1);
-    scale_v = size.y / (height - 1);
+    scale_v = size.z / (height - 1);
     
     // U, V and height of segment start in cell space
     u0 = (start.x - pos.x) / scale_u;

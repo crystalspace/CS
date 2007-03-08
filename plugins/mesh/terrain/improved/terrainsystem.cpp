@@ -135,7 +135,7 @@ iTerrainCell* csTerrainSystem::GetCellNL (const csVector2& pos)
     if (cell_pos.x <= pos.x + EPSILON &&
         cell_pos.x + cell_size.x >= pos.x - EPSILON &&
         cell_pos.y <= pos.y + EPSILON &&
-        cell_pos.y + cell_size.y >= pos.y - EPSILON)
+        cell_pos.y + cell_size.z >= pos.y - EPSILON)
     {
       return cells[i];
     }

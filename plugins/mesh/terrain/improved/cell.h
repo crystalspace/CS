@@ -60,6 +60,7 @@ private:
   csRef<iTerrainDataFeeder> feeder;
   csRef<iTerrainCellRenderProperties> render_properties;
   csRef<iTerrainCellCollisionProperties> collision_properties;
+  csRef<iMaterialWrapper> baseMaterial;
   
   csDirtyAccessArray<unsigned char> materialmap;
   csDirtyAccessArray<float> heightmap;
@@ -138,6 +139,9 @@ public:
   virtual void SetMaterialMask (unsigned int material, iImage* image);
   virtual void SetMaterialMask (unsigned int material, const unsigned char*
                              data, unsigned int width, unsigned int height);
+
+  virtual void SetBaseMaterial (iMaterialWrapper* material);
+  virtual iMaterialWrapper* GetBaseMaterial () const;
 
   virtual bool CollideSegment (const csVector3& start, const csVector3& end,
                            bool oneHit, iTerrainVector3Array& points);

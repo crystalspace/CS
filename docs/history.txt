@@ -13,6 +13,9 @@ chronological order.
 	  of new terrain.
 	- Marten added support for large blocks (32-bit indices) in bruteblock 
 	  renderer of new terrain.
+	- Marten added support for per cell base material. Changed the terraini
+	  level to mimic terrainf level.
+	- Marten did a small fix for coordinate systems in improved terrain.
 2-Mar-2007
 	- Marten made a number of fixes to improved terrain:
 	    - Changed the cell lru to be a bit more efficient.

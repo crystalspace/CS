@@ -88,7 +88,7 @@ bool csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
       float xd = float(x - width/2) / width;
       float yd = float(y - height/2) / height;
 
-      *dest_data++ = *imagedata++ / 255.0f * cell->GetSize().z;
+      *dest_data++ = *imagedata++ / 255.0f * cell->GetSize().y;
     }
     
     data.data += data.pitch;
