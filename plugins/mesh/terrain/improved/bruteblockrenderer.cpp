@@ -70,6 +70,8 @@ struct csTerrBlock : public csRefCount
   bool IsLeaf ()  const
   { return children[0] == 0; }
 
+  void ReplaceChildNeighbours (csTerrBlock *a, csTerrBlock *b);
+
   void DrawTest (iGraphics3D* g3d, iRenderView *rview, uint32 frustum_mask,
     csReversibleTransform &transform, iMovable *movable,
     csDirtyAccessArray<csRenderMesh*>& meshes);
@@ -214,40 +216,33 @@ void csTerrBlock::Detach ()
     children[1]->Detach ();
     children[2]->Detach ();
     children[3]->Detach ();
-    children[0] = children[1] = children[2] = children[3] = 0;
+    children[0] = 0;
+    children[1] = 0;
+    children[2] = 0;
+    children[3] = 0;
   }
 
-  if (parent)
-  {
-    if (neighbours[0])
-    {
-      if (child == 0 || child == 1)
-      {
-        neighbours[0]->neighbours[3] = parent;
-      }
-    }
-    if (neighbours[1])
-    {
-      if (child == 1 || child == 3)
-      {
-        neighbours[1]->neighbours[2] = parent;
-      }
-    }
-    if (neighbours[2])
-    {
-      if (child == 0 || child == 2)
-      {
-        neighbours[2]->neighbours[1] = parent;
-      }
-    }
-    if (neighbours[3])
-    {
-      if (child == 2 || child == 3)
-      {
-        neighbours[3]->neighbours[0] = parent;
-      }
-    }
-  }
+  if (neighbours[0] && ((child==0 || child==1) || !parent))
+    neighbours[0]->ReplaceChildNeighbours(this, parent);
+
+  if (neighbours[1] && ((child==1 || child==3) || !parent))
+    neighbours[1]->ReplaceChildNeighbours(this, parent);
+
+  if (neighbours[2] && ((child==0 || child==2) || !parent))
+    neighbours[2]->ReplaceChildNeighbours(this, parent);
+
+  if (neighbours[3] && ((child==2 || child==3) || !parent))
+    neighbours[3]->ReplaceChildNeighbours(this, parent);
+}
+
+void csTerrBlock::ReplaceChildNeighbours(csTerrBlock *a, csTerrBlock *b)
+{
+  for(int i = 0; i < 4; ++i)
+    if(neighbours[i] && neighbours[i]==a) neighbours[i]=b;
+
+  if(!IsLeaf())
+    for(int i = 0; i < 4; ++i)
+      children[i]->ReplaceChildNeighbours(a,b);
 }
 
 void csTerrBlock::LoadData ()
@@ -510,6 +505,11 @@ void csTerrBlock::Merge ()
 {
   if (IsLeaf ())
     return;
+
+  if(!children[0]->IsLeaf() || !children[1]->IsLeaf()
+    || !children[2]->IsLeaf() || !children[3]->IsLeaf())
+    return;
+  
   if (neighbours[0] && 
       (!neighbours[0]->IsLeaf () && 
        (!neighbours[0]->children[2]->IsLeaf () ||
@@ -606,8 +606,12 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
   csVector3 cam = transform.GetOrigin ();
 
   // left & top sides are covered with additional triangles
-  int idx = ((!neighbours[0] || neighbours[0]->step>step)?1:0)+
+  /*int idx = ((!neighbours[0] || neighbours[0]->step>step)?1:0)+
     (((!neighbours[1] || neighbours[1]->step>step)?1:0)<<1)+
+    (((neighbours[2] && neighbours[2]->step>step)?1:0)<<2)+
+    (((neighbours[3] && neighbours[3]->step>step)?1:0)<<3);*/
+  int idx = ((neighbours[0] && neighbours[0]->step>step)?1:0)+
+    (((neighbours[1] && neighbours[1]->step>step)?1:0)<<1)+
     (((neighbours[2] && neighbours[2]->step>step)?1:0)<<2)+
     (((neighbours[3] && neighbours[3]->step>step)?1:0)<<3);
 
@@ -627,7 +631,7 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
     csRenderMesh*& mesh = rdata->rm_holder->GetUnusedMesh (created,
       rview->GetCurrentFrameNumber ());
 
-    mesh->meshtype = CS_MESHTYPE_TRIANGLES;
+    mesh->meshtype = CS_MESHTYPE_TRIANGLESTRIP;
 
     mesh->buffers = 0;
     mesh->buffers = bufferHolder;
@@ -878,36 +882,87 @@ csTerrainBruteBlockRenderer::SetupCellRenderData (iTerrainCell* cell)
   return rdata;
 }
 
-
-static void FillEdge (bool halfres, int res, uint16* indices, int &indexcount,
-                      int offs, int add)
+template<typename T>
+static void FillEdge (bool halfres, int res, T* indices, int &indexcount,
+                      int offs, int xadd, int zadd)
 {
-  if (!halfres) return;
-
   int x;
   // This triangulation scheme could probably be better.
   for (x=0; x<res; x+=2)
   {
-    // 
-    // a - c - e - g - i
-    //   b   d   f   h
-    // ok, having 2 triangles for each crease is not cool
-    // though without that I doubt that it's possible to
-    // make correct orientation. Is it?
-    indices[indexcount++] = offs + x * add;
-    indices[indexcount++] = offs + (x+1) * add;
-    indices[indexcount++] = offs + (x+2) * add;
-    indices[indexcount++] = offs + x * add;
-    indices[indexcount++] = offs + (x+2) * add;
-    indices[indexcount++] = offs + (x+1) * add;
+    if (x>0)
+    {
+      indices[indexcount++] = offs+x*xadd+zadd;
+      indices[indexcount++] = offs+x*xadd;
+    }
+    else
+    {
+      indices[indexcount++] = offs+x*xadd;
+      indices[indexcount++] = offs+x*xadd;
+      indices[indexcount++] = offs+x*xadd;
+    }
+
+    indices[indexcount++] = offs+(x+1)*xadd+zadd;
+    if (!halfres)
+      indices[indexcount++] = offs+(x+1)*xadd;
+    else
+      indices[indexcount++] = offs+x*xadd;
+
+    if (x<res-2)
+    {
+      indices[indexcount++] = offs+(x+2)*xadd+zadd;
+      indices[indexcount++] = offs+(x+2)*xadd;
+    }
+    else
+    {
+      indices[indexcount++] = offs+(x+2)*xadd;
+      indices[indexcount++] = offs+(x+2)*xadd;
+      indices[indexcount++] = offs+(x+2)*xadd;
+    }
   }
+}
+
+template<typename T>
+static void FillBlock (T* indices, int &indexcount, int block_res, int t, int r, int l, int b)
+{
+  indexcount = 0;
+  int x, z;
+  for (z=1; z<(block_res-1); z++)
+  {
+    indices[indexcount++] = 1+z*(block_res+1);
+    indices[indexcount++] = 1+z*(block_res+1);
+    for (x=1; x<(block_res); x++)
+    { 
+      indices[indexcount++] = x+(z+0)*(block_res+1);
+      indices[indexcount++] = x+(z+1)*(block_res+1);
+    }
+    indices[indexcount++] = x-1+(z+1)*(block_res+1);
+    indices[indexcount++] = x-1+(z+1)*(block_res+1);
+  }
+
+  FillEdge (t==1,
+    block_res, indices, indexcount, 
+    0, 1, (block_res+1));
+
+  FillEdge (r==1,
+    block_res, indices, indexcount,
+    block_res, (block_res+1), -1);
+
+  FillEdge (l==1,
+    block_res, indices, indexcount, 
+    block_res*(block_res+1), -(block_res+1), 1);
+
+  FillEdge (b==1, 
+    block_res, indices, indexcount,
+    block_res*(block_res+1)+block_res, -1, -(block_res+1));
+
 }
 
 iRenderBuffer* csTerrainBruteBlockRenderer::GetIndexBuffer (int block_res_log2, int index, int& numIndices)
 {
   csRef<IndexBufferSet> set;
 
-  if (block_res_log2 > indexBufferList.GetSize () ||
+  if (block_res_log2 >= indexBufferList.GetSize () ||
     indexBufferList[block_res_log2] == 0)
   {
     // Add a new one
@@ -918,6 +973,9 @@ iRenderBuffer* csTerrainBruteBlockRenderer::GetIndexBuffer (int block_res_log2, 
     int block_res = 1 << block_res_log2;
 
     int* numindices = set->numindices;
+
+    int maxIndex = (block_res+1) * (block_res+1) - 1;
+
     // Reset
     for (int t=0; t<=1; t++)
     {
@@ -928,47 +986,37 @@ iRenderBuffer* csTerrainBruteBlockRenderer::GetIndexBuffer (int block_res_log2, 
           for (int b=0; b<=1; b++)
           {
             int idx = t+(r<<1)+(l<<2)+(b<<3);
-            set->mesh_indices[idx] = 
-              csRenderBuffer::CreateIndexRenderBuffer (
-              (block_res*block_res*2 + 4*block_res)*3, 
-              CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_SHORT,
-              0, (block_res+1) * (block_res+1) - 1);
-            uint16 *indices = 
-              (uint16*)set->mesh_indices[idx]->Lock (CS_BUF_LOCK_NORMAL);
 
-            numindices[idx] = 0;
-            int x, z;
-            for (z=0; z<block_res; z++)
+            if (maxIndex > 0xFFFF)
             {
-              for (x=0; x<block_res; x++)
-              { 
-                indices[numindices[idx]++] = x+(z+0)*(block_res+1);
-                indices[numindices[idx]++] = x+(z+1)*(block_res+1);
-                indices[numindices[idx]++] = x+1+(z+0)*(block_res+1);
+              set->mesh_indices[idx] = 
+                csRenderBuffer::CreateIndexRenderBuffer (
+                block_res*block_res*2*3, 
+                CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT,
+                0, maxIndex);
 
-                indices[numindices[idx]++] = x+1+(z+0)*(block_res+1);
-                indices[numindices[idx]++] = x+(z+1)*(block_res+1);
-                indices[numindices[idx]++] = x+1+(z+1)*(block_res+1);
-              }
+              uint32 *indices = 
+                (uint32*)set->mesh_indices[idx]->Lock (CS_BUF_LOCK_NORMAL);
+
+              FillBlock (indices, numindices[idx], block_res, t, r, l ,b);
+
+              set->mesh_indices[idx]->Release ();
             }
+            else
+            {
+              set->mesh_indices[idx] = 
+                csRenderBuffer::CreateIndexRenderBuffer (
+                block_res*block_res*2*3, 
+                CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_SHORT,
+                0, maxIndex);
 
-            FillEdge (t==1,
-              block_res, indices, numindices[idx], 
-              0, 1);
+              uint16 *indices = 
+                (uint16*)set->mesh_indices[idx]->Lock (CS_BUF_LOCK_NORMAL);
 
-            FillEdge (r==1,
-              block_res, indices, numindices[idx],
-              block_res, block_res + 1);
-
-            FillEdge (l==1,
-              block_res, indices, numindices[idx], 
-              0, block_res + 1);
-
-            FillEdge (b==1, 
-              block_res, indices, numindices[idx],
-              block_res*(block_res+1), 1);
-
-            set->mesh_indices[idx]->Release ();
+              FillBlock (indices, numindices[idx], block_res, t, r, l , b);
+              
+              set->mesh_indices[idx]->Release ();
+            }
           }
         }
       }
