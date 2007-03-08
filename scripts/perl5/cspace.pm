@@ -8218,6 +8218,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetFrame = *cspacec::iSkeletonAnimation_GetFrame;
 *FindFrameIndex = *cspacec::iSkeletonAnimation_FindFrameIndex;
 *RemoveFrame = *cspacec::iSkeletonAnimation_RemoveFrame;
+*RemoveAllFrames = *cspacec::iSkeletonAnimation_RemoveAllFrames;
 *RecalcSpline = *cspacec::iSkeletonAnimation_RecalcSpline;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -16048,6 +16049,38 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iDynamicsStepCallback ##############
+
+package cspace::iDynamicsStepCallback;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*Step = *cspacec::iDynamicsStepCallback_Step;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iDynamicsStepCallback($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iDynamics ##############
 
 package cspace::iDynamics;
@@ -16060,6 +16093,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *RemoveSystems = *cspacec::iDynamics_RemoveSystems;
 *FindSystem = *cspacec::iDynamics_FindSystem;
 *Step = *cspacec::iDynamics_Step;
+*AddStepCallback = *cspacec::iDynamics_AddStepCallback;
+*RemoveStepCallback = *cspacec::iDynamics_RemoveStepCallback;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});

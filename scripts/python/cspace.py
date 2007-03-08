@@ -5439,6 +5439,7 @@ class iSkeletonAnimation(iBase):
     def GetFrame(*args): return _cspace.iSkeletonAnimation_GetFrame(*args)
     def FindFrameIndex(*args): return _cspace.iSkeletonAnimation_FindFrameIndex(*args)
     def RemoveFrame(*args): return _cspace.iSkeletonAnimation_RemoveFrame(*args)
+    def RemoveAllFrames(*args): return _cspace.iSkeletonAnimation_RemoveAllFrames(*args)
     def RecalcSpline(*args): return _cspace.iSkeletonAnimation_RecalcSpline(*args)
     __swig_destroy__ = _cspace.delete_iSkeletonAnimation
     __del__ = lambda self : None;
@@ -10710,6 +10711,21 @@ iCollideSystem_swigregister = _cspace.iCollideSystem_swigregister
 iCollideSystem_swigregister(iCollideSystem)
 iCollideSystem_scfGetVersion = _cspace.iCollideSystem_scfGetVersion
 
+class iDynamicsStepCallback(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iDynamicsStepCallback, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iDynamicsStepCallback, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def Step(*args): return _cspace.iDynamicsStepCallback_Step(*args)
+    __swig_destroy__ = _cspace.delete_iDynamicsStepCallback
+    __del__ = lambda self : None;
+iDynamicsStepCallback_swigregister = _cspace.iDynamicsStepCallback_swigregister
+iDynamicsStepCallback_swigregister(iDynamicsStepCallback)
+
 class iDynamics(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -10724,6 +10740,8 @@ class iDynamics(iBase):
     def RemoveSystems(*args): return _cspace.iDynamics_RemoveSystems(*args)
     def FindSystem(*args): return _cspace.iDynamics_FindSystem(*args)
     def Step(*args): return _cspace.iDynamics_Step(*args)
+    def AddStepCallback(*args): return _cspace.iDynamics_AddStepCallback(*args)
+    def RemoveStepCallback(*args): return _cspace.iDynamics_RemoveStepCallback(*args)
     __swig_destroy__ = _cspace.delete_iDynamics
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iDynamics_scfGetVersion
