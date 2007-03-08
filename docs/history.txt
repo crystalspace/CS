@@ -19,7 +19,9 @@ chronological order.
 	  VFS mounts in a config file (VFS.Mount.[...] = [...]) and
 	  fixed a possible crash when a texture file couldn't be found.
 	  (Thank you vknecht!)
-
+	- res shaved a few bytes off the internal per-element data of TinyXML.
+	- res changed the implementation of ptpdlight's "lumel buffer" to
+	  avoid the use of offsetof().
 7-Mar-2007
 	- Jorrit fixed a crash bug in lighter2. In the simple TUI lastTask
 	  started as an empty null string and comparing that with GetTaskName()

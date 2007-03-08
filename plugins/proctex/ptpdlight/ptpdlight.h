@@ -87,12 +87,23 @@ public:
   };
   struct LumelBuffer : public csRefCount
   {
-    Lumel data[1];
+    static CS_FORCEINLINE size_t LumelAlign (size_t n)
+    {
+      static const size_t align = sizeof (Lumel);
+      return ((n + align - 1) / align) * align;
+    }
+  public:
+    CS_FORCEINLINE Lumel* GetData () 
+    { 
+      return reinterpret_cast<Lumel*> (
+        (reinterpret_cast<uint8*> (this)) + LumelAlign (sizeof (*this))); 
+    }
     
     inline void* operator new (size_t n, size_t lumels)
     { 
       CS_ASSERT (n == sizeof (LumelBuffer));
-      size_t allocSize = offsetof (LumelBuffer, data) + lumels * sizeof (Lumel);
+      size_t allocSize = 
+        LumelAlign (sizeof (LumelBuffer)) + lumels * sizeof (Lumel);
       return cs_malloc (allocSize);
     }
     inline void operator delete (void* p, size_t lumels) 
@@ -101,8 +112,6 @@ public:
     }
     inline void operator delete (void* p) 
     {
-      LumelBuffer* lb = static_cast<LumelBuffer*> (p);
-      lb->~LumelBuffer ();
       cs_free (p);
     }
 
@@ -171,6 +180,10 @@ private:
   void UpdateAffectedArea ();
 public:
   const char* AddLight (const MappedLight& light);
+  void FinishLoad()
+  {
+    lights.ShrinkBestFit();
+  }
 
   ProctexPDLight (iImage* img);
   virtual ~ProctexPDLight ();
