@@ -136,7 +136,7 @@ csRef<iDocumentNode> csTinyXmlNodeIterator::Next ()
 
 csTinyXmlNode::csTinyXmlNode (csTinyXmlDocument* doc) 
   : scfImplementationType (this), node (0),
-  node_children (0), doc (doc), next_pool (0)
+  node_children (0), lastChild (0), doc (doc), next_pool (0)
 {
 }
 
@@ -238,8 +238,12 @@ void csTinyXmlNode::RemoveNode (const csRef<iDocumentNode>& child)
 {
   //CS_ASSERT (child.IsValid ());
   if (node_children)
-    node_children->RemoveChild (
-  	static_cast<csTinyXmlNode*>((iDocumentNode*)child)->GetTiNode ());
+  {
+    CS::TiDocumentNode* tiNode = 
+      static_cast<csTinyXmlNode*>((iDocumentNode*)child)->GetTiNode ();
+    node_children->RemoveChild (tiNode);
+    if (tiNode == lastChild) lastChild = 0;
+  }
 }
 
 void csTinyXmlNode::RemoveNodes (csRef<iDocumentNodeIterator> children)
@@ -251,11 +255,13 @@ void csTinyXmlNode::RemoveNodes (csRef<iDocumentNodeIterator> children)
     csTinyXmlNode* tiNode = static_cast<csTinyXmlNode*>((iDocumentNode*)n);
     node_children->RemoveChild (tiNode->GetTiNode ());
   }
+  lastChild = 0;
 }
 
 void csTinyXmlNode::RemoveNodes ()
 {
   if (node_children) node_children->Clear ();
+  lastChild = 0;
 }
 
 csRef<iDocumentNode> csTinyXmlNode::CreateNodeBefore (csDocumentNodeType type,
@@ -273,10 +279,13 @@ csRef<iDocumentNode> csTinyXmlNode::CreateNodeBefore (csDocumentNodeType type,
         CS::TiXmlElement el;
 	if (before)
 	  child = node_children->InsertBeforeChild (
-	  	((csTinyXmlNode*)(iDocumentNode*)before)->GetTiNode (),
+	  	static_cast<csTinyXmlNode*> (before)->GetTiNode (),
 		el);
         else
-	  child = node_children->InsertEndChild (el);
+        {
+          if (lastChild == 0) lastChild = node_children->LastChild();
+	  lastChild = child = node_children->InsertAfterChild (lastChild, el);
+        }
         //CS_ASSERT (child != 0);
       }
       break;
@@ -285,10 +294,13 @@ csRef<iDocumentNode> csTinyXmlNode::CreateNodeBefore (csDocumentNodeType type,
         CS::TiXmlComment el;
 	if (before)
 	  child = node_children->InsertBeforeChild (
-	  	((csTinyXmlNode*)(iDocumentNode*)before)->GetTiNode (),
+	  	static_cast<csTinyXmlNode*> (before)->GetTiNode (),
 		el);
         else
-	  child = node_children->InsertEndChild (el);
+        {
+          if (lastChild == 0) lastChild = node_children->LastChild();
+	  lastChild = child = node_children->InsertAfterChild (lastChild, el);
+        }
         //CS_ASSERT (child != 0);
       }
       break;
@@ -297,10 +309,13 @@ csRef<iDocumentNode> csTinyXmlNode::CreateNodeBefore (csDocumentNodeType type,
         CS::TiXmlText el;
 	if (before)
 	  child = node_children->InsertBeforeChild (
-	  	((csTinyXmlNode*)(iDocumentNode*)before)->GetTiNode (),
+	  	static_cast<csTinyXmlNode*> (before)->GetTiNode (),
 		el);
         else
-	  child = node_children->InsertEndChild (el);
+        {
+          if (lastChild == 0) lastChild = node_children->LastChild();
+	  lastChild = child = node_children->InsertAfterChild (lastChild, el);
+        }
         //CS_ASSERT (child != 0);
       }
       break;
@@ -309,10 +324,13 @@ csRef<iDocumentNode> csTinyXmlNode::CreateNodeBefore (csDocumentNodeType type,
         CS::TiXmlDeclaration el;
 	if (before)
 	  child = node_children->InsertBeforeChild (
-	  	((csTinyXmlNode*)(iDocumentNode*)before)->GetTiNode (),
+	  	static_cast<csTinyXmlNode*> (before)->GetTiNode (),
 		el);
         else
-	  child = node_children->InsertEndChild (el);
+        {
+          if (lastChild == 0) lastChild = node_children->LastChild();
+	  lastChild = child = node_children->InsertAfterChild (lastChild, el);
+        }
         //CS_ASSERT (child != 0);
       }
       break;
@@ -321,10 +339,13 @@ csRef<iDocumentNode> csTinyXmlNode::CreateNodeBefore (csDocumentNodeType type,
         CS::TiXmlUnknown el;
 	if (before)
 	  child = node_children->InsertBeforeChild (
-	  	((csTinyXmlNode*)(iDocumentNode*)before)->GetTiNode (),
+	  	static_cast<csTinyXmlNode*> (before)->GetTiNode (),
 		el);
         else
-	  child = node_children->InsertEndChild (el);
+        {
+          if (lastChild == 0) lastChild = node_children->LastChild();
+	  lastChild = child = node_children->InsertAfterChild (lastChild, el);
+        }
         //CS_ASSERT (child != 0);
       }
       break;

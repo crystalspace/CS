@@ -161,6 +161,7 @@ private:
   friend class csTinyXmlDocument;
   CS::TiDocumentNode* node;
   CS::TiDocumentNodeChildren* node_children;
+  CS::TiDocumentNode* lastChild;
   // We keep a reference to 'doc' to avoid it being cleaned up too early.
   // We need 'doc' for the pool.
   csRef<csTinyXmlDocument> doc;
@@ -180,6 +181,7 @@ public:
   {
     csTinyXmlNode::node = node;
     node_children = node->ToDocumentNodeChildren ();
+    lastChild = 0;
   }
 
   

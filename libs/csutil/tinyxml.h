@@ -246,12 +246,6 @@ public:
   TiDocumentNodeChildren* Parent() const{ return parent; }
 
   /// Navigate to a sibling node.
-  TiDocumentNode* PreviousSibling() const { return prev; }
-
-  /// Navigate to a sibling node.
-  TiDocumentNode* PreviousSibling( const char * ) const;
-
-  /// Navigate to a sibling node.
   TiDocumentNode* NextSibling() const { return next; }
 
   /// Navigate to a sibling node with the given 'value'.
@@ -313,7 +307,6 @@ protected:
   NodeType type;
   TiDocumentNodeChildren* parent;
 
-  TiDocumentNode* prev;
   TiDocumentNode* next;
 };
 
@@ -338,31 +331,32 @@ public:
   TiDocumentNode* FirstChild( const char * value ) const;
 
   /**
-   * Add a new node related to this. Adds a child past the LastChild.
-   * Returns a pointer to the new object or 0 if an error occured.
-   */
-  TiDocumentNode* InsertEndChild( const TiDocumentNode& addThis );
-
-  /**
    * Add a new node related to this. Adds a child before the specified child.
    * Returns a pointer to the new object or 0 if an error occured.
    */
   TiDocumentNode* InsertBeforeChild( TiDocumentNode* beforeThis,
     const TiDocumentNode& addThis );
+  TiDocumentNode* InsertAfterChild( TiDocumentNode* beforeThis,
+    const TiDocumentNode& addThis );
 
   /// Delete a child of this node.
   bool RemoveChild( TiDocumentNode* removeThis );
 
+  TiDocumentNode* Previous (TiDocumentNode* child);
+  TiDocumentNode* LastChild ();
 protected:
   // Figure out what is at *p, and parse it. Returns null if it is not an xml
   // node.
   TiDocumentNode* Identify( TiDocument* document, const char* start );
 
-  // The node is passed in by ownership. This object will delete it.
-  TiDocumentNode* LinkEndChild( TiDocumentNode* addThis );
+  /**
+   * Add a new node related to this. Adds a child past afterThis.
+   * Returns a pointer to the new object or 0 if an error occured.
+   */
+  void InsertAfterChild( TiDocumentNode* afterThis,
+    TiDocumentNode* addThis );
 
   TiDocumentNode* firstChild;
-  TiDocumentNode* lastChild;
 };
 
 
@@ -444,9 +438,12 @@ private:
 class TiDocumentAttributeSet
 {
 public:
-  csArray<TiDocumentAttribute> set;
+  csArray<TiDocumentAttribute,
+    csArrayElementHandler<TiDocumentAttribute>,
+    CS::Memory::AllocatorMalloc,
+    csArrayCapacityLinear<csArrayThresholdFixed<4> > > set;
 
-  TiDocumentAttributeSet() : set (0, 4) { }
+  TiDocumentAttributeSet() : set (0) { }
   size_t Find (const char * name) const;
   size_t FindExact (const char * reg_name) const;
 };
