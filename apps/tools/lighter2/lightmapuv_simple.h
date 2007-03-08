@@ -35,9 +35,9 @@ namespace lighter
     {}
 
     virtual csPtr<LightmapUVObjectLayouter> LayoutFactory (
-      const PrimitiveArray& inPrims, ObjectVertexData& vertexData,
+      const FactoryPrimitiveArray& inPrims, ObjectFactoryVertexData& vertexData,
       const ObjectFactory* factory,
-      csArray<PrimitiveArray>& outPrims,
+      csArray<FactoryPrimitiveArray>& outPrims,
       csBitArray& usedVerts);
   protected:
     friend class SimpleUVObjectLayouter;
@@ -62,35 +62,37 @@ namespace lighter
 
     struct Edge
     {
-      const Primitive& prim;
+      const FactoryPrimitive& prim;
       size_t a, b;
 
-      Edge (const Primitive& prim, size_t a, size_t b) : 
+      Edge (const FactoryPrimitive& prim, size_t a, size_t b) : 
         prim (prim), a (a), b (b) {}
 
       bool equals (VertexEquality veq, const Edge& other);
     };
     struct UberPrimitive
     {
-      PrimitiveArray prims;
+      FactoryPrimitiveArray prims;
       csArray<Edge> outsideEdges;
       VertexEquality equality;
 
-      UberPrimitive (VertexEquality equality, const Primitive& startPrim);
+      UberPrimitive (VertexEquality equality, 
+        const FactoryPrimitive& startPrim);
 
       bool UsesEdge (const Edge& edge);
-      void AddPrimitive (const Primitive& prim);
+      void AddPrimitive (const FactoryPrimitive& prim);
     };
 
     void DetermineNeighbouringPrims (
-      const PrimitiveArray& inPrims, ObjectVertexData& vertexData,
-      csArray<PrimitiveArray>& outPrims);
+      const FactoryPrimitiveArray& inPrims, ObjectFactoryVertexData& vertexData,
+      csArray<FactoryPrimitiveArray>& outPrims);
 
     bool AllocLightmap (LightmapPtrDelArray& lightmaps, int u, int v, 
       csRect &lightmapArea, int &lightmapID);
 
-    bool ProjectPrimitives (PrimitiveArray& prims, 
-      csBitArray &usedVerts, float uscale, float vscale);
+    bool ProjectPrimitives (FactoryPrimitiveArray& prims, 
+      csBitArray &usedVerts, float uscale, float vscale,
+      Vector2Array& lightmapUVs);
   };
 
   class SimpleUVObjectLayouter : public LightmapUVObjectLayouter
@@ -104,6 +106,7 @@ namespace lighter
   protected:
     friend class SimpleUVFactoryLayouter;
     SimpleUVFactoryLayouter* parent;
+    Vector2Array lightmapUVs;
     csArray<csArray<csArray<size_t> > > coplanarGroups;
 
     void MapComplete (const csArray<csVector2>& sizes, 

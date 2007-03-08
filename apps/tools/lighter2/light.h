@@ -27,6 +27,7 @@ namespace lighter
   class Sector;
   struct HitIgnoreCallback;
   class Primitive;
+  class PrimitiveBase;
   class KDTree;
   
   class VisibilityTester

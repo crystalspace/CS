@@ -28,6 +28,7 @@ namespace lighter
   class KDTree;
   struct KDTreePrimitive;
   class Primitive;
+  class PrimitiveBase;
 
   /**
    * A ray in space.

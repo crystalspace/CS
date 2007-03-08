@@ -173,8 +173,8 @@ namespace lighter
     if (!LoadFiles (progLoadFiles)) 
       return false;
 
-    if (!scene->ParseEngine (progParseEngine)) 
-      return false;
+    /*if (!scene->ParseEngine (progParseEngine)) 
+      return false;*/
 
     progLightmapLayout.SetProgress (0);
     // Calculate lightmapping coordinates
@@ -189,10 +189,12 @@ namespace lighter
       fact->PrepareLightmapUV (uvLayout);
       progLightmapLayout.IncProgress (factoryProgress);
     }
+    if (!scene->SaveWorldFactories (/*progUpdateWorld*/)) return false;
+    scene->GetFactories ().DeleteAll();
 
     // Initialize all objects
     progInitialize.SetProgress (0);
-    float sectorProgress = 100.0f / scene->GetSectors ().GetSize();
+    float sectorProgress = 99.0f / scene->GetSectors ().GetSize();
     SectorHash::GlobalIterator sectIt = 
       scene->GetSectors ().GetIterator ();
     while (sectIt.HasNext ())
@@ -209,7 +211,8 @@ namespace lighter
     }
 
     progUpdateWorld.SetProgress (0);
-    if (!scene->SaveWorld (progUpdateWorld)) return false;
+    if (!scene->SaveWorldMeshes (/*progUpdateWorld*/)) return false;
+    if (!scene->FinishWorldSaving ()) return false;
     
     // Shoot direct lighting
     if (globalConfig.GetLighterProperties ().doDirectLight)
@@ -246,8 +249,6 @@ namespace lighter
         while (objIt.HasNext ())
         {
           csRef<Object> obj = objIt.Next ();
-          //csArray<LightmapPtrDelArray*> allLightmaps (scene->GetAllLightmaps());
-          //obj->FixupLightmaps (allLightmaps);
           obj->FillLightmapMask (lmMasks);
           progPostproc.IncProgress (objProgress);
         }

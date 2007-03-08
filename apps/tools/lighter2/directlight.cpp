@@ -81,12 +81,12 @@ namespace lighter
     for (size_t i = 0; i < 3; i++)
     {
       const size_t vi = prim->GetTriangle()[i];
-      const csVector3& pi = prim->GetVertexData().vertexArray[vi].position;
+      const csVector3& pi = prim->GetVertexData().positions[vi];
 
       for (size_t j = 0; j < 3; j++)
       {
         const size_t vj = originalPrim->GetTriangle()[j];
-        const csVector3& pj = originalPrim->GetVertexData().vertexArray[vj].position;
+        const csVector3& pj = originalPrim->GetVertexData().positions[vj];
 
         if ((pi - pj).IsZero (SMALL_EPSILON))
           return true;
@@ -606,10 +606,10 @@ namespace lighter
     Object::LitColorArray* litColors = obj->GetLitColors ();
     const ObjectVertexData& vdata = obj->GetVertexData ();
 
-    for (size_t i = 0; i < vdata.vertexArray.GetSize (); ++i)
+    for (size_t i = 0; i < vdata.positions.GetSize (); ++i)
     {
-      const csVector3& pos = vdata.vertexArray[i].position;
-      const csVector3& normal = vdata.vertexArray[i].normal;
+      const csVector3& pos = vdata.positions[i];
+      const csVector3& normal = vdata.normals[i];
 
       csColor& c = litColors->Get (i);
 

@@ -93,18 +93,19 @@ namespace lighter
     // Load all files, and parse the loaded info
     bool LoadFiles (Statistics::SubProgress& progress);
 
-    /* Save all files we've loaded. Will save any changed factory and mesh (to
-     * a temporary file). */
-    bool SaveWorld (Statistics::SubProgress& progress);
+    /* Save all files we've loaded. Will save any changed factory. */
+    bool SaveWorldFactories (/*Statistics::SubProgress& progress*/);
+    /* Save all files we've loaded. Will save any changed mesh. */
+    bool SaveWorldMeshes (/*Statistics::SubProgress& progress*/);
+    /* Save all files we've loaded. Writes out document to a temporary file. */
+    bool FinishWorldSaving (/*Statistics::SubProgress& progress*/);
+
     // Copy the temporary file created in SaveWorld() over the actual world file.
     bool ApplyWorldChanges (Statistics::SubProgress& progress);
     // Write the generated lightmaps out.
     bool SaveLightmaps (Statistics::SubProgress& progress);
     // Save any mesh data that can only be saved after lighting.
     bool SaveMeshesPostLighting (Statistics::SubProgress& progress);
-
-    // Parse in our scene from the engine
-    bool ParseEngine (Statistics::SubProgress& progress);
 
     // Data access
     inline ObjectFactoryHash& GetFactories () 
@@ -189,25 +190,32 @@ namespace lighter
       csSet<csString>& filesToDelete);
     void BuildLightmapTextureList (csStringArray& texturesToSave);
     void CleanOldLightmaps (LoadedFile* fileInfo);
-    void SaveSceneToDom (iDocumentNode* root, LoadedFile* fileInfo);
-    bool SaveSceneLibrary (const char* libFile, LoadedFile* fileInfo);
-    void HandleLibraryNode (iDocumentNode* node, LoadedFile* fileInfo);
-    void SaveMeshFactoryToDom (iDocumentNode* factNode, LoadedFile* fileInfo);
+    void SaveSceneFactoriesToDom (iDocumentNode* root, LoadedFile* fileInfo);
+    void SaveSceneMeshesToDom (iDocumentNode* root, LoadedFile* fileInfo);
+    bool SaveSceneLibrary (csSet<csString>& savedFactories, 
+      const char* libFile, LoadedFile* fileInfo);
+    void HandleLibraryNode (csSet<csString>& savedFactories, 
+      iDocumentNode* node, LoadedFile* fileInfo);
+    void SaveMeshFactoryToDom (csSet<csString>& savedObjects, 
+      iDocumentNode* factNode, LoadedFile* fileInfo);
     void SaveSectorToDom (iDocumentNode* sectorNode, LoadedFile* fileInfo);
-    void SaveMeshObjectToDom (iDocumentNode *objNode, Sector* sect, LoadedFile* fileInfo);
+    void SaveMeshObjectToDom (csSet<csString>& savedObjects, iDocumentNode *objNode, 
+      Sector* sect, LoadedFile* fileInfo);
 
     void SaveLightmapsToDom (iDocumentNode* root, LoadedFile* fileInfo);
     
     // Load functions
+    bool ParseEngine (/*Statistics::SubProgress& progress*/);
     void ParseSector (iSector *sector);
     void ParsePortals (iSector *srcSect, Sector* sector);
     enum MeshParseResult
     {
       Failure, Success, NotAGenMesh
     };
-    MeshParseResult ParseMesh (Sector *sector,  iMeshWrapper *mesh);
+    MeshParseResult ParseMesh (Sector *sector,  iMeshWrapper *mesh,
+      csRef<Object>& obj);
     MeshParseResult ParseMeshFactory (iMeshFactoryWrapper *factory, 
-      ObjectFactory*& radFact);
+      csRef<ObjectFactory>& radFact);
     void PropagateLight (Light* light, const csFrustum& lightFrustum);
 
   };

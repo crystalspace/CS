@@ -22,6 +22,12 @@ chronological order.
 	- res shaved a few bytes off the internal per-element data of TinyXML.
 	- res changed the implementation of ptpdlight's "lumel buffer" to
 	  avoid the use of offsetof().
+	- res changed lighter2's saving to save factories and objects 
+	  separately. Factories are saved before the objects are initialized -
+	  after that initialization, the factory can possibly be released,
+	  reducing memory usage.
+	- res reorganized primitive and vertex data so the data stored by 
+	  factories resp. objects is closer to what's really only needed.  
 7-Mar-2007
 	- Jorrit fixed a crash bug in lighter2. In the simple TUI lastTask
 	  started as an empty null string and comparing that with GetTaskName()

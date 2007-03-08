@@ -25,6 +25,7 @@
 #include "light.h"
 #include "lightmap.h"
 #include "lightmapuv.h"
+#include "vertexdata.h"
 #include "csgeom/transfrm.h"
 
 namespace lighter
@@ -41,71 +42,6 @@ namespace lighter
     OBJECT_FLAG_NOSHADOW = 2
   };
 
-
-  /**
-   * Hold per object vertex data
-   */
-  struct ObjectVertexData 
-  {
-    struct Vertex
-    {
-      //Position
-      csVector3 position;
-
-      //Normal
-      csVector3 normal;
-
-      //Texture UV
-      csVector2 textureUV;
-
-      //Lightmap UV (not normalized.. pixel-coordinates)
-      csVector2 lightmapUV;
-
-      //Extra data
-      csRef<csRefCount> extraData;
-    };
-
-    typedef csDirtyAccessArray<Vertex> VertexDelArray;
-    VertexDelArray vertexArray;
-
-    //Helper functions
-
-    /// Split one vertex, duplicate it and return index for new one
-    size_t SplitVertex (size_t oldIndex)
-    {
-      const Vertex& oldVertex = vertexArray[oldIndex];
-      return vertexArray.Push (oldVertex);
-    }
-
-    /// Interpolate between two vertices with t
-    Vertex InterpolateVertex (size_t i0, size_t i1, float t)
-    {
-      Vertex newVertex;
-
-      const Vertex& v0 = vertexArray[i0];
-      const Vertex& v1 = vertexArray[i1];
-
-      newVertex.position = v0.position - (v1.position - v0.position) * t;
-      newVertex.normal = v0.normal - (v1.normal - v0.normal) * t;
-      newVertex.normal.Normalize ();
-
-      newVertex.textureUV = v0.textureUV - (v1.textureUV - v0.textureUV) * t;
-      newVertex.lightmapUV = v0.lightmapUV - (v1.lightmapUV - v0.lightmapUV) * t;
-
-      return newVertex;
-    }
-
-    /// Transform all vertex positions and normal
-    void Transform (const csReversibleTransform& transform)
-    {
-      for(size_t i = 0; i < vertexArray.GetSize (); ++i)
-      {
-        vertexArray[i].position = transform.This2Other (vertexArray[i].position);
-        vertexArray[i].normal = transform.This2OtherRelative (vertexArray[i].normal);
-      }
-    }
-  };
-
   /**
    * Baseclass for Object factories.
    * Needs to be subclassed to provide an interface to a specific mesh
@@ -119,7 +55,7 @@ namespace lighter
     virtual bool PrepareLightmapUV (LightmapUVFactoryLayouter* uvlayout);
 
     // Get a new object
-    virtual Object* CreateObject ();
+    virtual csPtr<Object> CreateObject ();
 
     // Parse data
     virtual void ParseFactory (iMeshFactoryWrapper *factory);
@@ -155,28 +91,28 @@ namespace lighter
     {}
 
     // All faces, untransformed
-    csArray<PrimitiveArray> unlayoutedPrimitives;
+    csArray<FactoryPrimitiveArray> unlayoutedPrimitives;
     struct LayoutedPrimitives
     {
-      PrimitiveArray primitives;
+      FactoryPrimitiveArray primitives;
       csRef<LightmapUVObjectLayouter> factory;
       size_t group;
 
-      LayoutedPrimitives (const PrimitiveArray& primitives, 
+      LayoutedPrimitives (const FactoryPrimitiveArray& primitives, 
                           LightmapUVObjectLayouter* factory, size_t group) :
         primitives (primitives), factory (factory), group (group) {}
     };
     csArray<LayoutedPrimitives> layoutedPrimitives;
 
     // Vertex data for above faces
-    ObjectVertexData vertexData;
+    ObjectFactoryVertexData vertexData;
 
     // Lightmap settings
     float lmuScale;
     float lmvScale;
 
     // Factory created from
-    iMeshFactoryWrapper *factoryWrapper;
+    csRef<iMeshFactoryWrapper> factoryWrapper;
 
     // String identifying the saver plugin. Should be set from derived
     // classes
@@ -212,6 +148,10 @@ namespace lighter
 
     // Write out the data again
     virtual void SaveMesh (Scene* scene, iDocumentNode *node);
+
+    /* Conserve memory: free all object data that won't be needed for the 
+     * actual lighting. */
+    virtual void FreeNotNeededForLighting ();
 
     // Write out data that must be written after lighting.
     virtual void SaveMeshPostLighting (Scene* scene) { }
@@ -265,10 +205,10 @@ namespace lighter
     //@}
 
     // Factory we where created from
-    ObjectFactory* factory;
+    csRef<ObjectFactory> factory;
 
     // Reference to the mesh
-    iMeshWrapper *meshWrapper;
+    csRef<iMeshWrapper> meshWrapper;
 
     // String identifying the saver plugin. Should be set from derived
     // classes

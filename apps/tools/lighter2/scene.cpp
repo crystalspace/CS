@@ -28,6 +28,7 @@ using namespace CS;
 
 namespace lighter
 {
+
   void Sector::Initialize ()
   {
     // Initialize objects
@@ -43,6 +44,8 @@ namespace lighter
     KDTreeBuilder builder;
     kdTree = builder.BuildTree (objIt);
   }
+
+  //-------------------------------------------------------------------------
 
   Scene::Scene () : lightmapPostProc (this)
   {
@@ -114,16 +117,24 @@ namespace lighter
       if (!globalLighter->loader->Load (sceneFiles[i].rootNode, res))
         return globalLighter->Report ("Error loading file 'world'!");
 
+      // Parses meshes from engine
+      ParseEngine ();
+
       progress.IncProgress (div);
     }
+
+    /* We have turned everything needed into our own objects which keep
+       refs to the engine objects as needed. Hence instruct engine to
+       release everything it holds. */
+    globalLighter->engine->DeleteAll();
 
     progress.SetProgress (100);
     return true;
   }
 
-  bool Scene::SaveWorld (Statistics::SubProgress& progress)
+  bool Scene::SaveWorldFactories (/*Statistics::SubProgress& progress*/)
   {
-    progress.SetProgress (0);
+    //progress.SetProgress (0);
 
     if (sceneFiles.GetSize () == 0)
     {
@@ -135,8 +146,51 @@ namespace lighter
     for (size_t i = 0; i < sceneFiles.GetSize (); i++)
     {
       //Traverse the DOM, save any factory we encounter
-      SaveSceneToDom (sceneFiles[i].rootNode, &sceneFiles[i]);
+      SaveSceneFactoriesToDom (sceneFiles[i].rootNode, &sceneFiles[i]);
 
+      //progress.IncProgress (fileProgress);
+    }
+
+    //progress.SetProgress (100);
+    return true;
+  }
+
+  bool Scene::SaveWorldMeshes (/*Statistics::SubProgress& progress*/)
+  {
+    //progress.SetProgress (0);
+
+    if (sceneFiles.GetSize () == 0)
+    {
+      globalLighter->Report ("No files to save!");
+      return false;
+    }
+
+    float fileProgress = 100.0f / sceneFiles.GetSize ();
+    for (size_t i = 0; i < sceneFiles.GetSize (); i++)
+    {
+      //Traverse the DOM, save any mesh we encounter
+      SaveSceneMeshesToDom (sceneFiles[i].rootNode, &sceneFiles[i]);
+
+      //progress.IncProgress (fileProgress);
+    }
+
+    //progress.SetProgress (100);
+    return true;
+  }
+
+  bool Scene::FinishWorldSaving (/*Statistics::SubProgress& progress*/)
+  {
+    //progress.SetProgress (0);
+
+    if (sceneFiles.GetSize () == 0)
+    {
+      globalLighter->Report ("No files to save!");
+      return false;
+    }
+
+    float fileProgress = 100.0f / sceneFiles.GetSize ();
+    for (size_t i = 0; i < sceneFiles.GetSize (); i++)
+    {
       //Change path
       csStringArray paths;
       paths.Push ("/lev/");
@@ -163,7 +217,11 @@ namespace lighter
         return false;
       }
 
-      progress.IncProgress (fileProgress);
+      // Release document, not needed any more.
+      sceneFiles[i].document.Invalidate();
+      sceneFiles[i].rootNode.Invalidate();
+
+      //progress.IncProgress (fileProgress);
     }
 
     // Ensure no archives are cached in memory (for memory consumption reasons)
@@ -173,7 +231,7 @@ namespace lighter
       return false;
     }
 
-    progress.SetProgress (100);
+    //progress.SetProgress (100);
     return true;
   }
 
@@ -365,9 +423,46 @@ namespace lighter
     return true;
   }
 
-  bool Scene::ParseEngine (Statistics::SubProgress& progress)
+  Lightmap* Scene::GetLightmap (uint lightmapID, Light* light)
   {
-    progress.SetProgress (0);
+    if (!light || !light->IsPDLight ())
+      return lightmaps[lightmapID];
+
+    light = light->GetOriginalLight();
+    LightmapPtrDelArray* pdLights = pdLightmaps.Get (light, 0);
+    if (pdLights == 0)
+    {
+      pdLights = new LightmapPtrDelArray;
+      for (size_t i = 0; i < lightmaps.GetSize(); i++)
+      {
+        Lightmap* lm = new Lightmap (lightmaps[i]->GetWidth(), 
+          lightmaps[i]->GetHeight());
+        lm->Initialize ();
+        pdLights->Push (lm);
+      }
+      pdLightmaps.Put (light, pdLights);
+    }
+    return pdLights->Get (lightmapID);
+  }
+
+  csArray<LightmapPtrDelArray*> Scene::GetAllLightmaps ()
+  {
+    csArray<LightmapPtrDelArray*> allLms;
+    allLms.Push (&lightmaps);
+
+    PDLightmapsHash::GlobalIterator pdlIt = pdLightmaps.GetIterator();
+    while (pdlIt.HasNext())
+    {
+      LightmapPtrDelArray* lm = pdlIt.Next();
+      allLms.Push (lm);
+    }
+
+    return allLms;
+  }
+
+  bool Scene::ParseEngine (/*Statistics::SubProgress& progress*/)
+  {
+    //progress.SetProgress (0);
 
     // Parse sectors
     iSectorList *sectorList = globalLighter->engine->GetSectors ();
@@ -444,46 +539,8 @@ namespace lighter
       }
     }
 
-    progress.SetProgress (100);
+    //progress.SetProgress (100);
     return true;
-  }
-
-
-  Lightmap* Scene::GetLightmap (uint lightmapID, Light* light)
-  {
-    if (!light || !light->IsPDLight ())
-      return lightmaps[lightmapID];
-
-    light = light->GetOriginalLight();
-    LightmapPtrDelArray* pdLights = pdLightmaps.Get (light, 0);
-    if (pdLights == 0)
-    {
-      pdLights = new LightmapPtrDelArray;
-      for (size_t i = 0; i < lightmaps.GetSize(); i++)
-      {
-        Lightmap* lm = new Lightmap (lightmaps[i]->GetWidth(), 
-          lightmaps[i]->GetHeight());
-        lm->Initialize ();
-        pdLights->Push (lm);
-      }
-      pdLightmaps.Put (light, pdLights);
-    }
-    return pdLights->Get (lightmapID);
-  }
-
-  csArray<LightmapPtrDelArray*> Scene::GetAllLightmaps ()
-  {
-    csArray<LightmapPtrDelArray*> allLms;
-    allLms.Push (&lightmaps);
-
-    PDLightmapsHash::GlobalIterator pdlIt = pdLightmaps.GetIterator();
-    while (pdlIt.HasNext())
-    {
-      LightmapPtrDelArray* lm = pdlIt.Next();
-      allLms.Push (lm);
-    }
-
-    return allLms;
   }
 
   void Scene::ParseSector (iSector *sector)
@@ -491,31 +548,43 @@ namespace lighter
     if (!sector) return;
 
     // Setup a sector struct
-    Sector* radSector = new Sector (this);
-    radSector->sectorName = sector->QueryObject ()->GetName ();
-    sectors.Put (radSector->sectorName, radSector);
-    originalSectorHash.Put (sector, radSector);
+    const char* sectorName = sector->QueryObject ()->GetName ();
+    Sector* radSector = sectors.Get (sectorName, 0);
+    if (radSector == 0)
+    {
+      radSector = new Sector (this);
+      radSector->sectorName = sectorName;
+      sectors.Put (radSector->sectorName, radSector);
+      originalSectorHash.Put (sector, radSector);
+    }
 
     // Parse all meshes (should have selector later!)
     iMeshList *meshList = sector->GetMeshes ();
-    int i;
-    for (i = 0; i < meshList->GetCount (); i++)
+    for (int i = meshList->GetCount (); i-- > 0;)
     {
       iMeshWrapper* mesh = meshList->Get (i);
-      if (ParseMesh (radSector, mesh) == Failure)
+      csRef<Object> obj;
+      bool isPortal = mesh->GetPortalContainer() != 0;
+      if (ParseMesh (radSector, mesh, obj) == Failure)
       {
-        if (!mesh->GetPortalContainer())
+        if (!isPortal)
           globalLighter->Report ("Error parsing mesh '%s' in sector '%s'!", 
             mesh->QueryObject()->GetName(), radSector->sectorName.GetData ());
       }
+      // Mesh is parsed, release resources
+      if (!isPortal) meshList->Remove (i);
     }
 
     // Parse all lights (should have selector later!)
     iLightList *lightList = sector->GetLights ();
-    for (i = 0; i < lightList->GetCount (); i++)
+    for (int i = lightList->GetCount (); i-- > 0;)
     {
       iLight *light = lightList->Get (i);
-      if (light->GetDynamicType() == CS_LIGHT_DYNAMICTYPE_DYNAMIC) continue;
+      if (light->GetDynamicType() == CS_LIGHT_DYNAMICTYPE_DYNAMIC) 
+      {
+        lightList->Remove (i);
+        continue;
+      }
 
       bool isPD = light->GetDynamicType() == CS_LIGHT_DYNAMICTYPE_PSEUDO;
 
@@ -537,6 +606,8 @@ namespace lighter
         radSector->allPDLights.Push (intLight);
       else
         radSector->allNonPDLights.Push (intLight);
+
+      lightList->Remove (i);
     }
   }
 
@@ -583,6 +654,8 @@ namespace lighter
         sector->allPortals.Push (lightPortal);
       }
     }
+    // Remove the remaining portal meshes
+    srcSect->GetMeshes()->RemoveAll();
   }
 
   void Scene::PropagateLight (Light* light, const csFrustum& lightFrustum)
@@ -633,18 +706,27 @@ namespace lighter
   }
 
   Scene::MeshParseResult Scene::ParseMesh (Sector *sector, 
-                                           iMeshWrapper *mesh)
+                                           iMeshWrapper *mesh,
+                                           csRef<Object>& obj)
   {
     if (!sector || !mesh) return Failure;
 
+    if (sector->allObjects.Contains (mesh->QueryObject()->GetName()))
+    {
+      globalLighter->Report (
+        "A mesh named '%s' already exists in sector '%s'",
+        mesh->QueryObject()->GetName(), sector->sectorName.GetData());
+      return Success;
+    }
+
     // Get the factory
-    ObjectFactory *factory = 0;
+    csRef<ObjectFactory> factory;
     MeshParseResult parseFact = ParseMeshFactory (mesh->GetFactory (), factory);
     if (parseFact != Success) return parseFact;
     if (!factory) return Failure;
 
     // Construct a new mesh
-    Object* obj = factory->CreateObject ();
+    obj = factory->CreateObject ();
     if (!obj) return Failure;
 
     obj->ParseMesh (mesh);
@@ -656,7 +738,7 @@ namespace lighter
   }
 
   Scene::MeshParseResult Scene::ParseMeshFactory (iMeshFactoryWrapper *factory,
-                                                  ObjectFactory*& radFact)
+                                                  csRef<ObjectFactory>& radFact)
   {
     if (!factory) return Failure;
 
@@ -673,7 +755,7 @@ namespace lighter
     if (!strcasecmp (type, "crystalspace.mesh.object.genmesh"))
     {
       // Genmesh
-      radFact = new ObjectFactory_Genmesh ();
+      radFact.AttachNew (new ObjectFactory_Genmesh ());
     }
     else
       return NotAGenMesh;
@@ -741,7 +823,35 @@ namespace lighter
     }
   }
 
-  void Scene::SaveSceneToDom (iDocumentNode* r, LoadedFile* fileInfo)
+  void Scene::SaveSceneFactoriesToDom (iDocumentNode* r, LoadedFile* fileInfo)
+  {
+    csSet<csString> savedFactories;
+    
+    csRef <iDocumentNode> worldRoot = r->GetNode ("world");
+
+    csRef<iDocumentNodeIterator> it = worldRoot->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> node = it->Next ();
+      if (node->GetType () != CS_NODE_ELEMENT) continue;
+      
+      const char* nodeName = node->GetValue ();
+
+      if (!strcasecmp (nodeName, "library"))
+      {
+        const char* libFile = node->GetAttributeValue ("file");
+        if (!libFile) libFile = node->GetContentsValue();
+        if ((libFile != 0) && (strcmp (libFile, lightmapLibraryName) != 0))
+          HandleLibraryNode (savedFactories, node, fileInfo);
+      }
+      else if (!strcasecmp (nodeName, "meshfact"))
+      {
+        SaveMeshFactoryToDom (savedFactories, node, fileInfo);
+      }
+    }
+  }
+
+  void Scene::SaveSceneMeshesToDom (iDocumentNode* r, LoadedFile* fileInfo)
   {
     bool hasLightmapsLibrary = false;
     csStringArray texturesToSave;
@@ -764,12 +874,6 @@ namespace lighter
         if (!libFile) libFile = node->GetContentsValue();
         if ((libFile != 0) && (strcmp (libFile, lightmapLibraryName) == 0))
           hasLightmapsLibrary = true;
-        else
-          HandleLibraryNode (node, fileInfo);
-      }
-      else if (!strcasecmp (nodeName, "meshfact"))
-      {
-        SaveMeshFactoryToDom (node, fileInfo);
       }
       else if (!strcasecmp (nodeName, "sector"))
       {
@@ -827,7 +931,8 @@ namespace lighter
     }
   }
 
-  bool Scene::SaveSceneLibrary (const char* libFile, LoadedFile* fileInfo)
+  bool Scene::SaveSceneLibrary (csSet<csString>& savedFactories, 
+                                const char* libFile, LoadedFile* fileInfo)
   {
     csRef<iFile> buf = globalLighter->vfs->Open (libFile, VFS_FILE_READ);
     if (!buf) 
@@ -863,11 +968,11 @@ namespace lighter
 
       if (!strcasecmp (nodeName, "library"))
       {
-        HandleLibraryNode (node, fileInfo);
+        HandleLibraryNode (savedFactories, node, fileInfo);
       }
       else if (!strcasecmp (nodeName, "meshfact"))
       {
-        SaveMeshFactoryToDom (node, fileInfo);
+        SaveMeshFactoryToDom (savedFactories, node, fileInfo);
       }
     }
 
@@ -887,7 +992,8 @@ namespace lighter
     return true;
   }
 
-  void Scene::HandleLibraryNode (iDocumentNode* node, LoadedFile* fileInfo)
+  void Scene::HandleLibraryNode (csSet<csString>& savedFactories, 
+                                 iDocumentNode* node, LoadedFile* fileInfo)
   {
     const char* file = node->GetAttributeValue ("file");
     if (file)
@@ -900,24 +1006,33 @@ namespace lighter
         changer.PushDir ();
         globalLighter->vfs->ChDir (path);
       }
-      SaveSceneLibrary (file, fileInfo);
+      SaveSceneLibrary (savedFactories, file, fileInfo);
     }
     else
     {
-      SaveSceneLibrary (node->GetContentsValue (), fileInfo);
+      SaveSceneLibrary (savedFactories, node->GetContentsValue (), fileInfo);
     }
   }
 
-  void Scene::SaveMeshFactoryToDom (iDocumentNode* factNode, LoadedFile* fileInfo)
+  void Scene::SaveMeshFactoryToDom (csSet<csString>& savedObjects, 
+                                    iDocumentNode* factNode, LoadedFile* fileInfo)
   {
     // Save a single factory to the dom
     csString name = factNode->GetAttributeValue ("name");
+    if (savedObjects.Contains (name))
+    {
+      globalLighter->Report (
+        "A factory named '%s' already exists",
+        name.GetData());
+      return;
+    }
     csRef<ObjectFactory> radFact = radFactories.Get (name, 
       (ObjectFactory*)0);
     if (radFact)
     {
       // We do have one
       radFact->SaveFactory (factNode);
+      savedObjects.AddNoTest (name);
     }
 
     // Check if we have any child factories
@@ -925,7 +1040,7 @@ namespace lighter
     while (it->HasNext ())
     {
       csRef<iDocumentNode> node = it->Next ();
-      SaveMeshFactoryToDom (node, fileInfo);
+      SaveMeshFactoryToDom (savedObjects, node, fileInfo);
     }
   }
 
@@ -936,31 +1051,39 @@ namespace lighter
     if (sector)
     {
       //ok, have the sector, try to save all objects
+      csSet<csString> savedObjects;
       csRef<iDocumentNodeIterator> it = sectorNode->GetNodes ("meshobj");
       while (it->HasNext ())
       {
         csRef<iDocumentNode> node = it->Next ();
-        SaveMeshObjectToDom (node, sector, fileInfo);
+        SaveMeshObjectToDom (savedObjects, node, sector, fileInfo);
       }
     }
   }
 
-  void Scene::SaveMeshObjectToDom (iDocumentNode *objNode, Sector* sect, LoadedFile* fileInfo)
+  void Scene::SaveMeshObjectToDom (csSet<csString>& savedObjects, 
+                                   iDocumentNode *objNode, 
+                                   Sector* sect, LoadedFile* fileInfo)
   {
     // Save the mesh
     csString name = objNode->GetAttributeValue ("name");
+    if (savedObjects.Contains (name))
+      /* Already emitted an "ignoring duplicate mesh" earlier, so just skip 
+         saving here. */
+      return;
     csRef<Object> radObj = sect->allObjects.Get (name, (Object*)0);
     if (radObj)
     {
       // We do have one
       radObj->StripLightmaps (fileInfo->texturesToClean);
       radObj->SaveMesh (this, objNode);
+      radObj->FreeNotNeededForLighting ();
+      savedObjects.AddNoTest (name);
 
       // Remove any old lightmap svs
       objNode->RemoveNodes (DocumentHelper::FilterDocumentNodeIterator (
         objNode->GetNodes ("shadervar"),
         DocumentHelper::NodeAttributeRegexpTest ("name", "tex lightmap.*")));
-      
     }
 
     // Check if we have any child factories
@@ -968,7 +1091,7 @@ namespace lighter
     while (it->HasNext ())
     {
       csRef<iDocumentNode> node = it->Next ();
-      SaveMeshObjectToDom (node, sect, fileInfo);
+      SaveMeshObjectToDom (savedObjects, node, sect, fileInfo);
     }
   }
 

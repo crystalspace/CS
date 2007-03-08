@@ -175,15 +175,79 @@ namespace lighter
 
   //-------------------------------------------------------------------------
 
-  void Primitive::ComputeMinMaxUV (csVector2 &min, csVector2 &max) const
+  const csVector3 PrimitiveBase::GetCenter () const
+  {
+    csVector3 centroid;
+    centroid = vertexData->positions[triangle.a];
+    centroid += vertexData->positions[triangle.b];
+    centroid += vertexData->positions[triangle.c];
+    
+    return centroid / 3.0f;
+  }
+
+  float PrimitiveBase::GetArea () const
+  {
+    float area = csMath3::DoubleArea3 (
+      vertexData->positions[triangle.a],
+      vertexData->positions[triangle.b], 
+      vertexData->positions[triangle.c]);
+    return area/2.0f;
+  }
+
+  void PrimitiveBase::GetExtent (uint axis, float &min, float &max) const
+  {
+    min = FLT_MAX;
+    max = -FLT_MAX;
+    for (unsigned int i = 0; i < 3; ++i)
+    {
+      float val = vertexData->positions[triangle.a][axis];
+      min = csMin(min, val);
+      max = csMax(max, val);
+    }
+  }
+
+  int PrimitiveBase::Classify (const csPlane3 &plane) const
+  {
+    size_t i;
+    size_t front = 0, back = 0;
+
+    for (i = 0; i < 3; i++)
+    {
+      float dot = plane.Classify (vertexData->positions[triangle[i]]);
+      if (ABS (dot) < EPSILON) dot = 0;
+      if (dot > 0)
+        back++;
+      else if (dot < 0)
+        front++;
+    }
+
+    if (back == 0 && front == 0) return CS_POL_SAME_PLANE;
+    if (back == 0) return CS_POL_FRONT;
+    if (front == 0) return CS_POL_BACK;
+    return CS_POL_SPLIT_NEEDED;
+  }
+
+  void PrimitiveBase::ComputePlane ()
+  {
+    //Setup a temporary array of our vertices
+    Vector3DArray vertices;
+    vertices.Push (vertexData->positions[triangle.a]);
+    vertices.Push (vertexData->positions[triangle.b]);
+    vertices.Push (vertexData->positions[triangle.c]);
+
+    plane = csPoly3D::ComputePlane (vertices);
+  }
+
+  void PrimitiveBase::ComputeMinMaxUV (const Vector2Array& lightmapUVs,
+                                       csVector2 &min, csVector2 &max) const
   {
     size_t index = triangle[0];
-    min = vertexData.vertexArray[index].lightmapUV;
-    max = vertexData.vertexArray[index].lightmapUV;
+    min = lightmapUVs[index];
+    max = lightmapUVs[index];
     for (uint i = 1; i < 3; ++i)
     {
       index = triangle[i];
-      const csVector2 &uv = vertexData.vertexArray[index].lightmapUV;
+      const csVector2 &uv = lightmapUVs[index];
       min.x = csMin (min.x, uv.x);
       min.y = csMin (min.y, uv.y);
 
@@ -193,46 +257,164 @@ namespace lighter
     max += csVector2(0.5f, 0.5f);
   }
 
-  void Primitive::ComputePlane ()
-  {
-    //Setup a temporary array of our vertices
-    Vector3DArray vertices;
-    vertices.Push (vertexData.vertexArray[triangle.a].position);
-    vertices.Push (vertexData.vertexArray[triangle.b].position);
-    vertices.Push (vertexData.vertexArray[triangle.c].position);
+  //-------------------------------------------------------------------------
 
-    plane = csPoly3D::ComputePlane (vertices);
-  }
-
-  const csVector3 Primitive::GetCenter () const
+  void Primitive::Prepare ()
   {
-    csVector3 centroid;
-    centroid = vertexData.vertexArray[triangle.a].position;
-    centroid += vertexData.vertexArray[triangle.b].position;
-    centroid += vertexData.vertexArray[triangle.c].position;
+    // Reset current data
+    elementAreas.DeleteAll ();
+    elementAreas.SetFullArea ((uFormVector % vFormVector).Norm());
+
+    // Compute min/max uv
+    uint uc, vc;
+    int maxu, minu, maxv, minv;
+    ComputeMinMaxUV (minu, maxu, minv, maxv);
+
+    uc = maxu - minu + 1;
+    vc = maxv - minv + 1;
+
+    minUV.x = minu; minUV.y = minv;
+    maxUV.x = maxu; maxUV.y = maxv;
+
+    // Min xyz
+    csVector2 d = minUV - 
+      (GetVertexData().lightmapUVs[triangle.a] + csVector2 (0.5f));
+    minCoord = GetVertexData().positions[triangle.a] 
+      + uFormVector * d.x + vFormVector * d.y;
+
+    // Set some default info
+    elementAreas.SetSize (uc * vc);
+
+    // Create our splitplanes
+    csPlane3 uCut (plane.Normal () % vFormVector);
+    uCut.Normalize ();
+    csVector3 uCutOrigin = minCoord;
+    uCut.SetOrigin (uCutOrigin);
     
-    return centroid / 3.0f;
-  }
+    csPlane3 vCut (plane.Normal () % uFormVector);
+    vCut.Normalize ();
+    csVector3 vCutOrigin = minCoord;
+    vCut.SetOrigin (vCutOrigin);
 
-  float Primitive::GetArea () const
-  {
-    float area = csMath3::DoubleArea3 (
-      vertexData.vertexArray[triangle.a].position,
-      vertexData.vertexArray[triangle.b].position, 
-      vertexData.vertexArray[triangle.c].position);
-    return area/2.0f;
-  }
+    // Make sure they face correct way
+    csVector3 primCenter = GetCenter ();
+    if (uCut.Classify (primCenter) < 0) uCut.Normal () = -uCut.Normal ();
+    if (vCut.Classify (primCenter) < 0) vCut.Normal () = -vCut.Normal ();
 
-  void Primitive::GetExtent (uint axis, float &min, float &max) const
-  {
-    min = FLT_MAX;
-    max = -FLT_MAX;
-    for (unsigned int i = 0; i < 3; ++i)
+    // Start slicing
+    csPlane3 evCut = vCut;
+
+    csVector3 tmpArray[40];
+    csVector3* fullPoly = &tmpArray[0];
+    csVector3* rest = &tmpArray[10];
+    csVector3* elementRow = &tmpArray[20];
+    csVector3* element = &tmpArray[30];
+
+    size_t polygonSize = 0, restSize, elementRowSize, elementSize;
+    
+    // Add the originalpoly
+    fullPoly[polygonSize++] = GetVertexData().positions[triangle.a];
+    fullPoly[polygonSize++] = GetVertexData().positions[triangle.b];
+    fullPoly[polygonSize++] = GetVertexData().positions[triangle.c];
+
+
+    size_t elNum = 0;
+    for (uint v = 0; v  < vc; v++)
     {
-      float val = vertexData.vertexArray[triangle.a].position[axis];
-      min = csMin(min, val);
-      max = csMax(max, val);
+      vCutOrigin += vFormVector;
+      evCut.SetOrigin (vCutOrigin);
+      
+      // Cut of a row      
+      if (v < (vc-1)) 
+      {
+        PolygonSplitWithPlane (evCut,
+          fullPoly, polygonSize,
+          elementRow, elementRowSize, 
+          rest, restSize);
+
+        // make rest into new poly
+        csVector3* tmp = rest; rest = fullPoly; fullPoly = tmp;
+        polygonSize = restSize;
+      }
+      else
+      {
+        // Row is rest of polygon
+        csVector3* tmp = elementRow; elementRow = fullPoly; fullPoly = tmp;
+        elementRowSize = polygonSize;
+      }
+
+      // Cut into elements
+      csPlane3 euCut = uCut;
+      csVector3 euOrigin = uCutOrigin;
+      for (uint u = 0; u < uc; u++)
+      {
+        //if (elRow.GetVertexCount () == 0) break; //no idea to try to clip it
+        euOrigin += uFormVector;
+        euCut.SetOrigin (euOrigin);
+        
+        if (u < (uc-1))
+        {
+          PolygonSplitWithPlane (euCut,
+            elementRow, elementRowSize,
+            element, elementSize,
+            rest, restSize);
+
+          // make rest into new row
+          csVector3* tmp = rest; rest = elementRow; elementRow = tmp;
+          elementRowSize = restSize;
+        }
+        else
+        {
+          csVector3* tmp = element; element = elementRow; elementRow = tmp;
+          elementSize = elementRowSize;          
+        }
+        
+        float elArea = PolygonArea (element, elementSize);
+        elementAreas.SetElementArea (elNum++, elArea);
+      }
     }
+
+    elementAreas.ShrinkBestFit ();
+
+    ComputeBaryCoeffs();
+  }
+
+  size_t Primitive::ComputeElementIndex (const csVector3& pt) const
+  {
+    size_t u = (size_t)(pt * uFormVector);
+    size_t v = (size_t)(pt * vFormVector);
+
+    return v*size_t (maxUV.x - minUV.x + 1) + u;
+  }
+
+
+  csVector3 Primitive::ComputeElementCenter (size_t index) const
+  {
+    size_t u, v;
+
+    GetElementUV (index, u, v);
+
+    return minCoord + uFormVector * ((float)u+0.5f) + 
+      vFormVector * ((float)v+0.5f);
+  }
+
+  csVector3 Primitive::ComputeNormal (const csVector3& point) const
+  {
+    float lambda, my;
+    ComputeBaryCoords (point, lambda, my);
+
+    csVector3 norm;
+
+    norm = lambda * vertexData->normals[triangle.a] + 
+      my * vertexData->normals[triangle.b] + 
+      (1 - lambda - my) * vertexData->normals[triangle.c];
+
+    return norm.Unit ();
+  }
+
+  void Primitive::ComputeMinMaxUV (csVector2 &min, csVector2 &max) const
+  {
+    PrimitiveBase::ComputeMinMaxUV (GetVertexData().lightmapUVs, min, max);
   }
 
   /* Ok, this is a very strange method.. it is fetched from FSrad
@@ -371,9 +553,8 @@ namespace lighter
     //visit all vertices
     for (uint i = 0; i < 3; i++)
     {
-      const ObjectVertexData::Vertex& v = vertexData.vertexArray[triangle[i]];
-      const csVector3& c3D = v.position;
-      const csVector2& c2D = v.lightmapUV;
+      const csVector3& c3D = GetVertexData().positions[triangle[i]];
+      const csVector2& c2D = GetVertexData().lightmapUVs[triangle[i]];
 
       size_t v0 = 2;
 
@@ -383,14 +564,11 @@ namespace lighter
         // Skip those that includes current vertex
         if (v0 != i && v1 != i)
         {
-          const ObjectVertexData::Vertex& vert0 = vertexData.vertexArray[triangle[v0]];
-          const ObjectVertexData::Vertex& vert1 = vertexData.vertexArray[triangle[v1]];
+          const csVector3& v03D = GetVertexData().positions[triangle[v0]];
+          const csVector3& v13D = GetVertexData().positions[triangle[v1]];
 
-          const csVector3& v03D = vert0.position;
-          const csVector3& v13D = vert1.position;
-
-          const csVector2& v02D = vert0.lightmapUV;
-          const csVector2& v12D = vert1.lightmapUV;
+          const csVector2& v02D = GetVertexData().lightmapUVs[triangle[v0]];
+          const csVector2& v12D = GetVertexData().lightmapUVs[triangle[v1]];
 
           //intercept u
           if ((v02D.x - LITEPSILON <= c2D.x && v12D.x + LITEPSILON >= c2D.x) || 
@@ -438,127 +616,6 @@ namespace lighter
     if (maxvDist > 0) uFormVector = (v1_3d - v0_3d) / (v1_2d.x - v0_2d.x);
   }
 
-
-  void Primitive::Prepare ()
-  {
-    // Reset current data
-    elementAreas.DeleteAll ();
-    elementAreas.SetFullArea ((uFormVector % vFormVector).Norm());
-
-    // Compute min/max uv
-    uint uc, vc;
-    int maxu, minu, maxv, minv;
-    ComputeMinMaxUV (minu, maxu, minv, maxv);
-
-    uc = maxu - minu + 1;
-    vc = maxv - minv + 1;
-
-    minUV.x = minu; minUV.y = minv;
-    maxUV.x = maxu; maxUV.y = maxv;
-
-    // Min xyz
-    csVector2 d = minUV - 
-      (vertexData.vertexArray[triangle.a].lightmapUV + csVector2 (0.5f));
-    minCoord = vertexData.vertexArray[triangle.a].position 
-      + uFormVector * d.x + vFormVector * d.y;
-
-    // Set some default info
-    elementAreas.SetSize (uc * vc);
-
-    // Create our splitplanes
-    csPlane3 uCut (plane.Normal () % vFormVector);
-    uCut.Normalize ();
-    csVector3 uCutOrigin = minCoord;
-    uCut.SetOrigin (uCutOrigin);
-    
-    csPlane3 vCut (plane.Normal () % uFormVector);
-    vCut.Normalize ();
-    csVector3 vCutOrigin = minCoord;
-    vCut.SetOrigin (vCutOrigin);
-
-    // Make sure they face correct way
-    csVector3 primCenter = GetCenter ();
-    if (uCut.Classify (primCenter) < 0) uCut.Normal () = -uCut.Normal ();
-    if (vCut.Classify (primCenter) < 0) vCut.Normal () = -vCut.Normal ();
-
-    // Start slicing
-    csPlane3 evCut = vCut;
-
-    csVector3 tmpArray[40];
-    csVector3* fullPoly = &tmpArray[0];
-    csVector3* rest = &tmpArray[10];
-    csVector3* elementRow = &tmpArray[20];
-    csVector3* element = &tmpArray[30];
-
-    size_t polygonSize = 0, restSize, elementRowSize, elementSize;
-    
-    // Add the originalpoly
-    fullPoly[polygonSize++] = vertexData.vertexArray[triangle.a].position;
-    fullPoly[polygonSize++] = vertexData.vertexArray[triangle.b].position;
-    fullPoly[polygonSize++] = vertexData.vertexArray[triangle.c].position;
-
-
-    size_t elNum = 0;
-    for (uint v = 0; v  < vc; v++)
-    {
-      vCutOrigin += vFormVector;
-      evCut.SetOrigin (vCutOrigin);
-      
-      // Cut of a row      
-      if (v < (vc-1)) 
-      {
-        PolygonSplitWithPlane (evCut,
-          fullPoly, polygonSize,
-          elementRow, elementRowSize, 
-          rest, restSize);
-
-        // make rest into new poly
-        csVector3* tmp = rest; rest = fullPoly; fullPoly = tmp;
-        polygonSize = restSize;
-      }
-      else
-      {
-        // Row is rest of polygon
-        csVector3* tmp = elementRow; elementRow = fullPoly; fullPoly = tmp;
-        elementRowSize = polygonSize;
-      }
-
-      // Cut into elements
-      csPlane3 euCut = uCut;
-      csVector3 euOrigin = uCutOrigin;
-      for (uint u = 0; u < uc; u++)
-      {
-        //if (elRow.GetVertexCount () == 0) break; //no idea to try to clip it
-        euOrigin += uFormVector;
-        euCut.SetOrigin (euOrigin);
-        
-        if (u < (uc-1))
-        {
-          PolygonSplitWithPlane (euCut,
-            elementRow, elementRowSize,
-            element, elementSize,
-            rest, restSize);
-
-          // make rest into new row
-          csVector3* tmp = rest; rest = elementRow; elementRow = tmp;
-          elementRowSize = restSize;
-        }
-        else
-        {
-          csVector3* tmp = element; element = elementRow; elementRow = tmp;
-          elementSize = elementRowSize;          
-        }
-        
-        float elArea = PolygonArea (element, elementSize);
-        elementAreas.SetElementArea (elNum++, elArea);
-      }
-    }
-
-    elementAreas.ShrinkBestFit ();
-
-    ComputeBaryCoeffs();
-  }
-
   bool Primitive::PointInside (const csVector3& pt) const
   {
     float lambda, my;
@@ -566,32 +623,31 @@ namespace lighter
     return (lambda >= 0.0f && my >= 0.0f && (lambda + my) < 1.0f);
   }
 
-  int Primitive::Classify (const csPlane3 &plane) const
+  void Primitive::ComputeBaryCoords (const csVector3& v, float& lambda, 
+                                     float& my) const
   {
-    size_t i;
-    size_t front = 0, back = 0;
+    csVector3 thirdPosToV = 
+      vertexData->positions[triangle.c] - v;
 
-    for (i = 0; i < 3; i++)
-    {
-      float dot = plane.Classify (vertexData.vertexArray[triangle[i]].position);
-      if (ABS (dot) < EPSILON) dot = 0;
-      if (dot > 0)
-        back++;
-      else if (dot < 0)
-        front++;
-    }
+    lambda = (lambdaCoeffTV * thirdPosToV);
+    my = (myCoeffTV * thirdPosToV);
+  }
 
-    if (back == 0 && front == 0) return CS_POL_SAME_PLANE;
-    if (back == 0) return CS_POL_FRONT;
-    if (front == 0) return CS_POL_BACK;
-    return CS_POL_SPLIT_NEEDED;
+  ElementProxy Primitive::GetElement (size_t index)
+  {
+    return ElementProxy(*this, index);
+  }
+
+  ElementProxy Primitive::GetElement (const csVector3& pt)
+  {
+    return GetElement (ComputeElementIndex (pt));
   }
 
   void Primitive::ComputeBaryCoeffs ()
   {
-    const csVector3& v1 = vertexData.vertexArray[triangle.a].position;
-    const csVector3& v2 = vertexData.vertexArray[triangle.b].position;
-    const csVector3& v3 = vertexData.vertexArray[triangle.c].position;
+    const csVector3& v1 = vertexData->positions[triangle.a];
+    const csVector3& v2 = vertexData->positions[triangle.b];
+    const csVector3& v3 = vertexData->positions[triangle.c];
 
     csVector3 diff1_3 = v1 - v3;
     csVector3 diff2_3 = v2 - v3;
@@ -663,59 +719,6 @@ namespace lighter
         }
         break;
     }
-  }
-
-  void Primitive::ComputeBaryCoords (const csVector3& v, float& lambda, 
-                                        float& my) const
-  {
-    csVector3 thirdPosToV = 
-      vertexData.vertexArray[triangle.c].position - v;
-
-    lambda = (lambdaCoeffTV * thirdPosToV);
-    my = (myCoeffTV * thirdPosToV);
-  }
-
-  size_t Primitive::ComputeElementIndex (const csVector3& pt) const
-  {
-    size_t u = (size_t)(pt * uFormVector);
-    size_t v = (size_t)(pt * vFormVector);
-
-    return v*size_t (maxUV.x - minUV.x + 1) + u;
-  }
-
-
-  ElementProxy Primitive::GetElement (size_t index)
-  {
-    return ElementProxy(*this, index);
-  }
-
-  ElementProxy Primitive::GetElement (const csVector3& pt)
-  {
-    return GetElement (ComputeElementIndex (pt));
-  }
-
-  csVector3 Primitive::ComputeElementCenter (size_t index) const
-  {
-    size_t u, v;
-
-    GetElementUV (index, u, v);
-
-    return minCoord + uFormVector * ((float)u+0.5f) + 
-      vFormVector * ((float)v+0.5f);
-  }
-
-  csVector3 Primitive::ComputeNormal (const csVector3& point) const
-  {
-    float lambda, my;
-    ComputeBaryCoords (point, lambda, my);
-
-    csVector3 norm;
-
-    norm = lambda * vertexData.vertexArray[triangle.a].normal + 
-      my * vertexData.vertexArray[triangle.b].normal + 
-      (1 - lambda - my) * vertexData.vertexArray[triangle.c].normal;
-
-    return norm.Unit ();
   }
 
 }

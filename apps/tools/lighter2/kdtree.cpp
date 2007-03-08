@@ -517,9 +517,9 @@ namespace lighter
           const csVector3& N = prim->GetPlane ().Normal ();
           ObjectVertexData &vdata = prim->GetVertexData ();
           const Primitive::TriangleType& t = prim->GetTriangle ();
-          const csVector3& A = vdata.vertexArray[t.a].position;
-          const csVector3& B = vdata.vertexArray[t.b].position;
-          const csVector3& C = vdata.vertexArray[t.c].position;
+          const csVector3& A = vdata.positions[t.a];
+          const csVector3& B = vdata.positions[t.b];
+          const csVector3& C = vdata.positions[t.c];
 
           // Find max normal direction
           int k = N.DominantAxis ();
@@ -779,9 +779,9 @@ namespace lighter
   {
     const ObjectVertexData &vdata = prim->GetVertexData ();
     const Primitive::TriangleType& t = prim->GetTriangle ();
-    const csVector3& A = vdata.vertexArray[t.a].position;
-    const csVector3& B = vdata.vertexArray[t.b].position;
-    const csVector3& C = vdata.vertexArray[t.c].position;
+    const csVector3& A = vdata.positions[t.a];
+    const csVector3& B = vdata.positions[t.b];
+    const csVector3& C = vdata.positions[t.c];
 
     vertices[0] = A;
     vertices[1] = B;
