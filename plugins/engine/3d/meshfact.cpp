@@ -47,6 +47,7 @@ csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine,
 
   render_priority = engine->GetObjectRenderPriority ();
   imposter_active = false;
+  imposter_factory = 0;
 }
 
 csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine)
@@ -57,6 +58,7 @@ csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine)
 
   render_priority = engine->GetObjectRenderPriority ();
   imposter_active = false;
+  imposter_factory = 0;
 }
 
 csMeshFactoryWrapper::~csMeshFactoryWrapper ()
@@ -64,6 +66,7 @@ csMeshFactoryWrapper::~csMeshFactoryWrapper ()
   // This line MUST be here to ensure that the children are not
   // removed after the destructor has already finished.
   children.RemoveAll ();
+  delete imposter_factory;
 }
 
 void csMeshFactoryWrapper::SelfDestruct ()
@@ -225,6 +228,15 @@ void csMeshFactoryWrapper::AddFactoryToStaticLOD (int lod,
 void csMeshFactoryWrapper::SetImposterActive (bool flag)
 {
   imposter_active = flag;
+  if (imposter_active)
+  {
+    if (!imposter_factory)
+      imposter_factory = new csImposterFactory (this);
+  }
+  else if (!imposter_active)
+  {
+    delete imposter_factory;
+  }
 }
 
 

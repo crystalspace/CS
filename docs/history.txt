@@ -7,6 +7,10 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 9-Mar-2007
+	- Jorrit started work on moving imposter handling to imposter
+	  factories so that it is possible to share imposter textures.
+	  Not really working yet however, so the imposter factory
+	  currently behaves as if it is not sharing at all.
         - Piotr implemented finding bones by names in cal3d plugin.
 8-Mar-2007
 	- Jorrit did the following imposter updates:

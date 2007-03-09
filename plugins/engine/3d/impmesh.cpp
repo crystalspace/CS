@@ -31,6 +31,37 @@
 #include "light.h"
 #include "engine.h"
 
+
+csImposterMesh* csImposterFactory::GetImposterMesh (csMeshWrapper* mesh,
+      csImposterMesh* old_imposter_mesh, iRenderView* rview)
+{
+  // Check for imposter existence. If not create it.
+  if (!old_imposter_mesh)
+  {
+    old_imposter_mesh = new csImposterMesh (meshfact->GetEngine (), mesh);
+  }
+
+  // Check for imposter already ready
+  if (!old_imposter_mesh->GetImposterReady (rview))
+  {
+    return old_imposter_mesh;
+  }
+
+  // Check for too much camera movement since last imposter render
+  if (!old_imposter_mesh->CheckUpdateNeeded (rview,
+	meshfact->imposter_rotation_tolerance
+		? meshfact->imposter_rotation_tolerance->Get ()
+		: 0.4f,
+	meshfact->imposter_camera_rotation_tolerance
+		? meshfact->imposter_camera_rotation_tolerance->Get ()
+		: 0.2f))
+  {
+  }
+  return old_imposter_mesh;
+}
+
+//===========================================================================
+
 csImposterMesh::csImposterMesh (csEngine* engine, csMeshWrapper *parent)
 {
   csImposterMesh::engine = engine;

@@ -333,9 +333,9 @@ void ImposterTest::CreateSprites ()
   look_point = csVector3 (1, 1, 1);
 
   float x, y, z;
-  for (x = 0 ; x <= 1.1 ; x += .5)
-    for (y = 0 ; y <= 1.1 ; y += .5)
-      for (z = 0 ; z <= 1.1 ; z += .5)
+  for (x = 0 ; x <= 2.1 ; x += .5)
+    for (y = 0 ; y <= 2.1 ; y += .5)
+      for (z = 0 ; z <= 2.1 ; z += .5)
         CreateSprite (imeshfact, csVector3 (x, y, z));
 
   printf("done...\n");

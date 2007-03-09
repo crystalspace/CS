@@ -34,6 +34,8 @@ class csVector3;
 class csMatrix3;
 class csMovable;
 class csMeshWrapper;
+class csMeshFactoryWrapper;
+class csImposterMesh;
 struct iRenderView;
 struct iCamera;
 
@@ -42,6 +44,21 @@ struct iCamera;
  */
 class csImposterFactory
 {
+private:
+  csImposterMesh* imposter_mesh;	// @@@ Temporary.
+  csMeshFactoryWrapper* meshfact;
+
+public:
+  csImposterFactory (csMeshFactoryWrapper* meshfact)
+    : imposter_mesh (0), meshfact (meshfact) { }
+
+  /**
+   * Get a valid imposter mesh for a given mesh.
+   * If possible this will reuse the previous imposter mesh if there is
+   * one and if it is still usable.
+   */
+  csImposterMesh* GetImposterMesh (csMeshWrapper* mesh,
+      csImposterMesh* old_imposter_mesh, iRenderView* rview);
 };
 
 /**

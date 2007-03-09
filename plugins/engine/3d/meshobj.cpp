@@ -953,31 +953,16 @@ bool csMeshWrapper::CheckImposterRelevant (iRenderView *rview)
 
 csRenderMesh** csMeshWrapper::GetImposter (iRenderView *rview)
 {
-  // Check for imposter existence. If not create it.
-  if (!imposter_mesh)
-  {
-    imposter_mesh = new csImposterMesh (engine, this);
-  }
-
-  // Check for imposter already ready
-  if (!imposter_mesh->GetImposterReady (rview))
-  {
-    return 0;
-  }
-
   csMeshFactoryWrapper* factwrap = static_cast<csMeshFactoryWrapper*> (
   	factory);
+  csImposterFactory* imposter_factory = factwrap->GetImposterFactory ();
+  if (!imposter_factory) return 0;
 
-  // Check for too much camera movement since last imposter render
-  if (!imposter_mesh->CheckUpdateNeeded (rview,
-	factwrap->imposter_rotation_tolerance
-		? factwrap->imposter_rotation_tolerance->Get ()
-		: 0.4f,
-	factwrap->imposter_camera_rotation_tolerance
-		? factwrap->imposter_camera_rotation_tolerance->Get ()
-		: 0.2f))
-  {
-  }
+  imposter_mesh = imposter_factory->GetImposterMesh (this,
+      imposter_mesh, rview);
+  if (!imposter_mesh) return 0;
+  if (!imposter_mesh->GetImposterReady (rview))
+    return 0;
 
   // Get imposter rendermesh
   return imposter_mesh->GetRenderMesh (rview);

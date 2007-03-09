@@ -165,6 +165,9 @@ private:
 
   csEngine* engine;
 
+  /// Class for keeping track of imposter information.
+  csImposterFactory* imposter_factory;
+
 public:
   /// Flag indicating whether this factory should try to imposter or not.
   bool imposter_active;
@@ -186,6 +189,8 @@ public:
 
   /// Set the mesh object factory.
   void SetMeshObjectFactory (iMeshObjectFactory* meshFact);
+
+  csEngine* GetEngine () const { return engine; }
 
   /// Get the mesh object factory.
   iMeshObjectFactory* GetMeshObjectFactory () const
@@ -317,6 +322,9 @@ public:
   /// Determine if imposter or true rendering will be used.
   virtual bool WouldUseImposter (csReversibleTransform& /*pov*/) const
   { /* implement later */ return false; }
+
+  /// Get the imposter factory.
+  csImposterFactory* GetImposterFactory () { return imposter_factory; }
 
   //--------------------- iSelfDestruct implementation -------------------//
 
