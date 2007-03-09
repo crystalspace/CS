@@ -32,6 +32,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/memfile.h"
 #include "csutil/randomgen.h"
+#include "csutil/hash.h"
 #include "csutil/sysfunc.h"
 #include "cstool/rbuflock.h"
 
@@ -724,9 +725,23 @@ void csCal3dSkeletonFactory::SetSkeleton (CalCoreSkeleton *skeleton)
   for (size_t i = 0; i < bvect.size (); i++)
   {
     bones_factories[i]->Initialize ();
+    bones_names.Put (csHashComputer<const char*>::ComputeHash (bones_factories[i]->GetName ()), i);
   }
 }
-
+size_t csCal3dSkeletonFactory::FindBoneIndex (const char *name)
+{
+  csArray<size_t> b_idx = bones_names.GetAll (csHashComputer<const char*>::ComputeHash (name));
+  if (b_idx.GetSize () > 0)
+    return b_idx[0];
+  return csArrayItemNotFound;
+}
+iSkeletonBoneFactory *csCal3dSkeletonFactory::FindBone (const char *name)
+{
+  csArray<size_t> b_idx = bones_names.GetAll (csHashComputer<const char*>::ComputeHash (name));
+  if (b_idx.GetSize () > 0)
+    return bones_factories[b_idx[0]];
+  return 0;
+}
 //---------------------------csCal3dSkeletonBoneFactory---------------------------
 
 csCal3dSkeletonBoneFactory::csCal3dSkeletonBoneFactory (CalCoreBone *core_bone,
@@ -2266,6 +2281,7 @@ scfImplementationType(this), skeleton(skeleton), skeleton_factory (skel_factory)
   for (size_t i = 0; i < cal_bones.size (); i++)
   {
     bones[i]->Initialize ();
+    bones_names.Put (csHashComputer<const char*>::ComputeHash (bones[i]->GetName ()), i);
   }
 }
 
@@ -2276,7 +2292,20 @@ void csCal3dSkeleton::UpdateNotify (const csTicks &current_ticks)
     update_callbacks[i]->Execute (this, current_ticks);
   }
 }
-
+size_t csCal3dSkeleton::FindBoneIndex (const char *name)
+{
+  csArray<size_t> b_idx = bones_names.GetAll (csHashComputer<const char*>::ComputeHash (name));
+  if (b_idx.GetSize () > 0)
+    return b_idx[0];
+  return csArrayItemNotFound;
+}
+iSkeletonBone *csCal3dSkeleton::FindBone (const char *name)
+{
+  csArray<size_t> b_idx = bones_names.GetAll (csHashComputer<const char*>::ComputeHash (name));
+  if (b_idx.GetSize () > 0)
+    return bones[b_idx[0]];
+  return 0;
+}
 //---------------------------csCal3dSkeletonBone---------------------------
 
 csCal3dSkeletonBone::csCal3dSkeletonBone (CalBone *bone, iSkeletonBoneFactory *factory,

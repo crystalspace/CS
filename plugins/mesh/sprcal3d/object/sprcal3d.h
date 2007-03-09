@@ -791,6 +791,7 @@ class csCal3dSkeletonFactory : public
   CalCoreSkeleton *core_skeleton;
   csString name;
   csRefArray<csCal3dSkeletonBoneFactory> bones_factories;
+  csHash<uint, size_t> bones_names;
 
 public:
 
@@ -809,8 +810,8 @@ public:
   iSkeletonAnimation *CreateScript(const char *name) {return CreateAnimation (name);}
   iSkeletonAnimation *FindAnimation (const char *name) {return 0;}
   iSkeletonAnimation *FindScript (const char *name) {return FindAnimation (name);}
-  iSkeletonBoneFactory *FindBone (const char *name) {return 0;}
-  size_t FindBoneIndex (const char *name) {return 0;}
+  iSkeletonBoneFactory *FindBone (const char *name);
+  size_t FindBoneIndex (const char *name);
   size_t GetBonesCount () const {return bones_factories.GetSize ();}
   iSkeletonBoneFactory *GetBone (size_t i) {return (iSkeletonBoneFactory*)bones_factories[i];}
   iSkeletonGraveyard *GetGraveyard  () {return 0;}
@@ -910,6 +911,7 @@ class csCal3dSkeleton : public scfImplementation1<csCal3dSkeleton, iSkeleton>
   csRefArray<csCal3dSkeletonBone> bones;
   csWeakRef<csCal3dSkeletonFactory> skeleton_factory;
   csRefArray<iSkeletonUpdateCallback> update_callbacks;
+  csHash<uint, size_t> bones_names;
 
 public:
 
@@ -921,8 +923,8 @@ public:
   void SetName (const char* name) {csCal3dSkeleton::name = name;}
   size_t GetBonesCount () {return bones.GetSize ();}
   iSkeletonBone *GetBone (size_t i) {return bones[i];}
-  iSkeletonBone *FindBone (const char *name) {return 0;}
-  size_t FindBoneIndex (const char *name) {return 0;}
+  iSkeletonBone *FindBone (const char *name);
+  size_t FindBoneIndex (const char *name);
   iSkeletonAnimation* Execute (const char *scriptname) {return 0;}
   iSkeletonAnimation* Append (const char *scriptname) {return 0;}
   void ClearPendingAnimations () {;}
