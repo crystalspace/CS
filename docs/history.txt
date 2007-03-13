@@ -6,6 +6,18 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Mar-2007
+	- Marten did first step in renaming terrainimproved to terrain2.
+13-Mar-2007
+	- Marten did some more fixes to terrain:
+	    - Properly distinguish between factory and terrain object.
+	    - Move feeder to be per terrain instead of per cell. Added per 
+	      cell feeder properties.
+	    - Fixed some things in the API to be more like rest of CS 
+	      (sending SCF objects by pointer, transforms by reference).
+	    - Unified terrain to use a single interface header file inside 
+	      include/imesh.
+	    - Fixed the loader to use more standardized names for tags.
 9-Mar-2007
 	- Jorrit started work on moving imposter handling to imposter
 	  factories so that it is possible to share imposter textures.
@@ -33,7 +45,15 @@ chronological order.
 	  after that initialization, the factory can possibly be released,
 	  reducing memory usage.
 	- res reorganized primitive and vertex data so the data stored by 
-	  factories resp. objects is closer to what's really only needed.  
+	  factories resp. objects is closer to what's really only needed.
+	- Marten fixed an error related to accessing already removed objects
+	  when collapsing several lod-levels at once in bruteblock renderer
+	  of new terrain.
+	- Marten added support for large blocks (32-bit indices) in bruteblock 
+	  renderer of new terrain.
+	- Marten added support for per cell base material. Changed the terraini
+	  level to mimic terrainf level.
+	- Marten did a small fix for coordinate systems in improved terrain.  
 7-Mar-2007
 	- Jorrit fixed a crash bug in lighter2. In the simple TUI lastTask
 	  started as an empty null string and comparing that with GetTaskName()
@@ -143,6 +163,10 @@ chronological order.
 	  are created (each representing a task). Code that "does something"
 	  then sets the progress on one of such progress objects, which takes
 	  care of updating the display and updating the overall progress.
+	- Marten made a number of fixes to improved terrain:
+	    - Changed the cell lru to be a bit more efficient.
+	    - Removed all usage of csArray::Length/SetLength
+	    - Fixed a block culling bug.
 1-Mar-2007
 	- res fixed embedgl to properly include gl.h. (<GL/gl.h> doesn't work
 	  on all platforms, the CS_OPENGL_PATH construct takes care of the
@@ -152,6 +176,14 @@ chronological order.
 	  files).
 	- Marten fixed a serious bug in bruteblock terrain where it would
 	  never cull any terrain blocks.
+	- Marten fixed csLog2 to give correct result when a power of 2
+	  was given.
+	- Marten made a number of fixes to improved terrain plugin:
+	    - Rewrote the LOD level selection algorithm to use projected
+	      area instead of just maximum component.
+	    - Moved the index buffer generation to be done per terrain
+	      renderer instance, not per terrain cell instance.
+	    - Did some general stylistic fixes.
 28-Feb-2007
 	- Marten fixed the particle loader/saver to properly expose the
 	  saver interface.
@@ -333,15 +365,6 @@ chronological order.
 	    - Changed the cell lru to be a bit more efficient.
 	    - Removed all usage of csArray::Length/SetLength
 	    - Fixed a block culling bug.
-1-Mar-2007
-	- Marten fixed csLog2 to give correct result when a power of 2
-	  was given.
-	- Marten made a number of fixes to improved terrain plugin:
-	    - Rewrote the LOD level selection algorithm to use projected
-	      area instead of just maximum component.
-	    - Moved the index buffer generation to be done per terrain
-	      renderer instance, not per terrain cell instance.
-	    - Did some general stylistic fixes.
 19-Feb-2007
 	- Marten made a few changes in lighter2:
 	   - Disabled the use of the exposure function and use a simple
