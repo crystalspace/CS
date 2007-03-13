@@ -7,6 +7,15 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 
+13-Mar-2007
+	- Marten did some more fixes to terrain:
+	    - Properly distinguish between factory and terrain object.
+	    - Move feeder to be per terrain instead of per cell. Added per 
+	      cell feeder properties.
+	    - Fixed some things in the API to be more like rest of CS 
+	      (sending SCF objects by pointer, transforms by reference).
+	    - Unified terrain to use a single interface header file inside 
+	      include/imesh.
 8-Mar-2007
 	- Marten fixed an error related to accessing already removed objects
 	  when collapsing several lod-levels at once in bruteblock renderer

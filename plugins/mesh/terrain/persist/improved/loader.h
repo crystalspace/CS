@@ -23,6 +23,7 @@
 #include "imap/writer.h"
 #include "iutil/comp.h"
 #include "csutil/strhash.h"
+#include "csutil/csstring.h"
 
 struct iObjectRegistry;
 struct iSyntaxService;
@@ -37,9 +38,24 @@ class csTerrainFactoryLoader :
                             iComponent>
 {
 private:
+  struct ParamPair
+  {
+    csString name, value;
+  };
+
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
+  csRef<iReporter> reporter;
+
   csStringHash xmltokens;
+#define CS_TOKEN_ITEM_FILE "plugins/mesh/terrain/persist/improved/loader.tok"
+#include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE 
+
+  bool ParseCell (iDocumentNode* node, iLoaderContext* ldr_ctx,
+    iTerrainFactory* fact);
+
+  bool ParseParams (csArray<ParamPair>& pairs, iDocumentNode* node);
 
 public:
   /// Constructor
@@ -67,7 +83,13 @@ class csTerrainObjectLoader :
 private:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
+  csRef<iReporter> reporter;
+
   csStringHash xmltokens;
+#define CS_TOKEN_ITEM_FILE "plugins/mesh/terrain/persist/improved/loader.tok"
+#include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE 
+
 public:
   /// Constructor
   csTerrainObjectLoader (iBase*);

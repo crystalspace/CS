@@ -19,230 +19,155 @@
 #ifndef __CS_TERRAIN_TERRAINSYSTEM_H__
 #define __CS_TERRAIN_TERRAINSYSTEM_H__
 
-#include "csutil/scf_implementation.h"
-
-#include "cstool/objmodel.h"
-
-#include "iterrain/terrainsystem.h"
-#include "iterrain/terrainrenderer.h"
-#include "iterrain/terraincollider.h"
-
-#include "imesh/object.h"
-
-#include "iengine/material.h"
-
-#include "cell.h"
-
-#include "csutil/refarr.h"
-#include "csutil/flags.h"
-#include "csutil/scfarray.h"
-
 #include "csgeom/box.h"
-
-#include "csutil/refarr.h"
-
-#include "ivaria/collider.h"
-
-#include "iengine/shadcast.h"
-#include "imesh/lighting.h"
-#include "iengine/lightmgr.h"
-
-#include "csutil/set.h"
+#include "cstool/meshobjtmpl.h"
+#include "cstool/objmodel.h"
+#include "csutil/flags.h"
 #include "csutil/list.h"
-
-#include "iutil/comp.h"
+#include "csutil/refarr.h"
+#include "csutil/scf_implementation.h"
+#include "csutil/scfarray.h"
+#include "csutil/set.h"
 
 #include "iengine/engine.h"
+#include "iengine/lightmgr.h"
+#include "iengine/material.h"
+#include "iengine/shadcast.h"
+#include "imesh/lighting.h"
+#include "imesh/object.h"
+#include "imesh/terrain2.h"
+#include "iutil/comp.h"
+#include "ivaria/collider.h"
 
-CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
+CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
 {
+class csTerrainCell;
 
 class csTerrainSystem :
-  public scfImplementationExt5<csTerrainSystem,
-                            csObjectModel,
-                            iTerrainSystem,
-                            iMeshObject,
-                            iCollider,
-//                            iShadowReceiver,
-                            iLightingInfo,
-                            iComponent>
+  public scfImplementationExt2<csTerrainSystem,
+                               csMeshObject,
+                               iTerrainSystem,
+                               iCollider>
 {
-  csRef<iMeshObjectFactory> factory;
-
-  csRef<iTerrainRenderer> renderer;
-  csRef<iTerrainCollider> collider;
-
-  csRefArray<csTerrainCell> cells;
-
-  float vview_distance;
-  bool auto_preload;
-
-  csFlags imo_flags;
-  csRef<iMeshObjectDrawCallback> imo_viscb;
-  iMeshWrapper* logparent;
-
-  csDirtyAccessArray<iTerrainCell*> needed_cells;
-
-  csRefArray<iMaterialWrapper> material_palette;
-
-  csBox3 bbox;
-  bool bbox_valid;
-
-  scfArray<iTerrainVector3Array> collision_result;
-
-  unsigned int max_loaded_cells;
-
-  // lighting
-  csSet<csPtrKey<iLight> > affecting_lights;
-  unsigned int colorVersion;
-  unsigned int dynamic_ambient_version;
-  csRef<iLightManager> light_mgr;
-  csRef<iEngine> engine;
-  csRefArray<iOnCellLoadedListener> cell_listeners;
-
-  void ComputeBBox();
-
-  void UpdateColors (iMovable* movable, csColor& baseColor);
 public:
-  csTerrainSystem (iMeshObjectFactory* factory = 0);
+  csTerrainSystem (iMeshObjectFactory* factory,
+    iTerrainRenderer* renderer, iTerrainCollider* collider, 
+    iTerrainDataFeeder* feeder);
 
   virtual ~csTerrainSystem ();
 
   void AddCell (csTerrainCell* cell);
 
-  void SetRenderer (iTerrainRenderer* renderer);
-  void SetCollider (iTerrainCollider* collider);
+  void FireLoadCallbacks (csTerrainCell* cell);
+  void FirePreLoadCallbacks (csTerrainCell* cell);
+  void FireUnloadCallbacks (csTerrainCell* cell);
+  void FireHeightUpdateCallbacks (csTerrainCell* cell, const csRect& rectangle);
+
+  iTerrainRenderer* GetRenderer () const
+  {
+    return renderer;
+  }
+
+  iTerrainCollider* GetCollider () const
+  {
+    return collider;
+  }
+
+  iTerrainDataFeeder* GetFeeder () const
+  {
+    return dataFeeder;
+  }
 
   // ------------ iTerrainSystem implementation ------------
+  virtual iTerrainCell* GetCell (const char* name, bool loadData = false);
+  virtual iTerrainCell* GetCell (const csVector2& pos, bool loadData = false);
+  virtual iTerrainCell* GetCell (size_t index, bool loadData = false);
 
-  size_t GetCellsCount () {return cells.GetSize ();}
-
-  void AddCellListener (iOnCellLoadedListener* listener){cell_listeners.Push (listener);} 
-
-  virtual iTerrainCell* GetCell (const char* name);
-  virtual iTerrainCell* GetCell (const csVector2& pos);
-  
-  virtual iTerrainCell* GetCellNL (const char* name);
-  virtual iTerrainCell* GetCellNL (const csVector2& pos);
+  virtual size_t GetCellCount () const;
 
   virtual const csRefArray<iMaterialWrapper>& GetMaterialPalette () const;
   virtual void SetMaterialPalette (const csRefArray<iMaterialWrapper>& array);
 
   virtual bool CollideSegment (const csVector3& start, const csVector3& end,
-                        bool oneHit, iTerrainVector3Array& points);
+    bool oneHit, iTerrainVector3Array* points);
 
   virtual bool CollideTriangles (const csVector3* vertices,
-                       unsigned int tri_count,
-                       const unsigned int* indices, float radius,
-                       const csReversibleTransform* trans,
-                       bool oneHit, iTerrainCollisionPairArray& pairs);
+    size_t tri_count,
+    const unsigned int* indices, float radius,
+    const csReversibleTransform& trans,
+    bool oneHit, iTerrainCollisionPairArray* pairs);
 
   virtual bool Collide (iCollider* collider, float radius,
-                       const csReversibleTransform* trans,
-                       bool oneHit, iTerrainCollisionPairArray& pairs);
+    const csReversibleTransform& trans, bool oneHit,
+    iTerrainCollisionPairArray* pairs);
 
   virtual float GetVirtualViewDistance () const;
   virtual void SetVirtualViewDistance (float distance);
 
   virtual bool GetAutoPreLoad () const;
   virtual void SetAutoPreLoad (bool mode);
+
   virtual void PreLoadCells (iRenderView* rview, iMovable* movable);
-  
+
   virtual float GetHeight (const csVector2& pos);
   virtual csVector3 GetTangent (const csVector2& pos);
   virtual csVector3 GetBinormal (const csVector2& pos);
   virtual csVector3 GetNormal (const csVector2& pos);
-  
-  virtual unsigned int GetMaxLoadedCells () const;
-  virtual void SetMaxLoadedCells (unsigned int value);
-  virtual void UnloadLRUCells ();
+
+  virtual size_t GetMaxLoadedCells () const;
+  virtual void SetMaxLoadedCells (size_t value);
+
+  virtual void UnloadOldCells ();
+
+  virtual void AddCellLoadListener (iTerrainCellLoadCallback* cb);
+  virtual void RemoveCellLoadListener (iTerrainCellLoadCallback* cb);
+
+  virtual void AddCellHeightUpdateListener (iTerrainCellHeightDataCallback* cb);
+  virtual void RemoveCellHeightUpdateListener (iTerrainCellHeightDataCallback* cb);  
 
   // ------------ iMeshObject implementation ------------
 
   virtual iMeshObjectFactory* GetFactory () const;
-
-  virtual csFlags& GetFlags ();
-
-  virtual csPtr<iMeshObject> Clone ();
-
   virtual csRenderMesh** GetRenderMeshes (int& num, iRenderView* rview, 
     iMovable* movable, uint32 frustum_mask);
-
-  virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb);
-
-  virtual iMeshObjectDrawCallback* GetVisibleCallback () const;
-
-  virtual void NextFrame (csTicks current_time,const csVector3& pos,
-    uint currentFrame);
-
-  virtual void HardTransform (const csReversibleTransform& t);
-
-  virtual bool SupportsHardTransform () const;
 
   virtual bool HitBeamOutline (const csVector3& start,
         const csVector3& end, csVector3& isect, float* pr);
 
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
-        csVector3& isect, float* pr, int* polygon_idx = 0,
-        iMaterialWrapper** material = 0);
-
-  virtual void SetMeshWrapper (iMeshWrapper* lp);
-
-  virtual iMeshWrapper* GetMeshWrapper () const;
-
-  virtual iObjectModel* GetObjectModel ();
-
-  virtual bool SetColor (const csColor& color);
-
-  virtual bool GetColor (csColor& color) const;
-
-  virtual bool SetMaterialWrapper (iMaterialWrapper* material);
-
-  virtual iMaterialWrapper* GetMaterialWrapper () const;
-
-  virtual void SetMixMode (uint mode);
-  virtual uint GetMixMode () const;
+        csVector3& isect, float* pr, int* polygon_idx ,
+        iMaterialWrapper** material );
 
   virtual void InvalidateMaterialHandles ();
 
-  virtual void PositionChild (iMeshObject* child,csTicks current_time);
-  virtual void BuildDecal(const csVector3* pos, float decalRadius,
-    iDecalBuilder* decalBuilder)
-  {
-  }
-
   // ------------ iObjectModel implementation ------------
-  virtual void GetObjectBoundingBox (csBox3& box);
-  virtual void SetObjectBoundingBox (const csBox3& box);
-  virtual const csBox3& GetObjectBoundingBox ();
-
-  virtual void GetRadius (float& radius, csVector3& center);
-
   virtual iTerrainSystem* GetTerrainColldet () { return this; }
   
   // ------------ iCollider implementation ------------
   virtual csColliderType GetColliderType ();
   
-  // ------------ iShadowReceiver implementation ------
-  virtual void CastShadows (iMovable* movable, iFrustumView* fview);
-  
-  // ------------ iLightingInfo implementation --------
-  virtual void InitializeDefault (bool clear);
+private:
+  csRef<iMeshObjectFactory> factory;
 
-  virtual bool ReadFromCache (iCacheManager* cache_mgr);
-  virtual bool WriteToCache (iCacheManager* cache_mgr);
+  csRef<iTerrainRenderer> renderer;
+  csRef<iTerrainCollider> collider;
+  csRef<iTerrainDataFeeder> dataFeeder;
 
-  virtual void PrepareLighting ();
+  csRefArray<csTerrainCell> cells;
 
-  virtual void LightChanged (iLight* light);
-  virtual void LightDisconnect (iLight* light);
-  virtual void DisconnectAllLights ();
-  
-  // ------------ iComponent implementation ------------
-  virtual bool Initialize (iObjectRegistry* object_reg);
+  csRefArray<iMaterialWrapper> materialPalette;
+
+  csRefArray<iTerrainCellLoadCallback> loadCallbacks;
+  csRefArray<iTerrainCellHeightDataCallback> heightDataCallbacks;
+
+  float virtualViewDistance;
+  size_t maxLoadedCells;
+  bool autoPreload, bbStarted;
+
+  void ComputeBBox();
 };
 
 }
-CS_PLUGIN_NAMESPACE_END(ImprovedTerrain)
+CS_PLUGIN_NAMESPACE_END(Terrain2)
 
 #endif // __CS_TERRAIN_TERRAINSYSTEM_H__

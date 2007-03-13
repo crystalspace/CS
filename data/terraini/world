@@ -103,28 +103,30 @@
     <params>
       <renderer>crystalspace.mesh.object.terrainimproved.bruteblockrenderer</renderer>
       <collider>crystalspace.mesh.object.terrainimproved.collider</collider>
+      <feeder>crystalspace.mesh.object.terrainimproved.simpledatafeeder</feeder>
 
-      <max_loaded_cells value="20" />
+      <maxloadedcells>20</maxloadedcells>
 
       <cells>
         
         <cell>
-          <grid_size x="257" y="257" />
-          <material_size x="512" y="512" />
+          <gridsize width="257" height="257" />
+          <materialmapsize width="512" height="512" />
+          
           <position x="-128" y="-128" />
           <size x="256" y="32" z="256" />
+          
           <basematerial>Base</basematerial>
 
-          <render_properties>
-            <param name="block resolution" value="16" />
-            <param name="lod lcoeff" value="8" />
-          </render_properties>
+          <renderproperties>
+            <param name="block resolution">16</param>
+            <param name="lod lcoeff">8</param>
+          </renderproperties>
 
-          <feeder>
-            <plugin>crystalspace.mesh.object.terrainimproved.simpledatafeeder</plugin>
-            <param name="heightmap source" value="/lev/terrain/heightmap_257x257.png" />
-            <param name="materialmap source" value="/lev/terrain/materialmap.png" />
-          </feeder>
+          <feederproperties>
+            <param name="heightmap source">/lev/terrain/heightmap_257x257.png</param>
+            <param name="materialmap source">/lev/terrain/materialmap.png</param>
+          </feederproperties>
         </cell>
         
       </cells>

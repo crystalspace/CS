@@ -29,61 +29,23 @@
 #include "imap/ldrctxt.h"
 #include "imap/loader.h"
 #include "imesh/object.h"
+#include "imesh/terrain2.h"
 #include "iutil/comp.h"
 #include "iutil/document.h"
 #include "iutil/object.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
 
-#include "iterrain/terrainsystem.h"
-#include "iterrain/terrainrenderer.h"
-#include "iterrain/terraincollider.h"
-#include "iterrain/terraincell.h"
-#include "iterrain/terraindatafeeder.h"
-#include "iterrain/terrainfactory.h"
-#include "iterrain/terraincellrenderproperties.h"
-#include "iterrain/terraincellcollisionproperties.h"
-
 #include "loader.h"
 
 CS_IMPLEMENT_PLUGIN
 
-enum
-{
-  XMLTOKEN_RENDERER,
-  XMLTOKEN_COLLIDER,
-  XMLTOKEN_CELLS,
-  XMLTOKEN_CELL,
-  XMLTOKEN_GRIDSIZE,
-  XMLTOKEN_MATERIALSIZE,
-  XMLTOKEN_POSITION,
-  XMLTOKEN_SIZE,
-  XMLTOKEN_BASEMATERIAL,
-  XMLTOKEN_FEEDER,
-  XMLTOKEN_PLUGIN,
-  XMLTOKEN_PARAM,
-  XMLTOKEN_RENDERPROPERTIES,
-  XMLTOKEN_COLLISIONPROPERTIES,
-  XMLTOKEN_MATERIALPERSISTENT,
-  XMLTOKEN_MAXLOADEDCELLS,
-  
-  XMLTOKEN_FACTORY,
-  XMLTOKEN_MATERIALPALETTE,
-  XMLTOKEN_MATERIAL,
-};
-
-namespace
-{
-  struct ParamValuePair
-  {
-    const char* name;
-	const char* value;
-  };
-};
-
 SCF_IMPLEMENT_FACTORY (csTerrainFactoryLoader)
-
 SCF_IMPLEMENT_FACTORY (csTerrainObjectLoader)
+
+
+static const char* FACTORYERRORID = "crystalspace.mesh.loader.factory.terrainimproved";
+static const char* ERRORID = "crystalspace.mesh.loader.terrainimproved";
 
 csTerrainFactoryLoader::csTerrainFactoryLoader (iBase* parent)
  : scfImplementationType (this, parent)
@@ -97,24 +59,10 @@ csTerrainFactoryLoader::~csTerrainFactoryLoader ()
 bool csTerrainFactoryLoader::Initialize (iObjectRegistry* objreg)
 {
   object_reg = objreg;
+  reporter = csQueryRegistry<iReporter> (object_reg);
   synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
-  xmltokens.Register ("renderer", XMLTOKEN_RENDERER);
-  xmltokens.Register ("collider", XMLTOKEN_COLLIDER);
-  xmltokens.Register ("cells", XMLTOKEN_CELLS);
-  xmltokens.Register ("cell", XMLTOKEN_CELL);
-  xmltokens.Register ("grid_size", XMLTOKEN_GRIDSIZE);
-  xmltokens.Register ("material_size", XMLTOKEN_MATERIALSIZE);
-  xmltokens.Register ("position", XMLTOKEN_POSITION);
-  xmltokens.Register ("size", XMLTOKEN_SIZE);
-  xmltokens.Register ("basematerial", XMLTOKEN_BASEMATERIAL);
-  xmltokens.Register ("feeder", XMLTOKEN_FEEDER);
-  xmltokens.Register ("plugin", XMLTOKEN_PLUGIN);
-  xmltokens.Register ("param", XMLTOKEN_PARAM);
-  xmltokens.Register ("render_properties", XMLTOKEN_RENDERPROPERTIES);
-  xmltokens.Register ("collision_properties", XMLTOKEN_COLLISIONPROPERTIES);
-  xmltokens.Register ("material_persistent", XMLTOKEN_MATERIALPERSISTENT);
-  xmltokens.Register ("max_loaded_cells", XMLTOKEN_MAXLOADEDCELLS);
+  InitTokenTable (xmltokens);
   
   return true;
 }
@@ -122,304 +70,289 @@ bool csTerrainFactoryLoader::Initialize (iObjectRegistry* objreg)
 csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
   iStreamSource*, iLoaderContext* ldr_context, iBase* /*context*/)
 {
-  csRef<iPluginManager> plugin_mgr = csQueryRegistry<iPluginManager> (
-    object_reg);
-    
-  csRef<iMeshObjectType> mesh_type = csLoadPlugin<iMeshObjectType> (
+  csRef<iPluginManager> pluginManager = csQueryRegistry<iPluginManager> (object_reg);
+
+  csRef<iMeshObjectType> meshType = csLoadPlugin<iMeshObjectType> (
     object_reg, "crystalspace.mesh.object.terrainimproved");
-  
-  csRef<iMeshObjectFactory> mesh_factory = mesh_type->NewFactory ();
-  
-  csRef<iTerrainFactory> factory = scfQueryInterface<iTerrainFactory> (
-    mesh_factory);
-  
-  csRef<iTerrainRenderer> renderer;
-  csRef<iTerrainCollider> collider;
+
+  if (!meshType)
+  {
+    synldr->ReportError (FACTORYERRORID, node, "Cannot load mesh object type plugin");
+  }
+
+  csRef<iMeshObjectFactory> meshFactory = meshType->NewFactory ();
+  csRef<iTerrainFactory> factory = scfQueryInterface<iTerrainFactory> (meshFactory);
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  
-  csArray<ParamValuePair> render_properties, collision_properties;
 
-  while (it->HasNext())
+  while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
+
+    if (child->GetType () != CS_NODE_ELEMENT) 
+      continue;
+
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
-      case XMLTOKEN_RENDERER:
+    case XMLTOKEN_RENDERER:
       {
         const char* pluginname = child->GetContentsValue ();
-        renderer = csLoadPluginCheck<iTerrainRenderer> (
-          plugin_mgr, pluginname);
-              
+        csRef<iTerrainRenderer> renderer = csLoadPluginCheck<iTerrainRenderer> (
+          pluginManager, pluginname);
+
         if (!renderer)
         {
-          synldr->ReportError ("crystalspace.terrain.loader.factory",
-            node, "Could not load %s!", pluginname);
+          synldr->ReportError (FACTORYERRORID, child, "Could not load %s!", pluginname);
           return 0;
         }
-        
-        factory->SetRenderer(renderer);
-        
+
+        factory->SetRenderer (renderer);
         break;
       }
-      case XMLTOKEN_COLLIDER:
+    case XMLTOKEN_COLLIDER:
       {
         const char* pluginname = child->GetContentsValue ();
-        collider = csLoadPluginCheck<iTerrainCollider> (
-          plugin_mgr, pluginname);
-              
+        csRef<iTerrainCollider> collider = csLoadPluginCheck<iTerrainCollider> (
+          pluginManager, pluginname);
+
         if (!collider)
         {
-          synldr->ReportError ("crystalspace.terrain.loader.factory",
-            node, "Could not load %s!", pluginname);
+          synldr->ReportError (FACTORYERRORID, child, "Could not load %s!", pluginname);
           return 0;
         }
-        
-        factory->SetCollider(collider);
-        
+
+        factory->SetCollider (collider);
         break;
       }
-      case XMLTOKEN_CELLS:
+    case XMLTOKEN_FEEDER:
       {
-        csRef<iDocumentNodeIterator> it = child->GetNodes ();
-        
-        while (it->HasNext())
+        const char* pluginname = child->GetContentsValue ();
+        csRef<iTerrainDataFeeder> feeder = csLoadPluginCheck<iTerrainDataFeeder> (
+          pluginManager, pluginname);
+
+        if (!feeder)
         {
-          csRef<iDocumentNode> child = it->Next ();
-          if (child->GetType () != CS_NODE_ELEMENT) continue;
-          const char* value = child->GetValue ();
+          synldr->ReportError (FACTORYERRORID, child, "Could not load %s!", pluginname);
+          return 0;
+        }
+
+        factory->SetFeeder (feeder);
+        break;
+      }
+    case XMLTOKEN_CELLS:
+      {
+        csRef<iDocumentNodeIterator> it2 = child->GetNodes ();
+
+        while (it2->HasNext ())
+        {
+          csRef<iDocumentNode> child2 = it2->Next ();
+
+          if (child2->GetType () != CS_NODE_ELEMENT) 
+            continue;
+
+          const char* value = child2->GetValue ();
           csStringID id = xmltokens.Request (value);
+
           switch (id)
           {
-            case XMLTOKEN_CELL:
+          case XMLTOKEN_CELL:
             {
-              const char* cell_name = child->GetAttributeValue ("name");
-              int grid_width = 0, grid_height = 0, material_width = 0;
-              int material_height = 0;
-              bool material_persistent = false;
-              csVector2 position;
-              csVector3 size;
-              csRef<iTerrainDataFeeder> feeder;
-
-              csRef<iMaterialWrapper> basematerial;
-
-              render_properties.SetSize (0);
-              collision_properties.SetSize (0);
-              
-              if (!cell_name) cell_name = "";
-              
-              csRef<iDocumentNodeIterator> it = child->GetNodes ();
-        
-              while (it->HasNext())
-              {
-                csRef<iDocumentNode> child = it->Next ();
-                if (child->GetType () != CS_NODE_ELEMENT) continue;
-                const char* value = child->GetValue ();
-                csStringID id = xmltokens.Request (value);
-                switch (id)
-                {
-                  case XMLTOKEN_GRIDSIZE:
-                  {
-                    grid_width = child->GetAttributeValueAsInt ("x");
-                    grid_height = child->GetAttributeValueAsInt ("y");
-                    break;
-                  }
-                  case XMLTOKEN_MATERIALSIZE:
-                  {
-                    material_width = child->GetAttributeValueAsInt ("x");
-                    material_height = child->GetAttributeValueAsInt ("y");
-                    break;
-                  }
-                  case XMLTOKEN_MATERIALPERSISTENT:
-                  {
-                    material_persistent = true;
-                    break;
-                  }
-                  case XMLTOKEN_POSITION:
-                  {
-                    position.x = child->GetAttributeValueAsFloat ("x");
-                    position.y = child->GetAttributeValueAsFloat ("y");
-                    break;
-                  }
-                  case XMLTOKEN_SIZE:
-                  {                    
-                    size.x = child->GetAttributeValueAsFloat ("x");
-                    size.y = child->GetAttributeValueAsFloat ("y");
-                    size.z = child->GetAttributeValueAsFloat ("z");
-                    break;
-                  }
-                  case XMLTOKEN_BASEMATERIAL:
-                  {
-                    const char* matname = child->GetContentsValue ();
-                    basematerial = ldr_context->FindMaterial (matname);
-                    if (!basematerial)
-                    {
-                      synldr->ReportError (
-                        "crystalspace.terrain.object.loader.basematerial",
-                        child, "Couldn't find material '%s'!", matname);
-                      return 0;
-                    }
-                    break;
-                  }
-                  case XMLTOKEN_FEEDER:
-                  {
-                    csRef<iDocumentNodeIterator> it = child->GetNodes ();
-        
-                    while (it->HasNext())
-                    {
-                      csRef<iDocumentNode> child = it->Next ();
-                      if (child->GetType () != CS_NODE_ELEMENT) continue;
-                      const char* value = child->GetValue ();
-                      csStringID id = xmltokens.Request (value);
-                      switch (id)
-                      {
-                        case XMLTOKEN_PLUGIN:
-                        {
-                          const char* pluginname = child->GetContentsValue ();
-                          feeder = csLoadPlugin<iTerrainDataFeeder> (
-                            plugin_mgr, pluginname);
-              
-                          if (!feeder)
-                          {
-                            synldr->ReportError (
-                              "crystalspace.terrain.loader.factory",
-                              node, "Could not load %s!", pluginname);
-                            return 0;
-                          }
-                          break;
-                        }
-                        case XMLTOKEN_PARAM:
-                        {
-                          feeder->SetParam (child->GetAttributeValue (
-                            "name"), child->GetAttributeValue
-                            ("value"));
-                          break;
-                        }
-                        default:
-                          synldr->ReportError (
-                            "crystalspace.terrain.factory.loader",
-                            child, "Unknown token!");
-                      }
-                    }
-                    
-                    break;
-                  }
-                  case XMLTOKEN_RENDERPROPERTIES:
-                  {
-                    csRef<iDocumentNodeIterator> it = child->GetNodes ();
-        
-                    while (it->HasNext())
-                    {
-                      csRef<iDocumentNode> child = it->Next ();
-                      if (child->GetType () != CS_NODE_ELEMENT) continue;
-                      const char* value = child->GetValue ();
-                      csStringID id = xmltokens.Request (value);
-                      switch (id)
-                      {
-                        case XMLTOKEN_PARAM:
-                        {
-						  ParamValuePair p = {
-						    child->GetAttributeValue ("name"),
-							child->GetAttributeValue ("value") };
-
-                          render_properties.Push (p);
-
-                          break;
-                        }
-                        default:
-                          synldr->ReportError (
-                            "crystalspace.terrain.factory.loader",
-                            child, "Unknown token!");
-                      }
-                    }
-                    
-                    break;
-                  }
-                  case XMLTOKEN_COLLISIONPROPERTIES:
-                  {
-                    csRef<iDocumentNodeIterator> it = child->GetNodes ();
-        
-                    while (it->HasNext())
-                    {
-                      csRef<iDocumentNode> child = it->Next ();
-                      if (child->GetType () != CS_NODE_ELEMENT) continue;
-                      const char* value = child->GetValue ();
-                      csStringID id = xmltokens.Request (value);
-                      switch (id)
-                      {
-                        case XMLTOKEN_PARAM:
-                        {
-						  ParamValuePair p = {
-                            child->GetAttributeValue ("name"),
-							child->GetAttributeValue ("value") };
-
-                          collision_properties.Push (p);
-
-                          break;
-                        }
-                        default:
-                          synldr->ReportError (
-                            "crystalspace.terrain.factory.loader",
-                            child, "Unknown token!");
-                      }
-                    }
-                    
-                    break;
-                  }
-                  default:
-                    synldr->ReportError ("crystalspace.terrain.factory.loader",
-                      child, "Unknown token!");
-                }
-              }
-
-              iTerrainCell* cell = factory->AddCell(cell_name, grid_width,
-                grid_height, material_width, material_height,
-                material_persistent, position, size, feeder);
-
-              iTerrainCellRenderProperties* render_p =
-                cell->GetRenderProperties ();
-
-              if (render_p)
-                for (size_t i = 0; i < render_properties.GetSize (); ++i)
-                  render_p->SetParam (render_properties[i].name,
-                                      render_properties[i].value);
-
-              iTerrainCellCollisionProperties* collision_p =
-                cell->GetCollisionProperties ();
-              
-              if (collision_p)
-                for (size_t i = 0; i < collision_properties.GetSize (); ++i)
-                  collision_p->SetParam (collision_properties[i].name,
-                                         collision_properties[i].value);
-
-              cell->SetBaseMaterial (basematerial);
+              if (!ParseCell (child2, ldr_context, factory))
+                return 0;
 
               break;
             }
-            default:
-              synldr->ReportError ("crystalspace.terrain.factory.loader",
-                child, "Unknown token!");
+          default:
+            {
+              synldr->ReportBadToken (child2);
+              return 0;
+            }
           }
         }
-        
+
         break;
       }
-      case XMLTOKEN_MAXLOADEDCELLS:
+    case XMLTOKEN_MAXLOADEDCELLS:
       {
-        factory->SetMaxLoadedCells (child->GetAttributeValueAsInt ("value"));
+        factory->SetMaxLoadedCells (child->GetContentsValueAsInt ());
         break;
       }
-      default:
-        synldr->ReportError ("crystalspace.terrain.factory.loader",
-          child, "Unknown token!");
+    case XMLTOKEN_AUTOPRELOAD:
+      {
+        bool res;
+
+        synldr->ParseBool (child, res, false);
+        factory->SetAutoPreLoad (res);
+        break;
+      }
+    case XMLTOKEN_VIRTUALVIEWDISTANCE:
+      {
+        factory->SetVirtualViewDistance (child->GetContentsValueAsFloat ());
+        break;
+      }
+    default:
+      {
+        synldr->ReportBadToken (child);
+        return 0;
+      }
     }
   }
-  
-  return csPtr<iBase> (mesh_factory);
+
+  return csPtr<iBase> (meshFactory);
 }
+
+bool csTerrainFactoryLoader::ParseParams (csArray<ParamPair>& pairs, iDocumentNode* node)
+{
+  csRef<iDocumentNodeIterator> it2 = node->GetNodes ();
+
+  while (it2->HasNext ())
+  {
+    csRef<iDocumentNode> child2 = it2->Next ();
+
+    if (child2->GetType () != CS_NODE_ELEMENT) 
+      continue;
+
+    const char* value = child2->GetValue ();
+    csStringID id = xmltokens.Request (value);
+
+    switch (id)
+    {
+    case XMLTOKEN_PARAM:
+      {
+        ParamPair p;
+        p.name = child2->GetAttributeValue ("name");
+        p.value = child2->GetContentsValue ();
+
+        pairs.Push (p);
+        break;
+      }
+    default:
+      {
+        synldr->ReportBadToken (child2);
+        return false;
+      }
+    }
+  }    
+
+  return true;
+}
+
+bool csTerrainFactoryLoader::ParseCell (iDocumentNode *node, 
+  iLoaderContext *ldr_ctx, iTerrainFactory *fact)
+{
+  csArray<ParamPair> renderParams, collParams, feederParams;
+
+  csString name;
+  csVector3 size;
+  csVector2 position;
+  unsigned int gridWidth, gridHeight, materialmapWidth, materialmapHeight;
+  bool materialmapPersist;
+  csRef<iMaterialWrapper> baseMaterial;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+
+    if (child->GetType () != CS_NODE_ELEMENT) 
+      continue;
+
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+    case XMLTOKEN_NAME:
+      name = child->GetContentsValue ();
+      break;
+    case XMLTOKEN_SIZE:
+      synldr->ParseVector (child, size);
+      break;
+    case XMLTOKEN_POSITION:
+      synldr->ParseVector (child, position);
+      break;
+    case XMLTOKEN_GRIDSIZE:
+      gridWidth = child->GetAttributeValueAsInt ("width");
+      gridHeight = child->GetAttributeValueAsInt ("height");
+      break;
+    case XMLTOKEN_MATERIALMAPSIZE:
+      materialmapWidth = child->GetAttributeValueAsInt ("width");
+      materialmapHeight = child->GetAttributeValueAsInt ("height");
+      break;
+    case XMLTOKEN_BASEMATERIAL:
+      {
+        const char* matname = child->GetContentsValue ();
+        baseMaterial = ldr_ctx->FindMaterial (matname);
+        
+        if (!baseMaterial)
+        {
+          synldr->ReportError (
+            "crystalspace.terrain.object.loader.basematerial",
+            child, "Couldn't find material '%s'!", matname);
+          return false;
+        }
+        break;
+      }
+    case XMLTOKEN_MATERIALMAPPERSISTENT:
+      synldr->ParseBool (child, materialmapPersist, false);
+      break;
+    case XMLTOKEN_RENDERPROPERTIES:
+      {
+        if (!ParseParams (renderParams, child))
+          return false;
+
+        break;
+      }
+    case XMLTOKEN_COLLIDERPROPERTIES:
+      {
+        if (!ParseParams (collParams, child))
+          return false;
+
+        break;
+      }
+    case XMLTOKEN_FEEDERPROPERTIES:
+      {
+        if (!ParseParams (feederParams, child))
+          return false;
+
+        break;
+      }
+    default:
+      {
+        synldr->ReportBadToken (child);
+        return false;
+      }
+    }
+  }
+
+  // Time to build the cell
+  iTerrainFactoryCell* cell = fact->AddCell (name.GetDataSafe (), gridWidth, gridHeight, 
+    materialmapWidth, materialmapHeight, materialmapPersist, position, size);
+  
+  cell->SetBaseMaterial (baseMaterial);
+
+  iTerrainCellRenderProperties* renderProperties = cell->GetRenderProperties ();
+  for (size_t i = 0; i < renderParams.GetSize (); ++i)
+  {
+    renderProperties->SetParameter (renderParams[i].name.GetDataSafe (), renderParams[i].value.GetDataSafe ());
+  }
+
+  iTerrainCellCollisionProperties* colliderProperties = cell->GetCollisionProperties ();
+  for (size_t i = 0; i < collParams.GetSize (); ++i)
+  {
+    colliderProperties->SetParameter (collParams[i].name.GetDataSafe (), collParams[i].value.GetDataSafe ());
+  }
+
+  iTerrainCellFeederProperties* feederProperties = cell->GetFeederProperties ();
+  for (size_t i = 0; i < feederParams.GetSize (); ++i)
+  {
+    feederProperties->SetParameter (feederParams[i].name.GetDataSafe (), feederParams[i].value.GetDataSafe ());
+  }
+
+  return true;
+}
+
 
 csTerrainObjectLoader::csTerrainObjectLoader (iBase* parent)
  : scfImplementationType (this, parent)
@@ -433,11 +366,11 @@ csTerrainObjectLoader::~csTerrainObjectLoader ()
 bool csTerrainObjectLoader::Initialize (iObjectRegistry* objreg)
 {
   object_reg = objreg;
+  reporter = csQueryRegistry<iReporter> (object_reg);
   synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
-  xmltokens.Register ("factory", XMLTOKEN_FACTORY);
-  xmltokens.Register ("materialpalette", XMLTOKEN_MATERIALPALETTE);
-  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
+  InitTokenTable (xmltokens);
+
   return true;
 }
 
@@ -509,9 +442,7 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
               break;
             }
             default:
-              synldr->ReportError (
-                "crystalspace.terrain.object.loader.materialpalette",
-                child, "Unknown token in materials list!");
+              synldr->ReportBadToken (child);
           }
         }
 
@@ -519,8 +450,7 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
         break;
       }
       default:
-        synldr->ReportError ("crystalspace.terrain.object.loader",
-          child, "Unknown token");
+        synldr->ReportBadToken (child);
     }
   }
 

@@ -21,8 +21,7 @@
 
 #include "csutil/scf_implementation.h"
 
-#include "iterrain/terraincollider.h"
-#include "iterrain/terraincellcollisionproperties.h"
+#include "imesh/terrain2.h"
 
 #include "iutil/comp.h"
 
@@ -36,17 +35,20 @@ class csTerrainCellCollisionProperties :
                             iTerrainCellCollisionProperties>
 {
 private:
-  bool collideable;
+  bool collidable;
 
 public:
-  csTerrainCellCollisionProperties (iBase* parent);
+  csTerrainCellCollisionProperties ();
+  csTerrainCellCollisionProperties (csTerrainCellCollisionProperties& other);
 
   virtual ~csTerrainCellCollisionProperties ();
 
-  virtual bool GetCollideable () const;
-  virtual void SetCollideable (bool value);
+  virtual bool GetCollidable () const;
+  virtual void SetCollidable (bool value);
   
-  virtual void SetParam (const char* name, const char* value);
+  virtual void SetParameter (const char* name, const char* value);
+
+  virtual csPtr<iTerrainCellCollisionProperties> Clone ();
 };
 
 class csTerrainCollider :
@@ -69,20 +71,18 @@ public:
   virtual csPtr<iTerrainCellCollisionProperties> CreateProperties ();
 
   virtual bool CollideSegment (iTerrainCell* cell, const csVector3& start,
-            const csVector3& end, bool oneHit, iTerrainVector3Array& points);
+            const csVector3& end, bool oneHit, iTerrainVector3Array* points);
 
   virtual bool CollideTriangles (iTerrainCell* cell, const csVector3* vertices,
                        unsigned int tri_count,
                        const unsigned int* indices, float radius,
-                       const csReversibleTransform* trans,
-                       bool oneHit, iTerrainCollisionPairArray& pairs);
+                       const csReversibleTransform& trans,
+                       bool oneHit, iTerrainCollisionPairArray* pairs);
 
   virtual bool Collide (iTerrainCell* cell, iCollider* collider,
-                       float radius, const csReversibleTransform* trans,
-                       bool oneHit, iTerrainCollisionPairArray& pairs);
+                       float radius, const csReversibleTransform& trans,
+                       bool oneHit, iTerrainCollisionPairArray* pairs);
 
-  virtual void OnHeightUpdate (iTerrainCell* cell, const csRect& rectangle,
-                               const float* data, unsigned int pitch);
 
   // ------------ iComponent implementation ------------
   virtual bool Initialize (iObjectRegistry* object_reg);

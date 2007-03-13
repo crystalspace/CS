@@ -1,47 +1,40 @@
 /*
-    Copyright (C) 2006 by Kapoulkine Arseny
+  Copyright (C) 2006 by Kapoulkine Arseny
+                2007 by Marten Svanfeldt
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Library General Public
-    License as published by the Free Software Foundation; either
-    version 2 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Library General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Library General Public License for more details.
 
-    You should have received a copy of the GNU Library General Public
-    License along with this library; if not, write to the Free
-    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
 
-#include "iterrain/terraincell.h"
-
 #include "csgeom/csrect.h"
+#include "csgfx/imagemanipulate.h"
+#include "csutil/dirtyaccessarray.h"
+#include "csutil/refarr.h"
 
+#include "iengine/material.h"
 #include "igraphic/image.h"
+#include "imap/loader.h"
+#include "imesh/terrain2.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
 
-#include "csutil/refarr.h"
-#include "csutil/dirtyaccessarray.h"
-
-#include "csgfx/imagemanipulate.h"
-
-#include "iengine/material.h"
-
-#include "iengine/engine.h"
-
-#include "imap/loader.h"
-
 #include "simpledatafeeder.h"
 
-CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
+CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
 {
-
 SCF_IMPLEMENT_FACTORY (csTerrainSimpleDataFeeder)
 
 csTerrainSimpleDataFeeder::csTerrainSimpleDataFeeder (iBase* parent)
@@ -53,24 +46,34 @@ csTerrainSimpleDataFeeder::~csTerrainSimpleDataFeeder ()
 {
 }
 
+csPtr<iTerrainCellFeederProperties> csTerrainSimpleDataFeeder::CreateProperties ()
+{
+  return csPtr<iTerrainCellFeederProperties> (new csTerrainSimpleDataFeederProperties);
+}
+
 bool csTerrainSimpleDataFeeder::PreLoad (iTerrainCell* cell)
 {
-  return true;
+  return false;
 }
 
 bool csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
 {
+  csTerrainSimpleDataFeederProperties* properties = 
+    (csTerrainSimpleDataFeederProperties*)cell->GetFeederProperties ();
+
+  if (!loader || !properties)
+    return false;
+
   int width = cell->GetGridWidth ();
   int height = cell->GetGridHeight ();
 
   csLockedHeightData data = cell->LockHeightData (csRect(0, 0, width, height));
-
-  csRef<iLoader> loader = csQueryRegistry<iLoader> (object_reg);
   
-  csRef<iImage> map = loader->LoadImage (heightmap_source,
-  CS_IMGFMT_PALETTED8);
+  csRef<iImage> map = loader->LoadImage (properties->heightmapSource.GetDataSafe (), 
+    CS_IMGFMT_PALETTED8);
 
-  if (!map) return false;
+  if (!map) 
+    return false;
 
   if (map->GetWidth () != width || map->GetHeight () != height)
   {
@@ -78,6 +81,8 @@ bool csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
   }
   
   const unsigned char* imagedata = (const unsigned char*)map->GetImageData ();
+
+  float dataYScale = cell->GetSize().y;
 
   for (int y = 0; y < height; ++y)
   {
@@ -88,7 +93,7 @@ bool csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
       float xd = float(x - width/2) / width;
       float yd = float(y - height/2) / height;
 
-      *dest_data++ = *imagedata++ / 255.0f * cell->GetSize().y;
+      *dest_data++ = *imagedata++ / 255.0f * dataYScale;
     }
     
     data.data += data.pitch;
@@ -96,24 +101,25 @@ bool csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
 
   cell->UnlockHeightData ();
   
-  csRef<iImage> material = loader->LoadImage (mmap_source,
+  csRef<iImage> material = loader->LoadImage (properties->materialmapSource.GetDataSafe (),
     CS_IMGFMT_PALETTED8);
 
-  if (!material) return false;
+  if (!material) 
+    return false;
   
   if (material->GetWidth () != cell->GetMaterialMapWidth () ||
-    material->GetHeight () != cell->GetMaterialMapHeight ())
+      material->GetHeight () != cell->GetMaterialMapHeight ())
+  {
     material = csImageManipulate::Rescale (material,
       cell->GetMaterialMapWidth (), cell->GetMaterialMapHeight ());
+  }
   
   int mwidth = material->GetWidth ();
   int mheight = material->GetHeight ();
 
-  csLockedMaterialMap mdata = cell->LockMaterialMap (csRect (0, 0, mwidth,
-    mheight));
+  csLockedMaterialMap mdata = cell->LockMaterialMap (csRect (0, 0, mwidth, mheight));
 
-  const unsigned char* materialmap = (const unsigned char*)material->
-    GetImageData ();
+  const unsigned char* materialmap = (const unsigned char*)material->GetImageData ();
     
   for (int y = 0; y < mheight; ++y)
   {
@@ -129,21 +135,51 @@ bool csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
 
 bool csTerrainSimpleDataFeeder::Initialize (iObjectRegistry* object_reg)
 {
-  this->object_reg = object_reg;
+  this->objectReg = object_reg;
+
+  loader = csQueryRegistry<iLoader> (objectReg);
   return true;
 }
 
-void csTerrainSimpleDataFeeder::SetParam(const char* param, const char* value)
+void csTerrainSimpleDataFeeder::SetParameter (const char* param, const char* value)
 {
-  if (!strcmp (param, "heightmap source"))
+}
+
+
+csTerrainSimpleDataFeederProperties::csTerrainSimpleDataFeederProperties ()
+  : scfImplementationType (this)
+{
+}
+
+csTerrainSimpleDataFeederProperties::csTerrainSimpleDataFeederProperties (
+  csTerrainSimpleDataFeederProperties& other)
+  : scfImplementationType (this), heightmapSource (other.heightmapSource),
+  materialmapSource (other.materialmapSource)
+{
+}
+
+
+void csTerrainSimpleDataFeederProperties::SetHeightmapSource (const char* source)
+{
+  heightmapSource = source;
+}
+
+void csTerrainSimpleDataFeederProperties::SetParameter (const char* param, const char* value)
+{
+  if (strcmp (param, "heightmap source") == 0)
   {
-    heightmap_source = value;
+    heightmapSource = value;
   }
-  else if (!strcmp (param, "materialmap source"))
+  else if (strcmp (param, "materialmap source") == 0)
   {
-    mmap_source = value;
+    materialmapSource = value;
   }
 }
 
+csPtr<iTerrainCellFeederProperties> csTerrainSimpleDataFeederProperties::Clone ()
+{
+  return csPtr<iTerrainCellFeederProperties> (new csTerrainSimpleDataFeederProperties (*this));
 }
-CS_PLUGIN_NAMESPACE_END(ImprovedTerrain)
+
+}
+CS_PLUGIN_NAMESPACE_END(Terrain2)

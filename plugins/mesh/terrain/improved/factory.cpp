@@ -1,43 +1,35 @@
 /*
-    Copyright (C) 2006 by Kapoulkine Arseny
+  Copyright (C) 2006 by Kapoulkine Arseny
+                2007 by Marten Svanfeldt
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Library General Public
-    License as published by the Free Software Foundation; either
-    version 2 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Library General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Library General Public License for more details.
 
-    You should have received a copy of the GNU Library General Public
-    License along with this library; if not, write to the Free
-    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
 
 #include "factory.h"
+#include "cell.h"
 #include "terrainsystem.h"
 
-#include "csqsqrt.h"
-#include "csgeom/math3d.h"
-
-#include "iterrain/terrainrenderer.h"
-#include "iterrain/terraincollider.h"
-
-CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
+CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
 {
 
 csTerrainFactory::csTerrainFactory (iMeshObjectType *pParent)
-  : scfImplementationType (this, pParent)
+  : scfImplementationType (this), type (pParent), logParent (0),
+  maxLoadedCells (~0), virtualViewDistance (2.0f), autoPreLoad (false)
 {
-  terrain = new csTerrainSystem(this);
-  type = pParent;
-
-  renderer = NULL;
-  collider = NULL;
 }
 
 csTerrainFactory::~csTerrainFactory ()
@@ -51,14 +43,24 @@ csFlags& csTerrainFactory::GetFlags ()
 
 csPtr<iMeshObject> csTerrainFactory::NewInstance ()
 {
-  csPtr<iMeshObject> ptr = &*terrain;
-  terrain = 0;
-  return ptr;
+  csTerrainSystem* terrain = new csTerrainSystem (this, renderer, collider, dataFeeder);
+
+  terrain->SetMaxLoadedCells (maxLoadedCells);
+  terrain->SetVirtualViewDistance (virtualViewDistance);
+  terrain->SetAutoPreLoad (autoPreLoad);
+
+  for (size_t i = 0; i < cells.GetSize (); ++i)
+  {
+    csRef<csTerrainCell> c = cells[i]->CreateCell (terrain);
+    terrain->AddCell (c);
+  }
+
+  return csPtr<iMeshObject> (terrain);
 }
 
 csPtr<iMeshObjectFactory> csTerrainFactory::Clone ()
 {
-  return 0;
+  return csPtr<iMeshObjectFactory> (new csTerrainFactory (*this));
 }
 
 void csTerrainFactory::HardTransform (const csReversibleTransform& t)
@@ -72,12 +74,12 @@ bool csTerrainFactory::SupportsHardTransform () const
 
 void csTerrainFactory::SetMeshFactoryWrapper (iMeshFactoryWrapper* lp)
 {
-  logparent = lp;
+  logParent = lp;
 }
 
 iMeshFactoryWrapper* csTerrainFactory::GetMeshFactoryWrapper () const
 {
-  return logparent;
+  return logParent;
 }
 
 iMeshObjectType* csTerrainFactory::GetMeshObjectType () const
@@ -112,40 +114,115 @@ uint csTerrainFactory::GetMixMode () const
 void csTerrainFactory::SetRenderer (iTerrainRenderer* renderer)
 {
   this->renderer = renderer;
-  terrain->SetRenderer (renderer);
 }
 
 void csTerrainFactory::SetCollider (iTerrainCollider* collider)
 {
   this->collider = collider;
-  terrain->SetCollider (collider);
 }
 
-iTerrainCell* csTerrainFactory::AddCell(const char* name, int grid_width,
-  int grid_height, int material_width, int material_height,
-  bool material_persistent,
-  const csVector2& position, const csVector3& size, iTerrainDataFeeder* feeder)
+void csTerrainFactory::SetFeeder (iTerrainDataFeeder* feeder)
 {
-  csRef<iTerrainCellRenderProperties> render_properties =
-    renderer->CreateProperties ();
-  
-  csRef<iTerrainCellCollisionProperties> collision_properties =
+  this->dataFeeder = feeder;
+}
+
+iTerrainFactoryCell* csTerrainFactory::AddCell(const char* name, 
+  int gridWidth, int gridHeight, int materialMapWidth,
+  int materialMapHeight, bool materialMapPersistent,
+  const csVector2& position, const csVector3& size)
+{
+  csRef<csTerrainFactoryCell> cell;
+
+  csRef<iTerrainCellRenderProperties> renderProp =
+    renderer ? renderer->CreateProperties () : 0;
+
+  csRef<iTerrainCellCollisionProperties> collProp =
     collider ? collider->CreateProperties () : 0;
-  
-  csRef<csTerrainCell> cell;
-  cell.AttachNew (new csTerrainCell(terrain, name, grid_width, grid_height,
-    material_width, material_height, material_persistent, position, size, feeder,
-    render_properties, collision_properties, renderer, collider));
-                                     
-  terrain->AddCell (cell);
+
+  csRef<iTerrainCellFeederProperties> feederProp =
+    dataFeeder ? dataFeeder->CreateProperties () : 0;
+
+  cell.AttachNew (new csTerrainFactoryCell (name, gridWidth, gridHeight,
+    materialMapWidth, materialMapHeight, materialMapPersistent, position, size,
+    renderProp, collProp, feederProp));
+
+  cells.Push (cell);
 
   return cell;
 }
 
-void csTerrainFactory::SetMaxLoadedCells (unsigned int value)
+void csTerrainFactory::SetMaxLoadedCells (size_t value)
 {
-  terrain->SetMaxLoadedCells (value);
+  maxLoadedCells = value;
 }
 
+void csTerrainFactory::SetVirtualViewDistance (float distance)
+{
+  virtualViewDistance = distance;
 }
-CS_PLUGIN_NAMESPACE_END(ImprovedTerrain)
+
+void csTerrainFactory::SetAutoPreLoad (bool mode)
+{
+  autoPreLoad = mode; 
+}
+
+
+csTerrainFactoryCell::csTerrainFactoryCell (const char* name, 
+  int gridWidth, int gridHeight, int materialMapWidth, int materialMapHeight, 
+  bool materialMapPersistent, const csVector2& position, const csVector3& size, 
+  iTerrainCellRenderProperties* renderProp, 
+  iTerrainCellCollisionProperties* collisionProp, 
+  iTerrainCellFeederProperties* feederProp)
+  : scfImplementationType (this), name (name), position (position), size (size),
+  gridWidth (gridWidth), gridHeight (gridHeight), materialMapWidth (materialMapWidth),
+  materialMapHeight (materialMapHeight), materialMapPersistent (materialMapPersistent),
+  rendererProperties (renderProp), colliderProperties (collisionProp),
+  feederProperties (feederProp)
+{
+}
+
+csPtr<csTerrainCell> csTerrainFactoryCell::CreateCell (csTerrainSystem* terrain)
+{
+  csTerrainCell* cell;
+
+  csRef<iTerrainCellRenderProperties> renderProp =
+    rendererProperties ? rendererProperties->Clone () : 0;
+
+  csRef<iTerrainCellCollisionProperties> collProp =
+    colliderProperties ? colliderProperties->Clone () : 0;
+
+  csRef<iTerrainCellFeederProperties> feederProp =
+    feederProperties ? feederProperties->Clone () : 0;
+
+  cell = new csTerrainCell (terrain, name.GetData (), gridWidth, gridHeight,
+    materialMapWidth, materialMapHeight, materialMapPersistent, position, size,
+    renderProp, collProp, feederProp);
+
+  cell->SetBaseMaterial (baseMaterial);
+
+  return csPtr<csTerrainCell> (cell);
+}
+
+iTerrainCellRenderProperties* csTerrainFactoryCell::GetRenderProperties () const
+{
+  return rendererProperties;
+}
+
+iTerrainCellCollisionProperties* csTerrainFactoryCell::GetCollisionProperties () const
+{
+  return colliderProperties;
+}
+
+iTerrainCellFeederProperties* csTerrainFactoryCell::GetFeederProperties () const
+{
+  return feederProperties;
+}
+
+void csTerrainFactoryCell::SetBaseMaterial (iMaterialWrapper* material)
+{
+  baseMaterial = material;
+}
+
+
+}
+CS_PLUGIN_NAMESPACE_END(Terrain2)

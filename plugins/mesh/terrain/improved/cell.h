@@ -1,19 +1,20 @@
 /*
-    Copyright (C) 2006 by Kapoulkine Arseny
+  Copyright (C) 2006 by Kapoulkine Arseny
+                2007 by Marten Svanfeldt
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Library General Public
-    License as published by the Free Software Foundation; either
-    version 2 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Library General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Library General Public License for more details.
 
-    You should have received a copy of the GNU Library General Public
-    License along with this library; if not, write to the Free
-    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #ifndef __CS_TERRAIN_CELL_H__
@@ -22,13 +23,6 @@
 #include "csutil/scf_implementation.h"
 #include "csutil/refcount.h"
 #include "csutil/sysfunc.h"
-
-#include "iterrain/terrainsystem.h"
-#include "iterrain/terraincell.h"
-#include "iterrain/terraindatafeeder.h"
-#include "iterrain/terraincellrenderproperties.h"
-#include "iterrain/terraincellcollisionproperties.h"
-
 #include "csgeom/vector2.h"
 #include "csgeom/box.h"
 #include "csutil/cscolor.h"
@@ -36,94 +30,45 @@
 #include "csutil/csstring.h"
 #include "csutil/dirtyaccessarray.h"
 
-struct iTerrainRenderer;
-struct iTerrainCollider;
+#include "imesh/terrain2.h"
 
-CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
+CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
 {
+class csTerrainSystem;
 
 class csTerrainCell :
   public scfImplementation1<csTerrainCell,
                             iTerrainCell>
 {
-  enum {lmres = 32};
-private:
-  iTerrainSystem* parent;
-  
-  csString name;
-  int grid_width, grid_height;
-  int material_width, material_height;
-  bool material_persistent;
-  csVector2 position;
-  csVector3 size;
-  float step_x, step_z;
-  csRef<iTerrainDataFeeder> feeder;
-  csRef<iTerrainCellRenderProperties> render_properties;
-  csRef<iTerrainCellCollisionProperties> collision_properties;
-  csRef<iMaterialWrapper> baseMaterial;
-  
-  csDirtyAccessArray<unsigned char> materialmap;
-  csDirtyAccessArray<float> heightmap;
-  
-  csDirtyAccessArray<csColor> staticLights;
-  csDirtyAccessArray<csColor> staticColors;
-  unsigned int last_colorVersion, dynamic_ambient_version;
-  
-  csRect mm_rect;
-
-  LoadState state;
-
-  csLockedHeightData locked_height_data;
-  csRect locked_height_rect;
-
-  csRef<iTerrainRenderer> renderer;
-  csRef<iTerrainCollider> collider;
-
-  csRef<csRefCount> render_data, collision_data;
-
-  void LerpHelper (const csVector2& pos, int& x1, int& x2, float& xfrac,
-                                    int& y1, int& y2, float& yfrac) const;
-
-  csTicks lruTicks;
-
 public:
-  csTerrainCell (iTerrainSystem* parent, const char* name, int grid_width,
-                 int grid_height, int material_width, int material_height,
-                 bool material_persistent,
+  csTerrainCell (csTerrainSystem* terrain, const char* name, int gridWidth,
+                 int gridHeight, int materialMapWidth, int materialMapHeight,
+                 bool materialMapPersistent,
                  const csVector2& position, const csVector3& size,
-                 iTerrainDataFeeder* feeder,
                  iTerrainCellRenderProperties* render_properties,
                  iTerrainCellCollisionProperties* collision_properties,
-                 iTerrainRenderer* renderer, iTerrainCollider* collider);
+                 iTerrainCellFeederProperties* feederProperties);
 
   virtual ~csTerrainCell ();
-
-  iTerrainDataFeeder* GetDataFeeder () const;
 
   csBox3 GetBBox () const;
 
   // ------------ iTerrainCell implementation ------------
-
-  virtual iTerrainSystem* GetTerrain();
-
   virtual LoadState GetLoadState () const;
-  virtual void SetLoadState(LoadState state);
+  virtual void SetLoadState (LoadState state);
+
+  virtual iTerrainSystem* GetTerrain ();
 
   virtual const char* GetName () const;
+
   virtual iTerrainCellRenderProperties* GetRenderProperties () const;
   virtual iTerrainCellCollisionProperties* GetCollisionProperties () const;
-
-  virtual csRefCount* GetRenderData () const;
-  virtual void SetRenderData (csRefCount* data);
-
-  virtual csRefCount* GetCollisionData () const;
-  virtual void SetCollisionData (csRefCount* data);
+  virtual iTerrainCellFeederProperties* GetFeederProperties () const;
 
   virtual int GetGridWidth () const;
   virtual int GetGridHeight () const;
 
   virtual csLockedHeightData GetHeightData ();
-
   virtual csLockedHeightData LockHeightData (const csRect& rectangle);
   virtual void UnlockHeightData ();
 
@@ -133,32 +78,33 @@ public:
   virtual int GetMaterialMapWidth () const;
   virtual int GetMaterialMapHeight () const;
   virtual bool GetMaterialPersistent() const;
+
   virtual csLockedMaterialMap LockMaterialMap (const csRect& rectangle);
-  virtual void UnlockMaterialMap ();
+  virtual void UnlockMaterialMap();
 
   virtual void SetMaterialMask (unsigned int material, iImage* image);
   virtual void SetMaterialMask (unsigned int material, const unsigned char*
-                             data, unsigned int width, unsigned int height);
+    data, unsigned int width, unsigned int height);
 
   virtual void SetBaseMaterial (iMaterialWrapper* material);
   virtual iMaterialWrapper* GetBaseMaterial () const;
 
   virtual bool CollideSegment (const csVector3& start, const csVector3& end,
-                           bool oneHit, iTerrainVector3Array& points);
+    bool oneHit, iTerrainVector3Array* points);
 
   virtual bool CollideTriangles (const csVector3* vertices,
-                       unsigned int tri_count,
-                       const unsigned int* indices, float radius,
-                       const csReversibleTransform* trans,
-                       bool oneHit, iTerrainCollisionPairArray& pairs);
+    size_t tri_count,
+    const unsigned int* indices, float radius,
+    const csReversibleTransform& trans,
+    bool oneHit, iTerrainCollisionPairArray* pairs);
 
   virtual bool Collide (iCollider* collider, float radius,
-                       const csReversibleTransform* trans, bool oneHit,
-                       iTerrainCollisionPairArray& pairs);
+    const csReversibleTransform& trans, bool oneHit,
+    iTerrainCollisionPairArray* pairs);
 
   virtual float GetHeight (int x, int y) const;
   virtual float GetHeight (const csVector2& pos) const;
-  
+
   virtual csVector3 GetTangent (int x, int y) const;
   virtual csVector3 GetTangent (const csVector2& pos) const;
 
@@ -168,11 +114,14 @@ public:
   virtual csVector3 GetNormal (int x, int y) const;
   virtual csVector3 GetNormal (const csVector2& pos) const;
 
-  // lighting
-  void UpdateColors (iMovable* movable, unsigned int colorVersion, const
-    csColor& baseColor);
+  virtual csRefCount* GetRenderData () const;
+  virtual void SetRenderData (csRefCount* data);
 
-  csColor ambient;
+  virtual csRefCount* GetCollisionData () const;
+  virtual void SetCollisionData (csRefCount* data);
+
+  virtual csRefCount* GetFeederData () const;
+  virtual void SetFeederData (csRefCount* data);
 
   // unloading
   csTicks GetLRU () const
@@ -183,9 +132,42 @@ public:
   {
     lruTicks = csGetTicks ();
   }
+
+private:
+  csTerrainSystem* terrain;
+
+  csString name;
+
+  int gridWidth, gridHeight;
+  int materialMapWidth, materialMapHeight;
+  bool materialMapPersistent;
+  csVector2 position;
+  csVector3 size;
+  float step_x, step_z;
+  
+  csRef<iTerrainCellRenderProperties> renderProperties;
+  csRef<iTerrainCellCollisionProperties> collisionProperties;
+  csRef<iTerrainCellFeederProperties> feederProperties;
+  csRef<iMaterialWrapper> baseMaterial;
+
+  // Stored data (if any)
+  csDirtyAccessArray<unsigned char> materialmap;
+  csDirtyAccessArray<float> heightmap;
+
+  LoadState loadState;
+
+  csRect lockedHeightRect;
+  csRect lockedMaterialMapRect;
+
+  csRef<csRefCount> renderData, collisionData, feederData;
+
+  void LerpHelper (const csVector2& pos, int& x1, int& x2, float& xfrac,
+    int& y1, int& y2, float& yfrac) const;
+
+  csTicks lruTicks;
 };
 
 }
-CS_PLUGIN_NAMESPACE_END(ImprovedTerrain)
+CS_PLUGIN_NAMESPACE_END(Terrain2)
 
 #endif // __CS_TERRAIN_CELL_H__

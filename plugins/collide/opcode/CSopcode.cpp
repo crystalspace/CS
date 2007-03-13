@@ -198,8 +198,12 @@ bool csOPCODECollideSystem::Collide (
   
   scfArray<iTerrainCollisionPairArray> c_pairs;
   
+  csReversibleTransform t;
+  if (trans1)
+    t = *trans1;
+
   if (terrain->CollideTriangles ((const csVector3*)verts, tri_count,
-    tris, collider1->radius, trans1, false, c_pairs))
+    tris, collider1->radius, t, false, &c_pairs))
 // Change to use OPCODE-powered collision
 //  if (terrain->Collide (collider1, collider1->radius, trans1, false,
 //    c_pairs))

@@ -36,7 +36,7 @@
 #include "csutil/scf_implementation.h"
 #include "ivaria/collider.h"
 #include "csgeom/transfrm.h"
-#include "iterrain/terrainsystem.h"
+#include "imesh/terrain2.h"
 #include "CSopcodecollider.h"
 #include "csTerraFormerCollider.h"
 #include "Opcode.h"

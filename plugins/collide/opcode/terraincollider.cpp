@@ -18,22 +18,16 @@
 
 #include "cssysdef.h"
 
-#include "terraincollider.h"
-
+#include "csgeom/transfrm.h"
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
-#include "csgeom/transfrm.h"
-
+#include "csutil/dirtyaccessarray.h"
+#include "csutil/refcount.h"
+#include "imesh/terrain2.h"
 #include "ivaria/collider.h"
 
-#include "iterrain/terraincell.h"
-
-#include "csutil/dirtyaccessarray.h"
-
-#include "csutil/refcount.h"
-
 #include "segmentcell.h"
-
+#include "terraincollider.h"
 #include "CSopcodecollider.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
@@ -41,34 +35,44 @@ CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
 
 SCF_IMPLEMENT_FACTORY (csTerrainCollider)
 
-csTerrainCellCollisionProperties::csTerrainCellCollisionProperties
- (iBase* parent)
-  : scfImplementationType (this, parent)
-{
-  collideable = true;
-}
-
-csTerrainCellCollisionProperties::~csTerrainCellCollisionProperties
-()
+csTerrainCellCollisionProperties::csTerrainCellCollisionProperties ()
+  : scfImplementationType (this), collidable (true)
 {
 }
 
-bool csTerrainCellCollisionProperties::GetCollideable () const
+csTerrainCellCollisionProperties::csTerrainCellCollisionProperties (
+  csTerrainCellCollisionProperties& other)
+  : scfImplementationType (this), collidable (other.collidable)
 {
-  return collideable;
 }
 
-void csTerrainCellCollisionProperties::SetCollideable (bool value)
+csTerrainCellCollisionProperties::~csTerrainCellCollisionProperties ()
 {
-  collideable = value;
 }
 
-void csTerrainCellCollisionProperties::SetParam (const char* name,
+bool csTerrainCellCollisionProperties::GetCollidable () const
+{
+  return collidable;
+}
+
+void csTerrainCellCollisionProperties::SetCollidable (bool value)
+{
+  collidable = value;
+}
+
+void csTerrainCellCollisionProperties::SetParameter (const char* name,
   const char* value)
 {
   if (!strcmp (name, "collideable"))
-    collideable = !strcmp (value, "true");
+    collidable = !strcmp (value, "true");
 }
+
+csPtr<iTerrainCellCollisionProperties> csTerrainCellCollisionProperties::Clone ()
+{
+  return csPtr<iTerrainCellCollisionProperties> (
+    new csTerrainCellCollisionProperties (*this)); 
+}
+
 
 csTerrainCollider::csTerrainCollider (iBase* parent)
   : scfImplementationType (this, parent)
@@ -85,17 +89,16 @@ csTerrainCollider::~csTerrainCollider ()
 {
 }
 
-csPtr<iTerrainCellCollisionProperties> csTerrainCollider::
-CreateProperties ()
+csPtr<iTerrainCellCollisionProperties> csTerrainCollider::CreateProperties ()
 {
-  return new csTerrainCellCollisionProperties(NULL);
+  return csPtr<iTerrainCellCollisionProperties> (new csTerrainCellCollisionProperties);
 }
 
 bool csTerrainCollider::CollideSegment (iTerrainCell* cell,
 const csVector3& start, const csVector3& end, bool oneHit,
-iTerrainVector3Array& points)
+iTerrainVector3Array* points)
 {
-  size_t points_size = points.GetSize ();
+  size_t points_size = points->GetSize ();
   
   csTerrainSegmentCellCollider collider (cell, start, end);
   
@@ -105,10 +108,10 @@ iTerrainVector3Array& points)
   
   while ((rv = collider.GetIntersection (result, cell_result)) >= 0)
   {
-    if (rv == 1) points.Push (result);
+    if (rv == 1) points->Push (result);
   }
   
-  return points_size != points.GetSize ();
+  return points_size != points->GetSize ();
 }
 
 struct csTerrainTriangle
@@ -125,8 +128,8 @@ struct csTerrainTriangle
 bool csTerrainCollider::CollideTriangles (iTerrainCell* cell,
                        const csVector3* vertices, unsigned int tri_count,
                        const unsigned int* indices, float radius,
-                       const csReversibleTransform* trans,
-                       bool oneHit, iTerrainCollisionPairArray& pairs)
+                       const csReversibleTransform& trans,
+                       bool oneHit, iTerrainCollisionPairArray* pairs)
 {
   bool result = false;
   unsigned int width = cell->GetGridWidth ();
@@ -147,7 +150,7 @@ bool csTerrainCollider::CollideTriangles (iTerrainCell* cell,
     for (unsigned int j = 0; j < 3; ++j)
     {
       triv[j] = vertices[indices[i*3 + j]];
-      triv[j] = trans->This2Other(triv[j]);
+      triv[j] = trans.This2Other(triv[j]);
     }
     
     for (unsigned int edge = 0; edge < 3; ++edge)
@@ -221,7 +224,7 @@ bool csTerrainCollider::CollideTriangles (iTerrainCell* cell,
         p.b2.z *= scale_v; p.b2.z += pos.y;
         p.c2.z *= scale_v; p.c2.z += pos.y;
 
-        pairs.Push (p);
+        pairs->Push (p);
       }
     }
   }
@@ -351,7 +354,7 @@ namespace
   void CopyCollisionPairs (Opcode::AABBTreeCollider& TreeCollider,
                            csOPCODECollider* col1,
                            csOPCODETerrainCell* cell,
-                           iTerrainCollisionPairArray& pairs)
+                           iTerrainCollisionPairArray* pairs)
   {
     int size = (int) (udword(TreeCollider.GetNbPairs ()));
     if (size == 0) return;
@@ -368,26 +371,28 @@ namespace
     Point* current;
     int i, j;
 
-    size_t oldlen = pairs.GetSize ();
-    pairs.SetSize (oldlen + N_pairs);
+    size_t oldlen = pairs->GetSize ();
+    pairs->SetSize (oldlen + N_pairs);
 
     for (i = 0 ; i < N_pairs ; i++)
     {
       j = 3 * colPairs[i].id0;
+      csCollisionPair& pair = pairs->Get (oldlen);
+
       current = &vertholder0[indexholder0[j]];		
-      pairs.Get (oldlen).a1 = csVector3 (current->x, current->y, current->z);
+      pair.a1 = csVector3 (current->x, current->y, current->z);
       current = &vertholder0[indexholder0[j + 1]];		
-      pairs.Get (oldlen).b1 = csVector3 (current->x, current->y, current->z);
+      pair.b1 = csVector3 (current->x, current->y, current->z);
       current = &vertholder0[indexholder0[j + 2]];		
-      pairs.Get (oldlen).c1 = csVector3 (current->x, current->y, current->z);
+      pair.c1 = csVector3 (current->x, current->y, current->z);
 
       j = 3 * colPairs[i].id1;
       current = &vertholder1[indexholder1[j]];		
-      pairs.Get (oldlen).a2 = csVector3 (current->x, current->y, current->z);
+      pair.a2 = csVector3 (current->x, current->y, current->z);
       current = &vertholder1[indexholder1[j + 1 ]];		
-      pairs.Get (oldlen).b2 = csVector3 (current->x, current->y, current->z);
+      pair.b2 = csVector3 (current->x, current->y, current->z);
       current = &vertholder1[indexholder1[j + 2 ]];		
-      pairs.Get (oldlen).c2 = csVector3 (current->x, current->y, current->z);
+      pair.c2 = csVector3 (current->x, current->y, current->z);
 
       oldlen++;
     }
@@ -395,11 +400,10 @@ namespace
 };
 
 bool csTerrainCollider::Collide (iTerrainCell* cell, iCollider* collider,
-                       float radius, const csReversibleTransform* trans,
-                       bool oneHit, iTerrainCollisionPairArray& pairs)
+                       float radius, const csReversibleTransform& trans,
+                       bool oneHit, iTerrainCollisionPairArray* pairs)
 {
   csOPCODECollider* col1 = (csOPCODECollider*)collider;
-  const csReversibleTransform* trans1 = trans;
 
   csRef<csOPCODETerrainCell> cell_data = (csOPCODETerrainCell*)
     cell->GetCollisionData ();
@@ -414,9 +418,8 @@ bool csTerrainCollider::Collide (iTerrainCell* cell, iCollider* collider,
   ColCache.Model0 = col1->m_pCollisionModel;
   ColCache.Model1 = cell_data->opcode_model;
 
-  csMatrix3 m1;
-  if (trans1) m1 = trans1->GetT2O ();
-  csVector3 u;
+  csMatrix3 m1 = trans.GetT2O ();
+  csVector3 u = trans.GetO2TTranslation ();
 
   u = m1.Row1 ();
   col1->transform.m[0][0] = u.x;
@@ -431,8 +434,6 @@ bool csTerrainCollider::Collide (iTerrainCell* cell, iCollider* collider,
   col1->transform.m[1][2] = u.y;
   col1->transform.m[2][2] = u.z;
 
-  if (trans1) u = trans1->GetO2TTranslation ();
-  else u.Set (0, 0, 0);
   col1->transform.m[3][0] = u.x;
   col1->transform.m[3][1] = u.y;
   col1->transform.m[3][2] = u.z;
@@ -447,7 +448,6 @@ bool csTerrainCollider::Collide (iTerrainCell* cell, iCollider* collider,
     if (status)
     {
       CopyCollisionPairs (TreeCollider, col1, cell_data, pairs);
-      printf("%d pairs\n", pairs.GetSize ());
     }
     return status;
   }
@@ -463,10 +463,6 @@ bool csTerrainCollider::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-void csTerrainCollider::OnHeightUpdate (iTerrainCell* cell, const csRect&
-  rectangle, const float* data, unsigned int pitch)
-{
-}
 
 }
 CS_PLUGIN_NAMESPACE_END(ImprovedTerrain)

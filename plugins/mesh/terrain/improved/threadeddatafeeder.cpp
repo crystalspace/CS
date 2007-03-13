@@ -1,53 +1,156 @@
 /*
-    Copyright (C) 2006 by Kapoulkine Arseny
+  Copyright (C) 2006 by Kapoulkine Arseny
+                2007 by Marten Svanfeldt
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Library General Public
-    License as published by the Free Software Foundation; either
-    version 2 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Library General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Library General Public License for more details.
 
-    You should have received a copy of the GNU Library General Public
-    License along with this library; if not, write to the Free
-    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
 
-#include "iterrain/terraincell.h"
-
 #include "csgeom/csrect.h"
+#include "csgfx/imagemanipulate.h"
+#include "csutil/dirtyaccessarray.h"
+#include "csutil/refarr.h"
+#include "csutil/threadjobqueue.h"
+#include "csutil/threading/mutex.h"
 
+#include "iengine/material.h"
 #include "igraphic/image.h"
+#include "imap/loader.h"
+#include "imesh/terrain2.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
 
-#include "csutil/refarr.h"
-#include "csutil/dirtyaccessarray.h"
-
-#include "csgfx/imagemanipulate.h"
-
-#include "iengine/material.h"
-
-#include "iengine/engine.h"
-
-#include "imap/loader.h"
-
-#include "csutil/threadjobqueue.h"
-
 #include "threadeddatafeeder.h"
 
-#include "iterrain/terrainsystem.h"
-
-CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
+CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
 {
-
 SCF_IMPLEMENT_FACTORY (csTerrainThreadedDataFeeder)
 
+struct ThreadedFeederData : public csRefCount
+{
+  ThreadedFeederData () : haveValidData (false)
+  {
+  }
+
+  CS::Threading::Mutex dataMutex;
+
+  csRef<iJob> loaderJob;
+
+  csDirtyAccessArray<float> heightmapData;
+  csArray<csDirtyAccessArray<unsigned char> > materialmapData;
+
+  csString heightmapSource, materialmapSource;
+
+  float heightScale;
+
+  unsigned int gridWidth, gridHeight, materialMapWidth, materialMapHeight;
+  size_t materialMapCount;
+
+  bool haveValidData;
+};
+
+class ThreadedFeederJob : public scfImplementation1<ThreadedFeederJob, iJob>
+{
+public:
+  ThreadedFeederJob (ThreadedFeederData* data, iLoader* loader)
+    : scfImplementationType (this), data (data), loader (loader)
+  {
+
+  }
+
+  virtual void Run()
+  {
+    if (!data || !loader)
+      return;
+
+    csRef<iImage> map = loader->LoadImage (data->heightmapSource.GetDataSafe (),
+      CS_IMGFMT_PALETTED8);
+
+    if (!map) 
+      return;
+
+    if (map->GetWidth () != data->gridWidth || 
+        map->GetHeight () != data->gridHeight)
+    {
+      map = csImageManipulate::Rescale (map, data->gridWidth, data->gridHeight);
+    }
+
+    data->heightmapData.SetSize (data->gridWidth * data->gridHeight);
+
+    float* h_data = data->heightmapData.GetArray ();
+
+    const unsigned char* imagedata = (const unsigned char*)map->GetImageData ();
+
+
+    for (unsigned int y = 0; y < data->gridHeight; ++y)
+    {
+      for (unsigned int x = 0; x < data->gridWidth; ++x)
+      {
+        float xd = float(x - data->gridWidth/2) / data->gridWidth;
+        float yd = float(y - data->gridHeight/2) / data->gridHeight;
+
+        *h_data++ = *imagedata++ / 255.0f * data->heightScale;
+      }
+    }
+
+    csRef<iImage> material = loader->LoadImage (data->materialmapSource.GetDataSafe (),
+      CS_IMGFMT_PALETTED8);
+
+    if (!material) return;
+
+    if (material->GetWidth () != data->materialMapWidth ||
+        material->GetHeight () != data->materialMapHeight)
+    {
+      material = csImageManipulate::Rescale (material,
+        data->materialMapWidth, data->materialMapHeight);
+    }
+
+    data->materialmapData.SetSize (data->materialMapCount);
+
+    CS_ASSERT (data->materialMapCount < 255);
+
+    const unsigned char* materialmap = (const unsigned char*)
+      material->GetImageData ();
+
+    size_t materialMapSize = data->materialMapWidth *  data->materialMapHeight;
+
+    for (unsigned char i = 0; i < data->materialMapCount; ++i)
+    {
+      data->materialmapData[i].SetSize (materialMapSize);
+
+      unsigned char* m_data = data->materialmapData[i].GetArray ();
+
+      for (unsigned int y = 0; y < data->materialMapHeight; ++y)
+      {
+        for (unsigned int x = 0; x < data->materialMapWidth; ++x)
+        {
+          *m_data++ = (*materialmap++ == i) ? 255 : 0;
+        }
+      }
+    }
+
+    data->haveValidData = true;  
+  }
+  
+private:
+  ThreadedFeederData* data;
+  csRef<iLoader> loader;
+};
+
+/*
 class csTerrainFeedJob : public scfImplementation1<csTerrainFeedJob, iJob>
 {
   iTerrainCell* cell;
@@ -152,81 +255,105 @@ public:
     feed_data->result = true;
   }
 };
+*/
 
 csTerrainThreadedDataFeeder::csTerrainThreadedDataFeeder (iBase* parent)
-  : csTerrainSimpleDataFeeder(parent)
+  : scfImplementationType (this, parent)
 {
+  jobQueue.AttachNew (new CS::Threading::ThreadedJobQueue);
 }
 
 csTerrainThreadedDataFeeder::~csTerrainThreadedDataFeeder ()
 {
-  if (job.IsValid ())
-    job_queue->Unqueue (job);
 }
 
 bool csTerrainThreadedDataFeeder::PreLoad (iTerrainCell* cell)
 {
-  feed_data.heightmap_source = heightmap_source;
-  feed_data.mmap_source = mmap_source;
+  // Setup a new job iten and enqueue it
+  csTerrainSimpleDataFeederProperties* properties = 
+    (csTerrainSimpleDataFeederProperties*)cell->GetFeederProperties ();
 
-  job.AttachNew (new csTerrainFeedJob(cell, &feed_data, object_reg));
-  job_queue->Enqueue (job);
+  if (!loader || !properties)
+    return false;
+
+  // Check if there is any existing state associated with it
+  csRef<ThreadedFeederData> data = (ThreadedFeederData*)cell->GetFeederData ();
+
+  if (data)
+  {
+    // We have one, check if it is running etc
+    if (data->loaderJob)
+      return true; //Already enqueued
+  }
+  else
+  {
+    data.AttachNew (new ThreadedFeederData);
+    cell->SetFeederData (data);
+  }
+  
+  // Setup job
+  data->heightmapSource = properties->heightmapSource;
+  data->materialmapSource = properties->materialmapSource;
+  data->gridWidth = cell->GetGridWidth ();
+  data->gridHeight = cell->GetGridHeight ();
+  data->materialMapWidth = cell->GetMaterialMapWidth ();
+  data->materialMapHeight = cell->GetMaterialMapHeight ();
+  data->materialMapCount = cell->GetTerrain ()->GetMaterialPalette ().GetSize ();
+  data->heightScale = cell->GetSize ().y;
+
+  csRef<ThreadedFeederJob> job;
+  job.AttachNew (new ThreadedFeederJob (data, loader));
+
+  data->loaderJob = job;
+  jobQueue->Enqueue (job);
 
   return true;
 }
 
 bool csTerrainThreadedDataFeeder::Load (iTerrainCell* cell)
 {
-  if (job)
+  // Check if there is any existing state associated with it
+  csRef<ThreadedFeederData> data = (ThreadedFeederData*)cell->GetFeederData ();
+
+  if (data && data->loaderJob)
   {
-    feed_data.heightmap_source = heightmap_source;
-    feed_data.mmap_source = mmap_source;
+    // PreLoad was called earlier, so let the thread finish and upload data. 
+    // We can't do it in the thread because of thread-safeness issues (context 
+    // access from the main thread only)
+    jobQueue->PullAndRun (data->loaderJob);
+    data->loaderJob = 0;
 
-    // PreLoad was called earlier, so let the thread finish
-    // and upload data (we can't do it in the thread because
-    // of OpenGL issues (context access from the main thread
-    // only)
-    job_queue->PullAndRun (job);
+    if (!data->haveValidData)
+      return false; //Failed
 
-    if (!feed_data.result) return false;
-    
-    csLockedHeightData data = cell->LockHeightData (
-      csRect(0, 0, feed_data.height_width, feed_data.height_height));
+    // Copy over data
+    csLockedHeightData heightData = cell->LockHeightData (csRect (0, 0,
+      data->gridWidth, data->gridHeight));
 
-    float* src_data = feed_data.height_data;
-    
-    for (unsigned int y = 0; y < feed_data.height_height; ++y)
+    float* src_data = data->heightmapData.GetArray ();
+
+    for (unsigned int y = 0; y < data->gridHeight; ++y)
     {
-      memcpy (data.data, src_data, feed_data.height_width * sizeof(float));
-      data.data += data.pitch;
-      src_data += feed_data.height_width;
+      memcpy (heightData.data, src_data, data->gridWidth * sizeof(float));
+      heightData.data += heightData.pitch;
+      src_data += data->gridWidth;
     }
 
     cell->UnlockHeightData ();
 
-    for (unsigned int m = 0; m < feed_data.material_data.GetSize (); ++m)
-      cell->SetMaterialMask (m, feed_data.material_data[m],
-        feed_data.material_width, feed_data.material_height);
-
+    for (unsigned int m = 0; m < data->materialmapData.GetSize (); ++m)
+      cell->SetMaterialMask (m, data->materialmapData[m].GetArray (),
+        data->materialMapWidth, data->materialMapHeight);
+    
+    data->heightmapData.DeleteAll ();
+    data->materialmapData.DeleteAll ();
+    // Finished
     return true;
   }
-  else return csTerrainSimpleDataFeeder::Load (cell);
-}
 
-bool csTerrainThreadedDataFeeder::Initialize (iObjectRegistry* object_reg)
-{
-  this->object_reg = object_reg;
-  
-  static const char queue_tag[] = "crystalspace.jobqueue.threadeddatafeeder";
-  job_queue = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, queue_tag, iJobQueue);
-  if (!job_queue.IsValid ())
-  {
-    job_queue.AttachNew (new csThreadJobQueue ());
-    object_reg->Register (job_queue, queue_tag);
-  }
-
-  return true;
+  // No pre-load, just load normally
+  return csTerrainSimpleDataFeeder::Load (cell);
 }
 
 }
-CS_PLUGIN_NAMESPACE_END(ImprovedTerrain)
+CS_PLUGIN_NAMESPACE_END(Terrain2)

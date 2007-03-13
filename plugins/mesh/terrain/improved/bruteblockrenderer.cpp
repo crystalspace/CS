@@ -1,24 +1,23 @@
 /*
-    Copyright (C) 2006 by Kapoulkine Arseny
+  Copyright (C) 2006 by Kapoulkine Arseny
+                2007 by Marten Svanfeldt
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Library General Public
-    License as published by the Free Software Foundation; either
-    version 2 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Library General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Library General Public License for more details.
 
-    You should have received a copy of the GNU Library General Public
-    License along with this library; if not, write to the Free
-    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
-
-#include "bruteblockrenderer.h"
 
 #include "csgfx/imagememory.h"
 #include "csgfx/renderbuffer.h"
@@ -29,11 +28,13 @@
 #include "csutil/objreg.h"
 #include "csutil/refarr.h"
 #include "iengine.h"
-#include "iterrain/terraincell.h"
+#include "imesh/terrain2.h"
 #include "ivideo/rendermesh.h"
 #include "ivideo/txtmgr.h"
 
-CS_PLUGIN_NAMESPACE_BEGIN(ImprovedTerrain)
+#include "bruteblockrenderer.h"
+
+CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
 {
 
 SCF_IMPLEMENT_FACTORY (csTerrainBruteBlockRenderer)
@@ -678,21 +679,25 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
   }
 }
 
-csTerrainBruteBlockCellRenderProperties::
-csTerrainBruteBlockCellRenderProperties()
-: scfImplementationType (this)
+csTerrainBruteBlockCellRenderProperties::csTerrainBruteBlockCellRenderProperties()
+  : scfImplementationType (this), visible (true), block_res (16), lod_lcoeff (16)
 {
-  visible = true;
-  block_res = 16;
-  lod_lcoeff = 16;
+
 }
 
-csTerrainBruteBlockCellRenderProperties::
-~csTerrainBruteBlockCellRenderProperties ()
+csTerrainBruteBlockCellRenderProperties::csTerrainBruteBlockCellRenderProperties(
+  csTerrainBruteBlockCellRenderProperties& other)
+  : scfImplementationType (this), visible (other.visible), block_res (other.block_res),
+  lod_lcoeff (other.lod_lcoeff)
+{
+
+}
+
+csTerrainBruteBlockCellRenderProperties::~csTerrainBruteBlockCellRenderProperties ()
 {
 }
 
-void csTerrainBruteBlockCellRenderProperties::SetParam (const char* name,
+void csTerrainBruteBlockCellRenderProperties::SetParameter (const char* name,
                                                         const char* value)
 {
   if (strcmp (name, "visible") == 0)
@@ -702,6 +707,12 @@ void csTerrainBruteBlockCellRenderProperties::SetParam (const char* name,
   else if (strcmp (name, "lod lcoeff") == 0)
     SetLODLCoeff (atof (value));
 }
+
+csPtr<iTerrainCellRenderProperties> csTerrainBruteBlockCellRenderProperties::Clone ()
+{
+  return csPtr<iTerrainCellRenderProperties> (new csTerrainBruteBlockCellRenderProperties (*this));
+}
+
 
 csTerrainBruteBlockRenderer::csTerrainBruteBlockRenderer (iBase* parent)
 : scfImplementationType (this, parent)
@@ -713,15 +724,25 @@ csTerrainBruteBlockRenderer::~csTerrainBruteBlockRenderer ()
 {
 }
 
-csPtr<iTerrainCellRenderProperties> csTerrainBruteBlockRenderer::
-CreateProperties()
+csPtr<iTerrainCellRenderProperties> csTerrainBruteBlockRenderer::CreateProperties()
 {
-  return new csTerrainBruteBlockCellRenderProperties();
+  return csPtr<iTerrainCellRenderProperties> (new csTerrainBruteBlockCellRenderProperties);
 }
 
-csRenderMesh** csTerrainBruteBlockRenderer::GetRenderMeshes (int& n,
-                                                             iRenderView* rview, iMovable* movable, uint32 frustum_mask,
-                                                             iTerrainCell** cells, int cell_count)
+void csTerrainBruteBlockRenderer::ConnectTerrain (iTerrainSystem* system)
+{
+  system->AddCellHeightUpdateListener (this);
+}
+
+void csTerrainBruteBlockRenderer::DisconnectTerrain (iTerrainSystem* system)
+{
+  system->RemoveCellHeightUpdateListener (this);
+}
+
+
+csRenderMesh** csTerrainBruteBlockRenderer::GetRenderMeshes (int& n, iRenderView* rview,
+                                                             iMovable* movable, uint32 frustum_mask,
+                                                             const csArray<iTerrainCell*> cells)
 {
   meshes.Empty ();
 
@@ -738,7 +759,7 @@ csRenderMesh** csTerrainBruteBlockRenderer::GetRenderMeshes (int& n,
   csPlane3 planes[10];
   rview->SetupClipPlanes (tr_o2c, planes, frustum_mask);
 
-  for (int i = 0; i < cell_count; ++i)
+  for (int i = 0; i < cells.GetSize (); ++i)
   {
     csBruteBlockTerrainRenderData* rdata = (csBruteBlockTerrainRenderData*)
       cells[i]->GetRenderData ();
@@ -768,15 +789,11 @@ void csTerrainBruteBlockRenderer::OnMaterialPaletteUpdate (
 }
 
 void csTerrainBruteBlockRenderer::OnHeightUpdate (iTerrainCell* cell,
-                                                  const csRect& rectangle, const float* data, unsigned int pitch)
+                                                  const csRect& rectangle)
 {
-  int grid_width = cell->GetGridWidth ();
-  int grid_height = cell->GetGridHeight ();
-
-  int mm_width = cell->GetMaterialMapWidth ();
-  int mm_height = cell->GetMaterialMapHeight ();
-
   csRef<csBruteBlockTerrainRenderData> rdata = SetupCellRenderData (cell);
+
+  //@@TODO! Fix "incremental" updates
 }
 
 void csTerrainBruteBlockRenderer::OnMaterialMaskUpdate (iTerrainCell* cell,
@@ -841,50 +858,6 @@ void csTerrainBruteBlockRenderer::OnMaterialMaskUpdate (iTerrainCell* cell,
   rdata->alpha_map[material]->Blit (rectangle.xmin, rectangle.ymin,
     rectangle.Width (), rectangle.Height (), (unsigned char*)
     image_data.GetArray (), iTextureHandle::RGBA8888);
-}
-
-void csTerrainBruteBlockRenderer::OnColorUpdate (iTerrainCell* cell, const
-                                                 csColor* data, unsigned int res)
-{
-  if (!data)
-    return;
-/*
-  csRef<csBruteBlockTerrainRenderData> rdata = SetupCellRenderData (cell);    
-
-  if (!rdata->light_map)
-  {
-    csRef<iImage> image;
-    image.AttachNew (new csImageMemory (res, res, CS_IMGFMT_TRUECOLOR));
-
-    rdata->light_map = g3d->GetTextureManager ()->RegisterTexture
-      (image, CS_TEXTURE_2D | CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
-
-    rdata->light_context.AttachNew (new csShaderVariableContext);
-
-    csRef<csShaderVariable> var;
-    var.AttachNew (new csShaderVariable(strings->Request ("light map")));
-    var->SetType (csShaderVariable::TEXTURE);
-    var->SetValue (rdata->light_map);
-    rdata->light_context->AddVariable (var);
-  }
-
-  csDirtyAccessArray<csRGBpixel> image_data;
-  image_data.SetSize (res * res);
-
-  const csColor* src_data = data;
-  csRGBpixel* dst_data = image_data.GetArray ();
-
-  for (int y = 0; y < res; ++y)
-  {
-    for (int x = 0; x < res; ++x, ++src_data)
-    {
-      (*dst_data++).Set (src_data->red * 255, src_data->green * 255,
-        src_data->blue * 255, 255);
-    }
-  }
-
-  rdata->light_map->Blit (0, 0, res, res, (unsigned char*)
-    image_data.GetArray (), iTextureHandle::RGBA8888);*/
 }
 
 bool csTerrainBruteBlockRenderer::Initialize (iObjectRegistry* object_reg)
@@ -1065,4 +1038,4 @@ iRenderBuffer* csTerrainBruteBlockRenderer::GetIndexBuffer (int block_res_log2, 
 }
 
 }
-CS_PLUGIN_NAMESPACE_END(ImprovedTerrain)
+CS_PLUGIN_NAMESPACE_END(Terrain2)
