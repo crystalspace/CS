@@ -16,6 +16,7 @@ chronological order.
 	      (sending SCF objects by pointer, transforms by reference).
 	    - Unified terrain to use a single interface header file inside 
 	      include/imesh.
+	    - Fixed the loader to use more standardized names for tags.
 8-Mar-2007
 	- Marten fixed an error related to accessing already removed objects
 	  when collapsing several lod-levels at once in bruteblock renderer
