@@ -39,10 +39,21 @@ CS_IMPLEMENT_APPLICATION
 namespace lighter
 {
   Lighter* globalLighter;
-  Statistics globalStats;
 
   Lighter::Lighter (iObjectRegistry *objectRegistry)
-    : objectRegistry (objectRegistry), scene (new Scene)
+    : objectRegistry (objectRegistry), scene (new Scene),
+      progStartup ("Starting up", 5),
+      progLoadFiles ("Loading files", 2),
+      progParseEngine ("Loading files", 3),
+      progLightmapLayout ("Lightmap layout", 5),
+      progInitialize ("Initialize objects", 5),
+      progUpdateWorld ("Saving meshes", 7),
+      progDirectLighting ("Direct lighting", 60),
+      progPostproc ("Postprocessing lightmaps", 10),
+      progSaveResult ("Saving result", 2),
+      progSaveMeshesPostLight ("Updating meshes", 1),
+      progApplyWorldChanges ("Updating world files", 1),
+      progFinished ("Finished!", 0)
   {
   }
 
@@ -92,7 +103,7 @@ namespace lighter
 
     // Initialize the TUI
     globalTUI.Redraw ();
-    globalStats.SetTaskProgress ("Starting up", 0);
+    progStartup.SetProgress (0);
 
     // Setup reporter
     {
@@ -117,7 +128,7 @@ namespace lighter
             CS_REQUEST_END))
       return Report ("Cannot load plugins!");
 
-    lighter::globalStats.SetTaskProgress ("Starting up", 60);
+    progStartup.SetProgress (60);
 
     // Get the plugins wants to use
     reporter = csQueryRegistry<iReporter> (objectRegistry);
@@ -147,8 +158,7 @@ namespace lighter
     // For now, force the use of TinyXML to be able to write
     docSystem.AttachNew (new csTinyDocumentSystem);
 
-    globalStats.SetTaskProgress ("Starting up", 100);
-    globalStats.SetTotalProgress (5);
+    progStartup.SetProgress (100);
     return true;
   }
 
@@ -160,16 +170,13 @@ namespace lighter
   bool Lighter::LightEmUp ()
   {
     // Have to load to have anything to light
-    if (!LoadFiles ()) 
+    if (!LoadFiles (progLoadFiles)) 
       return false;
-    globalStats.SetTotalProgress (8);
 
-    if (!scene->ParseEngine ()) 
-      return false;
-    globalStats.SetTotalProgress (10);
-    
+    /*if (!scene->ParseEngine (progParseEngine)) 
+      return false;*/
 
-    globalStats.SetTaskProgress ("Lightmap layout", 0);
+    progLightmapLayout.SetProgress (0);
     // Calculate lightmapping coordinates
     LightmapUVFactoryLayouter *uvLayout = new SimpleUVFactoryLayouter (scene->GetLightmaps());
 
@@ -180,48 +187,49 @@ namespace lighter
     {
       csRef<ObjectFactory> fact = factIt.Next ();
       fact->PrepareLightmapUV (uvLayout);
-      globalStats.IncTaskProgress (factoryProgress);
+      progLightmapLayout.IncProgress (factoryProgress);
     }
+    if (!scene->SaveWorldFactories (/*progUpdateWorld*/)) return false;
+    scene->GetFactories ().DeleteAll();
 
     // Initialize all objects
-    globalStats.SetTotalProgress (15);
-    globalStats.SetTaskProgress ("Initialize objects", 0);
-    float sectorProgress = 100.0f / scene->GetSectors ().GetSize();
+    progInitialize.SetProgress (0);
+    float sectorProgress = 99.0f / scene->GetSectors ().GetSize();
     SectorHash::GlobalIterator sectIt = 
       scene->GetSectors ().GetIterator ();
     while (sectIt.HasNext ())
     {
       csRef<Sector> sect = sectIt.Next ();
       sect->Initialize ();
-      globalStats.IncTaskProgress (sectorProgress);
+      progInitialize.IncProgress (sectorProgress);
     }
 
     for (size_t i = 0; i < scene->GetLightmaps().GetSize(); i++)
     {
       Lightmap * lm = scene->GetLightmaps ()[i];
       lm->Initialize();
-    }    
-    
-    // Progress 20
-    globalStats.SetTotalProgress (20);
+    }
 
+    progUpdateWorld.SetProgress (0);
+    if (!scene->SaveWorldMeshes (/*progUpdateWorld*/)) return false;
+    if (!scene->FinishWorldSaving ()) return false;
+    
     // Shoot direct lighting
     if (globalConfig.GetLighterProperties ().doDirectLight)
     {
       DirectLighting::Initialize ();
-      globalStats.SetTaskProgress ("Direct lighting", 0);
+      progDirectLighting.SetProgress (0);
       sectIt.Reset ();
       while (sectIt.HasNext ())
       {
         csRef<Sector> sect = sectIt.Next ();
-        DirectLighting::ShadeDirectLighting (sect, sectorProgress);
+        DirectLighting::ShadeDirectLighting (sect, progDirectLighting, sectorProgress);
       }
     }
 
-    globalStats.SetTotalProgress (80);
-
     //@@ DO OTHER LIGHTING
 
+    progPostproc.SetProgress (0);
     // De-antialias the lightmaps
     {
       LightmapMaskArray lmMasks;
@@ -233,7 +241,6 @@ namespace lighter
       }
 
       sectIt.Reset ();
-      globalStats.SetTaskProgress ("Postprocessing lightmaps", 0);
       while (sectIt.HasNext ())
       {
         csRef<Sector> sect = sectIt.Next ();
@@ -242,10 +249,8 @@ namespace lighter
         while (objIt.HasNext ())
         {
           csRef<Object> obj = objIt.Next ();
-          //csArray<LightmapPtrDelArray*> allLightmaps (scene->GetAllLightmaps());
-          //obj->FixupLightmaps (allLightmaps);
           obj->FillLightmapMask (lmMasks);
-          globalStats.IncTaskProgress (objProgress);
+          progPostproc.IncProgress (objProgress);
         }
       }
 
@@ -258,17 +263,16 @@ namespace lighter
         for (size_t lmI = 0; lmI < lightmaps.GetSize (); ++lmI)
         {
           lightmaps[lmI]->FixupLightmap (lmMasks[lmI]);
-          globalStats.IncTaskProgress (lmProgress);
+          progPostproc.IncProgress (lmProgress);
         }
       }
     }
 
-    globalStats.SetTotalProgress (90);
-    globalStats.SetTaskProgress ("Saving result", 0);
     //Save the result
-    if (!scene->SaveFiles ()) return false;
-    globalStats.SetTotalProgress (100);
-    globalStats.SetTaskProgress ("Finished!", 0);
+    if (!scene->SaveLightmaps (progSaveResult)) return false;
+    if (!scene->SaveMeshesPostLighting (progSaveMeshesPostLight)) return false;
+    if (!scene->ApplyWorldChanges (progApplyWorldChanges)) return false;
+    progFinished.SetProgress (100);
 
     return true;  
   }
@@ -277,20 +281,13 @@ namespace lighter
   {
     va_list arg;
     va_start (arg, msg);
-    if (reporter)
-    {
-      reporter->ReportV (CS_REPORTER_SEVERITY_ERROR, 
-        "crystalspace.application.lighter2", msg, arg);
-    }
-    else
-    {
-      csPrintfV (msg, arg);
-      csPrintf ("\n");
-    }
+    csReportV(objectRegistry, CS_REPORTER_SEVERITY_ERROR, 
+      "crystalspace.application.lighter2", msg, arg);
+    va_end (arg);
     return false;
   }
 
-  bool Lighter::LoadFiles ()
+  bool Lighter::LoadFiles (Statistics::SubProgress& progress)
   {
     //Parse cmd-line
     csRef<iCommandLineParser> cmdline = csQueryRegistry<iCommandLineParser>
@@ -314,7 +311,7 @@ namespace lighter
     }
     
     // Load the files
-    return scene->LoadFiles ();
+    return scene->LoadFiles (progress);
   }
 
   void Lighter::LoadConfiguration ()

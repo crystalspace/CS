@@ -19,15 +19,14 @@
 #ifndef __PRIMITIVE_H__
 #define __PRIMITIVE_H__
 
-#include "common.h"
 #include "csutil/set.h"
 
-
+#include "common.h"
+#include "vertexdata.h"
 
 namespace lighter
 {
   class Object;
-  struct ObjectVertexData;
   struct ElementProxy;
 
   class Primitive;
@@ -63,22 +62,102 @@ namespace lighter
   };
 
   /**
-  * Primitive in the radiosity world.
-  * Represents a single primitive (face) in the radiosity world.
-  */
-  class Primitive
+   * Primitive in the radiosity world.
+   * Represents a single primitive (face) in the radiosity world.
+   */
+  class PrimitiveBase
   {
+  protected:
+    inline PrimitiveBase (ObjectBaseVertexData* vertexData) 
+      : vertexData (vertexData)
+    {
+    }
   public:
     typedef CS::TriangleT<size_t> TriangleType;
 
+    /// Calculate center
+    const csVector3 GetCenter () const;
+
+    /// Calculate area, forwarder
+    float GetArea () const;
+
+    /// Get min/max extent in given dimension
+    void GetExtent (uint dimension, float &min, float &max) const;
+
+    /// Classify with respect to another plane
+    int Classify (const csPlane3 &plane) const;
+
+    /// Calculate and save primitive plane
+    void ComputePlane ();
+
+    /// Calculate min-max UV-coords
+    void ComputeMinMaxUV (const Vector2Array& lightmapUVs,
+      csVector2 &min, csVector2 &max) const;
+
+    inline TriangleType& GetTriangle () { return triangle; }
+    inline const TriangleType& GetTriangle () const { return triangle; }
+    inline void SetTriangle (const TriangleType& t) { triangle = t; }
+
+    inline const csPlane3& GetPlane () const { return plane; }
+
+    /*inline const FactoryPrimitive* GetOriginalPrimitive () const 
+    { return originalPrim; }
+    inline void SetOriginalPrimitive (FactoryPrimitive*p) 
+    { originalPrim = p; }*/
+
+  protected:
+    /// Vertex data holder
+    ObjectBaseVertexData* vertexData;
+
+    /// Index array for this primitive
+    TriangleType triangle;
+
+    /// Computed plane
+    /* Plane normal seems to point into opposite direction compared to e.g.
+     * auto-computed vertex normals. (FIXME?) */
+    csPlane3 plane;
+  };
+
+  class FactoryPrimitive : public PrimitiveBase
+  {
+  public:
     // Constructors
-    inline Primitive (ObjectVertexData &dataHolder) 
-      : vertexData(dataHolder),
-      uFormVector (0), vFormVector (0), illuminationColor (0,0,0),
-      reflectanceColor (1.0f,1.0f,1.0f), minCoord (0),
-      minUV (0,0), maxUV (0,0), originalPrim (0), radObject (0)
+    inline FactoryPrimitive (ObjectFactoryVertexData &dataHolder) 
+      : PrimitiveBase (&dataHolder)
     {
     }
+
+    inline ObjectFactoryVertexData & GetVertexData () 
+    { return *(static_cast<ObjectFactoryVertexData*> (vertexData)); }
+    inline const ObjectFactoryVertexData & GetVertexData () const 
+    { return *(static_cast<ObjectFactoryVertexData*> (vertexData)); }
+
+  };
+
+  class Primitive : public PrimitiveBase
+  {
+  public:
+    inline Primitive (ObjectVertexData &dataHolder) 
+      : PrimitiveBase (&dataHolder), uFormVector (0), vFormVector (0), 
+        /*illuminationColor (0,0,0), reflectanceColor (1.0f,1.0f,1.0f), */
+        minCoord (0), minUV (0,0), maxUV (0,0), /*originalPrim (0), */
+        radObject (0)
+    {
+    }
+
+    /**
+     * Prepare the primitive, create elements.
+     */
+    void Prepare ();
+
+    /// Given a point, compute the element index
+    size_t ComputeElementIndex (const csVector3& pt) const;
+
+    /// Given an element index, compute center point
+    csVector3 ComputeElementCenter (size_t index) const;
+
+    /// Get interpolated normal at point
+    csVector3 ComputeNormal (const csVector3& point) const;
 
     /// Calculate min-max UV-coords
     void ComputeMinMaxUV (csVector2 &min, csVector2 &max) const;
@@ -94,46 +173,16 @@ namespace lighter
       maxV = (int)ceil (max.y);
     }
 
-    /// Calculate and save primitive plane
-    void ComputePlane ();
-
-    /// Calculate center
-    const csVector3 GetCenter () const;
-
-    /// Calculate area, forwarder
-    float GetArea () const;
-
-    /// Get min/max extent in given dimension
-    void GetExtent (uint dimension, float &min, float &max) const;
+    using PrimitiveBase::ComputeMinMaxUV;
 
     /// Calculate the u/v form vectors
     void ComputeUVTransform ();
 
-    /**
-     * Prepare the primitive, create elements.
-     */
-    void Prepare ();
-
-    /// Classify with respect to another plane
-    int Classify (const csPlane3 &plane) const;
-
-    /// Compute the two barycentric coordinates given a point
-    void ComputeBaryCoords (const csVector3& v, float& lambda, float& my) const;
-
     /// Compute if point is inside primitive or not
     bool PointInside (const csVector3& pt) const;
 
-    /// Given a point, compute the element index
-    size_t ComputeElementIndex (const csVector3& pt) const;
-
-    /// Given an element index, compute center point
-    csVector3 ComputeElementCenter (size_t index) const;
-
-    /// Get an element proxy given element index
-    ElementProxy GetElement (size_t index);
-
-    /// Get an element proxy given point
-    ElementProxy GetElement (const csVector3& pt);
+    /// Compute the two barycentric coordinates given a point
+    void ComputeBaryCoords (const csVector3& v, float& lambda, float& my) const;
 
     /// Get number of elements
     size_t GetElementCount () const
@@ -150,32 +199,28 @@ namespace lighter
       v = (elementIndex / uWidth);
     }
 
-    /// Get interpolated normal at point
-    csVector3 ComputeNormal (const csVector3& point) const;
+    /// Get an element proxy given element index
+    ElementProxy GetElement (size_t index);
 
-    inline TriangleType& GetTriangle () { return triangle; }
-    inline const TriangleType& GetTriangle () const { return triangle; }
-    inline void SetTriangle (const TriangleType& t) { triangle = t; }
+    /// Get an element proxy given point
+    ElementProxy GetElement (const csVector3& pt);
 
-    inline ObjectVertexData& GetVertexData () { return vertexData; }
-    inline const ObjectVertexData& GetVertexData () const { return vertexData; }
-
-    inline const csPlane3& GetPlane () const { return plane; }
+    inline ObjectVertexData & GetVertexData () 
+    { return *(static_cast<ObjectVertexData*> (vertexData)); }
+    inline const ObjectVertexData& GetVertexData () const 
+    { return *(static_cast<ObjectVertexData*> (vertexData)); }
 
     inline const csVector3& GetuFormVector () const { return uFormVector; }
     inline const csVector3& GetvFormVector () const { return vFormVector; }
 
-    inline const csColor& GetIlluminationColor () const { return illuminationColor; }
-    inline const csColor& GetReflectanceColor () const { return reflectanceColor; }
+    /*inline const csColor& GetIlluminationColor () const { return illuminationColor; }
+    inline const csColor& GetReflectanceColor () const { return reflectanceColor; }*/
 
     inline const ElementAreas& GetElementAreas () const { return elementAreas; }
 
     inline const csVector3& GetMinCoord () const { return minCoord; }
     inline const csVector2& GetMinUV () const { return minUV; }
     inline const csVector2& GetMaxUV () const { return maxUV; }
-
-    inline const Primitive* GetOriginalPrimitive () const { return originalPrim; }
-    inline void SetOriginalPrimitive (Primitive *p) { originalPrim = p; }
 
     inline const Object* GetObject () const { return radObject; }
     inline Object* GetObject () { return radObject; }
@@ -185,45 +230,29 @@ namespace lighter
     inline void SetGlobalLightmapID (uint id) { globalLightmapID = id; }
 
     
-  protected:
-    /// Vertex data holder
-    ObjectVertexData& vertexData;
-
-    /// Index array for this primitive
-    TriangleType triangle;
-
-    /// Computed plane
-    /* Plane normal seems to point into opposite direction compared to e.g.
-     * auto-computed vertex normals. (FIXME?) */
-    csPlane3 plane;
+protected:
+    //@{
+    /// Elements
+    ElementAreas elementAreas;
+    //@}
 
     /// Mapping vectors
     csVector3 uFormVector;
     csVector3 vFormVector;
 
     /// Color
-    csColor illuminationColor;
-    csColor reflectanceColor;
-
-    //@{
-    /// Elements
-    //size_t elementCount;
-    ElementAreas elementAreas;
-    //@}
+    //csColor illuminationColor;
+    //csColor reflectanceColor;
 
     /// Min/max data
     csVector3 minCoord;
     csVector2 minUV;
     csVector2 maxUV;
 
-    /// Pointer to unchanged prim
-    Primitive *originalPrim;
-
     /// Original object
     Object* radObject;
 
     /// GLobal lightmap id
-    // @@@ Only meaningful for object primitives
     uint globalLightmapID;
 
     /* Coefficients to computer barycentric coordinates for a point on the
@@ -239,6 +268,7 @@ namespace lighter
     void ComputeBaryCoeffs ();
   };
 
+  typedef csArray<FactoryPrimitive> FactoryPrimitiveArray;
   typedef csArray<Primitive> PrimitiveArray;
   typedef csArray<Primitive*> PrimitivePtrArray;
   typedef csSet<Primitive*> PrimitivePtrSet;

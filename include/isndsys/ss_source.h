@@ -48,9 +48,9 @@ struct iSndSysSource : public virtual iBase
   /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
   SCF_INTERFACE(iSndSysSource,2,0,0);
 
-  /// Set volume (range 0.0 = silence 1.0 = as provided 2.0 = twice as loud)
+  /// Set volume (0.0 = silence, 1.0 = as provided, 2.0 = twice as loud)
   virtual void SetVolume (float volume) = 0;
-  /// Get volume (range 0.0 = silence 1.0 = as provided 2.0 = twice as loud)
+  /// Get volume (0.0 = silence, 1.0 = as provided, 2.0 = twice as loud)
   virtual float GetVolume () = 0;
 
   /// Retrieve the iSoundStream attached to this source

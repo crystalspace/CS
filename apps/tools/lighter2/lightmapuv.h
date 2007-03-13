@@ -25,6 +25,7 @@
 namespace lighter
 {
 
+  struct ObjectFactoryVertexData;
   struct ObjectVertexData;
   
   class LightmapUVObjectLayouter;
@@ -45,9 +46,9 @@ namespace lighter
      *   primitives of a sub-array would fit on a single lightmap.
      */
     virtual csPtr<LightmapUVObjectLayouter> LayoutFactory (
-      const PrimitiveArray& inPrims, ObjectVertexData& vertexData,
-      const ObjectFactory* factory, csArray<PrimitiveArray>& outPrims,
-      BoolDArray& usedVerts) = 0;
+      const FactoryPrimitiveArray& inPrims, ObjectFactoryVertexData& vertexData,
+      const ObjectFactory* factory, csArray<FactoryPrimitiveArray>& outPrims,
+      csBitArray& usedVerts) = 0;
   };
 
   class LightmapUVObjectLayouter : public csRefCount

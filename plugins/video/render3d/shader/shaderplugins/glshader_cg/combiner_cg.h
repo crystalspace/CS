@@ -128,7 +128,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     Snippet currentSnippet;
     csRefArray<iDocumentNode> variableMaps;
     csString outputAssign;
-    csRefArray<iDocumentNode> includes;
+    csRefArray<iDocumentNode> definitions;
     csSet<csString> globalIDs;
     csString globals;
   public:
@@ -153,6 +153,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     void WriteToPass (iDocumentNode* pass);
     
     bool CompatibleParams (iDocumentNode* params);
+
+    csRef<iString> QueryInputTag (const char* location, 
+      iDocumentNode* blockNodes);
   private:
     class DocNodeAppender;
   

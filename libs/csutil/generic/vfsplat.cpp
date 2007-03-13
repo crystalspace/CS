@@ -25,8 +25,8 @@ const char* csCheckPlatformVFSVar(const char* /*VarName*/)
   return 0;
 }
 
-CS_CRYSTALSPACE_EXPORT void csExpandPlatformFilename(const char *inputFilename, 
-                                                     char *outputFilename)
+void csExpandPlatformFilename(const char *inputFilename, 
+                               char *outputFilename)
 {
   strcpy(outputFilename, inputFilename);
 }

@@ -178,6 +178,7 @@ csPtr<iBase> ProctexPDLightLoader::Parse (iDocumentNode* node,
         }
       }
     }
+    pt->FinishLoad();
 
     csRef<iTextureWrapper> tw = pt->GetTextureWrapper ();
     return csPtr<iBase> (tw);
@@ -270,7 +271,7 @@ void ProctexPDLight::PDMap::ComputeValueBounds (const csRect& area)
   if (!imageData) return;
 
   const int width = imageW;
-  const Lumel* map = imageData->data + area.ymin * width + area.xmin;
+  const Lumel* map = imageData->GetData() + area.ymin * width + area.xmin;
   int mapPitch = width - area.Width ();
   for (int y = area.ymin; y < area.ymax; y++)
   {
@@ -302,7 +303,7 @@ void ProctexPDLight::PDMap::SetImage (iImage* img)
   size_t numPixels = imageW * imageH;
   imageData.AttachNew (new (numPixels) LumelBuffer);
   const csRGBpixel* src = (csRGBpixel*)useImage->GetImageData();
-  Lumel* dst = imageData->data;
+  Lumel* dst = imageData->GetData();
   while (numPixels-- > 0)
   {
     dst->red = src->red;
@@ -425,7 +426,7 @@ void ProctexPDLight::Animate (csTicks /*current_time*/)
       LightmapScratch& scratch = GetScratch();
       scratch.SetSize (lightmapSize);
       {
-        Lumel* basePtr = (baseMap.imageData->data) +
+        Lumel* basePtr = (baseMap.imageData->GetData()) +
           totalAffectedAreas.ymin * mat_w + totalAffectedAreas.xmin;
         int lines = totalAffectedAreas.Height();
         Lumel* scratchPtr = scratch.GetArray();
@@ -454,7 +455,7 @@ void ProctexPDLight::Animate (csTicks /*current_time*/)
         csFixed16 lightB = light.light->GetColor ().blue;
 
         int mapW = light.map.nonNullArea.Width();
-        const Lumel* mapPtr = (light.map.imageData->data) +
+        const Lumel* mapPtr = (light.map.imageData->GetData()) +
           light.map.nonNullArea.ymin * mat_w +
           light.map.nonNullArea.xmin;
         int lines = light.map.nonNullArea.Height();

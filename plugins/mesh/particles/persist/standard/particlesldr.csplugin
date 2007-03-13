@@ -13,6 +13,16 @@
         <implementation>ParticlesObjectLoader</implementation>
         <description>Crystal Space Particles Mesh Loader</description>
       </class>
+      <class>
+        <name>crystalspace.mesh.saver.factory.particles</name>
+        <implementation>ParticlesFactorySaver</implementation>
+        <description>Crystal Space Particles Factory Saver</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.particles</name>
+        <implementation>ParticlesObjectSaver</implementation>
+        <description>Crystal Space Particles Mesh Saver</description>
+      </class>
     </classes>
   </scf>
 </plugin>

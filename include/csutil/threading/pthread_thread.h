@@ -35,7 +35,7 @@ namespace Implementation
 {
 
   // Thread base-class for pthreads
-  class ThreadBase
+  class CS_CRYSTALSPACE_EXPORT ThreadBase
   {
   public:
     ThreadBase (Runnable* runnable);

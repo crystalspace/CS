@@ -19,7 +19,7 @@
 #ifndef __CS_CSUTIL_CUSTOMALLOCATED_H__
 #define __CS_CSUTIL_CUSTOMALLOCATED_H__
 
-/**
+/**\file
  * Base class to allocate subclasses with cs_malloc().
  */
 

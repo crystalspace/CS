@@ -45,8 +45,6 @@ const char* TrXmlBase::errorString[ TIXML_ERROR_STRING_COUNT ] =
   "Error document empty."
 };
 
-bool TrXmlBase::condenseWhiteSpace = true;
-
 TrDocumentNode::TrDocumentNode( )
 {
   parent = 0;
@@ -72,7 +70,7 @@ TrDocumentNode* TrDocumentNode::NextSibling( const char * value ) const
 }
 
 
-TrDocumentNode* TrDocumentNodeChildren::Identify (TrDocument* document,
+TrDocumentNode* TrDocumentNodeChildren::Identify (const ParseInfo& parse,
 	const char* p)
 {
   TrDocumentNode* returnNode = 0;
@@ -104,10 +102,9 @@ TrDocumentNode* TrDocumentNodeChildren::Identify (TrDocument* document,
   {
     returnNode = new TrXmlDeclaration();
   }
-  else if (isalpha (*(p+1))
-        || *(p+1) == '_' )
+  else if (parse.IsNameStart (p+1))
   {
-    returnNode = document->blk_element.Alloc ();
+    returnNode = parse.document->blk_element.Alloc ();
   }
   else if (StringEqual (p, commentHeader))
   {
@@ -126,7 +123,7 @@ TrDocumentNode* TrDocumentNodeChildren::Identify (TrDocument* document,
   }
   else
   {
-    document->SetError( TIXML_ERROR_OUT_OF_MEMORY );
+    parse.document->SetError( TIXML_ERROR_OUT_OF_MEMORY );
   }
   return returnNode;
 }
@@ -278,7 +275,7 @@ TrDocument::~TrDocument ()
   // Call explicit clear so that all children are destroyed
   // before 'blk_element' and 'blk_text' are destroyed.
   Clear ();
-  delete[] input_data;
+  if (input_data != 0) cs_free (input_data);
 }
 
 const int TrDocumentAttribute::IntValue() const

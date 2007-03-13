@@ -103,6 +103,8 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory) :
   do_shadow_rec = false;
   lighting_dirty = true;
   shadow_caps = false;
+  factory_user_rb_state = 0;
+  mesh_user_rb_dirty_flag = false;
 
   dynamic_ambient_version = 0;
 
@@ -629,7 +631,12 @@ void csGenmeshMeshObject::SetupObject ()
     iMaterialWrapper* mater = material;
     if (!mater) mater = factory->GetMaterialWrapper ();
     material_needs_visit = mater ? mater->IsVisitRequired () : false;
-
+    SetupShaderVariableContext ();
+  }
+  if (factory->user_buffer_change != factory_user_rb_state || mesh_user_rb_dirty_flag)
+  {
+    mesh_user_rb_dirty_flag = false;
+    factory_user_rb_state = factory->user_buffer_change;
     SetupShaderVariableContext ();
   }
 }
@@ -875,7 +882,7 @@ void csGenmeshMeshObject::UpdateLighting (
 
   if (do_manual_colors) return;
 
-  csColor4* factory_colors = factory->GetColors ();
+  csColor4* factory_colors = factory->GetColors (false);
 
   if (do_lighting)
   {
@@ -902,9 +909,19 @@ void csGenmeshMeshObject::UpdateLighting (
     {
       col = base_color;
     }
-    for (i = 0 ; i < factory->GetVertexCount () ; i++)
+    if (factory_colors) 
     {
-      lit_mesh_colors[i] = col + static_mesh_colors[i] + factory_colors[i];
+      for (i = 0 ; i < factory->GetVertexCount () ; i++)
+      {
+        lit_mesh_colors[i] = col + static_mesh_colors[i] + factory_colors[i];
+      }
+    }
+    else
+    {
+      for (i = 0 ; i < factory->GetVertexCount () ; i++)
+      {
+        lit_mesh_colors[i] = col + static_mesh_colors[i];
+      }
     }
     if (do_shadow_rec)
     {
@@ -961,10 +978,22 @@ void csGenmeshMeshObject::UpdateLighting (
     lighting_dirty = false;
     mesh_colors_dirty_flag = true;
 
-    for (i = 0 ; i < factory->GetVertexCount () ; i++)
+    if (factory_colors)
     {
-      lit_mesh_colors[i] = base_color + factory_colors[i];
-      lit_mesh_colors[i].Clamp (2., 2., 2.);
+      for (i = 0 ; i < factory->GetVertexCount () ; i++)
+      {
+        lit_mesh_colors[i] = base_color + factory_colors[i];
+        lit_mesh_colors[i].Clamp (2., 2., 2.);
+      }
+    }
+    else
+    {
+      csColor4 base_color_clamped (base_color);
+      base_color_clamped.Clamp (2., 2., 2.);
+      for (i = 0 ; i < factory->GetVertexCount () ; i++)
+      {
+        lit_mesh_colors[i] = base_color_clamped;
+      }
     }
   }
 }
@@ -1419,10 +1448,10 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
       if (!vertex_buffer)
         vertex_buffer = csRenderBuffer::CreateRenderBuffer (
           num_mesh_vertices, CS_BUF_STATIC,
-          CS_BUFCOMP_FLOAT, 3, false);
+          CS_BUFCOMP_FLOAT, 3);
       const csVector3* mesh_vertices = AnimControlGetVertices ();
       if (!mesh_vertices) mesh_vertices = factory->GetVertices ();
-      vertex_buffer->CopyInto (mesh_vertices, num_mesh_vertices);
+      vertex_buffer->SetData (mesh_vertices);
       holder->SetRenderBuffer (buffer, vertex_buffer);
       return;
     }
@@ -1431,10 +1460,10 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
       if (!texel_buffer)
         texel_buffer = csRenderBuffer::CreateRenderBuffer (
           num_mesh_vertices, CS_BUF_STATIC,
-          CS_BUFCOMP_FLOAT, 2, false);
+          CS_BUFCOMP_FLOAT, 2);
       const csVector2* mesh_texels = AnimControlGetTexels ();
       if (!mesh_texels) mesh_texels = factory->GetTexels ();
-      texel_buffer->CopyInto (mesh_texels, num_mesh_vertices);
+      texel_buffer->SetData (mesh_texels);
       holder->SetRenderBuffer (buffer, texel_buffer);
       return;
     }
@@ -1443,10 +1472,10 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
       if (!normal_buffer)
         normal_buffer = csRenderBuffer::CreateRenderBuffer (
           num_mesh_vertices, CS_BUF_STATIC,
-          CS_BUFCOMP_FLOAT, 3, false);
+          CS_BUFCOMP_FLOAT, 3);
       const csVector3* mesh_normals = AnimControlGetNormals ();
       if (!mesh_normals) mesh_normals = factory->GetNormals ();
-      normal_buffer->CopyInto (mesh_normals, num_mesh_vertices);
+      normal_buffer->SetData (mesh_normals);
       holder->SetRenderBuffer (buffer, normal_buffer);
       return;
     }
@@ -1471,7 +1500,7 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
           color_buffer = csRenderBuffer::CreateRenderBuffer (
               num_lit_mesh_colors, 
               do_lighting ? CS_BUF_DYNAMIC : CS_BUF_STATIC,
-              CS_BUFCOMP_FLOAT, 4, false);
+              CS_BUFCOMP_FLOAT, 4);
         }
         mesh_colors_dirty_flag = false;
         const csColor4* mesh_colors = 0;
@@ -1479,27 +1508,30 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder,
           mesh_colors = AnimControlGetColors (lit_mesh_colors);
         else
           mesh_colors = lit_mesh_colors;
-        color_buffer->CopyInto (mesh_colors, num_lit_mesh_colors);
+        color_buffer->SetData (mesh_colors);
       }
       else
       {
-        if (!color_buffer || 
-          (color_buffer->GetSize() != (sizeof (csColor4) * 
-          factory->GetVertexCount())))
-        {
-          // Recreate the render buffer only if the new data cannot fit inside
-          //  the existing buffer.
-          color_buffer = csRenderBuffer::CreateRenderBuffer (
-            factory->GetVertexCount(), CS_BUF_STATIC,
-            CS_BUFCOMP_FLOAT, 4, false);
-        }
         mesh_colors_dirty_flag = false;
         const csColor4* mesh_colors = 0;
         if (anim_ctrl_colors)
-          mesh_colors = AnimControlGetColors (factory->GetColors ());
+          mesh_colors = AnimControlGetColors (factory->GetColors (false));
         else
-          mesh_colors = factory->GetColors ();
-        color_buffer->CopyInto (mesh_colors, factory->GetVertexCount());        
+          mesh_colors = factory->GetColors (false);
+        if (mesh_colors)
+        {
+          if (!color_buffer || 
+            (color_buffer->GetSize() != (sizeof (csColor4) * 
+            factory->GetVertexCount())))
+          {
+            // Recreate the render buffer only if the new data cannot fit inside
+            //  the existing buffer.
+            color_buffer = csRenderBuffer::CreateRenderBuffer (
+              factory->GetVertexCount(), CS_BUF_STATIC,
+              CS_BUFCOMP_FLOAT, 4);
+          }
+          color_buffer->SetData (mesh_colors);
+        }
       }
     }
     holder->SetRenderBuffer (buffer, color_buffer);
@@ -1522,6 +1554,7 @@ bool csGenmeshMeshObject::AddRenderBuffer (const char *name,
   if (userBuffers.AddRenderBuffer (bufID, buffer))
   {
     user_buffer_names.Push (bufID);
+    mesh_user_rb_dirty_flag = true;
     return true;
   }
   return false;
@@ -1533,6 +1566,7 @@ bool csGenmeshMeshObject::RemoveRenderBuffer (const char *name)
   if (userBuffers.RemoveRenderBuffer (bufID))
   {
     user_buffer_names.Delete (bufID);
+    mesh_user_rb_dirty_flag = true;
     return true;
   }
   return false;
@@ -1591,6 +1625,8 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (
   mesh_colors_dirty_flag = false;
   mesh_triangle_dirty_flag = false;
   mesh_tangents_dirty_flag = false;
+
+  user_buffer_change = 0;
 
   buffers_version = 0;
 
@@ -1888,10 +1924,9 @@ void csGenmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder,
       if (!vertex_buffer)
         vertex_buffer = csRenderBuffer::CreateRenderBuffer (
           mesh_vertices.GetSize (), CS_BUF_STATIC,
-          CS_BUFCOMP_FLOAT, 3, false);
+          CS_BUFCOMP_FLOAT, 3);
       mesh_vertices_dirty_flag = false;
-      vertex_buffer->CopyInto (mesh_vertices.GetArray (),
-	  mesh_vertices.GetSize ());
+      vertex_buffer->SetData (mesh_vertices.GetArray ());
     }
     holder->SetRenderBuffer (buffer, vertex_buffer);
     return;
@@ -1903,9 +1938,9 @@ void csGenmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder,
       if (!texel_buffer)
         texel_buffer = csRenderBuffer::CreateRenderBuffer (
           mesh_texels.GetSize (), CS_BUF_STATIC,
-          CS_BUFCOMP_FLOAT, 2, false);
+          CS_BUFCOMP_FLOAT, 2);
       mesh_texels_dirty_flag = false;
-      texel_buffer->CopyInto (mesh_texels.GetArray (), mesh_texels.GetSize ());
+      texel_buffer->SetData (mesh_texels.GetArray ());
     }
     holder->SetRenderBuffer (buffer, texel_buffer);
     return;
@@ -1917,10 +1952,9 @@ void csGenmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder,
       if (!normal_buffer)
         normal_buffer = csRenderBuffer::CreateRenderBuffer (
           mesh_normals.GetSize (), CS_BUF_STATIC,
-          CS_BUFCOMP_FLOAT, 3, false);
+          CS_BUFCOMP_FLOAT, 3);
       mesh_normals_dirty_flag = false;
-      normal_buffer->CopyInto (mesh_normals.GetArray (),
-	  mesh_normals.GetSize ());
+      normal_buffer->SetData (mesh_normals.GetArray ());
     }
     holder->SetRenderBuffer (buffer, normal_buffer);
     return;
@@ -2002,6 +2036,7 @@ void csGenmeshMeshObjectFactory::AddVertex (const csVector3& v,
   mesh_vertices.Push (v);
   mesh_texels.Push (uv);
   mesh_normals.Push (normal);
+  GetColors (true);
   mesh_colors.Push (color);
   Invalidate ();
 }
@@ -2016,18 +2051,15 @@ void csGenmeshMeshObjectFactory::AddTriangle (const csTriangle& tri)
 void csGenmeshMeshObjectFactory::SetVertexCount (int n)
 {
   size_t oldN = mesh_vertices.GetSize ();
-  mesh_vertices.SetSize (n);
-  mesh_texels.SetSize (n);
-  mesh_colors.SetSize (n);
-  mesh_normals.SetSize (n);
-  initialized = false;
-
-  if (size_t (n) > oldN)
+  mesh_vertices.SetCapacity (n); mesh_vertices.SetSize (n);
+  mesh_texels.SetCapacity (n); mesh_texels.SetSize (n);
+  if (mesh_colors.GetSize () > 0)
   {
-    size_t newN = n - oldN;
-    memset (mesh_normals.GetArray () + oldN, 0, sizeof (csVector3)*newN);
-    memset (mesh_colors.GetArray () + oldN, 0, sizeof (csColor4)*newN);
+    mesh_colors.SetCapacity (n); 
+    mesh_colors.SetSize (n, csColor4 (0, 0, 0, 1));
   }
+  mesh_normals.SetCapacity (n); mesh_normals.SetSize (n, csVector3 (0));
+  initialized = false;
 
   vertex_buffer = 0;
   normal_buffer = 0;
@@ -2163,9 +2195,7 @@ void csGenmeshMeshObjectFactory::GenerateSphere (const csEllipsoid& ellips,
 {
   csPrimitives::GenerateSphere (ellips, num, mesh_vertices, mesh_texels,
       mesh_normals, mesh_triangles, cyl_mapping, toponly, reversed);
-  mesh_colors.SetSize (mesh_vertices.GetSize ());
-  memset (mesh_colors.GetArray (), 0,
-      sizeof (csColor4)*mesh_vertices.GetSize ());
+  mesh_colors.DeleteAll();
   Invalidate();
 }
 
@@ -2177,8 +2207,7 @@ void csGenmeshMeshObjectFactory::GenerateBox (const csBox3& box)
 {
   csPrimitives::GenerateBox (box, mesh_vertices, mesh_texels,
       mesh_normals, mesh_triangles);
-  mesh_colors.SetSize (mesh_vertices.GetSize ());
-  memset (mesh_colors.GetArray (), 0, sizeof (csColor4)*mesh_vertices.GetSize ());
+  mesh_colors.DeleteAll();
   Invalidate();
 
 #if 0
@@ -2222,6 +2251,7 @@ bool csGenmeshMeshObjectFactory::AddRenderBuffer (const char *name,
   if (userBuffers.AddRenderBuffer (bufID, buffer))
   {
     user_buffer_names.Push (bufID);
+    user_buffer_change++;
     return true;
   }
   return false;
@@ -2233,6 +2263,7 @@ bool csGenmeshMeshObjectFactory::RemoveRenderBuffer (const char *name)
   if (userBuffers.RemoveRenderBuffer (bufID))
   {
     user_buffer_names.Delete (bufID);
+    user_buffer_change++;
     return true;
   }
   return false;

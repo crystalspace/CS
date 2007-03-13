@@ -530,6 +530,8 @@ struct iGenMeshAnimationControl : public virtual iBase
    * changes. The animation control can use this to optimize the animation
    * calculation by caching the animated version of the array and returning
    * that one.
+   * \remarks \a colors may be 0. In this case all color values should be
+   *   assumed to be (0, 0, 0, 1).
    */
   virtual const csColor4* UpdateColors (csTicks current,
   	const csColor4* colors, int num_colors, uint32 version_id) = 0;

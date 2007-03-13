@@ -52,6 +52,8 @@ csDecal::csDecal(iObjectRegistry * objectReg, csDecalManager * decalManager)
           CS_DECAL_MAX_VERTS_PER_DECAL, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
   normalBuffer = csRenderBuffer::CreateRenderBuffer(
           CS_DECAL_MAX_VERTS_PER_DECAL, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+  colorBuffer = csRenderBuffer::CreateRenderBuffer(
+          CS_DECAL_MAX_VERTS_PER_DECAL, CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 4);
   indexBuffer = csRenderBuffer::CreateIndexRenderBuffer(
           CS_DECAL_MAX_TRIS_PER_DECAL*3, CS_BUF_STATIC, 
           CS_BUFCOMP_UNSIGNED_INT, 0, CS_DECAL_MAX_TRIS_PER_DECAL*3-1);
@@ -61,6 +63,7 @@ csDecal::csDecal(iObjectRegistry * objectReg, csDecalManager * decalManager)
   bufferHolder->SetRenderBuffer(CS_BUFFER_POSITION, vertexBuffer);
   bufferHolder->SetRenderBuffer(CS_BUFFER_TEXCOORD0, texCoordBuffer);
   bufferHolder->SetRenderBuffer(CS_BUFFER_NORMAL, normalBuffer);
+  bufferHolder->SetRenderBuffer(CS_BUFFER_COLOR, colorBuffer);
 }
 
 csDecal::~csDecal()
@@ -92,6 +95,9 @@ void csDecal::Initialize(iDecalTemplate * decalTemplate,
   this->right = right;
 
   life = 0;
+
+  topPlaneDist = 0.0f;
+  bottomPlaneDist = 0.0f;
 
   ClearRenderMeshes();
 }
@@ -134,9 +140,9 @@ void csDecal::BeginMesh(iMeshWrapper * mesh)
   numClipPlanes = 4;
 
   // top
-  if (decalTemplate->HasTopClipping())
+  if (false && decalTemplate->HasTopClipping())
   {
-    float topPlaneDist = decalTemplate->GetTopClippingScale() * radius;
+    topPlaneDist = decalTemplate->GetTopClippingScale() * radius;
     clipPlanes[numClipPlanes++] = csPlane3(-localNormal,
 	-topPlaneDist + localNormal * relPos);
   }
@@ -144,21 +150,10 @@ void csDecal::BeginMesh(iMeshWrapper * mesh)
   // bottom
   if (decalTemplate->HasBottomClipping())
   {
-    float bottomPlaneDist = decalTemplate->GetBottomClippingScale() * radius;
+    bottomPlaneDist = decalTemplate->GetBottomClippingScale() * radius;
     clipPlanes[numClipPlanes++] = csPlane3( localNormal,
 	-bottomPlaneDist - localNormal * relPos);
   }
-  
-  /*
-  if (decalTemplate->HasNearFarClipping())
-  {
-    float halfNearFarDist = decalTemplate->GetNearFarClippingDist() * 0.5f;
-    clipPlanes[4] = csPlane3(-localNormal, 
-            -halfNearFarDist + localNormal * relPos);
-    clipPlanes[5] = csPlane3( localNormal, 
-            -halfNearFarDist - localNormal * relPos);
-  }
-  */
 #endif // CS_DECAL_CLIP_DECAL
 
   // we didn't encounter any errors, so validate the current mesh
@@ -255,12 +250,12 @@ void csDecal::AddStaticPoly(const csPoly3D & p)
 #ifdef CS_DECAL_CLIP_DECAL
     csVector3 vertPos = *poly.GetVertex(a);
 
+	float distToPos = (vertPos - relPos) * localNormal;
     if (doFaceOffset)
     {
       // linear interpolation where high vert goes nowhere and low vert is
       // full offset
-      float offsetVal = (faceHighDot - (vertPos - relPos) * localNormal) 
-	               * invHighLowFaceDist;
+      float offsetVal = (faceHighDot - distToPos) * invHighLowFaceDist;
       vertPos += offsetVal * faceBottomOffset;
 
       // spread out the base to avoid vertical seams
@@ -278,6 +273,24 @@ void csDecal::AddStaticPoly(const csPoly3D & p)
 
     // copy over vertex data
     vertexBuffer->CopyInto(&vertPos, 1, vertIdx);
+
+    // copy over color
+    csColor4 color;
+    if (-distToPos >= 0.0f)
+    {
+      float t = 0.0f;
+      if (topPlaneDist >= 0.01f)
+        t = -distToPos / topPlaneDist;
+      color = decalTemplate->GetMainColor() * (1.0f - t) + decalTemplate->GetTopColor() * t;
+    }
+    else
+    {
+      float t = 0.0f;
+      if (bottomPlaneDist >= 0.01f)
+        t = distToPos / bottomPlaneDist;
+      color = decalTemplate->GetMainColor() * (1.0f - t) + decalTemplate->GetBottomColor() * t;
+    }
+    colorBuffer->CopyInto(&color, 1, vertIdx);
         
     // create the index buffer for each triangle in the poly
     if (a >= 2)

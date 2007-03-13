@@ -28,10 +28,10 @@ namespace lighter
 
   // Very simple FactoryLayouter.. just map "flat" on the lightmap
   csPtr<LightmapUVObjectLayouter> SimpleUVFactoryLayouter::LayoutFactory (
-    const PrimitiveArray& inPrims, ObjectVertexData& vertexData,
+    const FactoryPrimitiveArray& inPrims, ObjectFactoryVertexData& vertexData,
     const ObjectFactory* factory,
-    csArray<PrimitiveArray>& outPrims,
-    BoolDArray& usedVerts)
+    csArray<FactoryPrimitiveArray>& outPrims,
+    csBitArray& usedVerts)
   {
     if (inPrims.GetSize () == 0) return 0;
 
@@ -41,15 +41,16 @@ namespace lighter
 
     LightmapPtrDelArray localLightmaps;
 
-    csArray<PrimitiveArray> coplanarPrims;
+    csArray<FactoryPrimitiveArray> coplanarPrims;
     DetermineNeighbouringPrims (inPrims, vertexData, coplanarPrims);
+    newFactory->lightmapUVs.SetSize (vertexData.positions.GetSize());
 
     //TODO Reimplement simple UV-FactoryLayouter
-    
+
     // Layout every primitive by itself    
     for (size_t i = 0; i < coplanarPrims.GetSize (); i++)
     {
-      PrimitiveArray& prims = coplanarPrims[i];
+      FactoryPrimitiveArray& prims = coplanarPrims[i];
       
       bool lmCoordsGood = false;
       int its = 0; //number of iterations
@@ -60,15 +61,16 @@ namespace lighter
         // Compute lightmapping
         ProjectPrimitives (prims, usedVerts,
                            factory->GetLMuTexelPerUnit () / (1<<its), 
-                           factory->GetLMvTexelPerUnit () / (1<<its));
+                           factory->GetLMvTexelPerUnit () / (1<<its),
+                           newFactory->lightmapUVs);
 
         // Compute uv-size  
-        prims[0].ComputeMinMaxUV (minuv, maxuv);
+        prims[0].ComputeMinMaxUV (newFactory->lightmapUVs, minuv, maxuv);
         for (size_t p = 1; p < prims.GetSize(); p++)
         {
-          Primitive& prim (prims[p]);
+          FactoryPrimitive& prim (prims[p]);
           csVector2 pminuv, pmaxuv;
-          prim.ComputeMinMaxUV (pminuv, pmaxuv);
+          prim.ComputeMinMaxUV (newFactory->lightmapUVs, pminuv, pmaxuv);
           minuv.x = csMin (minuv.x, pminuv.x);
           minuv.y = csMin (minuv.y, pminuv.y);
           maxuv.x = csMax (maxuv.x, pmaxuv.x);
@@ -93,7 +95,7 @@ namespace lighter
 	  (int)ceilf (uvSize.y), lmArea, lmID);
         if (!res) continue; 
 
-        PrimitiveArray& outArray = outPrims.GetExtend (lmID);
+        FactoryPrimitiveArray& outArray = outPrims.GetExtend (lmID);
         csArray<csArray<size_t> >& coplanarGroup = 
           newFactory->coplanarGroups.GetExtend (lmID);
         csArray<size_t>& thisGroup = 
@@ -122,7 +124,8 @@ namespace lighter
     return csPtr<LightmapUVObjectLayouter> (newFactory);
   }
 
-  static int SortPrimByD (const Primitive& prim1, const Primitive& prim2)
+  static int SortPrimByD (const FactoryPrimitive& prim1, 
+                          const FactoryPrimitive& prim2)
   {
     const float D1 = prim1.GetPlane().DD;
     const float D2 = prim2.GetPlane().DD;
@@ -143,29 +146,29 @@ namespace lighter
         return (a == other.b) && (b == other.a);
       case PositionAndNormal:
         {
-          const csVector3& n1 = prim.GetVertexData().vertexArray[a].normal;
+          const csVector3& n1 = prim.GetVertexData().normals[a];
           const csVector3& n2 = 
-            other.prim.GetVertexData().vertexArray[other.b].normal;
+            other.prim.GetVertexData().normals[other.b];
           if (!((n1-n2).IsZero (SMALL_EPSILON))) return false;
         }
         {
-          const csVector3& n1 = prim.GetVertexData().vertexArray[other.a].normal;
+          const csVector3& n1 = prim.GetVertexData().normals[other.a];
           const csVector3& n2 = 
-            other.prim.GetVertexData().vertexArray[b].normal;
+            other.prim.GetVertexData().normals[b];
           if (!((n1-n2).IsZero (SMALL_EPSILON))) return false;
         }
         // Fall through
       case Position:
         {
-          const csVector3& p1 = prim.GetVertexData().vertexArray[a].position;
+          const csVector3& p1 = prim.GetVertexData().positions[a];
           const csVector3& p2 = 
-            other.prim.GetVertexData().vertexArray[other.b].position;
+            other.prim.GetVertexData().positions[other.b];
           if (!((p1-p2).IsZero (SMALL_EPSILON))) return false;
         }
         {
-          const csVector3& p1 = prim.GetVertexData().vertexArray[other.a].position;
+          const csVector3& p1 = prim.GetVertexData().positions[other.a];
           const csVector3& p2 = 
-            other.prim.GetVertexData().vertexArray[b].position;
+            other.prim.GetVertexData().positions[b];
           if (!((p1-p2).IsZero (SMALL_EPSILON))) return false;
         }
         return true;
@@ -175,7 +178,8 @@ namespace lighter
   }
 
   SimpleUVFactoryLayouter::UberPrimitive::UberPrimitive (
-    VertexEquality equality, const Primitive& startPrim) : equality (equality)
+    VertexEquality equality, const FactoryPrimitive& startPrim) : 
+    equality (equality)
   {
     prims.Push (startPrim);
 
@@ -199,7 +203,7 @@ namespace lighter
   }
 
   void SimpleUVFactoryLayouter::UberPrimitive::AddPrimitive (
-    const Primitive& prim)
+    const FactoryPrimitive& prim)
   {
     prims.Push (prim);
     const Primitive::TriangleType& t = prim.GetTriangle ();
@@ -223,13 +227,13 @@ namespace lighter
   }
 
   void SimpleUVFactoryLayouter::DetermineNeighbouringPrims (
-    const PrimitiveArray& inPrims, ObjectVertexData& vertexData,
-    csArray<PrimitiveArray>& outPrims)
+    const FactoryPrimitiveArray& inPrims, ObjectFactoryVertexData& vertexData,
+    csArray<FactoryPrimitiveArray>& outPrims)
   {
-    PrimitiveArray primsByD;
+    FactoryPrimitiveArray primsByD;
     for (size_t i = 0; i < inPrims.GetSize (); i++)
     {
-      const Primitive& prim (inPrims[i]);
+      const FactoryPrimitive& prim (inPrims[i]);
       primsByD.InsertSorted (prim, SortPrimByD);
     }
     // Takes all neighbouring primitives
@@ -237,14 +241,14 @@ namespace lighter
     while (primsByD.GetSize() > 0)
     {
       // Primitives are sorted by D, look for actual coplanar ones
-      PrimitiveArray coplanarPrims;
-      const Primitive& prim0 (primsByD[0]);
+      FactoryPrimitiveArray coplanarPrims;
+      const FactoryPrimitive& prim0 (primsByD[0]);
       float lastD = prim0.GetPlane().DD;
       const csVector3& lastNormal = prim0.GetPlane().GetNormal();
       
       for (size_t i = 1; i < primsByD.GetSize(); )
       {
-        const Primitive& prim (primsByD[i]);
+        const FactoryPrimitive& prim (primsByD[i]);
         if (fabsf (prim.GetPlane().DD - lastD) > EPSILON) break;
         if (((prim.GetPlane().GetNormal() * lastNormal)) > (1.0f - EPSILON))
         {
@@ -260,7 +264,7 @@ namespace lighter
       // In the coplanar ones, look for neighbouring ones
       while (coplanarPrims.GetSize() > 0)
       {
-        const Primitive& prim (coplanarPrims[0]);
+        const FactoryPrimitive& prim (coplanarPrims[0]);
         UberPrimitive& ubp = uberPrims[uberPrims.Push (UberPrimitive (Position, prim))];
         coplanarPrims.DeleteIndexFast (0);
 
@@ -270,8 +274,8 @@ namespace lighter
           primAdded = false;
           for (size_t p = 0; (p < coplanarPrims.GetSize()) && !primAdded; p++)
           {
-            const Primitive& prim (coplanarPrims[p]);
-            const Primitive::TriangleType& t = prim.GetTriangle ();
+            const FactoryPrimitive& prim (coplanarPrims[p]);
+            const FactoryPrimitive::TriangleType& t = prim.GetTriangle ();
             for (size_t e = 0; e < 3; e++)
             {
               Edge edge (prim, t[e], t[(e+1) % 3]);
@@ -326,12 +330,13 @@ namespace lighter
     return false;
   }
 
-  bool SimpleUVFactoryLayouter::ProjectPrimitives (PrimitiveArray& prims, 
-                                            BoolDArray &usedVerts,
-                                            float uscale, float vscale)
+  bool SimpleUVFactoryLayouter::ProjectPrimitives (FactoryPrimitiveArray& prims, 
+                                                   csBitArray &usedVerts,
+                                                   float uscale, float vscale,
+                                                   Vector2Array& lightmapUVs)
   {
     size_t i;
-    const Primitive& prim = prims[0];
+    const FactoryPrimitive& prim = prims[0];
 
     // Select projection dimension to be biggest component of plane normal
     //if (prim.GetPlane ().GetNormal ().SquaredNorm () == 0.0f)
@@ -354,9 +359,9 @@ namespace lighter
 
     for (size_t p = 0; p < prims.GetSize(); p++)
     {
-      Primitive& prim = prims[p];
+      FactoryPrimitive& prim = prims[p];
 
-      ObjectVertexData &vdata = prim.GetVertexData ();
+      ObjectFactoryVertexData &vdata = prim.GetVertexData ();
 
       Primitive::TriangleType& t = prim.GetTriangle ();
 
@@ -370,7 +375,7 @@ namespace lighter
             || (indexMap[index] == (size_t)~0))
           {
             size_t newIndex = vdata.SplitVertex (index);
-            usedVerts.SetSize (newIndex+1, false);
+            usedVerts.SetSize (newIndex+1);
             indexMap.SetSize (newIndex+1, (size_t)~0);
             indexMap[index] = newIndex;
             index = newIndex;
@@ -385,8 +390,8 @@ namespace lighter
       for (i = 0; i < 3; ++i)
       {
         size_t index = t[i];
-        const csVector3 &position = vdata.vertexArray[index].position;
-        csVector2 &lightmapUV = vdata.vertexArray[index].lightmapUV;
+        const csVector3 &position = vdata.positions[index];
+        csVector2 &lightmapUV = lightmapUVs.GetExtend (index);
 
         lightmapUV.x = position[selX] * uscale;
         lightmapUV.y = position[selY] * vscale;
@@ -417,12 +422,12 @@ namespace lighter
       csVector2 minuv, maxuv, uvSize;
 
       // Compute uv-size  
-      prims[coPrim[0]].ComputeMinMaxUV (minuv, maxuv);
+      prims[coPrim[0]].ComputeMinMaxUV (lightmapUVs, minuv, maxuv);
       for (size_t p = 1; p < coPrim.GetSize(); p++)
       {
         Primitive& prim (prims[coPrim[p]]);
         csVector2 pminuv, pmaxuv;
-        prim.ComputeMinMaxUV (pminuv, pmaxuv);
+        prim.ComputeMinMaxUV (lightmapUVs, pminuv, pmaxuv);
         minuv.x = csMin (minuv.x, pminuv.x);
         minuv.y = csMin (minuv.y, pminuv.y);
         maxuv.x = csMax (maxuv.x, pmaxuv.x);
@@ -456,8 +461,8 @@ namespace lighter
           size_t index = t [v];
           if (!remapped.Contains (index))
           {
-            csVector2 &uv = vertexData.vertexArray[index].lightmapUV;
-            uv += move;
+            csVector2 &uv = vertexData.lightmapUVs[index];
+            uv = lightmapUVs[index] + move;
             remapped.AddNoTest (index);
           }
         }

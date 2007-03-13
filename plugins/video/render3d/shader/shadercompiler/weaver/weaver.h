@@ -68,6 +68,9 @@ public:
 
   void Report (int severity, const char* msg, ...);
   void Report (int severity, iDocumentNode* node, const char* msg, ...);
+
+  csPtr<iDocumentNode> LoadDocumentFromFile (const char* filename,
+    iDocumentNode* node);
 public:
   bool do_verbose;
   bool doDumpWeaved;

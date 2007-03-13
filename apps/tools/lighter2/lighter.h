@@ -21,6 +21,8 @@
 
 #include "csutil/refcount.h"
 
+#include "statistics.h"
+
 namespace lighter
 {
   class Scene;
@@ -64,13 +66,26 @@ namespace lighter
     void CleanUp ();
 
     // Parse the commandline and load any files specified
-    bool LoadFiles ();
+    bool LoadFiles (Statistics::SubProgress& progress);
 
     void LoadConfiguration ();
 
     void CommandLineHelp () const;
 
     Scene *scene;
+
+    Statistics::SubProgress progStartup;
+    Statistics::SubProgress progLoadFiles;
+    Statistics::SubProgress progParseEngine;
+    Statistics::SubProgress progLightmapLayout;
+    Statistics::SubProgress progInitialize;
+    Statistics::SubProgress progUpdateWorld;
+    Statistics::SubProgress progDirectLighting;
+    Statistics::SubProgress progPostproc;
+    Statistics::SubProgress progSaveResult;
+    Statistics::SubProgress progSaveMeshesPostLight;
+    Statistics::SubProgress progApplyWorldChanges;
+    Statistics::SubProgress progFinished;
   };
 
   // Global lighter

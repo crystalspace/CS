@@ -453,35 +453,89 @@ void csStringBase::ReplaceAll (const char* str, const char* replaceWith)
   Replace (newStr);
 }
 
-// Note: isalpha(int c),  toupper(int c), tolower(int c), isspace(int c)
-// If c is not an unsigned char value, or EOF, the behaviour of these functions
-// is undefined.
-csStringBase& csStringBase::Downcase()
+namespace
 {
-  char* p = GetDataMutable();
-  if (p != 0)
+  template<typename Mapping>
+  struct MapHelper
   {
-    char const* const pN = p + Length();
-    for ( ; p < pN; p++)
-      if (isalpha((unsigned char)(*p)))
-        *p = (char)tolower((unsigned char)(*p));
-  }
+    static void Map (csStringBase& str, char* data, uint flags)
+    {
+      char* p = data;
+      if (p != 0)
+      {
+        char const* const start = p;
+        char* out = p;
+        char const* const pN = p + str.Length();
+        const char* newDataStart = 0;
+        csString newData;
+
+        while (p < pN)
+        {
+          utf32_char ch;
+          int skip = csUnicodeTransform::UTF8Decode ((utf8_char*)p, pN - p, ch);
+          char* nextP = p + skip;
+
+          const size_t newChBufSize = 3;
+          utf32_char newChars[newChBufSize];
+          size_t numCh = Mapping::Map (ch, newChars, newChBufSize, flags);
+          // Increase newChBufSize if that ever triggers
+          CS_ASSERT (numCh <= newChBufSize);
+          utf8_char newChEncoded[CS_UC_MAX_UTF8_ENCODED * newChBufSize + 1];
+          size_t encLen = csUnicodeTransform::UTF32to8 (newChEncoded, 
+            sizeof (newChEncoded), newChars, numCh) - 1;
+
+          if ((newDataStart == 0) && ((out + encLen) <= nextP))
+          {
+            /* The new character is encoded shorter or same length as old,
+             * change in-place */
+            memcpy (out, newChEncoded, encLen);
+            out += encLen;
+          }
+          else
+          {
+            /* The new character needs more space than the old. So start
+             * storing everything in a separate buffer from now on. */
+            if (newDataStart == 0) newDataStart = out;
+            newData.Append ((const char*)newChEncoded);
+          }
+          p = nextP;
+        }
+        if (newDataStart != 0)
+        {
+          str.Overwrite (newDataStart - start, newData);
+        }
+      }
+    }
+  };
+
+  struct Map_ToLower
+  {
+    static size_t Map (const utf32_char ch, utf32_char* dest, size_t destSize,
+                       uint flags)
+    {
+      return csUnicodeTransform::MapToLower (ch, dest, destSize, flags);
+    }
+  };
+
+  struct Map_ToUpper
+  {
+    static size_t Map (const utf32_char ch, utf32_char* dest, size_t destSize,
+                       uint flags)
+    {
+      return csUnicodeTransform::MapToUpper (ch, dest, destSize, flags);
+    }
+  };
+}
+
+csStringBase& csStringBase::Downcase (uint flags)
+{
+  MapHelper<Map_ToLower>::Map (*this, GetDataMutable(), flags);
   return *this;
 }
 
-// Note: isalpha(int c),  toupper(int c), tolower(int c), isspace(int c)
-// If c is not an unsigned char value, or EOF, the behaviour of these functions
-// is undefined.
-csStringBase& csStringBase::Upcase()
+csStringBase& csStringBase::Upcase (uint flags)
 {
-  char* p = GetDataMutable();
-  if (p != 0)
-  {
-    char const* const pN = p + Length();
-    for ( ; p < pN; p++)
-      if (isalpha((unsigned char)(*p)))
-        *p = (char)toupper((unsigned char)(*p));
-  }
+  MapHelper<Map_ToUpper>::Map (*this, GetDataMutable(), flags);
   return *this;
 }
 

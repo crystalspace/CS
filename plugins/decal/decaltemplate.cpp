@@ -22,20 +22,25 @@
 SCF_IMPLEMENT_FACTORY(csDecalTemplate)
 
 csDecalTemplate::csDecalTemplate()
-    : scfImplementationType(this),
-      timeToLive(CS_DECAL_DEFAULT_TIME_TO_LIVE),
+    : scfImplementationType (this),
+      timeToLive (-1.0f),
       material(0),
-      renderPriority(CS_DECAL_DEFAULT_RENDER_PRIORITY),
-      zBufMode(CS_ZBUF_TEST),
-      polygonNormalThreshold(CS_DECAL_DEFAULT_NORMAL_THRESHOLD),
-      decalOffset(CS_DECAL_DEFAULT_OFFSET),
-      hasTopClip(CS_DECAL_DEFAULT_TOP_CLIP_ON), 
-      topClipScale(CS_DECAL_DEFAULT_TOP_CLIP_SCALE),
-      hasBottomClip(CS_DECAL_DEFAULT_BOTTOM_CLIP_ON), 
-      bottomClipScale(CS_DECAL_DEFAULT_BOTTOM_CLIP_SCALE),
-      minTexCoord(0,0),
-      maxTexCoord(1,1),
-      mixMode(CS_FX_COPY)
+      renderPriority (0),
+      zBufMode (CS_ZBUF_TEST),
+      polygonNormalThreshold (0.01f),
+      decalOffset (0.05f),
+      hasTopClip (true), 
+      topClipScale (0.5f),
+      hasBottomClip (true), 
+      bottomClipScale (0.5f),
+      minTexCoord (0,0),
+      maxTexCoord (1,1),
+      perpendicularFaceThreshold (0.05f),
+      perpendicularFaceOffset (0.01f),
+      mixMode (CS_FX_COPY),
+      mainColor (1,1,1,1),
+      topColor (1,1,1,1),
+      bottomColor (1,1,1,1)
 {
 }
 
@@ -93,7 +98,7 @@ bool csDecalTemplate::HasBottomClipping() const
   return hasBottomClip;
 }
 
-bool csDecalTemplate::GetBottomClippingScale() const
+float csDecalTemplate::GetBottomClippingScale() const
 {
   return bottomClipScale;
 }
@@ -121,6 +126,21 @@ float csDecalTemplate::GetPerpendicularFaceThreshold() const
 float csDecalTemplate::GetPerpendicularFaceOffset() const
 {
   return perpendicularFaceOffset;
+}
+
+const csColor4 & csDecalTemplate::GetMainColor() const
+{
+	return mainColor;
+}
+
+const csColor4 & csDecalTemplate::GetTopColor() const
+{
+	return topColor;
+}
+
+const csColor4 & csDecalTemplate::GetBottomColor() const
+{
+	return bottomColor;
 }
 
 void csDecalTemplate::SetTimeToLive(float timeToLive)
@@ -185,5 +205,20 @@ void csDecalTemplate::SetPerpendicularFaceThreshold(float threshold)
 void csDecalTemplate::SetPerpendicularFaceOffset(float offset)
 {
   perpendicularFaceOffset = offset;
+}
+
+void csDecalTemplate::SetMainColor(const csColor4 & color)
+{
+	mainColor = color;
+}
+
+void csDecalTemplate::SetTopColor(const csColor4 & color)
+{
+	topColor = color;
+}
+
+void csDecalTemplate::SetBottomColor(const csColor4 & color)
+{
+	bottomColor = color;
 }
 

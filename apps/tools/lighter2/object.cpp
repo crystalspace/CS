@@ -53,12 +53,12 @@ namespace lighter
     else
     {
       size_t oldSize = unlayoutedPrimitives.GetSize();
-      BoolDArray usedVertices;
-      usedVertices.SetSize (vertexData.vertexArray.GetSize (), true);
+      csBitArray usedVertices;
+      usedVertices.SetSize (vertexData.positions.GetSize ());
 
       for (size_t i = 0; i < oldSize; i++)
       {
-        csArray<PrimitiveArray> newPrims;
+        csArray<FactoryPrimitiveArray> newPrims;
         csRef<LightmapUVObjectLayouter> lightmaplayout = 
           uvlayout->LayoutFactory (unlayoutedPrimitives[i], vertexData, this, 
           newPrims, usedVertices);
@@ -79,9 +79,9 @@ namespace lighter
     return true;
   }
 
-  Object* ObjectFactory::CreateObject ()
+  csPtr<Object> ObjectFactory::CreateObject ()
   {
-    return new Object (this);
+    return csPtr<Object> (new Object (this));
   }
 
   void ObjectFactory::ParseFactory (iMeshFactoryWrapper *factory)
@@ -185,13 +185,13 @@ namespace lighter
 
     //Copy over data, transform the radprimitives..
     vertexData = factory->vertexData;
-    
     vertexData.Transform (transform);
 
     unsigned int i = 0;
+    this->allPrimitives.SetCapacity (factory->layoutedPrimitives.GetSize ());
     for(size_t j = 0; j < factory->layoutedPrimitives.GetSize (); ++j)
     {
-      PrimitiveArray& factPrims = factory->layoutedPrimitives[j].primitives;
+      FactoryPrimitiveArray& factPrims = factory->layoutedPrimitives[j].primitives;
       PrimitiveArray& allPrimitives =
         this->allPrimitives.GetExtend (j);
       for (i = 0; i < factPrims.GetSize(); i++)
@@ -199,7 +199,7 @@ namespace lighter
         Primitive newPrim (vertexData);
         
         Primitive& prim = allPrimitives[allPrimitives.Push (newPrim)];
-        prim.SetOriginalPrimitive (&factPrims[i]);
+        //prim.SetOriginalPrimitive (&factPrims[i]);
         prim.SetTriangle (factPrims[i].GetTriangle ()); 
         prim.ComputePlane ();
       }
@@ -209,8 +209,8 @@ namespace lighter
         // FIXME: probably separate out to allow for better progress display
         bool res = 
           factory->layoutedPrimitives[j].factory->LayoutUVOnPrimitives (
-          allPrimitives, factory->layoutedPrimitives[j].group, vertexData, 
-          lightmapIDs.GetExtend (j));
+            allPrimitives, factory->layoutedPrimitives[j].group, vertexData, 
+            lightmapIDs.GetExtend (j));
         if (!res) return false;
       }
 
@@ -226,47 +226,14 @@ namespace lighter
     if (lightPerVertex)
     {
       litColors = new LitColorArray();
-      litColors->SetSize (vertexData.vertexArray.GetSize(), 
+      litColors->SetSize (vertexData.positions.GetSize(), 
         csColor (0.0f, 0.0f, 0.0f));
       litColorsPD = new LitColorsPDHash();
     }
 
+    factory.Invalidate();
+
     return true;
-  }
-
-  void Object::RenormalizeLightmapUVs (const LightmapPtrDelArray& lightmaps)
-  {
-    if (lightPerVertex) return;
-
-    BoolArray vertexProcessed;
-    vertexProcessed.SetSize (vertexData.vertexArray.GetSize (),false);
-
-    for (size_t p = 0; p < allPrimitives.GetSize (); p++)
-    {
-      const Lightmap* lm = lightmaps[lightmapIDs[p]];
-      const float factorX = 1.0f / lm->GetWidth ();
-      const float factorY = 1.0f / lm->GetHeight ();
-      const PrimitiveArray& prims = allPrimitives[p];
-      csSet<size_t> indicesRemapped;
-      // Iterate over lightmaps and renormalize UVs
-      for (size_t j = 0; j < prims.GetSize (); ++j)
-      {
-        //TODO make sure no vertex is used in several lightmaps.. 
-        const Primitive &prim = prims.Get (j);
-        const Primitive::TriangleType& t = prim.GetTriangle ();
-        for (size_t i = 0; i < 3; ++i)
-        {
-          size_t index = t[i];
-          if (!indicesRemapped.Contains (index))
-          {
-            csVector2 &lmUV = vertexData.vertexArray[index].lightmapUV;
-            lmUV.x = (lmUV.x + 0.5f) * factorX;
-            lmUV.y = (lmUV.y + 0.5f) * factorY;
-            indicesRemapped.AddNoTest (index);
-          }
-        }
-      }
-    }
   }
 
   void Object::StripLightmaps (csSet<csString>& lms)
@@ -360,6 +327,11 @@ namespace lighter
     }
   }
 
+  void Object::FreeNotNeededForLighting ()
+  {
+    meshWrapper.Invalidate();
+  }
+
   void Object::FillLightmapMask (LightmapMaskArray& masks)
   {
     if (lightPerVertex) return;
@@ -409,4 +381,50 @@ namespace lighter
     return litColorsPD->GetElementPointer (light);
   }
 
+  void Object::RenormalizeLightmapUVs (const LightmapPtrDelArray& lightmaps,
+                                       csVector2* lmcoords)
+  {
+    if (lightPerVertex) return;
+
+    BoolArray vertexProcessed;
+    vertexProcessed.SetSize (vertexData.lightmapUVs.GetSize (), false);
+
+    for (size_t p = 0; p < allPrimitives.GetSize (); p++)
+    {
+      const Lightmap* lm = lightmaps[lightmapIDs[p]];
+      const float factorX = 1.0f / lm->GetWidth ();
+      const float factorY = 1.0f / lm->GetHeight ();
+      const PrimitiveArray& prims = allPrimitives[p];
+      csSet<size_t> indicesRemapped;
+      // Iterate over lightmaps and renormalize UVs
+      for (size_t j = 0; j < prims.GetSize (); ++j)
+      {
+        //TODO make sure no vertex is used in several lightmaps.. 
+        const Primitive &prim = prims.Get (j);
+        const Primitive::TriangleType& t = prim.GetTriangle ();
+        for (size_t i = 0; i < 3; ++i)
+        {
+          size_t index = t[i];
+          if (!indicesRemapped.Contains (index))
+          {
+            const csVector2 &lmUV = vertexData.lightmapUVs[index];
+            csVector2& outUV = lmcoords[index];
+            outUV.x = (lmUV.x + 0.5f) * factorX;
+            outUV.y = (lmUV.y + 0.5f) * factorY;
+            indicesRemapped.AddNoTest (index);
+          }
+        }
+      }
+    }
+  }
+
+  csString Object::GetFileName() const
+  {
+    csString filename (meshName);
+    filename.ReplaceAll ("\\", "_");
+    filename.ReplaceAll ("/", "_"); 
+    filename.ReplaceAll (" ", "_"); 
+    filename.ReplaceAll (".", "_"); 
+    return filename;
+  }
 }

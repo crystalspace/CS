@@ -202,38 +202,19 @@ struct iTextureManager : public virtual iBase
 
   /**
    * Create a new texture with the given texture format.
-   * Example format strings:
-   *   - rgba32_f: rgba format with 32-bits per floating point component.
-   *   - r5g6b5: 16-bit rgb format with default integer format.
-   *   - b8g8r8a8: blue, green, red, and alpha with 8-bits per component.
-   *   - *dxt1: special format string for DXT1
-   *   - *3dc: special format for 3Dc compressed texture.
-   *   - d24: 24-bit depth texture.
-   *   - d24s8: 24-bit depth texture combined with 8-bit stencil texture.
-   *
-   * Possible component types:
-   *   - r: red
-   *   - g: green
-   *   - b: blue
-   *   - a: alpha
-   *   - l: luminance
-   *   - d: depth
-   *   - s: stencil
-   *
-   * Possible format types:
-   *   - f: float
    * 
-   * \param w horizontal size of the texture.
-   * \param h vertical size of the texture.
-   * \param imagetype the type of the image.
-   * \param format is a texture format string.
-   * \param flags contains one or several of CS_TEXTURE_XXX flags OR'ed
+   * \param w Horizontal size of the texture.
+   * \param h Vertical size of the texture.
+   * \param imagetype Type of the image.
+   * \param format A texture format string.
+   * \param flags Contains one or several of CS_TEXTURE_XXX flags OR'ed
    *  together. They define the mode texture is going to be used in.
-   * \param fail_reason is an optional string which will be filled with
+   * \param fail_reason An optional string which will be filled with
    *  the reason for failure if there was a failure.
-   * \return a new texture handle or 0 if the texture couldn't be
+   * \return A new texture handle or 0 if the texture couldn't be
    *  created for some reason. The reason will be put in the optional
-   *  'fail_reason' parameter.
+   *  \a fail_reason parameter.
+   * \sa \ref TextureFormatStrings 
    */
   virtual csPtr<iTextureHandle> CreateTexture (int w, int h,
       csImageType imagetype, const char* format, int flags,

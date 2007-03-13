@@ -180,7 +180,7 @@ public:
   }
   ~GrowString ()
   {
-    if (curbuf != buf) delete[] curbuf;
+    if (curbuf != buf) cs_free (curbuf);
   }
 
   void AddChar (char c)
@@ -190,9 +190,9 @@ public:
     if (len >= max)
     {
       max += BUFSIZE;
-      char* newbuf = new char[max];
+      char* newbuf = (char*)cs_malloc (max);
       memcpy (newbuf, curbuf, len);
-      if (curbuf != buf) delete[] curbuf;
+      if (curbuf != buf) cs_free (curbuf);
       curbuf = newbuf;
       ptext = curbuf+len;
     }
@@ -200,7 +200,7 @@ public:
 
   char* GetNewCopy ()
   {
-    char* copy = new char[len+1];
+    char* copy = (char*)cs_malloc (len+1);
     strcpy (copy, curbuf);
     return copy;
   }
@@ -283,13 +283,15 @@ const char* TiDocument::Parse( TiDocument*,  const char* p )
     return 0;
   }
 
+  TiDocumentNode* lastChild = 0;
   while ( p && *p )
   {
     TiDocumentNode* node = Identify( this, p );
     if ( node )
     {
       p = node->Parse( this, p );
-      LinkEndChild( node );
+      InsertAfterChild (lastChild, node);
+      lastChild = node;
     }
     else
     {
@@ -409,6 +411,7 @@ const char* TiXmlElement::ReadValue( TiDocument* document, const char* p )
   // themselves if leading whitespace should be stripped.
   orig_p = p;
 
+  TiDocumentNode* lastChild = 0;
   // Read in text and elements in any order.
   p = SkipWhiteSpace( p );
   while ( p && *p )
@@ -427,7 +430,10 @@ const char* TiXmlElement::ReadValue( TiDocument* document, const char* p )
       p = textNode->Parse( document, orig_p );
 
       if ( !textNode->Blank() )
-        LinkEndChild( textNode );
+      {
+        InsertAfterChild (lastChild, textNode);
+        lastChild = textNode;
+      }
       else
         document->DeleteNode (textNode);
     } 
@@ -445,7 +451,10 @@ const char* TiXmlElement::ReadValue( TiDocument* document, const char* p )
       // don't care about whitespace before <![CDATA[ -> don't use orig_p
 
       if ( !cdataNode->Blank() )
-        LinkEndChild( cdataNode );
+      {
+        InsertAfterChild (lastChild, cdataNode );
+        lastChild = cdataNode;
+      }
       else
         delete cdataNode;
     }
@@ -463,8 +472,9 @@ const char* TiXmlElement::ReadValue( TiDocument* document, const char* p )
         if ( node )
         {
           p = node->Parse( document, p );
-          LinkEndChild( node );
+          InsertAfterChild (lastChild, node);
 	  if (!p) return 0;
+          lastChild = node;
         }        
         else
         {
@@ -526,7 +536,7 @@ const char* TiXmlComment::Parse( TiDocument* document, const char* p )
     return 0;
   }
   p += strlen( startTag );
-  delete[] value;
+  cs_free (value);
   GrowString buf;
   p = ReadText( p, buf, false, endTag);
   value = buf.GetNewCopy ();
@@ -569,7 +579,7 @@ const char* TiDocumentAttribute::Parse( TiDocument* document, const char* p )
   
   const char* end;
 
-  delete[] value;
+  cs_free (value);
   GrowString buf;
   if ( *p == '\'' )
   {

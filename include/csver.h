@@ -29,10 +29,10 @@
 
 /// Major version
 #define CS_VERSION_MAJOR CS_VER_QUOTE(1)
-/// Minor version (release, or "dev" for CVS version)
+/// Minor version (even are stable versions, odd are development versions)
 #define CS_VERSION_MINOR CS_VER_QUOTE(1)
 /// Maintenance release / RC
-#define CS_VERSION_BUILD CS_VER_QUOTE(dev)
+#define CS_VERSION_BUILD CS_VER_QUOTE(0)
 /// Date of release
 #define CS_RELEASE_DATE  CS_VER_QUOTE(Mon 30-Aug-2006)
 
@@ -67,7 +67,7 @@
 #endif
 
 /// A complete version number
-#define CS_VERSION_NUMBER CS_VERSION_MAJOR "." CS_VERSION_MINOR \
+#define CS_VERSION_NUMBER CS_VERSION_MAJOR "." CS_VERSION_MINOR "." \
   CS_VERSION_BUILD
 
 /// A complete version string, including platform, processor and compiler

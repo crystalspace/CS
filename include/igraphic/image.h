@@ -149,7 +149,8 @@ struct iImage : public virtual iBase
    * Get a string identifying the format of the raw data of the image
    * (or 0 if raw data is not provided).
    * The format string must be compatible with that supported by
-   * iTextureManager->CreateTexture().
+   * iTextureManager::CreateTexture().
+   * \sa \ref TextureFormatStrings 
    */
   virtual const char* GetRawFormat() const = 0;
   /**

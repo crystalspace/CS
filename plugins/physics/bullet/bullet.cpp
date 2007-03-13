@@ -109,6 +109,12 @@ void csBulletDynamics::Step (float stepsize)
   {
     systems[i]->Step (stepsize);
   }
+  //step callbacks
+  step_callbacks.Compact ();
+  for (size_t i = 0; i < step_callbacks.GetSize (); i++)
+  {
+    step_callbacks[i]->Step (stepsize);
+  }
 }
 //-------------------------------csBulletDynamicsSystem----------------------------------------------//
 

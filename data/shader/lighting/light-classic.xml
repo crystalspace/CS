@@ -20,35 +20,26 @@
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
-    <input name="primaryColor" type="rgb" default="complex">
+    <input name="primaryColor" type="rgba" default="complex"
+	condition='!vars."tex lightmap".texture'>
       <block location="pass">
-	<?if !vars."tex lightmap".texture?>
-	  <buffer source="primary color" destination="vertexIn.primaryColor" />
-	<?endif?>
+	<buffer source="primary color" destination="vertexIn.primaryColor" />
       </block>
       
       <block location="cg:vertexIn">
-	<?if !vars."tex lightmap".texture?>
-	<varying type="rgb" name="primaryColor" />
-	<?endif?>
+	<varying type="rgba" name="primaryColor" binding="COLOR" />
       </block>
       
       <block location="cg:vertexToFragment">
-	<?if !vars."tex lightmap".texture?>
-	float3 primaryColor : COLOR;
-	<?endif?>
+	<varying type="rgba" name="primaryColor" binding="COLOR" />
       </block>
       
       <block location="cg:vertexMain">
-	<?if !vars."tex lightmap".texture?>
 	vertexToFragment.primaryColor = vertexIn.primaryColor;
-	<?endif?>
       </block>
       
       <block location="cg:fragmentMain">
-	<?if !vars."tex lightmap".texture?>
 	primaryColor = vertexToFragment.primaryColor;
-	<?endif?>
       </block>
     </input>
     
@@ -66,18 +57,15 @@
       </block>
     </input>
     
-    <input name="texCoordLM" type="texcoord2" default="complex">
+    <input name="texCoordLM" type="texcoord2" default="complex"
+	condition='vars."tex lightmap".texture'>
       <block location="pass">
-        <?if vars."tex lightmap".texture?>
-	 <buffer source="texture coordinate lightmap" 
-	   destination="vertexIn.texcoordLM" />
-        <?endif?>
+	<buffer source="texture coordinate lightmap" 
+	  destination="vertexIn.texcoordLM" />
       </block>
       
       <block location="cg:vertexToFragment">
-	<?if vars."tex lightmap".texture?>
 	float2 texcoordLM;
-	<?endif?>
       </block>
       
       <block location="cg:vertexIn">
@@ -85,23 +73,18 @@
       </block>
       
       <block location="cg:vertexMain">
-	<?if vars."tex lightmap".texture?>
 	vertexToFragment.texcoordLM = vertexIn.texcoordLM;
-	<?endif?>
       </block>
       
       <block location="cg:fragmentMain">
-	<?if vars."tex lightmap".texture?>
 	texCoordLM = vertexToFragment.texcoordLM;
-	<?endif?>
       </block>
     </input>
     
-    <input name="lightmap" type="tex2d" default="complex">
+    <input name="lightmap" type="tex2d" default="complex"
+	condition='vars."tex lightmap".texture'>
       <block location="pass">
-	<?if vars."tex lightmap".texture?>
-	  <texture name="tex lightmap" destination="fragmentIn.lightmap" />
-	<?endif?>
+	<texture name="tex lightmap" destination="fragmentIn.lightmap" />
       </block>
       
       <block location="cg:fragmentIn">

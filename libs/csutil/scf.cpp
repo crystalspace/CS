@@ -295,7 +295,7 @@ public:
   SCF_DECLARE_IBASE;
 
   // Class identifier
-  char *ClassID;
+  const char *ClassID;
   // Class description
   char *Description;
   // The dependency list
@@ -357,15 +357,26 @@ public:
 
 //----------------------------------------- Class factory implementation ----//
 
+#ifdef CS_REF_TRACKER
+static class csStringHash* classIDs = 0; 
+#endif
+
 scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
   const char *iFactoryClass, scfFactoryFunc iCreate, const char *iDescription,
   const char *iDepend, csStringID context)
 {
   csRefTrackerAccess::SetDescription (this, CS_TYPENAME(*this));
+  csRefTrackerAccess::TrackConstruction (this);
   // Don't use SCF_CONSTRUCT_IBASE (0) since it will call IncRef()
   scfWeakRefOwners = 0;
   scfRefCount = 0; scfParent = 0;
+#ifdef CS_REF_TRACKER
+  /* Reftracker: make sure class ID string survives destruction of this 
+   * instance */
+  ClassID = classIDs->Register (iClassID);
+#else
   ClassID = csStrNew (iClassID);
+#endif
   Description = csStrNew (iDescription);
   Dependencies = csStrNew (iDepend);
   FactoryClass = csStrNew (iFactoryClass);
@@ -392,7 +403,9 @@ scfFactory::~scfFactory ()
   delete [] FactoryClass;
   delete [] Dependencies;
   delete [] Description;
+#ifndef CS_REF_TRACKER
   delete [] ClassID;
+#endif
 
   csRefTrackerAccess::TrackDestruction (this, scfRefCount);
 }
@@ -488,6 +501,7 @@ iBase *scfFactory::CreateInstance ()
     return 0;
 
   iBase *instance = CreateFunc(this);
+  csRefTrackerAccess::SetDescriptionWeak (instance, ClassID);
 
   // No matter whenever we succeeded or not, decrement the refcount
   DecRef ();
@@ -721,6 +735,8 @@ csSCF::csSCF (unsigned int v) : verbose(v),
 
 #ifdef CS_REF_TRACKER
   refTracker = new csRefTracker();
+  if (!classIDs)
+    classIDs = new csStringHash;
 #endif
 
   if (!ClassRegistry)
@@ -766,6 +782,7 @@ csSCF::~csSCF ()
 #ifdef CS_REF_TRACKER
   refTracker->Report ();
   delete refTracker;
+  delete classIDs; classIDs = 0;
 #endif
 #ifdef LAZY_UNLOAD
   for (size_t i = 0; i < lazyUnloadLibs.GetSize(); i++)
@@ -1160,17 +1177,6 @@ char const* csSCF::GetInterfaceName (scfInterfaceID i) const
 
 scfInterfaceID csSCF::GetInterfaceID (const char *iInterface)
 {
-#ifdef CS_REF_TRACKER
-  /*
-    Bit of a hack: when 'mutex' is assigned, this very function
-    is called (to get the iRefTracker id). So mutex is 0 in this
-    case, we need to test for that.
-   */
-  if (!mutex)
-  {
-    return (scfInterfaceID)InterfaceRegistry.Request (iInterface);
-  }
-#endif
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
   return (scfInterfaceID)InterfaceRegistry.Request (iInterface);
 }

@@ -1479,10 +1479,9 @@ void csInstmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder,
       if (!vertex_buffer)
         vertex_buffer = csRenderBuffer::CreateRenderBuffer (
         fact_vertices.GetSize (), CS_BUF_STATIC,
-        CS_BUFCOMP_FLOAT, 3, false);
+        CS_BUFCOMP_FLOAT, 3);
       vertices_dirty_flag = false;
-      vertex_buffer->CopyInto ((void*)fact_vertices.GetArray (),
-        fact_vertices.GetSize ());
+      vertex_buffer->SetData (fact_vertices.GetArray ());
     }
     holder->SetRenderBuffer (buffer, vertex_buffer);
     return;
@@ -1494,10 +1493,9 @@ void csInstmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder,
       if (!texel_buffer)
         texel_buffer = csRenderBuffer::CreateRenderBuffer (
         fact_texels.GetSize (), CS_BUF_STATIC,
-        CS_BUFCOMP_FLOAT, 2, false);
+        CS_BUFCOMP_FLOAT, 2);
       texels_dirty_flag = false;
-      texel_buffer->CopyInto ((void*)fact_texels.GetArray (),
-        fact_texels.GetSize ());
+      texel_buffer->SetData (fact_texels.GetArray ());
     }
     holder->SetRenderBuffer (buffer, texel_buffer);
     return;
@@ -1509,10 +1507,9 @@ void csInstmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder,
       if (!normal_buffer)
         normal_buffer = csRenderBuffer::CreateRenderBuffer (
         fact_normals.GetSize (), CS_BUF_STATIC,
-        CS_BUFCOMP_FLOAT, 3, false);
+        CS_BUFCOMP_FLOAT, 3);
       normals_dirty_flag = false;
-      normal_buffer->CopyInto ((void*)fact_normals.GetArray (),
-        fact_normals.GetSize ());
+      normal_buffer->SetData (fact_normals.GetArray ());
     }
     holder->SetRenderBuffer (buffer, normal_buffer);
     return;

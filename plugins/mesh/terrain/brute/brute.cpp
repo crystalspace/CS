@@ -320,15 +320,15 @@ bool csTerrBlock::Split ()
   for (i=0; i<4; i++)
   {
     if (neighbours[i] && neighbours[i]->size>size && neighbours[i]->IsLeaf ())
-	{
-		if(neighbours[i]->terr == terr)
-		{
-			if(!neighbours[i]->Split ())
-				return false;
-		}
-		else
-			return false;
-	}
+    {
+      if(neighbours[i]->terr == terr)
+      {
+        if(!neighbours[i]->Split ())
+          return false;
+      }
+      else
+        return false;
+    }
   }
 
   children[0].AttachNew (new csTerrBlock (terr));
@@ -501,43 +501,43 @@ void csTerrBlock::CalcLOD ()
 
   for(int i = 0; i < 4; ++i)
   {
-	if(IsLeaf() && neighbours[i] && neighbours[i]->terr != terr && !neighbours[i]->IsLeaf())
-	{
-	  if(!neighbours[i]->children[0]->IsLeaf()
-	    || !neighbours[i]->children[1]->IsLeaf()
-		|| !neighbours[i]->children[2]->IsLeaf()
-		|| !neighbours[i]->children[3]->IsLeaf())
-	  {
+    if(IsLeaf() && neighbours[i] && neighbours[i]->terr != terr && !neighbours[i]->IsLeaf())
+    {
+      if(!neighbours[i]->children[0]->IsLeaf()
+        || !neighbours[i]->children[1]->IsLeaf()
+        || !neighbours[i]->children[2]->IsLeaf()
+        || !neighbours[i]->children[3]->IsLeaf())
+      {
         Split();
-	    i = 4;
-	  }
-	  else
-	  {
-		if(neighbours[0] && !neighbours[0]->IsLeaf())
-		{
-		  neighbours[0]->children[2]->neighbours[3]=this;
-		  neighbours[0]->children[3]->neighbours[3]=this;
-		}
+        i = 4;
+      }
+      else
+      {
+        if(neighbours[0] && !neighbours[0]->IsLeaf())
+        {
+          neighbours[0]->children[2]->neighbours[3]=this;
+          neighbours[0]->children[3]->neighbours[3]=this;
+        }
 
-		if(neighbours[1] && !neighbours[1]->IsLeaf())
-		{
-		  neighbours[1]->children[0]->neighbours[2]=this;
-		  neighbours[1]->children[2]->neighbours[2]=this;
-		}
+        if(neighbours[1] && !neighbours[1]->IsLeaf())
+        {
+          neighbours[1]->children[0]->neighbours[2]=this;
+          neighbours[1]->children[2]->neighbours[2]=this;
+        }
 
-		if(neighbours[2] && !neighbours[2]->IsLeaf())
-		{
-		  neighbours[2]->children[1]->neighbours[1]=this;
-		  neighbours[2]->children[3]->neighbours[1]=this;
-		}
+        if(neighbours[2] && !neighbours[2]->IsLeaf())
+        {
+          neighbours[2]->children[1]->neighbours[1]=this;
+          neighbours[2]->children[3]->neighbours[1]=this;
+        }
 
-		if(neighbours[3] && !neighbours[3]->IsLeaf())
-		{
-		  neighbours[3]->children[0]->neighbours[0]=this;
-		  neighbours[3]->children[1]->neighbours[0]=this;
-		}
-	  }
-	}
+        if(neighbours[3] && !neighbours[3]->IsLeaf())
+        {
+          neighbours[3]->children[0]->neighbours[0]=this;
+          neighbours[3]->children[1]->neighbours[0]=this;
+        }
+      }
+    }
   }
 
   float splitdist = size*terr->lod_lcoeff / float (res);
@@ -630,6 +630,11 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
   if(detach)
 	  return;
 
+  int clip_portal, clip_plane, clip_z_plane;
+  if (!rview->ClipBBox (terr->planes, frustum_mask,
+    bbox, clip_portal, clip_plane, clip_z_plane))
+    return;
+
   if (!IsLeaf () && children[0]->built &&
                     children[1]->built &&
                     children[2]->built &&
@@ -694,10 +699,7 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
   //csVector3 cam = rview->GetCamera ()->GetTransform ().GetOrigin ();
   csVector3 cam = transform.GetOrigin ();
 
-  int clip_portal, clip_plane, clip_z_plane;
-  if (!rview->ClipBBox (terr->planes, frustum_mask,
-      bbox, clip_portal, clip_plane, clip_z_plane))
-    return;
+
 
   csBox3 cambox (bbox.Min ()-cam, bbox.Max ()-cam);
   bool baseonly = cambox.SquaredOriginDist () > 
@@ -2481,7 +2483,7 @@ bool csTerrainObject::DrawTest (iRenderView* rview, iMovable* movable,
   rview->SetupClipPlanes (tr_o2c, planes, frustum_mask);
 
   //rendermeshes.Empty ();
-  rootblock->DrawTest (g3d, rview, 0, tr_o2c, movable);
+  rootblock->DrawTest (g3d, rview, frustum_mask, tr_o2c, movable);
   if (staticlighting)
     rootblock->UpdateStaticLighting ();
 

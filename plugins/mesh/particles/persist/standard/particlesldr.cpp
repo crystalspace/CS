@@ -42,6 +42,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
 {
   SCF_IMPLEMENT_FACTORY(ParticlesFactoryLoader);
   SCF_IMPLEMENT_FACTORY(ParticlesObjectLoader);
+  SCF_IMPLEMENT_FACTORY(ParticlesFactorySaver);
+  SCF_IMPLEMENT_FACTORY(ParticlesObjectSaver);
 
   ParticlesBaseLoader::ParticlesBaseLoader (iBase* parent)
     : scfImplementationType (this, parent), objectRegistry (0)

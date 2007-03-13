@@ -32,14 +32,14 @@ namespace lighter
 {
 
   ObjectFactory_Genmesh::ObjectFactory_Genmesh()
-    : normals (0)
   {
+    submeshNames.AttachNew (new SubmeshNameArray);
     saverPluginName = "crystalspace.mesh.saver.factory.genmesh";
   }
 
-  Object* ObjectFactory_Genmesh::CreateObject ()
+  csPtr<Object> ObjectFactory_Genmesh::CreateObject ()
   {
-    return new Object_Genmesh (this);
+    return csPtr<Object> (new Object_Genmesh (this));
   }
 
   void ObjectFactory_Genmesh::AddPrimitive (size_t a, size_t b, size_t c, 
@@ -58,7 +58,7 @@ namespace lighter
       }
     }
 
-    PrimitiveArray* primArray;
+    FactoryPrimitiveArray* primArray;
     if (submeshIndex != csArrayItemNotFound)
       primArray = &unlayoutedPrimitives[submeshIndex];
     else
@@ -70,8 +70,8 @@ namespace lighter
       submeshes.Put (newSubmesh, submeshIndex);
     }
 
-    Primitive newPrim (vertexData);
-    Primitive::TriangleType t (a, b, c);
+    FactoryPrimitive newPrim (vertexData);
+    FactoryPrimitive::TriangleType t (a, b, c);
     newPrim.SetTriangle (t);
 
     newPrim.ComputePlane ();
@@ -82,7 +82,7 @@ namespace lighter
   void ObjectFactory_Genmesh::AddPrimitive (size_t a, size_t b, size_t c, 
                                                iMaterialWrapper* material)
   {
-    PrimitiveArray* primArray;
+    FactoryPrimitiveArray* primArray;
     Submesh sm;
     sm.material = material;
     size_t submesh = submeshes.Get (sm, csArrayItemNotFound);
@@ -95,8 +95,8 @@ namespace lighter
       submeshes.Put (sm, submesh);
     }
 
-    Primitive newPrim (vertexData);
-    Primitive::TriangleType t (a, b, c);
+    FactoryPrimitive newPrim (vertexData);
+    FactoryPrimitive::TriangleType t (a, b, c);
     newPrim.SetTriangle (t);
 
     newPrim.ComputePlane ();
@@ -118,22 +118,15 @@ namespace lighter
     genFact->Compress ();
     genFact->DisableAutoNormals();
 
-    csVector3 *verts = genFact->GetVertices ();
-    csVector2 *uv = genFact->GetTexels ();
-    csVector3 *factNormals = genFact->GetNormals ();
+    const size_t vertCount = genFact->GetVertexCount ();
 
-    int i = 0;
+    vertexData.positions.SetSize (vertCount);
+    memcpy (vertexData.positions.GetArray(), genFact->GetVertices (),
+      vertCount * sizeof (csVector3));
 
-    // Here we should save extra per-vertex stuff!
-    vertexData.vertexArray.SetSize (genFact->GetVertexCount ());
-    
-    for (i = 0; i < genFact->GetVertexCount (); i++)
-    {
-      ObjectVertexData::Vertex &vertex = vertexData.vertexArray[i];
-      vertex.position = verts[i];
-      vertex.normal = factNormals[i];
-      vertex.textureUV = uv[i];
-    }
+    vertexData.normals.SetSize (vertCount);
+    memcpy (vertexData.normals.GetArray(), genFact->GetNormals (),
+      vertCount * sizeof (csVector3));
 
     if (genFact->GetSubMeshCount() > 0)
     {
@@ -158,7 +151,7 @@ namespace lighter
       csTriangle *tris = genFact->GetTriangles ();
       iMaterialWrapper* material = 
         factory->GetMeshObjectFactory()->GetMaterialWrapper();
-      for (i=0; i < genFact->GetTriangleCount ();i++)
+      for (int i=0; i < genFact->GetTriangleCount ();i++)
       {
         AddPrimitive (tris[i].a, tris[i].b, tris[i].c, material);
       }
@@ -173,25 +166,36 @@ namespace lighter
     
     if (!genFact) return; // bail
 
-    // For now, just dump.. later we should preserve extra attributes etc :)
-    
-    genFact->SetVertexCount ((int)vertexData.vertexArray.GetSize ());
+    Vector2DArray uvcoords;
+    const size_t factVertCount = genFact->GetVertexCount();
+    uvcoords.SetSize (factVertCount);
+    memcpy (uvcoords.GetArray(), genFact->GetTexels(),
+      factVertCount * sizeof (csVector2));
 
-    csVector3 *verts = genFact->GetVertices ();
-    csVector2 *textureUV = genFact->GetTexels ();
-    
-    csVector3 *factNormals = genFact->GetNormals ();
-
+    for (size_t s = 0; s < vertexData.splits.GetSize(); s++)
     {
-      // Save vertex-data
-      for (int i = 0; i < genFact->GetVertexCount (); ++i)
+      const ObjectFactoryVertexData::SplitInfo& split = vertexData.splits[s];
+      if (split.i1 == (size_t)~0)
+        uvcoords.Push (uvcoords[split.i0]);
+      else
       {
-        const ObjectVertexData::Vertex &vertex = vertexData.vertexArray[i];
-        verts[i] = vertex.position;
-        textureUV[i] = vertex.textureUV;
-        factNormals[i] = vertex.normal;
+        const csVector2& uv0 = uvcoords[split.i0];
+        const csVector2& uv1 = uvcoords[split.i1];
+        uvcoords.Push (uv0 - (uv1 - uv0) * split.t);
       }
     }
+    // TODO: Apply 'vertexData.splits' to user buffers
+
+    const size_t vertCount = vertexData.positions.GetSize ();
+    genFact->SetVertexCount ((int)vertCount);
+
+    memcpy (genFact->GetVertices (), vertexData.positions.GetArray(),
+      vertCount * sizeof (csVector3));
+    memcpy (genFact->GetNormals (), vertexData.normals.GetArray(),
+      vertCount * sizeof (csVector3));
+    CS_ASSERT (uvcoords.GetSize() == vertCount);
+    memcpy (genFact->GetTexels(), uvcoords.GetArray(),
+      vertCount * sizeof (csVector2));
 
     genFact->ClearSubMeshes();
     SubmeshFindHelper findHelper (this);
@@ -199,7 +203,7 @@ namespace lighter
     // Save primitives, trianglate on the fly
     for (uint i = 0; i < layoutedPrimitives.GetSize (); ++i)
     {
-      const PrimitiveArray& meshPrims = layoutedPrimitives[i].primitives;
+      const FactoryPrimitiveArray& meshPrims = layoutedPrimitives[i].primitives;
       IntDArray* indexArray = findHelper.FindSubmesh (i);
       indexArray->SetCapacity (meshPrims.GetSize()*3);
       for (size_t p = 0; p < meshPrims.GetSize(); p++)
@@ -335,7 +339,7 @@ namespace lighter
       genFact->AddSubMesh (indices, material, 
         allocatedSubmeshes[i].name);
 
-      factory->submeshNames.GetExtend (allocatedSubmeshes[i].submeshIndex) =
+      factory->submeshNames->GetExtend (allocatedSubmeshes[i].submeshIndex) =
         allocatedSubmeshes[i].name;
     }
   }
@@ -354,7 +358,8 @@ namespace lighter
 
   //-------------------------------------------------------------------------
 
-  Object_Genmesh::Object_Genmesh (ObjectFactory* factory) : Object (factory)
+  Object_Genmesh::Object_Genmesh (ObjectFactory_Genmesh* factory) : 
+    Object (factory), submeshNames (factory->submeshNames)
   {
     saverPluginName = "crystalspace.mesh.saver.genmesh";
   }
@@ -366,43 +371,27 @@ namespace lighter
       meshWrapper->GetMeshObject());
     if (!genMesh) return; // bail
 
-    ObjectFactory_Genmesh* factory = 
-      static_cast<ObjectFactory_Genmesh*> (this->factory);
-    
+    genMesh->SetShadowReceiving (false);
+    genMesh->SetManualColors (true);
+    genMesh->SetLighting (false);
     genMesh->RemoveRenderBuffer ("colors");
     genMesh->RemoveRenderBuffer ("texture coordinate lightmap");
 
-    if (lightPerVertex)
-    {
-      scene->lightmapPostProc.ApplyAmbient (litColors->GetArray(),
-        vertexData.vertexArray.GetSize()); 
-      scene->lightmapPostProc.ApplyExposure (litColors->GetArray(),
-        vertexData.vertexArray.GetSize()); 
-
-      if (!litColorsPD)
-      {
-        csRef<csRenderBuffer> colorsBuffer = csRenderBuffer::CreateRenderBuffer (
-          vertexData.vertexArray.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
-        genMesh->AddRenderBuffer ("colors", colorsBuffer);
-
-        colorsBuffer->CopyInto (litColors->GetArray(),
-          vertexData.vertexArray.GetSize());
-      }
-    }
-
-    // Still may need to fix up submesh materials...
+   // Still may need to fix up submesh materials...
     CS::ShaderVarName lightmapName (globalLighter->strings, "tex lightmap");
 
     for (uint i = 0; i < allPrimitives.GetSize (); ++i)
     {
       csString submeshName;
-      submeshName = factory->submeshNames[i];
+      submeshName = submeshNames->Get (i);
 
       iGeneralMeshSubMesh* subMesh = genMesh->FindSubMesh (submeshName);
       if (!subMesh) continue;
 
       /* Fix up material (factory may not have a material set, but mesh object
        * material does not "propagate" to submeshes) */
+      // FIXME: Should detect when this is necessary
+      // FIXME: also can remove mesh object material then
       if (subMesh->GetMaterial() == 0)
       {
         csRef<iMeshObject> mo = 
@@ -427,68 +416,160 @@ namespace lighter
     if (!lightPerVertex)
     {
       csRef<csRenderBuffer> lightmapBuffer = csRenderBuffer::CreateRenderBuffer (
-        vertexData.vertexArray.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
+        vertexData.positions.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
       genMesh->AddRenderBuffer ("texture coordinate lightmap", lightmapBuffer);
       {
-        csRenderBufferLock<csVector2> bufferLock(lightmapBuffer);
-        csVector2 *lightmapUV = bufferLock.Lock ();
+        csRenderBufferLock<csVector2> bufferLock (lightmapBuffer);
         // Save vertex-data
-        for (size_t i = 0; i < vertexData.vertexArray.GetSize(); ++i)
-        {
-          const ObjectVertexData::Vertex &vertex = vertexData.vertexArray[i];
-          lightmapUV[i] = vertex.lightmapUV;
-        }
+        RenormalizeLightmapUVs (scene->GetLightmaps(), bufferLock);
       }
     }
 
     Object::SaveMesh (scene, node);
 
-    // Tack on animation control for PD lights
-    if (lightPerVertex && litColorsPD)
+    if (lightPerVertex)
     {
+      /* For per-vertex lit objects we need to store the params in an external
+         file as the complete data is only available after lighting. */
+      csRef<iDocumentNode> srcParams = node->GetNode ("params");
+      if (srcParams.IsValid())
+      {
+        csRef<iDocument> paramsDoc = globalLighter->docSystem->CreateDocument();
+        csRef<iDocumentNode> root = paramsDoc->CreateRoot ();
+        csRef<iDocumentNode> params = root->CreateNodeBefore (CS_NODE_ELEMENT);
+        params->SetValue ("params");
+        CS::DocumentHelper::CloneNode (srcParams, params);
+
+        csString paramsFile;
+        paramsFile.Format ("%s.params", GetFileName().GetData());
+        paramsDoc->Write (globalLighter->vfs, paramsFile);
+
+        csRef<iDocumentNode> srcParamsFile = node->GetNode ("paramsfile");
+        csRef<iDocumentNode> srcParamsFileContent;
+        if (!srcParamsFile.IsValid())
+        {
+          srcParamsFile = node->CreateNodeBefore (CS_NODE_ELEMENT, srcParams);
+          srcParamsFile->SetValue ("paramsfile");
+        }
+        else
+        {
+          csRef<iDocumentNodeIterator> nodes = srcParamsFile->GetNodes();
+          while (nodes->HasNext())
+          {
+            csRef<iDocumentNode> child = nodes->Next();
+            if (child->GetType() != CS_NODE_TEXT) continue;
+            srcParamsFileContent = child;
+            break;
+          }
+        }
+        if (!srcParamsFileContent.IsValid())
+          srcParamsFileContent =
+            srcParamsFile->CreateNodeBefore (CS_NODE_TEXT);
+        srcParamsFileContent->SetValue (paramsFile);
+
+        node->RemoveNode (srcParams);
+      }
+    }
+  }
+
+  void Object_Genmesh::FreeNotNeededForLighting ()
+  {
+    Object::FreeNotNeededForLighting ();
+    submeshNames.Invalidate();
+  }
+
+  void Object_Genmesh::SaveMeshPostLighting (Scene* scene)
+  {
+    // Tack on animation control for PD lights
+    if (lightPerVertex)
+    {
+      scene->lightmapPostProc.ApplyAmbient (litColors->GetArray(),
+        vertexData.positions.GetSize()); 
+      scene->lightmapPostProc.ApplyExposure (litColors->GetArray(),
+        vertexData.positions.GetSize()); 
+
+      csRef<iRenderBuffer> staticColorsBuf = 
+        csRenderBuffer::CreateRenderBuffer (litColors->GetSize(), 
+          CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+      staticColorsBuf->SetData (litColors->GetArray());
+
       csRef<iSyntaxService> synsrv = 
         csQueryRegistry<iSyntaxService> (globalLighter->objectRegistry);
 
-      csRef<iDocumentNode> paramChild = node->GetNode ("params");
-
-      csRef<iDocumentNode> animcontrolChild = 
-        paramChild->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-      animcontrolChild->SetValue ("animcontrol");
-      animcontrolChild->SetAttribute ("plugin", "crystalspace.mesh.anim.pdlight");
-
+      csString paramsFile;
+      paramsFile.Format ("%s.params", GetFileName().GetData());
+      csRef<iFile> paramsData = globalLighter->vfs->Open (paramsFile, 
+        VFS_FILE_READ);
+      if (!paramsData.IsValid())
       {
-        csRef<iDocumentNode> staticColorsChild =
-          animcontrolChild->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-        staticColorsChild->SetValue ("staticcolors");
-
-        csRef<iRenderBuffer> colorsBuf = 
-          csRenderBuffer::CreateRenderBuffer (litColors->GetSize(), 
-            CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
-        colorsBuf->CopyInto (litColors->GetArray(), litColors->GetSize());
-
-        synsrv->WriteRenderBuffer (staticColorsChild, colorsBuf);
+        globalLighter->Report ("Error reading '%s'", 
+          paramsFile.GetData());
+        return;
+      }
+      csRef<iDocument> paramsDoc = globalLighter->docSystem->CreateDocument();
+      const char* err = paramsDoc->Parse (paramsData);
+      if (err != 0)
+      {
+        globalLighter->Report ("Error reading '%s': %s", 
+          paramsFile.GetData(), err);
+        return;
       }
 
-      LitColorsPDHash::GlobalIterator pdIter (litColorsPD->GetIterator ());
-      while (pdIter.HasNext ())
+      csRef<iDocumentNode> paramChild = paramsDoc->GetRoot()->GetNode ("params");
+
+      if (litColorsPD && litColorsPD->GetSize() > 0)
       {
-        csPtrKey<Light> light;
-        LitColorArray& colors = pdIter.Next (light);
+        csRef<iDocumentNode> animcontrolChild = 
+          paramChild->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+        animcontrolChild->SetValue ("animcontrol");
+        animcontrolChild->SetAttribute ("plugin", "crystalspace.mesh.anim.pdlight");
 
-        csRef<iDocumentNode> lightChild =
-          animcontrolChild->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-        lightChild->SetValue ("light");
-        lightChild->SetAttribute ("lightid", light->GetLightID().HexString());
+        {
+          csRef<iDocumentNode> staticColorsChild =
+            animcontrolChild->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+          staticColorsChild->SetValue ("staticcolors");
 
-        scene->lightmapPostProc.ApplyExposure (colors.GetArray(),
-          colors.GetSize()); 
+          synsrv->WriteRenderBuffer (staticColorsChild, staticColorsBuf);
+        }
 
-        csRef<iRenderBuffer> colorsBuf = 
-          csRenderBuffer::CreateRenderBuffer (colors.GetSize(), 
-            CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
-        colorsBuf->CopyInto (colors.GetArray(), colors.GetSize());
+        LitColorsPDHash::GlobalIterator pdIter (litColorsPD->GetIterator ());
+        while (pdIter.HasNext ())
+        {
+          csPtrKey<Light> light;
+          LitColorArray& colors = pdIter.Next (light);
 
-        synsrv->WriteRenderBuffer (lightChild, colorsBuf);
+          csRef<iDocumentNode> lightChild =
+            animcontrolChild->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+          lightChild->SetValue ("light");
+          lightChild->SetAttribute ("lightid", light->GetLightID().HexString());
+
+          scene->lightmapPostProc.ApplyExposure (colors.GetArray(),
+            colors.GetSize()); 
+
+          csRef<iRenderBuffer> colorsBuf = 
+            csRenderBuffer::CreateRenderBuffer (colors.GetSize(), 
+              CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+          colorsBuf->SetData (colors.GetArray());
+
+          synsrv->WriteRenderBuffer (lightChild, colorsBuf);
+        }
+      }
+      else
+      {
+        csRef<iDocumentNode> renderbufferChild = 
+          paramChild->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+        renderbufferChild->SetValue ("renderbuffer");
+
+        renderbufferChild->SetAttribute ("name", "colors");
+
+        synsrv->WriteRenderBuffer (renderbufferChild, staticColorsBuf);
+      }
+
+      err = paramsDoc->Write (globalLighter->vfs, paramsFile);
+      if (err != 0)
+      {
+        globalLighter->Report ("Error writing '%s': %s", 
+          paramsFile.GetData(), err);
       }
     }
   }
@@ -497,12 +578,9 @@ namespace lighter
   {
     Object::StripLightmaps (lms);
 
-    ObjectFactory_Genmesh* factory = 
-      static_cast<ObjectFactory_Genmesh*> (this->factory);
-
     csRef<iGeneralFactoryState> genFact = 
       scfQueryInterface<iGeneralFactoryState> (
-      factory->factoryWrapper->GetMeshObjectFactory ());
+        meshWrapper->GetFactory()->GetMeshObjectFactory ());
     if (!genFact) return; // bail
 
     csRef<iGeneralMeshState> genMesh = 
@@ -531,6 +609,10 @@ namespace lighter
         }
       }
     }
+
+    /* FIXME: Also return external color buffer/params file.
+     * -> That then needs a mechanism to tell the scene that these file 
+     *    should not always be cleaned up. */
   }
 
 }

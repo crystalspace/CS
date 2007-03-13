@@ -85,15 +85,7 @@ void CsBench::Report (const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (csQueryRegistry<iReporter> (System->object_reg));
-  if (rep)
-    rep->ReportV (CS_REPORTER_SEVERITY_NOTIFY, "csbench", msg, arg);
-  else
-  {
-    csPrintfV (msg, arg);
-    csPrintf ("\n");
-    fflush (stdout);
-  }
+  csReportV(object_reg, CS_REPORTER_SEVERITY_NOTIFY, "csbench", msg, arg);
   va_end (arg);
 }
 

@@ -27,12 +27,25 @@
 
 namespace lighter
 {
+  struct SubmeshNameArray : public csArray<csString>,
+                            public csRefCount,
+                            public CS::Memory::CustomAllocated
+  {
+  };
+
+  class ObjectFactory_Genmesh;
+
   class Object_Genmesh : public Object
   {
+    csRef<SubmeshNameArray> submeshNames;
   public:
-    Object_Genmesh (ObjectFactory* factory);
+    Object_Genmesh (ObjectFactory_Genmesh* factory);
 
     virtual void SaveMesh (Scene* scene, iDocumentNode *node);
+
+    virtual void FreeNotNeededForLighting ();
+
+    virtual void SaveMeshPostLighting (Scene* scene);
 
     virtual void StripLightmaps (csSet<csString>& lms);
   };
@@ -43,7 +56,7 @@ namespace lighter
     ObjectFactory_Genmesh ();
 
     // Get a new object
-    virtual Object* CreateObject ();
+    virtual csPtr<Object> CreateObject ();
 
     // Parse data
     virtual void ParseFactory (iMeshFactoryWrapper *factory);
@@ -70,13 +83,10 @@ namespace lighter
     // Finish remapping of submeshes
     virtual void FinishSubmeshRemap ();
 
-    // Extra data saved
-    csVector3 *normals;
-
     typedef csHashReversible<size_t, Submesh> SubmeshHash;
     SubmeshHash submeshes;
     SubmeshHash tempSubmeshes;
-    csArray<csString> submeshNames;
+    csRef<SubmeshNameArray> submeshNames;
 
     void AddPrimitive (size_t a, size_t b, size_t c, 
       iGeneralMeshSubMesh* submesh);

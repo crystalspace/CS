@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000-2006 by Jorrit Tyberghein
+    Copyright (C) 2000-2007 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -52,7 +52,6 @@ struct iRenderView;
 struct iSharedVariable;
 class csEngine;
 class csLight;
-class csMeshFactoryWrapper;
 class csMeshWrapper;
 
 /**
@@ -113,77 +112,6 @@ public:
   virtual iMeshWrapper *FindByName (const char *Name) const;
 };
 
-/**
- * A list of mesh factories.
- */
-class csMeshFactoryList : public scfImplementation1<csMeshFactoryList,
-	iMeshFactoryList>
-{
-private:
-  csRefArrayObject<iMeshFactoryWrapper> list;
-  csHash<iMeshFactoryWrapper*, csString>
-  	factories_hash;
-
-  class NameChangeListener : public scfImplementation1<NameChangeListener,
-  	iObjectNameChangeListener>
-  {
-  private:
-    csWeakRef<csMeshFactoryList> list;
-
-  public:
-    NameChangeListener (csMeshFactoryList* list) : scfImplementationType (this),
-  	  list (list)
-    {
-    }
-    virtual ~NameChangeListener () { }
-
-    virtual void NameChanged (iObject* obj, const char* oldname,
-  	  const char* newname)
-    {
-      if (list)
-        list->NameChanged (obj, oldname, newname);
-    }
-  };
-  csRef<NameChangeListener> listener;
-
-
-public:
-
-  void NameChanged (iObject* object, const char* oldname,
-  	const char* newname);
-
-  /// constructor
-  csMeshFactoryList ();
-  virtual ~csMeshFactoryList ();
-  virtual void PrepareFactory (iMeshFactoryWrapper*) { }
-  virtual void FreeFactory (iMeshFactoryWrapper*) { }
-
-  virtual int GetCount () const { return (int)list.GetSize (); }
-  virtual iMeshFactoryWrapper *Get (int n) const { return list.Get (n); }
-  virtual int Add (iMeshFactoryWrapper *obj);
-  virtual bool Remove (iMeshFactoryWrapper *obj);
-  virtual bool Remove (int n);
-  virtual void RemoveAll ();
-  virtual int Find (iMeshFactoryWrapper *obj) const;
-  virtual iMeshFactoryWrapper *FindByName (const char *Name) const;
-};
-
-/**
- * Subclass of csMeshFactoryList to hold the children of another mesh factory.
- */
-class csMeshFactoryFactoryList : public csMeshFactoryList
-{
-private:
-  csMeshFactoryWrapper* meshfact;
-
-public:
-  csMeshFactoryFactoryList () : meshfact (0) {}
-  virtual ~csMeshFactoryFactoryList () { RemoveAll (); }
-  void SetMeshFactory (csMeshFactoryWrapper* m) { meshfact = m; }
-  virtual void PrepareFactory (iMeshFactoryWrapper* item);
-  virtual void FreeFactory (iMeshFactoryWrapper* item);
-};
-
 struct LSIAndDist
 {
   csLightSectorInfluence* lsi;
@@ -203,12 +131,11 @@ struct ExtraRenderMeshData
 /**
  * The holder class for all implementations of iMeshObject.
  */
-class csMeshWrapper : public scfImplementationExt6<csMeshWrapper,
+class csMeshWrapper : public scfImplementationExt5<csMeshWrapper,
                                                    csObject,
                                                    iMeshWrapper,
                                                    iShaderVariableContext,
                                                    iVisibilityObject,
-                                                   iImposter,
 						   iSceneNode,
 						   iSelfDestruct>
 {
@@ -247,7 +174,8 @@ protected:
   /// For NR: should we draw last
   bool draw_after_fancy_stuff;
 
-  /// used to store extra rendermeshes that something might attach to this mesh (ie, for decals)
+  // Used to store extra rendermeshes that something might attach to this
+  // mesh (ie, for decals)
   csDirtyAccessArray<csRenderMesh*> extraRenderMeshes;
   csArray<ExtraRenderMeshData> extraRenderMeshData;
 
@@ -316,12 +244,6 @@ private:
   /// Z-buf mode to use for drawing this object.
   csZBufMode zbufMode;
 
-  /// Flag indicating whether this mesh should try to imposter or not.
-  bool imposter_active;
-  /// Imposter Threshold Range.
-  csRef<iSharedVariable> min_imposter_distance;
-  /// Imposter Redo Threshold angle change.
-  csRef<iSharedVariable> imposter_rotation_tolerance;
   csImposterMesh *imposter_mesh;
 
   /**
@@ -574,56 +496,14 @@ public:
    */
   virtual void HardTransform (const csReversibleTransform& t);
 
-  //---------- iImposter Functions -----------------//
-
-  /// Set true if this Mesh should use Impostering.
-  virtual void SetImposterActive (bool flag);
-
-  /**
-   * Determine if this mesh is using Impostering
-   * (not if Imposter is being drawn, but simply considered).
-   */
-  virtual bool GetImposterActive () const { return imposter_active; }
-
-  /**
-   * Minimum Imposter Distance is the distance from camera 
-   * beyond which imposter is used. Imposter gets a 
-   * ptr here because value is a shared variable 
-   * which can be changed at runtime for many objects.
-   */
-  virtual void SetMinDistance (iSharedVariable* dist)
-  { min_imposter_distance = dist; }
-
-  /** 
-   * Rotation Tolerance is the maximum allowable 
-   * angle difference between when the imposter was 
-   * created and the current position of the camera.
-   * Angle greater than this triggers a re-render of
-   * the imposter.
-   */
-  virtual void SetRotationTolerance (iSharedVariable* angle)
-  { imposter_rotation_tolerance = angle; }
-
-  /**
-   * Tells the object to create its proctex and polygon
-   * for use by main render process later, relative to
-   * the specified Point Of View.
-   */
-  virtual void CreateImposter (csReversibleTransform& /*pov*/)
-  { /* implement later */ }
-
-  /**
-   * Renders the imposter on the screen.
-   */
-  bool DrawImposter (iRenderView *rview);
-
-  /// Determine if imposter or true rendering will be used.
-  virtual bool WouldUseImposter (csReversibleTransform& /*pov*/) const
-  { /* implement later */ return false; }
-
   /// This is the function to check distances.  Fn above may not be needed.
   bool CheckImposterRelevant (iRenderView *rview);
-  
+
+  /**
+   * Gets the imposters rendermesh
+   */
+  csRenderMesh** GetImposter (iRenderView *rview);
+
   //---------- Bounding volume and beam functions -----------------//
 
   virtual void GetRadius (float& rad, csVector3& cent) const;
@@ -672,8 +552,8 @@ public:
   virtual void GetWorldBoundingBox (csBox3& cbox);
   virtual void GetTransformedBoundingBox (const csReversibleTransform& trans,
   	csBox3& cbox);
-  virtual float GetScreenBoundingBox (iCamera *camera, csBox2& sbox,
-  	csBox3& cbox);
+  virtual float GetScreenBoundingBox (iCamera *camera,
+         csBox2& sbox, csBox3& cbox);
   virtual const csBox3& GetWorldBoundingBox ();
   virtual csBox3 GetTransformedBoundingBox (const csReversibleTransform& trans);
   virtual csScreenBoxResult GetScreenBoundingBox (iCamera *camera);
@@ -802,132 +682,5 @@ public:
 };
 
 #include "csutil/win32/msvc_deprecated_warn_on.h"
-
-/**
- * The holder class for all implementations of iMeshObjectFactory.
- */
-class csMeshFactoryWrapper : 
-  public scfImplementationExt3<csMeshFactoryWrapper,
-                               csObject, 
-                               iMeshFactoryWrapper,
-                               scfFakeInterface<iShaderVariableContext>,
-			       iSelfDestruct>,
-  public CS::ShaderVariableContextImpl
-{
-private:
-  /// Mesh object factory corresponding with this csMeshFactoryWrapper.
-  csRef<iMeshObjectFactory> meshFact;
-
-  /// Optional parent of this object (can be 0).
-  iMeshFactoryWrapper* parent;
-
-  /// Optional relative transform to parent.
-  csReversibleTransform transform;
-
-  /// Children of this object (other instances of iMeshFactoryWrapper).
-  csMeshFactoryFactoryList children;
-
-  /**
-   * Optional LOD control that will turn a hierarchical mesh in a
-   * mesh that supports static LOD.
-   */
-  csRef<csStaticLODFactoryMesh> static_lod;
-
-  /// Suggestion for new children created from factory.
-  long render_priority;
-  /// Suggestion for new children created from factory.
-  csZBufMode zbufMode;
-
-  csFlags flags;
-
-  csEngine* engine;
-public:
-  /// Constructor.
-  csMeshFactoryWrapper (csEngine* engine, iMeshObjectFactory* meshFact);
-  /// Constructor.
-  csMeshFactoryWrapper (csEngine* engine);
-  /// Destructor.
-  virtual ~csMeshFactoryWrapper ();
-
-  CS_LEAKGUARD_DECLARE (csMeshFactoryWrapper);
-
-  /// Set the mesh object factory.
-  void SetMeshObjectFactory (iMeshObjectFactory* meshFact);
-
-  /// Get the mesh object factory.
-  iMeshObjectFactory* GetMeshObjectFactory () const
-  {
-    return meshFact;
-  }
-
-  virtual csFlags& GetFlags ()
-  {
-    return flags;
-  }
-
-  /**
-   * Create a new mesh object for this template.
-   */
-  csPtr<iMeshWrapper> CreateMeshWrapper ();
-
-  /**
-   * Do a hard transform of this factory.
-   * This transformation and the original coordinates are not
-   * remembered but the object space coordinates are directly
-   * computed (world space coordinates are set to the object space
-   * coordinates by this routine). Note that some implementations
-   * of mesh objects will not change the orientation of the object but
-   * only the position.
-   */
-  void HardTransform (const csReversibleTransform& t);
-
-  /// This function is called for every child that is added
-  void PrepareChild (iMeshFactoryWrapper* child);
-  /// This function is called for every child that is removed
-  void UnprepareChild (iMeshFactoryWrapper* child);
-
-  /**
-   * Get optional relative transform (relative to parent).
-   */
-  csReversibleTransform& GetTransform () { return transform; }
-
-  /**
-   * Set optional relative transform (relative to parent).
-   */
-  void SetTransform (const csReversibleTransform& tr) { transform = tr; }
-
-  virtual iMeshFactoryWrapper* GetParentContainer () const { return parent; }
-  virtual void SetParentContainer (iMeshFactoryWrapper *p) { parent = p; }
-  virtual iMeshFactoryList* GetChildren (){ return &children; }
-
-  virtual iObject* QueryObject () { return this; }
-
-  virtual iShaderVariableContext* GetSVContext()
-  { return static_cast<iShaderVariableContext*> (this); }
-
-  // Static LOD methods.
-  iLODControl* CreateStaticLOD ();
-  void DestroyStaticLOD ();
-  iLODControl* GetStaticLOD ();
-  void SetStaticLOD (float m, float a);
-  void GetStaticLOD (float& m, float& a) const;
-  void RemoveFactoryFromStaticLOD (iMeshFactoryWrapper* mesh);
-  void AddFactoryToStaticLOD (int lod, iMeshFactoryWrapper* mesh);
-
-  // Flags that are used for children.
-  void SetZBufMode (csZBufMode mode) { zbufMode = mode; }
-  csZBufMode GetZBufMode () const { return zbufMode; }
-  void SetZBufModeRecursive (csZBufMode mode);
-  void SetRenderPriority (long rp);
-  long GetRenderPriority () const
-  {
-    return render_priority;
-  }
-  void SetRenderPriorityRecursive (long rp);
-
-  //--------------------- iSelfDestruct implementation -------------------//
-
-  virtual void SelfDestruct ();
-};
 
 #endif // __CS_MESHOBJ_H__

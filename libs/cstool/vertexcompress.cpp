@@ -94,7 +94,7 @@ static int compare_vt_full (const void *p1, const void *p2)
 template <class T, class U, class C>
 static csCompressVertexInfo* TemplatedCompressVertices (
 	T& vertices, U& texels, T& normals, C& colors,
-	size_t num_vertices,
+	size_t num_vertices, bool doColors,
 	csVector3*& new_vertices, csVector2*& new_texels,
 	csVector3*& new_normals, csColor4*& new_colors, size_t& new_count)
 {
@@ -119,10 +119,17 @@ static csCompressVertexInfo* TemplatedCompressVertices (
     vt[i].nx = (int)ceil (normals[i].x * 1000000);
     vt[i].ny = (int)ceil (normals[i].y * 1000000);
     vt[i].nz = (int)ceil (normals[i].z * 1000000);
-    vt[i].r = (int)ceil (colors[i].red * 1000000);
-    vt[i].g = (int)ceil (colors[i].green * 1000000);
-    vt[i].b = (int)ceil (colors[i].blue * 1000000);
-    vt[i].a = (int)ceil (colors[i].alpha * 1000000);
+    if (doColors)
+    {
+      vt[i].r = (int)ceil (colors[i].red * 1000000);
+      vt[i].g = (int)ceil (colors[i].green * 1000000);
+      vt[i].b = (int)ceil (colors[i].blue * 1000000);
+      vt[i].a = (int)ceil (colors[i].alpha * 1000000);
+    }
+    else
+    {
+      vt[i].r = vt[i].g = vt[i].b = vt[i].a = 0;
+    }
   }
 
   // First sort so that all (nearly) equal vertices are together.
@@ -172,8 +179,13 @@ static csCompressVertexInfo* TemplatedCompressVertices (
   new_texels[0] = texels[vt[0].orig_idx];
   new_normals = new csVector3[new_count];
   new_normals[0] = normals[vt[0].orig_idx];
-  new_colors = new csColor4[new_count];
-  new_colors[0] = colors[vt[0].orig_idx];
+  if (doColors)
+  {
+    new_colors = new csColor4[new_count];
+    new_colors[0] = colors[vt[0].orig_idx];
+  }
+  else
+    new_colors = 0;
 
   vt[0].new_idx = 0;
   j = 1;
@@ -184,7 +196,7 @@ static csCompressVertexInfo* TemplatedCompressVertices (
       new_vertices[j] = vertices[vt[i].orig_idx];
       new_texels[j] = texels[vt[i].orig_idx];
       new_normals[j] = normals[vt[i].orig_idx];
-      new_colors[j] = colors[vt[i].orig_idx];
+      if (doColors) new_colors[j] = colors[vt[i].orig_idx];
       vt[i].new_idx = j;
       j++;
     }
@@ -210,7 +222,7 @@ csCompressVertexInfo* csVertexCompressor::Compress (
 	csVector3*& new_normals, csColor4*& new_colors, size_t& new_count)
 {
   return TemplatedCompressVertices (vertices, texels, normals, colors,
-  	num_vertices,
+  	num_vertices, colors != 0,
   	new_vertices, new_texels, new_normals, new_colors, new_count);
 }
 
@@ -225,8 +237,9 @@ csCompressVertexInfo* csVertexCompressor::Compress (
   csVector3* new_normals;
   csColor4* new_colors;
   size_t new_count;
+  bool doColors = colors.GetSize() > 0;
   csCompressVertexInfo* vt = TemplatedCompressVertices (vertices,
-  	texels, normals, colors, vertices.GetSize (),
+        texels, normals, colors, vertices.GetSize (), doColors,
 	new_vertices, new_texels, new_normals, new_colors, new_count);
   if (vt == 0) return 0;
 
@@ -240,7 +253,7 @@ csCompressVertexInfo* csVertexCompressor::Compress (
     vertices.Push (new_vertices[i]);
     texels.Push (new_texels[i]);
     normals.Push (new_normals[i]);
-    colors.Push (new_colors[i]);
+    if (doColors) colors.Push (new_colors[i]);
   }
   delete[] new_vertices;
   delete[] new_texels;

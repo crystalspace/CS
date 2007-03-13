@@ -118,11 +118,8 @@ void TiXmlBase::PutString( const TiXmlString& str, TiXmlString* outString )
 }
 
 
-TiDocumentNode::TiDocumentNode( )
+TiDocumentNode::TiDocumentNode( ) : parent (0), next (0)
 {
-  parent = 0;
-  prev = 0;
-  next = 0;
 }
 
 
@@ -143,18 +140,6 @@ TiDocumentNode* TiDocumentNode::NextSibling( const char * value ) const
   return 0;
 }
 
-
-TiDocumentNode* TiDocumentNode::PreviousSibling( const char * value ) const
-{
-  TiDocumentNode* node;
-  for ( node = prev; node; node = node->prev )
-  {
-    const char* node_val = node->Value ();
-    if (node_val && strcmp (node_val, value) == 0)
-      return node;
-  }
-  return 0;
-}
 
 TiDocumentNode* TiDocumentNodeChildren::Identify( TiDocument* document,
 	const char* p )
@@ -215,10 +200,9 @@ TiDocumentNode* TiDocumentNodeChildren::Identify( TiDocument* document,
 }
 
 // -------------------------------------------------------------------------
-TiDocumentNodeChildren::TiDocumentNodeChildren ()
+TiDocumentNodeChildren::TiDocumentNodeChildren () : firstChild (0)
 {
   firstChild = 0;
-  lastChild = 0;
 }
 
 TiDocumentNodeChildren::~TiDocumentNodeChildren()
@@ -249,34 +233,18 @@ void TiDocumentNodeChildren::Clear()
   }
 
   firstChild = 0;
-  lastChild = 0;
 }
 
-TiDocumentNode* TiDocumentNodeChildren::LinkEndChild( TiDocumentNode* node )
+void TiDocumentNodeChildren::InsertAfterChild( TiDocumentNode* afterThis,
+                                               TiDocumentNode* addThis )
 {
-  node->parent = this;
+  addThis->parent = this;
+  addThis->next = 0;
 
-  node->prev = lastChild;
-  node->next = 0;
-
-  if ( lastChild )
-    lastChild->next = node;
+  if ( afterThis )
+    afterThis->next = addThis;
   else
-    firstChild = node;      // it was an empty list.
-
-  lastChild = node;
-  return node;
-}
-
-
-TiDocumentNode* TiDocumentNodeChildren::InsertEndChild(
-	const TiDocumentNode& addThis )
-{
-  TiDocumentNode* node = addThis.Clone(GetDocument ());
-  if ( !node )
-    return 0;
-
-  return LinkEndChild( node );
+    firstChild = addThis;      // it was an empty list.
 }
 
 
@@ -292,20 +260,29 @@ TiDocumentNode* TiDocumentNodeChildren::InsertBeforeChild(
   node->parent = this;
 
   node->next = beforeThis;
-  node->prev = beforeThis->prev;
-  if ( beforeThis->prev )
+  TiDocumentNode* beforeThisPrev = Previous (beforeThis);
+  if ( beforeThisPrev )
   {
-    beforeThis->prev->next = node;
+    beforeThisPrev->next = node;
   }
   else
   {
     assert( firstChild == beforeThis );
     firstChild = node;
   }
-  beforeThis->prev = node;
   return node;
 }
 
+TiDocumentNode* TiDocumentNodeChildren::InsertAfterChild(
+  TiDocumentNode* afterThis, const TiDocumentNode& addThis )
+{
+  TiDocumentNode* node = addThis.Clone(GetDocument ());
+  if ( !node )
+    return 0;
+
+  InsertAfterChild (afterThis, node);
+  return node;
+}
 
 bool TiDocumentNodeChildren::RemoveChild( TiDocumentNode* removeThis )
 {
@@ -315,13 +292,9 @@ bool TiDocumentNodeChildren::RemoveChild( TiDocumentNode* removeThis )
     return false;
   }
 
-  if ( removeThis->next )
-    removeThis->next->prev = removeThis->prev;
-  else
-    lastChild = removeThis->prev;
-
-  if ( removeThis->prev )
-    removeThis->prev->next = removeThis->next;
+  TiDocumentNode* removeThisPrev = Previous (removeThis);
+  if ( removeThisPrev )
+    removeThisPrev->next = removeThis->next;
   else
     firstChild = removeThis->next;
 
@@ -339,6 +312,35 @@ TiDocumentNode* TiDocumentNodeChildren::FirstChild( const char * value ) const
     if (node_val && strcmp (node_val, value) == 0)
       return node;
   }
+  return 0;
+}
+
+TiDocumentNode* TiDocumentNodeChildren::Previous (TiDocumentNode* child)
+{
+  TiDocumentNode* prev = 0;
+  TiDocumentNode* node = firstChild;
+
+  while (node != 0)
+  {
+    if (node == child) return prev;
+    prev = node;
+    node = node->next;
+  }
+
+  return 0;
+}
+
+TiDocumentNode* TiDocumentNodeChildren::LastChild ()
+{
+  TiDocumentNode* node = firstChild;
+
+  while (node != 0)
+  {
+    TiDocumentNode* next = node->next;
+    if (next == 0) return node;
+    node = next;
+  }
+
   return 0;
 }
 
@@ -521,7 +523,7 @@ void TiXmlElement::Print( iString* cfile, int depth ) const
   {
     StrPrintf ( cfile, " />" );
   }
-  else if ( firstChild == lastChild && firstChild->ToText() )
+  else if ( (firstChild->next == 0) && firstChild->ToText() )
   {
     StrPrintf ( cfile, ">" );
     firstChild->Print( cfile, depth + 1 );
@@ -564,10 +566,12 @@ TiDocumentNode* TiXmlElement::Clone(TiDocument* document) const
       SetValue (attrib.Value ());
   }
 
-  TiDocumentNode* node = 0;
-  for ( node = firstChild; node; node = node->NextSibling() )
+  TiDocumentNode* lastNode = 0;
+  for (TiDocumentNode*  node = firstChild; node; node = node->NextSibling() )
   {
-    clone->LinkEndChild( node->Clone(document) );
+    TiDocumentNode* newNode = node->Clone(document);
+    clone->InsertAfterChild (lastNode, newNode);
+    lastNode = newNode;
   }
   return clone;
 }
@@ -611,10 +615,12 @@ TiDocumentNode* TiDocument::Clone(TiDocument* document) const
   clone->error = error;
   clone->errorDesc = errorDesc.c_str ();
 
-  TiDocumentNode* node = 0;
-  for ( node = firstChild; node; node = node->NextSibling() )
+  TiDocumentNode* lastNode = 0;
+  for (TiDocumentNode*  node = firstChild; node; node = node->NextSibling() )
   {
-    clone->LinkEndChild( node->Clone(document) );
+    TiDocumentNode* newNode = node->Clone(document);
+    clone->InsertAfterChild (lastNode, newNode);
+    lastNode = newNode;
   }
   return clone;
 }

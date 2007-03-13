@@ -49,7 +49,6 @@ csRenderView::csRenderView (iCamera *c) :
 {
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));
-  c->IncRef ();
   ctxt->icamera = c;
   context_id = 0;
 }
@@ -64,7 +63,6 @@ csRenderView::csRenderView (
 {
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));
-  c->IncRef ();
   ctxt->icamera = c;
   ctxt->iview = v;
   if (v)
@@ -73,6 +71,37 @@ csRenderView::csRenderView (
   }
 
   context_id = 0;
+}
+
+csRenderView::csRenderView (const csRenderView& other) :
+  scfImplementationType (this)
+{
+  ctxt = new csRenderContext ();
+  memset (ctxt, 0, sizeof (csRenderContext));
+
+  ctxt->icamera.AttachNew (other.ctxt->icamera->Clone ());
+  ctxt->iview = other.ctxt->iview;	// @@@ Is this right?
+  memcpy (ctxt->frustum, other.ctxt->frustum, sizeof (other.ctxt->frustum));
+  memcpy (ctxt->clip_planes, other.ctxt->clip_planes,
+      sizeof (other.ctxt->clip_planes));
+  ctxt->clip_planes_mask = other.ctxt->clip_planes_mask;
+  ctxt->last_portal = other.ctxt->last_portal;
+  ctxt->previous_sector = other.ctxt->previous_sector;
+  ctxt->this_sector = other.ctxt->this_sector;
+  ctxt->clip_plane = other.ctxt->clip_plane;
+  ctxt->do_clip_plane = other.ctxt->do_clip_plane;
+  ctxt->do_clip_frustum = other.ctxt->do_clip_frustum;
+  // @@@ fog_info and added_fog_info?
+
+  context_id = 0;
+  engine = other.engine;
+  g3d = other.g3d;
+  g2d = other.g2d;
+  original_camera = 0;	// @@@ Right?
+  leftx = other.leftx;
+  rightx = other.rightx;
+  topy = other.topy;
+  boty = other.boty;
 }
 
 csRenderView::~csRenderView ()

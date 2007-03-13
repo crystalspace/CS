@@ -33,14 +33,14 @@ CS_IMPLEMENT_STATIC_CLASSVAR_REF(Variables::Values, def,
 ValueSet& Variables::Values::GetMultiValue (uint num)
 {
   ValueSetChain* p = multiValues;
-  while (num > 0) p = p->nextPlease;
+  while (num-- > 0) p = p->nextPlease;
   return p->vs;
 }
 
 const ValueSet& Variables::Values::GetMultiValue (uint num) const
 {
   ValueSetChain* p = multiValues;
-  while (num > 0) p = p->nextPlease;
+  while (num-- > 0) p = p->nextPlease;
   return p->vs;
 }
 

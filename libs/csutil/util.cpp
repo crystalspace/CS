@@ -108,6 +108,78 @@ wchar_t* csStrNewW (const char *s)
   }
 }
 
+namespace CS
+{
+  char* StrDup (const char *s)
+  {
+    if (s)
+    {
+      size_t sl = strlen (s) + 1;
+      char *r = (char*)cs_malloc (sl);
+      memcpy (r, s, sl);
+      return r;
+    }
+    else
+      return 0;
+  }
+
+  char* StrDup (const wchar_t *s)
+  {
+    if (!s) return 0;
+
+    utf8_char buf[shortStringChars];
+    static const size_t bufChars = sizeof (buf) / sizeof (utf8_char);
+    size_t charsNeeded;
+
+    if ((charsNeeded = 
+      csUnicodeTransform::WCtoUTF8 (buf, bufChars, s, (size_t)-1)) > bufChars)
+    {
+      utf8_char* newbuf = (utf8_char*)cs_malloc (charsNeeded);
+      csUnicodeTransform::WCtoUTF8 (newbuf, charsNeeded, s, (size_t)-1);
+      return (char*)newbuf;
+    }
+    else
+    {
+      return StrDup ((char*)buf);
+    }
+  }
+
+  wchar_t* StrDupW (const wchar_t *s)
+  {
+    if (s)
+    {
+      size_t sl = wcslen (s) + 1;
+      wchar_t *r = (wchar_t*)cs_malloc (sl * sizeof (wchar_t));
+      memcpy (r, s, sl * sizeof (wchar_t));
+      return r;
+    }
+    else
+      return 0;
+  }
+
+  wchar_t* StrDupW (const char *s)
+  {
+    if (!s) return 0;
+
+    wchar_t buf[shortStringChars];
+    static const size_t bufChars = sizeof (buf) / sizeof (wchar_t);
+    size_t charsNeeded;
+
+    if ((charsNeeded = csUnicodeTransform::UTF8toWC (buf, bufChars, 
+      (utf8_char*)s, (size_t)-1)) > bufChars)
+    {
+      wchar_t* newbuf = (wchar_t*)cs_malloc (charsNeeded * sizeof (wchar_t));
+      csUnicodeTransform::UTF8toWC (newbuf, charsNeeded, (utf8_char*)s, 
+        (size_t)-1);
+      return newbuf;
+    }
+    else
+    {
+      return StrDupW (buf);
+    }
+  }
+}
+
 // These functions are not inline in <csutil/util.h> because the underlying
 // str{n}casecmp() is not compatible with gcc's "-ansi -pedantic".
 int csStrCaseCmp(char const* s1, char const* s2)

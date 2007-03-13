@@ -22,12 +22,15 @@
 #include "iutil/document.h"
 
 #include "csutil/documenthelper.h"
+#include "csutil/scfstr.h"
 
 #include "combiner_default.h"
+#include "weaver.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 {
-  CombinerDefault::CombinerDefault () : scfImplementationType (this)
+  CombinerDefault::CombinerDefault (WeaverCompiler* compiler) : 
+    scfImplementationType (this), compiler (compiler), xmltokens (compiler->xmltokens)
   {
   }
   
@@ -81,6 +84,48 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   bool CombinerDefault::CompatibleParams (iDocumentNode* params)
   {
     return true;
+  }
+
+  csRef<iString> CombinerDefault::QueryInputTag (const char* location, 
+                                                 iDocumentNode* blockNode)
+  {
+    if (strcmp (location, "pass") == 0)
+    {
+      csRef<iString> result;
+      bool hasTag = false;
+      csRef<iDocumentNodeIterator> nodes = blockNode->GetNodes();
+      while (nodes->HasNext())
+      {
+        csRef<iDocumentNode> node = nodes->Next();
+        if (node->GetType() != CS_NODE_ELEMENT) continue;
+        csStringID id = xmltokens.Request (node->GetValue());
+        switch (id)
+        {
+          case WeaverCompiler::XMLTOKEN_BUFFER:
+            {
+              // For now only support 1 tag...
+              if (hasTag) return 0;
+              hasTag = true;
+              result.AttachNew (new scfString (
+                node->GetAttributeValue ("source")));
+            }
+            break;
+          case WeaverCompiler::XMLTOKEN_TEXTURE:
+            {
+              // For now only support 1 tag...
+              if (hasTag) return 0;
+              hasTag = true;
+              result.AttachNew (new scfString (
+                node->GetAttributeValue ("name")));
+            }
+            break;
+          default:
+            break;
+        }
+      }
+      return result;
+    }
+    return 0;
   }
 }
 CS_PLUGIN_NAMESPACE_END(ShaderWeaver)

@@ -22,17 +22,7 @@
 #include "igeom/decal.h"
 #include "csutil/scf_implementation.h"
 #include "csgeom/vector2.h"
-
-#define CS_DECAL_DEFAULT_TIME_TO_LIVE               -1.0f
-#define CS_DECAL_DEFAULT_RENDER_PRIORITY            0
-#define CS_DECAL_DEFAULT_NORMAL_THRESHOLD           0.01f
-#define CS_DECAL_DEFAULT_OFFSET                     0.05f
-#define CS_DECAL_DEFAULT_TOP_CLIP_ON                true
-#define CS_DECAL_DEFAULT_TOP_CLIP_SCALE             0.5f
-#define CS_DECAL_DEFAULT_BOTTOM_CLIP_ON             true
-#define CS_DECAL_DEFAULT_BOTTOM_CLIP_SCALE          0.5f
-#define CS_DECAL_DEFAULT_PERPENDICULAR_THRESHOLD    0.05
-#define CS_DECAL_DEFAULT_PERPENDICULAR_OFFSET       0.01
+#include "csutil/cscolor.h"
 
 class csDecalTemplate : public scfImplementation1<csDecalTemplate,
                                                  iDecalTemplate>
@@ -53,6 +43,9 @@ private:
   uint                  mixMode;
   float                 perpendicularFaceThreshold;
   float                 perpendicularFaceOffset;
+  csColor4              mainColor;
+  csColor4              topColor;
+  csColor4              bottomColor;
 
 public:
 
@@ -69,12 +62,15 @@ public:
   virtual bool HasTopClipping() const;
   virtual float GetTopClippingScale() const;
   virtual bool HasBottomClipping() const;
-  virtual bool GetBottomClippingScale() const;
+  virtual float GetBottomClippingScale() const;
   virtual const csVector2 & GetMinTexCoord() const;
   virtual const csVector2 & GetMaxTexCoord() const;
   virtual const uint GetMixMode() const;
   virtual float GetPerpendicularFaceThreshold() const;
   virtual float GetPerpendicularFaceOffset() const;
+  virtual const csColor4 & GetMainColor() const;
+  virtual const csColor4 & GetTopColor() const;
+  virtual const csColor4 & GetBottomColor() const;
 
   virtual void SetTimeToLive(float timeToLive);
   virtual void SetMaterialWrapper(iMaterialWrapper* material);
@@ -88,6 +84,9 @@ public:
   virtual void SetMixMode(uint mixMode);
   virtual void SetPerpendicularFaceThreshold(float threshold);
   virtual void SetPerpendicularFaceOffset(float offset);
+  virtual void SetMainColor(const csColor4 & color);
+  virtual void SetTopColor(const csColor4 & color);
+  virtual void SetBottomColor(const csColor4 & color);
 };
 
 #endif // __CS_DECAL_TEMPLATE_H__

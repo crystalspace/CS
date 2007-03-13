@@ -101,9 +101,10 @@ struct iSimpleFormerState : public virtual iBase
     /// Gets the processed heightmap data.
   virtual float *GetFloatMap () = 0;
 
-  /// Sets the materials scale
-  /// \param offset is the the number of pixels to offset the texture.
-  /// \param scale is the amount to scale the material.
+  /**
+   * Sets the materials scale
+   * \param scale is the amount to scale the material.
+   */
   virtual void SetMaterialScale(csVector2 scale)=0;
 
 };

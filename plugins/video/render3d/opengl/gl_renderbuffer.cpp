@@ -328,7 +328,6 @@ void csGLVBOBufferManager::ReleaseVBOSlot (VBOSlot* slot, bool deallocate /* = t
 {
   // Mark it as free
   VBOBuffer* buffer = slot->vboBuffer;
-  size_t slotIndex = (slot - buffer->vboSlots);
 
   ClearSlotUsed (slot);
 
@@ -493,10 +492,9 @@ void csGLVBOBufferManager::RenderBufferDestroyed (iRenderBuffer* buffer)
   }
 }
 
-static csString ByteFormat (size_t n)
+static csString ByteFormat (size_t size)
 {
   csString str;
-  unsigned long size = (unsigned long)n;
   if (size >= 1024*1024)
     str.Format ("%4zu MB", size / (1024*1024));
   else if (size >= 1024)
@@ -545,7 +543,7 @@ namespace
 void csGLVBOBufferManager::DumpStatsBufferType (size_t type)
 {
   csPrintf ("Fixed size buffers\n");
-  csPrintf ("SS            NB       NS       SU      SU%\n");
+  csPrintf ("SS            NB       NS       SU      SU%%\n");
 
   size_t vboSize = 0;
   size_t sysmemSize = 0;

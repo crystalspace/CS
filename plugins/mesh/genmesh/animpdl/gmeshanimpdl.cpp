@@ -120,11 +120,23 @@ const csColor4* GenmeshAnimationPDL::UpdateColors (csTicks current,
     combinedColors.SetSize (numUpdate);
     {
       csVertexListWalker<float, csColor> color (factory->staticColors, 3);
-      for (size_t n = 0; n < numUpdate; n++)
+      if (colors)
       {
-        combinedColors[n].Set ((*color).red, (*color).green, (*color).blue, 
-          colors[n].alpha);
-        ++color;
+        for (size_t n = 0; n < numUpdate; n++)
+        {
+          combinedColors[n].Set ((*color).red, (*color).green, (*color).blue, 
+            colors[n].alpha);
+          ++color;
+        }
+      }
+      else
+      {
+        for (size_t n = 0; n < numUpdate; n++)
+        {
+          combinedColors[n].Set ((*color).red, (*color).green, (*color).blue, 
+            1.0f);
+          ++color;
+        }
       }
     }
 

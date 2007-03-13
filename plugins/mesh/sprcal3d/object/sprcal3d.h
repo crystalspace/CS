@@ -30,6 +30,7 @@
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/flags.h"
 #include "csutil/hash.h"
+#include "csutil/weakrefarr.h"
 #include "csutil/hashr.h"
 #include "csutil/leakguard.h"
 #include "csutil/parray.h"
@@ -743,7 +744,9 @@ public:
   {
     calModel.getMixer()->setAnimationTime(animationTime);
   }
-  CalModel *GetCal3DModel() { return &calModel; }
+  CalModel *GetCal3DModel () { return &calModel; }
+
+  csPtr<iSkeleton> GetSkeleton () {return scfQueryInterface<iSkeleton> (skeleton);}
 
   void SetAnimTimeUpdateHandler (iAnimTimeUpdateHandler*);
   /** @} */
@@ -789,6 +792,7 @@ class csCal3dSkeletonFactory : public
   CalCoreSkeleton *core_skeleton;
   csString name;
   csRefArray<csCal3dSkeletonBoneFactory> bones_factories;
+  csHash<uint, size_t> bones_names;
 
 public:
 
@@ -796,15 +800,19 @@ public:
 
   void SetSkeleton (CalCoreSkeleton *skeleton);
 
+  CalCoreSkeleton *GetCal3dSkeleton () {return core_skeleton;}
+
   /**\name iSkeletonBoneFactory implementation
    * @{ */
   const char* GetName () const {return name.GetData ();}
   void SetName (const char* name) {csCal3dSkeletonFactory::name = name;}
   iSkeletonBoneFactory *CreateBone (const char *name) {return 0;}
-  iSkeletonScript *CreateScript(const char *name) {return 0;}
-  iSkeletonScript *FindScript(const char *name) {return 0;}
-  iSkeletonBoneFactory *FindBone (const char *name) {return 0;}
-  size_t FindBoneIndex (const char *name) {return 0;}
+  iSkeletonAnimation *CreateAnimation (const char *name) {return 0;}
+  iSkeletonAnimation *CreateScript(const char *name) {return CreateAnimation (name);}
+  iSkeletonAnimation *FindAnimation (const char *name) {return 0;}
+  iSkeletonAnimation *FindScript (const char *name) {return FindAnimation (name);}
+  iSkeletonBoneFactory *FindBone (const char *name);
+  size_t FindBoneIndex (const char *name);
   size_t GetBonesCount () const {return bones_factories.GetSize ();}
   iSkeletonBoneFactory *GetBone (size_t i) {return (iSkeletonBoneFactory*)bones_factories[i];}
   iSkeletonGraveyard *GetGraveyard  () {return 0;}
@@ -822,6 +830,8 @@ class csCal3dSkeletonBoneFactory : public
 
   CalCoreBone *core_bone;
   csWeakRef<csCal3dSkeletonFactory> skeleton_factory;
+  csWeakRefArray<iSkeletonBoneFactory> children;
+  csWeakRef<iSkeletonBoneFactory> parent;
   csBox3 skin_box;
 
   csReversibleTransform local_transform;
@@ -829,8 +839,9 @@ class csCal3dSkeletonBoneFactory : public
 
 public:
 
-  csCal3dSkeletonBoneFactory (CalCoreBone *core_bone, csCal3dSkeletonFactory* skelfact) :
-      scfImplementationType(this), core_bone(core_bone), skeleton_factory(skelfact) {}
+  csCal3dSkeletonBoneFactory (CalCoreBone *core_bone, csCal3dSkeletonFactory* skelfact);
+
+  bool Initialize ();
 
   /**\name iSkeletonBoneFactory implementation
    * @{ */
@@ -841,7 +852,7 @@ public:
   csReversibleTransform &GetFullTransform () {return global_transform;}
   void SetParent (iSkeletonBoneFactory *parent) {;}
   iSkeletonBoneFactory *GetParent () {return 0;}
-  int GetChildrenCount () {return (int)core_bone->getListChildId ().size ();}
+  size_t GetChildrenCount () {return children.GetSize ();}
   iSkeletonBoneFactory *GetChild (size_t i) {return 0;}
   iSkeletonBoneFactory *FindChild (const char *name) {return 0;}
   size_t FindChildIndex (iSkeletonBoneFactory *child) {return 0;}
@@ -854,9 +865,10 @@ public:
 class csCal3dSkeletonBone : public scfImplementation1<csCal3dSkeletonBone, iSkeletonBone>
 {
   CalBone *bone;
-  csWeakRef<csCal3dSkeletonBoneFactory> factory;
+  csWeakRef<iSkeletonBoneFactory> factory;
   csWeakRef<csCal3dSkeleton> skeleton;
-  csWeakRef<csCal3dSkeletonBone> parent;
+  csWeakRef<iSkeletonBone> parent;
+  csWeakRefArray<iSkeletonBone> children;
   csBox3 skin_box;
 
   csString name;
@@ -865,19 +877,21 @@ class csCal3dSkeletonBone : public scfImplementation1<csCal3dSkeletonBone, iSkel
 
 public:
   
-  csCal3dSkeletonBone (CalBone *bone, csCal3dSkeletonBoneFactory *factory) :
-      scfImplementationType(this), bone(bone), factory(factory) {}
+  csCal3dSkeletonBone (CalBone *bone, iSkeletonBoneFactory *factory,
+    csCal3dSkeleton *skeleton);
+
+  bool Initialize ();
 
   /**\name iSkeletonBone implementation
    * @{ */
   const char* GetName () const {return name.GetData ();}
   void SetName (const char* name) {csCal3dSkeletonBone::name = name;}
-  csReversibleTransform &GetTransform () {return local_transform;}
-  void SetTransform (const csReversibleTransform &transform) {;}
-  csReversibleTransform &GetFullTransform () {return global_transform;}
+  csReversibleTransform &GetTransform ();
+  void SetTransform (const csReversibleTransform &transform);
+  csReversibleTransform &GetFullTransform ();
   void SetParent (iSkeletonBone *parent) {;} 
   iSkeletonBone *GetParent () {return parent;}
-  int GetChildrenCount () {return (int)bone->getCoreBone ()->getListChildId().size ();}
+  size_t GetChildrenCount () {return children.GetSize ();}
   iSkeletonBone *GetChild (size_t i) {return 0;}
   iSkeletonBone *FindChild (const char *name) {return 0;}
   size_t FindChildIndex (iSkeletonBone *child) {return 0;}
@@ -895,38 +909,51 @@ class csCal3dSkeleton : public scfImplementation1<csCal3dSkeleton, iSkeleton>
 {
   CalSkeleton* skeleton;
   csString name;
-
   csRefArray<csCal3dSkeletonBone> bones;
   csWeakRef<csCal3dSkeletonFactory> skeleton_factory;
+  csRefArray<iSkeletonUpdateCallback> update_callbacks;
+  csHash<uint, size_t> bones_names;
 
 public:
 
-  csCal3dSkeleton (CalSkeleton* skeleton);
+  csCal3dSkeleton (CalSkeleton* skeleton, csCal3dSkeletonFactory* skel_factory);
 
   /**\name iSkeleton implementation
    * @{ */
   const char* GetName () const {return name.GetData ();}
   void SetName (const char* name) {csCal3dSkeleton::name = name;}
-  size_t GetBonesCount () {return skeleton->getVectorBone ().size ();}
-  iSkeletonBone *GetBone (size_t i) {return 0;}
-  iSkeletonBone *FindBone (const char *name) {return 0;}
-  size_t FindBoneIndex (const char *name) {return 0;}
-  iSkeletonScript* Execute (const char *scriptname) {return 0;}
-  iSkeletonScript* Append (const char *scriptname) {return 0;}
-  void ClearPendingScripts () {;}
-  size_t GetScriptsCount () {return 0;}
-  iSkeletonScript* GetScript (size_t i) {return 0;}
-  iSkeletonScript* FindScript (const char *scriptname) {return 0;}
+  size_t GetBonesCount () {return bones.GetSize ();}
+  iSkeletonBone *GetBone (size_t i) {return bones[i];}
+  iSkeletonBone *FindBone (const char *name);
+  size_t FindBoneIndex (const char *name);
+  iSkeletonAnimation* Execute (const char *scriptname) {return 0;}
+  iSkeletonAnimation* Append (const char *scriptname) {return 0;}
+  void ClearPendingAnimations () {;}
+  void ClearPendingScripts () {ClearPendingAnimations ();}
+  size_t GetAnimationsCount () {return 0;}
+  size_t GetScriptsCount () {return GetAnimationsCount ();}
+  iSkeletonAnimation* GetAnimation (size_t i) {return 0;}
+  iSkeletonAnimation* GetScript (size_t i) {return GetAnimation (i);}
+  iSkeletonAnimation* FindAnimation (const char *scriptname) {return 0;}
+  iSkeletonAnimation* FindScript (const char *scriptname) {return FindAnimation (scriptname);}
   iSkeletonSocket* FindSocket (const char *socketname) {return 0;}
   void StopAll () {;}
   void Stop (const char* scriptname) {;}
   iSkeletonFactory *GetFactory () {return 0;}
-  void SetScriptCallback(iSkeletonScriptCallback *cb) {;}
-  size_t AddUpdateCallback(iSkeletonUpdateCallback *update_callback) {return 0;}
-  size_t GetUpdateCallbacksCount () {return 0;}
-  iSkeletonUpdateCallback *GetUpdateCallback (size_t callback_idx) {return 0;}
-  void RemoveUpdateCallback(size_t callback_idx) {;}
+  void SetAnimationCallback (iSkeletonAnimationCallback *cb) {;}
+  void SetScriptCallback (iSkeletonAnimationCallback *cb) {SetAnimationCallback (cb);}
+  size_t AddUpdateCallback(iSkeletonUpdateCallback *update_callback) 
+  {return update_callbacks.Push (update_callback);}
+  size_t GetUpdateCallbacksCount () 
+  {return update_callbacks.GetSize ();}
+  iSkeletonUpdateCallback *GetUpdateCallback (size_t callback_idx) 
+  {return update_callbacks[callback_idx];}
+  void RemoveUpdateCallback(size_t callback_idx) 
+  {update_callbacks.DeleteIndex (callback_idx);}
   /** @} */
+
+  void UpdateNotify (const csTicks &current_ticks);
+
 };
 
 #include "csutil/win32/msvc_deprecated_warn_on.h"

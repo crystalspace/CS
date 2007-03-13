@@ -246,12 +246,6 @@ public:
   TiDocumentNodeChildren* Parent() const{ return parent; }
 
   /// Navigate to a sibling node.
-  TiDocumentNode* PreviousSibling() const { return prev; }
-
-  /// Navigate to a sibling node.
-  TiDocumentNode* PreviousSibling( const char * ) const;
-
-  /// Navigate to a sibling node.
   TiDocumentNode* NextSibling() const { return next; }
 
   /// Navigate to a sibling node with the given 'value'.
@@ -313,7 +307,6 @@ protected:
   NodeType type;
   TiDocumentNodeChildren* parent;
 
-  TiDocumentNode* prev;
   TiDocumentNode* next;
 };
 
@@ -338,31 +331,32 @@ public:
   TiDocumentNode* FirstChild( const char * value ) const;
 
   /**
-   * Add a new node related to this. Adds a child past the LastChild.
-   * Returns a pointer to the new object or 0 if an error occured.
-   */
-  TiDocumentNode* InsertEndChild( const TiDocumentNode& addThis );
-
-  /**
    * Add a new node related to this. Adds a child before the specified child.
    * Returns a pointer to the new object or 0 if an error occured.
    */
   TiDocumentNode* InsertBeforeChild( TiDocumentNode* beforeThis,
     const TiDocumentNode& addThis );
+  TiDocumentNode* InsertAfterChild( TiDocumentNode* beforeThis,
+    const TiDocumentNode& addThis );
 
   /// Delete a child of this node.
   bool RemoveChild( TiDocumentNode* removeThis );
 
+  TiDocumentNode* Previous (TiDocumentNode* child);
+  TiDocumentNode* LastChild ();
 protected:
   // Figure out what is at *p, and parse it. Returns null if it is not an xml
   // node.
   TiDocumentNode* Identify( TiDocument* document, const char* start );
 
-  // The node is passed in by ownership. This object will delete it.
-  TiDocumentNode* LinkEndChild( TiDocumentNode* addThis );
+  /**
+   * Add a new node related to this. Adds a child past afterThis.
+   * Returns a pointer to the new object or 0 if an error occured.
+   */
+  void InsertAfterChild( TiDocumentNode* afterThis,
+    TiDocumentNode* addThis );
 
   TiDocumentNode* firstChild;
-  TiDocumentNode* lastChild;
 };
 
 
@@ -381,7 +375,7 @@ class TiDocumentAttribute
 public:
   /// Construct an empty attribute.
   TiDocumentAttribute() { name = 0; value = 0; }
-  ~TiDocumentAttribute () { delete[] value; }
+  ~TiDocumentAttribute () { cs_free (value); }
 
   const char* Name()  const { return name; }
   const char* Value() const { return value; }
@@ -392,8 +386,8 @@ public:
   void SetName( const char* _name )  { name = _name; }
   void SetValue( const char* _value )
   {
-    delete[] value;
-    value = csStrNew (_value);
+    cs_free (value);
+    value = CS::StrDup (_value);
   }
   /// Take over value so that this attribute has ownership.
   void TakeOverValue( char* _value )
@@ -444,9 +438,12 @@ private:
 class TiDocumentAttributeSet
 {
 public:
-  csArray<TiDocumentAttribute> set;
+  csArray<TiDocumentAttribute,
+    csArrayElementHandler<TiDocumentAttribute>,
+    CS::Memory::AllocatorMalloc,
+    csArrayCapacityLinear<csArrayThresholdFixed<4> > > set;
 
-  TiDocumentAttributeSet() : set (0, 4) { }
+  TiDocumentAttributeSet() : set (0) { }
   size_t Find (const char * name) const;
   size_t FindExact (const char * reg_name) const;
 };
@@ -552,7 +549,7 @@ class TiXmlComment : public TiDocumentNode
 public:
   /// Constructs an empty comment.
   TiXmlComment() { value = 0; type = COMMENT; }
-  virtual ~TiXmlComment() { delete[] value; }
+  virtual ~TiXmlComment() { cs_free (value); }
 
   // [internal use] Creates a new Element and returs it.
   virtual TiDocumentNode* Clone(TiDocument* document) const;
@@ -561,11 +558,8 @@ public:
   virtual const char * Value () const { return value; }
   virtual void SetValue (const char * _value)
   {
-    delete[] value;
-    if (_value)
-      value = csStrNew (_value);
-    else
-      value = 0;
+    cs_free (value);
+    value = CS::StrDup (_value);
   }
 
 protected:

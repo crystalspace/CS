@@ -34,16 +34,10 @@ csRenderBuffer::csRenderBuffer (size_t size, csRenderBufferType type,
 				csRenderBufferComponentType componentType, 
 				uint componentCount, size_t rangeStart, 
 				size_t rangeEnd, bool copy) :
-  scfImplementationType(this, 0), props (type, componentType, componentCount,
-    copy), rangeStart (rangeStart), rangeEnd (rangeEnd), version (0), 
-    buffer (0)
+  scfImplementationType(this, 0), bufferSize (size), props (type, 
+    componentType, componentCount, copy), rangeStart (rangeStart), 
+    rangeEnd (rangeEnd), version (0),  buffer (0)
 {
-  bufferSize = size;
-  if (props.doCopy) 
-  {
-    buffer = (unsigned char*)cs_malloc (size);
-    props.doDelete = true;
-  }
 #if defined(CS_DEBUG) && defined(DEBUG_LOCKING)
   lockStack = 0;
 #endif
@@ -63,7 +57,6 @@ csRenderBuffer::~csRenderBuffer ()
     callback->RenderBufferDestroyed (this);
 
   if (props.doDelete) cs_free (buffer);
-  buffer = 0;
 }
 
 void* csRenderBuffer::Lock (csRenderBufferLockType lockType)
@@ -97,7 +90,14 @@ void* csRenderBuffer::Lock (csRenderBufferLockType lockType)
     rb = (uint8*)rb + props.offset;
   }
   else
+  {
+    if (buffer == 0)
+    {
+      buffer = (unsigned char*)cs_malloc (bufferSize);
+      props.doDelete = true;
+    }
     rb = buffer;
+  }
 
   CS_ASSERT(rb != 0);
 
@@ -136,14 +136,28 @@ void csRenderBuffer::CopyInto (const void *data, size_t elementCount,
     csRenderBufferComponentSizes[props.comptype] * props.compCount;
   const size_t byteOffs = elemSize * elemOffset;
   version++;
-  if (props.doCopy)
+  if (!props.doCopy)
   {
-    memcpy (buffer + byteOffs, data, csMin (bufferSize - byteOffs, 
-      elementCount * elemSize));
+    buffer = (unsigned char*)data;
   }
   else
   {
-    buffer = (unsigned char*)data;
+    if ((buffer == 0) || !props.doDelete)
+    {
+      unsigned char* oldBuffer = buffer;
+      buffer = (unsigned char*)cs_malloc (bufferSize);
+      props.doDelete = true;
+      if (oldBuffer != 0)
+      {
+        if (byteOffs > 0)
+          memcpy (buffer, oldBuffer, byteOffs);
+        size_t endOffs = (byteOffs + elementCount * elemSize);
+        if (endOffs < bufferSize)
+          memcpy (buffer+endOffs, oldBuffer+endOffs, bufferSize - endOffs);
+      }
+    }
+    memcpy (buffer + byteOffs, data, csMin (bufferSize - byteOffs, 
+      elementCount * elemSize));
   }
 }
 
@@ -156,6 +170,31 @@ size_t csRenderBuffer::GetElementCount() const
     (props.compCount * csRenderBufferComponentSizes[props.comptype]);
 }
 
+void csRenderBuffer::SetData (const void *data)
+{
+  if (masterBuffer.IsValid()) return;
+  version++;
+  if (props.doDelete)
+  {
+    cs_free (buffer);
+    props.doDelete = false;
+  }
+  buffer = (unsigned char*)data;
+}
+
+csRef<csRenderBuffer> csRenderBuffer::CreateRenderBuffer (size_t elementCount, 
+  csRenderBufferType type, csRenderBufferComponentType componentType,
+  uint componentCount)
+{
+  if (componentCount > 255) return 0;
+
+  size_t size = elementCount * componentCount * 
+    csRenderBufferComponentSizes[componentType];
+  csRenderBuffer* buf = new csRenderBuffer (size, type, 
+    componentType, componentCount, 0, 0);
+  return csPtr<csRenderBuffer> (buf);
+}
+
 csRef<csRenderBuffer> csRenderBuffer::CreateRenderBuffer (size_t elementCount, 
   csRenderBufferType type, csRenderBufferComponentType componentType,
   uint componentCount, bool copy)
@@ -166,6 +205,17 @@ csRef<csRenderBuffer> csRenderBuffer::CreateRenderBuffer (size_t elementCount,
     csRenderBufferComponentSizes[componentType];
   csRenderBuffer* buf = new csRenderBuffer (size, type, 
     componentType, componentCount, 0, 0, copy);
+  return csPtr<csRenderBuffer> (buf);
+}
+
+csRef<csRenderBuffer> csRenderBuffer::CreateIndexRenderBuffer (size_t elementCount, 
+    csRenderBufferType type, csRenderBufferComponentType componentType,
+    size_t rangeStart, size_t rangeEnd)
+{
+  size_t size = elementCount * csRenderBufferComponentSizes[componentType];
+  csRenderBuffer* buf = new csRenderBuffer (size, type, 
+    componentType, 1, rangeStart, rangeEnd);
+  buf->props.isIndex = true;
   return csPtr<csRenderBuffer> (buf);
 }
 
@@ -229,6 +279,8 @@ const char* csRenderBuffer::GetDescrFromBufferName (csRenderBufferName bufferNam
 
 csRenderBufferName csRenderBuffer::GetBufferNameFromDescr (const char* name)
 {
+  if (name == 0) return CS_BUFFER_NONE; 
+  
   struct StrToName
   {
     const char* descr;

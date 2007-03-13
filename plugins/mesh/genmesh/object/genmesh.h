@@ -28,7 +28,7 @@
 #include "csgfx/shadervarcontext.h"
 #include "cstool/rendermeshholder.h"
 #include "cstool/userrndbuf.h"
-#include "csutil/cscolor.h"
+#include "csutil/cscolor.h" 
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/flags.h"
 #include "csutil/hash.h"
@@ -141,11 +141,13 @@ class csGenmeshMeshObject : public scfImplementation5<csGenmeshMeshObject,
 						      iGeneralMeshState>
 {
 private:
+
   csRenderMeshHolder rmHolder;
   csRef<csShaderVariableContext> svcontext;
   csRef<csRenderBufferHolder> bufferHolder;
   csWeakRef<iGraphics3D> g3d;
   bool mesh_colors_dirty_flag;
+  bool mesh_user_rb_dirty_flag;
 
   uint buffers_version;
   csRef<iRenderBuffer> sorted_index_buffer;	// Only if factory back2front
@@ -156,6 +158,8 @@ private:
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
   csRef<iRenderBuffer> normal_buffer;
+
+  size_t factory_user_rb_state;
 
   csRef<iRenderBuffer> color_buffer;
   iMovable* lighting_movable;
@@ -448,12 +452,11 @@ class csGenmeshMeshObjectFactory :
                                iMeshObjectFactory,
                                iGeneralFactoryState>
 {
-private:
+public:
   csRef<iMaterialWrapper> material;
   csDirtyAccessArray<csVector3> mesh_vertices;
   csDirtyAccessArray<csVector2> mesh_texels;
   csDirtyAccessArray<csVector3> mesh_normals;
-  csDirtyAccessArray<csColor4> mesh_colors;
 
   bool autonormals;
   bool autonormals_compress;
@@ -491,6 +494,8 @@ private:
   bool default_shadowcasting;
   bool default_shadowreceiving;
 
+  size_t user_buffer_change;
+
   float radius;
   csBox3 object_bbox;
   bool object_bbox_valid;
@@ -514,7 +519,8 @@ private:
    * Setup this factory. This function will check if setup is needed.
    */
   void SetupFactory ();
-
+private:
+  csDirtyAccessArray<csColor4> mesh_colors;
 public:
   CS_LEAKGUARD_DECLARE (csGenmeshMeshObjectFactory);
 
@@ -574,10 +580,19 @@ public:
     SetupFactory ();
     return mesh_normals.GetArray ();
   }
+  csColor4* GetColors (bool ensureValid)
+  {
+    if (ensureValid && (mesh_colors.GetSize() == 0))
+    {
+      mesh_colors.SetCapacity (mesh_vertices.GetSize());
+      mesh_colors.SetSize (mesh_vertices.GetSize(), csColor4 (0, 0, 0, 1));
+    }
+    return mesh_colors.GetArray();
+  }
   csColor4* GetColors ()
   {
     SetupFactory ();
-    return mesh_colors.GetArray ();
+    return GetColors (true);
   }
 
   void AddTriangle (const csTriangle& tri);

@@ -253,6 +253,13 @@ void csODEDynamics::Step (float elapsed_time)
   }
   total_elapsed += elapsed_time;
 
+  //step callbacks
+  step_callbacks.Compact ();
+  for (size_t i = 0; i < step_callbacks.GetSize (); i++)
+  {
+    step_callbacks[i]->Step (elapsed_time);
+  }
+
   // TODO handle fractional total_remaining (interpolate render)
   while (total_elapsed > stepsize)
   {

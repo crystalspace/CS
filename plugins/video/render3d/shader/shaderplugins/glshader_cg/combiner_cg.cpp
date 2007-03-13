@@ -29,6 +29,7 @@
 #include "csplugincommon/shader/weavertypes.h"
 #include "csutil/documenthelper.h"
 #include "csutil/fifo.h"
+#include "csutil/scfstr.h"
 #include "csutil/set.h"
 #include "csutil/xmltiny.h"
 
@@ -378,12 +379,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
         // Search for direct match
 	for (size_t i = 0; i < items->GetSize(); i++)
 	{
-	  if (items->Get (i).toType == to)
+          const CoerceItem& item = items->Get (i);
+	  if (item.toType == to)
 	  {
 	    // Generate chain
 	    size_t d = testFrom.depth+1;
-	    chain.SetSize (d);
-            chain[d--] = testFrom.item;
+	    chain.SetSize (d+1);
+            chain[d] = &item;
+            chain[--d] = testFrom.item;
 	    size_t h = testFrom.hierarchy;
 	    while (d-- > 0)
 	    {
@@ -395,7 +398,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 	  else
 	  {
 	    // Otherwise, search if no match is found.
-	    const CoerceItem& item = items->Get (i);
 	    sourcesToTest.Push (TestSource<CoerceItem> (item,
 	      testFrom.depth+1, 
 	      hierarchy.Push (Hierarchy<CoerceItem> (&item, 
@@ -493,9 +495,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     {
       destNodes = &currentSnippet.fragmentIn;
     }
-    else if (strcmp (location, "includes") == 0)
+    else if (strcmp (location, "definitions") == 0)
     {
-      destNodes = &includes;
+      destNodes = &definitions;
     }
     
     if (destNodes != 0)
@@ -563,10 +565,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       
       DocNodeAppender appender (programNode);
 
-      if (includes.GetSize() > 0)
+      if (definitions.GetSize() > 0)
       {
         appender.Append ("\n");
-        appender.Append (includes);
+        appender.Append (definitions);
         appender.Append ("\n");
       }
       
@@ -575,7 +577,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       appender.Append ("  void dummy() {}\n");
       for (size_t s = 0; s < snippets.GetSize(); s++)
       {
-        appender.Append (snippets[s].vert2frag);
+        AppendProgramInput (snippets[s].vert2frag, appender);
       }
       
       appender.Append ("};\n\n");
@@ -641,10 +643,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       
       DocNodeAppender appender (programNode);
       
-      if (includes.GetSize() > 0)
+      if (definitions.GetSize() > 0)
       {
         appender.Append ("\n");
-        appender.Append (includes);
+        appender.Append (definitions);
         appender.Append ("\n");
       }
       
@@ -653,7 +655,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       appender.Append ("  void dummy() {}\n");
       for (size_t s = 0; s < snippets.GetSize(); s++)
       {
-        appender.Append (snippets[s].vert2frag);
+        AppendProgramInput (snippets[s].vert2frag, appender);
       }
       
       appender.Append ("};\n\n");
@@ -700,6 +702,56 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     return true;
   }
     
+  csRef<iString> ShaderCombinerCg::QueryInputTag (const char* location, 
+                                                  iDocumentNode* blockNode)
+  {
+    csRef<iString> result;
+    /* @@@ FIXME: Also check vertexToFragment? */
+    if ((strcmp (location, "vertexIn") == 0)
+      || (strcmp (location, "fragmentIn") == 0))
+    {
+      csRef<iDocumentNodeIterator> nodes = blockNode->GetNodes();
+      while (nodes->HasNext())
+      {
+        csRef<iDocumentNode> node = nodes->Next();
+        if (node->GetType() != CS_NODE_ELEMENT) continue;
+
+        csStringID id = loader->xmltokens.Request (node->GetValue());
+        if ((id == ShaderCombinerLoaderCg::XMLTOKEN_UNIFORM)
+          || (id == ShaderCombinerLoaderCg::XMLTOKEN_VARYING))
+        {
+          const char* binding = node->GetAttributeValue ("binding");
+          if (!binding || !*binding) continue;
+          // For now only support 1 tag...
+          if (result.IsValid() 
+            && (strcmp (result->GetData(), binding) != 0)) return 0;
+          result.AttachNew (new scfString (binding));
+        }
+      }
+    }
+    else if (strcmp (location, "variablemap") == 0)
+    {
+      csRef<iDocumentNodeIterator> nodes = blockNode->GetNodes();
+      while (nodes->HasNext())
+      {
+        csRef<iDocumentNode> node = nodes->Next();
+        if (node->GetType() != CS_NODE_ELEMENT) continue;
+
+        csStringID id = loader->xmltokens.Request (node->GetValue());
+        if (id == ShaderCombinerLoaderCg::XMLTOKEN_VARIABLEMAP)
+        {
+          const char* variable = node->GetAttributeValue ("variable");
+          if (!variable || !*variable) continue;
+          // For now only support 1 tag...
+          if (result.IsValid() 
+            && (strcmp (result->GetData(), variable) != 0)) return 0;
+          result.AttachNew (new scfString (variable));
+        }
+      }
+    }
+    return result;
+  }
+
   void ShaderCombinerCg::AppendProgramInput (
     const csRefArray<iDocumentNode>& nodes,
     DocNodeAppender& appender)
@@ -751,10 +803,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       switch (typeInfo->baseType)
       {
 	case ShaderWeaver::TypeInfo::Vector:
-	  if (typeInfo->dimensions == 1)
-	    return "float";
-	  else
-	    return csString().Format ("float%d", typeInfo->dimensions);
+	case ShaderWeaver::TypeInfo::VectorB:
+	case ShaderWeaver::TypeInfo::VectorI:
+          {
+            static const char* const baseTypeStrs[] = 
+            { "float", "bool", "int" };
+            const char* baseTypeStr = baseTypeStrs[typeInfo->baseType -
+              ShaderWeaver::TypeInfo::Vector];
+	    if (typeInfo->dimensions == 1)
+	      return baseTypeStr;
+	    else
+	      return csString().Format ("%s%d", baseTypeStr, typeInfo->dimensions);
+          }
 	case ShaderWeaver::TypeInfo::Sampler:
 	  if (typeInfo->samplerIsCube)
 	    return "samplerCUBE";

@@ -26,7 +26,6 @@
 
 #include "csutil/documenthelper.h"
 #include "csutil/scopeddelete.h"
-#include "csutil/xmltiny.h"
 
 #include "snippet.h"
 #include "weaver.h"
@@ -51,16 +50,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       return storage;
     }
   };
-
-  /*bool Snippet::Technique::HasOutput (const char* name) const
-  {
-    for (size_t o = 0; o < outputs.GetSize(); o++)
-    {
-      if (strcmp (outputs[o].name, name) == 0)
-        return true;
-    }
-    return false;
-  }*/
 
   //-------------------------------------------------------------------
 
@@ -119,12 +108,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   Snippet::Technique* Snippet::LoadLibraryTechnique (WeaverCompiler* compiler, 
     iDocumentNode* node, const Technique::CombinerPlugin& combiner)
   {
-    Snippet::AtomTechnique* technique = ParseAtomTechnique (compiler, node);
+    Snippet::AtomTechnique* technique = 
+      ParseAtomTechnique (compiler, node, true, combiner.name);
     technique->combiner = combiner;
-    for (size_t b = 0; b < technique->blocks.GetSize(); b++)
-    {
-      technique->blocks[b].combinerName = combiner.name;
-    }
     return technique;
   }
   
@@ -175,13 +161,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   
   void Snippet::LoadAtomTechnique (iDocumentNode* node)
   {
-    AtomTechnique* newTech = ParseAtomTechnique (compiler, node);
+    AtomTechnique* newTech = ParseAtomTechnique (compiler, node, false);
     if (newTech != 0)
       techniques.InsertSorted (newTech, &CompareTechnique);
   }
   
   Snippet::AtomTechnique* Snippet::ParseAtomTechnique (
-    WeaverCompiler* compiler, iDocumentNode* node)
+    WeaverCompiler* compiler, iDocumentNode* node, bool canOmitCombiner,
+    const char* defaultCombinerName)
   {
     AtomTechnique newTech (
       csMD5::Encode (CS::DocumentHelper::FlattenNode (node)));
@@ -225,6 +212,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  hasCombiner = true;
 	}
       }
+      if (!canOmitCombiner && !hasCombiner)
+      {
+	compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
+	  "Technique without 'combiner' node");
+        return 0;
+      }
     }
     
     {
@@ -235,32 +228,60 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	if (child->GetType() != CS_NODE_ELEMENT) continue;
 	
 	Technique::Input newInput;
-	newInput.name = child->GetAttributeValue ("name");
+        const char* condition = child->GetAttributeValue ("condition");
+        newInput.condition = condition;
+        if (child->GetAttributeValueAsBool ("private"))
+          newInput.flags |= Technique::Input::flagPrivate;
+        if (child->GetAttributeValueAsBool ("forcenomerge"))
+          newInput.flags |= Technique::Input::flagNoMerge;
+
+        csRef<iDocumentNode> inputNode;
+
+        const char* filename = child->GetAttributeValue ("file");
+        if (filename != 0)
+        {
+          csRef<iDocumentNode> rootNode = 
+            compiler->LoadDocumentFromFile (filename, child);
+          if (!rootNode.IsValid()) return 0;
+        
+          inputNode = rootNode->GetNode ("input");
+          if (!inputNode.IsValid())
+          {
+	    compiler->Report (CS_REPORTER_SEVERITY_WARNING,
+	      "Expected 'input' node in file '%s'", filename);
+	    return 0;
+          }
+        }
+        else
+          inputNode = child;
+
+	newInput.name = inputNode->GetAttributeValue ("name");
 	if (newInput.name.IsEmpty())
 	{
-	  compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
+	  compiler->Report (CS_REPORTER_SEVERITY_WARNING, inputNode,
 	    "'input' node without 'name' attribute");
 	  return 0;
 	}
-	newInput.type = child->GetAttributeValue ("type");
+	newInput.type = inputNode->GetAttributeValue ("type");
 	if (newInput.type.IsEmpty())
 	{
-	  compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
+	  compiler->Report (CS_REPORTER_SEVERITY_WARNING, inputNode,
 	    "'input' node without 'type' attribute");
 	  return 0;
 	}
-	const char* def = child->GetAttributeValue ("default");
+	const char* def = inputNode->GetAttributeValue ("default");
 	if (def != 0)
 	{
 	  if (strcmp (def, "complex") == 0)
 	  {
 	    newInput.defaultType = Technique::Input::Complex;
-	    if (!ReadBlocks (compiler, child, newInput.complexBlocks))
+	    if (!ReadBlocks (compiler, inputNode, newInput.complexBlocks, 
+                defaultCombinerName))
 	      return 0;
 	  }
 	  else
 	  {
-	    compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
+	    compiler->Report (CS_REPORTER_SEVERITY_WARNING, inputNode,
 	      "Invalid 'default' attribute for 'input' node: %s", def);
 	  }
 	}
@@ -296,7 +317,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       }
       
       csArray<Technique::Block> newBlocks;
-      if (!ReadBlocks (compiler, node, newBlocks))
+      if (!ReadBlocks (compiler, node, newBlocks, defaultCombinerName))
         return 0;
       for (size_t b = 0; b < newBlocks.GetSize(); b++)
         newTech.AddBlock (newBlocks[b]);
@@ -305,7 +326,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
   
   bool Snippet::ReadBlocks (WeaverCompiler* compiler, iDocumentNode* node, 
-		            csArray<Technique::Block>& blocks)
+		            csArray<Technique::Block>& blocks,
+                            const char* defaultCombinerName)
   {
     csRef<iDocumentNodeIterator> nodes = node->GetNodes ("block");
     while (nodes->HasNext ())
@@ -329,7 +351,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         newBlock.location = location.Slice (colon + 1);
       }
       else
+      {
+        newBlock.combinerName = defaultCombinerName;
         newBlock.location = location;
+      }
       newBlock.node = child;
       
       blocks.Push (newBlock);
@@ -360,14 +385,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
             LoadCompoundTechnique (child);
           }
           break;
-#if 0
-	case WeaverCompiler::XMLTOKEN_FALLBACKSHADER:
-	  /* Bit of a hack: the "main" shader is treated like a compound 
-	   * snippet. It can contain a <fallbackshader> which should not
-	   * result in an error ...
-	   */
-	  if (topLevel) break;
-#endif
         default:
           compiler->synldr->ReportBadToken (child);
       }
@@ -376,7 +393,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   
   void Snippet::LoadCompoundTechnique (iDocumentNode* node)
   {
-    CompoundTechnique newTech;
+    CompoundTechnique* newTech = new CompoundTechnique;
   
     csRef<iDocumentNodeIterator> nodes = node->GetNodes ();
     while (nodes->HasNext ())
@@ -389,17 +406,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       {
         case WeaverCompiler::XMLTOKEN_COMBINER:
           {
-            HandleCombinerNode (newTech, child);
+            HandleCombinerNode (*newTech, child);
           }
           break;
         case WeaverCompiler::XMLTOKEN_SNIPPET:
           {
-            HandleSnippetNode (newTech, child);
+            HandleSnippetNode (*newTech, child);
           }
           break;
 	case WeaverCompiler::XMLTOKEN_CONNECTION:
 	  {
-	    HandleConnectionNode (newTech, child);
+	    HandleConnectionNode (*newTech, child);
 	  }
 	  break;
         default:
@@ -407,7 +424,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       }
     }
     
-    techniques.Push (new CompoundTechnique (newTech));
+    techniques.Push (newTech);
   }
   
   void Snippet::HandleSnippetNode (CompoundTechnique& tech,
@@ -432,28 +449,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     const char* filename = node->GetAttributeValue ("file");
     if (filename != 0)
     {
-      csRef<iFile> file = compiler->vfs->Open (filename, VFS_FILE_READ);
-      if (!file)
-      {
-	compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	  "Unable to open snippet program file '%s'", filename);
-	return;
-      }
-      csRef<iDocumentSystem> docsys (
-	csQueryRegistry<iDocumentSystem> (compiler->objectreg));
-      if (docsys == 0)
-	docsys.AttachNew (new csTinyDocumentSystem ());
+      csRef<iDocumentNode> rootNode = 
+        compiler->LoadDocumentFromFile (filename, node);
+      if (!rootNode.IsValid()) return;
     
-      csRef<iDocument> doc = docsys->CreateDocument ();
-      const char* err = doc->Parse (file);
-      if (err != 0)
-      {
-	compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	  "Unable to parse snippet file '%s': %s", filename, err);
-	return;
-      }
-    
-      snippetNode = doc->GetRoot ()->GetNode ("snippet");
+      snippetNode = rootNode->GetNode ("snippet");
       if (!snippetNode.IsValid())
       {
 	compiler->Report (CS_REPORTER_SEVERITY_WARNING,
@@ -534,6 +534,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
   
   //-------------------------------------------------------------------
+
+  Snippet::CompoundTechnique::~CompoundTechnique()
+  {
+    IdSnippetHash::GlobalIterator it (snippets.GetIterator());
+    while (it.HasNext())
+    {
+      Snippet* snip = it.Next();
+      delete snip;
+    }
+  }
+
   void Snippet::CompoundTechnique::AddSnippet (const char* id, 
                                                Snippet* snippet)
   {
@@ -568,18 +579,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   void TechniqueGraph::AddTechnique (const Snippet::Technique* tech)
   {
     techniques.Push (tech);
+    inTechniques.Push (tech);
     outTechniques.Push (tech);
   }
   
   void TechniqueGraph::AddConnection (const Connection& conn)
   {
     connections.Push (conn);
+    inTechniques.Delete (conn.to);
     outTechniques.Delete (conn.from);
   }
 
   void TechniqueGraph::RemoveConnection (const Connection& conn)
   {
     connections.Delete (conn);
+    // @@@ FIXME: is re-adding to inTechniques/outTechniques needed?
   }
 
   void TechniqueGraph::Merge (const TechniqueGraph& other)
@@ -642,6 +656,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       const Snippet::Technique* tech = techIter->Next();
       if (tech->IsCompound ())
       {
+        csArray<GraphInfo> techGraphs;
         const Snippet::CompoundTechnique* compTech =
           static_cast<const Snippet::CompoundTechnique*> (tech);
 	// Each sub-snippet ...
@@ -650,9 +665,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	while (snippetIter.HasNext())
 	{
 	  Snippet* snippet = snippetIter.Next ();
-	  if (graphs.GetSize() == 0)
+	  if (techGraphs.GetSize() == 0)
 	  {
-	    BuildSubGraphs (snippet, graphs);
+	    BuildSubGraphs (snippet, techGraphs);
 	  }
 	  else
 	  {
@@ -664,22 +679,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	     * the technique into each. */
 	    for (size_t g = 0; g < newGraphs.GetSize(); g++)
 	    {
-	      for (size_t g2 = 0; g2 < graphs.GetSize(); g2++)
+	      for (size_t g2 = 0; g2 < techGraphs.GetSize(); g2++)
 	      {
-		GraphInfo graphMerged (graphs[g2]);
+		GraphInfo graphMerged (techGraphs[g2]);
 		graphMerged.Merge (newGraphs[g]);
 		graphs2.Push (graphMerged);
 	      }
 	    }
-	    graphs = graphs2;
+	    techGraphs = graphs2;
 	  }
 	}
 	/* Apply connections.
 	 * Connect "out" techs to "in" techs.
 	 */
-	for (size_t g = 0; g < graphs.GetSize(); g++)
+	for (size_t g = 0; g < techGraphs.GetSize(); g++)
 	{
-	  GraphInfo& graphInfo = graphs[g];
+	  GraphInfo& graphInfo = techGraphs[g];
 	  for (size_t c = 0; c < compTech->connections.GetSize(); c++)
 	  {
 	    TechniqueGraph::Connection newConn;
@@ -699,18 +714,50 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	    }
 	  }
 	}
+        // Add all the graphs for the technique to the complete graph list
+        for (size_t g = 0; g < techGraphs.GetSize(); g++)
+          graphs.Push (techGraphs[g]);
       }
       else
       {
 	GraphInfo graphInfo;
-	graphInfo.snippetToTechIn.PutUnique (snip, tech);
-	graphInfo.snippetToTechOut.PutUnique (snip, tech);
 	graphInfo.graph.AddTechnique (tech);
 	graphs.Push (graphInfo);
       }
     }
+    MapGraphInputsOutputs (graphs, snip);
+  }
+
+  void TechniqueGraphBuilder::MapGraphInputsOutputs (GraphInfo& graphInfo, 
+                                                     const Snippet* snip)
+  {
+    {
+      csArray<const Snippet::Technique*> inTechs;
+      graphInfo.graph.GetInputTechniques (inTechs);
+      for (size_t t = 0; t < inTechs.GetSize(); t++)
+      {
+        graphInfo.snippetToTechIn.PutUnique (snip, inTechs[t]);
+      }
+    }
+    {
+      csArray<const Snippet::Technique*> outTechs;
+      graphInfo.graph.GetOutputTechniques (outTechs);
+      for (size_t t = 0; t < outTechs.GetSize(); t++)
+      {
+        graphInfo.snippetToTechOut.PutUnique (snip, outTechs[t]);
+      }
+    }
   }
       
+  void TechniqueGraphBuilder::MapGraphInputsOutputs (
+    csArray<GraphInfo>& graphs, const Snippet* snip)
+  {
+    for (size_t g = 0; g < graphs.GetSize(); g++)
+    {
+      MapGraphInputsOutputs (graphs[g], snip);
+    }
+  }
+
   void TechniqueGraphBuilder::BuildGraphs (const Snippet* snip, 
                                            csArray<TechniqueGraph>& graphs)
   {

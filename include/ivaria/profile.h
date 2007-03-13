@@ -158,10 +158,14 @@ struct iProfiler : public virtual iBase
 
   /**
    * Start logging profiling data to file.
-   * \param filenamebase path and basic portion of filename. This will be 
-   * postfixed with an unique id for every logging session.
+   * \param filenamebase Path and basic portion of filename. This will be 
+   *   postfixed with an unique id for every logging session.
+   * \param objreg Object registry. If none is given, or the given object
+   *  registry does not contain an iVFS instance, \a filenamebase is treated
+   *  as a native path.
    */
-  virtual void StartLogging (const char* filenamebase, iObjectRegistry* objreg) = 0;
+  virtual void StartLogging (const char* filenamebase, 
+    iObjectRegistry* objreg) = 0;
 
   /**
    * Stop logging.

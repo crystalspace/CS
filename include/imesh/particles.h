@@ -38,6 +38,9 @@ struct iParticleSystemBase;
 /**\addtogroup meshplugins
  * @{ */
 
+/**\name Particle systems
+ * @{ */
+
 /**
  * Sorting modes for particle renderer
  */
@@ -505,10 +508,9 @@ struct iParticleSystem : public iParticleSystemBase
   virtual void Advance (csTicks time) = 0;
 };
 
-
 /** @} */
 
-/**\addtogroup defaultemitters
+/**\name Default particle system emitters
 * @{ */
 
 /// Set where in the emitter the builtin emitters should spawn their particles
@@ -642,7 +644,7 @@ struct iParticleBuiltinEmitterFactory : public virtual iBase
 
 /** @} */
 
-/**\addtogroup defaulteffectors
+/**\name Default particle system effectors
 * @{ */
 
 /**
@@ -807,6 +809,8 @@ struct iParticleBuiltinEffectorFactory : public virtual iBase
   virtual csPtr<iParticleBuiltinEffectorLinColor> CreateLinColor () const = 0;
   virtual csPtr<iParticleBuiltinEffectorVelocityField> CreateVelocityField () const = 0;
 };
+
+/** @} */
 
 /** @} */
 

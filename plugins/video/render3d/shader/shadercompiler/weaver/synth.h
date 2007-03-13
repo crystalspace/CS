@@ -20,6 +20,7 @@
 #define __CS_SYNTH_H__
 
 #include "csplugincommon/shader/weavercombiner.h"
+#include "csutil/blockallocator.h"
 #include "csutil/strhash.h"
 
 #include "snippet.h"
@@ -59,9 +60,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         csHash<csString, csString> inputRenames;
         csHash<csString, csString> outputRenames;
       };
-      typedef csArray<Node> NodeArray;
+      typedef csArray<Node*> NodeArray;
     private:
       size_t renameNr;
+      csBlockAllocator<Node> nodeAlloc;
       NodeArray nodes;
       csHash<size_t, csConstPtrKey<Snippet::Technique> > techToNode;
       /// Techs created in an augmentation, to be cleaned up later
@@ -82,7 +84,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         const Snippet::Technique* inTech, const char* inName,
         const Snippet::Technique* outTech, LinkHash& links);
       const Node& GetNodeForTech (const Snippet::Technique* tech)
-      { return nodes[techToNode.Get (tech, csArrayItemNotFound)]; }
+      { return *nodes[techToNode.Get (tech, csArrayItemNotFound)]; }
+
+      void ReverseNodeArray();
       
       void Rebuild (const TechniqueGraph& graph,
         const csArray<const Snippet::Technique*>& outputs);
@@ -100,12 +104,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         {
           if (reverse)
           {
-            while ((nextItem >= 1) && (array[nextItem-1].tech == 0))
+            while ((nextItem >= 1) && (array[nextItem-1]->tech == 0))
               nextItem--;
           }
           else
           {
-            while ((nextItem < array.GetSize()) && (array[nextItem].tech == 0))
+            while ((nextItem < array.GetSize()) && (array[nextItem]->tech == 0))
               nextItem++;
           }
         }
@@ -120,9 +124,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         { return reverse ? (nextItem > 0) : (nextItem < array.GetSize()); }
         const Node& Next()
         { 
-          const Node& val = reverse ? array[--nextItem] : array[nextItem++];
+          const Node* val = reverse ? array[--nextItem] : array[nextItem++];
           SeekNext();
-          return val; 
+          return *val; 
         }
       };
     };
@@ -146,6 +150,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       const Snippet::Technique::CombinerPlugin& comb,
       const Snippet::Technique::CombinerPlugin& requested,
       const char* requestedName);
+
+    csString GetInputTag (CS::PluginCommon::ShaderWeaver::iCombiner* combiner,
+      const Snippet::Technique::CombinerPlugin& comb,
+      const Snippet::Technique::CombinerPlugin& combTech,
+      const Snippet::Technique::Input& input);
+    /// Structure to track what default inputs to emit.
+    struct EmittedInput
+    {
+      const SynthesizeNodeTree::Node* node;
+      const Snippet::Technique::Input* input;
+      csArray<csString> conditions;
+    };
   public:
     WeaverCompiler* compiler;
   

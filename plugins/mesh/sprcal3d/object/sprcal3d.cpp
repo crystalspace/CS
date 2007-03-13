@@ -32,6 +32,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/memfile.h"
 #include "csutil/randomgen.h"
+#include "csutil/hash.h"
 #include "csutil/sysfunc.h"
 #include "cstool/rbuflock.h"
 
@@ -233,6 +234,7 @@ bool csSpriteCal3DMeshObjectFactory::LoadCoreSkeleton (iVFS *vfs,
     if (skel)
     {
       calCoreModel.setCoreSkeleton (skel.get());
+      skel_factory->SetSkeleton (skel.get());
       return true;
     }
     else
@@ -704,7 +706,7 @@ void csSpriteCal3DMeshObjectFactory::HardTransform (
 //  calCoreModel.getCoreSkeleton()->calculateBoundingBoxes(&calCoreModel);
 }
 
-//=============================================================================
+//---------------------------csCal3dSkeletonFactory---------------------------
 
 csCal3dSkeletonFactory::csCal3dSkeletonFactory () :
 scfImplementationType(this), core_skeleton(0) 
@@ -718,6 +720,48 @@ void csCal3dSkeletonFactory::SetSkeleton (CalCoreSkeleton *skeleton)
   {
     bones_factories.Push (new csCal3dSkeletonBoneFactory (bvect[i], this));
   }
+
+  //now we can setup parents and childres
+  for (size_t i = 0; i < bvect.size (); i++)
+  {
+    bones_factories[i]->Initialize ();
+    bones_names.Put (csHashComputer<const char*>::ComputeHash (bones_factories[i]->GetName ()), i);
+  }
+}
+size_t csCal3dSkeletonFactory::FindBoneIndex (const char *name)
+{
+  csArray<size_t> b_idx = bones_names.GetAll (csHashComputer<const char*>::ComputeHash (name));
+  if (b_idx.GetSize () > 0)
+    return b_idx[0];
+  return csArrayItemNotFound;
+}
+iSkeletonBoneFactory *csCal3dSkeletonFactory::FindBone (const char *name)
+{
+  csArray<size_t> b_idx = bones_names.GetAll (csHashComputer<const char*>::ComputeHash (name));
+  if (b_idx.GetSize () > 0)
+    return bones_factories[b_idx[0]];
+  return 0;
+}
+//---------------------------csCal3dSkeletonBoneFactory---------------------------
+
+csCal3dSkeletonBoneFactory::csCal3dSkeletonBoneFactory (CalCoreBone *core_bone,
+                                                        csCal3dSkeletonFactory* skelfact) :
+scfImplementationType(this), core_bone(core_bone), skeleton_factory(skelfact) 
+{
+}
+bool csCal3dSkeletonBoneFactory::Initialize ()
+{
+  std::list<int> children_ids = core_bone->getListChildId ();
+  for (std::list<int>::iterator it = children_ids.begin (); it != children_ids.end (); it++)
+  {
+    csRef<iSkeletonBoneFactory> skel_bone = skeleton_factory->GetBone ((*it));
+    children.Push (skel_bone);
+  }
+  int bid = core_bone->getParentId ();
+  if (bid != -1)
+    parent = skeleton_factory->GetBone (bid);
+  
+  return false;
 }
 
 //=============================================================================
@@ -774,7 +818,6 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
 
   anim_time_handler.AttachNew (new DefaultAnimTimeUpdateHandler());
   calModel.getPhysique()->setAxisFactorX(-1.0f);
-  skeleton.AttachNew (new csCal3dSkeleton (calModel.getSkeleton ()));
 }
 
 csSpriteCal3DMeshObject::~csSpriteCal3DMeshObject ()
@@ -787,17 +830,17 @@ void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
 {
   factory = tmpl;
 
-  CalSkeleton *skeleton;
+  CalSkeleton *cal_skeleton;
   CalBone *bone;
-  skeleton = calModel.getSkeleton();
-  std::vector < CalBone *> &bones = skeleton->getVectorBone();
-  int i;
-  for (i=0; i < (int)bones.size(); i++)
+  cal_skeleton = calModel.getSkeleton();
+  std::vector < CalBone *> &bones = cal_skeleton->getVectorBone();
+
+  for (size_t i = 0; i < bones.size(); i++)
   {
     bone = bones[i];
     bone->calculateState ();
   }
-  skeleton->calculateState ();
+  cal_skeleton->calculateState ();
 
   // attach all default meshes to the model
   int meshId;
@@ -823,7 +866,7 @@ void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
 
   // Copy the sockets list down to the mesh
   iSpriteCal3DSocket *factory_socket,*new_socket;
-  for (i=0; i<tmpl->GetSocketCount(); i++)
+  for (int i = 0; i < tmpl->GetSocketCount(); i++)
   {
     factory_socket = tmpl->GetSocket(i);
     new_socket = AddSocket();  // mesh now
@@ -833,6 +876,8 @@ void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
     new_socket->SetMeshIndex (factory_socket->GetMeshIndex() );
     new_socket->SetMeshWrapper (0);
   }
+
+  skeleton = new csCal3dSkeleton (cal_skeleton, factory->skel_factory);
 }
 
 
@@ -1499,6 +1544,8 @@ bool csSpriteCal3DMeshObject::Advance (csTicks current_time)
   // @@@ Optimization: Only when some animation or so is actually playing?
   if (anim_time_handler.IsValid())
     anim_time_handler->UpdatePosition (delta, &calModel);
+
+  skeleton->UpdateNotify (current_time);
 
   if (current_time)
     last_update_time = current_time;
@@ -2222,10 +2269,101 @@ void csSpriteCal3DMeshObject::MeshAccessor::PreGetBuffer
     meshobj->factory->DefaultGetBuffer (mesh, holder, buffer);
 }
 
-//----------------------------------------------------------------------
-csCal3dSkeleton::csCal3dSkeleton (CalSkeleton* skeleton) :
-scfImplementationType(this), skeleton(skeleton) 
+//---------------------------csCal3dSkeleton---------------------------
+csCal3dSkeleton::csCal3dSkeleton (CalSkeleton* skeleton, csCal3dSkeletonFactory* skel_factory) :
+scfImplementationType(this), skeleton(skeleton), skeleton_factory (skel_factory) 
 {
+  std::vector<CalBone*> cal_bones = skeleton->getVectorBone ();
+  for (size_t i = 0; i < cal_bones.size (); i++)
+  {
+    bones.Push (new csCal3dSkeletonBone (cal_bones[i], skel_factory->GetBone (i), this));
+  }
+  for (size_t i = 0; i < cal_bones.size (); i++)
+  {
+    bones[i]->Initialize ();
+    bones_names.Put (csHashComputer<const char*>::ComputeHash (bones[i]->GetName ()), i);
+  }
+}
+
+void csCal3dSkeleton::UpdateNotify (const csTicks &current_ticks)
+{
+  for (size_t i = 0; i < update_callbacks.GetSize (); i++)
+  {
+    update_callbacks[i]->Execute (this, current_ticks);
+  }
+}
+size_t csCal3dSkeleton::FindBoneIndex (const char *name)
+{
+  csArray<size_t> b_idx = bones_names.GetAll (csHashComputer<const char*>::ComputeHash (name));
+  if (b_idx.GetSize () > 0)
+    return b_idx[0];
+  return csArrayItemNotFound;
+}
+iSkeletonBone *csCal3dSkeleton::FindBone (const char *name)
+{
+  csArray<size_t> b_idx = bones_names.GetAll (csHashComputer<const char*>::ComputeHash (name));
+  if (b_idx.GetSize () > 0)
+    return bones[b_idx[0]];
+  return 0;
+}
+//---------------------------csCal3dSkeletonBone---------------------------
+
+csCal3dSkeletonBone::csCal3dSkeletonBone (CalBone *bone, iSkeletonBoneFactory *factory,
+                                          csCal3dSkeleton *skeleton) :
+scfImplementationType(this), bone(bone), factory(factory), skeleton(skeleton) 
+{
+}
+bool csCal3dSkeletonBone::Initialize ()
+{
+  std::list<int> children_ids = bone->getCoreBone ()->getListChildId ();
+  for (std::list<int>::iterator it = children_ids.begin (); it != children_ids.end (); it++)
+  {
+    csRef<iSkeletonBone> skel_bone = skeleton->GetBone ((*it));
+    children.Push (skel_bone);
+  }
+  int bid = bone->getCoreBone ()->getParentId ();
+  if (bid != -1)
+    parent = skeleton->GetBone (bid);
+
+  name = bone->getCoreBone ()->getName ().c_str ();
+
+  return true;
+}
+csReversibleTransform &csCal3dSkeletonBone::GetFullTransform ()
+{
+  CalQuaternion quat = bone->getRotationAbsolute ();
+  csQuaternion csquat (quat.x, quat.y, quat.z, quat.w);
+  csMatrix3 mat (csquat);
+
+  CalVector calv = bone->getTranslationAbsolute (); 
+  csVector3 csv (calv[0], calv[1], calv[2]); 
+
+  global_transform = csReversibleTransform (mat, csv); 
+  return global_transform;
+}
+csReversibleTransform &csCal3dSkeletonBone::GetTransform ()
+{
+  CalQuaternion quat = bone->getRotation();
+  csQuaternion csquat (quat.x, quat.y, quat.z, quat.w);
+  csMatrix3 mat (csquat);
+
+  CalVector calv = bone->getTranslation(); 
+	csVector3 csv (calv[0], calv[1], calv[2]); 
+  
+  local_transform = csReversibleTransform (mat, csv);
+  return local_transform;
+}
+
+void csCal3dSkeletonBone::SetTransform (const csReversibleTransform &transform)
+{
+  csQuaternion csquat;
+  csquat.SetMatrix (transform.GetO2T ());
+  csquat = csquat.Unit ();
+  CalQuaternion quat (csquat.v.x, csquat.v.y, csquat.v.z, csquat.w);
+  bone->setRotation (quat);
+  csVector3 vect = transform.GetOrigin();
+  bone->setTranslation (CalVector (vect[0], vect[1], vect[2]));
+  local_transform = transform;
 }
 
 //----------------------------------------------------------------------

@@ -950,9 +950,7 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
         ->SetValue("localshadows");
 
     //Writedown ManualColor tag
-    if (gfact->IsManualColors())
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)
-        ->SetValue("manualcolors");
+    synldr->WriteBool(paramsNode, "manualcolors", gfact->IsManualColors(), false);
 
     //Writedown AnimationControl tag
     iGenMeshAnimationControlFactory* aniconfact = 
@@ -1505,8 +1503,8 @@ bool csGeneralMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     synldr->WriteColor(colorNode, col);
 
     //Writedown ManualColor tag
-    synldr->WriteBool(paramsNode, "manualcolors",
-                      gmesh->IsManualColors(), true);
+    synldr->WriteBool(paramsNode, "manualcolors", gmesh->IsManualColors(), 
+      gfact->IsManualColors());
 
     //Writedown Material tag
     iMaterialWrapper* mat = mesh->GetMaterialWrapper();

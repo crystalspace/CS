@@ -32,6 +32,7 @@
 #include "ivaria/reporter.h"
 
 #include "csutil/cfgacc.h"
+#include "csutil/xmltiny.h"
 
 #include "weaver.h"
 #include "shader.h"
@@ -77,6 +78,33 @@ void WeaverCompiler::Report (int severity, iDocumentNode* node,
   
   synldr->Report ("crystalspace.graphics3d.shadercompiler.weaver",
     severity, node, "%s", str.GetData());
+}
+
+csPtr<iDocumentNode> WeaverCompiler::LoadDocumentFromFile (
+  const char* filename, iDocumentNode* node)
+{
+  csRef<iFile> file = vfs->Open (filename, VFS_FILE_READ);
+  if (!file)
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING, node,
+      "Unable to open file '%s'", filename);
+    return 0;
+  }
+  csRef<iDocumentSystem> docsys (
+    csQueryRegistry<iDocumentSystem> (objectreg));
+  if (docsys == 0)
+    docsys.AttachNew (new csTinyDocumentSystem ());
+
+  csRef<iDocument> doc = docsys->CreateDocument ();
+  const char* err = doc->Parse (file);
+  if (err != 0)
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING, node,
+      "Unable to parse file '%s': %s", filename, err);
+    return 0;
+  }
+
+  return csPtr<iDocumentNode> (doc->GetRoot ());
 }
 
 bool WeaverCompiler::Initialize (iObjectRegistry* object_reg)

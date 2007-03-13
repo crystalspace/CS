@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000-2004 by Jorrit Tyberghein
+    Copyright (C) 2000-2007 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -22,6 +22,7 @@
 #include "igeom/clip2d.h"
 #include "plugins/engine/3d/sector.h"
 #include "plugins/engine/3d/meshobj.h"
+#include "plugins/engine/3d/meshfact.h"
 #include "plugins/engine/3d/meshlod.h"
 #include "plugins/engine/3d/light.h"
 #include "plugins/engine/3d/engine.h"
@@ -32,7 +33,6 @@
 
 
 CS_LEAKGUARD_IMPLEMENT (csMeshWrapper);
-CS_LEAKGUARD_IMPLEMENT (csMeshFactoryWrapper);
 
 // ---------------------------------------------------------------------------
 
@@ -144,7 +144,7 @@ csMeshWrapper::csMeshWrapper (csEngine* engine, iMeshObject *meshobj)
   }
   factory = 0;
   zbufMode = CS_ZBUF_USE;
-  imposter_active = false;
+  //imposter_active = false;
   imposter_mesh = 0;
   cast_hardware_shadow = true;
   draw_after_fancy_stuff = false;
@@ -462,7 +462,8 @@ static int compare_light (const void *p1, const void *p2)
   return 0;
 }
 
-const csArray<iLightSectorInfluence*>& csMeshWrapper::GetRelevantLights (
+const csArray<iLightSectorInfluence*>& csMeshWrapper::GetRelevantLights 
+(
     	int maxLights, bool desireSorting)
 {
   bool always_update = relevant_lights_flags.Check (
@@ -587,9 +588,20 @@ const csArray<iLightSectorInfluence*>& csMeshWrapper::GetRelevantLights (
 csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview, 
 					       uint32 frustum_mask)
 {
-  //if (imposter_active && CheckImposterRelevant (rview))
-    //if (DrawImposter (rview))
-      //return;
+  if (factory)
+  {
+    csMeshFactoryWrapper* factwrap = static_cast<csMeshFactoryWrapper*> (
+  	factory);
+    if (factwrap->imposter_active && CheckImposterRelevant (rview))
+    {
+      csRenderMesh** imposter = GetImposter (rview);
+      if (imposter)
+      {
+        n = 1;
+        return imposter;
+      }
+    }
+  }
 
   // Callback are traversed in reverse order so that they can safely
   // delete themselves.
@@ -931,41 +943,29 @@ void csMeshWrapper::AddMeshToStaticLOD (int lod, iMeshWrapper* mesh)
 
 bool csMeshWrapper::CheckImposterRelevant (iRenderView *rview)
 {
+  if (!factory) return false;
+  csMeshFactoryWrapper* factwrap = static_cast<csMeshFactoryWrapper*> (
+  	factory);
   float wor_sq_dist = GetSquaredDistance (rview);
-  float dist = min_imposter_distance->Get ();
+  float dist = factwrap->min_imposter_distance->Get ();
   return (wor_sq_dist > dist*dist);
 }
 
-bool csMeshWrapper::DrawImposter (iRenderView *rview)
+csRenderMesh** csMeshWrapper::GetImposter (iRenderView *rview)
 {
-  // Check for imposter existence.  If not, create it.
-  if (!imposter_mesh)
-  {
-    return false;
-  }
+  csMeshFactoryWrapper* factwrap = static_cast<csMeshFactoryWrapper*> (
+  	factory);
+  csImposterFactory* imposter_factory = factwrap->GetImposterFactory ();
+  if (!imposter_factory) return 0;
 
-  // Check for imposter already ready
-  if (!imposter_mesh->GetImposterReady ())
-    return false;
+  imposter_mesh = imposter_factory->GetImposterMesh (this,
+      imposter_mesh, rview);
+  if (!imposter_mesh) return 0;
+  if (!imposter_mesh->GetImposterReady (rview))
+    return 0;
 
-  // Check for too much camera movement since last imposter render
-  if (!imposter_mesh->CheckIncidenceAngle (rview,
-	imposter_rotation_tolerance->Get ()))
-    return false;
-
-  // Else draw imposter as-is.
-  imposter_mesh->Draw (rview);
-  return true;
-}
-
-void csMeshWrapper::SetImposterActive (bool flag)
-{
-  imposter_active = flag;
-  if (flag)
-  {
-    imposter_mesh = new csImposterMesh (engine, this);
-    imposter_mesh->SetImposterReady (false);
-  }
+  // Get imposter rendermesh
+  return imposter_mesh->GetRenderMesh (rview);
 }
 
 csHitBeamResult csMeshWrapper::HitBeamOutline (
@@ -1362,193 +1362,6 @@ iMeshWrapper* csMeshWrapper::FindChildByName (const char* name)
   return 0;
 }
 
-// ---------------------------------------------------------------------------
-// csMeshFactoryWrapper
-// ---------------------------------------------------------------------------
-
-
-csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine,
-                                            iMeshObjectFactory *meshFact)
-  : scfImplementationType (this), meshFact (meshFact), parent (0),
-  zbufMode (CS_ZBUF_USE), engine (engine)
-{
-  children.SetMeshFactory (this);
-
-  render_priority = engine->GetObjectRenderPriority ();
-}
-
-csMeshFactoryWrapper::csMeshFactoryWrapper (csEngine* engine)
-  : scfImplementationType (this), parent (0), zbufMode (CS_ZBUF_USE), 
-  engine (engine)
-{
-  children.SetMeshFactory (this);
-
-  render_priority = engine->GetObjectRenderPriority ();
-}
-
-csMeshFactoryWrapper::~csMeshFactoryWrapper ()
-{
-  // This line MUST be here to ensure that the children are not
-  // removed after the destructor has already finished.
-  children.RemoveAll ();
-}
-
-void csMeshFactoryWrapper::SelfDestruct ()
-{
-  engine->GetMeshFactories ()->Remove (
-    static_cast<iMeshFactoryWrapper*> (this));
-}
-
-void csMeshFactoryWrapper::SetZBufModeRecursive (csZBufMode mode)
-{
-  SetZBufMode (mode);
-  const iMeshFactoryList* ml = &children;
-  if (!ml) return;
-  int i;
-  for (i = 0 ; i < ml->GetCount () ; i++)
-    ml->Get (i)->SetZBufModeRecursive (mode);
-}
-
-void csMeshFactoryWrapper::SetRenderPriorityRecursive (long rp)
-{
-  SetRenderPriority (rp);
-  const iMeshFactoryList* ml = &children;
-  if (!ml) return;
-  int i;
-  for (i = 0 ; i < ml->GetCount () ; i++)
-    ml->Get (i)->SetRenderPriorityRecursive (rp);
-}
-
-void csMeshFactoryWrapper::SetRenderPriority (long rp)
-{
-  render_priority = rp;
-}
-
-void csMeshFactoryWrapper::SetMeshObjectFactory (iMeshObjectFactory *meshFact)
-{
-  csMeshFactoryWrapper::meshFact = meshFact;
-}
-
-csPtr<iMeshWrapper> csMeshFactoryWrapper::CreateMeshWrapper ()
-{
-  csRef<iMeshObject> basemesh = meshFact->NewInstance ();
-  iMeshWrapper* mesh = 
-    static_cast<iMeshWrapper*> (new csMeshWrapper (engine, basemesh));
-  basemesh->SetMeshWrapper (mesh);
-
-  if (GetName ()) mesh->QueryObject ()->SetName (GetName ());
-  mesh->SetFactory (this);
-  mesh->SetRenderPriority (render_priority);
-  mesh->SetZBufMode (zbufMode);
-  mesh->GetFlags ().Set (flags.Get (), flags.Get ());
-
-  if (static_lod)
-  {
-    iLODControl* lod = mesh->CreateStaticLOD ();
-    iSharedVariable* varm, * vara;
-    static_lod->GetLOD (varm, vara);
-    if (varm)
-    {
-      lod->SetLOD (varm, vara);
-    }
-    else
-    {
-      float m, a;
-      static_lod->GetLOD (m, a);
-      lod->SetLOD (m, a);
-    }
-  }
-
-  int i;
-  for (i = 0; i < children.GetCount (); i++)
-  {
-    iMeshFactoryWrapper *childfact = children.Get (i);
-    csRef<iMeshWrapper> child = childfact->CreateMeshWrapper ();
-    child->QuerySceneNode ()->SetParent (mesh->QuerySceneNode ());
-    child->GetMovable ()->SetTransform (childfact->GetTransform ());
-    child->GetMovable ()->UpdateMove ();
-
-    if (static_lod)
-    {
-      // We have static lod so we need to put the child in the right
-      // lod level.
-      int l;
-      for (l = 0 ; l < static_lod->GetLODCount () ; l++)
-      {
-        csArray<iMeshFactoryWrapper*>& facts_for_lod =
-      	  static_lod->GetMeshesForLOD (l);
-        size_t j;
-	for (j = 0 ; j < facts_for_lod.GetSize () ; j++)
-	{
-	  if (facts_for_lod[j] == childfact)
-	    mesh->AddMeshToStaticLOD (l, child);
-	}
-      }
-    }
-  }
-
-  return csPtr<iMeshWrapper> (mesh);
-}
-
-void csMeshFactoryWrapper::HardTransform (const csReversibleTransform &t)
-{
-  meshFact->HardTransform (t);
-}
-
-iLODControl* csMeshFactoryWrapper::CreateStaticLOD ()
-{
-  static_lod = csPtr<csStaticLODFactoryMesh> (new csStaticLODFactoryMesh ());
-  return static_lod;
-}
-
-void csMeshFactoryWrapper::DestroyStaticLOD ()
-{
-  static_lod = 0;
-}
-
-iLODControl* csMeshFactoryWrapper::GetStaticLOD ()
-{
-  return (iLODControl*)static_lod;
-}
-
-void csMeshFactoryWrapper::SetStaticLOD (float m, float a)
-{
-  if (static_lod) static_lod->SetLOD (m, a);
-}
-
-void csMeshFactoryWrapper::GetStaticLOD (float& m, float& a) const
-{
-  if (static_lod)
-    static_lod->GetLOD (m, a);
-  else
-  {
-    m = 0;
-    a = 0;
-  }
-}
-
-void csMeshFactoryWrapper::RemoveFactoryFromStaticLOD (
-	iMeshFactoryWrapper* fact)
-{
-  if (!static_lod) return;	// No static lod, nothing to do here.
-  int lod;
-  for (lod = 0 ; lod < static_lod->GetLODCount () ; lod++)
-  {
-    csArray<iMeshFactoryWrapper*>& meshes_for_lod =
-    	static_lod->GetMeshesForLOD (lod);
-    meshes_for_lod.Delete (fact);
-  }
-}
-
-void csMeshFactoryWrapper::AddFactoryToStaticLOD (int lod,
-	iMeshFactoryWrapper* fact)
-{
-  if (!static_lod) return;	// No static lod, nothing to do here.
-  csArray<iMeshFactoryWrapper*>& meshes_for_lod =
-  	static_lod->GetMeshesForLOD (lod);
-  meshes_for_lod.Push (fact);
-}
-
 //--------------------------------------------------------------------------
 // csMeshList
 //--------------------------------------------------------------------------
@@ -1712,99 +1525,3 @@ void csMeshMeshList::FreeMesh (iMeshWrapper* item)
 }
 #endif
 
-//--------------------------------------------------------------------------
-// csMeshFactoryList
-//--------------------------------------------------------------------------
-csMeshFactoryList::csMeshFactoryList ()
-  : scfImplementationType (this), list (64, 64)
-{
-  listener.AttachNew (new NameChangeListener (this));
-}
-
-csMeshFactoryList::~csMeshFactoryList ()
-{
-  RemoveAll ();
-}
-
-void csMeshFactoryList::NameChanged (iObject* object, const char* oldname,
-  	const char* newname)
-{
-  csRef<iMeshFactoryWrapper> mesh = 
-    scfQueryInterface<iMeshFactoryWrapper> (object);
-  CS_ASSERT (mesh != 0);
-  if (oldname) factories_hash.Delete (oldname, mesh);
-  if (newname) factories_hash.Put (newname, mesh);
-}
-
-int csMeshFactoryList::Add (iMeshFactoryWrapper *obj)
-{
-  PrepareFactory (obj);
-  const char* name = obj->QueryObject ()->GetName ();
-  if (name)
-    factories_hash.Put (name, obj);
-  obj->QueryObject ()->AddNameChangeListener (listener);
-  return (int)list.Push (obj);
-}
-
-bool csMeshFactoryList::Remove (iMeshFactoryWrapper *obj)
-{
-  FreeFactory (obj);
-  const char* name = obj->QueryObject ()->GetName ();
-  if (name)
-    factories_hash.Delete (name, obj);
-  list.Delete (obj);
-  obj->QueryObject ()->RemoveNameChangeListener (listener);
-  return true;
-}
-
-bool csMeshFactoryList::Remove (int n)
-{
-  return Remove (Get (n));
-}
-
-void csMeshFactoryList::RemoveAll ()
-{
-  size_t i;
-  for (i = 0 ; i < list.GetSize () ; i++)
-  {
-    list[i]->QueryObject ()->RemoveNameChangeListener (listener);
-    FreeFactory (list[i]);
-  }
-  factories_hash.DeleteAll ();
-  list.DeleteAll ();
-}
-
-int csMeshFactoryList::Find (iMeshFactoryWrapper *obj) const
-{
-  return (int)list.Find (obj);
-}
-
-iMeshFactoryWrapper *csMeshFactoryList::FindByName (
-  const char *Name) const
-{
-  if (!Name) return 0;
-  return factories_hash.Get (Name, 0);
-}
-
-//--------------------------------------------------------------------------
-// csMeshFactoryFactoryList
-//--------------------------------------------------------------------------
-void csMeshFactoryFactoryList::PrepareFactory (iMeshFactoryWrapper* child)
-{
-  CS_ASSERT (meshfact != 0);
-  csMeshFactoryList::PrepareFactory (child);
-
-  // unlink the factory from another possible parent.
-  if (child->GetParentContainer ())
-    child->GetParentContainer ()->GetChildren ()->Remove (child);
-
-  child->SetParentContainer (meshfact);
-}
-
-void csMeshFactoryFactoryList::FreeFactory (iMeshFactoryWrapper* item)
-{
-  CS_ASSERT (meshfact != 0);
-  item->SetParentContainer (0);
-  meshfact->RemoveFactoryFromStaticLOD (item);
-  csMeshFactoryList::FreeFactory (item);
-}

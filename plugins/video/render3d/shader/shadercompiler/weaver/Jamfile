@@ -4,7 +4,7 @@ Description shaderweaver : "shader weaver" ;
 Plugin shaderweaver : [ Wildcard *.cpp *.h ] ;
 
 Includes weaver.h : $(SUBDIR)/weaver.tok ;
-MsvcExtraFile weaver : $(SUBDIR)/weaver.tok ;
+MsvcExtraFile shaderweaver : $(SUBDIR)/weaver.tok ;
 LinkWith shaderweaver : crystalspace ;
 CompileGroups shaderweaver : shaders renderers renderall openglrenderer ;
 

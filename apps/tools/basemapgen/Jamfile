@@ -1,0 +1,5 @@
+SubDir TOP apps tools basemapgen ;
+
+Description basemapgen : "Terrain basemap generator" ;
+Application basemapgen : [ Wildcard *.cpp *.h ] ;
+LinkWith basemapgen : crystalspace ;

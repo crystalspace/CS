@@ -1,5 +1,6 @@
 /*
   Copyright (C) 2002 by Keith Fulton and Jorrit Tyberghein
+  Rewritten during Sommer of Code 2006 by Christoph "Fossi" Mewes
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -23,6 +24,9 @@
 #include "iengine/sector.h"
 #include "csgeom/poly3d.h"
 #include "csgeom/box.h"
+#include "ivideo/rendermesh.h"
+#include "cstool/rendermeshholder.h"
+#include "iengine/mesh.h"
 
 #include "impprctx.h"
 
@@ -30,9 +34,36 @@ class csVector3;
 class csMatrix3;
 class csMovable;
 class csMeshWrapper;
+class csMeshFactoryWrapper;
+class csImposterMesh;
 struct iRenderView;
 struct iCamera;
 
+/**
+ * Class representing the factory/imposter relation.
+ */
+class csImposterFactory
+{
+private:
+  csImposterMesh* imposter_mesh;	// @@@ Temporary.
+  csMeshFactoryWrapper* meshfact;
+
+public:
+  csImposterFactory (csMeshFactoryWrapper* meshfact)
+    : imposter_mesh (0), meshfact (meshfact) { }
+
+  /**
+   * Get a valid imposter mesh for a given mesh.
+   * If possible this will reuse the previous imposter mesh if there is
+   * one and if it is still usable.
+   */
+  csImposterMesh* GetImposterMesh (csMeshWrapper* mesh,
+      csImposterMesh* old_imposter_mesh, iRenderView* rview);
+};
+
+/**
+ * Class representing the mesh/imposter relation.
+ */
 class csImposterMesh
 {
 private:
@@ -40,25 +71,53 @@ private:
   csImposterProcTex *tex;    // Texture which is drawn on rect
   csPoly3D cutout;           // Rect for cardboard cutout version
   bool     ready;            // Whether texture must be redrawn
-  float    incidence_dist;   // Angle of incidence to camera last time rendered
-  csBox2   screen_rect;      // Rectangle occupied by imposter on screen
-  csBox3   camera_box;       // Bounding box of object being impostered
+
+  //saved values for update checking
+  csVector3 meshLocalDir;
+  csVector3 cameraLocalDir;
+
+  //screen bounding box helper
+  csScreenBoxResult res;
+
+  //rendermeshholder for this mesh
+  csRenderMeshHolder rmHolder;
+
+  //flag that indices have been updated
+  bool dirty;
+
+  //current height and width of the billboard
+  float height, width;
+
+  //imposter material
+  iMaterialWrapper *impostermat;
+
+  //direction the imposter is facing in world coordinates
+  csVector3 imposterDir;
+
+  //convenience shortcut
+  csEngine *engine;
+
+  // Get the current rotation vectors.
+  void GetLocalViewVectors (iCamera *cam);
+
+  void FindImposterRectangle (iCamera *camera);
+  void SetImposterReady (bool r, iRenderView* rview);
+
+  friend class csImposterProcTex;
 
 public:
   csImposterMesh (csEngine* engine, csMeshWrapper *parent);
+  ~csImposterMesh ();
 
-  float CalcIncidenceAngleDist (iRenderView *rview);
-  bool CheckIncidenceAngle (iRenderView *rview,float tolerance);
-  void FindImposterRectangle (const iCamera *camera);
-  void Draw (iRenderView *rview);
+  bool CheckUpdateNeeded (iRenderView *rview, float tolerance,
+      	float camtolerance);
 
-  bool GetImposterReady () { return ready; }
-  void SetImposterReady (bool r) { ready=r; }
+  csMeshWrapper* GetParentMesh () const { return parent_mesh; }
 
-  void SetIncidenceDist (float d) { incidence_dist=d; }
-  float GetIncidenceDist () { return incidence_dist;  }
+  //returns the imposter billboard
+  csRenderMesh** GetRenderMesh (iRenderView *rview);
 
-  csMeshWrapper *GetParent () { return parent_mesh; }
+  bool GetImposterReady (iRenderView* rview);
 };
 
 #endif // __CS_IMPMESH_H__

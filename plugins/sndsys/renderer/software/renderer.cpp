@@ -396,7 +396,7 @@ bool csSndSysRendererSoftware::Open ()
 
 
   // Setup the listener settings
-  m_pListener = new SndSysListenerSoftware();
+  m_pListener.AttachNew (new SndSysListenerSoftware());
 
   // TEST - Create the sound normalizer/compressor
   m_pSoundCompressor=new csSoundCompressor(m_PlaybackFormat.Freq * m_PlaybackFormat.Channels / 100);

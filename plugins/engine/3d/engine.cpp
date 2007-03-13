@@ -448,6 +448,83 @@ iSector *csLightIt::GetLastSector ()
   return engine->sectors.Get (sectorIndex);
 }
 
+// ======================================================================
+// Imposter stuff.
+// ======================================================================
+
+/**
+ * Event handler that takes care of updating the imposters.
+ */
+class csImposterEventHandler : 
+  public scfImplementation1<csImposterEventHandler, iEventHandler>
+{
+private:
+  csWeakRef<csEngine> engine;
+
+public:
+  csImposterEventHandler (csEngine* engine)
+    : scfImplementationType (this), engine (engine)
+  {
+  }
+  virtual ~csImposterEventHandler ()
+  {
+  }
+
+  virtual bool HandleEvent (iEvent& event)
+  {
+    if (engine)
+      engine->HandleImposters ();
+    return true;
+  }
+
+  CS_EVENTHANDLER_NAMES("crystalspace.engine.imposters")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS
+};
+
+
+void csEngine::AddImposterToUpdateQueue (csImposterProcTex* imptex,
+      iRenderView* rview)
+{
+  long camnr = rview->GetCamera ()->GetCameraNumber ();
+  if (!imposterUpdateQueue.Contains (camnr))
+  {
+    // We don't yet have this camera in our queue. Make a clone of
+    // the renderview and camera.
+    csRenderView* copy_rview = new csRenderView (*(csRenderView*)rview);
+    csImposterUpdateQueue qu;
+    qu.rview.AttachNew (copy_rview);
+    imposterUpdateQueue.Put (camnr, qu);
+
+  }
+  csImposterUpdateQueue* q = imposterUpdateQueue.GetElementPointer (camnr);
+  q->queue.Push (csWeakRef<csImposterProcTex> (imptex));
+}
+
+void csEngine::HandleImposters ()
+{
+  // Imposter updating where needed.
+  csHash<csImposterUpdateQueue,long>::GlobalIterator queue_it =
+    imposterUpdateQueue.GetIterator ();
+  while (queue_it.HasNext ())
+  {
+    csImposterUpdateQueue& q = queue_it.Next ();
+    iRenderView* rview = q.rview;
+    csWeakRefArray<csImposterProcTex>::Iterator it = q.queue.GetIterator ();
+
+    // Update if camera is in a sector.
+    iCamera* c = rview->GetCamera ();
+    while (it.HasNext ())
+    {
+      csImposterProcTex* pt = it.Next ();
+      pt->RenderToTexture (rview, c->GetSector ());
+    }
+  }
+
+  // All updates done, empty list for next frame.
+  imposterUpdateQueue.Empty ();
+}
+
+
 //---------------------------------------------------------------------------
 SCF_IMPLEMENT_FACTORY (csEngine)
 
@@ -554,6 +631,10 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
     if (!G2D) events[2] = CS_EVENTLIST_END;
 
     CS::RegisterWeakListener (q, this, events, weakEventHandler);
+
+    csRef<csImposterEventHandler> imphandler;
+    imphandler.AttachNew (new csImposterEventHandler (this));
+    q->RegisterListener (imphandler, csevPreProcess (objectRegistry));
   }
 
   csConfigAccess cfg (objectRegistry, "/config/engine.cfg");
@@ -3360,10 +3441,8 @@ bool csEngine::DebugCommand (const char* cmd)
   return false;
 }
 
-//-------------------End-Multi-Context-Support--------------------------------
-
 // ======================================================================
-// Render loop stuff
+// Render loop stuff.
 // ======================================================================
   
 iRenderLoopManager* csEngine::GetRenderLoopManager ()
