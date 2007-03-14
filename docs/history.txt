@@ -6,6 +6,10 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Mar-2007
+	- Marten removed an extra include of windows.h that would pull in
+	  way more than required, and as it is in a public header mess with
+	  external projects.
 9-Mar-2007
 	- Jorrit started work on moving imposter handling to imposter
 	  factories so that it is possible to share imposter textures.

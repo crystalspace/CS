@@ -194,6 +194,7 @@
 #include <stdarg.h>
 #include <windef.h>
 #include <winbase.h>
+#include <winreg.h>
 #include <malloc.h>
 #include <sys/types.h>
 #include <sys/stat.h>
