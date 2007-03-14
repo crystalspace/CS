@@ -163,51 +163,26 @@ bool TiXmlBase::StringEqualIgnoreCase( const char* p,
 class GrowString
 {
 private:
-  char buf[BUFSIZE];
-  int max;
-  int len;
-  char* curbuf;
-  char* ptext;
+  csStringFast<BUFSIZE> buf;
 
 public:
-  GrowString ()
-  {
-    max = BUFSIZE;
-    len = 0;
-    curbuf = buf;
-    ptext = curbuf;
-    *ptext = 0;
-  }
-  ~GrowString ()
-  {
-    if (curbuf != buf) cs_free (curbuf);
-  }
+  GrowString() { buf.SetGrowsBy (0); }
 
   void AddChar (char c)
   {
-    *ptext++ = c;
-    len++;
-    if (len >= max)
-    {
-      max += BUFSIZE;
-      char* newbuf = (char*)cs_malloc (max);
-      memcpy (newbuf, curbuf, len);
-      if (curbuf != buf) cs_free (curbuf);
-      curbuf = newbuf;
-      ptext = curbuf+len;
-    }
+    buf.Append (c);
   }
 
   char* GetNewCopy ()
   {
-    char* copy = (char*)cs_malloc (len+1);
-    strcpy (copy, curbuf);
+    char* copy = (char*)cs_malloc (buf.Length()+1);
+    strcpy (copy, buf.GetDataSafe());
     return copy;
   }
 
   const char* GetThisCopy () const
   {
-    return curbuf;
+    return buf.GetData();
   }
 };
 

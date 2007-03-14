@@ -595,6 +595,7 @@ const char* csTinyXmlDocument::Write (iFile* file)
 
 const char* csTinyXmlDocument::Write (iString* str)
 {
+  str->SetGrowsBy (0);
   root->Print (str, 0);
   return 0;
 }
