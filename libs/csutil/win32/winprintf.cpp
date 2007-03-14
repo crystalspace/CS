@@ -26,7 +26,8 @@
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
 
-#include <windows.h>
+#define WIN32_LEAN_AND_MEAN
+#include <wincon.h>
 #include "csutil/win32/wintools.h"
 
 #if defined(__CYGWIN__) || defined(CS_COMPILER_BCC)

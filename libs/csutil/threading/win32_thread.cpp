@@ -22,7 +22,6 @@
 #include "csutil/threading/win32_thread.h"
 #include "csutil/threading/condition.h"
 
-#include <windows.h>
 #include <process.h>
 
 #if defined (__CYGWIN__) 

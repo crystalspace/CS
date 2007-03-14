@@ -20,7 +20,10 @@
 #include "cssysdef.h"
 #include "csutil/csuctransform.h"
 #include "iutil/event.h"
+
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <imm.h>
 
 #include "win32kbd.h"
 #include "csutil/win32/wintools.h"

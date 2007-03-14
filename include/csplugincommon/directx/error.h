@@ -21,7 +21,6 @@
 #define __CS_CSPLUGINCOMMON_DIRECTX_ERROR_H__
 
 #include "csextern_dx.h"
-#include <windows.h>
 
 /**\file
  * DirectX error strings.

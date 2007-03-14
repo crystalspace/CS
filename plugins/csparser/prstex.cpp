@@ -429,14 +429,22 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
       CS_REPORTER_SEVERITY_WARNING,
       node, "Could not load texture '%s', using checkerboard instead", txtname);
 
-    if (!BuiltinCheckerTexLoader)
+    /*if (!BuiltinCheckerTexLoader)
     {
       csCheckerTextureLoader* ctl = new csCheckerTextureLoader (0);
       ctl->Initialize (object_reg);
       BuiltinCheckerTexLoader.AttachNew (ctl);
     }
     csRef<iBase> b = BuiltinCheckerTexLoader->Parse (ParamsNode,
-      0/*ssource*/, ldr_context, static_cast<iBase*> (&context));
+      0, ldr_context, static_cast<iBase*> (&context));*/
+    if (!BuiltinErrorTexLoader)
+    {
+      csMissingTextureLoader* mtl = new csMissingTextureLoader (0);
+      mtl->Initialize (object_reg);
+      BuiltinErrorTexLoader.AttachNew (mtl);
+    }
+    csRef<iBase> b = BuiltinErrorTexLoader->Parse (ParamsNode,
+      0, ldr_context, static_cast<iBase*> (&context));
     CS_ASSERT(b);
     tex = scfQueryInterface<iTextureWrapper> (b);
     CS_ASSERT(tex);

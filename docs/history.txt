@@ -25,6 +25,8 @@ chronological order.
 	  would give. (Previously, the packing between these could differ;
 	  this tripped up the lightmap layouting in lighter2 which made this
 	  assumption.)
+	- Marten cleared up some more overuse of windows.h. Should help 
+	  compilation speed a bit as windows.h and its includes are huge.
 9-Mar-2007
 	- Jorrit started work on moving imposter handling to imposter
 	  factories so that it is possible to share imposter textures.
