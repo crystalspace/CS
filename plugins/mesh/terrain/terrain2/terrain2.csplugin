@@ -1,35 +1,35 @@
 <?xml version="1.0"?>
-<!-- terrainimproved.csplugin -->
+<!-- terrain2.csplugin -->
 <plugin>
   <scf>
     <classes>
       <class>
-        <name>crystalspace.mesh.object.terrainimproved.bruteblockrenderer</name>
+        <name>crystalspace.mesh.object.terrain2.bruteblockrenderer</name>
         <implementation>csTerrainBruteBlockRenderer</implementation>
         <description>Bruteblock terrain renderer</description>
       </class>
       <class>
-        <name>crystalspace.mesh.object.terrainimproved.simplerenderer</name>
+        <name>crystalspace.mesh.object.terrain2.simplerenderer</name>
         <implementation>csTerrainSimpleRenderer</implementation>
         <description>Simple terrain renderer</description>
       </class>
       <class>
-        <name>crystalspace.mesh.object.terrainimproved.terraformerdatafeeder</name>
+        <name>crystalspace.mesh.object.terrain2.terraformerdatafeeder</name>
         <implementation>csTerrainTerraFormerDataFeeder</implementation>
         <description>Terraformer-based data feeder</description>
       </class>
       <class>
-        <name>crystalspace.mesh.object.terrainimproved.threadeddatafeeder</name>
+        <name>crystalspace.mesh.object.terrain2.threadeddatafeeder</name>
         <implementation>csTerrainThreadedDataFeeder</implementation>
         <description>Terrain multithreaded data feeder</description>
       </class>
       <class>
-        <name>crystalspace.mesh.object.terrainimproved.simpledatafeeder</name>
+        <name>crystalspace.mesh.object.terrain2.simpledatafeeder</name>
         <implementation>csTerrainSimpleDataFeeder</implementation>
         <description>Terrain simple data feeder</description>
       </class>
       <class>
-        <name>crystalspace.mesh.object.terrainimproved</name>
+        <name>crystalspace.mesh.object.terrain2</name>
         <implementation>csTerrainMeshObjectType</implementation>
         <description>Terrain mesh type</description>
       </class>

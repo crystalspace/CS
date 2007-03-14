@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <world>
   <plugins>
-    <plugin name="terrainFact">crystalspace.mesh.loader.factory.terrainimproved</plugin>
-    <plugin name="terrain">crystalspace.mesh.loader.terrainimproved</plugin>
-    <plugin name="foliageFact">crystalspace.mesh.loader.factory.foliage</plugin>
-    <plugin name="foliage">crystalspace.mesh.loader.foliage</plugin>
+    <plugin name="terrainFact">crystalspace.mesh.loader.factory.terrain2</plugin>
+    <plugin name="terrain">crystalspace.mesh.loader.terrain2</plugin>
   </plugins>
 
   <textures>
@@ -101,9 +99,9 @@
   <meshfact name="TerrainFact">
     <plugin>terrainFact</plugin>
     <params>
-      <renderer>crystalspace.mesh.object.terrainimproved.bruteblockrenderer</renderer>
-      <collider>crystalspace.mesh.object.terrainimproved.collider</collider>
-      <feeder>crystalspace.mesh.object.terrainimproved.simpledatafeeder</feeder>
+      <renderer>crystalspace.mesh.object.terrain2.bruteblockrenderer</renderer>
+      <collider>crystalspace.mesh.object.terrain2.collider</collider>
+      <feeder>crystalspace.mesh.object.terrain2.simpledatafeeder</feeder>
 
       <maxloadedcells>20</maxloadedcells>
 

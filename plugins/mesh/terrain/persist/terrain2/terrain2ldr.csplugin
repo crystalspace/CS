@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
-<!-- loader.csplugin -->
+<!-- terrain2ldr.csplugin -->
 <plugin>
   <scf>
     <classes>
       <class>
-        <name>crystalspace.mesh.loader.factory.terrainimproved</name>
+        <name>crystalspace.mesh.loader.factory.terrain2</name>
         <implementation>csTerrainFactoryLoader</implementation>
         <description>Terrain Factory Loader</description>
       </class>
       <class>
-        <name>crystalspace.mesh.loader.terrainimproved</name>
+        <name>crystalspace.mesh.loader.terrain2</name>
         <implementation>csTerrainObjectLoader</implementation>
         <description>Terrain Object Loader</description>
       </class>

@@ -44,8 +44,8 @@ SCF_IMPLEMENT_FACTORY (csTerrainFactoryLoader)
 SCF_IMPLEMENT_FACTORY (csTerrainObjectLoader)
 
 
-static const char* FACTORYERRORID = "crystalspace.mesh.loader.factory.terrainimproved";
-static const char* ERRORID = "crystalspace.mesh.loader.terrainimproved";
+static const char* FACTORYERRORID = "crystalspace.mesh.loader.factory.terrain2";
+static const char* ERRORID = "crystalspace.mesh.loader.terrain2";
 
 csTerrainFactoryLoader::csTerrainFactoryLoader (iBase* parent)
  : scfImplementationType (this, parent)
@@ -73,7 +73,7 @@ csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
   csRef<iPluginManager> pluginManager = csQueryRegistry<iPluginManager> (object_reg);
 
   csRef<iMeshObjectType> meshType = csLoadPlugin<iMeshObjectType> (
-    object_reg, "crystalspace.mesh.object.terrainimproved");
+    object_reg, "crystalspace.mesh.object.terrain2");
 
   if (!meshType)
   {

@@ -8,6 +8,8 @@ chronological order.
 
 14-Mar-2007
 	- Marten did first step in renaming terrainimproved to terrain2.
+	- Marten finished renaming terrainimproved to terrain2.
+	- Marten did some clean-up of old terrainimproved/2 stuff.
 13-Mar-2007
 	- Marten did some more fixes to terrain:
 	    - Properly distinguish between factory and terrain object.
