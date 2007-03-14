@@ -48,7 +48,7 @@ private:
   csRef<iReporter> reporter;
 
   csStringHash xmltokens;
-#define CS_TOKEN_ITEM_FILE "plugins/mesh/terrain/persist/improved/loader.tok"
+#define CS_TOKEN_ITEM_FILE "plugins/mesh/terrain/persist/terrain2/loader.tok"
 #include "cstool/tokenlist.h"
 #undef CS_TOKEN_ITEM_FILE 
 
@@ -86,7 +86,7 @@ private:
   csRef<iReporter> reporter;
 
   csStringHash xmltokens;
-#define CS_TOKEN_ITEM_FILE "plugins/mesh/terrain/persist/improved/loader.tok"
+#define CS_TOKEN_ITEM_FILE "plugins/mesh/terrain/persist/terrain2/loader.tok"
 #include "cstool/tokenlist.h"
 #undef CS_TOKEN_ITEM_FILE 
 
