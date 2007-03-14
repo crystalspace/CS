@@ -27,6 +27,8 @@ chronological order.
 	  assumption.)
 	- Marten cleared up some more overuse of windows.h. Should help 
 	  compilation speed a bit as windows.h and its includes are huge.
+	- Marten changed the "missing texture" meta-texture from the xor-
+	  checker to a red-green-blue-black checker which is more visible.
 9-Mar-2007
 	- Jorrit started work on moving imposter handling to imposter
 	  factories so that it is possible to share imposter textures.
