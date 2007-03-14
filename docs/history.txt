@@ -16,6 +16,8 @@ chronological order.
 	  (which already provides what GrowString does). Also switched some
 	  strings to exponential growth for better performance with large
 	  strings.
+	- res optimized the csPrintfFormatter %s handling for a few cases 
+	  (including the rather common plain "%s").
 9-Mar-2007
 	- Jorrit started work on moving imposter handling to imposter
 	  factories so that it is possible to share imposter textures.
