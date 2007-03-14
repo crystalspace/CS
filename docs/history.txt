@@ -6,10 +6,33 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+
 14-Mar-2007
 	- Marten did first step in renaming terrainimproved to terrain2.
 	- Marten finished renaming terrainimproved to terrain2.
 	- Marten did some clean-up of old terrainimproved/2 stuff.
+	- Marten removed an extra include of windows.h that would pull in
+	  way more than required, and as it is in a public header mess with
+	  external projects.
+	- res changed csDirtyAccessArray<> to take a memory allocator and
+	  capacity handler (like csArray<> does).
+	- res changed tinyxml's GrowString to be a wrapper around csString
+	  (which already provides what GrowString does). Also switched some
+	  strings to exponential growth for better performance with large
+	  strings.
+	- res optimized the csPrintfFormatter %s handling for a few cases 
+	  (including the rather common plain "%s").
+	- res added CS::Memory::Heap::Footprint(). (Potentially useful for
+	  tracking memory usage.)
+	- res tweaked csSubRectangles so that adding rectangles with Reclaim()
+	  calls in between gives the same results as adding without Reclaim()
+	  would give. (Previously, the packing between these could differ;
+	  this tripped up the lightmap layouting in lighter2 which made this
+	  assumption.)
+	- Marten cleared up some more overuse of windows.h. Should help 
+	  compilation speed a bit as windows.h and its includes are huge.
+	- Marten changed the "missing texture" meta-texture from the xor-
+	  checker to a red-green-blue-black checker which is more visible.
 13-Mar-2007
 	- Marten did some more fixes to terrain:
 	    - Properly distinguish between factory and terrain object.

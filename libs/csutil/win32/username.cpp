@@ -20,7 +20,8 @@
 #include "csutil/csstring.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
-#include <windows.h>
+
+
 #include <lmcons.h>
 
 #include "csutil/win32/wintools.h"

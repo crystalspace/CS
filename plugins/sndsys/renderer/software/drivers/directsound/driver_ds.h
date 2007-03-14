@@ -32,6 +32,7 @@
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
 
+#include <mmsystem.h>
 #include <dsound.h>
 
 

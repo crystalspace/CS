@@ -19,7 +19,6 @@
 
 #include "cssysdef.h"
 #include "csutil/util.h"
-#include <windows.h>
 
 char* csExpandName (const char *iName)
 {

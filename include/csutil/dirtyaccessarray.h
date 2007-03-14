@@ -42,16 +42,24 @@
  * to the internal array that is in this class. This can be useful
  * if you want to access some external module (like OpenGL).
  */
-template <class T, class ElementHandler = csArrayElementHandler<T> >
-class csDirtyAccessArray : public csArray<T, ElementHandler>
+template <class T,
+	  class ElementHandler = csArrayElementHandler<T>,
+          class MemoryAllocator = CS::Memory::AllocatorMalloc,
+          class CapacityHandler = csArrayCapacityDefault>
+class csDirtyAccessArray : 
+  public csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>
 {
 public:
   /**
-   * Initialize object to hold initially 'ilimit' elements, and increase
-   * storage by 'ithreshold' each time the upper bound is exceeded.
+   * Initialize object to have initial capacity of \c in_capacity elements.
+   * The storage increase depends on the specified capacity handler. The
+   * default capacity handler accepts a threshold parameter by which the 
+   * storage is increased each time the upper bound is exceeded.
    */
-  csDirtyAccessArray (int ilimit = 0, int ithreshold = 0)
-  	: csArray<T, ElementHandler> (ilimit, ithreshold) {}
+  csDirtyAccessArray (size_t in_capacity = 0,
+    const CapacityHandler& ch = CapacityHandler())
+    : csArray<T, ElementHandler, MemoryAllocator, CapacityHandler> (
+      in_capacity, ch) {}
 
   /// Get the pointer to the start of the array.
   T* GetArray ()

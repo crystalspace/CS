@@ -750,7 +750,6 @@ class csPrintfFormatter
       return;
     }
 
-    size_t scratchOffs = scratch.GetSize ();
     size_t len = 0;
     {
       const T* ptr = stringPtr;
@@ -758,28 +757,55 @@ class csPrintfFormatter
     }
     if (currentFormat.precision > -1)
       len = MIN(len, (size_t)currentFormat.precision);
-    while (len > 0)
+
+    // How many utf32_chars were written
+    size_t writtenLen;
+    /* Check if we can circumvent using the scratch array:
+       we actually only need it when the string is right-justified
+       (and a width is given). */
+    bool fastTrack = currentFormat.leftJustify
+      || (currentFormat.width == 0);
+
+    if (fastTrack)
     {
-      utf32_char ch;
-      int n = csUnicodeTransform::Decode (stringPtr, len, ch);
-      scratch.Push (ch);
-      stringPtr += n;
-      len -= (size_t)n;
+      writtenLen = 0;
+      while (len > 0)
+      {
+        utf32_char ch;
+        int n = csUnicodeTransform::Decode (stringPtr, len, ch);
+        writer.Put (ch);
+        stringPtr += n;
+        len -= (size_t)n;
+        writtenLen++;
+      }
     }
-    if (!currentFormat.leftJustify 
-      && ((size_t)currentFormat.width > (scratch.GetSize () - scratchOffs)))
+    else
     {
-      size_t d = (size_t)currentFormat.width - scratch.GetSize () + scratchOffs;
-      while (d-- > 0) writer.Put (' ');
+      size_t scratchOffs = scratch.GetSize ();
+      while (len > 0)
+      {
+        utf32_char ch;
+        int n = csUnicodeTransform::Decode (stringPtr, len, ch);
+        scratch.Push (ch);
+        stringPtr += n;
+        len -= (size_t)n;
+      }
+      writtenLen = scratch.GetSize () - scratchOffs;
+      if (!currentFormat.leftJustify 
+        && ((size_t)currentFormat.width > writtenLen))
+      {
+        size_t d = (size_t)currentFormat.width - writtenLen;
+        while (d-- > 0) writer.Put (' ');
+      }
+      scratch.WriteTo (writer, scratchOffs);
+      scratch.Truncate (scratchOffs);
     }
-    scratch.WriteTo (writer, scratchOffs);
     if (currentFormat.leftJustify 
-      && ((size_t)currentFormat.width > (scratch.GetSize () - scratchOffs)))
+      && ((size_t)currentFormat.width > writtenLen))
     {
-      size_t d = (size_t)currentFormat.width - scratch.GetSize () + scratchOffs;
+      size_t d = (size_t)currentFormat.width - writtenLen;
       while (d-- > 0) writer.Put (' ');
     }
-    scratch.Truncate (scratchOffs);
   }
 
   /// Pad scratch buffer with spaces or zeros left resp. right

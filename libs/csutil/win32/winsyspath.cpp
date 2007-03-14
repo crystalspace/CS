@@ -20,8 +20,11 @@
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
 
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <process.h>
+#include <basetyps.h>
+
 #ifdef __CYGWIN__
 #include <sys/cygwin.h>
 #endif

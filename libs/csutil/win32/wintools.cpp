@@ -21,7 +21,6 @@
 #include "csutil/csstring.h"
 #include "csutil/util.h"
 
-#include <windows.h>
 #include "csutil/win32/wintools.h"
 
 struct _WinVersion 

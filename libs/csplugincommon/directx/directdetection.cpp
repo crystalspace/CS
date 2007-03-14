@@ -18,6 +18,9 @@
 */
 
 #include "cssysdef.h"
+
+
+#define WIN32_LEAN_AND_MEAN
 #include "csplugincommon/directx/guids.h"
 
 #include "csutil/csunicode.h"
@@ -25,6 +28,7 @@
 #include "csutil/util.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
+
 #include <stdlib.h>
 #include <windows.h>
 

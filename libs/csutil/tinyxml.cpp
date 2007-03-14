@@ -483,12 +483,12 @@ void TiXmlElement::SetAttribute (TiDocument* document,
 
 static void StrPrintf (iString* file, const char* msg, ...)
 {
-  scfString str;
+  csString str;
+  str.SetGrowsBy (0);
   va_list args;
   va_start (args, msg);
   str.FormatV (msg, args);
   va_end (args);
-  file->SetGrowsBy(0);
   file->Append (str);
 }
 

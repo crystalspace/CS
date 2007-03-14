@@ -27,15 +27,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/strhash.h"
 #include "csutil/leakguard.h"
 
-#include <Cg/cg.h>
-/* WIN32 is used in an "#if" inside <cgGL.h>, however, it is sometimes defined
- * without value. */
-#ifdef WIN32
-#undef WIN32
-#define WIN32 1
-#endif 
-#include <Cg/cgGL.h>
-
 #include "glshader_cg.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)

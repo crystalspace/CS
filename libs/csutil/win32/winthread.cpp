@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
 #include "winthread.h"
-#include <windows.h>
+
 #include <process.h>
 
 #include "csutil/win32/wintools.h"

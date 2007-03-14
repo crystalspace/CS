@@ -117,14 +117,15 @@ protected:
 
   /// Leaves of the region tree
   csArray<SubRect*> leaves;
+  static int SubRectCompare (SubRect* const& sr1, SubRect* const& sr2);
   inline void AddLeaf (SubRect* sr)
   {
-    leaves.InsertSorted (sr);
+    leaves.InsertSorted (sr, SubRectCompare);
   }
   void RemoveLeaf (SubRect* sr)
   {
     size_t index = leaves.FindSortedKey (
-      csArrayCmp<SubRect*, SubRect*> (sr));
+      csArrayCmp<SubRect*, SubRect*> (sr, SubRectCompare));
     leaves.DeleteIndex (index);
   }
   
@@ -165,7 +166,7 @@ public:
   /**
    * For debugging: dump all free rectangles.
    */
-  void Dump ();
+  void Dump (const char* tag = 0);
 };
 
 typedef csSubRectangles::SubRect csSubRect;

@@ -211,7 +211,8 @@ private:
   /// Pointer to built-in image texture loader.
   csRef<iLoaderPlugin> BuiltinImageTexLoader;
   /// Pointer to built-in checkerboard texture loader.
-  csRef<iLoaderPlugin> BuiltinCheckerTexLoader;
+  //csRef<iLoaderPlugin> BuiltinCheckerTexLoader;
+  csRef<iLoaderPlugin> BuiltinErrorTexLoader;
 
   /// Auto regions flag
   bool autoRegions;

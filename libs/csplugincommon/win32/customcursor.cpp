@@ -24,6 +24,8 @@
 
 #include "csplugincommon/win32/customcursor.h"
 #include "csplugincommon/canvas/cursorconvert.h"
+
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
 #include "csutil/win32/wintools.h"
