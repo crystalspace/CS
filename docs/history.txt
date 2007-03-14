@@ -20,6 +20,11 @@ chronological order.
 	  (including the rather common plain "%s").
 	- res added CS::Memory::Heap::Footprint(). (Potentially useful for
 	  tracking memory usage.)
+	- res tweaked csSubRectangles so that adding rectangles with Reclaim()
+	  calls in between gives the same results as adding without Reclaim()
+	  would give. (Previously, the packing between these could differ;
+	  this tripped up the lightmap layouting in lighter2 which made this
+	  assumption.)
 9-Mar-2007
 	- Jorrit started work on moving imposter handling to imposter
 	  factories so that it is possible to share imposter textures.

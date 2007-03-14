@@ -20,7 +20,7 @@
 #include "csgeom/subrec.h"
 #include "csutil/blockallocator.h"
 
-#if 0//defined(CS_DEBUG)
+#if 0 && defined(CS_DEBUG)
 #define DUMP_TO_IMAGES
 #endif
 
@@ -31,7 +31,7 @@
 #include "csutil/ref.h"
 #include "csutil/array.h"
 #include "csgfx/rgbpixel.h"
-#include "csgfx/memimage.h"
+#include "csgfx/imagememory.h"
 #include "iutil/objreg.h"
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
@@ -126,15 +126,19 @@ void csSubRectangles::SubRect::TestAlloc (int w, int h, AllocInfo& ai)
 
     if (dw < dh)
     {
-      ai.d = dw;
+      d = dw;
     }
     else
     {
-      ai.d = dh;
+      d = dh;
     }
-    ai.allocPos = ALLOC_NEW;
-    ai.node = this;
-    ai.res = true;
+    if (d < ai.d)
+    {
+      ai.d = d;
+      ai.allocPos = ALLOC_NEW;
+      ai.node = this;
+      ai.res = true;
+    }
   }
   else
   {
@@ -315,7 +319,7 @@ csSubRectangles::SubRect* csSubRectangles::SubRect::Alloc (int w, int h, const A
 
 	children[0]->splitType = SPLIT_H;
 	children[0]->splitPos = allocedRect.Height ();
-	children[0]->allocedRect = children[0]->rect;
+	children[0]->allocedRect = allocedRect;//children[0]->rect;
 	children[0]->children[0] = subChild0;
 	children[0]->children[1] = subChild1;
       }
@@ -365,7 +369,7 @@ csSubRectangles::SubRect* csSubRectangles::SubRect::Alloc (int w, int h, const A
 
 	children[0]->splitType = SPLIT_V;
 	children[0]->splitPos = allocedRect.Width ();
-	children[0]->allocedRect = children[0]->rect;
+	children[0]->allocedRect = allocedRect;//children[0]->rect;
 	children[0]->children[0] = subChild0;
 	children[0]->children[1] = subChild1;
       }
@@ -447,6 +451,23 @@ void csSubRectangles::FreeSubrect (SubRect* sr)
   FreeSubrect (sr->children[0]);
   FreeSubrect (sr->children[1]);
   alloc.Free (sr);
+}
+
+static inline uint Cantor (uint x, uint y)
+{
+  return ((x + y) * (x + y + 1)) / 2 + y;
+}
+
+int csSubRectangles::SubRectCompare (SubRect* const& sr1, SubRect* const& sr2)
+{
+  uint c1 = Cantor (sr1->rect.xmin, sr1->rect.ymin);
+  uint c2 = Cantor (sr2->rect.xmin, sr2->rect.ymin);
+  if (c1 < c2)
+    return -1;
+  else if (c1 > c2)
+    return 1;
+  else
+    return 0;
 }
 
 void csSubRectangles::Clear ()
@@ -541,7 +562,7 @@ static void IncImgRect (uint8* data, int imgW, int imgH,
 #endif
 
 // Debug dump: write some rect distribution into some images.
-void csSubRectangles::Dump ()
+void csSubRectangles::Dump (const char* tag)
 {
 #if defined(DUMP_TO_IMAGES)
   if (!iSCF::SCF->object_reg) return;
@@ -601,7 +622,7 @@ void csSubRectangles::Dump ()
   csArray<csSubRectangles::SubRect*> nodes;
   nodes.Push (root);
   
-  while (nodes.Length ())
+  while (nodes.GetSize ())
   {
     csSubRectangles::SubRect* node = nodes[0];
     nodes.DeleteIndex (0);
@@ -609,7 +630,8 @@ void csSubRectangles::Dump ()
     FillImgRect (data, c + 1, w, h, node->rect);
     FillImgRect (data2, c + 1, w, h, node->allocedRect);
     // Overlap information. The whole image should be just one color.
-    IncImgRect (data3, w, h, node->rect);
+    if (node->splitType == csSubRect::SPLIT_UNSPLIT)
+      IncImgRect (data3, w, h, node->rect);
 
     if (node->children[0] != 0) nodes.Push (node->children[0]);
     if (node->children[1] != 0) nodes.Push (node->children[1]);
@@ -619,7 +641,7 @@ void csSubRectangles::Dump ()
   {
     csRef<iDataBuffer> buf = imgsaver->Save (img, "image/png");
     csString outfn;
-    outfn.Format ("/tmp/csSubRectangles_dump_%p_r.png", this);
+    outfn.Format ("/tmp/csSubRectangles_dump_%p_r%s.png", this, tag ? tag : "");
     if (vfs->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
     {
       csReport (iSCF::SCF->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
@@ -632,9 +654,10 @@ void csSubRectangles::Dump ()
 	"crystalspace.geom.subrects", "Error dumping to %s",
 	outfn.GetData ());
     }
+    delete img;
 
     buf = imgsaver->Save (img2, "image/png");
-    outfn.Format ("/tmp/csSubRectangles_dump_%p_ar.png", this);
+    outfn.Format ("/tmp/csSubRectangles_dump_%p_ar%s.png", this, tag ? tag : "");
     if (vfs->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
     {
       csReport (iSCF::SCF->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
@@ -647,9 +670,10 @@ void csSubRectangles::Dump ()
 	"crystalspace.geom.subrects", "Error dumping to %s",
 	outfn.GetData ());
     }
+    delete img2;
 
     buf = imgsaver->Save (img3, "image/png");
-    outfn.Format ("/tmp/csSubRectangles_dump_%p_ov.png", this);
+    outfn.Format ("/tmp/csSubRectangles_dump_%p_ov%s.png", this, tag ? tag : "");
     if (vfs->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
     {
       csReport (iSCF::SCF->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
@@ -662,6 +686,7 @@ void csSubRectangles::Dump ()
 	"crystalspace.geom.subrects", "Error dumping to %s",
 	outfn.GetData ());
     }
+    delete img3;
   }
 #endif
 }
