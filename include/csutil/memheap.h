@@ -68,6 +68,11 @@ namespace CS
        * retained, in case future allocations are anticipated.
        */
       void Trim (size_t pad = 0);
+
+      /**
+       * Return the total amount of memory used for this heap.
+       */
+      size_t Footprint ();
     };
 
     /**
