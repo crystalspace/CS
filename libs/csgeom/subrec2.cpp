@@ -319,7 +319,7 @@ csSubRectangles::SubRect* csSubRectangles::SubRect::Alloc (int w, int h, const A
 
 	children[0]->splitType = SPLIT_H;
 	children[0]->splitPos = allocedRect.Height ();
-	children[0]->allocedRect = allocedRect;//children[0]->rect;
+	children[0]->allocedRect = allocedRect;
 	children[0]->children[0] = subChild0;
 	children[0]->children[1] = subChild1;
       }
@@ -369,7 +369,7 @@ csSubRectangles::SubRect* csSubRectangles::SubRect::Alloc (int w, int h, const A
 
 	children[0]->splitType = SPLIT_V;
 	children[0]->splitPos = allocedRect.Width ();
-	children[0]->allocedRect = allocedRect;//children[0]->rect;
+	children[0]->allocedRect = allocedRect;
 	children[0]->children[0] = subChild0;
 	children[0]->children[1] = subChild1;
       }
