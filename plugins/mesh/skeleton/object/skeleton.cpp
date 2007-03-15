@@ -590,6 +590,10 @@ void csSkeletonRunnable::ParseFrame(csSkeletonScriptKeyFrame *frame)
 csSkeletonScriptKeyFrame *csSkeletonRunnable::NextFrame()
 {
   size_t frames_count = script->GetFramesCount();
+  
+  if (frames_count == 0)
+    return 0;
+
   if (current_frame == -1)
   {
     current_frame = 0;
@@ -613,7 +617,7 @@ csSkeletonScriptKeyFrame *csSkeletonRunnable::NextFrame()
     skeleton->GetScriptCallback()->Execute(script, current_frame);
   }
 
-  return (csSkeletonScriptKeyFrame *)script->GetFrame(current_frame);
+  return (csSkeletonScriptKeyFrame *)script->GetFrame (current_frame);
 }
 
 void csSkeletonRunnable::release_tranform_data(TransformHash& h)
@@ -632,6 +636,8 @@ bool csSkeletonRunnable::Do (csTicks elapsed, bool& stop, csTicks & left)
   if (parse_key_frame)
   {
     csSkeletonScriptKeyFrame *frame = NextFrame ();
+    if (!frame) 
+      return false;
     delay.final = (csTicks) ( (float)(frame->GetDuration())*time_factor);
     ParseFrame (frame);
     parse_key_frame = false;

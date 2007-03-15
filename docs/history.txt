@@ -11,6 +11,7 @@ chronological order.
 	- Marten integrated terrain2 from the soc/terrain branch into trunk.
         - Piotr added support for keyframes without transform data for all 
           skeleton bones in genmeshanim.
+        - Piotr added handling for animations without keyframes.
 14-Mar-2007
 	- Marten did first step in renaming terrainimproved to terrain2.
 	- Marten finished renaming terrainimproved to terrain2.
