@@ -63,7 +63,7 @@
 #include "cstool/normalcalc.h"
 #include "cstool/primitives.h"
 #include "csgeom/poly3d.h"
-#include "igeom/decal.h"
+#include "ivaria/decal.h"
 
 #include "genmesh.h"
 

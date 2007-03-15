@@ -1012,7 +1012,7 @@ iArrayChangeElements<csShaderVariable * >;
 %include "iaws/aws.h"
 
 %include "igeom/clip2d.h"
-%include "igeom/decal.h"
+%include "ivaria/decal.h"
 %include "imesh/objmodel.h"
 %include "igeom/path.h"
 %template(scfPath) scfImplementation1<csPath,iPath >;

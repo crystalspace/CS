@@ -49,7 +49,7 @@
 #include "ivaria/reporter.h"
 #include "ivaria/view.h"
 #include "ivideo/graph3d.h"
-#include "igeom/decal.h"
+#include "ivaria/decal.h"
 #include "ivideo/material.h"
 
 #include "bot.h"

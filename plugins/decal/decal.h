@@ -20,7 +20,7 @@
 #define __CS_DECAL_H__
 
 #include "iutil/comp.h"
-#include "igeom/decal.h"
+#include "ivaria/decal.h"
 #include "csutil/scf_implementation.h"
 #include "csgeom/vector3.h"
 #include "iengine/sector.h"

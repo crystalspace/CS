@@ -67,7 +67,7 @@
 #include "polytext.h"
 #include "thing.h"
 #include "ivaria/collider.h"
-#include "igeom/decal.h"
+#include "ivaria/decal.h"
 
 #ifdef CS_DEBUG
   //#define LIGHTMAP_DEBUG

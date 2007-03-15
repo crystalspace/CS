@@ -19,7 +19,7 @@
 #ifndef __CS_DECAL_TEMPLATE_H__
 #define __CS_DECAL_TEMPLATE_H__
 
-#include "igeom/decal.h"
+#include "ivaria/decal.h"
 #include "csutil/scf_implementation.h"
 #include "csgeom/vector2.h"
 #include "csutil/cscolor.h"

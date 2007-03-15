@@ -26,6 +26,7 @@
 #include "ivaria/collider.h"
 #include "ivaria/conin.h"
 #include "ivaria/conout.h"
+#include "ivaria/decal.h"
 #include "ivaria/dynamics.h"
 #include "ivaria/engseq.h"
 #include "ivaria/gradient.h"
