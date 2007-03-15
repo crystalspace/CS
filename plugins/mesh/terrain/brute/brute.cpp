@@ -2545,7 +2545,7 @@ int csTerrainObject::CollisionDetect (iMovable* m, csTransform* transform)
 
   // @@@ The +2 seems pretty ugly, but seems to be needed, at least for
   // walktest
-  d.y += 2;
+  d.y -= 2;
   if (d.y > p.y)
   {
     transform->SetOrigin (d + m->GetPosition ());

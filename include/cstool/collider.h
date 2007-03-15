@@ -44,6 +44,7 @@ struct iObject;
 struct iPolygonMesh;
 struct iRegion;
 struct iSector;
+struct iTerrainSystem;
 
 struct csCollisionPair;
 class csReversibleTransform;
@@ -89,6 +90,10 @@ public:
   /// Create a collider based on a terrain.
   csColliderWrapper (iObject* parent, iCollideSystem* collide_system,
   	iTerraFormer* terrain);
+
+  /// Create a collider based on a terrain.
+  csColliderWrapper (iObject* parent, iCollideSystem* collide_system,
+  	iTerrainSystem* terrain);
 
   /**
    * Create a collider based on a collider. Note that it is legal to pass

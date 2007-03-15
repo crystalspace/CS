@@ -767,11 +767,14 @@ void csGLShaderFFP::SetupState (const csRenderMesh* /*mesh*/,
     {
       case CS_FOG_MODE_LINEAR:
 	{
+          float start = GetParamFloatVal (stacks, fog.start, 0.0f);
+          float end = GetParamFloatVal (stacks, fog.end, 0.0f);
+
+          end = (end == start) ? start + 0.001f : end;
+
 	  glFogi (GL_FOG_MODE, GL_LINEAR);
-	  glFogf (GL_FOG_START, 
-	    GetParamFloatVal (stacks, fog.start, 0.0f));
-	  glFogf (GL_FOG_END, 
-	    GetParamFloatVal (stacks, fog.end, 0.0f));
+	  glFogf (GL_FOG_START, start);
+	  glFogf (GL_FOG_END, end);
 	}
 	break;
       case CS_FOG_MODE_EXP:

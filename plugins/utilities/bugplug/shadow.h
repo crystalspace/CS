@@ -142,6 +142,7 @@ public:
   virtual iPolygonMesh* GetPolygonMeshBase () { return 0; }
   virtual iPolygonMesh* GetPolygonMeshColldet () { return 0; }
   virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
+  virtual iTerrainSystem* GetTerrainColldet () { return 0; }
   virtual void SetPolygonMeshColldet (iPolygonMesh*) { }
   virtual iPolygonMesh* GetPolygonMeshViscull () { return 0; }
   virtual void SetPolygonMeshViscull (iPolygonMesh*) { }

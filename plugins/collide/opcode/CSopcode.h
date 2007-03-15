@@ -36,6 +36,7 @@
 #include "csutil/scf_implementation.h"
 #include "ivaria/collider.h"
 #include "csgeom/transfrm.h"
+#include "imesh/terrain2.h"
 #include "CSopcodecollider.h"
 #include "csTerraFormerCollider.h"
 #include "Opcode.h"
@@ -56,6 +57,9 @@ class csOPCODECollideSystem :
     const csReversibleTransform* trans1, csTerraFormerCollider* terraformer,
     const csReversibleTransform* trans2);
   
+  bool Collide (csOPCODECollider* collider1, const csReversibleTransform*
+    trans1, iTerrainSystem* terrain);
+
   bool TestTriangleTerraFormer (csVector3 triangle[3],
     csTerraFormerCollider* c, csCollisionPair* pair);
 
@@ -85,6 +89,7 @@ public:
 
   virtual csPtr<iCollider> CreateCollider (iPolygonMesh* mesh);
   virtual csPtr<iCollider> CreateCollider (iTerraFormer* mesh);
+  virtual csPtr<iCollider> CreateCollider (iTerrainSystem* mesh);
 
   /**
    * Test collision between two colliders.

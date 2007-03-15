@@ -33,6 +33,7 @@ struct iPolygonMesh;
 struct iTerraFormer;
 struct iMeshObject;
 class csReversibleTransform;
+struct iTerrainSystem;
 
 /**
  * A structure used to return collision pairs.
@@ -48,6 +49,13 @@ struct csCollisionPair
   // Second triangle
   csVector3 a2, b2, c2;	
   //@}
+
+  /// A comparison operator in order for it to fit into iArray
+  bool operator==(const csCollisionPair& p) const
+  {
+    return (a1 == p.a1 && b1 == p.b1 && c1 == p.c1 &&
+            a2 == p.a2 && b2 == p.b2 && c2 == p.c2);
+  }
 };
 
 /**
@@ -63,7 +71,8 @@ struct csIntersectingTriangle
 enum csColliderType
 {
   CS_MESH_COLLIDER = 0,
-  CS_TERRAFORMER_COLLIDER
+  CS_TERRAFORMER_COLLIDER,
+  CS_TERRAIN_COLLIDER
 };
 
 /**
@@ -121,6 +130,11 @@ struct iCollideSystem : public virtual iBase
    */
   virtual csPtr<iCollider> CreateCollider (iTerraFormer* mesh) = 0;
   
+  /**
+   * Create a Collider from a terrain.
+   */
+  virtual csPtr<iCollider> CreateCollider (iTerrainSystem* mesh) = 0;
+
   /**
    * Test collision between two colliders.
    * This is only supported for iCollider objects created by

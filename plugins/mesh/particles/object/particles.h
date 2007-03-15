@@ -424,6 +424,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     {
       return false;
     }
+  virtual iTerrainSystem* GetTerrainColldet () { return 0; }
 
     virtual bool SetMaterialWrapper (iMaterialWrapper* material)
     {

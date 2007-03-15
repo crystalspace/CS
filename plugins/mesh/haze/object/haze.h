@@ -291,6 +291,7 @@ public:
   void GetRadius (float& rad, csVector3& cent)
   { rad = radius; cent = bbox.GetCenter (); }
   virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
+  virtual iTerrainSystem* GetTerrainColldet () { return 0; }
 
   ///--------------------- iMeshObject implementation ------------------------
   virtual iMeshObjectFactory* GetFactory () const { return ifactory; }

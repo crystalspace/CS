@@ -6,7 +6,13 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+
+15-Mar-2007
+	- Marten integrated terrain2 from the soc/terrain branch into trunk.
 14-Mar-2007
+	- Marten did first step in renaming terrainimproved to terrain2.
+	- Marten finished renaming terrainimproved to terrain2.
+	- Marten did some clean-up of old terrainimproved/2 stuff.
 	- Marten removed an extra include of windows.h that would pull in
 	  way more than required, and as it is in a public header mess with
 	  external projects.
@@ -29,6 +35,16 @@ chronological order.
 	  compilation speed a bit as windows.h and its includes are huge.
 	- Marten changed the "missing texture" meta-texture from the xor-
 	  checker to a red-green-blue-black checker which is more visible.
+13-Mar-2007
+	- Marten did some more fixes to terrain:
+	    - Properly distinguish between factory and terrain object.
+	    - Move feeder to be per terrain instead of per cell. Added per 
+	      cell feeder properties.
+	    - Fixed some things in the API to be more like rest of CS 
+	      (sending SCF objects by pointer, transforms by reference).
+	    - Unified terrain to use a single interface header file inside 
+	      include/imesh.
+	    - Fixed the loader to use more standardized names for tags.
 9-Mar-2007
 	- Jorrit started work on moving imposter handling to imposter
 	  factories so that it is possible to share imposter textures.
@@ -56,7 +72,15 @@ chronological order.
 	  after that initialization, the factory can possibly be released,
 	  reducing memory usage.
 	- res reorganized primitive and vertex data so the data stored by 
-	  factories resp. objects is closer to what's really only needed.  
+	  factories resp. objects is closer to what's really only needed.
+	- Marten fixed an error related to accessing already removed objects
+	  when collapsing several lod-levels at once in bruteblock renderer
+	  of new terrain.
+	- Marten added support for large blocks (32-bit indices) in bruteblock 
+	  renderer of new terrain.
+	- Marten added support for per cell base material. Changed the terraini
+	  level to mimic terrainf level.
+	- Marten did a small fix for coordinate systems in improved terrain.  
 7-Mar-2007
 	- Jorrit fixed a crash bug in lighter2. In the simple TUI lastTask
 	  started as an empty null string and comparing that with GetTaskName()
@@ -166,6 +190,10 @@ chronological order.
 	  are created (each representing a task). Code that "does something"
 	  then sets the progress on one of such progress objects, which takes
 	  care of updating the display and updating the overall progress.
+	- Marten made a number of fixes to improved terrain:
+	    - Changed the cell lru to be a bit more efficient.
+	    - Removed all usage of csArray::Length/SetLength
+	    - Fixed a block culling bug.
 1-Mar-2007
 	- res fixed embedgl to properly include gl.h. (<GL/gl.h> doesn't work
 	  on all platforms, the CS_OPENGL_PATH construct takes care of the
@@ -175,6 +203,14 @@ chronological order.
 	  files).
 	- Marten fixed a serious bug in bruteblock terrain where it would
 	  never cull any terrain blocks.
+	- Marten fixed csLog2 to give correct result when a power of 2
+	  was given.
+	- Marten made a number of fixes to improved terrain plugin:
+	    - Rewrote the LOD level selection algorithm to use projected
+	      area instead of just maximum component.
+	    - Moved the index buffer generation to be done per terrain
+	      renderer instance, not per terrain cell instance.
+	    - Did some general stylistic fixes.
 28-Feb-2007
 	- Marten fixed the particle loader/saver to properly expose the
 	  saver interface.
@@ -332,6 +368,30 @@ chronological order.
 	  implementation classes.
 	- res fixed old syntax being used in one of the manual tutorials.
 	  (Spotted by IRC user runix.)
+13-Mar-2007
+	- Marten did some more fixes to terrain:
+	    - Properly distinguish between factory and terrain object.
+	    - Move feeder to be per terrain instead of per cell. Added per 
+	      cell feeder properties.
+	    - Fixed some things in the API to be more like rest of CS 
+	      (sending SCF objects by pointer, transforms by reference).
+	    - Unified terrain to use a single interface header file inside 
+	      include/imesh.
+	    - Fixed the loader to use more standardized names for tags.
+8-Mar-2007
+	- Marten fixed an error related to accessing already removed objects
+	  when collapsing several lod-levels at once in bruteblock renderer
+	  of new terrain.
+	- Marten added support for large blocks (32-bit indices) in bruteblock 
+	  renderer of new terrain.
+	- Marten added support for per cell base material. Changed the terraini
+	  level to mimic terrainf level.
+	- Marten did a small fix for coordinate systems in improved terrain.
+2-Mar-2007
+	- Marten made a number of fixes to improved terrain:
+	    - Changed the cell lru to be a bit more efficient.
+	    - Removed all usage of csArray::Length/SetLength
+	    - Fixed a block culling bug.
 19-Feb-2007
 	- Marten made a few changes in lighter2:
 	   - Disabled the use of the exposure function and use a simple
@@ -656,7 +716,12 @@ chronological order.
 	    - added declaration for some key event macros which are not
 	      found automatically by swig.
 	- Genjix added fix for iGeneralFactory::AddTriangle() crash in
-          Invalidate().
+          Invalidate()
+13-Jan-2007
+	- Jorrit fixed a problem in the segmentcell header of opcode
+	  which handles collision detection for new terrain. It was
+	  using 'abs' which is for integers so all floating point
+	  things were wrongly truncated. Replaced all 'abs' with 'fabs'.
 12-Jan-2007
 	- caedes added scfImplementationExt1 template to scf.i swig file so
 	  this template can be wrapped.
@@ -960,6 +1025,8 @@ chronological order.
 	  config-file and overrides on command line.
 	- Marten added a simpler output mode for lighter2. Activate with
 	  --simpletui command line parameter.
+        - Piotr added normals handling to new terrain.
+        - Piotr added "on cel load" callback to new terrain system.
 5-Dec-2006
 	- Jorrit changed 'exprlib' into 'libexpr' for refering to
 	  previously loaded shader expressions.
@@ -1562,6 +1629,7 @@ chronological order.
 	- mdmkolbe fixed searching of Cygwin paths.
 	- mdmkolbe added CS_CONFIGDIR to configuration search paths on Cygwin.
 	- Marten added a "outward spiral" term to spiral particle effector.
+>>>>>>> .merge-right.r26425
 9-Oct-2006
 	- res fixed a problem in the iConfigIterator::HasNext() which
 	  manifested itself in scrambled "could not load plugin" messages

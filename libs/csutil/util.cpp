@@ -258,32 +258,44 @@ bool csGlobMatches (const char *fName, const char *fMask)
   return (!*fName) && (!*fMask);
 }
 
-// don't forget to revert the changes above
-#if defined(__CYGWIN__)
-#define CS_PLATFORM_WIN32
-#endif
-
-// finds the smallest number that is a power of two and is larger or equal to n
-int csFindNearestPowerOf2 (int n)
+/// Find the log2 of 32bit argument.
+int csLog2 (int v)
 {
-  int v=n;
+  static const char LogTable256[] = 
+  {
+    0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3,
+    4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+    5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+    5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+    6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+    6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+    6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+    6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+    7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+    7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+    7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+    7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+    7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+    7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+    7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+    7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7
+  };
 
-  v--;
-  v |= v >> 1;
-  v |= v >> 2;
-  v |= v >> 4;
-  v |= v >> 8;
-  v |= v >> 16;
-  v++;
+  unsigned int r;     // r will be lg(v)
+  register unsigned int t, tt; // temporaries
 
-  return v;
+  if (tt = v >> 16)
+  {
+    r = (t = tt >> 8) ? 24 + LogTable256[t] : 16 + LogTable256[tt];
+  }
+  else 
+  {
+    r = (t = v >> 8) ? 8 + LogTable256[t] : LogTable256[v];
+  }
+
+  return r;
 }
 
-// returns true if n is a power of two
-bool csIsPowerOf2 (int n)
-{
-  return !(n & (n - 1)) && n;	// (n-1) ^ n >= n;
-}
 
 /**
  * given src and dest, which are already allocated, copy source to dest.

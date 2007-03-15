@@ -361,6 +361,7 @@ public:
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent);
   virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
+  virtual iTerrainSystem* GetTerrainColldet () { return 0; }
   /** @} */
 
   virtual iObjectModel* GetObjectModel () { return this; }
