@@ -407,16 +407,21 @@ class csSkeletonScriptKeyFrame :
       */
     }
 
-  virtual void GetKeyFrameData(iSkeletonBoneFactory *bone_fact, 
+  virtual bool GetKeyFrameData(iSkeletonBoneFactory *bone_fact, 
 	  csQuaternion & rot, csVector3 & pos, csQuaternion & tangent,
        bool & relative)
   {
 	  bone_key_info fallback;
-          const bone_key_info & bki = bones_frame_transforms.Get(bone_fact, fallback);
+    fallback.bone = 0;
+    const bone_key_info & bki = bones_frame_transforms.Get(bone_fact, fallback);
+    if (bki.bone == 0)
+      return false;
+
 	  rot = bki.rot;
 	  pos = bki.pos;
 	  tangent = bki.tangent;
 	  relative = bki.relative;
+    return true;
   }
 };
 

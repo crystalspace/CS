@@ -541,7 +541,6 @@ csSkeletonRunnable::~csSkeletonRunnable ()
 void csSkeletonRunnable::ParseFrame(csSkeletonScriptKeyFrame *frame)
 {
   for (size_t i = 0; i < skeleton->GetFactory()->GetBonesCount(); i++)
-
   {
     iSkeletonBoneFactory * bone_fact = skeleton->GetFactory()->GetBone(i);
 
@@ -549,40 +548,41 @@ void csSkeletonRunnable::ParseFrame(csSkeletonScriptKeyFrame *frame)
     csQuaternion rot, tangent;
     csVector3 pos;
     bool relative;
-    frame->GetKeyFrameData(bone_fact, rot, pos, tangent, relative);
-
-    //current transform data
-    bone_transform_data *bone_transform = GetBoneTransform ((csSkeletonBoneFactory *)bone_fact);
-    if (!frame->GetDuration())
+    if (frame->GetKeyFrameData(bone_fact, rot, pos, tangent, relative))
     {
-      //TODO
-    }
-    else
-    {
-      sac_transform_execution m;
-      m.bone_transform = bone_transform;
-      m.elapsed_ticks = 0;
-      m.curr_quat = m.bone_transform->quat;
-      m.position = bone_transform->pos;
-      m.type = 1;
-      m.quat = rot;
-      m.tangent = tangent;
-      m.final_position = pos;
-
-      csVector3 delta;
-      if (relative)
+      //current transform data
+      bone_transform_data *bone_transform = GetBoneTransform ((csSkeletonBoneFactory *)bone_fact);
+      if (!frame->GetDuration())
       {
-        m.type = 2;
-        delta = m.final_position;
+        //TODO
       }
       else
       {
+        sac_transform_execution m;
+        m.bone_transform = bone_transform;
+        m.elapsed_ticks = 0;
+        m.curr_quat = m.bone_transform->quat;
+        m.position = bone_transform->pos;
         m.type = 1;
-        delta = m.final_position - m.position;
-      }
+        m.quat = rot;
+        m.tangent = tangent;
+        m.final_position = pos;
 
-      m.delta_per_tick = delta/ (float) (delay.final);
-      runnable_transforms.Push (m);
+        csVector3 delta;
+        if (relative)
+        {
+          m.type = 2;
+          delta = m.final_position;
+        }
+        else
+        {
+          m.type = 1;
+          delta = m.final_position - m.position;
+        }
+
+        m.delta_per_tick = delta/ (float) (delay.final);
+        runnable_transforms.Push (m);
+      }
     }
   }
 }

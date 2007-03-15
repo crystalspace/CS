@@ -223,9 +223,10 @@ struct iSkeletonAnimationKeyFrame : public virtual iBase
 	  csReversibleTransform &transform) = 0;
 
   /**
-   * Get key frame specific data.
+   * Get key frame specific data. Returns false when frame don't have data for given
+   * bone.
    */
-  virtual void GetKeyFrameData(iSkeletonBoneFactory *bone_fact, 
+  virtual bool GetKeyFrameData (iSkeletonBoneFactory *bone_fact, 
 	  csQuaternion & rot, csVector3 & pos, csQuaternion & tangent,
        bool & relative) = 0;
 };
