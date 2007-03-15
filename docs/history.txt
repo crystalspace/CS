@@ -13,6 +13,8 @@ chronological order.
           skeleton bones in genmeshanim.
         - Piotr added handling for animations without keyframes.
 	- Marten fixed a compilation bug on gcc with terrain2.
+	- caedes added a new accessor wrapper template to python bindings
+	  for write only attributes with several input arguments (or methods).
 14-Mar-2007
 	- Marten did first step in renaming terrainimproved to terrain2.
 	- Marten finished renaming terrainimproved to terrain2.

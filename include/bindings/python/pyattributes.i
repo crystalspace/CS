@@ -1,7 +1,11 @@
 /* Macros used to generate the right set of accessor methods to transform
  * getters/setters into Python attributes.
  *
- * Attribute templates:
+ * Class - the class name
+ * type - the type of the variable
+ * name - the name you wish to use in the python bindings
+ * setmethod - the set method in Class
+ * getmethod - the get method in Class
  * cs_attribute: Create a getter/setter. Both setmethod and getmethod are
     optional, if none is specified then Get and Set will be prepended to the
     attribute name to find the functions. If only setter is specified then
@@ -87,6 +91,17 @@ CS_PROPERTY_HELPERS
   __swig_setmethods__[#name] = fix_args(_##Module##.##Class##_##setmethod)
   name = property(_##Module##.##Class##_##getmethod, fix_args(_##Module##.##Class##_##setmethod), None,
                   "Class.name -> type\n\nThis is equivalent to calling the C++ cs methods:\n\tget: Class::getmethod()\n\tset: void Class::setmethod(...)")
+%}
+}
+%enddef
+
+/* cs_multi_attr_readonly calling macro */
+%define %cs_multi_attr_readonly(Module, Class, name, getmethod)
+%extend Class
+{
+%pythoncode %{
+  name = property(_##Module##.##Class##_##getmethod, None, None,
+                  "Class.name -> type\n\nThis is equivalent to calling the C++ cs method:\n\tget: Class::getmethod()")
 %}
 }
 %enddef
