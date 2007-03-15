@@ -4861,6 +4861,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetPolygonMeshBase = *cspacec::iObjectModel_GetPolygonMeshBase;
 *GetPolygonMeshColldet = *cspacec::iObjectModel_GetPolygonMeshColldet;
 *GetTerraFormerColldet = *cspacec::iObjectModel_GetTerraFormerColldet;
+*GetTerrainColldet = *cspacec::iObjectModel_GetTerrainColldet;
 *SetPolygonMeshColldet = *cspacec::iObjectModel_SetPolygonMeshColldet;
 *GetPolygonMeshViscull = *cspacec::iObjectModel_GetPolygonMeshViscull;
 *SetPolygonMeshViscull = *cspacec::iObjectModel_SetPolygonMeshViscull;
@@ -15884,6 +15885,9 @@ sub ACQUIRE {
 ############# Class : cspace::csCollisionPair ##############
 
 package cspace::csCollisionPair;
+use overload
+    "==" => sub { $_[0]->__eq__($_[1])},
+    "fallback" => 1;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace );
 %OWNER = ();
@@ -15900,6 +15904,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *swig_b2_set = *cspacec::csCollisionPair_b2_set;
 *swig_c2_get = *cspacec::csCollisionPair_c2_get;
 *swig_c2_set = *cspacec::csCollisionPair_c2_set;
+*__eq__ = *cspacec::csCollisionPair___eq__;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csCollisionPair(@_);
@@ -18839,6 +18844,7 @@ sub csConNormalCursor () { $cspacec::csConNormalCursor }
 sub csConInsertCursor () { $cspacec::csConInsertCursor }
 sub CS_MESH_COLLIDER () { $cspacec::CS_MESH_COLLIDER }
 sub CS_TERRAFORMER_COLLIDER () { $cspacec::CS_TERRAFORMER_COLLIDER }
+sub CS_TERRAIN_COLLIDER () { $cspacec::CS_TERRAIN_COLLIDER }
 sub NO_GEOMETRY () { $cspacec::NO_GEOMETRY }
 sub BOX_COLLIDER_GEOMETRY () { $cspacec::BOX_COLLIDER_GEOMETRY }
 sub PLANE_COLLIDER_GEOMETRY () { $cspacec::PLANE_COLLIDER_GEOMETRY }

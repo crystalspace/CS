@@ -3095,6 +3095,7 @@ class iObjectModel(iBase):
     def GetPolygonMeshBase(*args): return _cspace.iObjectModel_GetPolygonMeshBase(*args)
     def GetPolygonMeshColldet(*args): return _cspace.iObjectModel_GetPolygonMeshColldet(*args)
     def GetTerraFormerColldet(*args): return _cspace.iObjectModel_GetTerraFormerColldet(*args)
+    def GetTerrainColldet(*args): return _cspace.iObjectModel_GetTerrainColldet(*args)
     def SetPolygonMeshColldet(*args): return _cspace.iObjectModel_SetPolygonMeshColldet(*args)
     def GetPolygonMeshViscull(*args): return _cspace.iObjectModel_GetPolygonMeshViscull(*args)
     def SetPolygonMeshViscull(*args): return _cspace.iObjectModel_SetPolygonMeshViscull(*args)
@@ -10623,6 +10624,7 @@ class csCollisionPair(_object):
     __swig_setmethods__["c2"] = _cspace.csCollisionPair_c2_set
     __swig_getmethods__["c2"] = _cspace.csCollisionPair_c2_get
     if _newclass:c2 = property(_cspace.csCollisionPair_c2_get, _cspace.csCollisionPair_c2_set)
+    def __eq__(*args): return _cspace.csCollisionPair___eq__(*args)
     def __init__(self, *args): 
         this = _cspace.new_csCollisionPair(*args)
         try: self.this.append(this)
@@ -10658,6 +10660,7 @@ csIntersectingTriangle_swigregister(csIntersectingTriangle)
 
 CS_MESH_COLLIDER = _cspace.CS_MESH_COLLIDER
 CS_TERRAFORMER_COLLIDER = _cspace.CS_TERRAFORMER_COLLIDER
+CS_TERRAIN_COLLIDER = _cspace.CS_TERRAIN_COLLIDER
 class iCollider(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
