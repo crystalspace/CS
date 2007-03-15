@@ -126,7 +126,7 @@ struct csTerrainTriangle
 };
 
 bool csTerrainCollider::CollideTriangles (iTerrainCell* cell,
-                       const csVector3* vertices, unsigned int tri_count,
+                       const csVector3* vertices, size_t tri_count,
                        const unsigned int* indices, float radius,
                        const csReversibleTransform& trans,
                        bool oneHit, iTerrainCollisionPairArray* pairs)
@@ -176,11 +176,11 @@ bool csTerrainCollider::CollideTriangles (iTerrainCell* cell,
           if (cell_result.y >= height - 1 - EPSILON) 
             cell_result.y = height - 1 - EPSILON;
           
-          tri.x = floor(cell_result.x);
-          tri.y = floor(cell_result.y);
+          tri.x = (int)floorf(cell_result.x);
+          tri.y = (int)floorf(cell_result.y);
           
-          float frac = (cell_result.x - floor(cell_result.x)) +
-                       (cell_result.y - floor(cell_result.y));
+          float frac = (cell_result.x - floorf(cell_result.x)) +
+                       (cell_result.y - floorf(cell_result.y));
           
           tri.half = (frac >= 1);
           
@@ -276,13 +276,13 @@ public:
     unsigned int width = cell->GetGridWidth ();
     unsigned int height = cell->GetGridHeight ();
   
-    vertices.SetLength (width * height);
-    indices.SetLength( 3 * 2 * (width-1) * (height-1) );
+    vertices.SetSize (width * height);
+    indices.SetSize (3 * 2 * (width-1) * (height-1));
 
     opcode_model = new Opcode::Model;
 
     opcMeshInt.SetNbTriangles (2 * (width-1) * (height-1));
-    opcMeshInt.SetNbVertices((udword)vertices.GetSize());
+    opcMeshInt.SetNbVertices ((udword)vertices.GetSize());
 
     // Mesh data
     OPCC.mIMesh = &opcMeshInt;

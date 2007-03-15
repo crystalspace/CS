@@ -126,9 +126,9 @@ public:
 
   virtual void OnMaterialPaletteUpdate (const csRefArray<iMaterialWrapper>&
                                         material_palette);
-  virtual void OnMaterialMaskUpdate (iTerrainCell* cell, unsigned int material,
+  virtual void OnMaterialMaskUpdate (iTerrainCell* cell, size_t material,
                                const csRect& rectangle, const unsigned char*
-                               data, unsigned int pitch);
+                               data, size_t pitch);
 
   // -- iTerrainCellHeightDataCallback --
   virtual void OnHeightUpdate (iTerrainCell* cell, const csRect& rectangle);

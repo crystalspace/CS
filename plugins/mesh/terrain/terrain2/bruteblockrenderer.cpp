@@ -797,8 +797,8 @@ void csTerrainBruteBlockRenderer::OnHeightUpdate (iTerrainCell* cell,
 }
 
 void csTerrainBruteBlockRenderer::OnMaterialMaskUpdate (iTerrainCell* cell,
-                                                        unsigned int material, const csRect& rectangle, const unsigned char* data,
-                                                        unsigned int pitch)
+  size_t material, const csRect& rectangle, const unsigned char* data,
+  size_t pitch)
 {
   csRef<csBruteBlockTerrainRenderData> rdata = SetupCellRenderData (cell);
 

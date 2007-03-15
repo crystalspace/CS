@@ -52,8 +52,7 @@ private:
 public:
   csTerrainSegmentCellCollider (iTerrainCell* cell, const csVector3&
     start, const csVector3& end)
-    : pos(cell->GetPosition ()), size(cell->GetSize ()), start(start),
-    end(end)
+    : start(start), end(end), pos(cell->GetPosition ()), size(cell->GetSize ())
   {
     // Constants
     const float rootOf2 = 1.414213f;

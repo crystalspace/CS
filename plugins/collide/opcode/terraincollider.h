@@ -74,7 +74,7 @@ public:
             const csVector3& end, bool oneHit, iTerrainVector3Array* points);
 
   virtual bool CollideTriangles (iTerrainCell* cell, const csVector3* vertices,
-                       unsigned int tri_count,
+                       size_t tri_count,
                        const unsigned int* indices, float radius,
                        const csReversibleTransform& trans,
                        bool oneHit, iTerrainCollisionPairArray* pairs);

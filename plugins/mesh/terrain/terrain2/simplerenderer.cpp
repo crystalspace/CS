@@ -300,8 +300,8 @@ void csTerrainSimpleRenderer::OnHeightUpdate (iTerrainCell* cell,
 }
 
 void csTerrainSimpleRenderer::OnMaterialMaskUpdate (iTerrainCell* cell,
-unsigned int material, const csRect& rectangle, const unsigned char* data,
-unsigned int pitch)
+  size_t material, const csRect& rectangle, const unsigned char* data,
+  size_t pitch)
 {
   csRef<csSimpleTerrainRenderData> rdata = (csSimpleTerrainRenderData*)
   cell->GetRenderData ();
