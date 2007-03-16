@@ -105,8 +105,8 @@ do
   # try to determine if we're in a source or installed CS version
   if test "x\$includedir_main" = "x"
   then
-    if [ -r \${prefix}/include/$(PACKAGE_NAME)/cssysdef.h ] ; then
-      newincdir="\${prefix}/include/$(PACKAGE_NAME)"
+    if [ -r \${prefix}/include/$(PACKAGE_NAME)-$(PACKAGE_VERSION_SIGNIFICANT)/cssysdef.h ] ; then
+      newincdir="\${prefix}/include/$(PACKAGE_NAME)-$(PACKAGE_VERSION_SIGNIFICANT)"
       includedir_main=\$newincdir
     elif [ -r \${prefix}/include/cssysdef.h ] ; then
       newincdir="\${prefix}/include"
@@ -115,8 +115,8 @@ do
   fi
   if test "x\$includedir_config" = "x"
   then
-    if [ -r \${prefix}/include/$(PACKAGE_NAME)/csconfig.h ] ; then
-      newincdir="\${prefix}/include/$(PACKAGE_NAME)"
+    if [ -r \${prefix}/include/$(PACKAGE_NAME)-$(PACKAGE_VERSION_SIGNIFICANT)/csconfig.h ] ; then
+      newincdir="\${prefix}/include/$(PACKAGE_NAME)-$(PACKAGE_VERSION_SIGNIFICANT)"
       includedir_config=\$newincdir
     elif [ -r \${prefix}/include/csconfig.h ] ; then
       newincdir="\${prefix}/include"
@@ -217,4 +217,8 @@ __END__
   cat $(SUBDIR)/cs-config.temppost >> $(<)
 }
 
-ShellScript cs-config : csConfigGen ;
+
+CSCONFIGNAME = cs-config-$(PACKAGE_VERSION_SIGNIFICANT) ;
+ShellScript $(CSCONFIGNAME) : csConfigGen : nohelp ;
+Depends cs-config : $(CSCONFIGNAME) ;
+Help cs-config : "Build the cs-config script" ;

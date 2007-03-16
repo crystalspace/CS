@@ -11,6 +11,8 @@ AC_PREREQ([2.56])
 #------------------------------------------------------------------------------
 # cs_version_number
 #	Keep this value synchronized with CS/include/csver.h.
+#       Also, mk/autoconf/crystal.m4 should be updated with the current version
+#         number.
 #------------------------------------------------------------------------------
 m4_define([cs_version_number], [1.1])
 
