@@ -403,7 +403,8 @@ void csFrustum::ClipToPlane (csVector3 &v1, csVector3 &v2)
     return ;
   }
 
-  for (ccw_offset = num_vertices - 2; ccw_offset >= 0; ccw_offset--)
+  //for (ccw_offset = num_vertices - 2; ccw_offset >= 0; ccw_offset--)
+  for (ccw_offset = num_vertices - 1; ccw_offset-- > 0; )
   {
     if ((Plane_Normal * vertices[ccw_offset] > 0) != first_vertex_side)
       break;
@@ -449,7 +450,8 @@ void csFrustum::ClipToPlane (csVector3 &v1, csVector3 &v2)
     }
     else if (cw_offset + 1 > ccw_offset)
     {
-      for (i = num_vertices - 2 - ccw_offset; i-- > 0; )
+      //for (i = num_vertices - 2 - ccw_offset; i-- > 0; )
+      for (i = num_vertices - 1 - ccw_offset; i-- > 0; )
         vertices[cw_offset + 2 + i] = vertices[ccw_offset + 1 + i];
     }
 
@@ -493,7 +495,8 @@ void csFrustum::ClipToPlane (
     return ;
   }
 
-  for (ccw_offset = num_vertices - 2; ccw_offset >= 0; ccw_offset--)
+  //for (ccw_offset = num_vertices - 2; ccw_offset >= 0; ccw_offset--)
+  for (ccw_offset = num_vertices - 1; ccw_offset-- > 0; )
   {
     if ((plane.Classify (vertices[ccw_offset]) > 0) != first_vertex_side)
       break;
@@ -587,7 +590,8 @@ void csFrustum::ClipToPlane (
     }
     else if (cw_offset + 1 > ccw_offset)
     {
-      for (i = num_vertices - 2 - ccw_offset; i-- > 0; )
+      //for (i = num_vertices - 2 - ccw_offset; i-- > 0; )
+      for (i = num_vertices - 1 - ccw_offset; i-- > 0; )
       {
         vertices[cw_offset + 2 + i] = vertices[ccw_offset + 1 + i];
         clipinfo[cw_offset + 2 + i].Copy (clipinfo[ccw_offset + 1 + i]);
@@ -641,7 +645,8 @@ void csFrustum::ClipToPlane (
     return ;
   }
 
-  for (ccw_offset = num_vertices - 2; ccw_offset >= 0; ccw_offset--)
+  //for (ccw_offset = num_vertices - 2; ccw_offset >= 0; ccw_offset--)
+  for (ccw_offset = num_vertices - 1; ccw_offset-- > 0; )
   {
     if ((Plane_Normal * vertices[ccw_offset] > 0) != first_vertex_side)
       break;
@@ -737,7 +742,8 @@ void csFrustum::ClipToPlane (
     }
     else if (cw_offset + 1 > ccw_offset)
     {
-      for (i = num_vertices - 2 - ccw_offset; i-- > 0; )
+      //for (i = num_vertices - 2 - ccw_offset; i-- > 0; )
+      for (i = num_vertices - 1 - ccw_offset; i-- > 0; )
       {
         vertices[cw_offset + 2 + i] = vertices[ccw_offset + 1 + i];
         clipinfo[cw_offset + 2 + i].Copy (clipinfo[ccw_offset + 1 + i]);
