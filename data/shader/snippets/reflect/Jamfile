@@ -1,0 +1,3 @@
+SubDir TOP data shader snippets reflect ;
+
+InstallData [ Wildcard *.cginc *.xml *.inp ] : data shader snippets reflect ;

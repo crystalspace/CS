@@ -2,14 +2,17 @@ SubDir TOP data shader ;
 
 InstallData [ Wildcard *.afp *.avp *.fvp *.xml ] : data shader ;
 
-SubInclude TOP data shader fog ;
+SubInclude TOP data shader character ;
+SubInclude TOP data shader combiner-cg ;
 SubInclude TOP data shader extrudeGlow ;
+SubInclude TOP data shader fog ;
 SubInclude TOP data shader fresnelWater ;
 SubInclude TOP data shader lighting ;
 SubInclude TOP data shader parallax ;
 SubInclude TOP data shader parallaxAtt ;
-SubInclude TOP data shader specular ;
-SubInclude TOP data shader snippets ;
-SubInclude TOP data shader surface ;
-SubInclude TOP data shader character ;
+SubInclude TOP data shader reflect ;
 SubInclude TOP data shader shadowmap ;
+SubInclude TOP data shader snippets ;
+SubInclude TOP data shader specular ;
+SubInclude TOP data shader surface ;
+SubInclude TOP data shader uvanim ;

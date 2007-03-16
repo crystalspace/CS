@@ -1,0 +1,3 @@
+SubDir TOP data shader reflect ;
+
+InstallData [ Wildcard *.xml ] : data shader reflect ;
