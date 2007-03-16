@@ -13,6 +13,8 @@ chronological order.
 	- res changed the installation directory and cs-config naming to
 	  include the version number in order to allow parallel installations
 	  of multiple CS versions.
+	- res fixed an assert in csSubRectangles occuring after the latest
+	  changes there. Fixes trac #282.
 15-Mar-2007
 	- Jorrit moved igeom/decal.h to ivaria/decal.h
 	- Marten integrated terrain2 from the soc/terrain branch into trunk.

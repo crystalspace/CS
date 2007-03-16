@@ -75,10 +75,12 @@ csSubRectangles::SubRect::SubRect ()
 csSubRectangles::SubRect& csSubRectangles::SubRect::operator= (
   const csSubRectangles::SubRect& other)
 {
+  if (splitType == SPLIT_UNSPLIT) superrect->RemoveLeaf (this);
   rect = other.rect;
   allocedRect = other.allocedRect;
   splitType = other.splitType;
   splitPos = other.splitPos;
+  if (splitType == SPLIT_UNSPLIT) superrect->AddLeaf (this);
 
   if (children[0] != 0)
   {
@@ -467,7 +469,9 @@ int csSubRectangles::SubRectCompare (SubRect* const& sr1, SubRect* const& sr2)
   else if (c1 > c2)
     return 1;
   else
-    return 0;
+    /* @@@ Hmm... two SubRects with the same rect coords - 
+           is that supposed to happen? */
+    return csComparator<SubRect*, SubRect*>::Compare (sr1, sr2);;
 }
 
 void csSubRectangles::Clear ()
