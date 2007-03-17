@@ -30,6 +30,7 @@ namespace lighter
   class Light_old;
   class Primitive;
   class Raytracer;
+  class SwapManager;
 
   class Lighter : public csRefCount
   {
@@ -60,6 +61,8 @@ namespace lighter
     csRef<iConfigManager> configMgr;
     iObjectRegistry *objectRegistry;
     csRef<iStringSet> strings;
+
+    SwapManager* swapManager;
 
   protected:
     // Cleanup and prepare for shutdown

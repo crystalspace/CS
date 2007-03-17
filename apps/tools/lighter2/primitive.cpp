@@ -238,8 +238,10 @@ namespace lighter
     plane = csPoly3D::ComputePlane (vertices);
   }
 
-  void PrimitiveBase::ComputeMinMaxUV (const Vector2Array& lightmapUVs,
-                                       csVector2 &min, csVector2 &max) const
+  template<typename Array>
+  static void ComputeMinMaxUVHelper (const Array& lightmapUVs, 
+                                     const PrimitiveBase::TriangleType& triangle,
+                                     csVector2 &min, csVector2 &max)
   {
     size_t index = triangle[0];
     min = lightmapUVs[index];
@@ -255,6 +257,18 @@ namespace lighter
       max.y = csMax (max.y, uv.y);
     }
     max += csVector2(0.5f, 0.5f);
+  }
+
+  void PrimitiveBase::ComputeMinMaxUV (const Vector2Array& lightmapUVs,
+                                       csVector2 &min, csVector2 &max) const
+  {
+    ComputeMinMaxUVHelper (lightmapUVs, triangle, min, max);
+  }
+
+  void PrimitiveBase::ComputeMinMaxUV (const ObjectVertexData::Vector2Array& lightmapUVs,
+                                       csVector2 &min, csVector2 &max) const
+  {
+    ComputeMinMaxUVHelper (lightmapUVs, triangle, min, max);
   }
 
   //-------------------------------------------------------------------------

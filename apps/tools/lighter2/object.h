@@ -92,6 +92,7 @@ namespace lighter
 
     // All faces, untransformed
     csArray<FactoryPrimitiveArray> unlayoutedPrimitives;
+    // A group of primitives that fit on a lightmap together.
     struct LayoutedPrimitives
     {
       FactoryPrimitiveArray primitives;
@@ -147,11 +148,14 @@ namespace lighter
     virtual void ParseMesh (iMeshWrapper *wrapper);
 
     // Write out the data again
-    virtual void SaveMesh (Scene* scene, iDocumentNode *node);
+    virtual void SaveMesh (Sector* sector, iDocumentNode *node);
 
     /* Conserve memory: free all object data that won't be needed for the 
      * actual lighting. */
     virtual void FreeNotNeededForLighting ();
+
+    // Immediate preparations before object is being lit.
+    virtual void PrepareLighting ();
 
     // Write out data that must be written after lighting.
     virtual void SaveMeshPostLighting (Scene* scene) { }

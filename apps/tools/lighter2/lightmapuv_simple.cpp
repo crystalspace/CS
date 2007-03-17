@@ -25,6 +25,26 @@
 
 namespace lighter
 {
+  struct SizeAndIndex
+  {
+    csVector2 uvsize;
+    size_t index;
+  };
+
+  static int SortBySize (SizeAndIndex const& s1, SizeAndIndex const& s2)
+  {
+    float dx = s1.uvsize.x - s2.uvsize.x;
+    if (dx > 0)
+      return -1;
+    else if (dx < 0)
+      return 1;
+    float dy = s1.uvsize.y - s2.uvsize.y;
+    if (dy > 0)
+      return -1;
+    else if (dy < 0)
+      return 1;
+    return 0;
+  }
 
   // Very simple FactoryLayouter.. just map "flat" on the lightmap
   csPtr<LightmapUVObjectLayouter> SimpleUVFactoryLayouter::LayoutFactory (
@@ -47,6 +67,8 @@ namespace lighter
 
     //TODO Reimplement simple UV-FactoryLayouter
 
+    csArray<SizeAndIndex> sizes;
+
     // Layout every primitive by itself    
     for (size_t i = 0; i < coplanarPrims.GetSize (); i++)
     {
@@ -54,61 +76,77 @@ namespace lighter
       
       bool lmCoordsGood = false;
       int its = 0; //number of iterations
+
+      csBitArray groupUsedVerts (usedVerts);
+      // Compute lightmapping
+      ProjectPrimitives (prims, groupUsedVerts,
+                         factory->GetLMuTexelPerUnit (), 
+                         factory->GetLMvTexelPerUnit (),
+                         newFactory->lightmapUVs);
       
       csVector2 minuv, maxuv, uvSize;
+      // Compute uv-size  
+      prims[0].ComputeMinMaxUV (newFactory->lightmapUVs, minuv, maxuv);
+      for (size_t p = 1; p < prims.GetSize(); p++)
+      {
+        FactoryPrimitive& prim (prims[p]);
+        csVector2 pminuv, pmaxuv;
+        prim.ComputeMinMaxUV (newFactory->lightmapUVs, pminuv, pmaxuv);
+        minuv.x = csMin (minuv.x, pminuv.x);
+        minuv.y = csMin (minuv.y, pminuv.y);
+        maxuv.x = csMax (maxuv.x, pmaxuv.x);
+        maxuv.y = csMax (maxuv.y, pmaxuv.y);
+      }
       while (!lmCoordsGood && its < 5)
       {
-        // Compute lightmapping
-        ProjectPrimitives (prims, usedVerts,
-                           factory->GetLMuTexelPerUnit () / (1<<its), 
-                           factory->GetLMvTexelPerUnit () / (1<<its),
-                           newFactory->lightmapUVs);
-
-        // Compute uv-size  
-        prims[0].ComputeMinMaxUV (newFactory->lightmapUVs, minuv, maxuv);
-        for (size_t p = 1; p < prims.GetSize(); p++)
-        {
-          FactoryPrimitive& prim (prims[p]);
-          csVector2 pminuv, pmaxuv;
-          prim.ComputeMinMaxUV (newFactory->lightmapUVs, pminuv, pmaxuv);
-          minuv.x = csMin (minuv.x, pminuv.x);
-          minuv.y = csMin (minuv.y, pminuv.y);
-          maxuv.x = csMax (maxuv.x, pmaxuv.x);
-          maxuv.y = csMax (maxuv.y, pmaxuv.y);
-        }
-        uvSize = (maxuv-minuv)+csVector2(2.0f,2.0f);
+        float scale = 1.0f / (1<<its);
+        uvSize = (maxuv-minuv)*scale+csVector2(2.0f,2.0f);
         if (uvSize.x < globalConfig.GetLMProperties ().maxLightmapU &&
             uvSize.y < globalConfig.GetLMProperties ().maxLightmapV)
         {
           lmCoordsGood = true;
+          ScaleLightmapUVs (prims, newFactory->lightmapUVs, scale, scale);
         }
         its++;
       } 
 
       if (lmCoordsGood)
       {
-        // Ok, resonable size, lets try to find a LM for it
-        csRect lmArea; 
-        int lmID;
-        bool res;
-        res = AllocLightmap (localLightmaps, (int)ceilf (uvSize.x), 
-	  (int)ceilf (uvSize.y), lmArea, lmID);
-        if (!res) continue; 
+        // Ok, reasonable size - find a LM for it in the next step
+        usedVerts.SetSize (groupUsedVerts.GetSize());
+        usedVerts |= groupUsedVerts;
 
-        FactoryPrimitiveArray& outArray = outPrims.GetExtend (lmID);
-        csArray<csArray<size_t> >& coplanarGroup = 
-          newFactory->coplanarGroups.GetExtend (lmID);
-        csArray<size_t>& thisGroup = 
-          coplanarGroup.GetExtend (coplanarGroup.GetSize());
-        for (size_t p = 0; p < prims.GetSize(); p++)
-        {
-          size_t outIdx = outArray.Push (prims[p]);
-          thisGroup.Push (outIdx);
-        }
-        thisGroup.ShrinkBestFit();
-        //outPrims.Push (prims);
-        //prim.SetLightmapID (lmID);
+        SizeAndIndex newSize;
+        newSize.uvsize = uvSize;
+        newSize.index = i;
+        sizes.Push (newSize);
       }
+    }
+    // The rectangle packer works better when the rects are sorted by size.
+    sizes.Sort (SortBySize);
+
+    for (size_t s = 0; s < sizes.GetSize(); s++)
+    {
+      FactoryPrimitiveArray& prims = coplanarPrims[sizes[s].index];
+
+      csRect lmArea; 
+      int lmID;
+      bool res;
+      res = AllocLightmap (localLightmaps, (int)ceilf (sizes[s].uvsize.x), 
+	  (int)ceilf (sizes[s].uvsize.y), lmArea, lmID);
+      if (!res) continue; 
+
+      FactoryPrimitiveArray& outArray = outPrims.GetExtend (lmID);
+      csArray<csArray<size_t> >& coplanarGroup = 
+        newFactory->coplanarGroups.GetExtend (lmID);
+      csArray<size_t>& thisGroup = 
+        coplanarGroup.GetExtend (coplanarGroup.GetSize());
+      for (size_t p = 0; p < prims.GetSize(); p++)
+      {
+        size_t outIdx = outArray.Push (prims[p]);
+        thisGroup.Push (outIdx);
+      }
+      thisGroup.ShrinkBestFit();
     }
 
     // Set the size of the lightmaps..
@@ -237,7 +275,7 @@ namespace lighter
       primsByD.InsertSorted (prim, SortPrimByD);
     }
     // Takes all neighbouring primitives
-    csArray<UberPrimitive> uberPrims;
+    UberPrimArray uberPrims;
     while (primsByD.GetSize() > 0)
     {
       // Primitives are sorted by D, look for actual coplanar ones
@@ -407,6 +445,29 @@ namespace lighter
     return true;
   }
 
+  void SimpleUVFactoryLayouter::ScaleLightmapUVs (FactoryPrimitiveArray& prims,
+                                                  Vector2Array& lightmapUVs, 
+                                                  float uscale, float vscale)
+  {
+    csBitArray scaled;
+    scaled.SetSize (lightmapUVs.GetSize());
+
+    for (size_t p = 0; p < prims.GetSize(); p++)
+    {
+      FactoryPrimitive& prim = prims[p];
+      Primitive::TriangleType& t = prim.GetTriangle ();
+
+      for (int i = 0; i < 3; ++i)
+      {
+        size_t index = t[i];
+        if (scaled.IsBitSet (index)) continue;
+        lightmapUVs[index].x *= uscale;
+        lightmapUVs[index].y *= vscale;
+        scaled.SetBit (index);
+      }
+    }
+  }
+
   //-------------------------------------------------------------------------
 
   bool SimpleUVObjectLayouter::LayoutUVOnPrimitives (PrimitiveArray &prims, 
@@ -421,11 +482,12 @@ namespace lighter
       const csArray<size_t>& coPrim = coplanarGroup[c];
       csVector2 minuv, maxuv, uvSize;
 
-      // Compute uv-size  
-      prims[coPrim[0]].ComputeMinMaxUV (lightmapUVs, minuv, maxuv);
+      // Compute uv-size
+      Primitive& prim0 = prims[coPrim[0]];
+      prim0.ComputeMinMaxUV (lightmapUVs, minuv, maxuv);
       for (size_t p = 1; p < coPrim.GetSize(); p++)
       {
-        Primitive& prim (prims[coPrim[p]]);
+        Primitive& prim = prims[coPrim[p]];
         csVector2 pminuv, pmaxuv;
         prim.ComputeMinMaxUV (lightmapUVs, pminuv, pmaxuv);
         minuv.x = csMin (minuv.x, pminuv.x);
@@ -452,7 +514,7 @@ namespace lighter
       const csArray<size_t>& coPrim = coplanarGroup[c];
       for (size_t p = 0; p < coPrim.GetSize(); p++)
       {
-        Primitive& prim (prims[coPrim[p]]);
+        Primitive& prim = prims[coPrim[p]];
         const Primitive::TriangleType& t = prim.GetTriangle ();
         // Be careful to remap each distinct vertex only once
         const csVector2& move = remaps[c];

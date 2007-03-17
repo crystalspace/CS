@@ -82,6 +82,7 @@ namespace lighter
       bool UsesEdge (const Edge& edge);
       void AddPrimitive (const FactoryPrimitive& prim);
     };
+    typedef csSafeCopyArray<UberPrimitive> UberPrimArray;
 
     void DetermineNeighbouringPrims (
       const FactoryPrimitiveArray& inPrims, ObjectFactoryVertexData& vertexData,
@@ -93,6 +94,8 @@ namespace lighter
     bool ProjectPrimitives (FactoryPrimitiveArray& prims, 
       csBitArray &usedVerts, float uscale, float vscale,
       Vector2Array& lightmapUVs);
+    void ScaleLightmapUVs (FactoryPrimitiveArray& prims, 
+      Vector2Array& lightmapUVs, float uscale, float vscale);
   };
 
   class SimpleUVObjectLayouter : public LightmapUVObjectLayouter
@@ -107,6 +110,11 @@ namespace lighter
     friend class SimpleUVFactoryLayouter;
     SimpleUVFactoryLayouter* parent;
     Vector2Array lightmapUVs;
+    /* Records which faces were determined to be coplanar
+     * - outer array: a set of groups for each lightmaps
+     * - next inner array: contains the groups
+     * - innermost array: primitive indices
+     */
     csArray<csArray<csArray<size_t> > > coplanarGroups;
 
     void MapComplete (const csArray<csVector2>& sizes, 

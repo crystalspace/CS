@@ -209,8 +209,6 @@ namespace lighter
         }
       }
     }
-
-    
     
     return res * 0.25f;
   }
@@ -518,7 +516,7 @@ namespace lighter
         size_t numElements = prim.GetElementCount ();        
         Lightmap* normalLM = sector->scene->GetLightmap (prim.GetGlobalLightmapID (), (Light*)0);
 
-        globalLMCache->LockLM (normalLM);
+        ScopedSwapLock<Lightmap> lightLock (*normalLM);
 
         pdLightLMs.Empty ();
         for (size_t pdli = 0; pdli < allPDLights.GetSize (); ++pdli)
@@ -526,7 +524,7 @@ namespace lighter
           Lightmap* lm = sector->scene->GetLightmap (prim.GetGlobalLightmapID (),
             allPDLights[pdli]);
 
-          globalLMCache->LockLM (lm);
+          lm->Lock ();
           pdLightLMs.Push (lm);
         }
 
@@ -592,8 +590,10 @@ namespace lighter
             lm->SetAddPixel (u, v, c * pixelArea);
           }
         }
-
-        globalLMCache->UnlockAll ();
+        for (size_t pdli = 0; pdli < allPDLights.GetSize (); ++pdli)
+        {
+          pdLightLMs[pdli]->Unlock();
+        }
       }
     }
   }

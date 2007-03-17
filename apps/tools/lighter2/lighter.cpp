@@ -60,7 +60,7 @@ namespace lighter
   Lighter::~Lighter ()
   {
     CleanUp ();
-    LightmapCache::CleanUp ();
+    delete swapManager;
   }
 
   int Lighter::Run ()
@@ -99,7 +99,11 @@ namespace lighter
     LoadConfiguration ();
     globalConfig.Initialize ();
     globalTUI.Initialize ();
-    LightmapCache::Initialize ();
+    {
+      int maxSwapSize = configMgr->GetInt ("lighter2.swapcachesize", 
+        200)*1024*1024;
+      swapManager = new SwapManager (maxSwapSize);
+    }
 
     // Initialize the TUI
     globalTUI.Redraw ();
@@ -203,6 +207,7 @@ namespace lighter
       sect->Initialize ();
       progInitialize.IncProgress (sectorProgress);
     }
+    delete uvLayout;
 
     for (size_t i = 0; i < scene->GetLightmaps().GetSize(); i++)
     {
@@ -214,6 +219,25 @@ namespace lighter
     if (!scene->SaveWorldMeshes (/*progUpdateWorld*/)) return false;
     if (!scene->FinishWorldSaving ()) return false;
     
+    sectIt.Reset();
+    while (sectIt.HasNext ())
+    {
+      csRef<Sector> sect = sectIt.Next ();
+      sect->PrepareLighting();
+      //progInitialize.IncProgress (sectorProgress);
+    }
+    
+    /* TODO: the global lightmaps' subrect allocators are not needed any
+	     more, discard contents. */
+
+    sectIt.Reset();
+    while (sectIt.HasNext ())
+    {
+      csRef<Sector> sect = sectIt.Next ();
+      sect->BuildKDTree ();
+      //progInitialize.IncProgress (sectorProgress);
+    }
+   
     // Shoot direct lighting
     if (globalConfig.GetLighterProperties ().doDirectLight)
     {
@@ -361,8 +385,9 @@ namespace lighter
     csPrintf ("  Use simplified text ui for output. Recommended/needed\n"
               "  for platforms without ANSI console handling such as msys.\n");
 
-    csPrintf (" --lmcachesize=<byte>\n");
-    csPrintf ("  Set the size of the in memory lightmap cache in number of bytes\n");
+    csPrintf (" --swapcachesize=<megabyte>\n");
+    csPrintf ("  Set the size of the in memory swappable data cache in number "
+      "of megabytes\n");
 
     csPrintf (" --[no]directlight\n");
     csPrintf ("  Calculate direct lighting using per lumel/vertex sampling\n");

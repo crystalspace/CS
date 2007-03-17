@@ -41,7 +41,7 @@ namespace lighter
   public:
     Object_Genmesh (ObjectFactory_Genmesh* factory);
 
-    virtual void SaveMesh (Scene* scene, iDocumentNode *node);
+    virtual void SaveMesh (Sector* sector, iDocumentNode *node);
 
     virtual void FreeNotNeededForLighting ();
 

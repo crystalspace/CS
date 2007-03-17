@@ -194,6 +194,8 @@ namespace lighter
       FactoryPrimitiveArray& factPrims = factory->layoutedPrimitives[j].primitives;
       PrimitiveArray& allPrimitives =
         this->allPrimitives.GetExtend (j);
+
+      allPrimitives.SetCapacity (allPrimitives.GetSize() + factPrims.GetSize());
       for (i = 0; i < factPrims.GetSize(); i++)
       {
         Primitive newPrim (vertexData);
@@ -214,7 +216,21 @@ namespace lighter
         if (!res) return false;
       }
 
-      for (i = 0; i < allPrimitives.GetSize(); i++)
+    }
+
+    factory.Invalidate();
+
+    return true;
+  }
+
+  void Object::PrepareLighting ()
+  {
+    for (size_t j = 0; j < this->allPrimitives.GetSize(); j++)
+    {
+      PrimitiveArray& allPrimitives = this->allPrimitives[j];
+      allPrimitives.ShrinkBestFit ();
+
+      for (size_t i = 0; i < allPrimitives.GetSize(); i++)
       {
         Primitive& prim = allPrimitives[i];
         prim.ComputeUVTransform ();
@@ -230,10 +246,6 @@ namespace lighter
         csColor (0.0f, 0.0f, 0.0f));
       litColorsPD = new LitColorsPDHash();
     }
-
-    factory.Invalidate();
-
-    return true;
   }
 
   void Object::StripLightmaps (csSet<csString>& lms)
@@ -283,7 +295,7 @@ namespace lighter
     }
   }
 
-  void Object::SaveMesh (Scene* /*scene*/, iDocumentNode* node)
+  void Object::SaveMesh (Sector* /*sector*/, iDocumentNode* node)
   {
     // Save out the object to the node
     csRef<iSaverPlugin> saver = 

@@ -387,7 +387,12 @@ protected:
   {
     ElementHandler::InitRegion (root.p+start, count);
   }
-
+  
+  /**
+   * Set the internal pointer to the data.
+   * \warning This is \em obviously dangerous.
+   */
+  void SetData (T* data) { root.p = data; }
 private:
   /// Copy from one array to this one, properly constructing the copied items.
   void CopyFrom (const csArray& source)
@@ -1077,13 +1082,13 @@ public:
     { currentelem = 0; }
 
   protected:
-    Iterator(csArray<T, ElementHandler>& newarray)
+    Iterator(csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>& newarray)
 	: currentelem(0), array(newarray) {}
-    friend class csArray<T, ElementHandler>;
+    friend class csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>;
 
   private:
     size_t currentelem;
-    csArray<T, ElementHandler>& array;
+    csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>& array;
   };
 
   /** Iterator for the Array<> class */
@@ -1111,13 +1116,13 @@ public:
     { currentelem = 0; }
 
   protected:
-    ConstIterator(const csArray<T, ElementHandler>& newarray)
+    ConstIterator(const csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>& newarray)
       : currentelem(0), array(newarray) {}
-    friend class csArray<T, ElementHandler>;
+    friend class csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>;
 
   private:
     size_t currentelem;
-    const csArray<T, ElementHandler>& array;
+    const csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>& array;
   };
 
   /** Returns an Iterator which traverses the array. */

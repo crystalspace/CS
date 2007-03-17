@@ -31,7 +31,7 @@ namespace lighter
 
   class Primitive;
 
-  class ElementAreas
+  class ElementAreas: public CS::Memory::CustomAllocated
   {
     friend class Primitive;
     
@@ -72,6 +72,11 @@ namespace lighter
       : vertexData (vertexData)
     {
     }
+    inline PrimitiveBase (const PrimitiveBase& other) 
+      : vertexData (other.vertexData), triangle (other.triangle), 
+        plane (other.plane)
+    {
+    }
   public:
     typedef CS::TriangleT<size_t> TriangleType;
 
@@ -93,6 +98,8 @@ namespace lighter
     /// Calculate min-max UV-coords
     void ComputeMinMaxUV (const Vector2Array& lightmapUVs,
       csVector2 &min, csVector2 &max) const;
+    void ComputeMinMaxUV (const ObjectVertexData::Vector2Array& lightmapUVs,
+      csVector2 &min, csVector2 &max) const;
 
     inline TriangleType& GetTriangle () { return triangle; }
     inline const TriangleType& GetTriangle () const { return triangle; }
@@ -104,6 +111,11 @@ namespace lighter
     { return originalPrim; }
     inline void SetOriginalPrimitive (FactoryPrimitive*p) 
     { originalPrim = p; }*/
+
+    inline ObjectBaseVertexData& GetVertexData () 
+    { return *vertexData; }
+    inline const ObjectBaseVertexData& GetVertexData () const 
+    { return *vertexData; }
 
   protected:
     /// Vertex data holder
@@ -144,6 +156,15 @@ namespace lighter
         radObject (0)
     {
     }
+    inline Primitive (const Primitive& other) 
+      : PrimitiveBase (other), elementAreas (other.elementAreas), 
+        uFormVector (other.uFormVector), vFormVector (other.uFormVector), 
+        minCoord (other.minCoord), minUV (other.minUV), maxUV (other.maxUV), 
+        radObject (other.radObject), globalLightmapID (other.globalLightmapID),
+        lambdaCoeffTV (other.lambdaCoeffTV), myCoeffTV (other.myCoeffTV)
+    {
+    }
+    inline ~Primitive () { }
 
     /**
      * Prepare the primitive, create elements.

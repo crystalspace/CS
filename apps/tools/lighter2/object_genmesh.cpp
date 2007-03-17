@@ -364,7 +364,7 @@ namespace lighter
     saverPluginName = "crystalspace.mesh.saver.genmesh";
   }
 
-  void Object_Genmesh::SaveMesh (Scene* scene, iDocumentNode *node)
+  void Object_Genmesh::SaveMesh (Sector* sector, iDocumentNode *node)
   {
     csRef<iGeneralMeshState> genMesh = 
       scfQueryInterface<iGeneralMeshState> (
@@ -405,7 +405,7 @@ namespace lighter
           scfQueryInterface<iShaderVariableContext> (subMesh);
 
         uint lmID = uint (lightmapIDs[i]);
-        Lightmap* lm = scene->GetLightmaps()[lmID];
+        Lightmap* lm = sector->scene->GetLightmaps()[lmID];
         csRef<csShaderVariable> svLightmap;
         svLightmap.AttachNew (new csShaderVariable (lightmapName));
         svLightmap->SetValue (lm->GetTexture());
@@ -421,11 +421,11 @@ namespace lighter
       {
         csRenderBufferLock<csVector2> bufferLock (lightmapBuffer);
         // Save vertex-data
-        RenormalizeLightmapUVs (scene->GetLightmaps(), bufferLock);
+        RenormalizeLightmapUVs (sector->scene->GetLightmaps(), bufferLock);
       }
     }
 
-    Object::SaveMesh (scene, node);
+    Object::SaveMesh (sector, node);
 
     if (lightPerVertex)
     {

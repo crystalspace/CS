@@ -20,27 +20,13 @@
 #define __LIGHTMAP_H__
 
 #include "common.h"
+#include "swappable.h"
 
 namespace lighter
 {
   class LightmapMask;
 
-  struct LightmapData
-  {
-    LightmapData ()
-      : colorArray (0), colorArraySize (0)
-    {}
-
-    ~LightmapData ()
-    {
-      delete[] colorArray;
-    }
-
-    csColor *colorArray;
-    size_t colorArraySize;
-  };
-
-  class Lightmap
+  class Lightmap : public Swappable
   {
   public:
     Lightmap (uint width, uint height);
@@ -84,7 +70,7 @@ namespace lighter
     // Set a pixel to given color
     inline void SetAddPixel (size_t u, size_t v, csColor c)
     {
-      data->colorArray[v*width + u] += c;
+      colorArray[v*width + u] += c;
     }
 
     // Save the lightmap to given file
@@ -94,8 +80,7 @@ namespace lighter
     void FixupLightmap (const LightmapMask& mask);
 
     // Data getters
-    inline LightmapData* GetData () const { return data; }
-    inline void SetData (LightmapData* d) { data = d; }
+    inline csColor* GetData () const { return colorArray; }
 
     inline uint GetWidth () const {return width; }
     inline uint GetHeight () const {return height; }
@@ -114,9 +99,64 @@ namespace lighter
     iTextureWrapper* GetTexture();
 
     bool IsNull ();
+
+    void Lock () const
+    {
+      if (!IsLocked() && (colorArray == 0))
+      {
+	colorArray = AllocColors();
+      }
+      Swappable::Lock();
+    }
+    
+    virtual void GetSwapData (void*& data, size_t& size)
+    {
+#if 0
+      data = colorArray;
+      size = colorArray ? width * height * sizeof (csColor) : 0;
+      // Set a bogus pointer so accesses to swapped data causes a segfault
+      colorArray = BogusPointer ();
+#endif
+      if (colorArray == 0) colorArray = AllocColors ();
+      data = colorArray;
+      size = width * height * sizeof (csColor);
+      // Set a bogus pointer so accesses to swapped data causes a segfault
+      colorArray = BogusPointer ();
+    }
+    virtual size_t GetSwapSize()
+    {
+#if 0
+      return colorArray ? width * height * sizeof (csColor) : 0;
+#endif
+      return width * height * sizeof (csColor);
+    }
+    virtual void SwapIn (void* data, size_t size)
+    {
+#if 0
+      if (data != 0) 
+      {
+        /* We weren't empty when swapped out: take pointer over. */
+        CS_ASSERT (size == width * height * sizeof (csColor));
+        colorArray = (csColor*)data;
+      }
+      else
+      {
+        /* We were empty when swapped in. We must've been swapped out before,
+           so the pointer should be bogus here. */
+        CS_ASSERT (colorArray == BogusPointer ());
+        /* Lock() with no color array allocated. Being swapped in implies we're
+           locked - however, Lock() won't have allocated memory as colorArray
+           wasn't 0. So allocate now. */
+        colorArray = AllocColors ();
+      }
+#endif
+      CS_ASSERT (size == width * height * sizeof (csColor));
+      CS_ASSERT (colorArray == BogusPointer ());
+      colorArray = (csColor*)data;
+    }
   protected:
     // The color data itself
-    LightmapData* data;
+    mutable csColor *colorArray;
 
     // Size
     uint width, height;
@@ -132,6 +172,14 @@ namespace lighter
 
     iTextureWrapper* texture;
     csString GetTextureNameFromFilename (const csString& file);
+
+    CS_FORCEINLINE csColor* BogusPointer () const 
+    { return ((csColor*)~0) - (width * height); }
+    CS_FORCEINLINE csColor* AllocColors () const
+    { 
+      return (csColor*)SwappableHeap::Alloc (width * height * 
+        sizeof (csColor));
+    }
   };
   typedef csArray<Lightmap> LightmapArray;
   typedef csPDelArray<Lightmap> LightmapPtrDelArray;
@@ -166,100 +214,6 @@ namespace lighter
     // Do a static scaling
     static void ApplyScaleClampFunction (csColor* colors, size_t numColors, 
       float scaleValue, float maxValue);
-  };
-
-  // File-backed cache for LM data
-  class LightmapCache
-  {
-  public:
-    LightmapCache (size_t maxSize);
-    ~LightmapCache ();
-
-    // Initialize, load config, preallocate etc
-    static void Initialize ();
-
-    // Remove etc
-    static void CleanUp ();
-
-    // Lock a light map in cache, make sure it have data.
-    // Post condition: lightmap have a sufficiently large memory buffer
-    void LockLM (Lightmap* lm);
-
-    // Unlock a light map in cache, potentially it can be swapped out after this
-    void UnlockLM (Lightmap* lm);
-
-    // Unlock all light maps in cache
-    void UnlockAll ();
-
-    // Remove any trace of lm
-    void RemoveLM (Lightmap* lm);
-  private:
-    // One in-memory entry
-    struct LMEntry
-    {
-      LMEntry ()
-        : lm (0), data (0), lastUnlockTime (0)
-      {
-      }
-
-      Lightmap* lm;
-      LightmapData* data;
-      size_t lastUnlockTime;
-    };
-
-    // Swap out one LM-entry to disk
-    bool SwapOut (LMEntry* e);
-
-    // Swap in one LM-entry from disk
-    bool SwapIn (LMEntry* e);
-
-    // Free memory, around size bytes
-    void FreeMemory (size_t desiredAmount);
-
-    // Allocate
-    LightmapData* AllocateData (size_t size);
-
-    // Given a lightmap, get a temporary filename for the cache
-    csString GetLMFileName (Lightmap* lm);
-
-    // Compare two LM entries
-    static int LMEntryAgeCompare (LMEntry* const & e1, LMEntry* const& e2)
-    {
-      return (int)e1->lastUnlockTime - (int)e2->lastUnlockTime;
-    }
-    
-    //All current LM cache entries
-    typedef csHash<LMEntry*, csPtrKey<Lightmap> > LMCacheType;
-    LMCacheType lmCache;
-
-    //Currently unlocked LM cache entires (potential to be swapped out)
-    typedef csSet<csPtrKey<LMEntry> > UnlockedEntriesType;
-    UnlockedEntriesType unlockedCacheEntries;
-
-    //Statistics for house-keeping
-    size_t maxCacheSize, currentCacheSize;
-    size_t currentUnlockTime;
-  };
-  extern LightmapCache* globalLMCache;
-
-  // Small helper to lock LMs
-  class LightmapCacheLock
-  {
-  public:
-    LightmapCacheLock (Lightmap* lm)
-      : lightmap (lm)
-    {
-      globalLMCache->LockLM (lightmap);
-    }
-
-
-    ~LightmapCacheLock ()
-    {
-      globalLMCache->UnlockLM (lightmap);
-    }
-
-  private:
-    Lightmap* lightmap;
   };
 }
 

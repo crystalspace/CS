@@ -29,10 +29,8 @@
 
 namespace lighter
 {
-  LightmapCache* globalLMCache;
-
   Lightmap::Lightmap (uint width, uint height)
-    : data (0), width (0), height (0), maxUsedU (0), maxUsedV (0), 
+    : colorArray (0), width (0), height (0), maxUsedU (0), maxUsedV (0), 
     lightmapAllocator (csRect (0,0,1,1)), texture (0)
   {
     Grow (width, height);
@@ -40,44 +38,43 @@ namespace lighter
 
   Lightmap::~Lightmap ()
   {
-    globalLMCache->RemoveLM (this);
-
-    delete data;
+    if (colorArray) SwappableHeap::Free (colorArray);
   }
 
   void Lightmap::AddAmbientTerm (const csColor amb)
   {
-    LightmapCacheLock l (this);
-    LightmapPostProcess::AddAmbientTerm (data->colorArray,
-      data->colorArraySize, amb);
+    ScopedSwapLock<Lightmap> l (*this);
+    LightmapPostProcess::AddAmbientTerm (colorArray,
+      width * height, amb);
   }
 
   void Lightmap::ApplyExposureFunction (float expConstant, float expMax)
   {
-    LightmapCacheLock l (this);
-    LightmapPostProcess::ApplyExposureFunction (data->colorArray,
-      data->colorArraySize,  expConstant, expMax);
+    ScopedSwapLock<Lightmap> l (*this);
+    LightmapPostProcess::ApplyExposureFunction (colorArray,
+      width * height,  expConstant, expMax);
   }
 
   void Lightmap::ApplyScaleClampFunction (float scaleVal, float maxValue)
   {
-    LightmapCacheLock l (this);
-    LightmapPostProcess::ApplyScaleClampFunction (data->colorArray,
-      data->colorArraySize,  scaleVal, maxValue);
+    ScopedSwapLock<Lightmap> l (*this);
+    LightmapPostProcess::ApplyScaleClampFunction (colorArray,
+      width * height,  scaleVal, maxValue);
   }
 
   void Lightmap::SaveLightmap (const csString& fname)
   {
-    LightmapCacheLock l (this);
+    ScopedSwapLock<Lightmap> l (*this);
 
     filename = fname;
     //write it out
 
     // first we downsample to LDR csRGBpixel RGBA
-    csRGBpixel *pixelData = new csRGBpixel[width*height];
-    for (uint i = 0; i < data->colorArraySize; i++)
+    const size_t colorArraySize = width*height;
+    csRGBpixel *pixelData = new csRGBpixel[colorArraySize];
+    for (uint i = 0; i < colorArraySize; i++)
     {
-      csColor &c = data->colorArray[i];
+      csColor &c = colorArray[i];
       c.Clamp (1.0f,1.0f,1.0f); //just make sure we don't oversaturate below
       pixelData[i].red = (uint) (c.red * 255.0f);
       pixelData[i].green = (uint) (c.green * 255.0f);
@@ -99,11 +96,11 @@ namespace lighter
 
   void Lightmap::FixupLightmap (const LightmapMask& mask)
   {
-    LightmapCacheLock l (this);
-    csColor* lmData = data->colorArray;
+    ScopedSwapLock<Lightmap> l (*this);
+    csColor* lmData = colorArray;
     const float* mmData = mask.maskData.GetArray ();
 
-    const size_t size = data->colorArraySize;
+    const size_t size = width*height;
 
     for (uint j = 0; j < size; j++, lmData++, mmData++)
     {
@@ -113,7 +110,7 @@ namespace lighter
     }
 
     // Reset
-    lmData = data->colorArray;
+    lmData = colorArray;
     mmData = mask.maskData.GetArray ();
 
     for (uint v = 0; v < height; v++)
@@ -171,11 +168,11 @@ namespace lighter
 
   bool Lightmap::IsNull ()
   {
-    LightmapCacheLock l (this);
+    ScopedSwapLock<Lightmap> l (*this);
 
-    for (uint i = 0; i < data->colorArraySize; i++)
+    for (uint i = 0; i < width * height; i++)
     {
-      const csColor &c = data->colorArray[i];
+      const csColor &c = colorArray[i];
       if (!c.IsBlack ())
         return false;
     }
@@ -230,271 +227,4 @@ namespace lighter
     }
   }
 
-  //-------------------------------------------------------------------------
-
-  LightmapCache::LightmapCache (size_t maxSize)
-    : maxCacheSize (maxSize / sizeof(csColor)), currentCacheSize (0),
-    currentUnlockTime (1)
-  {
-
-  }
-
-  LightmapCache::~LightmapCache ()
-  {
-  }
-
-  void LightmapCache::Initialize ()
-  {
-    int maxSize = globalLighter->configMgr->GetInt ("lighter2.lmcachesize", 
-      200*1024*1024);
-
-    globalLMCache = new LightmapCache (maxSize);
-
-  }
-
-  void LightmapCache::CleanUp ()
-  {
-    delete globalLMCache;
-    globalLMCache = 0;
-  }
-
-  void LightmapCache::LockLM (Lightmap* lm)
-  {
-    LMEntry *e = lmCache.Get (lm, 0);
-
-    if (!e)
-    {
-      // Allocate and setup a new entry
-      e = new LMEntry;
-      e->lm = lm;
-      lmCache.Put (lm, e);
-    }
-    else
-    {
-      unlockedCacheEntries.Delete (e);
-
-      // Swap it in
-      if (!e->data && !SwapIn (e))
-      {
-        //Reallocate? Assert?
-        CS_ASSERT(0);
-      }
-    }    
-
-    if (!e->data)
-    {
-      size_t physSize = lm->GetWidth () * lm->GetHeight ();
-      e->data = AllocateData (physSize);
-    }
-
-    lm->SetData (e->data);    
-  }
-
-  void LightmapCache::UnlockLM (Lightmap* lm)
-  {
-    LMEntry *e = lmCache.Get (lm, 0);
-    CS_ASSERT (e != 0);
-
-    unlockedCacheEntries.Add (e);
-    e->lastUnlockTime = currentUnlockTime++;
-  }
-
-  void LightmapCache::UnlockAll ()
-  {
-    LMCacheType::GlobalIterator git = lmCache.GetIterator ();
-
-    while (git.HasNext ())
-    {
-      LMEntry* e = git.Next ();
-
-      if (!unlockedCacheEntries.In (e))
-      {
-        unlockedCacheEntries.AddNoTest (e);
-        e->lastUnlockTime = currentUnlockTime;
-      }
-    }
-
-    currentUnlockTime++;
-  }
-
-  void LightmapCache::RemoveLM (Lightmap* lm)
-  {
-    LMEntry *e = lmCache.Get (lm, 0);
-
-    if (e)
-    {
-      unlockedCacheEntries.Delete (e);
-      csString tmpFileName = GetLMFileName (e->lm);
-      globalLighter->vfs->DeleteFile (tmpFileName);
-    }
-  }
-
-  bool LightmapCache::SwapOut (LMEntry* e)
-  {
-    // If nothing to swap out, nothing to do
-    if (e->data == 0)
-      return false;
-
-    csString tmpFileName = GetLMFileName (e->lm);
-
-    csRef<iFile> file = globalLighter->vfs->Open (tmpFileName, VFS_FILE_WRITE);
-
-    if (!file.IsValid ())
-      return false;
-
-    // Write a smallish header
-    file->Write ("L2LM", 4);
-    file->Write ((const char*)&e->data->colorArraySize, sizeof (size_t));
-
-    // Write the raw data
-    z_stream zs;
-    memset (&zs, 0, sizeof(z_stream));
-
-    zs.next_in = (z_Byte*)e->data->colorArray;
-    zs.avail_in = (uInt)(e->data->colorArraySize*sizeof(csColor));
-
-    if (deflateInit (&zs, 1) != Z_OK)
-      return false;
-
-    size_t compressBufferSize = 128*1024;
-    CS_ALLOC_STACK_ARRAY(z_Byte, compressBuffer, compressBufferSize);
-
-    while (true)
-    {
-      zs.next_out = compressBuffer;
-      zs.avail_out = (uInt)compressBufferSize;
-
-      int rc = deflate (&zs, Z_FINISH);
-      size_t size = compressBufferSize - zs.avail_out;
-
-      if (file->Write ((const char*)compressBuffer, size) != size)
-      {
-        deflateEnd (&zs);
-        return false;
-      }
-
-      if (rc == Z_STREAM_END)
-        break;
-    }
-    deflateEnd (&zs);
-
-    //file->Write ((const char*)e->data->colorArray, 
-    //  e->data->colorArraySize*sizeof (csColor));
-
-    // Mark it as swapped out too..
-    unlockedCacheEntries.Delete (e);
-    
-    // Delete the memory (@@TODO: pool it)
-    currentCacheSize -= e->data->colorArraySize;
-
-    delete e->data;
-    e->lm->SetData (0);
-    e->data = 0;  
-
-    return true;
-  }
-
-  bool LightmapCache::SwapIn (LMEntry* e)
-  {
-    csString tmpFileName = GetLMFileName (e->lm);
-
-    csRef<iFile> file = globalLighter->vfs->Open (tmpFileName, VFS_FILE_READ);
-    if (!file.IsValid ())
-      return false;
-
-    char signBuffer [4];
-    file->Read (signBuffer, 4);
-
-    // Bail on wrong header
-    if (signBuffer[0] != 'L' || signBuffer[1] != '2' ||
-      signBuffer[2] != 'L' || signBuffer[3] != 'M')
-      return false;
-
-    // Read size
-    size_t lmSize;
-    file->Read ((char*)&lmSize, sizeof (size_t));
-
-    // Allocate
-    e->data = AllocateData (lmSize);
-
-    //file->Read ((char*)e->data->colorArray,
-    //  e->data->colorArraySize*sizeof (csColor));
-    z_stream zs;
-    memset (&zs, 0, sizeof(z_stream));
-
-    zs.next_out = (z_Byte*)e->data->colorArray;
-    zs.avail_out = (uInt)(e->data->colorArraySize*sizeof(csColor));
-
-    if (inflateInit (&zs) != Z_OK)
-      return false;
-
-    size_t compressBufferSize = 128*1024;
-    CS_ALLOC_STACK_ARRAY(z_Byte, compressBuffer, compressBufferSize);
-
-    while (true)
-    {
-      size_t readSize = file->Read ((char*)compressBuffer, compressBufferSize);
-
-      zs.next_in = compressBuffer;
-      zs.avail_in = (uInt)readSize;
-
-      int rc = inflate (&zs, Z_FINISH);
-
-      if (rc == Z_STREAM_END)
-        break;
-    }
-
-
-    return true;
-  }
-
-
-
-  void LightmapCache::FreeMemory (size_t targetSize)
-  {
-    // Walk through the unlocked set of entries, swap them out until we have enough free memory
-    // size_t targetSize = currentCacheSize - desiredAmount;
-
-    csArray<LMEntry*> sortedList;
-
-    UnlockedEntriesType::GlobalIterator git = unlockedCacheEntries.GetIterator ();
-    while (git.HasNext ())
-    {
-      LMEntry* e = git.Next ();
-      sortedList.InsertSorted (e, LMEntryAgeCompare);
-    }
-
-    csArray<LMEntry*>::Iterator sit = sortedList.GetIterator ();
-    while (targetSize < currentCacheSize && sit.HasNext ())
-    {
-      LMEntry* e = sit.Next ();
-
-      SwapOut (e);
-    }
-  }
-
-  LightmapData* LightmapCache::AllocateData (size_t size)
-  {
-    if (currentCacheSize + size > maxCacheSize)
-    {
-      FreeMemory (maxCacheSize - size);
-    }
-
-    LightmapData* lmD = new LightmapData;
-    lmD->colorArray = new csColor[size];
-    lmD->colorArraySize = size;
-
-    memset (lmD->colorArray, 0, lmD->colorArraySize * sizeof (csColor));
-
-    currentCacheSize += size;
-
-    return lmD;
-  }
-
-  csString LightmapCache::GetLMFileName (Lightmap* lm)
-  {
-    csString tmp;
-    tmp << "/tmp/lighter2/lm" << (uintptr_t)lm << ".tmp";
-    return tmp;
-  }
 }

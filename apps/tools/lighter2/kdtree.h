@@ -320,7 +320,7 @@ namespace lighter
     {
     public:
       PrimBox ()
-        : primitive (0), flags (STATE_STRADDLING), clone (0)
+        : primitive (0), clone (0), flags (STATE_STRADDLING)
       {
         //Setup side cross references
         for (size_t i = 0; i < 3; ++i)

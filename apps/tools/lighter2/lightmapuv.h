@@ -59,7 +59,7 @@ namespace lighter
      * \param prims Input primitives.
      * \param groupNum Index of the primitive arrays as returned by 
      *   LightmapUVLayouter::LayoutFactory.
-     * \param inPrims Input vertex data.
+     * \param vertexData Input vertex data.
      * \param lmID Output global lightmap ID onto which all primitives were
      *   layouted.
      */

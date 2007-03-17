@@ -38,9 +38,23 @@ namespace lighter
       csRef<Object> obj = objIt.Next ();
       obj->Initialize ();
     }
+  }
 
+  void Sector::PrepareLighting ()
+  {
+    // Prepare lighting of objects
+    ObjectHash::GlobalIterator objIt = allObjects.GetIterator ();
+    while (objIt.HasNext ())
+    {
+      csRef<Object> obj = objIt.Next ();
+      obj->PrepareLighting ();
+    }
+  }
+
+  void Sector::BuildKDTree ()
+  {
     // Build KD-tree
-    objIt.Reset ();
+    ObjectHash::GlobalIterator objIt = allObjects.GetIterator ();
     KDTreeBuilder builder;
     kdTree = builder.BuildTree (objIt);
   }
@@ -549,10 +563,10 @@ namespace lighter
 
     // Setup a sector struct
     const char* sectorName = sector->QueryObject ()->GetName ();
-    Sector* radSector = sectors.Get (sectorName, 0);
+    csRef<Sector> radSector = sectors.Get (sectorName, 0);
     if (radSector == 0)
     {
-      radSector = new Sector (this);
+      radSector.AttachNew (new Sector (this));
       radSector->sectorName = sectorName;
       sectors.Put (radSector->sectorName, radSector);
       originalSectorHash.Put (sector, radSector);
@@ -1076,7 +1090,7 @@ namespace lighter
     {
       // We do have one
       radObj->StripLightmaps (fileInfo->texturesToClean);
-      radObj->SaveMesh (this, objNode);
+      radObj->SaveMesh (sect, objNode);
       radObj->FreeNotNeededForLighting ();
       savedObjects.AddNoTest (name);
 

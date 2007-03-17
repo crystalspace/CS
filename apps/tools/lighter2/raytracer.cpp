@@ -102,7 +102,7 @@ namespace lighter
     HitPoint &hit, RaytraceState& state, HitCallback& hitCB, HitIgnore& ignoreCB)
   {
     size_t nIdx, nMax;
-    nMax = KDTreeNode_Op::GetPrimitiveListSize (node);;
+    nMax = KDTreeNode_Op::GetPrimitiveListSize (node);
     bool haveHit = false;
     bool haveAnyHit = false;
 
@@ -120,7 +120,7 @@ namespace lighter
       if (ignoreCB (prim->primPointer) ||
         ray.ignorePrimitive == prim->primPointer ||
         state.mailbox.PutPrimitiveRay (prim->primPointer, ray.rayID))
-        continue;
+          continue;
 
       haveHit = IntersectPrimitiveRay (*prim, ray, thisHit);
       if (haveHit)

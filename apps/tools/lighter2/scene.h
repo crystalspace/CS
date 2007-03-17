@@ -59,6 +59,11 @@ namespace lighter
     // Initialize any extra data in the sector
     void Initialize ();
 
+    void PrepareLighting ();
+
+    // Build kd tree for Sector
+    void BuildKDTree ();
+
     // All objects in sector
     ObjectHash allObjects;
 
