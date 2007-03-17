@@ -494,7 +494,9 @@ struct iParticleSystem : public iParticleSystemBase
 
   /**
    * Lock the particles and take external control over them.
-   * 
+   * \param maxParticles Amount of particles for which memory is allocated in
+   *   the returned particles buffer. (The actual number of provided particles 
+   *   must be set there; obviously it can't exceed \a maxParticles.)
    */
   virtual csParticleBuffer* LockForExternalControl (size_t maxParticles) = 0;
   
