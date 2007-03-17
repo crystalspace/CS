@@ -16,9 +16,8 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "crystalspace.h"
-
 #include "common.h"
+
 #include "config.h"
 #include "statistics.h"
 #include "lighter.h"

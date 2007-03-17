@@ -19,6 +19,7 @@
 #ifndef __COMMON_H__
 #define __COMMON_H__
 
+#include "crystalspace.h"
 
 namespace lighter
 {
@@ -61,4 +62,4 @@ namespace lighter
 // Debugging: uncomment to have normals dumped to the lightmaps
 //#define DUMP_NORMALS
 
-#endif
+#endif // __COMMON_H__

@@ -17,9 +17,8 @@
 */
 
 
-#include "crystalspace.h"
-
 #include "common.h"
+
 #include "light.h"
 #include "raytracer.h"
 #include "kdtree.h"

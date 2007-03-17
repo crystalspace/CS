@@ -16,12 +16,6 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "crystalspace.h"
-
-#define Byte z_Byte	/* Kludge to avoid conflicting typedef in zconf.h */
-#include <zlib.h>
-#undef Byte
-
 #include "common.h"
 
 #include "lightmap.h"

@@ -16,11 +16,10 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "crystalspace.h"
+#include "common.h"
 
 #include <algorithm>
 
-#include "common.h"
 #include "lighter.h"
 #include "lightmap.h"
 #include "lightmapuv.h"

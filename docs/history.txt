@@ -12,6 +12,7 @@ chronological order.
 	- Marten extended the jam system with a MsvcUsePCH target : file ;
 	  rule which will emit usage of pch (precompiled header) into generated
 	  Visual Studio project file.
+	- res made lighter2 use the new MSVC PCH support.
 16-Mar-2007
 	- Jorrit and res2k fixed frustum code that was borked in revisions
 	  26237 and 26242. This fixes ugly thing lightmaps (trac #262).
