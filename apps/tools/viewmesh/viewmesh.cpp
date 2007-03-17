@@ -489,14 +489,50 @@ void ViewMesh::CreateGui()
   btn = winMgr->getWindow("Tab1/NormalMovementRadio");
   btn->subscribeEvent(CEGUI::RadioButton::EventSelectStateChanged,
     CEGUI::Event::Subscriber(&ViewMesh::CameraModeMoveNormal, this));
+  CEGUI::RadioButton* radio = static_cast<CEGUI::RadioButton*> (btn);
+  radio->setGroupID (1);
+  radio->setID (101);
+  radio->setSelected (true);
 
   btn = winMgr->getWindow("Tab1/LooktooriginRadio");
   btn->subscribeEvent(CEGUI::RadioButton::EventSelectStateChanged,
     CEGUI::Event::Subscriber(&ViewMesh::CameraModeMoveOrigin, this));
+  radio = static_cast<CEGUI::RadioButton*> (btn);
+  radio->setGroupID (1);
+  radio->setID (102);
+  radio->setSelected (false);
 
   btn = winMgr->getWindow("Tab1/RotateRadio");
   btn->subscribeEvent(CEGUI::RadioButton::EventSelectStateChanged,
     CEGUI::Event::Subscriber(&ViewMesh::CameraModeRotate, this));
+  radio = static_cast<CEGUI::RadioButton*> (btn);
+  radio->setGroupID (1);
+  radio->setID (103);
+  radio->setSelected (false);
+
+  btn = winMgr->getWindow("Tab1/ThreePointLighting");
+  btn->subscribeEvent(CEGUI::RadioButton::EventSelectStateChanged,
+    CEGUI::Event::Subscriber(&ViewMesh::LightThreePoint, this));
+  radio = static_cast<CEGUI::RadioButton*> (btn);
+  radio->setGroupID (2);
+  radio->setID (201);
+  radio->setSelected (true);
+
+  btn = winMgr->getWindow("Tab1/FrontBackTopLighting");
+  btn->subscribeEvent(CEGUI::RadioButton::EventSelectStateChanged,
+    CEGUI::Event::Subscriber(&ViewMesh::LightFrontBackTop, this));
+  radio = static_cast<CEGUI::RadioButton*> (btn);
+  radio->setGroupID (2);
+  radio->setID (202);
+  radio->setSelected (false);
+
+  btn = winMgr->getWindow("Tab1/UnlitLighting");
+  btn->subscribeEvent(CEGUI::RadioButton::EventSelectStateChanged,
+    CEGUI::Event::Subscriber(&ViewMesh::LightUnlit, this));
+  radio = static_cast<CEGUI::RadioButton*> (btn);
+  radio->setGroupID (2);
+  radio->setID (203);
+  radio->setSelected (false);
 
   btn = winMgr->getWindow("Tab1/ScaleSprite");
   btn->subscribeEvent(CEGUI::Editbox::EventTextAccepted,
@@ -1106,6 +1142,18 @@ void ViewMesh::ScaleSprite (float newScale)
   component->setProperty("Text", valueMesh->GetData());
 }
 
+void ViewMesh::MoveLights (const csVector3 &a, const csVector3 &b,
+    const csVector3 &c)
+{
+  iLightList* ll = room->GetLights ();
+  if (ll->GetCount () < 3)
+    ReportError("MoveLights () has less lights than expected!");
+
+  ll->Get (0)->SetCenter (a);
+  ll->Get (1)->SetCenter (b);
+  ll->Get (2)->SetCenter (c);
+}
+
 //---------------------------------------------------------------------------
 
 bool ViewMesh::ReversAnimation (const CEGUI::EventArgs& e)
@@ -1530,7 +1578,7 @@ bool ViewMesh::CameraModeRotate (const CEGUI::EventArgs& e)
   CEGUI::RadioButton* radio = 
     (CEGUI::RadioButton*) winMgr->getWindow("Tab1/RotateRadio");
 
-  if (radio->getSelectedButtonInGroup() == radio)
+  if (radio->getSelectedButtonInGroup () == radio)
     camMode = rotateorigin;
   return true;
 }
@@ -1542,7 +1590,7 @@ bool ViewMesh::CameraModeMoveOrigin (const CEGUI::EventArgs& e)
   CEGUI::RadioButton* radio = 
     (CEGUI::RadioButton*) winMgr->getWindow("Tab1/LooktooriginRadio");
 
-  if (radio->getSelectedButtonInGroup() == radio)
+  if (radio->getSelectedButtonInGroup () == radio)
     camMode = moveorigin;
   return true;
 }
@@ -1554,8 +1602,50 @@ bool ViewMesh::CameraModeMoveNormal (const CEGUI::EventArgs& e)
   CEGUI::RadioButton* radio = 
     (CEGUI::RadioButton*) winMgr->getWindow("Tab1/NormalMovementRadio");
 
-  if (radio->getSelectedButtonInGroup() == radio)
+  if (radio->getSelectedButtonInGroup () == radio)
     camMode = movenormal;
+  return true;
+}
+
+bool ViewMesh::LightThreePoint (const CEGUI::EventArgs& e)
+{
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  CEGUI::RadioButton* radio = 
+    (CEGUI::RadioButton*) winMgr->getWindow("Tab1/ThreePointLighting");
+
+  if (radio->getSelectedButtonInGroup () == radio)
+    MoveLights (csVector3 (-roomsize/2, roomsize/2, 0),
+                csVector3 (roomsize/2,  -roomsize/2, 0),
+                csVector3 (0, 0, -roomsize/2));
+  return true;
+}
+
+bool ViewMesh::LightFrontBackTop (const CEGUI::EventArgs& e)
+{
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  CEGUI::RadioButton* radio = 
+    (CEGUI::RadioButton*) winMgr->getWindow("Tab1/FrontBackTopLighting");
+
+  if (radio->getSelectedButtonInGroup () == radio)
+    MoveLights (csVector3 (0, 0, roomsize/4),
+                csVector3 (0, 0, -roomsize/4),
+                csVector3 (0, roomsize/2, 0));
+  return true;
+}
+
+bool ViewMesh::LightUnlit (const CEGUI::EventArgs& e)
+{
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  CEGUI::RadioButton* radio = 
+    (CEGUI::RadioButton*) winMgr->getWindow("Tab1/UnlitLighting");
+
+  if (radio->getSelectedButtonInGroup () == radio)
+    MoveLights (csVector3 (0, 0, 0),
+                csVector3 (0,  -roomsize/4, 0),
+                csVector3 (0, roomsize/2, -roomsize/2));
   return true;
 }
 

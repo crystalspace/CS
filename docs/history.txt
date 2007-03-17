@@ -7,6 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 17-Mar-2007
+	- Genjix closed #172 by adding 2 new lighting options to viewmesh.
 	- res generalized lighter2's lightmap cache into a swapping mechanism
 	  for all kinds of data.
 	- Marten extended the jam system with a MsvcUsePCH target : file ;

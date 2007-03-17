@@ -105,6 +105,7 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   void AttachMesh (const char* file);
   void SelectSocket (const char* newsocket);
   void ScaleSprite (float newScale);
+  void MoveLights (const csVector3 &a, const csVector3 &b, const csVector3 &c);
   void UpdateSocketList ();
   void UpdateMorphList ();
   void UpdateAnimationList ();
@@ -114,6 +115,9 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   bool CameraModeRotate (const CEGUI::EventArgs& e);
   bool CameraModeMoveOrigin (const CEGUI::EventArgs& e);
   bool CameraModeMoveNormal (const CEGUI::EventArgs& e);
+  bool LightThreePoint (const CEGUI::EventArgs& e);
+  bool LightFrontBackTop (const CEGUI::EventArgs& e);
+  bool LightUnlit (const CEGUI::EventArgs& e);
   bool LoadButton (const CEGUI::EventArgs& e);
   bool LoadLibButton (const CEGUI::EventArgs& e);
   bool SaveButton (const CEGUI::EventArgs& e);
