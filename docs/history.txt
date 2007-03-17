@@ -9,6 +9,9 @@ chronological order.
 17-Mar-2007
 	- res generalized lighter2's lightmap cache into a swapping mechanism
 	  for all kinds of data.
+	- Marten extended the jam system with a MsvcUsePCH target : file ;
+	  rule which will emit usage of pch (precompiled header) into generated
+	  Visual Studio project file.
 16-Mar-2007
 	- Jorrit and res2k fixed frustum code that was borked in revisions
 	  26237 and 26242. This fixes ugly thing lightmaps (trac #262).

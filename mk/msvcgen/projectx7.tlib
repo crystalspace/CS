@@ -66,6 +66,13 @@
 			WholeProgramOptimization="1"
 [% END %]
 
+[% MACRO precompiled_header BLOCK -%]
+  [% IF my.doc.pch.0 %]
+				UsePrecompiledHeader="1"
+				PrecompiledHeaderThrough="[% my.doc.pch.0 %]"
+  [% END %]
+[% END %]
+
 [% MACRO compiler_release BLOCK -%]
 				Optimization="2"
 				StringPooling="TRUE"
@@ -73,6 +80,7 @@
 				RuntimeLibrary="2"
 				DebugInformationFormat="3"
 				BufferSecurityCheck="FALSE"
+				[% GET precompiled_header %]
 [% END %]
 [% MACRO compiler_debug BLOCK -%]
 				Optimization="0"
@@ -80,6 +88,7 @@
 				DebugInformationFormat="4"
 				RuntimeTypeInfo="TRUE"
 				RuntimeLibrary="3"
+				[% GET precompiled_header %]
 [% END %]
 
 [% MACRO linker_release BLOCK -%]

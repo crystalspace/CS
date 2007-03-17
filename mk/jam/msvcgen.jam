@@ -211,6 +211,12 @@ rule MsvcExtraFile1 { }
 rule MsvcGenName { MsvcGenName1 $(1) : $(2) ; }
 rule MsvcGenName1 { }
 
+## MsvcUsePCH target : file
+##   Use this rule to set the 'target' to use precompiled header with name 
+##   'file'.
+rule MsvcUsePCH { MsvcUsePCH1 $(1) : $(2) ; }
+rule MsvcUsePCH1 { }
+
 #------------------------------------------------------------------------------
 # Private utility rules. Common to all phases.
 
@@ -1326,6 +1332,13 @@ rule MsvcDefine1
 rule MsvcIncDirs1 
 { 
   _MsvcIncDirs $(1) : $(2) : $(3) ;
+}
+
+## MsvcUsePCH target : file
+##   (See documentation above.)
+rule MsvcUsePCH1
+{
+  _MsvcRespEmit $(1) : $(2) : pch ; 
 }
 
 # _MsvcDefine target : tuples [ : mode ]
