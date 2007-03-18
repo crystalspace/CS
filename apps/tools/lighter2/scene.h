@@ -96,21 +96,21 @@ namespace lighter
     void AddFile (const char* directory);
 
     // Load all files, and parse the loaded info
-    bool LoadFiles (Statistics::SubProgress& progress);
+    bool LoadFiles (Statistics::Progress& progress);
 
     /* Save all files we've loaded. Will save any changed factory. */
-    bool SaveWorldFactories (/*Statistics::SubProgress& progress*/);
+    bool SaveWorldFactories (Statistics::Progress& progress);
     /* Save all files we've loaded. Will save any changed mesh. */
-    bool SaveWorldMeshes (/*Statistics::SubProgress& progress*/);
+    bool SaveWorldMeshes (Statistics::Progress& progress);
     /* Save all files we've loaded. Writes out document to a temporary file. */
-    bool FinishWorldSaving (/*Statistics::SubProgress& progress*/);
+    bool FinishWorldSaving (Statistics::Progress& progress);
 
     // Copy the temporary file created in SaveWorld() over the actual world file.
-    bool ApplyWorldChanges (Statistics::SubProgress& progress);
+    bool ApplyWorldChanges (Statistics::Progress& progress);
     // Write the generated lightmaps out.
-    bool SaveLightmaps (Statistics::SubProgress& progress);
+    bool SaveLightmaps (Statistics::Progress& progress);
     // Save any mesh data that can only be saved after lighting.
-    bool SaveMeshesPostLighting (Statistics::SubProgress& progress);
+    bool SaveMeshesPostLighting (Statistics::Progress& progress);
 
     // Data access
     inline ObjectFactoryHash& GetFactories () 
@@ -210,7 +210,7 @@ namespace lighter
     void SaveLightmapsToDom (iDocumentNode* root, LoadedFile* fileInfo);
     
     // Load functions
-    bool ParseEngine (/*Statistics::SubProgress& progress*/);
+    bool ParseEngine (Statistics::Progress& progress);
     void ParseSector (iSector *sector);
     void ParsePortals (iSector *srcSect, Sector* sector);
     enum MeshParseResult

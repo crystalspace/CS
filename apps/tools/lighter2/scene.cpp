@@ -92,14 +92,14 @@ namespace lighter
     sceneFiles.Push (newFile);
   }
 
-  bool Scene::LoadFiles (Statistics::SubProgress& progress)
+  bool Scene::LoadFiles (Statistics::Progress& progress)
   {
     progress.SetProgress (0);
 
     if (sceneFiles.GetSize () == 0) 
       return globalLighter->Report ("No files to load!");
 
-    const float div = 100.0f / sceneFiles.GetSize ();
+    const float div = 1.0f / sceneFiles.GetSize ();
 
     for (unsigned int i = 0; i < sceneFiles.GetSize (); i++)
     {
@@ -132,9 +132,9 @@ namespace lighter
         return globalLighter->Report ("Error loading file 'world'!");
 
       // Parses meshes from engine
-      ParseEngine ();
-
-      progress.IncProgress (div);
+      Statistics::Progress* progEngine = progress.CreateProgress (div);
+      ParseEngine (*progEngine);
+      delete progEngine;
     }
 
     /* We have turned everything needed into our own objects which keep
@@ -142,13 +142,13 @@ namespace lighter
        release everything it holds. */
     globalLighter->engine->DeleteAll();
 
-    progress.SetProgress (100);
+    progress.SetProgress (1);
     return true;
   }
 
-  bool Scene::SaveWorldFactories (/*Statistics::SubProgress& progress*/)
+  bool Scene::SaveWorldFactories (Statistics::Progress& progress)
   {
-    //progress.SetProgress (0);
+    progress.SetProgress (0);
 
     if (sceneFiles.GetSize () == 0)
     {
@@ -156,22 +156,22 @@ namespace lighter
       return false;
     }
 
-    float fileProgress = 100.0f / sceneFiles.GetSize ();
+    float fileProgress = 1.0f / sceneFiles.GetSize ();
     for (size_t i = 0; i < sceneFiles.GetSize (); i++)
     {
       //Traverse the DOM, save any factory we encounter
       SaveSceneFactoriesToDom (sceneFiles[i].rootNode, &sceneFiles[i]);
 
-      //progress.IncProgress (fileProgress);
+      progress.IncProgress (fileProgress);
     }
 
-    //progress.SetProgress (100);
+    progress.SetProgress (1);
     return true;
   }
 
-  bool Scene::SaveWorldMeshes (/*Statistics::SubProgress& progress*/)
+  bool Scene::SaveWorldMeshes (Statistics::Progress& progress)
   {
-    //progress.SetProgress (0);
+    progress.SetProgress (0);
 
     if (sceneFiles.GetSize () == 0)
     {
@@ -179,22 +179,22 @@ namespace lighter
       return false;
     }
 
-    float fileProgress = 100.0f / sceneFiles.GetSize ();
+    float fileProgress = 1.0f / sceneFiles.GetSize ();
     for (size_t i = 0; i < sceneFiles.GetSize (); i++)
     {
       //Traverse the DOM, save any mesh we encounter
       SaveSceneMeshesToDom (sceneFiles[i].rootNode, &sceneFiles[i]);
 
-      //progress.IncProgress (fileProgress);
+      progress.IncProgress (fileProgress);
     }
 
-    //progress.SetProgress (100);
+    progress.SetProgress (1);
     return true;
   }
 
-  bool Scene::FinishWorldSaving (/*Statistics::SubProgress& progress*/)
+  bool Scene::FinishWorldSaving (Statistics::Progress& progress)
   {
-    //progress.SetProgress (0);
+    progress.SetProgress (0);
 
     if (sceneFiles.GetSize () == 0)
     {
@@ -202,7 +202,7 @@ namespace lighter
       return false;
     }
 
-    float fileProgress = 100.0f / sceneFiles.GetSize ();
+    float fileProgress = 1.0f / sceneFiles.GetSize ();
     for (size_t i = 0; i < sceneFiles.GetSize (); i++)
     {
       //Change path
@@ -245,11 +245,11 @@ namespace lighter
       return false;
     }
 
-    //progress.SetProgress (100);
+    progress.SetProgress (1);
     return true;
   }
 
-  bool Scene::ApplyWorldChanges (Statistics::SubProgress& progress)
+  bool Scene::ApplyWorldChanges (Statistics::Progress& progress)
   {
     progress.SetProgress (0);
 
@@ -259,7 +259,7 @@ namespace lighter
       return false;
     }
 
-    float fileProgress = 100.0f / sceneFiles.GetSize ();
+    float fileProgress = 1.0f / sceneFiles.GetSize ();
     for (size_t i = 0; i < sceneFiles.GetSize (); i++)
     {
       //Change path
@@ -312,13 +312,13 @@ namespace lighter
       progress.IncProgress (fileProgress);
     }
 
-    progress.SetProgress (100);
+    progress.SetProgress (1);
     return true;
   }
 
   static const char lightmapLibraryName[] = "lightmaps.cslib";
 
-  bool Scene::SaveLightmaps (Statistics::SubProgress& progress)
+  bool Scene::SaveLightmaps (Statistics::Progress& progress)
   {
     progress.SetProgress (0);
 
@@ -328,7 +328,7 @@ namespace lighter
       return false;
     }
 
-    float fileProgress = 100.0f / sceneFiles.GetSize ();
+    float fileProgress = 1.0f / sceneFiles.GetSize ();
     for (size_t i = 0; i < sceneFiles.GetSize (); i++)
     {
       //Change path
@@ -388,12 +388,12 @@ namespace lighter
       progress.IncProgress (fileProgress);
     }
 
-    progress.SetProgress (100);
+    progress.SetProgress (1);
 
     return true;
   }
 
-  bool Scene::SaveMeshesPostLighting (Statistics::SubProgress& progress)
+  bool Scene::SaveMeshesPostLighting (Statistics::Progress& progress)
   {
     progress.SetProgress (0);
 
@@ -403,7 +403,7 @@ namespace lighter
       return false;
     }
 
-    float fileProgress = 100.0f / sceneFiles.GetSize ();
+    float fileProgress = 1.0f / sceneFiles.GetSize ();
     for (size_t i = 0; i < sceneFiles.GetSize (); i++)
     {
       //Change path
@@ -422,17 +422,28 @@ namespace lighter
         progress.IncProgress (fileProgress);
         continue;
       }
-      float meshProgress = fileProgress / meshObjNum;
+
+      int updateFreq, u;
+      float progressStep;
+
+      u = updateFreq = int ((meshObjNum + 50) / 100) * fileProgress;
+      progressStep = updateFreq * (1.0f / meshObjNum);
+
       for (size_t o = 0; o < meshObjNum; o++)
       {
         Object* obj = sceneFiles[i].fileObjects[o];
         obj->SaveMeshPostLighting (this);
-        progress.IncProgress (meshProgress);
+        if (--u <= 0)
+        {
+          progress.IncProgress (progressStep);
+          u = updateFreq;
+        }
       }
       
+      progress.SetProgress (i * fileProgress);
     }
 
-    progress.SetProgress (100);
+    progress.SetProgress (1);
 
     return true;
   }
@@ -474,18 +485,26 @@ namespace lighter
     return allLms;
   }
 
-  bool Scene::ParseEngine (/*Statistics::SubProgress& progress*/)
+  bool Scene::ParseEngine (Statistics::Progress& progress)
   {
-    //progress.SetProgress (0);
+    progress.SetProgress (0);
+
+    Statistics::Progress sectorProgress (0, 1, &progress);
+    Statistics::Progress portalProgress (0, 1, &progress);
+    Statistics::Progress lightProgress (0, 1, &progress);
+    Statistics::Progress meshProgress (0, 1, &progress);
 
     // Parse sectors
+    sectorProgress.SetProgress (0);
     iSectorList *sectorList = globalLighter->engine->GetSectors ();
     for (int i = 0; i < sectorList->GetCount (); i++)
     {
       ParseSector (sectorList->Get (i));
     }
+    sectorProgress.SetProgress (1);
 
     // Parse portals
+    portalProgress.SetProgress (0);
     SectorOrigSectorHash::GlobalIterator sectIt = originalSectorHash.GetIterator ();
     while (sectIt.HasNext ())
     {
@@ -495,8 +514,10 @@ namespace lighter
       sector = sectIt.Next (srcSector);
       ParsePortals (srcSector, sector);
     }
+    portalProgress.SetProgress (1);
 
     // Propagate light in sectors
+    lightProgress.SetProgress (0);
     sectIt.Reset ();
     while (sectIt.HasNext ())
     {
@@ -521,8 +542,10 @@ namespace lighter
           PropagateLight (l, l->GetFrustum ());
       }
     }
+    lightProgress.SetProgress (1);
 
     // Map mesh objects loaded from each scene file to it
+    meshProgress.SetProgress (0);
     for (size_t i = 0; i < sceneFiles.GetSize (); i++)
     {
       csRef<iDocumentNode> worldNode = 
@@ -552,8 +575,9 @@ namespace lighter
         }
       }
     }
+    meshProgress.SetProgress (1);
 
-    //progress.SetProgress (100);
+    progress.SetProgress (1);
     return true;
   }
 

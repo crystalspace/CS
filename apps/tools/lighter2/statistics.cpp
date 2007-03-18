@@ -24,24 +24,71 @@ namespace lighter
 {
   Statistics globalStats;
 
-  Statistics::SubProgress::SubProgress (const char* name, float amount) :
-    taskName (name), subProgressStart (globalStats.progress.totalAmount), 
-    subProgressAmount (amount * 0.01f), progress (0)
+  Statistics::Progress::Progress (const char* name, float amount, 
+    Progress* parent) : parent (parent ? parent : &globalStats.progress),
+    taskName (name), totalAmount (0),
+    subProgressStart (this->parent->totalAmount), 
+    subProgressAmount (amount), progress (0)
   {
-    globalStats.progress.totalAmount += amount;
+    this->parent->totalAmount += amount;
   }
 
-  void Statistics::SubProgress::SetProgress (float progress)
+  void Statistics::Progress::SetProgress (float progress, const char* task)
   {
     this->progress = progress;
-    globalStats.progress.SetProgress (taskName, 
+    /*globalStats.progress.SetProgress (taskName, 
       subProgressStart + progress * subProgressAmount,
-      progress);
+      progress);*/
+    if (parent != 0)
+    {
+      csString displayTask (taskName);
+      if (task != 0) 
+      {
+        displayTask.Append (": ");
+        displayTask.Append (task);
+      }
+      if (parent == &globalStats.progress)
+      {
+        // Bit hacky.
+        globalStats.progress.SetTaskProgress (this);
+      }
+      float parentAmount = parent->totalAmount;
+      if (parentAmount == 0) parentAmount = 1.0f;
+      parent->SetProgress ((subProgressStart + progress * subProgressAmount)
+        / parentAmount, displayTask);
+    }
+    else
+      globalStats.progress.UpdateProgressDisplay (task);
   }
 
-  void Statistics::SubProgress::SetTaskName (const char* taskName)
+  void Statistics::Progress::SetTaskName (const char* taskName)
   {
     this->taskName = taskName;
-    globalStats.progress.SetTaskName (this->taskName);
+    //SetProgress (progress);
+    //globalStats.progress.SetTaskName (this->taskName);
+  }
+
+  Statistics::Progress* Statistics::Progress::CreateProgress (float amount, 
+    const char* name)
+  {
+    return new Progress (name, progress, amount, this);
+  }
+
+  //-------------------------------------------------------------------------
+
+  void Statistics::GlobalProgress::UpdateProgressDisplay (
+    const char* taskName)
+  {
+    lastUpdatePercentGlobal = int (100.0f * progress);
+    int redrawFlags;
+    if (this->taskName != taskName)
+    {
+      this->taskName = taskName;
+      redrawFlags = TUI::TUI_DRAW_ALL;
+    }
+    else
+      redrawFlags = TUI::TUI_DRAW_PROGRESS;
+
+    globalTUI.Redraw (redrawFlags);
   }
 }

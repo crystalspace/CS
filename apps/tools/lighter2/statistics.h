@@ -28,8 +28,7 @@ namespace lighter
   class Statistics
   {
   public:
-    class SubProgress;
-
+#if 0
     class Progress
     {
       friend class SubProgress;
@@ -75,14 +74,31 @@ namespace lighter
       float GetOverallProgress() const { return overallProgress; }
       float GetTaskProgress() const { return taskProgress; }
     } progress;
+#endif
+
+    class GlobalProgress;
 
     /// Progress for a single task.
-    class SubProgress
+    class Progress
     {
+    protected:
+      friend class GlobalProgress;
+
+      Progress* parent;
       /// Task description
       csString taskName;
 
-      float subProgressStart, subProgressAmount, progress;
+      /// Total amount of all sub-progress objects
+      float totalAmount;
+      float subProgressStart, subProgressAmount;
+      float progress;
+
+      Progress (const char* name, float progStart, float progAmount, 
+        Progress* parent) : parent (parent), taskName (name), 
+        totalAmount (progAmount), subProgressStart (progStart), 
+        subProgressAmount (progAmount), progress (0) {}
+
+      void SetProgress (float progress, const char* task);
     public:
       /**
        * Create a "sub-progress" object for a task. \a name is the 
@@ -92,10 +108,11 @@ namespace lighter
        * but the amounts of different tasks should be roughly in relation to
        * the time usually takes to complete them.
        */
-      SubProgress (const char* name, float amount);
+      Progress (const char* name, float amount, Progress* parent = 0);
 
-      /// Set complete progress, in percent.
-      void SetProgress (float progress);
+      /// Set complete progress, normalized.
+      void SetProgress (float progress)
+      { SetProgress (progress, 0); }
 
       /// Increment progress
       inline void IncProgress (float inc)
@@ -105,7 +122,31 @@ namespace lighter
 
       /// Set description
       void SetTaskName (const char* taskName);
+
+      /// Create a sub-progress object. \a amount is normalized.
+      Progress* CreateProgress (float amount, const char* name = 0);
     };
+
+    class GlobalProgress : public Progress
+    {
+      friend class Progress;
+
+      int lastUpdatePercentGlobal, lastUpdatePercentTask;
+
+      void UpdateProgressDisplay (const char* taskName);
+      void SetTaskProgress (Progress* prog)
+      {
+        lastUpdatePercentTask = int (prog->progress * 100.0f);
+      }
+    public:
+      GlobalProgress () : Progress (0, 0, 1.0f, 0), 
+        lastUpdatePercentGlobal (-1), lastUpdatePercentTask (-1) {}
+
+      const char* GetTaskName() const { return taskName; }
+      int GetOverallProgress() const { return lastUpdatePercentGlobal; }
+      int GetTaskProgress() const { return lastUpdatePercentTask; }
+    };
+    GlobalProgress progress;
 
     struct Raytracer
     {

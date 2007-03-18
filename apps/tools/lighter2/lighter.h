@@ -69,7 +69,7 @@ namespace lighter
     void CleanUp ();
 
     // Parse the commandline and load any files specified
-    bool LoadFiles (Statistics::SubProgress& progress);
+    bool LoadFiles (Statistics::Progress& progress);
 
     void LoadConfiguration ();
 
@@ -77,18 +77,26 @@ namespace lighter
 
     Scene *scene;
 
-    Statistics::SubProgress progStartup;
-    Statistics::SubProgress progLoadFiles;
-    Statistics::SubProgress progParseEngine;
-    Statistics::SubProgress progLightmapLayout;
-    Statistics::SubProgress progInitialize;
-    Statistics::SubProgress progUpdateWorld;
-    Statistics::SubProgress progDirectLighting;
-    Statistics::SubProgress progPostproc;
-    Statistics::SubProgress progSaveResult;
-    Statistics::SubProgress progSaveMeshesPostLight;
-    Statistics::SubProgress progApplyWorldChanges;
-    Statistics::SubProgress progFinished;
+    Statistics::Progress progStartup;
+    Statistics::Progress progLoadFiles;
+    Statistics::Progress progLightmapLayout;
+    Statistics::Progress progSaveFactories;
+    Statistics::Progress progInitializeMain;
+    Statistics::Progress progInitialize;
+    Statistics::Progress progInitializeLM;
+    Statistics::Progress progSaveMeshesMain;
+    Statistics::Progress progSaveMeshes;
+    Statistics::Progress progSaveFinish;
+    Statistics::Progress progPrepareLighting;
+    Statistics::Progress progBuildKDTree;
+    Statistics::Progress progDirectLighting;
+    Statistics::Progress progPostproc;
+    Statistics::Progress progPostprocSector;
+    Statistics::Progress progPostprocLM;
+    Statistics::Progress progSaveResult;
+    Statistics::Progress progSaveMeshesPostLight;
+    Statistics::Progress progApplyWorldChanges;
+    Statistics::Progress progFinished;
   };
 
   // Global lighter

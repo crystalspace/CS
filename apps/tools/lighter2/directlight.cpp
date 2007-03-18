@@ -461,13 +461,16 @@ namespace lighter
 
   //--------------------------------------------------------------------------
   void DirectLighting::ShadeDirectLighting (Sector* sector, 
-                                            Statistics::SubProgress& progress,
-                                            float progressStep)
+                                            Statistics::Progress& progress)
   {
     // Setup some common stuff
     SamplerSequence<2> masterSampler;
 
-    float progressPerObject = progressStep / sector->allObjects.GetSize ();
+    int updateFreq, u;
+    float progressStep;
+
+    u = updateFreq = int (sector->allObjects.GetSize () + 50) / 100;
+    progressStep = updateFreq * (1.0f / sector->allObjects.GetSize ());
 
     ObjectHash::GlobalIterator giter = sector->allObjects.GetIterator ();
 
@@ -483,7 +486,11 @@ namespace lighter
           ShadeLightmap (sector, obj, masterSampler);
       }
 
-      progress.IncProgress (progressPerObject);
+      if (--u <= 0)
+      {
+        progress.IncProgress (progressStep);
+        u = updateFreq;
+      }
       globalTUI.Redraw (TUI::TUI_DRAW_RAYCORE);
     }
 

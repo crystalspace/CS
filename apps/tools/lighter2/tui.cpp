@@ -235,8 +235,8 @@ namespace lighter
 
   void TUI::DrawProgress () const
   {
-    const uint overallProg = (uint)floor (globalStats.progress.GetOverallProgress());
-    const uint taskProg = (uint)floor (globalStats.progress.GetTaskProgress());
+    const uint overallProg = globalStats.progress.GetOverallProgress();
+    const uint taskProg = globalStats.progress.GetTaskProgress();
 
     csString taskName = globalStats.progress.GetTaskName();
     static const size_t maxTaskNameLen = 40;
@@ -338,7 +338,7 @@ namespace lighter
 
       prevWasReporter = false;
       csPrintf ("\n% 4d %% - %s ", 
-        (int)floor (globalStats.progress.GetOverallProgress()),
+        globalStats.progress.GetOverallProgress(),
         lastTask.GetDataSafe());
 
       // Print new task and global progress

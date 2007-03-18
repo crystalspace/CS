@@ -43,7 +43,7 @@ namespace lighter
 
     // Shade by using all primitives within range
     static void ShadeDirectLighting (Sector* sector, 
-      Statistics::SubProgress& progress, float progressStep);
+      Statistics::Progress& progress);
 
     //-- Shade a point
     typedef csColor (*PVLPointShader)(Sector* sector, 
