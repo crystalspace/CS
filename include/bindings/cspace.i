@@ -1193,6 +1193,10 @@ iArrayChangeElements<csSprite2DVertex>;
 TYPEMAP_ARGOUT_PTR(csKeyModifiers)
 APPLY_TYPEMAP_ARGOUT_PTR(csKeyModifiers,csKeyModifiers& modifiers)
 
+/* this one is for preventing swig from generating int32_t* for int32*
+   (trips compilation on msvc) */
+typedef int int32_t;
+
 %include "csutil/event.h"
 %extend iEvent {
 	csEventError RetrieveString(const char *name, char *&v)

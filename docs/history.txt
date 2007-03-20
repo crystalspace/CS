@@ -11,6 +11,9 @@ chronological order.
 	- Jorrit moved AWS data and docs.
 	- Jorrit moved awstest and awstut.
 	- Jorrit moved partedit, partedit2, and picview.
+	- caedes closed #287 by adding a typedef declaration for int32_t at
+	  cspace.i. This way swig does not use int32_t at the output cpp file.
+	  
 18-Mar-2007
 	- res changed lighter2's progress system to allow for arbitrarily
 	  nested progress objects.
