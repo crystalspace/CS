@@ -8,6 +8,8 @@ chronological order.
 
 20-Mar-2007
 	- Jorrit moved AWS and AWS2 from CS to CSExtra.
+	- Jorrit moved AWS data and docs.
+	- Jorrit moved awstest and awstut.
 18-Mar-2007
 	- res changed lighter2's progress system to allow for arbitrarily
 	  nested progress objects.

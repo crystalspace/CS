@@ -106,7 +106,7 @@ Quake @sc{md3} and @sc{mdl} to Crystal Space convertor.
 and @sc{3ds} models directly.
 
 @item
-Crystal Space native windowing system(s). @xref{AWS}. 
+Crystal Space native windowing system using CEGUI.
 
 @item
 Cross-platform support for hardware rendering via OpenGL and software 

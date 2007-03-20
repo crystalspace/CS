@@ -150,8 +150,7 @@ The Perl bindings automatically and correctly handle @code{csRef<>} and
 You can write your own Perl class and have it inherit from a Crystal Space
 interface, then use instances of that class wherever an implementation of that
 interface is expected. Currently the interfaces that support this feature are
-@samp{iEventHandler}, @samp{iEventPlug}, and @samp{iAwsSink}, but it is easy to
-add more.
+@samp{iEventHandler} and @samp{iEventPlug} but it is easy to add more.
 
 @example
 package MyPerlEventHandler;

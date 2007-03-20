@@ -186,9 +186,6 @@ Dynamically loaded plug-ins. Communication with these modules is performed
 strictly via @sc{scf} interfaces. @xref{SCF}.
 
 @table @code
-@item CS/plugin/aws
-Alternate Windowing System.
-
 @item CS/plugins/bugplug
 Crystal Space debugger.
 
