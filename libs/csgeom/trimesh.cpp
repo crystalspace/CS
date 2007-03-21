@@ -21,11 +21,15 @@
 
 //---------------------------------------------------------------------------
 
-csTriangleMesh::csTriangleMesh (const csTriangleMesh& mesh)
+csTriangleMesh::csTriangleMesh (const csTriangleMesh& mesh) :
+  scfImplementationType (this), change_nr (0)
 {
   triangles.SetSize (mesh.GetTriangleCount ());
   memcpy (triangles.GetArray (), mesh.GetTriangles (),
   	sizeof (csTriangle)*mesh.GetTriangleCount ());
+  vertices.SetSize (mesh.GetVertexCount ());
+  memcpy (vertices.GetArray (), mesh.GetVertices (),
+  	sizeof (csVector3)*mesh.GetVertexCount ());
 }
 
 csTriangleMesh::~csTriangleMesh ()
@@ -35,11 +39,17 @@ csTriangleMesh::~csTriangleMesh ()
 void csTriangleMesh::Clear ()
 {
   triangles.SetSize (0);
+  vertices.SetSize (0);
 }
 
 void csTriangleMesh::SetSize (int count)
 {
   triangles.SetSize (count);
+}
+
+void csTriangleMesh::AddVertex (const csVector3& v)
+{
+  vertices.Push (v);
 }
 
 void csTriangleMesh::SetTriangles (csTriangle const* trigs, int count)

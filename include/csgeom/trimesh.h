@@ -20,11 +20,14 @@
 #define __CS_TRIMESH_H__
 
 #include "csextern.h"
+#include "csutil/scf_implementation.h"
 
 #include "csgeom/tri.h"
 #include "csgeom/vector3.h"
+#include "igeom/trimesh.h"
 
 #include "csutil/array.h"
+#include "csutil/flags.h"
 #include "csutil/dirtyaccessarray.h"
 
 /**\file
@@ -38,30 +41,49 @@
  * if used in combination with a vertex or edge table. Every triangle is then
  * a set of three indices in that table.
  */
-class CS_CRYSTALSPACE_EXPORT csTriangleMesh
+class CS_CRYSTALSPACE_EXPORT csTriangleMesh :
+  public scfImplementation1<csTriangleMesh, iTriangleMesh>
 {
 protected:
   /// The triangles.
   csDirtyAccessArray<csTriangle> triangles;
+  // The vertices.
+  csDirtyAccessArray<csVector3> vertices;
+
+  uint32 change_nr;
+  csFlags flags;
 
 public:
   ///
-  csTriangleMesh () { }
+  csTriangleMesh () : scfImplementationType (this), change_nr (0) { }
   ///
   csTriangleMesh (const csTriangleMesh& mesh);
   ///
-  ~csTriangleMesh ();
+  virtual ~csTriangleMesh ();
+
+  /// Add a vertex to the mesh.
+  void AddVertex (const csVector3& v);
+  /// Get the number of vertices for this mesh.
+  virtual size_t GetVertexCount () { return vertices.GetSize (); }
+  /// Get the number of vertices for this mesh.
+  size_t GetVertexCount () const { return vertices.GetSize (); }
+  /// Get the pointer to the array of vertices.
+  virtual csVector3* GetVertices () { return vertices.GetArray (); }
+  /// Get the pointer to the array of vertices.
+  const csVector3* GetVertices () const { return vertices.GetArray (); }
 
   /// Add a triangle to the mesh.
   void AddTriangle (int a, int b, int c);
   /// Query the array of triangles.
-  csTriangle* GetTriangles () { return triangles.GetArray (); }
+  virtual csTriangle* GetTriangles () { return triangles.GetArray (); }
   /// Query the array of triangles.
   const csTriangle* GetTriangles () const { return triangles.GetArray (); }
   ///
   csTriangle& GetTriangle (int i) { return triangles[i]; }
   /// Query the number of triangles.
   size_t GetTriangleCount () const { return triangles.GetSize (); }
+  /// Query the number of triangles.
+  virtual size_t GetTriangleCount () { return triangles.GetSize (); }
 
   /// Clear the mesh of triangles.
   void Clear ();
@@ -69,6 +91,11 @@ public:
   void SetSize (int count);
   /// Set the triangle array.  The array is copied.
   void SetTriangles (csTriangle const* trigs, int count);
+
+  virtual void Lock () { }
+  virtual void Unlock () { }
+  virtual csFlags& GetFlags () { return flags; }
+  virtual uint32 GetChangeNumber () const { return change_nr; }
 };
 
 /**
