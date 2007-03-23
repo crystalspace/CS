@@ -16,6 +16,11 @@ chronological order.
 	- res made lighter2 progress output somewhat more detailed.
 	- res augmented cswinIsWinNT to return also have enumerants for 
 	  Windowses past XP.
+	- res added an alternative way to detect the OpenGL driver used,
+	  written by "heroalex" - see trac #263. The new way actually works on 
+	  Windows Vista, but it also incurs less guessing the driver from 
+	  registry entries than the "old" way, so I've made it default on NT 
+	  platforms.
 21-Mar-2007
 	- Jorrit started work on the deprecation of iPolygonMesh and
 	  the new iTriangleMesh. Added iTriangleMesh. Changed the already
