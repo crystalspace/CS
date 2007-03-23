@@ -14,6 +14,8 @@ chronological order.
 	  Also made it correctly handle a zlib "error" that's not really a
 	  fatal error.
 	- res made lighter2 progress output somewhat more detailed.
+	- res augmented cswinIsWinNT to return also have enumerants for 
+	  Windowses past XP.
 21-Mar-2007
 	- Jorrit started work on the deprecation of iPolygonMesh and
 	  the new iTriangleMesh. Added iTriangleMesh. Changed the already
