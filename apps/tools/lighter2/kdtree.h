@@ -26,6 +26,8 @@
 
 #include "csutil/compileassert.h"
 
+#include "statistics.h"
+
 namespace lighter
 {
   class Primitive;
@@ -213,7 +215,8 @@ namespace lighter
     /*
     Take an object iterator and build a kd-tree from that
     */
-    KDTree* BuildTree (csHash<csRef<Object>, csString>::GlobalIterator& objects);
+    KDTree* BuildTree (csHash<csRef<Object>, csString>::GlobalIterator& objects,
+      Statistics::Progress& progress);
 
   private:
 

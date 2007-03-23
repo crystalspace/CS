@@ -61,6 +61,23 @@ namespace lighter
       globalStats.progress.UpdateProgressDisplay (task);
   }
 
+  float Statistics::Progress::GetFractionFromTaskProgress ()
+  {
+    float parentFrac, parentAmount;
+    if (parent == &globalStats.progress)
+    {
+      parentFrac = 1.0f;
+      parentAmount = subProgressAmount;
+    }
+    else
+    {
+      parentFrac = parent->GetFractionFromTaskProgress ();
+      parentAmount = parent->totalAmount;
+    }
+    if (parentAmount == 0) parentAmount = 1.0f;
+    return (subProgressAmount / parentAmount) * parentFrac;
+  }
+
   void Statistics::Progress::SetTaskName (const char* taskName)
   {
     this->taskName = taskName;

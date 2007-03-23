@@ -460,20 +460,15 @@ namespace lighter
   }
 
   //--------------------------------------------------------------------------
+
   void DirectLighting::ShadeDirectLighting (Sector* sector, 
                                             Statistics::Progress& progress)
   {
-    // Setup some common stuff
-    SamplerSequence<2> masterSampler;
+    progress.SetProgress (0);
+    size_t totalElements = 0;
 
-    int updateFreq, u;
-    float progressStep;
-
-    u = updateFreq = int (sector->allObjects.GetSize () + 50) / 100;
-    progressStep = updateFreq * (1.0f / sector->allObjects.GetSize ());
-
+    // Sum up total amount of elements for progress display purposes
     ObjectHash::GlobalIterator giter = sector->allObjects.GetIterator ();
-
     while (giter.HasNext ())
     {
       csRef<Object> obj = giter.Next ();
@@ -481,24 +476,48 @@ namespace lighter
       if (!obj->GetFlags ().Check (OBJECT_FLAG_NOLIGHT))
       {
         if (obj->lightPerVertex)
-          ShadePerVertex (sector, obj, masterSampler);
+          totalElements += obj->GetVertexData().positions.GetSize();
         else
-          ShadeLightmap (sector, obj, masterSampler);
-      }
+        {
+          csArray<PrimitiveArray>& submeshArray = obj->GetPrimitives ();
+          for (size_t submesh = 0; submesh < submeshArray.GetSize (); ++submesh)
+          {
+            PrimitiveArray& primArray = submeshArray[submesh];
 
-      if (--u <= 0)
-      {
-        progress.IncProgress (progressStep);
-        u = updateFreq;
+            for (size_t pidx = 0; pidx < primArray.GetSize (); ++pidx)
+            {
+              Primitive& prim = primArray[pidx];
+              totalElements += prim.GetElementCount();
+            }
+          }
+        }
       }
-      globalTUI.Redraw (TUI::TUI_DRAW_RAYCORE);
     }
 
+    // Setup some common stuff
+    SamplerSequence<2> masterSampler;
+    ProgressState progressState (progress, totalElements);
+
+    giter.Reset();
+    while (giter.HasNext ())
+    {
+      csRef<Object> obj = giter.Next ();
+
+      if (!obj->GetFlags ().Check (OBJECT_FLAG_NOLIGHT))
+      {
+        if (obj->lightPerVertex)
+          ShadePerVertex (sector, obj, masterSampler, progressState);
+        else
+          ShadeLightmap (sector, obj, masterSampler, progressState);
+      }
+    }
+
+    progress.SetProgress (1);
     return;
   }
   
   void DirectLighting::ShadeLightmap (Sector* sector, Object* obj, 
-    SamplerSequence<2>& masterSampler)
+    SamplerSequence<2>& masterSampler, ProgressState& progress)
   {
     csArray<PrimitiveArray>& submeshArray = obj->GetPrimitives ();
     const LightRefArray& allPDLights = sector->allPDLights;
@@ -534,7 +553,6 @@ namespace lighter
           pdLightLMs.Push (lm);
         }
 
-
         csVector2 minUV = prim.GetMinUV ();
 
         // Iterate all elements
@@ -542,7 +560,10 @@ namespace lighter
         {
           const float elArea = areas.GetElementArea (eidx);
           if (elArea == 0)
+          {
+            progress.Advance ();
             continue;
+          }
 
           float pixelArea = (elArea*area2pixel);
           bool borderElement = fabsf (pixelArea - 1.0f) > SMALL_EPSILON;
@@ -595,6 +616,7 @@ namespace lighter
 
             lm->SetAddPixel (u, v, c * pixelArea);
           }
+          progress.Advance ();
         }
         for (size_t pdli = 0; pdli < allPDLights.GetSize (); ++pdli)
         {
@@ -605,7 +627,7 @@ namespace lighter
   }
 
   void DirectLighting::ShadePerVertex (Sector* sector, Object* obj, 
-    SamplerSequence<2>& masterSampler)
+    SamplerSequence<2>& masterSampler, ProgressState& progress)
   {
     const LightRefArray& allPDLights = sector->allPDLights;
 
@@ -628,6 +650,7 @@ namespace lighter
         pdlColors->Get (i) += UniformShadeOneLight (sector, pos, normal, allPDLights[pdli],
           masterSampler);
       }
+      progress.Advance ();
     }
 
   }

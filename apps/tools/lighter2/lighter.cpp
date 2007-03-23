@@ -184,14 +184,15 @@ namespace lighter
     if (!LoadFiles (progLoadFiles)) 
       return false;
 
-    int updateFreq, u;
+    size_t updateFreq, u;
     float progressStep;
 
     progLightmapLayout.SetProgress (0);
     // Calculate lightmapping coordinates
     LightmapUVFactoryLayouter *uvLayout = new SimpleUVFactoryLayouter (scene->GetLightmaps());
 
-    u = updateFreq = int (scene->GetFactories ().GetSize () + 50) / 100;
+    u = updateFreq = progLightmapLayout.GetUpdateFrequency (
+      scene->GetFactories ().GetSize ());
     progressStep = updateFreq * (1.0f / scene->GetFactories ().GetSize ());
     ObjectFactoryHash::GlobalIterator factIt = 
       scene->GetFactories ().GetIterator ();
@@ -199,7 +200,7 @@ namespace lighter
     {
       csRef<ObjectFactory> fact = factIt.Next ();
       fact->PrepareLightmapUV (uvLayout);
-      if (--u <= 0)
+      if (--u == 0)
       {
         progLightmapLayout.IncProgress (progressStep);
         u = updateFreq;
@@ -212,31 +213,30 @@ namespace lighter
 
     // Initialize all objects
     progInitialize.SetProgress (0);
-    u = updateFreq = int (scene->GetSectors ().GetSize() + 50) / 100;
-    progressStep = updateFreq * (1.0f / scene->GetSectors ().GetSize());
+    progressStep = 1.0f / scene->GetSectors ().GetSize();
     SectorHash::GlobalIterator sectIt = 
       scene->GetSectors ().GetIterator ();
     while (sectIt.HasNext ())
     {
       csRef<Sector> sect = sectIt.Next ();
-      sect->Initialize ();
-      if (--u <= 0)
-      {
-        progInitialize.IncProgress (progressStep);
-        u = updateFreq;
-      }
+
+      Statistics::Progress* progSector = 
+        progInitialize.CreateProgress (progressStep);
+      sect->Initialize (*progSector);
+      delete progSector;
     }
     delete uvLayout;
     progInitialize.SetProgress (1);
 
     progInitializeLM.SetProgress (0);
-    u = updateFreq = int (scene->GetLightmaps().GetSize() + 50) / 100;
+    u = updateFreq = progInitializeLM.GetUpdateFrequency (
+      scene->GetLightmaps().GetSize());
     progressStep = updateFreq * (1.0f / scene->GetLightmaps().GetSize());
     for (size_t i = 0; i < scene->GetLightmaps().GetSize(); i++)
     {
       Lightmap * lm = scene->GetLightmaps ()[i];
       lm->Initialize();
-      if (--u <= 0)
+      if (--u == 0)
       {
         progInitializeLM.IncProgress (progressStep);
         u = updateFreq;
@@ -248,18 +248,16 @@ namespace lighter
     if (!scene->FinishWorldSaving (progSaveFinish)) return false;
     
     progPrepareLighting.SetProgress (0);
-    u = updateFreq = int (scene->GetSectors ().GetSize() + 50) / 100;
-    progressStep = updateFreq * (1.0f / scene->GetSectors ().GetSize());
+    progressStep = 1.0f / scene->GetSectors ().GetSize();
     sectIt.Reset();
     while (sectIt.HasNext ())
     {
       csRef<Sector> sect = sectIt.Next ();
-      sect->PrepareLighting();
-      if (--u <= 0)
-      {
-        progPrepareLighting.IncProgress (progressStep);
-        u = updateFreq;
-      }
+
+      Statistics::Progress* progSector = 
+        progPrepareLighting.CreateProgress (progressStep);
+      sect->PrepareLighting (*progSector);
+      delete progSector;
     }
     progPrepareLighting.SetProgress (1);
     
@@ -267,18 +265,16 @@ namespace lighter
 	     more, discard contents. */
 
     progBuildKDTree.SetProgress (0);
-    u = updateFreq = int (scene->GetSectors ().GetSize() + 50) / 100;
-    progressStep = updateFreq * (1.0f / scene->GetSectors ().GetSize());
+    progressStep = 1.0f / scene->GetSectors ().GetSize();
     sectIt.Reset();
     while (sectIt.HasNext ())
     {
       csRef<Sector> sect = sectIt.Next ();
-      sect->BuildKDTree ();
-      if (--u <= 0)
-      {
-        progBuildKDTree.IncProgress (progressStep);
-        u = updateFreq;
-      }
+
+      Statistics::Progress* progSector = 
+        progBuildKDTree.CreateProgress (progressStep);
+      sect->BuildKDTree (*progSector);
+      delete progSector;
     }
     progBuildKDTree.SetProgress (1);
    
@@ -322,14 +318,15 @@ namespace lighter
         Statistics::Progress* progSector = 
           progPostprocSector.CreateProgress (sectorProgress);
 
-        u = updateFreq = int (sect->allObjects.GetSize() + 50) / 100;
+        u = updateFreq = 
+          progSector->GetUpdateFrequency (sect->allObjects.GetSize());
         progressStep = updateFreq * (1.0f / sect->allObjects.GetSize());
         ObjectHash::GlobalIterator objIt = sect->allObjects.GetIterator ();
         while (objIt.HasNext ())
         {
           csRef<Object> obj = objIt.Next ();
           obj->FillLightmapMask (lmMasks);
-          if (--u <= 0)
+          if (--u == 0)
           {
             progSector->IncProgress (progressStep);
             u = updateFreq;
@@ -347,15 +344,15 @@ namespace lighter
       {
         LightmapPtrDelArray& lightmaps = *allLightmaps[li];
 
-        u = updateFreq = int (lightmaps.GetSize() + 50) / 100;
-        progressStep = updateFreq * (1.0f / lightmaps.GetSize());
         Statistics::Progress* progLM = 
           progPostprocLM.CreateProgress (lightmapStep);
+        u = updateFreq = progLM->GetUpdateFrequency (lightmaps.GetSize());
+        progressStep = updateFreq * (1.0f / lightmaps.GetSize());
 
         for (size_t lmI = 0; lmI < lightmaps.GetSize (); ++lmI)
         {
           lightmaps[lmI]->FixupLightmap (lmMasks[lmI]);
-          if (--u <= 0)
+          if (--u == 0)
           {
             progLM->IncProgress (progressStep);
             u = updateFreq;

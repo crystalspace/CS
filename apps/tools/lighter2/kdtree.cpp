@@ -36,8 +36,10 @@ namespace lighter
     CS::Memory::AlignedFree (this->nodeList);
   }
 
-  KDTree* KDTreeBuilder::BuildTree (ObjectHash::GlobalIterator& objects)
+  KDTree* KDTreeBuilder::BuildTree (ObjectHash::GlobalIterator& objects,
+                                    Statistics::Progress& progress)
   {
+    progress.SetProgress (0);
     objects.Reset ();
 
     if (!objects.HasNext ())
@@ -45,10 +47,12 @@ namespace lighter
 
     // Collect all primitives into endpoints and boxes for building
     SetupEndpoints (objects);
+    progress.SetProgress (0.33f);
 
     // Recursively build internal nodes from the boxes lists
     KDNode* rootNode = nodeAllocator.Alloc ();
     BuildKDNodeRecursive (&endPointList, rootNode, objectExtents, numPrimitives, 0);
+    progress.SetProgress (0.66f);
 
     // Optimize them and create a real kd-tree and nodes
     KDTree* tree = SetupRealTree (rootNode);
@@ -56,6 +60,8 @@ namespace lighter
     //Clean up some memory
     boxAllocator.Empty ();
     nodeAllocator.Empty ();
+
+    progress.SetProgress (1);
     return tree;
   }
 

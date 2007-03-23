@@ -57,12 +57,12 @@ namespace lighter
     }
 
     // Initialize any extra data in the sector
-    void Initialize ();
+    void Initialize (Statistics::Progress& progress);
 
-    void PrepareLighting ();
+    void PrepareLighting (Statistics::Progress& progress);
 
     // Build kd tree for Sector
-    void BuildKDTree ();
+    void BuildKDTree (Statistics::Progress& progress);
 
     // All objects in sector
     ObjectHash allObjects;
@@ -192,26 +192,32 @@ namespace lighter
 
     // Save functions
     void CollectDeleteTextures (iDocumentNode* textureNode,
-      csSet<csString>& filesToDelete);
+                                csSet<csString>& filesToDelete);
     void BuildLightmapTextureList (csStringArray& texturesToSave);
     void CleanOldLightmaps (LoadedFile* fileInfo);
-    void SaveSceneFactoriesToDom (iDocumentNode* root, LoadedFile* fileInfo);
-    void SaveSceneMeshesToDom (iDocumentNode* root, LoadedFile* fileInfo);
+    void SaveSceneFactoriesToDom (iDocumentNode* root, LoadedFile* fileInfo,
+                                  Statistics::Progress& progress);
+    void SaveSceneMeshesToDom (iDocumentNode* root, LoadedFile* fileInfo,
+                               Statistics::Progress& progress);
     bool SaveSceneLibrary (csSet<csString>& savedFactories, 
-      const char* libFile, LoadedFile* fileInfo);
+                           const char* libFile, LoadedFile* fileInfo,
+                           Statistics::Progress& progress);
     void HandleLibraryNode (csSet<csString>& savedFactories, 
-      iDocumentNode* node, LoadedFile* fileInfo);
+                            iDocumentNode* node, LoadedFile* fileInfo,
+                            Statistics::Progress& progress);
     void SaveMeshFactoryToDom (csSet<csString>& savedObjects, 
-      iDocumentNode* factNode, LoadedFile* fileInfo);
-    void SaveSectorToDom (iDocumentNode* sectorNode, LoadedFile* fileInfo);
+                               iDocumentNode* factNode, LoadedFile* fileInfo);
+    void SaveSectorToDom (iDocumentNode* sectorNode, LoadedFile* fileInfo,
+                          Statistics::Progress& progress);
     void SaveMeshObjectToDom (csSet<csString>& savedObjects, iDocumentNode *objNode, 
-      Sector* sect, LoadedFile* fileInfo);
+                              Sector* sect, LoadedFile* fileInfo);
 
-    void SaveLightmapsToDom (iDocumentNode* root, LoadedFile* fileInfo);
+    void SaveLightmapsToDom (iDocumentNode* root, LoadedFile* fileInfo,
+                             Statistics::Progress& progress);
     
     // Load functions
     bool ParseEngine (Statistics::Progress& progress);
-    void ParseSector (iSector *sector);
+    void ParseSector (iSector *sector, Statistics::Progress& progress);
     void ParsePortals (iSector *srcSect, Sector* sector);
     enum MeshParseResult
     {

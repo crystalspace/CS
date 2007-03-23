@@ -111,12 +111,6 @@ namespace lighter
     
     virtual void GetSwapData (void*& data, size_t& size)
     {
-#if 0
-      data = colorArray;
-      size = colorArray ? width * height * sizeof (csColor) : 0;
-      // Set a bogus pointer so accesses to swapped data causes a segfault
-      colorArray = BogusPointer ();
-#endif
       if (colorArray == 0) colorArray = AllocColors ();
       data = colorArray;
       size = width * height * sizeof (csColor);
@@ -125,31 +119,10 @@ namespace lighter
     }
     virtual size_t GetSwapSize()
     {
-#if 0
-      return colorArray ? width * height * sizeof (csColor) : 0;
-#endif
       return width * height * sizeof (csColor);
     }
     virtual void SwapIn (void* data, size_t size)
     {
-#if 0
-      if (data != 0) 
-      {
-        /* We weren't empty when swapped out: take pointer over. */
-        CS_ASSERT (size == width * height * sizeof (csColor));
-        colorArray = (csColor*)data;
-      }
-      else
-      {
-        /* We were empty when swapped in. We must've been swapped out before,
-           so the pointer should be bogus here. */
-        CS_ASSERT (colorArray == BogusPointer ());
-        /* Lock() with no color array allocated. Being swapped in implies we're
-           locked - however, Lock() won't have allocated memory as colorArray
-           wasn't 0. So allocate now. */
-        colorArray = AllocColors ();
-      }
-#endif
       CS_ASSERT (size == width * height * sizeof (csColor));
       CS_ASSERT (colorArray == BogusPointer ());
       colorArray = (csColor*)data;

@@ -32,7 +32,8 @@ namespace lighter
 
   Lightmap::~Lightmap ()
   {
-    if (colorArray) SwappableHeap::Free (colorArray);
+    Lock();
+    SwappableHeap::Free (colorArray);
   }
 
   void Lightmap::AddAmbientTerm (const csColor amb)

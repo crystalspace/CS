@@ -108,11 +108,35 @@ namespace lighter
       const csVector3& normal, SamplerSequence<2>& lightSampler, 
       PartialElementIgnoreCallback* ignoreCB);
 
+    class ProgressState
+    {
+      Statistics::Progress& progress;
+      size_t updateFreq;
+      size_t u;
+      float progressStep;
+
+    public:
+      ProgressState (Statistics::Progress& progress, size_t total) : 
+        progress (progress), 
+        updateFreq (progress.GetUpdateFrequency (total)), u (updateFreq),
+        progressStep (float (updateFreq) / total) {}
+
+      CS_FORCEINLINE void Advance ()
+      {
+        if (--u == 0)
+        {
+          progress.IncProgress (progressStep);
+          u = updateFreq;
+          globalTUI.Redraw (TUI::TUI_DRAW_RAYCORE);
+        }
+      }
+    };
+
     static void ShadeLightmap (Sector* sector, Object* obj, 
-      SamplerSequence<2>& masterSampler);
+      SamplerSequence<2>& masterSampler, ProgressState& progress);
 
     static void ShadePerVertex (Sector* sector, Object* obj,
-      SamplerSequence<2>& masterSampler);
+      SamplerSequence<2>& masterSampler, ProgressState& progress);
 
     // Static data
     static PVLPointShader pvlPointShader;

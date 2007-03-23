@@ -29,34 +29,64 @@ using namespace CS;
 namespace lighter
 {
 
-  void Sector::Initialize ()
+  void Sector::Initialize (Statistics::Progress& progress)
   {
+    progress.SetProgress (0);
+
+    size_t u, updateFreq;
+    float progressStep;
+
+    u = updateFreq = progress.GetUpdateFrequency (allObjects.GetSize());
+    progressStep = updateFreq * (1.0f / allObjects.GetSize());
+
     // Initialize objects
     ObjectHash::GlobalIterator objIt = allObjects.GetIterator ();
     while (objIt.HasNext ())
     {
       csRef<Object> obj = objIt.Next ();
       obj->Initialize ();
+      if (--u == 0)
+      {
+        progress.IncProgress (progressStep);
+        u = updateFreq;
+      }
     }
+
+    progress.SetProgress (1);
   }
 
-  void Sector::PrepareLighting ()
+  void Sector::PrepareLighting (Statistics::Progress& progress)
   {
+    progress.SetProgress (0);
+
+    size_t u, updateFreq;
+    float progressStep;
+
+    u = updateFreq = progress.GetUpdateFrequency (allObjects.GetSize());
+    progressStep = updateFreq * (1.0f / allObjects.GetSize());
+
     // Prepare lighting of objects
     ObjectHash::GlobalIterator objIt = allObjects.GetIterator ();
     while (objIt.HasNext ())
     {
       csRef<Object> obj = objIt.Next ();
       obj->PrepareLighting ();
+      if (--u == 0)
+      {
+        progress.IncProgress (progressStep);
+        u = updateFreq;
+      }
     }
+
+    progress.SetProgress (1);
   }
 
-  void Sector::BuildKDTree ()
+  void Sector::BuildKDTree (Statistics::Progress& progress)
   {
     // Build KD-tree
     ObjectHash::GlobalIterator objIt = allObjects.GetIterator ();
     KDTreeBuilder builder;
-    kdTree = builder.BuildTree (objIt);
+    kdTree = builder.BuildTree (objIt, progress);
   }
 
   //-------------------------------------------------------------------------
@@ -160,9 +190,10 @@ namespace lighter
     for (size_t i = 0; i < sceneFiles.GetSize (); i++)
     {
       //Traverse the DOM, save any factory we encounter
-      SaveSceneFactoriesToDom (sceneFiles[i].rootNode, &sceneFiles[i]);
-
-      progress.IncProgress (fileProgress);
+      Statistics::Progress* progFile = progress.CreateProgress (fileProgress);
+      SaveSceneFactoriesToDom (sceneFiles[i].rootNode, &sceneFiles[i],
+        *progFile);
+      delete progFile;
     }
 
     progress.SetProgress (1);
@@ -183,9 +214,9 @@ namespace lighter
     for (size_t i = 0; i < sceneFiles.GetSize (); i++)
     {
       //Traverse the DOM, save any mesh we encounter
-      SaveSceneMeshesToDom (sceneFiles[i].rootNode, &sceneFiles[i]);
-
-      progress.IncProgress (fileProgress);
+      Statistics::Progress* progFile = progress.CreateProgress (fileProgress);
+      SaveSceneMeshesToDom (sceneFiles[i].rootNode, &sceneFiles[i], *progFile);
+      delete progFile;
     }
 
     progress.SetProgress (1);
@@ -235,7 +266,7 @@ namespace lighter
       sceneFiles[i].document.Invalidate();
       sceneFiles[i].rootNode.Invalidate();
 
-      //progress.IncProgress (fileProgress);
+      progress.IncProgress (fileProgress);
     }
 
     // Ensure no archives are cached in memory (for memory consumption reasons)
@@ -363,7 +394,10 @@ namespace lighter
           CS_NODE_ELEMENT);
         libNode->SetValue ("library");
       }
-      SaveLightmapsToDom (doc->GetRoot (), &sceneFiles[i]);
+      Statistics::Progress* progLightmaps = progress.CreateProgress (
+        fileProgress * 0.95f);
+      SaveLightmapsToDom (doc->GetRoot (), &sceneFiles[i], *progLightmaps);
+      delete progLightmaps;
 
       // Save it
       buf.Invalidate();
@@ -385,7 +419,7 @@ namespace lighter
       // Finally delete any leftover lightmap files
       CleanOldLightmaps (&sceneFiles[i]);
 
-      progress.IncProgress (fileProgress);
+      progress.SetProgress (i * fileProgress);
     }
 
     progress.SetProgress (1);
@@ -423,24 +457,27 @@ namespace lighter
         continue;
       }
 
-      int updateFreq, u;
+      size_t updateFreq, u;
       float progressStep;
 
-      u = updateFreq = int ((meshObjNum + 50) / 100) * fileProgress;
+      Statistics::Progress* progMesh = progress.CreateProgress (fileProgress);
+
+      u = updateFreq = progMesh->GetUpdateFrequency (meshObjNum);
       progressStep = updateFreq * (1.0f / meshObjNum);
 
+      progMesh->SetProgress (0);
       for (size_t o = 0; o < meshObjNum; o++)
       {
         Object* obj = sceneFiles[i].fileObjects[o];
         obj->SaveMeshPostLighting (this);
-        if (--u <= 0)
+        if (--u == 0)
         {
-          progress.IncProgress (progressStep);
+          progMesh->IncProgress (progressStep);
           u = updateFreq;
         }
       }
-      
-      progress.SetProgress (i * fileProgress);
+      progMesh->SetProgress (1);
+      delete progMesh;
     }
 
     progress.SetProgress (1);
@@ -497,9 +534,13 @@ namespace lighter
     // Parse sectors
     sectorProgress.SetProgress (0);
     iSectorList *sectorList = globalLighter->engine->GetSectors ();
+    float progressStep = 1.0f / sectorList->GetCount ();
     for (int i = 0; i < sectorList->GetCount (); i++)
     {
-      ParseSector (sectorList->Get (i));
+      Statistics::Progress* progSector = 
+        sectorProgress.CreateProgress (progressStep);
+      ParseSector (sectorList->Get (i), *progSector);
+      delete progSector;
     }
     sectorProgress.SetProgress (1);
 
@@ -581,9 +622,15 @@ namespace lighter
     return true;
   }
 
-  void Scene::ParseSector (iSector *sector)
+  void Scene::ParseSector (iSector *sector, Statistics::Progress& progress)
   {
-    if (!sector) return;
+    if (!sector) 
+    {
+      progress.SetProgress (1);
+      return;
+    }
+
+    progress.SetProgress (0);
 
     // Setup a sector struct
     const char* sectorName = sector->QueryObject ()->GetName ();
@@ -596,8 +643,15 @@ namespace lighter
       originalSectorHash.Put (sector, radSector);
     }
 
+    size_t u, updateFreq;
+    float progressStep;
+
     // Parse all meshes (should have selector later!)
     iMeshList *meshList = sector->GetMeshes ();
+
+    u = updateFreq = progress.GetUpdateFrequency (meshList->GetCount ());
+    progressStep = updateFreq * (1.0f / meshList->GetCount ());
+
     for (int i = meshList->GetCount (); i-- > 0;)
     {
       iMeshWrapper* mesh = meshList->Get (i);
@@ -611,6 +665,12 @@ namespace lighter
       }
       // Mesh is parsed, release resources
       if (!isPortal) meshList->Remove (i);
+
+      if (--u == 0)
+      {
+        progress.IncProgress (progressStep);
+        u = updateFreq;
+      }
     }
 
     // Parse all lights (should have selector later!)
@@ -647,6 +707,8 @@ namespace lighter
 
       lightList->Remove (i);
     }
+
+    progress.SetProgress (1);
   }
 
   void Scene::ParsePortals (iSector *srcSect, Sector* sector)
@@ -861,36 +923,57 @@ namespace lighter
     }
   }
 
-  void Scene::SaveSceneFactoriesToDom (iDocumentNode* r, LoadedFile* fileInfo)
+  void Scene::SaveSceneFactoriesToDom (iDocumentNode* r, LoadedFile* fileInfo,
+                                       Statistics::Progress& progress)
   {
+    progress.SetProgress (0);
+
     csSet<csString> savedFactories;
     
     csRef <iDocumentNode> worldRoot = r->GetNode ("world");
-
     csRef<iDocumentNodeIterator> it = worldRoot->GetNodes ();
+    float nodeStep = 1.0f / it->GetEndPosition ();
+
     while (it->HasNext ())
     {
       csRef<iDocumentNode> node = it->Next ();
-      if (node->GetType () != CS_NODE_ELEMENT) continue;
-      
-      const char* nodeName = node->GetValue ();
+      size_t nextPos = it->GetNextPosition ();
+      if (node->GetType () == CS_NODE_ELEMENT)
+      {
+        const char* nodeName = node->GetValue ();
 
-      if (!strcasecmp (nodeName, "library"))
-      {
-        const char* libFile = node->GetAttributeValue ("file");
-        if (!libFile) libFile = node->GetContentsValue();
-        if ((libFile != 0) && (strcmp (libFile, lightmapLibraryName) != 0))
-          HandleLibraryNode (savedFactories, node, fileInfo);
+        if (!strcasecmp (nodeName, "library"))
+        {
+          const char* libFile = node->GetAttributeValue ("file");
+          if (!libFile) libFile = node->GetContentsValue();
+          if ((libFile != 0) && (strcmp (libFile, lightmapLibraryName) != 0))
+          {
+            Statistics::Progress* progLibrary = 
+              progress.CreateProgress (nodeStep);
+            HandleLibraryNode (savedFactories, node, fileInfo, *progLibrary);
+            delete progLibrary;
+          }
+        }
+        else if (!strcasecmp (nodeName, "meshfact"))
+        {
+          SaveMeshFactoryToDom (savedFactories, node, fileInfo);
+        }
       }
-      else if (!strcasecmp (nodeName, "meshfact"))
-      {
-        SaveMeshFactoryToDom (savedFactories, node, fileInfo);
-      }
+      progress.SetProgress (nextPos * nodeStep);
     }
+
+    progress.SetProgress (1);
   }
 
-  void Scene::SaveSceneMeshesToDom (iDocumentNode* r, LoadedFile* fileInfo)
+  void Scene::SaveSceneMeshesToDom (iDocumentNode* r, LoadedFile* fileInfo,
+                                    Statistics::Progress& progress)
   {
+    Statistics::Progress sectorProgress (0, 90, &progress);
+    Statistics::Progress texturesProgress (0, 9, &progress);
+    Statistics::Progress lightmapsProgress (0, 1, &progress);
+
+    progress.SetProgress (0);
+
     bool hasLightmapsLibrary = false;
     csStringArray texturesToSave;
     
@@ -898,27 +981,37 @@ namespace lighter
 
     csRef <iDocumentNode> worldRoot = r->GetNode ("world");
 
+    sectorProgress.SetProgress (0);
     csRef<iDocumentNodeIterator> it = worldRoot->GetNodes ();
+    float nodeStep = 1.0f / it->GetEndPosition ();
     while (it->HasNext ())
     {
       csRef<iDocumentNode> node = it->Next ();
-      if (node->GetType () != CS_NODE_ELEMENT) continue;
-      
-      const char* nodeName = node->GetValue ();
+      size_t nextPos = it->GetNextPosition();
+      if (node->GetType () == CS_NODE_ELEMENT) 
+      {
+        const char* nodeName = node->GetValue ();
 
-      if (!strcasecmp (nodeName, "library"))
-      {
-        const char* libFile = node->GetAttributeValue ("file");
-        if (!libFile) libFile = node->GetContentsValue();
-        if ((libFile != 0) && (strcmp (libFile, lightmapLibraryName) == 0))
-          hasLightmapsLibrary = true;
+        if (!strcasecmp (nodeName, "library"))
+        {
+          const char* libFile = node->GetAttributeValue ("file");
+          if (!libFile) libFile = node->GetContentsValue();
+          if ((libFile != 0) && (strcmp (libFile, lightmapLibraryName) == 0))
+            hasLightmapsLibrary = true;
+        }
+        else if (!strcasecmp (nodeName, "sector"))
+        {
+          Statistics::Progress* progSector = sectorProgress.CreateProgress (
+            nodeStep);
+          SaveSectorToDom (node, fileInfo, *progSector);
+          delete progSector;
+        }
       }
-      else if (!strcasecmp (nodeName, "sector"))
-      {
-        SaveSectorToDom (node, fileInfo);
-      }
+      sectorProgress.SetProgress (nextPos * nodeStep);
     }
+    sectorProgress.SetProgress (1);
 
+    texturesProgress.SetProgress (0);
     // see if we have any <textures> node
     csRef<iDocumentNode> texturesNode = worldRoot->GetNode ("textures");
     if (texturesNode)
@@ -946,10 +1039,12 @@ namespace lighter
         CleanOldLightmaps (fileInfo);
       }
     }
+    texturesProgress.SetProgress (1);
 
     // Generate a <library> node for the external lightmaps library
     if (!hasLightmapsLibrary)
     {
+      lightmapsProgress.SetProgress (0);
       const char* const createNodeBeforeNames[] = { "materials", "meshfact", "sector" };
 
       csRef<iDocumentNode> createBefore;
@@ -966,16 +1061,22 @@ namespace lighter
       csRef<iDocumentNode> libraryContentsNode = 
         libraryNode->CreateNodeBefore (CS_NODE_TEXT);
       libraryContentsNode->SetValue (lightmapLibraryName);
+
+      lightmapsProgress.SetProgress (1);
     }
+
+    progress.SetProgress (1);
   }
 
   bool Scene::SaveSceneLibrary (csSet<csString>& savedFactories, 
-                                const char* libFile, LoadedFile* fileInfo)
+                                const char* libFile, LoadedFile* fileInfo,
+                                Statistics::Progress& progress)
   {
     csRef<iFile> buf = globalLighter->vfs->Open (libFile, VFS_FILE_READ);
     if (!buf) 
     {
       globalLighter->Report ("Error opening file '%s'!", libFile);
+      progress.SetProgress (1);
       return false;
     }
 
@@ -984,6 +1085,7 @@ namespace lighter
     if (error != 0)
     {
       globalLighter->Report ("Document system error: %s!", error);
+      progress.SetProgress (1);
       return false;
     }
 
@@ -993,25 +1095,35 @@ namespace lighter
     if (!libRoot)
     {
       globalLighter->Report ("'%s' is not a library", libFile);
+      progress.SetProgress (1);
       return false;
     }
 
+    progress.SetProgress (0);
     csRef<iDocumentNodeIterator> it = libRoot->GetNodes ();
+    float nodeStep = 1.0f / it->GetEndPosition ();
+
     while (it->HasNext ())
     {
       csRef<iDocumentNode> node = it->Next ();
-      if (node->GetType () != CS_NODE_ELEMENT) continue;
-      
-      const char* nodeName = node->GetValue ();
+      size_t nextPos = it->GetNextPosition ();
+      if (node->GetType () == CS_NODE_ELEMENT) 
+      {
+        const char* nodeName = node->GetValue ();
 
-      if (!strcasecmp (nodeName, "library"))
-      {
-        HandleLibraryNode (savedFactories, node, fileInfo);
+        if (!strcasecmp (nodeName, "library"))
+        {
+          Statistics::Progress* progLibrary = 
+            progress.CreateProgress (nodeStep);
+          HandleLibraryNode (savedFactories, node, fileInfo, *progLibrary);
+          delete progLibrary;
+        }
+        else if (!strcasecmp (nodeName, "meshfact"))
+        {
+          SaveMeshFactoryToDom (savedFactories, node, fileInfo);
+        }
       }
-      else if (!strcasecmp (nodeName, "meshfact"))
-      {
-        SaveMeshFactoryToDom (savedFactories, node, fileInfo);
-      }
+      progress.SetProgress (nextPos * nodeStep);
     }
 
     buf = globalLighter->vfs->Open (libFile, VFS_FILE_WRITE);
@@ -1026,12 +1138,14 @@ namespace lighter
       globalLighter->Report ("Document system error: %s!", error);
       return false;
     }
+    progress.SetProgress (1);
 
     return true;
   }
 
   void Scene::HandleLibraryNode (csSet<csString>& savedFactories, 
-                                 iDocumentNode* node, LoadedFile* fileInfo)
+                                 iDocumentNode* node, LoadedFile* fileInfo,
+                                 Statistics::Progress& progress)
   {
     const char* file = node->GetAttributeValue ("file");
     if (file)
@@ -1044,11 +1158,12 @@ namespace lighter
         changer.PushDir ();
         globalLighter->vfs->ChDir (path);
       }
-      SaveSceneLibrary (savedFactories, file, fileInfo);
+      SaveSceneLibrary (savedFactories, file, fileInfo, progress);
     }
     else
     {
-      SaveSceneLibrary (savedFactories, node->GetContentsValue (), fileInfo);
+      SaveSceneLibrary (savedFactories, node->GetContentsValue (), fileInfo, 
+        progress);
     }
   }
 
@@ -1082,8 +1197,10 @@ namespace lighter
     }
   }
 
-  void Scene::SaveSectorToDom (iDocumentNode* sectorNode, LoadedFile* fileInfo)
+  void Scene::SaveSectorToDom (iDocumentNode* sectorNode, LoadedFile* fileInfo,
+                               Statistics::Progress& progress)
   {
+    progress.SetProgress (0);
     csString name = sectorNode->GetAttributeValue ("name");
     csRef<Sector> sector = sectors.Get (name, (Sector*)0);
     if (sector)
@@ -1091,12 +1208,16 @@ namespace lighter
       //ok, have the sector, try to save all objects
       csSet<csString> savedObjects;
       csRef<iDocumentNodeIterator> it = sectorNode->GetNodes ("meshobj");
+      float nodeStep = 1.0f / it->GetEndPosition ();
       while (it->HasNext ())
       {
         csRef<iDocumentNode> node = it->Next ();
+        size_t nextPos = it->GetNextPosition ();
         SaveMeshObjectToDom (savedObjects, node, sector, fileInfo);
+        progress.SetProgress (nextPos * nodeStep);
       }
     }
+    progress.SetProgress (1);
   }
 
   void Scene::SaveMeshObjectToDom (csSet<csString>& savedObjects, 
@@ -1141,8 +1262,22 @@ namespace lighter
     csStringArray pdLightIDs;
   };
 
-  void Scene::SaveLightmapsToDom (iDocumentNode* r, LoadedFile* fileInfo)
+  void Scene::SaveLightmapsToDom (iDocumentNode* r, LoadedFile* fileInfo,
+                                  Statistics::Progress& progress)
   {
+    Statistics::Progress filesProgress (0, 90, &progress);
+    Statistics::Progress texturesProgress (0, 7, &progress);
+    Statistics::Progress cleanupProgress (0, 3, &progress);
+
+    progress.SetProgress (0);
+
+    size_t u, updateFreq;
+    size_t progressStep;
+
+    u = updateFreq = filesProgress.GetUpdateFrequency (lightmaps.GetSize());
+    progressStep = updateFreq * (1.0f / lightmaps.GetSize());
+
+    filesProgress.SetProgress (0);
     csArray<SaveTexture> texturesToSave;
     csStringSet pdlightNums;
     for (unsigned int i = 0; i < lightmaps.GetSize (); i++)
@@ -1191,7 +1326,14 @@ namespace lighter
       }
 
       texturesToSave.Push (savetex);
+
+      if (--u == 0)
+      {
+        filesProgress.IncProgress (progressStep);
+        u = updateFreq;
+      }
     }
+    filesProgress.SetProgress (1);
 
     csRef <iDocumentNode> libRoot = r->GetNode ("library");
 
@@ -1210,6 +1352,11 @@ namespace lighter
       texturesNode->SetValue ("textures");
     }
 
+    u = updateFreq = texturesProgress.GetUpdateFrequency (
+      texturesToSave.GetSize());
+    progressStep = updateFreq * (1.0f / texturesToSave.GetSize());
+
+    texturesProgress.SetProgress (0);
     for (unsigned int i = 0; i < texturesToSave.GetSize (); i++)
     {
       const SaveTexture& textureToSave = texturesToSave[i];
@@ -1295,9 +1442,17 @@ namespace lighter
       }
 
       fileInfo->texturesToClean.Delete (textureToSave.texname.GetData ());
+
+      if (--u == 0)
+      {
+        texturesProgress.IncProgress (progressStep);
+        u = updateFreq;
+      }
     }
+    texturesProgress.SetProgress (1);
 
     // Clean out old lightmap textures
+    cleanupProgress.SetProgress (0);
     {
       csRefArray<iDocumentNode> nodesToDelete;
       csRef<iDocumentNodeIterator> it = texturesNode->GetNodes ("texture");
@@ -1320,6 +1475,9 @@ namespace lighter
     DocumentHelper::RemoveDuplicateChildren(texturesNode, 
       texturesNode->GetNodes ("texture"),
       DocumentHelper::NodeAttributeCompare("name"));
+    cleanupProgress.SetProgress (1);
+
+    progress.SetProgress (1);
   }
 
   //-------------------------------------------------------------------------

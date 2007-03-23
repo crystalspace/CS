@@ -28,54 +28,6 @@ namespace lighter
   class Statistics
   {
   public:
-#if 0
-    class Progress
-    {
-      friend class SubProgress;
-
-      /// Total amount of all sub-progress objects
-      float totalAmount;
-      /// Task name
-      const char* taskName;
-
-      inline void SetTaskName (const char* taskName)
-      {
-        this->taskName = taskName;
-        globalTUI.Redraw ();
-      }
-      inline void SetProgress (const char* task, float overallProgress, 
-                               float taskProgress)
-      {
-        this->overallProgress = 100.0f * (overallProgress / totalAmount);
-        this->taskProgress = taskProgress;
-        int redrawFlags;
-        if (taskName != task)
-        {
-          taskName = task;
-          redrawFlags = TUI::TUI_DRAW_ALL;
-        }
-        else
-          redrawFlags = TUI::TUI_DRAW_PROGRESS;
-
-        globalTUI.Redraw (redrawFlags);
-      }
-      /// Overall progress  0-1000
-      float overallProgress;
-
-      /// Current task progress 0-1000
-      float taskProgress;
-    public:
-      Progress () 
-        : totalAmount (0), taskName (0), overallProgress (0), taskProgress (0)
-      {
-      }
-
-      const char* GetTaskName() const { return taskName; }
-      float GetOverallProgress() const { return overallProgress; }
-      float GetTaskProgress() const { return taskProgress; }
-    } progress;
-#endif
-
     class GlobalProgress;
 
     /// Progress for a single task.
@@ -99,6 +51,8 @@ namespace lighter
         subProgressAmount (progAmount), progress (0) {}
 
       void SetProgress (float progress, const char* task);
+
+      float GetFractionFromTaskProgress ();
     public:
       /**
        * Create a "sub-progress" object for a task. \a name is the 
@@ -125,6 +79,18 @@ namespace lighter
 
       /// Create a sub-progress object. \a amount is normalized.
       Progress* CreateProgress (float amount, const char* name = 0);
+
+      /**
+       * Given \a n items returns after how many items the progress can be
+       * updated to get a visible difference in the percentage. 
+       */
+      size_t GetUpdateFrequency (size_t n)
+      {
+        size_t f = size_t ((float(n) / (GetFractionFromTaskProgress() * 100.0f)) + 0.5f);
+        if (f == 0) return 1;
+        if (f > n) return n;
+        return f;
+      }
     };
 
     class GlobalProgress : public Progress
