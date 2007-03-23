@@ -543,6 +543,16 @@ csRef<iDocumentNode> csBinaryDocNodeIterator::Next ()
   return csPtr<iDocumentNode> (retNode);
 }
 
+size_t csBinaryDocNodeIterator::GetNextPosition () 
+{ 
+  return pos; 
+}
+
+size_t csBinaryDocNodeIterator::GetEndPosition () 
+{ 
+  return iteratedNode->ctNum(); 
+}
+
 // =================================================
 //  csBdNode
 // =================================================

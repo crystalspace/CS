@@ -105,6 +105,8 @@ public:
 
   virtual bool HasNext ();
   virtual csRef<iDocumentNode> Next ();
+  size_t GetNextPosition () { return wrappedIter->GetNextPosition(); }
+  size_t GetEndPosition () { return wrappedIter->GetEndPosition(); }
 };
 
 class csReplacerDocumentAttributeIterator :

@@ -142,6 +142,7 @@ private:
   CS::TiDocumentNodeChildren* parent;
   char* value;
 
+  size_t currentPos, endPos;
 public:
   csTinyXmlNodeIterator (csTinyXmlDocument* doc,
 	CS::TiDocumentNodeChildren* parent, const char* value);
@@ -149,6 +150,9 @@ public:
 
   virtual bool HasNext ();
   virtual csRef<iDocumentNode> Next ();
+
+  virtual size_t GetNextPosition () { return currentPos; }
+  virtual size_t GetEndPosition ();
 };
 
 /**

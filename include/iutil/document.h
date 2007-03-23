@@ -129,11 +129,36 @@ struct iDocumentAttribute : public virtual iBase
  */
 struct iDocumentNodeIterator : public virtual iBase
 {
-  SCF_INTERFACE(iDocumentNodeIterator, 2,0,0);
+  SCF_INTERFACE(iDocumentNodeIterator, 2,0,1);
   /// Are there more elements?
   virtual bool HasNext () = 0;
   /// Get next element.
   virtual csRef<iDocumentNode> Next () = 0;
+  
+  /**\name Position querying
+   * The position returned by an iterator gives an indicator for the place of
+   * the next item returned in relation to all items iterated. It is \b not an
+   * accurate counter. In fact, after an element is fetched, the position
+   * may increase by any number or not at all. 
+   *
+   * The only guarantees made are:
+   *  * The <em>next position</em> is less than the <em>last position</em>
+   *    as long as elements are available,
+   *  * the <em>next position</em> is equal to the <em>last position</em>
+   *    if no more elements are available, and
+   *  * after a Next() call, the <em>next position</em> is larger or equal
+   *    to the <em>next position</em> before the call.
+   * @{ */
+  /**
+   * Get an index of the next node.
+   */
+  virtual size_t GetNextPosition () = 0;
+  /**
+   * Return the index of the "end" position (the position that is taken after
+   * no more elements are available).
+   */
+  virtual size_t GetEndPosition () = 0;
+  /** @} */
 };
 
 //===========================================================================

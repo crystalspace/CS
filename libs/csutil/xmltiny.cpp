@@ -97,7 +97,8 @@ csRef<iDocumentAttribute> csTinyXmlAttributeIterator::Next ()
 csTinyXmlNodeIterator::csTinyXmlNodeIterator (
 	csTinyXmlDocument* doc, CS::TiDocumentNodeChildren* parent,
 	const char* value)
-  : scfImplementationType (this), doc (doc), parent (parent)
+  : scfImplementationType (this), doc (doc), parent (parent),
+  currentPos (0), endPos ((size_t)~0)
 {
   csTinyXmlNodeIterator::value = value ? csStrNew (value) : 0;
   if (!parent)
@@ -128,8 +129,24 @@ csRef<iDocumentNode> csTinyXmlNodeIterator::Next ()
       current = current->NextSibling (value);
     else
       current = current->NextSibling ();
+    currentPos++;
   }
   return node;
+}
+
+size_t csTinyXmlNodeIterator::GetEndPosition ()
+{
+  if (endPos == (size_t)~0)
+  {
+    endPos = currentPos;
+    CS::TiDocumentNode* node = current;
+    while (node != 0)
+    {
+      endPos++;
+      node = node->NextSibling ();
+    }
+  }
+  return endPos;
 }
 
 //------------------------------------------------------------------------

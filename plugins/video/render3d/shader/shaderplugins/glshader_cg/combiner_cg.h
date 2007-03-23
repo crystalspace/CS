@@ -100,6 +100,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       
       bool HasNext() { return pos < nodes.GetSize(); }
       csRef<iDocumentNode> Next () { return nodes[pos++]; }
+      size_t GetNextPosition () { return pos; }
+      size_t GetEndPosition () { return nodes.GetSize(); }
     };
   };
   

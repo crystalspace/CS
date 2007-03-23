@@ -163,6 +163,10 @@ protected:
     bool HasNext ();
     iDocumentNode* Peek ();
     iDocumentNode* Next ();
+    
+    // The lazy implementation...
+    size_t GetNextPosition () { return HasNext() ? 0 : GetEndPosition(); }
+    size_t GetEndPosition () { return (size_t)~0; }
   };
   friend class WrapperWalker;
 
@@ -336,6 +340,8 @@ public:
 
   virtual bool HasNext ();
   virtual csRef<iDocumentNode> Next ();
+  size_t GetNextPosition () { return walker.GetNextPosition (); }
+  size_t GetEndPosition () { return walker.GetEndPosition (); }
 };
 
 class csWrappedDocumentNodeFactory

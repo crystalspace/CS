@@ -74,6 +74,17 @@ namespace CS
           return current;
         }
 
+        virtual size_t GetNextPosition () 
+        { 
+          if (nextElement.IsValid ())
+            return parent->GetNextPosition (); 
+          else
+            return parent->GetEndPosition (); 
+        }
+  
+        virtual size_t GetEndPosition ()
+        { return parent->GetEndPosition (); }
+
       private:
         void ForwardIterator ()
         {

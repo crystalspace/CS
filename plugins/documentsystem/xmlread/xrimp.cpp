@@ -95,11 +95,11 @@ csRef<iDocumentAttribute> csXmlReadAttributeIterator::Next ()
 csXmlReadNodeIterator::csXmlReadNodeIterator (
 	csXmlReadDocument* doc, TrDocumentNodeChildren* parent,
 	const char* value) :
-  scfImplementationType(this)
+  scfImplementationType(this), currentPos (0), endPos ((size_t)~0)
 {
   csXmlReadNodeIterator::doc = doc;
   csXmlReadNodeIterator::parent = parent;
-  csXmlReadNodeIterator::value = value ? csStrNew (value) : 0;
+  csXmlReadNodeIterator::value = value ? CS::StrDup (value) : 0;
   use_contents_value = false;
   if (!parent)
     current = 0;
@@ -121,7 +121,7 @@ csXmlReadNodeIterator::csXmlReadNodeIterator (
 
 csXmlReadNodeIterator::~csXmlReadNodeIterator ()
 {
-  delete[] value;
+  cs_free (value);
 }
 
 bool csXmlReadNodeIterator::HasNext ()
@@ -137,6 +137,7 @@ csRef<iDocumentNode> csXmlReadNodeIterator::Next ()
     node = csPtr<iDocumentNode> (doc->Alloc (current, true));
     use_contents_value = false;
     current = parent->FirstChild ();
+    currentPos++;
   }
   else if (current != 0)
   {
@@ -145,11 +146,30 @@ csRef<iDocumentNode> csXmlReadNodeIterator::Next ()
       current = current->NextSibling (value);
     else
       current = current->NextSibling ();
+    currentPos++;
   }
   return node;
 }
 
-//------------------------------------------------------------------------
+size_t csXmlReadNodeIterator::GetEndPosition ()
+{
+  if (endPos == (size_t)~0)
+  {
+    if (use_contents_value)
+      endPos = 1;
+    else
+    {
+      endPos = currentPos;
+      TrDocumentNode* node = current;
+      while (node != 0)
+      {
+        endPos++;
+        node = node->NextSibling ();
+      }
+    }
+  }
+  return endPos;
+}
 
 //------------------------------------------------------------------------
 

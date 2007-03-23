@@ -43,6 +43,8 @@ public:
 
   virtual bool HasNext () { return false; }
   virtual csRef<iDocumentNode> Next () { return 0; }
+  virtual size_t GetNextPosition () { return 1; }
+  virtual size_t GetEndPosition () { return 1; }
 };
 
 /**
