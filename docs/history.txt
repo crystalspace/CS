@@ -10,6 +10,9 @@ chronological order.
 	- res augmented the iDocumentNodeIterator interfaces to provide
 	  "position" information. This is mostly intended for allowing to 
 	  determine a progress for operations on documents.
+	- res improved the error reporting of lighter2's swapping code a bit.
+	  Also made it correctly handle a zlib "error" that's not really a
+	  fatal error.
 21-Mar-2007
 	- Jorrit started work on the deprecation of iPolygonMesh and
 	  the new iTriangleMesh. Added iTriangleMesh. Changed the already

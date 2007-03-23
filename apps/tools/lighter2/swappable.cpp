@@ -132,8 +132,12 @@ namespace lighter
       zs.next_in = (z_Byte*)swapData;
       zs.avail_in = (uInt)(swapSize);
 
-      if (deflateInit (&zs, 1) != Z_OK)
+      int rc = deflateInit (&zs, 1);
+      if (rc != Z_OK)
+      {
+        csPrintfErr ("%s: zlib error %d: %s\n", CS_FUNCTION_NAME, rc, zs.msg);
         return false;
+      }
 
       size_t compressBufferSize = 128*1024;
       CS_ALLOC_STACK_ARRAY(z_Byte, compressBuffer, compressBufferSize);
@@ -143,11 +147,13 @@ namespace lighter
         zs.next_out = compressBuffer;
         zs.avail_out = (uInt)compressBufferSize;
 
-        int rc = deflate (&zs, Z_FINISH);
+        rc = deflate (&zs, Z_FINISH);
         size_t size = compressBufferSize - zs.avail_out;
 
         if (file->Write ((const char*)compressBuffer, size) != size)
         {
+          csPrintfErr ("%s: could not write to %s\n", CS_FUNCTION_NAME, 
+            tmpFileName.GetData());
           deflateEnd (&zs);
           return false;
         }
@@ -156,7 +162,8 @@ namespace lighter
           break;
         if (rc != Z_OK)
         {
-          csPrintfErr ("zlib error: %s\n", zs.msg);
+          csPrintfErr ("%s: zlib error %d: %s\n", CS_FUNCTION_NAME, rc, 
+            zs.msg);
           deflateEnd (&zs);
           return false;
         }
@@ -208,6 +215,14 @@ namespace lighter
 
     // Allocate
     void* swapData = swapHeap.Alloc (swapSize);
+    if (swapData == 0)
+    {
+      /* Perhaps don't give up so soon and try to evict more swap memory and 
+         allocate again? */
+      csPrintfErr ("%s: Error allocating %zu bytes\n", CS_FUNCTION_NAME, 
+        swapSize);
+      return false;
+    }
 
     z_stream zs;
     memset (&zs, 0, sizeof(z_stream));
@@ -235,10 +250,11 @@ namespace lighter
 
       if (rc == Z_STREAM_END)
         break;
-      if (rc != Z_OK)
+      if ((rc != Z_OK) && (rc != Z_BUF_ERROR))
       {
-        csPrintfErr ("zlib error: %s\n", zs.msg);
+        csPrintfErr ("%s: zlib error %d: %s\n", CS_FUNCTION_NAME, rc, zs.msg);
         inflateEnd (&zs);
+        cs_free (swapData);
         return false;
       }
     }
