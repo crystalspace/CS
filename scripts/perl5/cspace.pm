@@ -12650,6 +12650,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %ITERATORS = ();
 *HasNext = *cspacec::iDocumentNodeIterator_HasNext;
 *Next = *cspacec::iDocumentNodeIterator_Next;
+*GetNextPosition = *cspacec::iDocumentNodeIterator_GetNextPosition;
+*GetEndPosition = *cspacec::iDocumentNodeIterator_GetEndPosition;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});

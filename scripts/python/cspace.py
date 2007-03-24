@@ -8391,6 +8391,8 @@ class iDocumentNodeIterator(iBase):
     __repr__ = _swig_repr
     def HasNext(*args): return _cspace.iDocumentNodeIterator_HasNext(*args)
     def Next(*args): return _cspace.iDocumentNodeIterator_Next(*args)
+    def GetNextPosition(*args): return _cspace.iDocumentNodeIterator_GetNextPosition(*args)
+    def GetEndPosition(*args): return _cspace.iDocumentNodeIterator_GetEndPosition(*args)
     def __iter__(self):
         while self.HasNext():
             yield self.Next() 
