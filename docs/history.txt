@@ -6,6 +6,8 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Mar-2007
+	- res removed pseudo-instancing. See trac #280.
 23-Mar-2007
 	- res augmented the iDocumentNodeIterator interfaces to provide
 	  "position" information. This is mostly intended for allowing to 
@@ -3306,9 +3308,6 @@ chronological order.
 	- Jorrit got a new bush from Jason Bonham and added it to
 	  terrainf. Also made the lib files more standalone.
 14-May-2006
-	- Piotr Obrzut added support for pseudo instancing.
-	- Piotr Obrzut fixes compile warning/errors related to
-          pseudo-instancing.
 	- Piotr Obrzut aplies patch from Lak_Moore: added check for
           valid references to 3D and 2D graphics plugins to
           csReporterListener::HandleEvent before trying to use them.

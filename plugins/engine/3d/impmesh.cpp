@@ -223,7 +223,6 @@ csRenderMesh** csImposterMesh::GetRenderMesh(iRenderView *rview)
     //Initialize mesh
     mesh->meshtype = CS_MESHTYPE_TRIANGLES;
     mesh->flipCulling = false;
-    mesh->supports_pseudoinstancing = false;
     mesh->do_mirror = rview->GetCamera ()->IsMirrored ();
     mesh->object2world = csReversibleTransform ();
     mesh->worldspace_origin = csVector3 (0,0,0);

@@ -27,7 +27,6 @@
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/scanstr.h"
 #include "csutil/sysfunc.h"
-#include "csgfx/shadervar.h"
 
 #include "iengine/engine.h"
 #include "iengine/material.h"
@@ -70,10 +69,7 @@ enum
   XMLTOKEN_NOSHADOWS,
   XMLTOKEN_LOCALSHADOWS,
   XMLTOKEN_COMPRESS,
-  XMLTOKEN_INSTANCE,
-  XMLTOKEN_VARIABLE,
-  XMLTOKEN_MATRIX,
-  XMLTOKEN_VECTOR
+  XMLTOKEN_INSTANCE
 };
 
 SCF_IMPLEMENT_FACTORY (csInstFactoryLoader)
@@ -112,9 +108,6 @@ bool csInstFactoryLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("lighting", XMLTOKEN_LIGHTING);
   xmltokens.Register ("noshadows", XMLTOKEN_NOSHADOWS);
   xmltokens.Register ("localshadows", XMLTOKEN_LOCALSHADOWS);
-  xmltokens.Register ("variable",XMLTOKEN_VARIABLE);
-  xmltokens.Register ("matrix",XMLTOKEN_MATRIX);
-  xmltokens.Register ("vector",XMLTOKEN_VECTOR);
   return true;
 }
 
@@ -528,7 +521,6 @@ bool csInstMeshLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("noshadows", XMLTOKEN_NOSHADOWS);
   xmltokens.Register ("localshadows", XMLTOKEN_LOCALSHADOWS);
   xmltokens.Register ("instance", XMLTOKEN_INSTANCE);
-  xmltokens.Register ("variable", XMLTOKEN_VARIABLE);
   return true;
 }
 
@@ -547,9 +539,6 @@ csPtr<iBase> csInstMeshLoader::Parse (iDocumentNode* node,
   csRef<iInstancingMeshState> meshstate;
   csRef<iInstancingFactoryState> factstate;
 
-  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (object_reg,
-    "crystalspace.shared.stringset");
-
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
@@ -559,57 +548,27 @@ csPtr<iBase> csInstMeshLoader::Parse (iDocumentNode* node,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
-      case XMLTOKEN_VARIABLE:
-        {
-          csShaderVariable var (strings->Request (child->GetAttributeValue ("name")));
-          const char* type = child->GetAttributeValue ("type");
-          switch (xmltokens.Request (type))
-          {
-          case XMLTOKEN_VECTOR:
-            var.SetValue (csVector4 (0));
-            break;
-          case XMLTOKEN_MATRIX:
-            var.SetValue (csMatrix3 ());
-            break;
-          default:
-            synldr->ReportError (
-              "crystalspace.instmeshloader.parse.unknowntype",
-              child, "Wrong type name '%s'!", type);
-            return 0;
-          }
-          meshstate->AddInstancesVariable (var);
-        }
-        break;
-
       case XMLTOKEN_INSTANCE:
 	{
-    csReversibleTransform trans;
-    csRef<iDocumentNodeIterator> ch_it = child->GetNodes ("variable");
-    size_t inst_id = meshstate->AddInstance ();
-    while (ch_it->HasNext ())
-    {
-      csRef<iDocumentNode> var_node = ch_it->Next ();
-      csShaderVariable var (strings->Request (var_node->GetAttributeValue ("name")));
-      csRef<iDocumentNode> matrix_node = var_node->GetNode ("matrix");
-      if (matrix_node)
-      {
-        csMatrix3 m;
-        if (!synldr->ParseMatrix (matrix_node, m))
-          return false;
-        var.SetValue (m);
-      }
-      csRef<iDocumentNode> vector_node = child->GetNode ("v");
-      if (vector_node)
-      {
-        csVector3 v;
-        if (!synldr->ParseVector (vector_node, v))
-          return false;
-        var.SetValue (v);
-      }
-      meshstate->SetInstanceVariable (inst_id, var);
-    }
-    CHECK_MESH (meshstate);
-    
+	  csReversibleTransform trans;
+	  csRef<iDocumentNode> matrix_node = child->GetNode ("matrix");
+	  if (matrix_node)
+	  {
+	    csMatrix3 m;
+	    if (!synldr->ParseMatrix (matrix_node, m))
+	      return false;
+            trans.SetO2T (m);
+	  }
+	  csRef<iDocumentNode> vector_node = child->GetNode ("v");
+	  if (vector_node)
+	  {
+	    csVector3 v;
+	    if (!synldr->ParseVector (vector_node, v))
+	      return false;
+            trans.SetO2TTranslation (v);
+	  }
+	  CHECK_MESH (meshstate);
+	  meshstate->AddInstance (trans);
 	}
 	break;
       case XMLTOKEN_MANUALCOLORS:

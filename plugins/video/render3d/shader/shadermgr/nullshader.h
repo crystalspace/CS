@@ -67,7 +67,6 @@ public:
   virtual const csShaderMetadata& GetMetadata (size_t) const
   { return allShaderMeta; }
 
-
   /**\name iShaderVariableContext implementation
    * @{ */
   void AddVariable (csShaderVariable *) { }
