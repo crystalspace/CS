@@ -27,6 +27,9 @@
 #include "gl_txtmgr.h"
 #include "gl_r2t_framebuf.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
+{
+
 void csGLRender2TextureFramebuf::SetRenderTarget (iTextureHandle* handle, 
 						  bool persistent,
 						  int subtexture)
@@ -204,3 +207,6 @@ void csGLRender2TextureFramebuf::SetupClipPortalDrawing ()
   glScalef (1, -1, 1);
   //G3D->statecache->SetCullFace (GL_BACK);
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(gl3d)

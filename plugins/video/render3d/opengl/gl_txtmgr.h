@@ -42,6 +42,9 @@
 
 #include "csplugincommon/opengl/glextmanager.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
+{
+
 class csGLGraphics3D;
 class csGLTextureHandle;
 class csGLTextureManager;
@@ -553,6 +556,9 @@ public:
   /// Dump all SLMs to image files.
   void DumpSuperLightmaps (iVFS* VFS, iImageIO* iio, const char* dir);
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(gl3d)
 
 #endif // __CS_GL_TXTMGR_H__
 

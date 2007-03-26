@@ -59,12 +59,20 @@
 #include "ivideo/shader/shader.h"
 #include "ivideo/txtmgr.h"
 
+#include "gl_r2t_ext_fb_o.h"
 #include "gl_r2t_framebuf.h"
 #include "gl_render3d.h"
 #include "gl_renderbuffer.h"
 #include "gl_txtmgr.h"
-#include "gl_r2t_ext_fb_o.h"
 
+const int CS_CLIPPER_EMPTY = 0xf008412;
+
+#include "gl_stringlists.h"
+
+CS_IMPLEMENT_PLUGIN
+
+CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
+{
 
 CS_DECLARE_PROFILER
 CS_DECLARE_PROFILER_ZONE(csGLGraphics3D_DrawMesh);
@@ -74,17 +82,11 @@ CS_DECLARE_PROFILER_ZONE(csGLGraphics3D_DrawMesh);
 csGLStateCache* csGLGraphics3D::statecache = 0;
 csGLExtensionManager* csGLGraphics3D::ext = 0;
 
-const int CS_CLIPPER_EMPTY = 0xf008412;
-
-#include "gl_stringlists.h"
-
 CS_IMPLEMENT_STATIC_CLASSVAR(MakeAString, scratch, GetScratch, csString, ())
 CS_IMPLEMENT_STATIC_CLASSVAR_ARRAY(MakeAString, formatter, GetFormatter,
                                    char, [sizeof(MakeAString::Formatter)])
 CS_IMPLEMENT_STATIC_CLASSVAR_ARRAY(MakeAString, reader, GetReader,
                                    char, [sizeof(MakeAString::Reader)])
-
-CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGLGraphics3D)
 
@@ -3680,3 +3682,6 @@ void csGLGraphics3D::DumpZBuffer (const char* path)
     }
   }
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(gl3d)

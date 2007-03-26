@@ -24,6 +24,8 @@
 #include "gl_render3d.h"
 #include "gl_renderbuffer.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
+{
 
 CS_LEAKGUARD_IMPLEMENT (csGLVBOBufferManager);
 
@@ -617,3 +619,5 @@ void csGLVBOBufferManager::DumpStatsBufferType (size_t type)
   csPrintf ("Total sysmem size: %s\n", ByteFormat (sysmemSize).GetDataSafe ());
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(gl3d)

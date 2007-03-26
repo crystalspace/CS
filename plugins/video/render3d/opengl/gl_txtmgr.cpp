@@ -39,6 +39,9 @@
 #include "gl_render3d.h"
 #include "gl_txtmgr.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
+{
+
 CS_LEAKGUARD_IMPLEMENT(csGLBasicTextureHandle);
 CS_LEAKGUARD_IMPLEMENT(csGLRendererLightmap);
 CS_LEAKGUARD_IMPLEMENT(csGLSuperLightmap);
@@ -1705,3 +1708,6 @@ iTextureHandle* csGLSuperLightmap::GetTexture ()
   }
   return th;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(gl3d)

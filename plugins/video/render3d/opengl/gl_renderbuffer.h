@@ -25,6 +25,9 @@
 #include "csutil/bitops.h"
 #include "csutil/scf_implementation.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
+{
+
 static const GLenum compGLtypes[CS_BUFCOMP_TYPECOUNT] =
 {
   GL_BYTE, GL_UNSIGNED_BYTE,
@@ -281,5 +284,8 @@ private:
   // Helper when dumping statistics
   */
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(gl3d)
 
 #endif //__CS_GL_RENDERBUFFER_H__

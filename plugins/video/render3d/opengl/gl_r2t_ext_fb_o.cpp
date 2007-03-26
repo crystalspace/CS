@@ -25,6 +25,9 @@
 #include "gl_txtmgr.h"
 #include "gl_r2t_ext_fb_o.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
+{
+
 /* Stencil attachment status:
  * ATI Catalyst 6.8 (2006-09-08): reports "incomplete - dimensions"
  * NV: supposedly does not support separate stencil attachment, but packed
@@ -206,3 +209,6 @@ void csGLRender2TextureEXTfbo::FinishDraw ()
   //  render_target->GetPrivateObject ();
   //tex_mm->SetNeedMips (true);
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(gl3d)

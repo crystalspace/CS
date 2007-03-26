@@ -62,8 +62,6 @@
 #include "gl_renderbuffer.h"
 #include "gl_r2t_backend.h"
 
-class csGLTextureHandle;
-class csGLTextureManager;
 struct csGLExtensionManager;
 
 struct iClipper2D;
@@ -74,6 +72,14 @@ struct iLightingManager;
 
 struct iEvent;
 
+CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
+{
+
+class csGLTextureHandle;
+class csGLTextureManager;
+
+/* The purpose of this class is to generate a formatted string, but only
+   if it's actually used. */
 class MakeAString
 {
 public:
@@ -767,6 +773,9 @@ public:
   virtual void Dump (iGraphics3D* /*g3d*/)
   { }
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(gl3d)
 
 #endif // __CS_GL_RENDER3D_H__
 
