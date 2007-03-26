@@ -234,7 +234,7 @@ bool csSpriteCal3DMeshObjectFactory::LoadCoreSkeleton (iVFS *vfs,
     if (skel)
     {
       calCoreModel.setCoreSkeleton (skel.get());
-      skel_factory->SetSkeleton (skel.get());
+      skel_factory->SetSkeleton (&calCoreModel);
       return true;
     }
     else
@@ -713,9 +713,11 @@ scfImplementationType(this), core_skeleton(0)
 {
 }
 
-void csCal3dSkeletonFactory::SetSkeleton (CalCoreSkeleton *skeleton)
+void csCal3dSkeletonFactory::SetSkeleton (CalCoreModel *model)
 {
-  std::vector<CalCoreBone*> bvect = skeleton->getVectorCoreBone ();
+  core_model = model;
+  core_skeleton = model->getCoreSkeleton ();
+  std::vector<CalCoreBone*> bvect = core_skeleton->getVectorCoreBone ();
   for (size_t i = 0; i < bvect.size (); i++)
   {
     bones_factories.Push (new csCal3dSkeletonBoneFactory (bvect[i], this));
@@ -728,18 +730,39 @@ void csCal3dSkeletonFactory::SetSkeleton (CalCoreSkeleton *skeleton)
     bones_names.Put (csHashComputer<const char*>::ComputeHash (bones_factories[i]->GetName ()), i);
   }
 }
+int csCal3dSkeletonFactory::GetCoreBoneId (iSkeletonBoneFactory *core_bone)
+{
+  return core_skeleton->getCoreBoneId (core_bone->GetName ());
+}
 size_t csCal3dSkeletonFactory::FindBoneIndex (const char *name)
 {
-  csArray<size_t> b_idx = bones_names.GetAll (csHashComputer<const char*>::ComputeHash (name));
-  if (b_idx.GetSize () > 0)
-    return b_idx[0];
+  size_t b_idx = bones_names.Get (
+    csHashComputer<const char*>::ComputeHash (name), csArrayItemNotFound);
   return csArrayItemNotFound;
 }
 iSkeletonBoneFactory *csCal3dSkeletonFactory::FindBone (const char *name)
 {
-  csArray<size_t> b_idx = bones_names.GetAll (csHashComputer<const char*>::ComputeHash (name));
-  if (b_idx.GetSize () > 0)
-    return bones_factories[b_idx[0]];
+  size_t b_idx = bones_names.Get (
+    csHashComputer<const char*>::ComputeHash (name), csArrayItemNotFound);
+  if (b_idx != csArrayItemNotFound)
+    return bones_factories[b_idx];
+  return 0;
+}
+iSkeletonAnimation *csCal3dSkeletonFactory::CreateAnimation (const char *name)
+{
+  csCal3dSkeletonAnimation *anim = new csCal3dSkeletonAnimation (this);
+  anim->SetName (name);
+  animations_names.Put (csHashComputer<const char*>::ComputeHash (name),
+    animations.Push (anim));
+  core_model->addCoreAnimation (anim->GetCoreAnimation ());
+  return anim;
+}
+iSkeletonAnimation *csCal3dSkeletonFactory::FindAnimation (const char *name) 
+{
+  size_t idx = animations_names.Get (
+    csHashComputer<const char*>::ComputeHash (name), csArrayItemNotFound);
+  if (idx != csArrayItemNotFound)
+    return animations[idx];
   return 0;
 }
 //---------------------------csCal3dSkeletonBoneFactory---------------------------
@@ -763,7 +786,56 @@ bool csCal3dSkeletonBoneFactory::Initialize ()
   
   return false;
 }
+//---------------------------csCal3dSkeletonAnimation---------------------------
+csCal3dSkeletonAnimation::csCal3dSkeletonAnimation (csCal3dSkeletonFactory *skel_fact) : 
+scfImplementationType(this), skel_fact(skel_fact) 
+{
+  animation = new CalCoreAnimation ();
+}
+csCal3dSkeletonAnimation::~csCal3dSkeletonAnimation ()
+{
+}
+iSkeletonAnimationKeyFrame *csCal3dSkeletonAnimation::CreateFrame (const char* name)
+{
+  csCal3dAnimationKeyFrame *frame = new csCal3dAnimationKeyFrame (this);
+  frames.Push (frame);
+  return frame;
+}
+//---------------------------csCal3dAnimationKeyFrame---------------------------
+void csCal3dAnimationKeyFrame::AddTransform (iSkeletonBoneFactory *bone,
+    csReversibleTransform &transform, bool relative)
+{
+  int b_id = animation->GetSkeletonFactory ()->GetCoreBoneId (bone);
+  if (b_id != -1)
+  {
+    CalCoreTrack *track = animation->GetCoreAnimation ()->getCoreTrack (b_id);
+    if (!track)
+    {
+      track = new CalCoreTrack ();
+      animation->GetCoreAnimation ()->addCoreTrack (track);
+    }
+    CalCoreKeyframe *keyframe = new CalCoreKeyframe ();
+    csVector3 pos = transform.GetOrigin ();
+    keyframe->setTranslation (CalVector (pos.x, pos.y, pos.z));
 
+    csQuaternion csquat;
+    csquat.SetMatrix (transform.GetO2T ());
+    csquat.Norm ();
+    keyframe->setRotation (CalQuaternion (csquat.v.x, csquat.v.y, csquat.v.z, csquat.w));
+    if (track->addCoreKeyframe (keyframe))
+    {
+      bones.Push (bone);
+      bones_key_frames.Push (keyframe);
+    }
+  }
+}
+void csCal3dAnimationKeyFrame::SetDuration (csTicks time)
+{
+  for (size_t i = 0; i < bones_key_frames.GetSize (); i++)
+  {
+    bones_key_frames[i]->setTime (CS_TIME_2_CAL_TIME (time));
+  }
+}
 //=============================================================================
 
 void csSpriteCal3DMeshObject::DefaultAnimTimeUpdateHandler::UpdatePosition(
@@ -2294,16 +2366,16 @@ void csCal3dSkeleton::UpdateNotify (const csTicks &current_ticks)
 }
 size_t csCal3dSkeleton::FindBoneIndex (const char *name)
 {
-  csArray<size_t> b_idx = bones_names.GetAll (csHashComputer<const char*>::ComputeHash (name));
-  if (b_idx.GetSize () > 0)
-    return b_idx[0];
+  size_t b_idx = bones_names.Get (
+    csHashComputer<const char*>::ComputeHash (name), csArrayItemNotFound);
   return csArrayItemNotFound;
 }
 iSkeletonBone *csCal3dSkeleton::FindBone (const char *name)
 {
-  csArray<size_t> b_idx = bones_names.GetAll (csHashComputer<const char*>::ComputeHash (name));
-  if (b_idx.GetSize () > 0)
-    return bones[b_idx[0]];
+  size_t b_idx = bones_names.Get (
+    csHashComputer<const char*>::ComputeHash (name), csArrayItemNotFound);
+  if (b_idx != csArrayItemNotFound)
+    return bones[b_idx];
   return 0;
 }
 //---------------------------csCal3dSkeletonBone---------------------------

@@ -785,31 +785,35 @@ public:
 };
 
 class csCal3dSkeletonBoneFactory;
+class csCal3dSkeletonAnimation;
 
 class csCal3dSkeletonFactory : public 
   scfImplementation1<csCal3dSkeletonFactory, iSkeletonFactory> 
 {
   CalCoreSkeleton *core_skeleton;
+  CalCoreModel *core_model;
   csString name;
   csRefArray<csCal3dSkeletonBoneFactory> bones_factories;
-  csHash<uint, size_t> bones_names;
+  csHash<size_t, uint> bones_names;
+  csRefArray<csCal3dSkeletonAnimation> animations;
+  csHash<size_t, uint> animations_names;
 
 public:
 
   csCal3dSkeletonFactory ();
 
-  void SetSkeleton (CalCoreSkeleton *skeleton);
-
+  void SetSkeleton (CalCoreModel *model);
   CalCoreSkeleton *GetCal3dSkeleton () {return core_skeleton;}
+  int GetCoreBoneId (iSkeletonBoneFactory *core_bone);
 
-  /**\name iSkeletonBoneFactory implementation
+  /**\name iSkeletonFactory implementation
    * @{ */
   const char* GetName () const {return name.GetData ();}
   void SetName (const char* name) {csCal3dSkeletonFactory::name = name;}
   iSkeletonBoneFactory *CreateBone (const char *name) {return 0;}
-  iSkeletonAnimation *CreateAnimation (const char *name) {return 0;}
+  iSkeletonAnimation *CreateAnimation (const char *name);
   iSkeletonAnimation *CreateScript(const char *name) {return CreateAnimation (name);}
-  iSkeletonAnimation *FindAnimation (const char *name) {return 0;}
+  iSkeletonAnimation *FindAnimation (const char *name);
   iSkeletonAnimation *FindScript (const char *name) {return FindAnimation (name);}
   iSkeletonBoneFactory *FindBone (const char *name);
   size_t FindBoneIndex (const char *name);
@@ -840,13 +844,13 @@ class csCal3dSkeletonBoneFactory : public
 public:
 
   csCal3dSkeletonBoneFactory (CalCoreBone *core_bone, csCal3dSkeletonFactory* skelfact);
-
   bool Initialize ();
+  CalCoreBone *GetCoreBone () {return core_bone;}
 
   /**\name iSkeletonBoneFactory implementation
    * @{ */
   const char* GetName () const {return core_bone->getName ().c_str ();}
-  void SetName (const char* name) {;}
+  void SetName (const char* name) {}
   csReversibleTransform &GetTransform () {return local_transform;}
   void SetTransform (const csReversibleTransform &transform) {;}
   csReversibleTransform &GetFullTransform () {return global_transform;}
@@ -859,6 +863,75 @@ public:
   void SetSkinBox (csBox3 & box) {;}
   csBox3 &GetSkinBox () {return skin_box;}
   iSkeletonBoneRagdollInfo *GetRagdollInfo () {return 0;}
+  /** @} */
+};
+
+#define CAL_TIME_2_CS_TIME(time) time * 1000
+#define CS_TIME_2_CAL_TIME(time) ((float)time) / 1000
+class csCal3dSkeletonAnimation;
+
+class csCal3dAnimationKeyFrame : public 
+  scfImplementation1<csCal3dAnimationKeyFrame, iSkeletonAnimationKeyFrame>
+{
+  csCal3dSkeletonAnimation *animation;
+  csArray<iSkeletonBoneFactory *> bones;
+  csArray<CalCoreKeyframe *> bones_key_frames;
+  csReversibleTransform trans;
+  
+public:
+
+  csCal3dAnimationKeyFrame (csCal3dSkeletonAnimation *animation) : 
+      scfImplementationType(this), animation(animation) {;}
+
+  /**\name iSkeletonAnimationKeyFrame implementation
+   * @{ */
+  const char* GetName () const {return "";}
+  void SetName (const char* name) {;}
+  csTicks GetDuration () {return 0;}
+  void SetDuration (csTicks time);
+  size_t GetTransformsCount() {return 0;}
+  void AddTransform (iSkeletonBoneFactory *bone,csReversibleTransform &transform,
+    bool relative = false);
+  csReversibleTransform &GetTransform (iSkeletonBoneFactory *bone) {return trans;}
+  void SetTransform(iSkeletonBoneFactory *bone, csReversibleTransform &transform) {;}
+  bool GetKeyFrameData (iSkeletonBoneFactory *bone_fact,  csQuaternion & rot,
+    csVector3 & pos, csQuaternion &tangent, bool &relative) {return false;}
+  /** @} */
+};
+
+class csCal3dSkeletonAnimation : public scfImplementation1<csCal3dSkeletonAnimation, iSkeletonAnimation>
+{
+  CalCoreAnimation *animation;
+  csWeakRef<csCal3dSkeletonFactory> skel_fact;
+  csRefArray<csCal3dAnimationKeyFrame> frames;
+
+public:
+
+  csCal3dSkeletonAnimation (csCal3dSkeletonFactory *skel_fact);
+  virtual ~csCal3dSkeletonAnimation ();    
+
+  CalCoreAnimation *GetCoreAnimation () {return animation;}
+  csCal3dSkeletonFactory *GetSkeletonFactory () {return skel_fact;}
+
+  /**\name iSkeletonAnimation implementation
+   * @{ */
+  const char* GetName () const {return animation->getName ().c_str ();}
+  void SetName (const char* name) {animation->getName () == name;}
+  csTicks GetTime () {return CAL_TIME_2_CS_TIME(animation->getDuration ());}
+  void SetTime (csTicks time) {animation->setDuration (CS_TIME_2_CAL_TIME(time));}
+  float GetSpeed () {return 0;}
+  void SetSpeed (float speed) {;}
+  void SetFactor (float factor) {;}
+  float GetFactor () {return 1;}
+  void SetLoop (bool loop) {;}
+  bool GetLoop () {return false;}
+  iSkeletonAnimationKeyFrame *CreateFrame (const char* name);
+  size_t GetFramesCount () {return frames.GetSize ();}
+  iSkeletonAnimationKeyFrame *GetFrame (size_t i) {return frames[i];}
+  size_t FindFrameIndex (const char *name) {return csArrayItemNotFound;}
+  void RemoveFrame (size_t i) {;}
+  void RemoveAllFrames () {;}
+  void RecalcSpline (){;}
   /** @} */
 };
 
@@ -912,7 +985,7 @@ class csCal3dSkeleton : public scfImplementation1<csCal3dSkeleton, iSkeleton>
   csRefArray<csCal3dSkeletonBone> bones;
   csWeakRef<csCal3dSkeletonFactory> skeleton_factory;
   csRefArray<iSkeletonUpdateCallback> update_callbacks;
-  csHash<uint, size_t> bones_names;
+  csHash<size_t, uint> bones_names;
 
 public:
 
@@ -939,7 +1012,7 @@ public:
   iSkeletonSocket* FindSocket (const char *socketname) {return 0;}
   void StopAll () {;}
   void Stop (const char* scriptname) {;}
-  iSkeletonFactory *GetFactory () {return 0;}
+  iSkeletonFactory *GetFactory () {return skeleton_factory;}
   void SetAnimationCallback (iSkeletonAnimationCallback *cb) {;}
   void SetScriptCallback (iSkeletonAnimationCallback *cb) {SetAnimationCallback (cb);}
   size_t AddUpdateCallback(iSkeletonUpdateCallback *update_callback) 

@@ -9,6 +9,7 @@ chronological order.
 26-Mar-2007
 	- res removed pseudo-instancing. See trac #280.
 	- res made gl3d use a plugin namespace.
+        - Piotr blindly fixed trac #305.
 23-Mar-2007
 	- res augmented the iDocumentNodeIterator interfaces to provide
 	  "position" information. This is mostly intended for allowing to 
