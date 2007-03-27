@@ -738,7 +738,7 @@ size_t csCal3dSkeletonFactory::FindBoneIndex (const char *name)
 {
   size_t b_idx = bones_names.Get (
     csHashComputer<const char*>::ComputeHash (name), csArrayItemNotFound);
-  return csArrayItemNotFound;
+  return b_idx;
 }
 iSkeletonBoneFactory *csCal3dSkeletonFactory::FindBone (const char *name)
 {
@@ -2368,7 +2368,7 @@ size_t csCal3dSkeleton::FindBoneIndex (const char *name)
 {
   size_t b_idx = bones_names.Get (
     csHashComputer<const char*>::ComputeHash (name), csArrayItemNotFound);
-  return csArrayItemNotFound;
+  return b_idx;
 }
 iSkeletonBone *csCal3dSkeleton::FindBone (const char *name)
 {

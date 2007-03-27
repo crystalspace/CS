@@ -882,7 +882,7 @@ public:
 
   csCal3dAnimationKeyFrame (csCal3dSkeletonAnimation *animation) : 
       scfImplementationType(this), animation(animation) {;}
-
+ 
   /**\name iSkeletonAnimationKeyFrame implementation
    * @{ */
   const char* GetName () const {return "";}
