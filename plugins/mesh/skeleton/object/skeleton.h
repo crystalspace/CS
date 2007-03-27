@@ -700,6 +700,9 @@ public:
 
   virtual iSkeletonGraveyard *GetGraveyard  ();
 
+
+  size_t GetAnimationsCount () {return scripts.GetSize ();}
+  iSkeletonAnimation *GetAnimation (size_t idx) {return scripts[idx];}
   virtual iSkeletonAnimation *CreateScript(const char *name) {return CreateAnimation (name);}
   virtual iSkeletonAnimation *CreateAnimation (const char *name);
   virtual iSkeletonAnimation *FindAnimation (const char *name);

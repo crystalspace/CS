@@ -6,6 +6,10 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+27-Mar-2007
+        - Piotr did small bugfixing in cal3d iSkeleton implementation.
+        - Piotr added methods for getting animations by indices from
+          skeleton factory.
 26-Mar-2007
 	- res removed pseudo-instancing. See trac #280.
 	- res made gl3d use a plugin namespace.

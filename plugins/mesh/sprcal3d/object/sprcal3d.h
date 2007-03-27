@@ -825,6 +825,8 @@ public:
   iSkeletonSocketFactory *GetSocket (int i) {return 0;}
   void RemoveSocket (int i) {;}
   size_t GetSocketsCount () {return 0;}   
+  size_t GetAnimationsCount () {return animations.GetSize ();}
+  iSkeletonAnimation *GetAnimation (size_t idx) {return (iSkeletonAnimation *)animations[idx];}
   /** @} */
 };
 
@@ -916,7 +918,7 @@ public:
   /**\name iSkeletonAnimation implementation
    * @{ */
   const char* GetName () const {return animation->getName ().c_str ();}
-  void SetName (const char* name) {animation->getName () == name;}
+  void SetName (const char* name) {animation->setName (std::string (name));}
   csTicks GetTime () {return CAL_TIME_2_CS_TIME(animation->getDuration ());}
   void SetTime (csTicks time) {animation->setDuration (CS_TIME_2_CAL_TIME(time));}
   float GetSpeed () {return 0;}
