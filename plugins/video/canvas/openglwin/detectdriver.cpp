@@ -242,7 +242,12 @@ void csDetectDriver::ScanForDriver ()
 void csDetectDriver::DetermineDriverVersion()
 {
   DWORD dummy;
-  DWORD verInfoSize = GetFileVersionInfoSizeA (DriverDLL, &dummy);
+  /* The const_casts are needed as w32api from MinGW doesn't declare some 
+     string parameters as 'const', whereas e.g. Windows SDK 6.0 does. 
+     (w32api is probably not the only offender, older Platform SDKs aren't
+     always const-friendly, too.) */
+  DWORD verInfoSize = GetFileVersionInfoSizeA (
+    const_cast<char*> (DriverDLL.GetData()), &dummy);
   if (verInfoSize == 0)
   {
     // Try appending ".dll"
@@ -254,7 +259,8 @@ void csDetectDriver::DetermineDriverVersion()
   if (verInfoSize != 0)
   {
     uint8* buffer = new uint8[verInfoSize];
-    if (GetFileVersionInfoA (DriverDLL, 0, verInfoSize, buffer))
+    if (GetFileVersionInfoA (
+      const_cast<char*> (DriverDLL.GetData()), 0, verInfoSize, buffer))
     {
       void* data;
       UINT dataLen;
