@@ -1,7 +1,7 @@
 /*
     Copyright (C) 1998-2004 by Jorrit Tyberghein
 	      (C) 2003 by Philip Aumayr
-	      (C) 2004 by Frank Richter
+	      (C) 2004-2007 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -289,95 +289,6 @@ GLenum csGLBasicTextureHandle::DetermineTargetFormat (GLenum defFormat,
   return targetFormat;
 }
 
-CS::StructuredTextureFormat csGLBasicTextureHandle::fmt_r8g8b8_i
-	= CS::TextureFormatStrings::ConvertStructured ("r8g8b8_i");
-CS::StructuredTextureFormat csGLBasicTextureHandle::fmt_b8g8r8_i
-	= CS::TextureFormatStrings::ConvertStructured ("b8g8r8_i");
-CS::StructuredTextureFormat csGLBasicTextureHandle::fmt_r5g6b5_i
-	= CS::TextureFormatStrings::ConvertStructured ("r5g6b5_i");
-CS::StructuredTextureFormat csGLBasicTextureHandle::fmt_a8r8g8b8_i
-	= CS::TextureFormatStrings::ConvertStructured ("a8r8g8b8_i");
-CS::StructuredTextureFormat csGLBasicTextureHandle::fmt_l8_i
-	= CS::TextureFormatStrings::ConvertStructured ("l8_i");
-CS::StructuredTextureFormat csGLBasicTextureHandle::fmt_dxt1
-	= CS::TextureFormatStrings::ConvertStructured ("*dxt1");
-CS::StructuredTextureFormat csGLBasicTextureHandle::fmt_dxt1a
-	= CS::TextureFormatStrings::ConvertStructured ("*dxt1a");
-CS::StructuredTextureFormat csGLBasicTextureHandle::fmt_dxt3
-	= CS::TextureFormatStrings::ConvertStructured ("*dxt3");
-CS::StructuredTextureFormat csGLBasicTextureHandle::fmt_dxt5
-	= CS::TextureFormatStrings::ConvertStructured ("*dxt5");
-
-bool csGLBasicTextureHandle::ConvertFormat2GL (const char* format,
-	csGLSource& src, GLenum& targetFormat, bool allowCompressed,
-	bool& compressed)
-{
-  CS::StructuredTextureFormat fmt = CS::TextureFormatStrings
-  	::ConvertStructured (format);
-  if (fmt == fmt_b8g8r8_i)
-  {
-    src.format = GL_RGB;
-    src.type = GL_UNSIGNED_BYTE;
-    return true;
-  }
-  if (fmt == fmt_l8_i)
-  {
-    src.format = GL_LUMINANCE;
-    src.type = GL_UNSIGNED_BYTE;
-    targetFormat = GL_LUMINANCE;
-    return true;
-  }
-  if (G3D->ext->CS_GL_version_1_2)
-  {
-    if (fmt == fmt_r8g8b8_i)
-    {
-      src.format = GL_BGR;
-      src.type = GL_UNSIGNED_BYTE;
-      return true;
-    }
-    else if (fmt == fmt_r5g6b5_i)
-    {
-      src.format = GL_RGB;
-      src.type = GL_UNSIGNED_SHORT_5_6_5;
-      return true;
-    }
-    else if (fmt == fmt_a8r8g8b8_i)
-    {
-      src.format = GL_BGRA;
-      src.type = GL_UNSIGNED_BYTE;
-      return true;
-    }
-  }
-  if (allowCompressed && G3D->ext->CS_GL_EXT_texture_compression_s3tc)
-  {
-   if (fmt == fmt_dxt1)
-    {
-      targetFormat = GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
-      compressed = true;
-      return true;
-    }
-    else if (fmt == fmt_dxt1a)
-    {
-      targetFormat = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
-      compressed = true;
-      return true;
-    }
-    else if (fmt == fmt_dxt3)
-    {
-      targetFormat = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
-      compressed = true;
-      return true;
-    }
-    else if (fmt == fmt_dxt3)
-    {
-      targetFormat = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-      compressed = true;
-      return true;
-    }
-  }
-  return false;
-}
-
 bool csGLBasicTextureHandle::transform (bool allowCompressed, GLenum targetFormat, 
 				   iImage* Image, int mipNum, int imageNum)
 {
@@ -387,13 +298,22 @@ bool csGLBasicTextureHandle::transform (bool allowCompressed, GLenum targetForma
   if (rawFormat)
   {
     csRef<iDataBuffer> imageRaw = Image->GetRawData();
-    uploadData.dataRef = imageRaw;
-    if (ConvertFormat2GL (rawFormat, uploadData.source, targetFormat,
-	allowCompressed, uploadData.isCompressed))
+
+    if (imageRaw.IsValid())
     {
-      uploadData.image_data = imageRaw->GetUint8();
-      if (uploadData.isCompressed)
-	uploadData.compressed.size = imageRaw->GetSize();
+      uploadData.dataRef = imageRaw;
+
+      CS::StructuredTextureFormat texFormat (
+        CS::TextureFormatStrings::ConvertStructured (rawFormat));
+      TextureStorageFormat glFormat;
+      if (txtmgr->DetermineGLFormat (texFormat, glFormat)
+        && !(glFormat.isCompressed && !allowCompressed))
+      {
+        uploadData.sourceFormat = glFormat;
+        uploadData.image_data = imageRaw->GetUint8();
+        if (glFormat.isCompressed)
+	  uploadData.compressedSize = imageRaw->GetSize();
+      }
     }
   }
 
@@ -408,24 +328,25 @@ bool csGLBasicTextureHandle::transform (bool allowCompressed, GLenum targetForma
     {
       const size_t numPix = 
 	Image->GetWidth() * Image->GetHeight() * Image->GetDepth();
-      csRef<csDataBuffer> newDataBuf;
-      newDataBuf.AttachNew (new csDataBuffer (numPix));
+      csRef<iDataBuffer> newDataBuf;
+      newDataBuf.AttachNew (new CS::DataBuffer<> (
+        numPix * sizeof (csRGBpixel)));
       csPackRGBA::PackRGBpixelToRGBA (newDataBuf->GetUint8(),
 	(csRGBpixel*)Image->GetImageData(), numPix);
       uploadData.image_data = newDataBuf->GetUint8();
       uploadData.dataRef = newDataBuf;
     }
     //uploadData->size = n * 4;
-    uploadData.source.format = GL_RGBA;
-    uploadData.source.type = GL_UNSIGNED_BYTE;
+    uploadData.sourceFormat.format = GL_RGBA;
+    uploadData.sourceFormat.type = GL_UNSIGNED_BYTE;
   }
-  uploadData.targetFormat = targetFormat;
+  uploadData.sourceFormat.targetFormat = targetFormat;
   uploadData.w = Image->GetWidth();
   uploadData.h = Image->GetHeight();
   uploadData.d = Image->GetDepth();
   uploadData.mip = mipNum;
   uploadData.imageNum = imageNum;
-  
+
   //size += uploadData->size * d;
   return true;
 }
@@ -555,18 +476,18 @@ void csGLBasicTextureHandle::Load ()
     for (i = 0; i < uploadData->GetSize(); i++)
     {
       const csGLUploadData& uploadData = this->uploadData->Get (i);
-      if (uploadData.isCompressed)
+      if (uploadData.sourceFormat.isCompressed)
       {
 	G3D->ext->glCompressedTexImage2DARB (GL_TEXTURE_2D, uploadData.mip, 
-	  uploadData.targetFormat, uploadData.w, uploadData.h, 
-	  0, (GLsizei)uploadData.compressed.size, uploadData.image_data);
+	  uploadData.sourceFormat.targetFormat, uploadData.w, uploadData.h, 
+	  0, (GLsizei)uploadData.compressedSize, uploadData.image_data);
       }
       else
       {
 	glTexImage2D (GL_TEXTURE_2D, uploadData.mip, 
-	  uploadData.targetFormat, 
-	  uploadData.w, uploadData.h, 0, uploadData.source.format, 
-	  uploadData.source.type, uploadData.image_data);
+	  uploadData.sourceFormat.targetFormat, 
+	  uploadData.w, uploadData.h, 0, uploadData.sourceFormat.format, 
+	  uploadData.sourceFormat.type, uploadData.image_data);
       }
     }
   }
@@ -593,19 +514,19 @@ void csGLBasicTextureHandle::Load ()
     for (i = 0; i < uploadData->GetSize (); i++)
     {
       const csGLUploadData& uploadData = this->uploadData->Get (i);
-      if (uploadData.isCompressed)
+      if (uploadData.sourceFormat.isCompressed)
       {
 	G3D->ext->glCompressedTexImage3DARB (GL_TEXTURE_3D, uploadData.mip, 
-	  uploadData.targetFormat, uploadData.w, uploadData.h, 
-	  uploadData.d, 0, (GLsizei)uploadData.compressed.size, 
+	  uploadData.sourceFormat.targetFormat, uploadData.w, uploadData.h, 
+	  uploadData.d, 0, (GLsizei)uploadData.compressedSize, 
 	  uploadData.image_data);
       }
       else
       {
 	G3D->ext->glTexImage3DEXT (GL_TEXTURE_3D, uploadData.mip, 
-	  uploadData.targetFormat, uploadData.w, uploadData.h, uploadData.d,
-	  0, uploadData.source.format, uploadData.source.type, 
-	  uploadData.image_data);
+	  uploadData.sourceFormat.targetFormat, uploadData.w, uploadData.h, 
+          uploadData.d, 0, uploadData.sourceFormat.format, 
+          uploadData.sourceFormat.type, uploadData.image_data);
       }
     }
   }
@@ -637,20 +558,20 @@ void csGLBasicTextureHandle::Load ()
     {
       const csGLUploadData& uploadData = this->uploadData->Get (i);
 
-      if (uploadData.isCompressed)
+      if (uploadData.sourceFormat.isCompressed)
       {
 	G3D->ext->glCompressedTexImage2DARB (
 	  GL_TEXTURE_CUBE_MAP_POSITIVE_X + uploadData.imageNum, 
 	  uploadData.mip, 
-	  uploadData.targetFormat, uploadData.w, uploadData.h, 
-	  0, (GLsizei)uploadData.compressed.size, uploadData.image_data);
+	  uploadData.sourceFormat.targetFormat, uploadData.w, uploadData.h, 
+	  0, (GLsizei)uploadData.compressedSize, uploadData.image_data);
       }
       else
       {
 	glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X + uploadData.imageNum, 
-	  uploadData.mip, uploadData.targetFormat, 
+	  uploadData.mip, uploadData.sourceFormat.targetFormat, 
 	  uploadData.w, uploadData.h,
-	  0, uploadData.source.format, uploadData.source.type,	
+	  0, uploadData.sourceFormat.format, uploadData.sourceFormat.type,
 	  uploadData.image_data);
       }
     }
@@ -675,21 +596,23 @@ void csGLBasicTextureHandle::Load ()
     for (i = 0; i < uploadData->GetSize (); i++)
     {
       const csGLUploadData& uploadData = this->uploadData->Get (i);
-      if (uploadData.isCompressed)
+      if (uploadData.sourceFormat.isCompressed)
       {
 	G3D->ext->glCompressedTexImage2DARB (GL_TEXTURE_RECTANGLE_ARB, 
-          uploadData.mip, uploadData.targetFormat, uploadData.w, uploadData.h, 
-	  0, (GLsizei)uploadData.compressed.size, uploadData.image_data);
+          uploadData.mip, uploadData.sourceFormat.targetFormat, 
+          uploadData.w, uploadData.h, 0, 
+          (GLsizei)uploadData.compressedSize, uploadData.image_data);
       }
       else
       {
 	glTexImage2D (GL_TEXTURE_RECTANGLE_ARB, uploadData.mip, 
-	  uploadData.targetFormat, 
-	  uploadData.w, uploadData.h, 0, uploadData.source.format, 
-	  uploadData.source.type, uploadData.image_data);
+	  uploadData.sourceFormat.targetFormat, 
+	  uploadData.w, uploadData.h, 0, uploadData.sourceFormat.format, 
+	  uploadData.sourceFormat.type, uploadData.image_data);
       }
     }
   }
+
   delete uploadData; uploadData = 0;
 }
 
@@ -1129,6 +1052,10 @@ csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
   nameDiffuseTexture = iG3D->strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
 
   glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
+#ifndef CS_LITTLE_ENDIAN
+  // The texture format stuff generally assumes little endian
+  glPixelStorei (GL_UNPACK_SWAP_BYTES, 1);
+#endif
 
   pfmt = *iG2D->GetPixelFormat ();
 
@@ -1172,16 +1099,14 @@ csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
     GL_EXT_texture_compression_s3tc);
   CS_GL_TEXTURE_FORMAT_EXT(GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, 
     GL_EXT_texture_compression_s3tc);
-#undef CS_GL_TEXTURE_FORMAT_SUPP
 #undef CS_GL_TEXTURE_FORMAT_EXT
 #undef CS_GL_TEXTURE_FORMAT
 
   textureClasses.Put (textureClassIDs.Request ("default"), defaultSettings);
 
   read_config (config);
+  InitFormats ();
   Clear ();
-
-  glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
 }
 
 csGLTextureManager::~csGLTextureManager()
@@ -1375,7 +1300,7 @@ void csGLTextureManager::UnsetTexture (GLenum target, GLuint texture)
       statecache->SetTexture (target, 0);
   }
 }
-
+    
 csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImage *image,
 	int flags, iString* fail_reason)
 {

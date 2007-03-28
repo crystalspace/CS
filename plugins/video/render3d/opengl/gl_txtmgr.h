@@ -21,26 +21,27 @@
 #ifndef __CS_GL_NEWTXTMGR_H__
 #define __CS_GL_NEWTXTMGR_H__
 
-#include "csgfx/rgbpixel.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
 #include "ivideo/txtmgr.h"
 #include "iengine/texture.h"
-#include "csutil/blockallocator.h"
-#include "csutil/flags.h"
-#include "csutil/scf.h"
-#include "csutil/refarr.h"
-#include "csutil/weakref.h"
-#include "csutil/weakrefarr.h"
-#include "csutil/blockallocator.h"
-#include "csutil/leakguard.h"
-#include "csutil/stringarray.h"
+#include "csgeom/csrect.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "iutil/vfs.h"
-#include "csgfx/textureformatstrings.h"
 
+#include "csgfx/rgbpixel.h"
+#include "csgfx/textureformatstrings.h"
 #include "csplugincommon/opengl/glextmanager.h"
+#include "csutil/blockallocator.h"
+#include "csutil/flags.h"
+#include "csutil/leakguard.h"
+#include "csutil/refarr.h"
+#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
+#include "csutil/stringarray.h"
+#include "csutil/weakref.h"
+#include "csutil/weakrefarr.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 {
@@ -50,10 +51,30 @@ class csGLTextureHandle;
 class csGLTextureManager;
 class csGLTextureCache;
 
-struct csGLSource
+struct TextureStorageFormat
 {
+  /// Format in which to store the texture ('internalformat' in GL spec)
+  GLenum targetFormat;
+  /**
+   * Whether the format is compressed. The \c format and \c type members are
+   * only valid for uncompressed textures.
+   */
+  bool isCompressed;
+  /// Format of the source data
   GLenum format;
+  /// Type of the source data
   GLenum type;
+
+  /// Init with default values
+  TextureStorageFormat () : targetFormat (0), isCompressed (false), 
+    format (0), type (0) {}
+  /// Init for compressed texture
+  TextureStorageFormat (GLenum compressedFormat) : targetFormat (compressedFormat), 
+    isCompressed (true), format (0), type (0) {}
+  /// Init for uncompressed texture
+  TextureStorageFormat (GLenum targetFormat, GLenum format, GLenum type) : 
+    targetFormat (targetFormat), isCompressed (false), format (format), 
+    type (type) {}
 };
 
 struct csGLUploadData
@@ -61,20 +82,12 @@ struct csGLUploadData
   const void* image_data;
   int w, h, d;
   csRef<iBase> dataRef;
-  GLenum targetFormat;
-  bool isCompressed;
-  union
-  {
-    csGLSource source;
-    struct
-    {
-      size_t size;
-    } compressed;
-  };
+  TextureStorageFormat sourceFormat;
+  size_t compressedSize;
   int mip;
   int imageNum;
 
-  csGLUploadData() : image_data(0), isCompressed(false) {}
+  csGLUploadData() : image_data(0) {}
 };
 
 struct csGLTextureClassSettings;
@@ -141,20 +154,6 @@ protected:
     const char* rawFormat, bool& compressedTarget);
   bool transform (bool allowCompressed, 
     GLenum targetFormat, iImage* Image, int mipNum, int imageNum);
-
-  /// Convert an image format (canonical or not) into a GL source structure.
-  bool ConvertFormat2GL (const char* format, csGLSource& source,
-      GLenum& targetFormat, bool allowCompressed, bool& compressed);
-  /// Standard formats.
-  static CS::StructuredTextureFormat fmt_r8g8b8_i;
-  static CS::StructuredTextureFormat fmt_b8g8r8_i;
-  static CS::StructuredTextureFormat fmt_r5g6b5_i;
-  static CS::StructuredTextureFormat fmt_a8r8g8b8_i;
-  static CS::StructuredTextureFormat fmt_l8_i;
-  static CS::StructuredTextureFormat fmt_dxt1;
-  static CS::StructuredTextureFormat fmt_dxt1a;
-  static CS::StructuredTextureFormat fmt_dxt3;
-  static CS::StructuredTextureFormat fmt_dxt5;
 
   GLuint Handle;
   /// Upload the texture to GL.
@@ -475,6 +474,11 @@ private:
   void ReadTextureClasses (iConfigFile* config);
 
   iObjectRegistry *object_reg;
+
+  // DetermineGLFormat helpers
+  csHash<TextureStorageFormat, csString> specialFormats;
+  void InitFormats ();
+  bool FormatSupported (GLenum srcFormat, GLenum srcType);
 public:
   CS_LEAKGUARD_DECLARE (csGLTextureManager);
 
@@ -532,6 +536,14 @@ public:
    * Useful when deleting a texture.
    */
   static void UnsetTexture (GLenum target, GLuint texture);
+
+
+  /**
+   * Determine the GL texture format for a structured texture format.
+   */
+  bool DetermineGLFormat (const CS::StructuredTextureFormat& format,
+    TextureStorageFormat& glFormat);
+
 
   virtual csPtr<iTextureHandle> RegisterTexture (iImage *image, int flags,
       iString* fail_reason = 0);
