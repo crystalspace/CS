@@ -7660,6 +7660,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *CreateAnimation = *cspacec::iSkeletonFactory_CreateAnimation;
 *CreateScript = *cspacec::iSkeletonFactory_CreateScript;
 *FindAnimation = *cspacec::iSkeletonFactory_FindAnimation;
+*GetAnimationsCount = *cspacec::iSkeletonFactory_GetAnimationsCount;
+*GetAnimation = *cspacec::iSkeletonFactory_GetAnimation;
 *FindScript = *cspacec::iSkeletonFactory_FindScript;
 *FindBone = *cspacec::iSkeletonFactory_FindBone;
 *FindBoneIndex = *cspacec::iSkeletonFactory_FindBoneIndex;

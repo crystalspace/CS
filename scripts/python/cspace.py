@@ -5090,6 +5090,8 @@ class iSkeletonFactory(iBase):
     def CreateAnimation(*args): return _cspace.iSkeletonFactory_CreateAnimation(*args)
     def CreateScript(*args): return _cspace.iSkeletonFactory_CreateScript(*args)
     def FindAnimation(*args): return _cspace.iSkeletonFactory_FindAnimation(*args)
+    def GetAnimationsCount(*args): return _cspace.iSkeletonFactory_GetAnimationsCount(*args)
+    def GetAnimation(*args): return _cspace.iSkeletonFactory_GetAnimation(*args)
     def FindScript(*args): return _cspace.iSkeletonFactory_FindScript(*args)
     def FindBone(*args): return _cspace.iSkeletonFactory_FindBone(*args)
     def FindBoneIndex(*args): return _cspace.iSkeletonFactory_FindBoneIndex(*args)
