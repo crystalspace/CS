@@ -14,6 +14,17 @@ chronological order.
 	  existing code that takes/returns pointers allocated with a new T[].
 	- res augmented CS::StructuredTextureFormat with methods to query
 	  the contained information.
+	- res fixed some occasions where the a texture format string of
+	  "bgra8" was reported for csRGBpixel data when it really is "abgr8".
+	- res sanitized the memory handling of csImageMemory. Image data is
+	  now entirely managed by the 'databuf' member; the earlier practice
+	  of freeing the image data in the image class was problematic as the
+	  image data buffer was returned when asking for "raw data": the 
+	  associated memory block was freed when the image was destructed,
+	  but the image data buffer could live on past that point.
+	- res also fixed csCommonImageFile for a similar problem (image data
+	  destructed when image is although a returned data buffer may exist
+	  longer).
 27-Mar-2007
         - Piotr did small bugfixing in cal3d iSkeleton implementation.
         - Piotr added methods for getting animations by indices from
