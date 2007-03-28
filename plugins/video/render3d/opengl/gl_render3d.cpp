@@ -1010,8 +1010,8 @@ bool csGLGraphics3D::Open ()
   #define CS_FOGTABLE_MAXDISTANCE (CS_FOGTABLE_MEDIANDISTANCE * 2.0f)
   #define CS_FOGTABLE_DISTANCESCALE (1.0f / CS_FOGTABLE_MAXDISTANCE)
 
-  unsigned char *transientfogdata = 
-    new unsigned char[CS_FOGTABLE_SIZE * CS_FOGTABLE_SIZE * 4];
+  csRGBpixel *transientfogdata = 
+    new csRGBpixel[CS_FOGTABLE_SIZE * CS_FOGTABLE_SIZE];
   memset(transientfogdata, 255, CS_FOGTABLE_SIZE * CS_FOGTABLE_SIZE * 4);
   for (unsigned int fogindex1 = 0; fogindex1 < CS_FOGTABLE_SIZE; fogindex1++)
   {
@@ -1027,7 +1027,7 @@ bool csGLGraphics3D::Open ()
           (float)fogindex2 / CS_FOGTABLE_SIZE));
       if (fogindex2 == (CS_FOGTABLE_SIZE - 1))
         fogalpha2 = 255;
-      transientfogdata[(fogindex1+fogindex2*CS_FOGTABLE_SIZE) * 4 + 3] = 
+      transientfogdata[(fogindex1+fogindex2*CS_FOGTABLE_SIZE)].alpha = 
         MIN(fogalpha1, fogalpha2);
     }
   }
