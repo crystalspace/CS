@@ -23,50 +23,37 @@
 
 #include "csqint.h"
 
-#include "csgeom/polyclip.h"
-#include "csgeom/transfrm.h"
-#include "csgeom/vector4.h"
-#include "csgfx/imagememory.h"
-#include "csgfx/renderbuffer.h"
-#include "csplugincommon/opengl/glextmanager.h"
-#include "csplugincommon/opengl/glhelper.h"
-#include "csplugincommon/render3d/normalizationcube.h"
-#include "csplugincommon/render3d/txtmgr.h"
-#include "cstool/bitmasktostr.h"
-#include "cstool/fogmath.h"
-#include "cstool/rbuflock.h"
-#include "csutil/event.h"
-#include "csutil/eventnames.h"
-#include "csutil/flags.h"
-#include "csutil/objreg.h"
-#include "csutil/ref.h"
-#include "csutil/scf.h"
-#include "csutil/scfarray.h"
-#include "csutil/strset.h"
-#include "ivaria/profile.h"
-
 #include "igeom/clip2d.h"
-#include "iutil/cmdline.h"
-#include "iutil/comp.h"
-#include "iutil/dbghelp.h"
+#include "igraphic/imageio.h"
 #include "iutil/eventq.h"
 #include "iutil/plugin.h"
-#include "ivaria/reporter.h"
+#include "iutil/vfs.h"
+#include "ivaria/bugplug.h"
+#include "ivaria/profile.h"
 #include "ivideo/graph3d.h"
-#include "ivideo/halo.h"
-#include "ivideo/lighting.h"
+#include "ivideo/material.h"
 #include "ivideo/rendermesh.h"
-#include "ivideo/shader/shader.h"
-#include "ivideo/txtmgr.h"
+
+#include "csgeom/box.h"
+#include "csgfx/imagememory.h"
+#include "csgfx/renderbuffer.h"
+#include "csplugincommon/opengl/glhelper.h"
+#include "csplugincommon/opengl/glstates.h"
+#include "csplugincommon/render3d/normalizationcube.h"
+#include "cstool/fogmath.h"
+#include "cstool/rbuflock.h"
+#include "csutil/bitarray.h"
+#include "csutil/eventnames.h"
+#include "csutil/scfarray.h"
 
 #include "gl_r2t_ext_fb_o.h"
 #include "gl_r2t_framebuf.h"
 #include "gl_render3d.h"
-#include "gl_renderbuffer.h"
-#include "gl_txtmgr.h"
+#include "gl_txtmgr_basictex.h"
 
 const int CS_CLIPPER_EMPTY = 0xf008412;
 
+// uses CS_CLIPPER_EMPTY
 #include "gl_stringlists.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -1513,7 +1500,8 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
   }
   else if (unit != 0) return false;
 
-  csGLTextureHandle* gltxthandle = (csGLTextureHandle*)txthandle;
+  csGLBasicTextureHandle* gltxthandle = 
+    static_cast<csGLBasicTextureHandle*> (txthandle);
   GLuint texHandle = gltxthandle->GetHandle ();
 
   switch (gltxthandle->target)
@@ -1902,8 +1890,8 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
   // we correct the input coordinates here.
   int bitmapwidth = 0, bitmapheight = 0;
   hTex->GetRendererDimensions (bitmapwidth, bitmapheight);
-  csGLTextureHandle *txt_mm = (csGLTextureHandle *)
-    hTex->GetPrivateObject ();
+  csGLBasicTextureHandle *txt_mm = static_cast<csGLBasicTextureHandle*>
+    (hTex->GetPrivateObject ());
   int owidth = txt_mm->orig_width;
   int oheight = txt_mm->orig_height;
   if (owidth != bitmapwidth || oheight != bitmapheight)

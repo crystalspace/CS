@@ -26,36 +26,25 @@
 #include <GL/gl.h>
 #endif
 
-#include "csgeom/csrect.h"
-#include "csgeom/poly3d.h"
-#include "csgeom/transfrm.h"
-#include "csgeom/vector2.h"
-#include "csgeom/vector3.h"
-#include "csgfx/shadervarcontext.h"
-#include "csutil/cfgacc.h"
-#include "csutil/cscolor.h"
-#include "csutil/csstring.h"
-#include "csutil/csuctransform.h"
-#include "csutil/flags.h"
-#include "csutil/formatter.h"
-#include "csutil/parray.h"
-#include "csutil/scf_implementation.h"
-#include "csutil/scfstrset.h"
-#include "csutil/weakref.h"
-#include "csutil/weakrefarr.h"
-
 #include "iutil/comp.h"
 #include "iutil/dbghelp.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
-#include "iutil/strset.h"
-#include "ivaria/bugplug.h"
-#include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/halo.h"
-#include "ivideo/rndbuf.h"
-#include "ivideo/shader/shader.h"
 
+#include "csgeom/csrect.h"
+#include "csgeom/poly3d.h"
+#include "csgfx/shadervarcontext.h"
+#include "csutil/cfgacc.h"
+#include "csutil/csstring.h"
+#include "csutil/formatter.h"
+#include "csutil/parray.h"
+#include "csutil/scf_implementation.h"
+#include "csutil/weakref.h"
+#include "csutil/weakrefarr.h"
+
+#include "csplugincommon/opengl/glextmanager.h"
 #include "csplugincommon/opengl/glstates.h"
 
 #include "gl_txtmgr.h"
@@ -64,11 +53,13 @@
 
 struct csGLExtensionManager;
 
+struct iBugPlug;
 struct iClipper2D;
-struct iObjectRegistry;
-struct iTextureManager;
-struct iRenderBufferManager;
 struct iLightingManager;
+struct iObjectRegistry;
+struct iRenderBufferManager;
+struct iShaderManager;
+struct iTextureManager;
 
 struct iEvent;
 
@@ -192,6 +183,7 @@ class csGLGraphics3D : public scfImplementation3<csGLGraphics3D,
 {
 private:
   //friend declarations
+  friend class csGLBasicTextureHandle;
   friend class csGLSuperLightmap;
   friend class csGLRendererLightmap;
   friend class csGLTextureHandle;
@@ -432,7 +424,7 @@ private:
  */ //iTextureHandle* texunit[16]; // @@@ Hardcoded max number of units
   bool texunitenabled[16]; // @@@ Hardcoded max number of units
   GLuint texunittarget[16]; // @@@ Hardcoded max number of units
-  csRef<csGLTextureHandle> needNPOTSfixup[16]; // @@@ Hardcoded max number of units
+  csRef<csGLBasicTextureHandle> needNPOTSfixup[16]; // @@@ Hardcoded max number of units
   /// Array of buffers used for NPOTS texture coord fixup
   csArray<csRef<iRenderBuffer> > npotsFixupScrap;
   /// Whether an NPOTS scrap is attached to a TC bufer

@@ -21,9 +21,13 @@
 #define __CS_GL_RENDERBUFFER_H__
 
 #include "ivideo/rndbuf.h"
-#include "csutil/leakguard.h"
 #include "csutil/bitops.h"
+#include "csutil/leakguard.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/set.h"
+
+struct csGLExtensionManager;
+class csGLStateCache;
 
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 {

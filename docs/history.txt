@@ -29,6 +29,8 @@ chronological order.
 	  strings.
 	- res fixed the GL renderer to create the fog image from a correctly
 	  allocated memory block.
+	- res did some cleanup in gl3d. (Removed unnecessary inclusions, split
+	  gl_txtmgr.cpp into multiple, more manageable chunks.)
 27-Mar-2007
         - Piotr did small bugfixing in cal3d iSkeleton implementation.
         - Piotr added methods for getting animations by indices from

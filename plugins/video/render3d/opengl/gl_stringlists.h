@@ -20,6 +20,7 @@
 #ifndef __CS_GL_STRINGLISTS_H__
 #define __CS_GL_STRINGLISTS_H__
 
+#include "cstool/bitmasktostr.h"
 #include "cstool/identstrings.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)

@@ -106,8 +106,8 @@ void csGLRender2TextureEXTfbo::SetRenderTarget (iTextureHandle* handle,
     else
     {
       handle->GetRendererDimensions (txt_w, txt_h);
-      csGLTextureHandle* tex_mm = (csGLTextureHandle *)
-        handle->GetPrivateObject ();
+      csGLBasicTextureHandle* tex_mm = 
+        static_cast<csGLBasicTextureHandle*> (handle->GetPrivateObject ());
       if (!tex_mm->IsWasRenderTarget())
       {
         tex_mm->SetupAutoMipping();

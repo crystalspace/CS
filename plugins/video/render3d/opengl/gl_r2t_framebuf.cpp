@@ -87,8 +87,9 @@ void csGLRender2TextureFramebuf::BeginDraw (int drawflags)
     G3D->statecache->Disable_GL_BLEND ();
     G3D->SetZMode (CS_ZBUF_NONE);
 
-	csGLTextureHandle* tex_mm = (csGLTextureHandle *)(render_target->GetPrivateObject ());
-	GLenum textarget = tex_mm->GetGLTextureTarget();
+    csGLBasicTextureHandle* tex_mm = 
+      static_cast<csGLBasicTextureHandle*> (render_target->GetPrivateObject ());
+    GLenum textarget = tex_mm->GetGLTextureTarget();
 
     GLint oldMagFilt, oldMinFilt;
     glGetTexParameteriv (textarget, GL_TEXTURE_MAG_FILTER, &oldMagFilt);
@@ -124,8 +125,8 @@ void csGLRender2TextureFramebuf::FinishDraw ()
   if (rt_onscreen)
   {
     rt_onscreen = false;
-    csGLTextureHandle* tex_mm = (csGLTextureHandle *)
-      render_target->GetPrivateObject ();
+    csGLBasicTextureHandle* tex_mm = 
+      static_cast<csGLBasicTextureHandle*> (render_target->GetPrivateObject ());
     tex_mm->Precache ();
     // Texture is in tha cache, update texture directly.
     G3D->ActivateTexture (tex_mm);
