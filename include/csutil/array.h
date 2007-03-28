@@ -27,6 +27,7 @@
 
 #include "csutil/allocator.h"
 #include "csutil/comparator.h"
+#include "csutil/customallocated.h"
 
 #include "csutil/custom_new_disable.h"
 
@@ -347,7 +348,7 @@ template <class T,
 	class ElementHandler = csArrayElementHandler<T>,
         class MemoryAllocator = CS::Memory::AllocatorMalloc,
         class CapacityHandler = csArrayCapacityDefault>
-class csArray
+class csArray : public CS::Memory::CustomAllocated
 {
 public:
   typedef csArray<T, ElementHandler, MemoryAllocator, CapacityHandler> ThisType;
