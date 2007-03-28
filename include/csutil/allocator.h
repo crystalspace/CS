@@ -229,7 +229,7 @@ namespace CS
     };
 
     /**
-     * A default memory allocator that allocates new char[].
+     * A default memory allocator that allocates using new char[].
      * \c Reallocatable specifies whether Realloc() should be supported.
      * (This support incurs an overhead as the allocated size has to be stored.)
      */
@@ -242,7 +242,7 @@ namespace CS
     #endif
     public:
     #ifdef CS_MEMORY_TRACKER
-      AllocatorMalloc() : mti (0) {}
+      AllocatorNewChar() : mti (0) {}
     #endif
       /// Allocate a block of memory of size \p n.
       CS_ATTRIBUTE_MALLOC void* Alloc (const size_t n)
@@ -316,6 +316,41 @@ namespace CS
       }
     };
 
+    /**
+     * A default memory allocator that allocates using new T[].
+     * \warning Using this allocator is somewhat dangerous, as an array
+     *   of Ts to fit the requested size is allocated, and the array is
+     *   casted to a void*. Using anything but POD types is irresponsible.
+     *   Don't use this allocator unless you really, \em really have to - for
+     *   example, when memory is passed from/to code which uses 
+     *   new[]/delete[] of T for allocation/deallocation.
+     * \remarks Reallocatability is inherently unsupported.
+     */
+    template<typename T>
+    class AllocatorNew
+    {
+    public:
+      /// Allocate a block of memory of size \p n.
+      CS_ATTRIBUTE_MALLOC void* Alloc (const size_t n)
+      {
+        return new T[((n + sizeof(T) - 1) / sizeof(T)) * sizeof(T)];
+      }
+      /// Free the block \p p.
+      void Free (void* p)
+      {
+        delete[] (T*)p;
+      }
+      /// Resize the allocated block \p p to size \p newSize.
+      void* Realloc (void* p, size_t newSize)
+      {
+        CS_ASSERT_MSG("Realloc() called on AllocatorNew", false);
+	return 0;
+      }
+      /// Set the information used for memory tracking.
+      void SetMemTrackerInfo (const char* /*info*/)
+      {
+      }
+    };
 
     
     /**
