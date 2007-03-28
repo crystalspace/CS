@@ -12,6 +12,8 @@ chronological order.
 	- res added CS::Memory::AllocatorNew<T> which allocates/frees using
 	  new T[]/delete[]. The intended use is to ensure compatability for 
 	  existing code that takes/returns pointers allocated with a new T[].
+	- res augmented CS::StructuredTextureFormat with methods to query
+	  the contained information.
 27-Mar-2007
         - Piotr did small bugfixing in cal3d iSkeleton implementation.
         - Piotr added methods for getting animations by indices from

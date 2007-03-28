@@ -194,6 +194,61 @@ namespace CS
 
     /// Returns whether the contained format is a valid texture format.
     bool IsValid () { return format != Invalid; }
+
+    /**
+     * Returns the number of components in this format. Returns 0 for
+     * special or invalid formats.
+     */
+    int GetComponentCount () const
+    {
+      if ((format == Special) || (format == Invalid)) return 0;
+      int n = 0;
+      uint64 comp = coded_components;
+      while (comp != 0) 
+      {
+        comp >>= 16;
+        n++;
+      }
+      return n;
+    }
+
+    /**
+     * Get the nth component. Returns 0 if there is no such component.
+     */
+    char GetComponent (int n) const
+    {
+      int num = GetComponentCount ();
+      if ((n < 0) || (n >= num)) return 0;
+      return (coded_components >> (16 * (num - 1 - n) + 8)) & 255;
+    }
+
+    /**
+     * Get size of the nth component. 
+     * \remarks If there is no such component 0 is returned. However, this 
+     *   return value does \em not imply that a component doesn not exist,
+     *   as 0-sized components can be added by AddComponent(). Only the
+     *   return values of GetComponent() and GetComponentCount() can be used
+     *   for existance checkes.
+     */
+    char GetComponentSize (int n) const
+    {
+      int num = GetComponentCount ();
+      if ((n < 0) || (n >= num)) return 0;
+      return (coded_components >> (16 * (num - 1 - n))) & 255;
+    }
+
+    /**
+     * Returns the basic storage type for this texture format.
+     * \sa \ref tfs_g_format
+     */
+    TextureFormat GetFormat() const { return format; }
+
+    /// Return the special format string.
+    const char* GetSpecial() const
+    {
+      if (format != Special) return 0;
+      return special;
+    }
   };
 
   /**
