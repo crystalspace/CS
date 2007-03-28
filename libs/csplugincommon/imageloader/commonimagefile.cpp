@@ -145,13 +145,15 @@ void csCommonImageFile::WaitForJob() const
 #endif
 }
 
-void csCommonImageFile::MakeImageData()
+void csCommonImageFile::MakeImageData() const
 {
 #ifdef THREADED_LOADING
   if (loadJob)
   {
     WaitForJob();
-    loadJob->currentLoader->ApplyTo (this);
+    // Ugly ugly ugly so we can call ApplyTo()...
+    csImageMemory* thisNonConst = const_cast<csCommonImageFile*> (this);
+    loadJob->currentLoader->ApplyTo (thisNonConst);
     loadJob = 0;
     jobQueue = 0;
   }
@@ -191,9 +193,8 @@ const char* csCommonImageFile::DataTypeString (csLoaderDataType dataType)
   {
     case rdtR8G8B8:
       return "b8g8r8";
-    case rdtRGBpixel:
-      return "b8g8r8a8";
     default:
+      // Let the underlying image handle the other raw data types.
       return 0;
   }
 }
@@ -206,8 +207,13 @@ const char* csCommonImageFile::GetRawFormat() const
   csRef<iImageFileLoader> currentLoader = 
     loadJob->currentLoader;
 #endif
-  return (currentLoader.IsValid()) ? 
-    DataTypeString (currentLoader->GetDataType()) : 0;
+  if (currentLoader.IsValid())
+  {
+    const char* rawFormat = DataTypeString (currentLoader->GetDataType());
+    if (rawFormat != 0) return rawFormat;
+  }
+  MakeImageData();
+  return csImageMemory::GetRawFormat ();
 }
 
 csRef<iDataBuffer> csCommonImageFile::GetRawData() const
@@ -219,7 +225,9 @@ csRef<iDataBuffer> csCommonImageFile::GetRawData() const
   csRef<iImageFileLoader> currentLoader = 
     loadJob->currentLoader;
 #endif
-  if (currentLoader.IsValid())
-    d = currentLoader->GetRawData();
-  return d;
+  if (currentLoader.IsValid()
+    && (DataTypeString (currentLoader->GetDataType()) != 0))
+    return currentLoader->GetRawData();
+  MakeImageData();
+  return csImageMemory::GetRawData ();
 }
