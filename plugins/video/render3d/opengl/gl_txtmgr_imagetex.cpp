@@ -51,6 +51,9 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags,
 
   if (image->HasKeyColor())
     SetTransp (true);
+
+  SetOriginalDimensions (image->GetWidth(), image->GetHeight(),
+    image->GetDepth());
 }
 
 csGLTextureHandle::csGLTextureHandle (int target, GLuint Handle, 
@@ -87,8 +90,6 @@ void csGLTextureHandle::FreeImage ()
 
 void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh)
 {
-  SetOriginalDimensions (image->GetWidth(), image->GetHeight(),
-    image->GetDepth());
   AdjustSizePo2 ();
   mw = orig_width;
   mh = orig_height;
@@ -96,8 +97,6 @@ void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh)
 
 void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh, int &md)
 {
-  SetOriginalDimensions (image->GetWidth(), image->GetHeight(),
-    image->GetDepth());
   AdjustSizePo2 ();
   mw = orig_width;
   mh = orig_height;
@@ -270,8 +269,6 @@ void csGLTextureHandle::PrepareInt ()
 
   // In opengl all textures, even non-mipmapped textures are required
   // to be powers of 2.
-  SetOriginalDimensions (image->GetWidth(), image->GetHeight(),
-    image->GetDepth());
   AdjustSizePo2 ();
 
   csAlphaMode::AlphaType newAlphaType = csAlphaMode::alphaNone;

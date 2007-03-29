@@ -213,6 +213,7 @@ void csGLBasicTextureHandle::AdjustSizePo2 ()
     newwidth, newheight, newd, txtmgr->max_tex_size);
 
   actual_width = newwidth;
+  CS_ASSERT(newwidth != 0);
   actual_height = newheight;
   actual_d = newd;
 }
