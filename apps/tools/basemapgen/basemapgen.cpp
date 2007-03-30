@@ -402,23 +402,78 @@ void BaseMapGen::SaveImage (BaseMapGen::ImageMap image)
   }
 }
 
+void BaseMapGen::DrawProgress (int percent)
+{
+  uint numDone = (65*percent) / 100;
+  uint numToDo = (65*(100-percent)) / 100;
+
+  csPrintf(CS_ANSI_CLEAR_LINE);
+  csPrintf(CS_ANSI_CURSOR_BWD(70));
+  csPrintf(CS_ANSI_CURSOR_UP(1));
+
+  printf("[");
+  for (int x = 0 ; x < numDone ; x++)
+    printf("=");
+
+  for (int x = 0 ; x < numToDo ; x++)
+    printf(" ");
+
+  csPrintf("] %d% \n", percent);
+
+  fflush (stdout);
+
+}
+
+
+csRGBpixel BaseMapGen::GetPixel (MaterialLayer material, float coord_x, float coord_y)
+{
+  int matcoord_x, matcoord_y;
+
+  // Calculate the material coordinates.
+  matcoord_x =  (int) (coord_x * material.image->GetWidth());
+  matcoord_y =  (int) (coord_y * material.image->GetHeight());
+
+  // Scale the texture coordinates.
+  matcoord_x *= (int) (material.texture_scale.x);
+  matcoord_y *= (int) (material.texture_scale.y);
+
+  // Wrap around the texture coordinates.
+  matcoord_x = matcoord_x % material.image->GetWidth();
+  matcoord_y = matcoord_y % material.image->GetHeight();
+
+  // Get the material pixel.
+  csRGBpixel* mat = (csRGBpixel*)material.image->GetImageData();
+  csRGBpixel* mat_dst = mat + matcoord_x + (matcoord_y * material.image->GetHeight());
+
+
+  return csRGBpixel(mat_dst->red, mat_dst->green, mat_dst->blue);
+}
+
 void BaseMapGen::CreateBasemap (int basemap_res, 
-                                csRGBpixel* basemap_dst, 
+                                ImageMap basetexture, 
                                 int matmap_res, 
-                                uint8* matmap_dst, 
+                                ImageMap materialmap, 
                                 const csArray<MaterialLayer>& mat_layers)
 {
+  printf("Creating base texturemap... \n\n");fflush (stdout);
   {//to measure time
-    CS::MeasureTime lTimeMeasurer ("Creating base texturemap... ");
+    CS::MeasureTime lTimeMeasurer ("Time taken");
 
-    int layercoord_x, layercoord_y, matcoord_x, matcoord_y;
+    // Get image data.
+    csRGBpixel* bm_dst = (csRGBpixel*)(basetexture.image->GetImageData());
+    uint8* matmap_dst = (uint8*)(materialmap.image->GetImageData ());
+
+    int layercoord_x, layercoord_y;
     float coord_x, coord_y;
 
     float inv_basemap_res = 1.0f / basemap_res;
-    csRGBpixel* bm_dst = basemap_dst;
 
     for (int y = 0 ; y < basemap_res ; y++)
     {
+      // Draw progress.
+      uint percent = (y*100)/ basemap_res;
+      DrawProgress(percent);
+
       for (int x = 0 ; x < basemap_res ; x++)
       {
         // Get the layer index.
@@ -437,27 +492,15 @@ void BaseMapGen::CreateBasemap (int basemap_res,
           continue;
         }
 
-        // Calculate the material/destination coordinates.
+        // Calculate the destination coordinates.
         coord_x    = x * inv_basemap_res;
-        matcoord_x =  (int) (coord_x * mat_layers[layer].image->GetWidth());
         coord_y    = y * inv_basemap_res;
-        matcoord_y =  (int) (coord_y * mat_layers[layer].image->GetHeight());
-
-        // Scale the texture coordinates.
-        float factor = 1;
-        matcoord_x *= (int) (mat_layers[layer].texture_scale.x * factor);
-        matcoord_y *= (int) (mat_layers[layer].texture_scale.y * factor);
-
-        // Wrap around the texture coordinates.
-        matcoord_x = matcoord_x % mat_layers[layer].image->GetWidth();
-        matcoord_y = matcoord_y % mat_layers[layer].image->GetHeight();
 
         // Get the material pixel.
-        csRGBpixel* mat = (csRGBpixel*)mat_layers[layer].image->GetImageData();
-        csRGBpixel* mat_dst = mat + matcoord_x + (matcoord_y * mat_layers[layer].image->GetHeight());
+        csRGBpixel mat_dst = GetPixel(mat_layers[layer], coord_x, coord_y);
 
         // Set the basemap pixel.
-        bm_dst->Set (mat_dst->red, mat_dst->green, mat_dst->blue);
+        bm_dst->Set (mat_dst.red, mat_dst.green, mat_dst.blue);
 
         // Increase the pointer.
         bm_dst++;
@@ -487,24 +530,24 @@ void BaseMapGen::Start ()
   }
 
   // Get the materialmap.
-  ImageMap materialmap_img = GetMaterialMap();
-  if (!materialmap_img.image)
+  ImageMap materialmap = GetMaterialMap();
+  if (!materialmap.image)
   {
     Report("Failed to load Material Map!");
     return;
   }
 
   // Get the basematerial.
-  ImageMap basetexture_img = GetBaseMap();
-  if (!basetexture_img.image)
+  ImageMap basetexture = GetBaseMap();
+  if (!basetexture.image)
   {
     Report("Failed to load Base Map!");
     return;
   }
 
   // Get the resolution.
-  int matmap_res = materialmap_img.image->GetHeight();
-  int basemap_res = basetexture_img.image->GetHeight();
+  int matmap_res = materialmap.image->GetHeight();
+  int basemap_res = basetexture.image->GetHeight();
 
   // Get the resolution from the commandline.
   csString res = cmdline->GetOption("resolution");
@@ -515,31 +558,43 @@ void BaseMapGen::Start ()
   csString factorstr = cmdline->GetOption("factor");
   int factor = 1;
   if (!factorstr.IsEmpty())
-    factor = PowerOfTwo(atoi(factorstr));
+  {
+    factor = atoi(factorstr);
+    factor = (factor <= 1) ? 1 : PowerOfTwo(factor);
+  }
 
   printf("Using resolution: %d, factor: %d\n", basemap_res, factor);
 
   // Make it bigger.
-  basemap_res *= factor;
-  basetexture_img.image.Invalidate();
-  basetexture_img.image.AttachNew (new csImageMemory (basemap_res, basemap_res));
-  printf("Upscaling image to:\t %d x %d\n", basetexture_img.image->GetWidth(), basetexture_img.image->GetHeight());
+  if (factor > 1)
+  {
+    basemap_res *= factor;
+    basetexture.image.Invalidate();
+    basetexture.image.AttachNew (new csImageMemory (basemap_res, basemap_res));
+    printf("Upscaling image to:\t %d x %d\n", basetexture.image->GetWidth(), basetexture.image->GetHeight());
+  }
 
-  // Get image data.
-  csRGBpixel* basemap_dst = (csRGBpixel*)(basetexture_img.image->GetImageData());
-  uint8* matmap_dst = (uint8*)(materialmap_img.image->GetImageData ());
+  // Scale up the materials to the size of the basemap.
+  for (unsigned int i = 0 ; i < mat_layers.GetSize() ; i++)
+  {
+    mat_layers[i].image = csImageManipulate::Rescale(mat_layers[i].image, basemap_res, basemap_res, 24);
+  }
 
   // Create the basemap.
-  CreateBasemap (basemap_res, basemap_dst, matmap_res, matmap_dst, mat_layers);
+  CreateBasemap (basemap_res, basetexture, matmap_res, materialmap, mat_layers);
 
   // Make it smaller.
-  int step = (int)(log((float)factor) / log(2.0f));
-  basetexture_img.image = csImageManipulate::Mipmap(basetexture_img.image, step);
-  printf("Downscaling image to:\t %d x %d\n", basetexture_img.image->GetWidth(), basetexture_img.image->GetHeight());
-
+  if (factor > 1)
+  {
+    int step = (int)(log((float)factor) / log(2.0f));
+    basetexture.image = csImageManipulate::Mipmap(basetexture.image, step);
+    printf("Downscaling image to:\t %d x %d\n", basetexture.image->GetWidth(), basetexture.image->GetHeight());
+  }
 
   // Save the basemap.
-  SaveImage (basetexture_img);
+  printf("Saving %d KB of data.\n", csImageTools::ComputeDataSize(basetexture.image)/1024);
+  SaveImage (basetexture);
+  
  
 }
 

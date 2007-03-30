@@ -70,9 +70,9 @@ private:
   void SaveImage (ImageMap image);
 
   void CreateBasemap (int basemap_res, 
-                      csRGBpixel* basemap_dst, 
+                      ImageMap basemap_dst, 
                       int matmap_res,
-                      uint8* matmap_dst, 
+                      ImageMap matmap_dst, 
                       const csArray<MaterialLayer>& txt_layers);
 
 public:
@@ -83,7 +83,9 @@ public:
   void Start ();
   void OnCommandLineHelp();
   void Report(const char* msg, ...);
-  int PowerOfTwo(int value); 
+  int PowerOfTwo(int value);
+  void DrawProgress (int percent);
+  csRGBpixel GetPixel (MaterialLayer material, float coord_x, float coord_y);
 };
 
 #endif // __BASEMAPGEN_H__
