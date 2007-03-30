@@ -24,6 +24,7 @@
 
 #include "csgeom/tri.h"
 #include "csgeom/vector3.h"
+#include "csgeom/box.h"
 #include "igeom/trimesh.h"
 
 #include "csutil/array.h"
@@ -153,6 +154,73 @@ public:
   ///
   csTriangleVertex& GetVertex (int idx) { return vertices[idx]; }
 };
+
+/**
+ * A convenience triangle mesh implementation that represents a cube.
+ */
+class CS_CRYSTALSPACE_EXPORT csTriangleMeshBox :
+  public virtual scfImplementation1<csTriangleMeshBox,iTriangleMesh>
+{
+private:
+  csVector3 vertices[8];
+  csTriangle triangles[12];
+  uint32 change_nr;
+  csFlags flags;
+
+public:
+  /**
+   * Construct a cube triangle mesh.
+   */
+  csTriangleMeshBox (const csBox3& box) : scfImplementationType(this)
+  {
+    change_nr = 0;
+    triangles[0].Set (4, 5, 1);
+    triangles[1].Set (4, 1, 0);
+    triangles[2].Set (5, 7, 3);
+    triangles[3].Set (5, 3, 1);
+    triangles[4].Set (7, 6, 2);
+    triangles[5].Set (7, 2, 3);
+    triangles[6].Set (6, 4, 0);
+    triangles[7].Set (6, 0, 2);
+    triangles[8].Set (6, 7, 5);
+    triangles[9].Set (6, 5, 4);
+    triangles[10].Set (0, 1, 3);
+    triangles[11].Set (0, 3, 2);
+    SetBox (box);
+
+    flags.SetAll (CS_TRIMESH_CLOSED | CS_TRIMESH_CONVEX);
+  }
+
+  virtual ~csTriangleMeshBox ()
+  {
+  }
+
+  /**
+   * Set the box.
+   */
+  void SetBox (const csBox3& box)
+  {
+    change_nr++;
+    vertices[0] = box.GetCorner (0);
+    vertices[1] = box.GetCorner (1);
+    vertices[2] = box.GetCorner (2);
+    vertices[3] = box.GetCorner (3);
+    vertices[4] = box.GetCorner (4);
+    vertices[5] = box.GetCorner (5);
+    vertices[6] = box.GetCorner (6);
+    vertices[7] = box.GetCorner (7);
+  }
+
+  virtual size_t GetVertexCount () { return 8; }
+  virtual csVector3* GetVertices () { return vertices; }
+  virtual size_t GetTriangleCount () { return 12; }
+  virtual csTriangle* GetTriangles () { return triangles; }
+  virtual void Lock () { }
+  virtual void Unlock () { }
+  virtual csFlags& GetFlags () { return flags; }
+  virtual uint32 GetChangeNumber () const { return change_nr; }
+};
+
 
 /** @} */
 
