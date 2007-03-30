@@ -17,6 +17,7 @@ chronological order.
 	    - Added csTriangleMeshTools as a mirror of csPolygonMeshTools.
 	    - Deprecated csPolygonMeshBox.
 	    - Added new csTriangleMeshBox.
+	    - Added \deprecation tags.
 29-Mar-2007
 	- res fixed a division by zero caused by some changes in his gl3d 
 	  cleanup.

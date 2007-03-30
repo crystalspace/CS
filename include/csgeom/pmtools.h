@@ -41,6 +41,7 @@ struct iPolygonMesh;
 
 /**
  * A definition of one edge.
+ * \deprecated Use csTriangleMeshEdge instead.
  */
 struct CS_DEPRECATED_TYPE_MSG("csPolygonMeshEdge is deprecated; use csTriangleMeshEdge instead") CS_CRYSTALSPACE_EXPORT csPolygonMeshEdge
 {
@@ -74,6 +75,7 @@ struct CS_CRYSTALSPACE_EXPORT csTriangleMinMax : public csTriangle
 
 /**
  * A set of tools to work with iPolygonMesh instances.
+ * \deprecated Use csTriangleMeshTools instead.
  */
 class CS_DEPRECATED_TYPE_MSG("csPolygonMeshTools is deprecated; use csTriangleMeshTools instead") CS_CRYSTALSPACE_EXPORT csPolygonMeshTools
 {
