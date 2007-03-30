@@ -364,7 +364,7 @@ BaseMapGen::ImageMap BaseMapGen::GetBaseMap ()
 
 csRef<iImage> BaseMapGen::LoadImage (const csString& filename, int format)
 {
-  csPrintf("Trying to load '%s'... ", filename.GetData());fflush (stdout);
+  csPrintf("Trying to load '%s'... \t", filename.GetData());fflush (stdout);
   csRef<iImage> image;
   csRef<iImageIO> imageio = csQueryRegistry<iImageIO> (object_reg);
   csRef<iVFS> VFS = csQueryRegistry<iVFS> (object_reg);
@@ -509,18 +509,21 @@ void BaseMapGen::Start ()
   // Get the resolution from the commandline.
   csString res = cmdline->GetOption("resolution");
   if (!res.IsEmpty())
-    basemap_res = atoi(res);
+    basemap_res = PowerOfTwo(atoi(res));
 
   // Get the upscale factor from the commandline.
   csString factorstr = cmdline->GetOption("factor");
   int factor = 1;
   if (!factorstr.IsEmpty())
-    factor = atoi(factorstr);
+    factor = PowerOfTwo(atoi(factorstr));
+
+  printf("Using resolution: %d, factor: %d\n", basemap_res, factor);
 
   // Make it bigger.
   basemap_res *= factor;
   basetexture_img.image.Invalidate();
   basetexture_img.image.AttachNew (new csImageMemory (basemap_res, basemap_res));
+  printf("Upscaling image to:\t %d x %d\n", basetexture_img.image->GetWidth(), basetexture_img.image->GetHeight());
 
   // Get image data.
   csRGBpixel* basemap_dst = (csRGBpixel*)(basetexture_img.image->GetImageData());
@@ -530,11 +533,23 @@ void BaseMapGen::Start ()
   CreateBasemap (basemap_res, basemap_dst, matmap_res, matmap_dst, mat_layers);
 
   // Make it smaller.
-  basetexture_img.image = csImageManipulate::Mipmap(basetexture_img.image, factor/2);
+  int step = (int)(log((float)factor) / log(2.0f));
+  basetexture_img.image = csImageManipulate::Mipmap(basetexture_img.image, step);
+  printf("Downscaling image to:\t %d x %d\n", basetexture_img.image->GetWidth(), basetexture_img.image->GetHeight());
+
 
   // Save the basemap.
   SaveImage (basetexture_img);
  
+}
+
+int BaseMapGen::PowerOfTwo(int value) 
+{
+  int retval = 2;
+  while (retval < value) {
+    retval *= 2;
+  }
+  return retval;
 }
 
 /*---------------------------------------------------------------------*

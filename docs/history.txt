@@ -18,6 +18,8 @@ chronological order.
 	    - Deprecated csPolygonMeshBox.
 	    - Added new csTriangleMeshBox.
 	    - Added \deprecation tags.
+	- Sueastside fixed some "stupid maths" that caused the basemap to
+	  be scaled wrongly when specifying a factor.
 29-Mar-2007
 	- res fixed a division by zero caused by some changes in his gl3d 
 	  cleanup.

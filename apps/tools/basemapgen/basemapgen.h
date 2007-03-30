@@ -83,6 +83,7 @@ public:
   void Start ();
   void OnCommandLineHelp();
   void Report(const char* msg, ...);
+  int PowerOfTwo(int value); 
 };
 
 #endif // __BASEMAPGEN_H__
