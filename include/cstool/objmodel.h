@@ -32,8 +32,10 @@
 
 #include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/hash.h"
 #include "imesh/objmodel.h"
 #include "igeom/polymesh.h"
+#include "igeom/trimesh.h"
 
 struct iTerraFormer;
 
@@ -51,6 +53,8 @@ private:
   csRef<iPolygonMesh> polymesh_viscull;
   csRef<iPolygonMesh> polymesh_shadows;
   csRefArray<iObjectModelListener> listeners;
+
+  csHash<csRef<iTriangleMesh>,csStringID> trimesh;
 
 public:
   /**
@@ -100,6 +104,9 @@ public:
   }
 
   virtual long GetShapeNumber () const { return shapenr; }
+  virtual iTriangleMesh* GetTriangleData (csStringID);
+  virtual void SetTriangleData (csStringID, iTriangleMesh*);
+
   virtual iPolygonMesh* GetPolygonMeshBase () { return polymesh_base; }
   virtual iPolygonMesh* GetPolygonMeshColldet () { return polymesh_colldet; }
   virtual void SetPolygonMeshColldet (iPolygonMesh* polymesh)

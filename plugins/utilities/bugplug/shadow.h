@@ -139,6 +139,8 @@ public:
 
   //------------------------- iObjectModel implementation ----------------
   virtual long GetShapeNumber () const { return 1; }
+  virtual iTriangleMesh* GetTriangleData (csStringID) { return 0; }
+  virtual void SetTriangleData (csStringID, iTriangleMesh*) { }
   virtual iPolygonMesh* GetPolygonMeshBase () { return 0; }
   virtual iPolygonMesh* GetPolygonMeshColldet () { return 0; }
   virtual iTerraFormer* GetTerraFormerColldet () { return 0; }

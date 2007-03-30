@@ -6,6 +6,15 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+30-Mar-2007
+	- Jorrit continued work on iTriangleMesh:
+	    - Extended iObjectModel with methods to get and set triangle
+	      meshes (GetTriangleData()/SetTriangleData()).
+	    - Deprecated iPolygonMesh.
+	    - Deprecated iObjectModel methods having to do with
+	      iPolygonMesh.
+	    - Deprecated csPolygonMeshTools.
+	    - Added csTriangleMeshTools as a mirror of csPolygonMeshTools.
 29-Mar-2007
 	- res fixed a division by zero caused by some changes in his gl3d 
 	  cleanup.

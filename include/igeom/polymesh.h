@@ -134,8 +134,10 @@ struct csTriangle;
  * - Collision detection plugins (iCollideSystem)
  * - Visibility culler plugins (iVisibilityCuller)
  * - Shadow stencil plugin
+ *
+ * \deprecated iPolygonMesh is deprecated; use iTriangleMesh instead.
  */
-struct iPolygonMesh : public virtual iBase
+struct CS_DEPRECATED_TYPE_MSG("iPolygonMesh is deprecated; use iTriangleMesh insetad") iPolygonMesh : public virtual iBase
 {
   SCF_INTERFACE(iPolygonMesh, 2, 0, 0);
   /// Get the number of vertices for this mesh.

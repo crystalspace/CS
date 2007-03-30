@@ -42,7 +42,7 @@ struct iPolygonMesh;
 /**
  * A definition of one edge.
  */
-struct CS_CRYSTALSPACE_EXPORT csPolygonMeshEdge
+struct CS_DEPRECATED_TYPE_MSG("csPolygonMeshEdge is deprecated; use csTriangleMeshEdge instead") CS_CRYSTALSPACE_EXPORT csPolygonMeshEdge
 {
   /**
    * Indices of the two vertices forming the edge.
@@ -75,7 +75,7 @@ struct CS_CRYSTALSPACE_EXPORT csTriangleMinMax : public csTriangle
 /**
  * A set of tools to work with iPolygonMesh instances.
  */
-class CS_CRYSTALSPACE_EXPORT csPolygonMeshTools
+class CS_DEPRECATED_TYPE_MSG("csPolygonMeshTools is deprecated; use csTriangleMeshTools instead") CS_CRYSTALSPACE_EXPORT csPolygonMeshTools
 {
 private:
   static void CalculatePlanes (csVector3* vertices,
