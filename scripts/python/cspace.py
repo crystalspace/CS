@@ -2513,6 +2513,8 @@ class iObjectModel(iBase):
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetShapeNumber(*args): return _cspace.iObjectModel_GetShapeNumber(*args)
+    def GetTriangleData(*args): return _cspace.iObjectModel_GetTriangleData(*args)
+    def SetTriangleData(*args): return _cspace.iObjectModel_SetTriangleData(*args)
     def GetPolygonMeshBase(*args): return _cspace.iObjectModel_GetPolygonMeshBase(*args)
     def GetPolygonMeshColldet(*args): return _cspace.iObjectModel_GetPolygonMeshColldet(*args)
     def GetTerraFormerColldet(*args): return _cspace.iObjectModel_GetTerraFormerColldet(*args)

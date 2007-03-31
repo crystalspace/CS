@@ -3944,6 +3944,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *GetShapeNumber = *cspacec::iObjectModel_GetShapeNumber;
+*GetTriangleData = *cspacec::iObjectModel_GetTriangleData;
+*SetTriangleData = *cspacec::iObjectModel_SetTriangleData;
 *GetPolygonMeshBase = *cspacec::iObjectModel_GetPolygonMeshBase;
 *GetPolygonMeshColldet = *cspacec::iObjectModel_GetPolygonMeshColldet;
 *GetTerraFormerColldet = *cspacec::iObjectModel_GetTerraFormerColldet;
