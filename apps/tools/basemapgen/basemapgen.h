@@ -83,7 +83,6 @@ public:
   void Start ();
   void OnCommandLineHelp();
   void Report(const char* msg, ...);
-  int PowerOfTwo(int value);
   void DrawProgress (int percent);
   csRGBpixel GetPixel (MaterialLayer material, float coord_x, float coord_y);
 };

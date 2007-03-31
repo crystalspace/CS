@@ -552,7 +552,7 @@ void BaseMapGen::Start ()
   // Get the resolution from the commandline.
   csString res = cmdline->GetOption("resolution");
   if (!res.IsEmpty())
-    basemap_res = PowerOfTwo(atoi(res));
+    basemap_res = csFindNearestPowerOf2(atoi(res));
 
   // Get the upscale factor from the commandline.
   csString factorstr = cmdline->GetOption("factor");
@@ -560,19 +560,20 @@ void BaseMapGen::Start ()
   if (!factorstr.IsEmpty())
   {
     factor = atoi(factorstr);
-    factor = (factor <= 1) ? 1 : PowerOfTwo(factor);
+    factor = (factor <= 1) ? 1 : csFindNearestPowerOf2(factor);
   }
 
   printf("Using resolution: %d, factor: %d\n", basemap_res, factor);
 
   // Make it bigger.
-  if (factor > 1)
+  basemap_res *= factor;
+  if (basemap_res != basetexture.image->GetHeight())
   {
-    basemap_res *= factor;
     basetexture.image.Invalidate();
     basetexture.image.AttachNew (new csImageMemory (basemap_res, basemap_res));
-    printf("Upscaling image to:\t %d x %d\n", basetexture.image->GetWidth(), basetexture.image->GetHeight());
   }
+  if (factor > 1)
+    printf("Upscaling image to:\t %d x %d\n", basetexture.image->GetWidth(), basetexture.image->GetHeight());
 
   // Scale up the materials to the size of the basemap.
   for (unsigned int i = 0 ; i < mat_layers.GetSize() ; i++)
@@ -596,15 +597,6 @@ void BaseMapGen::Start ()
   SaveImage (basetexture);
   
  
-}
-
-int BaseMapGen::PowerOfTwo(int value) 
-{
-  int retval = 2;
-  while (retval < value) {
-    retval *= 2;
-  }
-  return retval;
 }
 
 /*---------------------------------------------------------------------*
