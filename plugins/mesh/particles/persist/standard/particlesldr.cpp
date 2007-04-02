@@ -388,7 +388,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
         coneAngle = child->GetContentsValueAsFloat ();
         break;
       case XMLTOKEN_BOX:
-        if (!synldr->ParseBox (node, box))
+        if (!synldr->ParseBox (child, box))
         {
           return 0;
         }
