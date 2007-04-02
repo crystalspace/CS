@@ -25,6 +25,8 @@
 #include "csgeom/polymesh.h"
 #include "csutil/array.h"
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 struct csTriangle;
 
 /**\file 
@@ -247,6 +249,8 @@ public:
   static csArray<csArray<int> > *CalculateVertexConnections (
 		  				iPolygonMesh* mesh);
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /** @} */
 

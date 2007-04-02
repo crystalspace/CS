@@ -27,6 +27,8 @@
 #include "csgeom/math3d.h"
 #include "igeom/polymesh.h"
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 void csPolygonMeshTools::CalculateNormals (iPolygonMesh* mesh,
   csVector3* normals)
 {
@@ -928,3 +930,4 @@ csArray<csArray<int> > *csPolygonMeshTools::CalculateVertexConnections (iPolygon
   return link_array;
 }
 
+#include "csutil/win32/msvc_deprecated_warn_on.h"

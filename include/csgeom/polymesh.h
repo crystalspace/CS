@@ -30,6 +30,8 @@
 
 #include "igeom/polymesh.h"
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 struct csTriangle;
 
 /**\file
@@ -302,6 +304,8 @@ public:
 
 
 /** @} */
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_CSGEOM_POLYMESH_H__
 

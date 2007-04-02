@@ -8,6 +8,8 @@ chronological order.
 
 2-Apr-2007
 	- Marten augmented ptpdlight to handle all black lightmaps.
+	- Marten disabled a few deprecation warnings from the recent
+	  iPolygonMesh and friends removal.
 31-Mar-2007
 	- Sueastside fixed a bug in basemapgen when factor=1
 	  and a resolution bigger then the original basemap was specified.
