@@ -346,6 +346,10 @@ const char* ProctexPDLight::AddLight (const MappedLight& light)
   if ((light.map.imageW != baseMap.imageW)
     || (light.map.imageH != baseMap.imageH))
     return "PD lightmap dimensions don't correspond to base lightmap dimensions";
+
+  if (light.map.nonNullArea.IsEmpty ())
+    return 0; //Silently ignore totally black maps
+
   lights.Push (light);
   state.Set (stateAffectedAreaDirty);
   return 0;
