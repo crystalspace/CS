@@ -71,10 +71,21 @@ public:
     compute_masks ();
     ImageToBitmap (Image);
   }
+  /// Create a csTexture object
+  csSoftwareTexture (csSoftwareTextureHandle* Parent, int w, int h) : 
+    parent (Parent)
+  {
+    this->w = w;
+    this->h = h;
+    compute_masks ();
+    size_t pixNum = w * h;
+    bitmap = (uint32*)cs_malloc (pixNum * sizeof (uint32));
+    memset (bitmap, 0, pixNum * sizeof (uint32));
+  }
   /// Destroy the texture
   virtual ~csSoftwareTexture ()
   {
-    delete [] bitmap;
+    cs_free (bitmap);
   }
 };
 
@@ -105,6 +116,9 @@ public:
   /// Create the mipmapped texture object
   csSoftwareTextureHandle (csSoftwareTextureManager *texman, iImage *image,
 		       int flags);
+  /// Create a texture object without an image
+  csSoftwareTextureHandle (csSoftwareTextureManager *texman, int w, int h,
+    bool alpha, int flags);
   /// Destroy the object and free all associated storage
   virtual ~csSoftwareTextureHandle ();
 
