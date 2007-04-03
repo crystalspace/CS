@@ -759,7 +759,7 @@ csRenderMesh** csTerrainBruteBlockRenderer::GetRenderMeshes (int& n, iRenderView
   csPlane3 planes[10];
   rview->SetupClipPlanes (tr_o2c, planes, frustum_mask);
 
-  for (int i = 0; i < cells.GetSize (); ++i)
+  for (size_t i = 0; i < cells.GetSize (); ++i)
   {
     csBruteBlockTerrainRenderData* rdata = (csBruteBlockTerrainRenderData*)
       cells[i]->GetRenderData ();
@@ -968,7 +968,7 @@ iRenderBuffer* csTerrainBruteBlockRenderer::GetIndexBuffer (int block_res_log2, 
 {
   csRef<IndexBufferSet> set;
 
-  if (block_res_log2 >= indexBufferList.GetSize () ||
+  if (size_t (block_res_log2) >= indexBufferList.GetSize () ||
     indexBufferList[block_res_log2] == 0)
   {
     // Add a new one

@@ -135,7 +135,7 @@ csRenderMesh** csTerrainSimpleRenderer::GetRenderMeshes (int& n, iRenderView* rv
   const csReversibleTransform& o2wt = movable->GetFullTransform ();
   const csVector3& wo = o2wt.GetOrigin ();
   
-  for (int i = 0; i < cells.GetSize (); ++i)
+  for (size_t i = 0; i < cells.GetSize (); ++i)
   {
     csSimpleTerrainRenderData* rdata = (csSimpleTerrainRenderData*)
       cells[i]->GetRenderData ();

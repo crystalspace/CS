@@ -296,7 +296,7 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
   //int nlights = lights->GetCount();
   const csArray<iLightSectorInfluence*>& lights = lightmgr->GetRelevantLights (sector,
       -1, false);
-  int nlights = lights.GetSize ();
+  size_t nlights = lights.GetSize ();
 
   csArray<iLight*> lightList (16);
 
