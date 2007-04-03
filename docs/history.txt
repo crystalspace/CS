@@ -13,6 +13,9 @@ chronological order.
 	- res added CS::StructuredTextureFormat::GetComponentMask() to allow
 	  quick identification of the components in a format.
 	- res implemented iTextureManager::CreateTexture() for soft3d.
+	- res changed csProcTexture to use iTextureManager::CreateTexture()
+	  and not a dummy image, if no image to create the texture from was
+	  given.
 2-Apr-2007
 	- Marten augmented ptpdlight to handle all black lightmaps.
 	- Marten disabled a few deprecation warnings from the recent
