@@ -333,6 +333,12 @@ csPtr<iTextureHandle> csGLTextureManager::CreateTexture (int w, int h,
     return 0;
   }
 
+  /* @@@ TODO: Does it make sense to "optimize" formats?
+         For example, NV is fastest when GL_BGR(A) is used. When a color format
+         is specified, an "argb" format (CS notation for GL_BGR(A)) could be
+         substituted instead. Or does the driver handle that automatically?
+   */
+
   csGLBasicTextureHandle *txt = new csGLBasicTextureHandle (
       w, h, 1, imagetype, flags, G3D);
 
