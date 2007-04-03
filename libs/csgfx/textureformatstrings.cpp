@@ -77,6 +77,31 @@ csString StructuredTextureFormat::GetCanonical ()
   return out;
 }
 
+uint StructuredTextureFormat::GetComponentMask () const
+{
+  if ((format == Special) || (format == Invalid)) return 0;
+
+  uint mask = 0;
+  for (int n = 0; n < 4; n++)
+  {
+    char c =  (coded_components >> (16 * n + 8)) & 255;
+    switch (c)
+    {
+      case 0:   break;
+      case 'r': mask |= compR; break;
+      case 'g': mask |= compG; break;
+      case 'b': mask |= compB; break;
+      case 'a': mask |= compA; break;
+      case 'x': mask |= compX; break;
+      case 'l': mask |= compL; break;
+      case 'd': mask |= compD; break;
+      case 's': mask |= compS; break;
+      default:  mask |= compUnknown; break;
+    }
+  }
+  return mask;
+}
+
 //--------------------------------------------------------------------------------
 
 StructuredTextureFormat TextureFormatStrings::ConvertStructured (const char* in)

@@ -249,6 +249,61 @@ namespace CS
       if (format != Special) return 0;
       return special;
     }
+
+    /**
+     * Bit flags for components present in a format.
+     * \sa \ref tfs_g_comptypes
+     */
+    enum
+    {
+      /// 'r' component
+      compR = 0x01,
+      /// 'g' component
+      compG = 0x02,
+      /// 'b' component
+      compB = 0x04,
+      /// 'a' component
+      compA = 0x08,
+      /// 'x' component
+      compX = 0x10,
+      /// 'l' component
+      compL = 0x20,
+      /// 'd' component
+      compD = 0x40,
+      /// 's' component
+      compS = 0x80,
+
+      /// 'r', 'g' and 'b' components
+      compRGB = compR | compB | compG,
+      /// 'r', 'g', 'b' and 'a' components
+      compRGBA = compR | compB | compG | compA,
+      /// 'l' and 'a' components
+      compLumA = compL | compA,
+      /// 'd' and 's' components
+      compDepthStencil = compD | compS,
+
+      /// One or more components are unknown.
+      compUnknown = 0x80000000
+    };
+
+    /**
+     * Return a bit mask that identifies the contained components, regardless
+     * of their order. This can be used to "classify" a texture format.
+     * The bit flags are #compR, #compG etc.
+     *
+     * Example: Testing whether a format is an RGB format:
+     * \code
+     * const char* formatString = "rgb8";
+     * CS::StructuredTextureFormat format = 
+     *   CS::TextureFormatStrings::ConvertStructured (formatString);
+     * // Succeeds
+     * if (format.GetComponentMask() == CS::StructuredTextureFormat::compRGB)
+     * { ... }
+     * // Would also succeed for formatString = "bgr8", or even wierd formats like 
+     * // "gbr4", and more
+     * \endcode
+     */
+    uint GetComponentMask () const;
   };
 
   /**
