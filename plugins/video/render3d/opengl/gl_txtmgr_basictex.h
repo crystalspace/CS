@@ -104,14 +104,13 @@ protected:
     flagPrepared = 1 << 30, 
     flagForeignHandle = 1 << 29,
     flagWasRenderTarget = 1 << 28,
-    flagSizeAdjusted = 1 << 27,
-    flagNeedMips = 1 << 26,
+    flagNeedMips = 1 << 27,
 
     // Flags below are used by csGLTextureHandle
     /// Does it have a keycolor?
-    flagTransp = 1 << 25,
+    flagTransp = 1 << 26,
     /// Is the color valid?
-    flagTranspSet = 1 << 24,
+    flagTranspSet = 1 << 25,
 
     flagLast,
     /// Mask to get only the "public" flags
@@ -133,8 +132,6 @@ protected:
   void SetTransp (bool b) { texFlags.SetBool (flagTransp, b); }
   bool IsForeignHandle() const { return texFlags.Check (flagForeignHandle); }
   void SetForeignHandle (bool b) { texFlags.SetBool (flagForeignHandle, b); }
-  bool IsSizeAdjusted() const { return texFlags.Check (flagSizeAdjusted); }
-  void SetSizeAdjusted (bool b) { texFlags.SetBool (flagSizeAdjusted, b); }
   bool IsTranspSet() const { return texFlags.Check (flagTranspSet); }
   void SetTranspSet (bool b) { texFlags.SetBool (flagTranspSet, b); }
 
@@ -145,15 +142,17 @@ protected:
     int orig_width, int orig_height, int orig_depth,
     int& newwidth, int& newheight, int& newdepth,
     int max_tex_size);
+
+  /// Make sure uploadData is valid, nice, and clean.
+  void FreshUploadData ();
+private:
   void AdjustSizePo2 ();
     
+protected:
   GLuint Handle;
   /// Upload the texture to GL.
   void Load ();
   void Unload ();
-
-  void SetOriginalDimensions (int mw, int mh, int md)
-  { orig_width = mw; orig_height = mh; orig_d = md; }
 public:
   /// The dimensions which were requested upon texture creation
   int orig_width, orig_height, orig_d;
@@ -175,9 +174,19 @@ public:
   bool IsNeedMips() const { return texFlags.Check (flagNeedMips); }
   void SetNeedMips (bool b) { texFlags.SetBool (flagNeedMips, b); }
 
-  csGLBasicTextureHandle (csImageType imagetype, int flags, csGLGraphics3D *iG3D);
+  /// Create a texture with given dimensions
+  csGLBasicTextureHandle (int width, int height, int depth,
+    csImageType imagetype, int flags, csGLGraphics3D *iG3D);
+  /// Create from existing handle
+  csGLBasicTextureHandle (csGLGraphics3D *iG3D, int target, GLuint Handle);
 
   virtual ~csGLBasicTextureHandle ();
+
+  /**
+   * Synthesize empty upload data structures for textures of the format 
+   * \a format. */
+  bool SynthesizeUploadData (const CS::StructuredTextureFormat& format,
+    iString* fail_reason);
 
   void Clear();
 

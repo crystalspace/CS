@@ -35,7 +35,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 
 csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, 
 				      csGLGraphics3D *iG3D) : 
-  csGLBasicTextureHandle (image->GetImageType (), flags, iG3D),
+  csGLBasicTextureHandle (image->GetWidth(), image->GetHeight(),
+    image->GetDepth(), image->GetImageType (), flags, iG3D),
   origName(0), transp_color (0, 0, 0)
 {
 //printf ("image='%s' format='%08x' rawformat='%s' type=%d\n",
@@ -51,20 +52,6 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags,
 
   if (image->HasKeyColor())
     SetTransp (true);
-
-  SetOriginalDimensions (image->GetWidth(), image->GetHeight(),
-    image->GetDepth());
-}
-
-csGLTextureHandle::csGLTextureHandle (int target, GLuint Handle, 
-				      csGLGraphics3D *iG3D) : 
-  csGLBasicTextureHandle (csimg2D, 0, iG3D),
-  origName(0)
-{
-  this->target = target;
-  csGLBasicTextureHandle::Handle = Handle;
-  alphaType = csAlphaMode::alphaNone;
-  SetForeignHandle (true);
 }
 
 csGLTextureHandle::~csGLTextureHandle()
@@ -90,14 +77,12 @@ void csGLTextureHandle::FreeImage ()
 
 void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh)
 {
-  AdjustSizePo2 ();
   mw = orig_width;
   mh = orig_height;
 }
 
 void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh, int &md)
 {
-  AdjustSizePo2 ();
   mw = orig_width;
   mh = orig_height;
   md = orig_d;
@@ -174,12 +159,9 @@ void csGLTextureHandle::CreateMipMaps()
     mipskip++;
 
   // Delete existing mipmaps, if any
-  size_t i;
-  if (uploadData != 0)
-    uploadData->DeleteAll();
-  else
-    uploadData = new csArray<csGLUploadData>;
+  FreshUploadData ();
 
+  size_t i;
   size_t subImageCount = image->HasSubImages() + 1;
 #ifdef MIPMAP_DEBUG
   for (i=0; i < subImageCount; i++)
@@ -202,7 +184,7 @@ void csGLTextureHandle::CreateMipMaps()
     {
       // Create each new level by creating a level 2 mipmap from previous level
       // we do this down to 1x1 as opengl defines it
-      int w, h;
+      int w, h, d;
       int nTex = 0;
       int nMip = 0;
       csRef<iImage> thisImage = image->GetSubImage ((uint)i); 
@@ -212,12 +194,13 @@ void csGLTextureHandle::CreateMipMaps()
       {
 	w = thisImage->GetWidth ();
 	h = thisImage->GetHeight ();
+        d = thisImage->GetDepth ();
 
-	if ((mipskip == 0) || ((w == 1) && (h == 1)))
+	if ((mipskip == 0) || ((w == 1) && (h == 1) && (d == 1)))
 	  MakeUploadData (!textureSettings->forceDecompress, targetFormat, 
 	    thisImage, nTex++, (int)i);
 
-	if ((w == 1) && (h == 1)) break;
+	if ((w == 1) && (h == 1) && (d == 1)) break;
 
 	nMip++;
 	csRef<iImage> cimg;
@@ -266,10 +249,6 @@ void csGLTextureHandle::PrepareInt ()
     image->GetKeyColor (r,g,b);
     SetKeyColor (r, g, b);
   }						 
-
-  // In opengl all textures, even non-mipmapped textures are required
-  // to be powers of 2.
-  AdjustSizePo2 ();
 
   csAlphaMode::AlphaType newAlphaType = csAlphaMode::alphaNone;
 

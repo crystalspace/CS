@@ -53,7 +53,6 @@ private:
     const csRGBpixel* transp_color, csAlphaMode::AlphaType& alphaType);
 public:
   csGLTextureHandle (iImage* image, int flags, csGLGraphics3D *iG3D);
-  csGLTextureHandle (int target, GLuint Handle, csGLGraphics3D *iG3D);
 
   virtual ~csGLTextureHandle ();
 

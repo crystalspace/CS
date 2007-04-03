@@ -30,16 +30,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
 
 CS_LEAKGUARD_IMPLEMENT(csGLBasicTextureHandle);
 
-csGLBasicTextureHandle::csGLBasicTextureHandle (
-    csImageType imagetype, int flags, csGLGraphics3D *iG3D) : 
-  scfImplementationType (this), uploadData(0), 
-  texFormat((TextureBlitDataFormat)-1)
+csGLBasicTextureHandle::csGLBasicTextureHandle (int width,
+                                                int height,
+                                                int depth,
+                                                csImageType imagetype, 
+                                                int flags, 
+                                                csGLGraphics3D *iG3D) : 
+  scfImplementationType (this), txtmgr (iG3D->txtmgr), 
+  textureClass (txtmgr->GetTextureClassID ("default")), Handle (0), 
+  orig_width (width), orig_height (height), orig_d (depth),
+  uploadData(0), G3D (iG3D), texFormat((TextureBlitDataFormat)-1)
 {
-  G3D = iG3D;
-  txtmgr = G3D->txtmgr;
-  Handle = 0;
-  textureClass = txtmgr->GetTextureClassID ("default");
-
   switch (imagetype)
   {
     case csimgCube:
@@ -82,12 +83,104 @@ csGLBasicTextureHandle::csGLBasicTextureHandle (
       target = CS_TEX_IMG_RECT;
   }
   texFlags.Set (flagsPublicMask, flags);
+
+  // In opengl all textures, even non-mipmapped textures are required
+  // to be powers of 2.
+  AdjustSizePo2 ();
+}
+
+csGLBasicTextureHandle::csGLBasicTextureHandle (csGLGraphics3D *iG3D,
+                                                int target, GLuint Handle) : 
+  scfImplementationType (this), txtmgr (iG3D->txtmgr), 
+  textureClass (txtmgr->GetTextureClassID ("default")), Handle (Handle), 
+  orig_width (0), orig_height (0), orig_d (0),
+  uploadData(0), G3D (iG3D), texFormat((TextureBlitDataFormat)-1), 
+  target (target), alphaType (csAlphaMode::alphaNone)
+{
+  SetForeignHandle (true);
 }
 
 csGLBasicTextureHandle::~csGLBasicTextureHandle()
 {
   Clear ();
   txtmgr->UnregisterTexture (this);
+}
+
+bool csGLBasicTextureHandle::SynthesizeUploadData (
+  const CS::StructuredTextureFormat& format,
+  iString* fail_reason)
+{
+  TextureStorageFormat glFormat;
+  if (!txtmgr->DetermineGLFormat (format, glFormat)) 
+  {
+    if (fail_reason) fail_reason->Replace ("no GL support for texture format");
+    return 0;
+  }
+
+  if (glFormat.isCompressed)
+  {
+    /* To support creation of compressed textures:
+       - compute size of compressed data
+       - create texture from dummy data
+
+       But we don't support them yet.
+     */
+    if (fail_reason) fail_reason->Replace ("compressed formats not supported");
+    return false;
+  }
+
+  const int imgNum = (target == GL_TEXTURE_CUBE_MAP) ? 6 : 1;
+
+  FreshUploadData ();
+  if (texFlags.Check (CS_TEXTURE_NOMIPMAPS))
+  {
+    for (int i = 0; i < imgNum; i++)
+    {
+      csGLUploadData upload;
+      upload.image_data = 0;
+      upload.w = actual_width;
+      upload.h = actual_height;
+      upload.d = actual_d;
+      upload.sourceFormat = glFormat;
+      upload.mip = 0;
+      upload.imageNum = i;
+
+      uploadData->Push (upload);
+    }
+  }
+  else
+  {
+    for (int i = 0; i < imgNum; i++)
+    {
+      // Create each new level by creating a level 2 mipmap from previous level
+      // we do this down to 1x1 as opengl defines it
+      int w  = actual_width, h = actual_height, d = actual_d;
+      int nMip = 0;
+
+      do
+      {
+        csGLUploadData upload;
+        upload.image_data = 0;
+        upload.w = w;
+        upload.h = h;
+        upload.d = d;
+        upload.sourceFormat = glFormat;
+        upload.mip = nMip;
+        upload.imageNum = i;
+
+        uploadData->Push (upload);
+
+	if ((w == 1) && (h == 1) && (d == 1)) break;
+
+	nMip++;
+        w = csMax (w >> 1, 1);
+        h = csMax (h >> 1, 1);
+        d = csMax (d >> 1, 1);
+      }
+      while (true);
+    }
+  }
+  return true;
 }
 
 void csGLBasicTextureHandle::Clear()
@@ -107,7 +200,6 @@ int csGLBasicTextureHandle::GetFlags () const
 
 bool csGLBasicTextureHandle::GetRendererDimensions (int &mw, int &mh)
 {
-  AdjustSizePo2 ();
   mw = actual_width; mh = actual_height;
   return true;
 }
@@ -115,7 +207,6 @@ bool csGLBasicTextureHandle::GetRendererDimensions (int &mw, int &mh)
 // Check the two below for correctness
 bool csGLBasicTextureHandle::GetRendererDimensions (int &mw, int &mh, int &md)
 {
-  AdjustSizePo2 ();
   mw = actual_width;
   mh = actual_height;
   md = actual_d;
@@ -194,11 +285,16 @@ void csGLBasicTextureHandle::ComputeNewPo2ImageSize (int texFlags,
     newdepth = max_tex_size;
 }
 
+void csGLBasicTextureHandle::FreshUploadData ()
+{
+  if (uploadData != 0)
+    uploadData->DeleteAll();
+  else
+    uploadData = new csArray<csGLUploadData>;
+}
+
 void csGLBasicTextureHandle::AdjustSizePo2 ()
 {
-  if (IsSizeAdjusted ()) return;
-  SetSizeAdjusted (true);
-
   if (texFlags.Check (CS_TEXTURE_NPOTS)) 
   {
     actual_width = MIN(orig_width, G3D->maxNpotsTexSize);
@@ -213,7 +309,6 @@ void csGLBasicTextureHandle::AdjustSizePo2 ()
     newwidth, newheight, newd, txtmgr->max_tex_size);
 
   actual_width = newwidth;
-  CS_ASSERT(newwidth != 0);
   actual_height = newheight;
   actual_d = newd;
 }

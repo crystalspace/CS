@@ -9,6 +9,7 @@ chronological order.
 3-Apr-2007
 	- Marten fixed loading of box emitters in particles (#286).
 	- res fixed a few warnings that occured on VC.
+	- res implemented iTextureManager::CreateTexture() for gl3d.
 2-Apr-2007
 	- Marten augmented ptpdlight to handle all black lightmaps.
 	- Marten disabled a few deprecation warnings from the recent

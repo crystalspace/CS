@@ -26,7 +26,7 @@
 #include "csutil/blockallocator.h"
 
 #include "gl_render3d.h"
-#include "gl_txtmgr_imagetex.h"
+#include "gl_txtmgr_basictex.h"
 #include "gl_txtmgr_lightmap.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
@@ -267,8 +267,8 @@ iTextureHandle* csGLSuperLightmap::GetTexture ()
   if (th == 0)
   {
     CreateTexture ();
-    th.AttachNew (new csGLTextureHandle (iTextureHandle::CS_TEX_IMG_2D, 
-      texHandle, txtmgr->G3D));
+    th.AttachNew (new csGLBasicTextureHandle (
+      txtmgr->G3D, iTextureHandle::CS_TEX_IMG_2D, texHandle));
   }
   return th;
 }

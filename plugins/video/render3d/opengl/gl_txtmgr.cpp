@@ -325,27 +325,23 @@ csPtr<iTextureHandle> csGLTextureManager::CreateTexture (int w, int h,
       csImageType imagetype, const char* format, int flags,
       iString* fail_reason)
 {
-  (void)w;
-  (void)h;
   CS::StructuredTextureFormat texFormat (
     CS::TextureFormatStrings::ConvertStructured (format));
-  if (!texFormat.IsValid()) return 0;
-
-  TextureStorageFormat glFormat;
-  if (!DetermineGLFormat (texFormat, glFormat)) return 0;
-
-  if (glFormat.isCompressed)
+  if (!texFormat.IsValid()) 
   {
-    // ... compute size of compressed data ...
-    // ... create texture from dummy data ...
+    if (fail_reason) fail_reason->Replace ("invalid texture format");
+    return 0;
   }
 
-  /* TBD:
-     - size adjustment
-   */
-
   csGLBasicTextureHandle *txt = new csGLBasicTextureHandle (
-      imagetype, flags, G3D);
+      w, h, 1, imagetype, flags, G3D);
+
+  if (!txt->SynthesizeUploadData (texFormat, fail_reason))
+  {
+    delete txt;
+    return 0;
+  }
+
   textures.Push(txt);
   return csPtr<iTextureHandle> (txt);
 }

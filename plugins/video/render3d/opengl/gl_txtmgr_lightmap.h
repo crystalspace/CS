@@ -88,7 +88,7 @@ private:
   /// Number of lightmaps on this SLM.
   int numRLMs;
 
-  csRef<csGLTextureHandle> th;
+  csRef<csGLBasicTextureHandle> th;
 
   /// Actually create the GL texture.
   void CreateTexture ();
