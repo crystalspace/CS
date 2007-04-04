@@ -131,7 +131,7 @@ struct iODESliderJoint;
  */
 struct iODEDynamicSystemState : public virtual iBase
 {
-  SCF_INTERFACE(iODEDynamicSystemState, 2, 0, 0);
+  SCF_INTERFACE(iODEDynamicSystemState, 2, 1, 0);
 
   /**
    * Sets ODE's Error Resolution Parameter (see ode docs for details)
@@ -301,6 +301,13 @@ struct iODEDynamicSystemState : public virtual iBase
    * \return the distance two bodies are allowed to interpenetrate
    */
   virtual float GetContactSurfaceLayer () = 0;
+
+  /**
+   * Set the code to use previous and broken inertia calculation. Use only
+   * if you know you need it
+   */
+  virtual void EnableOldInertia (bool enable) = 0;
+  virtual bool IsOldInertiaEnabled () const = 0;
 };
 
 /**

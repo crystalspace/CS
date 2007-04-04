@@ -6,6 +6,11 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Apr-2007
+	- Marten fixed the inertia calculation in odedynam (bug #279). This
+	  is a potentially behaviour changing fix so the old (broken) way
+	  can still be enabled via iODEDynamicsState::EnableOldInertia if
+	  you have things that depends on the _broken_ behaviour.
 3-Apr-2007
 	- Marten fixed loading of box emitters in particles (#286).
 	- res fixed a few warnings that occured on VC.

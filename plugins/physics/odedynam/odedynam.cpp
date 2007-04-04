@@ -554,6 +554,7 @@ csODEDynamicSystem::csODEDynamicSystem (float erp, float cfm)
   qsiter = 10;
   fastobjects = false;
   autodisable = true;
+  correctInertiaWorkAround = false; 
   dWorldSetAutoDisableFlag (worldID, autodisable);
 }
 
@@ -762,7 +763,7 @@ bool csODEDynamicSystem::AttachColliderMesh (iMeshWrapper* mesh,
 					     float friction, float elasticity,
 					     float softness)
 {
-  csODECollider *odec = new csODECollider ();
+  csODECollider *odec = new csODECollider (this);
   odec->SetElasticity (elasticity);
   odec->SetFriction (friction);
   odec->SetSoftness (softness);
@@ -780,7 +781,7 @@ bool csODEDynamicSystem::AttachColliderCylinder (float length, float radius,
 						 float elasticity,
 						 float softness)
 {
-  csODECollider *odec = new csODECollider ();
+  csODECollider *odec = new csODECollider (this);
   odec->SetElasticity (elasticity);
   odec->SetFriction (friction);
   odec->SetSoftness (softness);
@@ -795,7 +796,7 @@ bool csODEDynamicSystem::AttachColliderCylinder (float length, float radius,
 bool csODEDynamicSystem::AttachColliderBox (const csVector3 &size,
                                             const csOrthoTransform& trans, float friction, float elasticity, float softness)
 {
-  csODECollider *odec = new csODECollider ();
+  csODECollider *odec = new csODECollider (this);
   //odec->SetElasticity (elasticity);
   //odec->SetFriction (friction);
   //odec->SetSoftness (softness);
@@ -814,7 +815,7 @@ bool csODEDynamicSystem::AttachColliderSphere (float radius,
 {
   if (radius > 0) //otherwise ODE will treat radius as a 'bad argument'
   {
-    csODECollider *odec = new csODECollider ();
+    csODECollider *odec = new csODECollider (this);
     odec->SetElasticity (elasticity);
     odec->SetFriction (friction);
     odec->SetSoftness (softness);
@@ -828,7 +829,7 @@ bool csODEDynamicSystem::AttachColliderSphere (float radius,
 bool csODEDynamicSystem::AttachColliderPlane (const csPlane3 &plane,
                                               float friction, float elasticity, float softness)
 {
-  csODECollider *odec = new csODECollider ();
+  csODECollider *odec = new csODECollider (this);
   odec->SetElasticity (elasticity);
   odec->SetFriction (friction);
   odec->SetSoftness (softness);
@@ -848,16 +849,16 @@ csRef<iDynamicsSystemCollider> csODEDynamicSystem::GetCollider (
 }
 csRef<iDynamicsSystemCollider> csODEDynamicSystem::CreateCollider ()
 {
-  csODECollider *odec = new csODECollider ();
+  csODECollider *odec = new csODECollider (this);
   odec->AddToSpace (spaceID);
-  csRef<iDynamicsSystemCollider> c = (csPtr<iDynamicsSystemCollider>) odec;
-  colliders.Push (c);
+  csRef<csODECollider> c = (csPtr<csODECollider>) odec;
+  colliders.Push (c);  
   return c;
 }
 void csODEDynamicSystem::AttachCollider (iDynamicsSystemCollider* collider)
 {
   ((csODECollider*)collider)->AddToSpace (spaceID);
-  colliders.Push (collider);
+  colliders.Push ((csODECollider*)collider);
 }
 void csODEDynamicSystem::EnableAutoDisable (bool enable)
 {
@@ -928,7 +929,7 @@ bool csODEBodyGroup::BodyInGroup (iRigidBody *body)
 }
 
 //--------------------------csODECollider-------------------------------------
-csODECollider::csODECollider ()
+csODECollider::csODECollider (ColliderContainer* container)
 {
   SCF_CONSTRUCT_IBASE (0);
   surfacedata[0] = 0;
@@ -942,6 +943,7 @@ csODECollider::csODECollider ()
   dGeomTransformSetCleanup (transformID, 1);
   geom_type =  NO_GEOMETRY;
   is_static = true;
+  this->container = container;
 }
 void csODECollider::SetCollisionCallback (
 	iDynamicsColliderCollisionCallback* cb)
@@ -1005,7 +1007,19 @@ void csODECollider::ClearContents ()
   geom_type =  NO_GEOMETRY;
 }
 
-void csODECollider::MassCorrection ()
+void csODECollider::MassUpdate ()
+{
+  if (container->DoFullInertiaRecalculation ())
+  {
+    container->RecalculateFullInertia (this);
+  }
+  else
+  {
+    AddMassToBody (false);
+  }
+}
+
+void csODECollider::AddMassToBody (bool doSet)
 {
   if (density > 0 && dGeomGetBody (transformID) && geomID)
   {
@@ -1057,9 +1071,12 @@ void csODECollider::MassCorrection ()
     dMassRotate (&m, dGeomGetRotation (geomID));
 
     dBodyID bodyID = dGeomGetBody (transformID);
-    dBodyGetMass (bodyID, &om);
-    dMassAdd (&om, &m);
-    dBodySetMass (bodyID, &om);
+    if (!doSet)
+    {
+      dBodyGetMass (bodyID, &om);
+      dMassAdd (&m, &om);
+    }
+    dBodySetMass (bodyID, &m);
   }
 }
 void csODECollider::AttachBody (dBodyID bodyID)
@@ -1069,14 +1086,14 @@ void csODECollider::AttachBody (dBodyID bodyID)
     dGeomSetBody (transformID, bodyID);
     if (geomID)
     {
-      MassCorrection ();
+      MassUpdate ();
     }
   }
 }
 void csODECollider::SetDensity (float density)
 {
   csODECollider::density = density;
-  MassCorrection ();
+  MassUpdate ();
 }
 bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
 {
@@ -1138,7 +1155,7 @@ bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
   {
     AddTransformToSpace (spaceID);
     dGeomSetBody (transformID, b);
-    MassCorrection ();
+    MassUpdate ();
   } else if (spaceID) AddToSpace (spaceID);
 
   return true;
@@ -1160,7 +1177,7 @@ bool csODECollider::CreateCCylinderGeometry (float length, float radius)
   {
     AddTransformToSpace (spaceID);
     dGeomSetBody (transformID, b);
-    MassCorrection ();
+    MassUpdate ();
   } else if (spaceID) AddToSpace (spaceID);
 
   return true;
@@ -1182,7 +1199,7 @@ bool csODECollider::CreatePlaneGeometry (const csPlane3& plane)
   {
     AddTransformToSpace (spaceID);
     dGeomSetBody (transformID, b);
-    MassCorrection ();
+    MassUpdate ();
   } else if (spaceID) AddToSpace (spaceID);
 
   return true;
@@ -1209,7 +1226,7 @@ bool csODECollider::CreateSphereGeometry (const csSphere& sphere)
     {
       if (spaceID) AddTransformToSpace (spaceID);
       dGeomSetBody (transformID, b);
-      MassCorrection ();
+      MassUpdate ();
     } else if (spaceID) AddToSpace (spaceID);
 
     return true;
@@ -1234,7 +1251,7 @@ bool csODECollider::CreateBoxGeometry (const csVector3& size)
   {
     AddTransformToSpace (spaceID);
     dGeomSetBody (transformID, b);
-    MassCorrection ();
+    MassUpdate ();
   } else if (spaceID) AddToSpace (spaceID);
 
   return true;
@@ -1263,7 +1280,7 @@ void csODECollider::SetTransform (const csOrthoTransform& transform)
   dGeomSetRotation (geomID, rot);
 
   if (dGeomGetBody (transformID))
-    MassCorrection ();
+    MassUpdate ();
 }
 csOrthoTransform csODECollider::GetLocalTransform ()
 {
@@ -1526,7 +1543,7 @@ bool csODERigidBody::AttachColliderMesh (iMeshWrapper *mesh,
 					 float friction, float density,
                                          float elasticity, float softness)
 {
-  csODECollider *odec = new csODECollider ();
+  csODECollider *odec = new csODECollider (this);
   odec->SetElasticity (elasticity);
   odec->SetFriction (friction);
   odec->SetSoftness (softness);
@@ -1546,7 +1563,7 @@ bool csODERigidBody::AttachColliderCylinder (float length, float radius,
 					     float friction, float density,
                                              float elasticity, float softness)
 {
-  csODECollider *odec = new csODECollider ();
+  csODECollider *odec = new csODECollider (this);
   odec->SetElasticity (elasticity);
   odec->SetFriction (friction);
   odec->SetSoftness (softness);
@@ -1566,7 +1583,7 @@ bool csODERigidBody::AttachColliderBox (const csVector3 &size,
 					float friction, float density,
                                         float elasticity, float softness)
 {
-  csODECollider *odec = new csODECollider ();
+  csODECollider *odec = new csODECollider (this);
   odec->SetElasticity (elasticity);
   odec->SetFriction (friction);
   odec->SetSoftness (softness);
@@ -1588,7 +1605,7 @@ bool csODERigidBody::AttachColliderSphere (float radius,
 {
   if (radius > 0) //otherwise ODE will treat radius as a 'bad argument'
   {
-    csODECollider *odec = new csODECollider ();
+    csODECollider *odec = new csODECollider (this);
     odec->SetElasticity (elasticity);
     odec->SetFriction (friction);
     odec->SetSoftness (softness);
@@ -1608,7 +1625,7 @@ bool csODERigidBody::AttachColliderPlane (const csPlane3& plane,
                                           float friction, float density,
 					  float elasticity, float softness)
 {
-  csODECollider *odec = new csODECollider ();
+  csODECollider *odec = new csODECollider (this);
   odec->SetElasticity (elasticity);
   odec->SetFriction (friction);
   odec->SetSoftness (softness);
@@ -1625,7 +1642,7 @@ bool csODERigidBody::AttachColliderPlane (const csPlane3& plane,
 
 void csODERigidBody::AttachCollider (iDynamicsSystemCollider* collider)
 {
-  colliders.Push (collider);
+  colliders.Push ((csODECollider*)collider);
   dynsys->DestroyCollider (collider);
   if (collider->GetGeometryType () == PLANE_COLLIDER_GEOMETRY)
     ((csODECollider*) collider)->AddToSpace (dynsys->GetSpaceID());
@@ -1878,6 +1895,23 @@ csRef<iDynamicsSystemCollider> csODERigidBody::GetCollider (unsigned int index)
     return csRef<iDynamicsSystemCollider> (colliders[index]);
   else return 0;
 }
+
+void csODERigidBody::RecalculateFullInertia (csODECollider* thisCol)
+{
+  if (bodyID)
+  {
+    // Set using this collider
+    thisCol->AddMassToBody (true);
+
+    // Add all other
+    for (size_t i = 0; i < colliders.GetSize (); ++i)
+    {
+      if (thisCol != colliders[i])
+        colliders[i]->AddMassToBody (false); 
+    } 
+  }
+}
+
 //-----------------------csStrictODEJoint-------------------------------------
 void csStrictODEJoint::Attach (iRigidBody *b1, iRigidBody *b2)
 {

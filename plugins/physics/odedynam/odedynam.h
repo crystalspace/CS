@@ -98,6 +98,15 @@ struct MeshInfo
 
 typedef csDirtyAccessArray<ContactEntry> csContactList;
 
+class csODECollider;
+
+// Helper base for classes that can contain multiple colliders
+struct ColliderContainer
+{
+  virtual bool DoFullInertiaRecalculation () const = 0;
+  virtual void RecalculateFullInertia (csODECollider* thisCol) = 0;
+};
+
 /**
  * This is the implementation for the actual plugin.
  * It is responsible for creating iDynamicSystem.
@@ -286,6 +295,7 @@ public:
 
 class csODEBodyGroup;
 class csODEJoint;
+class csODECollider;
 struct csStrictODEJoint;
 
 /**
@@ -294,7 +304,7 @@ struct csStrictODEJoint;
  * It also handles collision response.
  * Collision detection is done in another plugin.
  */
-class csODEDynamicSystem : public csObject
+class csODEDynamicSystem : public csObject, public ColliderContainer
 {
 private:
   dWorldID worldID;
@@ -309,7 +319,7 @@ private:
   csRefArray<csODEJoint> joints;
   csRefArray<csStrictODEJoint> strict_joints;
   //here are all colliders
-  csRefArray<iDynamicsSystemCollider> colliders;
+  csRefArray<csODECollider> colliders;
 
   bool rateenabled;
   float steptime, limittime;
@@ -322,6 +332,7 @@ private:
   int qsiter;
   bool fastobjects;
   bool autodisable;
+  bool correctInertiaWorkAround;
 
 public:
   SCF_DECLARE_IBASE_EXT (csObject);
@@ -451,6 +462,8 @@ public:
   float GetContactMaxCorrectingVel ();
   void SetContactSurfaceLayer (float depth);
   float GetContactSurfaceLayer ();
+  void SetInertiaWorkaround (bool enable) {correctInertiaWorkAround = enable;}
+  bool GetInertiaWorkaround () const {return correctInertiaWorkAround;}
 
   struct ODEDynamicSystemState : public iODEDynamicSystemState
   {
@@ -538,6 +551,10 @@ public:
     { scfParent->SetContactSurfaceLayer(depth); }
     float GetContactSurfaceLayer ()
     { return scfParent->GetContactSurfaceLayer(); }
+    void EnableOldInertia (bool enable)
+    { scfParent->SetInertiaWorkaround (enable); }
+    bool IsOldInertiaEnabled () const
+    { return scfParent->GetInertiaWorkaround (); }
   } scfiODEDynamicSystemState;
 
 
@@ -603,9 +620,14 @@ public:
   void DestroyColliders () {colliders.DeleteAll ();};
   void DestroyCollider (iDynamicsSystemCollider* collider)
   {
-    colliders.Delete (collider);
+    colliders.Delete ((csODECollider*)collider);
   }
   void AttachCollider (iDynamicsSystemCollider* collider);
+
+  virtual bool DoFullInertiaRecalculation () const
+  { return !correctInertiaWorkAround; }
+  virtual void RecalculateFullInertia (csODECollider* thisCol) {/*Only static stuff, nothing to recalc*/}
+
 };
 
 class csODERigidBody;
@@ -637,6 +659,7 @@ class csODECollider : public iDynamicsSystemCollider
   dGeomID geomID;
   dGeomID transformID;
   dSpaceID spaceID; 
+  ColliderContainer* container;
   float density;
   csRef<iDynamicsColliderCollisionCallback> coll_cb;
   float surfacedata[3];
@@ -646,7 +669,7 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  csODECollider ();
+  csODECollider (ColliderContainer* container);
   virtual ~csODECollider (); 
   
   bool CreateSphereGeometry (const csSphere& sphere);
@@ -690,11 +713,13 @@ public:
   void MakeDynamic ();
   bool IsStatic ();
 
+  void AddMassToBody (bool doSet);
+
 private:
 
   inline void CS2ODEMatrix (const csMatrix3& csmat, dMatrix3& odemat);
   inline void ODE2CSMatrix (const dReal* odemat, csMatrix3& csmat);
-  void MassCorrection ();
+  void MassUpdate ();
   void ClearContents ();
   void KillGeoms ();
 
@@ -714,13 +739,13 @@ struct GeomData
  * It can also be attached to a movable,
  * to automatically update it.
  */
-class csODERigidBody : public csObject
+class csODERigidBody : public csObject, public ColliderContainer
 {
 private:
   dBodyID bodyID;
   dSpaceID groupID;
   dJointID statjoint;
-  csRefArray<iDynamicsSystemCollider> colliders;
+  csRefArray<csODECollider> colliders;
 
   /* these must be ptrs to avoid circular referencing */
   iBodyGroup* collision_group;
@@ -914,7 +939,7 @@ public:
   void DestroyColliders () {colliders.DeleteAll ();};
   void DestroyCollider (iDynamicsSystemCollider* collider)
   {
-    colliders.Delete (collider);
+    colliders.Delete ((csODECollider*)collider);
   }
 
   void SetPosition (const csVector3& trans);
@@ -969,6 +994,10 @@ public:
 
   csRef<iDynamicsSystemCollider> GetCollider (unsigned int index);
   int GetColliderCount () {return (int)colliders.GetSize ();};
+
+  virtual bool DoFullInertiaRecalculation () const
+  { return !dynsys->GetInertiaWorkaround (); }
+  virtual void RecalculateFullInertia (csODECollider* thisCol);
 };
 
 
