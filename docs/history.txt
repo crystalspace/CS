@@ -11,6 +11,10 @@ chronological order.
 	  is a potentially behaviour changing fix so the old (broken) way
 	  can still be enabled via iODEDynamicsState::EnableOldInertia if
 	  you have things that depends on the _broken_ behaviour.
+	- Marten fixed cssynldr to handle loading a csOBB from both an OBB
+	  syntax (<box><box>..</box><matrix>..</matrix></box>) and from 
+	  AABB syntax (<box>..</box>). In the later case the matrix will
+	  be identity.
 3-Apr-2007
 	- Marten fixed loading of box emitters in particles (#286).
 	- res fixed a few warnings that occured on VC.

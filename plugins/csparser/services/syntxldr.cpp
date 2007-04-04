@@ -390,8 +390,13 @@ bool csTextSyntaxService::ParseBox (iDocumentNode* node, csOBB &b)
   
   if (!boxNode)
   {
-    ReportError ("crystalspace.syntax.box", node, "Expected 'box' node!");
-    return false;
+    //Try to parse ourselves as a box node
+    if (!ParseBox (node, (csBox3&)b))
+    {
+      ReportError ("crystalspace.syntax.box", node, "Expected 'box' node!");
+      return false;
+    }
+    return true;
   }
 
   if (!ParseBox (boxNode, (csBox3&)b))
