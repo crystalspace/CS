@@ -52,6 +52,9 @@ struct iObjectModelListener : public virtual iBase
   virtual void ObjectModelChanged (iObjectModel* model) = 0;
 };
 
+// for iPolygonMesh
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * This interface represents data related to some geometry in object
  * space. It is a generic way to describe meshes in the engine. By using
@@ -249,6 +252,9 @@ struct iObjectModel : public virtual iBase
 };
 
 /** @} */
+
+// for iPolygonMesh
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_IMESH_OBJMODEL_H__
 

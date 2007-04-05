@@ -51,6 +51,8 @@ class csReversibleTransform;
 
 struct csIntersectingTriangle;
 
+// for iPolygonMesh
+#include "csutil/win32/msvc_deprecated_warn_off.h"
 
 /**
  * This is a convenience object that you can use in your own
@@ -156,6 +158,9 @@ public:
   void UpdateCollider(iTerraFormer* terrain);
 
 };
+
+// for iPolygonMesh
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * Return structure for the csColliderHelper::TraceBeam() method.

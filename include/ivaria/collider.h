@@ -93,6 +93,9 @@ struct iCollider : public virtual iBase
   virtual csColliderType GetColliderType () = 0;
 };
 
+// for iPolygonMesh
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * This is the Collide plug-in. This plugin is a factory for creating
  * iCollider entities. A collider represents an entity in the
@@ -242,6 +245,9 @@ struct iCollideSystem : public virtual iBase
    */
   virtual bool GetOneHitOnly () = 0;
 };
+
+// for iPolygonMesh
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_IVARIA_COLLIDER_H__
 

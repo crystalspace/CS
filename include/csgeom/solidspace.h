@@ -32,6 +32,9 @@
 class csSolidSpaceNode;
 struct iPolygonMesh;
 
+// for iPolygonMesh
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * This structure keeps track of solid space. Basically it represents
  * a 3 dimensional sparse bit array which is 1 where space is solid
@@ -65,6 +68,9 @@ public:
 };
 
 /** @} */
+
+// for iPolygonMesh
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_SOLIDSPACE_H__
 

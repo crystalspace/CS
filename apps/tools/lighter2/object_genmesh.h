@@ -28,8 +28,7 @@
 namespace lighter
 {
   struct SubmeshNameArray : public csArray<csString>,
-                            public csRefCount,
-                            public CS::Memory::CustomAllocated
+                            public csRefCount
   {
   };
 

@@ -39,6 +39,9 @@
 
 struct iTerraFormer;
 
+// for iPolygonMesh
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * Helper class to make it easier to implement iObjectModel in mesh
  * objects. This class does not implement the bounding box and radius
@@ -144,6 +147,9 @@ public:
 };
 
 /** @} */
+
+// for iPolygonMesh
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_CSTOOL_OBJMODEL_H__
 

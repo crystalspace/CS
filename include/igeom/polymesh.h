@@ -105,6 +105,8 @@ struct csMeshedPolygon
 class csVector3;
 struct csTriangle;
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * This interface reprents a mesh of polygons. It is useful to communicate
  * geometry information outside of the engine. One place where this will
@@ -137,7 +139,7 @@ struct csTriangle;
  *
  * \deprecated iPolygonMesh is deprecated; use iTriangleMesh instead.
  */
-struct CS_DEPRECATED_TYPE_MSG("iPolygonMesh is deprecated; use iTriangleMesh insetad") iPolygonMesh : public virtual iBase
+struct CS_DEPRECATED_TYPE_MSG("iPolygonMesh is deprecated; use iTriangleMesh instead") iPolygonMesh : public virtual iBase
 {
   SCF_INTERFACE(iPolygonMesh, 2, 0, 0);
   /// Get the number of vertices for this mesh.
@@ -188,6 +190,8 @@ struct CS_DEPRECATED_TYPE_MSG("iPolygonMesh is deprecated; use iTriangleMesh ins
 };
 
 /** @} */
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_IGEOM_POLYMESH_H__
 
