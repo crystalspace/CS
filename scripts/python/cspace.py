@@ -10554,6 +10554,8 @@ class iODEDynamicSystemState(iBase):
     def GetContactMaxCorrectingVel(*args): return _cspace.iODEDynamicSystemState_GetContactMaxCorrectingVel(*args)
     def SetContactSurfaceLayer(*args): return _cspace.iODEDynamicSystemState_SetContactSurfaceLayer(*args)
     def GetContactSurfaceLayer(*args): return _cspace.iODEDynamicSystemState_GetContactSurfaceLayer(*args)
+    def EnableOldInertia(*args): return _cspace.iODEDynamicSystemState_EnableOldInertia(*args)
+    def IsOldInertiaEnabled(*args): return _cspace.iODEDynamicSystemState_IsOldInertiaEnabled(*args)
     __swig_destroy__ = _cspace.delete_iODEDynamicSystemState
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iODEDynamicSystemState_scfGetVersion

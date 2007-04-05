@@ -15745,6 +15745,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetContactMaxCorrectingVel = *cspacec::iODEDynamicSystemState_GetContactMaxCorrectingVel;
 *SetContactSurfaceLayer = *cspacec::iODEDynamicSystemState_SetContactSurfaceLayer;
 *GetContactSurfaceLayer = *cspacec::iODEDynamicSystemState_GetContactSurfaceLayer;
+*EnableOldInertia = *cspacec::iODEDynamicSystemState_EnableOldInertia;
+*IsOldInertiaEnabled = *cspacec::iODEDynamicSystemState_IsOldInertiaEnabled;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
