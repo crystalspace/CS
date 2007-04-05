@@ -29,7 +29,7 @@
 
 
 csRenderView::csRenderView () :
-  scfImplementationType (this),
+  scfPooledImplementationType (this),
   engine(0),
   g3d(0),
   g2d(0),
@@ -41,7 +41,7 @@ csRenderView::csRenderView () :
 }
 
 csRenderView::csRenderView (iCamera *c) :
-  scfImplementationType (this),
+  scfPooledImplementationType (this),
   engine(0),
   g3d(0),
   g2d(0),
@@ -55,7 +55,7 @@ csRenderView::csRenderView (iCamera *c) :
 
 csRenderView::csRenderView (
   iCamera *c, iClipper2D *v, iGraphics3D *ig3d, iGraphics2D *ig2d) :
-    scfImplementationType (this),
+  scfPooledImplementationType (this),
     engine(0),
     g3d(ig3d),
     g2d(ig2d),
@@ -74,7 +74,7 @@ csRenderView::csRenderView (
 }
 
 csRenderView::csRenderView (const csRenderView& other) :
-  scfImplementationType (this)
+  scfPooledImplementationType (this)
 {
   ctxt = new csRenderContext ();
   memset (ctxt, 0, sizeof (csRenderContext));

@@ -490,7 +490,8 @@ void csEngine::AddImposterToUpdateQueue (csImposterProcTex* imptex,
   {
     // We don't yet have this camera in our queue. Make a clone of
     // the renderview and camera.
-    csRenderView* copy_rview = new csRenderView (*(csRenderView*)rview);
+    csRenderView* copy_rview = 
+      new (rviewPool) csRenderView (*(csRenderView*)rview);
     csImposterUpdateQueue qu;
     qu.rview.AttachNew (copy_rview);
     imposterUpdateQueue.Put (camnr, qu);
@@ -1483,22 +1484,23 @@ void csEngine::Draw (iCamera *c, iClipper2D *view, iMeshWrapper* mesh)
 
   currentFrameNumber++;
   ControlMeshes ();
-  csRenderView rview (c, view, G3D, G2D);
-  StartDraw (c, view, rview);
+  csRef<csRenderView> rview;
+  rview.AttachNew (new (rviewPool) csRenderView (c, view, G3D, G2D));
+  StartDraw (c, view, *rview);
 
   // First initialize G3D with the right clipper.
   G3D->SetClipper (view, CS_CLIPPER_TOPLEVEL);  // We are at top-level.
   G3D->ResetNearPlane ();
   G3D->SetPerspectiveAspect (c->GetFOV ());
 
-  FireStartFrame (&rview);
+  FireStartFrame (rview);
 
   iSector *s = c->GetSector ();
   if (s) 
   {
     iRenderLoop* rl = s->GetRenderLoop ();
     if (!rl) rl = defaultRenderLoop;
-    rl->Draw (&rview, s, mesh);
+    rl->Draw (rview, s, mesh);
   }
 
   // draw all halos on the screen

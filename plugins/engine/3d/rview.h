@@ -21,6 +21,7 @@
 
 #include "csgeom/frustum.h"
 #include "csgeom/math3d.h"
+#include "csutil/pooledscfclass.h"
 #include "csutil/scf_implementation.h"
 #include "iengine/engine.h"
 #include "iengine/rview.h"
@@ -40,7 +41,9 @@ struct iClipper2D;
  * a scene. It is modified while rendering according to
  * portals/warping portals and such.
  */
-class csRenderView : public scfImplementation1<csRenderView, iRenderView>
+class csRenderView : 
+  public scfImplementationPooled<scfImplementation1<csRenderView, 
+                                                    iRenderView> >
 {
 private:
   /**

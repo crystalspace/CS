@@ -17,6 +17,9 @@ chronological order.
 	  set of null triangle data as opposed to triangle data not
 	  being set at all. In the last case a subsystem (like collision
 	  detection) may chose to use the base mesh as a fallback.
+	- res made the renderview the engine uses for drawing properly 
+	  ref-counted and not stack-allocated, so it can be used after 
+	  drawing is finished. (Relevant for bugplug.)
 4-Apr-2007
 	- Marten fixed the inertia calculation in odedynam (bug #279). This
 	  is a potentially behaviour changing fix so the old (broken) way

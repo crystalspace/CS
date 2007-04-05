@@ -796,6 +796,9 @@ private:
 
   // -- PRIVATE MEMBERS
 
+  /// Pool from which to allocate render views.
+  csRenderView::Pool rviewPool;
+
   // -- Object lists
   /**
    * List of sectors in the engine. This vector contains
