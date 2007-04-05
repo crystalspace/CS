@@ -176,6 +176,9 @@ namespace lighter
     inline ObjectVertexData& GetVertexData ()
     { return vertexData; }
 
+    inline const csSphere& GetBoundingSphere () const
+    { return bsphere; }
+
     typedef csDirtyAccessArray<csColor> LitColorArray;
     inline LitColorArray* GetLitColors ()
     { return litColors; }
@@ -199,6 +202,9 @@ namespace lighter
     // All faces, already transformed
     csArray<PrimitiveArray> allPrimitives;
     csArray<uint> lightmapIDs;
+
+    // Bounding sphere
+    csSphere bsphere;
 
     // Vertex data for above, transformed
     ObjectVertexData vertexData;
@@ -224,6 +230,9 @@ namespace lighter
     // Renormalize lightmap UVs into buffer \a lmcoords.
     virtual void RenormalizeLightmapUVs (const LightmapPtrDelArray& lightmaps,
       csVector2* lmcoords);
+
+    // Compute bounding sphere from vertex data
+    void ComputeBoundingSphere ();
 
     // Helper function: get a filename prefix for this mesh
     csString GetFileName() const;

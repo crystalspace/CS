@@ -763,7 +763,6 @@ namespace lighter
     //Propagate light through all portals in its current sector, setup proxy-lights in targets
     Sector* sourceSector = light->GetSector ();
     const csVector3& lightCenter = light->GetPosition ();
-    const csBox3& lightBB = light->GetBoundingBox ();
 
     PortalRefArray::Iterator it = sourceSector->allPortals.GetIterator ();
     while (it.HasNext ())

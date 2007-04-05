@@ -117,6 +117,7 @@ namespace lighter
     inline void SetPosition (const csVector3& p)
     {
       position = p;
+      boundingSphere.SetCenter (p);
       lightFrustum.SetOrigin (p);
     }
 
@@ -140,9 +141,9 @@ namespace lighter
       memcpy (lightId.data, id, csMD5::Digest::DigestLen);
     }
 
-    inline const csBox3& GetBoundingBox () const 
+    inline const csSphere& GetBoundingSphere () const 
     {
-      return boundingBox;
+      return boundingSphere;
     }
 
     inline const csFrustum& GetFrustum () const
@@ -179,7 +180,7 @@ namespace lighter
     csVector3 position;
     csColor color;
     csMD5::Digest lightId;
-    csBox3 boundingBox;
+    csSphere boundingSphere;
 
     csFrustum lightFrustum;
 

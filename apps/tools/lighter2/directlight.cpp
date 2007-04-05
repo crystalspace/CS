@@ -522,7 +522,17 @@ namespace lighter
     csArray<PrimitiveArray>& submeshArray = obj->GetPrimitives ();
     const LightRefArray& allPDLights = sector->allPDLights;
 
+    LightRefArray PDLights;
     csArray<Lightmap*> pdLightLMs;
+
+    for (size_t pdli = 0; pdli < allPDLights.GetSize (); ++pdli)
+    {
+      Light* pdl = allPDLights[pdli];
+      if (pdl->GetBoundingSphere().TestIntersect (obj->GetBoundingSphere()))
+      {
+        PDLights.Push (pdl);
+      }
+    }
 
     for (size_t submesh = 0; submesh < submeshArray.GetSize (); ++submesh)
     {
@@ -544,10 +554,10 @@ namespace lighter
         ScopedSwapLock<Lightmap> lightLock (*normalLM);
 
         pdLightLMs.Empty ();
-        for (size_t pdli = 0; pdli < allPDLights.GetSize (); ++pdli)
+        for (size_t pdli = 0; pdli < PDLights.GetSize (); ++pdli)
         {
           Lightmap* lm = sector->scene->GetLightmap (prim.GetGlobalLightmapID (),
-            allPDLights[pdli]);
+            PDLights[pdli]);
 
           lm->Lock ();
           pdLightLMs.Push (lm);
@@ -592,24 +602,26 @@ namespace lighter
           normalLM->SetAddPixel (u, v, c * pixelArea);
 
           // Shade PD lights
-          for (size_t pdli = 0; pdli < allPDLights.GetSize (); ++pdli)
+          for (size_t pdli = 0; pdli < PDLights.GetSize (); ++pdli)
           {
+            Light* pdl = PDLights[pdli];
+
             csColor c;
             if (borderElement)
             {
               PartialElementIgnoreCallback callback (&prim);
               // Pass 1: collect inside hits
-              CollectShadowOneLight (sector, ep, allPDLights[pdli],
+              CollectShadowOneLight (sector, ep, pdl,
                 masterSampler, &callback);
-              //UniformShadeOneLight (sector, ep, allPDLights[pdli],
+              //UniformShadeOneLight (sector, ep, pdl,
                 //masterSampler, &callback);
               // Pass 2: "real" lighting
               callback.SetPass2 ();
-              c = UniformShadeOneLight (sector, ep, allPDLights[pdli],
+              c = UniformShadeOneLight (sector, ep, pdl,
                 masterSampler, &callback);
             }
             else
-              c = UniformShadeOneLight (sector, ep, allPDLights[pdli],
+              c = UniformShadeOneLight (sector, ep, pdl,
                 masterSampler, 0);
 
             Lightmap* lm = pdLightLMs[pdli];
@@ -618,7 +630,7 @@ namespace lighter
           }
           progress.Advance ();
         }
-        for (size_t pdli = 0; pdli < allPDLights.GetSize (); ++pdli)
+        for (size_t pdli = 0; pdli < PDLights.GetSize (); ++pdli)
         {
           pdLightLMs[pdli]->Unlock();
         }
@@ -630,9 +642,19 @@ namespace lighter
     SamplerSequence<2>& masterSampler, ProgressState& progress)
   {
     const LightRefArray& allPDLights = sector->allPDLights;
+    LightRefArray PDLights;
 
     Object::LitColorArray* litColors = obj->GetLitColors ();
     const ObjectVertexData& vdata = obj->GetVertexData ();
+
+    for (size_t pdli = 0; pdli < allPDLights.GetSize (); ++pdli)
+    {
+      Light* pdl = allPDLights[pdli];
+      if (pdl->GetBoundingSphere().TestIntersect (obj->GetBoundingSphere()))
+      {
+        PDLights.Push (pdl);
+      }
+    }
 
     for (size_t i = 0; i < vdata.positions.GetSize (); ++i)
     {
@@ -644,10 +666,11 @@ namespace lighter
       c = pvlPointShader (sector, pos, normal, masterSampler);
 
       // Shade PD lights
-      for (size_t pdli = 0; pdli < allPDLights.GetSize (); ++pdli)
+      for (size_t pdli = 0; pdli < PDLights.GetSize (); ++pdli)
       {
-        Object::LitColorArray* pdlColors = obj->GetLitColorsPD (allPDLights[pdli]);
-        pdlColors->Get (i) += UniformShadeOneLight (sector, pos, normal, allPDLights[pdli],
+        Light* pdl = PDLights[pdli];
+        Object::LitColorArray* pdlColors = obj->GetLitColorsPD (pdl);
+        pdlColors->Get (i) += UniformShadeOneLight (sector, pos, normal, pdl,
           masterSampler);
       }
       progress.Advance ();

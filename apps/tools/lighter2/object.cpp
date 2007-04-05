@@ -218,6 +218,7 @@ namespace lighter
     }
 
     factory.Invalidate();
+    ComputeBoundingSphere ();
 
     return true;
   }
@@ -427,6 +428,25 @@ namespace lighter
         }
       }
     }
+  }
+
+  void Object::ComputeBoundingSphere ()
+  {
+    if (vertexData.positions.GetSize() == 0)
+    {
+      bsphere.SetCenter (csVector3 (0));
+      bsphere.SetRadius (0);
+      return;
+    }
+
+    csBox3 bbox (vertexData.positions[0]);
+    for (size_t p = 1; p < vertexData.positions.GetSize(); p++)
+    {
+      bbox.AddBoundingVertexSmart (vertexData.positions[p]);
+    }
+
+    bsphere.SetCenter (bbox.GetCenter());
+    bsphere.SetRadius (sqrtf (bbox.SquaredPosMaxDist (bsphere.GetCenter())));
   }
 
   csString Object::GetFileName() const

@@ -176,8 +176,8 @@ namespace lighter
   void PointLight::SetRadius (float r)
   {
     radius = r;
-    //Update bb
-    boundingBox.SetSize (csVector3 (r));
+    //Update bs
+    boundingSphere.SetRadius (r);
   }
 
 

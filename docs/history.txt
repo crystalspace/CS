@@ -8,6 +8,8 @@ chronological order.
 
 5-Apr-2007
 	- res added csSphere::TestIntersect().
+	- res added a test to lighter2 to only compute lighting of PD lights
+	  that can really affect an object.
 4-Apr-2007
 	- Marten fixed the inertia calculation in odedynam (bug #279). This
 	  is a potentially behaviour changing fix so the old (broken) way
