@@ -10,6 +10,8 @@ chronological order.
 	- res added csSphere::TestIntersect().
 	- res added a test to lighter2 to only compute lighting of PD lights
 	  that can really affect an object.
+	- res fixed some more VC warnings.
+	- res converted odedynam to new SCF.
 4-Apr-2007
 	- Marten fixed the inertia calculation in odedynam (bug #279). This
 	  is a potentially behaviour changing fix so the old (broken) way

@@ -61,99 +61,19 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_IBASE (csODEDynamics)
-SCF_IMPLEMENTS_INTERFACE (iDynamics)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iODEDynamicState)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csODEDynamics::ODEDynamicState)
-SCF_IMPLEMENTS_INTERFACE (iODEDynamicState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csODEDynamics::Component)
-SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csODEDynamics::EventHandler)
-SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE_EXT (csODEDynamicSystem)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iDynamicSystem)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iODEDynamicSystemState);
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csODEDynamicSystem::DynamicSystem)
-SCF_IMPLEMENTS_INTERFACE (iDynamicSystem)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csODEDynamicSystem::ODEDynamicSystemState)
-SCF_IMPLEMENTS_INTERFACE (iODEDynamicSystemState)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csODEBodyGroup)
-SCF_IMPLEMENTS_INTERFACE (iBodyGroup)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE_EXT (csODERigidBody)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iRigidBody)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_IBASE (csODECollider)
-SCF_IMPLEMENTS_INTERFACE (iDynamicsSystemCollider)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csODERigidBody::RigidBody)
-SCF_IMPLEMENTS_INTERFACE (iRigidBody)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (ODEBallJoint)
-SCF_IMPLEMENTS_INTERFACE (iODEBallJoint)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (ODESliderJoint)
-SCF_IMPLEMENTS_INTERFACE (iODESliderJoint)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (ODEHingeJoint)
-SCF_IMPLEMENTS_INTERFACE (iODEHingeJoint)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (ODEHinge2Joint)
-SCF_IMPLEMENTS_INTERFACE (iODEHinge2Joint)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (ODEAMotorJoint)
-SCF_IMPLEMENTS_INTERFACE (iODEAMotorJoint)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (ODEUniversalJoint)
-SCF_IMPLEMENTS_INTERFACE (iODEUniversalJoint)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csODEDefaultMoveCallback)
-SCF_IMPLEMENTS_INTERFACE (iDynamicsMoveCallback)
-SCF_IMPLEMENT_IBASE_END
+CS_PLUGIN_NAMESPACE_BEGIN(odedynam)
+{
 
 SCF_IMPLEMENT_FACTORY (csODEDynamics)
 
-
-void DestroyGeoms( csGeomList & geoms );
-
+static void DestroyGeoms( csGeomList & geoms );
 
 int csODEDynamics::geomclassnum = 0;
 dJointGroupID csODEDynamics::contactjoints = dJointGroupCreate (0);
 
-csODEDynamics::csODEDynamics (iBase* parent)
+csODEDynamics::csODEDynamics (iBase* parent) : 
+  scfImplementationType (this, parent), object_reg (0), process_events (0)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiODEDynamicState);
-  object_reg = 0;
-  scfiEventHandler = 0;
-  process_events = false;
-
   // Initialize the colliders so that the class isn't overwritten
   dGeomID id = dCreateSphere (0, 1);
   dGeomDestroy (id);
@@ -189,9 +109,6 @@ csODEDynamics::~csODEDynamics ()
     if (q)
       q->RemoveListener (scfiEventHandler);
   }
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiODEDynamicState);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csODEDynamics::Initialize (iObjectRegistry* object_reg)
@@ -209,13 +126,12 @@ bool csODEDynamics::Initialize (iObjectRegistry* object_reg)
 
 csPtr<iDynamicSystem> csODEDynamics::CreateSystem ()
 {
-  csODEDynamicSystem* system = new csODEDynamicSystem (erp, cfm);
-  csRef<iDynamicSystem> isystem (scfQueryInterface<iDynamicSystem> (system));
-  systems.Push (isystem);
-  isystem->DecRef ();
+  csRef<csODEDynamicSystem> system;
+  system.AttachNew (new csODEDynamicSystem (erp, cfm));
+  systems.Push (system);
   if(stepfast) system->EnableStepFast(true);
   else if(quickstep) system->EnableQuickStep(true);
-  return csPtr<iDynamicSystem> (isystem);
+  return csPtr<iDynamicSystem> (system);
 }
 
 void csODEDynamics::RemoveSystem (iDynamicSystem* system)
@@ -336,17 +252,17 @@ void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
     /* there is only 1 actual body per set */
     if (b1)
     {
-      b1->Collision ((b2) ? &b2->scfiRigidBody : 0, pos, normal, depth);
+      b1->Collision (b2, pos, normal, depth);
       if (!b2)
         ((GeomData *)dGeomGetData (o2))->collider->Collision (
-		&b1->scfiRigidBody, pos, -normal, depth);
+		b1, pos, -normal, depth);
     }
     if (b2)
     {
-      b2->Collision ((b1) ? &b1->scfiRigidBody : 0, pos, -normal, depth);
+      b2->Collision (b1, pos, -normal, depth);
       if (!b1)
         ((GeomData *)dGeomGetData (o1))->collider->Collision (
-		&b2->scfiRigidBody, pos, normal, depth);
+		b2, pos, normal, depth);
     }
 
     for( int i=0; i<a; i++ )
@@ -529,11 +445,11 @@ bool csODEDynamics::HandleEvent (iEvent& Event)
   return false;
 }
 
-csODEDynamicSystem::csODEDynamicSystem (float erp, float cfm)
-{
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDynamicSystem);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiODEDynamicSystemState);
+//---------------------------------------------------------------------------
 
+csODEDynamicSystem::csODEDynamicSystem (float erp, float cfm) :
+  scfImplementationType (this)
+{
   //TODO: QUERY for collidesys
 
   worldID = dWorldCreate ();
@@ -569,18 +485,16 @@ csODEDynamicSystem::~csODEDynamicSystem ()
 
   dSpaceDestroy (spaceID);
   dWorldDestroy (worldID);
-
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiODEDynamicSystemState);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiDynamicSystem);
 }
 
 
 csPtr<iRigidBody> csODEDynamicSystem::CreateBody ()
 {
-  csODERigidBody* body = new csODERigidBody (this);
-  bodies.Push (&body->scfiRigidBody);
-  body->scfiRigidBody.SetMoveCallback(move_cb);
-  return &body->scfiRigidBody;
+  csRef<csODERigidBody> body;
+  body.AttachNew (new csODERigidBody (this));
+  bodies.Push (body);
+  body->SetMoveCallback(move_cb);
+  return csPtr<iRigidBody> (body);
 }
 
 
@@ -895,11 +809,11 @@ float csODEDynamicSystem::GetContactSurfaceLayer ()
   return dWorldGetContactSurfaceLayer(worldID);
 }
 
+//---------------------------------------------------------------------------
 
-csODEBodyGroup::csODEBodyGroup (csODEDynamicSystem* sys)
+csODEBodyGroup::csODEBodyGroup (csODEDynamicSystem* sys) : 
+  scfImplementationType (this), system (sys)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  system = sys;
 }
 
 csODEBodyGroup::~csODEBodyGroup ()
@@ -908,7 +822,6 @@ csODEBodyGroup::~csODEBodyGroup ()
   {
     ((csODERigidBody *)(iRigidBody*)bodies[i])->UnsetGroup ();
   }
-  SCF_DESTRUCT_IBASE();
 }
 
 void csODEBodyGroup::AddBody (iRigidBody *body)
@@ -929,9 +842,9 @@ bool csODEBodyGroup::BodyInGroup (iRigidBody *body)
 }
 
 //--------------------------csODECollider-------------------------------------
-csODECollider::csODECollider (ColliderContainer* container)
+
+csODECollider::csODECollider (ColliderContainer* container) : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   surfacedata[0] = 0;
   surfacedata[1] = 0;
   surfacedata[2] = 0;
@@ -968,7 +881,6 @@ void csODECollider::KillGeoms ()
 csODECollider::~csODECollider ()
 {
   KillGeoms ();
-  SCF_DESTRUCT_IBASE();
 }
 
 void csODECollider::MakeStatic ()
@@ -1439,13 +1351,12 @@ void csODECollider::FillWithColliderGeometry (csRef<iGeneralFactoryState> genmes
     break;
   }
 }
+
 //--------------------------csODERigidBody-------------------------------------
-csODERigidBody::csODERigidBody (csODEDynamicSystem* sys)
+
+csODERigidBody::csODERigidBody (csODEDynamicSystem* sys) : 
+  scfImplementationType (this), dynsys (sys)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRigidBody);
-
-  dynsys = sys;
-
   bodyID = dBodyCreate (dynsys->GetWorldID());
   dBodySetData (bodyID, this);
   groupID = dSimpleSpaceCreate (dynsys->GetSpaceID ());
@@ -1458,12 +1369,10 @@ csODERigidBody::~csODERigidBody ()
   colliders.DeleteAll ();
   dSpaceDestroy (groupID);
   dBodyDestroy (bodyID);
-
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiRigidBody);
 }
 
 
-void DestroyGeoms( csGeomList & geoms )
+static void DestroyGeoms( csGeomList & geoms )
 {
   dGeomID tempID;
   size_t i=0;
@@ -1533,7 +1442,7 @@ void csODERigidBody::SetGroup(iBodyGroup *group)
 {
   if (collision_group)
   {
-    collision_group->RemoveBody (&scfiRigidBody);
+    collision_group->RemoveBody (this);
   }
   collision_group = group;
 }
@@ -1872,7 +1781,7 @@ void csODERigidBody::SetCollisionCallback (iDynamicsCollisionCallback* cb)
 void csODERigidBody::Collision (iRigidBody *other,
     const csVector3& pos, const csVector3& normal, float depth)
 {
-  if (coll_cb) coll_cb->Execute (&scfiRigidBody, other,
+  if (coll_cb) coll_cb->Execute (this, other,
       pos, normal, depth);
 }
 
@@ -1913,6 +1822,7 @@ void csODERigidBody::RecalculateFullInertia (csODECollider* thisCol)
 }
 
 //-----------------------csStrictODEJoint-------------------------------------
+
 void csStrictODEJoint::Attach (iRigidBody *b1, iRigidBody *b2)
 {
   if (b1)
@@ -2206,14 +2116,13 @@ csVector3 csStrictODEJoint::GetFeedbackTorque2 ()
 }
 
 //-------------------------------------------------------------------------------
-ODESliderJoint::ODESliderJoint (dWorldID w_id)
+
+ODESliderJoint::ODESliderJoint (dWorldID w_id) : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   jointID = dJointCreateSlider (w_id, 0);
 }
 ODESliderJoint::~ODESliderJoint ()
 {
-  SCF_DESTRUCT_IBASE();
   dJointDestroy (jointID);
 }
 csVector3 ODESliderJoint::GetSliderAxis ()
@@ -2222,15 +2131,15 @@ csVector3 ODESliderJoint::GetSliderAxis ()
   dJointGetSliderAxis (jointID, pos);
   return csVector3 (pos[0], pos[1], pos[2]);
 }
+
 //-------------------------------------------------------------------------------
-ODEUniversalJoint::ODEUniversalJoint (dWorldID w_id)
+
+ODEUniversalJoint::ODEUniversalJoint (dWorldID w_id) : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   jointID = dJointCreateUniversal (w_id, 0);
 }
 ODEUniversalJoint::~ODEUniversalJoint ()
 {
-  SCF_DESTRUCT_IBASE();
   dJointDestroy (jointID);
 }
 csVector3 ODEUniversalJoint::GetUniversalAnchor1 ()
@@ -2257,17 +2166,16 @@ csVector3 ODEUniversalJoint::GetUniversalAxis2 ()
   dJointGetUniversalAxis2 (jointID, pos);
   return csVector3 (pos[0], pos[1], pos[2]);
 }
+
 //-------------------------------------------------------------------------------
 
-ODEAMotorJoint::ODEAMotorJoint (dWorldID w_id)
+ODEAMotorJoint::ODEAMotorJoint (dWorldID w_id) : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   jointID = dJointCreateAMotor (w_id, 0);
 }
 
 ODEAMotorJoint::~ODEAMotorJoint ()
 {
-  SCF_DESTRUCT_IBASE();
   dJointDestroy (jointID);
 }
 
@@ -2301,15 +2209,13 @@ csVector3 ODEAMotorJoint::GetAMotorAxis (int axis_num)
 }
 //-------------------------------------------------------------------------------
 
-ODEHinge2Joint::ODEHinge2Joint (dWorldID w_id)
+ODEHinge2Joint::ODEHinge2Joint (dWorldID w_id) : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   jointID = dJointCreateHinge2 (w_id, 0);
 }
 
 ODEHinge2Joint::~ODEHinge2Joint ()
 {
-  SCF_DESTRUCT_IBASE();
   dJointDestroy (jointID);
 }
 
@@ -2356,15 +2262,13 @@ csVector3 ODEHinge2Joint::GetAnchorError ()
 
 //-------------------------------------------------------------------------------
 
-ODEHingeJoint::ODEHingeJoint (dWorldID w_id)
+ODEHingeJoint::ODEHingeJoint (dWorldID w_id) : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   jointID = dJointCreateHinge (w_id, 0);
 }
 
 ODEHingeJoint::~ODEHingeJoint ()
 {
-  SCF_DESTRUCT_IBASE();
   dJointDestroy (jointID);
 }
 
@@ -2404,15 +2308,13 @@ csVector3 ODEHingeJoint::GetAnchorError ()
 
 //-------------------------------------------------------------------------------
 
-ODEBallJoint::ODEBallJoint (dWorldID w_id)
+ODEBallJoint::ODEBallJoint (dWorldID w_id) : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
   jointID = dJointCreateBall (w_id, 0);
 }
 
 ODEBallJoint::~ODEBallJoint ()
 {
-  SCF_DESTRUCT_IBASE();
   dJointDestroy (jointID);
 }
 
@@ -2854,14 +2756,13 @@ csVector3 csODEJoint::GetParam (int parameter)
   //}
 }
 
-csODEDefaultMoveCallback::csODEDefaultMoveCallback ()
+csODEDefaultMoveCallback::csODEDefaultMoveCallback () : 
+  scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
 }
 
 csODEDefaultMoveCallback::~csODEDefaultMoveCallback ()
 {
-  SCF_DESTRUCT_IBASE();
 }
 
 void csODEDefaultMoveCallback::Execute (iMovable* movable,
@@ -2909,3 +2810,5 @@ void csODEDefaultMoveCallback::Execute (csOrthoTransform& /*t*/)
   /* do nothing by default */
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(odedynam)

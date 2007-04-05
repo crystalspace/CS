@@ -337,8 +337,6 @@ struct iDynamicsCollisionCallback : public iBase
       const csVector3& pos, const csVector3& normal, float depth) = 0;
 };
 
-SCF_VERSION (iBodyGroup, 0, 0, 1);
-
 /**
  * Body Group is a collection of bodies which don't collide with
  * each other.  This can speed up processing by manually avoiding
@@ -355,14 +353,16 @@ SCF_VERSION (iBodyGroup, 0, 0, 1);
  * Main users of this interface:
  * - iDynamicSystem
  */
-struct iBodyGroup : public iBase
+struct iBodyGroup : public virtual iBase
 {
-   /// Adds a body to this group
-   virtual void AddBody (iRigidBody *body) = 0;
-   /// Removes a body from this group
-   virtual void RemoveBody (iRigidBody *body) = 0;
-   /// Tells whether the body is in this group or not
-   virtual bool BodyInGroup (iRigidBody *body) = 0;
+  SCF_INTERFACE (iBodyGroup, 0, 1, 0);
+
+  /// Adds a body to this group
+  virtual void AddBody (iRigidBody *body) = 0;
+  /// Removes a body from this group
+  virtual void RemoveBody (iRigidBody *body) = 0;
+  /// Tells whether the body is in this group or not
+  virtual bool BodyInGroup (iRigidBody *body) = 0;
 };
 
 /**
