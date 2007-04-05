@@ -29,10 +29,12 @@
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
 #include "csgeom/math3d.h"
+#include "csgfx/trianglestream.h"
 #include "cstool/collider.h"
 #include "cstool/csview.h"
-#include "cstool/uberscreenshot.h"
 #include "cstool/enginetools.h"
+#include "cstool/rbuflock.h"
+#include "cstool/uberscreenshot.h"
 #include "csutil/cscolor.h"
 #include "csutil/csuctransform.h"
 #include "csutil/event.h"
@@ -44,6 +46,7 @@
 #include "csutil/scf.h"
 #include "csutil/snprintf.h"
 #include "csutil/sysfunc.h"
+
 #include "iengine/camera.h"
 #include "iengine/engine.h"
 #include "iengine/light.h"
@@ -83,6 +86,7 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/material.h"
+#include "ivideo/rendermesh.h"
 #include "ivideo/txtmgr.h"
 
 #include "bugplug.h"
@@ -311,10 +315,10 @@ void csBugPlug::SelectMesh (iSector* sector, const char* meshname)
   {
     Report (CS_REPORTER_SEVERITY_NOTIFY,
         "Selecting %d mesh(es).", cnt);
-    bool bbox, rad;
-    shadow->GetShowOptions (bbox, rad);
+    bool bbox, rad, norm;
+    shadow->GetShowOptions (bbox, rad, norm);
 
-    if (bbox || rad || show_polymesh != BUGPLUG_POLYMESH_NO)
+    if (bbox || rad || norm || show_polymesh != BUGPLUG_POLYMESH_NO)
       shadow->AddToEngine (Engine);
     else
       shadow->RemoveFromEngine (Engine);
@@ -496,10 +500,10 @@ void csBugPlug::MouseButtonLeft (iCamera* camera)
     const char* n = sel->QueryObject ()->GetName ();
     Report (CS_REPORTER_SEVERITY_NOTIFY, "BugPlug found mesh '%s'!",
       	n ? n : "<noname>");
-    bool bbox, rad;
-    shadow->GetShowOptions (bbox, rad);
+    bool bbox, rad, norm;
+    shadow->GetShowOptions (bbox, rad, norm);
 
-    if (bbox || rad || show_polymesh != BUGPLUG_POLYMESH_NO)
+    if (bbox || rad || norm || show_polymesh != BUGPLUG_POLYMESH_NO)
       shadow->AddToEngine (Engine);
     else
       shadow->RemoveFromEngine (Engine);
@@ -824,36 +828,52 @@ bool csBugPlug::ExecCommand (int cmd, const csString& args)
 	}
       break;
     case DEBUGCMD_MESHBBOX:
-	{
-	  bool bbox, rad;
-	  shadow->GetShowOptions (bbox, rad);
+      {
+        bool bbox, rad, norm;
+        shadow->GetShowOptions (bbox, rad, norm);
         bbox = !bbox;
-	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+        Report (CS_REPORTER_SEVERITY_NOTIFY,
 	    	"BugPlug %s bounding box display.",
 		bbox ? "enabled" : "disabled");
-	  shadow->SetShowOptions (bbox, rad);
-	  if ((bbox || rad || show_polymesh != BUGPLUG_POLYMESH_NO)
-			  && HasSelectedMeshes ())
-	    shadow->AddToEngine (Engine);
-	  else
-	    shadow->RemoveFromEngine (Engine);
-	}
+        shadow->SetShowOptions (bbox, rad, norm);
+        if ((bbox || rad || norm || show_polymesh != BUGPLUG_POLYMESH_NO)
+    	  && HasSelectedMeshes ())
+          shadow->AddToEngine (Engine);
+        else
+          shadow->RemoveFromEngine (Engine);
+      }
       break;
     case DEBUGCMD_MESHRAD:
       {
-	  bool bbox, rad;
-	  shadow->GetShowOptions (bbox, rad);
+	bool bbox, rad, norm;
+	shadow->GetShowOptions (bbox, rad, norm);
         rad = !rad;
-	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
 	    	"BugPlug %s bounding sphere display.",
 		rad ? "enabled" : "disabled");
-	  shadow->SetShowOptions (bbox, rad);
-	  if ((bbox || rad || show_polymesh != BUGPLUG_POLYMESH_NO)
-			  && HasSelectedMeshes ())
-	    shadow->AddToEngine (Engine);
-	  else
-	    shadow->RemoveFromEngine (Engine);
-	}
+	shadow->SetShowOptions (bbox, rad, norm);
+	if ((bbox || rad || norm || show_polymesh != BUGPLUG_POLYMESH_NO)
+	  && HasSelectedMeshes ())
+	  shadow->AddToEngine (Engine);
+	else
+	  shadow->RemoveFromEngine (Engine);
+      }
+      break;
+    case DEBUGCMD_MESHNORM:
+      {
+	bool bbox, rad, norm;
+	shadow->GetShowOptions (bbox, rad, norm);
+        norm = !norm;
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug %s normals display.",
+		norm ? "enabled" : "disabled");
+	shadow->SetShowOptions (bbox, rad, norm);
+	if ((bbox || rad || norm || show_polymesh != BUGPLUG_POLYMESH_NO)
+	  && HasSelectedMeshes ())
+	  shadow->AddToEngine (Engine);
+	else
+	  shadow->RemoveFromEngine (Engine);
+      }
       break;
     case DEBUGCMD_DEBUGVIEW:
 	SwitchDebugView ();
@@ -1468,7 +1488,7 @@ bool csBugPlug::HandleStartFrame (iEvent& /*event*/)
   SetupPlugin ();
   if (!G3D) return false;
 
-  if (shadow) shadow->ClearCamera ();
+  if (shadow) shadow->ClearView ();
   
   if (do_clear)
   {
@@ -1584,15 +1604,16 @@ bool csBugPlug::HandleFrame (iEvent& /*event*/)
     }
   }
 
-  if (HasSelectedMeshes () && shadow && shadow->GetCamera () &&
+  if (HasSelectedMeshes () && shadow && shadow->GetView () &&
 		  !debug_view.show && !debug_sector.show)
   {
     size_t k;
-    iCamera* cam = shadow->GetCamera ();
+    iRenderView* rview = shadow->GetView();
+    iCamera* cam = rview->GetOriginalCamera();
     csTransform tr_w2c = cam->GetTransform ();
     float fov = G3D->GetPerspectiveAspect ();
-    bool do_bbox, do_rad;
-    shadow->GetShowOptions (do_bbox, do_rad);
+    bool do_bbox, do_rad, do_norm;
+    shadow->GetShowOptions (do_bbox, do_rad, do_norm);
     G3D->BeginDraw (CSDRAW_2DGRAPHICS);
     for (k = 0 ; k < selected_meshes.GetSize () ; k++)
     {
@@ -1639,6 +1660,50 @@ bool csBugPlug::HandleFrame (iEvent& /*event*/)
         G3D->DrawLine (trans_o-r, trans_o+r, fov, rad_color);
         r.Set (0, 0, radius);
         G3D->DrawLine (trans_o-r, trans_o+r, fov, rad_color);
+      }
+      if (do_norm)
+      {
+        int norm_color = G3D->GetDriver2D ()->FindRGB (0, 0, 255);
+        int denorm_color = G3D->GetDriver2D ()->FindRGB (128, 0, 255);
+        int num;
+        
+        csRenderMesh** rmeshes = 
+          selected_meshes[k]->GetMeshObject()->GetRenderMeshes (num, rview, 
+            selected_meshes[k]->GetMovable(), ~0/*frustum_mask*/);
+        if (rmeshes != 0)
+        {
+          for (int n = 0; n < num; n++)
+          {
+            iRenderBuffer* bufPos = rmeshes[n]->buffers->GetRenderBuffer (
+              CS_BUFFER_POSITION);
+            iRenderBuffer* bufNorm = rmeshes[n]->buffers->GetRenderBuffer (
+              CS_BUFFER_NORMAL);
+            iRenderBuffer* bufIndex = rmeshes[n]->buffers->GetRenderBuffer (
+              CS_BUFFER_INDEX);
+            if (!bufPos || !bufNorm || !bufIndex) continue;
+
+            // @@@ FIXME: Handle other component types.
+            csRenderBufferLock<csVector3> positions (bufPos, CS_BUF_LOCK_READ);
+            csRenderBufferLock<csVector3> normals (bufNorm, CS_BUF_LOCK_READ);
+
+            CS::TriangleIndicesStream<size_t> tris (bufIndex, rmeshes[n]->meshtype,
+              rmeshes[n]->indexstart, rmeshes[n]->indexend);
+            while (tris.HasNext())
+            {
+              CS::TriangleT<size_t> tri = tris.Next();
+              for (int t = 0; t < 3; t++)
+              {
+                csVector3 p = tr_o2c.Other2This (positions[tri[t]]);
+                csVector3 n = tr_o2c.Other2ThisRelative (normals[tri[t]]);
+                int color = 
+                  (fabsf (n.Norm() - 1.0f) < EPSILON) ? norm_color : denorm_color;
+                // @@@ FIXME: Should perhaps be configurable
+                const float normScale = 0.5f; 
+                G3D->DrawLine (p, p+n*normScale, fov, color);
+              }
+            }
+          }
+        }
       }
       if (show_polymesh != BUGPLUG_POLYMESH_NO)
       {
@@ -1796,6 +1861,7 @@ bool csBugPlug::HandleSystemOpen (iEvent* /*event*/)
 bool csBugPlug::HandleSystemClose (iEvent* /*event*/)
 {
   fnt = 0;
+  shadow->RemoveFromEngine (Engine);
   return false;
 }
 
@@ -2041,6 +2107,7 @@ int csBugPlug::GetCommandCode (const char* cmdstr, csString& args)
   if (!strcmp (cmd, "prof_log"))	return DEBUGCMD_PROFTOGGLELOG;
   if (!strcmp (cmd, "prof_autoreset"))	return DEBUGCMD_PROFAUTORESET;
   if (!strcmp (cmd, "uberscreenshot"))	return DEBUGCMD_UBERSCREENSHOT;
+  if (!strcmp (cmd, "meshnorm"))	return DEBUGCMD_MESHNORM;
 
   return DEBUGCMD_UNKNOWN;
 }

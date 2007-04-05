@@ -55,8 +55,9 @@ private:
   iMeshWrapper* wrap;
   bool do_bbox;	// Show bounding box.
   bool do_rad;	// Show bounding sphere.
+  bool do_normals; // Show normals
   csFlags flags;
-  iCamera* keep_camera;
+  csRef<iRenderView> keep_view;
   csBox3 bbox;
 
 public:
@@ -67,12 +68,12 @@ public:
   /**
    * Get renderview found when rendering the shadow mesh.
    */
-  iCamera* GetCamera () const { return keep_camera; }
+  iRenderView* GetView () const { return keep_view; }
 
   /**
    * Clear renderview.
    */
-  void ClearCamera () { keep_camera = 0; }
+  void ClearView () { keep_view = 0; }
 
   /**
    * Add Shadow to the engine.
@@ -87,19 +88,21 @@ public:
   /**
    * Set what we are showing.
    */
-  void SetShowOptions (bool bbox, bool rad)
+  void SetShowOptions (bool bbox, bool rad, bool norm)
   {
     do_bbox = bbox;
     do_rad = rad;
+    do_normals = norm;
   }
 
   /**
    * Get what we are showing.
    */
-  void GetShowOptions (bool& bbox, bool& rad) const
+  void GetShowOptions (bool& bbox, bool& rad, bool& norm) const
   {
     bbox = do_bbox;
     rad = do_rad;
+    norm = do_normals;
   }
 
   void GetObjectBoundingBox (csBox3& bbox)

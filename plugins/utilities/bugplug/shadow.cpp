@@ -29,7 +29,7 @@
 #include "ivideo/graph2d.h"
 
 csShadow::csShadow () :
-  scfImplementationType(this)
+  scfImplementationType(this), do_normals (false)
 {
   wrap = 0;
   do_bbox = true;
@@ -45,7 +45,7 @@ csShadow::~csShadow ()
 csRenderMesh** csShadow::GetRenderMeshes (int& n, iRenderView* rview,
     iMovable*, uint32)
 {
-  keep_camera = rview->GetOriginalCamera ();
+  keep_view = rview;
   n = 0;
   return 0;
 }

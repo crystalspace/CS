@@ -20,6 +20,7 @@ chronological order.
 	- res made the renderview the engine uses for drawing properly 
 	  ref-counted and not stack-allocated, so it can be used after 
 	  drawing is finished. (Relevant for bugplug.)
+	- res added normals drawing to bugplug.
 4-Apr-2007
 	- Marten fixed the inertia calculation in odedynam (bug #279). This
 	  is a potentially behaviour changing fix so the old (broken) way
