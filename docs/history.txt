@@ -12,6 +12,11 @@ chronological order.
 	  that can really affect an object.
 	- res fixed some more VC warnings.
 	- res converted odedynam to new SCF.
+	- Jorrit added IsTriangleDataSet() and ResetTriangleData() to
+	  iObjectModel. That way you can now distinguish between explicit
+	  set of null triangle data as opposed to triangle data not
+	  being set at all. In the last case a subsystem (like collision
+	  detection) may chose to use the base mesh as a fallback.
 4-Apr-2007
 	- Marten fixed the inertia calculation in odedynam (bug #279). This
 	  is a potentially behaviour changing fix so the old (broken) way

@@ -29,3 +29,13 @@ void csObjectModel::SetTriangleData (csStringID id, iTriangleMesh* tridata)
   trimesh.Put (id, tridata);
 }
 
+bool csObjectModel::IsTriangleDataSet (csStringID id)
+{
+  return trimesh.Contains (id);
+}
+
+void csObjectModel::ResetTriangleData (csStringID id)
+{
+  trimesh.DeleteAll (id);
+}
+

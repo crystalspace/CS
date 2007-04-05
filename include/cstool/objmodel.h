@@ -109,6 +109,8 @@ public:
   virtual long GetShapeNumber () const { return shapenr; }
   virtual iTriangleMesh* GetTriangleData (csStringID);
   virtual void SetTriangleData (csStringID, iTriangleMesh*);
+  virtual bool IsTriangleDataSet (csStringID);
+  virtual void ResetTriangleData (csStringID);
 
   virtual iPolygonMesh* GetPolygonMeshBase () { return polymesh_base; }
   virtual iPolygonMesh* GetPolygonMeshColldet () { return polymesh_colldet; }

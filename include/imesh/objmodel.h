@@ -81,12 +81,21 @@ struct iObjectModel : public virtual iBase
   /**
    * Get a triangle mesh representing the geometry of the object.
    * The ID indicates the type of mesh that is desired. Use the
-   * string registry to convert the ID string to a csStringID identification.
-   * Some common possibilities are:
+   * string registry (iStringSet from object registry with tag
+   * 'crystalspace.shared.stringset') to convert the ID string to a
+   * csStringID identification. Some common possibilities are:
    * - 'crystalspace.trianglemesh.base'
    * - 'crystalspace.trianglemesh.colldet'
    * - 'crystalspace.trianglemesh.viscull'
    * - 'crystalspace.trianglemesh.shadows'
+   * \return the triangle mesh for that id. If this is 0 then there
+   * are two possibilities: either the mesh was never set and in this
+   * case the subsystem can pick the base mesh as a fallback. Another
+   * possibility is that the triangle data was explicitelly cleared
+   * with SetTriangleData(id,0). In that case the mesh is assumed to
+   * be empty and usually that means that the specific subsystem will
+   * ignore it. To distinguish between these two cases use
+   * IsTriangleDataSet(id).
    */
   virtual iTriangleMesh* GetTriangleData (csStringID id) = 0;
 
@@ -95,8 +104,32 @@ struct iObjectModel : public virtual iBase
    * The ID indicates the type of mesh that you want to change. Note that
    * the base mesh (ID equal to 'crystalspace.trianglemesh.base')
    * cannot be modified.
+   * \param id is a numer id you can fetch from the string registry
+   *        (iStringSet from object registry with tag\
+   *        'crystalspace.shared.stringset').
+   * \param trimesh is the new mesh. The reference count will be increased.
+   *        If you pass in 0 here then this means that the mesh for this
+   *        specific ID is disabled. If you want to reset this then
+   *        call ResetTriangleData(id). When no mesh is set or
+   *        ResetTriangleData() is called many subsystems will use
+   *        the base mesh instead. However if you set 0 here then this
+   *        means that this mesh is disabled.
    */
   virtual void SetTriangleData (csStringID id, iTriangleMesh* trimesh) = 0;
+
+  /**
+   * Return true if the triangle data was set for this id. This can
+   * be used to distinguish between an empty mesh as set with
+   * SetTriangleData() or SetTriangleData() not being called at all.
+   * Calling ResetTriangleData() will clear this.
+   */
+  virtual bool IsTriangleDataSet (csStringID id) = 0;
+
+  /**
+   * Reset triangle data. After calling this it is as if the triangle
+   * data was never set.
+   */
+  virtual void ResetTriangleData (csStringID id) = 0;
 
   /**
    * Get a polygon mesh representing the basic geometry of the object.
