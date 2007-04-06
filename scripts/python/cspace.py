@@ -973,6 +973,7 @@ class csSphere(_object):
     def SetRadius(*args): return _cspace.csSphere_SetRadius(*args)
     def Union(*args): return _cspace.csSphere_Union(*args)
     def __iadd__(*args): return _cspace.csSphere___iadd__(*args)
+    def TestIntersect(*args): return _cspace.csSphere_TestIntersect(*args)
     def __imul__(*args): return _cspace.csSphere___imul__(*args)
     def __div__(*args): return _cspace.csSphere___div__(*args)
     __swig_destroy__ = _cspace.delete_csSphere
@@ -2515,6 +2516,8 @@ class iObjectModel(iBase):
     def GetShapeNumber(*args): return _cspace.iObjectModel_GetShapeNumber(*args)
     def GetTriangleData(*args): return _cspace.iObjectModel_GetTriangleData(*args)
     def SetTriangleData(*args): return _cspace.iObjectModel_SetTriangleData(*args)
+    def IsTriangleDataSet(*args): return _cspace.iObjectModel_IsTriangleDataSet(*args)
+    def ResetTriangleData(*args): return _cspace.iObjectModel_ResetTriangleData(*args)
     def GetPolygonMeshBase(*args): return _cspace.iObjectModel_GetPolygonMeshBase(*args)
     def GetPolygonMeshColldet(*args): return _cspace.iObjectModel_GetPolygonMeshColldet(*args)
     def GetTerraFormerColldet(*args): return _cspace.iObjectModel_GetTerraFormerColldet(*args)

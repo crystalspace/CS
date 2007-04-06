@@ -1735,6 +1735,7 @@ sub new {
 *SetRadius = *cspacec::csSphere_SetRadius;
 *Union = *cspacec::csSphere_Union;
 *__add_ass__ = *cspacec::csSphere___add_ass__;
+*TestIntersect = *cspacec::csSphere_TestIntersect;
 *__mult_ass__ = *cspacec::csSphere___mult_ass__;
 *__div__ = *cspacec::csSphere___div__;
 sub DESTROY {
@@ -3946,6 +3947,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetShapeNumber = *cspacec::iObjectModel_GetShapeNumber;
 *GetTriangleData = *cspacec::iObjectModel_GetTriangleData;
 *SetTriangleData = *cspacec::iObjectModel_SetTriangleData;
+*IsTriangleDataSet = *cspacec::iObjectModel_IsTriangleDataSet;
+*ResetTriangleData = *cspacec::iObjectModel_ResetTriangleData;
 *GetPolygonMeshBase = *cspacec::iObjectModel_GetPolygonMeshBase;
 *GetPolygonMeshColldet = *cspacec::iObjectModel_GetPolygonMeshColldet;
 *GetTerraFormerColldet = *cspacec::iObjectModel_GetTerraFormerColldet;
