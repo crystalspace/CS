@@ -34,6 +34,7 @@
 #include "csgeom/matrix3.h"
 #include "csgeom/vector3.h"
 #include "csgeom/box.h"
+#include "csgeom/tri.h"
 #include "csutil/scf_implementation.h"
 #include "ivaria/collider.h"
 #include "Opcode.h"
@@ -45,6 +46,7 @@ class csCdBBox;
 struct csCdTriangle;
 struct csCollisionPair;
 struct iPolygonMesh;
+struct iTriangleMesh;
 class PathPolygonMesh;
 
 CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
@@ -66,13 +68,18 @@ public:
   float radius;
 
 private:
+  void GeometryInitialize (csVector3* vertices, size_t vertcount,
+      csTriangle* triangles, size_t tri_count);
   void GeometryInitialize (iPolygonMesh *mesh);
+  void GeometryInitialize (iTriangleMesh *mesh);
 
   static void MeshCallback (udword triangle_index, 
     Opcode::VertexPointers& triangle, void* user_data);
 public:
   /// Create a collider based on geometry.
   csOPCODECollider (iPolygonMesh* mesh);
+  /// Create a collider based on geometry.
+  csOPCODECollider (iTriangleMesh* mesh);
 
   /// Destroy the RAPID collider object
   virtual ~csOPCODECollider ();

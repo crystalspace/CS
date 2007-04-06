@@ -221,6 +221,53 @@ public:
   virtual uint32 GetChangeNumber () const { return change_nr; }
 };
 
+/**
+ * A convenience triangle mesh which takes vertex and triangle
+ * pointers from another source. Take care of object life time
+ * when using this class; i.e. make sure the real owner of the
+ * vertex and triangle data is not destroyed at a time when
+ * this class is still in use.
+ */
+class CS_CRYSTALSPACE_EXPORT csTriangleMeshPointer :
+  public virtual scfImplementation1<csTriangleMeshPointer,iTriangleMesh>
+{
+private:
+  csVector3* vertices;
+  size_t num_vertices;
+  csTriangle* triangles;
+  size_t num_triangles;
+  uint32 change_nr;
+  csFlags flags;
+
+public:
+  /**
+   * Construct a triangle mesh.
+   */
+  csTriangleMeshPointer (csVector3* vertices, size_t num_vertices,
+      csTriangle* triangles, size_t num_triangles)
+    : scfImplementationType(this)
+  {
+    change_nr = 0;
+    csTriangleMeshPointer::vertices = vertices;
+    csTriangleMeshPointer::num_vertices = num_vertices;
+    csTriangleMeshPointer::triangles = triangles;
+    csTriangleMeshPointer::num_triangles = num_triangles;
+  }
+
+  virtual ~csTriangleMeshPointer ()
+  {
+  }
+
+  virtual size_t GetVertexCount () { return num_vertices; }
+  virtual csVector3* GetVertices () { return vertices; }
+  virtual size_t GetTriangleCount () { return num_triangles; }
+  virtual csTriangle* GetTriangles () { return triangles; }
+  virtual void Lock () { }
+  virtual void Unlock () { }
+  virtual csFlags& GetFlags () { return flags; }
+  virtual uint32 GetChangeNumber () const { return change_nr; }
+};
+
 
 /** @} */
 

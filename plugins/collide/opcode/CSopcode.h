@@ -72,6 +72,7 @@ public:
   csArray<int> collision_faces;
   csArray<csIntersectingTriangle> intersecting_triangles;
   iObjectRegistry *object_reg;
+  csStringID trianglemesh_id;
  
   static iObjectRegistry* rep_object_reg;
   static void OpcodeReportV (int severity, const char* message, 
@@ -85,9 +86,13 @@ public:
   // to 'pairs'.
   void CopyCollisionPairs (csOPCODECollider* col1, csOPCODECollider* col2);
 
-  void CopyCollisionPairs (csOPCODECollider* col2, csTerraFormerCollider* terraformer);
+  void CopyCollisionPairs (csOPCODECollider* col2,
+      csTerraFormerCollider* terraformer);
+
+  virtual csStringID GetTriangleDataID () { return trianglemesh_id; }
 
   virtual csPtr<iCollider> CreateCollider (iPolygonMesh* mesh);
+  virtual csPtr<iCollider> CreateCollider (iTriangleMesh* mesh);
   virtual csPtr<iCollider> CreateCollider (iTerraFormer* mesh);
   virtual csPtr<iCollider> CreateCollider (iTerrainSystem* mesh);
 

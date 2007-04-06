@@ -33,6 +33,8 @@
 #include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/hash.h"
+#include "iutil/strset.h"
+#include "iutil/objreg.h"
 #include "imesh/objmodel.h"
 #include "igeom/polymesh.h"
 #include "igeom/trimesh.h"
@@ -70,6 +72,26 @@ public:
   }
 
   virtual ~csObjectModel () {}
+
+  /**
+   * Conveniance method to fetch the standard string registry from the
+   * object registry.
+   */
+  csRef<iStringSet> GetStandardStringSet (iObjectRegistry* object_reg)
+  {
+    return csQueryRegistryTagInterface<iStringSet> (object_reg,
+	"crystalspace.shared.stringset");
+  }
+
+  /**
+   * Conveniance method to fetch the base string ID given the object
+   * registry.
+   */
+  csStringID GetBaseID (iObjectRegistry* object_reg)
+  {
+    csRef<iStringSet> strings = GetStandardStringSet (object_reg);
+    return strings->Request ("crystalspace.trianglemesh.base");
+  }
 
   /**
    * Set the pointer to the base polygon mesh.

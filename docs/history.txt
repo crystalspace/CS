@@ -6,6 +6,28 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Apr-2007
+	- Jorrit did several changes for iTriangleMesh:
+	    - Added csTriangleMeshPointer class. This is an implementation
+	      of iTriangleMesh that takes pointers to the vertex and triangle
+	      data.
+	    - Added some conveniance methods to csObjectModel to fetch
+	      the standard string set and also fetch the base trianglemesh id.
+	    - Converted the protomesh as a first test case for using the
+	      new iTriangleMesh.
+	    - Extended iCollideSystem to support the new iTriangleMesh (and
+	      deprecated the iPolygonMesh version). Extended the Opcode
+	      plugin to handle iTriangleMesh.
+	    - Changed csColliderWrapper to also work with the new
+	      iTriangleMesh and deprecated the iPolygonMesh versions.
+	    - Added iCollideSystem->GetTriangleDataID() so that it is easier
+	      to fetch the 'crystalspace.trianglemesh.colldet' id that
+	      is used to fetch the triangle data from iObjectModel. This
+	      also solves the problem that some collider classes (like
+	      csColliderHelper) don't have access to the object registry
+	      and are thus incapable of fetching that id on their own.
+	    - Changed csColliderHelper so it first checks if the object
+	      supports iTriangleMesh and in that case it will use that.
 5-Apr-2007
 	- res added csSphere::TestIntersect().
 	- res added a test to lighter2 to only compute lighting of PD lights

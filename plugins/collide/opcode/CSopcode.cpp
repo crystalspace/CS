@@ -99,7 +99,17 @@ bool csOPCODECollideSystem::Initialize (iObjectRegistry* iobject_reg)
 {
   object_reg = iobject_reg;
   rep_object_reg = object_reg;
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+      object_reg, "crystalspace.shared.stringset");
+  trianglemesh_id = strings->Request ("crystalspace.trianglemesh.colldet");
   return true;
+}
+
+csPtr<iCollider> csOPCODECollideSystem::CreateCollider (iTriangleMesh* mesh)
+{
+  csOPCODECollider* col = new csOPCODECollider (mesh);
+  // here we must store the caches (and the trees)?
+  return csPtr<iCollider> (col);
 }
 
 csPtr<iCollider> csOPCODECollideSystem::CreateCollider (iPolygonMesh* mesh)

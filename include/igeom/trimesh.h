@@ -39,10 +39,10 @@ enum
   /**
   * The object is closed, if set. 
   * With closed we mean that if you run a beam of light through the object 
-  * (through any point outside the mesh to another point outside) it will always
-  * hit an even amount of faces (one going in, and one going out). If you don't
-  * set CLOSED or NOTCLOSED then the state is not known and the engine may test 
-  * it if it wants.
+  * (through any point outside the mesh to another point outside) it will
+  * always hit an even amount of faces (one going in, and one going out).
+  * If you don't set CLOSED or NOTCLOSED then the state is not known and
+  * the engine may test it if it wants.
   */
   CS_TRIMESH_CLOSED = 1,
 
@@ -59,10 +59,10 @@ enum
   /**
   * The object is convex, if set. 
   * With convex we mean that if you run a beam of light through the object 
-  * (through any point outside the mesh to another point outside) it will always
-  * hit exactly two faces (one going in, and one going out). If you don't
-  * set CONVEX or NOTCONVEX then the state is not known and the engine may test 
-  * it if it wants.
+  * (through any point outside the mesh to another point outside) it will
+  * always hit exactly two faces (one going in, and one going out). If you
+  * don't * set CONVEX or NOTCONVEX then the state is not known and the
+  * engine may test it if it wants.
   */
   CS_TRIMESH_CONVEX = 4,
 
@@ -94,7 +94,8 @@ struct csTriangle;
  * All Crystal Space mesh objects (things, sprites, ...)
  * should implement and/or embed an implementation of this interface.
  *
- * A triangle mesh has the concept of a vertex buffer and an array of triangles.
+ * A triangle mesh has the concept of a vertex buffer and an array of
+ * triangles.
  *
  * Main creators of instances implementing this interface:
  * - Almost all mesh objects have several implementations of this

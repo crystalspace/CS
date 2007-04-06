@@ -295,18 +295,23 @@ void csProtoMeshObject::PreGetBuffer (csRenderBufferHolder *holder,
 
 //----------------------------------------------------------------------
 
-csProtoMeshObjectFactory::csProtoMeshObjectFactory (iMeshObjectType *pParent,
-                                                    iObjectRegistry* object_reg) :
-scfImplementationType (this, pParent)
+csProtoMeshObjectFactory::csProtoMeshObjectFactory (
+    iMeshObjectType *pParent, iObjectRegistry* object_reg)
+  : scfImplementationType (this, pParent)
 {
   csProtoMeshObjectFactory::object_reg = object_reg;
 
-  csRef<PolyMesh> polyMesh;
   polyMesh.AttachNew (new PolyMesh (this));
   SetPolygonMeshBase (polyMesh);
   SetPolygonMeshColldet (polyMesh);
   SetPolygonMeshViscull (polyMesh);
   SetPolygonMeshShadows (polyMesh);
+
+  csStringID base_mesh_id = GetBaseID (object_reg);
+  csRef<csTriangleMeshPointer> trimesh_base;
+  trimesh_base.AttachNew (new csTriangleMeshPointer (
+	vertices, PROTO_VERTS, triangles, PROTO_TRIS));
+  SetTriangleData (base_mesh_id, trimesh_base);
 
   logparent = 0;
   proto_type = pParent;
