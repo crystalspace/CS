@@ -334,8 +334,8 @@ struct bone_key_info
   iSkeletonBoneFactory *bone;
 };
 
-class csSkeletonScriptKeyFrame :
-  public scfImplementation1<csSkeletonScriptKeyFrame, iSkeletonAnimationKeyFrame>
+class csSkeletonAnimationKeyFrame :
+  public scfImplementation1<csSkeletonAnimationKeyFrame, iSkeletonAnimationKeyFrame>
 {
   public:
     typedef csHash<bone_key_info, csPtrKey<iSkeletonBoneFactory> > 
@@ -355,12 +355,12 @@ class csSkeletonScriptKeyFrame :
       return bones_frame_transforms.Get(bone_fact, fallback);
     }
     
-    csSkeletonScriptKeyFrame (const char* name);
-    virtual ~csSkeletonScriptKeyFrame ();
+    csSkeletonAnimationKeyFrame (const char* name);
+    virtual ~csSkeletonAnimationKeyFrame ();
 
     virtual const char* GetName () const { return name; }
     virtual void SetName (const char* name)
-      { csSkeletonScriptKeyFrame::name = name; }
+      { csSkeletonAnimationKeyFrame::name = name; }
     virtual csTicks GetDuration () { return duration; }
     virtual void SetDuration (csTicks time) { duration = time; }
     virtual size_t GetTransformsCount() 
@@ -425,20 +425,20 @@ class csSkeletonScriptKeyFrame :
   }
 };
 
-class csSkeletonScript :
-  public scfImplementation1<csSkeletonScript, iSkeletonAnimation>
+class csSkeletonAnimation :
+  public scfImplementation1<csSkeletonAnimation, iSkeletonAnimation>
 {
 private:
   csString name;
   csTicks time, forced_duration;
   bool loop;
   int loop_times;
-  csRefArray<csSkeletonScriptKeyFrame> key_frames;
+  csRefArray<csSkeletonAnimationKeyFrame> key_frames;
   csSkeletonFactory *fact;
 public:
 
-  csSkeletonScript (csSkeletonFactory *factory, const char* name);
-  virtual ~csSkeletonScript ();
+  csSkeletonAnimation (csSkeletonFactory *factory, const char* name);
+  virtual ~csSkeletonAnimation ();
 
   void SetForcedDuration(csTicks new_duration)
   { forced_duration = new_duration; }
@@ -446,23 +446,23 @@ public:
   csTicks GetForcedDuration()
   { return forced_duration; }
 
-  //void SetLoop (bool loop) { csSkeletonScript::loop = loop; }
+  //void SetLoop (bool loop) { csSkeletonAnimation::loop = loop; }
   //bool GetLoop () { return loop; }
   void SetLoopTimes (bool loop_times) 
-    { csSkeletonScript::loop_times = loop_times; }
+    { csSkeletonAnimation::loop_times = loop_times; }
   int GetLoopTimes () { return loop_times; }
 
 
   virtual const char* GetName () const { return name; }
-  virtual void SetName (const char* name){ csSkeletonScript::name = name; }
+  virtual void SetName (const char* name){ csSkeletonAnimation::name = name; }
   virtual csTicks GetTime () { return time; }
-  virtual void SetTime (csTicks time)  { csSkeletonScript::time = time; }
+  virtual void SetTime (csTicks time)  { csSkeletonAnimation::time = time; }
   virtual float GetSpeed () { return time; }
   virtual void SetSpeed (float)  {}
   virtual void SetFactor (float) {}
   virtual float GetFactor () { return 0; }
   virtual void SetLoop (bool loop)
-  { csSkeletonScript::loop = loop; }
+  { csSkeletonAnimation::loop = loop; }
   virtual bool GetLoop ()
   { return loop; }
 
@@ -501,14 +501,18 @@ struct sac_transform_execution
   int type;
 };
 
-class csSkeletonRunnable
+class csSkeletonAnimationInstance :
+  public scfImplementation1<csSkeletonAnimationInstance, iSkeletonAnimationInstance>
 {
+
 public:
   typedef csHash<bone_transform_data*, csPtrKey<csSkeletonBoneFactory> > 
     TransformHash;
+
 private:
+
   csSkeleton *skeleton;
-  csSkeletonScript* script;
+  csSkeletonAnimation* script;
   size_t current_instruction;
   int current_frame;
   float morph_factor;
@@ -538,21 +542,24 @@ private:
   csTicks current_ticks;
   TransformHash transforms;
 
+  size_t id;
+
   void release_tranform_data(TransformHash&);
   
-  void ParseFrame(csSkeletonScriptKeyFrame *frame);
-  csSkeletonScriptKeyFrame *NextFrame();
+  void ParseFrame(csSkeletonAnimationKeyFrame *frame);
+  csSkeletonAnimationKeyFrame *NextFrame();
 
 public:
-  csSkeletonScript *GetScript() { return script; }
+
+  csSkeletonAnimation *GetScript() { return script; }
 
   bool Do (csTicks elapsed, bool& stop, csTicks & left);
 
   bone_transform_data *GetBoneTransform(csSkeletonBoneFactory *bone);
   TransformHash& GetTransforms() { return transforms; };
 
-  csSkeletonRunnable (csSkeletonScript* script, csSkeleton *skeleton);
-  ~csSkeletonRunnable ();
+  csSkeletonAnimationInstance (csSkeletonAnimation* script, csSkeleton *skeleton);
+  ~csSkeletonAnimationInstance ();
 
   const char *GetName () const { return script->GetName (); }
   void SetName (const char* name) { return script->SetName (name); }
@@ -562,6 +569,7 @@ public:
   void SetTime (csTicks time) { script->SetTime (time); }
   float GetSpeed () { return script->GetSpeed (); }
   void SetSpeed (float speed) { return script->SetSpeed (speed); }
+  size_t GetID ();
 };
 
 #include "csutil/win32/msvc_deprecated_warn_off.h"
@@ -574,7 +582,7 @@ private:
   iObjectRegistry* object_reg;
   csSkeletonFactory *factory;
 
-  csArray<csSkeletonRunnable> running_scripts;
+  csRefArray<csSkeletonAnimationInstance> running_animations;
   csArray<csString> pending_scripts;
 
   csTicks last_update_time;
@@ -608,8 +616,8 @@ public:
   { return bones; }
   csArray<size_t>& GetParentBones () 
   { return parent_bones; }
-  csArray<csSkeletonRunnable> & GetRunningScripts () 
-  { return running_scripts; }
+  csRefArray<csSkeletonAnimationInstance> & GetRunningScripts () 
+  { return running_animations; }
 
   void SetForceUpdate(bool force_update)
   { force_bone_update = force_update; }
@@ -629,7 +637,7 @@ public:
   virtual void ClearPendingAnimations ()
   { pending_scripts.DeleteAll(); }
   virtual void ClearPendingScripts () {ClearPendingAnimations (); }
-  virtual size_t GetAnimationsCount () { return running_scripts.GetSize (); }
+  virtual size_t GetAnimationsCount () { return running_animations.GetSize (); }
   virtual size_t GetScriptsCount () { return GetAnimationsCount (); }
   virtual iSkeletonAnimation* GetAnimation (size_t i);
   virtual iSkeletonAnimation* GetScript (size_t i) {return GetAnimation (i);}
@@ -648,6 +656,8 @@ public:
     //virtual void CreateRagdoll(iODEDynamicSystem *dyn_sys, csReversibleTransform & transform);
   //virtual void DestroyRagdoll();
 
+  iSkeletonAnimationInstance *Play (const char *animation_name);
+  void Stop (iSkeletonAnimationInstance *anim_instance);
 
   virtual size_t AddUpdateCallback(iSkeletonUpdateCallback *update_callback)
   { return update_callbacks.Push(update_callback); }
@@ -671,7 +681,7 @@ private:
   csRefArray<csSkeletonBoneFactory> bones;
   csRefArray<csSkeletonSocketFactory> sockets;
   csArray<size_t> parent_bones;
-  csRefArray<csSkeletonScript> scripts;
+  csRefArray<csSkeletonAnimation> scripts;
 
 public:
 
@@ -752,8 +762,9 @@ private:
   iObjectRegistry* object_reg;
   csRef<iVirtualClock> vc;
   csRefArray<csSkeletonFactory> factories;
-  csRefArray<csSkeleton> skeletons;
+  csRefArray<iSkeleton> skeletons;
   csEventID PreProcess;
+  bool manual_updates;
 public:
   csSkeletonGraveyard (iBase*);
   virtual ~csSkeletonGraveyard ();
@@ -765,6 +776,9 @@ public:
   virtual iSkeletonFactory *LoadFactory(const char * /*file_name*/) { return 0; }
   virtual iSkeletonFactory *FindFactory(const char * /*name*/) { return 0; }
   virtual iSkeleton *CreateSkeleton(iSkeletonFactory *fact, const char *name);
+  virtual void SetManualUpdates (bool man_updates) {manual_updates = man_updates;}
+  virtual void Update (csTicks time);
+  void AddSkeleton (iSkeleton *skeleton) {skeletons.Push (skeleton);}
 
   class csSkelEventHandler : public scfImplementation1<csSkelEventHandler,
   	iEventHandler>

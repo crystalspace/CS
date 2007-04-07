@@ -6,6 +6,12 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Apr-2007
+        - Piotr made cal3d meshes animations to be updated by skeleton 
+          graveyard shared with genmeshanim meshes.
+        - Piotr added manual updates option to graveyard.
+        - Piotr added iAnimationInstance interface, for currently played 
+          animations. 
 6-Apr-2007
 	- Jorrit did several changes for iTriangleMesh:
 	    - Added csTriangleMeshPointer class. This is an implementation

@@ -370,6 +370,34 @@ struct iSkeletonUpdateCallback : public virtual iBase
 };
 
 /**
+ * This interface provides played animation instance of a skeleton. 
+ */
+struct iSkeletonAnimationInstance : public virtual iBase
+{
+  SCF_INTERFACE (iSkeletonAnimationInstance, 1, 0, 0);
+
+  /**
+   * Get animation speed.
+   */
+  virtual float GetSpeed () = 0;
+
+  /**
+   * Set animation speed (default = 1.0).
+   */
+  virtual void SetSpeed (float speed) = 0;
+
+  /**
+   * Set animation factor.
+   */
+  virtual void SetFactor (float factor) = 0;
+
+  /**
+   * Get animation factor.
+   */
+  virtual float GetFactor () = 0;
+};
+
+/**
  * The skeleton interface provides needed functionality
  * of a skeleton animation. It holds bones, sockets and scripts.
  * Skeleton is an independend object and it is not realted to a mesh.
@@ -426,6 +454,16 @@ struct iSkeleton : public virtual iBase
    * Append animation for execution.
    */
   virtual iSkeletonAnimation* Append (const char *animation_name) = 0;
+
+  /**
+   * Play specific animation. Returns played animation instance.
+   */
+  virtual iSkeletonAnimationInstance *Play (const char *animation_name) = 0;
+
+  /**
+   * Stop animation. 
+   */
+  virtual void Stop (iSkeletonAnimationInstance *anim_instance) = 0;
 
   /**
    * Clear animations for execution.
@@ -523,7 +561,13 @@ struct iSkeleton : public virtual iBase
   /**
    * Remove skelton callback by index.
    */
-  virtual void RemoveUpdateCallback(size_t callback_idx) = 0;
+  virtual void RemoveUpdateCallback (size_t callback_idx) = 0;
+
+  /**
+   * Update animations state. Returns 'false' when no update
+   * was aplied.
+   */
+  virtual bool UpdateAnimation (csTicks current_time) = 0;
 };
 
 /**
@@ -894,6 +938,21 @@ struct iSkeletonGraveyard : public virtual iBase
    * Create skeleton from specific factory.
    */
   virtual iSkeleton *CreateSkeleton(iSkeletonFactory *fact, const char *name = 0) = 0;
+
+  /**
+   * Set manual updates handling mode.
+   */
+  virtual void SetManualUpdates (bool man_updates) = 0;
+
+  /**
+   * Set manual updates handling mode.
+   */
+  virtual void Update (csTicks time) = 0;
+
+  /**
+   * Add skeleton that will be updated by this graveyard. 
+   */
+  virtual void AddSkeleton (iSkeleton *skeleton) = 0;
 };
 
 #endif //__CS_ISKELETON_H__

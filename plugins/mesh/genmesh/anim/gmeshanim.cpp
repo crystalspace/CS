@@ -362,16 +362,16 @@ void csGenmeshAnimationControl::UpdateAnimation (csTicks current,
   if (current != last_update_time)
   {
     last_update_time = current;
-    size_t i = running_scripts.GetSize ();
+    size_t i = running_animations.GetSize ();
     while (i > 0)
     {
       i--;
       bool stop = false;
-      if (running_scripts[i]->Do (current, stop))
+      if (running_animations[i]->Do (current, stop))
         mod = true;
       if (stop)
       {
-        running_scripts.DeleteIndexFast (i);
+        running_animations.DeleteIndexFast (i);
       }
     }
   }
@@ -557,7 +557,7 @@ bool csGenmeshAnimationControl::Execute (const char* scriptname)
   if (!script) return false;
   csAnimControlRunnable* runnable = new csAnimControlRunnable (script,
       factory);
-  running_scripts.Push (runnable);
+  running_animations.Push (runnable);
   return true;
 }
 

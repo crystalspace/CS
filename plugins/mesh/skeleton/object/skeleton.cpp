@@ -114,8 +114,8 @@ void csSkeletonBone::UpdateTransform ()
 
   if (scripts_len == 1)
   {
-    csSkeletonRunnable &script = skeleton->GetRunningScripts ().Get (0);
-    csSkeletonRunnable::TransformHash& transforms = script.GetTransforms ();
+    csSkeletonAnimationInstance *script = skeleton->GetRunningScripts ().Get (0);
+    csSkeletonAnimationInstance::TransformHash& transforms = script->GetTransforms ();
     bone_transform_data *b_tr = transforms.Get (factory_bone, 0);
     if (b_tr)
     {
@@ -133,24 +133,24 @@ void csSkeletonBone::UpdateTransform ()
 
     for (size_t i = 0; i < scripts_len; i++)
     {
-      csSkeletonRunnable &script = skeleton->GetRunningScripts ().Get (i);
-      csSkeletonRunnable::TransformHash& transforms = script.GetTransforms ();
+      csSkeletonAnimationInstance *script = skeleton->GetRunningScripts ().Get (i);
+      csSkeletonAnimationInstance::TransformHash& transforms = script->GetTransforms ();
       bone_transform_data *b_tr = transforms.Get (factory_bone, 0);
-      if (b_tr && (script.GetFactor () > 0))
+      if (b_tr && (script->GetFactor () > 0))
       {
-        final_pos += b_tr->pos*script.GetFactor ();
-        script_factors_total += script.GetFactor ();
+        final_pos += b_tr->pos*script->GetFactor ();
+        script_factors_total += script->GetFactor ();
         if (slerp)
         {
           float max_over_factor = max/script_factors_total;
-          if (script.GetFactor () >= min)
+          if (script->GetFactor () >= min)
           {
-            max = script.GetFactor ();
+            max = script->GetFactor ();
             q = q.SLerp (b_tr->quat, max_over_factor);
           }
           else
           {
-            min = script.GetFactor ();
+            min = script->GetFactor ();
             q = b_tr->quat.SLerp (q, max_over_factor);
           }
           script_factors_total = min + max_over_factor;
@@ -158,7 +158,7 @@ void csSkeletonBone::UpdateTransform ()
         else
         {
           slerp = true;
-          min = max = script.GetFactor ();
+          min = max = script->GetFactor ();
           q = b_tr->quat;
         }
         updated = true; 
@@ -383,22 +383,22 @@ csSkeletonSocketFactory::~csSkeletonSocketFactory ()
 
 //--------------------------iSkeletonAnimationKeyFrame-----------------------------------
 
-csSkeletonScriptKeyFrame::csSkeletonScriptKeyFrame (const char* name) :
+csSkeletonAnimationKeyFrame::csSkeletonAnimationKeyFrame (const char* name) :
   scfImplementationType(this)
 {
-  csSkeletonScriptKeyFrame::name = name;
+  csSkeletonAnimationKeyFrame::name = name;
 }
 
-csSkeletonScriptKeyFrame::~csSkeletonScriptKeyFrame () 
+csSkeletonAnimationKeyFrame::~csSkeletonAnimationKeyFrame () 
 {
 }
 
 //--------------------------iSkeletonAnimation-----------------------------------
 
-csSkeletonScript::csSkeletonScript (csSkeletonFactory *factory, const char* name) :
+csSkeletonAnimation::csSkeletonAnimation (csSkeletonFactory *factory, const char* name) :
   scfImplementationType(this)
 {
-  csSkeletonScript::name = name;
+  csSkeletonAnimation::name = name;
   time = 0;
   loop = false; //for now
   loop_times = -1;
@@ -406,19 +406,19 @@ csSkeletonScript::csSkeletonScript (csSkeletonFactory *factory, const char* name
   fact = factory;
 }
 
-csSkeletonScript::~csSkeletonScript () 
+csSkeletonAnimation::~csSkeletonAnimation () 
 {
 }
 
-iSkeletonAnimationKeyFrame *csSkeletonScript::CreateFrame(const char* name)
+iSkeletonAnimationKeyFrame *csSkeletonAnimation::CreateFrame(const char* name)
 {
-  csRef<csSkeletonScriptKeyFrame> key_frame;
-  key_frame.AttachNew(new csSkeletonScriptKeyFrame (name));
+  csRef<csSkeletonAnimationKeyFrame> key_frame;
+  key_frame.AttachNew(new csSkeletonAnimationKeyFrame (name));
   key_frames.Push(key_frame);
   return key_frame;
 }
 
-void csSkeletonScript::RecalcSpline()
+void csSkeletonAnimation::RecalcSpline()
 {
   const csRefArray<csSkeletonBoneFactory>& bones = fact->GetBones ();
   for (size_t i = 0; i < bones.GetSize () ; i++ )
@@ -426,7 +426,7 @@ void csSkeletonScript::RecalcSpline()
     csArray<bone_key_info *> tmp_arr;
     for (size_t j= 0; j < key_frames.GetSize (); j++ )
     {
-      csRef<csSkeletonScriptKeyFrame> key_frame = key_frames[j];
+      csRef<csSkeletonAnimationKeyFrame> key_frame = key_frames[j];
       bone_key_info & bt = key_frame->GetKeyInfo(bones[i]);
       tmp_arr.Push(&bt);
     }
@@ -501,13 +501,14 @@ void csSkeletonScript::RecalcSpline()
   }
 }
 
-//------------------------csSkeletonRunnable-------------------------------------
+//------------------------csSkeletonAnimationInstance-------------------------------------
 
-csSkeletonRunnable::csSkeletonRunnable (csSkeletonScript* script,
-  csSkeleton *skeleton)
+csSkeletonAnimationInstance::csSkeletonAnimationInstance (csSkeletonAnimation* script,
+                                                          csSkeleton *skeleton) : 
+                                                          scfImplementationType(this)
 {
-  csSkeletonRunnable::script = script;
-  csSkeletonRunnable::skeleton = skeleton;
+  csSkeletonAnimationInstance::script = script;
+  csSkeletonAnimationInstance::skeleton = skeleton;
   current_instruction = 0;
   current_frame = -1;
   delay.current = 0;
@@ -533,12 +534,12 @@ csSkeletonRunnable::csSkeletonRunnable (csSkeletonScript* script,
   */
 }
 
-csSkeletonRunnable::~csSkeletonRunnable ()
+csSkeletonAnimationInstance::~csSkeletonAnimationInstance ()
 {
   release_tranform_data (transforms);
 }
 
-void csSkeletonRunnable::ParseFrame(csSkeletonScriptKeyFrame *frame)
+void csSkeletonAnimationInstance::ParseFrame(csSkeletonAnimationKeyFrame *frame)
 {
   for (size_t i = 0; i < skeleton->GetFactory()->GetBonesCount(); i++)
   {
@@ -587,7 +588,7 @@ void csSkeletonRunnable::ParseFrame(csSkeletonScriptKeyFrame *frame)
   }
 }
 
-csSkeletonScriptKeyFrame *csSkeletonRunnable::NextFrame()
+csSkeletonAnimationKeyFrame *csSkeletonAnimationInstance::NextFrame()
 {
   size_t frames_count = script->GetFramesCount();
   
@@ -617,17 +618,17 @@ csSkeletonScriptKeyFrame *csSkeletonRunnable::NextFrame()
     skeleton->GetScriptCallback()->Execute(script, current_frame);
   }
 
-  return (csSkeletonScriptKeyFrame *)script->GetFrame (current_frame);
+  return (csSkeletonAnimationKeyFrame *)script->GetFrame (current_frame);
 }
 
-void csSkeletonRunnable::release_tranform_data(TransformHash& h)
+void csSkeletonAnimationInstance::release_tranform_data(TransformHash& h)
 {
   h.Empty();
 }
 
 //static csQuaternion zero_quat = csQuaternion(1.0f);
 
-bool csSkeletonRunnable::Do (csTicks elapsed, bool& stop, csTicks & left)
+bool csSkeletonAnimationInstance::Do (csTicks elapsed, bool& stop, csTicks & left)
 {
   stop = false;
   bool mod = false;
@@ -635,7 +636,7 @@ bool csSkeletonRunnable::Do (csTicks elapsed, bool& stop, csTicks & left)
   delay.diff += elapsed;
   if (parse_key_frame)
   {
-    csSkeletonScriptKeyFrame *frame = NextFrame ();
+    csSkeletonAnimationKeyFrame *frame = NextFrame ();
     if (!frame) 
       return false;
     delay.final = (csTicks) ( (float)(frame->GetDuration())*time_factor);
@@ -722,7 +723,7 @@ bool csSkeletonRunnable::Do (csTicks elapsed, bool& stop, csTicks & left)
   return mod;
 }
 
-bone_transform_data *csSkeletonRunnable::GetBoneTransform(
+bone_transform_data *csSkeletonAnimationInstance::GetBoneTransform(
     csSkeletonBoneFactory *bone_fact)
 {
   bone_transform_data *b_tr = transforms.Get (bone_fact, 0);
@@ -815,7 +816,22 @@ iSkeletonFactory *csSkeleton::GetFactory()
 {
   return static_cast<iSkeletonFactory*> (factory);
 }
-
+iSkeletonAnimationInstance *csSkeleton::Play (const char *animation_name)
+{
+  csSkeletonAnimation* script = (csSkeletonAnimation*)(factory->FindAnimation (animation_name));
+  if (!script) 
+  {
+    //printf("script %s doesn't exist\n", scriptname);
+    return 0;
+  }
+  csSkeletonAnimationInstance *runnable = new csSkeletonAnimationInstance (script, this);
+  running_animations.Push (runnable);
+  return runnable;
+}
+void csSkeleton::Stop (iSkeletonAnimationInstance *anim_instance)
+{
+  running_animations.Delete ((csSkeletonAnimationInstance*)anim_instance);
+}
 void csSkeleton::UpdateBones ()
 {
   size_t i;
@@ -889,17 +905,17 @@ bool csSkeleton::UpdateAnimation (csTicks current)
     }
 
     last_update_time = current;
-    i = running_scripts.GetSize ();
+    i = running_animations.GetSize ();
     while (i > 0)
     {
       i--;
       bool stop = false;
       csTicks left;
-      if (running_scripts[i].Do (elapsed, stop, left))
+      if (running_animations[i]->Do (elapsed, stop, left))
       {
         while (left)
         {
-          running_scripts[i].Do (left, stop, left);
+          running_animations[i]->Do (left, stop, left);
         }
       }
 
@@ -907,14 +923,14 @@ bool csSkeleton::UpdateAnimation (csTicks current)
       {
         if (script_callback)
         {
-          script_callback->OnFinish(running_scripts[i].GetScript());
+          script_callback->OnFinish(running_animations[i]->GetScript());
         }
 
-        running_scripts.DeleteIndexFast (i);
+        running_animations.DeleteIndexFast (i);
       }
     }
 
-    if (!running_scripts.GetSize () && pending_scripts.GetSize ())
+    if (!running_animations.GetSize () && pending_scripts.GetSize ())
     {
       Execute(pending_scripts[0]);
       pending_scripts.DeleteIndexFast(0);
@@ -938,21 +954,21 @@ iSkeletonBone *csSkeleton::FindBone (const char *name)
 
 iSkeletonAnimation* csSkeleton::Execute (const char *scriptname)
 {
-  csSkeletonScript* script = (csSkeletonScript*)(factory->FindScript (scriptname));
+  csSkeletonAnimation* script = (csSkeletonAnimation*)(factory->FindScript (scriptname));
   if (!script) 
   {
     //printf("script %s doesn't exist\n", scriptname);
     return 0;
   }
 
-  csSkeletonRunnable runnable = csSkeletonRunnable (script, this);
-  running_scripts.Push (runnable);
+  csSkeletonAnimationInstance *runnable = new csSkeletonAnimationInstance (script, this);
+  running_animations.Push (runnable);
   return script;
 }
 
 iSkeletonAnimation* csSkeleton::Append (const char *scriptname)
 {
-  csSkeletonScript* script = (csSkeletonScript*)(
+  csSkeletonAnimation* script = (csSkeletonAnimation*)(
     factory->FindScript (scriptname));
   if (!script) 
   {
@@ -967,9 +983,9 @@ iSkeletonAnimation* csSkeleton::Append (const char *scriptname)
 iSkeletonAnimation* csSkeleton::FindAnimation (const char *scriptname)
 {
   size_t i;
-  for (i = 0 ; i < running_scripts.GetSize () ; i++)
-    if (strcmp (running_scripts[i].GetName (), scriptname) == 0)
-      return running_scripts[i].GetScript();
+  for (i = 0 ; i < running_animations.GetSize () ; i++)
+    if (strcmp (running_animations[i]->GetName (), scriptname) == 0)
+      return running_animations[i]->GetScript();
   return 0;
 }
 
@@ -984,28 +1000,28 @@ iSkeletonSocket* csSkeleton::FindSocket (const char *socketname)
 
 void csSkeleton::StopAll ()
 {
-  running_scripts.DeleteAll ();
+  running_animations.DeleteAll ();
 }
 
 void csSkeleton::Stop (const char* scriptname)
 {
   size_t i;
-  for (i = 0 ; i < running_scripts.GetSize () ; i++)
-    if (strcmp (running_scripts[i].GetName (), scriptname) == 0)
-      running_scripts.DeleteIndexFast (i);
+  for (i = 0 ; i < running_animations.GetSize () ; i++)
+    if (strcmp (running_animations[i]->GetName (), scriptname) == 0)
+      running_animations.DeleteIndexFast (i);
 }
 
 void csSkeleton::Stop (iSkeletonAnimation *script)
 {
-  //csSkeletonRunnable *cs_skel_runnable = static_cast<csSkeletonRunnable *> (script);
-  //running_scripts.DeleteFast ( cs_skel_runnable );
+  //csSkeletonAnimationInstance *cs_skel_runnable = static_cast<csSkeletonAnimationInstance *> (script);
+  //running_animations.DeleteFast ( cs_skel_runnable );
 }
 
 iSkeletonAnimation* csSkeleton::GetAnimation (size_t i)
 {
-  if (i < running_scripts.GetSize ())
+  if (i < running_animations.GetSize ())
   {
-    return running_scripts[i].GetScript();
+    return running_animations[i]->GetScript();
   }
   return 0;
 }
@@ -1250,8 +1266,8 @@ void csSkeletonFactory::UpdateParentBones ()
 
 iSkeletonAnimation *csSkeletonFactory::CreateAnimation (const char *name)
 {
-  csRef<csSkeletonScript> script;
-  script.AttachNew(new csSkeletonScript (this, name));
+  csRef<csSkeletonAnimation> script;
+  script.AttachNew(new csSkeletonAnimation (this, name));
   scripts.Push(script);
   return script;
 }
@@ -1293,6 +1309,7 @@ size_t csSkeletonFactory::GetSocketsCount()
 csSkeletonGraveyard::csSkeletonGraveyard (iBase* pParent) :
   scfImplementationType(this, pParent), object_reg(0)
 {
+  manual_updates = false;
 }
 
 csSkeletonGraveyard::~csSkeletonGraveyard ()
@@ -1340,15 +1357,18 @@ iSkeleton *csSkeletonGraveyard::CreateSkeleton(iSkeletonFactory *fact,
   skeletons.Push(skeleton);
   return skeleton;
 }
-
+void csSkeletonGraveyard::Update (csTicks time)
+{
+  for (size_t i = 0; i < skeletons.GetSize () ; i++)
+  {
+    skeletons[i]->UpdateAnimation (time);
+  }
+}
 bool csSkeletonGraveyard::HandleEvent (iEvent& ev)
 {
-  if (ev.Name == PreProcess)
+  if (ev.Name == PreProcess && !manual_updates)
   {
-    for (size_t i = 0; i < skeletons.GetSize () ; i++)
-    {
-      skeletons[i]->UpdateAnimation(vc->GetCurrentTicks ());
-    }
+    Update (vc->GetCurrentTicks ());
     return true;
   }
   return false;

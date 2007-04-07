@@ -410,7 +410,6 @@ private:
     float weight;
   };
 
-  iObjectRegistry* object_reg;
   iMeshObjectDrawCallback* vis_cb;
   uint32 current_features;  // LOD Control thing
   iMeshWrapper* logparent;
@@ -567,6 +566,8 @@ public:
 public:
   CS_LEAKGUARD_DECLARE (csSpriteCal3DMeshObject);
 
+  iObjectRegistry* object_reg;
+
   /// The parent.
   csSpriteCal3DMeshObjectFactory* factory;
 
@@ -656,10 +657,7 @@ public:
   virtual bool Advance (csTicks current_time);
 
   virtual void NextFrame (csTicks current_time, const csVector3& /*new_pos*/,
-    uint /*currentFrame*/)
-  {
-    Advance (current_time);
-  }
+    uint /*currentFrame*/);
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
   virtual void SetMeshWrapper (iMeshWrapper* lp) { logparent = lp; }
@@ -988,10 +986,13 @@ class csCal3dSkeleton : public scfImplementation1<csCal3dSkeleton, iSkeleton>
   csWeakRef<csCal3dSkeletonFactory> skeleton_factory;
   csRefArray<iSkeletonUpdateCallback> update_callbacks;
   csHash<size_t, uint> bones_names;
+  csWeakRef<iSkeletonGraveyard> graveyard;
+  csSpriteCal3DMeshObject *mesh_object;
 
 public:
 
-  csCal3dSkeleton (CalSkeleton* skeleton, csCal3dSkeletonFactory* skel_factory);
+  csCal3dSkeleton (CalSkeleton* skeleton, csCal3dSkeletonFactory* skel_factory, 
+    csSpriteCal3DMeshObject *mesh_object);
 
   /**\name iSkeleton implementation
    * @{ */
@@ -1025,8 +1026,12 @@ public:
   {return update_callbacks[callback_idx];}
   void RemoveUpdateCallback(size_t callback_idx) 
   {update_callbacks.DeleteIndex (callback_idx);}
+  iSkeletonAnimationInstance *Play (const char *animation_name) {return 0;}
+  void Stop (iSkeletonAnimationInstance *anim_instance) {;}
+  bool UpdateAnimation (csTicks current_time) {return mesh_object->Advance (current_time);} 
   /** @} */
 
+  bool UpdatedByGraveyard () {return graveyard != 0;}
   void UpdateNotify (const csTicks &current_ticks);
 
 };

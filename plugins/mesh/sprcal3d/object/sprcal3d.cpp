@@ -949,7 +949,7 @@ void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
     new_socket->SetMeshWrapper (0);
   }
 
-  skeleton = new csCal3dSkeleton (cal_skeleton, factory->skel_factory);
+  skeleton = new csCal3dSkeleton (cal_skeleton, factory->skel_factory, this);
 }
 
 
@@ -1597,7 +1597,12 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
   n = (int)rendermeshes.GetSize ();
   return rendermeshes.GetArray();
 }
-
+void csSpriteCal3DMeshObject::NextFrame (csTicks current_time, const csVector3& /*new_pos*/,
+                                         uint /*currentFrame*/)
+{
+  if (!skeleton->UpdatedByGraveyard ())
+    Advance (current_time);
+}
 bool csSpriteCal3DMeshObject::Advance (csTicks current_time)
 {
   if (do_update != -1)
@@ -2342,9 +2347,15 @@ void csSpriteCal3DMeshObject::MeshAccessor::PreGetBuffer
 }
 
 //---------------------------csCal3dSkeleton---------------------------
-csCal3dSkeleton::csCal3dSkeleton (CalSkeleton* skeleton, csCal3dSkeletonFactory* skel_factory) :
+csCal3dSkeleton::csCal3dSkeleton (CalSkeleton* skeleton, csCal3dSkeletonFactory* skel_factory,
+                                  csSpriteCal3DMeshObject *mesh_object) :
 scfImplementationType(this), skeleton(skeleton), skeleton_factory (skel_factory) 
 {
+  csCal3dSkeleton::mesh_object = mesh_object;
+  graveyard = csQueryRegistry<iSkeletonGraveyard> (mesh_object->object_reg);
+  if (graveyard)
+    graveyard->AddSkeleton (this);
+
   std::vector<CalBone*> cal_bones = skeleton->getVectorBone ();
   for (size_t i = 0; i < cal_bones.size (); i++)
   {
