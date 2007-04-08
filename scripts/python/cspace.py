@@ -4904,6 +4904,24 @@ class iSkeletonUpdateCallback(iBase):
 iSkeletonUpdateCallback_swigregister = _cspace.iSkeletonUpdateCallback_swigregister
 iSkeletonUpdateCallback_swigregister(iSkeletonUpdateCallback)
 
+class iSkeletonAnimationInstance(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonAnimationInstance, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonAnimationInstance, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetSpeed(*args): return _cspace.iSkeletonAnimationInstance_GetSpeed(*args)
+    def SetSpeed(*args): return _cspace.iSkeletonAnimationInstance_SetSpeed(*args)
+    def SetFactor(*args): return _cspace.iSkeletonAnimationInstance_SetFactor(*args)
+    def GetFactor(*args): return _cspace.iSkeletonAnimationInstance_GetFactor(*args)
+    __swig_destroy__ = _cspace.delete_iSkeletonAnimationInstance
+    __del__ = lambda self : None;
+iSkeletonAnimationInstance_swigregister = _cspace.iSkeletonAnimationInstance_swigregister
+iSkeletonAnimationInstance_swigregister(iSkeletonAnimationInstance)
+
 class iSkeleton(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -4921,6 +4939,7 @@ class iSkeleton(iBase):
     def FindBoneIndex(*args): return _cspace.iSkeleton_FindBoneIndex(*args)
     def Execute(*args): return _cspace.iSkeleton_Execute(*args)
     def Append(*args): return _cspace.iSkeleton_Append(*args)
+    def Play(*args): return _cspace.iSkeleton_Play(*args)
     def ClearPendingAnimations(*args): return _cspace.iSkeleton_ClearPendingAnimations(*args)
     def ClearPendingScripts(*args): return _cspace.iSkeleton_ClearPendingScripts(*args)
     def GetAnimationsCount(*args): return _cspace.iSkeleton_GetAnimationsCount(*args)
@@ -4939,6 +4958,7 @@ class iSkeleton(iBase):
     def GetUpdateCallbacksCount(*args): return _cspace.iSkeleton_GetUpdateCallbacksCount(*args)
     def GetUpdateCallback(*args): return _cspace.iSkeleton_GetUpdateCallback(*args)
     def RemoveUpdateCallback(*args): return _cspace.iSkeleton_RemoveUpdateCallback(*args)
+    def UpdateAnimation(*args): return _cspace.iSkeleton_UpdateAnimation(*args)
     __swig_destroy__ = _cspace.delete_iSkeleton
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSkeleton_scfGetVersion
@@ -5130,6 +5150,9 @@ class iSkeletonGraveyard(iBase):
     def LoadFactory(*args): return _cspace.iSkeletonGraveyard_LoadFactory(*args)
     def FindFactory(*args): return _cspace.iSkeletonGraveyard_FindFactory(*args)
     def CreateSkeleton(*args): return _cspace.iSkeletonGraveyard_CreateSkeleton(*args)
+    def SetManualUpdates(*args): return _cspace.iSkeletonGraveyard_SetManualUpdates(*args)
+    def Update(*args): return _cspace.iSkeletonGraveyard_Update(*args)
+    def AddSkeleton(*args): return _cspace.iSkeletonGraveyard_AddSkeleton(*args)
     __swig_destroy__ = _cspace.delete_iSkeletonGraveyard
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSkeletonGraveyard_scfGetVersion

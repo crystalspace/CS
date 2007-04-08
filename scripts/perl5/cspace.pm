@@ -7401,6 +7401,41 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iSkeletonAnimationInstance ##############
+
+package cspace::iSkeletonAnimationInstance;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*GetSpeed = *cspacec::iSkeletonAnimationInstance_GetSpeed;
+*SetSpeed = *cspacec::iSkeletonAnimationInstance_SetSpeed;
+*SetFactor = *cspacec::iSkeletonAnimationInstance_SetFactor;
+*GetFactor = *cspacec::iSkeletonAnimationInstance_GetFactor;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSkeletonAnimationInstance($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iSkeleton ##############
 
 package cspace::iSkeleton;
@@ -7416,6 +7451,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *FindBoneIndex = *cspacec::iSkeleton_FindBoneIndex;
 *Execute = *cspacec::iSkeleton_Execute;
 *Append = *cspacec::iSkeleton_Append;
+*Play = *cspacec::iSkeleton_Play;
 *ClearPendingAnimations = *cspacec::iSkeleton_ClearPendingAnimations;
 *ClearPendingScripts = *cspacec::iSkeleton_ClearPendingScripts;
 *GetAnimationsCount = *cspacec::iSkeleton_GetAnimationsCount;
@@ -7434,6 +7470,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetUpdateCallbacksCount = *cspacec::iSkeleton_GetUpdateCallbacksCount;
 *GetUpdateCallback = *cspacec::iSkeleton_GetUpdateCallback;
 *RemoveUpdateCallback = *cspacec::iSkeleton_RemoveUpdateCallback;
+*UpdateAnimation = *cspacec::iSkeleton_UpdateAnimation;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -7715,6 +7752,9 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *LoadFactory = *cspacec::iSkeletonGraveyard_LoadFactory;
 *FindFactory = *cspacec::iSkeletonGraveyard_FindFactory;
 *CreateSkeleton = *cspacec::iSkeletonGraveyard_CreateSkeleton;
+*SetManualUpdates = *cspacec::iSkeletonGraveyard_SetManualUpdates;
+*Update = *cspacec::iSkeletonGraveyard_Update;
+*AddSkeleton = *cspacec::iSkeletonGraveyard_AddSkeleton;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
