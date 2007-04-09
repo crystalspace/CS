@@ -66,7 +66,7 @@ public:
   csRect (const csRect &copy);
 
   /// Destructor.
-  virtual ~csRect ();
+  ~csRect ();
 
   /// Intersect with another rectangle.
   void Intersect (int ixmin, int iymin, int ixmax, int iymax);

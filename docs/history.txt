@@ -18,6 +18,8 @@ chronological order.
 	- res customized texi2html to get rid of the "SEC123" anchor names
 	  for manual elements. This makes documentation changes cause less
 	  modified files in SVN (together with the previous change).
+	- res made the csRect destructor non-virtual: this seems rather
+	  unneeded as there are no virtual methods in it right now.
 7-Apr-2007
         - Piotr made cal3d meshes animations to be updated by skeleton 
           graveyard shared with genmeshanim meshes.
