@@ -34,12 +34,18 @@
 #include "csutil/array.h"
 #include "csutil/blockallocator.h"
 
+namespace CS
+{
+
+class SubRectanglesCompact;
+
 /**
  * A class managing allocations of sub-rectangles. i.e. this class represents
  * a rectangular region from which a client can allocate smaller rectangles
  * until the region is full.
+ * \remarks works best if bigger rectangles are inserted first.
  */
-class CS_CRYSTALSPACE_EXPORT csSubRectangles
+class CS_CRYSTALSPACE_EXPORT SubRectangles : public CS::Memory::CustomAllocated
 {
 public:
   /**
@@ -48,7 +54,8 @@ public:
   class SubRect
   {
   protected:
-    friend class csSubRectangles;
+    friend class SubRectangles;
+    friend class SubRectanglesCompact;
     typedef csBlockAllocator<SubRect> SubRectAlloc;
     friend class csBlockAllocator<SubRect>; // SubRectAlloc
 
@@ -82,7 +89,7 @@ public:
     int splitPos;
     SplitType splitType;
 
-    csSubRectangles* superrect;
+    SubRectangles* superrect;
     SubRect* parent;
     SubRect* children[2];
 
@@ -130,13 +137,18 @@ protected:
   }
   
   void Grow (SubRect* sr, int ow, int oh, int nw, int nh);
+  bool Shrink (SubRect* sr, int ow, int oh, int nw, int nh);
+  csRect GetMinimumRectangle (SubRect* sr) const;
+  void DupeWithOffset (const SubRect* from, SubRect* to, 
+    int x, int y, csHash<SubRect*, csConstPtrKey<SubRect> >* map,
+    const csRect& outerAllocated, const csRect& outerRect);
 public:
   /// Allocate a new empty region with the given size.
-  csSubRectangles (const csRect& region);
-  csSubRectangles (const csSubRectangles& other);
+  SubRectangles (const csRect& region);
+  SubRectangles (const SubRectangles& other);
 
   /// Remove this region and sub-regions.
-  ~csSubRectangles ();
+  ~SubRectangles ();
 
   /// Get the rectangle for this region.
   const csRect& GetRectangle () const { return region; }
@@ -144,12 +156,12 @@ public:
   /**
    * Free all rectangles in this region.
    */
-  void Clear ();
+  virtual void Clear ();
 
   /**
    * Allocate a new rectangle. Returns 0 if there is no room
    */
-  SubRect* Alloc (int w, int h, csRect& rect);
+  virtual SubRect* Alloc (int w, int h, csRect& rect);
 
   /**
    * Reclaim a subrectangle, meaning, the space occupied by the subrect can be
@@ -161,15 +173,72 @@ public:
    * Increase the size of the region.
    * You can only grow upwards.
    */
-  bool Grow (int newWidth, int newHeight);
+  virtual bool Grow (int newWidth, int newHeight);
+
+  /**
+   * Decrease the size of the region.
+   * If the region can't be shrunk to the desired size because some already 
+   * allocated subrectangles would be cut off \c false is returned. You
+   * can check if shrinking to a size is possible by comparing the result of
+   * GetMinimumRectangle() with the desired size.
+   */
+  virtual bool Shrink (int newWidth, int newHeight);
+
+  /**
+   * Return the rectangle to which the allocator can be shrunk to at most.
+   */
+  csRect GetMinimumRectangle () const
+  { return GetMinimumRectangle (root); }
+
+  /**
+   * Place the subrectangles of another allocator into a rectangle allocated
+   * from this allocator.
+   */
+  virtual bool PlaceInto (const SubRectangles* rectangles, 
+    SubRect* subRect, 
+    csHash<SubRect*, csConstPtrKey<SubRect> >* newRectangles = 0);
 
   /**
    * For debugging: dump all free rectangles.
+   * Has no effect if CS_DEBUG was not defined.
    */
   void Dump (const char* tag = 0);
 };
 
-typedef csSubRectangles::SubRect csSubRect;
+/**
+ * A variation of SubRectangles that tries to place rectangles in a rectangular
+ * fashion. This means all allocated rectangles are attempted to be placed 
+ * compactly in a rectangle in the upper left corner, where as the normal
+ * SubRectangles quickly "expands" in the X and Y directions.
+ *
+ * This variation is useful if the rectangle you fill is an upper limit but the
+ * covered area should be as small as possible. It has slightly more overhead 
+ * than the normal SubRectangles, though.
+ *
+ * \remarks works best if bigger rectangles are inserted first. The malus from
+ *  not doing so is bigger than the CS::SubRectangles one.
+ */
+class CS_CRYSTALSPACE_EXPORT SubRectanglesCompact : public SubRectangles
+{
+  const csRect maxArea;
+
+public:
+  SubRectanglesCompact (const csRect& maxArea);
+  SubRectanglesCompact (const SubRectanglesCompact& other);
+
+  void Clear ();
+  SubRect* Alloc (int w, int h, csRect& rect);
+
+  /// Return the upper limit of the rectangle.
+  const csRect& GetMaximumRectangle () const { return maxArea; }
+};
+
+} // namespace CS
+
+typedef CS_DEPRECATED_TYPE_MSG("csSubRectangles renamed to CS::SubRectangles")
+  CS::SubRectangles csSubRectangles;
+typedef CS_DEPRECATED_TYPE_MSG("csSubRect renamed to CS::SubRectangles::SubRect")
+  CS::SubRectangles::SubRect csSubRect;
 
 /** @} */
 

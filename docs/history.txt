@@ -6,6 +6,11 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-Apr-2007
+	- res renamed csSubRectangles to CS::SubRectangles.
+	- res added CS::SubRectanglesCompact, a variant of CS::SubRectangles
+	  which has a slightly different allocation behaviour - allocated
+	  rects are arranged in a more compact rectangular fashion.
 7-Apr-2007
         - Piotr made cal3d meshes animations to be updated by skeleton 
           graveyard shared with genmeshanim meshes.
