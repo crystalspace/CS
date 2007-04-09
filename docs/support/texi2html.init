@@ -125,7 +125,7 @@ $USE_NODES = 0;
 # -node-files
 # if this is set one file per node is generated, which can be a target for 
 # cross manual references.
-$NODE_FILES = 0;
+$NODE_FILES = 1;
 
 # -split section|chapter|node|none
 # if $SPLIT is set to 'section' (resp. 'chapter') one html file per section 
@@ -134,7 +134,7 @@ $NODE_FILES = 0;
 # for Top, Table of content (Toc), Overview and About are generated.
 # Otherwise a monolithic html file that contains the whole document is 
 # created.
-$SPLIT = 'section';
+$SPLIT = 'node';
 #$SPLIT = '';
 
 # -sec-nav|-nosec-nav

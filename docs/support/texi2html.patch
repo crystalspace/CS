@@ -1,5 +1,5 @@
---- texi2html.pl	Wed Jun 29 10:48:57 2005
-+++ CrystalSpace/CS/docs/support/texi2html.pl	Wed Jun 29 10:51:58 2005
+--- texi2html.pl.unpatched	2007-04-09 17:35:03.000000000 +0200
++++ texi2html.pl	2007-04-09 18:50:24.000000000 +0200
 @@ -1,4 +1,4 @@
 -#! @PERL@
 +#! /usr/bin/perl
@@ -18,15 +18,6 @@
  #
  # According to
  # larry.jones@sdrc.com (Larry Jones)
-@@ -55,7 +58,7 @@
- #--##############################################################################
- 
- # CVS version:
--# $Id$
-+# $Id$
- 
- # Homepage:
- my $T2H_HOMEPAGE = "http://texi2html.cvshome.org/";
 @@ -71,7 +74,7 @@
  EOT
  
@@ -72,21 +63,41 @@
          {
              warn "$ERROR Warning l2h: current dir contains a dot. Use /tmp as l2h_tmp dir \n";
              $dotbug = 1;
-@@ -4415,12 +4407,18 @@
-                 {
-                     $section->{'number'} = $number;
-                 }    
-+		$section->{'id'} = $section->{'number'};
-                 $level--;
-             }
+@@ -3688,6 +3680,7 @@
+                             $node_ref->{'current_place'} = [];
+                             merge_element_before_anything($node_ref);
+                             $node_ref->{'index_names'} = [];
++                            $node_ref->{'counter'} = 0;
+                             $state->{'place'} = $node_ref->{'current_place'};
+                             $state->{'element'} = $node_ref;
+                             $state->{'after_element'} = 1;
+@@ -3750,7 +3743,16 @@
+                         {
+                             $sec_num++;
+                             $num = $sec_num;
+-                            $docid = "SEC$sec_num";
++                            if ($Texi2HTML::Config::NODE_FILES)
++                            {
++                              $docid = $state->{'node_ref'}->{'counter'};
++                              $state->{'node_ref'}->{'counter'}++;
++			    }
++			    else
++			    {
++                              $docid = "SEC$sec_num";
++                              $num = $state->{'node_ref'}->{'counter'};
++			    }
+                         }
+                         else
+                         {
+@@ -4420,7 +4422,12 @@
              my $toplevel_number = $previous_numbers[$toplevel];
              $toplevel_number = 0 if (!defined($toplevel_number));
              $section->{'number'} = "$toplevel_number.$section->{'number'}";
-+	    $section->{'id'} = $section->{'number'};
++	    $section->{'id'} = $section->{'number'} unless $Texi2HTML::Config::NODE_FILES;
          }
 +	else
 +	{
-+	    $section->{'id'} = $section->{'texi'};
++	    $section->{'id'} = $section->{'texi'} unless $Texi2HTML::Config::NODE_FILES;
 +	}
          # find the previous section
          if (defined($previous_sections[$section->{'level'}]))

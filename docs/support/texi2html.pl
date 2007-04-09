@@ -3680,6 +3680,7 @@ $tag eq 'float')
                             $node_ref->{'current_place'} = [];
                             merge_element_before_anything($node_ref);
                             $node_ref->{'index_names'} = [];
+                            $node_ref->{'counter'} = 0;
                             $state->{'place'} = $node_ref->{'current_place'};
                             $state->{'element'} = $node_ref;
                             $state->{'after_element'} = 1;
@@ -3742,7 +3743,16 @@ $tag eq 'float')
                         {
                             $sec_num++;
                             $num = $sec_num;
-                            $docid = "SEC$sec_num";
+                            if ($Texi2HTML::Config::NODE_FILES)
+                            {
+                              $docid = $state->{'node_ref'}->{'counter'};
+                              $state->{'node_ref'}->{'counter'}++;
+			    }
+			    else
+			    {
+                              $docid = "SEC$sec_num";
+                              $num = $state->{'node_ref'}->{'counter'};
+			    }
                         }
                         else
                         {
@@ -4407,17 +4417,16 @@ sub rearrange_elements()
                 {
                     $section->{'number'} = $number;
                 }    
-		$section->{'id'} = $section->{'number'};
                 $level--;
             }
             my $toplevel_number = $previous_numbers[$toplevel];
             $toplevel_number = 0 if (!defined($toplevel_number));
             $section->{'number'} = "$toplevel_number.$section->{'number'}";
-	    $section->{'id'} = $section->{'number'};
+	    $section->{'id'} = $section->{'number'} unless $Texi2HTML::Config::NODE_FILES;
         }
 	else
 	{
-	    $section->{'id'} = $section->{'texi'};
+	    $section->{'id'} = $section->{'texi'} unless $Texi2HTML::Config::NODE_FILES;
 	}
         # find the previous section
         if (defined($previous_sections[$section->{'level'}]))

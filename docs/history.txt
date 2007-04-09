@@ -11,6 +11,13 @@ chronological order.
 	- res added CS::SubRectanglesCompact, a variant of CS::SubRectangles
 	  which has a slightly different allocation behaviour - allocated
 	  rects are arranged in a more compact rectangular fashion.
+	- res switched the texi2html configuration to generate a file per
+	  node instead per section and name the files after the node name.
+	  This makes references to manual content much nicer and less prone
+	  to break compared to the previously used section numbers.
+	- res customized texi2html to get rid of the "SEC123" anchor names
+	  for manual elements. This makes documentation changes cause less
+	  modified files in SVN (together with the previous change).
 7-Apr-2007
         - Piotr made cal3d meshes animations to be updated by skeleton 
           graveyard shared with genmeshanim meshes.

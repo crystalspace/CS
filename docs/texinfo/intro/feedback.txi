@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Feedback, Genesis, Internet Relay Chat (IRC), CS Introduction
+@node Feedback, Genesis, IRC, CS Introduction
 @section Feedback and Bug Reporting
 @cindex Feedback
 @cindex Bug Reporting

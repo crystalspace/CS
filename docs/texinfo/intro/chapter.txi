@@ -35,7 +35,7 @@ answer there you can always email the mailing lists. @xref{FAQ}, or
 * Feature List::
 * Where to Get:: Where to Get Crystal Space
 * Mailing Lists::
-* Internet Relay Chat (IRC):: Internet Relay Chat (@sc{irc})
+* IRC:: Internet Relay Chat (@sc{irc})
 * Feedback:: Feedback and Bug Reporting
 * Genesis:: Genesis of Crystal Space
 * Authors:: Documentation Authors & Contributors
