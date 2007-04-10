@@ -196,20 +196,20 @@ csPolygon3DStatic* csPolygon3DStatic::Clone (csThingStatic* new_parent)
   return clone;
 }
 
-void csPolygon3DStatic::MappingSetTextureSpace (
+bool csPolygon3DStatic::MappingSetTextureSpace (
   const csPlane3 &plane_wor,
   const csVector3 &v_orig,
   const csVector3 &v1,
   float len)
 {
-  MappingSetTextureSpace (
+  return MappingSetTextureSpace (
     plane_wor,
     v_orig.x, v_orig.y, v_orig.z,
     v1.x, v1.y, v1.z,
     len);
 }
 
-void csPolygon3DStatic::MappingSetTextureSpace (
+bool csPolygon3DStatic::MappingSetTextureSpace (
   const csPlane3 &plane_wor,
   float xo,
   float yo,
@@ -222,7 +222,7 @@ void csPolygon3DStatic::MappingSetTextureSpace (
   float A = plane_wor.A ();
   float B = plane_wor.B ();
   float C = plane_wor.C ();
-  csTextureTrans::compute_texture_space (
+  bool result = csTextureTrans::compute_texture_space (
       polygon_data.tmapping->GetO2T (),
       polygon_data.tmapping->GetO2TTranslation (),
       xo, yo, zo,
@@ -230,39 +230,42 @@ void csPolygon3DStatic::MappingSetTextureSpace (
       len1,
       A, B, C);
   thing_static->ShapeChanged ();
+  return result;
 }
 
-void csPolygon3DStatic::MappingSetTextureSpace (
+bool csPolygon3DStatic::MappingSetTextureSpace (
   const csVector3 &v_orig,
   const csVector3 &v1,
   float len1,
   const csVector3 &v2,
   float len2)
 {
-  csTextureTrans::compute_texture_space (
+  bool result = csTextureTrans::compute_texture_space (
       polygon_data.tmapping->GetO2T (),
       polygon_data.tmapping->GetO2TTranslation (),
       v_orig, v1,
       len1, v2,
       len2);
   thing_static->ShapeChanged ();
+  return result;
 }
 
-void csPolygon3DStatic::MappingSetTextureSpace (
+bool csPolygon3DStatic::MappingSetTextureSpace (
   const csVector3 &v_orig,
   const csVector3 &v_u,
   const csVector3 &v_v)
 {
-  csTextureTrans::compute_texture_space (
+  bool result = csTextureTrans::compute_texture_space (
       polygon_data.tmapping->GetO2T (),
       polygon_data.tmapping->GetO2TTranslation (),
       v_orig,
       v_u,
       v_v);
   thing_static->ShapeChanged ();
+  return result;
 }
 
-void csPolygon3DStatic::MappingSetTextureSpace (
+bool csPolygon3DStatic::MappingSetTextureSpace (
   float xo, float yo, float zo,
   float xu, float yu, float zu,
   float xv, float yv, float zv)
@@ -270,20 +273,21 @@ void csPolygon3DStatic::MappingSetTextureSpace (
   const csVector3 o (xo, yo, zo);
   const csVector3 u (xu, yu, zu);
   const csVector3 v (xv, yv, zv);
-  csTextureTrans::compute_texture_space (
+  bool result = csTextureTrans::compute_texture_space (
       polygon_data.tmapping->GetO2T (),
       polygon_data.tmapping->GetO2TTranslation (),
       o, u, v);
   thing_static->ShapeChanged ();
+  return result;
 }
 
-void csPolygon3DStatic::MappingSetTextureSpace (
+bool csPolygon3DStatic::MappingSetTextureSpace (
   float xo, float yo, float zo,
   float xu, float yu, float zu,
   float xv, float yv, float zv,
   float xw, float yw, float zw)
 {
-  csTextureTrans::compute_texture_space (
+  bool result = csTextureTrans::compute_texture_space (
       polygon_data.tmapping->GetO2T (),
       polygon_data.tmapping->GetO2TTranslation (),
       xo, yo, zo,
@@ -291,15 +295,17 @@ void csPolygon3DStatic::MappingSetTextureSpace (
       xv, yv, zv,
       xw, yw, zw);
   thing_static->ShapeChanged ();
+  return result;
 }
 
-void csPolygon3DStatic::MappingSetTextureSpace (
+bool csPolygon3DStatic::MappingSetTextureSpace (
   const csMatrix3 &tx_matrix,
   const csVector3 &tx_vector)
 {
   polygon_data.tmapping->SetO2T (tx_matrix),
   polygon_data.tmapping->SetO2TTranslation (tx_vector),
   thing_static->ShapeChanged ();
+  return true;
 }
 
 void csPolygon3DStatic::SetParent (csThingStatic *thing_static)
@@ -629,15 +635,16 @@ bool csPolygon3DStatic::Finish (iBase* thing_logparent)
   return rc;
 }
 
-void csPolygon3DStatic::SetTextureSpace (
+bool csPolygon3DStatic::SetTextureSpace (
   const csMatrix3 &tx_matrix,
   const csVector3 &tx_vector)
 {
   ComputeNormal ();
   if (IsTextureMappingEnabled ())
   {
-    MappingSetTextureSpace (tx_matrix, tx_vector);
+    return MappingSetTextureSpace (tx_matrix, tx_vector);
   }
+  return true;
 }
 
 void csPolygon3DStatic::GetTextureSpace (
@@ -718,11 +725,10 @@ bool csPolygon3DStatic::SetTextureSpace (
   pl = m * (csVector2 (0, 1) - uv1);
   pv = p1 + pl.x * (p2 - p1) + pl.y * (p3 - p1);
 
-  SetTextureSpace (po, pu, (pu - po).Norm (), pv, (pv - po).Norm ());
-  return true;
+  return SetTextureSpace (po, pu, (pu - po).Norm (), pv, (pv - po).Norm ());  
 }
 
-void csPolygon3DStatic::SetTextureSpace (
+bool csPolygon3DStatic::SetTextureSpace (
   const csVector3 &v_orig,
   const csVector3 &v1,
   float len1)
@@ -733,10 +739,10 @@ void csPolygon3DStatic::SetTextureSpace (
   float x1 = v1.x;
   float y1 = v1.y;
   float z1 = v1.z;
-  SetTextureSpace (xo, yo, zo, x1, y1, z1, len1);
+  return SetTextureSpace (xo, yo, zo, x1, y1, z1, len1);
 }
 
-void csPolygon3DStatic::SetTextureSpace (
+bool csPolygon3DStatic::SetTextureSpace (
   float xo,
   float yo,
   float zo,
@@ -748,15 +754,16 @@ void csPolygon3DStatic::SetTextureSpace (
   ComputeNormal ();
   if (IsTextureMappingEnabled ())
   {
-    MappingSetTextureSpace (
+    return MappingSetTextureSpace (
           polygon_data.plane_obj,
           xo, yo, zo,
           x1, y1, z1,
           len1);
   }
+  return true;
 }
 
-void csPolygon3DStatic::SetTextureSpace (
+bool csPolygon3DStatic::SetTextureSpace (
   const csVector3 &v_orig,
   const csVector3 &v1,
   float len1,
@@ -766,11 +773,12 @@ void csPolygon3DStatic::SetTextureSpace (
   ComputeNormal ();
   if (IsTextureMappingEnabled ())
   {
-    MappingSetTextureSpace (v_orig, v1, len1, v2, len2);
+    return MappingSetTextureSpace (v_orig, v1, len1, v2, len2);
   }
+  return true;
 }
 
-void csPolygon3DStatic::SetTextureSpace (
+bool csPolygon3DStatic::SetTextureSpace (
   float xo,
   float yo,
   float zo,
@@ -783,7 +791,7 @@ void csPolygon3DStatic::SetTextureSpace (
   float z2,
   float len2)
 {
-  SetTextureSpace (
+  return SetTextureSpace (
     csVector3 (xo, yo, zo),
     csVector3 (x1, y1, z1),
     len1,

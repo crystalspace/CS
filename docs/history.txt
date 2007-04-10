@@ -12,6 +12,8 @@ chronological order.
 	  made trouble on Windows.
 	- res slightly extended the iTextureWrapper docs to clarify when a
 	  texture handle is available.
+	- Marten added some error propagation in the texture matrix 
+	  computation in csTextureTrans and thingmesh. Fixes #221.
 9-Apr-2007
 	- res renamed csSubRectangles to CS::SubRectangles.
 	- res added CS::SubRectanglesCompact, a variant of CS::SubRectangles

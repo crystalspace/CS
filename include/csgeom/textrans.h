@@ -53,12 +53,12 @@ public:
    * I hope this explanation is clear since I can't seem to make it
    * any clearer :-)
    */
-  static void compute_texture_space (
+  static bool compute_texture_space (
 	csMatrix3& m, csVector3& v,
 	const csVector3& v_orig, const csVector3& v1, float len1,
 	float A, float B, float C);
   ///
-  static void compute_texture_space (
+  static bool compute_texture_space (
 	csMatrix3& m, csVector3& v,
 	float xo, float yo, float zo,
 	float x1, float y1, float z1, float len1,
@@ -68,7 +68,7 @@ public:
    * Use 'v1' and 'len1' for the u-axis and 'v2' and 'len2' for the
    * v-axis. Otherwise this function is the same as the previous one.
    */
-  static void compute_texture_space (
+  static bool compute_texture_space (
 	csMatrix3& m, csVector3& v,
 	const csVector3& v_orig,
 	const csVector3& v1, float len1,
@@ -78,7 +78,7 @@ public:
    * Similar to the previous function but treat as if the lengths
    * are set to 1.
    */
-  static void compute_texture_space (
+  static bool compute_texture_space (
 	csMatrix3& m, csVector3& v,
 	const csVector3& v_orig, const csVector3& v_u, const csVector3& v_v);
 
@@ -86,7 +86,7 @@ public:
    * The most general function. With these you provide the matrix
    * directly.
    */
-  static void compute_texture_space (
+  static bool compute_texture_space (
 	csMatrix3& m, csVector3& v,
 	float xo, float yo, float zo,
 	float xu, float yu, float zu,
