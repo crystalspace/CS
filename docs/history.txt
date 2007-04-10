@@ -7,10 +7,9 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 10-Apr-2007
-	- Marten reverted the file per node change in texi2html as it results
-	  in both index.html and Index.html being generated (which in turn
-	  prevents update on windows and other operating system where those
-	  are same file).
+	- res tweaked the texi2html config to work around that both an 
+	  index.html and Index.html was created - the difference in case only
+	  made trouble on Windows.
 9-Apr-2007
 	- res renamed csSubRectangles to CS::SubRectangles.
 	- res added CS::SubRectanglesCompact, a variant of CS::SubRectangles

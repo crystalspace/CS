@@ -125,7 +125,7 @@ $USE_NODES = 0;
 # -node-files
 # if this is set one file per node is generated, which can be a target for 
 # cross manual references.
-$NODE_FILES = 0;
+$NODE_FILES = 1;
 
 # -split section|chapter|node|none
 # if $SPLIT is set to 'section' (resp. 'chapter') one html file per section 
@@ -134,7 +134,7 @@ $NODE_FILES = 0;
 # for Top, Table of content (Toc), Overview and About are generated.
 # Otherwise a monolithic html file that contains the whole document is 
 # created.
-$SPLIT = section;
+$SPLIT = 'node';
 #$SPLIT = '';
 
 # -sec-nav|-nosec-nav
@@ -309,7 +309,7 @@ $TOP_HEADING = '';
 
 # if set, use this chapter for 'Index' button, else
 # use first chapter with @printindex
-$INDEX_CHAPTER = 'Index2';
+$INDEX_CHAPTER = 'Index';
 
 # if set and $SPLIT is set, then split index pages at the next letter
 # after they have more than that many entries
@@ -679,7 +679,7 @@ $print_toc_frame          = \&T2H_DEFAULT_print_toc_frame;
 $titlepage                 = \&T2H_DEFAULT_titlepage;
 $css_lines                 = \&T2H_DEFAULT_css_lines;
 $print_redirection_page    = \&T2H_DEFAULT_print_redirection_page;
-$node_file_name            = \&T2H_DEFAULT_node_file_name;
+$node_file_name            = \&CS_node_file_name;
 $element_file_name	   = \&CS_element_file_name;
 
 sub CS_element_file_name
@@ -698,6 +698,34 @@ sub CS_element_file_name
     $secname = $element->{'id'} unless $secname;
     
     return "${docu_name}_$secname.html";
+}
+
+sub CS_node_file_name($)
+{
+    my $node = shift;
+    return (undef, undef) if ($node->{'external_node'} or $node->{'index_page'});
+    my $file;
+    my $node_file;
+    
+    if (defined($node->{'file'}))
+    {
+	$file = $node->{'file'};
+	$node_file = $node->{'node_file'};
+    }
+    else
+    {
+	$node_file = $node->{'cross_manual_target'} . ".$NODE_FILE_EXTENSION";
+	$file =  $node_file if (($SPLIT eq 'node') and ($USE_NODES or $node->{'with_section'}));
+    }
+    
+    # HACK to avoid collision between index.html and Index.html on Windows.
+    if ($file =~ m/^Index/)
+    {
+      $file = 'cs_Index.html';
+      $node_file = 'cs_Index.html';
+    }
+    
+    return ($file, $node_file);
 }
 
 ########################################################################
