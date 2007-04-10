@@ -10,6 +10,8 @@ chronological order.
 	- res tweaked the texi2html config to work around that both an 
 	  index.html and Index.html was created - the difference in case only
 	  made trouble on Windows.
+	- res slightly extended the iTextureWrapper docs to clarify when a
+	  texture handle is available.
 9-Apr-2007
 	- res renamed csSubRectangles to CS::SubRectangles.
 	- res added CS::SubRectanglesCompact, a variant of CS::SubRectangles

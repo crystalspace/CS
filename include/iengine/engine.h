@@ -182,13 +182,15 @@ struct iEngine : public virtual iBase
    * @{ */
   
   /**
-   * Prepare the engine. This function must be called after
-   * you loaded/created the world. It will prepare all lightmaps
-   * for use and also free all images that were loaded for
-   * the texture manager (the texture manager should have them
-   * locally now). The optional progress meter will be used to
-   * report progress.
-   * <p>
+   * Prepare the engine. This function must be called after you loaded/created 
+   * the world and before it is rendered.
+   *
+   * Actions include:
+   * - Preparation of all lightmaps for use
+   * - Registering of textures with texture manager and freeing of loaded
+   *   images (as the texture manager will have created textures from them)
+   * The optional progress meter will be used to report progress.
+   *
    * The behaviour regarding cached lighting depends on the flag
    * you can set with the SetLightingCacheMode() function. The default
    * behaviour is to read the lightmap cache when present but don't
