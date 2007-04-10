@@ -309,7 +309,7 @@ $TOP_HEADING = '';
 
 # if set, use this chapter for 'Index' button, else
 # use first chapter with @printindex
-$INDEX_CHAPTER = '';
+$INDEX_CHAPTER = 'Index2';
 
 # if set and $SPLIT is set, then split index pages at the next letter
 # after they have more than that many entries
