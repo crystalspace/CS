@@ -166,6 +166,13 @@ struct iString : public virtual iBase
   virtual char GetAt (size_t n) const = 0;
 
   /**
+   * Delete a range of characters from the string.
+   * \param Pos Beginning of range to be deleted (zero-based).
+   * \param Count Number of characters to delete.
+   */
+  virtual void DeleteAt (size_t Pos, size_t Count = 1) = 0;
+
+  /**
    * Insert another string into this one.
    * \param Pos Position at which to insert the other string (zero-based).
    * \param Str String to insert.
@@ -296,6 +303,22 @@ struct iString : public virtual iBase
    * \remarks The comparison is case-insensitive.
    */
   virtual bool CompareNoCase (const iString* Str) const = 0;
+
+  /**
+   * Check if this string starts with another one.
+   * \param Str Other string.
+   * \param ignore_case Causes the comparison to be case insensitive if true.
+   * \return True if they are equal up to the length of Str; false if not.
+   */
+  virtual bool StartsWith (const iString* Str, bool ignore_case = false) const = 0;
+
+  /**
+   * Check if this string starts with another null-terminated C-string.
+   * \param Str Other string.
+   * \param ignore_case Causes the comparison to be case insensitive if true.
+   * \return True if they are equal up to the length of Str; false if not.
+   */
+  virtual bool StartsWith (const char* Str, bool ignore_case = false) const = 0;
 
   /// Append another string to this one.
   virtual void operator += (const iString& iStr) = 0;

@@ -251,7 +251,7 @@ CS_EMIT_BUILD_PROPERTY([PERL5], [$PERL])
 CS_EMIT_BUILD_PROPERTY([PERL], [$PERL])
 CS_EMIT_BUILD_PROPERTY([CMD.PERL5], [$PERL])
 
-# csperl5 fails to build on many platforms, so default is NO for now.
+# csperl5 is experimental/testing so default is NO for now.
 AC_ARG_WITH([perl], [AC_HELP_STRING([--with-perl],
     [use Perl5 scripting interface (default NO)])])
 AS_IF([test -z "$with_perl"], [with_perl=no])

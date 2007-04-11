@@ -133,6 +133,9 @@ public:
   /// Get character at position iPos
   virtual char GetAt (size_t iPos) const;
 
+  /// Delete iCount characters from position iPos.
+  virtual void DeleteAt (size_t iPos, size_t iCount);
+
   /// Insert another string into this one at position iPos
   virtual void Insert (size_t iPos, iString const* iStr);
 
@@ -235,6 +238,18 @@ public:
 
   /// Compare two strings ignoring case
   virtual bool CompareNoCase (const iString* iStr) const;
+
+  /// Check if two strings are equal
+  virtual bool Compare (const char* iStr) const;
+
+  /// Compare two strings ignoring case
+  virtual bool CompareNoCase (const char* iStr) const;
+
+  /// Check if this string starts with another
+  virtual bool StartsWith (const iString* iStr, bool ignore_case = false) const;
+
+  /// Check if this string starts with another
+  virtual bool StartsWith (const char* iStr, bool ignore_case = false) const;
 
   /// Append another string to this
   virtual void operator += (const iString& iStr);
