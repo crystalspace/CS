@@ -1454,7 +1454,7 @@ sub T2H_DEFAULT_print_redirection_page($)
     print $fh <<EOT;
 $DOCTYPE
 <html>
-<!-- Created on $Texi2HTML::THISDOC{'today'} by $Texi2HTML::THISDOC{'program'} -->
+<!-- Created by $Texi2HTML::THISDOC{'program'} -->
 <!--
 $Texi2HTML::THISDOC{'program_authors'}
 -->
