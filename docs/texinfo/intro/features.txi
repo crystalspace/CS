@@ -110,7 +110,7 @@ Crystal Space native windowing system using CEGUI.
 
 @item
 Cross-platform support for hardware rendering via OpenGL and software 
-rendering as well as a special "null" renderer for applications like game 
+rendering as well as a special ``null'' renderer for applications like game 
 servers. @xref{3D Renderer}.
 
 @item

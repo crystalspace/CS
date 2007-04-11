@@ -320,8 +320,15 @@ $SPLIT_INDEX = 100;
 $MENU_SYMBOL = '&bull;';
 #$MENU_SYMBOL = '*';
 
-$OPEN_QUOTE_SYMBOL = "\`";
-$CLOSE_QUOTE_SYMBOL = "'";
+$OPEN_QUOTE_SYMBOL = "&lsquo;";
+$CLOSE_QUOTE_SYMBOL = "&rsquo;";
+$OPEN_DOUBLE_QUOTE_SYMBOL = "&ldquo;";
+$CLOSE_DOUBLE_QUOTE_SYMBOL = "&rdquo;";
+
+# Symbol for -- dash
+$DASH_EN = "&ndash;";
+# Symbol for --- dash
+$DASH_EM = "&mdash;";
 
 # if true put a $MENU_SYMBOL before unnumbered in menus
 $UNNUMBERED_SYMBOL_IN_MENU = 0;

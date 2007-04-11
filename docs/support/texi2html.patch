@@ -1,69 +1,40 @@
---- texi2html.pl.unpatched	2007-04-09 17:35:03.000000000 +0200
-+++ texi2html.pl	2007-04-09 18:50:24.000000000 +0200
-@@ -1,4 +1,4 @@
--#! @PERL@
-+#! /usr/bin/perl
- 'di ';
- 'ig 00 ';
- #+##############################################################################
-@@ -32,8 +32,11 @@
- use strict;
- # used in case of tests, to revert to "C" locale.
- use POSIX qw(setlocale LC_ALL LC_CTYPE);
-+# used to obtain the name of the current working directory
-+use Cwd;
- # used to find a relative path back to the current working directory
- use File::Spec;
-+
- #
- # According to
- # larry.jones@sdrc.com (Larry Jones)
-@@ -71,7 +74,7 @@
- EOT
+--- texi2html.pl.orig	2006-05-21 16:16:05.000000000 +0200
++++ texi2html.pl	2007-04-11 16:09:38.000000000 +0200
+@@ -58,7 +58,7 @@
+ #--##############################################################################
  
- # Version: set in configure.in
--my $THISVERSION = '@PACKAGE_VERSION@';
-+my $THISVERSION = '1.76';
- my $THISPROG = "texi2html $THISVERSION"; # program name and version
+ # CVS version:
+-# $Id$
++# $Id$
  
- # set by configure, prefix for the sysconfdir and so on
-@@ -2360,17 +2363,6 @@
- # file name buisness
- #
- 
--# this is directly pasted over from latex2html
--sub getcwd
--{
--    local($_) = `pwd`;
--
--    die "'pwd' failed (out of memory?)\n"
--        unless length;
--    chop;
--    $_;
--}
--
- 
- my $docu_dir;            # directory of the document
- my $docu_name;           # basename of the document
-@@ -2500,7 +2492,7 @@
- my $path_to_working_dir = $docu_rdir;
- if ($docu_rdir ne '')
+ # Homepage:
+ my $T2H_HOMEPAGE = "http://texi2html.cvshome.org/";
+@@ -259,6 +259,10 @@
+ $MENU_SYMBOL
+ $OPEN_QUOTE_SYMBOL
+ $CLOSE_QUOTE_SYMBOL
++$OPEN_DOUBLE_QUOTE_SYMBOL
++$CLOSE_DOUBLE_QUOTE_SYMBOL
++$DASH_EN
++$DASH_EM
+ $TOC_LIST_STYLE
+ $TOC_LIST_ATTRIBUTE
+ $TOP_NODE_FILE
+@@ -618,9 +622,10 @@
+ sub t2h_gpl_normal_text($)
  {
--    my $cwd = getcwd;
-+    my $cwd = cwd;
-     my $docu_path = $docu_rdir;
-     $docu_path = $cwd . '/' . $docu_path unless ($docu_path =~ /^\//);
-     my @result = ();
-@@ -3037,7 +3029,7 @@
-     }
-     else
-     {
--        if (main::getcwd() =~ /\./)
-+        if (cwd() =~ /\./)
-         {
-             warn "$ERROR Warning l2h: current dir contains a dot. Use /tmp as l2h_tmp dir \n";
-             $dotbug = 1;
-@@ -3688,6 +3680,7 @@
+     my $text = shift;
+-    $text =~ s/``/"/go;
+-    $text =~ s/''/"/go;
+-    $text =~ s/-(--?)/$1/go;
++    $text =~ s/``/$OPEN_DOUBLE_QUOTE_SYMBOL/go;
++    $text =~ s/''/$CLOSE_DOUBLE_QUOTE_SYMBOL/go;
++    $text =~ s/---/$DASH_EM/go;
++    $text =~ s/--/$DASH_EN/go;
+     return $text;
+ }
+ # @INIT@
+@@ -3680,6 +3685,7 @@
                              $node_ref->{'current_place'} = [];
                              merge_element_before_anything($node_ref);
                              $node_ref->{'index_names'} = [];
@@ -71,7 +42,7 @@
                              $state->{'place'} = $node_ref->{'current_place'};
                              $state->{'element'} = $node_ref;
                              $state->{'after_element'} = 1;
-@@ -3750,7 +3743,16 @@
+@@ -3742,7 +3748,16 @@
                          {
                              $sec_num++;
                              $num = $sec_num;
@@ -89,16 +60,48 @@
                          }
                          else
                          {
-@@ -4420,7 +4422,12 @@
+@@ -4407,17 +4422,16 @@
+                 {
+                     $section->{'number'} = $number;
+                 }    
+-		$section->{'id'} = $section->{'number'};
+                 $level--;
+             }
              my $toplevel_number = $previous_numbers[$toplevel];
              $toplevel_number = 0 if (!defined($toplevel_number));
              $section->{'number'} = "$toplevel_number.$section->{'number'}";
+-	    $section->{'id'} = $section->{'number'};
 +	    $section->{'id'} = $section->{'number'} unless $Texi2HTML::Config::NODE_FILES;
          }
-+	else
-+	{
+ 	else
+ 	{
+-	    $section->{'id'} = $section->{'texi'};
 +	    $section->{'id'} = $section->{'texi'} unless $Texi2HTML::Config::NODE_FILES;
-+	}
+ 	}
          # find the previous section
          if (defined($previous_sections[$section->{'level'}]))
-         {
+@@ -7616,6 +7630,11 @@
+     my $text = shift;
+     my $state = shift;
+     return $text if ($state->{'keep_texi'});
++    # Protect first to allow normal_text to emit entities
++    if (!$state->{'no_protection'})
++    {
++        $text = &$Texi2HTML::Config::protect_text($text);
++    }
+     if (defined($state) and !$state->{'preformatted'} and !$state->{'code_style'})
+     {
+         # in normal text `` and '' serve as quotes, --- is for a long dash 
+@@ -7623,11 +7642,7 @@
+         # (see texinfo.txi, @node Conventions)
+         $text = &$Texi2HTML::Config::normal_text($text);
+     }
+-    if ($state->{'no_protection'})
+-    {
+-        return $text;
+-    }
+-    return &$Texi2HTML::Config::protect_text($text);
++    return $text;
+ }
+ 
+ sub end_simple_format($$)

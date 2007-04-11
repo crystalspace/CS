@@ -24,6 +24,8 @@ chronological order.
 	- Oktal added the methods DeleteAt() and StartsWith() to iString and
 	  scfString, bringing them in to line with csString, where identical
 	  methods already exist.
+	- res tweaked texi2html + config to produce nicer quotes and dashes,
+	  utilizing HTML entities instead of ASCII chars.
 10-Apr-2007
 	- res tweaked the texi2html config to work around that both an 
 	  index.html and Index.html was created - the difference in case only
