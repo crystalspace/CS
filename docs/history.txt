@@ -19,6 +19,11 @@ chronological order.
 	  <colldet/>.
 	- Jorrit updated the documentation on the new <trimesh>
 	  syntax in world files.
+	- Oktal eliminated a compiler warning in csutil/util.cpp.
+	- Oktal made a minor change to a comment in configure.ac.
+	- Oktal added the methods DeleteAt() and StartsWith() to iString and
+	  scfString, bringing them in to line with csString, where identical
+	  methods already exist.
 10-Apr-2007
 	- res tweaked the texi2html config to work around that both an 
 	  index.html and Index.html was created - the difference in case only
