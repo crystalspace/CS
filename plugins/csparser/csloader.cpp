@@ -79,6 +79,7 @@
 #include "ivaria/reporter.h"
 #include "csgeom/poly3d.h"
 #include "csgeom/polymesh.h"
+#include "csgeom/trimesh.h"
 #include "igeom/polymesh.h"
 #include "imesh/objmodel.h"
 #include "ivaria/terraform.h"
@@ -1769,18 +1770,21 @@ public:
   virtual uint32 GetChangeNumber () const { return 0; }
 };
 
-bool csLoader::ParsePolyMeshChildBox (iDocumentNode* child,
-	csRef<iPolygonMesh>& polymesh)
+bool csLoader::ParseTriMeshChildBox (iDocumentNode* child,
+	csRef<iPolygonMesh>& polymesh,
+	csRef<iTriangleMesh>& trimesh)
 {
   csBox3 b;
   if (!SyntaxService->ParseBox (child, b))
     return false;
   polymesh = csPtr<iPolygonMesh> (new csPolygonMeshBox (b));
+  trimesh = csPtr<iTriangleMesh> (new csTriangleMeshBox (b));
   return true;
 }
 
-bool csLoader::ParsePolyMeshChildMesh (iDocumentNode* child,
-	csRef<iPolygonMesh>& polymesh)
+bool csLoader::ParseTriMeshChildMesh (iDocumentNode* child,
+	csRef<iPolygonMesh>& polymesh,
+	csRef<iTriangleMesh>& trimesh)
 {
   int num_vt = 0;
   int num_tri = 0;
@@ -1801,7 +1805,10 @@ bool csLoader::ParsePolyMeshChildMesh (iDocumentNode* child,
     }
   }
 
-  polymesh = csPtr<iPolygonMesh> (new PolygonMeshMesh (num_vt, num_tri));
+  polymesh.AttachNew (new PolygonMeshMesh (num_vt, num_tri));
+  csTriangleMesh* cstrimesh = new csTriangleMesh ();
+  trimesh.AttachNew (cstrimesh);
+  
   csVector3* vt = polymesh->GetVertices ();
   csMeshedPolygon* po = polymesh->GetPolygons ();
   num_vt = 0;
@@ -1819,13 +1826,20 @@ bool csLoader::ParsePolyMeshChildMesh (iDocumentNode* child,
       case XMLTOKEN_V:
 	if (!SyntaxService->ParseVector (child_child, vt[num_vt]))
 	  return false;
+	cstrimesh->AddVertex (vt[num_vt]);
 	num_vt++;
 	break;
       case XMLTOKEN_T:
-	po[num_tri].vertices[0] = child_child->GetAttributeValueAsInt ("v1");
-	po[num_tri].vertices[1] = child_child->GetAttributeValueAsInt ("v2");
-	po[num_tri].vertices[2] = child_child->GetAttributeValueAsInt ("v3");
-	num_tri++;
+	{
+	  int a = child_child->GetAttributeValueAsInt ("v1");
+	  int b = child_child->GetAttributeValueAsInt ("v2");
+	  int c = child_child->GetAttributeValueAsInt ("v3");
+	  po[num_tri].vertices[0] = a;
+	  po[num_tri].vertices[1] = b;
+	  po[num_tri].vertices[2] = c;
+	  cstrimesh->AddTriangle (a, b, c);
+	  num_tri++;
+	}
 	break;
       default:
 	SyntaxService->ReportBadToken (child_child);
@@ -1835,18 +1849,44 @@ bool csLoader::ParsePolyMeshChildMesh (iDocumentNode* child,
   return true;
 }
 
-bool csLoader::ParsePolyMesh (iDocumentNode* node, iObjectModel* objmodel)
+#undef CS_CLO
+#undef CS_CON
+#define CS_CLO (CS_POLYMESH_CLOSED|CS_POLYMESH_NOTCLOSED)
+#define CS_CON (CS_POLYMESH_CONVEX|CS_POLYMESH_NOTCONVEX)
+static void SetPolyMeshFlags (csFlags& flags, bool closed, bool notclosed,
+    bool convex, bool notconvex)
+{
+  if (closed) flags.Set (CS_CLO, CS_POLYMESH_CLOSED);
+  if (notclosed) flags.Set (CS_CLO, CS_POLYMESH_NOTCLOSED);
+  if (convex) flags.Set (CS_CON, CS_POLYMESH_CONVEX);
+  if (notconvex) flags.Set (CS_CON, CS_POLYMESH_NOTCONVEX);
+}
+#undef CS_CLO
+#undef CS_CON
+#define CS_CLO (CS_TRIMESH_CLOSED|CS_TRIMESH_NOTCLOSED)
+#define CS_CON (CS_TRIMESH_CONVEX|CS_TRIMESH_NOTCONVEX)
+static void SetTriMeshFlags (csFlags& flags, bool closed, bool notclosed,
+    bool convex, bool notconvex)
+{
+  if (closed) flags.Set (CS_CLO, CS_TRIMESH_CLOSED);
+  if (notclosed) flags.Set (CS_CLO, CS_TRIMESH_NOTCLOSED);
+  if (convex) flags.Set (CS_CON, CS_TRIMESH_CONVEX);
+  if (notconvex) flags.Set (CS_CON, CS_TRIMESH_NOTCONVEX);
+}
+#undef CS_CLO
+#undef CS_CON
+
+bool csLoader::ParseTriMesh (iDocumentNode* node, iObjectModel* objmodel)
 {
   csRef<iPolygonMesh> polymesh;
+  csRef<iTriangleMesh> trimesh;
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  bool colldet = false;
-  bool viscull = false;
-  bool shadows = false;
   bool convex = false;
   bool notconvex = false;
   bool closed = false;
   bool notclosed = false;
   bool use_default_mesh = false;
+  csArray<csStringID> ids;
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
@@ -1856,35 +1896,35 @@ bool csLoader::ParsePolyMesh (iDocumentNode* node, iObjectModel* objmodel)
     switch (id)
     {
       case XMLTOKEN_DEFAULT:
-        if (polymesh)
+        if (polymesh || trimesh)
 	{
 	  SyntaxService->ReportError (
-	    "crystalspace.maploader.parse.polymesh", child,
+	    "crystalspace.maploader.parse.trimesh", child,
 	    "Use either <default>, <box>, or <mesh>!");
 	  return false;
 	}
 	use_default_mesh = true;
         break;
       case XMLTOKEN_BOX:
-        if (polymesh || use_default_mesh)
+        if (polymesh || trimesh || use_default_mesh)
 	{
 	  SyntaxService->ReportError (
-	    "crystalspace.maploader.parse.polymesh", child,
+	    "crystalspace.maploader.parse.trimesh", child,
 	    "Use either <default>, <box>, or <mesh>!");
 	  return false;
 	}
-        if (!ParsePolyMeshChildBox (child, polymesh))
+        if (!ParseTriMeshChildBox (child, polymesh, trimesh))
 	  return false;
         break;
       case XMLTOKEN_MESH:
-        if (polymesh || use_default_mesh)
+        if (polymesh || trimesh || use_default_mesh)
 	{
 	  SyntaxService->ReportError (
-	    "crystalspace.maploader.parse.polymesh", child,
+	    "crystalspace.maploader.parse.trimesh", child,
 	    "Use either <default>, <box>, or <mesh>!");
 	  return false;
 	}
-        if (!ParsePolyMeshChildMesh (child, polymesh))
+        if (!ParseTriMeshChildMesh (child, polymesh, trimesh))
 	  return false;
         break;
       case XMLTOKEN_CLOSED:
@@ -1904,55 +1944,69 @@ bool csLoader::ParsePolyMesh (iDocumentNode* node, iObjectModel* objmodel)
         notconvex = true;
         break;
       case XMLTOKEN_COLLDET:
-        colldet = true;
+	ReportWarning (
+	        "crystalspace.maploader.parse.trimesh",
+                child, "<colldet> is deprecated. Use <id>crystalspace.trianglemesh.colldet</id> instead.");
+	ids.Push (stringSet->Request ("crystalspace.trianglemesh.colldet"));
 	break;
       case XMLTOKEN_VISCULL:
-        viscull = true;
+	ReportWarning (
+	        "crystalspace.maploader.parse.trimesh",
+                child, "<viscull> is deprecated. Use <id>crystalspace.trianglemesh.viscull</id> instead.");
+	ids.Push (stringSet->Request ("crystalspace.trianglemesh.viscull"));
 	break;
       case XMLTOKEN_SHADOWS:
-        shadows = true;
+	ReportWarning (
+	        "crystalspace.maploader.parse.trimesh",
+                child, "<shadows> is deprecated. Use <id>crystalspace.trianglemesh.shadows</id> instead.");
+	ids.Push (stringSet->Request ("crystalspace.trianglemesh.shadows"));
+	break;
+      case XMLTOKEN_ID:
+	ids.Push (stringSet->Request (child->GetContentsValue ()));
 	break;
       default:
 	SyntaxService->ReportBadToken (child);
         return false;
     }
   }
-  if (!colldet && !viscull && !shadows)
+  if (ids.GetSize () == 0)
   {
     SyntaxService->ReportError (
-	"crystalspace.maploader.parse.polymesh",
-	node, "Please specify either <shadows/>, <viscull/> or <colldet/>!");
+	"crystalspace.maploader.parse.trimesh",
+	node, "No id's for this triangle mesh!");
     return false;
   }
-#undef CS_CLO
-#undef CS_CON
-#define CS_CLO (CS_POLYMESH_CLOSED|CS_POLYMESH_NOTCLOSED)
-#define CS_CON (CS_POLYMESH_CONVEX|CS_POLYMESH_NOTCONVEX)
+  csStringID cd_id = stringSet->Request (
+      "crystalspace.trianglemesh.colldet");
+  csStringID vis_id = stringSet->Request (
+      "crystalspace.trianglemesh.viscull");
+  csStringID shad_id = stringSet->Request (
+      "crystalspace.trianglemesh.shadows");
+  size_t i;
   if (use_default_mesh)
   {
-    if (colldet && objmodel->GetPolygonMeshColldet ())
+    for (i = 0 ; i < ids.GetSize () ; i++)
     {
-      csFlags& flags = objmodel->GetPolygonMeshColldet ()->GetFlags ();
-      if (closed) flags.Set (CS_CLO, CS_POLYMESH_CLOSED);
-      if (notclosed) flags.Set (CS_CLO, CS_POLYMESH_NOTCLOSED);
-      if (convex) flags.Set (CS_CON, CS_POLYMESH_CONVEX);
-      if (notconvex) flags.Set (CS_CON, CS_POLYMESH_NOTCONVEX);
-    }
-    if (viscull && objmodel->GetPolygonMeshViscull ())
-    {
-      csFlags& flags = objmodel->GetPolygonMeshViscull ()->GetFlags ();
-      if (closed) flags.Set (CS_CLO, CS_POLYMESH_CLOSED);
-      if (notclosed) flags.Set (CS_CLO, CS_POLYMESH_NOTCLOSED);
-      if (convex) flags.Set (CS_CON, CS_POLYMESH_CONVEX);
-      if (notconvex) flags.Set (CS_CON, CS_POLYMESH_NOTCONVEX);
-    }
-    if (shadows && objmodel->GetPolygonMeshShadows ())
-    {
-      csFlags& flags = objmodel->GetPolygonMeshShadows ()->GetFlags ();
-      if (closed) flags.Set (CS_CLO, CS_POLYMESH_CLOSED);
-      if (notclosed) flags.Set (CS_CLO, CS_POLYMESH_NOTCLOSED);
-      if (convex) flags.Set (CS_CON, CS_POLYMESH_CONVEX);
-      if (notconvex) flags.Set (CS_CON, CS_POLYMESH_NOTCONVEX);
+      if (ids[i] == cd_id && objmodel->GetPolygonMeshColldet ())
+      {
+        csFlags& flags = objmodel->GetPolygonMeshColldet ()->GetFlags ();
+        SetPolyMeshFlags (flags, closed, notclosed, convex, notconvex);
+      }
+      if (ids[i] == vis_id && objmodel->GetPolygonMeshViscull ())
+      {
+        csFlags& flags = objmodel->GetPolygonMeshViscull ()->GetFlags ();
+        SetPolyMeshFlags (flags, closed, notclosed, convex, notconvex);
+      }
+      if (ids[i] == shad_id && objmodel->GetPolygonMeshShadows ())
+      {
+        csFlags& flags = objmodel->GetPolygonMeshShadows ()->GetFlags ();
+        SetPolyMeshFlags (flags, closed, notclosed, convex, notconvex);
+      }
+      if (objmodel->GetTriangleData (ids[i]))
+      {
+        csFlags& flags = objmodel->GetTriangleData (ids[i])->GetFlags ();
+        SetTriMeshFlags (flags, closed, notclosed, convex, notconvex);
+      }
     }
   }
   else
@@ -1960,21 +2014,25 @@ bool csLoader::ParsePolyMesh (iDocumentNode* node, iObjectModel* objmodel)
     if (polymesh)
     {
       csFlags& flags = polymesh->GetFlags ();
-      if (closed) flags.Set (CS_CLO, CS_POLYMESH_CLOSED);
-      if (notclosed) flags.Set (CS_CLO, CS_POLYMESH_NOTCLOSED);
-      if (convex) flags.Set (CS_CON, CS_POLYMESH_CONVEX);
-      if (notconvex) flags.Set (CS_CON, CS_POLYMESH_NOTCONVEX);
+      SetPolyMeshFlags (flags, closed, notclosed, convex, notconvex);
+    }
+    if (trimesh)
+    {
+      csFlags& flags = trimesh->GetFlags ();
+      SetTriMeshFlags (flags, closed, notclosed, convex, notconvex);
     }
 
-    if (colldet)
-      objmodel->SetPolygonMeshColldet (polymesh);
-    if (viscull)
-      objmodel->SetPolygonMeshViscull (polymesh);
-    if (shadows)
-      objmodel->SetPolygonMeshShadows (polymesh);
+    for (i = 0 ; i < ids.GetSize () ; i++)
+    {
+      if (ids[i] == cd_id)
+        objmodel->SetPolygonMeshColldet (polymesh);
+      if (ids[i] == vis_id)
+        objmodel->SetPolygonMeshViscull (polymesh);
+      if (ids[i] == shad_id)
+        objmodel->SetPolygonMeshShadows (polymesh);
+      objmodel->SetTriangleData (ids[i], trimesh);
+    }
   }
-#undef CS_CLO
-#undef CS_CON
 
   return true;
 }
@@ -2199,6 +2257,11 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
         break;
 
       case XMLTOKEN_POLYMESH:
+	ReportWarning (
+	        "crystalspace.maploader.parse.meshfactory",
+                child, "<polymesh> is deprecated. Use <trimesh> instead.");
+	// FALL THRU!
+      case XMLTOKEN_TRIMESH:
         {
 	  if (!stemp->GetMeshObjectFactory ())
 	  {
@@ -2216,7 +2279,7 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	      "This factory doesn't support setting of other 'polymesh'!");
 	    return false;
 	  }
-	  if (!ParsePolyMesh (child, objmodel))
+	  if (!ParseTriMesh (child, objmodel))
 	  {
 	    // Error already reported.
 	    return false;
@@ -3122,14 +3185,13 @@ csRef<iMeshWrapper> csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_con
   return mesh;
 }
 
-bool csLoader::LoadPolyMeshInSector (iLoaderContext* ldr_context,
+bool csLoader::LoadTriMeshInSector (iLoaderContext* ldr_context,
 	iMeshWrapper* mesh, iDocumentNode* node, iStreamSource* ssource)
 {
   iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
   csRef<iPolygonMesh> polymesh;
-  bool colldet = false;
-  bool viscull = false;
-  bool shadows = false;
+  csRef<iTriangleMesh> trimesh;
+  csArray<csStringID> ids;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -3178,21 +3240,33 @@ bool csLoader::LoadPolyMeshInSector (iLoaderContext* ldr_context,
         break;
       }
       case XMLTOKEN_BOX:
-        if (!ParsePolyMeshChildBox (child, polymesh))
+        if (!ParseTriMeshChildBox (child, polymesh, trimesh))
 	  return false;
         break;
       case XMLTOKEN_MESH:
-        if (!ParsePolyMeshChildMesh (child, polymesh))
+        if (!ParseTriMeshChildMesh (child, polymesh, trimesh))
 	  return false;
         break;
       case XMLTOKEN_COLLDET:
-        colldet = true;
+	ReportWarning (
+	        "crystalspace.maploader.parse.trimesh",
+                child, "<colldet> is deprecated. Use <id>crystalspace.trianglemesh.colldet</id> instead.");
+	ids.Push (stringSet->Request ("crystalspace.trianglemesh.colldet"));
 	break;
       case XMLTOKEN_VISCULL:
-        viscull = true;
+	ReportWarning (
+	        "crystalspace.maploader.parse.trimesh",
+                child, "<viscull> is deprecated. Use <id>crystalspace.trianglemesh.viscull</id> instead.");
+	ids.Push (stringSet->Request ("crystalspace.trianglemesh.viscull"));
 	break;
       case XMLTOKEN_SHADOWS:
-        shadows = true;
+	ReportWarning (
+	        "crystalspace.maploader.parse.trimesh",
+                child, "<shadows> is deprecated. Use <id>crystalspace.trianglemesh.shadows</id> instead.");
+	ids.Push (stringSet->Request ("crystalspace.trianglemesh.shadows"));
+	break;
+      case XMLTOKEN_ID:
+	ids.Push (stringSet->Request (child->GetContentsValue ()));
 	break;
       default:
 	SyntaxService->ReportBadToken (child);
@@ -3200,36 +3274,43 @@ bool csLoader::LoadPolyMeshInSector (iLoaderContext* ldr_context,
     }
   }
 
-  if (!colldet && !viscull && !shadows)
+  if (ids.GetSize () == 0)
   {
     SyntaxService->ReportError (
-	"crystalspace.maploader.parse.polymesh",
-	node, "Please specify either <shadows/>, <viscull/> or <colldet/>!");
+	"crystalspace.maploader.parse.trimesh",
+	node, "No id's for this triangle mesh!");
     return false;
   }
-  if (!polymesh)
+  if (!polymesh || !trimesh)
   {
     SyntaxService->ReportError (
-	"crystalspace.maploader.parse.sector.polymesh",
+	"crystalspace.maploader.parse.sector.trimesh",
 	node, "Please specify either <mesh/> or <box/>!");
     return false;
   }
 
-  if (colldet)
-    objmodel->SetPolygonMeshColldet (polymesh);
-  if (viscull)
-    objmodel->SetPolygonMeshViscull (polymesh);
-  if (shadows)
-    objmodel->SetPolygonMeshShadows (polymesh);
+  csStringID cd_id = stringSet->Request (
+      "crystalspace.trianglemesh.colldet");
+  csStringID vis_id = stringSet->Request (
+      "crystalspace.trianglemesh.viscull");
+  csStringID shad_id = stringSet->Request (
+      "crystalspace.trianglemesh.shadows");
+  size_t i;
+  for (i = 0 ; i < ids.GetSize () ; i++)
+  {
+    if (ids[i] == cd_id) objmodel->SetPolygonMeshColldet (polymesh);
+    if (ids[i] == vis_id) objmodel->SetPolygonMeshViscull (polymesh);
+    if (ids[i] == shad_id) objmodel->SetPolygonMeshShadows (polymesh);
+    objmodel->SetTriangleData (ids[i], trimesh);
+  }
 
   csRef<iNullMeshState> nullmesh = scfQueryInterface<iNullMeshState> (
     	mesh->GetMeshObject ());
   CS_ASSERT (nullmesh != 0);
-  int i;
   csBox3 bbox;
-  csVector3* vt = polymesh->GetVertices ();
+  csVector3* vt = trimesh->GetVertices ();
   bbox.StartBoundingBox (vt[0]);
-  for (i = 1 ; i < polymesh->GetVertexCount () ; i++)
+  for (i = 1 ; i < trimesh->GetVertexCount () ; i++)
   {
     bbox.AddBoundingVertexSmart (vt[i]);
   }
@@ -3551,6 +3632,11 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
         break;
 
       case XMLTOKEN_POLYMESH:
+	ReportWarning (
+	        "crystalspace.maploader.parse.mesh",
+                child, "<polymesh> is deprecated. Use <trimesh> instead.");
+	// FALL THRU!
+      case XMLTOKEN_TRIMESH:
         {
 	  if (!mesh->GetMeshObject ())
 	  {
@@ -3567,7 +3653,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	      "This mesh doesn't support setting of other 'polymesh'!");
 	    return false;
 	  }
-	  if (!ParsePolyMesh (child, objmodel))
+	  if (!ParseTriMesh (child, objmodel))
 	  {
 	    // Error already reported.
 	    return false;
@@ -5140,6 +5226,11 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
         }
         break;
       case XMLTOKEN_POLYMESH:
+	ReportWarning (
+	        "crystalspace.maploader.parse.sector",
+                child, "<polymesh> is deprecated. Use <trimesh> instead.");
+	// FALL THRU!
+      case XMLTOKEN_TRIMESH:
         {
 	  const char* meshname = child->GetAttributeValue ("name");
 	  if (!meshname)
@@ -5152,7 +5243,7 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	  }
 	  csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (
 	  	"crystalspace.mesh.object.null", meshname);
-          if (!LoadPolyMeshInSector (ldr_context, mesh, child, ssource))
+          if (!LoadTriMeshInSector (ldr_context, mesh, child, ssource))
 	  {
 	    // Error is already reported.
 	    return 0;

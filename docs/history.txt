@@ -9,6 +9,16 @@ chronological order.
 11-Apr-2007
 	- res tweaked the texi2html config to not include the current date in
 	  redirect files.
+	- Jorrit changed the loader to recognize a new <trimesh> keyword.
+	  <polymesh> is now deprecated. However, both <trimesh> and
+	  <polymesh> will currently attach both a iPolygonMesh and
+	  an iTriangleMesh to the object model for compatibility reasons.
+	- Jorrit changed <colldet>, <viscull>, and <shadows> options
+	  inside a <trimesh> to the more general <id>. For example,
+	  use <id>crystalspace.trianglemesh.colldet</id> instead of
+	  <colldet/>.
+	- Jorrit updated the documentation on the new <trimesh>
+	  syntax in world files.
 10-Apr-2007
 	- res tweaked the texi2html config to work around that both an 
 	  index.html and Index.html was created - the difference in case only

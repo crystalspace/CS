@@ -151,7 +151,7 @@ For example, if you have a large dungeon-like map then you can put
 large simple occluding objects in the @emph{void space} between the dungeon
 corridors (this is space where the camera should normally not be able
 to see).  When used properly, this optimization can provide a lot of gain for
-performance.  You can use standalone @dfn{polymesh} objects (see example
+performance.  You can use standalone @dfn{trimesh} objects (see example
 below) to construct this, so you don't need to make a real mesh for it.
 This optimization can also be used when you have a complex multi-part
 object. You can then put a dummy occluder inside that object which will help
@@ -167,7 +167,7 @@ object in a map file:
   <params>
     @dots{}
   </params>
-  <polymesh>
+  <trimesh>
     <mesh>
       <v x="-1" y="-1" z="-1" />
       <v x="1" y="-1" z="-1" />
@@ -176,8 +176,8 @@ object in a map file:
       <t v1="0" v2="1" v3="2" />
       <t v1="0" v2="2" v3="3" />
     </mesh>
-    <viscull />
-  </polymesh>
+    <id>crystalspace.trianglemesh.viscull</id>
+  </trimesh>
 </meshobj>
 @end example
 
@@ -189,9 +189,9 @@ And this is an example of how you can disable the occlusion mesh for an object:
   <params>
     @dots{}
   </params>
-  <polymesh>
-    <viscull />
-  </polymesh>
+  <trimesh>
+    <id>crystalspace.trianglemesh.viscull</id>
+  </trimesh>
 </meshobj>
 @end example
 

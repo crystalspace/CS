@@ -64,6 +64,7 @@ struct iDocumentNode;
 struct iDocument;
 struct iFile;
 struct iPolygonMesh;
+struct iTriangleMesh;
 struct iShaderManager;
 struct iMeshGenerator;
 struct iSceneNode;
@@ -378,12 +379,12 @@ private:
   /// Find the named shared variable and verify its type if specified
   iSharedVariable *FindSharedVariable(const char *colvar,
 				      int verify_type );
-  /// Parse a 'polymesh' block.
-  bool ParsePolyMesh (iDocumentNode* node, iObjectModel* objmodel);
-  bool ParsePolyMeshChildBox (iDocumentNode* child,
-	csRef<iPolygonMesh>& polymesh);
-  bool ParsePolyMeshChildMesh (iDocumentNode* child,
-	csRef<iPolygonMesh>& polymesh);
+  /// Parse a 'trimesh' block.
+  bool ParseTriMesh (iDocumentNode* node, iObjectModel* objmodel);
+  bool ParseTriMeshChildBox (iDocumentNode* child,
+	csRef<iPolygonMesh>& polymesh, csRef<iTriangleMesh>& trimesh);
+  bool ParseTriMeshChildMesh (iDocumentNode* child,
+	csRef<iPolygonMesh>& polymesh, csRef<iTriangleMesh>& trimesh);
 
   /// -----------------------------------------------------------------------
   /// Parse a shaderlist
@@ -437,9 +438,9 @@ private:
   	iMeshWrapper* mesh, iMeshWrapper* parent, iDocumentNode* node,
 	iStreamSource* ssource);
   /**
-   * Load the polymesh object from the map file.
+   * Load the trimesh object from the map file.
    */
-  bool LoadPolyMeshInSector (iLoaderContext* ldr_context,
+  bool LoadTriMeshInSector (iLoaderContext* ldr_context,
   	iMeshWrapper* mesh, iDocumentNode* node, iStreamSource* ssource);
 
   /**

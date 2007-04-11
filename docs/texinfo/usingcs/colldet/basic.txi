@@ -6,7 +6,7 @@
 @cindex @code{csColliderActor}
 @cindex @code{iCollideSystem}
 @cindex @code{iCollider}
-@cindex @code{iPolygonMesh}
+@cindex @code{iTriangleMesh}
 @cindex @code{iObject}
 @cindex @code{iMeshWrapper}
 @cindex collision detection
@@ -80,10 +80,10 @@ choose another plugin then you can also hard-code the string.  The
 
 Before you can use the collision detection system you have to make
 instances of @samp{iCollider}. Only the collide system can do that. To
-create an @samp{iCollider} you have to give an instance of @samp{iPolygonMesh}.
-Several meshes in Crystal Space implement @samp{iPolygonMesh}. If you have
+create an @samp{iCollider} you have to give an instance of @samp{iTriangleMesh}.
+Several meshes in Crystal Space implement @samp{iTriangleMesh}. If you have
 special geometry on your own you can make your own classes to implement
-@samp{iPolygonMesh}. The easiest way to initialize a collider for a model
+@samp{iTriangleMesh}. The easiest way to initialize a collider for a model
 is to use this code:
 
 @example
@@ -117,11 +117,12 @@ The most primitive code to initialize a collider for a mesh is here:
 @example
 csRef<iCollider> MyGame::InitCollider (iMeshWrapper* mesh)
 @{
-  iPolygonMesh* polmesh =
-    mesh->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet();
-  if (polmesh)
+  iTriangleMesh* trimesh =
+    mesh->GetMeshObject()->GetObjectModel()->GetTriangleData(
+    	cdsys->GetTriangleDataID());
+  if (trimesh)
   @{
-    csRef<iCollider> cd = cd_sys->CreateCollider (polmesh);
+    csRef<iCollider> cd = cd_sys->CreateCollider (trimesh);
     return cd;
   @}
   else
@@ -324,7 +325,7 @@ The header files useful for this section are:
 #include <iutil/object.h>
 #include <iutil/plugin.h>
 #include <ivaria/collider.h>
-#include <igeom/polymesh.h>
+#include <igeom/trimesh.h>
 #include <iengine/mesh.h>
 #include <cstool/collider.h>
 @end example
