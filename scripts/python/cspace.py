@@ -424,6 +424,8 @@ class iString(iBase):
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetData(*args): return _cspace.iString_GetData(*args)
+    def DeleteAt(*args): return _cspace.iString_DeleteAt(*args)
+    def StartsWith(*args): return _cspace.iString_StartsWith(*args)
     def __ne__(*args): return _cspace.iString___ne__(*args)
     __swig_destroy__ = _cspace.delete_iString
     __del__ = lambda self : None;

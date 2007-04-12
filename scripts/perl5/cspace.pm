@@ -771,6 +771,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *GetData = *cspacec::iString_GetData;
+*DeleteAt = *cspacec::iString_DeleteAt;
+*StartsWith = *cspacec::iString_StartsWith;
 *__ne__ = *cspacec::iString___ne__;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
