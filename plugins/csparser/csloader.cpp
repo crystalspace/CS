@@ -1632,10 +1632,7 @@ bool csLoader::LoadSounds (iDocumentNode* node)
 	  }
           iSndSysWrapper* snd = SndSysManager->FindSoundByName (name);
           if (!snd)
-	  {
-	    if (mode3d != -1)
-              snd = LoadSoundWrapper (name, filename, mode3d);
-	    else
+	  {	    
               snd = LoadSoundWrapper (name, filename);
 	  }
           if (snd)

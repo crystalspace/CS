@@ -66,15 +66,6 @@ struct iVerbosityManager : public virtual iBase
    *   interpretation of \a flag and \a fuzzy.
    */
   virtual bool Enabled(char const* flag = 0, bool fuzzy = true) const = 0;
-
-  /**
-   * Given major and minor components, check if the verbosity class
-   * "major.minor" is enabled.
-   * \deprecated Use instead the more generic Enabled() method, which accepts
-   *   any granularity of class breakdown; not just major and minor components.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use Enabled() instead")
-  virtual bool CheckFlag(char const* major, char const* minor) const = 0;
 };
 
 #endif // __CS_IUTIL_VERBOSITYMANAGER_H__

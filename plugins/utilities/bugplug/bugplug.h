@@ -19,6 +19,7 @@
 #ifndef __CS_BUGPLUG_H__
 #define __CS_BUGPLUG_H__
 
+#include "cstool/numberedfilenamehelper.h"
 #include "csutil/cfgacc.h"
 #include "csutil/parray.h"
 #include "csutil/scf.h"
@@ -26,15 +27,15 @@
 #include "csutil/util.h"
 #include "csutil/weakref.h"
 #include "csutil/weakrefarr.h"
-#include "cstool/numberedfilenamehelper.h"
+#include "iengine/engine.h"
 #include "iutil/comp.h"
 #include "iutil/csinput.h"
 #include "iutil/eventh.h"
 #include "iutil/plugin.h"
+#include "iutil/strset.h"
+#include "ivaria/bugplug.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
-#include "ivaria/bugplug.h"
-#include "iengine/engine.h"
 
 struct iCamera;
 struct iConsoleOutput;
@@ -236,6 +237,7 @@ private:
   csRef<iVFS> VFS;
   csRef<iVirtualClock> vc;
   csRef<iFont> fnt;
+  csRef<iStringSet> stringSet;
   bool initialized;
   csConfigAccess config;
   /**

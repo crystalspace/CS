@@ -621,8 +621,6 @@ public:
   virtual csPtr<iSndSysData> LoadSoundSysData (const char *fname);
   virtual csPtr<iSndSysStream> LoadSoundStream (const char *fname,
   	int mode3d);
-  virtual iSndSysWrapper* LoadSoundWrapper (const char *name, const char *fname,
-  	int mode3d);
   virtual iSndSysWrapper* LoadSoundWrapper (const char *name, const char *fname);
 
   virtual csPtr<iLoaderStatus> ThreadedLoadMapFile (const char* filename,

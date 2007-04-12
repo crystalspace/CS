@@ -236,16 +236,6 @@ CS_CRYSTALSPACE_EXPORT int csLog2 (int n);
 CS_CRYSTALSPACE_EXPORT void csReplaceAll (char *dest, const char *src,
   const char *search, const char *replace, int max);
 
-/**
- * Given \p src and \p dest, which are already allocated, copy \p source to \p
- * dest.  But, do not copy \p search, instead replace that with \p replace
- * string.  \p max is size in bytes of \p dest.
- * \deprecated Use csReplaceAll() instead.
- */
-CS_DEPRECATED_METHOD_MSG("Use csReplaceAll() instead.")
-inline void csFindReplace (char *dest, const char *src,
-  const char *search, const char *replace, int max)
-{ csReplaceAll(dest, src, search, replace, max); }
 
 /** @} */
   

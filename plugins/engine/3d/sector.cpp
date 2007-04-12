@@ -656,37 +656,6 @@ csSectorHitBeamResult csSector::HitBeamPortals (
   return rc;
 }
 
-iMeshWrapper* csSector::HitBeamPortals (
-  const csVector3 &start,
-  const csVector3 &end,
-  csVector3 &isect,
-  int* polygon_idx,
-  iSector** final_sector)
-{
-  iMeshWrapper* mesh = 0;
-  int p = IntersectSegment (start, end, isect, 0, false, &mesh);
-  if (final_sector) *final_sector = static_cast<iSector*> (this);
-  if (p != -1)
-  {
-    iPortalContainer* portals = mesh->GetPortalContainer ();
-    if (portals)
-    {
-      // There are portals.
-      iPortal* po = portals->GetPortal (p);
-      if (po)
-      {
-	drawBusy++;
-	csVector3 new_start = isect;
-	mesh = po->HitBeamPortals (mesh->GetMovable ()->GetFullTransform (),
-		      new_start, end, isect, &p, final_sector);
-	drawBusy--;
-      }
-    }
-  }
-  if (polygon_idx) *polygon_idx = p;
-  return mesh;
-}
-
 csSectorHitBeamResult csSector::HitBeam (
   const csVector3 &start,
   const csVector3 &end,
@@ -702,26 +671,6 @@ csSectorHitBeamResult csSector::HitBeam (
   	&rc.polygon_idx, accurate);
   if (!result) rc.mesh = 0;
   return rc;
-}
-
-iMeshWrapper *csSector::HitBeam (
-  const csVector3 &start,
-  const csVector3 &end,
-  csVector3 &isect,
-  int *polygonPtr,
-  bool accurate)
-{
-  GetVisibilityCuller ();
-  float r;
-  iMeshWrapper* mesh = 0;
-  int poly = -1;
-  bool rc = culler->IntersectSegment (start, end, isect, &r, &mesh, &poly,
-  	accurate);
-  if (polygonPtr) *polygonPtr = poly;
-  if (rc)
-    return mesh;
-  else
-    return 0;
 }
 
 int csSector::IntersectSegment (

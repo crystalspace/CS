@@ -182,19 +182,6 @@ public:
    *   interpretation of \a flag.
    */
   bool Enabled(char const* flag = 0, bool fuzzy = true) const;
-
-  /**
-   * Given major and minor components, check if the verbosity class
-   * "major.minor" is enabled.
-   * \deprecated Use instead the more generic Enabled() method, which accepts
-   *   any granularity of class breakdown; not just major and minor components.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use Enabled() instead")
-  bool CheckFlag(char const* major, char const* minor) const
-  {
-    Str flag; flag << major << '.' << minor;
-    return Enabled(flag);
-  }
 };
 
 /**
@@ -296,18 +283,6 @@ public:
   virtual bool Enabled(char const* flag = 0, bool fuzzy = true) const
   { return vp.Enabled(flag, fuzzy); }
 
-  /**
-   * Given major and minor components, check if the verbosity class
-   * "major.minor" is enabled.
-   * \deprecated Use instead the more generic Enabled() method, which accepts
-   *   any granularity of class breakdown; not just major and minor components.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use Enabled() instead")
-  virtual bool CheckFlag(char const* major, char const* minor) const
-  {
-    csStringFast<128> flag; flag << major << '.' << minor;
-    return Enabled(flag);
-  }
 };
 
 #include "csutil/win32/msvc_deprecated_warn_on.h"

@@ -286,22 +286,6 @@ public:
   { return GrowBy; }
 
   /**
-   * Tell the string to re-size its buffer exponentially as needed.
-   * \deprecated Use SetGrowsBy(0) instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use SetGrowsBy(0) instead.") 
-  void SetGrowsExponentially(bool b)
-  { SetGrowsBy(b ? 0 : DEFAULT_GROW_BY); }
-
-  /**
-   * Returns true if exponential growth is enabled.
-   * \deprecated Use GetGrowsBy() instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use GetGrowsBy() instead.") 
-  bool GetGrowsExponentially() const
-  { return GetGrowsBy() == 0; }
-
-  /**
    * Free the memory allocated for the string.
    * \remarks Following a call to this method, invocations of GetData() and
    *   'operator char const*' will return a null pointer (until some new

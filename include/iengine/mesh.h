@@ -372,50 +372,6 @@ struct iMeshWrapper : public virtual iBase
    * overestimates the object. This also returns the face number
    * as defined in csBox3 on which face the hit occured. Useful for
    * grid structures.
-   * \deprecated Use HitBeamBBox() with csHitBeamResult instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use HitBeamBBox() with csHitBeamResult instead.")
-  virtual int HitBeamBBox (const csVector3& start,
-  	const csVector3& end, csVector3& isect, float* pr) = 0;
-
-  /**
-   * Check if this object is hit by this object space vector.
-   * Outline check.
-   * \deprecated Use HitBeamOutline() with csHitBeamResult instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use HitBeamOutline() with csHitBeamResult instead.")
-  virtual bool HitBeamOutline (const csVector3& start,
-  	const csVector3& end, csVector3& isect, float* pr) = 0;
-
-  /**
-   * Check if this object is hit by this object space vector.
-   * Return the collision point in object space coordinates. This version
-   * is more accurate than HitBeamOutline.
-   * \deprecated Use HitBeamObject() with csHitBeamResult instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use HitBeamObject() with csHitBeamResult instead.")
-  virtual bool HitBeamObject (const csVector3& start,
-  	const csVector3& end, csVector3& isect, float* pr,
-	int* polygon_idx = 0) = 0;
-
-  /**
-   * Check if this object is hit by this world space vector.
-   * Return the collision point in world space coordinates.
-   * \deprecated Use HitBeamObject() with csHitBeamResult instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use HitBeamObject() with csHitBeamResult instead.")
-  virtual bool HitBeam (const csVector3& start,
-  	const csVector3& end, csVector3& isect, float* pr,
-	iMaterialWrapper** material = 0) = 0;
-
-  /**
-   * Check if this mesh is hit by this object space vector.
-   * This will do a rough but fast test based on bounding box only.
-   * So this means that it might return a hit even though the object
-   * isn't really hit at all. Depends on how much the bounding box
-   * overestimates the object. This also returns the face number
-   * as defined in csBox3 on which face the hit occured. Useful for
-   * grid structures.
    * \sa csHitBeamResult
    */
   virtual csHitBeamResult HitBeamBBox (const csVector3& start,
@@ -578,39 +534,6 @@ struct iMeshWrapper : public virtual iBase
    * Get the bounding box of this object in world space.
    * This routine will cache the bounding box and only recalculate it
    * if the movable changes.
-   * \deprecated Use GetWorldBoundingBox that returns a csBox3 instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use GetWorldBoundingBox that returns a csBox3 "
-                           "instead")
-  virtual void GetWorldBoundingBox (csBox3& cbox) = 0;
-
-  /**
-   * Get the bounding box of this object after applying a transformation to it.
-   * This is really a very inaccurate function as it will take the bounding
-   * box of the object in object space and then transform this bounding box.
-   * \deprecated Use GetTransformedBoundingBox that returns a csBox3 instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use GetTransformedBoundingBox that returns a "
-                           "csBox3 instead")
-  virtual void GetTransformedBoundingBox (const csReversibleTransform& trans, 
-    csBox3& cbox) = 0;
-
-  /**
-   * Get a very inaccurate bounding box of the object in screen space.
-   * Returns -1 if object behind the camera or else the distance between
-   * the camera and the furthest point of the 3D box.
-   * \deprecated Use GetScreenBoundingBox() that returns a csScreenBoxResult
-   * instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use GetScreenBoundingBox() that returns a "
-                           "csScreenBoxResult instead")
-  virtual float GetScreenBoundingBox (iCamera* camera, csBox2& sbox, 
-    csBox3& cbox) = 0;
-
-  /**
-   * Get the bounding box of this object in world space.
-   * This routine will cache the bounding box and only recalculate it
-   * if the movable changes.
    */
   virtual const csBox3& GetWorldBoundingBox () = 0;
 
@@ -629,12 +552,6 @@ struct iMeshWrapper : public virtual iBase
    */
   virtual csScreenBoxResult GetScreenBoundingBox (iCamera* camera) = 0;
 
-  /**
-   * Get the radius of this mesh and all its children.
-   * \deprecated Use GetRadius() that returns csEllipsoid.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use GetRadius() that returns csEllipsoid")
-  virtual void GetRadius (float& rad, csVector3& cent) const = 0;
   /// Get the radius of this mesh and all its children.
   virtual csSphere GetRadius () const = 0;
 

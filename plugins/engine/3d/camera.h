@@ -323,23 +323,7 @@ public:
   void Correct (int n);
 
   /// Change the shift for perspective correction.
-  void SetPerspectiveCenter (float x, float y) { shift_x = x; shift_y = y; }
-
-  /// Calculate perspective corrected point for this camera.
-  virtual void Perspective (const csVector3& v, csVector2& p) const
-  {
-    float iz = aspect / v.z;
-    p.x = v.x * iz + shift_x;
-    p.y = v.y * iz + shift_y;
-  }
-
-  /// Calculate inverse perspective corrected point for this camera.
-  virtual void InvPerspective (const csVector2& p, float z, csVector3& v) const
-  {
-    v.z = z;
-    v.x = (p.x - shift_x) * z * inv_aspect;
-    v.y = (p.y - shift_y) * z * inv_aspect;
-  }
+  void SetPerspectiveCenter (float x, float y) { shift_x = x; shift_y = y; } 
 
   /// Calculate perspective corrected point for this camera.
   virtual csVector2 Perspective (const csVector3& v) const

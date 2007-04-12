@@ -2581,7 +2581,11 @@ iMaterialWrapper* csBugPlug::FindColor (float r, float g, float b)
   if (mw) return mw;
   // Create a new material.
   csRef<iMaterial> mat (Engine->CreateBaseMaterial (0));
-  mat->SetFlatColor (csRGBcolor (int (r*255), int (g*255), int (b*255)));
+
+  // Attach a new SV to it
+  csShaderVariable* var = mat->GetVariableAdd (stringSet->Request (CS_MATERIAL_VARNAME_FLATCOLOR));
+  var->SetValue (csColor (r,g,b));
+
   mw = Engine->GetMaterialList ()->NewMaterial (mat, name);
   return mw;
 }

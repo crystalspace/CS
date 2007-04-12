@@ -234,12 +234,6 @@ public:
 
   virtual void CheckFrustum (iFrustumView* lview);
   
-  virtual iMeshWrapper* HitBeamPortals (const csVector3& start,
-  	const csVector3& end, csVector3& isect, int* polygon_idx,
-	iSector** final_sector = 0);
-
-  virtual iMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,
-    csVector3& intersect, int* polygon_idx, bool accurate = false);
 
   virtual csSectorHitBeamResult HitBeamPortals (const csVector3& start,
   	const csVector3& end);

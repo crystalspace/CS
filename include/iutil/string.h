@@ -86,18 +86,6 @@ struct iString : public virtual iBase
   virtual void ShrinkBestFit () = 0;
 
   /**
-   * Set string buffer capacity to hold exactly the current content.
-   * \remarks If the string length is greater than zero, then the buffer's
-   *   capacity will be adjusted to exactly that size.  If the string length is
-   *   zero, then the implementation may shrink the allocation so that it only
-   *   holds the implicit null terminator, or it may free the string's memory
-   *   completely.
-   * \deprecated Use ShrinkBestFit() instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use ShrinkBestFit() instead")
-  virtual void Reclaim () = 0;
-
-  /**
    * Clear the string (so that it contains only a null terminator).
    * \remarks This is typically shorthand for Truncate(0), but more idiomatic
    *   in terms of human language.

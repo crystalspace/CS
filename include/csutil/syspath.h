@@ -347,24 +347,6 @@ public:
   static csString GetAppFilename (const char* basename);
 };
 
-//@{
-/** \deprecated Use the equivalent from csPathsUtilities or 
- * csInstallationPathsHelper instead. */
-CS_DEPRECATED_METHOD inline bool csPathsIdentical (const char* path1, 
-  const char* path2)
-{ return csPathsUtilities::PathsIdentical (path1, path2); }
-CS_DEPRECATED_METHOD inline csRef<iStringArray> csFindSystemRoots()
-{ return csInstallationPathsHelper::FindSystemRoots (); }
-CS_DEPRECATED_METHOD inline char* csExpandPath (const char* path)
-{ return csPathsUtilities::ExpandPath (path); }
-CS_DEPRECATED_METHOD inline csString csGetAppPath (const char* argv0)
-{ return csInstallationPathsHelper::GetAppPath (argv0); }
-CS_DEPRECATED_METHOD inline csString csGetAppDir (const char* argv0)
-{ return csInstallationPathsHelper::GetAppDir (argv0); }
-CS_DEPRECATED_METHOD inline csString csGetResourceDir (const char* argv0)
-{ return csInstallationPathsHelper::GetResourceDir (argv0); }
-//@}
-
 
 namespace CS
 {

@@ -85,13 +85,6 @@ public:
   /// Set string maximal capacity to current string length.
   virtual void ShrinkBestFit ();
 
-  /**
-   * Set string maximal capacity to current string length.
-   * \deprecated Use ShrinkBestFit() instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use ShrinkBestFit() instead.")
-  virtual void Reclaim ()
-  { ShrinkBestFit(); }
 
   /// Clear the string (so that it contains only ending 0 character).
   virtual void Empty ();

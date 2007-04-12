@@ -192,11 +192,6 @@ public:
   */
   void AddAdjacent (const csRect &rect);
   
-  ///\deprecated Misspelling; use AddAdjacent() instead
-  CS_DEPRECATED_METHOD_MSG("Misspelling; use AddAdjacent() instead")
-  void AddAdjanced (const csRect &rect)
-  { AddAdjacent (rect); }
-
   /// Test equality of two rectangles.
   inline bool operator == (const csRect& rect) const
   {

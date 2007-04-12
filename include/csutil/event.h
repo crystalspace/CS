@@ -166,12 +166,6 @@ public:
 
   /// Retrieve joystick number (0, 1, 2, ...)
   CS_PURE_METHOD static uint GetNumber(const iEvent *event);
-  /// Retrieve axis 0 value (X)
-  CS_PURE_METHOD CS_DEPRECATED_METHOD static int GetX(const iEvent *event) 
-  { return csJoystickEventHelper::GetAxis(event, 0); }
-  /// Retrieve axis 1 value (Y)
-  CS_PURE_METHOD CS_DEPRECATED_METHOD static int GetY(const iEvent *event) 
-  { return csJoystickEventHelper::GetAxis(event, 1); }
   /// retrieve any axis (basis 0) value
   CS_PURE_METHOD static int GetAxis(const iEvent *event, uint);
   /// retrieve number of axes

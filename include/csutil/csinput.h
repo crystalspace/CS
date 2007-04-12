@@ -332,12 +332,6 @@ public:
   /// Call to release all joystick buttons.
   virtual void Reset ();
 
-  /// Query last joystick X position
-  CS_DEPRECATED_METHOD CS_PURE_METHOD virtual int GetLastX (uint number) const 
-  { return Last [number][0]; }
-  /// Query last joystick Y position
-  CS_DEPRECATED_METHOD CS_PURE_METHOD virtual int GetLastY (uint number) const 
-  { return Last [number][0]; }
   CS_PURE_METHOD virtual const int32 *GetLast (uint number) const 
   { return Last [number]; }
   CS_PURE_METHOD virtual int GetLast (uint number, uint axis) const 

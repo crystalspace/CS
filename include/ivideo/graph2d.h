@@ -330,16 +330,6 @@ struct iGraphics2D : public virtual iBase
   virtual void Write (iFont *font, int x, int y, int fg, int bg,
     const char *str, uint flags = 0) = 0;
 
-  /**
-   * Write a text string into the back buffer. A value of -1 for \p bg
-   * color will not draw the background. x and y are the pen position on
-   * a baseline. The actual font baseline is shifted up by the font's descent.
-   * \deprecated
-   * Instead, use Write() with the #CS_WRITE_BASELINE flag set.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use Write() with CS_WRITE_BASELINE flag instead")
-  virtual void WriteBaseline (iFont *font, 
-    int x, int y, int fg, int bg, const char *str) = 0;
 
   /// Enable/disable canvas resizing
   virtual void AllowResize (bool iAllow) = 0;

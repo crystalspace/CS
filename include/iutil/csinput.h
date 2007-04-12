@@ -239,10 +239,6 @@ struct iJoystickDriver : public virtual iBase
    */
   virtual void Reset () = 0;
 
-  /// Query last X position of joystick 'number'.
-  CS_DEPRECATED_METHOD virtual int GetLastX (uint number) const = 0;
-  /// Query last Y position of joystick 'number'.
-  CS_DEPRECATED_METHOD virtual int GetLastY (uint number) const = 0;
   /// Query last position on all axes of joystick 'number'.
   virtual const int32 *GetLast (uint number) const = 0;
   /// Query last position on 'axis' of joystick 'number'.

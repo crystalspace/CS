@@ -82,21 +82,6 @@ struct iMaterial : public virtual iShaderVariableContext
    * Get a texture from the material.
    */
   virtual iTextureHandle* GetTexture (csStringID name) = 0;
-
-  /**
-   * Get the flat color. If the material has a texture assigned, this
-   * will return the mean texture color.
-   * \deprecated Use the shader variable system instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use the shader variable system instead")
-  virtual void GetFlatColor (csRGBpixel &oColor,
-    bool useTextureMean = true) = 0;
-  /**
-   * Set the flat shading color.
-   * \deprecated Use the shader variable system instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use the shader variable system instead")
-  virtual void SetFlatColor (const csRGBcolor& col) = 0;
 };
 
 /** @} */

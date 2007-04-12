@@ -1086,93 +1086,6 @@ bool csGeneralMeshLoader::ParseRenderBuffer(iDocumentNode *node,
   return true;
 }
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
-
-bool csGeneralMeshLoader::ParseLegacySubMesh(iDocumentNode *node,
-                                             iGeneralMeshState* state, 
-                                             iLoaderContext* ldr_context)
-{
-  if(!node) return false;
-  if (!state)
-  {
-    synldr->ReportError ("crystalspace.genmeshloader.parse",
-      node, "Submesh must be specified _after_ factory tag.");
-    return false;
-  }
-
-  csRef<iMeshObject> mo = scfQueryInterface<iMeshObject> (state);
-  csRef<iGeneralFactoryState> factstate =
-    scfQueryInterface<iGeneralFactoryState> (mo->GetFactory ());
-
-  csDirtyAccessArray<unsigned int> triangles;
-  csRef<iMaterialWrapper> material;
-  bool do_mixmode = false;
-  uint mixmode = CS_FX_COPY;
-
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  while (it->HasNext ())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-    case XMLTOKEN_T:
-      {
-        int tri = child->GetContentsValueAsInt ();
-        if (tri > factstate->GetTriangleCount ())
-        {
-          synldr->ReportError (
-            "crystalspace.genmeshloader.parse.invalidindex",
-            child, "Invalid triangle index in genmesh submesh!");
-          return false;
-        }
-        triangles.Push (tri);
-        break;
-      }
-    case XMLTOKEN_MIXMODE:
-      if (!synldr->ParseMixmode (child, mixmode))
-        return 0;
-      do_mixmode = true;
-      break;
-    case XMLTOKEN_MATERIAL:
-      {
-        const char* matname = child->GetContentsValue ();
-        material = ldr_context->FindMaterial (matname);
-        if (!material.IsValid ())
-        {
-          synldr->ReportError (
-            "crystalspace.genmeshloader.parse.unknownmaterial",
-            node, "Couldn't find material '%s'!", matname);
-          return false;
-        }
-        break;
-      }
-    default:
-      synldr->ReportBadToken (child);
-    }
-  }
-
-  if (!material.IsValid ())
-  {
-    synldr->ReportError (
-      "crystalspace.genmeshloader.parse.unknownmaterial",
-      node, "No material specified in genmesh submesh!");
-    return false;
-  }
-
-  if (do_mixmode)
-    state->AddSubMesh (triangles.GetArray (), (int)triangles.GetSize (),
-  	  material, mixmode);
-  else
-    state->AddSubMesh (triangles.GetArray (), (int)triangles.GetSize (),
-  	  material);
-
-  return true;
-}
-
-#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
                                        iGeneralMeshState* state,
@@ -1182,7 +1095,11 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
 
   csRef<iDocumentNode> Tnode = node->GetNode ("t");
   if (Tnode.IsValid()) 
-    return ParseLegacySubMesh(node, state, ldr_context);
+  {
+    synldr->ReportBadToken (Tnode);
+    return false;
+    //return ParseLegacySubMesh(node, state, ldr_context);
+  }
 
   const char* name = node->GetAttributeValue ("name");
   csRef<iGeneralMeshSubMesh> subMesh = state->FindSubMesh (name);

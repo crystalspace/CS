@@ -118,8 +118,6 @@ private:
 #include "cstool/tokenlist.h"
 #undef CS_TOKEN_ITEM_FILE 
 
-  bool ParseLegacySubMesh (iDocumentNode *node, iGeneralMeshState* state, 
-    iLoaderContext* ldr_context);
 public:
   /// Constructor.
   csGeneralMeshLoader (iBase*);

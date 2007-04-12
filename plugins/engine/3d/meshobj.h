@@ -506,17 +506,8 @@ public:
 
   //---------- Bounding volume and beam functions -----------------//
 
-  virtual void GetRadius (float& rad, csVector3& cent) const;
   virtual csSphere GetRadius () const;
-
-  virtual int HitBeamBBox (const csVector3& start, const csVector3& end,
-         csVector3& isect, float* pr);
-  virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
-         csVector3& isect, float* pr);
-  virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr, int* polygon_idx = 0);
-  virtual bool HitBeam (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr, iMaterialWrapper** material = 0);
+  
   virtual csHitBeamResult HitBeamBBox (const csVector3& start,
   	const csVector3& end);
   virtual csHitBeamResult HitBeamOutline (const csVector3& start,
@@ -549,11 +540,6 @@ public:
    */
   virtual void PlaceMesh ();
 
-  virtual void GetWorldBoundingBox (csBox3& cbox);
-  virtual void GetTransformedBoundingBox (const csReversibleTransform& trans,
-  	csBox3& cbox);
-  virtual float GetScreenBoundingBox (iCamera *camera,
-         csBox2& sbox, csBox3& cbox);
   virtual const csBox3& GetWorldBoundingBox ();
   virtual csBox3 GetTransformedBoundingBox (const csReversibleTransform& trans);
   virtual csScreenBoxResult GetScreenBoundingBox (iCamera *camera);

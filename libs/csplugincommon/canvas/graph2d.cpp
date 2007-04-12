@@ -834,12 +834,6 @@ void csGraphics2D::Write (iFont *font, int x, int y, int fg, int bg,
   fontCache->WriteString (font, x, y, fg, bg, text, true, flags);
 }
 
-void csGraphics2D::WriteBaseline (iFont *font, int x, int y, int fg, int bg, 
-				  const char *text) 
-{ 
-  Write (font, x, y, fg, bg, text, CS_WRITE_BASELINE);
-}
-
 unsigned char *csGraphics2D::GetPixelAt8 (csGraphics2D *This, int x, int y)
 {
   return (This->Memory + (x + This->LineAddress[y]));

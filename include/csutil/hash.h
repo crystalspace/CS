@@ -230,40 +230,6 @@ public:
   }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
-
-/**
- * This is a simple helper class to make a copy of a const char*.
- * This can be used to have a hash that makes copies of the keys.
- * \deprecated csString can also be used for hash keys.
- */
-class CS_DEPRECATED_TYPE_MSG("csString can also be used for hash keys") 
-  csStrKey
-{
-private:
-  char* str;
-
-public:
-  csStrKey () { str = 0; }
-  csStrKey (const char* s) { str = csStrNew (s); }
-  csStrKey (const csStrKey& c) { str = csStrNew (c.str); }
-  ~csStrKey () { delete[] str; }
-  csStrKey& operator=(const csStrKey& o)
-  {
-    delete[] str; str = csStrNew (o.str);
-    return *this;
-  }
-  operator const char* () const { return str; }
-  uint GetHash() const { return csHashCompute (str); }
-};
-
-/**
- * csComparator<> specialization for csStrKey that uses strcmp().
- */
-template<>
-class csComparator<csStrKey, csStrKey> : public csComparatorString<csStrKey> {};
-
-#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * A generic hash table class,
@@ -434,16 +400,6 @@ public:
     Size++;
     if (values.GetSize () > Elements.GetSize () / GrowRate
      && Elements.GetSize () < MaxSize) Grow ();
-  }
-
-  /**
-   * Add an element to the hash table, overwriting if the key already exists.
-   * \deprecated Use PutUnique() instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use PutUnique() instead.")
-  void PutFirst (const K& key, const T &value)
-  {
-    PutUnique(key, value);
   }
 
   /// Returns whether at least one element matches the given key.

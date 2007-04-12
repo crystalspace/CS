@@ -314,60 +314,6 @@ struct csSetToAddress
   //@}
 };
 
-/**\name Deprecated endian conversion routines
- * It is recommended to use csLittleEndian, csBigEndian, csIEEEfloat, 
- * csGetFromAddress or csSetToAddress for the tasks below.
- * @{ */
-
-/// Convert a longlong from big-endian to machine format
-CS_DEPRECATED_METHOD static inline uint64 csBigEndianLongLong (uint64 l)
-{ return csBigEndian::Convert (l); }
-
-/// Convert a long from big-endian to machine format
-CS_DEPRECATED_METHOD static inline uint32 csBigEndianLong (uint32 l)
-{ return csBigEndian::Convert (l); }
-
-/// Convert a short from big-endian to machine format
-CS_DEPRECATED_METHOD static inline uint16 csBigEndianShort (uint16 s)
-{ return csBigEndian::Convert (s); }
-
-/// Convert a big-endian floating-point number to machine format
-CS_DEPRECATED_METHOD static inline float csBigEndianFloat (float f)
-{ 
-  union
-  {
-    float f;
-    uint32 ui32;
-  } u;
-  u.f = f;
-  u.ui32 = csBigEndian::Convert (u.ui32); 
-  return u.f;
-}
-
-/// Convert a longlong from little-endian to machine format
-CS_DEPRECATED_METHOD static inline uint64 csLittleEndianLongLong (uint64 l)
-{ return csLittleEndian::Convert (l); }
-
-/// Convert a long from little-endian to machine format
-CS_DEPRECATED_METHOD static inline uint32 csLittleEndianLong (uint32 l)
-{ return csLittleEndian::Convert (l); }
-
-/// Convert a short from little-endian to machine format
-CS_DEPRECATED_METHOD static inline uint16 csLittleEndianShort (uint16 s)
-{ return csLittleEndian::Convert (s); }
-
-/// Convert a little-endian floating-point number to machine format
-CS_DEPRECATED_METHOD static inline float csLittleEndianFloat (float f)
-{ 
-  union
-  {
-    float f;
-    uint32 ui32;
-  } u;
-  u.f = f;
-  u.ui32 = csLittleEndian::Convert (u.ui32); 
-  return u.f;
-}
 
 /*
     To be able to painlessly transfer files betwen platforms, we should
@@ -486,68 +432,6 @@ CS_DEPRECATED_METHOD static inline float csLittleEndianFloat (float f)
 
 /** @} */
 
-/// Convert a uint64 value from host byte order to little-endian.
-CS_DEPRECATED_METHOD static inline uint64 csConvertEndian (uint64 l)
-{ return csLittleEndian::Convert (l); }
-
-/// Convert a int64 value from host byte order to little-endian.
-CS_DEPRECATED_METHOD static inline int64 csConvertEndian (int64 l)
-{ return csLittleEndian::Convert (l); }
-
-/// Convert a uint32 value from host byte order to little-endian.
-CS_DEPRECATED_METHOD static inline uint32 csConvertEndian (uint32 l)
-{ return csLittleEndian::Convert (l); }
-
-/// Convert a int32 value from host byte order to little-endian.
-CS_DEPRECATED_METHOD static inline int32 csConvertEndian (int32 l)
-{ return csLittleEndian::Convert (l); }
-
-/// Convert a int16 value from host byte order to little-endian.
-CS_DEPRECATED_METHOD static inline int16 csConvertEndian (int16 s)
-{ return csLittleEndian::Convert (s); }
-
-/// Convert a uint16 value from host byte order to little-endian.
-CS_DEPRECATED_METHOD static inline uint16 csConvertEndian (uint16 s)
-{ return csLittleEndian::Convert (s); }
-
-/// Convert bytes in a float value from host byte order to little-endian.
-CS_DEPRECATED_METHOD static inline float csConvertEndian (float f)
-{ 
-  union
-  {
-    float f;
-    uint32 ui32;
-  } u;
-  u.f = f;
-  u.ui32 = csLittleEndian::Convert (u.ui32); 
-  return u.f;
-}
-
-/// Read a little-endian short from address
-CS_DEPRECATED_METHOD inline uint16 csGetLittleEndianShort (const void *buff)
-{
-  return csLittleEndian::Convert (csGetFromAddress::UInt16 (buff));
-}
-
-/// Read a little-endian long from address
-CS_DEPRECATED_METHOD inline uint32 csGetLittleEndianLong (const void *buff)
-{
-  return csLittleEndian::Convert (csGetFromAddress::UInt32 (buff));
-}
-
-/// Read a little-endian 32-bit float from address
-CS_DEPRECATED_METHOD inline float csGetLittleEndianFloat32 (const void *buff)
-{ 
-  uint32 l = csLittleEndian::Convert (csGetFromAddress::UInt32 (buff));
-  return csLongToFloat (l); 
-}
-
-/// Read a little-endian 16-bit float from address
-CS_DEPRECATED_METHOD inline float csGetLittleEndianFloat16 (const void *buff)
-{ 
-  uint16 s = csLittleEndian::Convert (csGetFromAddress::UInt16 (buff));
-  return csShortToFloat (s); 
-}
 
 /** @} */
 

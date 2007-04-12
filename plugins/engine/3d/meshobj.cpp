@@ -977,14 +977,6 @@ csHitBeamResult csMeshWrapper::HitBeamOutline (
   return rc;
 }
 
-bool csMeshWrapper::HitBeamOutline (
-  const csVector3 &start,
-  const csVector3 &end,
-  csVector3 &isect,
-  float *pr)
-{
-  return meshobj->HitBeamOutline (start, end, isect, pr);
-}
 
 csHitBeamResult csMeshWrapper::HitBeamObject (
   const csVector3 &start,
@@ -998,14 +990,6 @@ csHitBeamResult csMeshWrapper::HitBeamObject (
   return rc;
 }
 
-bool csMeshWrapper::HitBeamObject (
-  const csVector3 &start,
-  const csVector3 &end,
-  csVector3 &isect,
-  float *pr, int* polygon_idx)
-{
-  return meshobj->HitBeamObject (start, end, isect, pr, polygon_idx);
-}
 
 csHitBeamResult csMeshWrapper::HitBeam (
   const csVector3 &start,
@@ -1013,18 +997,7 @@ csHitBeamResult csMeshWrapper::HitBeam (
   bool do_material)
 {
   csHitBeamResult rc;
-  rc.hit = HitBeam (start, end, rc.isect, &rc.r,
-  	do_material ? &rc.material : 0);
-  return rc;
-}
 
-bool csMeshWrapper::HitBeam (
-  const csVector3 &start,
-  const csVector3 &end,
-  csVector3 &isect,
-  float *pr,
-  iMaterialWrapper** material)
-{
   csVector3 startObj;
   csVector3 endObj;
   csReversibleTransform trans;
@@ -1039,17 +1012,22 @@ bool csMeshWrapper::HitBeam (
     startObj = trans.Other2This (start);
     endObj = trans.Other2This (end);
   }
-  bool rc = false;
-  if (HitBeamBBox (startObj, endObj, isect, 0) > -1)
+
+  if (HitBeamBBox (startObj, endObj).facehit > -1)
   {
-    if (material)
-      rc = meshobj->HitBeamObject (startObj, endObj, isect, pr, 0, material);
+    if (do_material)
+    {
+      rc.hit = meshobj->HitBeamObject (startObj, endObj, rc.isect, &rc.r, 0, &rc.material);
+    }
     else
-      rc = HitBeamOutline (startObj, endObj, isect, pr);
-    if (rc)
+    {
+      rc = HitBeamOutline (startObj, endObj);
+    }
+
+    if (rc.hit)
     {
       if (!movable.IsFullTransformIdentity ())
-        isect = trans.This2Other (isect);
+        rc.isect = trans.This2Other (rc.isect);
     }
   }
 
@@ -1072,19 +1050,16 @@ void csMeshWrapper::HardTransform (const csReversibleTransform &t)
 
 csSphere csMeshWrapper::GetRadius () const
 {
-  float radius;
-  csVector3 center;
-  GetRadius (radius, center);
-  return csSphere (center, radius);
-}
+  csVector3 cent;
+  float rad;
 
-void csMeshWrapper::GetRadius (float &rad, csVector3 &cent) const
-{
   meshobj->GetObjectModel ()->GetRadius (rad, cent);
   const csRefArray<iSceneNode>& children = movable.GetChildren ();
+
+  csSphere sphere (cent, rad);
+
   if (children.GetSize () > 0)
-  {
-    csSphere sphere (cent, rad);
+  {    
     size_t i;
     for (i = 0; i < children.GetSize (); i++)
     {
@@ -1092,16 +1067,15 @@ void csMeshWrapper::GetRadius (float &rad, csVector3 &cent) const
       if (spr)
       {
         csSphere childsphere = spr->GetRadius ();
-    
+
         // @@@ Is this the right transform?
         childsphere *= spr->GetMovable ()->GetTransform ();
         sphere += childsphere;
       }
     }
-
-    rad = sphere.GetRadius ();
-    cent.Set (sphere.GetCenter ());
   }
+
+  return sphere;
 }
 
 float csMeshWrapper::GetSquaredDistance (iRenderView *rview)
@@ -1213,17 +1187,6 @@ csHitBeamResult csMeshWrapper::HitBeamBBox (
   return rc;
 }
 
-int csMeshWrapper::HitBeamBBox (
-  const csVector3 &start,
-  const csVector3 &end,
-  csVector3 &isect,
-  float *pr)
-{
-  const csBox3& b = GetObjectModel ()->GetObjectBoundingBox ();
-
-  csSegment3 seg (start, end);
-  return csIntersect3::BoxSegment (b, seg, isect, pr);
-}
 
 const csBox3& csMeshWrapper::GetWorldBoundingBox ()
 {
@@ -1253,11 +1216,6 @@ const csBox3& csMeshWrapper::GetWorldBoundingBox ()
   return wor_bbox;
 }
 
-void csMeshWrapper::GetWorldBoundingBox (csBox3 &cbox)
-{
-  cbox = GetWorldBoundingBox ();
-}
-
 csBox3 csMeshWrapper::GetTransformedBoundingBox (
   const csReversibleTransform &trans)
 {
@@ -1274,60 +1232,50 @@ csBox3 csMeshWrapper::GetTransformedBoundingBox (
   return cbox;
 }
 
-void csMeshWrapper::GetTransformedBoundingBox (
-  const csReversibleTransform &trans,
-  csBox3 &cbox)
-{
-  cbox = GetTransformedBoundingBox (trans);
-}
 
 csScreenBoxResult csMeshWrapper::GetScreenBoundingBox (iCamera *camera)
 {
   csScreenBoxResult rc;
-  rc.distance = GetScreenBoundingBox (camera, rc.sbox, rc.cbox);
-  return rc;
-}
 
-float csMeshWrapper::GetScreenBoundingBox (
-  iCamera *camera,
-  csBox2 &sbox,
-  csBox3 &cbox)
-{
   csVector2 oneCorner;
   csReversibleTransform tr_o2c = camera->GetTransform ();
   if (!movable.IsFullTransformIdentity ())
     tr_o2c /= movable.GetFullTransform ();
-  GetTransformedBoundingBox (tr_o2c, cbox);
+  
+  rc.cbox = GetTransformedBoundingBox (tr_o2c);
 
   // if the entire bounding box is behind the camera, we're done
-  if ((cbox.MinZ () < 0) && (cbox.MaxZ () < 0))
+  if ((rc.cbox.MinZ () < 0) && (rc.cbox.MaxZ () < 0))
   {
-    return -1;
+    rc.distance = -1;
+    return rc;
   }
 
   // Transform from camera to screen space.
-  if (cbox.MinZ () <= 0)
+  if (rc.cbox.MinZ () <= 0)
   {
     // Mesh is very close to camera.
     // Just return a maximum bounding box.
-    sbox.Set (-10000, -10000, 10000, 10000);
+    rc.sbox.Set (-10000, -10000, 10000, 10000);
   }
   else
   {
-    oneCorner = camera->Perspective (cbox.Max ());
-    sbox.StartBoundingBox (oneCorner);
+    oneCorner = camera->Perspective (rc.cbox.Max ());
+    rc.sbox.StartBoundingBox (oneCorner);
 
-    csVector3 v (cbox.MinX (), cbox.MinY (), cbox.MaxZ ());
+    csVector3 v (rc.cbox.MinX (), rc.cbox.MinY (), rc.cbox.MaxZ ());
     oneCorner = camera->Perspective (v);
-    sbox.AddBoundingVertexSmart (oneCorner);
-    oneCorner = camera->Perspective (cbox.Min ());
-    sbox.AddBoundingVertexSmart (oneCorner);
-    v.Set (cbox.MaxX (), cbox.MaxY (), cbox.MinZ ());
+    rc.sbox.AddBoundingVertexSmart (oneCorner);
+    oneCorner = camera->Perspective (rc.cbox.Min ());
+    rc.sbox.AddBoundingVertexSmart (oneCorner);
+    v.Set (rc.cbox.MaxX (), rc.cbox.MaxY (), rc.cbox.MinZ ());
     oneCorner = camera->Perspective (v);
-    sbox.AddBoundingVertexSmart (oneCorner);
+    rc.sbox.AddBoundingVertexSmart (oneCorner);
   }
 
-  return cbox.MaxZ ();
+  rc.distance = rc.cbox.MaxZ ();
+  
+  return rc;
 }
 
 iMeshWrapper* csMeshWrapper::FindChildByName (const char* name)
