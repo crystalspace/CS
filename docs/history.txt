@@ -75,6 +75,11 @@ chronological order.
 	    - Fixed numerous other bugs in the Swig interface files for perl.
 	- Jorrit fixed a problem in the collider wrapper changes (reported
 	  by caedes).
+	- Jorrit updated the apimod documentation about the iPolygonMesh
+	  deprecation and related.
+	- Jorrit changed the verbose 'crystalspace.trianglemesh.bla' name
+	  to just 'bla' (in the context of the ids used by iObjectModel->
+	  GetTriangleData(id)).
 11-Apr-2007
 	- res tweaked the texi2html config to not include the current date in
 	  redirect files.

@@ -1946,20 +1946,20 @@ bool csLoader::ParseTriMesh (iDocumentNode* node, iObjectModel* objmodel)
       case XMLTOKEN_COLLDET:
 	ReportWarning (
 	        "crystalspace.maploader.parse.trimesh",
-                child, "<colldet> is deprecated. Use <id>crystalspace.trianglemesh.colldet</id> instead.");
-	ids.Push (stringSet->Request ("crystalspace.trianglemesh.colldet"));
+                child, "<colldet> is deprecated. Use <id>colldet</id> instead.");
+	ids.Push (stringSet->Request ("colldet"));
 	break;
       case XMLTOKEN_VISCULL:
 	ReportWarning (
 	        "crystalspace.maploader.parse.trimesh",
-                child, "<viscull> is deprecated. Use <id>crystalspace.trianglemesh.viscull</id> instead.");
-	ids.Push (stringSet->Request ("crystalspace.trianglemesh.viscull"));
+                child, "<viscull> is deprecated. Use <id>viscull</id> instead.");
+	ids.Push (stringSet->Request ("viscull"));
 	break;
       case XMLTOKEN_SHADOWS:
 	ReportWarning (
 	        "crystalspace.maploader.parse.trimesh",
-                child, "<shadows> is deprecated. Use <id>crystalspace.trianglemesh.shadows</id> instead.");
-	ids.Push (stringSet->Request ("crystalspace.trianglemesh.shadows"));
+                child, "<shadows> is deprecated. Use <id>shadows</id> instead.");
+	ids.Push (stringSet->Request ("shadows"));
 	break;
       case XMLTOKEN_ID:
 	ids.Push (stringSet->Request (child->GetContentsValue ()));
@@ -1976,12 +1976,9 @@ bool csLoader::ParseTriMesh (iDocumentNode* node, iObjectModel* objmodel)
 	node, "No id's for this triangle mesh!");
     return false;
   }
-  csStringID cd_id = stringSet->Request (
-      "crystalspace.trianglemesh.colldet");
-  csStringID vis_id = stringSet->Request (
-      "crystalspace.trianglemesh.viscull");
-  csStringID shad_id = stringSet->Request (
-      "crystalspace.trianglemesh.shadows");
+  csStringID cd_id = stringSet->Request ("colldet");
+  csStringID vis_id = stringSet->Request ("viscull");
+  csStringID shad_id = stringSet->Request ("shadows");
   size_t i;
   if (use_default_mesh)
   {
@@ -3250,20 +3247,20 @@ bool csLoader::LoadTriMeshInSector (iLoaderContext* ldr_context,
       case XMLTOKEN_COLLDET:
 	ReportWarning (
 	        "crystalspace.maploader.parse.trimesh",
-                child, "<colldet> is deprecated. Use <id>crystalspace.trianglemesh.colldet</id> instead.");
-	ids.Push (stringSet->Request ("crystalspace.trianglemesh.colldet"));
+                child, "<colldet> is deprecated. Use <id>colldet</id> instead.");
+	ids.Push (stringSet->Request ("colldet"));
 	break;
       case XMLTOKEN_VISCULL:
 	ReportWarning (
 	        "crystalspace.maploader.parse.trimesh",
-                child, "<viscull> is deprecated. Use <id>crystalspace.trianglemesh.viscull</id> instead.");
-	ids.Push (stringSet->Request ("crystalspace.trianglemesh.viscull"));
+                child, "<viscull> is deprecated. Use <id>viscull</id> instead.");
+	ids.Push (stringSet->Request ("viscull"));
 	break;
       case XMLTOKEN_SHADOWS:
 	ReportWarning (
 	        "crystalspace.maploader.parse.trimesh",
-                child, "<shadows> is deprecated. Use <id>crystalspace.trianglemesh.shadows</id> instead.");
-	ids.Push (stringSet->Request ("crystalspace.trianglemesh.shadows"));
+                child, "<shadows> is deprecated. Use <id>shadows</id> instead.");
+	ids.Push (stringSet->Request ("shadows"));
 	break;
       case XMLTOKEN_ID:
 	ids.Push (stringSet->Request (child->GetContentsValue ()));
@@ -3289,12 +3286,9 @@ bool csLoader::LoadTriMeshInSector (iLoaderContext* ldr_context,
     return false;
   }
 
-  csStringID cd_id = stringSet->Request (
-      "crystalspace.trianglemesh.colldet");
-  csStringID vis_id = stringSet->Request (
-      "crystalspace.trianglemesh.viscull");
-  csStringID shad_id = stringSet->Request (
-      "crystalspace.trianglemesh.shadows");
+  csStringID cd_id = stringSet->Request ("colldet");
+  csStringID vis_id = stringSet->Request ("viscull");
+  csStringID shad_id = stringSet->Request ("shadows");
   size_t i;
   for (i = 0 ; i < ids.GetSize () ; i++)
   {

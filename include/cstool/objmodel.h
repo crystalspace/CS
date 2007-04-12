@@ -90,7 +90,7 @@ public:
   csStringID GetBaseID (iObjectRegistry* object_reg)
   {
     csRef<iStringSet> strings = GetStandardStringSet (object_reg);
-    return strings->Request ("crystalspace.trianglemesh.base");
+    return strings->Request ("base");
   }
 
   /**

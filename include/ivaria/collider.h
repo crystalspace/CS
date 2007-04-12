@@ -121,9 +121,8 @@ struct iCollideSystem : public virtual iBase
   /**
    * Get the ID that the collision detection system prefers for getting
    * triangle data from iObjectModel. This corresponds with the ID you
-   * would get from doing strings->Request (
-   * "crystalspace.trianglemesh.colldet") where strings correspond to
-   * the standard string set.
+   * would get from doing strings->Request ("colldet") where 'strings'
+   * is a reference to the standard string set.
    */
   virtual csStringID GetTriangleDataID () = 0;
 
@@ -148,7 +147,7 @@ struct iCollideSystem : public virtual iBase
    * iMeshObject->GetObjectModel()->GetTriangleData(), or else
    * by using csTriangleMesh, or csTriangleMeshBox. Note that the
    * collision detection system usually uses triangle meshes with
-   * the id equal to 'crystalspace.trianglemesh.colldet'.
+   * the id equal to 'colldet'.
    * \return a reference to a collider that you have to store.
    */
   virtual csPtr<iCollider> CreateCollider (iTriangleMesh* mesh) = 0;

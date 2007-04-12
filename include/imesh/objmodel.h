@@ -84,10 +84,10 @@ struct iObjectModel : public virtual iBase
    * string registry (iStringSet from object registry with tag
    * 'crystalspace.shared.stringset') to convert the ID string to a
    * csStringID identification. Some common possibilities are:
-   * - 'crystalspace.trianglemesh.base'
-   * - 'crystalspace.trianglemesh.colldet'
-   * - 'crystalspace.trianglemesh.viscull'
-   * - 'crystalspace.trianglemesh.shadows'
+   * - 'base'
+   * - 'colldet'
+   * - 'viscull'
+   * - 'shadows'
    * \return the triangle mesh for that id. If this is 0 then there
    * are two possibilities: either the mesh was never set and in this
    * case the subsystem can pick the base mesh as a fallback. Another
@@ -102,7 +102,7 @@ struct iObjectModel : public virtual iBase
   /**
    * Set a triangle mesh representing the geometry of the object.
    * The ID indicates the type of mesh that you want to change. Note that
-   * the base mesh (ID equal to 'crystalspace.trianglemesh.base')
+   * the base mesh (ID equal to 'base')
    * cannot be modified.
    * \param id is a numer id you can fetch from the string registry
    *        (iStringSet from object registry with tag\
@@ -134,9 +134,7 @@ struct iObjectModel : public virtual iBase
   /**
    * Get a polygon mesh representing the basic geometry of the object.
    * Can return 0 if this object model doesn't support that.
-   * \deprecated Use GetTriangleData(id) with id the interned string
-   *   'crystalspace.trianglemesh.base' (or use csInvalidStringID for
-   *   default).
+   * \deprecated Use GetTriangleData(id) with id the interned string 'base'.
    */
   CS_DEPRECATED_METHOD_MSG("Use GetTriangleData() instead.")
   virtual iPolygonMesh* GetPolygonMeshBase () = 0;
@@ -146,7 +144,7 @@ struct iObjectModel : public virtual iBase
    * This mesh is useful for collision detection.
    * Can return 0 if this object model doesn't support that.
    * \deprecated Use GetTriangleData(id) with id the interned string
-   *   'crystalspace.trianglemesh.colldet'.
+   *   'colldet'.
    */
   CS_DEPRECATED_METHOD_MSG("Use GetTriangleData() instead.")
   virtual iPolygonMesh* GetPolygonMeshColldet () = 0;
@@ -174,7 +172,7 @@ struct iObjectModel : public virtual iBase
    * support it. The object model will keep a reference to the
    * given polymesh.
    * \deprecated Use SetTriangleData(id) with id the interned string
-   *   'crystalspace.trianglemesh.colldet'.
+   *   'colldet'.
    */
   CS_DEPRECATED_METHOD_MSG("Use SetTriangleData() instead.")
   virtual void SetPolygonMeshColldet (iPolygonMesh* polymesh) = 0;
@@ -189,7 +187,7 @@ struct iObjectModel : public virtual iBase
    * Can return 0 if this object model doesn't support that. In that
    * case the object will not be used for visibility culling.
    * \deprecated Use GetTriangleData(id) with id the interned string
-   *   'crystalspace.trianglemesh.viscull'.
+   *   'viscull'.
    */
   CS_DEPRECATED_METHOD_MSG("Use GetTriangleData() instead.")
   virtual iPolygonMesh* GetPolygonMeshViscull () = 0;
@@ -203,7 +201,7 @@ struct iObjectModel : public virtual iBase
    * support it. The object model will keep a reference to the
    * given polymesh.
    * \deprecated Use SetTriangleData(id) with id the interned string
-   *   'crystalspace.trianglemesh.viscull'.
+   *   'viscull'.
    */
   CS_DEPRECATED_METHOD_MSG("Use SetTriangleData() instead.")
   virtual void SetPolygonMeshViscull (iPolygonMesh* polymesh) = 0;
@@ -216,7 +214,7 @@ struct iObjectModel : public virtual iBase
    * Can return 0 if this object model doesn't support that. In that
    * case the object will not be used for shadow casting.
    * \deprecated Use GetTriangleData(id) with id the interned string
-   *   'crystalspace.trianglemesh.shadows'.
+   *   'shadows'.
    */
   CS_DEPRECATED_METHOD_MSG("Use GetTriangleData() instead.")
   virtual iPolygonMesh* GetPolygonMeshShadows () = 0;
@@ -230,7 +228,7 @@ struct iObjectModel : public virtual iBase
    * support it. The object model will keep a reference to the
    * given polymesh.
    * \deprecated Use SetTriangleData(id) with id the interned string
-   *   'crystalspace.trianglemesh.shadows'.
+   *   'shadows'.
    */
   CS_DEPRECATED_METHOD_MSG("Use SetTriangleData() instead.")
   virtual void SetPolygonMeshShadows (iPolygonMesh* polymesh) = 0;
