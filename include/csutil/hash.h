@@ -237,8 +237,8 @@ public:
  * The hash value of a key is computed using csHashComputer<>, two keys are
  * compared using csComparator<>. You need to provide appropriate 
  * specializations of those templates if you want use non-integral types 
- * (other than const char*, csStrKey and csString for which appropriate 
- * specializations are already provided) or special hash algorithms. 
+ * (other than const char* and csString for which appropriate specializations
+ * are already provided) or special hash algorithms. 
  */
 template <class T, class K = unsigned int, 
   class ArrayMemoryAlloc = CS::Memory::AllocatorMalloc> 
