@@ -82,6 +82,12 @@ chronological order.
 	  GetTriangleData(id)).
 	- Marten removed a big number of functions that were properly marked
 	  as deprecated in 1.0 and should be removed before 1.2.
+	- Oktal replaced csStrKey with csString as a hash key, fixing an error
+	  in the xwin plugin introduced by Marten's deprecated stuff removal.
+	- Oktal fixed a segfault in the python module related to improper
+	  reference counting, introduced with his recent scripting changes.
+	  csWrapPtr is now much more strict and cohesive about refcounting.
+	  Also discovered and fixed a pre-existing mistake in the module.
 11-Apr-2007
 	- res tweaked the texi2html config to not include the current date in
 	  redirect files.
