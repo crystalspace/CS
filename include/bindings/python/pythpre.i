@@ -232,8 +232,8 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
   PyObject * arr = PyList_New(cnt);
   for (int i = 0; i < cnt; ++i)
   {
-    base_type * item = new base_type(to_item ptr[i]);
-    PyObject* o = SWIG_NewPointerObj((void*)item, $descriptor(basetype*), 1);
+    base_type * item = new base_type(to_item (ptr[i]));
+    PyObject* o = SWIG_NewPointerObj((void*)item, $descriptor(base_type*), 1);
     PyList_SetItem(arr, i, o);
   }
   PyList_Append(l, arr);
@@ -463,11 +463,13 @@ PYITERATOR_PROTOCOL(classname)
         PYLIST_BASE_FUNCTIONS(classname,typename,size_t,GetSize,Get,Push,Delete,Find)
 %enddef
 /* Pseudo-List Functions */
+#undef LIST_OBJECT_FUNCTIONS
 %define LIST_OBJECT_FUNCTIONS(classname,typename)
         PYLIST_BASE_FUNCTIONS(classname,typename *,int,GetCount,Get,Add,Remove,Find)
         PYLIST_BYNAME_FUNCTIONS(classname,typename *,FindByName)
 %enddef
-
+/* Pseudo-Set Functions */
+#undef SET_OBJECT_FUNCTIONS
 %define SET_OBJECT_FUNCTIONS(classname,typename)
 %extend classname {
 	int __len__() {return self->GetSize();}
@@ -513,8 +515,6 @@ def __iter__(self):
     while self.HasNext():
         yield self.Next() %}
 %enddef
-
-%ignore iPen::Rotate;
 
 // csStringFast typemaps
 %typemap(out) csStringFast *

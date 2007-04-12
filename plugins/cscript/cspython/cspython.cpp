@@ -196,6 +196,11 @@ bool csPython::LoadModule (const char *path, const char *name)
     return false;
   csRef<iDataBuffer> rpath = vfs->GetRealPath (path);
 
+  return LoadModuleNative (rpath->GetData (), name);
+}
+
+bool csPython::LoadModuleNative (const char *path, const char *name)
+{
   // Alternative from `embedding' in py c api docs:
   //   Must provide custom implementation of
   //  Py_GetPath(), Py_GetPrefix(), Py_GetExecPrefix(),
@@ -203,7 +208,7 @@ bool csPython::LoadModule (const char *path, const char *name)
   csString import;
   import << "import sys\n"
          << "paths = sys.path\n"
-         << "sys.path = ['" << rpath->GetData () << "']\n"
+         << "sys.path = ['" << path << "']\n"
          << "import " << name << "\n"
          << "sys.path = paths\n";
   return RunText(import);

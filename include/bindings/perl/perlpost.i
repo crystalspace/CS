@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2003 Mat Sutcliffe <oktal@gmx.co.uk>
+    Copyright (C) 2003, 2007 Mat Sutcliffe <oktal@gmx.co.uk>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -34,165 +34,308 @@
 %}
 
 /****************************************************************************
+ * This implements the perl 'exists' built-in, for the tied hashes used by
+ * SWIG for accessing object properties. It is used by AUTOLOAD below, and is
+ * generally a good thing to have anyway.
+ ****************************************************************************/
+%perlcode %{
+  sub EXISTS
+  {
+    my ($self, $prop) = @_;
+
+    return $self->can('swig_' . $prop . '_get');
+  }
+%}
+
+/****************************************************************************
  * The AUTOLOAD function is called by Perl if the user tries to call a
  * non-existant object method. We use this to add loads of custom methods
  * to every class without bloating the module. Specifically, we add object
  * property accessor methods.
  ****************************************************************************/
-%native(AUTOLOAD) Autoload;
+%perlcode %{
+  sub AUTOLOAD
+  {
+    my ($sub, $self, $val) = ($AUTOLOAD, @_);
+
+    unless (@_ >= 1 and @_ <= 2 and ref $self and $self =~ /^cspace::.*?=HASH/)
+      { die "No such subroutine $sub" }
+
+    $sub =~ s/^.*:://;
+
+    unless (exists $self->{$sub})
+      { die "No such property $sub in class " . ref $self }
+
+    if (@_ == 2)
+      { return $self->{$sub} = $val }
+    else
+      { return $self->{$sub} }
+  }
+%}
+
+/****************************************************************************
+ * This function returns the pointer of a SWIGified object, casted to an int.
+ * It is used by csPerl5::Object::GetPointer() in the perl5 scripting plugin.
+ ****************************************************************************/
+%native(_GetCPointer) _GetCPointer;
 %{
-  void Autoload (pTHXo_ CV *thisfunc)
+  void _GetCPointer (pTHXo_ CV *thisfunc)
   {
     dXSARGS;
     dTARG;
-    SV *self = ST (0);
-    char *prop = SvPV_nolen (ST (1));
-    SV *val = ST (2);
+    SV *obj = ST (0);
 
-    if (! (SvROK (self) && SvTYPE (self) == SVt_PVHV))
-      croak ("No such class method %s in class %s", prop, SvPV_nolen (self));
+    if (! (items == 1 && SvOK (obj) && sv_isobject (obj)))
+      croak ("Malformed call to _GetCPointer");
 
-    HV *obj = (HV *) SvRV (self);
-    SV **valp = hv_fetch (obj, prop, 0, val ? 1 : 0);
+    const char *type = HvNAME (SvSTASH (SvRV (obj)));
+    void *ptr;
+    int err = SWIG_ConvertPtr (obj, &ptr, SWIG_TypeQuery (type), 0);
 
-    if (! valp)
-      croak ("No such instance method %s in object", prop);
+    if (! SWIG_IsOK (err))
+      croak ("Failed to access pointer from instance of class %s", type);
 
-    if (val) sv_setsv (* valp, val);
-
-    ST (0) = * valp;
-    XSRETURN (1);
+    XSRETURN_IV ((int) ptr);
   }
 %}
 
 /****************************************************************************
- * Create an scfInitialize function in Perl which grabs the program path
- * automatically, then remove the C argc/argv version.
+ * This function allows the perl5 scripting plugin to store a reference to
+ * the iObjectRegistry in the script. The pointer is first casted to an int.
  ****************************************************************************/
-%inline %{
-  void scfInitialize ()
+%native(_SetObjectReg) _SetObjectReg;
+%{
+  void _SetObjectReg (pTHXo_ CV *thisfunc)
   {
-    static char *argv[] = { 0, 0 };
-    argv[0] = SvPV_nolen (get_sv ("0", 0));
-    scfInitialize (1, argv);
+    dXSARGS;
+    dTARG;
+    SV *objreg = ST (0);
+
+    if (items != 1) croak ("Malformed call to _SetObjectReg");
+
+    void *ptr = (void *) SvIV (objreg);
+    SV *sv = get_sv ("cspace::object_reg", TRUE);
+    SWIG_MakePtr (sv, ptr, SWIGTYPE_p_iObjectRegistry, 0);
+
+    XSRETURN_EMPTY;
   }
 %}
 
+#ifndef CS_MINI_SWIG
 /****************************************************************************
  * This is CS's interface to the Perl script's event handler.
  ****************************************************************************/
-#ifndef CS_MICRO_SWIG
 %{
-  static SV * pl_csInitializer_EventHandler = 0;
+  static SV * EventHandler_sv = 0;
 
-  bool csInitializer_EventHandler (iEvent &event)
+  bool plEventHandler (iEvent &event)
   {
-    if (! pl_csInitializer_EventHandler) return false;
-    SV *event_obj = newSViv (0);
-    SWIG_MakePtr (event_obj, &event, SWIGTYPE_p_iEvent, 0);
+    if (! EventHandler_sv) return false;
+    SV *event_sv = newSViv (0);
+    SWIG_MakePtr (event_sv, &event, SWIGTYPE_p_iEvent, 0);
 
     dSP;
     PUSHMARK (SP);
-    XPUSHs (event_obj);
+    XPUSHs (event_sv);
     PUTBACK;
-    call_sv (pl_csInitializer_EventHandler, G_SCALAR);
+    call_sv (EventHandler_sv, G_SCALAR);
     SPAGAIN;
-    SV *result = POPs;
+    bool result = SvTRUE (POPs);
     PUTBACK;
 
-    bool ok = SvTRUE (result);
-    SvREFCNT_dec (event_obj);
-    SvREFCNT_dec (result);
-    return ok;
+    SvREFCNT_dec (event_sv);
+    return result;
   }
 %}
 
 /****************************************************************************
  * This is the Perl script's interface to SetupEventHandler.
  ****************************************************************************/
-%native(csInitializer_SetupEventHandler) pl_csInitializer_SetupEventHandler;
+%perlcode %{
+  *cspace::csInitializer::SetupEventHandler = *_SetupEventHandler;
+%}
+%native(_SetupEventHandler) _SetupEventHandler;
 %{
-  void pl_csInitializer_SetupEventHandler (pTHXo_ CV *thisfunc)
+  void _SetupEventHandler (pTHXo_ CV *thisfunc)
   {
     dXSARGS;
     dTARG;
-    SV *reg_ref = ST (0);
+    SV *reg_sv = ST (0);
     SV *func_rv = ST (1);
-    /* FIXME: Update event mask to use new array of desired events */
-    /*SV *mask_sv = ST (2);*/
-    if (! (reg_ref && func_rv))
-      croak ("SetupEventHandler needs at least 2 arguments");
+    SV *types_sv = ST (2);
+    if (items < 2 || items > 3)
+      croak ("Usage: SetupEventHandler(object_reg, coderef, [ event_types ])");
 
     iObjectRegistry* reg;
-    if (SWIG_ConvertPtr(reg_ref,(void**)&reg,SWIGTYPE_p_iObjectRegistry,0) < 0)
-      croak("Type error. Argument 1 must be iObjectRegistry.\n");
+    int status = SWIG_ConvertPtr
+	(reg_sv, (void**) &reg, SWIGTYPE_p_iObjectRegistry, 0);
+    if (! SWIG_IsOK (status)) croak("Argument 1 must be iObjectRegistry");
+    csRef<iEventNameRegistry> name_reg
+      (csQueryRegistry<iEventNameRegistry> (reg));
+    if (! name_reg.IsValid ()) croak("Can't find iEventNameRegistry");
 
-    /*unsigned int mask;
-    if (mask_sv)
-      mask = SvUV (mask_sv);
-    else
-      mask = csInitializer_SetupEventHandler_DefaultMask;*/
+    if (! (SvROK (func_rv) && SvTYPE (SvRV (func_rv)) == SVt_PVCV))
+      croak("Argument 2 must be a code reference");
 
-    SV *func = SvRV (func_rv);
-    pl_csInitializer_EventHandler = func;
+    csDirtyAccessArray<csEventID> types;
+    if (items == 3)
+    {
+      if (! SvROK (types_sv)) croak("Argument 3 must be an array reference");
+      AV *av = (AV *) SvRV (types_sv);
+      if (SvTYPE(av)!=SVt_PVAV) croak("Argument 3 must be an array reference");
+      for (int i = 0, last = av_len (av); i <= last; i++)
+        types.Push (name_reg->GetID (SvPV_nolen (* av_fetch (av, i, 0))));
+      types.Push (CS_EVENTLIST_END);
+    }
 
-    bool ok = csInitializer::SetupEventHandler
-      (reg, csInitializer_EventHandler/*, mask*/);
+    EventHandler_sv = func_rv;
+
+    bool ok = (items == 3)
+      ? csInitializer::SetupEventHandler (reg, plEventHandler, types.GetArray())
+      : csInitializer::SetupEventHandler (reg, plEventHandler);
     XSRETURN_IV (ok ? 1 : 0);
   }
+%}
+
+/****************************************************************************
+ * Wrapper function to get the array returned by GetCollisionPairs().
+ ****************************************************************************/
+%perlcode %{
+  *cspace::iCollideSystem::GetCollisionPairs = *_GetCollisionPairs;
+%}
+%native(_GetCollisionPairs) _GetCollisionPairs;
+%{
+  void _GetCollisionPairs (pTHXo_ CV *thisfunc)
+  {
+    dXSARGS;
+    dTARG;
+    SV *sys_ref = ST (0);
+    if (items != 1)
+      croak ("Usage: $collideSystem->GetCollisionPairs()");
+
+    iCollideSystem* sys;
+    int status = SWIG_ConvertPtr
+	(sys_ref, (void**) &sys, SWIGTYPE_p_iCollideSystem, 0);
+    if (! SWIG_IsOK (status))
+      croak ("iCollideSystem::GetCollisionPairs needs an iCollideSystem ref");
+
+    csCollisionPair *pairs = sys->GetCollisionPairs ();
+    int num = sys->GetCollisionPairCount ();
+
+    AV *av = newAV ();
+    for (int i = 0; i < num; i++)
+    {
+      SV *rv = newSViv (0);
+      SWIG_MakePtr (rv, pairs + i, SWIGTYPE_p_csCollisionPair, 0);
+      av_push (av, rv);
+    }
+
+    SV *rv = sv_2mortal (newRV_noinc ((SV *) av));
+    ST (0) = rv;
+    XSRETURN (1);
+  }
+%}
+
+/****************************************************************************
+ * Pure perl replacements for the CS_VEC_... macros.
+ ****************************************************************************/
+%perlcode %{
+  sub CS_VEC_FORWARD	{ new cspace::csVector3 ( 0,  0,  1) }
+  sub CS_VEC_BACKWARD	{ new cspace::csVector3 ( 0,  0, -1) }
+  sub CS_VEC_RIGHT	{ new cspace::csVector3 ( 1,  0,  0) }
+  sub CS_VEC_LEFT	{ new cspace::csVector3 (-1,  0,  0) }
+  sub CS_VEC_UP		{ new cspace::csVector3 ( 0,  1,  0) }
+  sub CS_VEC_DOWN	{ new cspace::csVector3 ( 0, -1,  0) }
+  sub CS_VEC_ROT_RIGHT	{ new cspace::csVector3 ( 0,  1,  0) }
+  sub CS_VEC_ROT_LEFT	{ new cspace::csVector3 ( 0, -1,  0) }
+  sub CS_VEC_TILT_RIGHT	{ new cspace::csVector3 ( 0,  0, -1) }
+  sub CS_VEC_TILT_LEFT	{ new cspace::csVector3 ( 0,  0,  1) }
+  sub CS_VEC_TILT_UP	{ new cspace::csVector3 (-1,  0,  0) }
+  sub CS_VEC_TILT_DOWN	{ new cspace::csVector3 ( 1,  0,  0) }
+%}
+
+/****************************************************************************
+ * Workaround iPen::Rotate broken with Swig 1.3.28
+ ****************************************************************************/
+%perlcode %{
+  *cspace::iPen::Rotate = *cspace::iPen::_Rotate;
+%}
+%extend iPen
+{
+  void _Rotate (float a)
+  {
+    self->Rotate (a);
+  }
+}
+#endif // CS_MINI_SWIG
+
+#ifndef CS_MICRO_SWIG
+/****************************************************************************
+ * Pure perl replacement for RequestPlugins' variadic argument list.
+ ****************************************************************************/
+%perlcode %{
+  *cspace::csInitializer::RequestPlugins = *_RequestPlugins;
+
+  sub _RequestPlugins
+  {
+    my $object_reg = shift;
+    my $array = new cspace::csPluginRequestArray ();
+
+    while (1)
+    {
+      my $plug = shift; my $iface = shift; my $scfid = shift; my $ver = shift;
+      last unless
+	(defined $plug and defined $iface and defined $scfid and defined $ver);
+
+      $array->Push (new cspace::csPluginRequest ($plug,$iface,$scfid,$ver));
+    }
+
+    return cspace::csInitializer::_RequestPlugins ($object_reg, $array);
+  }
+%}
+
+/****************************************************************************
+ * Pure perl replacements for the CS_REQUEST_... macros.
+ ****************************************************************************/
+%perlcode %{
+  sub CS_REQUEST_PLUGIN
+  {
+    my ($scfid, $iface) = @_;
+    return (new cspace::csString ($scfid),
+	    new cspace::csString ($iface),
+	    $cspace::iSCF::SCF->GetInterfaceID ($iface),
+	    &{ 'cspace::' . $iface . '::scfGetVersion' });
+  }
+  sub CS_REQUEST_VFS { CS_REQUEST_PLUGIN
+	('crystalspace.kernel.vfs', 'iVFS') }
+  sub CS_REQUEST_FONTSERVER { CS_REQUEST_PLUGIN
+	('crystalspace.font.server.default', 'iFontServer') }
+  sub CS_REQUEST_IMAGELOADER { CS_REQUEST_PLUGIN
+	('crystalspace.graphic.image.io.multiplexer', 'iImageIO') }
+  sub CS_REQUEST_NULL3D { CS_REQUEST_PLUGIN
+	('crystalspace.graphics3d.null', 'iGraphics3D') }
+  sub CS_REQUEST_SOFTWARE3D { CS_REQUEST_PLUGIN
+	('crystalspace.graphics3d.software', 'iGraphics3D') }
+  sub CS_REQUEST_OPENGL3D { CS_REQUEST_PLUGIN
+	('crystalspace.graphics3d.opengl', 'iGraphics3D') }
+  sub CS_REQUEST_ENGINE { CS_REQUEST_PLUGIN
+	('crystalspace.engine.3d', 'iEngine') }
+  sub CS_REQUEST_LEVELLOADER { CS_REQUEST_PLUGIN
+	('crystalspace.level.loader', 'iLoader') }
+  sub CS_REQUEST_LEVELSAVER { CS_REQUEST_PLUGIN
+	('crystalspace.level.saver', 'iSaver') }
+  sub CS_REQUEST_REPORTER { CS_REQUEST_PLUGIN
+	('crystalspace.utilities.reporter', 'iReporter') }
+  sub CS_REQUEST_REPORTERLISTENER { CS_REQUEST_PLUGIN
+	('crystalspace.utilities.stdrep', 'iReporterListener') }
+  sub CS_REQUEST_CONSOLEOUT { CS_REQUEST_PLUGIN
+	('crystalspace.console.output.standard', 'iConsoleOutput') }
 %}
 #endif // CS_MICRO_SWIG
 
 /****************************************************************************
- * This is a wrapper function for RequestPlugin's variable argument list.
- ****************************************************************************/
-%native(csInitializer_RequestPlugins) _csInitializer_RequestPlugins;
-%{
-  void _csInitializer_RequestPlugins (pTHXo_ CV *thisfunc)
-  {
-    dXSARGS;
-    dTARG;
-    iObjectRegistry* reg;
-    if (SWIG_ConvertPtr(ST(0),(void**)&reg,SWIGTYPE_p_iObjectRegistry,0) < 0)
-      croak("Type error. Argument 1 must be iObjectRegistry.\n");
-
-    csArray<csPluginRequest> plugins;
-    for (int arg = 1; arg + 4 <= items; arg += 4)
-    {
-      SV *plug_sv = ST (arg);
-      SV *iface_sv = ST (arg + 1);
-      SV *scfid_sv = ST (arg + 2);
-      SV *ver_sv = ST (arg + 3);
-
-      const char *plug = SvPV_nolen (plug_sv);
-      const char *iface = SvPV_nolen (iface_sv);
-      int scfid = SvIV (scfid_sv);
-      int ver = SvIV (ver_sv);
-
-      plugins.Push(csPluginRequest(plug, iface, scfid, ver));
-    }
-
-    bool ok = true;
-    if (plugins.Length() != 0)
-      ok = csInitializer::RequestPlugins(reg, plugins);
-    XSRETURN_IV (ok ? 1 : 0);
-  }
-%}
-
-/****************************************************************************
- * Helper function for the macros defined below.
- ****************************************************************************/
-%{
-  void csRequestPlugin (char *iface, int &idnum, int &ver)
-  {
-    idnum = iSCF::SCF->GetInterfaceID (iface);
-    ver = scfGetVersion (iface);
-  }
-%}
-
-/****************************************************************************
  * Custom INPUT/OUTPUT/INOUT typemaps like those imported from typemaps.i,
- * needed since typemaps.i doesn't define any for strings.
+ * since typemaps.i doesn't define any for strings.
  ****************************************************************************/
 %typemap(in) char *& INPUT (char * tmp)
 {
@@ -206,8 +349,7 @@
 %typemap(argout) char *& OUTPUT
 {
   if (argvi >= items) { EXTEND (sp, 1); }
-  $result = sv_newmortal ();
-  sv_setpv ($result, * ($1));
+  $result = sv_2mortal (newSVpv (* $1, 0));
   argvi++;
 }
 %typemap(in) char *& INOUT = char *& INPUT;
@@ -217,431 +359,69 @@
 %typemap(typecheck) char *& INOUT = char *;
 
 /****************************************************************************
- * Apply typemaps to arguments of macro replacement functions below.
+ * Extra pure perl operator overloads.
  ****************************************************************************/
-%apply char *& OUTPUT { char *& __scfid__ };
-%apply char *& OUTPUT { char *& __iface__ };
-%apply char *& INOUT { char *& __Iscfid__ };
-%apply char *& INOUT { char *& __Iiface__ };
-%apply int * OUTPUT { int & __idnum__ };
-%apply int * OUTPUT { int & __ver__ };
+%perlcode %{
+  package cspace::iDataBuffer;
+    use overload '${}'	=> sub { $_[0]->GetData () },
+		 '""'	=> sub { $_[0]->GetData () },
+		 'fallback' => 1;
 
-/****************************************************************************
- * These functions are replacements for CS's macros of the same names.
- * These functions can be wrapped by Swig but the macros can't.
- * They use csRequestPlugin defined above, and the typemaps.
- ****************************************************************************/
-%inline %{
-  #undef CS_REQUEST_PLUGIN
-  #undef CS_REQUEST_VFS
-  #undef CS_REQUEST_FONTSERVER
-  #undef CS_REQUEST_IMAGELOADER
-  #undef CS_REQUEST_NULL3D
-  #undef CS_REQUEST_SOFTWARE3D
-  #undef CS_REQUEST_OPENGL3D
-  #undef CS_REQUEST_ENGINE
-  #undef CS_REQUEST_LEVELLOADER
-  #undef CS_REQUEST_LEVELSAVER
-  #undef CS_REQUEST_REPORTER
-  #undef CS_REQUEST_REPORTERLISTENER
-  #undef CS_REQUEST_CONSOLEOUT
+  package cspace::iString;
+    use overload '${}'	=> sub { $_[0]->GetData () },
+		 '""'	=> sub { $_[0]->GetData () },
+		 'fallback' => 1;
 
-  void CS_REQUEST_PLUGIN
-    (char *& __Iscfid__, char *& __Iiface__, int & __idnum__, int & __ver__)
-  {
-    __idnum__ = iSCF::SCF->GetInterfaceID (__Iiface__);
-    __ver__ = scfGetVersion (__Iiface__);
-    csRequestPlugin (__Iiface__, __idnum__, __ver__);
-  }
-  void CS_REQUEST_VFS
-    (char *& __scfid__, char *& __iface__, int & __idnum__, int & __ver__)
-  {
-    __scfid__ = "crystalspace.kernel.vfs";
-    __iface__ = "iVFS";
-    csRequestPlugin (__iface__, __idnum__, __ver__);
-  }
-  void CS_REQUEST_FONTSERVER
-    (char *& __scfid__, char *& __iface__, int & __idnum__, int & __ver__)
-  {
-    __scfid__ = "crystalspace.font.server.default";
-    __iface__ = "iFontServer";
-    csRequestPlugin (__iface__, __idnum__, __ver__);
-  }
-  void CS_REQUEST_IMAGELOADER
-    (char *& __scfid__, char *& __iface__, int & __idnum__, int & __ver__)
-  {
-    __scfid__ = "crystalspace.graphic.image.io.multiplexer";
-    __iface__ = "iImageIO";
-    csRequestPlugin (__iface__, __idnum__, __ver__);
-  }
-  void CS_REQUEST_NULL3D
-    (char *& __scfid__, char *& __iface__, int & __idnum__, int & __ver__)
-  {
-    __scfid__ = "crystalspace.graphics3d.null";
-    __iface__ = "iGraphics3D";
-    csRequestPlugin (__iface__, __idnum__, __ver__);
-  }
-  void CS_REQUEST_SOFTWARE3D
-    (char *& __scfid__, char *& __iface__, int & __idnum__, int & __ver__)
-  {
-    __scfid__ = "crystalspace.graphics3d.software";
-    __iface__ = "iGraphics3D";
-    csRequestPlugin (__iface__, __idnum__, __ver__);
-  }
-  void CS_REQUEST_OPENGL3D
-    (char *& __scfid__, char *& __iface__, int & __idnum__, int & __ver__)
-  {
-    __scfid__ = "crystalspace.graphics3d.opengl";
-    __iface__ = "iGraphics3D";
-    csRequestPlugin (__iface__, __idnum__, __ver__);
-  }
-  void CS_REQUEST_ENGINE
-    (char *& __scfid__, char *& __iface__, int & __idnum__, int & __ver__)
-  {
-    __scfid__ = "crystalspace.engine.3d";
-    __iface__ = "iEngine";
-    csRequestPlugin (__iface__, __idnum__, __ver__);
-  }
-  void CS_REQUEST_LEVELLOADER
-    (char *& __scfid__, char *& __iface__, int & __idnum__, int & __ver__)
-  {
-    __scfid__ = "crystalspace.level.loader";
-    __iface__ = "iLoader";
-    csRequestPlugin (__iface__, __idnum__, __ver__);
-  }
-  void CS_REQUEST_LEVELSAVER
-    (char *& __scfid__, char *& __iface__, int & __idnum__, int & __ver__)
-  {
-    __scfid__ = "crystalspace.level.saver";
-    __iface__ = "iSaver";
-    csRequestPlugin (__iface__, __idnum__, __ver__);
-  }
-  void CS_REQUEST_REPORTER
-    (char *& __scfid__, char *& __iface__, int & __idnum__, int & __ver__)
-  {
-    __scfid__ = "crystalspace.utilities.reporter";
-    __iface__ = "iReporter";
-    csRequestPlugin (__iface__, __idnum__, __ver__);
-  }
-  void CS_REQUEST_REPORTERLISTENER
-    (char *& __scfid__, char *& __iface__, int & __idnum__, int & __ver__)
-  {
-    __scfid__ = "crystalspace.utilities.stdrep";
-    __iface__ = "iStandardReporterListener";
-    csRequestPlugin (__iface__, __idnum__, __ver__);
-  }
-  void CS_REQUEST_CONSOLEOUT
-    (char *& __scfid__, char *& __iface__, int & __idnum__, int & __ver__)
-  {
-    __scfid__ = "crystalspace.console.output.standard";
-    __iface__ = "iConsoleOutput";
-    csRequestPlugin (__iface__, __idnum__, __ver__);
-  }
+  package cspace::csString;
+    use overload '${}'	=> sub { $_[0]->GetData () },
+		 '""'	=> sub { $_[0]->GetData () },
+		 'fallback' => 1;
+
+  package cspace::csVector2;
+    use overload '@{}'	=> sub { [ $_[0]->x, $_[0]->y ] },
+		 'fallback' => 1;
+
+  package cspace::csVector3;
+    use overload '@{}'	=> sub { [ $_[0]->x, $_[0]->y, $_[0]->z ] },
+		 'fallback' => 1;
+
+  package cspace::csMatrix2;
+    use overload '@{}'	=> sub { [ [ $_[0]->m11, $_[0]->m12 ],
+				   [ $_[0]->m21, $_[0]->m22 ] ] },
+		 'fallback' => 1;
+
+  package cspace::csMatrix3;
+    use overload '@{}'	=> sub { [ [ $_[0]->m11, $_[0]->m12, $_[0]->m13 ],
+				   [ $_[0]->m21, $_[0]->m22, $_[0]->m23 ],
+				   [ $_[0]->m31, $_[0]->m23, $_[0]->m33 ] ] },
+		 'fallback' => 1;
+
+  package cspace::csColor;
+    use overload '@{}'	=> sub { [ $_[0]->red, $_[0]->green, $_[0]->blue ] },
+		 'fallback' => 1;
+
+  package cspace::csColor4;
+    use overload '@{}'	=> sub { [ $_[0]->red, $_[0]->green, $_[0]->blue,
+				   $_[0]->alpha ] },
+		 'fallback' => 1;
+
+  package cspace::csRGBcolor;
+    use overload '@{}'	=> sub { [ $_[0]->red, $_[0]->green, $_[0]->blue ] },
+		 'fallback' => 1;
+
+  package cspace::csRGBpixel;
+    use overload '@{}'	=> sub { [ $_[0]->red, $_[0]->green, $_[0]->blue,
+				   $_[0]->alpha ] },
+		 'fallback' => 1;
+
+  package cspace::csSphere;
+    use overload '+='	=> sub { $_[0]->Union
+					($_[1]->GetCenter(),$_[1]->GetRadius());
+				 $_[0]; },
+		 'fallback' => 1;
 %}
 
-#ifndef CS_MINI_SWIG
-/****************************************************************************
- * Wrapper function to get the array returned by GetCollisionPairs().
- ****************************************************************************/
-%native(iCollideSystem_GetCollisionPairs) _GetCollisionPairs;
-%{
-  void _GetCollisionPairs (pTHXo_ CV *thisfunc)
-  {
-    dXSARGS;
-    dTARG;
-    SV *sys_ref = ST (0);
-    if (! sys_ref)
-      croak("No self parameter passed to GetCollisionPairs");
-
-    iCollideSystem* sys;
-    if (SWIG_ConvertPtr(sys_ref,(void**)&sys,SWIGTYPE_p_iCollideSystem,0) < 0)
-      croak("Self parameter of GetCollisionPairs must be an iCollideSystem\n");
-
-    csCollisionPair *pairs = sys->GetCollisionPairs ();
-    int num = sys->GetCollisionPairCount ();
-    AV *av = newAV ();
-    for (int i = 0; i < num; i++)
-    {
-      SV *rv = newSViv (0);
-      SWIG_MakePtr (rv, pairs++, SWIGTYPE_p_csCollisionPair, 0);
-      av_push (av, rv);
-      SvREFCNT_dec (rv);
-    }
-
-    SV *rv = newRV ((SV *) av);
-    SvREFCNT_dec ((SV *) av);
-    ST (0) = rv;
-    XSRETURN (1);
-  }
-%}
-
-/****************************************************************************
- * Typemaps used by the csVector2/3 wrappings below.
- ****************************************************************************/
-%apply float * OUTPUT { float & __v1__ };
-%apply float * OUTPUT { float & __v2__ };
-%apply float * OUTPUT { float & __v3__ };
-
-/****************************************************************************
- * Some extra operator overloads for csVector2.
- ****************************************************************************/
-%extend csVector2
-{
-  float __abs__ ()
-  {
-    return self->Norm ();
-  }
-  void __av__ (float &__v1__, float &__v2__)
-  {
-    __v1__ = self->x;
-    __v2__ = self->y;
-  }
-}
-
-/****************************************************************************
- * Some extra operator overloads for csVector3.
- ****************************************************************************/
-%extend csVector3
-{
-  float __abs__ ()
-  {
-    return self->Norm ();
-  }
-  void __av__ (float &__v1__, float &__v2__, float &__v3__)
-  {
-    __v1__ = self->x;
-    __v2__ = self->y;
-    __v3__ = self->z;
-  }
-  bool __bool__ ()
-  {
-    return ! self->IsZero ();
-  }
-}
-
-/****************************************************************************
- * These functions are replacements for CS's macros of the same names.
- * These functions can be wrapped by Swig, but the macros can't.
- ****************************************************************************/
-%inline %{
-  #undef CS_VEC_FORWARD
-  #undef CS_VEC_BACKWARD
-  #undef CS_VEC_RIGHT
-  #undef CS_VEC_LEFT
-  #undef CS_VEC_UP
-  #undef CS_VEC_DOWN
-  #undef CS_VEC_ROT_RIGHT
-  #undef CS_VEC_ROT_LEFT
-  #undef CS_VEC_TILT_RIGHT
-  #undef CS_VEC_TILT_LEFT
-  #undef CS_VEC_TILT_UP
-  #undef CS_VEC_TILT_DOWN
-
-  const csVector3& CS_VEC_FORWARD()
-  {
-    static const csVector3 v ( 0,  0,  1);
-    return v;
-  }
-  const csVector3& CS_VEC_BACKWARD()
-  {
-    static const csVector3 v ( 0,  0, -1);
-    return v;
-  }
-  const csVector3& CS_VEC_RIGHT()
-  {
-    static const csVector3 v ( 1,  0,  0);
-    return v;
-  }
-  const csVector3& CS_VEC_LEFT()
-  {
-    static const csVector3 v (-1,  0,  0);
-    return v;
-  }
-  const csVector3& CS_VEC_UP()
-  {
-    static const csVector3 v ( 0,  1,  0);
-    return v;
-  }
-  const csVector3& CS_VEC_DOWN()
-  {
-    static const csVector3 v ( 0, -1,  0);
-    return v;
-  }
-  const csVector3& CS_VEC_ROT_RIGHT()
-  {
-    static const csVector3 v ( 0,  1,  0);
-    return v;
-  }
-  const csVector3& CS_VEC_ROT_LEFT()
-  {
-    static const csVector3 v ( 0, -1,  0);
-    return v;
-  }
-  const csVector3& CS_VEC_TILT_RIGHT()
-  {
-    static const csVector3 v ( 0,  0, -1);
-    return v;
-  }
-  const csVector3& CS_VEC_TILT_LEFT()
-  {
-    static const csVector3 v ( 0,  0,  1);
-    return v;
-  }
-  const csVector3& CS_VEC_TILT_UP()
-  {
-    static const csVector3 v (-1,  0,  0);
-    return v;
-  }
-  const csVector3& CS_VEC_TILT_DOWN()
-  {
-    static const csVector3 v ( 1,  0,  0);
-    return v;
-  }
-%}
-#endif // CS_MINI_SWIG
-
-/****************************************************************************
- * Create a typemap for the i/csString wrappings below.
- ****************************************************************************/
-TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
-
-#ifndef CS_MINI_SWIG
-/****************************************************************************
- * Some extra operator overloads for iString.
- ****************************************************************************/
-%extend iString
-{
-  bool __seq__ (iString *other)
-  {
-    return self->Compare (other);
-  }
-  const char* __string__ ()
-  {
-    return self->GetData ();
-  }
-  const char* __sv__ ()
-  {
-    return self->GetData ();
-  }
-  void __av__ (const char *&__chars__, int &__len__)
-  {
-    __chars__ = self->GetData ();
-    __len__ = self->Length ();
-  }
-  int length ()
-  {
-    return self->Length ();
-  }
-  csPtr<iString> __add__ (const char *other)
-  {
-    iString *result = new scfString (* self);
-    result->Append (other);
-    return csPtr<iString> (result);
-  }
-  csPtr<iString> __concat__ (const char *other)
-  {
-    iString *result = new scfString (* self);
-    result->Append (other);
-    return csPtr<iString> (result);
-  }
-  iString* __concat_ass__ (const char *other)
-  {
-    self->Append (other);
-    return self;
-  }
-  csPtr<iString> __concat__ (iString *other)
-  {
-    iString *result = new scfString (* self);
-    result->Append (other);
-    return csPtr<iString> (result);
-  }
-  iString* __concat_ass__ (iString *other)
-  {
-    self->Append (other);
-    return self;
-  }
-}
-#endif // CS_MINI_SWIG
-
-/****************************************************************************
- * Some extra operator overloads for csString.
- ****************************************************************************/
-%extend csString
-{
-  bool __eq__ (const char *other)
-  {
-    return self->Compare (other);
-  }
-  bool __seq__ (csString &other)
-  {
-    return self->Compare (other);
-  }
-
-  const char* __string__ ()
-  {
-    return self->GetData ();
-  }
-  const char* __sv__ ()
-  {
-    return self->GetData ();
-  }
-  void __av__ (const char *&__chars__, int &__len__)
-  {
-    __chars__ = self->GetData ();
-    __len__ = self->Length ();
-  }
-  int length ()
-  {
-    return self->Length ();
-  }
-
-  csString __add__ (const char *other)
-  {
-    csString result (* self);
-    result.Append (other);
-    return result;
-  }
-  csString __concat__ (const char *other)
-  {
-    csString result (* self);
-    result.Append (other);
-    return result;
-  }
-  csString* __concat_ass__ (const char *other)
-  {
-    self->Append (other);
-    return self;
-  }
-  csString __concat__ (csString &other)
-  {
-    csString result (* self);
-    result.Append (other);
-    return result;
-  }
-  csString* __concat_ass__ (csString &other)
-  {
-    self->Append (other);
-    return self;
-  }
-}
-
-#ifndef CS_MINI_SWIG
-/****************************************************************************
- * Some extra operator overloads for iDataBuffer.
- ****************************************************************************/
-%extend iDataBuffer
-{
-  const char* __string__ ()
-  {
-    return self->operator* ();
-  }
-  const char* __sv__ ()
-  {
-    return self->operator* ();
-  }
-}
-#endif // CS_MINI_SWIG
-
+#if 0 // very experimental
 /*****************************************************************************
  * Define macros to create classes that are inheritable by script classes,
  * to allow scripts to write their own implementations of interfaces.
@@ -740,7 +520,6 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
 /*****************************************************************************
  * Use the macros we defined above for iEventHandler and iAwsSink.
  *****************************************************************************/
-#ifndef CS_MICRO_SWIG
 WRAP_SCRIPT_CLASS (iEventHandler,
   WRAP_FUNC (bool, HandleEvent, (iEvent &ev),
     SV *ev_rv = newSViv (0);
@@ -766,9 +545,7 @@ WRAP_SCRIPT_CLASS (iEventPlug,
     XPUSHi (enabled ? 1 : 0);
   )
 )
-#endif // CS_MICRO_SWIG
 
-#ifndef CS_MINI_SWIG
 WRAP_SCRIPT_CLASS (iAwsSink,
   WRAP_FUNC (unsigned long, GetTriggerID, (const char *name),
     XPUSHp (name, strlen (name));,
@@ -790,6 +567,6 @@ WRAP_SCRIPT_CLASS (iAwsSink,
     POPu
   )
 )
-#endif // CS_MINI_SWIG
+#endif // 0
 
 #endif // SWIGPERL5

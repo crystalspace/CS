@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2003 Mat Sutcliffe <oktal@gmx.co.uk>
+    Copyright (C) 2003, 2007 Mat Sutcliffe <oktal@gmx.co.uk>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,155 +20,79 @@
 
 #include <csutil/csstring.h>
 
-/****************************************
- * Fill the following to extend list or csSet interfaces.
- **************************************************************/
-%define LIST_OBJECT_FUNCTIONS(classname,typename)
+/****************************************************************************
+ * Fill the following to extend csArray, csSet and iFooList interfaces.
+ ****************************************************************************/
+#undef ARRAY_OBJECT_FUNCTIONS
+%define ARRAY_OBJECT_FUNCTIONS(classname,typename)
 %enddef
+#undef SET_OBJECT_FUNCTIONS
 %define SET_OBJECT_FUNCTIONS(classname,typename)
+%enddef
+#undef LIST_OBJECT_FUNCTIONS
+%define LIST_OBJECT_FUNCTIONS(classname,typename)
 %enddef
 
 /****************************************************************************
- * Renaming operators is the first stage of wrapping them.
- * We ignore operator [] and () and unary *
- * since these will have to be wrapped manually.
- * We ignore operator &&= and ||=
- * since they have nothing to which to be wrapped
+ * Ignore the operator overloads that Swig cannot handle.
+ * Swig can only wrap +, -, *, /, %, ++, --, ==, !=, <, >, && and ||.
  ****************************************************************************/
-%ignore			operator[];
-%ignore			operator();
-%ignore			operator* ();
-
-%rename(__add__)	operator+;
-%rename(__subtr__)	operator-;
-%ignore			operator+ ();
-%rename(__neg__)	operator- ();
-
-%rename(__mult__)	operator*;
-%rename(__div__)	operator/;
-%rename(__modulo__)	operator%;
-%rename(__lshift__)	operator<<;
-%rename(__rshift__)	operator>>;
-%rename(__and__)	operator&;
-%rename(__or__)		operator|;
-%rename(__xor__)	operator^;
-
-%rename(__lt__)		operator<;
-%rename(__le__)		operator<=;
-%rename(__gt__)		operator>;
-%rename(__ge__)		operator>=;
-%rename(__eq__)		operator==;
-%rename(__ne__)		operator!=;
-
-%rename(__not__)	operator!;
-%rename(__compl__)	operator~;
-%rename(__inc__)	operator++;
-%rename(__dec__)	operator--;
-
-%rename(__copy__)	operator=;
-%rename(__add_ass__)	operator+=;
-%rename(__subtr_ass__)	operator-=;
-%rename(__mult_ass__)	operator*=;
-%rename(__divide_ass__)	operator/=;
-%rename(__modulo_ass__)	operator%=;
-%rename(__lshift_ass__)	operator<<=;
-%rename(__rshift_ass__)	operator>>=;
-%rename(__and_ass__)	operator&=;
-%rename(__or_ass__)	operator|=;
-%rename(__xor_ass__)	operator^=;
-
-%rename(__land__)	operator&&;
-%rename(__lor__)	operator||;
-
-%ignore			operator&&=;
-%ignore			operator||=;
+%ignore operator<<;
+%ignore operator>>;
+%ignore operator=;
+%ignore operator+=;
+%ignore operator-=;
+%ignore operator*=;
+%ignore operator/=;
+%ignore operator%=;
+%ignore operator* ();
+%ignore operator[];
+%ignore operator();
+%ignore operator<=;
+%ignore operator>=;
+%ignore operator&;
+%ignore operator|;
+%ignore operator^;
+%ignore operator!;
+%ignore operator~;
+%ignore operator<<=;
+%ignore operator>>=;
+%ignore operator&=;
+%ignore operator|=;
+%ignore operator^=;
+%ignore operator&&=;
+%ignore operator||=;
+%ignore operator->;
+%ignore operator->*;
+%ignore operator,;
+%ignore operator new;
+%ignore operator new[];
+%ignore operator delete;
+%ignore operator delete[];
 
 // csgeom/vector3.h -- ignore (float); (double) overloads still visible
 %ignore operator/ (const csVector3&, float);
 %ignore operator* (const csVector3&, float);
 %ignore operator* (float, const csVector3&);
 
-/****************************************************************************
- * Applying this Perl code is the second and final stage of wrapping
- * operator overloads. It is commented out since Swig doesn't yet have a
- * %perlcode directive.
- ****************************************************************************/
-#if 0
-%perlcode %{
-  use overload (
-    'abs'	=> '__abs__',
-    'bool'	=> '__bool__',
-    '""'	=> '__string__',
-    '0+'	=> '__numer__',
-
-    '+'		=> '__add__',
-    '-'		=> '__subtr__',
-    '*'		=> '__mult__',
-    '/'		=> '__div__',
-    '%'		=> '__modulo__',
-    '**'	=> '__pow__',
-
-    '<<'	=> '__lshift__',
-    '>>'	=> '__rshift__',
-    '&'		=> '__and__',
-    '|'		=> '__or__',
-    '^'		=> '__xor__',
-
-    '+='	=> '__add_ass__',
-    '-='	=> '__subtr_ass__',
-    '*='	=> '__mult_ass__',
-    '/='	=> '__div_ass__',
-    '%='	=> '__modulo_ass__',
-    '**='	=> '__pow_ass__',
-    '<<='	=> '__lshift_ass__',
-    '>>='	=> '__rshift_ass__',
-    '&='	=> '__and_ass__',
-    '|='	=> '__or_ass__',
-    '^='	=> '__xor_ass__',
-
-    '<'		=> '__lt__',
-    '<='	=> '__le__',
-    '>'		=> '__gt__',
-    '>='	=> '__ge__',
-    '=='	=> '__eq__',
-    '!='	=> '__ne__',
-
-    'lt'	=> '__slt__',
-    'le'	=> '__sle__',
-    'gt'	=> '__sgt__',
-    'ge'	=> '__sge__',
-    'eq'	=> '__seq__',
-    'ne'	=> '__sne__',
-
-    '!'		=> '__not__',
-    '~'		=> '__compl__',
-    '++'	=> '__inc__',
-    '--'	=> '__dec__',
-
-    'x'		=> '__repeat__',
-    '.'		=> '__concat__',
-    'x='	=> '__repeat_ass__',
-    '.='	=> '__concat_ass__',
-    '='		=> '__copy__',
-
-    'neg'	=> '__neg__',
-
-    '${}'	=> '__sv__',
-    '@{}'	=> '__av__',
-    '%{}'	=> '__hv__',
-    '*{}'	=> '__gv__',
-    '&{}'	=> '__cv__',
-
-    '<>'	=> '__iter__'
-  );
-
-  *and = *__land__;
-  *or = *__lor__;
-%}
-#endif // 0
+// Swig cannot wrap operator overloads that are friend functions, so we ignore
+// warnings about them.
+%warnfilter(503) operator+;
+%warnfilter(503) operator-;
+%warnfilter(503) operator*;
+%warnfilter(503) operator/;
+%warnfilter(503) operator%;
+%warnfilter(503) operator++;
+%warnfilter(503) operator--;
+%warnfilter(503) operator==;
+%warnfilter(503) operator!=;
+%warnfilter(503) operator<;
+%warnfilter(503) operator>;
+%warnfilter(503) operator&&;
+%warnfilter(503) operator||;
 
 /****************************************************************************
- * Fix wrapping of int8 so that Perl uses an int instead of a length-1 string.
+ * Wrap int8 so that Perl uses an int instead of a one-character string.
  ****************************************************************************/
 %typemap(in) int8
 {
@@ -176,12 +100,12 @@
 }
 %typemap(out) int8
 {
-  $result = newSViv ($1);
+  $result = sv_2mortal (newSViv ($1));
 }
 
 /****************************************************************************
- * Allow event key characters to be given as strings of length 1. Otherwise,
- * they would have to be passed as ASCII integers.
+ * Allow characters for keyboard events to be given as one-character strings.
+ * Otherwise, they would have to be passed as integer ASCII codes.
  ****************************************************************************/
 %typemap(out) int Char
 {
@@ -209,20 +133,15 @@
  * invoke SwigValueWrapper's operator T& before actually assigning the value to
  * a csRef.  This hack is noted by "* explicit cast *".
  ****************************************************************************/
-%define TYPEMAP_OUT_csRef_BODY(result, pT, cT)
+%define TYPEMAP_OUT_csRef_BODY(result, T)
   if (rf.IsValid ())
   {
+    // SWIG_SHADOW | SWIG_OWNER tells Swig that it is taking ownership of a
+    // reference to the object and should therefore DecRef it when its finished
+    SWIG_MakePtr (result, (T*) rf, $descriptor(T*), SWIG_SHADOW | SWIG_OWNER);
     rf->IncRef ();
-    SV* rv = sv_newmortal();
-    SWIG_MakePtr(rv, (cT*)rf, SWIG_TypeQuery(pT), 0);
-    result = rv;
   }
-  else
-  {
-    SvREFCNT_inc (& PL_sv_undef);
-    result = & PL_sv_undef;
-  }
-  argvi++;
+  else SvSetSV (result, & PL_sv_undef);
 %enddef
 
 #undef TYPEMAP_OUT_csRef
@@ -230,7 +149,9 @@
   %typemap(out) csRef<T>
   {
     csRef<T> rf ((csRef<T>&)$1); /* explicit cast */
-    TYPEMAP_OUT_csRef_BODY ($result, "cspace::" #T, T)
+    $result = sv_newmortal ();
+    TYPEMAP_OUT_csRef_BODY ($result, T)
+    argvi++;
   }
 %enddef
 
@@ -239,7 +160,9 @@
   %typemap(out) csPtr<T>
   {
     csRef<T> rf ((csPtr<T>&)$1); /* explicit cast */
-    TYPEMAP_OUT_csRef_BODY ($result, "cspace::" #T, T)
+    $result = sv_newmortal ();
+    TYPEMAP_OUT_csRef_BODY ($result, T)
+    argvi++;
   }
 %enddef
 
@@ -247,21 +170,17 @@
 %define TYPEMAP_OUT_csWrapPtr
   %typemap(out) csWrapPtr
   {
+    $result = sv_newmortal();
     csRef<iBase> rf ($1.Ref);
     if (rf.IsValid ())
     {
       csString pT; pT << "cspace::" << $1.Type;
-      iBase* ibase = rf;
-      void* ptr = ibase->QueryInterface(iSCF::SCF->GetInterfaceID($1.Type), $1.Version);
-      SV* rv = sv_newmortal();
-      SWIG_MakePtr(rv, ptr, SWIG_TypeQuery(pT.GetData()), 0);
-      $result = rv;
+      void* ptr = rf->QueryInterface(iSCF::SCF->GetInterfaceID($1.Type), $1.Version);
+      SWIG_MakePtr ($result, ptr, SWIG_TypeQuery (pT.GetData ()),
+	SWIG_SHADOW | SWIG_OWNER);
+      rf->IncRef ();
     }
-    else
-    {
-      SvREFCNT_inc (& PL_sv_undef);
-      $result = & PL_sv_undef;
-    }
+    else SvSetSV ($result, & PL_sv_undef);
     argvi++;
   }
 %enddef
@@ -274,14 +193,15 @@
   %typemap(out) csRefArray<T>
   {
     AV *av = newAV ();
-    for (int i = 0; i < $1.Length (); i++)
+    for (unsigned i = 0, size = $1.GetSize (); i < size; i++)
     {
-      SV *ae;
-      TYPEMAP_OUT_csRef_BODY (ae, "cspace::" #T, T)
+      csRef<T> rf ($1.Get (i));
+      SV *ae = newSViv (0);
+      TYPEMAP_OUT_csRef_BODY (ae, T)
       av_push (av, ae);
-      SvREFCNT_dec (ae);
     }
-    $result = newRV_noinc ((SV *) av);
+    $result = sv_2mortal (newRV_noinc ((SV *) av));
+    argvi++;
   }
 %enddef
 
@@ -292,24 +212,24 @@
   %typemap(out) csArray<T>
   {
     AV *av = newAV ();
-    for (int i = 0; i < $1.Length (); i++)
+    for (unsigned i = 0, size = $1.GetSize (); i < size; i++)
     {
       SV *ae = toSV ($1.Get (i));
       av_push (av, ae);
-      SvREFCNT_dec (ae);
     }
-    $result = newRV_noinc ((SV *) av);
+    $result = sv_2mortal (newRV_noinc ((SV *) av));
+    argvi++;
   }
   %typemap(in) csArray<T>
   {
+    if (! SvROK ($input)) croak ("Argument must be an array reference");
     AV *av = (AV *) SvRV ($input);
-    if (SvTYPE (av) != SVt_PVAV)
-      croak ("%s", "Argument must be an array reference");
+    if (SvTYPE (av) != SVt_PVAV) croak ("Argument must be an array reference");
     if (av_len (av) >= 0)
     {
-      for (int i = 0; i <= av_len (av); i++)
+      for (int i = 0, last = av_len (av); i <= last; i++)
       {
-        SV *sv = av_fetch (av, i, 0);
+        SV *sv = * av_fetch (av, i, 0);
         $1.Push (fromSV (sv));
       }
     }
@@ -330,98 +250,48 @@ _TYPEMAP_csArray(double,		newSVnv,	SvNV)
   %typemap(out) csArray<T>
   {
     AV *av = newAV ();
-    for (int i = 0; i < $1.Length (); i++)
+    for (unsigned i = 0, size = $1.GetSize (); i < size; i++)
     {
-      SV *rv = newSViv (0);
-      sv_setref_iv (rv, "cspace::" #T, (int) (void *) & $1.Get (i));
-      av_push (av, rv);
-      SvREFCNT_dec (ae);
+      SV *ae = newSViv (0);
+      void *ptr = & $1.Get (i);
+      SWIG_MakePtr (ae, ptr, $descriptor(T*), 0);
+      av_push (av, ae);
     }
-    $result = newRV_noinc ((SV *) av);
+    $result = sv_2mortal (newRV_noinc ((SV *) av));
+    argvi++;
   }
   %typemap(in) csArray<T>
   {
+    if (! SvROK ($input)) croak ("Argument must be an array reference");
     AV *av = (AV *) SvRV ($input);
-    if (SvTYPE (av) != SVt_PVAV)
-      croak ("%s", "Argument must be an array reference");
+    if (SvTYPE (av) != SVt_PVAV) croak ("Argument must be an array reference");
     if (av_len (av) >= 0)
-      for (int i = 0; i <= av_len (av); i++)
+      for (int i = 0, last = av_len (av); i <= last; i++)
       {
-        SV *sv = av_fetch (av, i, 0);
-        if (! sv_isa (sv, "cspace::" #T))
-          croak ("All elements of array must be cspace::%s", #T);
-        T *v = (T *) SvIV (SvRV (sv));
-        $1.Push (* v);
+        SV *sv = * av_fetch (av, i, 0);
+        void *ptr;
+        int status = SWIG_ConvertPtr (sv, &ptr, $input_descriptor, 0);
+        if (! SWIG_IsOK (status))
+          croak ("All elements of array must be instances of cspace::%s", #T);
+        $1.Push (* (T*) ptr);
       }
   }
 %enddef
-
-/****************************************************************************
- * Retrieve the version number of an interface which is provided as a string.
- * Used by the typemap below.
- ****************************************************************************/
-%{
-  int scfGetVersion (const char *iface)
-  {
-    dSP;
-    int ver;
-    int nresult;
-    csString var;
-    var << "cspace::" << iface << "::scfGetVersion";
-
-    ENTER;
-    SAVETMPS;
-    PUSHMARK(SP);
-    PUTBACK;
-    nresult = call_pv(var.GetData(), G_SCALAR);
-    SPAGAIN;
-
-    if (nresult != 1)
-      croak("Expected exactly one result from scfGetVersion()\n");
-
-    ver = POPi;
-
-    PUTBACK;
-    FREETMPS;
-    LEAVE;
-
-    return ver;
-  }
-%}
-
-/****************************************************************************
- * Typemaps to convert an interface and version from an interface name.
- ****************************************************************************/
-%typemap(in) (const char * iface, int iface_ver)
-{
-  // SvPV_nolen is a macro that can't be used in general expression so we
-  // declare a temp variable.  The temp variable is non-const because SWIG
-  // declares $1 to be non-const for some reason.
-  char *inputString;
-  inputString = SvPV_nolen($input);
-  $1 = inputString;
-  $2 = scfGetVersion(inputString);
-}
 
 /****************************************************************************
  * Typemaps to convert an argc/argv pair to a Perl array.
  ****************************************************************************/
 %typemap(in) (int argc, char const* const argv[])
 {
-  // Convert incoming Perl array reference to argc/argv[].  Note that we
-  // manually determine and prepend the script name to the incoming @ARGV array
-  // since C functions expect argv[0] to be the program name, whereas the Perl
-  // @ARGV array is filled only with script arguments.
+  if (! SvROK ($input)) croak ("Argument must be an array reference");
   AV *av = (AV *) SvRV ($input);
-  if (SvTYPE (av) != SVt_PVAV)
-    croak ("%s", "Argument must be an array reference");
-  $1 = av_len (av) + 2; // +1 to get actual array length; +1 for script name
+  if (SvTYPE (av) != SVt_PVAV) croak ("Argument must be an array reference");
+  $1 = av_len (av) + 1;
   $2 = new (char*)[$1];
-  $2[0] = SvPV_nolen(get_sv("0", 0));
-  for (int i = 1; i < $1; i++)
+  for (int i = 0; i < $1; i++)
   {
-    SV **sv = av_fetch (av, i - 1, 0);
-    $2[i] = SvPV_nolen (*sv);
+    SV *sv = * av_fetch (av, i, 0);
+    $2[i] = SvPV_nolen (sv);
   }
 }
 
@@ -429,7 +299,7 @@ _TYPEMAP_csArray(double,		newSVnv,	SvNV)
 {
   delete[] $2;
 
-  // Let caller know that we consumed the entire array (i.e. we `shifted'
+  // Let caller know that we consumed the entire array (i.e. we 'shifted'
   // all elements). It is safe to do this only after all usage of $2[]
   // since $2[] contains live references to strings in $input.
   av_clear((AV*)SvRV($input));
@@ -454,21 +324,22 @@ _TYPEMAP_csArray(double,		newSVnv,	SvNV)
   AV *av = newAV ();
   for (int i = 0; i < cnt; i++)
   {
-    base_type *item = new base_type (to_item ptr[i]);
-    SV *o = newSVsv (& PL_sv_undef);
-    SvREFCNT_dec (sv_setref_iv (o, #base_type, (int) item));
-    av_push (av, o);
-    SvREFCNT_dec (o);
+    base_type *item = new base_type (to_item (ptr[i]));
+    SV *sv = newSViv (0);
+    // SWIG_SHADOW | SWIG_OWNER tells Swig that it is taking ownership of the
+    // object and should therefore delete it when Perl releases the SV.
+    SWIG_MakePtr (sv, item, $descriptor(base_type*), SWIG_SHADOW | SWIG_OWNER);
+    av_push (av, sv);
   }
-  $result = newRV ((SV *) av);
-  AvREFCNT_dec (av);
+  $result = sv_2mortal (newRV_noinc ((SV *) av));
+  argvi++;
 %enddef
 
 #undef TYPEMAP_OUTARG_ARRAY_CNT_PTR
 %define TYPEMAP_OUTARG_ARRAY_CNT_PTR(pattern, ptr_init, to_item)
   %typemap(in, numinputs = 0) pattern ($2_type ptr, $1_basetype cnt)
   {
-    $1 = & cnt;
+    $1 = cnt;
     $2 = ($2_type) ptr_init;
   }
   %typemap(outarg) pattern
@@ -486,7 +357,7 @@ _TYPEMAP_csArray(double,		newSVnv,	SvNV)
   %typemap(in, numinputs = 0) pattern ($1_type ptr, $2_basetype cnt)
   {
     $1 = ($1_type) ptr_init;
-    $2 = & cnt;
+    $2 = cnt;
   }
   %typemap(outarg) pattern
   {
@@ -500,25 +371,23 @@ _TYPEMAP_csArray(double,		newSVnv,	SvNV)
 
 #undef TYPEMAP_IN_ARRAY_BODY
 %define TYPEMAP_IN_ARRAY_BODY(array_type, base_type, cnt, ptr, to_item)
+  if (! SvROK ($input)) croak ("Argument must be an array reference");
   AV *av = (AV *) SvRV ($input);
-  if (SvTYPE (av) != SVt_PVAV)
-    croak ("%s", "Argument must be an array reference");
+  if (SvTYPE (av) != SVt_PVAV) croak ("Argument must be an array reference");
   cnt = av_len (av) + 1;
   ptr = new array_type [cnt];
   for (int i = 0; i < cnt; i++)
   {
-    SV *oref = av_shift (av);
-    SV *o = SvRV (oref);
-    SvREFCNT_dec (oref);
-    if (! sv_isa (o, #base_type))
+    SV *ae = * av_fetch (av, i, 0);
+    void *p;
+    int status = SWIG_ConvertPtr (ae, &p, $descriptor(base_type*), 0);
+    if (! SWIG_IsOK (status))
     {
-      croak ("%s", "Array must contain " #base_type "'s");
+      croak ("All elements of array must be instances of %s", #base_type);
       delete [] ptr;
       return;
     }
-    base_type *p = (base_type *) SvIV (o);
-    SvREFCNT_dec (o);
-    ptr [i] = to_item p;
+    ptr [i] = to_item (base_type *) p;
   }
 %enddef
 
@@ -545,12 +414,6 @@ _TYPEMAP_csArray(double,		newSVnv,	SvNV)
     delete [] $1;
   }
 %enddef
-
-/****************************************************************************
- * In perlpost.i, create an scfInitialize function in Perl which grabs the
- * program path automatically, and remove the C argc/argv version here.
- ****************************************************************************/
-%ignore scfInitialize(int argc, const char * const argv []);
 
 /****************************************************************************
  * Modern versions of Swig generate garbage Perl C interface code when a class

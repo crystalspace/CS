@@ -172,8 +172,6 @@
 // list. Please keep the list sorted alphabetically.
 #ifndef CS_MINI_SWIG
 %define APPLY_FOR_EACH_INTERFACE
-  INTERFACE_APPLY(iAws)
-  INTERFACE_APPLY(iAwsKey)
   INTERFACE_APPLY(iBase)
   INTERFACE_APPLY(iBinaryLoaderPlugin)
   INTERFACE_APPLY(iBodyGroup)
@@ -291,8 +289,6 @@
   INTERFACE_APPLY(iSkeletonBoneRagdollInfo)
   INTERFACE_APPLY(iSkeletonFactory)
   INTERFACE_APPLY(iSkeletonGraveyard)
-  INTERFACE_APPLY(iSkeletonScript)
-  INTERFACE_APPLY(iSkeletonScriptKeyFrame)
   INTERFACE_APPLY(iSkeletonSocket)
   INTERFACE_APPLY(iSkeletonSocketFactory)
   INTERFACE_APPLY(iSndSysData)
@@ -483,7 +479,7 @@
     const char *Type;
     scfInterfaceVersion Version;
     csWrapPtr (const char *t, scfInterfaceVersion v, iBase *r)
-    : Ref (r), Type (t), Version(v) {}
+    : Ref (csPtr<iBase> (r)), Type (t), Version(v) {}
     csWrapPtr (const char *t, scfInterfaceVersion v, csPtr<iBase> r)
     : Ref (r), Type (t), Version(v) {}
     csWrapPtr (const char *t, scfInterfaceVersion v, csRef<iBase> r)
@@ -508,6 +504,8 @@
 #define APPLY_TYPEMAP_ARGOUT_PTR(T,Args)
 #define ITERATOR_FUNCTIONS(T)
 #define ARRAY_OBJECT_FUNCTIONS(classname,typename)
+#define LIST_OBJECT_FUNCTIONS(classname,typename)
+#define SET_OBJECT_FUNCTIONS(classname,typename)
 
 #if defined(SWIGPYTHON)
   %include "bindings/python/pythpre.i"
@@ -524,15 +522,23 @@
 #endif
 
 // Handle arrays as input arguments.
+// The second parameter is for putting in an extra dereference operator if the
+// array is an array of objects. If it is an array of _pointers to_ objects,
+// then the second parameter should be empty. This is the inverse of the
+// third parameter in the TYPEMAP_OUTARG_ARRAY_... macros below.
 TYPEMAP_IN_ARRAY_CNT_PTR((int num_layers, iTextureWrapper ** wrappers), /**/)
 TYPEMAP_IN_ARRAY_PTR_CNT((csVector2 * InPolygon, int InCount), *)
 TYPEMAP_IN_ARRAY_PTR_CNT((csVector3* vertices, int num_vertices), *)
 TYPEMAP_IN_ARRAY_PTR_CNT((csVector3* vertices, int num), *)
 
 // Handle arrays as output arguments.
+// The third parameter is for putting in an extra dereference operator if the
+// array is an array of _pointers to_ objects. If it is just array of objects,
+// then the third parameter should be empty. This is the inverse of the
+// second parameter in the TYPEMAP_IN_ARRAY_... macros above.
 TYPEMAP_OUTARG_ARRAY_PTR_CNT(
   (csVector2 * OutPolygon, int & OutCount),
-  new csVector2[MAX_OUTPUT_VERTICES], *
+  new csVector2[MAX_OUTPUT_VERTICES], /**/
 )
 
 %ignore csPtr::csPtr;
@@ -978,6 +984,8 @@ iArrayChangeElements<csShaderVariable * >;
 %feature("compactdefaultargs") csInitializer::SetupConfigManager;
 %include "cstool/initapp.h"
 %typemap(default) const char * configName;
+
+%include "csutil/customallocated.h"
 %ignore csArray<csPluginRequest>::Capacity;
 %ignore csArray<csPluginRequest>::DefaultCompare;
 %ignore csArray<csPluginRequest>::Delete;
@@ -1007,6 +1015,8 @@ iArrayChangeElements<csShaderVariable * >;
 %ignore csArray<csPluginRequest>::operator=;
 %ignore csArray<csPluginRequest>::operator[];
 %template(csPluginRequestArray) csArray<csPluginRequest>;
+
+%ignore iPen::Rotate;
 
 #ifndef CS_MINI_SWIG
 %include "igeom/clip2d.h"
@@ -1350,11 +1360,14 @@ typedef int int32_t;
 %include "cstool/pen.h"
 #endif // CS_MINI_SWIG
 
+%ignore iBase::~iBase(); // We replace iBase dtor with one that calls DecRef().
+			 // Swig already knows not to delete an SCF pointer.
+
 %define INTERFACE_POST(T)
   %extend T
   {
-    virtual ~T() { if (self) self->DecRef(); }
     static int scfGetVersion() { return scfInterfaceTraits<T>::GetVersion(); }
+    virtual ~T() { if (self) self->DecRef (); }
   }
 %enddef
 
@@ -1805,22 +1818,22 @@ csWrapPtr CS_LOAD_PLUGIN (iPluginManager *obj, const char *id,
 
 csWrapPtr CS_GET_CHILD_OBJECT (iObject *obj, const char *iface, int iface_ver)
 {
-  return csWrapPtr (iface, iface_ver, obj->GetChild(iSCF::SCF->GetInterfaceID (iface),
-    iface_ver));
+  return csWrapPtr (iface, iface_ver,
+    obj->GetChild(iSCF::SCF->GetInterfaceID (iface), iface_ver));
 }
 
 csWrapPtr CS_GET_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
   int iface_ver, const char *name)
 {
-  return csWrapPtr (iface, iface_ver, obj->GetChild(iSCF::SCF->GetInterfaceID (iface),
-    iface_ver, name));
+  return csWrapPtr (iface, iface_ver,
+    obj->GetChild(iSCF::SCF->GetInterfaceID (iface), iface_ver, name));
 }
 
 csWrapPtr CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
   int iface_ver, const char *name)
 {
-  return csWrapPtr (iface, iface_ver, obj->GetChild(iSCF::SCF->GetInterfaceID (iface),
-    iface_ver, name, true));
+  return csWrapPtr (iface, iface_ver,
+    obj->GetChild(iSCF::SCF->GetInterfaceID (iface), iface_ver, name, true));
 }
 %}
 

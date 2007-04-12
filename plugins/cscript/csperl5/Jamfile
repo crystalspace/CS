@@ -23,15 +23,14 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
     {
       actions PerlEmbedGlueFile
       {
-        $(CMD.PERL5) -MExtUtils::Embed -e xsinit -- \
-        -o $(<) -std DynaLoader cspace
+        $(CMD.PERL5) -MExtUtils::Embed -e xsinit -- -o $(<) -std DynaLoader
       }
     }
     else
     {
       actions PerlEmbedGlueFile
       {
-        $(CMD.PERL5) -MExtUtils::Embed -e xsinit -- -o $(<) -std cspace
+        $(CMD.PERL5) -MExtUtils::Embed -e xsinit -- -o $(<) -std
       }
     }
   }
@@ -57,16 +56,16 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
 
   if $(CMD.SWIG)
   {
-    Swig $(target) $(pmfile) :
-      [ FGristFiles cspace.i ] :
-      perl5 :
-      -c++ -shadow -const -module cspace :
-      [ ConcatDirs $(TOP) include ]
-      [ ConcatDirs $(BUILDTOP) include ] :
-      [ ConcatDirs $(TOP) include bindings ] :
-      [ ConcatDirs $(TOP) scripts perl5 ] :
-      :
-      [ on $(pmfile) GetVar LOCATE ] ;
+    Swig $(target) $(pmfile) :			#targets
+      [ FGristFiles cspace.i ] :		#swigfile
+      perl5 :					#language
+      -c++ -shadow -const -module cspace :	#swigflags
+      [ ConcatDirs $(TOP) include ]		#swigincdirs
+      [ ConcatDirs $(BUILDTOP) include ] :	#    "
+      [ ConcatDirs $(TOP) include bindings ] :	#swigfiledir
+      [ ConcatDirs $(TOP) scripts perl5 ] :	#frozendirs
+      :						#tag
+      [ on $(pmfile) GetVar LOCATE ] ;		#outdir
     Depends csperl5clean : perl5swigclean ;
     targetdir = $(LOCATE_TARGET) ;
   }
@@ -94,17 +93,13 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
   #--------
   # csperl5 -- Crystal Space plugin
   #--------
-  local common = [ DoSourceGrist cswigpl5.cpp ] ;
   Description csperl5 : "Perl5 plugin" ;
-  Includes $(common) : $(target) ;
-  Plugin csperl5 : $(common) $(perlxs) csperl5.cpp csperl5.h ;
+  Plugin csperl5 : $(perlxs) csperl5.cpp csperl5.h ;
   LinkWith csperl5 : crystalspace ;
   ExternalLibs csperl5 : PERL5 ;
   CFlags csperl5 :
-    [ FIncludes $(targetdir) ]
     $(COMPILER.C++FLAGS.WARNING.NO_UNUSED)
     $(COMPILER.C++FLAGS.WARNING.NO_UNINITIALIZED) ;
-  Depends csperl5 : $(pmfile) ;
 
 
   #--------
@@ -114,13 +109,12 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
   Description perl5mod : $(desc) ;
   Help perl5mod : "Build the $(desc)" ;
 
-  # Plugin rule above already invokes CompileObject for $(common). We do not
-  # invoking it again because we want to avoid compiling the same (large) file
-  # twice. Intead, we just get a reference to the object file.
-  local commonobj = [ DoObjectGrist $(common:S=$(SUFOBJ)) ] ;
-
   local perl5modsrc = [ DoSourceGrist perl5mod.cpp ] ;
-  local perl5modobj = $(commonobj) [ CompileObjects $(perl5modsrc) ] ;
+  local swigsrc = [ DoSourceGrist cswigpl5.cpp ] ;
+  Includes $(swigsrc) : $(target) ;
+
+  local perl5modobj = [ CompileObjects $(perl5modsrc) ] ;
+  local swigobj = [ CompileObjects $(swigsrc) ] ;
 
   local perl5mod = cspace ;
   if $(PERL5.MODULE_EXT)
@@ -132,20 +126,22 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
     perl5mod = [ ConstructPluginTarget $(perl5mod) ] ;
   }
 
+#  perl5mod_TARGET = [ ConcatDirs $(TOP) scripts perl5 $(perl5mod) ] ; #@@@???
   perl5mod_TARGET = $(perl5mod) ;
-  perl5mod_SOURCES = $(perl5modsrc) ;
-  perl5mod_OBJECTS = $(perl5modobj) ;
+  perl5mod_SOURCES = $(perl5modsrc) $(swigsrc) ;
+  perl5mod_OBJECTS = $(perl5modobj) $(swigobj) ;
   LinkWith perl5mod : crystalspace ;
   ExternalLibs perl5mod : PERL5 ;
-  CFlags perl5mod : $(PLUGIN.CFLAGS) ;
+  CFlags perl5mod : $(PLUGIN.CFLAGS) [ FIncludes $(targetdir) ] ;
   LFlags perl5mod : $(PLUGIN.LFLAGS) $(LINKLIBS) ;
   NotFile perl5mod ;
   Depends perl5mod : $(pmfile) ;
   Depends perl5mod : $(perl5mod) ;
   Depends plugins : perl5mod ;
-  MakeLocate $(perl5mod) : $(LOCATE.TARGETS) ;
-  Depends $(perl5mod) : $(perl5modobj) ;
-  LinkPlugin $(perl5mod) : $(perl5modobj) ;
+  MakeLocate $(perl5mod) : [ ConcatDirs $(TOP) scripts perl5 ] ; #@@@???
+#  MakeLocate $(perl5mod) : $(LOCATE.TARGETS) ;
+  Depends $(perl5mod) : $(perl5mod_OBJECTS) ;
+  LinkPlugin $(perl5mod) : $(perl5mod_OBJECTS) ;
 
   rule InstallPerl5mod
   {
@@ -156,7 +152,7 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
 
   Always perl5modclean ;
   NotFile perl5modclean ;
-  Clean perl5modclean : $(perl5mod) $(perl5modobj) ;
+  Clean perl5modclean : $(perl5mod) ;
   Depends clean : perl5modclean ;
 
 

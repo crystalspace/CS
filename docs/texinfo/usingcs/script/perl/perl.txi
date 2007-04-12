@@ -8,7 +8,7 @@ plugin module in which C++ code can call upon Perl code, and in which Perl code
 can call upon Crystal Space; (2) as a pure Perl module named @file{cspace}
 which one can @samp{use} from within Perl programs.  To use the first option,
 load the @file{csperl5} plugin as you would load any other Crystal Space
-plugin, and interact with it via the @sc{scf} @samp{iScript} interface
+plugin, and interact with it via the @sc{scf} interface @samp{iScript}
 (@pxref{iScript Interface}).  The second approach allows you to write Crystal
 Space applications entirely in Perl, without any C++ coding.  The rest of this
 document pertains to the second method of using Crystal Space from Perl, though
@@ -36,7 +36,9 @@ use lib "$ENV@{CRYSTAL@}/share/crystalspace/bindings/perl5";
 @noindent
 You can also use Perl's @samp{-I} command-line option to tell it the location
 of this file. Finally, you can set the @samp{PERL5LIB} environment variable so
-that it mentions the directory containing @file{cspace.pm}.
+that it mentions the directory containing @file{cspace.pm}. If you are using
+the Perl @sc{scf} plugin, then the correct directory will already be in the
+include list, so you need only call @code{iScript::LoadModule("cspace")}.
 
 In addition to the @samp{.pm} file, there is also a shared library,
 @file{cspace}, which contains the low-level bindings between Perl and Crystal
@@ -59,27 +61,16 @@ To get started with pure Perl scripts, you probably want to know how to
 initialize Crystal Space and obtain an @samp{iObjectRegistry} pointer:
 
 @example
-my $object_reg =
-  cspace::csInitializer::CreateEnvironment([$0, @@ARGV]);
+my $object_reg = cspace::csInitializer::CreateEnvironment([$0, @@ARGV]);
 @end example
 
-@subheading Functions and Classes
+If you are utilizing the Crystal Space Perl bindings module from within the
+Perl scripting plugin @samp{iScript} implementation, and
+@code{CreateEnvironment()} has already been called by C++ code, then the
+@samp{iObjectRegistry} will already be accessible to Perl code through
+@code{$cspace::object_reg}.
 
-Crystal Space has several global functions which can be accessed easily from
-Perl.  For instance, in C++, one might say:
-
-@example
-char const* str = "Hello, world!";
-int key = csHashCompute(str);
-@end example
-
-Perl is almost exactly the same, the most notable difference is the
-@code{cspace::} prefix:
-
-@example
-my $str = "Hello, world!";
-my $key = cspace::csHashCompute($str);
-@end example
+@subheading Objects
 
 To create an object instance, use the @samp{new} method:
 
@@ -92,21 +83,24 @@ has built-in reference counting, so if the object is still referenced in some
 other Perl code when one reference goes out of scope, it will continue to exist
 until there are no more references to it in Perl.
 
+You will note the obvious difference in semantics, being that everything in
+the @samp{cspace} module has a @code{cspace::} prefix.
+
 There are three ways to access object properties:
 
 @example
-print $vect->x;       # Preferred way, conforms to Perl convention
-print $vect->@{"x"@}; # Swig's primary way
-print $vect->get_x(); # Swig's secondary way
+print $vect->x;			# Preferred way, conforms to Perl convention
+print $vect->@{'x'@};		# Swig default way
+print $vect->swig_x_get();	# Swig alternate way
 @end example
 
 @noindent
 And, three ways to modify object properties:
 
 @example
-$vect->x(123);        # Preferred way, conforms to Perl convention
-$vect->@{"x"@} = 123; # Swig's primary way
-$vect->set_x(123);    # Swig's secondary way
+$vect->x(3.14);			# Preferred way, conforms to Perl convention
+$vect->@{'x'@} = 3.14;		# Swig default way
+$vect->swig_x_set(3.14);	# Swig alternate way
 @end example
 
 @noindent
@@ -121,19 +115,63 @@ $vect->Norm();
 Wherever an array is expected, or wherever an array is returned, in or from
 a Crystal Space C++ function, a Perl array reference is used.
 
+@subheading Strings
+
+Most of the methods of @samp{csString} and @samp{iString} are inaccessible
+from Perl code, but these classes can be converted into Perl strings very
+easily, using the scalar dereference operator or string interpolation:
+
+@example
+my $string_object = new cspace::csString ('This is a csString');
+
+print "$string_object that has been interpolated in double-quotes.\n";
+
+my $string1 = substr ${ $string_object }, 0, 4;
+my $string2 = substr ${ $string_object }, 8;
+
+print "$string1 has been extracted from $string2 using scalar dereference.\n";
+
+# Output:
+# This is a csString that has been interpolated in double-quotes.
+# This has been extracted from a csString using scalar dereference.
+@end example
+
+This also applies to @samp{iDataBuffer}.
+
+@subheading Vectors, Matrices and Colors
+
+By using the array dereference operator on a @samp{csVector2} or
+@samp{csVector3}, one will obtain a Perl array containing the components of
+the vector:
+
+@example
+my $vector = new cspace::csVector3 (1, 2, 3);
+
+print $vector->[1] . $vector->[0] . $vector->[2] . "\n";
+
+print reverse @@{ $vector } . "\n";
+
+# Output:
+# 213
+# 3 2 1
+@end example
+
+Similarly, using the array dereference operator on a @samp{csColor},
+@samp{csColor4}, @samp{csRGBcolor} or @samp{csRGBpixel} will yield a Perl
+array containing the red, green and blue components, and the alpha component
+if present.
+
+With a @samp{csMatrix2} or @samp{csMatrix3}, the array dereference will
+return a Perl two-dimensional array ("array of arrays") holding the components
+of the matrix.
+
 @subheading Operator Overloading
 
-Operator overloading is not yet supported. All the code required to support it
-has been written, but the code requires some non-existant features of Swig.
-The operators that exist in C++ and which Perl can overload are:
-@code{+ - * / % << >> & | ^ && || ! ~ < <= == >= > != ++ --
-= += -= *= /= %= <<= >>= &= |= ^=}
+The Crystal Space Perl module supports the following overloaded operators for
+objects:
+@code{+ - * / % ++ -- == != > < && ||}
 
-And: @code{** **=} (expontentiation), @code{lt le eq ge gt ne} (string
-comparison), @code{<>} (iteration), @code{x x=} (repeat), @code{. .=}
-(concatenate), @code{$ @@ % * &} (convert to Perl native types: scalar, array,
-hash, glob, subroutine), @code{abs} (absolute value), truth evaluation,
-stringify and numerify.
+Those declared in C++ as friend functions will not be available.
 
 @subheading Interface Pointers
 
@@ -145,16 +183,34 @@ way, and pass them on to other functions as arguments where appropriate.
 The Perl bindings automatically and correctly handle @code{csRef<>} and
 @code{csPtr<>}.
 
+@subheading Event Handling
+
+In C++, the class method
+@code{csInitializer::SetupEventHandler(object_reg, func_ptr, event_types)}
+allows one to register a function pointer callback that will be called by the
+event queue when handling certain types of events. In Perl, a subroutine
+reference may be passed to this method in place of the function pointer.
+
+This subroutine, when called, will be passed a single parameter: an object of
+type @samp{iEvent}. It is expected to return @code{true} if the event was
+handled, or @code{false} if it was not.
+
+The third parameter to @code{SetupEventHandler} is optional, and will be a
+reference to an array of strings specifying event types. These strings will
+automatically be translated into @samp{csStringID} using the event name
+registry. If not specified, all types of event will be passed to the callback.
+
 @subheading Implementing Interfaces
 
 You can write your own Perl class and have it inherit from a Crystal Space
 interface, then use instances of that class wherever an implementation of that
-interface is expected. Currently the interfaces that support this feature are
-@samp{iEventHandler} and @samp{iEventPlug} but it is easy to add more.
+interface is expected. Currently this feature is supported for the interfaces
+@samp{iEventHandler} and @samp{iEventPlug} but it is easy to add support for
+more.
 
 @example
 package MyPerlEventHandler;
-@@ISA = qw@{ cspace::iEventHandler @};
+@@ISA = qw( cspace::iEventHandler );
 sub new
 @{
   my $x = @{@};
@@ -169,7 +225,7 @@ sub HandleEvent
 
 package main;
 my $eventq = cspace::CS_QUERY_REGISTRY($object_reg, "iEventQueue");
-my $handler = new MyPerlEventHandler;
+my $handler = new MyPerlEventHandler ();
 $eventq->RegisterListener($handler);
 @end example
 
@@ -183,11 +239,11 @@ In Perl, Crystal Space macros that take interface names as parameters---for
 instance @code{CS_QUERY_REGISTRY()}---take interface names as strings:
 
 @example
-my $engine = cspace::CS_QUERY_REGISTRY($object_reg, "iEngine");
+my $engine = cspace::CS_QUERY_REGISTRY($object_reg, 'iEngine');
 @end example
 
 @noindent
-This differs from the C++ @code{CS_QUERY_REGISTRY()} macro in which
+This differs from the @code{CS_QUERY_REGISTRY()} macro in C++ in which
 @samp{iEngine} would not be quoted.
 
 @subsubheading @code{csRGBpixel}
@@ -258,3 +314,12 @@ call):
 @item
 @code{RetrieveVoidPtr()}
 @end itemize
+
+@subsubheading Renamed Methods
+
+To workaround some shortcomings of Swig, a few methods from C++ have been
+renamed for Perl. These are:
+
+@code{Classify(const csPlane3&, csVector3*, int)} becomes @code{ClassifyPolygon}.
+@code{ComputeNormal(csVector3*, int)} becomes @code{ComputePolygonNormal}.
+@code{ComputePlane(csVector3*, int)} becomes @code{ComputePolygonPlane}.

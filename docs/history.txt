@@ -6,6 +6,73 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Apr-2007
+	- Oktal made the following changes to the iScript interface:
+	    - Removed the Initialize() and Store() methods, which had been
+	      deprecated since before CS version 0.98.
+	    - Added a new interface called iScriptValue to hold a value from
+	      a scripting interpreter (constant expressions like 3.14 or
+	      "hello"), and added methods to iScript and iScriptObject that
+	      accept iScriptValue pointers. These new methods are intended to
+	      replace the existing Store/Set(), Retrieve/Get() and Call().
+	      Importantly, the old Call() methods used an ugly printf-style
+	      format string and var_args list to pass parameters to scripting
+	      subroutines while the new method uses a csRefArray<iScriptValue>
+	      which is much cleaner. The old methods are now deprecated.
+	    - Added LoadModuleNative(), companion to LoadModule(), that
+	      accepts a native filesystem path as opposed to a VFS path.
+	    - Renamed methods in iScriptObject: IsType() becomes IsA() and
+	      NewObject() becomes New() (better naming conventions IMHO).
+	      The old names remain as deprecated methods.
+	    - Added GetClass(), which returns a string containing the name of
+	      an object's class within the scripting language.
+	    - Marked SetPointer() as deprecated and not guaranteed to work.
+	    - Updated and improved doxygen comments and the relevant sections
+	      of the manual. Update of the release notes can wait until the
+	      iScript changes have been implemented in csPython.
+	    - Incremented the interfaces' version numbers.
+	- Oktal updated the csPerl5 plugin to conform to the new iScript.
+	- Oktal updated the perl5test application to test out the new stuff.
+	- For each new method added to iScript, Oktal added a corresponding
+	  stub implementation to csPython, so that compilation is not broken.
+	  Pablo Martin (caedes) has offered to fill in these methods. The old
+	  Store(), Retrieve() and Call() were never implemented for csPython,
+	  so this update has not resulted in the loss of any functionality.
+	- To maintain backwards compatibility with the deprecated methods in
+	  iScript and iScriptObject, without having to implement them for all
+	  subclasses, Oktal added intermediate classes csScriptCommon and
+	  csScriptObjectCommon in csplugincommon, which implement the old
+	  methods by forwarding requests to the new methods. csPerl5 and
+	  csPython now inherit from these classes. These classes can be
+	  removed when the deprecated methods are removed.
+	- Oktal made the following changes to the Swig bindings:
+	    - Fixed the Swig rule in the csperl5 Jamfile so the Swig-generated
+	      files get put in the correct directory.
+	    - The csPerl5 plugin no longer depends on the Swig-generated perl
+	      module; it is possible to use the plugin without the module.
+	    - Removed references to AWS, since it has been moved to CSExtra.
+	    - Swig now ignores the somewhat-recently added virtual destructor
+	      of iBase, and defines its own to correctly handle refcounts.
+	    - Moved the directive "%ignore iPen::Rotate" from pythpre.i to
+	      cspace.i since the problem it addresses appears to be present
+	      for all language targets.
+	    - The ..._OBJECT_FUNCTIONS macros now conform to the conventions
+	      of the other language-specific macros.
+	    - Removed the half-finished code related to operator overloading
+	      in perl, as recent versions of Swig handle it automatically.
+	    - Since Swig now has a %perlcode directive similar to %pythoncode,
+	      several functions that had previously been written with ugly XS
+	      (perl C API) were re-written in pure perl, less prone to errors.
+	    - Added some extra overloaded operators using %perlcode.
+	    - Replaced some calls to SWIG_TypeQuery("cspace::foo") with
+	      $descriptor(foo*) where possible. This is much faster.
+	    - Fixed several memory leaks and hanging pointers, with better
+	      understanding of which perl API calls modify reference counts
+	      and which do not.
+	    - Fixed two bugs in the python implementation of the
+	      TYPEMAP_OUTARG_ARRAY_... macros that would cause them to fail
+	      silently. This meant changing their parameter semantics.
+	    - Fixed numerous other bugs in the Swig interface files for perl.
 11-Apr-2007
 	- res tweaked the texi2html config to not include the current date in
 	  redirect files.
