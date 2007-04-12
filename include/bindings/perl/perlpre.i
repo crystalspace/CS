@@ -178,7 +178,6 @@
       void* ptr = rf->QueryInterface(iSCF::SCF->GetInterfaceID($1.Type), $1.Version);
       SWIG_MakePtr ($result, ptr, SWIG_TypeQuery (pT.GetData ()),
 	SWIG_SHADOW | SWIG_OWNER);
-      rf->IncRef ();
     }
     else SvSetSV ($result, & PL_sv_undef);
     argvi++;

@@ -119,6 +119,26 @@ _csRef_to_Python (const csRef<iBase> & ref, void * ptr, const char * name)
   }
 %enddef
 
+/***@@@***
+Oktal has commented out some lines of the following function on 12-Apr-2007
+until someone who knows more about Python can look at it and make sure I'm
+right about those lines being superfluous and possibly erroneous.
+
+There is a big comment (starting with "This is a bit tricky") that talks about
+having to create a second Python object and call its IncRef method, so that
+the result object owns one reference to the wrapper pointer.
+
+Except, the second Python object is destroyed at the end of the function,
+which causes its DecRef method to be called, so that whole section looks
+to me to be entirely pointless.
+
+That big comment also talks about calling IncRef twice, but I can only see one
+call to IncRef in the code :-/
+
+As long as we don't call DecRef after QueryInterface, the object should end up
+with the correct reference count. That's how I understand it, anyway, but I
+know practically nothing about Python.
+ ***@@@***/
 %{
 PyObject *
 _csWrapPtr_to_Python (const csWrapPtr & wp)
@@ -130,7 +150,7 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
   }
   iBase * ibase = (iBase *)wp.Ref;
   void * ptr = ibase->QueryInterface(iSCF::SCF->GetInterfaceID(wp.Type), wp.Version);
-  ibase->DecRef(); // Undo IncRef from QueryInterface
+//  ibase->DecRef(); // Undo IncRef from QueryInterface
 
   // This is a bit tricky: We want the generated Python 'result' object
   // to own one reference to the wrapped object, so we want to call
@@ -151,17 +171,17 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
   CS_ALLOC_STACK_ARRAY(char, type_name, strlen(wp.Type) + 3);
   strcat(strcpy(type_name, wp.Type), " *");
   PyObject *result = SWIG_NewPointerObj(ptr, SWIG_TypeQuery(type_name), 1);
-  PyObject * ibase_obj = SWIG_NewPointerObj (
-    ptr, SWIG_TypeQuery(type_name), 1);
-  PyObject * res_obj = PyObject_CallMethod(ibase_obj, "IncRef", "()");
-  if (!res_obj)
-  {
-    // Calling Python IncRef() failed; something wrong here.
-    Py_XDECREF(result);
-    result = 0;
-  }
-  Py_XDECREF(ibase_obj);
-  Py_XDECREF(res_obj);
+//  PyObject * ibase_obj = SWIG_NewPointerObj (
+//    ptr, SWIG_TypeQuery(type_name), 1);
+//  PyObject * res_obj = PyObject_CallMethod(ibase_obj, "IncRef", "()");
+//  if (!res_obj)
+//  {
+//    // Calling Python IncRef() failed; something wrong here.
+//    Py_XDECREF(result);
+//    result = 0;
+//  }
+//  Py_XDECREF(ibase_obj);
+//  Py_XDECREF(res_obj);
   return result;
 }
 %}

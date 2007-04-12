@@ -478,8 +478,6 @@
     csRef<iBase> Ref;
     const char *Type;
     scfInterfaceVersion Version;
-    csWrapPtr (const char *t, scfInterfaceVersion v, iBase *r)
-    : Ref (csPtr<iBase> (r)), Type (t), Version(v) {}
     csWrapPtr (const char *t, scfInterfaceVersion v, csPtr<iBase> r)
     : Ref (r), Type (t), Version(v) {}
     csWrapPtr (const char *t, scfInterfaceVersion v, csRef<iBase> r)
@@ -1765,14 +1763,14 @@ LIST_OBJECT_FUNCTIONS(iTextureList,iTextureWrapper)
 csWrapPtr CS_QUERY_REGISTRY (iObjectRegistry *reg, const char *iface,
   int iface_ver)
 {
-  iBase *b = reg->Get(iface, iSCF::SCF->GetInterfaceID (iface), iface_ver);
+  csPtr<iBase> b (reg->Get(iface, iSCF::SCF->GetInterfaceID(iface), iface_ver));
   return csWrapPtr (iface, iface_ver, b);
 }
 
 csWrapPtr CS_QUERY_REGISTRY_TAG_INTERFACE (iObjectRegistry *reg,
   const char *tag, const char *iface, int iface_ver)
 {
-  iBase *b = reg->Get(tag, iSCF::SCF->GetInterfaceID (iface), iface_ver);
+  csPtr<iBase> b (reg->Get(tag, iSCF::SCF->GetInterfaceID(iface), iface_ver));
   return csWrapPtr (iface, iface_ver, b);
 }
 
@@ -1783,57 +1781,58 @@ csWrapPtr SCF_QUERY_INTERFACE (iBase *obj, const char *iface, int iface_ver)
   // object layout reasons the void pointer returned by QueryInterface
   // can't be wrapped inside the csWrapPtr so obj must be wrapped.
   if (obj->QueryInterface(iSCF::SCF->GetInterfaceID(iface), iface_ver))
-    return csWrapPtr (iface, iface_ver, obj);
+    return csWrapPtr (iface, iface_ver, csPtr<iBase> (obj));
   else
-    return csWrapPtr (iface, iface_ver, 0);
+    return csWrapPtr (iface, iface_ver, csPtr<iBase> (0));
 }
 
 csWrapPtr SCF_QUERY_INTERFACE_SAFE (iBase *obj, const char *iface,
   int iface_ver)
 {
   if (!obj)
-    return csWrapPtr (iface, iface_ver, 0);
+    return csWrapPtr (iface, iface_ver, csPtr<iBase> (0));
 
   // This call to QueryInterface ensures that IncRef is called and that
   // the object supports the interface.  However, for type safety and
   // object layout reasons the void pointer returned by QueryInterface
   // can't be wrapped inside the csWrapPtr so obj must be wrapped.
   if (obj->QueryInterface(iSCF::SCF->GetInterfaceID(iface), iface_ver))
-    return csWrapPtr (iface, iface_ver, obj);
+    return csWrapPtr (iface, iface_ver, csPtr<iBase> (obj));
   else
-    return csWrapPtr (iface, iface_ver, 0);
+    return csWrapPtr (iface, iface_ver, csPtr<iBase> (0));
 }
 
 csWrapPtr CS_QUERY_PLUGIN_CLASS (iPluginManager *obj, const char *id,
   const char *iface, int iface_ver)
 {
-  return csWrapPtr (iface, iface_ver, obj->QueryPlugin (id, iface, iface_ver));
+  return csWrapPtr (iface, iface_ver,
+    csPtr<iBase> (obj->QueryPlugin (id, iface, iface_ver)));
 }
 
 csWrapPtr CS_LOAD_PLUGIN (iPluginManager *obj, const char *id,
   const char *iface, int iface_ver)
 {
-  return csWrapPtr (iface, iface_ver, obj->LoadPlugin(id));
+  return csWrapPtr (iface, iface_ver, csPtr<iBase> (obj->LoadPlugin (id)));
 }
 
 csWrapPtr CS_GET_CHILD_OBJECT (iObject *obj, const char *iface, int iface_ver)
 {
-  return csWrapPtr (iface, iface_ver,
-    obj->GetChild(iSCF::SCF->GetInterfaceID (iface), iface_ver));
+  return csWrapPtr (iface, iface_ver, csRef<iBase> (
+    obj->GetChild(iSCF::SCF->GetInterfaceID (iface), iface_ver)));
 }
 
 csWrapPtr CS_GET_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
   int iface_ver, const char *name)
 {
-  return csWrapPtr (iface, iface_ver,
-    obj->GetChild(iSCF::SCF->GetInterfaceID (iface), iface_ver, name));
+  return csWrapPtr (iface, iface_ver, csRef<iBase> (
+    obj->GetChild(iSCF::SCF->GetInterfaceID (iface), iface_ver, name)));
 }
 
 csWrapPtr CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
   int iface_ver, const char *name)
 {
-  return csWrapPtr (iface, iface_ver,
-    obj->GetChild(iSCF::SCF->GetInterfaceID (iface), iface_ver, name, true));
+  return csWrapPtr (iface, iface_ver, csRef<iBase> (
+    obj->GetChild(iSCF::SCF->GetInterfaceID (iface), iface_ver, name, true)));
 }
 %}
 
