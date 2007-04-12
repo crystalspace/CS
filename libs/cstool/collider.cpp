@@ -278,7 +278,6 @@ csColliderWrapper* csColliderHelper::InitializeCollisionWrapper (
             cw.AttachNew (new csColliderWrapper (mesh->QueryObject (),
               colsys, collider));
             cw->SetName (mesh->QueryObject ()->GetName());
-            cw = 0;
             // Clear object polygon mesh so we will no longer try to create
             // a collider from that (we already have a collider).
             obj_trimesh = 0;
@@ -312,7 +311,6 @@ csColliderWrapper* csColliderHelper::InitializeCollisionWrapper (
             cw.AttachNew (new csColliderWrapper (mesh->QueryObject (),
               colsys, collider));
             cw->SetName (mesh->QueryObject ()->GetName());
-            cw = 0;
             // Clear object polygon mesh so we will no longer try to create
             // a collider from that (we already have a collider).
             obj_polymesh = 0;
