@@ -43,7 +43,7 @@ for any of the other languages supported by Swig with a minimal amount of
 effort.
 
 @menu
-* iScript Interface:: The iScript Interfaces
+* iScript Interface:: The iScript Interface
 * Java Bindings::
 * Perl Bindings::
 * Python Bindings::

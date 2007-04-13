@@ -29,7 +29,7 @@ with guranteed atomicity such as CAS (Compare-And-Set) and increment.
 
 Full documentation in @pxref{Threading}.
 
-@node Api120 Rendering, , Api120 Threading, Release Notes 120
+@node Api120 Rendering, Api120 iPolygonMesh, Api120 Threading, Release Notes 120
 @subsection Rendering subsystem changes
 
 @subsubheading Shader variable type @samp{COLOR} deprecated
@@ -39,7 +39,7 @@ a significant benefit over @samp{VECTOR4}. Hence, use the latter if you intent
 to store colors. Internally, @samp{COLOR}s are the same as @samp{VECTOR4}s, so
 handling of the @samp{COLOR} type can generally be removed from code.
 
-@node Api120 iPolygonMesh, Api120 Rendering, Release Notes 120, Release Notes 120
+@node Api120 iPolygonMesh, , Api120 Rendering, Release Notes 120
 @subsection iPolygonMesh deprecation
 @cindex @code{iPolygonMesh}
 @cindex @code{iTriangleMesh}
