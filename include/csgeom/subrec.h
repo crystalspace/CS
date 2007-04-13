@@ -148,7 +148,7 @@ public:
   SubRectangles (const SubRectangles& other);
 
   /// Remove this region and sub-regions.
-  ~SubRectangles ();
+  virtual ~SubRectangles ();
 
   /// Get the rectangle for this region.
   const csRect& GetRectangle () const { return region; }
