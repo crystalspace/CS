@@ -16,6 +16,10 @@ chronological order.
 	  that it actually correctly uses the triangle mesh instead of the
 	  polygon mesh if the object model supports triangle meshes.
         - Piotr fixed small parameters setting bugs in ode joint.
+	- Jorrit fixed a bug in the iTriangleMesh implementation of
+	  the thing mesh. It would forget to call Setup() in the
+	  GetTriangleCount() and GetTriangles() methods.
+	- Jorrit implemented iTriangleMesh support in dynavis.
 12-Apr-2007
 	- Oktal made the following changes to the iScript interface:
 	    - Removed the Initialize() and Store() methods, which had been

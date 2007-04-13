@@ -21,6 +21,7 @@
 
 #include "csgeom/vector2.h"
 #include "csgeom/math2d.h"
+#include "igeom/trimesh.h"
 #include "iutil/dbghelp.h"
 
 // @@@ Hack(s) to avoid problems with static linking
@@ -29,6 +30,7 @@
 #endif
 
 struct iPolygonMesh;
+struct iTriangleMesh;
 struct iMovable;
 struct iCamera;
 class csPlane3;
@@ -78,6 +80,9 @@ public:
 
   /// Add an object to this culler.
   void AddObject (void* obj, iPolygonMesh* polymesh, iMovable* movable,
+  	iCamera* camera, const csPlane3* planes);
+  /// Add an object to this culler.
+  void AddObject (void* obj, iTriangleMesh* trimesh, iMovable* movable,
   	iCamera* camera, const csPlane3* planes);
 
   /// Do the visibility test.

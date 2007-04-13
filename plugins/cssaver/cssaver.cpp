@@ -595,7 +595,8 @@ bool csSaver::SaveMeshFactories(iMeshFactoryList* factList,
     char loadername[128] = "";
     csReplaceAll(loadername, basepluginname, ".object.", ".loader.factory.",128);
 
-    pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(GetPluginName (loadername, "Fact"));
+    pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(GetPluginName (
+	  loadername, "Fact"));
 
     char savername[128] = "";
     csReplaceAll(savername, basepluginname, ".object.", ".saver.factory.", 128);
@@ -627,6 +628,7 @@ bool csSaver::SaveMeshFactories(iMeshFactoryList* factList,
       }
 
       //TBD: Polymesh
+      //TBD: Trimesh
     }
 
     const char* pname = engine->GetRenderPriorityName (meshfactwrap->GetRenderPriority ());

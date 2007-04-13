@@ -210,10 +210,12 @@ public:
   }
   virtual size_t GetTriangleCount ()
   {
+    Setup ();
     return num_tri;
   }
   virtual csTriangle* GetTriangles ()
   {
+    Setup ();
     return triangles;
   }
   virtual void Lock () { locked++; }
