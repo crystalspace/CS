@@ -15,6 +15,7 @@ chronological order.
 	- Jorrit fixed csColliderHelper::InitializeCollisionWrapper() so
 	  that it actually correctly uses the triangle mesh instead of the
 	  polygon mesh if the object model supports triangle meshes.
+        - Piotr fixed small parameters setting bugs in ode joint.
 12-Apr-2007
 	- Oktal made the following changes to the iScript interface:
 	    - Removed the Initialize() and Store() methods, which had been

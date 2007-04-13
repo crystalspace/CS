@@ -1592,13 +1592,13 @@ public:
   void SetBounce (const csVector3 & bounce )
   { 
     csODEJoint::bounce = bounce;
-    ApplyJointProperty (dParamLoStop, bounce); 
+    ApplyJointProperty (dParamBounce, bounce); 
   }
   csVector3 GetBounce (){return bounce;}
   void SetDesiredVelocity (const csVector3 & velocity )
   { 
     vel = velocity;
-    ApplyJointProperty (dParamBounce, velocity); 
+    ApplyJointProperty (dParamVel, velocity); 
   }
   csVector3 GetDesiredVelocity (){return vel;}
   void SetMaxForce (const csVector3 & maxForce )
