@@ -3444,10 +3444,10 @@
         </mixmode>
         <color blue='1' green='1' red='1'/>
       </params>
-      <polymesh>
-        <colldet/>
-        <shadows/>
-      </polymesh>
+      <trimesh>
+	<id>colldet</id>
+	<id>shadows</id>
+      </trimesh>
       <ztest/>
       <noshadows/>
       <staticpos/>
@@ -3739,9 +3739,9 @@
           <alpha/>
         </mixmode>
       </params>
-      <polymesh>
-        <colldet/>
-      </polymesh>
+      <trimesh>
+	<id>colldet</id>
+      </trimesh>
       <ztest/>
       <move>
         <v y='3.2313' x='20.2621' z='17.6359'/>
