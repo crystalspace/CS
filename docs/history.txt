@@ -8,6 +8,13 @@ chronological order.
 
 13-Apr-2007
 	- Jorrit added virtual to the destructor of SubRectangles class.
+	- Jorrit changed the following meshes to also support
+	  iTriangleMesh: genmesh, bezier, instmesh, spr3d, brute, and
+	  thing.
+	- Jorrit added iCollideSystem->GetBaseDataID().
+	- Jorrit fixed csColliderHelper::InitializeCollisionWrapper() so
+	  that it actually correctly uses the triangle mesh instead of the
+	  polygon mesh if the object model supports triangle meshes.
 12-Apr-2007
 	- Oktal made the following changes to the iScript interface:
 	    - Removed the Initialize() and Store() methods, which had been

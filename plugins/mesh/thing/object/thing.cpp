@@ -161,6 +161,11 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
   SetPolygonMeshViscull (polygonMeshLOD);
   SetPolygonMeshShadows (polygonMeshLOD);
 
+  csRef<TriMeshHelper> trimesh;
+  trimesh.AttachNew (new TriMeshHelper ());
+  trimesh->SetThing (this);
+  SetTriangleData (thing_type->base_id, trimesh);
+
   max_vertices = num_vertices = 0;
   obj_verts = 0;
   obj_normals = 0;
@@ -2264,6 +2269,123 @@ void PolyMeshHelper::ForceCleanup ()
   num_poly = -1;
 }
 
+//-------------------------------------------------------------------------
+
+struct TriMeshTimerEvent : 
+  public scfImplementation1<TriMeshTimerEvent, 
+			    iTimerEvent>
+{
+  csWeakRef<TriMeshHelper> pmh;
+  TriMeshTimerEvent (TriMeshHelper* pmh) : scfImplementationType (this)
+  {
+    TriMeshTimerEvent::pmh = pmh;
+  }
+  virtual bool Perform (iTimerEvent*)
+  {
+    if (pmh) pmh->Cleanup ();
+    return false;
+  }
+};
+
+//-------------------------------------------------------------------------
+
+void TriMeshHelper::SetThing (csThingStatic* thing)
+{
+  TriMeshHelper::thing = thing;
+  static_data_nr = thing->GetStaticDataNumber ()-1;
+  num_tri = ~0;
+}
+
+void TriMeshHelper::Setup ()
+{
+  thing->Prepare (0);
+  if (static_data_nr != thing->GetStaticDataNumber ())
+  {
+    static_data_nr = thing->GetStaticDataNumber ();
+    ForceCleanup ();
+  }
+
+  if (triangles || num_tri == 0)
+  {
+    // Already set up. First we check if the object vertex array
+    // is still valid.
+    if (vertices == thing->obj_verts) return ;
+  }
+
+  vertices = 0;
+
+  // Count the number of needed triangles and vertices.
+  num_verts = thing->GetVertexCount ();
+  num_tri = 0;
+
+  size_t i;
+  const csPolygonStaticArray &pol = thing->static_polygons;
+  for (i = 0 ; i < pol.GetSize () ; i++)
+  {
+    csPolygon3DStatic *p = pol.Get (i);
+    num_tri += p->GetVertexCount ()-2;
+  }
+
+  // Allocate the arrays and the copy the data.
+  if (num_verts)
+  {
+    vertices = thing->obj_verts;
+  }
+
+  if (num_tri)
+  {
+    triangles = new csTriangle[num_tri];
+    num_tri = 0;
+    for (i = 0 ; i < pol.GetSize () ; i++)
+    {
+      csPolygon3DStatic *p = pol.Get (i);
+      int* vi = p->GetVertexIndices ();
+      size_t j;
+      for (j = 1 ; j < (size_t)p->GetVertexCount ()-1 ; j++)
+      {
+	triangles[num_tri].a = vi[0];
+	triangles[num_tri].b = vi[j];
+	triangles[num_tri].c = vi[j+1];
+        num_tri++;
+      }
+    }
+  }
+
+  csRef<iEventTimer> timer = csEventTimer::GetStandardTimer (
+        thing->thing_type->object_reg);
+  TriMeshTimerEvent* te = new TriMeshTimerEvent (this);
+  timer->AddTimerEvent (te, 9000+(rand ()%2000));
+  te->DecRef ();
+}
+
+void TriMeshHelper::Unlock ()
+{
+  locked--;
+  CS_ASSERT (locked >= 0);
+  if (locked <= 0)
+  {
+    csRef<iEventTimer> timer = csEventTimer::GetStandardTimer (
+        thing->thing_type->object_reg);
+    TriMeshTimerEvent* te = new TriMeshTimerEvent (this);
+    timer->AddTimerEvent (te, 9000+(rand ()%2000));
+    te->DecRef ();
+  }
+}
+
+void TriMeshHelper::Cleanup ()
+{
+  if (locked) return;
+  ForceCleanup ();
+}
+
+void TriMeshHelper::ForceCleanup ()
+{
+  vertices = 0;
+  delete[] triangles;
+  triangles = 0;
+  num_tri = ~0;
+}
+
 //----------------------------------------------------------------------
 
 void csThing::CastShadows (iMovable* movable, iFrustumView *lview)
@@ -2847,6 +2969,9 @@ csThingObjectType::~csThingObjectType ()
 bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
 {
   csThingObjectType::object_reg = object_reg;
+  csRef<iStringSet> strset = csQueryRegistryTagInterface<iStringSet> (
+      object_reg, "crystalspace.shared.stringset");
+  base_id = strset->Request ("base");
   csRef<iEngine> e = csQueryRegistry<iEngine> (object_reg);
   engine = e;   // We don't want a real ref here to avoid circular refs.
   csRef<iGraphics3D> g = csQueryRegistry<iGraphics3D> (object_reg);

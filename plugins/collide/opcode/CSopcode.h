@@ -73,6 +73,7 @@ public:
   csArray<csIntersectingTriangle> intersecting_triangles;
   iObjectRegistry *object_reg;
   csStringID trianglemesh_id;
+  csStringID basemesh_id;
  
   static iObjectRegistry* rep_object_reg;
   static void OpcodeReportV (int severity, const char* message, 
@@ -90,6 +91,7 @@ public:
       csTerraFormerCollider* terraformer);
 
   virtual csStringID GetTriangleDataID () { return trianglemesh_id; }
+  virtual csStringID GetBaseDataID () { return basemesh_id; }
 
   virtual csPtr<iCollider> CreateCollider (iPolygonMesh* mesh);
   virtual csPtr<iCollider> CreateCollider (iTriangleMesh* mesh);

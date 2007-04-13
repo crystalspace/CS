@@ -22,6 +22,7 @@
 #include "cstool/objmodel.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
+#include "igeom/trimesh.h"
 #include "cstool/rendermeshholder.h"
 #include "csutil/bitarray.h"
 #include "csutil/cscolor.h"
@@ -467,6 +468,36 @@ public:
   };
   csRef<PolyMesh> polygonMesh;
   friend struct PolyMesh;
+
+  //------------------ iTriangleMesh interface implementation ----------------//
+  struct TriMesh : public scfImplementation1<TriMesh, iTriangleMesh>
+  {
+  private:
+    csTerrainObject* terrain;
+    csFlags flags;
+  public:
+    void SetTerrain (csTerrainObject* t)
+    {
+      terrain = t;
+    }
+    void Cleanup () { }
+
+    virtual size_t GetVertexCount ();
+    virtual csVector3* GetVertices ();
+    virtual size_t GetTriangleCount ();
+    virtual csTriangle* GetTriangles ();
+    virtual void Lock () { }
+    virtual void Unlock () { }
+
+    virtual csFlags& GetFlags () { return flags;  }
+    virtual uint32 GetChangeNumber() const { return 0; }
+
+    TriMesh () : scfImplementationType (this)
+    { }
+    virtual ~TriMesh ()
+    { }
+  };
+  friend struct TriMesh;
 
   /**\name iObjectModel implementation
    * @{ */

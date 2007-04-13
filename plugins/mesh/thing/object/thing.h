@@ -24,6 +24,7 @@
 #include "csgeom/pmtools.h"
 #include "csgeom/subrec.h"
 #include "csgeom/transfrm.h"
+#include "igeom/trimesh.h"
 #include "csgfx/imagememory.h"
 #include "csgfx/shadervar.h"
 #include "csutil/array.h"
@@ -172,6 +173,68 @@ private:
 };
 
 #include "csutil/win32/msvc_deprecated_warn_off.h"
+
+/**
+ * A helper class for iTriangleMesh implementations used by csThing.
+ */
+class TriMeshHelper : 
+  public scfImplementation1<TriMeshHelper, 
+			    iTriangleMesh>
+{
+public:
+  /**
+   * Make a triangle mesh helper.
+   */
+  TriMeshHelper () : scfImplementationType (this), 
+    vertices (0), triangles (0),
+    locked (0)
+  {
+  }
+  virtual ~TriMeshHelper ()
+  {
+    Cleanup ();
+  }
+
+  void Setup ();
+  void SetThing (csThingStatic* thing);
+
+  virtual size_t GetVertexCount ()
+  {
+    Setup ();
+    return num_verts;
+  }
+  virtual csVector3* GetVertices ()
+  {
+    Setup ();
+    return vertices;
+  }
+  virtual size_t GetTriangleCount ()
+  {
+    return num_tri;
+  }
+  virtual csTriangle* GetTriangles ()
+  {
+    return triangles;
+  }
+  virtual void Lock () { locked++; }
+  virtual void Unlock ();
+
+  virtual csFlags& GetFlags () { return flags;  }
+  virtual uint32 GetChangeNumber() const { return 0; }
+
+  void Cleanup ();
+  void ForceCleanup ();
+
+private:
+  csThingStatic* thing;
+  uint32 static_data_nr;	// To see if the static thing has changed.
+  csVector3* vertices;		// Array of vertices (points to obj_verts).
+  size_t num_verts;		// Total number of vertices.
+  csFlags flags;
+  csTriangle* triangles;
+  size_t num_tri;
+  int locked;
+};
 
 /**
  * The static data for a thing.
@@ -1087,6 +1150,9 @@ public:
 
   int maxLightmapW, maxLightmapH;
   float maxSLMSpaceWaste;
+
+  csStringID base_id;
+
 public:
   /// Constructor.
   csThingObjectType (iBase*);

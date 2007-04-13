@@ -26,6 +26,7 @@
 #include "csgeom/poly2d.h"
 #include "csgeom/poly3d.h"
 #include "csgeom/trimeshlod.h"
+#include "igeom/trimesh.h"
 #include "csgfx/shadervarcontext.h"
 #include "csqint.h"
 #include "cstool/rendermeshholder.h"
@@ -703,6 +704,51 @@ public:
     csMeshedPolygon* polygons;
   };
   friend struct PolyMesh;
+  /** @} */
+
+  /**\name iTriangleMesh implementation
+   * @{ */
+  struct TriMesh : public scfImplementation1<TriMesh, iTriangleMesh>
+  {
+  private:
+    csSprite3DMeshObjectFactory* factory;
+    csFlags flags;
+
+  public:
+    virtual size_t GetVertexCount ()
+    {
+      return factory->GetVertexCount ();
+    }
+    virtual csVector3* GetVertices ()
+    {
+      return factory->GetVertices (0);
+    }
+    virtual size_t GetTriangleCount ()
+    {
+      return factory->GetTriangleCount ();
+    }
+    virtual csTriangle* GetTriangles ()
+    {
+      return factory->GetTriangles ();
+    }
+
+    virtual void Lock () { } //PM@@@
+    virtual void Unlock () { }
+ 
+    virtual csFlags& GetFlags () { return flags;  }
+    virtual uint32 GetChangeNumber() const { return 0; }
+
+    TriMesh (csSprite3DMeshObjectFactory* Factory) : 
+      scfImplementationType (this), factory(Factory)
+    {
+    }
+    virtual ~TriMesh ()
+    {
+      Cleanup ();
+    }
+    void Cleanup () { }
+  };
+  friend struct TriMesh;
   /** @} */
 
   virtual iObjectModel* GetObjectModel () { return this; }
@@ -1542,6 +1588,9 @@ private:
   iObjectRegistry* object_reg;
   csRef<iVirtualClock> vc;
   csWeakRef<iEngine> engine;
+
+public:
+  csStringID base_id;
 
 public:
   /// Constructor.

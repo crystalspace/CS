@@ -161,6 +161,11 @@ csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (
   SetPolygonMeshColldet (pm);
   SetPolygonMeshViscull (0);
   SetPolygonMeshShadows (0);
+  csSprite3DMeshObjectType* type = static_cast<csSprite3DMeshObjectType*> (
+      pParent);
+  csRef<TriMesh> trimesh;
+  trimesh.AttachNew (new TriMesh (this));
+  SetTriangleData (type->base_id, trimesh);
 
   logparent = 0;
   spr3d_type = pParent;
@@ -2184,6 +2189,9 @@ csSprite3DMeshObjectType::~csSprite3DMeshObjectType ()
 
 bool csSprite3DMeshObjectType::Initialize (iObjectRegistry* object_reg)
 {
+  csRef<iStringSet> strset = csQueryRegistryTagInterface<iStringSet> (
+      object_reg, "crystalspace.shared.stringset");
+  base_id = strset->Request ("base");
   csSprite3DMeshObjectType::object_reg = object_reg;
   vc = csQueryRegistry<iVirtualClock> (object_reg);
   csRef<iEngine> eng = csQueryRegistry<iEngine> (object_reg);

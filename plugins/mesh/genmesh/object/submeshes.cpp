@@ -205,5 +205,52 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     return triangleCache.GetArray ();
   }
 
+  //-------------------------------------------------------------------------
+
+  void SubMeshesTriMesh::CacheTriangles ()
+  {
+    if (triChangeNum == subMeshes.GetChangeNum()) return;
+
+    triangleCache.Empty();
+    for (size_t s = 0; s < subMeshes.GetSubMeshCount(); s++)
+    {
+      SubMesh* subMesh = subMeshes.GetSubMesh (s);
+      iRenderBuffer* buffer = subMesh->GetIndices();
+      size_t offs = triangleCache.GetSize();
+      size_t bufferTris = buffer->GetElementCount() / 3;
+      triangleCache.SetSize (offs + bufferTris);
+      void* tris = buffer->Lock (CS_BUF_LOCK_READ);
+      memcpy (triangleCache.GetArray() + offs, tris, 
+        bufferTris * sizeof (csTriangle));
+      buffer->Release();
+    }
+    triangleCache.ShrinkBestFit();
+
+    triChangeNum = subMeshes.GetChangeNum();
+  }
+
+  size_t SubMeshesTriMesh::GetVertexCount ()
+  {
+    if (!factory) return 0;
+    return factory->GetVertexCount ();
+  }
+  csVector3* SubMeshesTriMesh::GetVertices ()
+  {
+    if (!factory) return 0;
+    return factory->GetVertices ();
+  }
+  size_t SubMeshesTriMesh::GetTriangleCount ()
+  {
+    if (!factory) return 0;
+    CacheTriangles ();
+    return (int)triangleCache.GetSize ();
+  }
+  csTriangle* SubMeshesTriMesh::GetTriangles ()
+  {
+    if (!factory) return 0;
+    CacheTriangles ();
+    return triangleCache.GetArray ();
+  }
+
 }
 CS_PLUGIN_NAMESPACE_END(Genmesh)

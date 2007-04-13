@@ -102,6 +102,7 @@ bool csOPCODECollideSystem::Initialize (iObjectRegistry* iobject_reg)
   csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
       object_reg, "crystalspace.shared.stringset");
   trianglemesh_id = strings->Request ("colldet");
+  basemesh_id = strings->Request ("base");
   return true;
 }
 

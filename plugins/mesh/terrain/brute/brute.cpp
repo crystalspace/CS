@@ -1237,6 +1237,30 @@ csTriangle* csTerrainObject::PolyMesh::GetTriangles ()
   return terrain->polymesh_triangles;
 }
 
+size_t csTerrainObject::TriMesh::GetVertexCount ()
+{
+  terrain->SetupPolyMeshData ();
+  return terrain->polymesh_vertex_count;
+}
+
+csVector3* csTerrainObject::TriMesh::GetVertices ()
+{
+  terrain->SetupPolyMeshData ();
+  return terrain->polymesh_vertices;
+}
+
+size_t csTerrainObject::TriMesh::GetTriangleCount ()
+{
+  terrain->SetupPolyMeshData ();
+  return terrain->polymesh_tri_count;
+}
+
+csTriangle* csTerrainObject::TriMesh::GetTriangles ()
+{
+  terrain->SetupPolyMeshData ();
+  return terrain->polymesh_triangles;
+}
+
 //----------------------------------------------------------------------
 
 
@@ -1248,12 +1272,19 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
   csTerrainObject::pFactory = pFactory;
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
 
-  polygonMesh.AttachNew (new PolyMesh);
+  polygonMesh.AttachNew (new PolyMesh ());
   SetPolygonMeshBase (polygonMesh);
   SetPolygonMeshColldet (polygonMesh);
   SetPolygonMeshViscull (0);
   SetPolygonMeshShadows (0);
   polygonMesh->SetTerrain (this);
+  csRef<TriMesh> trimesh;
+  trimesh.AttachNew (new TriMesh ());
+  trimesh->SetTerrain (this);
+  csRef<iStringSet> strset = csQueryRegistryTagInterface<iStringSet> (
+      object_reg, "crystalspace.shared.stringset");
+  csStringID base_id = strset->Request ("base");
+  SetTriangleData (base_id, trimesh);
 
   polymesh_valid = false;
   polymesh_vertices = 0;
@@ -1310,14 +1341,10 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
 
 csTerrainObject::~csTerrainObject ()
 {  
-  if(neighbor[0])
-	  neighbor[0]->neighbor[3]=0;
-  if(neighbor[1])
-	  neighbor[1]->neighbor[2]=0;
-  if(neighbor[2])
-	  neighbor[2]->neighbor[1]=0;
-  if(neighbor[3])
-	  neighbor[3]->neighbor[0]=0;
+  if(neighbor[0]) neighbor[0]->neighbor[3]=0;
+  if(neighbor[1]) neighbor[1]->neighbor[2]=0;
+  if(neighbor[2]) neighbor[2]->neighbor[1]=0;
+  if(neighbor[3]) neighbor[3]->neighbor[0]=0;
 
   if (rootblock) rootblock->Detach();
   rootblock=0;

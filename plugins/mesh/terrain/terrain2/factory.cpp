@@ -43,7 +43,8 @@ csFlags& csTerrainFactory::GetFlags ()
 
 csPtr<iMeshObject> csTerrainFactory::NewInstance ()
 {
-  csTerrainSystem* terrain = new csTerrainSystem (this, renderer, collider, dataFeeder);
+  csTerrainSystem* terrain = new csTerrainSystem (this, renderer, collider,
+      dataFeeder);
 
   terrain->SetMaxLoadedCells (maxLoadedCells);
   terrain->SetVirtualViewDistance (virtualViewDistance);
@@ -89,7 +90,7 @@ iMeshObjectType* csTerrainFactory::GetMeshObjectType () const
 
 iObjectModel* csTerrainFactory::GetObjectModel ()
 {
-  return NULL;
+  return 0;
 }
 
 bool csTerrainFactory::SetMaterialWrapper (iMaterialWrapper* material)
@@ -174,8 +175,9 @@ csTerrainFactoryCell::csTerrainFactoryCell (const char* name,
   iTerrainCellCollisionProperties* collisionProp, 
   iTerrainCellFeederProperties* feederProp)
   : scfImplementationType (this), name (name), position (position), size (size),
-  gridWidth (gridWidth), gridHeight (gridHeight), materialMapWidth (materialMapWidth),
-  materialMapHeight (materialMapHeight), materialMapPersistent (materialMapPersistent),
+  gridWidth (gridWidth), gridHeight (gridHeight),
+  materialMapWidth (materialMapWidth), materialMapHeight (materialMapHeight),
+  materialMapPersistent (materialMapPersistent),
   rendererProperties (renderProp), colliderProperties (collisionProp),
   feederProperties (feederProp)
 {

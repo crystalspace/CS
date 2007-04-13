@@ -1576,10 +1576,10 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (
 
   csGenmeshMeshObjectFactory::object_reg = object_reg;
 
+  genmesh_type = pParent;
   SetPolyMeshStandard ();
 
   logparent = 0;
-  genmesh_type = pParent;
   initialized = false;
   object_bbox_valid = false;
 
@@ -1827,6 +1827,38 @@ void csGenmeshMeshObjectFactory::Compress ()
   }
 }
 
+class csTriangleMeshGenMesh :
+  public virtual scfImplementation1<csTriangleMeshGenMesh,iTriangleMesh>
+{
+private:
+  csGenmeshMeshObjectFactory* factory;
+  csFlags flags;
+  uint32 change_nr;
+
+public:
+  csTriangleMeshGenMesh () : scfImplementationType(this)
+  {
+    change_nr = 0;
+  }
+
+  virtual ~csTriangleMeshGenMesh ()
+  {
+  }
+
+  void SetFactory (csGenmeshMeshObjectFactory* Factory)
+  { factory = Factory; }
+
+  virtual size_t GetVertexCount () { return factory->GetVertexCount (); }
+  virtual csVector3* GetVertices () { return factory->GetVertices (); }
+  virtual size_t GetTriangleCount () { return factory->GetTriangleCount (); }
+  virtual csTriangle* GetTriangles () { return factory->GetTriangles (); }
+  virtual void Lock () { }
+  virtual void Unlock () { }
+  virtual csFlags& GetFlags () { return flags; }
+  virtual uint32 GetChangeNumber () const { return change_nr; }
+};
+
+
 void csGenmeshMeshObjectFactory::SetPolyMeshStandard ()
 {
   csRef<iPolygonMesh> polyMeshBase = GetPolygonMeshBase ();
@@ -1842,6 +1874,11 @@ void csGenmeshMeshObjectFactory::SetPolyMeshStandard ()
   if (GetPolygonMeshShadows() == polyMeshBase)
     SetPolygonMeshShadows (polygonMesh);
   polyMeshType = Standard;
+
+  csRef<csTriangleMeshGenMesh> trimesh;
+  trimesh.AttachNew (new csTriangleMeshGenMesh ());
+  trimesh->SetFactory (this);
+  SetTriangleData (genmesh_type->base_id, trimesh);
 }
 
 void csGenmeshMeshObjectFactory::SetPolyMeshSubmeshes ()
@@ -1857,6 +1894,10 @@ void csGenmeshMeshObjectFactory::SetPolyMeshSubmeshes ()
   if (GetPolygonMeshShadows() == polyMeshBase)
     SetPolygonMeshShadows (polygonMesh);
   polyMeshType = Submeshes;
+
+  csRef<SubMeshesTriMesh> trimesh;
+  trimesh.AttachNew (new SubMeshesTriMesh (this, subMeshes));
+  SetTriangleData (genmesh_type->base_id, trimesh);
 }
 
 void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (
@@ -2006,7 +2047,6 @@ void csGenmeshMeshObjectFactory::AddTriangle (const csTriangle& tri)
 
 void csGenmeshMeshObjectFactory::SetVertexCount (int n)
 {
-  size_t oldN = mesh_vertices.GetSize ();
   mesh_vertices.SetCapacity (n); mesh_vertices.SetSize (n);
   mesh_texels.SetCapacity (n); mesh_texels.SetSize (n);
   if (mesh_colors.GetSize () > 0)
@@ -2372,7 +2412,9 @@ csPtr<iMeshObjectFactory> csGenmeshMeshObjectType::NewFactory ()
 bool csGenmeshMeshObjectType::Initialize (iObjectRegistry* object_reg)
 {
   csGenmeshMeshObjectType::object_reg = object_reg;
-
+  csRef<iStringSet> strset = csQueryRegistryTagInterface<iStringSet> (
+      object_reg, "crystalspace.shared.stringset");
+  base_id = strset->Request ("base");
   csRef<iVerbosityManager> verbosemgr (
     csQueryRegistry<iVerbosityManager> (object_reg));
   if (verbosemgr) 

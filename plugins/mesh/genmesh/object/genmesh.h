@@ -47,6 +47,7 @@
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
 #include "iutil/virtclk.h"
+#include "iutil/strset.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rendermesh.h"
 #include "ivideo/rndbuf.h"
@@ -851,6 +852,7 @@ public:
   bool do_verbose;
   MergedSVContext::Pool mergedSVContextPool;
   csStringHash submeshNamePool;
+  csStringID base_id;
 
   /// Constructor.
   csGenmeshMeshObjectType (iBase*);

@@ -1193,6 +1193,32 @@ csTriangle* csInstmeshMeshObject::PolyMesh::GetTriangles ()
   //return scfParent->factory->GetTriangles ();
 }
 
+size_t csInstmeshMeshObject::TriMesh::GetVertexCount ()
+{
+  return parent->factory->GetVertexCount ();
+}
+
+csVector3* csInstmeshMeshObject::TriMesh::GetVertices ()
+{
+  //@@@FIXME: data must come from mesh itself. Not factory
+  return 0;
+  //return scfParent->factory->GetVertices ();
+}
+
+size_t csInstmeshMeshObject::TriMesh::GetTriangleCount ()
+{
+  //@@@FIXME: data from mesh instead of factory
+  return 0;
+  //return scfParent->factory->GetTriangleCount ();
+}
+
+csTriangle* csInstmeshMeshObject::TriMesh::GetTriangles ()
+{
+  //@@@FIXME: data from mesh instead of factory
+  return 0;
+  //return scfParent->factory->GetTriangles ();
+}
+
 void csInstmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder, 
 					csRenderBufferName buffer)
 {

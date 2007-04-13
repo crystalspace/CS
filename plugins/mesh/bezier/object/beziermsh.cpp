@@ -125,6 +125,10 @@ csBezierMesh::csBezierMesh (iBase *parent, csBezierMeshObjectType* thing_type) :
   SetPolygonMeshColldet (polygonMesh);
   SetPolygonMeshViscull (polygonMeshLOD);
   SetPolygonMeshShadows (polygonMeshLOD);
+  csRef<BezierTriMeshHelper> trimesh;
+  trimesh.AttachNew (new BezierTriMeshHelper ());
+  trimesh->SetThing (this);
+  SetTriangleData (thing_type->base_id, trimesh);
 
   last_thing_id++;
   thing_id = last_thing_id;
@@ -694,6 +698,75 @@ void BezierPolyMeshHelper::Cleanup ()
 
 //-------------------------------------------------------------------------
 
+void BezierTriMeshHelper::Setup ()
+{
+  if (triangles)
+  {
+    // Already set up.
+    return ;
+  }
+
+  triangles = 0;
+  vertices = 0;
+
+  // Count the number of needed polygons and vertices.
+  num_verts = 0;
+  num_tri = 0;
+
+  size_t i, j;
+
+  // Check curves.
+  for (i = 0; i < (size_t)thing->GetCurveCount (); i++)
+  {
+    csCurve *c = thing->curves.Get (i);
+    csCurveTesselated *tess = c->Tesselate (1000);    // @@@ High quality?
+    num_tri += tess->GetTriangleCount ();
+    num_verts += tess->GetVertexCount ();
+  }
+
+  if (!num_verts || !num_tri) return;
+
+  // Allocate the arrays and the copy the data.
+  vertices = new csVector3[num_verts];
+  triangles = new csTriangle[num_tri];
+
+  num_verts = 0;
+  num_tri = 0;
+  for (i = 0; i < (size_t)thing->GetCurveCount (); i++)
+  {
+    csCurve *c = thing->curves.Get (i);
+    csCurveTesselated *tess = c->Tesselate (1000);  // @@@ High quality?
+    csTriangle *tris = tess->GetTriangles ();
+    size_t tri_count = tess->GetTriangleCount ();
+    for (j = 0; j < tri_count; j++)
+    {
+      triangles[num_tri].a = 
+      // Adjust indices to skip the original polygon set vertices and
+      // preceeding curves.
+      triangles[num_tri].a = tris[j].a + num_verts;
+      triangles[num_tri].b = tris[j].b + num_verts;
+      triangles[num_tri].c = tris[j].c + num_verts;
+      num_tri++;
+    }
+
+    csVector3 *vts = tess->GetVertices ();
+    size_t num_vt = tess->GetVertexCount ();
+    memcpy (vertices + num_verts, vts, sizeof (csVector3) * num_vt);
+    num_verts += num_vt;
+  }
+}
+
+void BezierTriMeshHelper::Cleanup ()
+{
+  delete[] triangles;
+  triangles = 0;
+
+  delete[] vertices;
+  vertices = 0;
+}
+
+//-------------------------------------------------------------------------
+
 void csBezierMesh::UpdateCurveTransform (const csReversibleTransform &movtrans)
 {
   if (GetCurveCount () == 0) return ;
@@ -1056,6 +1129,9 @@ csBezierMeshObjectType::~csBezierMeshObjectType ()
 bool csBezierMeshObjectType::Initialize (iObjectRegistry *object_reg)
 {
   csBezierMeshObjectType::object_reg = object_reg;
+  csRef<iStringSet> strset = csQueryRegistryTagInterface<iStringSet> (
+      object_reg, "crystalspace.shared.stringset");
+  base_id = strset->Request ("base");
   csRef<iEngine> e = csQueryRegistry<iEngine> (object_reg);
   engine = e;	// We don't want a real ref here to avoid circular refs.
   csRef<iGraphics3D> g = csQueryRegistry<iGraphics3D> (object_reg);

@@ -34,6 +34,7 @@
 #include "cstool/framedataholder.h"
 #include "csgfx/shadervarcontext.h"
 #include "igeom/polymesh.h"
+#include "igeom/trimesh.h"
 #include "cstool/objmodel.h"
 #include "csgeom/pmtools.h"
 #include "iengine/mesh.h"
@@ -136,6 +137,60 @@ private:
     if (triangles) return;
     csPolygonMeshTools::Triangulate (this, triangles, tri_count);
   }
+};
+
+/**
+ * A helper class for iTriangleMesh implementations used by csBezierMesh.
+ */
+class BezierTriMeshHelper : public scfImplementation1<BezierTriMeshHelper, 
+                                                       iTriangleMesh>
+{
+public:
+  /**
+   * Make a triangle mesh helper.
+   */
+  BezierTriMeshHelper () : scfImplementationType (this),
+    vertices (0), triangles (0) { }
+  virtual ~BezierTriMeshHelper () { Cleanup (); }
+  void Cleanup ();
+
+  void Setup ();
+  void SetThing (csBezierMesh* thing) { BezierTriMeshHelper::thing = thing; }
+
+  virtual size_t GetVertexCount ()
+  {
+    Setup ();
+    return num_verts;
+  }
+  virtual csVector3* GetVertices ()
+  {
+    Setup ();
+    return vertices;
+  }
+  virtual size_t GetTriangleCount ()
+  {
+    Setup ();
+    return num_tri;
+  }
+  virtual csTriangle* GetTriangles ()
+  {
+    Setup ();
+    return triangles;
+  }
+
+  virtual void Lock () { }
+  virtual void Unlock () { }
+  
+  virtual csFlags& GetFlags () { return flags;  }
+  virtual uint32 GetChangeNumber() const { return 0; }
+
+private:
+  csBezierMesh* thing;
+  csVector3* vertices;		// Array of vertices.
+  size_t num_verts;		// Total number of vertices.
+  csFlags flags;
+  csTriangle* triangles;
+  size_t num_tri;
 };
 
 /**
@@ -293,6 +348,7 @@ class csBezierMesh : public scfImplementationExt6<csBezierMesh,
 		     public csBezierMesh2
 {
   friend class BezierPolyMeshHelper;
+  friend class BezierTriMeshHelper;
 
 public:
   /**
@@ -756,6 +812,8 @@ public:
   csWeakRef<iGraphics3D> G3D;
   /// An object pool for lightpatches.
   csBezierLightPatchPool* lightpatch_pool;
+
+  csStringID base_id;
 
 public:
   /// Constructor.

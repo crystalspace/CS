@@ -39,6 +39,7 @@
 #include "iengine/lightmgr.h"
 #include "iengine/shadcast.h"
 #include "igeom/polymesh.h"
+#include "igeom/trimesh.h"
 #include "imesh/instmesh.h"
 #include "imesh/lighting.h"
 #include "imesh/object.h"
@@ -367,6 +368,31 @@ public:
   };
   csRef<PolyMesh> polygonMesh;
   friend struct PolyMesh;
+
+  //------------------ iTriangleMesh interface implementation ----------------//
+  struct TriMesh : public scfImplementation1<TriMesh, iTriangleMesh>
+  {
+  private:
+    csFlags flags;
+    csInstmeshMeshObject* parent;
+  public:
+    virtual size_t GetVertexCount ();
+    virtual csVector3* GetVertices ();
+    virtual size_t GetTriangleCount ();
+    virtual csTriangle* GetTriangles ();
+    virtual void Lock () { }
+    virtual void Unlock () { }
+    
+    virtual csFlags& GetFlags () { return flags;  }
+    virtual uint32 GetChangeNumber() const { return 0; }
+
+    TriMesh (csInstmeshMeshObject* parent) : scfImplementationType (this),
+      parent (parent)
+    {
+    }
+    virtual ~TriMesh () { }
+  };
+  friend struct TriMesh;
 
   class RenderBufferAccessor : 
     public scfImplementation1<RenderBufferAccessor, iRenderBufferAccessor>

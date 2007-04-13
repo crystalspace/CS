@@ -116,7 +116,7 @@ struct iCollider : public virtual iBase
  */
 struct iCollideSystem : public virtual iBase
 {
-  SCF_INTERFACE (iCollideSystem, 2, 1, 0);
+  SCF_INTERFACE (iCollideSystem, 2, 1, 1);
 
   /**
    * Get the ID that the collision detection system prefers for getting
@@ -125,6 +125,14 @@ struct iCollideSystem : public virtual iBase
    * is a reference to the standard string set.
    */
   virtual csStringID GetTriangleDataID () = 0;
+
+  /**
+   * Get the ID that for the base triangle mesh model from
+   * iObjectModel. This corresponds with the ID you
+   * would get from doing strings->Request ("base") where 'strings'
+   * is a reference to the standard string set.
+   */
+  virtual csStringID GetBaseDataID () = 0;
 
   /**
    * Create a iCollider for the given mesh geometry.
