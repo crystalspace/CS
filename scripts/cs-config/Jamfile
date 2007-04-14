@@ -223,5 +223,10 @@ __END__
 
 CSCONFIGNAME = cs-config-$(PACKAGE_VERSION_SIGNIFICANT) ;
 ShellScript $(CSCONFIGNAME) : csConfigGen : nohelp ;
+
 Depends cs-config : $(CSCONFIGNAME) ;
+CS_CONFIG_GRISTED = [ DoSourceGrist cs-config ] ;
+SEARCH on $(CS_CONFIG_GRISTED) = $(SUBDIR) ;
+Depends cs-config : $(CS_CONFIG_GRISTED) ;
+Copy cs-config : $(CS_CONFIG_GRISTED) ;
 Help cs-config : "Build the cs-config script" ;
