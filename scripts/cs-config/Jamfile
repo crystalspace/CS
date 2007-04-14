@@ -69,6 +69,7 @@ rule csConfigGen
   libaddstrings on $(<) = $(libaddstrings) ;
   libbasestrs on $(<) = $(libbasestrs) ;
   libswitchcase on $(<) = $(libswitchcase) ;
+  ENV_VERSION on $(<) = $(PACKAGE_VERSION_LIST[0])_$(PACKAGE_VERSION_LIST[1]) ;
 
   csConfigGen1 $(<) : $(>) ;
 }
@@ -92,9 +93,11 @@ if test "\${PATH_SEPARATOR+set}" != set; then
   rm -f conf\$\$.sh
 fi
 
+CS_VERSION=$(PACKAGE_VERSION_SIGNIFICANT)
 CRYSTAL="\${CRYSTAL-$(prefix)\$PATH_SEPARATOR.}"
+CRYSTAL_$(ENV_VERSION)="\${CRYSTAL_$(ENV_VERSION)-\$CRYSTAL}"
 my_IFS=\$IFS; IFS=\$PATH_SEPARATOR
-for p in \$CRYSTAL
+for p in \$CRYSTAL_$(ENV_VERSION)
 do
   prefix="\${p}"
   exec_prefix="\${prefix}"
