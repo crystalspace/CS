@@ -44,7 +44,10 @@ struct csRGBpixel;
 #define CS_IMGFMT_MASK (0x0000ffff)
 /// We don't want the pixels at all, just (possibly) the alphamap
 #define CS_IMGFMT_NONE (0x00000000)
-/// Truecolor format (r/g/b/unused per each pixel)
+/**
+ * Truecolor format (r/g/b/unused resp. r/g/b/a per each pixel, depending on
+ * the presence of the CS_IMGFMT_ALPHA flag).
+ */
 #define CS_IMGFMT_TRUECOLOR (0x00000001)
 /// 8-bit indexed paletted image
 #define CS_IMGFMT_PALETTED8 (0x00000002)
