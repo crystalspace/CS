@@ -48,10 +48,10 @@ namespace lighter
       progInitializeMain ("Initialize objects", 10),
         progInitialize (0, 3, &progInitializeMain),
         progInitializeLM ("Initialize lightmaps", 3, &progInitializeMain),
+        progPrepareLighting ("Preparing objects for lighting", 5, &progInitializeMain),
         progSaveMeshesMain ("Saving mesh objects", 3, &progInitializeMain),
           progSaveMeshes (0, 99, &progSaveMeshesMain),
           progSaveFinish (0, 1, &progSaveMeshesMain),
-        progPrepareLighting ("Preparing objects for lighting", 5, &progInitializeMain),
         progBuildKDTree ("Building KD-Tree", 10, &progInitializeMain),
       progDirectLighting ("Direct lighting", 60),
       progPostproc ("Postprocessing lightmaps", 10),
@@ -189,7 +189,8 @@ namespace lighter
 
     progLightmapLayout.SetProgress (0);
     // Calculate lightmapping coordinates
-    LightmapUVFactoryLayouter *uvLayout = new SimpleUVFactoryLayouter (scene->GetLightmaps());
+    csRef<LightmapUVFactoryLayouter> uvLayout;
+    uvLayout.AttachNew (new SimpleUVFactoryLayouter (scene->GetLightmaps()));
 
     u = updateFreq = progLightmapLayout.GetUpdateFrequency (
       scene->GetFactories ().GetSize ());
@@ -225,7 +226,6 @@ namespace lighter
       sect->Initialize (*progSector);
       delete progSector;
     }
-    delete uvLayout;
     progInitialize.SetProgress (1);
 
     progInitializeLM.SetProgress (0);
@@ -244,8 +244,8 @@ namespace lighter
     }
     progInitializeLM.SetProgress (1);
 
-    if (!scene->SaveWorldMeshes (progSaveMeshes)) return false;
-    if (!scene->FinishWorldSaving (progSaveFinish)) return false;
+    uvLayout->PrepareLighting ();
+    uvLayout.Invalidate();
     
     progPrepareLighting.SetProgress (0);
     progressStep = 1.0f / scene->GetSectors ().GetSize();
@@ -260,7 +260,10 @@ namespace lighter
       delete progSector;
     }
     progPrepareLighting.SetProgress (1);
-    
+
+    if (!scene->SaveWorldMeshes (progSaveMeshes)) return false;
+    if (!scene->FinishWorldSaving (progSaveFinish)) return false;
+
     /* TODO: the global lightmaps' subrect allocators are not needed any
 	     more, discard contents. */
 

@@ -31,7 +31,7 @@ namespace lighter
   class LightmapUVObjectLayouter;
   class ObjectFactory;
 
-  class LightmapUVFactoryLayouter 
+  class LightmapUVFactoryLayouter : public csRefCount
   {
   public:
     virtual ~LightmapUVFactoryLayouter () {}
@@ -49,6 +49,8 @@ namespace lighter
       const FactoryPrimitiveArray& inPrims, ObjectFactoryVertexData& vertexData,
       const ObjectFactory* factory, csArray<FactoryPrimitiveArray>& outPrims,
       csBitArray& usedVerts) = 0;
+
+    virtual void PrepareLighting () = 0;
   };
 
   class LightmapUVObjectLayouter : public csRefCount
@@ -64,6 +66,9 @@ namespace lighter
      *   layouted.
      */
     virtual bool LayoutUVOnPrimitives (PrimitiveArray &prims, 
+      size_t groupNum, const csBitArray& pdBits) = 0;
+
+    virtual void FinalLightmapLayout (PrimitiveArray &prims, 
       size_t groupNum, ObjectVertexData& vertexData, uint& lmID) = 0;
   };
 

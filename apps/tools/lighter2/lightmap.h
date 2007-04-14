@@ -29,7 +29,7 @@ namespace lighter
   class Lightmap : public Swappable
   {
   public:
-    Lightmap (uint width, uint height);
+    Lightmap (int width, int height);
 
     ~Lightmap ();
 
@@ -47,30 +47,17 @@ namespace lighter
     void ApplyScaleClampFunction (float scaleVal, float maxValue);
 
     // Grow the lightmap    
-    inline void Grow (uint w, uint h)
+    inline void Grow (int w, int h)
     { 
-      width = csMax (width, w);
-      height = csMax (height, h);
+      width = csMax (GetWidth(), w);
+      height = csMax (GetHeight(), h);
       lightmapAllocator.Grow (width, height);
-    }
-
-    // Set the lightmap size.. this might mess up the allocator
-    inline void SetSize (uint w, uint h)
-    {
-      width = w; height = h;
-    }
-
-    // Set the max used uv
-    inline void SetMaxUsedUV (uint u, uint v)
-    {
-      maxUsedU = csMax (maxUsedU, u);
-      maxUsedV = csMax (maxUsedV, v);
     }
 
     // Set a pixel to given color
     inline void SetAddPixel (size_t u, size_t v, csColor c)
     {
-      colorArray[v*width + u] += c;
+      colorArray[v*GetWidth() + u] += c;
     }
 
     // Save the lightmap to given file
@@ -82,14 +69,16 @@ namespace lighter
     // Data getters
     inline csColor* GetData () const { return colorArray; }
 
-    inline uint GetWidth () const {return width; }
-    inline uint GetHeight () const {return height; }
+    inline int GetWidth () const { return width; }
+    inline int GetHeight () const { return height; }
 
-    inline uint GetMaxUsedU () const {return maxUsedU; }
-    inline uint GetMaxUsedV () const {return maxUsedV; }
-
-    inline csSubRectangles& GetAllocator () { return lightmapAllocator; }
-    inline const csSubRectangles& GetAllocator () const { return lightmapAllocator; }
+    inline CS::SubRectanglesCompact& GetAllocator () { return lightmapAllocator; }
+    inline const CS::SubRectanglesCompact& GetAllocator () const { return lightmapAllocator; }
+    inline void UpdateDimensions ()
+    {
+      width = lightmapAllocator.GetRectangle().Width();
+      height = lightmapAllocator.GetRectangle().Height();
+    }
 
     inline void SetFilename (const csString& fn) { filename = fn; }
     inline const csString& GetFilename () const { return filename; }
@@ -113,17 +102,17 @@ namespace lighter
     {
       if (colorArray == 0) colorArray = AllocColors ();
       data = colorArray;
-      size = width * height * sizeof (csColor);
+      size = GetWidth() * GetHeight() * sizeof (csColor);
       // Set a bogus pointer so accesses to swapped data causes a segfault
       colorArray = BogusPointer ();
     }
     virtual size_t GetSwapSize()
     {
-      return width * height * sizeof (csColor);
+      return GetWidth() * GetHeight() * sizeof (csColor);
     }
     virtual void SwapIn (void* data, size_t size)
     {
-      CS_ASSERT (size == width * height * sizeof (csColor));
+      CS_ASSERT (size == GetWidth() * GetHeight() * sizeof (csColor));
       CS_ASSERT (colorArray == BogusPointer ());
       colorArray = (csColor*)data;
     }
@@ -131,14 +120,10 @@ namespace lighter
     // The color data itself
     mutable csColor *colorArray;
 
-    // Size
-    uint width, height;
-
-    // Max used U/V
-    uint maxUsedU, maxUsedV;
+    int width, height;
 
     // Area allocator
-    csSubRectangles lightmapAllocator;
+    CS::SubRectanglesCompact lightmapAllocator;
 
     // Filename
     csString filename;
@@ -146,11 +131,11 @@ namespace lighter
     iTextureWrapper* texture;
     csString GetTextureNameFromFilename (const csString& file);
 
-    CS_FORCEINLINE csColor* BogusPointer () const 
-    { return ((csColor*)~0) - (width * height); }
-    CS_FORCEINLINE csColor* AllocColors () const
+    inline csColor* BogusPointer () const 
+    { return ((csColor*)~0) - (GetWidth() * GetHeight()); }
+    inline csColor* AllocColors () const
     { 
-      return (csColor*)SwappableHeap::Alloc (width * height * 
+      return (csColor*)SwappableHeap::Alloc (GetWidth() * GetHeight() * 
         sizeof (csColor));
     }
   };

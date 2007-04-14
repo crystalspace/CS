@@ -21,6 +21,7 @@
 #include "lighter.h"
 #include "lightmap.h"
 #include "lightmapuv.h"
+#include "scene.h"
 #include "object.h"
 #include "config.h"
 
@@ -176,7 +177,7 @@ namespace lighter
     delete litColorsPD;
   }
 
-  bool Object::Initialize ()
+  bool Object::Initialize (Sector* sector)
   {
     if (!factory || !meshWrapper) return false;
     const csReversibleTransform transform = meshWrapper->GetMovable ()->
@@ -185,6 +186,16 @@ namespace lighter
     //Copy over data, transform the radprimitives..
     vertexData = factory->vertexData;
     vertexData.Transform (transform);
+    ComputeBoundingSphere ();
+
+    const LightRefArray& allPDLights = sector->allPDLights;
+    csBitArray pdBits;
+    pdBits.SetSize (allPDLights.GetSize());
+    for (size_t i = 0; i < allPDLights.GetSize(); i++)
+    {
+      if (bsphere.TestIntersect (allPDLights[i]->GetBoundingSphere()))
+        pdBits.SetBit (i);
+    }
 
     unsigned int i = 0;
     this->allPrimitives.SetCapacity (factory->layoutedPrimitives.GetSize ());
@@ -208,17 +219,18 @@ namespace lighter
       if (!lightPerVertex)
       {
         // FIXME: probably separate out to allow for better progress display
-        bool res = 
-          factory->layoutedPrimitives[j].factory->LayoutUVOnPrimitives (
-            allPrimitives, factory->layoutedPrimitives[j].group, vertexData, 
-            lightmapIDs.GetExtend (j));
+        LightmapUVObjectLayouter* layout = 
+          factory->layoutedPrimitives[j].factory;
+        const size_t group = factory->layoutedPrimitives[j].group;
+        lmLayouts.Push (LMLayoutingInfo (layout, group));
+        bool res = layout->LayoutUVOnPrimitives (allPrimitives, 
+          group, pdBits);
         if (!res) return false;
       }
 
     }
 
     factory.Invalidate();
-    ComputeBoundingSphere ();
 
     return true;
   }
@@ -230,6 +242,12 @@ namespace lighter
       PrimitiveArray& allPrimitives = this->allPrimitives[j];
       allPrimitives.ShrinkBestFit ();
 
+      if (!lightPerVertex)
+      {
+        lmLayouts[j].layouter->FinalLightmapLayout (allPrimitives, 
+          lmLayouts[j].group, vertexData, lightmapIDs.GetExtend (j));
+      }
+
       for (size_t i = 0; i < allPrimitives.GetSize(); i++)
       {
         Primitive& prim = allPrimitives[i];
@@ -238,6 +256,7 @@ namespace lighter
         prim.Prepare ();
       }
     }
+    lmLayouts.DeleteAll ();
 
     if (lightPerVertex)
     {

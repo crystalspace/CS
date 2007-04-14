@@ -44,7 +44,7 @@ namespace lighter
     while (objIt.HasNext ())
     {
       csRef<Object> obj = objIt.Next ();
-      obj->Initialize ();
+      obj->Initialize (this);
       if (--u == 0)
       {
         progress.IncProgress (progressStep);
@@ -498,6 +498,8 @@ namespace lighter
       for (size_t i = 0; i < lightmaps.GetSize(); i++)
       {
         Lightmap* lm = new Lightmap (lightmaps[i]->GetWidth(), 
+          lightmaps[i]->GetHeight());
+        lm->Grow (lightmaps[i]->GetWidth(), 
           lightmaps[i]->GetHeight());
         lm->Initialize ();
         pdLights->Push (lm);
@@ -1266,12 +1268,12 @@ namespace lighter
   {
     Statistics::Progress filesProgress (0, 90, &progress);
     Statistics::Progress texturesProgress (0, 7, &progress);
-    Statistics::Progress cleanupProgress (0, 3, &progress);
+    Statistics::Progress cleanupProgress (0, 1, &progress);
 
     progress.SetProgress (0);
 
     size_t u, updateFreq;
-    size_t progressStep;
+    float progressStep;
 
     u = updateFreq = filesProgress.GetUpdateFrequency (lightmaps.GetSize());
     progressStep = updateFreq * (1.0f / lightmaps.GetSize());
@@ -1350,6 +1352,19 @@ namespace lighter
       texturesNode = libRoot->CreateNodeBefore (CS_NODE_ELEMENT, firstNode);
       texturesNode->SetValue ("textures");
     }
+    else
+    {
+      // Node exists already; clean out
+      csRef<iDocumentNodeIterator> it = texturesNode->GetNodes ();
+      while (it->HasNext ())
+      {
+        csRef<iDocumentNode> node = it->Next();
+        if (node->GetType() != CS_NODE_ELEMENT) continue;
+        CollectDeleteTextures (node, fileInfo->texFileNamesToDelete);
+      }
+
+      texturesNode->RemoveNodes ();
+    }
 
     u = updateFreq = texturesProgress.GetUpdateFrequency (
       texturesToSave.GetSize());
@@ -1361,32 +1376,8 @@ namespace lighter
       const SaveTexture& textureToSave = texturesToSave[i];
 
       csRef<iDocumentNode> textureNode;
-      {
-        csRef<iDocumentNodeIterator> textureNodes = 
-          texturesNode->GetNodes ("texture");
-        while (textureNodes->HasNext())
-        {
-          csRef<iDocumentNode> texNode = textureNodes->Next();
-          if (texNode->GetType() != CS_NODE_ELEMENT) continue;
-          const char* texName = texNode->GetAttributeValue ("name");
-          if (texName 
-            && (strcmp (texName, textureToSave.texname.GetData ()) == 0))
-          {
-            textureNode = texNode;
-            break;
-          }
-        }
-      }
-      if (!textureNode.IsValid())
-      {
-        textureNode = texturesNode->CreateNodeBefore (CS_NODE_ELEMENT);
-        textureNode->SetValue ("texture");
-      }
-      else
-      {
-        CollectDeleteTextures (textureNode, fileInfo->texFileNamesToDelete);
-        textureNode->RemoveNodes ();
-      }
+      textureNode = texturesNode->CreateNodeBefore (CS_NODE_ELEMENT);
+      textureNode->SetValue ("texture");
       textureNode->SetAttribute ("name", textureToSave.texname.GetData ());
            
       csRef<iDocumentNode> classNode = 
@@ -1450,27 +1441,7 @@ namespace lighter
     }
     texturesProgress.SetProgress (1);
 
-    // Clean out old lightmap textures
     cleanupProgress.SetProgress (0);
-    {
-      csRefArray<iDocumentNode> nodesToDelete;
-      csRef<iDocumentNodeIterator> it = texturesNode->GetNodes ("texture");
-      while (it->HasNext())
-      {
-        csRef<iDocumentNode> child = it->Next();
-        if (child->GetType() != CS_NODE_ELEMENT) continue;
-
-        const char* name = child->GetAttributeValue ("name");
-        if ((name != 0) && fileInfo->texturesToClean.Contains (name))
-        {
-          CollectDeleteTextures (child, fileInfo->texFileNamesToDelete);
-          nodesToDelete.Push (child);
-        }
-      }
-      for (size_t i = 0; i < nodesToDelete.GetSize(); i++)
-        texturesNode->RemoveNode (nodesToDelete[i]);
-    }
-
     DocumentHelper::RemoveDuplicateChildren(texturesNode, 
       texturesNode->GetNodes ("texture"),
       DocumentHelper::NodeAttributeCompare("name"));

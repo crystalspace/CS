@@ -23,11 +23,11 @@
 
 namespace lighter
 {
-  Lightmap::Lightmap (uint width, uint height)
-    : colorArray (0), width (0), height (0), maxUsedU (0), maxUsedV (0), 
-    lightmapAllocator (csRect (0,0,1,1)), texture (0)
+  Lightmap::Lightmap (int w, int h)
+    : colorArray (0), width (0), height (0),
+    lightmapAllocator (csRect (0, 0, w, h)), texture (0)
   {
-    Grow (width, height);
+    lightmapAllocator.SetGrowPO2 (true);
   }
 
   Lightmap::~Lightmap ()
@@ -108,12 +108,12 @@ namespace lighter
     lmData = colorArray;
     mmData = mask.maskData.GetArray ();
 
-    for (uint v = 0; v < height; v++)
+    for (int v = 0; v < height; v++)
     {
       // now scan over the row
-      for (uint u = 0; u < width; u++)
+      for (int u = 0; u < width; u++)
       {
-        const uint idx = v*width+u;
+        const int idx = v*width+u;
 
         // Only try to fix non-masked
         if (mmData[idx]>0) continue;
@@ -165,7 +165,7 @@ namespace lighter
   {
     ScopedSwapLock<Lightmap> l (*this);
 
-    for (uint i = 0; i < width * height; i++)
+    for (int i = 0; i < width * height; i++)
     {
       const csColor &c = colorArray[i];
       if (!c.IsBlack ())

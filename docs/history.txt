@@ -20,6 +20,8 @@ chronological order.
 	- res added CS::SubRectangles::SetGrowPO2() (and GetGrowPO2()).
 	- res slightly tweaked the behaviour of CS::SubRectangles::PlaceInto()
 	  to cause less very small rectangles to allocate from.
+	- res tweaked the lighter2 lightmap layouter to layout primitives 
+	  which are affected by similar sets of PD lights closer together.
 13-Apr-2007
 	- Jorrit added virtual to the destructor of SubRectangles class.
 	- Jorrit changed the following meshes to also support

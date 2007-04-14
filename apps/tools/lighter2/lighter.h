@@ -84,10 +84,10 @@ namespace lighter
     Statistics::Progress progInitializeMain;
     Statistics::Progress progInitialize;
     Statistics::Progress progInitializeLM;
+    Statistics::Progress progPrepareLighting;
     Statistics::Progress progSaveMeshesMain;
     Statistics::Progress progSaveMeshes;
     Statistics::Progress progSaveFinish;
-    Statistics::Progress progPrepareLighting;
     Statistics::Progress progBuildKDTree;
     Statistics::Progress progDirectLighting;
     Statistics::Progress progPostproc;

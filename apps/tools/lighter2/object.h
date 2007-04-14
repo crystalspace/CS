@@ -139,7 +139,7 @@ namespace lighter
 
     // Initialize the Object from factory and wrapper. Call only after
     // constructor and ParseMesh have been called
-    virtual bool Initialize ();
+    virtual bool Initialize (Sector* sector);
 
     // Remove lightmap SVs. Add names of used lightmap textures to set
     virtual void StripLightmaps (csSet<csString>& lms);
@@ -202,6 +202,15 @@ namespace lighter
     // All faces, already transformed
     csArray<PrimitiveArray> allPrimitives;
     csArray<uint> lightmapIDs;
+    struct LMLayoutingInfo
+    {
+      csRef<LightmapUVObjectLayouter> layouter;
+      size_t group;
+
+      LMLayoutingInfo (LightmapUVObjectLayouter* layouter, size_t group) :
+      layouter (layouter), group (group) {}
+    };
+    csArray<LMLayoutingInfo> lmLayouts;
 
     // Bounding sphere
     csSphere bsphere;

@@ -30,7 +30,8 @@ namespace lighter
     size_t index;
   };
 
-  static int SortBySize (SizeAndIndex const& s1, SizeAndIndex const& s2)
+  template<typename T>
+  static int SortByUVSize (T const& s1, T const& s2)
   {
     float dx = s1.uvsize.x - s2.uvsize.x;
     if (dx > 0)
@@ -122,7 +123,7 @@ namespace lighter
       }
     }
     // The rectangle packer works better when the rects are sorted by size.
-    sizes.Sort (SortBySize);
+    sizes.Sort (SortByUVSize<SizeAndIndex>);
 
     for (size_t s = 0; s < sizes.GetSize(); s++)
     {
@@ -160,7 +161,7 @@ namespace lighter
 
     return csPtr<LightmapUVObjectLayouter> (newFactory);
   }
-
+  
   static int SortPrimByD (const FactoryPrimitive& prim1, 
                           const FactoryPrimitive& prim2)
   {
@@ -339,7 +340,7 @@ namespace lighter
     int u, int v, csRect &lightmapArea, int &lightmapID)
   {
     // Now see if we can get some space in the already allocated lightmaps
-    csSubRect *rect;
+    CS::SubRectangles::SubRect *rect;
     for (unsigned int i = 0; i < lightmaps.GetSize (); i++)
     {
       rect = lightmaps[i]->GetAllocator ().Alloc (u,v,lightmapArea);
@@ -467,15 +468,86 @@ namespace lighter
     }
   }
 
+  void SimpleUVFactoryLayouter::QueuePDPrimitives (
+    SimpleUVObjectLayouter* layouter, PrimitiveArray &prims, 
+    size_t groupNum,  const csBitArray& pdBits, 
+    const csArray<csVector2>& uvsizes/*, const csArray<csVector2>& minuvs*/)
+  {
+    QueuedPDPrimitives queuedPrims;
+    queuedPrims.layouter = layouter;
+    queuedPrims.prims = &prims;
+    queuedPrims.groupNum = groupNum;
+    queuedPrims.uvsizes = uvsizes;
+    //queuedPrims.minuvs = minuvs;
+    QueuedPDPArray* q = pdQueues.GetElementPointer (pdBits);
+    if (q == 0)
+    {
+      pdQueues.Put (pdBits, QueuedPDPArray ());
+      q = pdQueues.GetElementPointer (pdBits);
+    }
+    q->Push (queuedPrims);
+  }
+
   //-------------------------------------------------------------------------
 
   bool SimpleUVObjectLayouter::LayoutUVOnPrimitives (PrimitiveArray &prims, 
-    size_t groupNum, ObjectVertexData& vertexData, uint& lmID)
+    size_t groupNum, const csBitArray& pdBits)
+  {
+    // Prims will be layouted later...
+    csArray<csVector2> uvsizes;
+    ComputeSizes (prims, groupNum, uvsizes, minuvs.GetExtend (groupNum));
+
+    parent->QueuePDPrimitives (this, prims, groupNum, pdBits,
+      uvsizes);
+
+    return true;
+  }
+
+  void SimpleUVObjectLayouter::FinalLightmapLayout (PrimitiveArray &prims, 
+                                                    size_t groupNum, 
+                                                    ObjectVertexData& vertexData, 
+                                                    uint& lmID)
+  {
+    /* Primitives were enqueued for PD layouting. layouted onto a PD lightmap. That lightmap itself was
+       placed somewhere on a global LM. So when remapping this must be taken
+       into consideration. */
+    const PDLayoutedGroup* layouted = pdLayouts.GetElementPointer (groupNum);
+    CS_ASSERT(layouted);
+    lmID = uint (layouted->lmID);
+
+    const csArray<csArray<size_t> >& coplanarGroup = coplanarGroups[groupNum];
+    csSet<size_t> remapped;
+    for (size_t c = 0; c < coplanarGroup.GetSize(); c++)
+    {
+      const csArray<size_t>& coPrim = coplanarGroup[c];
+      for (size_t p = 0; p < coPrim.GetSize(); p++)
+      {
+        Primitive& prim = prims[coPrim[p]];
+        const Primitive::TriangleType& t = prim.GetTriangle ();
+        // Be careful to remap each distinct vertex only once
+        const csVector2& move = layouted->remaps[c];
+        for (size_t v = 0; v < 3; v++)
+        {
+          size_t index = t [v];
+          if (!remapped.Contains (index))
+          {
+            csVector2 &uv = vertexData.lightmapUVs[index];
+            uv = lightmapUVs[index] + move;
+            remapped.AddNoTest (index);
+          }
+        }
+        prim.SetGlobalLightmapID (lmID);
+      }
+    }
+  }
+
+  void SimpleUVObjectLayouter::ComputeSizes (PrimitiveArray& prims, 
+                                             size_t groupNum,
+                                             csArray<csVector2>& uvsizes, 
+                                             csArray<csVector2>& minuvs)
   {
     const csArray<csArray<size_t> >& coplanarGroup = coplanarGroups[groupNum];
 
-    csArray<csVector2> uvsizes;
-    csArray<csVector2> minuvs;
     for (size_t c = 0; c < coplanarGroup.GetSize(); c++)
     {
       const csArray<size_t>& coPrim = coplanarGroup[c];
@@ -504,90 +576,23 @@ namespace lighter
       minuv.y = floor (minuv.y);
       minuvs.Push (minuv);
     }
-
-    csArray<csVector2> remaps;
-    csSet<size_t> remapped;
-    MapComplete (uvsizes, minuvs, remaps, lmID);
-    for (size_t c = 0; c < coplanarGroup.GetSize(); c++)
-    {
-      const csArray<size_t>& coPrim = coplanarGroup[c];
-      for (size_t p = 0; p < coPrim.GetSize(); p++)
-      {
-        Primitive& prim = prims[coPrim[p]];
-        const Primitive::TriangleType& t = prim.GetTriangle ();
-        // Be careful to remap each distinct vertex only once
-        const csVector2& move = remaps[c];
-        for (size_t v = 0; v < 3; v++)
-        {
-          size_t index = t [v];
-          if (!remapped.Contains (index))
-          {
-            csVector2 &uv = vertexData.lightmapUVs[index];
-            uv = lightmapUVs[index] + move;
-            remapped.AddNoTest (index);
-          }
-        }
-        //prim.RemapUVs (remaps[c]);
-        prim.SetGlobalLightmapID (lmID);
-      }
-    }
-
-    return true;
   }
 
-  void SimpleUVObjectLayouter::MapComplete (const csArray<csVector2>& sizes, 
-                                           const csArray<csVector2>& minuvs,  
-                                           csArray<csVector2>& remaps, 
-                                           uint& lmID)
+  void SimpleUVObjectLayouter::LayoutQueuedPrims (PrimitiveArray &prims, 
+    size_t groupNum, size_t lightmap, const csArray<csVector2>& positions, 
+    int dx, int dy)
   {
-    LightmapPtrDelArray& globalLightmaps = parent->globalLightmaps;
-    csArray<csSubRectangles::SubRect*> subRects;
-
-    remaps.SetSize (sizes.GetSize());
-    size_t lightmapIndex = 0;
-    bool successful = false;
-    while (!successful)
+    const csArray<csVector2>& minuvs = this->minuvs[groupNum];
+    PDLayoutedGroup layouted;
+    layouted.lmID = uint (lightmap);
+    layouted.remaps = positions;
+    csVector2 move (dx+1, dy+1);
+    for (size_t v = 0; v < layouted.remaps.GetSize(); v++)
     {
-      while (!successful && (lightmapIndex < globalLightmaps.GetSize()))
-      {
-        successful = true;
-        Lightmap* lm = globalLightmaps[lightmapIndex];
-        for (size_t i = 0; i < sizes.GetSize () && successful; i++)
-        {
-
-          const csVector2& uvSize = sizes[i];
-
-          csRect lmArea; 
-          csSubRectangles::SubRect* res = 
-            lm->GetAllocator().Alloc ((int)ceilf (uvSize.x), 
-	        (int)ceilf (uvSize.y), lmArea);
-          if (res == 0)
-          {
-            lightmapIndex++;
-            successful = false;
-            for (size_t r = 0; r < subRects.GetSize(); r++)
-              lm->GetAllocator().Reclaim (subRects[r]);
-            subRects.Empty();
-          }
-          else
-          {
-            subRects.Push (res);
-
-            csVector2 uvRemap = 
-              csVector2(lmArea.xmin, lmArea.ymin) - minuvs[i] 
-              + csVector2(1.0f,1.0f);
-            remaps[i] = uvRemap;
-          }
-        }
-      }
-      if (!successful && lightmapIndex >= globalLightmaps.GetSize())
-      {
-        Lightmap *newL = new Lightmap (globalConfig.GetLMProperties ().maxLightmapU,
-                                       globalConfig.GetLMProperties ().maxLightmapV);
-        globalLightmaps.Push (newL);
-      }
+      csVector2& remap = layouted.remaps[v];
+      remap += move - minuvs[v];
     }
-    lmID = uint (lightmapIndex);
+    pdLayouts.Put (groupNum, layouted);
   }
 
 }
