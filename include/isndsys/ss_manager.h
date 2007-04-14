@@ -39,7 +39,7 @@ struct iObject;
  */
 struct iSndSysWrapper : public virtual iBase
 {
-  SCF_INTERFACE (iSndSysWrapper, 1, 0, 1);
+  SCF_INTERFACE (iSndSysWrapper, 1, 1, 0);
 
   /// Get the iObject which represents this wrapper.
   virtual iObject* QueryObject () = 0;

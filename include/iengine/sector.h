@@ -187,7 +187,7 @@ struct csSectorHitBeamResult
  */
 struct iSector : public virtual iBase
 {
-  SCF_INTERFACE(iSector,2,1,1);
+  SCF_INTERFACE(iSector,2,2,0);
   /// Get the iObject for this sector.
   virtual iObject *QueryObject () = 0;
 

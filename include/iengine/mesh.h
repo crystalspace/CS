@@ -252,7 +252,7 @@ struct csScreenBoxResult
  */
 struct iMeshWrapper : public virtual iBase
 {
-  SCF_INTERFACE(iMeshWrapper, 2, 1, 0);
+  SCF_INTERFACE(iMeshWrapper, 2, 2, 0);
 
   /**
    * Get the iObject for this mesh object. This can be used to get the

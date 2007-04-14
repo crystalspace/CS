@@ -46,7 +46,7 @@
  */
 struct iVerbosityManager : public virtual iBase
 {
-  SCF_INTERFACE(iVerbosityManager, 2,0,0);
+  SCF_INTERFACE(iVerbosityManager, 2,1,0);
   /**
    * Parse additional verbosity flags.
    * \remarks See csVerbosityParser::Parse() for detailed information

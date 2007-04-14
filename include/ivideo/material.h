@@ -56,7 +56,7 @@ struct csRGBpixel;
  */
 struct iMaterial : public virtual iShaderVariableContext
 {
-  SCF_INTERFACE (iMaterial, 2, 1, 0);
+  SCF_INTERFACE (iMaterial, 2, 2, 0);
 
   /**
    * Associate a shader with a shader type

@@ -133,7 +133,7 @@ struct iMissingLoaderData : public virtual iBase
  */
 struct iLoader : public virtual iBase
 {
-  SCF_INTERFACE (iLoader, 2, 0, 0);
+  SCF_INTERFACE (iLoader, 2, 1, 0);
 
   /**
    * Load an image file. The image will be loaded in the format requested by

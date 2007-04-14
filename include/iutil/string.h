@@ -31,7 +31,7 @@
 /// This is a SCF-compatible interface for csString.
 struct iString : public virtual iBase
 {
-  SCF_INTERFACE(iString, 2,0,0);
+  SCF_INTERFACE(iString, 2,1,0);
   /**
    * Advise the string that it should allocate enough space to hold up to
    * NewSize characters.

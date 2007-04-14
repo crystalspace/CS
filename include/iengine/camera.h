@@ -101,7 +101,7 @@ struct iCameraSectorListener : public virtual iBase
  */
 struct iCamera : public virtual iBase
 {
-  SCF_INTERFACE(iCamera, 2,0,0);
+  SCF_INTERFACE(iCamera, 2,1,0);
   /**
    * Create a clone of this camera. Note that the array of listeners
    * is not cloned.
