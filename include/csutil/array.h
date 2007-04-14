@@ -635,6 +635,18 @@ public:
     return root.p[n];
   }
 
+  /**
+   * Get an item from the array. If the number of elements in this array is too
+   * small the array will be automatically extended, and the newly added
+   * objects will be constructed based on the given item \a what.
+   */
+  T& GetExtend (size_t n, T const& what)
+  {
+    if (n >= count)
+      SetSize (n+1, what);
+    return root.p[n];
+  }
+
   /// Get an element (non-const).
   T& operator [] (size_t n)
   {

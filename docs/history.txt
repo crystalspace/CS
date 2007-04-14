@@ -13,6 +13,9 @@ chronological order.
 	  CS installation.
 	- res changed the cs-config jam target to copy the cs-config wrapper
 	  script to the build dir.
+	- res added a variant of csArray<>::GetExtend() that takes a parameter
+	  specifying with what value newly created items should be constructed
+	  (analogue to SetSize()).
 13-Apr-2007
 	- Jorrit added virtual to the destructor of SubRectangles class.
 	- Jorrit changed the following meshes to also support
