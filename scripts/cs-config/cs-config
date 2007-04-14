@@ -1,0 +1,29 @@
+#!/bin/sh
+
+PATH_SEPARATOR=:
+
+TEMP_PREFIX=/tmp/cs-config$$
+
+# Collect executables starting with 'cs-config-' from $CRYSTAL and $PATH
+# @@@ FIXME: What about $CRYSTAL_x_y env vars?
+OLD_IFS="$IFS"
+IFS=$PATH_SEPARATOR
+for p in $CRYSTAL$PATH_SEPARATOR:$PATH ; do
+  if [ -d $p ] ; then
+    find $p -maxdepth 1 -executable -iname "cs-config-*" >> ${TEMP_PREFIX}_find
+  fi
+done
+IFS="$OLD_IFS"
+
+# Reorder for sorting
+cat ${TEMP_PREFIX}_find | sed 's!\(.*\)/cs-config-\(.*\)\.\(.*\)!\2:\3:\1!g' >> ${TEMP_PREFIX}_split
+# Sort by version number
+cat ${TEMP_PREFIX}_split | sort -u -t : -k 1,1nr -k 2,2nr >> ${TEMP_PREFIX}_sorted
+# Extract first entry (highest version)
+command=`cat ${TEMP_PREFIX}_sorted | head -n 1 | sed 's!\(.*\):\(.*\):\(.*\)!\3/cs-config-\1\.\2!'`
+# cleanup
+rm ${TEMP_PREFIX}*
+# ...and execute.
+$command $@
+
+
