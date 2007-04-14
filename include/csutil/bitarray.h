@@ -32,6 +32,7 @@
 
 #include "csextern.h"
 #include "allocator.h"
+#include "bitops.h"
 #include "comparator.h"
 #include "hash.h"
 
@@ -551,6 +552,30 @@ public:
       p[i] = ~p[i];
     Trim();
     return *this;
+  }
+  
+  /// Count the number of bits that are set.
+  size_t NumBitsSet() const
+  {
+    const size_t ui32perStorage = 
+      sizeof (csBitArrayStorageType) / sizeof (uint32);
+
+    union
+    {
+      csBitArrayStorageType s;
+      uint32 ui32[ui32perStorage];
+    } v;
+
+    const csBitArrayStorageType* p = GetStore();
+    size_t num = 0;
+    for (size_t i = 0; i < mLength; i++)
+    {
+      v.s = p[i];
+      for (size_t j = 0; j < ui32perStorage; j++)
+        num += CS::BitOps::ComputeBitsSet (v.ui32[j]);
+    }
+
+    return num;
   }
 
   /**
