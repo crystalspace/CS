@@ -95,7 +95,6 @@ SubRectangles::SubRect& SubRectangles::SubRect::operator= (
   {
     children[0] = superrect->AllocSubrect ();
     children[0]->parent = this;
-    children[0]->superrect = superrect;
     *(children[0]) = *(other.children[0]);
   }
   if (children[1] != 0)
@@ -107,7 +106,6 @@ SubRectangles::SubRect& SubRectangles::SubRect::operator= (
   {
     children[1] = superrect->AllocSubrect ();
     children[1]->parent = this;
-    children[1]->superrect = superrect;
     *(children[1]) = *(other.children[1]);
   }
   return *this;
@@ -298,7 +296,6 @@ SubRectangles::SubRect* SubRectangles::SubRect::Alloc (int w, int h, const Alloc
 
       children[0] = superrect->AllocSubrect ();
       children[0]->parent = this;
-      children[0]->superrect = superrect;
       children[0]->rect.Set (rect.xmin, rect.ymin, 
 	splitX, rect.ymax);
       if (ai.allocPos == ALLOC_RIGHT)
@@ -310,14 +307,12 @@ SubRectangles::SubRect* SubRectangles::SubRect::Alloc (int w, int h, const Alloc
       {
 	SubRectangles::SubRect* subChild0 = superrect->AllocSubrect ();
 	subChild0->parent = children[0];
-	subChild0->superrect = superrect;
 	subChild0->rect.Set (rect.xmin, rect.ymin, splitX, allocedRect.ymax);
 	subChild0->allocedRect = allocedRect;
 	superrect->AddLeaf (subChild0);
 
 	SubRectangles::SubRect* subChild1 = superrect->AllocSubrect ();
 	subChild1->parent = children[0];
-	subChild1->superrect = superrect;
 	subChild1->rect.Set (rect.xmin, allocedRect.ymax, splitX, rect.ymax);
 	subChild1->allocedRect = r;
 	ret = subChild1;
@@ -332,7 +327,6 @@ SubRectangles::SubRect* SubRectangles::SubRect::Alloc (int w, int h, const Alloc
 
       children[1] = superrect->AllocSubrect ();
       children[1]->parent = this;
-      children[1]->superrect = superrect;
       children[1]->rect.Set (splitX, rect.ymin, 
 	rect.xmax, rect.ymax);
       if (ai.allocPos == ALLOC_RIGHT)
@@ -348,7 +342,6 @@ SubRectangles::SubRect* SubRectangles::SubRect::Alloc (int w, int h, const Alloc
 
       children[0] = superrect->AllocSubrect ();
       children[0]->parent = this;
-      children[0]->superrect = superrect;
       children[0]->rect.Set (rect.xmin, rect.ymin, 
 	rect.xmax, splitY);
       if (ai.allocPos == ALLOC_BELOW)
@@ -360,14 +353,12 @@ SubRectangles::SubRect* SubRectangles::SubRect::Alloc (int w, int h, const Alloc
       {
 	SubRectangles::SubRect* subChild0 = superrect->AllocSubrect ();
 	subChild0->parent = children[0];
-	subChild0->superrect = superrect;
 	subChild0->rect.Set (rect.xmin, rect.ymin, allocedRect.xmax, splitY);
 	subChild0->allocedRect = allocedRect;
 	superrect->AddLeaf (subChild0);
 
 	SubRectangles::SubRect* subChild1 = superrect->AllocSubrect ();
 	subChild1->parent = children[0];
-	subChild1->superrect = superrect;
 	subChild1->rect.Set (allocedRect.xmax, rect.ymin, rect.xmax, splitY);
 	subChild1->allocedRect = r;
 	ret = subChild1;
@@ -382,7 +373,6 @@ SubRectangles::SubRect* SubRectangles::SubRect::Alloc (int w, int h, const Alloc
 
       children[1] = superrect->AllocSubrect ();
       children[1]->parent = this;
-      children[1]->superrect = superrect;
       children[1]->rect.Set (rect.xmin, splitY, 
 	rect.xmax, rect.ymax);
       if (ai.allocPos == ALLOC_BELOW)
@@ -483,9 +473,8 @@ void SubRectangles::Clear ()
   alloc.Free (root);
   leaves.DeleteAll();
 
-  root = alloc.Alloc ();
+  root = AllocSubrect ();
   root->rect = region;
-  root->superrect = this;
   leaves.Push (root);
 }
 
@@ -513,17 +502,66 @@ void SubRectangles::Reclaim (SubRectangles::SubRect* subrect)
   if (subrect) subrect->Reclaim ();
 }
 
-void SubRectangles::Grow (SubRectangles::SubRect* sr, int ow, int oh, int nw, int nh)
+void SubRectangles::Split (SubRect* subRect, SubRect::SplitType split, 
+                           int splitPos)
+{
+  CS_ASSERT((split == SubRect::SPLIT_V) || (split == SubRect::SPLIT_H));
+
+  SubRect* newRect = AllocSubrect ();
+  newRect->rect = subRect->rect;
+  newRect->allocedRect.Set (0, 0, 0, 0);
+  newRect->splitPos = splitPos;
+  newRect->splitType = split;
+
+  newRect->parent = subRect->parent;
+  newRect->children[0] = subRect;
+
+  SubRect* newChild1 = AllocSubrect ();
+  newChild1->rect = subRect->rect;
+  if (split == SubRect::SPLIT_V)
+    newChild1->rect.xmin = subRect->rect.xmin + splitPos;
+  else
+    newChild1->rect.ymin = subRect->rect.ymin + splitPos;
+  newRect->children[1] = newChild1;
+
+  AddLeaf (newChild1);
+
+  if (subRect->parent != 0)
+  {
+    if (subRect->parent->children[0] == subRect)
+      subRect->parent->children[0] = newRect;
+    else
+      subRect->parent->children[1] = newRect;
+  }
+  else
+    root = newRect;
+
+  subRect->parent = newRect;
+  if (split == SubRect::SPLIT_V)
+    subRect->rect.xmax = subRect->rect.xmin + splitPos;
+  else
+    subRect->rect.ymax = subRect->rect.ymin + splitPos;
+}
+
+void SubRectangles::Grow (SubRectangles::SubRect* sr, int ow, int oh, 
+                          int nw, int nh, int touch)
 {
   if (sr == 0) return;
+  if (touch == 0) return;
 
-  if (sr->rect.xmax == ow) sr->rect.xmax = nw;
-  if (sr->rect.ymax == oh) sr->rect.ymax = nh;
+  if ((touch & 1) && (sr->rect.xmax == ow)) sr->rect.xmax = nw;
+  if ((touch & 2) && (sr->rect.ymax == oh)) sr->rect.ymax = nh;
 
-  if (sr->splitType != SubRectangles::SubRect::SPLIT_UNSPLIT)
+  if (sr->splitType != SubRect::SPLIT_UNSPLIT)
   {
-    Grow (sr->children[0], ow, oh, nw, nh);
-    Grow (sr->children[1], ow, oh, nw, nh);
+    int touchMask0;
+    if (sr->splitType == SubRect::SPLIT_H)
+      touchMask0 = ~2;
+    else
+      touchMask0 = ~1;
+
+    Grow (sr->children[0], ow, oh, nw, nh, touch & touchMask0);
+    Grow (sr->children[1], ow, oh, nw, nh, touch);
   }
 }
 
@@ -532,12 +570,13 @@ bool SubRectangles::Grow (int newWidth, int newHeight)
   if ((newWidth < region.Width ()) || (newHeight < region.Height ()))
     return false;
 
-  Grow (root, region.Width (), region.Height (), newWidth, newHeight);
+  Grow (root, region.Width (), region.Height (), newWidth, newHeight, 1 | 2);
   region.SetSize (newWidth, newHeight);
   return true;
 }
 
-bool SubRectangles::Shrink (SubRectangles::SubRect* sr, int ow, int oh, int nw, int nh)
+bool SubRectangles::Shrink (SubRectangles::SubRect* sr, int ow, int oh, 
+                            int nw, int nh)
 {
   if (sr == 0) return true;
 
@@ -553,12 +592,13 @@ bool SubRectangles::Shrink (SubRectangles::SubRect* sr, int ow, int oh, int nw, 
   {
     if (!Shrink (sr->children[0], ow, oh, nw, nh))
     {
-      Grow (sr->children[0], nw, nh, ow, oh);
+      // FIXME: Correct touch flags needed?
+      Grow (sr->children[0], nw, nh, ow, oh, 3);
       return false;
     }
     if (!Shrink (sr->children[1], ow, oh, nw, nh))
     {
-      Grow (sr->children[1], nw, nh, ow, oh);
+      Grow (sr->children[1], nw, nh, ow, oh, 3);
       return false;
     }
   }
@@ -592,14 +632,14 @@ csRect SubRectangles::GetMinimumRectangle (SubRect* sr) const
 
 void SubRectangles::DupeWithOffset (const SubRect* from, SubRect* to, 
   int x, int y, csHash<SubRect*, csConstPtrKey<SubRect> >* map,
-  const csRect& outerAllocated, const csRect& outerRect)
+  const csRect& oldRect, const csRect& newRect)
 {
   to->rect = from->rect;
   to->rect.Move (x, y);
-  if (to->rect.xmax == outerAllocated.xmax)
-    to->rect.xmax = outerRect.xmax;
-  if (to->rect.ymax == outerAllocated.ymax)
-    to->rect.ymax = outerRect.ymax;
+  if (to->rect.xmax == oldRect.xmax)
+    to->rect.xmax = newRect.xmax;
+  if (to->rect.ymax == oldRect.ymax)
+    to->rect.ymax = newRect.ymax;
 
   to->allocedRect = from->allocedRect;
   to->allocedRect.Move (x, y);
@@ -609,20 +649,18 @@ void SubRectangles::DupeWithOffset (const SubRect* from, SubRect* to,
   if (from->children[0] != 0)
   {
     SubRect* newChild = AllocSubrect ();
-    newChild->superrect = this;
     newChild->parent = to;
     DupeWithOffset (from->children[0], newChild, x, y, map,
-      outerAllocated, outerRect);
+      oldRect, newRect);
     to->children[0] = newChild;
   }
 
   if (from->children[1] != 0)
   {
     SubRect* newChild = AllocSubrect ();
-    newChild->superrect = this;
     newChild->parent = to;
     DupeWithOffset (from->children[1], newChild, x, y, map,
-      outerAllocated, outerRect);
+      oldRect, newRect);
     to->children[1] = newChild;
   }
 
@@ -640,16 +678,35 @@ bool SubRectangles::PlaceInto (const SubRectangles* rectangles,
     || (rectangles->region.Height() > subRect->allocedRect.Height()))
     return false;
 
+  if (subRect->splitType == SubRect::SPLIT_UNSPLIT)
+  {
+    int dx = subRect->rect.xmax - subRect->allocedRect.xmax;
+    int sx = subRect->allocedRect.Width();
+    int dy = subRect->rect.ymax - subRect->allocedRect.ymax;
+    int sy = subRect->allocedRect.Height();
+    if (dx >= dy)
+    {
+      Split (subRect, SubRect::SPLIT_H, sy);
+      Split (subRect, SubRect::SPLIT_V, sx);
+    }
+    else
+    {
+      Split (subRect, SubRect::SPLIT_V, sx);
+      Split (subRect, SubRect::SPLIT_H, sy);
+    }
+  }
+
   while (subRect->children[0] != 0)
     subRect = subRect->children[0];
 
   RemoveLeaf (subRect);
 
-  csRect outerAllocated (subRect->allocedRect);
-  csRect outerRect (subRect->rect);
+  csRect oldRect (rectangles->region);
+  oldRect.Move (subRect->rect.xmin, subRect->rect.ymin);
+  csRect newRect (subRect->rect);
   DupeWithOffset (rectangles->root, subRect, 
     subRect->rect.xmin, subRect->rect.ymin, newRectangles,
-    outerAllocated, outerRect);
+    oldRect, newRect);
 
   return true;
 }
@@ -658,6 +715,7 @@ bool SubRectangles::PlaceInto (const SubRectangles* rectangles,
 static void FillImgRect (uint8* data, uint8 color, int imgW, int imgH, 
 			 const csRect& r)
 {
+  CS_ASSERT((r.xmax <= imgW) && (r.ymax <= imgH));
   int x, y;
   uint8* p = data + (r.ymin * imgW) + r.xmin;
   for (y = r.ymin; y < r.ymax; y++)
@@ -673,6 +731,7 @@ static void FillImgRect (uint8* data, uint8 color, int imgW, int imgH,
 static void IncImgRect (uint8* data, int imgW, int imgH, 
 			const csRect& r)
 {
+  CS_ASSERT((r.xmax <= imgW) && (r.ymax <= imgH));
   int x, y;
   uint8* p = data + (r.ymin * imgW) + r.xmin;
   for (y = r.ymin; y < r.ymax; y++)
@@ -822,12 +881,12 @@ void SubRectangles::Dump (const char* tag)
 //---------------------------------------------------------------------------
 
 SubRectanglesCompact::SubRectanglesCompact (const csRect& maxArea) :
-  SubRectangles (csRect (0, 0, 0, 0)), maxArea (maxArea)
+  SubRectangles (csRect (0, 0, 0, 0)), maxArea (maxArea), growPO2 (false)
 {
 }
 
 SubRectanglesCompact::SubRectanglesCompact (const SubRectanglesCompact& other) :
-  SubRectangles (other), maxArea (other.maxArea)
+  SubRectangles (other), maxArea (other.maxArea), growPO2 (other.growPO2)
 {
 }
 
@@ -869,12 +928,12 @@ SubRectangles::SubRect* SubRectanglesCompact::Alloc (int w, int h,
       csRect newRect (region);
       // Enlarge one side
       SetDimension (newRect, side, 
-        csMin (GetDimension (region, side) + ((side == 0) ? w : h), 
+        csMin (NewSize (GetDimension (region, side), ((side == 0) ? w : h)), 
           GetDimension (maxArea, side)));
       // Ensure other side is at least as large as requested
       if (GetDimension (newRect, side ^ 1) < ((side == 0) ? h : w))
       {
-        SetDimension (newRect, side ^ 1, ((side == 0) ? h : w));
+        SetDimension (newRect, side ^ 1, NewSize (((side == 0) ? h : w), 0));
       }
       Grow (newRect.Width(), newRect.Height());
       r = SubRectangles::Alloc (w, h, rect);

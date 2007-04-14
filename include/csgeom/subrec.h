@@ -119,7 +119,11 @@ protected:
 
   SubRect::SubRectAlloc alloc;
   inline SubRect* AllocSubrect ()
-  { return alloc.Alloc(); }
+  { 
+    SubRect* sr = alloc.Alloc(); 
+    sr->superrect = this;
+    return sr;
+  }
   void FreeSubrect (SubRect* sr);
 
   /// Leaves of the region tree
@@ -135,8 +139,12 @@ protected:
       csArrayCmp<SubRect*, SubRect*> (sr, SubRectCompare));
     leaves.DeleteIndex (index);
   }
+
+  /// Helper function to split a node.
+  void Split (SubRect* subRect, SubRect::SplitType split, int splitPos);
   
-  void Grow (SubRect* sr, int ow, int oh, int nw, int nh);
+  void Grow (SubRect* sr, int ow, int oh, int nw, int nh,
+    int touch);
   bool Shrink (SubRect* sr, int ow, int oh, int nw, int nh);
   csRect GetMinimumRectangle (SubRect* sr) const;
   void DupeWithOffset (const SubRect* from, SubRect* to, 
@@ -221,7 +229,10 @@ public:
 class CS_CRYSTALSPACE_EXPORT SubRectanglesCompact : public SubRectangles
 {
   const csRect maxArea;
+  bool growPO2;
 
+  inline int NewSize (int amount, int inc)
+  { return growPO2 ? csFindNearestPowerOf2 (amount + inc) : amount + inc; }
 public:
   SubRectanglesCompact (const csRect& maxArea);
   SubRectanglesCompact (const SubRectanglesCompact& other);
@@ -231,6 +242,15 @@ public:
 
   /// Return the upper limit of the rectangle.
   const csRect& GetMaximumRectangle () const { return maxArea; }
+
+  /**
+   * Enable growing to PO2 dimensions. Means that if an enlargement
+   * of the rectangle is necessary it will be to a PO2 dimension.
+   * Useful when e.g. the rectangle is to be used as a texture.
+   */
+  void SetGrowPO2 (bool growPO2) { this->growPO2 = growPO2; }
+  /// Return whether growing to PO2 dimensions is enabled.
+  bool GetGrowPO2 () const { return growPO2; }
 };
 
 } // namespace CS
