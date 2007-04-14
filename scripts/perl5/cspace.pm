@@ -15037,6 +15037,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *GetTriangleDataID = *cspacec::iCollideSystem_GetTriangleDataID;
+*GetBaseDataID = *cspacec::iCollideSystem_GetBaseDataID;
 *CreateCollider = *cspacec::iCollideSystem_CreateCollider;
 *Collide = *cspacec::iCollideSystem_Collide;
 *GetCollisionPairs = *cspacec::iCollideSystem_GetCollisionPairs;

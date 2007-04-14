@@ -10144,6 +10144,7 @@ class iCollideSystem(iBase):
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetTriangleDataID(*args): return _cspace.iCollideSystem_GetTriangleDataID(*args)
+    def GetBaseDataID(*args): return _cspace.iCollideSystem_GetBaseDataID(*args)
     def CreateCollider(*args): return _cspace.iCollideSystem_CreateCollider(*args)
     def Collide(*args): return _cspace.iCollideSystem_Collide(*args)
     def GetCollisionPairs(*args): return _cspace.iCollideSystem_GetCollisionPairs(*args)
