@@ -46,6 +46,10 @@ class ProctexPDLightLoader :
 protected:
   iObjectRegistry* object_reg;
 
+  csStringHash tokens;
+#define CS_TOKEN_ITEM_FILE "plugins/proctex/ptpdlight/ptpdlight.tok"
+#include "cstool/tokenlist.h"
+
   void Report (int severity, iDocumentNode* node, const char* msg, ...);
   bool HexToLightID (char* lightID, const char* lightIDHex);
 public:
@@ -165,6 +169,7 @@ private:
   CS_DECLARE_STATIC_CLASSVAR_REF(lightmapScratch, GetScratch, LightmapScratch);
   size_t lightmapSize;
 
+  csRGBcolor baseColor;
   PDMap baseMap;
   csArray<MappedLight> lights;
   csRect totalAffectedAreas;
@@ -184,8 +189,13 @@ public:
   {
     lights.ShrinkBestFit();
   }
+  void SetBaseColor (csRGBcolor col)
+  {
+    baseColor = col;
+  }
 
   ProctexPDLight (iImage* img);
+  ProctexPDLight (int w, int h);
   virtual ~ProctexPDLight ();
 
   virtual bool PrepareAnim ();

@@ -56,6 +56,7 @@ SCF_IMPLEMENT_FACTORY(ProctexPDLightLoader)
 ProctexPDLightLoader::ProctexPDLightLoader (iBase *p) :
   scfImplementationType(this, p)
 {
+  InitTokenTable (tokens);
 }
 
 ProctexPDLightLoader::~ProctexPDLightLoader ()
@@ -80,6 +81,12 @@ csPtr<iBase> ProctexPDLightLoader::Parse (iDocumentNode* node,
     Report (CS_REPORTER_SEVERITY_ERROR, 0, "No level loader");
     return false;
   }
+  csRef<iSyntaxService> synsrv = csQueryRegistry<iSyntaxService> (object_reg);
+  if (!synsrv) 
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, 0, "No syntax services");
+    return false;
+  }
 
   csRef<iTextureLoaderContext> ctx;
   if (context)
@@ -93,50 +100,57 @@ csPtr<iBase> ProctexPDLightLoader::Parse (iDocumentNode* node,
   {
     csRef<iDocumentNode> file = 
       node ? node->GetNode ("file") : csRef<iDocumentNode> (0);
-    if (!file) 
+    if (file) 
     {
-      Report (CS_REPORTER_SEVERITY_WARNING, node, 
-	"Please provide a <file> node in the <texture> or <params> block");
-      return 0;
-    }
-    const char* fname;
-    if (!(fname = file->GetContentsValue())) 
-    {
-      Report (CS_REPORTER_SEVERITY_WARNING, file, "Empty <file> node");
-      return 0;
-    }
-
-    img = LevelLoader->LoadImage (fname);
-    if (!img) 
-    {
-      Report (CS_REPORTER_SEVERITY_WARNING, file, 
-	"Couldn't load image '%s'", fname);
-      return 0;
+      const char* fname;
+      if (!(fname = file->GetContentsValue())) 
+      {
+        Report (CS_REPORTER_SEVERITY_WARNING, file, "Empty <file> node");
+      }
+      else
+      {
+        img = LevelLoader->LoadImage (fname);
+        if (!img) 
+        {
+          Report (CS_REPORTER_SEVERITY_WARNING, file, 
+	    "Couldn't load image '%s'", fname);
+        }
+      }
     }
   }
 
   csRef<ProctexPDLight> pt;
-  pt.AttachNew (new ProctexPDLight (img));
+  if (img.IsValid())
+    pt.AttachNew (new ProctexPDLight (img));
+  else
+  {
+    csRef<iTextureLoaderContext> ctx;
+    if (context)
+    {
+      ctx = csPtr<iTextureLoaderContext>
+        (scfQueryInterface<iTextureLoaderContext> (context));
+
+      if (ctx)
+      {
+        if (ctx->HasSize())
+        {
+	  int w, h;
+	  ctx->GetSize (w, h);
+          pt.AttachNew (new ProctexPDLight (w, h));
+        }
+      }
+    }
+  }
+  if (!pt.IsValid())
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING, node, 
+      "Please provide a <file> node in the <texture> or <params> block or "
+      "a <size> node in the <texture> block");
+    return 0;
+  }
+
   if (pt->Initialize (object_reg))
   {
-    csRef<iGraphics3D> G3D = csQueryRegistry<iGraphics3D> (object_reg);
-    if (!G3D) return 0;
-    csRef<iTextureManager> tm = G3D->GetTextureManager();
-    if (!tm) return 0;
-    int texFlags = (ctx && ctx->HasFlags()) ? ctx->GetFlags() : CS_TEXTURE_3D;
-    csRef<scfString> fail_reason;
-    fail_reason.AttachNew (new scfString ());
-    csRef<iTextureHandle> TexHandle (tm->RegisterTexture (img, 
-      texFlags, fail_reason));
-    if (!TexHandle)
-    {
-      Report (CS_REPORTER_SEVERITY_ERROR, node,
-	  "Couldn't create texture: %s", fail_reason->GetData ());
-      return 0;
-    }
-
-    pt->GetTextureWrapper()->SetTextureHandle (TexHandle);
-
     if (node)
     {
       csRef<iDocumentNodeIterator> nodes = node->GetNodes ();
@@ -144,35 +158,55 @@ csPtr<iBase> ProctexPDLightLoader::Parse (iDocumentNode* node,
       {
         csRef<iDocumentNode> child = nodes->Next ();
         if (child->GetType() != CS_NODE_ELEMENT) continue;
-        if (strcmp (child->GetValue(), "map") == 0)
+        csStringID id = tokens.Request (child->GetValue());
+        switch (id)
         {
-          const char* lightId = child->GetAttributeValue ("lightid");
-          const char* image = child->GetContentsValue ();
-          csRef<iImage> map = LevelLoader->LoadImage (image, 
-            CS_IMGFMT_TRUECOLOR);
-          if (!map)
-          {
-            Report (CS_REPORTER_SEVERITY_WARNING, child, 
-	      "Couldn't load image '%s'", image);
-            return 0;
-          }
-          ProctexPDLight::MappedLight light;
-          light.map = map;
-          light.lightId = new char[16];
-          if (!HexToLightID (light.lightId, lightId))
-          {
-            Report (CS_REPORTER_SEVERITY_WARNING, child, 
-              "Invalid light ID '%s'", lightId);
-          }
-          else
-          {
-            const char* err = pt->AddLight (light);
-            if (err != 0)
+          case XMLTOKEN_MAP:
             {
-              Report (CS_REPORTER_SEVERITY_WARNING, child, 
-                "Couldn't add map '%s' for light '%s': %s", image, lightId, err);
+              const char* lightId = child->GetAttributeValue ("lightid");
+              const char* image = child->GetContentsValue ();
+              csRef<iImage> map = LevelLoader->LoadImage (image, 
+                CS_IMGFMT_TRUECOLOR);
+              if (!map)
+              {
+                Report (CS_REPORTER_SEVERITY_WARNING, child, 
+	          "Couldn't load image '%s'", image);
+                return 0;
+              }
+              ProctexPDLight::MappedLight light;
+              light.map = map;
+              light.lightId = new char[16];
+              if (!HexToLightID (light.lightId, lightId))
+              {
+                Report (CS_REPORTER_SEVERITY_WARNING, child, 
+                  "Invalid light ID '%s'", lightId);
+              }
+              else
+              {
+                const char* err = pt->AddLight (light);
+                if (err != 0)
+                {
+                  Report (CS_REPORTER_SEVERITY_WARNING, child, 
+                    "Couldn't add map '%s' for light '%s': %s", image, lightId, err);
+                }
+              }
             }
-          }
+            break;
+          case XMLTOKEN_BASECOLOR:
+            {
+              csColor col;
+              if (synsrv->ParseColor (child, col))
+              {
+                csRGBcolor baseColor;
+                baseColor.Set (col.red * 255.99f, col.green * 255.99f, 
+                  col.blue * 255.99f);
+                pt->SetBaseColor (baseColor);
+              }
+            }
+            break;
+          default:
+            synsrv->ReportBadToken (child);
+            return false;
         }
       }
     }
@@ -343,8 +377,8 @@ void ProctexPDLight::UpdateAffectedArea ()
 
 const char* ProctexPDLight::AddLight (const MappedLight& light)
 {
-  if ((light.map.imageW != baseMap.imageW)
-    || (light.map.imageH != baseMap.imageH))
+  if ((light.map.imageW != mat_w)
+    || (light.map.imageH != mat_h))
     return "PD lightmap dimensions don't correspond to base lightmap dimensions";
 
   if (light.map.nonNullArea.IsEmpty ())
@@ -357,13 +391,21 @@ const char* ProctexPDLight::AddLight (const MappedLight& light)
 
 ProctexPDLight::ProctexPDLight (iImage* img) : 
   scfImplementationType (this, (iTextureFactory*)0, img), baseMap (img), 
-  state (stateAffectedAreaDirty | stateDirty)
+  state (stateAffectedAreaDirty | stateDirty), baseColor (0, 0, 0)
 {
   if (img)
   {
     mat_w = img->GetWidth();
     mat_h = img->GetHeight();
   }
+}
+
+ProctexPDLight::ProctexPDLight (int w, int h) : 
+  scfImplementationType (this), state (stateAffectedAreaDirty | stateDirty), 
+  baseColor (0, 0, 0)
+{
+  mat_w = w;
+  mat_h = h;
 }
 
 ProctexPDLight::~ProctexPDLight ()
@@ -383,8 +425,8 @@ bool ProctexPDLight::PrepareAnim ()
     return false;
   }
 
-  if (!baseMap.imageData) return false;
-  lightmapSize = baseMap.imageW * baseMap.imageH;
+  lightmapSize = mat_w * mat_h;
+  if (lightmapSize == 0) return false;
   for (size_t i = 0; i < lights.GetSize(); )
   {
     MappedLight& light = lights[i];
@@ -427,19 +469,37 @@ void ProctexPDLight::Animate (csTicks /*current_time*/)
       int scratchW = totalAffectedAreas.Width();
       LightmapScratch& scratch = GetScratch();
       scratch.SetSize (lightmapSize);
+      csRGBcolor scratchMax;
       {
-        Lumel* basePtr = (baseMap.imageData->GetData()) +
-          totalAffectedAreas.ymin * mat_w + totalAffectedAreas.xmin;
         int lines = totalAffectedAreas.Height();
         Lumel* scratchPtr = scratch.GetArray();
-        for (int y = 0; y < lines; y++)
+        if (baseMap.imageData.IsValid())
         {
-          memcpy (scratchPtr, basePtr, scratchW * sizeof (Lumel));
-          scratchPtr += scratchW;
-          basePtr += mat_w;
+          Lumel* basePtr = (baseMap.imageData->GetData()) +
+            totalAffectedAreas.ymin * mat_w + totalAffectedAreas.xmin;
+          for (int y = 0; y < lines; y++)
+          {
+            memcpy (scratchPtr, basePtr, scratchW * sizeof (Lumel));
+            scratchPtr += scratchW;
+            basePtr += mat_w;
+          }
+          scratchMax = baseMap.maxValue;
+        }
+        else
+        {
+          for (int y = 0; y < lines; y++)
+          {
+            for (int x = 0; x < scratchW; x++)
+            {
+              scratchPtr->red = baseColor.red;
+              scratchPtr->green = baseColor.green;
+              scratchPtr->blue = baseColor.blue;
+              scratchPtr++;
+            }
+          }
+          scratchMax = baseColor;
         }
       }
-      csRGBcolor scratchMax = baseMap.maxValue;
 
       for (size_t i = 0; i < lights.GetSize(); )
       {

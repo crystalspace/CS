@@ -25,6 +25,8 @@ chronological order.
 	- res implemented iTextureManager::CreateTexture() for null3d.
 	- res added a csColor::IsBlack() variant that takes a threshold for
 	  which values below are considered as "black".
+	- res changed ptpdlight to also accept a solid base color instead of
+	  a base image.
 14-Apr-2007
 	- res added a cs-config wrapper script that scans for cs-config-X.Y
 	  scripts in CRYSTAL and PATH and picks the latest version.
