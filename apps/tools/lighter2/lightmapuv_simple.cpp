@@ -46,6 +46,15 @@ namespace lighter
     return 0;
   }
 
+  /* Idea for future:
+     Take what PD lights affect the object's instances of a set of 
+     neighbouring prims and take that into consideration when splitting
+     the factory. E.g. if two sets of neighbouring prims are affected
+     by different PD light sets on the object two submeshes are created.
+     This could improve lightmap layouting when a lot of PD lights
+     are used.
+   */
+
   // Very simple FactoryLayouter.. just map "flat" on the lightmap
   csPtr<LightmapUVObjectLayouter> SimpleUVFactoryLayouter::LayoutFactory (
     const FactoryPrimitiveArray& inPrims, ObjectFactoryVertexData& vertexData,

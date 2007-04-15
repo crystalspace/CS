@@ -245,6 +245,25 @@ namespace lighter
       ArrayType Get (size_t index) const 
       { return ArrayType (allocs[index]); }
     };
+    class ArraysOneLQ
+    {
+      csArray<CS::SubRectanglesCompact*> allocs;
+    public:
+      typedef ArraysLQ::ArrayType ArrayType;
+
+      ArraysOneLQ (LayoutedQueue& queue)
+      {
+        for (size_t a = 0; a < queue.maps.GetSize(); a++)
+        {
+          CS::SubRectanglesCompact* allocP = queue.maps[a].alloc;
+          allocs.Push (allocP);
+        }
+      }
+
+      size_t GetSize() const { return allocs.GetSize(); }
+      ArrayType Get (size_t index) const 
+      { return ArrayType (allocs[index]); }
+    };
   };
 
   class SimpleUVObjectLayouter : public LightmapUVObjectLayouter

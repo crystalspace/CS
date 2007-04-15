@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2005 by Marten Svanfeldt
+  Copyright (C) 2007 by Frank Richter
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -61,6 +61,21 @@ namespace lighter
     csRect rect;
   };
 
+  struct MPTAAMAlloc
+  {
+    static CS::SubRectangles::SubRect* Alloc (CS::SubRectangles& allocator,
+      int w, int h, csRect& rect)
+    { return allocator.Alloc (w, h, rect);  }
+  };
+
+  struct MPTAAMAllocNoGrow
+  {
+    static CS::SubRectangles::SubRect* Alloc (
+      CS::SubRectanglesCompact& allocator, int w, int h, csRect& rect)
+    { return allocator.AllocNoGrow (w, h, rect);  }
+  };
+
+  template<class AllocMixin>
   static bool MapPrimsToAlloc (csArray<PrimToMap>& primsToMap, 
     CS::SubRectanglesCompact& alloc, 
     csArray<CS::SubRectangles::SubRect*>& outSubRects)
@@ -71,14 +86,12 @@ namespace lighter
     for (size_t p = 0; p < primsToMap.GetSize(); p++)
     {
       CS::SubRectanglesCompact::SubRect* sr = 
-        alloc.Alloc (int (ceilf (primsToMap[p].uvsize.x)),
-          int (ceilf (primsToMap[p].uvsize.y)),
-          primsToMap[p].rect);
+        AllocMixin::Alloc (alloc, int (ceilf (primsToMap[p].uvsize.x)),
+          int (ceilf (primsToMap[p].uvsize.y)), primsToMap[p].rect);
       if (sr == 0)
       {
         for (size_t s = subRects.GetSize(); s-- > 0; )
           alloc.Reclaim (subRects[s]);
-        subRects.Empty ();
         success = false;
         alloc.Shrink (oldSize.Width(), oldSize.Height());
         break;
@@ -100,10 +113,86 @@ namespace lighter
   };
   typedef csHash<AllocResult, size_t> AllocResultHash;
 
+  enum
+  {
+    resultFailure,
+    resultAllocated,
+    resultWithNew
+  };
+
+  template<class Arrays, class Allocators, class AllocMixin>
+  static int AllocAllPrimsInner (const Arrays& arrays, Allocators& allocs,
+    AllocResultHash& result, const csArray<SizeAndIndex>& testOrder,
+    const size_t arraysFirst, const size_t tryCount)
+  {
+    csArray<PrimToMap> primsToMap;
+    for (size_t a = 0; a < tryCount; a++)
+    {
+      typename Arrays::ArrayType queue = arrays.Get (a+arraysFirst);
+      for (size_t p = 0; p < queue.GetSize(); p++)
+      {
+        PrimToMap prim;
+        prim.srcArray = a+arraysFirst;
+        prim.sourceIndex = p;
+        prim.uvsize = queue.GetUVSize (p);
+        primsToMap.Push (prim);
+      }
+    }
+    primsToMap.Sort (SortByUVSize<PrimToMap>);
+
+    size_t allocator;
+    bool allMapped = false;
+    bool newCreated = false;
+    csArray<CS::SubRectangles::SubRect*> subRects;
+    for (size_t a = 0; a < allocs.GetSize(); a++)
+    {
+      size_t useAlloc = testOrder[a].index;
+      allMapped = MapPrimsToAlloc<AllocMixin> (primsToMap, 
+        allocs.Get (useAlloc), subRects);
+      if (allMapped)
+      {
+        allocator = useAlloc;
+        break;
+      }
+    }
+    if (!allMapped)
+    {
+      allMapped = MapPrimsToAlloc<AllocMixin> (primsToMap, 
+        allocs.New (allocator), subRects);
+      newCreated = true;
+    }
+    if (allMapped) 
+    {
+      for (size_t p = 0; p < primsToMap.GetSize(); p++)
+      {
+        const PrimToMap& prim = primsToMap[p];
+        AllocResult* res = result.GetElementPointer (prim.srcArray);
+        if (res == 0)
+        {
+          AllocResult newResult;
+          newResult.allocIndex = allocator;
+          result.Put (prim.srcArray, newResult);
+          res = result.GetElementPointer (prim.srcArray);
+        }
+        csVector2 uvRemap = csVector2(prim.rect.xmin, prim.rect.ymin);
+        res->positions.GetExtend (prim.sourceIndex) = uvRemap;
+        res->subRects.GetExtend (prim.sourceIndex, 0) = subRects[p];
+      }
+      return newCreated ? resultWithNew : resultAllocated;
+    }
+    else
+      allocs.Delete (allocator);
+    return resultFailure;
+  }
+
+  const uint allocTryNoGrow = 1;
+  const uint allocTryNormal = 2;
+  const uint allocDefault = allocTryNoGrow | allocTryNormal;
+
   /// Allocate all queued primitves onto allocators from \a allocs.
   template<class Arrays, class Allocators>
   static bool AllocAllPrims (const Arrays& arrays, Allocators& allocs,
-    AllocResultHash& result, Statistics::Progress* progress)
+    AllocResultHash& result, Statistics::Progress* progress, uint flags)
   {
     size_t u, updateFreq;
     float progressStep;
@@ -114,64 +203,45 @@ namespace lighter
       progressStep = updateFreq * (1.0f / arrays.GetSize());
       progress->SetProgress (0);
     }
+    bool createTestOrder = true;
+    csArray<SizeAndIndex> testOrder;
 
     size_t arraysFirst = 0;
     while (arraysFirst < arrays.GetSize())
     {
       size_t tryCount = arrays.GetSize() - arraysFirst;
 
-      while (tryCount > 0)
+      if (createTestOrder)
       {
-        csArray<PrimToMap> primsToMap;
-        for (size_t a = 0; a < tryCount; a++)
-        {
-          typename Arrays::ArrayType queue = arrays.Get (a+arraysFirst);
-          for (size_t p = 0; p < queue.GetSize(); p++)
-          {
-            PrimToMap prim;
-            prim.srcArray = a+arraysFirst;
-            prim.sourceIndex = p;
-            prim.uvsize = queue.GetUVSize (p);
-            primsToMap.Push (prim);
-          }
-        }
-        primsToMap.Sort (SortByUVSize<PrimToMap>);
-
-        size_t allocator;
-        bool allMapped = false;
-        csArray<CS::SubRectangles::SubRect*> subRects;
+        testOrder.Empty ();
         for (size_t a = 0; a < allocs.GetSize(); a++)
         {
-          allMapped = MapPrimsToAlloc (primsToMap, allocs.Get (a),
-            subRects);
-          if (allMapped)
-          {
-            allocator = a;
-            break;
-          }
+          SizeAndIndex si;
+          si.index = a;
+          const csRect& allocRec = allocs.Get (a).GetRectangle();
+          si.uvsize.Set (allocRec.xmax, allocRec.ymax);
+          testOrder.Push (si);
         }
-        if (!allMapped)
+        testOrder.Sort (SortByUVSize<SizeAndIndex>);
+        createTestOrder = false;
+      }
+
+      while (tryCount > 0)
+      {
+        int res = resultFailure;
+        if (flags & allocTryNoGrow)
         {
-          allMapped = MapPrimsToAlloc (primsToMap, allocs.New (allocator),
-            subRects);
+          res = AllocAllPrimsInner<Arrays, Allocators, MPTAAMAllocNoGrow> (
+            arrays, allocs, result, testOrder, arraysFirst, tryCount);
         }
-        if (allMapped) 
+        if (!res && (flags & allocTryNormal))
         {
-          for (size_t p = 0; p < primsToMap.GetSize(); p++)
-          {
-            const PrimToMap& prim = primsToMap[p];
-            AllocResult* res = result.GetElementPointer (prim.srcArray);
-            if (res == 0)
-            {
-              AllocResult newResult;
-              newResult.allocIndex = allocator;
-              result.Put (prim.srcArray, newResult);
-              res = result.GetElementPointer (prim.srcArray);
-            }
-            csVector2 uvRemap = csVector2(prim.rect.xmin, prim.rect.ymin);
-            res->positions.GetExtend (prim.sourceIndex) = uvRemap;
-            res->subRects.GetExtend (prim.sourceIndex, 0) = subRects[p];
-          }
+          res = AllocAllPrimsInner<Arrays, Allocators, MPTAAMAlloc> (
+            arrays, allocs, result, testOrder, arraysFirst, tryCount);
+        }
+
+        if (res) 
+        {
           arraysFirst += tryCount;
           if (progress)
           {
@@ -179,10 +249,9 @@ namespace lighter
             progress->IncProgress (progressStep * (u / updateFreq));
             u = u % updateFreq;
           }
+          if (res == resultWithNew) createTestOrder = true;
           break;
         }
-        else
-          allocs.Delete (allocator);
         tryCount--;
       }
       // None of the queues could be mapped...
@@ -213,6 +282,31 @@ namespace lighter
     void Delete (size_t index)
     {
       globalLightmaps.DeleteIndex (index);
+    }
+  };
+
+  class AllocNewGlobalLM
+  {
+    LightmapPtrDelArray& globalLightmaps;
+  public:
+    size_t glmOfs;
+
+    AllocNewGlobalLM (LightmapPtrDelArray& globalLightmaps) : 
+      globalLightmaps (globalLightmaps), glmOfs (globalLightmaps.GetSize()) {}
+
+    size_t GetSize() const { return globalLightmaps.GetSize() - glmOfs; }
+    CS::SubRectanglesCompact& Get (size_t n)
+    { return globalLightmaps[glmOfs + n]->GetAllocator(); }
+    CS::SubRectanglesCompact& New (size_t& index) 
+    { 
+      Lightmap *newL = new Lightmap (globalConfig.GetLMProperties ().maxLightmapU,
+                                     globalConfig.GetLMProperties ().maxLightmapV);
+      index = globalLightmaps.Push (newL) - glmOfs;
+      return newL->GetAllocator();
+    }
+    void Delete (size_t index)
+    {
+      globalLightmaps.DeleteIndex (glmOfs + index);
     }
   };
 
@@ -295,20 +389,6 @@ namespace lighter
     return success;
   }
 
-  struct MappedSubRect
-  {
-    /// Allocator index in source layouted queue
-    size_t srcAlloc;
-    /// Allocated SR
-    CS::SubRectangles::SubRect* sr;
-    /// Position of rectangle
-    csVector2 ofs;
-    /**
-     * Allocator of new queue on which the layouted queue rect was
-     * allocated. */
-    size_t nAlloc;
-  };
-
   struct GloballyAllocated
   {
     CS::SubRectanglesCompact* globalAlloc;
@@ -363,9 +443,6 @@ namespace lighter
       LayoutedQueue newEntry;
       newEntry.pdBits = currentQueue.pdBits;
 
-      // Map between layouted queue index and position on new queue.
-      csHash<MappedSubRect, size_t> mappedLayouted;
-
       /* Look for layouted queues whose PD lights are a subset of this one.
          These layouted queues are then "merged" into the new layouted queue
          before the current primitives are laid out.
@@ -384,45 +461,32 @@ namespace lighter
            */
           for (size_t a = 0; a < currentLayouted.maps.GetSize(); a++)
           {
-            const csRect& rect = 
-              currentLayouted.maps[a].alloc->GetRectangle ();
+            const LayoutedQueue::Map& map = currentLayouted.maps[a];
+            const csRect& rect = map.alloc->GetRectangle ();
             csRect newRect;
-            MappedSubRect mapped;
+            /// Allocated SR
+            CS::SubRectangles::SubRect* sr;
+            /// Position of rectangle
+            csVector2 ofs;
+            /**
+             * Allocator of new queue on which the layouted queue rect was
+             * allocated. */
+            size_t nAlloc;
             AllocLQ allocLQ (newEntry);
             bool b = AllocOntoOne (rect.Width(), rect.Height(),
-              allocLQ, mapped.sr, mapped.nAlloc, newRect);
+              allocLQ, sr, nAlloc, newRect);
             CS_ASSERT(b);
             (void)b;
-            mapped.srcAlloc = a;
-            mapped.ofs.Set (newRect.xmin, newRect.ymin);
-            mappedLayouted.Put (l, mapped); 
-          }
-        }
-      }
+            ofs.Set (newRect.xmin, newRect.ymin);
 
-      /* Place the allocated rectangles of layouted queues to merge into
-       * the right allocater of the current new queue. */
-      for (size_t l = layoutedQueues.GetSize(); l-- > 0; )
-      {
-        if (mappedLayouted.Contains (l))
-        {
-          const LayoutedQueue& lq = layoutedQueues[l];
-          csHash<MappedSubRect, size_t>::Iterator it (
-            mappedLayouted.GetIterator (l));
-          while (it.HasNext())
-          {
-            const MappedSubRect& mapped = it.Next();
-            CS::SubRectangles& newAlloc = *newEntry.maps[mapped.nAlloc].alloc;
-            newAlloc.PlaceInto (lq.maps[mapped.srcAlloc].alloc, mapped.sr);
+            newEntry.maps[nAlloc].alloc->PlaceInto (map.alloc, sr);
 
             /// Copy all the positions from the old LQ to the new
-            const LayoutedQueue::Map& map = 
-              lq.maps[mapped.srcAlloc];
             for (size_t q = 0; q < map.queues.GetSize(); q++)
             {
               const LayoutedQueue::Map::Queue& oldMapQueue = map.queues[q];
               LayoutedQueue::Map& newMap = 
-                newEntry.maps.GetExtend (mapped.nAlloc);
+                newEntry.maps.GetExtend (nAlloc);
               LayoutedQueue::Map::Queue& newMapQueue = 
                 newMap.queues.GetExtend (newMap.queues.GetSize());
               newMapQueue.srcQueue = oldMapQueue.srcQueue;
@@ -432,7 +496,7 @@ namespace lighter
               for (size_t v = 0; v < srcPos.GetSize(); v++)
               {
                 const csVector2& unmappedPos = srcPos[v];
-                const csVector2 mappedPos = unmappedPos + mapped.ofs;
+                const csVector2 mappedPos = unmappedPos + ofs;
                 positions.Push (mappedPos);
               }
             }
@@ -457,7 +521,7 @@ namespace lighter
       Statistics::Progress* allocCurrentProg = 
         progressPDLQueues.CreateProgress (progressStep * 0.95f);
       bool b = AllocAllPrims (ArraysQPDPA (*currentQueue.queue), 
-        allocLQ, results, allocCurrentProg);
+        allocLQ, results, allocCurrentProg, allocDefault);
       delete allocCurrentProg;
       CS_ASSERT(b);
       (void)b;
@@ -506,27 +570,37 @@ namespace lighter
     {
       LayoutedQueue& currentLayouted = layoutedQueues[l];
 
-      currentLayouted.maps.Sort (SortLQMaps);
-
       for (size_t a = 0; a < currentLayouted.maps.GetSize(); a++)
       {
         CS::SubRectanglesCompact& allocator = *currentLayouted.maps[a].alloc;
         csRect minRect (allocator.GetMinimumRectangle());
         allocator.Shrink (minRect.Width(), minRect.Height());
+      }
+
+      currentLayouted.maps.Sort (SortLQMaps);
 
 #if defined(DUMP_SUBRECTANGLES)
+      for (size_t a = 0; a < currentLayouted.maps.GetSize(); a++)
+      {
         csString str;
         str.Format ("l%zua%zu", l, a);
-        allocator.Dump (str);
-#endif
+        currentLayouted.maps[a].alloc->Dump (str);
       }
-    }
-    {
+#endif
+
       AllocResultHash results;
-      ArraysLQ allocArrays (layoutedQueues);
+      ArraysOneLQ allocArrays (currentLayouted);
       AllocGlobalLM allocGLM (globalLightmaps);
-      bool b = AllocAllPrims (allocArrays, allocGLM, 
-        results, 0);
+      size_t glmOfs = 0;
+      // Look if there is some space to spare somewhere anyway...
+      bool b = AllocAllPrims (allocArrays, allocGLM, results, 0, allocTryNoGrow);
+      if (!b)
+      {
+        // ...otherwise distribute onto to some new lightmaps.
+        AllocNewGlobalLM allocNewGLM (globalLightmaps);
+        b = AllocAllPrims (allocArrays, allocNewGLM, results, 0, allocTryNormal);
+        glmOfs = allocNewGLM.glmOfs;
+      }
       CS_ASSERT(b);
       (void)b;
 
@@ -535,18 +609,15 @@ namespace lighter
       {
         size_t queueIndex;
         AllocResult& result = it.Next (queueIndex);
-        size_t lq = allocArrays.origins[queueIndex].lq;
-        size_t alloc = allocArrays.origins[queueIndex].alloc;
-        const LayoutedQueue& lqueue = layoutedQueues[lq];
+        const LayoutedQueue::Map& currentMap = currentLayouted.maps[queueIndex];
 
+        size_t glmIndex = result.allocIndex + glmOfs;
         GloballyAllocated ga;
-        ga.globalAlloc = &globalLightmaps[result.allocIndex]->GetAllocator();
+        ga.globalAlloc = &globalLightmaps[glmIndex]->GetAllocator();
         ga.globalSR = result.subRects[0];
-        ga.srcAlloc = lqueue.maps[alloc].alloc;
+        ga.srcAlloc = currentMap.alloc;
         queuesAllocated.Push (ga);
 
-
-        const LayoutedQueue::Map& currentMap = lqueue.maps[alloc];
         int x = int (result.positions[0].x);
         int y = int (result.positions[0].y);
         for (size_t q = 0; q < currentMap.queues.GetSize(); q++)
@@ -554,12 +625,7 @@ namespace lighter
           const LayoutedQueue::Map::Queue& mapQueue = currentMap.queues[q];
           const QueuedPDPrimitives* queue = mapQueue.srcQueue;
           queue->layouter->LayoutQueuedPrims (*queue->prims, queue->groupNum, 
-            result.allocIndex, mapQueue.positions, x, y);
-        }
-        if (--u == 0)
-        {
-          progressOntoGlobal.IncProgress (progressStep);
-          u = updateFreq;
+            glmIndex, mapQueue.positions, x, y);
         }
       }
     }
@@ -596,7 +662,7 @@ namespace lighter
       AllocResultHash results;
       AllocGlobalLM allocGLM (globalLightmaps);
       bool b = AllocAllPrims (ArraysQPDPA (*currentQueue.queue), 
-        allocGLM, results, 0);
+        allocGLM, results, 0, allocDefault);
       CS_ASSERT(b);
       (void)b;
 
