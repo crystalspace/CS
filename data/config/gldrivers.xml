@@ -602,6 +602,22 @@
       </applicable>
     </rule>
 
+    <!-- 
+      * 2007-04-09: ATI Radeon 7200 series exhibits garbled text. Version 6.5.1 does not.
+                    vendor: Tungsten Graphics, Inc.
+                    renderer: Mesa DRI Radeon 20061018 AGP 1x x86/MMX+/3DNow!+/SSE TCL
+                    version: 1.3 Mesa 6.5.2
+      -->
+    <rule description="ATI: Radeon 7200 series exhibits garbled text">
+      <conditions>
+        <regexp string="renderer" pattern="Mesa.*Radeon" />
+        <regexp string="glversion" pattern="Mesa 6\.5\.2" />
+      </conditions>
+      <applicable>
+        <usecfg>disableMTtext</usecfg>
+      </applicable>
+    </rule>
+
     <!--
     <rule description="GeForce MX/Go class HW">
       <conditions fulfill="one">

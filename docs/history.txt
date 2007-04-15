@@ -8,6 +8,8 @@ chronological order.
 
 15-Apr-2007
 	- res made lighter2 display some progress after the last changes.
+	- res added a gldrivers.xml tweak from Rolenun to work around garbled
+	  text output with the Radeon DRI driver.
 14-Apr-2007
 	- res added a cs-config wrapper script that scans for cs-config-X.Y
 	  scripts in CRYSTAL and PATH and picks the latest version.
