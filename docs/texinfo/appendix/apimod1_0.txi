@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
-@node Release Notes 100, Release Notes 98, Release Notes 120, Release Notes
-@appendixsec Release Notes from 0.98 to 1.00
+@node Release Notes 1_0, Release Notes 98, Release Notes 1_2, Release Notes
+@appendixsec Release Notes from 0.98 to 1.0
 @cindex Release Notes
 
 @noindent
@@ -13,31 +13,31 @@ This section documents the major changes between versions 0.98 and 1.00 of
 Crystal Space.
 
 @menu
-* Api100 New Event System:: New Event System
-* Api100 iEvent Changes:: @code{iEvent} Changes
-* Api100 Input Helper Changes:: Input Helper Changes
-* Api100 Container Changes:: Container Templates Changes
-* Api100 String Changes:: String Changes
-* Api100 Identifier Changes:: Identifier Changes
-* Api100 Texture and Material Related Changes:: Texture and Material Related Changes
-* Api100 Libraries and Headers:: Libraries and Headers Changes
-* Api100 Rendering and Drawing:: Rendering and Drawing Changes
-* Api100 Java Bindings:: Java Bindings
-* Api100 vfs Changes:: @sc{vfs} Changes
-* Api100 Interface Changes:: Interface Changes
-* Api100 Random Number Generator Changes:: Random Number Generator Changes
-* Api100 new csQueryRegistryOrLoad:: New @code{csQueryRegistryOrLoad} Function
-* Api100 Reference Count Automation:: Reference Count Automation
-* Api100 64-Bit Portability Changes:: 64-Bit Portability Changes
-* Api100 aws Changes:: @sc{aws} Changes
-* Api100 Particle system changes:: Particle system changes
-* Api100 Changes for Mesh Object Writers:: Changes for Mesh Object Writers
-* Api100 Changes for hierarchical objects:: Changes for hierarchical objects
-* Api100 Model Importing:: Model Importing
-* Api100 Removed Features:: Removed Features
+* Api1_0 New Event System:: New Event System
+* Api1_0 iEvent Changes:: @code{iEvent} Changes
+* Api1_0 Input Helper Changes:: Input Helper Changes
+* Api1_0 Container Changes:: Container Templates Changes
+* Api1_0 String Changes:: String Changes
+* Api1_0 Identifier Changes:: Identifier Changes
+* Api1_0 Texture and Material Related Changes:: Texture and Material Related Changes
+* Api1_0 Libraries and Headers:: Libraries and Headers Changes
+* Api1_0 Rendering and Drawing:: Rendering and Drawing Changes
+* Api1_0 Java Bindings:: Java Bindings
+* Api1_0 vfs Changes:: @sc{vfs} Changes
+* Api1_0 Interface Changes:: Interface Changes
+* Api1_0 Random Number Generator Changes:: Random Number Generator Changes
+* Api1_0 new csQueryRegistryOrLoad:: New @code{csQueryRegistryOrLoad} Function
+* Api1_0 Reference Count Automation:: Reference Count Automation
+* Api1_0 64-Bit Portability Changes:: 64-Bit Portability Changes
+* Api1_0 aws Changes:: @sc{aws} Changes
+* Api1_0 Particle system changes:: Particle system changes
+* Api1_0 Changes for Mesh Object Writers:: Changes for Mesh Object Writers
+* Api1_0 Changes for hierarchical objects:: Changes for hierarchical objects
+* Api1_0 Model Importing:: Model Importing
+* Api1_0 Removed Features:: Removed Features
 @end menu
 
-@node Api100 New Event System, Api100 iEvent Changes, Release Notes 100, Release Notes 100
+@node Api1_0 New Event System, Api1_0 iEvent Changes, Release Notes 1_0, Release Notes 1_0
 @subsection New Event System
 
 The event system has undergone a major rewrite, and most client applications
@@ -354,7 +354,7 @@ Handling a keyboard event can be done like this:
 @end example
 
 
-@node Api100 iEvent Changes, Api100 Input Helper Changes, Api100 New Event System, Release Notes 100
+@node Api1_0 iEvent Changes, Api1_0 Input Helper Changes, Api1_0 New Event System, Release Notes 1_0
 @subsection @code{iEvent} Changes
 
 @subsubheading Property Bags
@@ -428,7 +428,7 @@ where both devices and axes are enumerated basis 0.
 Each helper class also has @code{GetX()} and @code{GetY()} methods
 available; for joystick events, these are deprecated.
 
-@node Api100 Input Helper Changes, Api100 Container Changes, Api100 iEvent Changes, Release Notes 100
+@node Api1_0 Input Helper Changes, Api1_0 Container Changes, Api1_0 iEvent Changes, Release Notes 1_0
 @subsection Input Helper Changes
 
 @subsubheading Input Definitions
@@ -494,7 +494,7 @@ considered them 1-based.  It now uniformly treats joystick numbers as
 0-based. This is consistent with button numbers for joysticks and mice, which
 are also basis-0.
 
-@node Api100 Container Changes, Api100 String Changes, Api100 Input Helper Changes, Release Notes 100
+@node Api1_0 Container Changes, Api1_0 String Changes, Api1_0 Input Helper Changes, Release Notes 1_0
 @subsection Container Templates Changes
 
 @subheading @code{csArray<>} Index and Size Type Change
@@ -797,7 +797,7 @@ while (iter.HasNext())
 Code using @samp{csStringHashIterator} can be fixed using the same simple
 transformation.
 
-@node Api100 String Changes, Api100 Identifier Changes, Api100 Container Changes, Release Notes 100
+@node Api1_0 String Changes, Api1_0 Identifier Changes, Api1_0 Container Changes, Release Notes 1_0
 @subsection String Changes
 
 The class hierarchy of @samp{csString} has changed. Most functionality is now
@@ -833,7 +833,7 @@ methods.
 functionality is provided by @code{SetGrowsBy(0)} and @code{GetGrowsBy()}.
 @end itemize
 
-@node Api100 Identifier Changes, Api100 Texture and Material Related Changes, Api100 String Changes, Release Notes 100
+@node Api1_0 Identifier Changes, Api1_0 Texture and Material Related Changes, Api1_0 String Changes, Release Notes 1_0
 @subsection Identifier Changes
 
 @subheading Naming Normalization
@@ -1262,7 +1262,7 @@ The @samp{iConfig} interface has been renamed to the more fitting
 @samp{csRenderMeshHolderSingle} has been renamed to @samp{csRenderMeshHolder}
 as a consequence of the removal of @samp{csRenderMeshHolderMultiple}.
 
-@node Api100 Texture and Material Related Changes, Api100 Libraries and Headers, Api100 Identifier Changes, Release Notes 100
+@node Api1_0 Texture and Material Related Changes, Api1_0 Libraries and Headers, Api1_0 Identifier Changes, Release Notes 1_0
 @subsection Texture and Material Related Changes
 
 @subsubheading Texture and Material Preparation
@@ -1328,7 +1328,7 @@ interfaces beyond the normal interfaces implemented by all procedural
 textures. In the example above, the ``fire'' texture implements the specialized
 @samp{iFireTexture}.
 
-@node Api100 Libraries and Headers, Api100 Rendering and Drawing, Api100 Texture and Material Related Changes, Release Notes 100
+@node Api1_0 Libraries and Headers, Api1_0 Rendering and Drawing, Api1_0 Texture and Material Related Changes, Release Notes 1_0
 @subsection Libraries and Headers Changes
 
 @subsubheading Library Consolidation
@@ -1558,7 +1558,7 @@ merely included @file{imap/loader.h} and did nothing more. Since
 @file{imap/parser.h} has no useful purpose, it is now officially deprecated,
 and deprecation warnings have been added. Use @file{imap/loader.h} instead.
 
-@node Api100 Rendering and Drawing, Api100 Java Bindings, Api100 Libraries and Headers, Release Notes 100
+@node Api1_0 Rendering and Drawing, Api1_0 Java Bindings, Api1_0 Libraries and Headers, Release Notes 1_0
 @subsection Rendering and Drawing Changes
 
 @subsubheading @code{iGraphics2D} Alpha Color Support
@@ -1683,7 +1683,7 @@ is sent via a shader variable, while @samp{world2camera} is specified via
 @code{iGraphics3D::SetWorldToCamera()} (but it is also available as a shader
 variable to shader programs).
 
-@node Api100 Java Bindings, Api100 vfs Changes, Api100 Rendering and Drawing, Release Notes 100
+@node Api1_0 Java Bindings, Api1_0 vfs Changes, Api1_0 Rendering and Drawing, Release Notes 1_0
 @subsection Java Bindings
 @cindex Java
 
@@ -1697,7 +1697,7 @@ domain name ``crystalspace3d.org''. This replaces the older package name
 @samp{com.crystalspace}, which itself replaced the much older name
 @samp{net.sourceforge.crystal}.
 
-@node Api100 vfs Changes, Api100 Interface Changes, Api100 Java Bindings, Release Notes 100
+@node Api1_0 vfs Changes, Api1_0 Interface Changes, Api1_0 Java Bindings, Release Notes 1_0
 @subsection @sc{vfs} Changes
 @cindex @sc{vfs} Configuration File
 @cindex @file{vfs.cfg}, @sc{vfs} Configuration File
@@ -1715,7 +1715,7 @@ conflicting entries, then mounts and variable assignments specified in
 configuration files discovered earlier in the scan take precedence over those
 discovered later.
 
-@node Api100 Interface Changes, Api100 Random Number Generator Changes, Api100 vfs Changes, Release Notes 100
+@node Api1_0 Interface Changes, Api1_0 Random Number Generator Changes, Api1_0 vfs Changes, Release Notes 1_0
 @subsection Interface Changes
 
 @subsubheading @samp{iDocument} Changes
@@ -1906,7 +1906,7 @@ up memory.  This happens automatically now; the images associated with a
 texture are released by the renderer as soon as the image data is converted
 into the internal texture format (that is, uploaded to the graphics hardware).
 
-@node Api100 Random Number Generator Changes, Api100 new csQueryRegistryOrLoad, Api100 Interface Changes, Release Notes 100
+@node Api1_0 Random Number Generator Changes, Api1_0 new csQueryRegistryOrLoad, Api1_0 Interface Changes, Release Notes 1_0
 @subsection Random Number Generator Changes
 
 The global function @code{csFastRandFloat()} has been retired.  In its stead is
@@ -1917,7 +1917,7 @@ controlled and seeded individually, thus making it far more flexible and
 useful.  (Note that the more general-purpose @samp{csRandomGen} class is also
 able to vend floating point numbers.)
 
-@node Api100 new csQueryRegistryOrLoad, Api100 Reference Count Automation, Api100 Random Number Generator Changes, Release Notes 100
+@node Api1_0 new csQueryRegistryOrLoad, Api1_0 Reference Count Automation, Api1_0 Random Number Generator Changes, Release Notes 1_0
 @subsection New @code{csQueryRegistryOrLoad} Function
 
 The function @code{csQueryRegistryOrLoad()} has been added to
@@ -1933,7 +1933,7 @@ csRef<iEngine> engine = csQueryRegistryOrLoad<iEngine> (object_reg,
   "crystalspace.engine.3d");
 @end example
 
-@node Api100 Reference Count Automation, Api100 64-Bit Portability Changes, Api100 new csQueryRegistryOrLoad, Release Notes 100
+@node Api1_0 Reference Count Automation, Api1_0 64-Bit Portability Changes, Api1_0 new csQueryRegistryOrLoad, Release Notes 1_0
 @subsection Reference Count Automation
 
 For consistency with the bulk of the Crystal Space @sc{api}, and in order to
@@ -1966,7 +1966,7 @@ dispose manually via @code{DecRef()}.
 @code{iHazeHullCreation::CreateCone()}
 @end itemize
 
-@node Api100 64-Bit Portability Changes, Api100 aws Changes, Api100 Reference Count Automation, Release Notes 100
+@node Api1_0 64-Bit Portability Changes, Api1_0 aws Changes, Api1_0 Reference Count Automation, Release Notes 1_0
 @subsection 64-Bit Portability Changes
 
 Some changes have been made to the Crystal Space @sc{api} in order to better
@@ -2068,7 +2068,7 @@ methods will result in compilation errors. Alternately, defining
 supports such deprecation warnings. (Presently, only modern version of the
 @sc{gnu} compiler are so configured.)
 
-@node Api100 aws Changes, Api100 Particle system changes, Api100 64-Bit Portability Changes, Release Notes 100
+@node Api1_0 aws Changes, Api1_0 Particle system changes, Api1_0 64-Bit Portability Changes, Release Notes 1_0
 @subsection @sc{aws} Changes
 
 The trigger system in @sc{aws} has changed. The trigger callback function
@@ -2081,7 +2081,7 @@ static void TriggerFunc (unsigned long, intptr_t, iAwsSource*);
 This extra parameter is the id of the given trigger name as returned by the
 standard string set (@samp{crystalspace.shared.stringset}).
 
-@node Api100 Particle system changes, Api100 Changes for Mesh Object Writers, Api100 aws Changes, Release Notes 100
+@node Api1_0 Particle system changes, Api1_0 Changes for Mesh Object Writers, Api1_0 aws Changes, Release Notes 1_0
 @subsection Particle system changes
 
 The @sc{particles} mesh object have been rewritten.
@@ -2096,9 +2096,9 @@ physical effects controlled via @code{iParticleEffector}.
 The full documentation for the new particle systems can be found at 
 @xref{MeshObject Particles}.
 
-@imports{appendix,apimod100_part.txi}
+@imports{appendix,apimod1_0_part.txi}
 
-@node Api100 Changes for Mesh Object Writers, Api100 Changes for hierarchical objects, Api100 Particle system changes, Release Notes 100
+@node Api1_0 Changes for Mesh Object Writers, Api1_0 Changes for hierarchical objects, Api1_0 Particle system changes, Release Notes 1_0
 @subsection Changes for Mesh Object Writers
 
 @code{iMeshObject::SetLogicalParent()} has been renamed to
@@ -2110,7 +2110,7 @@ of the parameter.
 Same for @code{GetLogicalParent()}. It also uses a @code{iMeshFactoryWrapper}
 instead of @code{iBase} as the type of the parameter.
 
-@node Api100 Changes for hierarchical objects, Api100 Model Importing, Api100 Changes for Mesh Object Writers, Release Notes 100
+@node Api1_0 Changes for hierarchical objects, Api1_0 Model Importing, Api1_0 Changes for Mesh Object Writers, Release Notes 1_0
 @subsection Changes for hierarchical objects
 
 Meshes and lights can now properly be used as hierarchical objects with the
@@ -2147,7 +2147,7 @@ The following methods have been removed:
 @code{iMovable->SetParent()}
 @end itemize
 
-@node Api100 Model Importing, Api100 Removed Features, Api100 Changes for hierarchical objects, Release Notes 100
+@node Api1_0 Model Importing, Api1_0 Removed Features, Api1_0 Changes for hierarchical objects, Release Notes 1_0
 @subsection Model Importing
 
 The old model importing system has been completely removed. That means
@@ -2205,7 +2205,7 @@ the following interfaces and classes are gone:
 Instead it is now possible to load @sc{3ds} models as genmesh mesh
 objects and @sc{md2} models as 3D sprites. @xref{Model Loading}.
 
-@node Api100 Removed Features, , Api100 Model Importing, Release Notes 100
+@node Api1_0 Removed Features, , Api1_0 Model Importing, Release Notes 1_0
 @subsection Removed Features
 
 In order to clean up the codebase and simplify maintenance, a couple of 
