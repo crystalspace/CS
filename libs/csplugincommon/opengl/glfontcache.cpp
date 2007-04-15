@@ -216,7 +216,7 @@ csGLFontCache::GlyphCacheData* csGLFontCache::InternalCacheGlyph (
     return cacheData;
   }
   csRect texRect;
-  csSubRect* sr = 0;
+  CS::SubRectangles::SubRect* sr = 0;
 
   csBitmapMetrics bmetrics;
   csRef<iDataBuffer> alphaData;
@@ -435,7 +435,9 @@ void csGLFontCache::CopyGlyphData (iFont* /*font*/, utf32_char /*glyph*/, size_t
 	  {
 	    const uint8 val = (byte & 0x80) ? 0xff : 0;
 	    *dest++ = valXor ^ val;
-	    if ((x & 7) == 7)
+	    if (((x & 7) == 7) &&
+                ((y < bmetrics.height-1) ||
+                 (x < bmetrics.width-1))) // Skip src read on last iteration
 	    {
 	      byte = *src++;
 	    }
@@ -444,7 +446,11 @@ void csGLFontCache::CopyGlyphData (iFont* /*font*/, utf32_char /*glyph*/, size_t
 	      byte <<= 1;
 	    }
 	  }
-	  if ((bmetrics.width & 7) != 0) byte = *src++;
+
+          
+	  if (((bmetrics.width & 7) != 0)  && 
+              (y < bmetrics.height-1)) // Don't do last iteration
+            byte = *src++;
 	  dest += padX;
 	}
       }

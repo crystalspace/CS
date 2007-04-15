@@ -44,8 +44,8 @@ class csGraphics2DGLCommon;
 class CS_CSPLUGINCOMMON_GL_EXPORT csGLFontCache : public csFontCache
 {
   struct GLGlyphCacheData : public csFontCache::GlyphCacheData
-  {
-    csSubRect* subrect;
+  {    
+    CS::SubRectangles::SubRect* subrect;
     float tx1, ty1, tx2, ty2;
     size_t texNum;
     csBitmapMetrics bmetrics;
@@ -85,7 +85,7 @@ class CS_CSPLUGINCOMMON_GL_EXPORT csGLFontCache : public csFontCache
   {
     GLuint handle;
     GLuint mirrorHandle;
-    csSubRectangles* glyphRects;
+    CS::SubRectangles* glyphRects;
 
     CacheTexture () 
     { 
@@ -97,7 +97,7 @@ class CS_CSPLUGINCOMMON_GL_EXPORT csGLFontCache : public csFontCache
     }
     void InitRects (int size) 
     { 
-      glyphRects = new csSubRectangles (csRect (0, 0, size, size));
+      glyphRects = new CS::SubRectangles (csRect (0, 0, size, size));
     }
   };
   csArray<CacheTexture> textures;
