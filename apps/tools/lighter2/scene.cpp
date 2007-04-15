@@ -1255,12 +1255,37 @@ namespace lighter
     }
   }
 
+  const char* Scene::GetSolidColorFile (const csColor& col)
+  {
+    int r = col.red * 255.99f;
+    int g = col.green * 255.99f;
+    int b = col.blue * 255.99f;
+    csString colorStr;
+    colorStr.Format ("lightmaps/%02x%02x%02x.png", r, g, b);
+    if (!solidColorFiles.Contains (colorStr))
+    {
+      csRef<iImage> img;
+      img.AttachNew (new csImageMemory (1, 1));
+      ((csRGBpixel*)img->GetImageData())->Set (r, g, b);
+      csRef<iDataBuffer> imgData = globalLighter->imageIO->Save (img, "image/png");
+      csRef<iFile> file = globalLighter->vfs->Open (colorStr, VFS_FILE_WRITE);
+      if (file)
+      {
+        file->Write (imgData->GetData (), imgData->GetSize ());
+      }
+    }
+    return solidColorFiles.Register (colorStr);
+  }
+
   struct SaveTexture
   {
     csString filename;
     csString texname;
     csStringArray pdLightmapFiles;
     csStringArray pdLightIDs;
+    Lightmap* lm;
+    bool isSolid;
+    csColor solidColor;
   };
 
   void Scene::SaveLightmapsToDom (iDocumentNode* r, LoadedFile* fileInfo,
@@ -1271,6 +1296,9 @@ namespace lighter
     Statistics::Progress cleanupProgress (0, 1, &progress);
 
     progress.SetProgress (0);
+
+    csRef<iSyntaxService> synsrv = 
+      csQueryRegistry<iSyntaxService> (globalLighter->objectRegistry);
 
     size_t u, updateFreq;
     float progressStep;
@@ -1283,28 +1311,33 @@ namespace lighter
     csStringSet pdlightNums;
     for (unsigned int i = 0; i < lightmaps.GetSize (); i++)
     {
-      const char* textureFilename = lightmaps[i]->GetFilename ();
-      // Save the lightmap
+      SaveTexture savetex;
+      Lightmap* lm = lightmaps[i];
+      savetex.lm = lm;
+    #ifndef DUMP_NORMALS
+      lightmapPostProc.ApplyAmbient (lightmaps[i]);
+      lightmapPostProc.ApplyExposure (lightmaps[i]);
+    #endif
+      savetex.isSolid = lm->IsOneColor (lightmapPostProc.GetColorTolerance(), 
+        savetex.solidColor);
+      if (!savetex.isSolid)
       {
+        const char* textureFilename = lm->GetFilename ();
+        // Save the lightmap
         // Texture file name is relative to world file
         csVfsDirectoryChanger chdir (globalLighter->vfs);
         chdir.ChangeTo (fileInfo->directory);
-      #ifndef DUMP_NORMALS
-        lightmapPostProc.ApplyAmbient (lightmaps[i]);
-        lightmapPostProc.ApplyExposure (lightmaps[i]);
-      #endif
-        lightmaps[i]->SaveLightmap (textureFilename);
+        lm->SaveLightmap (textureFilename);
+        savetex.filename = textureFilename;
       }
-      SaveTexture savetex;
-      savetex.filename = textureFilename;
-      savetex.texname = lightmaps[i]->GetTextureName();
+      savetex.texname = lm->GetTextureName();
 
       PDLightmapsHash::GlobalIterator pdlIt = pdLightmaps.GetIterator();
       while (pdlIt.HasNext())
       {
         csPtrKey<Light> key;
         LightmapPtrDelArray* lm = pdlIt.Next(key);
-        if (lm->Get (i)->IsNull()) continue;
+        if (lm->Get (i)->IsNull (lightmapPostProc.GetColorTolerance())) continue;
 
         csString lmID (key->GetLightID ().HexString());
         csString textureFilename = "lightmaps/";
@@ -1387,14 +1420,38 @@ namespace lighter
         classNode->CreateNodeBefore (CS_NODE_TEXT);
       classContNode->SetValue ("lightmap");
 
-      csRef<iDocumentNode> fileNode = 
-        textureNode->CreateNodeBefore (CS_NODE_ELEMENT);
-      fileNode->SetValue ("file");
+      csRef<iDocumentNode> fileNode;
+      const char* filename = 0;
+      if (textureToSave.isSolid)
+      {
+        if (textureToSave.pdLightmapFiles.GetSize() == 0)
+        {
+          filename = GetSolidColorFile (textureToSave.solidColor);
+        }
+        else
+        {
+          csRef<iDocumentNode> sizeNode = 
+            textureNode->CreateNodeBefore (CS_NODE_ELEMENT);
+          sizeNode->SetValue ("size");
+          sizeNode->SetAttributeAsInt ("width", textureToSave.lm->GetWidth());
+          sizeNode->SetAttributeAsInt ("height", textureToSave.lm->GetHeight());
+        }
+      }
+      else
+      {
+        filename = textureToSave.filename.GetData ();
+        fileInfo->texFileNamesToDelete.Delete (textureToSave.filename);
+      }
 
-      csRef<iDocumentNode> filenameNode =
-        fileNode->CreateNodeBefore (CS_NODE_TEXT);
-      filenameNode->SetValue (textureToSave.filename.GetData ());
-      fileInfo->texFileNamesToDelete.Delete (textureToSave.filename);
+      if (filename != 0)
+      {
+        fileNode = textureNode->CreateNodeBefore (CS_NODE_ELEMENT);
+        fileNode->SetValue ("file");
+
+        csRef<iDocumentNode> filenameNode =
+          fileNode->CreateNodeBefore (CS_NODE_TEXT);
+        filenameNode->SetValue (filename);
+      }
 
       csRef<iDocumentNode> mipmapNode = 
         textureNode->CreateNodeBefore (CS_NODE_ELEMENT);
@@ -1416,6 +1473,14 @@ namespace lighter
         csRef<iDocumentNode> pdlightParamsNode = 
           textureNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
         pdlightParamsNode->SetValue ("params");
+
+        if (textureToSave.isSolid)
+        {
+          csRef<iDocumentNode> baseColorNode = 
+            pdlightParamsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+          baseColorNode->SetValue ("basecolor");
+          synsrv->WriteColor (baseColorNode, textureToSave.solidColor);
+        }
 
         for (size_t p = 0; p < textureToSave.pdLightmapFiles.GetSize(); p++)
         {

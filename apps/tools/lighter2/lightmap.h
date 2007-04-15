@@ -87,7 +87,8 @@ namespace lighter
 
     iTextureWrapper* GetTexture();
 
-    bool IsNull ();
+    bool IsNull (float threshold);
+    bool IsOneColor (float threshold, csColor& color);
 
     void Lock () const
     {

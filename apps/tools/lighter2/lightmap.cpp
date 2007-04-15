@@ -161,16 +161,93 @@ namespace lighter
     return texture;
   }
 
-  bool Lightmap::IsNull ()
+  bool Lightmap::IsNull (float threshold)
   {
     ScopedSwapLock<Lightmap> l (*this);
 
     for (int i = 0; i < width * height; i++)
     {
       const csColor &c = colorArray[i];
-      if (!c.IsBlack ())
+      if (!c.IsBlack (threshold))
         return false;
     }
+    return true;
+  }
+
+  bool Lightmap::IsOneColor (float threshold, csColor& color)
+  {
+    if ((width == 1) && (height == 1))
+    {
+      color = colorArray[0];
+      return true;
+    }
+    // rest of code assumes number of pixels is even
+
+    // The threshold check is done every 2*N pixels, N this amount.
+    static const int checkThresholdFrequence = 1024;
+    csColor minColor (colorArray[0]);
+    csColor maxColor (colorArray[1]);
+    int n = width * height - 2;
+    csColor* p = colorArray + 2;
+    int check = checkThresholdFrequence;
+    do
+    {
+      if (p[0].red < p[1].red)
+      {
+        if (p[0].red < minColor.red) minColor.red = p[0].red;
+        if (p[1].red > maxColor.red) maxColor.red = p[1].red;
+      }
+      else
+      {
+        if (p[1].red < minColor.red) minColor.red = p[1].red;
+        if (p[0].red > maxColor.red) maxColor.red = p[0].red;
+      }
+      if (p[0].green < p[1].green)
+      {
+        if (p[0].green < minColor.green) minColor.green = p[0].green;
+        if (p[1].green > maxColor.green) maxColor.green = p[1].green;
+      }
+      else
+      {
+        if (p[1].green < minColor.green) minColor.green = p[1].green;
+        if (p[0].green > maxColor.green) maxColor.green = p[0].green;
+      }
+      if (p[0].blue < p[1].blue)
+      {
+        if (p[0].blue < minColor.blue) minColor.blue = p[0].blue;
+        if (p[1].blue > maxColor.blue) maxColor.blue = p[1].blue;
+      }
+      else
+      {
+        if (p[1].blue < minColor.blue) minColor.blue = p[1].blue;
+        if (p[0].blue > maxColor.blue) maxColor.blue = p[0].blue;
+      }
+      p += 2;
+      n -= 2;
+      if (--check == 0)
+      {
+        if (((maxColor.red - minColor.red) > threshold)
+          || ((maxColor.green - minColor.green) > threshold)
+          || ((maxColor.blue - minColor.blue) > threshold))
+        {
+          return false;
+        }
+        if (n > 0) check = checkThresholdFrequence;
+      }
+    }
+    while (n > 0);
+
+    if (check > 0)
+    {
+      if (((maxColor.red - minColor.red) > threshold)
+        || ((maxColor.green - minColor.green) > threshold)
+        || ((maxColor.blue - minColor.blue) > threshold))
+      {
+        return false;
+      }
+    }
+
+    color = (minColor + maxColor) * 0.5f;
     return true;
   }
 

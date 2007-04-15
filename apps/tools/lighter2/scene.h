@@ -161,6 +161,12 @@ namespace lighter
       void ApplyAmbient (Lightmap* lightmap);
       void ApplyAmbient (csColor* colors, size_t numColors);
       //@}
+
+      float GetColorTolerance() const
+      {
+        // @@@ Depends on lightmap precision and scale
+        return 1.0f/128.0f;
+      }
     };
     LightingPostProcessor lightmapPostProc;
   protected:
@@ -212,6 +218,8 @@ namespace lighter
     void SaveMeshObjectToDom (csSet<csString>& savedObjects, iDocumentNode *objNode, 
                               Sector* sect, LoadedFile* fileInfo);
 
+    csStringHash solidColorFiles;
+    const char* GetSolidColorFile (const csColor& col);
     void SaveLightmapsToDom (iDocumentNode* root, LoadedFile* fileInfo,
                              Statistics::Progress& progress);
     
