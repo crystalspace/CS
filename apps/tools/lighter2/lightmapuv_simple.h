@@ -40,7 +40,7 @@ namespace lighter
       csArray<FactoryPrimitiveArray>& outPrims,
       csBitArray& usedVerts);
 
-    virtual void PrepareLighting ();
+    virtual void PrepareLighting (Statistics::Progress& progress);
   protected:
     friend class SimpleUVObjectLayouter;
 
@@ -236,8 +236,6 @@ namespace lighter
             CS::SubRectanglesCompact* allocP = queues[q].maps[a].alloc;
             allocs.Push (allocP);
             org.alloc = a;
-            csPrintf ("%zu -> lq %zu, alloc %zu (%p)\n", origins.GetSize (),
-              q, a, allocP);
             origins.Push (org);
           }
         }

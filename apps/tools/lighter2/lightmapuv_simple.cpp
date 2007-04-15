@@ -471,14 +471,13 @@ namespace lighter
   void SimpleUVFactoryLayouter::QueuePDPrimitives (
     SimpleUVObjectLayouter* layouter, PrimitiveArray &prims, 
     size_t groupNum,  const csBitArray& pdBits, 
-    const csArray<csVector2>& uvsizes/*, const csArray<csVector2>& minuvs*/)
+    const csArray<csVector2>& uvsizes)
   {
     QueuedPDPrimitives queuedPrims;
     queuedPrims.layouter = layouter;
     queuedPrims.prims = &prims;
     queuedPrims.groupNum = groupNum;
     queuedPrims.uvsizes = uvsizes;
-    //queuedPrims.minuvs = minuvs;
     QueuedPDPArray* q = pdQueues.GetElementPointer (pdBits);
     if (q == 0)
     {

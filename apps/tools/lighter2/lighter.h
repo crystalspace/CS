@@ -83,8 +83,11 @@ namespace lighter
     Statistics::Progress progSaveFactories;
     Statistics::Progress progInitializeMain;
     Statistics::Progress progInitialize;
+    Statistics::Progress progInitializeLightmaps;
     Statistics::Progress progInitializeLM;
     Statistics::Progress progPrepareLighting;
+    Statistics::Progress progPrepareLightingUVL;
+    Statistics::Progress progPrepareLightingSector;
     Statistics::Progress progSaveMeshesMain;
     Statistics::Progress progSaveMeshes;
     Statistics::Progress progSaveFinish;
@@ -96,6 +99,7 @@ namespace lighter
     Statistics::Progress progSaveResult;
     Statistics::Progress progSaveMeshesPostLight;
     Statistics::Progress progApplyWorldChanges;
+    Statistics::Progress progCleanup;
     Statistics::Progress progFinished;
   };
 

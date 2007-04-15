@@ -103,8 +103,18 @@ namespace lighter
   /// Allocate all queued primitves onto allocators from \a allocs.
   template<class Arrays, class Allocators>
   static bool AllocAllPrims (const Arrays& arrays, Allocators& allocs,
-    AllocResultHash& result)
+    AllocResultHash& result, Statistics::Progress* progress)
   {
+    size_t u, updateFreq;
+    float progressStep;
+    if (progress && (arrays.GetSize() > 0))
+    {
+      updateFreq = progress->GetUpdateFrequency (arrays.GetSize());
+      u = 0;
+      progressStep = updateFreq * (1.0f / arrays.GetSize());
+      progress->SetProgress (0);
+    }
+
     size_t arraysFirst = 0;
     while (arraysFirst < arrays.GetSize())
     {
@@ -163,6 +173,12 @@ namespace lighter
             res->subRects.GetExtend (prim.sourceIndex, 0) = subRects[p];
           }
           arraysFirst += tryCount;
+          if (progress)
+          {
+            u += tryCount;
+            progress->IncProgress (progressStep * (u / updateFreq));
+            u = u % updateFreq;
+          }
           break;
         }
         else
@@ -173,6 +189,7 @@ namespace lighter
       if (tryCount == 0) return false;
     }
     // All queues mapped successfully
+    if (progress) progress->SetProgress (1);
     return true;
   }
 
@@ -299,8 +316,16 @@ namespace lighter
     CS::SubRectanglesCompact* srcAlloc;
   };
 
-  void SimpleUVFactoryLayouter::PrepareLighting ()
+  void SimpleUVFactoryLayouter::PrepareLighting (Statistics::Progress& progress)
   {
+    progress.SetProgress (0);
+
+    Statistics::Progress progressPDLQueues (0, 90, &progress);
+    Statistics::Progress progressOntoGlobal (0, 1, &progress);
+    Statistics::Progress progressNonPDL (0, 3, &progress);
+    size_t u, updateFreq;
+    float progressStep;
+
     totalAffectedPrimCount = new csArray<size_t> ();
     // Sort queues by number of PD lights they're affected by.
     csArray<PDLQueue> allQueues;
@@ -328,8 +353,12 @@ namespace lighter
 
     csArray<LayoutedQueue> layoutedQueues;
 
+    progressPDLQueues.SetProgress (0);
+    progressStep = 1.0f / allQueues.GetSize();
     for (size_t q = 0; q < allQueues.GetSize(); q++)
     {
+      progressPDLQueues.SetProgress (q * progressStep);
+
       PDLQueue& currentQueue = allQueues[q];
       LayoutedQueue newEntry;
       newEntry.pdBits = currentQueue.pdBits;
@@ -425,8 +454,11 @@ namespace lighter
        */
       AllocResultHash results;
       AllocLQ allocLQ (newEntry);
+      Statistics::Progress* allocCurrentProg = 
+        progressPDLQueues.CreateProgress (progressStep * 0.95f);
       bool b = AllocAllPrims (ArraysQPDPA (*currentQueue.queue), 
-        allocLQ, results);
+        allocLQ, results, allocCurrentProg);
+      delete allocCurrentProg;
       CS_ASSERT(b);
       (void)b;
 
@@ -458,9 +490,17 @@ namespace lighter
 
       layoutedQueues.Insert (0, newEntry);
     }
+    progressPDLQueues.SetProgress (1);
+
+    progressOntoGlobal.SetProgress (0);
+    if (layoutedQueues.GetSize() > 0)
+    {
+      u = updateFreq = progressOntoGlobal.GetUpdateFrequency (
+        layoutedQueues.GetSize());
+      progressStep = updateFreq * (1.0f / layoutedQueues.GetSize());
+    }
 
     csArray<GloballyAllocated> queuesAllocated;
-
     // Finally allocate onto global lightmaps...
     for (size_t l = layoutedQueues.GetSize(); l-- > 0; )
     {
@@ -479,7 +519,6 @@ namespace lighter
         str.Format ("l%zua%zu", l, a);
         allocator.Dump (str);
 #endif
-
       }
     }
     {
@@ -487,7 +526,7 @@ namespace lighter
       ArraysLQ allocArrays (layoutedQueues);
       AllocGlobalLM allocGLM (globalLightmaps);
       bool b = AllocAllPrims (allocArrays, allocGLM, 
-        results);
+        results, 0);
       CS_ASSERT(b);
       (void)b;
 
@@ -517,6 +556,11 @@ namespace lighter
           queue->layouter->LayoutQueuedPrims (*queue->prims, queue->groupNum, 
             result.allocIndex, mapQueue.positions, x, y);
         }
+        if (--u == 0)
+        {
+          progressOntoGlobal.IncProgress (progressStep);
+          u = updateFreq;
+        }
       }
     }
 
@@ -534,6 +578,15 @@ namespace lighter
         delete currentLayouted.maps[m].alloc;
       }
     }
+    progressOntoGlobal.SetProgress (1);
+
+    progressNonPDL.SetProgress (0);
+    if (queuesNoPDL.GetSize() > 0)
+    {
+      u = updateFreq = progressNonPDL.GetUpdateFrequency (
+        queuesNoPDL.GetSize());
+      progressStep = updateFreq * (1.0f / queuesNoPDL.GetSize());
+    }
 
     // Distribute unaffected prims to the space that's left
     for (size_t q = 0; q < queuesNoPDL.GetSize(); q++)
@@ -543,7 +596,7 @@ namespace lighter
       AllocResultHash results;
       AllocGlobalLM allocGLM (globalLightmaps);
       bool b = AllocAllPrims (ArraysQPDPA (*currentQueue.queue), 
-        allocGLM, results);
+        allocGLM, results, 0);
       CS_ASSERT(b);
       (void)b;
 
@@ -555,8 +608,14 @@ namespace lighter
         const QueuedPDPrimitives& queue = currentQueue.queue->Get (queueIndex);
         queue.layouter->LayoutQueuedPrims (*queue.prims, queue.groupNum, 
           result.allocIndex, result.positions, 0, 0);
+        if (--u == 0)
+        {
+          progressNonPDL.IncProgress (progressStep);
+          u = updateFreq;
+        }
       }
     }
+    progressNonPDL.SetProgress (1);
 
     for (size_t g = 0; g < globalLightmaps.GetSize(); g++)
     {
@@ -570,6 +629,7 @@ namespace lighter
 #endif
     }
 
+    progress.SetProgress (1);
   }
  
 

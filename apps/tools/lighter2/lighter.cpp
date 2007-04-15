@@ -47,8 +47,11 @@ namespace lighter
       progSaveFactories ("Saving mesh factories", 7),
       progInitializeMain ("Initialize objects", 10),
         progInitialize (0, 3, &progInitializeMain),
-        progInitializeLM ("Initialize lightmaps", 3, &progInitializeMain),
-        progPrepareLighting ("Preparing objects for lighting", 5, &progInitializeMain),
+        progInitializeLightmaps ("Lightmaps", 3, &progInitializeMain),
+          progInitializeLM (0, 3, &progInitializeLightmaps),
+          progPrepareLighting (0, 5, &progInitializeLightmaps),
+            progPrepareLightingUVL (0, 95, &progPrepareLighting),
+            progPrepareLightingSector (0, 5, &progPrepareLighting),
         progSaveMeshesMain ("Saving mesh objects", 3, &progInitializeMain),
           progSaveMeshes (0, 99, &progSaveMeshesMain),
           progSaveFinish (0, 1, &progSaveMeshesMain),
@@ -60,6 +63,7 @@ namespace lighter
       progSaveResult ("Saving result", 2),
       progSaveMeshesPostLight ("Updating meshes", 1),
       progApplyWorldChanges ("Updating world files", 1),
+      progCleanup ("Cleanup", 1),
       progFinished ("Finished!", 0)
   {
   }
@@ -67,7 +71,6 @@ namespace lighter
   Lighter::~Lighter ()
   {
     CleanUp ();
-    delete swapManager;
   }
 
   int Lighter::Run ()
@@ -75,7 +78,7 @@ namespace lighter
     // Initialize it
     if (!Initialize ()) return 1;
 
-    // Light em up!
+    // Common baby light my fire
     if (!LightEmUp ()) return 1;
 
     return 0;
@@ -175,7 +178,8 @@ namespace lighter
 
   void Lighter::CleanUp ()
   {
-    delete scene;
+    delete scene; scene = 0;
+    delete swapManager; swapManager = 0;
   }
 
   bool Lighter::LightEmUp ()
@@ -244,10 +248,10 @@ namespace lighter
     }
     progInitializeLM.SetProgress (1);
 
-    uvLayout->PrepareLighting ();
+    uvLayout->PrepareLighting (progPrepareLightingUVL);
     uvLayout.Invalidate();
     
-    progPrepareLighting.SetProgress (0);
+    progPrepareLightingSector.SetProgress (0);
     progressStep = 1.0f / scene->GetSectors ().GetSize();
     sectIt.Reset();
     while (sectIt.HasNext ())
@@ -255,11 +259,11 @@ namespace lighter
       csRef<Sector> sect = sectIt.Next ();
 
       Statistics::Progress* progSector = 
-        progPrepareLighting.CreateProgress (progressStep);
+        progPrepareLightingSector.CreateProgress (progressStep);
       sect->PrepareLighting (*progSector);
       delete progSector;
     }
-    progPrepareLighting.SetProgress (1);
+    progPrepareLightingSector.SetProgress (1);
 
     if (!scene->SaveWorldMeshes (progSaveMeshes)) return false;
     if (!scene->FinishWorldSaving (progSaveFinish)) return false;
@@ -371,6 +375,11 @@ namespace lighter
     if (!scene->SaveLightmaps (progSaveResult)) return false;
     if (!scene->SaveMeshesPostLighting (progSaveMeshesPostLight)) return false;
     if (!scene->ApplyWorldChanges (progApplyWorldChanges)) return false;
+
+    progCleanup.SetProgress (0);
+    CleanUp ();
+    progCleanup.SetProgress (1);
+
     progFinished.SetProgress (1);
 
     return true;  

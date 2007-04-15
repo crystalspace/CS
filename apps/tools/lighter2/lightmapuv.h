@@ -50,7 +50,7 @@ namespace lighter
       const ObjectFactory* factory, csArray<FactoryPrimitiveArray>& outPrims,
       csBitArray& usedVerts) = 0;
 
-    virtual void PrepareLighting () = 0;
+    virtual void PrepareLighting (Statistics::Progress& progress) = 0;
   };
 
   class LightmapUVObjectLayouter : public csRefCount
