@@ -292,6 +292,13 @@ public:
   void SetShadowReceiving (bool m) { do_shadow_rec = m; }
   bool IsShadowReceiving () const { return do_shadow_rec; }
   iGeneralMeshSubMesh* FindSubMesh (const char* name) const; 
+  void AddSubMesh (unsigned int *triangles, int tricount, 
+    iMaterialWrapper *material, uint mixmode);
+  void AddSubMesh (unsigned int *triangles, int tricount, 
+    iMaterialWrapper *material)
+  {
+    AddSubMesh (triangles, tricount, material, (uint)~0);
+  }
   /** @} */
 
   iVirtualClock* vc;
@@ -633,7 +640,14 @@ public:
   { return strings; }
 
   void ClearSubMeshes ();
-  
+  void AddSubMesh (unsigned int *triangles,
+    int tricount, iMaterialWrapper *material, uint mixmode);
+  virtual void AddSubMesh (unsigned int *triangles, int tricount, 
+    iMaterialWrapper *material)
+  {
+    if (polyMeshType != Submeshes) SetPolyMeshSubmeshes();
+    AddSubMesh (triangles, tricount, material, (uint)~0);
+  }
   iGeneralMeshSubMesh* AddSubMesh (iRenderBuffer* indices, 
     iMaterialWrapper *material, const char* name, uint mixmode);
   iGeneralMeshSubMesh* FindSubMesh (const char* name) const

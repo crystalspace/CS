@@ -133,6 +133,32 @@ csGenmeshMeshObject::~csGenmeshMeshObject ()
   ClearPseudoDynLights ();
 }
 
+void csGenmeshMeshObject::AddSubMesh (unsigned int *triangles,
+                                      int tricount,
+                                      iMaterialWrapper *material,
+				      uint mixmode)
+{
+  csRef<iRenderBuffer> index_buffer = 
+    csRenderBuffer::CreateIndexRenderBuffer (tricount*3,
+    CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 0, factory->GetVertexCount() - 1);
+  csTriangle *triangleData =
+    (csTriangle*)index_buffer->Lock(CS_BUF_LOCK_NORMAL);
+
+  for (int i=0; i<tricount; ++i)
+  {
+    triangleData[i] = factory->GetTriangles ()[triangles[i]];
+  }
+  index_buffer->Release ();
+
+  LegacySubmesh lms;
+  lms.indexbuffer = index_buffer;
+  lms.material = material;
+  lms.mixmode = mixmode;
+  lms.bufferHolder.AttachNew (new csRenderBufferHolder);
+  lms.bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX,
+    index_buffer);
+  legacySubmeshes.Push (lms);
+}
 
 const csVector3* csGenmeshMeshObject::AnimControlGetVertices ()
 {
@@ -1639,7 +1665,25 @@ void csGenmeshMeshObjectFactory::ClearSubMeshes ()
   SetPolyMeshStandard();
 }
 
+void csGenmeshMeshObjectFactory::AddSubMesh (unsigned int *triangles,
+                                             int tricount,
+                                             iMaterialWrapper *material,
+				             uint mixmode)
+{
+  csRef<iRenderBuffer> index_buffer = 
+    csRenderBuffer::CreateIndexRenderBuffer (tricount*3,
+    CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 0, GetVertexCount () - 1);
+  csTriangle *triangleData =
+    (csTriangle*)index_buffer->Lock(CS_BUF_LOCK_NORMAL);
 
+  for (int i=0; i<tricount; ++i)
+  {
+    triangleData[i] = GetTriangles ()[triangles[i]];
+  }
+  index_buffer->Release ();
+  subMeshes.AddSubMesh (index_buffer, material, 0, mixmode);
+  if (polyMeshType != Submeshes) SetPolyMeshSubmeshes();
+}
 
 iGeneralMeshSubMesh* csGenmeshMeshObjectFactory::AddSubMesh (
   iRenderBuffer* indices, iMaterialWrapper *material, const char* name, 
