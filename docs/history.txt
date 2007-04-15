@@ -30,6 +30,7 @@ chronological order.
 	- res augmented lighter2 to detect solid colored (base) lightmaps and
 	  optimize the output in that case (single pixel LM or base color
 	  if PD lights are used).
+	- res fixed ptpdlight textures to register themselves upon load.
 14-Apr-2007
 	- res added a cs-config wrapper script that scans for cs-config-X.Y
 	  scripts in CRYSTAL and PATH and picks the latest version.

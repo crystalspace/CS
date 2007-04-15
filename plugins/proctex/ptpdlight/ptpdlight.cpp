@@ -124,20 +124,13 @@ csPtr<iBase> ProctexPDLightLoader::Parse (iDocumentNode* node,
     pt.AttachNew (new ProctexPDLight (img));
   else
   {
-    csRef<iTextureLoaderContext> ctx;
-    if (context)
+    if (ctx)
     {
-      ctx = csPtr<iTextureLoaderContext>
-        (scfQueryInterface<iTextureLoaderContext> (context));
-
-      if (ctx)
+      if (ctx->HasSize())
       {
-        if (ctx->HasSize())
-        {
 	  int w, h;
 	  ctx->GetSize (w, h);
-          pt.AttachNew (new ProctexPDLight (w, h));
-        }
+        pt.AttachNew (new ProctexPDLight (w, h));
       }
     }
   }
@@ -211,8 +204,12 @@ csPtr<iBase> ProctexPDLightLoader::Parse (iDocumentNode* node,
       }
     }
     pt->FinishLoad();
-
     csRef<iTextureWrapper> tw = pt->GetTextureWrapper ();
+
+    csRef<iTextureManager> tm = pt->GetG3D()->GetTextureManager();
+    if (!tm) return 0;
+    tw->Register (tm);
+
     return csPtr<iBase> (tw);
   }
   return 0;
@@ -393,11 +390,8 @@ ProctexPDLight::ProctexPDLight (iImage* img) :
   scfImplementationType (this, (iTextureFactory*)0, img), baseMap (img), 
   state (stateAffectedAreaDirty | stateDirty), baseColor (0, 0, 0)
 {
-  if (img)
-  {
-    mat_w = img->GetWidth();
-    mat_h = img->GetHeight();
-  }
+  mat_w = img->GetWidth();
+  mat_h = img->GetHeight();
 }
 
 ProctexPDLight::ProctexPDLight (int w, int h) : 
