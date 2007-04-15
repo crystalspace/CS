@@ -87,3 +87,22 @@ csStringID id = strset->Request ("colldet");
 iTriangleMesh* trimesh = model->GetTriangleData (id);
 @end example
 
+@node Api120 Renamings
+@subsection Renamed Classes and Methods
+@cindex @code{csSubRectangles}
+@cindex @code{IsType()}, @code{iScriptObject}
+@cindex @code{NewObject()}, @code{iScriptObject}
+
+A number of classes and methods were renamed to more clearly reflect their 
+purpose or moved inside a namespace in order to reduce pollution of the global
+namespace.
+
+@itemize @bullet
+@item @code{csSubRectangles} @result{} @code{CS::SubRectangles}
+@item @code{iScriptObject::IsType()} @result{} @code{iScriptObject::IsA()}
+@item @code{iScriptObject::NewObject()} @result{} @code{iScriptObject::New()}
+@end itemize
+
+Note that for compatibility reasons the old names are generally still available.
+However, they should be considered deprecated and not be used any more as 
+they will be removed in a future version.
