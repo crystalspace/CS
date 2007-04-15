@@ -76,6 +76,11 @@ public:
   {
     return (red == 0 && green == 0 && blue == 0);
   }
+  /// Check if color is all black (red green and blue all below threshold)
+  bool IsBlack (float threshold) const
+  {
+    return (red < threshold && green < threshold && blue < threshold);
+  }
   /// Assign one color object to another.
   csColor& operator= (const csColor& c)
   { red = c.red; green = c.green; blue = c.blue; return *this; }
