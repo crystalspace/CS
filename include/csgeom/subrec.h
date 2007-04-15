@@ -251,6 +251,12 @@ public:
   void SetGrowPO2 (bool growPO2) { this->growPO2 = growPO2; }
   /// Return whether growing to PO2 dimensions is enabled.
   bool GetGrowPO2 () const { return growPO2; }
+
+  /// Allocate a rectangle but don't attempt growing to fit.
+  SubRect* AllocNoGrow (int w, int h, csRect& rect)
+  {
+    return SubRectangles::Alloc (w, h, rect);
+  }
 };
 
 } // namespace CS
