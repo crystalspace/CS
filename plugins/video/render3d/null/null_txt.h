@@ -38,13 +38,15 @@ protected:
   bool prepared;
 
   /// The texture manager
-  csTextureManagerNull *texman;
+  csRef<csTextureManagerNull> texman;
 
   int w, h, d;
   int orig_w, orig_h, orig_d;
 public:
   /// Create the mipmapped texture object
   csTextureHandleNull (csTextureManagerNull *txtmgr, iImage *image, int flags);
+  csTextureHandleNull (csTextureManagerNull *txtmgr, int w, int h, int d, 
+    int flags);
   /// Destroy the object and free all associated storage
   virtual ~csTextureHandleNull ();
 

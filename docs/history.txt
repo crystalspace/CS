@@ -22,6 +22,7 @@ chronological order.
 	- res added CS::SubRectanglesCompact::AllocNoGrow().
 	- res tweaked the lighter2 layouter to not create as few lightmaps as
 	  possible, but rather a few more which are then smaller in the sum.
+	- res implemented iTextureManager::CreateTexture() for null3d.
 14-Apr-2007
 	- res added a cs-config wrapper script that scans for cs-config-X.Y
 	  scripts in CRYSTAL and PATH and picks the latest version.

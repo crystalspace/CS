@@ -33,7 +33,7 @@
 csTextureHandleNull::csTextureHandleNull (csTextureManagerNull *txtmgr,
   iImage *image, int flags) : csTextureHandle (txtmgr, flags)
 {
-  (texman = txtmgr)->IncRef ();
+  texman = txtmgr;
 
   prepared = true;
   orig_w = image->GetWidth();
@@ -51,10 +51,28 @@ csTextureHandleNull::csTextureHandleNull (csTextureManagerNull *txtmgr,
   }
 }
 
+csTextureHandleNull::csTextureHandleNull (csTextureManagerNull *txtmgr,
+  int w, int h, int d, int flags) : csTextureHandle (txtmgr, flags),
+  orig_w (w), orig_h (h), orig_d (d)
+{
+  texman = txtmgr;
+
+  prepared = true;
+  if (flags & CS_TEXTURE_3D)
+  {
+    AdjustSizePo2 (orig_w, orig_h, orig_d, this->w, this->h, this->d);
+  }
+  else
+  {
+    this->w = orig_w;
+    this->h = orig_h;
+    this->d = orig_d;
+  }
+}
+
 csTextureHandleNull::~csTextureHandleNull ()
 {
   texman->UnregisterTexture (this);
-  texman->DecRef ();
 }
 
 //----------------------------------------------- csTextureManagerNull ---//
@@ -95,13 +113,11 @@ csPtr<iTextureHandle> csTextureManagerNull::CreateTexture (int w, int h,
       csImageType imagetype, const char* format, int flags,
       iString* fail_reason)
 {
-  (void)w;
-  (void)h;
   (void)imagetype;
   (void)format;
-  (void)flags;
-  if (fail_reason) fail_reason->Replace ("Not implemented yet!");
-  return 0;
+  csTextureHandleNull *txt = new csTextureHandleNull (this, w, h, 1, flags);
+  textures.Push (txt);
+  return csPtr<iTextureHandle> (txt);
 }
 
 void csTextureManagerNull::UnregisterTexture (csTextureHandleNull* handle)
