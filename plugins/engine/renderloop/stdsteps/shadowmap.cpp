@@ -399,5 +399,6 @@ void csShadowmapRenderStep::ObjectVisible (
   iVisibilityObject * /*visobject*/, iMeshWrapper *mesh,
   uint32 /*frustum_mask*/)
 {
-  lightMeshes.Push (mesh);
+  if (!mesh->GetFlags ().Check (CS_ENTITY_NOSHADOWS))
+    lightMeshes.Push (mesh);
 }

@@ -603,7 +603,10 @@ void csStencil2ShadowStep::DrawShadow(
 	csArray<int> & shadow_indeces, 
 	iShader* shader, size_t shaderTicket, size_t /*pass*/)
 {
-  if (!cache_entry->MeshCastsShadow() || !cache_entry->ShadowCaps()) return;
+  if (!cache_entry->MeshCastsShadow() || 
+    !cache_entry->ShadowCaps() ||
+    mesh->GetFlags ().Check (CS_ENTITY_NOSHADOWS)) 
+    return;
 
   iCamera* camera = rview->GetCamera ();  
 

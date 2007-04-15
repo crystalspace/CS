@@ -449,7 +449,9 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
     shadowcache.Put (mesh, shadowCacheEntry);
   }
 
-  if (!shadowCacheEntry->MeshCastsShadow ()) return;
+  if (!shadowCacheEntry->MeshCastsShadow () ||
+    mesh->GetFlags ().Check (CS_ENTITY_NOSHADOWS)) 
+    return;
 
   //float s, e;
   iCamera* camera = rview->GetCamera ();

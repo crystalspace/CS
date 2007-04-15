@@ -17,6 +17,8 @@ chronological order.
 	- Marten made a fix to csGLFontcache::CopyGlyphData which should fix 
 	  trac #314 (read past end of array). Also updated to use 
 	  CS::SubRectangles instead of deprecated csSubRect.
+	- Marten made stencil, stencil2 and shadowmap renderloop steps respect
+	  the CS_ENTITY_NOSHADOWS mesh flag.
 14-Apr-2007
 	- res added a cs-config wrapper script that scans for cs-config-X.Y
 	  scripts in CRYSTAL and PATH and picks the latest version.
