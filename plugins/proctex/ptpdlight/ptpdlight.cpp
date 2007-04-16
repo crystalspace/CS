@@ -77,6 +77,37 @@ CS_PLUGIN_NAMESPACE_BEGIN(PTPDLight)
 CS_IMPLEMENT_STATIC_CLASSVAR_REF(ProctexPDLight, lightmapScratch, GetScratch,
                                  ProctexPDLight::LightmapScratch, ());
 
+void ProctexPDLight::PDMap::ComputeValueBounds (const csRect& area, 
+                                                csRGBcolor& maxValue, 
+                                                csRect& nonNullArea)
+{
+  const int width = imageW;
+  maxValue.Set (0, 0, 0);
+  nonNullArea.Set (INT_MAX, INT_MAX, INT_MIN, INT_MIN);
+  const Lumel* map = imageData->GetData() + area.ymin * width + area.xmin;
+  int mapPitch = width - area.Width ();
+  for (int y = area.ymin; y < area.ymax; y++)
+  {
+    for (int x = area.xmin; x < area.xmax; x++)
+    {
+      const Lumel& p = *map++;
+
+      if (p.red > maxValue.red)
+        maxValue.red = p.red;
+      if (p.green > maxValue.green)
+        maxValue.green = p.green;
+      if (p.blue > maxValue.blue)
+        maxValue.blue = p.blue;
+
+      if (p.red + p.green + p.blue > 0)
+      {
+        nonNullArea.Extend (x, y);
+      }
+    }
+    map += mapPitch;
+  }
+}
+
 void ProctexPDLight::PDMap::ComputeValueBounds (const TileHelper& tiles)
 {
   csRect r (0, 0, imageW, imageH);
@@ -98,7 +129,6 @@ void ProctexPDLight::PDMap::ComputeValueBounds (const TileHelper& tiles,
     return;
   }
 
-  const int width = imageW;
   for (size_t t = 0; t < tileNonNull.GetSize(); t++)
   {
     csRect r;
@@ -111,30 +141,9 @@ void ProctexPDLight::PDMap::ComputeValueBounds (const TileHelper& tiles,
       continue;
     }
 
-    csRGBcolor maxValue (0, 0, 0);
-    csRect nonNullArea (INT_MAX, INT_MAX, INT_MIN, INT_MIN);
-    const Lumel* map = imageData->GetData() + r.ymin * width + r.xmin;
-    int mapPitch = width - r.Width ();
-    for (int y = r.ymin; y < r.ymax; y++)
-    {
-      for (int x = r.xmin; x < r.xmax; x++)
-      {
-        const Lumel& p = *map++;
-
-        if (p.red > maxValue.red)
-          maxValue.red = p.red;
-        if (p.green > maxValue.green)
-          maxValue.green = p.green;
-        if (p.blue > maxValue.blue)
-          maxValue.blue = p.blue;
-
-        if (p.red + p.green + p.blue > 0)
-        {
-          nonNullArea.Extend (x, y);
-        }
-      }
-      map += mapPitch;
-    }
+    csRGBcolor maxValue;
+    csRect nonNullArea;
+    ComputeValueBounds (r, maxValue, nonNullArea);
     maxValues[t] = maxValue;
     nonNullAreas[t] = nonNullArea;
     if (maxValue.red + maxValue.green + maxValue.blue > 0)
@@ -163,11 +172,42 @@ void ProctexPDLight::PDMap::SetImage (const TileHelper& tiles, iImage* img)
     dst->red = src->red;
     dst->green = src->green;
     dst->blue = src->blue;
-    dst->alpha = 0xff;
+    dst->alpha = 0;
     dst++;
     src++;
   }
   ComputeValueBounds (tiles); 
+}
+
+void ProctexPDLight::PDMap::Crop ()
+{
+  csRect nonNullArea (INT_MAX, INT_MAX, INT_MIN, INT_MIN);
+  for (size_t t = 0; t < tileNonNull.GetSize(); t++)
+  {
+    if (!tileNonNull.IsBitSet (t)) continue;
+    nonNullArea.Union (nonNullAreas[t]);
+  }
+  if (nonNullArea.IsEmpty()) return;
+
+  csRef<LumelBuffer> newData;
+  newData.AttachNew (
+    new (nonNullArea.Width() * nonNullArea.Height()) LumelBuffer);
+  const Lumel* srcMap = 
+    imageData->GetData() + nonNullArea.ymin * imageW + nonNullArea.xmin;
+  int rowSize = nonNullArea.Width ();
+  Lumel* dstMap = newData->GetData();
+  for (int y = nonNullArea.Height(); y-- > 0; )
+  {
+    memcpy (dstMap, srcMap, rowSize * sizeof (Lumel));
+    dstMap += rowSize;
+    srcMap += imageW;
+  }
+
+  imageData = newData;
+  imageX = nonNullArea.xmin;
+  imageY = nonNullArea.ymin;
+  imageW = nonNullArea.Width();
+  imageH = nonNullArea.Height();
 }
 
 void ProctexPDLight::Report (int severity, const char* msg, ...)
@@ -189,7 +229,8 @@ const char* ProctexPDLight::AddLight (const MappedLight& light)
   if (light.map.tileNonNull.AllBitsFalse())
     return 0; //Silently ignore totally black maps
 
-  lights.Push (light);
+  size_t n = lights.Push (light);
+  lights[n].map.Crop();
   return 0;
 }
 
@@ -346,12 +387,14 @@ void ProctexPDLight::Animate (csTicks /*current_time*/)
           csFixed16 lightG = light.light->GetColor ().green;
           csFixed16 lightB = light.light->GetColor ().blue;
 
-          int mapW = lightInTile.Width();
+          int mapW = csMin (lightInTile.xmax, light.map.imageX + light.map.imageW)
+            - csMax (lightInTile.xmin, light.map.imageX);
           const Lumel* mapPtr = (light.map.imageData->GetData()) +
-            lightInTile.ymin * mat_w +
-            lightInTile.xmin;
-          int lines = lightInTile.Height();
-          int mapPitch = mat_w - mapW;
+            (lightInTile.ymin - light.map.imageY) * light.map.imageW +
+            (lightInTile.xmin - light.map.imageX) ;
+          int lines = csMin (lightInTile.ymax, light.map.imageY + light.map.imageH)
+            - csMax (lightInTile.ymin, light.map.imageY);
+          int mapPitch = light.map.imageW - mapW;
 
           Lumel* scratchPtr = scratch.GetArray() + 
             (lightInTile.ymin - tileRect.ymin) * scratchW +

@@ -112,17 +112,23 @@ public:
   class PDMap
   {
     friend class ProctexPDLight;
+
+    csPtr<LumelBuffer> CropLumels (LumelBuffer* lumels, 
+      const csRect& lumelsRect, const csRect& cropRect);
+
+    void ComputeValueBounds (const csRect& area, 
+      csRGBcolor& maxValue, csRect& nonNullArea);
     void ComputeValueBounds (const TileHelper& tiles);
     void ComputeValueBounds (const TileHelper& tiles, const csRect& area);
-
   public:
     csArray<csRGBcolor> maxValues;
     csBitArray tileNonNull;
     csArray<csRect> nonNullAreas;
-    int imageW, imageH;
+    int imageX, imageY, imageW, imageH;
     csRef<LumelBuffer> imageData;
 
-    PDMap (size_t tilesNum) : imageW (0), imageH (0), imageData (0) 
+    PDMap (size_t tilesNum) : imageX (0), imageY (0), imageW (0), imageH (0),
+      imageData (0) 
     { 
       maxValues.SetSize (tilesNum, csRGBcolor (0, 0, 0));
       tileNonNull.SetSize (tilesNum);
@@ -130,12 +136,13 @@ public:
         csRect (INT_MAX, INT_MAX, INT_MIN, INT_MIN));
     }
     PDMap (size_t tilesNum, const TileHelper& tiles, iImage* img) : 
-      imageData (0)
+      imageX (0), imageY (0), imageData (0)
     { 
       tileNonNull.SetSize (tilesNum);
       SetImage (tiles, img); 
     }
     void SetImage (const TileHelper& tiles, iImage* img);
+    void Crop ();
   };
   struct MappedLight
   {
