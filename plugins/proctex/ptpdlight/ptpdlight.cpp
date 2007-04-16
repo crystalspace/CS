@@ -238,8 +238,8 @@ ProctexPDLight::ProctexPDLight (iImage* img) :
   scfImplementationType (this, (iTextureFactory*)0, img), 
   tiles (img->GetWidth(), img->GetHeight()),
   tilesDirty (tiles.ComputeTileCount()),
-  baseMap (tilesDirty.GetSize(), tiles, img), 
-  state (stateDirty), baseColor (0, 0, 0)
+  baseColor (0, 0, 0), baseMap (tilesDirty.GetSize(), tiles, img),
+  state (stateDirty)
 {
   mat_w = img->GetWidth();
   mat_h = img->GetHeight();
@@ -248,9 +248,8 @@ ProctexPDLight::ProctexPDLight (iImage* img) :
 ProctexPDLight::ProctexPDLight (int w, int h) : 
   scfImplementationType (this), 
   tiles (w, h), tilesDirty (tiles.ComputeTileCount()),
-  baseMap (tilesDirty.GetSize()), 
-  state (stateDirty), 
-  baseColor (0, 0, 0)
+  baseColor (0, 0, 0), baseMap (tilesDirty.GetSize()), 
+  state (stateDirty)
 {
   mat_w = w;
   mat_h = h;

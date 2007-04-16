@@ -181,8 +181,9 @@ csPtr<iBase> ProctexPDLightLoader::Parse (iDocumentNode* node,
               if (synsrv->ParseColor (child, col))
               {
                 csRGBcolor baseColor;
-                baseColor.Set (col.red * 255.99f, col.green * 255.99f, 
-                  col.blue * 255.99f);
+                baseColor.Set (int (col.red * 255.99f), 
+                  int (col.green * 255.99f), 
+                  int (col.blue * 255.99f));
                 pt->SetBaseColor (baseColor);
               }
             }
