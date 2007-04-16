@@ -421,26 +421,31 @@ bool csTerrainCollider::Collide (iTerrainCell* cell, iCollider* collider,
   csMatrix3 m1 = trans.GetT2O ();
   csVector3 u = trans.GetO2TTranslation ();
 
+  IceMaths::Matrix4x4 transform1;
+  transform1.m[0][3] = 0;
+  transform1.m[1][3] = 0;
+  transform1.m[2][3] = 0;
+  transform1.m[3][3] = 1;
   u = m1.Row1 ();
-  col1->transform.m[0][0] = u.x;
-  col1->transform.m[1][0] = u.y;
-  col1->transform.m[2][0] = u.z;
+  transform1.m[0][0] = u.x;
+  transform1.m[1][0] = u.y;
+  transform1.m[2][0] = u.z;
   u = m1.Row2 ();
-  col1->transform.m[0][1] = u.x;
-  col1->transform.m[1][1] = u.y;
-  col1->transform.m[2][1] = u.z;
+  transform1.m[0][1] = u.x;
+  transform1.m[1][1] = u.y;
+  transform1.m[2][1] = u.z;
   u = m1.Row3 ();
-  col1->transform.m[0][2] = u.x;
-  col1->transform.m[1][2] = u.y;
-  col1->transform.m[2][2] = u.z;
+  transform1.m[0][2] = u.x;
+  transform1.m[1][2] = u.y;
+  transform1.m[2][2] = u.z;
 
-  col1->transform.m[3][0] = u.x;
-  col1->transform.m[3][1] = u.y;
-  col1->transform.m[3][2] = u.z;
+  transform1.m[3][0] = u.x;
+  transform1.m[3][1] = u.y;
+  transform1.m[3][2] = u.z;
 
   TreeCollider.SetFirstContact(oneHit);
 
-  bool isOk = TreeCollider.Collide (ColCache, &col1->transform,
+  bool isOk = TreeCollider.Collide (ColCache, &transform1,
   	&cell_data->transform);
   if (isOk)
   {

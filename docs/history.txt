@@ -35,6 +35,12 @@ chronological order.
 	- res changed ptpdlight to compute and upload the lightmap data in a
 	  tiled fashion to get a finer granularity over the areas that are
 	  touched (or not) and to save on unnecessary computations.
+	- Jorrit fixed a bug in the opcode plugin when collision detection
+	  between the same collider (but different transform) was done.
+	  The problem was that the opcode plugin kept the transform in the
+	  collider class. And if that class is reused but with different
+	  transforms then that obviously doesn't work. Fixing this bug also
+	  causes every collider to be 4x4 floats shorter.
 15-Apr-2007
 	- res made lighter2 display some progress after the last changes.
 	- res added a gldrivers.xml tweak from Rolenun to work around garbled

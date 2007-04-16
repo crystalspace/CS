@@ -59,7 +59,6 @@ class csOPCODECollider :
 public:
   /// The internal model object.
   Opcode::Model* m_pCollisionModel;
-  IceMaths::Matrix4x4 transform;
   unsigned int* indexholder;
   Point *vertholder;
 

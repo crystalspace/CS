@@ -239,24 +239,29 @@ bool csOPCODECollideSystem::Collide (
   if (trans1) m1 = trans1->GetT2O ();
   csVector3 u;
 
+  IceMaths::Matrix4x4 transform1;
+  transform1.m[0][3] = 0;
+  transform1.m[1][3] = 0;
+  transform1.m[2][3] = 0;
+  transform1.m[3][3] = 1;
   u = m1.Row1 ();
-  col1->transform.m[0][0] = u.x;
-  col1->transform.m[1][0] = u.y;
-  col1->transform.m[2][0] = u.z;
+  transform1.m[0][0] = u.x;
+  transform1.m[1][0] = u.y;
+  transform1.m[2][0] = u.z;
   u = m1.Row2 ();
-  col1->transform.m[0][1] = u.x;
-  col1->transform.m[1][1] = u.y;
-  col1->transform.m[2][1] = u.z;
+  transform1.m[0][1] = u.x;
+  transform1.m[1][1] = u.y;
+  transform1.m[2][1] = u.z;
   u = m1.Row3 ();
-  col1->transform.m[0][2] = u.x;
-  col1->transform.m[1][2] = u.y;
-  col1->transform.m[2][2] = u.z;
+  transform1.m[0][2] = u.x;
+  transform1.m[1][2] = u.y;
+  transform1.m[2][2] = u.z;
 
   if (trans1) u = trans1->GetO2TTranslation ();
   else u.Set (0, 0, 0);
-  col1->transform.m[3][0] = u.x;
-  col1->transform.m[3][1] = u.y;
-  col1->transform.m[3][2] = u.z;
+  transform1.m[3][0] = u.x;
+  transform1.m[3][1] = u.y;
+  transform1.m[3][2] = u.z;
 
 
   if (trans1) m1 = trans2->GetT2O ();
@@ -280,7 +285,7 @@ bool csOPCODECollideSystem::Collide (
   terraformer->transform.m[3][1] = u.y;
   terraformer->transform.m[3][2] = u.z;
 
-  bool isOk = TreeCollider.Collide (ColCache, &col1->transform,
+  bool isOk = TreeCollider.Collide (ColCache, &transform1,
   	&terraformer->transform);
   if (isOk)
   {
@@ -330,7 +335,7 @@ bool csOPCODECollideSystem::Collide (
 
   csOPCODECollider* col1 = (csOPCODECollider*) collider1;
   csOPCODECollider* col2 = (csOPCODECollider*) collider2;
-  if (col1 == col2) return false;
+  //if (col1 == col2) return false;
 
   ColCache.Model0 = col1->m_pCollisionModel;
   ColCache.Model1 = col2->m_pCollisionModel;
@@ -341,45 +346,56 @@ bool csOPCODECollideSystem::Collide (
   if (trans2) m2 = trans2->GetT2O ();
   csVector3 u;
 
+  IceMaths::Matrix4x4 transform1;
+  transform1.m[0][3] = 0;
+  transform1.m[1][3] = 0;
+  transform1.m[2][3] = 0;
+  transform1.m[3][3] = 1;
+  IceMaths::Matrix4x4 transform2;
+  transform2.m[0][3] = 0;
+  transform2.m[1][3] = 0;
+  transform2.m[2][3] = 0;
+  transform2.m[3][3] = 1;
+
   u = m1.Row1 ();
-  col1->transform.m[0][0] = u.x;
-  col1->transform.m[1][0] = u.y;
-  col1->transform.m[2][0] = u.z;
+  transform1.m[0][0] = u.x;
+  transform1.m[1][0] = u.y;
+  transform1.m[2][0] = u.z;
   u = m2.Row1 ();
-  col2->transform.m[0][0] = u.x;
-  col2->transform.m[1][0] = u.y;
-  col2->transform.m[2][0] = u.z;
+  transform2.m[0][0] = u.x;
+  transform2.m[1][0] = u.y;
+  transform2.m[2][0] = u.z;
   u = m1.Row2 ();
-  col1->transform.m[0][1] = u.x;
-  col1->transform.m[1][1] = u.y;
-  col1->transform.m[2][1] = u.z;
+  transform1.m[0][1] = u.x;
+  transform1.m[1][1] = u.y;
+  transform1.m[2][1] = u.z;
   u = m2.Row2 ();
-  col2->transform.m[0][1] = u.x;
-  col2->transform.m[1][1] = u.y;
-  col2->transform.m[2][1] = u.z;
+  transform2.m[0][1] = u.x;
+  transform2.m[1][1] = u.y;
+  transform2.m[2][1] = u.z;
   u = m1.Row3 ();
-  col1->transform.m[0][2] = u.x;
-  col1->transform.m[1][2] = u.y;
-  col1->transform.m[2][2] = u.z;
+  transform1.m[0][2] = u.x;
+  transform1.m[1][2] = u.y;
+  transform1.m[2][2] = u.z;
   u = m2.Row3();
-  col2->transform.m[0][2] = u.x;
-  col2->transform.m[1][2] = u.y;
-  col2->transform.m[2][2] = u.z;
+  transform2.m[0][2] = u.x;
+  transform2.m[1][2] = u.y;
+  transform2.m[2][2] = u.z;
 
   if (trans1) u = trans1->GetO2TTranslation ();
   else u.Set (0, 0, 0);
-  col1->transform.m[3][0] = u.x;
-  col1->transform.m[3][1] = u.y;
-  col1->transform.m[3][2] = u.z;
+  transform1.m[3][0] = u.x;
+  transform1.m[3][1] = u.y;
+  transform1.m[3][2] = u.z;
 
   if (trans2) u = trans2->GetO2TTranslation ();
   else u.Set (0, 0, 0);
-  col2->transform.m[3][0] = u.x;
-  col2->transform.m[3][1] = u.y;
-  col2->transform.m[3][2] = u.z;
+  transform2.m[3][0] = u.x;
+  transform2.m[3][1] = u.y;
+  transform2.m[3][2] = u.z;
 
-  bool isOk = TreeCollider.Collide (ColCache, &col1->transform,
-  	&col2->transform);
+  bool isOk = TreeCollider.Collide (ColCache, &transform1,
+  	&transform2);
   if (isOk)
   {
     bool status = (TreeCollider.GetContactStatus () != FALSE);
@@ -418,24 +434,29 @@ bool csOPCODECollideSystem::CollideRaySegment (
   if (trans) m = trans->GetT2O ();
   csVector3 u;
 
+  IceMaths::Matrix4x4 transform;
+  transform.m[0][3] = 0;
+  transform.m[1][3] = 0;
+  transform.m[2][3] = 0;
+  transform.m[3][3] = 1;
   u = m.Row1 ();
-  col->transform.m[0][0] = u.x;
-  col->transform.m[1][0] = u.y;
-  col->transform.m[2][0] = u.z;
+  transform.m[0][0] = u.x;
+  transform.m[1][0] = u.y;
+  transform.m[2][0] = u.z;
   u = m.Row2 ();
-  col->transform.m[0][1] = u.x;
-  col->transform.m[1][1] = u.y;
-  col->transform.m[2][1] = u.z;
+  transform.m[0][1] = u.x;
+  transform.m[1][1] = u.y;
+  transform.m[2][1] = u.z;
   u = m.Row3 ();
-  col->transform.m[0][2] = u.x;
-  col->transform.m[1][2] = u.y;
-  col->transform.m[2][2] = u.z;
+  transform.m[0][2] = u.x;
+  transform.m[1][2] = u.y;
+  transform.m[2][2] = u.z;
 
   if (trans) u = trans->GetO2TTranslation ();
   else u.Set (0, 0, 0);
-  col->transform.m[3][0] = u.x;
-  col->transform.m[3][1] = u.y;
-  col->transform.m[3][2] = u.z;
+  transform.m[3][0] = u.x;
+  transform.m[3][1] = u.y;
+  transform.m[3][2] = u.z;
 
   Ray ray (Point (start.x, start.y, start.z),
   	   Point (end.x-start.x, end.y-start.y, end.z-start.z));
@@ -454,7 +475,7 @@ bool csOPCODECollideSystem::CollideRaySegment (
     max_dist = csQsqrt (csSquaredDist::PointPoint (start, end));
     RayCol.SetMaxDist (max_dist);
   }
-  bool isOk = RayCol.Collide (ray, *ColCache.Model0, &col->transform);
+  bool isOk = RayCol.Collide (ray, *ColCache.Model0, &transform);
   if (isOk)
   {
     bool status = (RayCol.GetContactStatus () != FALSE);

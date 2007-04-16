@@ -51,10 +51,10 @@ csOPCODECollider::csOPCODECollider (iTriangleMesh* mesh) :
   m_pCollisionModel = 0;
   indexholder = 0;
   vertholder = 0;
-  transform.m[0][3] = 0;
-  transform.m[1][3] = 0;
-  transform.m[2][3] = 0;
-  transform.m[3][3] = 1;
+  //transform.m[0][3] = 0;
+  //transform.m[1][3] = 0;
+  //transform.m[2][3] = 0;
+  //transform.m[3][3] = 1;
 
   opcMeshInt.SetCallback (&MeshCallback, this);
 
@@ -67,10 +67,10 @@ csOPCODECollider::csOPCODECollider (iPolygonMesh* mesh) :
   m_pCollisionModel = 0;
   indexholder = 0;
   vertholder = 0;
-  transform.m[0][3] = 0;
-  transform.m[1][3] = 0;
-  transform.m[2][3] = 0;
-  transform.m[3][3] = 1;
+  //transform.m[0][3] = 0;
+  //transform.m[1][3] = 0;
+  //transform.m[2][3] = 0;
+  //transform.m[3][3] = 1;
 
   opcMeshInt.SetCallback (&MeshCallback, this);
 
