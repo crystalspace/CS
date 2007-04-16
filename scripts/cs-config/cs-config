@@ -10,7 +10,9 @@ OLD_IFS="$IFS"
 IFS=$PATH_SEPARATOR
 for p in $CRYSTAL$PATH_SEPARATOR:$PATH ; do
   if [ -d $p ] ; then
-    find $p -maxdepth 1 -executable -iname "cs-config-*" >> ${TEMP_PREFIX}_find
+    # The -executable predicate would do what we like, but is not available
+    # with older find versions.
+    find $p -maxdepth 1 -perm /500 -iname "cs-config-*" >> ${TEMP_PREFIX}_find
   fi
 done
 IFS="$OLD_IFS"

@@ -45,6 +45,8 @@ chronological order.
 	  area in order to conserve some memory.
 	- res made the ptpdlight combining faster.
 	- res fixed some gcc warnings in ptpdlight.
+	- res changed the cs-config wrapper to not use -executable (which is
+	  apparently not supported by older 'find's) but -perm /500 instead.
 15-Apr-2007
 	- res made lighter2 display some progress after the last changes.
 	- res added a gldrivers.xml tweak from Rolenun to work around garbled
