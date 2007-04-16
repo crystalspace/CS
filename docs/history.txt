@@ -7,7 +7,13 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 16-Apr-2007
-    - Andrew Robberts added a CS_ENTITY_NODECAL flag.
+	- Andrew Robberts added a CS_ENTITY_NODECAL flag.
+	- Jorrit fixed a bug in csObjectModel. It would use Put() instead
+	  of PutUnique() for the hash of triangle data meshes. The
+	  consequence of that was that it was not possible to replace
+	  a triangle mesh once it was set. A further consequence of that
+	  was that it genmeshes with submeshes didn't have working
+	  collision detection.
 15-Apr-2007
 	- res made lighter2 display some progress after the last changes.
 	- res added a gldrivers.xml tweak from Rolenun to work around garbled

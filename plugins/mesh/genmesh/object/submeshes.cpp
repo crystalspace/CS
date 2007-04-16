@@ -243,7 +243,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
   {
     if (!factory) return 0;
     CacheTriangles ();
-    return (int)triangleCache.GetSize ();
+    return triangleCache.GetSize ();
   }
   csTriangle* SubMeshesTriMesh::GetTriangles ()
   {

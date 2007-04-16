@@ -26,7 +26,7 @@ iTriangleMesh* csObjectModel::GetTriangleData (csStringID id)
 
 void csObjectModel::SetTriangleData (csStringID id, iTriangleMesh* tridata)
 {
-  trimesh.Put (id, tridata);
+  trimesh.PutUnique (id, tridata);
 }
 
 bool csObjectModel::IsTriangleDataSet (csStringID id)
