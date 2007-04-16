@@ -206,6 +206,9 @@ void csDecalManager::FillDecal(csDecal * decal,
   while (meshIter->HasNext())
   {
     iMeshWrapper* mesh = meshIter->Next();
+    if (mesh->GetFlags().Check(CS_ENTITY_NODECAL))
+      continue;
+
     csVector3 relPos = 
         mesh->GetMovable()->GetFullTransform().Other2This(pos);
 

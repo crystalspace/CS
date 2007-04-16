@@ -129,6 +129,11 @@ class csReversibleTransform;
  */
 #define CS_ENTITY_NOCLIP 128
 
+/**
+ * If CS_ENTITY_NODECAL is set then this entity will not accept decals.
+ */
+#define CS_ENTITY_NODECAL 256
+
 /** @} */
 
 /** \name SetLightingUpdate flags

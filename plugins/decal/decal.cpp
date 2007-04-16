@@ -140,7 +140,7 @@ void csDecal::BeginMesh(iMeshWrapper * mesh)
   numClipPlanes = 4;
 
   // top
-  if (false && decalTemplate->HasTopClipping())
+  if (decalTemplate->HasTopClipping())
   {
     topPlaneDist = decalTemplate->GetTopClippingScale() * radius;
     clipPlanes[numClipPlanes++] = csPlane3(-localNormal,
