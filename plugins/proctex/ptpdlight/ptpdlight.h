@@ -60,22 +60,29 @@ class ProctexPDLight :
 public:
   struct Lumel
   {
-    uint8 blue, green, red, alpha;
+    union
+    {
+      struct
+      {
+        uint8 blue, green, red, alpha;
+      } c;
+      uint32 ui;
+    };
 
     void UnsafeAdd (int R, int G, int B)
     {
-      red   = (unsigned char)(red   + R);
-      green = (unsigned char)(green + G);
-      blue  = (unsigned char)(blue  + B);
+      c.red   = (unsigned char)(c.red   + R);
+      c.green = (unsigned char)(c.green + G);
+      c.blue  = (unsigned char)(c.blue  + B);
     }
     void SafeAdd (int R, int G, int B)
     {
-      int color = red + R;
-      red   = (unsigned char)(color > 255 ? 255 : color);
-      color = green + G;
-      green = (unsigned char)(color > 255 ? 255 : color);
-      color = blue + B;
-      blue  = (unsigned char)(color > 255 ? 255 : color);
+      int color = c.red + R;
+      c.red   = (unsigned char)(color > 255 ? 255 : color);
+      color = c.green + G;
+      c.green = (unsigned char)(color > 255 ? 255 : color);
+      color = c.blue + B;
+      c.blue  = (unsigned char)(color > 255 ? 255 : color);
     }
   };
   struct LumelBuffer : public csRefCount

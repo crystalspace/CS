@@ -43,6 +43,7 @@ chronological order.
 	  causes every collider to be 4x4 floats shorter.
 	- res made ptpdlight internally crop the PD light masks to the used
 	  area in order to conserve some memory.
+	- res made the ptpdlight combining faster.
 15-Apr-2007
 	- res made lighter2 display some progress after the last changes.
 	- res added a gldrivers.xml tweak from Rolenun to work around garbled

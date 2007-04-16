@@ -92,14 +92,14 @@ void ProctexPDLight::PDMap::ComputeValueBounds (const csRect& area,
     {
       const Lumel& p = *map++;
 
-      if (p.red > maxValue.red)
-        maxValue.red = p.red;
-      if (p.green > maxValue.green)
-        maxValue.green = p.green;
-      if (p.blue > maxValue.blue)
-        maxValue.blue = p.blue;
+      if (p.c.red > maxValue.red)
+        maxValue.red = p.c.red;
+      if (p.c.green > maxValue.green)
+        maxValue.green = p.c.green;
+      if (p.c.blue > maxValue.blue)
+        maxValue.blue = p.c.blue;
 
-      if (p.red + p.green + p.blue > 0)
+      if (p.c.red + p.c.green + p.c.blue > 0)
       {
         nonNullArea.Extend (x, y);
       }
@@ -169,10 +169,10 @@ void ProctexPDLight::PDMap::SetImage (const TileHelper& tiles, iImage* img)
   Lumel* dst = imageData->GetData();
   while (numPixels-- > 0)
   {
-    dst->red = src->red;
-    dst->green = src->green;
-    dst->blue = src->blue;
-    dst->alpha = 0;
+    dst->c.red = src->red;
+    dst->c.green = src->green;
+    dst->c.blue = src->blue;
+    dst->c.alpha = 0;
     dst++;
     src++;
   }
@@ -309,6 +309,104 @@ bool ProctexPDLight::PrepareAnim ()
   return true;
 }
 
+#if defined(CS_LITTLE_ENDIAN)
+static const int shiftR = 16;
+static const int shiftG =  8;
+static const int shiftB =  0;
+#else
+static const int shiftR =  8;
+static const int shiftG = 16;
+static const int shiftB = 24;
+#endif
+
+template<int shift>
+static void ComputeLUT (csFixed16 v, uint32* lut)
+{
+  for (int x = 0; x < 256; x++)
+  {
+    *lut++ = csMin (int (v * x), 255) << shift;
+  }
+}
+
+enum
+{
+  safeR = 1,
+  safeG = 2,
+  safeB = 4,
+
+  safeAll = safeR | safeG | safeB
+};
+
+template<int safeMask>
+static void MultiplyAddLumels (ProctexPDLight::Lumel* dst, size_t dstPitch,
+                               const ProctexPDLight::Lumel* map, size_t mapPitch,
+                               int columns, int rows,
+                               const uint32* lutR, 
+                               const uint32* lutG, 
+                               const uint32* lutB)
+{
+  for (int y = 0; y < rows; y++)
+  {
+    for (int x = 0; x < columns; x++)
+    {
+      const ProctexPDLight::Lumel mapVal = *map++;
+      uint32 dstVal = dst->ui;
+      if (safeMask & safeR)
+      {
+        // Possible overflow may occur
+        uint32 r = dstVal & (0xff << shiftR);
+        r += lutR[mapVal.c.red];
+        if (r > (0xff << shiftR)) r = (0xff << shiftR);
+        dstVal &= ~(0xff << shiftR);
+        dstVal |= r;
+      }
+      else
+        // Overflow can't occur
+        dstVal += lutR[mapVal.c.red];
+
+      if (safeMask & safeG)
+      {
+        uint32 g = dstVal & (0xff << shiftG);
+        g += lutG[mapVal.c.green];
+        if (g > (0xff << shiftR)) g = (0xff << shiftG);
+        dstVal &= ~(0xff << shiftG);
+        dstVal |= g;
+      }
+      else
+        dstVal += lutG[mapVal.c.green];
+
+      if (safeMask & safeB)
+      {
+        uint32 b = dstVal & (0xff << shiftB);
+        b += lutB[mapVal.c.blue];
+        if (b > (0xff << shiftB)) b = (0xff << shiftB);
+        dstVal &= ~(0xff << shiftB);
+        dstVal |= b;
+      }
+      else
+        dstVal += lutB[mapVal.c.blue];
+
+      (dst++)->ui = dstVal;
+    }
+    dst += dstPitch;
+    map += mapPitch;
+  }
+}
+
+typedef void (*MultiplyAddProc) (ProctexPDLight::Lumel* dst, size_t dstPitch,
+                                 const ProctexPDLight::Lumel* map, size_t mapPitch,
+                                 int columns, int rows,
+                                 const uint32* lutR, 
+                                 const uint32* lutG, 
+                                 const uint32* lutB);
+
+static const MultiplyAddProc maProcs[8] = {
+  MultiplyAddLumels<0>, MultiplyAddLumels<1>, 
+  MultiplyAddLumels<2>, MultiplyAddLumels<3>, 
+  MultiplyAddLumels<4>, MultiplyAddLumels<5>, 
+  MultiplyAddLumels<6>, MultiplyAddLumels<7>
+};
+
 void ProctexPDLight::Animate (csTicks /*current_time*/)
 {
   if (state.Check (stateDirty))
@@ -362,13 +460,16 @@ void ProctexPDLight::Animate (csTicks /*current_time*/)
           }
           else
           {
+            Lumel baseLumel;
+            baseLumel.c.red   = baseColor.red;
+            baseLumel.c.green = baseColor.green;
+            baseLumel.c.blue  = baseColor.blue;
+            baseLumel.c.alpha = 0;
             for (int y = 0; y < lines; y++)
             {
               for (int x = 0; x < scratchW; x++)
               {
-                scratchPtr->red = baseColor.red;
-                scratchPtr->green = baseColor.green;
-                scratchPtr->blue = baseColor.blue;
+                scratchPtr->ui = baseLumel.ui;
                 scratchPtr++;
               }
             }
@@ -382,10 +483,13 @@ void ProctexPDLight::Animate (csTicks /*current_time*/)
           if (!light.map.tileNonNull.IsBitSet (t)) continue;
 
           const csRect& lightInTile (light.map.nonNullAreas[t]);
+          uint32 lutR[256];
+          uint32 lutG[256];
+          uint32 lutB[256];
 
-          csFixed16 lightR = light.light->GetColor ().red;
-          csFixed16 lightG = light.light->GetColor ().green;
-          csFixed16 lightB = light.light->GetColor ().blue;
+          ComputeLUT<shiftR> (light.light->GetColor ().red,   lutR);
+          ComputeLUT<shiftG> (light.light->GetColor ().green, lutG);
+          ComputeLUT<shiftB> (light.light->GetColor ().blue,  lutB);
 
           int mapW = csMin (lightInTile.xmax, light.map.imageX + light.map.imageW)
             - csMax (lightInTile.xmin, light.map.imageX);
@@ -402,48 +506,21 @@ void ProctexPDLight::Animate (csTicks /*current_time*/)
           int scratchPitch = scratchW - mapW;
 
           csRGBcolor mapMax = light.map.maxValues[t];
-          mapMax.red = int (lightR * int (mapMax.red));
-          mapMax.green = int (lightG * int (mapMax.green));
-          mapMax.blue = int (lightB * int (mapMax.blue));
-          if ((scratchMax.red + mapMax.red <= 255)
-            && (scratchMax.green + mapMax.green <= 255)
-            && (scratchMax.blue + mapMax.blue <= 255))
-          {
-            // Safe to add values w/o overflow check
-            for (int y = 0; y < lines; y++)
-            {
-              for (int x = 0; x < mapW; x++)
-              {
-                scratchPtr->UnsafeAdd (
-                  int (lightR * int (mapPtr->red)),
-                  int (lightG * int (mapPtr->green)),
-                  int (lightB * int (mapPtr->blue)));
-                scratchPtr++;
-                mapPtr++;
-              }
-              scratchPtr += scratchPitch;
-              mapPtr += mapPitch;
-            }
-          }
+          mapMax.red   = lutR[mapMax.red]   >> shiftR;
+          mapMax.green = lutG[mapMax.green] >> shiftG;
+          mapMax.blue  = lutB[mapMax.blue]  >> shiftB;
+          int safeMask = 0;
+          if (scratchMax.red   + mapMax.red   > 255) safeMask |= safeR;
+          if (scratchMax.green + mapMax.green > 255) safeMask |= safeG;
+          if (scratchMax.blue  + mapMax.blue  > 255) safeMask |= safeB;
+          MultiplyAddProc maProc = maProcs[safeMask];
+          maProc (scratchPtr, scratchPitch, mapPtr, mapPitch,
+            mapW, lines, lutR, lutG, lutB);
+
+          if (safeMask == 0)
+            scratchMax.UnsafeAdd (mapMax);
           else
-          {
-            // Need overflow check for each pixel
-            for (int y = 0; y < lines; y++)
-            {
-              for (int x = 0; x < mapW; x++)
-              {
-                scratchPtr->SafeAdd (
-                  int (lightR * int (mapPtr->red)),
-                  int (lightG * int (mapPtr->green)),
-                  int (lightB * int (mapPtr->blue)));
-                scratchPtr++;
-                mapPtr++;
-              }
-              scratchPtr += scratchPitch;
-              mapPtr += mapPitch;
-            }
-          }
-          scratchMax.SafeAdd (mapMax);
+            scratchMax.SafeAdd (mapMax);
         }
 
         tex->GetTextureHandle ()->Blit (tileRect.xmin, 
