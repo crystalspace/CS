@@ -5,14 +5,14 @@ This section documents how to convert the various particle systems
 to the new particle system in Crystal Space.
 
 @menu
-* Api100 PartConv Explo:: Explosion
-* Api100 PartConv Rain:: Rain
-* Api100 PartConv Snow:: Snow
-* Api100 PartConv Fire:: Fire
-* Api100 PartConv Fountain:: Fountain
+* Api1_0 PartConv Explo:: Explosion
+* Api1_0 PartConv Rain:: Rain
+* Api1_0 PartConv Snow:: Snow
+* Api1_0 PartConv Fire:: Fire
+* Api1_0 PartConv Fountain:: Fountain
 @end menu
 
-@node Api100 PartConv Explo, Api100 PartConv Rain, Api1_0 Particle system changes, Api1_0 Particle system changes
+@node Api1_0 PartConv Explo, Api1_0 PartConv Rain, Api1_0 Particle system changes, Api1_0 Particle system changes
 @subsubsection Explosion
 
 To convert the old explosion particle system to new particles you
@@ -87,7 +87,7 @@ to emulate the ugly old explosion particle system from the past:
   Sys->Engine->DelayedRemoveObject (1101, mfw);
 @end example
 
-@node Api100 PartConv Rain, Api100 PartConv Snow, Api100 PartConv Explo, Api1_0 Particle system changes
+@node Api1_0 PartConv Rain, Api1_0 PartConv Snow, Api1_0 PartConv Explo, Api1_0 Particle system changes
 @subsubsection Rain
 
 To convert the old rain particle system to new particles you
@@ -184,7 +184,7 @@ Here is how this could work in code:
   partstate->AddEffector (lincol);
 @end example
 
-@node Api100 PartConv Snow, Api100 PartConv Fire, Api100 PartConv Rain, Api1_0 Particle system changes
+@node Api1_0 PartConv Snow, Api1_0 PartConv Fire, Api1_0 PartConv Rain, Api1_0 Particle system changes
 @subsubsection Snow
 
 To convert the old snow particle system to new particles you
@@ -289,7 +289,7 @@ Here is how this could work in code:
   partstate->AddEffector (force);
 @end example
 
-@node Api100 PartConv Fire, Api100 PartConv Fountain, Api100 PartConv Snow, Api1_0 Particle system changes
+@node Api1_0 PartConv Fire, Api1_0 PartConv Fountain, Api1_0 PartConv Snow, Api1_0 Particle system changes
 @subsubsection Fire
 
 To convert the old fire particle system to new particles you
@@ -410,7 +410,7 @@ Here is how this could work in code:
   partstate->AddEffector (force);
 @end example
 
-@node Api100 PartConv Fountain, , Api100 PartConv Fire, Api1_0 Particle system changes
+@node Api1_0 PartConv Fountain, , Api1_0 PartConv Fire, Api1_0 Particle system changes
 @subsubsection Fountain
 
 To convert the old fountain particle system to new particles you
