@@ -6904,6 +6904,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetAnimationControl = *cspacec::iGeneralMeshState_SetAnimationControl;
 *GetAnimationControl = *cspacec::iGeneralMeshState_GetAnimationControl;
 *FindSubMesh = *cspacec::iGeneralMeshState_FindSubMesh;
+*AddSubMesh = *cspacec::iGeneralMeshState_AddSubMesh;
 *scfGetVersion = *cspacec::iGeneralMeshState_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

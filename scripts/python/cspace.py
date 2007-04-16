@@ -4653,6 +4653,7 @@ class iGeneralMeshState(iGeneralMeshCommonState):
     def SetAnimationControl(*args): return _cspace.iGeneralMeshState_SetAnimationControl(*args)
     def GetAnimationControl(*args): return _cspace.iGeneralMeshState_GetAnimationControl(*args)
     def FindSubMesh(*args): return _cspace.iGeneralMeshState_FindSubMesh(*args)
+    def AddSubMesh(*args): return _cspace.iGeneralMeshState_AddSubMesh(*args)
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iGeneralMeshState_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iGeneralMeshState_scfGetVersion)
     __swig_destroy__ = _cspace.delete_iGeneralMeshState
