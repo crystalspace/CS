@@ -266,6 +266,10 @@ private:
   //here are all colliders
   csRefArray<csODECollider> colliders;
 
+  // For getting collision mesh data.
+  csStringID base_id;
+  csStringID colldet_id;
+
   bool rateenabled;
   float steptime, limittime;
   float total_elapsed;
@@ -280,6 +284,8 @@ private:
   bool correctInertiaWorkAround;
 
 public:
+  csStringID GetBaseID () const { return base_id; }
+  csStringID GetColldetID () const { return colldet_id; }
 
   void SetERP (float erp) { dWorldSetERP (worldID, erp); }
   float ERP () { return dWorldGetERP (worldID); }
@@ -322,7 +328,7 @@ public:
   bool IsOldInertiaEnabled () const
   { return correctInertiaWorkAround; }
 
-  csODEDynamicSystem (float erp, float cfm);
+  csODEDynamicSystem (iObjectRegistry* object_reg, float erp, float cfm);
   virtual ~csODEDynamicSystem ();
 
   dWorldID GetWorldID() { return worldID; }
@@ -426,6 +432,7 @@ public:
 class csODECollider : public scfImplementation1<csODECollider,
                                                 iDynamicsSystemCollider>
 {
+  csODEDynamicSystem* dynsys;
   csColliderGeometryType geom_type;
   dGeomID geomID;
   dGeomID transformID;
@@ -437,7 +444,7 @@ class csODECollider : public scfImplementation1<csODECollider,
   bool is_static;
 
 public:
-  csODECollider (ColliderContainer* container);
+  csODECollider (csODEDynamicSystem* dynsys, ColliderContainer* container);
   virtual ~csODECollider (); 
   
   bool CreateSphereGeometry (const csSphere& sphere);

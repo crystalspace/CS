@@ -24,6 +24,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/plane3.h"
 #include "csgeom/sphere.h"
 #include "csgeom/pmtools.h"
+#include "csgeom/trimeshtools.h"
+#include "csgeom/trimesh.h"
 #include "cstool/collider.h"
 #include "csutil/event.h"
 #include "csutil/eventnames.h"
@@ -66,7 +68,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(odedynam)
 
 SCF_IMPLEMENT_FACTORY (csODEDynamics)
 
-static void DestroyGeoms( csGeomList & geoms );
+//static void DestroyGeoms( csGeomList & geoms );
 
 int csODEDynamics::geomclassnum = 0;
 dJointGroupID csODEDynamics::contactjoints = dJointGroupCreate (0);
@@ -127,7 +129,7 @@ bool csODEDynamics::Initialize (iObjectRegistry* object_reg)
 csPtr<iDynamicSystem> csODEDynamics::CreateSystem ()
 {
   csRef<csODEDynamicSystem> system;
-  system.AttachNew (new csODEDynamicSystem (erp, cfm));
+  system.AttachNew (new csODEDynamicSystem (object_reg, erp, cfm));
   systems.Push (system);
   if(stepfast) system->EnableStepFast(true);
   else if(quickstep) system->EnableQuickStep(true);
@@ -447,8 +449,8 @@ bool csODEDynamics::HandleEvent (iEvent& Event)
 
 //---------------------------------------------------------------------------
 
-csODEDynamicSystem::csODEDynamicSystem (float erp, float cfm) :
-  scfImplementationType (this)
+csODEDynamicSystem::csODEDynamicSystem (iObjectRegistry* object_reg,
+    float erp, float cfm) : scfImplementationType (this)
 {
   //TODO: QUERY for collidesys
 
@@ -472,6 +474,11 @@ csODEDynamicSystem::csODEDynamicSystem (float erp, float cfm) :
   autodisable = true;
   correctInertiaWorkAround = false; 
   dWorldSetAutoDisableFlag (worldID, autodisable);
+
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+      object_reg, "crystalspace.shared.stringset");
+  base_id = strings->Request ("base");
+  colldet_id = strings->Request ("colldet");
 }
 
 csODEDynamicSystem::~csODEDynamicSystem ()
@@ -677,7 +684,7 @@ bool csODEDynamicSystem::AttachColliderMesh (iMeshWrapper* mesh,
 					     float friction, float elasticity,
 					     float softness)
 {
-  csODECollider *odec = new csODECollider (this);
+  csODECollider *odec = new csODECollider (this, this);
   odec->SetElasticity (elasticity);
   odec->SetFriction (friction);
   odec->SetSoftness (softness);
@@ -695,7 +702,7 @@ bool csODEDynamicSystem::AttachColliderCylinder (float length, float radius,
 						 float elasticity,
 						 float softness)
 {
-  csODECollider *odec = new csODECollider (this);
+  csODECollider *odec = new csODECollider (this, this);
   odec->SetElasticity (elasticity);
   odec->SetFriction (friction);
   odec->SetSoftness (softness);
@@ -710,7 +717,7 @@ bool csODEDynamicSystem::AttachColliderCylinder (float length, float radius,
 bool csODEDynamicSystem::AttachColliderBox (const csVector3 &size,
                                             const csOrthoTransform& trans, float friction, float elasticity, float softness)
 {
-  csODECollider *odec = new csODECollider (this);
+  csODECollider *odec = new csODECollider (this, this);
   //odec->SetElasticity (elasticity);
   //odec->SetFriction (friction);
   //odec->SetSoftness (softness);
@@ -729,7 +736,7 @@ bool csODEDynamicSystem::AttachColliderSphere (float radius,
 {
   if (radius > 0) //otherwise ODE will treat radius as a 'bad argument'
   {
-    csODECollider *odec = new csODECollider (this);
+    csODECollider *odec = new csODECollider (this, this);
     odec->SetElasticity (elasticity);
     odec->SetFriction (friction);
     odec->SetSoftness (softness);
@@ -743,7 +750,7 @@ bool csODEDynamicSystem::AttachColliderSphere (float radius,
 bool csODEDynamicSystem::AttachColliderPlane (const csPlane3 &plane,
                                               float friction, float elasticity, float softness)
 {
-  csODECollider *odec = new csODECollider (this);
+  csODECollider *odec = new csODECollider (this, this);
   odec->SetElasticity (elasticity);
   odec->SetFriction (friction);
   odec->SetSoftness (softness);
@@ -763,7 +770,7 @@ csRef<iDynamicsSystemCollider> csODEDynamicSystem::GetCollider (
 }
 csRef<iDynamicsSystemCollider> csODEDynamicSystem::CreateCollider ()
 {
-  csODECollider *odec = new csODECollider (this);
+  csODECollider *odec = new csODECollider (this, this);
   odec->AddToSpace (spaceID);
   csRef<csODECollider> c = (csPtr<csODECollider>) odec;
   colliders.Push (c);  
@@ -843,7 +850,9 @@ bool csODEBodyGroup::BodyInGroup (iRigidBody *body)
 
 //--------------------------csODECollider-------------------------------------
 
-csODECollider::csODECollider (ColliderContainer* container) : scfImplementationType (this)
+csODECollider::csODECollider (csODEDynamicSystem* dynsys,
+  ColliderContainer* container) : scfImplementationType (this),
+  dynsys (dynsys)
 {
   surfacedata[0] = 0;
   surfacedata[1] = 0;
@@ -991,6 +1000,7 @@ void csODECollider::AddMassToBody (bool doSet)
     dBodySetMass (bodyID, &m);
   }
 }
+
 void csODECollider::AttachBody (dBodyID bodyID)
 {
   if (geom_type != PLANE_COLLIDER_GEOMETRY)
@@ -1002,11 +1012,13 @@ void csODECollider::AttachBody (dBodyID bodyID)
     }
   }
 }
+
 void csODECollider::SetDensity (float density)
 {
   csODECollider::density = density;
   MassUpdate ();
 }
+
 bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
 {
   dBodyID b = dGeomGetBody (transformID);
@@ -1016,45 +1028,58 @@ bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
 
   // From Eroroman & Marc Rochel with modifications by Mike Handverger and Piotr Obrzut
 
-  iPolygonMesh* p = mesh->GetMeshObject()->GetObjectModel()
-  	->GetPolygonMeshColldet();
+  iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
 
-  if (!p || p->GetVertexCount () == 0 || p->GetTriangleCount () == 0)
+  csRef<iTriangleMesh> trimesh;
+  bool use_trimesh = objmodel->IsTriangleDataSet (dynsys->GetBaseID ());
+  if (use_trimesh)
+  {
+    if (objmodel->IsTriangleDataSet (dynsys->GetColldetID ()))
+      trimesh = objmodel->GetTriangleData (dynsys->GetColldetID ());
+    else
+      trimesh = objmodel->GetTriangleData (dynsys->GetBaseID ());
+  }
+  else
+  {
+    trimesh.AttachNew (new csTriangleMeshPolyMesh (
+	  objmodel->GetPolygonMeshColldet ()));
+  }
+
+  if (!trimesh || trimesh->GetVertexCount () == 0
+      || trimesh->GetTriangleCount () == 0)
   {
     csFPrintf(stderr, "csODECollider: No collision polygons, triangles or vertices on %s\n",mesh->QueryObject()->GetName());
     return false;
   }
 
-  csTriangle *c_triangle = p->GetTriangles();
-  int tr_num = p->GetTriangleCount();
+  csTriangle *c_triangle = trimesh->GetTriangles();
+  size_t tr_num = trimesh->GetTriangleCount();
   // Slight problem here is that we need to keep vertices and indices around
   // since ODE only uses the pointers. I am not sure if ODE cleans them up
-  // on exit or not. If not, we need some way to keep track of all mesh colliders
-  // and clean them up on destruct.
-  float *vertices = new float[p->GetVertexCount()*3];
+  // on exit or not. If not, we need some way to keep track of all mesh
+  // colliders and clean them up on destruct.
+  float *vertices = new float[trimesh->GetVertexCount()*3];
   int *indeces = new int[tr_num*3];
-  csVector3 *c_vertex = p->GetVertices();
+  csVector3 *c_vertex = trimesh->GetVertices();
   //csFPrintf(stderr, "vertex count: %d\n", p->GetVertexCount());
   //csFPrintf(stderr, "triangles count: %d\n", tr_num);
-  int i=0, j=0;
-  for (i=0, j=0; i < p->GetVertexCount(); i++)
+  size_t i, j;
+  for (i=0, j=0; i < trimesh->GetVertexCount(); i++)
   {
     vertices[j++] = c_vertex[i].x;
     vertices[j++] = c_vertex[i].y;
     vertices[j++] = c_vertex[i].z;
-    //csFPrintf(stderr, "vertex %d coords -> x=%.1f, y=%.1f, z=%.1f\n", i,c_vertex[i].x, c_vertex[i].y, c_vertex[i].z);
   }
   for (i=0, j=0; i < tr_num; i++)
   {
     indeces[j++] = c_triangle[i].a;
     indeces[j++] = c_triangle[i].b;
     indeces[j++] = c_triangle[i].c;
-    //csFPrintf(stderr, "triangle %d -> a=%d, b=%d, c=%d\n", i,c_triangle[i].a, c_triangle[i].b, c_triangle[i].c);
   }
   dTriMeshDataID TriData = dGeomTriMeshDataCreate();
 
   dGeomTriMeshDataBuildSingle(TriData, vertices, 3*sizeof(float),
-    p->GetVertexCount(), indeces, 3*tr_num, 3*sizeof(int));
+    trimesh->GetVertexCount(), indeces, 3*tr_num, 3*sizeof(int));
 
   geomID = dCreateTriMesh(0, TriData, 0, 0, 0);
 
@@ -1068,7 +1093,9 @@ bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
     AddTransformToSpace (spaceID);
     dGeomSetBody (transformID, b);
     MassUpdate ();
-  } else if (spaceID) AddToSpace (spaceID);
+  }
+  else if (spaceID)
+    AddToSpace (spaceID);
 
   return true;
 }
@@ -1372,6 +1399,7 @@ csODERigidBody::~csODERigidBody ()
 }
 
 
+#if 0
 static void DestroyGeoms( csGeomList & geoms )
 {
   dGeomID tempID;
@@ -1396,6 +1424,7 @@ static void DestroyGeoms( csGeomList & geoms )
     dGeomDestroy (geoms[i]);
   }
 }
+#endif
 
 
 bool csODERigidBody::MakeStatic ()
@@ -1452,7 +1481,7 @@ bool csODERigidBody::AttachColliderMesh (iMeshWrapper *mesh,
 					 float friction, float density,
                                          float elasticity, float softness)
 {
-  csODECollider *odec = new csODECollider (this);
+  csODECollider *odec = new csODECollider (dynsys, this);
   odec->SetElasticity (elasticity);
   odec->SetFriction (friction);
   odec->SetSoftness (softness);
@@ -1472,7 +1501,7 @@ bool csODERigidBody::AttachColliderCylinder (float length, float radius,
 					     float friction, float density,
                                              float elasticity, float softness)
 {
-  csODECollider *odec = new csODECollider (this);
+  csODECollider *odec = new csODECollider (dynsys, this);
   odec->SetElasticity (elasticity);
   odec->SetFriction (friction);
   odec->SetSoftness (softness);
@@ -1492,7 +1521,7 @@ bool csODERigidBody::AttachColliderBox (const csVector3 &size,
 					float friction, float density,
                                         float elasticity, float softness)
 {
-  csODECollider *odec = new csODECollider (this);
+  csODECollider *odec = new csODECollider (dynsys, this);
   odec->SetElasticity (elasticity);
   odec->SetFriction (friction);
   odec->SetSoftness (softness);
@@ -1514,7 +1543,7 @@ bool csODERigidBody::AttachColliderSphere (float radius,
 {
   if (radius > 0) //otherwise ODE will treat radius as a 'bad argument'
   {
-    csODECollider *odec = new csODECollider (this);
+    csODECollider *odec = new csODECollider (dynsys, this);
     odec->SetElasticity (elasticity);
     odec->SetFriction (friction);
     odec->SetSoftness (softness);
@@ -1534,7 +1563,7 @@ bool csODERigidBody::AttachColliderPlane (const csPlane3& plane,
                                           float friction, float density,
 					  float elasticity, float softness)
 {
-  csODECollider *odec = new csODECollider (this);
+  csODECollider *odec = new csODECollider (dynsys, this);
   odec->SetElasticity (elasticity);
   odec->SetFriction (friction);
   odec->SetSoftness (softness);

@@ -55,7 +55,7 @@
 #define Z_PASS 0
 #define Z_FAIL 1
 
-#include "polymesh.h"
+#include "trimesh.h"
 #include "stencil2.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -84,6 +84,7 @@ csStencil2ShadowCacheEntry::csStencil2ShadowCacheEntry (
 
   csRef<iObjectModel> model = mesh->GetMeshObject ()->GetObjectModel ();
   model->AddListener (this);
+  use_trimesh = model->IsTriangleDataSet (parent->GetBaseID ());
   ObjectModelChanged (model);
 }
 
@@ -119,38 +120,44 @@ void csStencil2ShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
 
   meshShadows = false;
 
-  csRef<iPolygonMesh> mesh = model->GetPolygonMeshShadows ();
-  if (mesh && mesh->GetPolygonCount () > 0)
+  // Try to get a MeshShadow polygonmesh
+  csRef<iTriangleMesh> trimesh;
+  if (use_trimesh)
   {
-    if (closedMesh == 0)
-      closedMesh = new csStencil2PolygonMesh ();
-    closedMesh->CopyFrom (mesh);
-
-    /* This is really hard method to close object ... must use better one
-
-    const csFlags& meshFlags = mesh->GetFlags ();
-    if (meshFlags.Check (CS_POLYMESH_NOTCLOSED) || (!meshFlags.Check (CS_POLYMESH_CLOSED) && 
-    !csPolygonMeshTools::IsMeshClosed (mesh)))
+    if (model->IsTriangleDataSet (parent->GetShadowsID ()))
+      trimesh = model->GetTriangleData (parent->GetShadowsID ());
+    else
+      trimesh = model->GetTriangleData (parent->GetBaseID ());
+    if (trimesh && trimesh->GetTriangleCount () <= 0)
     {
-    csArray<csMeshedPolygon> newPolys;
-    int* vertidx;
-    int vertidx_len;
-    csPolygonMeshTools::CloseMesh (mesh, newPolys, vertidx, vertidx_len);
-    closedMesh->AddPolys (newPolys, vertidx);
-    }
-    */
-
-    if (!CalculateEdges())
-    {
-      if (closedMesh)
-      {
-        delete closedMesh;
-        closedMesh = 0;
-      }
-      return;
+      trimesh = 0;
     }
   }
   else
+  {
+    iPolygonMesh* mesh = model->GetPolygonMeshShadows ();
+    if (mesh)
+      trimesh.AttachNew (new csTriangleMeshPolyMesh (mesh));
+  }
+
+  if (!trimesh) return;	// No shadow casting for this object.
+
+  if (closedMesh == 0)
+    closedMesh = new csStencil2TriangleMesh ();
+  closedMesh->CopyFrom (trimesh);
+
+  /* This is really hard method to close object ... must use better one
+  const csFlags& meshFlags = trimesh->GetFlags ();
+  if (meshFlags.Check (CS_TRIMESH_NOTCLOSED) || (!meshFlags.Check (CS_TRIMESH_CLOSED) && 
+    !csTriangleMeshTools::IsMeshClosed (trimesh)))
+  {
+    csArray<csTriangle> newTris;
+    csTriangleMeshTools::CloseMesh (trimesh, newTris);
+    closedMesh->AddTris (newTris);
+  }
+  */
+
+  if (!CalculateEdges())
   {
     if (closedMesh)
     {
@@ -433,6 +440,8 @@ bool csStencil2ShadowStep::Initialize (iObjectRegistry* objreg)
 
   csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet>
     (object_reg, "crystalspace.shared.stringset");
+  base_id = strings->Request ("base");
+  shadows_id = strings->Request ("shadows");
 
   return true;
 }

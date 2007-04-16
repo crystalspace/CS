@@ -14,6 +14,13 @@ chronological order.
 	  a triangle mesh once it was set. A further consequence of that
 	  was that it genmeshes with submeshes didn't have working
 	  collision detection.
+	- Jorrit added a new csTriangleMeshPolyMesh class. This class is
+	  immediatelly deprecated as it shouldn't be used outside CS.
+	  Its purpose is to make the transition from iPolygonMesh
+	  to iTriangleMesh easier.
+	- Jorrit changed the stencil and stencil2 plugins to support new
+	  iTriangleMesh.
+	- Jorrit changed the odedynam plugin to use the new iTriangleMesh.
 15-Apr-2007
 	- res made lighter2 display some progress after the last changes.
 	- res added a gldrivers.xml tweak from Rolenun to work around garbled

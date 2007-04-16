@@ -26,6 +26,7 @@
 #include "csgeom/vector3.h"
 #include "csgeom/box.h"
 #include "igeom/trimesh.h"
+#include "igeom/polymesh.h"
 
 #include "csutil/array.h"
 #include "csutil/flags.h"
@@ -266,6 +267,58 @@ public:
   virtual void Unlock () { }
   virtual csFlags& GetFlags () { return flags; }
   virtual uint32 GetChangeNumber () const { return change_nr; }
+};
+
+
+/**
+ * This triangle mesh is a temporary class that takes a polygon mesh
+ * and wraps it so that it becomes a triangle mesh. You should not have
+ * to use this mesh in production code!
+ * \deprecated This class should not be used!
+ */
+class CS_DEPRECATED_TYPE_MSG("Don't use this class")
+  CS_CRYSTALSPACE_EXPORT csTriangleMeshPolyMesh
+  : public virtual scfImplementation1<csTriangleMeshPolyMesh,iTriangleMesh>
+{
+private:
+  iPolygonMesh* polymesh;
+
+public:
+  csTriangleMeshPolyMesh (iPolygonMesh* polymesh)
+    : scfImplementationType(this), polymesh (polymesh)
+  {
+  }
+
+  virtual ~csTriangleMeshPolyMesh ()
+  {
+  }
+
+  virtual size_t GetVertexCount ()
+  {
+    return (size_t)polymesh->GetVertexCount ();
+  }
+  virtual csVector3* GetVertices ()
+  {
+    return polymesh->GetVertices ();
+  }
+  virtual size_t GetTriangleCount ()
+  {
+    return (size_t)polymesh->GetTriangleCount ();
+  }
+  virtual csTriangle* GetTriangles () { return polymesh->GetTriangles (); }
+  virtual void Lock () { polymesh->Lock (); }
+  virtual void Unlock () { polymesh->Unlock (); }
+  virtual csFlags& GetFlags ()
+  {
+    // This works because CS_POLYMESH flags are compatible with
+    // CS_TRIMESH flags. Since this is a temporary class that goes
+    // away once iPolygonMesh goes away this is not a problem.
+    return polymesh->GetFlags ();
+  }
+  virtual uint32 GetChangeNumber () const
+  {
+    return polymesh->GetChangeNumber ();
+  }
 };
 
 
