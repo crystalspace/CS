@@ -300,8 +300,6 @@ bool InfPortalCS::Traverse (iPortal* portal, iBase* context)
       delete lviews;
       lviews = n;
     }
-    csRef<iPolygonMesh> mesh = 
-      ird->walls->GetMeshObject ()->GetObjectModel()->GetPolygonMeshColldet();
     csColliderHelper::InitializeCollisionWrapper (Sys->collide_system, ird->walls);
     return true;
   }

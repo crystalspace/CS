@@ -303,26 +303,30 @@ bool csOPCODECollideSystem::Collide (
 {
   // csPrintf( " we are in Collide \n");
   if (collider1->GetColliderType () == CS_TERRAFORMER_COLLIDER && 
-    collider2->GetColliderType () == CS_MESH_COLLIDER)
-    return Collide ((csOPCODECollider*)collider2, trans2, (csTerraFormerCollider*)collider1, trans1);
+      collider2->GetColliderType () == CS_MESH_COLLIDER)
+    return Collide ((csOPCODECollider*)collider2, trans2,
+	(csTerraFormerCollider*)collider1, trans1);
     
   if (collider2->GetColliderType () == CS_TERRAFORMER_COLLIDER && 
-    collider1->GetColliderType () == CS_MESH_COLLIDER)
-    return Collide ((csOPCODECollider*)collider1, trans1, (csTerraFormerCollider*)collider2, trans2);
+      collider1->GetColliderType () == CS_MESH_COLLIDER)
+    return Collide ((csOPCODECollider*)collider1, trans1,
+	(csTerraFormerCollider*)collider2, trans2);
 
   if (collider1->GetColliderType () == CS_TERRAIN_COLLIDER && 
-    collider2->GetColliderType () == CS_MESH_COLLIDER)
-    {
-      csRef<iTerrainSystem> terrain = scfQueryInterface<iTerrainSystem> (collider1);
-      return Collide ((csOPCODECollider*)collider2, trans2, terrain);
-    }
+      collider2->GetColliderType () == CS_MESH_COLLIDER)
+  {
+    csRef<iTerrainSystem> terrain = scfQueryInterface<iTerrainSystem> (
+	  collider1);
+    return Collide ((csOPCODECollider*)collider2, trans2, terrain);
+  }
     
   if (collider2->GetColliderType () == CS_TERRAIN_COLLIDER && 
-    collider1->GetColliderType () == CS_MESH_COLLIDER)
-    {
-      csRef<iTerrainSystem> terrain = scfQueryInterface<iTerrainSystem> (collider2);
-      return Collide ((csOPCODECollider*)collider1, trans1, terrain);
-    }
+      collider1->GetColliderType () == CS_MESH_COLLIDER)
+  {
+    csRef<iTerrainSystem> terrain = scfQueryInterface<iTerrainSystem> (
+	  collider2);
+    return Collide ((csOPCODECollider*)collider1, trans1, terrain);
+  }
 
   csOPCODECollider* col1 = (csOPCODECollider*) collider1;
   csOPCODECollider* col2 = (csOPCODECollider*) collider2;

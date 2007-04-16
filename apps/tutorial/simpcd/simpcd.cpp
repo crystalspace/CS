@@ -156,13 +156,10 @@ bool Simple::SimpleEventHandler (iEvent& ev)
 
 iCollider* Simple::InitCollider (iMeshWrapper* mesh)
 {
-  csRef<iPolygonMesh> polmesh = 
-    mesh->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet();
-  if (polmesh)
+  csColliderWrapper* wrap = csColliderHelper::InitializeCollisionWrapper (
+      cdsys, mesh);
+  if (wrap)
   {
-    csColliderWrapper* wrap = new csColliderWrapper
-    	(mesh->QueryObject (), cdsys, polmesh);
-    wrap->DecRef ();
     return wrap->GetCollider ();
   }
   else

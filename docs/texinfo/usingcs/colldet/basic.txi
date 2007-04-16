@@ -117,9 +117,12 @@ The most primitive code to initialize a collider for a mesh is here:
 @example
 csRef<iCollider> MyGame::InitCollider (iMeshWrapper* mesh)
 @{
-  iTriangleMesh* trimesh =
-    mesh->GetMeshObject()->GetObjectModel()->GetTriangleData(
-    	cdsys->GetTriangleDataID());
+  iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
+  iTriangleMesh* trimesh;
+  if (objmodel->IsTriangleDataSet (cdsys->GetTriangleDataID ()))
+    trimesh = objmodel->GetTriangleData (cdsys->GetTriangleDataID ());
+  else
+    trimesh = objmodel->GetTriangleData (cdsys->GetBaseDataID ());
   if (trimesh)
   @{
     csRef<iCollider> cd = cd_sys->CreateCollider (trimesh);
@@ -144,12 +147,16 @@ without @code{csColliderHelper}:
 @example
 bool MyGame::InitCollider (iMeshWrapper* mesh)
 @{
-  iPolygonMesh* polmesh =
-    mesh->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet();
-  if (polmesh)
+  iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
+  iTriangleMesh* trimesh;
+  if (objmodel->IsTriangleDataSet (cdsys->GetTriangleDataID ()))
+    trimesh = objmodel->GetTriangleData (cdsys->GetTriangleDataID ());
+  else
+    trimesh = objmodel->GetTriangleData (cdsys->GetBaseDataID ());
+  if (trimesh)
   @{
     csColliderWrapper* wrapper = new csColliderWrapper(
-    	mesh->QueryObject(), cd_sys, polmesh);
+    	mesh->QueryObject(), cd_sys, trimesh);
     wrapper->DecRef ();
     return true;
   @}
@@ -182,7 +189,7 @@ The easiest way to do that is with this code:
 @example
 iMeshWrapper* mesh = @dots{};
 csBox3 box (-.1, 0, -.1, .1, 1.7, .1);
-csPolygonMeshBox* pmbox = new csPolygonMeshBox (box);
+csTriangleMeshBox* pmbox = new csTriangleMeshBox (box);
 csColliderWrapper* wrapper = new csColliderWrapper (
 	mesh->QueryObject (), cs_sys, pmbox);
 pmbox->DecRef ();

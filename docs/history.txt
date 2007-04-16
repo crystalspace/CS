@@ -21,6 +21,17 @@ chronological order.
 	- Jorrit changed the stencil and stencil2 plugins to support new
 	  iTriangleMesh.
 	- Jorrit changed the odedynam plugin to use the new iTriangleMesh.
+	- Jorrit changed bugplug to also show the new iTriangleMesh.
+	- Jorrit fixed a few documentation references that were using
+	  iPolygonMesh.
+	- Jorrit changed simpcd to avoid iPolygonMesh. This temporarily
+	  breaks simpcd though! There appears to be a bug in CSopcode where
+	  it fails to work if you calculate the collision between two
+	  identical colliders (but different transform). CSopcode currently
+	  just returns false if it detects the colliders are the same (which
+	  is not correct). Removing that test however doesn't seem to
+	  solve the issue as then the colliders seem to collide all
+	  the time.
 15-Apr-2007
 	- res made lighter2 display some progress after the last changes.
 	- res added a gldrivers.xml tweak from Rolenun to work around garbled

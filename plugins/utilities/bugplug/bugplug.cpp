@@ -26,6 +26,7 @@
 #include "csgeom/box.h"
 #include "csgeom/plane3.h"
 #include "csgeom/tri.h"
+#include "csgeom/trimesh.h"
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
 #include "csgeom/math3d.h"
@@ -216,6 +217,9 @@ bool csBugPlug::Initialize (iObjectRegistry *object_reg)
     };
     RegisterWeakListener (q, this, esub, weakEventHandler);
   }
+
+  stringSet = csQueryRegistryTagInterface<iStringSet> (object_reg,
+      "crystalspace.shared.stringset");
   return true;
 }
 
@@ -1707,48 +1711,87 @@ bool csBugPlug::HandleFrame (iEvent& /*event*/)
       }
       if (show_polymesh != BUGPLUG_POLYMESH_NO)
       {
-        iPolygonMesh* pm = 0;
-        switch (show_polymesh)
-        {
-	  case BUGPLUG_POLYMESH_CD:
-	    pm = selected_meshes[k]->GetMeshObject ()->GetObjectModel ()->
-		  GetPolygonMeshColldet ();
-	    break;
-	  case BUGPLUG_POLYMESH_VIS:
-	    pm = selected_meshes[k]->GetMeshObject ()->GetObjectModel ()->
-		  GetPolygonMeshViscull ();
-	    break;
-	  case BUGPLUG_POLYMESH_SHAD:
-	    pm = selected_meshes[k]->GetMeshObject ()->GetObjectModel ()->
-		  GetPolygonMeshShadows ();
-	    break;
-	  case BUGPLUG_POLYMESH_BASE:
-	    pm = selected_meshes[k]->GetMeshObject ()->GetObjectModel ()->
-		  GetPolygonMeshBase ();
-	    break;
-        }
-        if (pm)
+	csRef<iTriangleMesh> trimesh;
+	iObjectModel* objmodel = selected_meshes[k]->GetMeshObject ()
+	  ->GetObjectModel ();
+	csStringID base_id = stringSet->Request ("base");
+	if (objmodel->IsTriangleDataSet (base_id))
+	{
+          switch (show_polymesh)
+          {
+	    case BUGPLUG_POLYMESH_CD:
+	      {
+		csStringID id = stringSet->Request ("colldet");
+	        if (objmodel->IsTriangleDataSet (id))
+		  trimesh = objmodel->GetTriangleData (id);
+	        else
+		  trimesh = objmodel->GetTriangleData (base_id);
+	      }
+	      break;
+	    case BUGPLUG_POLYMESH_VIS:
+	      {
+		csStringID id = stringSet->Request ("viscull");
+	        if (objmodel->IsTriangleDataSet (id))
+		  trimesh = objmodel->GetTriangleData (id);
+	        else
+		  trimesh = objmodel->GetTriangleData (base_id);
+	      }
+	      break;
+	    case BUGPLUG_POLYMESH_SHAD:
+	      {
+		csStringID id = stringSet->Request ("shadows");
+	        if (objmodel->IsTriangleDataSet (id))
+		  trimesh = objmodel->GetTriangleData (id);
+	        else
+		  trimesh = objmodel->GetTriangleData (base_id);
+	      }
+	      break;
+	    case BUGPLUG_POLYMESH_BASE:
+	      trimesh = objmodel->GetTriangleData (stringSet->Request (
+		    "base"));
+	      break;
+          }
+	}
+	else
+	{
+          iPolygonMesh* pm = 0;
+          switch (show_polymesh)
+          {
+	    case BUGPLUG_POLYMESH_CD:
+	      pm = objmodel->GetPolygonMeshColldet ();
+	      break;
+	    case BUGPLUG_POLYMESH_VIS:
+	      pm = objmodel->GetPolygonMeshViscull ();
+	      break;
+	    case BUGPLUG_POLYMESH_SHAD:
+	      pm = objmodel->GetPolygonMeshShadows ();
+	      break;
+	    case BUGPLUG_POLYMESH_BASE:
+	      pm = objmodel->GetPolygonMeshBase ();
+	      break;
+          }
+	  if (pm)
+	  {
+	    trimesh.AttachNew (new csTriangleMeshPolyMesh (pm));
+	  }
+	}
+        if (trimesh)
         {
           int pm_color = G3D->GetDriver2D ()->FindRGB (255, 255, 128);
-	  int vtcount = pm->GetVertexCount ();
-	  csVector3* vt = pm->GetVertices ();
-	  int pocount = pm->GetPolygonCount ();
-	  csMeshedPolygon* po = pm->GetPolygons ();
+	  size_t vtcount = trimesh->GetVertexCount ();
+	  csVector3* vt = trimesh->GetVertices ();
+	  size_t pocount = trimesh->GetTriangleCount ();
+	  csTriangle* po = trimesh->GetTriangles ();
 	  csVector3* vtt = new csVector3[vtcount];
-	  int i;
+	  size_t i;
 	  for (i = 0 ; i < vtcount ; i++)
 	    vtt[i] = tr_o2c * vt[i];
 	  for (i = 0 ; i < pocount ; i++)
 	  {
-	    csMeshedPolygon& pol = po[i];
-	    int j, j1;
-	    j1 = pol.num_vertices - 1;
-	    for (j = 0 ; j < pol.num_vertices ; j++)
-	    {
-              G3D->DrawLine (vtt[pol.vertices[j]], vtt[pol.vertices[j1]],
-	      	fov, pm_color);
-	      j1 = j;
-	    }
+	    csTriangle& tri = po[i];
+            G3D->DrawLine (vtt[tri.a], vtt[tri.c], fov, pm_color);
+            G3D->DrawLine (vtt[tri.b], vtt[tri.a], fov, pm_color);
+            G3D->DrawLine (vtt[tri.c], vtt[tri.b], fov, pm_color);
 	  }
           delete[] vtt;
         }
