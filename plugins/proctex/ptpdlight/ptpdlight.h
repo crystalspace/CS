@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2003-2006 by Jorrit Tyberghein
-	      (C) 2003-2006 by Frank Richter
+	      (C) 2003-2007 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,48 +20,37 @@
 #ifndef __CS_PTPDLIGHT_H__
 #define __CS_PTPDLIGHT_H__
 
+#include "iengine/light.h"
+#include "imesh/lighting.h"
+
 #include "csgeom/csrect.h"
-#include "csgfx/imageautoconvert.h"
+#include "csgfx/rgbpixel.h"
+#include "csutil/bitarray.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/flags.h"
-#include "csutil/scf_implementation.h"
+#include "csutil/set.h"
 #include "csutil/weakref.h"
 #include "cstool/proctex.h"
-#include "iutil/comp.h"
-#include "iutil/plugin.h"
-#include "imap/reader.h"
-#include "imesh/lighting.h"
-#include "igraphic/image.h"
-
-class csProcTexture;
 
 CS_PLUGIN_NAMESPACE_BEGIN(PTPDLight)
 {
 
-class ProctexPDLightLoader :
-  public scfImplementation2<ProctexPDLightLoader,
-                            iLoaderPlugin, 
-                            iComponent>
+
+class TileHelper
 {
-protected:
-  iObjectRegistry* object_reg;
-
-  csStringHash tokens;
-#define CS_TOKEN_ITEM_FILE "plugins/proctex/ptpdlight/ptpdlight.tok"
-#include "cstool/tokenlist.h"
-
-  void Report (int severity, iDocumentNode* node, const char* msg, ...);
-  bool HexToLightID (char* lightID, const char* lightIDHex);
+  int w, h, tx;
 public:
-  ProctexPDLightLoader (iBase *p);
-  virtual ~ProctexPDLightLoader ();
+  // The texture data is uploaded in tiles of this size
+  // @@@ Make configurable?
+  static const int tileSizeX = 128;
+  static const int tileSizeY = 128;
 
-  virtual bool Initialize(iObjectRegistry *object_reg);
+  TileHelper (int w, int h);
 
-  virtual csPtr<iBase> Parse (iDocumentNode* node,
-  	iStreamSource*, iLoaderContext* ldr_context,
-  	iBase* context);
-};  
+  size_t ComputeTileCount () const;
+  void MarkTilesBits (const csRect& r, csBitArray& bits) const;
+  void GetTileRect (size_t n, csRect& r) const;
+};
 
 class ProctexPDLight : 
   public scfImplementationExt1<ProctexPDLight, 
@@ -123,25 +112,30 @@ public:
   class PDMap
   {
     friend class ProctexPDLight;
-    void ComputeValueBounds ();
-    void ComputeValueBounds (const csRect& area);
+    void ComputeValueBounds (const TileHelper& tiles);
+    void ComputeValueBounds (const TileHelper& tiles, const csRect& area);
 
-    void SetImage (iImage* img);
   public:
-    csRGBcolor maxValue;
-    csRect nonNullArea;
+    csArray<csRGBcolor> maxValues;
+    csBitArray tileNonNull;
+    csArray<csRect> nonNullAreas;
     int imageW, imageH;
     csRef<LumelBuffer> imageData;
 
-    PDMap () : imageW (0), imageH (0), imageData (0) { ComputeValueBounds (); }
-    PDMap (iImage* img) : imageData (0)
-    { SetImage (img); }
-
-    PDMap& operator=(iImage* image)
-    {
-      SetImage (image);
-      return *this;
+    PDMap (size_t tilesNum) : imageW (0), imageH (0), imageData (0) 
+    { 
+      maxValues.SetSize (tilesNum, csRGBcolor (0, 0, 0));
+      tileNonNull.SetSize (tilesNum);
+      nonNullAreas.SetSize (tilesNum, 
+        csRect (INT_MAX, INT_MAX, INT_MIN, INT_MIN));
     }
+    PDMap (size_t tilesNum, const TileHelper& tiles, iImage* img) : 
+      imageData (0)
+    { 
+      tileNonNull.SetSize (tilesNum);
+      SetImage (tiles, img); 
+    }
+    void SetImage (const TileHelper& tiles, iImage* img);
   };
   struct MappedLight
   {
@@ -149,10 +143,10 @@ public:
     char* lightId;
     csWeakRef<iLight> light;
 
-    MappedLight() : lightId (0) {}
-    MappedLight (const MappedLight& other)
+    MappedLight (size_t tilesNum, const TileHelper& tiles, iImage* img) : 
+      map (tilesNum, tiles, img), lightId (0) {}
+    MappedLight (const MappedLight& other) : map (other.map), light (other.light)
     {
-      map = other.map;
       if (other.lightId != 0)
       {
         lightId = new char[16];
@@ -160,7 +154,6 @@ public:
       }
       else
         lightId = 0;
-      light = other.light;
     }
     ~MappedLight() { delete[] lightId; }
   };
@@ -169,20 +162,21 @@ private:
   CS_DECLARE_STATIC_CLASSVAR_REF(lightmapScratch, GetScratch, LightmapScratch);
   size_t lightmapSize;
 
+  TileHelper tiles;
+  csBitArray tilesDirty;
   csRGBcolor baseColor;
   PDMap baseMap;
   csArray<MappedLight> lights;
-  csRect totalAffectedAreas;
+  csBitArray lightBits;
+  csSet<csConstPtrKey<iLight> > dirtyLights;
   enum
   {
-    stateAffectedAreaDirty = 1 << 0,
-    stateDirty = 1 << 1,
-    statePrepared = 1 << 2,
+    stateDirty = 1 << 0,
+    statePrepared = 1 << 1,
   };
   csFlags state;
 
   void Report (int severity, const char* msg, ...);
-  void UpdateAffectedArea ();
 public:
   const char* AddLight (const MappedLight& light);
   void FinishLoad()
@@ -193,6 +187,12 @@ public:
   {
     baseColor = col;
   }
+  void SetTexFlags (int flags)
+  {
+    texFlags = flags;
+  }
+  MappedLight NewLight (iImage* img) const
+  { return MappedLight (tilesDirty.GetSize(), tiles, img); }
 
   ProctexPDLight (iImage* img);
   ProctexPDLight (int w, int h);
@@ -204,13 +204,9 @@ public:
 
   /**\name iLightingInfo implementation
    * @{ */
-  void DisconnectAllLights ()
-  { 
-    lights.DeleteAll(); 
-    state.Set (stateAffectedAreaDirty);
-  }
+  void DisconnectAllLights ();
   void InitializeDefault (bool /*clear*/) {}
-  void LightChanged (iLight* /*light*/) { state.Set (stateDirty); }
+  void LightChanged (iLight* light);
   void LightDisconnect (iLight* light);
   void PrepareLighting () {}
   bool ReadFromCache (iCacheManager* /*cache_mgr*/) { return true; }

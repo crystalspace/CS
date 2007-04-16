@@ -32,6 +32,9 @@ chronological order.
 	  is not correct). Removing that test however doesn't seem to
 	  solve the issue as then the colliders seem to collide all
 	  the time.
+	- res changed ptpdlight to compute and upload the lightmap data in a
+	  tiled fashion to get a finer granularity over the areas that are
+	  touched (or not) and to save on unnecessary computations.
 15-Apr-2007
 	- res made lighter2 display some progress after the last changes.
 	- res added a gldrivers.xml tweak from Rolenun to work around garbled

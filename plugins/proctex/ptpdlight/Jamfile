@@ -6,7 +6,7 @@ Plugin ptpdlight
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith ptpdlight : crystalspace ;
-Includes ptpdlight.h : $(SUBDIR)/ptpdlight.tok ;
-MsvcExtraFile ptpdlight : $(SUBDIR)/ptpdlight.tok ;
+Includes ptpdlight_loader.h : $(SUBDIR)/ptpdlight_loader.tok ;
+MsvcExtraFile ptpdlight : $(SUBDIR)/ptpdlight_loader.tok ;
 
 CompileGroups ptpdlight : proctexes ;
