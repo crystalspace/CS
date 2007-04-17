@@ -34,6 +34,43 @@
 %}
 
 /****************************************************************************
+ * The 'import' class method allows the user to import symbols from cspace
+ * into the global namespace e.g. "use cspace qw(csInitializer csVector3);"
+ ****************************************************************************/
+%perlcode %{
+  use Carp;
+
+  sub import
+  {
+    shift;
+
+    my ($caller) = caller;
+    $caller .= '::';
+
+    foreach my $symbol (@_)
+    {
+      my $stash = $symbol . '::';
+
+      if (exists $cspace::{$stash})
+      {
+        if (exists $::{$stash} and $::{$stash} != $cspace::{$stash})
+          { carp "Namespace pollution: replacing existing package $symbol" }
+
+        *{ $stash } = *{ "cspace::$stash" };
+      }
+      elsif (exists $cspace::{$symbol})
+      {
+        if (exists $caller->{$symbol})
+          { carp "Namespace pollution: replacing existing symbol $symbol" }
+
+        *{ "$caller$symbol" } = *{ "cspace::$symbol" };
+      }
+      else { croak "No such package or symbol cspace::$symbol" }
+    }
+  }
+%}
+
+/****************************************************************************
  * This implements the perl 'exists' built-in, for the tied hashes used by
  * SWIG for accessing object properties. It is used by AUTOLOAD below, and is
  * generally a good thing to have anyway.
@@ -56,20 +93,21 @@
 %perlcode %{
   sub AUTOLOAD
   {
-    my ($sub, $self, $val) = ($AUTOLOAD, @_);
+    my ($self, $val) = @_;
 
-    unless (@_ >= 1 and @_ <= 2 and ref $self and $self =~ /^cspace::.*?=HASH/)
-      { die "No such subroutine $sub" }
+    unless (@_ >= 1 and @_ <= 2
+	and ref $self and $self =~ /=HASH/ and $self->isa('cspace'))
+      { croak "No such subroutine $AUTOLOAD" }
 
-    $sub =~ s/^.*:://;
+    $AUTOLOAD =~ s/^.*:://;
 
-    unless (exists $self->{$sub})
-      { die "No such property $sub in class " . ref $self }
+    unless (exists $self->{$AUTOLOAD})
+      { croak "No such member $AUTOLOAD in class " . ref $self }
 
     if (@_ == 2)
-      { return $self->{$sub} = $val }
+      { return $self->{$AUTOLOAD} = $val }
     else
-      { return $self->{$sub} }
+      { return $self->{$AUTOLOAD} }
   }
 %}
 
@@ -82,18 +120,16 @@
   void _GetCPointer (pTHXo_ CV *thisfunc)
   {
     dXSARGS;
-    dTARG;
     SV *obj = ST (0);
 
     if (! (items == 1 && SvOK (obj) && sv_isobject (obj)))
       croak ("Malformed call to _GetCPointer");
 
-    const char *type = HvNAME (SvSTASH (SvRV (obj)));
     void *ptr;
-    int err = SWIG_ConvertPtr (obj, &ptr, SWIG_TypeQuery (type), 0);
+    int err = SWIG_ConvertPtr (obj, &ptr, 0, 0);
 
     if (! SWIG_IsOK (err))
-      croak ("Failed to access pointer from instance of class %s", type);
+      croak ("Failed to access pointer from wrapped object");
 
     XSRETURN_IV ((int) ptr);
   }
@@ -108,7 +144,6 @@
   void _SetObjectReg (pTHXo_ CV *thisfunc)
   {
     dXSARGS;
-    dTARG;
     SV *objreg = ST (0);
 
     if (items != 1) croak ("Malformed call to _SetObjectReg");
@@ -131,19 +166,29 @@
   bool plEventHandler (iEvent &event)
   {
     if (! EventHandler_sv) return false;
-    SV *event_sv = newSViv (0);
-    SWIG_MakePtr (event_sv, &event, SWIGTYPE_p_iEvent, 0);
 
     dSP;
+    ENTER;
+    SAVETMPS;
+
+    SV *event_sv = sv_newmortal ();
+    SWIG_MakePtr (event_sv, &event, SWIGTYPE_p_iEvent, 0);
+
     PUSHMARK (SP);
     XPUSHs (event_sv);
     PUTBACK;
-    call_sv (EventHandler_sv, G_SCALAR);
+
+    int n = call_sv (EventHandler_sv, G_SCALAR);
+
     SPAGAIN;
-    bool result = SvTRUE (POPs);
+    if (n != 1) croak ("Perly event handler must return 1 value only");
+    SV *result_sv = POPs;
+    bool result = SvTRUE (result_sv);
     PUTBACK;
 
-    SvREFCNT_dec (event_sv);
+    FREETMPS;
+    LEAVE;
+
     return result;
   }
 %}
@@ -159,7 +204,6 @@
   void _SetupEventHandler (pTHXo_ CV *thisfunc)
   {
     dXSARGS;
-    dTARG;
     SV *reg_sv = ST (0);
     SV *func_rv = ST (1);
     SV *types_sv = ST (2);
@@ -188,7 +232,10 @@
       types.Push (CS_EVENTLIST_END);
     }
 
-    EventHandler_sv = func_rv;
+    if (EventHandler_sv)
+      SvSetSV (EventHandler_sv, func_rv);
+    else
+      EventHandler_sv = newSVsv (func_rv);
 
     bool ok = (items == 3)
       ? csInitializer::SetupEventHandler (reg, plEventHandler, types.GetArray())
@@ -196,7 +243,9 @@
     XSRETURN_IV (ok ? 1 : 0);
   }
 %}
+#endif // CS_MINI_SWIG
 
+#ifndef CS_MICRO_SWIG
 /****************************************************************************
  * Wrapper function to get the array returned by GetCollisionPairs().
  ****************************************************************************/
@@ -208,7 +257,6 @@
   void _GetCollisionPairs (pTHXo_ CV *thisfunc)
   {
     dXSARGS;
-    dTARG;
     SV *sys_ref = ST (0);
     if (items != 1)
       croak ("Usage: $collideSystem->GetCollisionPairs()");
@@ -255,21 +303,30 @@
 %}
 
 /****************************************************************************
- * Workaround iPen::Rotate broken with Swig 1.3.28
+ * CS_POLYRANGE replacements.
  ****************************************************************************/
 %perlcode %{
-  *cspace::iPen::Rotate = *cspace::iPen::_Rotate;
+  sub CS_POLYRANGE {		new cspace::csPolygonRange ($_[0], $_[1]) }
+  sub CS_POLYRANGE_SINGLE {	new cspace::csPolygonRange ($_[0]) }
+  sub CS_POLYRANGE_LAST {	new cspace::csPolygonRange (-1, -1) }
+  sub CS_POLYRANGE_ALL {	new cspace::csPolygonRange (0, 2000000000) }
 %}
-%extend iPen
-{
-  void _Rotate (float a)
-  {
-    self->Rotate (a);
-  }
-}
-#endif // CS_MINI_SWIG
 
-#ifndef CS_MICRO_SWIG
+/****************************************************************************
+ * CSKEY_SHIFT/CTRL/ALT replacements.
+ ****************************************************************************/
+%perlcode %{
+  sub CSKEY_SHIFT	{ CSKEY_SHIFT_NUM (csKeyModifierNumAny ()) }
+  sub CSKEY_SHIFT_LEFT	{ CSKEY_SHIFT_NUM (csKeyModifierNumLeft ()) }
+  sub CSKEY_SHIFT_RIGHT	{ CSKEY_SHIFT_NUM (csKeyModifierNumRight ()) }
+  sub CSKEY_CTRL	{ CSKEY_CTRL_NUM  (csKeyModifierNumAny ()) }
+  sub CSKEY_CTRL_LEFT	{ CSKEY_CTRL_NUM  (csKeyModifierNumLeft ()) }
+  sub CSKEY_CTRL_RIGHT	{ CSKEY_CTRL_NUM  (csKeyModifierNumRight ()) }
+  sub CSKEY_ALT		{ CSKEY_ALT_NUM   (csKeyModifierNumAny ()) }
+  sub CSKEY_ALT_LEFT	{ CSKEY_ALT_NUM   (csKeyModifierNumLeft ()) }
+  sub CSKEY_ALT_RIGHT	{ CSKEY_ALT_NUM   (csKeyModifierNumRight ()) }
+%}
+
 /****************************************************************************
  * Pure perl replacement for RequestPlugins' variadic argument list.
  ****************************************************************************/
@@ -304,7 +361,7 @@
     return (new cspace::csString ($scfid),
 	    new cspace::csString ($iface),
 	    $cspace::iSCF::SCF->GetInterfaceID ($iface),
-	    &{ 'cspace::' . $iface . '::scfGetVersion' });
+	    ('cspace::' . $iface . '::scfGetVersion')->());
   }
   sub CS_REQUEST_VFS { CS_REQUEST_PLUGIN
 	('crystalspace.kernel.vfs', 'iVFS') }
@@ -334,6 +391,20 @@
 #endif // CS_MICRO_SWIG
 
 /****************************************************************************
+ * Workaround iPen::Rotate broken with Swig 1.3.28
+ ****************************************************************************/
+%perlcode %{
+  *cspace::iPen::Rotate = *cspace::iPen::_Rotate;
+%}
+%extend iPen
+{
+  void _Rotate (float a)
+  {
+    self->Rotate (a);
+  }
+}
+
+/****************************************************************************
  * Custom INPUT/OUTPUT/INOUT typemaps like those imported from typemaps.i,
  * since typemaps.i doesn't define any for strings.
  ****************************************************************************/
@@ -361,6 +432,7 @@
 /****************************************************************************
  * Extra pure perl operator overloads.
  ****************************************************************************/
+#if 0
 %perlcode %{
   package cspace::iDataBuffer;
     use overload '${}'	=> sub { $_[0]->GetData () },
@@ -420,6 +492,7 @@
 				 $_[0]; },
 		 'fallback' => 1;
 %}
+#endif // 0
 
 #if 0 // very experimental
 /*****************************************************************************
@@ -473,7 +546,6 @@
 %define WRAP_FUNC(TYPE, FUNC, ARGS, PUSHARGS, POPRETVAL)
   virtual TYPE FUNC ARGS
   {
-    dTARG;
     dSP;
     ENTER;
     SAVETMPS;
@@ -498,7 +570,6 @@
 %define WRAP_VOID(FUNC, ARGS, PUSHARGS)
   virtual void FUNC ARGS
   {
-    dTARG;
     dSP;
     ENTER;
     SAVETMPS;

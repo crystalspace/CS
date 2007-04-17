@@ -52,7 +52,7 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
   local targetdir ;
   local target = [ FGristFiles cswigpl5.inc ] ;
   local pmfile = [ FGristFiles cspace.pm ] ;
-  MakeLocate $(pmfile) : $(LOCATE.TARGETS) ;
+  MakeLocate $(pmfile) : [ ConcatDirs $(TOP) scripts perl5 ] ;
 
   if $(CMD.SWIG)
   {

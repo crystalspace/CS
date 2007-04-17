@@ -14,6 +14,11 @@ Space applications entirely in Perl, without any C++ coding.  The rest of this
 document pertains to the second method of using Crystal Space from Perl, though
 much of the discussion is meaningful to both methods.
 
+As well as this document, there also exists an example Perl script located at
+@file{scripts/perl5/perlsimp.pl}. It is basically the tutorial application
+@samp{simple1} re-written in Perl, and it demonstrates many of the features
+discussed in this document.
+
 To make use of Crystal Space classes from a pure Perl script, first make sure
 that the file @samp{cspace.pm} is available to Perl.  This file is installed
 at:
@@ -55,6 +60,17 @@ To actually utilize Crystal Space from within your script, begin with:
 use cspace;
 @end example
 
+You may also import symbols and classes from the cspace module using the
+standard Perl syntax, for example:
+
+@example
+use cspace qw(csVector3 csMatrix3 CS_QUERY_REGISTRY SCF_QUERY_INTERFACE);
+@end example
+
+Classes will be imported into the @code{main::} namespace, while other symbols
+will be imported into the namespace of the current package. This will enable
+you to use these symbols and classes without using the @code{cspace::} prefix.
+
 @subheading Getting Started
 
 To get started with pure Perl scripts, you probably want to know how to
@@ -83,9 +99,6 @@ has built-in reference counting, so if the object is still referenced in some
 other Perl code when one reference goes out of scope, it will continue to exist
 until there are no more references to it in Perl.
 
-You will note the obvious difference in semantics, being that everything in
-the @samp{cspace} module has a @code{cspace::} prefix.
-
 There are three ways to access object properties:
 
 @example
@@ -112,7 +125,7 @@ $vect->Norm();
 
 @subheading Arrays
 
-Wherever an array is expected, or wherever an array is returned, in or from
+Wherever an array is expected, and wherever an array is returned, in or from
 a Crystal Space C++ function, a Perl array reference is used.
 
 @subheading Strings
@@ -126,8 +139,8 @@ my $string_object = new cspace::csString ('This is a csString');
 
 print "$string_object that has been interpolated in double-quotes.\n";
 
-my $string1 = substr ${ $string_object }, 0, 4;
-my $string2 = substr ${ $string_object }, 8;
+my $string1 = substr $@{ $string_object @}, 0, 4;
+my $string2 = substr $@{ $string_object @}, 8;
 
 print "$string1 has been extracted from $string2 using scalar dereference.\n";
 
@@ -137,6 +150,8 @@ print "$string1 has been extracted from $string2 using scalar dereference.\n";
 @end example
 
 This also applies to @samp{iDataBuffer}.
+
+To pass the null pointer as a string argument, use Perl's @code{undef} keyword.
 
 @subheading Vectors, Matrices and Colors
 
@@ -149,7 +164,7 @@ my $vector = new cspace::csVector3 (1, 2, 3);
 
 print $vector->[1] . $vector->[0] . $vector->[2] . "\n";
 
-print reverse @@{ $vector } . "\n";
+print reverse @@@{ $vector @} . "\n";
 
 # Output:
 # 213
@@ -182,6 +197,8 @@ way, and pass them on to other functions as arguments where appropriate.
 
 The Perl bindings automatically and correctly handle @code{csRef<>} and
 @code{csPtr<>}.
+
+The null pointer is represented in Perl by the @code{undef} keyword.
 
 @subheading Event Handling
 
@@ -320,6 +337,11 @@ call):
 To workaround some shortcomings of Swig, a few methods from C++ have been
 renamed for Perl. These are:
 
-@code{Classify(const csPlane3&, csVector3*, int)} becomes @code{ClassifyPolygon}.
-@code{ComputeNormal(csVector3*, int)} becomes @code{ComputePolygonNormal}.
-@code{ComputePlane(csVector3*, int)} becomes @code{ComputePolygonPlane}.
+@itemize @bullet
+@item
+@code{Classify(const csPlane3&, csVector3*, int)} becomes @code{ClassifyPolygon}
+@item
+@code{ComputeNormal(csVector3*, int)} becomes @code{ComputePolygonNormal}
+@item
+@code{ComputePlane(csVector3*, int)} becomes @code{ComputePolygonPlane}
+@end itemize

@@ -590,6 +590,7 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csArray::InitRegion;
 %ignore csArray::InsertSorted;
 %ignore csArray::Iterator;
+%ignore csArray::Length;
 %ignore csArray::PushSmart;
 %ignore csArray::Section;
 %ignore csArray::SetCapacity;
@@ -1485,6 +1486,12 @@ APPLY_FOR_EACH_INTERFACE
 #define _CSKEY_SHIFT_NUM(n) CSKEY_SHIFT_NUM(n)
 #undef CSKEY_SHIFT_NUM
 int CSKEY_SHIFT_NUM(int n);
+#define _CSKEY_CTRL_NUM(n) CSKEY_CTRL_NUM(n)
+#undef CSKEY_CTRL_NUM
+int CSKEY_CTRL_NUM(int n);
+#define _CSKEY_ALT_NUM(n) CSKEY_ALT_NUM(n)
+#undef CSKEY_ALT_NUM
+int CSKEY_ALT_NUM(int n);
 
 #define _CSKEY_SPECIAL(n) CSKEY_SPECIAL(n)
 #undef CSKEY_SPECIAL

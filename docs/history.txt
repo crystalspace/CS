@@ -43,6 +43,27 @@ chronological order.
         - Piotr added capsule generation to csPrimitives and genmeshfactory.
         - Piotr deprecated "CCylinder" name (caped cylinder) and replaced it 
           with "Capsule" (which is more widely used). 
+	- Oktal added perlsimp.pl, the Perl equivalent of the Python script
+	  pysimp.py (i.e. the simple1 app re-written in Perl), for testing
+	  and demonstration of the Swig-generated Perl bindings.
+	- Oktal made the following changes to the Swig-generated bindings:
+	  - Fixed a runtime error in the Perl module's event handler.
+	  - Fixed a runtime error in Perl's csInitializer::RequestPlugins.
+	  - Fixed a runtime error in the Perl typemap for csWrapPtr.
+	  - Restored scfGetVersion, mistakenly removed in previous revision.
+	  - Added pure Perl replacements for the CS_POLYRANGE and
+	    CSKEY_SHIFT/CTRL/ALT families of macros.
+	  - Commented out extra Perl operator overloads until they can be
+	    thoroughly checked for correctness.
+	  - Used 'Carp' to provide more meaningful Perl error messages.
+	  - Added %ignore directive for deprecated csArray::Length(), thereby
+	    eliminating a few compiler warnings. Use GetSize() instead.
+	  - Eliminated a few 'unused variable' warnings in the Perl module.
+	  - Added Perl 'import' method to allow users to import CS symbols
+	    into their namespace.
+	  - Additional fix to the csperl5 Jamfile so cspace.pm is really put
+	    in the correct location.
+	  - Updated and improved the manual entry about Perl scripting.
 16-Apr-2007
 	- Andrew Robberts added a CS_ENTITY_NODECAL flag.
 	- Jorrit fixed a bug in csObjectModel. It would use Put() instead

@@ -174,7 +174,7 @@
     csRef<iBase> rf ($1.Ref);
     if (rf.IsValid ())
     {
-      csString pT; pT << "cspace::" << $1.Type;
+      csString pT; pT << $1.Type << " *";
       void* ptr = rf->QueryInterface(iSCF::SCF->GetInterfaceID($1.Type), $1.Version);
       SWIG_MakePtr ($result, ptr, SWIG_TypeQuery (pT.GetData ()),
 	SWIG_SHADOW | SWIG_OWNER);
@@ -276,6 +276,50 @@ _TYPEMAP_csArray(double,		newSVnv,	SvNV)
       }
   }
 %enddef
+
+/****************************************************************************
+ * Get the version number of an SCF interface named in a string, by calling
+ * the class method scfGetVersion in the corresponding Perl package.
+ * Used by the typemap below.
+ ****************************************************************************/
+%{
+  int scfGetVersion (const char *iface)
+  {
+    csString sub;
+    sub << "cspace::" << iface << "::scfGetVersion";
+
+    dSP;
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK (SP);
+    PUTBACK;
+
+    int n = call_pv (sub.GetData (), G_SCALAR);
+
+    SPAGAIN;
+    if (n != 1) croak ("Expected 1 result from %s::scfGetVersion", iface);
+    int version = POPi;
+    PUTBACK;
+
+    FREETMPS;
+    LEAVE;
+
+    return version;
+  }
+%}
+
+/****************************************************************************
+ * Typemaps to convert an interface and version from an interface name.
+ * Used by wrapped versions of SCF_QUERY_INTERFACE, CS_QUERY_REGISTRY, etc.
+ ****************************************************************************/
+%typemap(in) (const char *iface, int iface_ver)
+{
+  char *inputString;
+  inputString = SvPV_nolen ($input);
+  $1 = inputString;
+  $2 = scfGetVersion (inputString);
+}
 
 /****************************************************************************
  * Typemaps to convert an argc/argv pair to a Perl array.
