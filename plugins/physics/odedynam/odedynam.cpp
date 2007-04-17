@@ -706,7 +706,7 @@ bool csODEDynamicSystem::AttachColliderCylinder (float length, float radius,
   odec->SetElasticity (elasticity);
   odec->SetFriction (friction);
   odec->SetSoftness (softness);
-  odec->CreateCCylinderGeometry (length, radius);
+  odec->CreateCapsuleGeometry (length, radius);
   odec->SetTransform (trans);
   odec->AddToSpace (spaceID);
   colliders.Push (odec);
@@ -962,7 +962,7 @@ void csODECollider::AddMassToBody (bool doSet)
     case CYLINDER_COLLIDER_GEOMETRY:
       {
         dReal radius, length;
-        dGeomCCylinderGetParams (geomID, &radius, &length);
+        dGeomCapsuleGetParams (geomID, &radius, &length);
         dMassSetCappedCylinder (&m, density, 3, radius, length);
       }
       break;
@@ -1099,13 +1099,13 @@ bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
 
   return true;
 }
-bool csODECollider::CreateCCylinderGeometry (float length, float radius)
+bool csODECollider::CreateCapsuleGeometry (float length, float radius)
 {
   dBodyID b = dGeomGetBody (transformID);
   ClearContents ();
 
-  geom_type = CYLINDER_COLLIDER_GEOMETRY;
-  geomID = dCreateCCylinder (0, radius, length);
+  geom_type = CAPSULE_COLLIDER_GEOMETRY;
+  geomID = dCreateCapsule (0, radius, length);
 
   GeomData *gd = new GeomData ();
   gd->surfacedata = surfacedata;
@@ -1317,7 +1317,7 @@ bool csODECollider::GetCylinderGeometry (float& length, float& radius)
   if (geom_type == CYLINDER_COLLIDER_GEOMETRY)
   {
     dReal odeR, odeL;
-    dGeomCCylinderGetParams (geomID, &odeR, &odeL);
+    dGeomCapsuleGetParams (geomID, &odeR, &odeL);
     radius = odeR;
     length = odeL;
     return true;
@@ -1346,6 +1346,14 @@ void csODECollider::FillWithColliderGeometry (csRef<iGeneralFactoryState> genmes
       genmesh_fact->GenerateSphere (sphere, 30);
       genmesh_fact->CalculateNormals ();
     }
+    break;
+  case CAPSULE_COLLIDER_GEOMETRY:
+    {
+      dReal r, l;
+      dGeomCapsuleGetParams (geomID, &r, &l);
+      genmesh_fact->GenerateCapsule (r, l, 10);
+    }
+    break;
   case PLANE_COLLIDER_GEOMETRY:
     {
       //dVector4 plane;
@@ -1506,7 +1514,7 @@ bool csODERigidBody::AttachColliderCylinder (float length, float radius,
   odec->SetFriction (friction);
   odec->SetSoftness (softness);
   odec->SetDensity (density);
-  odec->CreateCCylinderGeometry (length, radius);
+  odec->CreateCapsuleGeometry (length, radius);
   odec->SetTransform (trans);
   odec->AttachBody (bodyID);
   odec->AddTransformToSpace (groupID);

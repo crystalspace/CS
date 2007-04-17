@@ -652,6 +652,7 @@ enum csColliderGeometryType
   PLANE_COLLIDER_GEOMETRY,
   TRIMESH_COLLIDER_GEOMETRY,
   CYLINDER_COLLIDER_GEOMETRY,
+  CAPSULE_COLLIDER_GEOMETRY,
   SPHERE_COLLIDER_GEOMETRY
 };
 
@@ -717,7 +718,11 @@ struct iDynamicsSystemCollider : public virtual iBase
   virtual bool CreateBoxGeometry (const csVector3& box_size) = 0;
 
   /// Create Collider Geometry with Cylinder (given by its length and radius)
+  CS_DEPRECATED_METHOD_MSG("CreateCCylinderGeometry is deprecated, use CreateCapsuleGeometry instead")
   virtual bool CreateCCylinderGeometry (float length, float radius) = 0;
+  
+  /// Create Capsule Collider Geometry.
+  virtual bool CreateCapsuleGeometry (float length, float radius) = 0;
 
   //FIXME: This should be implememented, but it is not so obvious - it
   //should be valid also for static colliders.

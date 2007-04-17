@@ -2229,7 +2229,13 @@ void csGenmeshMeshObjectFactory::CalculateNormals (bool compress)
     autonormals_compress = compress;
   }
 }
-
+void csGenmeshMeshObjectFactory::GenerateCapsule (float l, float r, uint sides)
+{
+  csPrimitives::GenerateCapsule (l, r, sides, mesh_vertices, mesh_texels,
+      mesh_normals, mesh_triangles);
+  mesh_colors.DeleteAll ();
+  Invalidate ();
+}
 void csGenmeshMeshObjectFactory::GenerateSphere (const csEllipsoid& ellips,
     int num, bool cyl_mapping, bool toponly, bool reversed)
 {

@@ -350,6 +350,14 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
   virtual void GenerateBox (const csBox3& box) = 0;
 
   /**
+   * Automatically generate a capsule of given length and radius.
+   * \param l Capsule length.
+   * \param r Capsule radius.
+   * \param sides Number of sides.
+   */
+  virtual void GenerateCapsule (float l, float r, uint sides) = 0;
+
+  /**
    * Automatically generate a sphere. This will set the apropriate number 
    * of vertices and generate vertices, texels, normals, and triangles.
    * The vertex colors are set to black.

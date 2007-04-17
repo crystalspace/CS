@@ -738,7 +738,7 @@ bool csBulletCollider::CreateBoxGeometry (const csVector3& size)
 
   return true;
 }
-bool csBulletCollider::CreateCCylinderGeometry (float /*length*/,
+bool csBulletCollider::CreateCapsuleGeometry (float /*length*/,
   float /*radius*/)
 {
   return false;
