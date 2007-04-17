@@ -38,6 +38,8 @@ chronological order.
 	  the colldet and viscull flags for individual polygons. In this case
 	  the thing mesh will itself set the collision and visibility culling
 	  meshes.
+	- Jorrit converted csSolidSpace to iTriangleMesh. As far as I know
+	  this concludes the iPolygonMesh->iTriangleMesh task.
 16-Apr-2007
 	- Andrew Robberts added a CS_ENTITY_NODECAL flag.
 	- Jorrit fixed a bug in csObjectModel. It would use Put() instead

@@ -30,10 +30,7 @@
  * @{ */
 
 class csSolidSpaceNode;
-struct iPolygonMesh;
-
-// for iPolygonMesh
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+struct iTriangleMesh;
 
 /**
  * This structure keeps track of solid space. Basically it represents
@@ -64,13 +61,10 @@ public:
    * Add a closed object as solid space. This polygon mesh
    * must be closed. This function will not check for that.
    */
-  void AddClosedObject (iPolygonMesh* object);
+  void AddClosedObject (iTriangleMesh* object);
 };
 
 /** @} */
-
-// for iPolygonMesh
-#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_SOLIDSPACE_H__
 
