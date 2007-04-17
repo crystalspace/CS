@@ -52,7 +52,7 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
   local targetdir ;
   local target = [ FGristFiles cswigpl5.inc ] ;
   local pmfile = [ FGristFiles cspace.pm ] ;
-  MakeLocate $(pmfile) : [ ConcatDirs $(TOP) scripts perl5 ] ;
+  MakeLocate $(pmfile) : $(LOCATE.TARGETS) ;
 
   if $(CMD.SWIG)
   {
@@ -126,7 +126,6 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
     perl5mod = [ ConstructPluginTarget $(perl5mod) ] ;
   }
 
-#  perl5mod_TARGET = [ ConcatDirs $(TOP) scripts perl5 $(perl5mod) ] ; #@@@???
   perl5mod_TARGET = $(perl5mod) ;
   perl5mod_SOURCES = $(perl5modsrc) $(swigsrc) ;
   perl5mod_OBJECTS = $(perl5modobj) $(swigobj) ;
@@ -138,10 +137,16 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
   Depends perl5mod : $(pmfile) ;
   Depends perl5mod : $(perl5mod) ;
   Depends plugins : perl5mod ;
-  MakeLocate $(perl5mod) : [ ConcatDirs $(TOP) scripts perl5 ] ; #@@@???
-#  MakeLocate $(perl5mod) : $(LOCATE.TARGETS) ;
+  MakeLocate $(perl5mod) : $(LOCATE.TARGETS) ;
   Depends $(perl5mod) : $(perl5mod_OBJECTS) ;
   LinkPlugin $(perl5mod) : $(perl5mod_OBJECTS) ;
+
+  local perl5modcopy = [ ConcatDirs $(TOP) scripts perl5 $(perl5mod:D=) ] ;
+  Copy $(perl5modcopy) : $(perl5mod) ;
+  Depends $(perl5modcopy) : $(perl5mod) ;
+  NotFile perl5freezeobj ;
+  Depends perl5freezeobj : $(perl5modcopy) ;
+  Help perl5freezeobj : "Copy compiled Swig file to source directory" ;
 
   rule InstallPerl5mod
   {
@@ -152,9 +157,8 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
 
   Always perl5modclean ;
   NotFile perl5modclean ;
-  Clean perl5modclean : $(perl5mod) ;
+  Clean perl5modclean : $(perl5mod) $(perl5modobj) ;
   Depends clean : perl5modclean ;
-
 
   #--------
   # perl5.cex -- cs-config extension

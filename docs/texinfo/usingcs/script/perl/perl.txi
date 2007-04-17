@@ -51,8 +51,11 @@ Space. On Unix and MacOS/X, this file is named @file{cspace.so}; on Windows it
 is named @file{cspace.dll}. The shared library file should reside in the same
 directory as the @file{cspace.pm} file. This happens automatically when you
 install Crystal Space (via @samp{make install} or @samp{jam install}). If you
-have not installed Crystal Space, then the shared library will be in the
-top-level build directory, along with @file{cspace.pm}.
+have not installed Crystal Space, then the shared library will be put in the
+top-level build directory, along with @file{cspace.pm}. The preferred location
+is @file{scripts/perl5/}, and @file{cspace.pm} and @file{cspace.so} can be
+copied there by doing @samp{jam perl5freeze} and @samp{perl5freezeobj}
+respectively.
 
 To actually utilize Crystal Space from within your script, begin with:
 
