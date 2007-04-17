@@ -2293,6 +2293,14 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
         {
 	  iObjectModel* objmodel = stemp->GetMeshObjectFactory ()
 	  	->GetObjectModel ();
+	  csRef<iTriangleMeshIterator> it = objmodel->GetTriangleDataIterator ();
+	  while (it->HasNext ())
+	  {
+	    csStringID id;
+	    iTriangleMesh* trimesh = it->Next (id);
+	    if (trimesh) trimesh->GetFlags ().Set (
+	      CS_TRIMESH_CLOSED | CS_TRIMESH_NOTCLOSED, CS_TRIMESH_CLOSED);
+	  }
           if (objmodel->GetPolygonMeshShadows ())
             objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
 	      CS_POLYMESH_CLOSED | CS_POLYMESH_NOTCLOSED, CS_POLYMESH_CLOSED);
@@ -2316,6 +2324,14 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
         {
 	  iObjectModel* objmodel = stemp->GetMeshObjectFactory ()
 	  	->GetObjectModel ();
+	  csRef<iTriangleMeshIterator> it = objmodel->GetTriangleDataIterator ();
+	  while (it->HasNext ())
+	  {
+	    csStringID id;
+	    iTriangleMesh* trimesh = it->Next (id);
+	    if (trimesh) trimesh->GetFlags ().Set (
+	      CS_TRIMESH_CONVEX | CS_TRIMESH_NOTCONVEX, CS_TRIMESH_CONVEX);
+	  }
           if (objmodel->GetPolygonMeshShadows ())
             objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
 	      CS_POLYMESH_CONVEX | CS_POLYMESH_NOTCONVEX, CS_POLYMESH_CONVEX);
@@ -5734,6 +5750,14 @@ void csLoader::CollectAllChildren (iMeshWrapper* meshWrapper,
 void csLoader::ClosedFlags (iMeshWrapper* mesh)
 {
   iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
+  csRef<iTriangleMeshIterator> it = objmodel->GetTriangleDataIterator ();
+  while (it->HasNext ())
+  {
+    csStringID id;
+    iTriangleMesh* trimesh = it->Next (id);
+    if (trimesh) trimesh->GetFlags ().Set (
+      CS_TRIMESH_CLOSED | CS_TRIMESH_NOTCLOSED, CS_TRIMESH_CLOSED);
+  }
   if (objmodel->GetPolygonMeshShadows ())
     objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
     CS_POLYMESH_CLOSED | CS_POLYMESH_NOTCLOSED, CS_POLYMESH_CLOSED);
@@ -5748,6 +5772,14 @@ void csLoader::ClosedFlags (iMeshWrapper* mesh)
 void csLoader::ConvexFlags (iMeshWrapper* mesh)
 {
   iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
+  csRef<iTriangleMeshIterator> it = objmodel->GetTriangleDataIterator ();
+  while (it->HasNext ())
+  {
+    csStringID id;
+    iTriangleMesh* trimesh = it->Next (id);
+    if (trimesh) trimesh->GetFlags ().Set (
+      CS_TRIMESH_CONVEX | CS_TRIMESH_NOTCONVEX, CS_TRIMESH_CONVEX);
+  }
   if (objmodel->GetPolygonMeshShadows ())
     objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
     CS_POLYMESH_CONVEX | CS_POLYMESH_NOTCONVEX, CS_POLYMESH_CONVEX);

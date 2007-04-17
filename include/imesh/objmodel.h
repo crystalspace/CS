@@ -52,6 +52,28 @@ struct iObjectModelListener : public virtual iBase
   virtual void ObjectModelChanged (iObjectModel* model) = 0;
 };
 
+/**
+ * Iterator to iterate over all data mesh ID's in an object model.
+ * This is returned by iObjectModel::GetTriangleDataIterator().
+ * This iterator will return all data meshes that are set. That includes
+ * data meshes that are set but still 0.
+ */
+struct iTriangleMeshIterator : public virtual iBase
+{
+  SCF_INTERFACE(iTriangleMeshIterator, 0, 0, 1);
+
+  /// Return true if the iterator has more elements.
+  virtual bool HasNext () = 0;
+
+  /**
+   * Return next element. The id of the triangle mesh will be returned
+   * in 'id'. Note that this function can return 0. This doesn't mean
+   * that the iterator has ended. It just means that for the given 'id'
+   * the mesh was set to 0.
+   */
+  virtual iTriangleMesh* Next (csStringID& id) = 0;
+};
+
 // for iPolygonMesh
 #include "csutil/win32/msvc_deprecated_warn_off.h"
 
@@ -70,7 +92,7 @@ struct iObjectModelListener : public virtual iBase
  */
 struct iObjectModel : public virtual iBase
 {
-  SCF_INTERFACE(iObjectModel, 2, 0, 1);
+  SCF_INTERFACE(iObjectModel, 2, 0, 2);
   /**
    * Returns a number that will change whenever the shape of this object
    * changes. If that happens then the data in all the returned polygon
@@ -98,6 +120,12 @@ struct iObjectModel : public virtual iBase
    * IsTriangleDataSet(id).
    */
   virtual iTriangleMesh* GetTriangleData (csStringID id) = 0;
+
+  /**
+   * Get an iterator to iterate over all triangle meshes in this
+   * object model. This includes triangle meshes that are 0.
+   */
+  virtual csPtr<iTriangleMeshIterator> GetTriangleDataIterator () = 0;
 
   /**
    * Set a triangle mesh representing the geometry of the object.

@@ -44,6 +44,8 @@ struct iTerraFormer;
 // for iPolygonMesh
 #include "csutil/win32/msvc_deprecated_warn_off.h"
 
+class csTMIterator;
+
 /**
  * Helper class to make it easier to implement iObjectModel in mesh
  * objects. This class does not implement the bounding box and radius
@@ -51,6 +53,8 @@ struct iTerraFormer;
  */
 class csObjectModel : public scfImplementation1<csObjectModel,iObjectModel>
 {
+  friend class csTMIterator;
+
 private:
   long shapenr;
   iPolygonMesh* polymesh_base;
@@ -130,6 +134,7 @@ public:
 
   virtual long GetShapeNumber () const { return shapenr; }
   virtual iTriangleMesh* GetTriangleData (csStringID);
+  virtual csPtr<iTriangleMeshIterator> GetTriangleDataIterator ();
   virtual void SetTriangleData (csStringID, iTriangleMesh*);
   virtual bool IsTriangleDataSet (csStringID);
   virtual void ResetTriangleData (csStringID);

@@ -19,9 +19,42 @@
 #include "cssysdef.h"
 #include "cstool/objmodel.h"
 
+class csTMIterator : public scfImplementation1<csTMIterator,
+  iTriangleMeshIterator>
+{
+private:
+  // Keep a ref to the object model to guarantee it stays alive
+  // during iteration.
+  csRef<csObjectModel> model;
+  csHash<csRef<iTriangleMesh>,csStringID>::GlobalIterator it;
+
+public:
+  csTMIterator (csObjectModel* model) : scfImplementationType (this),
+    model (model), it (model->trimesh.GetIterator ())
+  {
+  }
+  virtual ~csTMIterator ()
+  {
+  }
+  virtual bool HasNext ()
+  {
+    return it.HasNext ();
+  }
+  virtual iTriangleMesh* Next (csStringID& id)
+  {
+    return it.Next (id);
+  }
+};
+
 iTriangleMesh* csObjectModel::GetTriangleData (csStringID id)
 {
   return trimesh.Get (id, 0);
+}
+
+csPtr<iTriangleMeshIterator> csObjectModel::GetTriangleDataIterator ()
+{
+  csTMIterator* it = new csTMIterator (this);
+  return it;
 }
 
 void csObjectModel::SetTriangleData (csStringID id, iTriangleMesh* tridata)

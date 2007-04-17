@@ -842,7 +842,7 @@ namespace genmeshify
       
       csRef<iDocumentNode> polymeshNode = 
         to->CreateNodeBefore (CS_NODE_ELEMENT, 0);
-      polymeshNode->SetValue ("polymesh");
+      polymeshNode->SetValue ("trimesh");
       if (!WritePolyMesh (key, polymeshNode)) return false;
 
       static const char* const meaningKeys[] = {"colldet", "shadows", "viscull" };
@@ -850,8 +850,10 @@ namespace genmeshify
       {
         if (meaning.Check (1 << i))
         {
-          csRef<iDocumentNode> node = 
-            polymeshNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	  csRef<iDocumentNode> id = polymeshNode->CreateNodeBefore (
+	      CS_NODE_ELEMENT, 0);
+	  id->SetValue ("id");
+          csRef<iDocumentNode> node = id->CreateNodeBefore (CS_NODE_TEXT, 0);
           node->SetValue (meaningKeys[i]);
         }
       }

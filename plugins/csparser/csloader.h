@@ -222,8 +222,8 @@ private:
   //the hierarchy of meshes starting from 'meshWrapper'.
   void CollectAllChildren (iMeshWrapper* meshWrapper, csRefArray<iMeshWrapper>&
     meshesArray);
-  //Two useful private functions to set the CS_POLYMESH_CLOSED and
-  //CS_POLYMESH_CONVEX flags on a single mesh wrapper.
+  //Two useful private functions to set the CS_TRIMESH_CLOSED and
+  //CS_TRIMESH_CONVEX flags on a single mesh wrapper.
   void ConvexFlags (iMeshWrapper* mesh);
   void ClosedFlags (iMeshWrapper* mesh);
 

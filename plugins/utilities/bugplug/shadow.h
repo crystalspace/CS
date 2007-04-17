@@ -143,6 +143,8 @@ public:
   //------------------------- iObjectModel implementation ----------------
   virtual long GetShapeNumber () const { return 1; }
   virtual iTriangleMesh* GetTriangleData (csStringID) { return 0; }
+  virtual csPtr<iTriangleMeshIterator> GetTriangleDataIterator ()
+  { return 0; }
   virtual void SetTriangleData (csStringID, iTriangleMesh*) { }
   virtual bool IsTriangleDataSet (csStringID) { return false; }
   virtual void ResetTriangleData (csStringID) { }
