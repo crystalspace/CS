@@ -437,6 +437,17 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
     return CSMutableArrayHelper(self.GetVertexByIndex, self.GetVertexCount)
 %}
 
+%feature("shadow") iTriangleMesh::GetTriangles()
+%{
+  def GetTriangles(self):
+    return CSMutableArrayHelper(self.GetTriangleByIndex, self.GetTriangleCount)
+%}
+%feature("shadow") iTriangleMesh::GetVertices()
+%{
+  def GetVertices(self):
+    return CSMutableArrayHelper(self.GetVertexByIndex, self.GetVertexCount)
+%}
+
 /* Macro to add an iterator to a python proxy
    requires the class to have __len__ and __getitem__ methods */
 %define PYITERATOR_PROTOCOL(classname)

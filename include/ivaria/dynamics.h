@@ -33,7 +33,6 @@ struct iMeshWrapper;
 struct iLight;
 struct iCamera;
 struct iObject;
-struct iPolygonMesh;
 struct iRigidBody;
 
 class csMatrix3;

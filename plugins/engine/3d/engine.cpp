@@ -576,6 +576,12 @@ bool csEngine::Initialize (iObjectRegistry *objectRegistry)
   virtualClock = csQueryRegistry<iVirtualClock> (objectRegistry);
   if (!virtualClock) return false;
 
+  globalStringSet = csQueryRegistryTagInterface<iStringSet> (
+      objectRegistry, "crystalspace.shared.stringset");
+  colldet_id = globalStringSet->Request ("colldet");
+  viscull_id = globalStringSet->Request ("viscull");
+  base_id = globalStringSet->Request ("base");
+
   G3D = csQueryRegistry<iGraphics3D> (objectRegistry);
   if (!G3D)
   {
@@ -658,9 +664,6 @@ bool csEngine::HandleEvent (iEvent &Event)
   {
   if (G3D)
   {
-    globalStringSet = csQueryRegistryTagInterface<iStringSet> (
-      objectRegistry, "crystalspace.shared.stringset");
-
     id_creation_time = globalStringSet->Request("mesh creation time");
 
     maxAspectRatio = 4096;

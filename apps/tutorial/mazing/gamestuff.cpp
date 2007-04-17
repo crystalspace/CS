@@ -266,7 +266,7 @@ Player::Player (AppMazing* app)
 bool Player::InitCollisionDetection ()
 {
   float ps = PLAYER_SIZE / 2.0;
-  csPolygonMeshBox* box = new csPolygonMeshBox (csBox3 (
+  csTriangleMeshBox* box = new csTriangleMeshBox (csBox3 (
   	csVector3 (-ps, -ps, -ps), csVector3 (ps, ps, ps)));
   player_collider = app->GetCollisionDetectionSystem ()
   	->CreateCollider (box);
@@ -563,8 +563,9 @@ bool Game::CreateFactories ()
   fstate->SetColor (csColor (1.0, 1.0, 1.0));
   // We don't want to hit the player against the laserbeam when it is
   // visible so we disable the collision detection mesh here.
+  csStringID colldet_id = app->GetStrings ()->Request ("colldet");
   laserbeam_factory->GetMeshObjectFactory ()->GetObjectModel ()
-  	->SetPolygonMeshColldet (0);
+  	->SetTriangleData (colldet_id, 0);
 
   if (!loader->LoadTexture ("laserbeam_texture", "/lib/stdtex/blobby.jpg"))
     return app->ReportError ("Error loading 'blobby' texture!");

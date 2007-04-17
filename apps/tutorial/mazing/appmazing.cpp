@@ -151,6 +151,11 @@ bool AppMazing::Application()
   if (!vc)
     return ReportError("Failed to locate the virtual clock!");
 
+  strings = csQueryRegistryTagInterface<iStringSet> (r,
+      "crystalspace.shared.stringset");
+  if (!strings)
+    return ReportError("Failed to locate the standard stringset!");
+
   // Setup game.
   if (!game.SetupGame ())
     return false;

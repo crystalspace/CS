@@ -318,6 +318,8 @@
   INTERFACE_APPLY(iTextureWrapper)
   INTERFACE_APPLY(iThingState)
   INTERFACE_APPLY(iThingFactoryState)
+  INTERFACE_APPLY(iTriangleMesh)
+  INTERFACE_APPLY(iTriangleMeshIterator)
   INTERFACE_APPLY(iVFS)
   INTERFACE_APPLY(iView)
   INTERFACE_APPLY(iVirtualClock)
@@ -1026,8 +1028,11 @@ iArrayChangeElements<csShaderVariable * >;
 %ignore iPolygonMesh::GetTriangles;
 %ignore iPolygonMesh::GetVertices;
 %ignore iPolygonMesh::GetPolygons;
+%ignore iTriangleMesh::GetTriangles;
+%ignore iTriangleMesh::GetVertices;
 #endif
 %include "igeom/polymesh.h"
+%include "igeom/trimesh.h"
 /*Ignore some deprecated functions*/
 %ignore csPath::GetPointCount;
 %ignore csPath::GetTimeValue;
@@ -1036,7 +1041,10 @@ iArrayChangeElements<csShaderVariable * >;
 %include "csgeom/path.h"
 %template(pycsPolygonMesh) scfImplementation1<csPolygonMesh, iPolygonMesh>;
 %template(pycsPolygonMeshBox) scfImplementation1<csPolygonMeshBox, iPolygonMesh>;
+%template(pycsTriangleMesh) scfImplementation1<csTriangleMesh, iTriangleMesh>;
+%template(pycsTriangleMeshBox) scfImplementation1<csTriangleMeshBox, iTriangleMesh>;
 %include "csgeom/polymesh.h"
+%include "csgeom/trimesh.h"
 
 %ignore csArray<csArray<int> >::Contains;
 %template(csIntArray) csArray<int>;
@@ -1044,7 +1052,9 @@ iArrayChangeElements<csShaderVariable * >;
 ARRAY_OBJECT_FUNCTIONS(csArray<int>,int)
 ARRAY_OBJECT_FUNCTIONS(csArray<csArray<int> >,csArray<int>)
 %newobject csPolygonMeshTools::CalculateVertexConnections;
+%newobject csTriangleMeshTools::CalculateVertexConnections;
 %include "csgeom/pmtools.h"
+%include "csgeom/trimeshtools.h"
 %include "csgeom/spline.h"
 
 %include "iengine/fview.h"
@@ -1410,6 +1420,15 @@ APPLY_FOR_EACH_INTERFACE
 
   csMeshedPolygon *GetPolygonByIndex(int index)
   { return &(self->GetPolygons()[index]); }
+
+  csTriangle *GetTriangleByIndex(int index)
+  { return &(self->GetTriangles()[index]); }
+}
+
+%extend iTriangleMesh
+{
+  csVector3 *GetVertexByIndex(int index)
+  { return &(self->GetVertices()[index]); }
 
   csTriangle *GetTriangleByIndex(int index)
   { return &(self->GetTriangles()[index]); }

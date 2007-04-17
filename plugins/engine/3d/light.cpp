@@ -20,7 +20,7 @@
 #include "csqint.h"
 
 #include "csgeom/frustum.h"
-#include "csgeom/polymesh.h"
+#include "csgeom/trimesh.h"
 #include "csutil/csendian.h"
 #include "csutil/csmd5.h"
 #include "csutil/memfile.h"
@@ -47,7 +47,7 @@ void csLight::UpdateViscullMesh ()
   // in case of a spot light. The geometry specified here should be at
   // least as big as that shape (for example, a box in case of a point light
   // would be fine).
-  csRef<iPolygonMesh> m;
+  csRef<iTriangleMesh> m;
   switch (type)
   {
     case CS_LIGHT_POINTLIGHT:
@@ -55,7 +55,7 @@ void csLight::UpdateViscullMesh ()
         object_model->box.Set (
 		-cutoffDistance, -cutoffDistance, -cutoffDistance,
 		cutoffDistance, cutoffDistance, cutoffDistance);
-        m.AttachNew (new csPolygonMeshBox (object_model->box));
+        m.AttachNew (new csTriangleMeshBox (object_model->box));
 	object_model->radius = cutoffDistance;
       }
       break;
@@ -66,7 +66,7 @@ void csLight::UpdateViscullMesh ()
       // @@@ TODO
       break;
   }
-  object_model->SetPolygonMeshViscull (m);
+  object_model->SetTriangleData (engine->viscull_id, m);
   object_model->ShapeChanged ();
 }
 

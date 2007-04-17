@@ -21,6 +21,23 @@ chronological order.
 	- Jorrit changed genmeshify so that it writes out trimeshes
 	  instead of polymeshes. However the code itself still works
 	  with polygon meshes.
+	- Jorrit did some more documentation updates related to the
+	  deprecation of iPolygonMesh in favor of iTriangleMesh.
+	- Jorrit updated mazing to the new iTriangleMesh.
+	- Jorrit updated cspace.i for the new iTriangleMesh.
+	- Jorrit updated light culling handling in the engine to use
+	  iTriangleMesh instead of iPolygonMesh.
+	- Jorrit updated the portal container mesh to use the new
+	  iTriangleMesh.
+	- Jorrit fixed a big bug in the thing mesh. It would accidently
+	  use the lighting polygon flag to construct the visibility culling
+	  mesh instead of the viscull flag. This bug was introduced in
+	  revision 24181 where res2k decided that polygons that are not
+	  lit should not contribute to visibility culling ;-)
+	- Jorrit fixed iTriangleMesh support in thing so that it also respects
+	  the colldet and viscull flags for individual polygons. In this case
+	  the thing mesh will itself set the collision and visibility culling
+	  meshes.
 16-Apr-2007
 	- Andrew Robberts added a CS_ENTITY_NODECAL flag.
 	- Jorrit fixed a bug in csObjectModel. It would use Put() instead

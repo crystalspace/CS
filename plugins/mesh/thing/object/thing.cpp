@@ -154,7 +154,7 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
   polygonMesh->SetThing (this);
   polygonMeshCD.AttachNew (new PolyMeshHelper (CS_POLY_COLLDET));
   polygonMeshCD->SetThing (this);
-  polygonMeshLOD.AttachNew (new PolyMeshHelper (CS_POLY_LIGHTING));
+  polygonMeshLOD.AttachNew (new PolyMeshHelper (CS_POLY_VISCULL));
   polygonMeshLOD->SetThing (this);
   SetPolygonMeshBase (polygonMesh);
   SetPolygonMeshColldet (polygonMeshCD);
@@ -162,9 +162,15 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
   SetPolygonMeshShadows (polygonMeshLOD);
 
   csRef<TriMeshHelper> trimesh;
-  trimesh.AttachNew (new TriMeshHelper ());
+  trimesh.AttachNew (new TriMeshHelper (0));
   trimesh->SetThing (this);
   SetTriangleData (thing_type->base_id, trimesh);
+  trimesh.AttachNew (new TriMeshHelper (CS_POLY_COLLDET));
+  trimesh->SetThing (this);
+  SetTriangleData (thing_type->colldet_id, trimesh);
+  trimesh.AttachNew (new TriMeshHelper (CS_POLY_VISCULL));
+  trimesh->SetThing (this);
+  SetTriangleData (thing_type->viscull_id, trimesh);
 
   max_vertices = num_vertices = 0;
   obj_verts = 0;
@@ -2323,7 +2329,8 @@ void TriMeshHelper::Setup ()
   for (i = 0 ; i < pol.GetSize () ; i++)
   {
     csPolygon3DStatic *p = pol.Get (i);
-    num_tri += p->GetVertexCount ()-2;
+    if (p->flags.CheckAll (poly_flag))
+      num_tri += p->GetVertexCount ()-2;
   }
 
   // Allocate the arrays and the copy the data.
@@ -2339,14 +2346,17 @@ void TriMeshHelper::Setup ()
     for (i = 0 ; i < pol.GetSize () ; i++)
     {
       csPolygon3DStatic *p = pol.Get (i);
-      int* vi = p->GetVertexIndices ();
-      size_t j;
-      for (j = 1 ; j < (size_t)p->GetVertexCount ()-1 ; j++)
+      if (p->flags.CheckAll (poly_flag))
       {
-	triangles[num_tri].a = vi[0];
-	triangles[num_tri].b = vi[j];
-	triangles[num_tri].c = vi[j+1];
-        num_tri++;
+        int* vi = p->GetVertexIndices ();
+        size_t j;
+        for (j = 1 ; j < (size_t)p->GetVertexCount ()-1 ; j++)
+        {
+	  triangles[num_tri].a = vi[0];
+	  triangles[num_tri].b = vi[j];
+	  triangles[num_tri].c = vi[j+1];
+          num_tri++;
+        }
       }
     }
   }
@@ -2972,6 +2982,8 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
   csRef<iStringSet> strset = csQueryRegistryTagInterface<iStringSet> (
       object_reg, "crystalspace.shared.stringset");
   base_id = strset->Request ("base");
+  viscull_id = strset->Request ("viscull");
+  colldet_id = strset->Request ("colldet");
   csRef<iEngine> e = csQueryRegistry<iEngine> (object_reg);
   engine = e;   // We don't want a real ref here to avoid circular refs.
   csRef<iGraphics3D> g = csQueryRegistry<iGraphics3D> (object_reg);

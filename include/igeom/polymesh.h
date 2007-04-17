@@ -95,8 +95,9 @@ enum
  * A polygon. Note that this structure is only valid if used
  * in combination with a vertex table. The vertex array then
  * contains indices in that table.
+ * \deprecated csMeshedPolygon is deprecated.
  */
-struct csMeshedPolygon
+struct CS_DEPRECATED_TYPE_MSG("csMeshedPolygon is deprecated") csMeshedPolygon
 {
   int num_vertices;
   int* vertices;

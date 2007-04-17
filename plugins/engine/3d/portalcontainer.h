@@ -21,6 +21,7 @@
 #define __CS_PORTALCONTAINER_H__
 
 #include "csgeom/pmtools.h"
+#include "csgeom/trimeshtools.h"
 #include "csgeom/vector3.h"
 #include "cstool/meshobjtmpl.h"
 #include "cstool/rendermeshholder.h"
@@ -117,6 +118,71 @@ private:
     if (triangles) return;
     csPolygonMeshTools::Triangulate (this, triangles, tri_count);
   }
+};
+
+/**
+ * A helper class for iTriangleMesh implementations used by csPortalContainer.
+ */
+class csPortalContainerTriMeshHelper : 
+  public scfImplementation1<csPortalContainerTriMeshHelper,
+                            iTriangleMesh>
+{
+public:
+
+  /**
+   * Make a polygon mesh helper which will accept polygons which match
+   * with the given flag (one of CS_POLY_COLLDET or CS_POLY_VISCULL).
+   */
+  csPortalContainerTriMeshHelper (uint32 flag) 
+    : scfImplementationType (this), vertices (0),
+      poly_flag (flag), triangles (0)
+  {
+  }
+  virtual ~csPortalContainerTriMeshHelper ()
+  {
+    Cleanup ();
+  }
+
+  void Setup ();
+  void SetPortalContainer (csPortalContainer* pc);
+
+  virtual size_t GetVertexCount ()
+  {
+    Setup ();
+    return vertices->GetSize ();
+  }
+  virtual csVector3* GetVertices ()
+  {
+    Setup ();
+    return vertices->GetArray ();
+  }
+  virtual size_t GetTriangleCount ()
+  {
+    Setup ();
+    return num_tri;
+  }
+  virtual csTriangle* GetTriangles ()
+  {
+    Setup ();
+    return triangles;
+  }
+  virtual void Lock () { }
+  virtual void Unlock () { }
+ 
+  virtual csFlags& GetFlags () { return flags;  }
+  virtual uint32 GetChangeNumber() const { return 0; }
+
+  void Cleanup ();
+
+private:
+  csPortalContainer* parent;
+  uint32 data_nr;		// To see if the portal container has changed.
+  // Array of vertices from portal container.
+  csDirtyAccessArray<csVector3>* vertices;
+  size_t num_tri;		// Total number of triangles.
+  uint32 poly_flag;		// Polygons must match with this flag.
+  csFlags flags;
+  csTriangle* triangles;
 };
 
 /**

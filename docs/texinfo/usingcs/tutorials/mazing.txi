@@ -592,7 +592,7 @@ Player::Player (AppMazing* app)
 bool Player::InitCollisionDetection ()
 @{
   float ps = PLAYER_SIZE / 2.0;
-  csPolygonMeshBox* box = new csPolygonMeshBox (csBox3 (
+  csTriangleMeshBox* box = new csTriangleMeshBox (csBox3 (
   	csVector3 (-ps, -ps, -ps), csVector3 (ps, ps, ps)));
   player_collider = app->GetCollisionDetectionSystem ()
   	->CreateCollider (box);
@@ -605,8 +605,8 @@ bool Player::InitCollisionDetection ()
 First we have the constructor. In this constructor we set all the defaults for
 the movement system. In @code{InitCollisionDetection()} we set up the collider
 that the collision detection system is going to use. Basically we represent
-the player as a box. The class @code{csPolygonMeshBox} can be used to quickly
-create an implementation of @code{iPolygonMesh} for a box.
+the player as a box. The class @code{csTriangleMeshBox} can be used to quickly
+create an implementation of @code{iTriangleMesh} for a box.
 
 @example
 void Player::StartMovement (const csVector3& dir)
@@ -1237,8 +1237,9 @@ bool Game::CreateFactories ()
   fstate->SetColor (csColor (1.0, 1.0, 1.0));
   // We don't want to hit the player against the laserbeam when it is
   // visible so we disable the collision detection mesh here.
+  csStringID colldet_id = app->GetStrings ()->Request ("colldet");
   laserbeam_factory->GetMeshObjectFactory ()->GetObjectModel ()
-  	->SetPolygonMeshColldet (0);
+  	->SetTriangleData (colldet_id, 0);
 
   if (!loader->LoadTexture ("laserbeam_texture", "/lib/stdtex/blobby.jpg"))
     return app->ReportError ("Error loading 'blobby' texture!");
@@ -1309,7 +1310,7 @@ With a bit of effort we're confident that you can make a better explosion
 by tweaking the parameters and using a better texture.
 
 A few special remarks about the geometry above. On the laserbeam factory
-we use @code{iObjectModel::SetPolygonMeshColldet()} to clear the collision
+we use @code{iObjectModel::SetTriangleData()} to clear the collision
 detection mesh. The laserbeam mesh is generated at roughly the same spot
 as the camera. We don't want the collision detection system to detect hits
 with it (we use other methods to detect hits of the laserbeam with adversary).
@@ -1581,6 +1582,12 @@ private:
   csRef<iVirtualClock> vc;
 
   /**
+   * The string registry. This is used for common constants in
+   * Crystal Space.
+   */
+  csRef<iStringSet> strings;
+
+  /**
    * Set up everything that needs to be rendered on screen.  This routine is
    * called from the event handler in response to a cscmdProcess broadcast
    * message.
@@ -1616,6 +1623,7 @@ public:
   iCamera* GetCamera () const @{ return view->GetCamera (); @}
   iEngine* GetEngine () const @{ return engine; @}
   iLoader* GetLoader () const @{ return loader; @}
+  iStringSet* GetStrings () const @{ return strings; @}
   iCollideSystem* GetCollisionDetectionSystem () const @{ return cdsys; @}
   Game& GetGame () @{ return game; @}
 
@@ -1801,6 +1809,11 @@ bool AppMazing::Application()
   vc = csQueryRegistry<iVirtualClock> (r);
   if (!vc)
     return ReportError("Failed to locate the virtual clock!");
+
+  strings = csQueryRegistryTagInterface<iStringSet> (r,
+      "crystalspace.shared.stringset");
+  if (!strings)
+    return ReportError("Failed to locate the standard stringset!");
 
   // Setup game.
   if (!game.SetupGame ())

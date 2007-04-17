@@ -30,6 +30,69 @@
 #include "plugins/engine/3d/portalcontainer.h"
 #include "plugins/engine/3d/rview.h"
 #include "plugins/engine/3d/meshobj.h"
+#include "plugins/engine/3d/engine.h"
+
+// ---------------------------------------------------------------------------
+// csPortalContainerTriMeshHelper
+// ---------------------------------------------------------------------------
+
+void csPortalContainerTriMeshHelper::SetPortalContainer (csPortalContainer* pc)
+{
+  parent = pc;
+  data_nr = pc->GetDataNumber ()-1;
+}
+
+void csPortalContainerTriMeshHelper::Setup ()
+{
+  parent->Prepare ();
+  if (data_nr != parent->GetDataNumber () || !vertices)
+  {
+    data_nr = parent->GetDataNumber ();
+    Cleanup ();
+
+    vertices = parent->GetVertices ();
+    // Count number of needed triangles.
+    num_tri = 0;
+
+    size_t i;
+    const csRefArray<csPortal>& portals = parent->GetPortals ();
+    for (i = 0 ; i < portals.GetSize () ; i++)
+    {
+      csPortal *p = portals[i];
+      if (p->flags.CheckAll (poly_flag))
+        num_tri += p->GetVertexIndicesCount ()-2;
+    }
+
+    if (num_tri)
+    {
+      triangles = new csTriangle[num_tri];
+      num_tri = 0;
+      for (i = 0 ; i < portals.GetSize () ; i++)
+      {
+        csPortal *p = portals[i];
+        if (p->flags.CheckAll (poly_flag))
+        {
+          csDirtyAccessArray<int>& vi = p->GetVertexIndices ();
+          size_t j;
+          for (j = 1 ; j < (size_t)p->GetVertexIndicesCount ()-1 ; j++)
+          {
+	    triangles[num_tri].a = vi[0];
+	    triangles[num_tri].b = vi[j];
+	    triangles[num_tri].c = vi[j+1];
+            num_tri++;
+          }
+        }
+      }
+    }
+  }
+}
+
+void csPortalContainerTriMeshHelper::Cleanup ()
+{
+  vertices = 0;
+  delete[] triangles;
+  triangles = 0;
+}
 
 // ---------------------------------------------------------------------------
 // csPortalContainerPolyMeshHelper
@@ -106,6 +169,18 @@ csPortalContainer::csPortalContainer (iEngine* engine,
   SetPolygonMeshViscull (polygonMeshLOD);
   SetPolygonMeshShadows (polygonMeshLOD);
 
+  csRef<csPortalContainerTriMeshHelper> trimesh;
+  trimesh.AttachNew (new csPortalContainerTriMeshHelper (0));
+  trimesh->SetPortalContainer (this);
+  csEngine* e = static_cast<csEngine*> (engine);
+  SetTriangleData (e->base_id, trimesh);
+  trimesh.AttachNew (new csPortalContainerTriMeshHelper (CS_PORTAL_COLLDET));
+  trimesh->SetPortalContainer (this);
+  SetTriangleData (e->colldet_id, trimesh);
+  trimesh.AttachNew (new csPortalContainerTriMeshHelper (CS_PORTAL_VISCULL));
+  trimesh->SetPortalContainer (this);
+  SetTriangleData (e->viscull_id, trimesh);
+
   prepared = false;
   data_nr = 0;
   movable_nr = -1;
@@ -120,11 +195,9 @@ csPortalContainer::csPortalContainer (iEngine* engine,
   shader_man = csQueryRegistry<iShaderManager> (object_reg);
   fog_shader = shader_man->GetShader ("std_lighting_portal");
 
-  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet>
-    (object_reg, "crystalspace.shared.stringset");
-  fogplane_name = strings->Request ("fogplane");
-  fogdensity_name = strings->Request ("fog density");
-  fogcolor_name = strings->Request ("fog color");
+  fogplane_name = e->globalStringSet->Request ("fogplane");
+  fogdensity_name = e->globalStringSet->Request ("fog density");
+  fogcolor_name = e->globalStringSet->Request ("fog color");
 }
 
 csPortalContainer::~csPortalContainer ()

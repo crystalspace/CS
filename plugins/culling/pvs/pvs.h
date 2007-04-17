@@ -39,7 +39,6 @@
 class csKDTree;
 class csKDTreeChild;
 class csPVSVis;
-struct iPolygonMesh;
 struct iMovable;
 struct iMeshWrapper;
 struct iThingState;

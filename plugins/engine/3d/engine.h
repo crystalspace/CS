@@ -762,6 +762,10 @@ public:
 
   /// Store engine shadervar names
   csStringID id_creation_time;
+  /// For triangle meshes.
+  csStringID colldet_id;
+  csStringID viscull_id;
+  csStringID base_id;
   /**
    * This is the Virtual File System object where all the files
    * used by the engine live. Textures, models, data, everything -

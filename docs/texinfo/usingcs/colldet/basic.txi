@@ -224,8 +224,8 @@ every loaded mesh. You can also restrict the above code to one region.
 
 Depending on the game your player might have a representation of
 geometry or not. If it doesn't you will have to make your own version
-of @samp{iPolygonMesh} to create a collider for the player (possibly
-using @code{csPolygonMeshBox} as explained above). Even if
+of @samp{iTriangleMesh} to create a collider for the player (possibly
+using @code{csTriangleMeshBox} as explained above). Even if
 your player has geometry (i.e. a 3D sprite) it is sometimes still preferable
 to create your own special geometry for the player. The reason is
 gravity. When you would just use one collider for the player you can have
@@ -240,7 +240,7 @@ to go over small height elevations, the player collider should float slightly
 above the ground.
 
 The best way to make the gravity collider is to make your own implementation
-of @samp{iPolygonMesh} using @code{csPolygonMeshBox}. This is very efficient.
+of @samp{iTriangleMesh} using @code{csTriangleMeshBox}. This is very efficient.
 To keep the returned collider I recommend storing them somewhere in the player
 class or else use @code{csColliderWrapper} as explained above.
 

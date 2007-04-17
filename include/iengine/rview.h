@@ -272,8 +272,7 @@ struct iRenderView : public virtual iBase
    * Check if the given bounding sphere (in camera and world space coordinates)
    * is visibile in this render view. If the sphere is visible this
    * function will also initialize the clip_plane, clip_z_plane, and
-   * clip_portal fields which can be used for DrawTriangleMesh or
-   * DrawPolygonMesh.
+   * clip_portal fields which can be used for the renderer.
    */
   virtual bool ClipBSphere (
 	const csSphere &cam_sphere,

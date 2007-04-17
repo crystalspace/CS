@@ -185,8 +185,8 @@ public:
   /**
    * Make a triangle mesh helper.
    */
-  TriMeshHelper () : scfImplementationType (this), 
-    vertices (0), triangles (0),
+  TriMeshHelper (uint32 flag) : scfImplementationType (this), 
+    vertices (0), triangles (0), poly_flag (flag),
     locked (0)
   {
   }
@@ -235,6 +235,7 @@ private:
   csFlags flags;
   csTriangle* triangles;
   size_t num_tri;
+  uint32 poly_flag;
   int locked;
 };
 
@@ -397,6 +398,7 @@ public:
     LightmapTexAccessor (csThing* instance, size_t polyIndex);
     void PreGetValue (csShaderVariable *variable);
   };
+
 public:
   csThingStatic (iBase* parent, csThingObjectType* thing_type);
   virtual ~csThingStatic ();
@@ -1154,6 +1156,8 @@ public:
   float maxSLMSpaceWaste;
 
   csStringID base_id;
+  csStringID colldet_id;
+  csStringID viscull_id;
 
 public:
   /// Constructor.
