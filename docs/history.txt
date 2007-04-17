@@ -6,6 +6,10 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Apr-2007
+	- Marten fixed two bugs in walktest with regards to the mouse mesh
+	  selection; crash on selection of no mesh with right button and
+	  no hit ever on middle button.
 16-Apr-2007
 	- Andrew Robberts added a CS_ENTITY_NODECAL flag.
 	- Jorrit fixed a bug in csObjectModel. It would use Put() instead

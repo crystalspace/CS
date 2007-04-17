@@ -587,12 +587,16 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
 	ps ? ps->GetPolygonName (sel) : "<null>");
     //Dumper::dump (sel);
   }
-  else
+  else if (mesh)
   {
     csRef<iObject> psobj = 
     	scfQueryInterface<iObject> (mesh->GetMeshObject ()->GetMeshWrapper ());
     Sys->Report (CS_REPORTER_SEVERITY_DEBUG, "Hit mesh '%s'",
     	psobj ? psobj->GetName () : "<null>");
+  }
+  else
+  {
+    Sys->Report (CS_REPORTER_SEVERITY_DEBUG, "No hit");
   }
 
   extern csVector2 coord_check_vector;
@@ -717,8 +721,6 @@ iMeshWrapper *FindNextClosestMesh (iMeshWrapper *baseMesh,
   float closestZLocation;
   iMeshWrapper *closestMesh;
   iMeshWrapper *nextMesh;
-  csBox2 screenBoundingBox;
-  csBox3 bbox3;
 
   if (baseMesh)
   {
@@ -748,7 +750,7 @@ iMeshWrapper *FindNextClosestMesh (iMeshWrapper *baseMesh,
       thisZLocation = nextBox.distance;
       if ((thisZLocation > 0) && (thisZLocation < closestZLocation))
       {
-        if (screenBoundingBox.In(screenCoord->x, screenCoord->y))
+        if (nextBox.sbox.In(screenCoord->x, screenCoord->y))
         {
           closestZLocation = thisZLocation;
           closestMesh = nextMesh;
