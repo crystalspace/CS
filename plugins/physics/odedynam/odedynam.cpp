@@ -1351,7 +1351,7 @@ void csODECollider::FillWithColliderGeometry (csRef<iGeneralFactoryState> genmes
     {
       dReal r, l;
       dGeomCapsuleGetParams (geomID, &r, &l);
-      genmesh_fact->GenerateCapsule (r, l, 10);
+      genmesh_fact->GenerateCapsule (l, r, 10);
     }
     break;
   case PLANE_COLLIDER_GEOMETRY:
