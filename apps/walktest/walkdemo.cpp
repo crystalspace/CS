@@ -788,6 +788,18 @@ void test_decal ()
       decalMgr->CreateDecalTemplate(material);
   decalTemplate->SetTimeToLive(5.0f);
   
+  csVector3 start = Sys->view->GetCamera()->GetTransform().GetOrigin();
+
+  csVector3 normal = 
+    Sys->view->GetCamera()->GetTransform().This2OtherRelative(csVector3(0,0,-1));
+
+  csVector3 end = start - normal * 10000.0f;
+
+  csSectorHitBeamResult result = Sys->view->GetCamera()->GetSector()->HitBeamPortals(start, end);
+  if (!result.mesh)
+      return;
+      
+/*
   // figure out the starting point
   csRef<iCollideSystem> cdsys = csQueryRegistry<iCollideSystem>(Sys->object_reg);
   if (!cdsys)
@@ -796,22 +808,20 @@ void test_decal ()
     return;
   }
 
-  csVector3 start = Sys->view->GetCamera()->GetTransform().GetOrigin();
-
-  csVector3 normal = 
-    Sys->view->GetCamera()->GetTransform().This2OtherRelative(
-	csVector3(0,0,-1));
-
-  csVector3 end = start - normal * 100.0f;
 
   // intersect with world to get a decal position
   csVector3 iSect;
   csIntersectingTriangle closestTri;
   iMeshWrapper * selMesh;
-  csColliderHelper::TraceBeam(cdsys, Sys->view->GetCamera()->GetSector(), 
-      start, end, true, closestTri, iSect, &selMesh);
+  if (csColliderHelper::TraceBeam(cdsys, Sys->view->GetCamera()->GetSector(), 
+        start, end, true, closestTri, iSect, &selMesh) <= 0.0f)
+  {
+      printf("No Decal Tracebeam\n");
+      return;
+  }
 
   start = iSect;
+*/
 
   // make the up direction of the decal the same as the camera
   csVector3 up =
@@ -819,8 +829,8 @@ void test_decal ()
 	csVector3(0,1,0));
 
   // create the decal
-  decalMgr->CreateDecal(decalTemplate, Sys->view->GetCamera()->GetSector(),
-	  start, up, normal, 1.0f, 0.5f);
+  decalMgr->CreateDecal(decalTemplate, result.final_sector,
+	  result.isect, up, normal, 1.0f, 0.5f);
 }
 
 void AttachRandomLight (iLight* light)

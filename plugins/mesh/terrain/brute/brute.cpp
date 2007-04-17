@@ -34,6 +34,7 @@
 #include "csutil/csmd5.h"
 #include "csutil/memfile.h"
 #include "csutil/util.h"
+#include "csutil/csstring.h"
 #include "iengine/camera.h"
 #include "iengine/engine.h"
 #include "iengine/material.h"
@@ -53,6 +54,8 @@
 #include "ivideo/rendermesh.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/txtmgr.h"
+#include "csgeom/poly3d.h"
+#include "ivaria/decal.h"
 
 #include "ivaria/simpleformer.h"
 
@@ -1284,6 +1287,7 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
   csRef<iStringSet> strset = csQueryRegistryTagInterface<iStringSet> (
       object_reg, "crystalspace.shared.stringset");
   csStringID base_id = strset->Request ("base");
+  stringVertices = strset->Request("vertices");
   SetTriangleData (base_id, trimesh);
 
   polymesh_valid = false;
@@ -2851,6 +2855,39 @@ bool csTerrainObject::HitBeamObject (const csVector3& start,
     *material = 0;
   }
   return rc;
+}
+
+void csTerrainObject::BuildDecal(const csVector3* pos, float decalRadius,
+          iDecalBuilder* decalBuilder)
+{
+  const int res = ((int)(decalRadius * 2.0f * (float)block_res / block_minsize) + 1) * 3;
+  const float heightAdjust = decalRadius * 0.01f; 
+  csBox2 region(pos->x - decalRadius, pos->z - decalRadius, pos->x + decalRadius, pos->z + decalRadius);
+  csRef<iTerraSampler> s = terraformer->GetSampler(region, res, res);
+  const csVector3 * verts = s->SampleVector3(stringVertices);
+
+  csPoly3D poly;
+  poly.SetVertexCount(4);
+
+  for (int y=0; y<res-1; ++y)
+  {
+    for (int x=0; x<res-1; ++x)
+    {
+      const int bottomLeft = (y+1)*res + x;
+      const int topLeft = y*res + x;
+      poly[0] = verts[bottomLeft];
+      poly[1] = verts[bottomLeft+1];
+      poly[2] = verts[topLeft+1];
+      poly[3] = verts[topLeft];
+
+      poly[0].y += heightAdjust;
+      poly[1].y += heightAdjust;
+      poly[2].y += heightAdjust;
+      poly[3].y += heightAdjust;
+
+      decalBuilder->AddStaticPoly(poly);
+    }
+  }
 }
 
 //----------------------------------------------------------------------

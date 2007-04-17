@@ -284,6 +284,8 @@ private:
 
   bool LODCalc;
 
+  csStringID stringVertices;
+
 public:
   CS_LEAKGUARD_DECLARE (csTerrainObject);
 
@@ -411,13 +413,12 @@ public:
     csVector3& isect, float* pr, int* polygon_idx = 0,
     iMaterialWrapper** material = 0);
 
+  virtual void BuildDecal(const csVector3* pos, float decalRadius,
+          iDecalBuilder* decalBuilder);
+
   virtual void InvalidateMaterialHandles () { }
   virtual void PositionChild (iMeshObject* /*child*/,
   	csTicks /*current_time*/) { }
-  virtual void BuildDecal(const csVector3* pos, float decalRadius,
-          iDecalBuilder* decalBuilder)
-  {
-  }
 
   void FireListeners ();
   void AddListener (iObjectModelListener* listener);

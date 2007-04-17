@@ -67,6 +67,8 @@ chronological order.
 	- Oktal reverted the Jamfile change from his previous commit and
 	  modified it so cspace.pm and cspace.so can be copied to the scripts
 	  directory with the perl5freeze and perl5freezeobj targets.
+    - Andrew Robberts added some sort of decal support to bruteblock
+      terrain
 16-Apr-2007
 	- Andrew Robberts added a CS_ENTITY_NODECAL flag.
 	- Jorrit fixed a bug in csObjectModel. It would use Put() instead
