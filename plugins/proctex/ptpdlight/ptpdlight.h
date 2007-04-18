@@ -180,7 +180,7 @@ private:
   csBitArray tilesDirty;
   csRGBcolor baseColor;
   PDMap baseMap;
-  csArray<MappedLight> lights;
+  csSafeCopyArray<MappedLight> lights;
   csBitArray lightBits;
   csSet<csConstPtrKey<iLight> > dirtyLights;
   enum

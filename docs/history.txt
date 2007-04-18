@@ -11,6 +11,7 @@ chronological order.
           ode collider is. 
         - Piotr fixed transform returned by dynamics system collider in
           odedynam.
+	- res did some cleanups to ptpdlight and added some profiler zones.
 17-Apr-2007
 	- Marten fixed two bugs in walktest with regards to the mouse mesh
 	  selection; crash on selection of no mesh with right button and

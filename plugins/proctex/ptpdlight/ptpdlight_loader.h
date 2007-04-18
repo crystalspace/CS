@@ -21,22 +21,11 @@
 #define __CS_PTPDLIGHT_LOADER_H__
 
 #include "iutil/comp.h"
-/*#include "iutil/plugin.h"*/
 #include "imap/reader.h"
-/*#include "imesh/lighting.h"
-#include "igraphic/image.h"
 
-#include "csgeom/csrect.h"
-#include "csgfx/imageautoconvert.h"*/
 #include "csutil/csstring.h"
-/*#include "csutil/dirtyaccessarray.h"
-#include "csutil/flags.h"*/
 #include "csutil/scf_implementation.h"
 #include "csutil/strhash.h"
-/*#include "csutil/weakref.h"
-#include "cstool/proctex.h"
-
-class csProcTexture;*/
 
 CS_PLUGIN_NAMESPACE_BEGIN(PTPDLight)
 {

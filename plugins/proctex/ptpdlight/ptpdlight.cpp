@@ -22,6 +22,7 @@
 
 #include "ivideo/texture.h"
 #include "iengine/engine.h"
+#include "ivaria/profile.h"
 #include "ivaria/reporter.h"
 
 #include "csgeom/fixed.h"
@@ -34,6 +35,11 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(PTPDLight)
 {
+
+  CS_DECLARE_PROFILER
+  CS_DECLARE_PROFILER_ZONE(ProctexPDLight_Animate)
+  CS_DECLARE_PROFILER_ZONE(ProctexPDLight_Animate_inner)
+  CS_DECLARE_PROFILER_ZONE(ProctexPDLight_Animate_Blit)
 
   TileHelper::TileHelper (int w, int h)
   {
@@ -412,6 +418,7 @@ void ProctexPDLight::Animate (csTicks /*current_time*/)
   {
     if (lightmapSize > 0)
     {
+      CS_PROFILER_ZONE(ProctexPDLight_Animate)
       lightBits.Clear();
       for (size_t l = 0; l < lights.GetSize(); )
       {
@@ -508,25 +515,31 @@ void ProctexPDLight::Animate (csTicks /*current_time*/)
           mapMax.red   = lutR[mapMax.red]   >> shiftR;
           mapMax.green = lutG[mapMax.green] >> shiftG;
           mapMax.blue  = lutB[mapMax.blue]  >> shiftB;
-          int safeMask = 0;
-          if (scratchMax.red   + mapMax.red   > 255) safeMask |= safeR;
-          if (scratchMax.green + mapMax.green > 255) safeMask |= safeG;
-          if (scratchMax.blue  + mapMax.blue  > 255) safeMask |= safeB;
-          MultiplyAddProc maProc = maProcs[safeMask];
-          maProc (scratchPtr, scratchPitch, mapPtr, mapPitch,
-            mapW, lines, lutR, lutG, lutB);
+          {
+            CS_PROFILER_ZONE(ProctexPDLight_Animate_inner)
+            int safeMask = 0;
+            if (scratchMax.red   + mapMax.red   > 255) safeMask |= safeR;
+            if (scratchMax.green + mapMax.green > 255) safeMask |= safeG;
+            if (scratchMax.blue  + mapMax.blue  > 255) safeMask |= safeB;
+            MultiplyAddProc maProc = maProcs[safeMask];
+            maProc (scratchPtr, scratchPitch, mapPtr, mapPitch,
+              mapW, lines, lutR, lutG, lutB);
 
-          if (safeMask == 0)
-            scratchMax.UnsafeAdd (mapMax);
-          else
-            scratchMax.SafeAdd (mapMax);
+            if (safeMask == 0)
+              scratchMax.UnsafeAdd (mapMax);
+            else
+              scratchMax.SafeAdd (mapMax);
+          }
         }
 
-        tex->GetTextureHandle ()->Blit (tileRect.xmin, 
-          tileRect.ymin, 
-          tileRect.Width(), tileRect.Height(),
-          (uint8*)scratch.GetArray(),
-          iTextureHandle::BGRA8888);
+        {
+          CS_PROFILER_ZONE(ProctexPDLight_Animate_Blit)
+          tex->GetTextureHandle ()->Blit (tileRect.xmin, 
+            tileRect.ymin, 
+            tileRect.Width(), tileRect.Height(),
+            (uint8*)scratch.GetArray(),
+            iTextureHandle::BGRA8888);
+        }
       }
     }
     state.Reset (stateDirty);
