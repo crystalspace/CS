@@ -45,9 +45,9 @@ bool csTranslator::Initialize (iObjectRegistry *object_reg)
 
 const char* csTranslator::GetMsg (const char* src) const
 {
-  csString dst = messages.Get (src, csString ());
-  if (!dst.IsEmpty ())
-    return dst.GetData ();
+  const csString* dst = messages.GetElementPointer (src);
+  if (dst)
+    return *dst;
   else
     return src;
 }

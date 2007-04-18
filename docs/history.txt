@@ -32,6 +32,8 @@ chronological order.
 	- res changed the lighter2 layouter to allow for some tolerance when
 	  comparing normals. By default normals with an angle up to 1 degree
 	  between them are considered equal for layouting purposes.
+	- res committed a patch from Dariusz Dawidowski to the trans_std 
+	  plugin that fixes the returning of a pointer to a local variable.
 17-Apr-2007
 	- Marten fixed two bugs in walktest with regards to the mouse mesh
 	  selection; crash on selection of no mesh with right button and
