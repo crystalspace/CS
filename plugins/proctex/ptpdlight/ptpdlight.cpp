@@ -217,6 +217,18 @@ void ProctexPDLight::PDMap::Crop ()
   imageH = nonNullArea.Height();
 }
 
+void ProctexPDLight::PDMap::GetMaxValue (csRGBcolor& maxValue)
+{
+  maxValue.Set (0, 0, 0);
+  for (size_t m = 0; m < maxValues.GetSize(); m++)
+  {
+    const csRGBcolor& color = maxValues[m];
+    if (color.red > maxValue.red) maxValue.red = color.red;
+    if (color.green > maxValue.green) maxValue.green = color.green;
+    if (color.blue > maxValue.blue) maxValue.blue = color.blue;
+  }
+}
+
 void ProctexPDLight::Report (int severity, const char* msg, ...)
 {
   static const char msgId[] = "crystalspace.proctex.pdlight";
@@ -293,6 +305,17 @@ bool ProctexPDLight::PrepareAnim ()
       light.light->AddAffectedLightingInfo (
         static_cast<iLightingInfo*> (this));
       dirtyLights.Add ((iLight*)light.light);
+
+      LightColorState colorState;
+      colorState.lastColor.Set (0, 0, 0);
+      csRGBcolor maxValue;
+      light.map.GetMaxValue (maxValue);
+      /* When a component changes by this amount the change is visible
+       * (assuming 8 bits per component precision). */
+      colorState.minChangeThresh.Set (1.0f/maxValue.red, 
+        1.0f/maxValue.green,
+        1.0f/maxValue.blue);
+      lightColorStates.Put ((iLight*)light.light, colorState);
     }
     else
     {
@@ -430,6 +453,7 @@ void ProctexPDLight::Animate (csTicks current_time)
       if (!light.light)
       {
         tilesDirty |= light.map.tileNonNull;
+        lightColorStates.DeleteAll ((iLight*)light.light);
         lights.DeleteIndexFast (l);
         lightBits.SetSize (lights.GetSize ());
         continue;
@@ -497,9 +521,12 @@ void ProctexPDLight::Animate (csTicks current_time)
         uint32 lutG[256];
         uint32 lutB[256];
 
-        ComputeLUT<shiftR> (light.light->GetColor ().red,   lutR);
-        ComputeLUT<shiftG> (light.light->GetColor ().green, lutG);
-        ComputeLUT<shiftB> (light.light->GetColor ().blue,  lutB);
+        const csColor& lightColor = light.light->GetColor ();
+        lightColorStates.GetElementPointer ((iLight*)light.light)->lastColor =
+          lightColor;
+        ComputeLUT<shiftR> (lightColor.red,   lutR);
+        ComputeLUT<shiftG> (lightColor.green, lutG);
+        ComputeLUT<shiftB> (lightColor.blue,  lutB);
 
         int mapW = csMin (lightInTile.xmax, light.map.imageX + light.map.imageW)
           - csMax (lightInTile.xmin, light.map.imageX);
@@ -561,12 +588,25 @@ void ProctexPDLight::DisconnectAllLights ()
   tilesDirty.Clear ();
   tilesDirty.FlipAllBits ();
   dirtyLights.DeleteAll ();
+  lightColorStates.DeleteAll ();
 }
 
 void ProctexPDLight::LightChanged (iLight* light) 
 { 
   dirtyLights.Add (light);
-  state.Set (stateDirty); 
+  const LightColorState& colorState = 
+    *lightColorStates.GetElementPointer (light);
+  const csColor& lightColor = light->GetColor ();
+  /* When the light color difference to the value last used at updating
+     is below the amount needed for a visible difference an update of the
+     texture because of this light isn't needed. */
+  if ((fabsf (colorState.lastColor.red - lightColor.red) 
+      >= colorState.minChangeThresh.red)
+    || (fabsf (colorState.lastColor.green - lightColor.green) 
+      >= colorState.minChangeThresh.green)
+    || (fabsf (colorState.lastColor.blue - lightColor.blue) 
+      >= colorState.minChangeThresh.blue))
+    state.Set (stateDirty); 
 }
 
 void ProctexPDLight::LightDisconnect (iLight* light)
@@ -576,6 +616,7 @@ void ProctexPDLight::LightDisconnect (iLight* light)
     if (lights[i].light == light)
     {
       lights.DeleteIndexFast (i);
+      lightColorStates.DeleteAll (light);
       state.Set (stateDirty);
       dirtyLights.Add (light);
       lightBits.SetSize (lights.GetSize ());

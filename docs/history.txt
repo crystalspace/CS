@@ -20,6 +20,9 @@ chronological order.
 	  are delayed to a future frame. Can be controlled through config
 	  vars "Texture.PTPDLight.UseScheduling" (enable/disable, default on) 
 	  and "Texture.PTPDLight.TimePerFrame" (time budget, default 25).
+	- res changed ptpdlight to only update a PD texture when at least
+	  one light changed it's color value by an amount that causes a
+	  visible difference.
 17-Apr-2007
 	- Marten fixed two bugs in walktest with regards to the mouse mesh
 	  selection; crash on selection of no mesh with right button and

@@ -151,6 +151,7 @@ public:
     }
     void SetImage (const TileHelper& tiles, iImage* img);
     void Crop ();
+    void GetMaxValue (csRGBcolor& maxValue);
   };
   struct MappedLight
   {
@@ -190,6 +191,15 @@ private:
     statePrepared = 1 << 1,
   };
   csFlags state;
+  struct LightColorState
+  {
+    // Color at the time the PT texture was last updated.
+    csColor lastColor;
+    /* Minimum difference of light color to lastColor before the "texture
+     * dirty" flag is set. */
+    csColor minChangeThresh;
+  };
+  csHash<LightColorState, csConstPtrKey<iLight> > lightColorStates;
 
   void Report (int severity, const char* msg, ...);
 public:
