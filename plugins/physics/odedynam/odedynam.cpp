@@ -1252,7 +1252,7 @@ csOrthoTransform csODECollider::GetTransform ()
   csMatrix3 g_rot;
   ODE2CSMatrix (dGeomGetRotation (geomID), g_rot);
 
-  return t_transf * csOrthoTransform (g_rot, g_pos);
+  return csOrthoTransform (g_rot, g_pos) * t_transf;
 }
 void csODECollider::AddTransformToSpace (dSpaceID spaceID)
 {
