@@ -196,13 +196,15 @@ namespace lighter
           const csVector3& n1 = prim.GetVertexData().normals[a];
           const csVector3& n2 = 
             other.prim.GetVertexData().normals[other.b];
-          if (!((n1-n2).IsZero (SMALL_EPSILON))) return false;
+          if (!((n1-n2).IsZero (
+            globalConfig.GetLMProperties().normalsTolerance))) return false;
         }
         {
           const csVector3& n1 = prim.GetVertexData().normals[other.a];
           const csVector3& n2 = 
             other.prim.GetVertexData().normals[b];
-          if (!((n1-n2).IsZero (SMALL_EPSILON))) return false;
+          if (!((n1-n2).IsZero (
+            globalConfig.GetLMProperties().normalsTolerance))) return false;
         }
         // Fall through
       case Position:
@@ -277,36 +279,33 @@ namespace lighter
     const FactoryPrimitiveArray& inPrims, ObjectFactoryVertexData& vertexData,
     csArray<FactoryPrimitiveArray>& outPrims)
   {
-    FactoryPrimitiveArray primsByD;
-    for (size_t i = 0; i < inPrims.GetSize (); i++)
-    {
-      const FactoryPrimitive& prim (inPrims[i]);
-      primsByD.InsertSorted (prim, SortPrimByD);
-    }
+    FactoryPrimitiveArray workPrims (inPrims);
     // Takes all neighbouring primitives
     UberPrimArray uberPrims;
-    while (primsByD.GetSize() > 0)
+    while (workPrims.GetSize() > 0)
     {
       // Primitives are sorted by D, look for actual coplanar ones
       FactoryPrimitiveArray coplanarPrims;
-      const FactoryPrimitive& prim0 (primsByD[0]);
-      float lastD = prim0.GetPlane().DD;
-      const csVector3& lastNormal = prim0.GetPlane().GetNormal();
+      const FactoryPrimitive& prim0 (workPrims[0]);
+      csVector3 normalsSum = prim0.GetPlane().GetNormal();
       
-      for (size_t i = 1; i < primsByD.GetSize(); )
+      for (size_t i = 1; i < workPrims.GetSize(); )
       {
-        const FactoryPrimitive& prim (primsByD[i]);
-        if (fabsf (prim.GetPlane().DD - lastD) > EPSILON) break;
-        if (((prim.GetPlane().GetNormal() * lastNormal)) > (1.0f - EPSILON))
+        const FactoryPrimitive& prim (workPrims[i]);
+        if (((prim.GetPlane().GetNormal() * normalsSum.Unit())) > 
+          (1.0f - globalConfig.GetLMProperties().normalsTolerance))
         {
+          normalsSum += prim.GetPlane().GetNormal();
           coplanarPrims.Push (prim);
-          primsByD.DeleteIndex (i);
+          workPrims.DeleteIndex (i);
         }
         else
+        {
           i++;
+        }
       }
       coplanarPrims.Push (prim0);
-      primsByD.DeleteIndex (0);
+      workPrims.DeleteIndex (0);
 
       // In the coplanar ones, look for neighbouring ones
       while (coplanarPrims.GetSize() > 0)
@@ -383,13 +382,15 @@ namespace lighter
                                                    Vector2Array& lightmapUVs)
   {
     size_t i;
-    const FactoryPrimitive& prim = prims[0];
+    //const FactoryPrimitive& prim = prims[0];
 
     // Select projection dimension to be biggest component of plane normal
-    //if (prim.GetPlane ().GetNormal ().SquaredNorm () == 0.0f)
-      //prim.ComputePlane ();
 
-    const csVector3& normal = prim.GetPlane ().GetNormal ();
+    //const csVector3& normal = prim.GetPlane ().GetNormal ();
+    csVector3 normal (prims[0].GetPlane ().GetNormal ());
+    for (size_t p = 1; p < prims.GetSize(); p++)
+      normal += prims[p].GetPlane ().GetNormal ();
+      
     size_t projDimension = 0; //x
 
     if (fabsf (normal.y) > fabsf (normal.x) &&

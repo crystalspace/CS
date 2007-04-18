@@ -39,6 +39,7 @@ namespace lighter
     lmProperties.maxLightmapU = 1024;
     lmProperties.maxLightmapV = 1024;
     lmProperties.blackThreshold = lightValueEpsilon;
+    lmProperties.normalsTolerance = 1.0f * (PI / 180.0f);
 
     diProperties.pointLightMultiplier = 1.0f;
     diProperties.areaLightMultiplier = 1.0f;
@@ -67,5 +68,10 @@ namespace lighter
       lmProperties.blackThreshold);
     lmProperties.blackThreshold = csMax (lmProperties.blackThreshold,
       lightValueEpsilon); // Values lower than the LM precision don't make sense
+
+    float normalsToleranceAngle = cfgMgr->GetInt ("lighter2.normalsTolerance", 
+      1.0f);
+    lmProperties.normalsTolerance = csMax (EPSILON, normalsToleranceAngle * 
+      (PI / 180.0f));
   }
 }

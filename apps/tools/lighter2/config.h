@@ -51,6 +51,10 @@ namespace lighter
 
       // Black threshold
       float blackThreshold;
+
+      /* When the dot product of two normals is bigger than 1-tolerance
+         they're considered as equal. */
+      float normalsTolerance;
     };
 
     // Direct light (direct illumination) calculation settings

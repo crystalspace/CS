@@ -496,7 +496,12 @@ namespace lighter
 
     csPrintf (" --blackthreshold=<threshold>\n");
     csPrintf ("  Set the normalized threshold for lightmap pixels to be "
-              "  considered black.\n");
+                "considered black.\n");
+
+    csPrintf (" --normalstolerance=<angle>\n");
+    csPrintf ("  Set the angle between two normals to be considered equal by "
+                "the\n");
+    csPrintf ("  lightmap layouter.\n");
 
     csPrintf ("\n");
   }
