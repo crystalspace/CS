@@ -13,6 +13,7 @@ chronological order.
           odedynam.
 	- res did some cleanups to ptpdlight and added some profiler zones.
 	- res made the lighter2 black threshold configurable.
+	- res added an implementation of a priority queue.
 17-Apr-2007
 	- Marten fixed two bugs in walktest with regards to the mouse mesh
 	  selection; crash on selection of no mesh with right button and
