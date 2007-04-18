@@ -23,6 +23,10 @@ chronological order.
 	- res changed ptpdlight to only update a PD texture when at least
 	  one light changed it's color value by an amount that causes a
 	  visible difference.
+	- res rigged csWeakRef<> to store 'this' in an member on construction 
+	  in debug mode and assert on that member being 'this' on destruction
+	  in order to catch csWeakRef<>s being memcpy()ed (e.g. when stuffed
+	  into a csArray<>).
 17-Apr-2007
 	- Marten fixed two bugs in walktest with regards to the mouse mesh
 	  selection; crash on selection of no mesh with right button and
