@@ -2347,7 +2347,6 @@ class csPluginRequestArray(CustomAllocated):
     def __eq__(*args): return _cspace.csPluginRequestArray___eq__(*args)
     def __ne__(*args): return _cspace.csPluginRequestArray___ne__(*args)
     def GetAllocator(*args): return _cspace.csPluginRequestArray_GetAllocator(*args)
-    def Length(*args): return _cspace.csPluginRequestArray_Length(*args)
 csPluginRequestArray_swigregister = _cspace.csPluginRequestArray_swigregister
 csPluginRequestArray_swigregister(csPluginRequestArray)
 
@@ -2523,6 +2522,25 @@ iObjectModelListener_swigregister = _cspace.iObjectModelListener_swigregister
 iObjectModelListener_swigregister(iObjectModelListener)
 iObjectModelListener_scfGetVersion = _cspace.iObjectModelListener_scfGetVersion
 
+class iTriangleMeshIterator(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iTriangleMeshIterator, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iTriangleMeshIterator, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def HasNext(*args): return _cspace.iTriangleMeshIterator_HasNext(*args)
+    def Next(*args): return _cspace.iTriangleMeshIterator_Next(*args)
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iTriangleMeshIterator_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iTriangleMeshIterator_scfGetVersion)
+    __swig_destroy__ = _cspace.delete_iTriangleMeshIterator
+    __del__ = lambda self : None;
+iTriangleMeshIterator_swigregister = _cspace.iTriangleMeshIterator_swigregister
+iTriangleMeshIterator_swigregister(iTriangleMeshIterator)
+iTriangleMeshIterator_scfGetVersion = _cspace.iTriangleMeshIterator_scfGetVersion
+
 class iObjectModel(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -2534,6 +2552,7 @@ class iObjectModel(iBase):
     __repr__ = _swig_repr
     def GetShapeNumber(*args): return _cspace.iObjectModel_GetShapeNumber(*args)
     def GetTriangleData(*args): return _cspace.iObjectModel_GetTriangleData(*args)
+    def GetTriangleDataIterator(*args): return _cspace.iObjectModel_GetTriangleDataIterator(*args)
     def SetTriangleData(*args): return _cspace.iObjectModel_SetTriangleData(*args)
     def IsTriangleDataSet(*args): return _cspace.iObjectModel_IsTriangleDataSet(*args)
     def ResetTriangleData(*args): return _cspace.iObjectModel_ResetTriangleData(*args)
@@ -2685,6 +2704,44 @@ iPolygonMesh_swigregister = _cspace.iPolygonMesh_swigregister
 iPolygonMesh_swigregister(iPolygonMesh)
 iPolygonMesh_scfGetVersion = _cspace.iPolygonMesh_scfGetVersion
 
+CS_TRIMESH_CLOSED = _cspace.CS_TRIMESH_CLOSED
+CS_TRIMESH_NOTCLOSED = _cspace.CS_TRIMESH_NOTCLOSED
+CS_TRIMESH_CONVEX = _cspace.CS_TRIMESH_CONVEX
+CS_TRIMESH_NOTCONVEX = _cspace.CS_TRIMESH_NOTCONVEX
+CS_TRIMESH_DEFORMABLE = _cspace.CS_TRIMESH_DEFORMABLE
+class iTriangleMesh(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iTriangleMesh, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iTriangleMesh, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetVertexCount(*args): return _cspace.iTriangleMesh_GetVertexCount(*args)
+    def GetVertices(self):
+      return CSMutableArrayHelper(self.GetVertexByIndex, self.GetVertexCount)
+
+
+    def GetTriangleCount(*args): return _cspace.iTriangleMesh_GetTriangleCount(*args)
+    def GetTriangles(self):
+      return CSMutableArrayHelper(self.GetTriangleByIndex, self.GetTriangleCount)
+
+
+    def Lock(*args): return _cspace.iTriangleMesh_Lock(*args)
+    def Unlock(*args): return _cspace.iTriangleMesh_Unlock(*args)
+    def GetFlags(*args): return _cspace.iTriangleMesh_GetFlags(*args)
+    def GetChangeNumber(*args): return _cspace.iTriangleMesh_GetChangeNumber(*args)
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iTriangleMesh_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iTriangleMesh_scfGetVersion)
+    __swig_destroy__ = _cspace.delete_iTriangleMesh
+    __del__ = lambda self : None;
+    def GetVertexByIndex(*args): return _cspace.iTriangleMesh_GetVertexByIndex(*args)
+    def GetTriangleByIndex(*args): return _cspace.iTriangleMesh_GetTriangleByIndex(*args)
+iTriangleMesh_swigregister = _cspace.iTriangleMesh_swigregister
+iTriangleMesh_swigregister(iTriangleMesh)
+iTriangleMesh_scfGetVersion = _cspace.iTriangleMesh_scfGetVersion
+
 class csPath(scfPath):
     __swig_setmethods__ = {}
     for _s in [scfPath]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -2760,6 +2817,42 @@ class pycsPolygonMeshBox(iPolygonMesh):
     def RemoveRefOwner(*args): return _cspace.pycsPolygonMeshBox_RemoveRefOwner(*args)
 pycsPolygonMeshBox_swigregister = _cspace.pycsPolygonMeshBox_swigregister
 pycsPolygonMeshBox_swigregister(pycsPolygonMeshBox)
+
+class pycsTriangleMesh(iTriangleMesh):
+    __swig_setmethods__ = {}
+    for _s in [iTriangleMesh]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, pycsTriangleMesh, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iTriangleMesh]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, pycsTriangleMesh, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def IncRef(*args): return _cspace.pycsTriangleMesh_IncRef(*args)
+    def DecRef(*args): return _cspace.pycsTriangleMesh_DecRef(*args)
+    def GetRefCount(*args): return _cspace.pycsTriangleMesh_GetRefCount(*args)
+    def QueryInterface(*args): return _cspace.pycsTriangleMesh_QueryInterface(*args)
+    def AddRefOwner(*args): return _cspace.pycsTriangleMesh_AddRefOwner(*args)
+    def RemoveRefOwner(*args): return _cspace.pycsTriangleMesh_RemoveRefOwner(*args)
+pycsTriangleMesh_swigregister = _cspace.pycsTriangleMesh_swigregister
+pycsTriangleMesh_swigregister(pycsTriangleMesh)
+
+class pycsTriangleMeshBox(iTriangleMesh):
+    __swig_setmethods__ = {}
+    for _s in [iTriangleMesh]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, pycsTriangleMeshBox, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iTriangleMesh]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, pycsTriangleMeshBox, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def IncRef(*args): return _cspace.pycsTriangleMeshBox_IncRef(*args)
+    def DecRef(*args): return _cspace.pycsTriangleMeshBox_DecRef(*args)
+    def GetRefCount(*args): return _cspace.pycsTriangleMeshBox_GetRefCount(*args)
+    def QueryInterface(*args): return _cspace.pycsTriangleMeshBox_QueryInterface(*args)
+    def AddRefOwner(*args): return _cspace.pycsTriangleMeshBox_AddRefOwner(*args)
+    def RemoveRefOwner(*args): return _cspace.pycsTriangleMeshBox_RemoveRefOwner(*args)
+pycsTriangleMeshBox_swigregister = _cspace.pycsTriangleMeshBox_swigregister
+pycsTriangleMeshBox_swigregister(pycsTriangleMeshBox)
 
 class csPolygonMesh(pycsPolygonMesh):
     __swig_setmethods__ = {}
@@ -2842,6 +2935,162 @@ class csPolygonMeshBox(pycsPolygonMeshBox):
 csPolygonMeshBox_swigregister = _cspace.csPolygonMeshBox_swigregister
 csPolygonMeshBox_swigregister(csPolygonMeshBox)
 
+class csTriangleMesh(pycsTriangleMesh):
+    __swig_setmethods__ = {}
+    for _s in [pycsTriangleMesh]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csTriangleMesh, name, value)
+    __swig_getmethods__ = {}
+    for _s in [pycsTriangleMesh]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, csTriangleMesh, name)
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _cspace.new_csTriangleMesh(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_csTriangleMesh
+    __del__ = lambda self : None;
+    def AddVertex(*args): return _cspace.csTriangleMesh_AddVertex(*args)
+    def GetVertexCount(*args): return _cspace.csTriangleMesh_GetVertexCount(*args)
+    def GetVertices(*args): return _cspace.csTriangleMesh_GetVertices(*args)
+    def AddTriangle(*args): return _cspace.csTriangleMesh_AddTriangle(*args)
+    def GetTriangles(*args): return _cspace.csTriangleMesh_GetTriangles(*args)
+    def GetTriangle(*args): return _cspace.csTriangleMesh_GetTriangle(*args)
+    def GetTriangleCount(*args): return _cspace.csTriangleMesh_GetTriangleCount(*args)
+    def Clear(*args): return _cspace.csTriangleMesh_Clear(*args)
+    def SetSize(*args): return _cspace.csTriangleMesh_SetSize(*args)
+    def SetTriangles(*args): return _cspace.csTriangleMesh_SetTriangles(*args)
+    def Lock(*args): return _cspace.csTriangleMesh_Lock(*args)
+    def Unlock(*args): return _cspace.csTriangleMesh_Unlock(*args)
+    def GetFlags(*args): return _cspace.csTriangleMesh_GetFlags(*args)
+    def GetChangeNumber(*args): return _cspace.csTriangleMesh_GetChangeNumber(*args)
+csTriangleMesh_swigregister = _cspace.csTriangleMesh_swigregister
+csTriangleMesh_swigregister(csTriangleMesh)
+
+class csTriangleVertex(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csTriangleVertex, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csTriangleVertex, name)
+    __repr__ = _swig_repr
+    __swig_setmethods__["pos"] = _cspace.csTriangleVertex_pos_set
+    __swig_getmethods__["pos"] = _cspace.csTriangleVertex_pos_get
+    if _newclass:pos = property(_cspace.csTriangleVertex_pos_get, _cspace.csTriangleVertex_pos_set)
+    __swig_setmethods__["idx"] = _cspace.csTriangleVertex_idx_set
+    __swig_getmethods__["idx"] = _cspace.csTriangleVertex_idx_get
+    if _newclass:idx = property(_cspace.csTriangleVertex_idx_get, _cspace.csTriangleVertex_idx_set)
+    __swig_setmethods__["con_triangles"] = _cspace.csTriangleVertex_con_triangles_set
+    __swig_getmethods__["con_triangles"] = _cspace.csTriangleVertex_con_triangles_get
+    if _newclass:con_triangles = property(_cspace.csTriangleVertex_con_triangles_get, _cspace.csTriangleVertex_con_triangles_set)
+    __swig_setmethods__["con_vertices"] = _cspace.csTriangleVertex_con_vertices_set
+    __swig_getmethods__["con_vertices"] = _cspace.csTriangleVertex_con_vertices_get
+    if _newclass:con_vertices = property(_cspace.csTriangleVertex_con_vertices_get, _cspace.csTriangleVertex_con_vertices_set)
+    def __init__(self, *args): 
+        this = _cspace.new_csTriangleVertex(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_csTriangleVertex
+    __del__ = lambda self : None;
+    def AddTriangle(*args): return _cspace.csTriangleVertex_AddTriangle(*args)
+    def AddVertex(*args): return _cspace.csTriangleVertex_AddVertex(*args)
+csTriangleVertex_swigregister = _cspace.csTriangleVertex_swigregister
+csTriangleVertex_swigregister(csTriangleVertex)
+
+class csTriangleVertices(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csTriangleVertices, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csTriangleVertices, name)
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _cspace.new_csTriangleVertices(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_csTriangleVertices
+    __del__ = lambda self : None;
+    def UpdateVertices(*args): return _cspace.csTriangleVertices_UpdateVertices(*args)
+    def GetVertexCount(*args): return _cspace.csTriangleVertices_GetVertexCount(*args)
+    def GetVertex(*args): return _cspace.csTriangleVertices_GetVertex(*args)
+csTriangleVertices_swigregister = _cspace.csTriangleVertices_swigregister
+csTriangleVertices_swigregister(csTriangleVertices)
+
+class csTriangleMeshBox(pycsTriangleMeshBox):
+    __swig_setmethods__ = {}
+    for _s in [pycsTriangleMeshBox]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csTriangleMeshBox, name, value)
+    __swig_getmethods__ = {}
+    for _s in [pycsTriangleMeshBox]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, csTriangleMeshBox, name)
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _cspace.new_csTriangleMeshBox(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_csTriangleMeshBox
+    __del__ = lambda self : None;
+    def SetBox(*args): return _cspace.csTriangleMeshBox_SetBox(*args)
+    def GetVertexCount(*args): return _cspace.csTriangleMeshBox_GetVertexCount(*args)
+    def GetVertices(self):
+      return CSMutableArrayHelper(self.GetVertexByIndex, self.GetVertexCount)
+
+
+    def GetTriangleCount(*args): return _cspace.csTriangleMeshBox_GetTriangleCount(*args)
+    def GetTriangles(self):
+      return CSMutableArrayHelper(self.GetTriangleByIndex, self.GetTriangleCount)
+
+
+    def Lock(*args): return _cspace.csTriangleMeshBox_Lock(*args)
+    def Unlock(*args): return _cspace.csTriangleMeshBox_Unlock(*args)
+    def GetFlags(*args): return _cspace.csTriangleMeshBox_GetFlags(*args)
+    def GetChangeNumber(*args): return _cspace.csTriangleMeshBox_GetChangeNumber(*args)
+csTriangleMeshBox_swigregister = _cspace.csTriangleMeshBox_swigregister
+csTriangleMeshBox_swigregister(csTriangleMeshBox)
+
+class csTriangleMeshPointer(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csTriangleMeshPointer, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csTriangleMeshPointer, name)
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _cspace.new_csTriangleMeshPointer(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_csTriangleMeshPointer
+    __del__ = lambda self : None;
+    def GetVertexCount(*args): return _cspace.csTriangleMeshPointer_GetVertexCount(*args)
+    def GetVertices(*args): return _cspace.csTriangleMeshPointer_GetVertices(*args)
+    def GetTriangleCount(*args): return _cspace.csTriangleMeshPointer_GetTriangleCount(*args)
+    def GetTriangles(*args): return _cspace.csTriangleMeshPointer_GetTriangles(*args)
+    def Lock(*args): return _cspace.csTriangleMeshPointer_Lock(*args)
+    def Unlock(*args): return _cspace.csTriangleMeshPointer_Unlock(*args)
+    def GetFlags(*args): return _cspace.csTriangleMeshPointer_GetFlags(*args)
+    def GetChangeNumber(*args): return _cspace.csTriangleMeshPointer_GetChangeNumber(*args)
+csTriangleMeshPointer_swigregister = _cspace.csTriangleMeshPointer_swigregister
+csTriangleMeshPointer_swigregister(csTriangleMeshPointer)
+
+class csTriangleMeshPolyMesh(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csTriangleMeshPolyMesh, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csTriangleMeshPolyMesh, name)
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _cspace.new_csTriangleMeshPolyMesh(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_csTriangleMeshPolyMesh
+    __del__ = lambda self : None;
+    def GetVertexCount(*args): return _cspace.csTriangleMeshPolyMesh_GetVertexCount(*args)
+    def GetVertices(*args): return _cspace.csTriangleMeshPolyMesh_GetVertices(*args)
+    def GetTriangleCount(*args): return _cspace.csTriangleMeshPolyMesh_GetTriangleCount(*args)
+    def GetTriangles(*args): return _cspace.csTriangleMeshPolyMesh_GetTriangles(*args)
+    def Lock(*args): return _cspace.csTriangleMeshPolyMesh_Lock(*args)
+    def Unlock(*args): return _cspace.csTriangleMeshPolyMesh_Unlock(*args)
+    def GetFlags(*args): return _cspace.csTriangleMeshPolyMesh_GetFlags(*args)
+    def GetChangeNumber(*args): return _cspace.csTriangleMeshPolyMesh_GetChangeNumber(*args)
+csTriangleMeshPolyMesh_swigregister = _cspace.csTriangleMeshPolyMesh_swigregister
+csTriangleMeshPolyMesh_swigregister(csTriangleMeshPolyMesh)
+
 class csIntArray(CustomAllocated):
     __swig_setmethods__ = {}
     for _s in [CustomAllocated]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -2874,7 +3123,6 @@ class csIntArray(CustomAllocated):
     def __eq__(*args): return _cspace.csIntArray___eq__(*args)
     def __ne__(*args): return _cspace.csIntArray___ne__(*args)
     def GetAllocator(*args): return _cspace.csIntArray_GetAllocator(*args)
-    def Length(*args): return _cspace.csIntArray_Length(*args)
     def __getitem__(*args): return _cspace.csIntArray___getitem__(*args)
     def __contains__(*args): return _cspace.csIntArray___contains__(*args)
     def __delitem__(*args): return _cspace.csIntArray___delitem__(*args)
@@ -2918,7 +3166,6 @@ class csIntArrayArray(CustomAllocated):
     def __eq__(*args): return _cspace.csIntArrayArray___eq__(*args)
     def __ne__(*args): return _cspace.csIntArrayArray___ne__(*args)
     def GetAllocator(*args): return _cspace.csIntArrayArray_GetAllocator(*args)
-    def Length(*args): return _cspace.csIntArrayArray_Length(*args)
     def __getitem__(*args): return _cspace.csIntArrayArray___getitem__(*args)
     def __contains__(*args): return _cspace.csIntArrayArray___contains__(*args)
     def __delitem__(*args): return _cspace.csIntArrayArray___delitem__(*args)
@@ -3043,6 +3290,90 @@ csPolygonMeshTools_PointInClosedMesh = _cspace.csPolygonMeshTools_PointInClosedM
 csPolygonMeshTools_LineInClosedMesh = _cspace.csPolygonMeshTools_LineInClosedMesh
 csPolygonMeshTools_BoxInClosedMesh = _cspace.csPolygonMeshTools_BoxInClosedMesh
 csPolygonMeshTools_CalculateVertexConnections = _cspace.csPolygonMeshTools_CalculateVertexConnections
+
+class csTriangleMeshEdge(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csTriangleMeshEdge, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csTriangleMeshEdge, name)
+    __repr__ = _swig_repr
+    __swig_setmethods__["vt1"] = _cspace.csTriangleMeshEdge_vt1_set
+    __swig_getmethods__["vt1"] = _cspace.csTriangleMeshEdge_vt1_get
+    if _newclass:vt1 = property(_cspace.csTriangleMeshEdge_vt1_get, _cspace.csTriangleMeshEdge_vt1_set)
+    __swig_setmethods__["vt2"] = _cspace.csTriangleMeshEdge_vt2_set
+    __swig_getmethods__["vt2"] = _cspace.csTriangleMeshEdge_vt2_get
+    if _newclass:vt2 = property(_cspace.csTriangleMeshEdge_vt2_get, _cspace.csTriangleMeshEdge_vt2_set)
+    __swig_setmethods__["tri1"] = _cspace.csTriangleMeshEdge_tri1_set
+    __swig_getmethods__["tri1"] = _cspace.csTriangleMeshEdge_tri1_get
+    if _newclass:tri1 = property(_cspace.csTriangleMeshEdge_tri1_get, _cspace.csTriangleMeshEdge_tri1_set)
+    __swig_setmethods__["tri2"] = _cspace.csTriangleMeshEdge_tri2_set
+    __swig_getmethods__["tri2"] = _cspace.csTriangleMeshEdge_tri2_get
+    if _newclass:tri2 = property(_cspace.csTriangleMeshEdge_tri2_get, _cspace.csTriangleMeshEdge_tri2_set)
+    __swig_setmethods__["active"] = _cspace.csTriangleMeshEdge_active_set
+    __swig_getmethods__["active"] = _cspace.csTriangleMeshEdge_active_get
+    if _newclass:active = property(_cspace.csTriangleMeshEdge_active_get, _cspace.csTriangleMeshEdge_active_set)
+    def __init__(self, *args): 
+        this = _cspace.new_csTriangleMeshEdge(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_csTriangleMeshEdge
+    __del__ = lambda self : None;
+csTriangleMeshEdge_swigregister = _cspace.csTriangleMeshEdge_swigregister
+csTriangleMeshEdge_swigregister(csTriangleMeshEdge)
+
+class csTriangleMeshTools(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csTriangleMeshTools, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csTriangleMeshTools, name)
+    __repr__ = _swig_repr
+    __swig_getmethods__["CalculateNormals"] = lambda x: _cspace.csTriangleMeshTools_CalculateNormals
+    if _newclass:CalculateNormals = staticmethod(_cspace.csTriangleMeshTools_CalculateNormals)
+    __swig_getmethods__["CalculatePlanes"] = lambda x: _cspace.csTriangleMeshTools_CalculatePlanes
+    if _newclass:CalculatePlanes = staticmethod(_cspace.csTriangleMeshTools_CalculatePlanes)
+    __swig_getmethods__["CalculateEdges"] = lambda x: _cspace.csTriangleMeshTools_CalculateEdges
+    if _newclass:CalculateEdges = staticmethod(_cspace.csTriangleMeshTools_CalculateEdges)
+    __swig_getmethods__["CheckActiveEdges"] = lambda x: _cspace.csTriangleMeshTools_CheckActiveEdges
+    if _newclass:CheckActiveEdges = staticmethod(_cspace.csTriangleMeshTools_CheckActiveEdges)
+    __swig_getmethods__["CalculateOutline"] = lambda x: _cspace.csTriangleMeshTools_CalculateOutline
+    if _newclass:CalculateOutline = staticmethod(_cspace.csTriangleMeshTools_CalculateOutline)
+    __swig_getmethods__["IsMeshClosed"] = lambda x: _cspace.csTriangleMeshTools_IsMeshClosed
+    if _newclass:IsMeshClosed = staticmethod(_cspace.csTriangleMeshTools_IsMeshClosed)
+    __swig_getmethods__["IsMeshConvex"] = lambda x: _cspace.csTriangleMeshTools_IsMeshConvex
+    if _newclass:IsMeshConvex = staticmethod(_cspace.csTriangleMeshTools_IsMeshConvex)
+    __swig_getmethods__["CloseMesh"] = lambda x: _cspace.csTriangleMeshTools_CloseMesh
+    if _newclass:CloseMesh = staticmethod(_cspace.csTriangleMeshTools_CloseMesh)
+    __swig_getmethods__["SortTrianglesX"] = lambda x: _cspace.csTriangleMeshTools_SortTrianglesX
+    if _newclass:SortTrianglesX = staticmethod(_cspace.csTriangleMeshTools_SortTrianglesX)
+    __swig_getmethods__["PointInClosedMesh"] = lambda x: _cspace.csTriangleMeshTools_PointInClosedMesh
+    if _newclass:PointInClosedMesh = staticmethod(_cspace.csTriangleMeshTools_PointInClosedMesh)
+    __swig_getmethods__["LineInClosedMesh"] = lambda x: _cspace.csTriangleMeshTools_LineInClosedMesh
+    if _newclass:LineInClosedMesh = staticmethod(_cspace.csTriangleMeshTools_LineInClosedMesh)
+    __swig_getmethods__["BoxInClosedMesh"] = lambda x: _cspace.csTriangleMeshTools_BoxInClosedMesh
+    if _newclass:BoxInClosedMesh = staticmethod(_cspace.csTriangleMeshTools_BoxInClosedMesh)
+    __swig_getmethods__["CalculateVertexConnections"] = lambda x: _cspace.csTriangleMeshTools_CalculateVertexConnections
+    if _newclass:CalculateVertexConnections = staticmethod(_cspace.csTriangleMeshTools_CalculateVertexConnections)
+    def __init__(self, *args): 
+        this = _cspace.new_csTriangleMeshTools(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_csTriangleMeshTools
+    __del__ = lambda self : None;
+csTriangleMeshTools_swigregister = _cspace.csTriangleMeshTools_swigregister
+csTriangleMeshTools_swigregister(csTriangleMeshTools)
+csTriangleMeshTools_CalculateNormals = _cspace.csTriangleMeshTools_CalculateNormals
+csTriangleMeshTools_CalculatePlanes = _cspace.csTriangleMeshTools_CalculatePlanes
+csTriangleMeshTools_CalculateEdges = _cspace.csTriangleMeshTools_CalculateEdges
+csTriangleMeshTools_CheckActiveEdges = _cspace.csTriangleMeshTools_CheckActiveEdges
+csTriangleMeshTools_CalculateOutline = _cspace.csTriangleMeshTools_CalculateOutline
+csTriangleMeshTools_IsMeshClosed = _cspace.csTriangleMeshTools_IsMeshClosed
+csTriangleMeshTools_IsMeshConvex = _cspace.csTriangleMeshTools_IsMeshConvex
+csTriangleMeshTools_CloseMesh = _cspace.csTriangleMeshTools_CloseMesh
+csTriangleMeshTools_SortTrianglesX = _cspace.csTriangleMeshTools_SortTrianglesX
+csTriangleMeshTools_PointInClosedMesh = _cspace.csTriangleMeshTools_PointInClosedMesh
+csTriangleMeshTools_LineInClosedMesh = _cspace.csTriangleMeshTools_LineInClosedMesh
+csTriangleMeshTools_BoxInClosedMesh = _cspace.csTriangleMeshTools_BoxInClosedMesh
+csTriangleMeshTools_CalculateVertexConnections = _cspace.csTriangleMeshTools_CalculateVertexConnections
 
 class iFrustumViewUserdata(iBase):
     __swig_setmethods__ = {}
@@ -4705,6 +5036,7 @@ class iGeneralFactoryState(iGeneralMeshCommonState):
     def CalculateNormals(*args): return _cspace.iGeneralFactoryState_CalculateNormals(*args)
     def Compress(*args): return _cspace.iGeneralFactoryState_Compress(*args)
     def GenerateBox(*args): return _cspace.iGeneralFactoryState_GenerateBox(*args)
+    def GenerateCapsule(*args): return _cspace.iGeneralFactoryState_GenerateCapsule(*args)
     def GenerateSphere(*args): return _cspace.iGeneralFactoryState_GenerateSphere(*args)
     def SetBack2Front(*args): return _cspace.iGeneralFactoryState_SetBack2Front(*args)
     def IsAutoNormals(*args): return _cspace.iGeneralFactoryState_IsAutoNormals(*args)
@@ -6033,7 +6365,6 @@ class csCharArrayArray(CustomAllocated):
     def __eq__(*args): return _cspace.csCharArrayArray___eq__(*args)
     def __ne__(*args): return _cspace.csCharArrayArray___ne__(*args)
     def GetAllocator(*args): return _cspace.csCharArrayArray_GetAllocator(*args)
-    def Length(*args): return _cspace.csCharArrayArray_Length(*args)
 csCharArrayArray_swigregister = _cspace.csCharArrayArray_swigregister
 csCharArrayArray_swigregister(csCharArrayArray)
 
@@ -9803,7 +10134,6 @@ class csImageIOFileFormatDescriptions(CustomAllocated):
     def __eq__(*args): return _cspace.csImageIOFileFormatDescriptions___eq__(*args)
     def __ne__(*args): return _cspace.csImageIOFileFormatDescriptions___ne__(*args)
     def GetAllocator(*args): return _cspace.csImageIOFileFormatDescriptions_GetAllocator(*args)
-    def Length(*args): return _cspace.csImageIOFileFormatDescriptions_Length(*args)
 csImageIOFileFormatDescriptions_swigregister = _cspace.csImageIOFileFormatDescriptions_swigregister
 csImageIOFileFormatDescriptions_swigregister(csImageIOFileFormatDescriptions)
 
@@ -10384,6 +10714,7 @@ BOX_COLLIDER_GEOMETRY = _cspace.BOX_COLLIDER_GEOMETRY
 PLANE_COLLIDER_GEOMETRY = _cspace.PLANE_COLLIDER_GEOMETRY
 TRIMESH_COLLIDER_GEOMETRY = _cspace.TRIMESH_COLLIDER_GEOMETRY
 CYLINDER_COLLIDER_GEOMETRY = _cspace.CYLINDER_COLLIDER_GEOMETRY
+CAPSULE_COLLIDER_GEOMETRY = _cspace.CAPSULE_COLLIDER_GEOMETRY
 SPHERE_COLLIDER_GEOMETRY = _cspace.SPHERE_COLLIDER_GEOMETRY
 class iDynamicsColliderCollisionCallback(iBase):
     __swig_setmethods__ = {}
@@ -10414,6 +10745,7 @@ class iDynamicsSystemCollider(iBase):
     def CreateMeshGeometry(*args): return _cspace.iDynamicsSystemCollider_CreateMeshGeometry(*args)
     def CreateBoxGeometry(*args): return _cspace.iDynamicsSystemCollider_CreateBoxGeometry(*args)
     def CreateCCylinderGeometry(*args): return _cspace.iDynamicsSystemCollider_CreateCCylinderGeometry(*args)
+    def CreateCapsuleGeometry(*args): return _cspace.iDynamicsSystemCollider_CreateCapsuleGeometry(*args)
     def SetCollisionCallback(*args): return _cspace.iDynamicsSystemCollider_SetCollisionCallback(*args)
     def SetFriction(*args): return _cspace.iDynamicsSystemCollider_SetFriction(*args)
     def SetSoftness(*args): return _cspace.iDynamicsSystemCollider_SetSoftness(*args)
@@ -11688,6 +12020,8 @@ csMemoryPen_swigregister = _cspace.csMemoryPen_swigregister
 csMemoryPen_swigregister(csMemoryPen)
 
 CSKEY_SHIFT_NUM = _cspace.CSKEY_SHIFT_NUM
+CSKEY_CTRL_NUM = _cspace.CSKEY_CTRL_NUM
+CSKEY_ALT_NUM = _cspace.CSKEY_ALT_NUM
 CSKEY_SPECIAL = _cspace.CSKEY_SPECIAL
 CSKEY_SPECIAL_NUM = _cspace.CSKEY_SPECIAL_NUM
 CSKEY_MODIFIER = _cspace.CSKEY_MODIFIER
@@ -11723,6 +12057,8 @@ class csPrimitives(_object):
     if _newclass:GenerateBox = staticmethod(_cspace.csPrimitives_GenerateBox)
     __swig_getmethods__["GenerateQuad"] = lambda x: _cspace.csPrimitives_GenerateQuad
     if _newclass:GenerateQuad = staticmethod(_cspace.csPrimitives_GenerateQuad)
+    __swig_getmethods__["GenerateCapsule"] = lambda x: _cspace.csPrimitives_GenerateCapsule
+    if _newclass:GenerateCapsule = staticmethod(_cspace.csPrimitives_GenerateCapsule)
     __swig_getmethods__["GenerateSphere"] = lambda x: _cspace.csPrimitives_GenerateSphere
     if _newclass:GenerateSphere = staticmethod(_cspace.csPrimitives_GenerateSphere)
     def __init__(self, *args): 
@@ -11735,6 +12071,7 @@ csPrimitives_swigregister = _cspace.csPrimitives_swigregister
 csPrimitives_swigregister(csPrimitives)
 csPrimitives_GenerateBox = _cspace.csPrimitives_GenerateBox
 csPrimitives_GenerateQuad = _cspace.csPrimitives_GenerateQuad
+csPrimitives_GenerateCapsule = _cspace.csPrimitives_GenerateCapsule
 csPrimitives_GenerateSphere = _cspace.csPrimitives_GenerateSphere
 
 CS_QUERY_REGISTRY = _cspace.CS_QUERY_REGISTRY
