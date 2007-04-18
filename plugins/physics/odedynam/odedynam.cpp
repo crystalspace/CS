@@ -1352,6 +1352,11 @@ void csODECollider::FillWithColliderGeometry (csRef<iGeneralFactoryState> genmes
       dReal r, l;
       dGeomCapsuleGetParams (geomID, &r, &l);
       genmesh_fact->GenerateCapsule (l, r, 10);
+      csRef<iMeshObjectFactory> collider_fact = 
+        scfQueryInterface<iMeshObjectFactory> (genmesh_fact);
+      collider_fact->HardTransform (
+        csReversibleTransform (csZRotMatrix3 (PI/2), csVector3 (0)));
+      genmesh_fact->Invalidate ();
     }
     break;
   case PLANE_COLLIDER_GEOMETRY:
