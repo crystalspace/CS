@@ -32,14 +32,15 @@
 #include "csutil/csstring.h"
 
 #include "ptpdlight.h"
+#include "ptpdlight_loader.h"
+
+CS_DECLARE_PROFILER
+CS_DECLARE_PROFILER_ZONE(ProctexPDLight_Animate)
+CS_DECLARE_PROFILER_ZONE(ProctexPDLight_Animate_inner)
+CS_DECLARE_PROFILER_ZONE(ProctexPDLight_Animate_Blit)
 
 CS_PLUGIN_NAMESPACE_BEGIN(PTPDLight)
 {
-
-  CS_DECLARE_PROFILER
-  CS_DECLARE_PROFILER_ZONE(ProctexPDLight_Animate)
-  CS_DECLARE_PROFILER_ZONE(ProctexPDLight_Animate_inner)
-  CS_DECLARE_PROFILER_ZONE(ProctexPDLight_Animate_Blit)
 
   TileHelper::TileHelper (int w, int h)
   {
@@ -240,8 +241,8 @@ const char* ProctexPDLight::AddLight (const MappedLight& light)
   return 0;
 }
 
-ProctexPDLight::ProctexPDLight (iImage* img) : 
-  scfImplementationType (this, (iTextureFactory*)0, img), 
+ProctexPDLight::ProctexPDLight (ProctexPDLightLoader* loader, iImage* img) : 
+  scfImplementationType (this, (iTextureFactory*)0, img), loader (loader),
   tiles (img->GetWidth(), img->GetHeight()),
   tilesDirty (tiles.ComputeTileCount()),
   baseColor (0, 0, 0), baseMap (tilesDirty.GetSize(), tiles, img),
@@ -251,8 +252,8 @@ ProctexPDLight::ProctexPDLight (iImage* img) :
   mat_h = img->GetHeight();
 }
 
-ProctexPDLight::ProctexPDLight (int w, int h) : 
-  scfImplementationType (this), 
+ProctexPDLight::ProctexPDLight (ProctexPDLightLoader* loader, int w, int h) : 
+  scfImplementationType (this), loader (loader),
   tiles (w, h), tilesDirty (tiles.ComputeTileCount()),
   baseColor (0, 0, 0), baseMap (tilesDirty.GetSize()), 
   state (stateDirty)
@@ -263,6 +264,7 @@ ProctexPDLight::ProctexPDLight (int w, int h) :
 
 ProctexPDLight::~ProctexPDLight ()
 {
+  loader->UnqueuePT (this);
 }
 
 bool ProctexPDLight::PrepareAnim ()
@@ -278,7 +280,7 @@ bool ProctexPDLight::PrepareAnim ()
     return false;
   }
 
-  lightmapSize = mat_w * mat_h;
+  size_t lightmapSize = mat_w * mat_h;
   if (lightmapSize == 0) return false;
   for (size_t i = 0; i < lights.GetSize(); )
   {
@@ -412,139 +414,143 @@ static const MultiplyAddProc maProcs[8] = {
   MultiplyAddLumels<6>, MultiplyAddLumels<7>
 };
 
-void ProctexPDLight::Animate (csTicks /*current_time*/)
+void ProctexPDLight::Animate (csTicks current_time)
 {
   if (state.Check (stateDirty))
   {
-    if (lightmapSize > 0)
+    if (!loader->UpdatePT (this, current_time)) return;
+
+    csTicks startTime = csGetTicks();
+
+    CS_PROFILER_ZONE(ProctexPDLight_Animate)
+    lightBits.Clear();
+    for (size_t l = 0; l < lights.GetSize(); )
     {
-      CS_PROFILER_ZONE(ProctexPDLight_Animate)
-      lightBits.Clear();
-      for (size_t l = 0; l < lights.GetSize(); )
+      MappedLight& light = lights[l];
+      if (!light.light)
       {
-        MappedLight& light = lights[l];
-        if (!light.light)
+        tilesDirty |= light.map.tileNonNull;
+        lights.DeleteIndexFast (l);
+        lightBits.SetSize (lights.GetSize ());
+        continue;
+      }
+      if (dirtyLights.Contains ((iLight*)light.light))
+      {
+        tilesDirty |= light.map.tileNonNull;
+        lightBits.SetBit (l);
+      }
+      l++;
+    }
+
+    LightmapScratch& scratch = GetScratch();
+    scratch.SetSize (TileHelper::tileSizeX * TileHelper::tileSizeY);
+    for (size_t t = 0; t < tilesDirty.GetSize(); t++)
+    {
+      if (!tilesDirty.IsBitSet (t)) continue;
+
+      csRect tileRect;
+      tiles.GetTileRect (t, tileRect);
+
+      int scratchW = tileRect.Width();
+      csRGBcolor scratchMax;
+      {
+        int lines = tileRect.Height();
+        Lumel* scratchPtr = scratch.GetArray();
+        if (baseMap.imageData.IsValid())
         {
-          tilesDirty |= light.map.tileNonNull;
-          lights.DeleteIndexFast (l);
-          lightBits.SetSize (lights.GetSize ());
-          continue;
+          Lumel* basePtr = (baseMap.imageData->GetData()) +
+            tileRect.ymin * mat_w + tileRect.xmin;
+          for (int y = 0; y < lines; y++)
+          {
+            memcpy (scratchPtr, basePtr, scratchW * sizeof (Lumel));
+            scratchPtr += scratchW;
+            basePtr += mat_w;
+          }
+          scratchMax = baseMap.maxValues[t];
         }
-        if (dirtyLights.Contains ((iLight*)light.light))
+        else
         {
-          tilesDirty |= light.map.tileNonNull;
-          lightBits.SetBit (l);
+          Lumel baseLumel;
+          baseLumel.c.red   = baseColor.red;
+          baseLumel.c.green = baseColor.green;
+          baseLumel.c.blue  = baseColor.blue;
+          baseLumel.c.alpha = 0;
+          for (int y = 0; y < lines; y++)
+          {
+            for (int x = 0; x < scratchW; x++)
+            {
+              scratchPtr->ui = baseLumel.ui;
+              scratchPtr++;
+            }
+          }
+          scratchMax = baseColor;
         }
-        l++;
+      }
+      for (size_t i = 0; i < lights.GetSize(); i++)
+      {
+        if (!lightBits.IsBitSet (i)) continue;
+        MappedLight& light = lights[i];
+        if (!light.map.tileNonNull.IsBitSet (t)) continue;
+
+        const csRect& lightInTile (light.map.nonNullAreas[t]);
+        uint32 lutR[256];
+        uint32 lutG[256];
+        uint32 lutB[256];
+
+        ComputeLUT<shiftR> (light.light->GetColor ().red,   lutR);
+        ComputeLUT<shiftG> (light.light->GetColor ().green, lutG);
+        ComputeLUT<shiftB> (light.light->GetColor ().blue,  lutB);
+
+        int mapW = csMin (lightInTile.xmax, light.map.imageX + light.map.imageW)
+          - csMax (lightInTile.xmin, light.map.imageX);
+        const Lumel* mapPtr = (light.map.imageData->GetData()) +
+          (lightInTile.ymin - light.map.imageY) * light.map.imageW +
+          (lightInTile.xmin - light.map.imageX) ;
+        int lines = csMin (lightInTile.ymax, light.map.imageY + light.map.imageH)
+          - csMax (lightInTile.ymin, light.map.imageY);
+        int mapPitch = light.map.imageW - mapW;
+
+        Lumel* scratchPtr = scratch.GetArray() + 
+          (lightInTile.ymin - tileRect.ymin) * scratchW +
+           lightInTile.xmin - tileRect.xmin;
+        int scratchPitch = scratchW - mapW;
+
+        csRGBcolor mapMax = light.map.maxValues[t];
+        mapMax.red   = lutR[mapMax.red]   >> shiftR;
+        mapMax.green = lutG[mapMax.green] >> shiftG;
+        mapMax.blue  = lutB[mapMax.blue]  >> shiftB;
+        {
+          CS_PROFILER_ZONE(ProctexPDLight_Animate_inner)
+          int safeMask = 0;
+          if (scratchMax.red   + mapMax.red   > 255) safeMask |= safeR;
+          if (scratchMax.green + mapMax.green > 255) safeMask |= safeG;
+          if (scratchMax.blue  + mapMax.blue  > 255) safeMask |= safeB;
+          MultiplyAddProc maProc = maProcs[safeMask];
+          maProc (scratchPtr, scratchPitch, mapPtr, mapPitch,
+            mapW, lines, lutR, lutG, lutB);
+
+          if (safeMask == 0)
+            scratchMax.UnsafeAdd (mapMax);
+          else
+            scratchMax.SafeAdd (mapMax);
+        }
       }
 
-      LightmapScratch& scratch = GetScratch();
-      scratch.SetSize (TileHelper::tileSizeX * TileHelper::tileSizeY);
-      for (size_t t = 0; t < tilesDirty.GetSize(); t++)
       {
-        if (!tilesDirty.IsBitSet (t)) continue;
-
-        csRect tileRect;
-        tiles.GetTileRect (t, tileRect);
-
-        int scratchW = tileRect.Width();
-        csRGBcolor scratchMax;
-        {
-          int lines = tileRect.Height();
-          Lumel* scratchPtr = scratch.GetArray();
-          if (baseMap.imageData.IsValid())
-          {
-            Lumel* basePtr = (baseMap.imageData->GetData()) +
-              tileRect.ymin * mat_w + tileRect.xmin;
-            for (int y = 0; y < lines; y++)
-            {
-              memcpy (scratchPtr, basePtr, scratchW * sizeof (Lumel));
-              scratchPtr += scratchW;
-              basePtr += mat_w;
-            }
-            scratchMax = baseMap.maxValues[t];
-          }
-          else
-          {
-            Lumel baseLumel;
-            baseLumel.c.red   = baseColor.red;
-            baseLumel.c.green = baseColor.green;
-            baseLumel.c.blue  = baseColor.blue;
-            baseLumel.c.alpha = 0;
-            for (int y = 0; y < lines; y++)
-            {
-              for (int x = 0; x < scratchW; x++)
-              {
-                scratchPtr->ui = baseLumel.ui;
-                scratchPtr++;
-              }
-            }
-            scratchMax = baseColor;
-          }
-        }
-        for (size_t i = 0; i < lights.GetSize(); i++)
-        {
-          if (!lightBits.IsBitSet (i)) continue;
-          MappedLight& light = lights[i];
-          if (!light.map.tileNonNull.IsBitSet (t)) continue;
-
-          const csRect& lightInTile (light.map.nonNullAreas[t]);
-          uint32 lutR[256];
-          uint32 lutG[256];
-          uint32 lutB[256];
-
-          ComputeLUT<shiftR> (light.light->GetColor ().red,   lutR);
-          ComputeLUT<shiftG> (light.light->GetColor ().green, lutG);
-          ComputeLUT<shiftB> (light.light->GetColor ().blue,  lutB);
-
-          int mapW = csMin (lightInTile.xmax, light.map.imageX + light.map.imageW)
-            - csMax (lightInTile.xmin, light.map.imageX);
-          const Lumel* mapPtr = (light.map.imageData->GetData()) +
-            (lightInTile.ymin - light.map.imageY) * light.map.imageW +
-            (lightInTile.xmin - light.map.imageX) ;
-          int lines = csMin (lightInTile.ymax, light.map.imageY + light.map.imageH)
-            - csMax (lightInTile.ymin, light.map.imageY);
-          int mapPitch = light.map.imageW - mapW;
-
-          Lumel* scratchPtr = scratch.GetArray() + 
-            (lightInTile.ymin - tileRect.ymin) * scratchW +
-             lightInTile.xmin - tileRect.xmin;
-          int scratchPitch = scratchW - mapW;
-
-          csRGBcolor mapMax = light.map.maxValues[t];
-          mapMax.red   = lutR[mapMax.red]   >> shiftR;
-          mapMax.green = lutG[mapMax.green] >> shiftG;
-          mapMax.blue  = lutB[mapMax.blue]  >> shiftB;
-          {
-            CS_PROFILER_ZONE(ProctexPDLight_Animate_inner)
-            int safeMask = 0;
-            if (scratchMax.red   + mapMax.red   > 255) safeMask |= safeR;
-            if (scratchMax.green + mapMax.green > 255) safeMask |= safeG;
-            if (scratchMax.blue  + mapMax.blue  > 255) safeMask |= safeB;
-            MultiplyAddProc maProc = maProcs[safeMask];
-            maProc (scratchPtr, scratchPitch, mapPtr, mapPitch,
-              mapW, lines, lutR, lutG, lutB);
-
-            if (safeMask == 0)
-              scratchMax.UnsafeAdd (mapMax);
-            else
-              scratchMax.SafeAdd (mapMax);
-          }
-        }
-
-        {
-          CS_PROFILER_ZONE(ProctexPDLight_Animate_Blit)
-          tex->GetTextureHandle ()->Blit (tileRect.xmin, 
-            tileRect.ymin, 
-            tileRect.Width(), tileRect.Height(),
-            (uint8*)scratch.GetArray(),
-            iTextureHandle::BGRA8888);
-        }
+        CS_PROFILER_ZONE(ProctexPDLight_Animate_Blit)
+        tex->GetTextureHandle ()->Blit (tileRect.xmin, 
+          tileRect.ymin, 
+          tileRect.Width(), tileRect.Height(),
+          (uint8*)scratch.GetArray(),
+          iTextureHandle::BGRA8888);
       }
     }
     state.Reset (stateDirty);
     dirtyLights.DeleteAll ();
     tilesDirty.Clear ();
+
+    csTicks endTime = csGetTicks();
+    loader->RecordUpdateTime (endTime-startTime);
   }
 }
 

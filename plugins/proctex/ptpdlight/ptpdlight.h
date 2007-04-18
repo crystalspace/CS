@@ -35,7 +35,6 @@
 CS_PLUGIN_NAMESPACE_BEGIN(PTPDLight)
 {
 
-
 class TileHelper
 {
   int w, h, tx;
@@ -51,6 +50,8 @@ public:
   void MarkTilesBits (const csRect& r, csBitArray& bits) const;
   void GetTileRect (size_t n, csRect& r) const;
 };
+
+class ProctexPDLightLoader;
 
 class ProctexPDLight : 
   public scfImplementationExt1<ProctexPDLight, 
@@ -174,8 +175,8 @@ public:
 private:
   typedef csDirtyAccessArray<Lumel> LightmapScratch;
   CS_DECLARE_STATIC_CLASSVAR_REF(lightmapScratch, GetScratch, LightmapScratch);
-  size_t lightmapSize;
 
+  csRef<ProctexPDLightLoader> loader;
   TileHelper tiles;
   csBitArray tilesDirty;
   csRGBcolor baseColor;
@@ -208,8 +209,8 @@ public:
   MappedLight NewLight (iImage* img) const
   { return MappedLight (tilesDirty.GetSize(), tiles, img); }
 
-  ProctexPDLight (iImage* img);
-  ProctexPDLight (int w, int h);
+  ProctexPDLight (ProctexPDLightLoader* loader, iImage* img);
+  ProctexPDLight (ProctexPDLightLoader* loader, int w, int h);
   virtual ~ProctexPDLight ();
 
   virtual bool PrepareAnim ();

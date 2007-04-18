@@ -24,11 +24,14 @@
 #include "imap/reader.h"
 
 #include "csutil/csstring.h"
+#include "csutil/priorityqueue.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/strhash.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(PTPDLight)
 {
+
+class ProctexPDLight;
 
 class ProctexPDLightLoader :
   public scfImplementation2<ProctexPDLightLoader,
@@ -42,6 +45,31 @@ protected:
 #define CS_TOKEN_ITEM_FILE "plugins/proctex/ptpdlight/ptpdlight_loader.tok"
 #include "cstool/tokenlist.h"
 
+  class Scheduler
+  {
+    CS::Utility::PriorityQueue<ProctexPDLight*, uint> queue;
+    csSet<csConstPtrKey<ProctexPDLight> > queuedPTs;
+
+    csTicks lastFrameTime;
+    uint frameNumber;
+
+    csTicks timeBudget;
+    csTicks thisFrameUsedTime;
+
+    ProctexPDLight* currentPT;
+  public:
+    Scheduler () : lastFrameTime ((csTicks)~0), frameNumber (0), 
+      timeBudget ((csTicks)~0), currentPT (0) {}
+
+    void SetBudget (csTicks budget) { timeBudget = budget; }
+
+    bool UpdatePT (ProctexPDLight* texture, csTicks time);
+    void RecordUpdateTime (csTicks time)
+    { thisFrameUsedTime += time; }
+    void UnqueuePT (ProctexPDLight* texture);
+  };
+  Scheduler sched;
+
   void Report (int severity, iDocumentNode* node, const char* msg, ...);
   bool HexToLightID (char* lightID, const char* lightIDHex);
 public:
@@ -53,6 +81,14 @@ public:
   virtual csPtr<iBase> Parse (iDocumentNode* node,
   	iStreamSource*, iLoaderContext* ldr_context,
   	iBase* context);
+
+  // PT update "scheduler"
+  bool UpdatePT (ProctexPDLight* texture, csTicks time)
+  { return sched.UpdatePT (texture, time); }
+  void RecordUpdateTime (csTicks time)
+  { sched.RecordUpdateTime (time); }
+  void UnqueuePT (ProctexPDLight* texture)
+  { sched.UnqueuePT (texture); }
 };  
 
 }

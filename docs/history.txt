@@ -14,6 +14,12 @@ chronological order.
 	- res did some cleanups to ptpdlight and added some profiler zones.
 	- res made the lighter2 black threshold configurable.
 	- res added an implementation of a priority queue.
+	- res added a "scheduler" to ptpdlight: the time needed to animate
+	  a PD texture is measured and recorded. If the total time spent for
+	  animating PD textures in a frame exceeds a given "budget" updates
+	  are delayed to a future frame. Can be controlled through config
+	  vars "Texture.PTPDLight.UseScheduling" (enable/disable, default on) 
+	  and "Texture.PTPDLight.TimePerFrame" (time budget, default 25).
 17-Apr-2007
 	- Marten fixed two bugs in walktest with regards to the mouse mesh
 	  selection; crash on selection of no mesh with right button and

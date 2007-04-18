@@ -27,6 +27,7 @@
 #include "ivaria/reporter.h"
 #include "itexture/itexloaderctx.h"
 
+#include "csutil/cfgacc.h"
 #include "csutil/cscolor.h"
 
 #include "ptpdlight.h"
@@ -54,6 +55,12 @@ ProctexPDLightLoader::~ProctexPDLightLoader ()
 bool ProctexPDLightLoader::Initialize(iObjectRegistry *object_reg)
 {
   ProctexPDLightLoader::object_reg = object_reg;
+
+  csConfigAccess cfg (object_reg);
+  if (cfg->GetBool ("Texture.PTPDLight.UseScheduling", true))
+  {
+    sched.SetBudget (cfg->GetInt ("Texture.PTPDLight.TimePerFrame", 25));
+  }
 
   return true;
 }
@@ -109,7 +116,7 @@ csPtr<iBase> ProctexPDLightLoader::Parse (iDocumentNode* node,
 
   csRef<ProctexPDLight> pt;
   if (img.IsValid())
-    pt.AttachNew (new ProctexPDLight (img));
+    pt.AttachNew (new ProctexPDLight (this, img));
   else
   {
     if (ctx)
@@ -118,7 +125,7 @@ csPtr<iBase> ProctexPDLightLoader::Parse (iDocumentNode* node,
       {
 	  int w, h;
 	  ctx->GetSize (w, h);
-        pt.AttachNew (new ProctexPDLight (w, h));
+        pt.AttachNew (new ProctexPDLight (this, w, h));
       }
     }
   }
@@ -204,6 +211,59 @@ csPtr<iBase> ProctexPDLightLoader::Parse (iDocumentNode* node,
     return csPtr<iBase> (tw);
   }
   return 0;
+}
+
+bool ProctexPDLightLoader::Scheduler::UpdatePT (ProctexPDLight* texture, 
+                                                csTicks time)
+{
+  if (currentPT == texture) return true;
+
+  // New frame: update state
+  if (time != lastFrameTime)
+  {
+    lastFrameTime = time;
+    frameNumber--;
+    thisFrameUsedTime = 0;
+  }
+  // Other textures are enqueued, animate these first
+  while ((!queue.IsEmpty()) && (thisFrameUsedTime < timeBudget))
+  {
+    ProctexPDLight* queuedTex (queue.Pop());
+
+    queuedPTs.Delete (queuedTex);
+
+    // The texture to animate is in the queue: so jump out and let it do
+    if (queuedTex == texture)
+      return true;
+
+    /* Otherwise, animate. Will call RecordUpdateTime() which updates the 
+     * time spent */
+    currentPT = queuedTex;
+    /* This will recursively call UpdatePT(), so track the current PT to 
+     * quickly exit. */
+    queuedTex->Animate (time);
+    currentPT = 0;
+  }
+
+  if (thisFrameUsedTime < timeBudget)
+    // Still have time left
+    return true;
+  else
+  {
+    // Run in a future frame.
+    if (!queuedPTs.Contains (texture))
+    {
+      queue.Insert (frameNumber, texture);
+      queuedPTs.AddNoTest (texture);
+    }
+  }
+
+  return false;
+}
+
+void ProctexPDLightLoader::Scheduler::UnqueuePT (ProctexPDLight* texture)
+{
+  while (queue.Delete (texture)) {}
 }
 
 void ProctexPDLightLoader::Report (int severity, iDocumentNode* node,
