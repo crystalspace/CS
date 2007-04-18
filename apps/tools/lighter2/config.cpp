@@ -26,15 +26,19 @@ namespace lighter
 
   Configuration globalConfig;
 
+  // @@@ Depends on lightmap precision and scale
+  static const float lightValueEpsilon = 2.0f/256.0f;
+
   Configuration::Configuration ()
   {
     //Setup defaults
     lighterProperties.doDirectLight = true;
 
-    lmProperties.uTexelPerUnit = 1.0f;
-    lmProperties.vTexelPerUnit = 1.0f;
+    lmProperties.uTexelPerUnit = 2.0f;
+    lmProperties.vTexelPerUnit = 2.0f;
     lmProperties.maxLightmapU = 1024;
     lmProperties.maxLightmapV = 1024;
+    lmProperties.blackThreshold = lightValueEpsilon;
 
     diProperties.pointLightMultiplier = 1.0f;
     diProperties.areaLightMultiplier = 1.0f;
@@ -44,14 +48,24 @@ namespace lighter
   {
     csRef<iConfigManager> cfgMgr = globalLighter->configMgr;
     
-    lighterProperties.doDirectLight = cfgMgr->GetBool ("lighter2.DirectLight", true);
+    lighterProperties.doDirectLight = cfgMgr->GetBool ("lighter2.DirectLight", 
+      lighterProperties.doDirectLight);
 
 
-    lmProperties.uTexelPerUnit = cfgMgr->GetFloat ("lighter2.uTexelPerUnit", 2.0f);
-    lmProperties.vTexelPerUnit = cfgMgr->GetFloat ("lighter2.vTexelPerUnit", 2.0f);
+    lmProperties.uTexelPerUnit = cfgMgr->GetFloat ("lighter2.uTexelPerUnit", 
+      lmProperties.uTexelPerUnit);
+    lmProperties.vTexelPerUnit = cfgMgr->GetFloat ("lighter2.vTexelPerUnit", 
+      lmProperties.vTexelPerUnit);
 
-    lmProperties.maxLightmapU = cfgMgr->GetInt ("lighter2.maxLightmapU", 1024);
-    lmProperties.maxLightmapV = cfgMgr->GetInt ("lighter2.maxLightmapV", 1024);
+    lmProperties.maxLightmapU = cfgMgr->GetInt ("lighter2.maxLightmapU", 
+      lmProperties.maxLightmapU);
+    lmProperties.maxLightmapV = cfgMgr->GetInt ("lighter2.maxLightmapV", 
+      lmProperties.maxLightmapV);
    
+
+    lmProperties.blackThreshold = cfgMgr->GetInt ("lighter2.blackThreshold", 
+      lmProperties.blackThreshold);
+    lmProperties.blackThreshold = csMax (lmProperties.blackThreshold,
+      lightValueEpsilon); // Values lower than the LM precision don't make sense
   }
 }

@@ -48,6 +48,9 @@ namespace lighter
 
       // Max lightmap sizes
       uint maxLightmapU, maxLightmapV;
+
+      // Black threshold
+      float blackThreshold;
     };
 
     // Direct light (direct illumination) calculation settings

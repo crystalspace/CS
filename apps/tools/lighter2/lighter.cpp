@@ -492,7 +492,13 @@ namespace lighter
     csPrintf ("  Set maximum lightmap size in u-mapping direction\n");
 
     csPrintf (" --maxlightmapv=<number>\n");
-    csPrintf ("  Set maximum lightmap size in v-mapping direction\n\n");
+    csPrintf ("  Set maximum lightmap size in v-mapping direction\n");
+
+    csPrintf (" --blackthreshold=<threshold>\n");
+    csPrintf ("  Set the normalized threshold for lightmap pixels to be "
+              "  considered black.\n");
+
+    csPrintf ("\n");
   }
 
 }

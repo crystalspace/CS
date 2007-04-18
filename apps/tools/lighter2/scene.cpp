@@ -1318,7 +1318,8 @@ namespace lighter
       lightmapPostProc.ApplyAmbient (lightmaps[i]);
       lightmapPostProc.ApplyExposure (lightmaps[i]);
     #endif
-      savetex.isSolid = lm->IsOneColor (lightmapPostProc.GetColorTolerance(), 
+      savetex.isSolid = lm->IsOneColor (
+        globalConfig.GetLMProperties().blackThreshold, 
         savetex.solidColor);
       if (!savetex.isSolid)
       {
@@ -1337,7 +1338,8 @@ namespace lighter
       {
         csPtrKey<Light> key;
         LightmapPtrDelArray* lm = pdlIt.Next(key);
-        if (lm->Get (i)->IsNull (lightmapPostProc.GetColorTolerance())) continue;
+        if (lm->Get (i)->IsNull (
+          globalConfig.GetLMProperties().blackThreshold)) continue;
 
         csString lmID (key->GetLightID ().HexString());
         csString textureFilename = "lightmaps/";
