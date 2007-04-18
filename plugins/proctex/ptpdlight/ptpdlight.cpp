@@ -398,7 +398,7 @@ static void MultiplyAddLumels (ProctexPDLight::Lumel* dst, size_t dstPitch,
       {
         uint32 g = dstVal & (0xff << shiftG);
         g += lutG[mapVal.c.green];
-        if (g > (0xff << shiftR)) g = (0xff << shiftG);
+        if (g > (0xff << shiftG)) g = (0xff << shiftG);
         dstVal &= ~(0xff << shiftG);
         dstVal |= g;
       }
