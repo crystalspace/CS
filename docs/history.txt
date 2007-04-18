@@ -27,6 +27,8 @@ chronological order.
 	  in debug mode and assert on that member being 'this' on destruction
 	  in order to catch csWeakRef<>s being memcpy()ed (e.g. when stuffed
 	  into a csArray<>).
+	- res fixed an invalid storage of a csWeakRef<> in a csArray<> in
+	  gmeshanimpdl.
 17-Apr-2007
 	- Marten fixed two bugs in walktest with regards to the mouse mesh
 	  selection; crash on selection of no mesh with right button and

@@ -62,7 +62,7 @@ private:
     csWeakRef<iLight> light;
     csRef<iRenderBuffer> colors;
   };
-  csArray<MappedLight> lights;
+  csSafeCopyArray<MappedLight> lights;
 
   bool prepared;
   bool lightsDirty;
