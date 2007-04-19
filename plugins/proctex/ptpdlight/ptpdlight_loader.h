@@ -45,9 +45,20 @@ protected:
 #define CS_TOKEN_ITEM_FILE "plugins/proctex/ptpdlight/ptpdlight_loader.tok"
 #include "cstool/tokenlist.h"
 
+public:
   class Scheduler
   {
-    CS::Utility::PriorityQueue<ProctexPDLight*, uint> queue;
+  public:
+    struct QueueItem
+    {
+      uint prio;
+      ProctexPDLight* tex;
+
+      bool operator< (const QueueItem& other) const
+      { return prio < other.prio; }
+    };
+  protected:
+    CS::Utility::PriorityQueue<QueueItem> queue;
     csSet<csConstPtrKey<ProctexPDLight> > queuedPTs;
 
     csTicks lastFrameTime;
@@ -68,6 +79,7 @@ protected:
     { thisFrameUsedTime += time; }
     void UnqueuePT (ProctexPDLight* texture);
   };
+protected:
   Scheduler sched;
 
   void Report (int severity, iDocumentNode* node, const char* msg, ...);
@@ -93,5 +105,24 @@ public:
 
 }
 CS_PLUGIN_NAMESPACE_END(PTPDLight)
+
+#define NS_PTPDL    CS_PLUGIN_NAMESPACE_NAME(PTPDLight)
+
+template<>
+class csComparator<NS_PTPDL::ProctexPDLightLoader::Scheduler::QueueItem,
+  NS_PTPDL::ProctexPDLight*>
+{
+public:
+  static int Compare(
+    NS_PTPDL::ProctexPDLightLoader::Scheduler::QueueItem const &a, 
+    NS_PTPDL::ProctexPDLight* const& b)
+  {
+    if (a.tex == b) return 0;
+    return csComparator<const NS_PTPDL::ProctexPDLight*,
+      NS_PTPDL::ProctexPDLight*>::Compare (a.tex, b);
+  }
+};
+
+#undef NS_PTPDL
 
 #endif // __CS_PTPDLIGHT_LOADER_H__

@@ -32,20 +32,13 @@ namespace CS
     
     /**
      * An implementation of a priority queue.
-     * Items with a \em higher priority value are returned first.
+     * \a T must be comparable with csComparator<>. Larger items are 
+     * returned first. 
      */
-    template<typename T, typename Tpriority = int>
+    template<typename T, class Container = csArray<T> >
     class PriorityQueue
     {
-      struct QueueItem
-      {
-	Tpriority p;
-	T val;
-
-        QueueItem (const Tpriority& p, const T& val) : p (p), val (val) {}
-      };
-      // Play safe so e.g. csWeakRef<> works
-      csSafeCopyArray<QueueItem> items;
+      Container items;
 
       inline static size_t Parent (size_t n) { return (n-1)/2; }
       inline static size_t Left (size_t n) { return 2*n+1; }
@@ -53,10 +46,12 @@ namespace CS
 
       void SwapItems (size_t a, size_t b)
       {
-        QueueItem tmp (items[a]);
+        T tmp (items[a]);
         items[a] = items[b];
         items[b] = tmp;
       }
+      inline bool Larger (size_t a, size_t b)
+      { return csComparator<T, T>::Compare (items[a], items[b]) > 0; }
 
       /// Ensure heap order on 'items'.
       void HeapifyUp (size_t n)
@@ -67,11 +62,11 @@ namespace CS
           size_t parent = Parent (current);
           size_t larger = current;
           if (((current ^ 1) < items.GetSize())
-            && (items[current ^ 1].p > items[larger].p))
+            && Larger (current ^ 1, larger))
           {
             larger = current ^ 1;
           }
-          if (items[larger].p > items[parent].p)
+          if (Larger (larger, parent))
             SwapItems (larger, parent);
           else
             return;
@@ -88,12 +83,12 @@ namespace CS
           size_t r = Right (current);
           size_t larger = current;
           if ((l < items.GetSize())
-            && (items[l].p > items[larger].p))
+            && Larger (l, larger))
           {
             larger = l;
           }
           if ((r < items.GetSize())
-            && (items[r].p > items[larger].p))
+            && Larger (r, larger))
           {
             larger = r;
           }
@@ -104,28 +99,18 @@ namespace CS
         while (current < items.GetSize ());
       }
     public:
-      typedef Tpriority PriorityType;
-    
-      /// Insert an item with a given priority.
-      void Insert (const Tpriority& prio, const T& what)
+      /// Insert an item.
+      void Insert (const T& what)
       {
-        size_t n = items.Push (QueueItem (prio, what));
+        size_t n = items.Push (what);
         HeapifyUp (n);
       }
     
       //@{
-      /// Return and remove the item with the \em highest priority.
-      T Pop (Tpriority& prio)
-      {
-        prio = items[0].p;
-        T val = items[0].val;
-        items.DeleteIndexFast (0);
-        HeapifyDown (0);
-        return val;
-      }
+      /// Return and remove the largest item.
       T Pop ()
       {
-        T val = items[0].val;
+        T val = items[0];
         items.DeleteIndexFast (0);
         HeapifyDown (0);
         return val;
@@ -133,28 +118,25 @@ namespace CS
       //@}
     
       //@{
-      /// Return, but don't remove the item with the \em highest priority.
-      const T& Top (Tpriority& prio) const
-      {
-        prio = items[0].p;
-        return items[0].val;
-      }
+      /// Return, but don't remove, the largest item.
       const T& Top () const
       {
-        return items[0].val;
+        return items[0];
       }
       //@}
 
       /**
-       * Remove \a item with highest attached priority from the queue.
+       * Remove largest item that is equal to \a what. The contained type \a T
+       * and the type \a T2 of \a what must be comparable with csComparator<>.
        * \returns Whether \a item was found and deleted.
        * \remarks Does a linear search - slow.
        */
-      bool Delete (const T& item)
+      template<typename T2>
+      bool Delete (const T2& what)
       {
         for (size_t n = 0; n < items.GetSize(); n++)
         {
-          if (csComparator<T, T>::Compare (items[n].val, item) == 0)
+          if (csComparator<T, T2>::Compare (items[n], what) == 0)
           {
             items.DeleteIndexFast (n);
             HeapifyDown (n);

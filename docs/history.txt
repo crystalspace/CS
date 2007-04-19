@@ -9,6 +9,9 @@ chronological order.
 19-Apr-2007
         - Piotr changed ode colliders to not loose transform data after
           recreation of geometry.
+	- res changed CS::Utility::PriorityQueue to only use one template
+	  argument and not a "priority" and "auxiliary" argument. Ordering has
+	  to be provided by csComparator<>.
 18-Apr-2007
         - Piotr fixed odedynam capsule representation to be oriented as
           ode collider is. 

@@ -228,7 +228,8 @@ bool ProctexPDLightLoader::Scheduler::UpdatePT (ProctexPDLight* texture,
   // Other textures are enqueued, animate these first
   while ((!queue.IsEmpty()) && (thisFrameUsedTime < timeBudget))
   {
-    ProctexPDLight* queuedTex (queue.Pop());
+    QueueItem item (queue.Pop());
+    ProctexPDLight* queuedTex = item.tex;
 
     queuedPTs.Delete (queuedTex);
 
@@ -253,7 +254,10 @@ bool ProctexPDLightLoader::Scheduler::UpdatePT (ProctexPDLight* texture,
     // Run in a future frame.
     if (!queuedPTs.Contains (texture))
     {
-      queue.Insert (frameNumber, texture);
+      QueueItem newItem;
+      newItem.prio = frameNumber;
+      newItem.tex = texture;
+      queue.Insert (newItem);
       queuedPTs.AddNoTest (texture);
     }
   }
