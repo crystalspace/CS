@@ -64,12 +64,12 @@ namespace lighter
       lmProperties.maxLightmapV);
    
 
-    lmProperties.blackThreshold = cfgMgr->GetInt ("lighter2.blackThreshold", 
+    lmProperties.blackThreshold = cfgMgr->GetFloat ("lighter2.blackThreshold", 
       lmProperties.blackThreshold);
     lmProperties.blackThreshold = csMax (lmProperties.blackThreshold,
       lightValueEpsilon); // Values lower than the LM precision don't make sense
 
-    float normalsToleranceAngle = cfgMgr->GetInt ("lighter2.normalsTolerance", 
+    float normalsToleranceAngle = cfgMgr->GetFloat ("lighter2.normalsTolerance", 
       1.0f);
     lmProperties.normalsTolerance = csMax (EPSILON, normalsToleranceAngle * 
       (PI / 180.0f));
