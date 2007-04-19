@@ -1021,6 +1021,7 @@ void csODECollider::SetDensity (float density)
 
 bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
 {
+  csOrthoTransform transform = GetLocalTransform ();
   dBodyID b = dGeomGetBody (transformID);
   ClearContents ();
 
@@ -1048,7 +1049,8 @@ bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
   if (!trimesh || trimesh->GetVertexCount () == 0
       || trimesh->GetTriangleCount () == 0)
   {
-    csFPrintf(stderr, "csODECollider: No collision polygons, triangles or vertices on %s\n",mesh->QueryObject()->GetName());
+    csFPrintf(stderr, "csODECollider: No collision polygons, triangles or vertices on %s\n",
+      mesh->QueryObject()->GetName());
     return false;
   }
 
@@ -1097,10 +1099,13 @@ bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
   else if (spaceID)
     AddToSpace (spaceID);
 
+  SetTransform (transform);
+
   return true;
 }
 bool csODECollider::CreateCapsuleGeometry (float length, float radius)
 {
+  csOrthoTransform transform = GetLocalTransform ();
   dBodyID b = dGeomGetBody (transformID);
   ClearContents ();
 
@@ -1119,6 +1124,7 @@ bool csODECollider::CreateCapsuleGeometry (float length, float radius)
     MassUpdate ();
   } else if (spaceID) AddToSpace (spaceID);
 
+  SetTransform (transform);
   return true;
 }
 bool csODECollider::CreatePlaneGeometry (const csPlane3& plane)
@@ -1147,6 +1153,7 @@ bool csODECollider::CreateSphereGeometry (const csSphere& sphere)
 {
   if (sphere.GetRadius () > 0) //otherwise ODE will treat radius as a 'bad argument'
   {
+    csOrthoTransform transform = GetLocalTransform ();
     dBodyID b = dGeomGetBody (transformID);
     ClearContents ();
 
@@ -1168,6 +1175,7 @@ bool csODECollider::CreateSphereGeometry (const csSphere& sphere)
       MassUpdate ();
     } else if (spaceID) AddToSpace (spaceID);
 
+    SetTransform (transform);
     return true;
   }
 
@@ -1175,6 +1183,7 @@ bool csODECollider::CreateSphereGeometry (const csSphere& sphere)
 }
 bool csODECollider::CreateBoxGeometry (const csVector3& size)
 {
+  csOrthoTransform transform = GetLocalTransform ();
   dBodyID b = dGeomGetBody (transformID);
   ClearContents ();
 
@@ -1192,6 +1201,8 @@ bool csODECollider::CreateBoxGeometry (const csVector3& size)
     dGeomSetBody (transformID, b);
     MassUpdate ();
   } else if (spaceID) AddToSpace (spaceID);
+
+  SetTransform (transform);
 
   return true;
 }
@@ -1223,6 +1234,8 @@ void csODECollider::SetTransform (const csOrthoTransform& transform)
 }
 csOrthoTransform csODECollider::GetLocalTransform ()
 {
+  if (!geomID)
+    return csOrthoTransform ();
   const dReal *tv = dGeomGetPosition (geomID);
   csVector3 t_pos (tv[0], tv[1], tv[2]);
 
@@ -1233,6 +1246,8 @@ csOrthoTransform csODECollider::GetLocalTransform ()
 }
 csOrthoTransform csODECollider::GetTransform ()
 {
+  if (!geomID)
+    return csOrthoTransform ();
   const dReal *tv = dGeomGetPosition (transformID);
   csVector3 t_pos (tv[0], tv[1], tv[2]);
 
