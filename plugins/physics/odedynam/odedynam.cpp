@@ -1370,8 +1370,7 @@ void csODECollider::FillWithColliderGeometry (csRef<iGeneralFactoryState> genmes
       csRef<iMeshObjectFactory> collider_fact = 
         scfQueryInterface<iMeshObjectFactory> (genmesh_fact);
       collider_fact->HardTransform (
-        csReversibleTransform (csZRotMatrix3 (PI/2), csVector3 (0)));
-      genmesh_fact->Invalidate ();
+        csReversibleTransform (csYRotMatrix3 (PI/2), csVector3 (0)));
     }
     break;
   case PLANE_COLLIDER_GEOMETRY:
