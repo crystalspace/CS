@@ -1619,11 +1619,10 @@ AS_IF([test $cs_host_family != windows],
 # Check for Cg shader package.
 #
 # A note on the 'log()' call: on Linux, libCg.so itself doesn't depend on
-# the libmy's shared object. However, if the --as-needed flag is used in 
+# the libm's shared object. However, if the --as-needed flag is used in 
 # LDFLAGS, and the app itself doesn't use a function from libm, it's symbols 
 # won't be available, causing problems. Normally any app calls some libm
-# function. However, the default test program doesn't, so a call to log() was 
-# added explicitly.
+# function. However, the default test program doesn't, so the link test fails.
 # And the same applies to pthread, too.
 # The workaround is to explicitly strip -Wl,--as-needed from LDFLAGS.
 #------------------------------------------------------------------------------
