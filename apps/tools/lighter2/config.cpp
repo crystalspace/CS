@@ -27,7 +27,7 @@ namespace lighter
   Configuration globalConfig;
 
   // @@@ Depends on lightmap precision and scale
-  static const float lightValueEpsilon = 2.0f/256.0f;
+  static const float lightValueEpsilon = 2.0f/255.0f;
 
   Configuration::Configuration ()
   {

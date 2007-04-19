@@ -172,7 +172,7 @@ namespace lighter
     // For now, force the use of TinyXML to be able to write
     docSystem.AttachNew (new csTinyDocumentSystem);
 
-    progStartup.SetProgress (100);
+    progStartup.SetProgress (1);
     return true;
   }
 
@@ -180,6 +180,7 @@ namespace lighter
   {
     delete scene; scene = 0;
     delete swapManager; swapManager = 0;
+    engine.Invalidate ();
   }
 
   bool Lighter::LightEmUp ()
