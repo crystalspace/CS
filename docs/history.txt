@@ -12,6 +12,8 @@ chronological order.
           in oposite direction). Before joints behavior was misleading:
           setting max/min distance for rotational joint was resulting in 
           angle constraints.
+        - Piotr changed ode joints "GetTransform" method to return transform
+          with origin in joint anchor (when joint is rotational).
 19-Apr-2007
         - Piotr changed ode colliders to not loose transform data after
           recreation of geometry.

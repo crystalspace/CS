@@ -2482,6 +2482,37 @@ void csODEJoint::SetTransform (const csOrthoTransform &trans)
 
 csOrthoTransform csODEJoint::GetTransform ()
 {
+  switch (GetType ())
+  {
+  case CS_ODE_JOINT_TYPE_BALL:
+    {
+      dVector3 result;
+      dJointGetBallAnchor (jointID, result);
+      transform.SetOrigin (csVector3 (result[0], result[1], result[2]));
+    }
+    break;
+  case CS_ODE_JOINT_TYPE_HINGE:
+    {
+      dVector3 result;
+      dJointGetHingeAnchor (jointID, result);
+      transform.SetOrigin (csVector3 (result[0], result[1], result[2]));
+    }
+    break;
+  case CS_ODE_JOINT_TYPE_HINGE2:
+    {
+      dVector3 result;
+      dJointGetHinge2Anchor (jointID, result);
+      transform.SetOrigin (csVector3 (result[0], result[1], result[2]));
+    }
+    break;
+  case CS_ODE_JOINT_TYPE_UNIVERSAL:
+    {
+      dVector3 result;
+      dJointGetUniversalAnchor (jointID, result);
+      transform.SetOrigin (csVector3 (result[0], result[1], result[2]));
+    }
+    break;
+  };  
   return transform;
 }
 
