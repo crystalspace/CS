@@ -141,7 +141,7 @@ if test "x\$includedir" = "x"
 then
   includedir="$(appincdir)"
 fi
-syslibs=" $(LINKLIBS) "
+syslibs=" $(COMPILER.LFLAGS) "
 common_cflags=" $(COMPILER.CFLAGS.MANDATORY) "
 common_cxxflags=" $(COMPILER.CFLAGS.MANDATORY) $(COMPILER.C++FLAGS.MANDATORY) "
 staticdeps="$(STATICPLUGINS.DEPENDENCIES)"

@@ -609,11 +609,11 @@ CS_CHECK_BUILD([if --kill-at is accepted], [cs_cv_prog_link_kill_at], [],
 #------------------------------------------------------------------------------
 CS_EMIT_BUILD_FLAGS([if reporting missing symbols is supported], 
     [cs_cv_prog_link_z_defs], [CS_CREATE_TUPLE([],[-Wl,-z,defs])], 
-    [C++], [COMPILER.LFLAGS], [+])
+    [C++], [COMPILER.LFLAGS.PRIVATE], [+])
 CS_EMIT_BUILD_FLAGS([if missing symbols can be reported as warnings], 
     [cs_cv_prog_link_warn_unresolved_symbols], 
     [CS_CREATE_TUPLE([],[-Wl,--warn-unresolved-symbols])], 
-    [C++], [COMPILER.LFLAGS], [+])
+    [C++], [COMPILER.LFLAGS.PRIVATE], [+])
 
 
 
