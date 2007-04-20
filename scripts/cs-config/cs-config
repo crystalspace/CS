@@ -1,6 +1,10 @@
 #!/bin/sh
 
-PATH_SEPARATOR=:
+if [ "x$MSYSTEM" == "xmsys" ] ; then
+  PATH_SEPARATOR=";"
+else
+  PATH_SEPARATOR=":"
+fi
 
 TEMP_PREFIX=/tmp/cs-config$$
 
@@ -8,11 +12,11 @@ TEMP_PREFIX=/tmp/cs-config$$
 # @@@ FIXME: What about $CRYSTAL_x_y env vars?
 OLD_IFS="$IFS"
 IFS=$PATH_SEPARATOR
-for p in $CRYSTAL$PATH_SEPARATOR:$PATH ; do
-  if [ -d $p ] ; then
+for p in $CRYSTAL$PATH_SEPARATOR$PATH ; do
+  if [ -d "$p" ] ; then
     # The -executable predicate would do what we like, but is not available
     # with older find versions.
-    find $p -maxdepth 1 -perm /500 -iname "cs-config-*" >> ${TEMP_PREFIX}_find
+    find "$p" -maxdepth 1 -perm +500 -iname "cs-config-*" >> ${TEMP_PREFIX}_find
   fi
 done
 IFS="$OLD_IFS"

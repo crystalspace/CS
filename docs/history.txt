@@ -17,6 +17,7 @@ chronological order.
 	- res adjusted configure the cs-config generation to not put "private"
 	  linker options such as the various -Wl params used into the linker
 	  flags returned by cs-config. Addresses #150.
+	- res tweaked the cs-config wrapper script to work better on MSYS.
 19-Apr-2007
         - Piotr changed ode colliders to not loose transform data after
           recreation of geometry.
