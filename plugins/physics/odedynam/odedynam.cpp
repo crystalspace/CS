@@ -2496,8 +2496,12 @@ void csODEJoint::SetTransConstraints (bool X, bool Y, bool Z)
 
 void csODEJoint::SetMinimumDistance (const csVector3 &min)
 {
-  lo_stop = min;
-  BuildJoint ();
+  int transcount = transConstraint[0] + transConstraint[1] + transConstraint[2];
+  if (transcount != 0)
+  {
+    lo_stop = min;
+    BuildJoint ();
+  }
 }
 csVector3 csODEJoint::GetMinimumDistance ()
 {
@@ -2505,8 +2509,12 @@ csVector3 csODEJoint::GetMinimumDistance ()
 }
 void csODEJoint::SetMaximumDistance (const csVector3 &max)
 {
-  hi_stop = max;
-  BuildJoint ();
+  int transcount = transConstraint[0] + transConstraint[1] + transConstraint[2];
+  if (transcount != 0)
+  {
+    hi_stop = max;
+    BuildJoint ();
+  }
 }
 csVector3 csODEJoint::GetMaximumDistance ()
 {
@@ -2523,8 +2531,12 @@ void csODEJoint::SetRotConstraints (bool X, bool Y, bool Z)
 }
 void csODEJoint::SetMinimumAngle (const csVector3 &min)
 {
-  lo_stop = min;
-  BuildJoint ();
+  int transcount = transConstraint[0] + transConstraint[1] + transConstraint[2];
+  if (transcount == 0)
+  {
+    lo_stop = min;
+    BuildJoint ();
+  }
 }
 csVector3 csODEJoint::GetMinimumAngle ()
 {
@@ -2532,8 +2544,12 @@ csVector3 csODEJoint::GetMinimumAngle ()
 }
 void csODEJoint::SetMaximumAngle (const csVector3 &max)
 {
-  hi_stop = max;
-  BuildJoint ();
+  int transcount = transConstraint[0] + transConstraint[1] + transConstraint[2];
+  if (transcount == 0)
+  {
+    hi_stop = max;
+    BuildJoint ();
+  }
 }
 csVector3 csODEJoint::GetMaximumAngle ()
 {

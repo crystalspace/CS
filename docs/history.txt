@@ -6,6 +6,12 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Apr-2007
+        - Piotr changed ode joints to ignore max/min distance parameter
+          when resulting joint will be rotational (same for max/min angle
+          in oposite direction). Before joints behavior was misleading:
+          setting max/min distance for rotational joint was resulting in 
+          angle constraints.
 19-Apr-2007
         - Piotr changed ode colliders to not loose transform data after
           recreation of geometry.
