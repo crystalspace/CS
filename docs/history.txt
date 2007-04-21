@@ -16,6 +16,8 @@ chronological order.
 	  jam target as well.
 	- res changed crystal.m4 to also use CRYSTAL_x_y environment variables
 	  for the path.
+	- res changed the runtime CS path detection routine(s) to prefer
+	  versioned environment variables (CRYSTAL_x_y, CRYSTAL_x_y_PLUGIN).
 20-Apr-2007
         - Piotr changed ode joints to ignore max/min distance parameter
           when resulting joint will be rotational (same for max/min angle

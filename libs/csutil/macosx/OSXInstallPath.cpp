@@ -24,11 +24,15 @@
 //
 //-----------------------------------------------------------------------------
 #include "cssysdef.h"
+#include "csver.h"
 #include "csutil/stringarray.h"
 #include "csutil/syspath.h"
 #include "OSXInstallPath.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+#define VERSION_STR         CS_VERSION_MAJOR "_" CS_VERSION_MINOR
+#define VERSION_STR_DOTTED  CS_VERSION_MAJOR "." CS_VERSION_MINOR
 
 //-----------------------------------------------------------------------------
 // is_config_dir
@@ -73,7 +77,10 @@ csString csGetConfigPath()
 
   if (OSXGetInstallPath(buff, FILENAME_MAX, CS_PATH_SEPARATOR))
     candidates.Push(buff);
-  if ((env = getenv("CRYSTAL")) != 0 && *env != '\0')
+  env = getenv("CRYSTAL_" VERSION_STR);
+  if (!env || !*env)
+    env = getenv ("CRYSTAL");
+  if (env != 0 && *env != '\0')
   {
     csString crystalPath (env);
 
@@ -96,6 +103,7 @@ csString csGetConfigPath()
 #if defined(CS_CONFIGDIR)
   candidates.Push(CS_CONFIGDIR);
 #endif
+  candidates.Push("/Library/CrystalSpace" VERSION_STR_DOTTED);
   candidates.Push("/Library/CrystalSpace");
   candidates.Push("/usr/local");
 
@@ -117,7 +125,9 @@ csPathsList* csInstallationPathsHelper::GetPlatformInstallationPaths()
 {
   csPathsList* paths = new csPathsList;
 
-  char const* envpath = getenv ("CRYSTAL");
+  char const* envpath = getenv ("CRYSTAL_" VERSION_STR);
+  if (!envpath || !*envpath)
+    envpath = getenv ("CRYSTAL");
   if (envpath != 0 && *envpath != '\0')
     paths->AddUnique(csPathsUtilities::ExpandAll(csPathsList(envpath)));
 
@@ -129,6 +139,7 @@ csPathsList* csInstallationPathsHelper::GetPlatformInstallationPaths()
 #if defined(CS_CONFIGDIR)
   paths->AddUniqueExpanded(CS_CONFIGDIR);
 #endif
+  paths->AddUniqueExpanded("/Library/CrystalSpace" VERSION_STR_DOTTED);
   paths->AddUniqueExpanded("/Library/CrystalSpace");
   paths->AddUniqueExpanded("/usr/local");
   return paths;
