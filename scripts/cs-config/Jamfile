@@ -230,3 +230,4 @@ SEARCH on $(CS_CONFIG_GRISTED) = $(SUBDIR) ;
 Depends cs-config : $(CS_CONFIG_GRISTED) ;
 Copy cs-config : $(CS_CONFIG_GRISTED) ;
 Help cs-config : "Build the cs-config script" ;
+Depends install_bin : [ DoInstall cs-config : $(bindir) : $(INSTALL_PROGRAM) ] ;

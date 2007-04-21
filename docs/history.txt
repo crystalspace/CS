@@ -12,6 +12,8 @@ chronological order.
 	- res changed the installation of applications to install apps with a
 	  suffix of the version number and to create a symlink for the
 	  undecorated name.
+	- res made the cs-config wrapper script be installed by the install_bin
+	  jam target as well.
 20-Apr-2007
         - Piotr changed ode joints to ignore max/min distance parameter
           when resulting joint will be rotational (same for max/min angle
