@@ -109,12 +109,25 @@ rule SystemInstallApplication
 {
     if [ IsElem console : $(3) ]
     {
-        Depends install_bin : 
-            [ DoInstall $(<) : $(bindir) $(2) : $(INSTALL_PROGRAM) ] ;
+	local suffix = $(4) ;
+	if "$(suffix)"
+	{
+	  local target_suffixed = $(<)-$(suffix) ;
+	  Depends install_bin :
+	    [ DoInstallFile $(<) : $(bindir) $(2) : $(target_suffixed) : $(INSTALL_PROGRAM) ] ;
+	  local linktarget = $(<:D=$(bindir)) ;
+	  SymLink $(linktarget) : $(target_suffixed) ;
+	  Depends install_bin : $(linktarget) ;
+	}
+	else
+	{
+	  Depends install_bin :
+	    [ DoInstall $(<) : $(bindir) $(2) : $(INSTALL_PROGRAM) ] ;
+	}
     }
     else
     {
-        InstallApplicationGUI $(<) : $(bindir) $(2) ;
+        InstallApplicationGUI $(<) : $(bindir) $(2) : $(4) ;
     }
 }
 
@@ -347,8 +360,21 @@ rule InstallApplicationGUI
     local target = $(wrapper:BSR=$(dir):G=install) ;
 
     InstallApplicationWrapperPrepare $(target) ;
-    Depends install_bin :
-	[ DoInstall $(wrapper) : $(2) : "$(DEEPCOPY)" ] ; 
+    local suffix = $(3) ;
+    if "$(suffix)"
+    {
+      local target_suffixed = $(<)-$(suffix).app ;
+      Depends install_bin :
+	[ DoInstallFile $(wrapper) : $(2) : $(target_suffixed) : "$(DEEPCOPY)" ] ;
+      local linktarget = $(<:D=$(dir)) ;
+      SymLink $(linktarget) : $(target_suffixed) ;
+      Depends install_bin : $(linktarget) ;
+    }
+    else
+    {
+      Depends install_bin :
+	  [ DoInstall $(wrapper) : $(2) : "$(DEEPCOPY)" ] ; 
+    }
 }
 
 actions InstallApplicationWrapperPrepare

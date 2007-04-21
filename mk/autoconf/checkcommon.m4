@@ -63,7 +63,9 @@ AC_DEFUN([CS_CHECK_COMMON_TOOLS_BASIC],
     CS_EMIT_BUILD_PROPERTY([CMD.MKDIRS], [$MKDIRS])
 
     CS_CHECK_PROGS([INSTALL], [install])
-    CS_EMIT_BUILD_PROPERTY([INSTALL], [$INSTALL])])
+    CS_EMIT_BUILD_PROPERTY([INSTALL], [$INSTALL])
+    AC_PROG_LN_S
+    CS_EMIT_BUILD_PROPERTY([LN_S], [$LN_S])])
 
 
 #------------------------------------------------------------------------------

@@ -74,8 +74,21 @@ rule SystemLinkApplication
 
 rule SystemInstallApplication
 {
-  Depends install_bin :
-    [ DoInstall $(<) : $(bindir) $(2) : $(INSTALL_PROGRAM) ] ;
+  local suffix = $(4) ;
+  if "$(suffix)"
+  {
+    local target_suffixed = $(<)-$(suffix) ;
+    Depends install_bin :
+      [ DoInstallFile $(<) : $(bindir) $(2) : $(target_suffixed) : $(INSTALL_PROGRAM) ] ;
+    local linktarget = $(<:D=$(bindir)) ;
+    SymLink $(linktarget) : $(target_suffixed) ;
+    Depends install_bin : $(linktarget) ;
+  }
+  else
+  {
+    Depends install_bin :
+      [ DoInstall $(<) : $(bindir) $(2) : $(INSTALL_PROGRAM) ] ;
+  }
 }
 
 rule SystemInstallPlugin

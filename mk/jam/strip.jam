@@ -23,16 +23,27 @@
 rule SplitDebugInfo
 {
   local binary = $(1) ;
+  local suffix = $(2) ;
+  local debugfile ;
+  # Optional suffix for debug info file
+  if "$(suffix)"
+  {
+    debugfile = $(binary)-$(suffix).dbg ;
+  }
+  else
+  {
+    debugfile = $(binary).dbg ;
+  }
+  DEBUG_FILE on $(binary) = $(debugfile) ;
   DoSplitDebugInfo $(binary) ;
-  local debugfile = $(binary).dbg ;
   LOCATE on $(debugfile) = [ on $(binary) GetVar LOCATE ] ;
   return $(debugfile) ;
 }
 
-actions DoSplitDebugInfo
+actions DoSplitDebugInfo bind DEBUG_FILE
 {
-  $(CMD.OBJCOPY) --only-keep-debug $(<) $(<).dbg
+  $(CMD.OBJCOPY) --only-keep-debug $(<) $(DEBUG_FILE)
   $(CMD.OBJCOPY) --strip-unneeded $(<)
-  $(CMD.OBJCOPY) --add-gnu-debuglink=$(<).dbg $(<)
-  if [ "$(CHMOD)" ] ; then $(CHMOD) a-x $(<).dbg ; fi
+  $(CMD.OBJCOPY) --add-gnu-debuglink=$(DEBUG_FILE) $(<)
+  if [ "$(CHMOD)" ] ; then $(CHMOD) a-x $(DEBUG_FILE) ; fi
 }

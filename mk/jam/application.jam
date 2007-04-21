@@ -76,7 +76,7 @@ rule Application
     {
       install_opts += console ;
     }
-    SystemInstallApplication $(target) : : $(install_opts) ;
+    SystemInstallApplication $(target) : : $(install_opts) : $(APPLICATION_SUFFIX) ;
   }
 
   # Link
@@ -86,7 +86,7 @@ rule Application
   local cleanextra ;
   if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
   {
-    local debugfile = [ SplitDebugInfo $(target) ] ;
+    local debugfile = [ SplitDebugInfo $(target) : $(APPLICATION_SUFFIX) ] ;
     cleanextra += $(debugfile) ;
     if ! [ IsElem noinstall : $(3) ]
     {

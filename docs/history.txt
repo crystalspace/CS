@@ -9,6 +9,9 @@ chronological order.
 21-Apr-2007
 	- res removed generation of python.cex - asking cs-config for the
 	  crystalspace_python lib should return the same information.
+	- res changed the installation of applications to install apps with a
+	  suffix of the version number and to create a symlink for the
+	  undecorated name.
 20-Apr-2007
         - Piotr changed ode joints to ignore max/min distance parameter
           when resulting joint will be rotational (same for max/min angle

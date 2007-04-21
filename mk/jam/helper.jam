@@ -22,6 +22,7 @@
 SED ?= sed ;
 DEEPCOPY ?= "cp -R" ;
 DELTREE ?= "rm -rf" ;
+LN_S ?= "ln -s" ;
 
 # The -f option to `cp' is not supported on older platforms.
 # The convolution of the conditional arises because CP is defined in Jambase as
@@ -591,4 +592,26 @@ actions Copy
 actions ignore Move
 {
   $(MV) $(>) $(<)
+}
+
+## SymLink target : source
+rule SymLink
+{
+  
+  if "$(LN_S)"
+  {
+    DoSymLink $(<) : $(>) ;
+  }
+  else
+  {
+    # "Poor man's ln"
+    Copy $(<) : $(>) ;
+  }
+}
+
+actions DoSymLink
+{
+  pushd $(<:D)
+  $(LN_S) $(>) $(<:D=)
+  popd
 }
