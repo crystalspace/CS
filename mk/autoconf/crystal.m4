@@ -63,6 +63,13 @@ AC_ARG_ENABLE([cstest],
 	[verify that the Crystal Space SDK is actually usable
 	(default YES)])], [], [enable_cstest=yes])
 
+# Split the DESIRED-VERSION into the major and minor version number 
+# components.
+cs_version_desired=m4_default([$1],[cs_min_version_default])
+sed_expr_base=[\\\([0-9]\\\+\\\)\.\\\([0-9]\\\+\\\).*]
+cs_version_major=`echo $cs_version_desired | sed "s/$sed_expr_base/\1/"`
+cs_version_minor=`echo $cs_version_desired | sed "s/$sed_expr_base/\2/"`
+
 # Try to find an installed cs-config.
 cs_path=''
 AS_IF([test -n "$CRYSTAL"],
@@ -88,11 +95,6 @@ cs_path="$cs_path$PATH$PATH_SEPARATOR/usr/local/crystalspace/bin"
 #  Y is even (stable version): X.Y, X.Y+2, X.Y+1
 #  Y is odd (development version): X.Y, X.Y+1, X.Y+3, X.Y+2
 
-cs_version_desired=m4_default([$1],[cs_min_version_default])
-sed_expr_base=[\\\([0-9]\\\+\\\)\.\\\([0-9]\\\+\\\).*]
-cs_version_major=`echo $cs_version_desired | sed "s/$sed_expr_base/\1/"`
-cs_version_minor=`echo $cs_version_desired | sed "s/$sed_expr_base/\2/"`
-
 cs_version_sequence="$cs_version_major.$cs_version_minor"
 
 cs_version_desired_is_stable=`expr $cs_version_minor % 2`
@@ -112,7 +114,19 @@ AS_IF([test $cs_version_desired_is_stable -eq 0],
   cs_version_sequence="$cs_version_sequence $cs_version_major.$y"])
 
 for test_version in $cs_version_sequence; do
-  AC_PATH_TOOL([CRYSTAL_CONFIG_TOOL], [cs-config-$test_version], [], [$cs_path])
+  cs_path_X_Y=''
+  test_version_major=`echo $test_version | sed "s/$sed_expr_base/\1/"`
+  test_version_minor=`echo $test_version | sed "s/$sed_expr_base/\2/"`
+  CRYSTAL_X_Y=$(sh -c "echo \$CRYSTAL_`echo ${test_version_major}_${test_version_minor}`")
+  AS_IF([test -n "$CRYSTAL_X_Y"],
+      [my_IFS=$IFS; IFS=$PATH_SEPARATOR
+      for cs_dir in $CRYSTAL_X_Y; do
+	  AS_IF([test -n "$cs_path_X_Y"], [cs_path_X_Y="$cs_path_X_Y$PATH_SEPARATOR"])
+	  cs_path_X_Y="$cs_path_X_Y$cs_dir$PATH_SEPARATOR$cs_dir/bin"
+      done
+      IFS=$my_IFS])
+  AC_PATH_TOOL([CRYSTAL_CONFIG_TOOL], [cs-config-$test_version], [], 
+      [$cs_path_X_Y$PATH_SEPARATOR$cs_path])
   AS_IF([test -n "$CRYSTAL_CONFIG_TOOL"],
     [break])
 done
