@@ -88,46 +88,4 @@ if $(PYTHON.AVAILABLE) = "yes"
   PythMod pythmod : _cspace : pythmod.cpp : crystalspace crystalspace_python : 
 		: "pure Python module" ;
   Depends pythmod : $(cspacepy) ;
-    
-  #--------
-  # python.cex -- cs-config extension
-  #--------
-  # Note that '__EOF__' is purposely quoted to prevent shell from intrepreting
-  # dollar signs in quoted block.
-  actions PythonCex
-  {
-    cat > $(<) << '__EOF__'
-#! /bin/sh
-# This file is generated automatically by cspython/Jamfile
-PYTH_LIBS="$(PYTHON.LFLAGS[1]) $(CSPYTHON.PLATFORM_LIBS[1])"
-PYTH_CFLAGS="$(PYTHON.CFLAGS[1])"
-PYTH_CXXFLAGS="$(PYTHON.CFLAGS[1])"
-PYTH_DEPS=""
-
-if test -z "$1"; then
-    echo "Do not invoke this sub-component of cs-config directly."
-    exit 1
-fi
-
-case $1 in
-    --libs) echo "$PYTH_LIBS" ;;
-    --deps) echo "$PYTH_DEPS" ;;
-    --cflags) echo "$PYTH_CFLAGS" ;;
-    --cxxflags) echo "$PYTH_CXXFLAGS" ;;
-    *) echo "Unknown option"; exit 1 ;;
-esac
-__EOF__
-  }
-
-  local cexfile = python.cex ;
-  local extralibs ;
-  switch $(TARGET.OS)
-  {
-    case WIN32 : extralibs = "gdi32 shell32" ;
-    case * : extralibs = "" ;
-  }
-  CSPYTHON.PLATFORM_LIBS on $(cexfile) = $(extralibs) ;
-  ShellScript $(cexfile) : PythonCex ;
-  Depends cspython : $(cexfile) ;
-  Depends cspythonclean : $(cexfile)clean ;
 }
