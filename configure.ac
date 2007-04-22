@@ -1544,7 +1544,7 @@ AS_IF([test $cs_cv_libwx = yes],
 	    #endif
 	    #include "wx/glcanvas.h"
 	    ]],
-	    [wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY); glVertex3f(0,0,0)])],
+	    [wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY, wxPoint()); glVertex3f(0,0,0)])],
 	[CS_CREATE_TUPLE(
 	    [$cs_cv_libwx_cflags],
 	    [$cs_cv_libwx_lflags],

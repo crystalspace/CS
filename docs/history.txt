@@ -11,6 +11,8 @@ chronological order.
         - Piotr did small tweak of csSkeltonBone: "next_transform" 
           will be set with current transform when no animation is active
           on it.
+    - Reed changed test for wxGLCanvas to include a third argument (wxPoint), 
+      making it work with 2.8 as well as 2.6. Ought to fix bug #309.
 21-Apr-2007
 	- res removed generation of python.cex - asking cs-config for the
 	  crystalspace_python lib should return the same information.

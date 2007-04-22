@@ -51540,7 +51540,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY); glVertex3f(0,0,0)
+wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY, wxPoint()); glVertex3f(0,0,0)
   ;
   return 0;
 }
@@ -51699,7 +51699,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY); glVertex3f(0,0,0)
+wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY, wxPoint()); glVertex3f(0,0,0)
   ;
   return 0;
 }
