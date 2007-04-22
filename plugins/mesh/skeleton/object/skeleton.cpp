@@ -801,6 +801,9 @@ csSkeleton::csSkeleton(csSkeletonFactory* fact) :
   last_update_time = 0;
   last_version_id = (uint32)~0;
   elapsed = 0;
+
+  //create animation for direct pose change
+
 }
 
 csSkeleton::~csSkeleton ()

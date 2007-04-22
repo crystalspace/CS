@@ -1029,6 +1029,7 @@ public:
   iSkeletonAnimationInstance *Play (const char *animation_name) {return 0;}
   void Stop (iSkeletonAnimationInstance *anim_instance) {;}
   bool UpdateAnimation (csTicks current_time) {return mesh_object->Advance (current_time);} 
+  void UpdateBones () {skeleton->calculateState ();}
   /** @} */
 
   bool UpdatedByGraveyard () {return graveyard != 0;}

@@ -568,6 +568,14 @@ struct iSkeleton : public virtual iBase
    * was aplied.
    */
   virtual bool UpdateAnimation (csTicks current_time) = 0;
+
+  /**
+   * Update skeleton bones. Normaly you won't ever need to call this
+   * method by yourself (updating bones is done via 'UpdateAnimation'),
+   * but you will need to use it too see changes after direct pose changes
+   * when you are not updating animations for some reason.
+   */
+  virtual void UpdateBones () = 0;
 };
 
 /**
