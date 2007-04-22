@@ -110,7 +110,11 @@ size_t csSkeletonBone::FindChildIndex (iSkeletonBone *child)
 void csSkeletonBone::UpdateTransform ()
 {
   size_t scripts_len = skeleton->GetRunningScripts ().GetSize ();
-  if (!scripts_len) return;
+  if (!scripts_len) 
+  {
+    next_transform = transform;
+    return;
+  }
 
   if (scripts_len == 1)
   {

@@ -8,6 +8,9 @@ chronological order.
 
 22-Apr-2007
         - Piotr added bones update method to iSkeleton interface.
+        - Piotr did small tweak of csSkeltonBone: "next_transform" 
+          will be set with current transform when no animation is active
+          on it.
 21-Apr-2007
 	- res removed generation of python.cex - asking cs-config for the
 	  crystalspace_python lib should return the same information.
