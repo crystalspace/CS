@@ -18,6 +18,10 @@ chronological order.
 	  for the path.
 	- res changed the runtime CS path detection routine(s) to prefer
 	  versioned environment variables (CRYSTAL_x_y, CRYSTAL_x_y_PLUGIN).
+	- res changed the VC project generation to not enable PCHs for release
+	  builds: apparently they're broken when whole program optimization is
+	  enabled. That is the case for CS projects. The problem can be
+	  worked around by disabling one of these settings, in this case PCHs.
 20-Apr-2007
         - Piotr changed ode joints to ignore max/min distance parameter
           when resulting joint will be rotational (same for max/min angle
