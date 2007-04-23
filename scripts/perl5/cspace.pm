@@ -7895,6 +7895,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetUpdateCallback = *cspacec::iSkeleton_GetUpdateCallback;
 *RemoveUpdateCallback = *cspacec::iSkeleton_RemoveUpdateCallback;
 *UpdateAnimation = *cspacec::iSkeleton_UpdateAnimation;
+*UpdateBones = *cspacec::iSkeleton_UpdateBones;
 *scfGetVersion = *cspacec::iSkeleton_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

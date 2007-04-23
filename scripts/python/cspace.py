@@ -5315,6 +5315,7 @@ class iSkeleton(iBase):
     def GetUpdateCallback(*args): return _cspace.iSkeleton_GetUpdateCallback(*args)
     def RemoveUpdateCallback(*args): return _cspace.iSkeleton_RemoveUpdateCallback(*args)
     def UpdateAnimation(*args): return _cspace.iSkeleton_UpdateAnimation(*args)
+    def UpdateBones(*args): return _cspace.iSkeleton_UpdateBones(*args)
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSkeleton_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iSkeleton_scfGetVersion)
     __swig_destroy__ = _cspace.delete_iSkeleton
