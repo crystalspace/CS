@@ -825,6 +825,7 @@ csODEBodyGroup::csODEBodyGroup (csODEDynamicSystem* sys) :
 
 csODEBodyGroup::~csODEBodyGroup ()
 {
+  bodies.Compact ();
   for (size_t i = 0; i < bodies.GetSize (); i ++)
   {
     ((csODERigidBody *)(iRigidBody*)bodies[i])->UnsetGroup ();

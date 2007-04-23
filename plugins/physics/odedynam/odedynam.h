@@ -416,7 +416,7 @@ class csODEBodyGroup :
   public scfImplementation1<csODEBodyGroup,
                             iBodyGroup>
 {
-  csRefArrayObject<iRigidBody> bodies;
+  csWeakRefArray<iRigidBody> bodies;
 
   csODEDynamicSystem* system;
 
