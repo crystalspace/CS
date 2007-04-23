@@ -20,6 +20,9 @@
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #==============================================================================
 
+CS_VERSION_MAJOR=1
+CS_VERSION_MINOR=1
+
 # Helper to read variables
 ReadValue()
 {
@@ -110,6 +113,8 @@ Instantiate()
 	s^#COPYRIGHT#^$COPYRIGHT^g; \
 	s^#USECEL#^$USECEL^g; \
 	s^#GPLCOMPATIBLE#^$GPLCOMPATIBLE^g; \
+	s^#CS_VERSION_MAJOR#^$CS_VERSION_MAJOR^g; \
+	s^#CS_VERSION_MINOR#^$CS_VERSION_MINOR^g; \
 	" > "$TARGET"
 }
 
@@ -117,10 +122,15 @@ Instantiate()
 # (i.e. ${prefix}/share/crystalspace/build) or a location in the source tree
 # (i.e. CS/mk).
 TEMPLATEDIR=`dirpart $0`
+CRYSTAL_X_Y=$(sh -c "echo \$CRYSTAL_`echo ${CS_VERSION_MAJOR}_${CS_VERSION_MINOR}`")
 
 if test -d "$TEMPLATEDIR/../autoconf"
 then
     SUPPORTDIR="$TEMPLATEDIR/.."
+    EXTRAM4=false
+elif test -n "$CRYSTAL_X_Y" && test -d "$CRYSTAL_X_Y/share/crystalspace/build/autoconf"
+then
+    SUPPORTDIR="$CRYSTAL_X_Y/share/crystalspace/build"
     EXTRAM4=false
 elif test -n "$CRYSTAL" && test -d "$CRYSTAL/share/crystalspace/build/autoconf"
 then
@@ -129,6 +139,10 @@ then
 elif test -d "$TEMPLATEDIR/../../mk/autoconf"
 then
     SUPPORTDIR="$TEMPLATEDIR/../../mk"
+    EXTRAM4=true
+elif test -n "$CRYSTAL_X_Y" && test -d "$CRYSTAL_X_Y/mk/autoconf"
+then
+    SUPPORTDIR="$CRYSTAL_X_Y/mk"
     EXTRAM4=true
 elif test -n "$CRYSTAL" && test -d "$CRYSTAL/mk/autoconf"
 then

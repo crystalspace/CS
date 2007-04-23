@@ -10,6 +10,10 @@ chronological order.
         - Piotr changed ode body group to store weak references of rigid
           bodies insted of references(there is no sense in storing body reference
           there, when it was deleted in dynamics system).
+	- res added some consideration of the CS version number to 
+	  createproject.sh: it also checks $CRYSTAL_x_y for support files and
+	  writes the version number as the default required CS version to the
+	  generated configure.ac.
 22-Apr-2007
         - Piotr added bones update method to iSkeleton interface.
         - Piotr did small tweak of csSkeltonBone: "next_transform" 

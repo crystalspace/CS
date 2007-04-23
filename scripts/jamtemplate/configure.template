@@ -107,12 +107,12 @@ AC_ARG_WITH([cs], [AC_HELP_STRING([--without-cs],
 AS_IF([test -z "$with_cs"], [with_cs=yes])
 
 AS_IF([test $with_cs != no],
-[CS_PATH_CRYSTAL_EMIT([1.1], [],
+[CS_PATH_CRYSTAL_EMIT([#CS_VERSION_MAJOR#.#CS_VERSION_MINOR#], [],
   [AC_MSG_ERROR([
 *** Crystal Space could not be found or was unusable. The latest version is
 *** always available from http://www.crystalspace3d.org/
 *** Also, be sure that you have either installed Crystal Space or set the
-*** CRYSTAL environment variable properly.
+*** CRYSTAL_#CS_VERSION_MAJOR#_#CS_VERSION_MINOR# environment variable properly.
 ])], [crystalspace])])
 
 #----------------------------------------------------------------------------
