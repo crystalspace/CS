@@ -480,7 +480,7 @@ namespace lighter
 
   void SimpleUVFactoryLayouter::QueuePDPrimitives (
     SimpleUVObjectLayouter* layouter, PrimitiveArray &prims, 
-    size_t groupNum,  const csBitArray& pdBits, 
+    size_t groupNum, Sector* sector, const csBitArray& pdBits, 
     const csArray<csVector2>& uvsizes)
   {
     QueuedPDPrimitives queuedPrims;
@@ -488,11 +488,14 @@ namespace lighter
     queuedPrims.prims = &prims;
     queuedPrims.groupNum = groupNum;
     queuedPrims.uvsizes = uvsizes;
-    QueuedPDPArray* q = pdQueues.GetElementPointer (pdBits);
+    SectorAndPDBits s;
+    s.pdBits = pdBits;
+    s.sector = sector;
+    QueuedPDPArray* q = pdQueues.GetElementPointer (s);
     if (q == 0)
     {
-      pdQueues.Put (pdBits, QueuedPDPArray ());
-      q = pdQueues.GetElementPointer (pdBits);
+      pdQueues.Put (s, QueuedPDPArray ());
+      q = pdQueues.GetElementPointer (s);
     }
     q->Push (queuedPrims);
   }
@@ -500,13 +503,13 @@ namespace lighter
   //-------------------------------------------------------------------------
 
   bool SimpleUVObjectLayouter::LayoutUVOnPrimitives (PrimitiveArray &prims, 
-    size_t groupNum, const csBitArray& pdBits)
+    size_t groupNum, Sector* sector, const csBitArray& pdBits)
   {
     // Prims will be layouted later...
     csArray<csVector2> uvsizes;
     ComputeSizes (prims, groupNum, uvsizes, minuvs.GetExtend (groupNum));
 
-    parent->QueuePDPrimitives (this, prims, groupNum, pdBits,
+    parent->QueuePDPrimitives (this, prims, groupNum, sector, pdBits,
       uvsizes);
 
     return true;

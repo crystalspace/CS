@@ -105,8 +105,8 @@ namespace lighter
      * queued and laid out in PrepareLighting.
      */
     void QueuePDPrimitives (SimpleUVObjectLayouter* layouter, 
-      PrimitiveArray &prims, size_t groupNum, const csBitArray& pdBits, 
-      const csArray<csVector2>& uvsizes/*, const csArray<csVector2>& minuvs*/);
+      PrimitiveArray &prims, size_t groupNum, Sector* sector, 
+      const csBitArray& pdBits, const csArray<csVector2>& uvsizes);
 
     /// One set of primitives that needs to be laid out onto one allocator.
     struct QueuedPDPrimitives
@@ -117,12 +117,20 @@ namespace lighter
       csArray<csVector2> uvsizes;
     };
     typedef csArray<QueuedPDPrimitives> QueuedPDPArray;
-    typedef csHash<QueuedPDPArray, csBitArray> PDQueuesHash;
+  public:
+    struct SectorAndPDBits
+    {
+      Sector* sector;
+      csBitArray pdBits;
+    };
+  protected:
+    typedef csHash<QueuedPDPArray, SectorAndPDBits> PDQueuesHash;
     PDQueuesHash pdQueues;
 
     /// Pair of a PD-lit primitive queues array and the affecting PD lights.
     struct PDLQueue
     {
+      Sector* sector;
       csBitArray pdBits;
       QueuedPDPArray* queue;
     };
@@ -157,6 +165,7 @@ namespace lighter
     {
       /// PD light bits for the queues
       csBitArray pdBits;
+      Sector* sector;
 
       struct Map
       {
@@ -273,7 +282,7 @@ namespace lighter
     {}
 
     virtual bool LayoutUVOnPrimitives (PrimitiveArray &prims, 
-      size_t groupNum, const csBitArray& pdBits);
+      size_t groupNum, Sector* sector, const csBitArray& pdBits);
 
     virtual void FinalLightmapLayout (PrimitiveArray &prims, 
       size_t groupNum, ObjectVertexData& vertexData, uint& lmID);
@@ -293,7 +302,6 @@ namespace lighter
       csArray<csVector2> remaps;
     };
     csHash<PDLayoutedGroup, size_t> pdLayouts;
-    //csSet<size_t> remapped;
     csArray<csArray<csVector2> > minuvs;
 
     void ComputeSizes (PrimitiveArray& prims, size_t groupNum,
@@ -305,5 +313,36 @@ namespace lighter
   };
 
 } // namespace lighter
+
+template<>
+class csHashComputer<lighter::SimpleUVFactoryLayouter::SectorAndPDBits>
+{
+public:
+  static uint ComputeHash (
+    lighter::SimpleUVFactoryLayouter::SectorAndPDBits const& key)
+  {
+    uint hash = csHashComputer<csBitArray>::ComputeHash (key.pdBits);
+    hash ^= uint (uintptr_t (key.sector));
+    return hash;
+  }
+};
+
+template<>
+class csComparator<lighter::SimpleUVFactoryLayouter::SectorAndPDBits,
+                   lighter::SimpleUVFactoryLayouter::SectorAndPDBits>
+{
+public:
+  static int Compare (
+    lighter::SimpleUVFactoryLayouter::SectorAndPDBits const& r1,
+    lighter::SimpleUVFactoryLayouter::SectorAndPDBits const& r2)
+  {
+    int c = csComparator<lighter::Sector*, lighter::Sector*>::Compare (
+      r1.sector, r2.sector);
+    if (c == 0)
+      c = csComparator<csBitArray, csBitArray>::Compare (r1.pdBits, r2.pdBits);
+    return c;
+  }
+};
+
 
 #endif // __LIGHTMAPUV_SIMPLE_H__

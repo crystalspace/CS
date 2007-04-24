@@ -319,6 +319,9 @@ namespace lighter
   int SimpleUVFactoryLayouter::SortPDLQueues (const PDLQueue& p1,
                                               const PDLQueue& p2)
   {
+    if (p1.sector != p2.sector)
+      return csComparator<Sector*, Sector*>::Compare (p1.sector, p2.sector);
+
     size_t nb1 = p1.pdBits.NumBitsSet();
     size_t nb2 = p2.pdBits.NumBitsSet();
     if (nb1 > nb2)
@@ -413,7 +416,10 @@ namespace lighter
     while (it.HasNext ())
     {
       PDLQueue& q = allQueues.GetExtend (allQueues.GetSize ());
-      q.queue = &it.Next (q.pdBits);
+      SectorAndPDBits s;
+      q.queue = &it.Next (s);
+      q.sector = s.sector;
+      q.pdBits = s.pdBits;
 
       for (size_t l = 0; l < q.pdBits.GetSize(); l++)
       {
@@ -442,6 +448,7 @@ namespace lighter
       PDLQueue& currentQueue = allQueues[q];
       LayoutedQueue newEntry;
       newEntry.pdBits = currentQueue.pdBits;
+      newEntry.sector = currentQueue.sector;
 
       /* Look for layouted queues whose PD lights are a subset of this one.
          These layouted queues are then "merged" into the new layouted queue
@@ -452,7 +459,8 @@ namespace lighter
       for (size_t l = layoutedQueues.GetSize(); l-- > 0; )
       {
         LayoutedQueue& currentLayouted = layoutedQueues[l];
-        if ((currentLayouted.pdBits & ~newEntry.pdBits).AllBitsFalse ()
+        if ((currentLayouted.sector == newEntry.sector)
+          && (currentLayouted.pdBits & ~newEntry.pdBits).AllBitsFalse ()
           && !((currentLayouted.pdBits & newEntry.pdBits).AllBitsFalse ()))
         {
           /**

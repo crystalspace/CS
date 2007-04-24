@@ -14,6 +14,8 @@ chronological order.
 	  This should fix #14.
 	- res fixed some compile errors on PPC Macs in cssynldr's 
 	  renderbuffer.cpp. Based on a patch from dfryer.
+	- res made lighter2 work in the case different sectors contain 
+	  different numbers of PD lights.
 23-Apr-2007
         - Piotr changed ode body group to store weak references of rigid
           bodies insted of references(there is no sense in storing body reference

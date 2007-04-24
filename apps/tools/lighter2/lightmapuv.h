@@ -66,7 +66,7 @@ namespace lighter
      *   layouted.
      */
     virtual bool LayoutUVOnPrimitives (PrimitiveArray &prims, 
-      size_t groupNum, const csBitArray& pdBits) = 0;
+      size_t groupNum, Sector* sector, const csBitArray& pdBits) = 0;
 
     virtual void FinalLightmapLayout (PrimitiveArray &prims, 
       size_t groupNum, ObjectVertexData& vertexData, uint& lmID) = 0;
