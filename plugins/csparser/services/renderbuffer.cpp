@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include <limits.h>
 
 #include "iutil/document.h"
 #include "iutil/objreg.h"
@@ -774,7 +775,7 @@ csRef<iRenderBuffer> csTextSyntaxService::ReadRenderBuffer (iDataBuffer* buf,
 
 #if !defined(CS_LITTLE_ENDIAN) || !defined(CS_IEEE_DOUBLE_FORMAT)
   const size_t totalSize = 
-    totalElements * RenderBufferComponentSizes[header->compType];
+    totalElements * csRenderBufferComponentSizes[header->compType];
 
   // Buffer data is in little endian format, floats in IEEE, need to convert...
   csRef<iDataBuffer> newData;
@@ -827,17 +828,16 @@ csRef<iDataBuffer> csTextSyntaxService::StoreRenderBuffer (iRenderBuffer* rbuf)
   // Buffer data is in little endian format, floats in IEEE, need to convert...
   csRef<iDataBuffer> newData;
   newData.AttachNew (new CS::DataBuffer<> (totalSizeDisk));
-  memcpy (newData->GetData(), header, sizeof (headerSize));
   void* src = srcData;
   void* dst = newData->GetData();
 
-  switch (header->compType)
+  switch (rbuf->GetComponentType ())
   {
     case CS_BUFCOMP_FLOAT:
-      ConvertFloatBufferDataToLE ((uint32*)src, (float*)dst, totalElements);
+      ConvertFloatBufferDataToLE ((float*)src, (uint32*)dst, totalElements);
       break;
     case CS_BUFCOMP_DOUBLE:
-      ConvertFloatBufferDataToLE ((uint64*)src, (double*)dst, totalElements);
+      ConvertFloatBufferDataToLE ((double*)src, (uint64*)dst, totalElements);
       break;
     default:
       ConvertBufferDataToLE (rbuf->GetComponentType(), src, dst, 
