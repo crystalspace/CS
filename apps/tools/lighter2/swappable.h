@@ -26,6 +26,7 @@ namespace lighter
   /// The functions that need to be implemented by an object to be swappable.
   struct iSwappable
   {
+    virtual ~iSwappable() {}
     /**
      * Get the data to be swapped out. \a data is assumed to have been 
      * allocated with SwappableHeap.

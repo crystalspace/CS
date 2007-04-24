@@ -224,7 +224,7 @@ namespace lighter
         const size_t group = factory->layoutedPrimitives[j].group;
         lmLayouts.Push (LMLayoutingInfo (layout, group));
         bool res = layout->LayoutUVOnPrimitives (allPrimitives, 
-          group, pdBits);
+          group, sector, pdBits);
         if (!res) return false;
       }
 

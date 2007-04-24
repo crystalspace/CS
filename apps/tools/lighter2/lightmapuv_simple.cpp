@@ -170,19 +170,6 @@ namespace lighter
 
     return csPtr<LightmapUVObjectLayouter> (newFactory);
   }
-  
-  static int SortPrimByD (const FactoryPrimitive& prim1, 
-                          const FactoryPrimitive& prim2)
-  {
-    const float D1 = prim1.GetPlane().DD;
-    const float D2 = prim2.GetPlane().DD;
-    if (D1 < D2)
-      return -1;
-    else if (D1 > D2)
-      return 1;
-    else
-      return 0;
-  }
 
   bool SimpleUVFactoryLayouter::Edge::equals (VertexEquality veq, 
                                               const Edge& other)

@@ -1257,9 +1257,9 @@ namespace lighter
 
   const char* Scene::GetSolidColorFile (const csColor& col)
   {
-    int r = col.red * 255.99f;
-    int g = col.green * 255.99f;
-    int b = col.blue * 255.99f;
+    int r = int (col.red * 255.99f);
+    int g = int (col.green * 255.99f);
+    int b = int (col.blue * 255.99f);
     csString colorStr;
     colorStr.Format ("lightmaps/%02x%02x%02x.png", r, g, b);
     if (!solidColorFiles.Contains (colorStr))
