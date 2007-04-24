@@ -235,6 +235,30 @@ const char* TiXmlBase::ReadText(const char* p,
   return p + strlen( endTag );
 }
 
+const char* TiDocumentNode::Parse( TiDocument* document, const char* p )
+{
+  switch (type)
+  {
+    case DOCUMENT:
+      return static_cast<TiDocument*> (this)->Parse (document, p);
+    case ELEMENT:
+      return static_cast<TiXmlElement*> (this)->Parse (document, p);
+    case COMMENT:
+      return static_cast<TiXmlComment*> (this)->Parse (document, p);
+    case UNKNOWN:
+      return static_cast<TiXmlUnknown*> (this)->Parse (document, p);
+    case TEXT:
+      return static_cast<TiXmlText*> (this)->Parse (document, p);
+    case CDATA:
+      return static_cast<TiXmlCData*> (this)->Parse (document, p);
+    case DECLARATION:
+      return static_cast<TiXmlDeclaration*> (this)->Parse (document, p);
+    default:
+      CS_ASSERT(false);
+      return 0;
+  }
+}
+
 const char* TiDocument::Parse( TiDocument*,  const char* p )
 {
   // Parse away, at the document level. Since a document
@@ -261,7 +285,7 @@ const char* TiDocument::Parse( TiDocument*,  const char* p )
   TiDocumentNode* lastChild = 0;
   while ( p && *p )
   {
-    TiDocumentNode* node = Identify( this, p );
+    csRef<TiDocumentNode> node (Identify( this, p ));
     if ( node )
     {
       p = node->Parse( this, p );
@@ -414,7 +438,8 @@ const char* TiXmlElement::ReadValue( TiDocument* document, const char* p )
     } 
     else if ( StringEqual(p, "<![CDATA[") )
     {
-      TiXmlCData* cdataNode = new TiXmlCData( );
+      csRef<TiXmlCData> cdataNode;
+      cdataNode.AttachNew (new TiXmlCData( ));
 
       if ( !cdataNode )
       {
@@ -430,8 +455,6 @@ const char* TiXmlElement::ReadValue( TiDocument* document, const char* p )
         InsertAfterChild (lastChild, cdataNode );
         lastChild = cdataNode;
       }
-      else
-        delete cdataNode;
     }
     else 
     {
@@ -443,7 +466,7 @@ const char* TiXmlElement::ReadValue( TiDocument* document, const char* p )
       }
       else
       {
-        TiDocumentNode* node = Identify( document, p );
+        csRef<TiDocumentNode> node (Identify( document, p ));
         if ( node )
         {
           p = node->Parse( document, p );
