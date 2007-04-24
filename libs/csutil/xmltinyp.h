@@ -162,7 +162,7 @@ public:
  */
 struct CS_CRYSTALSPACE_EXPORT csTinyXmlNode : 
   public scfImplementationPooled<scfImplementation1<csTinyXmlNode, 
-                                                    iDocumentNode>>
+                                                    iDocumentNode> >
 {
 private:
   friend class csTinyXmlDocument;
