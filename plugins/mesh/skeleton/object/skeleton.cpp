@@ -403,11 +403,10 @@ csSkeletonAnimation::csSkeletonAnimation (csSkeletonFactory *factory, const char
   scfImplementationType(this)
 {
   csSkeletonAnimation::name = name;
-  time = 0;
   loop = false; //for now
   loop_times = -1;
-  forced_duration = 0;
   fact = factory;
+  time_factor = 1;
 }
 
 csSkeletonAnimation::~csSkeletonAnimation () 
@@ -421,7 +420,27 @@ iSkeletonAnimationKeyFrame *csSkeletonAnimation::CreateFrame(const char* name)
   key_frames.Push(key_frame);
   return key_frame;
 }
-
+csTicks csSkeletonAnimation::GetFramesTime ()
+{
+  csTicks time = 0;
+  for (size_t i = 0; i < key_frames.GetSize (); i++)
+  {
+    time += key_frames[i]->GetDuration ();
+  }
+  return time;
+}
+csTicks csSkeletonAnimation::GetTime () 
+{
+  return GetFramesTime () * time_factor;
+}
+void csSkeletonAnimation::SetTime (csTicks time)
+{
+  float f_time = GetFramesTime ();
+  if (f_time)
+  {
+    time_factor = time / f_time;
+  }
+}
 void csSkeletonAnimation::RecalcSpline()
 {
   const csRefArray<csSkeletonBoneFactory>& bones = fact->GetBones ();
@@ -507,24 +526,23 @@ void csSkeletonAnimation::RecalcSpline()
 
 //------------------------csSkeletonAnimationInstance-------------------------------------
 
-csSkeletonAnimationInstance::csSkeletonAnimationInstance (csSkeletonAnimation* script,
+csSkeletonAnimationInstance::csSkeletonAnimationInstance (csSkeletonAnimation* animation,
                                                           csSkeleton *skeleton) : 
                                                           scfImplementationType(this)
 {
-  csSkeletonAnimationInstance::script = script;
+  csSkeletonAnimationInstance::animation = animation;
   csSkeletonAnimationInstance::skeleton = skeleton;
   current_instruction = 0;
   current_frame = -1;
-  delay.current = 0;
-  delay.final = 0;
-  delay.diff = 0;
+  current_frame_time = 0;
+  current_frame_duration = 0;
   morph_factor = 1;
   time_factor = 1;
-  current_ticks = 0;
-  parse_key_frame = true;
+  current_frame_duration = 0;
+  anim_state = CS_ANIM_STATE_PARSE_NEXT;
 
-  loop_times = script->GetLoopTimes ();
-  if (!script->GetLoop())
+  loop_times = animation->GetLoopTimes ();
+  if (!animation->GetLoop())
   {
     loop_times = 1;
   }
@@ -585,16 +603,38 @@ void csSkeletonAnimationInstance::ParseFrame(csSkeletonAnimationKeyFrame *frame)
           delta = m.final_position - m.position;
         }
 
-        m.delta_per_tick = delta/ (float) (delay.final);
+        m.delta_per_tick = delta / (float) (current_frame_duration);
         runnable_transforms.Push (m);
       }
     }
   }
 }
+csSkeletonAnimationKeyFrame *csSkeletonAnimationInstance::PrevFrame()
+{
+  size_t frames_count = animation->GetFramesCount();
+  
+  if (frames_count == 0)
+    return 0;
 
+  if (current_frame < 1)
+  {
+    return 0;
+  }
+  else
+  {
+    current_frame--;
+  }
+
+  if (skeleton->GetScriptCallback())
+  {
+    skeleton->GetScriptCallback()->Execute(animation, current_frame);
+  }
+
+  return (csSkeletonAnimationKeyFrame *)animation->GetFrame (current_frame);
+}
 csSkeletonAnimationKeyFrame *csSkeletonAnimationInstance::NextFrame()
 {
-  size_t frames_count = script->GetFramesCount();
+  size_t frames_count = animation->GetFramesCount();
   
   if (frames_count == 0)
     return 0;
@@ -619,10 +659,10 @@ csSkeletonAnimationKeyFrame *csSkeletonAnimationInstance::NextFrame()
 
   if (skeleton->GetScriptCallback())
   {
-    skeleton->GetScriptCallback()->Execute(script, current_frame);
+    skeleton->GetScriptCallback()->Execute(animation, current_frame);
   }
 
-  return (csSkeletonAnimationKeyFrame *)script->GetFrame (current_frame);
+  return (csSkeletonAnimationKeyFrame *)animation->GetFrame (current_frame);
 }
 
 void csSkeletonAnimationInstance::release_tranform_data(TransformHash& h)
@@ -631,39 +671,58 @@ void csSkeletonAnimationInstance::release_tranform_data(TransformHash& h)
 }
 
 //static csQuaternion zero_quat = csQuaternion(1.0f);
-
-bool csSkeletonAnimationInstance::Do (csTicks elapsed, bool& stop, csTicks & left)
+void csSkeletonAnimationInstance::SetDuration (csTicks time)
+{
+  float anim_time = animation->GetTime ();
+  if (anim_time)
+  {
+    time_factor = time / anim_time;
+  }
+}
+bool csSkeletonAnimationInstance::Do (long elapsed, bool& stop, long &left)
 {
   stop = false;
   bool mod = false;
   size_t i;
-  delay.diff += elapsed;
-  if (parse_key_frame)
-  {
-    csSkeletonAnimationKeyFrame *frame = NextFrame ();
-    if (!frame) 
-      return false;
-    delay.final = (csTicks) ( (float)(frame->GetDuration())*time_factor);
-    ParseFrame (frame);
-    parse_key_frame = false;
-  }
 
+  if (anim_state != CS_ANIM_STATE_CURRENT)
+  {
+    csSkeletonAnimationKeyFrame *frame = (anim_state == CS_ANIM_STATE_PARSE_NEXT)?  NextFrame () :
+      PrevFrame ();
+    if (!frame) 
+    {
+      left = 0;
+      return false;
+    }
+
+    current_frame_duration = (long) ((float)(frame->GetDuration())*time_factor);
+
+    ParseFrame (frame);
+    anim_state = CS_ANIM_STATE_CURRENT;
+  }
+  long time_tmp = (elapsed >= 0)? current_frame_time + elapsed : current_frame_duration + elapsed;
+  float delta = 0;
 
   if (!loop_times)
   {
     stop = true;
   }
 
-  if (delay.diff > delay.final)
+  if (time_tmp > current_frame_duration)
   {
-    delay.current = delay.final;
-    left = delay.diff - delay.final;
-    delay.diff = 0;
-    parse_key_frame = true;
+    left = time_tmp - current_frame_duration;
+    current_frame_time = 0;
+    anim_state = CS_ANIM_STATE_PARSE_NEXT;
+  }else if (time_tmp < 0)
+  {
+    left = time_tmp;
+    current_frame_time = 0;
+    anim_state = CS_ANIM_STATE_PARSE_PREV;
   }
   else
   {
-    delay.current = delay.diff;
+    delta = current_frame_duration - current_frame_time;
+    current_frame_time = time_tmp;
     left = 0;
   }
 
@@ -674,17 +733,17 @@ bool csSkeletonAnimationInstance::Do (csTicks elapsed, bool& stop, csTicks & lef
     sac_transform_execution& m = runnable_transforms[i];
     if (m.type == 1)
     {
-      if (delay.current < delay.final)
+      if (delta)
       {
         csVector3 current_pos = 
-          m.final_position - ( (float) (delay.final - delay.current))*m.delta_per_tick;
+          m.final_position - delta * m.delta_per_tick;
         m.bone_transform->pos = current_pos;
 
         float slerp = 
-          (float)delay.current/ (float)delay.final;
+          (float)current_frame_time / (float) current_frame_duration;
         //m.bone_transform->quat = m.curr_quat.SLerp (m.quat, slerp);
         m.bone_transform->quat = m.curr_quat.Squad(m.bone_transform->tangent, 
-			m.tangent, m.quat, slerp);
+          m.tangent, m.quat, slerp);
       }
       else
       {
@@ -696,26 +755,26 @@ bool csSkeletonAnimationInstance::Do (csTicks elapsed, bool& stop, csTicks & lef
     }
     else
     {
-      if (delay.current < delay.final)
+      if (delta)
       {
         csVector3 current_pos = 
-          (float) (delay.current - m.elapsed_ticks)*m.delta_per_tick;
+          (float) (current_frame_time - m.elapsed_ticks)*m.delta_per_tick;
 
         m.bone_transform->pos += current_pos;
         float slerp = 
-          ( (float) (delay.current - m.elapsed_ticks)/ (float)delay.final);
+          ( (float) (current_frame_time - m.elapsed_ticks)/ (float)current_frame_duration);
         csQuaternion zero_quat;
         m.curr_quat = zero_quat.SLerp (m.quat, slerp);
         m.bone_transform->quat = m.curr_quat*m.bone_transform->quat;
-        m.elapsed_ticks = delay.current;
+        m.elapsed_ticks = current_frame_time;
       }
       else
       {
         csVector3 current_pos = 
-          (float) (delay.final - m.elapsed_ticks)*m.delta_per_tick;
+          (float) (current_frame_duration - m.elapsed_ticks)*m.delta_per_tick;
         m.bone_transform->pos += current_pos;
         float slerp = 
-          ( (float) (delay.final - m.elapsed_ticks)/ (float)delay.final);
+          ( (float) (current_frame_duration - m.elapsed_ticks)/ (float)current_frame_duration);
         csQuaternion zero_quat;
         m.curr_quat = zero_quat.SLerp (m.quat, slerp);
         m.bone_transform->quat = m.curr_quat*m.bone_transform->quat;
@@ -777,7 +836,6 @@ csSkeleton::csSkeleton(csSkeletonFactory* fact) :
       }
     }
   }
-
 
   for (size_t i = 0; i < fact_sockets.GetSize (); i++ )
   {
@@ -899,7 +957,6 @@ bool csSkeleton::UpdateAnimation (csTicks current)
     return false;
   }
 
-
   elapsed = current - last_update_time;
   last_update_time = current;
 
@@ -917,7 +974,7 @@ bool csSkeleton::UpdateAnimation (csTicks current)
     {
       i--;
       bool stop = false;
-      csTicks left;
+      long left;
       if (running_animations[i]->Do (elapsed, stop, left))
       {
         while (left)

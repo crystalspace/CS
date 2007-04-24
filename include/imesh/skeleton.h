@@ -395,6 +395,16 @@ struct iSkeletonAnimationInstance : public virtual iBase
    * Get animation factor.
    */
   virtual float GetFactor () = 0;
+
+  /**
+   * Get animation instance duration.
+   */
+  virtual csTicks GetDuration () = 0;
+
+  /**
+   * Set animation instance duration.
+   */
+  virtual void SetDuration (csTicks time) = 0;
 };
 
 /**

@@ -428,23 +428,22 @@ class csSkeletonAnimationKeyFrame :
 class csSkeletonAnimation :
   public scfImplementation1<csSkeletonAnimation, iSkeletonAnimation>
 {
+
 private:
+
   csString name;
-  csTicks time, forced_duration;
+  csTicks time_factor;
   bool loop;
   int loop_times;
   csRefArray<csSkeletonAnimationKeyFrame> key_frames;
   csSkeletonFactory *fact;
+
 public:
 
   csSkeletonAnimation (csSkeletonFactory *factory, const char* name);
   virtual ~csSkeletonAnimation ();
 
-  void SetForcedDuration(csTicks new_duration)
-  { forced_duration = new_duration; }
-
-  csTicks GetForcedDuration()
-  { return forced_duration; }
+  csTicks GetFramesTime ();
 
   //void SetLoop (bool loop) { csSkeletonAnimation::loop = loop; }
   //bool GetLoop () { return loop; }
@@ -455,10 +454,10 @@ public:
 
   virtual const char* GetName () const { return name; }
   virtual void SetName (const char* name){ csSkeletonAnimation::name = name; }
-  virtual csTicks GetTime () { return time; }
-  virtual void SetTime (csTicks time)  { csSkeletonAnimation::time = time; }
-  virtual float GetSpeed () { return time; }
-  virtual void SetSpeed (float)  {}
+  virtual csTicks GetTime ();
+  virtual void SetTime (csTicks time);
+  virtual float GetSpeed () { return time_factor; }
+  virtual void SetSpeed (float speed)  {time_factor = speed;}
   virtual void SetFactor (float) {}
   virtual float GetFactor () { return 0; }
   virtual void SetLoop (bool loop)
@@ -512,7 +511,7 @@ public:
 private:
 
   csSkeleton *skeleton;
-  csSkeletonAnimation* script;
+  csSkeletonAnimation *animation;
   size_t current_instruction;
   int current_frame;
   float morph_factor;
@@ -530,16 +529,16 @@ private:
 
   csArray<runnable_frame> runnable_frames;
 
-  struct del
+  enum
   {
-    csTicks current;
-    csTicks final;
-    csTicks diff;
-  } delay;
+    CS_ANIM_STATE_CURRENT,
+    CS_ANIM_STATE_PARSE_NEXT,
+    CS_ANIM_STATE_PARSE_PREV
+  }anim_state;
 
-  bool parse_key_frame;
+  long current_frame_time;
+  long current_frame_duration;
 
-  csTicks current_ticks;
   TransformHash transforms;
 
   size_t id;
@@ -548,12 +547,13 @@ private:
   
   void ParseFrame(csSkeletonAnimationKeyFrame *frame);
   csSkeletonAnimationKeyFrame *NextFrame();
+  csSkeletonAnimationKeyFrame *PrevFrame();
 
 public:
 
-  csSkeletonAnimation *GetScript() { return script; }
+  csSkeletonAnimation *GetScript() { return animation; }
 
-  bool Do (csTicks elapsed, bool& stop, csTicks & left);
+  bool Do (long elapsed, bool& stop, long &left);
 
   bone_transform_data *GetBoneTransform(csSkeletonBoneFactory *bone);
   TransformHash& GetTransforms() { return transforms; };
@@ -561,14 +561,13 @@ public:
   csSkeletonAnimationInstance (csSkeletonAnimation* script, csSkeleton *skeleton);
   ~csSkeletonAnimationInstance ();
 
-  const char *GetName () const { return script->GetName (); }
-  void SetName (const char* name) { return script->SetName (name); }
-  float GetFactor () { return script->GetFactor (); }
-  void SetFactor (float factor) { script->SetFactor (factor); }
-  csTicks GetTime () { return script->GetTime (); }
-  void SetTime (csTicks time) { script->SetTime (time); }
-  float GetSpeed () { return script->GetSpeed (); }
-  void SetSpeed (float speed) { return script->SetSpeed (speed); }
+  const char *GetName () const { return animation->GetName (); }
+  float GetFactor () { return 1; }
+  void SetFactor (float factor) { }
+  csTicks GetDuration () { return animation->GetTime () * time_factor; }
+  void SetDuration (csTicks time);
+  float GetSpeed () {return time_factor; }
+  void SetSpeed (float speed) {time_factor = speed;}
   size_t GetID ();
 };
 
@@ -587,7 +586,7 @@ private:
 
   csTicks last_update_time;
   uint32 last_version_id;
-  csTicks elapsed;
+  long elapsed;
 
   static csArray<csReversibleTransform> bone_transforms;
   csRefArray<csSkeletonBone> bones;
