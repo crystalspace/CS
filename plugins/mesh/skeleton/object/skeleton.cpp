@@ -700,7 +700,8 @@ bool csSkeletonAnimationInstance::Do (long elapsed, bool& stop, long &left)
     ParseFrame (frame);
     anim_state = CS_ANIM_STATE_CURRENT;
   }
-  long time_tmp = (elapsed >= 0)? current_frame_time + elapsed : current_frame_duration + elapsed;
+  long time_tmp = (current_frame_time == 0 && elapsed < 0)?  current_frame_duration + elapsed : 
+                                                             current_frame_time + elapsed;
   float delta = 0;
 
   if (!loop_times)
@@ -889,7 +890,8 @@ iSkeletonAnimationInstance *csSkeleton::Play (const char *animation_name)
     //printf("script %s doesn't exist\n", scriptname);
     return 0;
   }
-  csSkeletonAnimationInstance *runnable = new csSkeletonAnimationInstance (script, this);
+  csRef<csSkeletonAnimationInstance> runnable;
+  runnable.AttachNew (new csSkeletonAnimationInstance (script, this));
   running_animations.Push (runnable);
   return runnable;
 }

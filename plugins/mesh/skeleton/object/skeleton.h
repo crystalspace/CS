@@ -432,7 +432,7 @@ class csSkeletonAnimation :
 private:
 
   csString name;
-  csTicks time_factor;
+  float time_factor;
   bool loop;
   int loop_times;
   csRefArray<csSkeletonAnimationKeyFrame> key_frames;
@@ -564,7 +564,7 @@ public:
   const char *GetName () const { return animation->GetName (); }
   float GetFactor () { return 1; }
   void SetFactor (float factor) { }
-  csTicks GetDuration () { return animation->GetTime () * time_factor; }
+  csTicks GetDuration () { return (csTicks) animation->GetTime () * time_factor; }
   void SetDuration (csTicks time);
   float GetSpeed () {return time_factor; }
   void SetSpeed (float speed) {time_factor = speed;}

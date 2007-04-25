@@ -9,6 +9,8 @@ chronological order.
 25-Apr-2007
 	- Jorrit fixed a bug in the stencil and stencil2 plugins caused
 	  by the iPolygonMesh changes. This fixes #322.
+        - Piotr made small bugfix in animation logic while playing it 
+          back in time.
 24-Apr-2007
         - Piotr made csSkeleton animation system to respect updates made
 	  backwards in time (with negative 'elapsed time' value).
