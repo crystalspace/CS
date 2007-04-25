@@ -379,18 +379,26 @@ class csSkeletonAnimationKeyFrame :
       bones_frame_transforms.Put(bone, bf);
     }
 
-    virtual csReversibleTransform & GetTransform(iSkeletonBoneFactory *bone)
+    bool GetTransform (iSkeletonBoneFactory *bone_fact, csReversibleTransform &dst_trans) 
     {
-      /*
-      for (size_t i = 0; i < bones_frame_transforms.GetSize () ; i++ )
-      {
-        if (bones_frame_transforms[i].bone == bone)
-        {
-          return bones_frame_transforms[i].transform;
-        }
-      }
-      */
-      return fallback_transform;
+      bone_key_info fallback;
+      fallback.bone = 0;
+      const bone_key_info & bki = bones_frame_transforms.Get (bone_fact, fallback);
+      if (bki.bone == 0)
+        return false;
+
+      dst_trans = csReversibleTransform (csMatrix3 (bki.rot), bki.pos);
+
+      return true;
+    }
+    virtual csReversibleTransform & GetTransform(iSkeletonBoneFactory *bone_fact)
+    {
+      bone_key_info fallback;
+      fallback.bone = 0;
+      const bone_key_info & bki = bones_frame_transforms.Get (bone_fact, fallback);
+      if (bki.bone == 0)
+        return fallback_transform;
+      return csReversibleTransform (csMatrix3 (bki.rot), bki.pos);
     }
 
     virtual void SetTransform(iSkeletonBoneFactory *bone, 

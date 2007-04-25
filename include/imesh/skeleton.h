@@ -217,6 +217,12 @@ struct iSkeletonAnimationKeyFrame : public virtual iBase
   virtual csReversibleTransform & GetTransform (iSkeletonBoneFactory *bone) = 0;
 
   /**
+   * Get the transform of a bone. Returns 'false' when there won't be 
+   * any transform data for given bone.
+   */
+  virtual bool GetTransform (iSkeletonBoneFactory *bone, csReversibleTransform &dst_trans) = 0;
+
+  /**
    * Set the transform of a bone.
    */
   virtual void SetTransform(iSkeletonBoneFactory *bone, 

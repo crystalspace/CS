@@ -893,6 +893,7 @@ public:
   void AddTransform (iSkeletonBoneFactory *bone,csReversibleTransform &transform,
     bool relative = false);
   csReversibleTransform &GetTransform (iSkeletonBoneFactory *bone) {return trans;}
+  bool GetTransform (iSkeletonBoneFactory *bone, csReversibleTransform &dst_trans) {return false;}
   void SetTransform(iSkeletonBoneFactory *bone, csReversibleTransform &transform) {;}
   bool GetKeyFrameData (iSkeletonBoneFactory *bone_fact,  csQuaternion & rot,
     csVector3 & pos, csQuaternion &tangent, bool &relative) {return false;}
