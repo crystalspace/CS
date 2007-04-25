@@ -6,10 +6,14 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-Apr-2007
+	- Jorrit fixed a bug in the stencil and stencil2 plugins caused
+	  by the iPolygonMesh changes. This fixes #322.
 24-Apr-2007
-        - Piotr made csSkeleton animation system to respect updates made backwards
-          in time (with negative 'elapsed time' value).
-        - Piotr made parameters like animation speed and duration to be effective.
+        - Piotr made csSkeleton animation system to respect updates made
+	  backwards in time (with negative 'elapsed time' value).
+        - Piotr made parameters like animation speed and duration to be
+	  effective.
 	- res changed the internals of TinyXML to reference count tiny nodes.
 	  This should fix #14.
 	- res fixed some compile errors on PPC Macs in cssynldr's 
@@ -18,8 +22,8 @@ chronological order.
 	  different numbers of PD lights.
 23-Apr-2007
         - Piotr changed ode body group to store weak references of rigid
-          bodies insted of references(there is no sense in storing body reference
-          there, when it was deleted in dynamics system).
+          bodies insted of references(there is no sense in storing body
+	  reference there, when it was deleted in dynamics system).
 	- res added some consideration of the CS version number to 
 	  createproject.sh: it also checks $CRYSTAL_x_y for support files and
 	  writes the version number as the default required CS version to the
@@ -29,8 +33,9 @@ chronological order.
         - Piotr did small tweak of csSkeltonBone: "next_transform" 
           will be set with current transform when no animation is active
           on it.
-        - Reed changed test for wxGLCanvas to include a third argument (wxPoint), 
-          making it work with 2.8 as well as 2.6. Ought to fix bug #309.
+        - Reed changed test for wxGLCanvas to include a third argument
+	  (wxPoint), making it work with 2.8 as well as 2.6. Ought to fix
+	  bug #309.
 21-Apr-2007
 	- res removed generation of python.cex - asking cs-config for the
 	  crystalspace_python lib should return the same information.

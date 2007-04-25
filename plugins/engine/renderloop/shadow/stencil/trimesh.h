@@ -70,6 +70,10 @@ public:
 
   void CopyFrom (iTriangleMesh* triMesh)
   {
+    size_t i;
+    csVector3* vt = triMesh->GetVertices ();
+    for (i = 0 ; i < triMesh->GetVertexCount () ; i++)
+      verts.Push (vt[i]);
     AddTris (triMesh->GetTriangles (), triMesh->GetTriangleCount ());
   }
 
