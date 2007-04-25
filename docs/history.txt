@@ -20,6 +20,7 @@ chronological order.
 	- res fixed Jam "using independent target <sometarget>.dbg" messages.
 	- res fixes needless relinks of binaries and plugins on Win32 with 
 	  shared libs enabled.
+	- res made the application symlink installation respect DESTDIR.
 24-Apr-2007
         - Piotr made csSkeleton animation system to respect updates made
 	  backwards in time (with negative 'elapsed time' value).

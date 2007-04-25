@@ -611,9 +611,10 @@ rule SymLink
 
 actions DoSymLink
 {
-  pushd $(<:D)
+  pushd $(<:D) > /dev/null
+  rm -f $(<)
   $(LN_S) $(>) $(<:D=)
-  popd
+  popd > /dev/null
 }
 
 actions piecemeal Touch

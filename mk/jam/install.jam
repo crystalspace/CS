@@ -134,6 +134,22 @@ rule InstallProgram
     return [ DoInstall $(files) : $(dir) : $(INSTALL_PROGRAM) ] ;
 }
 
+##  InstallSymLink target : linksource
+rule InstallSymLink
+{
+    local dir gdir target ;
+    dir = [ ConcatDirs $(DESTDIR) $(<:D) ] ;
+
+    gdir = $(dir:G=dir) ;
+    MkDir $(gdir) ;
+  
+    target = $(<:BSD=$(dir):G=install) ;
+    Depends $(target) : $(gdir) ;
+    SymLink $(target) : $(>) ;
+    Always $(target) ;
+    return $(target) ;
+}
+
 ##  DoInstall sourcenames : directories [ : installapp : [ postinstallrules ]]
 ##    Creates a new install target for the given sources named by
 ##    `sourcenames'.  `directories' is a list of directory components
@@ -178,7 +194,7 @@ rule DoInstall
 ##    the results as the input for another rule
 rule DoInstallFile
 {
-    local targets target dir gdir ;
+    local target dir gdir ;
     dir = [ ConcatDirs $(DESTDIR) $(2) ] ;
 
     gdir = $(dir:G=dir) ;
