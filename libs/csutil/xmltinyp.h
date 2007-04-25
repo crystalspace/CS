@@ -186,7 +186,7 @@ public:
        destructed is not yet freed. 
        Work around that by keeping an extra ref until after the node is deleted.
      */
-    csRef<csTinyXmlDocument> doc (doc);
+    csRef<csTinyXmlDocument> doc (this->doc);
     scfPooledImplementationType::DecRef();
   }
 

@@ -14,6 +14,8 @@ chronological order.
 	- res changed the way TinyXML destroys + frees node objects to avoid
 	  accesses to freed memory that have been introduced by yesterday's
 	  ref counting change.
+	- res fixed a missing 'this->' which caused csTinyXmlNode::DecRef()
+	  absolutely not do what it was intended to do.
 24-Apr-2007
         - Piotr made csSkeleton animation system to respect updates made
 	  backwards in time (with negative 'elapsed time' value).
