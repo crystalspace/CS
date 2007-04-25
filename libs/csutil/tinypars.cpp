@@ -418,7 +418,9 @@ const char* TiXmlElement::ReadValue( TiDocument* document, const char* p )
     if ( *p != '<' )
     {
       // Take what we have, make a text element.
-      TiXmlText* textNode = document->blk_text.Alloc ();
+      void* ptr = document->blk_text.Alloc (sizeof (TiXmlText));
+      csRef<TiXmlText> textNode;
+      textNode.AttachNew (new (ptr) TiXmlText ());
 
       if ( !textNode )
       {

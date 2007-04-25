@@ -37,8 +37,8 @@ distribution.
 #include <assert.h>
 #include "iutil/string.h"
 #include "csutil/array.h"
-#include "csutil/blockallocator.h"
 #include "csutil/fifo.h"
+#include "csutil/fixedsizeallocator.h"
 #include "csutil/reftrackeraccess.h"
 #include "csutil/strset.h"
 #include "csutil/util.h"
@@ -749,30 +749,77 @@ class TiDocument : public TiDocumentNodeChildren
      nodes to delete instead.
    */
   int deleteNest;
-  csFIFO<TiDocumentNode*> deleteQueue;
+  csFIFO<TiDocumentNode*> destroyQueue;
+  struct FreeQueueEntry
+  {
+    int type;
+    void* ptr;
+  };
 
   void ActualDeleteNode (TiDocumentNode* node)
   {
-    switch (node->Type ())
+    switch (node->Type())
     {
-      case ELEMENT: blk_element.Free ((TiXmlElement*)node); break;
-      case TEXT: blk_text.Free ((TiXmlText*)node); break;
-      case DOCUMENT: delete static_cast<TiDocument*> (node); break;
-      case COMMENT: delete static_cast<TiXmlComment*> (node); break;
-      case CDATA: delete static_cast<TiXmlCData*> (node); break;
-      case DECLARATION: delete static_cast<TiXmlDeclaration*> (node); break;
-      case UNKNOWN: delete static_cast<TiXmlUnknown*> (node); break;
+      case ELEMENT: static_cast<TiXmlElement*> (node)->~TiXmlElement(); break;
+      case TEXT: static_cast<TiXmlText*> (node)->~TiXmlText(); break;
+      case DOCUMENT: static_cast<TiDocument*> (node)->~TiDocument(); break;
+      case COMMENT: static_cast<TiXmlComment*> (node)->~TiXmlComment(); break;
+      case CDATA: static_cast<TiXmlCData*> (node)->~TiXmlCData(); break;
+      case DECLARATION: 
+        static_cast<TiXmlDeclaration*> (node)->~TiXmlDeclaration();
+        break;
+      case UNKNOWN: static_cast<TiXmlUnknown*> (node)->~TiXmlUnknown(); break;
       default: 
         CS_ASSERT(false);
+    }
+  }
+  void ActualFreeNode (const FreeQueueEntry& node)
+  {
+    switch (node.type)
+    {
+      case ELEMENT: 
+        blk_element.Free (node.ptr); 
+        break;
+      case TEXT: 
+        blk_text.Free (node.ptr); 
+        break;
+      case DOCUMENT:
+      case COMMENT:
+      case CDATA:
+      case DECLARATION:
+      case UNKNOWN:
+        CS::Memory::CustomAllocated::operator delete (node.ptr);
+        break;
+      default: 
+        CS_ASSERT(false);
+    }
+  }
+  void EmptyDestroyQueue()
+  {
+    csArray<FreeQueueEntry> freeQueue;
+    while (destroyQueue.GetSize() > 0)
+    {
+      TiDocumentNode* node = destroyQueue.PopTop ();
+      // If we delete ourselves here the queue will disappear!
+      CS_ASSERT(node != this);
+      FreeQueueEntry fqe;
+      fqe.ptr = node;
+      fqe.type = node->Type();
+      freeQueue.Push (fqe);
+      ActualDeleteNode (node);
+    }
+    for (size_t n = freeQueue.GetSize(); n-- > 0; )
+    {
+      ActualFreeNode (freeQueue[n]);
     }
   }
 public:
   /// Interned strings.
   csStringSet strings;
   /// Block allocator for elements.
-  csBlockAllocator<TiXmlElement> blk_element;
+  csFixedSizeAllocator<sizeof(TiXmlElement)> blk_element;
   /// Block allocator for text.
-  csBlockAllocator<TiXmlText> blk_text;
+  csFixedSizeAllocator<sizeof(TiXmlText)> blk_text;
 
   /// Create an empty document, that has no name.
   TiDocument();
@@ -794,21 +841,22 @@ public:
     {
       // No nesting yet:
       deleteNest++;
+      FreeQueueEntry fqe;
+      fqe.ptr = node;
+      fqe.type = node->Type();
       // Delete the node...
       ActualDeleteNode (node);
-      if (node == this) return;
       // ... and all that have been enqueued by that delete.
-      while (deleteQueue.GetSize() > 0)
-      {
-        TiDocumentNode* node = deleteQueue.PopTop ();
-        ActualDeleteNode (node);
-        if (node == this) return;
-      }
+      if (node != this)
+        EmptyDestroyQueue();
+      else
+        CS_ASSERT (destroyQueue.GetSize() == 0);
       deleteNest--;
+      ActualFreeNode (fqe);
       return;
     }
     // Nesting: enqueue for later deletion.
-    deleteQueue.Push (node);
+    destroyQueue.Push (node);
   }
 
   const char * Value () const { return value.c_str (); }

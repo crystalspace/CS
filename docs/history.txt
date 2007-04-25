@@ -11,6 +11,9 @@ chronological order.
 	  by the iPolygonMesh changes. This fixes #322.
         - Piotr made small bugfix in animation logic while playing it 
           back in time.
+	- res changed the way TinyXML destroys + frees node objects to avoid
+	  accesses to freed memory that have been introduced by yesterday's
+	  ref counting change.
 24-Apr-2007
         - Piotr made csSkeleton animation system to respect updates made
 	  backwards in time (with negative 'elapsed time' value).

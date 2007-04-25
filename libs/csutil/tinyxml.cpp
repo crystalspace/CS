@@ -290,7 +290,8 @@ csPtr<TiDocumentNode> TiDocumentNodeChildren::Identify( TiDocument* document,
   }
   else if (    isalpha( *(p+1) ) || *(p+1) == '_' )
   {
-    returnNode = document->blk_element.Alloc ();
+    void* p = document->blk_element.Alloc (sizeof (TiXmlElement));
+    returnNode = new (p) TiXmlElement ();
   }
   else if ( StringEqual ( p, commentHeader) )
   {
@@ -646,7 +647,8 @@ void TiXmlElement::Print( iString* cfile, int depth ) const
 csPtr<TiDocumentNode> TiXmlElement::Clone(TiDocument* document) const
 {
   csRef<TiXmlElement> clone;
-  clone.AttachNew (document->blk_element.Alloc ());
+  void* p = document->blk_element.Alloc (sizeof (TiXmlElement));
+  clone.AttachNew (new (p) TiXmlElement ());
   if ( !clone )
     return 0;
 
@@ -700,6 +702,9 @@ TiDocument::~TiDocument ()
   // Call explicit clear so that all children are destroyed
   // before 'blk_element' and 'blk_text' are destroyed.
   Clear ();
+  // The Clear() call may have enqueue a number of nodes to delete,
+  // and it needs to be emptied *before* we're destructed.
+  EmptyDestroyQueue ();
 }
 
 csPtr<TiDocumentNode> TiDocument::Clone(TiDocument* document) const
@@ -831,7 +836,8 @@ void TiXmlText::Print( iString* cfile, int /*depth*/ ) const
 csPtr<TiDocumentNode> TiXmlText::Clone(TiDocument* document) const
 {  
   csRef<TiXmlText> clone;
-  clone.AttachNew (document->blk_text.Alloc ());
+  void* p = document->blk_text.Alloc (sizeof (TiXmlText));
+  clone.AttachNew (new (p) TiXmlText ());
 
   if ( !clone )
     return 0;
