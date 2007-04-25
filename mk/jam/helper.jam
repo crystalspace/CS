@@ -615,3 +615,8 @@ actions DoSymLink
   $(LN_S) $(>) $(<:D=)
   popd
 }
+
+actions piecemeal Touch
+{
+  touch $(<)
+}

@@ -586,6 +586,4 @@ else
 actions LinkSharedLibrary bind NEEDLIBS bind EXTRAOBJECTS bind EXPORTDEFS bind IMPLIB
 {
   $(CMD.DLLWRAP) --driver-name=$(CMD.LINK[1]) --dllname $(<:B).dll --def=$(EXPORTDEFS) --implib $(IMPLIB) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
-  touch $(IMPLIB) # ensure the IMPLIB is always newer than the DLL, 
-                  # since the IMPLIB depends on the DLL.
 }

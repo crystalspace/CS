@@ -17,6 +17,9 @@ chronological order.
 	- res fixed a missing 'this->' which caused csTinyXmlNode::DecRef()
 	  absolutely not do what it was intended to do.
 	- res fixed csObjectModel to be properly exported from shared libs.
+	- res fixed Jam "using independent target <sometarget>.dbg" messages.
+	- res fixes needless relinks of binaries and plugins on Win32 with 
+	  shared libs enabled.
 24-Apr-2007
         - Piotr made csSkeleton animation system to respect updates made
 	  backwards in time (with negative 'elapsed time' value).

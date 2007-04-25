@@ -294,6 +294,14 @@ rule LibraryShared
       Depends install_lib : [ DoInstall $(debugfile) : $(libdir) : $(INSTALL_DATA) ] ;
     }
   }
+  
+  # This is really only needed for Win32: the link library (ie import library)
+  # should be newer than the shared library (ie DLL) since the former depends
+  # on the latter. 
+  # But: the dllwrap call itself results in a shared lib newer than the link
+  # lib, and the debug info splitting will touch the shared lib again.
+  # So to make sure the link lib is newest touch it.
+  Touch $(linklib) ;
 }
 
 # LibraryBaseName

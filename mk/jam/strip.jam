@@ -35,6 +35,7 @@ rule SplitDebugInfo
     debugfile = $(binary).dbg ;
   }
   DEBUG_FILE on $(binary) = $(debugfile) ;
+  NotFile $(debugfile) ;
   DoSplitDebugInfo $(binary) ;
   LOCATE on $(debugfile) = [ on $(binary) GetVar LOCATE ] ;
   return $(debugfile) ;
