@@ -7836,6 +7836,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetSpeed = *cspacec::iSkeletonAnimationInstance_SetSpeed;
 *SetFactor = *cspacec::iSkeletonAnimationInstance_SetFactor;
 *GetFactor = *cspacec::iSkeletonAnimationInstance_GetFactor;
+*GetDuration = *cspacec::iSkeletonAnimationInstance_GetDuration;
+*SetDuration = *cspacec::iSkeletonAnimationInstance_SetDuration;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});

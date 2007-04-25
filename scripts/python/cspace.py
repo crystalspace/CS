@@ -5273,6 +5273,8 @@ class iSkeletonAnimationInstance(iBase):
     def SetSpeed(*args): return _cspace.iSkeletonAnimationInstance_SetSpeed(*args)
     def SetFactor(*args): return _cspace.iSkeletonAnimationInstance_SetFactor(*args)
     def GetFactor(*args): return _cspace.iSkeletonAnimationInstance_GetFactor(*args)
+    def GetDuration(*args): return _cspace.iSkeletonAnimationInstance_GetDuration(*args)
+    def SetDuration(*args): return _cspace.iSkeletonAnimationInstance_SetDuration(*args)
     __swig_destroy__ = _cspace.delete_iSkeletonAnimationInstance
     __del__ = lambda self : None;
 iSkeletonAnimationInstance_swigregister = _cspace.iSkeletonAnimationInstance_swigregister
