@@ -51,7 +51,8 @@ class csTMIterator;
  * objects. This class does not implement the bounding box and radius
  * functions. 
  */
-class csObjectModel : public scfImplementation1<csObjectModel,iObjectModel>
+class CS_CRYSTALSPACE_EXPORT csObjectModel : 
+  public scfImplementation1<csObjectModel,iObjectModel>
 {
   friend class csTMIterator;
 

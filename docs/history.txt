@@ -16,6 +16,7 @@ chronological order.
 	  ref counting change.
 	- res fixed a missing 'this->' which caused csTinyXmlNode::DecRef()
 	  absolutely not do what it was intended to do.
+	- res fixed csObjectModel to be properly exported from shared libs.
 24-Apr-2007
         - Piotr made csSkeleton animation system to respect updates made
 	  backwards in time (with negative 'elapsed time' value).
