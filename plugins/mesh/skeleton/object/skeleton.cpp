@@ -110,7 +110,7 @@ size_t csSkeletonBone::FindChildIndex (iSkeletonBone *child)
 void csSkeletonBone::UpdateTransform ()
 {
   size_t scripts_len = skeleton->GetRunningScripts ().GetSize ();
-  if (!scripts_len) 
+  if (!scripts_len || skeleton->IsInInitialState ()) 
   {
     next_transform = transform;
     return;
@@ -391,6 +391,7 @@ csSkeletonAnimationKeyFrame::csSkeletonAnimationKeyFrame (const char* name) :
   scfImplementationType(this)
 {
   csSkeletonAnimationKeyFrame::name = name;
+  duration = 0;
 }
 
 csSkeletonAnimationKeyFrame::~csSkeletonAnimationKeyFrame () 
@@ -861,7 +862,7 @@ csSkeleton::csSkeleton(csSkeletonFactory* fact) :
     parent_bones.Push(fact_parent_bones[i]);
   }
 
-  last_update_time = 0;
+  last_update_time = -1;
   last_version_id = (uint32)~0;
   elapsed = 0;
 
@@ -953,7 +954,7 @@ void csSkeleton::UpdateSockets ()
 
 bool csSkeleton::UpdateAnimation (csTicks current)
 {
-  if (!last_update_time) 
+  if (last_update_time == -1) 
   {
     last_update_time = current;
     return false;

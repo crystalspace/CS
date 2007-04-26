@@ -184,7 +184,6 @@ public:
 
 
 //----------------------------- csSkeletonBoneFactory -------------------------------
-
 class csSkeletonBoneFactory :
   public scfImplementation1<csSkeletonBoneFactory, iSkeletonBoneFactory>
 {
@@ -396,18 +395,15 @@ class csSkeletonAnimationKeyFrame :
       return fallback_transform;
     }
 
-    virtual void SetTransform(iSkeletonBoneFactory *bone, 
+    virtual void SetTransform(iSkeletonBoneFactory *bone_fact, 
       csReversibleTransform &transform)
     {
-      /*
-      for (size_t i = 0; i < bones_frame_transforms.GetSize () ; i++ )
-      {
-        if (bones_frame_transforms[i].bone == bone)
-        {
-          bones_frame_transforms[i].transform = transform;
-        }
-      }
-      */
+      bone_key_info fallback;
+      fallback.bone = 0;
+      bone_key_info &bki = bones_frame_transforms.Get (bone_fact, fallback);
+      //transform.GetO2T ()
+      bki.rot.SetMatrix (transform.GetO2T ());
+      bki.pos = transform.GetOrigin ();
     }
 
   virtual bool GetKeyFrameData(iSkeletonBoneFactory *bone_fact, 
@@ -587,7 +583,7 @@ private:
   csRefArray<csSkeletonAnimationInstance> running_animations;
   csArray<csString> pending_scripts;
 
-  csTicks last_update_time;
+  long last_update_time;
   uint32 last_version_id;
   long elapsed;
 
@@ -620,6 +616,8 @@ public:
   { return parent_bones; }
   csRefArray<csSkeletonAnimationInstance> & GetRunningScripts () 
   { return running_animations; }
+
+  bool IsInInitialState () {return last_update_time == -1;}
 
   void SetForceUpdate(bool force_update)
   { force_bone_update = force_update; }
