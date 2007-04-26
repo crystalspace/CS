@@ -77,12 +77,7 @@ AS_IF([test -n "$SWIG"],
     [CS_CHECK_PROG_VERSION([swig], [$SWIG -version 2>&1], [1.3.21],
 	[9.9|.9], [CS_EMIT_BUILD_PROPERTY([CMD.SWIG], [$SWIG])])])
 
-CS_CHECK_PROGS([RSVG], [rsvg])
-CS_EMIT_BUILD_PROPERTY([CMD.RSVG], [$RSVG])
-
-CS_CHECK_PROGS([CONVERT], [convert])
-CS_EMIT_BUILD_PROPERTY([CMD.CONVERT], [$CONVERT])
-
+CS_CHECK_COMMON_TOOLS_ICONS
 
 #------------------------------------------------------------------------------
 # In order to avoid alienating users by forcing them to install and use Jam,

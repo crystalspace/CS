@@ -1,6 +1,17 @@
 if $(CMD.RSVG) != ""
 {
-  rule IconSVG
+  ## IconsFromSVG iconname
+  ##   Generate multiple PNG images suitable for icon use from an SVG file.
+  ##   The source SVG file is expected to have the name 
+  ##   icons-src/scalable/<iconname>.svg. The result files are named
+  ##   the icons/<size>/<iconname>.png for multiple common icon sizes as
+  ##   'size'.
+  ##   Images for certain sizes can be specified as 
+  ##   icons-src/<size>/<iconname>.png files; these are preferred over the
+  ##   automatically generated ones.
+  ##   The actual conversion is done when the "generateicons" target is
+  ##   invoked.
+  rule IconsFromSVG
   {
     local icon = $(1) ;
     local iconfile = $(icon).svg ;
@@ -12,12 +23,13 @@ if $(CMD.RSVG) != ""
     NotFile generateicons ;
     
     local size ;
+    # Icon sizes to generate/use:
     # 16 - Windows small icon (Window menu, start menu)
     # 22 - Small icon for KDE and GNOME menus
     # 24 - Small icon for GNOME file lists(*)
     # 32 - Normal icon for Windows
     # 48 - Large icon for Windows XP
-    # 128 - Some Windows Explorer alternatives use that(**)
+    # 128 - MacOS/X, some Windows Explorer alternatives use that(**)
     # 256 - Windows Vista icon(**)
     #
     # * - Can be generated from 22x22 pics by adding a border.
@@ -79,11 +91,96 @@ if $(CMD.RSVG) != ""
     elif [ -e $SIZEDICONSSRC/$ICONBASE.svg ] ; then
       $(CMD.RSVG) -f png -w 24 -h 24  $SIZEDICONSSRC/$ICONBASE.svg $(<)
     else
-      convert -bordercolor Transparent -border 1x1 $GENSIZEDICONSSRC/$ICONBASE.png $(<)
+      $(CMD.CONVERT) -bordercolor Transparent -border 1x1 $GENSIZEDICONSSRC/$ICONBASE.png $(<)
     fi
   }
 }
 else
 {
-  rule IconSVG { }
+  rule IconsFromSVG { }
+}
+
+if $(CMD.ICOTOOL) != ""
+{
+  ## IconsMakeWin32ICO filename : iconname
+  ##   Generate a Win32 ICO file from multiple PNG images, such as those
+  ##   produced by IconsFromSVG.
+  ##   The source images are expected to have the names
+  ##   icons/<size>/<iconname>.png for multiple common icon sizes as
+  ##   'size' (currently 16, 32 and 48).
+  ##   The ICO will also include 256 color images that are generated from
+  ##   the (presumably RGBA) source PNGs and stored as 
+  ##   icons/<size>/<iconname>_8.png. 
+  ##   Color-reduced images for certain sizes can be specified as 
+  ##   icons-src/<size>/<iconname>_8.png files; these are preferred over the
+  ##   automatically reduced ones.
+  ##   The actual conversion is done when the "generateicons" target is
+  ##   invoked.
+  rule IconsMakeWin32ICO
+  { 
+    local icofile = $(1) ;
+    local icon = $(2) ;
+    
+    local size icons ;
+    for size in 16 32 48
+    {
+      local pngdir = [ ConcatDirs $(SUBDIR) icons $(size) ] ;
+      local pngsrcdir = [ ConcatDirs $(SUBDIR) icons-src $(size) ] ;
+      local pngfile = $(icon:G=$(pngdir)).png ;
+      local lowfile = $(icon:G=$(pngdir))_8.png ;
+      NoCare $(pngfile) ;
+      if $(CMD.CONVERT) != ""
+      {
+	MakeLocate $(lowfile) : $(pngdir) ;
+        SIZE on $(lowfile) = $(size) ;
+	
+	ReduceColorDepth $(lowfile) : $(pngfile) ;
+	Always $(lowfile) ;
+        icons += "$(lowfile)" ;
+      }
+      icons += "$(pngfile)" ;
+    }
+    
+    MakeLocate $(icofile) : $(SUBDIR) ;
+    Depends $(icofile) : $(icons) ;
+    IcoTool $(icofile) : $(icons) ;
+    Depends generateicons : $(icofile) ;
+  }
+  
+  actions ReduceColorDepth
+  {
+    ICONSSRC=`dirname $(>)`/../../icons-src/$(SIZE)
+    ICONBASE=`basename $(>) .png`
+    if [ -e $ICONSSRC/\${ICONBASE}_8.png ] ; then
+      $(CP) $ICONSSRC/\${ICONBASE}_8.png $(<)
+    else
+      # Extract the matte (transparency) and make binary
+      $(CMD.CONVERT) -channel matte -separate -monochrome $(>) $(<)_mask.png
+      # Strip out transparency
+      $(CMD.CONVERT) +matte $(>) $(<)_rgb.png
+      # Composite so that background gets pinked
+      $(CMD.CONVERT) -size $(SIZE)x$(SIZE) $(<)_rgb.png XC:#FF00FF $(<)_mask.png -composite $(<)_transbg.png
+      # Finally reduce color depth, with pink set as transparent.
+      $(CMD.CONVERT) $(<)_transbg.png +matte -colors 256 -dither -transparent "#FF00FF" $(<)
+      # Cleanup
+      $(RM) $(<)_mask.png
+      $(RM) $(<)_rgb.png
+      $(RM) $(<)_transbg.png
+    fi
+  }
+  
+  actions IcoTool
+  {
+    SOURCES=
+    for i in $(>) ; do
+      if [ -a $i ] ; then
+        SOURCES="$SOURCES $i"
+      fi
+    done
+    $(CMD.ICOTOOL) -c -o $(<) $SOURCES
+  }
+}
+else
+{
+  rule IconsMakeWin32ICO { }
 }

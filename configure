@@ -712,6 +712,7 @@ HHC
 ac_ct_HHC
 SWIG
 RSVG
+ICOTOOL
 CONVERT
 JAM
 MAKE
@@ -7984,6 +7985,7 @@ fi
 fi
 
 
+# rsvg: for svg to png conversion
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -8033,7 +8035,7 @@ fi
   test -n "$RSVG" && break
 done
 
-cs_build_prop_val="$RSVG"
+    cs_build_prop_val="$RSVG"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}CMD.RSVG ?= \"$cs_build_prop_val\" ;
@@ -8041,6 +8043,66 @@ cs_build_prop_val="$RSVG"
 fi
 
 
+    # icotool: for creating Win32 ICO files
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin"
+	export PATH
+fi
+
+    for ac_prog in icotool
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_prog_ICOTOOL+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$ICOTOOL"; then
+  ac_cv_prog_ICOTOOL="$ICOTOOL" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_ICOTOOL="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+fi
+fi
+ICOTOOL=$ac_cv_prog_ICOTOOL
+if test -n "$ICOTOOL"; then
+  { echo "$as_me:$LINENO: result: $ICOTOOL" >&5
+echo "${ECHO_T}$ICOTOOL" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+  test -n "$ICOTOOL" && break
+done
+
+    cs_build_prop_val="$ICOTOOL"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.ICOTOOL ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+
+    # convert: for various image manipulations from both the svg conversion and
+    #  ICO creation.
 
     if test "$cs_prog_path_prepared" != yes; then
   cs_prog_path_prepared=yes
@@ -8090,13 +8152,12 @@ fi
   test -n "$CONVERT" && break
 done
 
-cs_build_prop_val="$CONVERT"
+    cs_build_prop_val="$CONVERT"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}CMD.CONVERT ?= \"$cs_build_prop_val\" ;
 "
 fi
-
 
 
 #------------------------------------------------------------------------------
@@ -77648,8 +77709,8 @@ HHC!$HHC$ac_delim
 ac_ct_HHC!$ac_ct_HHC$ac_delim
 SWIG!$SWIG$ac_delim
 RSVG!$RSVG$ac_delim
+ICOTOOL!$ICOTOOL$ac_delim
 CONVERT!$CONVERT$ac_delim
-JAM!$JAM$ac_delim
 _ACEOF
 
   if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 97; then
@@ -77691,6 +77752,7 @@ _ACEOF
 ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   cat >conf$$subs.sed <<_ACEOF
+JAM!$JAM$ac_delim
 MAKE!$MAKE$ac_delim
 CSLIBS_CONFIG!$CSLIBS_CONFIG$ac_delim
 ac_ct_CSLIBS_CONFIG!$ac_ct_CSLIBS_CONFIG$ac_delim
@@ -77787,7 +77849,6 @@ CONFIG_CPPUNIT!$CONFIG_CPPUNIT$ac_delim
 ac_ct_CONFIG_CPPUNIT!$ac_ct_CONFIG_CPPUNIT$ac_delim
 CONFIG_BFD!$CONFIG_BFD$ac_delim
 ac_ct_CONFIG_BFD!$ac_ct_CONFIG_BFD$ac_delim
-LIBOBJS!$LIBOBJS$ac_delim
 _ACEOF
 
   if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 97; then
@@ -77829,10 +77890,11 @@ _ACEOF
 ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   cat >conf$$subs.sed <<_ACEOF
+LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 1; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 2; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

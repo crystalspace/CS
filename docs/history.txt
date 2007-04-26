@@ -11,6 +11,8 @@ chronological order.
         - Piotr changed skeleton pose update to ignore animations, when they 
           wasn't used (before first animation update). Which is useful for
           setting skeleton initial pose. 
+	- res added a facility to generate Win32 ICO files from multiple PNG
+	  files (such as those we can already generate from SVGs).
 25-Apr-2007
 	- Jorrit fixed a bug in the stencil and stencil2 plugins caused
 	  by the iPolygonMesh changes. This fixes #322.
