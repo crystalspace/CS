@@ -214,6 +214,8 @@ struct iSkeletonAnimationKeyFrame : public virtual iBase
   /**
    * Get the transform of a bone.
    */
+  CS_DEPRECATED_METHOD_MSG("GetTransform (iSkeletonBoneFactory *bone) is deprecated, use GetTransform"
+    "(iSkeletonBoneFactory *bone, csReversibleTransform &dst_trans) instead")
   virtual csReversibleTransform & GetTransform (iSkeletonBoneFactory *bone) = 0;
 
   /**

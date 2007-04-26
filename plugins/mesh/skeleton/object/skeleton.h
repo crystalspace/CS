@@ -393,12 +393,7 @@ class csSkeletonAnimationKeyFrame :
     }
     virtual csReversibleTransform & GetTransform(iSkeletonBoneFactory *bone_fact)
     {
-      bone_key_info fallback;
-      fallback.bone = 0;
-      const bone_key_info & bki = bones_frame_transforms.Get (bone_fact, fallback);
-      if (bki.bone == 0)
-        return fallback_transform;
-      return csReversibleTransform (csMatrix3 (bki.rot), bki.pos);
+      return fallback_transform;
     }
 
     virtual void SetTransform(iSkeletonBoneFactory *bone, 
@@ -572,7 +567,7 @@ public:
   const char *GetName () const { return animation->GetName (); }
   float GetFactor () { return 1; }
   void SetFactor (float factor) { }
-  csTicks GetDuration () { return (csTicks) animation->GetTime () * time_factor; }
+  csTicks GetDuration () { return (csTicks) (animation->GetTime () * time_factor); }
   void SetDuration (csTicks time);
   float GetSpeed () {return time_factor; }
   void SetSpeed (float speed) {time_factor = speed;}

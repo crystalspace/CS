@@ -431,7 +431,7 @@ csTicks csSkeletonAnimation::GetFramesTime ()
 }
 csTicks csSkeletonAnimation::GetTime () 
 {
-  return GetFramesTime () * time_factor;
+  return (csTicks) (GetFramesTime () * time_factor);
 }
 void csSkeletonAnimation::SetTime (csTicks time)
 {
