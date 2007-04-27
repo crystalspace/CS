@@ -115,8 +115,14 @@ bool csLoader::ParseTextureList (iLoaderContext* ldr_context,
 	        return false;
         break;
       case XMLTOKEN_HEIGHTGEN:
+	SyntaxService->Report (
+	  "crystalspace.maploader.parse.texture",
+	  CS_REPORTER_SEVERITY_WARNING,
+	  child,
+	  "<heightmap> is obsolete: it was intended for use together with the "
+	  "'terrfunc' mesh which is long gone.");
         if (!ParseHeightgen (ldr_context, child))
-	        return false;
+	  return false;
         break;
       case XMLTOKEN_CUBEMAP:
         if (!ParseCubemap (ldr_context, child))

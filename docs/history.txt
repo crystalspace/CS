@@ -21,6 +21,8 @@ chronological order.
 	- res applied a patch from caedes to make the rendertarget render step
 	  actually work. See trac #326.
 	- res added some gldrivers.xml tweaks contributed by Andrew J. Kroll.
+	- res deprecated the terrain texture image generation functions
+	  (csGenerateImage and companions).
 26-Apr-2007
         - Piotr implemented skeleton 'SetTransform'.
         - Piotr changed skeleton pose update to ignore animations, when they 
