@@ -12,6 +12,8 @@ chronological order.
 	  background on the 256 color images on Windows. Last but not least
 	  made the 32-bit images being preferred by Windows over the 256 color
 	  ones.
+	- res fixed a recently introduced stupid typo that prevented CS' 
+	  "custom" -Wl flags from being used.
 26-Apr-2007
         - Piotr implemented skeleton 'SetTransform'.
         - Piotr changed skeleton pose update to ignore animations, when they 
