@@ -14,6 +14,10 @@ chronological order.
 	  ones.
 	- res fixed a recently introduced stupid typo that prevented CS' 
 	  "custom" -Wl flags from being used.
+	- Andrew Robberts added a "Reload" button to viewmesh that will reload
+	  the current mesh and all textures, etc. it uses.
+	- Andrew Robberts added mouse camera controls to viewmesh and moved around
+	  the viewmesh camera stuff a bit. 
 26-Apr-2007
         - Piotr implemented skeleton 'SetTransform'.
         - Piotr changed skeleton pose update to ignore animations, when they 

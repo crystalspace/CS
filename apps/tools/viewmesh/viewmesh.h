@@ -53,6 +53,21 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
 {
  private:
 
+  csRef<iRegion> region;
+
+  csVector3 camTarget;
+  float     camDist;
+  float     camYaw;
+  float     camPitch;
+
+  bool      camModePan;
+  bool      camModeRotate;
+  bool      camModeZoom;
+
+  csString reloadFilename;
+
+  int       lastMouseX, lastMouseY;
+
   csRef<iEngine> engine;
   csRef<iLoader> loader;
   csRef<iSaver> saver;
@@ -88,7 +103,15 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
 
   vmAnimCallback* callback;
 
+  void ResetCamera();
+  void UpdateCamera();
+  void FixCameraForOrigin(const csVector3 & desiredOrigin);
+
   bool OnKeyboard (iEvent&);
+
+  bool OnMouseDown (iEvent&);
+  bool OnMouseUp (iEvent&);
+  bool OnMouseMove (iEvent&);
 
   void ProcessFrame ();
   void FinishFrame ();
@@ -150,6 +173,8 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   bool SelMorph (const CEGUI::EventArgs& e);
   bool BlendButton (const CEGUI::EventArgs& e);
   bool ClearButton (const CEGUI::EventArgs& e);
+  bool ResetCameraButton (const CEGUI::EventArgs& e);
+  bool ReloadButton (const CEGUI::EventArgs& e);
 
  public:
 

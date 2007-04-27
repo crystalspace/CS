@@ -92,6 +92,7 @@ void ViewMesh::ProcessFrame()
   float speed = (elapsed_time / 1000.0) * (0.06 * 20);
 
   iCamera* c = view->GetCamera();
+  csVector3 orig = c->GetTransform().GetOrigin();
 
   if (!spritewrapper) camMode = movenormal;
 
@@ -101,35 +102,53 @@ void ViewMesh::ProcessFrame()
     {
       if (kbd->GetKeyState (CSKEY_SHIFT))
       {
-        if (kbd->GetKeyState (CSKEY_RIGHT))
-          c->Move (CS_VEC_RIGHT * 4 * speed);
-        if (kbd->GetKeyState (CSKEY_LEFT))
-          c->Move (CS_VEC_LEFT * 4 * speed);
         if (kbd->GetKeyState (CSKEY_UP))
-          c->Move (CS_VEC_UP * 4 * speed);
+          camTarget += c->GetTransform().This2OtherRelative(csVector3(0,1,0)) * 4 * speed;
         if (kbd->GetKeyState (CSKEY_DOWN))
-          c->Move (CS_VEC_DOWN * 4 * speed);
+          camTarget -= c->GetTransform().This2OtherRelative(csVector3(0,1,0)) * 4 * speed;
+        if (kbd->GetKeyState (CSKEY_RIGHT))
+          camTarget += c->GetTransform().This2OtherRelative(csVector3(1,0,0)) * 4 * speed;
+        if (kbd->GetKeyState (CSKEY_LEFT))
+          camTarget -= c->GetTransform().This2OtherRelative(csVector3(1,0,0)) * 4 * speed;
       }
       else
       {
-    	if (kbd->GetKeyState (CSKEY_RIGHT))
-	  c->GetTransform ().RotateOther (CS_VEC_ROT_RIGHT, speed);
-	if (kbd->GetKeyState (CSKEY_LEFT))
-	  c->GetTransform ().RotateOther (CS_VEC_ROT_LEFT, speed);
-	if (kbd->GetKeyState (CSKEY_PGUP))
-	  c->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed);
-	if (kbd->GetKeyState (CSKEY_PGDN))
-	  c->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed);
         if (kbd->GetKeyState (CSKEY_UP))
-          c->Move (CS_VEC_FORWARD * 4 * speed);
+          camTarget += (camTarget - orig).Unit() * 4 * speed;
         if (kbd->GetKeyState (CSKEY_DOWN))
-          c->Move (CS_VEC_BACKWARD * 4 * speed);
+          camTarget -= (camTarget - orig).Unit() * 4 * speed;
+        if (kbd->GetKeyState (CSKEY_RIGHT))
+          camYaw += speed;
+        if (kbd->GetKeyState (CSKEY_LEFT))
+          camYaw -= speed;
       }
+
+      if (kbd->GetKeyState (CSKEY_PGDN))
+        camPitch = csMin<float>(3.14159f * 0.5f - 0.01f, camPitch + speed);
+      if (kbd->GetKeyState (CSKEY_PGUP))
+        camPitch = csMax<float>(-3.14159f * 0.5f + 0.01f, camPitch - speed);
+
+      UpdateCamera();
       break;
     }
     case moveorigin:
     {
-      csVector3 orig = c->GetTransform().GetOrigin();
+      if (kbd->GetKeyState (CSKEY_DOWN))
+        orig.z -= 4 * speed;
+      if (kbd->GetKeyState (CSKEY_UP))
+        orig.z += 4 * speed;
+      if (kbd->GetKeyState (CSKEY_LEFT))
+        orig.x -= 4 * speed;
+      if (kbd->GetKeyState (CSKEY_RIGHT))
+        orig.x += 4 * speed;
+      if (kbd->GetKeyState (CSKEY_PGUP))
+        orig.y += 4 * speed;
+      if (kbd->GetKeyState (CSKEY_PGDN))
+        orig.y -= 4 * speed;
+      FixCameraForOrigin(orig);
+      UpdateCamera();
+      break;
+        /*
 
       csBox3 box;
       box = spritewrapper->GetWorldBoundingBox();
@@ -149,32 +168,23 @@ void ViewMesh::ProcessFrame()
 	c->GetTransform().SetOrigin (orig + CS_VEC_DOWN * 4 * speed);
       c->GetTransform().LookAt (spritepos-orig, csVector3(0,1,0) );
       break;
+      */
     }
     case rotateorigin:
     {
-      csVector3 orig = c->GetTransform().GetOrigin();
-
-      csBox3 box;
-      box = spritewrapper->GetWorldBoundingBox();
-      csVector3 spritepos = box.GetCenter();
-
       if (kbd->GetKeyState (CSKEY_LEFT))
-        orig = csYRotMatrix3(-speed) * (orig-spritepos) + spritepos;
+        camYaw += speed;
       if (kbd->GetKeyState (CSKEY_RIGHT))
-        orig = csYRotMatrix3(speed) * (orig-spritepos) + spritepos;
+        camYaw -= speed;
       if (kbd->GetKeyState (CSKEY_UP))
-        orig = csXRotMatrix3(speed) * (orig-spritepos) + spritepos;
+        camPitch = csMin<float>(3.14159f * 0.5f - 0.01f, camPitch + speed);
       if (kbd->GetKeyState (CSKEY_DOWN))
-        orig = csXRotMatrix3(-speed) * (orig-spritepos) + spritepos;
-
-      c->GetTransform().SetOrigin(orig);
-
+        camPitch = csMax<float>(-3.14159f * 0.5f + 0.01f, camPitch - speed);
       if (kbd->GetKeyState (CSKEY_PGUP))
-        c->Move(CS_VEC_FORWARD * 4 * speed);
+        camDist = csMax<float>(0.01f, camDist - speed * 4);
       if (kbd->GetKeyState (CSKEY_PGDN))
-        c->Move(CS_VEC_BACKWARD * 4 * speed);
-
-      c->GetTransform().LookAt (spritepos-orig, csVector3(0,1,0) );
+        camDist += speed * 4;
+      UpdateCamera();
       break;
     }
     default:
@@ -216,6 +226,47 @@ void ViewMesh::FinishFrame ()
   g3d->Print (0);
 }
 
+void ViewMesh::ResetCamera()
+{
+  camTarget.Set(0,0,0);
+  if (spritewrapper)
+  {
+    csBox3 box;
+    box = spritewrapper->GetWorldBoundingBox();
+    camTarget = box.GetCenter();
+  }
+
+  camDist = 3.5f;
+  camYaw = 0.0f;
+  camPitch = -0.2f;
+}
+
+void ViewMesh::UpdateCamera()
+{
+  csVector3 camPos;
+
+  camPos.x = camTarget.x - camDist * (float)cos(camPitch) * (float)sin(camYaw);
+  camPos.y = camTarget.y - camDist * (float)sin(camPitch);
+  camPos.z = camTarget.z - camDist * (float)cos(camPitch) * (float)cos(camYaw);
+
+  iCamera * c = view->GetCamera();
+  c->GetTransform().SetOrigin(camPos);
+  c->GetTransform().LookAt(camTarget - camPos, csVector3(0,1,0));
+}
+
+void ViewMesh::FixCameraForOrigin(const csVector3 & desiredOrigin)
+{
+  // calculate distance, yaw, and pitch values that will put the origin at the desired origin
+
+  camDist = (camTarget - desiredOrigin).Norm();
+
+  camPitch = (float)asin((camTarget.y - desiredOrigin.y) / camDist);
+
+  camYaw = (float)asin((camTarget.x - desiredOrigin.x) / (camDist * (float)cos(camPitch)));
+  if ((camTarget.z - desiredOrigin.z) / (camDist * (float)cos(camPitch)) < 0.0f)
+      camYaw = 3.14159f - camYaw;
+}
+
 bool ViewMesh::OnKeyboard(iEvent& ev)
 {
   csKeyEventType eventtype = csKeyEventHelper::GetEventType(&ev);
@@ -232,6 +283,85 @@ bool ViewMesh::OnKeyboard(iEvent& ev)
   }
   return false;
 }
+
+bool ViewMesh::OnMouseDown (iEvent& e)
+{
+  const float mouseWheelZoomAmount = 0.25f;
+
+  uint button = csMouseEventHelper::GetButton(&e);
+  switch (button)
+  {
+  case 0:
+    camModePan = true;
+    break;
+  case 1:
+    camModeRotate = true;
+    break;
+  case 2:
+    camModeZoom = true;
+    break;
+  case 3:
+    camDist = csMax<float>(0.1f, camDist - mouseWheelZoomAmount);
+    UpdateCamera();
+    break;
+  case 4:
+    camDist = csMax<float>(0.1f, camDist + mouseWheelZoomAmount);
+    UpdateCamera();
+    break;
+  }
+  return false;
+}
+
+bool ViewMesh::OnMouseUp (iEvent& e)
+{
+  uint button = csMouseEventHelper::GetButton(&e);
+  switch (button)
+  {
+  case 0:
+    camModePan = false;
+    break;
+  case 1:
+    camModeRotate = false;
+    break;
+  case 2:
+    camModeZoom = false;
+    break;
+  }
+  return false;
+}
+
+bool ViewMesh::OnMouseMove (iEvent& e)
+{
+  int x = (float)csMouseEventHelper::GetX(&e);
+  int y = (float)csMouseEventHelper::GetY(&e);
+  float dx = (float)(x - lastMouseX) * 0.02f;
+  float dy = (float)(y - lastMouseY) * -0.02f;
+  iCamera * c = view->GetCamera();
+
+  lastMouseX = x;
+  lastMouseY = y;
+
+  if (camModePan)
+  {
+    camTarget += c->GetTransform().This2OtherRelative(csVector3(1,0,0)) * dx 
+               + c->GetTransform().This2OtherRelative(csVector3(0,1,0)) * dy;
+  }
+  if (camModeRotate)
+  {
+      camYaw += dx;
+      camPitch += dy;
+  }
+  if (camModeZoom)
+  {
+      camDist = csMax<float>(0.1f, camDist - (dx + dy));
+  }
+
+  if (camModePan || camModeRotate || camModePan)
+      UpdateCamera();
+
+  return false;
+}
+
 
 void ViewMesh::Help ()
 {
@@ -301,7 +431,7 @@ void ViewMesh::LoadTexture(const char* file, const char* name)
 {
   if (file && name)
   {
-    iTextureWrapper* txt = loader->LoadTexture (name, file);
+    iTextureWrapper* txt = loader->LoadTexture (name, file, CS_TEXTURE_3D, 0, true, true, true, region);
     if (txt == 0)
     {
       ReportError("Cannot load texture '%s' from file '%s'.\n", name, file);
@@ -313,7 +443,7 @@ void ViewMesh::LoadTexture(const char* file, const char* name)
 
 void ViewMesh::LoadLibrary(const char* file)
 {
-  loader->LoadLibraryFile(file);
+  loader->LoadLibraryFile(file, region);
 }
 
 bool ViewMesh::OnInitialize(int /*argc*/, char* /*argv*/ [])
@@ -386,6 +516,9 @@ bool ViewMesh::Application()
 
   engine->SetLightingCacheMode (0);
 
+  region = engine->CreateRegion ("viewmesh_region");
+  reloadFilename = "";
+
   CreateRoom();
   CreateGui ();
 
@@ -396,7 +529,13 @@ bool ViewMesh::Application()
   rotY = rotX = 0;
 
   view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 1, -3));
+
+  ResetCamera();
+  UpdateCamera();
+
+  camModePan = false;
+  camModeRotate = false;
+  camModeZoom = false;
 
   x = g3d->GetDriver2D ()->GetWidth ();
   y = g3d->GetDriver2D ()->GetHeight ();
@@ -485,6 +624,14 @@ void ViewMesh::CreateGui()
   btn = winMgr->getWindow("Tab1/LoadLibButton");
   btn->subscribeEvent(CEGUI::PushButton::EventClicked,
     CEGUI::Event::Subscriber(&ViewMesh::LoadLibButton, this));
+
+  btn = winMgr->getWindow("Tab1/ReloadButton");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ViewMesh::ReloadButton, this));
+
+  btn = winMgr->getWindow("Tab1/ResetCameraButton");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ViewMesh::ResetCameraButton, this));
 
   btn = winMgr->getWindow("Tab1/NormalMovementRadio");
   btn->subscribeEvent(CEGUI::RadioButton::EventSelectStateChanged,
@@ -640,6 +787,7 @@ void ViewMesh::CreateGui()
   btn->subscribeEvent(CEGUI::PushButton::EventClicked,
     CEGUI::Event::Subscriber(&ViewMesh::ClearButton, this));
 
+
   // ----[ STDDLG ]----------------------------------------------------------
 
   btn = winMgr->getWindow("StdDlg/OkButton");
@@ -672,6 +820,8 @@ void ViewMesh::CreateGui()
 
 void ViewMesh::LoadSprite (const char* filename)
 {
+  reloadFilename = filename;
+
   if (spritewrapper)
   {
     if (sprite)
@@ -724,7 +874,6 @@ void ViewMesh::LoadSprite (const char* filename)
   iBase* result;
   printf ("Loading model '%s' from vfs dir '%s'\n",
 		  filename, vfs->GetCwd ()); fflush (stdout);
-  iRegion* region = engine->CreateRegion ("viewmesh_region");
   bool rc = loader->Load (filename, result, region, false, true);
 
   if (!rc)
@@ -1768,6 +1917,24 @@ bool ViewMesh::ClearButton (const CEGUI::EventArgs& e)
   cal3dstate->ClearMorphTarget(target, weight);
   return true;
 }
+
+bool ViewMesh::ResetCameraButton (const CEGUI::EventArgs& e)
+{
+  ResetCamera();
+  return true;
+}
+
+bool ViewMesh::ReloadButton (const CEGUI::EventArgs& e)
+{
+  if (reloadFilename == "")
+      return true;
+
+  region->DeleteAll();
+  LoadSprite(reloadFilename);
+
+  return true;
+}
+
 //---------------------------------------------------------------------------
 
 void ViewMesh::StdDlgUpdateLists(const char* filename)

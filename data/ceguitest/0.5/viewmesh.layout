@@ -42,8 +42,12 @@
 		       		<Property Name="Text" Value="Save Binary" />
 		       		<Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,25.0}}'/>
 		       		<Property Name='UnifiedPosition' Value='{{0.0,77.0},{0.0,35.0}}'/>
-                       </Window>                  
- 
+                       </Window>
+                    <Window Type="ice/Button" Name="Tab1/ReloadButton">
+                       <Property Name="Text" Value="Reload" />
+                       <Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,25.0}}'/>
+                       <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,65.0}}'/>
+                    </Window>
  
  
 	     	        <Window Type="ice/StaticText" Name="Tab1/ScaleSpriteLable" >
@@ -75,21 +79,27 @@
 				<Property Name='UnifiedSize' Value='{{0.0,140.0},{0.0,25.0}}'/>
 				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,180.0}}'/>
                         </Window>
+                    <Window Type="ice/Button" Name="Tab1/ResetCameraButton">
+                       <Property Name="Text" Value="Reset Camera" />
+                       <Property Name='UnifiedSize' Value='{{0.0,100.0},{0.0,25.0}}'/>
+                       <Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,205.0}}'/>
+                    </Window>
+
 
 			<Window Type="ice/RadioButton" Name="Tab1/ThreePointLighting" >
 				<Property Name="Text" Value="Three Point Lighting" />
 				<Property Name='UnifiedSize' Value='{{0.0,140.0},{0.0,25.0}}'/>
-				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,210.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,230.0}}'/>
 			</Window>
 			<Window Type="ice/RadioButton" Name="Tab1/FrontBackTopLighting" >
 				<Property Name="Text" Value="Front Back and Top" />
 				<Property Name='UnifiedSize' Value='{{0.0,140.0},{0.0,25.0}}'/>
-				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,230.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,250.0}}'/>
 			</Window>
 			<Window Type="ice/RadioButton" Name="Tab1/UnlitLighting" >
 				<Property Name="Text" Value="Unlit" />
 				<Property Name='UnifiedSize' Value='{{0.0,140.0},{0.0,25.0}}'/>
-				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,250.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,270.0}}'/>
 			</Window>
                      </Window>
 	         </Window>
