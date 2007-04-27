@@ -3671,5 +3671,10 @@ void csGLGraphics3D::DumpZBuffer (const char* path)
   }
 }
 
+int csGLGraphics3D::GetCurrentDrawFlags () const
+{
+  return current_drawflags;
+}
+
 }
 CS_PLUGIN_NAMESPACE_END(gl3d)

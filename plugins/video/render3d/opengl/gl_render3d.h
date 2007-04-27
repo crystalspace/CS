@@ -613,9 +613,10 @@ public:
 
   /// Begin drawing in the renderer
   bool BeginDraw (int drawflags);
-
   /// Indicate that drawing is finished
   void FinishDraw ();
+  /// Return current draw flags
+  int GetCurrentDrawFlags() const;
 
   /// Do backbuffer printing
   void Print (csRect const* area);

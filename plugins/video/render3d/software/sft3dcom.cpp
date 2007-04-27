@@ -108,6 +108,8 @@ csSoftwareGraphics3DCommon::csSoftwareGraphics3DCommon (iBase* parent) :
   memset (processedColorsFlag, 0, sizeof (processedColorsFlag));
   memset (triDraw, 0, sizeof (triDraw));
   specifica = 0;
+
+  current_drawflags = 0;
 }
 
 csSoftwareGraphics3DCommon::~csSoftwareGraphics3DCommon ()
@@ -502,6 +504,7 @@ bool csSoftwareGraphics3DCommon::BeginDraw (int DrawFlags)
     if (!G2D->BeginDraw())
       return false;
   }
+  current_drawflags = DrawFlags;
   bool wasSmallerActive = smallerActive;
   smallerActive = do_smaller_rendering 
     && ((DrawFlags & CSDRAW_MASK2D3D) == CSDRAW_3DGRAPHICS)
@@ -634,6 +637,7 @@ void csSoftwareGraphics3DCommon::FinishDraw ()
   if (DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
     G2D->FinishDraw ();
   DrawMode = 0;
+  current_drawflags = 0;
 }
 
 #define SMALL_D 0.01
@@ -1141,6 +1145,12 @@ void csSoftwareGraphics3DCommon::DrawPixmap (iTextureHandle *hTex,
 {
   specifica->DrawPixmap (this, hTex, sx, sy, sw, sh, tx, ty, tw, th, Alpha);
 }
+
+int csSoftwareGraphics3DCommon::GetCurrentDrawFlags () const
+{
+  return current_drawflags;
+}
+
 
 }
 CS_PLUGIN_NAMESPACE_END(Soft3D)

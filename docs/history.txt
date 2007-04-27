@@ -18,6 +18,8 @@ chronological order.
 	  the current mesh and all textures, etc. it uses.
 	- Andrew Robberts added mouse camera controls to viewmesh and moved around
 	  the viewmesh camera stuff a bit. 
+	- res applied a patch from caedes to make the rendertarget render step
+	  actually work. See trac #326.
 26-Apr-2007
         - Piotr implemented skeleton 'SetTransform'.
         - Piotr changed skeleton pose update to ignore animations, when they 

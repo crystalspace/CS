@@ -85,6 +85,8 @@ public:
   iTextureHandle* GetRenderTarget () const;
   bool BeginDraw (int DrawFlags);
   void FinishDraw ();
+  int GetCurrentDrawFlags() const
+  { return current_drawflags; }
   void Print (csRect const *area);
   void DrawPixmap (iTextureHandle *htex, int sx, int sy,
     int sw, int sh, int tx, int ty, int tw, int th, uint8 Alpha = 0);

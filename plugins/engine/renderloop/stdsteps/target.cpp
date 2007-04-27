@@ -197,7 +197,8 @@ void csTargetRenderStep::Perform (iRenderView* rview, iSector* sector,
     oldcontext = engine->GetContext ();
     engine->SetContext (tex->GetTextureHandle ());
   }
-  //g3d->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER);
+  int oldflags = g3d->GetCurrentDrawFlags();
+  g3d->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER);
   for (size_t i = 0; i < steps.GetSize (); i++)
   {
     steps[i]->Perform (rview, sector, stacks);
@@ -205,9 +206,10 @@ void csTargetRenderStep::Perform (iRenderView* rview, iSector* sector,
   
   if (tex != 0)
   {
-    //g3d->FinishDraw ();
+    g3d->FinishDraw ();
     engine->SetContext (oldcontext);
   }
+  g3d->BeginDraw (oldflags);
 }
 
 size_t csTargetRenderStep::AddStep (iRenderStep* step)
