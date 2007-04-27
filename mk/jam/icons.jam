@@ -129,6 +129,7 @@ if $(CMD.ICOTOOL) != ""
       local pngfile = $(icon:G=$(pngdir)).png ;
       local lowfile = $(icon:G=$(pngdir))_8.png ;
       NoCare $(pngfile) ;
+      icons += "$(pngfile)" ;
       if $(CMD.CONVERT) != ""
       {
 	MakeLocate $(lowfile) : $(pngdir) ;
@@ -138,7 +139,6 @@ if $(CMD.ICOTOOL) != ""
 	Always $(lowfile) ;
         icons += "$(lowfile)" ;
       }
-      icons += "$(pngfile)" ;
     }
     
     MakeLocate $(icofile) : $(SUBDIR) ;
@@ -154,18 +154,8 @@ if $(CMD.ICOTOOL) != ""
     if [ -e $ICONSSRC/\${ICONBASE}_8.png ] ; then
       $(CP) $ICONSSRC/\${ICONBASE}_8.png $(<)
     else
-      # Extract the matte (transparency) and make binary
-      $(CMD.CONVERT) -channel matte -separate -monochrome $(>) $(<)_mask.png
-      # Strip out transparency
-      $(CMD.CONVERT) +matte $(>) $(<)_rgb.png
-      # Composite so that background gets pinked
-      $(CMD.CONVERT) -size $(SIZE)x$(SIZE) $(<)_rgb.png XC:#FF00FF $(<)_mask.png -composite $(<)_transbg.png
-      # Finally reduce color depth, with pink set as transparent.
-      $(CMD.CONVERT) $(<)_transbg.png +matte -colors 256 -dither -transparent "#FF00FF" $(<)
-      # Cleanup
-      $(RM) $(<)_mask.png
-      $(RM) $(<)_rgb.png
-      $(RM) $(<)_transbg.png
+      # Makes transparency binary and reduces colors to 256-
+      $(CMD.CONVERT) $(>) \( +clone -fx a +matte -monochrome \) -compose CopyOpacity -composite -colors 256 -dither $(<)
     fi
   }
   
