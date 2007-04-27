@@ -325,7 +325,25 @@
       </applicable>
     </rule>
 
-    
+    <!--
+      * 2007-04-26: Reportedly sky corruption in PlaneShift
+		    OpenGL vendor string: NVIDIA Corporation
+		    OpenGL renderer string: GeForce 6600/PCI/SSE2/3DNOW!
+		    OpenGL version string: 2.1.0 NVIDIA 97.55
+		    Platform: Linux
+      -->
+    <rule description="Disable VBO on GeForce 6600">
+      <conditions fulfill="all">
+	<regexp string="platform" pattern="Unix" />
+	<regexp string="renderer" pattern="^GeForce 6600" />
+	<regexp string="glversion" pattern="NVIDIA 97.55" />
+      </conditions>
+      <applicable>
+        <usecfg>novbo</usecfg>
+      </applicable>
+    </rule>
+
+
     <!-- 
       * 2005-12-21: Point sprites are fixed with at least Catalyst 5.13.
       -->
@@ -583,6 +601,22 @@
         <regexp string="renderer" pattern="Mesa.*Intel" />
         <regexp string="glversion" pattern="Mesa 6\.5\.." />
       </conditions>
+      <applicable>
+        <usecfg>disableTC</usecfg>
+      </applicable>
+    </rule>
+    
+    <!--
+      * 2007-04-24: S3TC support in Mesa DRI R200 is broken.
+                    (Linux stock OpenGL drivers on Slackware)
+                    Since S3TC may also be used through generic
+                    compression formats, disable TC completely.
+      -->
+    <rule description="Disable texture compression for Mesa DRI 200">
+        <conditions fulfill="all">
+          <regexp string="renderer" pattern="^Mesa DRI R200" />
+          <regexp string="glversion" pattern="Mesa 6\.4\.." />
+        </conditions>
       <applicable>
         <usecfg>disableTC</usecfg>
       </applicable>
