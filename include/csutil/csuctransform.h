@@ -319,6 +319,8 @@ public:
    * Encode an Unicode code point to UTF-8.
    * \param ch Code point to encode.
    * \param buf Pointer to the buffer receiving the encoded code point.
+   *   When a fixed-size buffer is used it's a good idea to make it
+   *   CS_UC_MAX_UTF8_ENCODED utf8_chars large.
    * \param bufsize Number of code units that fit in \a buf.
    * \param allowNonchars Whether non-character or high and low surrogates
    *  are encoded. Normally, those code points are rejected to prevent the
@@ -383,7 +385,18 @@ public:
     
   /**
    * Encode an Unicode code point to UTF-16.
-   * \copydoc EncodeUTF8(const utf32_char,utf8_char*,size_t,bool)
+   * \param ch Code point to encode.
+   * \param buf Pointer to the buffer receiving the encoded code point.
+   *   When a fixed-size buffer is used it's a good idea to make it
+   *   CS_UC_MAX_UTF16_ENCODED utf16_chars large.
+   * \param bufsize Number of code units that fit in \a buf.
+   * \param allowNonchars Whether non-character or high and low surrogates
+   *  are encoded. Normally, those code points are rejected to prevent the
+   *  generation of invalid encoded strings.
+   * \return The number of code units needed to encode \a ch.
+   * \remark The buffer will be filled up as much as possible.
+   *  Check the returned value whether the encoded code point completely fit 
+   *  into the buffer.
    */
   inline static int EncodeUTF16 (const utf32_char ch, utf16_char* buf, 
     size_t bufsize, bool allowNonchars = false)
@@ -414,7 +427,18 @@ public:
 
   /**
    * Encode an Unicode code point to UTF-32.
-   * \copydoc EncodeUTF8(const utf32_char,utf8_char*,size_t,bool)
+   * \param ch Code point to encode.
+   * \param buf Pointer to the buffer receiving the encoded code point.
+   *   When a fixed-size buffer is used it's a good idea to make it
+   *   CS_UC_MAX_UTF32_ENCODED utf32_chars large.
+   * \param bufsize Number of code units that fit in \a buf.
+   * \param allowNonchars Whether non-character or high and low surrogates
+   *  are encoded. Normally, those code points are rejected to prevent the
+   *  generation of invalid encoded strings.
+   * \return The number of code units needed to encode \a ch.
+   * \remark The buffer will be filled up as much as possible.
+   *  Check the returned value whether the encoded code point completely fit 
+   *  into the buffer.
    */
   inline static int EncodeUTF32 (const utf32_char ch, utf32_char* buf, 
     size_t bufsize, bool allowNonchars = false)
