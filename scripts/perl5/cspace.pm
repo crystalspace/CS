@@ -13920,6 +13920,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetWorldToCamera = *cspacec::iGraphics3D_SetWorldToCamera;
 *PerformExtension = *cspacec::iGraphics3D_PerformExtension;
 *GetWorldToCamera = *cspacec::iGraphics3D_GetWorldToCamera;
+*GetCurrentDrawFlags = *cspacec::iGraphics3D_GetCurrentDrawFlags;
 *scfGetVersion = *cspacec::iGraphics3D_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

@@ -9460,6 +9460,7 @@ class iGraphics3D(iBase):
     def SetWorldToCamera(*args): return _cspace.iGraphics3D_SetWorldToCamera(*args)
     def PerformExtension(*args): return _cspace.iGraphics3D_PerformExtension(*args)
     def GetWorldToCamera(*args): return _cspace.iGraphics3D_GetWorldToCamera(*args)
+    def GetCurrentDrawFlags(*args): return _cspace.iGraphics3D_GetCurrentDrawFlags(*args)
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iGraphics3D_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iGraphics3D_scfGetVersion)
     __swig_destroy__ = _cspace.delete_iGraphics3D
