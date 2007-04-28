@@ -19,6 +19,9 @@ chronological order.
 	  contain the component's source directory in the list of include
 	  directories. This allows to reference files in that directory in
 	  addititionally used .rc files.
+	- res changed the Win32 icon generation to store the 256 color versions
+	  in an intermediate directory below out (since these files are
+	  intermediate in nature).
 27-Apr-2007
 	- res somewhat simplified the ImageMagick invocation(s) used to convert
 	  an icon's image to 256 colors (for Windows ICO). Also fixes the green
