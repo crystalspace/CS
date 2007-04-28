@@ -102,6 +102,25 @@ AC_DEFUN([CS_CHECK_COMMON_TOOLS_DOC_DOXYGEN],
 
 
 #------------------------------------------------------------------------------
+# CS_CHECK_COMMON_TOOLS_ICONS
+#	Checks for tools required by the icon generation rules from icons.jam.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_CHECK_COMMON_TOOLS_ICONS],
+    [# rsvg: for svg to png conversion
+    CS_CHECK_PROGS([RSVG], [rsvg])
+    CS_EMIT_BUILD_PROPERTY([CMD.RSVG], [$RSVG])
+
+    # icotool: for creating Win32 ICO files
+    CS_CHECK_PROGS([ICOTOOL], [icotool])
+    CS_EMIT_BUILD_PROPERTY([CMD.ICOTOOL], [$ICOTOOL])
+
+    # convert: for various image manipulations from both the svg conversion and
+    #  ICO creation.
+    CS_CHECK_PROGS([CONVERT], [convert])
+    CS_EMIT_BUILD_PROPERTY([CMD.CONVERT], [$CONVERT])])
+
+
+#------------------------------------------------------------------------------
 # CS_CHECK_COMMON_LIBS
 #       Check for typical required libraries (libm, libmx, libdl, libnsl).
 #------------------------------------------------------------------------------
