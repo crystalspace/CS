@@ -21,7 +21,7 @@ portals (@code{iEngine::CreatePortal()}).
 Creating genmesh mesh objects for the adversaries and the laserbeam
 (@pxref{MeshObject Genmesh}).
 @item
-Creating particle mesh objects for explosions (@pxref{MeshObject PartSys}).
+Creating particle mesh objects for explosions (@pxref{MeshObject Particles}).
 @item
 Doing collision detection manually (@code{csColliderWrapper} and
 @code{csColliderHelper}).
@@ -1305,7 +1305,7 @@ We use a genmesh for both the laserbeam and the adversary sphere
 we can orient it easily along the camera transformation. That means that
 it is a long beam oriented in the @sc{z} direction.
 
-For the explosion we use a particles mesh (@pxref{MeshObject PartSys}).
+For the explosion we use a particles mesh (@pxref{MeshObject Particles}).
 With a bit of effort we're confident that you can make a better explosion
 by tweaking the parameters and using a better texture.
 

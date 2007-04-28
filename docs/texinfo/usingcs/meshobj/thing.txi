@@ -19,7 +19,8 @@ This mesh object represents a 'thing' which is a very often used
 geometry object in Crystal Space. Things are often used to mark the bounding
 geometry of a sector so that it represents a closed space. Things are not
 very dynamic in nature (although you can have things that move) so they
-are most often used for static geometry.
+are most often used for static geometry. Things are considered deprecated
+and you should use 'genmesh' instead. @xref{MeshObject Genmesh}.
 
 Things support general polygons (as opposed to only supporting triangles).
 

@@ -150,7 +150,7 @@ on a terrain) and Level Of Detail @sc{lod}. @xref{MeshObject TerrFunc}.
 
 @item
 Particle system to make fire, explosions, rain, snow, fountains, and much
-more. @xref{MeshObject PartSys}.
+more. @xref{MeshObject Particles}.
 
 @item
 Collision detection (using @sc{opcode}) or full physics using

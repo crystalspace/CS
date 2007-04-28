@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MeshObject Emit, MeshObject PartSys, MeshObject SprCal3D, MeshObject
+@node MeshObject Emit, MeshObject Haze, MeshObject SprCal3D, MeshObject
 @subsection Emitter Mesh Object
 @cindex MeshObject
 @cindex Emitter Particle System
@@ -14,9 +14,10 @@
 @email{wouterw@@cs.vu.nl}.}
 
 An emitter particle system is a very general particle system, that
-can do a variety of things. See the general particle system documentation 
-which is valid for all particle systems, for 
-global options. @xref{MeshObject PartSys}.
+can do a variety of things. It is considered mostly deprecated and if possible
+you should use the new particle system instead. In the future we will
+extend the new particles mesh object so that all features of emit are
+supported. @xref{MeshObject Particles}.
 
 The emitter can be customized to a high degree, using the @samp{iEmitGen3D}
 objects. Particles are emitted from position you choose, with speeds
@@ -185,9 +186,6 @@ scale) of the particle.
 In addition you can use @samp{iParticleState}.
 
 @subsubheading Object Loader
-
-Also see the general documentation for particle systems for other recognized
-keywords.  @xref{MeshObject PartSys}.
 
 @table @code
 @item <rectparticles w="" h="" />

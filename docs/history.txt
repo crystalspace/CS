@@ -11,6 +11,10 @@ chronological order.
 	  in particle systems.
 	- Jorrit added a documentation section on decals (written by
 	  Andrew Robberts).
+	- Jorrit removed the outdated general particle system document
+	  (the new documentation on particles covers everything that was in
+	  there).
+	- Jorrit deprecated thing and emit in the documentation.
 27-Apr-2007
 	- res somewhat simplified the ImageMagick invocation(s) used to convert
 	  an icon's image to 256 colors (for Windows ICO). Also fixes the green
