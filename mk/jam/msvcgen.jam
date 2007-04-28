@@ -716,6 +716,7 @@ rule MsvcProject
     "target|$(decorated)"
     "sourceroot|$(relpath:J=/)"
     "buildroot|$(relpath:J=/)"
+    "subdir|$(SUBDIR)"
     "striproot|$(MSVCGEN_STRIP_ROOT)"
     "define|$(MSVC.DEFINES)"
     "define|$(MSVC.DEFINES.$(type))"
