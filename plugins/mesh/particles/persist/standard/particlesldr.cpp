@@ -792,7 +792,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ParticlesLoader)
 
             return 0;
           }
-          meshObj->SetMaterialWrapper(fact->GetMeshObjectFactory ()->GetMaterialWrapper ());
+          meshObj->SetMaterialWrapper(fact->GetMeshObjectFactory ()
+	  	->GetMaterialWrapper ());
           meshObj->SetMixMode(fact->GetMeshObjectFactory()->GetMixMode());
         }
         break;

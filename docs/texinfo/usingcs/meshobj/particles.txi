@@ -156,7 +156,7 @@ Set the material for particle system.
 Set the mixmode for particle system.
 @item <preadvance>time</preadvance>
 Advance the time of the particle system object by the given duration.
-This is useful to @em{fill} a particle system after its initial creation.
+This is useful to fill a particle system after its initial creation.
 @end table
 
 @subsubheading Operation of particles

@@ -9,6 +9,8 @@ chronological order.
 28-Apr-2007
 	- Jorrit added missing documentation for the 'preadvance' option
 	  in particle systems.
+	- Jorrit added a documentation section on decals (written by
+	  Andrew Robberts).
 27-Apr-2007
 	- res somewhat simplified the ImageMagick invocation(s) used to convert
 	  an icon's image to 256 colors (for Windows ICO). Also fixes the green
