@@ -642,7 +642,7 @@ CS_EMIT_BUILD_FLAGS([how to disable function inlining],
 # -fvisibility-inlines-hidden if the test program fails to link, however,
 # practical experience has shown that this test is not 100% reliable for all
 # such installations. Instead, for simplicity, we disable this flag presently
-# for all versions of gcc on AMD64.  References:
+# for gcc below version 4.1 on AMD64.  References:
 #
 #     http://dev.gentoo.org/~kugelfang/pappy-visibility.txt
 #     http://www.gnu.org/software/gcc/gcc-4.0/changes.html#visibility
@@ -664,10 +664,14 @@ CS_CHECK_BUILD_FLAGS([for inline visibility flag],
     [CS_CREATE_TUPLE([-fvisibility-inlines-hidden])],[C++])
 
 AS_IF([test -n "$cs_cv_prog_cxx_visibility_inlines_hidden"],
-    [AC_CACHE_CHECK([if $cs_cv_prog_cxx_visibility_inlines_hidden is buggy],
+    [CS_CHECK_PROG_VERSION([g++], [$CXX --version], [4.1], [9.9|.9],
+	[cs_cv_gxx_version_4_1=yes],
+	[cs_cv_gxx_version_4_1=no])
+    AC_CACHE_CHECK([if $cs_cv_prog_cxx_visibility_inlines_hidden is buggy],
 	[cs_cv_prog_cxx_visibility_inlines_hidden_buggy],
 	[AS_IF([test $ac_compiler_gnu = yes],
-	    [AS_IF([test $host_cpu = x86_64 || test x$cs_host_macosx = xyes],
+	    [AS_IF([test \( $host_cpu = x86_64 -a cs_cv_gxx_version_4_1 = no \) \
+		    || test x$cs_host_macosx = xyes],
 		[cs_cv_prog_cxx_visibility_inlines_hidden_buggy=yes],
 		[cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])],
 	    [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])])],
