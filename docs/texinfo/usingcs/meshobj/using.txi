@@ -33,8 +33,8 @@ statement) like this (this example uses the @dfn{fountain} plug-in to make a
 fountain):
 
 @example
-<meshfact name="fountainFactory">
-  <plugin>crystalspace.mesh.loader.factory.fountain</plugin>
+<meshfact name="particlesFactory">
+  <plugin>crystalspace.mesh.loader.factory.particles</plugin>
   <params />
 </meshfact>
 @end example
@@ -46,34 +46,44 @@ parameters for the fountain's Mesh Object Factory so that's why the
 @samp{params} block is empty.  But you still have to specify it.  Other mesh
 object factories may accept parameters.
 
-Because the fountain defines no parameters for the Mesh Object Factory
-you only have to create one factory in order to make all fountains you need.
-But in some cases you may have to create multiple factories depending
-on the object characteristics you want.
+With particle systems you have the option of specifying the parameters
+in the factory and/or the mesh object. The advantage of specifying it in
+the factory is that it then becomes easier to reuse the factory for
+different particle system instances. In this example however, we define
+the particle system in the mesh object. We still need the empty mesh
+factory however.
 
 To place a fountain in some room (sector) you use a @samp{meshobj}
 statement, within the definition of a room or sector, like this:
 
 @example
 <meshobj name="fountain">
-  <plugin>crystalspace.mesh.loader.fountain</plugin>
+  <plugin>crystalspace.mesh.loader.particles</plugin>
   <params>
-    <factory>fountainFactory</factory>
-    <number>300</number>
+    <factory>particlesFactory</factory>
     <material>spark</material>
-    <origin x="0" y="0" z="0"/>
-    <dropsize w=".05" h=".05"/>
-    <color red="0.7" green="0.9" blue="1.0"/>
-    <accel x="0" y="-.1" z="0"/>
-    <falltime>3</falltime>
-    <speed>1</speed>
-    <elevation>1.5</elevation>
-    <azimuth>0</azimuth>
-    <opening>.2</opening>
+    <particlesize x="0.025" y="0.025" />
+    <transformmode>local</transformmode>
     <mixmode>
       <add />
     </mixmode>
+
+    <emitter type="cone">
+      <enabled/>
+      <initialttl min="3" max="3" />
+      <emissionrate>100</emissionrate>
+      <position x="0" y="0" z="0" />
+      <placement>center</placement>
+      <extent x="0" y="1" z="0" />
+      <coneangle>0.2</coneangle>
+      <initialvelocity x="0" y="1" z="0" />
+    </emitter>
+    <effector type="force">
+      <acceleration x="0" y="-0.1" z="0" />
+    </effector>
   </params>
+  <ztest />
+  <priority>alpha</priority>
   <move>
     <v x="-10" y="-1" z="14"/>
     <matrix>
@@ -83,7 +93,7 @@ statement, within the definition of a room or sector, like this:
 </meshobj>
 @end example
 
-This code fragment uses the @samp{crystalspace.mesh.loader.fountain} loader
+This code fragment uses the @samp{crystalspace.mesh.loader.particles} loader
 plug-in named to load a Mesh Object (type
 @samp{iMeshObject}) and register it with the engine (while placing it in the
 current sector).  In this case there are many parameters.  The first parameter
@@ -134,9 +144,7 @@ calling @code{NewInstance()} on them.
 If the object has parameters you use @code{scfQueryInterface} to get a handle
 to the @samp{iSomethingState} interface (replace @emph{Something} with whatever
 the type name of the Mesh Object is).  Then set the parameters you want on the
-Mesh Object.  Note that there are Mesh Object implementations which have
-multiple interfaces like this (for example, the particle systems implement both
-@samp{iParticleState} plus another particle system-dependent interface).
+Mesh Object.
 
 @item
 For every instance of @samp{iMeshObject} you need to create a

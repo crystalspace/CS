@@ -6,6 +6,9 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+30-Apr-2007
+	- Jorrit changed an example using fountain mesh object to the
+	  particles mesh object.
 29-Apr-2007
 	- res changed configure's "-fvisibility-inline-hidden buggy" test to
 	  not consider gcc >= 4.1 on amd64 as buggy. See #80.
