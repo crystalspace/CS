@@ -17,13 +17,15 @@ in your own game:
 @samp{GenMesh} (@pxref{MeshObject Genmesh}). The genmesh object is one of the
 most useful mesh objects. You can use it for static data (walls, buildings,
 floor, @dots{}) or for dynamic data (moving objects). It supports multiple
-materials, vertex lighting, and even animation.
+materials, vertex lighting, and even animation. Using the new @samp{lighter2}
+app it can also support lightmaps.
 @item
 @samp{Thing} (@pxref{MeshObject Thing}). The thing object is often used
-for static geometry (walls and buildings). It is currently the only object
-that supports lightmaps (although that will change in the future). It
-doesn't support animation and in general it is less suitable for moving
-objects.
+for static geometry (walls and buildings). It supports lightmaps natively.
+It doesn't support animation and in general it is less suitable for moving
+objects. At this moment it is probably a good idea to avoid the thing
+object for future projects. In the future thing will be removed from Crystal
+Space in favor of @samp{GenMesh}.
 @item
 @samp{Terrain} (@pxref{MeshObject TerrFunc}). The terrain object is very
 useful if you want landscapes although you can do landscapes with genmesh
@@ -35,7 +37,9 @@ and 3DSMax can export @sc{cal3d} models. The other option is to use
 the genmesh skeletal animation system.
 @item
 @samp{Particles}. If you want particles then the particles mesh is
-the best choice.
+the best choice. Currently the @samp{Emit} particle system is also supported
+but it should be avoided as it is very slow and is going to be removed
+in the future as well.
 @end itemize
 
 In the first section a general overview is given on some of the concepts
