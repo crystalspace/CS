@@ -963,7 +963,7 @@ void csODECollider::AddMassToBody (bool doSet)
     case CYLINDER_COLLIDER_GEOMETRY:
       {
         dReal radius, length;
-        dGeomCapsuleGetParams (geomID, &radius, &length);
+        dGeomCCylinderGetParams (geomID, &radius, &length);
         dMassSetCappedCylinder (&m, density, 3, radius, length);
       }
       break;
@@ -1111,7 +1111,7 @@ bool csODECollider::CreateCapsuleGeometry (float length, float radius)
   ClearContents ();
 
   geom_type = CAPSULE_COLLIDER_GEOMETRY;
-  geomID = dCreateCapsule (0, radius, length);
+  geomID = dCreateCCylinder (0, radius, length);
 
   GeomData *gd = new GeomData ();
   gd->surfacedata = surfacedata;
@@ -1333,7 +1333,7 @@ bool csODECollider::GetCylinderGeometry (float& length, float& radius)
   if (geom_type == CYLINDER_COLLIDER_GEOMETRY)
   {
     dReal odeR, odeL;
-    dGeomCapsuleGetParams (geomID, &odeR, &odeL);
+    dGeomCCylinderGetParams (geomID, &odeR, &odeL);
     radius = odeR;
     length = odeL;
     return true;
@@ -1366,7 +1366,7 @@ void csODECollider::FillWithColliderGeometry (csRef<iGeneralFactoryState> genmes
   case CAPSULE_COLLIDER_GEOMETRY:
     {
       dReal r, l;
-      dGeomCapsuleGetParams (geomID, &r, &l);
+      dGeomCCylinderGetParams (geomID, &r, &l);
       genmesh_fact->GenerateCapsule (l, r, 10);
       csRef<iMeshObjectFactory> collider_fact = 
         scfQueryInterface<iMeshObjectFactory> (genmesh_fact);
