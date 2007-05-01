@@ -9,6 +9,9 @@ chronological order.
 1-May-2007
 	- Genjix added csTuple2 type ala std::pair and extended csHash with
 	  a NextTuple () (returns value, key) as well as an operator["key"].
+	- res fixed an issue in CS::SubRectangles where empty subrects would
+	  later be "collapsed" errorneously when the sibling or a child was
+	  reclaimed.
 30-Apr-2007
 	- Jorrit changed an example using fountain mesh object to the
 	  particles mesh object.

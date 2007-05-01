@@ -122,7 +122,7 @@ void SubRectangles::SubRect::TestAlloc (int w, int h, AllocInfo& ai)
   // leaf is not split yet.
   int d = 0x7fffffff;
 
-  if (allocedRect.IsEmpty ())
+  if (IsEmpty ())
   {
     // empty leaf.
     int dw = rW - w;
@@ -391,9 +391,10 @@ SubRectangles::SubRect* SubRectangles::SubRect::Alloc (int w, int h, const Alloc
 void SubRectangles::SubRect::Reclaim ()
 {
   // @@@ This could be improved.
+  MakeEmpty();
   if (splitType == SPLIT_UNSPLIT)
   {
-    allocedRect.Set (0, 0, 0, 0);
+    //MakeEmpty();
     if (parent != 0) parent->TestCollapse ();
   }
   else
@@ -407,11 +408,11 @@ void SubRectangles::SubRect::TestCollapse ()
 {
   // If both children are "empty space" we can revert the status
   // of this sub-rectangle to "unsplit" and free the children.
-  if (((children[0] != 0) && (children[0]->allocedRect.IsEmpty ())) && 
-    ((children[1] != 0) && (children[1]->allocedRect.IsEmpty ())))
+  if (((children[0] != 0) && children[0]->IsReclaimed())
+    && ((children[1] != 0) && children[1]->IsReclaimed()))
   {
     splitType = SPLIT_UNSPLIT;
-    allocedRect.Set (0, 0, 0, 0);
+    //MakeEmpty();
     superrect->RemoveLeaf (children[0]);
     superrect->RemoveLeaf (children[1]);
     superrect->FreeSubrect (children[0]); children[0] = 0;
@@ -509,7 +510,7 @@ void SubRectangles::Split (SubRect* subRect, SubRect::SplitType split,
 
   SubRect* newRect = AllocSubrect ();
   newRect->rect = subRect->rect;
-  newRect->allocedRect.Set (0, 0, 0, 0);
+  newRect->MakeEmpty();
   newRect->splitPos = splitPos;
   newRect->splitType = split;
 

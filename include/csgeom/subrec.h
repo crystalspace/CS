@@ -53,6 +53,9 @@ public:
    */
   class SubRect
   {
+  private:
+    csRect rect;
+    csRect allocedRect;
   protected:
     friend class SubRectangles;
     friend class SubRectanglesCompact;
@@ -84,8 +87,6 @@ public:
     };
     friend struct AllocInfo; // Give MSVC6 access to ALLOC_INVALID.
 
-    csRect rect;
-    csRect allocedRect;
     int splitPos;
     SplitType splitType;
 
@@ -96,12 +97,25 @@ public:
     SubRect ();
     SubRect& operator= (const SubRect& other);
 
+    /// Return the area this subrectangle covers
+    const csRect& GetRect() const { return rect; }
+    /// Return the area allocated from this subrectangle
+    const csRect& GetAllocedRect() const { return allocedRect; }
+    /// Clear allocated area
+    void MakeEmpty ()
+    { allocedRect.Set (0, 0, -1, -1); }
+    /// Test if allocated area is empty
+    bool IsEmpty () const
+    { return (allocedRect.xmax < 0) || (allocedRect.ymax < 0); }
+
     /// searches for the "ideal" position of a rectangle
     void TestAlloc (int w, int h, AllocInfo& ai);
     /// Do the actual allocation.
     SubRect* Alloc (int w, int h, const AllocInfo& ai, csRect& r);
     /// De-allocate
     void Reclaim ();
+    bool IsReclaimed() const
+    { return IsEmpty() && (splitType == SPLIT_UNSPLIT); }
     /// Test whether both children are empty.
     void TestCollapse ();
 
