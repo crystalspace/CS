@@ -12,6 +12,8 @@ chronological order.
 	- res fixed an issue in CS::SubRectangles where empty subrects would
 	  later be "collapsed" errorneously when the sibling or a child was
 	  reclaimed.
+	- res fixed csImageMemory which completely ignored the provided buffer
+	  if it was created with a buffer that was not to be destroyed.
 30-Apr-2007
 	- Jorrit changed an example using fountain mesh object to the
 	  particles mesh object.

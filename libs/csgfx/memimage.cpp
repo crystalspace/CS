@@ -94,7 +94,7 @@ void csImageMemory::ConstructBuffers (int width, int height, void* buffer,
   }
   else
   {
-    databuf.AttachNew (new CS::DataBuffer<> (size));
+    databuf.AttachNew (new CS::DataBuffer<> ((char*)buffer, size, false));
   }
 
   Palette = palette;
