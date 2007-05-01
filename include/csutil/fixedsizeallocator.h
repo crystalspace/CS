@@ -33,6 +33,11 @@
 #include <typeinfo>
 #endif
 
+#if defined(CS_DEBUG) && !defined(CS_FIXEDSIZEALLOC_DEBUG)
+#define _CS_FIXEDSIZEALLOC_DEBUG_DEFAULTED
+#define CS_FIXEDSIZEALLOC_DEBUG
+#endif
+
 /**\addtogroup util_memory
  * @{ */
 
@@ -289,6 +294,9 @@ protected: // 'protected' allows access by test-suite.
     }
     void* const node = freenode;
     freenode = freenode->next;
+#ifdef CS_FIXEDSIZEALLOC_DEBUG
+    memset (node, 0xfa, elsize);
+#endif
     return node;
   }
 private:
@@ -429,5 +437,10 @@ public:
 };
 
 /** @} */
+
+#ifdef _CS_FIXEDSIZEALLOC_DEBUG_DEFAULTED
+#undef CS_FIXEDSIZEALLOC_DEBUG
+#undef _CS_FIXEDSIZEALLOC_DEBUG_DEFAULTED
+#endif
 
 #endif // __CSUTIL_FIXEDSIZEALLOCATOR_H__
