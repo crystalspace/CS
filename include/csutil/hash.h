@@ -27,7 +27,7 @@
 #include "csutil/array.h"
 #include "csutil/comparator.h"
 #include "csutil/util.h"
-
+#include "csutil/tuple.h"
 
 /**\addtogroup util_containers
  * @{ */
@@ -464,6 +464,14 @@ public:
   }
 
   /**
+   * h["key"] shorthand notation for h.GetElementPoint ("key")
+   */
+  T* operator[] (const K& key)
+  {
+    return GetElementPointer (key);
+  }
+
+  /**
    * Get the first element matching the given key, or \p fallback if there is 
    * none.
    */
@@ -735,6 +743,15 @@ public:
       return Next ();
     }
 
+    /// Return a tuple of the value and key.
+    const csTuple2<T, K> NextTuple ()
+    {
+      csTuple2<T, K> t (NextNoAdvance (),
+          hash->Elements[bucket][element].key);
+      Advance ();
+      return t;
+    }
+
     /// Move the iterator back to the first element.
     void Reset () { Zero (); Init (); FindItem (); }
   };
@@ -902,6 +919,15 @@ public:
     {
       key = hash->Elements[bucket][element].key;
       return Next ();
+    }
+
+    /// Return a tuple of the value and key.
+    const csTuple2<T, K> NextTuple ()
+    {
+      csTuple2<T, K> t (NextNoAdvance (),
+          hash->Elements[bucket][element].key);
+      Advance ();
+      return t;
     }
 
     /// Move the iterator back to the first element.
