@@ -13,6 +13,8 @@ chronological order.
 	  colors incorrectly by expanding color array size to vertex array
 	  size after having added the vertex, then add another color to the
 	  array, thus usually adding two colors to the array per vertex.
+	- res fixed CS::SubRectangles apparently producing wrong allocations,
+	  resulting in fonts and Thing lightmaps being broken.
 1-May-2007
 	- Genjix added csTuple2 type ala std::pair and extended csHash with
 	  a NextTuple () (returns value, key) as well as an operator["key"].

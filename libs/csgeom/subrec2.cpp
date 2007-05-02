@@ -74,6 +74,7 @@ SubRectangles::SubRect::SubRect ()
   children[0] = 0;
   children[1] = 0;
   parent = 0;
+  MakeEmpty ();
 }
 
 SubRectangles::SubRect& SubRectangles::SubRect::operator= (
@@ -394,7 +395,6 @@ void SubRectangles::SubRect::Reclaim ()
   MakeEmpty();
   if (splitType == SPLIT_UNSPLIT)
   {
-    //MakeEmpty();
     if (parent != 0) parent->TestCollapse ();
   }
   else
@@ -412,7 +412,6 @@ void SubRectangles::SubRect::TestCollapse ()
     && ((children[1] != 0) && children[1]->IsReclaimed()))
   {
     splitType = SPLIT_UNSPLIT;
-    //MakeEmpty();
     superrect->RemoveLeaf (children[0]);
     superrect->RemoveLeaf (children[1]);
     superrect->FreeSubrect (children[0]); children[0] = 0;
