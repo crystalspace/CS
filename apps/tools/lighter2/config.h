@@ -55,6 +55,9 @@ namespace lighter
       /* When the dot product of two normals is bigger than 1-tolerance
          they're considered as equal. */
       float normalsTolerance;
+
+      // Whether to store PD light maps as grayscale maps.
+      bool grayPDMaps;
     };
 
     // Direct light (direct illumination) calculation settings

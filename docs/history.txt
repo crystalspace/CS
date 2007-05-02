@@ -16,6 +16,8 @@ chronological order.
 	- res fixed CS::SubRectangles apparently producing wrong allocations,
 	  resulting in fonts and Thing lightmaps being broken.
 	- res added csColor::Luminance().
+	- res added ability to write grayscale PD maps to lighter2 (enabled
+	  by default since the current PD maps are only grayscale anyway).
 1-May-2007
 	- Genjix added csTuple2 type ala std::pair and extended csHash with
 	  a NextTuple () (returns value, key) as well as an operator["key"].

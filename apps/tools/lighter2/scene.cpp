@@ -1339,7 +1339,8 @@ namespace lighter
         csPtrKey<Light> key;
         LightmapPtrDelArray* lm = pdlIt.Next(key);
         if (lm->Get (i)->IsNull (
-          globalConfig.GetLMProperties().blackThreshold)) continue;
+          globalConfig.GetLMProperties().blackThreshold,
+          globalConfig.GetLMProperties().grayPDMaps)) continue;
 
         csString lmID (key->GetLightID ().HexString());
         csString textureFilename = "lightmaps/";
@@ -1355,7 +1356,8 @@ namespace lighter
         #ifndef DUMP_NORMALS
           lightmapPostProc.ApplyExposure (lm->Get (i));
         #endif
-          lm->Get (i)->SaveLightmap (textureFilename);
+          lm->Get (i)->SaveLightmap (textureFilename,
+            globalConfig.GetLMProperties().grayPDMaps);
         }
         savetex.pdLightmapFiles.Push (textureFilename);
         savetex.pdLightIDs.Push (lmID);

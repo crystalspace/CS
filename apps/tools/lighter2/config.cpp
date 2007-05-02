@@ -40,6 +40,7 @@ namespace lighter
     lmProperties.maxLightmapV = 1024;
     lmProperties.blackThreshold = lightValueEpsilon;
     lmProperties.normalsTolerance = 1.0f * (PI / 180.0f);
+    lmProperties.grayPDMaps = true;
 
     diProperties.pointLightMultiplier = 1.0f;
     diProperties.areaLightMultiplier = 1.0f;
@@ -73,5 +74,8 @@ namespace lighter
       1.0f);
     lmProperties.normalsTolerance = csMax (EPSILON, normalsToleranceAngle * 
       (PI / 180.0f));
+
+    lmProperties.grayPDMaps = cfgMgr->GetBool ("lighter2.grayPDMaps", 
+      lmProperties.grayPDMaps);
   }
 }

@@ -57,28 +57,52 @@ namespace lighter
       width * height,  scaleVal, maxValue);
   }
 
-  void Lightmap::SaveLightmap (const csString& fname)
+  void Lightmap::SaveLightmap (const csString& fname, bool gray)
   {
     ScopedSwapLock<Lightmap> l (*this);
 
     filename = fname;
     //write it out
 
-    // first we downsample to LDR csRGBpixel RGBA
-    const size_t colorArraySize = width*height;
-    csRGBpixel *pixelData = new csRGBpixel[colorArraySize];
-    for (uint i = 0; i < colorArraySize; i++)
+    csRef<iImage> img;
+    void* data;
+    const size_t pixelArraySize = width*height;
+
+    if (gray)
     {
-      csColor &c = colorArray[i];
-      c.Clamp (1.0f,1.0f,1.0f); //just make sure we don't oversaturate below
-      pixelData[i].red = (uint) (c.red * 255.0f);
-      pixelData[i].green = (uint) (c.green * 255.0f);
-      pixelData[i].blue = (uint) (c.blue * 255.0f);
+      // first we downsample to LDR gray values
+      data = cs_malloc (pixelArraySize);
+      uint8* pixelData = (uint8*)data;
+      for (uint i = 0; i < pixelArraySize; i++)
+      {
+        csColor &c = colorArray[i];
+        // make sure we don't oversaturate below
+        float f = csClamp (c.Luminance(), 1.0f, 0.0f);
+        pixelData[i] = (uint) (f * 255.0f);
+      }
+      // make an image
+      csRGBpixel* gray = new csRGBpixel[256];
+      for (int v = 0; v < 256; v++) gray[v].Set (v, v, v);
+      img.AttachNew (new csImageMemory (width, height, pixelData, false,
+        CS_IMGFMT_PALETTED8, gray));
+    }
+    else
+    {
+      // first we downsample to LDR csRGBpixel RGBA
+      data = cs_malloc (pixelArraySize * sizeof (csRGBpixel));
+      csRGBpixel *pixelData = (csRGBpixel*)data;
+      for (uint i = 0; i < pixelArraySize; i++)
+      {
+        csColor &c = colorArray[i];
+        c.Clamp (1.0f,1.0f,1.0f); //just make sure we don't oversaturate below
+        pixelData[i].red = (uint) (c.red * 255.0f);
+        pixelData[i].green = (uint) (c.green * 255.0f);
+        pixelData[i].blue = (uint) (c.blue * 255.0f);
+      }
+      // make an image
+      img.AttachNew (new csImageMemory (width, height, pixelData, false));
     }
 
-    // make an image
-    csRef<iImage> img;
-    img.AttachNew (new csImageMemory (width, height, pixelData));
     csRef<iDataBuffer> imgData = globalLighter->imageIO->Save (img, "image/png");
     csRef<iFile> file = globalLighter->vfs->Open (fname, VFS_FILE_WRITE);
     if (file)
@@ -86,7 +110,7 @@ namespace lighter
       file->Write (imgData->GetData (), imgData->GetSize ());
       file->Flush ();
     }
-    delete[] pixelData;
+    cs_free (data);
   }
 
   void Lightmap::FixupLightmap (const LightmapMask& mask)
@@ -161,15 +185,27 @@ namespace lighter
     return texture;
   }
 
-  bool Lightmap::IsNull (float threshold)
+  bool Lightmap::IsNull (float threshold, bool gray)
   {
     ScopedSwapLock<Lightmap> l (*this);
 
-    for (int i = 0; i < width * height; i++)
+    if (gray)
     {
-      const csColor &c = colorArray[i];
-      if (!c.IsBlack (threshold))
-        return false;
+      for (int i = 0; i < width * height; i++)
+      {
+        float f = colorArray[i].Luminance();
+        if (f >= threshold)
+          return false;
+      }
+    }
+    else
+    {
+      for (int i = 0; i < width * height; i++)
+      {
+        const csColor &c = colorArray[i];
+        if (!c.IsBlack (threshold))
+          return false;
+      }
     }
     return true;
   }

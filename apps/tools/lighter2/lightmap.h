@@ -61,7 +61,7 @@ namespace lighter
     }
 
     // Save the lightmap to given file
-    void SaveLightmap (const csString& file);
+    void SaveLightmap (const csString& file, bool gray = false);
 
     // Fixup, de-antialise lightmap etc
     void FixupLightmap (const LightmapMask& mask);
@@ -87,7 +87,7 @@ namespace lighter
 
     iTextureWrapper* GetTexture();
 
-    bool IsNull (float threshold);
+    bool IsNull (float threshold, bool gray = false);
     bool IsOneColor (float threshold, csColor& color);
 
     void Lock () const
