@@ -136,6 +136,7 @@
 #include "csutil/threadjobqueue.h"
 #include "csutil/timer.h"
 #include "csutil/tree.h"
+#include "csutil/tuple.h"
 #include "csutil/typetraits.h"
 #include "csutil/util.h"
 #include "csutil/verbosity.h"
