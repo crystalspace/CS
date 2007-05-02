@@ -157,7 +157,7 @@ csPtr<iBase> ProctexPDLightLoader::Parse (iDocumentNode* node,
               const char* lightId = child->GetAttributeValue ("lightid");
               const char* image = child->GetContentsValue ();
               csRef<iImage> map = LevelLoader->LoadImage (image, 
-                CS_IMGFMT_TRUECOLOR);
+                CS_IMGFMT_ANY);
               if (!map)
               {
                 Report (CS_REPORTER_SEVERITY_WARNING, child, 

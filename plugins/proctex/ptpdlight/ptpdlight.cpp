@@ -91,27 +91,55 @@ void ProctexPDLight::PDMap::ComputeValueBounds (const csRect& area,
   const int width = imageW;
   maxValue.Set (0, 0, 0);
   nonNullArea.Set (INT_MAX, INT_MAX, INT_MIN, INT_MIN);
-  const Lumel* map = imageData->GetData() + area.ymin * width + area.xmin;
+  
   int mapPitch = width - area.Width ();
-  for (int y = area.ymin; y < area.ymax; y++)
+  if (imageData->IsGray())
   {
-    for (int x = area.xmin; x < area.xmax; x++)
+    const uint8* map = 
+      static_cast<LumelBufferGray*> ((LumelBufferBase*)imageData)->GetData() 
+      + area.ymin * width + area.xmin;
+    for (int y = area.ymin; y < area.ymax; y++)
     {
-      const Lumel& p = *map++;
-
-      if (p.c.red > maxValue.red)
-        maxValue.red = p.c.red;
-      if (p.c.green > maxValue.green)
-        maxValue.green = p.c.green;
-      if (p.c.blue > maxValue.blue)
-        maxValue.blue = p.c.blue;
-
-      if (p.c.red + p.c.green + p.c.blue > 0)
+      for (int x = area.xmin; x < area.xmax; x++)
       {
-        nonNullArea.Extend (x, y);
+	uint8 v = *map++;
+  
+	if (v > maxValue.red)
+          maxValue.Set (v, v, v);
+  
+	if (v > 0)
+	{
+	  nonNullArea.Extend (x, y);
+	}
       }
+      map += mapPitch;
     }
-    map += mapPitch;
+  }
+  else
+  {
+    const Lumel* map = 
+      static_cast<LumelBufferRGB*> ((LumelBufferBase*)imageData)->GetData() 
+      + area.ymin * width + area.xmin;
+    for (int y = area.ymin; y < area.ymax; y++)
+    {
+      for (int x = area.xmin; x < area.xmax; x++)
+      {
+	const Lumel& p = *map++;
+  
+	if (p.c.red > maxValue.red)
+	  maxValue.red = p.c.red;
+	if (p.c.green > maxValue.green)
+	  maxValue.green = p.c.green;
+	if (p.c.blue > maxValue.blue)
+	  maxValue.blue = p.c.blue;
+  
+	if (p.c.red + p.c.green + p.c.blue > 0)
+	{
+	  nonNullArea.Extend (x, y);
+	}
+      }
+      map += mapPitch;
+    }
   }
 }
 
@@ -167,21 +195,33 @@ void ProctexPDLight::PDMap::ComputeValueBounds (const TileHelper& tiles,
 
 void ProctexPDLight::PDMap::SetImage (const TileHelper& tiles, iImage* img)
 {
-  CS::ImageAutoConvert useImage (img, CS_IMGFMT_TRUECOLOR);
-  imageW = useImage->GetWidth();
-  imageH = useImage->GetHeight();
+  imageW = img->GetWidth();
+  imageH = img->GetHeight();
   size_t numPixels = imageW * imageH;
-  imageData.AttachNew (new (numPixels) LumelBuffer);
-  const csRGBpixel* src = (csRGBpixel*)useImage->GetImageData();
-  Lumel* dst = imageData->GetData();
-  while (numPixels-- > 0)
+  if ((img->GetFormat() & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
   {
-    dst->c.red = src->red;
-    dst->c.green = src->green;
-    dst->c.blue = src->blue;
-    dst->c.alpha = 0;
-    dst++;
-    src++;
+    // Assume grayscale map
+    LumelBufferGray* imageDataGray = new (numPixels) LumelBufferGray;
+    imageData.AttachNew (imageDataGray);
+    const uint8* src = (uint8*)img->GetImageData();
+    uint8* dst = imageDataGray->GetData();
+    memcpy (dst, src, numPixels);
+  }
+  else
+  {
+    LumelBufferRGB* imageDataRGB = new (numPixels) LumelBufferRGB;
+    imageData.AttachNew (imageDataRGB);
+    const csRGBpixel* src = (csRGBpixel*)img->GetImageData();
+    Lumel* dst = imageDataRGB->GetData();
+    while (numPixels-- > 0)
+    {
+      dst->c.red = src->red;
+      dst->c.green = src->green;
+      dst->c.blue = src->blue;
+      dst->c.alpha = 0;
+      dst++;
+      src++;
+    }
   }
   ComputeValueBounds (tiles); 
 }
@@ -196,21 +236,44 @@ void ProctexPDLight::PDMap::Crop ()
   }
   if (nonNullArea.IsEmpty()) return;
 
-  csRef<LumelBuffer> newData;
-  newData.AttachNew (
-    new (nonNullArea.Width() * nonNullArea.Height()) LumelBuffer);
-  const Lumel* srcMap = 
-    imageData->GetData() + nonNullArea.ymin * imageW + nonNullArea.xmin;
-  int rowSize = nonNullArea.Width ();
-  Lumel* dstMap = newData->GetData();
-  for (int y = nonNullArea.Height(); y-- > 0; )
+  if (imageData->IsGray())
   {
-    memcpy (dstMap, srcMap, rowSize * sizeof (Lumel));
-    dstMap += rowSize;
-    srcMap += imageW;
+    csRef<LumelBufferGray> newData;
+    newData.AttachNew (
+      new (nonNullArea.Width() * nonNullArea.Height()) LumelBufferGray);
+    const uint8* srcMap = 
+      static_cast<LumelBufferGray*> ((LumelBufferBase*)imageData)->GetData() 
+      + nonNullArea.ymin * imageW + nonNullArea.xmin;
+    int rowSize = nonNullArea.Width ();
+    uint8* dstMap = newData->GetData();
+    for (int y = nonNullArea.Height(); y-- > 0; )
+    {
+      memcpy (dstMap, srcMap, rowSize);
+      dstMap += rowSize;
+      srcMap += imageW;
+    }
+  
+    imageData = newData;
   }
-
-  imageData = newData;
+  else
+  {
+    csRef<LumelBufferRGB> newData;
+    newData.AttachNew (
+      new (nonNullArea.Width() * nonNullArea.Height()) LumelBufferRGB);
+    const Lumel* srcMap = 
+      static_cast<LumelBufferRGB*> ((LumelBufferBase*)imageData)->GetData() 
+      + nonNullArea.ymin * imageW + nonNullArea.xmin;
+    int rowSize = nonNullArea.Width ();
+    Lumel* dstMap = newData->GetData();
+    for (int y = nonNullArea.Height(); y-- > 0; )
+    {
+      memcpy (dstMap, srcMap, rowSize * sizeof (Lumel));
+      dstMap += rowSize;
+      srcMap += imageW;
+    }
+  
+    imageData = newData;
+  }
   imageX = nonNullArea.xmin;
   imageY = nonNullArea.ymin;
   imageW = nonNullArea.Width();
@@ -343,10 +406,14 @@ bool ProctexPDLight::PrepareAnim ()
 static const int shiftR = 16;
 static const int shiftG =  8;
 static const int shiftB =  0;
+static const uint32 grayToRGBmul = 0x00010101;
+static const uint32 grayToRGBalpha = 0xff000000;
 #else
 static const int shiftR =  8;
 static const int shiftG = 16;
 static const int shiftB = 24;
+static const uint32 grayToRGBmul = 0x01010100;
+static const uint32 grayToRGBalpha = 0x000000ff;
 #endif
 
 template<int shift>
@@ -423,18 +490,87 @@ static void MultiplyAddLumels (ProctexPDLight::Lumel* dst, size_t dstPitch,
   }
 }
 
+template<int safeMask>
+static void MultiplyAddLumels8 (ProctexPDLight::Lumel* dst, size_t dstPitch,
+                                const uint8* map, size_t mapPitch,
+                                int columns, int rows,
+                                const uint32* lutR, 
+                                const uint32* lutG, 
+                                const uint32* lutB)
+{
+  for (int y = 0; y < rows; y++)
+  {
+    for (int x = 0; x < columns; x++)
+    {
+      const uint8 v = *map++;
+      uint32 dstVal = dst->ui;
+      if (safeMask & safeR)
+      {
+        // Possible overflow may occur
+        uint32 r = dstVal & (0xff << shiftR);
+        r += lutR[v];
+        if (r > (0xff << shiftR)) r = (0xff << shiftR);
+        dstVal &= ~(0xff << shiftR);
+        dstVal |= r;
+      }
+      else
+        // Overflow can't occur
+        dstVal += lutR[v];
+
+      if (safeMask & safeG)
+      {
+        uint32 g = dstVal & (0xff << shiftG);
+        g += lutG[v];
+        if (g > (0xff << shiftG)) g = (0xff << shiftG);
+        dstVal &= ~(0xff << shiftG);
+        dstVal |= g;
+      }
+      else
+        dstVal += lutG[v];
+
+      if (safeMask & safeB)
+      {
+        uint32 b = dstVal & (0xff << shiftB);
+        b += lutB[v];
+        if (b > (0xff << shiftB)) b = (0xff << shiftB);
+        dstVal &= ~(0xff << shiftB);
+        dstVal |= b;
+      }
+      else
+        dstVal += lutB[v];
+
+      (dst++)->ui = dstVal;
+    }
+    dst += dstPitch;
+    map += mapPitch;
+  }
+}
+
 typedef void (*MultiplyAddProc) (ProctexPDLight::Lumel* dst, size_t dstPitch,
                                  const ProctexPDLight::Lumel* map, size_t mapPitch,
                                  int columns, int rows,
                                  const uint32* lutR, 
                                  const uint32* lutG, 
                                  const uint32* lutB);
+typedef void (*MultiplyAddProc8) (ProctexPDLight::Lumel* dst, size_t dstPitch,
+                                  const uint8* map, size_t mapPitch,
+                                  int columns, int rows,
+                                  const uint32* lutR, 
+                                  const uint32* lutG, 
+                                  const uint32* lutB);
 
 static const MultiplyAddProc maProcs[8] = {
   MultiplyAddLumels<0>, MultiplyAddLumels<1>, 
   MultiplyAddLumels<2>, MultiplyAddLumels<3>, 
   MultiplyAddLumels<4>, MultiplyAddLumels<5>, 
   MultiplyAddLumels<6>, MultiplyAddLumels<7>
+};
+
+static const MultiplyAddProc8 maProcs8[8] = {
+  MultiplyAddLumels8<0>, MultiplyAddLumels8<1>, 
+  MultiplyAddLumels8<2>, MultiplyAddLumels8<3>, 
+  MultiplyAddLumels8<4>, MultiplyAddLumels8<5>, 
+  MultiplyAddLumels8<6>, MultiplyAddLumels8<7>
 };
 
 void ProctexPDLight::Animate (csTicks current_time)
@@ -482,15 +618,35 @@ void ProctexPDLight::Animate (csTicks current_time)
         Lumel* scratchPtr = scratch.GetArray();
         if (baseMap.imageData.IsValid())
         {
-          Lumel* basePtr = (baseMap.imageData->GetData()) +
-            tileRect.ymin * mat_w + tileRect.xmin;
-          for (int y = 0; y < lines; y++)
+          if (baseMap.imageData->IsGray())
           {
-            memcpy (scratchPtr, basePtr, scratchW * sizeof (Lumel));
-            scratchPtr += scratchW;
-            basePtr += mat_w;
+	    uint8* basePtr = static_cast<LumelBufferGray*> (
+		(LumelBufferBase*)baseMap.imageData)->GetData()
+	      + tileRect.ymin * mat_w + tileRect.xmin;
+	    for (int y = 0; y < lines; y++)
+	    {
+              for (int x = 0; x < scratchW; x++)
+              {
+                uint8 v = basePtr[x];
+                scratchPtr[x].ui = (grayToRGBmul * v) | grayToRGBalpha;
+              }
+	      scratchPtr += scratchW;
+	      basePtr += mat_w;
+	    }
           }
-          scratchMax = baseMap.maxValues[t];
+          else
+          {
+	    Lumel* basePtr = static_cast<LumelBufferRGB*> (
+		(LumelBufferBase*)baseMap.imageData)->GetData()
+	      + tileRect.ymin * mat_w + tileRect.xmin;
+	    for (int y = 0; y < lines; y++)
+	    {
+	      memcpy (scratchPtr, basePtr, scratchW * sizeof (Lumel));
+	      scratchPtr += scratchW;
+	      basePtr += mat_w;
+	    }
+	  }
+	  scratchMax = baseMap.maxValues[t];
         }
         else
         {
@@ -530,9 +686,6 @@ void ProctexPDLight::Animate (csTicks current_time)
 
         int mapW = csMin (lightInTile.xmax, light.map.imageX + light.map.imageW)
           - csMax (lightInTile.xmin, light.map.imageX);
-        const Lumel* mapPtr = (light.map.imageData->GetData()) +
-          (lightInTile.ymin - light.map.imageY) * light.map.imageW +
-          (lightInTile.xmin - light.map.imageX) ;
         int lines = csMin (lightInTile.ymax, light.map.imageY + light.map.imageH)
           - csMax (lightInTile.ymin, light.map.imageY);
         int mapPitch = light.map.imageW - mapW;
@@ -546,8 +699,35 @@ void ProctexPDLight::Animate (csTicks current_time)
         mapMax.red   = lutR[mapMax.red]   >> shiftR;
         mapMax.green = lutG[mapMax.green] >> shiftG;
         mapMax.blue  = lutB[mapMax.blue]  >> shiftB;
+        
+        CS_PROFILER_ZONE(ProctexPDLight_Animate_inner)
+        if (light.map.imageData->IsGray())
         {
-          CS_PROFILER_ZONE(ProctexPDLight_Animate_inner)
+	  const uint8* mapPtr = static_cast<LumelBufferGray*> (
+		  (LumelBufferBase*)light.map.imageData)->GetData()
+	    + (lightInTile.ymin - light.map.imageY) * light.map.imageW
+	    + (lightInTile.xmin - light.map.imageX) ;
+	  
+          int safeMask = 0;
+          if (scratchMax.red   + mapMax.red   > 255) safeMask |= safeR;
+          if (scratchMax.green + mapMax.green > 255) safeMask |= safeG;
+          if (scratchMax.blue  + mapMax.blue  > 255) safeMask |= safeB;
+          MultiplyAddProc8 maProc = maProcs8[safeMask];
+          maProc (scratchPtr, scratchPitch, mapPtr, mapPitch,
+            mapW, lines, lutR, lutG, lutB);
+
+          if (safeMask == 0)
+            scratchMax.UnsafeAdd (mapMax);
+          else
+            scratchMax.SafeAdd (mapMax);
+        }
+        else
+        {
+	  const Lumel* mapPtr = static_cast<LumelBufferRGB*> (
+		  (LumelBufferBase*)light.map.imageData)->GetData()
+	    + (lightInTile.ymin - light.map.imageY) * light.map.imageW
+	    + (lightInTile.xmin - light.map.imageX) ;
+	  
           int safeMask = 0;
           if (scratchMax.red   + mapMax.red   > 255) safeMask |= safeR;
           if (scratchMax.green + mapMax.green > 255) safeMask |= safeG;

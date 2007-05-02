@@ -69,24 +69,18 @@ public:
       } c;
       uint32 ui;
     };
-
-    void UnsafeAdd (int R, int G, int B)
-    {
-      c.red   = (unsigned char)(c.red   + R);
-      c.green = (unsigned char)(c.green + G);
-      c.blue  = (unsigned char)(c.blue  + B);
-    }
-    void SafeAdd (int R, int G, int B)
-    {
-      int color = c.red + R;
-      c.red   = (unsigned char)(color > 255 ? 255 : color);
-      color = c.green + G;
-      c.green = (unsigned char)(color > 255 ? 255 : color);
-      color = c.blue + B;
-      c.blue  = (unsigned char)(color > 255 ? 255 : color);
-    }
   };
-  struct LumelBuffer : public csRefCount
+  struct LumelBufferBase : public csRefCount
+  {
+  private:
+    bool gray;
+  protected:
+    LumelBufferBase (bool gray) : gray (gray) {}
+  public:
+    bool IsGray() const { return gray; }
+  };
+
+  struct LumelBufferRGB : public LumelBufferBase
   {
     static CS_FORCEINLINE size_t LumelAlign (size_t n)
     {
@@ -94,7 +88,8 @@ public:
       return ((n + align - 1) / align) * align;
     }
   public:
-    CS_FORCEINLINE Lumel* GetData () 
+    LumelBufferRGB () : LumelBufferBase (false) {}
+    CS_FORCEINLINE Lumel* GetData ()
     { 
       return reinterpret_cast<Lumel*> (
         (reinterpret_cast<uint8*> (this)) + LumelAlign (sizeof (*this))); 
@@ -102,9 +97,9 @@ public:
     
     inline void* operator new (size_t n, size_t lumels)
     { 
-      CS_ASSERT (n == sizeof (LumelBuffer));
+      CS_ASSERT (n == sizeof (LumelBufferRGB));
       size_t allocSize = 
-        LumelAlign (sizeof (LumelBuffer)) + lumels * sizeof (Lumel);
+        LumelAlign (sizeof (LumelBufferRGB)) + lumels * sizeof (Lumel);
       return cs_malloc (allocSize);
     }
     inline void operator delete (void* p, size_t lumels) 
@@ -117,11 +112,39 @@ public:
     }
 
   };
+
+  struct LumelBufferGray : public LumelBufferBase
+  {
+  public:
+    LumelBufferGray () : LumelBufferBase (true) {}
+    CS_FORCEINLINE uint8* GetData ()
+    { 
+      return (reinterpret_cast<uint8*> (this)) + sizeof (*this); 
+    }
+    
+    inline void* operator new (size_t n, size_t lumels)
+    { 
+      CS_ASSERT (n == sizeof (LumelBufferGray));
+      size_t allocSize = 
+        sizeof (LumelBufferGray) + lumels;
+      return cs_malloc (allocSize);
+    }
+    inline void operator delete (void* p, size_t lumels) 
+    {
+      cs_free (p);
+    }
+    inline void operator delete (void* p) 
+    {
+      cs_free (p);
+    }
+
+  };
+
   class PDMap
   {
     friend class ProctexPDLight;
 
-    csPtr<LumelBuffer> CropLumels (LumelBuffer* lumels, 
+    csPtr<LumelBufferRGB> CropLumels (LumelBufferRGB* lumels, 
       const csRect& lumelsRect, const csRect& cropRect);
 
     void ComputeValueBounds (const csRect& area, 
@@ -133,7 +156,7 @@ public:
     csBitArray tileNonNull;
     csArray<csRect> nonNullAreas;
     int imageX, imageY, imageW, imageH;
-    csRef<LumelBuffer> imageData;
+    csRef<LumelBufferBase> imageData;
 
     PDMap (size_t tilesNum) : imageX (0), imageY (0), imageW (0), imageH (0),
       imageData (0) 
