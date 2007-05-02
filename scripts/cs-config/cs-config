@@ -12,7 +12,7 @@ TEMP_PREFIX=/tmp/cs-config$$
 # @@@ FIXME: What about $CRYSTAL_x_y env vars?
 OLD_IFS="$IFS"
 IFS=$PATH_SEPARATOR
-for p in $CRYSTAL$PATH_SEPARATOR$PATH ; do
+for p in $CRYSTAL$PATH_SEPARATOR$CRYSTAL/bin$PATH_SEPARATOR$PATH ; do
   if [ -d "$p" ] ; then
     # The -executable predicate would do what we like, but is not available
     # with older find versions.

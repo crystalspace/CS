@@ -21,6 +21,8 @@ chronological order.
 	- res made ptpdlight support grayscale PD maps "natively" (that is,
 	  they're not converted to RGB internally).
 	- res silenced some deprecation warnings on VC.
+	- res changed the cs-config wrapper to also lool into $CRYSTAL/bin
+	  for wrapped cs-config-X.Y scripts.
 1-May-2007
 	- Genjix added csTuple2 type ala std::pair and extended csHash with
 	  a NextTuple () (returns value, key) as well as an operator["key"].
