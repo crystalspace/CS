@@ -20,6 +20,7 @@ chronological order.
 	  by default since the current PD maps are only grayscale anyway).
 	- res made ptpdlight support grayscale PD maps "natively" (that is,
 	  they're not converted to RGB internally).
+	- res silenced some deprecation warnings on VC.
 1-May-2007
 	- Genjix added csTuple2 type ala std::pair and extended csHash with
 	  a NextTuple () (returns value, key) as well as an operator["key"].

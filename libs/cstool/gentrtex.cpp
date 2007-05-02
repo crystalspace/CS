@@ -25,7 +25,7 @@
 #include "csgfx/imagememory.h"
 #include "csqint.h"
 
-
+#include "csutil/win32/msvc_deprecated_warn_off.h"
 
 //-- csGenerateImageTextureBlend ----------------------------------
 csGenerateImageTextureBlend::csGenerateImageTextureBlend()

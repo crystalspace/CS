@@ -34,6 +34,8 @@ struct iImage;
 
 struct csRGBpixel;
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * A base class which represents a value that can be computed
  * for blending purposes for each pixel.
@@ -259,6 +261,7 @@ public:
   virtual float GetValue(float x, float y);
 };
 
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_GENTERTEX_H__
 
