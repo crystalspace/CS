@@ -117,6 +117,9 @@ public:
   /// Subtract given R,G,B components from color.
   void Subtract (float r, float g, float b)
   { red -= r; green -= g; blue -= b; }
+  /// Return luminance of pixel (assuming sRGB color space)
+  float Luminance() const
+  { return red*0.2126f + green*0.7152f + blue*0.0722f; }
 };
 
 /// Divide a color by a scalar.
