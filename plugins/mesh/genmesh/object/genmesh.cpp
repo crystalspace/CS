@@ -2074,10 +2074,10 @@ void csGenmeshMeshObjectFactory::AddVertex (const csVector3& v,
       const csVector2& uv, const csVector3& normal,
       const csColor4& color)
 {
+  GetColors (true);
   mesh_vertices.Push (v);
   mesh_texels.Push (uv);
   mesh_normals.Push (normal);
-  GetColors (true);
   mesh_colors.Push (color);
   Invalidate ();
 }

@@ -9,6 +9,10 @@ chronological order.
 2-May-2007
 	- Genjix corrected copyright blurb, added some doxygen comments and
 	  made the parameters use const references.
+	- caedes fixed a bug in genmesh AddVertex where it would allocate
+	  colors incorrectly by expanding color array size to vertex array
+	  size after having added the vertex, then add another color to the
+	  array, thus usually adding two colors to the array per vertex.
 1-May-2007
 	- Genjix added csTuple2 type ala std::pair and extended csHash with
 	  a NextTuple () (returns value, key) as well as an operator["key"].
