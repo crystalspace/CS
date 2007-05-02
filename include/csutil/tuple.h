@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2003 by Mat Sutcliffe <oktal@gmx.co.uk>
+    Copyright (C) 2003 by Marten Svanfeldt <developer@svanfeldt.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -35,19 +35,35 @@ template <typename First, typename Second>
 class csTuple2
 {
 public:
+  /// typedef that can be accessed to recreate object of
+  /// the first type
   typedef First FirstType;
+  /// typedef that can be accessed to recreate object of
+  /// the second type
   typedef Second SecondType;
 
+  /// First element in Tuple
   First first;
+  /// Second element in Tuple
   Second second;
 
-  csTuple2 () {}
-  csTuple2 (const First first, const Second second)
+  /// Empty default constructor.
+  csTuple2 () : first (), second () {}
+  /// Constructor to initialise both elements
+  csTuple2 (const First& first, const Second& second)
     : first (first), second (second) {}
+  /// Templated constructor from another csTuple2
   template <typename AlFirst, typename AlSecond>
   csTuple2 (const csTuple2<AlFirst, AlSecond>& t)
     : first (t.first), second (t.second) {}
 };
+
+/// Convenience function to create a csTuple2 from 2 types
+template <typename First, typename Second>
+inline csTuple2<First, Second> MakeTuple(First first, Second second)
+{
+  return csTuple2<First, Second> (first, second);
+}
 
 /** @} */
 
