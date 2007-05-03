@@ -307,6 +307,7 @@ class csColor(_object):
     def __ne__(*args): return _cspace.csColor___ne__(*args)
     def Add(*args): return _cspace.csColor_Add(*args)
     def Subtract(*args): return _cspace.csColor_Subtract(*args)
+    def Luminance(*args): return _cspace.csColor_Luminance(*args)
     def __add__(*args): return _cspace.csColor___add__(*args)
     def __sub__(*args): return _cspace.csColor___sub__(*args)
     def __rmul__(*args): return _cspace.csColor___rmul__(*args)

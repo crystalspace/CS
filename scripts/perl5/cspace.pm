@@ -517,6 +517,7 @@ sub new {
 *__ne__ = *cspacec::csColor___ne__;
 *Add = *cspacec::csColor_Add;
 *Subtract = *cspacec::csColor_Subtract;
+*Luminance = *cspacec::csColor_Luminance;
 *__add__ = *cspacec::csColor___add__;
 *__sub__ = *cspacec::csColor___sub__;
 sub DESTROY {
