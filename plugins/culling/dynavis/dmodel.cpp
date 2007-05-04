@@ -319,7 +319,7 @@ bool csObjectModelManager::CheckObjectModel (csDynavisObjectModel* model,
       }
       model->single_polygon = trimesh->GetTriangleCount () == 1;
     }
-    else if (!model->use_trianglemesh && mesh)
+    else if ((!model->use_trianglemesh) && mesh)
     {
       if (mesh->GetPolygonCount () == 0)
       {

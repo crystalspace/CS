@@ -66,7 +66,8 @@ void csTriangleMeshTools::CalculatePlanes (iTriangleMesh* mesh,
     CS_ASSERT (a >= 0 && a < (int)num_verts);
     CS_ASSERT (b >= 0 && b < (int)num_verts);
     CS_ASSERT (c >= 0 && c < (int)num_verts);
-    planes[p].Set (verts[a], verts[b], verts[c]);
+    planes[p].Set (verts[c], verts[b], verts[a]);
+    planes[p].Normalize ();
     tri++;
   }
 }
@@ -242,6 +243,7 @@ size_t csTriangleMeshTools::CheckActiveEdges (
 	csTriangleMeshEdge* edges, size_t num_edges,
   	csPlane3* planes)
 {
+  if (num_edges == (size_t)~0) return 0;
   size_t i;
   csTriangleMeshEdge* e = edges;
   int active = 0;

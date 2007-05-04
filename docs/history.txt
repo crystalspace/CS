@@ -6,6 +6,15 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-May-2007
+	- Jorrit protected csTriangleMeshTools::CheckActiveEdges() against
+	  empty meshes (num_edges == ~0).
+	- Jorrit fixed a bug in csTriangleMeshTools::CalculatePlanes(). This
+	  function was calculating the planes in reverse orientation compared
+	  to csPolygonMeshTools::CalculatePlanes() (and also not normalized).
+	  As a consequence of this, single-sided polygons (like portals)
+	  would cull from the wrong side with Dynavis.
+	  This fixes #330.
 2-May-2007
 	- Genjix corrected copyright blurb, added some doxygen comments and
 	  made the parameters use const references.
