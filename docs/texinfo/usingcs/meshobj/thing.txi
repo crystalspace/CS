@@ -211,8 +211,7 @@ Using this you can set the alpha transparency factor of this polygon.
 This is a value between 0 and 100.
 @item <mixmode><mode /></mixmode>
 With this you can control more blending options for the polygon.
-One of @samp{add}, @samp{alpha}, @samp{copy}, @samp{keycolor},
-@samp{multiply2}, @samp{multiply}, or @samp{transparent}.
+@pxref{XMLServices Mixmode}.
 @item len(scale) FIXME: obsolete ?
 This is similar to the @samp{texlen} command in the part and also to the
 @samp{len} command in the texture definition but it is repeated here

@@ -1,0 +1,121 @@
+@c -*-texinfo-*-
+@node XML Syntax Services, Old Map File Format, HOWTO Level Loading, Map Loader
+@subsection @sc{xml} Syntax Services
+@cindex Syntax Services
+@cindex @code{iSyntaxService}
+
+Various loaders in Crystal Space require the parsing of several common
+idioms (like vectors, matrices, @dots{}). To help with this there is
+the syntax services plugin. This section is mainly useful for people who
+want to write their own loader plugin or people who want to know the @sc{xml}
+syntax for one of the items parsed by this plugin.
+
+@menu
+* XMLServices Intro:: Getting the Plugin and Intro
+* XMLServices Mixmode:: Parsing Mixmode
+@end menu
+
+@node XMLServices Intro, XML World Element Section, XML File Format, XML File Format
+@subsubsection Getting the Plugin and Intro
+
+@subsubheading Getting the Plugin
+
+This plugin has @samp{crystalspace.syntax.loader.service.text} as plugin id.
+Usually this plugin is already loaded if you also use the main loader plugin.
+In that case you can get this plugin from the object registry by doing:
+
+@example
+csRef<iSyntaxService> services = csQueryRegistry<iSyntaxService> (object_reg);
+@end example
+
+If you need to load the plugin yourselves then the following code would
+work. This code will first check if the plugin is already loaded. If not
+it will load it:
+
+@example
+csRef<iSyntaxService> services = csLoadPluginCheck<iSyntaxService> (
+  object_reg, "crystalspace.syntax.loader.service.text");
+@end example
+
+@subsubheading Introduction
+
+This plugin implements the @code{iSyntaxService} interface. The definition
+of this interface can be found in @file{imap/services.h}. There are
+basically three kinds of functions in this interface:
+
+@itemize @bullet
+@item @samp{Reporting Helpers}
+These are functions that make it easier for a plugin writer to report
+an error to the user.
+@item @samp{Parsing Helpers}
+These functions are the main part of this plugin. They all start with
+@samp{Parse} and help with parsing a small part of the @sc{xml} format.
+They all expect a node (@code{iDocumentNode}) to be parsed as the input
+and they return the parsed result or an error.
+@item @samp{Writing Helpers}
+These functions create @sc{xml} (in the given @code{iDocumentNode} parameter)
+for some basic Crystal Space object. They are useful if you ware making
+a plugin that saves @sc{xml}.
+@end itemize
+
+In this document we explain a few of the more important parsing functions
+present in this plugin.
+
+@node XMLServices Mixmode, XML World Element Section, XML File Format, XML File Format
+@subsubsection Parsing Mixmode
+@cindex parsing mixmode
+
+The @code{iSyntaxService::ParseMixmode()} function parses a @samp{mixmode}
+node which is used for defining transparency or how the source (usually
+a texture) is blended with the destination (usually a screen buffer). In the
+explanation below we use the following terms: @sc{src} is the source of
+the blend operation (usually the texture or material). @sc{dst} is the
+destination of the blend operation (usually the screen buffer or texture
+on which you are rendering). @samp{srcAlpha} is the alpha component
+of the source buffer. @samp{dstAlpha} is the alpha component of the destination
+buffer. @samp{alpha} is a fixed alpha value as given in the mixmode
+itself. The following children are supported for mixmode:
+
+@itemize @bullet
+@item @samp{copy}
+Blending function: @sc{src}. This mode is usually default. It simply
+copies the source to the destination without blending.
+@item @samp{multiply}
+Blending function: @sc{src}*@sc{dst}. This is a common blend mode to
+simulate lighting.
+@item @samp{multiply2}
+Blending function: 2*@sc{src}*@src{dst}. This is a common blend mode
+to simulate brighter lighting.
+@item @samp{add}
+Blending function: @sc{src}+@sc{dst}. Add source and destination. This is a
+mode that allows for nice transparency effects. One of the big advantages (as
+opposed to @samp{alpha}) is that this mode doesn't require objects to be
+sorted from back to front.
+@item @samp{alpha}
+Blending function: @@@TODO 1-@samp{srcAlpha}*@sc{src} + @samp{srcAlpha}*@sc{dst}.
+@samp{alpha} expects a value between 0 and 1 as a parameter.
+@item @samp{premultalpha}
+Blending function: @sc{src} + @sc{dst}*(1-@samp{srcAlpha}). When the
+source alpha component was multoplied into the source color then this acts
+like normal alpha blending. If it was not then it acts like additive
+blending. So this mixmode can be used to do both additive and alpha
+blending on the same triangle even and interpolate between these two
+extremes by appropriate choice of the color and alpha values.
+@item @samp{destalphaadd}
+Blending function: @samp{dstAlpha}*@sc{src} + @sc{dst}.
+@item @samp{srcalphaadd}
+Blending function: @samp{srcAlpha}*@sc{src} + @sc{dst}.
+@item @samp{transparent}
+Blending function: @sc{dst}. This mode will simply leave the destination
+unchanged (fully transparent) except that the z-buffer is modified!
+@item @samp{mesh}
+@@@TODO
+@item @samp{alphatest}
+One of: @samp{auto}, @samp{enable}, or @samp{disable}. @@@TODO
+@item @samp{blendop}
+This child expects two attributes: @samp{src} and @samp{dest}. Both can have one of the following as a value: @samp{dstalpha}, @samp{dstalpha_inv},
+@samp{dstcolor}, @samp{dstcolor_inv}, @samp{one}, @samp{srcalpha},
+@samp{srcalpha_inv}, @samp{scrcolor}, @samp{srccolor_inv}, or @samp{zero}.
+@@@TODO
+@end itemize
+

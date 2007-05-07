@@ -113,8 +113,7 @@ current frame and action, and various other configuration parameters for an
 @item <factory>factoryname</factory>
 Name of the factory to use for creation of this instance.
 @item <mixmode><mode \></mixmode>
-Blending mode, one of @samp{add}, @samp{alpha}, @samp{copy}, @samp{keycolor},
-@samp{multiply2}, @samp{multiply}, or @samp{transparent}.
+Blending mode. @pxref{XMLServices Mixmode}.
 @item <material>materialname</material>
 Material to use for the sprite.
 @item <tween>yes/no</tween>

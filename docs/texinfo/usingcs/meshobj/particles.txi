@@ -139,6 +139,7 @@ Enable or disable deep-copy on creation of particle systems.
 Set the default material for particle system factory.
 @item <mixmode>mixmode</mixmode>
 Set the default mixmode for particle system factory.
+@pxref{XMLServices Mixmode}.
 @end table
 
 @subsubheading Object Loader
@@ -154,6 +155,7 @@ Set the factory to use when creating the particle system.
 Set the material for particle system.
 @item <mixmode>mixmode</mixmode>
 Set the mixmode for particle system.
+@pxref{XMLServices Mixmode}.
 @item <preadvance>time</preadvance>
 Advance the time of the particle system object by the given duration.
 This is useful to fill a particle system after its initial creation.

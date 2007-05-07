@@ -76,8 +76,7 @@ Enable/disable lighting.
 @item <material>materialname</material>
 Material to use for the polygon.
 @item <mixmode><mode /></mixmode>
-Blending mode; one of @samp{add}, @samp{alpha}, @samp{copy}, @samp{keycolor},
-@samp{multiply2}, @samp{multiply}, or @samp{transparent}.
+Blending mode. @pxref{XMLServices Mixmode}.
 @item <uvanimation name=uvanimationname><frame @dots{}> @dots{}
 Define an uv animation, that is a sequence of frames which textures are all in
 one big texture.  Thus the animation is achieved by altering the (u,v)
@@ -111,8 +110,7 @@ settings, and also the vertices of the 2D polygon controlled by this plugin.
 @item <factory>factoryname</factory>
 Name of the factory to use for creation of this instance.
 @item <mixmode><mode /></mixmode>
-Blending mode, one of @samp{add}, @samp{alpha}, @samp{copy}, @samp{keycolor},
-@samp{multiply2}, @samp{multiply}, or @samp{transparent}.
+Blending mode. @pxref{XMLServices Mixmode}.
 @item <material>materialname</material>
 Material to use for the polygon.
 @item <lighting>yes/no</lighting>

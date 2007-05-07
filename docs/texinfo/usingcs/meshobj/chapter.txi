@@ -18,7 +18,7 @@ in your own game:
 most useful mesh objects. You can use it for static data (walls, buildings,
 floor, @dots{}) or for dynamic data (moving objects). It supports multiple
 materials, vertex lighting, and even animation. Using the new @samp{lighter2}
-app it can also support lightmaps.
+app it can also support lightmaps. @xref{Using lighter2}.
 @item
 @samp{Thing} (@pxref{MeshObject Thing}). The thing object is often used
 for static geometry (walls and buildings). It supports lightmaps natively.
