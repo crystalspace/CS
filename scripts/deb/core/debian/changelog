@@ -1,8 +1,13 @@
-crystalspace (0.99-20061023-1) unstable; urgency=low
+crystalspace (1.0-20070508-1) unstable; urgency=low
 
-  * New upstream 1.0 prerelease, switch to SVN
+  * First upstream stable version (Closes: #400884)
+  * Fix FTBFS: lack of libcrystalspace.a... (Closes: #358545)
+  * Fix FTBFS: path problem (Closes: #399843)
+  * Do not know how to convert to IEEE floats, fixed upstream (Closes: #358044)
+  * Changed python dependancy for python-support (Closes: #380792)
+  * Renamed startme to csstartme (Closes: #401421) filename namespace pollution 
 
- -- Christian Bayle <bayle@debian.org>  Mon, 23 Oct 2006 21:29:27 +0200
+ -- Christian Bayle <bayle@debian.org>  Mon,  7 May 2007 21:18:42 +0200
 
 crystalspace (0.99-20060125-2) unstable; urgency=low
 
