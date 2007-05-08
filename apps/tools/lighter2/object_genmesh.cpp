@@ -373,7 +373,7 @@ namespace lighter
     genMesh->SetShadowReceiving (false);
     genMesh->SetManualColors (true);
     genMesh->SetLighting (false);
-    genMesh->RemoveRenderBuffer ("colors");
+    genMesh->RemoveRenderBuffer ("color");
     genMesh->RemoveRenderBuffer ("texture coordinate lightmap");
 
    // Still may need to fix up submesh materials...
@@ -559,7 +559,7 @@ namespace lighter
           paramChild->CreateNodeBefore (CS_NODE_ELEMENT, 0);
         renderbufferChild->SetValue ("renderbuffer");
 
-        renderbufferChild->SetAttribute ("name", "colors");
+        renderbufferChild->SetAttribute ("name", "color");
 
         synsrv->WriteRenderBuffer (renderbufferChild, staticColorsBuf);
       }
