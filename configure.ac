@@ -1725,21 +1725,6 @@ CS_CHECK_LIB_WITH([caca],
 
 
 
-#------------------------------------------------------------------------------
-# Check for SpiderMonkey JavaScript library.
-#------------------------------------------------------------------------------
-case $cs_host_family in
-    windows) cs_spidermonkey_platform='XP_WIN' ;;
-    *) cs_spidermonkey_platform='XP_UNIX' ;;
-esac
-
-CS_CHECK_LIB_WITH([js],
-    [AC_LANG_PROGRAM([[#include <js/jsapi.h>]], 
-    [JS_NewRuntime(0)])],
-    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libjs], [JS])], [], 
-    [-D$cs_spidermonkey_platform])
-
-
 
 #------------------------------------------------------------------------------
 # Check if regular expressions are available.

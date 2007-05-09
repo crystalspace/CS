@@ -31,7 +31,9 @@ chronological order.
 	    - Made it possible to specify a set of default values for
 	      cells so that common parameters don't need to be repeated.
 	    - Removed the "simple" renderer as it was horribly broken.
-	    - Updated terraini demo level to use four cells. 
+	    - Updated terraini demo level to use four cells.
+	- Marten removed a now obsolete check in configure for spidermonkey
+	  javascript library used by AWS2 (which have been moved to CSextra).
 8-May-2007
 	- Marten fixed a bug in lighter2 where it would write vertexcolors to
 	  a buffer named "colors" when "color" was expected.
