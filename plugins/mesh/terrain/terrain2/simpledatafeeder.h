@@ -40,7 +40,7 @@ struct csTerrainSimpleDataFeederProperties
   virtual void SetParameter (const char* param, const char* value);
   virtual csPtr<iTerrainCellFeederProperties> Clone ();
 
-  csString heightmapSource, materialmapSource;
+  csString heightmapSource, heightmapFormat, materialmapSource;
 };
 
 class csTerrainSimpleDataFeeder :

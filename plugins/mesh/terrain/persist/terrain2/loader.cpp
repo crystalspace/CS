@@ -85,6 +85,8 @@ csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
 
+  DefaultCellValues defaults;
+
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
@@ -157,9 +159,16 @@ csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
 
           switch (id)
           {
+          case XMLTOKEN_CELLDEFAULT:
+            {
+              if (!ParseDefaultCell (child2, ldr_context, defaults))
+                return 0;
+
+              break;
+            }
           case XMLTOKEN_CELL:
             {
-              if (!ParseCell (child2, ldr_context, factory))
+              if (!ParseCell (child2, ldr_context, factory, defaults))
                 return 0;
 
               break;
@@ -240,16 +249,20 @@ bool csTerrainFactoryLoader::ParseParams (csArray<ParamPair>& pairs, iDocumentNo
 }
 
 bool csTerrainFactoryLoader::ParseCell (iDocumentNode *node, 
-  iLoaderContext *ldr_ctx, iTerrainFactory *fact)
+  iLoaderContext *ldr_ctx, iTerrainFactory *fact, const DefaultCellValues& defaults)
 {
-  csArray<ParamPair> renderParams, collParams, feederParams;
+  ParamPairArray renderParams, collParams, feederParams;
 
   csString name;
-  csVector3 size;
-  csVector2 position;
-  unsigned int gridWidth, gridHeight, materialmapWidth, materialmapHeight;
-  bool materialmapPersist;
-  csRef<iMaterialWrapper> baseMaterial;
+  csVector3 size = defaults.size;
+  csVector2 position (0,0);
+  
+  unsigned int gridWidth = defaults.gridWidth, gridHeight = defaults.gridHeight;
+  unsigned int materialmapWidth = defaults.materialmapWidth, 
+    materialmapHeight = defaults.materialmapHeight;
+
+  bool materialmapPersist = defaults.materialmapPersist;
+  csRef<iMaterialWrapper> baseMaterial = defaults.baseMaterial;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -333,22 +346,118 @@ bool csTerrainFactoryLoader::ParseCell (iDocumentNode *node,
   cell->SetBaseMaterial (baseMaterial);
 
   iTerrainCellRenderProperties* renderProperties = cell->GetRenderProperties ();
+  for (size_t i = 0; i < defaults.renderParams.GetSize (); ++i)
+  {
+    renderProperties->SetParameter (defaults.renderParams[i].name.GetDataSafe (), 
+      defaults.renderParams[i].value.GetDataSafe ());
+  }
   for (size_t i = 0; i < renderParams.GetSize (); ++i)
   {
-    renderProperties->SetParameter (renderParams[i].name.GetDataSafe (), renderParams[i].value.GetDataSafe ());
+    renderProperties->SetParameter (renderParams[i].name.GetDataSafe (), 
+      renderParams[i].value.GetDataSafe ());
   }
 
   iTerrainCellCollisionProperties* colliderProperties = cell->GetCollisionProperties ();
+  for (size_t i = 0; i < defaults.collParams.GetSize (); ++i)
+  {
+    colliderProperties->SetParameter (defaults.collParams[i].name.GetDataSafe (), 
+      defaults.collParams[i].value.GetDataSafe ());
+  }
   for (size_t i = 0; i < collParams.GetSize (); ++i)
   {
-    colliderProperties->SetParameter (collParams[i].name.GetDataSafe (), collParams[i].value.GetDataSafe ());
+    colliderProperties->SetParameter (collParams[i].name.GetDataSafe (), 
+      collParams[i].value.GetDataSafe ());
   }
 
   iTerrainCellFeederProperties* feederProperties = cell->GetFeederProperties ();
+  for (size_t i = 0; i < defaults.feederParams.GetSize (); ++i)
+  {
+    feederProperties->SetParameter (defaults.feederParams[i].name.GetDataSafe (), 
+      defaults.feederParams[i].value.GetDataSafe ());
+  }
   for (size_t i = 0; i < feederParams.GetSize (); ++i)
   {
-    feederProperties->SetParameter (feederParams[i].name.GetDataSafe (), feederParams[i].value.GetDataSafe ());
+    feederProperties->SetParameter (feederParams[i].name.GetDataSafe (), 
+      feederParams[i].value.GetDataSafe ());
   }
+
+  return true;
+}
+
+bool csTerrainFactoryLoader::ParseDefaultCell (iDocumentNode* node, 
+  iLoaderContext* ldr_ctx, DefaultCellValues& defaults)
+{
+  
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+
+    if (child->GetType () != CS_NODE_ELEMENT) 
+      continue;
+
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {    
+    case XMLTOKEN_SIZE:
+      synldr->ParseVector (child, defaults.size);
+      break;
+    case XMLTOKEN_GRIDSIZE:
+      defaults.gridWidth = child->GetAttributeValueAsInt ("width");
+      defaults.gridHeight = child->GetAttributeValueAsInt ("height");
+      break;
+    case XMLTOKEN_MATERIALMAPSIZE:
+      defaults.materialmapWidth = child->GetAttributeValueAsInt ("width");
+      defaults.materialmapHeight = child->GetAttributeValueAsInt ("height");
+      break;
+    case XMLTOKEN_BASEMATERIAL:
+      {
+        const char* matname = child->GetContentsValue ();
+        defaults.baseMaterial = ldr_ctx->FindMaterial (matname);
+
+        if (!defaults.baseMaterial)
+        {
+          synldr->ReportError (
+            "crystalspace.terrain.object.loader.basematerial",
+            child, "Couldn't find material '%s'!", matname);
+          return false;
+        }
+        break;
+      }
+    case XMLTOKEN_MATERIALMAPPERSISTENT:
+      synldr->ParseBool (child, defaults.materialmapPersist, false);
+      break;
+    case XMLTOKEN_RENDERPROPERTIES:
+      {
+        if (!ParseParams (defaults.renderParams, child))
+          return false;
+
+        break;
+      }
+    case XMLTOKEN_COLLIDERPROPERTIES:
+      {
+        if (!ParseParams (defaults.collParams, child))
+          return false;
+
+        break;
+      }
+    case XMLTOKEN_FEEDERPROPERTIES:
+      {
+        if (!ParseParams (defaults.feederParams, child))
+          return false;
+
+        break;
+      }
+    default:
+      {
+        synldr->ReportBadToken (child);
+        return false;
+      }
+    }
+  }
+
+  
 
   return true;
 }

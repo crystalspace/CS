@@ -80,6 +80,8 @@ struct iTerrainCollisionPairArray : public iArrayChangeAll<csCollisionPair>
   SCF_IARRAYCHANGEALL_INTERFACE(iTerrainCollisionPairArray);
 };
 
+/// Type of the material palette
+typedef csRefArray<iMaterialWrapper> csTerrainMaterialPalette;
 
 
 /**
@@ -355,7 +357,7 @@ struct iTerrainRenderer : public virtual iBase
    *
    * \param material_palette new material palette
    */
-  virtual void OnMaterialPaletteUpdate (const csRefArray<iMaterialWrapper>&
+  virtual void OnMaterialPaletteUpdate (const csTerrainMaterialPalette&
                                         material_palette) = 0;
 
   /**
@@ -468,14 +470,14 @@ struct iTerrainSystem : public virtual iBase
    *
    * \return material palette
    */
-  virtual const csRefArray<iMaterialWrapper>& GetMaterialPalette () const = 0;
+  virtual const csTerrainMaterialPalette& GetMaterialPalette () const = 0;
   
   /**
    * Set a new material palette.
    *
    * \param array new  material palette
    */
-  virtual void SetMaterialPalette (const csRefArray<iMaterialWrapper>& array) = 0;
+  virtual void SetMaterialPalette (const csTerrainMaterialPalette& array) = 0;
 
   /**
    * Collide segment with the terrain

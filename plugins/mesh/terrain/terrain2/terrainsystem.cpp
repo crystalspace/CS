@@ -31,6 +31,7 @@
 #include "iengine/movable.h"
 #include "iengine/rview.h"
 #include "iengine/sector.h"
+#include "ivideo/rendermesh.h"
 #include "iutil/objreg.h"
 
 #include "terrainsystem.h"
@@ -45,7 +46,7 @@ csTerrainSystem::csTerrainSystem (iMeshObjectFactory* factory,
   collider (collider), dataFeeder (feeder), virtualViewDistance (2.0f), 
   maxLoadedCells (~0), autoPreload (false), bbStarted (false)
 {
-
+  renderer->ConnectTerrain (this);
 }
 
 csTerrainSystem::~csTerrainSystem ()
@@ -445,7 +446,8 @@ csRenderMesh** csTerrainSystem::GetRenderMeshes (int& num, iRenderView* rview,
   
   for (size_t i = 0; i < cells.GetSize (); ++i)
   {
-    if (!cells[i]->GetRenderProperties ()->GetVisible ()) continue;
+    if (!cells[i]->GetRenderProperties ()->GetVisible ()) 
+      continue;
 
     uint32 out_mask;
     
@@ -464,11 +466,29 @@ csRenderMesh** csTerrainSystem::GetRenderMeshes (int& num, iRenderView* rview,
     }
   }
   
-  if (autoPreload) PreLoadCells (rview, movable);
+  if (autoPreload) 
+    PreLoadCells (rview, movable);
   
-  if (VisCallback) VisCallback->BeforeDrawing (this, rview);
+  if (VisCallback) 
+    VisCallback->BeforeDrawing (this, rview);
   
-  return renderer->GetRenderMeshes (num, rview, movable, frustum_mask, neededCells);
+  csRenderMesh** allMeshes = renderer->GetRenderMeshes (num, rview, movable, 
+    frustum_mask, neededCells);
+
+  // Fill in some common info
+  const csReversibleTransform& trO2W = movable->GetFullTransform ();
+  bool isMirrored = rview->GetCamera ()->IsMirrored ();
+  uint mixMode = GetMixMode ();
+
+  for (int i = 0; i < num; ++i)
+  {
+    csRenderMesh* mesh = allMeshes[i];
+    mesh->object2world = trO2W;
+    mesh->do_mirror = isMirrored;
+    mesh->mixmode = mixMode;
+  }
+
+  return allMeshes;
 }
 
 

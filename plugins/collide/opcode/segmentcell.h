@@ -66,14 +66,20 @@ public:
     scale_u = size.x / (width - 1);
     scale_v = size.z / (height - 1);
     
+    // Offset from grid 0,0
+    const csVector2 gridOffsetStart = csVector2(start.x - pos.x,
+      -(start.z - (pos.y + size.z)));
+    const csVector2 gridOffsetEnd = csVector2(end.x - pos.x,
+      -(end.z - (pos.y + size.z)));
+
     // U, V and height of segment start in cell space
-    u0 = (start.x - pos.x) / scale_u;
-    v0 = (start.z - pos.y) / scale_v;
+    u0 = (gridOffsetStart.x) / scale_u;
+    v0 = (gridOffsetStart.y) / scale_v;
     h0 = start.y;
     
     // U, V and height of segment end in cell space
-    u1 = (end.x - pos.x) / scale_u;
-    v1 = (end.z - pos.y) / scale_v;
+    u1 = (gridOffsetEnd.x) / scale_u;
+    v1 = (gridOffsetEnd.y) / scale_v;
     h1 = end.y;
     
     // Compute differences for ray (lengths along axes) and their inverse
@@ -107,8 +113,7 @@ public:
     // Stepping variables
     t = 0;
     h = h0;
-    cell_height = cell->GetHeight (csVector2 (start.x - pos.x,
-                                                    start.z - pos.y));
+    cell_height = cell->GetHeight (gridOffsetStart);
     
     firsttime = true;
   }
@@ -231,7 +236,7 @@ public:
         
       result.x = pos.x + cell_result.x * scale_u;
       result.y = h0 + dh * correct_t;
-      result.z = pos.y + cell_result.y * scale_v;
+      result.z = pos.y + height - cell_result.y * scale_v;
 
       return (cell_result.x >=0 && cell_result.x <= width - 1 &&
               cell_result.y >=0 && cell_result.y <= height - 1);

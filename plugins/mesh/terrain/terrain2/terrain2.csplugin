@@ -9,11 +9,6 @@
         <description>Bruteblock terrain renderer</description>
       </class>
       <class>
-        <name>crystalspace.mesh.object.terrain2.simplerenderer</name>
-        <implementation>csTerrainSimpleRenderer</implementation>
-        <description>Simple terrain renderer</description>
-      </class>
-      <class>
         <name>crystalspace.mesh.object.terrain2.terraformerdatafeeder</name>
         <implementation>csTerrainTerraFormerDataFeeder</implementation>
         <description>Terraformer-based data feeder</description>

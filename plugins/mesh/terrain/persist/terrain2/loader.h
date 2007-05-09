@@ -37,26 +37,6 @@ class csTerrainFactoryLoader :
                             iLoaderPlugin,
                             iComponent>
 {
-private:
-  struct ParamPair
-  {
-    csString name, value;
-  };
-
-  iObjectRegistry* object_reg;
-  csRef<iSyntaxService> synldr;
-  csRef<iReporter> reporter;
-
-  csStringHash xmltokens;
-#define CS_TOKEN_ITEM_FILE "plugins/mesh/terrain/persist/terrain2/loader.tok"
-#include "cstool/tokenlist.h"
-#undef CS_TOKEN_ITEM_FILE 
-
-  bool ParseCell (iDocumentNode* node, iLoaderContext* ldr_ctx,
-    iTerrainFactory* fact);
-
-  bool ParseParams (csArray<ParamPair>& pairs, iDocumentNode* node);
-
 public:
   /// Constructor
   csTerrainFactoryLoader (iBase*);
@@ -70,6 +50,45 @@ public:
   csPtr<iBase> Parse (iDocumentNode *node,
     iStreamSource*, iLoaderContext *ldr_context,
     iBase* context);	
+private:
+  struct ParamPair
+  {
+    csString name, value;
+  };
+
+  typedef csArray<ParamPair> ParamPairArray;
+
+  struct DefaultCellValues
+  {
+    DefaultCellValues ()
+      : size (128.0f, 32.0f, 128.0f), gridWidth (128), gridHeight (128),
+      materialmapWidth (128), materialmapHeight (128), materialmapPersist (false)
+    {}
+
+    ParamPairArray renderParams, collParams, feederParams;
+    csVector3 size;
+    unsigned int gridWidth, gridHeight, materialmapWidth, materialmapHeight;
+    bool materialmapPersist;
+    csRef<iMaterialWrapper> baseMaterial;
+  };
+
+  iObjectRegistry* object_reg;
+  csRef<iSyntaxService> synldr;
+  csRef<iReporter> reporter;
+
+  csStringHash xmltokens;
+#define CS_TOKEN_ITEM_FILE "plugins/mesh/terrain/persist/terrain2/loader.tok"
+#include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE 
+
+  bool ParseCell (iDocumentNode* node, iLoaderContext* ldr_ctx,
+    iTerrainFactory* fact, const DefaultCellValues& defaults);
+
+  bool ParseDefaultCell (iDocumentNode* node, iLoaderContext* ldr_ctx,
+    DefaultCellValues& defaults);
+
+  bool ParseParams (csArray<ParamPair>& pairs, iDocumentNode* node);
+
 };
 
 /**

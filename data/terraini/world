@@ -71,16 +71,6 @@
     <plugin>crystalspace.renderloop.loop.loader</plugin>
     <paramsfile>/shader/std_rloop_terrainfixed.xml</paramsfile>
   </addon>
-    
-  <addon>
-    <plugin>crystalspace.terraformer.simple.loader</plugin>
-    <params>
-      <name>simple</name>
-      <heightmap>/lev/terrain/heightmap.png</heightmap>
-      <scale x="256" y="30" z="256" />
-      <materialmap image="/lev/terrain/materialmap.png" />
-    </params>
-  </addon>
 
   <settings>
     <clearscreen>yes</clearscreen>
@@ -91,7 +81,7 @@
 
   <start>
     <sector>room</sector>
-    <position x="100" y="50" z="100" />
+    <position x="0" y="200" z="0" />
     <forward x="0" y="0" z="1" />
     <up x="0" y="1" z="0" />
   </start>
@@ -106,25 +96,39 @@
       <maxloadedcells>20</maxloadedcells>
 
       <cells>
-        
-        <cell>
+        <celldefault>
           <gridsize width="257" height="257" />
           <materialmapsize width="512" height="512" />
-          
-          <position x="-128" y="-128" />
+
           <size x="256" y="32" z="256" />
-          
+
           <basematerial>Base</basematerial>
 
           <renderproperties>
             <param name="block resolution">16</param>
-            <param name="lod lcoeff">8</param>
+            <param name="lod splitcoeff">8</param>
           </renderproperties>
 
           <feederproperties>
-            <param name="heightmap source">/lev/terrain/heightmap_257x257.png</param>
+            <param name="heightmap source">/lev/terraini/heightmap_257x257.png</param>
             <param name="materialmap source">/lev/terrain/materialmap.png</param>
           </feederproperties>
+        </celldefault>
+        
+        <cell>
+          <position x="-256" y="-256" />         
+        </cell>
+        
+        <cell>
+          <position x="0" y="-256" />
+        </cell>
+
+        <cell>
+          <position x="-256" y="0" />
+        </cell>
+
+        <cell>
+          <position x="0" y="0" />
         </cell>
         
       </cells>

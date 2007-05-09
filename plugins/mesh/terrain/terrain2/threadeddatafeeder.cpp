@@ -34,6 +34,7 @@
 #include "iutil/plugin.h"
 
 #include "threadeddatafeeder.h"
+#include "feederhelper.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
 {
@@ -52,7 +53,7 @@ struct ThreadedFeederData : public csRefCount
   csDirtyAccessArray<float> heightmapData;
   csArray<csDirtyAccessArray<unsigned char> > materialmapData;
 
-  csString heightmapSource, materialmapSource;
+  csString heightmapSource, materialmapSource, heightmapFormat;
 
   float heightScale;
 
@@ -65,8 +66,8 @@ struct ThreadedFeederData : public csRefCount
 class ThreadedFeederJob : public scfImplementation1<ThreadedFeederJob, iJob>
 {
 public:
-  ThreadedFeederJob (ThreadedFeederData* data, iLoader* loader)
-    : scfImplementationType (this), data (data), loader (loader)
+  ThreadedFeederJob (ThreadedFeederData* data, iLoader* loader, iObjectRegistry* reg)
+    : scfImplementationType (this), data (data), loader (loader), objReg (reg)
   {
 
   }
@@ -76,35 +77,15 @@ public:
     if (!data || !loader)
       return;
 
-    csRef<iImage> map = loader->LoadImage (data->heightmapSource.GetDataSafe (),
-      CS_IMGFMT_PALETTED8);
-
-    if (!map) 
-      return;
-
-    if (map->GetWidth () != data->gridWidth || 
-        map->GetHeight () != data->gridHeight)
-    {
-      map = csImageManipulate::Rescale (map, data->gridWidth, data->gridHeight);
-    }
-
     data->heightmapData.SetSize (data->gridWidth * data->gridHeight);
 
     float* h_data = data->heightmapData.GetArray ();
 
-    const unsigned char* imagedata = (const unsigned char*)map->GetImageData ();
+    HeightFeederParser mapReader (data->heightmapSource, 
+      data->heightmapFormat, loader, objReg);
+    mapReader.Load (h_data, data->gridWidth, data->gridHeight, data->gridWidth, 
+      data->heightScale);
 
-
-    for (unsigned int y = 0; y < data->gridHeight; ++y)
-    {
-      for (unsigned int x = 0; x < data->gridWidth; ++x)
-      {
-        float xd = float(x - data->gridWidth/2) / data->gridWidth;
-        float yd = float(y - data->gridHeight/2) / data->gridHeight;
-
-        *h_data++ = *imagedata++ / 255.0f * data->heightScale;
-      }
-    }
 
     csRef<iImage> material = loader->LoadImage (data->materialmapSource.GetDataSafe (),
       CS_IMGFMT_PALETTED8);
@@ -148,114 +129,9 @@ public:
 private:
   ThreadedFeederData* data;
   csRef<iLoader> loader;
+  iObjectRegistry* objReg;
 };
 
-/*
-class csTerrainFeedJob : public scfImplementation1<csTerrainFeedJob, iJob>
-{
-  iTerrainCell* cell;
-  csTerrainFeederData* feed_data;
-  iObjectRegistry* object_reg;
-public:
-  csTerrainFeedJob(iTerrainCell* cell, csTerrainFeederData* data,
-	  iObjectRegistry* object_reg)
-    : scfImplementationType (this)
-  {
-    this->cell = cell;
-    this->feed_data = data;
-    this->object_reg = object_reg;
-	
-	static int counter = 0;
-	++counter;
-
-	if (counter > 100)
-	{
-		counter = 0;
-	}
-  }
-  
-  virtual void Run()
-  {
-    int width = cell->GetGridWidth ();
-    int height = cell->GetGridHeight ();
-
-    csRef<iLoader> loader = csQueryRegistry<iLoader> (object_reg);
-  
-    csRef<iImage> map = loader->LoadImage (feed_data->heightmap_source,
-      CS_IMGFMT_PALETTED8);
-
-    if (!map) return;
- 
-    if (map->GetWidth () != width || map->GetHeight () != height)
-    {
-      map = csImageManipulate::Rescale (map, width, height);
-    }
-
-    feed_data->height_width = width;
-    feed_data->height_height = height;
-
-    feed_data->height_data = new float[width * height];
-
-    float* h_data = feed_data->height_data;
-  
-    const unsigned char* imagedata = (const unsigned char*)map->GetImageData ();
-
-    float size_y = cell->GetSize ().y;
-
-    for (int y = 0; y < height; ++y)
-    {
-      for (int x = 0; x < width; ++x)
-      {
-        float xd = float(x - width/2) / width;
-        float yd = float(y - height/2) / height;
-
-        *h_data++ = *imagedata++ / 255.0f * size_y;
-      }
-    }
-  
-    csRef<iImage> material = loader->LoadImage (feed_data->mmap_source,
-      CS_IMGFMT_PALETTED8);
-    
-    if (!material) return;
-
-    if (material->GetWidth () != cell->GetMaterialMapWidth () ||
-      material->GetHeight () != cell->GetMaterialMapHeight ())
-      material = csImageManipulate::Rescale (material,
-        cell->GetMaterialMapWidth (), cell->GetMaterialMapHeight ());
-   
-    int mwidth = material->GetWidth ();
-    int mheight = material->GetHeight ();
-
-    feed_data->material_width = mwidth;
-    feed_data->material_height = mheight;
-
-    size_t mcount = cell->GetTerrain ()->GetMaterialPalette ().GetSize ();
-
-    feed_data->material_data.SetSize (mcount);
-
-    CS_ASSERT (mcount < 255);
-
-    for (unsigned char i = 0; i < mcount; ++i)
-    {
-      const unsigned char* materialmap = (const unsigned char*)
-	    material->GetImageData ();
-
-      unsigned char* m_data =
-        (feed_data->material_data[i] = new unsigned char[mwidth * mheight]);
-
-      for (int y = 0; y < mheight; ++y)
-      {
-        for (int x = 0; x < mwidth; ++x)
-        {
-          *m_data++ = (*materialmap++ == i) ? 255 : 0;
-        }
-      }
-    }
-
-    feed_data->result = true;
-  }
-};
-*/
 
 csTerrainThreadedDataFeeder::csTerrainThreadedDataFeeder (iBase* parent)
   : scfImplementationType (this, parent)
@@ -274,6 +150,10 @@ bool csTerrainThreadedDataFeeder::PreLoad (iTerrainCell* cell)
     (csTerrainSimpleDataFeederProperties*)cell->GetFeederProperties ();
 
   if (!loader || !properties)
+    return false;
+
+  if (properties->heightmapSource.IsEmpty () ||
+    properties->materialmapSource.IsEmpty ())
     return false;
 
   // Check if there is any existing state associated with it
@@ -302,7 +182,7 @@ bool csTerrainThreadedDataFeeder::PreLoad (iTerrainCell* cell)
   data->heightScale = cell->GetSize ().y;
 
   csRef<ThreadedFeederJob> job;
-  job.AttachNew (new ThreadedFeederJob (data, loader));
+  job.AttachNew (new ThreadedFeederJob (data, loader, objectReg));
 
   data->loaderJob = job;
   jobQueue->Enqueue (job);

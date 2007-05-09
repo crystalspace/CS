@@ -25,9 +25,10 @@
 #include "csgfx/shadervar.h"
 #include "csgfx/shadervarcontext.h"
 #include "cstool/rbuflock.h"
-#include "cstool/rviewclipper.h"
+#include "cstool/rviewclipper.h" 
 #include "csutil/objreg.h"
 #include "csutil/refarr.h"
+#include "csutil/blockallocator.h"
 #include "iengine.h"
 #include "imesh/terrain2.h"
 #include "ivideo/rendermesh.h"
@@ -40,464 +41,585 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
 
 SCF_IMPLEMENT_FACTORY (csTerrainBruteBlockRenderer)
 
-struct csBruteBlockTerrainRenderData;
+// File-static data
+static csStringID textureLodDistanceID = csInvalidStringID;
 
-/**
-* This is one block in the terrain.
-*/
-struct csTerrBlock : public csRefCount
+//-- Per cell properties class
+class TerrainBBCellRenderProperties :
+  public scfImplementation2<TerrainBBCellRenderProperties,
+                            iTerrainCellRenderProperties,
+                            scfFakeInterface<iShaderVariableContext> >
 {
-  csTerrBlock (csBruteBlockTerrainRenderData *data);
-  ~csTerrBlock ();
-
-  /// Load data from Former
-  void LoadData ();
-
-  /// Generate mesh
-  void SetupMesh ();
-
-  /// Detach the node from the tree
-  void Detach ();
-
-  /// Split block in 4 children
-  void Split ();
-
-  /// Merge block
-  void Merge ();
-
-  /// Checks if something needs to be merged or split
-  void CalcLOD ();
-
-  /// Returns true if this node is a leaf
-  bool IsLeaf ()  const
-  { return children[0] == 0; }
-
-  void ReplaceChildNeighbours (csTerrBlock *a, csTerrBlock *b);
-
-  void DrawTest (iGraphics3D* g3d, iRenderView *rview, uint32 frustum_mask,
-    csReversibleTransform &transform, iMovable *movable,
-    csDirtyAccessArray<csRenderMesh*>& meshes);
-
-
-  CS_LEAKGUARD_DECLARE (csTerrBlock);
-
-  csRef<iRenderBuffer> mesh_vertices;
-  csRef<iRenderBuffer> mesh_normals;
-  csRef<iRenderBuffer> mesh_texcoords;
-  csRef<iRenderBuffer> mesh_heights;
-  csRef<csRenderBufferHolder> bufferHolder;
-
-  csVector2 center;
-  csVector2 size;
-  int res;
-
-  // for this kind of grid:
-  // . _ .
-  // _ _ _
-  // . _ .
-  // left = top = 0, right = bottom = 2,
-  // step = 2
-  int left, top, right, bottom;
-  int step, child;
-
-
-  csBruteBlockTerrainRenderData *rdata;
-
-  //          0
-  //      ---------
-  //      | 0 | 1 |
-  //    2 |-------| 1
-  //      | 2 | 3 |
-  //      ---------
-  //          3
-
-  csTerrBlock* parent;
-  csRef<csTerrBlock> children[4];
-  csTerrBlock* neighbours[4];
-
-  csBox3 bbox;
-
-  bool detach;
-  bool built;
-};
-
-
-struct csBruteBlockTerrainRenderData: public csRefCount
-{
-  csRef<csTerrBlock> rootblock;
-
-  csRenderMeshHolder* rm_holder;
-
-  csPlane3* planes;
-
-  csRefArray<iMaterialWrapper>* material_palette;
-  csArray<csRef<csShaderVariableContext> > sv_context;
-
-  csArray<csRef<iTextureHandle> > alpha_map;
-
-  csRef<csShaderVariableContext> baseContext;
-
-  unsigned int primitive_count;
-
-  int block_res_log2;
-  float lod_lcoeff, lod_distance;
-
-
-  csReversibleTransform tr_o2c;
-
-  bool initialized;
-
-  iTerrainCell* cell;
-  csTerrainBruteBlockRenderer* renderer;
-
-  csBruteBlockTerrainRenderData(iTerrainCell* cell, csTerrainBruteBlockRenderer* renderer)
-    : cell (cell), renderer (renderer), initialized (false)
+public:
+  TerrainBBCellRenderProperties ()
+    : scfImplementationType (this), visible (true), blockResolution (16), 
+    minSteps (1), splitDistanceCoeff (16), splatDistance (200)
   {
-    csTerrainBruteBlockCellRenderProperties* prop = (csTerrainBruteBlockCellRenderProperties*)
-      cell->GetRenderProperties ();
-
-    block_res_log2 = csLog2 (prop->GetBlockResolution ());
-
-    lod_lcoeff = prop->GetLODLCoeff ();
-
-    lod_distance = 200;
-
-    baseContext.AttachNew (new csShaderVariableContext);
-
-    csRef<csShaderVariable> lod_var = 
-      new csShaderVariable (renderer->strings->Request ("texture lod distance"));
-    lod_var->SetType (csShaderVariable::VECTOR3);
-    lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
-    baseContext->AddVariable (lod_var);
   }
 
-  void SetupObject()
+  TerrainBBCellRenderProperties (const TerrainBBCellRenderProperties& other)
+    : scfImplementationType (this), visible (other.visible), 
+    blockResolution (other.blockResolution), minSteps (other.minSteps), 
+    splitDistanceCoeff (other.splitDistanceCoeff), splatDistance (other.splatDistance)
   {
-    if (!initialized)
+
+  }
+
+  virtual bool GetVisible () const
+  {
+    return visible;
+  }
+
+  virtual void SetVisible (bool value)
+  {
+    visible = value;
+  }
+
+  size_t GetBlockResolution () const 
+  {
+    return blockResolution;
+  }
+  void SetBlockResolution (int value)
+  {
+    blockResolution = 1 << csLog2 (value);
+  }
+
+  size_t GetMinSteps () const
+  {
+    return minSteps;
+  }
+  void SetMinSteps (int value)
+  {
+    minSteps = value > 0 ? value : 1;
+  }
+
+  float GetLODSplitCoeff () const 
+  {
+    return splitDistanceCoeff;
+  }
+  void SetLODSplitCoeff (float value) 
+  {
+    splitDistanceCoeff = value;
+  }
+
+  float GetSplatDistance () const 
+  {
+    return splatDistance;
+  }
+  void SetSplatDistance (float value) 
+  {
+    splatDistance = value;
+  }
+
+
+
+  virtual void SetParameter (const char* name, const char* value)
+  {
+    if (strcmp (name, "visible") == 0)
+      SetVisible (strcmp(value, "true") == 0);
+    else if (strcmp (name, "block resolution") == 0)
+      SetBlockResolution (atoi (value));
+    else if (strcmp (name, "min steps") == 0)
+      SetMinSteps (atoi (value));
+    else if (strcmp (name, "lod splitcoeff") == 0)
+      SetLODSplitCoeff (atof (value));
+    else if (strcmp (name, "splat distance") == 0)
+      SetLODSplitCoeff (atof (value));
+
+  }
+
+  virtual csPtr<iTerrainCellRenderProperties> Clone ()
+  {
+    return csPtr<iTerrainCellRenderProperties> (
+      new TerrainBBCellRenderProperties (*this));
+  }
+
+  //-- iShaderVariableContext --
+  virtual void AddVariable (csShaderVariable *variable)
+  {
+    svContext.AddVariable (variable);
+  }
+  virtual csShaderVariable* GetVariable (csStringID name) const
+  {
+    return svContext.GetVariable (name);
+  }
+
+  virtual const csRefArray<csShaderVariable>& GetShaderVariables () const
+  {
+    return svContext.GetShaderVariables ();
+  }
+
+  virtual void PushVariables (iShaderVarStack* stacks) const
+  {
+    svContext.PushVariables (stacks);
+  }
+
+  virtual bool IsEmpty () const
+  {
+    return svContext.IsEmpty ();
+  }
+
+  virtual void ReplaceVariable (csShaderVariable* variable)
+  {
+    svContext.ReplaceVariable (variable);
+  }
+
+  virtual void Clear()
+  {
+    svContext.Clear ();
+  }
+
+  virtual bool RemoveVariable (csShaderVariable* variable) 
+  {
+    return svContext.RemoveVariable (variable);
+  }
+
+
+private:
+  // Per cell properties
+  bool visible;
+
+  // Block resolution in "gaps".. should be 2^n
+  size_t blockResolution;
+
+  // Grid steps for lowest tessellation setting
+  size_t minSteps;
+
+  // Lod splitting coefficient
+  float splitDistanceCoeff;
+
+  // Splatting end distance
+  float splatDistance;
+
+  //@@TODO! Better handling of SVs
+  csShaderVariableContext svContext;
+};
+
+class TerrainBBSVAccessor : public scfImplementation1<TerrainBBSVAccessor,
+                                                      iShaderVariableAccessor>
+{
+public:
+  TerrainBBSVAccessor (TerrainBBCellRenderProperties* prop)
+    : scfImplementationType (this), properties (prop)
+  {
+  }
+
+  /// The accessor method itself, the important thing
+  virtual void PreGetValue (csShaderVariable *variable)
+  {
+    if (variable->GetName () == textureLodDistanceID)
     {
-      initialized = true;     
-
-      rootblock.AttachNew (new csTerrBlock (this));
-      csVector2 center = cell->GetPosition () + csVector2 (cell->GetSize ().x,
-        cell->GetSize ().z)/2;
-      rootblock->center = center;
-      rootblock->size = csVector2(cell->GetSize ().x, cell->GetSize ().z);
-
-      rootblock->left = rootblock->top = 0;
-      rootblock->right = cell->GetGridWidth () - 1;
-      rootblock->bottom = cell->GetGridHeight () - 1;
-
-      // so, we're going to take block_res steps of size step to reach 
-      // from left to right, that is
-      // left + step * block_res = right
-      // beware! block_res and right should be 2^n !
-      rootblock->step = rootblock->right >> block_res_log2;
-
-      rootblock->SetupMesh ();
+      float distance = properties->GetSplatDistance ();
+      variable->SetValue (csVector3 (distance, distance, distance));
     }
   }
+
+
+private:
+  csRef<TerrainBBCellRenderProperties> properties;
 };
 
-csTerrBlock::csTerrBlock (csBruteBlockTerrainRenderData* data)
-{
-  parent = 0;
-  child = 0;
-  children[0] = children[1] = children[2] = children[3] = 0;
-  neighbours[0] =  neighbours[1] = neighbours[2] = neighbours[3] = 0;
 
-  built = false;
+
+enum TerrainCellBorderMatch
+{
+  CELL_MATCH_NONE = -1,
+  CELL_MATCH_TOP = 0,
+  CELL_MATCH_RIGHT = 1,
+  CELL_MATCH_LEFT = 2,
+  CELL_MATCH_BOTTOM = 3
+};
+
+struct TerrainCellRData;
+
+/**
+ * A single terrain _block_
+ *
+ * A single terrain cell is made up of a hierarchy of blocks which basically 
+ * forms a quadtree. The quadtree is used to speed up rendering (culling) as 
+ * well as for LOD.
+ *
+ * To avoid cracks in the rendering there will be a set of index buffers for 
+ * any given block size where each of the buffers will contain pre-tesselated
+ * "connection" blocks. This requires adjacent blocks not to differ more than
+ * a single level.
+ *
+ * Parent own child-blocks
+ *
+ * Numbering of children and neighbours
+ *
+ *         0
+ *     ---------
+ *     | 0 | 1 |
+ *   2 |---+---| 1
+ *     | 2 | 3 |
+ *     ---------
+ *         3
+ */
+struct TerrainBlock
+{
+  TerrainBlock ();
+
+  // Setup geometry
+  void SetupGeometry ();
+
+  // Invalidate the geometry and make it recalculate it
+  void InvalidateGeometry (bool recursive = false);
+
+  // Split a block, if required by invariant, split the neighbours too
+  void Split ();
+
+  // Try to split a single block if it could be done without breaking the invariant
+  bool TrySplit ();
+
+  // Merge down block, taking care to fix children and neighbours to keep the invariant
+  void Merge ();
+
+  // Disconnect a block (and all its children) from any "external" neighbours
+  void Disconnect ();
+
+  // Compute lod, split/merge blocks to get "right" tesselation
+  void ComputeLOD (const csReversibleTransform& transformO2C, const size_t order[4]);
+
+  // Basic helpers
+  inline bool IsLeaf () const
+  {
+    return children[0] == 0;
+  }
+
+  // Recursivly cull and setup render meshes
+  void CullRenderMeshes (iRenderView* rview, const csPlane3* cullPlanes, 
+    uint32 frustumMask, const csReversibleTransform& obj2cam, iMovable* movable,
+    csDirtyAccessArray<csRenderMesh*>& meshCache);
+
+  //-- Memebers
+  // Basic geometric properties
+  csVector2 centerPos;
+  csVector2 size;
+
+  // The coordinate limits on the 2d grid 
+  size_t gridLeft, gridRight, gridTop, gridBottom;
+  
+  // The size of each step in number of grid-points
+  size_t stepSize;
+
+  // Index of us as a child (if we are one) within parent
+  size_t childIndex;
+
+  // References to children
+  TerrainBlock* children[4];
+
+  // Neighbour pointers
+  TerrainBlock* neighbours[4];
+
+  // Parent block
+  TerrainBlock* parent;
+
+  // Owning renderer data
+  TerrainCellRData* renderData;
+
+  // Data holders for rendering
+  csRef<iRenderBuffer> meshVertices, meshNormals, meshTexCoords;
+  csRef<csRenderBufferHolder> bufferHolder;
+
+  // Bounding box (in mesh-space)
+  csBox3 boundingBox;
+
+  // Is data built and valid?
+  bool dataValid;
+};
+
+
+struct TerrainCellRData : public csRefCount
+{
+  //-- Members
+  TerrainCellRData (iTerrainCell* cell, csTerrainBruteBlockRenderer* renderer);
+  ~TerrainCellRData ();
+
+  // Setup the root block
+  void SetupRoot ();
+
+  // Connect cell to another one in given direction
+  void ConnectCell (TerrainCellRData* otherCell, TerrainCellBorderMatch side);
+
+  // Disconnect cell from any neighbour cells
+  void DisconnectCell ();
+
+  //-- Data
+  TerrainCellRData* neighbours[4];
+
+  TerrainBlock* rootBlock;
+  csBlockAllocator<TerrainBlock> terrainBlockAllocator;
+
+  // Per cell base material sv context
+  csRef<csShaderVariableContext> baseLayerSVContext;
+
+  // Per cell, per layer sv contexts
+  csRefArray<csShaderVariableContext> svContextArray;
+  csRefArray<iTextureHandle> alphaMapArray;
+  
+  // Settings
+  size_t blockResolution;
+  
+  // Related objects
+  csRef<TerrainBBCellRenderProperties> properties;
+  csRef<TerrainBBSVAccessor> svAccessor;
+  iTerrainCell* cell;  
+  csTerrainBruteBlockRenderer* renderer;
+};
+
+
+// Match cell2 to cell1 (gives where cell2 attach to cell1)
+TerrainCellBorderMatch MatchCell (iTerrainCell* cell1, iTerrainCell* cell2)
+{
+  const csVector2& position1 = cell1->GetPosition ();
+  const csVector2& position2 = cell2->GetPosition ();
+
+  const csVector3& size1 = cell1->GetSize ();
+  const csVector3& size2 = cell2->GetSize ();
+
+  const csVector3 sizeSum2 = (size1 + size2) / 2.0f;
+
+  if (position1.x == position2.x &&
+    size1.z == size2.z)
+  {
+    // Center line up in x.. either top or bottom match
+    if (position1.y == (position2.y - sizeSum2.z))
+    {
+      // 1 is on top of 2
+      return CELL_MATCH_TOP;
+    }
+    else if (position1.y == (position2.y + sizeSum2.z))
+    {
+      // 1 under 2
+      return CELL_MATCH_BOTTOM;
+    }
+  }
+  else if (position1.y == position2.y &&
+    size1.x == size2.x)
+  {
+    // Center line up in y
+    if (position1.x == (position2.x + sizeSum2.x))
+    {
+      return CELL_MATCH_LEFT;
+    }
+    else if (position1.x == (position2.x - sizeSum2.x))
+    {
+      return CELL_MATCH_RIGHT;
+    }
+  }
+
+
+  return CELL_MATCH_NONE;
+}
+
+
+
+
+TerrainBlock::TerrainBlock ()
+: stepSize (0), childIndex (0), parent (0), renderData (0), dataValid (false)
+{
+  for (size_t i = 0; i < 4; ++i)
+  {
+    children[i] = 0;
+    neighbours[i] = 0;
+  }
+}
+
+void TerrainBlock::SetupGeometry ()
+{
+  if (dataValid)
+    return;
+
+  size_t numVerts = (renderData->blockResolution) + 1;
+
+  // Allocate the standard renderbuffers
+  meshVertices = csRenderBuffer::CreateRenderBuffer (numVerts*numVerts, 
+    CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+  meshNormals = csRenderBuffer::CreateRenderBuffer (numVerts*numVerts,
+    CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+  meshTexCoords = csRenderBuffer::CreateRenderBuffer (numVerts*numVerts,
+    CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
 
   bufferHolder.AttachNew (new csRenderBufferHolder);
 
-  detach = false;
+  bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, meshVertices);
+  bufferHolder->SetRenderBuffer (CS_BUFFER_NORMAL, meshNormals);
+  bufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, meshTexCoords);
 
-  rdata = data;
-}
+  const csVector2& cellPosition = renderData->cell->GetPosition ();
+  const csVector3& cellSize = renderData->cell->GetSize ();
 
-csTerrBlock::~csTerrBlock ()
-{
-}
+  boundingBox.Empty ();
 
-void csTerrBlock::Detach ()
-{
-  detach = true;
-
-  if (!IsLeaf ())
   {
-    children[0]->Detach ();
-    children[1]->Detach ();
-    children[2]->Detach ();
-    children[3]->Detach ();
-    children[0] = 0;
-    children[1] = 0;
-    children[2] = 0;
-    children[3] = 0;
+    // Lock and write the buffers
+    csRenderBufferLock<csVector3> vertexData (meshVertices);
+    csRenderBufferLock<csVector3> normalData (meshNormals);
+
+    // Get the data
+    csLockedHeightData cellData = renderData->cell->GetHeightData ();
+
+    // Temporary data holder
+    float minX = centerPos.x - size.x/2.0f;
+    float maxX = centerPos.x + size.x/2.0f;
+
+    float minZ = centerPos.y - size.y/2.0f;
+    float maxZ = centerPos.y + size.y/2.0f;
+
+    float xStep = size.x / (float)(numVerts - 1);
+    float zStep = size.y / (float)(numVerts - 1);
+
+    float currZ = maxZ;
+
+    float minHeight = FLT_MAX;
+    float maxHeight = -FLT_MAX;
+
+    for (size_t y = 0, gridY = gridTop; y < numVerts; ++y, gridY += stepSize, currZ -= zStep)
+    {
+      float currX = minX;
+      float* hRow = cellData.data + cellData.pitch * gridY + gridLeft;
+
+      for (size_t x = 0; x < numVerts; ++x, hRow += stepSize, currX += xStep)
+      {
+        float height = *hRow;
+        *vertexData++ = csVector3 (currX, height, currZ);
+        
+        //@@Optimize this!
+        *normalData++ = renderData->cell->GetNormal (
+          (int)(x*stepSize), (int)(y*stepSize)).Unit ();
+
+        if (height < minHeight)
+          minHeight = height;
+        if (height > maxHeight)
+          maxHeight = height; 
+      }
+    }
+
+    boundingBox.Set (minX, minHeight, minZ, maxX, maxHeight, maxZ);
   }
 
-  if (neighbours[0] && ((child==0 || child==1) || !parent))
-    neighbours[0]->ReplaceChildNeighbours(this, parent);
-
-  if (neighbours[1] && ((child==1 || child==3) || !parent))
-    neighbours[1]->ReplaceChildNeighbours(this, parent);
-
-  if (neighbours[2] && ((child==0 || child==2) || !parent))
-    neighbours[2]->ReplaceChildNeighbours(this, parent);
-
-  if (neighbours[3] && ((child==2 || child==3) || !parent))
-    neighbours[3]->ReplaceChildNeighbours(this, parent);
-}
-
-void csTerrBlock::ReplaceChildNeighbours(csTerrBlock *a, csTerrBlock *b)
-{
-  for(int i = 0; i < 4; ++i)
-    if(neighbours[i] && neighbours[i]==a) neighbours[i]=b;
-
-  if(!IsLeaf())
-    for(int i = 0; i < 4; ++i)
-      children[i]->ReplaceChildNeighbours(a,b);
-}
-
-void csTerrBlock::LoadData ()
-{
-  res = (1 << rdata->block_res_log2) + 1;
-
-  mesh_vertices = 
-    csRenderBuffer::CreateRenderBuffer (
-    res*res, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
-    3);
-
-  mesh_normals = 
-    csRenderBuffer::CreateRenderBuffer (
-    res*res, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
-    3);
-
-  mesh_texcoords = 
-    csRenderBuffer::CreateRenderBuffer (res*res,
-    CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
-    2);
-
-  bufferHolder->SetRenderBuffer (CS_BUFFER_POSITION, mesh_vertices);
-  bufferHolder->SetRenderBuffer (CS_BUFFER_NORMAL, mesh_normals);
-  bufferHolder->SetRenderBuffer (CS_BUFFER_TEXCOORD0, mesh_texcoords);
-
-  const csVector2& pos = rdata->cell->GetPosition ();
-  const csVector3& cell_size = rdata->cell->GetSize ();
-
-  csLockedHeightData data = rdata->cell->GetHeightData ();
-
-  if (!built)
-    bbox.Empty ();
 
   {
-    csRenderBufferLock<csVector3> vertex_data (mesh_vertices);
-    csRenderBufferLock<csVector3> normal_data (mesh_normals);
+    csRenderBufferLock<csVector2> texcoordData (meshTexCoords);
+   
+    const csVector2 offs2 = 2*(centerPos - cellPosition);
 
-    float min_x = center.x - size.x/2;
-    float max_x = center.x + size.x/2;
+    float minU = (offs2.x - size.x) / (2*cellSize.x);
+    float maxU = (offs2.x + size.x) / (2*cellSize.x);
 
-    float min_z = center.y - size.y/2;
-    float max_z = center.y + size.y/2;
+    float minV = (2*cellSize.z - offs2.y - size.y) / (2*cellSize.z);
+    float maxV = (2*cellSize.z - offs2.y + size.y) / (2*cellSize.z);
 
-    float x_offset = (max_x - min_x) / (float)(res - 1);
-    float z_offset = (max_z - min_z) / (float)(res - 1);
+    float uStep = (maxU - minU) / (float)(numVerts - 1);
+    float vStep = (maxV - minV) / (float)(numVerts - 1);
 
-    float c_z = min_z;
-
-    float min_height = 1e+20f;
-    float max_height = -1e+20f;
-
-    for (int y = 0, grid_y = top; y < res; ++y, grid_y += step)
+    float currV = minV;
+    for (size_t y = 0; y < numVerts; ++y, currV += vStep)
     {
-      float c_x = min_x;
-      float* row = data.data + data.pitch * grid_y + left;
-
-      for (int x = 0; x < res; ++x, row += step)
+      float currU = minU;
+      for (size_t x = 0; x < numVerts; ++x, currU += uStep)
       {
-        float height = *row;
-        *vertex_data++ = csVector3(c_x, height, c_z);
-        csVector3 normal = rdata->cell->GetNormal (x*step,y*step).Unit (); 
-        *normal_data++ = normal;       
 
-        if (min_height > height) min_height = height;
-        if (max_height < height) max_height = height;
+        if (currV < 0.0f || currV > 1.0f || currU < 0.0f || currU > 1.0f)
+          int a = 0;
 
-        c_x += x_offset;
+        (*texcoordData).x = currU;
+        (*texcoordData).y = currV;
+        ++texcoordData;
       }
-
-      c_z += z_offset;
     }
+  }
 
-    if (!built)
-    {
-      bbox.Set (min_x, min_height, min_z,
-        max_x, max_height, max_z);
-    }
-  }  
+  dataValid = true;
+}
 
+void TerrainBlock::InvalidateGeometry (bool recursive)
+{
+  dataValid = false;
+  meshVertices = meshNormals = meshTexCoords = 0;
+  boundingBox = csBox3 ();
+
+  if (recursive && !IsLeaf ())
   {
-    csRenderBufferLock<csVector2> texcoord_data(mesh_texcoords);
-
-    float min_u = (center.x - size.x/2 - pos.x) / cell_size.x;
-    float max_u = (center.x + size.x/2 - pos.x) / cell_size.x;
-
-    float min_v = (center.y - size.y/2 - pos.y) / cell_size.z;
-    float max_v = (center.y + size.y/2 - pos.y) / cell_size.z;
-
-    float u_offset = (max_u - min_u) / (float)(res - 1);
-    float v_offset = (max_v - min_v) / (float)(res - 1);
-
-    float v = min_v;
-
-    for (int y = 0; y < res; ++y)
+    for (size_t i = 0; i < 4; ++i)
     {
-      float u = min_u;
-
-      for (int x = 0; x < res; ++x)
-      {
-        (*texcoord_data).x = u;
-        (*texcoord_data).y = v;
-        ++texcoord_data;
-
-        u += u_offset;
-      }
-
-      v += v_offset;
+      children[i]->InvalidateGeometry (recursive);
     }
   }
 }
 
-void csTerrBlock::SetupMesh ()
-{ 
-  res = (1 << rdata->block_res_log2) + 1;
-
-  LoadData ();
-
-  built = true;
-}
-
-void csTerrBlock::Split ()
+void TerrainBlock::Split ()
 {
-  int i;
-  for (i=0; i<4; i++)
+  // Split any neighbours that needs splitting to keep the invariant
+  for (size_t i = 0; i < 4; ++i)
   {
-    if (neighbours[i] && neighbours[i]->step>step && neighbours[i]->IsLeaf ())
+    if (neighbours[i] &&
+      neighbours[i]->stepSize > stepSize &&
+      neighbours[i]->IsLeaf ())
+    {
       neighbours[i]->Split ();
+    }
   }
 
-  int half_right = left + (right - left) / 2;
-  int half_bottom = top + (bottom - top) / 2;
+  // Setup the four child-blocks
+  size_t halfRight = gridLeft + (gridRight - gridLeft) / 2;
+  size_t halfBottom = gridTop + (gridBottom - gridTop) / 2;
+  csVector2 size4 = size / 4.0f;
+  csVector2 size2 = size / 2.0f;
 
-  children[0].AttachNew (new csTerrBlock (rdata));
+  children[0] = renderData->terrainBlockAllocator.Alloc ();
+  children[0]->centerPos = centerPos + csVector2 (-size4.x, size4.y);
+  children[0]->size = size2;
+  children[0]->gridLeft = gridLeft;
+  children[0]->gridRight = halfRight;
+  children[0]->gridTop = gridTop;
+  children[0]->gridBottom = halfBottom;
+  children[0]->stepSize = stepSize / 2;
+  children[0]->childIndex = 0;   
   children[0]->parent = this;
-  children[0]->size = size/2.0;
-  children[0]->center = center + csVector2 (-size.x/4.0, -size.y/4.0);
-  children[0]->child = 0;
-  children[0]->step = step / 2;
-  children[0]->left = left;
-  children[0]->right = half_right;
-  children[0]->top = top;
-  children[0]->bottom = half_bottom;
+  children[0]->renderData = renderData;
 
-  children[1].AttachNew (new csTerrBlock (rdata));
+  children[1] = renderData->terrainBlockAllocator.Alloc ();
+  children[1]->centerPos = centerPos + csVector2 (size4.x, size4.y);
+  children[1]->size = size2;
+  children[1]->gridLeft = halfRight;
+  children[1]->gridRight = gridRight;
+  children[1]->gridTop = gridTop;
+  children[1]->gridBottom = halfBottom;
+  children[1]->stepSize = stepSize / 2;
+  children[1]->childIndex = 1;   
   children[1]->parent = this;
-  children[1]->size = size/2.0;
-  children[1]->center = center + csVector2 ( size.x/4.0, -size.y/4.0);
-  children[1]->child = 1;
-  children[1]->step = step / 2;
-  children[1]->left = half_right;
-  children[1]->right = right;
-  children[1]->top = top;
-  children[1]->bottom = half_bottom;
+  children[1]->renderData = renderData;
 
-  children[2].AttachNew (new csTerrBlock (rdata));
+  children[2] = renderData->terrainBlockAllocator.Alloc ();
+  children[2]->centerPos = centerPos + csVector2 (-size4.x, -size4.y);
+  children[2]->size = size2;
+  children[2]->gridLeft = gridLeft;
+  children[2]->gridRight = halfRight;
+  children[2]->gridTop = halfBottom;
+  children[2]->gridBottom = gridBottom;
+  children[2]->stepSize = stepSize / 2;
+  children[2]->childIndex = 2;   
   children[2]->parent = this;
-  children[2]->size = size/2.0;
-  children[2]->center = center + csVector2 (-size.x/4.0, size.y/4.0);
-  children[2]->child = 2;
-  children[2]->step = step / 2;
-  children[2]->left = left;
-  children[2]->right = half_right;
-  children[2]->top = half_bottom;
-  children[2]->bottom = bottom;
+  children[2]->renderData = renderData;
 
-  children[3].AttachNew (new csTerrBlock (rdata));
+  children[3] = renderData->terrainBlockAllocator.Alloc ();
+  children[3]->centerPos = centerPos + csVector2 (size4.x, -size4.y);
+  children[3]->size = size2;
+  children[3]->gridLeft = halfRight;
+  children[3]->gridRight = gridRight;
+  children[3]->gridTop = halfBottom;
+  children[3]->gridBottom = gridBottom;
+  children[3]->stepSize = stepSize / 2;
+  children[3]->childIndex = 3;   
   children[3]->parent = this;
-  children[3]->size = size/2.0;
-  children[3]->center = center + csVector2 ( size.x/4.0, size.y/4.0);
-  children[3]->child = 3;
-  children[3]->step = step / 2;
-  children[3]->left = half_right;
-  children[3]->right = right;
-  children[3]->top = half_bottom;
-  children[3]->bottom = bottom;
+  children[3]->renderData = renderData;
 
-  if (neighbours[0])
-  {
-    if (!neighbours[0]->IsLeaf ())
-    {
-      children[0]->neighbours[0] = neighbours[0]->children[2];
-      children[1]->neighbours[0] = neighbours[0]->children[3];
-      children[0]->neighbours[0]->neighbours[3] = children[0];
-      children[1]->neighbours[0]->neighbours[3] = children[1];
-    }
-    else
-    {
-      children[0]->neighbours[0] = neighbours[0];
-      children[1]->neighbours[0] = neighbours[0];
-      neighbours[0]->neighbours[3] = this;
-    }
-  }
-  if (neighbours[1])
-  {
-    if (!neighbours[1]->IsLeaf ())
-    {
-      children[1]->neighbours[1] = neighbours[1]->children[0];
-      children[3]->neighbours[1] = neighbours[1]->children[2];
-      children[1]->neighbours[1]->neighbours[2] = children[1];
-      children[3]->neighbours[1]->neighbours[2] = children[3];
-    }
-    else
-    {
-      children[1]->neighbours[1] = neighbours[1];
-      children[3]->neighbours[1] = neighbours[1];
-      neighbours[1]->neighbours[2] = this;
-    }
-  }
-  if (neighbours[2])
-  {
-    if (!neighbours[2]->IsLeaf ())
-    {
-      children[0]->neighbours[2] = neighbours[2]->children[1];
-      children[2]->neighbours[2] = neighbours[2]->children[3];
-      children[0]->neighbours[2]->neighbours[1] = children[0];
-      children[2]->neighbours[2]->neighbours[1] = children[2];
-    }
-    else
-    {
-      children[0]->neighbours[2] = neighbours[2];
-      children[2]->neighbours[2] = neighbours[2];
-      neighbours[2]->neighbours[1] = this;
-    }
-  }
-  if (neighbours[3])
-  {
-    if (!neighbours[3]->IsLeaf ())
-    {
-      children[2]->neighbours[3] = neighbours[3]->children[0];
-      children[3]->neighbours[3] = neighbours[3]->children[1];
-      children[2]->neighbours[3]->neighbours[0] = children[2];
-      children[3]->neighbours[3]->neighbours[0] = children[3];
-    }
-    else
-    {
-      children[2]->neighbours[3] = neighbours[3];
-      children[3]->neighbours[3] = neighbours[3];
-      neighbours[3]->neighbours[0] = this;
-    }
-  }
+  // Connect inter-children neighbours
   children[0]->neighbours[1] = children[1];
   children[0]->neighbours[3] = children[2];
-
+  
   children[1]->neighbours[2] = children[0];
   children[1]->neighbours[3] = children[3];
 
@@ -507,388 +629,676 @@ void csTerrBlock::Split ()
   children[3]->neighbours[0] = children[1];
   children[3]->neighbours[2] = children[2];
 
-  children[0]->SetupMesh ();
-  children[1]->SetupMesh ();
-  children[2]->SetupMesh ();
-  children[3]->SetupMesh ();
+  // Setup neighbour-neighbour/child neighbours
+  if (neighbours[0])
+  {
+    if (neighbours[0]->IsLeaf ())
+    {
+      // It is at its most tesselation
+      neighbours[0]->neighbours[3] = this;
+      children[0]->neighbours[0] = neighbours[0];
+      children[1]->neighbours[0] = neighbours[0];
+    }
+    else
+    {
+      children[0]->neighbours[0] = neighbours[0]->children[2];
+      children[1]->neighbours[0] = neighbours[0]->children[3];
+      neighbours[0]->children[2]->neighbours[3] = children[0];
+      neighbours[0]->children[3]->neighbours[3] = children[1];
+    }
+  }
+
+  if (neighbours[1])
+  {
+    if (neighbours[1]->IsLeaf ())
+    {
+      // It is at its most tesselation
+      neighbours[1]->neighbours[2] = this;
+      children[1]->neighbours[1] = neighbours[1];
+      children[3]->neighbours[1] = neighbours[1];
+    }
+    else
+    {
+      children[1]->neighbours[1] = neighbours[1]->children[0];
+      children[3]->neighbours[1] = neighbours[1]->children[2];
+      neighbours[1]->children[0]->neighbours[2] = children[1];
+      neighbours[1]->children[2]->neighbours[2] = children[3];
+    }
+  }
+
+  if (neighbours[2])
+  {
+    if (neighbours[2]->IsLeaf ())
+    {
+      // It is at its most tesselation
+      neighbours[2]->neighbours[1] = this;
+      children[0]->neighbours[2] = neighbours[2];
+      children[2]->neighbours[2] = neighbours[2];
+    }
+    else
+    {
+      children[0]->neighbours[2] = neighbours[2]->children[1];
+      children[2]->neighbours[2] = neighbours[2]->children[3];
+      neighbours[2]->children[1]->neighbours[1] = children[0];
+      neighbours[2]->children[3]->neighbours[1] = children[2];
+    }
+  }
+
+  if (neighbours[3])
+  {
+    if (neighbours[3]->IsLeaf ())
+    {
+      // It is at its most tesselation
+      neighbours[3]->neighbours[0] = this;
+      children[2]->neighbours[3] = neighbours[3];
+      children[3]->neighbours[3] = neighbours[3];
+    }
+    else
+    {
+      children[2]->neighbours[3] = neighbours[3]->children[0];
+      children[3]->neighbours[3] = neighbours[3]->children[1];
+      neighbours[3]->children[0]->neighbours[0] = children[2];
+      neighbours[3]->children[1]->neighbours[0] = children[3];
+    }
+  }
 }
 
-void csTerrBlock::Merge ()
+bool TerrainBlock::TrySplit ()
+{
+  // Test the preconditions under which a split succeeds
+  // 1. Is a leaf (no reason to split inner node again)
+  if (!IsLeaf ())
+    return false;
+
+  // 2. Neighbour is after split at same level or max one level from us 
+  // (if neighbour is inner node we can always connect to its children)
+  for (size_t i = 0; i < 4; ++i)
+  {
+    if (neighbours[i] && 
+        (!neighbours[i]->IsLeaf () ||
+        neighbours[i]->stepSize > stepSize))
+    return false;
+  }
+
+  // We can split, so do it
+  Split ();
+
+  return true;
+}
+
+void TerrainBlock::Merge ()
 {
   if (IsLeaf ())
-    return;
+  {
+    return; // Nothing to merge
+  }
 
-  if(!children[0]->IsLeaf() || !children[1]->IsLeaf()
-    || !children[2]->IsLeaf() || !children[3]->IsLeaf())
-    return;
+  // Merge all children
+  for (size_t i = 0; i < 4; ++i)
+  {
+    children[i]->Merge ();
+  }
   
-  if (neighbours[0] && 
-      (!neighbours[0]->IsLeaf () && 
-       (!neighbours[0]->children[2]->IsLeaf () ||
-        !neighbours[0]->children[3]->IsLeaf ())))
-    return;
-  if (neighbours[1] && 
-      (!neighbours[1]->IsLeaf () && 
-       (!neighbours[1]->children[0]->IsLeaf () ||
-        !neighbours[1]->children[2]->IsLeaf ())))
-    return;
-  if (neighbours[2] && 
-      (!neighbours[2]->IsLeaf () && 
-       (!neighbours[2]->children[1]->IsLeaf () ||
-        !neighbours[2]->children[3]->IsLeaf ())))
-    return;
-  if (neighbours[3] && 
-      (!neighbours[3]->IsLeaf () && 
-       (!neighbours[3]->children[0]->IsLeaf () ||
-        !neighbours[3]->children[1]->IsLeaf ())))
-    return;
+  // Merge any neighbours that needs to be merged
+  static const size_t childMapTable[4][2][2] = 
+  {
+    {
+      {0,3},{2,1}
+    },
+    {
+      {0,3},{1,2}
+    },
+    {
+      {2,1},{3,0}
+    },
+    {
+      {3,0},{1,2}
+    },
+  };
 
-  children[0]->Detach ();
-  children[1]->Detach ();
-  children[2]->Detach ();
-  children[3]->Detach ();
-  children[0] = children[1] = children[2] = children[3] = 0;
+  for (size_t child = 0; child < 4; ++child)
+  {
+    TerrainBlock* childPtr = children[child];
+
+    for (size_t neighbour = 0; neighbour < 2; ++neighbour)
+    {
+      TerrainBlock* cn = childPtr->neighbours[childMapTable[child][neighbour][0]];
+      
+      if (cn)
+      {
+        if (!cn->IsLeaf ())
+        {
+          cn->Merge ();
+        }
+        cn->neighbours[childMapTable[child][neighbour][1]] = this;
+      }
+    }
+  }
+
+  // Now, remove our children
+  for (size_t i = 0; i < 4; ++i)
+  {
+    renderData->terrainBlockAllocator.Free (children[i]);
+    children[i] = 0;
+  }
 }
 
-void csTerrBlock::CalcLOD ()
+void TerrainBlock::Disconnect ()
 {
-  int res = (1 << rdata->block_res_log2);
+  if (!IsLeaf ())
+  {
+    for (size_t i = 0; i < 4; ++i)
+    {
+      children[i]->Disconnect ();
+    }
+  }
 
-  csVector3 cam = rdata->tr_o2c.GetOrigin ();
-  csBox3 cambox (bbox.Min ()-cam, bbox.Max ()-cam);
+  // Disconnect any outer neighbour
+  for (size_t i = 0; i < 4; ++i)
+  {    
+    size_t neighbourBackPtr = 3-i;
 
-  csVector3 toBB = (bbox.GetCenter () - cam).Unit ();
-  csVector3 bbsize = bbox.GetSize ();
+    if (neighbours[i])
+    {
+      // Check if we are neighbour of neighbour
+      if (neighbours[i]->neighbours[neighbourBackPtr] == this)
+      {
+        neighbours[i]->neighbours[neighbourBackPtr] = 0;
+      }
 
-  float projArea = 
-    (bbsize.x*bbsize.y) * fabsf (toBB.z) +
-    (bbsize.x*bbsize.z) * fabsf (toBB.y) + 
-    (bbsize.y*bbsize.z) * fabsf (toBB.x);
+      // If neighbour is inner, check one level child
+      if (!neighbours[i]->IsLeaf())
+      {
+        for (size_t c = 0; c < 4; ++c)
+        {
+          if (neighbours[i]->children[c]->neighbours[neighbourBackPtr] == this)
+          {
+            neighbours[i]->children[c]->neighbours[neighbourBackPtr] = 0;
+          }
+        }
+      }
+    }
+  }
+}
 
-  const float resFactor = rdata->lod_lcoeff / float (res);
-  float targetDistSq = projArea*resFactor*resFactor;
+void TerrainBlock::ComputeLOD (const csReversibleTransform& transformO2C, const size_t order[4])
+{
+  const size_t blockRes = renderData->blockResolution;
 
-  if (cambox.SquaredOriginDist ()<targetDistSq && 
-    step > 1)
+  if (boundingBox.Empty ())
+    return;
+
+  const csVector3& camPosInObj = transformO2C.GetOrigin ();
+  csBox3 camBox (boundingBox.Min () - camPosInObj, boundingBox.Max () - camPosInObj);
+
+/*  const csVector3 toBBVec = camBox.GetCenter ().Unit ();
+  const csVector3 bbSize = camBox.GetSize ();
+
+  // Compute projected area of the seen (3) faces of the bb
+  const float projectedArea =
+    (bbSize.x*bbSize.y) * fabsf (toBBVec.z) +
+    (bbSize.x*bbSize.z) * fabsf (toBBVec.y) +
+    (bbSize.y*bbSize.z) * fabsf (toBBVec.x);
+
+  const float resFactor = renderData->properties->GetLODSplitCoeff () / (float)blockRes;
+  const float targetDistSq = projectedArea*resFactor*resFactor;
+*/
+
+  const float splitDist = size.x * renderData->properties->GetLODSplitCoeff () / (float)blockRes;
+  const float targetDistSq = splitDist*splitDist;
+
+  if (camBox.SquaredOriginDist  () < targetDistSq &&
+    stepSize > renderData->properties->GetMinSteps ())
   {
     if (IsLeaf ())
+    {
       Split ();
+    }
   }
   else
   {
     if (!IsLeaf ())
+    {
       Merge ();
+    }
   }
+
   if (!IsLeaf ())
-    for (int i=0; i<4; i++)
-      children[i]->CalcLOD ();
+  {
+    for (size_t i = 0; i < 4; ++i)
+    {
+      children[order[i]]->ComputeLOD (transformO2C, order);
+    }
+  }
 }
 
-void csTerrBlock::DrawTest (iGraphics3D* g3d,
-                            iRenderView *rview, uint32 frustum_mask,
-                            csReversibleTransform &transform,
-                            iMovable *movable,
-                            csDirtyAccessArray<csRenderMesh*>& meshes)
+void TerrainBlock::CullRenderMeshes (iRenderView* rview, const csPlane3* cullPlanes, 
+  uint32 frustumMask, const csReversibleTransform& obj2cam, iMovable* movable,
+  csDirtyAccessArray<csRenderMesh*>& meshCache)
 {
-  int clip_portal, clip_plane, clip_z_plane;
-  if (!CS::RenderViewClipper::CullBBox (rview->GetRenderContext (),
-	rdata->planes, frustum_mask, bbox,
-	clip_portal, clip_plane, clip_z_plane))
-    return;
+  int clipPortal, clipPlane, clipZPlane;
+  if (!CS::RenderViewClipper::CullBBox (rview->GetRenderContext (), cullPlanes, 
+    frustumMask, boundingBox, clipPortal, clipPlane, clipZPlane) &&
+    !boundingBox.Empty ())
+    return; // If we're not visible, our children won't be either
 
-  if (!IsLeaf () && children[0]->built &&
-    children[1]->built &&
-    children[2]->built &&
-    children[3]->built)
+  if (!IsLeaf ())
   {
-    children[0]->DrawTest (g3d, rview, frustum_mask, transform, movable,
-      meshes);
-    children[1]->DrawTest (g3d, rview, frustum_mask, transform, movable,
-      meshes);
-    children[2]->DrawTest (g3d, rview, frustum_mask, transform, movable,
-      meshes);
-    children[3]->DrawTest (g3d, rview, frustum_mask, transform, movable,
-      meshes);
+    // Have children, dispatch to them
+    for (size_t i = 0; i < 4; ++i)
+    {
+      children[i]->CullRenderMeshes (rview, cullPlanes, frustumMask, obj2cam,
+        movable, meshCache);
+    }
     return;
   }
 
-  if (!built)
-    return;
+  SetupGeometry ();
 
-  //csVector3 cam = rview->GetCamera ()->GetTransform ().GetOrigin ();
-  csVector3 cam = transform.GetOrigin ();
-
-  // left & top sides are covered with additional triangles
-  /*int idx = ((!neighbours[0] || neighbours[0]->step>step)?1:0)+
-    (((!neighbours[1] || neighbours[1]->step>step)?1:0)<<1)+
-    (((neighbours[2] && neighbours[2]->step>step)?1:0)<<2)+
-    (((neighbours[3] && neighbours[3]->step>step)?1:0)<<3);*/
-  int idx = ((neighbours[0] && neighbours[0]->step>step)?1:0)+
-    (((neighbours[1] && neighbours[1]->step>step)?1:0)<<1)+
-    (((neighbours[2] && neighbours[2]->step>step)?1:0)<<2)+
-    (((neighbours[3] && neighbours[3]->step>step)?1:0)<<3);
-
-  int numIndices;
-  bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, 
-    rdata->renderer->GetIndexBuffer (rdata->block_res_log2, idx, numIndices));
+  const csVector3 worldOrigin = movable->GetFullTransform ().GetOrigin () + 
+    csVector3 (centerPos.x, 0, centerPos.y);  
 
 
-  const csReversibleTransform o2wt = movable->GetFullTransform ();
-  const csVector3& wo = o2wt.GetOrigin ();
-  bool isMirrored = rview->GetCamera()->IsMirrored();
+  const csTerrainMaterialPalette& palette = renderData->renderer->GetMaterialPalette ();
 
-  for (int j = -1; j < (int)rdata->material_palette->GetSize (); ++j)
+  // Get the index buffer
+  size_t indexType = 
+    ((neighbours[0] && neighbours[0]->stepSize > stepSize) ? 1<<0 : 0) |
+    ((neighbours[1] && neighbours[1]->stepSize > stepSize) ? 1<<1 : 0) |
+    ((neighbours[2] && neighbours[2]->stepSize > stepSize) ? 1<<2 : 0) |
+    ((neighbours[3] && neighbours[3]->stepSize > stepSize) ? 1<<3 : 0);
+
+  uint numIndices;
+  bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX,
+    renderData->renderer->GetIndexBuffer (renderData->blockResolution,
+    indexType, numIndices));
+
+  for (int j = -1; j < (int)palette.GetSize (); ++j)
   {
-    bool created;
-
     iMaterialWrapper* mat = 0;
     iShaderVariableContext* svContext;
 
     if (j < 0)
     {
-      mat = rdata->cell->GetBaseMaterial ();
-      svContext = rdata->baseContext;
+      mat = renderData->cell->GetBaseMaterial ();
+      svContext = renderData->baseLayerSVContext;
     }
     else
     {
-      mat = rdata->material_palette->Get (j);
-      svContext = rdata->sv_context[j];
+      mat = palette.Get (j);
+      svContext = renderData->svContextArray[j];
     }
 
-    if (!mat)
+    if (!mat || !svContext)
       continue;
 
-    csRenderMesh*& mesh = rdata->rm_holder->GetUnusedMesh (created,
+    bool created;
+    csRenderMesh*& mesh = renderData->renderer->GetMeshHolder ().GetUnusedMesh (created,
       rview->GetCurrentFrameNumber ());
 
     mesh->meshtype = CS_MESHTYPE_TRIANGLESTRIP;
-
-    mesh->buffers = 0;
-    mesh->buffers = bufferHolder;
-    mesh->clip_portal = clip_portal;
-    mesh->clip_plane = clip_plane;
-    mesh->clip_z_plane = clip_z_plane;
+    mesh->clip_portal = clipPortal;
+    mesh->clip_plane = clipPlane;
+    mesh->clip_z_plane = clipZPlane;
     mesh->indexstart = 0;
     mesh->indexend = numIndices;
     mesh->material = mat;
     mesh->variablecontext = svContext;
+    mesh->buffers = bufferHolder;
 
-    mesh->object2world = o2wt;
-    mesh->worldspace_origin = wo;
-    mesh->do_mirror = isMirrored;
+    mesh->worldspace_origin = worldOrigin;
 
-    meshes.Push (mesh);
+    meshCache.Push (mesh);
   }
 }
 
-csTerrainBruteBlockCellRenderProperties::csTerrainBruteBlockCellRenderProperties()
-  : scfImplementationType (this), visible (true), block_res (16), lod_lcoeff (16)
-{
 
+TerrainCellRData::TerrainCellRData (iTerrainCell* cell, 
+                                    csTerrainBruteBlockRenderer* renderer)
+  : rootBlock (0), cell (cell), renderer (renderer)
+{
+  properties = (TerrainBBCellRenderProperties*)cell->GetRenderProperties (); 
+
+  blockResolution = properties->GetBlockResolution ();
+
+  baseLayerSVContext.AttachNew (new csShaderVariableContext);
+  svContextArray.SetSize (renderer->GetMaterialPalette ().GetSize ());
+  alphaMapArray.SetSize (renderer->GetMaterialPalette ().GetSize ());
+
+  // Setup the base context
+
+  svAccessor.AttachNew (new TerrainBBSVAccessor (properties));
+
+  if (textureLodDistanceID == csInvalidStringID)
+  {
+    textureLodDistanceID = renderer->GetStringSet ()->Request ("texture lod distance");
+  }
+
+  csRef<csShaderVariable> lodVar; lodVar.AttachNew (
+    new csShaderVariable (textureLodDistanceID));
+  lodVar->SetAccessor (svAccessor);
+  
+  baseLayerSVContext->AddVariable (lodVar);
+
+  for (size_t i = 0; i < 4; ++i)
+  {
+    neighbours[i] = 0;
+  }
 }
 
-csTerrainBruteBlockCellRenderProperties::csTerrainBruteBlockCellRenderProperties(
-  csTerrainBruteBlockCellRenderProperties& other)
-  : scfImplementationType (this), visible (other.visible), block_res (other.block_res),
-  lod_lcoeff (other.lod_lcoeff)
-{
-
+TerrainCellRData::~TerrainCellRData ()
+{  
 }
 
-csTerrainBruteBlockCellRenderProperties::~csTerrainBruteBlockCellRenderProperties ()
+void TerrainCellRData::SetupRoot ()
 {
+  if (rootBlock)
+    return;
+
+  rootBlock = terrainBlockAllocator.Alloc ();
+  
+  const csVector3& cellSize = cell->GetSize ();
+  rootBlock->centerPos = cell->GetPosition () + 
+    csVector2 (cellSize.x / 2.0f, cellSize.z / 2.0f);
+  rootBlock->size = csVector2 (cellSize.x, cellSize.z);
+  
+  rootBlock->gridLeft = rootBlock->gridTop = 0;
+  rootBlock->gridRight = cell->GetGridWidth () - 1;
+  rootBlock->gridBottom = cell->GetGridHeight () - 1;
+
+  rootBlock->stepSize = rootBlock->gridRight / blockResolution;
+  rootBlock->renderData = this;
 }
 
-void csTerrainBruteBlockCellRenderProperties::SetParameter (const char* name,
-                                                        const char* value)
+void TerrainCellRData::ConnectCell (TerrainCellRData* otherCell, TerrainCellBorderMatch side)
 {
-  if (strcmp (name, "visible") == 0)
-    SetVisible (strcmp(value, "true") == 0);
-  else if (strcmp (name, "block resolution") == 0)
-    SetBlockResolution (atoi (value));
-  else if (strcmp (name, "lod lcoeff") == 0)
-    SetLODLCoeff (atof (value));
+  size_t sideIdx = (size_t)side;
+  size_t sideBackIdx = 3-sideIdx;
+
+  // Reduce other cell to be small enough for making connection
+  if (rootBlock)
+    rootBlock->Merge ();
+
+  if (otherCell->rootBlock)
+    otherCell->rootBlock->Merge ();
+
+  neighbours[sideIdx] = otherCell;
+  otherCell->neighbours[sideBackIdx] = this;
+
+  // Make sure both actually have a root
+  SetupRoot ();
+  otherCell->SetupRoot ();
+
+  rootBlock->neighbours[sideIdx] = otherCell->rootBlock;
+  otherCell->rootBlock->neighbours[sideBackIdx] = rootBlock;
 }
 
-csPtr<iTerrainCellRenderProperties> csTerrainBruteBlockCellRenderProperties::Clone ()
+void TerrainCellRData::DisconnectCell ()
 {
-  return csPtr<iTerrainCellRenderProperties> (new csTerrainBruteBlockCellRenderProperties (*this));
+  if (rootBlock)
+  {
+    rootBlock->Disconnect ();
+  }
+
+  for (size_t i = 0; i < 4; ++i)
+  {
+    size_t bi = 3-i;
+
+    if (neighbours[i] && 
+      neighbours[i]->neighbours[bi] == this)
+    {
+      neighbours[i]->neighbours[bi] = 0;
+    }
+  }
+
+  rootBlock = 0;
+  terrainBlockAllocator.Empty ();
 }
 
-
+//-- THE TERRAIN RENDERER ITSELF
 csTerrainBruteBlockRenderer::csTerrainBruteBlockRenderer (iBase* parent)
-: scfImplementationType (this, parent)
-{
+  : scfImplementationType (this, parent), materialPalette (0)
+{  
 }
-
 
 csTerrainBruteBlockRenderer::~csTerrainBruteBlockRenderer ()
 {
+
 }
 
-csPtr<iTerrainCellRenderProperties> csTerrainBruteBlockRenderer::CreateProperties()
+csPtr<iTerrainCellRenderProperties> csTerrainBruteBlockRenderer::CreateProperties ()
 {
-  return csPtr<iTerrainCellRenderProperties> (new csTerrainBruteBlockCellRenderProperties);
+  return csPtr<iTerrainCellRenderProperties> (new TerrainBBCellRenderProperties);
 }
 
 void csTerrainBruteBlockRenderer::ConnectTerrain (iTerrainSystem* system)
 {
+  system->AddCellLoadListener (this);
   system->AddCellHeightUpdateListener (this);
 }
 
 void csTerrainBruteBlockRenderer::DisconnectTerrain (iTerrainSystem* system)
 {
   system->RemoveCellHeightUpdateListener (this);
+  system->RemoveCellLoadListener (this);
 }
 
-
-csRenderMesh** csTerrainBruteBlockRenderer::GetRenderMeshes (int& n, iRenderView* rview,
-                                                             iMovable* movable, uint32 frustum_mask,
-                                                             const csArray<iTerrainCell*> cells)
+csRenderMesh** csTerrainBruteBlockRenderer::GetRenderMeshes (int& n, 
+  iRenderView* rview, iMovable* movable, uint32 frustum_mask,
+  const csArray<iTerrainCell*> cells)
 {
-  meshes.Empty ();
+  renderMeshCache.Empty ();
 
-  bool do_mirroring = rview->GetCamera ()->IsMirrored ();
+  // Setup camera properties and clip planes
+  const csReversibleTransform& trO2W = movable->GetFullTransform ();
+  
+  iCamera* camera = rview->GetCamera ();
+  csReversibleTransform trO2C = camera->GetTransform ();
+  if (!trO2W.IsIdentity ())
+    trO2C /= trO2W;
 
-  const csReversibleTransform& o2wt = movable->GetFullTransform ();
-  const csVector3& wo = o2wt.GetOrigin ();
-
-  iCamera* cam = rview->GetCamera ();
-  csReversibleTransform tr_o2c = cam->GetTransform ();
-  if (!movable->IsFullTransformIdentity ())
-    tr_o2c /= movable->GetFullTransform ();
-
+  // At very most we can have 10 planes
   csPlane3 planes[10];
-  CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext (),
-      tr_o2c, planes, frustum_mask);
+  CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext (), 
+    trO2C, planes, frustum_mask); 
+
+  // Compute an approximate back to front direction
+  const csVector3& direction = trO2C.GetT2O ().Col3 ();
+  const size_t orderIdx = (direction.x > 0 ? 1 : 0) |
+                          (direction.z > 0 ? 2 : 0);
+
+  static const size_t blockOrderTable[4][4] = 
+  {
+    {2,3,0,1},
+    {3,2,1,0},
+    {0,1,2,3},
+    {1,0,3,2}
+  };
 
   for (size_t i = 0; i < cells.GetSize (); ++i)
   {
-    csBruteBlockTerrainRenderData* rdata = (csBruteBlockTerrainRenderData*)
-      cells[i]->GetRenderData ();
+    TerrainCellRData* renderData = (TerrainCellRData*)cells[i]->GetRenderData ();
 
-    if (!rdata) continue;
+    if (!renderData)
+      continue; // No data, nothing to render
 
-    rdata->material_palette = &material_palette;
-    rdata->rm_holder = &rm_holder;
-    rdata->planes = planes;
+    if (!renderData->rootBlock)
+      renderData->SetupRoot ();
 
-    rdata->rootblock->CalcLOD ();
-
-    rdata->tr_o2c = tr_o2c;
-
-    rdata->rootblock->DrawTest (g3d, rview, frustum_mask, tr_o2c, movable, meshes);
+    renderData->rootBlock->ComputeLOD (trO2C, blockOrderTable[orderIdx]);
   }
 
-  n = (int)meshes.GetSize ();
+  for (size_t i = 0; i < cells.GetSize (); ++i)
+  {
+    TerrainCellRData* renderData = (TerrainCellRData*)cells[i]->GetRenderData ();
 
-  return meshes.GetArray ();
+    if (!renderData)
+      continue; // No data, nothing to render
+
+    renderData->rootBlock->CullRenderMeshes (rview, planes, frustum_mask, trO2C, 
+      movable, renderMeshCache);
+  }
+
+  n = (int)renderMeshCache.GetSize ();
+  return renderMeshCache.GetArray ();
 }
 
 void csTerrainBruteBlockRenderer::OnMaterialPaletteUpdate (
   const csRefArray<iMaterialWrapper>& material_palette)
 {
-  this->material_palette = material_palette;
+  materialPalette = &material_palette;  
 }
 
-void csTerrainBruteBlockRenderer::OnHeightUpdate (iTerrainCell* cell,
+void csTerrainBruteBlockRenderer::OnMaterialMaskUpdate (iTerrainCell* cell, size_t materialIdx,
+  const csRect& rectangle, const unsigned char* mapData, size_t pitch)
+{
+  SetupCellData (cell);
+
+  csRef<TerrainCellRData> data = (TerrainCellRData*)cell->GetRenderData ();
+
+  if (data)
+  {
+    // Set enough length
+    if (data->svContextArray.GetSize () <= materialIdx)
+    {
+      data->svContextArray.SetSize (materialIdx + 1);
+      data->alphaMapArray.SetSize (materialIdx + 1);
+    }
+
+    if (!data->svContextArray[materialIdx])
+    {
+      csRef<csShaderVariableContext> ctx;
+      ctx.AttachNew (new csShaderVariableContext);
+
+      data->svContextArray.Put (materialIdx, ctx);
+
+      csRef<csShaderVariable> lodVar; 
+      lodVar.AttachNew (new csShaderVariable (textureLodDistanceID));
+      lodVar->SetAccessor (data->svAccessor);
+
+      data->svContextArray[materialIdx]->AddVariable (lodVar);
+    }
+
+    if (!data->alphaMapArray[materialIdx])
+    {
+      csRef<iImage> alphaImg;
+      alphaImg.AttachNew (new csImageMemory (cell->GetMaterialMapWidth (), 
+        cell->GetMaterialMapHeight (), CS_IMGFMT_TRUECOLOR));
+
+      csRef<iTextureHandle> txtHandle = graph3d->GetTextureManager ()->RegisterTexture (alphaImg, 
+        CS_TEXTURE_2D | CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
+
+      data->alphaMapArray.Put (materialIdx, txtHandle);
+
+      csRef<csShaderVariable> var;
+      var.AttachNew (new csShaderVariable(stringSet->Request ("splat alpha map")));
+      var->SetType (csShaderVariable::TEXTURE);
+      var->SetValue (data->alphaMapArray[materialIdx]);
+
+      data->svContextArray[materialIdx]->AddVariable (var);
+    }
+
+    // Update the alpha map
+    csDirtyAccessArray<csRGBpixel> imageData;
+    imageData.SetSize (rectangle.Width () * rectangle.Height ());
+   
+    csRGBpixel* dst_data = imageData.GetArray ();
+
+    for (int y = 0; y < rectangle.Width (); ++y)
+    {
+      const unsigned char* src_data = mapData + y * pitch;
+
+      for (int x = 0; x < rectangle.Height (); ++x, ++src_data)
+      {
+        (*dst_data++).Set (*src_data, *src_data, *src_data, *src_data);
+      }
+    }
+
+    data->alphaMapArray[materialIdx]->Blit (rectangle.xmin, rectangle.ymin,
+      rectangle.Width (), rectangle.Height (), 
+      (unsigned char*)imageData.GetArray (), iTextureHandle::RGBA8888);
+
+  }
+}
+
+void csTerrainBruteBlockRenderer::OnHeightUpdate (iTerrainCell* cell, 
                                                   const csRect& rectangle)
 {
-  csRef<csBruteBlockTerrainRenderData> rdata = SetupCellRenderData (cell);
+  // Invalidate all data, recursively
+  // @@TODO: Make this smarter!
+  csRef<TerrainCellRData> data = (TerrainCellRData*)cell->GetRenderData ();
 
-  //@@TODO! Fix "incremental" updates
+  if (data && data->rootBlock)
+  {
+    data->rootBlock->InvalidateGeometry (true);
+  }
 }
 
-void csTerrainBruteBlockRenderer::OnMaterialMaskUpdate (iTerrainCell* cell,
-  size_t material, const csRect& rectangle, const unsigned char* data,
-  size_t pitch)
+
+void csTerrainBruteBlockRenderer::OnCellLoad (iTerrainCell* cell)
 {
-  csRef<csBruteBlockTerrainRenderData> rdata = SetupCellRenderData (cell);
+  SetupCellData (cell);
+}
 
-  if (rdata->sv_context.GetSize () <= material)
+void csTerrainBruteBlockRenderer::OnCellPreLoad (iTerrainCell* cell)
+{
+
+}
+
+void csTerrainBruteBlockRenderer::OnCellUnload (iTerrainCell* cell)
+{
+  csRef<TerrainCellRData> data = (TerrainCellRData*)cell->GetRenderData ();
+
+  if (data)
   {
-    rdata->sv_context.SetSize (material + 1);
+    activeCellList.Delete (data);
+    data->DisconnectCell ();
   }
 
-  if (!rdata->sv_context[material])
+  // Clean out any renderer data in cell
+  cell->SetRenderData (0);
+}
+
+void csTerrainBruteBlockRenderer::SetupCellData (iTerrainCell* cell)
+{
+  // We got a new cell, so setup a render-data structure for it
+  if (cell->GetRenderData ())
+    return;
+
+  csRef<TerrainCellRData> newD;
+  newD.AttachNew (new TerrainCellRData (cell, this));
+  newD->SetupRoot ();
+
+  cell->SetRenderData (newD);
+
+  // Check possible matches for automatic neighbouring
+  for (size_t i = 0; i < activeCellList.GetSize (); ++i)
   {
-    rdata->sv_context[material].AttachNew (new csShaderVariableContext);
+    TerrainCellBorderMatch match = MatchCell (cell, activeCellList[i]->cell);
 
-    float lod_distance = rdata->lod_distance;
-    csRef<csShaderVariable> lod_var = 
-      new csShaderVariable (strings->Request ("texture lod distance"));
-    lod_var->SetType (csShaderVariable::VECTOR3);
-    lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
-    rdata->sv_context[material]->AddVariable (lod_var);
-  }
-
-  if (rdata->alpha_map.GetSize () <= material)
-  {
-    rdata->alpha_map.SetSize (material + 1);
-  }
-
-  if (!rdata->alpha_map[material])
-  {
-    csRef<iImage> image;
-    image.AttachNew (new csImageMemory (cell->GetMaterialMapWidth (),
-      cell->GetMaterialMapHeight (), CS_IMGFMT_TRUECOLOR));
-
-    rdata->alpha_map[material] = g3d->GetTextureManager ()->RegisterTexture
-      (image, CS_TEXTURE_2D | CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
-
-    csRef<csShaderVariable> var;
-    var.AttachNew (new csShaderVariable(strings->Request ("splat alpha map")));
-    var->SetType (csShaderVariable::TEXTURE);
-    var->SetValue (rdata->alpha_map[material]);
-    rdata->sv_context[material]->AddVariable (var);
-  }
-
-  csDirtyAccessArray<csRGBpixel> image_data;
-  image_data.SetSize (rectangle.Width () * rectangle.Height ());
-
-  csRGBpixel* dst_data = image_data.GetArray ();
-
-  for (int y = 0; y < rectangle.Width (); ++y)
-  {
-    const unsigned char* src_data = data + y * pitch;
-
-    for (int x = 0; x < rectangle.Height (); ++x, ++src_data)
+    if (match != CELL_MATCH_NONE)
     {
-      (*dst_data++).Set (*src_data, *src_data, *src_data, *src_data);
+      // We have a match, do connect it
+      newD->ConnectCell (activeCellList[i], match);
     }
   }
 
-  rdata->alpha_map[material]->Blit (rectangle.xmin, rectangle.ymin,
-    rectangle.Width (), rectangle.Height (), (unsigned char*)
-    image_data.GetArray (), iTextureHandle::RGBA8888);
+  activeCellList.Push (newD);
 }
 
-bool csTerrainBruteBlockRenderer::Initialize (iObjectRegistry* object_reg)
+
+bool csTerrainBruteBlockRenderer::Initialize (iObjectRegistry* objectReg)
 {
-  this->object_reg = object_reg;
-
-  g3d = csQueryRegistry<iGraphics3D> (object_reg);
-
-  strings = csQueryRegistryTagInterface<iStringSet> (object_reg,
+  objectRegistry = objectReg;
+  graph3d = csQueryRegistry<iGraphics3D> (objectReg);
+  stringSet = csQueryRegistryTagInterface<iStringSet> (objectReg,
     "crystalspace.shared.stringset");
 
+  // Error getting globals
+  if (!graph3d || !stringSet)
+    return false;
+
   return true;
-}
-
-csRef<csBruteBlockTerrainRenderData> 
-csTerrainBruteBlockRenderer::SetupCellRenderData (iTerrainCell* cell)
-{
-  csRef<csBruteBlockTerrainRenderData> rdata = 
-    (csBruteBlockTerrainRenderData*)cell->GetRenderData ();
-
-  if (!rdata)
-  {
-    rdata.AttachNew (new csBruteBlockTerrainRenderData(cell, this));
-    cell->SetRenderData (rdata);
-    rdata->SetupObject ();
-  }
-
-  return rdata;
 }
 
 template<typename T>
@@ -901,26 +1311,27 @@ static void FillEdge (bool halfres, int res, T* indices, int &indexcount,
   {
     if (x>0)
     {
-      indices[indexcount++] = offs+x*xadd+zadd;
       indices[indexcount++] = offs+x*xadd;
+      indices[indexcount++] = offs+x*xadd+zadd;
     }
     else
     {
-      indices[indexcount++] = offs+x*xadd;
-      indices[indexcount++] = offs+x*xadd;
-      indices[indexcount++] = offs+x*xadd;
+      indices[indexcount++] = offs;
+      indices[indexcount++] = offs;
+      indices[indexcount++] = offs;
     }
 
-    indices[indexcount++] = offs+(x+1)*xadd+zadd;
     if (!halfres)
       indices[indexcount++] = offs+(x+1)*xadd;
     else
       indices[indexcount++] = offs+x*xadd;
 
+    indices[indexcount++] = offs+(x+1)*xadd+zadd;
+
     if (x<res-2)
     {
-      indices[indexcount++] = offs+(x+2)*xadd+zadd;
       indices[indexcount++] = offs+(x+2)*xadd;
+      indices[indexcount++] = offs+(x+2)*xadd+zadd;
     }
     else
     {
@@ -932,21 +1343,28 @@ static void FillEdge (bool halfres, int res, T* indices, int &indexcount,
 }
 
 template<typename T>
-static void FillBlock (T* indices, int &indexcount, int block_res, int t, int r, int l, int b)
+static void FillBlock (T* indices, int &indexcount, int block_res, 
+                       int t, int r, int l, int b)
 {
   indexcount = 0;
   int x, z;
+
+  uint32 numVert = block_res + 1;
+
   for (z=1; z<(block_res-1); z++)
   {
-    indices[indexcount++] = 1+z*(block_res+1);
-    indices[indexcount++] = 1+z*(block_res+1);
+    // Start row
+    indices[indexcount++] = 1+z*(numVert);
+    indices[indexcount++] = 1+z*(numVert);
+
     for (x=1; x<(block_res); x++)
     { 
-      indices[indexcount++] = x+(z+0)*(block_res+1);
-      indices[indexcount++] = x+(z+1)*(block_res+1);
+      indices[indexcount++] = x+(z+1)*(numVert);
+      indices[indexcount++] = x+(z+0)*(numVert);
     }
-    indices[indexcount++] = x-1+(z+1)*(block_res+1);
-    indices[indexcount++] = x-1+(z+1)*(block_res+1);
+
+    indices[indexcount++] = x-1+(z+1)*(numVert);
+    indices[indexcount++] = x-1+(z+1)*(numVert);
   }
 
   FillEdge (t==1,
@@ -967,64 +1385,64 @@ static void FillBlock (T* indices, int &indexcount, int block_res, int t, int r,
 
 }
 
-iRenderBuffer* csTerrainBruteBlockRenderer::GetIndexBuffer (int block_res_log2, int index, int& numIndices)
+iRenderBuffer* csTerrainBruteBlockRenderer::GetIndexBuffer (size_t blockResolution, 
+  size_t indexType, uint& numIndices)
 {
   csRef<IndexBufferSet> set;
 
-  if (size_t (block_res_log2) >= indexBufferList.GetSize () ||
-    indexBufferList[block_res_log2] == 0)
+  size_t blockResLog2 = csLog2 ((int)blockResolution);
+
+  if (blockResLog2 >= indexBufferList.GetSize () ||
+    indexBufferList[blockResLog2] == 0)
   {
-    // Add a new one
-    indexBufferList.SetSize (block_res_log2 + 1);
+    //Need a new one
+    indexBufferList.SetSize (blockResLog2+1);
     set.AttachNew (new IndexBufferSet);
-    indexBufferList.Put (block_res_log2, set);
+    indexBufferList.Put (blockResLog2, set);
 
-    int block_res = 1 << block_res_log2;
+    int* numIndices = set->numIndices;
+    size_t maxIndex = (blockResolution+1)*(blockResolution+1) - 1;
 
-    int* numindices = set->numindices;
-
-    int maxIndex = (block_res+1) * (block_res+1) - 1;
-
-    // Reset
-    for (int t=0; t<=1; t++)
+    // Iterate over all possible border conditions
+    for (int t = 0; t <= 1; ++t)
     {
-      for (int r=0; r<=1; r++)
+      for (int r = 0; r <= 1; ++r)
       {
-        for (int l=0; l<=1; l++)
+        for (int l = 0; l <= 1; ++l)
         {
-          for (int b=0; b<=1; b++)
+          for (int b = 0; b <= 1; ++b)
           {
-            int idx = t+(r<<1)+(l<<2)+(b<<3);
+            int indexType = t | (r<<1) | (l<<2) | (b<<3);
 
             if (maxIndex > 0xFFFF)
             {
-              set->mesh_indices[idx] = 
+              // need 32-bit or more
+              set->meshIndices[indexType] = 
                 csRenderBuffer::CreateIndexRenderBuffer (
-                block_res*block_res*2*3, 
-                CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT,
-                0, maxIndex);
+                blockResolution*blockResolution*2*3, CS_BUF_STATIC,
+                CS_BUFCOMP_UNSIGNED_INT, 0, maxIndex);
 
-              uint32 *indices = 
-                (uint32*)set->mesh_indices[idx]->Lock (CS_BUF_LOCK_NORMAL);
+              uint32* indices = (uint32*)
+                set->meshIndices[indexType]->Lock(CS_BUF_LOCK_NORMAL);
 
-              FillBlock (indices, numindices[idx], block_res, t, r, l ,b);
-
-              set->mesh_indices[idx]->Release ();
+              FillBlock (indices, numIndices[indexType], (int)blockResolution,
+                t, r, l, b);
+              set->meshIndices[indexType]->Release ();
             }
             else
             {
-              set->mesh_indices[idx] = 
+              // 16 bits is enough
+              set->meshIndices[indexType] = 
                 csRenderBuffer::CreateIndexRenderBuffer (
-                block_res*block_res*2*3, 
-                CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_SHORT,
-                0, maxIndex);
+                blockResolution*blockResolution*2*3, CS_BUF_STATIC,
+                CS_BUFCOMP_UNSIGNED_SHORT, 0, maxIndex);
 
-              uint16 *indices = 
-                (uint16*)set->mesh_indices[idx]->Lock (CS_BUF_LOCK_NORMAL);
+              uint16* indices = (uint16*)
+                set->meshIndices[indexType]->Lock(CS_BUF_LOCK_NORMAL);
 
-              FillBlock (indices, numindices[idx], block_res, t, r, l , b);
-              
-              set->mesh_indices[idx]->Release ();
+              FillBlock (indices, numIndices[indexType], (int)blockResolution,
+                t, r, l, b);
+              set->meshIndices[indexType]->Release ();
             }
           }
         }
@@ -1033,12 +1451,13 @@ iRenderBuffer* csTerrainBruteBlockRenderer::GetIndexBuffer (int block_res_log2, 
   }
   else
   {
-    set = indexBufferList[block_res_log2];
+    set = indexBufferList[blockResLog2];
   }
 
-  numIndices = set->numindices[index];
-  return set->mesh_indices[index];
+  numIndices = set->numIndices[indexType];
+  return set->meshIndices[indexType];
 }
+
 
 }
 CS_PLUGIN_NAMESPACE_END(Terrain2)

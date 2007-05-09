@@ -20,6 +20,18 @@ chronological order.
 	  ones in iRenderView.
 	- Marten added a const qualifier to one parameter in 
 	  CS::RenderViewClipper::ClipBBox.
+	- Marten updated terrain2 with a number of changes:
+	    - Made the rendering seamless between cells given they line up
+	      perfectly, have same xz size etc.
+	    - Unified the coordinate systems to be consistient.
+	    - Updated rendering to be consistent when splitting/merging
+	      subblocks (needed for inter-cell connections).
+	    - Added support for raw heightmap as well as color encoded
+	      images to give higher precision.
+	    - Made it possible to specify a set of default values for
+	      cells so that common parameters don't need to be repeated.
+	    - Removed the "simple" renderer as it was horribly broken.
+	    - Updated terraini demo level to use four cells. 
 8-May-2007
 	- Marten fixed a bug in lighter2 where it would write vertexcolors to
 	  a buffer named "colors" when "color" was expected.

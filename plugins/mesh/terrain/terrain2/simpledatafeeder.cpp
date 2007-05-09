@@ -32,6 +32,7 @@
 #include "iutil/plugin.h"
 
 #include "simpledatafeeder.h"
+#include "feederhelper.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
 {
@@ -64,10 +65,21 @@ bool csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
   if (!loader || !properties)
     return false;
 
+  if (properties->heightmapSource.IsEmpty () ||
+    properties->materialmapSource.IsEmpty ())
+    return false;
+
   int width = cell->GetGridWidth ();
   int height = cell->GetGridHeight ();
 
   csLockedHeightData data = cell->LockHeightData (csRect(0, 0, width, height));
+  
+  HeightFeederParser mapReader (properties->heightmapSource, 
+    properties->heightmapFormat, loader, objectReg);
+  mapReader.Load (data.data, width, height, data.pitch, cell->GetSize ().y);
+
+
+/*
   
   csRef<iImage> map = loader->LoadImage (properties->heightmapSource.GetDataSafe (), 
     CS_IMGFMT_PALETTED8);
@@ -98,6 +110,7 @@ bool csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
     
     data.data += data.pitch;
   }
+*/
 
   cell->UnlockHeightData ();
   
@@ -154,7 +167,7 @@ csTerrainSimpleDataFeederProperties::csTerrainSimpleDataFeederProperties ()
 csTerrainSimpleDataFeederProperties::csTerrainSimpleDataFeederProperties (
   csTerrainSimpleDataFeederProperties& other)
   : scfImplementationType (this), heightmapSource (other.heightmapSource),
-  materialmapSource (other.materialmapSource)
+  materialmapSource (other.materialmapSource), heightmapFormat (other.heightmapFormat)
 {
 }
 
@@ -169,6 +182,10 @@ void csTerrainSimpleDataFeederProperties::SetParameter (const char* param, const
   if (strcmp (param, "heightmap source") == 0)
   {
     heightmapSource = value;
+  }
+  else if (strcmp (param, "heightmap format") == 0)
+  {
+    heightmapFormat = value;
   }
   else if (strcmp (param, "materialmap source") == 0)
   {

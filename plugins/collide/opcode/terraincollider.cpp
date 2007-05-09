@@ -205,15 +205,15 @@ bool csTerrainCollider::CollideTriangles (iTerrainCell* cell,
         
         if (!tri.half)
         {
-          p.a2 = csVector3(tri.x, cell->GetHeight (tri.x, tri.y), tri.y);
-          p.c2 = csVector3(tri.x+1, cell->GetHeight (tri.x+1, tri.y), tri.y);
-          p.b2 = csVector3(tri.x, cell->GetHeight (tri.x, tri.y+1), tri.y+1);
+          p.a2 = csVector3(tri.x, cell->GetHeight (tri.x, tri.y), height-tri.y-1);
+          p.b2 = csVector3(tri.x+1, cell->GetHeight (tri.x+1, tri.y), height-tri.y-1);
+          p.c2 = csVector3(tri.x, cell->GetHeight (tri.x, tri.y+1), height-tri.y-2);
         }
         else
         {
-          p.a2 = csVector3(tri.x+1, cell->GetHeight (tri.x+1, tri.y+1), tri.y+1);
-          p.c2 = csVector3(tri.x, cell->GetHeight (tri.x, tri.y+1), tri.y+1);
-          p.b2 = csVector3(tri.x+1, cell->GetHeight (tri.x+1, tri.y), tri.y);
+          p.a2 = csVector3(tri.x+1, cell->GetHeight (tri.x+1, tri.y+1), height-tri.y-2);
+          p.b2 = csVector3(tri.x, cell->GetHeight (tri.x, tri.y+1), height-tri.y-2);
+          p.c2 = csVector3(tri.x+1, cell->GetHeight (tri.x+1, tri.y), height-tri.y-1);
         }
         
         p.a2.x *= scale_u; p.a2.x += pos.x;
