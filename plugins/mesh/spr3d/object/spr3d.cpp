@@ -26,6 +26,7 @@
 #include "csgeom/polyclip.h"
 #include "csgeom/sphere.h"
 #include "cstool/rbuflock.h"
+#include "cstool/rviewclipper.h"
 #include "csutil/csendian.h"
 #include "csutil/csmd5.h"
 #include "csutil/dirtyaccessarray.h"
@@ -1115,8 +1116,8 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n,
   if (!movable->IsFullTransformIdentity ())
     tr_o2c /= movable->GetFullTransform ();
   int clip_portal, clip_plane, clip_z_plane;
-  rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
-  	clip_z_plane);
+  CS::RenderViewClipper::CalculateClipSettings (rview->GetRenderContext (),
+      frustum_mask, clip_portal, clip_plane, clip_z_plane);
 
   bool rmCreated;
   csRenderMesh*& rmesh = rmHolder.GetUnusedMesh (rmCreated,

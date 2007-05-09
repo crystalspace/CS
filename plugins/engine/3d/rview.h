@@ -26,6 +26,7 @@
 #include "iengine/engine.h"
 #include "iengine/rview.h"
 #include "plugins/engine/3d/camera.h"
+#include "cstool/rviewclipper.h"
 
 class csMatrix3;
 class csVector3;
@@ -74,14 +75,6 @@ private:
    */
   void UpdateFrustum ();
 
-  /**
-   * Given a csRenderContext (with frustum) and a bounding sphere calculate if
-   * the sphere is fully inside and fully outside that frustum.
-   * Works in world space.
-   */
-  static void TestSphereFrustumWorld (csRenderContext* frust,
-    const csVector3& center, float radius, bool& inside, bool& outside);
-
 public:
   ///
   csRenderView ();
@@ -103,9 +96,6 @@ public:
   void SetOriginalCamera (iCamera* camera);
   /// Get the original camera.
   virtual iCamera* GetOriginalCamera () const { return original_camera; }
-
-  /// Setup the clip planes for the current context and camera (in world space).
-  void SetupClipPlanes ();
 
   /// Get the current render context.
   csRenderContext* GetCsRenderContext () const { return ctxt; }
@@ -233,7 +223,12 @@ public:
   bool ClipBSphere (
 	const csSphere &cam_sphere,
 	const csSphere &world_sphere,
-	int& clip_portal, int& clip_plane, int& clip_z_plane);
+	int& clip_portal, int& clip_plane, int& clip_z_plane)
+  {
+    return CS::RenderViewClipper::CullBSphere (ctxt,
+	cam_sphere, world_sphere, clip_portal, clip_plane,
+	clip_z_plane);
+  }
 
   /// Get the current render context.
   virtual csRenderContext* GetRenderContext () { return ctxt; }
@@ -270,16 +265,32 @@ public:
    * transform world to camera space.
    */
   virtual bool TestBSphere (const csReversibleTransform& w2c,
-    const csSphere& sphere);
+    const csSphere& sphere)
+  {
+    return CS::RenderViewClipper::TestBSphere (ctxt, w2c, sphere);
+  }
 
   virtual void CalculateClipSettings (uint32 frustum_mask,
-    int &clip_portal, int &clip_plane, int &clip_z_plane);
+    int &clip_portal, int &clip_plane, int &clip_z_plane)
+  {
+    CS::RenderViewClipper::CalculateClipSettings (ctxt,
+	frustum_mask, clip_portal, clip_plane, clip_z_plane);
+  }
 
   virtual bool ClipBBox (csPlane3* planes, uint32& frustum_mask,
   	const csBox3& obox,
-        int& clip_portal, int& clip_plane, int& clip_z_plane);
+        int& clip_portal, int& clip_plane, int& clip_z_plane)
+  {
+    return CS::RenderViewClipper::CullBBox (ctxt, planes, frustum_mask,
+	obox, clip_portal, clip_plane, clip_z_plane);
+  }
+
   virtual void SetupClipPlanes (const csReversibleTransform& tr_o2c,
-  	csPlane3* planes, uint32& frustum_mask);
+  	csPlane3* planes, uint32& frustum_mask)
+  {
+    CS::RenderViewClipper::SetupClipPlanes (ctxt, tr_o2c,
+	planes, frustum_mask);
+  }
 
   /**
    * Get current sector.

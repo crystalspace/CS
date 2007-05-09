@@ -25,6 +25,7 @@
 #include "csgeom/sphere.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/vector4.h"
+#include "cstool/rviewclipper.h"
 #include "csgfx/renderbuffer.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/flags.h"
@@ -723,7 +724,8 @@ void csStencil2ShadowStep::Perform (iRenderView* rview, iSector* sector,
         csPlane3 frustum_planes[6];
         uint32 frustum_mask;
         csReversibleTransform tr_o2c = rview->GetCamera()->GetTransform()/tf;
-        rview->SetupClipPlanes(tr_o2c, frustum_planes, frustum_mask);
+	CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext (),
+	    tr_o2c, frustum_planes, frustum_mask);
 
         float shadow_length = 100;//(light->GetInfluenceRadius() + maxRadius);
         csVector3 light_pos2object = tf.Other2This(light_pos);

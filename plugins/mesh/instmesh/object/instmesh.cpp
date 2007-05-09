@@ -29,6 +29,7 @@
 #include "csgeom/trimesh.h"
 #include "csgfx/normalmaptools.h"
 #include "csgfx/renderbuffer.h"
+#include "cstool/rviewclipper.h"
 #include "csutil/csendian.h"
 #include "csutil/csmd5.h"
 #include "csutil/memfile.h"
@@ -1011,8 +1012,8 @@ csRenderMesh** csInstmeshMeshObject::GetRenderMeshes (
     iCamera* camera = rview->GetCamera ();
 
     int clip_portal, clip_plane, clip_z_plane;
-    rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
-      clip_z_plane);
+    CS::RenderViewClipper::CalculateClipSettings (rview->GetRenderContext (),
+	frustum_mask, clip_portal, clip_plane, clip_z_plane);
 
     lighting_movable = movable;
 

@@ -24,6 +24,7 @@
 #include "csgeom/polypool.h"
 #include "csgeom/sphere.h"
 #include "csgeom/subrec.h"
+#include "cstool/rviewclipper.h"
 #include "csgfx/shadervarcontext.h"
 #include "csqint.h"
 #include "csqsqrt.h"
@@ -2664,8 +2665,8 @@ csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview,
   size_t i;
 
   int clip_portal, clip_plane, clip_z_plane;
-  rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
-        clip_z_plane);
+  CS::RenderViewClipper::CalculateClipSettings (rview->GetRenderContext (),
+      frustum_mask, clip_portal, clip_plane, clip_z_plane);
 
   const uint currentFrame = rview->GetCurrentFrameNumber ();
   bool meshesCreated;

@@ -25,6 +25,7 @@
 #include "csgfx/shadervar.h"
 #include "csgfx/shadervarcontext.h"
 #include "cstool/rbuflock.h"
+#include "cstool/rviewclipper.h"
 #include "csutil/objreg.h"
 #include "csutil/refarr.h"
 #include "iengine.h"
@@ -590,8 +591,9 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
                             csDirtyAccessArray<csRenderMesh*>& meshes)
 {
   int clip_portal, clip_plane, clip_z_plane;
-  if (!rview->ClipBBox (rdata->planes, frustum_mask,
-    bbox, clip_portal, clip_plane, clip_z_plane))
+  if (!CS::RenderViewClipper::CullBBox (rview->GetRenderContext (),
+	rdata->planes, frustum_mask, bbox,
+	clip_portal, clip_plane, clip_z_plane))
     return;
 
   if (!IsLeaf () && children[0]->built &&
@@ -757,7 +759,8 @@ csRenderMesh** csTerrainBruteBlockRenderer::GetRenderMeshes (int& n, iRenderView
     tr_o2c /= movable->GetFullTransform ();
 
   csPlane3 planes[10];
-  rview->SetupClipPlanes (tr_o2c, planes, frustum_mask);
+  CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext (),
+      tr_o2c, planes, frustum_mask);
 
   for (size_t i = 0; i < cells.GetSize (); ++i)
   {

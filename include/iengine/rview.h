@@ -180,7 +180,7 @@ public:
  */
 struct iRenderView : public virtual iBase
 {
-  SCF_INTERFACE(iRenderView, 2,0,0);
+  SCF_INTERFACE(iRenderView, 2,1,0);
   /// Get the current render context.
   virtual csRenderContext* GetRenderContext () = 0;
 
@@ -207,7 +207,9 @@ struct iRenderView : public virtual iBase
 
   /**
    * Given a frustum_mask, calculate the clip settings.
+   * \deprecated Use CS::RenderViewClipper::CalculateClipSettings() instead.
    */
+  CS_DEPRECATED_METHOD_MSG("Use CS::RenderViewClipper::CalculateClipSettings() instead.")
   virtual void CalculateClipSettings (uint32 frustum_mask,
     int &clip_portal, int &clip_plane, int &clip_z_plane) = 0;
 
@@ -215,7 +217,9 @@ struct iRenderView : public virtual iBase
    * Test if the given bounding sphere (in world space coordinates)
    * is visible in this render view. The optional will
    * transform world to camera space.
+   * \deprecated Use CS::RenderViewClipper::TestBSphere() instead.
    */
+  CS_DEPRECATED_METHOD_MSG("Use CS::RenderViewClipper::TestBSphere() instead.")
   virtual bool TestBSphere (const csReversibleTransform& w2c,
   	const csSphere& sphere) = 0;
 
@@ -229,7 +233,9 @@ struct iRenderView : public virtual iBase
    * The frustum_mask will be modified according to all clip planes
    * that were relevant for the given box. That can be used to hierarchically
    * cull smaller objects.
+   * \deprecated Use CS::RenderViewClipper::CullBBox() instead.
    */
+  CS_DEPRECATED_METHOD_MSG("Use CS::RenderViewClipper::CullBBox() instead.")
   virtual bool ClipBBox (csPlane3* planes, uint32& frustum_mask,
   	const csBox3& obox,
       	int& clip_portal, int& clip_plane, int& clip_z_plane) = 0;
@@ -238,7 +244,9 @@ struct iRenderView : public virtual iBase
    * Setup clipping planes in object space. The input arrays for planes
    * should each be able to hold 10 planes. Returns a mask that you can
    * use for the csIntersect3::BoxFrustum() function.
+   * \deprecated Use CS::RenderViewClipper::SetupClipPlanes() instead.
    */
+  CS_DEPRECATED_METHOD_MSG("Use CS::RenderViewClipper::SetupClipPlanes() instead.")
   virtual void SetupClipPlanes (const csReversibleTransform& tr_o2c,
   	csPlane3* planes, uint32& frustum_mask) = 0;
 
@@ -273,34 +281,13 @@ struct iRenderView : public virtual iBase
    * is visibile in this render view. If the sphere is visible this
    * function will also initialize the clip_plane, clip_z_plane, and
    * clip_portal fields which can be used for the renderer.
+   * \deprecated Use CS::RenderViewClipper::CullBSphere() instead.
    */
+  CS_DEPRECATED_METHOD_MSG("Use CS::RenderViewClipper::CullBSphere() instead.")
   virtual bool ClipBSphere (
 	const csSphere &cam_sphere,
 	const csSphere &world_sphere,
 	int& clip_portal, int& clip_plane, int& clip_z_plane) = 0;
-  
-
-
-  // @@@ ADDED B/C OF FATLOOP PORTAL HACKING
-  // @@@ REMOVE AGAIN ASAP
-  virtual void CreateRenderContext () = 0;
-  virtual int GetRenderRecursionLevel () const = 0;
-  virtual void SetRenderRecursionLevel (int rec) = 0;
-  virtual void SetClipper (iClipper2D* clip) = 0;
-  virtual void ResetFogInfo () = 0;
-  virtual void SetPreviousSector (iSector* s) = 0;
-  virtual void SetClipPlane (const csPlane3& p) = 0;
-  virtual bool GetClipPlane (csPlane3& pl) const = 0;
-  virtual const csPlane3& GetClipPlane () const = 0;
-  virtual csPlane3& GetClipPlane () = 0;
-  virtual void UseClipPlane (bool u) = 0;
-  virtual void UseClipFrustum (bool u) = 0;
-  virtual void SetLastPortal (iPortal* por) = 0;
-  virtual bool IsClipperRequired () const = 0;
-  virtual iCamera* CreateNewCamera () = 0;
-  virtual void RestoreRenderContext () = 0;
-  virtual void SetThisSector (iSector* s) = 0;
-  virtual void SetupClipPlanes () = 0;
 };
 
 /** @} */

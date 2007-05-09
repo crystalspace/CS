@@ -23,6 +23,7 @@
 #include "csgeom/tri.h"
 #include "csgfx/renderbuffer.h"
 #include "cstool/rbuflock.h"
+#include "cstool/rviewclipper.h"
 #include "csutil/algorithms.h"
 #include "csutil/sysfunc.h"
 #include "csutil/radixsort.h"
@@ -502,9 +503,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       rview->GetCurrentFrameNumber ());
 
     int clip_portal, clip_plane, clip_z_plane;
-    rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
-      clip_z_plane);
-
+    CS::RenderViewClipper::CalculateClipSettings (rview->GetRenderContext (),
+	frustum_mask, clip_portal, clip_plane, clip_z_plane);
 
     if (rmCreated)
     {

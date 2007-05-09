@@ -23,6 +23,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/polyclip.h"
 #include "csgeom/quaternion.h"
 #include "csgeom/sphere.h"
+#include "cstool/rviewclipper.h"
 #include "csgfx/renderbuffer.h"
 #include "csgfx/shadervarcontext.h"
 #include "csutil/bitarray.h"
@@ -1540,8 +1541,8 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
     tr_o2c /= movable->GetFullTransform ();
 
   int clip_portal, clip_plane, clip_z_plane;
-  rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
-    clip_z_plane);
+  CS::RenderViewClipper::CalculateClipSettings (rview->GetRenderContext (),
+      frustum_mask, clip_portal, clip_plane, clip_z_plane);
   csVector3 camera_origin = tr_o2c.GetT2OTranslation ();
 
   // Distance between camera and object. Use this for LOD.

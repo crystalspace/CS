@@ -39,6 +39,7 @@
 #include "plugins/engine/3d/rview.h"
 #include "plugins/engine/3d/sector.h"
 #include "csutil/xmltiny.h"
+#include "cstool/rviewclipper.h"
 
 //---------------------------------------------------------------------------
 
@@ -64,7 +65,7 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s, iMeshWrapper* mesh)
 
   if (s)
   {
-    ((csRenderView*)rview)->SetupClipPlanes ();
+    CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext ());
 
     // Needed so halos are correctly recognized as "visible".
     csRef<iClipper2D> oldClipper = rview->GetGraphics3D()->GetClipper();

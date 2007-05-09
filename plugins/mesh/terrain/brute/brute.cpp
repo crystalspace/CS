@@ -30,6 +30,7 @@
 #include "csgfx/imagememory.h"
 #include "csgfx/renderbuffer.h"
 #include "csgfx/shadervarcontext.h"
+#include "cstool/rviewclipper.h"
 #include "csutil/csendian.h"
 #include "csutil/csmd5.h"
 #include "csutil/memfile.h"
@@ -634,8 +635,9 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
 	  return;
 
   int clip_portal, clip_plane, clip_z_plane;
-  if (!rview->ClipBBox (terr->planes, frustum_mask,
-    bbox, clip_portal, clip_plane, clip_z_plane))
+  if (!CS::RenderViewClipper::CullBBox (rview->GetRenderContext (),
+	terr->planes, frustum_mask, bbox,
+	clip_portal, clip_plane, clip_z_plane))
     return;
 
   if (!IsLeaf () && children[0]->built &&
@@ -2511,7 +2513,8 @@ bool csTerrainObject::DrawTest (iRenderView* rview, iMovable* movable,
   rootblock->CalcLOD ();
 
   uint32 frustum_mask;
-  rview->SetupClipPlanes (tr_o2c, planes, frustum_mask);
+  CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext (),
+      tr_o2c, planes, frustum_mask);
 
   //rendermeshes.Empty ();
   rootblock->DrawTest (g3d, rview, frustum_mask, tr_o2c, movable);

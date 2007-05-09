@@ -18,6 +18,7 @@
 #include "cssysdef.h"
 #include "csqsqrt.h"
 #include "csgeom/sphere.h"
+#include "cstool/rviewclipper.h"
 #include "imesh/objmodel.h"
 #include "igeom/clip2d.h"
 #include "plugins/engine/3d/sector.h"
@@ -714,8 +715,8 @@ csRenderMesh** csMeshWrapper::GetExtraRenderMeshes (size_t& num,
   }
 
   int clip_portal, clip_plane, clip_z_plane;
-  rview->CalculateClipSettings(frustum_mask, clip_portal, clip_plane,
-          clip_z_plane);
+  CS::RenderViewClipper::CalculateClipSettings (rview->GetRenderContext (),
+      frustum_mask, clip_portal, clip_plane, clip_z_plane);
 
   iCamera* pCamera = rview->GetCamera();
   const csReversibleTransform& o2wt = movable.GetFullTransform();

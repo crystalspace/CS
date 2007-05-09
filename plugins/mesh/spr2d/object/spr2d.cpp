@@ -26,6 +26,7 @@
 #include "csgeom/transfrm.h"
 #include "csgfx/renderbuffer.h"
 #include "cstool/rbuflock.h"
+#include "cstool/rviewclipper.h"
 #include "csutil/scfarray.h"
 
 #include "iengine/movable.h"
@@ -189,8 +190,8 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
     temp /= movable->GetFullTransform ();
 
   int clip_portal, clip_plane, clip_z_plane;
-  rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane, 
-    clip_z_plane);
+  CS::RenderViewClipper::CalculateClipSettings (rview->GetRenderContext (),
+      frustum_mask, clip_portal, clip_plane, clip_z_plane);
 
   csReversibleTransform tr_o2c;
   tr_o2c.SetO2TTranslation (-temp.Other2This (offset));

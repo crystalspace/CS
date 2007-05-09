@@ -36,6 +36,7 @@
 #include "csutil/scfstr.h"
 #include "csutil/sysfunc.h"
 #include "cstool/rbuflock.h"
+#include "cstool/rviewclipper.h"
 
 #include "iengine/camera.h"
 #include "iengine/engine.h"
@@ -1010,8 +1011,8 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   iCamera* camera = rview->GetCamera ();
 
   int clip_portal, clip_plane, clip_z_plane;
-  rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
-      clip_z_plane);
+  CS::RenderViewClipper::CalculateClipSettings (rview->GetRenderContext (),
+      frustum_mask, clip_portal, clip_plane, clip_z_plane);
 
   lighting_movable = movable;
 

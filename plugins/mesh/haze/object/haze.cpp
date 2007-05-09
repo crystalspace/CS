@@ -24,6 +24,7 @@
 #include "csgfx/renderbuffer.h"
 #include "csgfx/shadervarcontext.h"
 #include "cstool/rbuflock.h"
+#include "cstool/rviewclipper.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/sysfunc.h"
 #include "iengine/camera.h"
@@ -752,8 +753,8 @@ csRenderMesh** csHazeMeshObject::GetRenderMeshes (int &n, iRenderView* rview,
   }
 
   int clip_portal, clip_plane, clip_z_plane;
-  rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
-      clip_z_plane);
+  CS::RenderViewClipper::CalculateClipSettings (rview->GetRenderContext (),
+      frustum_mask, clip_portal, clip_plane, clip_z_plane);
 
   rm->worldspace_origin = movable->GetFullPosition ();
   rm->clip_portal = clip_portal;

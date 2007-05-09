@@ -25,6 +25,7 @@
 #include "csgeom/poly3d.h"
 #include "csgeom/polypool.h"
 #include "csgeom/sphere.h"
+#include "cstool/rviewclipper.h"
 #include "csgfx/renderbuffer.h"
 #include "csutil/array.h"
 #include "csutil/csendian.h"
@@ -832,8 +833,8 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
   obj_cam /= movtrans;
  
   int clip_portal, clip_plane, clip_z_plane;
-  rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
-      clip_z_plane);
+  CS::RenderViewClipper::CalculateClipSettings (rview->GetRenderContext (),
+      frustum_mask, clip_portal, clip_plane, clip_z_plane);
 
   const uint currentFrame = rview->GetCurrentFrameNumber();
   bool listCreated;

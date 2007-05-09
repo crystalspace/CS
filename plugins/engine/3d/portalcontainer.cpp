@@ -31,6 +31,7 @@
 #include "plugins/engine/3d/rview.h"
 #include "plugins/engine/3d/meshobj.h"
 #include "plugins/engine/3d/engine.h"
+#include "cstool/rviewclipper.h"
 
 // ---------------------------------------------------------------------------
 // csPortalContainerTriMeshHelper
@@ -915,8 +916,8 @@ bool csPortalContainer::ExtraVisTest (iRenderView* rview,
   csSphere cam_sphere = tr_o2c.Other2This (sphere);
   camera_origin = cam_sphere.GetCenter ();
 
-  return csrview->ClipBSphere (cam_sphere, world_sphere, clip_portal,
-      clip_plane, clip_z_plane);
+  return CS::RenderViewClipper::CullBSphere (csrview->GetRenderContext (),
+      cam_sphere, world_sphere, clip_portal, clip_plane, clip_z_plane);
 }
 
 bool csPortalContainer::Draw (iRenderView* rview, iMovable* /*movable*/,

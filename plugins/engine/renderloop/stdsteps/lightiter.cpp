@@ -23,6 +23,7 @@
 
 #include "csgeom/sphere.h"
 #include "csgfx/imagememory.h"
+#include "cstool/rviewclipper.h"
 #include "csutil/cscolor.h"
 #include "iengine/camera.h"
 #include "iengine/light.h"
@@ -350,7 +351,8 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
     lightList.Empty ();
 
     csSphere lightSphere (lightPos, light->GetCutoffDistance ());
-    if (rview->TestBSphere (camTransR, lightSphere))
+    if (CS::RenderViewClipper::TestBSphere (rview->GetRenderContext (),
+	  camTransR, lightSphere))
     {
       size_t i;
       for (i = 0; i < steps.GetSize (); i++)

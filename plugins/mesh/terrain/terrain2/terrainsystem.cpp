@@ -24,6 +24,7 @@
 #include "csgeom/sphere.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
+#include "cstool/rviewclipper.h"
 
 #include "iengine/camera.h"
 #include "iengine/light.h"
@@ -291,7 +292,8 @@ void csTerrainSystem::PreLoadCells (iRenderView* rview, iMovable* movable)
   csOrthoTransform c2ot = rview->GetCamera ()->GetTransform ();
   c2ot /= movable->GetFullTransform ();
   
-  rview->SetupClipPlanes (c2ot, planes, frustum_mask);
+  CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext (),
+      c2ot, planes, frustum_mask);
   
   /// Here I should not just multiply by vview_distance, because it scales the
   /// frustum in N times, and N has nothing to do with distance :)
@@ -438,7 +440,8 @@ csRenderMesh** csTerrainSystem::GetRenderMeshes (int& num, iRenderView* rview,
   
   csPlane3 planes[10];
   
-  rview->SetupClipPlanes (c2ot, planes, frustum_mask);
+  CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext (),
+      c2ot, planes, frustum_mask);
   
   for (size_t i = 0; i < cells.GetSize (); ++i)
   {
