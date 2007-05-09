@@ -55,7 +55,7 @@ struct ThreadedFeederData : public csRefCount
 
   csString heightmapSource, materialmapSource, heightmapFormat;
 
-  float heightScale;
+  float heightScale, offset;
 
   unsigned int gridWidth, gridHeight, materialMapWidth, materialMapHeight;
   size_t materialMapCount;
@@ -84,7 +84,7 @@ public:
     HeightFeederParser mapReader (data->heightmapSource, 
       data->heightmapFormat, loader, objReg);
     mapReader.Load (h_data, data->gridWidth, data->gridHeight, data->gridWidth, 
-      data->heightScale);
+      data->heightScale, data->offset);
 
 
     csRef<iImage> material = loader->LoadImage (data->materialmapSource.GetDataSafe (),
@@ -180,6 +180,7 @@ bool csTerrainThreadedDataFeeder::PreLoad (iTerrainCell* cell)
   data->materialMapHeight = cell->GetMaterialMapHeight ();
   data->materialMapCount = cell->GetTerrain ()->GetMaterialPalette ().GetSize ();
   data->heightScale = cell->GetSize ().y;
+  data->offset = properties->offset;
 
   csRef<ThreadedFeederJob> job;
   job.AttachNew (new ThreadedFeederJob (data, loader, objectReg));

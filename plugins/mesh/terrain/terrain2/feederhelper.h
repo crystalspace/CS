@@ -49,10 +49,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
       iLoader* imageLoader, iObjectRegistry* objReg);
 
     bool Load (float* outputBuffer, size_t outputWidth, size_t outputHeight,
-      size_t outputPitch, float heightScale);
+      size_t outputPitch, float heightScale, float offset);
 
     bool LoadFromImage (float* outputBuffer, size_t outputWidth, size_t outputHeight,
-      size_t outputPitch, float heightScale);
+      size_t outputPitch, float heightScale, float offset);
 
   private:
     csString sourceLocation;

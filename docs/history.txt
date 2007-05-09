@@ -41,6 +41,8 @@ chronological order.
 	  scfImplementationN and scfImplementationExtN templates via macro
 	  magic which adds substantial time to compiling. See top of 
 	  csutil/scf_implgen_p.h for instructions how to regenerate it.
+	- Marten added an "offset" parameter to the feeders in terrain2 that
+	  offsets the height data by a fixed amount.
 8-May-2007
 	- Marten fixed a bug in lighter2 where it would write vertexcolors to
 	  a buffer named "colors" when "color" was expected.

@@ -76,7 +76,8 @@ bool csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
   
   HeightFeederParser mapReader (properties->heightmapSource, 
     properties->heightmapFormat, loader, objectReg);
-  mapReader.Load (data.data, width, height, data.pitch, cell->GetSize ().y);
+  mapReader.Load (data.data, width, height, data.pitch, cell->GetSize ().y, 
+    properties->offset);
 
 
 /*
@@ -160,14 +161,15 @@ void csTerrainSimpleDataFeeder::SetParameter (const char* param, const char* val
 
 
 csTerrainSimpleDataFeederProperties::csTerrainSimpleDataFeederProperties ()
-  : scfImplementationType (this)
+  : scfImplementationType (this), offset (0.0f)
 {
 }
 
 csTerrainSimpleDataFeederProperties::csTerrainSimpleDataFeederProperties (
   csTerrainSimpleDataFeederProperties& other)
   : scfImplementationType (this), heightmapSource (other.heightmapSource),
-  materialmapSource (other.materialmapSource), heightmapFormat (other.heightmapFormat)
+  materialmapSource (other.materialmapSource), heightmapFormat (other.heightmapFormat),
+  offset (other.offset)
 {
 }
 
@@ -190,6 +192,10 @@ void csTerrainSimpleDataFeederProperties::SetParameter (const char* param, const
   else if (strcmp (param, "materialmap source") == 0)
   {
     materialmapSource = value;
+  }
+  else if (strcmp (param, "offset") == 0)
+  {
+    offset = atof (value);
   }
 }
 

@@ -87,7 +87,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
   {    
   public:
     bool ReadData (float* outputBuffer, size_t outputWidth, 
-      size_t outputHeight, size_t outputPitch, float heightScale, char* inputBuffer)
+      size_t outputHeight, size_t outputPitch, float heightScale, float offset,
+      char* inputBuffer)
     {
       size_t numPoints = outputWidth*outputHeight;
       
@@ -97,7 +98,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
         for (size_t x = 0; x < outputWidth; ++x)
         {
           Tgetter::Get (inputBuffer, *row);
-          *row++ *= heightScale;
+          *row = *row * heightScale + offset;
+          row++;
         }
         outputBuffer += outputPitch;
       }
@@ -151,12 +153,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
   }
 
   bool HeightFeederParser::Load (float* outputBuffer, size_t outputWidth, 
-    size_t outputHeight, size_t outputPitch, float heightScale)
+    size_t outputHeight, size_t outputPitch, float heightScale, float offset)
   {
     if (sourceFormat == HEIGHT_SOURCE_IMAGE)
     {
       return LoadFromImage (outputBuffer, outputWidth, outputHeight,
-        outputPitch, heightScale);
+        outputPitch, heightScale, offset);
     }
     
     // Handle loading from all other (raw) formats
@@ -174,14 +176,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
         {
           RawHeightmapReader<GetterUint8> reader;
           return reader.ReadData (outputBuffer, outputWidth, outputHeight, 
-            outputPitch, heightScale, buf->GetData ());
+            outputPitch, heightScale, offset, buf->GetData ());
         }
         break;
       case HEIGHT_SOURCE_RAW16LE:
         {
           RawHeightmapReader<GetterUint16<csLittleEndian> > reader;
           return reader.ReadData (outputBuffer, outputWidth, outputHeight, 
-            outputPitch, heightScale, buf->GetData ());
+            outputPitch, heightScale, offset, buf->GetData ());
         }
         break;
       case HEIGHT_SOURCE_RAW16BE:
@@ -189,34 +191,34 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
         {
           RawHeightmapReader<GetterUint16<csBigEndian> > reader;
           return reader.ReadData (outputBuffer, outputWidth, outputHeight, 
-            outputPitch, heightScale, buf->GetData ());
+            outputPitch, heightScale, offset, buf->GetData ());
         }
       case HEIGHT_SOURCE_RAW32LE:
         {
           RawHeightmapReader<GetterUint32<csLittleEndian> > reader;
           return reader.ReadData (outputBuffer, outputWidth, outputHeight, 
-            outputPitch, heightScale, buf->GetData ());
+            outputPitch, heightScale, offset, buf->GetData ());
         }
         break;
       case HEIGHT_SOURCE_RAW32BE:
         {
           RawHeightmapReader<GetterUint32<csBigEndian> > reader;
           return reader.ReadData (outputBuffer, outputWidth, outputHeight, 
-            outputPitch, heightScale, buf->GetData ());
+            outputPitch, heightScale, offset, buf->GetData ());
         }
         break;
       case HEIGHT_SOURCE_RAWFLOATLE:
         {
           RawHeightmapReader<GetterFloat<csLittleEndian> > reader;
           return reader.ReadData (outputBuffer, outputWidth, outputHeight, 
-            outputPitch, heightScale, buf->GetData ());
+            outputPitch, heightScale, offset, buf->GetData ());
         }
         break;
       case HEIGHT_SOURCE_RAWFLOATBE:
         {
           RawHeightmapReader<GetterFloat<csBigEndian> > reader;
           return reader.ReadData (outputBuffer, outputWidth, outputHeight, 
-            outputPitch, heightScale, buf->GetData ());
+            outputPitch, heightScale, offset, buf->GetData ());
         }
         break;
     }
@@ -225,7 +227,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
   }
   
   bool HeightFeederParser::LoadFromImage (float* outputBuffer, size_t outputWidth, 
-    size_t outputHeight, size_t outputPitch, float heightScale)
+    size_t outputHeight, size_t outputPitch, float heightScale, float offset)
   {
     csRef<iImage> image = imageLoader->LoadImage (sourceLocation.GetDataSafe (),
       CS_IMGFMT_ANY);
@@ -253,7 +255,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
           const csRGBpixel& p = *data++;
 
           const int h = p.red * 0xffff + p.green * 0xff + p.blue;
-          *row++ = h * heightConstant;
+          *row++ = h * heightConstant + offset;
         }
 
         outputBuffer += outputPitch;
@@ -276,7 +278,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
           const unsigned char p = *data++;
           const int h = palette[p].Intensity (); 
 
-          *row++ = h * heightConstant;
+          *row++ = h * heightConstant + offset;
         }
 
         outputBuffer += outputPitch;

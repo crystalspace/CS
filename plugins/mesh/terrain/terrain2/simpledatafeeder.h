@@ -41,6 +41,7 @@ struct csTerrainSimpleDataFeederProperties
   virtual csPtr<iTerrainCellFeederProperties> Clone ();
 
   csString heightmapSource, heightmapFormat, materialmapSource;
+  float offset;
 };
 
 class csTerrainSimpleDataFeeder :
