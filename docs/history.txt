@@ -36,6 +36,11 @@ chronological order.
 	  javascript library used by AWS2 (which have been moved to CSextra).
 	- Marten fixed comment for CS_FX_ALPHA to reflect the value of the
 	  constant.
+	- Marten added a manually preprocessed version of scf_implgen.h.
+	  scf_implgen.h is used to (compile-time) generate the 
+	  scfImplementationN and scfImplementationExtN templates via macro
+	  magic which adds substantial time to compiling. See top of 
+	  csutil/scf_implgen_p.h for instructions how to regenerate it.
 8-May-2007
 	- Marten fixed a bug in lighter2 where it would write vertexcolors to
 	  a buffer named "colors" when "color" was expected.

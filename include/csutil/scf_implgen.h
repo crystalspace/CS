@@ -25,6 +25,11 @@
  * SCF implementation base classes
  */
 
+/*
+ * NOTICE! This file is statically preprocessed into scf_implgen_p.h.
+ * Read comment in top of that file if doing any changes here!
+ */
+
 #if !defined(SCF_IN_IMPLEMENTATION_H) && !defined(DOXYGEN_RUN)
 #error Do not include this file directly. Included from scf_implementation.h
 #endif
@@ -34,6 +39,13 @@
  * generated below. Whatever, take it, keep it. */
 class __Doxygen_Workaround__ {};
 #endif
+
+/* The deprecation turn-off may seem odd here - but MSVC emits
+* deprecation warnings when using the destructor of a deprecated
+* class. Since interfaces may be deprecated this may cause 
+* deprecation warnings emitted in ~SCF_IMPL_NAME, which is kinda silly.
+*/
+#include "csutil/win32/msvc_deprecated_warn_off.h"
 
 #define SCF_IN_IMPLGEN_H 1
 // Instead of duplicating the code for every scfImplementationN and
@@ -132,3 +144,5 @@ class __Doxygen_Workaround__ {};
 */
 #undef SCF_IMPL_EXT
 #undef SCF_IN_IMPLGEN_H
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"

@@ -33,6 +33,9 @@
 // Needs to have iBase etc
 #include "csutil/scf_interface.h"
 
+// Control if we want to use preprocessed file or run generation each time
+#define SCF_IMPLGEN_PREPROCESSED
+
 #ifndef CS_TYPENAME
   #ifdef CS_REF_TRACKER
    #include <typeinfo>
@@ -265,11 +268,17 @@ protected:
 
 
 /* Here the magic happens: generate scfImplementationN and 
- * scfImplementationExtN classed */
+* scfImplementationExtN classed */
 #define SCF_IN_IMPLEMENTATION_H 1
-// Generation is in separate file mostly for documentation generation purposes.
-#include "scf_implgen.h"
+#if defined(DOXYGEN_RUN) || !defined(SCF_IMPLGEN_PREPROCESSED)
+  // Generation is in separate file mostly for documentation generation purposes.
+  #include "scf_implgen.h"
+#else
+  #include "scf_implgen_P.h"
+#endif
+
 #undef SCF_IN_IMPLEMENTATION_H
+#undef SCF_IMPLGEN_PREPROCESSED
 
 /** @} */
 
