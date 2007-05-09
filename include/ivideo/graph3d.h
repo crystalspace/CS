@@ -340,7 +340,7 @@ enum
 #define CS_FX_ADD \
     (CS_MIXMODE_BLEND(ONE, ONE) | CS_MIXMODE_ALPHATEST_DISABLE)
 /** 
- * Alpha blending. Formula: <tt>=(1-srcAlpha)*SRC + srcAlpha*DST</tt>
+ * Alpha blending. Formula: <tt>=srcAlpha*SRC + (1-srcAlpha)*DST</tt>
  * \remarks Usually used with a non-zero alpha part.
  *  \see CS_FX_MASK_ALPHA, \see CS_FX_SETALPHA
  */

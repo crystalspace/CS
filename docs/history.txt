@@ -34,6 +34,8 @@ chronological order.
 	    - Updated terraini demo level to use four cells.
 	- Marten removed a now obsolete check in configure for spidermonkey
 	  javascript library used by AWS2 (which have been moved to CSextra).
+	- Marten fixed comment for CS_FX_ALPHA to reflect the value of the
+	  constant.
 8-May-2007
 	- Marten fixed a bug in lighter2 where it would write vertexcolors to
 	  a buffer named "colors" when "color" was expected.
