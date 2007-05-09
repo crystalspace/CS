@@ -274,7 +274,7 @@ protected:
   // Generation is in separate file mostly for documentation generation purposes.
   #include "scf_implgen.h"
 #else
-  #include "scf_implgen_P.h"
+  #include "scf_implgen_p.h"
 #endif
 
 #undef SCF_IN_IMPLEMENTATION_H
