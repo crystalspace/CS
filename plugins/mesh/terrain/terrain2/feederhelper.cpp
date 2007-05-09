@@ -1,0 +1,292 @@
+/*
+  Copyright (C) 2007 by Marten Svanfeldt
+                2004 by Anders Stenberg, Daniel Duhprey
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Library General Public
+  License as published by the Free Software Foundation; either
+  version 2 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Library General Public License for more details.
+
+  You should have received a copy of the GNU Library General Public
+  License along with this library; if not, write to the Free
+  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#include "cssysdef.h"
+
+#include "csgfx/imagemanipulate.h"
+#include "csgfx/rgbpixel.h"
+#include "csutil/csendian.h"
+#include "csutil/objreg.h"
+#include "imesh/terrain2.h"
+#include "iutil/vfs.h"
+#include "imap/loader.h"
+
+#include "feederhelper.h"
+
+CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
+{
+
+  template<typename Endianness>
+  struct GetterFloat
+  {
+    static inline void Get (char*& buf, float&f)
+    {
+      f = csIEEEfloat::ToNative (Endianness::Convert (csGetFromAddress::UInt32 (buf))); 
+      buf += sizeof(uint32);
+    }
+    static inline size_t ItemSize()
+    { return sizeof(uint32); }
+  };
+
+  struct GetterUint8
+  {
+    static inline void Get (char*& buf, float&f)
+    {
+      uint8 v = (uint8) (*buf);
+      buf += sizeof (uint8);
+      f = float(v) / 255.0f;
+    }
+    static inline size_t ItemSize()
+    { return sizeof(uint8); }
+  };
+
+  template<typename Endianness>
+  struct GetterUint16
+  {
+    static inline void Get (char*& buf, float&f)
+    {
+      uint16 v = Endianness::Convert (csGetFromAddress::UInt16 (buf));
+      buf += sizeof (uint16);
+      f = float(v) / 65535.0f;
+    }
+    static inline size_t ItemSize()
+    { return sizeof(uint16); }
+  };
+
+  template<typename Endianness>
+  struct GetterUint32
+  {
+    static inline void Get (char*& buf, float&f)
+    {
+      uint32 v = Endianness::Convert (csGetFromAddress::UInt32 (buf));
+      buf += sizeof (uint32);
+      f = float(v) / 4294967295.0f;
+    }
+    static inline size_t ItemSize()
+    { return sizeof(uint32); }
+  };
+
+  template<typename Tgetter>
+  class RawHeightmapReader
+  {    
+  public:
+    bool ReadData (float* outputBuffer, size_t outputWidth, 
+      size_t outputHeight, size_t outputPitch, float heightScale, char* inputBuffer)
+    {
+      size_t numPoints = outputWidth*outputHeight;
+      
+      for (size_t y = 0; y < outputHeight; ++y)
+      {
+        float* row = outputBuffer;
+        for (size_t x = 0; x < outputWidth; ++x)
+        {
+          Tgetter::Get (inputBuffer, *row);
+          *row++ *= heightScale;
+        }
+        outputBuffer += outputPitch;
+      }
+      
+      return true;
+    }
+  };
+  
+
+  FeederHeightSourceType ParseFormatString (const csString& format)
+  {
+    if (format.IsEmpty ())
+    {
+      return HEIGHT_SOURCE_IMAGE;
+    }
+
+    static const char* formatStrings[] = 
+    {
+      "image", 
+      "raw8",
+      "raw16le",
+      "raw16be",
+      "raw32le",
+      "raw32be",
+      "rawfloatle",
+      "rawfloatbe"
+    };
+
+    for (size_t i = 0; i < sizeof(formatStrings) / sizeof(char*); ++i)
+    {
+      if (format == formatStrings[i])
+      {
+        return (FeederHeightSourceType)i;
+      }
+    }
+
+    return HEIGHT_SOURCE_IMAGE;
+  }
+
+  HeightFeederParser::HeightFeederParser (const csString& mapSource, 
+    const csString& format, iLoader* imageLoader, iObjectRegistry* objReg)
+    : sourceLocation (mapSource), sourceFormat (ParseFormatString (format)),
+    imageLoader (imageLoader), objReg (objReg)
+  {
+    // Depending on format we might need some extra pointers, store those
+    if (sourceFormat != HEIGHT_SOURCE_IMAGE)
+    {
+      // Need vfs, get it
+      vfs = csQueryRegistry<iVFS> (objReg);
+    }
+  }
+
+  bool HeightFeederParser::Load (float* outputBuffer, size_t outputWidth, 
+    size_t outputHeight, size_t outputPitch, float heightScale)
+  {
+    if (sourceFormat == HEIGHT_SOURCE_IMAGE)
+    {
+      return LoadFromImage (outputBuffer, outputWidth, outputHeight,
+        outputPitch, heightScale);
+    }
+    
+    // Handle loading from all other (raw) formats
+    if (!vfs)
+      return false;
+
+    csRef<iDataBuffer> buf = vfs->ReadFile (sourceLocation.GetDataSafe (), false);
+    if (!buf ||
+      outputHeight * outputWidth != buf->GetSize ())
+      return false;
+
+    switch (sourceFormat)
+    {
+      case HEIGHT_SOURCE_RAW8:
+        {
+          RawHeightmapReader<GetterUint8> reader;
+          return reader.ReadData (outputBuffer, outputWidth, outputHeight, 
+            outputPitch, heightScale, buf->GetData ());
+        }
+        break;
+      case HEIGHT_SOURCE_RAW16LE:
+        {
+          RawHeightmapReader<GetterUint16<csLittleEndian> > reader;
+          return reader.ReadData (outputBuffer, outputWidth, outputHeight, 
+            outputPitch, heightScale, buf->GetData ());
+        }
+        break;
+      case HEIGHT_SOURCE_RAW16BE:
+        break;
+        {
+          RawHeightmapReader<GetterUint16<csBigEndian> > reader;
+          return reader.ReadData (outputBuffer, outputWidth, outputHeight, 
+            outputPitch, heightScale, buf->GetData ());
+        }
+      case HEIGHT_SOURCE_RAW32LE:
+        {
+          RawHeightmapReader<GetterUint32<csLittleEndian> > reader;
+          return reader.ReadData (outputBuffer, outputWidth, outputHeight, 
+            outputPitch, heightScale, buf->GetData ());
+        }
+        break;
+      case HEIGHT_SOURCE_RAW32BE:
+        {
+          RawHeightmapReader<GetterUint32<csBigEndian> > reader;
+          return reader.ReadData (outputBuffer, outputWidth, outputHeight, 
+            outputPitch, heightScale, buf->GetData ());
+        }
+        break;
+      case HEIGHT_SOURCE_RAWFLOATLE:
+        {
+          RawHeightmapReader<GetterFloat<csLittleEndian> > reader;
+          return reader.ReadData (outputBuffer, outputWidth, outputHeight, 
+            outputPitch, heightScale, buf->GetData ());
+        }
+        break;
+      case HEIGHT_SOURCE_RAWFLOATBE:
+        {
+          RawHeightmapReader<GetterFloat<csBigEndian> > reader;
+          return reader.ReadData (outputBuffer, outputWidth, outputHeight, 
+            outputPitch, heightScale, buf->GetData ());
+        }
+        break;
+    }
+
+    return false;
+  }
+  
+  bool HeightFeederParser::LoadFromImage (float* outputBuffer, size_t outputWidth, 
+    size_t outputHeight, size_t outputPitch, float heightScale)
+  {
+    csRef<iImage> image = imageLoader->LoadImage (sourceLocation.GetDataSafe (),
+      CS_IMGFMT_ANY);
+
+    if (!image)
+      return false;
+
+    if (image->GetWidth () != outputWidth || 
+      image->GetHeight () != outputHeight)
+    {
+      image = csImageManipulate::Rescale (image, (int)outputWidth, (int)outputHeight);
+    }
+
+    if ((image->GetFormat () & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
+    {
+      const csRGBpixel *data = (csRGBpixel*)image->GetImageData ();
+      const float heightConstant = heightScale / 16777215.0f;
+
+      for (size_t y = 0; y < outputHeight; ++y)
+      {
+        float* row = outputBuffer;
+
+        for (size_t x = 0; x < outputWidth; ++x)
+        {          
+          const csRGBpixel& p = *data++;
+
+          const int h = p.red * 0xffff + p.green * 0xff + p.blue;
+          *row++ = h * heightConstant;
+        }
+
+        outputBuffer += outputPitch;
+      }
+      return true;
+    }
+    else if ((image->GetFormat () & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
+    {
+      unsigned char *data = (unsigned char*)image->GetImageData ();
+      const csRGBpixel *palette = image->GetPalette ();
+      
+      const float heightConstant = heightScale / 255.0f;
+
+      for (size_t y = 0; y < outputHeight; ++y)
+      {
+        float* row = outputBuffer;
+
+        for (size_t x = 0; x < outputWidth; ++x)
+        {   
+          const unsigned char p = *data++;
+          const int h = palette[p].Intensity (); 
+
+          *row++ = h * heightConstant;
+        }
+
+        outputBuffer += outputPitch;
+      }
+      return true;
+    }
+
+    return false;
+  }
+
+
+}
+CS_PLUGIN_NAMESPACE_END(Terrain2)
