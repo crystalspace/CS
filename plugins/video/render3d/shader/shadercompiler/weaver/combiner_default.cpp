@@ -77,7 +77,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     {
       csRef<iDocumentNode> newNode = 
         pass->CreateNodeBefore (passNodes[n]->GetType());
-      CS::DocumentHelper::CloneNode (passNodes[n], newNode);
+      CS::DocSystem::CloneNode (passNodes[n], newNode);
     }
   }
   

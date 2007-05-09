@@ -26,6 +26,9 @@
 
 namespace CS
 {
+namespace Utility
+{
+
   /**
    * Helper class to <tt>delete</tt> a pointer when exiting a scope.
    * \a T is the type pointed to.
@@ -53,6 +56,8 @@ namespace CS
     { return *ptr; }
   
   };
+
+} // namespace Utility
 } // namespace CS
 
 #endif // __CSUTIL_SCOPEDDELETE_H__

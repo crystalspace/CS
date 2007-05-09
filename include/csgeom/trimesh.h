@@ -26,7 +26,6 @@
 #include "csgeom/vector3.h"
 #include "csgeom/box.h"
 #include "igeom/trimesh.h"
-#include "igeom/polymesh.h"
 
 #include "csutil/array.h"
 #include "csutil/flags.h"
@@ -269,6 +268,9 @@ public:
   virtual uint32 GetChangeNumber () const { return change_nr; }
 };
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
+#include "igeom/polymesh.h"
 
 /**
  * This triangle mesh is a temporary class that takes a polygon mesh
@@ -276,14 +278,15 @@ public:
  * to use this mesh in production code!
  * \deprecated This class should not be used!
  */
-class CS_DEPRECATED_TYPE_MSG("Don't use this class")
-  CS_CRYSTALSPACE_EXPORT csTriangleMeshPolyMesh
+class CS_CRYSTALSPACE_EXPORT csTriangleMeshPolyMesh
   : public virtual scfImplementation1<csTriangleMeshPolyMesh,iTriangleMesh>
 {
 private:
   iPolygonMesh* polymesh;
 
 public:
+
+  CS_DEPRECATED_METHOD_MSG("You shouldn't use this class!")
   csTriangleMeshPolyMesh (iPolygonMesh* polymesh)
     : scfImplementationType(this), polymesh (polymesh)
   {
@@ -320,6 +323,8 @@ public:
     return polymesh->GetChangeNumber ();
   }
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 
 /** @} */

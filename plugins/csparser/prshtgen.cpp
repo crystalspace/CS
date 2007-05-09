@@ -37,6 +37,8 @@
 #include "iutil/vfs.h"
 #include "iutil/cache.h"
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 struct PrsHeightMapData :
   public scfImplementation1<PrsHeightMapData, iGenerateImageFunction>
 {
@@ -513,3 +515,4 @@ bool csLoader::ParseHeightgen (iLoaderContext* ldr_context, iDocumentNode* node)
   return true;
 }
 
+#include "csutil/win32/msvc_deprecated_warn_on.h"

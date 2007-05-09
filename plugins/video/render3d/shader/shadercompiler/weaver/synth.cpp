@@ -114,7 +114,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       if (fallback.IsValid())
       {
         csRef<iDocumentNode> newFallback = shaderNode->CreateNodeBefore (CS_NODE_ELEMENT);
-        CS::DocumentHelper::CloneNode (fallback, newFallback);
+        CS::DocSystem::CloneNode (fallback, newFallback);
       }
     }
     
@@ -152,7 +152,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     const Snippet::Technique::CombinerPlugin* comb;
     {
       // Here, snippet should contain 1 tech.
-      CS::ScopedDelete<BasicIterator<const Snippet::Technique*> > 
+      CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique*> > 
         snippetTechIter (snippet->GetTechniques());
       CS_ASSERT(snippetTechIter->HasNext());
       const Snippet::Technique* snipTech = snippetTechIter->Next();
@@ -199,7 +199,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     
     // Generate special technique for output
-    CS::ScopedDelete<Snippet::Technique> generatedOutput (
+    CS::Utility::ScopedDelete<Snippet::Technique> generatedOutput (
       Snippet::CreatePassthrough ("output", "rgba"));
     graph.AddTechnique (generatedOutput);
     {
@@ -235,7 +235,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       csArray<EmittedInput> emitInputs;
       TaggedInputHash taggedInputs;
 
-      CS::ScopedDelete<BasicIterator<const SynthesizeNodeTree::Node> > nodeIt (
+      CS::Utility::ScopedDelete<BasicIterator<const SynthesizeNodeTree::Node> > nodeIt (
         synthTree.GetNodes());
       while (nodeIt->HasNext())
       {
@@ -246,7 +246,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         csArray<TechniqueGraph::Connection> newConnections;
         
         UsedOutputsHash usedOutputs;
-	CS::ScopedDelete<BasicIterator<const Snippet::Technique::Input> > 
+	CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique::Input> > 
 	  inputIt (node.tech->GetInputs());
 	while (inputIt->HasNext())
 	{
@@ -444,7 +444,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     // Writing
     {
-      CS::ScopedDelete<BasicIterator<const SynthesizeNodeTree::Node> > nodeIt (
+      CS::Utility::ScopedDelete<BasicIterator<const SynthesizeNodeTree::Node> > nodeIt (
         synthTree.GetNodesReverse());
       while (nodeIt->HasNext())
       {
@@ -462,7 +462,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         }
         
 	{
-	  CS::ScopedDelete<BasicIterator<const Snippet::Technique::Input> > 
+	  CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique::Input> > 
 	    inputIt (node.tech->GetInputs());
 	  while (inputIt->HasNext())
 	  {
@@ -473,7 +473,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  }
 	}
 	{
-	  CS::ScopedDelete<BasicIterator<const Snippet::Technique::Output> > 
+	  CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique::Output> > 
 	    outputIt (node.tech->GetOutputs());
 	  while (outputIt->HasNext())
 	  {
@@ -485,7 +485,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	}
 	
 	{
-	  CS::ScopedDelete<BasicIterator<const Snippet::Technique::Block> >
+	  CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique::Block> >
 	    blockIt (node.tech->GetBlocks());
 	  while (blockIt->HasNext())
 	  {
@@ -535,7 +535,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     uint coerceCost = WeaverCommon::NoCoercion;
     for (size_t t = 0; t < outTechs.GetSize(); t++)
     {
-      CS::ScopedDelete<BasicIterator<const Snippet::Technique::Output> > 
+      CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique::Output> > 
 	outputs (outTechs[t]->GetOutputs());
       while (outputs->HasNext())
       {
@@ -566,7 +566,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       while (depTechs.GetSize() > 0)
       {
         const Snippet::Technique* tech = depTechs.PopTop ();
-        CS::ScopedDelete<BasicIterator<const Snippet::Technique::Output> > 
+        CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique::Output> > 
 	  outputs (tech->GetOutputs());
         while (outputs->HasNext())
         {
@@ -618,7 +618,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       const Snippet::Technique* tech = techsToTry.PopTop();
       if (!checkedTechs.Contains (tech))
       {
-	CS::ScopedDelete<BasicIterator<const Snippet::Technique::Output> > 
+	CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique::Output> > 
 	  outputIt (tech->GetOutputs());
 	while (outputIt->HasNext())
 	{
@@ -745,7 +745,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     WeaverCommon::iCombiner* combiner)
   {
     {
-      CS::ScopedDelete<BasicIterator<const Snippet::Technique::Input> > 
+      CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique::Input> > 
         inputIt (node.tech->GetInputs());
       while (inputIt->HasNext())
       {
@@ -758,7 +758,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       }
     }
     {
-      CS::ScopedDelete<BasicIterator<const Snippet::Technique::Output> > 
+      CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique::Output> > 
         outputIt (node.tech->GetOutputs());
       while (outputIt->HasNext())
       {
@@ -856,7 +856,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     graph.AddConnection (conn);
     
     {
-      CS::ScopedDelete<BasicIterator<const Snippet::Technique::Output> > 
+      CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique::Output> > 
         outputIt (lastTech->GetOutputs());
       if (outputIt->HasNext())
       {

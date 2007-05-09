@@ -43,6 +43,17 @@ chronological order.
 	  csutil/scf_implgen_p.h for instructions how to regenerate it.
 	- Marten added an "offset" parameter to the feeders in terrain2 that
 	  offsets the height data by a fixed amount.
+	- Marten did a cleanup of namespaces in CS by moving around some classes:
+	    - CS::BitOps -> CS::Utility::BitOps
+	    - CS::ImportKit -> CS::Utility::ImportKit
+	    - CS::ScopedDelete -> CS::Utility::ScopedDelete
+	    - CS::WeakReferenced -> CS::Utility::WeakReferenced
+	    - CS::CompileAssert* -> CS::Utility::Implementation::CompileAssert*
+	    - CS::DocumentHelper::* -> CS::DocSystem::*
+	    - CS::TypeTraits::* -> CS::Meta::*
+	  Typedefs, inline functions and deprecation warnings have been added
+	  where needed for compatibility.
+	- Marten added a header with documentation for the namespaces.
 8-May-2007
 	- Marten fixed a bug in lighter2 where it would write vertexcolors to
 	  a buffer named "colors" when "color" was expected.

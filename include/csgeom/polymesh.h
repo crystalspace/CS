@@ -22,6 +22,9 @@
 
 #include "csextern.h"
 
+
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 #include "csgeom/box.h"
 #include "csgeom/tri.h"
 #include "csgeom/vector3.h"
@@ -30,7 +33,6 @@
 
 #include "igeom/polymesh.h"
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
 
 struct csTriangle;
 
@@ -47,7 +49,8 @@ struct csTriangle;
  * calculate the triangles if requested.
  * \deprecated Use csTriangleMesh instead.
  */
-class CS_DEPRECATED_TYPE_MSG("csPolygonMesh is deprecated; use csTriangleMesh instead") CS_CRYSTALSPACE_EXPORT csPolygonMesh :
+class CS_DEPRECATED_TYPE_MSG("csPolygonMesh is deprecated; use csTriangleMesh instead") 
+  CS_CRYSTALSPACE_EXPORT csPolygonMesh :
   public scfImplementation1<csPolygonMesh, iPolygonMesh>
 {
 private:
@@ -213,7 +216,8 @@ public:
  * A convenience polygon mesh implementation that represents a cube.
  * \deprecated Use csTriangleMeshBox instead.
  */
-class CS_DEPRECATED_TYPE_MSG("csPolygonMeshBox is deprecated; use csTriangleMeshBox instead") CS_CRYSTALSPACE_EXPORT csPolygonMeshBox :
+class CS_DEPRECATED_TYPE_MSG("csPolygonMeshBox is deprecated; use csTriangleMeshBox instead") 
+  CS_CRYSTALSPACE_EXPORT csPolygonMeshBox :
   public virtual scfImplementation1<csPolygonMeshBox,iPolygonMesh>
 {
 private:

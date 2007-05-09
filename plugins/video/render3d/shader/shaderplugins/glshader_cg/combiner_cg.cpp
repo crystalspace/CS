@@ -557,7 +557,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       {
         csRef<iDocumentNode> newNode = 
           cgvpNode->CreateNodeBefore (variableMaps[n]->GetType());
-        CS::DocumentHelper::CloneNode (variableMaps[n], newNode);
+        CS::DocSystem::CloneNode (variableMaps[n], newNode);
       }
       
       csRef<iDocumentNode> programNode = cgvpNode->CreateNodeBefore (CS_NODE_ELEMENT);
@@ -635,7 +635,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       {
         csRef<iDocumentNode> newNode = 
           cgfpNode->CreateNodeBefore (variableMaps[n]->GetType());
-        CS::DocumentHelper::CloneNode (variableMaps[n], newNode);
+        CS::DocSystem::CloneNode (variableMaps[n], newNode);
       }
       
       csRef<iDocumentNode> programNode = cgfpNode->CreateNodeBefore (CS_NODE_ELEMENT);
@@ -868,7 +868,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       FlushAppendString();
       csRef<iDocumentNode> newNode = 
         node->CreateNodeBefore (nodeType);
-      CS::DocumentHelper::CloneNode (appendNode, newNode);
+      CS::DocSystem::CloneNode (appendNode, newNode);
     }
   }
 

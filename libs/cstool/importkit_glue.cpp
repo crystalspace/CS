@@ -53,7 +53,9 @@
 
 namespace CS
 {
-  namespace ImportKitImpl 
+namespace Utility
+{
+  namespace Implementation 
   { 
     
     Glue::Glue (iObjectRegistry* objectReg) : objectReg(objectReg), texId(0)
@@ -448,5 +450,7 @@ namespace CS
       return false;
     }
 
-  } // namespace ImportKitImpl 
+  } // namespace Implementation
+
+} // namespace Utility
 } // namespace CrystalSpace

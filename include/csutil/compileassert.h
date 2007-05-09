@@ -24,20 +24,27 @@
  */
 namespace CS
 {
-
-template <bool x> 
-struct COMPILE_ASSERT_FAILURE;
-
-template <> 
-struct COMPILE_ASSERT_FAILURE<true>
+namespace Utility
 {
-  enum { value = 1};
-};
-
-template <int x>
-struct CompileAssertTest
+namespace Implementation
 {
-};
+  
+  template <bool x> 
+  struct CompileAssertFailure;
+
+  template <> 
+  struct CompileAssertFailure<true>
+  {
+    enum { value = 1};
+  };
+
+  template <int x>
+  struct CompileAssertTest
+  {
+  };
+
+} // namespace Implementation
+} // namespace Utility
 } // namespace CS
 
 
@@ -46,8 +53,8 @@ struct CompileAssertTest
 #define CS_DO_JOIN2( X, Y ) X##Y
 
 #define CS_COMPILE_ASSERT(B) \
-  typedef CS::CompileAssertTest< \
-    sizeof(CS::COMPILE_ASSERT_FAILURE<(bool)(B)>)> \
+  typedef CS::Utility::Implementation::CompileAssertTest< \
+    sizeof(CS::Utility::Implementation::CompileAssertFailure<(bool)(B)>)> \
     CS_JOIN(CrystalSpaceCompileAssertTypedef, __LINE__)
 
 

@@ -154,7 +154,7 @@ namespace lighter
               break;
             csRef<iDocumentNode> newNode = node->CreateNodeBefore (
               child->GetType(), 0);
-            CS::DocumentHelper::CloneNode (child, newNode);
+            CS::DocSystem::CloneNode (child, newNode);
             node->RemoveNode (child);
           }
         }
@@ -349,7 +349,7 @@ namespace lighter
               break;
             csRef<iDocumentNode> newNode = node->CreateNodeBefore (
               child->GetType(), 0);
-            CS::DocumentHelper::CloneNode (child, newNode);
+            CS::DocSystem::CloneNode (child, newNode);
             node->RemoveNode (child);
           }
         }

@@ -22,12 +22,13 @@
 
 namespace CS
 {
-
-  /**
-   * Bit operations
-   */
-  namespace BitOps
+  namespace Utility
   {
+    /**
+     * Bit operations
+     */
+    namespace BitOps
+    {
     /**
      * Compute index of first bit set, scanned from LSB to MSB
      * \return true if any bit is found
@@ -93,6 +94,7 @@ namespace CS
       return ((v + (v >> 4) & 0x0f0f0f0f) * 0x01010101) >> 24;
     }
 
+    }
   }
 
 }

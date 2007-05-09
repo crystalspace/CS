@@ -158,7 +158,7 @@ csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node,
 
   if (exprNode)
   {
-    csString flattened (CS::DocumentHelper::FlattenNode (exprNode));
+    csString flattened (CS::DocSystem::FlattenNode (exprNode));
 
     csMD5::Digest md5 (csMD5::Encode (flattened));
     cache_scope << md5.HexString ();

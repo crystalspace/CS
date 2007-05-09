@@ -437,7 +437,7 @@ namespace lighter
         csRef<iDocumentNode> root = paramsDoc->CreateRoot ();
         csRef<iDocumentNode> params = root->CreateNodeBefore (CS_NODE_ELEMENT);
         params->SetValue ("params");
-        CS::DocumentHelper::CloneNode (srcParams, params);
+        CS::DocSystem::CloneNode (srcParams, params);
 
         csString paramsFile;
         paramsFile.Format ("%s.params", GetFileName().GetData());

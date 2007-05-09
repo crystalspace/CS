@@ -26,7 +26,7 @@
 
 namespace CS
 {
-  namespace TypeTraits
+  namespace Meta
   {
     namespace Implementation
     {

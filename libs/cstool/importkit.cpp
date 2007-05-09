@@ -20,9 +20,11 @@
 #include "cstool/importkit.h"
 #include "importkit_glue.h"
 
-using namespace CS::ImportKitImpl;
+using namespace CS::Utility::Implementation;
 
 namespace CS
+{
+namespace Utility
 {
 
   ImportKit::Container::Model::~Model()
@@ -78,4 +80,5 @@ namespace CS
     return cnt;
   }
 
+} // Namespace Utility
 } // namespace CS

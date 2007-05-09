@@ -1241,9 +1241,9 @@ namespace lighter
       savedObjects.AddNoTest (name);
 
       // Remove any old lightmap svs
-      objNode->RemoveNodes (DocumentHelper::FilterDocumentNodeIterator (
+      objNode->RemoveNodes (DocSystem::FilterDocumentNodeIterator (
         objNode->GetNodes ("shadervar"),
-        DocumentHelper::NodeAttributeRegexpTest ("name", "tex lightmap.*")));
+        DocSystem::NodeAttributeRegexpTest ("name", "tex lightmap.*")));
     }
 
     // Check if we have any child factories
@@ -1511,9 +1511,9 @@ namespace lighter
     texturesProgress.SetProgress (1);
 
     cleanupProgress.SetProgress (0);
-    DocumentHelper::RemoveDuplicateChildren(texturesNode, 
+    DocSystem::RemoveDuplicateChildren(texturesNode, 
       texturesNode->GetNodes ("texture"),
-      DocumentHelper::NodeAttributeCompare("name"));
+      DocSystem::NodeAttributeCompare("name"));
     cleanupProgress.SetProgress (1);
 
     progress.SetProgress (1);

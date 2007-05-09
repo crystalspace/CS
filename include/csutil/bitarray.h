@@ -572,7 +572,7 @@ public:
     {
       v.s = p[i];
       for (size_t j = 0; j < ui32perStorage; j++)
-        num += CS::BitOps::ComputeBitsSet (v.ui32[j]);
+        num += CS::Utility::BitOps::ComputeBitsSet (v.ui32[j]);
     }
 
     return num;

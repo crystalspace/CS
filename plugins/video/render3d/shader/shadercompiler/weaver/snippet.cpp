@@ -171,7 +171,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     const char* defaultCombinerName)
   {
     AtomTechnique newTech (
-      csMD5::Encode (CS::DocumentHelper::FlattenNode (node)));
+      csMD5::Encode (CS::DocSystem::FlattenNode (node)));
     
     newTech.priority = node->GetAttributeValueAsInt ("priority");
     
@@ -649,7 +649,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   void TechniqueGraphBuilder::BuildSubGraphs (const Snippet* snip, 
                                               csArray<GraphInfo>& graphs)
   {
-    CS::ScopedDelete<BasicIterator<const Snippet::Technique*> > techIter (
+    CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique*> > techIter (
       snip->GetTechniques());
     while (techIter->HasNext())
     {

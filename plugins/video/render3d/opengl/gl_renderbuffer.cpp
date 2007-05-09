@@ -270,7 +270,7 @@ csGLVBOBufferManager::VBOSlot* csGLVBOBufferManager::GetFreeVBOSlot (
     for (size_t bunchIdx = 0; bunchIdx < numSlotBitmap; bunchIdx++, bitmap++)
     {
       size_t localIndex;
-      bool foundSlot = CS::BitOps::ScanBitForward (*bitmap, localIndex);
+      bool foundSlot = CS::Utility::BitOps::ScanBitForward (*bitmap, localIndex);
       if (foundSlot)
       {
         size_t slotIndex = 32*bunchIdx + localIndex;
@@ -572,7 +572,7 @@ void csGLVBOBufferManager::DumpStatsBufferType (size_t type)
 
       uint32* bitmap = buffer->freeBitmap;
       for (size_t i = 0; i < slotBitmapSize; ++i)
-        numSlotsUsed -= CS::BitOps::ComputeBitsSet (*bitmap++);
+        numSlotsUsed -= CS::Utility::BitOps::ComputeBitsSet (*bitmap++);
 
       buffer = buffer->nextBuffer;
     } 
