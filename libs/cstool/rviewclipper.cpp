@@ -232,8 +232,8 @@ namespace CS
   }
 
   bool RenderViewClipper::CullBBox (
-    csRenderContext* ctxt,
-    csPlane3* planes,
+    const csRenderContext* ctxt,
+    const csPlane3* planes,
     uint32& frustum_mask,
     const csBox3 &obox,
     int &clip_portal,

@@ -899,7 +899,7 @@ bool csIntersect3::BoxFrustum (const csBox3& box, const csFrustum* frustum)
   return true;
 }
 
-bool csIntersect3::BoxFrustum (const csBox3& box, csPlane3* f,
+bool csIntersect3::BoxFrustum (const csBox3& box, const csPlane3* f,
 	uint32 inClipMask, uint32& outClipMask)
 {
   csVector3 m = box.GetCenter ();

@@ -236,7 +236,7 @@ struct iRenderView : public virtual iBase
    * \deprecated Use CS::RenderViewClipper::CullBBox() instead.
    */
   CS_DEPRECATED_METHOD_MSG("Use CS::RenderViewClipper::CullBBox() instead.")
-  virtual bool ClipBBox (csPlane3* planes, uint32& frustum_mask,
+  virtual bool ClipBBox (const csPlane3* planes, uint32& frustum_mask,
   	const csBox3& obox,
       	int& clip_portal, int& clip_plane, int& clip_z_plane) = 0;
 

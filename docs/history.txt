@@ -18,6 +18,8 @@ chronological order.
 	- Jorrit changed all current mesh objects to use the new
 	  methods in CS::RenderViewClipper instead of the deprecated
 	  ones in iRenderView.
+	- Marten added a const qualifier to one parameter in 
+	  CS::RenderViewClipper::ClipBBox.
 8-May-2007
 	- Marten fixed a bug in lighter2 where it would write vertexcolors to
 	  a buffer named "colors" when "color" was expected.

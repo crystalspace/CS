@@ -85,8 +85,8 @@ namespace CS
      * cull smaller objects.
      */
     static bool CullBBox (
-      csRenderContext* ctxt,
-      csPlane3* planes, uint32& frustum_mask,
+      const csRenderContext* ctxt,
+      const csPlane3* planes, uint32& frustum_mask,
       const csBox3& obox,
       int& clip_portal, int& clip_plane, int& clip_z_plane);
 

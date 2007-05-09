@@ -594,7 +594,7 @@ public:
    * frustum tests with children of the AABB (i.e. other AABB inside
    * this AABB).
    */
-  static bool BoxFrustum (const csBox3& box, csPlane3* frustum,
+  static bool BoxFrustum (const csBox3& box, const csPlane3* frustum,
   	uint32 inClipMask, uint32& outClipMask);
 
   /**

@@ -37,6 +37,8 @@ struct iGraphics2D;
 struct iSector;
 struct iClipper2D;
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * This structure represents all information needed for drawing
  * a scene. It is modified while rendering according to
@@ -277,7 +279,7 @@ public:
 	frustum_mask, clip_portal, clip_plane, clip_z_plane);
   }
 
-  virtual bool ClipBBox (csPlane3* planes, uint32& frustum_mask,
+  virtual bool ClipBBox (const csPlane3* planes, uint32& frustum_mask,
   	const csBox3& obox,
         int& clip_portal, int& clip_plane, int& clip_z_plane)
   {
@@ -308,5 +310,7 @@ public:
   /// Get the number of the current frame.
   virtual uint GetCurrentFrameNumber () const;
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_RVIEW_H__
