@@ -6,6 +6,8 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-May-2007
+	- Jorrit fixed a compile error in typetraits.h.
 9-May-2007
 	- Jorrit removed the fat renderloop. It is not very useful anymore
 	  and will be replaced by the new render manager in the (hopefully
@@ -43,7 +45,8 @@ chronological order.
 	  csutil/scf_implgen_p.h for instructions how to regenerate it.
 	- Marten added an "offset" parameter to the feeders in terrain2 that
 	  offsets the height data by a fixed amount.
-	- Marten did a cleanup of namespaces in CS by moving around some classes:
+	- Marten did a cleanup of namespaces in CS by moving around some
+	  classes:
 	    - CS::BitOps -> CS::Utility::BitOps
 	    - CS::ImportKit -> CS::Utility::ImportKit
 	    - CS::ScopedDelete -> CS::Utility::ScopedDelete

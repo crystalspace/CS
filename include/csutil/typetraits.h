@@ -100,7 +100,8 @@ namespace CS
     template <class Type>
     struct IsReference
     {
-      static const bool value = CS::TypeTraits::Implementation::IsReferenceImpl<Type>::value;
+      static const bool value = CS::Meta::Implementation
+	::IsReferenceImpl<Type>::value;
     };
 
     /**
@@ -109,7 +110,8 @@ namespace CS
     template <class Type1, class Type2>
     struct IsSame
     {
-      static const bool value = CS::TypeTraits::Implementation::IsSameImpl<Type1, Type2>::value;
+      static const bool value = CS::Meta::Implementation
+	::IsSameImpl<Type1, Type2>::value;
     };
   } // namespace TypeTraits
 
