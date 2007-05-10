@@ -27,10 +27,6 @@
 
 #include "csextern.h"
 
-// These are needed for compiletime checks on interfaces
-
-#include "csutil/compileassert.h"
-#include "csutil/typetraits.h"
 
 // -- Forward declarations
 struct iDocument;

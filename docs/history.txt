@@ -14,6 +14,7 @@ chronological order.
 	- Jorrit also added that step to the shadowed renderloops.
 	- Marten fixed a potential precision problem in the terrain2 
 	  feeders when loading from an color encoded image heightmap.
+	- Marten eliminated an unnecessary include.
 9-May-2007
 	- Jorrit removed the fat renderloop. It is not very useful anymore
 	  and will be replaced by the new render manager in the (hopefully
