@@ -201,7 +201,7 @@ void csOPCODECollideSystem::CopyCollisionPairs (csOPCODECollider* col1,
 }
 bool csOPCODECollideSystem::Collide (
   csOPCODECollider* collider1, const csReversibleTransform* trans1,
-    iTerrainSystem* terrain)
+    iTerrainSystem* terrain, const csReversibleTransform* terrainTrans)
 {
   unsigned int tri_count = collider1->opcMeshInt.GetNbTriangles ();
   const unsigned int* tris = collider1->indexholder;
@@ -209,9 +209,13 @@ bool csOPCODECollideSystem::Collide (
   
   scfArray<iTerrainCollisionPairArray> c_pairs;
   
+  // Compute the _relative_ transform
   csReversibleTransform t;
   if (trans1)
     t = *trans1;
+
+  if (terrainTrans)
+    t /= *terrainTrans;
 
   if (terrain->CollideTriangles ((const csVector3*)verts, tri_count,
     tris, collider1->radius, t, false, &c_pairs))
@@ -322,7 +326,7 @@ bool csOPCODECollideSystem::Collide (
   {
     csRef<iTerrainSystem> terrain = scfQueryInterface<iTerrainSystem> (
 	  collider1);
-    return Collide ((csOPCODECollider*)collider2, trans2, terrain);
+    return Collide ((csOPCODECollider*)collider2, trans2, terrain, trans1);
   }
     
   if (collider2->GetColliderType () == CS_TERRAIN_COLLIDER && 
@@ -330,7 +334,7 @@ bool csOPCODECollideSystem::Collide (
   {
     csRef<iTerrainSystem> terrain = scfQueryInterface<iTerrainSystem> (
 	  collider2);
-    return Collide ((csOPCODECollider*)collider1, trans1, terrain);
+    return Collide ((csOPCODECollider*)collider1, trans1, terrain, trans2);
   }
 
   csOPCODECollider* col1 = (csOPCODECollider*) collider1;
