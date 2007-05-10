@@ -26,5 +26,11 @@
 	</step>
       </steps>
     </step>
+    <step plugin="crystalspace.renderloop.step.generic">
+      <shadertype>standard</shadertype>
+      <zoffset>no</zoffset>
+      <portaltraversal/>
+      <zmesh/>
+    </step>
   </steps>
 </params>

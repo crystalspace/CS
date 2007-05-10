@@ -11,6 +11,7 @@ chronological order.
 	- Jorrit added a 'standard' shaderstep to std_rloop_diffuse. That
 	  helps with objects that want to use normal std_lighting (for
 	  mixmode/transparency reasons for example).
+	- Jorrit also added that step to the shadowed renderloops.
 9-May-2007
 	- Jorrit removed the fat renderloop. It is not very useful anymore
 	  and will be replaced by the new render manager in the (hopefully
