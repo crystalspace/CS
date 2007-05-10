@@ -244,7 +244,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
     if ((image->GetFormat () & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
     {
       const csRGBpixel *data = (csRGBpixel*)image->GetImageData ();
-      const float heightConstant = heightScale / 16777215.0f;
+      const float heightConstant = heightScale / ((float) ((1<<24)-1));
 
       for (size_t y = 0; y < outputHeight; ++y)
       {
@@ -254,8 +254,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
         {          
           const csRGBpixel& p = *data++;
 
-          const int h = p.red * 0xffff + p.green * 0xff + p.blue;
-          *row++ = h * heightConstant + offset;
+          unsigned int h;
+          h = p.red; h <<= 8;
+          h |= p.green; h <<= 8;
+          h |= p.blue;
+
+          *row++ = (h / ((float) ((1<<24)-1))) * heightScale + offset;
         }
 
         outputBuffer += outputPitch;

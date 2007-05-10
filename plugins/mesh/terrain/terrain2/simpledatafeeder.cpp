@@ -79,40 +79,6 @@ bool csTerrainSimpleDataFeeder::Load (iTerrainCell* cell)
   mapReader.Load (data.data, width, height, data.pitch, cell->GetSize ().y, 
     properties->offset);
 
-
-/*
-  
-  csRef<iImage> map = loader->LoadImage (properties->heightmapSource.GetDataSafe (), 
-    CS_IMGFMT_PALETTED8);
-
-  if (!map) 
-    return false;
-
-  if (map->GetWidth () != width || map->GetHeight () != height)
-  {
-    map = csImageManipulate::Rescale (map, width, height);
-  }
-  
-  const unsigned char* imagedata = (const unsigned char*)map->GetImageData ();
-
-  float dataYScale = cell->GetSize().y;
-
-  for (int y = 0; y < height; ++y)
-  {
-    float* dest_data = data.data;
-
-    for (int x = 0; x < width; ++x)
-    {
-      float xd = float(x - width/2) / width;
-      float yd = float(y - height/2) / height;
-
-      *dest_data++ = *imagedata++ / 255.0f * dataYScale;
-    }
-    
-    data.data += data.pitch;
-  }
-*/
-
   cell->UnlockHeightData ();
   
   csRef<iImage> material = loader->LoadImage (properties->materialmapSource.GetDataSafe (),
