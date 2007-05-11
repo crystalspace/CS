@@ -67,48 +67,33 @@ present in this plugin.
 
 The @code{iSyntaxService::ParseMixmode()} function parses a @samp{mixmode}
 node which is used for defining transparency or how the source (usually
-a texture) is blended with the destination (usually a screen buffer). In the
-explanation below we use the following terms: @sc{src} is the source of
-the blend operation (usually the texture or material). @sc{dst} is the
-destination of the blend operation (usually the screen buffer or texture
-on which you are rendering). @samp{srcAlpha} is the alpha component
-of the source buffer. @samp{dstAlpha} is the alpha component of the destination
-buffer. The following children are supported for mixmode:
+a texture) is blended with the destination (usually a screen buffer). For
+more information about mixmodes check @ref{Renderer Mixmodes}.
+
+The following children are supported for mixmode:
 
 @itemize @bullet
 @item @samp{copy}
-Blending function: @sc{src}. This mode is usually default. It simply
-copies the source to the destination without blending.
+Copy blending. This mode is usually default.
 @item @samp{multiply}
-Blending function: @sc{src}*@sc{dst}. This is a common blend mode to
-simulate lighting.
+Multiplicative blending.
 @item @samp{multiply2}
-Blending function: 2*@sc{src}*@src{dst}. This is a common blend mode
-to simulate brighter lighting.
+Double multiplicative blending. Often used for lighting.
 @item @samp{add}
-Blending function: @sc{src}+@sc{dst}. Add source and destination. This is a
-mode that allows for nice transparency effects. One of the big advantages (as
-opposed to @samp{alpha}) is that this mode doesn't require objects to be
-sorted from back to front.
+Additive blending. Used for transparency effects that don't require
+back to front sorting.
 @item @samp{alpha}
-Blending function: @samp{alpha}*@sc{src} + (1-@samp{alpha})*@sc{dst}.
-The @samp{alpha} used in this formula is a combination of the @samp{srcAlpha}
-and the alpha given as a parameter of this child (between 0 and 1). But this
-depends on the actual shader that is being used.
+Alpha blending. Expects and additional parameter between 0 and 1 that indicates
+the alpha value. This kind of blending requires back to front sorting to look
+right.
 @item @samp{premultalpha}
-Blending function: @sc{src} + @sc{dst}*(1-@samp{srcAlpha}). When the
-source alpha component was multoplied into the source color then this acts
-like normal alpha blending. If it was not then it acts like additive
-blending. So this mixmode can be used to do both additive and alpha
-blending on the same triangle even and interpolate between these two
-extremes by appropriate choice of the color and alpha values.
+Premultiplied alpha blending.
 @item @samp{destalphaadd}
-Blending function: @samp{dstAlpha}*@sc{src} + @sc{dst}.
+@@@TODO
 @item @samp{srcalphaadd}
-Blending function: @samp{srcAlpha}*@sc{src} + @sc{dst}.
+@@@TODO
 @item @samp{transparent}
-Blending function: @sc{dst}. This mode will simply leave the destination
-unchanged (fully transparent) except that the z-buffer is modified!
+Fully transparent but still affect Z-buffer.
 @item @samp{mesh}
 @@@TODO
 @item @samp{alphatest}
