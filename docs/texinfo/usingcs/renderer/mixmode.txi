@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Renderer Mixmodes, Old Map File Format, XML File Format, Map Loader
+@node Renderer Mixmodes, , HOWTO Use custom font, 3D Renderer
 @subsection Mixmodes and Blending
 @cindex mixmode
 

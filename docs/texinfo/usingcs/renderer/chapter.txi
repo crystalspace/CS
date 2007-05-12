@@ -40,7 +40,6 @@ to make more advanced texture effects using shaders.
 
 @menu
 * HOWTO Use custom font:: Using a Custom Font
-* HOWTO Draw Text:: Drawing Text
 * Renderer Mixmodes:: Mixmodes and Blending
 @end menu
 
