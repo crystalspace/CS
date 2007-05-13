@@ -64,10 +64,10 @@ namespace lighter
     virtual void SaveFactory (iDocumentNode *node);
 
     // Getters
-    inline float GetLMuTexelPerUnit () const
+    inline float GetLMlmDensityU () const
     { return lmuScale; }
 
-    inline float GetLMvTexelPerUnit () const
+    inline float GetLMlmDensityV () const
     { return lmvScale; }
 
 

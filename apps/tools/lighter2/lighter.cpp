@@ -481,11 +481,11 @@ namespace lighter
     csPrintf ("  Use random sampling for direct lighting instead of sampling\n"
               "  every light source.\n");
 
-    csPrintf (" --utexelperunit=<number>\n");
+    csPrintf (" --lmdensityu=<number>\n");
     csPrintf ("  Set scaling between world space units and lightmap pixels\n"
               "  in lightmap u-mapping direction\n");
 
-    csPrintf (" --vtexelperunit=<number>\n");
+    csPrintf (" --lmdensityv=<number>\n");
     csPrintf ("  Set scaling between world space units and lightmap pixels\n"
               "  in lightmap v-mapping direction\n");
    

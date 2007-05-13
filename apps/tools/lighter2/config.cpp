@@ -34,8 +34,8 @@ namespace lighter
     //Setup defaults
     lighterProperties.doDirectLight = true;
 
-    lmProperties.uTexelPerUnit = 2.0f;
-    lmProperties.vTexelPerUnit = 2.0f;
+    lmProperties.lmDensityU = 2.0f;
+    lmProperties.lmDensityV = 2.0f;
     lmProperties.maxLightmapU = 1024;
     lmProperties.maxLightmapV = 1024;
     lmProperties.blackThreshold = lightValueEpsilon;
@@ -54,10 +54,10 @@ namespace lighter
       lighterProperties.doDirectLight);
 
 
-    lmProperties.uTexelPerUnit = cfgMgr->GetFloat ("lighter2.uTexelPerUnit", 
-      lmProperties.uTexelPerUnit);
-    lmProperties.vTexelPerUnit = cfgMgr->GetFloat ("lighter2.vTexelPerUnit", 
-      lmProperties.vTexelPerUnit);
+    lmProperties.lmDensityU = cfgMgr->GetFloat ("lighter2.lmDensityU", 
+      lmProperties.lmDensityU);
+    lmProperties.lmDensityV = cfgMgr->GetFloat ("lighter2.lmDensityV", 
+      lmProperties.lmDensityV);
 
     lmProperties.maxLightmapU = cfgMgr->GetInt ("lighter2.maxLightmapU", 
       lmProperties.maxLightmapU);

@@ -89,8 +89,8 @@ namespace lighter
       csBitArray groupUsedVerts (usedVerts);
       // Compute lightmapping
       ProjectPrimitives (prims, groupUsedVerts,
-                         factory->GetLMuTexelPerUnit (), 
-                         factory->GetLMvTexelPerUnit (),
+                         factory->GetLMlmDensityU (), 
+                         factory->GetLMlmDensityV (),
                          newFactory->lightmapUVs);
       
       csVector2 minuv, maxuv, uvSize;

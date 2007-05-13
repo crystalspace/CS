@@ -30,8 +30,8 @@ namespace lighter
 
   ObjectFactory::ObjectFactory ()
     : lightPerVertex (false),
-    lmuScale (globalConfig.GetLMProperties ().uTexelPerUnit),
-    lmvScale (globalConfig.GetLMProperties ().vTexelPerUnit), 
+    lmuScale (globalConfig.GetLMProperties ().lmDensityU),
+    lmvScale (globalConfig.GetLMProperties ().lmDensityV), 
     factoryWrapper (0)
   {
   }

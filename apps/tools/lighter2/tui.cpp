@@ -174,8 +174,8 @@ namespace lighter
     csPrintf (CS_ANSI_CURSOR(14,13) "%#4.2g", globalConfig.GetDIProperties ().pointLightMultiplier);
     csPrintf (CS_ANSI_CURSOR(14,15) "%#4.2g", globalConfig.GetDIProperties ().areaLightMultiplier);
 
-    csPrintf (CS_ANSI_CURSOR(14,17) "%#4.2g", globalConfig.GetLMProperties ().uTexelPerUnit);
-    csPrintf (CS_ANSI_CURSOR(14,19) "%#4.2g", globalConfig.GetLMProperties ().vTexelPerUnit);
+    csPrintf (CS_ANSI_CURSOR(14,17) "%#4.2g", globalConfig.GetLMProperties ().lmDensityU);
+    csPrintf (CS_ANSI_CURSOR(14,19) "%#4.2g", globalConfig.GetLMProperties ().lmDensityV);
 
     csPrintf (CS_ANSI_CURSOR(1,1));
   }
