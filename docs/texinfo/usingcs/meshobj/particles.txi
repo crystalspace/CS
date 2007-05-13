@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MeshObject Particles, , MeshObject Haze, MeshObject
+@node MeshObject Particles, MeshObject Portal Container, MeshObject Terrain2, MeshObject
 @subsection Particles Mesh Object
 @cindex MeshObject
 @cindex Particles Particle System

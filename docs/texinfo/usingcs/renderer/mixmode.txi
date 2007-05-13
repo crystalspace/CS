@@ -23,7 +23,7 @@ copies the source to the destination without blending.
 Blending function: @sc{src}*@sc{dst}. This is a common blend mode to
 simulate lighting.
 @item @samp{CS_FX_MULTIPLY2}
-Blending function: 2*@sc{src}*@src{dst}. This is a common blend mode
+Blending function: 2*@sc{src}*@sc{dst}. This is a common blend mode
 to simulate brighter lighting.
 @item @samp{CS_FX_ADD}
 Blending function: @sc{src}+@sc{dst}. Add source and destination. This is a
@@ -56,12 +56,12 @@ Blending function: @samp{srcAlpha}*@sc{src} + @sc{dst}.
 Blending function: @sc{dst}. This mode will simply leave the destination
 unchanged (fully transparent) except that the z-buffer is modified!
 @item @samp{CS_FX_MESH}
-@@@TODO
+@@@@TODO
 @item @samp{CS_MIXMODE_ALPHATEST_AUTO}
-@@@TODO
+@@@@TODO
 @item @samp{CS_MIXMODE_ALPHATEST_ENABLE}
-@@@TODO
+@@@@TODO
 @item @samp{CS_MIXMODE_ALPHATEST_DISABLE}
-@@@TODO
+@@@@TODO
 @end itemize
 

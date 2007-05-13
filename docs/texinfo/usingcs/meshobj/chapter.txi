@@ -31,6 +31,9 @@ Space in favor of @samp{GenMesh}.
 useful if you want landscapes although you can do landscapes with genmesh
 too. But the terrain mesh object can do it more efficiently.
 @item
+@samp{Terrain2} The new improved terrain engine for rendering landscapes
+and outdoor areas.
+@item
 @samp{SprCal3D} (@pxref{MeshObject SprCal3D}). The sprcal3d object is
 one of the options you have for animated skeletal models. Both Blender
 and 3DSMax can export @sc{cal3d} models. The other option is to use
@@ -65,13 +68,14 @@ Crystal Space supports.
 * MeshObject Genmesh:: Genmesh Mesh Object
 * MeshObject Thing:: Thing Mesh Object
 * MeshObject TerrFunc:: Terrain Mesh Object
+* MeshObject Terrain2:: Terrain2 Mesh Object
+* MeshObject Particles:: Particles Mesh Object
 * MeshObject Portal Container:: Portal Container Mesh Object
+* MeshObject SprCal3D:: SpriteCal3D Mesh Object
 * MeshObject Spr2D:: Sprite2D Mesh Object
 * MeshObject Spr3D:: Sprite3D Mesh Object
-* MeshObject SprCal3D:: SpriteCal3D Mesh Object
 * MeshObject Emit:: Emitter Mesh Object
 * MeshObject Haze:: Haze Mesh Object
-* MeshObject Particles:: Particles Mesh Object
 @end menu
 
 @importss{usingcs,meshobj,concepts.txi}
@@ -84,10 +88,11 @@ Crystal Space supports.
 @importss{usingcs,meshobj,genmesh.txi}
 @importss{usingcs,meshobj,thing.txi}
 @importss{usingcs,meshobj,terrfunc.txi}
+@importss{usingcs,meshobj,terrain2.txi}
+@importss{usingcs,meshobj,particles.txi}
 @importss{usingcs,meshobj,portalcontainer.txi}
+@importss{usingcs,meshobj,sprcal3d.txi}
 @importss{usingcs,meshobj,spr2d.txi}
 @importss{usingcs,meshobj,spr3d.txi}
-@importss{usingcs,meshobj,sprcal3d.txi}
 @importss{usingcs,meshobj,emit.txi}
 @importss{usingcs,meshobj,haze.txi}
-@importss{usingcs,meshobj,particles.txi}

@@ -89,19 +89,19 @@ right.
 @item @samp{premultalpha}
 Premultiplied alpha blending.
 @item @samp{destalphaadd}
-@@@TODO
+@@@@TODO
 @item @samp{srcalphaadd}
-@@@TODO
+@@@@TODO
 @item @samp{transparent}
 Fully transparent but still affect Z-buffer.
 @item @samp{mesh}
-@@@TODO
+@@@@TODO
 @item @samp{alphatest}
-One of: @samp{auto}, @samp{enable}, or @samp{disable}. @@@TODO
+One of: @samp{auto}, @samp{enable}, or @samp{disable}. @@@@TODO
 @item @samp{blendop}
 This child expects two attributes: @samp{src} and @samp{dest}. Both can have one of the following as a value: @samp{dstalpha}, @samp{dstalpha_inv},
 @samp{dstcolor}, @samp{dstcolor_inv}, @samp{one}, @samp{srcalpha},
 @samp{srcalpha_inv}, @samp{scrcolor}, @samp{srccolor_inv}, or @samp{zero}.
-@@@TODO
+@@@@TODO
 @end itemize
 

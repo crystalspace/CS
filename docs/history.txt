@@ -9,6 +9,9 @@ chronological order.
 13-May-2007
 	- res renamed the lighter2 "Xtexelperunit" options to the more
 	  descriptive "lmdensityX".
+	- Marten added documentation on terrain2 terrain plugin. Also
+	  did a small reorganizing of the order in the mesh object 
+	  documentation.
 11-May-2007
 	- Jorrit moved the more technical information about mixmodes
 	  to the renderer section in the manual.

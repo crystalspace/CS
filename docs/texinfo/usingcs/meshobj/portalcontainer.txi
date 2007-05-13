@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MeshObject Portal Container, MeshObject Spr2D, MeshObject TerrFunc, MeshObject
+@node MeshObject Portal Container, MeshObject SprCal3D, MeshObject Particles, MeshObject
 @subsection Portal Container Mesh Object
 @cindex MeshObject
 @cindex Portal Container

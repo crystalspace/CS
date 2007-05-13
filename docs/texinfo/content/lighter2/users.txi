@@ -5,10 +5,10 @@
 
 @heading Introduction
 
-@code{lighter2} is a tool to compute \emph{static lighting} for a CrystalSpace
+@code{lighter2} is a tool to compute @emph{static lighting} for a CrystalSpace
 world. 
 
-\emph{Static} means that the lighting effects on objects in the world
+@emph{Static} means that the lighting effects on objects in the world
 are precomputed in a preprocessing step during and after modelling of the 
 world. The benefit is that it is very cheap to render; it makes no difference
 if a world uses one or one thousand lights, the runtime performance is the
@@ -18,7 +18,7 @@ won't have an effect on statically lit geometry.
 
 @c Mention GI and alpha shadows once we have them
 
-The oppositze is \emph{dynamic lighting} which is computed entirely at runtime.
+The oppositze is @emph{dynamic lighting} which is computed entirely at runtime.
 This means that light sources can be moved as desired, with changes immediately
 being reflected; however, shadows and multiple light sources all increase the
 runtime cost of lighting.
@@ -39,7 +39,7 @@ $ lighter2 [options] <map file>
 @code{options} optionally specify one or more command-line options (which are
 described in the course of this section). @code{map file} specifies the path to
 a directory or @sc{zip} file containing an @sc{xml} map file named @file{world}
-or the direct file name of an @sc{xml} map file. \emph{Note:} it is recommended
+or the direct file name of an @sc{xml} map file. @emph{Note:} it is recommended
 to extract worlds in @sc{zip} files before lighting as this will result in
 noticeably faster disk input/output, especially when the results are saved.
 
@@ -48,14 +48,14 @@ intervention being necessary.
 
 @heading Light computation
 
-Lighting for objects is either computed as a \emph{lightmap} or
-\emph{per-vertex}.
+Lighting for objects is either computed as a @emph{lightmap} or
+@emph{per-vertex}.
 
-\emph{Lightmap lighting} can be thought of as a grid being laid over surfaces
+@emph{Lightmap lighting} can be thought of as a grid being laid over surfaces
 in the world and the lighting for a surface being computed at the grid points.
 @c TODO explain lightmap density, reference to how to set it
 
-\emph{Per-Vertex lighting} means that lighting for surfaces is computed at
+@emph{Per-Vertex lighting} means that lighting for surfaces is computed at
 its vertices.
 
 @c TODO When to use per-vertex lighting
