@@ -47,7 +47,7 @@ csInitializer::SetupEventHandler($objreg, \&HandleEvent,
 [ 'crystalspace.input.keyboard', 'crystalspace.frame' ])
   or die 'SetupEventHandler failed';
 
-# Finish initializing Crystal Space
+# Finish initializing Crystal Space environment
 csInitializer::OpenApplication($objreg)
   or die 'OpenApplication failed';
 
@@ -78,17 +78,19 @@ $view->GetCamera->GetTransform->SetOrigin(new cspace::csVector3 (0, 5, -3));
 print "Crystal Space is go with Perl5...\n";
 
 my $status = cspace::csDefaultRunLoop($objreg);
-# Here the application runs until cspace::csInitializer::CloseApplication is
+# Here the application runs until csInitializer::CloseApplication is
 # called. Then the runloop will return control to this script.
 warn 'RunLoop exited with error status.' unless $status;
 
-END {
-  # Putting this in an END block ensures we have released all our references
-  # to Crystal Space objects before calling DestroyApplication.
+# Release references to Crystal Space objects (except $objreg)
+undef $_ for ($gfx3d, $gfx2d, $engine, $vclock, $kbd, $loader, $view, $sector);
 
-  print "Crystal Space is closing down.\n";
-  csInitializer::DestroyApplication($objreg);
-}
+# After releasing our object references we are ready to clean up the
+# Crystal Space environment prior to exit.
+print "Crystal Space is closing down.\n";
+csInitializer::DestroyApplication($objreg);
+
+exit 0;
 
 sub HandleEvent
 {
@@ -123,8 +125,8 @@ sub HandleEvent
     }
     else
     {
-      if ($kbd->GetKeyState(cspace::CSKEY_RIGHT()))  { $rotY += $speed }
-      if ($kbd->GetKeyState(cspace::CSKEY_LEFT())) { $rotY -= $speed }
+      if ($kbd->GetKeyState(cspace::CSKEY_RIGHT())) { $rotY += $speed }
+      if ($kbd->GetKeyState(cspace::CSKEY_LEFT()))  { $rotY -= $speed }
       if ($kbd->GetKeyState(cspace::CSKEY_PGUP()))  { $rotX += $speed }
       if ($kbd->GetKeyState(cspace::CSKEY_PGDN()))  { $rotX -= $speed }
       if ($kbd->GetKeyState(cspace::CSKEY_UP()))

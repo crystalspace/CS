@@ -95,8 +95,7 @@
   {
     my ($self, $val) = @_;
 
-    unless (@_ >= 1 and @_ <= 2
-	and ref $self and $self =~ /=HASH/ and $self->isa('cspace'))
+    unless (@_ >= 1 and @_ <= 2 and ref $self and $self->isa('cspace'))
       { croak "No such subroutine $AUTOLOAD" }
 
     $AUTOLOAD =~ s/^.*:://;
@@ -432,21 +431,17 @@
 /****************************************************************************
  * Extra pure perl operator overloads.
  ****************************************************************************/
-#if 0
 %perlcode %{
   package cspace::iDataBuffer;
-    use overload '${}'	=> sub { $_[0]->GetData () },
-		 '""'	=> sub { $_[0]->GetData () },
+    use overload '""'	=> sub { $_[0]->GetData () },
 		 'fallback' => 1;
 
   package cspace::iString;
-    use overload '${}'	=> sub { $_[0]->GetData () },
-		 '""'	=> sub { $_[0]->GetData () },
+    use overload '""'	=> sub { $_[0]->GetData () },
 		 'fallback' => 1;
 
   package cspace::csString;
-    use overload '${}'	=> sub { $_[0]->GetData () },
-		 '""'	=> sub { $_[0]->GetData () },
+    use overload '""'	=> sub { $_[0]->GetData () },
 		 'fallback' => 1;
 
   package cspace::csVector2;
@@ -492,7 +487,6 @@
 				 $_[0]; },
 		 'fallback' => 1;
 %}
-#endif // 0
 
 #if 0 // very experimental
 /*****************************************************************************

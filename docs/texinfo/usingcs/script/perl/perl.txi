@@ -135,26 +135,20 @@ a Crystal Space C++ function, a Perl array reference is used.
 
 Most of the methods of @samp{csString} and @samp{iString} are inaccessible
 from Perl code, but these classes can be converted into Perl strings very
-easily, using the scalar dereference operator or string interpolation:
+easily, using string interpolation:
 
 @example
 my $string_object = new cspace::csString ('This is a csString');
 
 print "$string_object that has been interpolated in double-quotes.\n";
 
-my $string1 = substr $@{ $string_object @}, 0, 4;
-my $string2 = substr $@{ $string_object @}, 8;
-
-print "$string1 has been extracted from $string2 using scalar dereference.\n";
-
 # Output:
 # This is a csString that has been interpolated in double-quotes.
-# This has been extracted from a csString using scalar dereference.
 @end example
 
 This also applies to @samp{iDataBuffer}.
 
-To pass the null pointer as a string argument, use Perl's @code{undef} keyword.
+To pass the null pointer as a char* argument, use Perl's @code{undef} keyword.
 
 @subheading Vectors, Matrices and Colors
 
@@ -165,12 +159,13 @@ the vector:
 @example
 my $vector = new cspace::csVector3 (1, 2, 3);
 
-print $vector->[1] . $vector->[0] . $vector->[2] . "\n";
+print $vector->[0] . $vector->[1] . $vector->[2] . "\n";
 
-print reverse @@@{ $vector @} . "\n";
+my @reversed = reverse @@$vector;
+print "@reversed\n";
 
 # Output:
-# 213
+# 123
 # 3 2 1
 @end example
 

@@ -6,6 +6,14 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-May-2007
+	- Oktal made the following changes to the Swig scripting bindings:
+	    - Fixed the Java bindings to work with the new OBJECT_FUNCTIONS
+	      semantics in cspace.i.
+	    - Cleaned up redundant code in Perl module's AUTOLOAD subroutine.
+	    - Fixed and uncommented Perl module's extra operator overloads.
+	    - Minor fix in the perlsimp.pl example script.
+	    - Updated Perl scripting section of the manual.
 13-May-2007
 	- res renamed the lighter2 "Xtexelperunit" options to the more
 	  descriptive "lmdensityX".
