@@ -14,6 +14,18 @@ chronological order.
 	    - Fixed and uncommented Perl module's extra operator overloads.
 	    - Minor fix in the perlsimp.pl example script.
 	    - Updated Perl scripting section of the manual.
+	- res added csLerp() to math.h.
+	- res made the following changes to basemapgen:
+	    - Made it not require an already existing basemap.
+	    - Default basemap size to nearest PO2 of material map size.
+	    - Made it sample from the material layer images bilinearly instead
+	      of nearest neighbor.
+	    - Made it mipmap the material layer images to the highest required
+	      mip needed when taking the scaling into account.
+	    - Removed supersampling realized by upscaling at the beginning
+	      and downscaling at the end: the bilinear filtering now used 
+	      should give sufficiently smooth results.
+	- res used basemapgen to compute basemaps for terrain and terrainf.
 13-May-2007
 	- res renamed the lighter2 "Xtexelperunit" options to the more
 	  descriptive "lmdensityX".

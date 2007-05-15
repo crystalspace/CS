@@ -69,10 +69,10 @@ private:
 
   void SaveImage (ImageMap image);
 
-  void CreateBasemap (int basemap_res, 
-                      ImageMap basemap_dst, 
-                      int matmap_res,
-                      ImageMap matmap_dst, 
+  void CreateBasemap (int basemap_w, int basemap_h, 
+                      ImageMap& basemap_dst, 
+                      int matmap_w, int matmap_h,
+                      const ImageMap& matmap_dst, 
                       const csArray<MaterialLayer>& txt_layers);
 
 public:

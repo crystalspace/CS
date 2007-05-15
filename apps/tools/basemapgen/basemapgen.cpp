@@ -88,16 +88,15 @@ void BaseMapGen::Report(const char* msg, ...)
 
 void BaseMapGen::OnCommandLineHelp()
 {
-  printf("\n");
-  printf("Usage: basemapgen path world [OPTIONS]\n");
-  printf(" Example: basemapgen /this/data/terrain world -terrainname=Terrain\n");
-  printf("\n");
-  printf("<path>                    The path to the worldfile        (default /this)\n");
-  printf("<world>                   Name of the world file           (default 'world')\n");
-  printf("-terrainname=<name>       Name of the terrain mesh object  (default 'Terrain')\n");
-  printf("-terraformername=<name>   Name of the terraformer          (default 'simple')\n");
-  printf("-resolution=<pixels>      The resolution for the basemap   (default basemap resolution)\n");
-  printf("-factor=<value>           Up/down scales the basemap       (default 1)\n");
+  csPrintf ("\n");
+  csPrintf ("Usage: basemapgen path world [OPTIONS]\n");
+  csPrintf (" Example: basemapgen /this/data/terrain world -terrainname=Terrain\n");
+  csPrintf ("\n");
+  csPrintf ("<path>                    The path to the worldfile        (default /this)\n");
+  csPrintf ("<world>                   Name of the world file           (default 'world')\n");
+  csPrintf ("-terrainname=<name>       Name of the terrain mesh object  (default 'Terrain')\n");
+  csPrintf ("-terraformername=<name>   Name of the terraformer          (default 'simple')\n");
+  csPrintf ("-resolution=<pixels>      The resolution for the basemap   (default basemap resolution)\n");
 }
 
 bool BaseMapGen::LoadMap ()
@@ -106,7 +105,7 @@ bool BaseMapGen::LoadMap ()
   csRef<iConfigManager> cfgmgr = csQueryRegistry<iConfigManager> (object_reg);
 
   csRef<iConfigFile> cfgfile = cfgmgr->GetDynamicDomain ();
-  csPrintf("Loading custom VFS mounts from:\n%s\n", cfgfile->GetFileName ());
+  csPrintf ("Loading custom VFS mounts from:\n%s\n", cfgfile->GetFileName ());
   vfs->LoadMountsFromFile(cfgfile);
   
   csString path = cmdline->GetName(0);
@@ -197,7 +196,8 @@ csRef<iDocumentNode> BaseMapGen::GetTerrainNode ()
   csString terrainname = cmdline->GetOption("terrainname");
   if (terrainname.IsEmpty()) terrainname = "Terrain";
 
-  csPrintf("Trying to load terrain '%s' ...\n", terrainname.GetData());fflush (stdout);
+  csPrintf ("Trying to load terrain '%s' ...\n", terrainname.GetData());
+  fflush (stdout);
 
    // Get the terrain node
   csRef<iDocumentNodeIterator> sectors = rootnode->GetNodes("sector");
@@ -304,7 +304,8 @@ BaseMapGen::ImageMap BaseMapGen::GetMaterialMap ()
   csString terrname = cmdline->GetOption("terraformername");
   if (terrname.IsEmpty()) terrname = "simple";
 
-  csPrintf("Trying to load terraformer '%s' ...\n", terrname.GetData());fflush (stdout);
+  csPrintf ("Trying to load terraformer '%s' ...\n", terrname.GetData());
+  fflush (stdout);
 
   // Get the terraformer node
   csRef<iDocumentNodeIterator> it = rootnode->GetNodes("addon");
@@ -313,16 +314,23 @@ BaseMapGen::ImageMap BaseMapGen::GetMaterialMap ()
     csRef<iDocumentNode> current = it->Next();
     csRef<iDocumentNode> params = current->GetNode ("params");
     if (!params) params = current;
-    csRef<iDocumentNode> matmap = params->GetNode ("materialmap");
-    if (!matmap) continue;
     csRef<iDocumentNode> namenode = params->GetNode("name");
     if (!namenode) continue;
     csString name = namenode->GetContentsValue();
     if ( name.Compare(terrname))
     {
-      // Set the image.
-      imagemap.texture_file = matmap->GetAttributeValue("image");
-      imagemap.image = LoadImage(imagemap.texture_file, CS_IMGFMT_PALETTED8);
+      csRef<iDocumentNode> matmap = params->GetNode ("materialmap");
+      if (!matmap) 
+      {
+        Report("Terraformer '%s' found, but no <materialmap> node.",
+          terrname.GetData());
+      }
+      else
+      {
+        // Set the image.
+        imagemap.texture_file = matmap->GetAttributeValue("image");
+        imagemap.image = LoadImage(imagemap.texture_file, CS_IMGFMT_PALETTED8);
+      }
       return imagemap;
     }
   } // while
@@ -356,15 +364,13 @@ BaseMapGen::ImageMap BaseMapGen::GetBaseMap ()
   csString texname = tex->GetContentsValue();
   imagemap.texture_file = GetTextureFile(texname);
 
-  // Load image.
-  imagemap.image = LoadImage(imagemap.texture_file, CS_IMGFMT_TRUECOLOR);
-
   return imagemap;
 }
 
 csRef<iImage> BaseMapGen::LoadImage (const csString& filename, int format)
 {
-  csPrintf("Trying to load '%s'... \t", filename.GetData());fflush (stdout);
+  csPrintf ("Trying to load '%s'... \t", filename.GetData());
+  fflush (stdout);
   csRef<iImage> image;
   csRef<iImageIO> imageio = csQueryRegistry<iImageIO> (object_reg);
   csRef<iVFS> VFS = csQueryRegistry<iVFS> (object_reg);
@@ -372,11 +378,11 @@ csRef<iImage> BaseMapGen::LoadImage (const csString& filename, int format)
   csRef<iDataBuffer> buf = VFS->ReadFile (filename.GetData(), false);
   if (!buf)
   {
-    Report("Failed to load image file '%s'!", filename.GetData());
+    Report ("Failed to load image file '%s'!", filename.GetData());
     return image;
   }
   image = imageio->Load (buf, format);
-  image.IsValid() ? printf("SUCCESS\n") : printf("FAILED\n");
+  image.IsValid() ? csPrintf ("success.\n") : csPrintf ("failed.\n");
 
   return image;
 }
@@ -404,18 +410,19 @@ void BaseMapGen::SaveImage (BaseMapGen::ImageMap image)
 
 void BaseMapGen::DrawProgress (int percent)
 {
-  uint numDone = (65*percent) / 100;
-  uint numToDo = (65*(100-percent)) / 100;
+  const uint progTotal = 65;
+  uint numDone = (progTotal*percent) / 100;
 
-  csPrintf(CS_ANSI_CLEAR_LINE);
-  csPrintf(CS_ANSI_CURSOR_BWD(70));
-  csPrintf(CS_ANSI_CURSOR_UP(1));
+  csPrintf (CS_ANSI_CLEAR_LINE);
+  csPrintf (CS_ANSI_CURSOR_BWD(70));
+  csPrintf (CS_ANSI_CURSOR_UP(1));
 
   printf("[");
-  for (int x = 0 ; x < numDone ; x++)
+  uint x;
+  for (x = 0 ; x < numDone ; x++)
     printf("=");
 
-  for (int x = 0 ; x < numToDo ; x++)
+  for (; x < progTotal; x++)
     printf(" ");
 
   csPrintf("] %d% \n", percent);
@@ -424,41 +431,63 @@ void BaseMapGen::DrawProgress (int percent)
 
 }
 
+static csColor GetPixelWrap (iImage* img, int img_w, int img_h, 
+                             int x, int y)
+{
+  // Wrap around the texture coordinates.
+  x = x % img_w;
+  y = y % img_h;
+
+  // Get the pixel.
+  csRGBpixel* px = (csRGBpixel*)img->GetImageData() + x + (y * img_h);
+  return csColor (px->red, px->green, px->blue);
+}
 
 csRGBpixel BaseMapGen::GetPixel (MaterialLayer material, float coord_x, float coord_y)
 {
-  int matcoord_x, matcoord_y;
-
-  // Calculate the material coordinates.
-  matcoord_x =  (int) (coord_x * material.image->GetWidth());
-  matcoord_y =  (int) (coord_y * material.image->GetHeight());
+  const int img_w = material.image->GetWidth();
+  const int img_h = material.image->GetHeight();
 
   // Scale the texture coordinates.
-  matcoord_x *= (int) (material.texture_scale.x);
-  matcoord_y *= (int) (material.texture_scale.y);
+  coord_x *= material.texture_scale.x;
+  coord_y *= material.texture_scale.y;
 
-  // Wrap around the texture coordinates.
-  matcoord_x = matcoord_x % material.image->GetWidth();
-  matcoord_y = matcoord_y % material.image->GetHeight();
+  // Calculate the material coordinates.
+  float matcoord_x_f = (coord_x * img_w);
+  float matcoord_y_f = (coord_y * img_w);
+  int matcoord_x = int (matcoord_x_f);
+  int matcoord_y = int (matcoord_y_f);
 
-  // Get the material pixel.
-  csRGBpixel* mat = (csRGBpixel*)material.image->GetImageData();
-  csRGBpixel* mat_dst = mat + matcoord_x + (matcoord_y * material.image->GetHeight());
+  // Bilinearly filter from material.
+  csColor p00 (GetPixelWrap (material.image, img_w, img_h,
+    matcoord_x, matcoord_y));
+  csColor p01 (GetPixelWrap (material.image, img_w, img_h,
+    matcoord_x, matcoord_y+1));
+  csColor p11 (GetPixelWrap (material.image, img_w, img_h,
+    matcoord_x+1, matcoord_y+1));
+  csColor p10 (GetPixelWrap (material.image, img_w, img_h,
+    matcoord_x+1, matcoord_y));
 
+  float f1 = matcoord_x_f - matcoord_x;
+  float f2 = matcoord_y_f - matcoord_y;
 
-  return csRGBpixel(mat_dst->red, mat_dst->green, mat_dst->blue);
+  csColor p = csLerp (csLerp (p00, p10, f1), 
+    csLerp (p01, p11, f1), f2);
+  return csRGBpixel (int (p.red), int (p.green), int (p.blue));
 }
 
-void BaseMapGen::CreateBasemap (int basemap_res, 
-                                ImageMap basetexture, 
-                                int matmap_res, 
-                                ImageMap materialmap, 
+void BaseMapGen::CreateBasemap (int basemap_w, int basemap_h, 
+                                ImageMap& basetexture, 
+                                int matmap_w, int matmap_h, 
+                                const ImageMap& materialmap, 
                                 const csArray<MaterialLayer>& mat_layers)
 {
-  printf("Creating base texturemap... \n\n");fflush (stdout);
-  {//to measure time
+  csPrintf ("Creating base texturemap... \n\n"); fflush (stdout);
+  // Block: to measure time
+  {
     CS::MeasureTime lTimeMeasurer ("Time taken");
 
+    basetexture.image.AttachNew (new csImageMemory (basemap_w, basemap_h));
     // Get image data.
     csRGBpixel* bm_dst = (csRGBpixel*)(basetexture.image->GetImageData());
     uint8* matmap_dst = (uint8*)(materialmap.image->GetImageData ());
@@ -466,20 +495,23 @@ void BaseMapGen::CreateBasemap (int basemap_res,
     int layercoord_x, layercoord_y;
     float coord_x, coord_y;
 
-    float inv_basemap_res = 1.0f / basemap_res;
+    float inv_basemap_w = 1.0f / basemap_w;
+    float inv_basemap_h = 1.0f / basemap_h;
+    float basemap_x_to_matmap = inv_basemap_w * matmap_w;
+    float basemap_y_to_matmap = inv_basemap_h * matmap_h;
 
-    for (int y = 0 ; y < basemap_res ; y++)
+    for (int y = 0 ; y < basemap_h ; y++)
     {
       // Draw progress.
-      uint percent = (y*100)/ basemap_res;
+      uint percent = (y*100) * inv_basemap_h;
       DrawProgress(percent);
 
-      for (int x = 0 ; x < basemap_res ; x++)
+      for (int x = 0 ; x < basemap_w ; x++)
       {
         // Get the layer index.
-        layercoord_x =  (int) (x * inv_basemap_res * matmap_res);
-        layercoord_y =  (int) (y * inv_basemap_res * matmap_res);
-        unsigned int layer = *(matmap_dst + layercoord_x + (layercoord_y * matmap_res));
+        layercoord_x =  (int) (x * basemap_x_to_matmap);
+        layercoord_y =  (int) (y * basemap_y_to_matmap);
+        unsigned int layer = *(matmap_dst + layercoord_x + (layercoord_y * matmap_w));
         if (layer > mat_layers.GetSize())
         {
           bm_dst->Set (255, 0, 0);
@@ -493,8 +525,8 @@ void BaseMapGen::CreateBasemap (int basemap_res,
         }
 
         // Calculate the destination coordinates.
-        coord_x    = x * inv_basemap_res;
-        coord_y    = y * inv_basemap_res;
+        coord_x    = x * inv_basemap_w;
+        coord_y    = y * inv_basemap_h;
 
         // Get the material pixel.
         csRGBpixel mat_dst = GetPixel(mat_layers[layer], coord_x, coord_y);
@@ -510,6 +542,20 @@ void BaseMapGen::CreateBasemap (int basemap_res,
 
   } // Block to measure time
 
+}
+
+/* Get mipmap for an image, using precomputed mipmaps as far as
+   possible. */
+static csRef<iImage> GetImageMip (iImage* img, uint mip)
+{
+  if (mip == 0) return img;
+  csRef<iImage> imgToMip (img);
+  uint hasMips = img->HasMipmaps();
+  if (mip <= hasMips) return img->GetMipmap (mip);
+  imgToMip = img->GetMipmap (hasMips);
+  mip -= hasMips;
+  if (mip == 0) return imgToMip;
+  return csImageManipulate::Mipmap (imgToMip, mip);
 }
 
 void BaseMapGen::Start ()
@@ -530,73 +576,56 @@ void BaseMapGen::Start ()
   }
 
   // Get the materialmap.
-  ImageMap materialmap = GetMaterialMap();
+  ImageMap materialmap (GetMaterialMap());
   if (!materialmap.image)
   {
     Report("Failed to load Material Map!");
     return;
   }
 
-  // Get the basematerial.
-  ImageMap basetexture = GetBaseMap();
-  if (!basetexture.image)
-  {
-    Report("Failed to load Base Map!");
-    return;
-  }
-
   // Get the resolution.
-  int matmap_res = materialmap.image->GetHeight();
-  int basemap_res = basetexture.image->GetHeight();
+  int matmap_w = materialmap.image->GetWidth();
+  int matmap_h = materialmap.image->GetHeight();
+
+  int basemap_w = csFindNearestPowerOf2 (matmap_w);
+  int basemap_h = csFindNearestPowerOf2 (matmap_h);
 
   // Get the resolution from the commandline.
   csString res = cmdline->GetOption("resolution");
   if (!res.IsEmpty())
-    basemap_res = csFindNearestPowerOf2(atoi(res));
-
-  // Get the upscale factor from the commandline.
-  csString factorstr = cmdline->GetOption("factor");
-  int factor = 1;
-  if (!factorstr.IsEmpty())
   {
-    factor = atoi(factorstr);
-    factor = (factor <= 1) ? 1 : csFindNearestPowerOf2(factor);
+    int basemap_res = csFindNearestPowerOf2(atoi(res));
+    basemap_w = basemap_h = basemap_res;
   }
 
-  printf("Using resolution: %d, factor: %d\n", basemap_res, factor);
+  csPrintf ("Basemap resolution: %dx%d\n", basemap_w, basemap_h);
 
-  // Make it bigger.
-  basemap_res *= factor;
-  if (basemap_res != basetexture.image->GetHeight())
-  {
-    basetexture.image.Invalidate();
-    basetexture.image.AttachNew (new csImageMemory (basemap_res, basemap_res));
-  }
-  if (factor > 1)
-    printf("Upscaling image to:\t %d x %d\n", basetexture.image->GetWidth(), basetexture.image->GetHeight());
-
-  // Scale up the materials to the size of the basemap.
+  /* Mipmap the materials to the highest mipmap needed below the required 
+   * resolution. This mipmap is then upsampled. */
   for (unsigned int i = 0 ; i < mat_layers.GetSize() ; i++)
   {
-    mat_layers[i].image = csImageManipulate::Rescale(mat_layers[i].image, basemap_res, basemap_res, 24);
+    float layer_needed_x = float (basemap_w) / mat_layers[i].texture_scale.x;
+    float layer_needed_y = float (basemap_w) / mat_layers[i].texture_scale.y;
+    int mip_x = csFindNearestPowerOf2 (
+      ceil (mat_layers[i].image->GetWidth() / layer_needed_x));
+    int mip_y = csFindNearestPowerOf2 (
+      ceil (mat_layers[i].image->GetHeight() / layer_needed_y));
+    int mip = csMax (
+      csClamp (csLog2 (mip_x), csLog2 (mat_layers[i].image->GetWidth()), 0),
+      csClamp (csLog2 (mip_y), csLog2 (mat_layers[i].image->GetHeight()), 0));
+    mat_layers[i].image = GetImageMip (mat_layers[i].image, mip);
+    //mat_layers[i].image = csImageManipulate::Rescale (mat_layers[i].image, basemap_w, basemap_h);
   }
 
   // Create the basemap.
-  CreateBasemap (basemap_res, basetexture, matmap_res, materialmap, mat_layers);
-
-  // Make it smaller.
-  if (factor > 1)
-  {
-    int step = (int)(log((float)factor) / log(2.0f));
-    basetexture.image = csImageManipulate::Mipmap(basetexture.image, step);
-    printf("Downscaling image to:\t %d x %d\n", basetexture.image->GetWidth(), basetexture.image->GetHeight());
-  }
+  ImageMap basetexture (GetBaseMap());
+  CreateBasemap (basemap_w, basemap_h, basetexture, 
+    matmap_w, matmap_h, materialmap, mat_layers);
 
   // Save the basemap.
-  printf("Saving %d KB of data.\n", csImageTools::ComputeDataSize(basetexture.image)/1024);
+  csPrintf ("Saving %zu KB of data.\n", 
+    csImageTools::ComputeDataSize(basetexture.image)/1024);
   SaveImage (basetexture);
-  
- 
 }
 
 /*---------------------------------------------------------------------*
