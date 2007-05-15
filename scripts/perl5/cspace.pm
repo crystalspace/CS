@@ -18507,8 +18507,7 @@ bless $iSCF_SCF, cspace::iSCF;
   {
     my ($self, $val) = @_;
 
-    unless (@_ >= 1 and @_ <= 2
-	and ref $self and $self =~ /=HASH/ and $self->isa('cspace'))
+    unless (@_ >= 1 and @_ <= 2 and ref $self and $self->isa('cspace'))
       { croak "No such subroutine $AUTOLOAD" }
 
     $AUTOLOAD =~ s/^.*:://;
@@ -18607,4 +18606,59 @@ bless $iSCF_SCF, cspace::iSCF;
 	('crystalspace.console.output.standard', 'iConsoleOutput') }
 
   *cspace::iPen::Rotate = *cspace::iPen::_Rotate;
+
+  package cspace::iDataBuffer;
+    use overload '""'	=> sub { $_[0]->GetData () },
+		 'fallback' => 1;
+
+  package cspace::iString;
+    use overload '""'	=> sub { $_[0]->GetData () },
+		 'fallback' => 1;
+
+  package cspace::csString;
+    use overload '""'	=> sub { $_[0]->GetData () },
+		 'fallback' => 1;
+
+  package cspace::csVector2;
+    use overload '@{}'	=> sub { [ $_[0]->x, $_[0]->y ] },
+		 'fallback' => 1;
+
+  package cspace::csVector3;
+    use overload '@{}'	=> sub { [ $_[0]->x, $_[0]->y, $_[0]->z ] },
+		 'fallback' => 1;
+
+  package cspace::csMatrix2;
+    use overload '@{}'	=> sub { [ [ $_[0]->m11, $_[0]->m12 ],
+				   [ $_[0]->m21, $_[0]->m22 ] ] },
+		 'fallback' => 1;
+
+  package cspace::csMatrix3;
+    use overload '@{}'	=> sub { [ [ $_[0]->m11, $_[0]->m12, $_[0]->m13 ],
+				   [ $_[0]->m21, $_[0]->m22, $_[0]->m23 ],
+				   [ $_[0]->m31, $_[0]->m23, $_[0]->m33 ] ] },
+		 'fallback' => 1;
+
+  package cspace::csColor;
+    use overload '@{}'	=> sub { [ $_[0]->red, $_[0]->green, $_[0]->blue ] },
+		 'fallback' => 1;
+
+  package cspace::csColor4;
+    use overload '@{}'	=> sub { [ $_[0]->red, $_[0]->green, $_[0]->blue,
+				   $_[0]->alpha ] },
+		 'fallback' => 1;
+
+  package cspace::csRGBcolor;
+    use overload '@{}'	=> sub { [ $_[0]->red, $_[0]->green, $_[0]->blue ] },
+		 'fallback' => 1;
+
+  package cspace::csRGBpixel;
+    use overload '@{}'	=> sub { [ $_[0]->red, $_[0]->green, $_[0]->blue,
+				   $_[0]->alpha ] },
+		 'fallback' => 1;
+
+  package cspace::csSphere;
+    use overload '+='	=> sub { $_[0]->Union
+					($_[1]->GetCenter(),$_[1]->GetRadius());
+				 $_[0]; },
+		 'fallback' => 1;
 1;
