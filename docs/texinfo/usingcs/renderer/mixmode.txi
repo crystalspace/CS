@@ -36,17 +36,17 @@ The @samp{alpha} used in this formula is a combination of the @samp{srcAlpha}
 and the alpha given in the alpha mask of the mixmode. But this
 depends on the actual shader that is being used.
 @item @samp{CS_FX_SETALPHA(alpha)}
-Conveniance macro to set @samp{CS_FX_ALPHA} and set the alpha value to the
+Convenience macro to set @samp{CS_FX_ALPHA} and set the alpha value to the
 alpha mask (value is between 0 and 1).
 @item @samp{CS_FX_SETALPHA_INT(alpha)}
-Conveniance macro to set @samp{CS_FX_ALPHA} and set the alpha value to the
+Convenience macro to set @samp{CS_FX_ALPHA} and set the alpha value to the
 alpha mask (value is between 0 and 255).
 @item @samp{CS_FX_PREMULTALPHA}
 Blending function: @sc{src} + @sc{dst}*(1-@samp{srcAlpha}). When the
 source alpha component was multoplied into the source color then this acts
 like normal alpha blending. If it was not then it acts like additive
 blending. So this mixmode can be used to do both additive and alpha
-blending on the same triangle even and interpolate between these two
+blending on the same triangle and even interpolate between these two
 extremes by appropriate choice of the color and alpha values.
 @item @samp{CS_FX_DESTALPHAADD}
 Blending function: @samp{dstAlpha}*@sc{src} + @sc{dst}.

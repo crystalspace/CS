@@ -29,7 +29,7 @@ debugging and other strange commands available.
 
 Walktest is probably the first program to run once you have compiled Crystal
 Space.  It takes a set of command line options, and the name of a map to open.
-By default, it will open the @file{/lev/flarge} directory.
+By default, it will open the @file{/lev/castle} directory.
 
 If this is the first time running Walktest (or any Crystal Space application),
 you will need to recalculate the lightmaps for the level.  The option
@@ -81,8 +81,8 @@ is given as a full @sc{vfs} path, the map file called @file{world} in that
 directory is loaded.
 
 If there is no initial @file{/} character, @file{/lev/} is stuck on the front.
-If there is no map specified at all, @file{/lev/flarge} is assumed, so the
-default map is @file{/lev/flarge/world}.  (This is almost true @dots{} the
+If there is no map specified at all, @file{/lev/castle} is assumed, so the
+default map is @file{/lev/castle/world}.  (This is almost true @dots{} the
 default path is specified in @file{/data/config/walktest.cfg}).
 
 Many of these command line options are of specialised or limited use.

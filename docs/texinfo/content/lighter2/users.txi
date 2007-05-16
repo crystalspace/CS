@@ -18,7 +18,7 @@ won't have an effect on statically lit geometry.
 
 @c Mention GI and alpha shadows once we have them
 
-The oppositze is @emph{dynamic lighting} which is computed entirely at runtime.
+The opposite is @emph{dynamic lighting} which is computed entirely at runtime.
 This means that light sources can be moved as desired, with changes immediately
 being reflected; however, shadows and multiple light sources all increase the
 runtime cost of lighting.

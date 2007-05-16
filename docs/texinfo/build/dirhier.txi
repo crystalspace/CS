@@ -286,6 +286,8 @@ Plug-ins relating to the physics of motion.
 @table @code
 @item CS/plugins/physics/odedynam
 @sc{ode} dynamics.
+@item CS/plugins/physics/bullet
+Bullet physics.
 @end table
 
 @item CS/plugins/reporter
@@ -295,42 +297,8 @@ Reporter.
 This is the sequence manager which is useful for managing timed sequences
 of events such as for demos.
 
-@item CS/plugins/sound
-Audio plugins.
-
-@table @code
-@item CS/plugins/sound/driver
-Platform-specific sound drivers.
-
-@table @code
-@item CS/plugins/sound/driver/coreaudio
-CoreAudio sound driver (MacOS/X).
-@item CS/plugins/sound/driver/oss
-Open Sound System (@sc{oss}) sound driver (@sc{unix}).
-@item CS/plugins/sound/driver/waveoutsd
-WaveOut sound driver (Windows).
-@end table
-
-@item CS/plugins/sound/loader
-Loaders for various sound file formats.
-
-@item CS/plugins/sound/renderer
-Platform- or facility-specific sound renderers.
-
-@table @code
-@item CS/plugins/sound/renderer/common
-Common sound rendering utility functions.
-
-@item CS/plugins/sound/renderer/ds3d
-DirectSound 3D sound renderer.
-
-@item CS/plugins/sound/renderer/openal
-OpenAL sound renderer.
-
-@item CS/plugins/sound/renderer/software
-Software sound renderer.
-@end table
-@end table
+@item CS/plugins/sndsys
+All sound-related plugins (@pxref{Sound System}).
 
 @item CS/plugins/stdrep
 Standard reporter listener.
@@ -385,26 +353,7 @@ X-extension driver (X11).
 @sc{mit} X-extension shared memory driver (X11).
 
 @item CS/plugins/video/canvas/xwindow
-X-windows X11 driver.
-@end table
-
-@item CS/plugins/video/format
-Code for playing video files on a surface.
-
-@table @code
-@item CS/plugins/video/format/avi
-Audio-Video Interlace format.
-
-@item CS/plugins/video/format/codecs
-Video codecs for various formats (currently only @sc{avi}).
-
-@table @code
-@item codecs/divx4
-DivX version 4.
-
-@item codecs/opendivx
-OpenDivX.
-@end table
+X-window X11 driver.
 @end table
 
 @item CS/plugins/video/loader

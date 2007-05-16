@@ -398,7 +398,7 @@ public:
 };
 
 /**
- * This class has a set of particles that behave with phsyics.
+ * This class has a set of particles that behave with physics.
  * They each have a speed and an acceleration.
  */
 class CS_CRYSTALSPACE_EXPORT csNewtonianParticleSystem :

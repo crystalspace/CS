@@ -51,6 +51,11 @@ that you can get from:
 @item csfgen
 A @emph{TrueType} to Crystal Space font converter.
 
+@cindex @file{csimagetool}
+@cindex Applications, @file{csimagetool}
+@item csimagetool
+The Crystal Space image manipulator.
+
 @cindex @file{cslight}
 @cindex Applications, @file{cslight}
 @item cslight
@@ -70,11 +75,6 @@ A Crystal Space event system testing application.
 @cindex Applications, @file{g2dtest}
 @item g2dtest
 The Crystal Space canvas plugin test application.
-
-@cindex @file{gfxtest}
-@cindex Applications, @file{gfxtest}
-@item gfxtest
-The Crystal Space image manipulator.
 
 @cindex @file{isotest}
 @cindex Applications, @file{isotest}

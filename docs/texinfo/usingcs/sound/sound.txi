@@ -83,7 +83,7 @@ In short, the sound handle can do the following:
 @item
 Create and play an instance of the sound. This is a convenience function. It
 does not allow 3d effects or stopping the sound later (you must wait until
-it is finished). IT can be used for example for @sc{gui} sounds.
+it is finished). It can be used for example for @sc{gui} sounds.
 
 @item
 Create a sound source. A @dfn{sound source} is an instance of the sound.

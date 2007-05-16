@@ -73,7 +73,7 @@ class CS_CRYSTALSPACE_EXPORT csWinThread : public csThread
   virtual bool SetPriority(csThreadPriority Priority);
 
   /**
-   * Return the last eror description and 0 if there was none.
+   * Return the last error description or 0 if there was none.
    */
   virtual char const* GetLastError () const;
 

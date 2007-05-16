@@ -334,7 +334,7 @@ private:
   csRef<iTextureHandle> render_target;
   csGLRender2TextureBackend* r2tbackend;
 
-  /// Should we use special buffertype (VBO) or just systemmeory
+  /// Should we use special buffertype (VBO) or just system memory
   bool use_hw_render_buffers;
   csGLDRAWRANGEELEMENTS glDrawRangeElements;
   static GLvoid csAPIENTRY myDrawRangeElements (GLenum mode, GLuint start, 
