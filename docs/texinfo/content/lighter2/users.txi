@@ -67,6 +67,10 @@ density reduces lightmap sizes and amounts, but also means less detailed and
 blurrier shadows. However, it may make sense for cases where shadows are not
 very detailed anyway (such as large outdoor surfaces).
 
+The default lightmap density is 2x2, which can usually be considered ``low'' 
+quality. A density of 8x8 can be considered ``medium'' quality and 16x16 as
+``high'' quality and sufficient in most cases.
+
 @emph{Per-Vertex lighting} means that lighting for surfaces is computed at
 its vertices.
 
@@ -87,7 +91,23 @@ together that sampling lighting at these can already give sufficient light
 and shadow detail, giving results as good as lightmaps, even though lighting
 for individual surfaces is only interpolated over them.
 
-@c TODO some pics comparing LM vs PVL on a highly tesselated object
+@ifnotinfo
+Below is a comparison between different lightmap densities and per-vertex
+lighting on a relatively highly tesselated, round object:
+
+@picturess{content,lighter2,pvlcompare}
+
+At the lowest used density (4x4), the object appears rather un-smooth with a
+number of visible edges and shadow issues. At the next density -- 16x16,
+a 16-fold increase from the lowest lightmap resolution -- the appearance is
+smoother, but still some visible artifacts remain.  With the highest density
+-- 64x64 -- the object looks acceptable, but the price being a ridiculously
+high lightmap density which is directly reflected in a hight number of lightmaps
+needed, high runtime memory usage and, ultimatively, lower runtime performance. 
+In comparison, the vertex-lit variant has a bit less detailed shadows, but
+looks more smooth overall with zero visible edges. Per-vertex lighting also has
+only low memory requirements.
+@end ifnotinfo
 
 Per-vertex lighting can also be beneficial on objects quite the opposite: when
 surfaces are extremely large, lightmaps will also be. If a large object is
