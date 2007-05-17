@@ -8,6 +8,8 @@ chronological order.
 
 17-May-2007
 	- res updated the docs for the new cs-win32libs release.
+	- res added support for alpha maps to basemapgen.
+	- res generated a basemap for terraina.
 16-May-2007
 	- Vincent fixed typos throughout the project, and updated or removed
 	  some of the obsolete parts in the manual.

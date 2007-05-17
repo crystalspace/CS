@@ -41,6 +41,11 @@ private:
     csString texture_name;
     csString texture_file;
     csRef<iImage> image;
+
+    uint8* alphaMap;
+
+    MaterialLayer() : alphaMap (0) {}
+    ~MaterialLayer() { cs_free (alphaMap); }
   };
 
   struct ImageMap
@@ -51,30 +56,29 @@ private:
 
   bool LoadMap ();
 
-  void AddMaterialLayer (csArray<MaterialLayer>& txt_layers, iDocumentNode* materialnode);
-
-  csRef<iDocumentNode> GetTerrainNode ();
-
   csString GetTextureFile (const csString& texturename);
 
+  csRef<iDocumentNode> GetTerrainNode ();
   csRef<iDocumentNode> GetMaterialNode (const csString& materialname);
-
   csRefArray<iDocumentNode> GetMaterialNodes ();
+  void AddMaterialLayer (csArray<MaterialLayer>& txt_layers, iDocumentNode* materialnode);
 
-  ImageMap GetMaterialMap ();
-
+  bool CopyAlphaMapsToLayers (const csRefArray<iImage>& alphaMaps,
+    int& matmap_w, int& matmap_h, csArray<MaterialLayer>& mat_layers);
+  bool GetMaterialMaps (csArray<MaterialLayer>& mat_layers,
+    int& matmap_w, int& matmap_h);
   ImageMap GetBaseMap ();
 
   csRef<iImage> LoadImage (const csString& filename, int format);
-
   void SaveImage (ImageMap image);
 
+  csColor GetPixel (const MaterialLayer& material, float coord_x, float coord_y);
   void CreateBasemap (int basemap_w, int basemap_h, 
                       ImageMap& basemap_dst, 
                       int matmap_w, int matmap_h,
-                      const ImageMap& matmap_dst, 
                       const csArray<MaterialLayer>& txt_layers);
-
+  void BuildAlphaMapsFromMatMap (const ImageMap& matmap,
+    csArray<MaterialLayer>& txt_layers);
 public:
   BaseMapGen (iObjectRegistry* object_reg);
   ~BaseMapGen ();
@@ -84,7 +88,6 @@ public:
   void OnCommandLineHelp();
   void Report(const char* msg, ...);
   void DrawProgress (int percent);
-  csRGBpixel GetPixel (MaterialLayer material, float coord_x, float coord_y);
 };
 
 #endif // __BASEMAPGEN_H__
