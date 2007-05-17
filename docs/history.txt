@@ -10,6 +10,9 @@ chronological order.
 	- res updated the docs for the new cs-win32libs release.
 	- res added support for alpha maps to basemapgen.
 	- res generated a basemap for terraina.
+	- res disabled -fvisibility-inlines-hidden for AMD64 again: as
+	  reported in trac #333 the -fvisibility-inlines-hidden + -fPIC + 
+	  -shared problem is still present with gcc 4.1.1.
 16-May-2007
 	- Vincent fixed typos throughout the project, and updated or removed
 	  some of the obsolete parts in the manual.
