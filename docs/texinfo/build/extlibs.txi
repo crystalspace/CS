@@ -78,11 +78,11 @@ location:
 
 @noindent
 @ifnottex
-@uref{http://www.crystalspace3d.org/downloads/cs-win32libs/cs-win32libs-1.0_001.exe}
+@uref{http://www.crystalspace3d.org/downloads/cs-win32libs/cs-win32libs-1.1_001.exe}
 @end ifnottex
 @iftex
 @code{http://www.crystalspace3d.org/downloads/cs-win32libs/}@*
-@code{cs-win32libs-1.0_001.exe}
+@code{cs-win32libs-1.1_001.exe}
 @end iftex
 
 @subheading zlib
@@ -187,7 +187,7 @@ can get the latest version at:
 @cindex Libraries, @sc{cg}
 @cindex CG library
 
-@emph{Version:} 1.4.1 recommended
+@emph{Version:} 1.5 recommended
 
 Many Crystal Space shaders require the @sc{cg} library from nVidia.
 Crystal Space depends on the @sc{cg} library with version number at least
@@ -200,7 +200,7 @@ from @url{http://developer.nvidia.com/object/cg_toolkit.html#downloads}.
 @cindex Libraries, @sc{ode}
 @cindex Physics library
 
-@emph{Version:} 0.7 recommended
+@emph{Version:} 0.8 recommended
 
 Crystal Space contains a plugin providing physics through @sc{ode}. You can get
 the required version at:
@@ -304,7 +304,7 @@ their user interface.
 @cindex wxWidgets
 @cindex Libraries, wxWidgets
 
-@emph{Version:} 2.6.x recommended
+@emph{Version:} 2.8.x recommended
 
 Integration into wxWidgets is supported; a special canvas is provided that
 creates a WX window into which Crystal Space can render graphics. To compile
