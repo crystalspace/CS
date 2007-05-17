@@ -27,6 +27,7 @@
 #include "csgeom/tri.h"
 #include "csplugincommon/particlesys/partgen.h"
 #include "cstool/rbuflock.h"
+#include "cstool/rviewclipper.h"
 
 #include "imesh/object.h"
 #include "iengine/camera.h"
@@ -308,7 +309,8 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
   }
 
   int ClipPortal, ClipPlane, ClipZ;
-  rview->CalculateClipSettings (frustum_mask, ClipPortal, ClipPlane, ClipZ);
+  CS::RenderViewClipper::CalculateClipSettings (rview->GetRenderContext(),
+    frustum_mask, ClipPortal, ClipPlane, ClipZ);
 
   // get the object-to-camera transformation
   iCamera *camera = rview->GetCamera ();

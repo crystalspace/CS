@@ -177,9 +177,9 @@ void csPrimitives::GenerateCapsule (float l, float r, uint sides,
   for (uint i = 0; i < n; i++)
   {
     mesh_normals.Push (csVector3 (0, ny, nz));
-    size_t v1 = mesh_vertices.Push (csVector3 (l, ny * r, nz * r));
+    int v1 = int (mesh_vertices.Push (csVector3 (l, ny * r, nz * r)));
     mesh_normals.Push (csVector3 (0, ny, nz));
-    size_t v2 = mesh_vertices.Push (csVector3 (-l, ny * r, nz * r));
+    int v2 = int (mesh_vertices.Push (csVector3 (-l, ny * r, nz * r)));
 
     float tmp =  ca * ny - sa * nz;
     nz = sa*ny + ca*nz;
@@ -213,9 +213,9 @@ void csPrimitives::GenerateCapsule (float l, float r, uint sides,
     for (uint i = 0; i <= n; i++) 
     {
       mesh_normals.Push (csVector3 (nx2, ny2, nz2));
-      size_t v1 = mesh_vertices.Push (csVector3 (l+nx2*r, ny2*r, nz2*r));
+      int v1 = int (mesh_vertices.Push (csVector3 (l+nx2*r, ny2*r, nz2*r)));
       mesh_normals.Push (csVector3 (nx, ny, nz));
-      size_t v2 = mesh_vertices.Push (csVector3 (l+nx*r, ny*r, nz*r));
+      int v2 = int (mesh_vertices.Push (csVector3 (l+nx*r, ny*r, nz*r)));
 
       float tmp = ca*ny - sa*nz;
       nz = sa*ny + ca*nz;
@@ -248,9 +248,9 @@ void csPrimitives::GenerateCapsule (float l, float r, uint sides,
     for (uint i = 0; i <= n; i++) 
     {
       mesh_normals.Push (csVector3 (nx, ny, nz));
-      size_t v1 = mesh_vertices.Push (csVector3 (-l+nx*r, ny*r, nz*r));
+      int v1 = int (mesh_vertices.Push (csVector3 (-l+nx*r, ny*r, nz*r)));
       mesh_normals.Push (csVector3 (nx2, ny2, nz2));
-      size_t v2 = mesh_vertices.Push (csVector3 (-l+nx2*r, ny2*r, nz2*r));
+      int v2 = int (mesh_vertices.Push (csVector3 (-l+nx2*r, ny2*r, nz2*r)));
 
       float tmp = ca*ny - sa*nz;
       nz = sa*ny + ca*nz;
