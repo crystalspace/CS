@@ -117,18 +117,26 @@ void ViewMesh::ProcessFrame()
           camTarget += (camTarget - orig).Unit() * 4 * speed;
         if (kbd->GetKeyState (CSKEY_DOWN))
           camTarget -= (camTarget - orig).Unit() * 4 * speed;
+      }
+
+      UpdateCamera();
+	  orig = c->GetTransform().GetOrigin();
+      if (!kbd->GetKeyState (CSKEY_SHIFT))
+      {
         if (kbd->GetKeyState (CSKEY_RIGHT))
           camYaw += speed;
         if (kbd->GetKeyState (CSKEY_LEFT))
           camYaw -= speed;
-      }
-
-      if (kbd->GetKeyState (CSKEY_PGDN))
-        camPitch = csMin<float>(3.14159f * 0.5f - 0.01f, camPitch + speed);
+	  }
       if (kbd->GetKeyState (CSKEY_PGUP))
+        camPitch = csMin<float>(3.14159f * 0.5f - 0.01f, camPitch + speed);
+      if (kbd->GetKeyState (CSKEY_PGDN))
         camPitch = csMax<float>(-3.14159f * 0.5f + 0.01f, camPitch - speed);
 
       UpdateCamera();
+	  csVector3 deltaOrig = c->GetTransform().GetOrigin() - orig;
+	  camTarget -= deltaOrig;
+	  UpdateCamera();
       break;
     }
     case moveorigin:
@@ -937,7 +945,7 @@ void ViewMesh::LoadSprite (const char* filename)
     csVector3 sprpos = box.GetCenter();
     csVector3 campos = view->GetCamera ()->GetTransform ().GetOrigin();
     view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (campos.x, sprpos.y, campos.z));
-    camMode = rotateorigin;
+//    camMode = rotateorigin;
   }
 
   UpdateSocketList();

@@ -13,6 +13,8 @@ chronological order.
 	- res disabled -fvisibility-inlines-hidden for AMD64 again: as
 	  reported in trac #333 the -fvisibility-inlines-hidden + -fPIC + 
 	  -shared problem is still present with gcc 4.1.1.
+	- Andrew Robberts fixed the normal movement camera mode to work like
+          the old one. Also fixed some minor bugs in viewmesh camera.
 16-May-2007
 	- Vincent fixed typos throughout the project, and updated or removed
 	  some of the obsolete parts in the manual.
