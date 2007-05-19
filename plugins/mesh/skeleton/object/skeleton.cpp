@@ -651,7 +651,9 @@ csSkeletonAnimationKeyFrame *csSkeletonAnimationInstance::NextFrame()
 
   if ( (size_t)current_frame >= frames_count) 
   {
-    if (loop_times > 0)
+  	// only decrement the loop_times counter provided the animation
+  	// is not looping forever.
+    if (!animation->GetLoop() && loop_times > 0)
     {
       loop_times -= 1;
     }
@@ -1022,7 +1024,7 @@ iSkeletonBone *csSkeleton::FindBone (const char *name)
 iSkeletonAnimation* csSkeleton::Execute (const char *scriptname)
 {
   csSkeletonAnimation* script = (csSkeletonAnimation*)(factory->FindScript (scriptname));
-  if (!script) 
+  if (!script)
   {
     //printf("script %s doesn't exist\n", scriptname);
     return 0;
