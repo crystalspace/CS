@@ -10,6 +10,8 @@ chronological order.
 	- Genjix fixed a bug in genmeshanim where it wouldn't animate
 	  the animation when first played, when the loop forever flag is set
 	  after it has been started.
+	- res added a note to the appendix on the csString::Upcase() and
+	  Downcase() behavior change.
 17-May-2007
 	- res updated the docs for the new cs-win32libs release.
 	- res added support for alpha maps to basemapgen.

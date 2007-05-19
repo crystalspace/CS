@@ -107,3 +107,21 @@ namespace.
 Note that for compatibility reasons the old names are generally still available.
 However, they should be considered deprecated and not be used any more as 
 they will be removed in a future version.
+
+@subsection @code{csString::Upcase()} and @code{Downcase()} Behaviour Change
+
+@code{csString::Upcase()} and @code{Downcase()} used to utilize the C runtime
+casing functions (@code{toupper()}, @code{tolower()}) to perform the casing.
+This has been changed to use Crystal Space's own casing functions
+(@code{csUnicodeTransform::MapToLower()}, @code{MapToUpper()}). This has to
+effects:
+
+@itemize @bullet
+@item The data is expected to be encoded in @sc{utf-8} and not a character set
+depending on the C runtime's current locale. This is more in line with other
+@code{csString} functions and consistent across systems.
+@item The C runtime's current locale is not taken into consideration when
+doing the casing. This was desired as the casing methods are used in a number
+of scenarios that really required locale neutrality; however, if proper
+locale support is required, some other casing functions have to be used.
+@end itemize
