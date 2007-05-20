@@ -64,12 +64,8 @@ namespace lighter
     virtual void SaveFactory (iDocumentNode *node);
 
     // Getters
-    inline float GetLMlmDensityU () const
-    { return lmuScale; }
-
-    inline float GetLMlmDensityV () const
-    { return lmvScale; }
-
+    inline float GetLMDensity () const
+    { return lmScale; }
 
     // Name of the factory
     csString factoryName;
@@ -109,8 +105,7 @@ namespace lighter
     ObjectFactoryVertexData vertexData;
 
     // Lightmap settings
-    float lmuScale;
-    float lmvScale;
+    float lmScale;
 
     // Factory created from
     csRef<iMeshFactoryWrapper> factoryWrapper;

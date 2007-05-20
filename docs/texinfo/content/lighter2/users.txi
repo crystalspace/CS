@@ -147,7 +147,7 @@ lightmap density.
 
 @itemize @bullet
 @item Can be set on mesh factories.
-@item Can be set globally: @code{lmdensityu}, @code{lmdensityv}.
+@item Can be set globally: @code{lmdensity}
 @end itemize
 
 @subheading Per-Vertex Lighting

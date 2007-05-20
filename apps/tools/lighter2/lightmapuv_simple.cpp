@@ -89,8 +89,7 @@ namespace lighter
       csBitArray groupUsedVerts (usedVerts);
       // Compute lightmapping
       ProjectPrimitives (prims, groupUsedVerts,
-                         factory->GetLMlmDensityU (), 
-                         factory->GetLMlmDensityV (),
+                         factory->GetLMDensity (), 
                          newFactory->lightmapUVs);
       
       csVector2 minuv, maxuv, uvSize;
@@ -114,7 +113,7 @@ namespace lighter
             uvSize.y < globalConfig.GetLMProperties ().maxLightmapV)
         {
           lmCoordsGood = true;
-          ScaleLightmapUVs (prims, newFactory->lightmapUVs, scale, scale);
+          ScaleLightmapUVs (prims, newFactory->lightmapUVs, scale);
         }
         its++;
       } 
@@ -365,7 +364,7 @@ namespace lighter
 
   bool SimpleUVFactoryLayouter::ProjectPrimitives (FactoryPrimitiveArray& prims, 
                                                    csBitArray &usedVerts,
-                                                   float uscale, float vscale,
+                                                   float lmscale, 
                                                    Vector2Array& lightmapUVs)
   {
     size_t i;
@@ -428,8 +427,8 @@ namespace lighter
         const csVector3 &position = vdata.positions[index];
         csVector2 &lightmapUV = lightmapUVs.GetExtend (index);
 
-        lightmapUV.x = position[selX] * uscale;
-        lightmapUV.y = position[selY] * vscale;
+        lightmapUV.x = position[selX] * lmscale;
+        lightmapUV.y = position[selY] * lmscale;
       
       }
     }
@@ -444,7 +443,7 @@ namespace lighter
 
   void SimpleUVFactoryLayouter::ScaleLightmapUVs (FactoryPrimitiveArray& prims,
                                                   Vector2Array& lightmapUVs, 
-                                                  float uscale, float vscale)
+                                                  float scale)
   {
     csBitArray scaled;
     scaled.SetSize (lightmapUVs.GetSize());
@@ -458,8 +457,8 @@ namespace lighter
       {
         size_t index = t[i];
         if (scaled.IsBitSet (index)) continue;
-        lightmapUVs[index].x *= uscale;
-        lightmapUVs[index].y *= vscale;
+        lightmapUVs[index].x *= scale;
+        lightmapUVs[index].y *= scale;
         scaled.SetBit (index);
       }
     }

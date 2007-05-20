@@ -10,6 +10,12 @@ chronological order.
 	- res changed the Cygwin build docs to generally recommend using the
 	  cs-win32libs package and to more prominently use jam (instead of
 	  make).
+	- res changed lighter2 to only have one "lmdensity" option and not
+	  two (for u and v direction, respectively): in practice, the two
+	  options usually had the same value anyway; and since the meaning of
+	  "u" and "v" depends on other factors such as the orientation of a
+	  primitive, much of the additional "control" from having two values
+	  would actually be difficult to utilize.
 19-May-2007
 	- Genjix fixed a bug in genmeshanim where it wouldn't animate
 	  the animation when first played, when the loop forever flag is set

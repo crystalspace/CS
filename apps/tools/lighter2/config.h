@@ -43,8 +43,8 @@ namespace lighter
     // Lightmap and lightmap layout properties
     struct LightmapProperties
     {
-      // Density in u and v direction. u = lmDensityU*x etc.. 
-      float lmDensityU, lmDensityV;
+      // Density in u and v direction (in lumels per world unit).
+      float lmDensity;
 
       // Max lightmap sizes
       uint maxLightmapU, maxLightmapV;

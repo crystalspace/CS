@@ -30,8 +30,7 @@ namespace lighter
 
   ObjectFactory::ObjectFactory ()
     : lightPerVertex (false),
-    lmuScale (globalConfig.GetLMProperties ().lmDensityU),
-    lmvScale (globalConfig.GetLMProperties ().lmDensityV), 
+    lmScale (globalConfig.GetLMProperties ().lmDensity),
     factoryWrapper (0)
   {
   }
@@ -107,11 +106,10 @@ namespace lighter
         const char* vLMScale = kvp->GetValue ("lmscale");
         if (vLMScale)
         {
-          float u=0,v=0;
-          if (sscanf (vLMScale, "%f,%f", &u, &v) == 2)
+          float s=0;
+          if (sscanf (vLMScale, "%f", &s) == 1)
           {
-            lmuScale = u;
-            lmvScale = v;
+            lmScale = s;
           }
         }
       }

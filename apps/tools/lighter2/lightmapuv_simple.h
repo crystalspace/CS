@@ -94,10 +94,10 @@ namespace lighter
       csRect &lightmapArea, int &lightmapID);
 
     bool ProjectPrimitives (FactoryPrimitiveArray& prims, 
-      csBitArray &usedVerts, float uscale, float vscale,
+      csBitArray &usedVerts, float lmscale, 
       Vector2Array& lightmapUVs);
     void ScaleLightmapUVs (FactoryPrimitiveArray& prims, 
-      Vector2Array& lightmapUVs, float uscale, float vscale);
+      Vector2Array& lightmapUVs, float lmscale);
 
     /* PD lighting queueing
      *
