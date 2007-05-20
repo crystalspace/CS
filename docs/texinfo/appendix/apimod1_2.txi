@@ -109,6 +109,7 @@ However, they should be considered deprecated and not be used any more as
 they will be removed in a future version.
 
 @subsection @code{csString::Upcase()} and @code{Downcase()} Behaviour Change
+@node csString::Upcase() and Downcase() Behaviour Change
 
 @code{csString::Upcase()} and @code{Downcase()} used to utilize the C runtime
 casing functions (@code{toupper()}, @code{tolower()}) to perform the casing.
