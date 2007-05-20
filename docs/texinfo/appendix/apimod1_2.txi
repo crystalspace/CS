@@ -114,7 +114,7 @@ they will be removed in a future version.
 @code{csString::Upcase()} and @code{Downcase()} used to utilize the C runtime
 casing functions (@code{toupper()}, @code{tolower()}) to perform the casing.
 This has been changed to use Crystal Space's own casing functions
-(@code{csUnicodeTransform::MapToLower()}, @code{MapToUpper()}). This has to
+(@code{csUnicodeTransform::MapToLower()}, @code{MapToUpper()}). This has two
 effects:
 
 @itemize @bullet
