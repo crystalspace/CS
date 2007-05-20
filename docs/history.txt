@@ -6,6 +6,10 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-May-2007
+	- res changed the Cygwin build docs to generally recommend using the
+	  cs-win32libs package and to more prominently use jam (instead of
+	  make).
 19-May-2007
 	- Genjix fixed a bug in genmeshanim where it wouldn't animate
 	  the animation when first played, when the loop forever flag is set
