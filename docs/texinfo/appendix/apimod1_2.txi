@@ -15,6 +15,7 @@ Crystal Space.
 * Api1_2 Rendering:: Rendering subsystem changes
 * Api1_2 iPolygonMesh:: iPolygonMesh deprecation
 * Api1_2 Renamings:: Renamed Classes and Methods
+* csString::Upcase() and Downcase() Behaviour Change::
 @end menu
 
 @node Api1_2 Threading, Api1_2 Rendering, Release Notes 1_2, Release Notes 1_2
@@ -88,7 +89,7 @@ csStringID id = strset->Request ("colldet");
 iTriangleMesh* trimesh = model->GetTriangleData (id);
 @end example
 
-@node Api1_2 Renamings, , Api1_2 iPolygonMesh, Release Notes 1_2
+@node Api1_2 Renamings, csString::Upcase() and Downcase() Behaviour Change, Api1_2 iPolygonMesh, Release Notes 1_2
 @subsection Renamed Classes and Methods
 @cindex @code{csSubRectangles}
 @cindex @code{IsType()}, @code{iScriptObject}
@@ -109,7 +110,7 @@ However, they should be considered deprecated and not be used any more as
 they will be removed in a future version.
 
 @subsection @code{csString::Upcase()} and @code{Downcase()} Behaviour Change
-@node csString::Upcase() and Downcase() Behaviour Change
+@node csString::Upcase() and Downcase() Behaviour Change, , Api1_2 Renamings, Release Notes 1_2
 
 @code{csString::Upcase()} and @code{Downcase()} used to utilize the C runtime
 casing functions (@code{toupper()}, @code{tolower()}) to perform the casing.
