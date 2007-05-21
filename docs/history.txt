@@ -6,6 +6,10 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-May-2007
+	- res committed a patch by 'whirm' to replace the use of pushd/popd
+	  when building CS with cd/cd -: pushd/popd is a bashism while cd/cd -
+	  works on a wider range of shells.
 20-May-2007
 	- res changed the Cygwin build docs to generally recommend using the
 	  cs-win32libs package and to more prominently use jam (instead of
