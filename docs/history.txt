@@ -6,6 +6,8 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+22-May-2007
+	- Genjix correct SCF Test example.
 21-May-2007
 	- res committed a patch by 'whirm' to replace the use of pushd/popd
 	  when building CS with cd/cd -: pushd/popd is a bashism while cd/cd -
