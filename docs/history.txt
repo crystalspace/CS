@@ -9,6 +9,8 @@ chronological order.
 22-May-2007
 	- caedes started splitting of the swig interface files so
 	  several modules can be built that work together.
+	- caedes added starting python module folders for the split
+	  scripting interface.
 20-May-2007
 	- res changed the Cygwin build docs to generally recommend using the
 	  cs-win32libs package and to more prominently use jam (instead of

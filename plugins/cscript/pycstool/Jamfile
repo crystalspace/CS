@@ -1,0 +1,65 @@
+SubDir TOP plugins cscript pycstool ;
+
+if $(PYTHON.AVAILABLE) = "yes"
+{
+  #--------
+  # Swig-generated files for cstool.
+  #--------
+  local common = cs_cstool.cpp ;
+  local cstoolpy = [ DoSourceGrist cstool.py ] ;
+  MakeLocate $(cstoolpy) : $(LOCATE.TARGETS) ;
+
+  if ! [ Property build : projgen ]
+  {
+    common = [ DoSourceGrist $(common) ] ;
+
+    if $(CMD.SWIG)
+    {
+      Swig $(common) $(cstoolpy) :
+        [ DoSourceGrist cstool.i ] :
+        python :
+	-c++ -shadow :
+	[ ConcatDirs $(TOP) include ]
+	[ ConcatDirs $(BUILDTOP) include ] :
+	[ ConcatDirs $(TOP) include bindings ]
+	[ ConcatDirs $(TOP) include bindings python ] :
+	$(SEARCH_SOURCE) [ ConcatDirs $(TOP) scripts python ] :
+	cstool :
+	[ on $(cstoolpy) GetVar LOCATE ] ;
+      Depends cstoolpyclean : pythonswigclean ;
+    }
+    else
+    {
+      SEARCH on $(common) = $(SEARCH_SOURCE) ;
+      local frozenpy = $(cstoolpy:G=frozencstoolpy) ;
+      SEARCH on $(frozenpy) = [ ConcatDirs $(TOP) scripts python ] ;
+      Copy $(cstoolpy) : $(frozenpy) ;
+      Depends $(cstoolpy) : $(frozenpy) ;
+    }
+  }
+  Clean cstoolpyclean : $(cstoolpy) ;
+  Depends clean : cstoolpyclean ;
+
+  rule InstallCSCeguiPY
+  {
+    # Temporary SUBDIR override for InstallData.
+    local SUBDIR = [ on $(<) GetVar LOCATE ] ;
+    InstallData $(<) : $(>) ;
+  }
+  InstallCSCeguiPY $(cstoolpy) : bindings python ;
+
+
+  #--------
+  # cstool -- Pure Python module
+  #--------
+  if $(CEGUI.AVAILABLE) = "yes"
+  {
+  PythMod cstoolmod : _cstool : 
+	cstoolmod.cpp cs_cstool.cpp : 
+	crystalspace_python : 
+	: 
+	"cstool cs Python module" ;
+  Depends cstoolmod : $(cstoolpy) ;
+  CFlags cstoolmod : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
+  }
+}

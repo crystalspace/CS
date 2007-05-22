@@ -1,0 +1,65 @@
+SubDir TOP plugins cscript pyivideo ;
+
+if $(PYTHON.AVAILABLE) = "yes"
+{
+  #--------
+  # Swig-generated files for ivideo.
+  #--------
+  local common = cs_ivideo.cpp ;
+  local ivideopy = [ DoSourceGrist ivideo.py ] ;
+  MakeLocate $(ivideopy) : $(LOCATE.TARGETS) ;
+
+  if ! [ Property build : projgen ]
+  {
+    common = [ DoSourceGrist $(common) ] ;
+
+    if $(CMD.SWIG)
+    {
+      Swig $(common) $(ivideopy) :
+        [ DoSourceGrist ivideo.i ] :
+        python :
+	-c++ -shadow :
+	[ ConcatDirs $(TOP) include ]
+	[ ConcatDirs $(BUILDTOP) include ] :
+	[ ConcatDirs $(TOP) include bindings ]
+	[ ConcatDirs $(TOP) include bindings python ] :
+	$(SEARCH_SOURCE) [ ConcatDirs $(TOP) scripts python ] :
+	ivideo :
+	[ on $(ivideopy) GetVar LOCATE ] ;
+      Depends ivideopyclean : pythonswigclean ;
+    }
+    else
+    {
+      SEARCH on $(common) = $(SEARCH_SOURCE) ;
+      local frozenpy = $(ivideopy:G=frozenivideopy) ;
+      SEARCH on $(frozenpy) = [ ConcatDirs $(TOP) scripts python ] ;
+      Copy $(ivideopy) : $(frozenpy) ;
+      Depends $(ivideopy) : $(frozenpy) ;
+    }
+  }
+  Clean ivideopyclean : $(ivideopy) ;
+  Depends clean : ivideopyclean ;
+
+  rule InstallCSCeguiPY
+  {
+    # Temporary SUBDIR override for InstallData.
+    local SUBDIR = [ on $(<) GetVar LOCATE ] ;
+    InstallData $(<) : $(>) ;
+  }
+  InstallCSCeguiPY $(ivideopy) : bindings python ;
+
+
+  #--------
+  # ivideo -- Pure Python module
+  #--------
+  if $(CEGUI.AVAILABLE) = "yes"
+  {
+  PythMod ivideomod : _ivideo : 
+	ivideomod.cpp cs_ivideo.cpp : 
+	crystalspace_python : 
+	: 
+	"cegui cs Python module" ;
+  Depends ivideomod : $(ivideopy) ;
+  #CFlags ivideomod : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
+  }
+}
