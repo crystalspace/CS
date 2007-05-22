@@ -167,188 +167,7 @@
 #include "crystalspace.h"
 %}
 
-// The following list holds all the interfaces that are handled correctly.
-// If you have problems, first check if the interface in question is in this
-// list. Please keep the list sorted alphabetically.
-#ifndef CS_MINI_SWIG
-%define APPLY_FOR_EACH_INTERFACE
-  INTERFACE_APPLY(iBase)
-  INTERFACE_APPLY(iBinaryLoaderPlugin)
-  INTERFACE_APPLY(iBodyGroup)
-  INTERFACE_APPLY(iCamera)
-  INTERFACE_APPLY(iCameraPosition)
-  INTERFACE_APPLY(iCacheManager)
-  INTERFACE_APPLY(iCollider)
-  INTERFACE_APPLY(iCollideSystem)
-  INTERFACE_APPLY(iCommandLineParser)
-  INTERFACE_APPLY(iComponent)
-  INTERFACE_APPLY(iConfigFile)
-  INTERFACE_APPLY(iConfigIterator)
-  INTERFACE_APPLY(iConfigManager)
-  INTERFACE_APPLY(iDataBuffer)
-  INTERFACE_APPLY(iDecalManager)
-  INTERFACE_APPLY(iDecalTemplate)
-  INTERFACE_APPLY(iDebugHelper)
-  INTERFACE_APPLY(iDocument)
-  INTERFACE_APPLY(iDocumentAttribute)
-  INTERFACE_APPLY(iDocumentAttributeIterator)
-  INTERFACE_APPLY(iDocumentNode)
-  INTERFACE_APPLY(iDocumentNodeIterator)
-  INTERFACE_APPLY(iDocumentSystem)
-  INTERFACE_APPLY(iDynamics)
-  INTERFACE_APPLY(iDynamicSystem)
-  INTERFACE_APPLY(iEngine)
-  INTERFACE_APPLY(iEngineSequenceManager)
-  INTERFACE_APPLY(iEvent)
-  INTERFACE_APPLY(iEventHandler)
-  INTERFACE_APPLY(iEventQueue)
-  INTERFACE_APPLY(iEventNameRegistry)
-  INTERFACE_APPLY(iFactory)
-  INTERFACE_APPLY(iFile)
-  INTERFACE_APPLY(iFont)
-  INTERFACE_APPLY(iFontServer)
-  INTERFACE_APPLY(iFrustumView)
-  INTERFACE_APPLY(iFrustumViewUserdata)
-  INTERFACE_APPLY(iGeneralFactoryState)
-  INTERFACE_APPLY(iGeneralMeshState)
-  INTERFACE_APPLY(iGraphics3D)
-  INTERFACE_APPLY(iGraphics2D)
-  INTERFACE_APPLY(iGenMeshSkeletonControlState)
-  INTERFACE_APPLY(iHalo)
-  INTERFACE_APPLY(iImage)
-  INTERFACE_APPLY(iImageIO)
-  INTERFACE_APPLY(iJoint)
-  INTERFACE_APPLY(iJoystickDriver)
-  INTERFACE_APPLY(iODEDynamicState)
-  INTERFACE_APPLY(iODEDynamicSystemState)
-  INTERFACE_APPLY(iODEJointState)
-  INTERFACE_APPLY(iODESliderJoint)
-  INTERFACE_APPLY(iODEUniversalJoint)
-  INTERFACE_APPLY(iODEAMotorJoint)
-  INTERFACE_APPLY(iODEHingeJoint)
-  INTERFACE_APPLY(iODEHinge2Joint)
-  INTERFACE_APPLY(iODEBallJoint)
-  INTERFACE_APPLY(iKeyboardDriver)
-  INTERFACE_APPLY(iLight)
-  INTERFACE_APPLY(iLightList)
-  INTERFACE_APPLY(iLoader)
-  INTERFACE_APPLY(iLoaderPlugin)
-  INTERFACE_APPLY(iMapNode)
-  INTERFACE_APPLY(iMaterial)
-  INTERFACE_APPLY(iMaterialWrapper)
-  INTERFACE_APPLY(iMeshFactoryWrapper)
-  INTERFACE_APPLY(iMeshObject)
-  INTERFACE_APPLY(iMeshObjectFactory)
-  INTERFACE_APPLY(iMeshObjectType)
-  INTERFACE_APPLY(iMeshWrapper)
-  INTERFACE_APPLY(iMeshWrapperIterator)
-  INTERFACE_APPLY(iMouseDriver)
-  INTERFACE_APPLY(iMovable)
-  INTERFACE_APPLY(iMovableListener)
-  INTERFACE_APPLY(iMovieRecorder)
-  INTERFACE_APPLY(iObject)
-  INTERFACE_APPLY(iObjectModel)
-  INTERFACE_APPLY(iObjectModelListener)
-  INTERFACE_APPLY(iObjectRegistry)
-  INTERFACE_APPLY(iPath)
-  INTERFACE_APPLY(iParticleEmitter)
-  INTERFACE_APPLY(iParticleEffector)
-  INTERFACE_APPLY(iParticleSystemBase)
-  INTERFACE_APPLY(iParticleSystemFactory)
-  INTERFACE_APPLY(iParticleSystem)
-  INTERFACE_APPLY(iParticleBuiltinEmitterBase)
-  INTERFACE_APPLY(iParticleBuiltinEmitterSphere)
-  INTERFACE_APPLY(iParticleBuiltinEmitterCone)
-  INTERFACE_APPLY(iParticleBuiltinEmitterBox)
-  INTERFACE_APPLY(iParticleBuiltinEmitterCylinder)
-  INTERFACE_APPLY(iParticleBuiltinEmitterFactory)
-  INTERFACE_APPLY(iParticleBuiltinEffectorForce)
-  INTERFACE_APPLY(iParticleBuiltinEffectorLinColor)
-  INTERFACE_APPLY(iParticleBuiltinEffectorFactory)
-  INTERFACE_APPLY(iPluginManager)
-  INTERFACE_APPLY(iPolygonMesh)
-  INTERFACE_APPLY(iPortal)
-  INTERFACE_APPLY(iPortalContainer)
-  INTERFACE_APPLY(iReporter)
-  INTERFACE_APPLY(iReporterIterator)
-  INTERFACE_APPLY(iReporterListener)
-  INTERFACE_APPLY(iSceneNode)
-  INTERFACE_APPLY(iSceneNodeArray)
-  INTERFACE_APPLY(iSCF)
-  INTERFACE_APPLY(iScript)
-  INTERFACE_APPLY(iScriptObject)
-  INTERFACE_APPLY(iSimpleFormerState)
-  INTERFACE_APPLY(iSector)
-  INTERFACE_APPLY(iSectorList)
-  INTERFACE_APPLY(iShader)
-  INTERFACE_APPLY(iShaderManager)
-  INTERFACE_APPLY(iShaderVariableContext)
-  INTERFACE_APPLY(iSkeleton)
-  INTERFACE_APPLY(iSkeletonBone)
-  INTERFACE_APPLY(iSkeletonBoneFactory)
-  INTERFACE_APPLY(iSkeletonBoneRagdollInfo)
-  INTERFACE_APPLY(iSkeletonFactory)
-  INTERFACE_APPLY(iSkeletonGraveyard)
-  INTERFACE_APPLY(iSkeletonSocket)
-  INTERFACE_APPLY(iSkeletonSocketFactory)
-  INTERFACE_APPLY(iSndSysData)
-  INTERFACE_APPLY(iSndSysManager)
-  INTERFACE_APPLY(iSndSysSoftwareDriver)
-  INTERFACE_APPLY(iSndSysSoftwareFilter3D)
-  INTERFACE_APPLY(iSndSysListener)
-  INTERFACE_APPLY(iSndSysLoader)
-  INTERFACE_APPLY(iSndSysSource)
-  INTERFACE_APPLY(iSndSysStream)
-  INTERFACE_APPLY(iSndSysRenderer)
-  INTERFACE_APPLY(iSndSysWrapper)
-  INTERFACE_APPLY(iSprite2DState)
-  INTERFACE_APPLY(iSprite3DState)
-  INTERFACE_APPLY(iSpriteCal3DState)
-  INTERFACE_APPLY(iStandardReporterListener)
-  INTERFACE_APPLY(iString)
-  INTERFACE_APPLY(iStringArray)
-  INTERFACE_APPLY(iStringSet)
-  INTERFACE_APPLY(iTerrainFactoryState)
-  INTERFACE_APPLY(iTerrainObjectState)
-  INTERFACE_APPLY(iTerraFormer)
-  INTERFACE_APPLY(iTerraSampler)
-  INTERFACE_APPLY(iTextureHandle)
-  INTERFACE_APPLY(iTextureList)
-  INTERFACE_APPLY(iTextureManager)
-  INTERFACE_APPLY(iTextureWrapper)
-  INTERFACE_APPLY(iThingState)
-  INTERFACE_APPLY(iThingFactoryState)
-  INTERFACE_APPLY(iTriangleMesh)
-  INTERFACE_APPLY(iTriangleMeshIterator)
-  INTERFACE_APPLY(iVFS)
-  INTERFACE_APPLY(iView)
-  INTERFACE_APPLY(iVirtualClock)
-  INTERFACE_APPLY(iVisibilityCuller)
-%enddef
-#else // CS_MINI_SWIG
-#ifndef CS_MICRO_SWIG
-%define APPLY_FOR_EACH_INTERFACE
-  INTERFACE_APPLY(iBase)
-  INTERFACE_APPLY(iEvent)
-  INTERFACE_APPLY(iEventHandler)
-  INTERFACE_APPLY(iEventQueue)
-  INTERFACE_APPLY(iFont)
-  INTERFACE_APPLY(iFontServer)
-  INTERFACE_APPLY(iGraphics3D)
-  INTERFACE_APPLY(iGraphics2D)
-  INTERFACE_APPLY(iObjectRegistry)
-  INTERFACE_APPLY(iSCF)
-  INTERFACE_APPLY(iVFS)
-%enddef
-#else // CS_MICRO_SWIG
-%define APPLY_FOR_EACH_INTERFACE
-  INTERFACE_APPLY(iBase)
-  INTERFACE_APPLY(iObjectRegistry)
-  INTERFACE_APPLY(iSCF)
-  INTERFACE_APPLY(iVFS)
-%enddef
-#endif // CS_MICRO_SWIG
-#endif // CS_MINI_SWIG
+%include "bindings/allinterfaces.i"
 
 %include "typemaps.i"
 
@@ -493,6 +312,7 @@
 // Macro's expected in rest of this file: ignored by default.
 // When overriding in language-specific files, first #undef and then
 // re-%define them.
+#define LANG_FUNCTIONS
 #define TYPEMAP_OUT_csRef(T)
 #define TYPEMAP_OUT_csPtr(T)
 #define TYPEMAP_OUT_csRefArray(T)
@@ -558,7 +378,7 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT(
 
 #undef INTERFACE_APPLY
 #define INTERFACE_APPLY(x) INTERFACE_PRE(x)
-APPLY_FOR_EACH_INTERFACE
+APPLY_FOR_ALL_INTERFACES
 
 TYPEMAP_OUT_csWrapPtr
 
@@ -632,7 +452,6 @@ csArrayCapacityLinear<csArrayThresholdVariable >;
 // hand made scf template wrappers
 %include "bindings/scf.i"
 
-#ifndef CS_MINI_SWIG
 %include "iutil/dbghelp.h"
 %include "iutil/cmdline.h"
 
@@ -697,7 +516,6 @@ SET_HELPER(csStringID)
 %ignore iString::operator [] (size_t) const;
 %ignore iString::operator char const*;
 %include "iutil/string.h"
-#endif // CS_MINI_SWIG
 
 %ignore csStringBase;
 %ignore csStringBase::operator [] (size_t);
@@ -761,7 +579,6 @@ SET_HELPER(csStringID)
 %ignore operator<<;
 %include "csutil/csstring.h"
 
-#ifndef CS_MINI_SWIG
 %include "csutil/refcount.h"
 %ignore csVector2::operator+ (const csVector2 &, const csVector2 &);
 %ignore csVector2::operator- (const csVector2 &, const csVector2 &);
@@ -952,6 +769,7 @@ namespace CS
 %ignore csSegment3::End ();   // Non-const.
 %include "csgeom/segment.h"
 
+/*
 %rename(asRGBcolor) csRGBpixel::operator csRGBcolor;
 %include "csgfx/rgbpixel.h"
 %ignore ShaderVarName;
@@ -960,8 +778,7 @@ namespace CS
 %template(csShaderVariableArrayChangeElements) 
 iArrayChangeElements<csShaderVariable * >;
 %template(csShaderVariableArray) iArrayChangeAll<csShaderVariable * >;
-
-#endif // CS_MINI_SWIG
+*/
 
 %ignore csGetPlatformConfig;
 %ignore csPrintfV;
@@ -1016,13 +833,11 @@ iArrayChangeElements<csShaderVariable * >;
 %ignore csArray<csPluginRequest>::operator=;
 %ignore csArray<csPluginRequest>::operator[];
 %template(csPluginRequestArray) csArray<csPluginRequest>;
+/*
 
 %ignore iPen::Rotate;
-
-#ifndef CS_MINI_SWIG
+*/
 %include "igeom/clip2d.h"
-%include "ivaria/decal.h"
-%include "imesh/objmodel.h"
 %include "igeom/path.h"
 %template(scfPath) scfImplementation1<csPath,iPath >;
 #ifndef CS_SWIG_PUBLISH_IGENERAL_FACTORY_STATE_ARRAYS
@@ -1058,6 +873,7 @@ ARRAY_OBJECT_FUNCTIONS(csArray<csArray<int> >,csArray<int>)
 %include "csgeom/trimeshtools.h"
 %include "csgeom/spline.h"
 
+/*
 %include "iengine/fview.h"
 %include "iengine/light.h"
 %include "iengine/sector.h"
@@ -1113,67 +929,25 @@ ARRAY_OBJECT_FUNCTIONS(csArray<csArray<int> >,csArray<int>)
 %extend iMeshWrapperIterator {
   ITERATOR_FUNCTIONS(iMeshWrapperIterator)
 }
+*/
+%ignore iReporter::ReportV;
+%ignore csReporterHelper::ReportV;
+%include "ivaria/reporter.h"
 
-#ifndef CS_SWIG_PUBLISH_IGENERAL_FACTORY_STATE_ARRAYS
-%ignore iGeneralFactoryState::GetVertices;
-%ignore iGeneralFactoryState::GetTexels;
-%ignore iGeneralFactoryState::GetNormals;
-%ignore iGeneralFactoryState::GetTriangles;
-%ignore iGeneralFactoryState::GetColors;
-#endif
-%include "imesh/genmesh.h"
-%include "imesh/skeleton.h"
-%include "imesh/gmeshskel2.h"
-struct csSprite2DVertex;
-%ignore iSprite2DState::GetVertices;
-%template(csSprite2DVertexArrayReadOnly) iArrayReadOnly<csSprite2DVertex>;
-%template(csSprite2DVertexArrayChangeElements) 
-iArrayChangeElements<csSprite2DVertex>;
-%template(csSprite2DVertexArrayChangeAll) iArrayChangeAll<csSprite2DVertex>;
-%include "imesh/sprite2d.h"
-%include "imesh/sprite3d.h"
-%include "imesh/spritecal3d.h"
-// Swig 1.3.24 doesn't handle pointer default args well unless we tell it
-// to use an alternate way for that function
-%feature("compactdefaultargs") HitBeamObject;
-%include "imesh/object.h"
-%include "imesh/thing.h"
-%template (csCharArrayArray) csArray<csArray<char> >;
-%include "imesh/terrain.h"
-
-%include "imesh/particles.h"
-
-%include "imap/loader.h"
-%include "imap/reader.h"
-%include "imap/saver.h"
-
-%include "isndsys/ss_data.h"
-%include "isndsys/ss_filter.h"
-%include "isndsys/ss_listener.h"
-%include "isndsys/ss_loader.h"
-%include "isndsys/ss_manager.h"
-%include "isndsys/ss_source.h"
-%include "isndsys/ss_structs.h"
-%include "isndsys/ss_stream.h"
-%include "isndsys/ss_renderer.h"
-%include "isndsys/ss_driver.h"
+/* %include "bindings/imesh.i" */
+/* %include "bindings/imap.i" */
+/* %include "bindings/isndsys.i" */
 
 %include "iutil/comp.h"
 %include "iutil/cache.h"
-#endif // CS_MINI_SWIG
 %include "iutil/vfs.h"
-#ifndef CS_MINI_SWIG
 %include "iutil/dbghelp.h"
 %include "iutil/object.h"
 %include "iutil/strset.h"
-#endif // CS_MINI_SWIG
 %ignore CS_QUERY_REGISTRY_TAG_is_deprecated;
 %include "iutil/objreg.h"
-#ifndef CS_MINI_SWIG
 %include "iutil/virtclk.h"
-#endif // CS_MINI_SWIG
 
-#ifndef CS_MICRO_SWIG
 %rename(AddInt8) iEvent::Add(const char *, int8);
 %rename(AddInt16) iEvent::Add(const char *, int16);
 %rename(AddInt32) iEvent::Add(const char *, int32);
@@ -1239,9 +1013,7 @@ typedef int int32_t;
 %include "csutil/eventnames.h"
 %include "iutil/eventh.h"
 %include "iutil/plugin.h"
-#endif // CS_MICRO_SWIG
 
-#ifndef CS_MINI_SWIG
 %include "iutil/csinput.h"
 %include "iutil/cfgfile.h"
 %include "iutil/cfgmgr.h"
@@ -1266,9 +1038,7 @@ typedef int int32_t;
 
 %ignore iDataBuffer::GetInt8;
 %include "iutil/databuff.h"
-#endif // CS_MINI_SWIG
-
-#ifndef CS_MICRO_SWIG
+/*
 %ignore iGraphics2D::PerformExtensionV;
 %ignore iGraphics3D::PerformExtensionV;
 %rename(GetRGBA) iGraphics2D::GetRGB(int, int&, int&, int&, int&);
@@ -1284,9 +1054,7 @@ typedef int int32_t;
 %ignore GetGlyphAlphaBitmap(uint8, int &, int &);
 %ignore GetDimensions(char const *, int &, int &);
 %include "ivideo/fontserv.h"
-#endif // CS_MICRO_SWIG
 
-#ifndef CS_MINI_SWIG
 %include "ivideo/halo.h"
 %include "ivideo/shader/shader.h"
 
@@ -1295,66 +1063,22 @@ typedef int int32_t;
 
 %include "ivideo/txtmgr.h"
 %include "ivideo/material.h"
-
+*/
 %include "igraphic/image.h"
+/*
 %template(csImageBaseBase) scfImplementation1<csImageBase, iImage>;
 %include "csgfx/imagebase.h"
 %template(csImageMemoryBase) scfImplementationExt0<csImageMemory, csImageBase>;
 %include "csgfx/imagememory.h"
+*/
 %immutable csImageIOFileFormatDescription::mime;
 %immutable csImageIOFileFormatDescription::subtype;
 %template (csImageIOFileFormatDescriptions) csArray<csImageIOFileFormatDescription const*>;
 %include "igraphic/imageio.h"
 
-%ignore iReporter::ReportV;
-%ignore csReporterHelper::ReportV;
-%include "ivaria/reporter.h"
-
-%ignore iConsoleOutput::PutTextV;
-%ignore iConsoleOutput::PerformExtensionV;
-%include "ivaria/conout.h"
-
-%include "ivaria/stdrep.h"
-%include "ivaria/view.h"
-%include "ivaria/collider.h"
-%include "ivaria/dynamics.h"
-%include "ivaria/ode.h"
-%include "ivaria/engseq.h"
-%include "ivaria/movierecorder.h"
-%include "ivaria/mapnode.h"
-
-%rename(IntCall) *::Call(const char*, int&, const char*, ...);
-%rename(FloatCall) *::Call(const char*, float&, const char*, ...);
-%rename(DoubleCall) *::Call(const char*, double&, const char*, ...);
-%rename(StringCall) *::Call(const char*, char**, const char*, ...);
-%rename(ObjectCall) *::Call(const char*,csRef<iScriptObject>&,const char*,...);
-%rename(StoreInt) iScript::Store(const char*, int);
-%rename(StoreFloat) iScript::Store(const char*, float);
-%rename(StoreDouble) iScript::Store(const char*, double);
-%rename(StoreString) iScript::Store(const char*, const char*);
-%rename(StoreObject) iScript::Store(const char*, iStringObject*);
-%rename(RetrieveInt) iScript::Retrieve(const char*, int);
-%rename(RetrieveFloat) iScript::Retrieve(const char*, float&);
-%rename(RetrieveDouble) iScript::Retrieve(const char*, double&);
-%rename(RetrieveString) iScript::Retrieve(const char*, char**);
-%rename(RetrieveObject) iScript::Retrieve(const char*, csRef<iStringObject>&);
-%rename(SetInt) iScriptObject::Set(const char*, int);
-%rename(SetFloat) iScriptObject::Set(const char*, float);
-%rename(SetDouble) iScriptObject::Set(const char*, double);
-%rename(SetString) iScriptObject::Set(const char*, const char*);
-%rename(SetObject) iScriptObject::Set(const char*, iStringObject*);
-%rename(GetInt) iScriptObject::Get(const char*, int);
-%rename(GetFloat) iScriptObject::Get(const char*, float&);
-%rename(GetDouble) iScriptObject::Get(const char*, double&);
-%rename(GetString) iScriptObject::Get(const char*, char**);
-%rename(GetObject) iScriptObject::Get(const char*, csRef<iStringObject>&);
-%include "ivaria/script.h"
-%include "ivaria/simpleformer.h"
-%include "ivaria/terraform.h"
-
 %template(pycsObject) scfImplementation1<csObject,iObject >;
 %include "csutil/csobject.h"
-
+/*
 %ignore csColliderHelper::TraceBeam (iCollideSystem*, iSector*,
   const csVector3&, const csVector3&, bool, csIntersectingTriangle&,
   csVector3&, iMeshWrapper**);
@@ -1367,8 +1091,7 @@ typedef int int32_t;
 %include "cstool/enginetools.h"
 
 %include "cstool/pen.h"
-#endif // CS_MINI_SWIG
-
+*/
 %ignore iBase::~iBase(); // We replace iBase dtor with one that calls DecRef().
 			 // Swig already knows not to delete an SCF pointer.
 
@@ -1382,37 +1105,7 @@ typedef int int32_t;
 
 #undef INTERFACE_APPLY
 #define INTERFACE_APPLY(x) INTERFACE_POST(x)
-APPLY_FOR_EACH_INTERFACE
-
-#ifndef CS_MINI_SWIG
-// imesh/sprite2d.h
-%extend iSprite2DState
-{
-  csSprite2DVertex* GetVertexByIndex(int index)
-  { return &self->GetVertices()->Get(index); }
-
-  int GetVertexCount()
-  { return self->GetVertices()->GetSize(); }
-}
-
-// imesh/genmesh.h
-%extend iGeneralFactoryState
-{
-  csVector3 *GetVertexByIndex(int index)
-  { return &(self->GetVertices()[index]); }
-
-  csVector2 *GetTexelByIndex(int index)
-  { return &(self->GetTexels()[index]); }
-
-  csVector3 *GetNormalByIndex(int index)
-  { return &(self->GetNormals()[index]); }
-
-  csTriangle *GetTriangleByIndex(int index)
-  { return &(self->GetTriangles()[index]); }
-
-  csColor *GetColorByIndex(int index)
-  { return &(self->GetColors()[index]); }
-}
+CORE_APPLY_FOR_EACH_INTERFACE
 
 %extend iPolygonMesh
 {
@@ -1447,9 +1140,7 @@ APPLY_FOR_EACH_INTERFACE
   bool GetKeyState (const char * key)
   { return self->GetKeyState ((int) key[0]); }
 }
-#endif // CS_MINI_SWIG
 
-#ifndef CS_MICRO_SWIG
 // iutil/event.h
 %extend iEvent
 {
@@ -1594,18 +1285,8 @@ csEventID _csevJoystickEvent (iObjectRegistry *);
 #define _CS_LOAD_PLUGIN_ALWAYS(a, b) CS_LOAD_PLUGIN_ALWAYS(a, b)
 #undef CS_LOAD_PLUGIN_ALWAYS
 csPtr<iBase> _CS_LOAD_PLUGIN_ALWAYS (iPluginManager *, const char *);
-#endif // CS_MICRO_SWIG
 
-#ifndef CS_MINI_SWIG
-// ivaria/collider.h
-%extend iCollideSystem
-{
-  csCollisionPair * GetCollisionPairByIndex (int index)
-  { return self->GetCollisionPairs() + index; }
-}
-#endif // CS_MINI_SWIG
-
-#ifndef CS_MICRO_SWIG
+/*
 // ivideo/graph3d.h
 #define _CS_FX_SETALPHA(a) CS_FX_SETALPHA(a)
 #undef CS_FX_SETALPHA
@@ -1613,9 +1294,8 @@ uint _CS_FX_SETALPHA (uint);
 #define _CS_FX_SETALPHA_INT(a) CS_FX_SETALPHA_INT(a)
 #undef CS_FX_SETALPHA_INT
 uint _CS_FX_SETALPHA_INT (uint);
-#endif // CS_MICRO_SWIG
+*/
 
-#ifndef CS_MINI_SWIG
 // csgeom/vector2.h csgeom/vector3.h
 %define VECTOR_OBJECT_FUNCTIONS(V)
   V operator + (const V & v) const { return *self + v; }
@@ -1745,6 +1425,7 @@ uint _CS_FX_SETALPHA_INT (uint);
 }
 
 %include "cstool/primitives.h"
+/*
 %extend csSimpleRenderMesh
 {
   void SetWithGenmeshFactory(iGeneralFactoryState *factory) 
@@ -1756,8 +1437,9 @@ uint _CS_FX_SETALPHA_INT (uint);
     self->texcoords = factory->GetTexels();
   }
 }
-
+*/
 /* List Methods */
+/*
 LIST_OBJECT_FUNCTIONS(iMeshList,iMeshWrapper)
 LIST_OBJECT_FUNCTIONS(iMeshFactoryList,iMeshFactoryWrapper)
 LIST_OBJECT_FUNCTIONS(iMaterialList,iMaterialWrapper)
@@ -1769,8 +1451,7 @@ LIST_OBJECT_FUNCTIONS(iTextureList,iTextureWrapper)
 // Not wrapping yet:
 //LIST_OBJECT_FUNCTIONS(iCollectionList,iCollection) 
 //LIST_OBJECT_FUNCTIONS(iSharedVariableList,iSharedVariable)
-#endif // CS_MINI_SWIG
-
+*/
 /****************************************************************************
  * These functions are replacements for CS's macros of the same names.
  * These functions can be wrapped by Swig but the macros can't.

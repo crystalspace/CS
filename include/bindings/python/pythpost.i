@@ -23,7 +23,6 @@
 
 #ifdef SWIGPYTHON
 %include "pyeventh.i"
-
 %pythoncode %{
 
   def _csInitializer_RequestPlugins (reg, plugins):
@@ -43,17 +42,13 @@
   csInitializer.RequestPlugins = staticmethod(_csInitializer_RequestPlugins)
 
 %}
-
 #ifndef CS_MINI_SWIG
-%include "pyshadervar.i"
-%pythoncode %{
-  csReport = csReporterHelper.Report
-%}
+/*%include "pyshadervar.i"*/
 #endif
 
 %pythoncode %{
   def CS_REQUEST_PLUGIN (name, intf):
-    return (name, intf.__name__, cvar.iSCF_SCF.GetInterfaceID(intf.__name__),
+    return (name, intf.__name__, _cspace.cvar.iSCF_SCF.GetInterfaceID(intf.__name__),
       intf.scfGetVersion())
 
   def CS_REQUEST_VFS ():
@@ -105,19 +100,6 @@
           return self->modifiers[i];
       return 0;
   }
-}
-%extend iCollideSystem
-{
-  %rename(_GetCollisionPairs) GetCollisionPairs;
-
-  %pythoncode %{
-    def GetCollisionPairs (self):
-      num = self.GetCollisionPairCount()
-      pairs = []
-      for i in range(num):
-        pairs.append(self.GetCollisionPairByIndex(i))
-      return pairs
-  %}
 }
 
 %define VECTOR_PYTHON_OBJECT_FUNCTIONS(N)
@@ -281,10 +263,6 @@ class CSMutableArrayHelper:
 
 %}
 
-%pythoncode %{
-  CS_POLYRANGE_LAST = csPolygonRange (-1, -1)
-%}
-
 /* allow using csMeshedPolygon as a (vert index) list */
 %extend csMeshedPolygon {
   int __getitem__(int index)
@@ -295,6 +273,7 @@ class CSMutableArrayHelper:
 PYITERATOR_PROTOCOL(csMeshedPolygon)
 
 /* work around broken Rotate function with swig 1.3.28 */
+/*
 %extend iPen {
         void _Rotate(float a)
         { self->Rotate(a); }
@@ -303,6 +282,12 @@ PYITERATOR_PROTOCOL(csMeshedPolygon)
          return _cspace.iPen__Rotate(a)
     %}
 }
+*/
+
+%pythoncode %{
+  csReport = csReporterHelper.Report
+%}
+
 #endif // CS_MINI_SWIG
 
 /*
@@ -331,6 +316,7 @@ CS_EXPORT_SYM PyObject* csWrapTypedObject(void* objectptr, const char *typetag,
 
 %}
 
+/*
 %include "bindings/python/pythvarg.i"
-
+*/
 #endif // SWIGPYTHON

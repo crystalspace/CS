@@ -70,6 +70,24 @@ _csRef_to_Python (const csRef<iBase> & ref, void * ptr, const char * name)
 }
 %}
 
+#undef LANG_FUNCTIONS
+%define LANG_FUNCTIONS
+%{
+PyObject *
+_csRef_to_Python (const csRef<iBase> & ref, void * ptr, const char * name)
+{
+  if (!ref.IsValid())
+  {
+    Py_INCREF(Py_None);
+    return Py_None;
+  }
+  ref->IncRef();
+  return SWIG_NewPointerObj((void *)ptr, SWIG_TypeQuery(name), 1);
+}
+%}
+%enddef
+
+
 /*
   ptr  : either a csRef<type> or csPtr<type>
   name : type name, e.g. "iEngine *"
@@ -87,6 +105,17 @@ _csRef_to_Python (const csRef<iBase> & ref, void * ptr, const char * name)
 */
 %define TYPEMAP_OUT_csRef_BODY(ptr, name, type, wrapper)
   csRef<type> ref((wrapper<type>&)ptr); /* explicit cast */
+  /*const csRef<iBase> ref = csRef<iBase>((type *)ref1);
+  if (!ref.IsValid())
+  {
+    Py_INCREF(Py_None);
+    $result = Py_None;
+  }
+  else
+  {
+    ref->IncRef();
+    $result = SWIG_NewPointerObj((void *)(type *)ref1, SWIG_TypeQuery(name), 1);
+  }*/
   $result = _csRef_to_Python(csRef<iBase>(
     (type *)ref), (void *)(type *)ref, name);
 %enddef
