@@ -52,14 +52,11 @@ if $(PYTHON.AVAILABLE) = "yes"
   #--------
   # ivaria -- Pure Python module
   #--------
-  if $(CEGUI.AVAILABLE) = "yes"
-  {
   PythMod ivariamod : _ivaria : 
 	ivariamod.cpp cs_ivaria.cpp : 
 	crystalspace_python : 
-	CEGUI : 
-	"cegui cs Python module" ;
+	: 
+	"ivaria cs Python module" ;
   Depends ivariamod : $(ivariapy) ;
   CFlags ivariamod : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
-  }
 }

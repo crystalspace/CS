@@ -52,14 +52,11 @@ if $(PYTHON.AVAILABLE) = "yes"
   #--------
   # isndsys -- Pure Python module
   #--------
-  if $(CEGUI.AVAILABLE) = "yes"
-  {
   PythMod isndsysmod : _isndsys : 
 	isndsysmod.cpp cs_isndsys.cpp : 
 	crystalspace_python : 
-	CEGUI : 
-	"cegui cs Python module" ;
+	: 
+	"isndsys cs Python module" ;
   Depends isndsysmod : $(isndsyspy) ;
   CFlags isndsysmod : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
-  }
 }

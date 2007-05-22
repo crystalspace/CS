@@ -11,6 +11,8 @@ chronological order.
 	  several modules can be built that work together.
 	- caedes added starting python module folders for the split
 	  scripting interface.
+	- caedes removed references and dependencies from cegui from the split
+	  python modules jamfiles and cpp files.
 20-May-2007
 	- res changed the Cygwin build docs to generally recommend using the
 	  cs-win32libs package and to more prominently use jam (instead of

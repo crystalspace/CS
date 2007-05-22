@@ -16,7 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-// Implementation specific to the pure Python "cscegui" module (pyceguimod).
+// Implementation specific to the pure Python "ivideo" module (ivideomod).
 
 #include "cssysdef.h"
 

@@ -56,7 +56,7 @@ if $(PYTHON.AVAILABLE) = "yes"
 	csgfxmod.cpp cs_csgfx.cpp : 
 	crystalspace_python : 
 	: 
-	"cegui cs Python module" ;
+	"csgfx cs Python module" ;
   Depends csgfxmod : $(csgfxpy) ;
   #CFlags csgfxmod : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
 }

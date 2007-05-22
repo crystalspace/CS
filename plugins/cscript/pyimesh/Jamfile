@@ -52,14 +52,11 @@ if $(PYTHON.AVAILABLE) = "yes"
   #--------
   # imesh -- Pure Python module
   #--------
-  if $(CEGUI.AVAILABLE) = "yes"
-  {
   PythMod imeshmod : _imesh : 
 	imeshmod.cpp cs_imesh.cpp : 
 	crystalspace_python : 
-	CEGUI : 
-	"cegui cs Python module" ;
+	: 
+	"imesh cs Python module" ;
   Depends imeshmod : $(imeshpy) ;
   CFlags imeshmod : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
-  }
 }

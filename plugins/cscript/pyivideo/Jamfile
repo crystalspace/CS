@@ -52,14 +52,11 @@ if $(PYTHON.AVAILABLE) = "yes"
   #--------
   # ivideo -- Pure Python module
   #--------
-  if $(CEGUI.AVAILABLE) = "yes"
-  {
   PythMod ivideomod : _ivideo : 
 	ivideomod.cpp cs_ivideo.cpp : 
 	crystalspace_python : 
 	: 
-	"cegui cs Python module" ;
+	"ivideo cs Python module" ;
   Depends ivideomod : $(ivideopy) ;
   #CFlags ivideomod : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
-  }
 }

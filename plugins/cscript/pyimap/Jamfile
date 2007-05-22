@@ -52,14 +52,11 @@ if $(PYTHON.AVAILABLE) = "yes"
   #--------
   # imap -- Pure Python module
   #--------
-  if $(CEGUI.AVAILABLE) = "yes"
-  {
   PythMod imapmod : _imap : 
 	imapmod.cpp cs_imap.cpp : 
 	crystalspace_python : 
 	: 
-	"cegui cs Python module" ;
+	"imap cs Python module" ;
   Depends imapmod : $(imappy) ;
   #CFlags imapmod : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
-  }
 }

@@ -52,14 +52,11 @@ if $(PYTHON.AVAILABLE) = "yes"
   #--------
   # iengine -- Pure Python module
   #--------
-  if $(CEGUI.AVAILABLE) = "yes"
-  {
   PythMod ienginemod : _iengine : 
 	ienginemod.cpp cs_iengine.cpp : 
 	crystalspace_python : 
 	: 
-	"cegui cs Python module" ;
+	"iengine cs Python module" ;
   Depends ienginemod : $(ienginepy) ;
   #CFlags ienginemod : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
-  }
 }
