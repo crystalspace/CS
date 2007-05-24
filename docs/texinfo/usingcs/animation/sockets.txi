@@ -94,7 +94,7 @@ bool DetachMesh (iMeshWrapper* actorMesh, const char* socketName)
   if (!socket) return false;
   iMeshWrapper* object = socket->GetMeshWrapper ();
   if (!object) return false;
-  actorMesh->GetChildren ()->Remove (object);
+  object->QueryScene ()->SetParent (0);
   socket->SetMeshWrapper (0);
   engine->RemoveObject (object);
   return true;
