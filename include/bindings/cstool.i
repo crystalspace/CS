@@ -4,8 +4,6 @@
 
 %include "bindings/basepre.i"
 
-%import "bindings/cspace.i" /* needed for iEventHandler */
-
 #undef APPLY_FOR_ALL_INTERFACES
 #define APPLY_FOR_ALL_INTERFACES
 
