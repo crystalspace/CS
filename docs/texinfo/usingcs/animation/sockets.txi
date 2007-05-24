@@ -66,7 +66,7 @@ bool AttachMesh (iMeshWrapper* actorMesh, const char* socketName,
   if (!objectFactory) return false;
   csRef<iMeshWrapper> object = engine->CreateMeshWrapper (objectFactory,
   	objectFactoryName);
-  actorMesh->GetChildren ()->Add (object);
+  object->QuerySceneNode ()->SetParent (actorMesh->QuerySceneNode ());
   socket->SetMeshWrapper (object);
   // Set a relative transform to correct the orientation of the object
   // relative to the socket orientation.
