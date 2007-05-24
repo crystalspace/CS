@@ -1,10 +1,13 @@
 %module iengine
-%import "bindings/cspace.i"
+
+%import "bindings/allinterfaces.i"
+
+%include "bindings/basepre.i"
+
 %import "bindings/ivideo.i" /* due to at least csZBufMode graph3d.h */
-%{
-#include "crystalspace.h"
-%}
-LANG_FUNCTIONS
+
+#undef APPLY_FOR_ALL_INTERFACES
+#define APPLY_FOR_ALL_INTERFACES IENGINE_APPLY_FOR_EACH_INTERFACE
 
 %include "iengine/fview.h"
 %include "iengine/light.h"
@@ -49,9 +52,8 @@ LANG_FUNCTIONS
 %include "iengine/portalcontainer.h"
 
 /* END STANCE */
-#undef INTERFACE_APPLY
-#define INTERFACE_APPLY(x) INTERFACE_POST(x)
-IENGINE_APPLY_FOR_EACH_INTERFACE
+
+%include "bindings/basepost.i"
 
 %extend iVisibilityObjectIterator {
   ITERATOR_FUNCTIONS(iVisibilityObjectIterator)

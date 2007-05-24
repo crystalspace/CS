@@ -1,15 +1,15 @@
 %module imap
-%import "bindings/cspace.i"
-%{
-#include "crystalspace.h"
-%}
-LANG_FUNCTIONS
+
+%import "bindings/allinterfaces.i"
+
+%include "bindings/basepre.i"
+
+#undef APPLY_FOR_ALL_INTERFACES
+#define APPLY_FOR_ALL_INTERFACES IMAP_APPLY_FOR_EACH_INTERFACE
 
 %include "imap/loader.h"
 %include "imap/reader.h"
 %include "imap/saver.h"
 
-#undef INTERFACE_APPLY
-#define INTERFACE_APPLY(x) INTERFACE_POST(x)
-IMAP_APPLY_FOR_EACH_INTERFACE
+%include "bindings/basepost.i"
 

@@ -1,9 +1,13 @@
 %module csgfx
-%import "bindings/cspace.i"
-%{
-#include "crystalspace.h"
-%}
-LANG_FUNCTIONS
+
+%import "bindings/allinterfaces.i"
+
+%include "bindings/basepre.i"
+
+%import "bindings/cspace.i" /* needed for iImage */
+
+#undef APPLY_FOR_ALL_INTERFACES
+#define APPLY_FOR_ALL_INTERFACES
 
 %rename(asRGBcolor) csRGBpixel::operator csRGBcolor;
 %include "csgfx/rgbpixel.h"
@@ -23,4 +27,5 @@ iArrayChangeElements<csShaderVariable * >;
 %include "bindings/python/pyshadervar.i"
 #endif
 
+%include "bindings/basepost.i"
 

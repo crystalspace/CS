@@ -1,10 +1,13 @@
 %module cstool
-%import "bindings/cspace.i"
-%{
-#include "crystalspace.h"
-%}
-LANG_FUNCTIONS
 
+%import "bindings/allinterfaces.i"
+
+%include "bindings/basepre.i"
+
+%import "bindings/cspace.i" /* needed for iEventHandler */
+
+#undef APPLY_FOR_ALL_INTERFACES
+#define APPLY_FOR_ALL_INTERFACES
 
 /* REST */
 /*
@@ -55,9 +58,10 @@ LANG_FUNCTIONS
          return _cspace.iPen__Rotate(a)
     %}
 }
-#endif
 
 /*
+%include "bindings/python/pyeventh.i"
+
 %pythoncode %{
   def _csInitializer_RequestPlugins (reg, plugins):
     """Replacement of C++ version."""
@@ -94,5 +98,8 @@ LANG_FUNCTIONS
   csInitializer.SetupEventHandler = \
     staticmethod(_csInitializer_SetupEventHandler)
 %}
-
 */
+#endif
+
+%include "bindings/basepost.i"
+

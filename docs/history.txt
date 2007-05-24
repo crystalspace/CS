@@ -6,6 +6,11 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-May-2007
+	- Oktal reorganized the split swig interface files; cspace.i now
+	  contains only code for the core module and modules that have yet to
+	  be split; basepre.i and basepost.i contain code that was previously
+	  in cspace.i and is common to all the modules.
 22-May-2007
 	- caedes started splitting of the swig interface files so
 	  several modules can be built that work together.

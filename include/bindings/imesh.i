@@ -1,9 +1,11 @@
 %module imesh
-%import "bindings/cspace.i"
-%{
-#include "crystalspace.h"
-%}
-LANG_FUNCTIONS
+
+%import "bindings/allinterfaces.i"
+
+%include "bindings/basepre.i"
+
+#undef APPLY_FOR_ALL_INTERFACES
+#define APPLY_FOR_ALL_INTERFACES IMESH_APPLY_FOR_EACH_INTERFACE
 
 #ifndef CS_SWIG_PUBLISH_IGENERAL_FACTORY_STATE_ARRAYS
 %ignore iGeneralFactoryState::GetVertices;
@@ -65,13 +67,11 @@ iArrayChangeElements<csSprite2DVertex>;
   { return &(self->GetColors()[index]); }
 }
 
-#undef INTERFACE_APPLY
-#define INTERFACE_APPLY(x) INTERFACE_POST(x)
-IMESH_APPLY_FOR_EACH_INTERFACE
-
 #if defined(SWIGPYTHON)
 %pythoncode %{
   CS_POLYRANGE_LAST = csPolygonRange (-1, -1)
 %}
 #endif
+
+%import "bindings/basepost.i"
 

@@ -1,10 +1,13 @@
 %module ivideo
-%import "bindings/cspace.i"
+
+%import "bindings/allinterfaces.i"
+
+%include "bindings/basepre.i"
+
 %import "bindings/csgfx.i"
-%{
-#include "crystalspace.h"
-%}
-LANG_FUNCTIONS
+
+#undef APPLY_FOR_ALL_INTERFACES
+#define APPLY_FOR_ALL_INTERFACES IVIDEO_APPLY_FOR_EACH_INTERFACE
 
 %ignore iGraphics2D::PerformExtensionV;
 %ignore iGraphics3D::PerformExtensionV;
@@ -39,9 +42,7 @@ uint _CS_FX_SETALPHA (uint);
 #undef CS_FX_SETALPHA_INT
 uint _CS_FX_SETALPHA_INT (uint);
 
-#undef INTERFACE_APPLY
-#define INTERFACE_APPLY(x) INTERFACE_POST(x)
-IVIDEO_APPLY_FOR_EACH_INTERFACE
+%include "bindings/basepost.i"
 
 #if defined(SWIGPYTHON)
 %extend csSimpleRenderMesh

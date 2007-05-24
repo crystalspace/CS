@@ -22,6 +22,8 @@
 */
 
 #ifdef SWIGPYTHON
+
+/*
 %include "pyeventh.i"
 %pythoncode %{
 
@@ -42,6 +44,7 @@
   csInitializer.RequestPlugins = staticmethod(_csInitializer_RequestPlugins)
 
 %}
+*/
 #ifndef CS_MINI_SWIG
 /*%include "pyshadervar.i"*/
 #endif
@@ -246,6 +249,7 @@ class CSMutableArrayHelper:
 }
 
 #ifndef CS_MINI_SWIG
+/*
 %pythoncode %{
 
   CS_VEC_FORWARD = csVector3(0,0,1)
@@ -262,6 +266,7 @@ class CSMutableArrayHelper:
   CS_VEC_TILT_DOWN = -csVector3(-1,0,0)
 
 %}
+*/
 
 /* allow using csMeshedPolygon as a (vert index) list */
 %extend csMeshedPolygon {
@@ -284,9 +289,11 @@ PYITERATOR_PROTOCOL(csMeshedPolygon)
 }
 */
 
+/*
 %pythoncode %{
   csReport = csReporterHelper.Report
 %}
+*/
 
 #endif // CS_MINI_SWIG
 

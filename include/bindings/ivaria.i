@@ -1,9 +1,11 @@
 %module ivaria
-%import "bindings/cspace.i"
-%{
-#include "crystalspace.h"
-%}
-LANG_FUNCTIONS
+
+%import "bindings/allinterfaces.i"
+
+%include "bindings/basepre.i"
+
+#undef APPLY_FOR_ALL_INTERFACES
+#define APPLY_FOR_ALL_INTERFACES IVARIA_APPLY_FOR_EACH_INTERFACE
 
 %include "ivaria/decal.h"
 /*%ignore iReporter::ReportV;
@@ -52,10 +54,7 @@ LANG_FUNCTIONS
 %include "ivaria/simpleformer.h"
 %include "ivaria/terraform.h"
 
-
-#undef INTERFACE_APPLY
-#define INTERFACE_APPLY(x) INTERFACE_POST(x)
-IVARIA_APPLY_FOR_EACH_INTERFACE
+%include "bindings/basepost.i"
 
 // ivaria/collider.h
 %extend iCollideSystem
