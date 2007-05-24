@@ -81,16 +81,16 @@
   and there will be a "X" function in the scripting language available.
 */
 
-%module cspace
 
-%include "bindings/allinterfaces.i"
+#ifndef SWIGIMPORTED
+  %module cspace
+  %include "bindings/allinterfaces.i"
+  #define APPLY_FOR_ALL_INTERFACES_PRE APPLY_FOR_ALL_INTERFACES
+  #define APPLY_FOR_ALL_INTERFACES_POST CORE_APPLY_FOR_EACH_INTERFACE
 
-#undef APPLY_FOR_ALL_INTERFACES
-#define APPLY_FOR_ALL_INTERFACES CORE_APPLY_FOR_EACH_INTERFACE
+  %include "bindings/basepre.i"
+#endif
 
-/****************************************************************************/
-%include "bindings/basepre.i"
-/****************************************************************************/
 
 /* Inclusion of CS headers.  The sequence of %include-ing the CS headers can be
    crucial!  The scheme is as follows: %ignore'd functions and types are placed
@@ -480,6 +480,52 @@ iArrayChangeElements<csShaderVariable * >;
 %ignore csArray<csPluginRequest>::operator=;
 %ignore csArray<csPluginRequest>::operator[];
 %template(csPluginRequestArray) csArray<csPluginRequest>;
+#if defined(SWIGPYTHON)
+%pythoncode %{
+  def CS_REQUEST_PLUGIN (name, intf):
+    return (name, intf.__name__, _cspace.cvar.iSCF_SCF.GetInterfaceID(intf.__name__),
+      intf.scfGetVersion())
+
+  def CS_REQUEST_VFS ():
+    return CS_REQUEST_PLUGIN("crystalspace.kernel.vfs", iVFS)
+
+  def CS_REQUEST_FONTSERVER ():
+    return CS_REQUEST_PLUGIN("crystalspace.font.server.default", iFontServer)
+
+  def CS_REQUEST_IMAGELOADER ():
+    return CS_REQUEST_PLUGIN("crystalspace.graphic.image.io.multiplexer",
+      iImageIO)
+
+  def CS_REQUEST_NULL3D ():
+    return CS_REQUEST_PLUGIN("crystalspace.graphics3d.null", iGraphics3D)
+
+  def CS_REQUEST_SOFTWARE3D ():
+    return CS_REQUEST_PLUGIN("crystalspace.graphics3d.software", iGraphics3D)
+
+  def CS_REQUEST_OPENGL3D ():
+    return CS_REQUEST_PLUGIN("crystalspace.graphics3d.opengl", iGraphics3D)
+
+  def CS_REQUEST_ENGINE ():
+    return CS_REQUEST_PLUGIN("crystalspace.engine.3d", iEngine)
+
+  def CS_REQUEST_LEVELLOADER ():
+    return CS_REQUEST_PLUGIN("crystalspace.level.loader", iLoader)
+
+  def CS_REQUEST_LEVELSAVER ():
+    return CS_REQUEST_PLUGIN("crystalspace.level.saver", iSaver)
+
+  def CS_REQUEST_REPORTER ():
+    return CS_REQUEST_PLUGIN("crystalspace.utilities.reporter", iReporter)
+
+  def CS_REQUEST_REPORTERLISTENER ():
+    return CS_REQUEST_PLUGIN("crystalspace.utilities.stdrep",
+      iStandardReporterListener)
+
+  def CS_REQUEST_CONSOLEOUT ():
+    return CS_REQUEST_PLUGIN("crystalspace.console.output.standard",
+      iConsoleOutput)
+%}
+#endif
 /*
 
 %ignore iPen::Rotate;
@@ -790,9 +836,11 @@ typedef int int32_t;
 %include "cstool/pen.h"
 */
 
-/****************************************************************************/
-%include "bindings/basepost.i"
-/****************************************************************************/
+
+#ifndef SWIGIMPORTED
+  %include "bindings/basepost.i"
+#endif
+
 
 %extend iPolygonMesh
 {

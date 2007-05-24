@@ -1,13 +1,15 @@
-%module ivideo
 
-%import "bindings/allinterfaces.i"
+#ifndef SWIGIMPORTED
+  %module ivideo
+  %include "bindings/allinterfaces.i"
+  #define APPLY_FOR_ALL_INTERFACES_PRE APPLY_FOR_ALL_INTERFACES
+  #define APPLY_FOR_ALL_INTERFACES_POST IVIDEO_APPLY_FOR_EACH_INTERFACE
 
-%include "bindings/basepre.i"
+  %include "bindings/basepre.i"
+#endif
 
 %import "bindings/csgfx.i"
 
-#undef APPLY_FOR_ALL_INTERFACES
-#define APPLY_FOR_ALL_INTERFACES IVIDEO_APPLY_FOR_EACH_INTERFACE
 
 %ignore iGraphics2D::PerformExtensionV;
 %ignore iGraphics3D::PerformExtensionV;
@@ -42,7 +44,11 @@ uint _CS_FX_SETALPHA (uint);
 #undef CS_FX_SETALPHA_INT
 uint _CS_FX_SETALPHA_INT (uint);
 
-%include "bindings/basepost.i"
+
+#ifndef SWIGIMPORTED
+  %include "bindings/basepost.i"
+#endif
+
 
 #if defined(SWIGPYTHON)
 %extend csSimpleRenderMesh

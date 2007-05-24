@@ -11,6 +11,11 @@ chronological order.
 	  contains only code for the core module and modules that have yet to
 	  be split; basepre.i and basepost.i contain code that was previously
 	  in cspace.i and is common to all the modules.
+	- Oktal added SWIGIMPORTED guards to the split swig interface files.
+	  This fixes several serious problems caused by my reorganization.
+	  Also a small semantic change to the APPLY_FOR_ALL_INTERFACES stuff.
+	- Oktal moved the pure python CS_REQUEST_PLUGIN wrappers from
+	  pythpost.i to cspace.i.
 22-May-2007
 	- caedes started splitting of the swig interface files so
 	  several modules can be built that work together.

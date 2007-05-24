@@ -1,13 +1,15 @@
-%module iengine
 
-%import "bindings/allinterfaces.i"
+#ifndef SWIGIMPORTED
+  %module iengine
+  %include "bindings/allinterfaces.i"
+  #define APPLY_FOR_ALL_INTERFACES_PRE APPLY_FOR_ALL_INTERFACES
+  #define APPLY_FOR_ALL_INTERFACES_POST IENGINE_APPLY_FOR_EACH_INTERFACE
 
-%include "bindings/basepre.i"
+  %include "bindings/basepre.i"
+#endif
 
 %import "bindings/ivideo.i" /* due to at least csZBufMode graph3d.h */
 
-#undef APPLY_FOR_ALL_INTERFACES
-#define APPLY_FOR_ALL_INTERFACES IENGINE_APPLY_FOR_EACH_INTERFACE
 
 %include "iengine/fview.h"
 %include "iengine/light.h"
@@ -24,8 +26,8 @@
 %include "iengine/material.h"
 %template(iSceneNodeArrayReadOnly) iArrayReadOnly<iSceneNode * >;
 %include "iengine/scenenode.h"
-// Swig 1.3.24 doesn't handle pointer default args well unless we tell it
-// to use an alternate way for that function
+/* Swig 1.3.24 doesn't handle pointer default args well unless we tell it
+   to use an alternate way for that function				    */
 %feature("compactdefaultargs") HitBeamObject;
 %ignore iMeshWrapper::HitBeamBBox (const csVector3&, const csVector3&,
   csVector3&, float*);
@@ -44,8 +46,8 @@
 
 %include "iengine/movable.h"
 %include "iengine/region.h"
-// Swig 1.3.24 doesn't handle pointer default args well unless we tell it
-// to use an alternate way for that function
+/* Swig 1.3.24 doesn't handle pointer default args well unless we tell it
+   to use an alternate way for that function				    */
 %feature("compactdefaultargs") IntersectSegment;
 %include "iengine/viscull.h"
 %include "iengine/portal.h"
@@ -53,7 +55,11 @@
 
 /* END STANCE */
 
-%include "bindings/basepost.i"
+
+#ifndef SWIGIMPORTED
+  %include "bindings/basepost.i"
+#endif
+
 
 %extend iVisibilityObjectIterator {
   ITERATOR_FUNCTIONS(iVisibilityObjectIterator)

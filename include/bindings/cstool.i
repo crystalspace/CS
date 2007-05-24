@@ -1,11 +1,15 @@
-%module cstool
 
-%import "bindings/allinterfaces.i"
+#ifndef SWIGIMPORTED
+  %module cstool
+  %include "bindings/allinterfaces.i"
+  #define APPLY_FOR_ALL_INTERFACES_PRE APPLY_FOR_ALL_INTERFACES
+  #define APPLY_FOR_ALL_INTERFACES_POST
 
-%include "bindings/basepre.i"
+  %include "bindings/basepre.i"
+#endif
 
-#undef APPLY_FOR_ALL_INTERFACES
-#define APPLY_FOR_ALL_INTERFACES
+%import "bindings/cspace.i" /* needed for csObject */
+
 
 /* REST */
 /*
@@ -99,5 +103,8 @@
 */
 #endif
 
-%include "bindings/basepost.i"
+
+#ifndef SWIGIMPORTED
+  %include "bindings/basepost.i"
+#endif
 

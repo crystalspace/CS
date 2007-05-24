@@ -49,6 +49,7 @@
 /*%include "pyshadervar.i"*/
 #endif
 
+/*
 %pythoncode %{
   def CS_REQUEST_PLUGIN (name, intf):
     return (name, intf.__name__, _cspace.cvar.iSCF_SCF.GetInterfaceID(intf.__name__),
@@ -94,6 +95,7 @@
       iConsoleOutput)
 
 %}
+*/
 
 #ifndef CS_MINI_SWIG
 %extend csKeyModifiers {

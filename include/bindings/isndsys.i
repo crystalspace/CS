@@ -1,11 +1,13 @@
-%module isndsys
 
-%import "bindings/allinterfaces.i"
+#ifndef SWIGIMPORTED
+  %module isndsys
+  %include "bindings/allinterfaces.i"
+  #define APPLY_FOR_ALL_INTERFACES_PRE APPLY_FOR_ALL_INTERFACES
+  #define APPLY_FOR_ALL_INTERFACES_POST ISNDSYS_APPLY_FOR_EACH_INTERFACE
 
-%include "bindings/basepre.i"
+  %include "bindings/basepre.i"
+#endif
 
-#undef APPLY_FOR_ALL_INTERFACES
-#define APPLY_FOR_ALL_INTERFACES ISNDSYS_APPLY_FOR_EACH_INTERFACE
 
 %include "isndsys/ss_data.h"
 %include "isndsys/ss_filter.h"
@@ -18,5 +20,8 @@
 %include "isndsys/ss_renderer.h"
 %include "isndsys/ss_driver.h"
 
-%include "bindings/basepost.i"
+
+#ifndef SWIGIMPORTED
+  %include "bindings/basepost.i"
+#endif
 

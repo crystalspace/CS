@@ -1,15 +1,20 @@
-%module imap
 
-%import "bindings/allinterfaces.i"
+#ifndef SWIGIMPORTED
+  %module imap
+  %include "bindings/allinterfaces.i"
+  #define APPLY_FOR_ALL_INTERFACES_PRE APPLY_FOR_ALL_INTERFACES
+  #define APPLY_FOR_ALL_INTERFACES_POST IMAP_APPLY_FOR_EACH_INTERFACE
 
-%include "bindings/basepre.i"
+  %include "bindings/basepre.i"
+#endif
 
-#undef APPLY_FOR_ALL_INTERFACES
-#define APPLY_FOR_ALL_INTERFACES IMAP_APPLY_FOR_EACH_INTERFACE
 
 %include "imap/loader.h"
 %include "imap/reader.h"
 %include "imap/saver.h"
 
-%include "bindings/basepost.i"
+
+#ifndef SWIGIMPORTED
+  %include "bindings/basepost.i"
+#endif
 

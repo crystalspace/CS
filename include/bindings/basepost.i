@@ -94,7 +94,7 @@
 
 #undef INTERFACE_APPLY
 #define INTERFACE_APPLY(x) INTERFACE_POST(x)
-APPLY_FOR_ALL_INTERFACES
+APPLY_FOR_ALL_INTERFACES_POST
 
 #if defined(SWIGPYTHON)
   %include "bindings/python/pythpost.i"

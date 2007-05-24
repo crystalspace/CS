@@ -1,13 +1,15 @@
-%module csgfx
 
-%import "bindings/allinterfaces.i"
+#ifndef SWIGIMPORTED
+  %module csgfx
+  %include "bindings/allinterfaces.i"
+  #define APPLY_FOR_ALL_INTERFACES_PRE APPLY_FOR_ALL_INTERFACES
+  #define APPLY_FOR_ALL_INTERFACES_POST
 
-%include "bindings/basepre.i"
+  %include "bindings/basepre.i"
+#endif
 
 %import "bindings/cspace.i" /* needed for iImage */
 
-#undef APPLY_FOR_ALL_INTERFACES
-#define APPLY_FOR_ALL_INTERFACES
 
 %rename(asRGBcolor) csRGBpixel::operator csRGBcolor;
 %include "csgfx/rgbpixel.h"
@@ -23,9 +25,12 @@ iArrayChangeElements<csShaderVariable * >;
 %template(csImageMemoryBase) scfImplementationExt0<csImageMemory, csImageBase>;
 %include "csgfx/imagememory.h"
 
-#ifdef SWIGPYTHON
+#if defined(SWIGPYTHON)
 %include "bindings/python/pyshadervar.i"
 #endif
 
-%include "bindings/basepost.i"
+
+#ifndef SWIGIMPORTED
+  %include "bindings/basepost.i"
+#endif
 

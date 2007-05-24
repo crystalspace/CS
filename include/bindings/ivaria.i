@@ -1,11 +1,13 @@
-%module ivaria
 
-%import "bindings/allinterfaces.i"
+#ifndef SWIGIMPORTED
+  %module ivaria
+  %include "bindings/allinterfaces.i"
+  #define APPLY_FOR_ALL_INTERFACES_PRE APPLY_FOR_ALL_INTERFACES
+  #define APPLY_FOR_ALL_INTERFACES_POST IVARIA_APPLY_FOR_EACH_INTERFACE
 
-%include "bindings/basepre.i"
+  %include "bindings/basepre.i"
+#endif
 
-#undef APPLY_FOR_ALL_INTERFACES
-#define APPLY_FOR_ALL_INTERFACES IVARIA_APPLY_FOR_EACH_INTERFACE
 
 %include "ivaria/decal.h"
 /*%ignore iReporter::ReportV;
@@ -54,7 +56,11 @@
 %include "ivaria/simpleformer.h"
 %include "ivaria/terraform.h"
 
-%include "bindings/basepost.i"
+
+#ifndef SWIGIMPORTED
+  %include "bindings/basepost.i"
+#endif
+
 
 // ivaria/collider.h
 %extend iCollideSystem

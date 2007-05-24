@@ -439,7 +439,7 @@ csArrayCapacityLinear<csArrayThresholdVariable >;
 
 #undef INTERFACE_APPLY
 #define INTERFACE_APPLY(x) INTERFACE_PRE(x)
-APPLY_FOR_ALL_INTERFACES
+APPLY_FOR_ALL_INTERFACES_PRE
 
 TYPEMAP_OUT_csWrapPtr
 
