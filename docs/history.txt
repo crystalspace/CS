@@ -8,6 +8,7 @@ chronological order.
 
 24-May-2007
 	- Jorrit fixed a bug in the socket docs.
+	- Jorrit created the 1.2 branch and marked that version as 1.2rc1.
 22-May-2007
 	- Genjix correct SCF Test example.
 21-May-2007
