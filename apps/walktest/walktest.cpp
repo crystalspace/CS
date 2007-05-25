@@ -405,13 +405,6 @@ void WalkTest::DrawFrameDebug ()
     extern void DrawPalette ();
     DrawPalette ();
   }
-  //if (selected_polygon || selected_light)
-    //view->GetEngine ()->DrawFunc (view->GetCamera (),
-      //view->GetClipper (), draw_edges, (void*)1);
-  if (cfg_debug_check_frustum)
-  {
-    // @@@
-  }
   if (do_show_debug_boxes)
   {
     extern void DrawDebugBoxes (iCamera* cam, bool do3d);

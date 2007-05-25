@@ -909,7 +909,7 @@ bool CommandHandler (const char *cmd, const char *arg)
 #   define CONPRI(m) Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, m);
     CONPRI("-*- Additional commands -*-");
     CONPRI("Visibility:");
-    CONPRI("  db_frustum farplane");
+    CONPRI("  farplane");
     CONPRI("Lights:");
     CONPRI("  addlight dellight dellights addstlight delstlight");
     CONPRI("  clrlights setlight relight");
@@ -922,22 +922,21 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  i_rotleftw i_rotrightc i_rotrightw i_rotleftx i_rotleftz");
     CONPRI("  i_rotrightx i_rotrightz do_gravity colldet freelook");
     CONPRI("Statistics:");
-    CONPRI("  stats perftest coordshow");
+    CONPRI("  perftest coordshow");
     CONPRI("Special effects:");
     CONPRI("  addmbot delmbot addbot delbot fire explosion frain decal_test");
     CONPRI("  rain snow fountain flame portal fs_inter fs_fadeout fs_fadecol");
     CONPRI("  fs_fadetxt fs_red fs_green fs_blue fs_whiteout fs_shadevert");
     CONPRI("Debugging:");
-    CONPRI("  hi zbuf debug0 debug1 debug2 palette bugplug");
+    CONPRI("  zbuf debug0 debug1 debug2 palette bugplug");
     CONPRI("  db_boxshow db_boxcam1 db_boxcam2 db_boxsize1 db_boxsize2");
-    CONPRI("  db_radstep db_radhi db_radtodo");
     CONPRI("Meshes:");
     CONPRI("  loadmesh addmesh delmesh listmeshes");
     CONPRI("  listactions setaction");
     CONPRI("Various:");
-    CONPRI("  coordsave coordload bind p_alpha s_fog");
+    CONPRI("  coordsave coordload bind s_fog");
     CONPRI("  snd_play snd_volume record play playonce clrrec saverec");
-    CONPRI("  loadrec action plugins conflist confset do_logo");
+    CONPRI("  loadrec plugins conflist confset do_logo");
     CONPRI("  varlist var setvar setvarv setvarc loadmap");
     CONPRI("  saveworld");
 
@@ -1211,24 +1210,6 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
       	"Expected index to plugin (from 'plugins' command)!");
   }
-  else if (!csStrCaseCmp (cmd, "action"))
-  {
-    csVector3 where = Sys->view->GetCamera ()->GetTransform ().This2Other (
-    	3.0f*CS_VEC_FORWARD);
-    csSectorHitBeamResult rc = Sys->view->GetCamera ()->GetSector ()
-    	->HitBeamPortals (
-	    Sys->view->GetCamera ()->GetTransform ().GetOrigin (), where);
-    int pidx = rc.polygon_idx;
-    iMeshWrapper* mesh = rc.mesh;
-
-    if (mesh && pidx != -1)
-    {
-      //Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-      	//"Action polygon '%s'", p->GetStaticData ()->GetName ());
-      csPrintf ("ACTION\n");
-      //Sys->ActivateObject ((csObject*)(ob->QueryObject ()));
-    }
-  }
   else if (!csStrCaseCmp (cmd, "saverec"))
   {
     if (arg)
@@ -1364,51 +1345,6 @@ bool CommandHandler (const char *cmd, const char *arg)
     csCommandProcessor::change_float (arg, &size, "box2 size", 0.01f, 1000);
     Sys->debug_box2.SetSize (csVector3 (size, size, size));
   }
-  else if (!csStrCaseCmp (cmd, "db_frustum"))
-    csCommandProcessor::change_int (arg, &Sys->cfg_debug_check_frustum, "debug check frustum", 0, 2000000000);
-  else if (!csStrCaseCmp (cmd, "db_radstep"))
-  {
-#if 0
-    csRadiosity* rad;
-    csEngine* engine = (csEngine*)(iEngine*)(Sys->Engine);
-    if ((rad = engine->GetRadiosity ()) != 0)
-    {
-      int steps;
-      if (arg)
-        sscanf (arg, "%d", &steps);
-      else
-        steps = 1;
-      if (steps < 1) steps = 1;
-      rad->DoRadiosityStep (steps);
-      engine->InvalidateLightmaps ();
-    }
-#endif
-  }
-  else if (!csStrCaseCmp (cmd, "db_radtodo"))
-  {
-#if 0
-    csRadiosity* rad;
-    csEngine* engine = (csEngine*)(iEngine*)(Sys->Engine);
-    if ((rad = engine->GetRadiosity ()) != 0)
-    {
-      rad->ToggleShowDeltaMaps ();
-      engine->InvalidateLightmaps ();
-    }
-#endif
-  }
-  else if (!csStrCaseCmp (cmd, "db_radhi"))
-  {
-#if 0
-    csRadiosity* rad;
-    csEngine* engine = (csEngine*)(iEngine*)(Sys->Engine);
-    if ((rad = engine->GetRadiosity ()) != 0)
-    {
-      csRef<iPolygon3D> p (
-      	scfQueryInterface<iPolygon3D> (rad->GetNextPolygon ()));
-      Sys->selected_polygon = p;
-    }
-#endif
-  }
   else if (!csStrCaseCmp (cmd, "palette"))
     csCommandProcessor::change_boolean (arg, &Sys->do_show_palette, "palette");
   else if (!csStrCaseCmp (cmd, "move3d"))
@@ -1432,35 +1368,6 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!csStrCaseCmp (cmd, "coordshow"))
   {
     csCommandProcessor::change_boolean (arg, &Sys->do_show_coord, "coordshow");
-  }
-  else if (!csStrCaseCmp (cmd, "hi"))
-  {
-#if 0
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-    csPolygon3D* hi = arg ? Sys->view->GetCamera ()->GetSector ()->GetPolygon3D (arg) : (csPolygon3D*)0;
-    if (hi) Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
-    	"Hilighting polygon: '%s'", arg);
-    else Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Disabled hilighting.");
-    Sys->selected_polygon = hi;
-#endif
-  }
-  else if (!csStrCaseCmp (cmd, "p_alpha"))
-  {
-#if 0
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-    csPolygon3D* hi = Sys->selected_polygon;
-    if (hi)
-    {
-      if (hi->GetPortal ())
-      {
-        int a = hi->GetAlpha ();
-        csCommandProcessor::change_int (arg, &a, "portal alpha", 0, 100);
-	hi->SetAlpha (a);
-      }
-      else Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Only for portals!");
-    }
-    else Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "No polygon selected!");
-#endif
   }
   else if (!csStrCaseCmp (cmd, "s_fog"))
   {

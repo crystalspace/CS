@@ -659,11 +659,6 @@ List available actions for this mesh.
 
 @item setaction meshname, action
 Starts named action.
-
-@item action [@key{a}]
-Activate the object that is right in front of you.  This command will use the
-WalkTest entity system.  Currently it only works for opening doors that use the
-@samp{cmd_door} key.
 @end table
 
 @node Walktest Lighting, Walktest Statistics, Walktest Meshes, Walktest Console Commands
@@ -765,24 +760,6 @@ Set or show size of @samp{db_box1}.
 @item db_boxsize2
 Set or show size of @samp{db_box2}.
 
-@item db_frustrum [@key{=} - reset, @key{]} increment, @key{[} decrement]
-Set or show @samp{cgf_debug_check_frustrum}.
-
-@item db_maxpol Value
-Set/get the maximum number of polygons that is drawn every frame.  Normally
-this is set to a very high number so that this maximum is never reached
-(2000000000 polygons every frame should suit everyone's need for the near
-future :-) You can reduce this number for debugging purposes.  In combination
-with @samp{fclear} and binding keys to @samp{db_maxpol ++1} and @samp{db_maxpol
---1} you can get the effect of drawing one polygon at a time.
-
-@item db_procpol Value
-Set/get the maximum number of polygons that is considered by the culling
-routines every frame.  Normally this is set to a very high number so that this
-maximum is never reached (2000000000 polygons every frame should suit
-everyone's need for the near future :-) You can reduce this number for
-debugging purposes.
-
 @item debug0, debug1, debug2
 These commands do not do anything, but serve as placeholders to put in your own
 debugging code.
@@ -796,14 +773,6 @@ disabled.  Otherwise, any value between 0 and 1 is legal.  Default is 1.
 Enable/disable drawing through portals.  If this is off, a portal will just
 draw as the default texture on the polygon
 
-@item sprlight Boolean [@key{s}]
-Change quality setting of sprite lighting.  If yes every vertex will be lit
-according to the correct distance with the light.  If no then the distances for
-all vertices are calculated to the center of the sprite.  Default is @samp{no}.
-
-@item hi Boolean
-This is intended to hilight the active polygon, but is currently disabled.
-
 @item zbuf Boolean
 For debugging.  When enabled this will show an alternate view where far away
 objects are rendered in another color.  In other words: it tests the Z buffer.
@@ -812,29 +781,8 @@ It works best in 16-bit mode.
 @item palette Boolean
 This only has effect when a palette is used, not in a True Colour display.
 
-@item db_radstep [@key{Shift-R}]
-@itemx db_radhi [@key{Alt-R}]
-@itemx db_radtodo [@key{Control-R}]
-The Radiosity system is disabled and will probably remain that way until the
-new renderer is fully available.
-
-@item db_frustum Boolean
-Set or show debug check frustum value.
-
 @item farplane Value
 Set far plane distance, or 0 to disable Y.
-
-@item emode front2back|back2front|zbuffer [@key{d}, @key{Shift-D}, @key{Alt-D}]
-Sets the Engine render mode to one of the given values.
-
-@item p_alpha Value
-Change the alpha transparency for a selected portal.  You can select a portal
-by clicking on it (only if it already has alpha transparency) or else by using
-the @samp{hi} command.  Legal values for p_alpha are between 0 and 100.  This
-command is currently disabled.
-
-@item action
-Hit a polygon, list name.
 
 @item plugins
 List loaded plugins.
@@ -867,31 +815,13 @@ Here is the current contents of the file, annotated:
 bind tab console toggle
 bind space fire
 bind ctrl-l lightning
-bind shift-a p_alpha ++1
-bind alt-a p_alpha --1
-    The p_alpha command is disabled.
-bind a action
 bind b turn
 bind shift-c coordsave
 bind c coordload
 bind ctrl-c coordshow toggle
-bind d emode front2back
-bind shift-d emode back2front
-bind alt-d emode zbuffer
-bind shift-e frustum toggle
-    This command does not exist.
 bind shift-l addlight 1,1,1,1000,1
 bind p perftest
 bind q quit
-bind shift-r db_radstep
-bind alt-r db_radhi
-bind ctrl-r db_radtodo
-    Radiosity is disabled.
-bind ctrl-t things toggle
-    The @code{things} commands has been removed.
-bind z cosfact ++.1
-bind shift-z cosfact --.1
-    These commands do not exist.
 bind shift-1 dellight
 bind 1 addlight
 bind alt-1 dellights
@@ -904,13 +834,6 @@ bind f4 fs_inter .01,100
 bind f5 fs_fadeout
 bind f6 fs_fadetxt spark
 bind \ freelook toggle
-bind ) db_octree 0
-bind _ db_octree --1
-bind + db_octree ++1
-    These commands do not exist.
-bind = db_frustum 0
-bind [ db_frustum --1
-bind ] db_frustum ++1
 bind status-alt-left strafe_left
 bind status-alt-right strafe_right
 bind status-left rotate_left
@@ -959,19 +882,10 @@ bind status-0 jump
 bind 3 move3d toggle
 bind shift-8 colldet toggle
 bind 8 do_gravity toggle
-bind s sprlight toggle
-bind f9 addsprite bot,1
-    This command does not exist.
-bind f10 delsprite bot
-    This command does not exist.
 bind alt-enter fullscreen
     This sends an Extension command to the current renderer,
     so probably has no effect unless you are using the X11
     plugin.
-bind ; trilinear on
-bind ' trilinear off
-    It looks as though the @code{trilinear} command has been
-    removed from the code.
 bind shift-s split_view
 bind shift-u unsplit_view
 bind shift-t toggle_view
