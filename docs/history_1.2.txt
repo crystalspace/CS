@@ -1,0 +1,5 @@
+1.2 branch log.
+
+25-May-2007
+	- Jorrit merged r26967 into 1.2 (small walktest cleanup).
+
