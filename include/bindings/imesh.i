@@ -69,14 +69,9 @@ iArrayChangeElements<csSprite2DVertex>;
   { return &(self->GetColors()[index]); }
 }
 
-#if defined(SWIGPYTHON)
-%pythoncode %{
-  CS_POLYRANGE_LAST = csPolygonRange (-1, -1)
-%}
-#endif
-
 
 #ifndef SWIGIMPORTED
-  %import "bindings/basepost.i"
+  %include "bindings/basepost.i"
+  %cs_lang_include(imeshpost.i)
 #endif
 

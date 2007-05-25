@@ -110,3 +110,19 @@ APPLY_FOR_ALL_INTERFACES_POST
   %include "bindings/lua/luapost.i"
 #endif
 
+%define %cs_lang_include(file)
+  #if defined(SWIGPYTHON)
+    %include bindings/python/ ## file
+  #elif defined(SWIGPERL5)
+    %include bindings/perl/ ## file
+  #elif defined(SWIGRUBY)
+    %include bindings/ruby/ ## file
+  #elif defined(SWIGTCL8)
+    %include bindings/tcl/ ## file
+  #elif defined(SWIGJAVA)
+    %include bindings/java/ ## file
+  #elif defined(SWIGLUA)
+    %include bindings/lua/ ## file
+  #endif
+%enddef
+
