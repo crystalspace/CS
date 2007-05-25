@@ -49,8 +49,6 @@ extern WalkTest* Sys;
 
 csKeyMap* mapping = 0;
 
-iMeshWrapper *FindNextClosestMesh (iMeshWrapper *baseMesh, iCamera *camera, csVector2 *screenCoord);
-
 //===========================================================================
 // Everything for key mapping and binding.
 //===========================================================================
@@ -613,11 +611,12 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
 void WalkTest::MouseClick3Handler(iEvent &Event)
 {
   csVector2   screenPoint;
-  iMeshWrapper *closestMesh;
 
   screenPoint.x = csMouseEventHelper::GetX(&Event);
   screenPoint.y = csMouseEventHelper::GetY(&Event);
-  closestMesh = FindNextClosestMesh (0, view->GetCamera(), &screenPoint);
+  csScreenTargetResult st = csEngineTools::FindScreenTarget (
+      screenPoint, 100.0f, view->GetCamera ());
+  closestMesh = st.mesh;
   if (closestMesh)
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
     	"Selected mesh %s", closestMesh->
@@ -713,51 +712,3 @@ bool WalkTest::WalkHandleEvent (iEvent &Event)
   return false;
 }
 
-iMeshWrapper *FindNextClosestMesh (iMeshWrapper *baseMesh,
-	iCamera *camera, csVector2 *screenCoord)
-{
-  int meshIndex;
-  float thisZLocation;
-  float closestZLocation;
-  iMeshWrapper *closestMesh;
-  iMeshWrapper *nextMesh;
-
-  if (baseMesh)
-  {
-    closestMesh = baseMesh;
-    csScreenBoxResult box = baseMesh->GetScreenBoundingBox
-    	(camera);
-    closestZLocation = box.distance; 
-    // if the baseMesh isn't in front of the camera, return
-    if (closestZLocation < 0)
-      return 0;
-  }
-  else
-  {
-    closestMesh = 0;
-    closestZLocation = 32000;
-  }
-
-  // @@@ This routine ignores 2D meshes for the moment.
-  iMeshList* meshes = Sys->Engine->GetMeshes ();
-  for (meshIndex = 0; meshIndex < meshes->GetCount (); meshIndex++)
-  {
-    nextMesh = meshes->Get (meshIndex);
-
-    if (nextMesh != baseMesh)
-    {
-      csScreenBoxResult nextBox = nextMesh->GetScreenBoundingBox(camera);
-      thisZLocation = nextBox.distance;
-      if ((thisZLocation > 0) && (thisZLocation < closestZLocation))
-      {
-        if (nextBox.sbox.In(screenCoord->x, screenCoord->y))
-        {
-          closestZLocation = thisZLocation;
-          closestMesh = nextMesh;
-        }
-      }
-    }
-  }
-
-  return closestMesh;
-}

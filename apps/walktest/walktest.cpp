@@ -69,6 +69,8 @@ WalkTest::WalkTest () :
 
   do_edges = false;
   do_show_coord = false;
+  do_object_move = false;
+  object_move_speed = 1.0f;
   busy_perf_test = false;
   do_show_z = false;
   do_show_palette = false;
@@ -447,6 +449,19 @@ void WalkTest::DrawFrameConsole ()
     int fw, fh;
     Font->GetMaxSize (fw, fh);
 
+    if (do_object_move || closestMesh)
+    {
+      csString buffer;
+      if (closestMesh)
+        buffer.Format ("[%s%s]", do_object_move ? "O:" : "",
+	    closestMesh->QueryObject ()->GetName ());
+      else
+        buffer.Format ("[%s]", do_object_move ? "O:" : "");
+      GfxWrite ( FRAME_WIDTH / 3, FRAME_HEIGHT - fh - 3, 0, -1, 
+                 "%s", buffer.GetData ());
+      GfxWrite ( FRAME_WIDTH / 3, FRAME_HEIGHT - fh - 3, fgcolor_stats, -1, 
+                 "%s", buffer.GetData ());
+    }
     if (do_show_coord)
     {
       csString buffer;
@@ -742,13 +757,19 @@ void WalkTest::PrepareFrame (csTicks elapsed_time, csTicks /*current_time*/)
 
   int shift, ctrl;
   float speed = 1;
+  object_move_speed = .01;
 
   ctrl = kbd->GetKeyState (CSKEY_CTRL);
   shift = kbd->GetKeyState (CSKEY_SHIFT);
   if (ctrl)
+  {
     speed = .5;
+  }
   if (shift)
+  {
     speed = 2;
+    object_move_speed = 1.0;
+  }
 
   float delta = float (elapsed_time) / 1000.0f;
   collider_actor.Move (delta, speed, velocity, angle_velocity);

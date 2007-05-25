@@ -886,9 +886,19 @@ bind alt-enter fullscreen
     This sends an Extension command to the current renderer,
     so probably has no effect unless you are using the X11
     plugin.
-bind shift-s split_view
-bind shift-u unsplit_view
-bind shift-t toggle_view
+bind o objectmove toggle
+bind w objectmovez 1
+bind s objectmovez -1
+bind a objectmovex 1
+bind d objectmovex -1
+bind shift-w objectmovez .01
+bind shift-s objectmovez -.01
+bind shift-a objectmovex .01
+bind shift-d objectmovex -.01
+    Related to moving objects around.
+bind v split_view
+bind shift-v unsplit_view
+bind alt-v toggle_view
     View splitting and unsplitting
 @end example
 

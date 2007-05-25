@@ -9,6 +9,11 @@ chronological order.
 25-May-2007
 	- Jorrit cleaned up several old unused (and/or broken) walktest
 	  commands. Also removed them from the key bindings.
+	- Jorrit fixed mesh selection in walktest.
+	- Jorrit added support for mesh movement. This helps to reposition
+	  objects on a terrain (for example).
+	- Jorrit changed the hotkeys for split-view and related (now
+	  equal to 'v', 'shift-'v, and 'alt-v').
 24-May-2007
 	- Jorrit fixed a bug in the socket docs.
 	- Jorrit created 1.2 branch and bumped version of trunk from 1.1
