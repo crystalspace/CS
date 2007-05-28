@@ -51,20 +51,20 @@ CS_MASTER_HEADER_REJECTS +=
   [ ConcatDirs iengine collectn.h     ]
   ;
   
-# List of headers that should not appear in the master-headers becasue they 
-# are platform specific
+# List of headers that should not appear in the master-headers because they 
+# are platform-specific.
 CS_MASTER_HEADER_REJECTS +=
-  [ ConcatDirs csutil  threading atomicops_gcc_ppc.h ]
-  [ ConcatDirs csutil  threading atomicops_gcc_x86.h ]
-  [ ConcatDirs csutil  threading atomicops_msvc.h    ]
-  [ ConcatDirs csutil  threading atomicops_sparc.h   ]
-  [ ConcatDirs csutil  threading pthread_condition.h ]
-  [ ConcatDirs csutil  threading pthread_mutex.h     ]
-  [ ConcatDirs csutil  threading pthread_thread.h    ]
-  [ ConcatDirs csutil  threading win32_apifuncs.h    ]
-  [ ConcatDirs csutil  threading win32_condition.h   ]
-  [ ConcatDirs csutil  threading win32_mutex.h       ]
-  [ ConcatDirs csutil  threading win32_thread.h      ]  
+  [ ConcatDirs csutil threading atomicops_gcc_ppc.h ]
+  [ ConcatDirs csutil threading atomicops_gcc_x86.h ]
+  [ ConcatDirs csutil threading atomicops_msvc.h    ]
+  [ ConcatDirs csutil threading atomicops_sparc.h   ]
+  [ ConcatDirs csutil threading pthread_condition.h ]
+  [ ConcatDirs csutil threading pthread_mutex.h     ]
+  [ ConcatDirs csutil threading pthread_thread.h    ]
+  [ ConcatDirs csutil threading win32_apifuncs.h    ]
+  [ ConcatDirs csutil threading win32_condition.h   ]
+  [ ConcatDirs csutil threading win32_mutex.h       ]
+  [ ConcatDirs csutil threading win32_thread.h      ]  
   ;
 
 {
