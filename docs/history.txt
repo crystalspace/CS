@@ -8,6 +8,7 @@ chronological order.
 
 28-May-2007
 	- res wrote the lighter2 "Developer's Manual".
+	- Marten fixed master include headers w.r.t. csutil/threading.
 25-May-2007
 	- Jorrit cleaned up several old unused (and/or broken) walktest
 	  commands. Also removed them from the key bindings.
