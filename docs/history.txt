@@ -12,6 +12,14 @@ chronological order.
 	  privately.
 	- res fixed a lighter2 issue where objects with the same factory 
 	  shared the same lightmap space.
+	- res fixed an issue in csStringBase::Append(): if "" was attempted to
+	  be appended to a 0 string, the string would be left as 0, and not
+	  "" as it should (since "" and 0 are two different things). Since
+	  Append() is used by csString copy constructors this meant that
+	  copy-constructing from an empty string actually resulted in a 0
+	  string. E.g. in one particular case this was problematic with a 
+	  csString set ("" was added, but became the 0 string - hence 
+	  subsequent tests whether the set contains the string failed).
 28-May-2007
 	- res wrote the lighter2 "Developer's Manual".
 	- Marten fixed master include headers w.r.t. csutil/threading.
