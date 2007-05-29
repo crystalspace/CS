@@ -2581,6 +2581,12 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
         break;
       case XMLTOKEN_IMPOSTER:
         {
+#if 1
+          SyntaxService->ReportError (
+	      "crystalspace.maploader.parse.meshfactory",
+	      node, "Imposters are not yet supported!");
+            return false;
+#else
           csRef<iImposter> imposter = scfQueryInterface<iImposter> (stemp);
           if (!imposter)
           {
@@ -2591,6 +2597,7 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
           }
           if (!ParseImposterSettings (imposter, child))
             return false;
+#endif
         }
         break;
       default:

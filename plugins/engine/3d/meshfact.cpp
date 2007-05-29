@@ -227,6 +227,11 @@ void csMeshFactoryWrapper::AddFactoryToStaticLOD (int lod,
 
 void csMeshFactoryWrapper::SetImposterActive (bool flag)
 {
+#if 1
+  // Imposters disabled in 1.2.
+  CS_ASSERT (false);
+  return;
+#else
   imposter_active = flag;
   if (imposter_active)
   {
@@ -237,6 +242,7 @@ void csMeshFactoryWrapper::SetImposterActive (bool flag)
   {
     delete imposter_factory;
   }
+#endif
 }
 
 
