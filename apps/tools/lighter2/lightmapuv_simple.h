@@ -105,13 +105,15 @@ namespace lighter
      * queued and laid out in PrepareLighting.
      */
     void QueuePDPrimitives (SimpleUVObjectLayouter* layouter, 
-      PrimitiveArray &prims, size_t groupNum, Sector* sector, 
-      const csBitArray& pdBits, const csArray<csVector2>& uvsizes);
+      PrimitiveArray &prims,  size_t layoutID, size_t groupNum, 
+      Sector* sector, const csBitArray& pdBits, 
+      const csArray<csVector2>& uvsizes);
 
     /// One set of primitives that needs to be laid out onto one allocator.
     struct QueuedPDPrimitives
     {
       SimpleUVObjectLayouter* layouter;
+      size_t layoutID;
       size_t groupNum;
       PrimitiveArray* prims;
       csArray<csVector2> uvsizes;
@@ -281,10 +283,10 @@ namespace lighter
     SimpleUVObjectLayouter (SimpleUVFactoryLayouter* parent) : parent (parent)
     {}
 
-    virtual bool LayoutUVOnPrimitives (PrimitiveArray &prims, 
+    virtual size_t LayoutUVOnPrimitives (PrimitiveArray &prims, 
       size_t groupNum, Sector* sector, const csBitArray& pdBits);
 
-    virtual void FinalLightmapLayout (PrimitiveArray &prims, 
+    virtual void FinalLightmapLayout (PrimitiveArray &prims, size_t layoutID,
       size_t groupNum, ObjectVertexData& vertexData, uint& lmID);
   protected:
     friend class SimpleUVFactoryLayouter;
@@ -308,7 +310,7 @@ namespace lighter
       csArray<csVector2>& uvsizes, csArray<csVector2>& minuvs);
 
     void LayoutQueuedPrims (PrimitiveArray &prims, size_t groupNum, 
-      size_t lightmap, const csArray<csVector2>& positions, 
+      size_t layoutID, size_t lightmap, const csArray<csVector2>& positions, 
       int dx, int dy);
   };
 

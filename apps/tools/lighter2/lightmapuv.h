@@ -65,10 +65,10 @@ namespace lighter
      * \param lmID Output global lightmap ID onto which all primitives were
      *   layouted.
      */
-    virtual bool LayoutUVOnPrimitives (PrimitiveArray &prims, 
+    virtual size_t LayoutUVOnPrimitives (PrimitiveArray &prims, 
       size_t groupNum, Sector* sector, const csBitArray& pdBits) = 0;
 
-    virtual void FinalLightmapLayout (PrimitiveArray &prims, 
+    virtual void FinalLightmapLayout (PrimitiveArray &prims, size_t layoutID,
       size_t groupNum, ObjectVertexData& vertexData, uint& lmID) = 0;
   };
 
