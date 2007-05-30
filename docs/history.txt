@@ -20,6 +20,8 @@ chronological order.
 	  string. E.g. in one particular case this was problematic with a 
 	  csString set ("" was added, but became the 0 string - hence 
 	  subsequent tests whether the set contains the string failed).
+	- res removed some AWS/AWS2-specific files left over from the move to
+	  CSEXTRA.
 28-May-2007
 	- res wrote the lighter2 "Developer's Manual".
 	- Marten fixed master include headers w.r.t. csutil/threading.
