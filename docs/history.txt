@@ -6,6 +6,17 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-May-2007
+	- res committed a patch by 'whirm' to replace the use of pushd/popd
+	  when building CS with cd/cd -: pushd/popd is a bashism while cd/cd -
+	  works on a wider range of shells.
+25-Apr-2007
+	- res fixed Jam "using independent target <sometarget>.dbg" messages.
+	- res made the application symlink installation respect DESTDIR.
+21-Apr-2007
+	- res changed the installation of applications to install apps with a
+	  suffix of the version number and to create a symlink for the
+	  undecorated name.
 12-Feb-2007
 	- res slightly expanded the manual section on smart pointers with
 	  information on translation to and from normal pointers as well as
@@ -32,6 +43,8 @@ chronological order.
 1-Feb-2007
 	- Marten made sure genmesh doesn't return any rendermeshes when
 	  there is no triangles. Fix bug #224.
+27-Jan-2007
+	- res fixed separate debug info to be properly installed.
 24-Jan-2007
 	- res fixed configure to also emit the directory variable 
 	  'datarootdir', as required by autoconf 2.60+. Should address #239.
