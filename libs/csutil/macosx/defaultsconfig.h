@@ -29,7 +29,7 @@
 /**
  * An iConfigFile which stores settings via Cocoa's NSUserDefaults facility.
  */
-class csDefaultsConfig : public iConfigFile
+class csDefaultsConfig : public scfImplementation1<csDefaultsConfig, iConfigFile>
 {
 private:
   friend class csDefaultsIterator;
@@ -42,8 +42,6 @@ private:
   bool Writable(NSString* Key) const;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csDefaultsConfig ();
   virtual ~csDefaultsConfig();
 
@@ -86,7 +84,8 @@ public:
 /**
  * Iterates over a Defaults key subkeys and values.
  */
-class csDefaultsIterator : public iConfigIterator
+class csDefaultsIterator : public scfImplementation1<csDefaultsIterator,
+                                                     iConfigIterator>
 {
   csRef<csDefaultsConfig> owner;
   NSString* name;
@@ -98,8 +97,6 @@ class csDefaultsIterator : public iConfigIterator
   NSString* currentkey;
   NSString* nextkey;
 public:
-  SCF_DECLARE_IBASE;
-
   csDefaultsIterator (csDefaultsConfig* Owner, const char* Subsection);
   virtual ~csDefaultsIterator();
 

@@ -45,14 +45,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(SndSysCOREAUDIO)
 
 SCF_IMPLEMENT_FACTORY (csSndSysDriverCoreAudio)
 
-SCF_IMPLEMENT_IBASE(csSndSysDriverCoreAudio)
-SCF_IMPLEMENTS_INTERFACE(iSndSysSoftwareDriver)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END;
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSndSysDriverCoreAudio::eiComponent)
-SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 // CoreAudio static IO procedure wrapper
 static OSStatus StaticAudioProc(AudioDeviceID inDevice,
@@ -71,17 +63,14 @@ static OSStatus StaticAudioProc(AudioDeviceID inDevice,
 }
 
 csSndSysDriverCoreAudio::csSndSysDriverCoreAudio(iBase* piBase) :
-  object_reg(0), attached_renderer(0), running(false)
+  scfImplementationType (this, piBase), object_reg(0), attached_renderer(0),
+  running(false)
 {
-  SCF_CONSTRUCT_IBASE(piBase);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   convert_buffer = 0;
 }
 
 csSndSysDriverCoreAudio::~csSndSysDriverCoreAudio()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE();
   cs_free(convert_buffer);
 }
 

@@ -22,10 +22,6 @@
 #include <sys/time.h>
 
 
-SCF_IMPLEMENT_IBASE(OSXDriver2D::EventHandler)
-  SCF_IMPLEMENTS_INTERFACE(iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
 
 // Constructor
 // Initialize graphics driver

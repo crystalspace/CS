@@ -54,11 +54,11 @@ public:
 };
 
 
-class SndSysDriverJackasyn : public iSndSysSoftwareDriver
+class SndSysDriverJackasyn : public scfImplementation2<SndSysDriverJackasyn,
+                                                       iSndSysSoftwareDriver,
+                                                       iComponent>
 {
 public:
-  SCF_DECLARE_IBASE;
-
   SndSysDriverJackasyn(iBase *piBase);
   virtual ~SndSysDriverJackasyn();
 
@@ -113,15 +113,6 @@ public:
 
   // iComponent
   virtual bool Initialize (iObjectRegistry *obj_reg);
-
-
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(SndSysDriverJackasyn);
-    virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
-  } scfiComponent;
-
 };
 
 }

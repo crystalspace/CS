@@ -53,22 +53,19 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-OSXAssistant::OSXAssistant(iObjectRegistry* r) : registry(r),
-  event_queue(0), event_outlet(0), virtual_clock(0), should_shutdown(false)
+OSXAssistant::OSXAssistant(iObjectRegistry* r) 
+  : scfImplementationType (this), registry(r),event_queue(0), event_outlet(0), 
+  virtual_clock(0), should_shutdown(false)
 {
-  SCF_CONSTRUCT_IBASE(0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventPlug);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
-
   controller = OSXDelegate_startup(this);
 
   run_always = false;
-  scfiEventHandler.Quit = csevQuit(registry);
+  quitEventID = csevQuit(registry);
   csRef<iEventQueue> q = get_event_queue();
   if (q.IsValid())
   {
-    event_outlet = q->CreateEventOutlet(&scfiEventPlug);
-    q->RegisterListener(&scfiEventHandler, csevQuit(registry));
+    event_outlet = q->CreateEventOutlet(this);
+    q->RegisterListener(this, csevQuit(registry));
   }
 }
 
@@ -81,11 +78,7 @@ OSXAssistant::~OSXAssistant()
   OSXDelegate_shutdown(controller);
 
   if (event_queue.IsValid())
-    event_queue->RemoveListener(&scfiEventHandler);
-
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiEventHandler);
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiEventPlug);
-  SCF_DESTRUCT_IBASE();
+    event_queue->RemoveListener(this);
 }
 
 
@@ -302,10 +295,10 @@ uint OSXAssistant::eiEventPlug::QueryEventPriority(uint)
 //=============================================================================
 // iEventHandler Implementation
 //=============================================================================
-bool OSXAssistant::eiEventHandler::HandleEvent(iEvent& e)
+bool OSXAssistant::HandleEvent(iEvent& e)
 {
   if (e.Name == Quit)
-    scfParent->should_shutdown = true;
+    should_shutdown = true;
   return false;
 }
 

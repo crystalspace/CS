@@ -9,7 +9,10 @@ chronological order.
 30-May-2007
 	- Marten made some cleanups to scfImplementation(Ext)N to reduce the 
 	  source size and hopefully speed up compilation a tiny bit.
-	- Marten added some basic reflection support to SCF.
+	- Marten added some basic reflection support to SCF.	
+	- Marten updated version of iBase which was previously forgotten.
+	- Marten removed the last usage of SCF_DECLARE_IBASE and 
+	  SCF_IMPLEMENT_IBASE and companions.
 29-May-2007
 	- Eric Sunshine fixed 'MyRunner' example in threading documentation in
 	  user manual so that it inherits from 'iRunnable' publicly rather than

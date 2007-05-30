@@ -140,7 +140,7 @@ protected:
    */
   virtual ~iBase() {}
 public:
-  SCF_INTERFACE(iBase, 1, 0, 0);
+  SCF_INTERFACE(iBase, 1, 1, 0);
   /// Increment the number of references to this object.
   virtual void IncRef () = 0;
   /// Decrement the reference count.
@@ -172,9 +172,9 @@ typedef iBase* (*scfFactoryFunc)(iBase*);
  * should not use scfXXX functions directly; instead they should obtain a
  * pointer to an iSCF object and work through that pointer.
  */
-struct iSCF : public iBase
+struct iSCF : public virtual iBase
 {
-  SCF_INTERFACE(iSCF, 2, 0,0);
+  SCF_INTERFACE(iSCF, 3,0,0);
   /**
    * This is the global instance of iSCF.  On most platforms, this variable is
    * module-global; for instance, the application has an iSCF::SCF variable,

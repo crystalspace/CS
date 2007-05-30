@@ -54,25 +54,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(SndSysJACKASYN)
 SCF_IMPLEMENT_FACTORY (SndSysDriverJackasyn)
 
 
-SCF_IMPLEMENT_IBASE(SndSysDriverJackasyn)
-SCF_IMPLEMENTS_INTERFACE(iSndSysSoftwareDriver)
-SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END;
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (SndSysDriverJackasyn::eiComponent)
-SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 // The system driver.
 iObjectRegistry *SndSysDriverJackasyn::object_reg=0;
 
 SndSysDriverJackasyn::SndSysDriverJackasyn(iBase* piBase) :
+  scfImplementationType (this, piBase),
  oss_buffer(0), output_fd(-1), running(false)
 {
-  SCF_CONSTRUCT_IBASE(piBase);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-
-//  scfiEventHandler = 0;
   object_reg = 0;
 }
 
@@ -84,9 +72,6 @@ SndSysDriverJackasyn::~SndSysDriverJackasyn()
   output_fd=-1;
 
   delete[] oss_buffer;
-
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 void SndSysDriverJackasyn::Report(int severity, const char* msg, ...)
