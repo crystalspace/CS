@@ -178,7 +178,7 @@ protected:
   }
 #else /* SCF_IMPL_EXT */
   SCF_IMPL_NAME(Class *object)
-    : SCF_IMPL_SUPER(), scfObject(object) 
+    : SCF_IMPL_SUPER(), scfObject(object)
   { 
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
     AddReftrackerAliases(); 
@@ -186,7 +186,7 @@ protected:
 
   template<class T1>
   SCF_IMPL_NAME(Class *object, T1 t1)
-    : SCF_IMPL_SUPER(t1), scfObject(object) 
+    : SCF_IMPL_SUPER(t1), scfObject(object)
   { 
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
     AddReftrackerAliases(); 
@@ -194,7 +194,7 @@ protected:
 
   template<class T1, class T2>
   SCF_IMPL_NAME(Class *object, T1 t1, T2 t2)
-    : SCF_IMPL_SUPER(t1, t2), scfObject(object) 
+    : SCF_IMPL_SUPER(t1, t2), scfObject(object)
   { 
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
     AddReftrackerAliases(); 
@@ -202,7 +202,7 @@ protected:
 
   template<class T1, class T2, class T3>
   SCF_IMPL_NAME(Class *object, T1 t1, T2 t2, T3 t3)
-    : SCF_IMPL_SUPER(t1, t2, t3), scfObject(object) 
+    : SCF_IMPL_SUPER(t1, t2, t3), scfObject(object)
   { 
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
     AddReftrackerAliases(); 
@@ -210,7 +210,7 @@ protected:
 
   template<class T1, class T2, class T3, class T4>
   SCF_IMPL_NAME(Class *object, T1 t1, T2 t2, T3 t3, T4 t4)
-    : SCF_IMPL_SUPER(t1, t2, t3, t4), scfObject(object) 
+    : SCF_IMPL_SUPER(t1, t2, t3, t4), scfObject(object)
   {
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
     AddReftrackerAliases(); 
@@ -218,7 +218,7 @@ protected:
 
   template<class T1, class T2, class T3, class T4, class T5>
   SCF_IMPL_NAME(Class *object, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5)
-    : SCF_IMPL_SUPER(t1, t2, t3, t4, t5), scfObject(object) 
+    : SCF_IMPL_SUPER(t1, t2, t3, t4, t5), scfObject(object)
   {
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
     AddReftrackerAliases(); 
@@ -226,7 +226,7 @@ protected:
 
   template<class T1, class T2, class T3, class T4, class T5, class T6>
   SCF_IMPL_NAME(Class *object, T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6)
-    : SCF_IMPL_SUPER(t1, t2, t3, t4, t5, t6), scfObject(object) 
+    : SCF_IMPL_SUPER(t1, t2, t3, t4, t5, t6), scfObject(object)
   {
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
     AddReftrackerAliases(); 
@@ -243,43 +243,51 @@ protected:
   typedef SCF_IMPL_NAME<Class SCF_IMPL_ARGS> scfImplementationType;
   typedef Class scfClassType; 
 
+
+  // Metadata handling
+  virtual size_t GetInterfaceMetadataCount () const
+  {
+    return SCF_IMPL_N + SCF_IMPL_SUPER::GetInterfaceMetadataCount ();
+  }
+
+  virtual void FillInterfaceMetadata (size_t n)
+  {
+#if SCF_IMPL_N >= 1
+    FillInterfaceMetadataIf<I1> (metadataList->metadata, n++);
+#endif
+#if SCF_IMPL_N >= 2
+    FillInterfaceMetadataIf<I2> (metadataList->metadata, n++);
+#endif
+#if SCF_IMPL_N >= 3
+    FillInterfaceMetadataIf<I3> (metadataList->metadata, n++);
+#endif
+#if SCF_IMPL_N >= 4
+    FillInterfaceMetadataIf<I4> (metadataList->metadata, n++);
+#endif
+#if SCF_IMPL_N >= 5
+    FillInterfaceMetadataIf<I5> (metadataList->metadata, n++);
+#endif
+#if SCF_IMPL_N >= 6
+    FillInterfaceMetadataIf<I6> (metadataList->metadata, n++);
+#endif
+#if SCF_IMPL_N >= 7
+    FillInterfaceMetadataIf<I7> (metadataList->metadata, n++);
+#endif
+#if SCF_IMPL_N >= 8
+    FillInterfaceMetadataIf<I8> (metadataList->metadata, n++);
+#endif
+#if SCF_IMPL_N >= 9
+    FillInterfaceMetadataIf<I9> (metadataList->metadata, n++);
+#endif
+#if SCF_IMPL_N >= 10
+    FillInterfaceMetadataIf<I10> (metadataList->metadata, n++);
+#endif
+
+    SCF_IMPL_SUPER::FillInterfaceMetadata (n);
+  }
+
 private:
-  template<typename I>
-  CS_FORCEINLINE_TEMPLATEMETHOD static void* GetInterface (
-    Class* scfObject, scfInterfaceID id, scfInterfaceVersion version)
-  {
-    if (id == scfInterfaceTraits<I>::GetID() &&
-      scfCompatibleVersion(version, scfInterfaceTraits<I>::GetVersion()))
-    {
-      scfObject->IncRef();
-      return static_cast<
-        typename scfInterfaceTraits<I>::InterfaceType*> (scfObject);
-    }
-    else
-    {
-      return 0;
-    }
-  }
-
-  template<typename I>
-  CS_FORCEINLINE_TEMPLATEMETHOD static void AddReftrackerAlias (
-    Class* scfObject)
-  {
-    csRefTrackerAccess::AddAlias(
-      static_cast<
-        typename scfInterfaceTraits<I>::InterfaceType*> (scfObject),
-      scfObject);
-  }
-
-  template<typename I>
-  CS_FORCEINLINE_TEMPLATEMETHOD static void RemoveReftrackerAlias (
-    Class* scfObject)
-  {
-    csRefTrackerAccess::RemoveAlias(
-      static_cast<
-        typename scfInterfaceTraits<I>::InterfaceType*> (scfObject),
-      scfObject);
-  }
+  
  
   void AddReftrackerAliases ()
   {
@@ -354,6 +362,8 @@ private:
     RemoveReftrackerAlias<I10>(this->scfObject);
 #endif
   }
+
+  
 };
 
 #undef SCF_IMPL_NAME

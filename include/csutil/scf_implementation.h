@@ -137,7 +137,7 @@ public:
    */
   scfImplementation (Class *object, iBase *parent = 0) :
       scfObject (object), scfRefCount (1), scfParent (parent), 
-        scfWeakRefOwners (0)
+        scfWeakRefOwners (0), metadataList (0)
   {
     csRefTrackerAccess::TrackConstruction (object);
     if (scfParent) scfParent->IncRef ();
@@ -164,6 +164,7 @@ public:
   {
     csRefTrackerAccess::TrackDestruction (scfObject, scfRefCount);
     scfRemoveRefOwners ();
+    CleanupMetadata ();
   }
 
   /**
@@ -222,6 +223,18 @@ public:
       scfWeakRefOwners->DeleteIndex (index);
   }
 
+  virtual scfInterfaceMetadataList* GetInterfaceMetadata ()
+  {
+    if (!metadataList)
+    {
+      // Need to set it up, do so
+      AllocMetadata (GetInterfaceMetadataCount ());
+      FillInterfaceMetadata (0);
+    }
+
+    return metadataList;
+  }
+
 protected:
   Class *scfObject;
 
@@ -232,6 +245,8 @@ protected:
     CS::Memory::AllocatorMalloc,
     csArrayCapacityLinear<csArrayThresholdFixed<4> > > WeakRefOwnerArray;
   WeakRefOwnerArray* scfWeakRefOwners;
+
+  scfInterfaceMetadataList* metadataList;
 
   void scfRemoveRefOwners ()
   {
@@ -250,7 +265,7 @@ protected:
   void *QueryInterface (scfInterfaceID iInterfaceID,
                         scfInterfaceVersion iVersion)
   {
-    // Default, just check iBase.. all objects have iBase
+    // Default, just check iBase.. all objects have iBase    
     if (iInterfaceID == scfInterfaceTraits<iBase>::GetID () &&
       scfCompatibleVersion (iVersion, scfInterfaceTraits<iBase>::GetVersion ()))
     {
@@ -264,6 +279,91 @@ protected:
 
     return 0;
   }
+
+  template<typename I, typename OriginalClass>
+  CS_FORCEINLINE_TEMPLATEMETHOD static void* GetInterface (
+    OriginalClass* scfObject, scfInterfaceID id, scfInterfaceVersion version)
+  {
+    if (id == scfInterfaceTraits<I>::GetID() &&
+      scfCompatibleVersion(version, scfInterfaceTraits<I>::GetVersion()))
+    {
+      scfObject->IncRef();
+      return static_cast<
+        typename scfInterfaceTraits<I>::InterfaceType*> (scfObject);
+    }
+    else
+    {
+      return 0;
+    }
+  }
+
+  template<typename I, typename OriginalClass>
+  CS_FORCEINLINE_TEMPLATEMETHOD static void AddReftrackerAlias (
+    OriginalClass* scfObject)
+  {
+    csRefTrackerAccess::AddAlias(
+      static_cast<
+      typename scfInterfaceTraits<I>::InterfaceType*> (scfObject),
+      scfObject);
+  }
+
+  template<typename I, typename OriginalClass>
+  CS_FORCEINLINE_TEMPLATEMETHOD static void RemoveReftrackerAlias (
+    OriginalClass* scfObject)
+  {
+    csRefTrackerAccess::RemoveAlias(
+      static_cast<
+      typename scfInterfaceTraits<I>::InterfaceType*> (scfObject),
+      scfObject);
+  }
+
+  //-- Metadata handling
+  void AllocMetadata (size_t numEntries)
+  {
+    CleanupMetadata ();
+
+    uint8* ptr = (uint8*)cs_malloc (sizeof (scfInterfaceMetadataList) + 
+                                    sizeof (scfInterfaceMetadata)*numEntries);
+
+    metadataList = (scfInterfaceMetadataList*)ptr;
+
+    metadataList->metadata = (scfInterfaceMetadata*)(ptr + sizeof (scfInterfaceMetadataList));
+    metadataList->metadataCount = numEntries;
+  }
+
+  void CleanupMetadata ()
+  {
+    if (metadataList)
+    {
+      cs_free (metadataList);
+      metadataList = 0;
+    }
+  }
+
+  // Some virtual helpers for the metadata registry
+  virtual size_t GetInterfaceMetadataCount () const = 0
+  {
+    return 1;
+  }
+
+  // Fill in interface metadata in the metadata table, starting at offset N
+  virtual void FillInterfaceMetadata (size_t n) = 0
+  {
+    if (!metadataList)
+      return;
+
+    FillInterfaceMetadataIf<iBase> (metadataList->metadata, n);
+  }
+
+  template<typename IF>
+  CS_FORCEINLINE_TEMPLATEMETHOD static void FillInterfaceMetadataIf (
+    scfInterfaceMetadata* metadataArray, size_t pos)
+  {
+    metadataArray[pos].interfaceName = scfInterfaceTraits<IF>::GetName ();
+    metadataArray[pos].interfaceID = scfInterfaceTraits<IF>::GetID ();
+    metadataArray[pos].interfaceVersion = scfInterfaceTraits<IF>::GetVersion ();
+  }
+
 };
 
 
