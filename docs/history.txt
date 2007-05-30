@@ -13,6 +13,8 @@ chronological order.
 	- Marten updated version of iBase which was previously forgotten.
 	- Marten removed the last usage of SCF_DECLARE_IBASE and 
 	  SCF_IMPLEMENT_IBASE and companions.
+	- Marten removed the highly unfinished and previously wrongly added
+	  pvs culler plugin.
 29-May-2007
 	- Eric Sunshine fixed 'MyRunner' example in threading documentation in
 	  user manual so that it inherits from 'iRunnable' publicly rather than
