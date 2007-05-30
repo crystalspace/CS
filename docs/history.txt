@@ -15,6 +15,9 @@ chronological order.
 	  SCF_IMPLEMENT_IBASE and companions.
 	- Marten removed the highly unfinished and previously wrongly added
 	  pvs culler plugin.
+	- res made the manual and API docs include the version number in their
+	  respective titles.  One idea is to make the different versions more
+	  distinguishable in e.g. search results.
 29-May-2007
 	- Eric Sunshine fixed 'MyRunner' example in threading documentation in
 	  user manual so that it inherits from 'iRunnable' publicly rather than
