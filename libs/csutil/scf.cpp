@@ -597,7 +597,7 @@ void* csSCF::QueryInterface (scfInterfaceID iInterfaceID,
   }
 #endif
 
-  return scfImplementation::QueryInterface (iInterfaceID, iVersion);
+  return scfImplementation<csSCF>::QueryInterface (iInterfaceID, iVersion);
 }
 
 void csSCF::ScanPluginsInt (csPathsList const* pluginPaths,
@@ -771,11 +771,10 @@ void scfRegisterStaticFactoryFunc (scfFactoryFunc func, const char *FactClass)
   staticFactoryFuncs.Push (ff);
 }
 
-csSCF::csSCF (unsigned int v) : verbose(v),
+csSCF::csSCF (unsigned int v) : scfImplementation<csSCF> (this), verbose(v)
 #ifdef CS_REF_TRACKER
-  refTracker(0), 
-#endif
-  scfImplementation (this)
+  ,refTracker(0)
+#endif  
 {
   SCF = PrivateSCF = this;
 #if defined(CS_DEBUG) || defined (CS_MEMORY_TRACKER)
