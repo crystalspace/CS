@@ -341,13 +341,13 @@ protected:
   }
 
   // Some virtual helpers for the metadata registry
-  virtual size_t GetInterfaceMetadataCount () const = 0
+  virtual size_t GetInterfaceMetadataCount () const
   {
     return 1;
   }
 
   // Fill in interface metadata in the metadata table, starting at offset N
-  virtual void FillInterfaceMetadata (size_t n) = 0
+  virtual void FillInterfaceMetadata (size_t n)
   {
     if (!metadataList)
       return;
