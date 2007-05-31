@@ -253,34 +253,34 @@ protected:
   virtual void FillInterfaceMetadata (size_t n)
   {
 #if SCF_IMPL_N >= 1
-    FillInterfaceMetadataIf<I1> (metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I1> (this->metadataList->metadata, n++);
 #endif
 #if SCF_IMPL_N >= 2
-    FillInterfaceMetadataIf<I2> (metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I2> (this->metadataList->metadata, n++);
 #endif
 #if SCF_IMPL_N >= 3
-    FillInterfaceMetadataIf<I3> (metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I3> (this->metadataList->metadata, n++);
 #endif
 #if SCF_IMPL_N >= 4
-    FillInterfaceMetadataIf<I4> (metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I4> (this->metadataList->metadata, n++);
 #endif
 #if SCF_IMPL_N >= 5
-    FillInterfaceMetadataIf<I5> (metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I5> (this->metadataList->metadata, n++);
 #endif
 #if SCF_IMPL_N >= 6
-    FillInterfaceMetadataIf<I6> (metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I6> (this->metadataList->metadata, n++);
 #endif
 #if SCF_IMPL_N >= 7
-    FillInterfaceMetadataIf<I7> (metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I7> (this->metadataList->metadata, n++);
 #endif
 #if SCF_IMPL_N >= 8
-    FillInterfaceMetadataIf<I8> (metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I8> (this->metadataList->metadata, n++);
 #endif
 #if SCF_IMPL_N >= 9
-    FillInterfaceMetadataIf<I9> (metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I9> (this->metadataList->metadata, n++);
 #endif
 #if SCF_IMPL_N >= 10
-    FillInterfaceMetadataIf<I10> (metadataList->metadata, n++);
+    FillInterfaceMetadataIf<I10> (this->metadataList->metadata, n++);
 #endif
 
     SCF_IMPL_SUPER::FillInterfaceMetadata (n);
@@ -363,6 +363,51 @@ private:
 #endif
   }
 
+  template<typename I>
+  CS_FORCEINLINE_TEMPLATEMETHOD static void* GetInterface (
+    Class* scfObject, scfInterfaceID id, scfInterfaceVersion version)
+  {
+    if (id == scfInterfaceTraits<I>::GetID() &&
+      scfCompatibleVersion(version, scfInterfaceTraits<I>::GetVersion()))
+    {
+      scfObject->IncRef();
+      return static_cast<
+        typename scfInterfaceTraits<I>::InterfaceType*> (scfObject);
+    }
+    else
+    {
+      return 0;
+    }
+  }
+
+  template<typename I>
+  CS_FORCEINLINE_TEMPLATEMETHOD static void AddReftrackerAlias (
+    Class* scfObject)
+  {
+    csRefTrackerAccess::AddAlias(
+      static_cast<
+      typename scfInterfaceTraits<I>::InterfaceType*> (scfObject),
+      scfObject);
+  }
+
+  template<typename I>
+  CS_FORCEINLINE_TEMPLATEMETHOD static void RemoveReftrackerAlias (
+    Class* scfObject)
+  {
+    csRefTrackerAccess::RemoveAlias(
+      static_cast<
+      typename scfInterfaceTraits<I>::InterfaceType*> (scfObject),
+      scfObject);
+  }
+
+  template<typename IF>
+  CS_FORCEINLINE_TEMPLATEMETHOD static void FillInterfaceMetadataIf (
+    scfInterfaceMetadata* metadataArray, size_t pos)
+  {
+    metadataArray[pos].interfaceName = scfInterfaceTraits<IF>::GetName ();
+    metadataArray[pos].interfaceID = scfInterfaceTraits<IF>::GetID ();
+    metadataArray[pos].interfaceVersion = scfInterfaceTraits<IF>::GetVersion ();
+  }
   
 };
 
