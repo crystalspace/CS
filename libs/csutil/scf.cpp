@@ -421,13 +421,16 @@ scfFactory::~scfFactory ()
       scfRefCount, ClassID);
 #endif
 
-  for (size_t i = 0; i < scfWeakRefOwners->GetSize (); i++)
+  if (scfWeakRefOwners)
   {
-    void** p = (*scfWeakRefOwners)[i];
-    *p = 0;
+    for (size_t i = 0; i < scfWeakRefOwners->GetSize (); i++)
+    {
+      void** p = (*scfWeakRefOwners)[i];
+      *p = 0;
+    }
+    delete scfWeakRefOwners;
+    scfWeakRefOwners = 0;
   }
-  delete scfWeakRefOwners;
-  scfWeakRefOwners = 0;
 
   if (Library)
     Library->DecRef ();
