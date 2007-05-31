@@ -673,7 +673,8 @@ actions RunDVIPDF
 
 actions RunDoxygen
 {
-  TOP=$(TOP) DOXYCPP=$(DOXYCPP) HAVE_DOT=$(HAVE_DOT) DOT_PATH=$(DOT_PATH) $(CMD.DOXYGEN) $(OPTIONS) $(FLAGS.DOXYGEN) $(>)
+  TOP=$(TOP) DOXYCPP=$(DOXYCPP) HAVE_DOT=$(HAVE_DOT) DOT_PATH=$(DOT_PATH) \
+    VERSION=$(PACKAGE_VERSION) $(CMD.DOXYGEN) $(OPTIONS) $(FLAGS.DOXYGEN) $(>)
 }
 
 #----------------------------------------------------------------------------

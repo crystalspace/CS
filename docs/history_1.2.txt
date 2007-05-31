@@ -6,6 +6,7 @@
 	- Jorrit merged r26983 into 1.2 (lighter2 factory fix).
 	- Jorrit merged r26984 into 1.2 (csString fix).
 	- Jorrit merged r26986 into 1.2 (leftover AWS stuff).
+	- Jorrit merged r26990 into 1.2 (CS version in doc titles).
 29-May-2007
 	- Jorrit removed shaderweaver from 1.2 (#307).
 	- Jorrit disabled imposters because they are currently
