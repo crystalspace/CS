@@ -128,6 +128,53 @@ csArrayCapacityDefault_swigregister = _cspace.csArrayCapacityDefault_swigregiste
 csArrayCapacityDefault_swigregister(csArrayCapacityDefault)
 
 scfCompatibleVersion = _cspace.scfCompatibleVersion
+class scfInterfaceMetadata(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, scfInterfaceMetadata, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, scfInterfaceMetadata, name)
+    __repr__ = _swig_repr
+    __swig_setmethods__["interfaceName"] = _cspace.scfInterfaceMetadata_interfaceName_set
+    __swig_getmethods__["interfaceName"] = _cspace.scfInterfaceMetadata_interfaceName_get
+    if _newclass:interfaceName = property(_cspace.scfInterfaceMetadata_interfaceName_get, _cspace.scfInterfaceMetadata_interfaceName_set)
+    __swig_setmethods__["interfaceID"] = _cspace.scfInterfaceMetadata_interfaceID_set
+    __swig_getmethods__["interfaceID"] = _cspace.scfInterfaceMetadata_interfaceID_get
+    if _newclass:interfaceID = property(_cspace.scfInterfaceMetadata_interfaceID_get, _cspace.scfInterfaceMetadata_interfaceID_set)
+    __swig_setmethods__["interfaceVersion"] = _cspace.scfInterfaceMetadata_interfaceVersion_set
+    __swig_getmethods__["interfaceVersion"] = _cspace.scfInterfaceMetadata_interfaceVersion_get
+    if _newclass:interfaceVersion = property(_cspace.scfInterfaceMetadata_interfaceVersion_get, _cspace.scfInterfaceMetadata_interfaceVersion_set)
+    def __init__(self, *args): 
+        this = _cspace.new_scfInterfaceMetadata(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_scfInterfaceMetadata
+    __del__ = lambda self : None;
+scfInterfaceMetadata_swigregister = _cspace.scfInterfaceMetadata_swigregister
+scfInterfaceMetadata_swigregister(scfInterfaceMetadata)
+cvar = _cspace.cvar
+csArrayItemNotFound = cvar.csArrayItemNotFound
+
+class scfInterfaceMetadataList(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, scfInterfaceMetadataList, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, scfInterfaceMetadataList, name)
+    __repr__ = _swig_repr
+    __swig_setmethods__["metadata"] = _cspace.scfInterfaceMetadataList_metadata_set
+    __swig_getmethods__["metadata"] = _cspace.scfInterfaceMetadataList_metadata_get
+    if _newclass:metadata = property(_cspace.scfInterfaceMetadataList_metadata_get, _cspace.scfInterfaceMetadataList_metadata_set)
+    __swig_setmethods__["metadataCount"] = _cspace.scfInterfaceMetadataList_metadataCount_set
+    __swig_getmethods__["metadataCount"] = _cspace.scfInterfaceMetadataList_metadataCount_get
+    if _newclass:metadataCount = property(_cspace.scfInterfaceMetadataList_metadataCount_get, _cspace.scfInterfaceMetadataList_metadataCount_set)
+    def __init__(self, *args): 
+        this = _cspace.new_scfInterfaceMetadataList(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_scfInterfaceMetadataList
+    __del__ = lambda self : None;
+scfInterfaceMetadataList_swigregister = _cspace.scfInterfaceMetadataList_swigregister
+scfInterfaceMetadataList_swigregister(scfInterfaceMetadataList)
+
 class iBase(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, iBase, name, value)
@@ -141,12 +188,11 @@ class iBase(_object):
     def QueryInterface(*args): return _cspace.iBase_QueryInterface(*args)
     def AddRefOwner(*args): return _cspace.iBase_AddRefOwner(*args)
     def RemoveRefOwner(*args): return _cspace.iBase_RemoveRefOwner(*args)
+    def GetInterfaceMetadata(*args): return _cspace.iBase_GetInterfaceMetadata(*args)
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iBase_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iBase_scfGetVersion)
 iBase_swigregister = _cspace.iBase_swigregister
 iBase_swigregister(iBase)
-cvar = _cspace.cvar
-csArrayItemNotFound = cvar.csArrayItemNotFound
 iBase_scfGetVersion = _cspace.iBase_scfGetVersion
 
 class iSCF(iBase):
@@ -2750,11 +2796,8 @@ class csPath(scfPath):
     __swig_getmethods__ = {}
     for _s in [scfPath]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csPath, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _cspace.new_csPath(*args)
-        try: self.this.append(this)
-        except: self.this = this
     __swig_destroy__ = _cspace.delete_csPath
     __del__ = lambda self : None;
     def Length(*args): return _cspace.csPath_Length(*args)
@@ -2862,11 +2905,8 @@ class csPolygonMesh(pycsPolygonMesh):
     __swig_getmethods__ = {}
     for _s in [pycsPolygonMesh]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csPolygonMesh, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _cspace.new_csPolygonMesh(*args)
-        try: self.this.append(this)
-        except: self.this = this
     __swig_destroy__ = _cspace.delete_csPolygonMesh
     __del__ = lambda self : None;
     def SetVertices(*args): return _cspace.csPolygonMesh_SetVertices(*args)
@@ -2906,11 +2946,8 @@ class csPolygonMeshBox(pycsPolygonMeshBox):
     __swig_getmethods__ = {}
     for _s in [pycsPolygonMeshBox]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csPolygonMeshBox, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _cspace.new_csPolygonMeshBox(*args)
-        try: self.this.append(this)
-        except: self.this = this
     __swig_destroy__ = _cspace.delete_csPolygonMeshBox
     __del__ = lambda self : None;
     def SetBox(*args): return _cspace.csPolygonMeshBox_SetBox(*args)
@@ -2943,11 +2980,8 @@ class csTriangleMesh(pycsTriangleMesh):
     __swig_getmethods__ = {}
     for _s in [pycsTriangleMesh]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csTriangleMesh, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _cspace.new_csTriangleMesh(*args)
-        try: self.this.append(this)
-        except: self.this = this
     __swig_destroy__ = _cspace.delete_csTriangleMesh
     __del__ = lambda self : None;
     def AddVertex(*args): return _cspace.csTriangleMesh_AddVertex(*args)
@@ -3021,11 +3055,8 @@ class csTriangleMeshBox(pycsTriangleMeshBox):
     __swig_getmethods__ = {}
     for _s in [pycsTriangleMeshBox]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csTriangleMeshBox, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _cspace.new_csTriangleMeshBox(*args)
-        try: self.this.append(this)
-        except: self.this = this
     __swig_destroy__ = _cspace.delete_csTriangleMeshBox
     __del__ = lambda self : None;
     def SetBox(*args): return _cspace.csTriangleMeshBox_SetBox(*args)
@@ -8883,11 +8914,8 @@ class csConfigFile(scfConfigFile):
     __swig_getmethods__ = {}
     for _s in [scfConfigFile]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csConfigFile, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _cspace.new_csConfigFile(*args)
-        try: self.this.append(this)
-        except: self.this = this
     __swig_destroy__ = _cspace.delete_csConfigFile
     __del__ = lambda self : None;
     def IsEmpty(*args): return _cspace.csConfigFile_IsEmpty(*args)
@@ -10064,11 +10092,8 @@ class csImageMemory(csImageMemoryBase):
     __swig_getmethods__ = {}
     for _s in [csImageMemoryBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csImageMemory, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _cspace.new_csImageMemory(*args)
-        try: self.this.append(this)
-        except: self.this = this
     __swig_destroy__ = _cspace.delete_csImageMemory
     __del__ = lambda self : None;
     def GetImagePtr(*args): return _cspace.csImageMemory_GetImagePtr(*args)
@@ -11590,11 +11615,8 @@ class csObject(pycsObject):
     __swig_getmethods__ = {}
     for _s in [pycsObject]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csObject, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _cspace.new_csObject(*args)
-        try: self.this.append(this)
-        except: self.this = this
     __swig_destroy__ = _cspace.delete_csObject
     __del__ = lambda self : None;
     def SetName(*args): return _cspace.csObject_SetName(*args)
@@ -11639,11 +11661,8 @@ class csColliderWrapper(pycsColliderWrapper):
     __swig_getmethods__ = {}
     for _s in [pycsColliderWrapper]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csColliderWrapper, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _cspace.new_csColliderWrapper(*args)
-        try: self.this.append(this)
-        except: self.this = this
     __swig_destroy__ = _cspace.delete_csColliderWrapper
     __del__ = lambda self : None;
     def GetCollider(*args): return _cspace.csColliderWrapper_GetCollider(*args)
@@ -12113,11 +12132,8 @@ class _csPyEventHandler(csPyEventHandlerParent):
     __swig_getmethods__ = {}
     for _s in [csPyEventHandlerParent]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, _csPyEventHandler, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _cspace.new__csPyEventHandler(*args)
-        try: self.this.append(this)
-        except: self.this = this
     __swig_destroy__ = _cspace.delete__csPyEventHandler
     __del__ = lambda self : None;
     def HandleEvent(*args): return _cspace._csPyEventHandler_HandleEvent(*args)

@@ -286,6 +286,90 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::scfInterfaceMetadata ##############
+
+package cspace::scfInterfaceMetadata;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_interfaceName_get = *cspacec::scfInterfaceMetadata_interfaceName_get;
+*swig_interfaceName_set = *cspacec::scfInterfaceMetadata_interfaceName_set;
+*swig_interfaceID_get = *cspacec::scfInterfaceMetadata_interfaceID_get;
+*swig_interfaceID_set = *cspacec::scfInterfaceMetadata_interfaceID_set;
+*swig_interfaceVersion_get = *cspacec::scfInterfaceMetadata_interfaceVersion_get;
+*swig_interfaceVersion_set = *cspacec::scfInterfaceMetadata_interfaceVersion_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_scfInterfaceMetadata(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_scfInterfaceMetadata($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::scfInterfaceMetadataList ##############
+
+package cspace::scfInterfaceMetadataList;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_metadata_get = *cspacec::scfInterfaceMetadataList_metadata_get;
+*swig_metadata_set = *cspacec::scfInterfaceMetadataList_metadata_set;
+*swig_metadataCount_get = *cspacec::scfInterfaceMetadataList_metadataCount_get;
+*swig_metadataCount_set = *cspacec::scfInterfaceMetadataList_metadataCount_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_scfInterfaceMetadataList(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_scfInterfaceMetadataList($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iBase ##############
 
 package cspace::iBase;
@@ -298,6 +382,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *QueryInterface = *cspacec::iBase_QueryInterface;
 *AddRefOwner = *cspacec::iBase_AddRefOwner;
 *RemoveRefOwner = *cspacec::iBase_RemoveRefOwner;
+*GetInterfaceMetadata = *cspacec::iBase_GetInterfaceMetadata;
 *scfGetVersion = *cspacec::iBase_scfGetVersion;
 sub DISOWN {
     my $self = shift;
@@ -4164,12 +4249,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::scfPath cspace );
 %OWNER = ();
 %ITERATORS = ();
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_csPath(@_);
-    bless $self, $pkg if defined($self);
-}
-
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -4324,12 +4403,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::pycsPolygonMesh cspace );
 %OWNER = ();
 %ITERATORS = ();
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_csPolygonMesh(@_);
-    bless $self, $pkg if defined($self);
-}
-
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -4376,12 +4449,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::pycsPolygonMeshBox cspace );
 %OWNER = ();
 %ITERATORS = ();
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_csPolygonMeshBox(@_);
-    bless $self, $pkg if defined($self);
-}
-
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -4421,12 +4488,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::pycsTriangleMesh cspace );
 %OWNER = ();
 %ITERATORS = ();
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_csTriangleMesh(@_);
-    bless $self, $pkg if defined($self);
-}
-
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -4557,12 +4618,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::pycsTriangleMeshBox cspace );
 %OWNER = ();
 %ITERATORS = ();
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_csTriangleMeshBox(@_);
-    bless $self, $pkg if defined($self);
-}
-
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -13269,12 +13324,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::scfConfigFile cspace );
 %OWNER = ();
 %ITERATORS = ();
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_csConfigFile(@_);
-    bless $self, $pkg if defined($self);
-}
-
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -14873,12 +14922,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::csImageMemoryBase cspace );
 %OWNER = ();
 %ITERATORS = ();
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_csImageMemory(@_);
-    bless $self, $pkg if defined($self);
-}
-
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -17187,12 +17230,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::pycsObject cspace );
 %OWNER = ();
 %ITERATORS = ();
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_csObject(@_);
-    bless $self, $pkg if defined($self);
-}
-
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -17263,12 +17300,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::pycsColliderWrapper cspace );
 %OWNER = ();
 %ITERATORS = ();
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_csColliderWrapper(@_);
-    bless $self, $pkg if defined($self);
-}
-
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
