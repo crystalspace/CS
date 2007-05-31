@@ -285,7 +285,9 @@ csStringBase &csStringBase::Append (const csStringBase &iStr, size_t iCount)
 
 csStringBase &csStringBase::Append (const char *iStr, size_t iCount)
 {
-  if (iStr == 0 || iCount == 0)
+  /* Since "" is not the same as 0, make an empty string if a non-null 
+     empty string is appended to a 0 string. */
+  if (iStr == 0 || ((iCount == 0) && (Size != 0)))
     return *this;
   if (iCount == (size_t)-1)
     iCount = strlen (iStr);
@@ -302,7 +304,9 @@ csStringBase &csStringBase::Append (const char *iStr, size_t iCount)
 
 csStringBase& csStringBase::Append (const wchar_t* Str, size_t Count)
 {
-  if (Str == 0 || Count == 0)
+  /* Since "" is not the same as 0, make an empty string if a non-null 
+     empty string is appended to a 0 string. */
+  if (Str == 0 || ((Count == 0) && (Size != 0)))
     return *this;
   if (Count == (size_t)-1)
     Count = wcslen (Str);

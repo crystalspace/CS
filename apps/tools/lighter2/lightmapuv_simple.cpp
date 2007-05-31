@@ -466,12 +466,13 @@ namespace lighter
 
   void SimpleUVFactoryLayouter::QueuePDPrimitives (
     SimpleUVObjectLayouter* layouter, PrimitiveArray &prims, 
-    size_t groupNum, Sector* sector, const csBitArray& pdBits, 
-    const csArray<csVector2>& uvsizes)
+    size_t layoutID, size_t groupNum, Sector* sector, 
+    const csBitArray& pdBits, const csArray<csVector2>& uvsizes)
   {
     QueuedPDPrimitives queuedPrims;
     queuedPrims.layouter = layouter;
     queuedPrims.prims = &prims;
+    queuedPrims.layoutID = layoutID;
     queuedPrims.groupNum = groupNum;
     queuedPrims.uvsizes = uvsizes;
     SectorAndPDBits s;
@@ -488,20 +489,22 @@ namespace lighter
 
   //-------------------------------------------------------------------------
 
-  bool SimpleUVObjectLayouter::LayoutUVOnPrimitives (PrimitiveArray &prims, 
+  size_t SimpleUVObjectLayouter::LayoutUVOnPrimitives (PrimitiveArray &prims, 
     size_t groupNum, Sector* sector, const csBitArray& pdBits)
   {
     // Prims will be layouted later...
     csArray<csVector2> uvsizes;
-    ComputeSizes (prims, groupNum, uvsizes, minuvs.GetExtend (groupNum));
+    size_t layoutID = minuvs.GetSize ();
+    ComputeSizes (prims, groupNum, uvsizes, minuvs.GetExtend (layoutID));
 
-    parent->QueuePDPrimitives (this, prims, groupNum, sector, pdBits,
+    parent->QueuePDPrimitives (this, prims, layoutID, groupNum, sector, pdBits,
       uvsizes);
 
-    return true;
+    return layoutID;
   }
 
   void SimpleUVObjectLayouter::FinalLightmapLayout (PrimitiveArray &prims, 
+                                                    size_t layoutID,
                                                     size_t groupNum, 
                                                     ObjectVertexData& vertexData, 
                                                     uint& lmID)
@@ -509,7 +512,7 @@ namespace lighter
     /* Primitives were enqueued for PD layouting. layouted onto a PD lightmap. That lightmap itself was
        placed somewhere on a global LM. So when remapping this must be taken
        into consideration. */
-    const PDLayoutedGroup* layouted = pdLayouts.GetElementPointer (groupNum);
+    const PDLayoutedGroup* layouted = pdLayouts.GetElementPointer (layoutID);
     CS_ASSERT(layouted);
     lmID = uint (layouted->lmID);
 
@@ -577,10 +580,10 @@ namespace lighter
   }
 
   void SimpleUVObjectLayouter::LayoutQueuedPrims (PrimitiveArray &prims, 
-    size_t groupNum, size_t lightmap, const csArray<csVector2>& positions, 
-    int dx, int dy)
+    size_t layoutID, size_t groupNum, size_t lightmap, 
+    const csArray<csVector2>& positions, int dx, int dy)
   {
-    const csArray<csVector2>& minuvs = this->minuvs[groupNum];
+    const csArray<csVector2>& minuvs = this->minuvs[layoutID];
     PDLayoutedGroup layouted;
     layouted.lmID = uint (lightmap);
     layouted.remaps = positions;
@@ -590,7 +593,7 @@ namespace lighter
       csVector2& remap = layouted.remaps[v];
       remap += move - minuvs[v];
     }
-    pdLayouts.Put (groupNum, layouted);
+    pdLayouts.Put (layoutID, layouted);
   }
 
 }

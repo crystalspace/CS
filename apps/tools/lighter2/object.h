@@ -200,10 +200,12 @@ namespace lighter
     struct LMLayoutingInfo
     {
       csRef<LightmapUVObjectLayouter> layouter;
+      size_t layoutID;
       size_t group;
 
-      LMLayoutingInfo (LightmapUVObjectLayouter* layouter, size_t group) :
-      layouter (layouter), group (group) {}
+      LMLayoutingInfo (LightmapUVObjectLayouter* layouter, size_t layoutID,
+        size_t group) :
+        layouter (layouter), layoutID (layoutID), group (group) {}
     };
     csArray<LMLayoutingInfo> lmLayouts;
 

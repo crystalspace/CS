@@ -632,8 +632,8 @@ namespace lighter
         {
           const LayoutedQueue::Map::Queue& mapQueue = currentMap.queues[q];
           const QueuedPDPrimitives* queue = mapQueue.srcQueue;
-          queue->layouter->LayoutQueuedPrims (*queue->prims, queue->groupNum, 
-            glmIndex, mapQueue.positions, x, y);
+          queue->layouter->LayoutQueuedPrims (*queue->prims, queue->layoutID,
+            queue->groupNum, glmIndex, mapQueue.positions, x, y);
         }
       }
     }
@@ -680,8 +680,8 @@ namespace lighter
         size_t queueIndex;
         AllocResult& result = it.Next (queueIndex);
         const QueuedPDPrimitives& queue = currentQueue.queue->Get (queueIndex);
-        queue.layouter->LayoutQueuedPrims (*queue.prims, queue.groupNum, 
-          result.allocIndex, result.positions, 0, 0);
+        queue.layouter->LayoutQueuedPrims (*queue.prims, queue.layoutID,
+          queue.groupNum, result.allocIndex, result.positions, 0, 0);
         if (--u == 0)
         {
           progressNonPDL.IncProgress (progressStep);
