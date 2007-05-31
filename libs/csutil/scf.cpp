@@ -421,13 +421,16 @@ scfFactory::~scfFactory ()
       scfRefCount, ClassID);
 #endif
 
-  for (size_t i = 0; i < scfWeakRefOwners->GetSize (); i++)
+  if (scfWeakRefOwners)
   {
-    void** p = (*scfWeakRefOwners)[i];
-    *p = 0;
+    for (size_t i = 0; i < scfWeakRefOwners->GetSize (); i++)
+    {
+      void** p = (*scfWeakRefOwners)[i];
+      *p = 0;
+    }
+    delete scfWeakRefOwners;
+    scfWeakRefOwners = 0;
   }
-  delete scfWeakRefOwners;
-  scfWeakRefOwners = 0;
 
   if (Library)
     Library->DecRef ();
@@ -597,7 +600,7 @@ void* csSCF::QueryInterface (scfInterfaceID iInterfaceID,
   }
 #endif
 
-  return scfImplementation::QueryInterface (iInterfaceID, iVersion);
+  return scfImplementation<csSCF>::QueryInterface (iInterfaceID, iVersion);
 }
 
 void csSCF::ScanPluginsInt (csPathsList const* pluginPaths,
@@ -771,11 +774,10 @@ void scfRegisterStaticFactoryFunc (scfFactoryFunc func, const char *FactClass)
   staticFactoryFuncs.Push (ff);
 }
 
-csSCF::csSCF (unsigned int v) : verbose(v),
+csSCF::csSCF (unsigned int v) : scfImplementation<csSCF> (this), verbose(v)
 #ifdef CS_REF_TRACKER
-  refTracker(0), 
-#endif
-  scfImplementation (this)
+  ,refTracker(0)
+#endif  
 {
   SCF = PrivateSCF = this;
 #if defined(CS_DEBUG) || defined (CS_MEMORY_TRACKER)

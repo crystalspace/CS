@@ -280,42 +280,6 @@ protected:
     return 0;
   }
 
-  template<typename I, typename OriginalClass>
-  CS_FORCEINLINE_TEMPLATEMETHOD static void* GetInterface (
-    OriginalClass* scfObject, scfInterfaceID id, scfInterfaceVersion version)
-  {
-    if (id == scfInterfaceTraits<I>::GetID() &&
-      scfCompatibleVersion(version, scfInterfaceTraits<I>::GetVersion()))
-    {
-      scfObject->IncRef();
-      return static_cast<
-        typename scfInterfaceTraits<I>::InterfaceType*> (scfObject);
-    }
-    else
-    {
-      return 0;
-    }
-  }
-
-  template<typename I, typename OriginalClass>
-  CS_FORCEINLINE_TEMPLATEMETHOD static void AddReftrackerAlias (
-    OriginalClass* scfObject)
-  {
-    csRefTrackerAccess::AddAlias(
-      static_cast<
-      typename scfInterfaceTraits<I>::InterfaceType*> (scfObject),
-      scfObject);
-  }
-
-  template<typename I, typename OriginalClass>
-  CS_FORCEINLINE_TEMPLATEMETHOD static void RemoveReftrackerAlias (
-    OriginalClass* scfObject)
-  {
-    csRefTrackerAccess::RemoveAlias(
-      static_cast<
-      typename scfInterfaceTraits<I>::InterfaceType*> (scfObject),
-      scfObject);
-  }
 
   //-- Metadata handling
   void AllocMetadata (size_t numEntries)
@@ -341,13 +305,13 @@ protected:
   }
 
   // Some virtual helpers for the metadata registry
-  virtual size_t GetInterfaceMetadataCount () const = 0
+  virtual size_t GetInterfaceMetadataCount () const
   {
     return 1;
   }
 
   // Fill in interface metadata in the metadata table, starting at offset N
-  virtual void FillInterfaceMetadata (size_t n) = 0
+  virtual void FillInterfaceMetadata (size_t n)
   {
     if (!metadataList)
       return;

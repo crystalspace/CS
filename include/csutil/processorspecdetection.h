@@ -48,6 +48,15 @@ namespace CS
 
             ProcessorSpecDetection()
             {
+                 for(int i=0; i<5; i++)
+                 {
+                      checked[i] = false;
+                 }
+                 supportsMMX = false;
+                 supportsSSE = false;
+                 supportsSSE2 = false;
+                 supportsSSE3 = false;
+                 supportsAltiVec = false;
             }
 
             ~ProcessorSpecDetection()
