@@ -39,38 +39,18 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csSndSysBasicEventRecorder)
 
-SCF_IMPLEMENT_IBASE(csSndSysBasicEventRecorder)
-  SCF_IMPLEMENTS_INTERFACE(iSndSysEventRecorder)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END;
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSndSysBasicEventRecorder::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-
-SCF_IMPLEMENT_IBASE (csSndSysBasicEventRecorder::EventHandler)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
 
 #define QUALIFIED_PLUGIN_NAME "crystalspace.sndsys.utility.eventrecorder"
 
 csSndSysBasicEventRecorder::csSndSysBasicEventRecorder(iBase *piBase) 
+  : scfImplementationType(this, piBase)
 {
-
   // Start out true, we'll revert to false if needed
   m_Active=true;
-
-  SCF_CONSTRUCT_IBASE(piBase);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csSndSysBasicEventRecorder::~csSndSysBasicEventRecorder()
 {
-
-
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 
@@ -116,14 +96,13 @@ bool csSndSysBasicEventRecorder::Initialize(iObjectRegistry *pObjectRegistry)
 
 
   // set event callback
-  scfiEventHandler = new EventHandler (this);
   csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (m_pObjectRegistry));
   m_evSystemOpen = csevSystemOpen(m_pObjectRegistry);
   m_evSystemClose = csevSystemClose(m_pObjectRegistry);
   m_evFrame = csevFrame(m_pObjectRegistry);
   if (q != 0) {
     csEventID subEvents[] = { m_evSystemOpen, m_evSystemClose, m_evFrame, CS_EVENTLIST_END };
-    q->RegisterListener(scfiEventHandler, subEvents);
+    q->RegisterListener(this, subEvents);
   }
 
   return true;

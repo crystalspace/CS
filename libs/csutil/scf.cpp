@@ -77,7 +77,7 @@ static class csSCF *PrivateSCF = 0;
  * The SCF module loader routines (CreateInstance, RegisterClass, ...)
  * are all thread-safe.
  */
-class csSCF : public iSCF
+class csSCF : public iSCF, public scfImplementation<csSCF>
 {
 private:
   mutable CS::Threading::RecursiveMutex mutex;
@@ -101,8 +101,13 @@ private:
 
   friend void scfInitialize (csPathsList const*, unsigned int);
 
+  virtual size_t GetInterfaceMetadataCount () const { return 0;}
+  virtual void FillInterfaceMetadata (size_t n) {;}
+
+  virtual void *QueryInterface (scfInterfaceID iInterfaceID,
+    scfInterfaceVersion iVersion);
+
 public:
-  SCF_DECLARE_IBASE;
 
   /// The global table of all known interface names
   csStringSet InterfaceRegistry;
@@ -292,8 +297,6 @@ int scfLibraryVector::CompareName (scfSharedLibrary* const& Item,
 class scfFactory : public iFactory
 {
 public:
-  SCF_DECLARE_IBASE;
-
   // Class identifier
   const char *ClassID;
   // Class description
@@ -332,6 +335,24 @@ public:
   virtual const char *QueryClassID();
   /// Query library module name.
   virtual const char *QueryModuleName ();
+
+protected:
+  /* SCF goop, this class cannot use scfImplementation1 due to its special 
+    ref-counting usage */
+  int scfRefCount;
+  typedef csArray<void**,
+    csArrayElementHandler<void**>,
+    CS::Memory::AllocatorMalloc,
+    csArrayCapacityLinear<csArrayThresholdFixed<4> > > WeakRefOwnerArray;
+  WeakRefOwnerArray* scfWeakRefOwners;
+
+  virtual void IncRef ();
+  virtual void DecRef ();
+  virtual int GetRefCount ();
+  virtual void AddRefOwner (void** ref_owner);
+  virtual void RemoveRefOwner (void** ref_owner);
+  scfInterfaceMetadataList* GetInterfaceMetadata () { return 0; }
+  virtual void *QueryInterface (scfInterfaceID iInterfaceID, int iVersion);
 };
 
 /// This class holds a number of scfFactory structures
@@ -369,7 +390,7 @@ scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
   csRefTrackerAccess::TrackConstruction (this);
   // Don't use SCF_CONSTRUCT_IBASE (0) since it will call IncRef()
   scfWeakRefOwners = 0;
-  scfRefCount = 0; scfParent = 0;
+  scfRefCount = 0;
 #ifdef CS_REF_TRACKER
   /* Reftracker: make sure class ID string survives destruction of this 
    * instance */
@@ -386,7 +407,9 @@ scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
     iLibraryName ? libraryNames->Request (iLibraryName) : csInvalidStringID;
   Library = 0;
 
-  SCF_INIT_TRACKER_ALIASES
+  csRefTrackerAccess::AddAlias(
+    static_cast<scfInterfaceTraits<iFactory>::InterfaceType*> (this),
+    this);
 }
 
 scfFactory::~scfFactory ()
@@ -397,6 +420,14 @@ scfFactory::~scfFactory ()
     csPrintfErr("SCF WARNING: %d unreleased instances of class %s!\n",
       scfRefCount, ClassID);
 #endif
+
+  for (size_t i = 0; i < scfWeakRefOwners->GetSize (); i++)
+  {
+    void** p = (*scfWeakRefOwners)[i];
+    *p = 0;
+  }
+  delete scfWeakRefOwners;
+  scfWeakRefOwners = 0;
 
   if (Library)
     Library->DecRef ();
@@ -468,7 +499,7 @@ void scfFactory::DecRef ()
 void scfFactory::AddRefOwner (void** ref_owner)
 {
   if (!scfWeakRefOwners)						
-    scfWeakRefOwners = new csArray<void**> (0, 4);			
+    scfWeakRefOwners = new WeakRefOwnerArray (0, 4);			
   scfWeakRefOwners->InsertSorted (ref_owner);				
 }
 
@@ -489,7 +520,12 @@ int scfFactory::GetRefCount ()
 
 void *scfFactory::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)
 {
-  SCF_IMPLEMENTS_INTERFACE (iFactory);
+  if (iInterfaceID == scfInterfaceTraits<iFactory>::GetID () &&
+    scfCompatibleVersion (iVersion, scfInterfaceTraits<iFactory>::GetVersion ()))
+  {
+    this->IncRef ();
+    return static_cast<iFactory*> (this);
+  }
   return 0;
 }
 
@@ -540,19 +576,32 @@ const char *scfFactory::QueryModuleName ()
 
 //------------------------------------ Implementation of csSCF functions ----//
 
-SCF_IMPLEMENT_IBASE (csSCF);
-  /// @@@ plain IMPL_INTF calls the ref tracker,  problematic
-  SCF_IMPLEMENTS_INTERFACE_COMMON (iSCF, this) 
+void* csSCF::QueryInterface (scfInterfaceID iInterfaceID,
+                             scfInterfaceVersion iVersion)
+{
+  if (iInterfaceID == scfInterfaceTraits<iSCF>::GetID () &&
+    scfCompatibleVersion (iVersion, scfInterfaceTraits<iSCF>::GetVersion ()))
+  {
+    scfObject->IncRef ();
+    return static_cast<iSCF*> (scfObject);
+  }
 #ifdef CS_REF_TRACKER
-    if (refTracker) 
-    { 
-      SCF_IMPLEMENTS_INTERFACE_COMMON (iRefTracker, refTracker); 
+  if (refTracker)
+  {
+    if (iInterfaceID == scfInterfaceTraits<iRefTracker>::GetID () &&
+      scfCompatibleVersion (iVersion, scfInterfaceTraits<iRefTracker>::GetVersion ()))
+    {
+      refTracker->IncRef ();
+      return static_cast<iRefTracker*> (refTracker);
     }
+  }
 #endif
-SCF_IMPLEMENT_IBASE_END
+
+  return scfImplementation::QueryInterface (iInterfaceID, iVersion);
+}
 
 void csSCF::ScanPluginsInt (csPathsList const* pluginPaths,
-			    const char* context)
+                            const char* context)
 {
   if (pluginPaths)
   {
@@ -565,52 +614,52 @@ void csSCF::ScanPluginsInt (csPathsList const* pluginPaths,
       csPathsList::Entry const& pathrec = (*pluginPaths)[i];
       if (IsVerbose(SCF_VERBOSE_PLUGIN_SCAN))
       {
-	char const* x = scannedDirs.Contains(pathrec.path) ? "re-" : "";
-	csPrintfErr("SCF_NOTIFY: %sscanning plugin directory: %s "
-	  "(context `%s'; recursive %s)\n", x, pathrec.path.GetData(),
-	  GetContextName(pathrec.type),
-	  pathrec.scanRecursive ? "yes" : "no");
+        char const* x = scannedDirs.Contains(pathrec.path) ? "re-" : "";
+        csPrintfErr("SCF_NOTIFY: %sscanning plugin directory: %s "
+          "(context `%s'; recursive %s)\n", x, pathrec.path.GetData(),
+          GetContextName(pathrec.type),
+          pathrec.scanRecursive ? "yes" : "no");
       }
 
       if (plugins)
-	plugins->DeleteAll();
+        plugins->DeleteAll();
 
       csRef<iStringArray> messages =
-	csScanPluginDir (pathrec.path, plugins, pathrec.scanRecursive);
+        csScanPluginDir (pathrec.path, plugins, pathrec.scanRecursive);
       scannedDirs.Request(pathrec.path);
 
       if ((messages != 0) && (messages->Length() > 0))
       {
-	csPrintfErr("SCF_WARNING: the following issue(s) arose while "
-	  "scanning '%s':", pathrec.path.GetData());
-	for (j = 0; j < messages->Length(); j++)
-	  csPrintfErr(" %s\n", messages->Get (j));
+        csPrintfErr("SCF_WARNING: the following issue(s) arose while "
+          "scanning '%s':", pathrec.path.GetData());
+        for (j = 0; j < messages->Length(); j++)
+          csPrintfErr(" %s\n", messages->Get (j));
       }
 
       csRef<iDocument> metadata;
       csRef<iString> msg;
       for (j = 0; j < plugins->Length(); j++)
       {
-	char const* plugin = plugins->Get(j);
-	msg = csGetPluginMetadata (plugin, metadata);
-	if (msg != 0)
-	{
-	  csPrintfErr("SCF_ERROR: metadata retrieval error for %s: %s\n",
-	    plugin, msg->GetData ());
-	}
-	// It is possible for an error or warning message to be generated even
-	// when metadata is also obtained.  Likewise, it is possible for no
-	// metadata to be obtained yet also to have no error message.  The
-	// latter case is indicative of csScanPluginDir() returning "potential"
-	// plugins which turn out to not be Crystal Space plugins after all.
-	// For instance, on Windows, the scan might find a DLL which is not a
-	// Crystal Space DLL; that is, which does not contain embedded
-	// metadata.  This is a valid case, which we simply ignore since it is
-	// legal for non-CS libraries to exist alongside CS plugins in the
-	// scanned directories.
-	if (metadata)
-	  RegisterClasses(plugin, metadata, 
-	    context ? context : pathrec.type.GetData());
+        char const* plugin = plugins->Get(j);
+        msg = csGetPluginMetadata (plugin, metadata);
+        if (msg != 0)
+        {
+          csPrintfErr("SCF_ERROR: metadata retrieval error for %s: %s\n",
+            plugin, msg->GetData ());
+        }
+        // It is possible for an error or warning message to be generated even
+        // when metadata is also obtained.  Likewise, it is possible for no
+        // metadata to be obtained yet also to have no error message.  The
+        // latter case is indicative of csScanPluginDir() returning "potential"
+        // plugins which turn out to not be Crystal Space plugins after all.
+        // For instance, on Windows, the scan might find a DLL which is not a
+        // Crystal Space DLL; that is, which does not contain embedded
+        // metadata.  This is a valid case, which we simply ignore since it is
+        // legal for non-CS libraries to exist alongside CS plugins in the
+        // scanned directories.
+        if (metadata)
+          RegisterClasses(plugin, metadata, 
+          context ? context : pathrec.type.GetData());
       }
     }
   }
@@ -726,7 +775,7 @@ csSCF::csSCF (unsigned int v) : verbose(v),
 #ifdef CS_REF_TRACKER
   refTracker(0), 
 #endif
-  scfRefCount(1), scfWeakRefOwners(0), scfParent(0)
+  scfImplementation (this)
 {
   SCF = PrivateSCF = this;
 #if defined(CS_DEBUG) || defined (CS_MEMORY_TRACKER)

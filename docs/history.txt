@@ -6,6 +6,34 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+30-May-2007
+	- Marten made some cleanups to scfImplementation(Ext)N to reduce the 
+	  source size and hopefully speed up compilation a tiny bit.
+	- Marten added some basic reflection support to SCF.	
+	- Marten updated version of iBase which was previously forgotten.
+	- Marten removed the last usage of SCF_DECLARE_IBASE and 
+	  SCF_IMPLEMENT_IBASE and companions.
+	- Marten removed the highly unfinished and previously wrongly added
+	  pvs culler plugin.
+	- res made the manual and API docs include the version number in their
+	  respective titles.  One idea is to make the different versions more
+	  distinguishable in e.g. search results.
+29-May-2007
+	- Eric Sunshine fixed 'MyRunner' example in threading documentation in
+	  user manual so that it inherits from 'iRunnable' publicly rather than
+	  privately.
+	- res fixed a lighter2 issue where objects with the same factory 
+	  shared the same lightmap space.
+	- res fixed an issue in csStringBase::Append(): if "" was attempted to
+	  be appended to a 0 string, the string would be left as 0, and not
+	  "" as it should (since "" and 0 are two different things). Since
+	  Append() is used by csString copy constructors this meant that
+	  copy-constructing from an empty string actually resulted in a 0
+	  string. E.g. in one particular case this was problematic with a 
+	  csString set ("" was added, but became the 0 string - hence 
+	  subsequent tests whether the set contains the string failed).
+	- res removed some AWS/AWS2-specific files left over from the move to
+	  CSEXTRA.
 28-May-2007
 	- res wrote the lighter2 "Developer's Manual".
 	- Marten fixed master include headers w.r.t. csutil/threading.

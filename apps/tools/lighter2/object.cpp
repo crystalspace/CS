@@ -220,10 +220,10 @@ namespace lighter
         LightmapUVObjectLayouter* layout = 
           factory->layoutedPrimitives[j].factory;
         const size_t group = factory->layoutedPrimitives[j].group;
-        lmLayouts.Push (LMLayoutingInfo (layout, group));
-        bool res = layout->LayoutUVOnPrimitives (allPrimitives, 
+        size_t layoutID = layout->LayoutUVOnPrimitives (allPrimitives, 
           group, sector, pdBits);
-        if (!res) return false;
+        if (layoutID == (size_t)~0) return false;
+        lmLayouts.Push (LMLayoutingInfo (layout, layoutID, group));
       }
 
     }
@@ -243,7 +243,8 @@ namespace lighter
       if (!lightPerVertex)
       {
         lmLayouts[j].layouter->FinalLightmapLayout (allPrimitives, 
-          lmLayouts[j].group, vertexData, lightmapIDs.GetExtend (j));
+          lmLayouts[j].layoutID, lmLayouts[j].group, vertexData, 
+          lightmapIDs.GetExtend (j));
       }
 
       for (size_t i = 0; i < allPrimitives.GetSize(); i++)

@@ -269,10 +269,10 @@ struct iVFS : public virtual iBase
    * \param FileName VFS path of the file to be read.
    * \param nullterm Null-terminate the returned buffer.
    * \return An iDataBuffer containing the file contents if the file was opened
-   *  and read successfully, otherwise an invalidated iFile.  Use
+   *  and read successfully, otherwise a null reference.  Use
    *  csRef<>::IsValid() to check validity.
    * \remarks Null-termination might have a performance penalty (dependent on
-   *  where the file is stored.) Use only when needed.
+   *  where the file is stored). Use only when needed.
    */
   virtual csPtr<iDataBuffer> ReadFile (const char *FileName,
     bool nullterm = true) = 0;

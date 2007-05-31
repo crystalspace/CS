@@ -45,14 +45,9 @@ csPtr<iConfigFile> csGetPlatformConfig (const char* key)
 }
 
 
-SCF_IMPLEMENT_IBASE (csDefaultsConfig)
-  SCF_IMPLEMENTS_INTERFACE (iConfigFile)
-SCF_IMPLEMENT_IBASE_END
-
 csDefaultsConfig::csDefaultsConfig ()
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-
   // Domain information comes from the application's bundle identifier,
   // generally.  Grab a defaults object.
   defaults = [[NSUserDefaults standardUserDefaults] retain];
@@ -68,7 +63,6 @@ csDefaultsConfig::~csDefaultsConfig()
     [domain release];
   if (defaults != nil)
     [defaults release];
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csDefaultsConfig::Open (const char* Key)
@@ -305,15 +299,11 @@ void csDefaultsConfig::SetEOFComment (const char* Text)
 }
 
 
-SCF_IMPLEMENT_IBASE (csDefaultsIterator)
-  SCF_IMPLEMENTS_INTERFACE (iConfigIterator)
-SCF_IMPLEMENT_IBASE_END
 
 csDefaultsIterator::csDefaultsIterator (
   csDefaultsConfig* Owner, const char* Subsection)
-{
-  SCF_CONSTRUCT_IBASE (0);
-
+  : scfImplementationType (this)
+{ 
   // Retain our calling parameters.
   owner = Owner;
   name = [[NSString stringWithCString:Subsection] retain];
@@ -343,7 +333,6 @@ csDefaultsIterator::~csDefaultsIterator()
   if (keyenum != nil)
     [keyenum release];
   owner = 0;  
-  SCF_DESTRUCT_IBASE();
 }
 
 iConfigFile* csDefaultsIterator::GetConfigFile () const

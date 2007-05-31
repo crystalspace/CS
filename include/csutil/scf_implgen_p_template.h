@@ -19,7 +19,7 @@
 
 /*
  * This header have been generated from scf_implgen.h by using
- * gcc -E -x c -P -DSCF_IN_IMPLEMENTATION_H -I.. scf_implgen.h > scf_implgen_P.h
+ * gcc -E -x c -P -DSCF_IN_IMPLEMENTATION_H -I.. scf_implgen.h
  * after which the result was put into scf_implgen_p_template.h manually!
  */
 
