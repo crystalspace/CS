@@ -2,6 +2,7 @@
 
 31-May-2007
 	- Jorrit merged r26971 into 1.2 (lighter2 docs).
+	- Jorrit merged r26982 into 1.2 (threading doc fix).
 29-May-2007
 	- Jorrit removed shaderweaver from 1.2 (#307).
 	- Jorrit disabled imposters because they are currently
