@@ -6,6 +6,12 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-Jun-2007
+	- res changed the cs-config wrapper script to use '=' instead of '==' 
+	  for more POSIX compliancy.
+	- res changed the cs-config wrapper script to use shell built-ins
+	  instead of external utilities to construct the initial list of
+	  cs-config-* scripts.
 31-May-2007
 	- Marten reverted some of the changes and did some more fixes to make
 	  CS compile on GCC again after the SCF improvements.
