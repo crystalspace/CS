@@ -179,7 +179,7 @@
       <file>/shader/reflect.xml</file>
     </shader>
     <shader>
-      <file>/shader/reflect/reflectsphere.xml</file>
+      <file>/shader/reflectsphere.xml</file>
     </shader>
     <shader>
       <file>/shader/std_lighting_detail.xml</file>

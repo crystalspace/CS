@@ -1,3 +1,0 @@
-SubDir TOP data shader combiner-cg ;
-
-InstallData [ Wildcard *.inp *.xml ] : data shader combiner-cg ;
