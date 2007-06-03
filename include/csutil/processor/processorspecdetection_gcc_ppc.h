@@ -16,8 +16,22 @@ License along with this library; if not, write to the Free
 Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifndef __PROCESSORSPECDETECTION_GCC_PPC_H__
+#define __PROCESSORSPECDETECTION_GCC_PPC_H__
 
-bool CheckSupportedInstruction(int iSet)
+namespace Implementation
 {
-    return false;
+    class DetectInstructionsGCCPPC
+    {
+    public:
+        uint CheckSupportedInstruction()
+        {
+            instructionBitMask = 0;
+            return instructionBitMask;
+        }
+    private:
+        uint instructionBitMask;
+    };
 }
+
+#endif // __PROCESSORSPECDETECTION_GCC_PPC_H__

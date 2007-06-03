@@ -16,26 +16,35 @@ License along with this library; if not, write to the Free
 Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "csextern.h"
+#ifndef __PROCESSORSPECDETECTION_H__
+#define __PROCESSORSPECDETECTION_H__
 
-/*
-*  Include the correct version of CheckSupportedInstruction().
-*/
-#ifdef CS_PLATFORM_WIN32
-#include "processorspecdetection_win.h"
-#elif defined(CS_PLATFORM_POWERPC)
-#include "processorspecdetection_gcc_ppc.h"
-#else
-#include "processorspecdetection_nonwin_gcc_x86.h"
-#endif
+#include "csextern.h"
 
 namespace CS
 {
     namespace Platform
     {
+        enum InstructionSetFlags
+        { 
+            ALTIVEC = 1 << 0,
+            MMX = 1 << 1,
+            SSE = 1 << 2, 
+            SSE2 = 1 << 3,
+            SSE3 = 1 << 4
+        };
+
+#ifdef CS_PLATFORM_WIN32
+#include "processor/processorspecdetection_win.h"
+#elif defined(CS_PLATFORM_POWERPC)
+#include "processor/processorspecdetection_gcc_ppc.h"
+#else
+#include "processor/processorspecdetection_nonwin_gcc_x86.h"
+#endif
+
         using namespace Implementation;
         template <class T>
-        class CS_CRYSTALSPACE_EXPORT ProcessorSpecDetectionBase
+        class ProcessorSpecDetectionBase
         {
         public:
 
@@ -101,11 +110,11 @@ namespace CS
                     return;
 
                 instructionBitMask = platform.CheckSupportedInstruction();
-                hasAltiVec = (platform.ALTIVEC == (instructionBitMask & platform.ALTIVEC));
-                hasMMX = (platform.MMX == (instructionBitMask & platform.MMX));
-                hasSSE = (platform.SSE == (instructionBitMask & platform.SSE));
-                hasSSE2 = (platform.SSE2 == (instructionBitMask & platform.SSE2));
-                hasSSE3 = (platform.SSE3 == (instructionBitMask & platform.SSE3));
+                hasAltiVec = (instructionBitMask & ALTIVEC) != 0;
+                hasMMX = (instructionBitMask & MMX) != 0;
+                hasSSE = (instructionBitMask & SSE) != 0;
+                hasSSE2 = (instructionBitMask & SSE2) != 0;
+                hasSSE3 = (instructionBitMask & SSE3) != 0;
                 checked = true;
             }
         };
@@ -150,3 +159,5 @@ namespace CS
         };
     }
 }
+
+#endif // __PROCESSORSPECDETECTION_H__
