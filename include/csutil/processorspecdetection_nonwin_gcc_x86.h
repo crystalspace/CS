@@ -23,19 +23,20 @@ namespace CS
         namespace Implementation
         {
             /* On 64-bit x86 cpu's we know cpuid is supported.
-             * Also, normal gcc asm isn't supported, but we can use
-             * this macro to make use of cpuid.
-             */
+            * Also, normal gcc asm isn't supported, but we can use
+            * this macro to make use of cpuid.
+            */
 
 #if (CS_PROCESSOR_SIZE == 64)
- #define cpuid(func, eax, ebx, ecx, edx)\
+#define cpuid(func, eax, ebx, ecx, edx)\
     __asm__ __volatile__ ("cpuid":\
     "=a" (eax), "=b" (ebx), "=c" (ecx), "=d" (edx) : "a" (func));
 #endif
-            
+
             class DetectInstructionsNonWinGCCx86
             {
-                bool CheckSupportedInstruction(int iSet)
+            public:
+                static bool CheckSupportedInstruction(int iSet)
                 {
                     int eax, ebx, ecx, edx;
                     // 64-bit x86
