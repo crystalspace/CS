@@ -41,12 +41,6 @@ namespace CS
 
             ProcessorSpecDetectionBase()
             {
-                // Init everything to false.
-                for(int i=0; i<INSTRUCTIONCOUNT; i++)
-                {
-                    instruction[i] = false;
-                    checked[i] = false;
-                }
             }
 
             ~ProcessorSpecDetectionBase()
@@ -55,47 +49,57 @@ namespace CS
 
             inline bool HasMMX()
             {
-                CheckSupport(MMX);
-                return instruction[MMX];
+                CheckSupport();
+                return hasMMX;
             }
 
             inline bool HasSSE()
             {
-                CheckSupport(SSE);
-                return instruction[SSE];
+                CheckSupport();
+                return hasSSE;
             }
 
             inline bool HasSSE2()
             {
-                CheckSupport(SSE2);
-                return instruction[SSE2];
+                CheckSupport();
+                return hasSSE2;
             }
 
             inline bool HasSSE3()
             {
-                CheckSupport(SSE3);
-                return instruction[SSE3];
+                CheckSupport();
+                return hasSSE3;
             }
 
             inline bool HasAltiVec()
             {
-                CheckSupport(ALTIVEC);
-                return instruction[ALTIVEC];
+                CheckSupport();
+                return hasAltiVec;
             }
 
         private:
 
-            enum InstructionList { MMX, SSE, SSE2, SSE3, ALTIVEC, INSTRUCTIONCOUNT };
-            bool instruction[INSTRUCTIONCOUNT];
-            bool checked[INSTRUCTIONCOUNT];
+            T platform;
+            uint instructionBitMask;
+            bool checked;
+            bool hasAltiVec;
+            bool hasMMX;
+            bool hasSSE;
+            bool hasSSE2;
+            bool hasSSE3;
 
-            void CheckSupport(int iSet)
+            void CheckSupport()
             {
-                if(checked[iSet])
+                if(checked)
                     return;
 
-                instruction[iSet] = T::CheckSupportedInstruction(iSet);
-                checked[iSet] = true;
+                instructionBitMask = platform.CheckSupportedInstruction();
+                checked = true;
+                hasAltiVec = (instructionBitMask == 1);
+                hasMMX = (instructionBitMask > 1);
+                hasSSE = (instructionBitMask > 2);
+                hasSSE2 = (instructionBitMask > 3);
+                hasSSE3 = (instructionBitMask > 4);
             }
         };
 
@@ -105,8 +109,6 @@ namespace CS
 
 #ifdef CS_PLATFORM_WIN32
             ProcessorSpecDetectionBase<DetectInstructionsWin> procDetect;
-            // Define static bool plat64bit.
-            bool DetectInstructionsWin::plat64bit = false;
 #elif defined(CS_PLATFORM_POWERPC)
             ProcessorSpecDetectionBase<DetectInstructionsGCCPPC> procDetect;
 #else

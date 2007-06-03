@@ -25,7 +25,7 @@ namespace CS
             class DetectInstructionsNonWinGCCx86
             {
             public:
-                static bool CheckSupportedInstruction(int iSet)
+                uint CheckSupportedInstruction()
                 {
                     // Data from asm.
                     int CPUnum = 0;
@@ -100,31 +100,28 @@ __asm__(
     : "g" (procName), "2" (maxEax)
     : "eax", "ebx", "ecx", "edx", "esi");
 #endif
+
+if((edxCapFlags & (1<<23)) != 0)
+instructionBitMask += MMX;
+if((edxCapFlags & (1<<25)) != 0)
+instructionBitMask += SSE;
+if((edxCapFlags & (1<<26)) != 0)
+instructionBitMask += SSE2;
+if((ecxCapFlags & 1) != 0)
+instructionBitMask += SSE3;
  
-                    switch(iSet)
-                    {
-                    case 0:
-                        {
-                            return ((edxCapFlags & (1<<23)) != 0);
-                        }
-                    case 1:
-                        {
-                            return ((edxCapFlags & (1<<25)) != 0);
-                        }
-                    case 2:
-                        {
-                            return ((edxCapFlags & (1<<26)) != 0);
-                        }
-                    case 3:
-                        {
-                            return ((ecxCapFlags & 1) != 0);
-                        }
-                    default:
-                        {
-                            return false;
-                        }
-                    }
+return instructionBitMask;
                 }
+private:
+uint instructionBitMask;
+enum bitMask
+{ 
+ALTIVEC = 1,
+MMX,
+SSE, 
+SSE2,
+SSE3
+};
             };
         }
     }
