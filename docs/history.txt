@@ -21,6 +21,9 @@ chronological order.
 	- res added the X Window System and OpenGL to the list of "External
 	  Libraries" in the manual.
 	- res made a couple of tweaks to the API docs.
+1-Mar-2007
+	- Marten fixed a serious bug in bruteblock terrain where it would
+	  never cull any terrain blocks.
 20-Feb-2007
 	- res fixed old syntax being used in one of the manual tutorials.
 	  (Spotted by IRC user runix.)
