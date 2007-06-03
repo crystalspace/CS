@@ -104,7 +104,9 @@ namespace CS
         private:
 
 #ifdef CS_PLATFORM_WIN32
-            ProcessorSpecDetectionBase<Implementation::DetectInstructionsWin> procDetect;
+            ProcessorSpecDetectionBase<DetectInstructionsWin> procDetect;
+            // Define static bool plat64bit.
+            bool DetectInstructionsWin::plat64bit = false;
 #elif defined(CS_PLATFORM_POWERPC)
             ProcessorSpecDetectionBase<DetectInstructionsGCCPPC> procDetect;
 #else
@@ -136,10 +138,6 @@ namespace CS
             {
                 return procDetect.HasAltiVec();
             }
-
         };
-
-        // Define static bool plat64bit.
-        bool DetectInstructionsWin::plat64bit = false;
     }
 }
