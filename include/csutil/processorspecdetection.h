@@ -19,8 +19,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csextern.h"
 
 /*
- *  Include the correct version of CheckSupportedInstruction().
- */
+*  Include the correct version of CheckSupportedInstruction().
+*/
 #ifdef CS_PLATFORM_WIN32
 #include "processorspecdetection_win.h"
 #elif defined(CS_PLATFORM_POWERPC)
@@ -29,123 +29,117 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "processorspecdetection_nonwin_gcc_x86.h"
 #endif
 
-/*
- * 
- */
-#define MMX 0
-#define SSE 1
-#define SSE2 2
-#define SSE3 3
-#define ALTIVEC 4
-
 namespace CS
 {
     namespace Platform
     {
-        class CS_CRYSTALSPACE_EXPORT ProcessorSpecDetection
+        using namespace Implementation;
+        template <class T>
+        class CS_CRYSTALSPACE_EXPORT ProcessorSpecDetectionBase
         {
         public:
 
-            ProcessorSpecDetection()
+            ProcessorSpecDetectionBase()
             {
-                 for(int i=0; i<5; i++)
-                 {
-                      checked[i] = false;
-                 }
-                 supportsMMX = false;
-                 supportsSSE = false;
-                 supportsSSE2 = false;
-                 supportsSSE3 = false;
-                 supportsAltiVec = false;
+                // Init everything to false.
+                for(int i=0; i<INSTRUCTIONCOUNT; i++)
+                {
+                    instruction[i] = false;
+                    checked[i] = false;
+                }
             }
 
-            ~ProcessorSpecDetection()
+            ~ProcessorSpecDetectionBase()
             {
             }
 
             inline bool HasMMX()
             {
-#if defined(CS_PLATFORM_WIN32) && (CS_PROCESSOR_SIZE == 64)
-                    return true;
-#endif
-                checkSupport(MMX);
-                return supportsMMX;
+                CheckSupport(MMX);
+                return instruction[MMX];
             }
 
             inline bool HasSSE()
             {
-#if defined(CS_PLATFORM_WIN32) && (CS_PROCESSOR_SIZE == 64)
-                    return true;
-#endif
-                checkSupport(SSE);
-                return supportsSSE;
+                CheckSupport(SSE);
+                return instruction[SSE];
             }
 
             inline bool HasSSE2()
             {
-#if defined(CS_PLATFORM_WIN32) && (CS_PROCESSOR_SIZE == 64)
-                    return true;
-#endif
-                checkSupport(SSE2);
-                return supportsSSE2;
+                CheckSupport(SSE2);
+                return instruction[SSE2];
             }
 
             inline bool HasSSE3()
             {
-                checkSupport(SSE3);
-                return supportsSSE3;
+                CheckSupport(SSE3);
+                return instruction[SSE3];
             }
 
             inline bool HasAltiVec()
             {
-#ifndef CS_PLATFORM_POWERPC
-                    return false;
-#endif
-                checkSupport(ALTIVEC);
-                return supportsAltiVec;
+                CheckSupport(ALTIVEC);
+                return instruction[ALTIVEC];
             }
 
         private:
 
-            bool supportsMMX;
-            bool supportsSSE;
-            bool supportsSSE2;
-            bool supportsSSE3;
-            bool supportsAltiVec;
-            bool checked[5];
+            enum InstructionList { MMX, SSE, SSE2, SSE3, ALTIVEC, INSTRUCTIONCOUNT };
+            bool instruction[INSTRUCTIONCOUNT];
+            bool checked[INSTRUCTIONCOUNT];
 
-            void checkSupport(int iSet)
+            void CheckSupport(int iSet)
             {
                 if(checked[iSet])
                     return;
 
-                bool result = CheckSupportedInstruction(iSet);
-
-                switch(iSet)
-                {
-                case 0:
-                    {
-                        supportsMMX = result;
-                    }
-                case 1:
-                    {
-                        supportsSSE = result;
-                    }
-                case 2:
-                    {
-                        supportsSSE2 = result;
-                    }
-                case 3:
-                    {
-                        supportsSSE3 = result;
-                    }
-                case 4:
-                    {
-                        supportsAltiVec = result;
-                    }
-                }
+                instruction[iSet] = T::CheckSupportedInstruction(iSet);
                 checked[iSet] = true;
             }
         };
+
+        class CS_CRYSTALSPACE_EXPORT ProcessorSpecDetection
+        {
+        private:
+
+#ifdef CS_PLATFORM_WIN32
+            ProcessorSpecDetectionBase<Implementation::DetectInstructionsWin> procDetect;
+#elif defined(CS_PLATFORM_POWERPC)
+            ProcessorSpecDetectionBase<DetectInstructionsGCCPPC> procDetect;
+#else
+            ProcessorSpecDetectionBase<DetectInstructionsNonWinGCCx86> procDetect;
+#endif
+
+        public:
+            inline bool HasMMX()
+            {
+                return procDetect.HasMMX();
+            }
+
+            inline bool HasSSE()
+            {
+                return procDetect.HasSSE();
+            }
+
+            inline bool HasSSE2()
+            {
+                return procDetect.HasSSE2();
+            }
+
+            inline bool HasSSE3()
+            {
+                return procDetect.HasSSE3();
+            }
+
+            inline bool HasAltiVec()
+            {
+                return procDetect.HasAltiVec();
+            }
+
+        };
+
+        // Define static bool plat64bit.
+        bool DetectInstructionsWin::plat64bit = false;
     }
 }
