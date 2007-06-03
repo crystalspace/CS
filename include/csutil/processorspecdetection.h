@@ -41,6 +41,13 @@ namespace CS
 
             ProcessorSpecDetectionBase()
             {
+
+                checked = false;
+                hasAltiVec = false;
+                hasMMX = false;
+                hasSSE = false;
+                hasSSE2 = false;
+                hasSSE3 = false;
             }
 
             ~ProcessorSpecDetectionBase()
@@ -94,12 +101,12 @@ namespace CS
                     return;
 
                 instructionBitMask = platform.CheckSupportedInstruction();
+                hasAltiVec = (platform.ALTIVEC == (instructionBitMask & platform.ALTIVEC));
+                hasMMX = (platform.MMX == (instructionBitMask & platform.MMX));
+                hasSSE = (platform.SSE == (instructionBitMask & platform.SSE));
+                hasSSE2 = (platform.SSE2 == (instructionBitMask & platform.SSE2));
+                hasSSE3 = (platform.SSE3 == (instructionBitMask & platform.SSE3));
                 checked = true;
-                hasAltiVec = (instructionBitMask == 1);
-                hasMMX = (instructionBitMask > 1);
-                hasSSE = (instructionBitMask > 2);
-                hasSSE2 = (instructionBitMask > 3);
-                hasSSE3 = (instructionBitMask > 4);
             }
         };
 

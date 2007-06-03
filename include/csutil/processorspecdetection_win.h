@@ -32,42 +32,38 @@ namespace CS
             {
             public:
 
-                static bool CheckSupportedInstruction(int iSet)
+                uint CheckSupportedInstruction()
                 {
+                    instructionBitMask = 0;
                     // We know 64-bit processors on windows will support MMX, SSE and SSE2 instructions.
+                    bool plat64bit = false;
 #if defined(CS_PLATFORM_WIN32) && (CS_PROCESSOR_SIZE == 64)
                     plat64bit = true;
 #endif
 
-                    // Detect if instruction set is present.
-                    switch(iSet)
-                    {
-                    case 0:
-                        {
-                            return (plat64bit || IsProcessorFeaturePresent(PF_MMX_INSTRUCTIONS_AVAILABLE) != 0);
-                        }
-                    case 1:
-                        {
-                            return (plat64bit || IsProcessorFeaturePresent(PF_XMMI_INSTRUCTIONS_AVAILABLE) != 0);
-                        }
-                    case 2:
-                        {
-                            return (plat64bit || IsProcessorFeaturePresent(PF_XMMI64_INSTRUCTIONS_AVAILABLE) != 0);
-                        }
-                    case 3:
-                        {
-                            return (IsProcessorFeaturePresent(PF_SSE3_INSTRUCTIONS_AVAILABLE) != 0);
-                        }
-                        // AltiVec always false on windows.
-                    default:
-                        {
-                            return false;
-                        }
-                    }
+                    if(plat64bit || IsProcessorFeaturePresent(PF_MMX_INSTRUCTIONS_AVAILABLE) != 0)
+                        instructionBitMask += MMX;
+                    if(plat64bit || IsProcessorFeaturePresent(PF_XMMI_INSTRUCTIONS_AVAILABLE) != 0)
+                        instructionBitMask += SSE;
+                    if(plat64bit || IsProcessorFeaturePresent(PF_XMMI64_INSTRUCTIONS_AVAILABLE) != 0)
+                        instructionBitMask += SSE2;
+                    if(IsProcessorFeaturePresent(PF_SSE3_INSTRUCTIONS_AVAILABLE) != 0)
+                        instructionBitMask += SSE3;
+
+                    return instructionBitMask;
                 }
+
+                enum bitMask
+                { 
+                    ALTIVEC = 0x1,
+                    MMX = 0x10,
+                    SSE = 0x100, 
+                    SSE2 = 0x1000,
+                    SSE3 = 0x10000
+                };
+
             private:
-                // True if platform is 64-bit.
-                static bool plat64bit;
+                uint instructionBitMask;
             };
         }
     }
