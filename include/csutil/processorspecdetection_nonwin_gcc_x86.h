@@ -16,36 +16,57 @@ License along with this library; if not, write to the Free
 Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#define cpuid(func, ax, bx, cx, dx)\
-        __asm__ __volatile__ ("cpuid":\
-        "=a" (ax), "=b" (bx), "=c" (cx), "=d" (dx) : "a" (func));
-
-bool CheckSupportedInstruction(int iSet)
+namespace CS
 {
-    int a, b, c, d;
-    cpuid(0x1, a, b, c, d);
-
-    switch(iSet)
+    namespace Platform
     {
-    case 0:
+        namespace Implementation
         {
-            return ((d & (1<<23)) != 0);
-        }
-    case 1:
-        {
-            return ((d & (1<<25)) != 0);
-        }
-    case 2:
-        {
-            return ((d & (1<<26)) != 0);
-        }
-    case 3:
-        {
-            return ((c & 1) != 0);
-        }
-    default:
-        {
-            return false;
+            /* On 64-bit x86 cpu's we know cpuid is supported.
+             * Also, normal gcc asm isn't supported, but we can use
+             * this macro to make use of cpuid.
+             */
+
+#if (CS_PROCESSOR_SIZE == 64)
+ #define cpuid(func, eax, ebx, ecx, edx)\
+    __asm__ __volatile__ ("cpuid":\
+    "=a" (eax), "=b" (ebx), "=c" (ecx), "=d" (edx) : "a" (func));
+#endif
+            
+            class DetectInstructionsNonWinGCCx86
+            {
+                bool CheckSupportedInstruction(int iSet)
+                {
+                    int eax, ebx, ecx, edx;
+                    // 64-bit x86
+                    if(CS_PROCESSOR_SIZE == 64)
+                        cpuid(0x1, eax, ebx, ecx, edx);
+
+                    switch(iSet)
+                    {
+                    case 0:
+                        {
+                            return ((edx & (1<<23)) != 0);
+                        }
+                    case 1:
+                        {
+                            return ((edx & (1<<25)) != 0);
+                        }
+                    case 2:
+                        {
+                            return ((edx & (1<<26)) != 0);
+                        }
+                    case 3:
+                        {
+                            return ((ecx & 1) != 0);
+                        }
+                    default:
+                        {
+                            return false;
+                        }
+                    }
+                }
+            };
         }
     }
 }
