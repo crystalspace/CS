@@ -17,6 +17,9 @@ chronological order.
 	- res changed the installation of applications to install apps with a
 	  suffix of the version number and to create a symlink for the
 	  undecorated name.
+15-Feb-2007
+	- res fixed the reflect and reflectsphere shaders to actually map the
+	  diffuse texture coordinates. (Reported in CS-forum:1557.)
 12-Feb-2007
 	- res slightly expanded the manual section on smart pointers with
 	  information on translation to and from normal pointers as well as

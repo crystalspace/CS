@@ -2,6 +2,7 @@
   <technique priority="150">
     <pass>
       <!--<mixmode><copy/></mixmode>-->
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <buffer source="texture coordinate lightmap" destination="texture coordinate 1" />
       <buffer source="normal" destination="normal"/>
       <vp plugin="glfixed">
@@ -43,6 +44,7 @@
   <technique priority="100">
     <pass>
       <!--<mixmode><copy/></mixmode>-->
+      <buffer source="texture coordinate 0" destination="texture coordinate 0" />
       <buffer source="texture coordinate lightmap" destination="texture coordinate 1" />
       <vp plugin="glfixed">
         <fixedvp>  
