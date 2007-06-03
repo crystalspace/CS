@@ -786,14 +786,17 @@ struct iEngineSequenceManager : public virtual iBase
 
   /**
    * Start a timed operation with a given delta (in ticks).
-   * The delta has to be interpreted as the amount of time that has
-   * already elapsed since the beginning of the timed operation.
-   * The params block is increffed for as long as is needed so you
-   * can release your reference.
+   * \param delta To be interpreted as the amount of time that has already 
+   *   elapsed since the beginning of the timed operation.
+   * \param duration Duration of the timed operation.
+   * \param op Operation to start.
+   * \param params Operation parameters.
    * \param sequence_id This identifier can be used to get track of
    *   a given sequence. You can use this id to remove all operations that
    *   have this id. Use iSequenceManager->GetUniqueID() to fetch a suitable
    *   id here or else use the same id as the sequence has.
+   * \remarks  The params block is increffed for as long as is needed so you
+   *   can release your reference.
    */
   virtual void FireTimedOperation (csTicks delta, csTicks duration,
   	iSequenceTimedOperation* op, iBase* params = 0,

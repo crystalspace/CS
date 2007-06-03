@@ -109,9 +109,9 @@ public:
    * \param str Pointer to the encoded code point.
    * \param strlen Number of code units in the source string.
    * \param ch Decoded code point.
-   * \param isValid When an error occured during decoding, \p ch contains the
+   * \param isValid When an error occured during decoding, \a ch contains the
    *  replacement character (#CS_UC_CHAR_REPLACER). In this case, the bool
-   *  pointed to by \p isValid will be set to false. The parameter can be 0,
+   *  pointed to by \a isValid will be set to false. The parameter can be 0,
    *  but in this case the information whether the decoded char is the 
    *  replacement character because the source data is errorneous is lost.
    * \param returnNonChar Whether decoded non-character or high and low 
@@ -323,7 +323,7 @@ public:
    * \param allowNonchars Whether non-character or high and low surrogates
    *  are encoded. Normally, those code points are rejected to prevent the
    *  generation of invalid encoded strings.
-   * \return The number of code units needed to encode \p ch.
+   * \return The number of code units needed to encode \a ch.
    * \remark The buffer will be filled up as much as possible.
    *  Check the returned value whether the encoded code point completely fit 
    *  into the buffer.
@@ -852,7 +852,7 @@ public:
    * \param str Pointer to buffer with encoded code point.
    * \param maxSkip The number of code units to skip at max. Usually, this is
    *  the number of chars from \a str to the end of the buffer.
-   * \return Number of chars to skip in the buffer. Returns 0 if \p maxSkip is
+   * \return Number of chars to skip in the buffer. Returns 0 if \a maxSkip is
    *  0.
    */
   inline static int UTF8Skip (const utf8_char* str, size_t maxSkip)
@@ -894,7 +894,7 @@ public:
    * \param maxRew The number of code units to go back at max. Typically, this 
    *  is the number of chars from \a str to the start of the buffer.
    * \return Number of chars to skip back in the buffer. Returns 0 if 
-   *  \p maxRew is 0.
+   *  \a maxRew is 0.
    */
   inline static int UTF8Rewind (const utf8_char* str, size_t maxRew)
   {
@@ -985,7 +985,7 @@ public:
    * \param dest Destination buffer.
    * \param destSize Number of code units the destination buffer can hold.
    * \param flags Flags to control the result of the mapping. Currently 
-   *   supported is csUcMapSimple.
+   *   supported is #csUcMapSimple.
    * \return Number of code units the complete mapping result would require.
    */
   static size_t MapToUpper (const utf32_char ch, utf32_char* dest, 

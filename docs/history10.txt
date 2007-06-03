@@ -9,6 +9,8 @@ chronological order.
 3-Jun-2007
 	- res merged r26416 into 1.0 (shader fixes).
 	- res merged r26420, r26439 into 1.0 (xmlshader fixes).
+	- res merged r26447, r26526, r26528:26531, r26554, r26607 into 1.0
+	  (various doc tweaks).
 31-May-2007
 	- res merged r26267. r26815, r26839, r26840, r26948 into 1.0 (various
 	  changes in an effort to add support for multiple CS versions being

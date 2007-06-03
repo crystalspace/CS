@@ -13,6 +13,10 @@ libpng
 @item
 libjpeg
 @item
+X Window System
+@item
+OpenGL
+@item
 Freetype2
 @item
 @sc{cg}
@@ -132,6 +136,39 @@ graphic files.  You can download @code{libjpeg} from:
 After downloading you can either install the package normally (i.e. @samp{make
 install}) or unpack it into the directory @file{CS/libs/jpeg*}.  In general,
 if you have permission to do so, it is best to install the library.
+
+@subheading X Window System
+@cindex X Window System
+@cindex Libraries, X Window System
+
+This is needed to enable graphical output on a number of Unix-like operating 
+systems, most prominently @sc{gnu}/Linux.  It is @emph{not} needed for Windows
+or MacOS/X.
+
+The exact installation procedure depends on the operating system/distribution 
+you're using.  If you are, what is likely, running a graphical desktop, the
+needed runtime components of the X Window System are installed and functioning
+on your system.  However, development components (headers and libraries) may 
+still have to be installed.  It is outside the scope of this manual to detail
+how this is done on the various distributions and platforms, please refer to
+other resources for that.
+
+@subheading OpenGL
+@cindex OpenGL
+@cindex Libraries, OpenGL
+
+OpenGL is needed to provide accelerated 3D graphics @emph{on all platforms}.
+
+No special effort is usually needed to install the development components on
+Windows or MacOS/X, as the various Development Kits for that platform 
+generally contain the headers and libraries needed to utilize OpenGL.
+
+For other platforms the exact installation procedure depends on the operating 
+system/distribution you're using.  While the runtime components are usually
+installed when a graphical desktop is used, development components may 
+still have to be.  It is outside the scope of this manual to detail how this 
+is done on the various distributions and platforms, please refer to other 
+resources for that.
 
 @subheading Freetype2
 @cindex Freetype2

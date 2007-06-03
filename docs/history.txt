@@ -17,6 +17,13 @@ chronological order.
 	- res changed the installation of applications to install apps with a
 	  suffix of the version number and to create a symlink for the
 	  undecorated name.
+3-Mar-2007
+	- res added the X Window System and OpenGL to the list of "External
+	  Libraries" in the manual.
+	- res made a couple of tweaks to the API docs.
+20-Feb-2007
+	- res fixed old syntax being used in one of the manual tutorials.
+	  (Spotted by IRC user runix.)
 16-Feb-2007
 	- res fixed an issue in xmlshader where conditions were incorrectly
 	  folded away.

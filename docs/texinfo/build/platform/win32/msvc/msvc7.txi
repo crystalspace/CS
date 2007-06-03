@@ -223,6 +223,7 @@ the project.
 @item
 Q1. @emph{I'm using the Visual C++ 2005 Express Edition and I get a lot of 
 ``file not found'' errors for @file{windef.h} and others. What is wrong?}
+
 Q2. @emph{I'm using the Visual C++ 2005 Express Edition and I get a lot of 
 ``unresolved symbol'' errors for names like 
 @code{SHGetSpecialFolderLocation@@12}. What is wrong?}
@@ -264,24 +265,6 @@ It's the same problem, and if you have already done what is explained there,
 I can't do much for you!
 
 @item
-Q. @emph{I've got unresolved symbols.}
-
-A. What kind of symbols?
-
-@itemize @minus
-@item
-@samp{_png_@dots{}}: That means that you don't link the project with
-@file{libpng.lib}.  Just take a look below where it is explained how to do so.
-
-@item
-@samp{_inflate@dots{}} and @samp{_deflate@dots{}}: Well, it seems to your
-project lacks @file{zlib.lib}.  The trick is explained just below, so hang on.
-
-@item
-@samp{_DirectDraw@dots{}}: Same as above, but for @file{ddraw.lib} (DirectX
-component), look below.
-
-@item
 Q. @emph{How can I reduce build times?}
 
 A. Build only the projects you will need. You must build all the Crystal Space
@@ -292,20 +275,23 @@ some plugins are dependent on others}.
 
 @item
 Q. @emph{How can I reduce build sizes?}
+
 A. Build only the projects you will need.
+
 A. Turning off precompiled headers tends to save a large amount of file space
 while increasing build times somewhat.
 
 @item
-Any others: It seems that there is a missing source file in the project.  
+Q. @emph{It seems that there is a missing source file in the project.}
 
-For Crystal Space the MSVC project files are generated once every 24 hours, so 
-normally all missing sources should have been added after that time.  If you
-can't wait that long, or the file is still missing, contact one of the Crystal
-Space developers.
+A. For Crystal Space the MSVC project files are generated once every 24 hours, 
+so normally all missing sources should have been added after that time.  If 
+you can't wait that long, or the file is still missing, contact one of the 
+Crystal Space developers.
 
 For third party projects it's usually the best idea to contact one of it's
 developers, they should be able to tell you which file is missing.
+@end itemize
 
 @subsubheading Executing
 
