@@ -6,6 +6,14 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-June-2007
+        - Mike Gist added PSD code for PPC on OSX. Still needs testing.
+
+3-June-2007
+        - Mike Gist refactored PSD (Processor Spec Detection) code and made it
+          check for and return a bitmask of all supported instructions. Win and 
+          unix runtime checking work well now.
+
 1-Jun-2007
 	- res changed the cs-config wrapper script to use '=' instead of '==' 
 	  for more POSIX compliancy.
