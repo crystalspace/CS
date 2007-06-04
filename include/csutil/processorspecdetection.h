@@ -35,11 +35,11 @@ namespace CS
         };
 
 #ifdef CS_PLATFORM_WIN32
-#include "processor/processorspecdetection_win.h"
+#include "csutil/processor/processorspecdetection_win.h"
 #elif defined(CS_PLATFORM_POWERPC)
-#include "processor/processorspecdetection_gcc_ppc.h"
+#include "csutil/processor/processorspecdetection_gcc_ppc.h"
 #else
-#include "processor/processorspecdetection_nonwin_gcc_x86.h"
+#include "csutil/processor/processorspecdetection_nonwin_gcc_x86.h"
 #endif
 
         using namespace Implementation;
@@ -156,6 +156,7 @@ namespace CS
             {
                 return procDetect.HasAltiVec();
             }
+
         };
     }
 }

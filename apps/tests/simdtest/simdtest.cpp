@@ -29,7 +29,7 @@ int main()
     }
     else
     {
-        printf("MMX is not supported! :-(\n");
+        printf("MMX is not supported! :-( \n");
     }
     if(detect.HasSSE())
     {
