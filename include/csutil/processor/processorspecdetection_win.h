@@ -41,13 +41,13 @@ namespace Implementation
 
             // Check for instruction sets and set flags.
             if(plat64bit || IsProcessorFeaturePresent(PF_MMX_INSTRUCTIONS_AVAILABLE) != 0)
-                instructionBitMask += MMX;
+                instructionBitMask |= MMX;
             if(plat64bit || IsProcessorFeaturePresent(PF_XMMI_INSTRUCTIONS_AVAILABLE) != 0)
-                instructionBitMask += SSE;
+                instructionBitMask |= SSE;
             if(plat64bit || IsProcessorFeaturePresent(PF_XMMI64_INSTRUCTIONS_AVAILABLE) != 0)
-                instructionBitMask += SSE2;
+                instructionBitMask |= SSE2;
             if(IsProcessorFeaturePresent(PF_SSE3_INSTRUCTIONS_AVAILABLE) != 0)
-                instructionBitMask += SSE3;
+                instructionBitMask |= SSE3;
 
             return instructionBitMask;
         }

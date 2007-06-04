@@ -21,16 +21,36 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 namespace Implementation
 {
+#include <sys/sysctl.h>
     class DetectInstructionsGCCPPC
     {
     public:
         uint CheckSupportedInstruction()
         {
             instructionBitMask = 0;
+
+            if(GetAltiVecTypeAvailable() > 0)
+                instructionBitMask |= ALTIVEC;
+
             return instructionBitMask;
         }
     private:
         uint instructionBitMask;
+
+        // Returns 0 for scalar only, >0 for AltiVec
+        int GetAltiVecTypeAvailable()
+        {
+
+            int sels[2] = { CTL_HW, HW_VECTORUNIT };
+            int vType = 0; // 0 == scalar only
+            size_t length = sizeof(vType);
+            int error = sysctl(sels, 2, &vType, &length, NULL, 0);
+
+            if( 0 == error ) return vType;
+
+            return 0;
+        }
+
     };
 }
 
