@@ -21,7 +21,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 namespace Implementation
 {
-    enum InstructionSetFlags;
     class DetectInstructionsNonWinGCCx86
     {
     public:
@@ -104,13 +103,13 @@ namespace Implementation
 
             // Check for instruction sets and set flags.
             if((edxCapFlags & (1<<23)) != 0)
-                instructionBitMask += MMX;
+                instructionBitMask |= MMX;
             if((edxCapFlags & (1<<25)) != 0)
-                instructionBitMask += SSE;
+                instructionBitMask |= SSE;
             if((edxCapFlags & (1<<26)) != 0)
-                instructionBitMask += SSE2;
+                instructionBitMask |= SSE2;
             if((ecxCapFlags & 1) != 0)
-                instructionBitMask += SSE3;
+                instructionBitMask |= SSE3;
 
             return instructionBitMask;
         }
