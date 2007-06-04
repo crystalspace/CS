@@ -19,9 +19,10 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __PROCESSORSPECDETECTION_GCC_PPC_H__
 #define __PROCESSORSPECDETECTION_GCC_PPC_H__
 
+#include <sys/sysctl.h>
+
 namespace Implementation
 {
-#include <sys/sysctl.h>
     class DetectInstructionsGCCPPC
     {
     public:
