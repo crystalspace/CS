@@ -21,6 +21,8 @@ chronological order.
 	- res added the X Window System and OpenGL to the list of "External
 	  Libraries" in the manual.
 	- res made a couple of tweaks to the API docs.
+	- res changed CS_VERSION_NUMBER to properly contain a version
+	  number in the "x.y.z" scheme (and not "x.yz").
 1-Mar-2007
 	- Marten fixed a serious bug in bruteblock terrain where it would
 	  never cull any terrain blocks.
