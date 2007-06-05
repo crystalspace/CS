@@ -19,8 +19,23 @@
 #ifndef _CS_IUTIL_COLLADA_H
 #define _CS_IUTIL_COLLADA_H
 
-#include <crystalspace.h>
+/* These aren't needed - just forward declarations
+#include <iutil/string.h>
+#include <iutil/document.h>
+#include <iutil/vfs.h>
+#include <iutil/databuff.h>
+*/
 
+#include <csutil/scf.h>
+#include <csutil/scf_implementation.h>
+
+// Forward Declarations
+struct iString;
+struct iFile;
+struct iDataBuffer;
+struct iDocumentNode;
+
+// Enumerated File Type Definition
 enum csColladaFileType {
 	CS_COLLADA_COLLADA_FILE = 1,
 	CS_COLLADA_CRYSTAL_FILE

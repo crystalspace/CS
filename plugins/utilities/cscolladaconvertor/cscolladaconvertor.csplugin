@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- cscolladaconvertor.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.utilities.colladaconvertor</name>
+        <implementation>csColladaConvertor</implementation>
+        <description>COLLADA Conversion Utility</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
