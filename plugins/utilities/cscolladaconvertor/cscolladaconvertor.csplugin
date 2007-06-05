@@ -6,7 +6,7 @@
       <class>
         <name>crystalspace.utilities.colladaconvertor</name>
         <implementation>csColladaConvertor</implementation>
-        <description>COLLADA Conversion Utility</description>
+        <description>Crystal Space COLLADA Conversion System</description>
       </class>
     </classes>
   </scf>

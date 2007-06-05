@@ -23,3 +23,61 @@
 
 CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENTATION_FACTORY(csColladaConvertor)
+
+csColladaConvertor::csColladaConvertor(iBase* parent) :
+	scfImplementationType(this, parent), 
+	obj_reg(0),
+	colladaReady(false),
+	csReady(false)
+{
+}
+
+csColladaConvertor::~csColladaConvertor()
+{
+}
+
+bool csColladaConvertor::Initialize (iObjectRegistry* reg)
+{
+	obj_reg = reg;
+	return true;
+}
+
+const char* csColladaConvertor::Load(const char *str, csColladaFileType typeEnum)
+{
+}
+
+const char* csColladaConvertor::Load(iString *str, csColladaFileType typeEnum)
+{
+}
+
+const char* csColladaConvertor::Load(iFile *file, csColladaFileType typeEnum)
+{
+}
+
+const char* csColladaConvertor::Load(iDataBuffer *db, csColladaFileType typeEnum)
+{
+}
+
+const char* csColladaConvertor::Convert()
+{
+}
+
+bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
+{
+}
+
+bool csColladaConvertor::ConvertLighting(iDocumentNode *lightingSection)
+{
+}
+
+bool csColladaConvertor::ConvertTextureShading(iDocumentNode *textureSection)
+{
+}
+
+bool csColladaConvertor::ConvertRiggingAnimation(iDocumentNode *riggingSection)
+{
+}
+
+bool csColladaConvertor::ConvertPhysics(iDocumentNode *physicsSection)
+{
+}

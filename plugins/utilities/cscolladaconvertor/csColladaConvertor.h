@@ -16,45 +16,62 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifndef _CS_COLLADA_CONVERTOR_H_
+#define _CS_COLLADA_CONVERTOR_H_
+
 #include <ivaria/collada.h>
 #include <iutil/comp.h>
 
 // Forward Declarations
 struct iObjectRegistry;
 
+/** 
+ * This class implements the iColladaConvertor interface.  It is used as a conversion utility
+ * between files in the COLLADA digital interchange format, and Crystal Space Library and/or
+ * map files.
+ */
+
 class csColladaConvertor : public scfImplementation2<csColladaConvertor,iColladaConvertor,iComponent>
 {
 	private:
+		
+		/// A smart pointer to the Crystal Space document we will be working on in memory 
 		csRef<iDocument> csFile;
+
+		/// A smart pointer to the COLLADA document we will be working from in memory
 		csRef<iDocument> colladaFile;
 
+		/// Whether or not the COLLADA file has been loaded and is ready
 		bool colladaReady;
+
+		/// Whether or not the Crystal Space file has been loaded and is ready
 		bool csReady;
 
+		/// A pointer to the object registry
 		iObjectRegistry* obj_reg;
 
 	public:
 
-		// Constructors
-		csColladaConvertor();
+		/// Constructor
 		csColladaConvertor(iBase* parent);
 
-		// Destructor
+		/// Destructor
 		virtual ~csColladaConvertor();
 
-		// From iComponent
+		/// Initializes the plugin
 		virtual bool Initialize (iObjectRegistry*);
 		
-		// From iColladaConvertor
-		virtual const char* Load(const char *str, csColladaFileType typeEnum) = 0;
-		virtual const char* Load(iString *str, csColladaFileType typeEnum) = 0; 
-		virtual const char* Load(iFile *file, csColladaFileType typeEnum) = 0;
-		virtual const char* Load(iDataBuffer *db, csColladaFileType typeEnum) = 0;
+		virtual const char* Load(const char *str, csColladaFileType typeEnum);
+		virtual const char* Load(iString *str, csColladaFileType typeEnum); 
+		virtual const char* Load(iFile *file, csColladaFileType typeEnum);
+		virtual const char* Load(iDataBuffer *db, csColladaFileType typeEnum);
 
-		virtual const char* Convert() = 0;
-		virtual bool ConvertGeometry(iDocumentNode *geometrySection) = 0;
-		virtual bool ConvertLighting(iDocumentNode *lightingSection) = 0;
-		virtual bool ConvertTextureShading(iDocumentNode *textureSection) = 0;
-		virtual bool ConvertRiggingAnimation(iDocumentNode *riggingSection) = 0;
-		virtual bool ConvertPhysics(iDocumentNode *physicsSection) = 0;
+		virtual const char* Convert();
+		virtual bool ConvertGeometry(iDocumentNode *geometrySection);
+		virtual bool ConvertLighting(iDocumentNode *lightingSection);
+		virtual bool ConvertTextureShading(iDocumentNode *textureSection);
+		virtual bool ConvertRiggingAnimation(iDocumentNode *riggingSection);
+		virtual bool ConvertPhysics(iDocumentNode *physicsSection);
 };
+
+#endif
