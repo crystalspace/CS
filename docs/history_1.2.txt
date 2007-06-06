@@ -2,6 +2,7 @@
 
 6-Jan-2007
 	- res merged r26991 into 1.2 (docs tweak).
+	- res merged r27009 into 1.2 (cs-config wrapper fixes).
 1-Jan-2007
 	- res removed weaver-based shaders.
 31-May-2007
