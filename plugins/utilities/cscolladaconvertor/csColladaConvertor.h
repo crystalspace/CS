@@ -24,11 +24,15 @@
 
 // Forward Declarations
 struct iObjectRegistry;
+struct iDocumentSystem;
 
 /** 
  * This class implements the iColladaConvertor interface.  It is used as a conversion utility
  * between files in the COLLADA digital interchange format, and Crystal Space Library and/or
  * map files.
+ *
+ * \remarks This class requires writeable XML documents, and thus utilizes the TinyXML plugin.
+ *          The TinyXML plugin will be loaded on initialization of this plugin.
  */
 
 class csColladaConvertor : public scfImplementation2<csColladaConvertor,iColladaConvertor,iComponent>
@@ -40,6 +44,9 @@ class csColladaConvertor : public scfImplementation2<csColladaConvertor,iCollada
 
 		/// A smart pointer to the COLLADA document we will be working from in memory
 		csRef<iDocument> colladaFile;
+
+		/// A smart pointer to the document system
+		iDocumentSystem* docSys;
 
 		/// Whether or not the COLLADA file has been loaded and is ready
 		bool colladaReady;
@@ -58,7 +65,12 @@ class csColladaConvertor : public scfImplementation2<csColladaConvertor,iCollada
 		/// Destructor
 		virtual ~csColladaConvertor();
 
-		/// Initializes the plugin
+		/**
+		 * Initializes the plugin.
+		 * 
+		 * \warning This will reload the iDocumentSystem interface so that it uses the TinyXML
+		 *          plugin as an implementation.
+		 */
 		virtual bool Initialize (iObjectRegistry*);
 		
 		virtual const char* Load(const char *str, csColladaFileType typeEnum);

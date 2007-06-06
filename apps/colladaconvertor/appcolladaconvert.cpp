@@ -44,12 +44,6 @@ bool ColladaConversionUtility::OnInitialize(int argc, char* argv[])
   
     /* Load up the XML Read Document System, instead of the default */
     plugManager = csQueryRegistry<iPluginManager> (GetObjectRegistry());
-
-	/* Deprecated */
-    //csPluginLoader* plugload = new csPluginLoader(GetObjectRegistry());
-	//plugload->RequestPlugin("crystalspace.documentsystem.xmlread", "iDocumentSystem");
-	//plugload->LoadPlugins();
-	//docSystem = csQueryRegistry<iDocumentSystem> (GetObjectRegistry());
 	docSystem = csLoadPlugin<iDocumentSystem> (plugManager, "crystalspace.documentsystem.xmlread");
 
 	if (!docSystem.IsValid())
@@ -57,7 +51,15 @@ bool ColladaConversionUtility::OnInitialize(int argc, char* argv[])
 		ReportWarning("Warning: Document system invalid.  Defaulting to Tiny XML Document System.");
 		docSystem.AttachNew(new csTinyDocumentSystem());
 	}
-	
+
+	colladaConv = csLoadPlugin<iColladaConvertor> (plugManager, "crystalspace.utilities.colladaconvertor");
+
+	if (!colladaConv.IsValid())
+	{
+		return ReportError("Error: Unable to load COLLADA Conversion System.  Terminating.");
+	}
+
+	/*
 	colladaDocument = docSystem->CreateDocument();
 	if (!colladaDocument.IsValid())
 	{
@@ -116,6 +118,7 @@ bool ColladaConversionUtility::OnInitialize(int argc, char* argv[])
 	}
 
 	//cout << "Everything seems good, proceeding!" << endl;
+	*/
 
   return true;
 }

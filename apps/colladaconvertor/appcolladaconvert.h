@@ -30,10 +30,9 @@ class ColladaConversionUtility : public csApplicationFramework, public csBaseEve
 		csRef<iDocumentSystem> docSystem;
 		csRef<iVFS> fileSystem;
 		csRef<iDocument> colladaDocument;
-
 		csRef<iFile> colladaFile;
-
 		csRef<iPluginManager> plugManager;
+		csRef<iColladaConvertor> colladaConv;
 
 	public:
 		ColladaConversionUtility();

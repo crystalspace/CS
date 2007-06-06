@@ -17,12 +17,14 @@
 */
 
 #include <cssysdef.h>
-#include <csColladaConvertor.h>
 #include <iutil/objreg.h>
 #include <iutil/plugin.h>
+#include <iutil/document.h>
+#include <csutil/xmltiny.h>
+#include "csColladaConvertor.h"
 
 CS_IMPLEMENT_PLUGIN
-SCF_IMPLEMENTATION_FACTORY(csColladaConvertor)
+SCF_IMPLEMENT_FACTORY(csColladaConvertor)
 
 csColladaConvertor::csColladaConvertor(iBase* parent) :
 	scfImplementationType(this, parent), 
@@ -34,50 +36,66 @@ csColladaConvertor::csColladaConvertor(iBase* parent) :
 
 csColladaConvertor::~csColladaConvertor()
 {
+	delete docSys;
 }
 
 bool csColladaConvertor::Initialize (iObjectRegistry* reg)
 {
 	obj_reg = reg;
+
+	// create our own document system, since we will be reading and
+	// writing to the XML files
+	docSys = new csTinyDocumentSystem();
+
 	return true;
 }
 
 const char* csColladaConvertor::Load(const char *str, csColladaFileType typeEnum)
 {
+	return "0";
 }
 
 const char* csColladaConvertor::Load(iString *str, csColladaFileType typeEnum)
 {
+	return "0";
 }
 
 const char* csColladaConvertor::Load(iFile *file, csColladaFileType typeEnum)
 {
+	return "0";
 }
 
 const char* csColladaConvertor::Load(iDataBuffer *db, csColladaFileType typeEnum)
 {
+	return "0";
 }
 
 const char* csColladaConvertor::Convert()
 {
+	return "0";
 }
 
 bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
 {
+	return true;
 }
 
 bool csColladaConvertor::ConvertLighting(iDocumentNode *lightingSection)
 {
+	return true;
 }
 
 bool csColladaConvertor::ConvertTextureShading(iDocumentNode *textureSection)
 {
+	return true;
 }
 
 bool csColladaConvertor::ConvertRiggingAnimation(iDocumentNode *riggingSection)
 {
+	return true;
 }
 
 bool csColladaConvertor::ConvertPhysics(iDocumentNode *physicsSection)
 {
+	return true;
 }
