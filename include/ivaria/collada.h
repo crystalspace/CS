@@ -63,7 +63,7 @@ enum csColladaFileType {
 
 struct iColladaConvertor : public virtual iBase
 {
-	SCF_INTERFACE(iColladaConvertor, 1, 0, 0);
+  SCF_INTERFACE(iColladaConvertor, 1, 0, 0);
 		
 	/** 
 	 * Load a file from a null-terminated C-string into the COLLADA Conversion System
