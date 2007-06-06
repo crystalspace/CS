@@ -29,10 +29,13 @@ ColladaConversionUtility::ColladaConversionUtility()
 
 bool ColladaConversionUtility::OnInitialize(int argc, char* argv[])
 {
-	if (!csInitializer::RequestPlugins(GetObjectRegistry(),
+  if (!csInitializer::RequestPlugins(GetObjectRegistry(),
     CS_REQUEST_VFS,
     CS_REQUEST_OPENGL3D,
     CS_REQUEST_ENGINE,
+    CS_REQUEST_FONTSERVER,
+    CS_REQUEST_IMAGELOADER,
+    CS_REQUEST_LEVELLOADER,
     CS_REQUEST_REPORTER,
     CS_REQUEST_REPORTERLISTENER,
     CS_REQUEST_END))
@@ -48,7 +51,7 @@ bool ColladaConversionUtility::OnInitialize(int argc, char* argv[])
 
 	if (!docSystem.IsValid())
 	{
-		ReportWarning("Warning: Document system invalid.  Defaulting to Tiny XML Document System.");
+		ReportWarning("Document system invalid.  Defaulting to Tiny XML Document System.");
 		docSystem.AttachNew(new csTinyDocumentSystem());
 	}
 
@@ -57,6 +60,11 @@ bool ColladaConversionUtility::OnInitialize(int argc, char* argv[])
 	if (!colladaConv.IsValid())
 	{
 		return ReportError("Error: Unable to load COLLADA Conversion System.  Terminating.");
+	}
+
+	else
+	{
+		colladaConv->Load("Just testing", CS_COLLADA_FILE);
 	}
 
 	/*
@@ -129,7 +137,7 @@ bool ColladaConversionUtility::Application()
 		return ReportError("Error: Unable to fetch Object Registry!");
 
   // We don't need the runloop to start
-  //Run();
+  Run();
 
   return true;
 }

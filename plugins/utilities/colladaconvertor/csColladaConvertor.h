@@ -21,6 +21,7 @@
 
 #include <ivaria/collada.h>
 #include <iutil/comp.h>
+#include <iutil/vfs.h>
 
 // Forward Declarations
 struct iObjectRegistry;
@@ -40,13 +41,16 @@ class csColladaConvertor : public scfImplementation2<csColladaConvertor,iCollada
 	private:
 		
 		/// A smart pointer to the Crystal Space document we will be working on in memory 
-		csRef<iDocument> csFile;
+    csRef<iDocument> csFile;
 
 		/// A smart pointer to the COLLADA document we will be working from in memory
 		csRef<iDocument> colladaFile;
 
 		/// A smart pointer to the document system
 		iDocumentSystem* docSys;
+
+		/// A smart pointer to the virtual file system
+		csRef<iVFS> fileSys;
 
 		/// Whether or not the COLLADA file has been loaded and is ready
 		bool colladaReady;
