@@ -8,7 +8,7 @@ chronological order.
 
 6-Jun-2007
 	- caedes fixed scripting bindings for latest scf changes.
-	- res fixed thee configure javac detection to quote the Java directory
+	- res fixed the configure javac detection to quote the Java directory
 	  (so directories with spaces work).
 4-Jun-2007
 	- Oktal fixed a mistake made during Marten's SCF clean-up, that broke
