@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _APP_COLLADA_CONVERT_H_
-#define _APP_COLLADA_CONVERT_H_
+#ifndef _APP_COLLADATEST_H_
+#define _APP_COLLADATEST_H_
 
 #include <iostream>
 #include <crystalspace.h>
@@ -25,7 +25,7 @@
 #define TESTDIR "E:$/Source$/ColladaConvertor$/data$/test$/"
 #define TESTFILE "colladatest2.dae"
 
-class ColladaConversionUtility : public csApplicationFramework, public csBaseEventHandler {
+class ColladaTest : public csApplicationFramework, public csBaseEventHandler {
 	private:
 		csRef<iDocumentSystem> docSystem;
 		csRef<iVFS> fileSystem;
@@ -42,7 +42,7 @@ class ColladaConversionUtility : public csApplicationFramework, public csBaseEve
 		// Crystal Space Functions
 		bool OnInitialize(int argc, char* argv[]);
 		bool Application();
-		 
+
   CS_EVENTHANDLER_NAMES("application.colladaconvertor")
   CS_EVENTHANDLER_NIL_CONSTRAINTS
 };

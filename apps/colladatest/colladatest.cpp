@@ -16,18 +16,18 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "appcolladaconvert.h"
+#include "colladatest.h"
 
 using namespace std;
 
 CS_IMPLEMENT_APPLICATION
 
-ColladaConversionUtility::ColladaConversionUtility()
+ColladaTest::ColladaTest()
 {
-	SetApplicationName("crystalspace.colladaconvertor");
+	SetApplicationName("crystalspace.colladatest");
 }
 
-bool ColladaConversionUtility::OnInitialize(int argc, char* argv[])
+bool ColladaTest::OnInitialize(int argc, char* argv[])
 {
   if (!csInitializer::RequestPlugins(GetObjectRegistry(),
     CS_REQUEST_VFS,
@@ -44,7 +44,7 @@ bool ColladaConversionUtility::OnInitialize(int argc, char* argv[])
   csBaseEventHandler::Initialize(GetObjectRegistry());
   if (!RegisterQueue(GetObjectRegistry(), csevAllEvents(GetObjectRegistry())))
     return ReportError("Failed to set up event handler!");
-  
+
     /* Load up the XML Read Document System, instead of the default */
     plugManager = csQueryRegistry<iPluginManager> (GetObjectRegistry());
 	docSystem = csLoadPlugin<iDocumentSystem> (plugManager, "crystalspace.documentsystem.xmlread");
@@ -99,7 +99,7 @@ bool ColladaConversionUtility::OnInitialize(int argc, char* argv[])
 	// This works
 	csRef<iDataBuffer> buf = colladaFile->GetAllData();
 	//cout << buf->GetData() << endl;
-	
+
 	// This does not work
 	colladaDocument->Parse(colladaFile);
 	//int position = colladaFile->GetPos();
@@ -107,10 +107,10 @@ bool ColladaConversionUtility::OnInitialize(int argc, char* argv[])
 	//colladaDocument->Parse(buf);
 
 	csRef<iDocumentNode> root = colladaDocument->GetRoot();
-	
+
 	// we need to start at the root node
 	// for our purposes, this will be the node <COLLADA>
-	root = root->GetNode("COLLADA"); 
+	root = root->GetNode("COLLADA");
 	csRef<iDocumentAttribute> ver = root->GetAttribute("version");
 	if (!ver.IsValid())
 	{
@@ -133,7 +133,7 @@ bool ColladaConversionUtility::OnInitialize(int argc, char* argv[])
   return true;
 }
 
-bool ColladaConversionUtility::Application()
+bool ColladaTest::Application()
 {
 	if (!OpenApplication(GetObjectRegistry()))
 		return ReportError("Error: Unable to fetch Object Registry!");
@@ -146,5 +146,5 @@ bool ColladaConversionUtility::Application()
 
 int main(int argc, char** argv)
 {
-	return csApplicationRunner<ColladaConversionUtility>::Run (argc, argv);
+	return csApplicationRunner<ColladaTest>::Run (argc, argv);
 }
