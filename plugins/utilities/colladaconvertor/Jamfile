@@ -1,0 +1,9 @@
+SubDir TOP plugins utilities colladaconvertor ;
+
+Description colladaconvertor : "COLLADA Conversion Plugin" ;
+
+Plugin colladaconvertor
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith colladaconvertor : crystalspace ;
+
