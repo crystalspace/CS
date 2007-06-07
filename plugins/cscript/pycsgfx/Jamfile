@@ -54,9 +54,9 @@ if $(PYTHON.AVAILABLE) = "yes"
   #--------
   PythMod csgfxmod : _csgfx : 
 	csgfxmod.cpp cs_csgfx.cpp : 
-	crystalspace_python : 
+	crystalspace : 
 	: 
 	"csgfx cs Python module" ;
   Depends csgfxmod : $(csgfxpy) ;
-  #CFlags csgfxmod : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
+  CFlags csgfxmod : $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE) ;
 }

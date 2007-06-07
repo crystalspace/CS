@@ -54,9 +54,9 @@ if $(PYTHON.AVAILABLE) = "yes"
   #--------
   PythMod imapmod : _imap : 
 	imapmod.cpp cs_imap.cpp : 
-	crystalspace_python : 
+	crystalspace : 
 	: 
 	"imap cs Python module" ;
   Depends imapmod : $(imappy) ;
-  #CFlags imapmod : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
+  CFlags imapmod : $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE) ;
 }

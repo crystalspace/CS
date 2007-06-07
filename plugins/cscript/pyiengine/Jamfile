@@ -54,9 +54,9 @@ if $(PYTHON.AVAILABLE) = "yes"
   #--------
   PythMod ienginemod : _iengine : 
 	ienginemod.cpp cs_iengine.cpp : 
-	crystalspace_python : 
+	crystalspace : 
 	: 
 	"iengine cs Python module" ;
   Depends ienginemod : $(ienginepy) ;
-  #CFlags ienginemod : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
+  CFlags ienginemod : $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE) ;
 }

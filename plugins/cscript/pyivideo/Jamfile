@@ -54,9 +54,9 @@ if $(PYTHON.AVAILABLE) = "yes"
   #--------
   PythMod ivideomod : _ivideo : 
 	ivideomod.cpp cs_ivideo.cpp : 
-	crystalspace_python : 
+	crystalspace : 
 	: 
 	"ivideo cs Python module" ;
   Depends ivideomod : $(ivideopy) ;
-  #CFlags ivideomod : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
+  CFlags ivideomod : $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE) ;
 }

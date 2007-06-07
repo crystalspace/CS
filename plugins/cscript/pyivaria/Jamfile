@@ -54,9 +54,9 @@ if $(PYTHON.AVAILABLE) = "yes"
   #--------
   PythMod ivariamod : _ivaria : 
 	ivariamod.cpp cs_ivaria.cpp : 
-	crystalspace_python : 
+	crystalspace : 
 	: 
 	"ivaria cs Python module" ;
   Depends ivariamod : $(ivariapy) ;
-  CFlags ivariamod : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
+  CFlags ivariamod : $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE) ;
 }

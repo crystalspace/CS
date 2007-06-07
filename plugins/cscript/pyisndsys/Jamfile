@@ -54,9 +54,9 @@ if $(PYTHON.AVAILABLE) = "yes"
   #--------
   PythMod isndsysmod : _isndsys : 
 	isndsysmod.cpp cs_isndsys.cpp : 
-	crystalspace_python : 
+	crystalspace : 
 	: 
 	"isndsys cs Python module" ;
   Depends isndsysmod : $(isndsyspy) ;
-  CFlags isndsysmod : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
+  CFlags isndsysmod : $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE) ;
 }

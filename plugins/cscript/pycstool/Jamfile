@@ -54,9 +54,9 @@ if $(PYTHON.AVAILABLE) = "yes"
   #--------
   PythMod cstoolmod : _cstool : 
 	cstoolmod.cpp cs_cstool.cpp : 
-	crystalspace_python : 
+	crystalspace : 
 	: 
 	"cstool cs Python module" ;
   Depends cstoolmod : $(cstoolpy) ;
-  CFlags cstoolmod : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
+  CFlags cstoolmod : $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE) ;
 }
