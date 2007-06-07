@@ -6,6 +6,17 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+07-Jun-2007
+	- caedes did the following changes in swig interface files:
+	  - moved all common swig interface declarations to a new folder
+	    called 'include/bindings/common'.
+	  - made the main module swig files a thin wrapper that declares
+	    the module names and includes the real stuff lying in common/,
+	    this will allow building small modules or old monolithic approach
+	    for languages that havent adapted for new structure.
+	  - merged cspace.i and basepre.i, thus reverting that part of the
+	    split.
+	  - created post swig files for all modules for python.
 25-May-2007
 	- Oktal started splitting the per-module language-specific parts of
 	  the swig interface files (only done python/imeshpost.i so far).
