@@ -34,6 +34,8 @@ class ColladaConversionUtility : public csApplicationFramework, public csBaseEve
 		csRef<iPluginManager> plugManager;
 		csRef<iColladaConvertor> colladaConv;
 
+		//csPathsList* pathList;
+
 	public:
 		ColladaConversionUtility();
 

@@ -55,8 +55,8 @@ bool ColladaConversionUtility::OnInitialize(int argc, char* argv[])
 		docSystem.AttachNew(new csTinyDocumentSystem());
 	}
 
-	colladaConv = csLoadPlugin<iColladaConvertor> (plugManager, "crystalspace.utilities.colladaconvertor");
-
+	//colladaConv = csLoadPlugin<iColladaConvertor> (plugManager, "crystalspace.utilities.colladaconvertor");
+  /*
 	if (!colladaConv.IsValid())
 	{
 		return ReportError("Error: Unable to load COLLADA Conversion System.  Terminating.");
@@ -66,6 +66,8 @@ bool ColladaConversionUtility::OnInitialize(int argc, char* argv[])
 	{
 		colladaConv->Load("Just testing", CS_COLLADA_FILE);
 	}
+  */
+	//pathList = csGetPluginPaths("0");
 
 	/*
 	colladaDocument = docSystem->CreateDocument();
