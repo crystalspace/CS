@@ -12,4 +12,5 @@ SubInclude TOP plugins cscript pycstool ;
 SubInclude TOP plugins cscript pyivideo ;
 SubInclude TOP plugins cscript pyimap ;
 SubInclude TOP plugins cscript pycsgfx ;
+SubInclude TOP plugins cscript pycsgeom ;
 
