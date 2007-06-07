@@ -70,6 +70,24 @@ _csRef_to_Python (const csRef<iBase> & ref, void * ptr, const char * name)
 }
 %}
 
+#undef LANG_FUNCTIONS
+%define LANG_FUNCTIONS
+%{
+PyObject *
+_csRef_to_Python (const csRef<iBase> & ref, void * ptr, const char * name)
+{
+  if (!ref.IsValid())
+  {
+    Py_INCREF(Py_None);
+    return Py_None;
+  }
+  ref->IncRef();
+  return SWIG_NewPointerObj((void *)ptr, SWIG_TypeQuery(name), 1);
+}
+%}
+%enddef
+
+
 /*
   ptr  : either a csRef<type> or csPtr<type>
   name : type name, e.g. "iEngine *"
