@@ -22,6 +22,10 @@
 #include <ivaria/collada.h>
 #include <iutil/comp.h>
 #include <iutil/vfs.h>
+#include <ivaria/reporter.h>
+
+// Standard Headers
+#include <cstdarg>
 
 // Forward Declarations
 struct iObjectRegistry;
@@ -60,6 +64,11 @@ class csColladaConvertor : public scfImplementation2<csColladaConvertor,iCollada
 
 		/// A pointer to the object registry
 		iObjectRegistry* obj_reg;
+
+		/**
+		 * Report various things back to the application
+		 */
+		void Report(int severity, const char* msg, ...);
 
 	public:
 

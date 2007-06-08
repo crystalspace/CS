@@ -26,6 +26,26 @@
 CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY(csColladaConvertor)
 
+void csColladaConvertor::Report(int severity, const char* msg, ...)
+{
+	va_list argList;
+	va_start(argList, msg);
+
+	csRef<iReporter> rep = csQueryRegistry<iReporter>(obj_reg);
+	if (rep.IsValid())
+	{
+		rep->ReportV(severity, "crystalspace.colladaconvertor", msg, argList); 
+	}
+	else
+	{
+		csPrintfV(msg, argList);
+		csPrintf("\n");
+	}
+
+	va_end(argList);
+}
+
+
 csColladaConvertor::csColladaConvertor(iBase*	parent)	:
 	scfImplementationType(this,	parent), 
 	obj_reg(0),
@@ -43,29 +63,35 @@ bool csColladaConvertor::Initialize	(iObjectRegistry*	reg)
 {
 	obj_reg	=	reg;
 
+	
 	// create	our	own	document system, since we	will be	reading	and
 	// writing to	the	XML	files
-  docSys = new csTinyDocumentSystem();
+	docSys = new csTinyDocumentSystem();
 
+/*
 	// get a pointer to the virtual file system
-	//fileSys = csQueryRegistry<iVFS>(obj_reg);
+	fileSys = csQueryRegistry<iVFS>(obj_reg);
 
 	if (!fileSys.IsValid())
 	{
 		return false;
 	}
+*/
 
 	return true;
 }
 
 const	char*	csColladaConvertor::Load(const char	*str,	csColladaFileType	typeEnum)
 {
-	iFile* filePtr;
-	
+	//iFile* filePtr;
+
+	Report(CS_REPORTER_SEVERITY_NOTIFY, "Inside Load!");
+	/*
 	if (!fileSys.IsValid())
 	{
 		return "Unable to acquire pointer to VFS.";
 	}
+*/
 
 	return "0";
 }
