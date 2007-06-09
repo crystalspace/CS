@@ -35,20 +35,6 @@ typedef void* OSXAssistantHandle;
 #define NSD_PROTO(RET,FUNC) extern "C" RET OSXAssistant_##FUNC
 #define NSD_ASSIST(HANDLE) ((iOSXAssistant*)(HANDLE))
 
-SCF_IMPLEMENT_IBASE(OSXAssistant)
-  SCF_IMPLEMENTS_INTERFACE(iOSXAssistant)
-  SCF_IMPLEMENTS_INTERFACE(iOSXAssistantLocal)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventPlug)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE(OSXAssistant::eiEventPlug)
-  SCF_IMPLEMENTS_INTERFACE(iEventPlug)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE(OSXAssistant::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE(iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 //-----------------------------------------------------------------------------
 // Constructor
