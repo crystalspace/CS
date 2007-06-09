@@ -272,7 +272,7 @@ NSD_PROTO(void,application_unhidden)(OSXAssistantHandle h)
 //=============================================================================
 // iEventPlug Implementation
 //=============================================================================
-uint OSXAssistant:::GetPotentiallyConflictingEvents()
+uint OSXAssistant::GetPotentiallyConflictingEvents()
   { return (CSEVTYPE_Keyboard | CSEVTYPE_Mouse); }
 uint OSXAssistant::QueryEventPriority(uint)
   { return 150; }
@@ -283,7 +283,7 @@ uint OSXAssistant::QueryEventPriority(uint)
 //=============================================================================
 bool OSXAssistant::HandleEvent(iEvent& e)
 {
-  if (e.Name == Quit)
+  if (e.Name == quitEventID)
     should_shutdown = true;
   return false;
 }
