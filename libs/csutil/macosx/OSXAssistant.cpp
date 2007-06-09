@@ -272,9 +272,9 @@ NSD_PROTO(void,application_unhidden)(OSXAssistantHandle h)
 //=============================================================================
 // iEventPlug Implementation
 //=============================================================================
-uint OSXAssistant::eiEventPlug::GetPotentiallyConflictingEvents()
+uint OSXAssistant:::GetPotentiallyConflictingEvents()
   { return (CSEVTYPE_Keyboard | CSEVTYPE_Mouse); }
-uint OSXAssistant::eiEventPlug::QueryEventPriority(uint)
+uint OSXAssistant::QueryEventPriority(uint)
   { return 150; }
 
 
