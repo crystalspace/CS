@@ -41,14 +41,14 @@ struct iDocumentNode;
 
 enum csColladaFileType {
 
-	/// A COLLADA File
-	CS_COLLADA_FILE = 1,
-	
 	/// A Crystal Space library file
-	CS_LIBRARY_FILE,
+	CS_LIBRARY_FILE = 1,
 
 	/// A Crystal Space map file
-	CS_MAP_FILE
+	CS_MAP_FILE,
+
+	/// No file type.  This is for an initialization value.  Do not use.
+	CS_NO_FILE
 };
 
 /**
@@ -66,67 +66,152 @@ struct iColladaConvertor : public virtual iBase
   SCF_INTERFACE(iColladaConvertor, 1, 0, 0);
 		
 	/** 
-	 * Load a file from a null-terminated C-string into the COLLADA Conversion System
+	 * Load a COLLADA file from a null-terminated C-string into the COLLADA Conversion System
 	 *
-     * \param str A string containing the location of the file to be loaded in VFS
-	 * \param typeEnum The type of file to load.  This is one of:
-	 *                 - CS_COLLADA_FILE
-	 *                 - CS_MAP_FILE
-	 *                 - CS_LIBRARY_FILE
-     * \return 0 if everything is ok; otherwise an error message
+   * \param str A string containing the location of the file to be loaded in VFS
+	 *
+	 * \return 0 if everything is ok; otherwise an error message
 	 * \remarks This will replace the current file being used to read data
-	 *          from, or store data to, depending on the second parameter.
+	 *          from.
 	 */
-	virtual const char* Load(const char *str, csColladaFileType typeEnum) = 0;
+	virtual const char* Load(const char *str) = 0;
 	 
 	 /** 
-	 * Load a file from an iString object into the COLLADA Conversion System
+	 * Load a COLLADA file from an iString object into the COLLADA Conversion System
 	 *
-     * \param str An iString containing the location of the file to be loaded in VFS
-	 * \param typeEnum The type of file to load.  This is one of:
-	 *                 - CS_COLLADA_FILE
-	 *                 - CS_MAP_FILE
-	 *                 - CS_LIBRARY_FILE
-     * \return 0 if everything is ok; otherwise an error message
+   * \param str An iString containing the location of the file to be loaded in VFS
+	 * \return 0 if everything is ok; otherwise an error message
 	 * \remarks This will replace the current file being used to read data
-	 *          from, or store data to, depending on the second parameter.
+	 *          from.
 	 */
-	virtual const char* Load(iString *str, csColladaFileType typeEnum) = 0;
+	virtual const char* Load(iString *str) = 0;
 	 
 	 /** 
-	 * Load a file from an iFile object into the COLLADA Conversion System
+	 * Load a COLLADA file from an iFile object into the COLLADA Conversion System
 	 *
-     * \param file An iFile object which points to the document to be loaded
-	 * \param typeEnum The type of file to load.  This is one of:
-	 *                 - CS_COLLADA_FILE
-	 *                 - CS_MAP_FILE
-	 *                 - CS_LIBRARY_FILE
-     * \return 0 if everything is ok; otherwise an error message
+   * \param file An iFile object which points to the document to be loaded
+	 * \return 0 if everything is ok; otherwise an error message
 	 * \remarks This will replace the current file being used to read data
-	 *          from, or store data to, depending on the second parameter.
+	 *          from.
+	 * \warning This version of the Load function assumes that the caller created
+	 *          the iFile object, and thus it is the caller's responsibility to
+	 *          close/destroy the object.
 	 */
-	virtual const char* Load(iFile *file, csColladaFileType typeEnum) = 0;
+	virtual const char* Load(iFile *file) = 0;
 
 	 /** 
-	 * Load a file from an iDataBuffer object into the COLLADA Conversion System
+	 * Load a COLLADA file from an iDataBuffer object into the COLLADA Conversion System
 	 *
-     * \param db An iDataBuffer object which contains a document to be loaded
-	 * \param typeEnum The type of file to load.  This is one of:
-	 *                 - CS_COLLADA_FILE
-	 *                 - CS_MAP_FILE
-	 *                 - CS_LIBRARY_FILE
-     * \return 0 if everything is ok; otherwise an error message
+   * \param db An iDataBuffer object which contains a document to be loaded
+	 * \return 0 if everything is ok; otherwise an error message
 	 * \remarks This will replace the current file being used to read data
-	 *          from, or store data to, depending on the second parameter.
+	 *          from.
 	 */
-	virtual const char* Load(iDataBuffer *db, csColladaFileType typeEnum) = 0;
+	virtual const char* Load(iDataBuffer *db) = 0;
 
+	/** \brief Sets the Crystal Space output file type.
+	 *
+	 * This function is designed to tell the COLLADA Conversion System what type of
+	 * file will be written to.  
+	 * \param filetype The type of file to be written out.  Will be one of:
+	 *  - CS_LIBRARY_FILE, a Crystal Space library file
+	 *  - CS_MAP_FILE, a Crystal Space world file
+	 * \return 0 if everything is ok; otherwise an error message
+	 * \remarks This function should be called before beginning the conversion process.
+	 *          if it has not been called, the conversion functions will return an error
+	 *          message.
+	 */
+	virtual const char* SetOutputFiletype(csColladaFileType filetype) = 0;
+
+	/**
+	 * \brief Writes the converted Crystal Space file out to disk
+	 *
+	 * This is used to write the Crystal Space file out to disk, once
+	 * a conversion process has been completed.
+	 * 
+	 * \param filepath The path in VFS where the file should be written to
+	 *
+	 * \return 0 if operation completed successfully; otherwise an error message
+	 *
+	 * \remarks This operation does not check to determine if the COLLADA file has been 
+	 *          converted, or if the Crystal Space document holds anything of value.  It
+	 *          Merely writes the document out to disk.
+	 */
+	virtual const char* Write(const char* filepath) = 0;
+
+	/**
+	 * Returns the Crystal Space Document 
+	 */
+	virtual csRef<iDocument> GetCrystalDocument() = 0;
+
+	/**
+	 * Returns the Collada Document
+	 */
+	virtual csRef<iDocument> GetColladaDocument() = 0;
+
+ /**
+  * \brief Converts the loaded COLLADA file into the loaded Crystal Space file.
+	*
+	* This function will completely convert a loaded COLLADA file into Crystal Space
+	* format.  It is required that both a COLLADA file must be loaded, and that a 
+	* Crystal Space document must be ready.  It will convert to the document type 
+	* specified when the Crystal Space document was loaded.
+	* 
+	* This function essentially calls all of the other convert functions and then finalizes
+	* the iDocument so it can be completely written out to a file.
+	*
+	* \return 0 is everything is ok; otherwise an error message
+	*
+	* \remarks If debugging warnings are enabled, this function will display
+	*          error messages in the console window.  Otherwise, error messages
+	*          will only be available through the return value.
+	* \warning An error will result if SetOutputFileType() is not called prior to 
+	*          this function.
+	*
+	* \sa ConvertGeometry(iDocumentNode *geometrySection)
+	* \sa ConvertLighting(iDocumentNode *lightingSection)
+	* \sa ConvertTextureShading(iDocumentNode *textureSection)
+	* \sa ConvertRiggingAnimation(iDocumentNode *riggingSection)
+	* \sa ConvertPhysics(iDocumentNode *physicsSection)
+	* \sa Write(const char* path)
+	* \sa Load(iFile *file, csColladaFileType typeEnum)
+	*/
 	virtual const char* Convert() = 0;
+	
+	/**
+	 * Converts the geometry section of the COLLADA file
+	 */
 	virtual bool ConvertGeometry(iDocumentNode *geometrySection) = 0;
+	
+	/**
+	 * Converts the lighting section of the COLLADA file
+	 */
 	virtual bool ConvertLighting(iDocumentNode *lightingSection) = 0;
+	
+	/**
+	 * Converts the textures and shading sections of the COLLADA file
+	 */
 	virtual bool ConvertTextureShading(iDocumentNode *textureSection) = 0;
+	
+	/**
+	 * Converts the rigging and animation sections of the COLLADA file
+	 */
 	virtual bool ConvertRiggingAnimation(iDocumentNode *riggingSection) = 0;
+	
+	/**
+	 * Converts the physics section of the COLLADA file
+	 */
 	virtual bool ConvertPhysics(iDocumentNode *physicsSection) = 0;
+
+	/**
+	 * Turn debugging warnings on or off.  This will turn on all possible debug information for the 
+	 * plugin.  It also will check to verify that files and data structures conform to specified standards.
+	 *
+	 * \param toggle If true, turns on debug warnings.
+	 * 
+	 * \notes Debug warnings are off by default.
+	 */
+	virtual void SetWarnings(bool toggle=false) = 0;
 
 };
 

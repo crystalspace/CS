@@ -22,14 +22,17 @@
 #include <ivaria/collada.h>
 #include <iutil/comp.h>
 #include <iutil/vfs.h>
+#include <iutil/document.h>
+#include <iutil/objreg.h>
 #include <ivaria/reporter.h>
 
 // Standard Headers
 #include <cstdarg>
+#include <string>
 
-// Forward Declarations
-struct iObjectRegistry;
-struct iDocumentSystem;
+// Forward Declarations (probably not needed)
+//struct iObjectRegistry;
+//struct iDocumentSystem;
 
 /** 
  * This class implements the iColladaConvertor interface.  It is used as a conversion utility
@@ -44,11 +47,7 @@ class csColladaConvertor : public scfImplementation2<csColladaConvertor,iCollada
 {
 	private:
 		
-		/// A smart pointer to the Crystal Space document we will be working on in memory 
-    csRef<iDocument> csFile;
-
-		/// A smart pointer to the COLLADA document we will be working from in memory
-		csRef<iDocument> colladaFile;
+		// =============== System Attributes ===============
 
 		/// A smart pointer to the document system
 		iDocumentSystem* docSys;
@@ -56,19 +55,61 @@ class csColladaConvertor : public scfImplementation2<csColladaConvertor,iCollada
 		/// A smart pointer to the virtual file system
 		csRef<iVFS> fileSys;
 
-		/// Whether or not the COLLADA file has been loaded and is ready
-		bool colladaReady;
+		/// Whether or not we have warnings turned on.  Warnings are off by default.
+		bool warningsOn;
+
+		/// A pointer to the object registry
+		iObjectRegistry* obj_reg;
+
+		// =============== Crystal Space Attributes ===============
+
+		/// A smart pointer to the Crystal Space document we will be working on in memory 
+    csRef<iDocument> csFile;
 
 		/// Whether or not the Crystal Space file has been loaded and is ready
 		bool csReady;
 
-		/// A pointer to the object registry
-		iObjectRegistry* obj_reg;
+		/// The output file type.  Initially, this is set to CS_FILE_NONE.
+		csColladaFileType outputFileType;
+
+		// =============== COLLADA Attributes ===============
+
+		/// A smart pointer to the COLLADA document we will be working from in memory
+		csRef<iDocument> colladaFile;
+
+		/// Whether or not the COLLADA file has been loaded and is ready
+		bool colladaReady;
+
+		/// A smart pointer to the <COLLADA> element
+		csRef<iDocumentNode> colladaElement;
 
 		/**
 		 * Report various things back to the application
 		 */
 		void Report(int severity, const char* msg, ...);
+
+		/**
+		 * Checks for validity of the file name to see if it conforms to COLLADA standards.
+		 */
+		void CheckColladaFilenameValidity(const char* str);
+
+		/**
+		 * Checks for validity of the COLLADA file.
+		 *
+		 * Right now, this only checks to see if the file is valid XML.
+		 * @todo Add some abilities to validate the XML.
+		 */
+		const char* CheckColladaValidity(iFile *file);
+
+		/**
+		 * \brief Initialization routine for the output document.
+		 *
+		 * Constructs a new Crystal Space document.  This function requires that 
+		 * SetOutputFileType(csColladaFileType filetype) has already been called.
+		 * 
+		 * \returns true, if initialization went ok; false otherwise
+		 */
+		bool InitializeCrystalSpaceDocument();
 
 	public:
 
@@ -86,11 +127,26 @@ class csColladaConvertor : public scfImplementation2<csColladaConvertor,iCollada
 		 */
 		virtual bool Initialize (iObjectRegistry*);
 		
-		virtual const char* Load(const char *str, csColladaFileType typeEnum);
-		virtual const char* Load(iString *str, csColladaFileType typeEnum); 
-		virtual const char* Load(iFile *file, csColladaFileType typeEnum);
-		virtual const char* Load(iDataBuffer *db, csColladaFileType typeEnum);
+		/**
+		 * Turn debugging warnings on or off.  This will turn on all possible debug information for the 
+		 * plugin.  It also will check to verify that files and data structures conform to specified standards.
+		 *
+		 * \param toggle If true, turns on debug warnings.
+		 * 
+		 * \notes Debug warnings are off by default.
+		 */
+		void SetWarnings(bool toggle);
 
+		virtual const char* Load(const char *str);
+		virtual const char* Load(iString *str); 
+		virtual const char* Load(iFile *file);
+		virtual const char* Load(iDataBuffer *db);
+
+		csRef<iDocument> GetCrystalDocument();
+		csRef<iDocument> GetColladaDocument();
+
+		virtual const char* Write(const char* filepath);
+		virtual const char* SetOutputFiletype(csColladaFileType filetype);
 		virtual const char* Convert();
 		virtual bool ConvertGeometry(iDocumentNode *geometrySection);
 		virtual bool ConvertLighting(iDocumentNode *lightingSection);

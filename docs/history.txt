@@ -6,6 +6,18 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Jun-2007
+  - Scott Johnson fixed Load() functionality in plgcolladaconvertor so that it no longer
+    expects the user to load the output file before beginning conversion. 
+  - Scott Johnson began implementing Convert() and ConvertGeometry() in plgcolladaconvertor.
+4-Jun-2007
+	- Scott Johnson (jwir3) has neglected to edit this file when performing commits, so
+	  the following is a detailed report on what previously has been done.  
+	- Scott Johnson added the files ivaria/collada.h, apps/colladatest/*, 
+	  plugins/utilities/colladaconvertor/*
+	- Scott Johnson began work on the collada conversion plugin, added basic functionality, Load(),
+	  Write(), and skeletons for Convert() functions.
+	- Scott Johnson created msvc project files for the collada plugin.
 1-Jun-2007
 	- res changed the cs-config wrapper script to use '=' instead of '==' 
 	  for more POSIX compliancy.

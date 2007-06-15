@@ -40,14 +40,16 @@ bool ColladaTest::OnInitialize(int argc, char* argv[])
     CS_REQUEST_REPORTERLISTENER,
 		CS_REQUEST_PLUGIN("crystalspace.utilities.colladaconvertor", iColladaConvertor),
     CS_REQUEST_END))
-    return ReportError("Failed to initialize plugins!");
+		return ReportError("Failed to initialize plugins!");
 
-  csBaseEventHandler::Initialize(GetObjectRegistry());
-  if (!RegisterQueue(GetObjectRegistry(), csevAllEvents(GetObjectRegistry())))
+	object_reg = GetObjectRegistry();
+
+  csBaseEventHandler::Initialize(object_reg);
+  if (!RegisterQueue(object_reg, csevAllEvents(GetObjectRegistry())))
     return ReportError("Failed to set up event handler!");
 
     /* Load up the XML Read Document System, instead of the default */
-    plugManager = csQueryRegistry<iPluginManager> (GetObjectRegistry());
+    plugManager = csQueryRegistry<iPluginManager> (object_reg);
 	docSystem = csLoadPlugin<iDocumentSystem> (plugManager, "crystalspace.documentsystem.xmlread");
 
 	if (!docSystem.IsValid())
@@ -55,22 +57,55 @@ bool ColladaTest::OnInitialize(int argc, char* argv[])
 		ReportWarning("Document system invalid.  Defaulting to Tiny XML Document System.");
 		docSystem.AttachNew(new csTinyDocumentSystem());
 	}
+	
+	fileSystem = csQueryRegistry<iVFS> (object_reg);
+
+	if (!fileSystem.IsValid())
+	{
+		return ReportError("Unable to get virtual file system.  Terminating.");
+	}
+
+	/// @todo Change this, possibly accept user input.
+	fileSystem->Mount("/colladafiles", TESTDIR);
 
 	colladaConv = csLoadPlugin<iColladaConvertor> (plugManager, "crystalspace.utilities.colladaconvertor");
-  
+  colladaConv->SetWarnings(true);
 	
 	if (!colladaConv.IsValid())
 	{
 		return ReportError("Error: Unable to load COLLADA Conversion System.  Terminating.");
 	}
 
-	else
+	string path = "/colladafiles/";
+	path.append(COLLADATESTFILE);
+
+	colladaConv->Load(path.c_str());
+	colladaConv->SetOutputFiletype(CS_MAP_FILE);
+	colladaConv->Convert();
+	//colladaConv->Load(path.c_str(), CS_MAP_FILE);
+	colladaConv->Write("/colladafiles/test.xml");
+	
+	/*
+	csRef<iDocument> crystalFile = colladaConv->GetCrystalDocument();
+	csRef<iDocumentNode> crystalFileRoot = crystalFile->GetRoot();
+	
+	if (!crystalFileRoot.IsValid())
 	{
-		colladaConv->Load("Just testing", CS_COLLADA_FILE);
+		return ReportError ("Root node is invalid!");
 	}
 
-  /*
-	//pathList = csGetPluginPaths("0");
+	cout << crystalFileRoot->GetValue() << endl;
+
+	//csRef<iDocumentNode> crystalFileWorld = crystalFileRoot->GetNode("world");
+
+	//if (!crystalFileWorld.IsValid())
+	//{
+		//ReportError("Error: Unable to find world node!");
+	//}
+
+	//crystalFileWorld.Invalidate();
+	crystalFileRoot.Invalidate();
+	crystalFile.Invalidate();
 */
 	/*
 	colladaDocument = docSystem->CreateDocument();

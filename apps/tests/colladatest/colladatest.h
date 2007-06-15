@@ -20,13 +20,16 @@
 #define _APP_COLLADATEST_H_
 
 #include <iostream>
+#include <string>
 #include <crystalspace.h>
 
-#define TESTDIR "E:$/Source$/ColladaConvertor$/data$/test$/"
-#define TESTFILE "colladatest2.dae"
+#define TESTDIR "E:$/Source$/CS-COLLADA$/data$/colladatest$/"
+#define COLLADATESTFILE "colladatest.dae"
+#define CSTESTFILE "colladatest.csworld"
 
 class ColladaTest : public csApplicationFramework, public csBaseEventHandler {
 	private:
+		iObjectRegistry* object_reg;
 		csRef<iDocumentSystem> docSystem;
 		csRef<iVFS> fileSystem;
 		csRef<iDocument> colladaDocument;
