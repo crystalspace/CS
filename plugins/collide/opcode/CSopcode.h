@@ -108,6 +108,15 @@ public:
   bool CollideRaySegment (
   	iCollider* collider, const csReversibleTransform* trans,
 	const csVector3& start, const csVector3& end, bool use_ray);
+  bool CollideRaySegment (
+  	csOPCODECollider* collider, const csReversibleTransform* trans,
+	const csVector3& start, const csVector3& end, bool use_ray);
+  bool CollideRaySegment (
+  	iTerrainSystem* terrain, const csReversibleTransform* trans,
+	const csVector3& start, const csVector3& end, bool use_ray);
+  bool CollideRaySegment (
+  	csTerraFormerCollider* terraformer, const csReversibleTransform* trans,
+	const csVector3& start, const csVector3& end, bool use_ray);
   virtual bool CollideRay (
   	iCollider* collider, const csReversibleTransform* trans,
 	const csVector3& start, const csVector3& end)
