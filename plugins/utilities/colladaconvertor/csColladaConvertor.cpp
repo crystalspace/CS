@@ -38,7 +38,7 @@ void csColladaConvertor::Report(int severity, const char* msg, ...)
 	csRef<iReporter> rep = csQueryRegistry<iReporter>(obj_reg);
 	if (rep.IsValid())
 	{
-		rep->ReportV(severity, "crystalspace.colladaconvertor", msg, argList); 
+		rep->ReportV(severity, "crystalspace.utilities.colladaconvertor", msg, argList); 
 	}
 	else
 	{
@@ -349,6 +349,40 @@ bool csColladaConvertor::InitializeCrystalSpaceDocument()
 	return true;
 }
 
+// =============== Basic Utility Functions ===============
+
+std::string& csColladaConvertor::Chop(std::string& str, int index)
+{
+	std::string before, after;
+	before = str.substr(0, index);
+	after = str.substr(index+1);
+
+	before.append(after);
+	str = before;
+
+	return str;
+}
+
+csRef<iDocumentNode> csColladaConvertor::FindNumericArray(const csRef<iDocumentNode>& node)
+{
+	csRef<iDocumentNode> retVal;
+
+	// search first for a <float_array> element
+	retVal = node->GetNode("float_array");
+	if (retVal.IsValid())
+	{
+		return retVal;
+	}
+
+	// then for a <int_array> element
+	else
+	{
+		retVal = node->GetNode("int_array");
+		return retVal;
+	}
+}
+
+
 // =============== Conversion Functions ===============
 // This is the warp core of the implementation.  ;)
 // Currently, the core has been ejected, so it's missing.  Engineering is still
@@ -386,14 +420,158 @@ const	char*	csColladaConvertor::Convert()
 		return "Unable to find geometry section";
 	}
 
-	ConvertGeometry(geoNode)
+	ConvertGeometry(geoNode);
 
 	return 0;
 }
 
 bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
 {
+	csRef<iDocumentNodeIterator> geometryIterator;
 	
+	// get an iterator over all <geometry> elements
+	geometryIterator = geometrySection->GetNodes("geometry");
+	
+	if (!geometryIterator.IsValid())
+	{
+		if (warningsOn)
+		{
+			Report(CS_REPORTER_SEVERITY_WARNING, "Warning: Unable to get iterator over geometry nodes.");
+		}
+
+		return false;
+	}
+
+	// variable definitions, so we don't have to run the constructors each
+	// time during an iteration of the while loops
+	csRef<iDocumentNode> currentGeometryElement;
+	csRef<iDocumentAttribute> currentGeometryID;
+	csRef<iDocumentNodeIterator> meshIterator;
+	csRef<iDocumentNode> currentMeshElement;
+	csRef<iDocumentNode> currentVerticesElement;
+	csRef<iDocumentNode> currentInputElement;
+	csRef<iDocumentNodeIterator> inputElements;
+	csRef<iDocumentNodeIterator> sourceElements;
+	csRef<iDocumentNode> currentNumericArrayElement;
+	csRef<iDocumentNode> currentSourceElement;
+	std::string inputElementSemantic = "";
+	std::string positionSource = "";
+
+	// while the iterator is not empty
+	while (geometryIterator->HasNext())
+	{
+		// retrieve next <geometry> element and store as currentGeometryElement
+		currentGeometryElement = geometryIterator->Next();
+
+		// get value of id attribute and store as currentGeometryID
+		currentGeometryID	= currentGeometryElement->GetAttribute("id");
+
+		if (currentGeometryID.IsValid())
+		{
+			if (warningsOn)
+			{
+				std::string notifyMsg = "Current Geometry Node ID: ";
+				notifyMsg.append(currentGeometryID->GetValue());
+				Report(CS_REPORTER_SEVERITY_NOTIFY, notifyMsg.c_str());
+			}
+		}
+
+		// get an iterator over all <mesh> child elements
+		meshIterator = currentGeometryElement->GetNodes("mesh");
+
+		if (!meshIterator.IsValid())
+		{
+			if (warningsOn)
+			{
+				Report(CS_REPORTER_SEVERITY_WARNING, "Warning: Unable to get iterator over mesh nodes.");
+			}
+
+			return false;
+		}
+
+		// while this iterator is not empty
+		while (meshIterator->HasNext())
+		{
+			// get next mesh element as currentMeshElement
+			currentMeshElement = meshIterator->Next();
+
+			// retrieve <vertices> element from currentMeshElement as
+			// currentVerticesElement
+			currentVerticesElement = currentMeshElement->GetNode("vertices");
+
+			if(!currentVerticesElement.IsValid())
+			{
+				if (warningsOn)
+				{
+					Report(CS_REPORTER_SEVERITY_WARNING, "Warning: Unable to retrieve vertices element from mesh.");
+				}
+
+				return false;
+			}
+
+			// find <input> child element of currentVerticesElement with
+			// attribute semantic="POSITION" and store this element as positionElement
+			inputElements = currentVerticesElement->GetNodes("input");
+			while (inputElements->HasNext())
+			{
+				currentInputElement = inputElements->Next();
+				inputElementSemantic = currentInputElement->GetAttribute("semantic")->GetValue();
+				if (inputElementSemantic.compare("POSITION") == 0)
+				{
+					positionSource = currentInputElement->GetAttribute("source")->GetValue();
+					break;
+				}
+			}
+
+			// remove '#' from positionSource
+			Chop(positionSource, 0);
+
+			if (warningsOn)
+			{
+				std::string notifyMsg = "Found position semantic.  Source value: ";
+				notifyMsg.append(positionSource);
+				Report(CS_REPORTER_SEVERITY_NOTIFY, notifyMsg.c_str());
+			}
+
+			// find child <source> element of currentMeshElement
+			// with id equal to positionSource and store as currentSourceElement
+			sourceElements = currentMeshElement->GetNodes("source");
+			while (sourceElements->HasNext())
+			{
+				currentSourceElement = sourceElements->Next();
+				
+				std::string idValue = currentSourceElement->GetAttribute("id")->GetValue();
+				if (idValue.compare(positionSource) == 0)
+				{
+					break;
+				}
+			}
+
+			// find child numeric array element of currentSourceElement
+			// store as currentNumericArrayElement
+			currentNumericArrayElement = FindNumericArray(currentSourceElement);
+
+			if (!currentNumericArrayElement.IsValid())
+			{
+				if (warningsOn)
+				{
+					Report(CS_REPORTER_SEVERITY_WARNING, "Warning: Unable to find a numeric array element under source node!");
+					return false;
+				}
+			}
+
+			if (warningsOn)
+			{
+				std::string notifyMsg = "Numeric array found.  Type: ";
+				notifyMsg.append(currentNumericArrayElement->GetValue());
+				notifyMsg.append(", Count: ");
+				notifyMsg.append(currentNumericArrayElement->GetAttribute("count")->GetValue());
+				Report(CS_REPORTER_SEVERITY_NOTIFY, notifyMsg.c_str());
+			}
+
+		}
+	}
+
 	return true;
 }
 

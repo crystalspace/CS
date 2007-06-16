@@ -7,9 +7,18 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 15-Jun-2007
-  - Scott Johnson fixed Load() functionality in plgcolladaconvertor so that it no longer
-    expects the user to load the output file before beginning conversion. 
-  - Scott Johnson began implementing Convert() and ConvertGeometry() in plgcolladaconvertor.
+  	- Scott Johnson added Chop() and FindNumericArray() functions to csColladaConvertor.
+    	  Chop() removes a single character from (currently) an std::string.  This will be changed
+    	  to work with iStrings instead.  In fact, it might be more useful to add it to the iString
+          interface.  FindNumericArray() is a collada-specific function that locates <int_array> or
+          <float_array> elements as children of a current node.  It only finds the first occurrence.
+          This needs to be changed to find ALL occurrences.
+  	- Scott Johnson modified ConvertGeometry() so it now locates a source node for position data,
+  	  and outputs the information about the array, if found (and warnings are on).
+15-Jun-2007
+  	- Scott Johnson fixed Load() functionality in plgcolladaconvertor so that it no longer
+ 	  expects the user to load the output file before beginning conversion. 
+  	- Scott Johnson began implementing Convert() and ConvertGeometry() in plgcolladaconvertor.
 4-Jun-2007
 	- Scott Johnson (jwir3) has neglected to edit this file when performing commits, so
 	  the following is a detailed report on what previously has been done.  

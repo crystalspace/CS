@@ -111,6 +111,39 @@ class csColladaConvertor : public scfImplementation2<csColladaConvertor,iCollada
 		 */
 		bool InitializeCrystalSpaceDocument();
 
+		// =============== Basic Utility Functions ===============
+
+		/** \brief Chops a single character out of a string
+		 * 
+		 * This function will remove a single character in a string.
+		 *
+		 * \param str The string to chop out of
+		 * \param index An index into the string representing the location of the
+		 *              character to remove
+		 *
+		 * \warning This function changes the string sent into the function.
+		 * @todo Place this into iString?
+		 */
+		std::string& Chop(std::string& str, int index);
+		
+		/** \brief Find the next numeric array element
+		 *
+		 * Finds a child numeric array node within a given node.  This function will
+		 * attempt to find one of:
+		 *  - <float_array>
+		 *  - <int_array>
+		 * within the current node.
+		 *
+		 * \param node The current node to be searched. Typically, this will be a <source> node.
+		 *						 This restriction is not absolutely enforced, but this function will not 
+		 *             return anything unless this is a <source> node, since no other nodes 
+		 *             will contain one of the aforementioned array nodes.
+		 * \returns		 The array node, as a smart pointer to an iDocumentNode, if successful;
+		 *						 otherwise, an invalid smart pointer.  Use csRef<>::IsValid() to check for
+		 *             validity.
+		 */
+		csRef<iDocumentNode> FindNumericArray(const csRef<iDocumentNode>& node);
+
 	public:
 
 		/// Constructor
