@@ -29,6 +29,7 @@
 // Standard Headers
 #include <cstdarg>
 #include <string>
+#include <sstream>
 
 // Forward Declarations (probably not needed)
 //struct iObjectRegistry;
@@ -180,12 +181,36 @@ class csColladaConvertor : public scfImplementation2<csColladaConvertor,iCollada
 
 		virtual const char* Write(const char* filepath);
 		virtual const char* SetOutputFiletype(csColladaFileType filetype);
+		
+		// =============== Conversion Functions ===============
+
 		virtual const char* Convert();
 		virtual bool ConvertGeometry(iDocumentNode *geometrySection);
 		virtual bool ConvertLighting(iDocumentNode *lightingSection);
 		virtual bool ConvertTextureShading(iDocumentNode *textureSection);
 		virtual bool ConvertRiggingAnimation(iDocumentNode *riggingSection);
 		virtual bool ConvertPhysics(iDocumentNode *physicsSection);
+
+	private:
+
+		/** \brief Gets the array of vertices from the mesh
+		 *
+		 * Retrieves an array of float values from the COLLADA document which represent
+		 * the vertices of the mesh.
+		 *
+		 * \param verticesElement An iDocumentNode representing the <vertices> element of the 
+		 *                        COLLADA file.
+		 * \param id A reference to a variable which will store the id of the mesh object.
+		 * \param arraySize A reference to a variable where the array size will be stored.
+		 *
+		 * \returns A pointer to an array of float values.  If the <vertices> element contained 
+		 *          an <int_array>, the integers will be cast to floating point values.
+		 *
+		 * \warning The caller is responsible for deallocating the array of floating point
+		 *          values, once finished.
+		 */
+		float* GetVertexArray(iDocumentNode* verticesElement, iString& id, int& size);
+
 };
 
 #endif

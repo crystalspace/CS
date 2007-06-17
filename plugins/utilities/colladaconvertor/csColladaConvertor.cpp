@@ -25,6 +25,9 @@
 #include <csutil/scfstr.h>
 #include "csColladaConvertor.h"
 
+using std::string;
+using std::stringstream;
+
 CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY(csColladaConvertor)
 
@@ -388,6 +391,100 @@ csRef<iDocumentNode> csColladaConvertor::FindNumericArray(const csRef<iDocumentN
 // Currently, the core has been ejected, so it's missing.  Engineering is still
 // trying to locate it on sensors.  :)
 
+float* csColladaConvertor::GetVertexArray(iDocumentNode* verticesElement, iString& id, int& arraySize)
+{
+	csRef<iDocumentNode> currentInputElement;
+	csRef<iDocumentNodeIterator> inputElements;
+	csRef<iDocumentNodeIterator> sourceElements;
+	csRef<iDocumentNode> currentNumericArrayElement;
+	csRef<iDocumentNode> currentSourceElement;
+	csRef<iDocumentNode> currentMeshElement = verticesElement->GetParent();
+	std::string inputElementSemantic = "";
+	std::string positionSource = "";
+	float* vertexArray = 0;
+	
+	// a sanity check, in the event someone tries to do something foolish
+	arraySize = 0;
+
+	// find <input> child element of currentVerticesElement with
+	// attribute semantic="POSITION" and store this element as positionElement
+	inputElements = verticesElement->GetNodes("input");
+	while (inputElements->HasNext())
+	{
+		currentInputElement = inputElements->Next();
+		inputElementSemantic = currentInputElement->GetAttribute("semantic")->GetValue();
+		if (inputElementSemantic.compare("POSITION") == 0)
+		{
+			positionSource = currentInputElement->GetAttribute("source")->GetValue();
+			break;
+		}
+	}
+
+	// remove '#' from positionSource
+	Chop(positionSource, 0);
+
+	if (warningsOn)
+	{
+		std::string notifyMsg = "Found position semantic.  Source value: ";
+		notifyMsg.append(positionSource);
+		Report(CS_REPORTER_SEVERITY_NOTIFY, notifyMsg.c_str());
+	}
+
+	// find child <source> element of currentMeshElement
+	// with id equal to positionSource and store as currentSourceElement
+	sourceElements = currentMeshElement->GetNodes("source");
+	while (sourceElements->HasNext())
+	{
+		currentSourceElement = sourceElements->Next();
+		
+		id = currentSourceElement->GetAttribute("id")->GetValue();
+		if (id.compare(positionSource) == 0)
+		{
+			break;
+		}
+	}
+
+	// find child numeric array element of currentSourceElement
+	// store as currentNumericArrayElement
+	currentNumericArrayElement = FindNumericArray(currentSourceElement);
+
+	if (!currentNumericArrayElement.IsValid())
+	{
+		if (warningsOn)
+		{
+			Report(CS_REPORTER_SEVERITY_WARNING, "Warning: Unable to find a numeric array element under source node!");
+			return 0;
+		}
+	}
+	
+	stringstream conver(currentNumericArrayElement->GetAttribute("count")->GetValue());
+	conver >> arraySize;
+
+	conver << arraySize;
+
+	string countElements = conver.str();
+
+	if (warningsOn)
+	{
+		std::string notifyMsg = "Numeric array found.  Type: ";
+		notifyMsg.append(currentNumericArrayElement->GetValue());
+		notifyMsg.append(", Count: ");
+		notifyMsg.append(countElements);
+		Report(CS_REPORTER_SEVERITY_NOTIFY, notifyMsg.c_str());
+	}
+
+	conver << currentNumericArrayElement->GetContentsValue();
+	
+	vertexArray = new float[arraySize];
+
+	for (int i = 0; i < arraySize; i++)
+	{
+		conver >> vertexArray[i]; 
+	}
+
+	return vertexArray;
+}
+
 const	char*	csColladaConvertor::Convert()
 {
 	if (!csReady)
@@ -449,13 +546,9 @@ bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
 	csRef<iDocumentNodeIterator> meshIterator;
 	csRef<iDocumentNode> currentMeshElement;
 	csRef<iDocumentNode> currentVerticesElement;
-	csRef<iDocumentNode> currentInputElement;
-	csRef<iDocumentNodeIterator> inputElements;
-	csRef<iDocumentNodeIterator> sourceElements;
-	csRef<iDocumentNode> currentNumericArrayElement;
-	csRef<iDocumentNode> currentSourceElement;
-	std::string inputElementSemantic = "";
-	std::string positionSource = "";
+	iString idValue;
+	float* vertexArray;
+	int vertexArraySize = 0;
 
 	// while the iterator is not empty
 	while (geometryIterator->HasNext())
@@ -508,67 +601,15 @@ bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
 
 				return false;
 			}
+		
+			vertexArray = GetVertexArray(currentVerticesElement, idValue, vertexArraySize);
 
-			// find <input> child element of currentVerticesElement with
-			// attribute semantic="POSITION" and store this element as positionElement
-			inputElements = currentVerticesElement->GetNodes("input");
-			while (inputElements->HasNext())
+			if (warningsOn && vertexArraySize > 0)
 			{
-				currentInputElement = inputElements->Next();
-				inputElementSemantic = currentInputElement->GetAttribute("semantic")->GetValue();
-				if (inputElementSemantic.compare("POSITION") == 0)
-				{
-					positionSource = currentInputElement->GetAttribute("source")->GetValue();
-					break;
-				}
+				Report(CS_REPORTER_SEVERITY_NOTIFY, "Vertex array acquired.");
 			}
 
-			// remove '#' from positionSource
-			Chop(positionSource, 0);
-
-			if (warningsOn)
-			{
-				std::string notifyMsg = "Found position semantic.  Source value: ";
-				notifyMsg.append(positionSource);
-				Report(CS_REPORTER_SEVERITY_NOTIFY, notifyMsg.c_str());
-			}
-
-			// find child <source> element of currentMeshElement
-			// with id equal to positionSource and store as currentSourceElement
-			sourceElements = currentMeshElement->GetNodes("source");
-			while (sourceElements->HasNext())
-			{
-				currentSourceElement = sourceElements->Next();
-				
-				std::string idValue = currentSourceElement->GetAttribute("id")->GetValue();
-				if (idValue.compare(positionSource) == 0)
-				{
-					break;
-				}
-			}
-
-			// find child numeric array element of currentSourceElement
-			// store as currentNumericArrayElement
-			currentNumericArrayElement = FindNumericArray(currentSourceElement);
-
-			if (!currentNumericArrayElement.IsValid())
-			{
-				if (warningsOn)
-				{
-					Report(CS_REPORTER_SEVERITY_WARNING, "Warning: Unable to find a numeric array element under source node!");
-					return false;
-				}
-			}
-
-			if (warningsOn)
-			{
-				std::string notifyMsg = "Numeric array found.  Type: ";
-				notifyMsg.append(currentNumericArrayElement->GetValue());
-				notifyMsg.append(", Count: ");
-				notifyMsg.append(currentNumericArrayElement->GetAttribute("count")->GetValue());
-				Report(CS_REPORTER_SEVERITY_NOTIFY, notifyMsg.c_str());
-			}
-
+			delete[] vertexArray;
 		}
 	}
 
