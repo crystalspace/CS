@@ -94,9 +94,74 @@ csPtr<iTerrainCellCollisionProperties> csTerrainCollider::CreateProperties ()
   return csPtr<iTerrainCellCollisionProperties> (new csTerrainCellCollisionProperties);
 }
 
+csTerrainColliderCollideSegmentResult csTerrainCollider::CollideSegment (
+      iTerrainCell* cell, const csVector3& start, const csVector3& end)
+{
+  csTerrainColliderCollideSegmentResult rc;
+
+  csTerrainSegmentCellCollider collider (cell, start, end);
+
+  csVector2 cell_result;
+  int rv;
+  
+  while ((rv = collider.GetIntersection (rc.isect, cell_result)) >= 0)
+  {
+    if (rv == 1)
+    {
+      unsigned int width = cell->GetGridWidth ();
+      unsigned int height = cell->GetGridHeight ();
+  
+      const csVector2& pos = cell->GetPosition ();
+      const csVector3& size = cell->GetSize ();
+
+      float scale_u = size.x / (width - 1);
+      float scale_v = size.z / (height - 1);
+
+      rc.hit = true;
+      if (cell_result.x >= width - 1 - EPSILON) 
+        cell_result.x = width - 1 - EPSILON;
+            
+      if (cell_result.y >= height - 1 - EPSILON) 
+        cell_result.y = height - 1 - EPSILON;
+
+      int x = (int)floorf(cell_result.x);
+      int y = (int)floorf(cell_result.y);
+
+      float frac = (cell_result.x - floorf(cell_result.x)) +
+		   (cell_result.y - floorf(cell_result.y));
+      bool half = (frac >= 1);
+      if (!half)
+      {
+        rc.a = csVector3(x, cell->GetHeight (x, y), height-y-1);
+        rc.b = csVector3(x+1, cell->GetHeight (x+1, y), height-y-1);
+        rc.c = csVector3(x, cell->GetHeight (x, y+1), height-y-2);
+      }
+      else
+      {
+        rc.a = csVector3(x+1, cell->GetHeight (x+1, y+1), height-y-2);
+        rc.b = csVector3(x, cell->GetHeight (x, y+1), height-y-2);
+        rc.c = csVector3(x+1, cell->GetHeight (x+1, y), height-y-1);
+      }
+        
+      rc.a.x *= scale_u; rc.a.x += pos.x;
+      rc.b.x *= scale_u; rc.b.x += pos.x;
+      rc.c.x *= scale_u; rc.c.x += pos.x;
+        
+      rc.a.z *= scale_v; rc.a.z += pos.y;
+      rc.b.z *= scale_v; rc.b.z += pos.y;
+      rc.c.z *= scale_v; rc.c.z += pos.y;
+
+      return rc;
+    }
+  }
+
+  rc.hit = false;
+  return rc;
+}
+
 bool csTerrainCollider::CollideSegment (iTerrainCell* cell,
-const csVector3& start, const csVector3& end, bool oneHit,
-iTerrainVector3Array* points)
+  const csVector3& start, const csVector3& end, bool oneHit,
+  iTerrainVector3Array* points)
 {
   size_t points_size = points->GetSize ();
   
