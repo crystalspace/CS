@@ -232,10 +232,27 @@ struct iTerrainDataFeeder : public virtual iBase
   virtual void SetParameter (const char* param, const char* value) = 0;
 };
 
+/**
+ * Return structure for the iTerrainCollider->CollideSegment() routines.
+ */
+struct csTerrainColliderCollideSegmentResult
+{
+  /// True if we hit.
+  bool hit;
+
+  /// Intersection point in world space.
+  csVector3 isect;
+
+  //@{
+  /// Triangle we hit.
+  csVector3 a, b, c;	
+  //@}
+};
+
 /// Provides an interface for custom collision
 struct iTerrainCollider : public virtual iBase
 {
-  SCF_INTERFACE (iTerrainCollider, 2, 0, 0);
+  SCF_INTERFACE (iTerrainCollider, 2, 0, 1);
 
   /**
    * Create an object that implements iTerrainCellCollisionProperties
@@ -262,6 +279,19 @@ struct iTerrainCollider : public virtual iBase
   virtual bool CollideSegment (iTerrainCell* cell, const csVector3& start,
                                const csVector3& end, bool oneHit, 
                                iTerrainVector3Array* points) = 0;
+
+  /**
+   * Collide segment with cell
+   *
+   * \param cell cell
+   * \param start segment start (specified in object space)
+   * \param end segment end (specified in object space)
+   * 
+   * \return a csTerrainColliderCollideSegmentResult instance
+   * indicating what we hit.
+   */
+  virtual csTerrainColliderCollideSegmentResult CollideSegment (
+      iTerrainCell* cell, const csVector3& start, const csVector3& end) = 0;
 
   /**
    * Collide set of triangles with cell
