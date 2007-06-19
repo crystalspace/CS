@@ -211,9 +211,43 @@ bool csTerrainSystem::CollideSegment (const csVector3& start, const csVector3&
   return size != points->GetSize ();
 }
 
+csTerrainColliderCollideSegmentResult csTerrainSystem::CollideSegment (
+      const csVector3& start, const csVector3& end, bool use_ray)
+{
+  csTerrainColliderCollideSegmentResult rc;
+  rc.hit = false;
+
+  if (!collider) 
+    return rc;
+
+  for (size_t i = 0; i < cells.GetSize (); ++i)
+  {
+    csSegment3 seg(start, end);
+    csBox3 box = cells[i]->GetBBox ();
+
+    csVector3 isect;
+
+    if (csIntersect3::BoxSegment (box, seg, isect) >= 0)
+    {
+      seg.SetStart (seg.End ());
+      seg.SetEnd (isect);
+      
+      if (csIntersect3::BoxSegment (box, seg, isect) >= 0)
+        seg.SetStart (isect);
+
+      rc = cells[i]->CollideSegment (seg.End (), seg.Start (), use_ray);
+      if (rc.hit)
+        return rc;
+    }
+  }
+
+  return rc;
+}
+
 bool csTerrainSystem::CollideTriangles (const csVector3* vertices,
   size_t tri_count, const unsigned int* indices, float radius,
-  const csReversibleTransform& trans, bool oneHit, iTerrainCollisionPairArray* pairs)
+  const csReversibleTransform& trans, bool oneHit,
+  iTerrainCollisionPairArray* pairs)
 {
   if (!collider) 
     return false;

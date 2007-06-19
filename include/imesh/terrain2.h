@@ -286,12 +286,15 @@ struct iTerrainCollider : public virtual iBase
    * \param cell cell
    * \param start segment start (specified in object space)
    * \param end segment end (specified in object space)
+   * \param use_ray if true then use a ray instead of a segment
+   * (default false).
    * 
    * \return a csTerrainColliderCollideSegmentResult instance
    * indicating what we hit.
    */
   virtual csTerrainColliderCollideSegmentResult CollideSegment (
-      iTerrainCell* cell, const csVector3& start, const csVector3& end) = 0;
+      iTerrainCell* cell, const csVector3& start, const csVector3& end,
+      bool use_ray = false) = 0;
 
   /**
    * Collide set of triangles with cell
@@ -463,8 +466,8 @@ struct iTerrainSystem : public virtual iBase
    * Query a cell by name
    *
    * \param name name of cell
-   * \param load set if cell should be loaded if it isn't. Default is not to load
-   * cell data.
+   * \param load set if cell should be loaded if it isn't. Default is not
+   * to load cell data.
    * \return pointer to the cell with the given name, or NULL, if none found
    */
   virtual iTerrainCell* GetCell (const char* name, bool loadData = false) = 0;
@@ -472,8 +475,8 @@ struct iTerrainSystem : public virtual iBase
   /**
    * Query a cell by position
    *
-   * \param load set if cell should be loaded if it isn't. Default is not to load
-   * cell data.
+   * \param load set if cell should be loaded if it isn't. Default is not
+   * to load cell data.
    * \return pointer to the first cell which intersects with the vertical ray
    * of given position, or NULL if none found
    *
@@ -485,8 +488,8 @@ struct iTerrainSystem : public virtual iBase
   /**
    * Query a cell by index (0 to GetCellCount ()).
    *
-   * \param load set if cell should be loaded if it isn't. Default is not to load
-   * cell data.
+   * \param load set if cell should be loaded if it isn't. Default is not to
+   * load cell data.
    */
   virtual iTerrainCell* GetCell (size_t index, bool loadData = false) = 0;
 
@@ -529,6 +532,26 @@ struct iTerrainSystem : public virtual iBase
    */
   virtual bool CollideSegment (const csVector3& start, const csVector3& end,
                            bool oneHit, iTerrainVector3Array* points) = 0;
+
+  /**
+   * Collide segment with the terrain
+   *
+   * \param start segment start (specified in object space)
+   * \param end segment end (specified in object space)
+   * \param use_ray if true then use a ray instead of a segment
+   * (default false).
+   * 
+   * \return the intersection result.
+   *
+   * \rem this will perform cell loading for the cells that potentially
+   * collide with the segment
+   *
+   * \rem this will not perform collision for cells that have Collideable
+   * property set to false
+   */
+  virtual csTerrainColliderCollideSegmentResult CollideSegment (
+      const csVector3& start, const csVector3& end,
+      bool use_ray = false) = 0;
 
   /**
    * Collide set of triangles with the terrain
