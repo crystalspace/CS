@@ -62,10 +62,13 @@ private:
     uint nAxes;			 // number of axis
     joystate state[2];		 // joystick current & last state
     int nstate;			 // this is current state
+	csDirtyAccessArray<int32> axesMapping;
+
     joydata() : number(0), device(0), nButtons(0), nAxes(0), nstate(0) {}
     joydata(joydata const& j) : number(j.number), device(j.device),
       nButtons(j.nButtons), nAxes(j.nAxes), nstate(j.nstate)
-    {
+	{
+	  axesMapping = j.axesMapping;
       for (int i = 0; i < 2; i++)
         state[i] = j.state[i];
     }
@@ -83,7 +86,7 @@ private:
   bool Init ();
   bool Close ();
   void Report (int severity, const char* msg, ...);
-  void LoadAxes(joystate&);
+  void LoadAxes(joystate& j, const joydata& jdata);
 
   void ReportDXError (HRESULT hr, const char* msg, ...);
  public:

@@ -16,6 +16,10 @@ chronological order.
 	    - Rays are not supported yet.
 	    - There seems to be a bug at cell boundaries. The terrain
 	      is missed there.
+	- res committed a patch from Joerg Fischer (with minor stylistic 
+	  changes) to properly support joysticks on Windows whose axes do not
+	  correspond to the order found in the DIJOYSTATE2 structure (which is
+	  probably about every joystick). See trac #343. 
 18-Jun-2007
 	- Jorrit extended iTerrainCollider with a new version of
 	  CollideSegment() that returns at most one hit and also the
