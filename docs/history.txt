@@ -8,6 +8,8 @@ chronological order.
 
 4-June-2007
 	- Mike Gist added PSD code for PPC on OSX. Still needs testing.
+        - Oktal fixed a mistake made during Marten's SCF clean-up, that broke
+	  some X11 canvas plugins
 3-June-2007
 	- Mike Gist refactored PSD (Processor Spec Detection) code and made it
 	  check for and return a bitmask of all supported instructions. Win and 
