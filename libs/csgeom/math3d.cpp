@@ -770,7 +770,8 @@ int csIntersect3::BoxSegment (
   const csBox3 &box,
   const csSegment3 &seg,
   csVector3 &isect,
-  float *pr)
+  float *pr,
+  bool use_ray)
 {
   const csVector3 &u = seg.Start ();
   const csVector3 &v = seg.End ();
@@ -800,7 +801,7 @@ int csIntersect3::BoxSegment (
         if (ABS (v.x - u.x) > SMALL_EPSILON)
         {
           r = (plane_pos - u.x) / (v.x - u.x);
-          if (r < 0 || r > 1) break;
+          if (r < 0 || ((!use_ray) && r > 1)) break;
           isect.x = plane_pos;
           isect.y = r * (v.y - u.y) + u.y;
           isect.z = r * (v.z - u.z) + u.z;
@@ -824,7 +825,7 @@ int csIntersect3::BoxSegment (
         if (ABS (v.y - u.y) > SMALL_EPSILON)
         {
           r = (plane_pos - u.y) / (v.y - u.y);
-          if (r < 0 || r > 1) break;
+          if (r < 0 || ((!use_ray) && r > 1)) break;
           isect.x = r * (v.x - u.x) + u.x;
           isect.y = plane_pos;
           isect.z = r * (v.z - u.z) + u.z;
@@ -848,7 +849,7 @@ int csIntersect3::BoxSegment (
         if (ABS (v.z - u.z) > SMALL_EPSILON)
         {
           r = (plane_pos - u.z) / (v.z - u.z);
-          if (r < 0 || r > 1) break;
+          if (r < 0 || ((!use_ray) && r > 1)) break;
           isect.x = r * (v.x - u.x) + u.x;
           isect.y = r * (v.y - u.y) + u.y;
           isect.z = plane_pos;
@@ -868,6 +869,84 @@ int csIntersect3::BoxSegment (
 
   return -1;
 }
+
+bool csIntersect3::ClipSegmentBox (csSegment3& segment, const csBox3& box,
+    bool use_ray)
+{
+  const csVector3& minBox = box.Min ();
+  const csVector3& maxBox = box.Max ();
+
+  float minLength = 0.0f;
+  float maxLength;
+  if (use_ray) maxLength = FLT_MAX * 0.9f;
+  else maxLength = sqrt (csSquaredDist::PointPoint (segment.Start (),
+	segment.End ()));
+
+  const csVector3& origin = segment.Start ();
+  csVector3 direction = (segment.End () - segment.Start ()).Unit ();
+
+  float mint = minLength;
+  float maxt = maxLength;
+
+  // Check if ray have any chance of going through box
+  int i = 0;
+  for (i = 0; i < 3; i++)
+  {
+    if (direction[i] < 0)
+    {
+      if (origin[i] < minBox[i]) return false;
+    }
+    else if (direction[i] > 0)
+    {
+      if (origin[i] > maxBox[i]) return false;
+    }
+  }
+
+  // Clip one dimension at a time
+  for (i = 0; i < 3; i++)
+  {
+    float pos = origin[i] + direction[i] * maxt;
+
+    // Ray going "left"
+    if (direction[i] < 0)
+    {
+      // Clip end
+      if (pos < minBox[i])
+      {
+        maxt = mint + (maxt - mint) * ((origin[i] - minBox[i])
+	    / (origin[i] - pos));
+      }
+      // Clip start
+      if (origin[i] > maxBox[i])
+      {
+        mint += (maxt - mint) * ((origin[i] - maxBox[i])
+	    / (maxt * direction[i]));
+      }
+    }
+    else // Ray going straight or "right"
+    {
+      // Clip end
+      if (pos > maxBox[i])
+      {
+        maxt = mint + (maxt - mint) * ((maxBox[i] - origin[i])
+	    / (pos - origin[i]));
+      }
+      // Clip start
+      if (origin[i] < minBox[i])
+      {
+        mint += (maxt - mint) * ((minBox[i] - origin[i])
+	    / (maxt * direction[i]));
+      }
+    }
+    if (mint > maxt) return false;
+  }
+
+  segment.SetStart (origin + mint * direction);
+  segment.SetEnd (origin + maxt * direction);
+
+  return true;
+}
+
 
 bool csIntersect3::BoxFrustum (const csBox3& box, const csFrustum* frustum)
 {

@@ -376,7 +376,7 @@ bool csTerrainCell::CollideSegment (const csVector3& start,
 }
 
 csTerrainColliderCollideSegmentResult csTerrainCell::CollideSegment (
-    const csVector3& start, const csVector3& end, bool use_ray)
+    const csVector3& start, const csVector3& end)
 {
   iTerrainCollider* collider = terrain->GetCollider ();
 
@@ -387,7 +387,7 @@ csTerrainColliderCollideSegmentResult csTerrainCell::CollideSegment (
     return rc;
   }
 
-  return collider->CollideSegment (this, start, end, use_ray);
+  return collider->CollideSegment (this, start, end);
 }
 
 bool csTerrainCell::CollideTriangles (const csVector3* vertices,
