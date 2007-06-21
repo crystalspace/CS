@@ -2210,6 +2210,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SegmentXFrustum = *cspacec::csIntersect3_SegmentXFrustum;
 *SegmentYFrustum = *cspacec::csIntersect3_SegmentYFrustum;
 *BoxSegment = *cspacec::csIntersect3_BoxSegment;
+*ClipSegmentBox = *cspacec::csIntersect3_ClipSegmentBox;
 *BoxFrustum = *cspacec::csIntersect3_BoxFrustum;
 *BoxSphere = *cspacec::csIntersect3_BoxSphere;
 *BoxPlane = *cspacec::csIntersect3_BoxPlane;
