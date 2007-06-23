@@ -1,9 +1,11 @@
 1.2 branch log.
 
-6-Jan-2007
+23-Jan-2007
+	- res merged r27099 into 1.2 (#347 fix).
+6-Jun-2007
 	- res merged r26991 into 1.2 (docs tweak).
 	- res merged r27009 into 1.2 (cs-config wrapper fixes).
-1-Jan-2007
+1-Jun-2007
 	- res removed weaver-based shaders.
 31-May-2007
 	- Jorrit merged r26971 into 1.2 (lighter2 docs).
