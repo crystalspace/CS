@@ -877,7 +877,6 @@ void csODECollider::KillGeoms ()
 {
   if (transformID)
   {
-    int test = dGeomGetClass (transformID);
     if (dGeomTransformGetGeom (transformID))
       geomID = 0;
 
