@@ -6,10 +6,19 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-Jun-2007
+	- res changed the cs-config wrapper script to use '=' instead of '==' 
+	  for more POSIX compliancy.
+	- res changed the cs-config wrapper script to use shell built-ins
+	  instead of external utilities to construct the initial list of
+	  cs-config-* scripts.
 21-May-2007
 	- res committed a patch by 'whirm' to replace the use of pushd/popd
 	  when building CS with cd/cd -: pushd/popd is a bashism while cd/cd -
 	  works on a wider range of shells.
+2-May-2007
+	- res changed the cs-config wrapper to also look into $CRYSTAL/bin
+	  for wrapped cs-config-X.Y scripts.
 25-Apr-2007
 	- res fixed Jam "using independent target <sometarget>.dbg" messages.
 	- res made the application symlink installation respect DESTDIR.
@@ -17,6 +26,24 @@ chronological order.
 	- res changed the installation of applications to install apps with a
 	  suffix of the version number and to create a symlink for the
 	  undecorated name.
+	- res made the cs-config wrapper script be installed by the install_bin
+	  jam target as well.
+20-Apr-2007
+	- res tweaked the cs-config wrapper script to work better on MSYS.
+16-Apr-2007
+	- res changed the cs-config wrapper to not use -executable (which is
+	  apparently not supported by older 'find's) but -perm /500 instead.
+14-Apr-2007
+	- res added a cs-config wrapper script that scans for cs-config-X.Y
+	  scripts in CRYSTAL and PATH and picks the latest version.
+	- res changed cs-config to also check a CRYSTAL_x_y env var for a 
+	  CS installation.
+	- res changed the cs-config jam target to copy the cs-config wrapper
+	  script to the build dir.
+16-Mar-2007
+	- res changed the installation directory and cs-config naming to
+	  include the version number in order to allow parallel installations
+	  of multiple CS versions.
 3-Mar-2007
 	- res added the X Window System and OpenGL to the list of "External
 	  Libraries" in the manual.

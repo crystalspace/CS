@@ -49,7 +49,7 @@ done
 usage()
 {
 	cat <<EOF
-Usage: cs-config [OPTIONS] [LIBRARIES]
+Usage: cs-config-$CS_VERSION [OPTIONS] [LIBRARIES]
 Options:
 	[--prefix]
 	[--exec-prefix]

@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Jun-2007
+	- res merged (a partitial) r26604, r26742, (a partitial) r26743,
+	  r26744, r26778, r26812, r26816, r26828, r26885, r27009 into 1.0
+	  (trac #316 - cs-config-1.0).
 6-Jun-2007
 	- res merged r26535 into 1.0 (csver.h fix).
 3-Jun-2007

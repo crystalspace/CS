@@ -76,6 +76,7 @@ if test "\${PATH_SEPARATOR+set}" != set; then
   rm -f conf\$\$.sh
 fi
 
+CS_VERSION=$(PACKAGE_VERSION_SIGNIFICANT)
 CRYSTAL="\${CRYSTAL-$(prefix)\$PATH_SEPARATOR.}"
 my_IFS=\$IFS; IFS=\$PATH_SEPARATOR
 for p in \$CRYSTAL
@@ -182,4 +183,14 @@ __END__
   cat $(SUBDIR)/cs-config.temppost >> $(<)
 }
 
-ShellScript cs-config : csConfigGen ;
+
+CSCONFIGNAME = cs-config-$(PACKAGE_VERSION_SIGNIFICANT) ;
+ShellScript $(CSCONFIGNAME) : csConfigGen : nohelp ;
+
+Depends cs-config : $(CSCONFIGNAME) ;
+CS_CONFIG_GRISTED = [ DoSourceGrist cs-config ] ;
+SEARCH on $(CS_CONFIG_GRISTED) = $(SUBDIR) ;
+Depends cs-config : $(CS_CONFIG_GRISTED) ;
+Copy cs-config : $(CS_CONFIG_GRISTED) ;
+Help cs-config : "Build the cs-config script" ;
+Depends install_bin : [ DoInstall cs-config : $(bindir) : $(INSTALL_PROGRAM) ] ;
