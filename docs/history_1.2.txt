@@ -2,7 +2,8 @@
 
 24-Jun-2007
 	- Eric Sunshine merged r27108 into 1.2 (#348 fix).
-23-Jan-2007
+	- res merged r27110:27112 into 1.2 (install branch history).
+23-Jun-2007
 	- res merged r27099 into 1.2 (#347 fix).
 6-Jun-2007
 	- res merged r26991 into 1.2 (docs tweak).
