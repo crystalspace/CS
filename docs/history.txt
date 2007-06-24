@@ -8,6 +8,8 @@ chronological order.
 
 24-Jun-2007
         - Piotr made small bugfix in odedynam colliders ref handling.
+	- Eric Sunshine corrected "camera movement" documentation bug.
+	  Fixes #348.
 23-Jun-2007
 	- res made the CS_PACKAGEINFO autoconf macro truncate the version
 	  number after non-numerical and non-dot characters. This has the
