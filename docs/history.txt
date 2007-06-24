@@ -10,6 +10,9 @@ chronological order.
         - Piotr made small bugfix in odedynam colliders ref handling.
 	- Eric Sunshine corrected "camera movement" documentation bug.
 	  Fixes #348.
+	- res made "jam install" install not just "history.txt" but
+	  "history*.txt" - this way the branch-specific histories (e.g.
+	  for release branches) are installed as well.
 23-Jun-2007
 	- res made the CS_PACKAGEINFO autoconf macro truncate the version
 	  number after non-numerical and non-dot characters. This has the

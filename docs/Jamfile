@@ -1,6 +1,6 @@
 SubDir TOP docs ;
 
-InstallDoc history.txt history.old ;
+nstallDoc [ Wildcard history*.txt ] history.old ;
 
 SubInclude TOP docs texinfo ;
 SubInclude TOP docs doxygen ;
