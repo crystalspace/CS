@@ -10,6 +10,7 @@ chronological order.
 	- res merged (a partitial) r26604, r26742, (a partitial) r26743,
 	  r26744, r26778, r26812, r26816, r26828, r26885, r27009 into 1.0
 	  (trac #316 - cs-config-1.0).
+	- res merged r27110:27112 into 1.0 (install branch history).
 6-Jun-2007
 	- res merged r26535 into 1.0 (csver.h fix).
 3-Jun-2007

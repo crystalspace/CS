@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Jun-2007
+	- res made "jam install" install not just "history.txt" but
+	  "history*.txt" - this way the branch-specific histories (e.g.
+	  for release branches) are installed as well.
 1-Jun-2007
 	- res changed the cs-config wrapper script to use '=' instead of '==' 
 	  for more POSIX compliancy.
