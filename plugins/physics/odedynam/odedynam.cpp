@@ -772,9 +772,8 @@ csRef<iDynamicsSystemCollider> csODEDynamicSystem::CreateCollider ()
 {
   csODECollider *odec = new csODECollider (this, this);
   odec->AddToSpace (spaceID);
-  csRef<csODECollider> c = (csPtr<csODECollider>) odec;
-  colliders.Push (c);  
-  return c;
+  colliders.Push ((csODECollider *) odec);  
+  return odec;
 }
 void csODEDynamicSystem::AttachCollider (iDynamicsSystemCollider* collider)
 {
@@ -878,6 +877,7 @@ void csODECollider::KillGeoms ()
 {
   if (transformID)
   {
+    int test = dGeomGetClass (transformID);
     if (dGeomTransformGetGeom (transformID))
       geomID = 0;
 

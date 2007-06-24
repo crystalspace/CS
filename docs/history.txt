@@ -6,6 +6,8 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Jun-2007
+        - Piotr made small bugfix in odedynam colliders ref handling.
 23-Jun-2007
 	- res made the CS_PACKAGEINFO autoconf macro truncate the version
 	  number after non-numerical and non-dot characters. This has the
