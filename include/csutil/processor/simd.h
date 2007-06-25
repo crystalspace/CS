@@ -17,31 +17,11 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "csutil/processorspecdetection.h"
-#include <xmmintrin.h>
-
 
 namespace CS
 {
     namespace SIMD
     {
-        // TODO: Make PPC versions and check compat with gcc/*nix.
-        typedef __m128 SIMDVector4;
-
-        static inline __m128 csMulSIMD(__m128 a, __m128 b)
-        {
-            return _mm_mul_ps(a, b);
-        }
-
-        static inline __m128 csAddSIMD(__m128 a, __m128 b)
-        {
-            return _mm_add_ps(a, b);
-        }
-
-        static inline __m128 csSqrtSIMD(__m128 a)
-        {
-            return _mm_sqrt_ps(a);
-        }
-
         struct AltiVecType
         {
         public:
@@ -136,7 +116,7 @@ namespace CS
             // Two SIMD
 
             template<typename R, class SIMDType1, class SIMDType2>
-            static R SIMDCheck(R (*SIMDFunction), R (*SIMDFunction2), R (*CPPFunction))
+            static R SIMDCheck(R (*SIMDFunction1), R (*SIMDFunction2), R (*CPPFunction))
             {
                 if(SIMDType1::iSet < SIMDType2::iSet)
                 {
@@ -154,8 +134,8 @@ namespace CS
                 }
                 return (*CPPFunction);
             }
-            template<typename R, class SIMDType, class SIMDType2, typename ArgR>
-            static R SIMDCheck(R (*SIMDFunction)(ArgR), R (*SIMDFunction2), R (*CPPFunction)(ArgR), ArgR arg)
+            template<typename R, class SIMDType1, class SIMDType2, typename ArgR>
+            static R SIMDCheck(R (*SIMDFunction1)(ArgR), R (*SIMDFunction2), R (*CPPFunction)(ArgR), ArgR arg)
             {
                 if(SIMDType1::iSet < SIMDType2::iSet)
                 {
@@ -173,8 +153,8 @@ namespace CS
                 }
                 return (*CPPFunction)(arg);
             }
-            template<typename R, class SIMDType, class SIMDType2, typename ArgR1, typename ArgR2>
-            static R SIMDCheck(R (*SIMDFunction)(ArgR1, ArgR2), R (*SIMDFunction2), R (*CPPFunction)(ArgR1, ArgR2), ArgR1 arg1, ArgR2 arg2)
+            template<typename R, class SIMDType1, class SIMDType2, typename ArgR1, typename ArgR2>
+            static R SIMDCheck(R (*SIMDFunction1)(ArgR1, ArgR2), R (*SIMDFunction2), R (*CPPFunction)(ArgR1, ArgR2), ArgR1 arg1, ArgR2 arg2)
             {
                 if(SIMDType1::iSet < SIMDType2::iSet)
                 {
@@ -192,8 +172,8 @@ namespace CS
                 }
                 return (*CPPFunction)(arg1, arg2);
             }
-            template<typename R, class SIMDType, class SIMDType2, typename ArgR1, typename ArgR2, typename ArgR3>
-            static R SIMDCheck(R (*SIMDFunction)(ArgR1, ArgR2, ArgR3), R (*SIMDFunction2), R (*CPPFunction)(ArgR1, ArgR2, ArgR3), ArgR1 arg1, ArgR2 arg2, ArgR3 arg3)
+            template<typename R, class SIMDType1, class SIMDType2, typename ArgR1, typename ArgR2, typename ArgR3>
+            static R SIMDCheck(R (*SIMDFunction1)(ArgR1, ArgR2, ArgR3), R (*SIMDFunction2), R (*CPPFunction)(ArgR1, ArgR2, ArgR3), ArgR1 arg1, ArgR2 arg2, ArgR3 arg3)
             {
                 if(SIMDType1::iSet < SIMDType2::iSet)
                 {
@@ -211,8 +191,8 @@ namespace CS
                 }
                 return (*CPPFunction)(arg1, arg2, arg3);
             }
-            template<typename R, class SIMDType, class SIMDType2, typename ArgR1, typename ArgR2, typename ArgR3, typename ArgR4>
-            static R SIMDCheck(R (*SIMDFunction)(ArgR1, ArgR2, ArgR3, ArgR4), R (*SIMDFunction2), R (*CPPFunction)(ArgR1, ArgR2, ArgR3, ArgR4), ArgR1 arg1, ArgR2 arg2, ArgR3 arg3, ArgR4 arg4)
+            template<typename R, class SIMDType1, class SIMDType2, typename ArgR1, typename ArgR2, typename ArgR3, typename ArgR4>
+            static R SIMDCheck(R (*SIMDFunction1)(ArgR1, ArgR2, ArgR3, ArgR4), R (*SIMDFunction2), R (*CPPFunction)(ArgR1, ArgR2, ArgR3, ArgR4), ArgR1 arg1, ArgR2 arg2, ArgR3 arg3, ArgR4 arg4)
             {
                 if(SIMDType1::iSet < SIMDType2::iSet)
                 {
@@ -230,8 +210,8 @@ namespace CS
                 }
                 return (*CPPFunction)(arg1, arg2, arg3, arg4);
             }
-            template<typename R, class SIMDType, class SIMDType2, typename ArgR1, typename ArgR2, typename ArgR3, typename ArgR4, typename ArgR5>
-            static R SIMDCheck(R (*SIMDFunction)(ArgR1, ArgR2, ArgR3, ArgR4, ArgR5), R (*SIMDFunction2), R (*CPPFunction)(ArgR1, ArgR2, ArgR3, ArgR4, ArgR5), ArgR1 arg1, ArgR2 arg2, ArgR3 arg3, ArgR4 arg4, ArgR5 arg5)
+            template<typename R, class SIMDType1, class SIMDType2, typename ArgR1, typename ArgR2, typename ArgR3, typename ArgR4, typename ArgR5>
+            static R SIMDCheck(R (*SIMDFunction1)(ArgR1, ArgR2, ArgR3, ArgR4, ArgR5), R (*SIMDFunction2), R (*CPPFunction)(ArgR1, ArgR2, ArgR3, ArgR4, ArgR5), ArgR1 arg1, ArgR2 arg2, ArgR3 arg3, ArgR4 arg4, ArgR5 arg5)
             {
                 if(SIMDType1::iSet < SIMDType2::iSet)
                 {

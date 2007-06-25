@@ -234,6 +234,39 @@ AS_IF([test "x$cs_host_macosx" = "xyes"],
 CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
     [AS_ESCAPE(["])$cs_host_os_normalized[]AS_ESCAPE(["])])
 
+#------------------------------------------------------------------------------
+# Check for SIMD flags, xmmintrin.h and __m128 type
+#------------------------------------------------------------------------------
+
+AX_CHECK_COMPILER_FLAGS([-mmmx], [CS_EMIT_BUILD_PROPERTY([CS_COMPILER_HAS_MMX], [yes])
+CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.SIMD], [-mmmx], [+])],
+[CS_EMIT_BUILD_PROPERTY([CS_COMPILER_HAS_MMX], [no])])
+
+AX_CHECK_COMPILER_FLAGS([-msse], [CS_EMIT_BUILD_PROPERTY([CS_COMPILER_HAS_SSE], [yes])
+CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.SIMD], [-msse], [+])],
+[CS_EMIT_BUILD_PROPERTY([CS_COMPILER_HAS_SSE], [no])])
+
+AX_CHECK_COMPILER_FLAGS([-msse2], [CS_EMIT_BUILD_PROPERTY([CS_COMPILER_HAS_SSE2], [yes])
+CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.SIMD], [-msse2], [+])],
+[CS_EMIT_BUILD_PROPERTY([CS_COMPILER_HAS_SSE2], [no])])
+
+AX_CHECK_COMPILER_FLAGS([-msse3], [CS_EMIT_BUILD_PROPERTY([CS_COMPILER_HAS_SSE3], [yes])
+CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.SIMD], [-msse3], [+])],
+[CS_EMIT_BUILD_PROPERTY([CS_COMPILER_HAS_SSE3], [no])])
+
+
+AC_CHECK_HEADER([xmmintrin.h],
+    [CS_HEADER_PROPERTY([CS_HAVE_XMMINTRIN_H])])
+
+m4_define([cs_xmmintrin_include],
+    [[#if CS_HAVE_XMMINTRIN_H
+    #include <xmmintrin.h>
+    #endif
+    ]])
+
+AC_CHECK_TYPE([__m128], [CS_HEADER_PROPERTY([CS_HAVE_M128])], [],
+    [cs_xmmintrin_include])
+
 
 
 #------------------------------------------------------------------------------
@@ -2127,8 +2160,7 @@ AS_IF([test $cs_cv_sys_socket = yes],
 #------------------------------------------------------------------------------
 AC_CHECK_HEADERS([byteswap.h],
     [CS_HEADER_PROPERTY([CS_HAVE_BYTESWAP_H])])
-
-
+    
 
 #------------------------------------------------------------------------------
 # Check how to declare functions and types deprecated.

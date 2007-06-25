@@ -20,6 +20,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #define __PROCESSORSPECDETECTION_H__
 
 #include "csextern.h"
+#include "cstypes.h"
 
 namespace CS
 {

@@ -2,4 +2,5 @@ SubDir TOP apps tests simdtest ;
 
 Description simdtest : "SIMD Test" ;
 Application simdtest : [ Wildcard *.cpp *.h ] : console ;
+C++FLAGS on [ DoObjectGrist simdtestSSE$(SUFOBJ) ] += $(COMPILER.CFLAGS.SIMD) ;
 LinkWith simdtest : crystalspace ;

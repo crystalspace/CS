@@ -18,14 +18,14 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "cssysdef.h"
 #include "csutil/processorspecdetection.h"
-#include "csutil/processor/simd.h"
 #include "csutil/sysfunc.h"
+#include "simdtest.h"
 
 using namespace CS::SIMD;
 
 CS_IMPLEMENT_APPLICATION
 
-bool testCPP(float* a, float* b, float* c, int size)
+bool SIMDTest::testCPP(float* a, float* b, float* c, int size)
 {
 
     float holder = 0;
@@ -41,30 +41,6 @@ bool testCPP(float* a, float* b, float* c, int size)
             a++;
             b++;
             c++;
-        }
-    return true;
-}
-
-bool testCPPSSE(float* a, float* b, float* c, int size)
-{
-
-    SIMDVector4* ap = (SIMDVector4*) a;
-    SIMDVector4* bp = (SIMDVector4*) b;
-    SIMDVector4* cp = (SIMDVector4*) c;
-
-    SIMDVector4 simd;
-    SIMDVector4 simd2;
-    SIMDVector4 simd3;
-
-        for(int j=0; j<size; j+=4)
-        {
-            simd = CS::SIMD::csMulSIMD(*ap, *ap);
-            simd2 = CS::SIMD::csMulSIMD(*bp, *bp);
-            simd3 = CS::SIMD::csAddSIMD(simd, simd2);
-            *cp = CS::SIMD::csSqrtSIMD(simd3);
-            ap++;
-            bp++;
-            cp++;
         }
     return true;
 }
@@ -116,9 +92,15 @@ int main(int argc, char* argv[])
 
 
     const int size = 30000;
+#ifdef CS_COMPILER_MSVC
     __declspec(align(16)) float a[size];
     __declspec(align(16)) float b[size];
     __declspec(align(16)) float c[size];
+#else
+    float a[size] __attribute__((aligned(16)));
+    float b[size] __attribute__((aligned(16)));
+    float c[size] __attribute__((aligned(16)));
+#endif
 
     for(int i=0; i<size; i++)
     {
@@ -129,7 +111,7 @@ int main(int argc, char* argv[])
 
     printf("Running SIMD test 1.\n");
     csTicks start = csGetMicroTicks();
-    if(SIMD::SIMDCheck<bool, SSEType, float*, float*, float*, int>((*testCPPSSE), (*testCPP), a, b, c, size))
-        printf("Time taken: %dus \n", csGetMicroTicks()-start);
+    if(SIMD::SIMDCheck<bool, SSEType, float*, float*, float*, int>((*SIMDTest::testSSE), (*SIMDTest::testCPP), a, b, c, size))
+        printf("Time taken: %lldus \n", csGetMicroTicks()-start);
     return 0;
 }
