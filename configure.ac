@@ -238,22 +238,21 @@ CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
 # Check for SIMD flags, xmmintrin.h and __m128 type
 #------------------------------------------------------------------------------
 
-AX_CHECK_COMPILER_FLAGS([-mmmx], [CS_EMIT_BUILD_PROPERTY([CS_COMPILER_HAS_MMX], [yes])
-CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.SIMD], [-mmmx], [+])],
-[CS_EMIT_BUILD_PROPERTY([CS_COMPILER_HAS_MMX], [no])])
+CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx], [CS_CREATE_TUPLE([-mmmx])])
+AS_IF([test -n "$cs_cv_prog_cc_mmmx"], [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.SIMD],
+[$cs_cv_prog_cc_mmmx], [+])])
 
-AX_CHECK_COMPILER_FLAGS([-msse], [CS_EMIT_BUILD_PROPERTY([CS_COMPILER_HAS_SSE], [yes])
-CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.SIMD], [-msse], [+])],
-[CS_EMIT_BUILD_PROPERTY([CS_COMPILER_HAS_SSE], [no])])
+CS_CHECK_BUILD_FLAGS([for -msse flag], [cs_cv_prog_cc_msse], [CS_CREATE_TUPLE([-msse])])
+AS_IF([test -n "$cs_cv_prog_cc_msse"], [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.SIMD],
+[$cs_cv_prog_cc_msse], [+])])
 
-AX_CHECK_COMPILER_FLAGS([-msse2], [CS_EMIT_BUILD_PROPERTY([CS_COMPILER_HAS_SSE2], [yes])
-CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.SIMD], [-msse2], [+])],
-[CS_EMIT_BUILD_PROPERTY([CS_COMPILER_HAS_SSE2], [no])])
+CS_CHECK_BUILD_FLAGS([for -msse2 flag], [cs_cv_prog_cc_msse2], [CS_CREATE_TUPLE([-msse2])])
+AS_IF([test -n "$cs_cv_prog_cc_msse2"], [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.SIMD],
+[$cs_cv_prog_cc_msse2], [+])])
 
-AX_CHECK_COMPILER_FLAGS([-msse3], [CS_EMIT_BUILD_PROPERTY([CS_COMPILER_HAS_SSE3], [yes])
-CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.SIMD], [-msse3], [+])],
-[CS_EMIT_BUILD_PROPERTY([CS_COMPILER_HAS_SSE3], [no])])
-
+CS_CHECK_BUILD_FLAGS([for -msse3 flag], [cs_cv_prog_cc_msse3], [CS_CREATE_TUPLE([-msse3])])
+AS_IF([test -n "$cs_cv_prog_cc_msse3"], [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.SIMD],
+[$cs_cv_prog_cc_msse3], [+])])
 
 AC_CHECK_HEADER([xmmintrin.h],
     [CS_HEADER_PROPERTY([CS_HAVE_XMMINTRIN_H])])
