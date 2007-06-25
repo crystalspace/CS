@@ -16,6 +16,10 @@ chronological order.
 	- res changed the cs-config wrapper script to use shell built-ins
 	  instead of external utilities to construct the initial list of
 	  cs-config-* scripts.
+30-May-2007
+	- res made the manual and API docs include the version number in their
+	  respective titles.  One idea is to make the different versions more
+	  distinguishable in e.g. search results.
 21-May-2007
 	- res committed a patch by 'whirm' to replace the use of pushd/popd
 	  when building CS with cd/cd -: pushd/popd is a bashism while cd/cd -
