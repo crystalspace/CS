@@ -59,7 +59,7 @@ struct iNullMeshState : public virtual iBase
 /**
  * This interface describes the API for the null mesh object factory.
  */
-struct iNullFactoryState : public iNullMeshState
+struct iNullFactoryState : public virtual iNullMeshState
 {
   SCF_INTERFACE (iNullFactoryState, 0, 0, 1);
 };
