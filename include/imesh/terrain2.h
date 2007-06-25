@@ -286,15 +286,12 @@ struct iTerrainCollider : public virtual iBase
    * \param cell cell
    * \param start segment start (specified in object space)
    * \param end segment end (specified in object space)
-   * \param use_ray if true then use a ray instead of a segment
-   * (default false).
    * 
    * \return a csTerrainColliderCollideSegmentResult instance
    * indicating what we hit.
    */
   virtual csTerrainColliderCollideSegmentResult CollideSegment (
-      iTerrainCell* cell, const csVector3& start, const csVector3& end,
-      bool use_ray = false) = 0;
+      iTerrainCell* cell, const csVector3& start, const csVector3& end) = 0;
 
   /**
    * Collide set of triangles with cell

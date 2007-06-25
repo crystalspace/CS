@@ -1384,6 +1384,8 @@ class csIntersect3(_object):
     if _newclass:SegmentYFrustum = staticmethod(_cspace.csIntersect3_SegmentYFrustum)
     __swig_getmethods__["BoxSegment"] = lambda x: _cspace.csIntersect3_BoxSegment
     if _newclass:BoxSegment = staticmethod(_cspace.csIntersect3_BoxSegment)
+    __swig_getmethods__["ClipSegmentBox"] = lambda x: _cspace.csIntersect3_ClipSegmentBox
+    if _newclass:ClipSegmentBox = staticmethod(_cspace.csIntersect3_ClipSegmentBox)
     __swig_getmethods__["BoxFrustum"] = lambda x: _cspace.csIntersect3_BoxFrustum
     if _newclass:BoxFrustum = staticmethod(_cspace.csIntersect3_BoxFrustum)
     __swig_getmethods__["BoxSphere"] = lambda x: _cspace.csIntersect3_BoxSphere
@@ -1425,6 +1427,7 @@ csIntersect3_SegmentAxisPlane = _cspace.csIntersect3_SegmentAxisPlane
 csIntersect3_SegmentXFrustum = _cspace.csIntersect3_SegmentXFrustum
 csIntersect3_SegmentYFrustum = _cspace.csIntersect3_SegmentYFrustum
 csIntersect3_BoxSegment = _cspace.csIntersect3_BoxSegment
+csIntersect3_ClipSegmentBox = _cspace.csIntersect3_ClipSegmentBox
 csIntersect3_BoxFrustum = _cspace.csIntersect3_BoxFrustum
 csIntersect3_BoxSphere = _cspace.csIntersect3_BoxSphere
 csIntersect3_BoxPlane = _cspace.csIntersect3_BoxPlane

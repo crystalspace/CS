@@ -30,8 +30,6 @@
 
 #include "csutil/scf.h"
 
-SCF_VERSION (iMovieRecorder, 0, 0, 1);
-
 /**
  * Using this interface you can communicate with the MovieRecorder plugin.
  * This allows changing or disabling the hotkey bindings, changing the
@@ -40,6 +38,8 @@ SCF_VERSION (iMovieRecorder, 0, 0, 1);
  */
 struct iMovieRecorder : public virtual iBase
 {
+  SCF_INTERFACE (iMovieRecorder, 0, 0, 1);
+
   /// Start recording using the settings in the configuration system
   virtual void Start(void) = 0;
 

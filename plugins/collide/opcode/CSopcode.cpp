@@ -540,8 +540,9 @@ bool csOPCODECollideSystem::CollideRaySegment (
   	csTerraFormerCollider* terraformer, const csReversibleTransform* trans,
 	const csVector3& start, const csVector3& end, bool use_ray)
 {
-#if 0
-  ColCache.Model0 = col->m_pCollisionModel;
+  terraformer->UpdateOPCODEModel (start, sqrtf (csSquaredDist::PointPoint (
+	  start, end)));
+  ColCache.Model0 = terraformer->opcode_model;
 
   csMatrix3 m;
   if (trans) m = trans->GetT2O ();
@@ -595,9 +596,9 @@ bool csOPCODECollideSystem::CollideRaySegment (
     if (status)
     {
       // Now calculate the real intersection points for all hit faces.
-      Point* vertholder = col->vertholder;
+      Point* vertholder = terraformer->vertices.GetArray ();
       if (!vertholder) return true;
-      udword* indexholder = col->indexholder;
+      udword* indexholder = terraformer->indexholder;
       if (!indexholder) return true;
       if (collision_faces.GetSize () == 0) return false;
       Point* c;
@@ -620,9 +621,6 @@ bool csOPCODECollideSystem::CollideRaySegment (
   {
     return false;
   }
-#else
-  return false;
-#endif
 }
 
 bool csOPCODECollideSystem::CollideRaySegment (

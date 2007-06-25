@@ -127,19 +127,19 @@ bool csFancyConsole::HandleEvent (iEvent &Event)
 {
   if (Event.Name == SystemOpen)
   {
-          system_ready = true;
-	  if (!pix_loaded)
-	  {
-            ImageLoader = csQueryRegistry<iImageIO> (object_reg);
-	    LoadPix ();
-	    pix_loaded = true;
-	  }
-          return true;
+    system_ready = true;
+    if (!pix_loaded)
+    {
+      ImageLoader = csQueryRegistry<iImageIO> (object_reg);
+      LoadPix ();
+      pix_loaded = true;
+    }
+    return true;
   }
   else if (Event.Name == SystemClose)
   {
-          system_ready = false;
-          return true;
+    system_ready = false;
+    return true;
   }
   return false;
 }

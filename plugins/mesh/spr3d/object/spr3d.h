@@ -1077,7 +1077,7 @@ private:
   ///
   bool force_otherskin;
 
-  iMeshObjectDrawCallback* vis_cb;
+  csRef<iMeshObjectDrawCallback> vis_cb;
 
   /**
    * Camera space bounding box is cached here.
@@ -1468,8 +1468,6 @@ public:
     iMovable* movable, uint32 frustum_mask);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
-    if (cb) cb->IncRef ();
-    if (vis_cb) vis_cb->DecRef ();
     vis_cb = cb;
   }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const
