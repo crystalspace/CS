@@ -8,6 +8,7 @@ chronological order.
 
 25-Jun-2007
 	- res merged r26545 into 1,0 (gmeshldr and <manualcolors>).
+	- res merged r26310 into 1,0 (response file support detection).
 24-Jun-2007
 	- res merged (a partial) r26604, r26742, (a partial) r26743,
 	  r26744, r26778, r26812, r26816, r26828, r26885, r27009 into 1.0
