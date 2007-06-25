@@ -41,17 +41,17 @@ struct iODEDynamicSystem;
 
 enum csBoneTransformType
 {
-	CS_BTT_NONE = 0,
-	CS_BTT_SCRIPT,
-	CS_BTT_RIGID_BODY
+  CS_BTT_NONE = 0,
+  CS_BTT_SCRIPT,
+  CS_BTT_RIGID_BODY
 };
 
 enum csBoneGeomType
 {
-	CS_BGT_NONE = 0,
-	CS_BGT_BOX,
-	CS_BGT_SPHERE,
-	CS_BGT_CYLINDER
+  CS_BGT_NONE = 0,
+  CS_BGT_BOX,
+  CS_BGT_SPHERE,
+  CS_BGT_CYLINDER
 };
 
 class csReversibleTransform;
@@ -160,14 +160,15 @@ struct iSkeletonBone : public virtual iBase
   //virtual iODEJoint *GetJoint() = 0;
 };
 
-SCF_VERSION  (iSkeletonBoneUpdateCallback, 0, 0, 1);
-
 /**
  * This callback fires every time when bone changes it's transform.
  */
 struct iSkeletonBoneUpdateCallback : public virtual iBase
 {
-	virtual void UpdateTransform(iSkeletonBone *bone, const csReversibleTransform & transform) = 0;
+  SCF_INTERFACE  (iSkeletonBoneUpdateCallback, 0, 0, 1);
+
+  virtual void UpdateTransform(iSkeletonBone *bone,
+      const csReversibleTransform & transform) = 0;
 };
 
 class csQuaternion;
@@ -209,7 +210,7 @@ struct iSkeletonAnimationKeyFrame : public virtual iBase
    * Add new bone transform to the key frame.
    */
   virtual void AddTransform (iSkeletonBoneFactory *bone, 
-	  csReversibleTransform &transform, bool relative = false) = 0;
+    csReversibleTransform &transform, bool relative = false) = 0;
 
   /**
    * Get the transform of a bone.
@@ -224,21 +225,22 @@ struct iSkeletonAnimationKeyFrame : public virtual iBase
    * Get the transform of a bone. Returns 'false' when there won't be 
    * any transform data for given bone.
    */
-  virtual bool GetTransform (iSkeletonBoneFactory *bone, csReversibleTransform &dst_trans) = 0;
+  virtual bool GetTransform (iSkeletonBoneFactory *bone,
+      csReversibleTransform &dst_trans) = 0;
 
   /**
    * Set the transform of a bone.
    */
   virtual void SetTransform(iSkeletonBoneFactory *bone, 
-	  csReversibleTransform &transform) = 0;
+    csReversibleTransform &transform) = 0;
 
   /**
-   * Get key frame specific data. Returns false when frame don't have data for given
-   * bone.
+   * Get key frame specific data. Returns false when frame don't have
+   * data for given bone.
    */
   virtual bool GetKeyFrameData (iSkeletonBoneFactory *bone_fact, 
-	  csQuaternion & rot, csVector3 & pos, csQuaternion & tangent,
-       bool & relative) = 0;
+    csQuaternion & rot, csVector3 & pos, csQuaternion & tangent,
+    bool & relative) = 0;
 };
 
 CS_DEPRECATED_METHOD_MSG("iSkeletonScriptKeyFrame is deprecated, use iSkeletonAnimationKeyFrame instead")
@@ -348,17 +350,17 @@ typedef iSkeletonAnimation iSkeletonScript;
  */
 struct iSkeletonAnimationCallback : public virtual iBase
 {
-    SCF_INTERFACE (iSkeletonAnimationCallback, 1, 0, 0);
+  SCF_INTERFACE (iSkeletonAnimationCallback, 1, 0, 0);
 
   /**
    * On execute action.
    */
-	virtual void Execute(iSkeletonAnimation *animation, size_t frame_idx) = 0;
+  virtual void Execute(iSkeletonAnimation *animation, size_t frame_idx) = 0;
 
   /**
    * On finish action.
    */
-	virtual void OnFinish(iSkeletonAnimation *animation) = 0;
+  virtual void OnFinish(iSkeletonAnimation *animation) = 0;
 };
 
 CS_DEPRECATED_METHOD_MSG("iSkeletonScriptCallback is deprecated, use iSkeletonAnimationCallback instead")
@@ -371,12 +373,12 @@ typedef iSkeletonAnimationCallback iSkeletonScriptCallback;
 
 struct iSkeletonUpdateCallback : public virtual iBase
 {
-    SCF_INTERFACE (iSkeletonUpdateCallback, 1, 0, 0);
+  SCF_INTERFACE (iSkeletonUpdateCallback, 1, 0, 0);
 
-    /**
-     * General skeleon update callback.
-     */
-	virtual void Execute(iSkeleton *skeleton, const csTicks & current_ticks) = 0;
+  /**
+   * General skeleon update callback.
+   */
+  virtual void Execute(iSkeleton *skeleton, const csTicks & current_ticks) = 0;
 };
 
 /**
@@ -560,7 +562,8 @@ struct iSkeleton : public virtual iBase
 
   /**
    * Set animation callback.
-   * \deprecated SetScriptCallback is deprecated, use SetAnimationCallback instead.
+   * \deprecated SetScriptCallback is deprecated, use SetAnimationCallback
+   * instead.
    */
   CS_DEPRECATED_METHOD_MSG("SetScriptCallback is deprecated, use SetAnimationCallback instead")
   virtual void SetAnimationCallback (iSkeletonAnimationCallback *cb) = 0;
@@ -571,7 +574,8 @@ struct iSkeleton : public virtual iBase
   /**
    * Adds skeleton update callback.
    */
-  virtual size_t AddUpdateCallback (iSkeletonUpdateCallback *update_callback) = 0;
+  virtual size_t AddUpdateCallback (
+      iSkeletonUpdateCallback *update_callback) = 0;
 
   /**
    * Get number of skeleton callbacks.
@@ -916,7 +920,8 @@ struct iSkeletonFactory : public virtual iBase
   /**
    * Create new socket factory.
    */
-  virtual iSkeletonSocketFactory *CreateSocket(const char *name, iSkeletonBoneFactory *bone) = 0;
+  virtual iSkeletonSocketFactory *CreateSocket(const char *name,
+      iSkeletonBoneFactory *bone) = 0;
 
   /**
    * Find socket factory by name.
@@ -972,7 +977,8 @@ struct iSkeletonGraveyard : public virtual iBase
   /**
    * Create skeleton from specific factory.
    */
-  virtual iSkeleton *CreateSkeleton(iSkeletonFactory *fact, const char *name = 0) = 0;
+  virtual iSkeleton *CreateSkeleton(iSkeletonFactory *fact,
+      const char *name = 0) = 0;
 
   /**
    * Set manual updates handling mode.

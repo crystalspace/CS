@@ -31,13 +31,13 @@
 class csVector3;
 class csBox3;
 
-SCF_VERSION (iNullMeshState, 0, 0, 2);
-
 /**
  * This interface describes the API for the null mesh object.
  */
 struct iNullMeshState : public virtual iBase
 {
+  SCF_INTERFACE (iNullMeshState, 0, 0, 2);
+
   /**
    * Set the radius of the sphere represented by this object.
    * If you call this function then the box will be calculated from the
@@ -56,13 +56,12 @@ struct iNullMeshState : public virtual iBase
   virtual void GetBoundingBox (csBox3& box) = 0;
 };
 
-SCF_VERSION (iNullFactoryState, 0, 0, 1);
-
 /**
  * This interface describes the API for the null mesh object factory.
  */
 struct iNullFactoryState : public iNullMeshState
 {
+  SCF_INTERFACE (iNullFactoryState, 0, 0, 1);
 };
 
 /** @} */
