@@ -21,6 +21,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/sysfunc.h"
 #include "simdtest.h"
 
+using namespace CS::Platform;
 using namespace CS::SIMD;
 
 CS_IMPLEMENT_APPLICATION
@@ -47,7 +48,7 @@ bool SIMDTest::testCPP(float* a, float* b, float* c, int size)
 
 int main(int argc, char* argv[])
 {
-    CS::Platform::ProcessorSpecDetection detect;
+    ProcessorSpecDetection detect;
 
     if(detect.HasMMX())
     {
@@ -111,7 +112,7 @@ int main(int argc, char* argv[])
 
     printf("Running SIMD test 1.\n");
     csTicks start = csGetMicroTicks();
-    if(SIMD::SIMDCheck<bool, SSEType, float*, float*, float*, int>((*SIMDTest::testSSE), (*SIMDTest::testCPP), a, b, c, size))
+    if(SIMDCheck<bool, SSEType, float*, float*, float*, int>((*SIMDTest::testSSE), (*SIMDTest::testCPP), a, b, c, size))
         printf("Time taken: %lldus \n", csGetMicroTicks()-start);
     return 0;
 }

@@ -20,8 +20,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/processor/simd.h"
 
 using namespace CS::Platform;
-using namespace CS::SIMD;
-bool SIMD::hasISet(int setReq)
+
+bool CS::SIMD::hasISet(int setReq)
 {
     ProcessorSpecDetection detect;
 
