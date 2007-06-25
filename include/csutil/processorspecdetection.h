@@ -119,7 +119,7 @@ namespace CS
             }
         };
 
-        class CS_CRYSTALSPACE_EXPORT ProcessorSpecDetection
+        class ProcessorSpecDetection
         {
         private:
 

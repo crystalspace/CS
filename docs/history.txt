@@ -9,6 +9,14 @@ chronological order.
 25-Jun-2007
 	- Jorrit converted a few remaining interfaces to using SCF_INTERFACE
 	  instead of SCF_VERSION.
+        - Mike Gist added CS::SIMD namespace, containing some SIMD specific
+          functions and types.
+        - Mike Gist added preliminary SIMDCheck function. This takes up to two
+          SIMD function pointers and a c++ fallback, and decides which to use
+          based on CPU instruction set support.
+        - Mike Gist enhanced simdtest to make use of SIMDCheck. Everything in
+          CS::SIMD and using those functions and types is only tested working on
+          MSVC. Other platform support in progress.
 24-Jun-2007
         - Piotr made small bugfix in odedynam colliders ref handling.
 	- Eric Sunshine corrected "camera movement" documentation bug.
@@ -67,11 +75,11 @@ chronological order.
 	- caedes fixed scripting bindings for latest scf changes.
 	- res fixed the configure javac detection to quote the Java directory
 	  (so directories with spaces work).
-4-June-2007
+4-Jun-2007
 	- Mike Gist added PSD code for PPC on OSX. Still needs testing.
         - Oktal fixed a mistake made during Marten's SCF clean-up, that broke
 	  some X11 canvas plugins
-3-June-2007
+3-Jun-2007
 	- Mike Gist refactored PSD (Processor Spec Detection) code and made it
 	  check for and return a bitmask of all supported instructions. Win and 
 	  unix runtime checking work well now.
