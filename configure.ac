@@ -254,6 +254,10 @@ CS_CHECK_BUILD_FLAGS([for -msse3 flag], [cs_cv_prog_cc_msse3], [CS_CREATE_TUPLE(
 AS_IF([test -n "$cs_cv_prog_cc_msse3"], [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.SIMD],
 [$cs_cv_prog_cc_msse3], [+])])
 
+CS_CHECK_BUILD_FLAGS([for -maltivec flag], [cs_cv_prog_cc_maltivec], [CS_CREATE_TUPLE([-maltivec])])
+AS_IF([test -n "$cs_cv_prog_cc_maltivec"], [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.SIMD],
+[$cs_cv_prog_cc_maltivec], [+])])
+
 AC_CHECK_HEADER([xmmintrin.h],
     [CS_HEADER_PROPERTY([CS_HAVE_XMMINTRIN_H])])
 

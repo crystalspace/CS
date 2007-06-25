@@ -28,6 +28,7 @@ namespace Implementation
         {
             // Data from asm.
             int CPUnum = 0;
+            int have_cpuid = 0;
             int maxEax = 0;
             int ecxCapFlags = 0;
             int edxCapFlags = 0;
@@ -47,10 +48,11 @@ namespace Implementation
 #else
             char procName[16];
             maxEax = 0;
+            char* procNamePtr = procName;
             __asm__(
                 //detect 386/486
-                "  pushfl                           \n"
                 "  pushl        %%ebx               \n"
+                "  pushfl                           \n"
                 "  popl         %%eax               \n"      //get EFLAGS
                 "  movl         %%eax, %%ebx        \n"      //save original EFLAGS
                 "  xorl         $0x40000, %%eax     \n"      //toggle AC bit
@@ -95,10 +97,10 @@ namespace Implementation
                 "  cpuid                            \n"
                 "  movl         %%ecx,%3            \n"
                 "  movl         %%edx,%4            \n"
-                "  popl          %%ebx               \n"
                 "1:                                 \n"
-                : "=g" (CPUnum), "=g" (maxEax), "=g" (ecxCapFlags), "=g" (edxCapFlags)
-                : "g" (procName), "2" (maxEax)
+                "  popl         %%ebx               \n"
+                : "=g" (CPUnum), "=g" (have_cpuid), "=g" (maxEax), "=g" (ecxCapFlags), "=g" (edxCapFlags)
+                : "g" (procNamePtr), "2" (maxEax)
                 : "eax", "ecx", "edx", "esi");
 #endif
 
