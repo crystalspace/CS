@@ -24,6 +24,7 @@
  */
 
 #include "csextern.h"
+#include "csutil/csuctransform.h"
 #include "csutil/snprintf.h"
 #include "csutil/util.h"
 
@@ -913,13 +914,21 @@ public:
   /**
    * Convert this string to lower-case.
    * \return Reference to itself.
+   * \remarks This method makes the assumption that the string is UTF-8 
+   *   encoded. If the string is in a different character set all non-ASCII
+   *   characters will be mangled as they're replaced with 
+   *   #CS_UC_CHAR_REPLACER.
    */
-  csStringBase& Downcase();
+  csStringBase& Downcase ();
   /**
    * Convert this string to upper-case.
    * \return Reference to itself.
+   * \remarks This method makes the assumption that the string is UTF-8 
+   *   encoded. If the string is in a different character set all non-ASCII
+   *   characters will be mangled as they're replaced with 
+   *   #CS_UC_CHAR_REPLACER.
    */
-  csStringBase& Upcase();
+  csStringBase& Upcase ();
 
   /**
    * Detach the low-level null-terminated C-string buffer from the csString

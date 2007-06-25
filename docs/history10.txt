@@ -10,6 +10,8 @@ chronological order.
 	- res merged r26545 into 1.0 (gmeshldr and <manualcolors>).
 	- res merged r26310 into 1.0 (response file support detection).
 	- res merged r26990 into 1.0 (version numbers in docs titles).
+	- res merged r26553 into 1.0 (don't use tolower()/toupper() in
+	  csString casing - makes XML parsing work on Turkish locales).
 24-Jun-2007
 	- res merged (a partial) r26604, r26742, (a partial) r26743,
 	  r26744, r26778, r26812, r26816, r26828, r26885, r27009 into 1.0
