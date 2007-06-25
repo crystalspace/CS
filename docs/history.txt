@@ -48,6 +48,10 @@ chronological order.
 	- res changed the installation directory and cs-config naming to
 	  include the version number in order to allow parallel installations
 	  of multiple CS versions.
+	- res changed gmeshldr to save the "manualcolors" flag for objects
+	  if it differs from the factory's setting. Also, previously it was
+	  only written when manualcolors was disabled - which was wrong since
+	  the default is exactly that.
 3-Mar-2007
 	- res added the X Window System and OpenGL to the list of "External
 	  Libraries" in the manual.
