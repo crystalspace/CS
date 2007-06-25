@@ -32,7 +32,7 @@
 /// Minor version (even are stable versions, odd are development versions)
 #define CS_VERSION_MINOR CS_VER_QUOTE(0)
 /// Maintenance release / RC
-#define CS_VERSION_BUILD CS_VER_QUOTE(1)
+#define CS_VERSION_BUILD CS_VER_QUOTE(2)
 /// Date of release
 #define CS_RELEASE_DATE  CS_VER_QUOTE(Mon 15-Feb-2007)
 
