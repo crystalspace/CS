@@ -12594,7 +12594,7 @@ echo "${ECHO_T}$cs_cv_header_mmintrin_h" >&6; }
 fi
 
     if test $cs_cv_header_mmintrin_h = yes; then
-  cs_header_text="${cs_header_text}#define CS_HAS_MMINRIN_H
+  cs_header_text="${cs_header_text}#define CS_HAS_MMINTRIN_H
 "
 else
   cs_cv_header_mmintrin_h_cflags=''
@@ -12910,7 +12910,7 @@ echo "${ECHO_T}$cs_cv_header_xmmintrin_h" >&6; }
 fi
 
     if test $cs_cv_header_xmmintrin_h = yes; then
-  cs_header_text="${cs_header_text}#define CS_HAS_XMMINRIN_H
+  cs_header_text="${cs_header_text}#define CS_HAS_XMMINTRIN_H
 "
 else
   cs_cv_header_xmmintrin_h_cflags=''
