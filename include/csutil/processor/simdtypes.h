@@ -19,7 +19,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __SIMD_TYPES_H__
 #define __SIMD_TYPES_H__
 
-#ifdef CS_HAS_XMMINRIN_H
+#ifdef CS_HAS_XMMINTRIN_H
 
 #include <xmmintrin.h>
 
@@ -49,7 +49,7 @@ namespace CS
 
 #endif // CS_HAS_XMMINTRIN_H
 
-#ifdef CS_HAS_MMINTRIN_H && ndefined(CS_HAS_XMMINTRIN_H)
+#if defined(CS_HAS_MMINTRIN_H) && !defined(CS_HAS_XMMINTRIN_H)
 
 #include <mmintrin.h>
 
@@ -64,5 +64,7 @@ namespace CS
         // TODO: MMX types.
     }
 }
+
+#endif
 
 #endif // __SIMD_TYPES_H__

@@ -264,7 +264,7 @@ AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
    [AC_LANG_PROGRAM([[#include <mmintrin.h>]], [])],
    [CS_CREATE_TUPLE([-mmmx])],
    [C++],
-   [CS_HEADER_PROPERTY([CS_HAS_MMINRIN_H])], [])])
+   [CS_HEADER_PROPERTY([CS_HAS_MMINTRIN_H])], [])])
 
 AS_IF([test -n "$cs_cv_prog_cc_msse"],
 [CS_CHECK_BUILD([checking for xmmintrin.h],
@@ -272,7 +272,7 @@ AS_IF([test -n "$cs_cv_prog_cc_msse"],
    [AC_LANG_PROGRAM([[#include <xmmintrin.h>]], [])],
    [CS_CREATE_TUPLE([-msse])],
    [C++],
-   [CS_HEADER_PROPERTY([CS_HAS_XMMINRIN_H])], [])])
+   [CS_HEADER_PROPERTY([CS_HAS_XMMINTRIN_H])], [])])
 
 #------------------------------------------------------------------------------
 # Check if Perl SDK is installed and which compiler and linker flags are
