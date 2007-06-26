@@ -235,42 +235,28 @@ CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
     [AS_ESCAPE(["])$cs_host_os_normalized[]AS_ESCAPE(["])])
 
 #------------------------------------------------------------------------------
-# Check for SIMD flags, xmmintrin.h and __m128 type
+# Check for SIMD flags
 #------------------------------------------------------------------------------
 
 CS_CHECK_BUILD_FLAGS([for -mmmx flag], [cs_cv_prog_cc_mmmx], [CS_CREATE_TUPLE([-mmmx])])
-AS_IF([test -n "$cs_cv_prog_cc_mmmx"], [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.SIMD],
-[$cs_cv_prog_cc_mmmx], [+])])
+AS_IF([test -n "$cs_cv_prog_cc_mmmx"], [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.MMX],
+[$cs_cv_prog_cc_mmmx], [+]) CS_HEADER_PROPERTY([CS_SUPPORTS_MMX])])
 
 CS_CHECK_BUILD_FLAGS([for -msse flag], [cs_cv_prog_cc_msse], [CS_CREATE_TUPLE([-msse])])
-AS_IF([test -n "$cs_cv_prog_cc_msse"], [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.SIMD],
-[$cs_cv_prog_cc_msse], [+])])
+AS_IF([test -n "$cs_cv_prog_cc_msse"], [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.SSE],
+[$cs_cv_prog_cc_msse], [+]) CS_HEADER_PROPERTY([CS_SUPPORTS_SSE])])
 
 CS_CHECK_BUILD_FLAGS([for -msse2 flag], [cs_cv_prog_cc_msse2], [CS_CREATE_TUPLE([-msse2])])
-AS_IF([test -n "$cs_cv_prog_cc_msse2"], [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.SIMD],
-[$cs_cv_prog_cc_msse2], [+])])
+AS_IF([test -n "$cs_cv_prog_cc_msse2"], [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.SSE2],
+[$cs_cv_prog_cc_msse2], [+]) CS_HEADER_PROPERTY([CS_SUPPORTS_SSE2])])
 
 CS_CHECK_BUILD_FLAGS([for -msse3 flag], [cs_cv_prog_cc_msse3], [CS_CREATE_TUPLE([-msse3])])
-AS_IF([test -n "$cs_cv_prog_cc_msse3"], [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.SIMD],
-[$cs_cv_prog_cc_msse3], [+])])
+AS_IF([test -n "$cs_cv_prog_cc_msse3"], [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.SSE3],
+[$cs_cv_prog_cc_msse3], [+]) CS_HEADER_PROPERTY([CS_SUPPORTS_SSE3])])
 
 CS_CHECK_BUILD_FLAGS([for -maltivec flag], [cs_cv_prog_cc_maltivec], [CS_CREATE_TUPLE([-maltivec])])
-AS_IF([test -n "$cs_cv_prog_cc_maltivec"], [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.SIMD],
-[$cs_cv_prog_cc_maltivec], [+])])
-
-AC_CHECK_HEADER([xmmintrin.h],
-    [CS_HEADER_PROPERTY([CS_HAVE_XMMINTRIN_H])])
-
-m4_define([cs_xmmintrin_include],
-    [[#if CS_HAVE_XMMINTRIN_H
-    #include <xmmintrin.h>
-    #endif
-    ]])
-
-AC_CHECK_TYPE([__m128], [CS_HEADER_PROPERTY([CS_HAVE_M128])], [],
-    [cs_xmmintrin_include])
-
-
+AS_IF([test -n "$cs_cv_prog_cc_maltivec"], [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.ALTIVEC],
+[$cs_cv_prog_cc_maltivec], [+]) CS_HEADER_PROPERTY([CS_SUPPORTS_ALTIVEC])])
 
 #------------------------------------------------------------------------------
 # Check if Perl SDK is installed and which compiler and linker flags are
