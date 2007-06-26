@@ -994,6 +994,11 @@ struct iSkeletonGraveyard : public virtual iBase
    * Add skeleton that will be updated by this graveyard. 
    */
   virtual void AddSkeleton (iSkeleton *skeleton) = 0;
+
+  /**
+   * Remove a skeleton again.
+   */
+  virtual void RemoveSkeleton (iSkeleton* skeleton) = 0;
 };
 
 #endif //__CS_ISKELETON_H__

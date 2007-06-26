@@ -28,6 +28,7 @@
 #include "csgeom/vector3.h"
 #include "csutil/array.h"
 #include "csutil/cscolor.h"
+#include "csutil/weakref.h"
 #include "csutil/csstring.h"
 #include "csutil/flags.h"
 #include "csutil/hash.h"
@@ -72,134 +73,134 @@ class csGenmeshSkelAnimationControl :
     iGenMeshAnimationControl, iGenMeshSkeletonControlState>
 {
 private:
-	iObjectRegistry* object_reg;
+  iObjectRegistry* object_reg;
 
-	iSkeleton *skeleton;
+  csWeakRef<iSkeleton> skeleton;
 
-	csRef<csGenmeshSkelAnimationControlFactory> factory;
-	csStringID bones_name;
-	iMeshObject *mesh_obj;
-	csArray<csReversibleTransform> in_trs;
-	csArray<int> used_bones;
+  csRef<csGenmeshSkelAnimationControlFactory> factory;
+  csStringID bones_name;
+  iMeshObject *mesh_obj;
+  csArray<csReversibleTransform> in_trs;
+  csArray<int> used_bones;
 
-	int num_animated_verts;
-	csVector3* animated_verts;
-	csVector3* transformed_verts;
-	csColor4* animated_colors;
-	csVector3* animated_tangents;
-	csVector3* animated_bitangents;
+  int num_animated_verts;
+  csVector3* animated_verts;
+  csVector3* transformed_verts;
+  csColor4* animated_colors;
+  csVector3* animated_tangents;
+  csVector3* animated_bitangents;
 
-	int num_animated_vert_norms;
-	csVector3* animated_vert_norms;
-	int num_animated_face_norms;
-	csVector3* animated_face_norms;
-	bool* updated_face_norms;
+  int num_animated_vert_norms;
+  csVector3* animated_vert_norms;
+  int num_animated_face_norms;
+  csVector3* animated_face_norms;
+  bool* updated_face_norms;
 
-	csTicks last_update_time;
-	uint32 last_version_id;
-	csTicks elapsed;
+  csTicks last_update_time;
+  uint32 last_version_id;
+  csTicks elapsed;
 
-	// Work tables.
-	static csArray<csColor4> bone_colors;
+  // Work tables.
+  static csArray<csColor4> bone_colors;
 
-	// Copied from the factory.
-	bool animates_vertices;
-	bool animates_texels;
-	bool animates_colors;
-	bool animates_normals;
-	bool animates_tangents;
-	bool animates_bitangents;
+  // Copied from the factory.
+  bool animates_vertices;
+  bool animates_texels;
+  bool animates_colors;
+  bool animates_normals;
+  bool animates_tangents;
+  bool animates_bitangents;
 
-	// Set to true if the animated version of that array needs updating.
-	bool dirty_vertices;
-	bool dirty_texels;
-	bool dirty_colors;
-	bool dirty_normals;
+  // Set to true if the animated version of that array needs updating.
+  bool dirty_vertices;
+  bool dirty_texels;
+  bool dirty_colors;
+  bool dirty_normals;
 
-	// Update the arrays to have correct size. If a realloc was
-	// needed then last_version_id will be forced to ~0.
-	void UpdateArrays (int num_verts);
-	void UpdateVertNormArrays (int num_norms);
+  // Update the arrays to have correct size. If a realloc was
+  // needed then last_version_id will be forced to ~0.
+  void UpdateArrays (int num_verts);
+  void UpdateVertNormArrays (int num_norms);
 
-	// Update animation state. Set the 'dirty_XXX' flags to true if
-	// the arrays need updating too.
-	//void UpdateAnimation (csTicks current, int num_verts, uint32 version_id);
-	bool vertices_mapped;
-	bool normals_mapped;
-	bool tangents_mapped;
-	bool bitangents_mapped;
+  // Update animation state. Set the 'dirty_XXX' flags to true if
+  // the arrays need updating too.
+  //void UpdateAnimation (csTicks current, int num_verts, uint32 version_id);
+  bool vertices_mapped;
+  bool normals_mapped;
+  bool tangents_mapped;
+  bool bitangents_mapped;
 
-	bool initialized;
-	void Initialize ();
-	bool use_parent;
-	csArray<csString> v_bones;
+  bool initialized;
+  void Initialize ();
+  bool use_parent;
+  csArray<csString> v_bones;
 
 public:
 
-	/// Constructor.
-	csGenmeshSkelAnimationControl (csGenmeshSkelAnimationControlFactory* fact, 
-		iMeshObject *mesh, iObjectRegistry* object_reg);
-	/// Destructor.
-	virtual ~csGenmeshSkelAnimationControl ();
+  /// Constructor.
+  csGenmeshSkelAnimationControl (csGenmeshSkelAnimationControlFactory* fact, 
+  	iMeshObject *mesh, iObjectRegistry* object_reg);
+  /// Destructor.
+  virtual ~csGenmeshSkelAnimationControl ();
 
-	// --- For iGenMeshAnimationControl --------------------------------
-	virtual bool AnimatesVertices () const { return animates_vertices; }
-	virtual bool AnimatesTexels () const { return animates_texels; }
-	virtual bool AnimatesNormals () const { return animates_normals; }
-	virtual bool AnimatesColors () const { return animates_colors; }
-	virtual bool AnimatesTangents () const { return animates_tangents; }
-	virtual bool AnimatesBiTangents () const { return animates_bitangents; }
-	virtual void Update (csTicks current);
-	virtual const csVector3* UpdateVertices (csTicks current,
-		const csVector3* verts, int num_verts, uint32 version_id);
-	virtual const csVector2* UpdateTexels (csTicks current,
-		const csVector2* texels, int num_texels, uint32 version_id);
-	virtual const csVector3* UpdateNormals (csTicks current,
-		const csVector3* normals, int num_normals, uint32 version_id);
-	virtual const csColor4* UpdateColors (csTicks current,
-		const csColor4* colors, int num_colors, uint32 version_id);
-	virtual const csVector3* UpdateTangents (csTicks current,
-		const csVector3* tangents, int num_tangents, uint32 version_id);
-	virtual const csVector3* UpdateBiTangents (csTicks current,
-		const csVector3* bitangents, int num_bitangents, uint32 version_id);
+  // --- For iGenMeshAnimationControl --------------------------------
+  virtual bool AnimatesVertices () const { return animates_vertices; }
+  virtual bool AnimatesTexels () const { return animates_texels; }
+  virtual bool AnimatesNormals () const { return animates_normals; }
+  virtual bool AnimatesColors () const { return animates_colors; }
+  virtual bool AnimatesTangents () const { return animates_tangents; }
+  virtual bool AnimatesBiTangents () const { return animates_bitangents; }
+  virtual void Update (csTicks current);
+  virtual const csVector3* UpdateVertices (csTicks current,
+  	const csVector3* verts, int num_verts, uint32 version_id);
+  virtual const csVector2* UpdateTexels (csTicks current,
+  	const csVector2* texels, int num_texels, uint32 version_id);
+  virtual const csVector3* UpdateNormals (csTicks current,
+  	const csVector3* normals, int num_normals, uint32 version_id);
+  virtual const csColor4* UpdateColors (csTicks current,
+  	const csColor4* colors, int num_colors, uint32 version_id);
+  virtual const csVector3* UpdateTangents (csTicks current,
+  	const csVector3* tangents, int num_tangents, uint32 version_id);
+  virtual const csVector3* UpdateBiTangents (csTicks current,
+  	const csVector3* bitangents, int num_bitangents, uint32 version_id);
 
-	virtual int GetAnimatedVerticesCount()
-	{ return num_animated_verts; }
+  virtual int GetAnimatedVerticesCount()
+  { return num_animated_verts; }
 
-	virtual csVector3 *GetAnimatedVertices()
-	{ return animated_verts; }
+  virtual csVector3 *GetAnimatedVertices()
+  { return animated_verts; }
 
-	virtual csVector3 *GetAnimatedFaceNormals()
-	{
-		return animated_face_norms; 
-	}
+  virtual csVector3 *GetAnimatedFaceNormals()
+  {
+    return animated_face_norms; 
+  }
 
-	virtual int GetAnimatedFaceNormalsCount()
-	{
-		return num_animated_face_norms; 
-	}
+  virtual int GetAnimatedFaceNormalsCount()
+  {
+    return num_animated_face_norms; 
+  }
 
-	virtual csVector3 *GetAnimatedVertNormals()
-	{
-		return animated_vert_norms; 
-	}
+  virtual csVector3 *GetAnimatedVertNormals()
+  {
+    return animated_vert_norms; 
+  }
 
-	virtual int GetAnimatedVertNormalsCount()
-	{
-		return num_animated_vert_norms; 
-	}
+  virtual int GetAnimatedVertNormalsCount()
+  {
+    return num_animated_vert_norms; 
+  }
 
-	virtual csVector3* GetAnimatedTangents()
-	{
-		return animated_tangents;
-	}
+  virtual csVector3* GetAnimatedTangents()
+  {
+    return animated_tangents;
+  }
 
-	virtual csVector3* GetAnimatedBiTangents()
-	{
-		return animated_bitangents;
-	}
+  virtual csVector3* GetAnimatedBiTangents()
+  {
+    return animated_bitangents;
+  }
 
-	virtual iSkeleton *GetSkeleton() { return skeleton; }
+  virtual iSkeleton *GetSkeleton() { return skeleton; }
 };
 
 /**
@@ -210,67 +211,68 @@ class csGenmeshSkelAnimationControlFactory :
     iGenMeshAnimationControlFactory>
 {
 private:
-	csGenmeshSkelAnimationControlType* type;
-	iObjectRegistry* object_reg;
+  csGenmeshSkelAnimationControlType* type;
+  iObjectRegistry* object_reg;
 
-	csStringArray autorun_scripts;
+  csStringArray autorun_scripts;
 
-	csRef<iSkeletonFactory> skeleton_factory;
+  csRef<iSkeletonFactory> skeleton_factory;
 
-	csArray<size_t> parent_bones;
+  csArray<size_t> parent_bones;
 
-	csArray<int> used_bones;
-	//csArray<csString> vert_bones;
+  csArray<int> used_bones;
+  //csArray<csString> vert_bones;
 
-	// These flags are set during script compilation to see if
-	// the script can possibly affect the given attributes.
-	bool animates_vertices;
-	bool animates_texels;
-	bool animates_colors;
-	bool animates_normals;
+  // These flags are set during script compilation to see if
+  // the script can possibly affect the given attributes.
+  bool animates_vertices;
+  bool animates_texels;
+  bool animates_colors;
+  bool animates_normals;
 
-	// This flag is set to true if there are hierarchical bones.
-	bool has_hierarchical_bones;
+  // This flag is set to true if there are hierarchical bones.
+  bool has_hierarchical_bones;
 
-	csFlags flags;
+  csFlags flags;
 
-	csStringHash xmltokens;
+  csStringHash xmltokens;
 
 #define CS_TOKEN_ITEM_FILE "plugins/mesh/genmesh/skelanim2/gmeshskelanim.tok"
 #include "cstool/tokenlist.h"
 
-	csString error_buf;
-	iMeshObjectFactory *mesh_fact;
+  csString error_buf;
+  iMeshObjectFactory *mesh_fact;
 
-	bool use_parent;
+  bool use_parent;
 public:
     csArray<int> & GetUsedBones() { return used_bones; }
-	iSkeletonGraveyard *gr;
+  iSkeletonGraveyard *gr;
     virtual bool GetUseParent() { return use_parent; }
     virtual iSkeletonFactory* GetSkelFact() { return skeleton_factory; }
 
-	//csAnimationUpdateLevel & GetAULevel() { return always_update_level; }
-	iSkeletonFactory * GetSkeletonFactory() {return skeleton_factory; }
-	const csFlags & GetFlags() {return flags; }
-	/// Constructor.
-	csGenmeshSkelAnimationControlFactory (csGenmeshSkelAnimationControlType* type,
-		iObjectRegistry* object_reg);
-	/// Destructor.
-	virtual ~csGenmeshSkelAnimationControlFactory ();
+  //csAnimationUpdateLevel & GetAULevel() { return always_update_level; }
+  iSkeletonFactory * GetSkeletonFactory() {return skeleton_factory; }
+  const csFlags & GetFlags() {return flags; }
+  /// Constructor.
+  csGenmeshSkelAnimationControlFactory (csGenmeshSkelAnimationControlType* type,
+  	iObjectRegistry* object_reg);
+  /// Destructor.
+  virtual ~csGenmeshSkelAnimationControlFactory ();
 
-	virtual csPtr<iGenMeshAnimationControl> CreateAnimationControl (iMeshObject *mesh);
+  virtual csPtr<iGenMeshAnimationControl> CreateAnimationControl (
+      iMeshObject *mesh);
 
-	csGenmeshSkelAnimationControlType* GetType () { return type; }
+  csGenmeshSkelAnimationControlType* GetType () { return type; }
 
-	bool AnimatesVertices () const { return animates_vertices; }
-	bool AnimatesTexels () const { return animates_texels; }
-	bool AnimatesNormals () const { return animates_normals; }
-	bool AnimatesColors () const { return animates_colors; }
-	bool HasHierarchicalBones () const { return has_hierarchical_bones; }
+  bool AnimatesVertices () const { return animates_vertices; }
+  bool AnimatesTexels () const { return animates_texels; }
+  bool AnimatesNormals () const { return animates_normals; }
+  bool AnimatesColors () const { return animates_colors; }
+  bool HasHierarchicalBones () const { return has_hierarchical_bones; }
 
-	// --- For iGenMeshAnimationControlFactory -------------------------
-	virtual const char* Load (iDocumentNode* node);
-	virtual const char* Save (iDocumentNode* parent);
+  // --- For iGenMeshAnimationControlFactory -------------------------
+  virtual const char* Load (iDocumentNode* node);
+  virtual const char* Save (iDocumentNode* parent);
 };
 
 /**
@@ -281,20 +283,21 @@ class csGenmeshSkelAnimationControlType :
     iGenMeshAnimationControlType, iComponent>
 {
 private:
-	iObjectRegistry* object_reg;
-	csRef<iVirtualClock> vc;
-	csEventID PreProcess;
-	csArray<csGenmeshSkelAnimationControl*> always_update_animations;
+  iObjectRegistry* object_reg;
+  csRef<iVirtualClock> vc;
+  csEventID PreProcess;
+  csArray<csGenmeshSkelAnimationControl*> always_update_animations;
 
 public:
-	/// Constructor.
-	csGenmeshSkelAnimationControlType (iBase*);
-	/// Destructor.
-	virtual ~csGenmeshSkelAnimationControlType ();
-	/// Initialize.
-	bool Initialize (iObjectRegistry* object_reg);
+  /// Constructor.
+  csGenmeshSkelAnimationControlType (iBase*);
+  /// Destructor.
+  virtual ~csGenmeshSkelAnimationControlType ();
+  /// Initialize.
+  bool Initialize (iObjectRegistry* object_reg);
 
-	virtual csPtr<iGenMeshAnimationControlFactory> CreateAnimationControlFactory ();
+  virtual csPtr<iGenMeshAnimationControlFactory> CreateAnimationControlFactory (
+      );
 };
 
 #endif // __CS_GENMESHSKELANIM_H__
