@@ -25,6 +25,8 @@ using namespace CS::SIMD;
 bool SIMDTest::testSSE(float* a, float* b, float* c, int size)
 {
 
+#ifdef CS_SUPPORTS_SSE
+
     SIMDVector4* ap = (SIMDVector4*) a;
     SIMDVector4* bp = (SIMDVector4*) b;
     SIMDVector4* cp = (SIMDVector4*) c;
@@ -43,5 +45,8 @@ bool SIMDTest::testSSE(float* a, float* b, float* c, int size)
             bp++;
             cp++;
         }
+
+#endif // CS_SUPPORTS_SSE
+
     return true;
 }

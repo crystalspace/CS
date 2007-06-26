@@ -16,6 +16,11 @@ License along with this library; if not, write to the Free
 Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifndef __SIMD_TYPES_H__
+#define __SIMD_TYPES_H__
+
+// TODO: Make compatible with non-supporting compiler (i.e. checks for xmmintrin.h)
+
 #include <xmmintrin.h>
 
 namespace CS
@@ -41,3 +46,5 @@ namespace CS
         }
     }
 }
+
+#endif // __SIMD_TYPES_H__

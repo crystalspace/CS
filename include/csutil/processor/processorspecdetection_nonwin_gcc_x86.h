@@ -84,14 +84,14 @@ namespace Implementation
                 "  xorl         %%eax,%%eax         \n"      // thebolt: this was a movl $0,%eax
                 "  cpuid                            \n"
                 "  movl         %%eax,%2            \n"      //save the maximum eax for cpuid
-                //save MFT string
-                "  movl         %5,%%esi            \n"
-                "  movl         %%ebx,0(%%esi)      \n"
-                "  movl         %%edx,4(%%esi)      \n"
-                "  movl         %%ecx,8(%%esi)      \n"
-                "  movl         $0,12(%%esi)        \n"
-                "  cmp          $1,%2               \n"
-                "  jb           1f                  \n"
+                //save MFT string - Buggy
+                //"  movl         %5,%%esi            \n"
+                //"  movl         %%ebx,0(%%esi)      \n"
+                //"  movl         %%edx,4(%%esi)      \n"
+                //"  movl         %%ecx,8(%%esi)      \n"
+                //"  movl         $0,12(%%esi)        \n"
+                //"  cmp          $1,%2               \n"
+                //"  jb           1f                  \n"
                 //get flagstring
                 "  movl         $1,%%eax            \n"
                 "  cpuid                            \n"
