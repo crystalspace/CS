@@ -118,4 +118,10 @@
   #define CS_HAVE__ALIGNED_MALLOC
 #endif
 
+// VC supports MMX/SSE.
+#if defined(CS_COMPILER_MSVC)
+  #define CS_HAS_MMINRIN_H
+  #define CS_HAS_XMMINRIN_H
+#endif
+
 #endif // __CS_WIN32_CSCONFIG_H__

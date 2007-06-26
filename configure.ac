@@ -258,6 +258,22 @@ CS_CHECK_BUILD_FLAGS([for -maltivec flag], [cs_cv_prog_cc_maltivec], [CS_CREATE_
 AS_IF([test -n "$cs_cv_prog_cc_maltivec"], [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.ALTIVEC],
 [$cs_cv_prog_cc_maltivec], [+]) CS_HEADER_PROPERTY([CS_SUPPORTS_ALTIVEC])])
 
+AS_IF([test -n "$cs_cv_prog_cc_mmmx"],
+[CS_CHECK_BUILD([checking for mmintrin.h],
+   [cs_cv_header_mmintrin_h],
+   [AC_LANG_PROGRAM([[#include <mmintrin.h>]], [])],
+   [CS_CREATE_TUPLE([-mmmx])],
+   [C++],
+   [CS_HEADER_PROPERTY([CS_HAS_MMINRIN_H])], [])])
+
+AS_IF([test -n "$cs_cv_prog_cc_msse"],
+[CS_CHECK_BUILD([checking for xmmintrin.h],
+   [cs_cv_header_xmmintrin_h],
+   [AC_LANG_PROGRAM([[#include <xmmintrin.h>]], [])],
+   [CS_CREATE_TUPLE([-msse])],
+   [C++],
+   [CS_HEADER_PROPERTY([CS_HAS_XMMINRIN_H])], [])])
+
 #------------------------------------------------------------------------------
 # Check if Perl SDK is installed and which compiler and linker flags are
 # required to embed Perl.  Also determine if the glue file can be created with
