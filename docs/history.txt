@@ -13,17 +13,27 @@ chronological order.
 	  memory leaks and crashes when genmesh anim objects are removed
 	  from memory. Note that sprcal3d still has a circular reference
 	  bug with the graveyard.
+        - Mike Gist added compile checks for xmmintrin.h and mmintrin.h
+          SIMDCheck and simdtest now work fully when compiled with MSVC and gcc(x86).
 25-Jun-2007
 	- Jorrit converted a few remaining interfaces to using SCF_INTERFACE
 	  instead of SCF_VERSION.
-        - Mike Gist added CS::SIMD namespace, containing some SIMD specific
-          functions and types.
-        - Mike Gist added preliminary SIMDCheck function. This takes up to two
-          SIMD function pointers and a c++ fallback, and decides which to use
-          based on CPU instruction set support.
-        - Mike Gist enhanced simdtest to make use of SIMDCheck. Everything in
-          CS::SIMD and using those functions and types is only tested working on
-          MSVC. Other platform support in progress.
+        - Mike Gist made the following changes:
+          - Added CS::SIMD namespace, containing some SIMD specific
+            functions and types.
+          - Added preliminary SIMDCheck function. This takes up to two
+            SIMD function pointers and a c++ fallback, and decides which to use
+            based on CPU instruction set support.
+          - Enhanced simdtest to make use of SIMDCheck. Everything in
+            CS::SIMD and using those functions and types is only tested working on
+            MSVC. Other platform support in progress.
+          - Finished runtime checking support for linux/gcc, fixed
+            compile errors, a few crashes, cleaned and optimized some areas of code.
+          - Added compile time checks for -mmmx, -msse, -msse2, -msse3, -maltivec,
+            and added a number of checks using the results of this in code.
+          - Moved all SSE code in simdtest to a seperate CPP. All SIMD code
+            must go in a seperate file for each instruction set, then the correct 
+            compile time flag set in the Jamfile.
 24-Jun-2007
         - Piotr made small bugfix in odedynam colliders ref handling.
 	- Eric Sunshine corrected "camera movement" documentation bug.

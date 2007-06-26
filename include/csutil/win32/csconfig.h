@@ -122,6 +122,10 @@
 #if defined(CS_COMPILER_MSVC)
   #define CS_HAS_MMINTRIN_H
   #define CS_HAS_XMMINTRIN_H
+  #define CS_SUPPORTS_MMX
+  #define CS_SUPPORTS_SSE
+  #define CS_SUPPORTS_SSE2
+  #define CS_SUPPORTS_SSE3
 #endif
 
 #endif // __CS_WIN32_CSCONFIG_H__
