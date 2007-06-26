@@ -6,6 +6,13 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Jun-2007
+	- Jorrit fixed a bug in the skeleton graveyard by adding
+	  iSkeletonGraveyard->RemoveSkeleton(). Genmesh anim now
+	  calls this method when the animation is destroyed. That fixes
+	  memory leaks and crashes when genmesh anim objects are removed
+	  from memory. Note that sprcal3d still has a circular reference
+	  bug with the graveyard.
 25-Jun-2007
 	- Jorrit converted a few remaining interfaces to using SCF_INTERFACE
 	  instead of SCF_VERSION.
