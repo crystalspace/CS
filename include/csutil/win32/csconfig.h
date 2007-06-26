@@ -120,8 +120,8 @@
 
 // VC supports MMX/SSE.
 #if defined(CS_COMPILER_MSVC)
-  #define CS_HAS_MMINRIN_H
-  #define CS_HAS_XMMINRIN_H
+  #define CS_HAS_MMINTRIN_H
+  #define CS_HAS_XMMINTRIN_H
 #endif
 
 #endif // __CS_WIN32_CSCONFIG_H__
