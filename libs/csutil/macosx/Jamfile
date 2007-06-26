@@ -4,7 +4,6 @@ CsLibAddModule ;
 
 CSUTIL.GENERIC +=
   apppath.cpp
-  csprocessorcap.cpp
   cspthrd.cpp 
   cspthrd.h
   expandname.cpp

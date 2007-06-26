@@ -12,7 +12,6 @@ SubDir TOP libs csutil win32 ;
 
 CSUTIL.GENERIC +=
   appdir.cpp
-  csprocessorcap.cpp
   findlib.cpp
   getopt.cpp
   pluginpaths.cpp
