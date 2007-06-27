@@ -2,6 +2,8 @@
 
 27-Jun-2007
 	- Jorrit merged r27079 into 1.2 (walktest recording crasher).
+	- Jorrit merged r27080, r27087:27089, r27093:r27094, and r27096
+	  into 1.2 (CollideRay).
 24-Jun-2007
 	- Eric Sunshine merged r27108 into 1.2 (#348 fix).
 	- res merged r27110:27112 into 1.2 (install branch history).
