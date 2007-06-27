@@ -5567,6 +5567,7 @@ class iSkeletonGraveyard(iBase):
     def SetManualUpdates(*args): return _cspace.iSkeletonGraveyard_SetManualUpdates(*args)
     def Update(*args): return _cspace.iSkeletonGraveyard_Update(*args)
     def AddSkeleton(*args): return _cspace.iSkeletonGraveyard_AddSkeleton(*args)
+    def RemoveSkeleton(*args): return _cspace.iSkeletonGraveyard_RemoveSkeleton(*args)
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSkeletonGraveyard_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iSkeletonGraveyard_scfGetVersion)
     __swig_destroy__ = _cspace.delete_iSkeletonGraveyard

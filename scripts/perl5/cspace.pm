@@ -8274,6 +8274,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetManualUpdates = *cspacec::iSkeletonGraveyard_SetManualUpdates;
 *Update = *cspacec::iSkeletonGraveyard_Update;
 *AddSkeleton = *cspacec::iSkeletonGraveyard_AddSkeleton;
+*RemoveSkeleton = *cspacec::iSkeletonGraveyard_RemoveSkeleton;
 *scfGetVersion = *cspacec::iSkeletonGraveyard_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
