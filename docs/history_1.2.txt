@@ -5,6 +5,7 @@
 	- Jorrit merged r27080, r27087:27089, r27093:r27094, and r27096
 	  into 1.2 (CollideRay).
 	- Jorrit merged r27048 into 1.2 (javac detection fix).
+	- Jorrit merged r27090 into 1.2 (windows joystick).
 24-Jun-2007
 	- Eric Sunshine merged r27108 into 1.2 (#348 fix).
 	- res merged r27110:27112 into 1.2 (install branch history).
