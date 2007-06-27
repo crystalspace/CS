@@ -1415,6 +1415,16 @@ iSkeletonFactory* csSkeletonGraveyard::CreateFactory(const char *name)
   return fact;
 }
 
+void csSkeletonGraveyard::AddSkeleton (iSkeleton *skeleton)
+{
+  skeletons.Push (skeleton);
+}
+
+void csSkeletonGraveyard::RemoveSkeleton (iSkeleton* skeleton)
+{
+  skeletons.Delete (skeleton);
+}
+
 iSkeleton *csSkeletonGraveyard::CreateSkeleton(iSkeletonFactory *fact,
     const char *name)
 {

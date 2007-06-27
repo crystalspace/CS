@@ -778,7 +778,8 @@ public:
   virtual iSkeleton *CreateSkeleton(iSkeletonFactory *fact, const char *name);
   virtual void SetManualUpdates (bool man_updates) {manual_updates = man_updates;}
   virtual void Update (csTicks time);
-  void AddSkeleton (iSkeleton *skeleton) {skeletons.Push (skeleton);}
+  void AddSkeleton (iSkeleton *skeleton);
+  void RemoveSkeleton (iSkeleton* skeleton);
 
   class csSkelEventHandler : public scfImplementation1<csSkelEventHandler,
   	iEventHandler>

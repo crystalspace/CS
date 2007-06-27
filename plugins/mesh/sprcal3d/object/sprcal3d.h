@@ -744,7 +744,8 @@ public:
   }
   CalModel *GetCal3DModel () { return &calModel; }
 
-  csPtr<iSkeleton> GetSkeleton () {return scfQueryInterface<iSkeleton> (skeleton);}
+  csPtr<iSkeleton> GetSkeleton () {return scfQueryInterface<iSkeleton> (
+      skeleton);}
 
   void SetAnimTimeUpdateHandler (iAnimTimeUpdateHandler*);
   /** @} */
