@@ -135,7 +135,7 @@ void SaveRecording (iVFS* vfs, const char* fName)
     }
     else
     {
-      len = 100;
+      len = 254;
       cf->Write ((char*)&len, 1);
     }
     if (reccam->arg)
@@ -147,7 +147,7 @@ void SaveRecording (iVFS* vfs, const char* fName)
     }
     else
     {
-      len = 100;
+      len = 254;
       cf->Write ((char*)&len, 1);
     }
   }
@@ -193,15 +193,16 @@ void LoadRecording (iVFS* vfs, const char* fName)
     }
     else
     {
-      char buf[100];
+      char* buf = new char[1+len];
       cf->Read (buf, 1+len);
       s = Sys->Engine->GetSectors ()->FindByName (buf);
+      delete[] buf;
     }
     reccam->sector = s;
     prev_sector = s;
 
     cf->Read ((char*)&len, 1);
-    if (len == 100)
+    if (len == 254)
     {
       reccam->cmd = 0;
     }
@@ -211,7 +212,7 @@ void LoadRecording (iVFS* vfs, const char* fName)
       cf->Read (reccam->cmd, 1+len);
     }
     cf->Read ((char*)&len, 1);
-    if (len == 100)
+    if (len == 254)
     {
       reccam->arg = 0;
     }
