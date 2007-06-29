@@ -123,9 +123,7 @@ T csSquare (const T& x)
 }
 
 //@{
-/**
- * Checks if a floating point value is finite.
- */
+/// Checks if a floating point value is finite.
 CS_FORCEINLINE bool csFinite (float f)
 {
 #if defined (CS_HAVE_FINITEF)
@@ -142,6 +140,7 @@ CS_FORCEINLINE bool csFinite (float f)
 #error Your platform has no isfinite()-alike function!
 #endif
 }
+/// Checks if a double-precision floating point value is finite.
 CS_FORCEINLINE bool csFinite (double d)
 {
 #if defined (CS_HAVE_STD__ISFINITE)
@@ -154,6 +153,60 @@ CS_FORCEINLINE bool csFinite (double d)
   return _finite (d) != 0;
 #else
 #error Your platform has no isfinite()-alike function!
+#endif
+}
+
+/// Checks if a floating point value is not-a-number.
+CS_FORCEINLINE bool csNaN (float f)
+{
+#if defined (CS_HAVE_NANF)
+  return isnanf (f);
+#elif defined (CS_HAVE_STD__ISNAN)
+  return std::isnan (f);
+#elif defined(CS_HAVE_ISNAN)
+  return isnan (f);
+#elif defined (CS_HAVE__NAN)
+  return _isnan (f) != 0;
+#else
+#error Your platform has no isnan()-alike function!
+#endif
+}
+/// Checks if a double-precision floating point value is not-a-number.
+CS_FORCEINLINE bool csNaN (double d)
+{
+#if defined (CS_HAVE_STD__ISNAN)
+  return std::isnan (d);
+#elif defined(CS_HAVE_ISNAN)
+  return isnan (d);
+#elif defined (CS_HAVE__NAN)
+  return _isnan (d) != 0;
+#else
+#error Your platform has no isnan()-alike function!
+#endif
+}
+
+/// Checks if a floating point value is normal (not infinite or nan).
+CS_FORCEINLINE bool csNormal (float f)
+{
+#if defined (CS_HAVE_NORMALF)
+  return normalf (f);
+#elif defined (CS_HAVE_STD__ISNORMAL)
+  return std::isnormal (f);
+#elif defined(CS_HAVE_ISNORMAL)
+  return isnormal (f);
+#else
+  return csFinite(d) && !csNaN(d);
+#endif
+}
+/// Checks if a double-precision floating point value is normal.
+CS_FORCEINLINE bool csNormal (double d)
+{
+#if defined (CS_HAVE_STD__ISNORMAL)
+  return std::isnormal (d);
+#elif defined(CS_HAVE_ISNORMAL)
+  return isnormal (d);
+#else
+  return csFinite(d) && !csNaN(d);
 #endif
 }
 //@}
