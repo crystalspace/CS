@@ -35,11 +35,11 @@ namespace CS
      * \a T must be comparable with csComparator<>. Larger items are 
      * returned first. 
      */
-    template<typename T, class Container = csArray<T> >
+    template<typename T, class Container = csArray<T>, class Comparator = csComparator<T, T> >
     class PriorityQueue
     {
       Container items;
-
+      
       inline static size_t Parent (size_t n) { return (n-1)/2; }
       inline static size_t Left (size_t n) { return 2*n+1; }
       inline static size_t Right (size_t n) { return 2*n+2; }
@@ -51,7 +51,7 @@ namespace CS
         items[b] = tmp;
       }
       inline bool Larger (size_t a, size_t b)
-      { return csComparator<T, T>::Compare (items[a], items[b]) > 0; }
+      { return Comparator::Compare (items[a], items[b]) > 0; }
 
       /// Ensure heap order on 'items'.
       void HeapifyUp (size_t n)
