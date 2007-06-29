@@ -165,7 +165,7 @@ CS_FORCEINLINE bool csNaN (float f)
   return std::isnan (f);
 #elif defined(CS_HAVE_ISNAN)
   return isnan (f);
-#elif defined (CS_HAVE__NAN)
+#elif defined (CS_HAVE__ISNAN)
   return _isnan (f) != 0;
 #else
 #error Your platform has no isnan()-alike function!
@@ -178,7 +178,7 @@ CS_FORCEINLINE bool csNaN (double d)
   return std::isnan (d);
 #elif defined(CS_HAVE_ISNAN)
   return isnan (d);
-#elif defined (CS_HAVE__NAN)
+#elif defined (CS_HAVE__ISNAN)
   return _isnan (d) != 0;
 #else
 #error Your platform has no isnan()-alike function!
