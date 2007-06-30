@@ -195,7 +195,7 @@ CS_FORCEINLINE bool csNormal (float f)
 #elif defined(CS_HAVE_ISNORMAL)
   return isnormal (f);
 #else
-  return csFinite(d) && !csNaN(d);
+  return csFinite(f) && !csNaN(f);
 #endif
 }
 /// Checks if a double-precision floating point value is normal.
