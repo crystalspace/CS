@@ -2213,10 +2213,12 @@ AS_IF([test $cs_cv_cxx_qsqrt_ok = no],
 
 
 #------------------------------------------------------------------------------
-# Check how to determine whether a floating point value is finite.
+# Check how to determine whether a floating point value is finite or nan.
 #------------------------------------------------------------------------------
-# CS_CHECK_FINITE(FUNCTION)
-AC_DEFUN([CS_CHECK_FINITE],
+# CS_CHECK_SPECIAL_FLOAT(FUNCTION)
+# CS_CHECK_STD_SPECIAL_FLOAT(FUNCTION)
+
+AC_DEFUN([CS_CHECK_SPECIAL_FLOAT],
     [CS_CHECK_BUILD([for $1], [cs_cv_func_$1],
 	[AC_LANG_PROGRAM(
 	    [[#if HAVE_CMATH
@@ -2229,28 +2231,39 @@ AC_DEFUN([CS_CHECK_FINITE],
 	    #include <ieeefp.h>
 	    #endif]],
 	    [float f; $1(f)])],
-	[], [C++], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_HAVE_$1]))], [], [],
-	[$cs_cv_prog_cxx_enable_pedantic])])
+	[], [C++], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_HAVE_$1]))],
+	[], [], [$cs_cv_prog_cxx_enable_pedantic])])
 
-CS_CHECK_BUILD([for std::isfinite], [cs_cv_func_std__isfinite],
-    [AC_LANG_PROGRAM(
-	[[#if HAVE_CMATH
-	#include <cmath>
-	#endif
-	#if HAVE_MATH_H
-	#include <math.h>
-	#endif
-	#if HAVE_IEEEFP_H
-	#include <ieeefp.h>
-	#endif]],
-	[float f; std::isfinite(f)])],
-    [], [C++], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_HAVE_STD__ISFINITE]))],
-    [], [], [$cs_cv_prog_cxx_enable_pedantic])
+AC_DEFUN([CS_CHECK_STD_SPECIAL_FLOAT],
+    [CS_CHECK_BUILD([for std::$1], [cs_cv_func_std__$1],
+	[AC_LANG_PROGRAM(
+	    [[#if HAVE_CMATH
+	    #include <cmath>
+	    #endif
+	    #if HAVE_MATH_H
+	    #include <math.h>
+	    #endif
+	    #if HAVE_IEEEFP_H
+	    #include <ieeefp.h>
+	    #endif]],
+	    [float f; std::$1(f)])],
+	[], [C++], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_HAVE_STD__$1]))],
+	[], [], [$cs_cv_prog_cxx_enable_pedantic])])
 
-CS_CHECK_FINITE([isfinite])
-CS_CHECK_FINITE([finitef])
-CS_CHECK_FINITE([finite])
-CS_CHECK_FINITE([_finite])
+CS_CHECK_SPECIAL_FLOAT([isfinite])
+CS_CHECK_SPECIAL_FLOAT([finitef])
+CS_CHECK_SPECIAL_FLOAT([finite])
+CS_CHECK_SPECIAL_FLOAT([_finite])
+CS_CHECK_STD_SPECIAL_FLOAT([isfinite])
+
+CS_CHECK_SPECIAL_FLOAT([isnan])
+CS_CHECK_SPECIAL_FLOAT([isnanf])
+CS_CHECK_SPECIAL_FLOAT([_isnan])
+CS_CHECK_STD_SPECIAL_FLOAT([isnan])
+
+CS_CHECK_SPECIAL_FLOAT([isnormal])
+CS_CHECK_SPECIAL_FLOAT([normalf])
+CS_CHECK_STD_SPECIAL_FLOAT([isnormal])
 
 
 

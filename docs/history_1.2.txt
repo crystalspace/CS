@@ -1,5 +1,8 @@
 1.2 branch log.
 
+1-Jul-2007
+	- Vincent merged r27167:27169 into 1.2 (portable replacements for
+	  isnan() and isnormal()).
 27-Jun-2007
 	- Jorrit merged r27079 into 1.2 (walktest recording crasher).
 	- Jorrit merged r27080, r27087:27089, r27093:r27094, and r27096
