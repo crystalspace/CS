@@ -3018,6 +3018,14 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
   }
   else
   {
+    if (fixedFunctionForcefulEnable)
+    {
+      const GLenum state = GL_LIGHTING;
+      GLboolean s = glIsEnabled (state);
+      if (s) glDisable (state); else glEnable (state);
+      glBegin (GL_TRIANGLES);  glEnd ();
+      if (s) glEnable (state); else glDisable (state);
+    }
     if (ext->CS_GL_ARB_multitexture)
     {
       statecache->SetCurrentTU (0);
