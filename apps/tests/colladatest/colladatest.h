@@ -21,7 +21,7 @@
 
 #include <iostream>
 #include <string>
-#include <crystalspace.h>
+#include "crystalspace.h"
 
 #define TESTDIR "E:$/Source$/CS-COLLADA$/data$/colladatest$/"
 #define COLLADATESTFILE "colladatest.dae"

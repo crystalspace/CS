@@ -65,8 +65,8 @@ bool ColladaTest::OnInitialize(int argc, char* argv[])
 		return ReportError("Unable to get virtual file system.  Terminating.");
 	}
 
-	/// @todo Change this, possibly accept user input.
-	fileSystem->Mount("/colladafiles", TESTDIR);
+	/// @todo Change this, possibly use config file.
+	// fileSystem->Mount("/colladafiles", TESTDIR);
 
 	colladaConv = csLoadPlugin<iColladaConvertor> (plugManager, "crystalspace.utilities.colladaconvertor");
   colladaConv->SetWarnings(true);
@@ -76,14 +76,14 @@ bool ColladaTest::OnInitialize(int argc, char* argv[])
 		return ReportError("Error: Unable to load COLLADA Conversion System.  Terminating.");
 	}
 
-	string path = "/colladafiles/";
+	string path = "/lev/colladatest/";
 	path.append(COLLADATESTFILE);
 
 	colladaConv->Load(path.c_str());
-	colladaConv->SetOutputFiletype(CS_MAP_FILE);
+	colladaConv->SetOutputFiletype(CS_LIBRARY_FILE);
 	colladaConv->Convert();
 	//colladaConv->Load(path.c_str(), CS_MAP_FILE);
-	colladaConv->Write("/colladafiles/test.xml");
+	colladaConv->Write("/lev/colladatest/test.xml");
 	
 	/*
 	csRef<iDocument> crystalFile = colladaConv->GetCrystalDocument();

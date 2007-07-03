@@ -51,6 +51,15 @@ enum csColladaFileType {
 	CS_NO_FILE
 };
 
+enum csColladaNumericType {
+
+	/// A type representing the COLLADA integer format
+	CS_COLLADA_INTEGER = 1,
+
+	/// A Type representing the COLLADA floating point format
+	CS_COLLADA_FLOAT
+};
+
 /**
  * Representation of a convertor from COLLADA files to Crystal Space files.
  *

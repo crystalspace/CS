@@ -6,6 +6,21 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+03-July-2007
+	- Scott Johnson changed colladatest to utilize a file inside the /lev directory on VFS.
+	- Scott Johnson added an enumerated type representing a numeric type to collada.h.
+	- Scott Johnson removed GetVertexArray() from the csColladaConvertor code.  It is being
+	  replaced by a separate data structure.
+	- Scott Johnson added two new data structures to csColladaConvertor - one representing
+	  a mesh object, and one representing an accessor to the vertices in COLLADA.
+	- Scott Johnson added a new function called GetSourceElement() to csColladaConvertor
+	  that retrieves the <source> node of a mesh object in COLLADA. 
+	- Scott Johnson added all of the csColladaConvertor code to a new namespace called
+	  ColladaConvertor.
+22-June-2007
+	- Scott Johnson removed Chop() functionality from csColladaConvertor.  It now uses 
+	  iString::DeleteAt().  Didn't realize this was a function, as it isn't documented.
+	- Scott Johnson changed VFS.cfg to include data/colladatest on load as /lev/colladatest.
 15-Jun-2007
   	- Scott Johnson added Chop() and FindNumericArray() functions to csColladaConvertor.
     	  Chop() removes a single character from (currently) an std::string.  This will be changed
