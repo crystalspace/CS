@@ -22,29 +22,10 @@
 #include "object.h"
 #include "config.h"
 
+#include "lightmapuv_simple_util.h"
+
 namespace lighter
 {
-  struct SizeAndIndex
-  {
-    csVector2 uvsize;
-    size_t index;
-  };
-
-  template<typename T>
-  static int SortByUVSize (T const& s1, T const& s2)
-  {
-    float dx = s1.uvsize.x - s2.uvsize.x;
-    if (dx > 0)
-      return -1;
-    else if (dx < 0)
-      return 1;
-    float dy = s1.uvsize.y - s2.uvsize.y;
-    if (dy > 0)
-      return -1;
-    else if (dy < 0)
-      return 1;
-    return 0;
-  }
 
   /* Idea for future:
      Take what PD lights affect the object's instances of a set of 
@@ -157,15 +138,17 @@ namespace lighter
       thisGroup.ShrinkBestFit();
     }
 
-    // Set the size of the lightmaps..
-    /*for (i = 0; i < lightmaps.GetSize (); i++)
+#ifdef DUMP_SUBRECTANGLES
+    static int counter = 0;
+    for (size_t i = 0; i < localLightmaps.GetSize (); i++)
     {
-      Lightmap *lm = lightmaps[i];
-      // Calculate next pow2 size
-      uint newWidth = csFindNearestPowerOf2 (lm->GetMaxUsedU ());
-      uint newHeight = csFindNearestPowerOf2 (lm->GetMaxUsedV ());
-      lm->SetSize (newWidth, newHeight);
-    }*/
+      Lightmap *lm = localLightmaps[i];
+      csString str;
+      str.Format ("locallightmap_%i_%zu", counter, i);
+      lm->GetAllocator().Dump (str);
+    }
+    counter++;
+#endif
 
     return csPtr<LightmapUVObjectLayouter> (newFactory);
   }
@@ -330,36 +313,44 @@ namespace lighter
     }
   }
 
+  class ArraysOneUV
+  {
+  public:
+    class ArrayType
+    {
+      int u, v;
+    public:
+      ArrayType (int u, int v) : u (u), v (v) {}
+
+      size_t GetSize () const { return 1; }
+      csVector2 GetUVSize (size_t n) const 
+      { 
+        return csVector2 (u, v);
+      }
+    };
+    ArrayType pseudoArray;
+    ArraysOneUV (int u, int v) : pseudoArray (u, v) {}
+
+    size_t GetSize() const { return 1; }
+    ArrayType Get (size_t index) const 
+    { return pseudoArray; }
+  };
+
   bool SimpleUVFactoryLayouter::AllocLightmap (LightmapPtrDelArray& lightmaps, 
     int u, int v, csRect &lightmapArea, int &lightmapID)
   {
-    // Now see if we can get some space in the already allocated lightmaps
-    CS::SubRectangles::SubRect *rect;
-    for (unsigned int i = 0; i < lightmaps.GetSize (); i++)
-    {
-      rect = lightmaps[i]->GetAllocator ().Alloc (u,v,lightmapArea);
-      if (rect)
-      {
-        //We have a space, use it
-        lightmapID = i;
-        return true;
-      }
-    }
+    AllocLightmapArray<false> allocLM (lightmaps);
+    AllocResultHash results;
+    bool b = AllocAllPrims (ArraysOneUV (u, v), allocLM, results, 0, allocDefault);
+    
+    const AllocResult& result = *results.GetElementPointer (0);
+    lightmapArea.xmin = int (result.positions[0].x);
+    lightmapArea.ymin = int (result.positions[0].y);
+    lightmapArea.xmax = lightmapArea.xmin + u;
+    lightmapArea.ymax = lightmapArea.ymin + v;
+    lightmapID = int (result.allocIndex);
 
-    // Still here, need a new lightmap
-    Lightmap *newL = new Lightmap (globalConfig.GetLMProperties ().maxLightmapU,
-                                   globalConfig.GetLMProperties ().maxLightmapV);
-    lightmaps.Push (newL);
-
-    rect = newL->GetAllocator ().Alloc (u,v,lightmapArea);
-    if (rect)
-    {
-      //We have a space, use it
-      lightmapID = (int)lightmaps.GetSize () - 1;
-      return true;
-    }
-
-    return false;
+    return b;
   }
 
   bool SimpleUVFactoryLayouter::ProjectPrimitives (FactoryPrimitiveArray& prims, 

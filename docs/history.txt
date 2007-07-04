@@ -8,6 +8,12 @@ chronological order.
 
 4-Jul-2007
 	- res fixed lighter2 not cleaning out all old lightmaps.
+	- res fixed an assertion in lightmap layouting by matching the 
+	  "factory" layouting (to determine whether to split) to the "object"
+	  layouting. Previously, the differences between those could have the
+	  result that the "factory" layouting would return a set of primitives
+	  that the "object" layouting actually failed to layout onto one
+	  lightmap.
 1-Jul-2007
 	- res made csGLGraphics3D::DrawSimpleMesh () do a "forceful fixed
 	  function enable" when drawing without shaders.
