@@ -199,6 +199,9 @@ namespace lighter
          before the current primitives are laid out.
          The motivation is to get primitives that have similar PD light 
          affection closer together.
+
+         Since PD lights are stored in the sector we can only compare PD bits
+         when both queues originated in the same sector.
         */
       for (size_t l = layoutedQueues.GetSize(); l-- > 0; )
       {
@@ -416,14 +419,14 @@ namespace lighter
       AllocLightmapArray<> allocGLM (globalLightmaps);
       bool b = AllocAllPrims (ArraysQPDPA (*currentQueue.queue), 
         allocGLM, results, 0, allocDefault);
-      if (b)
+      if (!b)
       {
         /* It can happen that layouting onto a PO2-growing LM results
            in a different layout compared to non-PO2 growing. So try
            one more time with non-PO2 growing. */
         AllocLightmapArray<false> allocGLMnpo2 (globalLightmaps);
         b = AllocAllPrims (ArraysQPDPA (*currentQueue.queue), 
-          allocGLM, results, 0, allocTryNormal);
+          allocGLMnpo2, results, 0, allocTryNormal);
       }
       CS_ASSERT(b);
       (void)b;
