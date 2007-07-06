@@ -115,8 +115,6 @@ public:
   virtual csPtr<iMeshObject> Clone () { return 0; }
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
-    if (cb) cb->IncRef ();
-    if (vis_cb) vis_cb->DecRef ();
     vis_cb = cb;
   }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const
@@ -164,7 +162,7 @@ private:
   iMeshObjectFactory* factory;
   iMeshObjectType* nullmesh_type;
   iMeshWrapper* logparent;
-  iMeshObjectDrawCallback* vis_cb;
+  csRef<iMeshObjectDrawCallback> vis_cb;
   float radius;
   csBox3 box;
   csFlags object_flags;

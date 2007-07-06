@@ -22,6 +22,9 @@
 #include "primitive.h"
 #include "lightmapuv.h"
 
+// Uncomment to dump subrectangles used during PrepareLighting()
+//#define DUMP_SUBRECTANGLES
+
 namespace lighter
 {
 

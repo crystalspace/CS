@@ -59,7 +59,7 @@ class csLightningMeshObject :
   csRef<iMaterialWrapper> material;
   uint MixMode;
   bool initialized;
-  iMeshObjectDrawCallback* vis_cb;
+  csRef<iMeshObjectDrawCallback> vis_cb;
   float length;  
   float wildness;
   float vibration;
@@ -97,8 +97,6 @@ public:
     iMovable*, uint32);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
-    if (cb) cb->IncRef ();
-    if (vis_cb) vis_cb->DecRef ();
     vis_cb = cb;
   }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const

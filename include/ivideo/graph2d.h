@@ -132,15 +132,15 @@ struct csImageArea
   { x = sx; y = sy; w = sw; h = sh; data = 0; }
 };
 
-SCF_VERSION (iOffscreenCanvasCallback, 1, 0, 0);
-
 /**
  * When you create an offscreen canvas (CreateOffscreenCanvas()) then
  * you can use this callback to get informed when the texture has
  * been modified (FinishDraw() called) or a palette entry is modified.
  */
-struct iOffscreenCanvasCallback : public iBase
+struct iOffscreenCanvasCallback : public virtual iBase
 {
+  SCF_INTERFACE (iOffscreenCanvasCallback, 1, 0, 0);
+
   /// FinishDraw has been called.
   virtual void FinishDraw (iGraphics2D* canvas) = 0;
   /// Palette entry has been modified.

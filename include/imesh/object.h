@@ -76,13 +76,13 @@ class csVector3;
 #define CS_FACTORY_STATICSHAPE 2
 /** @} */
 
-SCF_VERSION (iMeshObjectDrawCallback, 0, 0, 1);
-
 /**
  * Set a callback which is called just before the object is drawn.
  */
-struct iMeshObjectDrawCallback : public iBase
+struct iMeshObjectDrawCallback : virtual public iBase
 {
+  SCF_INTERFACE (iMeshObjectDrawCallback, 0, 0, 1);
+
   /// Before drawing.
   virtual bool BeforeDrawing (iMeshObject* spr, iRenderView* rview) = 0;
 };

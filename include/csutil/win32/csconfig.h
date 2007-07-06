@@ -94,6 +94,7 @@
 // MSVC has only _finite
 #if defined(CS_COMPILER_MSVC)
 #define CS_HAVE__FINITE
+#define CS_HAVE__ISNAN
 #endif
 
 // --- Stuff that needs to go before *any* inclusion of VC standard headers:

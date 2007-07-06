@@ -1250,7 +1250,8 @@ void csBugPlug::CaptureScreen ()
 		name.GetData());
       }
       else
-        Report (CS_REPORTER_SEVERITY_NOTIFY, "Wrote screenshot %s", name.GetData());
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "Wrote screenshot %s",
+	    name.GetData());
     }
     else
     {

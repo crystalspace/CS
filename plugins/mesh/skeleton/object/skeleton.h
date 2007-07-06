@@ -103,9 +103,9 @@ public:
   virtual iSkeletonBone *GetChild (size_t i) { return bones[i]; }
   virtual iSkeletonBone *FindChild (const char *name);
   virtual void SetUpdateCallback (iSkeletonBoneUpdateCallback *callback) 
-    { cb = callback; }
+  { cb = callback; }
   virtual iSkeletonBoneUpdateCallback *GetUpdateCallback () 
-    { return cb; };
+  { return cb; };
   virtual iSkeletonBoneFactory *GetFactory();
   virtual size_t FindChildIndex (iSkeletonBone *child);
   virtual void SetSkinBox (csBox3 & box) { skin_box = box; }
@@ -778,7 +778,8 @@ public:
   virtual iSkeleton *CreateSkeleton(iSkeletonFactory *fact, const char *name);
   virtual void SetManualUpdates (bool man_updates) {manual_updates = man_updates;}
   virtual void Update (csTicks time);
-  void AddSkeleton (iSkeleton *skeleton) {skeletons.Push (skeleton);}
+  void AddSkeleton (iSkeleton *skeleton);
+  void RemoveSkeleton (iSkeleton* skeleton);
 
   class csSkelEventHandler : public scfImplementation1<csSkelEventHandler,
   	iEventHandler>

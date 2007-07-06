@@ -47,12 +47,13 @@ private:
   
   unsigned int width, height;
     
-  bool firsttime;
+  bool firsttime, vertical, verticalhit;
     
 public:
   csTerrainSegmentCellCollider (iTerrainCell* cell, const csVector3&
     start, const csVector3& end)
-    : start(start), end(end), pos(cell->GetPosition ()), size(cell->GetSize ())
+    : start(start), end(end), pos(cell->GetPosition ()), size(cell->GetSize ()),
+    vertical (false), verticalhit (false)
   {
     // Constants
     const float rootOf2 = 1.414213f;
@@ -87,8 +88,21 @@ public:
     dv = v1 - v0;
     dh = h1 - h0;
     
-    if (fabs (du) < EPSILON) du = EPSILON;
-    if (fabs (dv) < EPSILON) dv = EPSILON;
+    // vertical case
+    if (du == 0 && dv == 0)
+    {
+      vertical = true;
+
+      float height = cell->GetHeight (gridOffsetStart);
+      if (csMin(h0, h1) <= height &&
+        csMax(h0, h1) >= height)
+      {
+        verticalhit = true;
+      }
+    }
+
+    if (fabs (du) < SMALL_EPSILON) du = SMALL_EPSILON;
+    if (fabs (dv) < SMALL_EPSILON) dv = SMALL_EPSILON;
    
     oneOverdu = 1 / du;
     oneOverdv = 1 / dv;
@@ -100,7 +114,7 @@ public:
     // Differences and distance to intersection with diagonal
     dp = (du + dv) / rootOf2;
     
-    if (fabs (dp) < EPSILON) dp = EPSILON;
+    if (fabs (dp) < SMALL_EPSILON) dp = SMALL_EPSILON;
     
     oneOverdp = 1 / dp;
     ep = fabs(dp) * (1 - eu - ev) / (dv + du); // line-line intersection
@@ -132,7 +146,28 @@ public:
 
     float r_h0 = h;
     float tstep = 0;
-      
+    
+    if (vertical)
+    {
+      if (verticalhit && firsttime)
+      {
+        firsttime = false;
+
+        cell_result.x = u0;
+        cell_result.y = v0;
+
+        result.x = pos.x + cell_result.x * scale_u;
+        result.y = cell_height;
+        result.z = pos.y + height - cell_result.y * scale_v;
+        
+        return 1;
+      }
+      else
+      {
+        return -1;
+      }
+    }
+
     if (!firsttime)
     {
       float tToU = eu * fabs (oneOverdu); // Time to reach U intersection

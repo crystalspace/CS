@@ -2348,24 +2348,30 @@ void csSpriteCal3DMeshObject::MeshAccessor::PreGetBuffer
 }
 
 //---------------------------csCal3dSkeleton---------------------------
-csCal3dSkeleton::csCal3dSkeleton (CalSkeleton* skeleton, csCal3dSkeletonFactory* skel_factory,
-                                  csSpriteCal3DMeshObject *mesh_object) :
-scfImplementationType(this), skeleton(skeleton), skeleton_factory (skel_factory) 
+csCal3dSkeleton::csCal3dSkeleton (CalSkeleton* skeleton,
+    csCal3dSkeletonFactory* skel_factory,
+    csSpriteCal3DMeshObject *mesh_object) :
+      scfImplementationType(this), skeleton(skeleton),
+      skeleton_factory (skel_factory) 
 {
   csCal3dSkeleton::mesh_object = mesh_object;
   graveyard = csQueryRegistry<iSkeletonGraveyard> (mesh_object->object_reg);
   if (graveyard)
+    // @@@ This is a memory leak! There is a circular reference between
+    // this Cal3DSkeleton and the list of skeletons in the graveyard.
     graveyard->AddSkeleton (this);
 
   std::vector<CalBone*> cal_bones = skeleton->getVectorBone ();
   for (size_t i = 0; i < cal_bones.size (); i++)
   {
-    bones.Push (new csCal3dSkeletonBone (cal_bones[i], skel_factory->GetBone (i), this));
+    bones.Push (new csCal3dSkeletonBone (cal_bones[i],
+	  skel_factory->GetBone (i), this));
   }
   for (size_t i = 0; i < cal_bones.size (); i++)
   {
     bones[i]->Initialize ();
-    bones_names.Put (csHashComputer<const char*>::ComputeHash (bones[i]->GetName ()), i);
+    bones_names.Put (csHashComputer<const char*>::ComputeHash (
+	  bones[i]->GetName ()), i);
   }
 }
 
