@@ -21,11 +21,6 @@
 #include "csgeom/subrec.h"
 #include "csutil/blockallocator.h"
 
-#if defined(CS_DEBUG)
-#define DUMP_TO_IMAGES
-#endif
-
-#ifdef DUMP_TO_IMAGES
 // SubRectangles::Dump () writes an image, stuff needed for that
 #include "csqint.h"
 #include "csutil/csstring.h"
@@ -37,7 +32,6 @@
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 #include "igraphic/imageio.h"
-#endif
 
 namespace CS
 {
@@ -517,6 +511,7 @@ void SubRectangles::Split (SubRect* subRect, SubRect::SplitType split,
   newRect->children[0] = subRect;
 
   SubRect* newChild1 = AllocSubrect ();
+  newChild1->parent = newRect;
   newChild1->rect = subRect->rect;
   if (split == SubRect::SPLIT_V)
     newChild1->rect.xmin = subRect->rect.xmin + splitPos;
@@ -711,7 +706,6 @@ bool SubRectangles::PlaceInto (const SubRectangles* rectangles,
   return true;
 }
 
-#if defined(DUMP_TO_IMAGES)
 static void FillImgRect (uint8* data, uint8 color, int imgW, int imgH, 
 			 const csRect& r)
 {
@@ -743,18 +737,14 @@ static void IncImgRect (uint8* data, int imgW, int imgH,
     p += (imgW - r.Width ());
   }
 }
-#endif
 
 // Debug dump: write some rect distribution into some images.
-void SubRectangles::Dump (const char* tag)
+void SubRectangles::Dump (iObjectRegistry* object_reg, const char* tag)
 {
-#if defined(DUMP_TO_IMAGES)
-  if (!iSCF::SCF->object_reg) return;
-
   csRef<iImageIO> imgsaver =
-    csQueryRegistry<iImageIO> (iSCF::SCF->object_reg);
+    csQueryRegistry<iImageIO> (object_reg);
   csRef<iVFS> vfs =
-    csQueryRegistry<iVFS> (iSCF::SCF->object_reg);
+    csQueryRegistry<iVFS> (object_reg);
 
   if (!imgsaver || !vfs) return;
   
@@ -771,6 +761,8 @@ void SubRectangles::Dump (const char* tag)
   }
 
   int w = region.Width (), h = region.Height ();
+
+  if ((w == 0) || (h == 0)) return;
 
   csRGBpixel* newpal = new csRGBpixel[256];
   memcpy (newpal, pal, sizeof (pal));
@@ -826,55 +818,71 @@ void SubRectangles::Dump (const char* tag)
   if (tagStr.IsEmpty()) tagStr.Format ("%p", this);
 
   {
-    csRef<iDataBuffer> buf = imgsaver->Save (img, "image/png");
     csString outfn;
-    outfn.Format ("/tmp/SubRectangles_dump_%s_r.png", tagStr.GetData());
-    if (vfs->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
+    csRef<iDataBuffer> buf = imgsaver->Save (img, "image/png");
+    if (buf.IsValid())
     {
-      csReport (iSCF::SCF->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-	"crystalspace.geom.subrects", "Successfully dumped to %s",
-	outfn.GetData ());
-    }
-    else
-    {
-      csReport (iSCF::SCF->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-	"crystalspace.geom.subrects", "Error dumping to %s",
-	outfn.GetData ());
+      outfn.Format ("/tmp/SubRectangles_dump_%s_r.png", tagStr.GetData());
+      if (vfs->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
+      {
+        csReport (iSCF::SCF->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+	  "crystalspace.geom.subrects", "Successfully dumped to %s",
+	  outfn.GetData ());
+      }
+      else
+      {
+        csReport (iSCF::SCF->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+	  "crystalspace.geom.subrects", "Error dumping to %s",
+	  outfn.GetData ());
+      }
     }
     delete img;
 
     buf = imgsaver->Save (img2, "image/png");
-    outfn.Format ("/tmp/SubRectangles_dump_%s_ar.png", tagStr.GetData());
-    if (vfs->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
+    if (buf.IsValid())
     {
-      csReport (iSCF::SCF->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-	"crystalspace.geom.subrects", "Successfully dumped to %s",
-	outfn.GetData ());
-    }
-    else
-    {
-      csReport (iSCF::SCF->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-	"crystalspace.geom.subrects", "Error dumping to %s",
-	outfn.GetData ());
+      outfn.Format ("/tmp/SubRectangles_dump_%s_ar.png", tagStr.GetData());
+      if (vfs->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
+      {
+        csReport (iSCF::SCF->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+	  "crystalspace.geom.subrects", "Successfully dumped to %s",
+	  outfn.GetData ());
+      }
+      else
+      {
+        csReport (iSCF::SCF->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+	  "crystalspace.geom.subrects", "Error dumping to %s",
+	  outfn.GetData ());
+      }
     }
     delete img2;
 
     buf = imgsaver->Save (img3, "image/png");
-    outfn.Format ("/tmp/SubRectangles_dump_%s_ov.png", tagStr.GetData());
-    if (vfs->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
+    if (buf.IsValid())
     {
-      csReport (iSCF::SCF->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-	"crystalspace.geom.subrects", "Successfully dumped to %s",
-	outfn.GetData ());
-    }
-    else
-    {
-      csReport (iSCF::SCF->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-	"crystalspace.geom.subrects", "Error dumping to %s",
-	outfn.GetData ());
+      outfn.Format ("/tmp/SubRectangles_dump_%s_ov.png", tagStr.GetData());
+      if (vfs->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
+      {
+        csReport (iSCF::SCF->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+	  "crystalspace.geom.subrects", "Successfully dumped to %s",
+	  outfn.GetData ());
+      }
+      else
+      {
+        csReport (iSCF::SCF->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+	  "crystalspace.geom.subrects", "Error dumping to %s",
+	  outfn.GetData ());
+      }
     }
     delete img3;
   }
+}
+
+// Debug dump: write some rect distribution into some images.
+void SubRectangles::Dump (const char* tag)
+{
+#ifdef CS_DEBUG
+  Dump (iSCF::SCF->object_reg, tag);
 #endif
 }
 

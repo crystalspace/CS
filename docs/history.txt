@@ -6,6 +6,11 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Jul-2007
+	- res fixed CS::SubRectangles::Split() neglecting to set the 
+	  parent of newly created rectangles which would corrupt the internal
+	  structure (and cause subsequent operations to return wrong results).
+	  Also made Dump() available in non-debug builds.
 5-Jul-2007
 	- res made a fix to yesterday's lighter2 assertion fix.
 4-Jul-2007
