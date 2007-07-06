@@ -11,6 +11,12 @@ chronological order.
 	  parent of newly created rectangles which would corrupt the internal
 	  structure (and cause subsequent operations to return wrong results).
 	  Also made Dump() available in non-debug builds.
+	- res made the following changes to lighter2:
+	    - Fixed an issue where the "factory" and "object" layouting would
+	      produce slightly different bounding sizes for primitive groups -
+	      enough to break layouting in tight situations.
+	    - Made the lightmap masks used for postprocessing swappables.
+	    - Some layouting tweaks.
 5-Jul-2007
 	- res made a fix to yesterday's lighter2 assertion fix.
 4-Jul-2007

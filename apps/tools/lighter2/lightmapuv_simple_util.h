@@ -77,7 +77,8 @@ namespace lighter
   template<class AllocMixin>
   static bool MapPrimsToAlloc (csArray<PrimToMap>& primsToMap, 
     CS::SubRectanglesCompact& alloc, 
-    csArray<CS::SubRectangles::SubRect*>& outSubRects)
+    csArray<CS::SubRectangles::SubRect*>& outSubRects, 
+    bool failDump = false)
   {
     bool success = true;
     csRect oldSize (alloc.GetRectangle());
@@ -90,10 +91,14 @@ namespace lighter
       if (sr == 0)
       {
 #if defined(DUMP_SUBRECTANGLES)
-        csString str;
-        str.Format ("MapPrimsToAlloc_fail_%d", MapPrimsToAlloc_counter++);
-        alloc.Dump (str);
+        if (failDump)
+        {
+          csString str;
+          str.Format ("MapPrimsToAlloc_fail_%d", MapPrimsToAlloc_counter++);
+          alloc.Dump (str);
+        }
 #endif
+
         for (size_t s = subRects.GetSize(); s-- > 0; )
           alloc.Reclaim (subRects[s]);
         success = false;
@@ -127,7 +132,7 @@ namespace lighter
   template<class Arrays, class Allocators, class AllocMixin>
   static int AllocAllPrimsInner (const Arrays& arrays, Allocators& allocs,
     AllocResultHash& result, const csArray<SizeAndIndex>& testOrder,
-    csArray<PrimToMap>& primsToMap)
+    csArray<PrimToMap>& primsToMap, bool failDump = false)
   {
     size_t allocator;
     bool allMapped = false;
@@ -170,7 +175,17 @@ namespace lighter
       return newCreated ? resultWithNew : resultAllocated;
     }
     else
+    {
       allocs.Delete (allocator);
+#if defined(DUMP_SUBRECTANGLES)
+      if (failDump)
+      {
+        allMapped = MapPrimsToAlloc<AllocMixin> (primsToMap, 
+          allocs.New (allocator), subRects, true);
+        allocs.Delete (allocator);
+      }
+#endif
+    }
     return resultFailure;
   }
 
@@ -232,16 +247,21 @@ namespace lighter
         }
         primsToMap.Sort (SortByUVSize<PrimToMap>);
 
+#if defined(DUMP_SUBRECTANGLES)
+        const bool doFailDump = tryCount == 1;
+#else
+        const bool doFailDump = false;
+#endif
         int res = resultFailure;
         if (flags & allocTryNoGrow)
         {
           res = AllocAllPrimsInner<Arrays, Allocators, MPTAAMAllocNoGrow> (
-            arrays, allocs, result, testOrder, primsToMap);
+            arrays, allocs, result, testOrder, primsToMap, doFailDump);
         }
         if (!res && (flags & allocTryNormal))
         {
           res = AllocAllPrimsInner<Arrays, Allocators, MPTAAMAlloc> (
-            arrays, allocs, result, testOrder, primsToMap);
+            arrays, allocs, result, testOrder, primsToMap, doFailDump);
         }
 
         if (res) 
