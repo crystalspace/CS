@@ -16,18 +16,20 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "colladatest.h"
+#include "tri3dtest.h"
 
 using namespace std;
+using CS::Geom::Triangulate3D;
+using CS::Geom::csContour3;
 
 CS_IMPLEMENT_APPLICATION
 
-ColladaTest::ColladaTest()
+Tri3DTest::Tri3DTest()
 {
-	SetApplicationName("crystalspace.colladatest");
+	SetApplicationName("crystalspace.tri3dtest");
 }
 
-bool ColladaTest::OnInitialize(int argc, char* argv[])
+bool Tri3DTest::OnInitialize(int argc, char* argv[])
 {
   if (!csInitializer::RequestPlugins(GetObjectRegistry(),
     CS_REQUEST_VFS,
@@ -38,8 +40,8 @@ bool ColladaTest::OnInitialize(int argc, char* argv[])
     CS_REQUEST_LEVELLOADER,
     CS_REQUEST_REPORTER,
     CS_REQUEST_REPORTERLISTENER,
-		CS_REQUEST_PLUGIN("crystalspace.utilities.colladaconvertor", iColladaConvertor),
-    CS_REQUEST_END))
+//		CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
+		CS_REQUEST_END))
 		return ReportError("Failed to initialize plugins!");
 
 	object_reg = GetObjectRegistry();
@@ -48,141 +50,54 @@ bool ColladaTest::OnInitialize(int argc, char* argv[])
   if (!RegisterQueue(object_reg, csevAllEvents(GetObjectRegistry())))
     return ReportError("Failed to set up event handler!");
 
-    /* Load up the XML Read Document System, instead of the default */
-    plugManager = csQueryRegistry<iPluginManager> (object_reg);
-	docSystem = csLoadPlugin<iDocumentSystem> (plugManager, "crystalspace.documentsystem.xmlread");
-
-	if (!docSystem.IsValid())
-	{
-		ReportWarning("Document system invalid.  Defaulting to Tiny XML Document System.");
-		docSystem.AttachNew(new csTinyDocumentSystem());
-	}
+		plugManager = csQueryRegistry<iPluginManager> (object_reg);
 	
-	fileSystem = csQueryRegistry<iVFS> (object_reg);
+		g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry());
+		if (!g3d) return ReportError("Failed to locate 3D renderer!");
 
-	if (!fileSystem.IsValid())
-	{
-		return ReportError("Unable to get virtual file system.  Terminating.");
-	}
-
-	/// @todo Change this, possibly use config file.
-	// fileSystem->Mount("/colladafiles", TESTDIR);
-
-	colladaConv = csLoadPlugin<iColladaConvertor> (plugManager, "crystalspace.utilities.colladaconvertor");
-  colladaConv->SetWarnings(true);
-	
-	if (!colladaConv.IsValid())
-	{
-		return ReportError("Error: Unable to load COLLADA Conversion System.  Terminating.");
-	}
-
-	string path = "/lev/colladatest/";
-	path.append(COLLADATESTFILE);
-
-	colladaConv->Load(path.c_str());
-	colladaConv->SetOutputFiletype(CS_LIBRARY_FILE);
-	colladaConv->Convert();
-	//colladaConv->Load(path.c_str(), CS_MAP_FILE);
-	colladaConv->Write("/lev/colladatest/test.xml");
-	
-	/*
-	csRef<iDocument> crystalFile = colladaConv->GetCrystalDocument();
-	csRef<iDocumentNode> crystalFileRoot = crystalFile->GetRoot();
-	
-	if (!crystalFileRoot.IsValid())
-	{
-		return ReportError ("Root node is invalid!");
-	}
-
-	cout << crystalFileRoot->GetValue() << endl;
-
-	//csRef<iDocumentNode> crystalFileWorld = crystalFileRoot->GetNode("world");
-
-	//if (!crystalFileWorld.IsValid())
-	//{
-		//ReportError("Error: Unable to find world node!");
-	//}
-
-	//crystalFileWorld.Invalidate();
-	crystalFileRoot.Invalidate();
-	crystalFile.Invalidate();
-*/
-	/*
-	colladaDocument = docSystem->CreateDocument();
-	if (!colladaDocument.IsValid())
-	{
-		return ReportError("Error: Unable to create new COLLADA document.  Terminating.");
-	}
-
-	fileSystem = csQueryRegistry<iVFS> (GetObjectRegistry());
-	if (!fileSystem)
-	{
-		return ReportError("Error: Unable to fetch VFS.  Terminating.");
-	}
-
-	// for testing only
-	fileSystem->Mount("/test/", TESTDIR);
-	if (!fileSystem->ChDir("/test/"))
-	{
-		return ReportError("Error: Unable to change directory to VFS mount /test.  Terminating.");
-	}
-
-	colladaFile = fileSystem->Open(TESTFILE, VFS_FILE_READ);
-	if (!colladaFile.IsValid())
-	{
-		cout << "Attempting to open: " << TESTDIR << TESTFILE << endl;
-		return ReportError("Error: Unable to open COLLADA file on VFS.  Terminating.");
-	}
-
-	// This works
-	csRef<iDataBuffer> buf = colladaFile->GetAllData();
-	//cout << buf->GetData() << endl;
-
-	// This does not work
-	colladaDocument->Parse(colladaFile);
-	//int position = colladaFile->GetPos();
-	//cout << "Position in file: " << position << endl;
-	//colladaDocument->Parse(buf);
-
-	csRef<iDocumentNode> root = colladaDocument->GetRoot();
-
-	// we need to start at the root node
-	// for our purposes, this will be the node <COLLADA>
-	root = root->GetNode("COLLADA");
-	csRef<iDocumentAttribute> ver = root->GetAttribute("version");
-	if (!ver.IsValid())
-	{
-		cout << "Unable to find attribute named version!" << endl;
-		//cout << "Node value: " << root->GetValue() << endl;
-	}
-
-	else
-	{
-		//string warn = "COLLADA Version: ";
-		//warn.append(ver->GetValue());
-		cout << "COLLADA Version: " << ver->GetValue() << endl;
-
-		//ReportWarning(warn.c_str());
-	}
-
-	//cout << "Everything seems good, proceeding!" << endl;
-	*/
+		engine = csQueryRegistry<iEngine> (GetObjectRegistry());
+		if (!engine) return ReportError("Failed to locate 3D engine!");
 
   return true;
 }
 
-bool ColladaTest::Application()
+bool Tri3DTest::Application()
 {
 	if (!OpenApplication(GetObjectRegistry()))
 		return ReportError("Error: Unable to fetch Object Registry!");
+	
+	csContour3 polygon;
+	csVector3 point1(10, 0, 10);
+	csVector3 point2(-10, 0, 10);
+	csVector3 point3(10, 10, 0);
+	csVector3 point4(-10, 10, 0);
+	csVector3 point5(10, 0, -10);
+	csVector3 point6(-10, 0, -10);
 
-  // We don't need the runloop to start
-  Run();
+	polygon.Push(point1);
+	polygon.Push(point2);
+	polygon.Push(point3);
+	polygon.Push(point4);
+	polygon.Push(point5);
+	polygon.Push(point6);
+
+	csContour3 result_vertices;
+	csTriangleMesh result;
+
+	Triangulate3D::Process(polygon, result, result_vertices);
+
+	view.AttachNew(new csView (engine, g3d));
+  iGraphics2D* g2d = g3d->GetDriver2D ();
+  view->SetRectangle(0, 0, g2d->GetWidth(), g2d->GetHeight ());
+
+	//csTriangle tri = result.GetTriangle(0);
+
+	Run();
 
   return true;
 }
 
 int main(int argc, char** argv)
 {
-	return csApplicationRunner<ColladaTest>::Run (argc, argv);
+	return csApplicationRunner<Tri3DTest>::Run (argc, argv);
 }

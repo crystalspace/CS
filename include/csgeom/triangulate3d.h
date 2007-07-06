@@ -36,10 +36,13 @@ namespace Geom
 				~Triangulate3D() {};
 
 				static bool Process(csContour3& polygon, csTriangleMesh& result, csContour3& result_vertices, csContour3* holes = 0);
-			
-			private:
-				static bool SeparatePlanes(const csContour3& polygon, csContour3* results);
 
+			private:
+				static bool FindVertexGroups(csContour3& poly, csContour3& reflex, csContour3& convex, csArray<size_t>& ears);
+				static bool Snip(csContour3& polygon, const size_t earPoint, csTriangleMesh& addTo);
+				static bool IsConvex(const csContour3& polygon, const size_t index);
+				static bool IsContained(const csVector3& testVertex, const csVector3& a, const csVector3& b, const csVector3& c);
+				static bool IsSameSide(const csVector3& p1, const csVector3& p2, const csVector3& a, const csVector3& b);
 		}; /* End class Triangulate3D */
 
 } // namespace Geom

@@ -16,35 +16,30 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _APP_COLLADATEST_H_
-#define _APP_COLLADATEST_H_
+#ifndef _APP_TRI3DTEST_H_
+#define _APP_TRI3DTEST_H_
 
 #include <iostream>
 #include <string>
 #include "crystalspace.h"
+#include "csgeom/triangulate3d.h"
 
-#define TESTDIR "E:$/Source$/CS-COLLADA$/data$/colladatest$/"
-#define COLLADATESTFILE "colladatest.dae"
-#define CSTESTFILE "colladatest.csworld"
-
-class ColladaTest : public csApplicationFramework, public csBaseEventHandler {
+class Tri3DTest : public csApplicationFramework, public csBaseEventHandler {
 	private:
 		iObjectRegistry* object_reg;
-		csRef<iDocumentSystem> docSystem;
-		csRef<iVFS> fileSystem;
-		csRef<iDocument> colladaDocument;
-		csRef<iFile> colladaFile;
 		csRef<iPluginManager> plugManager;
-		csRef<iColladaConvertor> colladaConv;
-
+		csRef<iEngine> engine;
+		csRef<iGraphics3D> g3d;
+    csRef<iView> view;
+		
 	public:
-		ColladaTest();
+		Tri3DTest();
 
 		// Crystal Space Functions
 		bool OnInitialize(int argc, char* argv[]);
 		bool Application();
 
-  CS_EVENTHANDLER_NAMES("application.colladaconvertor")
+  CS_EVENTHANDLER_NAMES("application.tri3dtest")
   CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
