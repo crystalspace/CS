@@ -121,9 +121,13 @@ csTerrainColliderCollideSegmentResult csTerrainCollider::CollideSegment (
       rc.hit = true;
       if (cell_result.x >= width - 1 - EPSILON) 
         cell_result.x = width - 1 - EPSILON;
+      if (cell_result.x < 0)
+        cell_result.x = 0;
             
       if (cell_result.y >= height - 1 - EPSILON) 
         cell_result.y = height - 1 - EPSILON;
+      if (cell_result.y < 0)
+        cell_result.y = 0;
 
       int x = (int)floorf(cell_result.x);
       int y = (int)floorf(cell_result.y);

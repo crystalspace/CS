@@ -879,7 +879,7 @@ bool csIntersect3::ClipSegmentBox (csSegment3& segment, const csBox3& box,
   float minLength = 0.0f;
   float maxLength;
   if (use_ray) maxLength = FLT_MAX * 0.9f;
-  else maxLength = sqrt (csSquaredDist::PointPoint (segment.Start (),
+  else maxLength = sqrtf (csSquaredDist::PointPoint (segment.Start (),
 	segment.End ()));
 
   const csVector3& origin = segment.Start ();
@@ -923,7 +923,7 @@ bool csIntersect3::ClipSegmentBox (csSegment3& segment, const csBox3& box,
 	    / (maxt * direction[i]));
       }
     }
-    else // Ray going straight or "right"
+    else if (direction[i] > 0) // Ray going "right"
     {
       // Clip end
       if (pos > maxBox[i])
