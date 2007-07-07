@@ -67,7 +67,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     csRef<iDocumentNode> rootNode = synthesizedDoc->CreateRoot();
     csRef<iDocumentNode> shaderNode = rootNode->CreateNodeBefore (CS_NODE_ELEMENT);
     shaderNode->SetValue ("shader");
-    CS::DocumentHelper::CloneAttributes (sourceNode, shaderNode);
+    CS::DocSystem::CloneAttributes (sourceNode, shaderNode);
     shaderNode->SetAttribute ("compiler", "xmlshader");
     
     WEAVER_PRINTF ("%zu graphs\n", graphs.GetSize());
