@@ -6,6 +6,8 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-Jun-2007
+	- Marten made some fixes for compilation on OSX
 6-Jun-2007
 	- caedes fixed scripting bindings for latest scf changes.
 	- res fixed the configure javac detection to quote the Java directory
