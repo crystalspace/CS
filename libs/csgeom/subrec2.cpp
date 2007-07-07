@@ -825,13 +825,13 @@ void SubRectangles::Dump (iObjectRegistry* object_reg, const char* tag)
       outfn.Format ("/tmp/SubRectangles_dump_%s_r.png", tagStr.GetData());
       if (vfs->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
       {
-        csReport (iSCF::SCF->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+        csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
 	  "crystalspace.geom.subrects", "Successfully dumped to %s",
 	  outfn.GetData ());
       }
       else
       {
-        csReport (iSCF::SCF->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+        csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
 	  "crystalspace.geom.subrects", "Error dumping to %s",
 	  outfn.GetData ());
       }
@@ -844,13 +844,13 @@ void SubRectangles::Dump (iObjectRegistry* object_reg, const char* tag)
       outfn.Format ("/tmp/SubRectangles_dump_%s_ar.png", tagStr.GetData());
       if (vfs->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
       {
-        csReport (iSCF::SCF->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+        csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
 	  "crystalspace.geom.subrects", "Successfully dumped to %s",
 	  outfn.GetData ());
       }
       else
       {
-        csReport (iSCF::SCF->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+        csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
 	  "crystalspace.geom.subrects", "Error dumping to %s",
 	  outfn.GetData ());
       }
@@ -863,13 +863,13 @@ void SubRectangles::Dump (iObjectRegistry* object_reg, const char* tag)
       outfn.Format ("/tmp/SubRectangles_dump_%s_ov.png", tagStr.GetData());
       if (vfs->WriteFile (outfn, (char*)buf->GetInt8 (), buf->GetSize ()))
       {
-        csReport (iSCF::SCF->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+        csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
 	  "crystalspace.geom.subrects", "Successfully dumped to %s",
 	  outfn.GetData ());
       }
       else
       {
-        csReport (iSCF::SCF->object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+        csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
 	  "crystalspace.geom.subrects", "Error dumping to %s",
 	  outfn.GetData ());
       }
