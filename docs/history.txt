@@ -6,6 +6,14 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Jun-2007
+	- Jorrit extended csIntersect3::BoxSegment() so that it also
+	  (optionally) supports rays.
+	- Jorrit added csIntersect3::ClipSegmentBox() to clip a segment
+	  or ray to a box.
+	- Jorrit changed csTerrainSystem::CollideSegment() to use this
+	  new clipper and by doing that made it support rays in addition
+	  to normal segments.
 19-Jun-2007
 	- Jorrit extended iTerrainSystem with a new CollideSegment()
 	  variant that returns at most one hit and the triangle.

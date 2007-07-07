@@ -92,7 +92,7 @@ public:
   virtual bool CollideSegment (const csVector3& start, const csVector3& end,
     bool oneHit, iTerrainVector3Array* points);
   virtual csTerrainColliderCollideSegmentResult CollideSegment (
-      const csVector3& start, const csVector3& end, bool use_ray);
+      const csVector3& start, const csVector3& end);
 
   virtual bool CollideTriangles (const csVector3* vertices,
     size_t tri_count,

@@ -96,10 +96,8 @@ csPtr<iTerrainCellCollisionProperties> csTerrainCollider::CreateProperties ()
 }
 
 csTerrainColliderCollideSegmentResult csTerrainCollider::CollideSegment (
-      iTerrainCell* cell, const csVector3& start, const csVector3& end,
-      bool use_ray)
+      iTerrainCell* cell, const csVector3& start, const csVector3& end)
 {
-  // @@@ TODO Implement use_ray!!!
   csTerrainColliderCollideSegmentResult rc;
 
   csTerrainSegmentCellCollider collider (cell, start, end);
