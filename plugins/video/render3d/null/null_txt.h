@@ -74,7 +74,6 @@ public:
   const char* GetImageName () const { return imageName; }
   virtual void Blit (int, int, int, int, unsigned char const*, 
     TextureBlitDataFormat) {}
-  virtual TextureType GetTextureType () const { return texType2D; }
 };
 
 /**
