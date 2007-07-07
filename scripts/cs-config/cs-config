@@ -14,8 +14,6 @@ OLD_IFS="$IFS"
 IFS=$PATH_SEPARATOR
 for p in $CRYSTAL$PATH_SEPARATOR$CRYSTAL/bin$PATH_SEPARATOR$PATH ; do
   if [ -d "$p" ] ; then
-    # The -executable predicate would do what we like, but is not available
-    # with older find versions.
     for s in "$p"/cs-config-* ; do
       if [ -x "$s" ] ; then
 	echo "$s" >> ${TEMP_PREFIX}_find

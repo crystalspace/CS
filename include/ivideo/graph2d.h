@@ -137,9 +137,7 @@ struct csImageArea
  * you can use this callback to get informed when the texture has
  * been modified (FinishDraw() called) or a palette entry is modified.
  */
-struct CS_DEPRECATED_TYPE_MSG("Offscreen canvases are deprecated, use "
-  "iGraphics3D::SetRenderTarget()")
-iOffscreenCanvasCallback : public virtual iBase
+struct iOffscreenCanvasCallback : public virtual iBase
 {
   SCF_INTERFACE (iOffscreenCanvasCallback, 1, 0, 0);
 

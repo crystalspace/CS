@@ -6,6 +6,21 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-Jun-2007
+	- Jorrit converted a few remaining interfaces to using SCF_INTERFACE
+	  instead of SCF_VERSION.
+24-Jun-2007
+        - Piotr made small bugfix in odedynam colliders ref handling.
+	- Eric Sunshine corrected "camera movement" documentation bug.
+	  Fixes #348.
+	- res made "jam install" install not just "history.txt" but
+	  "history*.txt" - this way the branch-specific histories (e.g.
+	  for release branches) are installed as well.
+23-Jun-2007
+	- res made the CS_PACKAGEINFO autoconf macro truncate the version
+	  number after non-numerical and non-dot characters. This has the
+	  effect that versions such as "1.2rc1" are split into "1" and "2",
+	  and not "1" and "2rc1". Fixes #347.
 21-Jun-2007
 	- Jorrit implemented CollideRaySegment() for old terraformer
 	  as well.
