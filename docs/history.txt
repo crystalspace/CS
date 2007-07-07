@@ -20,6 +20,8 @@ chronological order.
 	- res declared the offscreen canvas stuff deprecated.
 	- res added support for separate blending modes (ie RGB and alpha
 	  factors can be specifies separately).
+	- res changed the engine to not reload the standard shaders when
+	  closing.
 5-Jul-2007
 	- res made a fix to yesterday's lighter2 assertion fix.
 4-Jul-2007
