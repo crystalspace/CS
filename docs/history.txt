@@ -6,6 +6,24 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Jun-2007
+	- Jorrit extended iTerrainSystem with a new CollideSegment()
+	  variant that returns at most one hit and the triangle.
+	- Jorrit added a 'use_ray' parameter to
+	  iTerrainCollider->CollideSegment(). Not implemented yet.
+	- Jorrit implemented CollideRay() for new terrain in opcode
+	  plugin. Works mostly with two problems:
+	    - Rays are not supported yet.
+	    - There seems to be a bug at cell boundaries. The terrain
+	      is missed there.
+	- res committed a patch from Joerg Fischer (with minor stylistic 
+	  changes) to properly support joysticks on Windows whose axes do not
+	  correspond to the order found in the DIJOYSTATE2 structure (which is
+	  probably about every joystick). See trac #343. 
+18-Jun-2007
+	- Jorrit extended iTerrainCollider with a new version of
+	  CollideSegment() that returns at most one hit and also the
+	  triangle. Added an implementation for this to csopcode plugin.
 15-Jun-2007
 	- Jorrit did some preparation work in csopcode plugin to allow
 	  CollideRaySegment to also work with new and old terrain. Not

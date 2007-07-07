@@ -222,14 +222,20 @@ csTerrainColliderCollideSegmentResult csTerrainSystem::CollideSegment (
 
   for (size_t i = 0; i < cells.GetSize (); ++i)
   {
-    csSegment3 seg (start, end);
+    csSegment3 seg(start, end);
     csBox3 box = cells[i]->GetBBox ();
 
     csVector3 isect;
 
-    if (csIntersect3::ClipSegmentBox (seg, box, use_ray) >= 0)
+    if (csIntersect3::BoxSegment (box, seg, isect) >= 0)
     {
-      rc = cells[i]->CollideSegment (seg.End (), seg.Start ());
+      seg.SetStart (seg.End ());
+      seg.SetEnd (isect);
+      
+      if (csIntersect3::BoxSegment (box, seg, isect) >= 0)
+        seg.SetStart (isect);
+
+      rc = cells[i]->CollideSegment (seg.End (), seg.Start (), use_ray);
       if (rc.hit)
         return rc;
     }
