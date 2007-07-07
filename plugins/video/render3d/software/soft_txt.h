@@ -177,6 +177,11 @@ public:
       delete tex[i]; tex[i] = 0;
     }
   }
+
+  virtual TextureType GetTextureType () const
+  {
+    return texType2D;
+  }
 };
 
 /**

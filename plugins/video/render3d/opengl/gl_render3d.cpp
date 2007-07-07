@@ -313,9 +313,17 @@ void csGLGraphics3D::SetMixMode (uint mode, csAlphaMode::AlphaType alphaType)
   {
     case CS_MIXMODE_TYPE_BLENDOP:
       statecache->Enable_GL_BLEND ();
-      statecache->SetBlendFunc (
-	CSblendOpToGLblendOp (CS_MIXMODE_BLENDOP_SRC(mode)),
-	CSblendOpToGLblendOp (CS_MIXMODE_BLENDOP_DST(mode)));
+      if ((mode & CS_MIXMODE_FLAG_BLENDOP_ALPHA) 
+	&& (ext->CS_GL_EXT_blend_func_separate))
+	statecache->SetBlendFuncSeparate (
+	  CSblendOpToGLblendOp (CS_MIXMODE_BLENDOP_SRC(mode)),
+	  CSblendOpToGLblendOp (CS_MIXMODE_BLENDOP_DST(mode)),
+	  CSblendOpToGLblendOp (CS_MIXMODE_BLENDOP_ALPHA_SRC(mode)),
+	  CSblendOpToGLblendOp (CS_MIXMODE_BLENDOP_ALPHA_DST(mode)));
+      else
+	statecache->SetBlendFunc (
+	  CSblendOpToGLblendOp (CS_MIXMODE_BLENDOP_SRC(mode)),
+	  CSblendOpToGLblendOp (CS_MIXMODE_BLENDOP_DST(mode)));
       break;
     case CS_MIXMODE_TYPE_AUTO:
     default:
@@ -820,6 +828,7 @@ bool csGLGraphics3D::Open ()
   ext->InitGL_ARB_fragment_program (); // needed for AFP DrawPixmap() workaround
   //ext->InitGL_ATI_separate_stencil ();
   ext->InitGL_EXT_secondary_color ();
+  ext->InitGL_EXT_blend_func_separate ();
 #ifdef CS_DEBUG
   ext->InitGL_GREMEDY_string_marker ();
 #endif
