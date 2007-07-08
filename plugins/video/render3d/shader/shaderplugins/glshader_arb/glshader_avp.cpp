@@ -307,9 +307,6 @@ bool csShaderGLAVP::Load (iShaderDestinationResolver*, iDocumentNode* program)
   if(!program)
     return false;
 
-  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
-    shaderPlug->object_reg, "crystalspace.shared.stringset");
-
   csRef<iDocumentNode> variablesnode = program->GetNode("arbvp");
   if (variablesnode)
   {

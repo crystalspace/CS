@@ -154,6 +154,11 @@ public:
     svContext.PushVariables (stacks);
   }
 
+  virtual void PushVariables (csShaderVariable** stacks) const
+  {
+    svContext.PushVariables (stacks);
+  }
+
   virtual bool IsEmpty () const
   {
     return svContext.IsEmpty ();
@@ -1292,7 +1297,7 @@ bool csTerrainBruteBlockRenderer::Initialize (iObjectRegistry* objectReg)
   objectRegistry = objectReg;
   graph3d = csQueryRegistry<iGraphics3D> (objectReg);
   stringSet = csQueryRegistryTagInterface<iStringSet> (objectReg,
-    "crystalspace.shared.stringset");
+    "crystalspace.shader.variablenameset");
 
   // Error getting globals
   if (!graph3d || !stringSet)

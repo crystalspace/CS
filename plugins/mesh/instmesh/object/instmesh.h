@@ -448,7 +448,6 @@ private:
   bool do_fullbright;
 
   csWeakRef<iGraphics3D> g3d;
-  csRef<iStringSet> strings;
 
   uint default_mixmode;
   bool default_lighting;
@@ -530,9 +529,6 @@ public:
   void GenerateSphere (const csEllipsoid& sphere, int rim_vertices,
       	bool cyl_mapping = false, bool toponly = false,
 	bool reversed = false);
-
-  iStringSet* GetStrings()
-  { return strings; }
 
   void SetMixMode (uint mode)
   {

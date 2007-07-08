@@ -52,6 +52,7 @@ namespace CS
     virtual void AddVariable (csShaderVariable *variable);
     virtual csShaderVariable* GetVariable (csStringID name) const;
     virtual void PushVariables (iShaderVarStack* stacks) const;
+    virtual void PushVariables (csShaderVariable** stacks) const;
     virtual bool IsEmpty() const { return variables.GetSize () == 0; }  
     virtual void ReplaceVariable (csShaderVariable *variable);
     virtual void Clear () { variables.Empty(); }

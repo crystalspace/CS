@@ -67,7 +67,8 @@ csImposterProcTex::csImposterProcTex  (csEngine* engine,
 
   if (stringid_standard == csInvalidStringID)
   {
-    csRef<iStringSet> stringSet = engine->globalStringSet;
+    csRef<iStringSet> stringSet = csQueryRegistryTagInterface<iStringSet> (
+      engine->objectRegistry, "crystalspace.shader.variablenameset");
     stringid_standard = stringSet->Request("standard");
     stringid_light_ambient = stringSet->Request("light ambient");
   }

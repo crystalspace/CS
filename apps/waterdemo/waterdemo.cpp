@@ -441,6 +441,10 @@ bool csWaterDemo::Initialize ()
     csQueryRegistryTagInterface<iStringSet> 
     (object_reg, "crystalspace.shared.stringset");
 
+  csRef<iStringSet> stringsSvName = 
+    csQueryRegistryTagInterface<iStringSet> 
+    (object_reg, "crystalspace.shader.variablenameset");
+
   //get a custom renderloop
   csRef<iRenderLoop> rl = engine->GetRenderLoopManager ()->Create ();
   
@@ -543,7 +547,7 @@ bool csWaterDemo::Initialize ()
     cubeMaker, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS);
 
   csRef<csShaderVariable> attvar (csPtr<csShaderVariable> (
-    new csShaderVariable (strings->Request ("tex diffuse"))));
+    new csShaderVariable (stringsSvName->Request ("tex diffuse"))));
   attvar->SetValue (tex);
   mat->AddVariable (attvar);  
 

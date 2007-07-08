@@ -188,7 +188,7 @@ csShadowmapRenderStep::csShadowmapRenderStep (
 {
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
   csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
-    (object_reg, "crystalspace.shared.stringset");
+    (object_reg, "crystalspace.shader.variablenameset");
   csShadowmapRenderStep::object_reg = object_reg;
   bones_name = strings->Request("bones");
   shader_name = strings->Request("distance_animated");

@@ -1133,7 +1133,7 @@ public:
   csWeakRef<iGraphics3D> G3D;
   /// An object pool for lightpatches.
   csLightPatchPool* lightpatch_pool;
-  csRef<iStringSet> stringset;
+  csRef<iStringSet> stringsetSvName;
   csRef<iShaderManager> shadermgr;
 
   /**

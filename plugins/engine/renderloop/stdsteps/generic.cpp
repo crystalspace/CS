@@ -165,6 +165,8 @@ csGenericRenderStep::csGenericRenderStep (
 
   strings = csQueryRegistryTagInterface<iStringSet> 
     (object_reg, "crystalspace.shared.stringset");
+  stringsSvName = csQueryRegistryTagInterface<iStringSet> 
+    (object_reg, "crystalspace.shader.variablenameset");
   shaderManager = csQueryRegistry<iShaderManager> (object_reg);
 
   shadertype = 0;
@@ -172,10 +174,10 @@ csGenericRenderStep::csGenericRenderStep (
   portalTraversal = false;
   zmode = CS_ZBUF_USE;
   currentSettings = false;
-  fogplane_name = strings->Request ("fogplane");
-  string_object2world = strings->Request ("object2world transform");
-  light_0_type = strings->Request ("light 0 type");
-  light_ambient = strings->Request ("light ambient");
+  fogplane_name = stringsSvName->Request ("fogplane");
+  string_object2world = stringsSvName->Request ("object2world transform");
+  light_0_type = stringsSvName->Request ("light 0 type");
+  light_ambient = stringsSvName->Request ("light ambient");
 
   visible_meshes_index = 0;
 }

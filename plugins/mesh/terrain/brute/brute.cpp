@@ -1314,13 +1314,13 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
   block_maxsize = region.MaxX () - region.MinX ();
   block_minsize = block_maxsize;
 
-  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+  csRef<iStringSet> stringsSvName = csQueryRegistryTagInterface<iStringSet> (
     object_reg, "crystalspace.shared.stringset");
   
-  vertices_name = strings->Request ("vertices");
-  normals_name = strings->Request ("normals");
-  texcoords_name = strings->Request ("texture coordinates");
-  colors_name = strings->Request ("colors");
+  vertices_name = stringsSvName->Request ("vertices");
+  normals_name = stringsSvName->Request ("normals");
+  texcoords_name = stringsSvName->Request ("texture coordinates");
+  colors_name = stringsSvName->Request ("colors");
 
   //terr_func = &((csTerrainFactory*)pFactory)->terr_func;
   terraformer = ((csTerrainFactory*)pFactory)->terraformer;
@@ -2008,13 +2008,13 @@ bool csTerrainObject::SetCurrentMaterialAlphaMaps (
 
   csRef<iGraphics3D> g3d = 
     csQueryRegistry<iGraphics3D> (object_reg);
-  csRef<iStringSet> strings = 
+  csRef<iStringSet> stringsSvName = 
     csQueryRegistryTagInterface<iStringSet>
-    (object_reg, "crystalspace.shared.stringset");
+    (object_reg, "crystalspace.shader.variablenameset");
   csRef<iTextureManager> mgr = g3d->GetTextureManager ();
 
   csRef<csShaderVariable> lod_var = 
-    new csShaderVariable (strings->Request ("texture lod distance"));
+    new csShaderVariable (stringsSvName->Request ("texture lod distance"));
   lod_var->SetType (csShaderVariable::VECTOR3);
   lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
   baseContext->AddVariable (lod_var);
@@ -2078,13 +2078,13 @@ printf("%s\n",fn.GetData());
     csRef<iTextureHandle> hdl = mgr->RegisterTexture (alpha, 
       CS_TEXTURE_2D | CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
     csRef<csShaderVariable> var = 
-      new csShaderVariable (strings->Request ("splat alpha map"));
+      new csShaderVariable (stringsSvName->Request ("splat alpha map"));
     var->SetType (csShaderVariable::TEXTURE);
     var->SetValue (hdl);
     paletteContexts[i]->AddVariable (var);
 
     csRef<csShaderVariable> lod_var = 
-      new csShaderVariable (strings->Request ("texture lod distance"));
+      new csShaderVariable (stringsSvName->Request ("texture lod distance"));
     lod_var->SetType (csShaderVariable::VECTOR3);
     lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
     paletteContexts[i]->AddVariable (lod_var);
@@ -2222,13 +2222,13 @@ bool csTerrainObject::SetCurrentMaterialMap (const csArray<char>& data,
 
   csRef<iGraphics3D> g3d = 
     csQueryRegistry<iGraphics3D> (object_reg);
-  csRef<iStringSet> strings = 
+  csRef<iStringSet> stringsSvName = 
     csQueryRegistryTagInterface<iStringSet>
-    (object_reg, "crystalspace.shared.stringset");
+    (object_reg, "crystalspace.shader.variablenameset");
   iTextureManager* mgr = g3d->GetTextureManager ();
 
   csRef<csShaderVariable> lod_var = 
-    new csShaderVariable (strings->Request ("texture lod distance"));
+    new csShaderVariable (stringsSvName->Request ("texture lod distance"));
   lod_var->SetType (csShaderVariable::VECTOR3);
   lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
   baseContext->AddVariable (lod_var);
@@ -2269,13 +2269,13 @@ printf("%s\n",fn.GetData());
     csRef<iTextureHandle> hdl = mgr->RegisterTexture (alpha, 
       CS_TEXTURE_2D | CS_TEXTURE_3D | CS_TEXTURE_CLAMP);
     csRef<csShaderVariable> var = 
-      new csShaderVariable (strings->Request ("splat alpha map"));
+      new csShaderVariable (stringsSvName->Request ("splat alpha map"));
     var->SetType (csShaderVariable::TEXTURE);
     var->SetValue (hdl);
     paletteContexts[i]->AddVariable (var);
 
     csRef<csShaderVariable> lod_var = 
-      new csShaderVariable (strings->Request ("texture lod distance"));
+      new csShaderVariable (stringsSvName->Request ("texture lod distance"));
     lod_var->SetType (csShaderVariable::VECTOR3);
     lod_var->SetValue (csVector3 (lod_distance, lod_distance, lod_distance));
     paletteContexts[i]->AddVariable (lod_var);

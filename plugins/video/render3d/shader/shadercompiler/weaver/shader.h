@@ -146,6 +146,11 @@ public:
     realShader->PushVariables (stacks);
   }
 
+  void PushVariables (csShaderVariable** stacks) const
+  {
+    realShader->PushVariables (stacks);
+  }
+
   bool IsEmpty() const
   {
     return realShader->IsEmpty();

@@ -120,7 +120,7 @@ bool WeaverCompiler::Initialize (iObjectRegistry* object_reg)
     return false;
 
   strings = csQueryRegistryTagInterface<iStringSet> (
-    object_reg, "crystalspace.shared.stringset");
+    object_reg, "crystalspace.shader.variablenameset");
 
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
   vfs = csQueryRegistry<iVFS> (object_reg);

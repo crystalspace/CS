@@ -237,7 +237,7 @@ private:
   csRef<iVFS> VFS;
   csRef<iVirtualClock> vc;
   csRef<iFont> fnt;
-  csRef<iStringSet> stringSet;
+  csRef<iStringSet> stringSet, stringSetSvName;
   bool initialized;
   csConfigAccess config;
   /**

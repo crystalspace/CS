@@ -431,7 +431,7 @@ csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory) :
 
   csRef<iStringSet> strings;
   strings = csQueryRegistryTagInterface<iStringSet>
-    (factory->object_reg, "crystalspace.shared.stringset");
+    (factory->object_reg, "crystalspace.shader.variablenameset");
 
   if ((vertex_name == csInvalidStringID) ||
     (texel_name == csInvalidStringID) ||

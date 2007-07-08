@@ -40,7 +40,7 @@ CS_LEAKGUARD_IMPLEMENT (csXMLShader);
 
 csShaderConditionResolver::csShaderConditionResolver (
   csXMLShaderCompiler* compiler) : rootNode (0), nextVariant (0),
-  evaluator (compiler->strings, compiler->condConstants)
+  evaluator (compiler->stringsSvName, compiler->condConstants)
 {
   SetEvalParams (0, 0);
 }
@@ -436,6 +436,8 @@ public:
   virtual const csRefArray<csShaderVariable>& GetShaderVariables () const
   { return wrappedSVC.GetShaderVariables (); }
   virtual void PushVariables (iShaderVarStack* stacks) const
+  { wrappedSVC.PushVariables (stacks); }
+  virtual void PushVariables (csShaderVariable** stacks) const
   { wrappedSVC.PushVariables (stacks); }
   virtual bool IsEmpty() const
   { return wrappedSVC.IsEmpty(); }

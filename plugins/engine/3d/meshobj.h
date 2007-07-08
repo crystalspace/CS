@@ -449,10 +449,6 @@ public:
   /// Return true if there is a parent mesh that has static lod.
   bool SomeParentHasStaticLOD () const;
 
-  /**
-   * Draw the zpass for the object.  If this object doesn't use lighting
-   * then it can be drawn fully here.
-   */
   virtual csRenderMesh** GetRenderMeshes (int& num, iRenderView* rview,
   	uint32 frustum_mask);
   /**
@@ -572,6 +568,12 @@ public:
    * supplied in the "stacks" argument
    */
   void PushVariables (iShaderVarStack* stacks) const
+  { 
+    if (factorySVC.IsValid()) factorySVC->PushVariables (stacks);
+    svcontext.PushVariables (stacks); 
+  }
+
+  void PushVariables (csShaderVariable** stacks) const
   { 
     if (factorySVC.IsValid()) factorySVC->PushVariables (stacks);
     svcontext.PushVariables (stacks); 

@@ -76,6 +76,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
 {
   iSyntaxService* synldr = parent->compiler->synldr;
   iStringSet* strings = parent->compiler->strings;
+  iStringSet* stringsSvName = parent->compiler->stringsSvName;
 
   //Load shadervar block
   csRef<iDocumentNode> varNode = node->GetNode(
@@ -332,7 +333,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
 	if (cname == 0)
 	  cname = source;
 
-        csStringID varID = strings->Request (cname);
+        csStringID varID = stringsSvName->Request (cname);
         pass->custommapping_id.Push (varID);
         //pass->bufferGeneric[pass->bufferCount] = CS_VATTRIB_IS_GENERIC (attrib);
 
@@ -401,7 +402,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass,
       }
 
       if (texUnit < 0) continue;
-      csStringID varID = strings->Request (mapping->GetAttributeValue("name"));
+      csStringID varID = stringsSvName->Request (mapping->GetAttributeValue("name"));
       pass->textureID[texUnit] = varID;
 
       pass->textureCount = MAX(pass->textureCount, texUnit + 1);
@@ -571,7 +572,7 @@ bool csXMLShaderTech::Load (iLoaderContext* ldr_context,
     shaderPass& pass = passes[i];
     pass.alphaMode.autoAlphaMode = true;
     pass.alphaMode.autoModeTexture = 
-      strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
+      parent->compiler->stringsSvName->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
   }
 
 

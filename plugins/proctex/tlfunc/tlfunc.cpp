@@ -183,7 +183,7 @@ csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node,
     if (exprNode)
     {
       csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
-	object_reg, "crystalspace.shared.stringset");
+	object_reg, "crystalspace.shader.variablenameset");
 
       csShaderExpression expr (object_reg);
       

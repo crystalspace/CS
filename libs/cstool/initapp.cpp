@@ -179,8 +179,10 @@ bool csInitializer::CreateInputDrivers (iObjectRegistry* r)
 bool csInitializer::CreateStringSet (iObjectRegistry* r)
 {
   csRef<iStringSet> strings;
-  strings.AttachNew (new csScfStringSet ());
+  strings.AttachNew (new csScfStringSet);
   r->Register (strings, "crystalspace.shared.stringset");
+  strings.AttachNew (new csScfStringSet);
+  r->Register (strings, "crystalspace.shader.variablenameset");
   return true;
 }
 

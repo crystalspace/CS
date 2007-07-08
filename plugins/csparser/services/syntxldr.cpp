@@ -81,7 +81,7 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
   InitTokenTable (xmltokens);
 
   strings = csQueryRegistryTagInterface<iStringSet> (
-    object_reg, "crystalspace.shared.stringset");
+    object_reg, "crystalspace.shader.variablenameset");
 
   return true;
 }
