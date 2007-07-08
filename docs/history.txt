@@ -6,6 +6,9 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Jul-2007
+	- Genjix removed qualifier for LightmapMask destructor due to failing
+	  to compile on linux.
 7-Jul-2007
 	- Marten fixed the OSX assistant to properly expose its intefaces.
 	- res fixed lighter2 problems introduced by r27190.
