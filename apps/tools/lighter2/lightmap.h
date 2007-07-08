@@ -160,6 +160,11 @@ namespace lighter
       width (lm.GetWidth ()), height (lm.GetHeight ())
     {
     }
+    LightmapMask::~LightmapMask ()
+    {
+      Lock();
+      SwappableHeap::Free (maskData);
+    }
     
     float* GetMaskData() const { return maskData; }
     inline uint GetWidth () const { return width; }

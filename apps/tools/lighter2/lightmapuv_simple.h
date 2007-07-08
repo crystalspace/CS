@@ -283,8 +283,7 @@ namespace lighter
   class SimpleUVObjectLayouter : public LightmapUVObjectLayouter
   {
   public:
-    SimpleUVObjectLayouter (SimpleUVFactoryLayouter* parent) : parent (parent),
-      layoutID (0)
+    SimpleUVObjectLayouter (SimpleUVFactoryLayouter* parent) : parent (parent)
     {}
 
     virtual size_t LayoutUVOnPrimitives (PrimitiveArray &prims, 
@@ -308,9 +307,15 @@ namespace lighter
       csArray<csVector2> remaps;
     };
     csHash<PDLayoutedGroup, size_t> pdLayouts;
-    csArray<csArray<csVector2> > minuvs;
     csArray<csArray<csVector2> > uvsizes;
-    size_t layoutID;
+    /**
+     * Minimum UVs for each *layout* (since a group can appear multiple times
+     * on lightmaps)
+     */
+    csArray<csArray<csVector2> > minuvs;
+
+    void ComputeMinUVs (PrimitiveArray& prims, size_t groupNum,
+      csArray<csVector2>& minuvs);
 
     void LayoutQueuedPrims (PrimitiveArray &prims, size_t groupNum, 
       size_t layoutID, size_t lightmap, const csArray<csVector2>& positions, 
