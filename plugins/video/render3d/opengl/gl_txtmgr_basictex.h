@@ -47,25 +47,30 @@ struct TextureStorageFormat
   /// Format in which to store the texture ('internalformat' in GL spec)
   GLenum targetFormat;
   /**
-   * Whether the format is compressed. The \c format and \c type members are
-   * only valid for uncompressed textures.
+   * Whether the format is compressed. Accompanying "source format" 
+   * information is only valid for uncompressed textures.
    */
   bool isCompressed;
+
+  /// Init with default values
+  TextureStorageFormat () : targetFormat (0), isCompressed (false) {}
+  /// Init with given format
+  TextureStorageFormat (GLenum targetFormat, bool compressed) : 
+    targetFormat (targetFormat), isCompressed (compressed) {}
+};
+
+struct TextureSourceFormat
+{
   /// Format of the source data
   GLenum format;
   /// Type of the source data
   GLenum type;
 
   /// Init with default values
-  TextureStorageFormat () : targetFormat (0), isCompressed (false), 
-    format (0), type (0) {}
-  /// Init for compressed texture
-  TextureStorageFormat (GLenum compressedFormat) : targetFormat (compressedFormat), 
-    isCompressed (true), format (0), type (0) {}
+  TextureSourceFormat () : format (0), type (0) {}
   /// Init for uncompressed texture
-  TextureStorageFormat (GLenum targetFormat, GLenum format, GLenum type) : 
-    targetFormat (targetFormat), isCompressed (false), format (format), 
-    type (type) {}
+  TextureSourceFormat (GLenum format, GLenum type) : 
+    format (format), type (type) {}
 };
 
 struct csGLUploadData
@@ -73,7 +78,8 @@ struct csGLUploadData
   const void* image_data;
   int w, h, d;
   csRef<iBase> dataRef;
-  TextureStorageFormat sourceFormat;
+  TextureStorageFormat storageFormat;
+  TextureSourceFormat sourceFormat;
   size_t compressedSize;
   int mip;
   int imageNum;

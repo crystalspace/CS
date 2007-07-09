@@ -131,6 +131,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
     /* NV supposedly does not support separate stencil attachment, but packed
      * depth/stencil attachments (EXT_packed_depth_stencil or so) - tried 
      * first if available. */
+    G3D->ext->InitGL_EXT_packed_depth_stencil ();
     if (G3D->ext->CS_GL_EXT_packed_depth_stencil)
     {
       depthStorage = GL_DEPTH_STENCIL_EXT;

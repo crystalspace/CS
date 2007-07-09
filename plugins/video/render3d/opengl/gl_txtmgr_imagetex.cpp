@@ -354,10 +354,12 @@ bool csGLTextureHandle::MakeUploadData (bool allowCompressed,
       CS::StructuredTextureFormat texFormat (
         CS::TextureFormatStrings::ConvertStructured (rawFormat));
       TextureStorageFormat glFormat;
-      if (txtmgr->DetermineGLFormat (texFormat, glFormat)
+      TextureSourceFormat srcFormat;
+      if (txtmgr->DetermineGLFormat (texFormat, glFormat, srcFormat)
         && !(glFormat.isCompressed && !allowCompressed))
       {
-        uploadData.sourceFormat = glFormat;
+        uploadData.storageFormat = glFormat;
+        uploadData.sourceFormat = srcFormat;
         uploadData.image_data = imageRaw->GetUint8();
         if (glFormat.isCompressed)
 	  uploadData.compressedSize = imageRaw->GetSize();
@@ -388,7 +390,7 @@ bool csGLTextureHandle::MakeUploadData (bool allowCompressed,
     uploadData.sourceFormat.format = GL_RGBA;
     uploadData.sourceFormat.type = GL_UNSIGNED_BYTE;
   }
-  uploadData.sourceFormat.targetFormat = targetFormat;
+  uploadData.storageFormat.targetFormat = targetFormat;
   uploadData.w = Image->GetWidth();
   uploadData.h = Image->GetHeight();
   uploadData.d = Image->GetDepth();

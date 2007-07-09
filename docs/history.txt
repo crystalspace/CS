@@ -33,6 +33,7 @@ chronological order.
 	  unconditionally.
 	- res changed csProcTexture to allow overriding of the actual texture 
 	  wrapper creation.
+	- res added support for float textures to gl3d CreateTexture().
 8-Jul-2007
 	- Genjix removed qualifier for LightmapMask destructor due to failing
 	  to compile on linux.

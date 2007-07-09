@@ -111,7 +111,8 @@ bool csGLBasicTextureHandle::SynthesizeUploadData (
   iString* fail_reason)
 {
   TextureStorageFormat glFormat;
-  if (!txtmgr->DetermineGLFormat (format, glFormat)) 
+  TextureSourceFormat srcFormat;
+  if (!txtmgr->DetermineGLFormat (format, glFormat, srcFormat)) 
   {
     if (fail_reason) fail_reason->Replace ("no GL support for texture format");
     return 0;
@@ -141,7 +142,8 @@ bool csGLBasicTextureHandle::SynthesizeUploadData (
       upload.w = actual_width;
       upload.h = actual_height;
       upload.d = actual_d;
-      upload.sourceFormat = glFormat;
+      upload.storageFormat = glFormat;
+      upload.sourceFormat = srcFormat;
       upload.mip = 0;
       upload.imageNum = i;
 
@@ -164,7 +166,8 @@ bool csGLBasicTextureHandle::SynthesizeUploadData (
         upload.w = w;
         upload.h = h;
         upload.d = d;
-        upload.sourceFormat = glFormat;
+        upload.storageFormat = glFormat;
+        upload.sourceFormat = srcFormat;
         upload.mip = nMip;
         upload.imageNum = i;
 
@@ -426,16 +429,16 @@ void csGLBasicTextureHandle::Load ()
     for (i = 0; i < uploadData->GetSize(); i++)
     {
       const csGLUploadData& uploadData = this->uploadData->Get (i);
-      if (uploadData.sourceFormat.isCompressed)
+      if (uploadData.storageFormat.isCompressed)
       {
 	G3D->ext->glCompressedTexImage2DARB (GL_TEXTURE_2D, uploadData.mip, 
-	  uploadData.sourceFormat.targetFormat, uploadData.w, uploadData.h, 
+	  uploadData.storageFormat.targetFormat, uploadData.w, uploadData.h, 
 	  0, (GLsizei)uploadData.compressedSize, uploadData.image_data);
       }
       else
       {
 	glTexImage2D (GL_TEXTURE_2D, uploadData.mip, 
-	  uploadData.sourceFormat.targetFormat, 
+	  uploadData.storageFormat.targetFormat, 
 	  uploadData.w, uploadData.h, 0, uploadData.sourceFormat.format, 
 	  uploadData.sourceFormat.type, uploadData.image_data);
       }
@@ -464,17 +467,17 @@ void csGLBasicTextureHandle::Load ()
     for (i = 0; i < uploadData->GetSize (); i++)
     {
       const csGLUploadData& uploadData = this->uploadData->Get (i);
-      if (uploadData.sourceFormat.isCompressed)
+      if (uploadData.storageFormat.isCompressed)
       {
 	G3D->ext->glCompressedTexImage3DARB (GL_TEXTURE_3D, uploadData.mip, 
-	  uploadData.sourceFormat.targetFormat, uploadData.w, uploadData.h, 
+	  uploadData.storageFormat.targetFormat, uploadData.w, uploadData.h, 
 	  uploadData.d, 0, (GLsizei)uploadData.compressedSize, 
 	  uploadData.image_data);
       }
       else
       {
 	G3D->ext->glTexImage3DEXT (GL_TEXTURE_3D, uploadData.mip, 
-	  uploadData.sourceFormat.targetFormat, uploadData.w, uploadData.h, 
+	  uploadData.storageFormat.targetFormat, uploadData.w, uploadData.h, 
           uploadData.d, 0, uploadData.sourceFormat.format, 
           uploadData.sourceFormat.type, uploadData.image_data);
       }
@@ -508,18 +511,18 @@ void csGLBasicTextureHandle::Load ()
     {
       const csGLUploadData& uploadData = this->uploadData->Get (i);
 
-      if (uploadData.sourceFormat.isCompressed)
+      if (uploadData.storageFormat.isCompressed)
       {
 	G3D->ext->glCompressedTexImage2DARB (
 	  GL_TEXTURE_CUBE_MAP_POSITIVE_X + uploadData.imageNum, 
 	  uploadData.mip, 
-	  uploadData.sourceFormat.targetFormat, uploadData.w, uploadData.h, 
+	  uploadData.storageFormat.targetFormat, uploadData.w, uploadData.h, 
 	  0, (GLsizei)uploadData.compressedSize, uploadData.image_data);
       }
       else
       {
 	glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X + uploadData.imageNum, 
-	  uploadData.mip, uploadData.sourceFormat.targetFormat, 
+	  uploadData.mip, uploadData.storageFormat.targetFormat, 
 	  uploadData.w, uploadData.h,
 	  0, uploadData.sourceFormat.format, uploadData.sourceFormat.type,
 	  uploadData.image_data);
@@ -546,17 +549,17 @@ void csGLBasicTextureHandle::Load ()
     for (i = 0; i < uploadData->GetSize (); i++)
     {
       const csGLUploadData& uploadData = this->uploadData->Get (i);
-      if (uploadData.sourceFormat.isCompressed)
+      if (uploadData.storageFormat.isCompressed)
       {
 	G3D->ext->glCompressedTexImage2DARB (GL_TEXTURE_RECTANGLE_ARB, 
-          uploadData.mip, uploadData.sourceFormat.targetFormat, 
+          uploadData.mip, uploadData.storageFormat.targetFormat, 
           uploadData.w, uploadData.h, 0, 
           (GLsizei)uploadData.compressedSize, uploadData.image_data);
       }
       else
       {
 	glTexImage2D (GL_TEXTURE_RECTANGLE_ARB, uploadData.mip, 
-	  uploadData.sourceFormat.targetFormat, 
+	  uploadData.storageFormat.targetFormat, 
 	  uploadData.w, uploadData.h, 0, uploadData.sourceFormat.format, 
 	  uploadData.sourceFormat.type, uploadData.image_data);
       }
