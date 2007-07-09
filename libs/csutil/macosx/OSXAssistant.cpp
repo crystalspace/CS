@@ -43,7 +43,7 @@ OSXAssistant::OSXAssistant(iObjectRegistry* r)
   : scfImplementationType (this), registry(r),event_queue(0), event_outlet(0), 
   virtual_clock(0), should_shutdown(false)
 {
-  controller = OSXDelegate_startup(this);
+  controller = OSXDelegate_startup(static_cast<iOSXAssistant>(this));
 
   run_always = false;
   quitEventID = csevQuit(registry);
