@@ -83,6 +83,9 @@ struct csGLUploadData
 
 struct csGLTextureClassSettings;
 
+// For GetTextureTarget ()
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 class csGLBasicTextureHandle :
   public scfImplementation1<csGLBasicTextureHandle, 
 			    iTextureHandle>
@@ -160,7 +163,7 @@ public:
   int actual_width, actual_height, actual_d;
   csArray<csGLUploadData>* uploadData;
   csWeakRef<csGLGraphics3D> G3D;
-  int target;
+  TextureType texType;
   /// Format used for last Blit() call
   TextureBlitDataFormat texFormat;
   bool IsWasRenderTarget() const
@@ -178,7 +181,7 @@ public:
   csGLBasicTextureHandle (int width, int height, int depth,
     csImageType imagetype, int flags, csGLGraphics3D *iG3D);
   /// Create from existing handle
-  csGLBasicTextureHandle (csGLGraphics3D *iG3D, int target, GLuint Handle);
+  csGLBasicTextureHandle (csGLGraphics3D *iG3D, TextureType texType, GLuint Handle);
 
   virtual ~csGLBasicTextureHandle ();
 
@@ -255,7 +258,7 @@ public:
   void SetupAutoMipping();
 
   /// Get the texture target
-  virtual int GetTextureTarget () const { return target; }
+  virtual int GetTextureTarget () const { return int (texType); }
 
   /**
    * Query the private object associated with this handle.
@@ -291,7 +294,14 @@ public:
    * \remark Returns GL_TEXTURE_CUBE_MAP for cubemaps.
    */
   GLenum GetGLTextureTarget() const;
+
+  virtual TextureType GetTextureType () const
+  {
+    return texType;
+  }
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 }
 CS_PLUGIN_NAMESPACE_END(gl3d)

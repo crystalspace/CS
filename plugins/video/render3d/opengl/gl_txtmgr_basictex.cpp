@@ -44,13 +44,13 @@ csGLBasicTextureHandle::csGLBasicTextureHandle (int width,
   switch (imagetype)
   {
     case csimgCube:
-      target = CS_TEX_IMG_CUBEMAP;
+      texType = texTypeCube;
       break;
     case csimg3D:
-      target = CS_TEX_IMG_3D;
+      texType = texType3D;
       break;
     default:
-      target = CS_TEX_IMG_2D;
+      texType = texType2D;
       break;
   }
   const uint npotsNeededFlags = (CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP);
@@ -80,7 +80,7 @@ csGLBasicTextureHandle::csGLBasicTextureHandle (int width,
        * support of non-POT _2D_ textures; that is, the textures, being
        * NPOTS, need to go to the 2D target, not RECT. 
        * Same when ARB_tnpot is available. */
-      target = CS_TEX_IMG_RECT;
+      texType = texTypeRect;
   }
   texFlags.Set (flagsPublicMask, flags);
 
@@ -90,12 +90,12 @@ csGLBasicTextureHandle::csGLBasicTextureHandle (int width,
 }
 
 csGLBasicTextureHandle::csGLBasicTextureHandle (csGLGraphics3D *iG3D,
-                                                int target, GLuint Handle) : 
+                                                TextureType texType, GLuint Handle) : 
   scfImplementationType (this), txtmgr (iG3D->txtmgr), 
   textureClass (txtmgr->GetTextureClassID ("default")), Handle (Handle), 
   orig_width (0), orig_height (0), orig_d (0),
   uploadData(0), G3D (iG3D), texFormat((TextureBlitDataFormat)-1), 
-  target (target), alphaType (csAlphaMode::alphaNone)
+  texType (texType), alphaType (csAlphaMode::alphaNone)
 {
   SetForeignHandle (true);
 }
@@ -129,7 +129,7 @@ bool csGLBasicTextureHandle::SynthesizeUploadData (
     return false;
   }
 
-  const int imgNum = (target == GL_TEXTURE_CUBE_MAP) ? 6 : 1;
+  const int imgNum = (texType == texTypeCube) ? 6 : 1;
 
   FreshUploadData ();
   if (texFlags.Check (CS_TEXTURE_NOMIPMAPS))
@@ -403,7 +403,7 @@ void csGLBasicTextureHandle::Load ()
   const GLint wrapMode = 
     (texFlags.Check (CS_TEXTURE_CLAMP)) ? GL_CLAMP_TO_EDGE : GL_REPEAT;
 
-  if (target == CS_TEX_IMG_1D)
+  if (texType == texType1D)
   {
     G3D->statecache->SetTexture (GL_TEXTURE_1D, Handle);
     glTexParameteri (GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, wrapMode);
@@ -418,7 +418,7 @@ void csGLBasicTextureHandle::Load ()
 
     // @@@ Implement upload!
   }
-  else if (target == CS_TEX_IMG_2D)
+  else if (texType == texType2D)
   {
     G3D->statecache->SetTexture (GL_TEXTURE_2D, Handle);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
@@ -453,7 +453,7 @@ void csGLBasicTextureHandle::Load ()
       }
     }
   }
-  else if (target == CS_TEX_IMG_3D)
+  else if (texType == texType3D)
   {
     G3D->statecache->Enable_GL_TEXTURE_3D ();
     G3D->statecache->SetTexture (GL_TEXTURE_3D, Handle);
@@ -492,7 +492,7 @@ void csGLBasicTextureHandle::Load ()
       }
     }
   }
-  else if (target == CS_TEX_IMG_CUBEMAP)
+  else if (texType == texTypeCube)
   {
     G3D->statecache->SetTexture (GL_TEXTURE_CUBE_MAP, Handle);
     // @@@ Temporarily force clamp, although I don't know if REPEAT
@@ -538,7 +538,7 @@ void csGLBasicTextureHandle::Load ()
       }
     }
   }
-  else if (target == CS_TEX_IMG_RECT)
+  else if (texType == texTypeRect)
   {
     G3D->statecache->SetTexture (GL_TEXTURE_RECTANGLE_ARB, Handle);
     glTexParameteri (GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_S, wrapMode);
@@ -581,15 +581,15 @@ void csGLBasicTextureHandle::Load ()
 void csGLBasicTextureHandle::Unload ()
 {
   if ((Handle == 0) || IsForeignHandle()) return;
-  if (target == CS_TEX_IMG_1D)
+  if (texType == texType1D)
     csGLTextureManager::UnsetTexture (GL_TEXTURE_1D, Handle);
-  else if (target == CS_TEX_IMG_2D)
+  else if (texType == texType2D)
     csGLTextureManager::UnsetTexture (GL_TEXTURE_2D, Handle);
-  else if (target == CS_TEX_IMG_3D)
+  else if (texType == texType3D)
     csGLTextureManager::UnsetTexture (GL_TEXTURE_3D, Handle);
-  else if (target == CS_TEX_IMG_CUBEMAP)
+  else if (texType == texTypeCube)
     csGLTextureManager::UnsetTexture (GL_TEXTURE_CUBE_MAP, Handle);
-  else if (target == CS_TEX_IMG_RECT)
+  else if (texType == texTypeRect)
     csGLTextureManager::UnsetTexture (GL_TEXTURE_RECTANGLE_ARB, Handle);
   glDeleteTextures (1, &Handle);
   Handle = 0;
@@ -632,17 +632,17 @@ GLuint csGLBasicTextureHandle::GetHandle ()
 
 GLenum csGLBasicTextureHandle::GetGLTextureTarget() const
 {
-  switch (target)
+  switch (texType)
   {
-    case CS_TEX_IMG_1D:
+    case texType1D:
       return GL_TEXTURE_1D;
-    case CS_TEX_IMG_2D:
+    case texType2D:
       return GL_TEXTURE_2D;
-    case CS_TEX_IMG_3D:
-      return GL_TEXTURE_3D;
-    case CS_TEX_IMG_CUBEMAP:
+    case texType3D:
+      return texType3D;
+    case texTypeCube:
       return GL_TEXTURE_CUBE_MAP;
-    case CS_TEX_IMG_RECT:
+    case texTypeRect:
       return GL_TEXTURE_RECTANGLE_ARB;
     default:
       return 0;

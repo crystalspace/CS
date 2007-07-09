@@ -50,7 +50,7 @@ struct iGraphics3D;
  */
 struct iTextureHandle : public virtual iBase
 {
-  SCF_INTERFACE(iTextureHandle, 3,0,0);
+  SCF_INTERFACE(iTextureHandle, 3,0,1);
   /// Retrieve the flags set for this texture
   virtual int GetFlags () const = 0;
 
@@ -88,7 +88,7 @@ struct iTextureHandle : public virtual iBase
 
   // CHANGED TO ADD SUPPORT FOR CUBEMAPS AND 3D TEXTURES
   // done by Phil Aumayr (phil@rarebyte.com)
-  enum 
+  enum CS_DEPRECATED_TYPE
   { 
     CS_TEX_IMG_1D = 0, 
     CS_TEX_IMG_2D, 
@@ -127,7 +127,9 @@ struct iTextureHandle : public virtual iBase
   /**
    * Get the texture target. Note the texture target is determined by the 
    * image from which the texture was created and possibly the texture flags.
+   * \deprecated Use GetTextureType() instead
    */
+  CS_DEPRECATED_METHOD_MSG("Use GetTextureType() instead")
   virtual int GetTextureTarget () const = 0;
 
   /// Format of the pixel data that is passed to iTextureHandle->Blit()
@@ -200,6 +202,28 @@ struct iTextureHandle : public virtual iBase
    * be overridden with this method.
    */
   virtual void SetAlphaType (csAlphaMode::AlphaType alphaType) = 0;
+  
+  /// Possible texture types
+  enum TextureType
+  {
+    /// 1D texture
+    texType1D = 0,
+    /// 2D texture
+    texType2D,
+    /// 3D texture
+    texType3D,
+    /// Cube map
+    texTypeCube,
+    /// Rectangle texture
+    texTypeRect
+  };
+  
+  /**
+   * Get the texture type (2D, 3D, cube map, RECT texture ...). Note that the 
+   * texture type is determined by the image from which the texture was 
+   * created and possibly the texture flags.
+   */
+  virtual TextureType GetTextureType() const = 0;
 };
 
 /** @} */

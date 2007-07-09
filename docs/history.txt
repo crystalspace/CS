@@ -23,6 +23,8 @@ chronological order.
 	      detect an error and fall back to the frame buffer.
 	    - The depth and stencil format to be used is automatically 
 	      detected: stencil buffer support is used when available.
+	- res deprecated iTextureHandle::GetTextureTarget() in favor of the
+	  more intuitively named GetTextureType().
 8-Jul-2007
 	- Genjix removed qualifier for LightmapMask destructor due to failing
 	  to compile on linux.

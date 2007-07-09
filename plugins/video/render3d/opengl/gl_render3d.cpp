@@ -1514,25 +1514,25 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
     static_cast<csGLBasicTextureHandle*> (txthandle);
   GLuint texHandle = gltxthandle->GetHandle ();
 
-  switch (gltxthandle->target)
+  switch (gltxthandle->texType)
   {
-    case iTextureHandle::CS_TEX_IMG_1D:
+    case iTextureHandle::texType1D:
       statecache->Enable_GL_TEXTURE_1D ();
       statecache->SetTexture (GL_TEXTURE_1D, texHandle);
       break;
-    case iTextureHandle::CS_TEX_IMG_2D:
+    case iTextureHandle::texType2D:
       statecache->Enable_GL_TEXTURE_2D ();
       statecache->SetTexture (GL_TEXTURE_2D, texHandle);
       break;
-    case iTextureHandle::CS_TEX_IMG_3D:
+    case iTextureHandle::texType3D:
       statecache->Enable_GL_TEXTURE_3D ();
       statecache->SetTexture (GL_TEXTURE_3D, texHandle);
       break;
-    case iTextureHandle::CS_TEX_IMG_CUBEMAP:
+    case iTextureHandle::texTypeCube:
       statecache->Enable_GL_TEXTURE_CUBE_MAP ();
       statecache->SetTexture (GL_TEXTURE_CUBE_MAP, texHandle);
       break;
-    case iTextureHandle::CS_TEX_IMG_RECT:
+    case iTextureHandle::texTypeRect:
       statecache->Enable_GL_TEXTURE_RECTANGLE_ARB ();
       statecache->SetTexture (GL_TEXTURE_RECTANGLE_ARB, texHandle);
       break;
@@ -1542,7 +1542,7 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
   }
   /*texunitenabled[unit] = true;
   texunittarget[unit] = gltxthandle->target;*/
-  bool doNPOTS = (gltxthandle->target == iTextureHandle::CS_TEX_IMG_RECT);
+  bool doNPOTS = (gltxthandle->texType == iTextureHandle::texTypeRect);
   if (doNPOTS && (unit < 8))
     needNPOTSfixup[unit] = gltxthandle;
   else
@@ -1939,7 +1939,7 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
   ntx2 = ((float)tx + (float)tw);
   nty1 = ((float)ty            );
   nty2 = ((float)ty + (float)th);
-  if (txt_mm->target != iTextureHandle::CS_TEX_IMG_RECT)
+  if (txt_mm->texType != iTextureHandle::texTypeRect)
   {
     ntx1 /= bitmapwidth;
     ntx2 /= bitmapwidth;
