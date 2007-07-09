@@ -11,6 +11,9 @@ chronological order.
 	    - Added ability to specify custom memory allocator.
 	    - Added convenience methods to move an item to the front/back of
 	      the list.
+	- res relaxed the "no copy" restriction for csFixedSizeAllocator<> a 
+	  bit: it's now	allowed to copy an empty allocator (which basically 
+	  only copies the block sizes). Useful for some initialization cases.
 8-Jul-2007
 	- Genjix removed qualifier for LightmapMask destructor due to failing
 	  to compile on linux.
