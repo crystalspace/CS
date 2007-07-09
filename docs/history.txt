@@ -31,6 +31,8 @@ chronological order.
 	- Eric Sunshine fixed csQsqrt() check in configure.ac which was broken
 	  due to use of CS_FORCEINLINE in csqsqrt.h, causing the test to fail
 	  unconditionally.
+	- res changed csProcTexture to allow overriding of the actual texture 
+	  wrapper creation.
 8-Jul-2007
 	- Genjix removed qualifier for LightmapMask destructor due to failing
 	  to compile on linux.
