@@ -6,8 +6,6 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-10-Jul-2007
-	- Marten made another OSX fix, still untested.
 9-Jul-2007
 	- res made the following changes to csList<>:
 	    - Added ability to specify custom memory allocator.
@@ -29,6 +27,10 @@ chronological order.
 	  more intuitively named GetTextureType().
 	- res made a method for the (more than once occuring) "ensure 
 	  uncompressed texture" logic in gl3d.
+	- Marten made another OSX fix, still untested.
+	- Eric Sunshine fixed csQsqrt() check in configure.ac which was broken
+	  due to use of CS_FORCEINLINE in csqsqrt.h, causing the test to fail
+	  unconditionally.
 8-Jul-2007
 	- Genjix removed qualifier for LightmapMask destructor due to failing
 	  to compile on linux.
