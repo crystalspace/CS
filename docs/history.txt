@@ -25,6 +25,8 @@ chronological order.
 	      detected: stencil buffer support is used when available.
 	- res deprecated iTextureHandle::GetTextureTarget() in favor of the
 	  more intuitively named GetTextureType().
+	- res made a method for the (more than once occuring) "ensure 
+	  uncompressed texture" logic in gl3d.
 8-Jul-2007
 	- Genjix removed qualifier for LightmapMask destructor due to failing
 	  to compile on linux.

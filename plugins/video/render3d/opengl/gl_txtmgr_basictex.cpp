@@ -337,19 +337,7 @@ void csGLBasicTextureHandle::Blit (int x, int y, int width,
     // (slooow) on subsequent glTexSubImage() calls.
     if (!isWholeImage)
     {
-      uint8* pixels = new uint8[actual_width * actual_height * 4];
-      glGetTexImage (textarget, 0, textureFormat, GL_UNSIGNED_BYTE, 
-	pixels);
-
-      if (!IsWasRenderTarget())
-      {
-	SetWasRenderTarget (true);
-	SetupAutoMipping();
-      }
-
-      glTexImage2D (textarget, 0, GL_RGBA8, actual_width, 
-	actual_height, 0, textureFormat, GL_UNSIGNED_BYTE, pixels);
-      delete[] pixels;
+      EnsureUncompressed (true);
     }
     else
     {
@@ -647,6 +635,35 @@ GLenum csGLBasicTextureHandle::GetGLTextureTarget() const
     default:
       return 0;
   }
+}
+
+void csGLBasicTextureHandle::EnsureUncompressed (bool keepPixels)
+{
+  if (!G3D->ext->CS_GL_ARB_texture_compression) return;
+
+  GLenum target = GetGLTextureTarget();
+  // @@@ FIXME: support more than 2D
+  if (target != GL_TEXTURE_2D) return;
+
+  GLint isCompressed;
+  glGetTexLevelParameteriv (target, 0, GL_TEXTURE_COMPRESSED_ARB, 
+    &isCompressed);
+  if (!isCompressed) return;
+
+  uint8* pixelData = 0;
+  /* @@@ FIXME: This really should use the actual internal (base?) format and 
+   * not just RGBA. */
+  if (keepPixels)
+  {
+    pixelData = (uint8*)cs_malloc (actual_width * actual_height * 4);
+    glGetTexImage (target, 0, GL_RGBA8, GL_UNSIGNED_BYTE, 
+      pixelData);
+  }
+
+  glTexImage2D (target, 0, GL_RGBA8, actual_width, actual_height, 
+    0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
+  if (pixelData != 0) cs_free (pixelData);
 }
 
 }

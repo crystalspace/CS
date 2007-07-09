@@ -299,6 +299,19 @@ public:
   {
     return texType;
   }
+
+  /**
+   * Ensure the texture's internal format is an uncompressed one.
+   * Blitting to a compressed texture or using one as a render target may
+   * incur a hefty performance penalty (due the performed compression of the
+   * changed texels), so for texture intended for such use it's a good idea
+   * to make sure the internal format is not compressed.
+   * \param keepPixels Whether to keep the existing pixel data should be 
+   *   preserved.
+   * \remarks The texture handle must be bound properly before this method
+   *   is called.
+   */
+  void EnsureUncompressed (bool keepPixels);
 };
 
 #include "csutil/win32/msvc_deprecated_warn_on.h"

@@ -299,10 +299,7 @@ void csGLRender2TextureEXTfbo::SetRenderTarget (iTextureHandle* handle,
         tex_mm->SetWasRenderTarget (true);
         G3D->statecache->SetTexture (GL_TEXTURE_2D, tex_mm->GetHandle());
 	// FIXME: Take persistence into account?
-        glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA8, txt_w, txt_h, 
-          0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-	// FIXME: Only use GL_LINEAR if mipmaps aren't generated
-        glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        tex_mm->EnsureUncompressed (false);
         G3D->statecache->SetTexture (GL_TEXTURE_2D, 0);
       }
 
