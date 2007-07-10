@@ -31,6 +31,7 @@ class Tri3DTest : public csApplicationFramework, public csBaseEventHandler {
 		csRef<iEngine> engine;
 		csRef<iGraphics3D> g3d;
     csRef<iView> view;
+		csRef<iReporter> report;
 		
 	public:
 		Tri3DTest();

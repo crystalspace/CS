@@ -25,6 +25,7 @@
 #include "iutil/document.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
+#include "csgeom/trimesh.h"
 
 // Standard	Headers
 #include <cstdarg>
@@ -33,10 +34,6 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 {
-
-// Forward Declarations	(probably	not	needed)
-//struct iObjectRegistry;
-//struct iDocumentSystem;
 
 /**	
  * This	class	implements the iColladaConvertor interface.	 It	is used	as a conversion	utility
@@ -123,24 +120,6 @@ class	csColladaConvertor : public	scfImplementation2<csColladaConvertor,iCollada
 		bool InitializeCrystalSpaceDocument();
 
 		// =============== Basic Utility Functions ===============
-
-		/**	\brief Chops a single	character	out	of a string
-		 * 
-		 * This	function will	remove a single	character	in a string.
-		 *
-		 * \param	str	The	string to	chop out of
-		 * \param	index	An index into	the	string representing	the	location of	the
-		 *							character	to remove
-		 *
-		 * \warning	This function	changes	the	string sent	into the function.
-		 * @todo Place this	into iString?
-		 */
-		
-		/*
-		CS_DEPRECATED_METHOD_MSG("Use	iString::DeleteAt()	instead");
-		std::string& Chop(iString& str,	int	index);
-		*/
-
 	public:
 
 		///	Constructor
@@ -189,45 +168,7 @@ class	csColladaConvertor : public	scfImplementation2<csColladaConvertor,iCollada
 
 	private:
 
-		/**	\brief Gets	the	array	of vertices	from the mesh
-		 *
-		 * Retrieves an	array	of float values	from the COLLADA document	which	represent
-		 * the vertices	of the mesh.
-		 *
-		 * \param	verticesElement	An iDocumentNode representing	the	<vertices> element of	the	
-		 *												COLLADA	file.
-		 * \param	id A reference to	a	variable which will	store	the	id of	the	mesh object.
-		 * \param	arraySize	A	reference	to a variable	where	the	array	size will	be stored.
-		 *
-		 * \returns	A	pointer	to an	array	of float values.	If the <vertices>	element	contained	
-		 *					an <int_array>,	the	integers will	be cast	to floating	point	values.
-		 *
-		 * \warning	The	caller is	responsible	for	deallocating the array of	floating point
-		 *					values,	once finished.
-		 */
-		// float* GetVertexArray(iDocumentNode* verticesElement,	iString	**name,	int& size, int&	stride);
-
-		/**	\brief Retrieves the array of	accessor strings
-		 *
-		 * Used	to retrieve	the	values of	the	<accessor> elements, in	order	to access
-		 * the vertex	array.	This function	is mainly	used for swizzling,	as red/green/blue
-		 * values	could	be dereferenced	as x/y/x.
-		 *
-		 * \param	currentSourceElement A pointer to	the	<source> tag containing	the	
-		 *														 <accessor>	element	to be	parsed.	
-		 * \param	size The size	of the accessor	array.
-		 *
-		 * \returns	The	array	of strings depicting the accessor	values on	success;
-		 *					0	on failure.
-		 *
-		 * \remarks	This function	greatly	depends	on the context of	it's call.
-		 *
-		 * \warning	It is	the	caller's reponsibility to	deallocate the array when
-		 *					finished using it.
-		 */
-	//iStringArray*	GetAccessorArray(iDocumentNode*	currentSourceElement,	int& size);
-
-		 /** \brief	Returns	a	<source> element
+	 /** \brief	Returns	a	<source> element
 		*
 		*	Retrieves	a	<source> element associated	with a given element.
 		*
@@ -264,32 +205,20 @@ class	csColladaAccessor	{
 
 }; /* End of class csColladaAccessor */
 
-class csColladaPolygon {
-	private:
-		int* vertexIndices;
-	public:
-		virtual bool Process(iDocumentNode* element) = 0;
-}; /* End of class csColladaPolygon */
-
-class csColladaSimplePolygon : public csColladaPolygon {
-	public:
-		virtual bool Process(iDocumentNode* element);
-
-}; /* End of class csColladaSimplePolygon */
-
 class	csColladaMesh	{
 
 	private:
 		csColladaConvertor* parent;
-		void *vertices;
-		int numVertices;
+		void *vertices; // a list of vertex components (x, y, z)
+		int numberOfVertices;  // number of vertices in the mesh
+		int numVertexElements; // the number of vertex components (3* numberOfVertices)
 		iString	*name;  // what the polygon is actually called
 		iString *id;    // what the position ID is
 		csRef<iDocumentNode> meshElement;
 		csColladaAccessor	vAccess;
 		csColladaNumericType vType;
 
-		csColladaPolygon* polygons;
+		csTriangleMesh* triangles;
 
 		/**	\brief Find	the	next numeric array element
 		 *
@@ -309,17 +238,30 @@ class	csColladaMesh	{
 		 */
 		csRef<iDocumentNode> FindNumericArray(const	csRef<iDocumentNode>&	node);
 
+		/** \brief Sets the vertex and normal arrays
+		 * 
+		 * Retrieves values from the given numeric array element in the COLLADA document
+		 * and places them in the vertex and normal arrays for the mesh object.  This also
+		 * sets the vertices for the csTriangleMesh object.
+		 *
+		 * @param numericArrayElement A pointer to the XML element which contains the numeric (int
+		 *                            or float) array.
+		 */
+		void SetVertexArray(iDocumentNode* numericArrayElement); 
+
 	public:
 		csColladaMesh(iDocumentNode* element, csColladaConvertor* parent);
 		~csColladaMesh();
 
-		void *GetVertices();
-		int GetNumVertices();
-		csColladaNumericType GetVertexType();
-		iString* GetName();
-		iString* GetID();
-		csRef<iDocumentNode> GetMeshElement();
-		void* Process(iDocumentNode*	element);
+		void *GetVertices() { return vertices; }
+		int GetNumVertexElements() { return numVertexElements; }
+		int GetNumberOfVertices() { return numberOfVertices; }
+		csColladaNumericType GetVertexType() { return vType; }
+		iString* GetName() { return name; }
+		iString* GetID() { return id; }
+		csTriangleMesh* GetTriangleMesh() { return triangles; } 
+		csRef<iDocumentNode> GetMeshElement() { return meshElement; }
+		void* Process(iDocumentNode* element);
 
 }; /* End of class csColladaMesh */
 

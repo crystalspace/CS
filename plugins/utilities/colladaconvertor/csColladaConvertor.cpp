@@ -441,7 +441,8 @@ bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
 	csRef<iDocumentNode> currentMeshElement;
 	csRef<iDocumentNode> currentVerticesElement;
 	//iString *idValue;
-	float* vertexArray;
+	float *vertexArray;
+	//int *normalArray;
 	//iStringArray *accessorArray;
 	int vertexArraySize = 0;
 	csColladaMesh *mesh;
@@ -507,15 +508,15 @@ bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
 			}
 
 			vertexArray = (float*)(mesh->GetVertices());
+//			normalArray = mesh->GetNormalIndices();
 			
 			if (warningsOn)
 			{
 				Report(CS_REPORTER_SEVERITY_NOTIFY, "Done");
 				Report(CS_REPORTER_SEVERITY_NOTIFY, "Getting number of vertices...");
 			}
-
 			
-			vertexArraySize = mesh->GetNumVertices();
+			vertexArraySize = mesh->GetNumVertexElements();
 
 			if (warningsOn)
 			{
@@ -566,8 +567,6 @@ bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
 			int accessorArraySize = 0;
 			csColladaAccessor *accessorArray = new csColladaAccessor(sourceElement, this);
 
-			//accessorArray = GetAccessorArray(sourceElement, accessorArraySize);
-			
 			while (counter < vertexArraySize)
 			{
 				if (warningsOn)
@@ -575,6 +574,7 @@ bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
 					Report(CS_REPORTER_SEVERITY_NOTIFY, "Adding the following vertex: %f, %f, %f", vertexArray[counter], vertexArray[counter+1], vertexArray[counter+2]);
 				}
 			
+				/* WRITE OUT VERTICES */
 				scfString formatter;
 				currentCrystalVElement = currentCrystalParamsElement->CreateNodeBefore(CS_NODE_ELEMENT, 0);
 				currentCrystalVElement->SetValue("v");
@@ -583,9 +583,50 @@ bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
 				formatter.Format("%f", vertexArray[counter+1]);
 				currentCrystalVElement->SetAttribute(accessorArray->Get(1), formatter.GetData());
 				formatter.Format("%f", vertexArray[counter+2]);
-				currentCrystalVElement->SetAttribute(accessorArray->Get(2), formatter.GetData()) ;
-				
+				currentCrystalVElement->SetAttribute(accessorArray->Get(2), formatter.GetData());
+				/* DONE WRITING OUT VERTICES */
+
 				counter = counter + 3;
+			}
+
+			if (warningsOn)
+			{
+				Report(CS_REPORTER_SEVERITY_NOTIFY, "Done adding vertices.");
+			}
+
+			// now, output the triangles
+			csTriangleMesh* currentTriMesh = mesh->GetTriangleMesh();
+			
+			size_t triCount = currentTriMesh->GetTriangleCount();
+			csTriangle* tris = currentTriMesh->GetTriangles();
+			size_t triCounter = 0;
+			csTriangle* currentTri;
+
+			while (triCounter < triCount)
+			{
+				currentTri = &tris[triCounter];
+
+				// create a t element
+				csRef<iDocumentNode> currentTElement = currentCrystalParamsElement->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+				
+				if (!currentTElement.IsValid())
+				{
+					if (warningsOn)
+					{
+						Report(CS_REPORTER_SEVERITY_NOTIFY, "Unable to add triangle element!");
+					}
+					
+					return false;
+				}
+
+				currentTElement->SetValue("t");
+
+				// get the vertices associated with this triangle
+				currentTElement->SetAttributeAsInt("v1", currentTri->a);
+				currentTElement->SetAttributeAsInt("v2", currentTri->b);
+				currentTElement->SetAttributeAsInt("v3", currentTri->c); 
+
+				triCounter++;
 			}
 
 			meshFactNode.Invalidate();
@@ -688,7 +729,6 @@ bool csColladaAccessor::Process(iDocumentNode* src)
 	csRef<iDocumentNode> currentAccessorElement;
 	csRef<iDocumentNode> currentParamsElement;
 	csRef<iDocumentNodeIterator> paramsIterator;
-	//iStringArray *retArray;
 
 	sourceElement = src;
 
@@ -753,7 +793,12 @@ const char* csColladaAccessor::Get(int index)
 csColladaMesh::csColladaMesh(iDocumentNode* element, csColladaConvertor* par)
 {
 	meshElement = element;
+	vertices = 0;
+//	normals = 0;
+	numberOfVertices = 0;
+	numVertexElements = 0;
 	parent = par;
+	triangles = new csTriangleMesh();
 	Process(meshElement);
 }
 
@@ -770,12 +815,12 @@ csColladaMesh::~csColladaMesh()
 	}
 
 	parent = 0;
-	numVertices = 0;
-}
+	numVertexElements = 0;
+	numberOfVertices = 0;
+	vertices = 0;
+//	normals = 0;
 
-csRef<iDocumentNode> csColladaMesh::GetMeshElement()
-{
-	return meshElement;
+	delete triangles;
 }
 
 csRef<iDocumentNode> csColladaMesh::FindNumericArray(const csRef<iDocumentNode>& node)
@@ -799,29 +844,61 @@ csRef<iDocumentNode> csColladaMesh::FindNumericArray(const csRef<iDocumentNode>&
 	}
 }
 
-iString* csColladaMesh::GetID()
+void csColladaMesh::SetVertexArray(iDocumentNode* numericArrayElement)
 {
-	return id;
-}
+	stringstream conver;
+	int countArray = numericArrayElement->GetAttributeValueAsInt("count");
+	std::string arrayElement(numericArrayElement->GetContentsValue());
+	
+	if (parent->warningsOn)
+	{
+		// check for string correctness
+		parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Current value of vertex array string: %s", arrayElement.c_str());
+	}
 
-void* csColladaMesh::GetVertices()
-{
-	return vertices;
-}
+	conver.str(arrayElement.c_str());
+	
+	if (vertices != 0)
+	{
+		delete[] vertices;
+		vertices = 0;
+	}
 
-int csColladaMesh::GetNumVertices()
-{
-	return numVertices;
-}
+	if (parent->warningsOn)
+	{
+		parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Assigning vertices to array...");
+	}
+	
+	if (vType == CS_COLLADA_INTEGER)
+	{
+		vertices = new int[countArray];
+		int temp;
+		int i = 0;
+		while (conver >> temp)
+		{
+			((int*)vertices)[i] = temp; 
+			i++;
+		}
+	}
 
-csColladaNumericType csColladaMesh::GetVertexType()
-{
-	return vType;
-}
-
-iString* csColladaMesh::GetName()
-{
-	return name;
+	else
+	{
+		vertices = new float[countArray];
+		float temp;
+		int i = 0;
+		while (conver >> temp)
+		{
+			((float*)vertices)[i] = temp; 
+			i++;
+		}
+	}
+	
+	for (int i = 0; i < numberOfVertices; i++)
+	{
+			triangles->AddVertex(((float*)vertices)[i]);
+			triangles->AddVertex(((float*)vertices)[i+1]);
+			triangles->AddVertex(((float*)vertices)[i+2]);
+	}
 }
 
 void* csColladaMesh::Process(iDocumentNode* element)
@@ -831,16 +908,14 @@ void* csColladaMesh::Process(iDocumentNode* element)
 	csRef<iDocumentNodeIterator> sourceElements;
 	csRef<iDocumentNode> currentNumericArrayElement;
 	csRef<iDocumentNode> currentSourceElement;
-	//csRef<iDocumentNode> currentMeshElement = verticesElement->GetParent();
 	std::string inputElementSemantic = "";
 	scfString positionSource = "";
-	//(*id) = 0;
-	//void* vertexArray = 0;
 
 	meshElement = element;
 
 	// a sanity check, in the event someone tries to do something foolish
-	numVertices = 0;
+	numberOfVertices = 0;
+	numVertexElements = 0;
 
 	// find <input> child element of currentVerticesElement with
 	// attribute semantic="POSITION" and store this element as positionElement
@@ -869,30 +944,14 @@ void* csColladaMesh::Process(iDocumentNode* element)
 	sourceElements = meshElement->GetNodes("source");
 	while (sourceElements->HasNext())
 	{
-/*		
-		if (!((*id) == 0))
-		{
-			delete (*id);
-		}
-*/
 		currentSourceElement = sourceElements->Next();
 		
 		name = new scfString(currentSourceElement->GetParent()->GetParent()->GetAttribute("id")->GetValue());
 
 		id = new scfString(currentSourceElement->GetAttribute("id")->GetValue());
-//		id = new scfString(attrib->GetValue());
-/*
-		if (warningsOn)
-		{
-			Report(CS_REPORTER_SEVERITY_NOTIFY, "attrib is: %s", attrib->GetName()); 
-			Report(CS_REPORTER_SEVERITY_NOTIFY, "id is: %s", (*id)->GetData());
-			Report(CS_REPORTER_SEVERITY_NOTIFY, "positionSource is: %s", positionSource.GetData()); 
-		}
-*/
 
 		if (id->Compare(&positionSource))
 		{
-			//parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Breaking...");
 			break;
 		}
 
@@ -913,74 +972,111 @@ void* csColladaMesh::Process(iDocumentNode* element)
 	
 	stringstream conver(currentNumericArrayElement->GetAttribute("count")->GetValue());
 
-	conver >> numVertices;
+	conver >> numVertexElements;
+	numberOfVertices = numVertexElements/3;
 
 	if (parent->warningsOn)
 	{
-		/*
-		std::string notifyMsg = "Numeric array found.  Type: ";
-		notifyMsg.append(currentNumericArrayElement->GetValue());
-		notifyMsg.append(", Count: ");
-		notifyMsg.append(countElements);
-		*/
-		parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Numeric array found.  Type: %s, Number of elements: %d", currentNumericArrayElement->GetValue(), numVertices);
+		parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Numeric array found.  Type: %s, Number of elements: %d", currentNumericArrayElement->GetValue(), numVertexElements);
 	}
 
-	std::string arrayElement(currentNumericArrayElement->GetContentsValue());
-	
-	if (parent->warningsOn)
-	{
-		// check for string correctness
-		parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Current value of vertex array string: %s", arrayElement.c_str());
-	}
-
-	conver.clear();
-	conver.str(arrayElement.c_str());
-	
-	if (parent->warningsOn)
-	{
-		parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Assigning vertices to array...");
-	}
-	
-	if (vType == CS_COLLADA_INTEGER)
-	{
-		vertices = new int[numVertices];
-		int temp;
-		int i = 0;
-		while (conver >> temp)
-		{
-			((int*)vertices)[i] = temp; 
-			i++;
-		}
-	}
-
-	else
-	{
-		vertices = new float[numVertices];
-		float temp;
-		int i = 0;
-		while (conver >> temp)
-		{
-	
-			((float*)vertices)[i] = temp; 
-			i++;
-		}
-	}
+	SetVertexArray(currentNumericArrayElement);
 
 	if (parent->warningsOn)
 	{
 		parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Done.");
 	}
 
+	if (parent->warningsOn)
+	{
+		parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Converting triangle elements to objects...");
+	}
+
+	csRef<iDocumentNodeIterator> triangleMeshes = element->GetNodes("triangles");
+	csRef<iDocumentNode> nextTrianglesElement;
+	csRef<iDocumentNode> nextPElement;
+
+	if (parent->warningsOn)
+	{
+		parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Number of vertices/normals: %d", numberOfVertices);
+	}
+
+	while (triangleMeshes->HasNext())
+	{
+		nextTrianglesElement = triangleMeshes->Next();
+		
+		/* BEGIN TRIANGLE PROCESSING */
+
+		// get number of triangles in the mesh
+		int numTris = nextTrianglesElement->GetAttributeValueAsInt("count");
+		
+		// get next p element
+		nextPElement = nextTrianglesElement->GetNode("p");
+		
+		if (!nextPElement.IsValid())
+		{
+			if (parent->warningsOn)
+			{
+				parent->Report(CS_REPORTER_SEVERITY_WARNING, "Unable to access <p> element of <triangles> element.");
+			}
+
+			return false;
+		}
+		
+		// find the offset of the normals and vertices
+		csRef<iDocumentNodeIterator> inputElements = nextTrianglesElement->GetNodes("input");
+		csRef<iDocumentNode> currentInputElement;
+		size_t vertexOffset, normalOffset;
+		int counter = 0;
+
+		while (inputElements->HasNext())
+		{
+			currentInputElement = inputElements->Next();
+			scfString semVal(currentInputElement->GetAttributeValue("semantic"));
+			if (semVal.Compare("NORMAL"))
+			{
+				normalOffset = counter;
+			}
+			else if (semVal.Compare("VERTEX"))
+			{
+				vertexOffset = counter;
+			}
+
+			counter++;
+		}
+		
+		if (parent->warningsOn)
+		{
+			parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Vertex offset is: %d, Normal offset is: %d", vertexOffset, normalOffset);
+		}
+
+		stringstream vertexConvertor(nextPElement->GetContentsValue());
+
+		int triCounter = 0;
+
+		int *linearList = new int[numTris * counter*3];
+		for (int x = 0; x < 3*numTris*counter; x++)
+		{
+			vertexConvertor >> linearList[x];
+		}
+
+		while (triCounter < numTris)
+		{
+			int vertex1, vertex2, vertex3;
+			vertex1 = linearList[3*triCounter*counter+vertexOffset];
+			vertex2 = linearList[3*triCounter*counter+counter+vertexOffset];
+			vertex3 = linearList[3*triCounter*counter + 2*counter + vertexOffset];
+			triangles->AddTriangle(vertex1, vertex2, vertex3);
+
+			triCounter++;
+    }
+
+	delete[] linearList;
+		/* END TRIANGLE PROCESSING */
+	}
+
 	return vertices;
-	//Report(CS_REPORTER_SEVERITY_WARNING, "First element of vertexArray: %f", vertexArray[0]);
-}
-
-bool csColladaSimplePolygon::Process(iDocumentNode* element)
-{
-	// element should represent a <p> or <ph> node
-	return true;
-}
-
+	
+	}
 }
 CS_PLUGIN_NAMESPACE_END(ColladaConvertor)

@@ -58,6 +58,9 @@ bool Tri3DTest::OnInitialize(int argc, char* argv[])
 		engine = csQueryRegistry<iEngine> (GetObjectRegistry());
 		if (!engine) return ReportError("Failed to locate 3D engine!");
 
+		report = csQueryRegistry<iReporter> (GetObjectRegistry());
+		if (!report) return ReportError("Unable to load reporter!");
+
   return true;
 }
 
@@ -67,30 +70,34 @@ bool Tri3DTest::Application()
 		return ReportError("Error: Unable to fetch Object Registry!");
 	
 	csContour3 polygon;
-	csVector3 point1(10, 0, 10);
-	csVector3 point2(-10, 0, 10);
-	csVector3 point3(10, 10, 0);
-	csVector3 point4(-10, 10, 0);
-	csVector3 point5(10, 0, -10);
-	csVector3 point6(-10, 0, -10);
+	csVector3 point1(10.0, 0, 0);
+	csVector3 point2(0, 10.0, 0);
+	csVector3 point3(-10.0, 0, 0);
+	csVector3 point4(0, -10.0, 0);
+	csVector3 point5(0, 0, 0);
+	//csVector3 point6(-10, 0, -10);
 
-	polygon.Push(point1);
-	polygon.Push(point2);
-	polygon.Push(point3);
-	polygon.Push(point4);
-	polygon.Push(point5);
-	polygon.Push(point6);
+	polygon.Insert(0, point1);
+	polygon.Insert(1, point2);
+	polygon.Insert(2, point3);
+	polygon.Insert(3, point4);
+	polygon.Insert(4, point5);
+	//polygon.Push(point6);
 
 	csContour3 result_vertices;
 	csTriangleMesh result;
 
-	Triangulate3D::Process(polygon, result, result_vertices);
+	Triangulate3D::Process(polygon, result, report);
 
 	view.AttachNew(new csView (engine, g3d));
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle(0, 0, g2d->GetWidth(), g2d->GetHeight ());
 
 	//csTriangle tri = result.GetTriangle(0);
+
+	size_t numTris = result.GetTriangleCount();
+
+	ReportWarning("Number of Triangles: %d", numTris);
 
 	Run();
 
