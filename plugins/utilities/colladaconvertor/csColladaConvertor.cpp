@@ -371,7 +371,7 @@ bool csColladaConvertor::InitializeCrystalSpaceDocument()
 
 // =============== Basic Utility Functions ===============
 
-
+// None, anymore ;)
 
 
 // =============== Conversion Functions ===============
@@ -508,7 +508,6 @@ bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
 			}
 
 			vertexArray = (float*)(mesh->GetVertices());
-//			normalArray = mesh->GetNormalIndices();
 			
 			if (warningsOn)
 			{
@@ -549,9 +548,13 @@ bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
 			}
 		
 			csRef<iDocumentNode> meshFactNode = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-			meshFactNode->SetValue("meshFact");
+			meshFactNode->SetValue("meshfact");
 			meshFactNode->SetAttribute("name", mesh->GetName()->GetData());
-			
+			csRef<iDocumentNode> pluginNode = meshFactNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+			pluginNode->SetValue("plugin");
+			csRef<iDocumentNode> pluginContents = pluginNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+			pluginContents->SetValue(mesh->GetPluginType()->GetData());
+
 			if (warningsOn)
 			{
 				Report(CS_REPORTER_SEVERITY_NOTIFY, "MeshFact element created.  Creating params element");
@@ -777,7 +780,9 @@ bool csColladaAccessor::Process(iDocumentNode* src)
 		currentParamsElement = paramsIterator->Next();
 		
 		// retrieve name of current element
-		accessorNames->Push(currentParamsElement->GetAttributeValue("name"));
+		scfString currentName(currentParamsElement->GetAttributeValue("name"));
+		currentName.Downcase();
+		accessorNames->Push(currentName);
 	}
 
 	return 1;
@@ -793,6 +798,7 @@ const char* csColladaAccessor::Get(int index)
 csColladaMesh::csColladaMesh(iDocumentNode* element, csColladaConvertor* par)
 {
 	meshElement = element;
+	pluginType = new scfString(CS_COLLADA_DEFAULT_MESH_PLUGIN_TYPE);
 	vertices = 0;
 //	normals = 0;
 	numberOfVertices = 0;

@@ -35,6 +35,9 @@
 CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 {
 
+/// The default type for mesh <plugin> tags
+#define CS_COLLADA_DEFAULT_MESH_PLUGIN_TYPE "crystalspace.mesh.loader.factory.genmesh"
+
 /**	
  * This	class	implements the iColladaConvertor interface.	 It	is used	as a conversion	utility
  * between files in	the	COLLADA	digital	interchange	format,	and	Crystal	Space	Library	and/or
@@ -217,6 +220,7 @@ class	csColladaMesh	{
 		csRef<iDocumentNode> meshElement;
 		csColladaAccessor	vAccess;
 		csColladaNumericType vType;
+		iString *pluginType;  // the type of plugin we're using (default = genmeshfact)
 
 		csTriangleMesh* triangles;
 
@@ -259,6 +263,7 @@ class	csColladaMesh	{
 		csColladaNumericType GetVertexType() { return vType; }
 		iString* GetName() { return name; }
 		iString* GetID() { return id; }
+		iString* GetPluginType() { return pluginType; }
 		csTriangleMesh* GetTriangleMesh() { return triangles; } 
 		csRef<iDocumentNode> GetMeshElement() { return meshElement; }
 		void* Process(iDocumentNode* element);

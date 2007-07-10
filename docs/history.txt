@@ -10,6 +10,9 @@ chronological order.
 	- jwir3 got triangle conversion working correctly in csColladaConvertor.  All COLLADA
 	  <triangles> elements are now able to be converted to CS format.  The vertex normals 
 	  have not yet been converted, but this will happen soon.
+	- jwir3 modified the conversion code so that the XML parameters were all lowercase (e.g.
+	  'meshfact' instead of 'meshFact'.  Also added a <plugin> tag, in the hopes that things
+	  could be visible.
 9-Jul-2007
 	- jwir3 made a change to iutil/document.h so that the list under position querying
 	  outputs correctly in Doxygen. 
