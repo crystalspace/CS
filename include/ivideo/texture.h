@@ -88,7 +88,7 @@ struct iTextureHandle : public virtual iBase
 
   // CHANGED TO ADD SUPPORT FOR CUBEMAPS AND 3D TEXTURES
   // done by Phil Aumayr (phil@rarebyte.com)
-  enum CS_DEPRECATED_TYPE
+  enum //CS_DEPRECATED_TYPE
   { 
     CS_TEX_IMG_1D = 0, 
     CS_TEX_IMG_2D, 

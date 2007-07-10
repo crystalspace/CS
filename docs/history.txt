@@ -6,6 +6,9 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Jul-2007
+	- Jorrit unbreaks CS on mingw by commenting the CS_DEPRECATED_TYPE
+	  after the CS_TEX_IMG enum.
 9-Jul-2007
 	- res made the following changes to csList<>:
 	    - Added ability to specify custom memory allocator.
