@@ -485,6 +485,8 @@ MAX_RELEASE_CHECK_RATE   default: 255 unless not HAVE_MMAP
 #include "dlmalloc-settings.h"
 /*****  CS SPECIFIC SETTINGS END HERE  *****/
 
+#define _GNU_SOURCE /* Use GNU extensions on linux, for mremap */
+
 #ifndef WIN32
 #ifdef _WIN32
 #define WIN32 1
