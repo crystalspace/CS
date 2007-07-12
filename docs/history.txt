@@ -6,6 +6,14 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Jul-2007
+	- Jorrit fixed a rather big bug in
+	  csKeyEventHelper::GetModifiersBits(). It was declared using
+	  CS_CONST_METHOD but that is wrong in this case since that function
+	  takes a reference to a modifier (which it modifies). This bug
+	  caused celconsole in CEL to misbehave in release mode due to the
+	  second call to this method being optimized away wrongly by
+	  the compiler.
 11-Jul-2007
         - Mike Gist added a #define to enable GNU C extensions in dlmalloc.
 10-Jul-2007
