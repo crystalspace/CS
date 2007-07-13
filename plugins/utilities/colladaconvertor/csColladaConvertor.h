@@ -154,8 +154,8 @@ class	csColladaConvertor : public	scfImplementation2<csColladaConvertor,iCollada
 		virtual	const	char*	Load(iFile *file);
 		virtual	const	char*	Load(iDataBuffer *db);
 
-		csRef<iDocument> GetCrystalDocument();
-		csRef<iDocument> GetColladaDocument();
+		csRef<iDocument> GetCrystalDocument() { return csFile; }
+		csRef<iDocument> GetColladaDocument() { return colladaFile; }
 
 		virtual	const	char*	Write(const	char*	filepath);
 		virtual	const	char*	SetOutputFiletype(csColladaFileType	filetype);
@@ -164,7 +164,7 @@ class	csColladaConvertor : public	scfImplementation2<csColladaConvertor,iCollada
 
 		virtual	const	char*	Convert();
 		virtual	bool ConvertGeometry(iDocumentNode *geometrySection);
-		virtual	bool ConvertLighting(iDocumentNode *lightingSection);
+		virtual	bool ConvertMaterials(iDocumentNode *materialsSection);
 		virtual	bool ConvertTextureShading(iDocumentNode *textureSection);
 		virtual	bool ConvertRiggingAnimation(iDocumentNode *riggingSection);
 		virtual	bool ConvertPhysics(iDocumentNode	*physicsSection);
@@ -183,92 +183,6 @@ class	csColladaConvertor : public	scfImplementation2<csColladaConvertor,iCollada
 		csRef<iDocumentNode> GetSourceElement(const	char*	name,	iDocumentNode* parent);
 
 }; /* End of class csColladaConvertor */
-
-// =============== Auxiliary Classes ===============
-
-class	csColladaAccessor	{
-	private:
-		csRef<iDocumentNode> sourceElement;
-		csColladaConvertor *parent;
-		int	stride;
-		int	count;
-		iStringArray *accessorNames;
-
-	public:
-		csColladaAccessor();
-		csColladaAccessor(iDocumentNode* source, csColladaConvertor* parent);
-
-		int GetStride();
-		int GetCount();
-		iStringArray* GetAccessorNames();
-		csColladaConvertor* GetParent();
-		csRef<iDocumentNode> GetSourceElement();
-		bool Process(iDocumentNode* src);
-		const char* Get(int index);
-
-}; /* End of class csColladaAccessor */
-
-class	csColladaMesh	{
-
-	private:
-		csColladaConvertor* parent;
-		void *vertices; // a list of vertex components (x, y, z)
-		int numberOfVertices;  // number of vertices in the mesh
-		int numVertexElements; // the number of vertex components (3* numberOfVertices)
-		iString	*name;  // what the polygon is actually called
-		iString *id;    // what the position ID is
-		csRef<iDocumentNode> meshElement;
-		csColladaAccessor	vAccess;
-		csColladaNumericType vType;
-		iString *pluginType;  // the type of plugin we're using (default = genmeshfact)
-
-		csTriangleMesh* triangles;
-
-		/**	\brief Find	the	next numeric array element
-		 *
-		 * Finds a child numeric array node	within a given node.	This function	will
-		 * attempt to	find one of:
-		 *	-	<float_array>
-		 *	-	<int_array>
-		 * within	the	current	node.
-		 *
-		 * \param	node The current node	to be	searched.	Typically, this	will be	a	<source> node.
-		 *						 This	restriction	is not absolutely	enforced,	but	this function	will not 
-		 *						 return	anything unless	this is	a	<source> node, since no	other	nodes	
-		 *						 will	contain	one	of the aforementioned	array	nodes.
-		 * \returns		 The array node, as	a	smart	pointer	to an	iDocumentNode, if	successful;
-		 *						 otherwise,	an invalid smart pointer.	 Use csRef<>::IsValid()	to check for
-		 *						 validity.
-		 */
-		csRef<iDocumentNode> FindNumericArray(const	csRef<iDocumentNode>&	node);
-
-		/** \brief Sets the vertex and normal arrays
-		 * 
-		 * Retrieves values from the given numeric array element in the COLLADA document
-		 * and places them in the vertex and normal arrays for the mesh object.  This also
-		 * sets the vertices for the csTriangleMesh object.
-		 *
-		 * @param numericArrayElement A pointer to the XML element which contains the numeric (int
-		 *                            or float) array.
-		 */
-		void SetVertexArray(iDocumentNode* numericArrayElement); 
-
-	public:
-		csColladaMesh(iDocumentNode* element, csColladaConvertor* parent);
-		~csColladaMesh();
-
-		void *GetVertices() { return vertices; }
-		int GetNumVertexElements() { return numVertexElements; }
-		int GetNumberOfVertices() { return numberOfVertices; }
-		csColladaNumericType GetVertexType() { return vType; }
-		iString* GetName() { return name; }
-		iString* GetID() { return id; }
-		iString* GetPluginType() { return pluginType; }
-		csTriangleMesh* GetTriangleMesh() { return triangles; } 
-		csRef<iDocumentNode> GetMeshElement() { return meshElement; }
-		void* Process(iDocumentNode* element);
-
-}; /* End of class csColladaMesh */
 
 
 } /* End of ColladaConvertor namespace */

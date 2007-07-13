@@ -70,19 +70,19 @@ bool Tri3DTest::Application()
 		return ReportError("Error: Unable to fetch Object Registry!");
 	
 	csContour3 polygon;
-	csVector3 point1(10.0, 0, 0);
-	csVector3 point2(0, 10.0, 0);
-	csVector3 point3(-10.0, 0, 0);
-	csVector3 point4(0, -10.0, 0);
-	csVector3 point5(0, 0, 0);
-	//csVector3 point6(-10, 0, -10);
+	csVector3 point1(0, 10.0, 10.0);
+	csVector3 point2(0, -10.0, 10.0);
+	csVector3 point3(0.0, -10.0, -10.0);
+	csVector3 point4(20.0, 5.0, -10.0);
+	csVector3 point5(10.0, 0.0, -10.0);
+	csVector3 point6(0, 10.0, -10.0);
 
 	polygon.Insert(0, point1);
 	polygon.Insert(1, point2);
 	polygon.Insert(2, point3);
 	polygon.Insert(3, point4);
 	polygon.Insert(4, point5);
-	//polygon.Push(point6);
+	polygon.Insert(5, point6);
 
 	csContour3 result_vertices;
 	csTriangleMesh result;

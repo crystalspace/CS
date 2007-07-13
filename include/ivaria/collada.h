@@ -19,13 +19,6 @@
 #ifndef _CS_IVARIA_COLLADA_H
 #define _CS_IVARIA_COLLADA_H
 
-/* These aren't needed - just forward declarations
-#include <iutil/string.h>
-#include <iutil/document.h>
-#include <iutil/vfs.h>
-#include <iutil/databuff.h>
-*/
-
 #include <csutil/scf.h>
 #include <csutil/scf_implementation.h>
 

@@ -64,7 +64,7 @@ namespace Geom
 		while (!potentialEarIndices.IsEmpty())
 		{
 			// remove the next ear
-			size_t nextEar = potentialEarIndices.Pop();
+			int nextEar = (int)potentialEarIndices.Pop();
 
 /*  Old code to make it more like Triangulate2
 			result_vertices.Push(polygon[nextEar]);
@@ -126,9 +126,9 @@ namespace Geom
 
 	bool Triangulate3D::FindVertexGroups(csContour3& poly, csContour3& reflex, csContour3& convex, csArray<size_t>& ears)
 	{
-		size_t length = poly.GetSize();
+		int length = (int)poly.GetSize();
 
-		for (size_t x = 0; x < length; x++)
+		for (int x = 0; x < length; x++)
 		{
 			if (!IsConvex(poly, x))
 			{
@@ -164,44 +164,43 @@ namespace Geom
 		return true;
 	}
 
-	bool Triangulate3D::IsConvex(const csContour3& polygon, const size_t index)
+	bool Triangulate3D::IsConvex(const csContour3& polygon, const int index)
 	{
-			size_t polyLength = polygon.GetSize();
+		int polyLength = (int)polygon.GetSize();
+		int nextIndex = (index+1)%polyLength;
+		int prevIndex = (index-1);
+		
+		while (prevIndex < 0)
+		{
+			prevIndex += polyLength;
+		}
 
-			// determine the angle between the consecutive vectors
-			csVector3 temp1(polygon[index].x + polygon[(index+1)%polyLength].x, polygon[index].y + polygon[(index+1)%polyLength].y, polygon[index].z + polygon[(index+1)%polyLength].z);
-			csVector3 temp2(polygon[index].x + polygon[(index-1)%polyLength].x, polygon[index].y + polygon[(index-1)%polyLength].y, polygon[index].z + polygon[(index-1)%polyLength].z);
-//			temp2 = -temp2;
+		prevIndex = prevIndex%polyLength;
+		
+		report->Report(CS_REPORTER_SEVERITY_WARNING, "crystalspace.Triangulate3D", "polyLength: %d, index: %d, index+1mod: %d, index-1mod: %d", polyLength, index, nextIndex, prevIndex);
 
-			float normalDir;
-			if ((temp2%temp1).Norm() > 0)
-			{
-				return true;
-			}
+		csPlane3 plane(polygon[index], polygon[nextIndex], polygon[prevIndex]);
 
-			else
-			{
-				return false;
-			}
+		// detect clockwise movement, and invert plane in that case
+		
 
-/*
-			float dotProd = temp2*temp1;
-			float length1 = csVector3::Norm(temp1);
-			float length2 = csVector3::Norm(temp2);
-			float angle = dotProd/length1;
-			angle = angle/length2;
-			angle = acos(angle);
-			angle = angle*(180.0/PI);
+		csVector3 temp1 = polygon[index] - polygon[nextIndex];
+		csVector3 temp2 = polygon[index] - polygon[prevIndex];
 
-			if (angle < 180.0)
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-	*/
+		csVector3 crossProd = temp1%temp2;
+		csVector3 crossAtVert = crossProd + polygon[index];
+		
+		float indicator = plane.Classify(crossAtVert);
+		if (indicator > 0)
+		{
+			return true;
+		}
+
+		else
+		{
+			return false;
+		}
+	
 	}
 
 	bool Triangulate3D::IsContained(const csVector3& testVertex, const csVector3& a, const csVector3& b, const csVector3& c)

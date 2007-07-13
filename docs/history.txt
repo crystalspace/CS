@@ -6,6 +6,12 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Jul-2007
+	- jwir3 separated a bunch of auxiliary classes from csColladaConvertor.cpp to csColladaClasses
+	  to make it easier to work with.  
+	- jwir3 attempted to get csgeom/triangulate3d.cpp working, but to no avail.
+	- jwir3 changed csColladaConvertor::ConvertLighting() to ConvertMaterials().
+	- jwir3 began implementing ConvertMaterials.
 10-Jul-2007
 	- jwir3 got triangle conversion working correctly in csColladaConvertor.  All COLLADA
 	  <triangles> elements are now able to be converted to CS format.  The vertex normals 
