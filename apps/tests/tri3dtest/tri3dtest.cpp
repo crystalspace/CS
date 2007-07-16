@@ -68,7 +68,8 @@ bool Tri3DTest::Application()
 {
 	if (!OpenApplication(GetObjectRegistry()))
 		return ReportError("Error: Unable to fetch Object Registry!");
-	
+
+	/* Old Testing Code -- Will be reinserted later
 	csContour3 polygon;
 	csVector3 point1(0, 10.0, 10.0);
 	csVector3 point2(0, -10.0, 10.0);
@@ -88,6 +89,67 @@ bool Tri3DTest::Application()
 	csTriangleMesh result;
 
 	Triangulate3D::Process(polygon, result, report);
+	*/
+
+	/* Testing Code for new addition to csTriangleMesh: AddTriangleMesh()
+
+	csTriangleMesh mesh1, mesh2;
+	csVector3 *verts1, *verts2;
+	csTriangle *tris1, *tris2;
+
+	mesh1.AddVertex(csVector3(0.0, 0.0, 0.0));
+	mesh1.AddVertex(csVector3(1.0, 1.0, 1.0));
+	mesh1.AddVertex(csVector3(2.0, 2.0, 2.0));
+	mesh1.AddTriangle(0, 1, 2);
+
+	verts1 = mesh1.GetVertices();
+	tris1 = mesh1.GetTriangles();
+
+	mesh2.AddVertex(csVector3(11.0, 11.0, 11.0));
+	mesh2.AddVertex(csVector3(15.0, 15.0, 15.0));
+	mesh2.AddVertex(csVector3(20.0, 20.0, 20.0));
+	mesh2.AddTriangle(0, 1, 2);
+	
+	verts2 = mesh2.GetVertices();
+	tris2 = mesh2.GetTriangles();
+
+	ReportWarning("Mesh 1 contains %d vertices.  Mesh 2 contains %d vertices", mesh1.GetVertexCount(), mesh2.GetVertexCount());
+	ReportWarning("Mesh 1 contains %d triangles.  Mesh 2 contains %d triangles", mesh1.GetTriangleCount(), mesh2.GetTriangleCount());
+
+	for (int i = 0; i < (int)mesh1.GetVertexCount(); i++)
+	{
+		ReportWarning("Mesh 1 vertex number %d: (%f, %f, %f)", i, verts1[i].x, verts1[i].y, verts1[i].z);
+	}
+	
+	for (int i = 0; i < (int)mesh2.GetVertexCount(); i++)
+	{
+		ReportWarning("Mesh 2 vertex number %d: (%f, %f, %f)", i, verts2[i].x, verts2[i].y, verts2[i].z);
+	}
+
+	for (int i = 0; i < (int)mesh1.GetTriangleCount(); i++)
+	{
+		ReportWarning("Mesh 1 Triangle number %d connects vertices %d, %d, and %d", i, tris1[i].a, tris1[i].b, tris1[i].c);
+	}
+
+	for (int i = 0; i < (int)mesh2.GetTriangleCount(); i++)
+	{
+		ReportWarning("Mesh 2 Triangle number %d connects vertices %d, %d, and %d", i, tris2[i].a, tris2[i].b, tris2[i].c);
+	}
+
+	ReportWarning("Merging mesh 1 into mesh2...");
+
+	mesh2.AddTriangleMesh(mesh1);
+	
+	for (int i = 0; i < (int)mesh2.GetVertexCount(); i++)
+	{
+		ReportWarning("Mesh 2 vertex number %d: (%f, %f, %f)", i, verts2[i].x, verts2[i].y, verts2[i].z);
+	}
+
+	for (int i = 0; i < (int)mesh2.GetTriangleCount(); i++)
+	{
+		ReportWarning("Mesh 2 Triangle number %d connects vertices %d, %d, and %d", i, tris2[i].a, tris2[i].b, tris2[i].c);
+	}
+	*/
 
 	view.AttachNew(new csView (engine, g3d));
   iGraphics2D* g2d = g3d->GetDriver2D ();
@@ -95,9 +157,9 @@ bool Tri3DTest::Application()
 
 	//csTriangle tri = result.GetTriangle(0);
 
-	size_t numTris = result.GetTriangleCount();
+	//size_t numTris = result.GetTriangleCount();
 
-	ReportWarning("Number of Triangles: %d", numTris);
+	//ReportWarning("Number of Triangles: %d", numTris);
 
 	Run();
 

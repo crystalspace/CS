@@ -75,6 +75,8 @@ public:
 
   /// Add a triangle to the mesh.
   void AddTriangle (int a, int b, int c);
+	/// Add another triangle mesh to this one.
+	void AddTriangleMesh(const csTriangleMesh& tm);
   /// Query the array of triangles.
   virtual csTriangle* GetTriangles () { return triangles.GetArray (); }
   /// Query the array of triangles.

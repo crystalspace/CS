@@ -2,7 +2,7 @@
 <!--FILE GENERATED AUTOMATICALLY - DO NOT EDIT-->
 <library>
     <meshfact name="Plane-Geometry">
-        <plugin>crystalspace.mesh.loader.factory.thing</plugin>
+        <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
         <params>
             <v x="3.435410" y="3.435410" z="0.000000" />
             <v x="3.435410" y="-3.435410" z="0.000000" />

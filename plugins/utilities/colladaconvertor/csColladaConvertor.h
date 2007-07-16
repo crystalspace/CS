@@ -54,7 +54,7 @@ class	csColladaConvertor : public	scfImplementation2<csColladaConvertor,iCollada
 
 	private:
 		
-		// =============== System	Attributes ===============
+		// =============== Conversion System	Attributes ===============
 
 		///	A	smart	pointer	to the document	system
 		iDocumentSystem* docSys;
@@ -67,11 +67,6 @@ class	csColladaConvertor : public	scfImplementation2<csColladaConvertor,iCollada
 
 		///	A	pointer	to the object	registry
 		iObjectRegistry* obj_reg;
-
-		/**
-		 * Report	various	things back	to the application
-		 */
-		void Report(int	severity,	const	char*	msg, ...);
 
 
 		// =============== Crystal Space Attributes	===============
@@ -99,6 +94,43 @@ class	csColladaConvertor : public	scfImplementation2<csColladaConvertor,iCollada
 		///	A	smart	pointer	to the <COLLADA> element
 		csRef<iDocumentNode> colladaElement;
 
+		// =============== Basic Utility Functions ===============
+	public:
+		
+		/**
+		 * Initializes the plugin.
+		 * 
+		 * \warning	This will	reload the iDocumentSystem interface so	that it	uses the TinyXML
+		 *					plugin as	an implementation.
+		 */
+		virtual	bool Initialize	(iObjectRegistry*);
+		
+		/**
+		 * \brief	Initialization routine for the output	document.
+		 *
+		 * Constructs	a	new	Crystal	Space	document.	 This	function requires	that 
+		 * SetOutputFileType(csColladaFileType filetype) has already been	called.
+		 * 
+		 * \returns	true,	if initialization	went ok; false otherwise
+		 */
+		bool InitializeCrystalSpaceDocument();
+
+	// =============== Error Reporting and Handling Functions ===============
+		/**
+		 * Report	various	things back	to the application
+		 */
+		void Report(int	severity,	const	char*	msg, ...);
+		
+		/**
+		 * Turn	debugging	warnings on	or off.	 This	will turn	on all possible	debug	information	for	the	
+		 * plugin.	It also	will check to	verify that	files	and	data structures	conform	to specified standards.
+		 *
+		 * \param	toggle If	true,	turns	on debug warnings.
+		 * 
+		 * \notes	Debug	warnings are off by	default.
+		 */
+		void SetWarnings(bool	toggle);
+
 		/**
 		 * Checks	for	validity of	the	file name	to see if	it conforms	to COLLADA standards.
 		 */
@@ -111,64 +143,12 @@ class	csColladaConvertor : public	scfImplementation2<csColladaConvertor,iCollada
 		 * @todo Add some	abilities	to validate	the	XML.
 		 */
 		const	char*	CheckColladaValidity(iFile *file);
-
-		/**
-		 * \brief	Initialization routine for the output	document.
-		 *
-		 * Constructs	a	new	Crystal	Space	document.	 This	function requires	that 
-		 * SetOutputFileType(csColladaFileType filetype) has already been	called.
-		 * 
-		 * \returns	true,	if initialization	went ok; false otherwise
-		 */
-		bool InitializeCrystalSpaceDocument();
-
-		// =============== Basic Utility Functions ===============
-	public:
-
-		///	Constructor
-		csColladaConvertor(iBase*	parent);
-
-		///	Destructor
-		virtual	~csColladaConvertor();
-
-		/**
-		 * Initializes the plugin.
-		 * 
-		 * \warning	This will	reload the iDocumentSystem interface so	that it	uses the TinyXML
-		 *					plugin as	an implementation.
-		 */
-		virtual	bool Initialize	(iObjectRegistry*);
 		
-		/**
-		 * Turn	debugging	warnings on	or off.	 This	will turn	on all possible	debug	information	for	the	
-		 * plugin.	It also	will check to	verify that	files	and	data structures	conform	to specified standards.
-		 *
-		 * \param	toggle If	true,	turns	on debug warnings.
-		 * 
-		 * \notes	Debug	warnings are off by	default.
-		 */
-		void SetWarnings(bool	toggle);
-
-		virtual	const	char*	Load(const char	*str);
-		virtual	const	char*	Load(iString *str);	
-		virtual	const	char*	Load(iFile *file);
-		virtual	const	char*	Load(iDataBuffer *db);
+		// =============== Accessor Functions =============== 
 
 		csRef<iDocument> GetCrystalDocument() { return csFile; }
 		csRef<iDocument> GetColladaDocument() { return colladaFile; }
-
-		virtual	const	char*	Write(const	char*	filepath);
-		virtual	const	char*	SetOutputFiletype(csColladaFileType	filetype);
-		
-		// =============== Conversion	Functions	===============
-
-		virtual	const	char*	Convert();
-		virtual	bool ConvertGeometry(iDocumentNode *geometrySection);
-		virtual	bool ConvertMaterials(iDocumentNode *materialsSection);
-		virtual	bool ConvertTextureShading(iDocumentNode *textureSection);
-		virtual	bool ConvertRiggingAnimation(iDocumentNode *riggingSection);
-		virtual	bool ConvertPhysics(iDocumentNode	*physicsSection);
-
+	
 	private:
 
 	 /** \brief	Returns	a	<source> element
@@ -181,6 +161,39 @@ class	csColladaConvertor : public	scfImplementation2<csColladaConvertor,iCollada
 		*	\returns The source	element	associated with	given	element.
 		*/
 		csRef<iDocumentNode> GetSourceElement(const	char*	name,	iDocumentNode* parent);
+	
+	public:
+
+		// =============== Mutator Functions =============== 
+
+		virtual	const	char*	SetOutputFiletype(csColladaFileType	filetype);
+/*	
+	private:	
+		virtual bool AddVerticesToCSDocument(
+		
+		// =============== Normal Class Functions =============== 
+	public:
+*/
+		///	Constructor
+		csColladaConvertor(iBase*	parent);
+
+		///	Destructor
+		virtual	~csColladaConvertor();
+		
+		virtual	const	char*	Load(const char	*str);
+		virtual	const	char*	Load(iString *str);	
+		virtual	const	char*	Load(iFile *file);
+		virtual	const	char*	Load(iDataBuffer *db);
+	  virtual	const	char*	Write(const	char*	filepath);
+		
+		// =============== Conversion	Functions	===============
+
+		virtual	const	char*	Convert();
+		virtual	bool ConvertGeometry(iDocumentNode *geometrySection);
+		virtual	bool ConvertMaterials(iDocumentNode *materialsSection);
+		virtual	bool ConvertTextureShading(iDocumentNode *textureSection);
+		virtual	bool ConvertRiggingAnimation(iDocumentNode *riggingSection);
+		virtual	bool ConvertPhysics(iDocumentNode	*physicsSection);
 
 }; /* End of class csColladaConvertor */
 

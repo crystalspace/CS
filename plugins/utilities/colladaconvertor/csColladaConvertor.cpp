@@ -37,8 +37,7 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 
 SCF_IMPLEMENT_FACTORY(csColladaConvertor)
 
-// =============== Error Reporting and Handling ===============
-
+// =============== Error Reporting and Handling Functions ===============
 void csColladaConvertor::Report(int severity, const char* msg, ...)
 {
 	va_list argList;
@@ -394,8 +393,9 @@ bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
 	csRef<iDocumentNodeIterator> meshIterator;
 	csRef<iDocumentNode> currentMeshElement;
 	csRef<iDocumentNode> currentVerticesElement;
+	csRef<iDocumentNodeIterator> convexMeshIterator;
 	//iString *idValue;
-	float *vertexArray;
+	csArray<float> vertexArray;
 	//int *normalArray;
 	//iStringArray *accessorArray;
 	int vertexArraySize = 0;
@@ -418,6 +418,16 @@ bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
 				notifyMsg.append(currentGeometryID->GetValue());
 				Report(CS_REPORTER_SEVERITY_NOTIFY, notifyMsg.c_str());
 			}
+		}
+
+		// let's make sure that we output a warning in the event that the
+		// user attempts to convert a <convex_mesh> element, as this
+		// isn't supported yet
+		/// @todo Add support for <convex_mesh> elements.
+		convexMeshIterator = currentGeometryElement->GetNodes("convex_mesh");
+		if (convexMeshIterator->HasNext() && warningsOn)
+		{
+			Report(CS_REPORTER_SEVERITY_WARNING, "Warning: <convex_mesh> element detected.  This system does not currently support this element type.  It will not be converted.");
 		}
 
 		// get an iterator over all <mesh> child elements
@@ -455,34 +465,18 @@ bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
 			
 			mesh = new csColladaMesh(currentMeshElement, this);
 
-			//vertexArray = GetVertexArray(currentVerticesElement, &idValue, vertexArraySize);
-			if (warningsOn)
-			{
-				Report(CS_REPORTER_SEVERITY_NOTIFY, "Converting to float* ...");
-			}
-
-			vertexArray = (float*)(mesh->GetVertices());
-			
-			if (warningsOn)
-			{
-				Report(CS_REPORTER_SEVERITY_NOTIFY, "Done");
-				Report(CS_REPORTER_SEVERITY_NOTIFY, "Getting number of vertices...");
-			}
-			
+			// Adding vertices to CS document
+			vertexArray = mesh->GetVertices();
+						
 			vertexArraySize = mesh->GetNumVertexElements();
-
-			if (warningsOn)
-			{
-				Report(CS_REPORTER_SEVERITY_NOTIFY, "Done.");
-			}
 
 			if (warningsOn && vertexArraySize > 0)
 			{
-				Report(CS_REPORTER_SEVERITY_NOTIFY, "Vertex array acquired.  id: %s", mesh->GetID()->GetData());
+				Report(CS_REPORTER_SEVERITY_NOTIFY, "Array acquired.  id: %s", mesh->GetPositionID()->GetData());
 			}
 			else if (warningsOn && vertexArraySize <= 0)
 			{
-				Report(CS_REPORTER_SEVERITY_WARNING, "Unable to acquire vertex array.  Vertex array size: %d", vertexArraySize);
+				Report(CS_REPORTER_SEVERITY_WARNING, "Unable to acquire array.  Array size: %d", vertexArraySize);
 				return false;
 			}
 			
@@ -494,13 +488,14 @@ bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
 				return false;
 			}
 			
-			csRef<iDocumentNode> sourceElement = GetSourceElement(mesh->GetID()->GetData(), currentMeshElement);
+			csRef<iDocumentNode> sourceElement = GetSourceElement(mesh->GetPositionID()->GetData(), currentMeshElement);
 			if (sourceElement == 0)
 			{
-				Report(CS_REPORTER_SEVERITY_ERROR, "Unable to acquire source element with id: %s", mesh->GetID()->GetData());
+				Report(CS_REPORTER_SEVERITY_ERROR, "Unable to acquire source element with id: %s", mesh->GetPositionID()->GetData());
 				return false;
 			}
 		
+			// create meshfact and plugin (top-level) nodes
 			csRef<iDocumentNode> meshFactNode = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
 			meshFactNode->SetValue("meshfact");
 			meshFactNode->SetAttribute("name", mesh->GetName()->GetData());
@@ -514,6 +509,7 @@ bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
 				Report(CS_REPORTER_SEVERITY_NOTIFY, "MeshFact element created.  Creating params element");
 			}
 
+			// create the sub params element
 			csRef<iDocumentNode> currentCrystalParamsElement = 
 								meshFactNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
 			currentCrystalParamsElement->SetValue("params");

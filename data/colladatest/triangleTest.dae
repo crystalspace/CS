@@ -40,6 +40,9 @@
 	</library_lights>
 	<library_geometries>
 		<geometry id="Plane-Geometry" name="Plane-Geometry">
+			<convex_mesh>
+				Some data...
+			</convex_mesh>
 			<mesh>
 				<source id="Plane-Geometry-Position">
 					<float_array count="12" id="Plane-Geometry-Position-array">3.43541 3.43541 0.00000 3.43541 -3.43541 0.00000 -3.43541 -3.43541 0.00000 -3.43540 3.43541 0.00000</float_array>

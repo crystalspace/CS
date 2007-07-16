@@ -188,7 +188,7 @@ struct iColladaConvertor : public virtual iBase
 	/**
 	 * Converts the lighting section of the COLLADA file
 	 */
-	virtual bool ConvertLighting(iDocumentNode *lightingSection) = 0;
+	virtual bool ConvertMaterials(iDocumentNode *materialsSection) = 0;
 	
 	/**
 	 * Converts the textures and shading sections of the COLLADA file
