@@ -9,6 +9,8 @@ chronological order.
 18-Jul-2007
 	- res changed the default CS_PLUGINDIR and CS_CONFIGDIR values used
 	  by libs/unix/instpath.cpp to contain version numbers.
+	- res fixed the cs-csconfig-X.Y scripts to use the right CRYSTAL_x_y
+	  variable (due a bug in the Jam code it currently used CRYSTAL_x_x).
 16-Jul-2007
 	- Jorrit fixed two problems in csSpline as reported by valgrind.
 	- Andres changed the python detection code to look for a 
