@@ -8,6 +8,13 @@ chronological order.
 
 16-Jul-2007
 	- Jorrit fixed two problems in csSpline as reported by valgrind.
+	- Andres changed the python detection code to look for a 
+	  ${hosttype}-python as well in order to make cross-compiling with
+	  python support more automatic/possible. He also added
+	  CS/bin to the search path in configure, and added a python wrapper
+	  (prefixed with hosttype i586-mingw32msvc) which calls the windows 
+	  python via wine and changes all paths to unix paths.
+	- Andres updated svn:ignore of the CS directory to reflect new binaries.
 12-Jul-2007
 	- Jorrit fixed a rather big bug in
 	  csKeyEventHelper::GetModifiersBits(). It was declared using
