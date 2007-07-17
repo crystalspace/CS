@@ -56,7 +56,7 @@ AC_DEFUN([CS_CHECK_PYTHON],
     AS_IF([test -z "$with_python"],
 	[with_python=m4_if([$2], [without], [no], [yes])])
 
-    CS_CHECK_PROGS([PYTHON], [python])
+    CS_CHECK_TOOL([PYTHON], [python])
     AC_SUBST([PYTHON])
     CS_EMIT_BUILD_PROPERTY([PYTHON],[$PYTHON],[],[],CS_EMITTER_OPTIONAL([$1]))
 
@@ -102,9 +102,10 @@ AC_DEFUN([CS_CHECK_PYTHON],
 
 	    AS_IF([test -n "$cs_pyver" &&
 		   test -n "$cs_cv_pybase_cflags" &&
-		   test -n "$cs_cv_pybase_lflags$cs_cv_pybase_sysprefix_lflags"],
+		   test -n "$cs_cv_pybase_lflags$cs_cv_pybase_sysprefix_lflags" \
+		   	-o .pyd = "$cs_cv_python_ext"],
 		[cs_cv_python_sdk=yes], [cs_cv_python_sdk=no])])
-
+		
 	# Check if Python SDK is usable.  The most common library name is the
 	# basename with a few decorations (for example, libpython2.2.a),
 	# however some Windows libraries lack the decimal point (for example,

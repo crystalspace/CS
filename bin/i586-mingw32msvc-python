@@ -1,0 +1,31 @@
+#!/bin/sh
+
+#Wrapper script around wine and python which is called if youre cross
+#compiling crystalspace from unix for windows. Its only goind to work
+#if wine is installed, and either resides in $HOME/.wine or $WINEPATH
+#is set.
+
+
+TMPF=`mktemp`;
+#Try to find if the local wine instance has an installed
+#python. Unfortunately regedit doesnt seem to support spitting out its
+#information to stdout.
+regedit /E $TMPF 'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\App Paths\Python.exe'
+
+#Cut the value out of the exported registry piece
+WINEXPATH=`cat $TMPF |tail -n 1|cut -c 3-|tr -d '\"'|tr -d '\r'`;
+
+#Translate the path out of windows paths to a linux path we can
+#execute.
+PYTHONPATH=`winepath $WINEXPATH|tr -d '\r'`
+#This is the path were gona replace in the output in order to make the
+#windows python spit out unix names
+WINEPATH=$(wine "$PYTHONPATH" \
+    -c "import os.path; print os.path.dirname('${WINEXPATH}')")
+UNIXPATH=$(winepath $WINPATH|tr -d '\r')
+rm $TMPF;
+
+#Finally execute python, replace all windows line endings, and replace
+#the paths.
+echo `wine $PYTHONPATH "$@"`|tr -d '\r'|sed 's/$WINPATH/$UNIXPATH/'
+
