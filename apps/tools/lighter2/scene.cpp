@@ -163,7 +163,7 @@ namespace lighter
 
       // Parses meshes from engine
       Statistics::Progress* progEngine = progress.CreateProgress (div);
-      ParseEngine (*progEngine);
+      ParseEngine (&sceneFiles[i], *progEngine);
       delete progEngine;
     }
 
@@ -524,7 +524,7 @@ namespace lighter
     return allLms;
   }
 
-  bool Scene::ParseEngine (Statistics::Progress& progress)
+  bool Scene::ParseEngine (LoadedFile* fileInfo, Statistics::Progress& progress)
   {
     progress.SetProgress (0);
 
@@ -541,7 +541,7 @@ namespace lighter
     {
       Statistics::Progress* progSector = 
         sectorProgress.CreateProgress (progressStep);
-      ParseSector (sectorList->Get (i), *progSector);
+      ParseSector (fileInfo, sectorList->Get (i), *progSector);
       delete progSector;
     }
     sectorProgress.SetProgress (1);
@@ -624,7 +624,8 @@ namespace lighter
     return true;
   }
 
-  void Scene::ParseSector (iSector *sector, Statistics::Progress& progress)
+  void Scene::ParseSector (LoadedFile* fileInfo,iSector *sector, 
+                           Statistics::Progress& progress)
   {
     if (!sector) 
     {
@@ -659,7 +660,7 @@ namespace lighter
       iMeshWrapper* mesh = meshList->Get (i);
       csRef<Object> obj;
       bool isPortal = mesh->GetPortalContainer() != 0;
-      if (ParseMesh (radSector, mesh, obj) == Failure)
+      if (ParseMesh (fileInfo, radSector, mesh, obj) == Failure)
       {
         if (!isPortal)
           globalLighter->Report ("Error parsing mesh '%s' in sector '%s'!", 
@@ -806,7 +807,8 @@ namespace lighter
     }
   }
 
-  Scene::MeshParseResult Scene::ParseMesh (Sector *sector, 
+  Scene::MeshParseResult Scene::ParseMesh (LoadedFile* fileInfo,
+                                           Sector *sector, 
                                            iMeshWrapper *mesh,
                                            csRef<Object>& obj)
   {
@@ -831,6 +833,7 @@ namespace lighter
     if (!obj) return Failure;
 
     obj->ParseMesh (mesh);
+    obj->StripLightmaps (fileInfo->texturesToClean);
 
     // Save it
     sector->allObjects.Put (obj->meshName, obj);
@@ -1017,7 +1020,6 @@ namespace lighter
     csRef<iDocumentNode> texturesNode = worldRoot->GetNode ("textures");
     if (texturesNode)
     {
-      csSet<csString> texFileNamesToDelete;
       // Clean out old lightmap textures
       {
         csRefArray<iDocumentNode> nodesToDelete;
@@ -1030,7 +1032,7 @@ namespace lighter
           const char* name = child->GetAttributeValue ("name");
           if ((name != 0) && fileInfo->texturesToClean.Contains (name))
           {
-            CollectDeleteTextures (child, texFileNamesToDelete);
+            CollectDeleteTextures (child, fileInfo->texFileNamesToDelete);
             nodesToDelete.Push (child);
           }
         }
@@ -1235,7 +1237,6 @@ namespace lighter
     if (radObj)
     {
       // We do have one
-      radObj->StripLightmaps (fileInfo->texturesToClean);
       radObj->SaveMesh (sect, objNode);
       radObj->FreeNotNeededForLighting ();
       savedObjects.AddNoTest (name);

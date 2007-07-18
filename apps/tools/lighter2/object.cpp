@@ -362,7 +362,7 @@ namespace lighter
     meshWrapper.Invalidate();
   }
 
-  void Object::FillLightmapMask (LightmapMaskArray& masks)
+  void Object::FillLightmapMask (LightmapMaskPtrDelArray& masks)
   {
     if (lightPerVertex) return;
 
@@ -371,7 +371,10 @@ namespace lighter
     // And fill it with data
     for (size_t i = 0; i < allPrimitives.GetSize(); i++)
     {
-      LightmapMask &mask = masks[lightmapIDs[i]];
+      LightmapMask& mask = *(masks[lightmapIDs[i]]);
+      ScopedSwapLock<LightmapMask> m (mask);
+      float* maskData = mask.GetMaskData();
+
       PrimitiveArray::Iterator primIt = allPrimitives[i].GetIterator ();
       while (primIt.HasNext ())
       {
@@ -386,13 +389,13 @@ namespace lighter
         // Go through all lightmap cells and add their element areas to the mask
         for (uint v = minv; v <= (uint)maxv;v++)
         {
-          uint vindex = v * mask.width;
+          uint vindex = v * mask.GetWidth();
           for (uint u = minu; u <= (uint)maxu; u++, findex++)
           {
             const float elemArea = prim.GetElementAreas ().GetElementArea (findex);
             if (elemArea == 0) continue; // No area, skip
 
-            mask.maskData[vindex+u] += elemArea * area2pixel; //Accumulate
+            maskData[vindex+u] += elemArea * area2pixel; //Accumulate
           }
         } 
       }

@@ -11,6 +11,9 @@
 	- res merged r27251, r27255 into 1.2 (cs-config wrapper improvements).
 	- res reverted some breaking and undesireable changes that crept in
 	  via r26988 and merged r27005, r27006 (SCF fixes).
+	- res merged r27181, r27183, r27186, r27189, r27190, r27195, 
+	  r27211:27213 (lighter2 fixes and improvements + related 
+	  CS::SubRectangles changes).
 1-Jul-2007
 	- Vincent merged r27167:27169 into 1.2 (portable replacements for
 	  isnan() and isnormal()).

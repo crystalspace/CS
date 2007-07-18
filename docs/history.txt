@@ -6,6 +6,7 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Jul-2007
 	- res changed the cs-config wrapper to emit a better error message
 	  when no cs-config-* scripts are found. Also, the directory from
 	  which the wrapper was started is now searched as well.
@@ -27,8 +28,33 @@ chronological order.
         - Mike Gist added a #define to enable GNU C extensions in dlmalloc.
 10-Jul-2007
 	- Marten made another OSX fix, still untested.
+8-Jul-2007
+	- Genjix removed qualifier for LightmapMask destructor due to failing
+	  to compile on linux.
 7-Jul-2007
 	- Marten fixed the OSX assistant to properly expose its intefaces.
+	- res fixed lighter2 problems introduced by r27190.
+6-Jul-2007
+	- res fixed CS::SubRectangles::Split() neglecting to set the 
+	  parent of newly created rectangles which would corrupt the internal
+	  structure (and cause subsequent operations to return wrong results).
+	  Also made Dump() available in non-debug builds.
+	- res made the following changes to lighter2:
+	    - Fixed an issue where the "factory" and "object" layouting would
+	      produce slightly different bounding sizes for primitive groups -
+	      enough to break layouting in tight situations.
+	    - Made the lightmap masks used for postprocessing swappables.
+	    - Some layouting tweaks.
+5-Jul-2007
+	- res made a fix to yesterday's lighter2 assertion fix.
+4-Jul-2007
+	- res fixed lighter2 not cleaning out all old lightmaps.
+	- res fixed an assertion in lightmap layouting by matching the 
+	  "factory" layouting (to determine whether to split) to the "object"
+	  layouting. Previously, the differences between those could have the
+	  result that the "factory" layouting would return a set of primitives
+	  that the "object" layouting actually failed to layout onto one
+	  lightmap.
 30-Jun-2007
 	- Marten fixed compilation on MSVC after Oktals additions.
 29-Jun-2007
