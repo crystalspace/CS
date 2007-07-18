@@ -18,6 +18,10 @@ chronological order.
 	- res changed the cs-config wrapper to emit a better error message
 	  when no cs-config-* scripts are found. Also, the directory from
 	  which the wrapper was started is now searched as well.
+	- res replaced the unportable use of 'dirname' in the cs-config 
+	  wrapper with a custom (but portable) function, as suggested by Eric.
+	  Also made the "no cs-config-* ..." error message output to stderr
+	  instead of stdout.
 16-Jul-2007
 	- Jorrit fixed two problems in csSpline as reported by valgrind.
 	- Andres changed the python detection code to look for a 
