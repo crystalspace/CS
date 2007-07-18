@@ -1,0 +1,13 @@
+@c -*-texinfo-*-
+@node Release Notes 1_4
+@appendixsec Release Notes from 1.2 to 1.4
+@cindex Release Notes
+
+This section documents the major changes between versions 1.2 and 1.4 of of
+Crystal Space.
+
+@menu
+@end menu
+
+@c @node Api1_4 Your Change Here
+@c @subsection Your Change Here

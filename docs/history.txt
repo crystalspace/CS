@@ -22,6 +22,7 @@ chronological order.
 	  wrapper with a custom (but portable) function, as suggested by Eric.
 	  Also made the "no cs-config-* ..." error message output to stderr
 	  instead of stdout.
+	- res added a (still empty) appendix for the 1.2 to 1.4 API changes.
 16-Jul-2007
 	- Jorrit fixed two problems in csSpline as reported by valgrind.
 	- Andres changed the python detection code to look for a 
