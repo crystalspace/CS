@@ -10,6 +10,10 @@ chronological order.
 	- res changed the cs-config wrapper to emit a better error message
 	  when no cs-config-* scripts are found. Also, the directory from
 	  which the wrapper was started is now searched as well.
+	- res replaced the unportable use of 'dirname' in the cs-config 
+	  wrapper with a custom (but portable) function, as suggested by Eric.
+	  Also made the "no cs-config-* ..." error message output to stderr
+	  instead of stdout.
 24-Jun-2007
 	- res made "jam install" install not just "history.txt" but
 	  "history*.txt" - this way the branch-specific histories (e.g.
