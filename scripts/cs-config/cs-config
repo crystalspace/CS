@@ -6,7 +6,13 @@ else
   PATH_SEPARATOR=":"
 fi
 
-BASE_DIR=`dirname $0`
+# Poor man's (portable) 'dirname' command.
+dirpart()
+{
+   expr "$1" : '\(..*\)[/\\].*'
+}
+
+BASE_DIR=`dirpart $0`
 TEMP_PREFIX=/tmp/cs-config$$
 
 # Collect executables starting with 'cs-config-' from $CRYSTAL and $PATH
@@ -25,7 +31,7 @@ done
 IFS="$OLD_IFS"
 
 if [ ! -e ${TEMP_PREFIX}_find ] ; then
-  echo No cs-config-* scripts found
+  echo "No cs-config-* scripts found" >&2
   exit -1
 fi
 
