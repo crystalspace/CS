@@ -26,6 +26,7 @@
 #include "iutil/event.h"
 #include "iutil/eventh.h"
 #include "csutil/csstring.h"
+#include "csutil/scf_implementation.h"
 struct iEventQueue;
 struct iObjectRegistry;
 struct iVirtualClock;
@@ -40,7 +41,7 @@ struct iOSXAssistantLocal : public iOSXAssistant
 };
 
 class OSXAssistant : public scfImplementation3<OSXAssistant,
-                                               iOSXAssistantLocal
+                                               iOSXAssistantLocal,
                                                iEventHandler,
                                                iEventPlug>
 {
