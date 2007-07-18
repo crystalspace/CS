@@ -18,7 +18,9 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_RENDERTREE_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_RENDERTREE_H__
 
+#include "csplugincommon/rendermanager/standardtreetraits.h"
 #include "iengine/viscull.h"
+#include "csutil/redblacktree.h"
 
 namespace CS
 {
@@ -35,16 +37,10 @@ namespace RenderManager
   struct EBOptHelper<void>
   {};
 
-  struct RenderTreeStandardTraits
-  {
-
-  };
-
   /**
    * 
    */
-  template<typename MeshNodeDataType = void, typename ContextNodeDataType = void, 
-    typename TreeTraits = RenderTreeStandardTraits>
+  template<typename TreeTraits = RenderTreeStandardTraits>
   class RenderTree
   {
   public:
@@ -53,6 +49,7 @@ namespace RenderManager
     struct ContextNode;
 
     //---- Type definitions
+    typedef TreeTraits TreeTraitsType;
     /**
      * 
      */
@@ -65,22 +62,30 @@ namespace RenderManager
     /**
      * 
      */
-    struct MeshNode : public EBOptHelper<MeshNodeDataType>
+    struct MeshNode : public EBOptHelper<typename TreeTraits::MeshNodeExtraDataType>
     {
-      iMeshWrapper* meshWrapper;
-      csArray<csRenderMesh*> renderMeshes;
+      /**
+       * 
+       */
+      struct SingleMesh : public EBOptHelper<typename TreeTraits::MeshExtraDataType>
+      {
+        csRenderMesh* renderMesh;
+      };
+
+      csArray<SingleMesh> meshes;
     };
 
     /**
      * 
      */
-    struct ContextNode : public EBOptHelper<ContextNodeDataType>
+    struct ContextNode : public EBOptHelper<typename TreeTraits::MeshNodeExtraDataType>
     {
-      csArray<MeshNode*> meshNodes;
+      // A sub-tree of mesh nodes
+      csRedBlackTreeMap<typename TreeTraits::MeshNodeKeyType, MeshNode*>   meshNodes;
     };
 
 
-    typedef RenderTree<MeshNodeDataType, ContextNodeDataType, TreeTraits> ThisType;
+    typedef RenderTree<TreeTraits> ThisType;
 
     //---- Methods
     RenderTree (PersistentData& dataStorage)
@@ -103,6 +108,8 @@ namespace RenderManager
       // Create an initial context
       ContextNode* newCtx = persistentData.contextNodeAllocator.Alloc ();
       contextNodeList.Push (newCtx);
+
+      currentContextNode = newCtx;
     }
 
     /**
@@ -136,24 +143,41 @@ namespace RenderManager
      * 
      */
     template<typename Fn>
-    void TraverseMeshNodes (Fn& meshFunction)
+    void TraverseMeshNodes (Fn& meshNodeFunction)
     {
       struct LocalWalk
       {
-        LocalWalk (Fn& meshFunction)
-          : meshFunction (meshFunction)
+        LocalWalk (Fn& meshNodeFunction)
+          : meshNodeFunction (meshNodeFunction)
         {}
 
-        void operator() (const ContextNode* node, const ThisType& tree)
+        void operator() (ContextNode* node, ThisType& tree)
         {
-          CS::ForEach (node->meshNodes.GetIterator (), meshFunction, *node, tree);
+          struct MeshNodeCB
+          {
+            MeshNodeCB(Fn& meshNodeFunction, ContextNode* node, ThisType& tree)
+              : meshNodeFunction (meshNodeFunction), node (node), tree (tree)
+            {}
+
+            void operator() (const TreeTraits::MeshNodeKeyType& key, MeshNode* meshNode)
+            {
+              meshNodeFunction (key, meshNode, *node, tree);
+            }
+
+            Fn& meshNodeFunction;
+            ContextNode* node;
+            ThisType& tree;
+          };
+
+          node->meshNodes.TraverseInOrder (MeshNodeCB (meshNodeFunction, node, tree));
         }
 
-        Fn& meshFunction;
+        Fn& meshNodeFunction;
       };
 
-      TraverseContexts (LocalWalk(meshFunction));
+      TraverseContexts (LocalWalk(meshNodeFunction));
     }
+
 
     // Some helpers
     ///
@@ -168,11 +192,13 @@ namespace RenderManager
     }
 
   protected:    
-    PersistentData& persistentData;
-    csArray<ContextNode*> contextNodeList;
+    PersistentData&         persistentData;
+    csArray<ContextNode*>   contextNodeList;
+    
+    ContextNode*            currentContextNode;
 
-    size_t    totalMeshNodes;
-    size_t    totalRenderMeshes;
+    size_t                  totalMeshNodes;
+    size_t                  totalRenderMeshes;
 
     /**
      * 
@@ -188,28 +214,51 @@ namespace RenderManager
       virtual void ObjectVisible (iVisibilityObject *visobject, 
         iMeshWrapper *mesh, uint32 frustum_mask)
       {
-        // For now, just add them to first context, not that smart
-        MeshNode* mn = ownerTree.persistentData.meshNodeAllocator.Alloc ();
-        ownerTree.contextNodeList[0]->meshNodes.Push (mn);
-
-        mn->meshWrapper = mesh;
-
-        ownerTree.totalMeshNodes++;
-
-        int count;
-        csRenderMesh** rms = mesh->GetRenderMeshes (count, currentRenderView, frustum_mask);
-
-        for (int i = 0; i < count; ++i)
-        {
-          mn->renderMeshes.Push (rms[i]);
-          ownerTree.totalRenderMeshes++;
-        }
+        // Call uppwards
+        ownerTree.ViscullObjectVisible (visobject, mesh, frustum_mask, currentRenderView);
       }
 
     private:
       ThisType& ownerTree;
       iRenderView* currentRenderView;
     };
+
+    void ViscullObjectVisible (iVisibilityObject *visobject, 
+      iMeshWrapper *imesh, uint32 frustum_mask, iRenderView* renderView)
+    {
+      // Todo: Handle static lod & draw distance
+
+      // Get the meshes
+      int numMeshes;
+      csRenderMesh** meshList = imesh->GetRenderMeshes (numMeshes, renderView, frustum_mask);
+
+      // Add it to the appropriate meshnode
+      for (int i = 0; i < numMeshes; ++i)
+      {
+        TreeTraits::MeshNodeKeyType meshKey = 
+          TreeTraits::GetMeshNodeKey (imesh, *meshList[i]);
+
+        // Get the mesh node
+        MeshNode* meshNode = currentContextNode->meshNodes.Get (meshKey, 0);
+        if (!meshNode)
+        {
+          // Get a new one
+          meshNode = persistentData.meshNodeAllocator.Alloc ();
+
+          TreeTraits::SetupMeshNode(*meshNode, imesh, *meshList[i]);
+          currentContextNode->meshNodes.Put (meshKey, meshNode);
+
+          totalMeshNodes++;
+        }
+
+        MeshNode::SingleMesh sm;
+        sm.renderMesh = meshList[i];
+
+        meshNode->meshes.Push (sm);
+
+        totalRenderMeshes++;
+      }
+    }
 
   };
 

@@ -42,6 +42,8 @@
 #include "csplugincommon/render3d/txtmgr.h"
 #include "csplugincommon/rendermanager/rendertree.h"
 #include "csplugincommon/rendermanager/renderview.h"
+#include "csplugincommon/rendermanager/standardsorter.h"
+#include "csplugincommon/rendermanager/standardtreetraits.h"
 #include "csplugincommon/renderstep/basesteploader.h"
 #include "csplugincommon/renderstep/basesteptype.h"
 #include "csplugincommon/renderstep/parserenderstep.h"

@@ -397,7 +397,7 @@ protected:
   void RecursiveTraverseInOrder (Node* node, CB& callback) const
   {
     if (node->left != 0) RecursiveTraverseInOrder (node->left, callback);
-    callback.Process (*((K*)&node->key));
+    callback(*((K*)&node->key));
     if (node->right != 0) RecursiveTraverseInOrder (node->right, callback);
   }
 
@@ -563,9 +563,9 @@ class csRedBlackTreeMap : protected csRedBlackTree<csRedBlackTreePayload<K, T> >
     CB callback;
   public:
     TraverseCB (const CB& callback) : callback(callback) {}
-    void Process (csRedBlackTreePayload<K, T>& value)
+    void operator() (csRedBlackTreePayload<K, T>& value)
     {
-      callback.Process (value.GetKey(), value.GetValue());
+      callback (value.GetKey(), value.GetValue());
     }
   };
 public:
@@ -616,7 +616,7 @@ public:
    */
   const T& Get (const K& key, const T& fallback) const
   {
-    csRedBlackTreePayload<K, T>* payload = Find (key);
+    const csRedBlackTreePayload<K, T>* payload = Find (key);
     if (payload == 0) return fallback;
     return payload->GetValue();
   }

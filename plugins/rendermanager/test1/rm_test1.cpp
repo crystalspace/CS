@@ -51,8 +51,18 @@ bool RMTest1::RenderView (iView* view)
   // Finalize the tree
   renderTree.FinishViscull ();
 
+  // Sort the mesh lists  
+  {
+    StandardMeshSorter<RenderTreeType> mySorter (view->GetEngine (), view->GetCamera ());
+    renderTree.TraverseMeshNodes (mySorter);
+  }
+
+  // Setup the SV arrays
+  
+  
+
   // Setup SV arrays
-  size_t numSVs = svNameStringSet->GetSize ();
+/*  size_t numSVs = svNameStringSet->GetSize ();
   size_t numRMs = renderTree.GetTotalRenderMeshes ();
 
   // Allocate the temporary storage for all render meshes
@@ -125,7 +135,7 @@ bool RMTest1::RenderView (iView* view)
   delete shaderVarStacks;
   delete shaderList;
   delete shaderTicket;
-
+*/
   return true;
 }
 
