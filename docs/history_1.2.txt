@@ -6,6 +6,7 @@
 	- Jorrit merged r27211 into 1.2 (SCF stuff).
 	- Jorrit merged r27222:27223 into 1.2 (MacOS/X fixes).
 	- Jorrit merged r27232 into 1.2 (csKeyEventHelper::GetModifierBits()).
+	- Jorrit merged r27235 into 1.2 (csSpline fixes).
 1-Jul-2007
 	- Vincent merged r27167:27169 into 1.2 (portable replacements for
 	  isnan() and isnormal()).
