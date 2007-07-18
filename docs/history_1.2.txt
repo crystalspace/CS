@@ -14,6 +14,7 @@
 	- res merged r27181, r27183, r27186, r27189, r27190, r27195, 
 	  r27211:27213 (lighter2 fixes and improvements + related 
 	  CS::SubRectangles changes).
+	- res merged r27193 into 1.2 (don't reload shaders on engine close).
 1-Jul-2007
 	- Vincent merged r27167:27169 into 1.2 (portable replacements for
 	  isnan() and isnormal()).
