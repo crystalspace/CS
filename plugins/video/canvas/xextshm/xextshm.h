@@ -40,7 +40,9 @@ extern "C" {
 #  include <sys/shm.h>
 }
 
-class csXExtSHM : public iXExtSHM
+class csXExtSHM : public scfImplementation2<csXExtSHM, 
+                                            iXExtSHM,
+                                            iComponent>
 {
   /// The Object Registry
   iObjectRegistry *object_reg;
@@ -55,7 +57,6 @@ class csXExtSHM : public iXExtSHM
   int Width, Height;
 
 public:
-  SCF_DECLARE_IBASE;
 
   csXExtSHM (iBase*);
   virtual ~csXExtSHM ();
@@ -68,12 +69,6 @@ public:
   virtual void DestroyMemory ();
   virtual void Print (Window window, GC gc, csRect const* area);
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(csXExtSHM);
-    virtual bool Initialize (iObjectRegistry *o)
-    { return scfParent->Initialize(o); }
-  } scfiComponent;
 
 };
 

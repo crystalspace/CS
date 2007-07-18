@@ -1,4 +1,8 @@
-g`"each new day's entries appears before the previous day's entries.  The
+Crystal Space detailed change log.
+http://www.crystalspace3d.org/
+
+The overall history is in reverse (descending) chronological order, so that
+each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
@@ -77,6 +81,12 @@ chronological order.
 	  instead of external utilities to construct the initial list of
 	  cs-config-* scripts.
 30-May-2007
+	- Marten made some cleanups to scfImplementation(Ext)N to reduce the 
+	  source size and hopefully speed up compilation a tiny bit.
+	- Marten added some basic reflection support to SCF.	
+	- Marten updated version of iBase which was previously forgotten.
+	- Marten removed the last usage of SCF_DECLARE_IBASE and 
+	  SCF_IMPLEMENT_IBASE and companions.
 	- res made the manual and API docs include the version number in their
 	  respective titles.  One idea is to make the different versions more
 	  distinguishable in e.g. search results.

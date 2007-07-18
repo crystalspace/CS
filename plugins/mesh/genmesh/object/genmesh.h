@@ -765,8 +765,6 @@ public:
     csGenmeshMeshObjectFactory* factory;
     csFlags flags;
   public:
-    //SCF_DECLARE_IBASE;
-
     void SetFactory (csGenmeshMeshObjectFactory* Factory)
     { factory = Factory; }
 

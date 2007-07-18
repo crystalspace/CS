@@ -29,12 +29,10 @@
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
 
-
-SCF_VERSION (iXExtF86VM, 1, 0, 0);
-
 /// Document me!@@@
-struct iXExtF86VM : public iBase
+struct iXExtF86VM : public virtual iBase
 {
+  SCF_INTERFACE(iXExtF86VM,2,0,0);
   /// Open Video Mode plugin
   virtual bool Open (Display *dpy, int screen_num,
 		     XVisualInfo *xvis, Colormap cmap) = 0;
