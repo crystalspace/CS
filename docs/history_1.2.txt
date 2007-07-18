@@ -3,6 +3,7 @@
 18-Jul-2007
 	- Jorrit merged r26988 into 1.2 (SCF stuff).
 	- Jorrit merged r27072:27074 into 1.2 (MacOS/X fixes).
+	- Jorrit merged r27211 into 1.2 (SCF stuff).
 1-Jul-2007
 	- Vincent merged r27167:27169 into 1.2 (portable replacements for
 	  isnan() and isnormal()).

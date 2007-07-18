@@ -40,8 +40,9 @@ struct iOSXAssistantLocal : public iOSXAssistant
   virtual void start_event_loop() = 0;
 };
 
-class OSXAssistant : public scfImplementation3<OSXAssistant,
+class OSXAssistant : public scfImplementation4<OSXAssistant,
                                                iOSXAssistantLocal,
+                                               scfFakeInterface<iOSXAssistant>,
                                                iEventHandler,
                                                iEventPlug>
 {
