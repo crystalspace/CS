@@ -113,7 +113,7 @@ protected:
    */
   virtual ~iBase() {}
 public:
-  SCF_INTERFACE(iBase, 1, 1, 0);
+  SCF_INTERFACE(iBase, 1, 0, 0);
   /// Increment the number of references to this object.
   virtual void IncRef () = 0;
   /// Decrement the reference count.

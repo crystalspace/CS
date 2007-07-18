@@ -9,6 +9,8 @@
 	- Jorrit merged r27235 into 1.2 (csSpline fixes).
 	- Jorrit merged r27231 into 1.2 (enable GNU C extensions/dmalloc).
 	- res merged r27251, r27255 into 1.2 (cs-config wrapper improvements).
+	- res reverted some breaking and undesireable changes that crept in
+	  via r26988 and merged r27005, r27006 (SCF fixes).
 1-Jul-2007
 	- Vincent merged r27167:27169 into 1.2 (portable replacements for
 	  isnan() and isnormal()).
