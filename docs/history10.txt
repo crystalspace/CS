@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Jul-2007
+	- res merged r27251 into 1.0 (cs-config wrapper improvements).
 25-Jun-2007
 	- res merged r26545 into 1.0 (gmeshldr and <manualcolors>).
 	- res merged r26310 into 1.0 (response file support detection).
