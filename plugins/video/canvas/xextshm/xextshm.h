@@ -21,7 +21,7 @@
 #define __CS_XESTSHM_H__
 
 #include <stdarg.h>
-#include "csutil/scf.h"
+#include "csutil/scf_implementation.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "plugins/video/canvas/xwindowcommon/xextshm.h"

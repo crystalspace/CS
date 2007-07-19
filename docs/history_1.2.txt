@@ -1,5 +1,7 @@
 1.2 branch log.
 
+19-Jul-2006
+	- Vincent merged r27038 into 1.2 (xextf86vm & xextshm SCF fixes).
 18-Jul-2007
 	- Jorrit merged r26988 into 1.2 (SCF stuff).
 	- Jorrit merged r27072:27074 into 1.2 (MacOS/X fixes).
