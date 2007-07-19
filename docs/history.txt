@@ -11,6 +11,9 @@ chronological order.
 	  on Mac OS X.
 	- Eric Sunshine removed some outdated entries from vfs.cfg and
 	  vfs.cfg.template which referred to items moved to CSEXTRA.
+	- res changed CS::Memory::LocalBufferAllocator to support multiple
+	  allocations. (The old but miniscully more memory-efficient behaviour
+	  can be enabled with a template argument.)
 18-Jul-2007
 	- res changed the default CS_PLUGINDIR and CS_CONFIGDIR values used
 	  by libs/unix/instpath.cpp to contain version numbers.
