@@ -10,7 +10,7 @@ chronological order.
 	- Eric Sunshine eliminated several compilation and deprecation warnings
 	  on Mac OS X.
 	- Eric Sunshine removed some outdated entries from vfs.cfg and
-	  vfs.cfg.template which referred to items moved CSEXTRA.
+	  vfs.cfg.template which referred to items moved to CSEXTRA.
 18-Jul-2007
 	- res changed the default CS_PLUGINDIR and CS_CONFIGDIR values used
 	  by libs/unix/instpath.cpp to contain version numbers.
