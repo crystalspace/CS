@@ -11,6 +11,8 @@ chronological order.
 	  backend implementations.
 	- Marten removed the only usage we had of dynamic_cast and fixed 
 	  trac #192.
+	- Marten fixed event constraint in viewmesh between viewmesh itself
+	  and CEGUI. Solves trac #332.
 19-Jul-2007
 	- Eric Sunshine eliminated several compilation and deprecation warnings
 	  on Mac OS X.
