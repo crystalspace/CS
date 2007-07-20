@@ -2199,6 +2199,7 @@ AC_DEFUN([CS_CHECK_QSQRT],
 		    [[#define CS_PROCESSOR_$cs_host_cpu_normalized
 		    #define CS_COMPILER_GCC
 		    #define __CS_CSSYSDEF_H__
+		    #define CS_FORCEINLINE
 		    #include <csqsqrt.h>]],
 		    [float n = csQsqrt(1.0f); (void)n;])],
 		[CS_CREATE_TUPLE([-I$srcdir/include])], [C++],

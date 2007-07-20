@@ -1,6 +1,8 @@
 1.2 branch log.
 
-19-Jul-2006
+20-Jul-2007
+	- Vincent merged r27224 into 1.2 (csQsqrt() configure check fix).
+19-Jul-2007
 	- Vincent merged r27038 into 1.2 (xextf86vm & xextshm SCF fixes).
 18-Jul-2007
 	- Jorrit merged r26988 into 1.2 (SCF stuff).
