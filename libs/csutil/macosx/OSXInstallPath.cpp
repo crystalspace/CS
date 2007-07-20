@@ -107,7 +107,7 @@ csString csGetConfigPath()
   candidates.Push("/Library/CrystalSpace");
   candidates.Push("/usr/local");
 
-  for (size_t i = 0, n = candidates.Length(); i < n; i++)
+  for (size_t i = 0, n = candidates.GetSize(); i < n; i++)
   {
     csString const path = test_config_dir(candidates[i]);
     if (!path.IsEmpty())
