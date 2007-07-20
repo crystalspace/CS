@@ -4,6 +4,8 @@
 	- Vincent merged r27224 into 1.2 (csQsqrt() configure check fix).
 	- Vincent merged r27263 into 1.2 (Mac OS X compilation and deprecation
 	  warnings fixes).
+	- Vincent merged r27264:27265 into 1.2 (Remove outdated entries from
+	  vfs.cfg and vfs.cfg.template).
 19-Jul-2007
 	- Vincent merged r27038 into 1.2 (xextf86vm & xextshm SCF fixes).
 18-Jul-2007
