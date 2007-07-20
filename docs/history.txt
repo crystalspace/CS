@@ -9,6 +9,8 @@ chronological order.
 20-Jul-2007
 	- Marten added a CS::Threading::Thread::GetThreadID function and
 	  backend implementations.
+	- Marten removed the only usage we had of dynamic_cast and fixed 
+	  trac #192.
 19-Jul-2007
 	- Eric Sunshine eliminated several compilation and deprecation warnings
 	  on Mac OS X.
