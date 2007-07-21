@@ -206,7 +206,7 @@ for map in castle flarge partsys terrain terrainf ; \
 %{_includedir}/%{csprefix}/*
 
 %changelog
-* Sat Jul 21 2007 Vincent Knecht <vknecht@users.sourceforge.net> 1.1-0.svn20070721.1
+* Sat Jul 21 2007 Vincent Knecht <vknecht@users.sourceforge.net> 1.3-0.svn20070721.1
 - Updated for AWS stuff removal and lighter2 addition.
 - Updated for multiple install support (versioned directories and cs-config).
 
