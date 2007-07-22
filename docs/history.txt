@@ -13,6 +13,9 @@ chronological order.
 	- Eric Sunshine suppressed deprecation warnings in cstool/collider.cpp
 	  where it is forced to invoke its own deprecated constructors for
 	  the sake of backward-compatibility.
+	- Eric Sunshine rewrote the plugin loader for Mac OS X to fully employ
+	  the "two-level" namespace dynamic-library model introduced in OSX
+	  10.1. The deprecated "flat" namespace model is no longer supported.
 21-Jul-2007
 	- Vincent updated rpm/cs.spec for items moved to CSExtra, lighter2
 	  addition, and versioned files & directories.
