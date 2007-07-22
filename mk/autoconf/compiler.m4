@@ -88,6 +88,9 @@ AC_DEFUN([CS_PROG_LINK],[
 	[CS_EMIT_BUILD_PROPERTY([CMD.LINK], [AS_ESCAPE([$(CMD.C++)])])],
 	[CS_EMIT_BUILD_PROPERTY([CMD.LINK], [AS_ESCAPE([$(CMD.CC)])])])
 
+    CS_CHECK_TOOLS([LD], [ld])
+    CS_EMIT_BUILD_PROPERTY([CMD.LD], [$LD])
+    
     CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [$LDFLAGS], [+])
 
     # Check if compiler/linker recognizes -shared directive which is needed for
