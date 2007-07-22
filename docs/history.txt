@@ -10,6 +10,9 @@ chronological order.
 	- Vincent committed res' patch for incremental shared linking support
 	  on Unix, which fixes 'LinkSharedLibrary actions too long' build error
 	  when ld doesn't support response file. Solves trac #278.
+	- Eric Sunshine suppressed deprecation warnings in cstool/collider.cpp
+	  where it is forced to invoke its own deprecated constructors for
+	  the sake of backward-compatibility.
 21-Jul-2007
 	- Vincent updated rpm/cs.spec for items moved to CSExtra, lighter2
 	  addition, and versioned files & directories.
