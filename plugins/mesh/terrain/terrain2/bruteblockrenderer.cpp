@@ -149,12 +149,7 @@ public:
     return svContext.GetShaderVariables ();
   }
 
-  virtual void PushVariables (iShaderVarStack* stacks) const
-  {
-    svContext.PushVariables (stacks);
-  }
-
-  virtual void PushVariables (csShaderVariable** stacks) const
+  virtual void PushVariables (csShaderVariableStack& stacks) const
   {
     svContext.PushVariables (stacks);
   }

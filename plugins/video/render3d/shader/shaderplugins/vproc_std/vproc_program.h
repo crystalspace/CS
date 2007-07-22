@@ -49,7 +49,7 @@ public:
   /// Setup states needed for proper operation of the shader
   virtual void SetupState (const csRenderMesh* mesh,
                            csRenderMeshModes& modes,
-                           const iShaderVarStack* stacks);
+                           const csShaderVariableStack& stack);
 
   /// Reset states to original
   virtual void ResetState ();
@@ -123,16 +123,16 @@ private:
   csBitArray disableMask;
 
   void FixupLightWorldPos (csLightProperties& light, size_t lightNum,
-    const iArrayReadOnly<csShaderVariable*>* stacks, 
+    const csShaderVariableStack& stack, 
     const csReversibleTransform& object2world);
 
   bool ParseLightMixMode (iDocumentNode* child, LightMixmode& mixmode);
   bool ParseBufferName (iDocumentNode* child, BufferName& name);
   iRenderBuffer* GetBuffer (const BufferName& name,
     csRenderMeshModes& modes, 
-    const iArrayReadOnly<csShaderVariable*>* stacks);
+    const csShaderVariableStack& stack);
   bool UpdateSkinnedVertices (csRenderMeshModes& modes,
-                           const iShaderVarStack* stacks);
+                           const csShaderVariableStack& stack);
 };
 
 }

@@ -69,9 +69,8 @@ void csNullShader::SelfDestruct ()
 
 // General stuff
 csShaderManager::csShaderManager(iBase* parent) : 
-  scfImplementationType (this, parent)
+  scfImplementationType (this, parent), shaderVarStack (0,0)
 {
-  shaderVarStack.AttachNew (new scfArray<iShaderVarStack>);
   seqnumber = 0;
   eventSucc[0] = CS_HANDLERLIST_END;
   eventSucc[1] = CS_HANDLERLIST_END;
@@ -132,7 +131,7 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
 
   strings = csQueryRegistryTagInterface<iStringSet> (
     objectreg, "crystalspace.shared.stringset");
-  csRef<iStringSet> stringsSvName = csQueryRegistryTagInterface<iStringSet> (
+  stringsSvName = csQueryRegistryTagInterface<iStringSet> (
     objectreg, "crystalspace.shader.variablenameset");
 
   {

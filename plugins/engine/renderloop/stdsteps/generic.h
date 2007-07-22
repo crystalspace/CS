@@ -134,9 +134,9 @@ public:
   virtual ~csGenericRenderStep ();
 
   virtual void Perform (iRenderView* rview, iSector* sector,
-    iShaderVarStack* stacks);
+    csShaderVariableStack& stack);
   virtual void Perform (iRenderView* rview, iSector* sector,
-    iLight* light, iShaderVarStack* stacks);
+    iLight* light, csShaderVariableStack& stack);
 
   virtual void SetShaderType (const char* type);
   virtual const char* GetShaderType ();
@@ -160,7 +160,7 @@ public:
   inline void RenderMeshes (iRenderView* rview,
   	iGraphics3D* g3d, const ShaderVarPusher& Pusher,
 	size_t ticket, meshInfo* meshContext,
-	csRenderMesh** meshes, size_t num, iShaderVarStack* stacks);
+	csRenderMesh** meshes, size_t num, csShaderVariableStack& stack);
 
   /// Enables/disables z offset and z mode as needed
   inline void ToggleStepSettings (iGraphics3D* g3d, bool settings);

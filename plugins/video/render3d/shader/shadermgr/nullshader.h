@@ -54,7 +54,7 @@ public:
   void SetFileName (const char* /*filename*/) {  }
 
   virtual size_t GetTicket (const csRenderMeshModes&, 
-    const iShaderVarStack*) { return 0; }
+    const csShaderVariableStack&) { return 0; }
   virtual size_t GetTicket (const csRenderMeshModes& modes,
     csShaderVariable** stacks)
   {
@@ -64,7 +64,7 @@ public:
   virtual size_t GetNumberOfPasses (size_t) { return 0; }
   virtual bool ActivatePass (size_t, size_t) { return false; }
   virtual bool SetupPass (size_t, const csRenderMesh*,
-    csRenderMeshModes&, const iShaderVarStack*)
+    csRenderMeshModes&, const csShaderVariableStack&)
   { return false; }
   virtual bool TeardownPass (size_t)
   { return false; }
@@ -78,9 +78,8 @@ public:
   csShaderVariable* GetVariable (csStringID) const { return 0; }
   const csRefArray<csShaderVariable>& GetShaderVariables () const
   { return dummySVs; }
-  void PushVariables (iShaderVarStack*) const { }
-  void PushVariables (csShaderVariable** stacks) const {  }
-
+  void PushVariables (csShaderVariableStack&) const { }
+  
   bool IsEmpty() const { return true; }
   void ReplaceVariable (csShaderVariable*) {}
   void Clear () { }

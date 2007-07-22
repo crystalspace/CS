@@ -169,10 +169,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
       if (var == 0) var = parentSubMesh->GetVariable (name);
       return var;
     }
-    virtual void PushVariables (iShaderVarStack* stacks) const
+    virtual void PushVariables (csShaderVariableStack& stack) const
     {
-      parentSubMesh->PushVariables (stacks);
-      CS::ShaderVariableContextImpl::PushVariables (stacks);
+      parentSubMesh->PushVariables (stack);
+      CS::ShaderVariableContextImpl::PushVariables (stack);
     }
     virtual bool IsEmpty() const 
     { 

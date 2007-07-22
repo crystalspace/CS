@@ -107,7 +107,7 @@ public:
   virtual ~csShadowmapRenderStep ();
 
   virtual void Perform (iRenderView* rview, iSector* sector,
-    iShaderVarStack* stacks);
+    csShaderVariableStack& stack);
 
   DrawSettings& GetSettings () { return settings; }
   void SetDefaultShader (iShader* shader)

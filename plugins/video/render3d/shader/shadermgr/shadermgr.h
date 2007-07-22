@@ -63,6 +63,7 @@ private:
   csRef<iVirtualClock> vc;
   csRef<iTextureManager> txtmgr;
   csRef<iStringSet> strings;
+  csRef<iStringSet> stringsSvName;
   csRef<iEventHandler> weakEventHandler;
 
   bool do_verbose;
@@ -79,7 +80,7 @@ private:
   csRef<csShaderVariable> sv_time;
   void UpdateStandardVariables();
 
-  csRef<iShaderVarStack> shaderVarStack;
+  csShaderVariableStack shaderVarStack;
 
   csSet<csStringID> neutralTags;
   csSet<csStringID> forbiddenTags;
@@ -141,7 +142,7 @@ public:
   void Report (int severity, const char* msg, ...);
 
   /// Get the shadervariablestack used to handle shadervariables on rendering
-  virtual iShaderVarStack* GetShaderVariableStack ()
+  virtual csShaderVariableStack& GetShaderVariableStack ()
   {
     return shaderVarStack;
   }
@@ -166,6 +167,11 @@ public:
   virtual const csArray<iLight*>& GetActiveLights () const
   {
     return activeLights;
+  }
+
+  virtual iStringSet* GetSVNameStringset () const
+  {
+    return stringsSvName;
   }
   /** @} */
 

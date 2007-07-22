@@ -97,10 +97,10 @@ const char* csShaderConditionResolver::ParseCondition (const char* str,
 bool csShaderConditionResolver::Evaluate (csConditionID condition)
 {
   const csRenderMeshModes* modes = csShaderConditionResolver::modes;
-  const iShaderVarStack* stacks = csShaderConditionResolver::stacks;
+  const csShaderVariableStack* stack = csShaderConditionResolver::stack;
 
   return evaluator.Evaluate (condition, modes ? *modes : csRenderMeshModes(),
-    stacks);
+    stack ? *stack : csShaderVariableStack());
 }
 
 csConditionNode* csShaderConditionResolver::NewNode (csConditionNode* parent)
@@ -177,16 +177,16 @@ void csShaderConditionResolver::FinishAdding ()
 }
 
 void csShaderConditionResolver::SetEvalParams (const csRenderMeshModes* modes,
-					       const iShaderVarStack* stacks)
+					       const csShaderVariableStack* stack)
 {
   csShaderConditionResolver::modes = modes;
-  csShaderConditionResolver::stacks = stacks;
+  csShaderConditionResolver::stack = stack;
 }
 
 size_t csShaderConditionResolver::GetVariant ()
 {
   const csRenderMeshModes& modes = *csShaderConditionResolver::modes;
-  const iShaderVarStack* stacks = csShaderConditionResolver::stacks;
+  const csShaderVariableStack& stack = *csShaderConditionResolver::stack;
 
   if (rootNode == 0)
   {
@@ -200,7 +200,7 @@ size_t csShaderConditionResolver::GetVariant ()
     while (nextRoot != 0)
     {
       currentRoot = nextRoot;
-      if (evaluator.Evaluate (currentRoot->condition, modes, stacks))
+      if (evaluator.Evaluate (currentRoot->condition, modes, stack))
       {
 	nextRoot = currentRoot->trueNode;
       }
@@ -418,12 +418,12 @@ class SVCWrapper : public scfImplementation1<SVCWrapper,
 {
   csShaderVariableContext& wrappedSVC;
 public:
-  csRef<iShaderVarStack> svStack;
+  csShaderVariableStack svStack;
 
-  SVCWrapper (csShaderVariableContext& wrappedSVC) : 
+  SVCWrapper (csShaderVariableContext& wrappedSVC, size_t maxSVs) : 
     scfImplementationType (this), wrappedSVC (wrappedSVC)
-  {
-    svStack.AttachNew (new scfArray<iShaderVarStack>);
+  {     
+    svStack.Setup (maxSVs);
     wrappedSVC.PushVariables (svStack);
   }
   virtual ~SVCWrapper () { }
@@ -434,10 +434,8 @@ public:
   virtual csShaderVariable* GetVariable (csStringID name) const
   { return wrappedSVC.GetVariable (name); }
   virtual const csRefArray<csShaderVariable>& GetShaderVariables () const
-  { return wrappedSVC.GetShaderVariables (); }
-  virtual void PushVariables (iShaderVarStack* stacks) const
-  { wrappedSVC.PushVariables (stacks); }
-  virtual void PushVariables (csShaderVariable** stacks) const
+  { return wrappedSVC.GetShaderVariables (); }  
+  virtual void PushVariables (csShaderVariableStack& stacks) const
   { wrappedSVC.PushVariables (stacks); }
   virtual bool IsEmpty() const
   { return wrappedSVC.IsEmpty(); }
@@ -452,9 +450,9 @@ public:
 void csXMLShader::ParseGlobalSVs (iLoaderContext* ldr_context,
     iDocumentNode* node)
 {
-  SVCWrapper wrapper (globalSVContext);
+  SVCWrapper wrapper (globalSVContext, shadermgr->GetSVNameStringset ()->GetSize ());
   resolver->ResetEvaluationCache();
-  resolver->SetEvalParams (0, wrapper.svStack);
+  resolver->SetEvalParams (0, &wrapper.svStack);
   compiler->LoadSVBlock (ldr_context, node, &wrapper);
   resolver->SetEvalParams (0, 0);
 }
@@ -479,10 +477,10 @@ static void CloneNode (iDocumentNode* from, iDocumentNode* to)
 }
 
 size_t csXMLShader::GetTicket (const csRenderMeshModes& modes, 
-			       const iShaderVarStack* stacks)
+			       const csShaderVariableStack& stack)
 {
   resolver->ResetEvaluationCache();
-  resolver->SetEvalParams (&modes, stacks);
+  resolver->SetEvalParams (&modes, &stack);
   size_t vi = resolver->GetVariant ();
 
   if (vi != csArrayItemNotFound)
@@ -547,7 +545,7 @@ size_t csXMLShader::GetTicket (const csRenderMeshModes& modes,
 	    "No technique validated for shader '%s'<%zu>: using fallback", 
 	    GetName(), vi);
 	}
-	size_t fallbackTicket = fallbackShader->GetTicket (modes, stacks);
+	size_t fallbackTicket = fallbackShader->GetTicket (modes, stack);
 	if (fallbackTicket != csArrayItemNotFound)
 	{
 	  size_t vc = resolver->GetVariantCount();

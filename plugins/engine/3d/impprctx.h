@@ -50,6 +50,8 @@ private:
   static csStringID stringid_standard;
   static csStringID stringid_light_ambient;
 
+  csRef<iStringSet> stringSet;
+
   void SetImposterReady (bool r);
 
 public:

@@ -39,7 +39,7 @@ struct iRenderStep : public virtual iBase
   SCF_INTERFACE (iRenderStep, 2, 1, 0);
 
   virtual void Perform (iRenderView* rview, iSector* sector,
-    iShaderVarStack* stacks) = 0;
+    csShaderVariableStack& stack) = 0;
 };
 
 /** @} */

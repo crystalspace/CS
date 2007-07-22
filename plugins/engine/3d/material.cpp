@@ -35,7 +35,7 @@ void csMaterial::SetupSVNames()
 {
   if (SVNames().diffuseTex == csInvalidStringID)
   {
-    SVNames().diffuseTex = CS::ShaderVarName (engine->globalStringSet,
+    SVNames().diffuseTex = CS::ShaderVarName (engine->svNameStringSet,
       CS_MATERIAL_TEXTURE_DIFFUSE);
   }
 }

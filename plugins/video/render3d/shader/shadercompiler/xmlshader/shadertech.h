@@ -141,7 +141,7 @@ public:
   bool ActivatePass (size_t number);
   bool SetupPass  (const csRenderMesh *mesh,
     csRenderMeshModes& modes,
-    const iShaderVarStack* stacks);
+    const csShaderVariableStack& stack);
   bool TeardownPass();
   bool DeactivatePass();
 

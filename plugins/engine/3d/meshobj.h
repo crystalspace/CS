@@ -567,17 +567,12 @@ public:
    * Push the variables of this context onto the variable stacks
    * supplied in the "stacks" argument
    */
-  void PushVariables (iShaderVarStack* stacks) const
+  void PushVariables (csShaderVariableStack& stack) const
   { 
-    if (factorySVC.IsValid()) factorySVC->PushVariables (stacks);
-    svcontext.PushVariables (stacks); 
+    if (factorySVC.IsValid()) factorySVC->PushVariables (stack);
+    svcontext.PushVariables (stack); 
   }
 
-  void PushVariables (csShaderVariable** stacks) const
-  { 
-    if (factorySVC.IsValid()) factorySVC->PushVariables (stacks);
-    svcontext.PushVariables (stacks); 
-  }
 
   bool IsEmpty () const 
   {

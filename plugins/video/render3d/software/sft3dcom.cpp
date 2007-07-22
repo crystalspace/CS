@@ -909,10 +909,11 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
 
   rmesh.object2world = mesh.object2world;
 
-  csRef<iShaderVarStack> stacks;
-  stacks.AttachNew (new scfArray<iShaderVarStack>);
-  shadermgr->PushVariables (stacks);
-  scrapContext.PushVariables (stacks);
+  csShaderVariableStack stack;
+  stack.Setup (strings->GetSize ());
+
+  shadermgr->PushVariables (stack);
+  scrapContext.PushVariables (stack);
 
   if (mesh.alphaType.autoAlphaMode)
   {
@@ -921,7 +922,7 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
     iTextureHandle* tex = 0;
 
     csShaderVariable* texVar =
-      csGetShaderVariableFromStack (stacks, mesh.alphaType.autoModeTexture);
+      csGetShaderVariableFromStack (stack, mesh.alphaType.autoModeTexture);
 
     if (texVar)
       texVar->GetValue (tex);
@@ -939,7 +940,7 @@ void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
   }
 
   SetZMode (mesh.z_buf_mode);
-  DrawMesh (&rmesh, rmesh, stacks);
+  DrawMesh (&rmesh, rmesh, stack);
 }
 
 static csZBufMode GetZModePass2 (csZBufMode mode)
@@ -1004,7 +1005,7 @@ static iRenderBuffer* ColorFixup (iRenderBuffer* srcBuffer,
 
 void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     const csRenderMeshModes& modes,
-    const iShaderVarStack* stacks)
+    const csShaderVariableStack& stack)
 {
   if (DrawMode == 0) return;
 
@@ -1061,7 +1062,7 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
 
   if (!indexbuf)
   {
-    csShaderVariable* indexBufSV = csGetShaderVariableFromStack (stacks, string_indices);
+    csShaderVariable* indexBufSV = csGetShaderVariableFromStack (stack, string_indices);
     CS_ASSERT (indexBufSV != 0);
     indexBufSV->GetValue (indexbuf);
   }
