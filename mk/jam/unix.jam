@@ -146,7 +146,9 @@ rule SystemLinkSharedLibrary
   }
   else
   {
-    LinkSharedLibrary $(<) : $(>) ;
+    LinkSharedLibraryFirst $(<) : $(>[1]) ;
+    LinkSharedLibraryIncremental $(<) : $(>[2-]) ;
+    LinkSharedLibraryFinal $(<) ;
   }
 
   Clean clean : $(<) ;
@@ -174,10 +176,22 @@ else
   }
 }
 
-actions LinkSharedLibrary bind NEEDLIBS bind EXTRAOBJECTS
+actions piecemeal together LinkSharedLibraryFirst bind NEEDLIBS bind EXTRAOBJECTS
 {
-  $(CMD.LINK) -shared -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS) \
+  $(CMD.LD) -r -o $(<).il $(>)
+}
+
+actions piecemeal together LinkSharedLibraryIncremental bind NEEDLIBS bind EXTRAOBJECTS
+{
+  $(CMD.LD) -r -o $(<).il.new $(<).il $(>)
+  $(MV) $(<).il.new $(<).il
+}
+
+actions LinkSharedLibraryFinal bind NEEDLIBS bind EXTRAOBJECTS
+{
+  $(CMD.LINK) -shared -o $(<) $(<).il $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS) \
     -Wl,-soname,$(<:BS)
+  $(RM) $(<).il
 }
 
 actions LinkSharedLibraryRsp bind NEEDLIBS bind EXTRAOBJECTS
