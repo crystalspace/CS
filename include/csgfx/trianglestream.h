@@ -115,7 +115,7 @@ namespace CS
      * \remark Don't forget to call BeginTriangulate() before using 
      * HasNext() or Next()!
      */
-    TriangleIndicesStream () : buf (0) { }
+    TriangleIndicesStream () : old2(0), old1(0), buf (0) { }
     /**
      * Construct triangle stream with an index buffer.
      * \param indices Index buffer to triangulate.
@@ -127,7 +127,7 @@ namespace CS
     TriangleIndicesStream (iRenderBuffer* indices,
 			   csRenderMeshType meshtype,
 			   size_t indexStart = 0, 
-			   size_t indexEnd = (size_t)~0)
+			   size_t indexEnd = (size_t)~0) : old2(0), old1(0)
     {
       BeginTriangulate (indices, meshtype, indexStart, indexEnd);
     }
