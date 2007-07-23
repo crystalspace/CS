@@ -8,6 +8,8 @@ chronological order.
 
 23-Jul-2007
 	- res merged r27294 into 1.0 (crystal.m4 fix).
+	- res updated scripts/jamtemplate/cel.m4 with the latest version from
+	  the CEL repository.
 18-Jul-2007
 	- res merged r27251, r27255 into 1.0 (cs-config wrapper improvements).
 25-Jun-2007
