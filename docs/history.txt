@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+23-Jul-2007
+	- res fixed crystal.m4 to use the right test order when a development
+	  resp. stable version is requested (previously, the orders actually
+	  tested where swapped in comparison to the described desired
+	  behaviour).
 18-Jul-2007
 	- res changed the cs-config wrapper to emit a better error message
 	  when no cs-config-* scripts are found. Also, the directory from

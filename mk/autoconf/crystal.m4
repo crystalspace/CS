@@ -95,9 +95,9 @@ cs_version_minor=`echo $cs_version_desired | sed "s/$sed_expr_base/\2/"`
 
 cs_version_sequence="$cs_version_major.$cs_version_minor"
 
-cs_version_desired_is_stable=`expr $cs_version_minor % 2`
+cs_version_desired_is_unstable=`expr $cs_version_minor % 2`
 
-AS_IF([test $cs_version_desired_is_stable -eq 0],
+AS_IF([test $cs_version_desired_is_unstable -eq 1],
   [# Development version search sequence
   y=`expr $cs_version_minor + 1`
   cs_version_sequence="$cs_version_sequence $cs_version_major.$y"
