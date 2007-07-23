@@ -20,7 +20,7 @@
 #==============================================================================
 AC_PREREQ([2.56])
 
-m4_define([cel_min_version_default], [0.99])
+m4_define([cel_min_version_default], [1.2])
 
 #------------------------------------------------------------------------------
 # CS_PATH_CEL_CHECK([MINIMUM-VERSION], [ACTION-IF-FOUND],
@@ -74,7 +74,49 @@ AS_IF([test -n "$CEL"],
 AS_IF([test -n "$cel_path"], [cel_path="$cel_path$PATH_SEPARATOR"])
 cel_path="$cel_path$PATH$PATH_SEPARATOR/usr/local/cel/bin"
 
-AC_PATH_TOOL([CEL_CONFIG_TOOL], [cel-config], [], [$cel_path])
+# Find a suitable CEL version.
+# For a given desired version X.Y, the compatibility rules are as follows:
+#  Y is even (stable version): compatible are X.Y+1 and X.Y+2.
+#  Y is odd (development version): compatible are X.Y+1 up to X.Y+3, assuming 
+#                                  no deprecated features are used.
+# Generally, an exact version match is preferred. If that is not the case,
+# stable versions are preferred over development version, with a closer
+# version number preferred.
+# This yields the following search order:
+#  Y is even (stable version): X.Y, X.Y+2, X.Y+1
+#  Y is odd (development version): X.Y, X.Y+1, X.Y+3, X.Y+2
+
+cel_version_desired=m4_default([$1],[cel_min_version_default])
+sed_expr_base=[\\\([0-9]\\\+\\\)\.\\\([0-9]\\\+\\\).*]
+cel_version_major=`echo $cel_version_desired | sed "s/$sed_expr_base/\1/"`
+cel_version_minor=`echo $cel_version_desired | sed "s/$sed_expr_base/\2/"`
+
+cel_version_sequence="$cel_version_major.$cels_version_minor"
+
+cel_version_desired_is_unstable=`expr $cel_version_minor % 2`
+
+AS_IF([test $cel_version_desired_is_unstable -eq 1],
+  [# Development version search sequence
+  y=`expr $cel_version_minor + 1`
+  cel_version_sequence="$cel_version_sequence $cel_version_major.$y"
+  y=`expr $cel_version_minor + 3`
+  cel_version_sequence="$cel_version_sequence $cel_version_major.$y"
+  y=`expr $cel_version_minor + 2`
+  cel_version_sequence="$cel_version_sequence $cel_version_major.$y"],
+  [# Stable version search sequence
+  y=`expr $cel_version_minor + 2`
+  cel_version_sequence="$cel_version_sequence $cel_version_major.$y"
+  y=`expr $cel_version_minor + 1`
+  cel_version_sequence="$cel_version_sequence $cel_version_major.$y"])
+
+for test_version in $cel_version_sequence; do
+  AC_PATH_TOOL([CEL_CONFIG_TOOL], [cel-config-$test_version], [], [$cel_path])
+  AS_IF([test -n "$CEL_CONFIG_TOOL"],
+    [break])
+done
+# Legacy: CEL 1.0 used a bare-named cel-config
+AS_IF([test -z "$CEL_CONFIG_TOOL"],
+  [AC_PATH_TOOL([CEL_CONFIG_TOOL], [cel-config], [], [$cel_path])])
 
 AS_IF([test -n "$CEL_CONFIG_TOOL"],
     [cfg="$CEL_CONFIG_TOOL"
