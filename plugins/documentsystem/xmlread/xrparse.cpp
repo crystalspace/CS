@@ -569,8 +569,8 @@ char* TrDocumentAttribute::Parse( const ParseInfo& parse, char* p )
 char* TrXmlText::Parse( const ParseInfo& parse, char* p )
 {
   //TrDocument* doc = GetDocument();
-  bool ignoreWhite = true;
-//  if ( doc && !doc->IgnoreWhiteSpace() ) ignoreWhite = false;
+  //bool ignoreWhite = true;
+  //if ( doc && !doc->IgnoreWhiteSpace() ) ignoreWhite = false;
 
   const char* end = "<";
   p = ReadText( p, value, vallen, parse.condenseWhiteSpace, end);

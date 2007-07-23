@@ -258,7 +258,6 @@ OSStatus csSndSysDriverCoreAudio::AudioProc(AudioDeviceID inDevice,
 
   // Fill the provided buffer with as many samples as possible and return the
   // number of frames provided
-    int q = 0; 
     OSStatus stat = 0;
     size_t framesFilled = attached_renderer->FillDriverBuffer( convert_buffer, convert_size, 0, 0);
 	size_t bytesWritten = outOutputData->mBuffers[0].mDataByteSize;

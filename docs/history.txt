@@ -25,6 +25,8 @@ chronological order.
 	  outright coding errors in various mesh plugins.
 	- Eric Sunshine eliminated compilation warnings in 'bugplug' and
 	  CS::TriangleIndicesStream.
+	- Eric Sunshine eliminated compilation warnings from various plugin
+	  modules.
 22-Jul-2007
 	- Vincent committed res' patch for incremental shared linking support
 	  on Unix, which fixes 'LinkSharedLibrary actions too long' build error
