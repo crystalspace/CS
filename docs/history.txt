@@ -11,6 +11,9 @@ chronological order.
 	  resp. stable version is requested (previously, the orders actually
 	  tested where swapped in comparison to the described desired
 	  behaviour).
+	- Eric Sunshine eliminated several compilation warnings in the shaders
+	  reported by the (admittedly somewhat buggy) Mac OS X gcc 4.0.1
+	  compiler.
 22-Jul-2007
 	- Vincent committed res' patch for incremental shared linking support
 	  on Unix, which fixes 'LinkSharedLibrary actions too long' build error
