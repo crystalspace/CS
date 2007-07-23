@@ -45,7 +45,6 @@ SCF_IMPLEMENT_FACTORY (csTerrainObjectLoader)
 
 
 static const char* FACTORYERRORID = "crystalspace.mesh.loader.factory.terrain2";
-static const char* ERRORID = "crystalspace.mesh.loader.terrain2";
 
 csTerrainFactoryLoader::csTerrainFactoryLoader (iBase* parent)
  : scfImplementationType (this, parent)

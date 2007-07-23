@@ -90,8 +90,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
       size_t outputHeight, size_t outputPitch, float heightScale, float offset,
       char* inputBuffer)
     {
-      size_t numPoints = outputWidth*outputHeight;
-      
       for (size_t y = 0; y < outputHeight; ++y)
       {
         float* row = outputBuffer;
@@ -221,6 +219,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
             outputPitch, heightScale, offset, buf->GetData ());
         }
         break;
+      case HEIGHT_SOURCE_IMAGE:
+	// @@@FIXME: Handle this case?
+	break;
     }
 
     return false;
@@ -235,8 +236,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
     if (!image)
       return false;
 
-    if (image->GetWidth () != outputWidth || 
-      image->GetHeight () != outputHeight)
+    if ((size_t)image->GetWidth () != outputWidth || 
+      (size_t)image->GetHeight () != outputHeight)
     {
       image = csImageManipulate::Rescale (image, (int)outputWidth, (int)outputHeight);
     }
@@ -244,7 +245,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Terrain2)
     if ((image->GetFormat () & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
     {
       const csRGBpixel *data = (csRGBpixel*)image->GetImageData ();
-      const float heightConstant = heightScale / ((float) ((1<<24)-1));
 
       for (size_t y = 0; y < outputHeight; ++y)
       {

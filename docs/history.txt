@@ -21,6 +21,8 @@ chronological order.
 	- Eric Sunshine suppressed deprecation warnings in 'stencil' render
 	  step where it is forced to utilize deprecated
 	  csTriangleMeshPolyMesh() for the sake of backward-compatibility.
+	- Eric Sunshine eliminated gobs of compilation warnings and some
+	  outright coding errors in various mesh plugins.
 22-Jul-2007
 	- Vincent committed res' patch for incremental shared linking support
 	  on Unix, which fixes 'LinkSharedLibrary actions too long' build error

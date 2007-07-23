@@ -65,7 +65,7 @@ struct TerraFormerFeederProperties : public
     {
       float x = 0, y = 0;
 
-      sscanf (value, "%f %f", x, y);
+      sscanf (value, "%f %f", &x, &y);
 
       samplerRegion.SetMin (0, x);
       samplerRegion.SetMin (1, y);
@@ -74,7 +74,7 @@ struct TerraFormerFeederProperties : public
     {
       float x = 1.0f, y = 1.0f;
 
-      sscanf (value, "%f %f", x, y);
+      sscanf (value, "%f %f", &x, &y);
 
       samplerRegion.SetMax (0, x);
       samplerRegion.SetMax (1, y);
