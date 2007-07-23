@@ -16,6 +16,8 @@ chronological order.
 	  compiler.
 	- Eric Sunshine eliminated a batch of compilation warnings in OpenGL
 	  renderer.
+	- Eric Sunshine eliminated a slew of compilation warnings, including
+	  deprecation warnings, from 'thing' plugin.
 22-Jul-2007
 	- Vincent committed res' patch for incremental shared linking support
 	  on Unix, which fixes 'LinkSharedLibrary actions too long' build error
