@@ -322,7 +322,6 @@ bool csGLTextureManager::FindFormats (const CS::StructuredTextureFormat& format,
   GLenum sourceType = 0;
 
   // Search for a matching, valid component size combo.
-  const FormatTemplate* foundFormat = 0;
   while (templates->targetFmtIndex >= 0)
   {
     targetFormat = targetTable[templates->targetFmtIndex];

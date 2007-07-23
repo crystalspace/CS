@@ -74,7 +74,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
   {
     GLint currentFB;
     glGetIntegerv (GL_FRAMEBUFFER_BINDING_EXT, &currentFB);
-    if (currentFB == framebuffer)
+    if (currentFB == (GLint)framebuffer)
       ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
 
     if (depthRB != 0)

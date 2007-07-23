@@ -89,13 +89,20 @@ csGLBasicTextureHandle::csGLBasicTextureHandle (int width,
   AdjustSizePo2 ();
 }
 
-csGLBasicTextureHandle::csGLBasicTextureHandle (csGLGraphics3D *iG3D,
-                                                TextureType texType, GLuint Handle) : 
-  scfImplementationType (this), txtmgr (iG3D->txtmgr), 
-  textureClass (txtmgr->GetTextureClassID ("default")), Handle (Handle), 
-  orig_width (0), orig_height (0), orig_d (0),
-  uploadData(0), G3D (iG3D), texFormat((TextureBlitDataFormat)-1), 
-  texType (texType), alphaType (csAlphaMode::alphaNone)
+csGLBasicTextureHandle::csGLBasicTextureHandle (
+    csGLGraphics3D *iG3D, TextureType texType, GLuint Handle) : 
+  scfImplementationType (this),
+  txtmgr (iG3D->txtmgr), 
+  textureClass (txtmgr->GetTextureClassID ("default")),
+  alphaType (csAlphaMode::alphaNone),
+  Handle (Handle),
+  orig_width (0),
+  orig_height (0),
+  orig_d (0),
+  uploadData (0),
+  G3D (iG3D),
+  texType (texType),
+  texFormat ((TextureBlitDataFormat)-1)
 {
   SetForeignHandle (true);
 }
