@@ -1,5 +1,7 @@
 1.2 branch log.
 
+23-Jul-2007
+	- res merged r27294 into 1.2 (crystal.m4 fix).
 22-Jul-2007
 	- Vincent merged r27282 into 1.2 (#278 fix).
 20-Jul-2007
