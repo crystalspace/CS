@@ -86,7 +86,9 @@ public:
    * Create a collider based on a mesh.
    * \deprecated Use version with iTriangleMesh instead.
    */
+#ifndef CS_DEPRECATION_SUPPRESS_HACK
   CS_DEPRECATED_METHOD_MSG("Use version with iTriangleMesh instead.")
+#endif
   csColliderWrapper (csObject& parent, iCollideSystem* collide_system,
   	iPolygonMesh* mesh);
 
@@ -94,7 +96,9 @@ public:
    * Create a collider based on a mesh.
    * \deprecated Use version with iTriangleMesh instead.
    */
+#ifndef CS_DEPRECATION_SUPPRESS_HACK
   CS_DEPRECATED_METHOD_MSG("Use version with iTriangleMesh instead.")
+#endif
   csColliderWrapper (iObject* parent, iCollideSystem* collide_system,
   	iPolygonMesh* mesh);
 
