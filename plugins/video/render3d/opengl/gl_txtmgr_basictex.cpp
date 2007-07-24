@@ -102,7 +102,7 @@ csGLBasicTextureHandle::csGLBasicTextureHandle (
   uploadData(0),
   G3D (iG3D),
   target (target),
-  texFormat((TextureBlitDataFormat)-1),
+  texFormat((TextureBlitDataFormat)-1)
 {
   SetForeignHandle (true);
 }
