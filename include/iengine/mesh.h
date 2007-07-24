@@ -156,8 +156,6 @@ class csReversibleTransform;
 
 /** @} */
 
-SCF_VERSION (iMeshDrawCallback, 0, 0, 1);
-
 /**
  * Set a callback which is called just before the object is drawn.
  * This is useful to do some expensive computations which only need
@@ -171,6 +169,8 @@ SCF_VERSION (iMeshDrawCallback, 0, 0, 1);
  */
 struct iMeshDrawCallback : public iBase
 {
+  SCF_INTERFACE (iMeshDrawCallback, 0, 0, 1);
+
   /**
    * Before drawing. It is safe to delete this callback
    * in this function.

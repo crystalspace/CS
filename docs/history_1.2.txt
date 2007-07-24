@@ -3,6 +3,7 @@
 24-Jul-2007
 	- Jorrit merged r27290:27292 into 1.2 (MacOS/X warning fixes).
 	- Jorrit merged r27297:27303 into 1.2 (warnings, OpenGL, MacOS/X).
+	- Jorrit merged r27118 into 1.2 (new SCF).
 23-Jul-2007
 	- res merged r27294 into 1.2 (crystal.m4 fix).
 	- res updated scripts/jamtemplate/cel.m4 with the latest version from

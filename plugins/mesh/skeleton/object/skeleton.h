@@ -103,9 +103,9 @@ public:
   virtual iSkeletonBone *GetChild (size_t i) { return bones[i]; }
   virtual iSkeletonBone *FindChild (const char *name);
   virtual void SetUpdateCallback (iSkeletonBoneUpdateCallback *callback) 
-    { cb = callback; }
+  { cb = callback; }
   virtual iSkeletonBoneUpdateCallback *GetUpdateCallback () 
-    { return cb; };
+  { return cb; };
   virtual iSkeletonBoneFactory *GetFactory();
   virtual size_t FindChildIndex (iSkeletonBone *child);
   virtual void SetSkinBox (csBox3 & box) { skin_box = box; }

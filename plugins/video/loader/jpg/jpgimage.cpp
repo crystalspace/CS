@@ -187,8 +187,8 @@ void csJPGImageIO::SetDithering (bool enable)
   ImageJpgFile::dither = enable;
 }
 
-csPtr<iDataBuffer> csJPGImageIO::Save(iImage *Image, iImageIO::FileFormatDescription*,
-  const char* extraoptions)
+csPtr<iDataBuffer> csJPGImageIO::Save(iImage *Image,
+    iImageIO::FileFormatDescription*, const char* extraoptions)
 {
   int format = Image->GetFormat ();
   switch (format & CS_IMGFMT_MASK)

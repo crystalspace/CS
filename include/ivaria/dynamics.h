@@ -310,8 +310,6 @@ struct iDynamicsMoveCallback : public virtual iBase
   virtual void Execute (csOrthoTransform& t) = 0;
 };
 
-SCF_VERSION (iDynamicsCollisionCallback, 0, 0, 2);
-
 /**
  * This is the interface for attaching a collider callback to the body
  * 
@@ -322,8 +320,10 @@ SCF_VERSION (iDynamicsCollisionCallback, 0, 0, 2);
  * - iDynamicSystem
  *   
  */
-struct iDynamicsCollisionCallback : public iBase
+struct iDynamicsCollisionCallback : public virtual iBase
 {
+  SCF_INTERFACE (iDynamicsCollisionCallback, 0, 0, 2);
+
   /**
    * A collision occured.
    * \param thisbody The body that received a collision.
@@ -657,8 +657,6 @@ enum csColliderGeometryType
 };
 
 
-SCF_VERSION (iDynamicsColliderCollisionCallback, 0, 0, 1);
-
 /**
  * This is the interface for attaching a collider callback to the body
  *
@@ -668,8 +666,10 @@ SCF_VERSION (iDynamicsColliderCollisionCallback, 0, 0, 1);
  * Main users of this interface:
  * - iDynamicSystem
  */
-struct iDynamicsColliderCollisionCallback : public iBase
+struct iDynamicsColliderCollisionCallback : public virtual iBase
 {
+  SCF_INTERFACE (iDynamicsColliderCollisionCallback, 0, 0, 1);
+
   virtual void Execute (iDynamicsSystemCollider *thiscollider, 
     iDynamicsSystemCollider *othercollider) = 0;
   virtual void Execute (iDynamicsSystemCollider *thiscollider, 

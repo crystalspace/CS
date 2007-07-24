@@ -110,6 +110,9 @@ chronological order.
 	  memory leaks and crashes when genmesh anim objects are removed
 	  from memory. Note that sprcal3d still has a circular reference
 	  bug with the graveyard.
+25-Jun-2007
+	- Jorrit converted a few remaining interfaces to using SCF_INTERFACE
+	  instead of SCF_VERSION.
 24-Jun-2007
 	- Eric Sunshine corrected "camera movement" documentation bug.
 	  Fixes #348.
