@@ -11,6 +11,22 @@ chronological order.
 	  resp. stable version is requested (previously, the orders actually
 	  tested where swapped in comparison to the described desired
 	  behaviour).
+	- Eric Sunshine eliminated several compilation warnings in the shaders
+	  reported by the (admittedly somewhat buggy) Mac OS X gcc 4.0.1
+	  compiler.
+	- Eric Sunshine eliminated a batch of compilation warnings in OpenGL
+	  renderer.
+	- Eric Sunshine eliminated a slew of compilation warnings, including
+	  deprecation warnings, from 'thing' plugin.
+	- Eric Sunshine suppressed deprecation warnings in 'stencil' render
+	  step where it is forced to utilize deprecated
+	  csTriangleMeshPolyMesh() for the sake of backward-compatibility.
+	- Eric Sunshine eliminated gobs of compilation warnings and some
+	  outright coding errors in various mesh plugins.
+	- Eric Sunshine eliminated compilation warnings in 'bugplug' and
+	  CS::TriangleIndicesStream.
+	- Eric Sunshine eliminated compilation warnings from various plugin
+	  modules.
 22-Jul-2007
 	- Vincent committed res' patch for incremental shared linking support
 	  on Unix, which fixes 'LinkSharedLibrary actions too long' build error

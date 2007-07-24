@@ -23,10 +23,13 @@
 #include <string.h>
 #include <ctype.h>
 
+#define CS_DEPRECATION_SUPPRESS_HACK
+#include "csgeom/trimesh.h"
+#undef CS_DEPRECATION_SUPPRESS_HACK
+
 #include "csgeom/box.h"
 #include "csgeom/plane3.h"
 #include "csgeom/tri.h"
-#include "csgeom/trimesh.h"
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
 #include "csgeom/math3d.h"

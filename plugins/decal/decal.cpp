@@ -204,8 +204,8 @@ void csDecal::AddStaticPoly(const csPoly3D & p)
   // more than the top of the face
 #ifdef CS_DECAL_CLIP_DECAL
   bool doFaceOffset = false;
-  float faceHighDot;
-  float invHighLowFaceDist;
+  float faceHighDot = 0.0f;
+  float invHighLowFaceDist = 0.0f;
   csVector3 faceBottomOffset;
   csVector3 faceCenter;
   if (fabs(polyNormThresholdValue) 

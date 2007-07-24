@@ -492,7 +492,7 @@ void csThingStatic::DistributePolyLMs (
       while (inputQueues[curQueue].polys.GetSize () > 0)
       {
         bool stuffed = false;
-        csSubRect* slmSR;
+        CS::SubRectangles::SubRect* slmSR;
         int polyIdx = inputQueues[curQueue].polys.Pop ();
         csPolygon3DStatic* sp = static_polygons[polyIdx];
 

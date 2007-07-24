@@ -1447,7 +1447,7 @@ void csInstmeshMeshObjectFactory::AddVertex (const csVector3& v,
 
 void csInstmeshMeshObjectFactory::Compress ()
 {
-  size_t old_num = fact_vertices.GetSize ();
+  //size_t old_num = fact_vertices.GetSize ();
   csCompressVertexInfo* vt = csVertexCompressor::Compress (
     	fact_vertices, fact_texels, fact_normals, fact_colors);
   if (vt)

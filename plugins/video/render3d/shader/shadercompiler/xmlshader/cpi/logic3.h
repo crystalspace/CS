@@ -61,8 +61,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
         return Lie;
       else if ((a.state == Truth) && (b.state == Truth))
         return Truth;
-      else
-        return Uncertain;
+      return Uncertain;
     }
     friend Logic3 operator|| (const Logic3& a, const Logic3& b)
     {
@@ -70,8 +69,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
         return Truth;
       else if ((a.state == Lie) && (b.state == Lie))
         return Lie;
-      else
-        return Uncertain;
+      return Uncertain;
     }
     friend Logic3 operator== (const Logic3& a, const Logic3& b)
     {

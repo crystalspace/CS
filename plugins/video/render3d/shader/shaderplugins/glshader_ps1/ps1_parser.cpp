@@ -465,11 +465,11 @@ static char GetRegType (csPSRegisterType type)
 {
   switch (type)
   {
-    case CS_PS_REG_TEX:		return 't'; break;
-    case CS_PS_REG_CONSTANT:	return 'c'; break;
-    case CS_PS_REG_TEMP:	return 'r'; break;
-    case CS_PS_REG_COLOR:	return 'v'; break;
-    default:			return '?'; break;
+    case CS_PS_REG_TEX:		return 't';
+    case CS_PS_REG_CONSTANT:	return 'c';
+    case CS_PS_REG_TEMP:	return 'r';
+    case CS_PS_REG_COLOR:	return 'v';
+    default:			return '?';
   }
 }
 

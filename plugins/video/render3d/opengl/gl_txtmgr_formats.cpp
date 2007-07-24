@@ -309,7 +309,6 @@ bool csGLTextureManager::DetermineGLFormat (
         if (!formats) return false;
 
         // Search for a matching, valid component size combo.
-        const FormatTemplate* foundFormat = 0;
         while (formats->targetFmtIndex >= 0)
         {
           targetFormat = targetTable[formats->targetFmtIndex];

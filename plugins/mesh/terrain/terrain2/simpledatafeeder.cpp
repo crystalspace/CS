@@ -133,9 +133,11 @@ csTerrainSimpleDataFeederProperties::csTerrainSimpleDataFeederProperties ()
 
 csTerrainSimpleDataFeederProperties::csTerrainSimpleDataFeederProperties (
   csTerrainSimpleDataFeederProperties& other)
-  : scfImplementationType (this), heightmapSource (other.heightmapSource),
-  materialmapSource (other.materialmapSource), heightmapFormat (other.heightmapFormat),
-  offset (other.offset)
+  : scfImplementationType (this),
+    heightmapSource (other.heightmapSource),
+    heightmapFormat (other.heightmapFormat),
+    materialmapSource (other.materialmapSource),
+    offset (other.offset)
 {
 }
 
