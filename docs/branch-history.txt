@@ -5,3 +5,7 @@ Order is the same as in history.txt.
 25-Jul-2007
 	- res started working on adding DLL creation support to the MSVC
 	  projects.
+	- res made the VC project generation respect the "shared" Library
+	  option.
+	- res made the VC-built shared libs include the version number in the
+	  filename.

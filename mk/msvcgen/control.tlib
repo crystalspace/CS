@@ -154,11 +154,11 @@ projtypes = {
   group =>
   {
   },
-  library =>
+  library_static =>
   {
     defines = ['_LIB', '_WINDOWS']
   },
-  library_dll =>
+  library_shared =>
   {
     defines = ['_WINDOWS', 'CS_BUILD_SHARED_LIBS']
   },
@@ -169,13 +169,19 @@ projtypes = {
   }
 };
 
+#------------------------------------------------------------------------------
+# "Mutators" create additional configurations where project types can be 
+# replaced with some other types. 
+#------------------------------------------------------------------------------
 mutators = [
   {
     namesuffix => ' (with static libs)'
+    library_static => 'library',
+    library_shared => 'library'
   },
   {
     namesuffix => ' (with DLLs)',
-    library => 'library_dll'
+    library_static => 'library'
   }
 ];
 

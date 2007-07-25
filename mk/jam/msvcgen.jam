@@ -528,23 +528,34 @@ MSVC.CFLAGS.plugin ?= ;
 MSVC.CFLAGS_DEBUG.plugin ?= ;
 MSVC.DEFINES.plugin ?= ;
 MSVC.DEFINES_DEBUG.plugin ?= ;
-MSVC.DEPEND.library ?= ;
-MSVC.DEPEND_DEBUG.library ?= ;
-MSVC.LIBRARY.library ?= ;
-MSVC.LIBRARY_DEBUG.library ?= ;
-MSVC.LFLAGS.library ?= ;
-MSVC.LFLAGS_DEBUG.library ?= ;
-MSVC.CFLAGS.library ?= ;
-MSVC.CFLAGS_DEBUG.library ?= ;
-MSVC.DEFINES.library ?= ;
-MSVC.DEFINES_DEBUG.library ?= ;
+MSVC.DEPEND.library_static ?= ;
+MSVC.DEPEND_DEBUG.library_static ?= ;
+MSVC.LIBRARY.library_static ?= ;
+MSVC.LIBRARY_DEBUG.library_static ?= ;
+MSVC.LFLAGS.library_static ?= ;
+MSVC.LFLAGS_DEBUG.library_static ?= ;
+MSVC.CFLAGS.library_static ?= ;
+MSVC.CFLAGS_DEBUG.library_static ?= ;
+MSVC.DEFINES.library_static ?= ;
+MSVC.DEFINES_DEBUG.library_static ?= ;
+MSVC.DEPEND.library_shared ?= ;
+MSVC.DEPEND_DEBUG.library_shared ?= ;
+MSVC.LIBRARY.library_shared ?= ;
+MSVC.LIBRARY_DEBUG.library_shared ?= ;
+MSVC.LFLAGS.library_shared ?= ;
+MSVC.LFLAGS_DEBUG.library_shared ?= ;
+MSVC.CFLAGS.library_shared ?= ;
+MSVC.CFLAGS_DEBUG.library_shared ?= ;
+MSVC.DEFINES.library_shared ?= ;
+MSVC.DEFINES_DEBUG.library_shared ?= ;
 
-MSVC.PREFIX.appgui    ?= app ;
-MSVC.PREFIX.appcon    ?= app ;
-MSVC.PREFIX.plugin    ?= plg ;
-MSVC.PREFIX.library   ?= lib ;
-MSVC.PREFIX.group     ?= grp ;
-MSVC.PREFIX.workspace ?= wks ;
+MSVC.PREFIX.appgui         ?= app ;
+MSVC.PREFIX.appcon         ?= app ;
+MSVC.PREFIX.plugin         ?= plg ;
+MSVC.PREFIX.library_static ?= lib ;
+MSVC.PREFIX.library_shared ?= lib ;
+MSVC.PREFIX.group          ?= grp ;
+MSVC.PREFIX.workspace      ?= wks ;
 
 SetProperty build : projgen : msvc ;
 SetProperty build : projgen_version : $(MSVC_VERSION) ;
@@ -710,6 +721,7 @@ rule MsvcProject
   ResponseFile $(respfile) :
     "key|value"
     "formatversion|$(MSVC_FORMATVERSION_PRJ)"
+    "packageversion|$(PACKAGE_VERSION_LIST[1]).$(PACKAGE_VERSION_LIST[2])"
     "projtype|$(type)"
     "project|$(msvcname)"
     "rawtarget|$(rawname)"
@@ -1073,9 +1085,20 @@ rule Plugin
 
 rule Library
 {
+  local options = $(3) ;
+
   RegisterWellKnownCompileGroup libs ;
-  $(<)_TYPE = library ;
-  MsvcProject $(<) : library : $(<:S=.lib) : $(>) ;
+  local type ;
+  if ( ! [ IsElem shared : $(options) ] )
+  {
+    type = library_static ;
+  }
+  else
+  {
+    type = library_shared ;
+  }
+  $(<)_TYPE = $(type) ;
+  MsvcProject $(<) : $(type) : $(<:S=.lib) : $(>) ;
   CompileGroups $(<) : all libs ;
 }
 

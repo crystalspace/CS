@@ -58,10 +58,10 @@
 [% MACRO global_library BLOCK -%]
 			ConfigurationType="4"
 [% END %]
-[% MACRO global_library_dll BLOCK -%]
+[% MACRO global_library_shared BLOCK -%]
 			ConfigurationType="2"
 [% END %]
-[% MACRO global_library_dll_relwase BLOCK -%]
+[% MACRO global_library_shared_release BLOCK -%]
 			WholeProgramOptimization="1"
 [% END %]
 
@@ -121,15 +121,17 @@
 [% MACRO linker_appgui_release GET linker_app(2) %]
 [% MACRO linker_appgui_debug GET linker_app(1) %]
 
+[% MACRO library_dll_versuffix GET ('-' _ my.doc.packageversion.0) IF my.doc.packageversion.0 -%]
 [% MACRO library_dll_outfile(suffix) BLOCK -%]
-				OutputFile="[% path([my.doc.buildroot.0, my.doc.project.0]) %]-vc[% my.doc.msvcversion.0 %][% suffix %].dll"
+				OutputFile="[% path([my.doc.buildroot.0, my.doc.project.0]) -%]
+[% library_dll_versuffix %]-vc[% my.doc.msvcversion.0 %][% suffix %].dll"
 [% END %]
-[% MACRO linker_library_dll_release BLOCK -%]
+[% MACRO linker_library_shared_release BLOCK -%]
 [% library_dll_outfile('') -%]
 				ImportLibrary="[% worklibout %]\[% my.doc.project.0 %].lib"
 [% END %]
 
-[% MACRO linker_library_dll_debug BLOCK -%]
+[% MACRO linker_library_shared_debug BLOCK -%]
 [% library_dll_outfile('_d') -%]
 				ImportLibrary="[% worklibout %]\[% my.doc.project.0 %]_d.lib"
 [% END %]
@@ -149,7 +151,7 @@
 [% MACRO librarian_group	   GET library_outfile('') %]
 
 [% MACRO postbuild_common BLOCK -%]
-				CommandLine="md bin 2&gt; nul&#x0D;&#x0Acopy /y &quot;$(TargetPath)&quot; [% path([workroot, 'bin\\']) %]&#x0D;&#x0A"
+				CommandLine="md bin 2&gt; nul&#x0D;&#x0A;copy /y &quot;$(TargetPath)&quot; [% path([workroot, 'bin\\']) %]&#x0D;&#x0A;"
 [% END %]
 
 [% MACRO postbuild_release GET postbuild_common %]
