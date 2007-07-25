@@ -2125,6 +2125,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SegmentXFrustum = *cspacec::csIntersect3_SegmentXFrustum;
 *SegmentYFrustum = *cspacec::csIntersect3_SegmentYFrustum;
 *BoxSegment = *cspacec::csIntersect3_BoxSegment;
+*ClipSegmentBox = *cspacec::csIntersect3_ClipSegmentBox;
 *BoxFrustum = *cspacec::csIntersect3_BoxFrustum;
 *BoxSphere = *cspacec::csIntersect3_BoxSphere;
 *BoxPlane = *cspacec::csIntersect3_BoxPlane;
@@ -8183,6 +8184,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetManualUpdates = *cspacec::iSkeletonGraveyard_SetManualUpdates;
 *Update = *cspacec::iSkeletonGraveyard_Update;
 *AddSkeleton = *cspacec::iSkeletonGraveyard_AddSkeleton;
+*RemoveSkeleton = *cspacec::iSkeletonGraveyard_RemoveSkeleton;
 *scfGetVersion = *cspacec::iSkeletonGraveyard_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
