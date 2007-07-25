@@ -21,9 +21,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 using namespace CS::Platform;
 
-bool CS::SIMD::hasISet(int setReq)
+bool CS::SIMD::HasInstructionSet(int setReq)
 {
-    ProcessorSpecDetection detect;
+    static ProcessorSpecDetection detect;
 
     switch(setReq)
     {

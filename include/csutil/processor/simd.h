@@ -56,57 +56,57 @@ namespace CS
         };
 
         // Checks if the instruction set is available.
-        bool hasISet(int setReq);
+        bool HasInstructionSet(int setReq);
 
         // TODO: Make function pointer a parameter of the template and use a class to ID SIMD type.
         // Right now, support is for 1-2 SIMD functions + Fallback, with up to 5 arguments.
 
         /*
         * Syntax is:
-        * SIMDCheck<ReturnType, SIMDTypes, ArgumentTypes>(SIMDFunction, C++Function, Arguments);
+        * SIMDDispatch<ReturnType, SIMDTypes, ArgumentTypes>(SIMDFunction, C++Function, Arguments);
         */
 
         // One SIMD
 
         template<typename R, class SIMDType>
-        inline R SIMDCheck(R (*SIMDFunction), R (*CPPFunction))
+        inline R SIMDDispatch(R (*SIMDFunction), R (*CPPFunction))
         {
-            if(hasISet(SIMDType::iSet))
+            if(HasInstructionSet(SIMDType::iSet))
                 return (*SIMDFunction);
             return (*CPPFunction);
         }
         template<typename R, class SIMDType, typename ArgR>
-        inline R SIMDCheck(R (*SIMDFunction)(ArgR), R (*CPPFunction)(ArgR), ArgR arg)
+        inline R SIMDDispatch(R (*SIMDFunction)(ArgR), R (*CPPFunction)(ArgR), ArgR arg)
         {
-            if(hasISet(SIMDType::iSet))
+            if(HasInstructionSet(SIMDType::iSet))
                 return (*SIMDFunction)(arg);
             return (*CPPFunction)(arg);
         }
         template<typename R, class SIMDType, typename ArgR1, typename ArgR2>
-        inline R SIMDCheck(R (*SIMDFunction)(ArgR1, ArgR2), R (*CPPFunction)(ArgR1, ArgR2), ArgR1 arg1, ArgR2 arg2)
+        inline R SIMDDispatch(R (*SIMDFunction)(ArgR1, ArgR2), R (*CPPFunction)(ArgR1, ArgR2), ArgR1 arg1, ArgR2 arg2)
         {
-            if(hasISet(SIMDType::iSet))
+            if(HasInstructionSet(SIMDType::iSet))
                 return (*SIMDFunction)(arg1, arg2);
             return (*CPPFunction)(arg1, arg2);
         }
         template<typename R, class SIMDType, typename ArgR1, typename ArgR2, typename ArgR3>
-        inline R SIMDCheck(R (*SIMDFunction)(ArgR1, ArgR2, ArgR3), R (*CPPFunction)(ArgR1, ArgR2, ArgR3), ArgR1 arg1, ArgR2 arg2, ArgR3 arg3)
+        inline R SIMDDispatch(R (*SIMDFunction)(ArgR1, ArgR2, ArgR3), R (*CPPFunction)(ArgR1, ArgR2, ArgR3), ArgR1 arg1, ArgR2 arg2, ArgR3 arg3)
         {
-            if(hasISet(SIMDType::iSet))
+            if(HasInstructionSet(SIMDType::iSet))
                 return (*SIMDFunction)(arg1, arg2, arg3);
             return (*CPPFunction)(arg1, arg2, arg3);
         }
         template<typename R, class SIMDType, typename ArgR1, typename ArgR2, typename ArgR3, typename ArgR4>
-        inline R SIMDCheck(R (*SIMDFunction)(ArgR1, ArgR2, ArgR3, ArgR4), R (*CPPFunction)(ArgR1, ArgR2, ArgR3, ArgR4), ArgR1 arg1, ArgR2 arg2, ArgR3 arg3, ArgR4 arg4)
+        inline R SIMDDispatch(R (*SIMDFunction)(ArgR1, ArgR2, ArgR3, ArgR4), R (*CPPFunction)(ArgR1, ArgR2, ArgR3, ArgR4), ArgR1 arg1, ArgR2 arg2, ArgR3 arg3, ArgR4 arg4)
         {
-            if(hasISet(SIMDType::iSet))
+            if(HasInstructionSet(SIMDType::iSet))
                 return (*SIMDFunction)(arg1, arg2, arg3, arg4);
             return (*CPPFunction)(arg1, arg2, arg3, arg4);
         }
         template<typename R, class SIMDType, typename ArgR1, typename ArgR2, typename ArgR3, typename ArgR4, typename ArgR5>
-        inline R SIMDCheck(R (*SIMDFunction)(ArgR1, ArgR2, ArgR3, ArgR4, ArgR5), R (*CPPFunction)(ArgR1, ArgR2, ArgR3, ArgR4, ArgR5), ArgR1 arg1, ArgR2 arg2, ArgR3 arg3, ArgR4 arg4, ArgR5 arg5)
+        inline R SIMDDispatch(R (*SIMDFunction)(ArgR1, ArgR2, ArgR3, ArgR4, ArgR5), R (*CPPFunction)(ArgR1, ArgR2, ArgR3, ArgR4, ArgR5), ArgR1 arg1, ArgR2 arg2, ArgR3 arg3, ArgR4 arg4, ArgR5 arg5)
         {
-            if(hasISet(SIMDType::iSet))
+            if(HasInstructionSet(SIMDType::iSet))
                 return (*SIMDFunction)(arg1, arg2, arg3, arg4, arg5);
             return (*CPPFunction)(arg1, arg2, arg3, arg4, arg5);
         }
@@ -114,115 +114,115 @@ namespace CS
         // Two SIMD
 
         template<typename R, class SIMDType1, class SIMDType2>
-        inline R SIMDCheck(R (*SIMDFunction1), R (*SIMDFunction2), R (*CPPFunction))
+        inline R SIMDDispatch(R (*SIMDFunction1), R (*SIMDFunction2), R (*CPPFunction))
         {
             if(SIMDType1::iSet < SIMDType2::iSet)
             {
-                if(hasISet(SIMDType2::iSet))
+                if(HasInstructionSet(SIMDType2::iSet))
                     return (*SIMDFunction2);
-                if(hasISet(SIMDType1::iSet))
+                if(HasInstructionSet(SIMDType1::iSet))
                     return (*SIMDFunction1);
             }
             else
             {
-                if(hasISet(SIMDType1::iSet))
+                if(HasInstructionSet(SIMDType1::iSet))
                     return (*SIMDFunction1);
-                if(hasISet(SIMDType2::iSet))
+                if(HasInstructionSet(SIMDType2::iSet))
                     return (*SIMDFunction2);
             }
             return (*CPPFunction);
         }
         template<typename R, class SIMDType1, class SIMDType2, typename ArgR>
-        inline R SIMDCheck(R (*SIMDFunction1)(ArgR), R (*SIMDFunction2), R (*CPPFunction)(ArgR), ArgR arg)
+        inline R SIMDDispatch(R (*SIMDFunction1)(ArgR), R (*SIMDFunction2), R (*CPPFunction)(ArgR), ArgR arg)
         {
             if(SIMDType1::iSet < SIMDType2::iSet)
             {
-                if(hasISet(SIMDType2::iSet))
+                if(HasInstructionSet(SIMDType2::iSet))
                     return (*SIMDFunction2)(arg);
-                if(hasISet(SIMDType1::iSet))
+                if(HasInstructionSet(SIMDType1::iSet))
                     return (*SIMDFunction1)(arg);
             }
             else
             {
-                if(hasISet(SIMDType1::iSet))
+                if(HasInstructionSet(SIMDType1::iSet))
                     return (*SIMDFunction1)(arg);
-                if(hasISet(SIMDType2::iSet))
+                if(HasInstructionSet(SIMDType2::iSet))
                     return (*SIMDFunction2)(arg);
             }
             return (*CPPFunction)(arg);
         }
         template<typename R, class SIMDType1, class SIMDType2, typename ArgR1, typename ArgR2>
-        inline R SIMDCheck(R (*SIMDFunction1)(ArgR1, ArgR2), R (*SIMDFunction2), R (*CPPFunction)(ArgR1, ArgR2), ArgR1 arg1, ArgR2 arg2)
+        inline R SIMDDispatch(R (*SIMDFunction1)(ArgR1, ArgR2), R (*SIMDFunction2), R (*CPPFunction)(ArgR1, ArgR2), ArgR1 arg1, ArgR2 arg2)
         {
             if(SIMDType1::iSet < SIMDType2::iSet)
             {
-                if(hasISet(SIMDType2::iSet))
+                if(HasInstructionSet(SIMDType2::iSet))
                     return (*SIMDFunction2)(arg1, arg2);
-                if(hasISet(SIMDType1::iSet))
+                if(HasInstructionSet(SIMDType1::iSet))
                     return (*SIMDFunction1)(arg1, arg2);
             }
             else
             {
-                if(hasISet(SIMDType1::iSet))
+                if(HasInstructionSet(SIMDType1::iSet))
                     return (*SIMDFunction1)(arg1, arg2);
-                if(hasISet(SIMDType2::iSet))
+                if(HasInstructionSet(SIMDType2::iSet))
                     return (*SIMDFunction2)(arg1, arg2);
             }
             return (*CPPFunction)(arg1, arg2);
         }
         template<typename R, class SIMDType1, class SIMDType2, typename ArgR1, typename ArgR2, typename ArgR3>
-        inline R SIMDCheck(R (*SIMDFunction1)(ArgR1, ArgR2, ArgR3), R (*SIMDFunction2), R (*CPPFunction)(ArgR1, ArgR2, ArgR3), ArgR1 arg1, ArgR2 arg2, ArgR3 arg3)
+        inline R SIMDDispatch(R (*SIMDFunction1)(ArgR1, ArgR2, ArgR3), R (*SIMDFunction2), R (*CPPFunction)(ArgR1, ArgR2, ArgR3), ArgR1 arg1, ArgR2 arg2, ArgR3 arg3)
         {
             if(SIMDType1::iSet < SIMDType2::iSet)
             {
-                if(hasISet(SIMDType2::iSet))
+                if(HasInstructionSet(SIMDType2::iSet))
                     return (*SIMDFunction2)(arg1, arg2, arg3);
-                if(hasISet(SIMDType1::iSet))
+                if(HasInstructionSet(SIMDType1::iSet))
                     return (*SIMDFunction1)(arg1, arg2, arg3);
             }
             else
             {
-                if(hasISet(SIMDType1::iSet))
+                if(HasInstructionSet(SIMDType1::iSet))
                     return (*SIMDFunction1)(arg1, arg2, arg3);
-                if(hasISet(SIMDType2::iSet))
+                if(HasInstructionSet(SIMDType2::iSet))
                     return (*SIMDFunction2)(arg1, arg2, arg3);
             }
             return (*CPPFunction)(arg1, arg2, arg3);
         }
         template<typename R, class SIMDType1, class SIMDType2, typename ArgR1, typename ArgR2, typename ArgR3, typename ArgR4>
-        inline R SIMDCheck(R (*SIMDFunction1)(ArgR1, ArgR2, ArgR3, ArgR4), R (*SIMDFunction2), R (*CPPFunction)(ArgR1, ArgR2, ArgR3, ArgR4), ArgR1 arg1, ArgR2 arg2, ArgR3 arg3, ArgR4 arg4)
+        inline R SIMDDispatch(R (*SIMDFunction1)(ArgR1, ArgR2, ArgR3, ArgR4), R (*SIMDFunction2), R (*CPPFunction)(ArgR1, ArgR2, ArgR3, ArgR4), ArgR1 arg1, ArgR2 arg2, ArgR3 arg3, ArgR4 arg4)
         {
             if(SIMDType1::iSet < SIMDType2::iSet)
             {
-                if(hasISet(SIMDType2::iSet))
+                if(HasInstructionSet(SIMDType2::iSet))
                     return (*SIMDFunction2)(arg1, arg2, arg3, arg4);
-                if(hasISet(SIMDType1::iSet))
+                if(HasInstructionSet(SIMDType1::iSet))
                     return (*SIMDFunction1)(arg1, arg2, arg3, arg4);
             }
             else
             {
-                if(hasISet(SIMDType1::iSet))
+                if(HasInstructionSet(SIMDType1::iSet))
                     return (*SIMDFunction1)(arg1, arg2, arg3, arg4);
-                if(hasISet(SIMDType2::iSet))
+                if(HasInstructionSet(SIMDType2::iSet))
                     return (*SIMDFunction2)(arg1, arg2, arg3, arg4);
             }
             return (*CPPFunction)(arg1, arg2, arg3, arg4);
         }
         template<typename R, class SIMDType1, class SIMDType2, typename ArgR1, typename ArgR2, typename ArgR3, typename ArgR4, typename ArgR5>
-        inline R SIMDCheck(R (*SIMDFunction1)(ArgR1, ArgR2, ArgR3, ArgR4, ArgR5), R (*SIMDFunction2), R (*CPPFunction)(ArgR1, ArgR2, ArgR3, ArgR4, ArgR5), ArgR1 arg1, ArgR2 arg2, ArgR3 arg3, ArgR4 arg4, ArgR5 arg5)
+        inline R SIMDDispatch(R (*SIMDFunction1)(ArgR1, ArgR2, ArgR3, ArgR4, ArgR5), R (*SIMDFunction2), R (*CPPFunction)(ArgR1, ArgR2, ArgR3, ArgR4, ArgR5), ArgR1 arg1, ArgR2 arg2, ArgR3 arg3, ArgR4 arg4, ArgR5 arg5)
         {
             if(SIMDType1::iSet < SIMDType2::iSet)
             {
-                if(hasISet(SIMDType2::iSet))
+                if(HasInstructionSet(SIMDType2::iSet))
                     return (*SIMDFunction2)(arg1, arg2, arg3, arg4, arg5);
-                if(hasISet(SIMDType1::iSet))
+                if(HasInstructionSet(SIMDType1::iSet))
                     return (*SIMDFunction1)(arg1, arg2, arg3, arg4, arg5);
             }
             else
             {
-                if(hasISet(SIMDType1::iSet))
+                if(HasInstructionSet(SIMDType1::iSet))
                     return (*SIMDFunction1)(arg1, arg2, arg3, arg4, arg5);
-                if(hasISet(SIMDType2::iSet))
+                if(HasInstructionSet(SIMDType2::iSet))
                     return (*SIMDFunction2)(arg1, arg2, arg3, arg4, arg5);
             }
             return (*CPPFunction)(arg1, arg2, arg3, arg4, arg5);

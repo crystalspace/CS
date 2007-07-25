@@ -112,7 +112,7 @@ int main(int argc, char* argv[])
 
     printf("Running SIMD test 1.\n");
     csTicks start = csGetMicroTicks();
-    if(SIMDCheck<bool, SSEType, float*, float*, float*, int>((*SIMDTest::testSSE), (*SIMDTest::testCPP), a, b, c, size))
+    if(SIMDDispatch<bool, SSEType, float*, float*, float*, int>((*SIMDTest::testSSE), (*SIMDTest::testCPP), a, b, c, size))
     {
         printf("Time taken: %lldus \n", csGetMicroTicks()-start);
         float output = 0.0f;
