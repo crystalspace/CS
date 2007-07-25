@@ -44,13 +44,13 @@ csGLBasicTextureHandle::csGLBasicTextureHandle (int width,
   switch (imagetype)
   {
     case csimgCube:
-      target = CS_TEX_IMG_CUBEMAP;
+      texType = texTypeCube;
       break;
     case csimg3D:
-      target = CS_TEX_IMG_3D;
+      texType = texType3D;
       break;
     default:
-      target = CS_TEX_IMG_2D;
+      texType = texType2D;
       break;
   }
   const uint npotsNeededFlags = (CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_CLAMP);
@@ -80,7 +80,7 @@ csGLBasicTextureHandle::csGLBasicTextureHandle (int width,
        * support of non-POT _2D_ textures; that is, the textures, being
        * NPOTS, need to go to the 2D target, not RECT. 
        * Same when ARB_tnpot is available. */
-      target = CS_TEX_IMG_RECT;
+      texType = texTypeRect;
   }
   texFlags.Set (flagsPublicMask, flags);
 
@@ -89,13 +89,20 @@ csGLBasicTextureHandle::csGLBasicTextureHandle (int width,
   AdjustSizePo2 ();
 }
 
-csGLBasicTextureHandle::csGLBasicTextureHandle (csGLGraphics3D *iG3D,
-                                                int target, GLuint Handle) : 
-  scfImplementationType (this), txtmgr (iG3D->txtmgr), 
-  textureClass (txtmgr->GetTextureClassID ("default")), Handle (Handle), 
-  orig_width (0), orig_height (0), orig_d (0),
-  uploadData(0), G3D (iG3D), texFormat((TextureBlitDataFormat)-1), 
-  target (target), alphaType (csAlphaMode::alphaNone)
+csGLBasicTextureHandle::csGLBasicTextureHandle (
+    csGLGraphics3D *iG3D, TextureType texType, GLuint Handle) : 
+  scfImplementationType (this),
+  txtmgr (iG3D->txtmgr), 
+  textureClass (txtmgr->GetTextureClassID ("default")),
+  alphaType (csAlphaMode::alphaNone),
+  Handle (Handle),
+  orig_width (0),
+  orig_height (0),
+  orig_d (0),
+  uploadData (0),
+  G3D (iG3D),
+  texType (texType),
+  texFormat ((TextureBlitDataFormat)-1)
 {
   SetForeignHandle (true);
 }
@@ -111,7 +118,8 @@ bool csGLBasicTextureHandle::SynthesizeUploadData (
   iString* fail_reason)
 {
   TextureStorageFormat glFormat;
-  if (!txtmgr->DetermineGLFormat (format, glFormat)) 
+  TextureSourceFormat srcFormat;
+  if (!txtmgr->DetermineGLFormat (format, glFormat, srcFormat)) 
   {
     if (fail_reason) fail_reason->Replace ("no GL support for texture format");
     return 0;
@@ -129,7 +137,7 @@ bool csGLBasicTextureHandle::SynthesizeUploadData (
     return false;
   }
 
-  const int imgNum = (target == GL_TEXTURE_CUBE_MAP) ? 6 : 1;
+  const int imgNum = (texType == texTypeCube) ? 6 : 1;
 
   FreshUploadData ();
   if (texFlags.Check (CS_TEXTURE_NOMIPMAPS))
@@ -141,7 +149,8 @@ bool csGLBasicTextureHandle::SynthesizeUploadData (
       upload.w = actual_width;
       upload.h = actual_height;
       upload.d = actual_d;
-      upload.sourceFormat = glFormat;
+      upload.storageFormat = glFormat;
+      upload.sourceFormat = srcFormat;
       upload.mip = 0;
       upload.imageNum = i;
 
@@ -164,7 +173,8 @@ bool csGLBasicTextureHandle::SynthesizeUploadData (
         upload.w = w;
         upload.h = h;
         upload.d = d;
-        upload.sourceFormat = glFormat;
+        upload.storageFormat = glFormat;
+        upload.sourceFormat = srcFormat;
         upload.mip = nMip;
         upload.imageNum = i;
 
@@ -337,19 +347,7 @@ void csGLBasicTextureHandle::Blit (int x, int y, int width,
     // (slooow) on subsequent glTexSubImage() calls.
     if (!isWholeImage)
     {
-      uint8* pixels = new uint8[actual_width * actual_height * 4];
-      glGetTexImage (textarget, 0, textureFormat, GL_UNSIGNED_BYTE, 
-	pixels);
-
-      if (!IsWasRenderTarget())
-      {
-	SetWasRenderTarget (true);
-	SetupAutoMipping();
-      }
-
-      glTexImage2D (textarget, 0, GL_RGBA8, actual_width, 
-	actual_height, 0, textureFormat, GL_UNSIGNED_BYTE, pixels);
-      delete[] pixels;
+      EnsureUncompressed (true);
     }
     else
     {
@@ -403,7 +401,7 @@ void csGLBasicTextureHandle::Load ()
   const GLint wrapMode = 
     (texFlags.Check (CS_TEXTURE_CLAMP)) ? GL_CLAMP_TO_EDGE : GL_REPEAT;
 
-  if (target == CS_TEX_IMG_1D)
+  if (texType == texType1D)
   {
     G3D->statecache->SetTexture (GL_TEXTURE_1D, Handle);
     glTexParameteri (GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, wrapMode);
@@ -418,7 +416,7 @@ void csGLBasicTextureHandle::Load ()
 
     // @@@ Implement upload!
   }
-  else if (target == CS_TEX_IMG_2D)
+  else if (texType == texType2D)
   {
     G3D->statecache->SetTexture (GL_TEXTURE_2D, Handle);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
@@ -438,22 +436,22 @@ void csGLBasicTextureHandle::Load ()
     for (i = 0; i < uploadData->GetSize(); i++)
     {
       const csGLUploadData& uploadData = this->uploadData->Get (i);
-      if (uploadData.sourceFormat.isCompressed)
+      if (uploadData.storageFormat.isCompressed)
       {
 	G3D->ext->glCompressedTexImage2DARB (GL_TEXTURE_2D, uploadData.mip, 
-	  uploadData.sourceFormat.targetFormat, uploadData.w, uploadData.h, 
+	  uploadData.storageFormat.targetFormat, uploadData.w, uploadData.h, 
 	  0, (GLsizei)uploadData.compressedSize, uploadData.image_data);
       }
       else
       {
 	glTexImage2D (GL_TEXTURE_2D, uploadData.mip, 
-	  uploadData.sourceFormat.targetFormat, 
+	  uploadData.storageFormat.targetFormat, 
 	  uploadData.w, uploadData.h, 0, uploadData.sourceFormat.format, 
 	  uploadData.sourceFormat.type, uploadData.image_data);
       }
     }
   }
-  else if (target == CS_TEX_IMG_3D)
+  else if (texType == texType3D)
   {
     G3D->statecache->Enable_GL_TEXTURE_3D ();
     G3D->statecache->SetTexture (GL_TEXTURE_3D, Handle);
@@ -476,23 +474,23 @@ void csGLBasicTextureHandle::Load ()
     for (i = 0; i < uploadData->GetSize (); i++)
     {
       const csGLUploadData& uploadData = this->uploadData->Get (i);
-      if (uploadData.sourceFormat.isCompressed)
+      if (uploadData.storageFormat.isCompressed)
       {
 	G3D->ext->glCompressedTexImage3DARB (GL_TEXTURE_3D, uploadData.mip, 
-	  uploadData.sourceFormat.targetFormat, uploadData.w, uploadData.h, 
+	  uploadData.storageFormat.targetFormat, uploadData.w, uploadData.h, 
 	  uploadData.d, 0, (GLsizei)uploadData.compressedSize, 
 	  uploadData.image_data);
       }
       else
       {
 	G3D->ext->glTexImage3DEXT (GL_TEXTURE_3D, uploadData.mip, 
-	  uploadData.sourceFormat.targetFormat, uploadData.w, uploadData.h, 
+	  uploadData.storageFormat.targetFormat, uploadData.w, uploadData.h, 
           uploadData.d, 0, uploadData.sourceFormat.format, 
           uploadData.sourceFormat.type, uploadData.image_data);
       }
     }
   }
-  else if (target == CS_TEX_IMG_CUBEMAP)
+  else if (texType == texTypeCube)
   {
     G3D->statecache->SetTexture (GL_TEXTURE_CUBE_MAP, Handle);
     // @@@ Temporarily force clamp, although I don't know if REPEAT
@@ -520,25 +518,25 @@ void csGLBasicTextureHandle::Load ()
     {
       const csGLUploadData& uploadData = this->uploadData->Get (i);
 
-      if (uploadData.sourceFormat.isCompressed)
+      if (uploadData.storageFormat.isCompressed)
       {
 	G3D->ext->glCompressedTexImage2DARB (
 	  GL_TEXTURE_CUBE_MAP_POSITIVE_X + uploadData.imageNum, 
 	  uploadData.mip, 
-	  uploadData.sourceFormat.targetFormat, uploadData.w, uploadData.h, 
+	  uploadData.storageFormat.targetFormat, uploadData.w, uploadData.h, 
 	  0, (GLsizei)uploadData.compressedSize, uploadData.image_data);
       }
       else
       {
 	glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X + uploadData.imageNum, 
-	  uploadData.mip, uploadData.sourceFormat.targetFormat, 
+	  uploadData.mip, uploadData.storageFormat.targetFormat, 
 	  uploadData.w, uploadData.h,
 	  0, uploadData.sourceFormat.format, uploadData.sourceFormat.type,
 	  uploadData.image_data);
       }
     }
   }
-  else if (target == CS_TEX_IMG_RECT)
+  else if (texType == texTypeRect)
   {
     G3D->statecache->SetTexture (GL_TEXTURE_RECTANGLE_ARB, Handle);
     glTexParameteri (GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_S, wrapMode);
@@ -558,17 +556,17 @@ void csGLBasicTextureHandle::Load ()
     for (i = 0; i < uploadData->GetSize (); i++)
     {
       const csGLUploadData& uploadData = this->uploadData->Get (i);
-      if (uploadData.sourceFormat.isCompressed)
+      if (uploadData.storageFormat.isCompressed)
       {
 	G3D->ext->glCompressedTexImage2DARB (GL_TEXTURE_RECTANGLE_ARB, 
-          uploadData.mip, uploadData.sourceFormat.targetFormat, 
+          uploadData.mip, uploadData.storageFormat.targetFormat, 
           uploadData.w, uploadData.h, 0, 
           (GLsizei)uploadData.compressedSize, uploadData.image_data);
       }
       else
       {
 	glTexImage2D (GL_TEXTURE_RECTANGLE_ARB, uploadData.mip, 
-	  uploadData.sourceFormat.targetFormat, 
+	  uploadData.storageFormat.targetFormat, 
 	  uploadData.w, uploadData.h, 0, uploadData.sourceFormat.format, 
 	  uploadData.sourceFormat.type, uploadData.image_data);
       }
@@ -581,15 +579,15 @@ void csGLBasicTextureHandle::Load ()
 void csGLBasicTextureHandle::Unload ()
 {
   if ((Handle == 0) || IsForeignHandle()) return;
-  if (target == CS_TEX_IMG_1D)
+  if (texType == texType1D)
     csGLTextureManager::UnsetTexture (GL_TEXTURE_1D, Handle);
-  else if (target == CS_TEX_IMG_2D)
+  else if (texType == texType2D)
     csGLTextureManager::UnsetTexture (GL_TEXTURE_2D, Handle);
-  else if (target == CS_TEX_IMG_3D)
+  else if (texType == texType3D)
     csGLTextureManager::UnsetTexture (GL_TEXTURE_3D, Handle);
-  else if (target == CS_TEX_IMG_CUBEMAP)
+  else if (texType == texTypeCube)
     csGLTextureManager::UnsetTexture (GL_TEXTURE_CUBE_MAP, Handle);
-  else if (target == CS_TEX_IMG_RECT)
+  else if (texType == texTypeRect)
     csGLTextureManager::UnsetTexture (GL_TEXTURE_RECTANGLE_ARB, Handle);
   glDeleteTextures (1, &Handle);
   Handle = 0;
@@ -632,21 +630,50 @@ GLuint csGLBasicTextureHandle::GetHandle ()
 
 GLenum csGLBasicTextureHandle::GetGLTextureTarget() const
 {
-  switch (target)
+  switch (texType)
   {
-    case CS_TEX_IMG_1D:
+    case texType1D:
       return GL_TEXTURE_1D;
-    case CS_TEX_IMG_2D:
+    case texType2D:
       return GL_TEXTURE_2D;
-    case CS_TEX_IMG_3D:
-      return GL_TEXTURE_3D;
-    case CS_TEX_IMG_CUBEMAP:
+    case texType3D:
+      return texType3D;
+    case texTypeCube:
       return GL_TEXTURE_CUBE_MAP;
-    case CS_TEX_IMG_RECT:
+    case texTypeRect:
       return GL_TEXTURE_RECTANGLE_ARB;
     default:
       return 0;
   }
+}
+
+void csGLBasicTextureHandle::EnsureUncompressed (bool keepPixels)
+{
+  if (!G3D->ext->CS_GL_ARB_texture_compression) return;
+
+  GLenum target = GetGLTextureTarget();
+  // @@@ FIXME: support more than 2D
+  if (target != GL_TEXTURE_2D) return;
+
+  GLint isCompressed;
+  glGetTexLevelParameteriv (target, 0, GL_TEXTURE_COMPRESSED_ARB, 
+    &isCompressed);
+  if (!isCompressed) return;
+
+  uint8* pixelData = 0;
+  /* @@@ FIXME: This really should use the actual internal (base?) format and 
+   * not just RGBA. */
+  if (keepPixels)
+  {
+    pixelData = (uint8*)cs_malloc (actual_width * actual_height * 4);
+    glGetTexImage (target, 0, GL_RGBA8, GL_UNSIGNED_BYTE, 
+      pixelData);
+  }
+
+  glTexImage2D (target, 0, GL_RGBA8, actual_width, actual_height, 
+    0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
+  if (pixelData != 0) cs_free (pixelData);
 }
 
 }

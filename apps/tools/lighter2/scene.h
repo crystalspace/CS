@@ -218,15 +218,16 @@ namespace lighter
                              Statistics::Progress& progress);
     
     // Load functions
-    bool ParseEngine (Statistics::Progress& progress);
-    void ParseSector (iSector *sector, Statistics::Progress& progress);
+    bool ParseEngine (LoadedFile* fileInfo, Statistics::Progress& progress);
+    void ParseSector (LoadedFile* fileInfo, iSector *sector, 
+      Statistics::Progress& progress);
     void ParsePortals (iSector *srcSect, Sector* sector);
     enum MeshParseResult
     {
       Failure, Success, NotAGenMesh
     };
-    MeshParseResult ParseMesh (Sector *sector,  iMeshWrapper *mesh,
-      csRef<Object>& obj);
+    MeshParseResult ParseMesh (LoadedFile* fileInfo, Sector *sector,  
+      iMeshWrapper *mesh, csRef<Object>& obj);
     MeshParseResult ParseMeshFactory (iMeshFactoryWrapper *factory, 
       csRef<ObjectFactory>& radFact);
     void PropagateLight (Light* light, const csFrustum& lightFrustum);

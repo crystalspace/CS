@@ -614,7 +614,7 @@ void csSndSysRendererSoftware::GarbageCollection()
     SourceRemoved(sourceptr);
 
     // Remove this source from the Filter list as well
-    m_DispatchSources.Delete(dynamic_cast<iSndSysSourceSoftware *>(sourceptr));
+    m_DispatchSources.Delete(static_cast<iSndSysSourceSoftware *>(sourceptr));
 
     sourceptr->DecRef();
   }
@@ -710,7 +710,7 @@ void csSndSysRendererSoftware::ProcessPendingSources()
   }
 
   // Empty the queue of source removal requests
-  while ((src=dynamic_cast<iSndSysSourceSoftware *> (m_SourceRemoveQueue.DequeueEntry())))
+  while ((src=static_cast<iSndSysSourceSoftware *> (m_SourceRemoveQueue.DequeueEntry())))
   {
     // We don't know that the application has queued a pointer to a source that's
     //  active.  If the Delete() fails, then the source is not even in our active list.

@@ -300,7 +300,6 @@ protected: // 'protected' allows access by test-suite.
     return node;
   }
 private:
-  csFixedSizeAllocator (csFixedSizeAllocator const&);  // Illegal; unimplemented.
   void operator= (csFixedSizeAllocator const&); 	// Illegal; unimplemented.
 public:
   /**
@@ -323,7 +322,22 @@ public:
       elsize = sizeof (FreeNode);
     blocksize = elsize * elcount;
   }
-
+  
+  /**
+   * Construct a new fixed size allocator, copying the amounts of elements to
+   * store in an allocation unit.
+   * \remarks Copy-constructing an allocator is only valid if the allocator
+   *   copied from is not empty. Attempting to copy a non-empty allocator will
+   *   cause an assertion to fail at runtime!
+   */
+  csFixedSizeAllocator (csFixedSizeAllocator const& other) : 
+    elcount (other.elcount), elsize (other.elsize), 
+    blocksize (other.blocksize), freenode (0), insideDisposeAll (false)
+  {
+    /* Technically, an allocator can be empty even with freenode != 0 */
+    CS_ASSERT(other.freenode == 0);
+  }
+  
   /**
    * Destroy all allocated objects and release memory.
    */

@@ -601,11 +601,10 @@ bool csGLShaderFFP::TryMergeTexFuncs (mtexlayer::TexFunc& newTF,
   }
   /* If "previous layer" is not referenced in TF2, "merge" to just TF2. */
   {
-    bool usePrevious;
+    bool usePrevious = false;
     for (int i = 0; i < GetUsedLayersCount (tf2.op); i++)
-    {
-      if (tf2.source[i] == GL_PREVIOUS_ARB) usePrevious = true;
-    }
+      if (tf2.source[i] == GL_PREVIOUS_ARB)
+	usePrevious = true;
     if (!usePrevious)
     {
       newTF = tf2;

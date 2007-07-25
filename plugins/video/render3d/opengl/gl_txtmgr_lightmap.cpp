@@ -268,7 +268,7 @@ iTextureHandle* csGLSuperLightmap::GetTexture ()
   {
     CreateTexture ();
     th.AttachNew (new csGLBasicTextureHandle (
-      txtmgr->G3D, iTextureHandle::CS_TEX_IMG_2D, texHandle));
+      txtmgr->G3D, iTextureHandle::texType2D, texHandle));
   }
   return th;
 }

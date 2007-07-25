@@ -950,9 +950,9 @@ public:
   inline static int UTF16Skip (const utf16_char* str, size_t maxSkip)
   {
     if (CS_UC_IS_HIGH_SURROGATE (*str))
-      return (int)(MIN(maxSkip, 2));
+      return (int)(MIN(maxSkip, (size_t)2));
     else
-      return (int)(MIN(maxSkip, 1));
+      return (int)(MIN(maxSkip, (size_t)1));
   }
   
   /**
@@ -984,7 +984,7 @@ public:
   inline static int UTF32Skip (const utf32_char* str, size_t maxSkip)
   {
     (void)str; // silence gcc
-    return (int)(MIN(maxSkip, 1));
+    return (int)(MIN(maxSkip, (size_t)1));
   }
 
   /**

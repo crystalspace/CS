@@ -68,7 +68,7 @@ class OSXPluginArray : public csArray<OSXPluginEntry>
 public:
   OSXPluginEntry const* find(csString path) const
   {
-    for (int i = 0, n = Length(); i < n; i++)
+    for (int i = 0, n = GetSize(); i < n; i++)
       if (Get(i).path == path)
 	return &Get(i);
     return 0;
@@ -80,7 +80,7 @@ public:
   }
   void remove(csLibraryHandle handle)
   {
-    for (int i = Length() - 1; i >= 0; i--)
+    for (int i = GetSize() - 1; i >= 0; i--)
       if (Get(i).handle == handle)
         { DeleteIndex(i); break; }
   }

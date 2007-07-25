@@ -579,7 +579,7 @@ void csGLVBOBufferManager::DumpStatsBufferType (size_t type)
     int percentSU = (!numberOfSlots || !numBuffers) ? 0 : 
       int(100.0f * numSlotsUsed / (numberOfSlots*numBuffers));
 
-    csPrintf ("%s %8zu %8zu %8zu %8zu\n", ByteFormat (slotSize).GetDataSafe (),
+    csPrintf ("%s %8zu %8zu %8zu %8u\n", ByteFormat (slotSize).GetDataSafe (),
       numBuffers, numberOfSlots, numSlotsUsed, percentSU);
   }
 
@@ -598,20 +598,20 @@ void csGLVBOBufferManager::DumpStatsBufferType (size_t type)
 
     csPrintf ("Big buffers\n");
     size_t count = 0;
-    size_t size;
+    size_t size = 0;
     for (size_t i = 0; i < bigBufferSizes.GetSize () - 1; ++i)
     {
       count++;
       size = bigBufferSizes[i];
       if (size != bigBufferSizes[i+1])
       {
-        csPrintf ("%s %8u\n", ByteFormat (size).GetDataSafe (), count);
+        csPrintf ("%s %8zu\n", ByteFormat (size).GetDataSafe (), count);
         count = 0;
       }
     }
     if (count > 0)
     {
-      csPrintf ("%s %8u\n", ByteFormat (size).GetDataSafe (), count);
+      csPrintf ("%s %8zu\n", ByteFormat (size).GetDataSafe (), count);
     }
   }
 

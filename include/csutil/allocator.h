@@ -99,16 +99,19 @@ namespace CS
       #endif
       }
     };
-    
+
     /**
      * An allocator with a small local buffer.
      * If the data fits into the local buffer (which is set up to holds 
      * \c N elements of type \c T), a memory allocation from the heap is saved.
      * Thus, if you have lots of arrays with a relatively small, well known size
      * you can gain some performance by using this allocator.
+     * \c SingleAllocation specifies whether no more than a single block is
+     * allocated from the allocator at any time. Using that option saves 
+     * (albeit a miniscule amount of) memory, but obviously is only safe when
+     * it's know that the single allocation constraint is satisfied (such as 
+     * allocators for csArray<>s).
      *
-     * \warning This allocator is designed to work in scenarios where you
-     *  have at most one block allocated at any time!
      * \warning The pointer returned may point into the instance data; be 
      *  careful when moving that around - an earlier allocated pointer may
      *  suddenly become invalid!
@@ -116,55 +119,144 @@ namespace CS
      *  nest that into another array, you MUST use 
      *  csSafeCopyArrayElementHandler for  the nesting array!
      */
-    template<typename T, size_t N, class ExcessAllocator = AllocatorMalloc>
+    template<typename T, size_t N, class ExcessAllocator = AllocatorMalloc,
+      bool SingleAllocation = false>
     class LocalBufferAllocator : public ExcessAllocator
     {
       static const size_t localSize = N * sizeof (T);
-      uint8 localBuf[localSize];
-    #ifdef CS_DEBUG
-      bool allocation;
-    #endif
+      static const uint8 freePattern = 0xfa;
+      static const uint8 newlyAllocatedSalt = 0xac;
+      uint8 localBuf[localSize + (SingleAllocation ? 0 : 1)];
     public:
-    #ifdef CS_DEBUG
-      LocalBufferAllocator () : allocation (false) {}
+      LocalBufferAllocator ()
+      {
+        if (SingleAllocation) 
+        {
+      #ifdef CS_DEBUG
+          memset (localBuf, freePattern, localSize);
+      #endif
+        }
+        else
+          localBuf[localSize] = 0;
+      }
       LocalBufferAllocator (const ExcessAllocator& xalloc) : 
-        ExcessAllocator (xalloc), allocation (false) {}
-    #else
-      LocalBufferAllocator () {}
-      LocalBufferAllocator (const ExcessAllocator& xalloc) : 
-        ExcessAllocator (xalloc) {}
-    #endif
+        ExcessAllocator (xalloc)
+      {
+        if (SingleAllocation) 
+        {
+      #ifdef CS_DEBUG
+          memset (localBuf, freePattern, localSize);
+      #endif
+        }
+        else
+          localBuf[localSize] = 0;
+      }
       T* Alloc (size_t allocSize)
       {
+        if (SingleAllocation)
+        {
       #ifdef CS_DEBUG
-        CS_ASSERT_MSG("LocalBufferAllocator only allows one allocation a time!",
-          !allocation);
-        allocation = true;
+          /* Verify that the local buffer consists entirely of the "local
+             buffer unallocated" pattern. (Not 100% safe since a valid 
+             allocated buffer may be coincidentally filled with just that
+             pattern, but let's just assume that it's unlikely.) */
+          bool validPattern = true;
+          for (size_t n = 0; n < localSize; n++)
+          {
+            if (localBuf[n] != freePattern)
+            {
+              validPattern = false;
+              break;
+            }
+          }
+          CS_ASSERT_MSG("This LocalBufferAllocator only allows one allocation "
+            "a time!", validPattern);
+          memset (localBuf, newlyAllocatedSalt, localSize);
       #endif
-	if (allocSize <= localSize)
-	  return (T*)localBuf;
-	else
-	  return (T*)ExcessAllocator::Alloc (allocSize);
+	  if (allocSize <= localSize)
+	    return (T*)localBuf;
+	  else
+          {
+            void* p = ExcessAllocator::Alloc (allocSize);
+	    return (T*)p;
+          }
+        }
+        else
+        {
+          void* p;
+	  if ((allocSize <= localSize) && !localBuf[localSize])
+          {
+            localBuf[localSize] = 1;
+	    p = localBuf;
+        #ifdef CS_DEBUG
+            memset (p, newlyAllocatedSalt, allocSize);
+        #endif
+          }
+	  else
+          {
+            p = ExcessAllocator::Alloc (allocSize);
+          }
+          return (T*)p;
+        }
       }
     
       void Free (T* mem)
       {
+        if (SingleAllocation)
+        {
       #ifdef CS_DEBUG
-        CS_ASSERT_MSG("Free() without prior allocation",
-          allocation);
-        allocation = false;
+          /* Verify that the local buffer consists entirely of the "local
+             buffer unallocated" pattern. (Not 100% safe since a valid 
+             allocated buffer may be coincidentally filled with just that
+             pattern, but let's just assume that it's unlikely.) */
+          bool validPattern = true;
+          for (size_t n = 0; n < localSize; n++)
+          {
+            if (localBuf[n] != freePattern)
+            {
+              validPattern = false;
+              break;
+            }
+          }
+          CS_ASSERT_MSG("Free() without prior allocation", !validPattern);
+          memset (localBuf, freePattern, localSize);
       #endif
-	if (mem != (T*)localBuf) ExcessAllocator::Free (mem);
+          if (mem != (T*)localBuf) ExcessAllocator::Free (mem);
+        }
+        else
+        {
+          if (mem != (T*)localBuf) 
+            ExcessAllocator::Free (mem);
+          else
+          {
+            localBuf[localSize] = 0;
+          }
+        }
       }
     
       // The 'relevantcount' parameter should be the number of items
       // in the old array that are initialized.
       void* Realloc (void* p, size_t newSize)
       {
+        if (SingleAllocation)
+        {
       #ifdef CS_DEBUG
-        CS_ASSERT_MSG("Realloc() without prior allocation",
-          allocation);
+          /* Verify that the local buffer consists entirely of the "local
+             buffer unallocated" pattern. (Not 100% safe since a valid 
+             allocated buffer may be coincidentally filled with just that
+             pattern, but let's just assume that it's unlikely.) */
+          bool validPattern = true;
+          for (size_t n = 0; n < localSize; n++)
+          {
+            if (localBuf[n] != freePattern)
+            {
+              validPattern = false;
+              break;
+            }
+          }
+          CS_ASSERT_MSG("Realloc() without prior allocation", !validPattern);
       #endif
+        }
         if (p == localBuf)
         {
           if (newSize <= localSize)
@@ -173,21 +265,27 @@ namespace CS
           {
 	    p = ExcessAllocator::Alloc (newSize);
 	    memcpy (p, localBuf, localSize);
+        #ifdef CS_DEBUG
+            memset (localBuf, freePattern, localSize);
+        #endif
+            if (!SingleAllocation) localBuf[localSize] = 0;
 	    return p;
           }
         }
         else
         {
-          if (newSize <= localSize)
+          if ((newSize <= localSize) && !localBuf[localSize])
 	  {
 	    memcpy (localBuf, p, newSize);
 	    ExcessAllocator::Free (p);
+            if (!SingleAllocation) localBuf[localSize] = 1;
 	    return localBuf;
 	  }
 	  else
 	    return ExcessAllocator::Realloc (p, newSize);
         }
       }
+
       using ExcessAllocator::SetMemTrackerInfo;
     };
     

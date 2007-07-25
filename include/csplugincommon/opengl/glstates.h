@@ -380,6 +380,12 @@ public:
   int activeUnit[2];
   GLuint currentBufferID, currentIndexID;
 
+  // BlendFunc/BlendFuncSeparate
+  GLenum blend_sourceRGB;
+  GLenum blend_destinationRGB;
+  GLenum blend_sourceA;
+  GLenum blend_destinationA;
+
   // Standardized caches
   DECLARE_CACHED_BOOL (GL_DEPTH_TEST)
   DECLARE_CACHED_BOOL (GL_BLEND)
@@ -402,7 +408,6 @@ public:
   DECLARE_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_CUBE_MAP)
   DECLARE_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_RECTANGLE_ARB)
   DECLARE_CACHED_PARAMETER_2 (glAlphaFunc, AlphaFunc, GLenum, alpha_func, GLclampf, alpha_ref)
-  DECLARE_CACHED_PARAMETER_2 (glBlendFunc, BlendFunc, GLenum, blend_source, GLenum, blend_destination)
   DECLARE_CACHED_PARAMETER_1 (glCullFace, CullFace, GLenum, cull_mode)
   DECLARE_CACHED_PARAMETER_1 (glDepthFunc, DepthFunc, GLenum, depth_func)
   DECLARE_CACHED_PARAMETER_1 (glDepthMask, DepthMask, GLboolean, depth_mask)
@@ -445,8 +450,20 @@ public:
     int i;
     glGetIntegerv (GL_ALPHA_TEST_FUNC, (GLint*)&parameter_alpha_func);
     glGetFloatv (GL_ALPHA_TEST_REF, &parameter_alpha_ref);
-    glGetIntegerv (GL_BLEND_SRC, (GLint*)&parameter_blend_source);
-    glGetIntegerv (GL_BLEND_DST, (GLint*)&parameter_blend_destination);
+    if (extmgr->CS_GL_EXT_blend_func_separate)
+    {
+      glGetIntegerv (GL_BLEND_SRC_RGB_EXT, (GLint*)&blend_sourceRGB);
+      glGetIntegerv (GL_BLEND_SRC_ALPHA_EXT, (GLint*)&blend_sourceA);
+      glGetIntegerv (GL_BLEND_DST_RGB_EXT, (GLint*)&blend_destinationRGB);
+      glGetIntegerv (GL_BLEND_DST_ALPHA_EXT, (GLint*)&blend_destinationA);
+    }
+    else
+    {
+      glGetIntegerv (GL_BLEND_SRC, (GLint*)&blend_sourceRGB);
+      blend_sourceA = blend_sourceRGB;
+      glGetIntegerv (GL_BLEND_DST, (GLint*)&blend_destinationRGB);
+      blend_destinationA = blend_destinationRGB;
+    }
     glGetIntegerv (GL_CULL_FACE_MODE, (GLint*)&parameter_cull_mode);
     glGetIntegerv (GL_DEPTH_FUNC, (GLint*)&parameter_depth_func);
     glGetBooleanv (GL_DEPTH_WRITEMASK, &parameter_depth_mask);
@@ -646,7 +663,6 @@ public:
   IMPLEMENT_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_CUBE_MAP)
   IMPLEMENT_CACHED_BOOL_CURRENTLAYER (GL_TEXTURE_RECTANGLE_ARB)
   IMPLEMENT_CACHED_PARAMETER_2 (glAlphaFunc, AlphaFunc, GLenum, alpha_func, GLclampf, alpha_ref)
-  IMPLEMENT_CACHED_PARAMETER_2 (glBlendFunc, BlendFunc, GLenum, blend_source, GLenum, blend_destination)
   IMPLEMENT_CACHED_PARAMETER_1 (glCullFace, CullFace, GLenum, cull_mode)
   IMPLEMENT_CACHED_PARAMETER_1 (glDepthFunc, DepthFunc, GLenum, depth_func)
   IMPLEMENT_CACHED_PARAMETER_1 (glDepthMask, DepthMask, GLboolean, depth_mask)
@@ -788,6 +804,61 @@ public:
     {
       return currentContext->currentBufferID;
     }
+  }
+
+  // Blend functions
+  void SetBlendFunc (GLenum blend_source, GLenum blend_destination, 
+		      bool forced = false)
+  {
+    if (forced 
+      || (blend_source != currentContext->blend_sourceRGB)
+      || (blend_source != currentContext->blend_sourceA)
+      || (blend_destination != currentContext->blend_destinationRGB) 
+      || (blend_destination != currentContext->blend_destinationA) 
+      || FORCE_STATE_CHANGE)
+    {
+      currentContext->blend_sourceRGB = blend_source;
+      currentContext->blend_sourceA = blend_source;
+      currentContext->blend_destinationRGB = blend_destination;
+      currentContext->blend_destinationA = blend_destination;
+      glBlendFunc (blend_source, blend_destination);
+    }
+  }
+  void GetBlendFunc (GLenum& blend_source, GLenum& blend_destination) const
+  {
+    blend_source = currentContext->blend_sourceRGB;
+    blend_destination = currentContext->blend_destinationRGB;
+  }
+  void SetBlendFuncSeparate (GLenum blend_sourceRGB, 
+			      GLenum blend_destinationRGB, 
+			      GLenum blend_sourceA, 
+			      GLenum blend_destinationA, 
+			      bool forced = false)
+  {
+    if (forced 
+      || (blend_sourceRGB != currentContext->blend_sourceRGB)
+      || (blend_sourceA != currentContext->blend_sourceA)
+      || (blend_destinationRGB != currentContext->blend_destinationRGB) 
+      || (blend_destinationA != currentContext->blend_destinationA) 
+      || FORCE_STATE_CHANGE)
+    {
+      currentContext->blend_sourceRGB = blend_sourceRGB;
+      currentContext->blend_sourceA = blend_sourceA;
+      currentContext->blend_destinationRGB = blend_destinationRGB;
+      currentContext->blend_destinationA = blend_destinationA;
+      extmgr->glBlendFuncSeparateEXT (blend_sourceRGB, blend_destinationRGB, 
+	blend_sourceA, blend_destinationA);
+    }
+  }
+  void GetBlendFuncSeparate (GLenum& blend_sourceRGB, 
+			      GLenum& blend_destinationRGB,
+			      GLenum& blend_sourceA, 
+			      GLenum& blend_destinationA) const
+  {
+    blend_sourceRGB = currentContext->blend_sourceRGB;
+    blend_destinationRGB = currentContext->blend_destinationRGB;
+    blend_sourceA = currentContext->blend_sourceA;
+    blend_destinationA = currentContext->blend_destinationA;
   }
 };
 

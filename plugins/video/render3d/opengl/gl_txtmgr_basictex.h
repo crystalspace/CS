@@ -47,25 +47,30 @@ struct TextureStorageFormat
   /// Format in which to store the texture ('internalformat' in GL spec)
   GLenum targetFormat;
   /**
-   * Whether the format is compressed. The \c format and \c type members are
-   * only valid for uncompressed textures.
+   * Whether the format is compressed. Accompanying "source format" 
+   * information is only valid for uncompressed textures.
    */
   bool isCompressed;
+
+  /// Init with default values
+  TextureStorageFormat () : targetFormat (0), isCompressed (false) {}
+  /// Init with given format
+  TextureStorageFormat (GLenum targetFormat, bool compressed) : 
+    targetFormat (targetFormat), isCompressed (compressed) {}
+};
+
+struct TextureSourceFormat
+{
   /// Format of the source data
   GLenum format;
   /// Type of the source data
   GLenum type;
 
   /// Init with default values
-  TextureStorageFormat () : targetFormat (0), isCompressed (false), 
-    format (0), type (0) {}
-  /// Init for compressed texture
-  TextureStorageFormat (GLenum compressedFormat) : targetFormat (compressedFormat), 
-    isCompressed (true), format (0), type (0) {}
+  TextureSourceFormat () : format (0), type (0) {}
   /// Init for uncompressed texture
-  TextureStorageFormat (GLenum targetFormat, GLenum format, GLenum type) : 
-    targetFormat (targetFormat), isCompressed (false), format (format), 
-    type (type) {}
+  TextureSourceFormat (GLenum format, GLenum type) : 
+    format (format), type (type) {}
 };
 
 struct csGLUploadData
@@ -73,7 +78,8 @@ struct csGLUploadData
   const void* image_data;
   int w, h, d;
   csRef<iBase> dataRef;
-  TextureStorageFormat sourceFormat;
+  TextureStorageFormat storageFormat;
+  TextureSourceFormat sourceFormat;
   size_t compressedSize;
   int mip;
   int imageNum;
@@ -82,6 +88,9 @@ struct csGLUploadData
 };
 
 struct csGLTextureClassSettings;
+
+// For GetTextureTarget ()
+#include "csutil/win32/msvc_deprecated_warn_off.h"
 
 class csGLBasicTextureHandle :
   public scfImplementation1<csGLBasicTextureHandle, 
@@ -160,7 +169,7 @@ public:
   int actual_width, actual_height, actual_d;
   csArray<csGLUploadData>* uploadData;
   csWeakRef<csGLGraphics3D> G3D;
-  int target;
+  TextureType texType;
   /// Format used for last Blit() call
   TextureBlitDataFormat texFormat;
   bool IsWasRenderTarget() const
@@ -178,7 +187,7 @@ public:
   csGLBasicTextureHandle (int width, int height, int depth,
     csImageType imagetype, int flags, csGLGraphics3D *iG3D);
   /// Create from existing handle
-  csGLBasicTextureHandle (csGLGraphics3D *iG3D, int target, GLuint Handle);
+  csGLBasicTextureHandle (csGLGraphics3D *iG3D, TextureType texType, GLuint Handle);
 
   virtual ~csGLBasicTextureHandle ();
 
@@ -255,7 +264,7 @@ public:
   void SetupAutoMipping();
 
   /// Get the texture target
-  virtual int GetTextureTarget () const { return target; }
+  virtual int GetTextureTarget () const { return int (texType); }
 
   /**
    * Query the private object associated with this handle.
@@ -291,7 +300,27 @@ public:
    * \remark Returns GL_TEXTURE_CUBE_MAP for cubemaps.
    */
   GLenum GetGLTextureTarget() const;
+
+  virtual TextureType GetTextureType () const
+  {
+    return texType;
+  }
+
+  /**
+   * Ensure the texture's internal format is an uncompressed one.
+   * Blitting to a compressed texture or using one as a render target may
+   * incur a hefty performance penalty (due the performed compression of the
+   * changed texels), so for texture intended for such use it's a good idea
+   * to make sure the internal format is not compressed.
+   * \param keepPixels Whether to keep the existing pixel data should be 
+   *   preserved.
+   * \remarks The texture handle must be bound properly before this method
+   *   is called.
+   */
+  void EnsureUncompressed (bool keepPixels);
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 }
 CS_PLUGIN_NAMESPACE_END(gl3d)

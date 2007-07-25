@@ -692,7 +692,7 @@ bool csEngine::HandleEvent (iEvent &Event)
     // We must free all material and texture handles since after
     // G3D->Close() they all become invalid, no matter whenever
     // we did or didn't an IncRef on them.
-    DeleteAll ();
+    DeleteAllForce ();
     return true;
   }
   else if (G2D)

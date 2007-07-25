@@ -286,7 +286,9 @@ private:
 
 public:
 
+#ifndef CS_DEPRECATION_SUPPRESS_HACK
   CS_DEPRECATED_METHOD_MSG("You shouldn't use this class!")
+#endif
   csTriangleMeshPolyMesh (iPolygonMesh* polymesh)
     : scfImplementationType(this), polymesh (polymesh)
   {
