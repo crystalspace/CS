@@ -1,0 +1,234 @@
+/*
+    Copyright (C) 2003, 04 by Mathew Sutcliffe <oktal@gmx.co.uk>
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#include "cssysdef.h"
+#include "csutil/csunicode.h"
+#include "csutil/binder.h"
+#include "csutil/event.h"
+#include "csutil/csevent.h"
+#include "iutil/cfgfile.h"
+
+csInputBinder::csInputBinder (iObjectRegistry *r, iBase *parent, int btnSize, int axisSize)
+  : scfImplementationType (this, parent),
+    name_reg(csEventNameRegistry::GetRegistry(r)),
+    axisHash (axisSize), axisArray (axisSize),
+    btnHash (btnSize), btnArray (btnSize)
+{
+}
+
+csInputBinder::~csInputBinder ()
+{
+  UnbindAll ();
+}
+
+bool csInputBinder::HandleEvent (iEvent &ev)
+{
+  if (ev.Name == csevMouseMove(name_reg, 0))
+  {
+    // mouse move
+    for (uint8 axis = 0; axis <= csMouseEventHelper::GetNumAxes(&ev); axis++)
+    {
+      AxisCmd *bind = axisHash.Get
+        (csInputDefinition (name_reg, &ev, axis), 0);
+      if (bind) bind->val =
+        csMouseEventHelper::GetAxis(&ev, axis);
+    }
+    return true;
+  }
+  else if (CS_IS_JOYSTICK_EVENT(name_reg, ev) &&
+        csJoystickEventHelper::GetButton(&ev)==0)
+  {
+    // joystick move
+    for (uint8 axis = 0; axis < csJoystickEventHelper::GetNumAxes(&ev); axis++)
+    {
+      AxisCmd *bind = axisHash.Get
+        (csInputDefinition (name_reg, &ev, axis), 0);
+      if (bind) bind->val =
+        csJoystickEventHelper::GetAxis(&ev, axis);
+    }
+    return true;
+  }
+  else if (CS_IS_KEYBOARD_EVENT(name_reg, ev) ||
+           CS_IS_MOUSE_EVENT(name_reg, ev) ||
+           CS_IS_JOYSTICK_EVENT(name_reg, ev))
+  {
+      // "GetButtonState" doesn't seem to work for mouse buttons(?),
+      // so check if it is a mouse button up/down event specifically
+    bool down;
+    if(CS_IS_MOUSE_EVENT(name_reg, ev)) {
+        if(ev.Name == csevMouseDown (name_reg, 0)) {
+            down = true;
+        } else if(ev.Name == csevMouseUp (name_reg, 0)) {
+            down = false;
+        } else {
+            return false; // ???
+        }
+    } else {
+        down = csInputEventHelper::GetButtonState(name_reg, &ev);
+    }
+    BtnCmd *bind = btnHash.Get(csInputDefinition (name_reg, &ev,
+        (uint8) CSMASK_ALLMODIFIERS), 0);
+
+    if (! bind) return false;
+
+    if (bind->toggle)
+    {
+      if (down) bind->down = ! bind->down;
+    }
+    else bind->down = down;
+
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+void csInputBinder::BindAxis (const csInputDefinition &def, unsigned cmd,
+  int sens)
+{
+  AxisCmd *bind = new AxisCmd (cmd, sens);
+  axisArray.GetExtend (cmd) = bind;
+  axisHash.Put (def, bind);
+}
+
+void csInputBinder::BindButton (const csInputDefinition &def, unsigned cmd,
+  bool toggle)
+{
+  BtnCmd *bind = new BtnCmd (cmd, toggle);
+  btnArray.GetExtend (cmd) = bind;
+
+  btnHash.Put (def, bind);
+}
+
+int csInputBinder::Axis (unsigned cmd)
+{
+  if (axisArray.GetSize () > cmd)
+  {
+    AxisCmd *bind = axisArray[cmd];
+    if (bind) return bind->val * bind->sens;
+  }
+  return 0;
+}
+
+bool csInputBinder::Button (unsigned cmd)
+{
+  if (btnArray.GetSize () > cmd)
+  {
+    BtnCmd *bind = btnArray[cmd];
+    if (bind) return bind->down;
+  }
+  return false;
+}
+
+bool csInputBinder::UnbindAxis (unsigned cmd)
+{
+  if (axisArray.GetSize () <= cmd) return false;
+  AxisCmd *bind = axisArray[cmd];
+  if (! bind) return false;
+
+  axisArray[cmd] = 0;
+  delete bind;
+
+  csInputDefinition key(name_reg);
+  AxisHash::GlobalIterator iter (axisHash.GetIterator ());
+  while (iter.HasNext ())
+  {
+    if (bind == iter.NextNoAdvance (key)) break;
+    iter.Advance ();
+  }
+  if (iter.HasNext ()) axisHash.Delete (key, bind);
+  return true;
+}
+
+bool csInputBinder::UnbindButton (unsigned cmd)
+{
+  if (btnArray.GetSize () <= cmd) return false;
+  BtnCmd *bind = btnArray[cmd];
+  if (! bind) return false;
+
+  btnArray[cmd] = 0;
+  delete bind;
+
+  csInputDefinition key(name_reg);
+  BtnHash::GlobalIterator iter (btnHash.GetIterator ());
+  while (iter.HasNext ())
+  {
+    if (bind == iter.NextNoAdvance (key)) break;
+    iter.Advance ();
+  }
+  if (iter.HasNext ()) btnHash.Delete (key, bind);
+  return true;
+}
+
+void csInputBinder::UnbindAll ()
+{
+  size_t i;
+  for (i = 0; i < axisArray.GetSize (); i++)
+  {
+    delete axisArray[i];
+    axisArray[i] = 0;
+  }
+  for (i = 0; i < btnArray.GetSize (); i++)
+  {
+    delete btnArray[i];
+    btnArray[i] = 0;
+  }
+
+  axisHash.DeleteAll ();
+  btnHash.DeleteAll ();
+}
+
+void csInputBinder::LoadConfig (
+  iConfigFile * /*cfg*/, const char * /*subsection*/)
+{
+#if 0
+  csRef<iConfigIterator> iter = cfg->Enumerate (subsection);
+  while (iter->HasNext ())
+  {
+    iter->Next();
+    const char *key = iter->GetKey (true);
+    int val = iter->GetInt ();
+
+    csInputDefinition def (key);
+    if (! def.IsValid ()) continue;
+
+    //TODO: BindButton or BindAxis (def, val) depending on def's type
+  }
+#endif
+}
+
+void csInputBinder::SaveConfig (
+  iConfigFile * /*cfg*/, const char * /*subsection*/)
+{
+#if 0
+  AxisHash::GlobalIterator iter (axisHash.GetIterator ());
+  while (iter.HasNext ())
+  {
+    csString key (subsection ? subsection : "")
+    csInputDefinition def;
+    AxisCmd *cmd = iter.Next (def);
+    key.Append (def.AsString ());
+
+    int val = (int) axisArray.Find (cmd);
+
+    cfg->PutInt (key, val);
+  }
+#endif
+}

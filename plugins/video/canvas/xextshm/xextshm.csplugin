@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- xextshm.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.window.x.extshm</name>
+        <implementation>csXExtSHM</implementation>
+        <description>X-Window extension shared memory plugin</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

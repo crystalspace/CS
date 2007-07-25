@@ -1,0 +1,120 @@
+
+<h3> Objects Properties</h3>
+<p>There are a number of supported CS properties that you can set in 3dsmax. Some 
+  are based on the naming convention others are defined as properties of the object 
+  in 3dsmax. To set a property in 3dsmax just select the object and right-click 
+  to open the object menu. Select "Properties...", then the tab "User Defined". 
+  In that window you can add the properties of the object. Be sure to use same 
+  case, properties are case sensitive.</p>
+  
+<table border="1" cellspacing="0">
+  <tr> 
+    <td>title</td>
+    <td>description</td>
+    <td>options</td>
+    <td>defaults</td>
+  </tr>
+  <tr> 
+    <td><b>Player Barrier</b></td>
+    <td>If you need one object to be invisible and to block players (they can't 
+      pass through it), then define the object as a &quot;player barrier&quot;.</td>
+    <td> <ul>
+        <li> PLAYERBARRIER=yes</li>
+      </ul></td>
+    <td>NO</td>
+  </tr>
+  <tr> 
+    <td><b>Smooth</b></td>
+    <td> Changes lightmap so the object will appear more round, if the object 
+      is not exposed to a light, it will not look rounded.<br>
+      Default is no smooth. You can activate that with: 
+      <p></p>
+      <ul>
+      </ul></td>
+    <td> <li> SMOOTH=yes</li></td>
+    <td>NO</td>
+  </tr>
+  <tr> 
+    <td> <p><b>No Shadows</b>: </td>
+    <td>Sprites don't cast shadow. Static objects normally cast shadows. You can 
+      disable shadows on static objects using that setting. Default is casting 
+      shadows.<br> <p></p>
+      <ul>
+      </ul></td>
+    <td> <li>NOSHADOWS=yes </li></td>
+    <td>YES</td>
+  </tr>
+  <tr> 
+    <td> <p><b>Lighting</b>: </td>
+    <td>Static objects are normally lit by the surrounding lights. You can disable 
+      this and have the object shine by himself. Default is to be affected by 
+      external lighting.<br> <p></p>
+      <ul>
+      </ul></td>
+    <td> <li>LIGHTING=no </li></td>
+    <td>YES</td>
+  </tr>
+  <tr> 
+    <td> <p><b>Collision Detection</b>: </td>
+    <td> Normally you can't pass through objects, they will collide with other 
+      objects and stop them. You can disable collision detection so you can move 
+      through it. Default is collision detection yes.<br> <p></p>
+      <ul>
+      </ul></td>
+    <td> <li>COLLDET=no</li></td>
+    <td>YES</td>
+  </tr>
+  <tr> 
+    <td> <p><b>Invisible faces:</b> </td>
+    <td> You can set some faces to be invisible in CS. Imagine you have a box, 
+      but you want 1 face to be invisible. You can surely remove that face, but 
+      it seems that Dynavis works better if you keep that face and set it as invisible. 
+      So Dynavis will consider the object closed, and you will have the same visual 
+      effect. To set a face as invisible, create a new material with texture "csinvisible.tga" 
+      (this IS case-sensitive) and assign it to the faces you want to be invisible. 
+    </td>
+    <td>Those faces will be flagged as LIGHTING=no and INVISIBLE=yes. 
+      <p></p></td>
+    <td>NA</td>
+  </tr>
+  <tr> 
+    <td> <p><b>Transparency:</b> </td>
+    <td> <p>If an object has a transparent texture you need no special flag on 
+        the object itself. You have to set the texture as transparent. To do that, 
+        open the material editor, pick your material and select the &quot;Opacity&quot; 
+        checkbox. It's not needed that you also add a texture for it.</p>
+      <p></p></td>
+    <td> <p>Set on texture and not on object.</p></td>
+    <td>NO</td>
+  </tr>
+  <tr> 
+    <td> <p><b>Sky:</b> </td>
+    <td> Sky objects must have a different rendering priority in CS, to set an 
+      object as a sky object (like the bounding box of your level) name it with 
+      prefix "_sky_". Example: _sky_box01. 
+      <p></p></td>
+  </tr>
+  <tr> 
+    <td> <p><b>Disable Culing</b>: </td>
+    <td> If you set this property to off the object will not be considered for 
+      visibility culling purposes. Default is on. 
+      <p></p>
+      <ul>
+      </ul></td>
+    <td> <li>VISCULL=no</li></td>
+    <td>YES</td>
+  </tr>
+  <tr> 
+    <td> <p><b>Only for Culling:</b> </td>
+    <td> If you set this property the object will be used only for culling purposes, 
+      so the object will be invisible. 
+      <p></p>
+      <ul>
+      </ul></td>
+    <td> <li>CULLERONLY=yes</li></td>
+    <td>NO</td>
+  </tr>
+</table>
+
+<p align=right>Next: <a href="thinggenmesh.htm">Genmeshes</a></p>
+</body></html>

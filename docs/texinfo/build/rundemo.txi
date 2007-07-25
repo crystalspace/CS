@@ -1,0 +1,72 @@
+@c -*-texinfo-*-
+@node Quick Start, , Problems, Building
+@section Quick Start
+@cindex Walktest
+@cindex Quick Start
+
+Once you have built the Crystal Space system and its demonstration applications
+you may be eager to test them out.  This section will give you the opportunity
+to do so without forcing you to wade through an overabundance of explanations.
+Later sections will describe options and applications in more detail, but
+for now, sit back and have some fun.
+
+Typically, the executable for each application and its support files will be
+located in the same directory, though this is not strictly necessary.  The map
+files are generally placed in the @file{CS/data} directory, but this not
+required.  Please note that the map @sc{zip} files should @emph{not} be
+unpacked.  Crystal Space can read these files directly.
+
+In the following examples we will run @samp{walktest}, the quintessential
+Crystal Space demonstration program in various ways.
+
+When running @samp{walktest} for the first time we must update it's lightmaps.
+ This is accomplished by adding @samp{-relight} to the command line.
+
+On Windows:
+
+@example
+walktest.exe -relight
+@end example
+
+On other Operating Systems:
+
+@example
+./walktest -relight
+@end example
+
+In this example, we will run @samp{walktest} and specify the map it should load
+and use.
+
+On Windows:
+
+@example
+walktest.exe @var{map}
+@end example
+
+On other Operating Systems:
+
+@example
+./walktest @var{map}
+@end example
+
+Replace @var{map} with any map file name which you have downloaded and
+placed in your @file{CS/data} directory.  For instance:
+
+@example
+walktest partsys
+@end example
+
+If your map is not one of those from the @sc{cs} homepage, you may also
+have to add it to @file{vfs.cfg}.  Look at the entries for the other maps
+to see how to do this.
+
+Note when running lightmap based maps you must as above in our initial example
+update it's lightmaps.  This is accomplished as stated by adding @samp{-relight}
+to the command line. Do not worry about this too much, if lightmaps are out
+of date you will in most cases be prompted of the fact in your terminal and
+advised to re-run the application with @samp{-relight}.
+
+You can also use other command line parameters when running Crystal Space
+applications.  @xref{Common Command Line Options}.  Detailed setup can be done
+in the configuration file.  @xref{Configuration File}.  For Walktest, in-game
+setup can be done via the console.  @xref{Walktest Console Commands}.

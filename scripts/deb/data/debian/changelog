@@ -1,0 +1,45 @@
+crystalspace-data (0.98-20040623-1) unstable; urgency=low
+
+  * New upstream
+
+ -- Christian Bayle <bayle@debian.org>  Thu, 24 Jun 2004 01:58:56 +0200
+
+crystalspace-data (0.96-3) unstable; urgency=low
+
+  * Create CrystalSpace submenu (Closes: bug#196131)
+
+ -- Christian Bayle <bayle@debian.org>  Tue, 24 Jun 2003 23:27:11 +0200
+
+crystalspace-data (0.96-2) unstable; urgency=low
+
+  * New upstream datas
+
+ -- Christian Bayle <bayle@debian.org>  Sat, 22 Feb 2003 23:53:52 +0100
+
+crystalspace-data (0.94-2) unstable; urgency=low
+
+  * Changed data (I completly missed the previous one)
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Thu, 13 Dec 2001 02:11:42 +0100
+
+crystalspace-data (0.94-1) unstable; urgency=low
+
+  * New upstream
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Thu, 13 Dec 2001 02:11:42 +0100
+
+crystalspace-data (0.93-1) unstable; urgency=low
+
+  * New demodata.zip file
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Thu, 13 Dec 2001 02:11:42 +0100
+
+crystalspace-data (0.92-1) unstable; urgency=low
+
+  * Data are in a separate package
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Thu, 13 Dec 2001 02:11:42 +0100
+
+Local variables:
+mode: debian-changelog
+End:

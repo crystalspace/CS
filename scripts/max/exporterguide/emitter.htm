@@ -1,0 +1,94 @@
+<h3>Emitters</h3>
+<p>We currently support a number of particle emitters, those are listed below. 
+  To add an emitter to a 3dsmax scene select the "Create" tab (the one 
+  you use for creating Boxes) and click on the Helpers icon. Select "Point" 
+  helper and add that to the scene where you want to place the emitter. "Point" 
+  has a properties page like other objects.<br>
+  
+  
+  <br>For editing particles sytems more easily you might find usefull to use the partedit application than you should find at the root of th "CS" directory , note than the for more finetunning you should edit the properties directly in the world file using the properties described after, if you want good sample have a look at to the ones shipped with the CEL project.
+  
+  <br>All emitter use a default <b>texture</b>: raindrop.png. If you want to specify 
+  a different texture you can just add a property to the Point object called MATERIAL. 
+  ex.: MATERIAL=icedrop.png</p>
+<p>All emitter use a default <b>mixmode</b>: add. If you want to specify a different 
+  mixmode you can just add a property to the Point object called MIXMODE. Available 
+  mixmodes are: add, copy, mult2, mult, alpha, transparent, keycolor, tiling. 
+  ex.: MIXMODE=copy</p>
+<p><b>Fire</b>: Used for torches, campfires, etc... Add ALL those properties to 
+  the object  :  
+<br>*  TYPE=fire
+<br>* NUMBER=25
+<br>* DROPSIZE=0.1,0.1
+<br>* LIGHTING=off
+<br>* SWIRL=1.8
+<br>* COLORSCALE=0.15
+ </p>
+
+<img src="pictures/attrib.jpg" ALIGN=right alt="the attribute tab">
+
+<p><b>Emit:</b> Can produce a great amount of effects because is highly customizable. 
+  Add those properties to the object. </p>
+<ul>
+  <li>TYPE=emit</li>
+  <li>NUMBER=250<br>
+    <br>
+  </li>
+  <li>REGULARPARTICLES=4,0.1<br>
+    (where first parameter is sides and second is radius) <br>
+    or <br>
+    RECTPARTICLES=4,0.1<br>
+    (where first parameter is width and second is height) <br>
+    <br>
+  </li>
+  <li>LIGHTING=off</li>
+  <li>TOTALTIME=4000<br>
+    <br>
+  </li>
+  <li>STARTPOS1=EMITSPHERE<br>
+    STARTPOS2=0,0.1<br>
+    or<br>
+    STARTPOS1=EMITFIXED<br>
+    STARTPOS2=0,0 (in this case this parameter is not used, but must be present)<br>
+    or<br>
+    STARTPOS1=EMITBOX<br>
+    STARTPOS2=-1,-1,-1,1,1,1 (the parameter is NOT scaled! it must have final 
+    coords)<br>
+    <br>
+  </li>
+  <li>STARTSPEED=EMITBOX(-1,-1,-1,1,1,1) (the parameter is NOT scaled! it must 
+    have final coords)<br>
+    or<br>
+    STARTSPEED=EMITFIXED(-1,-2,2)<br>
+    <br>
+  </li>
+  <li>STARTACCEL=EMITFIXED(0,0,0)<br>
+    <br>
+  </li>
+  <li> ATTRACTOR=Attractor02</li>
+  <li>ATTRACTORFORCE=0.5<br>
+    <br>
+  </li>
+  <li>AGING0=0,1.0,0.2,0.8,0.5,2.0,0.0,1.25<br>
+    AGING1=1000,1.0,0.8,0.2,1.0,1.5,0.0,0.75<br>
+    AGING2=2000,1.0,0.2,0.8,0.5,1.0,0.0,1.0<br>
+    AGING3=3000,1.0,0.8,0.2,1.0,0.5,0.0,0.5<br>
+    AGING4=4000,1.0,0.2,0.8,0.5,0.0,0.0,0.25</li>
+</ul>
+<p>The AGING part is really important, there you can set what happens to the emitter 
+  during time. Here is the meaning of the fields used in AGING line:</p>
+<p>AGING0=&lt;time&gt;,&lt;color red&gt;,&lt;color green&gt;,&lt;color
+blue&gt;,&lt;alpha&gt;,&lt;swirl&gt;,&lt;rotspeed&gt;,&lt;scale&gt;</p>
+<p>An Emit <b>MUST</b> have an attractor. This is where the particles will be 
+  attracted through the time cycle described in the AGING fields. In the ATTRACTOR 
+  field you have to set the 3dsmax Point Object that will use that.</p>
+<p><b>Aging:</b> Aging is optional and can range from 0 to 5 entries.</p>
+<p><b>Attractor:</b> Used in combination with the Emit, has only one property 
+  that tells the exporter that it must be not considered as a stand-alone emitter.</p>
+<ul>
+  <li>TYPE=hidden</li>
+</ul>
+
+<img src="pictures/particle.jpg" alt="some fire"  >
+<p align=right>Next: <a href="terrain.htm">Terrain</a></p>
+</body></html>

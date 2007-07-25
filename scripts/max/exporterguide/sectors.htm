@@ -1,0 +1,100 @@
+
+<h3> Sectors and portals</h3>
+<p>Sectors and portals are a very important tool to speed up the rendering of 
+  levels. Well defined sectors can greatly speed up rendering and allow various 
+  tricks, to understand what they are, read <a href="sectorsinfo.htm">this</a> 
+  guide.<br>
+  <br>
+  The exporter supports 2 different ways of creating your levels:</p>
+<p>1) One sector per Max scene</p>
+<p>2) Multiple sectors per Max scene</p>
+<h4>One sector per Max scene</h4>
+<p>Be sure you have no objects named &quot;_sect_&quot; in the scene.</p>
+<p>The sector name will be taken from the &quot;roomname&quot; custom property 
+  that you added on the Max scene.</p>
+<p>All objects present in the scene will be exported as part of the sector.</p>
+<p>&nbsp;</p>
+<h4>Multiple sectors per Max scene</h4>
+<p>Create a &quot;Dummy&quot; object (Create-&gt;Helpers-&gt;Dummy) for each sector 
+  you want to have in the scene, and name it:<br>
+  &quot;_sect_sectorname&quot;<br>
+  where &quot;sectorname&quot; is the name of your sector. The sector will be 
+  exported with name=sectorname</p>
+<p>To add objects to one specific sector, use the &quot;Select and Link&quot; 
+  button in the toolbar making the objects children of the Dummy sector object 
+  (click on the object then drag to the Dummy sector object. You can also do that 
+  with multiple objects selected).</p>
+<p>Remember that:<br>
+  - the camera object must be parented to the right sector<br>
+  - a portal that brings from sector1 to sector2 must be linked to sector1<br>
+  - all objects that are not linked to a _sect_ object will not be exported</p>
+<p>&nbsp;</p>
+TODO!!!!   SECTOR_TYPE=simple<br>
+<br>
+<h4>Adding Portals</h4>
+<p>To add a portal to a 3dsmax scene follow this guidelines:</p>
+<ul>
+  <li>the object name must start with "_p_" . For example "_p_laanx1" is a valid 
+    portal name.</li>
+  <li>it MUST be a mesh with 2 planar triangle polygons (a square similar to a 
+    door is perfect).</li>
+  <li>add a property to the object (see 'Objects' chapter for details on how to 
+    add a property) called "PORTAL" that points to the roomname of the sector 
+    where that portal will lead to.<br>
+    Example: PORTAL=plaza</li>
+</ul>
+<p>When you have a portal that arrives in the middle of a sector. i.e. the player 
+  will have geometry behind him when arriving in the new sector, then you have 
+  to use a property to tell the engine that it should consider differently that 
+  geometry while looking through the portal. The flag is: ARRIVESINTHEMIDDLE. 
+  This flag is quite bad for performances, so should be avoided as much as possible. 
+  Default is no.</p>
+<ul>
+  <li>ARRIVESINTHEMIDDLE=yes</li>
+</ul>
+<p>When you have a portal that is placed in the middle of a sector i.e. there 
+  is geometry behind the portal in the sector it's placed, then you have to use 
+  a property to tell the engine that it should consider differently that geometry 
+  while looking through the portal. The flag is: STARTSINTHEMIDDLE. This flag 
+  is not that bad for performances. Default is no.</p>
+<ul>
+  <li>STARTSINTHEMIDDLE=yes</li>
+</ul>
+<p>When testing a level remember that the target sector must be loaded in memory 
+  to have the portal &quot;active&quot;. If you don't load the other sector (or 
+  level), the portal will just look black or with checkerboard texture and will 
+  be solid, like a wall.</p>
+<h4>Adding a Warping Portal</h4>
+<p>As you know, a portal is not bi-directional, so by itself it defines a starting 
+  point and a destination point. The destination point is by default in the same 
+  coordinates as the portal is, but located in the destination sector. Let's say 
+  we have a portal placed in coords (1,10,20) located in sector &quot;one&quot; 
+  with destination sector &quot;two&quot;. This portal will be seen in sector 
+  one at coords (1,10,20) and when the player will pass through it, it will bring 
+  in sector &quot;two&quot; at coords (1,10,20).</p>
+<p>This means that if you have many linked sectors, you will end up modeling things 
+  at coords 2000 or 10000, having to figure out the position to place your new 
+  sector based on the location of the incoming portals.</p>
+<p>A &quot;warping&quot; portal gives you the ability to define which is the exact 
+  destination point, the place where the player will appear when passing through 
+  the portal. Obviously the same rule is applied when the player looks at the 
+  portal, so he will see the geometry present at the specified target position.</p>
+<p>To easily specify a target position, instead of inserting manually the coordinates, 
+  you can just place a dummy object in the scene to represent the target position. 
+  If the target will be another portal, I strongly recommend to merge that second 
+  portal into your scene, to rename it _n_something (so it's not exported), and 
+  use this object as the warp destination target.</p>
+<p>To have a warping portal, add the usual PORTAL property, plus a WARPTARGET 
+  property:</p>
+<p>PORTAL=two<br>
+  WARPTARGET=_n_mylocation</p>
+<p>the WARPTARGET property tells the exporter to check the object '_n_mylocation' 
+  and extract his coords. It subtracts the portal coords from the target object 
+  coords, and displace the portal of that amount.</p>
+<p>Let's say that our portal (_p_portal1) is in coords: x=3, y=0 and that the 
+  target object (_n_mylocation) is in coords x=5, y=0. When exporting the distance 
+  from one to the other is calculated: x=2. The portal _p_portal1 will be then 
+  exported with a warp of x=2. This means that the sector &quot;two&quot; (destination 
+  sector) will be displaced of x=2 when viewed from _p_portal1.</p>
+<p align=right>Next: <a href="occluders.htm">Occluders</a></p>
+</body></html>

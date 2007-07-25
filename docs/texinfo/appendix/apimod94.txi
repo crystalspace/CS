@@ -1,0 +1,207 @@
+@c -*-texinfo-*-
+@node Release Notes 94, Release Notes 92, Release Notes 96, Release Notes
+@appendixsec Release Notes from 0.92 to 0.94
+@cindex Release Notes
+
+This section documents the major changes between versions 0.92 and 0.94 of of
+Crystal Space.
+
+@subheading Loader and Saver Changes
+@cindex @code{iSaverPlugin}
+@cindex @code{iLoaderPlugin}
+@cindex @code{iLoaderContext}
+@cindex @code{iTerrFuncState}
+
+All plugins implementing @samp{iLoaderPlugin} will have to be changed
+since the material and mesh factory lists are now replaced with a
+@samp{iLoaderContext} parameter.
+
+This change also means that @code{iTerrFuncState::LoadMaterialGroup()}
+now expects an @samp{iLoaderContext} instead of @samp{iMaterialList}.
+
+@emph{Warning}: This loader change means that the searching restricted
+on the current region now actually works. This means that by default
+when loading a map it will @emph{only} find objects defined in this map.
+
+The @samp{iSaverPlugin} interface has also changed. It now uses an
+@samp{iFile} parameter instead of @samp{iStrVector}.
+
+@subheading iCamera Changes
+@cindex @code{iCamera}
+
+Added @code{iCamera::SetFarPlane()} and changed @code{iCamera::GetFarPlane()}
+to return a pointer to the far plane. This function will return null if
+no far plane is used.
+
+The following constants have been renamed in order to avoid pollution of the
+global namespace:
+
+@itemize @bullet
+@item
+@code{VEC_FORWARD} @result{} @code{CS_VEC_FORWARD}
+@item
+@code{VEC_BACKWARD} @result{} @code{CS_VEC_BACKWARD}
+@item
+@code{VEC_RIGHT} @result{} @code{CS_VEC_RIGHT}
+@item
+@code{VEC_LEFT} @result{} @code{CS_VEC_LEFT}
+@item
+@code{VEC_UP} @result{} @code{CS_VEC_UP}
+@item
+@code{VEC_DOWN} @result{} @code{CS_VEC_DOWN}
+@item
+@code{VEC_ROT_RIGHT} @result{} @code{CS_VEC_ROT_RIGHT}
+@item
+@code{VEC_ROT_LEFT} @result{} @code{CS_VEC_ROT_LEFT}
+@item
+@code{VEC_TILT_RIGHT} @result{} @code{CS_VEC_TILT_RIGHT}
+@item
+@code{VEC_TILT_LEFT} @result{} @code{CS_VEC_TILT_LEFT}
+@item
+@code{VEC_TILT_UP} @result{} @code{CS_VEC_TILT_UP}
+@item
+@code{VEC_TILT_DOWN} @result{} @code{CS_VEC_TILT_DOWN}
+@end itemize
+
+@subheading Engine Changes
+@cindex far planes
+@cindex @code{iEngine.LoadMeshFactory()}
+@cindex @code{iEngine.LoadMeshWrapper()}
+
+Far plane handling in the engine has changed. Polygons are no longer
+clipped exactly to the far plane but instead the polygons are rejected
+which are fully behind the far plane.
+
+@code{iEngine::LoadMeshFactory()} and @code{iEngine::LoadMeshWrapper()}
+used to have a @samp{classId} parameter. That parameter has now been removed.
+
+@subheading Various Changes
+@cindex @code{csPlane3.ClipPolygon()}
+
+@code{csPlane3::ClipPolygon()} will now by default consider the
+polygon to be visible on the negative side of the plane
+(@code{csPlane3::Classify()}) as opposed to the positive side like
+it used to be. It now has a third parameter @samp{reversed} which
+you can set to @code{true} so that it behaves again as before.
+
+@subheading Various Constant Changes
+
+The following constants have been renamed in order to avoid pollution of the
+global namespace:
+
+@itemize @bullet
+@item
+@code{BOX_CORNER_xy} @result{} @code{CS_BOX_CORNER_xy}
+@item
+@code{BOX_CORNER_xY} @result{} @code{CS_BOX_CORNER_xY}
+@item
+@code{BOX_CORNER_Xy} @result{} @code{CS_BOX_CORNER_Xy}
+@item
+@code{BOX_CORNER_XY} @result{} @code{CS_BOX_CORNER_XY}
+@item
+@code{BOX_EDGE_xy_Xy} @result{} @code{CS_BOX_EDGE_xy_Xy}
+@item
+@code{BOX_EDGE_Xy_xy} @result{} @code{CS_BOX_EDGE_Xy_xy}
+@item
+@code{BOX_EDGE_Xy_XY} @result{} @code{CS_BOX_EDGE_Xy_XY}
+@item
+@code{BOX_EDGE_XY_xy} @result{} @code{CS_BOX_EDGE_XY_Xy}
+@item
+@code{BOX_EDGE_XY_xY} @result{} @code{CS_BOX_EDGE_XY_xY}
+@item
+@code{BOX_EDGE_xY_XY} @result{} @code{CS_BOX_EDGE_xY_XY}
+@item
+@code{BOX_EDGE_xY_xy} @result{} @code{CS_BOX_EDGE_xY_xy}
+@item
+@code{BOX_EDGE_xy_XY} @result{} @code{CS_BOX_EDGE_xy_xY}
+@item
+@code{BOX_CORNER_xyz} @result{} @code{CS_BOX_CORNER_xyz}
+@item
+@code{BOX_CORNER_xyZ} @result{} @code{CS_BOX_CORNER_xyZ}
+@item
+@code{BOX_CORNER_xYz} @result{} @code{CS_BOX_CORNER_xYz}
+@item
+@code{BOX_CORNER_xYZ} @result{} @code{CS_BOX_CORNER_xYZ}
+@item
+@code{BOX_CORNER_Xyz} @result{} @code{CS_BOX_CORNER_Xyz}
+@item
+@code{BOX_CORNER_XyZ} @result{} @code{CS_BOX_CORNER_XyZ}
+@item
+@code{BOX_CORNER_XYz} @result{} @code{CS_BOX_CORNER_XYz}
+@item
+@code{BOX_CORNER_XYZ} @result{} @code{CS_BOX_CORNER_XYZ}
+@item
+@code{BOX_SIDE_x} @result{} @code{CS_BOX_SIDE_x}
+@item
+@code{BOX_SIDE_X} @result{} @code{CS_BOX_SIDE_X}
+@item
+@code{BOX_SIDE_y} @result{} @code{CS_BOX_SIDE_y}
+@item
+@code{BOX_SIDE_Y} @result{} @code{CS_BOX_SIDE_Y}
+@item
+@code{BOX_SIDE_z} @result{} @code{CS_BOX_SIDE_z}
+@item
+@code{BOX_SIDE_Z} @result{} @code{CS_BOX_SIDE_Z}
+@item
+@code{BOX_INSIDE} @result{} @code{CS_BOX_INSIDE}
+@item
+@code{BOX_EDGE_Xyz_xyz} @result{} @code{CS_BOX_EDGE_Xyz_xyz}
+@item
+@code{BOX_EDGE_xyz_Xyz} @result{} @code{CS_BOX_EDGE_xyz_Xyz}
+@item
+@code{BOX_EDGE_xyz_xYz} @result{} @code{CS_BOX_EDGE_xyz_xYz}
+@item
+@code{BOX_EDGE_xYz_xyz} @result{} @code{CS_BOX_EDGE_xYz_xyz}
+@item
+@code{BOX_EDGE_xYz_XYz} @result{} @code{CS_BOX_EDGE_xYz_XYz}
+@item
+@code{BOX_EDGE_XYz_xYz} @result{} @code{CS_BOX_EDGE_XYz_xYz}
+@item
+@code{BOX_EDGE_XYz_Xyz} @result{} @code{CS_BOX_EDGE_XYz_Xyz}
+@item
+@code{BOX_EDGE_Xyz_XYz} @result{} @code{CS_BOX_EDGE_Xyz_XYz}
+@item
+@code{BOX_EDGE_Xyz_XyZ} @result{} @code{CS_BOX_EDGE_Xyz_XyZ}
+@item
+@code{BOX_EDGE_XyZ_Xyz} @result{} @code{CS_BOX_EDGE_XyZ_Xyz}
+@item
+@code{BOX_EDGE_XyZ_XYZ} @result{} @code{CS_BOX_EDGE_XyZ_XYZ}
+@item
+@code{BOX_EDGE_XYZ_XyZ} @result{} @code{CS_BOX_EDGE_XYZ_XyZ}
+@item
+@code{BOX_EDGE_XYZ_XYz} @result{} @code{CS_BOX_EDGE_XYZ_XYz}
+@item
+@code{BOX_EDGE_XYz_XYZ} @result{} @code{CS_BOX_EDGE_XYz_XYZ}
+@item
+@code{BOX_EDGE_XYZ_xYZ} @result{} @code{CS_BOX_EDGE_XYZ_xYZ}
+@item
+@code{BOX_EDGE_xYZ_XYZ} @result{} @code{CS_BOX_EDGE_xYZ_XYZ}
+@item
+@code{BOX_EDGE_xYZ_xYz} @result{} @code{CS_BOX_EDGE_xYZ_xYz}
+@item
+@code{BOX_EDGE_xYz_xYZ} @result{} @code{CS_BOX_EDGE_xYz_xYZ}
+@item
+@code{BOX_EDGE_xYZ_xyZ} @result{} @code{CS_BOX_EDGE_xYZ_xyZ}
+@item
+@code{BOX_EDGE_xyZ_xYZ} @result{} @code{CS_BOX_EDGE_xyZ_xYZ}
+@item
+@code{BOX_EDGE_xyZ_xyz} @result{} @code{CS_BOX_EDGE_xyZ_xyz}
+@item
+@code{BOX_EDGE_xyz_xyZ} @result{} @code{CS_BOX_EDGE_xyz_xyZ}
+@item
+@code{BOX_EDGE_xyZ_XyZ} @result{} @code{CS_BOX_EDGE_xyZ_XyZ}
+@item
+@code{BOX_EDGE_XyZ_xyZ} @result{} @code{CS_BOX_EDGE_XyZ_xyZ}
+@item
+@code{POL_FRONT} @result{} @code{CS_POL_FRONT}
+@item
+@code{POL_BACK} @result{} @code{CS_POL_BACK}
+@item
+@code{POL_SAME_PLANE} @result{} @code{CS_POL_SAME_PLANE}
+@item
+@code{POL_SPLIT_NEEDED} @result{} @code{CS_POL_SPLIT_NEEDED}
+@item
+@code{DECLARE_TYPED_QUEUE} @result{} @code{CS_DECLARE_TYPED_QUEUE}
+@item
+@code{DECLARE_TYPED_QUEUE_BASE} @result{} @code{CS_DECLARE_TYPED_QUEUE_BASE}
+@end itemize

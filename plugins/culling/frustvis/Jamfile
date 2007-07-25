@@ -1,0 +1,8 @@
+SubDir TOP plugins culling frustvis ;
+
+Description frustvis : "Frustum Visibility System" ;
+
+Plugin frustvis
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith frustvis : crystalspace ;

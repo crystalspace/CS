@@ -1,0 +1,129 @@
+<h3><a name="genmeshs" >Genmeshes</a></h3>
+<p>Genmeshes are used to reduce the amount of geometry CS will handle. You can 
+  define a "factory" object (example: a stone) and then copy it in several places 
+  of the level. If it's a genmesh the copies will be exported with the reference 
+  to the factory, plus their position and rotation, all the geometry will be identical 
+  to the "factory" object. This saves a lot of memory. Please note that genmeshes 
+  can have just one material per object. You can have one material (e.g. stone1.gif) 
+  on the factory, a different one on a certain instance (e.g. stone2.gif), and 
+  so on. You <u>cannot</u> have two materials (e.g. column_top.gif and column_body.gif).</p>
+<p>To have genmeshes working you <u>must</u> follow carefully these procedures.</p>
+<p>Create a valid factory:</p>
+<ul>
+  <li>Define a valid name for factory 
+    <ul>
+      <li>name it with a starting "_g_" prefix</li>
+      <li>name it with a unique identifier that will be used on copies. eg.: "_g_stonebig"</li>
+      <li>add a "_0" suffix to the end of the name to tell the exporter that this 
+        is a factory.</li>
+      <li>A valid factory name is: "_g_stonebig_0". Underscores should be in the 
+        right quantity: &quot;_g_stone_big_0" is invalid and this will not be 
+        considered a factory.</li>
+    </ul>
+  </li>
+  <li>Reset the factory 
+    <ul>
+      <li>Move the factory object to 0,0,0. This will be used as a reference for 
+        the position of all other instances</li>
+      <li>Select the object, go to Hierarchy, click on Affect Object Only, and 
+        then &quot;Align to World&quot;, &quot;Center to Pivot&quot;</li>
+      <li>Click on Affect Pivot Only, and then &quot;Align to World&quot;</li>
+    </ul>
+  </li>
+</ul>
+<p>Create a valid instance:</p>
+<ul>
+  <li>Define a valid name for instance 
+    <ul>
+      <li>name it with a starting "_g_" prefix</li>
+      <li>use the same unique indentifier of the factory (I mean the central part 
+        of the name. e.g. &quot;stonebig&quot;)</li>
+      <li>add a unique suffix at the end of the name: eg.: "_g_stonebig_01"</li>
+    </ul>
+  </li>
+  <li>Reset the instances </li>
+  <ul>
+    <li>NEVER create an instance by mirroring the factory. Mirror function mess 
+      up the pivot, so we have no way to have it oriented correctly when exported. 
+      To create an instance copy the factory object and then rotated it, move 
+      it as you wish.</li>
+    <li>Select the object, go to Hierarchy, click on Affect Object Only, and then 
+      &quot;Center to Pivot&quot;</li>
+    <li>Click on Affect Pivot Only, and then &quot;Align to object&quot;</li>
+  </ul>
+</ul>
+<p>Please note that the factory is NOT exported in the scene, so it will be invisible 
+  in CS.</p>
+<p>All genmeshes have the tiling <b>mixmode</b>.</p>
+<p><b>Shadows</b>: genmeshes can have the same settings Objects have for shadows 
+  (see <a href="object.htm">Object Properties</a>).</p>
+<p><b>Trasparency</b>: if the object has a transparent texture you have two options:<br>
+  1) if the object is made of just one plane you can just add the property transparent 
+  on the factory object (see <a href="object.htm">Object Properties</a>)</p>
+<p>2) if the object is made of many planes, some of which can be seen as overlapping 
+  by the player (like two parallel planes one after the other), then you must 
+  add the transparentmultiple property on the factory object (see <a href="object.htm">Object 
+  Properties</a>)</p>
+<p> </p>
+<h3><a name="thingmeshs">Thingmeshes</a></h3>
+<p>Thingmeshes are used to reduce the amount of geometry CS will handle. You can 
+  define a "factory" object (example: a house) and then copy it in several 
+  places of the level. If it's a thingmesh the copies will have only the location, 
+  rotation and texture associated, all the geometry will be identical to the "factory" 
+  object. This saves a lot of memory. The difference with genmeshes is that thingmesh 
+  instances can have a different texture from the factory, that thingmesh support 
+  multiple textures and that those "can receive light (check with Jorrit)".</p>
+<p>To have thingmeshes working you <u>must</u> follow carefully these procedures.</p>
+<p>Create a valid factory:</p>
+<ul>
+  <li>Define a valid name for factory 
+    <ul>
+      <li>name it with a starting "_f_" prefix</li>
+      <li>name it with a unique identifier that will be used on copies. eg.: "_g_house"</li>
+      <li>add a "_0" suffix to the end of the name to tell the exporter that this 
+        is a factory.</li>
+      <li>A valid factory name is: "_f_house_0". Underscores should be in the 
+        right quantity: &quot;_f_house_big_0" is invalid and this will not be 
+        considered a factory.</li>
+    </ul>
+  </li>
+  <li>Reset the factory 
+    <ul>
+      <li>Move the factory object to 0,0,0. This will be used as a reference for 
+        the position of all other instances</li>
+      <li>Select the object, go to Hierarchy, click on Affect Object Only, and 
+        then &quot;Align to World&quot;, &quot;Center to Pivot&quot;</li>
+      <li>Click on Affect Pivot Only, and then &quot;Align to World&quot;</li>
+    </ul>
+  </li>
+</ul>
+<p>Please note that the factory is NOT exported in the scene, so it will be invisible 
+  in CS.</p>
+<p>Create a valid instance:</p>
+<ul>
+  <li>Define a valid name for instance 
+    <ul>
+      <li>name it with a starting "_f_" prefix</li>
+      <li>use the same unique indentifier of the factory (I mean the central part 
+        of the name. e.g. &quot;house&quot;)</li>
+      <li>add a unique suffix at the end of the name: eg.: "_f_house_01"</li>
+    </ul>
+  </li>
+  <li>Reset the instances </li>
+  <ul>
+    <li>NEVER create an instance by mirroring the factory. Mirror function mess 
+      up the pivot, so we have no way to have it oriented correctly when exported. 
+      To create an instance copy the factory object and then rotated it, move 
+      it as you wish.</li>
+    <li>Select the object, go to Hierarchy, click on Affect Object Only, and then 
+      &quot;Center to Pivot&quot;</li>
+    <li>Click on Affect Pivot Only, and then &quot;Align to object&quot;</li>
+  </ul>
+</ul>
+<p><b>Trasparency</b>: if the object has a trasparent texture you should set a 
+  property on the factory object (see <a href="object.htm">Object Properties</a>).</p>
+<p>&nbsp;</p>
+<p align=right>Next: <a href="light.htm">Lights</a></p>
+<p><b></b></p>
+
+</body></html>

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- ddraw2d.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphics2d.directdraw</name>
+        <implementation>csGraphics2DDDraw3</implementation>
+        <description>Crystal Space 2D DirectDraw driver</description>
+        <requires>
+          <class>crystalspace.font.server.</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

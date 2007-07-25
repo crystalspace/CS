@@ -1,0 +1,4 @@
+SubDir TOP data flarge ;
+
+InstallData world [ Wildcard *.png *.dds ] : data maps flarge ;
+InstallData [ Wildcard factories : thing* ] : data maps flarge factories ;

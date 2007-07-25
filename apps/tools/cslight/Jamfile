@@ -1,0 +1,6 @@
+SubDir TOP apps tools cslight ;
+
+Description cslight : "Lighting Calculator" ;
+ApplicationIcon win32 : cslight : cslight.ico ;
+Application cslight : [ Wildcard *.cpp *.h ] ;
+LinkWith cslight : crystalspace ;

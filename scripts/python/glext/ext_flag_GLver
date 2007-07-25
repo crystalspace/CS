@@ -1,0 +1,2 @@
+  /** Whether the corresponding GL version is supported. */
+  bool CS_%Name%;

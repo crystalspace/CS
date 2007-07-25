@@ -1,0 +1,91 @@
+SubDir TOP plugins cscript cspython ;
+
+if $(PYTHON.AVAILABLE) = "yes"
+{
+  # Compiler flags for Swig-generated code. The synthesized code is not 100%
+  # clean, so we disable some compilation warnings in order to avoid abuse
+  # about code over which we have no control.  Additionally, it is reported
+  # that, with some versions of GNU build tools on Windows, the Crystal Space
+  # Python plugin fails to link and emits the error message "Error: 0-bit reloc
+  # in dll". In particular, this occurs with optimizations (such as -O3)
+  # enabled. We can avoid the error by disabling function inlining.
+  CSPYTHON.CFLAGS =
+    [ FDefines SWIG_GLOBAL ]
+    $(COMPILER.C++FLAGS.WARNING.NO_UNUSED) 
+    $(COMPILER.C++FLAGS.WARNING.NO_UNINITIALIZED) 
+    $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE)
+    ;
+  if $(TARGET.OS) = WIN32
+  {
+    CSPYTHON.CFLAGS += $(COMPILER.C++FLAGS.INLINING.DISABLE) ;
+  }
+
+  #--------
+  # Swig-generated files.
+  #--------
+  local common = cs_pyth.cpp ;
+  local cspacepy = [ DoSourceGrist cspace.py ] ;
+  MakeLocate $(cspacepy) : $(LOCATE.TARGETS) ;
+
+  if ! [ Property build : projgen ]
+  {
+    common = [ DoSourceGrist $(common) ] ;
+
+    if $(CMD.SWIG)
+    {
+      Swig $(common) $(cspacepy) :
+        [ DoSourceGrist cspace.i ] :
+        python :
+	-c++ -shadow :
+	[ ConcatDirs $(TOP) include ]
+	[ ConcatDirs $(BUILDTOP) include ] :
+	[ ConcatDirs $(TOP) include bindings ] :
+	$(SEARCH_SOURCE) [ ConcatDirs $(TOP) scripts python ] :
+	:
+	[ on $(cspacepy) GetVar LOCATE ] ;
+      Depends cspythonclean : pythonswigclean ;
+    }
+    else
+    {
+      SEARCH on $(common) = $(SEARCH_SOURCE) ;
+      local frozenpy = $(cspacepy:G=frozencspacepy) ;
+      SEARCH on $(frozenpy) = [ ConcatDirs $(TOP) scripts python ] ;
+      Copy $(cspacepy) : $(frozenpy) ;
+      Depends $(cspacepy) : $(frozenpy) ;
+    }
+  }
+  Clean cspythonclean : $(cspacepy) ;
+  Depends clean : cspythonclean ;
+
+  rule InstallCSPythonPY
+  {
+    # Temporary SUBDIR override for InstallData.
+    local SUBDIR = [ on $(<) GetVar LOCATE ] ;
+    InstallData $(<) : $(>) ;
+  }
+  InstallCSPythonPY $(cspacepy) : bindings python ;
+
+  Description crystalspace_python : "Python-specific support" ;
+  Library crystalspace_python : $(common) staticvarcleanup.cpp : shared independent optional ;
+  LibDepends crystalspace_python : crystalspace ;
+  ExternalLibs crystalspace_python : PYTHON ;
+  CFlags crystalspace_python : $(CSPYTHON.CFLAGS) ;
+  MsvcDefine crystalspace_python : _CRT_SECURE_NO_DEPRECATE _CRT_NONSTDC_NO_DEPRECATE ;
+
+  #--------
+  # cspython -- Crystal Space plugin
+  #--------
+  Description cspython : "Python plugin" ;
+  Plugin cspython : cspython.h cspython.cpp pytocs.h pytocs.cpp ;
+  LinkWith cspython : crystalspace_python crystalspace ;
+  ExternalLibs cspython : PYTHON ;
+  CFlags cspython : $(CSPYTHON.CFLAGS) ;
+  Depends cspython : $(cspacepy) ;
+
+  #--------
+  # pythmod -- Pure Python module
+  #--------
+  PythMod pythmod : _cspace : pythmod.cpp : crystalspace crystalspace_python : 
+		: "pure Python module" ;
+  Depends pythmod : $(cspacepy) ;
+}

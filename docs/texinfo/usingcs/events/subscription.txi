@@ -1,0 +1,33 @@
+@c -*-texinfo-*-
+@node Event Subscription, Frame phase events, Event Scheduling, Event System
+@subsection Subscription
+@cindex Events, Subscription
+
+The event scheduling system is invoked by calling the 
+@code{csEventQueue::RegisterListener()} or @code{csEventQueue::Subscribe()} 
+methods (or, if you are inheriting from @samp{csBaseEventHandler},
+@code{csBaseEventHandler::RegisterQueue()}).  For each of these, the arguments 
+of interest are the @samp{csEventID} and @code{csEventID[]} parameters.  
+(Note that the @code{RegisterListener()} form with no @samp{csEventID} argument 
+does not subscribe the listener to anything, and must be followed by a call to
+@code{Subscribe()} if you ever want the handler to receive any events.)  For
+each @samp{csEventID} (arrays are terminated by @samp{CS_EVENTLIST_END}), these
+functions will subscribe the event handler to that event name @emph{as well as
+all of its children}.  Note, however, that it will only retrieve from the event
+handler the ordering lists (the @code{Prec()} and @code{Succ()} methods) for
+the event name to which it is @emph{explicitly} subscribed; if you wish to have
+one set of ordering constraints for both @samp{crystalspace.input.keyboard} and
+@samp{crystalspace.input.mouse} but a different set for
+@samp{crystalspace.input.joystick}, you @strong{should not} simply subscribe to
+@samp{crystalspace.input} and have the @code{Prec()} and @code{Succ()}
+functions return different values for each of @samp{.keyboard}, @samp{.mouse},
+and @samp{.joystick}; rather, you should subscribe to each of those three event
+names individually.  This restriction helps us avoid the introduction of
+hard-to-detect circular ordering rules.
+
+Also note that you should use the @code{Subscribe()} and @code{Unsubscribe()} 
+methods to add and remove events from the set of events a handler wishes to 
+receive.  You should only @code{Unsubscribe()} from the particular 
+events to which you have @code{Subscribe()}d; the behavior is undefined 
+otherwise (e.g., if you subscribe to @samp{crystalspace.input} and 
+subsequently unsubscribe from @samp{crystalspace.input.joystick}).

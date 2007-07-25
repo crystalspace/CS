@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- bezier.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.bezier</name>
+        <implementation>csBezierMeshObjectType</implementation>
+        <description>Crystal Space Bezier Mesh Type</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

@@ -1,0 +1,375 @@
+@c -*-texinfo-*-
+@node Release Notes 17, , Release Notes 18, Release Notes
+@appendixsec Release Notes from 0.16 to 0.17
+@cindex Release Notes
+
+This section documents the major changes between versions 0.16 and 0.17 of of
+Crystal Space.
+
+@subheading Signature Change: NextFrame(elapsed_time/current_time)
+@cindex @code{NextFrame()} Changes
+@cindex @code{elapsed_time} Changes
+@cindex @code{current_time} Changes
+
+@code{csSystemDriver::NextFrame()} no longer accepts @samp{elapsed_time} and
+@samp{current_time} arguments, so you have to change the prototype of your own
+subclassed version of @code{NextFrame()} and call the following three lines in
+the order below (only if you need the elapsed and current time, of course):
+
+@example
+void MySubclass::NextFrame()
+@{
+  SysSystemDriver::NextFrame();
+  cs_time elapsed_time, current_time;
+  GetElapsedTime(elapsed_time,current_time);
+  @dots{}
+@end example
+
+@subheading Signature Change: HandleEvent(csEvent)
+@cindex @code{HandleEvent()} Changes
+@cindex @code{csEvent} Changes
+@cindex @code{iEvent} Changes
+
+The argument of @code{csSystemDriver::HandleEvent()} has changed from a
+@samp{csEvent*} parameter to an @samp{iEvent*}.  Update your subclassed
+versions if present.
+
+@subheading Materials Versus Textures
+@cindex Materials Changes
+@cindex Textures Changes
+
+Crystal Space 0.17 supports @dfn{materials} in the sense that the @sc{api} is
+ready for it.  There is no real material support though.  A material currently
+just corresponds with a texture.  Here are a few short remarks about the
+changes:
+
+@itemize @bullet
+@item
+@code{csTextureHandle()} was renamed to @code{csTextureWrapper()}.
+
+@item
+New class: @code{csMaterialWrapper}
+
+@item
+The methods @code{SetTexture()} and @code{GetTexture()} were renamed to
+@code{SetMaterial()} and @code{GetMaterial()}, respectively, in many places.
+
+@item
+The methods
+@code{SetTextureHandle()} and @code{GetTextureHandle()} were renamed to
+@code{SetMaterialWrapper()} and @code{GetMaterialWrapper()}, respectively.
+@end itemize
+
+In general, in most places where you used to use @code{SetTexture()} or
+@code{GetTexture()} you now need to use the material versions.  There are few
+places where you deal directly with textures.  The material system sits on top
+of the texture system and is what you should use in most cases.
+
+@samp{csWorld} now has a @code{GetMaterials()} function which you probably
+should use wherever you used @code{GetTextures()} in the past.
+
+In the loader you can find a new function, @code{csLoader::FindMaterial()},
+which will find a material with the given name.  If not found it tries to find
+a texture with of the same name and, if found, will automatically then create
+a material from that texture.
+
+The @code{csLoader::LoadTexture()} method is a bit special.  As before, it
+loads a texture (and returns a @samp{csTextureWrapper}) but it also adds a
+material with the same name to the material list.  You can then fetch that
+material from that list with code similar to the following:
+
+@example
+csLoader::LoadTexture(world,"myTexture","/lib/std/stone4.gif");
+csMaterialWrapper* m =
+  world->GetMaterials()->FindByName("myTexture");
+@end example
+
+@subheading Collision Detection Plugin
+@cindex Collision Detection Changes
+@cindex @sc{rapid} Changes
+
+This is a very significant change.  The @sc{rapid} collision detection system
+has been completely removed from the engine and is now available through a
+plug-in module.  This change will most likely require the most complicated
+changes to your code.
+
+The first thing you need to add to your application is code to load the
+plugin.  You can do this with the following code:
+
+@example
+char const* p = Config->GetStr (
+  "YourGame",
+  "COLLDET_PLUGIN",
+  "crystalspace.colldet.rapid");
+collide_system =
+  LOAD_PLUGIN(this, p, "CollDet", iCollideSystem);
+if (!collide_system)
+@{
+  Printf(MSG_FATAL_ERROR,
+    "No Collision Detection plugin found!\n");
+  return false;
+@}
+@end example
+
+This code loads the rapid collision detection plugin by default (which is the
+only one we have now) but it also reads an entry from your config file so that
+the user can possibly change it.  If you don't want that then you can just
+hardcode the @samp{p} pointer with the name of the @sc{rapid} plugin.
+
+Note that you need to store the value of @samp{collide_system} some place
+where it can be accessed by the routines that need to do the collision
+detection.
+
+Then the class @samp{csRAPIDCollider} has been removed from csengine.  Instead
+there is a new class, @samp{csCollider}.  This class encapsulates an
+@samp{iCollider} (which is something that is returned from
+@samp{collide_system}).  This is the easiest way to use the new collision
+detection system as it more closely resembles what was possible with
+@samp{csRAPIDCollider}.  To make a @samp{csCollider} you can use the following
+code:
+
+@example
+iPolygonMesh* mesh =
+  QUERY_INTERFACE(object, iPolygonMesh);
+csCollider* collider =
+  new csCollider(*object, collide_system, mesh);
+@end example
+
+@samp{object} can be a sector, sprite, thing, or your own object that supports
+the @samp{iPolygonMesh} interface.  The new collider will be attached (through
+the @samp{csObject} system) to the object.  This is similar to what happened
+with the old @samp{csRAPIDCollider} class.
+
+To do collision detection you need to find the colliders (or have them stored
+somewhere) and then you can do:
+
+@example
+bool rc = collide_system->Collide(
+  col1->GetCollider(), trans1,
+  col2->GetCollider(), trans2);
+@end example
+
+@noindent
+Or:
+
+@example
+bool rc = col1->Collide(*object2, trans1, trans2);
+@end example
+
+With @samp{col1} and @samp{col2} are the colliders (@samp{csCollider}) and
+@samp{object2} is the second object.  @samp{trans1} and @samp{trans2} are the
+respective transformations.
+
+Note that before you call this you probably want to initialize the collision
+system like this:
+
+@example
+collide_system->ResetCollisionPairs();
+collide_system->SetOneHitOnly(@var{true}/@var{false});
+@end example
+
+The argument for the second function depends on whether or not you
+are interested in receiving more than one hit.
+
+Note that @code{ResetCollisionPairs()} is important. Every call
+to @code{Collide()} will add additional collision pairs to this array.
+So you have to reset it if you are no longer interested in that.
+
+Note that @code{csRAPIDCollider::Report()} is gone. If you want that
+functionality you have to do it on your own (which is not difficult).
+
+@subheading Texture Mapping Changes
+@cindex Texture Mapping Changes
+
+The way engine defines and uses texturing has changed.  There are four polygon
+texturing types now:
+
+@table @code
+@item POLYTXT_NONE
+No texturing.  Useful when using materials without textures.  It defines no
+texturing parameters at all thus saves memory.
+
+@item POLYTXT_FLAT
+Flat-shading.  Only the angle between light and polygon normal is considered
+if @samp{CS_POLY_LIGHTING} flag is set, and entire polygon is painted with one
+lighting value.  Every vertex has an @sc{u/v} pair associated.
+
+@item POLYTXT_GOURAUD
+Every polygon vertex has a color and those colors are interpolated across
+scanlines.
+
+@item POLYTXT_LIGHTMAP
+A polygon which has an associated lightmap and a texture plane.
+@end table
+
+Now it is possible to define and use objects which have flat-color but still
+receive light with Gouraud as well as without Gouraud interpolation; in
+general this open a whole new area for experimenting.
+
+In practice this means that @samp{csGouraudShaded} is gone and has been
+replaced with @samp{csPolyTexGouraud}.  @samp{csLightMapped} has also gone and
+is replaced with @samp{csPolyTexLightMap}.
+
+@subheading Sound Changes
+@cindex Sound Changes
+
+Merged sound buffers into sound sources.  We now have 3D and non-3D sound
+sources.  Non-3D sources are what were formerly sound buffers.  As a parameter
+to @samp{Renderer->CreateSource()} you can indicate if you want a 3D or non-3D
+source.
+
+The sound loader is now a plugin and must be loaded as such.  It uses the
+@samp{iSoundLoader} interface.  A loaded sound data block is represented by
+@samp{iSoundData}.
+
+If you use standard Crystal Space libraries to load sounds, this is all you
+need to be aware of.  Otherwise you should also know how to load a sound
+without @samp{csParser}.
+
+To load a sound the sound loader now needs some information describing the
+format of the sound.  This information can be queried from the sound renderer.
+Also, a sound can be optionally be loaded as @dfn{stream}.  This is currently
+not useful for anything, but will instead affect performance and memory in a
+negative way.  It is intended as a future option to load background music.
+All member functions of @samp{iSoundData} are intended for private use (of
+course you may use them, but I don't think they are useful).  To load a sound,
+perform the following steps.
+
+@enumerate
+@item
+Load the file buffer from a @sc{vfs} path.  @xref{VFS}.
+
+@item
+Ask the sound renderer for the format descriptor (@samp{csSoundFormat}).
+
+@item
+Pass both the file data and the format to the sound loader, using @samp{false}
+for streaming (the default).  After that, you may delete the file data.
+@end enumerate
+
+@subheading Thing and Sprite Changes (csMovable)
+@cindex Thing Changes
+@cindex Sprite Changes
+@cindex @code{csMovable}
+
+The movement system of Things and Sprites has been merged into one class
+called @samp{csMovable}.  Thus, all functions such as @code{SetPosition()},
+@code{SetTransform()}, and so on, have been removed from @samp{csThing} and
+@samp{csSprite}.  Instead there is a function @code{GetMovable()} (both for
+Things and Sprites) which returns the @samp{csMovable} for that object.  There
+is also a new function called @code{csMovable::UpdateMove()}--which resembles
+the original @code{csThing::Transform()} somewhat--which you @emph{must} call
+after updating the position and/or transformation of the movable which belongs
+to the object.
+
+In addition to the changes related to @samp{csMovable} the linked list of sky
+and thing objects in a sector has also been replaced by a @samp{csVector} and
+things are now also kept in a global list in the @samp{csWorld}, just like
+sprites.  This means that sprites and things look a lot more like each other
+now with regards to movement and placement in sectors.  This means that
+functions such as @code{AddThing()}, @code{GetNumThings()},
+@code{RemoveThing()} and @code{GetFirstThing()} are now gone, as are the
+similar methods for sky objects.  Instead, you should work through the new
+public @samp{skies} and @samp{things} vectors.  In addition to this the
+@code{GetNext()} and @code{GetParent()} functions have been removed from
+@samp{csPolygonSet}.
+
+@noindent
+Given the old code to operate on things:
+
+@example
+csThing* thing = new csThing(world);
+sector->AddThing(thing);
+thing->SetPosition(csVector3(0,0,3));
+thing->SetTransform(csMatrix3());
+thing->Transform();
+@dots{}
+sector->RemoveThing(thing);
+delete thing;
+@end example
+
+@noindent
+It will need to be converted to the following:
+
+@example
+csThing* thing = new csThing(world);
+world->things.Push(thing);
+csMovable& move = thing->GetMovable();
+move.SetSector(sector);
+move.SetPosition(csVector3(0,0,3));
+move.SetTransform(csMatrix3());
+move.UpdateMove();
+@dots{}
+world->RemoveThing(thing);
+@end example
+
+@noindent
+Given the old to operate on sprites:
+
+@example
+csSprite3D* sprite = new csSprite3D(world);
+world->sprites.Push(sprite);
+sprite->MoveToSector(sector);
+sprite->SetPosition(csVector3(0,0,3));
+sprite->SetTransform(csMatrix3());
+@end example
+
+@noindent
+It will need to be transformed to:
+
+@example
+csSprite3D* sprite = new csSprite3D(world);
+world->sprites.Push(sprite);
+csMovable& move = sprite->GetMovable();
+move.SetSector(sector);
+move.SetPosition(csVector3(0,0,3));
+move.SetTransform(csMatrix3());
+move.UpdateMove();
+@end example
+
+@noindent
+Especially note the new call to @code{UpdateMove()}.
+
+@subheading @sc{api} Changes: csCamera
+@cindex @code{csCamera} Changes
+
+The function @code{SetFOV()} now needs an extra parameter which is the width
+of the display.  This is needed for calculating the angle of the @sc{fov}
+(@dfn{field of view}).  In addition, there are now new @code{SetFOVAngle()}
+and @code{GetFOVAngle()} functions.  @code{GetFOVAngle()} used to be in
+@code{csRenderView()}.
+
+@subheading @sc{api} Changes: csWorld
+@cindex @code{csWorld} Changes
+
+Here is a list of the more significant @sc{api} changes to @samp{csWorld}.
+
+@itemize @bullet
+@item
+Added @code{csWorld::FindLight(char const* name)}.
+
+@item
+Removed @code{csWorld::NewSector()}.  Use @code{world->CreateCsSector()}
+instead.
+
+@item
+Removed @code{csWorld::GetThing()}.  Use @code{world->things.FindByName()}
+instead.
+
+@item
+Removed the method @code{csWorld::GetSpriteTemplate()}.  Instead, use this
+expression: @code{world->sprite_templates.FindByName()}
+
+@item
+Removed the method @code{csWorld::GetThingTemplate()}.  Instead, use this
+expression: @code{world->thing_templates.FindByName()} instead.
+
+@item
+Added @code{csWorld::UnlinkCollection()} and
+@code{csWorld::RemoveCollection()}.
+
+@item
+Added @code{csWorld::GetBeginDrawFlags()}.  This is a very important function
+that you @emph{must} invoke when calling @code{iGraphics3D::BeginDraw()} in
+your application just before you give control to the engine for drawing.
+@end itemize

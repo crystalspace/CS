@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- csfont.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.font.server.default</name>
+        <implementation>csDefaultFontServer</implementation>
+        <description>CrystalSpace default font server</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

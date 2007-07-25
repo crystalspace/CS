@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!-- sndsysloader.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.sndsys.element.loader</name>
+        <implementation>SndSysLoader</implementation>
+        <description>Sound System Element Loader</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>
+

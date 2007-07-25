@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- gmesh3ds.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.loader.factory.genmesh.3ds</name>
+        <implementation>csGenmesh3DSFactoryLoader</implementation>
+        <description>Crystal Space Genmesh 3DS Factory Loader</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

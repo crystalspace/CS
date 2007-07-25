@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- genmesh.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.genmesh</name>
+        <implementation>csGenmeshMeshObjectType</implementation>
+        <description>Crystal Space General Mesh Type</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

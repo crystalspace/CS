@@ -1,0 +1,5 @@
+SubDir TOP apps isotest ;
+
+Description isotest : "isotest demo executable" ;
+Application isotest : [ Wildcard *.cpp *.h ] : noinstall ;
+LinkWith isotest : crystalspace ;

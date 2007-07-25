@@ -1,0 +1,9 @@
+SubDir TOP plugins decal ;
+
+Description decal : "decal support" ;
+
+Plugin decal
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith decal : crystalspace ;
+

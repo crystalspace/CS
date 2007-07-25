@@ -1,0 +1,9 @@
+SubDir TOP apps tools levtool ;
+
+Description levtool : "Level Tool" ;
+
+Application levtool
+	: [ Wildcard *.cpp *.h ]
+	: console
+;
+LinkWith levtool : crystalspace ;

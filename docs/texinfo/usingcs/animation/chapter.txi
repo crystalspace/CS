@@ -1,0 +1,24 @@
+@c -*-texinfo-*-
+@node Animation, Map Loader, Collision Detection, Using Crystal Space
+@section Animating your Objects
+@cindex animation
+@cindex sequence manager
+@cindex particle systems
+
+Everything about animation.
+
+@menu
+* Sprite3D Animation::
+* SpriteCal3D Animation::
+* Socket Animation::
+* GenMesh Animation::
+* Sequence Manager::
+* ProcTextures:: Procedural Texture System
+@end menu
+
+@importss{usingcs,animation,sprite3danim.txi}
+@importss{usingcs,animation,sprcal3danim.txi}
+@importss{usingcs,animation,sockets.txi}
+@importss{usingcs,animation,genmeshanim.txi}
+@importss{usingcs,animation,sequence.txi}
+@importss{usingcs,animation,proctex.txi}

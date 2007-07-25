@@ -1,0 +1,25 @@
+@c -*-texinfo-*-
+@node Problems, Quick Start, Platform Instructions, Building
+@section Platform Specific Problems
+
+These problems are relevant for both compiling and running.  Crystal Space is
+work in progress.  Expect these problems to go away in the future.
+
+@itemize @bullet
+@item
+Software renderer: Crystal Space requires a 15-bit, 16-bit, or 32-bit display
+to run.  It will @emph{not} work on 24-bit displays.
+
+@item
+OpenGL: If you are using OpenGL but everything goes in slow motion then it
+is possible that you are running software emulated OpenGL. This can happen
+if there is a problem with the installation of the OpenGL driver for your
+system. Updating that driver might fix this situation. Another problem may
+be that you are using a map which uses stencil buffer (like the default map
+that is used by walktest and the maps that use stencil shadows). For hardware
+accelerated stencil operations you need a 24/32-bit display.
+
+@item
+Direct3D: Not currently supported.  (If you would like to write a Direct3D
+renderer, please contact us.)
+@end itemize

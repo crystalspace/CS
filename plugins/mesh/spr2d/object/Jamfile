@@ -1,0 +1,11 @@
+SubDir TOP plugins mesh spr2d object ;
+
+Description spr2d : "2D Sprite mesh object plugin" ;
+
+Plugin spr2d
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith spr2d : crystalspace ;
+
+CompileGroups spr2d :  meshes ;
+

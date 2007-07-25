@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!-- bezierldr.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.loader.bezier</name>
+        <implementation>csBezierLoader</implementation>
+        <description>Crystal Space Bezier Mesh Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.loader.factory.bezier</name>
+        <implementation>csBezierLoader</implementation>
+        <description>Crystal Space Bezier Mesh Factory Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.bezier</name>
+        <implementation>csBezierSaver</implementation>
+        <description>Crystal Space Bezier Mesh Saver</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.factory.bezier</name>
+        <implementation>csBezierSaver</implementation>
+        <description>Crystal Space Bezier Mesh Factory Saver</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

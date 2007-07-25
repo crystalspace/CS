@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- nullmesh.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.null</name>
+        <implementation>csNullmeshMeshObjectType</implementation>
+        <description>Crystal Space Null Mesh Type</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

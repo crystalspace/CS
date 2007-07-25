@@ -1,0 +1,21 @@
+@c -*-texinfo-*-
+@node Walktest, map2cs, Applications Overview, Applications
+@section Walktest
+@cindex @file{walktest}
+@cindex Applications, @file{walktest}
+
+This is the quintessential test application for the project, and the
+application most likely to be up-to-date any time a change is
+made to any part of the project.  Developers probably should not use
+this application as a guide for developing their own programs, as
+it is not the best example in clean coding.
+
+@menu
+* Walktest Keyboard:: Keyboard Interface
+* Console:: The Console
+* Walktest Configuration:: Configuration File
+@end menu
+
+@importss{apps,walktest,keys.txi}
+@importss{apps,walktest,console.txi}
+@importss{apps,walktest,config.txi}

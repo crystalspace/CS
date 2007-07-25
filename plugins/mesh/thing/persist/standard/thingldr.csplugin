@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!-- thingldr.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.loader.factory.thing</name>
+        <implementation>csThingFactoryLoader</implementation>
+        <description>Crystal Space Thing Mesh Factory Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.loader.thing</name>
+        <implementation>csThingLoader</implementation>
+        <description>Crystal Space Thing Mesh Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.factory.thing</name>
+        <implementation>csThingFactorySaver</implementation>
+        <description>Crystal Space Thing Mesh Factory Saver</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.saver.thing</name>
+        <implementation>csThingSaver</implementation>
+        <description>Crystal Space Thing Mesh Saver</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

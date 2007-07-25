@@ -1,0 +1,14 @@
+@c -*-texinfo-*-
+@node Renderloops, HOWTO Render Priorities, World Components, Engine
+@subsection Renderloops
+@cindex renderloop
+@cindex @code{iRenderLoop}
+
+A renderloop is an engine structure that
+tells the engine how to render the objects in a given sector. Basically it tells
+the engine the steps required to do the rendering of the mesh objects and
+also the steps required to do the lighting. You can make your own renderloops
+but typically you would use one of the standard provided renderloops
+from the @file{data/shader} directory.
+
+TODO

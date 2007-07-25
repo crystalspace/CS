@@ -1,0 +1,12 @@
+SubDir TOP plugins video render3d software ;
+
+Description soft3d : "3D software renderer" ;
+
+Plugin soft3d : [ Wildcard *.cpp *.h ] ;
+LinkWith soft3d : crystalspace ;
+CompileGroups soft3d : renderers softrenderer ;
+MsvcCFlags soft3d : "/Zm200" ;
+
+# Historic alias.
+NotFile softrender3d ;
+Depends softrender3d soft3d ;

@@ -1,0 +1,5 @@
+SubDir TOP apps tests unittest ;
+
+Description unittest : "unittest tester" ;
+Application unittest : [ Wildcard *.cpp *.h ] : console noinstall ;
+LinkWith unittest : crystalspace ;

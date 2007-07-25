@@ -1,0 +1,510 @@
+@c -*-texinfo-*-
+@node FAQ, Release Notes, Glossary, Top
+@appendix Frequently Asked Questions (@sc{faq})
+@cindex Frequently Asked Questions
+@cindex @sc{faq}
+
+This is a list of frequently asked questions and their answers.  If you have
+some questions about Crystal Space, try consulting this list first.
+
+The first section contains practical questions and answers.  The second
+section (see later) contains more technical questions.
+
+More @sc{faq}s can also be found online in the Crystal Space Wiki:@*
+
+@noindent
+@uref{http://www.crystalspace3d.org/tikiwiki/tiki-list_faqs.php}
+
+@itemize @bullet
+@item
+@strong{Q}: From where can I download Crystal Space?
+
+@strong{A}: The latest release of Crystal Space is always available from the
+Crystal Space home page, and from the Crystal Space download site:
+
+@noindent
+@uref{http://www.crystalspace3d.org/support/release/}
+
+@noindent
+You can also access the bleeding-edge developmental version.
+@xref{Where to Get}.
+
+@item
+@strong{Q}: What do I need to compile Crystal Space?
+
+@strong{A}: You need the source code, which you can obtain in a variety of
+ways.  @xref{Where to Get}.  You also need a compiler and development system
+for the platform which you are using.  Some of the supported compilers are
+@sc{gcc} (including MingW and Cygwin), @sc{msvc} and Code Warrior.
+
+@item
+@strong{Q}: What do you need to run Crystal Space?
+
+@strong{A}: You need the following items:
+
+@itemize @minus
+@item
+A compiled executable program such as @file{walktest} or @file{csdemo}, for
+example.  These are demo programs included in the main source archive.
+
+Note that there exist two types of executables: statically linked and
+dynamically linked.  If you have a statically linked executable then you don't
+need any of the following drivers.  Otherwise you will need the remaining
+items.
+
+@item
+Several plugins for those applications.  On and Windows (32 bit) plugins
+will be @file{.DLL} files.  On most Unix systems they will be @file{.so} files.
+ If Crystal Space compiled successfully then you will have a great deal of
+those plugins in the Crystal Space directory.
+
+@item
+You should also have the data directory which is included with Crystal
+Space.  This directory contains various texture and data libraries (like
+@file{standard.zip} and @file{stdtex.zip}), data files for some of the
+applications (like the @samp{flarge} world file for @file{walktest}), 
+shader definitions in case you are running with the new renderer architecture,
+configuration files for various plugins in Crystal Space and a lot more.
+
+@item
+Crystal Space applications also require a @file{vfs.cfg} configuration file
+which tells the virtual file system (@sc{vfs}) where everything is located.
+
+@item
+In addition to maps that are included in the data folder of Crystal Space
+itself (@samp{flarge} and @samp{partsys} for old renderer architecture,
+and @samp{particles}, @samp{terrain}, @samp{terrainf}, @samp{r3dtest},
+@samp{stenciltest}, and @samp{isotest} for the new renderer) you can also
+download additional maps for @file{walktest}.  The map files included with
+Crystal Space are normal directories but Crystal Space can also read
+directly from @sc{zip} archives.
+@end itemize
+
+@item
+@strong{Q}: I downloaded Crystal Space but it won't run.  What could be the
+cause?
+
+@strong{A1}: Are you sure that you have downloaded all the necessary
+components, as explained by the previous section? If not, then download the
+missing components.
+
+@strong{A2}: In general, Crystal Space requires a 15, 16, or 32-bit
+display and will not work with other displays modes.  Note, however, that the
+Mac OS X Server, OpenStep, and NextStep ports of Crystal Space are not subject
+to this limitation.
+
+@strong{A3}: If you are using a dynamically linked executable then the required
+plug-in modules, such as 3D renderer, 2D driver, etc., usually must reside in
+the same directory.  On Mac OS X, the plug-in modules can reside in a
+@file{components} subdirectory.  Most ports of Crystal Space use plug-in
+modules by default.
+
+@strong{A4}: Are you certain that you are trying to load the correct map file?
+If you are running the application from the command-line, then you can try
+specifying the map file on on the command-line, like this:
+
+@example
+% walktest flarge
+@end example
+
+Where @samp{flarge} is the name of the map file you wish to use.  In this case,
+@samp{flarge} corresponds to the @file{flarge} directory which is included
+with @samp{cs}.  Also note that @samp{flarge} itself requires the file
+@file{stdtex.zip} which contains all the textures.
+
+Alternately, for WalkTest, you can change the @samp{WorldFile} setting in its
+configuration file @file{CS/data/config/walktest.cfg}.  For example:
+
+@example
+Walktest.Settings.WorldFile = flarge
+@end example
+
+@strong{A5}: If all else fails ask a question on the Crystal Space mailing
+list.  @xref{Mailing Lists}.
+
+@item
+@strong{Q}: What documentation is available?  Where can I find it?
+
+@strong{A}: There is a lot of documentation available.  Not all of it is
+completely up-to-date but we try to do our best in keeping it as up-to-date as
+possible.  Refer to the section in the Crystal Space manual which discusses
+documentation resources.  @xref{Documentation Resources}.
+
+@item
+@strong{Q}: I don't have lots of memory.  Can I still run Crystal Space?
+
+@strong{A1}: You may want to decrease the size of the texture cache with the
+@samp{-cache=<size>} command-line option or the @samp{CACHE} configuration
+option in @file{soft3d.cfg} if you are using the software renderer.  By
+default the size of the texture cache is quite large (typically 5 to eight
+megabytes in size), so adjusting this value might be useful for low-memory
+systems.
+
+@strong{A2}: Using a smaller window size and a lower bit-depth can also
+decrease memory usage.  In addition to the memory used for the actual graphics
+display, Crystal Space uses a Z-buffer containing 4-byte values with the same
+dimensions as the display.  Therefore, a display with dimensions of 640x480
+uses a Z-buffer of 1,228,800 bytes.
+
+@strong{A3}: If you are still low on memory there is only one thing you can
+do: decrease the complexity of the map.  For every polygon in the world a lot
+of memory used.  If you just want to try the engine you can run Crystal Space
+with some of the simpler worlds such as @file{room.zip} or @file{maze.zip}.
+
+@item
+@strong{Q}: Crystal Space is really slow on my computer.  What can I do to
+speed it up?
+
+@strong{A1}: Crystal Space is a 6@sc{dof} engine.  It needs to do
+semi-perspective correct texture mapping to get a nice display and
+calculations to achieve this are slow.  You can expect that Crystal Space will
+probably need the same kind of computer as a game such as Quake 1 or Quake 2,
+at least a Pentium or a very fast 486 with a floating point co-processor.
+Also note that Crystal Space is still in the developmental stage and has not
+yet been fully optimized.  You might try using smaller window dimensions
+with the @samp{-mode=} option.  @xref{Common Command Line Options}.
+
+@strong{A2}: Use a hardware accelerated graphics card and driver.  Such cards
+are quite popular these days and can perform extremely well, especially when
+compared to Crystal Space's software renderer. Framerates of 100 fps and more
+are not uncommon if you have a properly configured OpenGL renderer. Note that
+by default Crystal Space uses OpenGL. You have to use the
+@samp{-video=software} command-line option to go back to Software rendering.
+
+@item
+@strong{Q}: I'm using OpenGL with Crystal Space (via the @samp{-video=opengl}
+command-line option, for example) and the animation is extremely slow.  What's
+wrong?
+
+@strong{A1}: When this happens this usually means that your OpenGL renderer
+is not using hardware acceleration. If you are sure that you actually have
+a 3D card that is supported by OpenGL then you should make sure you have
+recent drivers for that card and that they are properly configured.
+
+@strong{A2}: Note that some operations in Crystal Space require the
+existence of a stencil buffer. If there is no hardware stencil available
+OpenGL will revert to using software which is very slow. Some 3D cards
+only have hardware stencil in some display modes. For example ATI and
+nVidia cards only have accelerated stencil in 24/32-bit color mode and
+not in 16-bit mode.
+
+@item
+@strong{Q}: Should I use the new renderer or the old renderer architecture?
+
+@strong{A}: Crystal Space is currently in the process of moving from the
+old renderer architecture to a new one. The new renderer supports advanced
+OpenGL features like shaders, stencil shadows, and a lot more but it is still
+in an experimental stage (although we feel it is already working rather well).
+Basically we recommend using the new renderer architecture unless
+it doesn't work for you (in which case we like to hear a report), you need
+the software renderer, or you require another feature of the new renderer
+that we don't support yet (like one of the missing meshes, fog, @dots{}).
+
+@item
+@strong{Q}: I want to create textures for Crystal Space.  What palette should I
+use?  How big should I create the textures?  What format can I use?
+
+@strong{A1}: The palette does not really matter because Crystal Space
+calculates its own optimal palette given a set of input textures.  But there
+are some things to keep in mind.  Try to get the number of different colors as
+low as possible without sacrificing for quality and if you design a set of
+textures that are meant to be used together it is always best to let them use
+a similar palette.  This will make it easier for Crystal Space to calculate a
+good palette.
+
+@strong{A2}: The width and height of a texture must be a power of 2 (such as
+8, 16, 32, 64, @dots{}).  That's about the only restriction.  Textures need
+not be square.  You can have textures with sizes like 16x256. If a texture
+does not conform to the above mentioned limitations then it will be scaled.
+This may mean that there is quality degradation though!
+
+@strong{A3}: Crystal Space textures may be in any of the supported image
+formats, such as @sc{png}, @sc{tga}, @sc{bmp}, @sc{jpg}, @sc{mng} and @sc{gif}.
+
+@strong{A4}: Unless a texture is not meant for tiling you should make sure
+that it can be tiled.  This means that if you put a number of textures next to
+each other or above each other the boundaries should seamlessly integrate with
+each other.  Of course, it is entirely possible to create textures that are
+specifically drawn for untiled usage.  An example would be a texture
+representing a computer keyboard.
+
+@item
+@strong{Q}: How can I actually make 3D models and maps for use in Crystal
+Space?
+
+@strong{A1}: For maps and objects using either @samp{genmesh} or @samp{thing}
+(i.e. non-animated) you can use Blender (@uref{http://www.blender3d.org/})
+together with Blend2CS
+(@uref{http://projects.blender.org/projects/blend2cs/}).  Blend2CS works
+very well and is fully supported by the Crystal Space project.  Using this
+convertor you can make complete maps with support for portals and much more.
+
+@strong{A2}: For animated models using Cal3D (@pxref{MeshObject SprCal3D})
+you can also use Blender, which has support for Cal3D objects.
+There is a tutorial on this subject at:
+
+@noindent
+@uref{http://www.cs.indiana.edu/~joellis/CSIntro.html}
+
+@strong{A3}: For maps and objects using either @samp{genmesh} or @samp{thing}
+you can also use 3dsMax.  There is a 3dsMax exporter plugin
+included with Crystal Space (@file{CS/scripts/max}) with associated
+documentation which works very well.  This script is made and used by the 
+PlaneShift project (@uref{http://www.planeshift.it}). There is a tutorial
+on this exporter at:
+
+@noindent
+@uref{http://lww.demon-host.com/html/guide/}
+
+@strong{A4}: For animated models using Cal3D you can also use
+3dsMax.  There is a tutorial on this subject at:
+
+@noindent
+@uref{http://cal3d.sourceforge.net/modeling/tutorial.html}
+
+@strong{A5}: There is a tool to convert map files (from tools like
+Q3Radiant, Hammer, or QuArK) to @sc{cs}. You can find this tool at:
+
+@noindent
+@uref{http://www-poleia.lip6.fr/~degris/converter/}
+
+@strong{A6}: There is a @file{Maya2Spr} utility included with Crystal Space
+which can convert Maya files to 3D sprites. Not for maps, though.
+
+@strong{A7}: There is a @file{3ds2lev} utility to convert @file{.3ds} files
+to either a level or a 3D sprite model.  This tool is very limited though
+and the generated maps usually require hand-editing.
+
+@strong{A8}: There is @file{md22spr} utility which can convert Quake @sc{md2}
+and @sc{mdl} models to Crystal Space 3D sprites. The animation frames are also
+properly converted.  This will not generate Cal3D models!
+
+@strong{A9}: There is md32spr utility which can convert Quake @sc{md3} models.
+
+@item
+@strong{Q}: I would like to contribute to Crystal Space.  What can I do?
+
+@strong{A}: Have a look at the section of this manual about contributing
+to the project (@pxref{Contributing}), and take a look at the To-Do and
+Bug lists on the Developer's Project page at SourceForge:
+
+@noindent
+@uref{http://sourceforge.net/projects/crystal/}
+
+@noindent You can also contact the mailing list (@pxref{Mailing Lists}) in
+order to coordinate your efforts with those of other people.
+
+@item
+@strong{Q}: How does Crystal Space work?
+
+@strong{A1} If you want to know how you can use @sc{cs}, you can look at the
+@xref{Using Crystal Space}. If you want to know how
+it works internally, @xref{Internals}.
+
+@strong{A2}: Read any other documentation related to this project as mentioned
+earlier in this @sc{faq}.
+
+@strong{A3}: If you need more information, you should consider posting your
+queries to the Crystal Space mailing list, @ref{Mailing Lists}.
+
+@item
+@strong{Q}: I want to write a game with Crystal Space.  Can I do this?
+
+@strong{A1}: The ultimate purpose of Crystal Space is that it will become a
+usable and powerful engine for writing games and other graphics visualization
+programs.  As a project which is still under development, it may be simple or
+difficult to build your particular game, depending upon your specific
+requirements.  One way to improve the state of Crystal Space so that it better
+fits your needs is to contribute to the project yourself.
+
+@strong{A2}: Crystal Space is under the @sc{lgpl} licensing policy so you can
+make commercial or shareware products using it.  For more details about what
+you can and cannot do, see the license, @ref{Licenses}.
+
+@item
+@strong{Q}: How stable is the @sc{api} for Crystal Space?
+
+@strong{A}: The @sc{api} which you can find in the 0.90 release should be about
+95% stable as compared to the 1.0 release. After 1.0 we will make sure
+to keep backwards compatibility (until we release 2.0 :-)
+@end itemize
+
+The following section lists some more technical questions.
+
+@itemize @bullet
+@item
+@strong{Q}: I have some objects but collision detection is not working on
+them. What is wrong?
+
+@strong{A}: One of the most common errors is to scale an object using
+the transform in the movable. Unfortunatelly various subsystems in Crystal
+Space (like collision detection and visibility culling) don't work on
+scaled objects. If you want to scale your object you should do it
+with @code{HardTransform} or @code{<hardmove>} instead. Note that for
+some types of mesh objects (like 3D sprites) you must do this on the factory.
+
+@item
+@strong{Q}: I have some objects that seem to be culled wrong. What can cause
+this?
+
+@strong{A1}: See the question about collision detection not working with
+scaled objects. Don't scale your objects using the movable. Instead scale
+them with @code{HardTransform}.
+
+@strong{A2}: Another common error is forgetting to call
+@code{movable->UpdateMove()} after moving a model. If you don't call that
+function then the visibility culler doesn't know the object has moved.
+
+@item
+@strong{Q}: Why isn't my polygon lit correctly? It is simply full bright.
+
+@strong{A}: Both the software and OpenGL renderer have a limitation on
+lightmap size.  For the software renderer the limitation is that the
+final resulting lit texture may not exceed 1500000 pixels.  To calculate
+the final resulting lit texture size the easiest way is to take the
+texture size that is used on the polygon (i.e. 64x64 for example) and
+calculate how many times the texture is repeated on that polygon.  If the
+given texture is repeated four times on the polygon then you basically
+have a total texture of 256x256 which will be fine.  For the OpenGL
+renderer the limitation is that a lightmap cannot be bigger than 256x256.
+Note that there will be a lightmap lumel for every 16x16 texels on the
+polygon.  To avoid this limitation you basically have five possible
+solutions: (1) split the polygon into smaller polygons, (2) use a smaller
+base texture (this will also reduce size of lightmap/lit texture), (3)
+decrease the number of times the texture is tiled on the polygon, (4)
+increase the size of the lumels (i.e. 32x32 instead of 16x16) by changing
+the @samp{lightmapcellsize} option in the world file, and finally (5) use a
+low-resolution base texture and a high-resolution detail texture to add detail
+(this only works for OpenGL).
+
+@item
+@strong{Q}: I added lights, and/or moved geometry in my level but they are not
+correctly lit.  What did I do wrong?
+
+@strong{A}: Crystal Space does not automatically recalculate lighting.
+To do that you have to use the @samp{-relight} command-line option.
+
+@item
+@strong{Q}: I'm confused by the Crystal Space coordinate system.  The 3D
+renderer seems to work in reverse y.  What's up?
+
+@strong{A}: When talking in 3D, Crystal Space defines the positive X axis
+as pointing to the right, the positive Y axis as pointing upwards, and
+the positive Z axis pointing forwards.  2D operations in the 3D renderer
+(like when drawing polygons using coordinates perspective projected by
+the engine) work with positive X axis to the right (as usual), and positive
+Y axis pointing upwards (so (0,0) is in the bottom-left corner).  This is the
+exact reverse of how screen coordinates are usually defined but corresponds
+better with the Y axis pointing upwards in 3D coordinates).
+However, when getting mouse events the normal screen
+space coordinate system is used with (0,0) in the top-left corner.
+
+@item
+@strong{Q}: Why can't I get the
+@code{iThingState} / @code{iSprite3DState} / @dots{} from my mesh wrapper?  I
+do @code{scfQueryInterface} from the mesh and it returns @samp{0}.
+
+@strong{A}: A common error is to try to query the state interface for
+a mesh object from the @code{iMeshWrapper} instance.  However it is not
+@code{iMeshWrapper} that represents the mesh object.  @code{iMeshWrapper} is
+only a stub in the engine to wrap a mesh object so the engine can use
+it.  To get the state interface you must query from the @code{iMeshObject}
+instance instead.  You can get this instance with @code{mesh->GetMeshObject()}.
+
+@item
+@strong{Q}: I do not understand when I have to use @code{DecRef()} and when
+not.  Can you explain this reference counting to me?
+
+@strong{A}: In recent versions of Crystal Space we now have a new
+@code{csRef} class which implements a kind of smart pointer.  Smart pointers
+make it easier for you to keep track of references.  They will automatically
+@code{DecRef()} when they are ready.  Here is an example of their usage:
+
+@example
+csRef<iThingState> st =
+  scfQueryInterface<iThingState> (mesh->GetMeshObject());
+if (st)
+@{
+  st->blabla @dots{};
+@}
+@end example
+
+You can use the @samp{st} variable just like you would use the normal
+@code{iThingState} reference. The only difference with code that doesn't use
+smart pointers is that you don't have to take care of calling
+@code{DecRef}.  @xref{Smart Pointers}.
+
+@item
+@strong{Q}: My objects are rendered incorrectly.  It seems as if parts of it
+sometimes appear and sometimes disappear.
+
+@strong{A}: Incorrect rendering of objects can be caused by bugs but there
+is one common cause of this problem which is Z-buffer related.  It is
+important to realize that Crystal Space does @sc{not} clear the Z-buffer
+every frame (nor does it clear the screen).  By default Crystal Space depends
+on the geometry itself to clear the Z-buffer.  For example, if you have a
+room with a single object in it then you should use @samp{ZFILL} mode for
+the room polygons (so that the Z-buffer will be filled but not read) and
+@samp{ZUSE} for the object (so that the Z-buffer will be both
+updated and read).
+
+In many cases levels are closed (meaning that there is some exterior object
+which blocks the view into infinity). If you have such a convex closed
+object at the boundary of your level you can use @samp{ZFILL} for that.
+However, there are occasions when this is not possible.  Either because there
+is no exterior object, the exterior object is not closed, or the exterior
+object is not convex.  In that case you better use @samp{ZUSE} for all objects
+and enable Z-clearing every frame. In world files you can do this by
+using the @samp{settings} block and enabling the @samp{clearzbuf} option.
+
+Note that you should invoke the method @code{engine->GetBeginDrawFlags()} in
+your call to @code{g3d->BeginDraw()} to ensure that this Z-buffer clearing will
+actually work (in fact you should @emph{always} use
+@code{GetBeginDrawFlags()}).
+
+@item
+@strong{Q}: I'm using a @samp{thing} mesh object and some of the polygons
+are rendered completely wrong.
+
+@strong{A1}: Polygons in Crystal Space must be convex (meaning that every
+line between two random vertices of the polygon is fully contained in
+the polygon).
+
+@strong{A2}: The vertices of the polygon must all be on the same plane.
+For a triangle that is automatically the case.
+
+@strong{A3}: If you specify texture coordinates using @samp{uv} on three
+of the polygon vertices then those three texture coordinates must be
+different.
+
+@item
+@strong{Q}: I'm trying to use some plugin but it says that it cannot find it
+(i.e. @code{csQueryRegistry} returns null).
+
+@strong{A}: It is important to realize that @code{csQueryRegistry}
+does @samp{not} load a plugin.  It only looks for some component in the object
+registry.  There are two basic ways to load a plugin: the first is to use
+@code{csInitializer::RequestPlugins()} and the second is to manually
+load the plugin using @code{csLoadPlugin}.  @code{RequestPlugins()} is
+best because it actually registers the plugin with the object
+registry and it also correctly manages config file, command-line and
+request plugins (so you can override a plugin on command-line/config file).
+
+@item
+@strong{Q}: How can I show @sc{fps} (Frames Per Second) in my Crystal Space
+application?
+
+@strong{A}: Add the following entry to the user-specific application-neutral
+or application-specific domain (@pxref{Configuration File}):
+
+@example
+Global.System.Plugins.iBugPlug = crystalspace.utilities.bugplug
+@end example
+
+This will make sure that the BugPlug plugin runs in either you or any 
+Crystal Space application (dependent on the config domain you chose). 
+BugPlug shows @sc{fps} (among other things) and is otherwise not harmful.  You
+can also use BugPlug to make screenshots (press @kbd{Ctrl-d} followed by
+@kbd{F12}).
+
+@end itemize

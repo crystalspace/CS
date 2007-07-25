@@ -1,0 +1,245 @@
+//
+// CrystalSpace game definition file (.fgd) 
+// for Worldcraft 3.3 & Valve Hammer 3.4 & possibly newer
+//
+// Copyright (C) 2003 Leandro Ezequiel Lovisolo <lovisolo@datafull.com>
+//
+//    This library is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Library General Public
+//    License as published by the Free Software Foundation; either
+//    version 2 of the License, or (at your option) any later version.
+//
+//    This library is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//    Library General Public License for more details.
+//
+//    You should have received a copy of the GNU Library General Public
+//    License along with this library; if not, write to the Free
+//    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+//
+
+
+@SolidClass = worldspawn : "World entity"
+[
+// @@@ needs checking
+//	skydome(string) : "Skydome texture"
+//	skydomeradius(integer) : "Skydome radius (default 800)" : 800
+
+	skybox(string) : "Skybox texture"
+	skyboxsize(integer) : "Skybox size (the lenght of a side, default 1600)" : 1600
+	dynavis(choices) : "Activate Dynavis" : 0 =
+	[
+		1 : "Yes"
+		0 : "No"
+	]
+	lightmapcellsize(choices) : "Lightmap cell size" : "16" =
+	[
+		 4 :  "4"
+		 8 :  "8"
+		16 : "16" 
+		32 : "32"
+		64 : "64"
+	]
+	libraries(string) : "Libraries to include"
+	usermaterials(string) : "User-defined materials"
+	usertextures(string) : "User-defined textures"
+	renderloopname(string) : "Render loop name" : "*default"
+	skyportalsonly(choices) : "Show sky only through portals" : 0 =
+	[
+		1 : "Yes"
+		0 : "No"
+	]
+]
+
+
+
+@SolidClass = cs_sector : "Crystal Space sector brush"
+[
+	cs_name(string) : "Sector name"
+	lighting(choices) : "Lighting" : 1 =
+	[
+		1 : "On"
+		0 : "Off"
+	]
+	mipmap(choices) : "Use mipmaps" : 0 =
+	[
+		1 : "Yes"
+		0 : "No"
+	]
+//	cs_collection(string) : "Under development"
+]
+
+
+// @@@ auto-generated
+//@SolidClass = cs_sky : "Crystal Space sky brush"
+//[
+//	cs_name(string) : "This key must be set to cs_skysector"
+//	sky(integer) : "Portal to sky" : 0
+//]
+
+
+
+@SolidClass = thing : "Crystal Space thing brush"
+[
+	cs_name(string) : "Thing name"
+	alpha(integer) : "Transparency" : 100
+	mirror(choices) : "Mirror effect" : 0 =
+	[
+		1 : "Yes"
+		0 : "No"
+	]
+	// if set to ´No, a portal is created for every side of the entity to the given targetsector
+	solid(choices) : "Portal" : 1 =
+	[
+		1 : "No"
+		0 : "Yes"
+	]
+	// Combine it with solid key
+	targetsector(string) : "Target sector"
+	trigger(string) : "Trigger a script event"
+	moveable(choices) : "Moveable" : 0 =
+	[
+		1 : "Yes"
+		0 : "No"
+	]
+	// `cs_name´ of script specified in Classname cs_script that must be used to animate the thing
+	activate(string) : "Activated by"
+	lighting(choices) : "Lighting" : 1 =
+	[
+		1 : "Yes"
+		0 : "No"
+	]
+	// @@@ still supported?
+	mipmap(choices) : "Use mipmaps" : 0 =
+	[
+		1 : "Yes"
+		0 : "No"
+	]
+	sky(choices) : "Act as portal to sky" : 0 =
+	[
+		1 : "Yes"
+		0 : "No"
+	]
+//	cs_collection(string) : "Under development"
+	priority(choices) : "Render priority" : "object" =
+	[
+		"sky" : "Sky"
+		"mirror" : "Mirror"
+		"wall" : "Wall"
+		"object" : "Object"
+		"alpha" : "Alpha"
+	]
+]
+
+
+
+@PointClass iconsprite("sprites/lightbulb.spr") = light : "Crystal space light entity"
+[
+	cs_name(string) : "Light name"
+	_light(color255) : "Red, green, blue and intensity values for the light (i.e. 255 255 255 20)" : "255 255 255 20"
+	dynamic(choices) : "Dynamic light" : 0 =
+	[
+		1 : "Yes"
+		0 : "No"
+	]
+	halo(string) : "Halo (value intensity cross)" : "0 0 0"
+	attenuation(choices): "Attenuation type" : "linear" =
+	[
+		"none" : "None"
+		"linear" : "Linear"
+		"inverse" : "Inverse"
+		"realistic" : "Realistic"
+	]
+//	cs_collection(string) : "Under development"
+]
+
+
+
+@PointClass = info_player_start : "Determines where the player starts"
+[
+]
+
+
+
+@PointClass = info_player_deathmatch : "Determines where the player starts"
+[
+]
+
+
+
+@PointClass = fog : "Crystal Space fog entity"
+[
+	cs_name(string) : "Fog name"
+	fogcolor(color255) : "Fog color"
+	fogdensity(string) : "Thickness of fog in the given sector" : "0.0"
+]
+
+
+
+@PointClass = cs_sound : "Crystal Space sound entity"
+[
+	cs_name(string) : "Sound name"
+	soundfile(string) : "Sound filename (i.e. `filename.wav´)"
+]
+
+
+
+@PointClass = cs_sprite : "2D Sprite"
+[
+	cs_name(string) : "Sprite name"
+	texture(string) : "Sprite texture name"
+	copy(integer) : "Mixmode = SRC" : 0
+	add(integer) : "Mixmode = SRC + DST" : 0
+	multiply(integer) : "Mixmode = SRC * DST" : 0
+	multiply2(integer) : "Mixmode = 2 * SRC * DST" : 0
+	alpha(integer) : "Mixmode = (1 - alpha) * SRC + alpha * DST" : 1
+	transparent(integer) : "Mixmode = DST" : 0
+	keycolor(color255) : "Mixmode = RGBcolor. Indicates the transparency color for the image"
+]
+
+
+
+@PointClass = cs_model : "3D Model"
+[
+	cs_name(string) : "Model name"
+	modelname(string) : "Model filename"
+	texture(string) : "Model texture filename"
+	uniformscale(string) : "Used to scale the model uniformly in x,y,z" : "1"
+	action(string) : "Base name of frame action"
+	action1(string) : "Frame action 1; add more as needed"
+]
+
+
+
+//@PointClass = cs_collection : "Under development. Will be used to create functional groups for trigger events"
+//[
+//	cs_name(string) : "Collection name"
+//	cs_collection(string) : "Parent cs_collection"
+//	collitem1(string) : "First member of the cs_collection; add more as needed"
+//]
+
+
+
+//@PointClass = cs_script : "Crystal Space script entity"
+//[
+//	script_cmdfile(string) : "Script filename" : "csscript.txt"
+//	cs_name(choices) : "Script name" : 1 =
+//	[
+//		0 : "message"
+//		1 : "rotate_x"
+//		2 : "rotate_y"
+//		3 : "rotate_z"
+//		4 : "rotate_xr"
+//		5 : "rotate_yr"
+//		6 : "rotate_zr"
+//		7 : "rotate_ym"
+//		8 : "rotate_xyz"
+//		9 : "opendoor"
+//		10 : "moveBackAndForth"
+//		11 : "light1"
+//		12 : "light2"
+//		13 : "light3"
+//		14 : "light_anim"
+//	]
+//]

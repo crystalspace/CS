@@ -1,0 +1,3 @@
+SubDir TOP plugins gui ;
+
+SubInclude TOP plugins gui cegui ;

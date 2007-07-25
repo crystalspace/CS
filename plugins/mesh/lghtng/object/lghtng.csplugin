@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- lghtng.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.lightning</name>
+        <implementation>csLightningMeshObjectType</implementation>
+        <description>Crystal Space Lightning Mesh Type</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

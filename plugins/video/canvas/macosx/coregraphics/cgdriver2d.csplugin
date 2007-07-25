@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- cgdriver2d.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphics2d.coregraphics</name>
+        <implementation>CGDriver2D</implementation>
+        <description>Crystal Space 2D driver for MacOS/X (CoreGraphics)</description>
+        <requires>
+          <class>crystalspace.font.server.</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

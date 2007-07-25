@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- simpleformerldr.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.terraformer.simple.loader</name>
+        <implementation>csSimpleFormerLoader</implementation>
+        <description>Simple terrain formation loader</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

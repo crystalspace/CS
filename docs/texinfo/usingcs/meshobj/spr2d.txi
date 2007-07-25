@@ -1,0 +1,231 @@
+@c -*-texinfo-*-
+@node MeshObject Spr2D, MeshObject Spr3D, MeshObject SprCal3D, MeshObject
+@subsection Sprite2D Mesh Object
+@cindex MeshObject
+@cindex 2D Sprite
+@cindex @code{iMeshObject}
+@cindex @code{iMeshObjectFactory}
+@cindex @code{iMeshObjectType}
+@cindex @code{iSprite2DState}
+@cindex @code{iSprite2DFactoryState}
+@cindex @code{iParticle}
+
+@emph{Written by Jorrit Tyberghein,
+(@email{jorrit.tyberghein@@gmail.com}).}
+
+A 2D Sprite is basically a polygon that always faces the camera.  There are
+some special effects that you can do with this but it is really very simple
+otherwise.
+
+@subsubheading Basic Structure
+
+The following @sc{scf} class names are used (for @code{csLoadPlugin}):
+
+@itemize @bullet
+@item
+Type plugin: @samp{crystalspace.mesh.object.sprite.2d}
+@item
+Loader plugin: @samp{crystalspace.mesh.loader.sprite.2d}
+@item
+Factory loader plugin: @samp{crystalspace.mesh.loader.factory.sprite.2d}
+@end itemize
+
+Objects in this plugin implement the following @sc{scf} interfaces (get with
+@code{scfQueryInterface}):
+
+@itemize @bullet
+@item
+@emph{MeshObject}
+@itemize @bullet
+@item
+Implements @samp{iMeshObject}
+@item
+Implements @samp{iSprite2DState}
+@item
+Implements @samp{iParticle}
+@end itemize
+@item
+@emph{MeshObjectFactory}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectFactory}
+@item
+Implements @samp{iSprite2DFactoryState}
+@end itemize
+@item
+@emph{MeshObjectFactory}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectType}
+@end itemize
+@end itemize
+
+@subsubheading Factory State Interface
+
+Use the @sc{scf} interface @samp{iSprite2DFactoryState} to access settings for
+a 2D sprite factory.  The definition of this interface can be found in
+@file{CS/include/imesh/sprite2d.h} and that is also the include file you need
+to include in your applications to use this plugin.  Using this interface you
+can access the material, blending mode (mixmode), and lighting settings.
+
+@subsubheading Factory Loader
+
+@table @code
+@item <lighting>yes/no</lighting>
+Enable/disable lighting.
+@item <material>materialname</material>
+Material to use for the polygon.
+@item <mixmode><mode /></mixmode>
+Blending mode. @pxref{XMLServices Mixmode}.
+@item <uvanimation name=uvanimationname><frame @dots{}> @dots{}
+Define an uv animation, that is a sequence of frames which textures are all in
+one big texture.  Thus the animation is achieved by altering the (u,v)
+coordinates of the polygon defined by this sprite.
+@item <frame><duration><vertices @dots{}> @dots{}
+Defines a single frame within an uv animation by specifying its duration in
+milliseconds and the u,v coordinates to use.
+@itemize @bullet
+@example
+<frame name="framename">
+  <duration>milliseconds</duration>
+  <v u="" v="" />
+  @dots{} u,v coo list
+</frame>
+@end example
+@end itemize
+@end table
+
+@subsubheading Object State Interface
+
+@samp{iSprite2DState} is the @sc{scf} interface that you can use to set/get
+settings for a 2D sprite object.  The definition of this interface can be found
+in @file{CS/include/imesh/sprite2d.h} and that is also the include file you
+need to include in your applications to use this plugin.  Using this
+interface you can access the material, blending mode (mixmode), lighting
+settings, and also the vertices of the 2D polygon controlled by this plugin.
+
+@subsubheading Object Loader
+
+@table @code
+@item <factory>factoryname</factory>
+Name of the factory to use for creation of this instance.
+@item <mixmode><mode /></mixmode>
+Blending mode. @pxref{XMLServices Mixmode}.
+@item <material>materialname</material>
+Material to use for the polygon.
+@item <lighting>yes/no</lighting>
+Enable/disable lighting.
+@item vertices <v x="" y="" /> @dots{}
+List of 2D vertices defining the polygon.
+@item <uv u="" v="" />
+List of texture mapping UV coordinates for the polygon.
+@item <color red="" green="" blue="" />
+List of rgb colors for the polygon.
+@item <animate> @dots{}
+Select an uv animation from the list of animations declared in the template
+@itemize @bullet
+@example
+<animate name="animationname">
+  <timing>milliseconds</timing>
+  <loop>yes/no</loop>
+</animate>
+@end example
+@itemize @bullet
+@item
+timing > 0 : every <timing> milliseconds the next frame will be shown
+@item
+timing < 0 : every <-timing> gameloop the next frame will be shown
+@item
+timing = 0 : timing attached to the frame will be used
+@item
+loop : loop the animation or stop after last frame (and show the last frame)
+@end itemize
+@end itemize
+@end table
+
+@subsubheading Example 1
+
+This is how our world file looks:
+
+@example
+<world>
+  <textures>
+    <texture name="blow">
+      <file>blow.png</file>
+    </texture>
+  </textures>
+  <materials>
+    <material name="explosion">
+      <texture>blow</texture>
+    </material>
+  </materials>
+  <meshobj name="Explosion">
+    <plugin>crystalspace.mesh.loader.factory.sprite.2d</plugin>
+    <params>
+      <material>explosion</material>
+      <uvanimation name="boom">
+        <frame name="first">
+          <duration>100</duration>
+          <v u="0" v="0" />
+          <v u="0.5" v="0" />
+          <v u="0.5" v="0.5" />
+          <v u="0" v="0.5" />
+        </frame>
+        <frame name="second">
+          <duration>100</duration>
+          <v u="0.5" v="0" />
+          <v u="1" v="0" />
+          <v u="1" v="0.5" />
+          <v u="0.5" v="0.5" />
+        </frame>
+        <frame name="third">
+          <duration>100</duration>
+          <v u="0" v="0.5" />
+          <v u="0.5" v="0.5" />
+          <v u="0.5" v="1" />
+          <v u="0" v="1" />
+        </frame>
+        <frame name="fourth">
+          <duration>100</duration>
+          <v u="0.5" v="0.5" />
+          <v u="1" v="0.5" />
+          <v u="1" v="1" />
+          <v u="0.5" v="1" />
+        </frame>
+      </uvanimation>
+    </params>
+  </meshobj>
+  <sector name="space">
+  <!-- define all the stuff in space @dots{}
+       and now one of the enemies right after we met him -->
+    <meshobj name="Kaboom">
+      <plugin>crystalspace.mesh.loader.sprite.2d</plugin>
+      <params>
+        <v x="-1" y="1" />
+        <v x="1" y="1" />
+        <v x="1" y="-1" />
+        <v x="-1" y="-1" />
+        <uv u="0" v="0" />
+        <uv u="1" v="0" />
+        <uv u="1" v="1" />
+        <uv u="0" v="1" />
+        <color red="1" green="1" blue="1" />
+        <color red="1" green="1" blue="1" />
+        <color red="1" green="1" blue="1" />
+        <color red="1" green="1" blue="1" />
+        <lighting>no</lighting>
+        <!-- show the animation, use the timings attached to
+             the frames, loop -->
+        <animate name="boom">
+          <timing>0</timing>
+          <loop>yes</loop>
+        </animate>
+      </params>
+      <move>
+        <v x="0" y="0" z="0">
+      </move>
+    </meshobj>
+  </sector>
+</world>
+
+@end example

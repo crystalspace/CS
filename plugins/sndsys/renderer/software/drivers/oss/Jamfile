@@ -1,0 +1,11 @@
+SubDir TOP plugins sndsys renderer software drivers oss ;
+
+if $(OSS.AVAILABLE) = "yes"
+{
+Description sndsysoss : "Linux OSS driver for the software sound renderer for sndsys" ;
+Plugin sndsysoss : [ Wildcard *.cpp *.h ] ;
+LinkWith sndsysoss : crystalspace ;
+ExternalLibs sndsysoss : OSS ;
+CompileGroups sndsysoss : sndsys ;
+}
+

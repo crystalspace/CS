@@ -1,0 +1,47 @@
+<shader compiler="xmlshader" name="character2">
+  <!--
+  <technique priority="150">
+    <pass>
+      <mixmode><copy /></mixmode>
+      <buffer source="normal" destination="normal" />
+	  <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+      <buffer source="bones indices" destination="IN.BonesIndices" />
+      <buffer source="bones weights" destination="IN.BonesWeights" />
+	  <vp plugin="glcg" file="/shader/character/character2.cgvp" />
+	    <texture name="tex diffuse" destination="unit 0" />
+	    <fp plugin="glfixed">
+		<fixedfp>
+		    <layer>
+			<colorsource num="0" source="primary color" modifier="color"/>
+			<colorsource num="1" source="texture" modifier="color"/>
+			<coloroperation operation="modulate"/>
+		    </layer>
+		</fixedfp>
+	    </fp>
+    </pass>
+  </technique>
+  -->
+  <technique priority="100">
+    <pass>
+      <mixmode><copy /></mixmode>
+	  <buffer source="texture coordinate 0" destination="texture coordinate 0" />
+	  <buffer source="generic 0" destination="position" />
+	  <vp plugin="glarb" file="/shader/ambient.avp" />
+	<vproc plugin="vproc_std">
+	  <vproc_std>
+	    <skinned_position buffer="generic 0" />
+	  </vproc_std>
+	  </vproc>
+	    <texture name="tex diffuse" destination="unit 0" />
+	    <fp plugin="glfixed">
+		<fixedfp>
+		    <layer>
+			<colorsource num="0" source="primary color" modifier="color"/>
+			<colorsource num="1" source="texture" modifier="color"/>
+			<coloroperation operation="modulate"/>
+		    </layer>
+		</fixedfp>
+	    </fp>
+    </pass>
+  </technique>
+</shader>

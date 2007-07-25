@@ -1,0 +1,10 @@
+SubDir TOP plugins mesh particles object ;
+
+Description particles : "Particle system plugin" ;
+
+Plugin particles
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith particles : crystalspace ;
+
+CompileGroups particles :  meshes ;

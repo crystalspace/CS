@@ -1,0 +1,6 @@
+SubDir TOP plugins mesh terrain brute ;
+
+Description bruteblock : "Brute Block Terrain plugin" ;
+Plugin bruteblock : [ Wildcard *.cpp *.h ] ;
+LinkWith bruteblock : crystalspace ;
+CompileGroups bruteblock : meshes ;

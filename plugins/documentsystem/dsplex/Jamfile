@@ -1,0 +1,8 @@
+SubDir TOP plugins documentsystem dsplex ;
+
+Description dsplex : "document system multiplexer" ;
+
+Plugin dsplex
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith dsplex : crystalspace ;

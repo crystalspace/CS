@@ -1,0 +1,47 @@
+@node Config Sound, Config Console, Config Engine, Specific Options
+@subsubsection Sound Configuration
+@cindex Configuration, Sound
+
+The following options can be used to configure the sound modules.
+The default values are stored in @file{CS/data/config/sound.cfg}.
+
+@subsubheading General Sound Configuration
+
+These options apply to all sound renderers:
+
+@table @code
+@item Sound.Volume = [0..1]
+Set the global volume. A value of 0 means silence, 1 means as loud as
+possible. Default is 1.
+@end table
+
+@subsubheading Software Sound Configuration
+
+These options only apply to the software sound renderer:
+
+@table @code
+@item Sound.Software.Frequency = <frequency>
+This sets the output frequency. Possible values depend on your system and
+sound card, but divisors of 44100 (e.g. 22050 or 11025) usually work.
+Default is 44100 (optimal).
+
+@item Sound.Software.16Bits = <yes/no>
+Enables 16 bit sound output. Default is yes.
+
+@item Sound.Software.Stereo = <yes/no>
+Enables stereo sound output. Default is yes.
+@end table
+
+@subsubheading Wave-Out Configuration
+
+These options only apply to the Wave-Out sound driver under Windows:
+
+@table @code
+@item Sound.WaveOut.Refresh = <rate>
+Sets the refresh rate of the sound output as a per-second rate. The lower
+this rate, the more time passes between your application starting to play a
+sound and the sound actually being audible. Because the Wave-Out driver uses
+a triple buffering system, this delay is 2 to 3 seconds divided by the
+refresh rate. So you should set a rate of at least 10 to prevent serious
+delays. Default is 5.
+@end table
