@@ -158,11 +158,25 @@ projtypes = {
   {
     defines = ['_LIB', '_WINDOWS']
   },
+  library_dll =>
+  {
+    defines = ['_WINDOWS', 'CS_BUILD_SHARED_LIBS']
+  },
   plugin =>
   {
     defines = ['_WINDOWS'],
     libs = ['delayimp.lib']
   }
 };
+
+mutators = [
+  {
+    namesuffix => ' (with static libs)'
+  },
+  {
+    namesuffix => ' (with DLLs)',
+    library => 'library_dll'
+  }
+];
 
 END %]

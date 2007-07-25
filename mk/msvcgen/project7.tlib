@@ -45,8 +45,9 @@ END -%]
 	</Platforms>
 	<Configurations>
 [% FOREACH build IN builds -%]
+  [% FOREACH mutator IN mutators -%]
 		<Configuration
-			Name="[% build.name %]|Win32"
+			Name="[% build.name %][% mutator.namesuffix %]|Win32"
 			OutputDirectory="[% workbuild([]) %]"
 			IntermediateDirectory="[% workbuild([]) %]"
 [% interpolate('global') -%]
@@ -77,7 +78,6 @@ END -%]
 [% interpolate('linker') -%]
 				AdditionalOptions="[% flags(compose('lflags', [], ' ')) | html %] [% flags(compose('lflags7', [], ' ')) | html %]"
 				AdditionalDependencies="[% compose('libs', [], ' ') %]"
-				IgnoreImportLibrary="TRUE"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="[% composedirs('libdirs', []) %]"
 				ProgramDatabaseFile="[% workbuild([my.doc.rawtarget.0,'.pdb']) %]"
@@ -111,6 +111,7 @@ END -%]
 			<Tool
 				Name="VCWebDeploymentTool"/>
 		</Configuration>
+  [% END -%]
 [% END -%]
 	</Configurations>
 	<Files>

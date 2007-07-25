@@ -58,6 +58,12 @@
 [% MACRO global_library BLOCK -%]
 			ConfigurationType="4"
 [% END %]
+[% MACRO global_library_dll BLOCK -%]
+			ConfigurationType="2"
+[% END %]
+[% MACRO global_library_dll_relwase BLOCK -%]
+			WholeProgramOptimization="1"
+[% END %]
 
 [% MACRO global_plugin BLOCK -%]
 			ConfigurationType="2"
@@ -115,8 +121,22 @@
 [% MACRO linker_appgui_release GET linker_app(2) %]
 [% MACRO linker_appgui_debug GET linker_app(1) %]
 
+[% MACRO library_dll_outfile(suffix) BLOCK -%]
+				OutputFile="[% path([my.doc.buildroot.0, my.doc.project.0]) %]-vc[% my.doc.msvcversion.0 %][% suffix %].dll"
+[% END %]
+[% MACRO linker_library_dll_release BLOCK -%]
+[% library_dll_outfile('') -%]
+				ImportLibrary="[% worklibout %]\[% my.doc.project.0 %].lib"
+[% END %]
+
+[% MACRO linker_library_dll_debug BLOCK -%]
+[% library_dll_outfile('_d') -%]
+				ImportLibrary="[% worklibout %]\[% my.doc.project.0 %]_d.lib"
+[% END %]
+
 [% MACRO linker_plugin BLOCK -%]
 [% linker_common -%]
+				IgnoreImportLibrary="TRUE"
 				DelayLoadDLLs="[% glue(my.doc.librarydelay,';','','.dll') %]"
 				ImportLibrary="[% workbuild([my.doc.project.0,'.lib']) %]"
 [% END %]
@@ -127,3 +147,10 @@
 [% MACRO librarian_library_release GET library_outfile('') %]
 [% MACRO librarian_library_debug   GET library_outfile('_d') %]
 [% MACRO librarian_group	   GET library_outfile('') %]
+
+[% MACRO postbuild_common BLOCK -%]
+				CommandLine="md bin 2&gt; nul&#x0D;&#x0Acopy /y &quot;$(TargetPath)&quot; [% path([workroot, 'bin\\']) %]&#x0D;&#x0A"
+[% END %]
+
+[% MACRO postbuild_release GET postbuild_common %]
+[% MACRO postbuild_debug   GET postbuild_common %]

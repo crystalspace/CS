@@ -1,0 +1,7 @@
+Change log for the "msvc-dlls" branch.
+
+Order is the same as in history.txt.
+
+25-Jul-2007
+	- res started working on adding DLL creation support to the MSVC
+	  projects.
