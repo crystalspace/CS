@@ -20,6 +20,11 @@ chronological order.
 	  non-dllexported classes in MSVC.
 	- res added a small shell script to regenerate 
 	  include/csutil/scf_implgen_p.h (and also regenerated that file).
+	- res slightly changed how CS_DEBUG_BREAK is realized: the actual
+	  debugging break functionality is now provided by the function
+	  CS::Debug::DebugBreak() and is also available in optimize builds;
+	  CS_DEBUG_BREAK now just wraps around that. (Note that CS_DEBUG_BREAK
+	  still resolves to a no-op in optimize builds.)
 23-Jul-2007
 	- res fixed crystal.m4 to use the right test order when a development
 	  resp. stable version is requested (previously, the orders actually
