@@ -11,6 +11,11 @@ chronological order.
 	  libraries as DLLs with MSVC.
 	- res fixed the GUIDs in libcrystalspace_directx to be properly
 	  exported when built as a DLL with MSVC.
+	- res fixed a couple of linking issues for DLLs with MSVC: marking
+	  all-inline or as "exported" give problems on MSVC since VC tries to
+	  even import members that are inline. Also, "exported" templates 
+	  classes are not a good idea either since VC will attempt to import
+	  instantiations of it (which fails in most cases).
 23-Jul-2007
 	- res fixed crystal.m4 to use the right test order when a development
 	  resp. stable version is requested (previously, the orders actually
