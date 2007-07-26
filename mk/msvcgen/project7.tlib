@@ -57,7 +57,7 @@ END -%]
 				Name="VCCLCompilerTool"
 [% interpolate('compiler') -%]
 				PreprocessorDefinitions="
-[%- composedefs(['WIN32']) %]"
+[%- d = ['WIN32']; composedefs(d.merge(mutator.defines)) %]"
 				OptimizeForProcessor="1"
 				AdditionalOptions="[% flags(compose('cflags', [], ' ')) | html %] [% flags(compose('cflags7', [], ' ')) | html %]"
 				AdditionalIncludeDirectories="[% composedirs('incdirs', ['.']) %]"
@@ -80,7 +80,6 @@ END -%]
 				AdditionalDependencies="[% compose('libs', [], ' ') %]"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="[% composedirs('libdirs', []) %]"
-				ProgramDatabaseFile="[% workbuild([my.doc.rawtarget.0,'.pdb']) %]"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCLibrarianTool"

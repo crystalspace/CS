@@ -160,7 +160,7 @@ projtypes = {
   },
   library_shared =>
   {
-    defines = ['_WINDOWS', 'CS_BUILD_SHARED_LIBS']
+    defines = ['_WINDOWS']
   },
   plugin =>
   {
@@ -175,12 +175,14 @@ projtypes = {
 #------------------------------------------------------------------------------
 mutators = [
   {
-    namesuffix => ' (with static libs)'
+    namesuffix => ' (with static libs)',
+    defines => [],
     library_static => 'library',
     library_shared => 'library'
   },
   {
     namesuffix => ' (with DLLs)',
+    defines => ['CS_BUILD_SHARED_LIBS'],
     library_static => 'library'
   }
 ];

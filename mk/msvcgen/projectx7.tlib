@@ -111,6 +111,7 @@
 
 [% MACRO linker_common BLOCK -%]
 				OutputFile="[% path([my.doc.buildroot.0, my.doc.target.0]) %]"
+				ProgramDatabaseFile="[% workbuild([my.doc.rawtarget.0,'.pdb']) %]"
 [% END %]
 
 [% MACRO linker_app(subsys) BLOCK -%]
@@ -121,19 +122,21 @@
 [% MACRO linker_appgui_release GET linker_app(2) %]
 [% MACRO linker_appgui_debug GET linker_app(1) %]
 
-[% MACRO library_dll_versuffix GET ('-' _ my.doc.packageversion.0) IF my.doc.packageversion.0 -%]
-[% MACRO library_dll_outfile(suffix) BLOCK -%]
-				OutputFile="[% path([my.doc.buildroot.0, my.doc.project.0]) -%]
-[% library_dll_versuffix %]-vc[% my.doc.msvcversion.0 %][% suffix %].dll"
-[% END %]
+[% MACRO library_dll_versuffix GET 
+  ('-' _ my.doc.packageversion.0) IF my.doc.packageversion.0 -%]
+[% MACRO library_dll_outfile(suffix) GET
+  my.doc.project.0 _ library_dll_versuffix _ '-vc' _ my.doc.msvcversion.0 _ suffix
+%]
 [% MACRO linker_library_shared_release BLOCK -%]
-[% library_dll_outfile('') -%]
+                                OutputFile="[% path([my.doc.buildroot.0, library_dll_outfile('.dll')]) %]"
 				ImportLibrary="[% worklibout %]\[% my.doc.project.0 %].lib"
+				ProgramDatabaseFile="[% workbuild(library_dll_outfile('.pdb')) %]"
 [% END %]
 
 [% MACRO linker_library_shared_debug BLOCK -%]
-[% library_dll_outfile('_d') -%]
+                                OutputFile="[% path([my.doc.buildroot.0, library_dll_outfile('_d.dll')]) %]"
 				ImportLibrary="[% worklibout %]\[% my.doc.project.0 %]_d.lib"
+				ProgramDatabaseFile="[% workbuild(library_dll_outfile('_d.pdb')) %]"
 [% END %]
 
 [% MACRO linker_plugin BLOCK -%]
