@@ -16,6 +16,8 @@ chronological order.
 	  even import members that are inline. Also, "exported" templates 
 	  classes are not a good idea either since VC will attempt to import
 	  instantiations of it (which fails in most cases).
+	- res suppressed some warnings about mixing dllexported and 
+	  non-dllexported classes in MSVC.
 23-Jul-2007
 	- res fixed crystal.m4 to use the right test order when a development
 	  resp. stable version is requested (previously, the orders actually
