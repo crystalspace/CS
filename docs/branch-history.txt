@@ -8,6 +8,8 @@ Order is the same as in history.txt.
 	- res made library prohjects properly depend on each other.
 	- res changed the file names of the DLLs to follow the same naming
 	  as on MinGW (specifically, no "lib" prefix).
+	- res fixed the (new) post-build step to contain the correct path
+	  to create.
 25-Jul-2007
 	- res started working on adding DLL creation support to the MSVC
 	  projects.
