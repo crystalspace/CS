@@ -9,6 +9,8 @@ chronological order.
 26-Jul-2007
 	- res fixed some undefined type issues that occured when building 
 	  libraries as DLLs with MSVC.
+	- res fixed the GUIDs in libcrystalspace_directx to be properly
+	  exported when built as a DLL with MSVC.
 23-Jul-2007
 	- res fixed crystal.m4 to use the right test order when a development
 	  resp. stable version is requested (previously, the orders actually
