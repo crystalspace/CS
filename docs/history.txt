@@ -18,6 +18,8 @@ chronological order.
 	  instantiations of it (which fails in most cases).
 	- res suppressed some warnings about mixing dllexported and 
 	  non-dllexported classes in MSVC.
+	- res added a small shell script to regenerate 
+	  include/csutil/scf_implgen_p.h (and also regenerated that file).
 23-Jul-2007
 	- res fixed crystal.m4 to use the right test order when a development
 	  resp. stable version is requested (previously, the orders actually
