@@ -1284,6 +1284,23 @@ rule LinkWith
   $(<).NEEDLIBS = $(libs) ;
 }
 
+rule LibDepends
+{
+  local libs = $(>) ;
+  for w in $(MSVC.WORKSPACES)
+  {
+    local l ;
+    for l in $(libs)_MSVCNAME
+    {
+      if $($(l))
+      {
+	ResponseFile $($(w)_WKS_RESPFILE) : "$($(<)_MSVCNAME)|$($(l))" :
+	  notfile : $($(w)_WKS_RESPDIR) ;
+      }
+    }
+  }
+}
+
 rule MsvcClassifyMode
 {
   local c ;

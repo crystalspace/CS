@@ -5,6 +5,7 @@ Order is the same as in history.txt.
 26-Jul-2007
 	- res fixed the CS_BUILD_SHARED_LIBS define: it must be defined for
 	  all projects when using DLLs, not only the library ones.
+	- res made library prohjects properly depend on each other.
 25-Jul-2007
 	- res started working on adding DLL creation support to the MSVC
 	  projects.
