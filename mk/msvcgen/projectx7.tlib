@@ -125,7 +125,7 @@
 [% MACRO library_dll_versuffix GET 
   ('-' _ my.doc.packageversion.0) IF my.doc.packageversion.0 -%]
 [% MACRO library_dll_outfile(suffix) GET
-  my.doc.project.0 _ library_dll_versuffix _ '-vc' _ my.doc.msvcversion.0 _ suffix
+  my.doc.rawtarget.0 _ library_dll_versuffix _ '-vc' _ my.doc.msvcversion.0 _ suffix
 %]
 [% MACRO linker_library_shared_release BLOCK -%]
                                 OutputFile="[% path([my.doc.buildroot.0, library_dll_outfile('.dll')]) %]"
