@@ -1148,6 +1148,11 @@ struct iEngine : public virtual iBase
    */
   virtual uint GetCurrentFrameNumber () const = 0;
 
+  /**
+   * Force engine to increment the framenumber.
+   */
+  virtual void IncrementCurrentFrameNumber () = 0;
+
   /** @} */
   
   /**\name Saving/loading

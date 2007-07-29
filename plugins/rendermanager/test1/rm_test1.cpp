@@ -3,7 +3,8 @@
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
-    License version 2 as published by the Free Software Foundation; 
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
 
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -38,6 +39,8 @@ bool RMTest1::RenderView (iView* view)
   csRef<CS::RenderManager::RenderView> rview;
   rview.AttachNew (new(renderViewPool) CS::RenderManager::RenderView(view));
 
+  view->GetEngine ()->IncrementCurrentFrameNumber ();
+
   iSector* startSector = rview->GetThisSector ();
 
   // Pre-setup culling graph
@@ -51,6 +54,7 @@ bool RMTest1::RenderView (iView* view)
   // Finalize the tree
   renderTree.FinishViscull ();
 
+
   // Sort the mesh lists  
   {
     StandardMeshSorter<RenderTreeType> mySorter (view->GetEngine (), view->GetCamera ());
@@ -58,84 +62,58 @@ bool RMTest1::RenderView (iView* view)
   }
 
   // Setup the SV arrays
+  SVArrayHolder svArrays (svNameStringSet->GetSize (), renderTree.GetTotalRenderMeshes ());
+
+  // Push the default stuff
+  csShaderVariableStack& svStack = shaderManager->GetShaderVariableStack ();
+  svArrays.SetupSVStck (svStack, 0);
+
+  shaderManager->PushVariables (svStack);
+  startSector->GetSVContext ()->PushVariables (svStack);
+
+  // Replicate
+  svArrays.ReplicateSet (0, 1);
   
-  
-
-  // Setup SV arrays
-/*  size_t numSVs = svNameStringSet->GetSize ();
-  size_t numRMs = renderTree.GetTotalRenderMeshes ();
-
-  // Allocate the temporary storage for all render meshes
-  csShaderVariable **shaderVarStacks = new csShaderVariable* [numSVs * numRMs];
-  memset(shaderVarStacks, 0, sizeof (csShaderVariable*)*numSVs);
-  size_t rmOffset = 0;
-
-  // Shader and tickets list
-  iShader** shaderList = new iShader*[numRMs];
-  size_t* shaderTicket = new size_t[numRMs];
-
-  // Setup the shadermanager + sector SVs
-  shaderManager->PushVariables (shaderVarStacks);
-  startSector->GetSVContext ()->PushVariables (shaderVarStacks);
-
-  // Replicate to all meshes
-  for (size_t i = 1; i < numRMs; ++i)
+  // Setup the material&mesh SVs
   {
-    memcpy (shaderVarStacks+numSVs*i, shaderVarStacks, sizeof(csShaderVariable*)*numSVs);
+    StandardSVSetup<RenderTreeType> svSetup (svArrays);
+    renderTree.TraverseMeshNodes (svSetup);
   }
 
-  struct SVSetup
+  // Render all meshes, using only default shader
   {
-    SVSetup (csShaderVariable** svStacks, iShader** shaderList, size_t* shaderTickets,
-      csStringID shaderType, size_t& rmOffset, size_t numSVs)
-      : svStacks (svStacks), shaderList (shaderList), shaderTickets (shaderTickets), 
-      shaderType(shaderType), rmOffset (rmOffset), numSVs (numSVs)
+    csArray<iShader*> shaderArray; shaderArray.SetSize (renderTree.GetTotalRenderMeshes ());
+    csArray<size_t> ticketArray; ticketArray.SetSize (renderTree.GetTotalRenderMeshes ());
+    // Shader setup
     {
+      ShaderSetup<RenderTreeType> shaderSetup (shaderArray, defaultShaderName, defaultShader);
+
+      renderTree.TraverseMeshNodes (shaderSetup);
     }
 
-    void operator() (const RenderTreeType::MeshNode* mn, const RenderTreeType::ContextNode& ctx, 
-      const RenderTreeType& tree)
+    // Ticket setup
     {
-      iMeshWrapper* mw = mn->meshWrapper;
-      
-      for (size_t i = 0; i < mn->renderMeshes.GetSize (); ++i)
-      {
-        csRenderMesh* rm = mn->renderMeshes[i];
-        csShaderVariable** localStack = svStacks + rmOffset*numSVs;
+      TicketSetup<RenderTreeType> ticketSetup (svArrays, shaderManager->GetShaderVariableStack (),
+        shaderArray, ticketArray);
 
-        shaderList[rmOffset] = rm->material->GetMaterial ()->GetShader (shaderType);
-        
-        shaderList[rmOffset]->PushVariables (localStack);
-        rm->material->GetMaterial ()->PushVariables (localStack);
-        rm->variablecontext->PushVariables (localStack);
-        mw->GetSVContext ()->PushVariables (localStack);
-
-        // Setup shader tickets
-        shaderTickets[rmOffset] = 0; //shaderList[rmOffset]->GetTicket (*rm, localStack);
-        
-
-        rmOffset++;
-      }  
+      renderTree.TraverseMeshNodes (ticketSetup);
     }
 
-    csShaderVariable** svStacks;
-    iShader** shaderList;
-    size_t* shaderTickets;
-    csStringID shaderType;
+    // Render
+    {
+      iGraphics3D* g3d = view->GetContext ();
 
-    size_t& rmOffset;
-    size_t numSVs;
-  };
-  renderTree.TraverseMeshNodes (SVSetup(shaderVarStacks, shaderList, shaderTicket, defaultShaderName, 
-    rmOffset, numSVs));
+      BeginFinishDrawScope bd (g3d, view->GetEngine ()->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS);
 
-  // Render to screen
+      g3d->SetWorldToCamera (view->GetCamera ()->GetTransform ().GetInverse ());
 
-  // Clean up
-  delete shaderVarStacks;
-  delete shaderList;
-  delete shaderTicket;
-*/
+      SimpleRender<RenderTreeType> render (g3d, svArrays, 
+        shaderManager->GetShaderVariableStack (), shaderArray, ticketArray);
+
+      renderTree.TraverseMeshNodes (render);
+    }
+  }
+
   return true;
 }
 
@@ -150,6 +128,7 @@ bool RMTest1::Initialize(iObjectRegistry* objectReg)
   shaderManager = csQueryRegistry<iShaderManager> (objectReg);
 
   defaultShaderName = stringSet->Request("standard");
-
+  
+  defaultShader = shaderManager->GetShader ("std_lighting");
   return true;
 }

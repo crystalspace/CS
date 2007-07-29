@@ -69,23 +69,36 @@ public:
   ~csShaderVariableStack ()
   {
     if (ownArray)
-      delete[] varArray;
+      cs_free (varArray);
   }
 
   /// Initialize stack internal storage
   void Setup (size_t size)
   {
     if (ownArray)
-      delete[] varArray;
+      cs_free (varArray);
 
     csShaderVariableStack::size = size;
     varArray = 0;
 
     if (size > 0)
-    {
+    {      
+      varArray = (csShaderVariable**)cs_malloc (size * sizeof(csShaderVariable*));
       ownArray = true;
-      varArray = new csShaderVariable* [size];
+
+      memset (varArray, 0, size * sizeof(csShaderVariable*));
     }    
+  }
+
+  /// Initialize stack with external storage
+  void Setup (csShaderVariable** stack, size_t size)
+  {
+    if (ownArray)
+      cs_free (varArray);
+
+    varArray = stack;
+    csShaderVariableStack::size = size;
+    ownArray = false;
   }
 
   /// Get the number of variable slots in the stack

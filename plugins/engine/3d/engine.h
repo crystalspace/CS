@@ -504,6 +504,8 @@ public:
 
   virtual uint GetCurrentFrameNumber () const
   { return currentFrameNumber; }
+  virtual void IncrementCurrentFrameNumber ()
+  { currentFrameNumber++; }
 
   //-- Saving/loading
 

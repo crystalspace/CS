@@ -3,7 +3,8 @@
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
-    License version 2 as published by the Free Software Foundation; 
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
 
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -262,6 +263,29 @@ namespace RenderManager
 
   };
 
+  template<typename Tree, typename Fn>
+  class NumberedMeshTraverser
+  {
+  public:
+    typedef NumberedMeshTraverser<Tree, Fn> NumberedMeshTraverserType;
+
+    NumberedMeshTraverser (Fn& fun)
+      : fun(fun), meshOffset (0)
+    {}
+
+    void operator() (const typename Tree::TreeTraitsType::MeshNodeKeyType& key,
+      typename Tree::MeshNode* node, typename Tree::ContextNode& ctxNode, Tree& tree)
+    {
+      for (size_t i = 0; i < node->meshes.GetSize(); ++i)
+      {
+        fun (node->meshes[i], meshOffset++, ctxNode, tree);
+      }
+    }
+
+  private:
+    Fn& fun;
+    size_t meshOffset;
+  };
 
 
 }
