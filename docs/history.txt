@@ -9,6 +9,10 @@ chronological order.
 29-Jul-2007
 	- res made the CEL jobber import crystalspace_staticplugins_msvc.jam
 	  from CS before generating VC projects.
+	- res changed the way the MSVC static plugin information for external
+	  projects is generated: since the different VC versions need different
+	  flags, multiple files are now generated, and must later be included
+	  separately (e.g. by an umbrella jam file).
 26-Jul-2007
 	- res fixed some undefined type issues that occured when building 
 	  libraries as DLLs with MSVC.
