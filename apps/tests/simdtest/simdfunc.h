@@ -17,8 +17,12 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 /*
- * Our 'generic' function. In this case, it can be either C++ or SSE.
- * Both versions are compiled, and then the correct one is chosen at runtime.
+ * Our 'generic' function. In this case, it can be either C++ or SSE or Altivec.
+ * All three versions are compiled, and then the correct one is 
+ * chosen at runtime. If the instruction set isn't supported by the compiler,
+ * then the C++ abstraction is used as a fallback. It's the users responsibility
+ * to check for this in their CPP file, if they don't want multiple versions of 
+ * the C++ code.
  */
 
 using namespace CS::SIMD;
