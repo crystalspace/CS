@@ -19,7 +19,9 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "cssysdef.h"
 #include "csutil/processorspecdetection.h"
 #include "csutil/sysfunc.h"
+#include "csutil/processor/simdtypes.h"
 #include "simdtest.h"
+#include "simdfunc.h"
 
 using namespace CS::Platform;
 using namespace CS::SIMD;
@@ -28,22 +30,7 @@ CS_IMPLEMENT_APPLICATION
 
 bool SIMDTest::testCPP(float* a, float* b, float* c, int size)
 {
-
-    float holder = 0;
-    float holder2 = 0;
-    float holder3 = 0;
-
-        for(int j=0; j<size; j++)
-        {
-            holder = (*a) * (*a);
-            holder2 = (*b) * (*b);
-            holder3 = holder + holder2;
-            *c = sqrt(holder3);
-            a++;
-            b++;
-            c++;
-        }
-    return true;
+    return SIMDFunc(a, b, c, size);
 }
 
 int main(int argc, char* argv[])
@@ -112,7 +99,7 @@ int main(int argc, char* argv[])
 
     printf("Running SIMD test 1.\n");
     csTicks start = csGetMicroTicks();
-    if(SIMDDispatch<bool, SSEType, float*, float*, float*, int>((*SIMDTest::testSSE), (*SIMDTest::testCPP), a, b, c, size))
+    if(SIMDDispatch<bool, AltiVecType, SSEType, float*, float*, float*, int>((*SIMDTest::testAV), (*SIMDTest::testSSE), (*SIMDTest::testCPP), a, b, c, size))
     {
         printf("Time taken: %ldus \n", csGetMicroTicks()-start);
         float output = 0.0f;
@@ -120,7 +107,7 @@ int main(int argc, char* argv[])
         {
             output += c[i];
         }
-        printf("Output is %f, expected output is 84852.812290\n", output);
+        printf("Output is %f, expected output is roughly 84844.835938\n", output);
     }
     return 0;
 }

@@ -17,7 +17,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
-#include "csutil/processor/ssesimdtypes.h"
+#include "csutil/processor/avsimdtypes.h"
 #include "simdtest.h"
 #include "simdfunc.h"
 
@@ -26,19 +26,18 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  * GCC is a PITA :P
  */
 
-#ifdef CS_HAS_XMMINTRIN_H // This is a small optimization, so two version of the C++ code aren't compiled.
+#ifdef CS_HAS_ALTIVEC_H // This is a small optimization, so two version of the C++ code aren't compiled.
 
-
-bool SIMDTest::testSSE(float* a, float* b, float* c, int size)
+bool SIMDTest::testAV(float* a, float* b, float* c, int size)
 {
     return SIMDFunc(a, b, c, size);
 }
 
 #else
 
-bool SIMDTest::testSSE(float* a, float* b, float* c, int size)
+bool SIMDTest::testAV(float* a, float* b, float* c, int size)
 {
     return false;
 }
 
-#endif // CS_HAS_XMMINTRIN_H
+#endif // CS_HAS_ALTIVEC_H

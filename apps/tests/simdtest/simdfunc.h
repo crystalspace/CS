@@ -16,29 +16,33 @@ License along with this library; if not, write to the Free
 Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "cssysdef.h"
-#include "csutil/processor/ssesimdtypes.h"
-#include "simdtest.h"
-#include "simdfunc.h"
-
 /*
- * File needed for GCC, because we need to compile this cpp with the relevant cflags.
- * GCC is a PITA :P
+ * Our 'generic' function. In this case, it can be either C++ or SSE.
+ * Both versions are compiled, and then the correct one is chosen at runtime.
  */
 
-#ifdef CS_HAS_XMMINTRIN_H // This is a small optimization, so two version of the C++ code aren't compiled.
+using namespace CS::SIMD;
 
-
-bool SIMDTest::testSSE(float* a, float* b, float* c, int size)
+CS_FORCEINLINE bool SIMDFunc(float* a, float* b, float* c, int size)
 {
-    return SIMDFunc(a, b, c, size);
+    Vector4* ap = (Vector4*) a;
+    Vector4* bp = (Vector4*) b;
+    Vector4* cp = (Vector4*) c;
+
+    Vector4 simd;
+    Vector4 simd2;
+    Vector4 simd3;
+
+        for(int j=0; j<size; j+=4)
+        {
+            simd = VectorMul(*ap, *ap);
+            simd2 = VectorMul(*bp, *bp);
+            simd3 = VectorAdd(simd, simd2);
+            *cp = VectorSqrt(simd3);
+            ap++;
+            bp++;
+            cp++;
+        }
+
+    return true;
 }
-
-#else
-
-bool SIMDTest::testSSE(float* a, float* b, float* c, int size)
-{
-    return false;
-}
-
-#endif // CS_HAS_XMMINTRIN_H

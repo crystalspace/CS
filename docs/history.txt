@@ -8,6 +8,10 @@ chronological order.
 
 30-Jul-2007
         - Mike Gist fixed a few warnings.
+        - Mike Gist added preliminary SIMD abstraction and converted
+          simdtest to use it.
+        - Mike Gist fixed SIMDDespatch to work with more than one ISet.
+        - Mike Gist improved AltiVec support a little.
 25-Jul-2007
         - Mike Gist made a few function name changes in the SIMD code.
 23-Jul-2007

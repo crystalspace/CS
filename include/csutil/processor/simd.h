@@ -133,7 +133,7 @@ namespace CS
             return (*CPPFunction);
         }
         template<typename R, class SIMDType1, class SIMDType2, typename ArgR>
-        inline R SIMDDispatch(R (*SIMDFunction1)(ArgR), R (*SIMDFunction2), R (*CPPFunction)(ArgR), ArgR arg)
+        inline R SIMDDispatch(R (*SIMDFunction1)(ArgR), R (*SIMDFunction2)(ArgR), R (*CPPFunction)(ArgR), ArgR arg)
         {
             if(SIMDType1::iSet < SIMDType2::iSet)
             {
@@ -152,7 +152,7 @@ namespace CS
             return (*CPPFunction)(arg);
         }
         template<typename R, class SIMDType1, class SIMDType2, typename ArgR1, typename ArgR2>
-        inline R SIMDDispatch(R (*SIMDFunction1)(ArgR1, ArgR2), R (*SIMDFunction2), R (*CPPFunction)(ArgR1, ArgR2), ArgR1 arg1, ArgR2 arg2)
+        inline R SIMDDispatch(R (*SIMDFunction1)(ArgR1, ArgR2), R (*SIMDFunction2)(ArgR1, ArgR2), R (*CPPFunction)(ArgR1, ArgR2), ArgR1 arg1, ArgR2 arg2)
         {
             if(SIMDType1::iSet < SIMDType2::iSet)
             {
@@ -171,7 +171,7 @@ namespace CS
             return (*CPPFunction)(arg1, arg2);
         }
         template<typename R, class SIMDType1, class SIMDType2, typename ArgR1, typename ArgR2, typename ArgR3>
-        inline R SIMDDispatch(R (*SIMDFunction1)(ArgR1, ArgR2, ArgR3), R (*SIMDFunction2), R (*CPPFunction)(ArgR1, ArgR2, ArgR3), ArgR1 arg1, ArgR2 arg2, ArgR3 arg3)
+        inline R SIMDDispatch(R (*SIMDFunction1)(ArgR1, ArgR2, ArgR3), R (*SIMDFunction2)(ArgR1, ArgR2, ArgR3), R (*CPPFunction)(ArgR1, ArgR2, ArgR3), ArgR1 arg1, ArgR2 arg2, ArgR3 arg3)
         {
             if(SIMDType1::iSet < SIMDType2::iSet)
             {
@@ -190,7 +190,7 @@ namespace CS
             return (*CPPFunction)(arg1, arg2, arg3);
         }
         template<typename R, class SIMDType1, class SIMDType2, typename ArgR1, typename ArgR2, typename ArgR3, typename ArgR4>
-        inline R SIMDDispatch(R (*SIMDFunction1)(ArgR1, ArgR2, ArgR3, ArgR4), R (*SIMDFunction2), R (*CPPFunction)(ArgR1, ArgR2, ArgR3, ArgR4), ArgR1 arg1, ArgR2 arg2, ArgR3 arg3, ArgR4 arg4)
+        inline R SIMDDispatch(R (*SIMDFunction1)(ArgR1, ArgR2, ArgR3, ArgR4), R (*SIMDFunction2)(ArgR1, ArgR2, ArgR3, ArgR4), R (*CPPFunction)(ArgR1, ArgR2, ArgR3, ArgR4), ArgR1 arg1, ArgR2 arg2, ArgR3 arg3, ArgR4 arg4)
         {
             if(SIMDType1::iSet < SIMDType2::iSet)
             {
@@ -209,7 +209,7 @@ namespace CS
             return (*CPPFunction)(arg1, arg2, arg3, arg4);
         }
         template<typename R, class SIMDType1, class SIMDType2, typename ArgR1, typename ArgR2, typename ArgR3, typename ArgR4, typename ArgR5>
-        inline R SIMDDispatch(R (*SIMDFunction1)(ArgR1, ArgR2, ArgR3, ArgR4, ArgR5), R (*SIMDFunction2), R (*CPPFunction)(ArgR1, ArgR2, ArgR3, ArgR4, ArgR5), ArgR1 arg1, ArgR2 arg2, ArgR3 arg3, ArgR4 arg4, ArgR5 arg5)
+        inline R SIMDDispatch(R (*SIMDFunction1)(ArgR1, ArgR2, ArgR3, ArgR4, ArgR5), R (*SIMDFunction2)(ArgR1, ArgR2, ArgR3, ArgR4, ArgR5), R (*CPPFunction)(ArgR1, ArgR2, ArgR3, ArgR4, ArgR5), ArgR1 arg1, ArgR2 arg2, ArgR3 arg3, ArgR4 arg4, ArgR5 arg5)
         {
             if(SIMDType1::iSet < SIMDType2::iSet)
             {

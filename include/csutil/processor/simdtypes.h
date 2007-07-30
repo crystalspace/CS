@@ -19,52 +19,44 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifndef __SIMD_TYPES_H__
 #define __SIMD_TYPES_H__
 
-#ifdef CS_HAS_XMMINTRIN_H
-
-#include <xmmintrin.h>
-
 namespace CS
 {
     namespace SIMD
     {
-        // TODO: Make PPC versions and check compat with gcc/*nix.
-        typedef __m128 SIMDVector4;
-
-        static inline __m128 csMulSIMD(__m128 a, __m128 b)
+        struct Vector4
         {
-            return _mm_mul_ps(a, b);
+            float a;
+            float b;
+            float c;
+            float d;
+        };
+
+        struct ReturnVector4 : public Vector4
+        {
+            CS_FORCEINLINE ReturnVector4(float _a, float _b, float _c, float _d)
+            {
+                a = _a;
+                b = _b;
+                c = _c;
+                d = _d;
+            }
+        };
+
+        CS_FORCEINLINE Vector4 VectorMul(Vector4 x, Vector4 y)
+        {
+            return ReturnVector4(x.a * y.a, x.b * y.b, x.c * y.c, x.d * y.d);
         }
 
-        static inline __m128 csAddSIMD(__m128 a, __m128 b)
+        CS_FORCEINLINE Vector4 VectorAdd(Vector4 x, Vector4 y)
         {
-            return _mm_add_ps(a, b);
+            return ReturnVector4(x.a + y.a, x.b + y.b, x.c + y.c, x.d + y.d);
         }
 
-        static inline __m128 csSqrtSIMD(__m128 a)
+        CS_FORCEINLINE Vector4 VectorSqrt(Vector4 x)
         {
-            return _mm_sqrt_ps(a);
+            return ReturnVector4(sqrtf(x.a), sqrtf(x.b), sqrtf(x.c), sqrtf(x.d));
         }
     }
 }
-
-#endif // CS_HAS_XMMINTRIN_H
-
-#if defined(CS_HAS_MMINTRIN_H) && !defined(CS_HAS_XMMINTRIN_H)
-
-#include <mmintrin.h>
-
-#endif
-
-#ifdef CS_HAS_MMINTRIN
-
-namespace CS
-{
-    namespace SIMD
-    {
-        // TODO: MMX types.
-    }
-}
-
-#endif
 
 #endif // __SIMD_TYPES_H__

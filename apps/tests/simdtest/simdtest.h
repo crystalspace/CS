@@ -22,5 +22,6 @@ class SIMDTest
 {
 public:
 static bool testSSE(float* a, float* b, float* c, int size);
+static bool testAV(float* a, float* b, float* c, int size);
 static bool testCPP(float* a, float* b, float* c, int size);
 };
