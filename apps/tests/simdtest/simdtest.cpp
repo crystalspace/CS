@@ -114,7 +114,7 @@ int main(int argc, char* argv[])
     csTicks start = csGetMicroTicks();
     if(SIMDDispatch<bool, SSEType, float*, float*, float*, int>((*SIMDTest::testSSE), (*SIMDTest::testCPP), a, b, c, size))
     {
-        printf("Time taken: %lldus \n", csGetMicroTicks()-start);
+        printf("Time taken: %ldus \n", csGetMicroTicks()-start);
         float output = 0.0f;
         for(int i=0; i<size; i++)
         {

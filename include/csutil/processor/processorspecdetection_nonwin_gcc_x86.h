@@ -27,9 +27,6 @@ namespace Implementation
         uint CheckSupportedInstruction()
         {
             // Data from asm.
-            int CPUnum = 0;
-            int have_cpuid = 0;
-            int maxEax = 0;
             int ecxCapFlags = 0;
             int edxCapFlags = 0;
 
@@ -46,6 +43,9 @@ namespace Implementation
                 : "=a" (eaxCapFlags), "=b" (ebxCapFlags), "=c" (ecxCapFlags), "=d" (edxCapFlags)
                 : "a" (function));
 #else
+            int CPUnum = 0;
+            int have_cpuid = 0;
+            int maxEax = 0;
             char procName[16];
             maxEax = 0;
             char* procNamePtr = procName;
