@@ -834,7 +834,7 @@ bool csConditionEvaluator::IsConditionPartOf (csConditionID condition,
 
 bool csConditionEvaluator::Evaluate (csConditionID condition, 
 				     const csRenderMeshModes& modes,
-				     const csShaderVariableStack& stack)
+				     const csShaderVariableStack* stack)
 {
   if (condition == csCondAlwaysTrue)
     return true;
@@ -877,18 +877,18 @@ csConditionEvaluator::EvaluatorShadervar::Boolean (
       return operand.boolVal;
     case operandSV:
       {
-        if (stack.GetSize () > operand.svName)
+        if (stack && stack->GetSize () > operand.svName)
 	{
-	  csShaderVariable* sv = stack[operand.svName];
+	  csShaderVariable* sv = (*stack)[operand.svName];
 	  return sv != 0;
 	}
       }
       break;
     case operandSVValueTexture:
       {
-        if (stack.GetSize () > operand.svName)
+        if (stack && stack->GetSize () > operand.svName)
         {
-          csShaderVariable* sv = stack[operand.svName];
+          csShaderVariable* sv = (*stack)[operand.svName];
 	  if (sv != 0)
 	  {
 	    iTextureHandle* th;
@@ -901,9 +901,9 @@ csConditionEvaluator::EvaluatorShadervar::Boolean (
     case operandSVValueBuffer:
       //@@TODO: CHECK FOR DEFAULTBUFFERS
       {
-        if (stack.GetSize () > operand.svName)
+        if (stack && stack->GetSize () > operand.svName)
         {
-          csShaderVariable* sv = stack[operand.svName];
+          csShaderVariable* sv = (*stack)[operand.svName];
 	  if (sv != 0)
 	  {
 	    iRenderBuffer* th;
@@ -931,9 +931,9 @@ csConditionEvaluator::EvaluatorShadervar::Int (
       return (int)operand.floatVal;
     case operandSVValueFloat:
       {
-        if (stack.GetSize () > operand.svName)
+        if (stack && stack->GetSize () > operand.svName)
         {
-          csShaderVariable* sv = stack[operand.svName];
+          csShaderVariable* sv = (*stack)[operand.svName];
 	  if (sv != 0)
 	  {
 	    float v;
@@ -948,9 +948,9 @@ csConditionEvaluator::EvaluatorShadervar::Int (
     case operandSVValueZ:
     case operandSVValueW:
       {
-        if (stack.GetSize () > operand.svName)
+        if (stack && stack->GetSize () > operand.svName)
         {
-          csShaderVariable* sv = stack[operand.svName];
+          csShaderVariable* sv = (*stack)[operand.svName];
 	  if (sv != 0)
 	  {
 	    csVector4 v;
@@ -965,9 +965,9 @@ csConditionEvaluator::EvaluatorShadervar::Int (
       break;
     case operandSVValueInt:
       {
-        if (stack.GetSize () > operand.svName)
+        if (stack && stack->GetSize () > operand.svName)
         {
-          csShaderVariable* sv = stack[operand.svName];
+          csShaderVariable* sv = (*stack)[operand.svName];
 	  if (sv != 0)
 	  {
 	    int v;
@@ -996,9 +996,9 @@ csConditionEvaluator::EvaluatorShadervar::Float (
       return (float)operand.intVal;
     case operandSVValueFloat:
       {
-        if (stack.GetSize () > operand.svName)
+        if (stack && stack->GetSize () > operand.svName)
         {
-          csShaderVariable* sv = stack[operand.svName];
+          csShaderVariable* sv = (*stack)[operand.svName];
 	  if (sv != 0)
 	  {
 	    float v;
@@ -1013,9 +1013,9 @@ csConditionEvaluator::EvaluatorShadervar::Float (
     case operandSVValueZ:
     case operandSVValueW:
       {
-        if (stack.GetSize () > operand.svName)
+        if (stack && stack->GetSize () > operand.svName)
         {
-          csShaderVariable* sv = stack[operand.svName];
+          csShaderVariable* sv = (*stack)[operand.svName];
 	    if (sv != 0)
 	    {
 	      csVector4 v;
@@ -1030,9 +1030,9 @@ csConditionEvaluator::EvaluatorShadervar::Float (
       break;
     case operandSVValueInt:
       {
-        if (stack.GetSize () > operand.svName)
+        if (stack && stack->GetSize () > operand.svName)
         {
-          csShaderVariable* sv = stack[operand.svName];
+          csShaderVariable* sv = (*stack)[operand.svName];
 	  if (sv != 0)
 	  {
 	    int v;

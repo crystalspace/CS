@@ -100,7 +100,7 @@ bool csShaderConditionResolver::Evaluate (csConditionID condition)
   const csShaderVariableStack* stack = csShaderConditionResolver::stack;
 
   return evaluator.Evaluate (condition, modes ? *modes : csRenderMeshModes(),
-    stack ? *stack : csShaderVariableStack());
+    stack);
 }
 
 csConditionNode* csShaderConditionResolver::NewNode (csConditionNode* parent)
@@ -186,7 +186,7 @@ void csShaderConditionResolver::SetEvalParams (const csRenderMeshModes* modes,
 size_t csShaderConditionResolver::GetVariant ()
 {
   const csRenderMeshModes& modes = *csShaderConditionResolver::modes;
-  const csShaderVariableStack& stack = *csShaderConditionResolver::stack;
+  const csShaderVariableStack* stack = csShaderConditionResolver::stack;
 
   if (rootNode == 0)
   {

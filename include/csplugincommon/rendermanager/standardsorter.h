@@ -19,6 +19,8 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_STANDARDSOTER_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_STANDARDSOTER_H__
 
+#include "iengine/camera.h"
+
 namespace CS
 {
 namespace RenderManager

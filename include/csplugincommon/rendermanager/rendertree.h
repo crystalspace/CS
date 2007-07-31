@@ -146,37 +146,8 @@ namespace RenderManager
     template<typename Fn>
     void TraverseMeshNodes (Fn& meshNodeFunction)
     {
-      struct LocalWalk
-      {
-        LocalWalk (Fn& meshNodeFunction)
-          : meshNodeFunction (meshNodeFunction)
-        {}
-
-        void operator() (ContextNode* node, ThisType& tree)
-        {
-          struct MeshNodeCB
-          {
-            MeshNodeCB(Fn& meshNodeFunction, ContextNode* node, ThisType& tree)
-              : meshNodeFunction (meshNodeFunction), node (node), tree (tree)
-            {}
-
-            void operator() (const TreeTraits::MeshNodeKeyType& key, MeshNode* meshNode)
-            {
-              meshNodeFunction (key, meshNode, *node, tree);
-            }
-
-            Fn& meshNodeFunction;
-            ContextNode* node;
-            ThisType& tree;
-          };
-
-          node->meshNodes.TraverseInOrder (MeshNodeCB (meshNodeFunction, node, tree));
-        }
-
-        Fn& meshNodeFunction;
-      };
-
-      TraverseContexts (LocalWalk(meshNodeFunction));
+      TraverseMeshNodesWalker<Fn> walker (meshNodeFunction);
+      TraverseContexts (walker);
     }
 
 
@@ -208,7 +179,7 @@ namespace RenderManager
     {
     public:
       ViscullCallback (ThisType& ownerTree, iRenderView* rw)
-        : scfImplementationType (this), ownerTree (ownerTree), currentRenderView (rw)
+        : scfImplementation1<ViscullCallback, iVisibilityCullerListener> (this), ownerTree (ownerTree), currentRenderView (rw)
       {}
 
 
@@ -236,7 +207,7 @@ namespace RenderManager
       // Add it to the appropriate meshnode
       for (int i = 0; i < numMeshes; ++i)
       {
-        TreeTraits::MeshNodeKeyType meshKey = 
+        typename TreeTraits::MeshNodeKeyType meshKey = 
           TreeTraits::GetMeshNodeKey (imesh, *meshList[i]);
 
         // Get the mesh node
@@ -252,7 +223,7 @@ namespace RenderManager
           totalMeshNodes++;
         }
 
-        MeshNode::SingleMesh sm;
+        typename MeshNode::SingleMesh sm;
         sm.renderMesh = meshList[i];
 
         meshNode->meshes.Push (sm);
@@ -260,7 +231,41 @@ namespace RenderManager
         totalRenderMeshes++;
       }
     }
+    
+    template<typename Fn>
+    struct TraverseMeshNodesWalker
+    {
+      TraverseMeshNodesWalker (Fn& meshNodeFunction)
+        : meshNodeFunction (meshNodeFunction)
+      {}
 
+      void operator() (ContextNode* node, ThisType& tree)
+      {        
+        MeshNodeCB<Fn> cb (meshNodeFunction, node, tree);
+        node->meshNodes.TraverseInOrder (cb);
+      }
+
+      Fn& meshNodeFunction;
+    };
+
+    private:
+
+      template<typename Fn>
+      struct MeshNodeCB
+      {
+        MeshNodeCB(Fn& meshNodeFunction, ContextNode* node, ThisType& tree)
+          : meshNodeFunction (meshNodeFunction), node (node), tree (tree)
+        {}
+
+        void operator() (const typename TreeTraits::MeshNodeKeyType& key, MeshNode* meshNode)
+        {
+          meshNodeFunction (key, meshNode, *node, tree);
+        }
+
+        Fn& meshNodeFunction;
+        ContextNode* node;
+        ThisType& tree;
+      };
   };
 
   template<typename Tree, typename Fn>
@@ -286,7 +291,7 @@ namespace RenderManager
     Fn& fun;
     size_t meshOffset;
   };
-
+ 
 
 }
 }

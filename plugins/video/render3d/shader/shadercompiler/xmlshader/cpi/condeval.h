@@ -550,12 +550,12 @@ class csConditionEvaluator
     typedef int IntType;
     csConditionEvaluator& evaluator;
     const csRenderMeshModes& modes;
-    const csShaderVariableStack& stack;
+    const csShaderVariableStack* stack;
 
     EvalResult GetDefaultResult() const { return false; }
 
     EvaluatorShadervar (csConditionEvaluator& evaluator,
-      const csRenderMeshModes& modes, const csShaderVariableStack& stack) : 
+      const csRenderMeshModes& modes, const csShaderVariableStack* stack) : 
         evaluator (evaluator), modes (modes), stack (stack)
     { }
     BoolType Boolean (const CondOperand& operand);
@@ -580,7 +580,7 @@ public:
 
   /// Evaluate a condition and return the result.
   bool Evaluate (csConditionID condition, const csRenderMeshModes& modes,
-    const csShaderVariableStack& stack);
+    const csShaderVariableStack* stack);
   /**
    * Reset the evaluation cache. Prevents same conditions from being evaled 
    * twice.

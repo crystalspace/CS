@@ -25,21 +25,22 @@ namespace RenderManager
 {
 
   template<typename Tree>
-  class ShaderSetup : public NumberedMeshTraverser<Tree, typename ShaderSetup<Tree> >
+  class ShaderSetup : public NumberedMeshTraverser<Tree, ShaderSetup<Tree> >
   {
   public:
     typedef csArray<iShader*> ShaderArrayType;
+    typedef NumberedMeshTraverser<Tree, ShaderSetup<Tree> > BaseType;
 
     ShaderSetup (ShaderArrayType& shaderArray, csStringID shaderName, 
       iShader* defaultShader = 0)
-      : NumberedMeshTraverserType (*this), shaderArray (shaderArray), shaderName (shaderName),
+      : BaseType (*this), shaderArray (shaderArray), shaderName (shaderName),
       defaultShader (defaultShader)
     {
     }
 
 
     // Need to unhide this one
-    using NumberedMeshTraverserType::operator();
+    using BaseType::operator();
 
     void operator() (const typename Tree::MeshNode::SingleMesh& mesh, size_t index,
       typename Tree::ContextNode& ctxNode, const Tree& tree)
@@ -57,22 +58,23 @@ namespace RenderManager
   };
 
   template<typename Tree>
-  class TicketSetup : public NumberedMeshTraverser<Tree, typename TicketSetup<Tree> >
+  class TicketSetup : public NumberedMeshTraverser<Tree, TicketSetup<Tree> >
   {
   public:
     typedef csArray<size_t> TicketArrayType;
     typedef csArray<iShader*> ShaderArrayType;
+    typedef NumberedMeshTraverser<Tree, TicketSetup<Tree> > BaseType;
 
     TicketSetup (SVArrayHolder& svArrays, csShaderVariableStack& varStack, 
       const ShaderArrayType& shaderArray, TicketArrayType& tickets)
-      : NumberedMeshTraverserType (*this), svArrays (svArrays), varStack (varStack),
+      : BaseType (*this), svArrays (svArrays), varStack (varStack),
       shaderArray (shaderArray), ticketArray (tickets)
     {
     }
 
 
     // Need to unhide this one
-    using NumberedMeshTraverserType::operator();
+    using BaseType::operator();
 
     void operator() (const typename Tree::MeshNode::SingleMesh& mesh, size_t index,
       typename Tree::ContextNode& ctxNode, const Tree& tree)

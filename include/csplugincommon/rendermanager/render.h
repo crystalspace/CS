@@ -51,21 +51,23 @@ namespace RenderManager
 
 
   template<typename Tree>
-  class SimpleRender : public NumberedMeshTraverser<Tree, typename SimpleRender<Tree> >
+  class SimpleRender : public NumberedMeshTraverser<Tree, SimpleRender<Tree> >
   {
   public:
     typedef csArray<size_t> TicketArrayType;
     typedef csArray<iShader*> ShaderArrayType;
 
+    typedef NumberedMeshTraverser<Tree, SimpleRender<Tree> > BaseType;
+
     SimpleRender (iGraphics3D* g3d, SVArrayHolder& svArrays, csShaderVariableStack& varStack,
       const ShaderArrayType& shaderArray, const TicketArrayType& ticketArray)
-      : NumberedMeshTraverserType (*this), g3d (g3d), svArrays (svArrays), varStack (varStack),
-      shaderArray (shaderArray), ticketArray (ticketArray)
+      : BaseType (*this), g3d (g3d), svArrays (svArrays), 
+      varStack (varStack), shaderArray (shaderArray), ticketArray (ticketArray)
     {
     }
 
     // Need to unhide this one
-    using NumberedMeshTraverserType::operator();
+    using BaseType::operator();
 
     void operator() (const typename Tree::MeshNode::SingleMesh& mesh, size_t index,
       typename Tree::ContextNode& ctxNode, const Tree& tree)

@@ -29,16 +29,18 @@ namespace RenderManager
 {
 
   template<typename Tree>
-  class StandardSVSetup : public NumberedMeshTraverser<Tree, typename StandardSVSetup<Tree> >
+  class StandardSVSetup : public NumberedMeshTraverser<Tree, StandardSVSetup<Tree> >
   {
   public:
+    typedef NumberedMeshTraverser<Tree, StandardSVSetup<Tree> > BaseType;
+
     StandardSVSetup (SVArrayHolder& svArrays)
-      : NumberedMeshTraverserType (*this), svArrays (svArrays)
+      : BaseType (*this), svArrays (svArrays)
     {
     }
 
     // Need to unhide this one
-    using NumberedMeshTraverserType::operator();
+    using BaseType::operator();
 
     void operator() (const typename Tree::MeshNode::SingleMesh& mesh, size_t index,
       typename Tree::ContextNode& ctxNode, const Tree& tree)
