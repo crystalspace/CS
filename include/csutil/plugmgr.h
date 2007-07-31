@@ -28,10 +28,10 @@
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/threading/mutex.h"
+#include "iutil/comp.h"
 #include "iutil/plugin.h"
 #include "iutil/pluginconfig.h"
 
-struct iComponent;
 struct iObjectRegistry;
 
 /**

@@ -126,7 +126,7 @@
 
 
 template<class Class SCF_IMPL_TYPES>
-class CS_CRYSTALSPACE_EXPORT SCF_IMPL_NAME :
+class SCF_IMPL_NAME :
   public SCF_IMPL_SUPER
   SCF_IMPL_INTERFACES
 {
@@ -177,7 +177,11 @@ protected:
     AddReftrackerAliases(); 
   }
 #else /* SCF_IMPL_EXT */
-  SCF_IMPL_NAME(Class *object)
+  /* The template<...> is a peculiar hack to prevent MSVC from trying to 
+   * instance this ctor when inheriting from a dllexport class (ie if 'Super'
+   * is dllexport). */
+  template<class Class_>
+  SCF_IMPL_NAME(Class_ *object)
     : SCF_IMPL_SUPER(), scfObject(object)
   { 
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));

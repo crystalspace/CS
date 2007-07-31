@@ -369,7 +369,7 @@
   }
 
 
-class CS_CSPLUGINCOMMON_GL_EXPORT csGLStateCacheContext
+class csGLStateCacheContext
 {
 public:
   csGLExtensionManager* extmgr;
@@ -619,7 +619,7 @@ public:
  * deallocations. The functions in this class will only
  * manipulate member variables.
  */
-class CS_CSPLUGINCOMMON_GL_EXPORT csGLStateCache
+class csGLStateCache
 {
   enum
   {

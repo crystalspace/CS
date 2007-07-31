@@ -12,6 +12,33 @@ chronological order.
           simdtest to use it.
         - Mike Gist fixed SIMDDespatch to work with more than one ISet.
         - Mike Gist improved AltiVec support a little.
+29-Jul-2007
+	- res made the CEL jobber import crystalspace_staticplugins_msvc.jam
+	  from CS before generating VC projects.
+	- res changed the way the MSVC static plugin information for external
+	  projects is generated: since the different VC versions need different
+	  flags, multiple files are now generated, and must later be included
+	  separately (e.g. by an umbrella jam file).
+	- res added a target to create a doxygen tagfile for the public API.
+26-Jul-2007
+	- res fixed some undefined type issues that occured when building 
+	  libraries as DLLs with MSVC.
+	- res fixed the GUIDs in libcrystalspace_directx to be properly
+	  exported when built as a DLL with MSVC.
+	- res fixed a couple of linking issues for DLLs with MSVC: marking
+	  all-inline or as "exported" give problems on MSVC since VC tries to
+	  even import members that are inline. Also, "exported" templates 
+	  classes are not a good idea either since VC will attempt to import
+	  instantiations of it (which fails in most cases).
+	- res suppressed some warnings about mixing dllexported and 
+	  non-dllexported classes in MSVC.
+	- res added a small shell script to regenerate 
+	  include/csutil/scf_implgen_p.h (and also regenerated that file).
+	- res slightly changed how CS_DEBUG_BREAK is realized: the actual
+	  debugging break functionality is now provided by the function
+	  CS::Debug::DebugBreak() and is also available in optimize builds;
+	  CS_DEBUG_BREAK now just wraps around that. (Note that CS_DEBUG_BREAK
+	  still resolves to a no-op in optimize builds.)
 25-Jul-2007
         - Mike Gist made a few function name changes in the SIMD code.
 23-Jul-2007

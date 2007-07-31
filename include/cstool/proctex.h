@@ -30,11 +30,13 @@
 #include "csutil/ref.h"
 #include "csutil/scf_implementation.h"
 #include "itexture/iproctex.h"
+#include "itexture/itexfact.h"
 #include "iengine/texture.h"
+#include "iutil/event.h"
+#include "iutil/eventh.h"
 
 
 struct iEngine;
-struct iEventHandler;
 struct iGraphics2D;
 struct iGraphics3D;
 struct iMaterialWrapper;
