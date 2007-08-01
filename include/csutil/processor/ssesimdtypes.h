@@ -22,6 +22,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #ifdef CS_HAS_XMMINTRIN_H
 
 #include <xmmintrin.h>
+#include "csgeom/vector3.h"
 
 namespace CS
 {
@@ -29,9 +30,73 @@ namespace CS
     {
         typedef __m128 Vector4;
 
-        CS_FORCEINLINE Vector4 VectorMul(Vector4 a, Vector4 b)
+        CS_FORCEINLINE Vector4 VectorSet(const float x)
         {
-            return _mm_mul_ps(a, b);
+            return _mm_set1_ps(x);
+        }
+
+        CS_FORCEINLINE Vector4 VectorSet(const float x, const float y, const float z, const float w)
+        {
+            return _mm_setr_ps(x, y, z, w);
+        }
+        
+        CS_FORCEINLINE Vector4 VectorSetZero()
+        {
+            return _mm_setzero_ps();
+        }
+
+        CS_FORCEINLINE float VectorGetX(Vector4 a)
+        {
+            return a.m128_f32[0];
+        }
+
+        CS_FORCEINLINE float VectorGetY(Vector4 a)
+        {
+            return a.m128_f32[1];
+        }
+
+        CS_FORCEINLINE float VectorGetZ(Vector4 a)
+        {
+            return a.m128_f32[2];
+        }
+
+        CS_FORCEINLINE float VectorGetW(Vector4 a)
+        {
+            return a.m128_f32[3];
+        }
+
+        CS_FORCEINLINE Vector4 VectorLoad1(const float* f)
+        {
+            return _mm_load1_ps(f);
+        }
+
+        CS_FORCEINLINE Vector4 VectorLoad(const float* data)
+        {
+            return _mm_load_ps(data);
+        }
+
+        CS_FORCEINLINE Vector4 VectorLoad(csVector3 vec)
+        {
+            return _mm_load_ps(vec.m);
+        }
+
+        CS_FORCEINLINE void VectorStore1(float* data, Vector4 a)
+        {
+            _mm_store1_ps(data, a);
+        }
+
+        CS_FORCEINLINE void VectorStore(float* data, Vector4 a)
+        {
+            _mm_store_ps(data, a);
+        }
+
+        CS_FORCEINLINE void VectorStore1(csVector3* vec, Vector4 a)
+        {
+            _mm_store1_ps(vec->m, a);
+        }
+        CS_FORCEINLINE void VectorStore(csVector3* vec, Vector4 a)
+        {
+            _mm_store_ps(vec->m, a);
         }
 
         CS_FORCEINLINE Vector4 VectorAdd(Vector4 a, Vector4 b)
@@ -39,9 +104,144 @@ namespace CS
             return _mm_add_ps(a, b);
         }
 
+        CS_FORCEINLINE Vector4 VectorSub(Vector4 a, Vector4 b)
+        {
+            return _mm_sub_ps(a, b);
+        }
+
+        CS_FORCEINLINE Vector4 VectorMul(Vector4 a, Vector4 b)
+        {
+            return _mm_mul_ps(a, b);
+        }
+
+        CS_FORCEINLINE Vector4 VectorDiv(Vector4 a, Vector4 b)
+        {
+            return _mm_div_ps(a, b);
+        }
+        CS_FORCEINLINE Vector4 VectorNeg(Vector4 a)
+        {
+            return _mm_sub_ps(_mm_setzero_ps(), a);
+        }
+        CS_FORCEINLINE Vector4 VectorMultAdd(Vector4 a, Vector4 b, Vector4 c)
+        {
+            return _mm_add_ps(_mm_mul_ps(a, b), c);
+        }
+
         CS_FORCEINLINE Vector4 VectorSqrt(Vector4 a)
         {
             return _mm_sqrt_ps(a);
+        }
+
+        CS_FORCEINLINE Vector4 VectorRecip(Vector4 a)
+        {
+            return _mm_rcp_ps(a);
+        }
+
+        CS_FORCEINLINE Vector4 VectorRecipSqrt(Vector4 a)
+        {
+            return _mm_rsqrt_ps(a);
+        }
+
+        CS_FORCEINLINE Vector4 VectorMin(Vector4 a, Vector4 b)
+        {
+            return _mm_min_ps(a, b);
+        }
+
+        CS_FORCEINLINE Vector4 VectorMax(Vector4 a, Vector4 b)
+        {
+            return _mm_max_ps(a, b);
+        }
+
+        CS_FORCEINLINE Vector4 VectorAND(Vector4 a, Vector4 b)
+        {
+            return _mm_and_ps(a, b);
+        }
+
+        CS_FORCEINLINE Vector4 VectorOR(Vector4 a, Vector4 b)
+        {
+            return _mm_or_ps(a, b);
+        }
+
+        CS_FORCEINLINE Vector4 VectorNOT(Vector4 a)
+        {
+            return _mm_xor_ps(a, _mm_cmpeq_ps(a, a));
+        }
+
+        CS_FORCEINLINE Vector4 VectorXOR(Vector4 a, Vector4 b)
+        {
+            return _mm_xor_ps(a, b);
+        }
+
+        CS_FORCEINLINE Vector4 VectorEqual(Vector4 a, Vector4 b)
+        {
+            return _mm_cmpeq_ss(a, b);
+        }
+
+        CS_FORCEINLINE Vector4 VectorLess(Vector4 a, Vector4 b)
+        {
+            return _mm_cmplt_ps(a, b);
+        }
+
+        CS_FORCEINLINE Vector4 VectorLessEqual(Vector4 a, Vector4 b)
+        {
+            return _mm_cmple_ps(a, b);
+        }
+
+        CS_FORCEINLINE Vector4 VectorNotEqual(Vector4 a, Vector4 b)
+        {
+            return _mm_cmpneq_ps(a, b);
+        }
+
+        CS_FORCEINLINE void MatrixTranspose(Vector4& a, Vector4& b, Vector4& c, Vector4& d)
+        {
+            _MM_TRANSPOSE4_PS(a, b, c, d);
+        }
+
+#define VectorSplat(a, component)_mm_shuffle_ps((a), (a), _MM_SHUFFLE((component), (component), (component), (component)))
+
+        CS_FORCEINLINE Vector4 VectorSplatX(Vector4 a)
+        {
+            return VectorSplat(a, 0);
+        }
+
+        CS_FORCEINLINE Vector4 VectorSplatY(Vector4 a)
+        {
+            return VectorSplat(a, 1);
+        }
+
+        CS_FORCEINLINE Vector4 VectorSplatZ(Vector4 a)
+        {
+            return VectorSplat(a, 2);
+        }
+
+        CS_FORCEINLINE Vector4 VectorSplatW(Vector4 a)
+        {
+            return VectorSplat(a, 3);
+        }
+
+        CS_FORCEINLINE Vector4 VectorSelect(Vector4 a, Vector4 b, Vector4 c)
+        {
+            return _mm_or_ps(_mm_andnot_ps(c, a), _mm_and_ps(c, b));
+        }
+
+        CS_FORCEINLINE bool VectorAllTrue(Vector4 a)
+        {
+            return (_mm_movemask_ps(a) == 0xf);
+        }
+
+        CS_FORCEINLINE bool VectorAnyTrue(Vector4 a)
+        {
+            return (_mm_movemask_ps(a) != 0);
+        }
+
+        CS_FORCEINLINE Vector4 VectorMergeXY(Vector4 a, Vector4 b)
+        {
+            return _mm_unpacklo_ps(a, b);
+        }
+
+        CS_FORCEINLINE Vector4 VectorMergeZW(Vector4 a, Vector4 b)
+        {
+            return _mm_unpackhi_ps(a, b);
         }
     }
 }

@@ -6,12 +6,15 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+01-Aug-2007
+      - Mike Gist added to the SIMD abstraction code. C++ and SSE done
+        so far, AltiVec to come later.
 30-Jul-2007
-        - Mike Gist fixed a few warnings.
-        - Mike Gist added preliminary SIMD abstraction and converted
-          simdtest to use it.
-        - Mike Gist fixed SIMDDespatch to work with more than one ISet.
-        - Mike Gist improved AltiVec support a little.
+      - Mike Gist fixed a few warnings.
+      - Mike Gist added preliminary SIMD abstraction and converted
+        simdtest to use it.
+      - Mike Gist fixed SIMDDespatch to work with more than one ISet.
+      - Mike Gist improved AltiVec support a little.
 29-Jul-2007
 	- res made the CEL jobber import crystalspace_staticplugins_msvc.jam
 	  from CS before generating VC projects.
