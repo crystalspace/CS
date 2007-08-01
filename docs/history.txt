@@ -9,6 +9,9 @@ chronological order.
 01-Aug-2007
       - Mike Gist added to the SIMD abstraction code. C++ and SSE done
         so far, AltiVec to come later.
+      - Mike Gist changed AltiVec checking to be decided more at compile time.
+        This reduces the code needed to choose between them, so it's
+        faster at runtime and easier for the user.
 30-Jul-2007
       - Mike Gist fixed a few warnings.
       - Mike Gist added preliminary SIMD abstraction and converted

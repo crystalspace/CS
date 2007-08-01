@@ -21,7 +21,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 class SIMDTest
 {
 public:
-static bool testSSE(float* a, float* b, float* c, int size);
-static bool testAV(float* a, float* b, float* c, int size);
+static bool testAVSSE(float* a, float* b, float* c, int size);
 static bool testCPP(float* a, float* b, float* c, int size);
 };

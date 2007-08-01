@@ -25,22 +25,20 @@ namespace CS
 {
     namespace SIMD
     {
-        struct AltiVecType
+        struct SIMDType
         {
         public:
+#ifdef CS_HAS_ALTIVEC_H
             static const int iSet = CS::Platform::ALTIVEC;
+#elif defined(CS_HAS_XMMINTRIN_H)
+            static const int iSet = CS::Platform::SSE;
+#endif
         };
 
         struct MMXType
         {
         public:
             static const int iSet = CS::Platform::MMX;
-        };
-
-        struct SSEType
-        {
-        public:
-            static const int iSet = CS::Platform::SSE;
         };
 
         struct SSE2Type
