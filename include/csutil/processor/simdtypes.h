@@ -304,17 +304,17 @@ namespace CS
                 (a.z != b.z) ? 0xffffffff : 0x0, (a.w != b.w) ? 0xffffffff : 0x0);
         }
 
-        CS_FORCEINLINE void MatrixTranspose(Vector4* a, Vector4* b, Vector4* c, Vector4* d)
+        CS_FORCEINLINE void MatrixTranspose(Vector4& a, Vector4& b, Vector4& c, Vector4& d)
         {
-            ReturnVector4 _a(a->x, b->x, c->x, d->x);
-            ReturnVector4 _b(a->y, b->y, c->y, d->y);
-            ReturnVector4 _c(a->z, b->z, c->z, d->z);
-            ReturnVector4 _d(a->w, b->w, c->w, d->w);
+            ReturnVector4 _a(a.x, b.x, c.x, d.x);
+            ReturnVector4 _b(a.y, b.y, c.y, d.y);
+            ReturnVector4 _c(a.z, b.z, c.z, d.z);
+            ReturnVector4 _d(a.w, b.w, c.w, d.w);
 
-            a = &(Vector4) _a;
-            b = &(Vector4) _b;
-            c = &(Vector4) _c;
-            d = &(Vector4) _d;
+            a = (Vector4)_a;
+            b = (Vector4)_b;
+            c = (Vector4)_c;
+            d = (Vector4)_d;
         }
 
         CS_FORCEINLINE Vector4 VectorSplat(Vector4 a, uint i)

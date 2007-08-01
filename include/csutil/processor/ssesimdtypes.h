@@ -45,26 +45,6 @@ namespace CS
             return _mm_setzero_ps();
         }
 
-        CS_FORCEINLINE float VectorGetX(Vector4 a)
-        {
-            return a.m128_f32[0];
-        }
-
-        CS_FORCEINLINE float VectorGetY(Vector4 a)
-        {
-            return a.m128_f32[1];
-        }
-
-        CS_FORCEINLINE float VectorGetZ(Vector4 a)
-        {
-            return a.m128_f32[2];
-        }
-
-        CS_FORCEINLINE float VectorGetW(Vector4 a)
-        {
-            return a.m128_f32[3];
-        }
-
         CS_FORCEINLINE Vector4 VectorLoad1(const float* f)
         {
             return _mm_load1_ps(f);
@@ -94,9 +74,38 @@ namespace CS
         {
             _mm_store1_ps(vec->m, a);
         }
+
         CS_FORCEINLINE void VectorStore(csVector3* vec, Vector4 a)
         {
             _mm_store_ps(vec->m, a);
+        }
+
+        CS_FORCEINLINE float VectorGetX(Vector4 a)
+        {
+            float temp[4];
+            VectorStore(temp, a);
+            return temp[0];
+        }
+
+        CS_FORCEINLINE float VectorGetY(Vector4 a)
+        {
+            float temp[4];
+            VectorStore(temp, a);
+            return temp[1];
+        }
+
+        CS_FORCEINLINE float VectorGetZ(Vector4 a)
+        {
+            float temp[4];
+            VectorStore(temp, a);
+            return temp[2];
+        }
+
+        CS_FORCEINLINE float VectorGetW(Vector4 a)
+        {
+            float temp[4];
+            VectorStore(temp, a);
+            return temp[3];
         }
 
         CS_FORCEINLINE Vector4 VectorAdd(Vector4 a, Vector4 b)
