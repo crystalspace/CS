@@ -70,12 +70,10 @@ namespace CS
             _mm_storeu_ps(data, a);
         }
 
-        Vector4 VectorSplatY(Vector4 a);
-
         CS_FORCEINLINE void VectorStore(csVector3* vec, Vector4 a)
         {
             _mm_store_ss(&vec->x, a);
-            _mm_store_ss(&vec->y, VectorSplatY(a));
+            _mm_store_ss(&vec->y, _mm_shuffle_ps(a, a, _MM_SHUFFLE(1, 1, 1, 1)));
             _mm_store_ss(&vec->z, _mm_unpackhi_ps(a,a));
         }
 
