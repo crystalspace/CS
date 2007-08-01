@@ -274,6 +274,14 @@ AS_IF([test -n "$cs_cv_prog_cc_msse"],
    [C++],
    [CS_HEADER_PROPERTY([CS_HAS_XMMINTRIN_H])], [])])
 
+AS_IF([test -n "$cs_cv_prog_cc_msse2"],
+[CS_CHECK_BUILD([checking for emmintrin.h],
+   [cs_cv_header_emmintrin_h],
+   [AC_LANG_PROGRAM([[#include <emmintrin.h>]], [])],
+   [CS_CREATE_TUPLE([-msse2])],
+   [C++],
+   [CS_HEADER_PROPERTY([CS_HAS_EMMINTRIN_H])], [])])
+
 AS_IF([test -n "$cs_cv_prog_cc_maltivec"],
 [CS_CHECK_BUILD([checking for altivec.h],
    [cs_cv_header_altivec_h],
