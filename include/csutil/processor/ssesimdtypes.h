@@ -37,7 +37,7 @@ namespace CS
 
         CS_FORCEINLINE Vector4 VectorSet(const float x, const float y, const float z, const float w)
         {
-            return _mm_setr_ps(x, y, z, w);
+            return _mm_set_ps(x, y, z, w);
         }
         
         CS_FORCEINLINE Vector4 VectorSetZero()
@@ -47,22 +47,41 @@ namespace CS
 
         CS_FORCEINLINE Vector4 VectorLoad(const float* data)
         {
-            return _mm_load_ps(data);
+            return _mm_loadu_ps(data);
         }
 
         CS_FORCEINLINE Vector4 VectorLoad(csVector3 vec)
         {
-            return _mm_load_ps(vec.m);
+            Vector4 x = _mm_load_ss(&vec.x); //x 0 0 0
+            Vector4 y = _mm_load_ss(&vec.y); //y 0 0 0
+            Vector4 z = _mm_load_ss(&vec.z); //z 0 0 0
+ 
+            Vector4 tmp = _mm_unpacklo_ps(x,y); //x y 0 0
+            return _mm_shuffle_ps(tmp,z, _MM_SHUFFLE(0,1,0,1)); // x y z 0
+        }
+
+        CS_FORCEINLINE Vector4 VectorLoad4(csVector3 vec)
+        {
+            return _mm_loadu_ps(vec.m);
         }
 
         CS_FORCEINLINE void VectorStore(float* data, Vector4 a)
         {
-            _mm_store_ps(data, a);
+            _mm_storeu_ps(data, a);
         }
+
+        Vector4 VectorSplatY(Vector4 a);
 
         CS_FORCEINLINE void VectorStore(csVector3* vec, Vector4 a)
         {
-            _mm_store_ps(vec->m, a);
+            _mm_store_ss(&vec->x, a);
+            _mm_store_ss(&vec->y, VectorSplatY(a));
+            _mm_store_ss(&vec->z, _mm_unpackhi_ps(a,a));
+        }
+
+        CS_FORCEINLINE void VectorStore4(csVector3* vec, Vector4 a)
+        {
+            _mm_storeu_ps(vec->m, a);
         }
 
         CS_FORCEINLINE float VectorGetX(Vector4 a)
