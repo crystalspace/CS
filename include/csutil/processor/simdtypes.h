@@ -149,7 +149,17 @@ namespace CS
 
         CS_FORCEINLINE Vector4 VectorLoad(const csVector3& vec)
         {
-            return ReturnVector4(vec.x, vec.y, vec.z, 0.0f);
+            Vector4 vec4;
+            AccessVector4 a (vec4);
+            a.fdata[0] = vec.x;
+            a.fdata[1] = vec.y;
+            a.fdata[2] = vec.z;
+            return vec4;
+        }
+
+        CS_FORCEINLINE Vector4 VectorLoad4(const csVector3& vec)
+        {
+            return VectorLoad(vec);
         }
 
         CS_FORCEINLINE void VectorStore(float* data, Vector4 a)
@@ -165,6 +175,14 @@ namespace CS
             vec->x = a.x;
             vec->y = a.y;
             vec->z = a.z;
+        }
+
+        CS_FORCEINLINE void VectorStore4(csVector3* vec, Vector4 a)
+        {
+           vec->m[0] = a.x;
+           vec->m[1] = a.y;
+           vec->m[2] = a.z;
+           vec->m[4] = a.w;
         }
 
         CS_FORCEINLINE Vector4 VectorAdd(Vector4 a, Vector4 b)
