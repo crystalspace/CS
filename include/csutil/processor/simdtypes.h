@@ -32,13 +32,10 @@ VectorGetX(Vector4)
 VectorGetY(Vector4)
 VectorGetZ(Vector4)
 VectorGetW(Vector4)
-VectorLoad1(Float[], Vector4)
-VectorLoad(Float[], Vector4)
-VectorLoad1(csVector3, Vector4)
-VectorLoad(csVector3, Vector4)
-VectorStore1(Float[], Vector4)
+VectorLoad(Float[])
+VectorLoad(csVector3)
+VectorLoad4(csVector3)
 VectorStore(Float[], Vector4)
-VectorStore1(csVector3, Vector4)
 VectorStore(csVector3, Vector4)
 VectorAdd(Vector4, Vector4)
 VectorSub(Vector4, Vector4)
@@ -102,7 +99,8 @@ namespace CS
             union
             {
                 Vector4 vec;
-                float data[4];
+                float fdata[4];
+                int udata[4];
             };
 
             CS_FORCEINLINE AccessVector4(const Vector4& vec) : vec(vec) {}
@@ -144,51 +142,24 @@ namespace CS
             return a.w;
         }
 
-        CS_FORCEINLINE void VectorLoad1(float f, Vector4* a)
+        CS_FORCEINLINE Vector4 VectorLoad(const float* data)
         {
-            a->x = f;
-            a->y = f;
-            a->z = f;
-            a->w = f;
+            return ReturnVector4(data[0], data[1], data[2], data[3]);
         }
 
-        CS_FORCEINLINE void VectorLoad(float Array[], Vector4* a)
+        CS_FORCEINLINE Vector4 VectorLoad(const csVector3& vec)
         {
-            a->x = Array[0];
-            a->y = Array[1];
-            a->z = Array[2];
-            a->w = Array[3];
+            return ReturnVector4(vec.x, vec.y, vec.z, 0.0f);
         }
 
-        CS_FORCEINLINE void VectorLoad(csVector3 vec, Vector4* a)
+        CS_FORCEINLINE void VectorStore(float* data, Vector4 a)
         {
-            a->x = vec.x;
-            a->y = vec.y;
-            a->z = vec.z;
+            data[0] = a.x;
+            data[1] = a.y;
+            data[2] = a.z;
+            data[3] = a.w;
         }
 
-        CS_FORCEINLINE void VectorStore1(float* Array, Vector4 a)
-        {
-            Array[0] = a.x;
-            Array[1] = a.x;
-            Array[2] = a.x;
-            Array[3] = a.x;
-        }
-
-        CS_FORCEINLINE void VectorStore(float* Array, Vector4 a)
-        {
-            Array[0] = a.x;
-            Array[1] = a.y;
-            Array[2] = a.z;
-            Array[3] = a.w;
-        }
-
-        CS_FORCEINLINE void VectorStore1(csVector3* vec, Vector4 a)
-        {
-            vec->x = a.x;
-            vec->y = a.x;
-            vec->z = a.x;
-        }
         CS_FORCEINLINE void VectorStore(csVector3* vec, Vector4 a)
         {
             vec->x = a.x;
@@ -198,22 +169,30 @@ namespace CS
 
         CS_FORCEINLINE Vector4 VectorAdd(Vector4 a, Vector4 b)
         {
-            return ReturnVector4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
+            return ReturnVector4(
+                 a.x + b.x, a.y + b.y,
+                 a.z + b.z, a.w + b.w);
         }
 
         CS_FORCEINLINE Vector4 VectorSub(Vector4 a, Vector4 b)
         {
-            return ReturnVector4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
+            return ReturnVector4(
+                   a.x - b.x, a.y - b.y,
+                   a.z - b.z, a.w - b.w);
         }
 
         CS_FORCEINLINE Vector4 VectorMul(Vector4 a, Vector4 b)
         {
-            return ReturnVector4(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w);
+            return ReturnVector4(
+                 a.x * b.x, a.y * b.y,
+                 a.z * b.z, a.w * b.w);
         }
 
         CS_FORCEINLINE Vector4 VectorDiv(Vector4 a, Vector4 b)
         {
-            return ReturnVector4(a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w);
+            return ReturnVector4(
+                 a.x / b.x, a.y / b.y,
+                 a.z / b.z, a.w / b.w);
         }
         CS_FORCEINLINE Vector4 VectorNeg(Vector4 a)
         {
@@ -221,7 +200,9 @@ namespace CS
         }
         CS_FORCEINLINE Vector4 VectorMultAdd(Vector4 a, Vector4 b, Vector4 c)
         {
-            return ReturnVector4(a.x * b.x + c.x, a.y * b.y + c.y, a.z * b.z + c.z, a.w * b.w + c.w);
+            return ReturnVector4(
+                 a.x * b.x + c.x, a.y * b.y + c.y,
+                 a.z * b.z + c.z, a.w * b.w + c.w);
         }
 
         CS_FORCEINLINE Vector4 VectorSqrt(Vector4 a)
@@ -236,7 +217,9 @@ namespace CS
 
         CS_FORCEINLINE Vector4 VectorRecipSqrt(Vector4 a)
         {
-            return ReturnVector4(1/sqrtf(a.x), 1/sqrtf(a.y), 1/sqrtf(a.z), 1/sqrtf(a.w));
+            return ReturnVector4(
+                 1/sqrtf(a.x), 1/sqrtf(a.y),
+                 1/sqrtf(a.z), 1/sqrtf(a.w));
         }
 
         CS_FORCEINLINE Vector4 VectorMin(Vector4 a, Vector4 b)
@@ -259,49 +242,81 @@ namespace CS
 
         CS_FORCEINLINE Vector4 VectorAND(Vector4 a, Vector4 b)
         {
-            return ReturnVector4((uint)a.x & (uint)b.x, (uint)a.y & (uint)b.y,
-                (uint)a.z & (uint)b.z, (uint)a.w & (uint)b.w);
+            AccessVector4 _a (a);
+            AccessVector4 _b (b);
+            return ReturnVector4(
+                _a.udata[0] & _b.udata[0],
+                _a.udata[1] & _b.udata[1],
+                _a.udata[2] & _b.udata[2],
+                _a.udata[3] & _b.udata[3]);
         }
 
         CS_FORCEINLINE Vector4 VectorOR(Vector4 a, Vector4 b)
         {
-            return ReturnVector4((uint)a.x | (uint)b.x, (uint)a.y | (uint)b.y,
-                (uint)a.z | (uint)b.z, (uint)a.w | (uint)b.w);
+            AccessVector4 _a (a);
+            AccessVector4 _b (b);
+            return ReturnVector4(
+                _a.udata[0] | _b.udata[0],
+                _a.udata[1] | _b.udata[1],
+                _a.udata[2] | _b.udata[2],
+                _a.udata[3] | _b.udata[3]);
         }
 
         CS_FORCEINLINE Vector4 VectorNOT(Vector4 a)
         {
-            return ReturnVector4(~(uint)a.x, ~(uint)a.y, ~(uint)a.z, ~(uint)a.w);
+            AccessVector4 _a (a);
+            return ReturnVector4(
+               ~_a.udata[0],
+               ~_a.udata[1],
+               ~_a.udata[2],
+               ~_a.udata[3]);
         }
 
         CS_FORCEINLINE Vector4 VectorXOR(Vector4 a, Vector4 b)
         {
-            return ReturnVector4((uint)a.x ^ (uint)b.x, (uint)a.y ^ (uint)b.y,
-                (uint)a.z ^ (uint)b.z, (uint)a.w ^ (uint)b.w);
+            AccessVector4 _a (a);
+            AccessVector4 _b (b);
+            return ReturnVector4(
+                _a.udata[0] ^ _b.udata[0],
+                _a.udata[1] ^ _b.udata[1],
+                _a.udata[2] ^ _b.udata[2],
+                _a.udata[3] ^ _b.udata[3]);
         }
 
         CS_FORCEINLINE Vector4 VectorEqual(Vector4 a, Vector4 b)
         {
-            return ReturnVector4((a.x == b.x) ? 0xffffffff : 0x0, (a.y == b.y) ? 0xffffffff : 0x0, 
-                (a.z == b.z) ? 0xffffffff : 0x0, (a.w == b.w) ? 0xffffffff : 0x0);
+            return ReturnVector4(
+                (a.x == b.x) ? 0xffffffff : 0x0,
+                (a.y == b.y) ? 0xffffffff : 0x0, 
+                (a.z == b.z) ? 0xffffffff : 0x0,
+                (a.w == b.w) ? 0xffffffff : 0x0);
         }
 
         CS_FORCEINLINE Vector4 VectorLess(Vector4 a, Vector4 b)
         {
-            return ReturnVector4((a.x < b.x) ? 0xffffffff : 0x0, (a.y < b.y) ? 0xffffffff : 0x0, 
-                (a.z < b.z) ? 0xffffffff : 0x0, (a.w < b.w) ? 0xffffffff : 0x0);
+            return ReturnVector4(
+                (a.x < b.x) ? 0xffffffff : 0x0,
+                (a.y < b.y) ? 0xffffffff : 0x0, 
+                (a.z < b.z) ? 0xffffffff : 0x0,
+                (a.w < b.w) ? 0xffffffff : 0x0);
         }
 
         CS_FORCEINLINE Vector4 VectorLessEqual(Vector4 a, Vector4 b)
         {
-            return ReturnVector4((a.x <= b.x) ? 0xffffffff : 0x0, (a.y <= b.y) ? 0xffffffff : 0x0, 
-                (a.z <= b.z) ? 0xffffffff : 0x0, (a.w <= b.w) ? 0xffffffff : 0x0);
+            return ReturnVector4(
+                (a.x <= b.x) ? 0xffffffff : 0x0,
+                (a.y <= b.y) ? 0xffffffff : 0x0, 
+                (a.z <= b.z) ? 0xffffffff : 0x0,
+                (a.w <= b.w) ? 0xffffffff : 0x0);
         }
 
         CS_FORCEINLINE Vector4 VectorNotEqual(Vector4 a, Vector4 b)
         {
-            return ReturnVector4((a.x != b.x) ? 0xffffffff : 0x0, (a.y != b.y) ? 0xffffffff : 0x0, 
-                (a.z != b.z) ? 0xffffffff : 0x0, (a.w != b.w) ? 0xffffffff : 0x0);
+            return ReturnVector4(
+                (a.x != b.x) ? 0xffffffff : 0x0,
+                (a.y != b.y) ? 0xffffffff : 0x0, 
+                (a.z != b.z) ? 0xffffffff : 0x0,
+                (a.w != b.w) ? 0xffffffff : 0x0);
         }
 
         CS_FORCEINLINE void MatrixTranspose(Vector4& a, Vector4& b, Vector4& c, Vector4& d)
@@ -321,8 +336,8 @@ namespace CS
         {
 	        AccessVector4 a_ (a);
 	        return ReturnVector4(
-                a_.data[i], a_.data[i],
-                a_.data[i], a_.data[i]);
+                a_.fdata[i], a_.fdata[i],
+                a_.fdata[i], a_.fdata[i]);
         }
 
         CS_FORCEINLINE Vector4 VectorSplatX(Vector4 a)
@@ -347,11 +362,14 @@ namespace CS
 
         CS_FORCEINLINE Vector4 VectorSelect(Vector4 a, Vector4 b, Vector4 c)
         {
+            AccessVector4 _a (a);
+            AccessVector4 _b (b);
+            AccessVector4 _c (c);
             return ReturnVector4(
-                ((uint)a.x & ~(uint)c.x) | ((uint)b.x & (uint)c.x),
-                ((uint)a.y & ~(uint)c.y) | ((uint)b.y & (uint)c.y),
-                ((uint)a.z & ~(uint)c.z) | ((uint)b.z & (uint)c.z),
-                ((uint)a.w & ~(uint)c.w) | ((uint)b.w & (uint)c.w));
+                (_a.udata[0] & ~_c.udata[0]) | (_b.udata[0] & _c.udata[0]),
+                (_a.udata[1] & ~_c.udata[1]) | (_b.udata[1] & _c.udata[1]),
+                (_a.udata[2] & ~_c.udata[2]) | (_b.udata[2] & _c.udata[2]),
+                (_a.udata[3] & ~_c.udata[3]) | (_b.udata[3] & _c.udata[3]));
         }
 
         CS_FORCEINLINE bool VectorAllTrue(Vector4 a)
@@ -361,7 +379,7 @@ namespace CS
 
         CS_FORCEINLINE bool VectorAnyTrue(Vector4 a)
         {
-            return (a.x == 0 || a.y == 0 || a.z == 0 || a.w == 0);
+            return (a.x != 0 || a.y != 0 || a.z != 0 || a.w != 0);
         }
 
         CS_FORCEINLINE Vector4 VectorMergeXY(Vector4 a, Vector4 b)

@@ -45,11 +45,6 @@ namespace CS
             return _mm_setzero_ps();
         }
 
-        CS_FORCEINLINE Vector4 VectorLoad1(const float* f)
-        {
-            return _mm_load1_ps(f);
-        }
-
         CS_FORCEINLINE Vector4 VectorLoad(const float* data)
         {
             return _mm_load_ps(data);
@@ -60,19 +55,9 @@ namespace CS
             return _mm_load_ps(vec.m);
         }
 
-        CS_FORCEINLINE void VectorStore1(float* data, Vector4 a)
-        {
-            _mm_store1_ps(data, a);
-        }
-
         CS_FORCEINLINE void VectorStore(float* data, Vector4 a)
         {
             _mm_store_ps(data, a);
-        }
-
-        CS_FORCEINLINE void VectorStore1(csVector3* vec, Vector4 a)
-        {
-            _mm_store1_ps(vec->m, a);
         }
 
         CS_FORCEINLINE void VectorStore(csVector3* vec, Vector4 a)
