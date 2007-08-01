@@ -34,7 +34,7 @@
 /// Maintenance release / RC
 #define CS_VERSION_BUILD CS_VER_QUOTE(2)
 /// Date of release
-#define CS_RELEASE_DATE  CS_VER_QUOTE(Mon 18-Jul-2007)
+#define CS_RELEASE_DATE  CS_VER_QUOTE(Mon 1-Aug-2007)
 
 #define CS_VER_QUOTE(X) #X
 
