@@ -1,5 +1,7 @@
 1.2 branch log.
 
+1-Aug-2007
+	- Jorrit merged r27356 into 1.2 (gmeshanim2 fix).
 24-Jul-2007
 	- Jorrit merged r27290:27292 into 1.2 (MacOS/X warning fixes).
 	- Jorrit merged r27297:27303 into 1.2 (warnings, OpenGL, MacOS/X).
