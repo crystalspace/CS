@@ -99,7 +99,7 @@ csGenmeshSkelAnimationControl::csGenmeshSkelAnimationControl (
 
 csGenmeshSkelAnimationControl::~csGenmeshSkelAnimationControl ()
 {
-  if (skeleton && factory)
+  if (skeleton && factory && factory->gr)
   {
     factory->gr->RemoveSkeleton (skeleton);
   }
@@ -298,6 +298,7 @@ csGenmeshSkelAnimationControlFactory::csGenmeshSkelAnimationControlFactory (
   flags.SetAll(0);
   skeleton_factory = 0;
   use_parent = false;
+  gr = 0;
 }
 
 csGenmeshSkelAnimationControlFactory::~csGenmeshSkelAnimationControlFactory ()
