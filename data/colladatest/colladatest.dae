@@ -3,13 +3,13 @@
 	<asset>
 		<contributor>
 			<author>Illusoft Collada 1.4.0 plugin for Blender - http://colladablender.illusoft.com</author>
-			<authoring_tool>Blender v:243 - Illusoft Collada Exporter v:0.3.146</authoring_tool>
+			<authoring_tool>Blender v:244 - Illusoft Collada Exporter v:0.3.153</authoring_tool>
 			<comments></comments>
 			<copyright></copyright>
-			<source_data>file://E:/Source/eridanus/data/blend/command-snaptogrid.blend</source_data>
+			<source_data>file://&lt;memory&gt;</source_data>
 		</contributor>
-		<created>2007-05-25T15:35:05.234000</created>
-		<modified>2007-05-25T15:35:05.234000</modified>
+		<created>2007-08-02T20:30:28.804000</created>
+		<modified>2007-08-02T20:30:28.804000</modified>
 		<unit meter="0.01" name="centimeter"/>
 		<up_axis>Z_UP</up_axis>
 	</asset>
@@ -27,7 +27,7 @@
 		</camera>
 	</library_cameras>
 	<library_effects>
-		<effect>
+		<effect id="Material-fx" name="Material-fx">
 			<profile_COMMON>
 				<technique sid="blender">
 					<phong>
@@ -50,7 +50,7 @@
 							<color>1.00000 1.00000 1.00000 1</color>
 						</reflective>
 						<reflectivity>
-							<float>0.8</float>
+							<float>0.0</float>
 						</reflectivity>
 						<transparent>
 							<color>1 1 1 1</color>
@@ -68,7 +68,7 @@
 			<technique_common>
 				<point>
 					<color>1.00000 1.00000 1.00000</color>
-					<constant_attenuation>0.0</constant_attenuation>
+					<constant_attenuation>1.0</constant_attenuation>
 					<linear_attenuation>0.0</linear_attenuation>
 					<quadratic_attenuation>0.0</quadratic_attenuation>
 				</point>
@@ -77,7 +77,7 @@
 	</library_lights>
 	<library_materials>
 		<material id="Material" name="Material">
-			<instance_effect url="#"/>
+			<instance_effect url="#Material-fx"/>
 		</material>
 	</library_materials>
 	<library_geometries>
@@ -106,16 +106,11 @@
 				<vertices id="Cube-Geometry-Vertex">
 					<input semantic="POSITION" source="#Cube-Geometry-Position"/>
 				</vertices>
-				<polygons count="6" material="Material">
+				<triangles count="12" material="Material">
 					<input offset="0" semantic="VERTEX" source="#Cube-Geometry-Vertex"/>
 					<input offset="1" semantic="NORMAL" source="#Cube-Geometry-Normals"/>
-					<p>0 0 1 0 2 0 3 0</p>
-					<p>4 1 7 1 6 1 5 1</p>
-					<p>0 2 4 2 5 2 1 2</p>
-					<p>1 3 5 3 6 3 2 3</p>
-					<p>2 4 6 4 7 4 3 4</p>
-					<p>4 5 0 5 3 5 7 5</p>
-				</polygons>
+					<p>0 0 1 0 2 0 2 0 3 0 0 0 4 1 7 1 6 1 6 1 5 1 4 1 0 2 4 2 5 2 5 2 1 2 0 2 1 3 5 3 6 3 6 3 2 3 1 3 2 4 6 4 7 4 7 4 3 4 2 4 4 5 0 5 3 5 3 5 7 5 4 5</p>
+				</triangles>
 			</mesh>
 		</geometry>
 	</library_geometries>

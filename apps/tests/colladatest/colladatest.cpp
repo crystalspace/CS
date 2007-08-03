@@ -83,7 +83,7 @@ bool ColladaTest::OnInitialize(int argc, char* argv[])
 	colladaConv->SetOutputFiletype(CS_LIBRARY_FILE);
 	colladaConv->Convert();
 	//colladaConv->Load(path.c_str(), CS_MAP_FILE);
-	colladaConv->Write("/lev/colladatest/test.xml");
+	colladaConv->Write(CSTESTFILE);
 	
 	/*
 	csRef<iDocument> crystalFile = colladaConv->GetCrystalDocument();

@@ -43,18 +43,21 @@ CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
  * between files in	the	COLLADA	digital	interchange	format,	and	Crystal	Space	Library	and/or
  * map files.
  *
- * \remarks	This class requires	writeable	XML	documents, and thus	utilizes the TinyXML plugin.
- *					The	TinyXML	plugin will	be loaded	on initialization	of this	plugin.
+ * \remarks	This class requires	writeable XML documents, and thus utilizes the TinyXML plugin.
+ *		    The	TinyXML	plugin will	be loaded on initialization	of this	plugin.
  */
 
 class	csColladaConvertor : public	scfImplementation2<csColladaConvertor,iColladaConvertor,iComponent>
 {
 	friend class csColladaAccessor;
 	friend class csColladaMesh;
+	friend class csColladaEffect;
+	friend class csColladaEffectProfile;
+	friend class csColladaMaterial;
 
 	private:
 		
-		// =============== Conversion System	Attributes ===============
+		// =============== Conversion System Attributes ===============
 
 		///	A	smart	pointer	to the document	system
 		iDocumentSystem* docSys;
@@ -67,6 +70,12 @@ class	csColladaConvertor : public	scfImplementation2<csColladaConvertor,iCollada
 
 		///	A	pointer	to the object	registry
 		iObjectRegistry* obj_reg;
+
+		/// A list of COLLADA effects
+		csArray<csColladaEffect> effectsList;
+		
+		/// The last used effect id for GenerateEffectID()
+		int lastEffectId; 
 
 
 		// =============== Crystal Space Attributes	===============
@@ -83,7 +92,7 @@ class	csColladaConvertor : public	scfImplementation2<csColladaConvertor,iCollada
 		///	The	output file	type.	 Initially,	this is	set	to CS_FILE_NONE.
 		csColladaFileType	outputFileType;
 
-		// =============== COLLADA Attributes	===============
+		// =============== COLLADA Attributes ===============
 
 		///	A	smart	pointer	to the COLLADA document	we will	be working from	in memory
 		csRef<iDocument> colladaFile;
@@ -93,6 +102,9 @@ class	csColladaConvertor : public	scfImplementation2<csColladaConvertor,iCollada
 
 		///	A	smart	pointer	to the <COLLADA> element
 		csRef<iDocumentNode> colladaElement;
+
+		/// An array of materials referenced in the COLLADA document
+		csArray<csColladaMaterial> materialsList;
 
 		// =============== Basic Utility Functions ===============
 	public:
@@ -148,6 +160,14 @@ class	csColladaConvertor : public	scfImplementation2<csColladaConvertor,iCollada
 
 		csRef<iDocument> GetCrystalDocument() { return csFile; }
 		csRef<iDocument> GetColladaDocument() { return colladaFile; }
+
+		/** Get the index of the specified effect in the effects list
+		 */
+		size_t GetEffectIndex(const csColladaEffect& effect);
+
+		/** Get the effect at a particular index in the effects list
+		 */
+		csColladaEffect& GetEffect(size_t index);
 	
 	private:
 
@@ -184,16 +204,17 @@ class	csColladaConvertor : public	scfImplementation2<csColladaConvertor,iCollada
 		virtual	const	char*	Load(iString *str);	
 		virtual	const	char*	Load(iFile *file);
 		virtual	const	char*	Load(iDataBuffer *db);
-	  virtual	const	char*	Write(const	char*	filepath);
+		virtual	const	char*	Write(const	char*	filepath);
 		
 		// =============== Conversion	Functions	===============
 
 		virtual	const	char*	Convert();
 		virtual	bool ConvertGeometry(iDocumentNode *geometrySection);
+		virtual	bool ConvertEffects(iDocumentNode *effectsSection);
 		virtual	bool ConvertMaterials(iDocumentNode *materialsSection);
-		virtual	bool ConvertTextureShading(iDocumentNode *textureSection);
 		virtual	bool ConvertRiggingAnimation(iDocumentNode *riggingSection);
 		virtual	bool ConvertPhysics(iDocumentNode	*physicsSection);
+		virtual bool ConvertScene(iDocumentNode *camerasSection, iDocumentNode *lightsSection, iDocumentNode *nodesSection, iDocumentNode *visualScenesSection);
 
 }; /* End of class csColladaConvertor */
 

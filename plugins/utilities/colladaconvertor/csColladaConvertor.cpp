@@ -88,6 +88,7 @@ void csColladaConvertor::CheckColladaFilenameValidity(const char* str)
 
 const char* csColladaConvertor::CheckColladaValidity(iFile *file)
 {
+	Report(CS_REPORTER_SEVERITY_WARNING, "Warning: The function CheckColladaValidity(iFile* file) has not yet been implemented.");
 	return 0;
 }
 
@@ -99,7 +100,8 @@ csColladaConvertor::csColladaConvertor(iBase*	parent)	:
 	colladaReady(false),
 	csReady(false),
 	outputFileType(CS_NO_FILE),
-	warningsOn(false)
+	warningsOn(false),
+	lastEffectId(-1)
 {
 }
 
@@ -110,6 +112,7 @@ csColladaConvertor::~csColladaConvertor()
 	csFile.Invalidate();
 	csTopNode.Invalidate();
 	delete docSys;
+	materialsList.DeleteAll();
 }
 
 // =============== Plugin Initialization ===============
@@ -259,7 +262,19 @@ const char* csColladaConvertor::Write(const char* filepath)
 	return 0;
 }
 
+// =============== Accessor Functions =============== 
+csColladaEffect& csColladaConvertor::GetEffect(size_t index)
+{
+	return effectsList.Get(index);
+}
+
+size_t csColladaConvertor::GetEffectIndex(const csColladaEffect& effect)
+{
+	return 0;
+}
+
 // =============== Mutator Functions ===============
+
 const char* csColladaConvertor::SetOutputFiletype(csColladaFileType filetype)
 {
 	if (filetype == CS_NO_FILE)
@@ -360,11 +375,22 @@ const char*	csColladaConvertor::Convert()
 	csRef<iDocumentNode> geoNode = colladaElement->GetNode("library_geometries");
 	if (!geoNode.IsValid())
 	{
-		Report(CS_REPORTER_SEVERITY_ERROR, "Error: Unable to find geometry section.");
-		return "Unable to find geometry section";
+		Report(CS_REPORTER_SEVERITY_ERROR, "Error: Unable to find <library_geometries> element.");
+		return "Unable to find library_geometries.";
 	}
 
 	ConvertGeometry(geoNode);
+
+	csRef<iDocumentNode> materialsNode = colladaElement->GetNode("library_materials");
+	if (!materialsNode.IsValid())
+	{
+		Report(CS_REPORTER_SEVERITY_ERROR, "Error: Unable to find <library_materials> element");
+		return "Unable to find library_materials.";
+	}
+
+	ConvertMaterials(materialsNode);
+
+
 
 	return 0;
 }
@@ -395,7 +421,7 @@ bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
 	csRef<iDocumentNode> currentVerticesElement;
 	csRef<iDocumentNodeIterator> convexMeshIterator;
 	//iString *idValue;
-	csArray<float> vertexArray;
+	csArray<csVector3> vertexArray;
 	//int *normalArray;
 	//iStringArray *accessorArray;
 	int vertexArraySize = 0;
@@ -468,7 +494,7 @@ bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
 			// Adding vertices to CS document
 			vertexArray = mesh->GetVertices();
 						
-			vertexArraySize = mesh->GetNumVertexElements();
+			vertexArraySize = mesh->GetNumberOfVertices();
 
 			if (warningsOn && vertexArraySize > 0)
 			{
@@ -524,22 +550,23 @@ bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
 			{
 				if (warningsOn)
 				{
-					Report(CS_REPORTER_SEVERITY_NOTIFY, "Adding the following vertex: %f, %f, %f", vertexArray[counter], vertexArray[counter+1], vertexArray[counter+2]);
+					Report(CS_REPORTER_SEVERITY_NOTIFY, "Current values: counter = %d, vertexArraySize = %d", counter, vertexArraySize);
+					Report(CS_REPORTER_SEVERITY_NOTIFY, "Adding the following vertex: %f, %f, %f", vertexArray[counter].x, vertexArray[counter].y, vertexArray[counter].z);
 				}
 			
 				/* WRITE OUT VERTICES */
 				scfString formatter;
 				currentCrystalVElement = currentCrystalParamsElement->CreateNodeBefore(CS_NODE_ELEMENT, 0);
 				currentCrystalVElement->SetValue("v");
-				formatter.Format("%f", vertexArray[counter]);
+				formatter.Format("%f", vertexArray[counter].x);
 				currentCrystalVElement->SetAttribute(accessorArray->Get(0), formatter.GetData());
-				formatter.Format("%f", vertexArray[counter+1]);
+				formatter.Format("%f", vertexArray[counter].y);
 				currentCrystalVElement->SetAttribute(accessorArray->Get(1), formatter.GetData());
-				formatter.Format("%f", vertexArray[counter+2]);
+				formatter.Format("%f", vertexArray[counter].z);
 				currentCrystalVElement->SetAttribute(accessorArray->Get(2), formatter.GetData());
 				/* DONE WRITING OUT VERTICES */
 
-				counter = counter + 3;
+				counter++;
 			}
 
 			if (warningsOn)
@@ -618,13 +645,79 @@ csRef<iDocumentNode> csColladaConvertor::GetSourceElement(const char* name, iDoc
 	return returnValue;
 }
 
-bool csColladaConvertor::ConvertMaterials(iDocumentNode *materialsSection)
+bool csColladaConvertor::ConvertEffects(iDocumentNode *effectsSection)
 {
+	Report(CS_REPORTER_SEVERITY_WARNING, "Warning: ConvertEffects() functionality not fully implemented.  Use at your own risk!");
+
+	csRef<iDocumentNodeIterator> effectsToProcess = effectsSection->GetNodes("effect");
+	csRef<iDocumentNode> currentEffect;
+
+	csColladaEffect* currentEffectObject;
+
+	while (effectsToProcess->HasNext())
+	{
+		currentEffect = effectsToProcess->Next();
+		currentEffectObject = new csColladaEffect(currentEffect, this);
+	}
+
 	return true;
 }
 
-bool csColladaConvertor::ConvertTextureShading(iDocumentNode *textureSection)
+bool csColladaConvertor::ConvertMaterials(iDocumentNode *materialsSection)
 {
+	Report(CS_REPORTER_SEVERITY_WARNING, "Warning: ConvertMaterials() functionality not fully implemented.  Use at your own risk!");
+
+	// get an iterator over all the <material> elements
+	csRef<iDocumentNodeIterator> materialsElements = materialsSection->GetNodes("material");
+	csRef<iDocumentNode> nextMaterialElement;
+	csColladaMaterial* nextMaterial;
+	csRef<iDocumentNode> effectNode;
+	csRef<iDocumentNode> libraryEffects = colladaElement->GetNode("library_effects");
+	csRef<iDocumentNodeIterator> effectIter;
+
+	while (materialsElements->HasNext())
+	{
+		nextMaterialElement = materialsElements->Next();
+		nextMaterial = new csColladaMaterial(this);
+		nextMaterial->SetID(nextMaterialElement->GetAttributeValue("id"));
+
+		scfString url = nextMaterialElement->GetNode("instance_effect")->GetAttributeValue("url");
+		
+		// chop off the '#'
+		if (url.GetAt(0) == '#')
+		{
+			url.DeleteAt(0, 1);
+		}
+
+		// now, find the same effect in the <library_effects> list
+		effectIter = libraryEffects->GetNodes("effect");
+		while (effectIter->HasNext())
+		{
+			effectNode = effectIter->Next();
+			scfString newUrl = effectNode->GetAttributeValue("id");
+			if (newUrl.Compare(url))
+			{
+				break;
+			}
+		}
+
+		nextMaterial->SetInstanceEffect(effectNode);
+		materialsList.Push(*nextMaterial);
+
+	}
+
+	return true;
+}
+
+
+bool csColladaConvertor::ConvertScene(iDocumentNode *camerasSection, iDocumentNode *lightsSection, iDocumentNode *nodesSection, iDocumentNode *visualScenesSection)
+{
+	if (outputFileType != CS_MAP_FILE)
+	{
+		Report(CS_REPORTER_SEVERITY_WARNING, "Warning: Conversion of scenes is invalid except for Crystal Space map files.  Continuing blithely...");
+		return false;
+	}
+
 	return true;
 }
 

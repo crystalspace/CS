@@ -53,6 +53,18 @@ enum csColladaNumericType {
 	CS_COLLADA_FLOAT
 };
 
+enum csColladaEffectProfileType {
+	/// The common profile
+	CS_COLLADA_PROFILE_COMMON = 1,
+
+	/// nVidia's cg shading language
+	CS_COLLADA_PROFILE_CG,
+
+	/// OpenGL's GL Shading Language (GLSL)
+	CS_COLLADA_PROFILE_GLSL
+
+};
+
 /**
  * Representation of a convertor from COLLADA files to Crystal Space files.
  *
@@ -181,20 +193,74 @@ struct iColladaConvertor : public virtual iBase
 	virtual const char* Convert() = 0;
 	
 	/**
-	 * Converts the geometry section of the COLLADA file
+	 * \brief Converts the geometry section of the COLLADA file
+	 * 
+	 * This converts the <mesh> elements of a COLLADA file to Crystal Space
+	 * format.  The function will update the internal Crystal Space document,
+	 * which can then be used to write out to a file.
+	 *
+	 * @param geometrySection A pointer to the <library_geometries> element,
+	 *        in the COLLADA document.
 	 */
 	virtual bool ConvertGeometry(iDocumentNode *geometrySection) = 0;
 	
 	/**
-	 * Converts the lighting section of the COLLADA file
+	 * \brief Converts the effects (COLLADA FX) section of the COLLADA file
+	 * 
+	 * This converts the COLLADA FX portion of the COLLADA file to Crystal
+	 * Space format.  Specifically, it converts all <effect> elements to 
+	 * Crystal Space materials and shaders.  Currently, only <profile_COMMON>
+	 * is supported, but support for <profile_GLSL> and <profile_CG> are coming.
+	 *
+	 * @param effectsSection A pointer to the <library_effects> element,
+	 *        in the COLLADA document.
+	 *
+	 * @returns true on success, false otherwise
+	 */
+	virtual bool ConvertEffects(iDocumentNode *effectsSection) = 0;
+	
+	/**
+	 * Converts the materials section of the COLLADA file.
+	 * 
+	 * This converts the <library_materials> section of the COLLADA file to
+	 * Crystal Space format.  Note that it depends on the FX section already
+	 * having been converted to work properly.
+	 *
+	 * @param materialsSection A pointer to the iDocumentNode representing the 
+	 *        <library_materials> element of the COLLADA document.
+	 *
+	 * @returns true on success, false otherwise
+	 *
+	 * @sa ConvertEffects(iDocumentNode *effectsSection)
 	 */
 	virtual bool ConvertMaterials(iDocumentNode *materialsSection) = 0;
 	
 	/**
-	 * Converts the textures and shading sections of the COLLADA file
+	 * Converts the scene section of the COLLADA file.
+	 * 
+	 * This function converts the <library_cameras>, <library_lights>, <library_nodes>,
+	 * and <library_visual_scenes> sections of the COLLADA document.  Note that
+	 * unlike the other conversion functions, this function requires multiple 
+	 * arguments to be passed for conversion - one for each of these library elements.
+	 *
+	 * @param camerasSection A pointer to the iDocumentNode representing the 
+	 *        <library_cameras> element of the COLLADA document.
+	 *
+	 * @param lightsSection A pointer to the iDocumentNode representing the 
+	 *        <library_lights> element of the COLLADA document.
+	 *
+	 * @param nodesSection A pointer to the iDocumentNode representing the 
+	 *        <library_nodes> element of the COLLADA document.
+	 *
+	 * @param visualScenesSection A pointer to the iDocumentNode representing the 
+	 *        <library_visual_scenes> element of the COLLADA document.
+	 *
+	 * @returns true on success, false otherwise
+	 *
+	 * @sa ConvertEffects(iDocumentNode *effectsSection)
 	 */
-	virtual bool ConvertTextureShading(iDocumentNode *textureSection) = 0;
-	
+	virtual bool ConvertScene(iDocumentNode *camerasSection, iDocumentNode *lightsSection, iDocumentNode *nodesSection, iDocumentNode *visualScenesSection) = 0;
+
 	/**
 	 * Converts the rigging and animation sections of the COLLADA file
 	 */
@@ -206,12 +272,17 @@ struct iColladaConvertor : public virtual iBase
 	virtual bool ConvertPhysics(iDocumentNode *physicsSection) = 0;
 
 	/**
-	 * Turn debugging warnings on or off.  This will turn on all possible debug information for the 
-	 * plugin.  It also will check to verify that files and data structures conform to specified standards.
-	 *
-	 * \param toggle If true, turns on debug warnings.
+	 * Turn debugging warnings on or off.  
 	 * 
-	 * \notes Debug warnings are off by default.
+	 * This will turn on all possible debug information for the plugin.  
+	 * It also will check to verify that files and data structures conform 
+	 * to specified standards.
+	 *
+	 * @param toggle If true, turns on debug warnings.
+	 * 
+	 * @notes Debug warnings are off by default.  There is a lot of information
+	 *        given by turning debugging warnings on.  It is suggested that it
+	 *        it remains off unless there appears to be a problem with the plugin.
 	 */
 	virtual void SetWarnings(bool toggle=false) = 0;
 

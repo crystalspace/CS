@@ -24,8 +24,8 @@
 #include "crystalspace.h"
 
 #define TESTDIR "E:$/Source$/CS-COLLADA$/data$/colladatest$/"
-#define COLLADATESTFILE "triangletest.dae"
-#define CSTESTFILE "colladatest.csworld"
+#define COLLADATESTFILE "colladatest.dae"
+#define CSTESTFILE "/lev/colladatest/colladatest.cslib"
 
 class ColladaTest : public csApplicationFramework, public csBaseEventHandler {
 	private:
