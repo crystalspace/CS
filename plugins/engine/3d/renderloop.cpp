@@ -69,10 +69,7 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s, iMeshWrapper* mesh)
 
     // Needed so halos are correctly recognized as "visible".
     csRef<iClipper2D> oldClipper = rview->GetGraphics3D()->GetClipper();
-    int oldClipType = rview->GetGraphics3D()->GetClipType();
-
-    csShaderVariableStack& varStack = shadermanager->GetShaderVariableStack ();
-    varStack.Setup (shadermanager->GetSVNameStringset ()->GetSize ());
+    int oldClipType = rview->GetGraphics3D()->GetClipType();    
 
     s->IncRecLevel ();
     s->PrepareDraw (rview);
@@ -82,7 +79,7 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s, iMeshWrapper* mesh)
     size_t i;
     for (i = 0; i < steps.GetSize (); i++)
     {
-      steps[i]->Perform (rview, s, varStack);
+      steps[i]->Perform (rview, s, shadermanager->GetShaderVariableStack ());
     }
     s->DecRecLevel ();
     cs->SetSingleMesh (0);
@@ -94,9 +91,7 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s, iMeshWrapper* mesh)
     for (i = lights->GetCount (); i-- > 0;)
       // Tell the engine to try to add this light into the halo queue
       engine->AddHalo (rview->GetCamera(), 
-        ((csLight*)lights->Get ((int)i))->GetPrivateObject ());
-
-    varStack.Setup (0);
+        ((csLight*)lights->Get ((int)i))->GetPrivateObject ());    
   }
 }
 

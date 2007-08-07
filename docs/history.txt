@@ -11,6 +11,7 @@ chronological order.
 	- Marten changed csBlockAllocator::Empty() to mimic csArray::Empty()
 	  and not deallocate the memory. Added a csBlockAllocator::DeleteAll()
 	  which does what Emtpy does and deallocates all memory.
+	- Marten fixed rendering through old pipeline with portals.
 31-Jul-2007
 	- Marten made the RM stuff compile on gcc.
 29-Jul-2007

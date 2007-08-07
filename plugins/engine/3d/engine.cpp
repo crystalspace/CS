@@ -1505,9 +1505,14 @@ void csEngine::Draw (iCamera *c, iClipper2D *view, iMeshWrapper* mesh)
   iSector *s = c->GetSector ();
   if (s) 
   {
+    csShaderVariableStack& varStack = shaderManager->GetShaderVariableStack ();
+    varStack.Setup (shaderManager->GetSVNameStringset ()->GetSize ());
+
     iRenderLoop* rl = s->GetRenderLoop ();
     if (!rl) rl = defaultRenderLoop;
     rl->Draw (rview, s, mesh);
+
+    varStack.Setup (0);
   }
 
   // draw all halos on the screen
