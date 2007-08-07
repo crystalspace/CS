@@ -504,8 +504,11 @@ public:
 
   virtual uint GetCurrentFrameNumber () const
   { return currentFrameNumber; }
-  virtual void IncrementCurrentFrameNumber ()
-  { currentFrameNumber++; }
+  virtual void UpdateNewFrame ()
+  { 
+    currentFrameNumber++; 
+    ControlMeshes ();
+  }
 
   //-- Saving/loading
 

@@ -18,6 +18,8 @@
 
 #include "crystalspace.h"
 
+#include "csutil/compositefunctor.h"
+
 #include "rm_test1.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -39,64 +41,63 @@ bool RMTest1::RenderView (iView* view)
   csRef<CS::RenderManager::RenderView> rview;
   rview.AttachNew (new(renderViewPool) CS::RenderManager::RenderView(view));
 
-  view->GetEngine ()->IncrementCurrentFrameNumber ();
+  view->GetEngine ()->UpdateNewFrame ();
 
   iSector* startSector = rview->GetThisSector ();
 
   // Pre-setup culling graph
   RenderTreeType renderTree (treePersistent);
-  renderTree.PrepareViscull (rview);
+  RenderTreeType::ContextNode* mainContext = renderTree.PrepareViscull (rview);
 
   // Do the culling
   iVisibilityCuller* culler = startSector->GetVisibilityCuller ();
-  renderTree.Viscull (rview, culler);
-
-  // Finalize the tree
-  renderTree.FinishViscull ();
+  renderTree.Viscull (mainContext, rview, culler);
 
 
   // Sort the mesh lists  
   {
     StandardMeshSorter<RenderTreeType> mySorter (view->GetEngine (), view->GetCamera ());
-    renderTree.TraverseMeshNodes (mySorter);
+    renderTree.TraverseMeshNodes (mySorter, mainContext);
   }
 
   // Setup the SV arrays
-  SVArrayHolder svArrays (svNameStringSet->GetSize (), renderTree.GetTotalRenderMeshes ());
+  //SVArrayHolder svArrays (svNameStringSet->GetSize (), renderTree.GetTotalRenderMeshes ());
+  mainContext->svArrays.Setup (svNameStringSet->GetSize (), mainContext->totalRenderMeshes);
+  SVArrayHolder& svArrays = mainContext->svArrays;
 
   // Push the default stuff
   csShaderVariableStack& svStack = shaderManager->GetShaderVariableStack ();
-  svArrays.SetupSVStck (svStack, 0);
+  {
+    svArrays.SetupSVStck (svStack, 0);
 
-  shaderManager->PushVariables (svStack);
-  startSector->GetSVContext ()->PushVariables (svStack);
+    shaderManager->PushVariables (svStack);
+    startSector->GetSVContext ()->PushVariables (svStack);
 
-  // Replicate
-  svArrays.ReplicateSet (0, 1);
+    // Replicate
+    svArrays.ReplicateSet (0, 1);
+  }
   
   // Setup the material&mesh SVs
   {
     StandardSVSetup<RenderTreeType> svSetup (svArrays);
-    renderTree.TraverseMeshNodes (svSetup);
+    renderTree.TraverseMeshNodes (svSetup, mainContext);
   }
 
   // Render all meshes, using only default shader
   {
     csArray<iShader*> shaderArray; shaderArray.SetSize (renderTree.GetTotalRenderMeshes ());
     csArray<size_t> ticketArray; ticketArray.SetSize (renderTree.GetTotalRenderMeshes ());
-    // Shader setup
+    // Shader, sv and ticket setup
     {
       ShaderSetup<RenderTreeType> shaderSetup (shaderArray, defaultShaderName, defaultShader);
-
-      renderTree.TraverseMeshNodes (shaderSetup);
-    }
-
-    // Ticket setup
-    {
+      ShaderSVSetup<RenderTreeType> shaderSVSetup (svArrays, shaderArray);
       TicketSetup<RenderTreeType> ticketSetup (svArrays, shaderManager->GetShaderVariableStack (),
         shaderArray, ticketArray);
 
-      renderTree.TraverseMeshNodes (ticketSetup);
+      renderTree.TraverseMeshNodes (
+        CS::Meta::CompositeFunctor(
+          CS::Meta::CompositeFunctor(shaderSetup, shaderSVSetup), 
+          ticketSetup), mainContext);
     }
 
     // Render
@@ -110,7 +111,7 @@ bool RMTest1::RenderView (iView* view)
       SimpleRender<RenderTreeType> render (g3d, svArrays, 
         shaderManager->GetShaderVariableStack (), shaderArray, ticketArray);
 
-      renderTree.TraverseMeshNodes (render);
+      renderTree.TraverseMeshNodes (render, mainContext);
     }
   }
 
@@ -127,8 +128,7 @@ bool RMTest1::Initialize(iObjectRegistry* objectReg)
 
   shaderManager = csQueryRegistry<iShaderManager> (objectReg);
 
-  defaultShaderName = stringSet->Request("standard");
-  
+  defaultShaderName = stringSet->Request("standard");  
   defaultShader = shaderManager->GetShader ("std_lighting");
   return true;
 }

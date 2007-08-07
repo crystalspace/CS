@@ -54,7 +54,7 @@ namespace RenderManager
       typename Tree::MeshNode* meshNode, typename Tree::ContextNode& contextNode, Tree& tree)
     {
       // Get the render priority for node
-      int renderPrio = meshNode->customData.priority;
+      int renderPrio = meshNode->priority;
       CS_ASSERT(renderPrio >= 0 && renderPrio < renderPriorityCount);
       
       switch (sortingTypeTable[renderPrio])

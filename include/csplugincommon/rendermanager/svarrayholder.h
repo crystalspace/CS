@@ -29,17 +29,46 @@ namespace RenderManager
   class SVArrayHolder
   {
   public:
-    SVArrayHolder (size_t numSVNames, size_t numSets)
-      : numSVNames (numSVNames), numSets (numSets)
+    SVArrayHolder (size_t numSVNames = 0, size_t numSets = 0)
+      : svArray (0), numSVNames (numSVNames), numSets (numSets)
     {
-      const size_t arraySize = sizeof(csShaderVariable*)*numSVNames*numSets;
-      svArray = static_cast<csShaderVariable**> (cs_malloc (arraySize));
-      memset (svArray, 0, arraySize);
+      if (numSVNames && numSets)
+        Setup (numSVNames, numSets);
+    }
+
+    SVArrayHolder (const SVArrayHolder& other)
+    {
+      *this = other;
     }
 
     ~SVArrayHolder ()
     {
       cs_free (svArray);
+    }
+
+    SVArrayHolder& operator= (const SVArrayHolder& other)
+    {
+      cs_free (svArray);
+
+      numSVNames = other.numSVNames;
+      numSets = other.numSets;
+
+      const size_t arraySize = sizeof(csShaderVariable*)*numSVNames*numSets;
+      svArray = static_cast<csShaderVariable**> (cs_malloc (arraySize));
+
+      memcpy (svArray, other.svArray, arraySize);
+
+      return *this;
+    }
+
+    void Setup (size_t numSVNames, size_t numSets)
+    {
+      this->numSVNames = numSVNames;
+      this->numSets = numSets;
+
+      const size_t arraySize = sizeof(csShaderVariable*)*numSVNames*numSets;
+      svArray = static_cast<csShaderVariable**> (cs_malloc (arraySize));
+      memset (svArray, 0, arraySize);
     }
 
     void SetupSVStck (csShaderVariableStack& stack, size_t set)
@@ -59,6 +88,11 @@ namespace RenderManager
 
       memcpy (svArray + start*numSVNames, svArray + from*numSVNames,
         sizeof(csShaderVariable*)*numSVNames*(end-start+1));
+    }
+
+    size_t GetNumSVNames () const
+    {
+      return numSVNames;
     }
 
   private:

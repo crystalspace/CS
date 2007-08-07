@@ -173,7 +173,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine,2,1,0);
+  SCF_INTERFACE(iEngine,3,0,0);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
@@ -1149,10 +1149,9 @@ struct iEngine : public virtual iBase
   virtual uint GetCurrentFrameNumber () const = 0;
 
   /**
-   * Force engine to increment the framenumber.
+   * Update the engine and animations etc for a new frame
    */
-  virtual void IncrementCurrentFrameNumber () = 0;
-
+  virtual void UpdateNewFrame () = 0;
   /** @} */
   
   /**\name Saving/loading

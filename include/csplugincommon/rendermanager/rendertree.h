@@ -29,10 +29,8 @@ namespace RenderManager
 {
   
   template<typename T>
-  struct EBOptHelper
-  {
-    T customData;
-  };
+  struct EBOptHelper : public T
+  {};
 
   template<>
   struct EBOptHelper<void>
@@ -79,10 +77,13 @@ namespace RenderManager
     /**
      * 
      */
-    struct ContextNode : public EBOptHelper<typename TreeTraits::MeshNodeExtraDataType>
+    struct ContextNode : public EBOptHelper<typename TreeTraits::ContextNodeExtraDataType>
     {
       // A sub-tree of mesh nodes
       csRedBlackTreeMap<typename TreeTraits::MeshNodeKeyType, MeshNode*>   meshNodes;
+
+      // Total number of render meshes within the context
+      size_t totalRenderMeshes;
     };
 
 
@@ -104,22 +105,22 @@ namespace RenderManager
     /**
      * 
      */
-    void PrepareViscull (iRenderView* rw)
+    ContextNode* PrepareViscull (iRenderView* rw)
     {
       // Create an initial context
       ContextNode* newCtx = persistentData.contextNodeAllocator.Alloc ();
       contextNodeList.Push (newCtx);
 
-      currentContextNode = newCtx;
+      return newCtx;
     }
 
     /**
      * 
      */
-    bool Viscull (iRenderView* rw, iVisibilityCuller* culler)
+    bool Viscull (ContextNode* context, iRenderView* rw, iVisibilityCuller* culler)
     {
-      ViscullCallback cb (*this, rw);
-
+      ViscullCallback cb (*this, context, rw);
+      
       culler->VisTest (rw, &cb);
       return true;
     }
@@ -127,8 +128,12 @@ namespace RenderManager
     /**
      * 
      */
-    void FinishViscull ()
+    void DestoryContext (ContextNode* context)
     {
+      CS_ASSERT(contextNodeList.Find (contextNodeList) != csArrayItemNotFound);
+      contextNodeList.Delete (context);
+
+      persistentData.contextNodeAllocator.Free (context);
     }
 
     /**
@@ -144,10 +149,13 @@ namespace RenderManager
      * 
      */
     template<typename Fn>
-    void TraverseMeshNodes (Fn& meshNodeFunction)
+    void TraverseMeshNodes (Fn& meshNodeFunction, ContextNode* context = 0)
     {
       TraverseMeshNodesWalker<Fn> walker (meshNodeFunction);
-      TraverseContexts (walker);
+      if (context)
+        walker (context, *this);
+      else
+        TraverseContexts (walker);
     }
 
 
@@ -166,8 +174,6 @@ namespace RenderManager
   protected:    
     PersistentData&         persistentData;
     csArray<ContextNode*>   contextNodeList;
-    
-    ContextNode*            currentContextNode;
 
     size_t                  totalMeshNodes;
     size_t                  totalRenderMeshes;
@@ -178,8 +184,10 @@ namespace RenderManager
     class ViscullCallback : public scfImplementation1<ViscullCallback, iVisibilityCullerListener>
     {
     public:
-      ViscullCallback (ThisType& ownerTree, iRenderView* rw)
-        : scfImplementation1<ViscullCallback, iVisibilityCullerListener> (this), ownerTree (ownerTree), currentRenderView (rw)
+      ViscullCallback (ThisType& ownerTree, typename ThisType::ContextNode* context,
+        iRenderView* rw)
+        : scfImplementation1<ViscullCallback, iVisibilityCullerListener> (this), 
+        ownerTree (ownerTree), context (context),  currentRenderView (rw)    
       {}
 
 
@@ -187,16 +195,17 @@ namespace RenderManager
         iMeshWrapper *mesh, uint32 frustum_mask)
       {
         // Call uppwards
-        ownerTree.ViscullObjectVisible (visobject, mesh, frustum_mask, currentRenderView);
+        ownerTree.ViscullObjectVisible (visobject, mesh, frustum_mask, currentRenderView, context);
       }
 
     private:
       ThisType& ownerTree;
+      typename ThisType::ContextNode* context;
       iRenderView* currentRenderView;
     };
 
     void ViscullObjectVisible (iVisibilityObject *visobject, 
-      iMeshWrapper *imesh, uint32 frustum_mask, iRenderView* renderView)
+      iMeshWrapper *imesh, uint32 frustum_mask, iRenderView* renderView, ContextNode* context)
     {
       // Todo: Handle static lod & draw distance
 
@@ -211,25 +220,30 @@ namespace RenderManager
           TreeTraits::GetMeshNodeKey (imesh, *meshList[i]);
 
         // Get the mesh node
-        MeshNode* meshNode = currentContextNode->meshNodes.Get (meshKey, 0);
+        MeshNode* meshNode = context->meshNodes.Get (meshKey, 0);
         if (!meshNode)
         {
           // Get a new one
           meshNode = persistentData.meshNodeAllocator.Alloc ();
 
           TreeTraits::SetupMeshNode(*meshNode, imesh, *meshList[i]);
-          currentContextNode->meshNodes.Put (meshKey, meshNode);
+          context->meshNodes.Put (meshKey, meshNode);
 
           totalMeshNodes++;
         }
-
+ 
         typename MeshNode::SingleMesh sm;
         sm.renderMesh = meshList[i];
 
-        meshNode->meshes.Push (sm);
+        //TODO: better/proper portal handling
+        if (sm.renderMesh->portal)
+          continue;
 
-        totalRenderMeshes++;
+        meshNode->meshes.Push (sm);
       }
+
+      context->totalRenderMeshes += numMeshes;
+      totalRenderMeshes += numMeshes;
     }
     
     template<typename Fn>

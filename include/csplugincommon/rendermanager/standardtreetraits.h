@@ -23,6 +23,7 @@
 #include "iengine/mesh.h"
 #include "csutil/comparator.h"
 #include "csutil/compileassert.h"
+#include "csplugincommon/rendermanager/svarrayholder.h"
 
 namespace CS
 {
@@ -45,13 +46,16 @@ namespace RenderManager
     //-- Standard types
 
     // Any extra data that should be defined for each mesh node
-    typedef struct MeshNodeExtraDataType
+    struct MeshNodeExtraDataType
     {
       int   priority;
     };
 
     // Any extra data that should be defined for each context node
-    typedef void ContextNodeExtraDataType;
+    struct ContextNodeExtraDataType
+    {
+      SVArrayHolder svArrays;
+    };
 
     // Any extra data per mesh in a mesh node
     typedef void MeshExtraDataType;
@@ -84,7 +88,7 @@ namespace RenderManager
     static CS_FORCEINLINE_TEMPLATEMETHOD 
     void SetupMeshNode(T& meshNode, iMeshWrapper* imesh, const csRenderMesh& rendermesh)
     {
-      meshNode.customData.priority = imesh->GetRenderPriority ();
+      meshNode.priority = imesh->GetRenderPriority ();
     }
 
   private:
@@ -96,7 +100,7 @@ namespace RenderManager
 }
 
 
-CS_COMPILE_ASSERT(sizeof(CS::RenderManager::RenderTreeStandardTraits::MeshNodeKeyType) == sizeof(uint8));
+CS_COMPILE_ASSERT(sizeof(CS::RenderManager::RenderTreeStandardTraits::MeshNodeKeyType) == sizeof(int8));
 
 template<>
 class csComparator<CS::RenderManager::RenderTreeStandardTraits::MeshNodeKeyType>
@@ -106,7 +110,7 @@ public:
     CS::RenderManager::RenderTreeStandardTraits::MeshNodeKeyType const& mk2)
   {
     //BIG HACK
-    return (int) (reinterpret_cast<const uint8&> (mk1) - reinterpret_cast<const uint8&> (mk2));
+    return (int) (reinterpret_cast<const int8&> (mk1) - reinterpret_cast<const int8&> (mk2));
   }
 };
 

@@ -52,11 +52,48 @@ namespace RenderManager
 
       // Push all contexts here @@TODO: get more of them
       rm->material->GetMaterial ()->PushVariables (localStack);
-      rm->variablecontext->PushVariables (localStack);
+      if (rm->variablecontext)
+        rm->variablecontext->PushVariables (localStack);
     }
 
   private:
     SVArrayHolder& svArrays;  
+  };
+
+  template<typename Tree>
+  class ShaderSVSetup : public NumberedMeshTraverser<Tree, ShaderSVSetup<Tree> >
+  {
+  public:
+    typedef NumberedMeshTraverser<Tree, ShaderSVSetup<Tree> > BaseType;
+    typedef csArray<iShader*> ShaderArrayType;
+
+    ShaderSVSetup (SVArrayHolder& svArrays, const ShaderArrayType& shaderArray)
+      : BaseType (*this), svArrays (svArrays), shaderArray (shaderArray)
+    {
+      tempStack.Setup (svArrays.GetNumSVNames ());
+    }
+
+    // Need to unhide this one
+    using BaseType::operator();
+
+    void operator() (const typename Tree::MeshNode::SingleMesh& mesh, size_t index,
+      typename Tree::ContextNode& ctxNode, const Tree& tree)
+    {
+      tempStack.Clear ();
+
+      iShader* shader = shaderArray[index];
+      shader->PushVariables (tempStack);
+      
+      // Back-merge it onto the real one
+      csShaderVariableStack localStack;
+      svArrays.SetupSVStck (localStack, index);
+      localStack.MergeFront (tempStack);
+    }
+
+  private:
+    SVArrayHolder& svArrays; 
+    const ShaderArrayType& shaderArray;
+    csShaderVariableStack tempStack;
   };
 
   

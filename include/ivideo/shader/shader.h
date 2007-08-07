@@ -127,6 +127,16 @@ public:
       memset (varArray, 0, sizeof(csShaderVariable*)*size);
   }
 
+  /// Merge one stack onto the front of this one
+  void MergeFront (const csShaderVariableStack& other)
+  {
+    CS_ASSERT(other.size >= size);
+    for (size_t i = 0; i < size; ++i)
+    {
+      if (!varArray[i])
+        varArray[i] = other.varArray[i];
+    }
+  }
 private:
   csShaderVariable** varArray;
   size_t size;

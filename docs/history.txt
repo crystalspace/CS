@@ -12,6 +12,10 @@ chronological order.
 	  and not deallocate the memory. Added a csBlockAllocator::DeleteAll()
 	  which does what Emtpy does and deallocates all memory.
 	- Marten fixed rendering through old pipeline with portals.
+	- Marten made some more work on the RM:
+	   - Made it properly update the engine once per frame.
+	   - Improved data-locality to the context (not finished yet).
+	   - Updated simpmap to use it for better testing.
 31-Jul-2007
 	- Marten made the RM stuff compile on gcc.
 29-Jul-2007
