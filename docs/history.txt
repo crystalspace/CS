@@ -8,8 +8,10 @@ chronological order.
 
 7-Aug-2007
 	- res changed the cs-win32libs link to point to the 1.2 version.
-	- res deprecated the obsoloete 
+	- res deprecated the obsolete 
 	  iMeshObject->InvalidateMaterialHandles().
+	- res changed csPath to not be marked as "exported" any more 
+	  (all-inline, gives link errors with MSVC/DLLs).
 2-Aug-2007
 	- Marten implemented a small optimization for the (i+1)%3 case,
 	  mainly used when traversing edges in triangles.
