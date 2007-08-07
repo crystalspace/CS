@@ -261,7 +261,7 @@ struct iMeshObject : public virtual iBase
    * handles are changed in some way which requires the mesh object
    * to fetch it again (i.e. to call materialwrapper->GetMaterialHandle())
    * again.
-   * \deprecated Obsolete and unused.
+   * \deprecated Deprecated in 1.3. Obsolete and unused.
    */
   CS_DEPRECATED_METHOD_MSG("Obsolete and unused.")
   virtual void InvalidateMaterialHandles () = 0;
