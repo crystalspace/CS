@@ -174,11 +174,22 @@ public:
   }
 
   /**
-   * Destroy all objects allocated by the pool.
+   * Destroy all objects allocated by the pool without releasing the memory.
    * \remarks All pointers returned by Alloc() are invalidated. It is safe to
    *   perform new allocations from the pool after invoking Empty().
    */
-  void Empty()
+  void Empty ()
+  {
+    ObjectDispose dispose (*this, true);
+    FreeAll (dispose);
+  }
+
+  /**
+   * Destroy all objects allocated by the pool and release the memory.
+   * \remarks All pointers returned by Alloc() are invalidated. It is safe to
+   *   perform new allocations from the pool after invoking DeleteAll().
+   */
+  void DeleteAll ()
   {
     ObjectDispose dispose (*this, true);
     DisposeAll (dispose);
