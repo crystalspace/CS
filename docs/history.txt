@@ -6,6 +6,8 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Aug-2007
+	- Marten made a small bugfix in csRedBlackTree.
 31-Jul-2007
 	- Marten made the RM stuff compile on gcc.
 29-Jul-2007

@@ -125,7 +125,7 @@ protected:
   {
     Node* pivotReplace = pivot->left;
     pivot->left = pivotReplace->right;
-    pivotReplace->right->SetParent (pivot);
+    if (pivotReplace->right != 0) pivotReplace->right->SetParent (pivot);
     pivotReplace->SetParent (pivot->GetParent());
     if (pivot->GetParent() == 0)
       root = pivotReplace;
