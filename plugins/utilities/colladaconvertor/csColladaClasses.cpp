@@ -424,6 +424,14 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 		parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Converting triangle elements to objects...");
 	}
 
+	// we need to perform a sanity check, in the event someone forgot to 
+	// call ConvertMaterials(), otherwise we have the potential for a segfault
+	if (parent->materialsList.IsEmpty())
+	{
+		csRef<iDocumentNode> materialsNode = parent->GetColladaDocument()->GetRoot()->GetNode("library_materials");
+		parent->ConvertMaterials(materialsNode);
+	}
+
 	/* BEGIN POLYGONS PROCESSING */
 	// test to see if we have any generic polygons
 	csRef<iDocumentNodeIterator> polygonsIterator = element->GetNodes("polygons");
@@ -497,6 +505,10 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 		// get number of triangle fans in the mesh
 		int numTriFans = trifansElement->GetAttributeValueAsInt("count");
 		//int numberTriangles = numTriStrips * 
+		
+		scfString *mat = new scfString(trifansElement->GetAttributeValue("material"));
+		materials = parent->FindMaterial(mat);
+		delete mat;		
 		
 		while (pElementIterator->HasNext())
 		{
@@ -591,6 +603,11 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 
 		// sample the vcount element
 		csArray<int> vCountElement;
+		
+		scfString *mat = new scfString(polylistElement->GetAttributeValue("material"));
+		materials = parent->FindMaterial(mat);
+		delete mat;
+
 		stringstream polylistConv(polylistElement->GetNode("vcount")->GetContentsValue());
 
 		int tempInt;
@@ -635,6 +652,10 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 		int tempVertIndex;
 		csArray<int> vertexIndexArrayPolys;
 
+		scfString *mat = new scfString(polygonsElement->GetAttributeValue("material"));
+		materials = parent->FindMaterial(mat);
+		delete mat;
+
 		polyPIterator = polygonsElement->GetNodes("p");
 
 		// we'll also need one for the <ph> elements
@@ -669,6 +690,10 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 		int numTriStrips = tristripsElement->GetAttributeValueAsInt("count");
 		//int numberTriangles = numTriStrips * 
 		
+		scfString *mat = new scfString(tristripsElement->GetAttributeValue("material"));
+		materials = parent->FindMaterial(mat);
+		delete mat;
+
 		while (pElementIterator->HasNext())
 		{
 			// get next p element
@@ -742,6 +767,10 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 		// get number of triangles in the mesh
 		int numTris = trianglesElement->GetAttributeValueAsInt("count");
 		
+		scfString *mat = new scfString(trianglesElement->GetAttributeValue("material"));
+		materials = parent->FindMaterial(mat);
+		delete mat;
+		
 		while (pElementIterator->HasNext())
 		{
 			// get next p element
@@ -814,16 +843,100 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 		{
 			nextTechnique = techniquesToProcess->Next();
 
-			// for each technique, we can have multiple passes
-			passesToProcess = nextTechnique->GetNodes("pass");
-			while (passesToProcess->HasNext())
+			// for the time being, we're just going to convert basic
+			// materials
+			csRef<iDocumentNode> pbNode = nextTechnique->GetNode("phong");
+			if (!pbNode.IsValid())
 			{
-				nextPass = passesToProcess->Next();
+				pbNode = nextTechnique->GetNode("blinn");
+			}
+
+			if (!pbNode.IsValid() && parent->warningsOn)
+			{
+				parent->Report(CS_REPORTER_SEVERITY_ERROR, "Error: Unable to find a phong or blinn node to convert.");
+				return false;
+			}
+
+			// set the ambient, specular, and diffuse colors
+			csRef<iDocumentNode> colorElement = pbNode->GetNode("diffuse");
+			csRGBcolor tempColor;
+			if (colorElement.IsValid())
+			{
+				stringstream colConver(colorElement->GetNode("color")->GetValue());
+				float tempVal;
+				colConver >> tempVal; // red
+				tempColor.red = tempVal;
+				colConver >> tempVal; // green
+				tempColor.green = tempVal;
+				colConver >> tempVal; // blue
+				tempColor.blue = tempVal;
+
+				diffuseColor = tempColor;
+			}
+			
+			tempColor.red = 0.0;
+			tempColor.green = 0.0;
+			tempColor.blue = 0.0;
+
+			colorElement = pbNode->GetNode("specular");
+			
+			if (colorElement.IsValid())
+			{
+				stringstream colConver(colorElement->GetNode("color")->GetValue());
+				float tempVal;
+				colConver >> tempVal; // red
+				tempColor.red = tempVal;
+				colConver >> tempVal; // green
+				tempColor.green = tempVal;
+				colConver >> tempVal; // blue
+				tempColor.blue = tempVal;
+
+				specularColor = tempColor;
+			}
+			
+			tempColor.red = 0.0;
+			tempColor.green = 0.0;
+			tempColor.blue = 0.0;
+
+			colorElement = pbNode->GetNode("ambient");
+			
+			if (colorElement.IsValid())
+			{
+				stringstream colConver(colorElement->GetNode("color")->GetValue());
+				float tempVal;
+				colConver >> tempVal; // red
+				tempColor.red = tempVal;
+				colConver >> tempVal; // green
+				tempColor.green = tempVal;
+				colConver >> tempVal; // blue
+				tempColor.blue = tempVal;
+
+				ambientColor = tempColor;
 			}
 
 		}
-
+		
 		return true;
+	}
+
+	void csColladaEffectProfile::SetAmbientColor(csRGBcolor newAmbient)
+	{
+		ambientColor = newAmbient;
+	}
+
+	void csColladaEffectProfile::SetDiffuseColor(csRGBcolor newDiffuse)
+	{
+		diffuseColor = newDiffuse;
+	}
+
+	void csColladaEffectProfile::SetSpecularColor(csRGBcolor newSpecular)
+	{
+		specularColor = newSpecular;
+	}
+
+	void csColladaEffectProfile::SetName(iString* newName)
+	{
+		name = newName;
 	}
 
 	// =============== Auxiliary Class: csColladaEffect ===============
@@ -832,6 +945,31 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 	{
 		parent = parentObj;
 		Process(effectElement);
+	}
+
+	csColladaEffectProfile* csColladaEffect::GetProfile(const char* query)
+	{
+		scfString* queryString = new scfString(query);
+		csColladaEffectProfile* retVal = GetProfile(queryString);
+		return retVal;
+	}
+
+	csColladaEffectProfile* csColladaEffect::GetProfile(iString* query)
+	{
+		csColladaEffectProfile* retVal;
+		csArray<csColladaEffectProfile>::Iterator iter = profiles.GetIterator();
+
+		while (iter.HasNext())
+		{
+			retVal = &(iter.Next());
+			if (query->Compare(retVal->GetName()))
+			{
+				return retVal;
+			}
+		}
+
+		retVal = 0;
+		return retVal;
 	}
 
 	bool csColladaEffect::Process(iDocumentNode* effectElement)
@@ -851,6 +989,8 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 		{
 			currentProfile = profilesToProcess->Next();
 			currentProfileObject = new csColladaEffectProfile(currentProfile, parent);
+			scfString* nameString = new scfString("profile_COMMON");
+			currentProfileObject->SetName(nameString);
 			profiles.Push((*currentProfileObject));
 		}
 
@@ -883,6 +1023,8 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 			return false;
 		}
 	}
+
+  // =============== Auxiliary Class: csColladaMaterial ===============
 
 	csColladaMaterial::csColladaMaterial(csColladaConvertor *parentEl)
 	{

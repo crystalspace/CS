@@ -168,6 +168,8 @@ class	csColladaConvertor : public	scfImplementation2<csColladaConvertor,iCollada
 		/** Get the effect at a particular index in the effects list
 		 */
 		csColladaEffect& GetEffect(size_t index);
+
+		csColladaMaterial* FindMaterial(iString* accessorString);
 	
 	private:
 

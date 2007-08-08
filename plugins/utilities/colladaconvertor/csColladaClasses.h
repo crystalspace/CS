@@ -27,6 +27,7 @@
 #include "ivaria/reporter.h"
 #include "csgeom/triangulate3d.h"
 #include "csgeom/trimesh.h"
+#include "csgfx/rgbpixel.h"
 
 #ifndef	_CS_COLLADA_CLASSES_H_
 #define	_CS_COLLADA_CLASSES_H_
@@ -85,6 +86,7 @@ class	csColladaMesh	{
 		csColladaNumericType vType;
 		iString *pluginType;  // the type of plugin we're using (default = genmeshfact)
 		size_t vertexOffset, normalOffset;  // the offsets of the normals and positions
+		csColladaMaterial* materials;	// the materials applied to the mesh object
 
 		csTriangleMesh* triangles;
 
@@ -136,6 +138,14 @@ class	csColladaMesh	{
 		 */
 		void SetNormals();
 
+		/** \brief Sets the pointer for the mesh's material list.
+		 *
+		 * This is a mutator function for the materials pointer in the
+		 * class.  Use it to set a pointer to a list of materials on
+		 * the object.
+		 */
+		void SetMaterialsPointer(csColladaMaterial* matPtr);
+
 	public:
 		csColladaMesh(iDocumentNode* element, csColladaConvertor* parent);
 		~csColladaMesh();
@@ -143,6 +153,7 @@ class	csColladaMesh	{
 		const csArray<csVector3>& GetVertices() { return vertices; }
 		int GetNumVertexElements() { return numVertexElements; }
 		int GetNumberOfVertices() { return numberOfVertices; }
+		csColladaMaterial* GetMaterialPointer() { return materials; }
 		csColladaNumericType GetVertexType() { return vType; }
 		iString* GetName() { return name; }
 		iString* GetPositionID() { return positionId; }
@@ -150,6 +161,30 @@ class	csColladaMesh	{
 		int GetNumInputElements(iDocumentNode* element);
 		csTriangleMesh* GetTriangleMesh() { return triangles; } 
 		csRef<iDocumentNode> GetMeshElement() { return meshElement; }
+
+		/** \brief Process a COLLADA mesh node and construct a csColladaMesh object
+		 *
+		 * Creates a csColladaMesh object from a COLLADA <mesh> element.  COLLADA mesh
+		 * elements should contain at least one of the following:
+		 *
+		 *  - <triangles>
+		 *  - <trifans>
+		 *  - <tristrips>
+		 *  - <polygons> 
+		 *  - <polylist>
+		 *
+		 * Note that <lines> and <linestrips> are not part of this list.  Currently, 
+		 * lines and linestrips are not considered mesh objects, and are therefore not
+		 * processed.  Ideally, all COLLADA mesh objects can be added to a csTriangleMesh 
+		 * object after being triangulated.  Since lines and linestrips cannot be 
+		 * triangulated, they are not included in this list.
+		 *
+		 * @returns A csArray of vertices of the mesh.
+		 *
+		 * @param element A pointer to the <mesh> node to be processed
+		 *
+		 * @sa CS::Geom::Triangulate3D::Process(CS::Geom::csContour3& polygon, csTriangleMesh& result, iReporter* report2, CS::Geom::csContour3* holes = 0)
+		 */
 		const csArray<csVector3>& Process(iDocumentNode* element);
 
 	private:
@@ -169,6 +204,8 @@ class csColladaEffectProfile {
 		csColladaEffectProfileType profileType;
 		csRef<iDocumentNode> element;
 		csColladaConvertor* parent;
+		csRGBcolor diffuseColor, specularColor, ambientColor;
+		iString* name;
 
 	public:
 		csColladaEffectProfile(iDocumentNode* profileElement, csColladaConvertor* parentObj);
@@ -177,6 +214,17 @@ class csColladaEffectProfile {
 		void SetProfileType(csColladaEffectProfileType newType);
 
 		csColladaEffectProfileType GetProfileType();
+
+		csRGBcolor GetAmbientColor() { return ambientColor; }
+		csRGBcolor GetDiffuseColor() { return diffuseColor; }
+		csRGBcolor GetSpecularColor() { return specularColor; }
+
+		iString* GetName() { return name; }
+
+		void SetAmbientColor(csRGBcolor newAmbient);
+		void SetDiffuseColor(csRGBcolor newDiffuse);
+		void SetSpecularColor(csRGBcolor newSpecular);
+		void SetName(iString* newName);
 
 }; /* End of class csColladaEffectProfile */
 
@@ -190,6 +238,10 @@ class csColladaEffect {
 	public:
 		csColladaEffect(iDocumentNode* effectElement, csColladaConvertor* parentObj);
 		bool Process(iDocumentNode* effectElement);
+
+		csColladaEffectProfile* GetProfile(iString* query); // probably should be csRef
+		csColladaEffectProfile* GetProfile(const char* query);
+
 		bool operator==(const csColladaEffect& compEffect);
 
 }; /* End of class csColladaEffect */

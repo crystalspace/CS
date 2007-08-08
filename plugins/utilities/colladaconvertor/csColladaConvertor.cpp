@@ -263,6 +263,26 @@ const char* csColladaConvertor::Write(const char* filepath)
 }
 
 // =============== Accessor Functions =============== 
+
+csColladaMaterial* csColladaConvertor::FindMaterial(iString* accessorString)
+{
+	// Using csArrayCmp would be more efficient I believe, but
+	// I have no idea how to use this comparator.  ;)
+	//csArrayCmp<csColladaMaterial, const char*> functor;
+
+	csArray<csColladaMaterial>::Iterator matIter = materialsList.GetIterator();
+	while (matIter.HasNext())
+	{
+		csColladaMaterial* currentMat = &(matIter.Next());
+		if (currentMat->GetID()->Compare(accessorString))
+		{
+			return currentMat;
+		}
+	}
+
+	return 0;
+}
+
 csColladaEffect& csColladaConvertor::GetEffect(size_t index)
 {
 	return effectsList.Get(index);
@@ -372,15 +392,8 @@ const char*	csColladaConvertor::Convert()
 		return "COLLADA file not loaded";
 	}
 
-	csRef<iDocumentNode> geoNode = colladaElement->GetNode("library_geometries");
-	if (!geoNode.IsValid())
-	{
-		Report(CS_REPORTER_SEVERITY_ERROR, "Error: Unable to find <library_geometries> element.");
-		return "Unable to find library_geometries.";
-	}
-
-	ConvertGeometry(geoNode);
-
+	// ConvertMaterials() needs to be called first, so that there actually *is* a materials
+	// list from which to assign materials in ConvertGeometry()
 	csRef<iDocumentNode> materialsNode = colladaElement->GetNode("library_materials");
 	if (!materialsNode.IsValid())
 	{
@@ -390,7 +403,14 @@ const char*	csColladaConvertor::Convert()
 
 	ConvertMaterials(materialsNode);
 
+	csRef<iDocumentNode> geoNode = colladaElement->GetNode("library_geometries");
+	if (!geoNode.IsValid())
+	{
+		Report(CS_REPORTER_SEVERITY_ERROR, "Error: Unable to find <library_geometries> element.");
+		return "Unable to find library_geometries.";
+	}
 
+	ConvertGeometry(geoNode);
 
 	return 0;
 }
@@ -645,6 +665,8 @@ csRef<iDocumentNode> csColladaConvertor::GetSourceElement(const char* name, iDoc
 	return returnValue;
 }
 
+// ConvertEffects() will become the dominant function for use with COLLADA
+// materials/effects conversion, but as of right now, it's broken.  ;)
 bool csColladaConvertor::ConvertEffects(iDocumentNode *effectsSection)
 {
 	Report(CS_REPORTER_SEVERITY_WARNING, "Warning: ConvertEffects() functionality not fully implemented.  Use at your own risk!");
@@ -663,6 +685,10 @@ bool csColladaConvertor::ConvertEffects(iDocumentNode *effectsSection)
 	return true;
 }
 
+// Eventually, I think, ConvertMaterials() will become deprecated in favor
+// of ConvertEffects, as this is more generalized.  However, for the sake
+// of simplicity in the initial materials conversion, I added this function
+// so that I didn't have to convert all of the shaders.
 bool csColladaConvertor::ConvertMaterials(iDocumentNode *materialsSection)
 {
 	Report(CS_REPORTER_SEVERITY_WARNING, "Warning: ConvertMaterials() functionality not fully implemented.  Use at your own risk!");
@@ -703,7 +729,14 @@ bool csColladaConvertor::ConvertMaterials(iDocumentNode *materialsSection)
 
 		nextMaterial->SetInstanceEffect(effectNode);
 		materialsList.Push(*nextMaterial);
-
+		
+		/*
+		csColladaEffectProfile* prof = nextMaterial->GetInstanceEffect()->GetProfile("profile_COMMON");
+		if (warningsOn)
+		{
+			Report(CS_REPORTER_SEVERITY_NOTIFY, "Profile name: %s", prof->GetName()->GetData()); 
+		}
+		*/
 	}
 
 	return true;
@@ -723,11 +756,13 @@ bool csColladaConvertor::ConvertScene(iDocumentNode *camerasSection, iDocumentNo
 
 bool csColladaConvertor::ConvertRiggingAnimation(iDocumentNode *riggingSection)
 {
+	Report(CS_REPORTER_SEVERITY_WARNING, "Warning: ConvertRiggingAnimation() functionality not fully implemented.  Use at your own risk!");
 	return true;
 }
 
 bool csColladaConvertor::ConvertPhysics(iDocumentNode	*physicsSection)
 {
+	Report(CS_REPORTER_SEVERITY_WARNING, "Warning: ConvertPhysics() functionality not fully implemented.  Use at your own risk!");
 	return true;
 }
 

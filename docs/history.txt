@@ -6,6 +6,23 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+06-Aug-2007
+	- jwir3 added functionality to csColladaConvertor to allow the finding of
+	  a material in the materials list, given a search string for the name.
+	- jwir3 added warnings for functions that have not yet been implemented and
+	  or completed.
+	- jwir3 added a materials list for the csColladaMesh class.  
+	- jwir3 added functionality to ProcessPolygons(), ProcessTriangles(), 
+	  ProcessTriStrips(), ProcessPolyList(), and ProcessTriFans() functions
+	  to allow for setting the materials data member by finding the correct
+	  material via a string search.
+	- jwir3 added doxygen documentation for CS::Geom::Triangulate3D and for 
+	  the ConvertMaterials() and supporting functions.  Triangulate3D still
+	  does not work.
+03-Aug-2007
+	- jwir3 added functionality to retrieve diffuse, specular, and ambient color
+	  from the COLLADA <phong> or <blinn> elements, in the effects section of
+	  the document.
 02-Aug-2007
 	- jwir3 changed all vertex arrays to csArray<csVector3> inside the collada 
 	  conversion library.
