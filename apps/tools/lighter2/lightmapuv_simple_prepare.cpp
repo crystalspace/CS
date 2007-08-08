@@ -216,6 +216,9 @@ namespace lighter
            */
           for (size_t a = 0; a < currentLayouted.maps.GetSize(); a++)
           {
+      #if defined(DUMP_SUBRECTANGLES)
+            static int counter = 0;
+      #endif
             const LayoutedQueue::Map& map = currentLayouted.maps[a];
             const csRect& rect = map.alloc->GetRectangle ();
             csRect newRect;
@@ -234,7 +237,24 @@ namespace lighter
             (void)b;
             ofs.Set (newRect.xmin, newRect.ymin);
 
+      #if defined(DUMP_SUBRECTANGLES)
+            {
+              csString str;
+              str.Format ("placed_before_%zu_%d", nAlloc, counter);
+              newEntry.maps[nAlloc].alloc->Dump (str);
+            }
+      #endif
             newEntry.maps[nAlloc].alloc->PlaceInto (map.alloc, sr);
+      #if defined(DUMP_SUBRECTANGLES)
+            {
+              csString str;
+              str.Format ("placee_%zu_%d", nAlloc, counter);
+              map.alloc->Dump (str);
+              str.Format ("placed_after_%zu_%d", nAlloc, counter);
+              newEntry.maps[nAlloc].alloc->Dump (str);
+              counter++;
+            }
+      #endif
 
             /// Copy all the positions from the old LQ to the new
             for (size_t q = 0; q < map.queues.GetSize(); q++)
@@ -428,6 +448,18 @@ namespace lighter
         b = AllocAllPrims (ArraysQPDPA (*currentQueue.queue), 
           allocGLMnpo2, results, 0, allocTryNormal);
       }
+#if defined(DUMP_SUBRECTANGLES)
+      if (!b)
+      {
+        for (size_t g = 0; g < globalLightmaps.GetSize(); g++)
+        {
+          Lightmap* lm = globalLightmaps[g];
+          csString str;
+          str.Format ("glm%zu", g);
+          lm->GetAllocator().Dump (str);
+        }
+      }
+#endif
       CS_ASSERT(b);
       (void)b;
 

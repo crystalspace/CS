@@ -102,7 +102,7 @@ csTerrainColliderCollideSegmentResult csTerrainCollider::CollideSegment (
 
   csTerrainSegmentCellCollider collider (cell, start, end);
 
-  csVector2 cell_result;
+  csVector2 cell_result (0, 0);
   int rv;
   
   while ((rv = collider.GetIntersection (rc.isect, cell_result)) >= 0)
@@ -226,12 +226,12 @@ bool csTerrainCollider::CollideTriangles (iTerrainCell* cell,
     for (unsigned int edge = 0; edge < 3; ++edge)
     {
       const csVector3& start = triv[edge];
-      const csVector3& end = triv[(edge + 1)%3];
+      const csVector3& end = triv[CS::Math::NextModulo3(edge)];
       
       csTerrainSegmentCellCollider collider (cell, start, end);
   
       csVector3 result;
-      csVector2 cell_result;
+      csVector2 cell_result (0, 0);
       int rv;
   
       while ((rv = collider.GetIntersection (result, cell_result)) >= 0)

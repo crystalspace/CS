@@ -92,8 +92,8 @@ public:
 
     if (!material) return;
 
-    if (material->GetWidth () != data->materialMapWidth ||
-        material->GetHeight () != data->materialMapHeight)
+    if ((unsigned int)material->GetWidth () != data->materialMapWidth ||
+        (unsigned int)material->GetHeight () != data->materialMapHeight)
     {
       material = csImageManipulate::Rescale (material,
         data->materialMapWidth, data->materialMapHeight);
