@@ -51,14 +51,12 @@ namespace lighter
     CS::Memory::AlignedFree (traversalStack);
   }
 
-  static const uint mod5[] = {0,1,2,0,1};
-
   static bool IntersectPrimitiveRay (const KDTreePrimitive &primitive, const Ray &ray,
     HitPoint &hit)
   {
     const uint k = primitive.normal_K & ~KDPRIM_FLAG_MASK;
-    const uint ku = mod5[k+1];
-    const uint kv = mod5[k+2];
+    const uint ku = CS::Math::NextModulo3(k);  // ku = (k+1) % 3
+    const uint kv = CS::Math::NextModulo3(ku); // kv = (k+2) % 3
 
     // prefetch?
 

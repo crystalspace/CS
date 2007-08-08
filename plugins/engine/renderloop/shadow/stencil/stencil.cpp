@@ -19,6 +19,10 @@
 
 #include "cssysdef.h"
 
+#define CS_DEPRECATION_SUPPRESS_HACK
+#include "trimesh.h"
+#undef CS_DEPRECATION_SUPPRESS_HACK
+
 #include "csgeom/pmtools.h"
 #include "csgeom/trimeshtools.h"
 #include "csgeom/transfrm.h"
@@ -50,7 +54,6 @@
 
 //#define SHADOW_CACHE_DEBUG
 
-#include "trimesh.h"
 #include "stencil.h"
 
 CS_IMPLEMENT_PLUGIN

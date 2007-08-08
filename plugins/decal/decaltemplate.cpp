@@ -35,9 +35,9 @@ csDecalTemplate::csDecalTemplate()
       bottomClipScale (0.5f),
       minTexCoord (0,0),
       maxTexCoord (1,1),
+      mixMode (CS_FX_COPY),
       perpendicularFaceThreshold (0.05f),
       perpendicularFaceOffset (0.01f),
-      mixMode (CS_FX_COPY),
       mainColor (1,1,1,1),
       topColor (1,1,1,1),
       bottomColor (1,1,1,1)

@@ -14648,6 +14648,12 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetTextureClass = *cspacec::iTextureHandle_SetTextureClass;
 *GetTextureClass = *cspacec::iTextureHandle_GetTextureClass;
 *SetAlphaType = *cspacec::iTextureHandle_SetAlphaType;
+*texType1D = *cspacec::iTextureHandle_texType1D;
+*texType2D = *cspacec::iTextureHandle_texType2D;
+*texType3D = *cspacec::iTextureHandle_texType3D;
+*texTypeCube = *cspacec::iTextureHandle_texTypeCube;
+*texTypeRect = *cspacec::iTextureHandle_texTypeRect;
+*GetTextureType = *cspacec::iTextureHandle_GetTextureType;
 *scfGetVersion = *cspacec::iTextureHandle_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -18396,6 +18402,7 @@ sub CS_VATTRIB_14 () { $cspacec::CS_VATTRIB_14 }
 sub CS_VATTRIB_15 () { $cspacec::CS_VATTRIB_15 }
 sub CS_MIXMODE_TYPE_AUTO () { $cspacec::CS_MIXMODE_TYPE_AUTO }
 sub CS_MIXMODE_TYPE_BLENDOP () { $cspacec::CS_MIXMODE_TYPE_BLENDOP }
+sub CS_MIXMODE_FLAG_BLENDOP_ALPHA () { $cspacec::CS_MIXMODE_FLAG_BLENDOP_ALPHA }
 sub CS_MIXMODE_TYPE_MESH () { $cspacec::CS_MIXMODE_TYPE_MESH }
 sub CS_MIXMODE_TYPE_MASK () { $cspacec::CS_MIXMODE_TYPE_MASK }
 sub CS_MIXMODE_FACT_ZERO () { $cspacec::CS_MIXMODE_FACT_ZERO }

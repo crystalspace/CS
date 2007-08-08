@@ -209,5 +209,12 @@ void csGLRender2TextureFramebuf::SetupClipPortalDrawing ()
   //G3D->statecache->SetCullFace (GL_BACK);
 }
 
+bool csGLRender2TextureFramebuf::HasStencil()
+{
+  GLint sbits;
+  glGetIntegerv (GL_STENCIL_BITS, &sbits);
+  return sbits > 0;
+}
+
 }
 CS_PLUGIN_NAMESPACE_END(gl3d)

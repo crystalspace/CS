@@ -211,6 +211,21 @@ CS_FORCEINLINE bool csNormal (double d)
 }
 //@}
 
+
+namespace CS
+{
+namespace Math
+{
+  /// Return the next number in the sequence 0,1,2 modulo 3
+  template<typename T>
+  CS_FORCEINLINE T NextModulo3 (T number)
+  {
+    return (1 << number) & 0x3;
+  }
+}
+}
+
+
 /** @} */
 
 #endif //__CS_MATH_H__

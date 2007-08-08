@@ -24,7 +24,12 @@
 #include "csgeom/polymesh.h"
 #include "csgeom/quaternion.h"
 #include "csgeom/transfrm.h"
+
+// For backward-compatibility, collider.cpp must invoke its own deprecated
+// constructors. Suppress the deprecation warning for this special case.
+#define CS_DEPRECATION_SUPPRESS_HACK
 #include "cstool/collider.h"
+#undef CS_DEPRECATION_SUPPRESS_HACK
 
 #include "iengine/camera.h"
 #include "iengine/engine.h"

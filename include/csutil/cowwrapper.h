@@ -84,6 +84,11 @@ namespace CS
       WrappedData (const WrappedData& other) : refcount (1), data (other.data) {}
     };
   public:
+    /**
+     * This is the size of the memory block the wrapper internally uses to
+     * store the actual data. It is published to make fixed-size allocators
+     * possible.
+     */
     static const size_t allocSize = sizeof (WrappedData);
   private:
     csRef<WrappedData> data;
