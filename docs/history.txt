@@ -6,18 +6,23 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+08-Aug-2007
+        - Mike Gist added abstraction for AltiVec.
+        - Mike Gist fixed SSE/AltiVec code path selection... each implementation
+          of the function must be in its own file.
+        - Mike Gist also fixed some other misc bugs in his code.
 01-Aug-2007
-      - Mike Gist added to the SIMD abstraction code. C++ and SSE done
-        so far, AltiVec to come later.
-      - Mike Gist changed AltiVec checking to be decided more at compile time.
-        This reduces the code needed to choose between them, so it's
-        faster at runtime and easier for the user.
+        - Mike Gist added to the SIMD abstraction code. C++ and SSE done
+          so far, AltiVec to come later.
+        - Mike Gist changed AltiVec checking to be decided more at compile time.
+          This reduces the code needed to choose between them, so it's
+          faster at runtime and easier for the user.
 30-Jul-2007
-      - Mike Gist fixed a few warnings.
-      - Mike Gist added preliminary SIMD abstraction and converted
-        simdtest to use it.
-      - Mike Gist fixed SIMDDespatch to work with more than one ISet.
-      - Mike Gist improved AltiVec support a little.
+        - Mike Gist fixed a few warnings.
+        - Mike Gist added preliminary SIMD abstraction and converted
+          simdtest to use it.
+        - Mike Gist fixed SIMDDespatch to work with more than one ISet.
+        - Mike Gist improved AltiVec support a little.
 29-Jul-2007
 	- res made the CEL jobber import crystalspace_staticplugins_msvc.jam
 	  from CS before generating VC projects.

@@ -19,19 +19,12 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "cssysdef.h"
 #include "csutil/processorspecdetection.h"
 #include "csutil/sysfunc.h"
-#include "csutil/processor/simdtypes.h"
 #include "simdtest.h"
-#include "simdfunc.h"
 
 using namespace CS::Platform;
 using namespace CS::SIMD;
 
 CS_IMPLEMENT_APPLICATION
-
-bool SIMDTest::testCPP(float* a, float* b, float* c, int size)
-{
-    return SIMDFunc(a, b, c, size);
-}
 
 int main(int argc, char* argv[])
 {

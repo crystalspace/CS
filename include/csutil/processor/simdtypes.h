@@ -392,7 +392,7 @@ namespace CS
 
         CS_FORCEINLINE bool VectorAllTrue(Vector4 a)
         {
-            return (a.x == 0 && a.y == 0 && a.z == 0 && a.w == 0);
+            return (a.x != 0 && a.y != 0 && a.z != 0 && a.w != 0);
         }
 
         CS_FORCEINLINE bool VectorAnyTrue(Vector4 a)

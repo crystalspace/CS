@@ -185,7 +185,7 @@ namespace CS
 
         CS_FORCEINLINE Vector4 VectorEqual(Vector4 a, Vector4 b)
         {
-            return _mm_cmpeq_ss(a, b);
+            return _mm_cmpeq_ps(a, b);
         }
 
         CS_FORCEINLINE Vector4 VectorLess(Vector4 a, Vector4 b)
