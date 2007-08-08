@@ -24,7 +24,6 @@
 #include "cssysdef.h"
 #include "igeom/clip2d.h"
 #include "igeom/path.h"
-#include "igeom/polymesh.h"
 #include "igeom/trimesh.h"
 #endif /* __IGEOM_H__ */
 

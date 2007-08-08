@@ -40,7 +40,6 @@
 #include "iengine/light.h"
 #include "iengine/lightmgr.h"
 #include "iengine/shadcast.h"
-#include "igeom/polymesh.h"
 #include "imesh/genmesh.h"
 #include "imesh/lighting.h"
 #include "imesh/object.h"
@@ -57,7 +56,6 @@
 class csBSPTree;
 class csColor;
 class csColor4;
-class csPolygonMesh;
 struct iCacheManager;
 struct iEngine;
 struct iMaterialWrapper;
@@ -511,8 +509,6 @@ public:
     return anim_ctrl_fact;
   }
 
-  csMeshedPolygon* polygons;
-
   /// Calculate bounding box and radius.
   void CalculateBBoxRadius ();
 
@@ -685,11 +681,6 @@ public:
   }
   /** @} */
 
-  /**
-   * Calculate polygons for iPolygonMesh.
-   */
-  csMeshedPolygon* GetPolygons ();
-
   void SetMixMode (uint mode)
   {
     default_mixmode = mode;
@@ -758,38 +749,6 @@ public:
   { return logparent; }
   virtual iMeshObjectType* GetMeshObjectType () const; 
 
-  //------------------ iPolygonMesh interface implementation ----------------//
-  struct PolyMesh : public scfImplementation1<PolyMesh, iPolygonMesh>
-  {
-  private:
-    csGenmeshMeshObjectFactory* factory;
-    csFlags flags;
-  public:
-    void SetFactory (csGenmeshMeshObjectFactory* Factory)
-    { factory = Factory; }
-
-    virtual int GetVertexCount ();
-    virtual csVector3* GetVertices ();
-    virtual int GetPolygonCount ();
-    virtual csMeshedPolygon* GetPolygons ();
-    virtual int GetTriangleCount ();
-    virtual csTriangle* GetTriangles ();
-    virtual void Lock () { }
-    virtual void Unlock () { }
-    
-    virtual csFlags& GetFlags () { return flags;  }
-    virtual uint32 GetChangeNumber() const { return 0; }
-
-    PolyMesh () : scfImplementationType (this)
-    {
-      flags.Set (CS_POLYMESH_TRIANGLEMESH);
-    }
-    virtual ~PolyMesh ()
-    {
-    }
-  };
-  csRef<iPolygonMesh> polygonMesh;
-  friend struct PolyMesh;
   enum { Standard, Submeshes } polyMeshType;
 
   void SetPolyMeshStandard ();

@@ -277,9 +277,6 @@ private:
   csBox3 object_bbox;
   bool object_bbox_valid;
 
-  // For polygon mesh.
-  csMeshedPolygon* polygons;
-
   /// Calculate bounding box and radius.
   void CalculateBBoxRadius ();
 
@@ -316,11 +313,6 @@ public:
   void SetObjectBoundingBox (const csBox3& b);
   void GetRadius (float& radius, csVector3& center);
 
-  /**
-   * Calculate polygons for iPolygonMesh.
-   */
-  csMeshedPolygon* GetPolygons ();
-
   /**\name iMeshObjectFactory implementation
    * @{ */
   virtual csFlags& GetFlags () { return flags; }
@@ -341,39 +333,6 @@ public:
   virtual void SetMixMode (uint) { }
   virtual uint GetMixMode () const { return 0; }
   /** @} */
-
-  //------------------ iPolygonMesh interface implementation ----------------//
-  struct PolyMesh : public scfImplementation1<PolyMesh, 
-                                              iPolygonMesh>
-  {
-  private:
-    csWeakRef<csProtoMeshObjectFactory> factory;
-    csFlags flags;
-
-  public:
-    virtual int GetVertexCount () { return PROTO_VERTS; }
-    virtual csVector3* GetVertices () 
-    { return factory ? factory->GetVertices () : 0; }
-    virtual int GetPolygonCount () { return PROTO_TRIS; }
-    virtual csMeshedPolygon* GetPolygons ();
-    virtual int GetTriangleCount () { return PROTO_TRIS; }
-    virtual csTriangle* GetTriangles () 
-    { return factory ? factory->GetTriangles () : 0; }
-    virtual void Lock () { }
-    virtual void Unlock () { }
-    
-    virtual csFlags& GetFlags () { return flags;  }
-    virtual uint32 GetChangeNumber() const { return 0; }
-
-    PolyMesh (csProtoMeshObjectFactory* Factory) : 
-      scfImplementationType (this), factory (Factory)
-    {
-      flags.Set (CS_POLYMESH_TRIANGLEMESH);
-    }
-    virtual ~PolyMesh () { }
-  };
-  friend struct PolyMesh;
-  csRef<PolyMesh> polyMesh;
 
   virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
   virtual iTerrainSystem* GetTerrainColldet () { return 0; }

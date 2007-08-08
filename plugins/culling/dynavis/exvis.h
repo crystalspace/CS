@@ -29,7 +29,6 @@
 #define csExactCuller	csExactCuller_DEBUG
 #endif
 
-struct iPolygonMesh;
 struct iTriangleMesh;
 struct iMovable;
 struct iCamera;
@@ -78,9 +77,6 @@ public:
   /// Destroy the exact culler.
   ~csExactCuller ();
 
-  /// Add an object to this culler.
-  void AddObject (void* obj, iPolygonMesh* polymesh, iMovable* movable,
-  	iCamera* camera, const csPlane3* planes);
   /// Add an object to this culler.
   void AddObject (void* obj, iTriangleMesh* trimesh, iMovable* movable,
   	iCamera* camera, const csPlane3* planes);

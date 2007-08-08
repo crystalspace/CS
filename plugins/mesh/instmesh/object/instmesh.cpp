@@ -1154,46 +1154,6 @@ bool csInstmeshMeshObject::HitBeamObject (const csVector3& start,
   return true;
 }
 
-int csInstmeshMeshObject::PolyMesh::GetVertexCount ()
-{
-  return (int)parent->factory->GetVertexCount ();
-}
-
-csVector3* csInstmeshMeshObject::PolyMesh::GetVertices ()
-{
-  //@@@FIXME: data must come from mesh itself. Not factory
-  return 0;
-  //return scfParent->factory->GetVertices ();
-}
-
-int csInstmeshMeshObject::PolyMesh::GetPolygonCount ()
-{
-  //@@@FIXME: data from mesh instead of factory
-  return 0;
-  //return scfParent->factory->GetTriangleCount ();
-}
-
-csMeshedPolygon* csInstmeshMeshObject::PolyMesh::GetPolygons ()
-{
-  //@@@FIXME: data from mesh instead of factory
-  return 0;
-  //return scfParent->factory->GetPolygons ();
-}
-
-int csInstmeshMeshObject::PolyMesh::GetTriangleCount ()
-{
-  //@@@FIXME: data from mesh instead of factory
-  return 0;
-  //return scfParent->factory->GetTriangleCount ();
-}
-
-csTriangle* csInstmeshMeshObject::PolyMesh::GetTriangles ()
-{
-  //@@@FIXME: data from mesh instead of factory
-  return 0;
-  //return scfParent->factory->GetTriangles ();
-}
-
 size_t csInstmeshMeshObject::TriMesh::GetVertexCount ()
 {
   return parent->factory->GetVertexCount ();

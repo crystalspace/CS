@@ -268,67 +268,6 @@ public:
   virtual uint32 GetChangeNumber () const { return change_nr; }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
-
-#include "igeom/polymesh.h"
-
-/**
- * This triangle mesh is a temporary class that takes a polygon mesh
- * and wraps it so that it becomes a triangle mesh. You should not have
- * to use this mesh in production code!
- * \deprecated This class should not be used!
- */
-class CS_CRYSTALSPACE_EXPORT csTriangleMeshPolyMesh
-  : public virtual scfImplementation1<csTriangleMeshPolyMesh,iTriangleMesh>
-{
-private:
-  iPolygonMesh* polymesh;
-
-public:
-
-#ifndef CS_DEPRECATION_SUPPRESS_HACK
-  CS_DEPRECATED_METHOD_MSG("You shouldn't use this class!")
-#endif
-  csTriangleMeshPolyMesh (iPolygonMesh* polymesh)
-    : scfImplementationType(this), polymesh (polymesh)
-  {
-  }
-
-  virtual ~csTriangleMeshPolyMesh ()
-  {
-  }
-
-  virtual size_t GetVertexCount ()
-  {
-    return (size_t)polymesh->GetVertexCount ();
-  }
-  virtual csVector3* GetVertices ()
-  {
-    return polymesh->GetVertices ();
-  }
-  virtual size_t GetTriangleCount ()
-  {
-    return (size_t)polymesh->GetTriangleCount ();
-  }
-  virtual csTriangle* GetTriangles () { return polymesh->GetTriangles (); }
-  virtual void Lock () { polymesh->Lock (); }
-  virtual void Unlock () { polymesh->Unlock (); }
-  virtual csFlags& GetFlags ()
-  {
-    // This works because CS_POLYMESH flags are compatible with
-    // CS_TRIMESH flags. Since this is a temporary class that goes
-    // away once iPolygonMesh goes away this is not a problem.
-    return polymesh->GetFlags ();
-  }
-  virtual uint32 GetChangeNumber () const
-  {
-    return polymesh->GetChangeNumber ();
-  }
-};
-
-#include "csutil/win32/msvc_deprecated_warn_on.h"
-
-
 /** @} */
 
 #endif // __CS_TRIMESH_H__

@@ -148,17 +148,8 @@ public:
   virtual void SetTriangleData (csStringID, iTriangleMesh*) { }
   virtual bool IsTriangleDataSet (csStringID) { return false; }
   virtual void ResetTriangleData (csStringID) { }
-  virtual iPolygonMesh* GetPolygonMeshBase () { return 0; }
-  virtual iPolygonMesh* GetPolygonMeshColldet () { return 0; }
   virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
   virtual iTerrainSystem* GetTerrainColldet () { return 0; }
-  virtual void SetPolygonMeshColldet (iPolygonMesh*) { }
-  virtual iPolygonMesh* GetPolygonMeshViscull () { return 0; }
-  virtual void SetPolygonMeshViscull (iPolygonMesh*) { }
-  virtual iPolygonMesh* GetPolygonMeshShadows () { return 0; }
-  virtual void SetPolygonMeshShadows (iPolygonMesh*) { }
-  virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
-  { return 0; }
   virtual void AddListener (iObjectModelListener*) { }
   virtual void RemoveListener (iObjectModelListener*) { }
 

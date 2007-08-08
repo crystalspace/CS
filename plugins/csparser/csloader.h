@@ -63,7 +63,6 @@ struct iCameraPosition;
 struct iDocumentNode;
 struct iDocument;
 struct iFile;
-struct iPolygonMesh;
 struct iTriangleMesh;
 struct iShaderManager;
 struct iMeshGenerator;
@@ -382,9 +381,9 @@ private:
   /// Parse a 'trimesh' block.
   bool ParseTriMesh (iDocumentNode* node, iObjectModel* objmodel);
   bool ParseTriMeshChildBox (iDocumentNode* child,
-	csRef<iPolygonMesh>& polymesh, csRef<iTriangleMesh>& trimesh);
+	csRef<iTriangleMesh>& trimesh);
   bool ParseTriMeshChildMesh (iDocumentNode* child,
-	csRef<iPolygonMesh>& polymesh, csRef<iTriangleMesh>& trimesh);
+	csRef<iTriangleMesh>& trimesh);
 
   /// -----------------------------------------------------------------------
   /// Parse a shaderlist

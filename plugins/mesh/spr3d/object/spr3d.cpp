@@ -156,12 +156,6 @@ csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (
   scfImplementationType (this, pParent), texels (8, 8), vertices (8, 8), 
   normals (8, 8)
 {
-  csRef<iPolygonMesh> pm;
-  pm.AttachNew (new PolyMesh (this));
-  SetPolygonMeshBase (pm);
-  SetPolygonMeshColldet (pm);
-  SetPolygonMeshViscull (0);
-  SetPolygonMeshShadows (0);
   csSprite3DMeshObjectType* type = static_cast<csSprite3DMeshObjectType*> (
       pParent);
   csRef<TriMesh> trimesh;
@@ -691,23 +685,6 @@ void csSprite3DMeshObjectFactory::GetRadius (float& rad, csVector3& cent)
   cframe->GetRadius (r);
   rad = r;
 }
-
-csMeshedPolygon* csSprite3DMeshObjectFactory::PolyMesh::GetPolygons ()
-{
-  if (!polygons)
-  {
-    csTriangle* triangles = factory->GetTriangles ();
-    polygons = new csMeshedPolygon [GetPolygonCount ()];
-    int i;
-    for (i = 0 ; i < GetPolygonCount () ; i++)
-    {
-      polygons[i].num_vertices = 3;
-      polygons[i].vertices = &triangles[i].a;
-    }
-  }
-  return polygons;
-}
-
 
 //=============================================================================
 

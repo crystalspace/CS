@@ -1081,26 +1081,6 @@ public:
   /// New Factory.
   virtual csPtr<iMeshObjectFactory> NewFactory ();
   /** @} */
-
-  struct NullPolyMesh : public scfImplementation1<NullPolyMesh, iPolygonMesh>
-  {
-    int GetVertexCount() { return 0; }
-    csVector3* GetVertices () { return 0; }
-    int GetPolygonCount () { return 0; }
-    int GetTriangleCount () { return 0; }
-    csMeshedPolygon* GetPolygons () { return 0; }
-    csTriangle* GetTriangles () { return 0; }
-    void Lock () {}
-    void Unlock () {}
-
-    csFlags polymesh_flags;
-    csFlags& GetFlags () { return polymesh_flags; }
-    uint32 GetChangeNumber() const { return 0; }
-
-    NullPolyMesh (iBase* parent) : scfImplementationType (this, parent),
-      polymesh_flags (CS_POLYMESH_TRIANGLEMESH) {}
-  };
-  csRef<iPolygonMesh> nullPolyMesh;
 };
 
 }

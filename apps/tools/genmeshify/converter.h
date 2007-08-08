@@ -92,8 +92,8 @@ namespace genmeshify
       const LMLayout& layout, iThingState* object, 
       iDocumentNode* textures, csStringArray& slmNames);
 
-    bool WritePolyMeshes (iObjectModel* objmodel, iDocumentNode* to);
-    bool WritePolyMesh (iPolygonMesh* polyMesh, iDocumentNode* to);
+    bool WriteTriMeshes (iObjectModel* objmodel, iDocumentNode* to);
+    bool WriteTriMesh (iTriangleMesh* triMesh, iDocumentNode* to);
   public:
     Converter (App* app, iLoaderContext* context, iRegion* region);
   

@@ -34,7 +34,6 @@
 #include "csgeom/segment.h"
 #include "csgeom/sphere.h"
 #include "csgeom/kdtree.h"
-#include "igeom/polymesh.h"
 #include "imesh/objmodel.h"
 #include "csutil/flags.h"
 #include "iutil/objreg.h"

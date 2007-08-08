@@ -148,7 +148,7 @@
       <zfill />
       <priority>sky</priority>
       <camera />
-      <polymesh> <colldet/> </polymesh>
+      <trimesh> <id>colldet</id> </trimesh>
     </meshobj>
 
     <meshobj name="Terrain">
