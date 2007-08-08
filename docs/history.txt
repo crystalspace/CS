@@ -10,6 +10,7 @@ chronological order.
 	- Jorrit (hopefully) removed all traces of the deprecated
 	  iPolygonMesh.
 	- res removed the debugging graph header.
+	- res removed the deprecated image generation stuff.
 7-Aug-2007
 	- res changed the cs-win32libs link to point to the 1.2 version.
 	- res deprecated the obsolete 

@@ -41,8 +41,6 @@
 #include "ivaria/engseq.h"
 #include "ivideo/graph3d.h"
 
-class csGenerateImageTexture;
-class csGenerateImageValue;
 class csReversibleTransform;
 class csColor;
 struct csRGBcolor;
@@ -393,13 +391,6 @@ private:
   bool ParseShader (iLoaderContext* ldr_context, iDocumentNode* node,
     iShaderManager* shaderMgr);
   virtual csRef<iShader> LoadShader (const char* filename, bool registerShader = true);
-
-  /// For heightgen.
-  csGenerateImageTexture* ParseHeightgenTexture (iDocumentNode* node);
-  /// For heightgen.
-  csGenerateImageValue* ParseHeightgenValue (iDocumentNode* node);
-  /// Parse and load a height texture
-  bool ParseHeightgen (iLoaderContext* ldr_context, iDocumentNode* node);
 
   /**
    * Load a LOD control object.

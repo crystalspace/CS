@@ -27,7 +27,6 @@
 #include "csutil/cfgfile.h"
 #include "csutil/scanstr.h"
 #include "csutil/scfstr.h"
-#include "cstool/gentrtex.h"
 #include "cstool/keyval.h"
 #include "cstool/mapnode.h"
 #include "cstool/saverfile.h"
