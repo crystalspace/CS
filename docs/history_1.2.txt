@@ -2,6 +2,7 @@
 
 8-Aug-2007
 	- res merged r27373 into 1.2 (new cs-win32libs version).
+	- res merged r27392 into 1.2 (csconout fix).
 1-Aug-2007
 	- Jorrit merged r27356 into 1.2 (gmeshanim2 fix).
 24-Jul-2007
