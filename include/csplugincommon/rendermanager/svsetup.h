@@ -96,6 +96,27 @@ namespace RenderManager
     csShaderVariableStack tempStack;
   };
 
+  template<typename Tree>
+  void SetupStandardSVs (typename Tree::ContextNode& context, 
+    iShaderManager* shaderManager, iSector* sector)
+  {
+    // Setup SV arrays
+    context.svArrays.Setup (shaderManager->GetSVNameStringset ()->GetSize (), 
+      context.totalRenderMeshes);
+
+    // Push the default stuff
+    csShaderVariableStack& svStack = shaderManager->GetShaderVariableStack ();
+
+    {
+      context.svArrays.SetupSVStck (svStack, 0);
+
+      shaderManager->PushVariables (svStack);
+      sector->GetSVContext ()->PushVariables (svStack);
+
+      // Replicate
+      context.svArrays.ReplicateSet (0, 1);
+    }
+  }
   
 }
 }

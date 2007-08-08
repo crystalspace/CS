@@ -54,7 +54,12 @@ namespace RenderManager
     // Any extra data that should be defined for each context node
     struct ContextNodeExtraDataType
     {
+      // The SVs themselves
       SVArrayHolder svArrays;
+
+      // Arrays of per-mesh shader and ticket info
+      csArray<iShader*> shaderArray;
+      csArray<size_t> ticketArray;
     };
 
     // Any extra data per mesh in a mesh node
@@ -73,7 +78,7 @@ namespace RenderManager
     //-- Standard functions
     // Given a iMeshWrapper and a csRenderMesh, get the correct mesh node index
     static CS_FORCEINLINE 
-    MeshNodeKeyType GetMeshNodeKey(iMeshWrapper* imesh, const csRenderMesh& rendermesh)
+    MeshNodeKeyType GetMeshNodeKey (iMeshWrapper* imesh, const csRenderMesh& rendermesh)
     {
       MeshNodeKeyType result = {0};
 
@@ -86,7 +91,7 @@ namespace RenderManager
     // Setup a new mesh node from the first iMeshWrapper and csRenderMesh
     template<typename T>
     static CS_FORCEINLINE_TEMPLATEMETHOD 
-    void SetupMeshNode(T& meshNode, iMeshWrapper* imesh, const csRenderMesh& rendermesh)
+    void SetupMeshNode (T& meshNode, iMeshWrapper* imesh, const csRenderMesh& rendermesh)
     {
       meshNode.priority = imesh->GetRenderPriority ();
     }

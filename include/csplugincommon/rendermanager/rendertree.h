@@ -109,6 +109,7 @@ namespace RenderManager
     {
       // Create an initial context
       ContextNode* newCtx = persistentData.contextNodeAllocator.Alloc ();
+      newCtx->totalRenderMeshes = 0;
       contextNodeList.Push (newCtx);
 
       return newCtx;

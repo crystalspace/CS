@@ -94,6 +94,29 @@ namespace RenderManager
     TicketArrayType& ticketArray;
   };
 
+
+  // Setup the standard shader, shader SV and ticket
+  template<typename Tree>
+  void SetupStandarShaderAndTicket (Tree& tree, typename Tree::ContextNode& context, 
+    iShaderManager* shaderManager,
+    csStringID defaultShaderType, iShader* defaultShader = 0)
+  {
+    context.shaderArray.SetSize (context.totalRenderMeshes);
+    context.ticketArray.SetSize (context.totalRenderMeshes);
+
+    // Shader, sv and ticket setup
+    {
+      ShaderSetup<Tree> shaderSetup (context.shaderArray, defaultShaderType, defaultShader);
+      ShaderSVSetup<Tree> shaderSVSetup (context.svArrays, context.shaderArray);
+      TicketSetup<Tree> ticketSetup (context.svArrays, shaderManager->GetShaderVariableStack (),
+        context.shaderArray, context.ticketArray);
+
+      tree.TraverseMeshNodes (
+        CS::Meta::CompositeFunctor(
+          CS::Meta::CompositeFunctor(shaderSetup, shaderSVSetup), 
+          ticketSetup), &context);
+    }
+  }
 }
 }
 

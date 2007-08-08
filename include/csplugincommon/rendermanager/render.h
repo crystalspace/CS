@@ -54,15 +54,10 @@ namespace RenderManager
   class SimpleRender : public NumberedMeshTraverser<Tree, SimpleRender<Tree> >
   {
   public:
-    typedef csArray<size_t> TicketArrayType;
-    typedef csArray<iShader*> ShaderArrayType;
-
     typedef NumberedMeshTraverser<Tree, SimpleRender<Tree> > BaseType;
 
-    SimpleRender (iGraphics3D* g3d, SVArrayHolder& svArrays, csShaderVariableStack& varStack,
-      const ShaderArrayType& shaderArray, const TicketArrayType& ticketArray)
-      : BaseType (*this), g3d (g3d), svArrays (svArrays), 
-      varStack (varStack), shaderArray (shaderArray), ticketArray (ticketArray)
+    SimpleRender (iGraphics3D* g3d, csShaderVariableStack& varStack)
+      : BaseType (*this), g3d (g3d), varStack (varStack)
     {
     }
 
@@ -73,9 +68,9 @@ namespace RenderManager
       typename Tree::ContextNode& ctxNode, const Tree& tree)
     {
       // Get the shader, ticket and sv array
-      iShader* shader = shaderArray[index];
-      size_t ticket = ticketArray[index];
-      svArrays.SetupSVStck (varStack, index);
+      iShader* shader = ctxNode.shaderArray[index];
+      size_t ticket = ctxNode.ticketArray[index];
+      ctxNode.svArrays.SetupSVStck (varStack, index);
 
       // Render the mesh
       RenderSingleMesh (mesh.renderMesh, shader, ticket);
@@ -102,10 +97,7 @@ namespace RenderManager
     }
 
     iGraphics3D* g3d;
-    SVArrayHolder& svArrays;
     csShaderVariableStack& varStack;
-    const ShaderArrayType& shaderArray;
-    const TicketArrayType& ticketArray;
   };
 
 

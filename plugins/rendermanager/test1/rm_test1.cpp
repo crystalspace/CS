@@ -61,44 +61,18 @@ bool RMTest1::RenderView (iView* view)
   }
 
   // Setup the SV arrays
-  //SVArrayHolder svArrays (svNameStringSet->GetSize (), renderTree.GetTotalRenderMeshes ());
-  mainContext->svArrays.Setup (svNameStringSet->GetSize (), mainContext->totalRenderMeshes);
-  SVArrayHolder& svArrays = mainContext->svArrays;
-
   // Push the default stuff
-  csShaderVariableStack& svStack = shaderManager->GetShaderVariableStack ();
-  {
-    svArrays.SetupSVStck (svStack, 0);
+  SetupStandardSVs<RenderTreeType> (*mainContext, shaderManager, startSector);
 
-    shaderManager->PushVariables (svStack);
-    startSector->GetSVContext ()->PushVariables (svStack);
-
-    // Replicate
-    svArrays.ReplicateSet (0, 1);
-  }
-  
   // Setup the material&mesh SVs
   {
-    StandardSVSetup<RenderTreeType> svSetup (svArrays);
+    StandardSVSetup<RenderTreeType> svSetup (mainContext->svArrays);
     renderTree.TraverseMeshNodes (svSetup, mainContext);
   }
 
   // Render all meshes, using only default shader
   {
-    csArray<iShader*> shaderArray; shaderArray.SetSize (renderTree.GetTotalRenderMeshes ());
-    csArray<size_t> ticketArray; ticketArray.SetSize (renderTree.GetTotalRenderMeshes ());
-    // Shader, sv and ticket setup
-    {
-      ShaderSetup<RenderTreeType> shaderSetup (shaderArray, defaultShaderName, defaultShader);
-      ShaderSVSetup<RenderTreeType> shaderSVSetup (svArrays, shaderArray);
-      TicketSetup<RenderTreeType> ticketSetup (svArrays, shaderManager->GetShaderVariableStack (),
-        shaderArray, ticketArray);
-
-      renderTree.TraverseMeshNodes (
-        CS::Meta::CompositeFunctor(
-          CS::Meta::CompositeFunctor(shaderSetup, shaderSVSetup), 
-          ticketSetup), mainContext);
-    }
+    SetupStandarShaderAndTicket (renderTree, *mainContext, shaderManager, defaultShaderName, defaultShader);
 
     // Render
     {
@@ -108,8 +82,7 @@ bool RMTest1::RenderView (iView* view)
 
       g3d->SetWorldToCamera (view->GetCamera ()->GetTransform ().GetInverse ());
 
-      SimpleRender<RenderTreeType> render (g3d, svArrays, 
-        shaderManager->GetShaderVariableStack (), shaderArray, ticketArray);
+      SimpleRender<RenderTreeType> render (g3d, shaderManager->GetShaderVariableStack ());
 
       renderTree.TraverseMeshNodes (render, mainContext);
     }
