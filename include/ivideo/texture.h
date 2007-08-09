@@ -127,7 +127,7 @@ struct iTextureHandle : public virtual iBase
   /**
    * Get the texture target. Note the texture target is determined by the 
    * image from which the texture was created and possibly the texture flags.
-   * \deprecated Use GetTextureType() instead
+   * \deprecated Deprecated in 1.3. Use GetTextureType() instead
    */
   CS_DEPRECATED_METHOD_MSG("Use GetTextureType() instead")
   virtual int GetTextureTarget () const = 0;
