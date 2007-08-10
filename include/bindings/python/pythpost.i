@@ -47,8 +47,9 @@
 #endif
 
 %pythoncode %{
+  corecvar = cvar
   def CS_REQUEST_PLUGIN (name, intf):
-    return (name, intf.__name__, _cspace.cvar.iSCF_SCF.GetInterfaceID(intf.__name__),
+    return (name, intf.__name__, corecvar.iSCF_SCF.GetInterfaceID(intf.__name__),
       intf.scfGetVersion())
 
   def CS_REQUEST_VFS ():
