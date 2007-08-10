@@ -6,6 +6,10 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Aug-2007
+	- caedes reworked the split bindings swig files so now both split
+	  and monolithic bindings can be built from the same set of swig
+	  interface files. this also adds a new core module to the bindings.
 07-Jun-2007
 	- caedes did the following changes in swig interface files:
 	  - moved all common swig interface declarations to a new folder
