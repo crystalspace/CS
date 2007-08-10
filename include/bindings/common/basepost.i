@@ -94,8 +94,7 @@
 
 #undef INTERFACE_APPLY
 #define INTERFACE_APPLY(x) INTERFACE_POST(x)
-APPLY_FOR_ALL_INTERFACES_POST
-
+/*
 #if defined(SWIGPYTHON)
   %include "bindings/python/pythpost.i"
 #elif defined(SWIGPERL5)
@@ -109,8 +108,9 @@ APPLY_FOR_ALL_INTERFACES_POST
 #elif defined(SWIGLUA)
   %include "bindings/lua/luapost.i"
 #endif
-
-%define %cs_lang_include(file)
+*/
+%define cs_lang_include(file)
+APPLY_FOR_ALL_INTERFACES_POST
   #if defined(SWIGPYTHON)
     %include bindings/python/ ## file
   #elif defined(SWIGPERL5)

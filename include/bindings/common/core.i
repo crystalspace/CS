@@ -82,13 +82,13 @@
 */
 
 //#define USE_DIRECTORS
-
+/*
 #ifdef USE_DIRECTORS
 %module(directors="1") cspace
 #else
 %module cspace
 #endif
-
+*/
 %include "csconfig.h"
 // Ignored macros.
 #undef CS_STRUCT_ALIGN_4BYTE_BEGIN
@@ -168,10 +168,39 @@
 %}
 
 %include "bindings/common/allinterfaces.i"
+/*
+%define INTERFACE_POST(T)
+  %extend T
+  {
+    static int scfGetVersion() { return scfInterfaceTraits<T>::GetVersion(); }
+    virtual ~T() { if (self) self->DecRef (); }
+  }
+%enddef
 
+
+%define %cs_lang_post(file)
+  #ifndef SWIGIMPORTED
+    #undef INTERFACE_APPLY
+    #define INTERFACE_APPLY INTERFACE_POST
+    APPLY_FOR_ALL_INTERFACES_POST
+  #endif
+  #if defined(SWIGPYTHON)
+    %include bindings/python/ ## file ## post.i
+  #elif defined(SWIGPERL5)
+    %include bindings/perl/ ## file ## post.i
+  #elif defined(SWIGRUBY)
+    %include bindings/ruby/ ## file ## post.i
+  #elif defined(SWIGTCL8)
+    %include bindings/tcl/ ## file ## post.i
+  #elif defined(SWIGJAVA)
+    %include bindings/java/ ## file ## post.i
+  #elif defined(SWIGLUA)
+    %include bindings/lua/ ## file ## post.i
+  #endif
+%enddef
+*/
 %ignore iBase::~iBase(); // We replace iBase dtor with one that calls DecRef().
                          // Swig already knows not to delete an SCF pointer.
-
 %include "typemaps.i"
 
 // The following list all kown arguments that are actually (also) outputs.
@@ -892,6 +921,7 @@ typedef int int32_t;
 %ignore iBase::~iBase(); // We replace iBase dtor with one that calls DecRef().
 			 // Swig already knows not to delete an SCF pointer.
 
+/*
 %define INTERFACE_POST(T)
   %extend T
   {
@@ -903,6 +933,7 @@ typedef int int32_t;
 #undef INTERFACE_APPLY
 #define INTERFACE_APPLY(x) INTERFACE_POST(x)
 CORE_APPLY_FOR_EACH_INTERFACE
+*/
 
 %extend iPolygonMesh
 {
@@ -1219,6 +1250,7 @@ csWrapPtr CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
 }
 %}
 
+/*
 #if defined(SWIGPYTHON)
   %include "bindings/python/pythpost.i"
 #elif defined(SWIGPERL5)
@@ -1232,3 +1264,4 @@ csWrapPtr CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
 #elif defined(SWIGLUA)
   %include "bindings/lua/luapost.i"
 #endif
+*/

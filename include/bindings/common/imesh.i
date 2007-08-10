@@ -63,6 +63,6 @@ iArrayChangeElements<csSprite2DVertex>;
 #undef APPLY_FOR_ALL_INTERFACES_POST
 #define APPLY_FOR_ALL_INTERFACES_POST IMESH_APPLY_FOR_EACH_INTERFACE
 %include "bindings/common/basepost.i"
-%cs_lang_include(imeshpost.i)
+cs_lang_include(imeshpost.i)
 #endif
 

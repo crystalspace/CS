@@ -1,5 +1,5 @@
 %module ivaria
-%import "bindings/cspace.i"
+%import "bindings/core.i"
 %{
 #include "crystalspace.h"
 %}

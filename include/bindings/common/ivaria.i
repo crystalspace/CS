@@ -58,5 +58,5 @@
 #undef APPLY_FOR_ALL_INTERFACES_POST
 #define APPLY_FOR_ALL_INTERFACES_POST IVARIA_APPLY_FOR_EACH_INTERFACE
 %include "bindings/common/basepost.i"
-%cs_lang_include(ivariapost.i)
+cs_lang_include(ivariapost.i)
 #endif

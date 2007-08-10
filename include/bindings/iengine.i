@@ -1,5 +1,5 @@
 %module iengine
-%import "bindings/cspace.i"
+%import "bindings/core.i"
 %import "bindings/ivideo.i" /* due to at least csZBufMode graph3d.h */
 %{
 #include "crystalspace.h"

@@ -1,5 +1,5 @@
 %module ivideo
-%import "bindings/cspace.i"
+%import "bindings/core.i"
 %import "bindings/csgfx.i"
 %{
 #include "crystalspace.h"
