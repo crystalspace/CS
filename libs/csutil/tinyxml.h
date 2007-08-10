@@ -42,6 +42,7 @@ distribution.
 #include "csutil/reftrackeraccess.h"
 #include "csutil/strset.h"
 #include "csutil/util.h"
+#include "csgeom/math.h"
 
 #include "tinystr.h"
 
@@ -794,9 +795,33 @@ class TiDocument : public TiDocumentNodeChildren
         CS_ASSERT(false);
     }
   }
+  /**
+   * Array capacity. Grows exponentially until a cap is hit.
+   */
+  class FreeQueueArrayCapacity
+  {
+    static const size_t maxGrow = 256*1024;
+  public:
+    FreeQueueArrayCapacity () {}
+  
+    bool IsCapacityExcessive (size_t capacity, size_t count) const
+    {
+      size_t threshold = csMin (size_t (csFindNearestPowerOf2 (int (count))),
+	maxGrow);
+      return (capacity > threshold && count < capacity - threshold);
+    }
+    size_t GetCapacity (size_t count) const
+    {
+      size_t threshold = csMin (size_t (csFindNearestPowerOf2 (int (count))), 
+	maxGrow);
+      return ((count + threshold - 1) / threshold) * threshold;
+    }
+  };
   void EmptyDestroyQueue()
   {
-    csArray<FreeQueueEntry> freeQueue;
+    csArray<FreeQueueEntry, csArrayElementHandler<FreeQueueEntry>,
+      CS::Memory::AllocatorMalloc, FreeQueueArrayCapacity> freeQueue;
+    freeQueue.SetCapacity (destroyQueue.GetSize());
     while (destroyQueue.GetSize() > 0)
     {
       TiDocumentNode* node = destroyQueue.PopTop ();
