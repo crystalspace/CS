@@ -1,0 +1,62 @@
+SubDir TOP plugins cscript pycore ;
+
+if $(PYTHON.AVAILABLE) = "yes"
+{
+  #--------
+  # Swig-generated files for core.
+  #--------
+  local common = cs_core.cpp ;
+  local corepy = [ DoSourceGrist core.py ] ;
+  MakeLocate $(corepy) : $(LOCATE.TARGETS) ;
+
+  if ! [ Property build : projgen ]
+  {
+    common = [ DoSourceGrist $(common) ] ;
+
+    if $(CMD.SWIG)
+    {
+      Swig $(common) $(corepy) :
+        [ DoSourceGrist core.i ] :
+        python :
+	-c++ -shadow :
+	[ ConcatDirs $(TOP) include ]
+	[ ConcatDirs $(BUILDTOP) include ] :
+	[ ConcatDirs $(TOP) include bindings ]
+	[ ConcatDirs $(TOP) include bindings python ] :
+	$(SEARCH_SOURCE) [ ConcatDirs $(TOP) scripts python ] :
+	core :
+	[ on $(corepy) GetVar LOCATE ] ;
+      Depends corepyclean : pythonswigclean ;
+    }
+    else
+    {
+      SEARCH on $(common) = $(SEARCH_SOURCE) ;
+      local frozenpy = $(corepy:G=frozencorepy) ;
+      SEARCH on $(frozenpy) = [ ConcatDirs $(TOP) scripts python ] ;
+      Copy $(corepy) : $(frozenpy) ;
+      Depends $(corepy) : $(frozenpy) ;
+    }
+  }
+  Clean corepyclean : $(corepy) ;
+  Depends clean : corepyclean ;
+
+  rule InstallCSCeguiPY
+  {
+    # Temporary SUBDIR override for InstallData.
+    local SUBDIR = [ on $(<) GetVar LOCATE ] ;
+    InstallData $(<) : $(>) ;
+  }
+  InstallCSCeguiPY $(corepy) : bindings python ;
+
+
+  #--------
+  # core -- Pure Python module
+  #--------
+  PythMod coremod : _core : 
+	coremod.cpp cs_core.cpp : 
+	crystalspace : 
+	: 
+	"core cs Python module" ;
+  Depends coremod : $(corepy) ;
+  CFlags coremod : [ FDefines SWIG_GLOBAL ] $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE) ;
+}

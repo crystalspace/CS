@@ -4,6 +4,7 @@ SubInclude TOP plugins cscript csjava ;
 SubInclude TOP plugins cscript csperl5 ;
 SubInclude TOP plugins cscript cspython ;
 SubInclude TOP plugins cscript pycscegui ;
+SubInclude TOP plugins cscript pycore ;
 SubInclude TOP plugins cscript pyimesh ;
 SubInclude TOP plugins cscript pyisndsys ;
 SubInclude TOP plugins cscript pyivaria ;
