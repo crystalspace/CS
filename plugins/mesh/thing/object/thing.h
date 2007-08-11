@@ -21,7 +21,6 @@
 
 #include "csgeom/csrect.h"
 #include "cstool/objmodel.h"
-#include "csgeom/pmtools.h"
 #include "csgeom/subrec.h"
 #include "csgeom/transfrm.h"
 #include "igeom/trimesh.h"
@@ -87,92 +86,6 @@ struct RepMaterial
   RepMaterial (iMaterialWrapper* o, iMaterialWrapper* n) :
   	old_mat (o), new_mat (n) { }
 };
-
-/**
- * A helper class for iPolygonMesh implementations used by csThing.
- */
-class PolyMeshHelper : 
-  public scfImplementation1<PolyMeshHelper, 
-			    iPolygonMesh>
-{
-public:
-  /**
-   * Make a polygon mesh helper which will accept polygons which match
-   * with the given flag (one of CS_POLY_COLLDET or CS_POLY_VISCULL).
-   */
-  PolyMeshHelper (uint32 flag) : scfImplementationType (this), 
-    polygons (0), vertices (0), poly_flag (flag), triangles (0),
-    locked (0)
-  {
-  }
-  virtual ~PolyMeshHelper ()
-  {
-    Cleanup ();
-  }
-
-  void Setup ();
-  void SetThing (csThingStatic* thing);
-
-  virtual int GetVertexCount ()
-  {
-    Setup ();
-    return num_verts;
-  }
-  virtual csVector3* GetVertices ()
-  {
-    Setup ();
-    return vertices;
-  }
-  virtual int GetPolygonCount ()
-  {
-    Setup ();
-    return num_poly;
-  }
-  virtual csMeshedPolygon* GetPolygons ()
-  {
-    Setup ();
-    return polygons;
-  }
-  virtual int GetTriangleCount ()
-  {
-    Triangulate ();
-    return tri_count;
-  }
-  virtual csTriangle* GetTriangles ()
-  {
-    Triangulate ();
-    return triangles;
-  }
-  virtual void Lock () { locked++; }
-  virtual void Unlock ();
-
-  virtual csFlags& GetFlags () { return flags;  }
-  virtual uint32 GetChangeNumber() const { return 0; }
-
-  void Cleanup ();
-  void ForceCleanup ();
-
-private:
-  csThingStatic* thing;
-  uint32 static_data_nr;	// To see if the static thing has changed.
-  csMeshedPolygon* polygons;	// Array of polygons.
-  csVector3* vertices;		// Array of vertices (points to obj_verts).
-  int num_poly;			// Total number of polygons.
-  int num_verts;		// Total number of vertices.
-  uint32 poly_flag;		// Polygons must match with this flag.
-  csFlags flags;
-  csTriangle* triangles;
-  int tri_count;
-  int locked;
-
-  void Triangulate ()
-  {
-    if (triangles) return;
-    csPolygonMeshTools::Triangulate (this, triangles, tri_count);
-  }
-};
-
-#include "csutil/win32/msvc_deprecated_warn_off.h"
 
 /**
  * A helper class for iTriangleMesh implementations used by csThing.
@@ -621,13 +534,6 @@ public:
   virtual uint GetMixMode () const
   { return mixmode; }
 
-  //-------------------- iPolygonMesh interface implementation ----------------
-  csRef<PolyMeshHelper> polygonMesh;
-  //-------------------- CD iPolygonMesh implementation -----------------------
-  csRef<PolyMeshHelper> polygonMeshCD;
-  //-------------------- Lower detail iPolygonMesh implementation -------------
-  csRef<PolyMeshHelper> polygonMeshLOD;
-
   //-------------------- iObjectModel implementation --------------------------
   virtual void GetObjectBoundingBox (csBox3& bbox)
   {
@@ -676,7 +582,6 @@ class csThing :
 			    iLightingInfo, 
 			    iShadowCaster>
 {
-  friend class PolyMeshHelper;
   friend class csPolygon3D;
   friend class csPolygonRenderer::BufferAccessor;
 
@@ -1094,12 +999,6 @@ public:
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
   virtual void BuildDecal(const csVector3* pos, float decalRadius,
 	iDecalBuilder* decalBuilder);
-  //-------------------- iPolygonMesh interface implementation ----------------
-  //csRef<PolyMeshHelper> polygonMesh;
-  //-------------------- CD iPolygonMesh implementation -----------------------
-  //csRef<PolyMeshHelper> polygonMeshCD;
-  //-------------------- Lower detail iPolygonMesh implementation -------------
-  //csRef<PolyMeshHelper> polygonMeshLOD;
 };
 
 struct intar2 { int ar[2]; };

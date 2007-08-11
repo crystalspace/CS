@@ -226,7 +226,7 @@ bool csTerrainCollider::CollideTriangles (iTerrainCell* cell,
     for (unsigned int edge = 0; edge < 3; ++edge)
     {
       const csVector3& start = triv[edge];
-      const csVector3& end = triv[(edge + 1)%3];
+      const csVector3& end = triv[CS::Math::NextModulo3(edge)];
       
       csTerrainSegmentCellCollider collider (cell, start, end);
   

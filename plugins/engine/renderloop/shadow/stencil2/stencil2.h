@@ -32,7 +32,7 @@
 #include "iengine/rendersteps/ilightiter.h"
 #include "iengine/viscull.h"
 #include "imesh/objmodel.h"
-#include "igeom/polymesh.h"
+#include "igeom/trimesh.h"
 #include "csutil/hash.h"
 #include "csutil/csstring.h"
 #include "csutil/strhash.h"

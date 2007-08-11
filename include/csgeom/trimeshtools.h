@@ -23,10 +23,17 @@
 #include "csextern.h"
 
 #include "csgeom/trimesh.h"
-#include "csgeom/pmtools.h"
 #include "csutil/array.h"
 
 struct csTriangle;
+
+/**
+ * A triangle with minimum/maximum information on x.
+ */
+struct CS_CRYSTALSPACE_EXPORT csTriangleMinMax : public csTriangle
+{
+  float minx, maxx;
+};
 
 /**\file 
  * Set of tools to work with iTriangleMesh instances.

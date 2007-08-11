@@ -266,7 +266,6 @@
   INTERFACE_APPLY(iParticleBuiltinEffectorLinColor)
   INTERFACE_APPLY(iParticleBuiltinEffectorFactory)
   INTERFACE_APPLY(iPluginManager)
-  INTERFACE_APPLY(iPolygonMesh)
   INTERFACE_APPLY(iPortal)
   INTERFACE_APPLY(iPortalContainer)
   INTERFACE_APPLY(iReporter)
@@ -1026,13 +1025,9 @@ iArrayChangeElements<csShaderVariable * >;
 %include "igeom/path.h"
 %template(scfPath) scfImplementation1<csPath,iPath >;
 #ifndef CS_SWIG_PUBLISH_IGENERAL_FACTORY_STATE_ARRAYS
-%ignore iPolygonMesh::GetTriangles;
-%ignore iPolygonMesh::GetVertices;
-%ignore iPolygonMesh::GetPolygons;
 %ignore iTriangleMesh::GetTriangles;
 %ignore iTriangleMesh::GetVertices;
 #endif
-%include "igeom/polymesh.h"
 %include "igeom/trimesh.h"
 /*Ignore some deprecated functions*/
 %ignore csPath::GetPointCount;
@@ -1040,11 +1035,8 @@ iArrayChangeElements<csShaderVariable * >;
 %ignore csPath::SetTimeValues;
 %ignore csPath::GetTimeValues;
 %include "csgeom/path.h"
-%template(pycsPolygonMesh) scfImplementation1<csPolygonMesh, iPolygonMesh>;
-%template(pycsPolygonMeshBox) scfImplementation1<csPolygonMeshBox, iPolygonMesh>;
 %template(pycsTriangleMesh) scfImplementation1<csTriangleMesh, iTriangleMesh>;
 %template(pycsTriangleMeshBox) scfImplementation1<csTriangleMeshBox, iTriangleMesh>;
-%include "csgeom/polymesh.h"
 %include "csgeom/trimesh.h"
 
 %ignore csArray<csArray<int> >::Contains;
@@ -1054,7 +1046,6 @@ ARRAY_OBJECT_FUNCTIONS(csArray<int>,int)
 ARRAY_OBJECT_FUNCTIONS(csArray<csArray<int> >,csArray<int>)
 %newobject csPolygonMeshTools::CalculateVertexConnections;
 %newobject csTriangleMeshTools::CalculateVertexConnections;
-%include "csgeom/pmtools.h"
 %include "csgeom/trimeshtools.h"
 %include "csgeom/spline.h"
 
@@ -1412,18 +1403,6 @@ APPLY_FOR_EACH_INTERFACE
 
   csColor *GetColorByIndex(int index)
   { return &(self->GetColors()[index]); }
-}
-
-%extend iPolygonMesh
-{
-  csVector3 *GetVertexByIndex(int index)
-  { return &(self->GetVertices()[index]); }
-
-  csMeshedPolygon *GetPolygonByIndex(int index)
-  { return &(self->GetPolygons()[index]); }
-
-  csTriangle *GetTriangleByIndex(int index)
-  { return &(self->GetTriangles()[index]); }
 }
 
 %extend iTriangleMesh

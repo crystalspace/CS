@@ -421,22 +421,6 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
     return CSMutableArrayHelper(self.GetColorByIndex, self.GetVertexCount)
 %}
 
-%feature("shadow") iPolygonMesh::GetTriangles()
-%{
-  def GetTriangles(self):
-    return CSMutableArrayHelper(self.GetTriangleByIndex, self.GetTriangleCount)
-%}
-%feature("shadow") iPolygonMesh::GetPolygons()
-%{
-  def GetPolygons(self):
-    return CSMutableArrayHelper(self.GetPolygonByIndex, self.GetPolygonCount)
-%}
-%feature("shadow") iPolygonMesh::GetVertices()
-%{
-  def GetVertices(self):
-    return CSMutableArrayHelper(self.GetVertexByIndex, self.GetVertexCount)
-%}
-
 %feature("shadow") iTriangleMesh::GetTriangles()
 %{
   def GetTriangles(self):

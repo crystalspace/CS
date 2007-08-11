@@ -1,3 +1,4 @@
+
 /*
     Crystal Space Shared Class Facility (SCF)
     Copyright (C) 2005 by Marten Svanfeldt and Michael D. Adams
@@ -19,8 +20,12 @@
 
 /*
  * This header have been generated from scf_implgen.h by using
- * gcc -E -x c -P -DSCF_IN_IMPLEMENTATION_H -I.. scf_implgen.h
- * after which the result was put into scf_implgen_p_template.h manually!
+ * bin/gen-scf_impl.sh. Rerun this script if you wish to apply changes made
+ * to any of the scf_impl* files.
+ *
+ * Note that the generation incurs C preprocessing; thus most of this file
+ * is devoid of comments - check the original scf_impl* files for possible
+ * notes and comments.
  */
 
 #if !defined(SCF_IN_IMPLEMENTATION_H)
@@ -34,10 +39,11 @@
 
 #include "csutil/win32/msvc_deprecated_warn_off.h"
 
+/* Pre-preprocessed code starts here */
 template<class Class >
-class CS_CRYSTALSPACE_EXPORT scfImplementation0 :
+class scfImplementation0 :
   public scfImplementation<Class>
-
+ 
 {
 public:
   inline void *QueryInterface(scfInterfaceID id, scfInterfaceVersion version)
@@ -136,7 +142,7 @@ private:
 
 };
 template<class Class ,class I1>
-class CS_CRYSTALSPACE_EXPORT scfImplementation1 :
+class scfImplementation1 :
   public scfImplementation<Class>
   ,public I1
 {
@@ -248,7 +254,7 @@ private:
 
 };
 template<class Class ,class I1, class I2>
-class CS_CRYSTALSPACE_EXPORT scfImplementation2 :
+class scfImplementation2 :
   public scfImplementation<Class>
   ,public I1, public I2
 {
@@ -372,7 +378,7 @@ private:
 
 };
 template<class Class ,class I1, class I2, class I3>
-class CS_CRYSTALSPACE_EXPORT scfImplementation3 :
+class scfImplementation3 :
   public scfImplementation<Class>
   ,public I1, public I2, public I3
 {
@@ -508,7 +514,7 @@ private:
 
 };
 template<class Class ,class I1, class I2, class I3, class I4>
-class CS_CRYSTALSPACE_EXPORT scfImplementation4 :
+class scfImplementation4 :
   public scfImplementation<Class>
   ,public I1, public I2, public I3, public I4
 {
@@ -656,7 +662,7 @@ private:
 
 };
 template<class Class ,class I1, class I2, class I3, class I4, class I5>
-class CS_CRYSTALSPACE_EXPORT scfImplementation5 :
+class scfImplementation5 :
   public scfImplementation<Class>
   ,public I1, public I2, public I3, public I4, public I5
 {
@@ -816,7 +822,7 @@ private:
 
 };
 template<class Class ,class I1, class I2, class I3, class I4, class I5, class I6>
-class CS_CRYSTALSPACE_EXPORT scfImplementation6 :
+class scfImplementation6 :
   public scfImplementation<Class>
   ,public I1, public I2, public I3, public I4, public I5, public I6
 {
@@ -988,7 +994,7 @@ private:
 
 };
 template<class Class ,class I1, class I2, class I3, class I4, class I5, class I6, class I7>
-class CS_CRYSTALSPACE_EXPORT scfImplementation7 :
+class scfImplementation7 :
   public scfImplementation<Class>
   ,public I1, public I2, public I3, public I4, public I5, public I6, public I7
 {
@@ -1172,9 +1178,9 @@ private:
 
 };
 template<class Class ,class Super>
-class CS_CRYSTALSPACE_EXPORT scfImplementationExt0 :
+class scfImplementationExt0 :
   public Super
-
+ 
 {
 public:
   inline void *QueryInterface(scfInterfaceID id, scfInterfaceVersion version)
@@ -1183,7 +1189,8 @@ public:
   }
 
 protected:
-  scfImplementationExt0(Class *object)
+  template<class Class_>
+  scfImplementationExt0(Class_ *object)
     : Super(), scfObject(object)
   {
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
@@ -1320,7 +1327,7 @@ private:
 
 };
 template<class Class ,class Super ,class I1>
-class CS_CRYSTALSPACE_EXPORT scfImplementationExt1 :
+class scfImplementationExt1 :
   public Super
   ,public I1
 {
@@ -1334,7 +1341,8 @@ public:
   }
 
 protected:
-  scfImplementationExt1(Class *object)
+  template<class Class_>
+  scfImplementationExt1(Class_ *object)
     : Super(), scfObject(object)
   {
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
@@ -1483,7 +1491,7 @@ private:
 
 };
 template<class Class ,class Super ,class I1, class I2>
-class CS_CRYSTALSPACE_EXPORT scfImplementationExt2 :
+class scfImplementationExt2 :
   public Super
   ,public I1, public I2
 {
@@ -1500,7 +1508,8 @@ public:
   }
 
 protected:
-  scfImplementationExt2(Class *object)
+  template<class Class_>
+  scfImplementationExt2(Class_ *object)
     : Super(), scfObject(object)
   {
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
@@ -1658,7 +1667,7 @@ private:
 
 };
 template<class Class ,class Super ,class I1, class I2, class I3>
-class CS_CRYSTALSPACE_EXPORT scfImplementationExt3 :
+class scfImplementationExt3 :
   public Super
   ,public I1, public I2, public I3
 {
@@ -1678,7 +1687,8 @@ public:
   }
 
 protected:
-  scfImplementationExt3(Class *object)
+  template<class Class_>
+  scfImplementationExt3(Class_ *object)
     : Super(), scfObject(object)
   {
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
@@ -1845,7 +1855,7 @@ private:
 
 };
 template<class Class ,class Super ,class I1, class I2, class I3, class I4>
-class CS_CRYSTALSPACE_EXPORT scfImplementationExt4 :
+class scfImplementationExt4 :
   public Super
   ,public I1, public I2, public I3, public I4
 {
@@ -1868,7 +1878,8 @@ public:
   }
 
 protected:
-  scfImplementationExt4(Class *object)
+  template<class Class_>
+  scfImplementationExt4(Class_ *object)
     : Super(), scfObject(object)
   {
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
@@ -2044,7 +2055,7 @@ private:
 
 };
 template<class Class ,class Super ,class I1, class I2, class I3, class I4, class I5>
-class CS_CRYSTALSPACE_EXPORT scfImplementationExt5 :
+class scfImplementationExt5 :
   public Super
   ,public I1, public I2, public I3, public I4, public I5
 {
@@ -2070,7 +2081,8 @@ public:
   }
 
 protected:
-  scfImplementationExt5(Class *object)
+  template<class Class_>
+  scfImplementationExt5(Class_ *object)
     : Super(), scfObject(object)
   {
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
@@ -2255,7 +2267,7 @@ private:
 
 };
 template<class Class ,class Super ,class I1, class I2, class I3, class I4, class I5, class I6>
-class CS_CRYSTALSPACE_EXPORT scfImplementationExt6 :
+class scfImplementationExt6 :
   public Super
   ,public I1, public I2, public I3, public I4, public I5, public I6
 {
@@ -2284,7 +2296,8 @@ public:
   }
 
 protected:
-  scfImplementationExt6(Class *object)
+  template<class Class_>
+  scfImplementationExt6(Class_ *object)
     : Super(), scfObject(object)
   {
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
@@ -2478,7 +2491,7 @@ private:
 
 };
 template<class Class ,class Super ,class I1, class I2, class I3, class I4, class I5, class I6, class I7>
-class CS_CRYSTALSPACE_EXPORT scfImplementationExt7 :
+class scfImplementationExt7 :
   public Super
   ,public I1, public I2, public I3, public I4, public I5, public I6, public I7
 {
@@ -2510,7 +2523,8 @@ public:
   }
 
 protected:
-  scfImplementationExt7(Class *object)
+  template<class Class_>
+  scfImplementationExt7(Class_ *object)
     : Super(), scfObject(object)
   {
     csRefTrackerAccess::SetDescription (object, CS_TYPENAME (Class));
@@ -2712,7 +2726,6 @@ private:
   }
 
 };
-
+/* Pre-preprocessed code ends here */
 
 #include "csutil/win32/msvc_deprecated_warn_on.h"
-

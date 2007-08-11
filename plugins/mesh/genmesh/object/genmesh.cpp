@@ -1611,7 +1611,6 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (
   object_bbox_valid = false;
 
   material = 0;
-  polygons = 0;
   light_mgr = csQueryRegistry<iLightManager> (object_reg);
   back2front = false;
   back2front_tree = 0;
@@ -1654,8 +1653,6 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (
 csGenmeshMeshObjectFactory::~csGenmeshMeshObjectFactory ()
 {
   ClearSubMeshes ();
-
-  delete[] polygons;
 
   delete back2front_tree;
 }
@@ -1906,18 +1903,6 @@ public:
 
 void csGenmeshMeshObjectFactory::SetPolyMeshStandard ()
 {
-  csRef<iPolygonMesh> polyMeshBase = GetPolygonMeshBase ();
-  PolyMesh* polyMesh = new PolyMesh;
-  polyMesh->SetFactory (this);
-  polygonMesh.AttachNew (polyMesh);
-  SetPolygonMeshBase (polygonMesh);
-  // Poly meshes may have been set by the user; preserve those
-  if (GetPolygonMeshColldet() == polyMeshBase)
-    SetPolygonMeshColldet (polygonMesh);
-  if (GetPolygonMeshViscull() == polyMeshBase)
-    SetPolygonMeshViscull (polygonMesh);
-  if (GetPolygonMeshShadows() == polyMeshBase)
-    SetPolygonMeshShadows (polygonMesh);
   polyMeshType = Standard;
 
   csRef<csTriangleMeshGenMesh> trimesh;
@@ -1928,16 +1913,6 @@ void csGenmeshMeshObjectFactory::SetPolyMeshStandard ()
 
 void csGenmeshMeshObjectFactory::SetPolyMeshSubmeshes ()
 {
-  csRef<iPolygonMesh> polyMeshBase = GetPolygonMeshBase ();
-  polygonMesh.AttachNew (new SubMeshesPolyMesh (this, subMeshes));
-  SetPolygonMeshBase (polygonMesh);
-  // Poly meshes may have been set by the user; preserve those
-  if (GetPolygonMeshColldet() == polyMeshBase)
-    SetPolygonMeshColldet (polygonMesh);
-  if (GetPolygonMeshViscull() == polyMeshBase)
-    SetPolygonMeshViscull (polygonMesh);
-  if (GetPolygonMeshShadows() == polyMeshBase)
-    SetPolygonMeshShadows (polygonMesh);
   polyMeshType = Submeshes;
 
   csRef<SubMeshesTriMesh> trimesh;
@@ -2332,8 +2307,6 @@ csRef<iString> csGenmeshMeshObjectFactory::GetRenderBufferName (int index) const
 void csGenmeshMeshObjectFactory::Invalidate ()
 {
   object_bbox_valid = false;
-  delete[] polygons;
-  polygons = 0;
   index_buffer = 0;
   initialized = false;
 
@@ -2345,36 +2318,6 @@ void csGenmeshMeshObjectFactory::Invalidate ()
   mesh_tangents_dirty_flag = true;
 
   ShapeChanged ();
-}
-
-int csGenmeshMeshObjectFactory::PolyMesh::GetVertexCount ()
-{
-  return factory->GetVertexCount ();
-}
-
-csVector3* csGenmeshMeshObjectFactory::PolyMesh::GetVertices ()
-{
-  return factory->GetVertices ();
-}
-
-int csGenmeshMeshObjectFactory::PolyMesh::GetPolygonCount ()
-{
-  return factory->GetTriangleCount ();
-}
-
-csMeshedPolygon* csGenmeshMeshObjectFactory::PolyMesh::GetPolygons ()
-{
-  return factory->GetPolygons ();
-}
-
-int csGenmeshMeshObjectFactory::PolyMesh::GetTriangleCount ()
-{
-  return factory->GetTriangleCount ();
-}
-
-csTriangle* csGenmeshMeshObjectFactory::PolyMesh::GetTriangles ()
-{
-  return factory->GetTriangles ();
 }
 
 void csGenmeshMeshObjectFactory::HardTransform (
@@ -2418,23 +2361,6 @@ csPtr<iMeshObject> csGenmeshMeshObjectFactory::NewInstance ()
 
   csRef<iMeshObject> im (scfQueryInterface<iMeshObject> (cm));
   return csPtr<iMeshObject> (im);
-}
-
-csMeshedPolygon* csGenmeshMeshObjectFactory::GetPolygons ()
-{
-  if (!polygons)
-  {
-
-    csTriangle* triangles = mesh_triangles.GetArray ();
-    polygons = new csMeshedPolygon [mesh_triangles.GetSize ()];
-    size_t i;
-    for (i = 0 ; i < mesh_triangles.GetSize () ; i++)
-    {
-      polygons[i].num_vertices = 3;
-      polygons[i].vertices = &triangles[i].a;
-    }
-  }
-  return polygons;
 }
 
 //----------------------------------------------------------------------

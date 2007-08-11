@@ -6,9 +6,39 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Aug-2007
+	- res changed csFixedSizeAllocator<> to allow construction from a
+	  given memory allocator.
+	- res changed TinyXML documents to use their own heap. Can reduce 
+	  memory fragmentation when dealing with large documents.
+	- res added CS::Utility::SmartFileOpen() - a function for the somewhat
+	  common task to open a world file from a path that could denote any
+	  of: a plain filename, directory or .zip archive.
+	- res made genmeshify use CS::Utility::SmartFileOpen().
+	- res added an option to levtool to fix <polymesh> tags (by replacing
+	  them with <trimesh> tags).
+	- res made levtool use CS::Utility::SmartFileOpen().
+	- res removed deprecated methods from csArray<>.
+10-Aug-2007
+	- Jorrit fixed a compile bug in math.h (for gcc).
+	- Jorrit removed renderpriorities tag from some levels.
+	- res changed the delayed TinyXML node freeing to use less memory 
+	  allocations. Can speed up cleanup for large documents.
 8-Aug-2007
+	- Jorrit (hopefully) removed all traces of the deprecated
+	  iPolygonMesh.
+	- res removed the debugging graph header.
+	- res removed the deprecated image generation stuff.
+	- res added a missing initialization to csConsoleOutput. Should 
+	  address trac #368.
+	- res removed the deprecated csutil/profile.h header.
 	- Marten made some more unification work in the RM.
 7-Aug-2007
+	- res changed the cs-win32libs link to point to the 1.2 version.
+	- res deprecated the obsolete 
+	  iMeshObject->InvalidateMaterialHandles().
+	- res changed csPath to not be marked as "exported" any more 
+	  (all-inline, gives link errors with MSVC/DLLs).
 	- Marten made a small bugfix in csRedBlackTree.
 	- Marten changed csBlockAllocator::Empty() to mimic csArray::Empty()
 	  and not deallocate the memory. Added a csBlockAllocator::DeleteAll()
@@ -18,11 +48,43 @@ chronological order.
 	   - Made it properly update the engine once per frame.
 	   - Improved data-locality to the context (not finished yet).
 	   - Updated simpmap to use it for better testing.
+2-Aug-2007
+	- Marten implemented a small optimization for the (i+1)%3 case,
+	  mainly used when traversing edges in triangles.
+1-Aug-2007
+	- Jorrit fixed an initialization error in gmeshskelanim2 that could
+	  cause crashes at exit. This fixes #367.
 31-Jul-2007
 	- Marten made the RM stuff compile on gcc.
 29-Jul-2007
+	- res made the CEL jobber import crystalspace_staticplugins_msvc.jam
+	  from CS before generating VC projects.
+	- res changed the way the MSVC static plugin information for external
+	  projects is generated: since the different VC versions need different
+	  flags, multiple files are now generated, and must later be included
+	  separately (e.g. by an umbrella jam file).
+	- res added a target to create a doxygen tagfile for the public API.
 	- Marten added some more code to the render manager; it now is able
 	  to actually draw simple1.
+26-Jul-2007
+	- res fixed some undefined type issues that occured when building 
+	  libraries as DLLs with MSVC.
+	- res fixed the GUIDs in libcrystalspace_directx to be properly
+	  exported when built as a DLL with MSVC.
+	- res fixed a couple of linking issues for DLLs with MSVC: marking
+	  all-inline or as "exported" give problems on MSVC since VC tries to
+	  even import members that are inline. Also, "exported" templates 
+	  classes are not a good idea either since VC will attempt to import
+	  instantiations of it (which fails in most cases).
+	- res suppressed some warnings about mixing dllexported and 
+	  non-dllexported classes in MSVC.
+	- res added a small shell script to regenerate 
+	  include/csutil/scf_implgen_p.h (and also regenerated that file).
+	- res slightly changed how CS_DEBUG_BREAK is realized: the actual
+	  debugging break functionality is now provided by the function
+	  CS::Debug::DebugBreak() and is also available in optimize builds;
+	  CS_DEBUG_BREAK now just wraps around that. (Note that CS_DEBUG_BREAK
+	  still resolves to a no-op in optimize builds.)
 23-Jul-2007
 	- res fixed crystal.m4 to use the right test order when a development
 	  resp. stable version is requested (previously, the orders actually

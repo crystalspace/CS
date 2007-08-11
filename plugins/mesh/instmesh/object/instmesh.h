@@ -38,7 +38,6 @@
 #include "iengine/light.h"
 #include "iengine/lightmgr.h"
 #include "iengine/shadcast.h"
-#include "igeom/polymesh.h"
 #include "igeom/trimesh.h"
 #include "imesh/instmesh.h"
 #include "imesh/lighting.h"
@@ -53,7 +52,6 @@
 class csBSPTree;
 class csColor;
 class csColor4;
-class csPolygonMesh;
 struct iCacheManager;
 struct iEngine;
 struct iMaterialWrapper;
@@ -339,35 +337,6 @@ public:
   /** @} */
 
   virtual iObjectModel* GetObjectModel () { return this; }
-
-  //------------------ iPolygonMesh interface implementation ----------------//
-  struct PolyMesh : public scfImplementation1<PolyMesh, iPolygonMesh>
-  {
-  private:
-    csFlags flags;
-    csInstmeshMeshObject* parent;
-  public:
-    virtual int GetVertexCount ();
-    virtual csVector3* GetVertices ();
-    virtual int GetPolygonCount ();
-    virtual csMeshedPolygon* GetPolygons ();
-    virtual int GetTriangleCount ();
-    virtual csTriangle* GetTriangles ();
-    virtual void Lock () { }
-    virtual void Unlock () { }
-    
-    virtual csFlags& GetFlags () { return flags;  }
-    virtual uint32 GetChangeNumber() const { return 0; }
-
-    PolyMesh (csInstmeshMeshObject* parent) : scfImplementationType (this),
-      parent (parent)
-    {
-      flags.Set (CS_POLYMESH_TRIANGLEMESH);
-    }
-    virtual ~PolyMesh () { }
-  };
-  csRef<PolyMesh> polygonMesh;
-  friend struct PolyMesh;
 
   //------------------ iTriangleMesh interface implementation ----------------//
   struct TriMesh : public scfImplementation1<TriMesh, iTriangleMesh>

@@ -222,7 +222,7 @@ namespace lighter
     
     for (size_t e = 0; e < 3; e++)
     {
-      Edge edge (startPrim, t[e], t[(e+1) % 3]);
+      Edge edge (startPrim, t[e], t[CS::Math::NextModulo3(e)]);
       outsideEdges.Push (edge);
     }
   }
@@ -244,7 +244,7 @@ namespace lighter
     const Primitive::TriangleType& t = prim.GetTriangle ();
     for (size_t e = 0; e < 3; e++)
     {
-      Edge edge (prim, t[e], t[(e+1) % 3]);
+      Edge edge (prim, t[e], t[CS::Math::NextModulo3 (e)]);
       bool found = false;
       /* If edge is an "outside edge", remove from the outside list
        * Otherwise add it */
@@ -310,7 +310,7 @@ namespace lighter
             const FactoryPrimitive::TriangleType& t = prim.GetTriangle ();
             for (size_t e = 0; e < 3; e++)
             {
-              Edge edge (prim, t[e], t[(e+1) % 3]);
+              Edge edge (prim, t[e], t[CS::Math::NextModulo3(e)]);
               if (ubp.UsesEdge (edge))
               {
                 ubp.AddPrimitive (prim);
@@ -393,8 +393,8 @@ namespace lighter
     else if (fabsf (normal.z) > fabsf (normal.x))
       projDimension = 2; //z biggest
 
-    size_t selX = (projDimension + 1) % 3;
-    size_t selY = (projDimension + 2) % 3;
+    size_t selX = CS::Math::NextModulo3(projDimension);
+    size_t selY = CS::Math::NextModulo3(selX);
 
     csSet<size_t> primsUsedVerts;
     csArray<size_t> indexMap;

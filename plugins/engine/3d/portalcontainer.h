@@ -20,7 +20,6 @@
 #ifndef __CS_PORTALCONTAINER_H__
 #define __CS_PORTALCONTAINER_H__
 
-#include "csgeom/pmtools.h"
 #include "csgeom/trimeshtools.h"
 #include "csgeom/vector3.h"
 #include "cstool/meshobjtmpl.h"
@@ -37,90 +36,6 @@ class csMeshWrapper;
 class csMovable;
 
 /**
- * A helper class for iPolygonMesh implementations used by csPortalContainer.
- */
-class csPortalContainerPolyMeshHelper : 
-  public scfImplementation1<csPortalContainerPolyMeshHelper,
-                            iPolygonMesh>
-{
-public:
-
-  /**
-   * Make a polygon mesh helper which will accept polygons which match
-   * with the given flag (one of CS_POLY_COLLDET or CS_POLY_VISCULL).
-   */
-  csPortalContainerPolyMeshHelper (uint32 flag) 
-    : scfImplementationType (this), polygons (0), vertices (0),
-      poly_flag (flag), 
-    triangles (0)
-  {
-  }
-  virtual ~csPortalContainerPolyMeshHelper ()
-  {
-    Cleanup ();
-  }
-
-  void Setup ();
-  void SetPortalContainer (csPortalContainer* pc);
-
-  virtual int GetVertexCount ()
-  {
-    Setup ();
-    return (int)vertices->GetSize ();
-  }
-  virtual csVector3* GetVertices ()
-  {
-    Setup ();
-    return vertices->GetArray ();
-  }
-  virtual int GetPolygonCount ()
-  {
-    Setup ();
-    return num_poly;
-  }
-  virtual csMeshedPolygon* GetPolygons ()
-  {
-    Setup ();
-    return polygons;
-  }
-  virtual int GetTriangleCount ()
-  {
-    Triangulate ();
-    return tri_count;
-  }
-  virtual csTriangle* GetTriangles ()
-  {
-    Triangulate ();
-    return triangles;
-  }
-  virtual void Lock () { }
-  virtual void Unlock () { }
- 
-  virtual csFlags& GetFlags () { return flags;  }
-  virtual uint32 GetChangeNumber() const { return 0; }
-
-  void Cleanup ();
-
-private:
-  csPortalContainer* parent;
-  uint32 data_nr;		// To see if the portal container has changed.
-  csMeshedPolygon* polygons;	// Array of polygons.
-  // Array of vertices from portal container.
-  csDirtyAccessArray<csVector3>* vertices;
-  int num_poly;			// Total number of polygons.
-  uint32 poly_flag;		// Polygons must match with this flag.
-  csFlags flags;
-  csTriangle* triangles;
-  int tri_count;
-
-  void Triangulate ()
-  {
-    if (triangles) return;
-    csPolygonMeshTools::Triangulate (this, triangles, tri_count);
-  }
-};
-
-/**
  * A helper class for iTriangleMesh implementations used by csPortalContainer.
  */
 class csPortalContainerTriMeshHelper : 
@@ -130,7 +45,7 @@ class csPortalContainerTriMeshHelper :
 public:
 
   /**
-   * Make a polygon mesh helper which will accept polygons which match
+   * Make a triangle mesh helper which will accept polygons which match
    * with the given flag (one of CS_POLY_COLLDET or CS_POLY_VISCULL).
    */
   csPortalContainerTriMeshHelper (uint32 flag) 
@@ -268,13 +183,6 @@ public:
   void WorldToCamera (iCamera* camera, const csReversibleTransform& camtrans);
   bool Draw (iRenderView* rview, iMovable* movable, csZBufMode zbufMode);
 
-
-  //-------------------- iPolygonMesh interface implementation ---------------
-  csRef<csPortalContainerPolyMeshHelper> polygonMesh;
-  //------------------- CD iPolygonMesh implementation ---------------
-  csRef<csPortalContainerPolyMeshHelper> polygonMeshCD;
-  //------------------- LOD iPolygonMesh implementation ---------------
-  csRef<csPortalContainerPolyMeshHelper> polygonMeshLOD;
 
   //-------------------For iShadowReceiver ----------------------------//
   virtual void CastShadows (iMovable* movable, iFrustumView* fview);

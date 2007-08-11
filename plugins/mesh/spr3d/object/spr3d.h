@@ -651,61 +651,6 @@ public:
   virtual iMeshObjectType* GetMeshObjectType () const { return spr3d_type; }
   /** @} */
 
-  /**\name iPolygonMesh implementation
-   * @{ */
-  struct PolyMesh : public scfImplementation1<PolyMesh, iPolygonMesh>
-  {
-  private:
-    csSprite3DMeshObjectFactory* factory;
-    csFlags flags;
-
-  public:
-    virtual int GetVertexCount ()
-    {
-      return factory->GetVertexCount ();
-    }
-    virtual csVector3* GetVertices ()
-    {
-      return factory->GetVertices (0);
-    }
-    virtual int GetPolygonCount ()
-    {
-      return factory->GetTriangleCount ();
-    }
-
-    virtual csMeshedPolygon* GetPolygons ();
-
-    virtual int GetTriangleCount ()
-    {
-      return factory->GetTriangleCount ();
-    }
-    virtual csTriangle* GetTriangles ()
-    {
-      return factory->GetTriangles ();
-    }
-
-    virtual void Lock () { } //PM@@@
-    virtual void Unlock () { }
- 
-    virtual csFlags& GetFlags () { return flags;  }
-    virtual uint32 GetChangeNumber() const { return 0; }
-
-    PolyMesh (csSprite3DMeshObjectFactory* Factory) : 
-      scfImplementationType (this), factory(Factory), polygons (0)
-    {
-      flags.Set (CS_POLYMESH_TRIANGLEMESH);
-    }
-    virtual ~PolyMesh ()
-    {
-      Cleanup ();
-    }
-    void Cleanup () { delete[] polygons; polygons = 0; }
-
-    csMeshedPolygon* polygons;
-  };
-  friend struct PolyMesh;
-  /** @} */
-
   /**\name iTriangleMesh implementation
    * @{ */
   struct TriMesh : public scfImplementation1<TriMesh, iTriangleMesh>

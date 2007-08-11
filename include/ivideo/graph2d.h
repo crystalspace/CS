@@ -136,6 +136,8 @@ struct csImageArea
  * When you create an offscreen canvas (CreateOffscreenCanvas()) then
  * you can use this callback to get informed when the texture has
  * been modified (FinishDraw() called) or a palette entry is modified.
+ * \deprecated Deprecated in 1.3. Offscreen canvases are deprecated, use 
+ *   iGraphics3D::SetRenderTarget()
  */
 struct CS_DEPRECATED_TYPE_MSG("Offscreen canvases are deprecated, use "
   "iGraphics3D::SetRenderTarget()")
@@ -427,7 +429,7 @@ struct iGraphics2D : public virtual iBase
    * The callback interface (if given) is used to communicate from the
    * canvas back to the caller. You can use this to detect when the
    * texture data has changed for example.
-   * \deprecated Offscreen canvases are deprecated, use 
+   * \deprecated Deprecated in 1.3. Offscreen canvases are deprecated, use 
    *   iGraphics3D::SetRenderTarget()
    */
   CS_DEPRECATED_METHOD_MSG("Offscreen canvases are deprecated, use "

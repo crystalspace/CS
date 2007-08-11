@@ -24,6 +24,7 @@
 #include "csgeom/polypool.h"
 #include "csgeom/sphere.h"
 #include "csgeom/subrec.h"
+#include "csgeom/trimesh.h"
 #include "cstool/rviewclipper.h"
 #include "csgfx/shadervarcontext.h"
 #include "csqint.h"
@@ -150,17 +151,6 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
 {
   csThingStatic::thing_type = thing_type;
   static_polygons.SetThingType (thing_type);
-
-  polygonMesh.AttachNew (new PolyMeshHelper (0));
-  polygonMesh->SetThing (this);
-  polygonMeshCD.AttachNew (new PolyMeshHelper (CS_POLY_COLLDET));
-  polygonMeshCD->SetThing (this);
-  polygonMeshLOD.AttachNew (new PolyMeshHelper (CS_POLY_VISCULL));
-  polygonMeshLOD->SetThing (this);
-  SetPolygonMeshBase (polygonMesh);
-  SetPolygonMeshColldet (polygonMeshCD);
-  SetPolygonMeshViscull (polygonMeshLOD);
-  SetPolygonMeshShadows (polygonMeshLOD);
 
   csRef<TriMeshHelper> trimesh;
   trimesh.AttachNew (new TriMeshHelper (0));
@@ -2158,122 +2148,6 @@ void csThing::GetBoundingBox (iMovable *movable, csBox3 &box)
   }
 
   box = wor_bbox;
-}
-
-//-------------------------------------------------------------------------
-
-struct PolyMeshTimerEvent : 
-  public scfImplementation1<PolyMeshTimerEvent, 
-			    iTimerEvent>
-{
-  csWeakRef<PolyMeshHelper> pmh;
-  PolyMeshTimerEvent (PolyMeshHelper* pmh) : scfImplementationType (this)
-  {
-    PolyMeshTimerEvent::pmh = pmh;
-  }
-  virtual bool Perform (iTimerEvent*)
-  {
-    if (pmh) pmh->Cleanup ();
-    return false;
-  }
-};
-
-//-------------------------------------------------------------------------
-
-void PolyMeshHelper::SetThing (csThingStatic* thing)
-{
-  PolyMeshHelper::thing = thing;
-  static_data_nr = thing->GetStaticDataNumber ()-1;
-  num_poly = -1;
-}
-
-void PolyMeshHelper::Setup ()
-{
-  thing->Prepare (0);
-  if (static_data_nr != thing->GetStaticDataNumber ())
-  {
-    static_data_nr = thing->GetStaticDataNumber ();
-    ForceCleanup ();
-  }
-
-  if (polygons || num_poly == 0)
-  {
-    // Already set up. First we check if the object vertex array
-    // is still valid.
-    if (vertices == thing->obj_verts) return ;
-  }
-
-  vertices = 0;
-
-  // Count the number of needed polygons and vertices.
-  num_verts = thing->GetVertexCount ();
-  num_poly = 0;
-
-  size_t i;
-  const csPolygonStaticArray &pol = thing->static_polygons;
-  for (i = 0 ; i < pol.GetSize () ; i++)
-  {
-    csPolygon3DStatic *p = pol.Get (i);
-    if (p->flags.CheckAll (poly_flag)) num_poly++;
-  }
-
-  // Allocate the arrays and the copy the data.
-  if (num_verts)
-  {
-    vertices = thing->obj_verts;
-  }
-
-  if (num_poly)
-  {
-    polygons = new csMeshedPolygon[num_poly];
-    num_poly = 0;
-    for (i = 0 ; i < pol.GetSize () ; i++)
-    {
-      csPolygon3DStatic *p = pol.Get (i);
-      if (p->flags.CheckAll (poly_flag))
-      {
-        polygons[num_poly].num_vertices = p->GetVertexCount ();
-        polygons[num_poly].vertices = p->GetVertexIndices ();
-        num_poly++;
-      }
-    }
-  }
-
-  csRef<iEventTimer> timer = csEventTimer::GetStandardTimer (
-        thing->thing_type->object_reg);
-  PolyMeshTimerEvent* te = new PolyMeshTimerEvent (this);
-  timer->AddTimerEvent (te, 9000+(rand ()%2000));
-  te->DecRef ();
-}
-
-void PolyMeshHelper::Unlock ()
-{
-  locked--;
-  CS_ASSERT (locked >= 0);
-  if (locked <= 0)
-  {
-    csRef<iEventTimer> timer = csEventTimer::GetStandardTimer (
-        thing->thing_type->object_reg);
-    PolyMeshTimerEvent* te = new PolyMeshTimerEvent (this);
-    timer->AddTimerEvent (te, 9000+(rand ()%2000));
-    te->DecRef ();
-  }
-}
-
-void PolyMeshHelper::Cleanup ()
-{
-  if (locked) return;
-  ForceCleanup ();
-}
-
-void PolyMeshHelper::ForceCleanup ()
-{
-  delete[] polygons;
-  polygons = 0;
-  vertices = 0;
-  delete[] triangles;
-  triangles = 0;
-  num_poly = -1;
 }
 
 //-------------------------------------------------------------------------

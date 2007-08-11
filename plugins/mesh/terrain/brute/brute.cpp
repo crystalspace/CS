@@ -1064,7 +1064,6 @@ void csTerrainObject::SetupPolyMeshData ()
   polymesh_valid = true;
   delete[] polymesh_vertices;
   delete[] polymesh_triangles;
-  delete[] polymesh_polygons; polymesh_polygons = 0;
 
   int res = cd_resolution;
   csRef<iTerraSampler> terrasampler = terraformer->GetSampler (
@@ -1184,62 +1183,6 @@ void csTerrainObject::CleanPolyMeshData ()
   polymesh_vertices = 0;
   delete[] polymesh_triangles;
   polymesh_triangles = 0;
-  delete[] polymesh_polygons;
-  polymesh_polygons = 0;
-}
-
-void csTerrainObject::PolyMesh::Cleanup ()
-{
-  terrain->CleanPolyMeshData ();
-}
-
-csMeshedPolygon* csTerrainObject::PolyMesh::GetPolygons ()
-{
-  terrain->SetupPolyMeshData ();
-  if (!terrain->polymesh_polygons)
-  {
-    int pcnt = terrain->polymesh_tri_count;
-    terrain->polymesh_polygons = new csMeshedPolygon [pcnt];
-    csTriangle* tris = terrain->polymesh_triangles;
-    int i;
-    for (i = 0 ; i < pcnt ; i++)
-    {
-      terrain->polymesh_polygons[i].num_vertices = 3;
-      terrain->polymesh_polygons[i].vertices = &tris[i].a;
-    }
-  }
-
-  return terrain->polymesh_polygons;
-}
-
-int csTerrainObject::PolyMesh::GetVertexCount ()
-{
-  terrain->SetupPolyMeshData ();
-  return terrain->polymesh_vertex_count;
-}
-
-csVector3* csTerrainObject::PolyMesh::GetVertices ()
-{
-  terrain->SetupPolyMeshData ();
-  return terrain->polymesh_vertices;
-}
-
-int csTerrainObject::PolyMesh::GetPolygonCount ()
-{
-  terrain->SetupPolyMeshData ();
-  return terrain->polymesh_tri_count;
-}
-
-int csTerrainObject::PolyMesh::GetTriangleCount ()
-{
-  terrain->SetupPolyMeshData ();
-  return terrain->polymesh_tri_count;
-}
-
-csTriangle* csTerrainObject::PolyMesh::GetTriangles ()
-{
-  terrain->SetupPolyMeshData ();
-  return terrain->polymesh_triangles;
 }
 
 size_t csTerrainObject::TriMesh::GetVertexCount ()
@@ -1277,12 +1220,6 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
   csTerrainObject::pFactory = pFactory;
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
 
-  polygonMesh.AttachNew (new PolyMesh ());
-  SetPolygonMeshBase (polygonMesh);
-  SetPolygonMeshColldet (polygonMesh);
-  SetPolygonMeshViscull (0);
-  SetPolygonMeshShadows (0);
-  polygonMesh->SetTerrain (this);
   csRef<TriMesh> trimesh;
   trimesh.AttachNew (new TriMesh ());
   trimesh->SetTerrain (this);
@@ -1295,7 +1232,6 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
   polymesh_valid = false;
   polymesh_vertices = 0;
   polymesh_triangles = 0;
-  polymesh_polygons = 0;
   cd_resolution = 256;
   cd_lod_cost = -1; //0.02;
 
