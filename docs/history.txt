@@ -18,6 +18,7 @@ chronological order.
 	- res added an option to levtool to fix <polymesh> tags (by replacing
 	  them with <trimesh> tags).
 	- res made levtool use CS::Utility::SmartFileOpen().
+	- res removed deprecated methods from csArray<>.
 10-Aug-2007
 	- Jorrit fixed a compile bug in math.h (for gcc).
 	- Jorrit removed renderpriorities tag from some levels.
