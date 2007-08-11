@@ -11,6 +11,9 @@ chronological order.
 	  given memory allocator.
 	- res changed TinyXML documents to use their own heap. Can reduce 
 	  memory fragmentation when dealing with large documents.
+	- res added CS::Utility::SmartFileOpen() - a function for the somewhat
+	  common task to open a world file from a path that could denote any
+	  of: a plain filename, directory or .zip archive.
 10-Aug-2007
 	- Jorrit fixed a compile bug in math.h (for gcc).
 	- Jorrit removed renderpriorities tag from some levels.

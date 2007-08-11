@@ -54,6 +54,7 @@
 #include "cstool/rviewclipper.h"
 #include "cstool/saverfile.h"
 #include "cstool/saverref.h"
+#include "cstool/smartfileopen.h"
 #include "cstool/uberscreenshot.h"
 #include "cstool/userrndbuf.h"
 #include "cstool/vertexcompress.h"
