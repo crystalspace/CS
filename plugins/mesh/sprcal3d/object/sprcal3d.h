@@ -410,7 +410,7 @@ private:
     float weight;
   };
 
-  iMeshObjectDrawCallback* vis_cb;
+  csRef<iMeshObjectDrawCallback> vis_cb;
   uint32 current_features;  // LOD Control thing
   iMeshWrapper* logparent;
   CalModel calModel;
@@ -645,8 +645,6 @@ public:
     iMovable* movable, uint32 frustum_mask);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
-    if (cb) cb->IncRef ();
-    if (vis_cb) vis_cb->DecRef ();
     vis_cb = cb;
   }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const
@@ -743,7 +741,8 @@ public:
   }
   CalModel *GetCal3DModel () { return &calModel; }
 
-  csPtr<iSkeleton> GetSkeleton () {return scfQueryInterface<iSkeleton> (skeleton);}
+  csPtr<iSkeleton> GetSkeleton () {return scfQueryInterface<iSkeleton> (
+      skeleton);}
 
   void SetAnimTimeUpdateHandler (iAnimTimeUpdateHandler*);
   /** @} */

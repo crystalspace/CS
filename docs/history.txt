@@ -41,10 +41,23 @@ chronological order.
 	    - Added first prototype of RenderTree
 	    - Added a testing RM for development.
 	    - Made simple1 use said RM, whoever atm without any visual output.
+26-Jun-2007
+	- Jorrit fixed a bug in the skeleton graveyard by adding
+	  iSkeletonGraveyard->RemoveSkeleton(). Genmesh anim now
+	  calls this method when the animation is destroyed. That fixes
+	  memory leaks and crashes when genmesh anim objects are removed
+	  from memory. Note that sprcal3d still has a circular reference
+	  bug with the graveyard.
+25-Jun-2007
+	- Jorrit converted a few remaining interfaces to using SCF_INTERFACE
+	  instead of SCF_VERSION.
 24-Jun-2007
         - Piotr made small bugfix in odedynam colliders ref handling.
 	- Eric Sunshine corrected "camera movement" documentation bug.
 	  Fixes #348.
+	- res made "jam install" install not just "history.txt" but
+	  "history*.txt" - this way the branch-specific histories (e.g.
+	  for release branches) are installed as well.
 23-Jun-2007
 	- res made the CS_PACKAGEINFO autoconf macro truncate the version
 	  number after non-numerical and non-dot characters. This has the
@@ -2556,7 +2569,6 @@ chronological order.
 	- mdmkolbe fixed searching of Cygwin paths.
 	- mdmkolbe added CS_CONFIGDIR to configuration search paths on Cygwin.
 	- Marten added a "outward spiral" term to spiral particle effector.
->>>>>>> .merge-right.r26425
 9-Oct-2006
 	- res fixed a problem in the iConfigIterator::HasNext() which
 	  manifested itself in scrambled "could not load plugin" messages

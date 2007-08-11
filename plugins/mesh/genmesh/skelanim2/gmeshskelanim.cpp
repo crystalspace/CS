@@ -99,6 +99,10 @@ csGenmeshSkelAnimationControl::csGenmeshSkelAnimationControl (
 
 csGenmeshSkelAnimationControl::~csGenmeshSkelAnimationControl ()
 {
+  if (skeleton && factory)
+  {
+    factory->gr->RemoveSkeleton (skeleton);
+  }
   delete[] animated_verts;
   delete[] animated_colors;
   delete[] animated_vert_norms;

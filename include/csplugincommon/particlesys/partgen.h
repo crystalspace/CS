@@ -99,7 +99,7 @@ protected:
    * no particle may exceed the bbox.
    */
   csBox3 bbox;
-  iMeshObjectDrawCallback* vis_cb;
+  csRef<iMeshObjectDrawCallback> vis_cb;
 
   /// Pointer to a mesh object factory for 2D sprites.
   csRef<iMeshObjectFactory> spr_factory;
@@ -317,8 +317,6 @@ public:
     iMovable* movable, uint32 frustum_mask);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
-    if (cb) cb->IncRef ();
-    if (vis_cb) vis_cb->DecRef ();
     vis_cb = cb;
   }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const

@@ -737,7 +737,8 @@ public:
 
   /** \name iMeshObject interface implementation
    * @{ */
-  virtual iMeshObjectFactory* GetFactory () const { return (iMeshObjectFactory*)this; }
+  virtual iMeshObjectFactory* GetFactory () const
+  { return (iMeshObjectFactory*)this; }
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* /*cb*/) { }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const
   { return 0; }

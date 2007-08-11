@@ -5567,6 +5567,7 @@ class iSkeletonGraveyard(iBase):
     def SetManualUpdates(*args): return _cspace.iSkeletonGraveyard_SetManualUpdates(*args)
     def Update(*args): return _cspace.iSkeletonGraveyard_Update(*args)
     def AddSkeleton(*args): return _cspace.iSkeletonGraveyard_AddSkeleton(*args)
+    def RemoveSkeleton(*args): return _cspace.iSkeletonGraveyard_RemoveSkeleton(*args)
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSkeletonGraveyard_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iSkeletonGraveyard_scfGetVersion)
     __swig_destroy__ = _cspace.delete_iSkeletonGraveyard
@@ -9283,6 +9284,7 @@ CS_VATTRIB_14 = _cspace.CS_VATTRIB_14
 CS_VATTRIB_15 = _cspace.CS_VATTRIB_15
 CS_MIXMODE_TYPE_AUTO = _cspace.CS_MIXMODE_TYPE_AUTO
 CS_MIXMODE_TYPE_BLENDOP = _cspace.CS_MIXMODE_TYPE_BLENDOP
+CS_MIXMODE_FLAG_BLENDOP_ALPHA = _cspace.CS_MIXMODE_FLAG_BLENDOP_ALPHA
 CS_MIXMODE_TYPE_MESH = _cspace.CS_MIXMODE_TYPE_MESH
 CS_MIXMODE_TYPE_MASK = _cspace.CS_MIXMODE_TYPE_MASK
 CS_MIXMODE_FACT_ZERO = _cspace.CS_MIXMODE_FACT_ZERO

@@ -622,6 +622,9 @@ bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode,
       case XMLTOKEN_BLENDOP:
         {
           mixmodeSpecified = true;
+	  mixmode &= ~CS_MIXMODE_TYPE_MASK;
+          mixmode |= CS_MIXMODE_TYPE_BLENDOP;
+	  
           const char* srcFactorStr = child->GetAttributeValue ("src");
           const char* dstFactorStr = child->GetAttributeValue ("dst");
           uint srcFactor = 0, dstFactor = 0;
@@ -635,10 +638,32 @@ bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode,
           {
             Report ("crystalspace.syntax.mixmode",
               CS_REPORTER_SEVERITY_WARNING,
-	      child, "Invalid blend factor %s", srcFactorStr);
+	      child, "Invalid blend factor %s", dstFactorStr);
           }
           mixmode &= ~((CS_MIXMODE_FACT_MASK << 20) | (CS_MIXMODE_FACT_MASK << 16));
           mixmode |= ((srcFactor << 20) | (dstFactor << 16));
+
+          const char* srcAlphaFactorStr = child->GetAttributeValue ("srcalpha");
+          const char* dstAlphaFactorStr = child->GetAttributeValue ("dstalpha");
+	  if (srcAlphaFactorStr || dstAlphaFactorStr)
+	  {
+	    uint srcFactorA = 0, dstFactorA = 0;
+	    if (!StringToBlendFactor (srcAlphaFactorStr, srcFactorA))
+	    {
+	      Report ("crystalspace.syntax.mixmode",
+		CS_REPORTER_SEVERITY_WARNING,
+		child, "Invalid blend factor %s", srcAlphaFactorStr);
+	    }
+	    if (!StringToBlendFactor (dstAlphaFactorStr, dstFactorA))
+	    {
+	      Report ("crystalspace.syntax.mixmode",
+		CS_REPORTER_SEVERITY_WARNING,
+		child, "Invalid blend factor %s", dstAlphaFactorStr);
+	    }
+	    mixmode &= ~((CS_MIXMODE_FACT_MASK << 12) | (CS_MIXMODE_FACT_MASK << 8));
+	    mixmode |= ((srcFactor << 12) | (dstFactor << 8));
+	    mixmode |= CS_MIXMODE_FLAG_BLENDOP_ALPHA;
+	  }
         }
         break;
       default:
@@ -723,6 +748,13 @@ bool csTextSyntaxService::WriteMixmode (iDocumentNode* node, uint mixmode,
             BlendFactorToString (CS_MIXMODE_BLENDOP_SRC (mixmode)));
           blendOp->SetAttribute ("dst", 
             BlendFactorToString (CS_MIXMODE_BLENDOP_DST (mixmode)));
+	  if (mixmode & CS_MIXMODE_FLAG_BLENDOP_ALPHA)
+	  {
+	    blendOp->SetAttribute ("srcalpha", 
+	      BlendFactorToString (CS_MIXMODE_BLENDOP_ALPHA_SRC (mixmode)));
+	    blendOp->SetAttribute ("dstalpha", 
+	      BlendFactorToString (CS_MIXMODE_BLENDOP_ALPHA_DST (mixmode)));
+	  }
         }
     }
   }

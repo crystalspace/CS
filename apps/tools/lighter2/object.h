@@ -156,7 +156,7 @@ namespace lighter
     virtual void SaveMeshPostLighting (Scene* scene) { }
 
     // Fill lightmap mask with primitive sub-pixel area coverage
-    virtual void FillLightmapMask (LightmapMaskArray& masks);
+    virtual void FillLightmapMask (LightmapMaskPtrDelArray& masks);
 
     //-- Getters for data
     inline const csArray<PrimitiveArray>& GetPrimitives () const

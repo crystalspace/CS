@@ -140,24 +140,60 @@ namespace lighter
         sizeof (csColor));
     }
   };
-  typedef csArray<Lightmap> LightmapArray;
   typedef csPDelArray<Lightmap> LightmapPtrDelArray;
 
   //Used as a mask for lightmap during un-antialiasing
-  class LightmapMask
+  class LightmapMask : public Swappable
   {
+    mutable float* maskData;
+    uint width, height;
+    
+    inline float* BogusPointer () const 
+    { return ((float*)~0) - (width * height); }
+    inline float* AllocMask () const
+    { 
+      return (float*)SwappableHeap::Alloc (width * height * 
+        sizeof (float));
+    }
   public:
-    LightmapMask (const Lightmap &lm)
-      : width (lm.GetWidth ()), height (lm.GetHeight ())
+    LightmapMask (const Lightmap &lm) : maskData (0),
+      width (lm.GetWidth ()), height (lm.GetHeight ())
     {
-      // Copy over the size from the lightmap
-      maskData.SetSize (width*height, 0);
     }
     
-    csDirtyAccessArray<float> maskData;
-    uint width, height;
+    float* GetMaskData() const { return maskData; }
+    inline uint GetWidth () const { return width; }
+    inline uint GetHeight () const { return height; }
+
+    void Lock () const
+    {
+      if (!IsLocked() && (maskData == 0))
+      {
+	maskData = AllocMask();
+      }
+      Swappable::Lock();
+    }
+    
+    virtual void GetSwapData (void*& data, size_t& size)
+    {
+      if (maskData == 0) maskData = AllocMask ();
+      data = maskData;
+      size = width * height * sizeof (float);
+      // Set a bogus pointer so accesses to swapped data causes a segfault
+      maskData = BogusPointer ();
+    }
+    virtual size_t GetSwapSize()
+    {
+      return width * height * sizeof (float);
+    }
+    virtual void SwapIn (void* data, size_t size)
+    {
+      CS_ASSERT (size == width * height * sizeof (float));
+      CS_ASSERT (maskData == BogusPointer ());
+      maskData = (float*)data;
+    }
   };
-  typedef csArray<LightmapMask> LightmapMaskArray;
+  typedef csPDelArray<LightmapMask> LightmapMaskPtrDelArray;
 
   class LightmapPostProcess
   {

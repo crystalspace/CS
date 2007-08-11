@@ -60,14 +60,14 @@ struct iTextureFactory : public virtual iBase
   virtual iTextureType* GetTextureType () const = 0;
 };
 
-SCF_VERSION (iTextureType, 0, 0, 1);
-
 /**
  * Texture type.
  * Interface used to create instances of iTextureFactory.
  */
 struct iTextureType : public virtual iBase
 {
+  SCF_INTERFACE (iTextureType, 0, 0, 1);
+
   /**
    * Create a new instance of a texture factory.
    */
