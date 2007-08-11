@@ -256,6 +256,24 @@ class csString;
 class LevTool
 {
 public:
+  enum Operation
+  {
+    OP_HELP,
+    OP_LIST,
+    OP_DYNAVIS,
+    OP_VALIDATE,
+    OP_SPLITUNIT,
+    OP_SPLITGEOM,
+    OP_COMPRESS,
+    OP_ANALYZE,
+    OP_FLAGCLEAR,
+    OP_FLAGGOOD,
+    OP_FLAGBAD,
+    OP_TRANSLATE,
+    OP_PLANES,
+    OP_FIXPOLYMESH
+  };
+
   iObjectRegistry* object_reg;
   csRef<iVFS> vfs;
   csRef<iCommandLineParser> cmdline;
@@ -369,14 +387,14 @@ public:
    * Clone a document but change flags of all things in the process.
    */
   void CloneAndChangeFlags (iDocumentNode* node, iDocumentNode* newnode,
-  	int op, int minsize, int maxsize, int minpoly, int maxpoly,
+  	Operation op, int minsize, int maxsize, int minpoly, int maxpoly,
 	float global_area);
 
   /**
    * Clone a document but change flags of all things in the process.
    */
   void CloneAndChangeFlags (iDocument* doc, iDocument* newdoc,
-  	int op, int minsize, int maxsize, int minpoly, int maxpoly,
+  	Operation op, int minsize, int maxsize, int minpoly, int maxpoly,
 	float global_area);
 
   /**
