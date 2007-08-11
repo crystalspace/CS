@@ -9910,6 +9910,12 @@ class iTextureHandle(iBase):
     def SetTextureClass(*args): return _cspace.iTextureHandle_SetTextureClass(*args)
     def GetTextureClass(*args): return _cspace.iTextureHandle_GetTextureClass(*args)
     def SetAlphaType(*args): return _cspace.iTextureHandle_SetAlphaType(*args)
+    texType1D = _cspace.iTextureHandle_texType1D
+    texType2D = _cspace.iTextureHandle_texType2D
+    texType3D = _cspace.iTextureHandle_texType3D
+    texTypeCube = _cspace.iTextureHandle_texTypeCube
+    texTypeRect = _cspace.iTextureHandle_texTypeRect
+    def GetTextureType(*args): return _cspace.iTextureHandle_GetTextureType(*args)
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iTextureHandle_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iTextureHandle_scfGetVersion)
     __swig_destroy__ = _cspace.delete_iTextureHandle

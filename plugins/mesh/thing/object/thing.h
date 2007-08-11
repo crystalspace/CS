@@ -328,7 +328,7 @@ public:
   struct StaticSuperLM
   {
     int width, height;
-    csSubRectangles* rects;
+    CS::SubRectangles* rects;
     int freeLumels;
 
     StaticSuperLM (int w, int h) : width(w), height(h)
@@ -341,11 +341,11 @@ public:
       delete rects;
     }
 
-    csSubRectangles* GetRects ()
+    CS::SubRectangles* GetRects ()
     {
       if (rects == 0)
       {
-	rects = new csSubRectangles (csRect (0, 0, width, height));
+	rects = new CS::SubRectangles (csRect (0, 0, width, height));
       }
       return rects;
     }

@@ -520,10 +520,10 @@ void TerrainBlock::SetupGeometry ()
       float currU = minU;
       for (size_t x = 0; x < numVerts; ++x, currU += uStep)
       {
-
+	/* Apparently useless code: probably a bug. Commenting out...
         if (currV < 0.0f || currV > 1.0f || currU < 0.0f || currU > 1.0f)
           int a = 0;
-
+	*/
         (*texcoordData).x = currU;
         (*texcoordData).y = currV;
         ++texcoordData;

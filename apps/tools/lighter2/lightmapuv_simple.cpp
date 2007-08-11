@@ -150,9 +150,9 @@ namespace lighter
         newFactory->uvsizes.GetExtend (lmID);
       groupUVsizes.Push (sizes[s].uvsize);
 
-      csArray<csVector2>& groupMinUVs = 
+      /*csArray<csVector2>& groupMinUVs = 
         newFactory->minuvs.GetExtend (lmID);
-      groupMinUVs.Push (minuvs[sizes[s].index]);
+      groupMinUVs.Push (minuvs[sizes[s].index]);*/
     }
 
 #ifdef DUMP_SUBRECTANGLES
@@ -529,7 +529,9 @@ namespace lighter
     size_t groupNum, Sector* sector, const csBitArray& pdBits)
   {
     // Prims will be layouted later...
-    size_t layoutID = this->layoutID++;
+    size_t layoutID = minuvs.GetSize();
+    // Update minimum UVs for this particular layout
+    ComputeMinUVs (prims, groupNum, minuvs.GetExtend (layoutID));
 
     parent->QueuePDPrimitives (this, prims, layoutID, groupNum, sector, pdBits,
       this->uvsizes[groupNum]);
@@ -576,11 +578,46 @@ namespace lighter
     }
   }
 
+  void SimpleUVObjectLayouter::ComputeMinUVs (PrimitiveArray& prims, 
+                                              size_t groupNum,
+                                              csArray<csVector2>& minuvs)
+  {
+    const csArray<csArray<size_t> >& coplanarGroup = coplanarGroups[groupNum];
+
+    for (size_t c = 0; c < coplanarGroup.GetSize(); c++)
+    {
+      const csArray<size_t>& coPrim = coplanarGroup[c];
+      csVector2 minuv, maxuv;
+
+      // Compute uv-size
+      Primitive& prim0 = prims[coPrim[0]];
+      prim0.ComputeMinMaxUV (lightmapUVs, minuv, maxuv);
+      for (size_t p = 1; p < coPrim.GetSize(); p++)
+      {
+        Primitive& prim = prims[coPrim[p]];
+        csVector2 pminuv, pmaxuv;
+        prim.ComputeMinMaxUV (lightmapUVs, pminuv, pmaxuv);
+        minuv.x = csMin (minuv.x, pminuv.x);
+        minuv.y = csMin (minuv.y, pminuv.y);
+        maxuv.x = csMax (maxuv.x, pmaxuv.x);
+        maxuv.y = csMax (maxuv.y, pmaxuv.y);
+      }
+      
+      /* Subtle: causes lumels to be aligned on a world space grid.
+       * The intention is that the lightmap coordinates for vertices 
+       * for two adjacent faces are lined up nicely.
+       * @@@ Does not take object translation into account. */
+      minuv.x = floor (minuv.x);
+      minuv.y = floor (minuv.y);
+      minuvs.Push (minuv);
+    }
+  }
+
   void SimpleUVObjectLayouter::LayoutQueuedPrims (PrimitiveArray &prims, 
     size_t layoutID, size_t groupNum, size_t lightmap, 
     const csArray<csVector2>& positions, int dx, int dy)
   {
-    const csArray<csVector2>& minuvs = this->minuvs[groupNum];
+    const csArray<csVector2>& minuvs = this->minuvs[/*groupNum*/layoutID];
     PDLayoutedGroup layouted;
     layouted.lmID = uint (lightmap);
     layouted.remaps = positions;

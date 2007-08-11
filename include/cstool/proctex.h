@@ -100,6 +100,14 @@ protected:
   // Are we visible? Can be 'false' if animated w/ 'always animate'.
   bool visible;
 
+  /**
+   * Create the actual texture wrapper.
+   * The default implementation creates a texture from proc_image if that is
+   * valid, or a texture of format "rgb8" otherwise. Override this function
+   * to realize different texture formats.
+   */
+  virtual iTextureWrapper* CreateTexture (iObjectRegistry* object_reg);
+
   virtual iObject *QueryObject();
   virtual iTextureWrapper *Clone () const;
   virtual void SetImageFile (iImage *Image);
