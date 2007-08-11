@@ -39,6 +39,7 @@ distribution.
 #include "csutil/array.h"
 #include "csutil/fifo.h"
 #include "csutil/fixedsizeallocator.h"
+#include "csutil/memheap.h"
 #include "csutil/reftrackeraccess.h"
 #include "csutil/strset.h"
 #include "csutil/util.h"
@@ -784,11 +785,13 @@ class TiDocument : public TiDocumentNodeChildren
       case TEXT: 
         blk_text.Free (node.ptr); 
         break;
-      case DOCUMENT:
       case COMMENT:
       case CDATA:
       case DECLARATION:
       case UNKNOWN:
+        docHeap.Free (node.ptr);
+        break;
+      case DOCUMENT:
         CS::Memory::CustomAllocated::operator delete (node.ptr);
         break;
       default: 
@@ -839,12 +842,15 @@ class TiDocument : public TiDocumentNodeChildren
     }
   }
 public:
+  /// Heap used for document allocations.
+  CS::Memory::Heap docHeap;
+  typedef CS::Memory::AllocatorHeap<CS::Memory::Heap*> DocHeapAlloc;
   /// Interned strings.
   csStringSet strings;
   /// Block allocator for elements.
-  csFixedSizeAllocator<sizeof(TiXmlElement)> blk_element;
+  csFixedSizeAllocator<sizeof(TiXmlElement), DocHeapAlloc> blk_element;
   /// Block allocator for text.
-  csFixedSizeAllocator<sizeof(TiXmlText)> blk_text;
+  csFixedSizeAllocator<sizeof(TiXmlText), DocHeapAlloc> blk_text;
 
   /// Create an empty document, that has no name.
   TiDocument();
