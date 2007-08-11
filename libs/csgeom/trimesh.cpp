@@ -89,6 +89,12 @@ void csTriangleMesh::AddTriangleMesh(const csTriangleMesh& tm)
 	}
 }
 
+csTriangleMesh& csTriangleMesh::operator+=(const csTriangleMesh& tm)
+{
+	AddTriangleMesh(tm);
+	return *this;
+}
+
 //---------------------------------------------------------------------------
 
 void csTriangleVertex::AddTriangle (size_t idx)

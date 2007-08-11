@@ -264,20 +264,52 @@ const char* csColladaConvertor::Write(const char* filepath)
 
 // =============== Accessor Functions =============== 
 
-csColladaMaterial* csColladaConvertor::FindMaterial(iString* accessorString)
+csColladaMaterial* csColladaConvertor::FindMaterial(const char* accessorString)
 {
 	// Using csArrayCmp would be more efficient I believe, but
 	// I have no idea how to use this comparator.  ;)
 	//csArrayCmp<csColladaMaterial, const char*> functor;
 
+	if (warningsOn)
+	{
+		Report(CS_REPORTER_SEVERITY_WARNING, "Inside FindMaterial()");
+	}
+
 	csArray<csColladaMaterial>::Iterator matIter = materialsList.GetIterator();
 	while (matIter.HasNext())
 	{
-		csColladaMaterial* currentMat = &(matIter.Next());
-		if (currentMat->GetID()->Compare(accessorString))
+		csString accessConverted(accessorString);
+		
+		if (warningsOn)
 		{
+			Report(CS_REPORTER_SEVERITY_WARNING, "Creating currentMat...");
+		}
+
+		csColladaMaterial *currentMat = new csColladaMaterial(matIter.Next());
+		
+		if (warningsOn)
+		{
+			Report(CS_REPORTER_SEVERITY_WARNING, "Done.");
+		}
+
+		if (currentMat->GetID().Compare(accessConverted.GetData()))
+		{
+			if (warningsOn)
+			{
+				Report(CS_REPORTER_SEVERITY_WARNING, "Returning...");
+			}
 			return currentMat;
 		}
+		
+		else
+		{
+			delete currentMat;
+		}
+	}
+	
+	if (warningsOn)
+	{
+		Report(CS_REPORTER_SEVERITY_WARNING, "Returning...");
 	}
 
 	return 0;
@@ -401,7 +433,17 @@ const char*	csColladaConvertor::Convert()
 		return "Unable to find library_materials.";
 	}
 
+	if (warningsOn)
+	{
+		Report(CS_REPORTER_SEVERITY_WARNING, "Beginning to convert materials");
+	}
+
 	ConvertMaterials(materialsNode);
+
+	if (warningsOn)
+	{
+		Report(CS_REPORTER_SEVERITY_WARNING, "Done converting materials");
+	}
 
 	csRef<iDocumentNode> geoNode = colladaElement->GetNode("library_geometries");
 	if (!geoNode.IsValid())
@@ -410,7 +452,17 @@ const char*	csColladaConvertor::Convert()
 		return "Unable to find library_geometries.";
 	}
 
+	if (warningsOn)
+	{
+		Report(CS_REPORTER_SEVERITY_WARNING, "Beginning to convert geometry");
+	}
+
 	ConvertGeometry(geoNode);
+
+	if (warningsOn)
+	{
+		Report(CS_REPORTER_SEVERITY_WARNING, "Done converting geometry");
+	}
 
 	return 0;
 }
@@ -440,11 +492,10 @@ bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
 	csRef<iDocumentNode> currentMeshElement;
 	csRef<iDocumentNode> currentVerticesElement;
 	csRef<iDocumentNodeIterator> convexMeshIterator;
-	//iString *idValue;
 	csArray<csVector3> vertexArray;
-	//int *normalArray;
-	//iStringArray *accessorArray;
+	csArray<csVector3> normalArray;
 	int vertexArraySize = 0;
+	int normalArraySize = 0;
 	csColladaMesh *mesh;
 
 	// while the iterator is not empty
@@ -513,12 +564,14 @@ bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
 
 			// Adding vertices to CS document
 			vertexArray = mesh->GetVertices();
+			normalArray = mesh->GetNormals();
 						
 			vertexArraySize = mesh->GetNumberOfVertices();
+			normalArraySize = mesh->GetNumberOfNormals();
 
 			if (warningsOn && vertexArraySize > 0)
 			{
-				Report(CS_REPORTER_SEVERITY_NOTIFY, "Array acquired.  id: %s", mesh->GetPositionID()->GetData());
+				Report(CS_REPORTER_SEVERITY_NOTIFY, "Array acquired.  id: %s", mesh->GetPositionID().GetData());
 			}
 			else if (warningsOn && vertexArraySize <= 0)
 			{
@@ -534,21 +587,21 @@ bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
 				return false;
 			}
 			
-			csRef<iDocumentNode> sourceElement = GetSourceElement(mesh->GetPositionID()->GetData(), currentMeshElement);
+			csRef<iDocumentNode> sourceElement = GetSourceElement(mesh->GetPositionID().GetData(), currentMeshElement);
 			if (sourceElement == 0)
 			{
-				Report(CS_REPORTER_SEVERITY_ERROR, "Unable to acquire source element with id: %s", mesh->GetPositionID()->GetData());
+				Report(CS_REPORTER_SEVERITY_ERROR, "Unable to acquire source element with id: %s", mesh->GetPositionID().GetData());
 				return false;
 			}
 		
 			// create meshfact and plugin (top-level) nodes
 			csRef<iDocumentNode> meshFactNode = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
 			meshFactNode->SetValue("meshfact");
-			meshFactNode->SetAttribute("name", mesh->GetName()->GetData());
+			meshFactNode->SetAttribute("name", mesh->GetName().GetData());
 			csRef<iDocumentNode> pluginNode = meshFactNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
 			pluginNode->SetValue("plugin");
 			csRef<iDocumentNode> pluginContents = pluginNode->CreateNodeBefore(CS_NODE_TEXT, 0);
-			pluginContents->SetValue(mesh->GetPluginType()->GetData());
+			pluginContents->SetValue(mesh->GetPluginType().GetData());
 
 			if (warningsOn)
 			{
@@ -560,11 +613,18 @@ bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
 								meshFactNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
 			currentCrystalParamsElement->SetValue("params");
 
+			// output the materials
+			csRef<iDocumentNode> materialNode = currentCrystalParamsElement->CreateNodeBefore(CS_NODE_ELEMENT);
+			materialNode->SetValue("material");
+			csRef<iDocumentNode> materialContents = materialNode->CreateNodeBefore(CS_NODE_TEXT);
+			materialContents->SetValue(mesh->GetMaterialPointer()->GetID());
+
 			int counter = 0;
 			csRef<iDocumentNode> currentCrystalVElement;
 
-			int accessorArraySize = 0;
-			csColladaAccessor *accessorArray = new csColladaAccessor(sourceElement, this);
+			//int accessorArraySize = 0;
+			csColladaAccessor *vertAccess = mesh->GetVertexAccessor();
+			csColladaAccessor *normAccess = mesh->GetNormalAccessor();
 
 			while (counter < vertexArraySize)
 			{
@@ -574,16 +634,30 @@ bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
 					Report(CS_REPORTER_SEVERITY_NOTIFY, "Adding the following vertex: %f, %f, %f", vertexArray[counter].x, vertexArray[counter].y, vertexArray[counter].z);
 				}
 			
+				/// @todo: Add normal information here.
 				/* WRITE OUT VERTICES */
 				scfString formatter;
 				currentCrystalVElement = currentCrystalParamsElement->CreateNodeBefore(CS_NODE_ELEMENT, 0);
 				currentCrystalVElement->SetValue("v");
 				formatter.Format("%f", vertexArray[counter].x);
-				currentCrystalVElement->SetAttribute(accessorArray->Get(0), formatter.GetData());
+				currentCrystalVElement->SetAttribute(vertAccess->Get(0), formatter.GetData());
 				formatter.Format("%f", vertexArray[counter].y);
-				currentCrystalVElement->SetAttribute(accessorArray->Get(1), formatter.GetData());
+				currentCrystalVElement->SetAttribute(vertAccess->Get(1), formatter.GetData());
 				formatter.Format("%f", vertexArray[counter].z);
-				currentCrystalVElement->SetAttribute(accessorArray->Get(2), formatter.GetData());
+				currentCrystalVElement->SetAttribute(vertAccess->Get(2), formatter.GetData());
+				
+				/* Actually, this isn't going to work quite as I expected, due to the 
+				 * fact that we need an index into the normal array.
+
+				formatter.Format("%f", normalArray[counter].x);
+				currentCrystalVElement->SetAttribute("nx", formatter.GetData());
+				formatter.Format("%f", normalArray[counter].y);
+				currentCrystalVElement->SetAttribute("nx", formatter.GetData());
+				formatter.Format("%f", normalArray[counter].z);
+				currentCrystalVElement->SetAttribute("nx", formatter.GetData());
+
+				*/
+
 				/* DONE WRITING OUT VERTICES */
 
 				counter++;
@@ -628,9 +702,20 @@ bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
 
 				triCounter++;
 			}
+			
+			if (warningsOn)
+			{
+					Report(CS_REPORTER_SEVERITY_NOTIFY, "Done adding triangles");
+					Report(CS_REPORTER_SEVERITY_NOTIFY, "Invalidating document nodes...");
+			}
 
 			meshFactNode.Invalidate();
 			currentCrystalParamsElement.Invalidate();
+
+			if (warningsOn)
+			{
+				Report(CS_REPORTER_SEVERITY_NOTIFY, "Done");
+			}
 
 			delete mesh;
 		}
@@ -700,6 +785,8 @@ bool csColladaConvertor::ConvertMaterials(iDocumentNode *materialsSection)
 	csRef<iDocumentNode> effectNode;
 	csRef<iDocumentNode> libraryEffects = colladaElement->GetNode("library_effects");
 	csRef<iDocumentNodeIterator> effectIter;
+	csRef<iDocumentNode> materialsNode = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT);
+	materialsNode->SetValue("materials");
 
 	while (materialsElements->HasNext())
 	{
@@ -730,6 +817,27 @@ bool csColladaConvertor::ConvertMaterials(iDocumentNode *materialsSection)
 		nextMaterial->SetInstanceEffect(effectNode);
 		materialsList.Push(*nextMaterial);
 		
+		csRef<iDocumentNode> newNode = materialsNode->CreateNodeBefore(CS_NODE_ELEMENT);
+		newNode->SetValue("material");
+		newNode->SetAttribute("name", nextMaterial->GetID());
+		csRef<iDocumentNode> colorNode = newNode->CreateNodeBefore(CS_NODE_ELEMENT);
+		colorNode->SetValue("color");
+		csRGBcolor diffuseColor = nextMaterial->GetInstanceEffect()->GetProfile("profile_COMMON")->GetDiffuseColor();
+		
+		if (warningsOn)
+		{
+			Report(CS_REPORTER_SEVERITY_NOTIFY, "Outputting color: %d, %d, %d", diffuseColor.red, diffuseColor.green, diffuseColor.blue);
+		}
+	
+		csString outputString;
+		outputString = outputString.Format("%d", diffuseColor.red);
+		colorNode->SetAttribute("red", outputString.GetData());
+		outputString = outputString.Format("%d", diffuseColor.green);
+		colorNode->SetAttribute("green", outputString.GetData());
+		outputString = outputString.Format("%d", diffuseColor.blue);
+		colorNode->SetAttribute("blue", outputString.GetData());
+
+		
 		/*
 		csColladaEffectProfile* prof = nextMaterial->GetInstanceEffect()->GetProfile("profile_COMMON");
 		if (warningsOn)
@@ -737,6 +845,8 @@ bool csColladaConvertor::ConvertMaterials(iDocumentNode *materialsSection)
 			Report(CS_REPORTER_SEVERITY_NOTIFY, "Profile name: %s", prof->GetName()->GetData()); 
 		}
 		*/
+		
+		//delete nextMaterial;
 	}
 
 	return true;

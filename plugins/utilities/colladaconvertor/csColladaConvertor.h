@@ -169,7 +169,7 @@ class	csColladaConvertor : public	scfImplementation2<csColladaConvertor,iCollada
 		 */
 		csColladaEffect& GetEffect(size_t index);
 
-		csColladaMaterial* FindMaterial(iString* accessorString);
+		csColladaMaterial* FindMaterial(const char* accessorString);
 	
 	private:
 
@@ -182,7 +182,7 @@ class	csColladaConvertor : public	scfImplementation2<csColladaConvertor,iCollada
 		*
 		*	\returns The source	element	associated with	given	element.
 		*/
-		csRef<iDocumentNode> GetSourceElement(const	char*	name,	iDocumentNode* parent);
+		static csRef<iDocumentNode> GetSourceElement(const	char*	name,	iDocumentNode* parent);
 	
 	public:
 

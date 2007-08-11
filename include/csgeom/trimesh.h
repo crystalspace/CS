@@ -99,6 +99,9 @@ public:
   virtual void Unlock () { }
   virtual csFlags& GetFlags () { return flags; }
   virtual uint32 GetChangeNumber () const { return change_nr; }
+
+	/// Adds another triangle mesh to this one
+	csTriangleMesh& operator+=(const csTriangleMesh& tm);
 };
 
 /**

@@ -29,6 +29,7 @@
 #include "csgeom/trimesh.h"
 #include "csgfx/rgbpixel.h"
 
+
 #ifndef	_CS_COLLADA_CLASSES_H_
 #define	_CS_COLLADA_CLASSES_H_
 
@@ -50,16 +51,17 @@ class	csColladaAccessor	{
 		// positions, which starts vertex normals, etc...
 		int accessorOffset; 
 
-		iStringArray *accessorNames;
+		csStringArray *accessorNames;
 
 	public:
 		csColladaAccessor();
 		csColladaAccessor(iDocumentNode* source, csColladaConvertor* parent);
+		~csColladaAccessor();
 
 		int GetStride() { return stride; }
 		int GetCount() { return count; }
 		int GetOffset() { return accessorOffset; }
-		iStringArray* GetAccessorNames() { return accessorNames; }
+		csStringArray* GetAccessorNames() { return accessorNames; }
 		csColladaConvertor* GetParent() { return parent; }
 		csRef<iDocumentNode> GetSourceElement() { return sourceElement; }
 		
@@ -74,17 +76,23 @@ class	csColladaMesh	{
 	private:
 		csColladaConvertor* parent;
 		csArray<csVector3> vertices; // a list of vertex components (x, y, z)
+		csArray<csVector3> normals;  // a list of normal components
 		int numberOfVertices;  // number of vertices in the mesh
 		int numVertexElements; // the number of vertex components (3* numberOfVertices)
-		iString	*name;  // what the polygon is actually called
-		iString *positionId;    // the id of the position array
-		iString *normalId;		// the id of the normal array
-		iString *vertexId;		// the id of the vertices
+		csColladaAccessor* vertexAccessor; // the accessor for vertices
+		csColladaAccessor* normalAccessor; // the accessor for normals
+		csString	name;  // what the polygon is actually called
+		csString positionId;    // the id of the position array
+		csString normalId;		// the id of the normal array
+		csString vertexId;		// the id of the vertices
 		csRef<iDocumentNode> meshElement;
-		csArray<csColladaAccessor> accessorList; // a list of accessors
-		csColladaAccessor	vAccess; // the accessor corresponding to the vertices
+		
+		// is this needed?
+		//csArray<csColladaAccessor> accessorList; // a list of accessors
+		
+		//csColladaAccessor	vAccess; // the accessor corresponding to the vertices
 		csColladaNumericType vType;
-		iString *pluginType;  // the type of plugin we're using (default = genmeshfact)
+		csString pluginType;  // the type of plugin we're using (default = genmeshfact)
 		size_t vertexOffset, normalOffset;  // the offsets of the normals and positions
 		csColladaMaterial* materials;	// the materials applied to the mesh object
 
@@ -118,9 +126,9 @@ class	csColladaMesh	{
 		 *                            or float) array.
 		 * @param storeIn The csArray that we want to use as a destination.
 		 */
-		void RetrieveArray(iDocumentNode* numericArrayElement, csArray<csVector3>& storeIn); 
+		void RetrieveArray(iDocumentNode* sourceElement, csColladaAccessor* accessPtr, csArray<csVector3>& storeIn); 
 
-		/** \brief Retrieves the vertex and normal offsets
+		/** \brief Retrieves the vertex and normal information
 		 *
 		 * Retrives values for vertexOffset and normalOffset, given a specific
 		 * element.  This function also retrieves the names of the vertex (position)
@@ -130,13 +138,13 @@ class	csColladaMesh	{
 		 *                array with respect to.
 		 * @notes This function does NOT retrieve the positionId.
 		 */
-		void RetrieveOffsets(iDocumentNode* element);
+		void RetrieveInfo(iDocumentNode* element);
 
 		/** \brief Sets the normals in the vertex array
 		 * 
 		 * Sets all of the normX, normY, and normZ values in the vertex array.
 		 */
-		void SetNormals();
+		//void SetNormals();
 
 		/** \brief Sets the pointer for the mesh's material list.
 		 *
@@ -151,16 +159,21 @@ class	csColladaMesh	{
 		~csColladaMesh();
 
 		const csArray<csVector3>& GetVertices() { return vertices; }
+		const csArray<csVector3>& GetNormals() { return normals; }
 		int GetNumVertexElements() { return numVertexElements; }
 		int GetNumberOfVertices() { return numberOfVertices; }
+		int GetNumberOfNormals() { return (int)normals.GetSize(); }
 		csColladaMaterial* GetMaterialPointer() { return materials; }
 		csColladaNumericType GetVertexType() { return vType; }
-		iString* GetName() { return name; }
-		iString* GetPositionID() { return positionId; }
-		iString* GetPluginType() { return pluginType; }
+		csString GetName() { return name; }
+		csString GetPositionID() { return positionId; }
+		csString GetPluginType() { return pluginType; }
 		int GetNumInputElements(iDocumentNode* element);
 		csTriangleMesh* GetTriangleMesh() { return triangles; } 
 		csRef<iDocumentNode> GetMeshElement() { return meshElement; }
+
+		csColladaAccessor* GetVertexAccessor() { return vertexAccessor; }
+		csColladaAccessor* GetNormalAccessor() { return normalAccessor; }
 
 		/** \brief Process a COLLADA mesh node and construct a csColladaMesh object
 		 *
@@ -205,7 +218,7 @@ class csColladaEffectProfile {
 		csRef<iDocumentNode> element;
 		csColladaConvertor* parent;
 		csRGBcolor diffuseColor, specularColor, ambientColor;
-		iString* name;
+		csString name;
 
 	public:
 		csColladaEffectProfile(iDocumentNode* profileElement, csColladaConvertor* parentObj);
@@ -219,12 +232,12 @@ class csColladaEffectProfile {
 		csRGBcolor GetDiffuseColor() { return diffuseColor; }
 		csRGBcolor GetSpecularColor() { return specularColor; }
 
-		iString* GetName() { return name; }
+		csString GetName() { return name; }
 
 		void SetAmbientColor(csRGBcolor newAmbient);
 		void SetDiffuseColor(csRGBcolor newDiffuse);
 		void SetSpecularColor(csRGBcolor newSpecular);
-		void SetName(iString* newName);
+		void SetName(const char* newName);
 
 }; /* End of class csColladaEffectProfile */
 
@@ -233,13 +246,13 @@ class csColladaEffect {
 		csArray<csColladaEffectProfile> profiles;
 		csRef<iDocumentNode> element;
 		csColladaConvertor* parent;
-		iString* id;
+		csString id;
 
 	public:
 		csColladaEffect(iDocumentNode* effectElement, csColladaConvertor* parentObj);
 		bool Process(iDocumentNode* effectElement);
 
-		csColladaEffectProfile* GetProfile(iString* query); // probably should be csRef
+		//csColladaEffectProfile* GetProfile(const char* query); // probably should be csRef
 		csColladaEffectProfile* GetProfile(const char* query);
 
 		bool operator==(const csColladaEffect& compEffect);
@@ -248,7 +261,7 @@ class csColladaEffect {
 
 class csColladaMaterial {
 	private:
-		iString *id;
+		csString id;
 		csColladaEffect* instanceEffect;
 		csColladaConvertor *parent;
 
@@ -260,10 +273,12 @@ class csColladaMaterial {
 		void SetInstanceEffect(iDocumentNode* effectNode);
 		void SetInstanceEffect(csColladaEffect *newInstEffect);
 
-		iString* GetID() { return id; }
+		csString GetID() { return id; }
 		csColladaEffect* GetInstanceEffect() { return instanceEffect; }
 
 		bool operator==(const csColladaMaterial& comp);
+
+		static csRGBcolor StringToColor(const char* toConvert);
 
 }; /* End of class csColladaMaterial */
 

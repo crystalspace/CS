@@ -33,6 +33,7 @@
 
 using std::string;
 using std::stringstream;
+using std::skipws;
 
 CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 {
@@ -46,8 +47,15 @@ csColladaAccessor::csColladaAccessor()
 
 csColladaAccessor::csColladaAccessor(iDocumentNode* source, csColladaConvertor* par)
 {
+	stride = 0;
+	count = 0;
 	parent = par;
 	Process(source);
+}
+
+csColladaAccessor::~csColladaAccessor()
+{
+	delete accessorNames;
 }
 
 bool csColladaAccessor::Process(iDocumentNode* src)
@@ -89,6 +97,18 @@ bool csColladaAccessor::Process(iDocumentNode* src)
 		return 0;
 	}
 
+	stride = currentAccessorElement->GetAttributeValueAsInt("stride");
+	if (parent->warningsOn)
+	{
+		parent->Report(CS_REPORTER_SEVERITY_WARNING, "Stride value of accessor: %d", stride);
+	}
+	
+	if (stride == 0 && parent->warningsOn)
+	{
+		parent->Report(CS_REPORTER_SEVERITY_ERROR, "Unable to acquire stride parameter in accessor element.");
+		return 0;
+	}
+
 	paramsIterator = currentAccessorElement->GetNodes("param");
 
 	if (!paramsIterator.IsValid() && parent->warningsOn)
@@ -97,7 +117,7 @@ bool csColladaAccessor::Process(iDocumentNode* src)
 		return 0;
 	}
 
-	accessorNames = new scfStringArray();
+	accessorNames = new csStringArray();
 
 	while(paramsIterator->HasNext())
 	{
@@ -127,37 +147,27 @@ void csColladaAccessor::SetOffset(int newOffset)
 csColladaMesh::csColladaMesh(iDocumentNode* element, csColladaConvertor* par)
 {
 	meshElement = element;
-	pluginType = new scfString(CS_COLLADA_DEFAULT_MESH_PLUGIN_TYPE);
+	pluginType = CS_COLLADA_DEFAULT_MESH_PLUGIN_TYPE;
 	numberOfVertices = 0;
 	numVertexElements = 0;
 	normalId = 0;
 	vertexId = 0;
 	parent = par;
 	triangles = new csTriangleMesh();
+	materials = 0;
 	Process(meshElement);
 }
 
 csColladaMesh::~csColladaMesh()
 {
-	// we no longer need this - everything will be converted to
-	// floating point values.
-	/*
-	if (vType == CS_COLLADA_FLOAT)
+	if (materials != 0)
 	{
-		delete[] ((float*)vertices);
+		delete materials;
 	}
-
-	else
-	{
-		delete[] ((int*) vertices);
-	}
-*/
-
-	parent = 0;
-	numVertexElements = 0;
-	numberOfVertices = 0;
-
+	
 	delete triangles;
+	delete vertexAccessor;
+	delete normalAccessor;
 }
 
 csRef<iDocumentNode> csColladaMesh::FindNumericArray(const csRef<iDocumentNode>& node)
@@ -181,8 +191,16 @@ csRef<iDocumentNode> csColladaMesh::FindNumericArray(const csRef<iDocumentNode>&
 	}
 }
 
-void csColladaMesh::RetrieveArray(iDocumentNode* numericArrayElement, csArray<csVector3>& toStore)
+/** @todo Refactor this, so it *only* retrieves the array, but sets the 
+ *       accessor accordingly.  Also, it should probably be a static 
+ *       member of csColladaConvertor.
+ */
+void csColladaMesh::RetrieveArray(iDocumentNode* sourceElement, csColladaAccessor* accessPtr, csArray<csVector3>& toStore)
 {
+	csRef<iDocumentNode> numericArrayElement = FindNumericArray(sourceElement);
+
+	// accessor needs to be defined outside of this method
+	//vertexAccessor = new csColladaAccessor(sourceElement, this);
 	stringstream conver;
 	int countArray = numericArrayElement->GetAttributeValueAsInt("count");
 	std::string arrayElement(numericArrayElement->GetContentsValue());
@@ -207,40 +225,44 @@ void csColladaMesh::RetrieveArray(iDocumentNode* numericArrayElement, csArray<cs
 	}
 
 
-	float tempx, tempy, tempz;
-	int numVertsInArray = countArray/3;
-/*
-	while (conver >> temp)
-	{
-		toStore.Put(toStore.GetSize(), (float)temp);
-	}
-*/
-	for (int i = 0; i < numVertsInArray; i++)
-	{
-		conver >> tempx;
-		conver >> tempy;
-		conver >> tempz;
+	// get the number of accessor strings
+	int accessorStride = accessPtr->GetStride();
 
+	float* temp = new float[accessorStride];
+
+	int numItemsInArray = countArray/accessorStride;
+
+	if (parent->warningsOn)
+	{
+		parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "numItemsInArray: %d", numItemsInArray);
+	}
+
+	for (int i = 0; i < numItemsInArray; i++)
+	{
+		for (int j = 0; j < accessorStride; j++)
+		{
+			conver >> temp[j];
+			if (parent->warningsOn)
+			{
+				parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Value of temp[%d] is: %f", j, temp[j]);
+			}
+		}
+
+		// this might need to be made a little more general,
+		// but that can wait, since we're only using it for
+		// csVector3's for right now
 		csVector3 t;
-		t.x = tempx;
-		t.y = tempy;
-		t.z = tempz;
+		t.x = temp[0];
+		t.y = temp[1];
+		t.z = temp[2];
 
 		toStore.Put(toStore.GetSize(), t);
 	}
 
-	if (positionId->Compare(&scfString(numericArrayElement->GetParent()->GetAttributeValue("id"))) == 0)
-	{
-		for (int i = 0; i < numberOfVertices; i++)
-		{
-				triangles->AddVertex(toStore[i].x);
-				triangles->AddVertex(toStore[i].y);
-				triangles->AddVertex(toStore[i].z);
-		}
-	}
+	delete[] temp;
 }
 
-void csColladaMesh::RetrieveOffsets(iDocumentNode *element)
+void csColladaMesh::RetrieveInfo(iDocumentNode *element)
 {
 	// find the offset of the normals and vertices
 	csRef<iDocumentNodeIterator> inputElements = element->GetNodes("input");
@@ -253,32 +275,36 @@ void csColladaMesh::RetrieveOffsets(iDocumentNode *element)
 		scfString semVal(currentInputElement->GetAttributeValue("semantic"));
 		if (semVal.Compare("NORMAL"))
 		{
+			/* This was only valid when normalId was a pointer
 			if (normalId != 0)
 			{
 				delete normalId;
 				normalId = 0;
 			}
+			*/
 
-			normalId = new scfString(currentInputElement->GetAttributeValue("source"));
-			if (normalId->GetAt(0) == '#')
+			normalId = currentInputElement->GetAttributeValue("source");
+			if (normalId.GetAt(0) == '#')
 			{
-				normalId->DeleteAt(0, 1);
+				normalId.DeleteAt(0, 1);
 			}
 
 			normalOffset = counter;
 		}
 		else if (semVal.Compare("VERTEX"))
 		{
+			/* This was only valid when vertexId was a pointer
 			if (vertexId != 0)
 			{
 				delete vertexId;
 				vertexId = 0;
 			}
+			*/
 
-			vertexId = new scfString(currentInputElement->GetAttributeValue("source"));
-			if (vertexId->GetAt(0) == '#')
+			vertexId = currentInputElement->GetAttributeValue("source");
+			if (vertexId.GetAt(0) == '#')
 			{
-				vertexId->DeleteAt(0, 1);
+				vertexId.DeleteAt(0, 1);
 			}
 
 			vertexOffset = counter;
@@ -315,8 +341,9 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 	csRef<iDocumentNodeIterator> sourceElements;
 	csRef<iDocumentNode> currentNumericArrayElement;
 	csRef<iDocumentNode> currentSourceElement;
+	csRef<iDocumentNode> currentNormalArrayElement;
 	std::string inputElementSemantic = "";
-	scfString positionSource = "";
+	csString positionSource = "";
 	//scfString normalSource = "";
 
 	meshElement = element;
@@ -364,16 +391,17 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 	{
 		currentSourceElement = sourceElements->Next();
 		
-		name = new scfString(currentSourceElement->GetParent()->GetParent()->GetAttribute("id")->GetValue());
+		name = currentSourceElement->GetParent()->GetParent()->GetAttribute("id")->GetValue();
 
-		scfString *newId = new scfString(currentSourceElement->GetAttribute("id")->GetValue());
+		csString newId = currentSourceElement->GetAttribute("id")->GetValue();
 
 		// this if statement controls the finding of the position
 		// array
-		if (newId->Compare(&positionSource))
+		if (newId.Compare(positionSource))
 		{
 			positionId = newId;
-
+			vertexAccessor = new csColladaAccessor(currentSourceElement, parent);
+			
 			// find child numeric array element of currentSourceElement
 			// store as currentNumericArrayElement
 			currentNumericArrayElement = FindNumericArray(currentSourceElement);
@@ -399,15 +427,17 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 				parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Numeric array found.  Type: %s, Number of elements: %d", currentNumericArrayElement->GetValue(), numVertexElements);
 			}
 
-			RetrieveArray(currentNumericArrayElement, vertices);
-		}
-		
-		// in the event that we aren't looking at the position array,
-		// we need to delete the scfString we created, otherwise we will
-		// have a memory leak.
-		else 
-		{
-			delete newId;
+			RetrieveArray(currentSourceElement, vertexAccessor, vertices);
+			
+			if (positionId.Compare(currentNumericArrayElement->GetParent()->GetAttributeValue("id")))
+			{
+				for (int i = 0; i < numberOfVertices; i++)
+				{
+					triangles->AddVertex(vertices[i].x);
+					triangles->AddVertex(vertices[i].y);
+					triangles->AddVertex(vertices[i].z);
+				}
+			}
 		}
 
 		// we will need another if statement to control the finding of the
@@ -493,6 +523,28 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 	}
 	/* END TRIANGLES PROCESSING */
 
+	if (parent->warningsOn)
+	{
+		parent->Report(CS_REPORTER_SEVERITY_WARNING, "Normal id: %s", normalId.GetData());
+	}
+
+	// now, we need to retrieve the normals
+	csRef<iDocumentNode> sourceNode = parent->GetSourceElement(normalId.GetData(), meshElement);
+	normalAccessor = new csColladaAccessor(sourceNode, parent);
+	csRef<iDocumentNode> numericArray = FindNumericArray(sourceNode);
+	RetrieveArray(sourceNode, normalAccessor, normals);
+	
+	if (parent->warningsOn)
+	{
+		csString appender;
+		for (int i = 0; i < (int)normals.GetSize(); i++)
+		{
+			appender.Append(appender.Format("%f ", normals[i]));
+		}
+
+		parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Normals data: %s", appender.GetData());
+	}
+
 	return vertices;
 	
 	}
@@ -506,9 +558,9 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 		int numTriFans = trifansElement->GetAttributeValueAsInt("count");
 		//int numberTriangles = numTriStrips * 
 		
-		scfString *mat = new scfString(trifansElement->GetAttributeValue("material"));
-		materials = parent->FindMaterial(mat);
-		delete mat;		
+		csString mat = trifansElement->GetAttributeValue("material");
+		materials = parent->FindMaterial(mat.GetData());
+		//delete mat;		
 		
 		while (pElementIterator->HasNext())
 		{
@@ -527,29 +579,17 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 			}
 			
 			// find the offset of the normals and vertices
-			csRef<iDocumentNodeIterator> inputElements = trifansElement->GetNodes("input");
-			csRef<iDocumentNode> currentInputElement;
-			size_t vertexOffset, normalOffset;
+			/// @todo Clean this up, so that it doesn't rely on 
+			///       an external counter like this.
 			int counter = 0;
-
-			while (inputElements->HasNext())
+			csRef<iDocumentNodeIterator> nodeIter = trifansElement->GetNodes("input");
+			while (nodeIter->HasNext())
 			{
-				currentInputElement = inputElements->Next();
-				scfString semVal(currentInputElement->GetAttributeValue("semantic"));
-				if (semVal.Compare("NORMAL"))
-				{
-					normalOffset = counter;
-				}
-				else if (semVal.Compare("VERTEX"))
-				{
-					vertexOffset = counter;
-				}
-
+				nodeIter->Next();
 				counter++;
 			}
-			
-			vertexOffset = vertexOffset * numberOfVertices;
-			normalOffset = normalOffset * numberOfVertices;
+
+			RetrieveInfo(trifansElement);
 
 			if (parent->warningsOn)
 			{
@@ -604,9 +644,9 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 		// sample the vcount element
 		csArray<int> vCountElement;
 		
-		scfString *mat = new scfString(polylistElement->GetAttributeValue("material"));
-		materials = parent->FindMaterial(mat);
-		delete mat;
+		csString mat = polylistElement->GetAttributeValue("material");
+		materials = parent->FindMaterial(mat.GetData());
+		//delete mat;
 
 		stringstream polylistConv(polylistElement->GetNode("vcount")->GetContentsValue());
 
@@ -652,9 +692,9 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 		int tempVertIndex;
 		csArray<int> vertexIndexArrayPolys;
 
-		scfString *mat = new scfString(polygonsElement->GetAttributeValue("material"));
-		materials = parent->FindMaterial(mat);
-		delete mat;
+		csString mat = polygonsElement->GetAttributeValue("material");
+		materials = parent->FindMaterial(mat.GetData());
+		//delete mat;
 
 		polyPIterator = polygonsElement->GetNodes("p");
 
@@ -690,8 +730,8 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 		int numTriStrips = tristripsElement->GetAttributeValueAsInt("count");
 		//int numberTriangles = numTriStrips * 
 		
-		scfString *mat = new scfString(tristripsElement->GetAttributeValue("material"));
-		materials = parent->FindMaterial(mat);
+		csString mat = tristripsElement->GetAttributeValue("material");
+		materials = parent->FindMaterial(mat.GetData());
 		delete mat;
 
 		while (pElementIterator->HasNext())
@@ -710,7 +750,7 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 				//return vertices;
 			}
 			
-			RetrieveOffsets(tristripsElement);
+			RetrieveInfo(tristripsElement);
 
 			int counter = GetNumInputElements(tristripsElement);
 
@@ -766,10 +806,19 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 
 		// get number of triangles in the mesh
 		int numTris = trianglesElement->GetAttributeValueAsInt("count");
+	
+		csString mat = trianglesElement->GetAttributeValue("material");
 		
-		scfString *mat = new scfString(trianglesElement->GetAttributeValue("material"));
+		// there is a bug here causing a debug assertion failure
 		materials = parent->FindMaterial(mat);
-		delete mat;
+
+		if (parent->warningsOn)
+		{
+			parent->Report(CS_REPORTER_SEVERITY_WARNING, "Materials parameter successfully set.");
+		}
+
+		//delete mat;
+
 		
 		while (pElementIterator->HasNext())
 		{
@@ -788,7 +837,7 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 			}
 			
 			// find the offset of the normals and vertices
-			RetrieveOffsets(trianglesElement);
+			RetrieveInfo(trianglesElement);
 
 			if (parent->warningsOn)
 			{
@@ -859,59 +908,26 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 
 			// set the ambient, specular, and diffuse colors
 			csRef<iDocumentNode> colorElement = pbNode->GetNode("diffuse");
-			csRGBcolor tempColor;
 			if (colorElement.IsValid())
 			{
-				stringstream colConver(colorElement->GetNode("color")->GetValue());
-				float tempVal;
-				colConver >> tempVal; // red
-				tempColor.red = tempVal;
-				colConver >> tempVal; // green
-				tempColor.green = tempVal;
-				colConver >> tempVal; // blue
-				tempColor.blue = tempVal;
-
-				diffuseColor = tempColor;
+				diffuseColor = csColladaMaterial::StringToColor(colorElement->GetNode("color")->GetContentsValue());
+				if (parent->warningsOn)
+				{
+					parent->Report(CS_REPORTER_SEVERITY_WARNING, "Diffuse color of instance effect should be: %d, %d, %d", diffuseColor.red, diffuseColor.green, diffuseColor.blue);
+				}
 			}
-			
-			tempColor.red = 0.0;
-			tempColor.green = 0.0;
-			tempColor.blue = 0.0;
 
 			colorElement = pbNode->GetNode("specular");
 			
 			if (colorElement.IsValid())
 			{
-				stringstream colConver(colorElement->GetNode("color")->GetValue());
-				float tempVal;
-				colConver >> tempVal; // red
-				tempColor.red = tempVal;
-				colConver >> tempVal; // green
-				tempColor.green = tempVal;
-				colConver >> tempVal; // blue
-				tempColor.blue = tempVal;
-
-				specularColor = tempColor;
+				specularColor = csColladaMaterial::StringToColor(colorElement->GetNode("color")->GetValue());
 			}
-			
-			tempColor.red = 0.0;
-			tempColor.green = 0.0;
-			tempColor.blue = 0.0;
-
 			colorElement = pbNode->GetNode("ambient");
 			
 			if (colorElement.IsValid())
 			{
-				stringstream colConver(colorElement->GetNode("color")->GetValue());
-				float tempVal;
-				colConver >> tempVal; // red
-				tempColor.red = tempVal;
-				colConver >> tempVal; // green
-				tempColor.green = tempVal;
-				colConver >> tempVal; // blue
-				tempColor.blue = tempVal;
-
-				ambientColor = tempColor;
+				ambientColor = csColladaMaterial::StringToColor(colorElement->GetNode("color")->GetValue());
 			}
 
 		}
@@ -934,7 +950,7 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 		specularColor = newSpecular;
 	}
 
-	void csColladaEffectProfile::SetName(iString* newName)
+	void csColladaEffectProfile::SetName(const char* newName)
 	{
 		name = newName;
 	}
@@ -949,20 +965,13 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 
 	csColladaEffectProfile* csColladaEffect::GetProfile(const char* query)
 	{
-		scfString* queryString = new scfString(query);
-		csColladaEffectProfile* retVal = GetProfile(queryString);
-		return retVal;
-	}
-
-	csColladaEffectProfile* csColladaEffect::GetProfile(iString* query)
-	{
 		csColladaEffectProfile* retVal;
 		csArray<csColladaEffectProfile>::Iterator iter = profiles.GetIterator();
 
 		while (iter.HasNext())
 		{
 			retVal = &(iter.Next());
-			if (query->Compare(retVal->GetName()))
+			if (retVal->GetName().Compare(query))
 			{
 				return retVal;
 			}
@@ -981,7 +990,7 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 		element = effectElement;
 		
 		// grab the id of this effect element
-		id = new scfString(element->GetAttributeValue("id"));
+		id = element->GetAttributeValue("id");
 
 		// find all of the profile_COMMON elements
 		profilesToProcess = element->GetNodes("profile_COMMON");
@@ -989,8 +998,8 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 		{
 			currentProfile = profilesToProcess->Next();
 			currentProfileObject = new csColladaEffectProfile(currentProfile, parent);
-			scfString* nameString = new scfString("profile_COMMON");
-			currentProfileObject->SetName(nameString);
+			//scfString* nameString = new scfString("profile_COMMON");
+			currentProfileObject->SetName("profile_COMMON");
 			profiles.Push((*currentProfileObject));
 		}
 
@@ -1033,12 +1042,12 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 
 	csColladaMaterial::~csColladaMaterial()
 	{
-		delete id;
+		// empty body
 	}
 
 	void csColladaMaterial::SetID(const char* newId)
 	{
-		id = new scfString(newId);
+		id = newId;
 	}
 
 	void csColladaMaterial::SetInstanceEffect(iDocumentNode *effectNode)
@@ -1053,11 +1062,11 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 
 	bool csColladaMaterial::operator ==(const csColladaMaterial& comp)
 	{
-		iString *compId, *thisId;
+		csString compId, thisId;
 		thisId = id;
 		compId = comp.id;
 
-		if (thisId->Compare(compId))
+		if (thisId.Compare(compId))
 		{
 			return true;
 		}
@@ -1065,6 +1074,27 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 		return false;
 	}
 
+	csRGBcolor csColladaMaterial::StringToColor(const char* toConvert)
+	{
+		csRGBcolor tempColor;
+		stringstream colConver(toConvert);
+
+		float tempVal;
+		
+		colConver >> tempVal; // red
+		tempVal *= 100; // make sure we have a value between 0-255
+		tempColor.red = tempVal;
+
+		colConver >> tempVal; // green
+		tempVal *= 100;
+		tempColor.green = tempVal;
+
+		colConver >> tempVal; // blue
+		tempVal *= 100;
+		tempColor.blue = tempVal;
+		
+		return tempColor;
+	}
 
 
 } /* End of ColladaConvertor namespace */
