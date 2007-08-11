@@ -64,17 +64,16 @@ bool csWindowsJoystick::Initialize (iObjectRegistry* oreg)
   return Init ();
 }
 
-void csWindowsJoystick::LoadAxes(joystate& j)
+//  Pointer Math
+// should be Win64 safe, though
+#define JOYSTICK_ACCESS(afield,anofs) *(LONG*)(((ULONG_PTR)&afield)+anofs)
+
+void csWindowsJoystick::LoadAxes(joystate& j, const joydata& jdata)
 {
   size_t const n = j.axes.GetSize ();
-  if (n > 0) j.axes[0] = j.di.lX;
-  if (n > 1) j.axes[1] = j.di.lY;
-  if (n > 2) j.axes[2] = j.di.lZ;
-  if (n > 3) j.axes[3] = j.di.lRx;
-  if (n > 4) j.axes[4] = j.di.lRy;
-  if (n > 5) j.axes[5] = j.di.lRz;
-  if (n > 6) j.axes[6] = j.di.rglSlider[0];
-  if (n > 7) j.axes[7] = j.di.rglSlider[1];
+
+  for (size_t i = 0; i < n; i++)
+    j.axes[i] = JOYSTICK_ACCESS(j.di.lX,jdata.axesMapping[i]);
 }
 
 bool csWindowsJoystick::HandleEvent (iEvent& ev)
@@ -98,7 +97,7 @@ bool csWindowsJoystick::HandleEvent (iEvent& ev)
     } 
     if (SUCCEEDED (hr))
     {
-      LoadAxes(jd.state[nstate]);
+      LoadAxes(jd.state[nstate],jd);
 
       int last_state=1-nstate;
       for (int btn = 0; btn < 128; btn++) 
@@ -126,10 +125,21 @@ bool csWindowsJoystick::HandleEvent (iEvent& ev)
   return false;
 }
 
+// a pointer to this struct is passed to axes_callback
+
+struct JoyAxesInfo
+{
+  LPDIRECTINPUTDEVICE2 device;
+  uint nAxes;
+  csDirtyAccessArray<int32> axesMapping;
+};
+
 static BOOL CALLBACK axes_callback(LPCDIDEVICEOBJECTINSTANCE i, LPVOID p)
 {
   // Configure to return data in the range (-32767..32767)
   DIPROPRANGE diprg;
+  JoyAxesInfo* pJoyAxisInfo = (JoyAxesInfo*)p;
+
   diprg.diph.dwSize = sizeof (diprg);
   diprg.diph.dwHeaderSize = sizeof (diprg.diph);
   diprg.diph.dwHow = DIPH_BYID;
@@ -137,11 +147,55 @@ static BOOL CALLBACK axes_callback(LPCDIDEVICEOBJECTINSTANCE i, LPVOID p)
   diprg.lMin = -32767;
   diprg.lMax =  32767;
 
-  LPDIRECTINPUTDEVICE2 device = (LPDIRECTINPUTDEVICE2)p;
+  // use the GUID to set the offset of axis n
+  // in the DIJOYSTATE2 struct
+  // misUsing nAxes as Index variable
+  if (i->guidType != GUID_Unknown) 
+  {
+    if (i->guidType == GUID_XAxis)
+    { 
+      pJoyAxisInfo->axesMapping[pJoyAxisInfo->nAxes++] = DIJOFS_X;
+    }
+    else if (i->guidType == GUID_YAxis) 
+    { 
+      pJoyAxisInfo->axesMapping[pJoyAxisInfo->nAxes++] = DIJOFS_Y;
+    }
+    else if (i->guidType == GUID_ZAxis)
+    {   
+      pJoyAxisInfo->axesMapping[pJoyAxisInfo->nAxes++] = DIJOFS_Z;
+    }
+    else if (i->guidType == GUID_RxAxis)
+    { 
+      pJoyAxisInfo->axesMapping[pJoyAxisInfo->nAxes++] = DIJOFS_RX;
+    }
+    else if (i->guidType == GUID_RyAxis)
+    { 
+      pJoyAxisInfo->axesMapping[pJoyAxisInfo->nAxes++] = DIJOFS_RY;
+    }
+    else if (i->guidType == GUID_RzAxis)
+    { 
+      pJoyAxisInfo->axesMapping[pJoyAxisInfo->nAxes++] = DIJOFS_RZ;
+    }
+    else if (i->guidType == GUID_Slider)
+    { 
+      //TODO check whether Slider0 or 1
+      // haven't seen one with more than 1 Slider, though...
+      pJoyAxisInfo->axesMapping[pJoyAxisInfo->nAxes++] = DIJOFS_SLIDER(0);
+    }
+  }
+  else 
+  {
+    // I honestly don't know what to do in this case.
+    // There seems to be no clear mapping between
+    // axis # and DIJoystate2 member/offset
+    //TODO BLACK MAGIC HERE
+  }
+  LPDIRECTINPUTDEVICE2 device = pJoyAxisInfo->device;
   device->SetProperty (DIPROP_RANGE, &diprg.diph);
 
   return DIENUM_CONTINUE;
 }
+
 
 bool csWindowsJoystick::CreateDevice (const DIDEVICEINSTANCE*  pdidInstanc)
 { 
@@ -153,18 +207,33 @@ bool csWindowsJoystick::CreateDevice (const DIDEVICEINSTANCE*  pdidInstanc)
     LPDIRECTINPUTDEVICE2 device2 = (LPDIRECTINPUTDEVICE2)device;
 
     DIDEVCAPS caps;
+    JoyAxesInfo jaxes;
+
     caps.dwSize = sizeof (caps);
     device2->GetCapabilities (&caps);
     device2->SetDataFormat (&c_dfDIJoystick2);
 
-    if (SUCCEEDED(device2->EnumObjects(axes_callback, (LPVOID)device2,
+    jaxes.nAxes = 0;
+    jaxes.axesMapping.SetSize(caps.dwAxes);
+    if (caps.dwAxes >0) {
+      DWORD i;
+      for ( i = 0; i < caps.dwAxes; i++) {
+        //TODO use a more sane default mapping
+	jaxes.axesMapping[i] = 0; // default X Axis
+      }
+    }
+    jaxes.device = device2;
+    if (SUCCEEDED(device2->EnumObjects(axes_callback, (LPVOID)&jaxes,
       DIDFT_AXIS)))
     {
       joydata data;
+
+      data.axesMapping = jaxes.axesMapping;
       data.number = (int)joystick.GetSize () + 0; // CS joystick numbers 1-based
       data.device = device2;
       data.nButtons = caps.dwButtons;    
       data.nAxes = (uint)caps.dwAxes;
+     
       for (int i = 0; i < 2; i++)
         data.state[i].axes.SetSize(data.nAxes);
       joystick.Push (data);

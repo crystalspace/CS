@@ -569,21 +569,36 @@ public:
   }
 
   /**
-   * Intersect a segment with a box.
+   * Intersect a segment or ray with a box.
    * If the segment starts inside the box then isect will return
    * the start of the segment.
    * \param box The box with which to perform the intersection.
    * \param segment The intersection candidate.
    * \param isect The returned intersection point.
-   * \param pr If not null then a number between 0 and 1 is returned which
-   * corresponds to the position on the segment. If we were in the box
+   * \param pr If not null then a number between 0 and 1 (or bigger then
+   * 1 in case we are doing ray testing) is returned which corresponds
+   * to the position on the segment or ray. If we were in the box
    * this this function will return CS_BOX_INSIDE. In this case 'isect' will
    * be set to the start of the segment and *pr to 0.
+   * \param use_ray if true then the test is done as if the segment
+   * is a ray starting at the start of the segment and going in the
+   * direction of the end of the segment. Default is false.
    * \return one of CS_BOX_SIDE_... if it intersects, CS_BOX_INSIDE if inside,
    * or -1 otherwise.
    */
   static int BoxSegment (const csBox3& box, const csSegment3& segment,
-  	csVector3& isect, float* pr = 0);
+  	csVector3& isect, float* pr = 0, bool use_ray = false);
+
+  /**
+   * Clip a segment or ray to a box.
+   * \param segment Is the segment or ray. It will be modified (if
+   * this routine returns true) to give the clipped segment.
+   * \param box is the box to clip against.
+   * \param use_ray if true then the test is done with a ray instead
+   * of a segment. Default is false.
+   */
+  static bool ClipSegmentBox (csSegment3& segment, const csBox3& box,
+	bool use_ray = false);
 
   /**
    * Intersect an AABB with a frustum. The frustum may contain up to

@@ -2210,6 +2210,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SegmentXFrustum = *cspacec::csIntersect3_SegmentXFrustum;
 *SegmentYFrustum = *cspacec::csIntersect3_SegmentYFrustum;
 *BoxSegment = *cspacec::csIntersect3_BoxSegment;
+*ClipSegmentBox = *cspacec::csIntersect3_ClipSegmentBox;
 *BoxFrustum = *cspacec::csIntersect3_BoxFrustum;
 *BoxSphere = *cspacec::csIntersect3_BoxSphere;
 *BoxPlane = *cspacec::csIntersect3_BoxPlane;
@@ -4105,6 +4106,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *QueryInterface = *cspacec::scfPath_QueryInterface;
 *AddRefOwner = *cspacec::scfPath_AddRefOwner;
 *RemoveRefOwner = *cspacec::scfPath_RemoveRefOwner;
+*GetInterfaceMetadata = *cspacec::scfPath_GetInterfaceMetadata;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -4249,6 +4251,12 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::scfPath cspace );
 %OWNER = ();
 %ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csPath(@_);
+    bless $self, $pkg if defined($self);
+}
+
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -4308,6 +4316,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *QueryInterface = *cspacec::pycsPolygonMesh_QueryInterface;
 *AddRefOwner = *cspacec::pycsPolygonMesh_AddRefOwner;
 *RemoveRefOwner = *cspacec::pycsPolygonMesh_RemoveRefOwner;
+*GetInterfaceMetadata = *cspacec::pycsPolygonMesh_GetInterfaceMetadata;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -4333,6 +4342,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *QueryInterface = *cspacec::pycsPolygonMeshBox_QueryInterface;
 *AddRefOwner = *cspacec::pycsPolygonMeshBox_AddRefOwner;
 *RemoveRefOwner = *cspacec::pycsPolygonMeshBox_RemoveRefOwner;
+*GetInterfaceMetadata = *cspacec::pycsPolygonMeshBox_GetInterfaceMetadata;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -4358,6 +4368,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *QueryInterface = *cspacec::pycsTriangleMesh_QueryInterface;
 *AddRefOwner = *cspacec::pycsTriangleMesh_AddRefOwner;
 *RemoveRefOwner = *cspacec::pycsTriangleMesh_RemoveRefOwner;
+*GetInterfaceMetadata = *cspacec::pycsTriangleMesh_GetInterfaceMetadata;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -4383,6 +4394,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *QueryInterface = *cspacec::pycsTriangleMeshBox_QueryInterface;
 *AddRefOwner = *cspacec::pycsTriangleMeshBox_AddRefOwner;
 *RemoveRefOwner = *cspacec::pycsTriangleMeshBox_RemoveRefOwner;
+*GetInterfaceMetadata = *cspacec::pycsTriangleMeshBox_GetInterfaceMetadata;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -4403,6 +4415,12 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::pycsPolygonMesh cspace );
 %OWNER = ();
 %ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csPolygonMesh(@_);
+    bless $self, $pkg if defined($self);
+}
+
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -4449,6 +4467,12 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::pycsPolygonMeshBox cspace );
 %OWNER = ();
 %ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csPolygonMeshBox(@_);
+    bless $self, $pkg if defined($self);
+}
+
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -4488,6 +4512,12 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::pycsTriangleMesh cspace );
 %OWNER = ();
 %ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csTriangleMesh(@_);
+    bless $self, $pkg if defined($self);
+}
+
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -4618,6 +4648,12 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::pycsTriangleMeshBox cspace );
 %OWNER = ();
 %ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csTriangleMeshBox(@_);
+    bless $self, $pkg if defined($self);
+}
+
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -13304,6 +13340,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *QueryInterface = *cspacec::scfConfigFile_QueryInterface;
 *AddRefOwner = *cspacec::scfConfigFile_AddRefOwner;
 *RemoveRefOwner = *cspacec::scfConfigFile_RemoveRefOwner;
+*GetInterfaceMetadata = *cspacec::scfConfigFile_GetInterfaceMetadata;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -13324,6 +13361,12 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::scfConfigFile cspace );
 %OWNER = ();
 %ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csConfigFile(@_);
+    bless $self, $pkg if defined($self);
+}
+
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -14832,6 +14875,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *QueryInterface = *cspacec::csImageBaseBase_QueryInterface;
 *AddRefOwner = *cspacec::csImageBaseBase_AddRefOwner;
 *RemoveRefOwner = *cspacec::csImageBaseBase_RemoveRefOwner;
+*GetInterfaceMetadata = *cspacec::csImageBaseBase_GetInterfaceMetadata;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -14902,6 +14946,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *QueryInterface = *cspacec::csImageMemoryBase_QueryInterface;
 *AddRefOwner = *cspacec::csImageMemoryBase_AddRefOwner;
 *RemoveRefOwner = *cspacec::csImageMemoryBase_RemoveRefOwner;
+*GetInterfaceMetadata = *cspacec::csImageMemoryBase_GetInterfaceMetadata;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -14922,6 +14967,12 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::csImageMemoryBase cspace );
 %OWNER = ();
 %ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csImageMemory(@_);
+    bless $self, $pkg if defined($self);
+}
+
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -17210,6 +17261,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *QueryInterface = *cspacec::pycsObject_QueryInterface;
 *AddRefOwner = *cspacec::pycsObject_AddRefOwner;
 *RemoveRefOwner = *cspacec::pycsObject_RemoveRefOwner;
+*GetInterfaceMetadata = *cspacec::pycsObject_GetInterfaceMetadata;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -17230,6 +17282,12 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::pycsObject cspace );
 %OWNER = ();
 %ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csObject(@_);
+    bless $self, $pkg if defined($self);
+}
+
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -17280,6 +17338,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *QueryInterface = *cspacec::pycsColliderWrapper_QueryInterface;
 *AddRefOwner = *cspacec::pycsColliderWrapper_AddRefOwner;
 *RemoveRefOwner = *cspacec::pycsColliderWrapper_RemoveRefOwner;
+*GetInterfaceMetadata = *cspacec::pycsColliderWrapper_GetInterfaceMetadata;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -17300,6 +17359,12 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace::pycsColliderWrapper cspace );
 %OWNER = ();
 %ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csColliderWrapper(@_);
+    bless $self, $pkg if defined($self);
+}
+
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
