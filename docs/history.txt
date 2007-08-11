@@ -14,6 +14,7 @@ chronological order.
 	- res added CS::Utility::SmartFileOpen() - a function for the somewhat
 	  common task to open a world file from a path that could denote any
 	  of: a plain filename, directory or .zip archive.
+	- res made genmeshify use CS::Utility::SmartFileOpen().
 10-Aug-2007
 	- Jorrit fixed a compile bug in math.h (for gcc).
 	- Jorrit removed renderpriorities tag from some levels.
