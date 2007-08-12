@@ -11,6 +11,7 @@ chronological order.
 	- res sped up the lighter2 object lightmap layouting. (Replaced a
 	  linear search with a binary search when determining the primitives
 	  that can be layouted together.)
+	- res fixed TinyXML to build on gcc 4.1.2 again (issue found by Darek).
 11-Aug-2007
 	- res changed csFixedSizeAllocator<> to allow construction from a
 	  given memory allocator.

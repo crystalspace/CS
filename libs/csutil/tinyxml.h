@@ -803,20 +803,20 @@ class TiDocument : public TiDocumentNodeChildren
    */
   class FreeQueueArrayCapacity
   {
-    static const size_t maxGrow = 256*1024;
+    enum { maxGrow = 256*1024 };
   public:
     FreeQueueArrayCapacity () {}
   
     bool IsCapacityExcessive (size_t capacity, size_t count) const
     {
       size_t threshold = csMin (size_t (csFindNearestPowerOf2 (int (count))),
-	maxGrow);
+	size_t (maxGrow));
       return (capacity > threshold && count < capacity - threshold);
     }
     size_t GetCapacity (size_t count) const
     {
       size_t threshold = csMin (size_t (csFindNearestPowerOf2 (int (count))), 
-	maxGrow);
+	size_t (maxGrow));
       return ((count + threshold - 1) / threshold) * threshold;
     }
   };
