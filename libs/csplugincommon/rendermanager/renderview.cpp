@@ -248,3 +248,28 @@ uint RenderView::GetCurrentFrameNumber () const
 {
   return engine->GetCurrentFrameNumber ();
 }
+
+
+void RenderView::DestroyRenderContext (csRenderContext* context)
+{
+  if (context == ctxt)
+  {
+    ctxt = context->previous;
+  }
+  else
+  {
+    // Its somewhere in the middle, scan starting from ctxt
+    csRenderContext* localctxt = ctxt;
+    while (localctxt)
+    {
+      if (localctxt->previous == context)
+      {
+        localctxt->previous = context->previous;
+        break;
+      }
+      localctxt = localctxt->previous;
+    }
+  }
+
+  delete context;
+}

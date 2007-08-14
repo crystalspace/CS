@@ -256,6 +256,8 @@ namespace RenderManager
 
     /// Get the number of the current frame.
     virtual uint GetCurrentFrameNumber () const;
+
+    virtual void DestroyRenderContext (csRenderContext* context);
   };
 
 }

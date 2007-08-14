@@ -1138,6 +1138,74 @@ public:
     const csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>& array;
   };
 
+  /** Reverse iterator for the Array<> class */
+  class ReverseIterator
+  {
+  public:
+    /** Copy constructor. */
+    ReverseIterator(ReverseIterator const& r) :
+      currentelem(r.currentelem), array(r.array) {}
+
+    /** Assignment operator. */
+    ReverseIterator& operator=(ReverseIterator const& r)
+    { currentelem = r.currentelem; array = r.array; return *this; }
+
+    /** Returns true if the next Next() call will return an element */
+    bool HasNext() const
+    { return currentelem > 0 && currentelem <= array.GetSize (); }
+
+    /** Returns the next element in the array. */
+    T& Next()
+    { return array.Get(--currentelem); }
+
+    /** Reset the array to the first element */
+    void Reset()
+    { currentelem = array.GetSize (); }
+
+  protected:
+    ReverseIterator(csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>& newarray)
+	: currentelem(newarray.GetSize ()), array(newarray) {}
+    friend class csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>;
+
+  private:
+    size_t currentelem;
+    csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>& array;
+  };
+
+  /** Reverse iterator for the Array<> class */
+  class ReverseConstIterator
+  {
+  public:
+    /** Copy constructor. */
+    ReverseConstIterator(ReverseConstIterator const& r) :
+      currentelem(r.currentelem), array(r.array) {}
+
+    /** Assignment operator. */
+    ReverseConstIterator& operator=(ReverseConstIterator const& r)
+    { currentelem = r.currentelem; array = r.array; return *this; }
+
+    /** Returns true if the next Next() call will return an element */
+    bool HasNext() const
+    { return currentelem > 0 && currentelem <= array.GetSize (); }
+
+    /** Returns the next element in the array. */
+    const T& Next()
+    { return array.Get(--currentelem); }
+
+    /** Reset the array to the first element */
+    void Reset()
+    { currentelem = array.GetSize (); }
+
+  protected:
+    ReverseConstIterator(const csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>& newarray)
+      : currentelem(newarray.GetSize ()), array(newarray) {}
+    friend class csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>;
+
+  private:
+    size_t currentelem;
+    const csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>& array;
+  };
+
   /** Returns an Iterator which traverses the array. */
   Iterator GetIterator()
   { return Iterator(*this); }
@@ -1145,6 +1213,14 @@ public:
   /** Returns an Iterator which traverses the array. */
   ConstIterator GetIterator() const
   { return ConstIterator(*this); }
+
+  /** Returns an ReverseIterator which traverses the array in reverse direction. */
+  ReverseIterator GetReverseIterator()
+  { return ReverseIterator(*this); }
+
+  /** Returns an Iterator which traverses the array. */
+  ReverseConstIterator GetReverseIterator() const
+  { return ReverseConstIterator(*this); }
   
   /// Check if this array has the exact same contents as \a other.
   bool operator== (const csArray& other) const

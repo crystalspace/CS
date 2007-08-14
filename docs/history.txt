@@ -9,6 +9,7 @@ chronological order.
 14-Aug-2007
 	- res added the ability to query the shader variables used for a given
 	  ticket from a shader.
+	- Marten did some initial work on simple portals in the RM branch.
 11-Aug-2007
 	- res changed csFixedSizeAllocator<> to allow construction from a
 	  given memory allocator.

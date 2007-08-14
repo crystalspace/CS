@@ -49,11 +49,20 @@ namespace RenderManager
 
     //---- Type definitions
     typedef TreeTraits TreeTraitsType;
+    typedef RenderTree<TreeTraits> ThisType;
+
     /**
      * 
      */
     struct PersistentData
     {
+      void Clear ()
+      {
+        // Clean up the persistent data
+        contextNodeAllocator.Empty ();
+        meshNodeAllocator.Empty ();
+      }
+
       csBlockAllocator<MeshNode> meshNodeAllocator;
       csBlockAllocator<ContextNode> contextNodeAllocator;
     };
@@ -79,15 +88,26 @@ namespace RenderManager
      */
     struct ContextNode : public EBOptHelper<typename TreeTraits::ContextNodeExtraDataType>
     {
+      /**
+       * 
+       */
+      struct PortalHolder
+      {
+        iPortalContainer* portalContainer;
+        iMeshWrapper* meshWrapper;
+      };
+
       // A sub-tree of mesh nodes
-      csRedBlackTreeMap<typename TreeTraits::MeshNodeKeyType, MeshNode*>   meshNodes;
+      csRedBlackTreeMap<typename TreeTraits::MeshNodeKeyType, MeshNode*> meshNodes;
+
+      // All portals within context
+      csArray<PortalHolder> allPortals;
 
       // Total number of render meshes within the context
       size_t totalRenderMeshes;
     };
 
-
-    typedef RenderTree<TreeTraits> ThisType;
+  
 
     //---- Methods
     RenderTree (PersistentData& dataStorage)
@@ -97,9 +117,7 @@ namespace RenderManager
 
     ~RenderTree ()
     {
-      // Clean up the persistent data
-      persistentData.contextNodeAllocator.Empty ();
-      persistentData.meshNodeAllocator.Empty ();
+      persistentData.Clear ();
     }
 
     /**
@@ -144,6 +162,15 @@ namespace RenderManager
     void TraverseContexts (Fn& contextFunction)
     {
       CS::ForEach (contextNodeList.GetIterator (), contextFunction, *this);
+    }
+
+    /**
+     * 
+     */
+    template<typename Fn>
+    void TraverseContextsReverse (Fn& contextFunction)
+    {
+      CS::ForEach (contextNodeList.GetReverseIterator (), contextFunction, *this);
     }
 
     /**
@@ -217,8 +244,17 @@ namespace RenderManager
       // Add it to the appropriate meshnode
       for (int i = 0; i < numMeshes; ++i)
       {
+        csRenderMesh* rm = meshList[i];
+
+        if (rm->portal)
+        {
+          ContextNode::PortalHolder h = {rm->portal, imesh};
+          context->allPortals.Push (h);
+          continue;
+        }
+
         typename TreeTraits::MeshNodeKeyType meshKey = 
-          TreeTraits::GetMeshNodeKey (imesh, *meshList[i]);
+          TreeTraits::GetMeshNodeKey (imesh, *rm);
 
         // Get the mesh node
         MeshNode* meshNode = context->meshNodes.Get (meshKey, 0);
@@ -227,18 +263,14 @@ namespace RenderManager
           // Get a new one
           meshNode = persistentData.meshNodeAllocator.Alloc ();
 
-          TreeTraits::SetupMeshNode(*meshNode, imesh, *meshList[i]);
+          TreeTraits::SetupMeshNode(*meshNode, imesh, *rm);
           context->meshNodes.Put (meshKey, meshNode);
 
           totalMeshNodes++;
         }
  
         typename MeshNode::SingleMesh sm;
-        sm.renderMesh = meshList[i];
-
-        //TODO: better/proper portal handling
-        if (sm.renderMesh->portal)
-          continue;
+        sm.renderMesh = rm;
 
         meshNode->meshes.Push (sm);
       }

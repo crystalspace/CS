@@ -309,6 +309,11 @@ public:
 
   /// Get the number of the current frame.
   virtual uint GetCurrentFrameNumber () const;
+
+  /**
+  * Destroy a specific render context (and unlink it from the previous-links)
+  */
+  virtual void DestroyRenderContext (csRenderContext* context);
 };
 
 #include "csutil/win32/msvc_deprecated_warn_on.h"
