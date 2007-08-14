@@ -243,17 +243,18 @@ void Simple::CreateRoom ()
 
 #if 0
   // First we make the factory containing our geometry.
-  csRef<iMeshFactoryWrapper> walls_fact = engine->CreateGenMeshFactory (
-      "walls_factory");
+  using namespace CS::Geometry;
+  csRef<iMeshFactoryWrapper> walls_fact = GeneralMeshBuilder::CreateFactory (
+  	engine, "walls_factory");
   csRef<iGeneralFactoryState> fact_state = scfQueryInterface<
     iGeneralFactoryState> (walls_fact->GetMeshObjectFactory ());
-  csGeneralMeshPrimitives::GenerateBox (fact_state, false,
+  GeneralMeshBuilder::GenerateBox (fact_state, false,
       csBox3 (csVector3 (-5, 0, -5), csVector3 (5, 20, 5)),
       csPrimitives::CS_PRIMBOX_INSIDE);
 
   // Now we make a single mesh from that factory.
-  csRef<iMeshWrapper> walls = engine->CreateGenMesh (room, "walls",
-      "walls_factory");
+  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateMesh (engine,
+  	room, "walls", "walls_factory");
   walls->GetMeshObject ()->SetMaterialWrapper (tm);
 #else
   csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));

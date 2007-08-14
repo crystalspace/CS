@@ -28,13 +28,42 @@
 #include "cstool/primitives.h"
 
 struct iGeneralFactoryState;
+struct iMeshWrapper;
+struct iMeshFactoryWrapper;
+struct iEngine;
+struct iSector;
+
+namespace CS
+{
+namespace Geometry
+{
 
 /**
- * A primitive mesh generator for genmesh.
+ * Tools related to creating genmesh instances and factories.
  */
-class CS_CRYSTALSPACE_EXPORT csGeneralMeshPrimitives
+class GeneralMeshBuilder
 {
 public:
+  /**
+   * Create an empty genmesh factory. Assign to a csRef.
+   * \param name the engine name of the factory that will be created
+   */
+  static csPtr<iMeshFactoryWrapper> CreateFactory (iEngine* engine, 
+    const char* name);
+
+  /**
+   * Create a genmesh instance from a named factory.
+   * This mesh will have #CS_ZBUF_USE set (use Z-buffer fully) and have
+   * 'object' as render priority. This means this function is useful
+   * for general objects. Assign to a csRef. The object will be placed
+   * at position 0,0,0 in the sector.
+   * \param sector the sector to add the object to
+   * \param name the engine name of the mesh that will be created
+   * \param factoryname the engine name of the factory to use.
+   */
+  static csPtr<iMeshWrapper> CreateMesh (iEngine* engine, iSector* sector,
+    const char* name, const char* factoryname);
+
   /**
    * Generate a box with 24 vertices and 12 triangles so that
    * the normals of every face point inwards or outwards (the normals of the
@@ -90,6 +119,8 @@ public:
       bool toponly = false,
       bool reversed = false);
 };
+} // namespace Geometry
+} // namespace CS
 
 /** @} */
 

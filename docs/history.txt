@@ -21,6 +21,11 @@ chronological order.
 	- res made the fractional element areas in lighter2 swappable. (On
 	  large levels they can account for a significant portion of the
 	  used memory).
+	- Jorrit put csGeneralMeshPrimitives into the new namespace
+	  CS::Geometry. Also renamed it to GeneralMeshBuilder.
+	- Jorrit removed the new iEngine functions (CreateGenMesh() and
+	  CreateGenMeshFactory()) and added CS::Geometry::GeneralMeshBuilder
+	  functions CreateMesh() and CreateFactory().
 12-Aug-2007
 	- res added CS::SubRectangles::IsEmpty().
 	- res sped up the lighter2 object lightmap layouting. (Replaced a

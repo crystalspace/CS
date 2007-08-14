@@ -20,8 +20,35 @@
 #include "csgeom/math3d.h"
 #include "csgeom/sphere.h"
 #include "csgeom/trimesh.h"
-#include "cstool/genmeshprim.h"
+#include "cstool/genmeshbuilder.h"
 #include "imesh/genmesh.h"
+#include "iengine/engine.h"
+#include "iengine/mesh.h"
+
+namespace CS
+{
+namespace Geometry
+{
+
+csPtr<iMeshFactoryWrapper> GeneralMeshBuilder::CreateFactory (
+	iEngine* engine, const char* name)
+{
+  return engine->CreateMeshFactory ("crystalspace.mesh.object.genmesh", name);
+}
+
+csPtr<iMeshWrapper> GeneralMeshBuilder::CreateMesh (
+	iEngine* engine, iSector* sector, const char* name,
+	const char* factoryname)
+{
+  iMeshFactoryWrapper* factory = engine->FindMeshFactory (factoryname);
+  if (!factory) return 0;
+
+  csRef<iMeshWrapper> mesh = engine->CreateMeshWrapper (factory,
+      name, sector, csVector3 (0));
+  mesh->SetZBufMode (CS_ZBUF_USE);
+  mesh->SetRenderPriority (engine->GetObjectRenderPriority ());
+  return csPtr<iMeshWrapper> (mesh);
+}
 
 static void AppendOrSetData (iGeneralFactoryState* factory, bool append,
     const csDirtyAccessArray<csVector3>& mesh_vertices,
@@ -62,8 +89,7 @@ static void AppendOrSetData (iGeneralFactoryState* factory, bool append,
   factory->Invalidate ();
 }
 
-
-void csGeneralMeshPrimitives::GenerateBox (
+void GeneralMeshBuilder::GenerateBox (
       iGeneralFactoryState* factory, bool append,
       const csBox3& box, uint32 flags)
 {
@@ -78,7 +104,7 @@ void csGeneralMeshPrimitives::GenerateBox (
       mesh_normals, mesh_triangles);
 }
 
-void csGeneralMeshPrimitives::GenerateCapsule (
+void GeneralMeshBuilder::GenerateCapsule (
       iGeneralFactoryState* factory, bool append,
       float l, float r, uint sides)
 {
@@ -93,7 +119,7 @@ void csGeneralMeshPrimitives::GenerateCapsule (
       mesh_normals, mesh_triangles);
 }
 
-void csGeneralMeshPrimitives::GenerateQuad (
+void GeneralMeshBuilder::GenerateQuad (
     iGeneralFactoryState* factory, bool append,
     const csVector3 &v1, const csVector3 &v2,
     const csVector3 &v3, const csVector3 &v4)
@@ -109,7 +135,7 @@ void csGeneralMeshPrimitives::GenerateQuad (
       mesh_normals, mesh_triangles);
 }
 
-void csGeneralMeshPrimitives::GenerateSphere (
+void GeneralMeshBuilder::GenerateSphere (
       iGeneralFactoryState* factory, bool append,
       const csEllipsoid& ellips, int num,
       bool cyl_mapping, bool toponly, bool reversed)
@@ -124,5 +150,8 @@ void csGeneralMeshPrimitives::GenerateSphere (
   AppendOrSetData (factory, append, mesh_vertices, mesh_texels,
       mesh_normals, mesh_triangles);
 }
+
+} // namespace Geometry
+} // namespace CS
 
 //---------------------------------------------------------------------------

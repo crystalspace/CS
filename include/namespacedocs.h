@@ -48,6 +48,12 @@ namespace CS
   {}
 
   /**
+   * Geometry and mesh related classes.
+   */
+  namespace Geometry
+  {}
+
+  /**
    * Mathematical functions and definitions
    */
   namespace Math
