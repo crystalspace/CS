@@ -240,6 +240,22 @@ void Simple::CreateRoom ()
   room = engine->CreateSector ("room");
 
   // Creating the walls for our room.
+
+#if 0
+  // First we make the factory containing our geometry.
+  csRef<iMeshFactoryWrapper> walls_fact = engine->CreateGenMeshFactory (
+      "walls_factory");
+  csRef<iGeneralFactoryState> fact_state = scfQueryInterface<
+    iGeneralFactoryState> (walls_fact->GetMeshObjectFactory ());
+  csGeneralMeshPrimitives::GenerateBox (fact_state, false,
+      csBox3 (csVector3 (-5, 0, -5), csVector3 (5, 20, 5)),
+      csPrimitives::CS_PRIMBOX_INSIDE);
+
+  // Now we make a single mesh from that factory.
+  csRef<iMeshWrapper> walls = engine->CreateGenMesh (room, "walls",
+      "walls_factory");
+  walls->GetMeshObject ()->SetMaterialWrapper (tm);
+#else
   csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
   iMeshObject* walls_object = walls->GetMeshObject ();
   iMeshObjectFactory* walls_factory = walls_object->GetFactory();
@@ -248,6 +264,7 @@ void Simple::CreateRoom ()
   walls_state->AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
   walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
   walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
+#endif
 
   // Now we need light to see something.
   csRef<iLight> light;

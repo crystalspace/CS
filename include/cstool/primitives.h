@@ -39,18 +39,27 @@ class csEllipsoid;
 class CS_CRYSTALSPACE_EXPORT csPrimitives
 {
 public:
+  enum BoxFlags
+  {
+    CS_PRIMBOX_INSIDE = 1,
+    CS_PRIMBOX_SMOOTH = 2
+  };
+
   /**
    * Generate a box with 24 vertices and 12 triangles so that
-   * the normals of every face point outwards (the normals of the
+   * the normals of every face point in or outwards (the normals of the
    * vertices belonging to a face will point with the correct
    * normal of the face).
+   * \param flags is a combination of BoxFlags enumeration values. Default
+   * is CS_PRIMBOX_SMOOTH.
    */
   static void GenerateBox (
       const csBox3& box,
       csDirtyAccessArray<csVector3>& mesh_vertices,
       csDirtyAccessArray<csVector2>& mesh_texels,
       csDirtyAccessArray<csVector3>& mesh_normals,
-      csDirtyAccessArray<csTriangle>& mesh_triangles);
+      csDirtyAccessArray<csTriangle>& mesh_triangles,
+      uint32 flags = CS_PRIMBOX_SMOOTH);
 
   /**
    * Generate quad.

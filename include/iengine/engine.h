@@ -758,6 +758,27 @@ struct iEngine : public virtual iBase
   	const char* name) = 0;
 
   /**
+   * Convenience function to create a genmesh factory.
+   * Assign to a csRef.
+   * \param name the engine name of the factory that will be created
+   */
+  virtual csPtr<iMeshFactoryWrapper> CreateGenMeshFactory (
+  	const char* name) = 0;
+
+  /**
+   * Convenience function to create a genmesh mesh in a sector.
+   * This mesh will have #CS_ZBUF_USE set (use Z-buffer fully)
+   * and have 'object' as render priority. This means this function
+   * is useful for general objects.
+   * Assign to a csRef.
+   * \param sector the sector to add the object to
+   * \param name the engine name of the mesh that will be created
+   * \param factoryname the engine name of the factory to use.
+   */
+  virtual csPtr<iMeshWrapper> CreateGenMesh (iSector* sector,
+  	const char* name, const char* factoryname) = 0;
+
+  /**
    * Convenience function to load a mesh object from a given loader plugin.
    * \param name The engine name for the mesh wrapper; may be null.  
    * Different mesh objects can have the same name (in contrast 

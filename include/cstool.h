@@ -34,6 +34,7 @@
 #include "cstool/enginetools.h"
 #include "cstool/fogmath.h"
 #include "cstool/framedataholder.h"
+#include "cstool/genmeshprim.h"
 #include "cstool/identstrings.h"
 #include "cstool/importkit.h"
 #include "cstool/initapp.h"

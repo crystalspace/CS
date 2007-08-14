@@ -2758,6 +2758,28 @@ csPtr<iMeshWrapper> csEngine::CreateThingMesh (
   return csPtr<iMeshWrapper> (thing_wrap);
 }
 
+csPtr<iMeshFactoryWrapper> csEngine::CreateGenMeshFactory (const char *name)
+{
+  csRef<iMeshFactoryWrapper> factory = CreateMeshFactory (
+      "crystalspace.mesh.object.genmesh", name);
+  return csPtr<iMeshFactoryWrapper> (factory);
+}
+
+csPtr<iMeshWrapper> csEngine::CreateGenMesh (
+  iSector *sector,
+  const char *name,
+  const char* factoryname)
+{
+  iMeshFactoryWrapper* factory = FindMeshFactory (factoryname);
+  if (!factory) return 0;
+
+  csRef<iMeshWrapper> mesh = CreateMeshWrapper (factory,
+      name, sector, csVector3 (0));
+  mesh->SetZBufMode (CS_ZBUF_USE);
+  mesh->SetRenderPriority (GetObjectRenderPriority ());
+  return csPtr<iMeshWrapper> (mesh);
+}
+
 csPtr<iMeshWrapper> csEngine::CreateSectorWallsMesh (
   iSector *sector,
   const char *name)

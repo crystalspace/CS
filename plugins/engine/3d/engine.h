@@ -388,6 +388,9 @@ public:
 
   virtual csPtr<iMeshWrapper> CreateThingMesh (iSector* sector,
   	const char* name);
+  virtual csPtr<iMeshFactoryWrapper> CreateGenMeshFactory (const char* name);
+  virtual csPtr<iMeshWrapper> CreateGenMesh (iSector* sector,
+  	const char* name, const char* factoryname);
 
   virtual csPtr<iMeshWrapper> LoadMeshWrapper (
   	const char* name, const char* loaderClassId,

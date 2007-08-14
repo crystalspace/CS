@@ -22,13 +22,37 @@
 #include "csgeom/trimesh.h"
 #include "cstool/primitives.h"
 
+static void TriSwap (csTriangle*& tr, const csTriangle tri, bool in)
+{
+  if (in)
+  {
+    tr->a = tri.c;
+    tr->b = tri.b;
+    tr->c = tri.a;
+  }
+  else
+  {
+    tr->a = tri.a;
+    tr->b = tri.b;
+    tr->c = tri.c;
+  }
+  tr++;
+}
+
+static void NormSwap (csVector3& n, bool in)
+{
+  n.Normalize ();
+  if (in) n = -n;
+}
+
 
 void csPrimitives::GenerateBox (
       const csBox3& box,
       csDirtyAccessArray<csVector3>& mesh_vertices,
       csDirtyAccessArray<csVector2>& mesh_texels,
       csDirtyAccessArray<csVector3>& mesh_normals,
-      csDirtyAccessArray<csTriangle>& mesh_triangles)
+      csDirtyAccessArray<csTriangle>& mesh_triangles,
+      uint32 flags)
 {
   mesh_vertices.SetSize (24);
   mesh_texels.SetSize (24);
@@ -103,57 +127,104 @@ void csPrimitives::GenerateBox (
 
   mesh_triangles.SetSize (12);
   csTriangle* triangles = mesh_triangles.GetArray ();
-  triangles[0].a = 0; triangles[0].b = 9; triangles[0].c = 18;
-  triangles[1].a = 0; triangles[1].b = 18; triangles[1].c = 21;
 
-  triangles[2].a = 3; triangles[2].b = 6; triangles[2].c = 10;
-  triangles[3].a = 3; triangles[3].b = 10; triangles[3].c = 1;
+  bool in = flags & CS_PRIMBOX_INSIDE;
+  TriSwap (triangles, csTriangle (0, 9, 18), in);
+  TriSwap (triangles, csTriangle (0, 18, 21), in);
+  TriSwap (triangles, csTriangle (3, 6, 10), in);
+  TriSwap (triangles, csTriangle (3, 10, 1), in);
+  TriSwap (triangles, csTriangle (4, 2, 22), in);
+  TriSwap (triangles, csTriangle (4, 22, 12), in);
+  TriSwap (triangles, csTriangle (7, 5, 13), in);
+  TriSwap (triangles, csTriangle (7, 13, 15), in);
+  TriSwap (triangles, csTriangle (11, 8, 16), in);
+  TriSwap (triangles, csTriangle (11, 16, 19), in);
+  TriSwap (triangles, csTriangle (23, 20, 17), in);
+  TriSwap (triangles, csTriangle (23, 17, 14), in);
 
-  triangles[4].a = 4; triangles[4].b = 2; triangles[4].c = 22;
-  triangles[5].a = 4; triangles[5].b = 22; triangles[5].c = 12;
+  csVector3* n = mesh_normals.GetArray ();
+  if (flags & CS_PRIMBOX_SMOOTH)
+  {
+    // Corner -X +Y -Z
+    n[0].Set(box.MinX(),box.MaxY(),box.MinZ()); NormSwap (n[0], in);
+    n[1].Set(box.MinX(),box.MaxY(),box.MinZ()); NormSwap (n[1], in);
+    n[2].Set(box.MinX(),box.MaxY(),box.MinZ()); NormSwap (n[2], in);
 
-  triangles[6].a = 7; triangles[6].b = 5; triangles[6].c = 13;
-  triangles[7].a = 7; triangles[7].b = 13; triangles[7].c = 15;
+    // Corner -X +Y +Z
+    n[3].Set(box.MinX(),box.MaxY(),box.MaxZ()); NormSwap (n[3], in);
+    n[4].Set(box.MinX(),box.MaxY(),box.MaxZ()); NormSwap (n[4], in);
+    n[5].Set(box.MinX(),box.MaxY(),box.MaxZ()); NormSwap (n[5], in);
 
-  triangles[8].a = 11; triangles[8].b = 8; triangles[8].c = 16;
-  triangles[9].a = 11; triangles[9].b = 16; triangles[9].c = 19;
+    // Corner +X +Y +Z
+    n[6].Set(box.MaxX(),box.MaxY(),box.MaxZ()); NormSwap (n[6], in);
+    n[7].Set(box.MaxX(),box.MaxY(),box.MaxZ()); NormSwap (n[7], in);
+    n[8].Set(box.MaxX(),box.MaxY(),box.MaxZ()); NormSwap (n[8], in);
 
-  triangles[10].a = 23; triangles[10].b = 20; triangles[10].c = 17;
-  triangles[11].a = 23; triangles[11].b = 17; triangles[11].c = 14;
+    // Corner +X +Y -Z
+    n[9].Set(box.MaxX(),box.MaxY(),box.MinZ()); NormSwap (n[9], in);
+    n[10].Set(box.MaxX(),box.MaxY(),box.MinZ()); NormSwap (n[10], in);
+    n[11].Set(box.MaxX(),box.MaxY(),box.MinZ()); NormSwap (n[11], in);
 
-  csVector3* normals = mesh_normals.GetArray ();
-  normals[0].Set(box.MinX(),box.MaxY(),box.MinZ()); normals[0].Normalize();
-  normals[1].Set(box.MinX(),box.MaxY(),box.MinZ()); normals[1].Normalize();
-  normals[2].Set(box.MinX(),box.MaxY(),box.MinZ()); normals[2].Normalize();
+    // Corner -X -Y +Z
+    n[12].Set(box.MinX(),box.MinY(),box.MaxZ()); NormSwap (n[12], in);
+    n[13].Set(box.MinX(),box.MinY(),box.MaxZ()); NormSwap (n[13], in);
+    n[14].Set(box.MinX(),box.MinY(),box.MaxZ()); NormSwap (n[14], in);
 
-  normals[3].Set(box.MinX(),box.MaxY(),box.MaxZ()); normals[3].Normalize();
-  normals[4].Set(box.MinX(),box.MaxY(),box.MaxZ()); normals[4].Normalize();
-  normals[5].Set(box.MinX(),box.MaxY(),box.MaxZ()); normals[5].Normalize();
+    // Corner +X -Y +Z
+    n[15].Set(box.MaxX(),box.MinY(),box.MaxZ()); NormSwap (n[15], in);
+    n[16].Set(box.MaxX(),box.MinY(),box.MaxZ()); NormSwap (n[16], in);
+    n[17].Set(box.MaxX(),box.MinY(),box.MaxZ()); NormSwap (n[17], in);
 
-  normals[6].Set(box.MaxX(),box.MaxY(),box.MaxZ()); normals[6].Normalize();
-  normals[7].Set(box.MaxX(),box.MaxY(),box.MaxZ()); normals[7].Normalize();
-  normals[8].Set(box.MaxX(),box.MaxY(),box.MaxZ()); normals[8].Normalize();
+    // Corner +X -Y -Z
+    n[18].Set(box.MaxX(),box.MinY(),box.MinZ()); NormSwap (n[18], in);
+    n[19].Set(box.MaxX(),box.MinY(),box.MinZ()); NormSwap (n[19], in);
+    n[20].Set(box.MaxX(),box.MinY(),box.MinZ()); NormSwap (n[20], in);
 
-  normals[9].Set(box.MaxX(),box.MaxY(),box.MinZ()); normals[9].Normalize();
-  normals[10].Set(box.MaxX(),box.MaxY(),box.MinZ()); normals[10].Normalize();
-  normals[11].Set(box.MaxX(),box.MaxY(),box.MinZ()); normals[11].Normalize();
+    // Corner -X -Y -Z
+    n[21].Set(box.MinX(),box.MinY(),box.MinZ()); NormSwap (n[21], in);
+    n[22].Set(box.MinX(),box.MinY(),box.MinZ()); NormSwap (n[22], in);
+    n[23].Set(box.MinX(),box.MinY(),box.MinZ()); NormSwap (n[23], in);
+  }
+  else
+  {
+    // Face 1 (-Z).
+    n[0].Set(0, 0, -1); NormSwap (n[0], in);
+    n[9].Set(0, 0, -1); NormSwap (n[9], in);
+    n[18].Set(0, 0, -1); NormSwap (n[18], in);
+    n[21].Set(0, 0, -1); NormSwap (n[21], in);
 
-  normals[12].Set(box.MinX(),box.MinY(),box.MaxZ()); normals[12].Normalize();
-  normals[13].Set(box.MinX(),box.MinY(),box.MaxZ()); normals[13].Normalize();
-  normals[14].Set(box.MinX(),box.MinY(),box.MaxZ()); normals[14].Normalize();
+    // Face 2 (+Y).
+    n[1].Set(0, 1, 0); NormSwap (n[1], in);
+    n[3].Set(0, 1, 0); NormSwap (n[3], in);
+    n[6].Set(0, 1, 0); NormSwap (n[6], in);
+    n[10].Set(0, 1, 0); NormSwap (n[10], in);
 
-  normals[15].Set(box.MaxX(),box.MinY(),box.MaxZ()); normals[15].Normalize();
-  normals[16].Set(box.MaxX(),box.MinY(),box.MaxZ()); normals[16].Normalize();
-  normals[17].Set(box.MaxX(),box.MinY(),box.MaxZ()); normals[17].Normalize();
+    // Face 3 (-X).
+    n[2].Set(-1, 0, 0); NormSwap (n[2], in);
+    n[4].Set(-1, 0, 0); NormSwap (n[4], in);
+    n[12].Set(-1, 0, 0); NormSwap (n[12], in);
+    n[22].Set(-1, 0, 0); NormSwap (n[22], in);
 
-  normals[18].Set(box.MaxX(),box.MinY(),box.MinZ()); normals[18].Normalize();
-  normals[19].Set(box.MaxX(),box.MinY(),box.MinZ()); normals[19].Normalize();
-  normals[20].Set(box.MaxX(),box.MinY(),box.MinZ()); normals[20].Normalize();
+    // Face 4 (+Z).
+    n[5].Set(0, 0, 1); NormSwap (n[5], in);
+    n[7].Set(0, 0, 1); NormSwap (n[7], in);
+    n[13].Set(0, 0, 1); NormSwap (n[13], in);
+    n[15].Set(0, 0, 1); NormSwap (n[15], in);
 
-  normals[21].Set(box.MinX(),box.MinY(),box.MinZ()); normals[21].Normalize();
-  normals[22].Set(box.MinX(),box.MinY(),box.MinZ()); normals[22].Normalize();
-  normals[23].Set(box.MinX(),box.MinY(),box.MinZ()); normals[23].Normalize();
+    // Face 5 (+X).
+    n[8].Set(1, 0, 0); NormSwap (n[8], in);
+    n[11].Set(1, 0, 0); NormSwap (n[11], in);
+    n[16].Set(1, 0, 0); NormSwap (n[16], in);
+    n[19].Set(1, 0, 0); NormSwap (n[19], in);
+
+    // Face 6 (-Y).
+    n[14].Set(0, -1, 0); NormSwap (n[14], in);
+    n[17].Set(0, -1, 0); NormSwap (n[17], in);
+    n[20].Set(0, -1, 0); NormSwap (n[20], in);
+    n[23].Set(0, -1, 0); NormSwap (n[23], in);
+  }
 }
+
 void csPrimitives::GenerateCapsule (float l, float r, uint sides,
       csDirtyAccessArray<csVector3>& mesh_vertices,
       csDirtyAccessArray<csVector2>& mesh_texels,
@@ -271,6 +342,7 @@ void csPrimitives::GenerateCapsule (float l, float r, uint sides,
     start_ny = start_ny2;
   }
 }
+
 void csPrimitives::GenerateQuad (const csVector3 &v1, const csVector3 &v2,
                           const csVector3 &v3, const csVector3 &v4,
                           csDirtyAccessArray<csVector3>& mesh_vertices,
