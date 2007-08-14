@@ -117,6 +117,12 @@ public:
     return realShader->GetMetadata (ticket);
   }
 
+  virtual bool GetUsedShaderVars (size_t ticket, csStringID* names,
+    size_t namesCount, size_t& returnedNames) const
+  {
+    return realShader->GetUsedShaderVars (ticket, names, namesCount, returnedNames);
+  }
+
   friend class csXMLShaderCompiler;
 
   /**\name iSelfDestruct implementation

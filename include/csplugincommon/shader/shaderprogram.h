@@ -137,6 +137,31 @@ protected:
   /// Variable mappings
   csArray<VariableMapEntry> variablemap;
 
+  bool TryAddUsedShaderVarName (csStringID name,
+    csStringID*& names, size_t& namesCount, size_t& returnedNames) const
+  {
+    if (name != csInvalidStringID)
+    {
+      if (namesCount == 0) return false;
+      *names++ = name;
+      namesCount--;
+      returnedNames++;
+    }
+    return true;
+  }
+  bool TryAddUsedShaderVarProgramParam (const ProgramParam& param,
+    csStringID*& names, size_t& namesCount, size_t& returnedNames) const
+  {
+    if (param.valid)
+    {
+      return TryAddUsedShaderVarName (param.name, names, namesCount, 
+        returnedNames);
+    }
+    return true;
+  }
+  bool GetUsedShaderVarsFromVariableMappings (csStringID* names,
+    size_t namesCount, size_t& returnedNames) const;
+
   /// Program description
   csString description;
 
@@ -234,6 +259,9 @@ public:
 
   virtual csVertexAttrib ResolveBufferDestination (const char* /*binding*/)
   { return CS_VATTRIB_INVALID; }
+
+  virtual bool GetUsedShaderVars (csStringID* names,
+    size_t namesCount, size_t& returnedNames) const;
 };
 
 /** @} */

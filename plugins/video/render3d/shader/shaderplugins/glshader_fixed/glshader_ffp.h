@@ -65,9 +65,6 @@ private:
   // Layers of multitexturing
   struct mtexlayer
   {
-    // texture to use
-    csRef<iTextureHandle> texturehandle;
-
     struct TexFunc
     {
       // Argument sources
@@ -168,6 +165,9 @@ public:
 
   virtual int ResolveTU (const char* binding)
   { return layerNames.Get (binding, -1); }
+
+  virtual bool GetUsedShaderVars (csStringID* names,
+    size_t namesCount, size_t& returnedNames) const;
 };
 
 

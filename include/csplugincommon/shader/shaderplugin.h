@@ -90,6 +90,19 @@ struct iShaderProgram : public virtual iBase
 
   /// Compile a program
   virtual bool Compile () = 0;
+  
+  /**
+   * Request all shader variables used by this program.
+   * \param names Buffer that will take the shader variable names.
+   *   A good size would be the number of strings in the shader variable 
+   *   string set.
+   * \param namesCount Number of shader variable names fitting into \a names.
+   * \param returnedNames Amount of variable names actually returned.
+   * \return Whether all variable names were returned. In other words, 
+   *   <tt>false</tt> indicates that the provided buffer was too small.
+   */
+  virtual bool GetUsedShaderVars (csStringID* names,
+    size_t namesCount, size_t& returnedNames) const = 0;
 };
 
 /**

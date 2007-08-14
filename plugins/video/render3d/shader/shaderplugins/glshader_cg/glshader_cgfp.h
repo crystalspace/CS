@@ -66,6 +66,16 @@ public:
   virtual int ResolveTU (const char* binding);
 
   virtual const char* GetProgramType() { return "fragment"; }
+
+  virtual bool GetUsedShaderVars (csStringID* names,
+    size_t namesCount, size_t& returnedNames) const
+  {
+    if (pswrap.IsValid())
+      return pswrap->GetUsedShaderVars (names, namesCount, returnedNames);
+
+    return csShaderGLCGCommon::GetUsedShaderVars (names, namesCount, 
+      returnedNames);
+  }
 };
 
 }

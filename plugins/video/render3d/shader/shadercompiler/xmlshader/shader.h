@@ -279,6 +279,22 @@ public:
       return allShaderMeta;
   }
 
+  virtual bool GetUsedShaderVars (size_t ticket, csStringID* names,
+    size_t namesCount, size_t& returnedNames) const
+  {
+    if (IsFallbackTicket (ticket))
+      return fallbackShader->GetUsedShaderVars (GetFallbackTicket (ticket),
+        names, namesCount, returnedNames);
+
+    csXMLShaderTech* tech = (ticket != csArrayItemNotFound) ? 
+      variants[ticket].tech : 0;
+    if (tech != 0)
+      return tech->GetUsedShaderVars (names, namesCount, returnedNames);
+
+    returnedNames = 0;
+    return true;
+  }
+
   friend class csXMLShaderCompiler;
 
   /**\name iSelfDestruct implementation

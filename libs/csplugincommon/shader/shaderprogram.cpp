@@ -418,3 +418,24 @@ void csShaderProgram::DumpVariableMappings (csString& output)
     output << '\n'; 
   }
 }
+
+bool csShaderProgram::GetUsedShaderVarsFromVariableMappings (csStringID* names,
+  size_t namesCount, size_t& returnedNames) const
+{
+  returnedNames = 0;
+  for (size_t i = 0; i < variablemap.GetSize(); i++)
+  {
+    if (!TryAddUsedShaderVarName (variablemap[i].name, names, namesCount,
+        returnedNames))
+      return false;
+  }
+  return true;
+}
+
+bool csShaderProgram::GetUsedShaderVars (csStringID* names,
+                                         size_t namesCount, 
+                                         size_t& returnedNames) const
+{
+  return GetUsedShaderVarsFromVariableMappings (names, namesCount, 
+    returnedNames);
+}

@@ -79,6 +79,9 @@ public:
 
   /// Compile a program
   virtual bool Compile();
+
+  virtual bool GetUsedShaderVars (csStringID* names,
+    size_t namesCount, size_t& returnedNames) const;
 };
 
 }

@@ -670,6 +670,24 @@ bool csGLShaderFFP::Compile ()
   return true;
 }
 
+bool csGLShaderFFP::GetUsedShaderVars (csStringID* names,
+                                       size_t namesCount, 
+                                       size_t& returnedNames) const
+{
+  returnedNames = 0;
+
+  if (!TryAddUsedShaderVarProgramParam (fog.density, names, namesCount, 
+      returnedNames)) return false;
+  if (!TryAddUsedShaderVarProgramParam (fog.start, names, namesCount, 
+      returnedNames)) return false;
+  if (!TryAddUsedShaderVarProgramParam (fog.end, names, namesCount, 
+      returnedNames)) return false;
+  if (!TryAddUsedShaderVarProgramParam (fog.color, names, namesCount, 
+      returnedNames)) return false;
+
+  return true;
+}
+
 void csGLShaderFFP::ActivateTexFunc (const mtexlayer::TexFunc& tf, 
 				     GLenum sourceP, GLenum operandP, 
 				     GLenum combineP, GLenum scaleP)

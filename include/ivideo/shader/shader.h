@@ -362,7 +362,7 @@ struct csShaderMetadata
  */
 struct iShader : public virtual iShaderVariableContext
 {
-  SCF_INTERFACE(iShader, 3, 1, 0);
+  SCF_INTERFACE(iShader, 3, 1, 1);
 
   /// Query the object.
   virtual iObject* QueryObject () = 0;
@@ -408,6 +408,20 @@ struct iShader : public virtual iShaderVariableContext
 
   /// Get shader metadata
   virtual const csShaderMetadata& GetMetadata (size_t ticket) const = 0;
+  
+  /**
+   * Request all shader variables used by a certain shader ticket.
+   * \param ticket The ticket for which to retrieve the information.
+   * \param names Buffer that will take the shader variable names.
+   *   A good size would be the number of strings in the shader variable 
+   *   string set.
+   * \param namesCount Number of shader variable names fitting into \a names.
+   * \param returnedNames Amount of variable names actually returned.
+   * \return Whether all variable names were returned. In other words, 
+   *   <tt>false</tt> indicates that the provided buffer was too small.
+   */
+  virtual bool GetUsedShaderVars (size_t ticket, csStringID* names,
+    size_t namesCount, size_t& returnedNames) const = 0;
 };
 
 
