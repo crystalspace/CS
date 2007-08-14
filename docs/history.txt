@@ -18,6 +18,9 @@ chronological order.
 	  the inside and also can disable the smooth option for normals.
 	- Jorrit added (ifdeffed out) a first try at converting simple1 to
 	  use this instead of a thing for the room.
+	- res made the fractional element areas in lighter2 swappable. (On
+	  large levels they can account for a significant portion of the
+	  used memory).
 12-Aug-2007
 	- res added CS::SubRectangles::IsEmpty().
 	- res sped up the lighter2 object lightmap layouting. (Replaced a

@@ -21,6 +21,8 @@
 #include "primitive.h"
 #include "object.h"
 
+#include <algorithm>
+
 namespace lighter
 {
   // Helpers for element calculations
@@ -100,21 +102,44 @@ namespace lighter
     return area / 2.0f;
   }
 
+  //-------------------------------------------------------------------------
 
-  void ElementAreas::DeleteAll()
+  struct TempElementAreas
+  {
+    float fullArea;
+    size_t elementCount;
+
+    csBitArray elementsBits;
+    struct ElementFloatPair
+    {
+      size_t element;
+      float area;
+    };
+    csArray<ElementFloatPair> fractionalElements;
+
+    void DeleteAll();
+    void SetFullArea (float fullArea) { this->fullArea = fullArea; }
+    void SetSize (size_t count);
+    void SetElementArea (size_t element, float area);
+
+    static int ElementFloatPairCompare (const ElementFloatPair& i1,
+      const ElementFloatPair& i2);
+  };
+
+  void TempElementAreas::DeleteAll()
   {
     elementsBits.SetSize (0);
-    fractionalElements.DeleteAll ();
     elementCount = 0;
+    fractionalElements.DeleteAll ();
   }
 
-  void ElementAreas::SetSize (size_t count)
+  void TempElementAreas::SetSize (size_t count)
   {
     elementCount = count;
     elementsBits.SetSize (2*count);
   }
 
-  void ElementAreas::SetElementArea (size_t element, float area)
+  void TempElementAreas::SetElementArea (size_t element, float area)
   {
     if (area == 0)
     {
@@ -132,14 +157,9 @@ namespace lighter
       fractionalElements.InsertSorted (elem, ElementFloatPairCompare);
     }
   }
-
-  void ElementAreas::ShrinkBestFit ()
-  {
-    fractionalElements.ShrinkBestFit ();
-  }
-
-  int ElementAreas::ElementFloatPairCompare (const ElementFloatPair& i1,
-                                             const ElementFloatPair& i2)
+  
+  int TempElementAreas::ElementFloatPairCompare (const ElementFloatPair& i1,
+                                                 const ElementFloatPair& i2)
   {
     if (i1.element > i2.element)
       return 1;
@@ -149,6 +169,21 @@ namespace lighter
       return 0;
   }
   
+  //-------------------------------------------------------------------------
+
+  ElementAreas::ElementAreas() : elementCount ((size_t)~0) {}
+  
+  ElementAreas::ElementAreas (const ElementAreas& other) : elementCount (other.elementCount)
+  {
+    CS_ASSERT_MSG("Can only copy empty ElementAreas",
+      elementCount == (size_t)~0);
+  }
+  
+  ElementAreas::~ElementAreas()
+  { 
+  }
+    
+#if 0
   int ElementAreas::ElementFloatPairSearch (const ElementFloatPair& item,
                                             const size_t& key)
   {
@@ -159,6 +194,9 @@ namespace lighter
     else
       return 0;
   }
+#endif
+
+  
 
   float ElementAreas::GetElementArea (size_t element) const
   {
@@ -168,10 +206,107 @@ namespace lighter
       return fullArea;
     else
     {
-      size_t index = fractionalElements.FindSortedKey (
-        csArrayCmp<ElementFloatPair, size_t> (element, ElementFloatPairSearch));
-      return fractionalElements[index].area;
+      size_t index;
+      {
+	ScopedChunkyLock<ElementAreasAlloc> indices (
+	 *(globalLighter->elementAreasAlloc),
+	 elementChunkID);
+	switch (elementIndexType)
+	{
+	  case idxUI8:
+	    {
+	      index = *std::lower_bound ((uint8*)indices, 
+	       (uint8*)indices + elementCount,
+	       uint8 (element));
+	    }
+	    break;
+	  case idxUI16:
+	    {
+	      index = *std::lower_bound ((uint16*)indices, 
+	       (uint16*)indices + elementCount,
+	       uint16 (element));
+	    }
+	    break;
+	  case idxUI32:
+	    {
+	      index = *std::lower_bound ((uint32*)indices, 
+	       (uint32*)indices + elementCount,
+	       uint32 (element));
+	    }
+	    break;
+	  case idxSizeT:
+	    {
+	      index = *std::lower_bound ((size_t*)indices, 
+	       (size_t*)indices + elementCount,
+	       size_t (element));
+	    }
+	    break;
+	}
+      }
+      ScopedChunkyLock<ElementAreasAlloc> areas (
+	*(globalLighter->elementAreasAlloc),
+        areasChunkID);
+      return ((float*)areas)[index];
     }
+  }
+    
+  void ElementAreas::Finalize (const TempElementAreas& tmp)
+  {
+    fullArea = tmp.fullArea;
+    elementCount = tmp.elementCount;
+    elementsBits = tmp.elementsBits;
+    if (elementCount <= (uint8)~0)
+    {
+      elementIndexType = idxUI8;
+      elementChunkID = globalLighter->elementAreasAlloc->Alloc (
+        tmp.fractionalElements.GetSize() * sizeof (uint8));
+      ScopedChunkyLock<ElementAreasAlloc> indices (
+	*(globalLighter->elementAreasAlloc),
+	elementChunkID);
+      for (size_t i = 0; i < tmp.fractionalElements.GetSize(); i++)
+        ((uint8*)indices)[i] = tmp.fractionalElements[i].element;
+    }
+    else if (elementCount <= (uint16)~0)
+    {
+      elementIndexType = idxUI16;
+      elementChunkID = globalLighter->elementAreasAlloc->Alloc (
+        tmp.fractionalElements.GetSize() * sizeof (uint16));
+      ScopedChunkyLock<ElementAreasAlloc> indices (
+	*(globalLighter->elementAreasAlloc),
+	elementChunkID);
+      for (size_t i = 0; i < tmp.fractionalElements.GetSize(); i++)
+        ((uint16*)indices)[i] = tmp.fractionalElements[i].element;
+    }
+    else if (elementCount <= (uint32)~0)
+    {
+      elementIndexType = idxUI32;
+      elementChunkID = globalLighter->elementAreasAlloc->Alloc (
+        tmp.fractionalElements.GetSize() * sizeof (uint32));
+      ScopedChunkyLock<ElementAreasAlloc> indices (
+	*(globalLighter->elementAreasAlloc),
+	elementChunkID);
+      for (size_t i = 0; i < tmp.fractionalElements.GetSize(); i++)
+        ((uint32*)indices)[i] = tmp.fractionalElements[i].element;
+    }
+    else 
+    {
+      elementIndexType = idxSizeT;
+      elementChunkID = globalLighter->elementAreasAlloc->Alloc (
+        tmp.fractionalElements.GetSize() * sizeof (size_t));
+      ScopedChunkyLock<ElementAreasAlloc> indices (
+	*(globalLighter->elementAreasAlloc),
+	elementChunkID);
+      for (size_t i = 0; i < tmp.fractionalElements.GetSize(); i++)
+        ((size_t*)indices)[i] = tmp.fractionalElements[i].element;
+    }
+    
+    areasChunkID = globalLighter->elementAreasAlloc->Alloc (
+      tmp.fractionalElements.GetSize() * sizeof (float));
+    ScopedChunkyLock<ElementAreasAlloc> areas (
+      *(globalLighter->elementAreasAlloc),
+      areasChunkID);
+    for (size_t i = 0; i < tmp.fractionalElements.GetSize(); i++)
+      ((float*)areas )[i] = tmp.fractionalElements[i].area;
   }
 
   //-------------------------------------------------------------------------
@@ -276,6 +411,8 @@ namespace lighter
 
   void Primitive::Prepare ()
   {
+    TempElementAreas elementAreas;
+  
     // Reset current data
     elementAreas.DeleteAll ();
     elementAreas.SetFullArea ((uFormVector % vFormVector).Norm());
@@ -287,7 +424,7 @@ namespace lighter
 
     uc = maxu - minu + 1;
     vc = maxv - minv + 1;
-
+    
     minUV.x = minu; minUV.y = minv;
     maxUV.x = maxu; maxUV.y = maxv;
 
@@ -389,7 +526,7 @@ namespace lighter
       }
     }
 
-    elementAreas.ShrinkBestFit ();
+    this->elementAreas.Finalize (elementAreas);
 
     ComputeBaryCoeffs();
   }

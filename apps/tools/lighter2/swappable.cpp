@@ -99,6 +99,19 @@ namespace lighter
     e->lastUnlockTime = currentUnlockTime++;
   }
 
+  void SwapManager::UpdateSize (iSwappable* obj)
+  {
+    SwapEntry* e = swapCache.Get (obj, 0);
+    CS_ASSERT(e != 0);
+    if (e->swapStatus == e->swappedIn)
+    {
+      if (e->lastSize != (size_t)~0)
+        currentCacheSize -= e->lastSize;
+      e->lastSize = obj->GetSwapSize ();
+      currentCacheSize += e->lastSize;
+    }
+  }
+
   static const uint32 swapFileMagic = 0x4c325357;
 
   bool SwapManager::SwapOut (SwapEntry* e)

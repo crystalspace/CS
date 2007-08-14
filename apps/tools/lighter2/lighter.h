@@ -31,6 +31,8 @@ namespace lighter
   class Primitive;
   class Raytracer;
   class SwapManager;
+  
+  class ElementAreasAlloc;
 
   class Lighter : public csRefCount
   {
@@ -63,6 +65,7 @@ namespace lighter
     csRef<iStringSet> strings;
 
     SwapManager* swapManager;
+    ElementAreasAlloc* elementAreasAlloc;
 
   protected:
     // Cleanup and prepare for shutdown

@@ -22,6 +22,8 @@
 #include "csutil/set.h"
 
 #include "common.h"
+#include "chunkyalloc.h"
+#include "swappable.h"
 #include "vertexdata.h"
 
 namespace lighter
@@ -30,8 +32,13 @@ namespace lighter
   struct ElementProxy;
 
   class Primitive;
+  class TempElementAreas;
+  
+  class ElementAreasAlloc : public ChunkyAllocator<2*1024*1024>
+  {
+  };
 
-  class ElementAreas: public CS::Memory::CustomAllocated
+  class ElementAreas : public CS::Memory::CustomAllocated
   {
     friend class Primitive;
     
@@ -39,24 +46,17 @@ namespace lighter
     size_t elementCount;
 
     csBitArray elementsBits;
-    struct ElementFloatPair
-    {
-      size_t element;
-      float area;
-    };
-    csArray<ElementFloatPair> fractionalElements;
-
-    void DeleteAll();
-    void SetFullArea (float fullArea) { this->fullArea = fullArea; }
-    void SetSize (size_t count);
-    void SetElementArea (size_t element, float area);
-    void ShrinkBestFit ();
-
-    static int ElementFloatPairCompare (const ElementFloatPair& i1,
-      const ElementFloatPair& i2);
-    static int ElementFloatPairSearch (const ElementFloatPair& item,
-      const size_t& key);
+    enum IndexType { idxUI8, idxUI16, idxUI32, idxSizeT };
+    IndexType elementIndexType;
+    size_t elementChunkID;
+    size_t areasChunkID;
+    
+    void Finalize (const TempElementAreas&);
   public:
+    ElementAreas();
+    ElementAreas (const ElementAreas& other);
+    ~ElementAreas();
+
     float GetElementArea (size_t element) const;
     size_t GetSize() const { return elementCount; }
   };
