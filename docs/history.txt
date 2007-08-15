@@ -12,7 +12,10 @@ chronological order.
 	- res made the gl3d renderer work if the current render target is
 	  tried to be set again.
 	- res made the gl3d texture blit and render to texture stuff use
-	  glGenerateMipmap, if available,
+	  glGenerateMipmap, if available.
+	- res added a support for "render target dependencies": a texture and
+	  a view can be registered with the render manager which then takes
+	  care of rendering that view to the texture, if needed.
 14-Aug-2007
 	- res added the ability to query the shader variables used for a given
 	  ticket from a shader.

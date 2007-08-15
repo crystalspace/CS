@@ -24,9 +24,13 @@
 
 struct iRenderManager : public virtual iBase
 {
-  SCF_INTERFACE(iRenderManager,1,0,0);
+  SCF_INTERFACE(iRenderManager,1,0,1);
 
   virtual bool RenderView (iView* view) = 0;
+
+  virtual void RegisterRenderTarget (iTextureHandle* target, 
+    iView* view) = 0;
+  virtual void UnregisterRenderTarget (iTextureHandle* target) = 0;
 };
 
 #endif

@@ -73,12 +73,14 @@ namespace RenderManager
       ctxNode.svArrays.SetupSVStck (varStack, index);
 
       // Render the mesh
-      RenderSingleMesh (mesh.renderMesh, shader, ticket);
+      RenderSingleMesh (mesh.renderMesh, shader, ticket,
+        mesh.zmode);
     }
 
   private:
 
-    void RenderSingleMesh (csRenderMesh* mesh, iShader* shader, size_t shaderTicket)
+    void RenderSingleMesh (csRenderMesh* mesh, iShader* shader, size_t shaderTicket,
+      csZBufMode zmode)
     {
       size_t numPasses = shader->GetNumberOfPasses (shaderTicket);
 
@@ -88,6 +90,7 @@ namespace RenderManager
 
         csRenderMeshModes modes (*mesh);
         shader->SetupPass (shaderTicket, mesh, modes, varStack);
+        modes.z_buf_mode = zmode;
 
         g3d->DrawMesh (mesh, modes, varStack);
 

@@ -46,6 +46,7 @@ namespace RenderManager
     //---- Forward declarations
     struct MeshNode;
     struct ContextNode;
+    struct ContextsContainer;
 
     //---- Type definitions
     typedef TreeTraits TreeTraitsType;
@@ -61,10 +62,12 @@ namespace RenderManager
         // Clean up the persistent data
         contextNodeAllocator.Empty ();
         meshNodeAllocator.Empty ();
+        contextsContainerAllocator.Empty ();
       }
 
       csBlockAllocator<MeshNode> meshNodeAllocator;
       csBlockAllocator<ContextNode> contextNodeAllocator;
+      csBlockAllocator<ContextsContainer> contextsContainerAllocator;
     };
 
     /**
@@ -78,6 +81,7 @@ namespace RenderManager
       struct SingleMesh : public EBOptHelper<typename TreeTraits::MeshExtraDataType>
       {
         csRenderMesh* renderMesh;
+        csZBufMode zmode;
       };
 
       csArray<SingleMesh> meshes;
@@ -105,9 +109,17 @@ namespace RenderManager
 
       // Total number of render meshes within the context
       size_t totalRenderMeshes;
+      
+      ContextNode() : totalRenderMeshes (0) {}
     };
 
-  
+    class ContextsContainer : 
+      public EBOptHelper<typename TreeTraits::ContextsContainerExtraDataType>
+    {
+    protected:
+      friend class RenderTree;
+      csArray<ContextNode*>   contextNodeList;
+    };
 
     //---- Methods
     RenderTree (PersistentData& dataStorage)
@@ -120,15 +132,23 @@ namespace RenderManager
       persistentData.Clear ();
     }
 
+    ContextsContainer* CreateContextContainer ()
+    {
+      // Create an initial context
+      ContextsContainer* newCtx = persistentData.contextsContainerAllocator.Alloc ();
+      contexts.Push (newCtx);
+
+      return newCtx;
+    }
+
     /**
      * 
      */
-    ContextNode* PrepareViscull (iRenderView* rw)
+    ContextNode* CreateContext (ContextsContainer* contexts, iRenderView* rw)
     {
       // Create an initial context
       ContextNode* newCtx = persistentData.contextNodeAllocator.Alloc ();
-      newCtx->totalRenderMeshes = 0;
-      contextNodeList.Push (newCtx);
+      contexts->contextNodeList.Push (newCtx);
 
       return newCtx;
     }
@@ -147,7 +167,7 @@ namespace RenderManager
     /**
      * 
      */
-    void DestoryContext (ContextNode* context)
+    void DestoryContext (ContextsContainer& contexts, ContextNode* context)
     {
       CS_ASSERT(contextNodeList.Find (contextNodeList) != csArrayItemNotFound);
       contextNodeList.Delete (context);
@@ -159,29 +179,63 @@ namespace RenderManager
      * 
      */
     template<typename Fn>
+    void TraverseContexts (ContextsContainer* contexts, Fn& contextFunction)
+    {
+      CS::ForEach (contexts->contextNodeList.GetIterator (), contextFunction, *this);
+    }
+
+    template<typename Fn>
     void TraverseContexts (Fn& contextFunction)
     {
-      CS::ForEach (contextNodeList.GetIterator (), contextFunction, *this);
+      ContextsIterator<Fn, false> it (contextFunction);
+      CS::ForEach (contexts.GetIterator (), it, *this);
+    }
+
+    template<typename Fn>
+    void TraverseContextContainers (Fn& contextFunction)
+    {
+      CS::ForEach (contexts.GetIterator (), contextFunction, *this);
     }
 
     /**
      * 
      */
     template<typename Fn>
+    void TraverseContextsReverse (ContextsContainer* contexts, Fn& contextFunction)
+    {
+      CS::ForEach (contexts->contextNodeList.GetReverseIterator (), 
+        contextFunction, *this);
+    }
+
+    template<typename Fn>
     void TraverseContextsReverse (Fn& contextFunction)
     {
-      CS::ForEach (contextNodeList.GetReverseIterator (), contextFunction, *this);
+      ContextsIterator<Fn, true> it (contextFunction);
+      CS::ForEach (contexts.GetReverseIterator (), it, *this);
+    }
+
+    template<typename Fn>
+    void TraverseContextContainersReverse (Fn& contextFunction)
+    {
+      CS::ForEach (contexts.GetReverseIterator  (), contextFunction, *this);
     }
 
     /**
      * 
      */
+    template<typename Fn>
+    void TraverseMeshNodes (ContextsContainer* contexts, Fn& meshNodeFunction)
+    {
+      TraverseMeshNodesWalker<Fn> walker (meshNodeFunction);
+      TraverseContexts (contexts, walker);
+    }
+
     template<typename Fn>
     void TraverseMeshNodes (Fn& meshNodeFunction, ContextNode* context = 0)
     {
       TraverseMeshNodesWalker<Fn> walker (meshNodeFunction);
       if (context)
-        walker (context, *this);
+        walker (context, *this, 0 /* currently ignored */);
       else
         TraverseContexts (walker);
     }
@@ -201,8 +255,7 @@ namespace RenderManager
 
   protected:    
     PersistentData&         persistentData;
-    csArray<ContextNode*>   contextNodeList;
-
+    csArray<ContextsContainer*> contexts;
     size_t                  totalMeshNodes;
     size_t                  totalRenderMeshes;
 
@@ -236,6 +289,7 @@ namespace RenderManager
       iMeshWrapper *imesh, uint32 frustum_mask, iRenderView* renderView, ContextNode* context)
     {
       // Todo: Handle static lod & draw distance
+      csZBufMode zmode = imesh->GetZBufMode ();
 
       // Get the meshes
       int numMeshes;
@@ -271,6 +325,7 @@ namespace RenderManager
  
         typename MeshNode::SingleMesh sm;
         sm.renderMesh = rm;
+        sm.zmode = zmode;
 
         meshNode->meshes.Push (sm);
       }
@@ -286,7 +341,8 @@ namespace RenderManager
         : meshNodeFunction (meshNodeFunction)
       {}
 
-      void operator() (ContextNode* node, ThisType& tree)
+      void operator() (ContextNode* node, ThisType& tree, 
+        const ContextsContainer* container)
       {        
         MeshNodeCB<Fn> cb (meshNodeFunction, node, tree);
         node->meshNodes.TraverseInOrder (cb);
@@ -313,6 +369,24 @@ namespace RenderManager
         ContextNode* node;
         ThisType& tree;
       };
+
+    template<typename Fn, bool reverse>
+    struct ContextsIterator
+    {
+      Fn& function;
+
+      ContextsIterator (Fn& function) : function (function) { }
+
+      void operator() (const ContextsContainer* contexts, ThisType& tree)
+      {
+        if (reverse)
+          CS::ForEach (contexts->contextNodeList.GetReverseIterator (), 
+            function, tree, contexts);
+        else
+          CS::ForEach (contexts->contextNodeList.GetIterator (), function, 
+            tree, contexts);
+      }
+    };
   };
 
   template<typename Tree, typename Fn>

@@ -61,6 +61,14 @@ namespace RenderManager
       csArray<iShader*> shaderArray;
       csArray<size_t> ticketArray;
     };
+    
+    struct ContextsContainerExtraDataType
+    {
+      iTextureHandle* renderTarget;
+      iView* view;
+      
+      ContextsContainerExtraDataType() : renderTarget (0), view (0) {}
+    };
 
     // Any extra data per mesh in a mesh node
     typedef void MeshExtraDataType;

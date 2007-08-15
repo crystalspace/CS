@@ -292,6 +292,9 @@ bool Simple::Initialize ()
     return false;
   }
 
+  rm = csQueryRegistryOrLoad<iRenderManager> (object_reg,
+    "crystalspace.rendermanager.test1");
+
   // Setup the texture manager
   iTextureManager* txtmgr = g3d->GetTextureManager ();
 
@@ -317,7 +320,7 @@ bool Simple::Initialize ()
   }
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
   // Create the procedural texture and a material for it
-  ProcTexture = new csEngineProcTex ();
+  //ProcTexture = new csEngineProcTex ();
   // Find the pointer to VFS.
   csRef<iVFS> VFS (csQueryRegistry<iVFS> (object_reg));
   if (!VFS)
@@ -328,7 +331,31 @@ bool Simple::Initialize ()
     return false;
   }
 
-  iMaterialWrapper* ProcMat = ProcTexture->Initialize (object_reg, engine,
+  VFS->PushDir ();
+  VFS->ChDir ("/lev/partsys/");
+  bool Success = (loader->LoadMapFile ("world", false));
+  VFS->PopDir ();
+
+  {
+    csRef<iTextureHandle> texHandle = 
+      g3d->GetTextureManager()->CreateTexture (256, 256, csimg2D, "rgb8",
+        CS_TEXTURE_3D);
+    targetTexture = engine->GetTextureList()->NewTexture (texHandle);
+  }
+  csRef<iMaterialWrapper> targetMat = engine->CreateMaterial ("rendertarget", targetTexture);
+  {
+    iSector *room = engine->GetSectors ()->FindByName ("room");
+    targetView = csPtr<iView> (new csView (engine, g3d));
+    targetView->GetCamera ()->GetTransform ().SetOrigin (csVector3 (-0.5,0,0));
+    targetView->GetCamera ()->SetSector (room);
+    targetView->SetRectangle (0, 0, 256, 256);
+    targetView->GetCamera ()->SetPerspectiveCenter (128, 128);
+    targetView->GetCamera ()->SetFOVAngle (targetView->GetCamera ()->GetFOVAngle(), 256);
+
+    rm->RegisterRenderTarget (targetTexture->GetTextureHandle(), targetView);
+  }
+
+  /*iMaterialWrapper* ProcMat = ProcTexture->Initialize (object_reg, engine,
   	txtmgr, "procmat");
   if (!ProcMat)
   {
@@ -339,7 +366,7 @@ bool Simple::Initialize ()
   }
   ProcMat->QueryObject ()->ObjAdd (ProcTexture);
   ProcTexture->LoadLevel ();
-  ProcTexture->DecRef ();
+  ProcTexture->DecRef ();*/
   room = engine->CreateSector ("proctex-room");
   csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
   csRef<iThingFactoryState> walls_state = 
@@ -358,7 +385,7 @@ bool Simple::Initialize ()
   CreatePolygon (walls_state, 1, 0, 4, 5, tm);
   genmesh_resolution = 15;
   genmesh_scale.Set (6, 6, 0);
-  CreateGenMesh (ProcMat);
+  CreateGenMesh (targetMat);
   CreatePolygon (walls_state, 3, 2, 6, 7, tm);
   CreatePolygon (walls_state, 0, 3, 7, 4, tm);
   CreatePolygon (walls_state, 7, 6, 5, 4, tm);
@@ -405,6 +432,11 @@ void Simple::SetupFrame ()
 
   AnimateGenMesh (elapsed_time);
 
+  // move the r2t camera
+  csVector3 Position (-0.5, 0, 3 + sin (current_time / (10*1000.0))*3);
+  targetView->GetCamera ()->Move (Position
+    - targetView->GetCamera ()->GetTransform ().GetOrigin ());
+
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
 
@@ -423,12 +455,12 @@ void Simple::SetupFrame ()
     c->Move (CS_VEC_BACKWARD * 4 * speed);
 
   // Tell 3D driver we're going to display 3D things.
-  if (!g3d->BeginDraw (
+  /*if (!g3d->BeginDraw (
       engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
-      return;
+      return;*/
 
   // Tell the camera to render into the frame buffer.
-  view->Draw ();
+  rm->RenderView (view);
 }
 
 void Simple::FinishFrame ()

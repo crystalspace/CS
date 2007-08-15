@@ -35,13 +35,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMTest1)
     //---- iRenderManager ----
     virtual bool RenderView (iView* view);
 
+    virtual void RegisterRenderTarget (iTextureHandle* target, 
+      iView* view)
+    {
+      targets.RegisterRenderTarget (target, view);
+    }
+    virtual void UnregisterRenderTarget (iTextureHandle* target)
+    {
+      targets.UnregisterRenderTarget (target);
+    }
+
     //---- iComponent ----
     virtual bool Initialize (iObjectRegistry*);
 
+    typedef CS::RenderManager::RenderTree<> RenderTreeType;
   protected:
     CS::RenderManager::RenderView::Pool renderViewPool;
 
-    typedef CS::RenderManager::RenderTree<> RenderTreeType;
     RenderTreeType::PersistentData treePersistent;
 
     csRef<iStringSet>       svNameStringSet;
@@ -50,6 +60,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMTest1)
 
     csStringID              defaultShaderName;
     csRef<iShader>          defaultShader;
+
+    CS::RenderManager::DependentTargetManager<RenderTreeType> targets;
+
   };
 
 

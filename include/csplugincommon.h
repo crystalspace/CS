@@ -40,6 +40,8 @@
 #include "csplugincommon/particlesys/partgen.h"
 #include "csplugincommon/render3d/normalizationcube.h"
 #include "csplugincommon/render3d/txtmgr.h"
+#include "csplugincommon/rendermanager/context.h"
+#include "csplugincommon/rendermanager/dependenttarget.h"
 #include "csplugincommon/rendermanager/rendertree.h"
 #include "csplugincommon/rendermanager/renderview.h"
 #include "csplugincommon/rendermanager/render.h"

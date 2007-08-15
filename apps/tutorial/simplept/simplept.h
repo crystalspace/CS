@@ -27,7 +27,6 @@ class csEngineProcTex : public csProcTexture
 private:
   csRef<iEngine> Engine;
   csRef<iView> View;
-
 public:
   csEngineProcTex ();
   ~csEngineProcTex ();
@@ -53,10 +52,14 @@ private:
   csRef<iKeyboardDriver> kbd;
   iSector* room;
   csRef<iView> view;
+  csRef<iRenderManager> rm;
   csRef<iVirtualClock> vc;
   csEngineProcTex* ProcTexture;
   csRef<iMeshWrapper> genmesh;
   csRef<iGeneralFactoryState> factstate;
+
+  csRef<iTextureWrapper> targetTexture;
+  csRef<iView> targetView;
 
   void CreatePolygon (iThingFactoryState *th, int v1, int v2, int v3, int v4,
     iMaterialWrapper *mat);

@@ -57,12 +57,13 @@ namespace RenderManager
     iShader* defaultShader;
   };
 
+  typedef csArray<size_t> TicketArrayType;
+  typedef csArray<iShader*> ShaderArrayType;
+
   template<typename Tree>
   class TicketSetup : public NumberedMeshTraverser<Tree, TicketSetup<Tree> >
   {
   public:
-    typedef csArray<size_t> TicketArrayType;
-    typedef csArray<iShader*> ShaderArrayType;
     typedef NumberedMeshTraverser<Tree, TicketSetup<Tree> > BaseType;
 
     TicketSetup (SVArrayHolder& svArrays, csShaderVariableStack& varStack, 
@@ -97,7 +98,7 @@ namespace RenderManager
 
   // Setup the standard shader, shader SV and ticket
   template<typename Tree>
-  void SetupStandarShaderAndTicket (Tree& tree, typename Tree::ContextNode& context, 
+  static void SetupStandarShaderAndTicket (Tree& tree, typename Tree::ContextNode& context, 
     iShaderManager* shaderManager,
     csStringID defaultShaderType, iShader* defaultShader = 0)
   {
@@ -117,6 +118,45 @@ namespace RenderManager
           ticketSetup), &context);
     }
   }
+
+  typedef csDirtyAccessArray<csStringID> ShaderVariableNameArray;
+
+  static void GetUsedShaderVars (const ShaderArrayType& shaderArray,
+    const TicketArrayType& ticketArray, 
+    ShaderVariableNameArray& names)
+  {
+    size_t nameArrayOfs = 0;
+    for (size_t i = 0; i < shaderArray.GetSize(); i++)
+    {
+      size_t returnedNames = 0;
+      iShader* shader = shaderArray[i];
+      if (shader == 0) continue;
+      shader->GetUsedShaderVars (ticketArray[i],
+        names.GetArray() + nameArrayOfs, 
+        names.GetSize() - nameArrayOfs, returnedNames);
+      nameArrayOfs += returnedNames;
+    }
+    names.SetSize (nameArrayOfs);
+  }
+
+  template<typename Tree>
+  static void GetAllUsedShaderVars (const typename Tree::ContextNode& context, 
+    iShaderManager* shaderManager, ShaderVariableNameArray& allNames)
+  {
+    ShaderVariableNameArray names;
+    size_t numSVs = shaderManager->GetSVNameStringset()->GetSize();
+    names.SetSize (numSVs * context.shaderArray.GetSize());
+    GetUsedShaderVars (context.shaderArray, context.ticketArray,
+      names);
+    allNames.Empty ();
+    for (size_t i = 0; i < names.GetSize(); i++)
+    {
+      if (allNames.FindSortedKey (
+        csArrayCmp<csStringID, csStringID> (names[i])) == csArrayItemNotFound)
+        allNames.InsertSorted (names[i]);
+    }
+  }
+
 }
 }
 
