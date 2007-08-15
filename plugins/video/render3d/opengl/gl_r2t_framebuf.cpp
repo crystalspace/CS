@@ -149,10 +149,11 @@ void csGLRender2TextureFramebuf::FinishDraw ()
     {
       GLenum textarget = tex_mm->GetGLTextureTarget();
       if ((textarget != GL_TEXTURE_2D) && (textarget != GL_TEXTURE_RECTANGLE_ARB) 
-		  && (textarget != GL_TEXTURE_CUBE_MAP))
+	&& (textarget != GL_TEXTURE_CUBE_MAP))
         return;
 
-	  bool handle_subtexture = (textarget == GL_TEXTURE_CUBE_MAP);
+      if (textarget == GL_TEXTURE_CUBE_MAP)
+        textarget = GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + sub_texture_id;
       /* Reportedly, some drivers crash if using CopyTexImage on a texture
        * size larger than the framebuffer. Use CopyTexSubImage then. */
       bool needSubImage = (txt_w > G3D->GetWidth()) 
@@ -174,23 +175,15 @@ void csGLRender2TextureFramebuf::FinishDraw ()
 	}
       }
       if (needSubImage)
-		{
-		  if (handle_subtexture)
-			glCopyTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + sub_texture_id, 0, 0, 0, 0, 0, 
-			  G3D->GetWidth(), G3D->GetHeight());
-		  else
-		   glCopyTexSubImage2D (textarget, 0, 0, 0, 0, 0, 
-		    G3D->GetWidth(), G3D->GetHeight());
-		}
+      {
+	glCopyTexSubImage2D (textarget, 0, 0, 0, 0, 0, 
+	  G3D->GetWidth(), G3D->GetHeight());
+      }
       else
-		{
-		  if (handle_subtexture)
-		    glCopyTexSubImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + sub_texture_id, 
-			  0, 0, 0, 0, 0, txt_w, txt_h);
-		  else
-		    glCopyTexImage2D (textarget, 0, GL_RGBA, 0, 0, txt_w, txt_h, 0);
-		      tex_mm->SetNeedMips (true);
-		}
+      {
+        glCopyTexImage2D (textarget, 0, GL_RGBA, 0, 0, txt_w, txt_h, 0);
+      }
+      tex_mm->RegenerateMipmaps();
     }
   }
 }

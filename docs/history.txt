@@ -8,6 +8,11 @@ chronological order.
 
 15-Aug-2007
 	- res made CS::RenderManager::RenderView dllexported.
+	- res fixed an uninitialized struct member in glshader_fixed.
+	- res made the gl3d renderer work if the current render target is
+	  tried to be set again.
+	- res made the gl3d texture blit and render to texture stuff use
+	  glGenerateMipmap, if available,
 14-Aug-2007
 	- res added the ability to query the shader variables used for a given
 	  ticket from a shader.

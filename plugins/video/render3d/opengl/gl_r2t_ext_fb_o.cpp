@@ -353,9 +353,12 @@ void csGLRender2TextureEXTfbo::FinishDraw ()
   csGLRender2TextureFramebuf::FinishDraw();
   //G3D->ext->glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
-  //csGLTextureHandle* tex_mm = (csGLTextureHandle *)
-  //  render_target->GetPrivateObject ();
-  //tex_mm->SetNeedMips (true);
+  csGLBasicTextureHandle* tex_mm = 
+    static_cast<csGLBasicTextureHandle*> (render_target->GetPrivateObject ());
+  if (!(tex_mm->GetFlags() & CS_TEXTURE_NOMIPMAPS))
+  {
+    tex_mm->RegenerateMipmaps();
+  }
 
   frameNum++;
   if (frameNum >= lastFBOPurge+fboPurgeAfter)

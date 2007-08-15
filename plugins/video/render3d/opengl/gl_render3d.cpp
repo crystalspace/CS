@@ -1074,6 +1074,7 @@ bool csGLGraphics3D::Open ()
   cache_clip_plane = -1;
   cache_clip_z_plane = -1;
 
+  rt_subtex = 0;
   const char* r2tBackendStr;
   if (ext->CS_GL_EXT_framebuffer_object)
   {

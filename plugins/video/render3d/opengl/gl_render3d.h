@@ -331,6 +331,7 @@ private:
 
   /// Current render target.
   csRef<iTextureHandle> render_target;
+  int rt_subtex;
   csGLRender2TextureBackend* r2tbackend;
 
   /// Should we use special buffertype (VBO) or just system memory
@@ -594,7 +595,9 @@ public:
 	  bool persistent = false,
 	  int subtexture = 0)
   {
+    if ((render_target == handle) && (rt_subtex == subtexture)) return;
     render_target = handle;
+    rt_subtex = subtexture;
     r2tbackend->SetRenderTarget (handle, persistent, subtexture);
 
     int hasRenderTarget = (handle != 0) ? 1 : 0;
