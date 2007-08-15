@@ -38,7 +38,7 @@ namespace RenderManager
    * a scene. It is modified while rendering according to
    * portals/warping portals and such.
    */
-  class RenderView : 
+  class CS_CRYSTALSPACE_EXPORT RenderView : 
     public scfImplementationPooled<scfImplementation1<RenderView, iRenderView> >
   {
   private:
