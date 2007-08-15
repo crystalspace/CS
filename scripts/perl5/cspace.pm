@@ -17586,6 +17586,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
+*CS_PRIMBOX_INSIDE = *cspacec::csPrimitives_CS_PRIMBOX_INSIDE;
+*CS_PRIMBOX_SMOOTH = *cspacec::csPrimitives_CS_PRIMBOX_SMOOTH;
 *GenerateBox = *cspacec::csPrimitives_GenerateBox;
 *GenerateQuad = *cspacec::csPrimitives_GenerateQuad;
 *GenerateCapsule = *cspacec::csPrimitives_GenerateCapsule;

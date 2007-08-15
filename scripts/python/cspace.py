@@ -11812,6 +11812,8 @@ class csPrimitives(_object):
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csPrimitives, name)
     __repr__ = _swig_repr
+    CS_PRIMBOX_INSIDE = _cspace.csPrimitives_CS_PRIMBOX_INSIDE
+    CS_PRIMBOX_SMOOTH = _cspace.csPrimitives_CS_PRIMBOX_SMOOTH
     __swig_getmethods__["GenerateBox"] = lambda x: _cspace.csPrimitives_GenerateBox
     if _newclass:GenerateBox = staticmethod(_cspace.csPrimitives_GenerateBox)
     __swig_getmethods__["GenerateQuad"] = lambda x: _cspace.csPrimitives_GenerateQuad
