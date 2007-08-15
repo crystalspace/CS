@@ -118,7 +118,8 @@ private:
     csStringID fogplane;
     csStringID fogdensity;
 
-    layerentry () : texgen(TEXGEN_NONE) {}
+    layerentry () : texgen(TEXGEN_NONE), fogplane (csInvalidStringID),
+      fogdensity (csInvalidStringID) {}
   };
 
   csArray<layerentry> layers;
