@@ -259,7 +259,7 @@ struct iColladaConvertor : public virtual iBase
 	 *
 	 * @sa ConvertEffects(iDocumentNode *effectsSection)
 	 */
-	virtual bool ConvertScene(iDocumentNode *camerasSection, iDocumentNode *lightsSection, iDocumentNode *nodesSection, iDocumentNode *visualScenesSection) = 0;
+	virtual bool ConvertScene(iDocumentNode *camerasSection, iDocumentNode *lightsSection, iDocumentNode *visualScenesSection) = 0;
 
 	/**
 	 * Converts the rigging and animation sections of the COLLADA file

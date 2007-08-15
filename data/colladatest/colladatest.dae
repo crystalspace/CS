@@ -6,14 +6,36 @@
 			<authoring_tool>Blender v:244 - Illusoft Collada Exporter v:0.3.153</authoring_tool>
 			<comments></comments>
 			<copyright></copyright>
-			<source_data>file://&lt;memory&gt;</source_data>
+			<source_data>file://D:/Source/CrystalSpace/data/colladatest/colladatest.blend</source_data>
 		</contributor>
-		<created>2007-08-02T20:30:28.804000</created>
-		<modified>2007-08-02T20:30:28.804000</modified>
+		<created>2007-08-13T11:01:24.453000</created>
+		<modified>2007-08-13T11:01:24.453000</modified>
 		<unit meter="0.01" name="centimeter"/>
 		<up_axis>Z_UP</up_axis>
 	</asset>
 	<library_cameras>
+		<camera id="Camera-Camera_001" name="Camera-Camera_001">
+			<optics>
+				<technique_common>
+					<perspective>
+						<yfov>49.13434</yfov>
+						<znear>0.1</znear>
+						<zfar>100.0</zfar>
+					</perspective>
+				</technique_common>
+			</optics>
+		</camera>
+		<camera id="Camera-Camera_001" name="Camera-Camera_001">
+			<optics>
+				<technique_common>
+					<perspective>
+						<yfov>49.13434</yfov>
+						<znear>0.1</znear>
+						<zfar>100.0</zfar>
+					</perspective>
+				</technique_common>
+			</optics>
+		</camera>
 		<camera id="Camera-Camera" name="Camera-Camera">
 			<optics>
 				<technique_common>
@@ -27,7 +49,7 @@
 		</camera>
 	</library_cameras>
 	<library_effects>
-		<effect id="Material-fx" name="Material-fx">
+		<effect id="BasicTextureMaterial-fx" name="BasicTextureMaterial-fx">
 			<profile_COMMON>
 				<technique sid="blender">
 					<phong>
@@ -44,7 +66,7 @@
 							<color>0.50000 0.50000 0.50000 1</color>
 						</specular>
 						<shininess>
-							<float>12.5</float>
+							<float>12.0</float>
 						</shininess>
 						<reflective>
 							<color>1.00000 1.00000 1.00000 1</color>
@@ -74,13 +96,109 @@
 				</point>
 			</technique_common>
 		</light>
+		<light id="Spot_001" name="Spot_001">
+			<technique_common>
+				<point>
+					<color>1.00000 1.00000 1.00000</color>
+					<constant_attenuation>1.0</constant_attenuation>
+					<linear_attenuation>0.0</linear_attenuation>
+					<quadratic_attenuation>0.0</quadratic_attenuation>
+				</point>
+			</technique_common>
+		</light>
+		<light id="Spot_001" name="Spot_001">
+			<technique_common>
+				<point>
+					<color>1.00000 1.00000 1.00000</color>
+					<constant_attenuation>1.0</constant_attenuation>
+					<linear_attenuation>0.0</linear_attenuation>
+					<quadratic_attenuation>0.0</quadratic_attenuation>
+				</point>
+			</technique_common>
+		</light>
 	</library_lights>
 	<library_materials>
-		<material id="Material" name="Material">
-			<instance_effect url="#Material-fx"/>
+		<material id="BasicTextureMaterial" name="BasicTextureMaterial">
+			<instance_effect url="#BasicTextureMaterial-fx"/>
 		</material>
 	</library_materials>
 	<library_geometries>
+		<geometry id="Cube_001" name="Cube_001">
+			<mesh>
+				<source id="Cube_001-Position">
+					<float_array count="24" id="Cube_001-Position-array">1.00000 1.00000 -1.00000 1.00000 -1.00000 -1.00000 -1.00000 -1.00000 -1.00000 -1.00000 1.00000 -1.00000 1.00000 1.00000 1.00000 1.00000 -1.00000 1.00000 -1.00000 -1.00000 1.00000 -1.00000 1.00000 1.00000</float_array>
+					<technique_common>
+						<accessor count="8" source="#Cube_001-Position-array" stride="3">
+							<param type="float" name="X"></param>
+							<param type="float" name="Y"></param>
+							<param type="float" name="Z"></param>
+						</accessor>
+					</technique_common>
+				</source>
+				<source id="Cube_001-Normals">
+					<float_array count="18" id="Cube_001-Normals-array">0.00000 0.00000 -1.00000 0.00000 0.00000 1.00000 1.00000 -0.00000 0.00000 -0.00000 -1.00000 -0.00000 -1.00000 0.00000 -0.00000 0.00000 1.00000 0.00000</float_array>
+					<technique_common>
+						<accessor count="6" source="#Cube_001-Normals-array" stride="3">
+							<param type="float" name="X"></param>
+							<param type="float" name="Y"></param>
+							<param type="float" name="Z"></param>
+						</accessor>
+					</technique_common>
+				</source>
+				<vertices id="Cube_001-Vertex">
+					<input semantic="POSITION" source="#Cube_001-Position"/>
+				</vertices>
+				<triangles count="12">
+					<input offset="0" semantic="VERTEX" source="#Cube_001-Vertex"/>
+					<input offset="1" semantic="NORMAL" source="#Cube_001-Normals"/>
+					<p>0 0 
+					   1 0 
+					   2 0 
+					   2 0 
+					   3 0 
+					   0 0 
+					   4 1 
+					   7 1 
+					   6 1 
+					   6 1 
+					   5 1 
+					   4 1 
+					   0 2 4 2 5 2 5 2 1 2 0 2 1 3 5 3 6 3 6 3 2 3 1 3 2 4 6 4 7 4 7 4 3 4 2 4 4 5 0 5 3 5 3 5 7 5 4 5</p>
+				</triangles>
+			</mesh>
+		</geometry>
+		<geometry id="Cube-Geometry_001" name="Cube-Geometry_001">
+			<mesh>
+				<source id="Cube-Geometry_001-Position">
+					<float_array count="24" id="Cube-Geometry_001-Position-array">1.00000 1.00000 -1.00000 1.00000 -1.00000 -1.00000 -1.00000 -1.00000 -1.00000 -1.00000 1.00000 -1.00000 1.00000 1.00000 1.00000 1.00000 -1.00000 1.00000 -1.00000 -1.00000 1.00000 -1.00000 1.00000 1.00000</float_array>
+					<technique_common>
+						<accessor count="8" source="#Cube-Geometry_001-Position-array" stride="3">
+							<param type="float" name="X"></param>
+							<param type="float" name="Y"></param>
+							<param type="float" name="Z"></param>
+						</accessor>
+					</technique_common>
+				</source>
+				<source id="Cube-Geometry_001-Normals">
+					<float_array count="36" id="Cube-Geometry_001-Normals-array">0.00000 0.00000 -1.00000 0.00000 0.00000 -1.00000 0.00000 0.00000 1.00000 0.00000 0.00000 1.00000 1.00000 0.00000 0.00000 1.00000 0.00000 0.00000 0.00000 -1.00000 0.00000 0.00000 -1.00000 0.00000 -1.00000 0.00000 0.00000 -1.00000 0.00000 0.00000 0.00000 1.00000 0.00000 0.00000 1.00000 0.00000</float_array>
+					<technique_common>
+						<accessor count="12" source="#Cube-Geometry_001-Normals-array" stride="3">
+							<param type="float" name="X"></param>
+							<param type="float" name="Y"></param>
+							<param type="float" name="Z"></param>
+						</accessor>
+					</technique_common>
+				</source>
+				<vertices id="Cube-Geometry_001-Vertex">
+					<input semantic="POSITION" source="#Cube-Geometry_001-Position"/>
+				</vertices>
+				<triangles count="12">
+					<input offset="0" semantic="VERTEX" source="#Cube-Geometry_001-Vertex"/>
+					<input offset="1" semantic="NORMAL" source="#Cube-Geometry_001-Normals"/>
+					<p>2 0 0 0 1 0 0 1 2 1 3 1 6 2 4 2 7 2 4 3 6 3 5 3 5 4 0 4 4 4 0 5 5 5 1 5 6 6 1 6 5 6 1 7 6 7 2 7 7 8 2 8 6 8 2 9 7 9 3 9 4 10 0 10 3 10 4 11 3 11 7 11</p>
+				</triangles>
+			</mesh>
+		</geometry>
 		<geometry id="Cube-Geometry" name="Cube-Geometry">
 			<mesh>
 				<source id="Cube-Geometry-Position">
@@ -94,22 +212,32 @@
 					</technique_common>
 				</source>
 				<source id="Cube-Geometry-Normals">
-					<float_array count="18" id="Cube-Geometry-Normals-array">0.00000 0.00000 -1.00000 0.00000 0.00000 1.00000 1.00000 -0.00000 0.00000 -0.00000 -1.00000 -0.00000 -1.00000 0.00000 -0.00000 0.00000 1.00000 0.00000</float_array>
+					<float_array count="36" id="Cube-Geometry-Normals-array">0.00000 0.00000 -1.00000 0.00000 0.00000 -1.00000 0.00000 0.00000 1.00000 0.00000 0.00000 1.00000 1.00000 0.00000 0.00000 1.00000 0.00000 0.00000 0.00000 -1.00000 0.00000 0.00000 -1.00000 0.00000 -1.00000 0.00000 0.00000 -1.00000 0.00000 0.00000 0.00000 1.00000 0.00000 0.00000 1.00000 0.00000</float_array>
 					<technique_common>
-						<accessor count="6" source="#Cube-Geometry-Normals-array" stride="3">
+						<accessor count="12" source="#Cube-Geometry-Normals-array" stride="3">
 							<param type="float" name="X"></param>
 							<param type="float" name="Y"></param>
 							<param type="float" name="Z"></param>
 						</accessor>
 					</technique_common>
 				</source>
+				<source id="Cube-Geometry-UV">
+					<float_array count="72" id="Cube-Geometry-UV-array">0.50000 0.50000 0.75000 0.25000 0.75000 0.50000 0.50000 0.25000 0.75000 0.25000 0.50000 0.50000 0.25000 0.25000 0.25000 0.50000 0.00000 0.25000 0.00000 0.50000 0.00000 0.25000 0.25000 0.50000 1.00000 0.50000 0.75000 0.25000 1.00000 0.25000 0.75000 0.50000 0.75000 0.25000 1.00000 0.50000 0.25000 0.75000 0.25000 0.50000 0.50000 0.75000 0.50000 0.50000 0.50000 0.75000 0.25000 0.50000 0.25000 0.50000 0.25000 0.25000 0.50000 0.50000 0.50000 0.25000 0.50000 0.50000 0.25000 0.25000 0.25000 0.00000 0.50000 0.00000 0.50000 0.25000 0.25000 0.25000 0.25000 0.00000 0.50000 0.25000</float_array>
+					<technique_common>
+						<accessor count="36" source="#Cube-Geometry-UV-array" stride="2">
+							<param type="float" name="S"></param>
+							<param type="float" name="T"></param>
+						</accessor>
+					</technique_common>
+				</source>
 				<vertices id="Cube-Geometry-Vertex">
 					<input semantic="POSITION" source="#Cube-Geometry-Position"/>
 				</vertices>
-				<triangles count="12" material="Material">
+				<triangles count="12" material="BasicTextureMaterial">
 					<input offset="0" semantic="VERTEX" source="#Cube-Geometry-Vertex"/>
 					<input offset="1" semantic="NORMAL" source="#Cube-Geometry-Normals"/>
-					<p>0 0 1 0 2 0 2 0 3 0 0 0 4 1 7 1 6 1 6 1 5 1 4 1 0 2 4 2 5 2 5 2 1 2 0 2 1 3 5 3 6 3 6 3 2 3 1 3 2 4 6 4 7 4 7 4 3 4 2 4 4 5 0 5 3 5 3 5 7 5 4 5</p>
+					<input offset="2" semantic="TEXCOORD" source="#Cube-Geometry-UV"/>
+					<p>2 0 0 0 0 1 1 0 2 3 1 3 0 1 4 2 1 5 7 2 6 6 2 7 4 2 8 5 3 9 4 3 10 6 3 11 5 4 12 0 4 13 4 4 14 1 5 15 0 5 16 5 5 17 5 6 18 6 6 19 1 6 20 2 7 21 1 7 22 6 7 23 6 8 24 7 8 25 2 8 26 3 9 27 2 9 28 7 9 29 4 10 30 0 10 31 3 10 32 7 11 33 4 11 34 3 11 35</p>
 				</triangles>
 			</mesh>
 		</geometry>
@@ -122,15 +250,7 @@
 				<rotate sid="rotateY">0 1 0 0.00000</rotate>
 				<rotate sid="rotateX">1 0 0 0.00000</rotate>
 				<scale sid="scale">1.00000 1.00000 1.00000</scale>
-				<instance_geometry url="#Cube-Geometry">
-					<bind_material>
-						<technique_common>
-							<instance_material symbol="Material" target="#Material">
-								<bind_vertex_input input_semantic="TEXCOORD" input_set="1" semantic="CHANNEL1"/>
-							</instance_material>
-						</technique_common>
-					</bind_material>
-				</instance_geometry>
+				<instance_geometry url="#Cube_001"/>
 			</node>
 			<node layer="L1" id="Lamp" name="Lamp">
 				<translate sid="translate">4.07625 1.00545 5.90386</translate>
@@ -146,12 +266,88 @@
 				<rotate sid="rotateY">0 1 0 0.61977</rotate>
 				<rotate sid="rotateX">1 0 0 63.55930</rotate>
 				<scale sid="scale">1.00000 1.00000 1.00000</scale>
+				<instance_camera url="#Camera-Camera_001"/>
+			</node>
+		</visual_scene>
+		<visual_scene id="Scene_001" name="Scene_001"/>
+		<visual_scene id="Scene001" name="Scene001">
+			<node layer="L1" id="Camera_001" name="Camera_001">
+				<translate sid="translate">7.48113 -6.50764 5.34367</translate>
+				<rotate sid="rotateZ">0 0 1 46.69194</rotate>
+				<rotate sid="rotateY">0 1 0 0.61977</rotate>
+				<rotate sid="rotateX">1 0 0 63.55930</rotate>
+				<scale sid="scale">1.00000 1.00000 1.00000</scale>
+				<instance_camera url="#Camera-Camera_001"/>
+			</node>
+			<node layer="L1" id="Lamp_001" name="Lamp_001">
+				<translate sid="translate">4.07625 1.00545 5.90386</translate>
+				<rotate sid="rotateZ">0 0 1 106.93632</rotate>
+				<rotate sid="rotateY">0 1 0 3.16371</rotate>
+				<rotate sid="rotateX">1 0 0 37.26105</rotate>
+				<scale sid="scale">1.00000 1.00000 1.00000</scale>
+				<instance_light url="#Spot_001"/>
+			</node>
+			<node layer="L1" id="Cube_001-Node" name="Cube_001-Node">
+				<translate sid="translate">0.00000 0.00000 0.00000</translate>
+				<rotate sid="rotateZ">0 0 1 0.00000</rotate>
+				<rotate sid="rotateY">0 1 0 0.00000</rotate>
+				<rotate sid="rotateX">1 0 0 0.00000</rotate>
+				<scale sid="scale">1.00000 1.00000 1.00000</scale>
+				<instance_geometry url="#Cube-Geometry_001"/>
+			</node>
+		</visual_scene>
+		<visual_scene id="Scene001_001" name="Scene001_001">
+			<node layer="L1" id="BasicCube" name="BasicCube">
+				<translate sid="translate">0.00000 0.00000 0.00000</translate>
+				<rotate sid="rotateZ">0 0 1 0.00000</rotate>
+				<rotate sid="rotateY">0 1 0 0.00000</rotate>
+				<rotate sid="rotateX">1 0 0 0.00000</rotate>
+				<scale sid="scale">1.00000 1.00000 1.00000</scale>
+				<instance_geometry url="#Cube-Geometry">
+					<bind_material>
+						<technique_common>
+							<instance_material symbol="BasicTextureMaterial" target="#BasicTextureMaterial">
+								<bind_vertex_input input_semantic="TEXCOORD" input_set="1" semantic="CHANNEL1"/>
+							</instance_material>
+						</technique_common>
+					</bind_material>
+				</instance_geometry>
+			</node>
+			<node layer="L1" id="Lamp_001" name="Lamp_001">
+				<translate sid="translate">4.07625 1.00545 5.90386</translate>
+				<rotate sid="rotateZ">0 0 1 106.93632</rotate>
+				<rotate sid="rotateY">0 1 0 3.16371</rotate>
+				<rotate sid="rotateX">1 0 0 37.26105</rotate>
+				<scale sid="scale">1.00000 1.00000 1.00000</scale>
+				<instance_light url="#Spot_001"/>
+			</node>
+			<node layer="L1" id="Camera_001" name="Camera_001">
+				<translate sid="translate">7.48113 -6.50764 5.34367</translate>
+				<rotate sid="rotateZ">0 0 1 46.69194</rotate>
+				<rotate sid="rotateY">0 1 0 0.61977</rotate>
+				<rotate sid="rotateX">1 0 0 63.55930</rotate>
+				<scale sid="scale">1.00000 1.00000 1.00000</scale>
 				<instance_camera url="#Camera-Camera"/>
 			</node>
 		</visual_scene>
+		<visual_scene id="Scene_001" name="Scene_001"/>
 	</library_visual_scenes>
 	<library_physics_materials>
 		<physics_material id="Cube-PhysicsMaterial" name="Cube-PhysicsMaterial">
+			<technique_common>
+				<dynamic_friction>0</dynamic_friction>
+				<restitution>0</restitution>
+				<static_friction>0</static_friction>
+			</technique_common>
+		</physics_material>
+		<physics_material id="Cube_001-Node-PhysicsMaterial" name="Cube_001-Node-PhysicsMaterial">
+			<technique_common>
+				<dynamic_friction>0</dynamic_friction>
+				<restitution>0</restitution>
+				<static_friction>0</static_friction>
+			</technique_common>
+		</physics_material>
+		<physics_material id="BasicCube-PhysicsMaterial" name="BasicCube-PhysicsMaterial">
 			<technique_common>
 				<dynamic_friction>0</dynamic_friction>
 				<restitution>0</restitution>
@@ -167,11 +363,37 @@
 					<mass>0</mass>
 					<instance_physics_material url="#Cube-PhysicsMaterial"/>
 					<shape>
+						<instance_geometry url="#Cube_001"/>
+					</shape>
+				</technique_common>
+			</rigid_body>
+		</physics_model>
+		<physics_model id="Scene_001-PhysicsModel" name="Scene_001-PhysicsModel"/>
+		<physics_model id="Scene001-PhysicsModel" name="Scene001-PhysicsModel">
+			<rigid_body name="Cube_001-Node-RigidBody" sid="Cube_001-Node-RigidBody">
+				<technique_common>
+					<dynamic>false</dynamic>
+					<mass>0</mass>
+					<instance_physics_material url="#Cube_001-Node-PhysicsMaterial"/>
+					<shape>
+						<instance_geometry url="#Cube-Geometry_001"/>
+					</shape>
+				</technique_common>
+			</rigid_body>
+		</physics_model>
+		<physics_model id="Scene001_001-PhysicsModel" name="Scene001_001-PhysicsModel">
+			<rigid_body name="BasicCube-RigidBody" sid="BasicCube-RigidBody">
+				<technique_common>
+					<dynamic>false</dynamic>
+					<mass>0</mass>
+					<instance_physics_material url="#BasicCube-PhysicsMaterial"/>
+					<shape>
 						<instance_geometry url="#Cube-Geometry"/>
 					</shape>
 				</technique_common>
 			</rigid_body>
 		</physics_model>
+		<physics_model id="Scene_001-PhysicsModel" name="Scene_001-PhysicsModel"/>
 	</library_physics_models>
 	<library_physics_scenes>
 		<physics_scene id="Scene-Physics" name="Scene-Physics">
@@ -179,9 +401,25 @@
 				<instance_rigid_body body="Cube-RigidBody" target="#Cube"/>
 			</instance_physics_model>
 		</physics_scene>
+		<physics_scene id="Scene_001-Physics" name="Scene_001-Physics">
+			<instance_physics_model url="#Scene_001-PhysicsModel"/>
+		</physics_scene>
+		<physics_scene id="Scene001-Physics" name="Scene001-Physics">
+			<instance_physics_model url="#Scene001-PhysicsModel">
+				<instance_rigid_body body="Cube_001-Node-RigidBody" target="#Cube_001-Node"/>
+			</instance_physics_model>
+		</physics_scene>
+		<physics_scene id="Scene001_001-Physics" name="Scene001_001-Physics">
+			<instance_physics_model url="#Scene001_001-PhysicsModel">
+				<instance_rigid_body body="BasicCube-RigidBody" target="#BasicCube"/>
+			</instance_physics_model>
+		</physics_scene>
+		<physics_scene id="Scene_001-Physics" name="Scene_001-Physics">
+			<instance_physics_model url="#Scene_001-PhysicsModel"/>
+		</physics_scene>
 	</library_physics_scenes>
 	<scene>
-		<instance_physics_scene url="#Scene-Physics"/>
-		<instance_visual_scene url="#Scene"/>
+		<instance_physics_scene url="#Scene001_001-Physics"/>
+		<instance_visual_scene url="#Scene001_001"/>
 	</scene>
 </COLLADA>

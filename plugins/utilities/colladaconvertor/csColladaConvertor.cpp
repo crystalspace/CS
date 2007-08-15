@@ -289,7 +289,7 @@ csColladaMaterial* csColladaConvertor::FindMaterial(const char* accessorString)
 		
 		if (warningsOn)
 		{
-			Report(CS_REPORTER_SEVERITY_WARNING, "Done.");
+			Report(CS_REPORTER_SEVERITY_WARNING, "Done. Accessor string: %s", accessConverted.GetData());
 		}
 
 		if (currentMat->GetID().Compare(accessConverted.GetData()))
@@ -464,6 +464,26 @@ const char*	csColladaConvertor::Convert()
 		Report(CS_REPORTER_SEVERITY_WARNING, "Done converting geometry");
 	}
 
+	if (outputFileType == CS_MAP_FILE)
+	{
+		csRef<iDocumentNode> camerasNode, lightsNode, visualScenesNode;
+		camerasNode = colladaElement->GetNode("library_cameras");
+		lightsNode = colladaElement->GetNode("library_lights");
+		visualScenesNode = colladaElement->GetNode("library_visual_scenes");
+
+		if (warningsOn)
+		{
+			Report(CS_REPORTER_SEVERITY_WARNING, "Beginning to convert scene data");
+		}
+		
+		ConvertScene(camerasNode, lightsNode, visualScenesNode);
+
+		if (warningsOn)
+		{
+			Report(CS_REPORTER_SEVERITY_WARNING, "Done converting scene data");
+		}
+	}
+
 	return 0;
 }
 
@@ -492,10 +512,6 @@ bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
 	csRef<iDocumentNode> currentMeshElement;
 	csRef<iDocumentNode> currentVerticesElement;
 	csRef<iDocumentNodeIterator> convexMeshIterator;
-	csArray<csVector3> vertexArray;
-	csArray<csVector3> normalArray;
-	int vertexArraySize = 0;
-	int normalArraySize = 0;
 	csColladaMesh *mesh;
 
 	// while the iterator is not empty
@@ -562,160 +578,7 @@ bool csColladaConvertor::ConvertGeometry(iDocumentNode *geometrySection)
 			
 			mesh = new csColladaMesh(currentMeshElement, this);
 
-			// Adding vertices to CS document
-			vertexArray = mesh->GetVertices();
-			normalArray = mesh->GetNormals();
-						
-			vertexArraySize = mesh->GetNumberOfVertices();
-			normalArraySize = mesh->GetNumberOfNormals();
-
-			if (warningsOn && vertexArraySize > 0)
-			{
-				Report(CS_REPORTER_SEVERITY_NOTIFY, "Array acquired.  id: %s", mesh->GetPositionID().GetData());
-			}
-			else if (warningsOn && vertexArraySize <= 0)
-			{
-				Report(CS_REPORTER_SEVERITY_WARNING, "Unable to acquire array.  Array size: %d", vertexArraySize);
-				return false;
-			}
-			
-			// now that we have the vertex array, we need to add it to the
-			// crystal space document.
-			if (!csTopNode.IsValid() && warningsOn)
-			{
-				Report(CS_REPORTER_SEVERITY_ERROR, "Unable to acquire top-level node!");
-				return false;
-			}
-			
-			csRef<iDocumentNode> sourceElement = GetSourceElement(mesh->GetPositionID().GetData(), currentMeshElement);
-			if (sourceElement == 0)
-			{
-				Report(CS_REPORTER_SEVERITY_ERROR, "Unable to acquire source element with id: %s", mesh->GetPositionID().GetData());
-				return false;
-			}
-		
-			// create meshfact and plugin (top-level) nodes
-			csRef<iDocumentNode> meshFactNode = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-			meshFactNode->SetValue("meshfact");
-			meshFactNode->SetAttribute("name", mesh->GetName().GetData());
-			csRef<iDocumentNode> pluginNode = meshFactNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-			pluginNode->SetValue("plugin");
-			csRef<iDocumentNode> pluginContents = pluginNode->CreateNodeBefore(CS_NODE_TEXT, 0);
-			pluginContents->SetValue(mesh->GetPluginType().GetData());
-
-			if (warningsOn)
-			{
-				Report(CS_REPORTER_SEVERITY_NOTIFY, "MeshFact element created.  Creating params element");
-			}
-
-			// create the sub params element
-			csRef<iDocumentNode> currentCrystalParamsElement = 
-								meshFactNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-			currentCrystalParamsElement->SetValue("params");
-
-			// output the materials
-			csRef<iDocumentNode> materialNode = currentCrystalParamsElement->CreateNodeBefore(CS_NODE_ELEMENT);
-			materialNode->SetValue("material");
-			csRef<iDocumentNode> materialContents = materialNode->CreateNodeBefore(CS_NODE_TEXT);
-			materialContents->SetValue(mesh->GetMaterialPointer()->GetID());
-
-			int counter = 0;
-			csRef<iDocumentNode> currentCrystalVElement;
-
-			//int accessorArraySize = 0;
-			csColladaAccessor *vertAccess = mesh->GetVertexAccessor();
-			csColladaAccessor *normAccess = mesh->GetNormalAccessor();
-
-			while (counter < vertexArraySize)
-			{
-				if (warningsOn)
-				{
-					Report(CS_REPORTER_SEVERITY_NOTIFY, "Current values: counter = %d, vertexArraySize = %d", counter, vertexArraySize);
-					Report(CS_REPORTER_SEVERITY_NOTIFY, "Adding the following vertex: %f, %f, %f", vertexArray[counter].x, vertexArray[counter].y, vertexArray[counter].z);
-				}
-			
-				/// @todo: Add normal information here.
-				/* WRITE OUT VERTICES */
-				scfString formatter;
-				currentCrystalVElement = currentCrystalParamsElement->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-				currentCrystalVElement->SetValue("v");
-				formatter.Format("%f", vertexArray[counter].x);
-				currentCrystalVElement->SetAttribute(vertAccess->Get(0), formatter.GetData());
-				formatter.Format("%f", vertexArray[counter].y);
-				currentCrystalVElement->SetAttribute(vertAccess->Get(1), formatter.GetData());
-				formatter.Format("%f", vertexArray[counter].z);
-				currentCrystalVElement->SetAttribute(vertAccess->Get(2), formatter.GetData());
-				
-				/* Actually, this isn't going to work quite as I expected, due to the 
-				 * fact that we need an index into the normal array.
-
-				formatter.Format("%f", normalArray[counter].x);
-				currentCrystalVElement->SetAttribute("nx", formatter.GetData());
-				formatter.Format("%f", normalArray[counter].y);
-				currentCrystalVElement->SetAttribute("nx", formatter.GetData());
-				formatter.Format("%f", normalArray[counter].z);
-				currentCrystalVElement->SetAttribute("nx", formatter.GetData());
-
-				*/
-
-				/* DONE WRITING OUT VERTICES */
-
-				counter++;
-			}
-
-			if (warningsOn)
-			{
-				Report(CS_REPORTER_SEVERITY_NOTIFY, "Done adding vertices.");
-			}
-
-			// now, output the triangles
-			csTriangleMesh* currentTriMesh = mesh->GetTriangleMesh();
-			
-			size_t triCount = currentTriMesh->GetTriangleCount();
-			csTriangle* tris = currentTriMesh->GetTriangles();
-			size_t triCounter = 0;
-			csTriangle* currentTri;
-
-			while (triCounter < triCount)
-			{
-				currentTri = &tris[triCounter];
-
-				// create a t element
-				csRef<iDocumentNode> currentTElement = currentCrystalParamsElement->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-				
-				if (!currentTElement.IsValid())
-				{
-					if (warningsOn)
-					{
-						Report(CS_REPORTER_SEVERITY_NOTIFY, "Unable to add triangle element!");
-					}
-					
-					return false;
-				}
-
-				currentTElement->SetValue("t");
-
-				// get the vertices associated with this triangle
-				currentTElement->SetAttributeAsInt("v1", currentTri->a);
-				currentTElement->SetAttributeAsInt("v2", currentTri->b);
-				currentTElement->SetAttributeAsInt("v3", currentTri->c); 
-
-				triCounter++;
-			}
-			
-			if (warningsOn)
-			{
-					Report(CS_REPORTER_SEVERITY_NOTIFY, "Done adding triangles");
-					Report(CS_REPORTER_SEVERITY_NOTIFY, "Invalidating document nodes...");
-			}
-
-			meshFactNode.Invalidate();
-			currentCrystalParamsElement.Invalidate();
-
-			if (warningsOn)
-			{
-				Report(CS_REPORTER_SEVERITY_NOTIFY, "Done");
-			}
+			mesh->WriteXML(csFile);
 
 			delete mesh;
 		}
@@ -853,8 +716,10 @@ bool csColladaConvertor::ConvertMaterials(iDocumentNode *materialsSection)
 }
 
 
-bool csColladaConvertor::ConvertScene(iDocumentNode *camerasSection, iDocumentNode *lightsSection, iDocumentNode *nodesSection, iDocumentNode *visualScenesSection)
+bool csColladaConvertor::ConvertScene(iDocumentNode *camerasSection, iDocumentNode *lightsSection, iDocumentNode *visualScenesSection)
 {
+	Report(CS_REPORTER_SEVERITY_WARNING, "Warning: ConvertScene() functionality not fully implemented.  Use at your own risk!");
+
 	if (outputFileType != CS_MAP_FILE)
 	{
 		Report(CS_REPORTER_SEVERITY_WARNING, "Warning: Conversion of scenes is invalid except for Crystal Space map files.  Continuing blithely...");

@@ -36,6 +36,12 @@
 CS_PLUGIN_NAMESPACE_BEGIN (ColladaConvertor)
 {
 
+struct csColladaVertexIndex {
+	int positionIndex;
+	int normalIndex;
+	int textureIndex;
+}; /* End of struct csColladaVertexIndex */
+
 class	csColladaAccessor	{
 	private:
 		csRef<iDocumentNode> sourceElement;
@@ -61,6 +67,7 @@ class	csColladaAccessor	{
 		int GetStride() { return stride; }
 		int GetCount() { return count; }
 		int GetOffset() { return accessorOffset; }
+		void SetAccessorName(size_t x, const char* str);
 		csStringArray* GetAccessorNames() { return accessorNames; }
 		csColladaConvertor* GetParent() { return parent; }
 		csRef<iDocumentNode> GetSourceElement() { return sourceElement; }
@@ -77,14 +84,23 @@ class	csColladaMesh	{
 		csColladaConvertor* parent;
 		csArray<csVector3> vertices; // a list of vertex components (x, y, z)
 		csArray<csVector3> normals;  // a list of normal components
+		csArray<csVector2> textures; // a list of texture coordinates
+		//csArray<int> normalIndices;  // a list of indices into the normals array
+		
+		// this is actually sort of a temporary variable
+		// it's used to hold the indices for triangles, polygons, etc...
+		csArray<csColladaVertexIndex> polygonIndices;
+
 		int numberOfVertices;  // number of vertices in the mesh
 		int numVertexElements; // the number of vertex components (3* numberOfVertices)
 		csColladaAccessor* vertexAccessor; // the accessor for vertices
 		csColladaAccessor* normalAccessor; // the accessor for normals
+		csColladaAccessor* textureAccessor; // the accessor for textures
 		csString	name;  // what the polygon is actually called
 		csString positionId;    // the id of the position array
 		csString normalId;		// the id of the normal array
 		csString vertexId;		// the id of the vertices
+		csString textureId;   // the id of the texture coordinates
 		csRef<iDocumentNode> meshElement;
 		
 		// is this needed?
@@ -93,7 +109,10 @@ class	csColladaMesh	{
 		//csColladaAccessor	vAccess; // the accessor corresponding to the vertices
 		csColladaNumericType vType;
 		csString pluginType;  // the type of plugin we're using (default = genmeshfact)
-		size_t vertexOffset, normalOffset;  // the offsets of the normals and positions
+
+		// the offsets of the normals, positions, and texture coordinates
+		size_t vertexOffset, normalOffset, textureOffset;  
+		
 		csColladaMaterial* materials;	// the materials applied to the mesh object
 
 		csTriangleMesh* triangles;
@@ -126,7 +145,8 @@ class	csColladaMesh	{
 		 *                            or float) array.
 		 * @param storeIn The csArray that we want to use as a destination.
 		 */
-		void RetrieveArray(iDocumentNode* sourceElement, csColladaAccessor* accessPtr, csArray<csVector3>& storeIn); 
+		void RetrieveArray(iDocumentNode* sourceElement, csColladaAccessor* accessPtr, csArray<csVector3>& storeIn);
+		void RetrieveArray(iDocumentNode* sourceElement, csColladaAccessor* accessPtr, csArray<csVector2>& storeIn);
 
 		/** \brief Retrieves the vertex and normal information
 		 *
@@ -160,6 +180,7 @@ class	csColladaMesh	{
 
 		const csArray<csVector3>& GetVertices() { return vertices; }
 		const csArray<csVector3>& GetNormals() { return normals; }
+		// const csArray<int>& GetNormalIndices() { return normalIndices; }
 		int GetNumVertexElements() { return numVertexElements; }
 		int GetNumberOfVertices() { return numberOfVertices; }
 		int GetNumberOfNormals() { return (int)normals.GetSize(); }
@@ -168,12 +189,16 @@ class	csColladaMesh	{
 		csString GetName() { return name; }
 		csString GetPositionID() { return positionId; }
 		csString GetPluginType() { return pluginType; }
+		void AddVertex(const csVector3& v);
+		csVector3& GetVertexAt(const int i) { return vertices[i]; }
 		int GetNumInputElements(iDocumentNode* element);
 		csTriangleMesh* GetTriangleMesh() { return triangles; } 
 		csRef<iDocumentNode> GetMeshElement() { return meshElement; }
 
 		csColladaAccessor* GetVertexAccessor() { return vertexAccessor; }
 		csColladaAccessor* GetNormalAccessor() { return normalAccessor; }
+
+		bool WriteXML(iDocument* xmlDoc);
 
 		/** \brief Process a COLLADA mesh node and construct a csColladaMesh object
 		 *
@@ -201,14 +226,39 @@ class	csColladaMesh	{
 		const csArray<csVector3>& Process(iDocumentNode* element);
 
 	private:
-		/** @todo Make sure these will work for an arbitrary number of
-		 *        <p> elements.
-		 */       
+
 		void ProcessTriangles(iDocumentNode* trianglesElement);
 		void ProcessTriStrips(iDocumentNode* tristripsElement);
 		void ProcessTriFans(iDocumentNode* trifansElement);
 		void ProcessPolygons(iDocumentNode* polygonsElement);
 		void ProcessPolyList(iDocumentNode* polylistElement);
+
+		/** @brief Restructure the vertices array
+		 * 
+		 * This function traverses through the vertex indices of the polygon, and 
+		 * creates duplicate vertices for those vertices which have a different 
+		 * normal or texture coordinates.  
+		 *
+		 * The reason this even has to be done is because of the way COLLADA files
+		 * differ from Crystal Space files.  In Crystal Space files, normal and 
+		 * texture information is local to a vertex, (that is, a <v> element).
+		 * In COLLADA files, the position, normal, and texture information are
+		 * all independant.  Normal, position, and texture information are 
+		 * combined when a polygon is declared.  Thus, a single position could
+		 * have multiple normals, depending on how the polygon is declared.  
+		 * In order to simplify this conversion, this system treats vertices as
+		 * independant if one of: position, normal, or texture coordinates are
+		 * different.
+		 *
+		 * @notes This function is designed to be called ONLY from one of the
+		 *        following:
+		 *        - ProcessTriangles(iDocumentNode* trianglesElement)
+		 *        - ProcessTriStrips(iDocumentNode* tristripsElement)
+		 *        - ProcessTriFans(iDocumentNode* trifansElement)
+		 *        - ProcessPolygons(iDocumentNode* polygonsElement)
+		 *        - ProcessPolyList(iDocumentNode* polylistElement)
+		 */
+		void RestructureIndices();
 
 }; /* End of class csColladaMesh */
 

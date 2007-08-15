@@ -216,7 +216,7 @@ class	csColladaConvertor : public	scfImplementation2<csColladaConvertor,iCollada
 		virtual	bool ConvertMaterials(iDocumentNode *materialsSection);
 		virtual	bool ConvertRiggingAnimation(iDocumentNode *riggingSection);
 		virtual	bool ConvertPhysics(iDocumentNode	*physicsSection);
-		virtual bool ConvertScene(iDocumentNode *camerasSection, iDocumentNode *lightsSection, iDocumentNode *nodesSection, iDocumentNode *visualScenesSection);
+		virtual bool ConvertScene(iDocumentNode *camerasSection, iDocumentNode *lightsSection, iDocumentNode *visualScenesSection);
 
 }; /* End of class csColladaConvertor */
 

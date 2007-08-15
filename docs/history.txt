@@ -6,6 +6,16 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Aug-2007
+    - jwir3 added function RestructureIndices(), which refactors the vertex
+      indices, such that two vertices are unique if they have differing position,
+      normal, or texture coordinates.
+    - jwir3 added conversion of texture and normal coordinates.
+13-Aug-2007
+    - jwir3 added a WriteXML() function to csColladaMesh, in preparation for converting
+      normals and texture coordinates.  All functionality that was previously in 
+      csColladaConvertor::ConvertGeometry() that has to do with writing out CS XML 
+      has now been transferred to this new WriteXML() function.
 9-Aug-2007
 	- jwir3 modified csColladaMesh to include arrays for both vertices
 	  and normals, as well as pointers to their corresponding csColladaAccessor

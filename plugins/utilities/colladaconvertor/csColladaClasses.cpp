@@ -132,6 +132,16 @@ bool csColladaAccessor::Process(iDocumentNode* src)
 	return 1;
 }
 
+void csColladaAccessor::SetAccessorName(size_t x, const char* str)
+{
+	if (x >= accessorNames->GetSize())
+	{
+		return;
+	}
+	
+	accessorNames->Put(x, str);
+}
+
 const char* csColladaAccessor::Get(int index)
 {
 	return accessorNames->Get(index);
@@ -191,10 +201,6 @@ csRef<iDocumentNode> csColladaMesh::FindNumericArray(const csRef<iDocumentNode>&
 	}
 }
 
-/** @todo Refactor this, so it *only* retrieves the array, but sets the 
- *       accessor accordingly.  Also, it should probably be a static 
- *       member of csColladaConvertor.
- */
 void csColladaMesh::RetrieveArray(iDocumentNode* sourceElement, csColladaAccessor* accessPtr, csArray<csVector3>& toStore)
 {
 	csRef<iDocumentNode> numericArrayElement = FindNumericArray(sourceElement);
@@ -248,9 +254,6 @@ void csColladaMesh::RetrieveArray(iDocumentNode* sourceElement, csColladaAccesso
 			}
 		}
 
-		// this might need to be made a little more general,
-		// but that can wait, since we're only using it for
-		// csVector3's for right now
 		csVector3 t;
 		t.x = temp[0];
 		t.y = temp[1];
@@ -262,12 +265,80 @@ void csColladaMesh::RetrieveArray(iDocumentNode* sourceElement, csColladaAccesso
 	delete[] temp;
 }
 
+void csColladaMesh::RetrieveArray(iDocumentNode* sourceElement, csColladaAccessor* accessPtr, csArray<csVector2>& toStore)
+{
+	csRef<iDocumentNode> numericArrayElement = FindNumericArray(sourceElement);
+
+	// accessor needs to be defined outside of this method
+	//vertexAccessor = new csColladaAccessor(sourceElement, this);
+	stringstream conver;
+	int countArray = numericArrayElement->GetAttributeValueAsInt("count");
+	std::string arrayElement(numericArrayElement->GetContentsValue());
+	
+	if (parent->warningsOn)
+	{
+		// check for string correctness
+		parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Current value of array string: %s", arrayElement.c_str());
+	}
+
+	conver.str(arrayElement.c_str());
+	
+	//if (vertices != 0)
+	if (!toStore.IsEmpty())
+	{
+		toStore.Empty();
+	}
+
+	if (parent->warningsOn)
+	{
+		parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Assigning values to array...");
+	}
+
+
+	// get the number of accessor strings
+	int accessorStride = accessPtr->GetStride();
+
+	float* temp = new float[accessorStride];
+
+	int numItemsInArray = countArray/accessorStride;
+
+	if (parent->warningsOn)
+	{
+		parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "numItemsInArray: %d", numItemsInArray);
+	}
+
+	for (int i = 0; i < numItemsInArray; i++)
+	{
+		for (int j = 0; j < accessorStride; j++)
+		{
+			conver >> temp[j];
+			if (parent->warningsOn)
+			{
+				parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Value of temp[%d] is: %f", j, temp[j]);
+			}
+		}
+
+		csVector2 t;
+		t.x = temp[0];
+		t.y = temp[1];
+
+		toStore.Put(toStore.GetSize(), t);
+	}
+
+	delete[] temp;
+}
+
+
 void csColladaMesh::RetrieveInfo(iDocumentNode *element)
 {
 	// find the offset of the normals and vertices
 	csRef<iDocumentNodeIterator> inputElements = element->GetNodes("input");
 	csRef<iDocumentNode> currentInputElement;
 	int counter = 0;
+	normalOffset = 0;
+	textureOffset = 0;
+
+	bool foundN = false, foundT = false, foundP = false;
 
 	while (inputElements->HasNext())
 	{
@@ -275,14 +346,7 @@ void csColladaMesh::RetrieveInfo(iDocumentNode *element)
 		scfString semVal(currentInputElement->GetAttributeValue("semantic"));
 		if (semVal.Compare("NORMAL"))
 		{
-			/* This was only valid when normalId was a pointer
-			if (normalId != 0)
-			{
-				delete normalId;
-				normalId = 0;
-			}
-			*/
-
+			foundN = true;
 			normalId = currentInputElement->GetAttributeValue("source");
 			if (normalId.GetAt(0) == '#')
 			{
@@ -291,16 +355,21 @@ void csColladaMesh::RetrieveInfo(iDocumentNode *element)
 
 			normalOffset = counter;
 		}
+		else if (semVal.Compare("TEXCOORD"))
+		{
+			foundT = true;
+			textureId = currentInputElement->GetAttributeValue("source");
+			if (textureId.GetAt(0) == '#')
+			{
+				textureId.DeleteAt(0, 1);
+			}
+
+			textureOffset = counter;
+		}
+
 		else if (semVal.Compare("VERTEX"))
 		{
-			/* This was only valid when vertexId was a pointer
-			if (vertexId != 0)
-			{
-				delete vertexId;
-				vertexId = 0;
-			}
-			*/
-
+			foundP = true;
 			vertexId = currentInputElement->GetAttributeValue("source");
 			if (vertexId.GetAt(0) == '#')
 			{
@@ -313,9 +382,19 @@ void csColladaMesh::RetrieveInfo(iDocumentNode *element)
 		counter++;
 	}
 	
-	vertexOffset = vertexOffset * numberOfVertices;
-	normalOffset = normalOffset * numberOfVertices;
+	// no idea why this was previously set to multiply by # of verts
+	//vertexOffset = vertexOffset * numberOfVertices;
+	//normalOffset = normalOffset * numberOfVertices;
+	
+	if (!foundT)
+	{
+		textureOffset = -1;
+	}
 
+	if (!foundN)
+	{
+		normalOffset = -1;
+	}
 }
 
 int csColladaMesh::GetNumInputElements(iDocumentNode* element)
@@ -462,7 +541,7 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 		parent->ConvertMaterials(materialsNode);
 	}
 
-	/* BEGIN POLYGONS PROCESSING */
+	/* BEGIN POLYGONS PROCESSING - THIS NEEDS WORK*/
 	// test to see if we have any generic polygons
 	csRef<iDocumentNodeIterator> polygonsIterator = element->GetNodes("polygons");
 	csRef<iDocumentNode> nextPolygonsElement;
@@ -478,7 +557,7 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 	}
 	/* END POLYGONS PROCESSING */
 
-	/* BEGIN POLYLIST PROCESSING */
+	/* BEGIN POLYLIST PROCESSING - THIS NEEDS WORK */
 	csRef<iDocumentNodeIterator> polylistElements = element->GetNodes("polylist");
 	csRef<iDocumentNode> nextPolylistElement;
 	while (polylistElements->HasNext())
@@ -488,7 +567,7 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 	}
 	/* END POLYLIST PROCESSING */
 
-	/* BEGIN TRISTRIPS PROCESSING */
+	/* BEGIN TRISTRIPS PROCESSING - THIS NEEDS WORK */
 	csRef<iDocumentNodeIterator> tristripsElements = element->GetNodes("tristrips");
 	csRef<iDocumentNode> nextTristripsElement;
 	while (tristripsElements->HasNext())
@@ -498,7 +577,7 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 	}
 	/* END TRISTRIPS PROCESSING */
 
-	/* BEGIN TRIFANS PROCESSING */
+	/* BEGIN TRIFANS PROCESSING - THIS NEEDS WORK */
 	csRef<iDocumentNodeIterator> trifansElements = element->GetNodes("trifans");
 	csRef<iDocumentNode> nextTrifansElement;
 	while (trifansElements->HasNext())
@@ -528,12 +607,6 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 		parent->Report(CS_REPORTER_SEVERITY_WARNING, "Normal id: %s", normalId.GetData());
 	}
 
-	// now, we need to retrieve the normals
-	csRef<iDocumentNode> sourceNode = parent->GetSourceElement(normalId.GetData(), meshElement);
-	normalAccessor = new csColladaAccessor(sourceNode, parent);
-	csRef<iDocumentNode> numericArray = FindNumericArray(sourceNode);
-	RetrieveArray(sourceNode, normalAccessor, normals);
-	
 	if (parent->warningsOn)
 	{
 		csString appender;
@@ -547,6 +620,311 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 
 	return vertices;
 	
+	}
+
+	void csColladaMesh::RestructureIndices()
+	{
+
+		// create a new list of vertex indices
+		csArray<csColladaVertexIndex> newIndexList;
+		
+		csArray<csColladaVertexIndex>::Iterator indicesIter = polygonIndices.GetIterator();
+		
+		while (indicesIter.HasNext())
+		{
+			csColladaVertexIndex needle = indicesIter.Next();
+			
+			int positionFoundAt = -1;
+			bool foundMatch = false;
+			int counter = 0;
+
+			// search through the newIndexList for a given vertex index
+			csArray<csColladaVertexIndex>::Iterator newIndexListIter = newIndexList.GetIterator();
+
+			while (newIndexListIter.HasNext())
+			{
+				csColladaVertexIndex currentSearchComponent = newIndexListIter.Next();
+
+				if (needle.positionIndex == currentSearchComponent.positionIndex &&
+						needle.normalIndex == currentSearchComponent.normalIndex &&
+						needle.textureIndex == currentSearchComponent.textureIndex)
+				{
+					// we've found what we're looking for
+					foundMatch = true;
+					break;
+				}
+
+				else if (needle.positionIndex == currentSearchComponent.positionIndex)
+				{
+					// we've found a situation where the position index was found, but one of
+					// the other two doesn't match up
+					positionFoundAt = counter;
+				}
+
+				counter++;
+			}
+
+			// we've now searched through all of the possible situations 
+			
+			// CASE 1: we found a complete match
+			if (foundMatch)
+			{
+				/*
+				if (parent->warningsOn)
+				{
+					parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Case 1 invoked");
+				}
+				*/
+
+				// insert the needle as it is
+				newIndexList.Push(needle);
+				continue;
+			}
+			
+			// CASE 2: we found a position that matches, but one of 
+			// the other two didn't match
+			else if (positionFoundAt != -1)
+			{
+				/*
+				if (parent->warningsOn)
+				{
+					parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Case 2 invoked");
+				}
+				*/
+
+				// in this case, we need to create a new vertex
+				// but it will have the same position index as the 
+				// one we found previously
+				csVector3 position = vertices[newIndexList[positionFoundAt].positionIndex];
+				int positionOfNewVertex = GetNumberOfVertices();
+				AddVertex(position);
+				needle.positionIndex = positionOfNewVertex;
+				newIndexList.Push(needle);
+			}
+
+			// CASE 3: we didn't find anything that matched
+			else
+			{
+				/*
+				if (parent->warningsOn)
+				{
+					parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Case 3 invoked");
+				}
+				*/
+
+				// in this case, just re-insert it into the list, as
+				// it's a new value
+				newIndexList.Push(needle);
+			}
+		}
+
+		// now, make sure that indices reflects our changes
+		polygonIndices.Empty();
+
+		for (int i = 0; i < (int)newIndexList.GetSize(); i++)
+		{
+			polygonIndices.Push(newIndexList[i]);
+		}
+	
+	}
+
+	void csColladaMesh::AddVertex(const csVector3& v)
+	{
+		vertices.Push(v);
+		numberOfVertices++;
+	}
+
+	bool csColladaMesh::WriteXML(iDocument* xmlDoc)
+	{ 
+		if (parent->warningsOn)
+		{
+			parent->Report(CS_REPORTER_SEVERITY_WARNING, "Inside WriteXML()");
+		}
+
+		csArray<csVector3> vertexArray;
+		csArray<csVector3> normalArray;
+		int vertexArraySize = 0;
+		int normalArraySize = 0;
+
+		csRef<iDocumentNode> csTopNode = xmlDoc->GetRoot();
+
+		// Adding vertices to CS document
+		vertexArray = GetVertices();
+		normalArray = GetNormals();
+					
+		vertexArraySize = GetNumberOfVertices();
+		normalArraySize = GetNumberOfNormals();
+
+		if (parent->warningsOn && vertexArraySize > 0)
+		{
+			parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Array acquired.  id: %s", GetPositionID().GetData());
+		}
+		else if (parent->warningsOn && vertexArraySize <= 0)
+		{
+			parent->Report(CS_REPORTER_SEVERITY_WARNING, "Unable to acquire array.  Array size: %d", vertexArraySize);
+			return false;
+		}
+		
+		// now that we have the vertex array, we need to add it to the
+		// crystal space document.
+		if (!csTopNode.IsValid() && parent->warningsOn)
+		{
+			parent->Report(CS_REPORTER_SEVERITY_ERROR, "Unable to acquire top-level node!");
+			return false;
+		}
+		
+		csRef<iDocumentNode> sourceElement = parent->GetSourceElement(GetPositionID().GetData(), meshElement);
+		if (sourceElement == 0)
+		{
+			parent->Report(CS_REPORTER_SEVERITY_ERROR, "Unable to acquire source element with id: %s", GetPositionID().GetData());
+			return false;
+		}
+
+		// create meshfact and plugin (top-level) nodes
+		csRef<iDocumentNode> meshFactNode = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+		meshFactNode->SetValue("meshfact");
+		meshFactNode->SetAttribute("name", GetName().GetData());
+		csRef<iDocumentNode> pluginNode = meshFactNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+		pluginNode->SetValue("plugin");
+		csRef<iDocumentNode> pluginContents = pluginNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+		pluginContents->SetValue(GetPluginType().GetData());
+
+		if (parent->warningsOn)
+		{
+			parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "MeshFact element created.  Creating params element");
+		}
+
+		// create the sub params element
+		csRef<iDocumentNode> currentCrystalParamsElement = 
+							meshFactNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+		currentCrystalParamsElement->SetValue("params");
+
+		// output the materials
+		if (materials != 0)
+		{
+			csRef<iDocumentNode> materialNode = currentCrystalParamsElement->CreateNodeBefore(CS_NODE_ELEMENT);
+			materialNode->SetValue("material");
+			csRef<iDocumentNode> materialContents = materialNode->CreateNodeBefore(CS_NODE_TEXT);
+			materialContents->SetValue(GetMaterialPointer()->GetID());
+		}
+
+		int counter = 0;
+		csRef<iDocumentNode> currentCrystalVElement;
+
+		//int accessorArraySize = 0;
+		csColladaAccessor *vertAccess = GetVertexAccessor();
+		csColladaAccessor *normAccess = GetNormalAccessor();
+		//csArray<int> normalInds = GetNormalIndices();
+
+		while (counter < vertexArraySize)
+		{
+			if (parent->warningsOn)
+			{
+				parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Current values: counter = %d, vertexArraySize = %d", counter, vertexArraySize);
+				parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Adding the following vertex: %f, %f, %f", vertexArray[counter].x, vertexArray[counter].y, vertexArray[counter].z);
+			}
+		
+			/// @todo: Add normal information here.
+			/* WRITE OUT VERTICES */
+			scfString formatter;
+			currentCrystalVElement = currentCrystalParamsElement->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+			currentCrystalVElement->SetValue("v");
+			formatter.Format("%f", vertexArray[counter].x);
+			currentCrystalVElement->SetAttribute(vertAccess->Get(0), formatter.GetData());
+			formatter.Format("%f", vertexArray[counter].y);
+			currentCrystalVElement->SetAttribute(vertAccess->Get(1), formatter.GetData());
+			formatter.Format("%f", vertexArray[counter].z);
+			currentCrystalVElement->SetAttribute(vertAccess->Get(2), formatter.GetData());
+
+			/*
+			if (parent->warningsOn)
+			{
+				parent->Report(CS_REPORTER_SEVERITY_WARNING, "Normal for vertex %d: (%f, %f, %f)", 
+																						 counter,
+																						 normalArray[normalInds[counter]].x,
+																						 normalArray[normalInds[counter]].y,
+																						 normalArray[normalInds[counter]].z);
+			}
+			*/
+
+			/* Actually, this isn't going to work quite as I expected, due, in part,
+			 * to the fact that I expected there was going to be unique normals
+			 * for a given vertex.  This isn't exactly true in the COLLADA file -
+			 * a given vertex can have multiple normals, and, I believe, that each
+			 * such vertex is treated separately.  That is, two vertices are treated
+			 * as distinct if they have either different spatial coordinates, or if
+			 * they have distinct normals.  This presents a major problem with the 
+			 * code I have thus far, and will need to be re-analyzed.
+
+			formatter.Format("%f", normalArray[counter].x);
+			currentCrystalVElement->SetAttribute("nx", formatter.GetData());
+			formatter.Format("%f", normalArray[counter].y);
+			currentCrystalVElement->SetAttribute("nx", formatter.GetData());
+			formatter.Format("%f", normalArray[counter].z);
+			currentCrystalVElement->SetAttribute("nx", formatter.GetData());
+
+			*/
+
+			/* DONE WRITING OUT VERTICES */
+
+			counter++;
+		}
+
+		if (parent->warningsOn)
+		{
+			parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Done adding vertices.");
+		}
+
+		// now, output the triangles
+		csTriangleMesh* currentTriMesh = GetTriangleMesh();
+		
+		size_t triCount = currentTriMesh->GetTriangleCount();
+		csTriangle* tris = currentTriMesh->GetTriangles();
+		size_t triCounter = 0;
+		csTriangle* currentTri;
+
+		while (triCounter < triCount)
+		{
+			currentTri = &tris[triCounter];
+
+			// create a t element
+			csRef<iDocumentNode> currentTElement = currentCrystalParamsElement->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+			
+			if (!currentTElement.IsValid())
+			{
+				if (parent->warningsOn)
+				{
+					parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Unable to add triangle element!");
+				}
+				
+				return false;
+			}
+
+			currentTElement->SetValue("t");
+
+			// get the vertices associated with this triangle
+			currentTElement->SetAttributeAsInt("v1", currentTri->a);
+			currentTElement->SetAttributeAsInt("v2", currentTri->b);
+			currentTElement->SetAttributeAsInt("v3", currentTri->c); 
+
+			triCounter++;
+		}
+		
+		if (parent->warningsOn)
+		{
+				parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Done adding triangles");
+				parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Invalidating document nodes...");
+		}
+
+		meshFactNode.Invalidate();
+		currentCrystalParamsElement.Invalidate();
+
+		if (parent->warningsOn)
+		{
+			parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Done");
+		}
+
+		return true;
 	}
 
 	void csColladaMesh::ProcessTriFans(iDocumentNode* trifansElement)
@@ -804,17 +1182,24 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 		csRef<iDocumentNode> nextPElement;
 		csRef<iDocumentNodeIterator> pElementIterator = trianglesElement->GetNodes("p");
 
+		if (parent->warningsOn)
+		{
+			parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Initiating processing of triangles");
+		}
+
 		// get number of triangles in the mesh
 		int numTris = trianglesElement->GetAttributeValueAsInt("count");
 	
 		csString mat = trianglesElement->GetAttributeValue("material");
 		
-		// there is a bug here causing a debug assertion failure
-		materials = parent->FindMaterial(mat);
-
-		if (parent->warningsOn)
+		if (!mat.IsEmpty())
 		{
-			parent->Report(CS_REPORTER_SEVERITY_WARNING, "Materials parameter successfully set.");
+			materials = parent->FindMaterial(mat);
+
+			if (parent->warningsOn)
+			{
+				parent->Report(CS_REPORTER_SEVERITY_WARNING, "Materials parameter successfully set.");
+			}
 		}
 
 		//delete mat;
@@ -841,7 +1226,7 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 
 			if (parent->warningsOn)
 			{
-				parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Vertex offset is: %d, Normal offset is: %d", vertexOffset, normalOffset);
+				parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Vertex offset is: %d, Normal offset is: %d, Texture offset is: %d", vertexOffset, normalOffset, textureOffset);
 			}
 
 			stringstream vertexConvertor(nextPElement->GetContentsValue());
@@ -850,24 +1235,119 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 			
 			int counter = GetNumInputElements(trianglesElement);
 
+			// linearlist previously held the vertex indexes for the triangle mesh
 			int *linearList = new int[numTris * counter*3];
+			
 			for (int x = 0; x < 3*numTris*counter; x++)
 			{
 				vertexConvertor >> linearList[x];
 			}
 
+			// now, convert them to vertex indexes
+			for (int x = 0; x < 3*numTris; x++)
+			{
+				csColladaVertexIndex tempIndex;
+				tempIndex.positionIndex = linearList[counter*x+vertexOffset];
+				
+				if (normalOffset != -1)
+				{
+					tempIndex.normalIndex = linearList[counter*x+normalOffset];
+				}
+				else 
+				{
+					tempIndex.normalIndex = -1;
+				}
+
+				if (textureOffset != -1)
+				{
+					tempIndex.textureIndex = linearList[counter*x+textureOffset];
+				}
+				else
+				{
+					tempIndex.textureIndex = -1;
+				}
+
+				polygonIndices.Push(tempIndex);
+			}
+
+			delete[] linearList;
+
+			if (normalOffset != -1)
+			{
+				// now, we need to retrieve the normals (if there are normals)
+				csRef<iDocumentNode> sourceNode = parent->GetSourceElement(normalId.GetData(), meshElement);
+				normalAccessor = new csColladaAccessor(sourceNode, parent);
+				//csRef<iDocumentNode> normalsNumericArray = FindNumericArray(sourceNode);
+				RetrieveArray(sourceNode, normalAccessor, normals);
+			
+				if (parent->warningsOn)
+				{
+					parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Normal array acquired.");
+				}
+			}
+
+			// and finally, the textures (if they exist)
+			if (textureOffset != -1)
+			{
+				csRef<iDocumentNode> texSourceNode = parent->GetSourceElement(textureId.GetData(), meshElement);
+				textureAccessor = new csColladaAccessor(texSourceNode, parent);
+				//csRef<iDocumentNode> textureNumArray = FindNumericArray(texSourceNode);
+				RetrieveArray(texSourceNode, textureAccessor, textures);
+				if (parent->warningsOn)
+				{
+					parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Texture array acquired.");
+				}
+				
+				// for textures, the default accessor names are 's' and 't'
+				// which doesn't work for our purposes
+				textureAccessor->SetAccessorName(0, "u");
+				textureAccessor->SetAccessorName(1, "v");
+			}
+
+			// let's make sure RestructureVertices works...
+			if (parent->warningsOn)
+			{
+				parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Vertex index list before restructure:");
+				for (int i = 0; i < (int)polygonIndices.GetSize(); i++)
+				{
+					parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Position Index: %d, Normal Index: %d, Texture Index: %d",
+																											polygonIndices[i].positionIndex,
+																											polygonIndices[i].normalIndex,
+																											polygonIndices[i].textureIndex);
+				}
+			}
+
+			RestructureIndices();
+
+			if (parent->warningsOn)
+			{
+				parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Vertex index list after restructure:");
+				for (int i = 0; i < (int)polygonIndices.GetSize(); i++)
+				{
+					parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Position Index: %d, Normal Index: %d, Texture Index: %d",
+																											polygonIndices[i].positionIndex,
+																											polygonIndices[i].normalIndex,
+																											polygonIndices[i].textureIndex);
+				}
+			}
+
 			while (triCounter < numTris)
 			{
-				int vertex1, vertex2, vertex3;
-				vertex1 = linearList[3*triCounter*counter+vertexOffset];
-				vertex2 = linearList[3*triCounter*counter+counter+vertexOffset];
-				vertex3 = linearList[3*triCounter*counter + 2*counter + vertexOffset];
-				triangles->AddTriangle(vertex1, vertex2, vertex3);
+				csColladaVertexIndex vertex1, vertex2, vertex3;
+				vertex1 = polygonIndices[3*triCounter];
+				vertex2 = polygonIndices[3*triCounter+1];
+				vertex3 = polygonIndices[3*triCounter+2];
+				
+				triangles->AddTriangle(vertex1.positionIndex, vertex2.positionIndex, vertex3.positionIndex);
 
 				triCounter++;
 			}
 
-			delete[] linearList;
+		}
+		
+		if (parent->warningsOn)
+		{
+			parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Done processing triangles");
 		}
 	}
   // =============== Auxiliary Class: csColladaEffectProfile ===============
