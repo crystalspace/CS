@@ -1,9 +1,11 @@
 %define name     crystalspace
-%define version  1.1
-%define release  0.svn20061024.1
+%define version  1.2
+%define release  1
 %define prefix   /usr
-%define csprefix crystalspace
+%define csprefix crystalspace-%{version}
 
+# (vk) full version number is used for doc directory naming
+%define fullversion 1.2.0
 
 %{?dist: %{expand: %%define %dist 1}}
 
@@ -22,7 +24,8 @@
 # (vk) This should prevent symbol stripping.
 %define __spec_install_post /usr/lib/rpm/brp-compress || :
 # (vk) Disable RPM's external debug info package
-%define debug_package %{nil}                                                                                                         
+%define debug_package %{nil}
+
 %define with_PERL 0
 %{?_without_perl: %{expand: %%global with_PERL 0}}
 %{?_with_perl: %{expand: %%global with_PERL 1}}
@@ -32,19 +35,19 @@
 %{?_with_shared: %{expand: %%global with_SHARED 1}}
 
 Group: Development/C++
-Source: http://www.crystalspace3d.org/cvs-snapshots/bzip2/cs-current-snapshot.tar.bz2
+Source: http://www.crystalspace3d.org/downloads/release/crystalspace-src-1.2.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 URL: http://www.crystalspace3d.org/
 
 BuildRequires: zlib-devel, libpng-devel, libjpeg-devel, libmng-devel
 BuildRequires: lcms-devel, libogg-devel, libvorbis-devel, alsa-lib-devel
-BuildRequires: gcc-c++, XFree86-devel, freetype-devel, lib3ds
+BuildRequires: gcc-c++, XFree86-devel, freetype-devel, lib3ds = 1.2.0
 BuildRequires: cal3d-devel >= 0.11.0, ode-devel >= 0.6
 #BuildRequires: Cg >= 1.4, cegui-devel >= 0.4.1
 %{?_without_xorg:BuildRequires: XFree86-Mesa-libGLU}
 %{!?_without_xorg:BuildRequires: xorg-x11-Mesa-libGLU}
 
-#Requires: 
+#Requires:
 #Obsoletes:
 
 # Main rpm and .src.rpm packages
@@ -97,7 +100,7 @@ Documentation (manual and public API reference)
 for Crystal Space free 3D SDK.
 
 %prep
-%setup -n CS
+%setup -n %{name}-src-%{version}
 
 %build
 sh  configure \
@@ -133,14 +136,11 @@ for map in castle flarge partsys terrain terrainf ; \
 
 %{_sysconfdir}/%{csprefix}/*
 %exclude %{_sysconfdir}/%{csprefix}/autoexec.cfg
-%exclude %{_sysconfdir}/%{csprefix}/awstest.cfg
-%exclude %{_sysconfdir}/%{csprefix}/awstut.cfg
 %exclude %{_sysconfdir}/%{csprefix}/csdemo.cfg
 %exclude %{_sysconfdir}/%{csprefix}/g2dtest.cfg
 %exclude %{_sysconfdir}/%{csprefix}/heightmapgen.cfg
 %exclude %{_sysconfdir}/%{csprefix}/lighter.xml
-%exclude %{_sysconfdir}/%{csprefix}/partedit2.cfg
-%exclude %{_sysconfdir}/%{csprefix}/picview.cfg
+%exclude %{_sysconfdir}/%{csprefix}/lighter2.cfg
 %exclude %{_sysconfdir}/%{csprefix}/startme.cfg
 %exclude %{_sysconfdir}/%{csprefix}/walktest.cfg
 %exclude %{_sysconfdir}/%{csprefix}/waterdemo.cfg
@@ -157,9 +157,7 @@ for map in castle flarge partsys terrain terrainf ; \
 %defattr(-,root,root)
 
 %{_bindir}/*
-#%exclude %{_bindir}/awstest
-%exclude %{_bindir}/cs-config
-%exclude %{_bindir}/*.cex
+%exclude %{_bindir}/cs-config*
 %exclude %{_bindir}/ceguitest
 %exclude %{_bindir}/csdemo
 #%exclude %{_bindir}/isotest
@@ -171,22 +169,18 @@ for map in castle flarge partsys terrain terrainf ; \
 %{_sysconfdir}/%{csprefix}/autoexec.cfg
 %{_sysconfdir}/%{csprefix}/heightmapgen.cfg
 %{_sysconfdir}/%{csprefix}/lighter.xml
-%{_sysconfdir}/%{csprefix}/partedit2.cfg
-%{_sysconfdir}/%{csprefix}/picview.cfg
+%{_sysconfdir}/%{csprefix}/lighter2.cfg
 %{_sysconfdir}/%{csprefix}/walktest.cfg
 
 %files -n %{name}-demos
 %defattr(-,root,root)
 
-#%{_bindir}/awstest
 %{_bindir}/ceguitest
 %{_bindir}/csdemo
 #%{_bindir}/isotest
 #%{_bindir}/lghtngtest
 %{_bindir}/startme
 #%{_bindir}/waterdemo
-%{_sysconfdir}/%{csprefix}/awstest.cfg
-%{_sysconfdir}/%{csprefix}/awstut.cfg
 %{_sysconfdir}/%{csprefix}/csdemo.cfg
 %{_sysconfdir}/%{csprefix}/g2dtest.cfg
 %{_sysconfdir}/%{csprefix}/startme.cfg
@@ -198,23 +192,30 @@ for map in castle flarge partsys terrain terrainf ; \
 %defattr(-,root,root)
 
 %docdir docs
-%{_datadir}/doc/%{csprefix}-%{version}/*
+%{_datadir}/doc/%{name}-%{fullversion}/*
 
 %files -n %{name}-devel
 %defattr(-,root,root)
 
-%{_bindir}/cs-config
+%{_bindir}/cs-config*
 %if %{with_SHARED}
 %else
 %{_libdir}/*.a
 %endif
 # (vk) Scripting related files are here for now
-%{_bindir}/*.cex
 %{_datadir}/%{csprefix}/bindings/*
 %{_datadir}/%{csprefix}/build/*
 %{_includedir}/%{csprefix}/*
 
 %changelog
+* Thu Aug 16 2007 Vincent Knecht <vknecht@users.sourceforge.net> 1.2-1
+- Updated for 1.2 release.
+- Added 'fullversion' variable for doc directory naming.
+
+* Sat Jul 21 2007 Vincent Knecht <vknecht@users.sourceforge.net> 1.1-0.svn20070721.1
+- Updated for AWS stuff removal and lighter2 addition.
+- Updated for multiple install support (versioned directories and cs-config).
+
 * Tue Oct 24 2006 Vincent Knecht <vknecht@users.sourceforge.net> 1.1-0.svn20061024.1
 - Updated for SVN and new trunk version number.
 - Disabled stripping even in optimize mode, it erases .crystalspace section.
