@@ -50,6 +50,7 @@ namespace lighter
     IndexType elementIndexType;
     size_t elementChunkID;
     size_t areasChunkID;
+    size_t fractionalLength;
     
     void Finalize (const TempElementAreas&);
   public:

@@ -216,28 +216,28 @@ namespace lighter
 	  case idxUI8:
 	    {
 	      index = *std::lower_bound ((uint8*)indices, 
-	       (uint8*)indices + elementCount,
+	       (uint8*)indices + fractionalLength,
 	       uint8 (element));
 	    }
 	    break;
 	  case idxUI16:
 	    {
 	      index = *std::lower_bound ((uint16*)indices, 
-	       (uint16*)indices + elementCount,
+	       (uint16*)indices + fractionalLength,
 	       uint16 (element));
 	    }
 	    break;
 	  case idxUI32:
 	    {
 	      index = *std::lower_bound ((uint32*)indices, 
-	       (uint32*)indices + elementCount,
+	       (uint32*)indices + fractionalLength,
 	       uint32 (element));
 	    }
 	    break;
 	  case idxSizeT:
 	    {
 	      index = *std::lower_bound ((size_t*)indices, 
-	       (size_t*)indices + elementCount,
+	       (size_t*)indices + fractionalLength,
 	       size_t (element));
 	    }
 	    break;
@@ -255,6 +255,7 @@ namespace lighter
     fullArea = tmp.fullArea;
     elementCount = tmp.elementCount;
     elementsBits = tmp.elementsBits;
+    fractionalLength = tmp.fractionalElements.GetSize ();
     if (elementCount <= (uint8)~0)
     {
       elementIndexType = idxUI8;
