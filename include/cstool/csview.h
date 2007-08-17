@@ -28,7 +28,9 @@
 
 #include "csutil/ref.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/set.h"
 #include "igeom/clip2d.h"
+#include "iengine/mesh.h"
 #include "ivaria/view.h"
 
 class csBox2;
@@ -65,6 +67,9 @@ private:
   /// State of the automatic resizing
   bool AutoResize;
 
+  FilterMode meshFilterMode;
+  // FIXME: csRef<> prolly not a good idea
+  csSet<csRef<iMeshWrapper> > filteredMeshes;
 public:
   /// Constructor.
   csView (iEngine *iEngine, iGraphics3D* ig3d);
@@ -104,6 +109,24 @@ public:
   virtual iClipper2D* GetClipper ();
   /// Draw 3D world as seen from the camera.
   virtual void Draw (iMeshWrapper* mesh = 0);
+
+
+  virtual void SetMeshFilterModer (FilterMode mode)
+  { meshFilterMode = mode; }
+  virtual FilterMode SetMeshFilterModer ()
+  { return meshFilterMode; }
+
+  virtual void AddFilterMesh (iMeshWrapper* mesh)
+  {
+    filteredMeshes.Add (mesh);
+  }
+  virtual void RemoveFilterMesh (iMeshWrapper* mesh)
+  {
+    filteredMeshes.Delete (mesh);
+  }
+
+  virtual void FilterMeshes (iMeshWrapper** inMeshes, size_t meshNum,
+    iMeshWrapper** outMeshes, size_t& outNum);
 };
 
 #endif // __CS_CSVIEW_H__
