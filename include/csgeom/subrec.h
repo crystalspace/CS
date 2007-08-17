@@ -181,6 +181,12 @@ public:
   virtual void Clear ();
 
   /**
+   * Returns whether the allocator is empty (ie no rectangles have been 
+   * allocated at all or all allocated rectangles have been reclaimed).
+   */
+  bool IsEmpty() const { return root->IsReclaimed(); }
+
+  /**
    * Allocate a new rectangle. Returns 0 if there is no room
    */
   virtual SubRect* Alloc (int w, int h, csRect& rect);

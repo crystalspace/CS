@@ -361,7 +361,7 @@ namespace lighter
       // Cut into elements
       csPlane3 euCut = uCut;
       csVector3 euOrigin = uCutOrigin;
-      for (uint u = 0; u < uc; u++)
+    for (uint u = 0; u < uc; u++)
       {
         //if (elRow.GetVertexCount () == 0) break; //no idea to try to clip it
         euOrigin += uFormVector;
