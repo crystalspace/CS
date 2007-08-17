@@ -23,6 +23,7 @@ chronological order.
 	  environment.
 	- res added a weaver-based shader that reflects the environment.
 	- res made the "reflect" shader use the new environment texture.
+	- res updated walktest to use the render manager.
 15-Aug-2007
 	- res made CS::RenderManager::RenderView dllexported.
 	- res fixed an uninitialized struct member in glshader_fixed.
