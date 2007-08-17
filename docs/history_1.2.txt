@@ -2,6 +2,7 @@
 
 17-Aug-2007
 	- Vincent updated CS/scripts/rpm/cs.spec for 1.2 release.
+	- Jorrit merged r27446 into 1.2 (genmesh/decal fix).
 8-Aug-2007
 	- res merged r27373 into 1.2 (new cs-win32libs version).
 	- res merged r27392 into 1.2 (csconout fix).
