@@ -1403,21 +1403,50 @@ bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
 void csGenmeshMeshObject::BuildDecal(const csVector3* pos, float decalRadius,
           iDecalBuilder* decalBuilder)
 {
-  size_t a;
-  size_t triCount = factory->GetTriangleCount();
-  csTriangle* tris = factory->GetTriangles();
-  csVector3* vertices = factory->GetVertices();
+  UpdateSubMeshProxies ();
+  SubMeshProxiesContainer& sm = subMeshes;
+
   csPoly3D poly;
   poly.SetVertexCount(3);
-  
-  for (a=0; a<triCount; ++a)
-  {
-    poly[0] = vertices[tris[a].a];
-    poly[1] = vertices[tris[a].b];
-    poly[2] = vertices[tris[a].c];
+  csVector3* vertices = factory->GetVertices();
 
-    if (poly.InSphere(*pos, decalRadius))
+  if (sm.GetSize() == 0)
+  {
+    size_t a;
+    size_t triCount = factory->GetTriangleCount();
+    csTriangle* tris = factory->GetTriangles();
+    
+    for (a=0; a<triCount; ++a)
+    {
+      poly[0] = vertices[tris[a].a];
+      poly[1] = vertices[tris[a].b];
+      poly[2] = vertices[tris[a].c];
+
+      if (poly.InSphere(*pos, decalRadius))
         decalBuilder->AddStaticPoly(poly);
+    }
+  }
+  else
+  {
+    for (size_t s = 0; s < sm.GetSize(); s++)
+    {
+      iRenderBuffer* indexBuffer = sm[s]->GetIndices();
+      csRenderBufferLock<uint> indices (indexBuffer, CS_BUF_LOCK_READ);
+      size_t n = indexBuffer->GetElementCount();
+      size_t idx = 0;
+      while (n > 0)
+      {
+        poly[0] = vertices[indices.Get (idx)];
+        poly[1] = vertices[indices.Get (idx+1)];
+        poly[2] = vertices[indices.Get (idx+2)];
+
+        if (poly.InSphere(*pos, decalRadius))
+          decalBuilder->AddStaticPoly(poly);
+
+        n -= 3;
+        idx += 3;
+      }
+    }
   }
 }
 
@@ -2221,49 +2250,12 @@ void csGenmeshMeshObjectFactory::GenerateSphere (const csEllipsoid& ellips,
   Invalidate();
 }
 
-//void csGenmeshMeshObjectFactory::GeneratePlane (const csPlane3& plane)
-//{
-//
-//}
 void csGenmeshMeshObjectFactory::GenerateBox (const csBox3& box)
 {
   csPrimitives::GenerateBox (box, mesh_vertices, mesh_texels,
       mesh_normals, mesh_triangles);
   mesh_colors.DeleteAll();
   Invalidate();
-
-#if 0
-  SetVertexCount (8);
-  SetTriangleCount (12);
-  int i;
-  csVector3* v = GetVertices ();
-  csVector2* uv = GetTexels ();
-  for (i = 0 ; i < 8 ; i++)
-  {
-    v[i].Set (box.GetCorner (7-i));
-  }
-  uv[0].Set (0, 0);
-  uv[1].Set (1, 0);
-  uv[2].Set (0, 1);
-  uv[3].Set (1, 1);
-  uv[4].Set (1, 1);
-  uv[5].Set (0, 0);
-  uv[6].Set (0, 0);
-  uv[7].Set (0, 1);
-  csTriangle* triangles = GetTriangles ();
-  triangles[0].a = 0; triangles[0].b = 2; triangles[0].c = 3;
-  triangles[1].a = 0; triangles[1].b = 3; triangles[1].c = 1;
-  triangles[2].a = 1; triangles[2].b = 3; triangles[2].c = 7;
-  triangles[3].a = 1; triangles[3].b = 7; triangles[3].c = 5;
-  triangles[4].a = 7; triangles[4].b = 4; triangles[4].c = 5;
-  triangles[5].a = 7; triangles[5].b = 6; triangles[5].c = 4;
-  triangles[6].a = 6; triangles[6].b = 0; triangles[6].c = 4;
-  triangles[7].a = 6; triangles[7].b = 2; triangles[7].c = 0;
-  triangles[8].a = 6; triangles[8].b = 7; triangles[8].c = 3;
-  triangles[9].a = 6; triangles[9].b = 3; triangles[9].c = 2;
-  triangles[10].a = 0; triangles[10].b = 1; triangles[10].c = 4;
-  triangles[11].a = 1; triangles[11].b = 5; triangles[11].c = 4;
-#endif
 }
 
 bool csGenmeshMeshObjectFactory::AddRenderBuffer (const char *name,
