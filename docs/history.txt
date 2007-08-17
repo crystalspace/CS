@@ -8,6 +8,7 @@ chronological order.
 
 17-Aug-2007
 	- res augmented iView to support mesh filtering.
+	- res fixed cubemap support in the gl3d fbo render-to-texture path.
 15-Aug-2007
 	- res made CS::RenderManager::RenderView dllexported.
 	- res fixed an uninitialized struct member in glshader_fixed.

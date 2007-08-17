@@ -37,10 +37,11 @@ class csGLRender2TextureEXTfbo : public csGLRender2TextureFramebuf
   public:
     GLuint framebuffer, depthRB, stencilRB;
     iTextureHandle* txthandle;
+    int subtex;
     uint lastUsedFrame;
 
     FBOWrapper (csGLExtensionManager* ext) : ext (ext), framebuffer (0), depthRB (0), 
-      stencilRB (0), txthandle (0) { }
+      stencilRB (0), txthandle (0), subtex (0) { }
     FBOWrapper (const FBOWrapper& other) : ext (other.ext), framebuffer (0), 
       depthRB (0), stencilRB (0), txthandle (0)
     {

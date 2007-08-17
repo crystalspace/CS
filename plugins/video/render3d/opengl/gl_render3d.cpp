@@ -989,6 +989,7 @@ bool csGLGraphics3D::Open ()
   string_point_scale = strings->Request ("point scale");
   string_texture_diffuse = strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
   string_world2camera = strings->Request ("world2camera transform");
+  shadermgr->GetVariableAdd (string_world2camera);
 
   /* @@@ All those default textures, better put them into the engine? */
 

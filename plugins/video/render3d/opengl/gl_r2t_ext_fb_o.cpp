@@ -306,16 +306,39 @@ void csGLRender2TextureEXTfbo::SetRenderTarget (iTextureHandle* handle,
 
       FBOWrapper& fbo = GetFBO (txt_w, txt_h);
 
-      if (fbo.txthandle != handle)
+      if ((fbo.txthandle != handle) || (fbo.subtex != subtexture))
       {
         fbo.txthandle = handle;
+        fbo.subtex = subtexture;
 
         //glReadBuffer (GL_NONE);
         G3D->ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, fbo.framebuffer);
 
 	// FIXME: Support cube map faces, rect textures etc. at some point
-        G3D->ext->glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, 
-          GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, tex_mm->GetHandle(), 0);
+        GLenum textarget = tex_mm->GetGLTextureTarget();
+        switch (textarget)
+        {
+          case GL_TEXTURE_1D:
+            G3D->ext->glFramebufferTexture1DEXT (GL_FRAMEBUFFER_EXT,
+              GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_1D, tex_mm->GetHandle(), 0);
+            break;
+          case GL_TEXTURE_2D:
+          case GL_TEXTURE_RECTANGLE_ARB:
+            G3D->ext->glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, 
+              GL_COLOR_ATTACHMENT0_EXT, textarget, tex_mm->GetHandle(), 0);
+            break;
+          case GL_TEXTURE_CUBE_MAP:
+            G3D->ext->glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, 
+              GL_COLOR_ATTACHMENT0_EXT, 
+              GL_TEXTURE_CUBE_MAP_POSITIVE_X_ARB + subtexture, 
+              tex_mm->GetHandle(), 0);
+            break;
+          case GL_TEXTURE_3D:
+            G3D->ext->glFramebufferTexture3DEXT (GL_FRAMEBUFFER_EXT, 
+              GL_COLOR_ATTACHMENT0_EXT, textarget, tex_mm->GetHandle(), 0,
+              subtexture);
+            break;
+        }
 
         GLenum fbStatus = G3D->ext->glCheckFramebufferStatusEXT (
           GL_FRAMEBUFFER_EXT);
