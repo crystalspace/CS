@@ -88,5 +88,8 @@ bool RMTest1::Initialize(iObjectRegistry* objectReg)
 
   defaultShaderName = stringSet->Request("standard");  
   defaultShader = shaderManager->GetShader ("std_lighting");
+
+  treePersistent.Initialize (shaderManager);
+
   return true;
 }

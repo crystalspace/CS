@@ -43,9 +43,16 @@ namespace RenderManager
       typename RenderTreeType::ContextsContainer* container, 
       iSector* sector, CS::RenderManager::RenderView* rview)
     {
+      int numSectorCB = sector->GetSectorCallbackCount ();
+      while (numSectorCB-- > 0)
+      {
+        iSectorCallback* cb = sector->GetSectorCallback (numSectorCB);
+        cb->Traverse (sector, rview);
+      }
+
       // Do the culling
       iVisibilityCuller* culler = sector->GetVisibilityCuller ();
-      renderTree.Viscull (context, rview, culler);
+      renderTree.Viscull (container, context, rview, culler);
   
       // Sort the mesh lists  
       {
@@ -147,7 +154,8 @@ namespace RenderManager
     SetupRenderTarget (typename RenderTreeType::ContextsContainer* contexts,
       iGraphics3D* g3d)
     {
-      g3d->SetRenderTarget (contexts->renderTarget);
+      g3d->SetRenderTarget (contexts->renderTarget, false,
+        contexts->subtexture);
     }
   };
     
@@ -168,10 +176,13 @@ namespace RenderManager
       int drawFlags = view->GetEngine ()->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS;
 
       SetupRenderTarget<RenderTreeType> setupTarget (contexts, g3d);
+      iCamera* cam = view->GetCamera();
+      g3d->SetPerspectiveCenter (cam->GetShiftX (), cam->GetShiftY ());
+      g3d->SetPerspectiveAspect (cam->GetFOV ());
       
       BeginFinishDrawScope bd (g3d, drawFlags);
 
-      g3d->SetWorldToCamera (view->GetCamera ()->GetTransform ().GetInverse ());
+      g3d->SetWorldToCamera (cam->GetTransform ().GetInverse ());
 
       ContextCB cb (*this, g3d);
       tree.TraverseContextsReverse (contexts, cb);

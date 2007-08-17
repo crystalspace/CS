@@ -47,27 +47,35 @@ namespace RenderManager
     {
       typedef NumberedMeshTraverser<Tree, FnMeshTraverser> BaseType;
 
-      ShaderVariableNameArray& names;
       iShaderManager* shaderManager;
       Fn& function;
       csShaderVariableStack& varStack;
 
-      FnMeshTraverser (ShaderVariableNameArray& names,
-        iShaderManager* shaderManager, Fn& function) : BaseType (*this),
-        names (names), shaderManager (shaderManager), 
+      FnMeshTraverser (iShaderManager* shaderManager, Fn& function) : 
+        BaseType (*this), shaderManager (shaderManager), 
         function (function),
         varStack (shaderManager->GetShaderVariableStack()) {}
 
       using BaseType::operator();
 
-      void operator() (const typename Tree::MeshNode::SingleMesh& mesh, size_t index,
+      void operator() (typename Tree::MeshNode* node,
+        const typename Tree::MeshNode::SingleMesh& mesh, size_t index,
         typename Tree::ContextNode& ctxNode, const Tree& tree)
       {
+        size_t numSVs = shaderManager->GetSVNameStringset()->GetSize();
+        ShaderVariableNameArray names;
+        names.SetSize (numSVs);
+        GetUsedShaderVars (ctxNode.shaderArray, ctxNode.ticketArray, index,
+          names);
+
+        csShaderVariableStack varStack;
         ctxNode.svArrays.SetupSVStck (varStack, index);
 
         for (size_t j = 0; j < names.GetSize(); j++)
         {
-          csShaderVariable* sv = varStack[names[j]];
+          csStringID name = names[j];
+          if (name >= varStack.GetSize()) continue;
+          csShaderVariable* sv = varStack[name];
           if (sv == 0) continue;
           function (sv);
         }
@@ -79,10 +87,10 @@ namespace RenderManager
 
     void operator() (typename Tree::ContextNode* contextNode, Tree& tree)
     {
-      ShaderVariableNameArray names;
-      GetAllUsedShaderVars<Tree> (*contextNode, shaderManager, names);
+      //ShaderVariableNameArray names;
+      //GetAllUsedShaderVars<Tree> (*contextNode, shaderManager, names);
 
-      FnMeshTraverser traverse (names, shaderManager, function);
+      FnMeshTraverser traverse (shaderManager, function);
       tree.TraverseMeshNodes (traverse, contextNode);
     }
 
@@ -130,7 +138,17 @@ namespace RenderManager
   {
     friend struct TextureTraverser;
 
-    csHash<csRef<iView>, csRef<iTextureHandle> > targets;
+    struct RenderTargetInfo
+    {
+      struct ViewInfo
+      {
+        csRef<iView> view;
+        uint flags;
+      };
+      typedef csHash<ViewInfo, int> ViewsHash;
+      ViewsHash views;
+    };
+    csHash<RenderTargetInfo, csRef<iTextureHandle> > targets;
     CS::RenderManager::RenderView::Pool renderViewPool;
 
     typedef csSet<csPtrKey<iTextureHandle> > HandledTargetsSet;
@@ -154,16 +172,30 @@ namespace RenderManager
 
       void operator() (iTextureHandle* texh)
       {
-        csRef<iView> targetView = parent.targets.Get (texh, csRef<iView> ());
-        if (targetView.IsValid () && !handledTargets.Contains (texh))
+        RenderTargetInfo* targetInfo = parent.targets.GetElementPointer (texh);
+        if ((targetInfo == 0) || handledTargets.Contains (texh)) return;
+        handledTargets.Add (texh);
+
+        RenderTargetInfo::ViewsHash::GlobalIterator viewsIt (
+          targetInfo->views.GetIterator());
+        while (viewsIt.HasNext ())
         {
-          handledTargets.Add (texh);
+          int subtexture;
+          RenderTargetInfo::ViewInfo viewInfo (viewsIt.NextNoAdvance (subtexture));
+          if (viewInfo.flags & iRenderManager::updateOnce)
+            targetInfo->views.DeleteElement (viewsIt);
+          else
+            viewsIt.Advance();
+          csRef<iView> targetView = viewInfo.view;
+          if (!targetView.IsValid ()) continue;
+
           // Setup a rendering view
           csRef<CS::RenderManager::RenderView> rview;
 
           Tree::ContextsContainer* targetContexts = 
             renderTree.CreateContextContainer ();
           targetContexts->renderTarget = texh;
+          targetContexts->subtexture = subtexture;
           targetContexts->view = targetView;
 
           rview.AttachNew (new (parent.renderViewPool) 
@@ -179,18 +211,40 @@ namespace RenderManager
           renderTree.TraverseContexts (targetContexts, traverseAllTextures);
           //traverseAllTextures (targetContexts, renderTree);
         }
-        
+        if (targetInfo->views.IsEmpty())
+        {
+          parent.targets.DeleteAll (texh);
+        }
       }
     };
   public:
     void RegisterRenderTarget (iTextureHandle* target, 
-      iView* view)
+      iView* view, int subtexture = 0, uint flags = 0)
     {
-      targets.PutUnique (target, view);
+      RenderTargetInfo::ViewInfo newView;
+      newView.view = view;
+      newView.flags = flags;
+      RenderTargetInfo* targetInfo = targets.GetElementPointer (target);
+      if (targetInfo == 0)
+      {
+        RenderTargetInfo newInfo;
+        newInfo.views.Put (subtexture, newView);
+        targets.PutUnique (target, newInfo);
+      }
+      else
+      {
+        targetInfo->views.Put (subtexture, newView);
+      }
     }
-    void UnregisterRenderTarget (iTextureHandle* target)
+    void UnregisterRenderTarget (iTextureHandle* target,
+      int subtexture = 0)
     {
-      targets.DeleteAll (target);
+      RenderTargetInfo* targetInfo = targets.GetElementPointer (target);
+      if (targetInfo != 0)
+      {
+        targetInfo->views.DeleteAll (subtexture);
+        if (targetInfo->views.IsEmpty()) targets.DeleteAll (target);
+      }
     }
 
     void AddDependentTargetsToTree (typename Tree::ContextsContainer* contexts,

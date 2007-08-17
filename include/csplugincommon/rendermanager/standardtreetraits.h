@@ -65,13 +65,19 @@ namespace RenderManager
     struct ContextsContainerExtraDataType
     {
       iTextureHandle* renderTarget;
-      iView* view;
+      int subtexture;
+      csRef<iView> view;
       
-      ContextsContainerExtraDataType() : renderTarget (0), view (0) {}
+      ContextsContainerExtraDataType() : renderTarget (0), subtexture (0),
+        view (0) {}
     };
 
     // Any extra data per mesh in a mesh node
-    typedef void MeshExtraDataType;
+    struct MeshExtraDataType
+    {
+      iShaderVariableContext* meshObjSVs;
+      csRef<csShaderVariable> svObjectToWorld;
+    };
 
     // The data type to use as node key for mesh nodes
     struct MeshNodeKeyType

@@ -22,15 +22,22 @@
 #include "csutil/scf_interface.h"
 #include "ivaria/view.h"
 
+struct iTextureHandle;
+
 struct iRenderManager : public virtual iBase
 {
-  SCF_INTERFACE(iRenderManager,1,0,1);
+  SCF_INTERFACE(iRenderManager,1,0,2);
 
   virtual bool RenderView (iView* view) = 0;
 
+  enum TargetFlags
+  {
+    updateOnce = 1
+  };
   virtual void RegisterRenderTarget (iTextureHandle* target, 
-    iView* view) = 0;
-  virtual void UnregisterRenderTarget (iTextureHandle* target) = 0;
+    iView* view, int subtexture = 0, uint flags = 0) = 0;
+  virtual void UnregisterRenderTarget (iTextureHandle* target,
+    int subtexture = 0) = 0;
 };
 
 #endif

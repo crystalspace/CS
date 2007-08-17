@@ -9,6 +9,14 @@ chronological order.
 17-Aug-2007
 	- res augmented iView to support mesh filtering.
 	- res fixed cubemap support in the gl3d fbo render-to-texture path.
+	- res made various changes to the rendermanager stuff:
+	    - Call sector callbacks.
+	    - Set perspective aspect + center.
+	    - Fixed the "used shadervar traversal" to only use SVs used by a
+	      mesh and not the combination of all used SVs of a context.
+	    - Added ability to specify subtextures for render targets.
+	    - Set "object2world transform" SV.
+	    - Apply mesh filters.
 15-Aug-2007
 	- res made CS::RenderManager::RenderView dllexported.
 	- res fixed an uninitialized struct member in glshader_fixed.

@@ -68,6 +68,14 @@ namespace RenderManager
       csBlockAllocator<MeshNode> meshNodeAllocator;
       csBlockAllocator<ContextNode> contextNodeAllocator;
       csBlockAllocator<ContextsContainer> contextsContainerAllocator;
+
+      csStringID svObjectToWorldName;
+
+      void Initialize (iShaderManager* shmgr)
+      {
+        svObjectToWorldName = 
+          shmgr->GetSVNameStringset()->Request ("object2world transform");
+      }
     };
 
     /**
@@ -156,11 +164,32 @@ namespace RenderManager
     /**
      * 
      */
-    bool Viscull (ContextNode* context, iRenderView* rw, iVisibilityCuller* culler)
+    bool Viscull (ContextsContainer* contexts, ContextNode* context, iRenderView* rw, 
+      iVisibilityCuller* culler)
     {
-      ViscullCallback cb (*this, context, rw);
+      csArray<CulledObject> culledObjects;
+      ViscullCallback cb (culledObjects);
       
       culler->VisTest (rw, &cb);
+
+      csDirtyAccessArray<iMeshWrapper*> meshObjs;
+      meshObjs.SetSize (culledObjects.GetSize() * 2);
+      for (size_t i = 0; i < culledObjects.GetSize(); i++)
+        meshObjs[i] = culledObjects[i].imesh;
+
+      size_t numFiltered;
+      iMeshWrapper** filtered = meshObjs.GetArray()+culledObjects.GetSize();
+      contexts->view->FilterMeshes (meshObjs.GetArray(), 
+        culledObjects.GetSize(), filtered, numFiltered);
+      
+      size_t c = 0;
+      for (size_t i = 0; i < numFiltered; i++)
+      {
+        while (culledObjects[c].imesh != filtered[i]) { c++; }
+        ViscullObjectVisible (culledObjects[c].imesh, culledObjects[c].frustum_mask,
+          rw, context);
+        c++;
+      }
       return true;
     }
 
@@ -253,11 +282,22 @@ namespace RenderManager
       return totalRenderMeshes;
     }
 
+    csStringID GetObjectToWorldName() const
+    {
+      return persistentData.svObjectToWorldName;
+    }
+
   protected:    
     PersistentData&         persistentData;
     csArray<ContextsContainer*> contexts;
     size_t                  totalMeshNodes;
     size_t                  totalRenderMeshes;
+
+    struct CulledObject
+    {
+      iMeshWrapper *imesh;
+      uint32 frustum_mask;
+    };
 
     /**
      * 
@@ -265,10 +305,9 @@ namespace RenderManager
     class ViscullCallback : public scfImplementation1<ViscullCallback, iVisibilityCullerListener>
     {
     public:
-      ViscullCallback (ThisType& ownerTree, typename ThisType::ContextNode* context,
-        iRenderView* rw)
+      ViscullCallback (csArray<CulledObject>& culledObjects)
         : scfImplementation1<ViscullCallback, iVisibilityCullerListener> (this), 
-        ownerTree (ownerTree), context (context),  currentRenderView (rw)    
+        culledObjects (culledObjects)
       {}
 
 
@@ -276,20 +315,23 @@ namespace RenderManager
         iMeshWrapper *mesh, uint32 frustum_mask)
       {
         // Call uppwards
-        ownerTree.ViscullObjectVisible (visobject, mesh, frustum_mask, currentRenderView, context);
+        //ownerTree.ViscullObjectVisible (visobject, mesh, frustum_mask, currentRenderView, context);
+        CulledObject culled;
+        culled.imesh = mesh;
+        culled.frustum_mask = frustum_mask;
+        culledObjects.Push (culled);
       }
 
     private:
-      ThisType& ownerTree;
-      typename ThisType::ContextNode* context;
-      iRenderView* currentRenderView;
+      csArray<CulledObject>& culledObjects;
     };
 
-    void ViscullObjectVisible (iVisibilityObject *visobject, 
-      iMeshWrapper *imesh, uint32 frustum_mask, iRenderView* renderView, ContextNode* context)
+    void ViscullObjectVisible (iMeshWrapper *imesh, uint32 frustum_mask, 
+      iRenderView* renderView, ContextNode* context)
     {
       // Todo: Handle static lod & draw distance
       csZBufMode zmode = imesh->GetZBufMode ();
+      csRef<csShaderVariable> svObjectToWorld;
 
       // Get the meshes
       int numMeshes;
@@ -322,10 +364,16 @@ namespace RenderManager
 
           totalMeshNodes++;
         }
+
+        svObjectToWorld.AttachNew (new csShaderVariable (
+          persistentData.svObjectToWorldName));
+        svObjectToWorld->SetValue (rm->object2world);
  
         typename MeshNode::SingleMesh sm;
         sm.renderMesh = rm;
         sm.zmode = zmode;
+        sm.meshObjSVs = imesh->GetSVContext();
+        sm.svObjectToWorld = svObjectToWorld;
 
         meshNode->meshes.Push (sm);
       }
@@ -404,7 +452,7 @@ namespace RenderManager
     {
       for (size_t i = 0; i < node->meshes.GetSize(); ++i)
       {
-        fun (node->meshes[i], meshOffset++, ctxNode, tree);
+        fun (node, node->meshes[i], meshOffset++, ctxNode, tree);
       }
     }
 

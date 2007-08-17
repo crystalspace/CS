@@ -36,13 +36,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMTest1)
     virtual bool RenderView (iView* view);
 
     virtual void RegisterRenderTarget (iTextureHandle* target, 
-      iView* view)
+      iView* view, int subtexture = 0, uint flags = 0)
     {
-      targets.RegisterRenderTarget (target, view);
+      targets.RegisterRenderTarget (target, view, subtexture, flags);
     }
-    virtual void UnregisterRenderTarget (iTextureHandle* target)
+    virtual void UnregisterRenderTarget (iTextureHandle* target,
+      int subtexture = 0)
     {
-      targets.UnregisterRenderTarget (target);
+      targets.UnregisterRenderTarget (target, subtexture);
     }
 
     //---- iComponent ----

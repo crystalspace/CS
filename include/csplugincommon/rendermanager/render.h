@@ -64,11 +64,13 @@ namespace RenderManager
     // Need to unhide this one
     using BaseType::operator();
 
-    void operator() (const typename Tree::MeshNode::SingleMesh& mesh, size_t index,
+    void operator() (typename Tree::MeshNode* node,
+      const typename Tree::MeshNode::SingleMesh& mesh, size_t index,
       typename Tree::ContextNode& ctxNode, const Tree& tree)
     {
       // Get the shader, ticket and sv array
       iShader* shader = ctxNode.shaderArray[index];
+      if (!shader) return;
       size_t ticket = ctxNode.ticketArray[index];
       ctxNode.svArrays.SetupSVStck (varStack, index);
 

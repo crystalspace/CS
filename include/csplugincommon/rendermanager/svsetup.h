@@ -42,7 +42,8 @@ namespace RenderManager
     // Need to unhide this one
     using BaseType::operator();
 
-    void operator() (const typename Tree::MeshNode::SingleMesh& mesh, size_t index,
+    void operator() (typename Tree::MeshNode* node,
+      const typename Tree::MeshNode::SingleMesh& mesh, size_t index,
       typename Tree::ContextNode& ctxNode, const Tree& tree)
     {
       csRenderMesh* rm = mesh.renderMesh;
@@ -51,9 +52,11 @@ namespace RenderManager
       svArrays.SetupSVStck (localStack, index);
 
       // Push all contexts here @@TODO: get more of them
+      localStack[tree.GetObjectToWorldName()] = mesh.svObjectToWorld;
       rm->material->GetMaterial ()->PushVariables (localStack);
       if (rm->variablecontext)
         rm->variablecontext->PushVariables (localStack);
+      mesh.meshObjSVs->PushVariables (localStack);
     }
 
   private:
@@ -76,13 +79,14 @@ namespace RenderManager
     // Need to unhide this one
     using BaseType::operator();
 
-    void operator() (const typename Tree::MeshNode::SingleMesh& mesh, size_t index,
+    void operator() (typename Tree::MeshNode* node, 
+      const typename Tree::MeshNode::SingleMesh& mesh, size_t index,
       typename Tree::ContextNode& ctxNode, const Tree& tree)
     {
       tempStack.Clear ();
 
       iShader* shader = shaderArray[index];
-      shader->PushVariables (tempStack);
+      if (shader) shader->PushVariables (tempStack);
       
       // Back-merge it onto the real one
       csShaderVariableStack localStack;

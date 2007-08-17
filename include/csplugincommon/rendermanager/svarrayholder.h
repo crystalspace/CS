@@ -86,8 +86,11 @@ namespace RenderManager
       CS_ASSERT (from < numSets && start < numSets && end < numSets);
       CS_ASSERT (from < start || from > end);
 
-      memcpy (svArray + start*numSVNames, svArray + from*numSVNames,
-        sizeof(csShaderVariable*)*numSVNames*(end-start+1));
+      /*memcpy (svArray + start*numSVNames, svArray + from*numSVNames,
+        sizeof(csShaderVariable*)*numSVNames*(end-start+1));*/
+      for (size_t i = start, j = from; i <= end; i++, j++)
+        memcpy (svArray + i*numSVNames, svArray + j*numSVNames,
+          sizeof(csShaderVariable*)*numSVNames);
     }
 
     size_t GetNumSVNames () const
