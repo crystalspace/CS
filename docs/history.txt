@@ -21,6 +21,8 @@ chronological order.
 	- res added support for automatic environment maps: the 
 	  "tex environment" SV provides a cubemap with the mesh's current
 	  environment.
+	- res added a weaver-based shader that reflects the environment.
+	- res made the "reflect" shader use the new environment texture.
 15-Aug-2007
 	- res made CS::RenderManager::RenderView dllexported.
 	- res fixed an uninitialized struct member in glshader_fixed.
