@@ -531,6 +531,7 @@ SCF_IMPLEMENT_FACTORY (csEngine)
 
 csEngine::csEngine (iBase *iParent) :
   scfImplementationType (this, iParent), objectRegistry (0),
+  envTexHolder (this),
   frameWidth (0), frameHeight (0), 
   lightAmbientRed (CS_DEFAULT_LIGHT_LEVEL),
   lightAmbientGreen (CS_DEFAULT_LIGHT_LEVEL),
@@ -666,30 +667,28 @@ bool csEngine::HandleEvent (iEvent &Event)
 {
   if (Event.Name == SystemOpen)
   {
-  if (G3D)
-  {
-    id_creation_time = svNameStringSet->Request("mesh creation time");
+    if (G3D)
+    {
+      maxAspectRatio = 4096;
+      frameWidth = G3D->GetWidth ();
+      frameHeight = G3D->GetHeight ();
+    }
+    else
+    {
+      maxAspectRatio = 4096;
+      frameWidth = 640;
+      frameHeight = 480;
+    }
 
-    maxAspectRatio = 4096;
-    frameWidth = G3D->GetWidth ();
-    frameHeight = G3D->GetHeight ();
-  }
-  else
-  {
-    maxAspectRatio = 4096;
-    frameWidth = 640;
-    frameHeight = 480;
-  }
+    if (csCamera::GetDefaultFOV () == 0)
+      csCamera::SetDefaultFOV (frameHeight, frameWidth);
 
-  if (csCamera::GetDefaultFOV () == 0)
-    csCamera::SetDefaultFOV (frameHeight, frameWidth);
+    // Allow context resizing since we handle CanvasResize(G2D)
+    if (G2D) G2D->AllowResize (true);
 
-  // Allow context resizing since we handle CanvasResize(G2D)
-  if (G2D) G2D->AllowResize (true);
+    StartEngine ();
 
-  StartEngine ();
-
-  return true;
+    return true;
   }
   else if (Event.Name == SystemClose)
   {
@@ -775,6 +774,8 @@ void csEngine::DeleteAllForce ()
 
   // remove objects
   QueryObject ()->ObjRemoveAll ();
+
+  envTexHolder.Clear ();
 }
 
 void csEngine::DeleteAll ()
@@ -840,6 +841,9 @@ void csEngine::DeleteAll ()
     // Register it.
     renderLoopManager->Register (CS_DEFAULT_RENDERLOOP_NAME, 
       defaultRenderLoop);
+
+    renderManager = csQueryRegistryOrLoad<iRenderManager> (objectRegistry,
+      "crystalspace.rendermanager.test1");
   }
 }
 
@@ -1402,6 +1406,8 @@ bool csEngine::CheckConsistency ()
 void csEngine::StartEngine ()
 {
   DeleteAll ();
+  id_creation_time = svNameStringSet->Request("mesh creation time");
+  svTexEnvironmentName = svNameStringSet->Request("tex environment");
 }
 
 void csEngine::PrecacheMesh (iMeshWrapper* s, iRenderView* rview)

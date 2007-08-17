@@ -204,8 +204,6 @@ protected:
 
   csShaderVariableContext svcontext;
   csRef<iShaderVariableContext> factorySVC;
-
-  csEngine* engine;
 private:
   /// Mesh object corresponding with this csMeshWrapper.
   csRef<iMeshObject> meshobj;
@@ -281,6 +279,8 @@ public:
   csFlags flags;
   /// Culler flags.
   csFlags culler_flags;
+
+  csEngine* engine;
 
   /**
    * Clear this object from all sector portal lists.
@@ -499,6 +499,8 @@ public:
    * Gets the imposters rendermesh
    */
   csRenderMesh** GetImposter (iRenderView *rview);
+
+  void SetDefaultEnvironmentTexture ();
 
   //---------- Bounding volume and beam functions -----------------//
 

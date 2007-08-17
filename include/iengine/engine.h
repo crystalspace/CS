@@ -68,6 +68,7 @@ struct iRegion;
 struct iRegionList;
 struct iRenderLoop;
 struct iRenderLoopManager;
+struct iRenderManager;
 struct iRenderView;
 struct iSector;
 struct iSectorIterator;
@@ -173,7 +174,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine,3,0,0);
+  SCF_INTERFACE(iEngine,3,0,1);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
@@ -1312,6 +1313,8 @@ struct iEngine : public virtual iBase
   virtual void ResetWorldSpecificSettings() = 0;  
   
   /** @} */
+  
+  virtual iRenderManager* GetRenderManager () = 0;
 };
 
 /** @} */

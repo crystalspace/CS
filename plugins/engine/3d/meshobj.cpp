@@ -32,8 +32,11 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/rendermesh.h"
 
+#include "reflectomotron3000.h"
 
 CS_LEAKGUARD_IMPLEMENT (csMeshWrapper);
+
+using namespace CS_PLUGIN_NAMESPACE_NAME(Engine);
 
 // ---------------------------------------------------------------------------
 
@@ -166,6 +169,8 @@ csMeshWrapper::csMeshWrapper (csEngine* engine, iMeshObject *meshobj)
   sv_creation_time.AttachNew(new csShaderVariable(engine->id_creation_time));
   sv_creation_time->SetValue((float)engine->virtualClock->GetCurrentTicks() / 1000.0f);
   GetSVContext()->AddVariable(sv_creation_time);
+
+  SetDefaultEnvironmentTexture ();
 }
 
 void csMeshWrapper::SelfDestruct ()
@@ -967,6 +972,19 @@ csRenderMesh** csMeshWrapper::GetImposter (iRenderView *rview)
 
   // Get imposter rendermesh
   return imposter_mesh->GetRenderMesh (rview);
+}
+
+void csMeshWrapper::SetDefaultEnvironmentTexture ()
+{
+  csRef<csShaderVariable> svTexEnvironment;
+  svTexEnvironment.AttachNew (new csShaderVariable (engine->svTexEnvironmentName));
+  svTexEnvironment->SetType (csShaderVariable::TEXTURE);
+
+  csRef<iShaderVariableAccessor> accessor;
+  accessor.AttachNew (new EnvTex::Accessor (this));
+  svTexEnvironment->SetAccessor (accessor);
+
+  GetSVContext()->AddVariable(svTexEnvironment);
 }
 
 csHitBeamResult csMeshWrapper::HitBeamOutline (

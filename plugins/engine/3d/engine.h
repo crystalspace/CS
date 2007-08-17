@@ -37,6 +37,7 @@
 #include "iengine/campos.h"
 #include "iengine/engine.h"
 #include "iengine/renderloop.h"
+#include "iengine/rendermanager.h"
 #include "igraphic/imageio.h"
 #include "iutil/cache.h"
 #include "iutil/comp.h"
@@ -59,6 +60,8 @@
 #include "plugins/engine/3d/renderloop.h"
 #include "plugins/engine/3d/rview.h"
 #include "plugins/engine/3d/sharevar.h"
+
+#include "reflectomotron3000.h"
 
 class csCamera;
 class csEngine;
@@ -184,6 +187,8 @@ struct csImposterUpdateQueue
   csRef<iRenderView> rview;
   csWeakRefArray<csImposterProcTex> queue;
 };
+
+using namespace CS_PLUGIN_NAMESPACE_NAME(Engine);
 
 /**
  * The 3D engine.
@@ -507,6 +512,7 @@ public:
   virtual void UpdateNewFrame ()
   { 
     currentFrameNumber++; 
+    envTexHolder.NextFrame ();
     ControlMeshes ();
   }
 
@@ -747,6 +753,8 @@ private:
 
   iMeshObjectType* GetThingType ();
 
+  iRenderManager* GetRenderManager () { return renderManager; }
+
 public:
   // -- PUBLIC MEMBERS. THESE ARE FOR CONVENIANCE WITHIN ENGINE PLUGIN
 
@@ -769,10 +777,16 @@ public:
 
   /// Store engine shadervar names
   csStringID id_creation_time;
+  csStringID svTexEnvironmentName;
+
+  csRef<iRenderManager> renderManager;
+  EnvTex::Holder envTexHolder;
+
   /// For triangle meshes.
   csStringID colldet_id;
   csStringID viscull_id;
   csStringID base_id;
+
   /**
    * This is the Virtual File System object where all the files
    * used by the engine live. Textures, models, data, everything -

@@ -86,6 +86,8 @@ namespace CS
             {TypeInfo::Sampler, false, 2, TypeInfo::NoSemantics, TypeInfo::NoSpace, false}},
           {"texcoord2", 
             {TypeInfo::Vector,  false, 2, TypeInfo::Texcoord,    TypeInfo::NoSpace, false}},
+          {"texcube", 
+            {TypeInfo::Sampler, true,  3, TypeInfo::NoSemantics, TypeInfo::NoSpace, false}},
 	};
 	static const size_t numTypeInfos = 
 	  sizeof (typeInfoMap) / sizeof (typeInfoMap[0]);

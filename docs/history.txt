@@ -17,6 +17,10 @@ chronological order.
 	    - Added ability to specify subtextures for render targets.
 	    - Set "object2world transform" SV.
 	    - Apply mesh filters.
+	- res fixed the engine's PrecacheDraw() to use the render manager.
+	- res added support for automatic environment maps: the 
+	  "tex environment" SV provides a cubemap with the mesh's current
+	  environment.
 15-Aug-2007
 	- res made CS::RenderManager::RenderView dllexported.
 	- res fixed an uninitialized struct member in glshader_fixed.
