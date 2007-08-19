@@ -160,11 +160,9 @@ class	csColladaMesh	{
 		 */
 		void RetrieveInfo(iDocumentNode* element);
 
-		/** \brief Sets the normals in the vertex array
-		 * 
-		 * Sets all of the normX, normY, and normZ values in the vertex array.
-		 */
-		//void SetNormals();
+		void RetrieveOtherData();
+
+		void RestructureArrays();
 
 		/** \brief Sets the pointer for the mesh's material list.
 		 *
@@ -180,10 +178,11 @@ class	csColladaMesh	{
 
 		const csArray<csVector3>& GetVertices() { return vertices; }
 		const csArray<csVector3>& GetNormals() { return normals; }
+		const csArray<csVector2>& GetTextures() { return textures; }
 		// const csArray<int>& GetNormalIndices() { return normalIndices; }
 		int GetNumVertexElements() { return numVertexElements; }
 		int GetNumberOfVertices() { return numberOfVertices; }
-		int GetNumberOfNormals() { return (int)normals.GetSize(); }
+		// int GetNumberOfNormals() { return (int)normals.GetSize(); }
 		csColladaMaterial* GetMaterialPointer() { return materials; }
 		csColladaNumericType GetVertexType() { return vType; }
 		csString GetName() { return name; }

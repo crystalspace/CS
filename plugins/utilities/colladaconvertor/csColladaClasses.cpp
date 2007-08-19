@@ -323,8 +323,14 @@ void csColladaMesh::RetrieveArray(iDocumentNode* sourceElement, csColladaAccesso
 		t.y = temp[1];
 
 		toStore.Put(toStore.GetSize(), t);
+		//toStore.Push(t);
 	}
 
+  if (parent->warningsOn)
+	{
+		parent->Report(CS_REPORTER_SEVERITY_WARNING, "toStore[32]: (%f, %f)", toStore[32].x, toStore[32].y);
+	}
+	
 	delete[] temp;
 }
 
@@ -743,6 +749,7 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 
 		csArray<csVector3> vertexArray;
 		csArray<csVector3> normalArray;
+		csArray<csVector2> textureArray;
 		int vertexArraySize = 0;
 		int normalArraySize = 0;
 
@@ -750,10 +757,18 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 
 		// Adding vertices to CS document
 		vertexArray = GetVertices();
-		normalArray = GetNormals();
+		if (normalOffset != -1)
+		{
+			normalArray = GetNormals();
+		}
+
+		if (textureOffset != -1)
+		{
+			textureArray = GetTextures();
+		}
 					
 		vertexArraySize = GetNumberOfVertices();
-		normalArraySize = GetNumberOfNormals();
+		// normalArraySize = GetNumberOfNormals();
 
 		if (parent->warningsOn && vertexArraySize > 0)
 		{
@@ -827,6 +842,8 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 			/// @todo: Add normal information here.
 			/* WRITE OUT VERTICES */
 			scfString formatter;
+			
+			// positions
 			currentCrystalVElement = currentCrystalParamsElement->CreateNodeBefore(CS_NODE_ELEMENT, 0);
 			currentCrystalVElement->SetValue("v");
 			formatter.Format("%f", vertexArray[counter].x);
@@ -835,35 +852,27 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 			currentCrystalVElement->SetAttribute(vertAccess->Get(1), formatter.GetData());
 			formatter.Format("%f", vertexArray[counter].z);
 			currentCrystalVElement->SetAttribute(vertAccess->Get(2), formatter.GetData());
-
-			/*
-			if (parent->warningsOn)
+			
+			// normals
+			if (normalOffset != -1)
 			{
-				parent->Report(CS_REPORTER_SEVERITY_WARNING, "Normal for vertex %d: (%f, %f, %f)", 
-																						 counter,
-																						 normalArray[normalInds[counter]].x,
-																						 normalArray[normalInds[counter]].y,
-																						 normalArray[normalInds[counter]].z);
+				formatter.Format("%f", normalArray[counter].x);
+				currentCrystalVElement->SetAttribute("nx", formatter.GetData());
+				formatter.Format("%f", normalArray[counter].y);
+				currentCrystalVElement->SetAttribute("ny", formatter.GetData());
+				formatter.Format("%f", normalArray[counter].z);
+				currentCrystalVElement->SetAttribute("nz", formatter.GetData());
 			}
-			*/
 
-			/* Actually, this isn't going to work quite as I expected, due, in part,
-			 * to the fact that I expected there was going to be unique normals
-			 * for a given vertex.  This isn't exactly true in the COLLADA file -
-			 * a given vertex can have multiple normals, and, I believe, that each
-			 * such vertex is treated separately.  That is, two vertices are treated
-			 * as distinct if they have either different spatial coordinates, or if
-			 * they have distinct normals.  This presents a major problem with the 
-			 * code I have thus far, and will need to be re-analyzed.
+			// texture coordinates
+			if (textureOffset != -1)
+			{
+				formatter.Format("%f", textureArray[counter].x);
+				currentCrystalVElement->SetAttribute("u", formatter.GetData());
+				formatter.Format("%f", textureArray[counter].y);
+				currentCrystalVElement->SetAttribute("v", formatter.GetData());
+			}
 
-			formatter.Format("%f", normalArray[counter].x);
-			currentCrystalVElement->SetAttribute("nx", formatter.GetData());
-			formatter.Format("%f", normalArray[counter].y);
-			currentCrystalVElement->SetAttribute("nx", formatter.GetData());
-			formatter.Format("%f", normalArray[counter].z);
-			currentCrystalVElement->SetAttribute("nx", formatter.GetData());
-
-			*/
 
 			/* DONE WRITING OUT VERTICES */
 
@@ -1272,6 +1281,125 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 
 			delete[] linearList;
 
+			RetrieveOtherData();
+
+			if (parent->warningsOn)
+			{
+				if (textureOffset != -1)
+				{
+					parent->Report(CS_REPORTER_SEVERITY_WARNING, "Value of textures[32]: (%f, %f)", textures[32].x, textures[32].y);
+				}
+			}
+
+			// let's make sure RestructureVertices works...
+			if (parent->warningsOn)
+			{
+				parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Vertex index list before restructure:");
+				for (int i = 0; i < (int)polygonIndices.GetSize(); i++)
+				{
+					parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Position Index: %d, Normal Index: %d, Texture Index: %d",
+																											polygonIndices[i].positionIndex,
+																											polygonIndices[i].normalIndex,
+																											polygonIndices[i].textureIndex);
+				}
+			}
+
+			RestructureIndices();
+
+			if (parent->warningsOn)
+			{
+				parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Vertex index list after restructure:");
+				for (int i = 0; i < (int)polygonIndices.GetSize(); i++)
+				{
+					parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Position Index: %d, Normal Index: %d, Texture Index: %d",
+																											polygonIndices[i].positionIndex,
+																											polygonIndices[i].normalIndex,
+																											polygonIndices[i].textureIndex);
+				}
+			}
+
+			// now, indices are restructured, we need to restructure the
+			// normal and texture arrays
+			RestructureArrays();
+
+			// ok, so let's make sure that the arrays are all accounted for
+			if (parent->warningsOn)
+			{
+				for (int i = 0; i < numberOfVertices; i++)
+				{
+					if (textureOffset != -1)
+					{
+						parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Vertex position: (%f, %f, %f), Vertex Normal: (%f, %f, %f), Vertex Texture Coords: (%f, %f)",
+																											vertices[i].x, vertices[i].y, vertices[i].z, normals[i].x, normals[i].y, normals[i].z, textures[i].x, textures[i].y);
+					}
+				}
+			}
+
+			while (triCounter < numTris)
+			{
+				csColladaVertexIndex vertex1, vertex2, vertex3;
+				vertex1 = polygonIndices[3*triCounter];
+				vertex2 = polygonIndices[3*triCounter+1];
+				vertex3 = polygonIndices[3*triCounter+2];
+				
+				triangles->AddTriangle(vertex1.positionIndex, vertex2.positionIndex, vertex3.positionIndex);
+
+				triCounter++;
+			}
+
+		}
+		
+		if (parent->warningsOn)
+		{
+			parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Done processing triangles");
+		}
+	}
+
+	void csColladaMesh::RestructureArrays()
+	{
+		// first, restructure normals (if they exist)
+		csArray<csVector3> newNormalArray;
+		csArray<csVector2> newTextureArray;
+
+		// let's verify the size of textures
+		/*
+		if (parent->warningsOn)
+		{
+			parent->Report(CS_REPORTER_SEVERITY_WARNING, "Size of texture array: %d", textures.GetSize());
+		}
+		*/
+
+		// for each of the vertices
+		for (int i = 0; i < numberOfVertices; i++)
+		{
+			// find the normal index which corresponds to it
+			// by searching through the indices array
+			for (int x = 0; x < (int)polygonIndices.GetSize(); x++)
+			{
+				if (polygonIndices[x].positionIndex == i)
+				{
+					if (polygonIndices[x].normalIndex != -1)
+					{
+						newNormalArray.Push(normals[polygonIndices[x].normalIndex]);
+					}
+
+					if (polygonIndices[x].textureIndex != -1)
+					{
+						csVector2 vec = textures[polygonIndices[x].textureIndex];
+						newTextureArray.Push(vec);
+						//newTextureArray.Push(textures[polygonIndices[x].textureIndex]);
+					}
+					break;
+				}
+			}
+		}
+		
+		normals = newNormalArray;
+		textures = newTextureArray;
+	}
+
+	void csColladaMesh::RetrieveOtherData()
+	{
 			if (normalOffset != -1)
 			{
 				// now, we need to retrieve the normals (if there are normals)
@@ -1303,53 +1431,8 @@ const csArray<csVector3>& csColladaMesh::Process(iDocumentNode* element)
 				textureAccessor->SetAccessorName(0, "u");
 				textureAccessor->SetAccessorName(1, "v");
 			}
-
-			// let's make sure RestructureVertices works...
-			if (parent->warningsOn)
-			{
-				parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Vertex index list before restructure:");
-				for (int i = 0; i < (int)polygonIndices.GetSize(); i++)
-				{
-					parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Position Index: %d, Normal Index: %d, Texture Index: %d",
-																											polygonIndices[i].positionIndex,
-																											polygonIndices[i].normalIndex,
-																											polygonIndices[i].textureIndex);
-				}
-			}
-
-			RestructureIndices();
-
-			if (parent->warningsOn)
-			{
-				parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Vertex index list after restructure:");
-				for (int i = 0; i < (int)polygonIndices.GetSize(); i++)
-				{
-					parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Position Index: %d, Normal Index: %d, Texture Index: %d",
-																											polygonIndices[i].positionIndex,
-																											polygonIndices[i].normalIndex,
-																											polygonIndices[i].textureIndex);
-				}
-			}
-
-			while (triCounter < numTris)
-			{
-				csColladaVertexIndex vertex1, vertex2, vertex3;
-				vertex1 = polygonIndices[3*triCounter];
-				vertex2 = polygonIndices[3*triCounter+1];
-				vertex3 = polygonIndices[3*triCounter+2];
-				
-				triangles->AddTriangle(vertex1.positionIndex, vertex2.positionIndex, vertex3.positionIndex);
-
-				triCounter++;
-			}
-
-		}
-		
-		if (parent->warningsOn)
-		{
-			parent->Report(CS_REPORTER_SEVERITY_NOTIFY, "Done processing triangles");
-		}
 	}
+
   // =============== Auxiliary Class: csColladaEffectProfile ===============
 
 	csColladaEffectProfile::csColladaEffectProfile(iDocumentNode* profileElement, csColladaConvertor* parentObj)

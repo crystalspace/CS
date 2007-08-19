@@ -132,6 +132,12 @@ class	csColladaConvertor : public	scfImplementation2<csColladaConvertor,iCollada
 		 * Report	various	things back	to the application
 		 */
 		void Report(int	severity,	const	char*	msg, ...);
+
+		/** Outputs an array.
+		 *
+		 */
+		//void ReportArray(int severity, csArray<csVector3>& ar);
+		//void ReportArray(int severity, csArray<csVector2>& ar);
 		
 		/**
 		 * Turn	debugging	warnings on	or off.	 This	will turn	on all possible	debug	information	for	the	
@@ -170,7 +176,7 @@ class	csColladaConvertor : public	scfImplementation2<csColladaConvertor,iCollada
 		csColladaEffect& GetEffect(size_t index);
 
 		csColladaMaterial* FindMaterial(const char* accessorString);
-	
+
 	private:
 
 	 /** \brief	Returns	a	<source> element

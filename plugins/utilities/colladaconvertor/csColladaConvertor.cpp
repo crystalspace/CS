@@ -715,7 +715,6 @@ bool csColladaConvertor::ConvertMaterials(iDocumentNode *materialsSection)
 	return true;
 }
 
-
 bool csColladaConvertor::ConvertScene(iDocumentNode *camerasSection, iDocumentNode *lightsSection, iDocumentNode *visualScenesSection)
 {
 	Report(CS_REPORTER_SEVERITY_WARNING, "Warning: ConvertScene() functionality not fully implemented.  Use at your own risk!");
@@ -725,6 +724,28 @@ bool csColladaConvertor::ConvertScene(iDocumentNode *camerasSection, iDocumentNo
 		Report(CS_REPORTER_SEVERITY_WARNING, "Warning: Conversion of scenes is invalid except for Crystal Space map files.  Continuing blithely...");
 		return false;
 	}
+
+	// first, let's convert the scenes
+	// each scene (<visual_scene> node) will be converted to 
+	// a sector in crystal space
+	csRef<iDocumentNodeIterator> visualSceneIterator = visualScenesSection->GetNodes("visual_scene");
+	csRef<iDocumentNode> currentVisualSceneElement;
+	while (visualSceneIterator->HasNext())
+	{
+		currentVisualSceneElement = visualSceneIterator->Next();
+		const char* sceneName = currentVisualSceneElement->GetAttributeValue("name");
+		csRef<iDocumentNode> currentSectorElement = csTopNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+		currentSectorElement->SetValue("sector");
+		currentSectorElement->SetAttribute("name", sceneName);
+	}
+
+	// next, we'll convert the cameras
+	// a camera will convert to a start location in the world file
+	// a start location requires 
+	//   * a sector to start in
+	//   * a position to start at
+	//   * an up vector
+	//   * a forward vector
 
 	return true;
 }
