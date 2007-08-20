@@ -55,9 +55,7 @@ bool Simple::Setup ()
   cdsys = csQueryRegistry<iCollideSystem> (GetObjectRegistry());
   if (!cdsys) return ReportError ("Failed to locate CD system!");
 
-  rm = csQueryRegistryOrLoad<iRenderManager> (GetObjectRegistry (),
-    "crystalspace.rendermanager.test1");
-
+  rm = engine->GetRenderManager ();
 
   // We need a View to the virtual world.
   view.AttachNew(new csView (engine, g3d));
@@ -155,8 +153,8 @@ void Simple::ProcessFrame ()
     	obj_move, obj_rotate);
 
   // Tell 3D driver we're going to display 3D things.
-  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
-    return;
+  //if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
+    //return;
 
   // Tell the camera to render into the frame buffer.
   //view->Draw ();
@@ -251,7 +249,7 @@ bool Simple::LoadMap ()
 {
   // Set VFS current directory to the level we want to load.
   csRef<iVFS> VFS (csQueryRegistry<iVFS> (GetObjectRegistry ()));
-  VFS->ChDir ("/lev/partsys");
+  VFS->ChDir ("/lev/parallaxtest");
   // Load the level file which is called 'world'.
   if (!loader->LoadMapFile ("world"))
     ReportError("Error couldn't load level!");
