@@ -19,7 +19,12 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_CONTEXT_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_CONTEXT_H__
 
+#include "iengine/sector.h"
+
+#include "csplugincommon/rendermanager/render.h"
 #include "csplugincommon/rendermanager/renderview.h"
+#include "csplugincommon/rendermanager/standardsorter.h"
+#include "csplugincommon/rendermanager/svsetup.h"
 
 namespace CS
 {
@@ -177,7 +182,8 @@ namespace RenderManager
 
       SetupRenderTarget<RenderTreeType> setupTarget (contexts, g3d);
       iCamera* cam = view->GetCamera();
-      g3d->SetPerspectiveCenter (cam->GetShiftX (), cam->GetShiftY ());
+      g3d->SetPerspectiveCenter (int (cam->GetShiftX ()), 
+        int (cam->GetShiftY ()));
       g3d->SetPerspectiveAspect (cam->GetFOV ());
       
       BeginFinishDrawScope bd (g3d, drawFlags);

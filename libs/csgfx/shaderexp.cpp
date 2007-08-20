@@ -244,7 +244,7 @@ static const op_args_info optimize_arg_table[] =
 CS_LEAKGUARD_IMPLEMENT (csShaderExpression);
 
 csShaderExpression::csShaderExpression(iObjectRegistry * objr) :
-accstack_max(0), stack (0)
+  stack (0), accstack_max (0)
 {
   obj_reg = objr;
 

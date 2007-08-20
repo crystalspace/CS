@@ -20,6 +20,7 @@
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_RENDERTREE_H__
 
 #include "csplugincommon/rendermanager/standardtreetraits.h"
+#include "iengine/portal.h"
 #include "iengine/viscull.h"
 #include "csutil/redblacktree.h"
 
@@ -198,8 +199,9 @@ namespace RenderManager
      */
     void DestoryContext (ContextsContainer& contexts, ContextNode* context)
     {
-      CS_ASSERT(contextNodeList.Find (contextNodeList) != csArrayItemNotFound);
-      contextNodeList.Delete (context);
+      CS_ASSERT(contexts.contextNodeList.Find (contexts.contextNodeList) 
+        != csArrayItemNotFound);
+      contexts.contextNodeList.Delete (context);
 
       persistentData.contextNodeAllocator.Free (context);
     }
@@ -344,7 +346,7 @@ namespace RenderManager
 
         if (rm->portal)
         {
-          ContextNode::PortalHolder h = {rm->portal, imesh};
+          typename ContextNode::PortalHolder h = {rm->portal, imesh};
           context->allPortals.Push (h);
           continue;
         }

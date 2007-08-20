@@ -30,7 +30,7 @@ namespace RenderManager
   {
   public:
     SVArrayHolder (size_t numSVNames = 0, size_t numSets = 0)
-      : svArray (0), numSVNames (numSVNames), numSets (numSets)
+      : numSVNames (numSVNames), numSets (numSets), svArray (0)
     {
       if (numSVNames && numSets)
         Setup (numSVNames, numSets);

@@ -20,6 +20,7 @@
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_STANDARDSOTER_H__
 
 #include "iengine/camera.h"
+#include "ivideo/rendermesh.h"
 
 namespace CS
 {

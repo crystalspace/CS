@@ -20,6 +20,7 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_DEPENDENTTARGET_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_DEPENDENTTARGET_H__
 
+#include "iengine/rendermanager.h"
 #include "csplugincommon/rendermanager/rendertree.h"
 #include "csplugincommon/rendermanager/shadersetup.h"
 
@@ -49,12 +50,10 @@ namespace RenderManager
 
       iShaderManager* shaderManager;
       Fn& function;
-      csShaderVariableStack& varStack;
 
       FnMeshTraverser (iShaderManager* shaderManager, Fn& function) : 
         BaseType (*this), shaderManager (shaderManager), 
-        function (function),
-        varStack (shaderManager->GetShaderVariableStack()) {}
+        function (function) {}
 
       using BaseType::operator();
 
@@ -83,7 +82,7 @@ namespace RenderManager
     };
   public:
     TraverseAllUsedSVs (Fn& function, iShaderManager* shaderManager) : 
-      function (function), shaderManager (shaderManager) {}
+      shaderManager (shaderManager), function (function) {}
 
     void operator() (typename Tree::ContextNode* contextNode, Tree& tree)
     {
@@ -176,12 +175,13 @@ namespace RenderManager
         if ((targetInfo == 0) || handledTargets.Contains (texh)) return;
         handledTargets.Add (texh);
 
-        RenderTargetInfo::ViewsHash::GlobalIterator viewsIt (
+        typename RenderTargetInfo::ViewsHash::GlobalIterator viewsIt (
           targetInfo->views.GetIterator());
         while (viewsIt.HasNext ())
         {
           int subtexture;
-          RenderTargetInfo::ViewInfo viewInfo (viewsIt.NextNoAdvance (subtexture));
+          typename RenderTargetInfo::ViewInfo viewInfo (
+            viewsIt.NextNoAdvance (subtexture));
           if (viewInfo.flags & iRenderManager::updateOnce)
             targetInfo->views.DeleteElement (viewsIt);
           else
@@ -192,7 +192,7 @@ namespace RenderManager
           // Setup a rendering view
           csRef<CS::RenderManager::RenderView> rview;
 
-          Tree::ContextsContainer* targetContexts = 
+          typename Tree::ContextsContainer* targetContexts = 
             renderTree.CreateContextContainer ();
           targetContexts->renderTarget = texh;
           targetContexts->subtexture = subtexture;
@@ -201,7 +201,7 @@ namespace RenderManager
           rview.AttachNew (new (parent.renderViewPool) 
             CS::RenderManager::RenderView (targetView));
           targetView->UpdateClipper ();
-          Tree::ContextNode* context = 
+          typename Tree::ContextNode* context = 
             renderTree.CreateContext (targetContexts, rview);
   
           contextSetup (renderTree, context, targetContexts, rview->GetThisSector (), rview);
@@ -221,7 +221,7 @@ namespace RenderManager
     void RegisterRenderTarget (iTextureHandle* target, 
       iView* view, int subtexture = 0, uint flags = 0)
     {
-      RenderTargetInfo::ViewInfo newView;
+      typename RenderTargetInfo::ViewInfo newView;
       newView.view = view;
       newView.flags = flags;
       RenderTargetInfo* targetInfo = targets.GetElementPointer (target);

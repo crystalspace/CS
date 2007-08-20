@@ -19,8 +19,9 @@
 #ifndef __CS_CSPLUGINCOMMON_RENDERMANAGER_STANDARDTREETRAITS_H__
 #define __CS_CSPLUGINCOMMON_RENDERMANAGER_STANDARDTREETRAITS_H__
 
-#include "ivideo/rendermesh.h"
 #include "iengine/mesh.h"
+#include "ivaria/view.h"
+#include "ivideo/rendermesh.h"
 #include "csutil/comparator.h"
 #include "csutil/compileassert.h"
 #include "csplugincommon/rendermanager/svarrayholder.h"
