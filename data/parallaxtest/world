@@ -45,6 +45,15 @@
 		<shader>
 			<file>/shader/parallax/parallax.xml</file>
 		</shader>
+		<shader>
+		  <file>/shader/reflect.xml</file>
+		</shader>
+		<shader>
+		  <file>/shader/reflect/glass.xml</file>
+		</shader>
+		<shader>
+		  <file>/shader/reflect/reflect_environment.xml</file>
+		</shader>
 	</shaders>
 	<textures>
 		<texture name="walls.jpg">
@@ -63,6 +72,10 @@
 		</texture>
 		<texture name="boxh.jpg">
 			<file>boxh.jpg</file>
+		</texture>
+		<texture name="bricks_n.png">
+			<file>/lev/stenciltest/bricks_n.png</file>
+			<class>normalmap</class>
 		</texture>
 	</textures>
 	<materials>
@@ -95,7 +108,31 @@
 		<sector>Scene</sector>
 		<position x="0.00333691" y="-0.00952018" z="-0.00766289" />
 	</start>
+    <library>/lib/teapot/teapot.lib</library>
+    <materials>
+        <material name="Teapot_reflect">
+            <texture>xygyw.tga</texture>
+	    <shader type="standard">glass</shader>
+	    <shadervar name="refraction index" type="float">1.1</shadervar>
+            <shadervar name="tex normal" type="texture">bricks_n.png</shadervar>
+        </material>
+    </materials>
 	<sector name="Scene">
+    <meshobj name="teapot1">
+      <zuse />
+      <plugin>crystalspace.mesh.loader.genmesh</plugin>
+      <params>
+        <factory>Teapot</factory>
+	<material>Teapot_reflect</material>
+        <localshadows />
+        <!--mixmode>
+          <add/>
+        </mixmode-->
+      </params>
+      <move>
+        <v x="0" y="-2.10426" z="1" />
+      </move>
+    </meshobj>
 		<meshobj name="Cube">
 			<plugin>thing</plugin>
 			<params>

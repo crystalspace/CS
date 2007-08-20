@@ -15,6 +15,7 @@ chronological order.
 	  environment reflection and refraction, a glass shader, and made
 	  adjustments to properly support the discarding of unused vertex-to-
 	  fragment data.
+	- res added a glassy teapot to parallaxtest.
 17-Aug-2007
 	- res augmented iView to support mesh filtering.
 	- res fixed cubemap support in the gl3d fbo render-to-texture path.
