@@ -45,6 +45,22 @@ static void NormSwap (csVector3& n, bool in)
   if (in) n = -n;
 }
 
+csVector2 csPrimitives::boxTable[] =
+{
+  csVector2 ( 0, 0 ), csVector2 ( 0, 1 ), csVector2 ( 1, 0 ),
+  csVector2 ( 0, 0 ), csVector2 ( 0, 0 ), csVector2 ( 1, 0 ),
+  csVector2 ( 1, 0 ), csVector2 ( 0, 0 ), csVector2 ( 1, 0 ),
+  csVector2 ( 1, 0 ), csVector2 ( 1, 1 ), csVector2 ( 0, 0 ),
+  csVector2 ( 0, 1 ), csVector2 ( 1, 1 ), csVector2 ( 1, 1 ),
+  csVector2 ( 0, 1 ), csVector2 ( 1, 1 ), csVector2 ( 1, 0 ),
+  csVector2 ( 1, 1 ), csVector2 ( 0, 1 ), csVector2 ( 0, 0 ),
+  csVector2 ( 0, 1 ), csVector2 ( 1, 1 ), csVector2 ( 0, 1 )
+};
+
+csVector2 csPrimitives::quadTable[] =
+{
+  csVector2 (0,0), csVector2 (0,1), csVector2 (1,1), csVector2 (1,0)
+};
 
 void csPrimitives::GenerateBox (
       const csBox3& box,
@@ -52,8 +68,15 @@ void csPrimitives::GenerateBox (
       csDirtyAccessArray<csVector2>& mesh_texels,
       csDirtyAccessArray<csVector3>& mesh_normals,
       csDirtyAccessArray<csTriangle>& mesh_triangles,
-      uint32 flags)
+      uint32 flags, CS::Geometry::TextureMapper* mapper)
 {
+  bool alloced = false;
+  if (!mapper)
+  {
+    alloced = true;
+    mapper = new CS::Geometry::TableTextureMapper (boxTable);
+  }
+
   mesh_vertices.SetSize (24);
   mesh_texels.SetSize (24);
   mesh_normals.SetSize (24);
@@ -89,41 +112,6 @@ void csPrimitives::GenerateBox (
   vertices[21].Set(box.MinX(), box.MinY(), box.MinZ());
   vertices[22].Set(box.MinX(), box.MinY(), box.MinZ());
   vertices[23].Set(box.MinX(), box.MinY(), box.MinZ());
-
-  csVector2* texels = mesh_texels.GetArray ();
-  // the comments indicate which face
-  // (numbered 1-6) the texel applies to
-  texels[0].Set(0, 0); // 1
-  texels[1].Set(0, 1); // 2
-  texels[2].Set(1, 0); // 3
-
-  texels[3].Set(0, 0); // 2
-  texels[4].Set(0, 0); // 3
-  texels[5].Set(1, 0); // 4
-
-  texels[6].Set(1, 0); // 2
-  texels[7].Set(0, 0); // 4
-  texels[8].Set(1, 0); // 5
-
-  texels[9].Set(1, 0); // 1
-  texels[10].Set(1, 1); // 2
-  texels[11].Set(0, 0); // 5
-
-  texels[12].Set(0, 1); // 3
-  texels[13].Set(1, 1); // 4
-  texels[14].Set(1, 1); // 6
-
-  texels[15].Set(0, 1); // 4
-  texels[16].Set(1, 1); // 5
-  texels[17].Set(1, 0); // 6
-
-  texels[18].Set(1, 1); // 1
-  texels[19].Set(0, 1); // 5
-  texels[20].Set(0, 0); // 6
-
-  texels[21].Set(0, 1); // 1
-  texels[22].Set(1, 1); // 3
-  texels[23].Set(0, 1); // 6
 
   mesh_triangles.SetSize (12);
   csTriangle* triangles = mesh_triangles.GetArray ();
@@ -223,13 +211,24 @@ void csPrimitives::GenerateBox (
     n[20].Set(0, -1, 0); NormSwap (n[20], in);
     n[23].Set(0, -1, 0); NormSwap (n[23], in);
   }
+
+  csVector2* texels = mesh_texels.GetArray ();
+  // the comments indicate which face
+  // (numbered 1-6) the texel applies to
+  size_t i;
+  for (i = 0 ; i < 24 ; i++)
+  {
+    texels[i] = mapper->Map (vertices[i], n[i], i);
+  }
+  if (alloced) delete mapper;
 }
 
 void csPrimitives::GenerateCapsule (float l, float r, uint sides,
       csDirtyAccessArray<csVector3>& mesh_vertices,
       csDirtyAccessArray<csVector2>& mesh_texels,
       csDirtyAccessArray<csVector3>& mesh_normals,
-      csDirtyAccessArray<csTriangle>& mesh_triangles)
+      csDirtyAccessArray<csTriangle>& mesh_triangles,
+      CS::Geometry::TextureMapper* mapper)
 {
   const uint n = sides * 4;
   l *= 0.5;
@@ -341,6 +340,12 @@ void csPrimitives::GenerateCapsule (float l, float r, uint sides,
     start_nx = start_nx2;
     start_ny = start_ny2;
   }
+  if (mapper)
+  {
+    size_t i;
+    for (i = 0 ; i < mesh_vertices.GetSize () ; i++)
+      mesh_texels.Push (mapper->Map (mesh_vertices[i], mesh_normals[i], i));
+  }
 }
 
 void csPrimitives::GenerateQuad (const csVector3 &v1, const csVector3 &v2,
@@ -348,8 +353,16 @@ void csPrimitives::GenerateQuad (const csVector3 &v1, const csVector3 &v2,
                           csDirtyAccessArray<csVector3>& mesh_vertices,
                           csDirtyAccessArray<csVector2>& mesh_texels,
                           csDirtyAccessArray<csVector3>& mesh_normals,
-                          csDirtyAccessArray<csTriangle>& mesh_triangles)
+                          csDirtyAccessArray<csTriangle>& mesh_triangles,
+			  CS::Geometry::TextureMapper* mapper)
 {
+  bool alloced = false;
+  if (!mapper)
+  {
+    alloced = true;
+    mapper = new CS::Geometry::TableTextureMapper (quadTable);
+  }
+
   mesh_vertices.SetSize (4);
   mesh_texels.SetSize (4);
   mesh_normals.SetSize (4);
@@ -365,15 +378,17 @@ void csPrimitives::GenerateQuad (const csVector3 &v1, const csVector3 &v2,
   mesh_normals[2].Normalize ();
   mesh_normals[3].Normalize ();
 
-  mesh_texels[0] = csVector2 (0,0);
-  mesh_texels[1] = csVector2 (0,1);
-  mesh_texels[2] = csVector2 (1,1);
-  mesh_texels[3] = csVector2 (1,0);
+  mesh_texels[0] = mapper->Map (mesh_vertices[0], mesh_normals[0], 0);
+  mesh_texels[1] = mapper->Map (mesh_vertices[1], mesh_normals[1], 0);
+  mesh_texels[2] = mapper->Map (mesh_vertices[2], mesh_normals[2], 0);
+  mesh_texels[3] = mapper->Map (mesh_vertices[3], mesh_normals[3], 0);
 
   mesh_triangles[0].a = 3; mesh_triangles[0].b = 0; mesh_triangles[0].c = 1;
   mesh_triangles[1].a = 0; mesh_triangles[1].b = 1; mesh_triangles[1].c = 2;
   mesh_triangles[2].a = 1; mesh_triangles[2].b = 2; mesh_triangles[2].c = 3;
   mesh_triangles[3].a = 2; mesh_triangles[3].b = 3; mesh_triangles[3].c = 0;
+
+  if (alloced) delete mapper;
 }
 
 void csPrimitives::GenerateSphere (const csEllipsoid& ellips, int num,
@@ -381,7 +396,8 @@ void csPrimitives::GenerateSphere (const csEllipsoid& ellips, int num,
       csDirtyAccessArray<csVector2>& mesh_texels,
       csDirtyAccessArray<csVector3>& mesh_normals,
       csDirtyAccessArray<csTriangle>& mesh_triangles,
-      bool cyl_mapping, bool toponly, bool reversed)
+      bool cyl_mapping, bool toponly, bool reversed,
+      CS::Geometry::TextureMapper* mapper)
 {
   int num_vertices = 0;
   int num_triangles = 0;
@@ -417,18 +433,21 @@ void csPrimitives::GenerateSphere (const csEllipsoid& ellips, int num,
     vertices.GetExtend (num_vertices).Set (new_radius * (float) cos (angle),
       new_height, new_radius * (float) sin (angle));
 
-    if (cyl_mapping)
+    if (!mapper)
     {
-      u = float (j) / float (num);
-      v = 0.5f;
-    }
-    else
-    {
-      u = (float) cos (angle) * 0.5f + 0.5f;
-      v = (float) sin (angle) * 0.5f + 0.5f;
-    }
+      if (cyl_mapping)
+      {
+        u = float (j) / float (num);
+        v = 0.5f;
+      }
+      else
+      {
+        u = (float) cos (angle) * 0.5f + 0.5f;
+        v = (float) sin (angle) * 0.5f + 0.5f;
+      }
 
-    uvverts.GetExtend (num_vertices).Set (u, v);
+      uvverts.GetExtend (num_vertices).Set (u, v);
+    }
     num_vertices++;
   }
 
@@ -454,21 +473,24 @@ void csPrimitives::GenerateSphere (const csEllipsoid& ellips, int num,
     {
       float angle = j * 2.0f * radius_step * TWO_PI / 360.0f;
 
-      if (cyl_mapping)
+      if (!mapper)
       {
-        u = float (j) / float (num);
-        v = 1.0f - float (i + num / 2) / float (num);
-      }
-      else
-      {
-        u = uv_radius * (float) cos (angle) + 0.5f;
-        v = uv_radius * (float) sin (angle) + 0.5f;
+        if (cyl_mapping)
+        {
+          u = float (j) / float (num);
+          v = 1.0f - float (i + num / 2) / float (num);
+        }
+        else
+        {
+          u = uv_radius * (float) cos (angle) + 0.5f;
+          v = uv_radius * (float) sin (angle) + 0.5f;
+        }
+        uvverts.GetExtend (num_vertices).Set (u, v);
       }
 
       new_verticesT.GetExtend (j) = num_vertices;
       vertices.GetExtend (num_vertices).Set (new_radius * (float) cos (angle),
         new_height, new_radius * (float) sin (angle));
-      uvverts.GetExtend (num_vertices).Set (u, v);
       num_vertices++;
 
       if (!toponly)
@@ -477,8 +499,11 @@ void csPrimitives::GenerateSphere (const csEllipsoid& ellips, int num,
         vertices.GetExtend (num_vertices).Set (new_radius * (float) cos (angle),
           -new_height, new_radius * (float) sin (angle));
 
-        if (cyl_mapping) v = 1.0f - v;
-        uvverts.GetExtend (num_vertices).Set (u, v);
+	if (!mapper)
+	{
+          if (cyl_mapping) v = 1.0f - v;
+          uvverts.GetExtend (num_vertices).Set (u, v);
+	}
         num_vertices++;
       }
     }
@@ -530,10 +555,13 @@ void csPrimitives::GenerateSphere (const csEllipsoid& ellips, int num,
   // Create the top and bottom vertices.
   int top_vertex = num_vertices;
   vertices.GetExtend (num_vertices).Set (0.0f, vert_radius, 0.0f);
-  if (cyl_mapping)
-    uvverts.GetExtend (num_vertices).Set (0.5f, 0.0f);
-  else
-    uvverts.GetExtend (num_vertices).Set (0.5f, 0.5f);
+  if (!mapper)
+  {
+    if (cyl_mapping)
+      uvverts.GetExtend (num_vertices).Set (0.5f, 0.0f);
+    else
+      uvverts.GetExtend (num_vertices).Set (0.5f, 0.5f);
+  }
   num_vertices++;
   int bottom_vertex = 0;
 
@@ -541,10 +569,13 @@ void csPrimitives::GenerateSphere (const csEllipsoid& ellips, int num,
   {
     bottom_vertex = num_vertices;
     vertices.GetExtend (num_vertices).Set (0.0f, -vert_radius, 0.0f);
-    if (cyl_mapping)
-      uvverts.GetExtend (num_vertices).Set (0.5f, 1.0f);
-    else
-      uvverts.GetExtend (num_vertices).Set (0.5f, 0.5f);
+    if (!mapper)
+    {
+      if (cyl_mapping)
+        uvverts.GetExtend (num_vertices).Set (0.5f, 1.0f);
+      else
+        uvverts.GetExtend (num_vertices).Set (0.5f, 0.5f);
+    }
     num_vertices++;
   }
 
@@ -611,8 +642,16 @@ void csPrimitives::GenerateSphere (const csEllipsoid& ellips, int num,
       sizeof(csVector3)*num_vertices);
 
   csVector2* genmesh_texels = mesh_texels.GetArray ();
-  memcpy (genmesh_texels, uvverts.GetArray (),
+  if (mapper)
+  {
+    for (i = 0 ; i < num_vertices ; i++)
+      genmesh_texels[i] = mapper->Map (mesh_vertices[i], mesh_normals[i], i);
+  }
+  else
+  {
+    memcpy (genmesh_texels, uvverts.GetArray (),
       sizeof(csVector2)*num_vertices);
+  }
 
   mesh_triangles.SetSize (num_triangles);
   csTriangle* ball_triangles = mesh_triangles.GetArray ();

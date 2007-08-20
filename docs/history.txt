@@ -8,6 +8,11 @@ chronological order.
 
 20-Aug-2007
 	- Jorrit fixed decals so they work fine on 64-bit.
+	- Jorrit added CS::Geometry::TextureMapper. This class works
+	  together with csPrimitives so that you can specify alternative
+	  ways to do the texture mapping for the generated primites.
+	  Also extended the GeneralMeshBuilder functions with a texture
+	  mapper parameter.
 17-Aug-2007
 	- Jorrit fixed a bug in genmesh. Decals didn't work on submeshes.
 	  This prevented decals from working on levels treated with

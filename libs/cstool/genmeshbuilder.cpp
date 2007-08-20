@@ -91,7 +91,8 @@ static void AppendOrSetData (iGeneralFactoryState* factory, bool append,
 
 void GeneralMeshBuilder::GenerateBox (
       iGeneralFactoryState* factory, bool append,
-      const csBox3& box, uint32 flags)
+      const csBox3& box, uint32 flags,
+      TextureMapper* mapper)
 {
   csDirtyAccessArray<csVector3> mesh_vertices;
   csDirtyAccessArray<csVector2> mesh_texels;
@@ -99,14 +100,15 @@ void GeneralMeshBuilder::GenerateBox (
   csDirtyAccessArray<csTriangle> mesh_triangles;
   csPrimitives::GenerateBox (box,
       mesh_vertices, mesh_texels, mesh_normals,
-      mesh_triangles, flags);
+      mesh_triangles, flags, mapper);
   AppendOrSetData (factory, append, mesh_vertices, mesh_texels,
       mesh_normals, mesh_triangles);
 }
 
 void GeneralMeshBuilder::GenerateCapsule (
       iGeneralFactoryState* factory, bool append,
-      float l, float r, uint sides)
+      float l, float r, uint sides,
+      TextureMapper* mapper)
 {
   csDirtyAccessArray<csVector3> mesh_vertices;
   csDirtyAccessArray<csVector2> mesh_texels;
@@ -114,7 +116,7 @@ void GeneralMeshBuilder::GenerateCapsule (
   csDirtyAccessArray<csTriangle> mesh_triangles;
   csPrimitives::GenerateCapsule (l, r, sides,
       mesh_vertices, mesh_texels, mesh_normals,
-      mesh_triangles);
+      mesh_triangles, mapper);
   AppendOrSetData (factory, append, mesh_vertices, mesh_texels,
       mesh_normals, mesh_triangles);
 }
@@ -122,7 +124,8 @@ void GeneralMeshBuilder::GenerateCapsule (
 void GeneralMeshBuilder::GenerateQuad (
     iGeneralFactoryState* factory, bool append,
     const csVector3 &v1, const csVector3 &v2,
-    const csVector3 &v3, const csVector3 &v4)
+    const csVector3 &v3, const csVector3 &v4,
+    TextureMapper* mapper)
 {
   csDirtyAccessArray<csVector3> mesh_vertices;
   csDirtyAccessArray<csVector2> mesh_texels;
@@ -130,7 +133,7 @@ void GeneralMeshBuilder::GenerateQuad (
   csDirtyAccessArray<csTriangle> mesh_triangles;
   csPrimitives::GenerateQuad (v1, v2, v3, v4,
       mesh_vertices, mesh_texels, mesh_normals,
-      mesh_triangles);
+      mesh_triangles, mapper);
   AppendOrSetData (factory, append, mesh_vertices, mesh_texels,
       mesh_normals, mesh_triangles);
 }
@@ -138,7 +141,8 @@ void GeneralMeshBuilder::GenerateQuad (
 void GeneralMeshBuilder::GenerateSphere (
       iGeneralFactoryState* factory, bool append,
       const csEllipsoid& ellips, int num,
-      bool cyl_mapping, bool toponly, bool reversed)
+      bool cyl_mapping, bool toponly, bool reversed,
+      TextureMapper* mapper)
 {
   csDirtyAccessArray<csVector3> mesh_vertices;
   csDirtyAccessArray<csVector2> mesh_texels;
@@ -146,7 +150,8 @@ void GeneralMeshBuilder::GenerateSphere (
   csDirtyAccessArray<csTriangle> mesh_triangles;
   csPrimitives::GenerateSphere (ellips, num,
       mesh_vertices, mesh_texels, mesh_normals,
-      mesh_triangles, cyl_mapping, toponly, reversed);
+      mesh_triangles, cyl_mapping, toponly, reversed,
+      mapper);
   AppendOrSetData (factory, append, mesh_vertices, mesh_texels,
       mesh_normals, mesh_triangles);
 }

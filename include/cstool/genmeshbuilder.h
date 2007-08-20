@@ -73,21 +73,27 @@ public:
    * to the geometry already in the factory.
    * \param flags is a combination of csPrimitives::BoxFlags enumeration
    * values. Default is CS_PRIMBOX_SMOOTH.
+   * \param mapper is an optional texture mapper. If not given the default
+   * TableTextureMapper is used with csPrimitives::boxTable.
    */
   static void GenerateBox (
       iGeneralFactoryState* factory, bool append,
       const csBox3& box,
-      uint32 flags = csPrimitives::CS_PRIMBOX_SMOOTH);
+      uint32 flags = csPrimitives::CS_PRIMBOX_SMOOTH,
+      TextureMapper* mapper = 0);
 
   /**
    * Generate quad.
    * \param append if true then append the vertices and triangles
    * to the geometry already in the factory.
+   * \param mapper is an optional texture mapper. If not given the default
+   * TableTextureMapper is used with csPrimitives::quadTable.
    */
   static void GenerateQuad (
       iGeneralFactoryState* factory, bool append,
       const csVector3 &v1, const csVector3 &v2,
-      const csVector3 &v3, const csVector3 &v4);
+      const csVector3 &v3, const csVector3 &v4,
+      TextureMapper* mapper = 0);
 
   /**
    * Generate a capsule of given length and radius.
@@ -96,10 +102,14 @@ public:
    * \param l Capsule length.
    * \param r Capsule radius.
    * \param sides Number of sides.
+   * \param mapper is an optional texture mapper. If not given the
+   * default capsule texture mapping will be used (currently not
+   * implemented, you have to specify a mapper).
    */
   static void GenerateCapsule (
       iGeneralFactoryState* factory, bool append,
-      float l, float r, uint sides);
+      float l, float r, uint sides,
+      TextureMapper* mapper = 0);
 
   /**
    * Generate a sphere with 'num' vertices on the rim.
@@ -111,13 +121,16 @@ public:
    * \param toponly if true then only generate the top half of the sphere.
    * \param reversed if true then generate the sphere so it is visible
    * from the inside.
+   * \param mapper is an optional texture mapper. If not given the
+   * mapping as defined by the 'cyl_mapping' flag will be used.
    */
   static void GenerateSphere (
       iGeneralFactoryState* factory, bool append,
       const csEllipsoid& ellips, int num,
       bool cyl_mapping = false,
       bool toponly = false,
-      bool reversed = false);
+      bool reversed = false,
+      TextureMapper* mapper = 0);
 };
 } // namespace Geometry
 } // namespace CS
