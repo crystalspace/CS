@@ -61,8 +61,19 @@ namespace RenderManager
     {
     }
 
-    // Need to unhide this one
-    using BaseType::operator();
+    void operator() (const typename Tree::TreeTraitsType::MeshNodeKeyType& key,
+      typename Tree::MeshNode* node, typename Tree::ContextNode& ctxNode, Tree& tree)
+    {
+      iShader* lastShader = 0;
+      size_t lastTicket = (size_t)~0;
+      firstMeshIndex = 0;
+      meshesToRender.Empty ();
+      meshesToRender.SetCapacity (ctxNode.totalRenderMeshes);
+
+      BaseType::operator() (key, node, ctxNode, tree);
+
+      RenderMeshes (lastShader, lastTicket, ctxNode);
+    }
 
     void operator() (typename Tree::MeshNode* node,
       const typename Tree::MeshNode::SingleMesh& mesh, size_t index,
@@ -72,37 +83,64 @@ namespace RenderManager
       iShader* shader = ctxNode.shaderArray[index];
       if (!shader) return;
       size_t ticket = ctxNode.ticketArray[index];
-      ctxNode.svArrays.SetupSVStck (varStack, index);
 
-      // Render the mesh
-      RenderSingleMesh (mesh.renderMesh, shader, ticket,
-        mesh.zmode);
+      // Render meshes if shader or ticket differ
+      if ((shader != lastShader) || (ticket != lastTicket))
+      {
+        RenderMeshes (lastShader, lastTicket, ctxNode);
+        lastShader = shader;
+        lastTicket = ticket;
+        firstMeshIndex = index;
+      }
+      MeshToRender& mtr = meshesToRender.GetExtend (meshesToRender.GetSize ());
+      mtr.mesh = mesh.renderMesh;
+      mtr.zmode = mesh.zmode;
     }
 
   private:
 
-    void RenderSingleMesh (csRenderMesh* mesh, iShader* shader, size_t shaderTicket,
-      csZBufMode zmode)
+    void RenderMeshes (iShader* shader, size_t shaderTicket, 
+      typename Tree::ContextNode& ctxNode)
     {
+      if (meshesToRender.GetSize() == 0) return;
+
       size_t numPasses = shader->GetNumberOfPasses (shaderTicket);
 
       for (size_t i = 0; i < numPasses; ++i)
       {
         shader->ActivatePass (shaderTicket, i);
 
-        csRenderMeshModes modes (*mesh);
-        shader->SetupPass (shaderTicket, mesh, modes, varStack);
-        modes.z_buf_mode = zmode;
+        for (size_t m = 0; m < meshesToRender.GetSize(); m++)
+        {
+          ctxNode.svArrays.SetupSVStck (varStack, firstMeshIndex + m);
 
-        g3d->DrawMesh (mesh, modes, varStack);
+          csRenderMesh* mesh = meshesToRender[m].mesh;
+          csRenderMeshModes modes (*mesh);
+          shader->SetupPass (shaderTicket, mesh, modes, varStack);
+          modes.z_buf_mode = meshesToRender[m].zmode;
 
-        shader->TeardownPass (shaderTicket);
+          g3d->DrawMesh (mesh, modes, varStack);
+
+          shader->TeardownPass (shaderTicket);
+        }
         shader->DeactivatePass (shaderTicket);
       }
+      meshesToRender.Empty ();
     }
+
 
     iGraphics3D* g3d;
     csShaderVariableStack& varStack;
+
+    iShader* lastShader;
+    size_t lastTicket;
+    size_t firstMeshIndex;
+    struct MeshToRender
+    {
+      csRenderMesh* mesh;
+      csZBufMode zmode;
+    };
+    csArray<MeshToRender> meshesToRender;
   };
 
 

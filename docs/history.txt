@@ -16,6 +16,8 @@ chronological order.
 	  adjustments to properly support the discarding of unused vertex-to-
 	  fragment data.
 	- res added a glassy teapot to parallaxtest.
+	- res made a small optimization to the RM rendering: multiple meshes
+	  with the same shader + ticket are now rendered in "bulk".
 17-Aug-2007
 	- res augmented iView to support mesh filtering.
 	- res fixed cubemap support in the gl3d fbo render-to-texture path.
