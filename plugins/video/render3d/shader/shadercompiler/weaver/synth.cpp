@@ -677,8 +677,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         checkedTechs.AddNoTest (tech);
       }
     }
+
+    bool result = coerceCost != WeaverCommon::NoCoercion;
+    if (result)
+    {
+      usedOutputs.AddNoTest (output);
+    }
     
-    return coerceCost != WeaverCommon::NoCoercion;
+    return result;
   }
       
   WeaverCommon::iCombiner* Synthesizer::GetCombiner (
