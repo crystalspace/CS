@@ -17,21 +17,29 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
-<input name="Normal" type="normal" default="complex">
-  <block location="vertexIn">
-    <varying type="normal" name="Normal" />
+<!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
+     verbatim -->
+<input name="objectToWorld" type="float4x4" default="complex">
+  <block location="cg:vertexIn">
+    <uniform type="float4x4" name="objectToWorld" />
   </block>
   
-  <block location=":pass">
-    <buffer source="normal" destination="vertexIn.Normal" />
+  <block location="cg:fragmentIn">
+    <uniform type="float4x4" name="objectToWorld" />
   </block>
   
-  <block location="vertexToFragment">
-    <varying type="normal" name="Normal" />
+  <block location="cg:vertexMain">
+    objectToWorld = vertexIn.objectToWorld;
   </block>
-  
-  <block location="vertexMain">
-    Normal = vertexIn.Normal;
+
+  <block location="cg:fragmentMain">
+    objectToWorld = fragmentIn.objectToWorld;
   </block>
-  
+
+  <block location="cg:variablemap">
+    <variablemap variable="object2world transform" 
+      destination="vertexIn.objectToWorld" />
+    <variablemap variable="object2world transform" 
+      destination="fragmentIn.objectToWorld" />
+  </block>
 </input>

@@ -16,21 +16,21 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
-<!-- Direction from vertex to eye, in camera space -->
 <snippet>
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
-  
-    <input name="position" type="position4_camera" />
     
-    <block location="cg:vertexMain">
-      eyeDirectionCamera = -position;
-    </block>
-  
+    <input name="a" type="rgba" />
+    <input name="b" type="rgba" />
+      
     <block location="cg:fragmentMain">
-      eyeDirectionCamera = -position;
+      result = a+b;
     </block>
-  
-    <output name="eyeDirectionCamera" type="direction_camera" />
+
+    <block location="cg:vertexMain">
+      result = a+b;
+    </block>
+    
+    <output name="result" type="rgba" />
   </technique>
 </snippet>

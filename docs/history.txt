@@ -11,6 +11,10 @@ chronological order.
 	  output of a node was used twice, tho it shouldn't have.
 	- res augmented the Cg weaver combiner to discard unused vertex-to-
 	  fragment data.
+	- res added new weaver snippets for additive blending, fresnel term,
+	  environment reflection and refraction, a glass shader, and made
+	  adjustments to properly support the discarding of unused vertex-to-
+	  fragment data.
 17-Aug-2007
 	- res augmented iView to support mesh filtering.
 	- res fixed cubemap support in the gl3d fbo render-to-texture path.

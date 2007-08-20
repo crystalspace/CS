@@ -37,8 +37,8 @@
     </input>
     
     <block location="cg:fragmentMain">
-      // @@@ Why the minus?
-      envColor = texCUBE (texReflect, -dir);
+      envColor = texCUBE (texReflect, dir);
+      //envColor = float4 (0.5*dir+float3(0.5), 1);
     </block>
     
     <output name="envColor" type="rgba" />

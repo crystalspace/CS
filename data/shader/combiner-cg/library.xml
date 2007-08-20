@@ -31,6 +31,34 @@
     
     <output name="output" type="rgba" />
   </coercion>
+
+  <coercion from="float" to="rgb" cost="0">
+    <input name="input" type="float" />
+
+    <block location="fragmentMain">
+      output = float3 (input);
+    </block>
+
+    <block location="vertexMain">
+      output = float3 (input);
+    </block>
+    
+    <output name="output" type="rgb" />
+  </coercion>
+  
+  <coercion from="float" to="rgba" cost="0">
+    <input name="input" type="float" />
+
+    <block location="fragmentMain">
+      output = float4 (input);
+    </block>
+
+    <block location="vertexMain">
+      output = float4 (input);
+    </block>
+    
+    <output name="output" type="rgba" />
+  </coercion>
   
   <!------------------------------------------------------------------------->
   
@@ -141,6 +169,30 @@
     <output name="output" type="direction_camera" />
   </coercion>
   
+  <coercion from="direction_camera" to="direction_world" cost="3">
+    <input name="input" type="direction_camera" />
+
+    <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
+	 verbatim -->
+    <input name="ModelViewIT" type="float4x4" default="complex"
+	private="yes">
+      <block location="vertexIn">
+	<uniform type="float4x4" name="ModelViewIT" 
+	  binding="state.matrix.modelview.invtrans" />
+      </block>
+      
+      <block location="vertexMain">
+	ModelViewIT = vertexIn.ModelViewIT;
+      </block>
+    </input>
+    
+    <block location="vertexMain">
+      output = mul (ModelViewIT, float4 (input, 0)).xyz;
+    </block>
+    
+    <output name="output" type="direction_world" />
+  </coercion>
+  
   <!------------------------------------------------------------------------->
   
   <coercion from="normal_object" to="normal_tangent" cost="3">
@@ -202,33 +254,7 @@
   <coercion from="normal_object" to="normal_world" cost="3">
     <input name="input" type="normal_object" />
 
-    <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
-	 verbatim -->
-    <input name="objectToWorld" type="float4x4" default="complex" 
-	private="yes">
-      <block location="vertexIn">
-	<uniform type="float4x4" name="objectToWorld" />
-      </block>
-      
-      <block location="fragmentIn">
-	<uniform type="float4x4" name="objectToWorld" />
-      </block>
-      
-      <block location="vertexMain">
-	objectToWorld = vertexIn.objectToWorld;
-      </block>
-
-      <block location="fragmentMain">
-	objectToWorld = fragmentIn.objectToWorld;
-      </block>
-
-      <block location="variablemap">
-	<variablemap variable="object2world transform" 
-	  destination="vertexIn.objectToWorld" />
-	<variablemap variable="object2world transform" 
-	  destination="fragmentIn.objectToWorld" />
-      </block>
-    </input>
+    <input file="/shader/combiner-cg/objectToWorld.inp" private="yes" />
     
     <block location="vertexMain">
       output =  mul (objectToWorld, float4 (input, 0)).xyz;
