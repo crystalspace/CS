@@ -1,5 +1,7 @@
 1.2 branch log.
 
+20-Aug-2007
+	- Jorrit merged r27453 into 1.2 (decal 64-bit fix).
 17-Aug-2007
 	- Vincent updated CS/scripts/rpm/cs.spec for 1.2 release.
 	- Jorrit merged r27446 into 1.2 (genmesh/decal fix).
