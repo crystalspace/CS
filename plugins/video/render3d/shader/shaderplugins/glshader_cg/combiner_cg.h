@@ -120,10 +120,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       
       csSet<csString> localIDs;
       csString locals;
-      csString inputMaps;
+      csHash<csString, csString> inputMaps;
       csRefArray<iDocumentNode> vertexBody;
       csRefArray<iDocumentNode> fragmentBody;
-      csString outputMaps;
+      csHash<csString, csString> outputMaps;
       csString links;
     };
     csArray<Snippet> snippets;
@@ -163,7 +163,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   
     void AppendProgramInput (const csRefArray<iDocumentNode>& nodes, 
       DocNodeAppender& appender);
+    void AppendProgramInput_V2FDecl (const csRefArray<iDocumentNode>& nodes, 
+      DocNodeAppender& appender);
+    void AppendProgramInput_V2FVP (const csRefArray<iDocumentNode>& nodes, 
+      DocNodeAppender& appender);
+    void AppendProgramInput_V2FFP (const csRefArray<iDocumentNode>& nodes, 
+      DocNodeAppender& appender);
+    void AppendProgramInput (iDocumentNode* node, DocNodeAppender& appender);
     csString CgType (const char* weaverType);
+    void AppendSnippetMap (const csHash<csString, csString>& map, 
+      DocNodeAppender& appender);
     
     class DocNodeAppender
     {
@@ -178,6 +187,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       void Append (const char* str);
       void Append (iDocumentNode* appendNode);
       void Append (const csRefArray<iDocumentNode>& nodes);
+      void AppendFmt (const char* str, ...)
+      {
+        va_list args;
+        va_start (args, str);
+        csString s;
+        s.FormatV (str, args);
+        va_end (args);
+        Append (s);
+      }
     };
   };
 }

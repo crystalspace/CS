@@ -6,6 +6,11 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Aug-2007
+	- res fixed an issue in the shader weaver where sometimes the same 
+	  output of a node was used twice, tho it shouldn't have.
+	- res augmented the Cg weaver combiner to discard unused vertex-to-
+	  fragment data.
 17-Aug-2007
 	- res augmented iView to support mesh filtering.
 	- res fixed cubemap support in the gl3d fbo render-to-texture path.
