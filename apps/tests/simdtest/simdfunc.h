@@ -29,13 +29,13 @@ using namespace CS::SIMD;
 
 CS_FORCEINLINE bool SIMDFunc(float* a, float* b, float* c, int size)
 {
-    Vector4* ap = (Vector4*) a;
-    Vector4* bp = (Vector4*) b;
-    Vector4* cp = (Vector4*) c;
+    Vector4f* ap = (Vector4f*) a;
+    Vector4f* bp = (Vector4f*) b;
+    Vector4f* cp = (Vector4f*) c;
 
-    Vector4 simd;
-    Vector4 simd2;
-    Vector4 simd3;
+    Vector4f simd;
+    Vector4f simd2;
+    Vector4f simd3;
 
         for(int j=0; j<size; j+=4)
         {

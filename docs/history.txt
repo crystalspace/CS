@@ -5,7 +5,10 @@ The overall history is in reverse (descending) chronological order, so that
 each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
-
+20-Aug-2007
+        - Mike Gist did a load of commenting and made some code pretty, nice
+          and correct.
+        - Mike Gist added basic sse2 abstraction.
 08-Aug-2007
         - Mike Gist added abstraction for AltiVec.
         - Mike Gist fixed SSE/AltiVec code path selection... each implementation

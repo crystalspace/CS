@@ -23,52 +23,61 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include <altivec.h>
 #include "csgeom/vector3.h"
+#include "csutil/processor/sse2cppsimdtypes.h"
 
 namespace CS
 {
     namespace SIMD
     {
-        typedef vector float Vector4;
+        typedef vector float Vector4f;
 
-        CS_FORCEINLINE Vector4 VectorSet(const float x)
+        /// Sets the 4 floating-point values to x.
+        CS_FORCEINLINE Vector4f VectorSet(const float x)
         {
-            Vector4 vec = (Vector4) (x, x, x, x);
+            Vector4 vec = (Vector4f) (x, x, x, x);
             return vec;
         }
 
-        CS_FORCEINLINE Vector4 VectorSet(const float x, const float y, const float z, const float w)
+        /// Sets highest to lowest floating-point values to x, y, z, w respectively.
+        CS_FORCEINLINE Vector4f VectorSet(const float x, const float y, const float z, const float w)
         {
-            Vector4 vec = (Vector4) (x, y, z, w);
+            Vector4f vec = (Vector4f) (x, y, z, w);
             return vec;
         }
         
-        CS_FORCEINLINE Vector4 VectorSetZero()
+        /// Sets the 4 floating-point values to zero.
+        CS_FORCEINLINE Vector4f VectorSetZerof()
         {
-            Vector4 vec = (Vector4) (0, 0, 0, 0);
+            Vector4f vec = (Vector4f) (0, 0, 0, 0);
             return vec;
         }
 
-        CS_FORCEINLINE Vector4 VectorLoad(const float* data)
+        /// Loads four floating-point values. Address 'data' can be unaligned.
+        CS_FORCEINLINE Vector4f VectorLoad(const float* data)
         {
             return vec_ld(0, data);
         }
 
-        CS_FORCEINLINE Vector4 VectorLoad(csVector3 vec)
+        /// Loads three floating-point values from a csVector3, forth is empty.
+        CS_FORCEINLINE Vector4f VectorLoad(const csVector3& vec)
         {
             return vec_sel(vec, VectorSetZero(), VectorSet(0,0,0,1));
         }
 
-        CS_FORCEINLINE Vector4 VectorLoad4(csVector3 vec)
+        /// Loads three floating-point values from a csVector3, forth is garbage data.
+        CS_FORCEINLINE Vector4f VectorLoad4(const csVector3& vec)
         {
             return vec_ld(0, vec.m);
         }
 
-        CS_FORCEINLINE void VectorStore(float* data, Vector4 a)
+        /// Stores 4 floating-point values. Address 'data' can be unaligned.
+        CS_FORCEINLINE void VectorStore(float* data, const Vector4f& a)
         {
             vec_st(data,0,a);
         }
 
-        CS_FORCEINLINE void VectorStore(csVector3* vec, Vector4 a)
+        /// Stores 3 floating-point values into a csVector3. Forth is not stored.
+        CS_FORCEINLINE void VectorStore(csVector3* vec, const Vector4f& a)
         {
             float f1[4];
 
@@ -78,185 +87,221 @@ namespace CS
             vec->z = f1[2];
         }
 
-        CS_FORCEINLINE void VectorStore4(csVector3* vec, Vector4 a)
+        /// Stores 3 floating-point values into a csVector3. Forth is stored in next memory address.
+        CS_FORCEINLINE void VectorStore4(csVector3* vec, const Vector4f& a)
         {
             vec_st(vec->m,0,a);
         }
 
-        CS_FORCEINLINE float VectorGetX(Vector4 a)
+        /// Returns the x floating-point value of a.
+        CS_FORCEINLINE float VectorGetX(const Vector4f& a)
         {
             float temp[4];
             VectorStore(temp, a);
             return temp[0];
         }
 
-        CS_FORCEINLINE float VectorGetY(Vector4 a)
+        /// Returns the y floating-point value of a.
+        CS_FORCEINLINE float VectorGetY(const Vector4f& a)
         {
             float temp[4];
             VectorStore(temp, a);
             return temp[1];
         }
 
-        CS_FORCEINLINE float VectorGetZ(Vector4 a)
+        /// Returns the z floating-point value of a.
+        CS_FORCEINLINE float VectorGetZ(const Vector4f& a)
         {
             float temp[4];
             VectorStore(temp, a);
             return temp[2];
         }
 
-        CS_FORCEINLINE float VectorGetW(Vector4 a)
+        /// Returns the w floating-point value of a.
+        CS_FORCEINLINE float VectorGetW(const Vector4f& a)
         {
             float temp[4];
             VectorStore(temp, a);
             return temp[3];
         }
 
-        CS_FORCEINLINE Vector4 VectorAdd(Vector4 a, Vector4 b)
+        /// Adds the four floating-point values of a and b.
+        CS_FORCEINLINE Vector4f VectorAdd(const Vector4f& a, const Vector4f& b)
         {
             return vec_add(a, b);
         }
 
-        CS_FORCEINLINE Vector4 VectorSub(Vector4 a, Vector4 b)
+        /// Subtracts the four floating-point values of a and b.
+        CS_FORCEINLINE Vector4f VectorSub(const Vector4f& a, const Vector4f& b)
         {
             return vec_sub(a, b);
         }
 
-        CS_FORCEINLINE Vector4 VectorMul(Vector4 a, Vector4 b)
+        /// Multiplies the four floating-point values of a and b.
+        CS_FORCEINLINE Vector4f VectorMul(const Vector4f& a, const Vector4f& b)
         {
             return vec_madd(a, b, VectorSetZero());
         }
 
-        CS_FORCEINLINE Vector4 VectorDiv(Vector4 a, Vector4 b)
+        /// Divides the four floating-point values of a and b.
+        CS_FORCEINLINE Vector4f VectorDiv(const Vector4f& a, const Vector4f& b)
         {
             return VectorMul(a, vec_re(b))
         }
-        CS_FORCEINLINE Vector4 VectorNeg(Vector4 a)
+
+        /// Returns the negatives of the four floating-point values of a and b.
+        CS_FORCEINLINE Vector4f VectorNeg(const Vector4f& a)
         {
             return VectorSub(VectorSetZero(), a);
         }
-        CS_FORCEINLINE Vector4 VectorMultAdd(Vector4 a, Vector4 b, Vector4 c)
+
+        /// Returns the four floating-point values of 'a multiplied by b and added to c'.
+        CS_FORCEINLINE Vector4f VectorMultAdd(const Vector4f& a, const Vector4f& b, const Vector4f& c)
         {
             return vec_madd(a, b, c);
         }
 
-        CS_FORCEINLINE Vector4 VectorSqrt(Vector4 a)
+        /// Returns the square roots of the four floating-point values of a.
+        CS_FORCEINLINE Vector4f VectorSqrt(const Vector4f& a)
         {
             return vec_re(vec_rsqrte(a));
         }
 
-        CS_FORCEINLINE Vector4 VectorRecip(Vector4 a)
+        /// Returns the reciprocals of the four floating-point values of a. 
+        CS_FORCEINLINE Vector4f VectorRecip(const Vector4f& a)
         {
             return vec_re(a);
         }
 
-        CS_FORCEINLINE Vector4 VectorRecipSqrt(Vector4 a)
+        /// Returns the reciprocals of the square roots of the four floating-point values of a.
+        CS_FORCEINLINE Vector4f VectorRecipSqrt(const Vector4f& a)
         {
             return vec_rsqrte(a);
         }
 
-        CS_FORCEINLINE Vector4 VectorMin(Vector4 a, Vector4 b)
+        /// Returns the minima of the four floating-point values of a and b.
+        CS_FORCEINLINE Vector4f VectorMin(const Vector4f& a, const Vector4f& b)
         {
             return vec_min(a, b);
         }
 
-        CS_FORCEINLINE Vector4 VectorMax(Vector4 a, Vector4 b)
+        /// Returns the maxima of the four floating-point values of a and b.
+        CS_FORCEINLINE Vector4f VectorMax(const Vector4f& a, const Vector4f& b)
         {
             return vec_max(a, b);
         }
 
-        CS_FORCEINLINE Vector4 VectorAND(Vector4 a, Vector4 b)
+        /// Returns the bitwise AND of the four floating-point values of a and b.
+        CS_FORCEINLINE Vector4f VectorAND(const Vector4f& a, const Vector4f& b)
         {
             return vec_and(a, b);
         }
 
-        CS_FORCEINLINE Vector4 VectorOR(Vector4 a, Vector4 b)
+        /// Returns the bitwise OR of the four floating-point values of a and b.
+        CS_FORCEINLINE Vector4f VectorOR(const Vector4f& a, const Vector4f& b)
         {
             return vec_or(a, b);
         }
 
-        CS_FORCEINLINE Vector4 VectorNOT(Vector4 a)
+        /// Returns the bitwise NOT of the four floating-point values of a and b.
+        CS_FORCEINLINE Vector4f VectorNOT(const Vector4f& a)
         {
             return vec_xor(a, vec_cmpeq(a, a));
         }
 
-        CS_FORCEINLINE Vector4 VectorXOR(Vector4 a, Vector4 b)
+        /// Returns the bitwise XOR of the four floating-point values of a and b.
+        CS_FORCEINLINE Vector4f VectorXOR(const Vector4f& a, const Vector4f& b)
         {
             return vec_xor(a, b);
         }
 
-        CS_FORCEINLINE Vector4 VectorEqual(Vector4 a, Vector4 b)
+        /// Compares the four floating-point values of a and b for equality.
+        CS_FORCEINLINE Vector4f VectorEqual(const Vector4f& a, const Vector4f& b)
         {
             return vec_cmpeq(a, b);
         }
 
-        CS_FORCEINLINE Vector4 VectorLess(Vector4 a, Vector4 b)
+        /// Compares the four floating-point values of a to see if they are less than b.
+        CS_FORCEINLINE Vector4f VectorLess(const Vector4f& a, const Vector4f& b)
         {
             return vec_cmplt(a, b);
         }
 
-        CS_FORCEINLINE Vector4 VectorLessEqual(Vector4 a, Vector4 b)
+        /// Compares the four floating-point values of a to see if they are less than or equal to b.
+        CS_FORCEINLINE Vector4f VectorLessEqual(const Vector4f& a, const Vector4f& b)
         {
             return vec_cmple(a, b);
         }
 
-        CS_FORCEINLINE Vector4 VectorNotEqual(Vector4 a, Vector4 b)
+        /// Compares the four floating-point values of a and b for non-equality.
+        CS_FORCEINLINE Vector4f VectorNotEqual(const Vector4f& a, const Vector4f& b)
         {
             return vec_nor(vec_cmpeq(a, b), VectorSetZero());
         }
 
-        CS_FORCEINLINE void MatrixTranspose(Vector4& a, Vector4& b, Vector4& c, Vector4& d)
+        /// Transposes the matrix with rows a, b, c, d.
+        CS_FORCEINLINE void MatrixTranspose(Vector4f& a, Vector4f& b, Vector4f& c, Vector4f& d)
         {
-            Vector4 AC1 = vec_mergeh(a, c);
-            Vector4 AC2 = vec_mergel(a, c);
-            Vector4 BD1 = vec_mergeh(b, d);
-            Vector4 BD2 = vec_mergel(b, d);
+            Vector4f AC1 = vec_mergeh(a, c);
+            Vector4f AC2 = vec_mergel(a, c);
+            Vector4f BD1 = vec_mergeh(b, d);
+            Vector4f BD2 = vec_mergel(b, d);
             a = vec_mergeh(AC1, BD1);
             b = vec_mergel(AC1, BD1);
             c = vec_mergeh(AC2, BD2);
             d = vec_mergel(AC2, BD2);
         }
 
-        CS_FORCEINLINE Vector4 VectorSplatX(Vector4 a)
+        /// Returns four floating-point values of the x element of a.
+        CS_FORCEINLINE Vector4f VectorSplatX(const Vector4f& a)
         {
             return vec_splat(a, 0);
         }
 
-        CS_FORCEINLINE Vector4 VectorSplatY(Vector4 a)
+        /// Returns four floating-point values of the y element of a.
+        CS_FORCEINLINE Vector4f VectorSplatY(const Vector4f& a)
         {
             return vec_splat(a, 1);
         }
 
-        CS_FORCEINLINE Vector4 VectorSplatZ(Vector4 a)
+        /// Returns four floating-point values of the z element of a.
+        CS_FORCEINLINE Vector4f VectorSplatZ(const Vector4f& a)
         {
             return vec_splat(a, 2);
         }
 
-        CS_FORCEINLINE Vector4 VectorSplatW(Vector4 a)
+        /// Returns four floating-point values of the w element of a.
+        CS_FORCEINLINE Vector4f VectorSplatW(const Vector4f& a)
         {
             return vec_splat(a, 3);
         }
 
-        CS_FORCEINLINE Vector4 VectorSelect(Vector4 a, Vector4 b, Vector4 c)
+        /// Selectively merges the two vectors a and b.
+        CS_FORCEINLINE Vector4f VectorSelect(const Vector4f& a, const Vector4f& b, const Vector4f& c)
         {
             return vec_sel(a, b, c);
         }
 
-        CS_FORCEINLINE bool VectorAllTrue(Vector4 a)
+        /// Returns true if all four floating-point values of a are true.
+        CS_FORCEINLINE bool VectorAllTrue(const Vector4f& a)
         {
             return vec_all_ne(a, 0);
         }
 
-        CS_FORCEINLINE bool VectorAnyTrue(Vector4 a)
+        /// Returns true if any four floating-point values of a are true.
+        CS_FORCEINLINE bool VectorAnyTrue(const Vector4f& a)
         {
             return vec_any_ne(a, 0);
         }
 
-        CS_FORCEINLINE Vector4 VectorMergeXY(Vector4 a, Vector4 b)
+        /// Selects and interleaves the lower two floating-point values from a and b.
+        CS_FORCEINLINE Vector4f VectorMergeXY(const Vector4f& a, const Vector4f& b)
         {
             return vec_mergel(a, b);
         }
 
-        CS_FORCEINLINE Vector4 VectorMergeZW(Vector4 a, Vector4 b)
+        /// Selects and interleaves the upper two floating-point values from a and b.
+        CS_FORCEINLINE Vector4f VectorMergeZW(const Vector4f& a, const Vector4f& b)
         {
             return vec_mergeh(a, b);
         }

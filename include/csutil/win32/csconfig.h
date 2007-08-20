@@ -120,9 +120,15 @@
 #endif
 
 // VC supports MMX/SSE.
-#if defined(CS_COMPILER_MSVC)
+/*
+ * Probably need some version checking
+ * for SSE3 if/when we get to that.
+ */
+ #if defined(CS_COMPILER_MSVC)
   #define CS_HAS_MMINTRIN_H
   #define CS_HAS_XMMINTRIN_H
+  #define CS_HAS_EMMINTRIN_H
+// For later use?
   #define CS_SUPPORTS_MMX
   #define CS_SUPPORTS_SSE
   #define CS_SUPPORTS_SSE2
