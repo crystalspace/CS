@@ -52,6 +52,19 @@ namespace lighter
     {
       globalLightmaps.DeleteIndex (glmOfs + index);
     }
+    void CleanEmpty ()
+    {
+      size_t i = glmOfs;
+      while (i < globalLightmaps.GetSize())
+      {
+        if (globalLightmaps[i]->GetAllocator().IsEmpty())
+        {
+          globalLightmaps.DeleteIndex (i);
+        }
+        else
+          i++;
+      }
+    }
   };
 
   namespace

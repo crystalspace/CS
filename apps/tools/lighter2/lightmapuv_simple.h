@@ -214,6 +214,20 @@ namespace lighter
         delete queue.maps[index].alloc;
         queue.maps.DeleteIndex (index);
       }
+      void CleanEmpty ()
+      {
+        size_t i = 0;
+        while (i < queue.maps.GetSize())
+        {
+          if (queue.maps[i].alloc->IsEmpty())
+          {
+            delete queue.maps[i].alloc;
+            queue.maps.DeleteIndex (i);
+          }
+          else
+            i++;
+        }
+      }
     };
     class ArraysLQ
     {

@@ -59,8 +59,7 @@ bool Simple::Setup ()
   view.AttachNew(new csView (engine, g3d));
   iGraphics2D* g2d = g3d->GetDriver2D ();
   // We use the full window to draw the world.
-  //view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
-  //view->SetRectangle (0, 0, 1024, 1024);
+  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   // Here we load our world from a map file.
   if (!LoadMap ()) return false;
@@ -98,8 +97,8 @@ bool Simple::Setup ()
   // Initialize our collider actor.
   collider_actor.SetCollideSystem (cdsys);
   collider_actor.SetEngine (engine);
-  csVector3 legs (.2f, 1.7f, .2f);
-  csVector3 body (.2f, 2.2f, .2f);
+  csVector3 legs (.2f, .3f, .2f);
+  csVector3 body (.2f, 1.2f, .2f);
   csVector3 shift (0, -1, 0);
   collider_actor.InitializeColliders (view->GetCamera (),
   	legs, body, shift);
@@ -120,13 +119,13 @@ void Simple::ProcessFrame ()
     // the camera to strafe up, down, left or right from it's
     // current position.
     if (kbd->GetKeyState (CSKEY_RIGHT))
-      obj_move = CS_VEC_RIGHT * 5.0f;
+      obj_move = CS_VEC_RIGHT * 3.0f;
     if (kbd->GetKeyState (CSKEY_LEFT))
-      obj_move = CS_VEC_LEFT * 5.0f;
+      obj_move = CS_VEC_LEFT * 3.0f;
     if (kbd->GetKeyState (CSKEY_UP))
-      obj_move = CS_VEC_UP * 5.0f;
+      obj_move = CS_VEC_UP * 3.0f;
     if (kbd->GetKeyState (CSKEY_DOWN))
-      obj_move = CS_VEC_DOWN * 5.0f;
+      obj_move = CS_VEC_DOWN * 3.0f;
   }
   else
   {
@@ -143,58 +142,26 @@ void Simple::ProcessFrame ()
     if (kbd->GetKeyState (CSKEY_PGDN))
       obj_rotate.Set (-1, 0, 0);
     if (kbd->GetKeyState (CSKEY_UP))
-      obj_move = CS_VEC_FORWARD * 5.0f;
+      obj_move = CS_VEC_FORWARD * 3.0f;
     if (kbd->GetKeyState (CSKEY_DOWN))
-      obj_move = CS_VEC_BACKWARD * 5.0f;
+      obj_move = CS_VEC_BACKWARD * 3.0f;
   }
 
   collider_actor.Move (float (elapsed_time) / 1000.0f, 1.0f,
     	obj_move, obj_rotate);
 
-
-
-
-
-  //r2t
-  csRef<iTextureWrapper> tex = 
-    engine->GetTextureList ()->FindByName ("r2t_target");
-  csRef<iTextureHandle> oldcontext;
-  if (!tex.IsValid())
-  {
-    tex = engine->CreateBlackTexture ("r2t_target", 512, 512, 0, 
-      CS_TEXTURE_3D);
-    tex->Register (g3d->GetTextureManager ());
-    g3d->SetRenderTarget (tex->GetTextureHandle (), false);
-    view->SetRectangle (0, 128, 512, 384); // @@@ Bah for unintuitive SetRectangle() coords.
-  }
-  else
-    g3d->SetRenderTarget (tex->GetTextureHandle (), false);
-  oldcontext = engine->GetContext ();
-  engine->SetContext (tex->GetTextureHandle ());
-  g3d->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER);
-  view->Draw ();
-  engine->SetContext (oldcontext);
-  g3d->FinishDraw ();
-
   // Tell 3D driver we're going to display 3D things.
-  if (!g3d->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARSCREEN | CSDRAW_3DGRAPHICS))
+  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
     return;
 
   // Tell the camera to render into the frame buffer.
-  //view->Draw ();
+  view->Draw ();
 }
 
 void Simple::FinishFrame ()
 {
   // Just tell the 3D renderer that everything has been rendered.
   g3d->FinishDraw ();
-  if (g3d->BeginDraw (CSDRAW_2DGRAPHICS))
-  {
-    csRef<iTextureWrapper> tex = engine->GetTextureList ()->FindByName ("r2t_target");
-    if (tex)
-      g3d->DrawPixmap (tex->GetTextureHandle(), 0, 0, g3d->GetWidth(), g3d->GetHeight(), 0, 0, 512, 384);
-    g3d->FinishDraw ();
-  }
   g3d->Print (0);
 }
 
@@ -279,7 +246,7 @@ bool Simple::LoadMap ()
 {
   // Set VFS current directory to the level we want to load.
   csRef<iVFS> VFS (csQueryRegistry<iVFS> (GetObjectRegistry ()));
-  VFS->ChDir ("/lev/terraina");
+  VFS->ChDir ("/lev/flarge");
   // Load the level file which is called 'world'.
   if (!loader->LoadMapFile ("world"))
     ReportError("Error couldn't load level!");

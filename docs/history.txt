@@ -5,16 +5,90 @@ The overall history is in reverse (descending) chronological order, so that
 each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
+
 20-Aug-2007
+	- Jorrit fixed decals so they work fine on 64-bit.
+	- Jorrit added CS::Geometry::TextureMapper. This class works
+	  together with csPrimitives so that you can specify alternative
+	  ways to do the texture mapping for the generated primites.
+	  Also extended the GeneralMeshBuilder functions with a texture
+	  mapper parameter.
         - Mike Gist did a load of commenting and made some code pretty, nice
           and correct.
         - Mike Gist added basic sse2 abstraction.
-08-Aug-2007
+17-Aug-2007
+	- Jorrit fixed a bug in genmesh. Decals didn't work on submeshes.
+	  This prevented decals from working on levels treated with
+	  lighter2.
+	- Jorrit fixed a crash bug in lighter2.
+14-Aug-2007
+	- Jorrit added iEngine->CreateGenMesh() and
+	  iEngine->CreateGenMeshFactory() (alternative to the current
+	  iEngine->CreateThingMesh()).
+	- Jorrit added csGeneralMeshPrimitives class. This class complements
+	  csPrimitives with the ability to directly populate a genmesh
+	  factory.
+	- Jorrit added an optional 'flags' parameter to
+	  csPrimitives::GenerateBox() so that you can create a box visible from
+	  the inside and also can disable the smooth option for normals.
+	- Jorrit added (ifdeffed out) a first try at converting simple1 to
+	  use this instead of a thing for the room.
+	- res made the fractional element areas in lighter2 swappable. (On
+	  large levels they can account for a significant portion of the
+	  used memory).
+	- Jorrit put csGeneralMeshPrimitives into the new namespace
+	  CS::Geometry. Also renamed it to GeneralMeshBuilder.
+	- Jorrit removed the new iEngine functions (CreateGenMesh() and
+	  CreateGenMeshFactory()) and added CS::Geometry::GeneralMeshBuilder
+	  functions CreateMesh() and CreateFactory().
+12-Aug-2007
+	- res added CS::SubRectangles::IsEmpty().
+	- res sped up the lighter2 object lightmap layouting. (Replaced a
+	  linear search with a binary search when determining the primitives
+	  that can be layouted together.)
+	- res fixed TinyXML to build on gcc 4.1.2 again (issue found by Darek).
+11-Aug-2007
+	- res changed csFixedSizeAllocator<> to allow construction from a
+	  given memory allocator.
+	- res changed TinyXML documents to use their own heap. Can reduce 
+	  memory fragmentation when dealing with large documents.
+	- res added CS::Utility::SmartFileOpen() - a function for the somewhat
+	  common task to open a world file from a path that could denote any
+	  of: a plain filename, directory or .zip archive.
+	- res made genmeshify use CS::Utility::SmartFileOpen().
+	- res added an option to levtool to fix <polymesh> tags (by replacing
+	  them with <trimesh> tags).
+	- res made levtool use CS::Utility::SmartFileOpen().
+	- res removed deprecated methods from csArray<>.
+10-Aug-2007
+	- Jorrit fixed a compile bug in math.h (for gcc).
+	- Jorrit removed renderpriorities tag from some levels.
+	- res changed the delayed TinyXML node freeing to use less memory 
+	  allocations. Can speed up cleanup for large documents.
+8-Aug-2007
+	- Jorrit (hopefully) removed all traces of the deprecated
+	  iPolygonMesh.
+	- res removed the debugging graph header.
+	- res removed the deprecated image generation stuff.
+	- res added a missing initialization to csConsoleOutput. Should 
+	  address trac #368.
+	- res removed the deprecated csutil/profile.h header.
         - Mike Gist added abstraction for AltiVec.
         - Mike Gist fixed SSE/AltiVec code path selection... each implementation
           of the function must be in its own file.
         - Mike Gist also fixed some other misc bugs in his code.
-01-Aug-2007
+7-Aug-2007
+	- res changed the cs-win32libs link to point to the 1.2 version.
+	- res deprecated the obsolete 
+	  iMeshObject->InvalidateMaterialHandles().
+	- res changed csPath to not be marked as "exported" any more 
+	  (all-inline, gives link errors with MSVC/DLLs).
+2-Aug-2007
+	- Marten implemented a small optimization for the (i+1)%3 case,
+	  mainly used when traversing edges in triangles.
+1-Aug-2007
+	- Jorrit fixed an initialization error in gmeshskelanim2 that could
+	  cause crashes at exit. This fixes #367.
         - Mike Gist added to the SIMD abstraction code. C++ and SSE done
           so far, AltiVec to come later.
         - Mike Gist changed AltiVec checking to be decided more at compile time.
