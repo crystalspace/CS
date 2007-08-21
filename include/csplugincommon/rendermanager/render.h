@@ -104,26 +104,29 @@ namespace RenderManager
     {
       if (meshesToRender.GetSize() == 0) return;
 
-      size_t numPasses = shader->GetNumberOfPasses (shaderTicket);
-
-      for (size_t i = 0; i < numPasses; ++i)
+      if (shader != 0)
       {
-        shader->ActivatePass (shaderTicket, i);
-
-        for (size_t m = 0; m < meshesToRender.GetSize(); m++)
-        {
-          ctxNode.svArrays.SetupSVStck (varStack, firstMeshIndex + m);
-
-          csRenderMesh* mesh = meshesToRender[m].mesh;
-          csRenderMeshModes modes (*mesh);
-          shader->SetupPass (shaderTicket, mesh, modes, varStack);
-          modes.z_buf_mode = meshesToRender[m].zmode;
-
-          g3d->DrawMesh (mesh, modes, varStack);
-
-          shader->TeardownPass (shaderTicket);
-        }
-        shader->DeactivatePass (shaderTicket);
+	size_t numPasses = shader->GetNumberOfPasses (shaderTicket);
+  
+	for (size_t i = 0; i < numPasses; ++i)
+	{
+	  shader->ActivatePass (shaderTicket, i);
+  
+	  for (size_t m = 0; m < meshesToRender.GetSize(); m++)
+	  {
+	    ctxNode.svArrays.SetupSVStck (varStack, firstMeshIndex + m);
+  
+	    csRenderMesh* mesh = meshesToRender[m].mesh;
+	    csRenderMeshModes modes (*mesh);
+	    shader->SetupPass (shaderTicket, mesh, modes, varStack);
+	    modes.z_buf_mode = meshesToRender[m].zmode;
+  
+	    g3d->DrawMesh (mesh, modes, varStack);
+  
+	    shader->TeardownPass (shaderTicket);
+	  }
+	  shader->DeactivatePass (shaderTicket);
+	}
       }
       meshesToRender.Empty ();
     }
