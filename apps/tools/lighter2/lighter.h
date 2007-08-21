@@ -65,7 +65,6 @@ namespace lighter
     csRef<iStringSet> strings;
 
     SwapManager* swapManager;
-    ElementAreasAlloc* elementAreasAlloc;
 
   protected:
     // Cleanup and prepare for shutdown

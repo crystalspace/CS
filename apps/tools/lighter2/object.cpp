@@ -392,10 +392,24 @@ namespace lighter
           uint vindex = v * mask.GetWidth();
           for (uint u = minu; u <= (uint)maxu; u++, findex++)
           {
-            const float elemArea = prim.GetElementAreas ().GetElementArea (findex);
-            if (elemArea == 0) continue; // No area, skip
+            //const float elemArea = prim.GetElementAreas ().GetElementArea (findex);
+            //if (elemArea == 0) continue; // No area, skip
 
-            maskData[vindex+u] += elemArea * area2pixel; //Accumulate
+            //maskData[vindex+u] += elemArea * area2pixel; //Accumulate
+            //@@TODO
+            Primitive::ElementType type = prim.GetElementType (findex);
+            if (type == Primitive::ELEMENT_EMPTY)
+            {
+              continue;
+            }
+            else if (type == Primitive::ELEMENT_BORDER)
+            {
+              maskData[vindex+u] += prim.ComputeElementFraction (findex);
+            }
+            else
+            {
+              maskData[vindex+u] += 1.0f;
+            }            
           }
         } 
       }

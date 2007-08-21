@@ -263,6 +263,14 @@ public:
   static bool PlanePlane (const csPlane2& p1, const csPlane2& p2,
                       csVector2& isect);
 
+  /**
+   * Intersect segment with an axis aligned bounding box
+   * \return true if there is any intersection and then updates
+   * the segment to reflect the intersection.
+   * If there is no intersection the segment isn't updated.
+   */
+  static bool SegmentBox (csSegment2& segment, const csBox2& box);
+
 };
 
 /** @} */

@@ -22,7 +22,6 @@
 #include "csutil/set.h"
 
 #include "common.h"
-#include "chunkyalloc.h"
 #include "swappable.h"
 #include "vertexdata.h"
 
@@ -32,35 +31,7 @@ namespace lighter
   struct ElementProxy;
 
   class Primitive;
-  class TempElementAreas;
   
-  class ElementAreasAlloc : public ChunkyAllocator<2*1024*1024>
-  {
-  };
-
-  class ElementAreas : public CS::Memory::CustomAllocated
-  {
-    friend class Primitive;
-    
-    float fullArea;
-    size_t elementCount;
-
-    csBitArray elementsBits;
-    enum IndexType { idxUI8, idxUI16, idxUI32, idxSizeT };
-    IndexType elementIndexType;
-    size_t elementChunkID;
-    size_t areasChunkID;
-    size_t fractionalLength;
-    
-    void Finalize (const TempElementAreas&);
-  public:
-    ElementAreas();
-    ElementAreas (const ElementAreas& other);
-    ~ElementAreas();
-
-    float GetElementArea (size_t element) const;
-    size_t GetSize() const { return elementCount; }
-  };
 
   /**
    * Primitive in the radiosity world.
@@ -150,6 +121,9 @@ namespace lighter
   class Primitive : public PrimitiveBase
   {
   public:
+    enum ElementType
+    {ELEMENT_EMPTY, ELEMENT_BORDER, ELEMENT_INSIDE};
+
     inline Primitive (ObjectVertexData &dataHolder) 
       : PrimitiveBase (&dataHolder), uFormVector (0), vFormVector (0), 
         /*illuminationColor (0,0,0), reflectanceColor (1.0f,1.0f,1.0f), */
@@ -158,7 +132,7 @@ namespace lighter
     {
     }
     inline Primitive (const Primitive& other) 
-      : PrimitiveBase (other), elementAreas (other.elementAreas), 
+      : PrimitiveBase (other), elementClassification (other.elementClassification), 
         uFormVector (other.uFormVector), vFormVector (other.uFormVector), 
         minCoord (other.minCoord), minUV (other.minUV), maxUV (other.maxUV), 
         radObject (other.radObject), globalLightmapID (other.globalLightmapID),
@@ -178,6 +152,9 @@ namespace lighter
     /// Given an element index, compute center point
     csVector3 ComputeElementCenter (size_t index) const;
 
+    /// Given an element index, compute the fractional size of it
+    float ComputeElementFraction (size_t index) const;
+
     /// Get interpolated normal at point
     csVector3 ComputeNormal (const csVector3& point) const;
 
@@ -189,16 +166,19 @@ namespace lighter
     {
       csVector2 min, max;
       ComputeMinMaxUV (min, max);
-      minU = (int)floor (min.x);
-      minV = (int)floor (min.y);
-      maxU = (int)ceil (max.x);
-      maxV = (int)ceil (max.y);
+      minU = (int)floorf (min.x);
+      minV = (int)floorf (min.y);
+      maxU = (int)ceilf (max.x);
+      maxV = (int)ceilf (max.y);
     }
 
     using PrimitiveBase::ComputeMinMaxUV;
 
     /// Calculate the u/v form vectors
     void ComputeUVTransform ();
+
+    /// Update quadrant offsets
+    bool RecomputeQuadrantOffset (size_t element, csVector2 offsets[4]) const;
 
     /// Compute if point is inside primitive or not
     bool PointInside (const csVector3& pt) const;
@@ -209,16 +189,23 @@ namespace lighter
     /// Get number of elements
     size_t GetElementCount () const
     {
-      return elementAreas.GetSize ();
+      return elementClassification.GetSize () / 2;
     }
 
     /// Get u/v offset of element
     inline void GetElementUV (size_t elementIndex, size_t &u, size_t &v) const
     {
-      size_t uWidth = size_t (maxUV.x - minUV.x + 1);
+      u = (elementIndex % countU);
+      v = (elementIndex / countU);
+    }
 
-      u = (elementIndex % uWidth);
-      v = (elementIndex / uWidth);
+    /// Get classification of element
+    inline ElementType GetElementType (size_t elementIndex) const
+    {
+      bool isSet = elementClassification.IsBitSet (2*(elementIndex));
+      bool isFull = elementClassification.IsBitSet (2*(elementIndex)+1);
+
+      return isSet ? (isFull ? ELEMENT_INSIDE : ELEMENT_BORDER) : ELEMENT_EMPTY;
     }
 
     /// Get an element proxy given element index
@@ -235,11 +222,6 @@ namespace lighter
     inline const csVector3& GetuFormVector () const { return uFormVector; }
     inline const csVector3& GetvFormVector () const { return vFormVector; }
 
-    /*inline const csColor& GetIlluminationColor () const { return illuminationColor; }
-    inline const csColor& GetReflectanceColor () const { return reflectanceColor; }*/
-
-    inline const ElementAreas& GetElementAreas () const { return elementAreas; }
-
     inline const csVector3& GetMinCoord () const { return minCoord; }
     inline const csVector2& GetMinUV () const { return minUV; }
     inline const csVector2& GetMaxUV () const { return maxUV; }
@@ -255,7 +237,8 @@ namespace lighter
 protected:
     //@{
     /// Elements
-    ElementAreas elementAreas;
+    //ElementAreas elementAreas;
+    csBitArray elementClassification;
     //@}
 
     /// Mapping vectors
@@ -270,6 +253,8 @@ protected:
     csVector3 minCoord;
     csVector2 minUV;
     csVector2 maxUV;
+
+    size_t countU, countV;
 
     /// Original object
     Object* radObject;

@@ -285,4 +285,65 @@ bool csIntersect2::PlanePlane (
 #endif
 }
 
+bool csIntersect2::SegmentBox (csSegment2& segment, const csBox2& box)
+{
+  const csVector2& minBox = box.Min ();
+  const csVector2& maxBox = box.Max ();
+
+  const csVector2& origin = segment.Start ();
+  csVector2 direction = segment.End () - segment.Start ();
+
+  // Check if ray have any chance of going through box
+  for (int i = 0; i < 2; ++i)
+  {
+    if (direction[i] < 0)
+    {
+      if (origin[i] < minBox[i]) return false;
+    }
+    else if (direction[i] > 0)
+    {
+      if (origin[i] > maxBox[i]) return false;
+    }
+    else
+    {
+      if (origin[i] < minBox[i] || origin[i] > maxBox[i]) return false;
+    }
+  }  
+
+  float mint = 0, maxt = direction.Norm ();
+  direction /= maxt;
+
+  // Clip a dimension at a time
+  for (int i = 0; i < 2; ++i)
+  {
+    // Ray going "left"
+    if (direction[i] < 0)
+    {
+      float mintp = (maxBox[i] - origin[i]) / direction[i];
+      float maxtp = (minBox[i] - origin[i]) / direction[i];
+      if (mintp > mint)
+        mint = mintp;
+
+      if (maxtp < maxt)
+        maxt = maxtp;
+    }
+    else if (direction[i] > 0) // Ray going "right"
+    {
+      float mintp = (minBox[i] - origin[i]) / direction[i];
+      float maxtp = (maxBox[i] - origin[i]) / direction[i];
+      if (mintp > mint)
+        mint = mintp;
+
+      if (maxtp < maxt)
+        maxt = maxtp;
+    }
+    if (mint > maxt) return false;
+  }
+
+  // Update segment
+  segment.SetEnd (origin + maxt*direction);
+  segment.SetStart (origin + mint*direction);  
+  return true;
+}
+
 //---------------------------------------------------------------------------
