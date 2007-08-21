@@ -17579,6 +17579,76 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::TextureMapper ##############
+
+package cspace::TextureMapper;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*Map = *cspacec::TextureMapper_Map;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_TextureMapper($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::TableTextureMapper ##############
+
+package cspace::TableTextureMapper;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::TextureMapper cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_TableTextureMapper(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_TableTextureMapper($self);
+        delete $OWNER{$self};
+    }
+}
+
+*Map = *cspacec::TableTextureMapper_Map;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csPrimitives ##############
 
 package cspace::csPrimitives;
@@ -17586,6 +17656,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
+*boxTable = *cspacec::csPrimitives_boxTable;
+*quadTable = *cspacec::csPrimitives_quadTable;
 *CS_PRIMBOX_INSIDE = *cspacec::csPrimitives_CS_PRIMBOX_INSIDE;
 *CS_PRIMBOX_SMOOTH = *cspacec::csPrimitives_CS_PRIMBOX_SMOOTH;
 *GenerateBox = *cspacec::csPrimitives_GenerateBox;
@@ -18179,6 +18251,16 @@ $iSCF_SCF= \%__iSCF_SCF_hash;
 bless $iSCF_SCF, cspace::iSCF;
 *CS_SNDSYS_STREAM_UNKNOWN_LENGTH = *cspacec::CS_SNDSYS_STREAM_UNKNOWN_LENGTH;
 *csInvalidStringID = *cspacec::csInvalidStringID;
+
+my %__csPrimitives_boxTable_hash;
+tie %__csPrimitives_boxTable_hash,"cspace::csVector2", $cspacec::csPrimitives_boxTable;
+$csPrimitives_boxTable= \%__csPrimitives_boxTable_hash;
+bless $csPrimitives_boxTable, cspace::csVector2;
+
+my %__csPrimitives_quadTable_hash;
+tie %__csPrimitives_quadTable_hash,"cspace::csVector2", $cspacec::csPrimitives_quadTable;
+$csPrimitives_quadTable= \%__csPrimitives_quadTable_hash;
+bless $csPrimitives_quadTable, cspace::csVector2;
 
   use Carp;
 

@@ -11806,12 +11806,49 @@ csevJoystickEvent = _cspace.csevJoystickEvent
 CS_LOAD_PLUGIN_ALWAYS = _cspace.CS_LOAD_PLUGIN_ALWAYS
 CS_FX_SETALPHA = _cspace.CS_FX_SETALPHA
 CS_FX_SETALPHA_INT = _cspace.CS_FX_SETALPHA_INT
+class TextureMapper(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, TextureMapper, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, TextureMapper, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def Map(*args): return _cspace.TextureMapper_Map(*args)
+    __swig_destroy__ = _cspace.delete_TextureMapper
+    __del__ = lambda self : None;
+TextureMapper_swigregister = _cspace.TextureMapper_swigregister
+TextureMapper_swigregister(TextureMapper)
+
+class TableTextureMapper(TextureMapper):
+    __swig_setmethods__ = {}
+    for _s in [TextureMapper]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, TableTextureMapper, name, value)
+    __swig_getmethods__ = {}
+    for _s in [TextureMapper]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, TableTextureMapper, name)
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _cspace.new_TableTextureMapper(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_TableTextureMapper
+    __del__ = lambda self : None;
+    def Map(*args): return _cspace.TableTextureMapper_Map(*args)
+TableTextureMapper_swigregister = _cspace.TableTextureMapper_swigregister
+TableTextureMapper_swigregister(TableTextureMapper)
+
 class csPrimitives(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csPrimitives, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csPrimitives, name)
     __repr__ = _swig_repr
+    __swig_setmethods__["boxTable"] = _cspace.csPrimitives_boxTable_set
+    __swig_getmethods__["boxTable"] = _cspace.csPrimitives_boxTable_get
+    if _newclass:boxTable = property(_cspace.csPrimitives_boxTable_get, _cspace.csPrimitives_boxTable_set)
+    __swig_setmethods__["quadTable"] = _cspace.csPrimitives_quadTable_set
+    __swig_getmethods__["quadTable"] = _cspace.csPrimitives_quadTable_get
+    if _newclass:quadTable = property(_cspace.csPrimitives_quadTable_get, _cspace.csPrimitives_quadTable_set)
     CS_PRIMBOX_INSIDE = _cspace.csPrimitives_CS_PRIMBOX_INSIDE
     CS_PRIMBOX_SMOOTH = _cspace.csPrimitives_CS_PRIMBOX_SMOOTH
     __swig_getmethods__["GenerateBox"] = lambda x: _cspace.csPrimitives_GenerateBox
