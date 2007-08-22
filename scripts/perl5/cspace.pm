@@ -1971,6 +1971,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SegmentPlane = *cspacec::csIntersect2_SegmentPlane;
 *SegmentPlaneNoTest = *cspacec::csIntersect2_SegmentPlaneNoTest;
 *PlanePlane = *cspacec::csIntersect2_PlanePlane;
+*SegmentBox = *cspacec::csIntersect2_SegmentBox;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csIntersect2(@_);

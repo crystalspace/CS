@@ -1186,6 +1186,8 @@ class csIntersect2(_object):
     if _newclass:SegmentPlaneNoTest = staticmethod(_cspace.csIntersect2_SegmentPlaneNoTest)
     __swig_getmethods__["PlanePlane"] = lambda x: _cspace.csIntersect2_PlanePlane
     if _newclass:PlanePlane = staticmethod(_cspace.csIntersect2_PlanePlane)
+    __swig_getmethods__["SegmentBox"] = lambda x: _cspace.csIntersect2_SegmentBox
+    if _newclass:SegmentBox = staticmethod(_cspace.csIntersect2_SegmentBox)
     def __init__(self, *args): 
         this = _cspace.new_csIntersect2(*args)
         try: self.this.append(this)
@@ -1201,6 +1203,7 @@ csIntersect2_LineLine = _cspace.csIntersect2_LineLine
 csIntersect2_SegmentPlane = _cspace.csIntersect2_SegmentPlane
 csIntersect2_SegmentPlaneNoTest = _cspace.csIntersect2_SegmentPlaneNoTest
 csIntersect2_PlanePlane = _cspace.csIntersect2_PlanePlane
+csIntersect2_SegmentBox = _cspace.csIntersect2_SegmentBox
 
 class csPoly2D(_object):
     __swig_setmethods__ = {}
