@@ -2236,7 +2236,8 @@ void csGenmeshMeshObjectFactory::CalculateNormals (bool compress)
 }
 void csGenmeshMeshObjectFactory::GenerateCapsule (float l, float r, uint sides)
 {
-  csPrimitives::GenerateCapsule (l, r, sides, mesh_vertices, mesh_texels,
+  CS::Geometry::Primitives::GenerateCapsule (
+      l, r, sides, mesh_vertices, mesh_texels,
       mesh_normals, mesh_triangles);
   mesh_colors.DeleteAll ();
   Invalidate ();
@@ -2244,7 +2245,8 @@ void csGenmeshMeshObjectFactory::GenerateCapsule (float l, float r, uint sides)
 void csGenmeshMeshObjectFactory::GenerateSphere (const csEllipsoid& ellips,
     int num, bool cyl_mapping, bool toponly, bool reversed)
 {
-  csPrimitives::GenerateSphere (ellips, num, mesh_vertices, mesh_texels,
+  CS::Geometry::Primitives::GenerateSphere (
+      ellips, num, mesh_vertices, mesh_texels,
       mesh_normals, mesh_triangles, cyl_mapping, toponly, reversed);
   mesh_colors.DeleteAll();
   Invalidate();
@@ -2252,7 +2254,7 @@ void csGenmeshMeshObjectFactory::GenerateSphere (const csEllipsoid& ellips,
 
 void csGenmeshMeshObjectFactory::GenerateBox (const csBox3& box)
 {
-  csPrimitives::GenerateBox (box, mesh_vertices, mesh_texels,
+  CS::Geometry::Primitives::GenerateBox (box, mesh_vertices, mesh_texels,
       mesh_normals, mesh_triangles);
   mesh_colors.DeleteAll();
   Invalidate();

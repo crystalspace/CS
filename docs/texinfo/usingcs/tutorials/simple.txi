@@ -328,7 +328,8 @@ terminating the run-loop.
 @cindex World, Creating, Simple Tutorial
 @cindex iMaterialWrapper
 @cindex iSector
-@cindex iThingFactoryState
+@cindex iGeneralMeshState
+@cindex iGeneralFactoryState
 @cindex iLight
 @cindex iLightList
 @cindex iMeshWrapper
@@ -387,16 +388,25 @@ void Simple::CreateRoom ()
     engine->GetMaterialList ()->FindByName ("stone");
 
   room = engine->CreateSector ("room");
-  csRef<iMeshWrapper> walls (
-    engine->CreateSectorWallsMesh (room, "walls"));
-  iMeshObject* walls_object = walls->GetMeshObject ();
-  iMeshObjectFactory* walls_factory = walls_object->GetFactory();
-  csRef<iThingFactoryState> walls_state = 
-    scfQueryInterface<iThingFactoryState> (walls_factory);
-  walls_state->AddInsideBox (
-    csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
-  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
-  walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
+
+  // First we make the factory containing our geometry.
+  using namespace CS::Geometry;
+  csRef<iMeshFactoryWrapper> walls_fact = GeneralMeshBuilder::CreateFactory (
+  	engine, "walls_factory");
+  csRef<iGeneralFactoryState> fact_state = scfQueryInterface<
+    iGeneralFactoryState> (walls_fact->GetMeshObjectFactory ());
+  DensityTextureMapper mapper (0.3f);
+  GeneralMeshBuilder::TesselatedBox (fact_state, false,
+      csVector3 (-5, 0, -5), csVector3 (5, 20, 5),
+      3, Primitives::CS_PRIMBOX_INSIDE, &mapper);
+
+  // Now we make a single mesh from that factory.
+  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateMesh (engine,
+  	room, "walls", "walls_factory");
+  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
+    iGeneralMeshState> (walls->GetMeshObject ());
+  mesh_state->SetShadowReceiving (true);
+  walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
   csRef<iLight> light;
   iLightList* ll = room->GetLights ();
@@ -435,61 +445,54 @@ basically a container which can hold geometrical objects. Objects
 in Crystal Space are represented by @dfn{mesh objects} (@pxref{MeshObject}).
 There are several types of mesh objects in Crystal Space. Every type of
 mesh object represents some different way to represent geometry. In this
-tutorial we are only going to use the ``thing'' mesh object type. This mesh
-object type is very useful for walls of indoor maps or buildings.
+tutorial we are only going to use the ``genmesh'' mesh object type. This mesh
+object type is very useful for walls of indoor maps or buildings. Most mesh
+objects don't contain any geometry. The geometry definition is actually
+contained in the mesh factory. So that's why we first create a factory for
+our walls.
 
-Now, we want to create the six walls of our room. First, we make our thing mesh
-object. Because this is a very common case there is a convenience function
-in the engine (called @code{CreateSectorWallsMesh()}) which will create a
-thing mesh and add it to the given sector. The only thing that has to be
-done after this is add polygons to that mesh. The geometry of a mesh is 
-generally stored in its @emph{factory}, thus we need to obtain an interface
-to the ``thing'' factory.
+Now, we want to create the six walls of our room. First, we make our genmesh
+factory. Because this is a very common case there is a convenience class
+called @samp{CS::Geometry::GeneralMeshBuilder}. This class has various
+methods for creating genmesh factories and objects and also for generating
+geometry inside the genmeshes. In this example we first create a factory
+using @code{GeneralMeshBuilder::CreateFactory()} and then we fill that
+factory with a box that is visible from the inside using
+@code{GeneralMeshBuilder::TesselatedBox()}. We use a tesselated box so that
+our lighting is more accurate. If you don't use lightmaps (like in this
+example) then genmeshes are only lit at vertices of the model and lighting
+for the rest of the surface is interpolated. So to get accurate lighting
+you need a model that has sufficient vertices. We use a tesselation
+level so that every face has 16 vertices (3 times 3 quads or eighteen triangles
+for every face). You can increase the value '3' even more to get even better
+lighting resolution but that will increase the number of triangles in the
+model too much and it is not needed in this simple example.
 
-To do this we first need to obtain the interface to the @samp{iMeshObject}
-interface. The @samp{iMeshWrapper} interface, as returned by 
-@code{CreateSectorWallsMesh()}, has a method @code{GetMeshObject()} which
-gives us just that.
-
-In the next step, we need to query the @emph{mesh factory}. Again, the 
-previously obtained @samp{iMeshObject} has a method which returns an interface
-to the mesh factory.
-
-And lastly, to obtain the interface to control ``thing''-specific aspects of
-the mesh factory, we query the interface called @samp{iThingFactoryState} 
-from the mesh factory interface.
-We use the function @code{scfQueryInterface<>()} which is part of @sc{scf}
-(@pxref{SCF}). This will see if the mesh factory actually implements 
-@samp{iThingFactoryState} (which should be the case here) and, if so, it will 
-return a pointer to the implementation of @samp{iThingFactoryState}. 
+From that factory we can now make our mesh object which is the object that
+will be actually visible on screen. Note that from one factory you can create
+as many objects as you want. In this case we only need one. To create the
+genmesh object we use @code{GeneralMeshBuilder::CreateMesh()}. To make the
+model really usable we now have to set a material on it
+(using @code{SetMaterialWrapper()} and we also call
+@code{iGeneralMeshState::SetShadowReceiving(true)}. The @samp{iGeneralMeshState}
+interface is the interface containing genmesh specific functions for genmesh
+objects. @samp{iGeneralFactoryState} was the interface for genmesh specific
+functions for factories.
+To get access to these special interfaces we use the function
+@code{scfQueryInterface<>()} which is part of @sc{scf} (@pxref{SCF}). This
+will see if the mesh object actually implements @samp{iGeneralMeshState} (which
+should be the case here) and, if so, it will return a pointer to the
+implementation of @samp{iGeneralMeshState}. 
 All mesh objects and factories implement some kind of state interface which is 
 used to set up or query the state of that mesh object or factory.
 Note that all interfaces which you query using @code{scfQueryInterface<>()}
 must be assigned to a variable of type @code{csRef<>}. This ensures that the
 reference to the interface is released once it is no longer needed.
 
-We now have the factory state (@samp{iThingFactoryState}) which we can now use 
-to create polygons. There are various functions to create individual polygons, 
-if you want that, but in this case we use a convenience function to create a 
-box that can be seen from the inside. That will serve as the walls of our room.
-The @code{AddInsideBox()} function does this. It will create six polygons
-arranged so that they are visible from inside.
-(Note that in Crystal Space a polygon is visible if vertices are oriented
-clock-wise). The box coordinates given to @code{AddInsideBox()} are in object
-space (in contrast with world space and camera space).
-
-The @code{SetPolygonMaterial()} function will set the material of the
-polygons. The first parameter is a range. We use @samp{CS_POLYRANGE_LAST}
-here to indicate that we are interested in setting the materials of the last
-created polygons (i.e. all polygons created with @code{AddInsideBox()}).
-
-The texture is mapped onto the polygon using @code{SetPolygonTextureMapping()}.
-There are several versions of this function.  The one we use in this tutorial
-is one of the simplest but it offers the least control.  In this particular
-case we take the first two vertices of each polygon that was created for the
-box and use that as the u-axis of the texture.  The v-axis will be calculated
-perpendicular to the u-axis.  The 3rd parameter indicates that the texture will
-be scaled so that one texture tile is exactly 3x3 world units in size.
+We use @code{SetShadowReceiving(true)} so that our
+object will be lit by a more accurate per-vertex method. If we don't use
+this then the genmesh will be lit according to the light that it receives
+at the center of the model.
 
 Finally, we create some lights in our room to make sure that we actually are
 able to see the walls.  The interface @samp{iLight} represents a light.

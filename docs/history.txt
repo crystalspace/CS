@@ -6,6 +6,19 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+22-Aug-2007
+	- Jorrit deprecated csPrimitives and added CS::Geometry::Primitives
+	  instead.
+	- Jorrit added csPlane3::FindOrthogonalPoints().
+	- Jorrit added a new CS::Geometry::DensityTextureMapper class
+	  which computes texture mapping on a surface based on fixed
+	  density.
+	- Jorrit fixed a texture mapping bug in Primitives::GenerateQuad().
+	- Jorrit added GeneralMeshBuilder::GenerateTesselatedQuad().
+	- Jorrit renamed GeneralMeshBuilder::GenerateBla() methods to Bla().
+	- Jorrit modified simple1 and simple2 to use the new
+	  GeneralMeshBuilder. Also modified the tutorial documentation
+	  for this.
 21-Aug-2007
 	- Marten rewrote the way lighter2 handles border elements.
 20-Aug-2007

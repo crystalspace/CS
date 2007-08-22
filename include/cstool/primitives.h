@@ -74,13 +74,33 @@ public:
   }
 };
 
-} // namespace Geometry
-} // namespace CS
+/**
+ * Density based texture mapper. This mapper tries to achieve
+ * a constant texture density on the surface. This texture mapper
+ * is really only useful on non-smoothed surfaces. So for GenerateBox(),
+ * GenerateQuad(), and GenerateTesselatedQuad().
+ */
+class DensityTextureMapper : public TextureMapper
+{
+private:
+  float density;
+
+public:
+  /**
+   * Create a density texture mapper with the given density. This
+   * density value represents the number of times the texture is
+   * repeated in a 1x1 unit block. So a density of 10 will repeat the
+   * texture exactly 10x10 times.
+   */
+  DensityTextureMapper (float density) : density (density) { }
+  virtual ~DensityTextureMapper () { }
+  virtual csVector2 Map (const csVector3&, const csVector3&, size_t idx);
+};
 
 /**
  * A primitive mesh generator.
  */
-class CS_CRYSTALSPACE_EXPORT csPrimitives
+class Primitives
 {
 public:
   static csVector2 boxTable[];
@@ -109,10 +129,10 @@ public:
       csDirtyAccessArray<csVector3>& mesh_normals,
       csDirtyAccessArray<csTriangle>& mesh_triangles,
       uint32 flags = CS_PRIMBOX_SMOOTH,
-      CS::Geometry::TextureMapper* mapper = 0);
+      TextureMapper* mapper = 0);
 
   /**
-   * Generate quad.
+   * Generate a double-sided quad.
    * \param mapper is an optional texture mapper. If not given the default
    * TableTextureMapper is used with quadTable.
    */
@@ -123,7 +143,27 @@ public:
       csDirtyAccessArray<csVector2>& mesh_texels,
       csDirtyAccessArray<csVector3>& mesh_normals,
       csDirtyAccessArray<csTriangle>& mesh_triangles,
-      CS::Geometry::TextureMapper* mapper = 0);
+      TextureMapper* mapper = 0);
+
+  /**
+   * Generate a single-sided tesselations quad. v0-v1 and v0-v2 should
+   * be oriented clockwise from the visible side.
+   * \param v0 is the origin of the quad.
+   * \param v1 is the first axis.
+   * \param v2 is the second axis.
+   * \param tesselations is the number of tesselations.
+   * \param mapper is an optional texture mapper. If not given the default
+   * DensityTextureMapper is used with density 1.
+   */
+  static void GenerateTesselatedQuad (
+      const csVector3 &v0,
+      const csVector3 &v1, const csVector3 &v2,
+      int tesselations,
+      csDirtyAccessArray<csVector3>& mesh_vertices,
+      csDirtyAccessArray<csVector2>& mesh_texels,
+      csDirtyAccessArray<csVector3>& mesh_normals,
+      csDirtyAccessArray<csTriangle>& mesh_triangles,
+      TextureMapper* mapper = 0);
 
   /**
    * Generate a capsule of given length and radius.
@@ -139,7 +179,7 @@ public:
       csDirtyAccessArray<csVector2>& mesh_texels,
       csDirtyAccessArray<csVector3>& mesh_normals,
       csDirtyAccessArray<csTriangle>& mesh_triangles,
-      CS::Geometry::TextureMapper* mapper = 0);
+      TextureMapper* mapper = 0);
 
   /**
    * Generate a sphere with 'num' vertices on the rim.
@@ -164,7 +204,21 @@ public:
       bool cyl_mapping = false,
       bool toponly = false,
       bool reversed = false,
-      CS::Geometry::TextureMapper* mapper = 0);
+      TextureMapper* mapper = 0);
+};
+
+} // namespace Geometry
+} // namespace CS
+
+/**
+ * A primitive mesh generator.
+ * \deprecated Deprecated in 1.3. csPrimitives is deprecated. Use
+ * CS::Geometry::Primitives instead.
+ */
+class CS_CRYSTALSPACE_EXPORT
+  CS_DEPRECATED_TYPE_MSG ("csPrimitives is deprecated. Use CS::Geometry::Primitives instead")
+  csPrimitives : public CS::Geometry::Primitives
+{
 };
 
 /** @} */
