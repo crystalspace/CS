@@ -20,6 +20,8 @@ chronological order.
 	  iEngine->CreateThingMesh().
 	- Jorrit removed (nearly) all uses of CreateThingMesh() and
 	  CreateSectorWallsMesh() in CS.
+	- Jorrit removed usage of CreateSectorWallsMesh() in mazing tutorial
+	  (code and documentation).
 22-Aug-2007
 	- Jorrit deprecated csPrimitives and added CS::Geometry::Primitives
 	  instead.

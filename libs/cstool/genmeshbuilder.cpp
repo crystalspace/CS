@@ -244,16 +244,22 @@ csPtr<iMeshFactoryWrapper> GeneralMeshBuilder::CreateFactory (
 
 csPtr<iMeshWrapper> GeneralMeshBuilder::CreateMesh (
 	iEngine* engine, iSector* sector, const char* name,
-	const char* factoryname)
+	iMeshFactoryWrapper* factory)
 {
-  iMeshFactoryWrapper* factory = engine->FindMeshFactory (factoryname);
-  if (!factory) return 0;
-
   csRef<iMeshWrapper> mesh = engine->CreateMeshWrapper (factory,
       name, sector, csVector3 (0));
   mesh->SetZBufMode (CS_ZBUF_USE);
   mesh->SetRenderPriority (engine->GetObjectRenderPriority ());
   return csPtr<iMeshWrapper> (mesh);
+}
+
+csPtr<iMeshWrapper> GeneralMeshBuilder::CreateMesh (
+	iEngine* engine, iSector* sector, const char* name,
+	const char* factoryname)
+{
+  iMeshFactoryWrapper* factory = engine->FindMeshFactory (factoryname);
+  if (!factory) return 0;
+  return CreateMesh (engine, sector, name, factory);
 }
 
 csPtr<iMeshWrapper> GeneralMeshBuilder::CreateFactoryAndMesh (
