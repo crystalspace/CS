@@ -26,10 +26,10 @@
 #include "csextern.h"
 
 #include "cstool/primitives.h"
+#include "iengine/mesh.h"
+#include "imesh/object.h"
+#include "imesh/genmesh.h"
 
-struct iGeneralFactoryState;
-struct iMeshWrapper;
-struct iMeshFactoryWrapper;
 struct iEngine;
 struct iSector;
 
@@ -39,17 +39,304 @@ namespace Geometry
 {
 
 /**
+ * Superclass for all primitives.
+ */
+struct Primitive
+{
+public:
+  virtual ~Primitive () { }
+
+  /// Append this primitive to the given factory.
+  virtual void Append (iGeneralFactoryState* factory) = 0;
+
+  /**
+   * Append this primitive to the given factory.
+   * Returns false if the primitive is not a genmesh.
+   */
+  virtual bool Append (iMeshFactoryWrapper* factory)
+  {
+    csRef<iGeneralFactoryState> state = scfQueryInterface<
+      iGeneralFactoryState> (factory->GetMeshObjectFactory ());
+    if (!state) return false;
+    Append (state);
+    return true;
+  }
+};
+
+/**
+ * A tesselated quad.
+ */
+class TesselatedQuad : public Primitive
+{
+private:
+  csVector3 v0, v1, v2;
+  int tesselations;
+  TextureMapper* mapper;
+
+public:
+  /**
+   * Generate a single-sided tesselations quad. v0-v1 and v0-v2 should
+   * be oriented clockwise from the visible side.
+   * \param v0 is the origin of the quad.
+   * \param v1 is the first axis.
+   * \param v2 is the second axis.
+   */
+  TesselatedQuad (const csVector3& v0, const csVector3& v1, const csVector3& v2);
+  virtual ~TesselatedQuad () { }
+
+  /// Set the tesselation level for this quad. Default is 1.
+  void SetLevel (int level) { tesselations = level; }
+
+  /// Get the tesselation level.
+  int GetLevel () const { return tesselations; }
+
+  /**
+   * Set the mapper. Default mapper is Primitives::DensityTextureMapper
+   * with density 1.
+   */
+  void SetMapper (TextureMapper* mapper)
+  {
+    TesselatedQuad::mapper = mapper;
+  }
+
+  virtual void Append (iGeneralFactoryState* state);
+  virtual bool Append (iMeshFactoryWrapper* factory)
+  {
+    return Primitive::Append (factory);
+  }
+};
+
+/**
+ * A Tesselated box.
+ */
+class TesselatedBox : public Primitive
+{
+private:
+  csBox3 box;
+  int tesselations;
+  TextureMapper* mapper;
+  uint32 flags;
+
+  void Init (const csBox3& box);
+
+public:
+  /**
+   * Generate a tesselated box so the normals of every face point inwards
+   * or outwards (the normals of the vertices belonging to a face will point
+   * with the correct normal of the face).
+   */
+  TesselatedBox (const csBox3& box)
+  {
+    Init (box);
+  }
+  /**
+   * Generate a tesselated box so the normals of every face point inwards
+   * or outwards (the normals of the vertices belonging to a face will point
+   * with the correct normal of the face).
+   */
+  TesselatedBox (const csVector3& v1, const csVector3& v2)
+  {
+    Init (csBox3 (v1, v2));
+  }
+  virtual ~TesselatedBox () { }
+
+  /// Set the tesselation level for this box. Default is 1.
+  void SetLevel (int level) { tesselations = level; }
+
+  /// Get the tesselation level.
+  int GetLevel () const { return tesselations; }
+
+  /**
+   * Set the mapper. Default mapper is Primitives::DensityTextureMapper
+   * with density 1.
+   */
+  void SetMapper (TextureMapper* mapper)
+  {
+    TesselatedBox::mapper = mapper;
+  }
+
+  /**
+   * Set the flags. These are a combination of csPrimitives::BoxFlags
+   * enumeration values. CS_PRIMBOX_SMOOTH is not supported here. Default
+   * is 0.
+   */
+  void SetFlags (uint32 flags)
+  {
+    TesselatedBox::flags = flags;
+  }
+
+  /// Get the flags.
+  uint32 GetFlags () const { return flags; }
+
+  virtual void Append (iGeneralFactoryState* state);
+  virtual bool Append (iMeshFactoryWrapper* factory)
+  {
+    return Primitive::Append (factory);
+  }
+};
+
+/**
+ * A box.
+ */
+class Box : public Primitive
+{
+private:
+  csBox3 box;
+  TextureMapper* mapper;
+  uint32 flags;
+
+  void Init (const csBox3& box);
+
+public:
+  Box (const csBox3& box)
+  {
+    Init (box);
+  }
+  Box (const csVector3& v1, const csVector3& v2)
+  {
+    Init (csBox3 (v1, v2));
+  }
+  virtual ~Box () { }
+
+  /**
+   * Set the mapper. Default mapper is Primitives::DensityTextureMapper
+   * with density 1.
+   */
+  void SetMapper (TextureMapper* mapper)
+  {
+    Box::mapper = mapper;
+  }
+
+  /**
+   * Set the flags. These are a combination of csPrimitives::BoxFlags
+   * enumeration values. Default is CS_PRIMBOX_SMOOTH.
+   */
+  void SetFlags (uint32 flags)
+  {
+    Box::flags = flags;
+  }
+
+  /// Get the flags.
+  uint32 GetFlags () const { return flags; }
+
+  virtual void Append (iGeneralFactoryState* state);
+  virtual bool Append (iMeshFactoryWrapper* factory)
+  {
+    return Primitive::Append (factory);
+  }
+};
+
+/**
+ * A capsule.
+ */
+class Capsule : public Primitive
+{
+private:
+  float l, r;
+  uint sides;
+  TextureMapper* mapper;
+
+public:
+  /**
+   * Generate a capsule of given length and radius.
+   * \param l Capsule length.
+   * \param r Capsule radius.
+   * \param sides Number of sides.
+   */
+  Capsule (float l, float r, uint sides);
+  virtual ~Capsule () { }
+
+  /**
+   * Set the mapper. There is no default mapper. You have to specify one.
+   */
+  void SetMapper (TextureMapper* mapper)
+  {
+    Capsule::mapper = mapper;
+  }
+
+  virtual void Append (iGeneralFactoryState* state);
+  virtual bool Append (iMeshFactoryWrapper* factory)
+  {
+    return Primitive::Append (factory);
+  }
+};
+
+/**
+ * A sphere.
+ */
+class Sphere : public Primitive
+{
+private:
+  csEllipsoid ellips;
+  int num;
+  TextureMapper* mapper;
+  bool cyl_mapping;
+  bool toponly;
+  bool reversed;
+
+public:
+  /**
+   * Generate a sphere with 'num' vertices on the rim.
+   * \param ellips Properties of the ellipsoid to create.
+   * \param num Number of vertices in the generated  mesh.
+   */
+  Sphere (const csEllipsoid& ellips, int num);
+  virtual ~Sphere () { }
+
+  /**
+   * Set cylindrical mapping to true. This is only useful if no
+   * mapper was used. Default is false.
+   */
+  void SetCylindricalMapping (bool cyl) { cyl_mapping = cyl; }
+  /// Get cylindrical mapping setting.
+  bool HasCylindricalMapping () const { return cyl_mapping; }
+
+  /**
+   * If this flag is set then only the top half of the sphere is generated.
+   * Default is false.
+   */
+  void SetTopOnly (bool top) { toponly = top; }
+  /// Get toponly settings.
+  bool IsTopOnly () const { return toponly; }
+
+  /**
+   * If this flag is set then generate the sphere so that it is visible
+   * from the inside. Default false.
+   */
+  void SetReversed (bool rev) { reversed  = rev; }
+  /// Return reversed setting.
+  bool IsReversed () const { return reversed; }
+
+  /**
+   * Set the mapper. If not given the mapping as defined by
+   * SetCylindricalMapping() will be used.
+   */
+  void SetMapper (TextureMapper* mapper)
+  {
+    Sphere::mapper = mapper;
+  }
+
+  virtual void Append (iGeneralFactoryState* state);
+  virtual bool Append (iMeshFactoryWrapper* factory)
+  {
+    return Primitive::Append (factory);
+  }
+};
+
+/**
  * Tools related to creating genmesh instances and factories.
  */
 class GeneralMeshBuilder
 {
 public:
   /**
-   * Create an empty genmesh factory. Assign to a csRef.
+   * Create a genmesh factory with an optional primitive. Assign to a csRef.
    * \param name the engine name of the factory that will be created
+   * \param primitive is an optional primitive that can be used to augment
+   * the factory.
    */
   static csPtr<iMeshFactoryWrapper> CreateFactory (iEngine* engine, 
-    const char* name);
+    const char* name, Primitive* primitive = 0);
 
   /**
    * Create a genmesh instance from a named factory.
@@ -65,154 +352,21 @@ public:
     const char* name, const char* factoryname);
 
   /**
-   * Generate a box with 24 vertices and 12 triangles so that
-   * the normals of every face point inwards or outwards (the normals of the
-   * vertices belonging to a face will point with the correct
-   * normal of the face).
-   * \param append if true then append the vertices and triangles
-   * to the geometry already in the factory.
-   * \param flags is a combination of csPrimitives::BoxFlags enumeration
-   * values. Default is CS_PRIMBOX_SMOOTH.
-   * \param mapper is an optional texture mapper. If not given the default
-   * TableTextureMapper is used with csPrimitives::boxTable.
+   * Create a factory and a genmesh from a primitive. This is a common
+   * used method where you only need one mesh from a factory. So with this
+   * method you can create both at once.
+   * This mesh will have #CS_ZBUF_USE set (use Z-buffer fully) and have
+   * 'object' as render priority. This means this function is useful
+   * for general objects. Assign to a csRef. The object will be placed
+   * at position 0,0,0 in the sector.
+   * \param sector the sector to add the object to
+   * \param name the engine name of the mesh that will be created
+   * \param factoryname the engine name of the factory to create.
+   * \param primitive is an optional primitive that can be used to augment
+   * the factory.
    */
-  static void Box (
-      iGeneralFactoryState* factory, bool append,
-      const csBox3& box,
-      uint32 flags = csPrimitives::CS_PRIMBOX_SMOOTH,
-      TextureMapper* mapper = 0);
-
-  /**
-   * Generate a box with 24 vertices and 12 triangles so that
-   * the normals of every face point inwards or outwards (the normals of the
-   * vertices belonging to a face will point with the correct
-   * normal of the face).
-   * \param append if true then append the vertices and triangles
-   * to the geometry already in the factory.
-   * \param flags is a combination of csPrimitives::BoxFlags enumeration
-   * values. Default is CS_PRIMBOX_SMOOTH.
-   * \param mapper is an optional texture mapper. If not given the default
-   * TableTextureMapper is used with csPrimitives::boxTable.
-   */
-  static void Box (
-      iGeneralFactoryState* factory, bool append,
-      const csVector3& v1, const csVector3& v2,
-      uint32 flags = csPrimitives::CS_PRIMBOX_SMOOTH,
-      TextureMapper* mapper = 0)
-  {
-    Box (factory, append, csBox3 (v1, v2), flags, mapper);
-  }
-
-  /**
-   * Generate a tesselated box so the normals of every face point inwards
-   * or outwards (the normals of the vertices belonging to a face will point
-   * with the correct normal of the face).
-   * \param append if true then append the vertices and triangles
-   * to the geometry already in the factory.
-   * \param tesselations is the number of tesselations.
-   * \param flags is a combination of Primitives::BoxFlags enumeration
-   * values. CS_PRIMBOX_SMOOTH is not supported here.
-   * \param mapper is an optional texture mapper. If not given the default
-   * TableTextureMapper is used with csPrimitives::boxTable.
-   */
-  static void TesselatedBox (
-      iGeneralFactoryState* factory, bool append,
-      const csBox3& box,
-      int tesselations,
-      uint32 flags = 0,
-      TextureMapper* mapper = 0);
-
-  /**
-   * Generate a tesselated box so the normals of every face point inwards
-   * or outwards (the normals of the vertices belonging to a face will point
-   * with the correct normal of the face).
-   * \param append if true then append the vertices and triangles
-   * to the geometry already in the factory.
-   * \param tesselations is the number of tesselations.
-   * \param flags is a combination of Primitives::BoxFlags enumeration
-   * values. CS_PRIMBOX_SMOOTH is not supported here.
-   * \param mapper is an optional texture mapper. If not given the default
-   * TableTextureMapper is used with csPrimitives::boxTable.
-   */
-  static void TesselatedBox (
-      iGeneralFactoryState* factory, bool append,
-      const csVector3& v1, const csVector3& v2,
-      int tesselations,
-      uint32 flags = 0,
-      TextureMapper* mapper = 0)
-  {
-    TesselatedBox (factory, append, csBox3 (v1, v2), tesselations,
-	flags, mapper);
-  }
-
-  /**
-   * Generate a double-sided quad.
-   * \param append if true then append the vertices and triangles
-   * to the geometry already in the factory.
-   * \param mapper is an optional texture mapper. If not given the default
-   * TableTextureMapper is used with csPrimitives::quadTable.
-   */
-  static void Quad (
-      iGeneralFactoryState* factory, bool append,
-      const csVector3 &v1, const csVector3 &v2,
-      const csVector3 &v3, const csVector3 &v4,
-      TextureMapper* mapper = 0);
-
-  /**
-   * Generate a single-sided tesselations quad. v0-v1 and v0-v2 should
-   * be oriented clockwise from the visible side.
-   * \param append if true then append the vertices and triangles
-   * to the geometry already in the factory.
-   * \param v0 is the origin of the quad.
-   * \param v1 is the first axis.
-   * \param v2 is the second axis.
-   * \param tesselations is the number of tesselations.
-   * \param mapper is an optional texture mapper. If not given the default
-   * DensityTextureMapper is used with density 1.
-   */
-  static void TesselatedQuad (
-      iGeneralFactoryState* factory, bool append,
-      const csVector3 &v0,
-      const csVector3 &v1, const csVector3 &v2,
-      int tesselations,
-      TextureMapper* mapper = 0);
-
-  /**
-   * Generate a capsule of given length and radius.
-   * \param append if true then append the vertices and triangles
-   * to the geometry already in the factory.
-   * \param l Capsule length.
-   * \param r Capsule radius.
-   * \param sides Number of sides.
-   * \param mapper is an optional texture mapper. If not given the
-   * default capsule texture mapping will be used (currently not
-   * implemented, you have to specify a mapper).
-   */
-  static void Capsule (
-      iGeneralFactoryState* factory, bool append,
-      float l, float r, uint sides,
-      TextureMapper* mapper = 0);
-
-  /**
-   * Generate a sphere with 'num' vertices on the rim.
-   * \param append if true then append the vertices and triangles
-   * to the geometry already in the factory.
-   * \param ellips Properties of the ellipsoid to create.
-   * \param num Number of vertices in the generated  mesh.
-   * \param cyl_mapping if true then use cylindrical texture mapping.
-   * \param toponly if true then only generate the top half of the sphere.
-   * \param reversed if true then generate the sphere so it is visible
-   * from the inside.
-   * \param mapper is an optional texture mapper. If not given the
-   * mapping as defined by the 'cyl_mapping' flag will be used.
-   */
-  static void Sphere (
-      iGeneralFactoryState* factory, bool append,
-      const csEllipsoid& ellips, int num,
-      bool cyl_mapping = false,
-      bool toponly = false,
-      bool reversed = false,
-      TextureMapper* mapper = 0);
+  static csPtr<iMeshWrapper> CreateFactoryAndMesh (iEngine* engine, iSector* sector,
+    const char* name, const char* factoryname, Primitive* primitive = 0);
 };
 } // namespace Geometry
 } // namespace CS

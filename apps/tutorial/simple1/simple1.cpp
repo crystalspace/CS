@@ -241,20 +241,18 @@ void Simple::CreateRoom ()
 
   // Creating the walls for our room.
 
-  // First we make the factory containing our geometry.
+  // First we make a primitive for our geometry.
   using namespace CS::Geometry;
-  csRef<iMeshFactoryWrapper> walls_fact = GeneralMeshBuilder::CreateFactory (
-  	engine, "walls_factory");
-  csRef<iGeneralFactoryState> fact_state = scfQueryInterface<
-    iGeneralFactoryState> (walls_fact->GetMeshObjectFactory ());
   DensityTextureMapper mapper (0.3f);
-  GeneralMeshBuilder::TesselatedBox (fact_state, false,
-      csVector3 (-5, 0, -5), csVector3 (5, 20, 5),
-      3, Primitives::CS_PRIMBOX_INSIDE, &mapper);
+  TesselatedBox box (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
+  box.SetLevel (3);
+  box.SetMapper (&mapper);
+  box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
 
-  // Now we make a single mesh from that factory.
-  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateMesh (engine,
-  	room, "walls", "walls_factory");
+  // Now we make a factory and a mesh at once.
+  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
+      engine, room, "walls", "walls_factory", &box);
+
   csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
     iGeneralMeshState> (walls->GetMeshObject ());
   mesh_state->SetShadowReceiving (true);
