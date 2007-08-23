@@ -382,12 +382,23 @@ bool Simple::Initialize ()
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   room = engine->CreateSector ("room");
-  walls = engine->CreateSectorWallsMesh (room, "walls");
-  csRef<iThingFactoryState> walls_state = 
-    scfQueryInterface<iThingFactoryState> (walls->GetMeshObject ()->GetFactory());
-  walls_state->AddInsideBox (csVector3 (-5, -5, -5), csVector3 (5, 5, 5));
-  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
-  walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
+
+  // First we make a primitive for our geometry.
+  using namespace CS::Geometry;
+  DensityTextureMapper mapper (0.3f);
+  TesselatedBox box (csVector3 (-5, -5, -5), csVector3 (5, 5, 5));
+  box.SetLevel (3);
+  box.SetMapper (&mapper);
+  box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+
+  // Now we make a factory and a mesh at once.
+  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
+      engine, room, "walls", "walls_factory", &box);
+
+  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
+    iGeneralMeshState> (walls->GetMeshObject ());
+  mesh_state->SetShadowReceiving (true);
+  walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
   csRef<iLight> light;
   iLightList* ll = room->GetLights ();
@@ -632,8 +643,8 @@ void Simple::CreateWalls (const csVector3& /*radius*/)
 {
   csOrthoTransform t;
 
-  csRef<iThingFactoryState> walls_state = 
-    scfQueryInterface<iThingFactoryState> (walls->GetMeshObject ()->GetFactory());
+  //csRef<iThingFactoryState> walls_state = 
+    //scfQueryInterface<iThingFactoryState> (walls->GetMeshObject ()->GetFactory());
 
 #if 0
   // Enabling this will work, however, mesh<->mesh collision

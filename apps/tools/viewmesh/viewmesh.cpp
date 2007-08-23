@@ -31,6 +31,7 @@
 #include "iutil/stringarray.h"
 #include "iengine/scenenode.h"
 #include "ivideo/graph2d.h"
+#include "cstool/genmeshbuilder.h"
 
 // Hack: work around problems caused by #defining 'new'
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
@@ -103,13 +104,17 @@ void ViewMesh::ProcessFrame()
       if (kbd->GetKeyState (CSKEY_SHIFT))
       {
         if (kbd->GetKeyState (CSKEY_UP))
-          camTarget += c->GetTransform().This2OtherRelative(csVector3(0,1,0)) * 4 * speed;
+          camTarget += c->GetTransform().This2OtherRelative(
+	      csVector3(0,1,0)) * 4 * speed;
         if (kbd->GetKeyState (CSKEY_DOWN))
-          camTarget -= c->GetTransform().This2OtherRelative(csVector3(0,1,0)) * 4 * speed;
+          camTarget -= c->GetTransform().This2OtherRelative(
+	      csVector3(0,1,0)) * 4 * speed;
         if (kbd->GetKeyState (CSKEY_RIGHT))
-          camTarget += c->GetTransform().This2OtherRelative(csVector3(1,0,0)) * 4 * speed;
+          camTarget += c->GetTransform().This2OtherRelative(
+	      csVector3(1,0,0)) * 4 * speed;
         if (kbd->GetKeyState (CSKEY_LEFT))
-          camTarget -= c->GetTransform().This2OtherRelative(csVector3(1,0,0)) * 4 * speed;
+          camTarget -= c->GetTransform().This2OtherRelative(
+	      csVector3(1,0,0)) * 4 * speed;
       }
       else
       {
@@ -203,7 +208,8 @@ void ViewMesh::ProcessFrame()
   {
     csRef<iMovable> mov = spritewrapper->GetMovable();
     csVector3 pos = mov->GetFullPosition();    
-    mov->MovePosition(csVector3(pos.x,pos.y,-move_sprite_speed*elapsed_time/1000.0f));
+    mov->MovePosition(csVector3(pos.x,pos.y,
+	  -move_sprite_speed*elapsed_time/1000.0f));
     mov->UpdateMove();
     if (pos.z > roomsize) 
     {
@@ -270,7 +276,8 @@ void ViewMesh::FixCameraForOrigin(const csVector3 & desiredOrigin)
 
   camPitch = (float)asin((camTarget.y - desiredOrigin.y) / camDist);
 
-  camYaw = (float)asin((camTarget.x - desiredOrigin.x) / (camDist * (float)cos(camPitch)));
+  camYaw = (float)asin((camTarget.x - desiredOrigin.x)
+      / (camDist * (float)cos(camPitch)));
   if ((camTarget.z - desiredOrigin.z) / (camDist * (float)cos(camPitch)) < 0.0f)
       camYaw = 3.14159f - camYaw;
 }
@@ -340,8 +347,8 @@ bool ViewMesh::OnMouseUp (iEvent& e)
 
 bool ViewMesh::OnMouseMove (iEvent& e)
 {
-  int x = (float)csMouseEventHelper::GetX(&e);
-  int y = (float)csMouseEventHelper::GetY(&e);
+  int x = csMouseEventHelper::GetX(&e);
+  int y = csMouseEventHelper::GetY(&e);
   float dx = (float)(x - lastMouseX) * 0.02f;
   float dy = (float)(y - lastMouseY) * -0.02f;
   iCamera * c = view->GetCamera();
@@ -356,16 +363,16 @@ bool ViewMesh::OnMouseMove (iEvent& e)
   }
   if (camModeRotate)
   {
-      camYaw += dx;
-      camPitch += dy;
+    camYaw += dx;
+    camPitch += dy;
   }
   if (camModeZoom)
   {
-      camDist = csMax<float>(0.1f, camDist - (dx + dy));
+    camDist = csMax<float>(0.1f, camDist - (dx + dy));
   }
 
   if (camModePan || camModeRotate || camModePan)
-      UpdateCamera();
+    UpdateCamera();
 
   return false;
 }
@@ -562,13 +569,24 @@ void ViewMesh::CreateRoom ()
 
   room = engine->CreateSector ("room");
 
-  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingFactoryState> walls_state = 
-    scfQueryInterface<iThingFactoryState> (walls->GetMeshObject ()->GetFactory());
-  walls_state->AddInsideBox (csVector3 (-roomsize, -roomsize/2, -roomsize),
+  // First we make a primitive for our geometry.
+  using namespace CS::Geometry;
+  DensityTextureMapper mapper (0.3f);
+  TesselatedBox box (
+    csVector3 (-roomsize, -roomsize/2, -roomsize),
     csVector3 (roomsize, 3*roomsize/2, roomsize));
-  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
-  walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
+  box.SetLevel (3);
+  box.SetMapper (&mapper);
+  box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+
+  // Now we make a factory and a mesh at once.
+  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
+      engine, room, "walls", "walls_factory", &box);
+
+  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
+    iGeneralMeshState> (walls->GetMeshObject ());
+  mesh_state->SetShadowReceiving (true);
+  walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
   csRef<iLight> light;
   iLightList* ll = room->GetLights ();

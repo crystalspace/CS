@@ -25,6 +25,7 @@
 
 #include "csextern.h"
 
+#include "csgeom/sphere.h"
 #include "cstool/primitives.h"
 #include "iengine/mesh.h"
 #include "imesh/object.h"
@@ -365,8 +366,9 @@ public:
    * \param primitive is an optional primitive that can be used to augment
    * the factory.
    */
-  static csPtr<iMeshWrapper> CreateFactoryAndMesh (iEngine* engine, iSector* sector,
-    const char* name, const char* factoryname, Primitive* primitive = 0);
+  static csPtr<iMeshWrapper> CreateFactoryAndMesh (iEngine* engine,
+      iSector* sector, const char* name, const char* factoryname,
+      Primitive* primitive = 0);
 };
 } // namespace Geometry
 } // namespace CS

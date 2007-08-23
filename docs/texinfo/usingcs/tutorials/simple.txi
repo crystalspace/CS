@@ -3,6 +3,7 @@
 @subsection Simple Tutorial 1: Basic Setup, World Creation
 @cindex Tutorial, Simple
 @cindex Simple Tutorial
+@cindex @code{GeneralMeshBuilder}
 
 This tutorial provides a step-by-step explanation on how you can use Crystal
 Space from within your application.  This tutorial is mainly based on the
@@ -59,7 +60,7 @@ Creating of the 3D window.
 Loading of a texture and material using @code{iLoader::LoadTexture()}.
 @item
 Creation of a simple room using @code{iEngine::CreateSector()} and
-@code{iEngine::CreateSectorWallsMesh()}. Also adding a few lights so
+@code{CS::Geometry::GeneralMeshBuilder}. Also adding a few lights so
 that everything is visible.
 @item
 Creation of a view (@code{csView} class) and a camera.

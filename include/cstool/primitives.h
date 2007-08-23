@@ -27,6 +27,7 @@
 
 #include "csgeom/vector3.h"
 #include "csgeom/vector2.h"
+#include "csgeom/tri.h"
 #include "csutil/cscolor.h"
 #include "csutil/dirtyaccessarray.h"
 

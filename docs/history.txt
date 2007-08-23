@@ -8,14 +8,18 @@ chronological order.
 
 23-Aug-2007
 	- Jorrit completely rewrote the GeneralMeshBuilder class and split
-	  every primitive in its own class. This simplifies the usage considerably
-	  and is better design in general. New classes (in namespace CS::Geometry)
-	  are now:
+	  every primitive in its own class. This simplifies the usage
+	  considerably and is better design in general. New classes (in
+	  namespace CS::Geometry) are now:
 	    - Box
 	    - TesselatedBox
 	    - TesselatedQuad
 	    - Capsule
 	    - Sphere
+	- Jorrit deprecated iEngine->CreateSectorWallsMesh() and
+	  iEngine->CreateThingMesh().
+	- Jorrit removed (nearly) all uses of CreateThingMesh() and
+	  CreateSectorWallsMesh() in CS.
 22-Aug-2007
 	- Jorrit deprecated csPrimitives and added CS::Geometry::Primitives
 	  instead.

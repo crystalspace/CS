@@ -741,7 +741,10 @@ struct iEngine : public virtual iBase
    * Assign to a csRef.
    * \param sector the sector to add walls to
    * \param name the engine name of the walls mesh that will be created
+   * \deprecated Deprecated in 1.3. Use CS::Geometry::GeneralMeshBuilder
+   * instead.
    */
+  CS_DEPRECATED_METHOD_MSG("Use CS::Geometry::GeneralMeshBuilder instead")
   virtual csPtr<iMeshWrapper> CreateSectorWallsMesh (iSector* sector,
       const char* name) = 0;
 
@@ -753,7 +756,10 @@ struct iEngine : public virtual iBase
    * Assign to a csRef.
    * \param sector the sector to add the object to
    * \param name the engine name of the mesh that will be created
+   * \deprecated Deprecated in 1.3. Use CS::Geometry::GeneralMeshBuilder
+   * instead.
    */
+  CS_DEPRECATED_METHOD_MSG("Use CS::Geometry::GeneralMeshBuilder instead")
   virtual csPtr<iMeshWrapper> CreateThingMesh (iSector* sector,
   	const char* name) = 0;
 
