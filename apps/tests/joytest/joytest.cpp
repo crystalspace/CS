@@ -37,7 +37,6 @@
 #include "imap/loader.h"
 #include "imesh/object.h"
 #include "imesh/sprite3d.h"
-#include "imesh/thing.h"
 #include "iutil/csinput.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"

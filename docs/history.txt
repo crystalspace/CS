@@ -9,6 +9,10 @@ chronological order.
 24-Aug-2007
 	- Jorrit ran gemneshify on nearly all levels in CS. All usage of
 	  thing has been eliminated.
+	- Jorrit changed simplept to use genmesh instead of thing.
+	- Jorrit removed the infinite maze from walktest. It was broken
+	  anyway and removing it is the fastest way to remove the usage
+	  of thing :-)
 23-Aug-2007
 	- Jorrit completely rewrote the GeneralMeshBuilder class and split
 	  every primitive in its own class. This simplifies the usage

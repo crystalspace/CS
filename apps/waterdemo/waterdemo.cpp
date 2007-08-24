@@ -45,7 +45,6 @@
 #include "imap/ldrctxt.h"
 #include "imesh/genmesh.h"
 #include "imesh/object.h"
-#include "imesh/thing.h"
 #include "iutil/cmdline.h"
 #include "iutil/csinput.h"
 #include "iutil/document.h"

@@ -21,7 +21,6 @@
 #include "csqint.h"
 #include "walktest.h"
 #include "bot.h"
-#include "infmaze.h"
 #include "command.h"
 #include "imesh/thing.h"
 #include "iengine/camera.h"

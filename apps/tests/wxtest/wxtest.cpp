@@ -45,7 +45,6 @@
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "iengine/material.h"
-#include "imesh/thing.h"
 #include "imesh/object.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"

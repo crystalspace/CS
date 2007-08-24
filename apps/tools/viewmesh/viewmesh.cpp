@@ -25,7 +25,6 @@
 #include "csutil/event.h"
 #include "csutil/scfstr.h"
 #include "imesh/object.h"
-#include "imesh/thing.h"
 #include "iutil/eventq.h"
 #include "iutil/object.h"
 #include "iutil/stringarray.h"

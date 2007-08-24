@@ -44,7 +44,6 @@
 #include "imap/writer.h"
 #include "imesh/sprite3d.h"
 #include "imesh/spritecal3d.h"
-#include "imesh/thing.h"
 #include "ivaria/icegui.h"
 
 struct vmAnimCallback;
