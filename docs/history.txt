@@ -6,20 +6,114 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Aug-2007
+	- Jorrit ran gemneshify on nearly all levels in CS. All usage of
+	  thing has been eliminated.
+	- Jorrit changed simplept to use genmesh instead of thing.
+	- Jorrit removed the infinite maze from walktest. It was broken
+	  anyway and removing it is the fastest way to remove the usage
+	  of thing :-)
+	- Jorrit deprecated thing.
+23-Aug-2007
+	- Jorrit completely rewrote the GeneralMeshBuilder class and split
+	  every primitive in its own class. This simplifies the usage
+	  considerably and is better design in general. New classes (in
+	  namespace CS::Geometry) are now:
+	    - Box
+	    - TesselatedBox
+	    - TesselatedQuad
+	    - Capsule
+	    - Sphere
+	- Jorrit deprecated iEngine->CreateSectorWallsMesh() and
+	  iEngine->CreateThingMesh().
+	- Jorrit removed (nearly) all uses of CreateThingMesh() and
+	  CreateSectorWallsMesh() in CS.
+	- Jorrit removed usage of CreateSectorWallsMesh() in mazing tutorial
+	  (code and documentation).
+22-Aug-2007
+	- Jorrit deprecated csPrimitives and added CS::Geometry::Primitives
+	  instead.
+	- Jorrit added csPlane3::FindOrthogonalPoints().
+	- Jorrit added a new CS::Geometry::DensityTextureMapper class
+	  which computes texture mapping on a surface based on fixed
+	  density.
+	- Jorrit fixed a texture mapping bug in Primitives::GenerateQuad().
+	- Jorrit added GeneralMeshBuilder::GenerateTesselatedQuad().
+	- Jorrit renamed GeneralMeshBuilder::GenerateBla() methods to Bla().
+	- Jorrit modified simple1 and simple2 to use the new
+	  GeneralMeshBuilder. Also modified the tutorial documentation
+	  for this.
+21-Aug-2007
+	- Marten rewrote the way lighter2 handles border elements.
+20-Aug-2007
+	- Jorrit fixed decals so they work fine on 64-bit.
+	- Jorrit added CS::Geometry::TextureMapper. This class works
+	  together with csPrimitives so that you can specify alternative
+	  ways to do the texture mapping for the generated primites.
+	  Also extended the GeneralMeshBuilder functions with a texture
+	  mapper parameter.
 18-Aug-2007
-    - jwir3 began conversion of scenes.  Added functionality to convert sectors,
-      which, as in the blend2cs case, are actual scenes.  Thus, <visual_scene>
-      elements are converted to sectors inside the Crystal Space map file.
+ 	- jwir3 began conversion of scenes.  Added functionality to convert sectors,
+          which, as in the blend2cs case, are actual scenes.  Thus, <visual_scene>
+          elements are converted to sectors inside the Crystal Space map file.	  
+17-Aug-2007
+	- Jorrit fixed a bug in genmesh. Decals didn't work on submeshes.
+	  This prevented decals from working on levels treated with
+	  lighter2.
+	- Jorrit fixed a crash bug in lighter2.
 14-Aug-2007
-    - jwir3 added function RestructureIndices(), which refactors the vertex
-      indices, such that two vertices are unique if they have differing position,
-      normal, or texture coordinates.
-    - jwir3 added conversion of texture and normal coordinates.
+	- jwir3 added function RestructureIndices(), which refactors the vertex
+          indices, such that two vertices are unique if they have differing position,
+          normal, or texture coordinates.
+        - jwir3 added conversion of texture and normal coordinates.
+	- Jorrit added iEngine->CreateGenMesh() and
+	  iEngine->CreateGenMeshFactory() (alternative to the current
+	  iEngine->CreateThingMesh()).
+	- Jorrit added csGeneralMeshPrimitives class. This class complements
+	  csPrimitives with the ability to directly populate a genmesh
+	  factory.
+	- Jorrit added an optional 'flags' parameter to
+	  csPrimitives::GenerateBox() so that you can create a box visible from
+	  the inside and also can disable the smooth option for normals.
+	- Jorrit added (ifdeffed out) a first try at converting simple1 to
+	  use this instead of a thing for the room.
+	- res made the fractional element areas in lighter2 swappable. (On
+	  large levels they can account for a significant portion of the
+	  used memory).
+	- Jorrit put csGeneralMeshPrimitives into the new namespace
+	  CS::Geometry. Also renamed it to GeneralMeshBuilder.
+	- Jorrit removed the new iEngine functions (CreateGenMesh() and
+	  CreateGenMeshFactory()) and added CS::Geometry::GeneralMeshBuilder
+	  functions CreateMesh() and CreateFactory().
 13-Aug-2007
-    - jwir3 added a WriteXML() function to csColladaMesh, in preparation for converting
-      normals and texture coordinates.  All functionality that was previously in 
-      csColladaConvertor::ConvertGeometry() that has to do with writing out CS XML 
-      has now been transferred to this new WriteXML() function.
+	- jwir3 added a WriteXML() function to csColladaMesh, in preparation for converting
+	  normals and texture coordinates.  All functionality that was previously in 
+          csColladaConvertor::ConvertGeometry() that has to do with writing out CS XML 
+          has now been transferred to this new WriteXML() function.
+12-Aug-2007
+	- res added CS::SubRectangles::IsEmpty().
+	- res sped up the lighter2 object lightmap layouting. (Replaced a
+	  linear search with a binary search when determining the primitives
+	  that can be layouted together.)
+	- res fixed TinyXML to build on gcc 4.1.2 again (issue found by Darek).
+11-Aug-2007
+	- res changed csFixedSizeAllocator<> to allow construction from a
+	  given memory allocator.
+	- res changed TinyXML documents to use their own heap. Can reduce 
+	  memory fragmentation when dealing with large documents.
+	- res added CS::Utility::SmartFileOpen() - a function for the somewhat
+	  common task to open a world file from a path that could denote any
+	  of: a plain filename, directory or .zip archive.
+	- res made genmeshify use CS::Utility::SmartFileOpen().
+	- res added an option to levtool to fix <polymesh> tags (by replacing
+	  them with <trimesh> tags).
+	- res made levtool use CS::Utility::SmartFileOpen().
+	- res removed deprecated methods from csArray<>.
+10-Aug-2007
+	- Jorrit fixed a compile bug in math.h (for gcc).
+	- Jorrit removed renderpriorities tag from some levels.
+	- res changed the delayed TinyXML node freeing to use less memory 
+	  allocations. Can speed up cleanup for large documents.
 9-Aug-2007
 	- jwir3 modified csColladaMesh to include arrays for both vertices
 	  and normals, as well as pointers to their corresponding csColladaAccessor
@@ -32,6 +126,13 @@ chronological order.
 	- jwir3 began implementing support for conversion of normals from COLLADA 
 	  to Crystal Space format.
 8-Aug-2007
+	- Jorrit (hopefully) removed all traces of the deprecated
+	  iPolygonMesh.
+	- res removed the debugging graph header.
+	- res removed the deprecated image generation stuff.
+	- res added a missing initialization to csConsoleOutput. Should 
+	  address trac #368.
+	- res removed the deprecated csutil/profile.h header.
 	- jwir3 finished basic materials conversion for COLLADA.  The collada
 	  conversion library now outputs basic diffuse colors, as well as 
 	  triangle meshes.
@@ -41,199 +142,12 @@ chronological order.
 	  iMeshObject->InvalidateMaterialHandles().
 	- res changed csPath to not be marked as "exported" any more 
 	  (all-inline, gives link errors with MSVC/DLLs).
-6-Aug-2007
-	- jwir3 added functionality to csColladaConvertor to allow the finding of
-	  a material in the materials list, given a search string for the name.
-	- jwir3 added warnings for functions that have not yet been implemented and
-	  or completed.
-	- jwir3 added a materials list for the csColladaMesh class.  
-	- jwir3 added functionality to ProcessPolygons(), ProcessTriangles(), 
-	  ProcessTriStrips(), ProcessPolyList(), and ProcessTriFans() functions
-	  to allow for setting the materials data member by finding the correct
-	  material via a string search.
-	- jwir3 added doxygen documentation for CS::Geom::Triangulate3D and for 
-	  the ConvertMaterials() and supporting functions.  Triangulate3D still
-3-Aug-2007
-	- jwir3 added functionality to retrieve diffuse, specular, and ambient color
-	  from the COLLADA <phong> or <blinn> elements, in the effects section of
-	  the document.
 2-Aug-2007
 	- Marten implemented a small optimization for the (i+1)%3 case,
 	  mainly used when traversing edges in triangles.
-	- jwir3 changed all vertex arrays to csArray<csVector3> inside the collada 
-	  conversion library.
 1-Aug-2007
 	- Jorrit fixed an initialization error in gmeshskelanim2 that could
 	  cause crashes at exit. This fixes #367.
-	  does not work.
-
-15-Jul-2007
-	- jwir3 added all remaining code for ConvertGeometry(), with the sole exception 
-	  of the implementation for CS::Geom::Triangulate3D.  This function will be 
-	  added as soon as possible.  However, all other wrapping code has been 
-	  tested and seems to work correctly.
-	- jwir3 separated out the different conversions for <polygons>, <triangles>, 
-	  <trifans>, <tristrips>, and <polylist> into functions which can then be 
-	  more cleanly called from within csColladaMesh::Process().  <lines> and 
-	  <linestrips> have not been implemented yet, as it is unclear how they will 
-	  fit into the overall scheme of things.
-	- jwir3 added a detection process for <convex_mesh> elements.  Upon detection, 
-	  the collada conversion library spits out a warning letting users know that 
-	  conversion for this element has not been implemented.  It will be implemented 
-	  as time permits.
-14-Jul-2007
-	- jwir3 changed trimesh.cpp and trimesh.h to add another function to the 
-	  csTriangleMesh class - AddTriangleMesh().  AddTriangleMesh is used to 
-	  merge another triangle mesh with the existing triangle mesh.  This is useful 
-	  if a user has multiple trimeshes, and wants to merge them into one.
-13-Jul-2007
-	- jwir3 separated a bunch of auxiliary classes from csColladaConvertor.cpp to 
-	  csColladaClasses to make it easier to work with.  
-	- jwir3 attempted to get csgeom/triangulate3d.cpp working, but to no avail.
-	- jwir3 changed csColladaConvertor::ConvertLighting() to ConvertMaterials().
-10-Jul-2007
-	- jwir3 got triangle conversion working correctly in csColladaConvertor.  
-	  All COLLADA <triangles> elements are now able to be converted to CS format.  
-	  The vertex normals have not yet been converted, but this will happen soon.
-	- jwir3 modified the conversion code so that the XML parameters were all lowercase 
-	  (e.g. 'meshfact' instead of 'meshFact').  Also added a <plugin> tag, in the hopes 
-	  that things could be visible.
-9-Jul-2007
-	- jwir3 made a change to iutil/document.h so that the list under position querying
-	  outputs correctly in Doxygen. 
-5-Jul-2007
-	- res made a fix to yesterday's lighter2 assertion fix.
-4-Jul-2007
-	- res fixed lighter2 not cleaning out all old lightmaps.
-	- res fixed an assertion in lightmap layouting by matching the 
-	  "factory" layouting (to determine whether to split) to the "object"
-	  layouting. Previously, the differences between those could have the
-	  result that the "factory" layouting would return a set of primitives
-	  that the "object" layouting actually failed to layout onto one
-	  lightmap.
-3-July-2007
-	- Scott Johnson changed colladatest to utilize a file inside the 
-	  /lev directory on VFS.
-	- Scott Johnson added an enumerated type representing a numeric type to 
-	  collada.h.
-	- Scott Johnson removed GetVertexArray() from the csColladaConvertor code.  
-	  It is being replaced by a separate data structure.
-	- Scott Johnson added two new data structures to csColladaConvertor - one 
-	  representing a mesh object, and one representing an accessor to the vertices 
-	  in COLLADA.
-	- Scott Johnson added a new function called GetSourceElement() to 
-	  csColladaConvertor that retrieves the <source> node of a mesh object 
-	  in COLLADA. 
-	- Scott Johnson added all of the csColladaConvertor code to a new 
-	  namespace called ColladaConvertor.
-1-Jul-2007
-	- res made csGLGraphics3D::DrawSimpleMesh () do a "forceful fixed
-	  function enable" when drawing without shaders.
-30-Jun-2007
-	- Marten fixed compilation on MSVC after Oktals additions.
-29-Jun-2007
-	- Oktal augmented the isfinite() test in configure with tests for
-	  isnan() and isnormal().
-	- Oktal added portable csNaN() and csNormal() functions alongside the
-	  preexisting csFinite() in csgeom/math.h
-26-Jun-2007
-	- Jorrit fixed a bug in the skeleton graveyard by adding
-	  iSkeletonGraveyard->RemoveSkeleton(). Genmesh anim now
-	  calls this method when the animation is destroyed. That fixes
-	  memory leaks and crashes when genmesh anim objects are removed
-	  from memory. Note that sprcal3d still has a circular reference
-	  bug with the graveyard.
-25-Jun-2007
-	- Jorrit converted a few remaining interfaces to using SCF_INTERFACE
-	  instead of SCF_VERSION.
-24-Jun-2007
-        - Piotr made small bugfix in odedynam colliders ref handling.
-	- Eric Sunshine corrected "camera movement" documentation bug.
-	  Fixes #348.
-	- res made "jam install" install not just "history.txt" but
-	  "history*.txt" - this way the branch-specific histories (e.g.
-	  for release branches) are installed as well.
-23-Jun-2007
-	- res made the CS_PACKAGEINFO autoconf macro truncate the version
-	  number after non-numerical and non-dot characters. This has the
-	  effect that versions such as "1.2rc1" are split into "1" and "2",
-	  and not "1" and "2rc1". Fixes #347.
-22-June-2007
-	- Scott Johnson removed Chop() functionality from csColladaConvertor.  
-	  It now uses iString::DeleteAt().  Didn't realize this was a function.
-	- Scott Johnson changed VFS.cfg to include data/colladatest on load as 
-	  /lev/colladatest.
-21-Jun-2007
-	- Jorrit implemented CollideRaySegment() for old terraformer
-	  as well.
-20-Jun-2007
-	- Jorrit extended csIntersect3::BoxSegment() so that it also
-	  (optionally) supports rays.
-	- Jorrit added csIntersect3::ClipSegmentBox() to clip a segment
-	  or ray to a box.
-	- Jorrit changed csTerrainSystem::CollideSegment() to use this
-	  new clipper and by doing that made it support rays in addition
-	  to normal segments.
-	- Marten fixed the ClipSegmentBox to support perfectly aligned
-	  rays on bounding box border.
-	- Marten made csTerrainSystem::CollideSegment() handle perfectly
-	  vertical segments/rays.
-19-Jun-2007
-	- Jorrit extended iTerrainSystem with a new CollideSegment()
-	  variant that returns at most one hit and the triangle.
-	- Jorrit added a 'use_ray' parameter to
-	  iTerrainCollider->CollideSegment(). Not implemented yet.
-	- Jorrit implemented CollideRay() for new terrain in opcode
-	  plugin. Works mostly with two problems:
-	    - Rays are not supported yet.
-	    - There seems to be a bug at cell boundaries. The terrain
-	      is missed there.
-	- res committed a patch from Joerg Fischer (with minor stylistic 
-	  changes) to properly support joysticks on Windows whose axes do not
-	  correspond to the order found in the DIJOYSTATE2 structure (which is
-	  probably about every joystick). See trac #343. 
-18-Jun-2007
-	- Jorrit extended iTerrainCollider with a new version of
-	  CollideSegment() that returns at most one hit and also the
-	  triangle. Added an implementation for this to csopcode plugin.	
-15-Jun-2007
-	- Jorrit did some preparation work in csopcode plugin to allow
-	  CollideRaySegment to also work with new and old terrain. Not
-	  finished yet.
-  	- Scott Johnson added Chop() and FindNumericArray() functions to csColladaConvertor.
-    	  Chop() removes a single character from (currently) an std::string.  This will be 
-    	  changed to work with iStrings instead.  In fact, it might be more useful to add 
-    	  it to the iString interface.  FindNumericArray() is a collada-specific function 
-    	  that locates <int_array> or <float_array> elements as children of a current node.  
-    	  It only finds the first occurrence.  This needs to be changed to find ALL 
-    	  occurrences.
-  	- Scott Johnson modified ConvertGeometry() so it now locates a source node for 
-  	  position data, and outputs the information about the array, if found 
-  	  (and warnings are on).
-15-Jun-2007
-  	- Scott Johnson fixed Load() functionality in plgcolladaconvertor so that it 
-  	  no longer expects the user to load the output file before beginning conversion. 
-  	- Scott Johnson began implementing Convert() and ConvertGeometry() in 
-  	  plgcolladaconvertor.
-14-Jun-2007
-	- Jorrit fixed walktest recording facility so it no longer crashes
-	  on very big commands.
-9-Jun-2007
-	- Marten made some fixes for compilation on OSX
-6-Jun-2007
-	- caedes fixed scripting bindings for latest scf changes.
-	- res fixed the configure javac detection to quote the Java directory
-	  (so directories with spaces work).
-4-Jun-2007
-	- Oktal fixed a mistake made during Marten's SCF clean-up, that broke
-	  some X11 canvas plugins.
-	- Scott Johnson (jwir3) has neglected to edit this file when performing commits, 
-	  so the following is a (semi)-detailed report on what previously has been done.  
-	- Scott Johnson added the files ivaria/collada.h, apps/colladatest/*, 
-	  plugins/utilities/colladaconvertor/*
-	- Scott Johnson began work on the collada conversion plugin, added basic 
-	  functionality, Load(), Write(), and skeletons for Convert() functions.
-	- Scott Johnson created msvc project files for the collada plugin.
 29-Jul-2007
 	- res made the CEL jobber import crystalspace_staticplugins_msvc.jam
 	  from CS before generating VC projects.

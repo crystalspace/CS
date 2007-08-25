@@ -237,13 +237,12 @@ struct csScreenBoxResult
  * Note that a mesh object should never be contained in more than one wrapper.
  *
  * Main creators of instances implementing this interface:
- * - iEngine::CreateSectorWallsMesh()
- * - iEngine::CreateThingMesh()
  * - iEngine::CreateMeshWrapper()
  * - iEngine::LoadMeshWrapper()
  * - iEngine::CreatePortalContainer()
  * - iEngine::CreatePortal()
  * - iLoader::LoadMeshObject()
+ * - CS::Geometry::GeneralMeshBuilder::CreateMesh()
  *
  * Main ways to get pointers to this interface:
  * - iEngine::FindMeshObject()

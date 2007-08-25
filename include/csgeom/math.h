@@ -218,7 +218,7 @@ namespace Math
 {
   /// Return the next number in the sequence 0,1,2 modulo 3
   template<typename T>
-  CS_FORCEINLINE T NextModulo3 (T number)
+  CS_FORCEINLINE_TEMPLATEMETHOD T NextModulo3 (T number)
   {
     return (1 << number) & 0x3;
   }

@@ -163,7 +163,7 @@ void csDecal::BeginMesh(iMeshWrapper * mesh)
 void csDecal::AddStaticPoly(const csPoly3D & p)
 {
   size_t a;
-  CS::TriangleT<size_t> tri;
+  CS::TriangleT<int> tri;
 
   if (!currMesh)
       return;

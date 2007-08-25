@@ -35,7 +35,6 @@
 #include "isndsys.h"
 
 #include "walktest.h"
-#include "infmaze.h"
 #include "command.h"
 
 #if defined(CS_PLATFORM_DOS) || defined(CS_PLATFORM_WIN32)
@@ -60,7 +59,6 @@ WalkTest::WalkTest () :
   csCommandProcessor::ExtraHandler = CommandHandler;
   auto_script = 0;
   view = 0;
-  infinite_maze = 0;
   wMissile_boom = 0;
   wMissile_whoosh = 0;
   cslogo = 0;
@@ -74,7 +72,6 @@ WalkTest::WalkTest () :
   busy_perf_test = false;
   do_show_z = false;
   do_show_palette = false;
-  do_infinite = false;
   do_freelook = false;
   do_logo = true;
   player_spawned = false;
@@ -127,7 +124,6 @@ WalkTest::WalkTest () :
 WalkTest::~WalkTest ()
 {
   delete [] auto_script;
-  delete infinite_maze;
   delete cslogo;
 
   while (first_map)
@@ -189,9 +185,6 @@ void WalkTest::SetDefaults ()
     val = cmdline->GetName (idx);
   }
 
-  if (cmdline->GetOption ("infinite"))
-    do_infinite = true;
-
   extern bool do_bots;
   if (cmdline->GetOption ("bots"))
     do_bots = true;
@@ -240,7 +233,6 @@ void WalkTest::Help ()
   csPrintf ("  -regions           load every map in a separate region (default off)\n");
   csPrintf ("  -dupes             check for duplicate objects in multiple maps (default off)\n");
   csPrintf ("  -noprecache        after loading don't precache to speed up rendering\n");
-  csPrintf ("  -infinite          special infinite level generation (ignores map file!)\n");
   csPrintf ("  -bots              allow random generation of bots\n");
   csPrintf ("  -[no]saveable      enable/disable engine 'saveable' flag\n");
   csPrintf ("  <path>             load map from VFS <path> (default '%s')\n",
@@ -1127,215 +1119,138 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   csCommandProcessor::Initialize (Engine, view->GetCamera (),
     Gfx3D, myConsole, object_reg);
 
-  if (do_infinite)
+  // Load from a map file.
+  if (num_maps == 1)
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map '%s'.",
+      first_map->map_dir);
+  else if (num_maps == 2 && cache_map != 0)
   {
-    // The infinite maze.
+    if (cache_map != first_map)
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map '%s'.",
+	      first_map->map_dir);
+    else
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map '%s'.",
+	      first_map->next_map->map_dir);
+  }
+  else if (num_maps > 1)
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading multiple maps '%s', ...",
+      first_map->map_dir);
 
-    if (!myVFS->ChDir ("/tmp"))
+  // Check if we have to load every separate map in a separate region.
+  csRef<iCommandLineParser> cmdline = 
+      csQueryRegistry<iCommandLineParser> (object_reg);
+  bool do_regions = false;
+  if (cmdline->GetOption ("regions"))
+    do_regions = true;
+  bool do_dupes = false;
+  if (cmdline->GetOption ("dupes"))
+    do_dupes = true;
+    
+  if ((!do_regions) && cache_map != 0)
+  {
+    // Then we set the current directory right.
+    if (!SetMapDir (cache_map->map_dir))
+      return false;
+    // Set the cache manager based on current VFS dir.
+    Engine->SetVFSCacheManager ();
+  }
+
+  // Check the map and mount it if required.
+  int i;
+  csMapToLoad* map = first_map;
+  Engine->DeleteAll ();
+  csTicks start_time = csGetTicks ();
+  for (i = 0 ; i < num_maps ; i++, map = map->next_map)
+  {
+    if (map == cache_map)
     {
-      Report (CS_REPORTER_SEVERITY_ERROR,
-      	"Temporary directory /tmp not mounted on VFS!");
+      continue;
+    }
+    if (!SetMapDir (map->map_dir))
+      return false;
+
+    // Load the map from the file.
+    if (num_maps > 1)
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "  Loading map '%s'",
+	      map->map_dir);
+    iRegion* region = 0;
+    if (do_regions)
+    {
+      region = Engine->CreateRegion (map->map_dir);
+    }
+    if (!LevelLoader->LoadMapFile ("world", false, region, !do_regions,
+	      do_dupes))
+    {
+      Report (CS_REPORTER_SEVERITY_ERROR, "Failing to load map!");
       return false;
     }
-
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating initial room!...");
-    Engine->SetLightingCacheMode (0);
-
-    // Unfortunately the current movement system does not allow the user to
-    // move around the maze unless collision detection is enabled, even
-    // though collision detection does not really make sense in this context.
-    // Hopefully the movement system will be fixed some day so that the user
-    // can move around even with collision detection disabled.
-    collider_actor.SetCD (true);
-
-    // Load two textures that are used in the maze.
-    if (!LevelLoader->LoadTexture ("txt", "/lib/std/stone4.gif"))
+    if (do_regions)
     {
-      Report (CS_REPORTER_SEVERITY_ERROR, "Failed to load /lib/std/stone4.gif");
-      return false;
+      // Set the cache manager based on current VFS dir.
+      Engine->SetVFSCacheManager ();
+      region->Prepare ();
     }
-    if (!LevelLoader->LoadTexture ("txt2", "/lib/std/mystone2.gif"))
-    {
-      Report (CS_REPORTER_SEVERITY_ERROR, "Failed to load /lib/std/mystone2.gif");
-      return false;
-    }
+  }
 
-    iSector* room;
-    // Create the initial (non-random) part of the maze.
-    infinite_maze = new InfiniteMaze ();
-    room = infinite_maze->create_six_room (Engine, 0, 0, 0)->sector;
-    infinite_maze->create_six_room (Engine, 0, 0, 1);
-    infinite_maze->create_six_room (Engine, 0, 0, 2);
-    infinite_maze->create_six_room (Engine, 1, 0, 2);
-    infinite_maze->create_six_room (Engine, 0, 1, 2);
-    infinite_maze->create_six_room (Engine, 1, 1, 2);
-    infinite_maze->create_six_room (Engine, 0, 0, 3);
-    infinite_maze->create_six_room (Engine, 0, 0, 4);
-    infinite_maze->create_six_room (Engine, -1, 0, 4);
-    infinite_maze->create_six_room (Engine, -2, 0, 4);
-    infinite_maze->create_six_room (Engine, 0, -1, 3);
-    infinite_maze->create_six_room (Engine, 0, -2, 3);
-    infinite_maze->create_six_room (Engine, 0, 1, 3);
-    infinite_maze->create_six_room (Engine, 0, 2, 3);
-    infinite_maze->connect_infinite (0, 0, 0, 0, 0, 1);
-    infinite_maze->connect_infinite (0, 0, 1, 0, 0, 2);
-    infinite_maze->connect_infinite (0, 0, 2, 0, 0, 3);
-    infinite_maze->connect_infinite (0, 0, 2, 1, 0, 2);
-    infinite_maze->connect_infinite (0, 0, 2, 0, 1, 2);
-    infinite_maze->connect_infinite (1, 1, 2, 0, 1, 2);
-    infinite_maze->connect_infinite (1, 1, 2, 1, 0, 2);
-    infinite_maze->connect_infinite (0, 0, 3, 0, 0, 4);
-    infinite_maze->connect_infinite (-1, 0, 4, 0, 0, 4);
-    infinite_maze->connect_infinite (-2, 0, 4, -1, 0, 4);
-    infinite_maze->connect_infinite (0, 0, 3, 0, -1, 3);
-    infinite_maze->connect_infinite (0, -1, 3, 0, -2, 3);
-    infinite_maze->connect_infinite (0, 0, 3, 0, 1, 3);
-    infinite_maze->connect_infinite (0, 1, 3, 0, 2, 3);
-    infinite_maze->create_loose_portal (-2, 0, 4, -2, 1, 4);
-    view->GetCamera ()->SetSector(room);
-    printf ("Done creation of infinite maze!\n"); fflush (stdout);
+  iRegion* region = 0;
+  if (do_regions)
+    region = Engine->CreateRegion ("libdata");
+  LoadLibraryData (region);
+  if (do_regions)
+  {
+    region->Prepare ();
+  }
+  Inititalize2DTextures ();
+  ParseKeyCmds ();
 
-    // Prepare the engine. This will calculate all lighting and
-    // prepare the lightmaps for the 3D rasterizer.
+  // Prepare the engine. This will calculate all lighting and
+  // prepare the lightmaps for the 3D rasterizer.
+  if (!do_regions)
+  {
     csTextProgressMeter* meter = new csTextProgressMeter (myConsole);
     Engine->Prepare (meter);
     delete meter;
   }
-  else
+
+  if (!cmdline->GetOption ("noprecache"))
   {
-    // Load from a map file.
-    if (num_maps == 1)
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map '%s'.",
-      	first_map->map_dir);
-    else if (num_maps == 2 && cache_map != 0)
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Precaching all things...");
+    Engine->PrecacheDraw ();
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Precaching finished...");
+  }
+
+  csTicks stop_time = csGetTicks ();
+  csPrintf ("Total level load time: %g seconds\n",
+      float (stop_time-start_time) / 1000.0); fflush (stdout);
+
+  Create2DSprites ();
+
+  // Look for the start sector in this map.
+  bool camok = false;
+  if (!camok && Engine->GetCameraPositions ()->GetCount () > 0)
+  {
+    iCameraPosition *cp = Engine->GetCameraPositions ()->Get (0);
+    if (cp->Load(views[0]->GetCamera (), Engine) &&
+	cp->Load(views[1]->GetCamera (), Engine))
+      camok = true;
+  }
+  if (!camok)
+  {
+    iSector* room = Engine->GetSectors ()->FindByName ("room");
+    if (room)
     {
-      if (cache_map != first_map)
-        Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map '%s'.",
-		first_map->map_dir);
-      else
-        Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map '%s'.",
-		first_map->next_map->map_dir);
+      views[0]->GetCamera ()->SetSector (room);
+      views[1]->GetCamera ()->SetSector (room);
+      camok = true;
     }
-    else if (num_maps > 1)
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading multiple maps '%s', ...",
-      	first_map->map_dir);
+  }
 
-    // Check if we have to load every separate map in a separate region.
-    csRef<iCommandLineParser> cmdline = 
-    	csQueryRegistry<iCommandLineParser> (object_reg);
-    bool do_regions = false;
-    if (cmdline->GetOption ("regions"))
-      do_regions = true;
-    bool do_dupes = false;
-    if (cmdline->GetOption ("dupes"))
-      do_dupes = true;
-      
-    if ((!do_regions) && cache_map != 0)
-    {
-      // Then we set the current directory right.
-      if (!SetMapDir (cache_map->map_dir))
-	return false;
-      // Set the cache manager based on current VFS dir.
-      Engine->SetVFSCacheManager ();
-    }
-
-    // Check the map and mount it if required.
-    int i;
-    csMapToLoad* map = first_map;
-    Engine->DeleteAll ();
-    csTicks start_time = csGetTicks ();
-    for (i = 0 ; i < num_maps ; i++, map = map->next_map)
-    {
-      if (map == cache_map)
-      {
-	continue;
-      }
-      if (!SetMapDir (map->map_dir))
-	return false;
-
-      // Load the map from the file.
-      if (num_maps > 1)
-        Report (CS_REPORTER_SEVERITY_NOTIFY, "  Loading map '%s'",
-		map->map_dir);
-      iRegion* region = 0;
-      if (do_regions)
-      {
-        region = Engine->CreateRegion (map->map_dir);
-      }
-      if (!LevelLoader->LoadMapFile ("world", false, region, !do_regions,
-      		do_dupes))
-      {
-        Report (CS_REPORTER_SEVERITY_ERROR, "Failing to load map!");
-        return false;
-      }
-      if (do_regions)
-      {
-        // Set the cache manager based on current VFS dir.
-        Engine->SetVFSCacheManager ();
-        region->Prepare ();
-      }
-    }
-
-    iRegion* region = 0;
-    if (do_regions)
-      region = Engine->CreateRegion ("libdata");
-    LoadLibraryData (region);
-    if (do_regions)
-    {
-      region->Prepare ();
-    }
-    Inititalize2DTextures ();
-    ParseKeyCmds ();
-
-    // Prepare the engine. This will calculate all lighting and
-    // prepare the lightmaps for the 3D rasterizer.
-    if (!do_regions)
-    {
-      csTextProgressMeter* meter = new csTextProgressMeter (myConsole);
-      Engine->Prepare (meter);
-      delete meter;
-    }
-
-    if (!cmdline->GetOption ("noprecache"))
-    {
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "Precaching all things...");
-      Engine->PrecacheDraw ();
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "Precaching finished...");
-    }
-
-    csTicks stop_time = csGetTicks ();
-    csPrintf ("Total level load time: %g seconds\n",
-    	float (stop_time-start_time) / 1000.0); fflush (stdout);
-
-    Create2DSprites ();
-
-    // Look for the start sector in this map.
-    bool camok = false;
-    if (!camok && Engine->GetCameraPositions ()->GetCount () > 0)
-    {
-      iCameraPosition *cp = Engine->GetCameraPositions ()->Get (0);
-      if (cp->Load(views[0]->GetCamera (), Engine) &&
-	  cp->Load(views[1]->GetCamera (), Engine))
-	camok = true;
-    }
-    if (!camok)
-    {
-      iSector* room = Engine->GetSectors ()->FindByName ("room");
-      if (room)
-      {
-	views[0]->GetCamera ()->SetSector (room);
-	views[1]->GetCamera ()->SetSector (room);
-	camok = true;
-      }
-    }
-
-    if (!camok)
-    {
-      Report (CS_REPORTER_SEVERITY_ERROR,
-        "Map does not contain a valid starting point!\n"
-        "Try adding a room called 'room' or a START keyword");
-      return false;
-    }
+  if (!camok)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR,
+      "Map does not contain a valid starting point!\n"
+      "Try adding a room called 'room' or a START keyword");
+    return false;
   }
 
   // Initialize collision detection system (even if disabled so

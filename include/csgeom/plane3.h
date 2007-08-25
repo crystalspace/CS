@@ -194,6 +194,14 @@ public:
   csVector3 FindPoint () const;
 
   /**
+   * Calculate two orthogonal points on the plane given by
+   * the normal 'norm' and going through the origin. This gives an
+   * axis on that plane.
+   */
+  static void FindOrthogonalPoints (const csVector3& norm,
+      csVector3& p, csVector3& q);
+
+  /**
    * Clip the polygon in pverts (having num_verts vertices) to this plane.
    * Method returns true if there is something visible, false otherwise.
    * Note that this function returns a pointer to a static array in csPlane3.

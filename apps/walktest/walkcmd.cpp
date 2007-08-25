@@ -36,6 +36,7 @@
 #include "iengine/light.h"
 #include "iengine/light.h"
 #include "iengine/material.h"
+#include "iengine/portal.h"
 #include "iengine/movable.h"
 #include "iengine/portalcontainer.h"
 #include "iengine/sector.h"
@@ -48,7 +49,6 @@
 #include "imap/saver.h"
 #include "imesh/object.h"
 #include "imesh/sprite3d.h"
-#include "imesh/thing.h"
 #include "isndsys.h"
 #include "iutil/databuff.h"
 #include "iutil/pluginconfig.h"
@@ -65,7 +65,6 @@
 
 #include "bot.h"
 #include "command.h"
-#include "infmaze.h"
 #include "walktest.h"
 #include "wentity.h"
 

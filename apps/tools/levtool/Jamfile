@@ -6,4 +6,6 @@ Application levtool
 	: [ Wildcard *.cpp *.h ]
 	: console
 ;
+Includes fixpolymesh.h : $(SUBDIR)/fixpolymesh.tok ;
+MsvcExtraFile levtool : $(SUBDIR)/fixpolymesh.tok ;
 LinkWith levtool : crystalspace ;

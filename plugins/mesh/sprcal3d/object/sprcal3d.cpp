@@ -170,11 +170,6 @@ csSpriteCal3DMeshObjectFactory::csSpriteCal3DMeshObjectFactory (
   scfImplementationType (this, (iBase*)pParent), sprcal3d_type (pParent), 
   calCoreModel("no name")
 {
-  SetPolygonMeshBase (sprcal3d_type->nullPolyMesh);
-  SetPolygonMeshColldet (sprcal3d_type->nullPolyMesh);
-  SetPolygonMeshViscull (0);
-  SetPolygonMeshShadows (0);
-
   csSpriteCal3DMeshObjectFactory::object_reg = object_reg;
 
   light_mgr = csQueryRegistry<iLightManager> (object_reg);
@@ -853,12 +848,6 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
   scfImplementationType (this, pParent), calModel(&calCoreModel)
 {
   csSpriteCal3DMeshObject::object_reg = object_reg;
-
-  //  scfiPolygonMesh.SetFactory (this);
-  //  scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
-  //  scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
-  //  scfiObjectModel.SetPolygonMeshViscull (0);
-  //  scfiObjectModel.SetPolygonMeshShadows (0);
 
   // create the model instance from the loaded core model
 //  if(!calModel.create (&calCoreModel))
@@ -2463,7 +2452,7 @@ SCF_IMPLEMENT_FACTORY (csSpriteCal3DMeshObjectType)
 csSpriteCal3DMeshObjectType::csSpriteCal3DMeshObjectType (iBase* pParent) :
   scfImplementationType (this, pParent)
 {
-  nullPolyMesh.AttachNew (new NullPolyMesh (pParent));
+  //nullPolyMesh.AttachNew (new NullPolyMesh (pParent));
 }
 
 csSpriteCal3DMeshObjectType::~csSpriteCal3DMeshObjectType ()

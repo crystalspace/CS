@@ -23,7 +23,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/obb.h"
 #include "csgeom/plane3.h"
 #include "csgeom/sphere.h"
-#include "csgeom/pmtools.h"
 #include "csgeom/trimeshtools.h"
 #include "csgeom/trimesh.h"
 #include "cstool/collider.h"
@@ -31,7 +30,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/eventnames.h"
 #include "iengine/engine.h"
 #include "imesh/objmodel.h"
-#include "igeom/polymesh.h"
 #include "imesh/object.h"
 #include "imesh/genmesh.h"
 #include "iutil/evdefs.h"
@@ -297,8 +295,6 @@ csReversibleTransform GetGeomTransform (dGeomID id)
   ODE2CSMATRIX(mat,rot);
   return csReversibleTransform (rot, csVector3 (pos[0], pos[1], pos[2]));
 }
-
-typedef csDirtyAccessArray<csMeshedPolygon> csPolyMeshList;
 
 #if 0
 void csODEDynamics::GetAABB (dGeomID g, dReal aabb[6])
@@ -1039,11 +1035,6 @@ bool csODECollider::CreateMeshGeometry (iMeshWrapper *mesh)
       trimesh = objmodel->GetTriangleData (dynsys->GetColldetID ());
     else
       trimesh = objmodel->GetTriangleData (dynsys->GetBaseID ());
-  }
-  else
-  {
-    trimesh.AttachNew (new csTriangleMeshPolyMesh (
-	  objmodel->GetPolygonMeshColldet ()));
   }
 
   if (!trimesh || trimesh->GetVertexCount () == 0

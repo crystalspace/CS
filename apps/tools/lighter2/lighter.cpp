@@ -179,7 +179,9 @@ namespace lighter
   void Lighter::CleanUp ()
   {
     delete scene; scene = 0;
+    
     delete swapManager; swapManager = 0;
+    
     engine.Invalidate ();
   }
 

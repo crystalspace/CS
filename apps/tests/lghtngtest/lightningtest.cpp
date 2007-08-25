@@ -22,6 +22,7 @@
 #include "iutil/vfs.h"
 #include "csutil/cscolor.h"
 #include "cstool/csview.h"
+#include "cstool/genmeshbuilder.h"
 #include "cstool/initapp.h"
 #include "lightningtest.h"
 #include "iutil/eventq.h"
@@ -37,7 +38,6 @@
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "iengine/material.h"
-#include "imesh/thing.h"
 #include "imesh/object.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
@@ -267,12 +267,23 @@ bool Simple::Initialize ()
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   room = engine->CreateSector ("room");
-  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingFactoryState> walls_state = 
-    scfQueryInterface<iThingFactoryState> (walls->GetMeshObject ()->GetFactory());
-  walls_state->AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
-  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
-  walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
+
+  // First we make a primitive for our geometry.
+  using namespace CS::Geometry;
+  DensityTextureMapper mapper (0.3f);
+  TesselatedBox box (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
+  box.SetLevel (3);
+  box.SetMapper (&mapper);
+  box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+
+  // Now we make a factory and a mesh at once.
+  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
+      engine, room, "walls", "walls_factory", &box);
+
+  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
+    iGeneralMeshState> (walls->GetMeshObject ());
+  mesh_state->SetShadowReceiving (true);
+  walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
   csRef<iLight> light;
   iLightList* ll = room->GetLights ();

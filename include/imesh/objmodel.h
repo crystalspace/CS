@@ -32,7 +32,6 @@
 #include "csutil/ref.h"
 #include "iutil/strset.h"
 
-struct iPolygonMesh;
 struct iTriangleMesh;
 struct iTerraFormer;
 struct iTerrainSystem;
@@ -74,9 +73,6 @@ struct iTriangleMeshIterator : public virtual iBase
   virtual iTriangleMesh* Next (csStringID& id) = 0;
 };
 
-// for iPolygonMesh
-#include "csutil/win32/msvc_deprecated_warn_off.h"
-
 /**
  * This interface represents data related to some geometry in object
  * space. It is a generic way to describe meshes in the engine. By using
@@ -92,7 +88,7 @@ struct iTriangleMeshIterator : public virtual iBase
  */
 struct iObjectModel : public virtual iBase
 {
-  SCF_INTERFACE(iObjectModel, 2, 0, 2);
+  SCF_INTERFACE(iObjectModel, 2, 1, 2);
   /**
    * Returns a number that will change whenever the shape of this object
    * changes. If that happens then the data in all the returned polygon
@@ -160,24 +156,6 @@ struct iObjectModel : public virtual iBase
   virtual void ResetTriangleData (csStringID id) = 0;
 
   /**
-   * Get a polygon mesh representing the basic geometry of the object.
-   * Can return 0 if this object model doesn't support that.
-   * \deprecated Use GetTriangleData(id) with id the interned string 'base'.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use GetTriangleData() instead.")
-  virtual iPolygonMesh* GetPolygonMeshBase () = 0;
-
-  /**
-   * Get a polygon mesh representing the geometry of the object.
-   * This mesh is useful for collision detection.
-   * Can return 0 if this object model doesn't support that.
-   * \deprecated Use GetTriangleData(id) with id the interned string
-   *   'colldet'.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use GetTriangleData() instead.")
-  virtual iPolygonMesh* GetPolygonMeshColldet () = 0;
-
-  /**
    * Get a terra former representing the geometry of the object.
    * This class is useful for collision detection.
    * Can return 0 if this object model doesn't support that.
@@ -190,88 +168,6 @@ struct iObjectModel : public virtual iBase
    * Can return 0 if this object model doesn't support that.
    */
   virtual iTerrainSystem* GetTerrainColldet () = 0;
-
-  /**
-   * Set a polygon mesh representing the geometry of the object.
-   * This mesh is useful for collision detection.
-   * This can be used to replace the default polygon mesh returned
-   * by GetPolygonMeshColldet() with one that has less detail or
-   * even to support polygon mesh for mesh objects that otherwise don't
-   * support it. The object model will keep a reference to the
-   * given polymesh.
-   * \deprecated Use SetTriangleData(id) with id the interned string
-   *   'colldet'.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use SetTriangleData() instead.")
-  virtual void SetPolygonMeshColldet (iPolygonMesh* polymesh) = 0;
-
-  /**
-   * Get a polygon mesh specifically for visibility culling (to be used
-   * as an occluder). This polygon mesh is guaranteed to be smaller or equal
-   * to the real object. In other words: if you would render the original
-   * mesh in red and this one in blue you should not see any blue anywhere.
-   * This kind of lower detail version can be used for occlusion writing
-   * in a visibility culling system.
-   * Can return 0 if this object model doesn't support that. In that
-   * case the object will not be used for visibility culling.
-   * \deprecated Use GetTriangleData(id) with id the interned string
-   *   'viscull'.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use GetTriangleData() instead.")
-  virtual iPolygonMesh* GetPolygonMeshViscull () = 0;
-
-  /**
-   * Set a polygon mesh representing the geometry of the object.
-   * This mesh is useful for visibility culling.
-   * This can be used to replace the default polygon mesh returned
-   * by GetPolygonMeshViscull() with one that has less detail or
-   * even to support polygon mesh for mesh objects that otherwise don't
-   * support it. The object model will keep a reference to the
-   * given polymesh.
-   * \deprecated Use SetTriangleData(id) with id the interned string
-   *   'viscull'.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use SetTriangleData() instead.")
-  virtual void SetPolygonMeshViscull (iPolygonMesh* polymesh) = 0;
-
-  /**
-   * Get a polygon mesh specifically for shadow casting (to be used by the
-   * shadow manager). This polygon mesh is guaranteed to be smaller or equal
-   * to the real object. In other words: if you would render the original
-   * mesh in red and this one in blue you should not see any blue anywhere.
-   * Can return 0 if this object model doesn't support that. In that
-   * case the object will not be used for shadow casting.
-   * \deprecated Use GetTriangleData(id) with id the interned string
-   *   'shadows'.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use GetTriangleData() instead.")
-  virtual iPolygonMesh* GetPolygonMeshShadows () = 0;
-
-  /**
-   * Set a polygon mesh representing the geometry of the object.
-   * This mesh is useful for shadow casting.
-   * This can be used to replace the default polygon mesh returned
-   * by GetPolygonMeshShadows() with one that has less detail or
-   * even to support polygon mesh for mesh objects that otherwise don't
-   * support it. The object model will keep a reference to the
-   * given polymesh.
-   * \deprecated Use SetTriangleData(id) with id the interned string
-   *   'shadows'.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use SetTriangleData() instead.")
-  virtual void SetPolygonMeshShadows (iPolygonMesh* polymesh) = 0;
-
-  /**
-   * Create a polygon mesh representing a lower detail version of the
-   * object but without the restrictions of GetPolygonMeshViscull().
-   * The floating point input number is 0 for minimum detail and
-   * 1 for highest detail. This function may return the same polygon
-   * mesh as GetPolygonMeshColldet() (but with ref count incremented by one).
-   * Can return 0 if this object model doesn't support that.
-   * \deprecated This method was never implemented and is misplaced.
-   */
-  CS_DEPRECATED_METHOD_MSG("Deprecated because unimplemented.")
-  virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float detail) = 0;
 
   /**
    * Get the bounding box in object space for this mesh object.
@@ -311,9 +207,6 @@ struct iObjectModel : public virtual iBase
 };
 
 /** @} */
-
-// for iPolygonMesh
-#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_IMESH_OBJMODEL_H__
 

@@ -59,6 +59,31 @@ csVector3 csPlane3::FindPoint () const
   }
 }
 
+#define CS_INV_SQRT2 float(0.7071067811865475244008443621048490)
+
+void csPlane3::FindOrthogonalPoints (const csVector3& norm,
+    csVector3& p, csVector3& q)
+{
+  if (fabs (norm.z) > CS_INV_SQRT2)
+  {
+    // Choose p in y-z plane
+    float a = norm.y*norm.y + norm.z*norm.z;
+    float k = 1.0f / sqrt (a);
+    p.Set (0, -norm.z*k, norm.y*k);
+    // Set q = norm x p
+    q.Set (a*k, -norm.x*p.z, norm.x*p.y);
+  }
+  else
+  {
+    // Choose p in x-y plane
+    float a = norm.x*norm.x + norm.y*norm.y;
+    float k = 1.0f / sqrt (a);
+    p.Set (-norm.y*k, norm.x*k, 0);
+    // Set q = n x p
+    q.Set (-norm.z*p.y, norm.z*p.x, a*k);
+  }
+}
+
 namespace
 {
   typedef csDirtyAccessArray<csVector3> csgeom_csPlane3_Verts;

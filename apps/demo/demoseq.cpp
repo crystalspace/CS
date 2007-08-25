@@ -32,7 +32,6 @@
 #include "iengine/camera.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
-#include "imesh/thing.h"
 #include "imesh/object.h"
 #include "imesh/particle.h"
 #include "ivaria/reporter.h"

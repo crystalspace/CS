@@ -36,13 +36,9 @@
 #include "iutil/strset.h"
 #include "iutil/objreg.h"
 #include "imesh/objmodel.h"
-#include "igeom/polymesh.h"
 #include "igeom/trimesh.h"
 
 struct iTerraFormer;
-
-// for iPolygonMesh
-#include "csutil/win32/msvc_deprecated_warn_off.h"
 
 class csTMIterator;
 
@@ -58,10 +54,6 @@ class CS_CRYSTALSPACE_EXPORT csObjectModel :
 
 private:
   long shapenr;
-  iPolygonMesh* polymesh_base;
-  csRef<iPolygonMesh> polymesh_colldet;
-  csRef<iPolygonMesh> polymesh_viscull;
-  csRef<iPolygonMesh> polymesh_shadows;
   csRefArray<iObjectModelListener> listeners;
 
   csHash<csRef<iTriangleMesh>,csStringID> trimesh;
@@ -72,7 +64,7 @@ public:
    * SetPolygonMesh<xxx>()!
    */
   csObjectModel (iBase* parent = 0)
-    : scfImplementationType (this, parent), shapenr (-1), polymesh_base (0)
+    : scfImplementationType (this, parent), shapenr (-1)
   {
   }
 
@@ -96,14 +88,6 @@ public:
   {
     csRef<iStringSet> strings = GetStandardStringSet (object_reg);
     return strings->Request ("base");
-  }
-
-  /**
-   * Set the pointer to the base polygon mesh.
-   */
-  void SetPolygonMeshBase (iPolygonMesh* base)
-  {
-    polymesh_base = base;
   }
 
   /**
@@ -140,26 +124,6 @@ public:
   virtual bool IsTriangleDataSet (csStringID);
   virtual void ResetTriangleData (csStringID);
 
-  virtual iPolygonMesh* GetPolygonMeshBase () { return polymesh_base; }
-  virtual iPolygonMesh* GetPolygonMeshColldet () { return polymesh_colldet; }
-  virtual void SetPolygonMeshColldet (iPolygonMesh* polymesh)
-  {
-    polymesh_colldet = polymesh;
-  }
-  virtual iPolygonMesh* GetPolygonMeshViscull () { return polymesh_viscull; }
-  virtual void SetPolygonMeshViscull (iPolygonMesh* polymesh)
-  {
-    polymesh_viscull = polymesh;
-  }
-  virtual iPolygonMesh* GetPolygonMeshShadows () { return polymesh_shadows; }
-  virtual void SetPolygonMeshShadows (iPolygonMesh* polymesh)
-  {
-    polymesh_shadows = polymesh;
-  }
-  virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
-  {
-    return 0;
-  }
   virtual void AddListener (iObjectModelListener* listener)
   {
     RemoveListener (listener);
@@ -177,9 +141,6 @@ public:
 };
 
 /** @} */
-
-// for iPolygonMesh
-#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_CSTOOL_OBJMODEL_H__
 

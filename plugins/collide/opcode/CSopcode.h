@@ -93,7 +93,6 @@ public:
   virtual csStringID GetTriangleDataID () { return trianglemesh_id; }
   virtual csStringID GetBaseDataID () { return basemesh_id; }
 
-  virtual csPtr<iCollider> CreateCollider (iPolygonMesh* mesh);
   virtual csPtr<iCollider> CreateCollider (iTriangleMesh* mesh);
   virtual csPtr<iCollider> CreateCollider (iTerraFormer* mesh);
   virtual csPtr<iCollider> CreateCollider (iTerrainSystem* mesh);
