@@ -195,13 +195,9 @@ class	csColladaConvertor : public	scfImplementation2<csColladaConvertor,iCollada
 		// =============== Mutator Functions =============== 
 
 		virtual	const	char*	SetOutputFiletype(csColladaFileType	filetype);
-/*	
-	private:	
-		virtual bool AddVerticesToCSDocument(
-		
+	
 		// =============== Normal Class Functions =============== 
-	public:
-*/
+
 		///	Constructor
 		csColladaConvertor(iBase*	parent);
 
