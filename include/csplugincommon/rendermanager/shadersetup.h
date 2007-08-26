@@ -127,20 +127,6 @@ namespace RenderManager
   }
 
   typedef csDirtyAccessArray<csStringID> ShaderVariableNameArray;
-
-  static void GetUsedShaderVars (const ShaderArrayType& shaderArray,
-    const TicketArrayType& ticketArray, size_t index,
-    ShaderVariableNameArray& names)
-  {
-    size_t returnedNames = 0;
-    iShader* shader = shaderArray[index];
-    if (shader == 0) return;
-    shader->GetUsedShaderVars (ticketArray[index],
-      names.GetArray(), 
-      names.GetSize(), returnedNames);
-    names.SetSize (returnedNames/*nameArrayOfs*/);
-  }
-
 }
 }
 

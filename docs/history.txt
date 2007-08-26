@@ -9,6 +9,9 @@ chronological order.
 26-Aug-2007
 	- res fixed some local variables in CS::RenderManager::SimpleRender
 	  errorneously shadowing class members.
+	- res made another optimization to the RM: the "used shader variables"
+	  is not recomputed again if subsequent meshes have the same shader/
+	  ticket.
 20-Aug-2007
 	- res fixed an issue in the shader weaver where sometimes the same 
 	  output of a node was used twice, tho it shouldn't have.

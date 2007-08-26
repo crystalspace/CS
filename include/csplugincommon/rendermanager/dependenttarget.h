@@ -55,17 +55,33 @@ namespace RenderManager
         BaseType (*this), shaderManager (shaderManager), 
         function (function) {}
 
-      using BaseType::operator();
+      void operator() (const typename Tree::TreeTraitsType::MeshNodeKeyType& key,
+        typename Tree::MeshNode* node, typename Tree::ContextNode& ctxNode, Tree& tree)
+      {
+        lastShader = 0;
+        lastTicket = (size_t)~0;
+
+        BaseType::operator() (key, node, ctxNode, tree);
+      }
 
       void operator() (typename Tree::MeshNode* node,
         const typename Tree::MeshNode::SingleMesh& mesh, size_t index,
         typename Tree::ContextNode& ctxNode, const Tree& tree)
       {
-        size_t numSVs = shaderManager->GetSVNameStringset()->GetSize();
-        ShaderVariableNameArray names;
-        names.SetSize (numSVs);
-        GetUsedShaderVars (ctxNode.shaderArray, ctxNode.ticketArray, index,
-          names);
+        iShader* shader = ctxNode.shaderArray[index];
+        if (!shader) return;
+        size_t ticket = ctxNode.ticketArray[index];
+
+        if ((shader != lastShader) || (ticket != lastTicket))
+        {
+          size_t numSVs = shaderManager->GetSVNameStringset()->GetSize();
+          names.SetSize (numSVs);
+
+          size_t returnedNames = 0;
+          shader->GetUsedShaderVars (ticket, names.GetArray(), 
+            names.GetSize(), returnedNames);
+          names.SetSize (returnedNames);
+        }
 
         csShaderVariableStack varStack;
         ctxNode.svArrays.SetupSVStck (varStack, index);
@@ -79,6 +95,10 @@ namespace RenderManager
           function (sv);
         }
       }
+
+      iShader* lastShader;
+      size_t lastTicket;
+      ShaderVariableNameArray names;
     };
   public:
     TraverseAllUsedSVs (Fn& function, iShaderManager* shaderManager) : 
@@ -86,9 +106,6 @@ namespace RenderManager
 
     void operator() (typename Tree::ContextNode* contextNode, Tree& tree)
     {
-      //ShaderVariableNameArray names;
-      //GetAllUsedShaderVars<Tree> (*contextNode, shaderManager, names);
-
       FnMeshTraverser traverse (shaderManager, function);
       tree.TraverseMeshNodes (traverse, contextNode);
     }
