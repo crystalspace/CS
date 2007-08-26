@@ -64,8 +64,8 @@ namespace RenderManager
     void operator() (const typename Tree::TreeTraitsType::MeshNodeKeyType& key,
       typename Tree::MeshNode* node, typename Tree::ContextNode& ctxNode, Tree& tree)
     {
-      iShader* lastShader = 0;
-      size_t lastTicket = (size_t)~0;
+      lastShader = 0;
+      lastTicket = (size_t)~0;
       firstMeshIndex = 0;
       meshesToRender.Empty ();
       meshesToRender.SetCapacity (ctxNode.totalRenderMeshes);

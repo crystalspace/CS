@@ -6,6 +6,9 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Aug-2007
+	- res fixed some local variables in CS::RenderManager::SimpleRender
+	  errorneously shadowing class members.
 20-Aug-2007
 	- res fixed an issue in the shader weaver where sometimes the same 
 	  output of a node was used twice, tho it shouldn't have.
