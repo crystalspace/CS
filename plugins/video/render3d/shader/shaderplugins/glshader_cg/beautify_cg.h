@@ -27,6 +27,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   {
     csString& dest;
 
+    // Indentation level
     int indent;
     /* Keep track of the "statement number" of the current line and current
        statement. If they're equal at the time of a line break it means a
@@ -37,14 +38,26 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     int state;
     enum
     {
+      /* "Between" two statements - after a ;, {, or }, but before some
+         other character was encountered. Skips whitespace and indents when
+         (basically) a non-whitespace was found. */
       stateBetween = 0,
+      /* In a statement - just output chars until the end (with some 
+         indentation when a newline is encountered). */
       stateStatement = 1,
+      /* In a preprocessor statement - just copy chars until the end of the
+         line. */
       statePreprocessor = 2,
 
+      /* Comment flags, when currently in a comment. They're flags so
+         the state before the comment can be restored.
+       */
       stateCommentLine = 0x10,
       stateCommentBlock = 0x20,
       stateCommentMask = stateCommentLine | stateCommentBlock,
 
+      /* Set when a newline was encountered between statements; used to 
+         properly emit a newline before the start of the next statement. */
       stateNeedNewline = 0x100
     };
     int HandleCommentChar (const char*& str, int commentType, char ch);
@@ -53,6 +66,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     int HandlePreprocessorChar (const char*& str, char ch);
 
     void BeginComment (char ch, char next, const char*& str, int& newState);
+    /* Insert newline, if needed. \a keepStatementCounter can be set to avoid
+       keep the special indentation level for multi-line statements. */
     void InsertNewlineIfNeeded (bool keepStatementCounter = false)
     {
       if (state & stateNeedNewline)
@@ -63,8 +78,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
         state &= ~stateNeedNewline;
       }
     }
+    // Apply indentation according to current indent level, plus minus delta.
     void ApplyIndentation (int delta = 0);
-    void SkipSpaces (const char*& str);
   public:
     CgBeautifier (csString& dest);
   

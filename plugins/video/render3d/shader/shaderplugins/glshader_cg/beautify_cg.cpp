@@ -253,15 +253,5 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       dest += "  ";
   }
 
-  static bool IsSpace (char ch)
-  {
-    return (ch == ' ') || (ch == '\t') || (ch == '\n') || (ch == '\r');
-  }
-
-  void CgBeautifier::SkipSpaces (const char*& str)
-  {
-    while (IsSpace (*str)) str++;
-  }
-
 }
 CS_PLUGIN_NAMESPACE_END(GLShaderCg)
