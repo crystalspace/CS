@@ -29,6 +29,8 @@
 
 #include "iutil/comp.h"
 
+#include "beautify_cg.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 {
   struct FindCoerceChainHelper;
@@ -159,30 +161,31 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     csRef<iString> QueryInputTag (const char* location, 
       iDocumentNode* blockNodes);
   private:
-    class DocNodeAppender;
+    class DocNodeCgAppender;
   
     void AppendProgramInput (const csRefArray<iDocumentNode>& nodes, 
-      DocNodeAppender& appender);
+      DocNodeCgAppender& appender);
     void AppendProgramInput_V2FDecl (const csRefArray<iDocumentNode>& nodes, 
-      DocNodeAppender& appender);
+      DocNodeCgAppender& appender);
     void AppendProgramInput_V2FVP (const csRefArray<iDocumentNode>& nodes, 
-      DocNodeAppender& appender);
+      DocNodeCgAppender& appender);
     void AppendProgramInput_V2FFP (const csRefArray<iDocumentNode>& nodes, 
-      DocNodeAppender& appender);
-    void AppendProgramInput (iDocumentNode* node, DocNodeAppender& appender);
+      DocNodeCgAppender& appender);
+    void AppendProgramInput (iDocumentNode* node, DocNodeCgAppender& appender);
     csString CgType (const char* weaverType);
     void AppendSnippetMap (const csHash<csString, csString>& map, 
-      DocNodeAppender& appender);
+      DocNodeCgAppender& appender);
     
-    class DocNodeAppender
+    class DocNodeCgAppender
     {
       csRef<iDocumentNode> node;
       csString stringAppend;
+      CgBeautifier beautifier;
       
       void FlushAppendString ();
     public:
-      DocNodeAppender (iDocumentNode* node);
-      ~DocNodeAppender ();
+      DocNodeCgAppender (iDocumentNode* node);
+      ~DocNodeCgAppender ();
     
       void Append (const char* str);
       void Append (iDocumentNode* appendNode);

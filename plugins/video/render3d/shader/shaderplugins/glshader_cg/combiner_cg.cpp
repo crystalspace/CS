@@ -561,7 +561,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       csRef<iDocumentNode> programNode = cgvpNode->CreateNodeBefore (CS_NODE_ELEMENT);
       programNode->SetValue ("program");
       
-      DocNodeAppender appender (programNode);
+      DocNodeCgAppender appender (programNode);
 
       if (definitions.GetSize() > 0)
       {
@@ -640,7 +640,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       csRef<iDocumentNode> programNode = cgfpNode->CreateNodeBefore (CS_NODE_ELEMENT);
       programNode->SetValue ("program");
       
-      DocNodeAppender appender (programNode);
+      DocNodeCgAppender appender (programNode);
       
       if (definitions.GetSize() > 0)
       {
@@ -754,7 +754,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 
   void ShaderCombinerCg::AppendProgramInput (
     const csRefArray<iDocumentNode>& nodes,
-    DocNodeAppender& appender)
+    DocNodeCgAppender& appender)
   {
     // FIXME: error handling here
     for (size_t n = 0; n < nodes.GetSize(); n++)
@@ -766,7 +766,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   
   void ShaderCombinerCg::AppendProgramInput_V2FDecl (
     const csRefArray<iDocumentNode>& nodes,
-    DocNodeAppender& appender)
+    DocNodeCgAppender& appender)
   {
     // FIXME: error handling here
     for (size_t n = 0; n < nodes.GetSize(); n++)
@@ -789,7 +789,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   }
   
   void ShaderCombinerCg::AppendProgramInput_V2FVP (
-    const csRefArray<iDocumentNode>& nodes, DocNodeAppender& appender)
+    const csRefArray<iDocumentNode>& nodes, DocNodeCgAppender& appender)
   {
     // FIXME: error handling here
     for (size_t n = 0; n < nodes.GetSize(); n++)
@@ -816,7 +816,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   }
   
   void ShaderCombinerCg::AppendProgramInput_V2FFP (
-    const csRefArray<iDocumentNode>& nodes, DocNodeAppender& appender)
+    const csRefArray<iDocumentNode>& nodes, DocNodeCgAppender& appender)
   {
     // FIXME: error handling here
     for (size_t n = 0; n < nodes.GetSize(); n++)
@@ -843,7 +843,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   }
   
   void ShaderCombinerCg::AppendProgramInput (iDocumentNode* node,
-    DocNodeAppender& appender)
+    DocNodeCgAppender& appender)
   {
     if (node->GetType() == CS_NODE_ELEMENT)
     {
@@ -910,7 +910,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   }
 
   void ShaderCombinerCg::AppendSnippetMap (const csHash<csString, csString>& map, 
-                                           DocNodeAppender& appender)
+                                           DocNodeCgAppender& appender)
   {
     csHash<csString, csString>::ConstGlobalIterator it = map.GetIterator ();
     while (it.HasNext())
@@ -923,7 +923,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   
   //-------------------------------------------------------------------------
   
-  void ShaderCombinerCg::DocNodeAppender::FlushAppendString ()
+  void ShaderCombinerCg::DocNodeCgAppender::FlushAppendString ()
   {
     if (!stringAppend.IsEmpty ())
     {
@@ -933,22 +933,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     }
   }
   
-  ShaderCombinerCg::DocNodeAppender::DocNodeAppender (iDocumentNode* node) :
-    node (node)
+  ShaderCombinerCg::DocNodeCgAppender::DocNodeCgAppender (iDocumentNode* node) :
+    node (node), beautifier (stringAppend)
   {
   }
   
-  ShaderCombinerCg::DocNodeAppender::~DocNodeAppender ()
+  ShaderCombinerCg::DocNodeCgAppender::~DocNodeCgAppender ()
   {
     FlushAppendString();
   }
 
-  void ShaderCombinerCg::DocNodeAppender::Append (const char* str)
+  void ShaderCombinerCg::DocNodeCgAppender::Append (const char* str)
   {
-    stringAppend += str;
+    if (str == 0) return;
+    beautifier.Append (str);
   }
   
-  void ShaderCombinerCg::DocNodeAppender::Append (iDocumentNode* appendNode)
+  void ShaderCombinerCg::DocNodeCgAppender::Append (iDocumentNode* appendNode)
   {
     csDocumentNodeType nodeType = appendNode->GetType();
     if (nodeType == CS_NODE_TEXT)
@@ -968,7 +969,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     }
   }
 
-  void ShaderCombinerCg::DocNodeAppender::Append (
+  void ShaderCombinerCg::DocNodeCgAppender::Append (
     const csRefArray<iDocumentNode>& nodes)
   {
     for (size_t n = 0; n < nodes.GetSize(); n++)

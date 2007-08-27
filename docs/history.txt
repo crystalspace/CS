@@ -6,6 +6,10 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+27-Aug-2007
+	- res added a simple beautification step to the Cg weaver combiner.
+	  This makes the synthesized Cg programs more human-readable (and thus
+	  can make debugging easier).
 26-Aug-2007
 	- res fixed some local variables in CS::RenderManager::SimpleRender
 	  errorneously shadowing class members.
