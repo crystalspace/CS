@@ -133,8 +133,17 @@ public:
   static T* ResizeRegion (Allocator& alloc, T* mem, size_t relevantcount, 
     size_t oldcount, size_t newcount)
   {
-    (void)relevantcount; (void)oldcount;
-    return (T*)alloc.Realloc (mem, newcount * sizeof(T));
+    (void)relevantcount; 
+    T* newp = (T*)alloc.Realloc (mem, newcount * sizeof(T));
+    if (newp != 0) return newp;
+    // Realloc() failed - allocate a new block
+    newp = (T*)alloc.Alloc (newcount * sizeof(T));
+    if (newcount < oldcount)
+      memcpy (newp, mem, newcount * sizeof(T));
+    else
+      memcpy (newp, mem, oldcount * sizeof(T));
+    alloc.Free (mem);
+    return newp;
   }
 
   /// Move elements inside a region.
@@ -190,8 +199,12 @@ public:
     {
       // Realloc is safe.
       T* newmem = (T*)alloc.Realloc (mem, newcount * sizeof (T));
-      CS_ASSERT (newmem == mem);
-      return newmem;
+      if (newmem != 0)
+      {
+	CS_ASSERT (newmem == mem);
+	return newmem;
+      }
+      // else Realloc() failed (probably not supported) - allocate a new block
     }
 
     T* newmem = (T*)alloc.Alloc (newcount * sizeof (T));

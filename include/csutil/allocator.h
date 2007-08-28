@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2006 by Frank Richter
+    Copyright (C) 2006-2007 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -33,6 +33,43 @@ namespace CS
 {
   namespace Memory
   {
+    /**\page Allocators Memory allocators
+     * Several Crystal Space utility classes take optional memory allocators
+     * (e.g. csArray<>). This allows to customize the memory allocation
+     * strategy used in a particular case. 
+    
+     * For example, if you know that an array has a size below a certain 
+     * threshold most of the time, you could utilize a LocalBufferAllocator<>
+     * which return memory from a fast local buffer, if possible - this is 
+     * faster than using the heap.
+     *
+     * As another example, when memory allocations follow a pattern where
+     * long-lived allocations are mixed with very short-lived allocations,
+     * heap fragmentation can occur when the short-lived allocations are 
+     * freed. In that case it's beneficial to use a separate heap for the
+     * short-lived allocations; specific objects can use that heap via the
+     * allocator customization.
+     *
+     * Allocators must obey the following methods and their semantics:
+     * - <tt>void* Alloc(const size_t n)</tt> allocates \a n bytes of memory.
+     *   Returns 0 if allocation fails.
+     * - <tt>void Free (void* p)</tt> frees the pointer \a p. For debugging
+     *   purposes it's usually a good idea to throw an assertion when \a p is
+     *   invalid for an allocator.
+     * - <tt>void* Realloc (void* p, size_t newSize)</tt> "resizes" the block
+     *   at \a p to have a size of \a newSize bytes. If \a p is 0 then the call
+     *   shoule have the same effect as an Alloc() with the specifiec size.
+     *   Be aware that the returned pointer may be different from \a p! Also, 
+     *   if the reallocation fails, 0 is returned - however, the original 
+     *   memory block is still valid!
+     * - <tt>void SetMemTrackerInfo (const char* info)</tt> is a debugging 
+     *   aid. If the allocator does memory tracking, some users will call
+     *   this method to set a description of themselves which is displayed
+     *   to allow easy identification of what object allocated how much
+     *   memory. Implementation of this method is entirely optional and can be
+     *   safely stubbed out.
+     */
+    
     /**
      * A default memory allocator that allocates with cs_malloc().
      */
@@ -238,25 +275,7 @@ namespace CS
       // in the old array that are initialized.
       void* Realloc (void* p, size_t newSize)
       {
-        if (SingleAllocation)
-        {
-      #ifdef CS_DEBUG
-          /* Verify that the local buffer consists entirely of the "local
-             buffer unallocated" pattern. (Not 100% safe since a valid 
-             allocated buffer may be coincidentally filled with just that
-             pattern, but let's just assume that it's unlikely.) */
-          bool validPattern = true;
-          for (size_t n = 0; n < localSize; n++)
-          {
-            if (localBuf[n] != freePattern)
-            {
-              validPattern = false;
-              break;
-            }
-          }
-          CS_ASSERT_MSG("Realloc() without prior allocation", !validPattern);
-      #endif
-        }
+        if (p == 0) return Alloc (newSize);
         if (p == localBuf)
         {
           if (newSize <= localSize)
@@ -383,8 +402,8 @@ namespace CS
       /// Resize the allocated block \p p to size \p newSize.
       void* Realloc (void* p, size_t newSize)
       {
-        CS_ASSERT_MSG("Realloc() called on non-reallocatable AllocatorNewChar",
-          Reallocatable);
+        if (!Reallocatable) return 0;
+	  
         if (p == 0) return Alloc (newSize);
 	size_t* x = (size_t*)p;
 	x--;
@@ -392,7 +411,7 @@ namespace CS
       #ifdef CS_MEMORY_TRACKER
 	if (mti) mtiUpdateAmount (mti, -1, -int (oldSize));
       #endif
-	size_t* np = Alloc (newSize);
+	size_t* np = (size_t*)Alloc (newSize);
         if (newSize < oldSize)
           memcpy (np, p, newSize);
         else
