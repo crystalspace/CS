@@ -12,6 +12,8 @@ chronological order.
 	- res marked the new CS::Geometry::Primitive and TextureMapper stuff
 	  as dllexported.
 	- res added a missing include to wxtest, as found by DaHoC.
+	- res added a missing "msvc warning off" include to thing.h, fixing
+	  some MSVC #pragma warnings.
 26-Aug-2007
 	- Jorrit added ptpdlight to 'jam walkall'.
 24-Aug-2007
