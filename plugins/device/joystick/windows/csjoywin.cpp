@@ -264,7 +264,12 @@ bool csWindowsJoystick::Init ()
       return false;
     }
     csRef<iWin32Canvas> canvas = scfQueryInterface<iWin32Canvas> (g2d);
-    CS_ASSERT(canvas.IsValid());
+    if (!canvas.IsValid())
+    {
+      Report(CS_REPORTER_SEVERITY_WARNING,
+        "A window is required");
+      return false;
+    }
 
     HWND window = canvas->GetWindowHandle();
     // Only enum attached Joysticks, get Details of Devices

@@ -19,6 +19,8 @@ chronological order.
 	  Updated some allocators to follow that specification.
 	- res fixed csArray<> to properly deal with allocator Realloc()
 	  calls returning 0.
+	- Vincent changed joywin plugin so that it doesn't assert when there's
+	  no window. Fixes crash when used with null renderer (trac #369).
 26-Aug-2007
 	- Jorrit added ptpdlight to 'jam walkall'.
 24-Aug-2007
