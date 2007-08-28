@@ -46,6 +46,8 @@ namespace Geometry
  */
 struct TextureMapper
 {
+  virtual ~TextureMapper() {}
+
   /**
    * Map a 3D coordinate and a triangle plane to 2D UV space.
    * \param point is the point in 3D space.
@@ -81,7 +83,7 @@ public:
  * is really only useful on non-smoothed surfaces. So for GenerateBox(),
  * GenerateQuad(), and GenerateTesselatedQuad().
  */
-class DensityTextureMapper : public TextureMapper
+class CS_CRYSTALSPACE_EXPORT DensityTextureMapper : public TextureMapper
 {
 private:
   float density;
@@ -101,7 +103,7 @@ public:
 /**
  * A primitive mesh generator.
  */
-class Primitives
+class CS_CRYSTALSPACE_EXPORT Primitives
 {
 public:
   static csVector2 boxTable[];

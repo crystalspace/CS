@@ -67,7 +67,7 @@ public:
 /**
  * A tesselated quad.
  */
-class TesselatedQuad : public Primitive
+class CS_CRYSTALSPACE_EXPORT TesselatedQuad : public Primitive
 {
 private:
   csVector3 v0, v1, v2;
@@ -110,7 +110,7 @@ public:
 /**
  * A Tesselated box.
  */
-class TesselatedBox : public Primitive
+class CS_CRYSTALSPACE_EXPORT TesselatedBox : public Primitive
 {
 private:
   csBox3 box;
@@ -179,7 +179,7 @@ public:
 /**
  * A box.
  */
-class Box : public Primitive
+class CS_CRYSTALSPACE_EXPORT Box : public Primitive
 {
 private:
   csBox3 box;
@@ -230,7 +230,7 @@ public:
 /**
  * A capsule.
  */
-class Capsule : public Primitive
+class CS_CRYSTALSPACE_EXPORT Capsule : public Primitive
 {
 private:
   float l, r;
@@ -265,7 +265,7 @@ public:
 /**
  * A sphere.
  */
-class Sphere : public Primitive
+class CS_CRYSTALSPACE_EXPORT Sphere : public Primitive
 {
 private:
   csEllipsoid ellips;
@@ -327,7 +327,7 @@ public:
 /**
  * Tools related to creating genmesh instances and factories.
  */
-class GeneralMeshBuilder
+class CS_CRYSTALSPACE_EXPORT GeneralMeshBuilder
 {
 public:
   /**
