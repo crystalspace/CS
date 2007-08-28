@@ -1,5 +1,7 @@
 1.2 branch log.
 
+28-Aug-2007
+	- Vincent merged r27504 into 1.2 (#369 fix).
 20-Aug-2007
 	- Jorrit merged r27453 into 1.2 (decal 64-bit fix).
 17-Aug-2007
