@@ -1,5 +1,7 @@
 1.2 branch log.
 
+29-Aug-2007
+	- res merged r27508:27510 into 1.2 (fix wxgl+UNICODE on Win32).
 28-Aug-2007
 	- Vincent merged r27504 into 1.2 (#369 fix).
 20-Aug-2007
