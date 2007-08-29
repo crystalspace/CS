@@ -459,7 +459,7 @@ int csGraphics2DWX::FindPixelFormat (csGLPixelFormatPicker& picker, PIXELFORMATD
 
   HINSTANCE ModuleHandle = GetModuleHandle(0);
 
-  WNDCLASS wc;
+  WNDCLASSA wc;
   wc.hCursor        = 0;
   wc.hIcon	    = 0;
   wc.lpszMenuName   = 0;

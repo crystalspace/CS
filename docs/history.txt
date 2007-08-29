@@ -7,6 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 29-Aug-2007
+        - Piotr changed remaining Win32 call to *A version.
 	- res reverted r27508, but also made sure all Win32 calls are
 	  explicitly using the *A versions of functions.
 28-Aug-2007
