@@ -455,7 +455,7 @@ int csGraphics2DWX::FindPixelFormatGDI (HDC hDC,
 
 int csGraphics2DWX::FindPixelFormat (csGLPixelFormatPicker& picker, PIXELFORMATDESCRIPTOR& pfd)
 {
-  static const char* dummyClassName = "CSGL_DummyWindow";
+  static wxChar* dummyClassName = _T ("CSGL_DummyWindow");
 
   HINSTANCE ModuleHandle = GetModuleHandle(0);
 
@@ -471,7 +471,11 @@ int csGraphics2DWX::FindPixelFormat (csGLPixelFormatPicker& picker, PIXELFORMATD
   wc.cbClsExtra     = 0;
   wc.cbWndExtra     = 0;
 
+#ifdef UNICODE
+  if (!RegisterClassW (&wc)) return false;
+#else
   if (!RegisterClassA (&wc)) return false;
+#endif //UNICODE
 
   HWND wnd = CreateWindow (dummyClassName, 0, 0, CW_USEDEFAULT, 
     CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 0, 0,
@@ -492,7 +496,11 @@ int csGraphics2DWX::FindPixelFormat (csGLPixelFormatPicker& picker, PIXELFORMATD
 
   DestroyWindow (wnd);
 
+#ifdef UNICODE
+  UnregisterClassW (dummyClassName, ModuleHandle);
+#else
   UnregisterClassA (dummyClassName, ModuleHandle);
+#endif //UNICODE
 
   ext.Reset();
 
