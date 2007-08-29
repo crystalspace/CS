@@ -2,6 +2,7 @@
 
 29-Aug-2007
 	- res merged r27508:27510 into 1.2 (fix wxgl+UNICODE on Win32).
+	- res merged r27511 into 1.2 (new cs-win32libs).
 28-Aug-2007
 	- Vincent merged r27504 into 1.2 (#369 fix).
 20-Aug-2007
