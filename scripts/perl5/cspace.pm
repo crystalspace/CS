@@ -17588,7 +17588,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
-*Map = *cspacec::TextureMapper_Map;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -17600,6 +17599,7 @@ sub DESTROY {
     }
 }
 
+*Map = *cspacec::TextureMapper_Map;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);

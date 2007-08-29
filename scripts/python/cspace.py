@@ -11819,9 +11819,9 @@ class TextureMapper(_object):
     __getattr__ = lambda self, name: _swig_getattr(self, TextureMapper, name)
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def Map(*args): return _cspace.TextureMapper_Map(*args)
     __swig_destroy__ = _cspace.delete_TextureMapper
     __del__ = lambda self : None;
+    def Map(*args): return _cspace.TextureMapper_Map(*args)
 TextureMapper_swigregister = _cspace.TextureMapper_swigregister
 TextureMapper_swigregister(TextureMapper)
 
