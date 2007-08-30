@@ -8,6 +8,8 @@ chronological order.
 
 30-Aug-2007
 	- Genjix removed useless line of code from csSkeleton.
+	- Genjix replaced type integer with an easier to understand
+	  enum value.
 29-Aug-2007
         - Piotr changed remaining Win32 call to *A version.
 	- res reverted r27508, but also made sure all Win32 calls are

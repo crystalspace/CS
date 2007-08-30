@@ -496,7 +496,12 @@ struct sac_transform_execution
   csQuaternion tangent;
   csQuaternion curr_quat;
   csTicks elapsed_ticks;
-  int type;
+
+  enum TransformType
+  {
+    CS_TRANS_RELATIVE,
+    CS_TRANS_FIXED
+  } type;
 };
 
 class csSkeletonAnimationInstance :

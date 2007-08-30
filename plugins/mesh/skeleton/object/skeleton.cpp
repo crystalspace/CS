@@ -587,7 +587,7 @@ void csSkeletonAnimationInstance::ParseFrame(csSkeletonAnimationKeyFrame *frame)
         m.elapsed_ticks = 0;
         m.curr_quat = m.bone_transform->quat;
         m.position = bone_transform->pos;
-        m.type = 1;
+        //m.type = 1;
         m.quat = rot;
         m.tangent = tangent;
         m.final_position = pos;
@@ -595,12 +595,12 @@ void csSkeletonAnimationInstance::ParseFrame(csSkeletonAnimationKeyFrame *frame)
         csVector3 delta;
         if (relative)
         {
-          m.type = 2;
+          m.type = sac_transform_execution::CS_TRANS_RELATIVE;
           delta = m.final_position;
         }
         else
         {
-          m.type = 1;
+          m.type = sac_transform_execution::CS_TRANS_FIXED;
           delta = m.final_position - m.position;
         }
 
@@ -735,7 +735,7 @@ bool csSkeletonAnimationInstance::Do (long elapsed, bool& stop, long &left)
   {
     i--;
     sac_transform_execution& m = runnable_transforms[i];
-    if (m.type == 1)
+    if (m.type == sac_transform_execution::CS_TRANS_FIXED)
     {
       if (delta)
       {
