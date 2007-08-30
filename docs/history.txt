@@ -6,6 +6,8 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+30-Aug-2007
+	- Genjix removed useless line of code from csSkeleton.
 29-Aug-2007
         - Piotr changed remaining Win32 call to *A version.
 	- res reverted r27508, but also made sure all Win32 calls are

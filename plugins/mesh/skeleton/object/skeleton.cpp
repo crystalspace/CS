@@ -973,7 +973,6 @@ bool csSkeleton::UpdateAnimation (csTicks current)
       update_callbacks[i]->Execute(this, current);
     }
 
-    last_update_time = current;
     i = running_animations.GetSize ();
     while (i > 0)
     {
