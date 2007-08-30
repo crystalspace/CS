@@ -92,16 +92,16 @@ csGenmeshSkelAnimationControl::csGenmeshSkelAnimationControl (
 
   if (!use_parent)
   {
-    skeleton = factory->gr->CreateSkeleton(factory->GetSkeletonFactory(), "");
+    skeleton = factory->GetSkeletonGraveyard()->CreateSkeleton(factory->GetSkeletonFactory(), "");
   }
 
 }
 
 csGenmeshSkelAnimationControl::~csGenmeshSkelAnimationControl ()
 {
-  if (skeleton && factory && factory->gr)
+  if (skeleton && factory && factory->GetSkeletonGraveyard())
   {
-    factory->gr->RemoveSkeleton (skeleton);
+    factory->GetSkeletonGraveyard()->RemoveSkeleton (skeleton);
   }
   delete[] animated_verts;
   delete[] animated_colors;
@@ -298,7 +298,7 @@ csGenmeshSkelAnimationControlFactory::csGenmeshSkelAnimationControlFactory (
   flags.SetAll(0);
   skeleton_factory = 0;
   use_parent = false;
-  gr = 0;
+  the_graveyard = 0;
 }
 
 csGenmeshSkelAnimationControlFactory::~csGenmeshSkelAnimationControlFactory ()
@@ -366,7 +366,7 @@ const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
         {
           csRef<iBase> skf = ldr_plg->Parse(child, 0, 0, 0);
           skeleton_factory = scfQueryInterface<iSkeletonFactory> (skf);
-          gr = skeleton_factory->GetGraveyard();
+          the_graveyard = skeleton_factory->GetGraveyard();
         }
       }
       break;
@@ -393,7 +393,7 @@ const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
           {
             csRef<iBase> skf = ldr_plg->Parse(doc->GetRoot(), 0, 0, 0);
             skeleton_factory = scfQueryInterface<iSkeletonFactory> (skf);
-            gr = skeleton_factory->GetGraveyard();
+            the_graveyard = skeleton_factory->GetGraveyard();
           }
           else
           {

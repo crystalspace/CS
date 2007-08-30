@@ -146,6 +146,10 @@ struct iSkeletonBone : public virtual iBase
 
   /**
    * Set bone transform mode.
+   * Possible values are:
+   * - #CS_BTT_NONE: Same as CS_BTT_SCRIPT.
+   * - #CS_BTT_SCRIPT: Normal default behaviour. Animations control the bone.
+   * - #CS_BTT_RIGID_BODY: Unimplemented rigid body ragdoll.
    */
   virtual void SetTransformMode(csBoneTransformType mode) = 0;
 

@@ -7,11 +7,14 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 30-Aug-2007
+	- Genjix added api documentation about iSkeleton::SetTransformMode (...)
+	- Genjix added joystick define to initapp.h (CS_REQUEST_JOYSTICK)
+	- Genjix hid public data member and added an accessor instead.
 	- Genjix removed useless line of code from csSkeleton.
 	- Genjix replaced type integer with an easier to understand
 	  enum value.
 29-Aug-2007
-        - Piotr changed remaining Win32 call to *A version.
+	- Piotr changed remaining Win32 call to *A version.
 	- res reverted r27508, but also made sure all Win32 calls are
 	  explicitly using the *A versions of functions.
 	- res updated the winlibs version link for 1.2_002.
