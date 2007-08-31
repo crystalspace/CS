@@ -81,7 +81,7 @@ void csGLShader_CG::ErrorHandler (CGcontext context, CGerror error,
   if (error == CG_COMPILER_ERROR)
   {
     const char* listing = cgGetLastListing (context);
-    if (listing)
+    if (listing && *listing)
     {
       csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
 	"crystalspace.graphics3d.shader.glcg",

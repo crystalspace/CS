@@ -17,6 +17,9 @@ chronological order.
 	- res fixed an issue in shader weaver where dependencies, inserted
 	  between snippets to reuse program inputs, were also, incorrectly,
 	  used when resolving candidates for inputs.
+	- res made the Cg plugin emit warnings from the Cg compiler in verbose
+	  mode (previously it only reported issues from the compiler when an
+	  error occured).
 27-Aug-2007
 	- res added a simple beautification step to the Cg weaver combiner.
 	  This makes the synthesized Cg programs more human-readable (and thus

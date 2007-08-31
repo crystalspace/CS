@@ -406,6 +406,13 @@ bool csShaderGLCGCommon::DefaultLoadProgram (
     if (!cgGLIsProgramLoaded (program)) return false;
   }
 
+  const char* listing = cgGetLastListing (shaderPlug->context);
+  if (listing && *listing && shaderPlug->doVerbose)
+  {
+    shaderPlug->Report (CS_REPORTER_SEVERITY_WARNING,
+      "%s", listing);
+  }
+
   i = 0;
   while (i < variablemap.GetSize ())
   {
