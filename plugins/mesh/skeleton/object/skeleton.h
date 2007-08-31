@@ -345,7 +345,6 @@ class csSkeletonAnimationKeyFrame :
     //csArray<bone_key_info> bones_frame_transforms;
     //csArray<bone_key_info> bones_frame_transforms;
     BoneKeyHash bones_frame_transforms;
-    csReversibleTransform fallback_transform;
   public:
 
     bone_key_info & GetKeyInfo(iSkeletonBoneFactory *bone_fact)
@@ -389,10 +388,6 @@ class csSkeletonAnimationKeyFrame :
       dst_trans = csReversibleTransform (csMatrix3 (bki.rot), bki.pos);
 
       return true;
-    }
-    virtual csReversibleTransform & GetTransform(iSkeletonBoneFactory *bone_fact)
-    {
-      return fallback_transform;
     }
 
     virtual void SetTransform(iSkeletonBoneFactory *bone_fact, 
@@ -641,13 +636,9 @@ public:
   virtual iSkeletonAnimation* Append (const char *scriptname);
   virtual void ClearPendingAnimations ()
   { pending_scripts.DeleteAll(); }
-  virtual void ClearPendingScripts () {ClearPendingAnimations (); }
   virtual size_t GetAnimationsCount () { return running_animations.GetSize (); }
-  virtual size_t GetScriptsCount () { return GetAnimationsCount (); }
   virtual iSkeletonAnimation* GetAnimation (size_t i);
-  virtual iSkeletonAnimation* GetScript (size_t i) {return GetAnimation (i);}
   virtual iSkeletonAnimation* FindAnimation (const char *scriptname);
-  virtual iSkeletonAnimation* FindScript (const char *scriptname) {return FindAnimation (scriptname);}
   virtual void StopAll ();
   virtual void Stop (const char* scriptname);
   virtual void Stop (iSkeletonAnimation *script);
@@ -655,8 +646,6 @@ public:
   virtual iSkeletonFactory *GetFactory();
   virtual void SetAnimationCallback (iSkeletonAnimationCallback *cb)
   { script_callback = cb; }
-  virtual void SetScriptCallback(iSkeletonAnimationCallback *cb)
-  { SetAnimationCallback (cb); }
   virtual iSkeletonSocket* FindSocket (const char *socketname);
     //virtual void CreateRagdoll(iODEDynamicSystem *dyn_sys, csReversibleTransform & transform);
   //virtual void DestroyRagdoll();
@@ -718,10 +707,8 @@ public:
 
   size_t GetAnimationsCount () {return scripts.GetSize ();}
   iSkeletonAnimation *GetAnimation (size_t idx) {return scripts[idx];}
-  virtual iSkeletonAnimation *CreateScript(const char *name) {return CreateAnimation (name);}
   virtual iSkeletonAnimation *CreateAnimation (const char *name);
   virtual iSkeletonAnimation *FindAnimation (const char *name);
-  virtual iSkeletonAnimation *FindScript (const char *name) {return FindAnimation (name);}
 
   virtual iSkeletonSocketFactory *CreateSocket(const char *name, iSkeletonBoneFactory *bone);
   virtual iSkeletonSocketFactory *FindSocket(const char *name);

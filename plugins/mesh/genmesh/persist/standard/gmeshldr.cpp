@@ -1086,6 +1086,7 @@ bool csGeneralMeshLoader::ParseRenderBuffer(iDocumentNode *node,
   return true;
 }
 
+#if 0
 #include "csutil/win32/msvc_deprecated_warn_off.h"
 
 bool csGeneralMeshLoader::ParseLegacySubMesh(iDocumentNode *node,
@@ -1178,6 +1179,7 @@ bool csGeneralMeshLoader::ParseLegacySubMesh(iDocumentNode *node,
 }
 
 #include "csutil/win32/msvc_deprecated_warn_on.h"
+#endif
 
 bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
                                        iGeneralMeshState* state,
@@ -1185,9 +1187,11 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
 {
   if(!node) return false;
 
+#if 0
   csRef<iDocumentNode> Tnode = node->GetNode ("t");
   if (Tnode.IsValid()) 
     return ParseLegacySubMesh(node, state, ldr_context);
+#endif
 
   const char* name = node->GetAttributeValue ("name");
   csRef<iGeneralMeshSubMesh> subMesh = state->FindSubMesh (name);

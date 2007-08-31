@@ -217,15 +217,6 @@ struct iSkeletonAnimationKeyFrame : public virtual iBase
     csReversibleTransform &transform, bool relative = false) = 0;
 
   /**
-   * Get the transform of a bone.
-   * \deprecated GetTransform (iSkeletonBoneFactory *bone) is deprecated, use 
-   * GetTransform (iSkeletonBoneFactory *bone, csReversibleTransform &dst_trans) instead
-   */
-  CS_DEPRECATED_METHOD_MSG("GetTransform (iSkeletonBoneFactory *bone) is deprecated, use GetTransform"
-    "(iSkeletonBoneFactory *bone, csReversibleTransform &dst_trans) instead")
-  virtual csReversibleTransform & GetTransform (iSkeletonBoneFactory *bone) = 0;
-
-  /**
    * Get the transform of a bone. Returns 'false' when there won't be 
    * any transform data for given bone.
    */
@@ -246,9 +237,6 @@ struct iSkeletonAnimationKeyFrame : public virtual iBase
     csQuaternion & rot, csVector3 & pos, csQuaternion & tangent,
     bool & relative) = 0;
 };
-
-CS_DEPRECATED_METHOD_MSG("iSkeletonScriptKeyFrame is deprecated, use iSkeletonAnimationKeyFrame instead")
-typedef iSkeletonAnimationKeyFrame iSkeletonScriptKeyFrame;
 
 /**
  * This interface provides animation of a skeleton.
@@ -345,9 +333,6 @@ struct iSkeletonAnimation : public virtual iBase
   virtual void RecalcSpline () = 0;
 };
 
-CS_DEPRECATED_METHOD_MSG("iSkeletonScript is deprecated, use iSkeletonAnimation instead")
-typedef iSkeletonAnimation iSkeletonScript;
-
 /**
  * This is a callback function of an animation.
  * It is called every time when animation is started or finished.
@@ -366,9 +351,6 @@ struct iSkeletonAnimationCallback : public virtual iBase
    */
   virtual void OnFinish(iSkeletonAnimation *animation) = 0;
 };
-
-CS_DEPRECATED_METHOD_MSG("iSkeletonScriptCallback is deprecated, use iSkeletonAnimationCallback instead")
-typedef iSkeletonAnimationCallback iSkeletonScriptCallback;
 
 /**
  * This is a callback function of a skeleton.
@@ -497,23 +479,9 @@ struct iSkeleton : public virtual iBase
   virtual void ClearPendingAnimations () = 0;
 
   /**
-   * Clear animations for execution.
-   * \deprecated ClearPendingScripts is deprecated, use ClearPendingAnimations instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("ClearPendingScripts is deprecated, use ClearPendingAnimations instead")
-  virtual void ClearPendingScripts () = 0;
-
-  /**
    * Get number of running animations.
    */
   virtual size_t GetAnimationsCount () = 0;
-
-  /**
-   * Get number of running animations.
-   * \deprecated GetScriptsCount is deprecated, use GetAnimationsCount instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("GetScriptsCount is deprecated, use GetAnimationsCount instead")
-  virtual size_t GetScriptsCount () = 0;
 
   /**
    * Get animation by index.
@@ -521,23 +489,9 @@ struct iSkeleton : public virtual iBase
   virtual iSkeletonAnimation* GetAnimation (size_t i) = 0;
 
   /**
-   * Get animation by index.
-   * \deprecated GetScript is deprecated, use GetAnimation instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("GetScript is deprecated, use GetAnimation instead")
-  virtual iSkeletonAnimation* GetScript (size_t i) = 0;
-
-  /**
    * Find animation by name.
    */
   virtual iSkeletonAnimation* FindAnimation (const char *animation_name) = 0;
-
-  /**
-   * Find animation by name.
-   * \deprecated FindScript is deprecated, use FindAnimation instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("FindScript is deprecated, use FindAnimation instead")
-  virtual iSkeletonAnimation* FindScript (const char *animation_name) = 0;
 
   /**
    * Find socket by name.
@@ -562,14 +516,6 @@ struct iSkeleton : public virtual iBase
   /**
    * Set animation callback.
    */
-  virtual void SetScriptCallback (iSkeletonAnimationCallback *cb) = 0;
-
-  /**
-   * Set animation callback.
-   * \deprecated SetScriptCallback is deprecated, use SetAnimationCallback
-   * instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("SetScriptCallback is deprecated, use SetAnimationCallback instead")
   virtual void SetAnimationCallback (iSkeletonAnimationCallback *cb) = 0;
 
   //virtual void CreateRagdoll(iODEDynamicSystem *dyn_sys, csReversibleTransform & transform) = 0;
@@ -868,13 +814,6 @@ struct iSkeletonFactory : public virtual iBase
   virtual iSkeletonAnimation *CreateAnimation (const char *name) = 0;
 
   /**
-   * Create new animation.
-   * \deprecated CreateScript is deprecated, use CreateAnimation instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("CreateScript is deprecated, use CreateAnimation instead")
-  virtual iSkeletonAnimation *CreateScript(const char *name) = 0;
-
-  /**
    * Find animation by name.
    */
   virtual iSkeletonAnimation *FindAnimation (const char *name) = 0;
@@ -888,13 +827,6 @@ struct iSkeletonFactory : public virtual iBase
    * Get animation by index.
    */
   virtual iSkeletonAnimation *GetAnimation (size_t idx) = 0;
-
-  /**
-   * Find script by name.
-   * \deprecated FindScript is deprecated, use FindAnimation instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("FindScript is deprecated, use FindAnimation instead")
-  virtual iSkeletonAnimation *FindScript (const char *name) = 0;
 
   /**
    * Find bone factory by name.

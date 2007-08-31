@@ -10,6 +10,8 @@ chronological order.
 	- Jorrit started removing lots of deprecated stuff in CS.
 	- Jorrit fixed an infinite loop in sprcal3d GetObjectBoundingBox()
 	  for factories.
+	- Jorrit did more deprecation removals (including legacy submesh
+	  support in genmesh).
 30-Aug-2007
 	- Genjix added api documentation about iSkeleton::SetTransformMode (...)
 	- Genjix added joystick define to initapp.h (CS_REQUEST_JOYSTICK)

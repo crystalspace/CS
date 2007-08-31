@@ -134,6 +134,7 @@ csGenmeshMeshObject::~csGenmeshMeshObject ()
   ClearPseudoDynLights ();
 }
 
+#if 0
 void csGenmeshMeshObject::AddSubMesh (unsigned int *triangles,
                                       int tricount,
                                       iMaterialWrapper *material,
@@ -160,6 +161,7 @@ void csGenmeshMeshObject::AddSubMesh (unsigned int *triangles,
     index_buffer);
   legacySubmeshes.Push (lms);
 }
+#endif
 
 const csVector3* csGenmeshMeshObject::AnimControlGetVertices ()
 {

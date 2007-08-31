@@ -1022,14 +1022,16 @@ iSkeletonBone *csSkeleton::FindBone (const char *name)
 
 iSkeletonAnimation* csSkeleton::Execute (const char *scriptname)
 {
-  csSkeletonAnimation* script = (csSkeletonAnimation*)(factory->FindScript (scriptname));
+  csSkeletonAnimation* script = (csSkeletonAnimation*)(factory->FindAnimation (
+    scriptname));
   if (!script)
   {
     //printf("script %s doesn't exist\n", scriptname);
     return 0;
   }
 
-  csSkeletonAnimationInstance *runnable = new csSkeletonAnimationInstance (script, this);
+  csSkeletonAnimationInstance *runnable = new csSkeletonAnimationInstance (
+    script, this);
   running_animations.Push (runnable);
   return script;
 }
@@ -1037,7 +1039,7 @@ iSkeletonAnimation* csSkeleton::Execute (const char *scriptname)
 iSkeletonAnimation* csSkeleton::Append (const char *scriptname)
 {
   csSkeletonAnimation* script = (csSkeletonAnimation*)(
-    factory->FindScript (scriptname));
+    factory->FindAnimation (scriptname));
   if (!script) 
   {
     return 0;

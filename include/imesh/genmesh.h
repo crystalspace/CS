@@ -191,10 +191,10 @@ struct iGeneralMeshState : public virtual iGeneralMeshCommonState
    * be completely ignored as soon as the instance has submeshes).
    * \deprecated Use AddSubMesh from iGeneralFactoryState instead
    */
-  CS_DEPRECATED_METHOD_MSG("Use AddSubMesh from iGeneralFactoryState instead")
-  virtual void AddSubMesh (unsigned int *triangles,
-    int tricount,
-    iMaterialWrapper *material) = 0;
+  //CS_DEPRECATED_METHOD_MSG("Use AddSubMesh from iGeneralFactoryState instead")
+  //virtual void AddSubMesh (unsigned int *triangles,
+    //int tricount,
+    //iMaterialWrapper *material) = 0;
 
   /**
    * Add a submesh to this object. A submesh is a subset of the mesh triangles
@@ -210,10 +210,10 @@ struct iGeneralMeshState : public virtual iGeneralMeshCommonState
    * This version overrides the parent mixmode.
    * \deprecated Use AddSubMesh from iGeneralFactoryState instead
    */
-  CS_DEPRECATED_METHOD_MSG("Use AddSubMesh from iGeneralFactoryState instead")
-  virtual void AddSubMesh (unsigned int *triangles,
-    int tricount,
-    iMaterialWrapper *material, uint mixmode) = 0;
+  //CS_DEPRECATED_METHOD_MSG("Use AddSubMesh from iGeneralFactoryState instead")
+  //virtual void AddSubMesh (unsigned int *triangles,
+    //int tricount,
+    //iMaterialWrapper *material, uint mixmode) = 0;
   /** @} */
 };
 
