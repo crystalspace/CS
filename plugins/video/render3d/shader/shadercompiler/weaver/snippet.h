@@ -202,8 +202,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   public:
     struct Connection
     {
+      // If a connection is weak, don't use it for input/output matching.
+      bool weak;
       const Snippet::Technique* from;
       const Snippet::Technique* to;
+
+      Connection () : weak (false), from (0), to (0) {}
       
       inline bool operator==(const Connection& other)
       { return (from == other.from) && (to == other.to); }
@@ -219,7 +223,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     { inTechs = inTechniques; }
     void GetOutputTechniques (csArray<const Snippet::Technique*>& outTechs) const
     { outTechs = outTechniques; }
-    void GetDependencies (const Snippet::Technique* tech, csArray<const Snippet::Technique*>& deps) const;
+    void GetDependencies (const Snippet::Technique* tech, csArray<const Snippet::Technique*>& deps,
+      bool strongOnly = true) const;
   private:
     csArray<const Snippet::Technique*> techniques;
     csArray<Connection> connections;

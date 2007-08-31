@@ -618,13 +618,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
   
   void TechniqueGraph::GetDependencies (const Snippet::Technique* tech, 
-    csArray<const Snippet::Technique*>& deps) const
+    csArray<const Snippet::Technique*>& deps, bool strongOnly) const
   {
     csSet<csConstPtrKey<Snippet::Technique> > addedDeps;
     for (size_t c = 0; c < connections.GetSize(); c++)
     {
       const Connection& conn = connections[c];
-      if ((conn.to == tech) && (!addedDeps.Contains (conn.from)))
+      if ((conn.to == tech) && (!addedDeps.Contains (conn.from))
+        && (!strongOnly || !conn.weak))
       {
         deps.Push (conn.from);
         addedDeps.AddNoTest (conn.from);

@@ -331,6 +331,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
                     TechniqueGraph::Connection conn;
                     conn.from = prevInput->node->tech;
                     conn.to = node.tech;
+                    conn.weak = true;
                     newConnections.Push (conn);
                   }
                   else
@@ -959,7 +960,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       }
       
       csArray<const Snippet::Technique*> deps;
-      graph.GetDependencies (tech, deps);
+      graph.GetDependencies (tech, deps, false);
       for (size_t d = 0; d < deps.GetSize(); d++)
       {
         techsToAdd.Push (deps[d]);

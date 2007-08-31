@@ -6,6 +6,17 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+31-Aug-2007
+	- res augmented the Cg weaver combiner to contain a number of simple,
+	  "templated" coercions (for trivial stuff such as normalization).
+	- res added "annotations" to the shader weaver: when enabled comments
+	  are added to the generated shader code that make it easier to follow
+	  it.
+	- res made the weaver-generated shader code slightly more readable by
+	  removing some indirections.
+	- res fixed an issue in shader weaver where dependencies, inserted
+	  between snippets to reuse program inputs, were also, incorrectly,
+	  used when resolving candidates for inputs.
 27-Aug-2007
 	- res added a simple beautification step to the Cg weaver combiner.
 	  This makes the synthesized Cg programs more human-readable (and thus
