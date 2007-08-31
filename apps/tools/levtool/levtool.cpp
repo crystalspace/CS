@@ -1741,14 +1741,9 @@ void LevTool::Main ()
     const char *inds = cmdline->GetOption ("inds");
     if (inds)
     {
-/*      inputDS = csPtr<iDocumentSystem> (CS_LOAD_PLUGIN (plugin_mgr,
-	inds, iDocumentSystem));
-      if (!inputDS)*/
-      {
-        inputDS = csPtr<iDocumentSystem> (CS_LOAD_PLUGIN (plugin_mgr,
-	  csString().Format ("crystalspace.documentsystem.%s", inds),
-	  iDocumentSystem));
-      }
+      inputDS = csLoadPlugin<iDocumentSystem> (
+          plugin_mgr,
+	  csString().Format ("crystalspace.documentsystem.%s", inds));
       if (!inputDS)
       {
 	Report (CS_REPORTER_SEVERITY_ERROR,
@@ -1761,14 +1756,8 @@ void LevTool::Main ()
     const char *outds = cmdline->GetOption ("outds");
     if (outds)
     {
-/*      outputDS = csPtr<iDocumentSystem> (CS_LOAD_PLUGIN (plugin_mgr,
-	outds, iDocumentSystem));
-      if (!outputDS)*/
-      {
-	outputDS = csPtr<iDocumentSystem> (CS_LOAD_PLUGIN (plugin_mgr,
-	  csString().Format ("crystalspace.documentsystem.%s", outds),
-	  iDocumentSystem));
-      }
+      outputDS = csLoadPlugin<iDocumentSystem> (plugin_mgr,
+	  csString().Format ("crystalspace.documentsystem.%s", outds));
       if (!outputDS)
       {
 	Report (CS_REPORTER_SEVERITY_ERROR,

@@ -156,8 +156,8 @@ csLightningMeshObjectFactory::csLightningMeshObjectFactory (
   
   csRef<iPluginManager> PlugMgr (csQueryRegistry<iPluginManager> (object_registry));
   CS_ASSERT (PlugMgr);
-  csRef<iMeshObjectType> MeshType (CS_LOAD_PLUGIN(PlugMgr,
-      "crystalspace.mesh.object.genmesh", iMeshObjectType));
+  csRef<iMeshObjectType> MeshType = csLoadPlugin<iMeshObjectType> (PlugMgr,
+      "crystalspace.mesh.object.genmesh");
   if (MeshType)
   {
     GenMeshFact = MeshType->NewFactory ();

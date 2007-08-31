@@ -1295,7 +1295,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!csStrCaseCmp (cmd, "bugplug"))
   {
-    csRef<iBase> plug = CS_LOAD_PLUGIN_ALWAYS (Sys->plugin_mgr,
+    csRef<iBase> plug = csLoadPluginAlways (Sys->plugin_mgr,
     	"crystalspace.utilities.bugplug");
     plug->IncRef ();	// Avoid smart pointer release (@@@)
   }
@@ -2390,7 +2390,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     csRef<iSaver> saver = csQueryRegistry<iSaver> (Sys->object_reg);
     if (!saver.IsValid ())
     {
-      saver = CS_LOAD_PLUGIN(Sys->plugin_mgr, "crystalspace.level.saver", iSaver);
+      saver = csLoadPlugin<iSaver> (Sys->plugin_mgr, "crystalspace.level.saver");
       if (!saver.IsValid ())
       {
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,

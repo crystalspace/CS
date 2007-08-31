@@ -301,8 +301,8 @@ bool Simple::Initialize ()
   ll->Add (light);
 
  
-  csRef<iMeshObjectType> type (CS_LOAD_PLUGIN(PluginManager,
-  	"crystalspace.mesh.object.lightning", iMeshObjectType));  
+  csRef<iMeshObjectType> type = csLoadPlugin<iMeshObjectType> (PluginManager,
+  	"crystalspace.mesh.object.lightning");
 
   /// Lightning 1
   csRef<iMeshObjectFactory> LightningObjectFactory1 = type->NewFactory();

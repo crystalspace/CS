@@ -940,9 +940,8 @@ csPtr<iBase> csStencil2ShadowLoader::Parse (iDocumentNode* node,
 {
   csRef<iPluginManager> plugin_mgr (
     csQueryRegistry<iPluginManager> (object_reg));
-  csRef<iRenderStepType> type (CS_LOAD_PLUGIN (plugin_mgr,
-    "crystalspace.renderloop.step.shadow.stencil2.type", 
-    iRenderStepType));
+  csRef<iRenderStepType> type = csLoadPlugin<iRenderStepType> (plugin_mgr,
+    "crystalspace.renderloop.step.shadow.stencil2.type");
 
   csRef<iRenderStepFactory> factory = type->NewFactory();
   csRef<iRenderStep> step = factory->Create ();

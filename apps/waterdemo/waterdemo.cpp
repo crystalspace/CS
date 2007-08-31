@@ -443,10 +443,8 @@ bool csWaterDemo::Initialize ()
   //get a custom renderloop
   csRef<iRenderLoop> rl = engine->GetRenderLoopManager ()->Create ();
   
-  csRef<iRenderStepType> genType =
-    CS_LOAD_PLUGIN (plugin_mgr,
-    "crystalspace.renderloop.step.generic.type",
-    iRenderStepType);
+  csRef<iRenderStepType> genType = csLoadPlugin<iRenderStepType> (
+    plugin_mgr, "crystalspace.renderloop.step.generic.type");
 
   csRef<iRenderStepFactory> genFact = genType->NewFactory ();
 

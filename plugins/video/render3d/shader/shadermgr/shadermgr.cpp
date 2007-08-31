@@ -152,7 +152,7 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
     {
       const char* classname = classlist->Get(i);
       csRef<iShaderCompiler> plugin = 
-	CS_LOAD_PLUGIN (plugin_mgr, classname, iShaderCompiler);
+	csLoadPlugin<iShaderCompiler> (plugin_mgr, classname);
       if (plugin)
       {
 	if (do_verbose)

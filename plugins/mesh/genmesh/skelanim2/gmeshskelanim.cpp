@@ -326,8 +326,8 @@ const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
 
   if (!ldr_plg)
   {
-    ldr_plg = CS_LOAD_PLUGIN(plugin_mgr, 
-      "crystalspace.graveyard.loader", iLoaderPlugin);
+    ldr_plg = csLoadPlugin<iLoaderPlugin> (plugin_mgr, 
+      "crystalspace.graveyard.loader");
     if (!ldr_plg )
     {
       printf("Missing <crystalspace.graveyard.loader> plugin!\n");

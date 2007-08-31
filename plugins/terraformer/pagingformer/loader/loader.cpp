@@ -71,8 +71,8 @@ csPtr<iBase> csPagingFormerLoader::Parse (iDocumentNode* node,
 		iStreamSource*, iLoaderContext* /*ldr_context*/,
 		iBase* /*context*/)
 {
-  csRef<iTerraFormer> former = CS_LOAD_PLUGIN (pluginmgr, 
-  	"crystalspace.terraformer.paging", iTerraFormer);
+  csRef<iTerraFormer> former = csLoadPlugin<iTerraFormer> (pluginmgr, 
+  	"crystalspace.terraformer.paging");
   if (!former) 
   {
     synldr->ReportError ("crystalspace.terraformer.paging.loader",

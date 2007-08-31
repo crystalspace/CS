@@ -274,7 +274,7 @@ bool Simple::Initialize ()
     phys_engine_id = BULLET_ID;
     csRef<iPluginManager> plugmgr = 
       csQueryRegistry<iPluginManager> (object_reg);
-    dyn = CS_LOAD_PLUGIN (plugmgr, "crystalspace.dynamics.bullet", iDynamics);
+    dyn = csLoadPlugin<iDynamics> (plugmgr, "crystalspace.dynamics.bullet");
   }
   else 
   {
@@ -282,7 +282,7 @@ bool Simple::Initialize ()
     phys_engine_id = ODE_ID;
     csRef<iPluginManager> plugmgr = 
       csQueryRegistry<iPluginManager> (object_reg);
-    dyn = CS_LOAD_PLUGIN (plugmgr, "crystalspace.dynamics.ode", iDynamics);
+    dyn = csLoadPlugin<iDynamics> (plugmgr, "crystalspace.dynamics.ode");
   }
   if (!dyn)
   {

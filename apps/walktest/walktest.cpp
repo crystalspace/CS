@@ -1107,7 +1107,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   // Get the collide system plugin.
   const char* p = cfg->GetStr ("Walktest.Settings.CollDetPlugin",
   	"crystalspace.collisiondetection.opcode");
-  collide_system = CS_LOAD_PLUGIN (plugin_mgr, p, iCollideSystem);
+  collide_system = csLoadPlugin<iCollideSystem> (plugin_mgr, p);
   if (!collide_system)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No Collision Detection plugin found!");

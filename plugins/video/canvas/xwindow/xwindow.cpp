@@ -170,7 +170,7 @@ bool csXWindow::Initialize (iObjectRegistry *object_reg)
   {
     csRef<iPluginManager> plugin_mgr (
     	csQueryRegistry<iPluginManager> (object_reg));
-    xf86vm = CS_LOAD_PLUGIN (plugin_mgr, CS_XEXT_XF86VM_SCF_ID, iXExtF86VM);
+    xf86vm = csLoadPlugin<iXExtF86VM> (plugin_mgr, CS_XEXT_XF86VM_SCF_ID);
   }
   return true;
 }

@@ -1527,7 +1527,7 @@ csPtr<iRenderLoop> csEngine::CreateDefaultRenderLoop ()
 
   char const* const stdstep = "crystalspace.renderloop.step.generic.type";
   csRef<iRenderStepType> genType =
-    CS_LOAD_PLUGIN (plugin_mgr, stdstep, iRenderStepType);
+    csLoadPlugin<iRenderStepType> (plugin_mgr, stdstep);
 
   if (genType.IsValid())
   {

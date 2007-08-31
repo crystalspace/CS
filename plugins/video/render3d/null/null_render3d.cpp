@@ -115,9 +115,10 @@ bool csNullGraphics3D::Initialize (iObjectRegistry* objreg)
   if (!driver)
     driver = config->GetStr ("Video.Null.Canvas", CS_SOFTWARE_2D_DRIVER);
 
-  G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, iGraphics2D);
+  G2D = csLoadPlugin<iGraphics2D> (plugin_mgr, driver);
   if (!G2D)
-    G2D = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.graphics2d.null", iGraphics2D);
+    G2D = csLoadPlugin<iGraphics2D> (plugin_mgr,
+      "crystalspace.graphics2d.null");
   if (!G2D)
     return false;
 
