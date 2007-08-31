@@ -99,7 +99,7 @@ struct iKeyComposer : public virtual iBase
  * - csInitializer::CreateInputDrivers()
  *
  * Main ways to get pointers to this interface:
- * - CS_QUERY_REGISTRY()
+ * - csQueryRegistry<iKeyboardDriver>()
  *
  * 
  * \todo Need a simple way to query all currently-set modifiers for event 
@@ -174,7 +174,7 @@ struct iKeyboardDriver : public virtual iBase
  * - csInitializer::CreateInputDrivers()
  *
  * Main ways to get pointers to this interface:
- * - CS_QUERY_REGISTRY()
+ * - csQueryRegistry<iMouseDriver>()
  */
 struct iMouseDriver : public virtual iBase
 {
@@ -226,7 +226,7 @@ struct iMouseDriver : public virtual iBase
  * - csInitializer::CreateInputDrivers()
  *
  * Main ways to get pointers to this interface:
- * - CS_QUERY_REGISTRY()
+ * - csQueryRegistry<iJoystickDriver>()
  */
 struct iJoystickDriver : public virtual iBase
 {

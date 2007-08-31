@@ -327,8 +327,6 @@ public:
   bool CreatePlaneGeometry (const csPlane3& plane);
   bool CreateMeshGeometry (iMeshWrapper *mesh);
   bool CreateBoxGeometry (const csVector3& box_size);
-  bool CreateCCylinderGeometry (float length, float radius) 
-  {return CreateCapsuleGeometry (length, radius);}
   bool CreateCapsuleGeometry (float length, float radius);
 
   void SetCollisionCallback (

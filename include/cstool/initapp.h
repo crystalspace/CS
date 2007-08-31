@@ -268,8 +268,8 @@ public:
    * This can be used if multiple, distinct modules want to share string IDs.
    * The set can be requested with:
    * \code
-   * csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-   *   object_reg, "crystalspace.shared.stringset", iStringSet);
+   * csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+   *   object_reg, "crystalspace.shared.stringset");
    * \endcode
    */
   static bool CreateStringSet (iObjectRegistry*);

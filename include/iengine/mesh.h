@@ -279,7 +279,7 @@ struct iMeshWrapper : public virtual iBase
    * Get the optional lighting information that is implemented
    * by this mesh object. If the mesh object doesn't implement it
    * then this will return 0. This is similar (but more efficient)
-   * to calling SCF_QUERY_INTERFACE on the mesh object for iLightingInfo.
+   * to calling scfQueryInterface<iLightingInfo> on the mesh object.
    */
   virtual iLightingInfo* GetLightingInfo () const = 0;
 
@@ -287,7 +287,7 @@ struct iMeshWrapper : public virtual iBase
    * Get the optional shadow receiver that is implemented
    * by this mesh object. If the mesh object doesn't implement it
    * then this will return 0. This is similar (but more efficient)
-   * to calling SCF_QUERY_INTERFACE on the mesh object for iShadowReceiver.
+   * to calling scfQueryInterface<iShadowReceiver> on the mesh object.
    * <p>
    * Note! If the mesh is a static lod mesh (i.e. a parent of a mesh
    * hierarchy that is used for static lod) then this will return
@@ -300,7 +300,7 @@ struct iMeshWrapper : public virtual iBase
    * Get the optional shadow caster that is implemented
    * by this mesh object. If the mesh object doesn't implement it
    * then this will return 0. This is similar (but more efficient)
-   * to calling SCF_QUERY_INTERFACE on the mesh object for iShadowCaster.
+   * to calling scfQueryInterface<iShadowCaster> on the mesh object.
    * <p>
    * Note! If the mesh is a static lod mesh (i.e. a parent of a mesh
    * hierarchy that is used for static lod) then this will return a

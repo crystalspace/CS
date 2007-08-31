@@ -92,15 +92,6 @@ struct iString : public virtual iBase
    */
   virtual void Empty () = 0;
 
-  /**
-   * Clear the string (so that it contains only a null terminator).
-   * \remarks This is typically shorthand for Truncate(0), but more idiomatic
-   *   in terms of human language.
-   * \deprecated Use Empty() instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use Empty() instead")
-  virtual void Clear () = 0;
-
   /// Get a copy of this string
   virtual csRef<iString> Clone () const = 0;
 
@@ -110,17 +101,6 @@ struct iString : public virtual iBase
    *   if the string represents a null-pointer.
    */
   virtual char const* GetData () const = 0;
-
-  /**
-   * Get a pointer to the null-terminated character array.
-   * \return A C-string pointer to the null-terminated character array; or zero
-   *   if the string represents a null-pointer.
-   * \warning This returns a non-const pointer, so use this function with care!
-   * \deprecated Use the 'const' version of GetData() instead.
-   */
-  /*CS_DEPRECATED_METHOD*/ 
-  // @@@ GCC and VC always seem to prefer this GetData() and barf "deprecated".
-  virtual char* GetData () = 0;
 
   /**
    * Query string length.

@@ -12,6 +12,8 @@ chronological order.
 	  for factories.
 	- Jorrit did more deprecation removals (including legacy submesh
 	  support in genmesh).
+	- Jorrit did more deprecation removals (including SCF_QUERY_INTERFACE,
+	  CS_QUERY_REGISTRY and related).
 30-Aug-2007
 	- Genjix added api documentation about iSkeleton::SetTransformMode (...)
 	- Genjix added joystick define to initapp.h (CS_REQUEST_JOYSTICK)

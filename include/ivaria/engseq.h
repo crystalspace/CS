@@ -687,7 +687,7 @@ struct iSequenceTimedOperation : public virtual iBase
  * - Engine Sequence Manager plugin (crystalspace.utilities.sequence.engine)
  *   
  * Main ways to get pointers to this interface:
- * - CS_QUERY_REGISTRY()
+ * - csQueryRegistry<iEngineSequenceManager>()
  *   
  */
 struct iEngineSequenceManager : public virtual iBase

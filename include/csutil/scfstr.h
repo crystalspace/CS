@@ -30,8 +30,6 @@
 #include "csutil/scf_implementation.h"
 #include "iutil/string.h"
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
-
 /// This is a thin SCF wrapper around csString
 class CS_CRYSTALSPACE_EXPORT scfString : 
   public scfImplementation1<scfString, iString>
@@ -89,24 +87,11 @@ public:
   /// Clear the string (so that it contains only ending 0 character).
   virtual void Empty ();
 
-  /**
-   * Clear the string (so that it contains only ending 0 character).
-   * \deprecated Use Empty() instead.
-   */
-  /* CS_DEPRECATED_METHOD_MSG("Use Empty() instead.") */ 
-  virtual void Clear ()
-  { Empty(); }
-
   /// Get a copy of this string
   virtual csRef<iString> Clone () const;
 
   /// Get a pointer to null-terminated character data.
   virtual char const* GetData () const;
-
-  /// Get a pointer to null-terminated character data.
-  /*CS_DEPRECATED_METHOD*/ 
-  // @@@ GCC and VC always seem to prefer this GetData() and barf "deprecated".
-  virtual char* GetData ();
 
   /// Query string length
   virtual size_t Length () const;
@@ -271,7 +256,5 @@ public:
   /// Convert string to uppercase.
   virtual void Upcase();
 };
-
-#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_SCFSTR_H__

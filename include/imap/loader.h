@@ -436,7 +436,7 @@ struct iLoader : public virtual iBase
    * factory is already in memory (with that name). This function will
    * still return true in that case and set 'result' to the correct object.
    * <br>
-   * Note! Use SCF_QUERY_INTERFACE on 'result' to detect what type was loaded.
+   * Note! Use scfQueryInterface on 'result' to detect what type was loaded.
    * \param fname is a VFS filename for the XML file.
    * \param result will be set to the loaded result (see above).
    * \param region is 0 by default which means that all loaded objects are not
@@ -482,7 +482,7 @@ struct iLoader : public virtual iBase
    * factory is already in memory (with that name). This function will
    * still return true in that case and set 'result' to the correct object.
    * <br>
-   * Note! Use SCF_QUERY_INTERFACE on 'result' to detect what type was loaded.
+   * Note! Use scfQueryInterface on 'result' to detect what type was loaded.
    * \param buffer is a buffer for the model contents.
    * \param result will be set to the loaded result (see above).
    * \param region is 0 by default which means that all loaded objects are not
@@ -527,7 +527,7 @@ struct iLoader : public virtual iBase
    * factory is already in memory (with that name). This function will
    * still return true in that case and set 'result' to the correct object.
    * <br>
-   * Note! Use SCF_QUERY_INTERFACE on 'result' to detect what type was loaded.
+   * Note! Use scfQueryInterface on 'result' to detect what type was loaded.
    * \param node is the node from which to read.
    * \param result will be set to the loaded result (see above).
    * \param region is 0 by default which means that all loaded objects are not

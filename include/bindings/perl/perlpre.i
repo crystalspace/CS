@@ -311,7 +311,7 @@ _TYPEMAP_csArray(double,		newSVnv,	SvNV)
 
 /****************************************************************************
  * Typemaps to convert an interface and version from an interface name.
- * Used by wrapped versions of SCF_QUERY_INTERFACE, CS_QUERY_REGISTRY, etc.
+ * Used by wrapped versions of scfQueryInterface, csQueryRegistry, etc.
  ****************************************************************************/
 %typemap(in) (const char *iface, int iface_ver)
 {
