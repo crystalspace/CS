@@ -127,8 +127,6 @@ public:
   bool RemoveVariable  (csShaderVariable *) { return false; }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
-
 /**
  * Genmesh version of mesh object.
  */
@@ -289,13 +287,6 @@ public:
   void SetShadowReceiving (bool m) { do_shadow_rec = m; }
   bool IsShadowReceiving () const { return do_shadow_rec; }
   iGeneralMeshSubMesh* FindSubMesh (const char* name) const; 
-  //void AddSubMesh (unsigned int *triangles, int tricount, 
-    //iMaterialWrapper *material, uint mixmode);
-  //void AddSubMesh (unsigned int *triangles, int tricount, 
-    //iMaterialWrapper *material)
-  //{
-    //AddSubMesh (triangles, tricount, material, (uint)~0);
-  //}
   /** @} */
 
   iVirtualClock* vc;
@@ -802,8 +793,6 @@ public:
 
   void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
 };
-
-#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * Genmesh type. This is the plugin you have to use to create instances
