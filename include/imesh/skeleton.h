@@ -61,7 +61,7 @@ class csReversibleTransform;
  */
 struct iSkeletonBone : public virtual iBase
 {
-  SCF_INTERFACE (iSkeletonBone, 1, 0, 0);
+  SCF_INTERFACE (iSkeletonBone, 1, 0, 1);
 
   /**
    * Get name of the bone.

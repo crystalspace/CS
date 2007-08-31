@@ -7,6 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 31-Aug-2007
+	- Genjix bumped interface minor version.
 	- Genjix added animation blending to genmeshanim2. Now the there is
 	  Execute("animname", blend_factor). By default this is 0, and if all
 	  running animations for a bone are 0 then it blends equally between
