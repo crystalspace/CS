@@ -723,13 +723,13 @@ void csConfigFile::SetTuple (const char *Key, iStringArray* Value)
     if (sa)
     {
       // its different if lengths differ
-      if (sa->Length () != Value->Length ())
+      if (sa->GetSize () != Value->GetSize ())
       {
         changed = true;
       }
       else
       {
-        for (uint i = 0 ; i < sa->Length (); i++)
+        for (uint i = 0 ; i < sa->GetSize (); i++)
         {
           // found 2 different strings in tuple
           if (sa->Get (i) != Value->Get (i))

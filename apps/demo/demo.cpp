@@ -317,14 +317,14 @@ bool Demo::Initialize (int argc, const char* const argv[],
     // user.
     csRef<iStringArray> zips = myVFS->FindFiles ("/this/*");
     size_t i;
-    for (i = 0 ; i < zips->Length () ; i++)
+    for (i = 0 ; i < zips->GetSize () ; i++)
     {
       const char* zip = zips->Get (i);
       TestDemoFile (zip, myVFS, demos);
     }
     myVFS->Mount ("/tmp/csdemo_datadir", "$@data$/");
     zips = myVFS->FindFiles ("/tmp/csdemo_datadir/*");
-    for (i = 0 ; i < zips->Length () ; i++)
+    for (i = 0 ; i < zips->GetSize () ; i++)
     {
       const char* zip = zips->Get (i);
       TestDemoFile (zip, myVFS, demos);

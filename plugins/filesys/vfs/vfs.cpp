@@ -1820,7 +1820,7 @@ csRef<iStringArray> csVFS::MountRoot (const char *Path)
   {
     csRef<iStringArray> roots = csInstallationPathsHelper::FindSystemRoots();
     size_t i;
-    size_t n = roots->Length ();
+    size_t n = roots->GetSize ();
     for (i = 0 ; i < n ; i++)
     {
       char const* t = roots->Get(i);

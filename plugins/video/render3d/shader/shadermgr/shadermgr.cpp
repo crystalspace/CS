@@ -144,7 +144,7 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
 
   csRef<iStringArray> classlist =
     iSCF::SCF->QueryClassList("crystalspace.graphics3d.shadercompiler.");
-  size_t const nmatches = classlist.IsValid() ? classlist->Length() : 0;
+  size_t const nmatches = classlist.IsValid() ? classlist->GetSize() : 0;
   if (nmatches != 0)
   {
     size_t i;

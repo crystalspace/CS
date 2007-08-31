@@ -52,16 +52,6 @@ public:
     return v.GetSize ();
   }
 
-  /**
-   * Get array length.
-   * \deprecated Use GetSize() instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use GetSize() instead.")
-  virtual size_t Length () const
-  {
-    return GetSize ();
-  }
-
   /// Push a string onto the stack.
   virtual void Push (char const *value)
   {
@@ -158,16 +148,6 @@ public:
   virtual void Empty ()
   {
     v.Empty();
-  }
-
-  /**
-   * Remove all strings from array.
-   * \deprecated Use Empty() instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use Empty() instead.")
-  virtual void DeleteAll ()
-  {
-    Empty();
   }
 
   /**

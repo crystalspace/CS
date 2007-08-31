@@ -36,13 +36,6 @@ struct iStringArray : public virtual iBase
   /// Get array length.
   virtual size_t GetSize () const = 0;
 
-  /**
-   * Get array length.
-   * \deprecated Use GetSize() instead.
-   */
-  /*CS_DEPRECATED_METHOD_MSG("Use GetSize() instead.")*/
-  virtual size_t Length () const = 0;
-
   /// Push a string onto the stack.
   virtual void Push (const char *value) = 0;
 
@@ -107,13 +100,6 @@ struct iStringArray : public virtual iBase
 
   /// Remove all strings from array, releasing allocated memory.
   virtual void Empty () = 0;
-
-  /**
-   * Remove all strings from array.
-   * \deprecated Use Empty() instead.
-   */
-  /*CS_DEPRECATED_METHOD_MSG("Use Empty() instead.")*/
-  virtual void DeleteAll () = 0;
 
   /**
    * Return true if the array is empty.

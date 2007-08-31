@@ -625,23 +625,23 @@ void csSCF::ScanPluginsInt (csPathsList const* pluginPaths,
       }
 
       if (plugins)
-        plugins->DeleteAll();
+        plugins->Empty();
 
       csRef<iStringArray> messages =
         csScanPluginDir (pathrec.path, plugins, pathrec.scanRecursive);
       scannedDirs.Request(pathrec.path);
 
-      if ((messages != 0) && (messages->Length() > 0))
+      if ((messages != 0) && (messages->GetSize () > 0))
       {
         csPrintfErr("SCF_WARNING: the following issue(s) arose while "
           "scanning '%s':", pathrec.path.GetData());
-        for (j = 0; j < messages->Length(); j++)
+        for (j = 0; j < messages->GetSize (); j++)
           csPrintfErr(" %s\n", messages->Get (j));
       }
 
       csRef<iDocument> metadata;
       csRef<iString> msg;
-      for (j = 0; j < plugins->Length(); j++)
+      for (j = 0; j < plugins->GetSize (); j++)
       {
         char const* plugin = plugins->Get(j);
         msg = csGetPluginMetadata (plugin, metadata);

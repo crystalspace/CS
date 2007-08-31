@@ -1980,7 +1980,7 @@ void ViewMesh::StdDlgUpdateLists(const char* filename)
 
   csRef<iStringArray> files = vfs->FindFiles(filename);
   
-  for (size_t i = 0; i < files->Length(); i++)
+  for (size_t i = 0; i < files->GetSize(); i++)
   {
     char* file = (char*)files->Get(i);
     if (!file) continue;

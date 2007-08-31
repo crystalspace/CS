@@ -16,6 +16,7 @@ chronological order.
 	  CS_QUERY_REGISTRY and related).
 	- Jorrit did more deprecation removals (including CS_LOAD_PLUGIN
 	  and related).
+	- Jorrit did more deprecation removals.
 30-Aug-2007
 	- Genjix added api documentation about iSkeleton::SetTransformMode (...)
 	- Genjix added joystick define to initapp.h (CS_REQUEST_JOYSTICK)
