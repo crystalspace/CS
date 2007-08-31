@@ -1,5 +1,7 @@
 1.2 branch log.
 
+31-Aug-2007
+	- Vincent merged r27336 into 1.2 (Add PyCSCegui generation to jobber).
 29-Aug-2007
 	- res merged r27508:27510 into 1.2 (fix wxgl+UNICODE on Win32).
 	- res merged r27511 into 1.2 (new cs-win32libs).
