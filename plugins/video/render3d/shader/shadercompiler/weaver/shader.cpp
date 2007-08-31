@@ -59,7 +59,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	if (child->GetType () == CS_NODE_ELEMENT &&
 	  xmltokens.Request (child->GetValue ()) == WeaverCompiler::XMLTOKEN_PASS)
 	{
-	  passSnippets.Push (new Snippet (compiler, child, true));
+	  passSnippets.Push (new Snippet (compiler, child, 0, true));
 	}
       }
 	

@@ -38,9 +38,6 @@
 #include "snippet.h"
 #include "synth.h"
 
-// Debugging
-#define WEAVER_PRINTF   if (false) csPrintf
-
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 {
   namespace WeaverCommon = CS::PluginCommon::ShaderWeaver;
@@ -70,7 +67,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     CS::DocSystem::CloneAttributes (sourceNode, shaderNode);
     shaderNode->SetAttribute ("compiler", "xmlshader");
     
-    WEAVER_PRINTF ("%zu graphs\n", graphs.GetSize());
     if (graphs.GetSize() > 0)
     {
       size_t techNum = graphs[0].GetSize();
@@ -78,7 +74,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       {
         techNum *= graphs[g].GetSize();
       }
-      WEAVER_PRINTF ("%zu techniques\n", techNum);
       size_t currentTech = 0;
       while (currentTech < techNum)
       {
@@ -200,7 +195,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     // Generate special technique for output
     CS::Utility::ScopedDelete<Snippet::Technique> generatedOutput (
-      Snippet::CreatePassthrough ("output", "rgba"));
+      snippet->CreatePassthrough ("output", "rgba"));
     graph.AddTechnique (generatedOutput);
     {
       TechniqueGraph::Connection conn;
@@ -213,13 +208,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         These will be emitted.
       - For each node perform input/output renaming.
      */
-    SynthesizeNodeTree synthTree;
+    SynthesizeNodeTree synthTree (this);
     synthTree.AddAllInputNodes (graph, generatedOutput, combiner);
     synthTree.AddAllInputNodes (graph, outTechniquePos, combiner);
     // The input linking works better if "top" nodes come first
     synthTree.ReverseNodeArray();
     
-    LinkHash links;
     /* Linking.
      * Given are "A depends on B" style connections between nodes. Now actual
      * parameter links have to be established.
@@ -235,11 +229,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       csArray<EmittedInput> emitInputs;
       TaggedInputHash taggedInputs;
 
-      CS::Utility::ScopedDelete<BasicIterator<const SynthesizeNodeTree::Node> > nodeIt (
+      CS::Utility::ScopedDelete<BasicIterator<SynthesizeNodeTree::Node> > nodeIt (
         synthTree.GetNodes());
       while (nodeIt->HasNext())
       {
-        const SynthesizeNodeTree::Node& node = nodeIt->Next();
+        SynthesizeNodeTree::Node& node = nodeIt->Next();
+        csString& nodeAnnotation = node.annotation;
+
         /* For new connections introduced by input merging.
          * Connections are added delayed to avoid interference with
          * input resolution. */
@@ -251,7 +247,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	while (inputIt->HasNext())
 	{
 	  const Snippet::Technique::Input& inp = inputIt->Next();
-	  
+
 	  const Snippet::Technique* sourceTech;
           const Snippet::Technique::Output* output;
 
@@ -278,40 +274,42 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
             }
           }
 
-          WEAVER_PRINTF ("find input: %p, %s", node.tech, inp.name.GetData());
+          nodeAnnotation.Append (GetAnnotation ("Input: %s %s -",
+            inp.type.GetData(), inp.name.GetData()));
           if (!(inp.flags & Snippet::Technique::Input::flagPrivate)
-            && FindInput (graph, combiner, node.tech, inp, sourceTech, output,
-            usedOutputs))
+            && FindInput (graph, combiner, nodeAnnotation, node.tech, inp, 
+            sourceTech, output, usedOutputs))
           {
-            WEAVER_PRINTF (" ...found\n");
+            nodeAnnotation.Append (
+              GetAnnotation (" found match: %s %s from %s\n",
+                output->type.GetData(), output->name.GetData(), 
+                sourceTech->snippetName));
             if (strcmp (output->type, inp.type) == 0)
             {
-	      Link link;
-	      link.fromName = 
+	      const csString& linkFromName = 
 	        synthTree.GetNodeForTech (sourceTech).outputRenames.Get (
 		  output->name, (const char*)0);
-	      CS_ASSERT(!link.fromName.IsEmpty());
-	    
-	      link.toName = node.inputRenames.Get (inp.name, (const char*)0);
-	      CS_ASSERT(!link.toName.IsEmpty());
-	    
-  	      links.Put (sourceTech, link);
+	      CS_ASSERT(!linkFromName.IsEmpty());
+
+              node.inputLinks.Put (inp.name, linkFromName);
 	    }
 	    else
 	    {
-	      csRef<iDocumentNodeIterator> coerceChain = 
+	      csRef<WeaverCommon::iCoerceChainIterator> coerceChain = 
 	        combiner->QueryCoerceChain (output->type, inp.type);
 	      // Ugly?
 	      Snippet::Technique::CombinerPlugin tempComb (*comb);
 	      tempComb.name = "combiner";
               // Subtle: may add nodes to the node tree
-              synthTree.AugmentCoerceChain (compiler, tempComb, combiner, coerceChain, 
-	        graph, node.tech, inp.name, sourceTech, links);
+              synthTree.AugmentCoerceChain (compiler, tempComb, 
+                combiner, coerceChain, graph, node, inp.name,
+                sourceTech);
 	    }
 	  }
 	  else
 	  {
-            WEAVER_PRINTF (" ...use default\n");
+            nodeAnnotation.Append (
+              GetAnnotation (" using default\n"));
 	    // Obtain default
 	    switch (inp.defaultType)
 	    {
@@ -321,16 +319,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	        {
                   if (prevInput != 0)
                   {
-	            Link link;
-	            link.fromName = 
-	              synthTree.GetNodeForTech (prevInput->node->tech).inputRenames.Get (
-		        prevInput->input->name, (const char*)0);
-	            CS_ASSERT(!link.fromName.IsEmpty());
+                    const StringStringHash& srcInputLinks = 
+                      synthTree.GetNodeForTech (prevInput->node->tech).inputLinks;
+	            const csString& linkFromName = 
+	              srcInputLinks.Get (prevInput->input->name, (const char*)0);
+	            CS_ASSERT(!linkFromName.IsEmpty());
       	    
-	            link.toName = node.inputRenames.Get (inp.name, (const char*)0);
-	            CS_ASSERT(!link.toName.IsEmpty());
-      	    
-  	            links.Put (prevInput->node->tech, link);
+                    node.inputLinks.Put (inp.name, linkFromName);
 
                     // There's now a dependency on the node providing prevInput.
                     TechniqueGraph::Connection conn;
@@ -345,10 +340,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
                     emit.input = &inp;
                     if (!inp.condition.IsEmpty())
                       emit.conditions.Push (inp.condition);
+                    emit.tag = tag;
                     size_t index = emitInputs.Push (emit);
                     if (!tag.IsEmpty()
                       && !(inp.flags & Snippet::Technique::Input::flagNoMerge))
                       taggedInputs.Put (tag, index);
+                    
+                    csString inpOutputName;
+	            inpOutputName.Format ("in_%s", inp.name.GetData());
+                    node.inputLinks.Put (inp.name, inpOutputName);
                   }
                 }
 	        break;
@@ -379,8 +379,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         const EmittedInput& emitted = emitInputs[i];
         const Snippet::Technique::Input& inp = *emitted.input;
 
-	defaultCombiner->BeginSnippet();
-	combiner->BeginSnippet ();
+        const char* snippetAnnotate = GetAnnotation ("input \"%s\" tag \"%s\"",
+          inp.name.GetData(), emitted.tag.GetData());
+	defaultCombiner->BeginSnippet (snippetAnnotate);
+	combiner->BeginSnippet (snippetAnnotate);
 	for (size_t b = 0; b < inp.complexBlocks.GetSize(); b++)
 	{
 	  const Snippet::Technique::Block& block = 
@@ -424,12 +426,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 		  
         csString inpOutputName;
 	inpOutputName.Format ("in_%s", inp.name.GetData());
-	combiner->AddGlobal (inpOutputName, inp.type);
+	combiner->AddGlobal (inpOutputName, inp.type,
+          GetAnnotation ("Unique name for default input \"%s\" tag \"%s\"",
+            inp.name.GetData(), emitted.tag.GetData()));
 		  
 	combiner->AddOutput (inp.name, inp.type);
 	combiner->OutputRename (inp.name, inpOutputName);
-	combiner->Link (inpOutputName,
-	  emitted.node->inputRenames.Get (inp.name, (const char*)0));
 
 	combiner->EndSnippet ();
 	defaultCombiner->EndSnippet ();
@@ -444,23 +446,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     // Writing
     {
-      CS::Utility::ScopedDelete<BasicIterator<const SynthesizeNodeTree::Node> > nodeIt (
+      CS::Utility::ScopedDelete<BasicIterator<SynthesizeNodeTree::Node> > nodeIt (
         synthTree.GetNodesReverse());
       while (nodeIt->HasNext())
       {
         const SynthesizeNodeTree::Node& node = nodeIt->Next();
         
-        defaultCombiner->BeginSnippet();
-        combiner->BeginSnippet ();
-        {
-          LinkHash::Iterator linkIt (links.GetIterator (node.tech));
-          while (linkIt.HasNext())
-          {
-            const Link& link = linkIt.Next ();
-            combiner->Link (link.fromName, link.toName);
-          }
-        }
-        
+        const char* snippetAnnotate = GetAnnotation ("snippet \"%s<%d>\"\n\n%s",
+          node.tech->snippetName, node.tech->priority,
+          node.annotation.GetData());
+        defaultCombiner->BeginSnippet (snippetAnnotate);
+        combiner->BeginSnippet (snippetAnnotate);
+       
 	{
 	  CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique::Input> > 
 	    inputIt (node.tech->GetInputs());
@@ -468,7 +465,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  {
 	    const Snippet::Technique::Input& inp = inputIt->Next();
 	    combiner->AddInput (inp.name, inp.type);
-	    combiner->InputRename (node.inputRenames.Get (inp.name, (const char*)0),
+	    combiner->InputRename (node.inputLinks.Get (inp.name, (const char*)0),
 	      inp.name);
 	  }
 	}
@@ -509,7 +506,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  "output", (const char*)0);
       CS_ASSERT(!outputRenamed.IsEmpty());
       
-      combiner->SetOutput (outputRenamed);
+      combiner->SetOutput (outputRenamed,
+        GetAnnotation ("Map color output"));
     }
     
     defaultCombiner->WriteToPass (passNode);
@@ -594,6 +592,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       
   bool Synthesizer::FindInput (const TechniqueGraph& graph,
     WeaverCommon::iCombiner* combiner,
+    csString& nodeAnnotation,
     const Snippet::Technique* receivingTech, 
     const Snippet::Technique::Input& input,
     const Snippet::Technique*& sourceTech,
@@ -615,67 +614,86 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     uint coerceCost = WeaverCommon::NoCoercion;
     while (techsToTry.GetSize() > 0)
     {
-      const Snippet::Technique* tech = techsToTry.PopTop();
-      if (!checkedTechs.Contains (tech))
+      /* To first check all techs of immediate dependencies, then
+         techs of dependencies with a distance of 1, and so on, copy
+         have a "current techs to try" and "next techs to try" fifo.
+       */
+      csFIFO<const Snippet::Technique*> currentTechsToTry = techsToTry;
+      techsToTry.DeleteAll ();
+
+      while (currentTechsToTry.GetSize() > 0)
       {
-	CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique::Output> > 
-	  outputIt (tech->GetOutputs());
-	while (outputIt->HasNext())
-	{
-	  const Snippet::Technique::Output& outp = outputIt->Next();
-	  if (usedOutputs.Contains (&outp)) continue;
-	  WEAVER_PRINTF ("\n%s %s -> %s %s",
-	   outp.type.GetData(), outp.name.GetData(),
-	   input.type.GetData(), input.name.GetData());
-	  if (outp.type == input.type)
+        const Snippet::Technique* tech = currentTechsToTry.PopTop();
+        if (!checkedTechs.Contains (tech))
+        {
+	  CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique::Output> > 
+	    outputIt (tech->GetOutputs());
+	  while (outputIt->HasNext())
 	  {
-	    WEAVER_PRINTF (" match");
-	    sourceTech = tech;
-	    output = &outp;
-	    usedOutputs.AddNoTest (output);
-	    return true;
-	  }
-	  uint cost = combiner->CoerceCost (outp.type, input.type);
-	  WEAVER_PRINTF(" cost %u", cost);
-	  if (cost < coerceCost)
-	  {
-	    sourceTech = tech;
-	    output = &outp;
-	    if (cost == 0)
+	    const Snippet::Technique::Output& outp = outputIt->Next();
+	    if (usedOutputs.Contains (&outp)) continue;
+            nodeAnnotation.Append (
+              GetAnnotation (" trying %s %s of %s: ",
+                outp.type.GetData(), outp.name.GetData(),
+	        tech->snippetName));
+	    if (outp.type == input.type)
 	    {
+	      nodeAnnotation.Append ("match\n");
+	      sourceTech = tech;
+	      output = &outp;
 	      usedOutputs.AddNoTest (output);
 	      return true;
 	    }
-	    coerceCost = cost;
+	    uint cost = combiner->CoerceCost (outp.type, input.type);
+            nodeAnnotation.Append ((cost == WeaverCommon::NoCoercion)
+              ? "no coercion\n" : GetAnnotation ("cost %u\n", cost));
+	    if (cost < coerceCost)
+	    {
+	      sourceTech = tech;
+	      output = &outp;
+	      if (cost == 0)
+	      {
+	        usedOutputs.AddNoTest (output);
+	        return true;
+	      }
+	      coerceCost = cost;
+	    }
+            // See if maybe we can just drop a property.
+            const WeaverCommon::TypeInfo* outputTypeInfo = 
+              WeaverCommon::QueryTypeInfo (outp.type);
+            if (inputTypeInfo && outputTypeInfo
+              && (outputTypeInfo->baseType == inputTypeInfo->baseType)
+              && (outputTypeInfo->samplerIsCube == inputTypeInfo->samplerIsCube)
+              && (outputTypeInfo->dimensions == inputTypeInfo->dimensions)
+              && ((outputTypeInfo->semantics == inputTypeInfo->semantics)
+                || (inputTypeInfo->semantics == WeaverCommon::TypeInfo::NoSemantics))
+              && ((outputTypeInfo->space == inputTypeInfo->space)
+                || (inputTypeInfo->space == WeaverCommon::TypeInfo::NoSpace))
+              && ((outputTypeInfo->unit == inputTypeInfo->unit)
+                || (!inputTypeInfo->unit)))
+            {
+              bool b = compiler->annotateCombined 
+                && (rand() <= int (INT_MAX * 0.005));
+              nodeAnnotation.Append (
+                GetAnnotation ("drop a prop%s\n", b ? " like it's hot" : ""));
+	      sourceTech = tech;
+	      output = &outp;
+              usedOutputs.AddNoTest (output);
+              return true;
+            }
 	  }
-          // See if maybe we can just drop a property.
-          const WeaverCommon::TypeInfo* outputTypeInfo = 
-            WeaverCommon::QueryTypeInfo (outp.type);
-          if (inputTypeInfo && outputTypeInfo
-            && (outputTypeInfo->baseType == inputTypeInfo->baseType)
-            && (outputTypeInfo->samplerIsCube == inputTypeInfo->samplerIsCube)
-            && (outputTypeInfo->dimensions == inputTypeInfo->dimensions)
-            && ((outputTypeInfo->semantics == inputTypeInfo->semantics)
-              || (inputTypeInfo->semantics == WeaverCommon::TypeInfo::NoSemantics))
-            && ((outputTypeInfo->space == inputTypeInfo->space)
-              || (inputTypeInfo->space == WeaverCommon::TypeInfo::NoSpace))
-            && ((outputTypeInfo->unit == inputTypeInfo->unit)
-              || (!inputTypeInfo->unit)))
-          {
-	    sourceTech = tech;
-	    output = &outp;
-            usedOutputs.AddNoTest (output);
-            return true;
-          }
-	}
-	
-	csArray<const Snippet::Technique*> deps;
-	graph.GetDependencies (tech, deps);
-	for (size_t d = 0; d < deps.GetSize(); d++)
-	  techsToTry.Push (deps[d]);
-      
-        checkedTechs.AddNoTest (tech);
+  	
+	  csArray<const Snippet::Technique*> deps;
+	  graph.GetDependencies (tech, deps);
+	  for (size_t d = 0; d < deps.GetSize(); d++)
+	    techsToTry.Push (deps[d]);
+        
+          checkedTechs.AddNoTest (tech);
+        }
       }
+      /* If we found an input on this "distance level", don't search further.
+       */
+      if (coerceCost != WeaverCommon::NoCoercion) break;
     }
 
     bool result = coerceCost != WeaverCommon::NoCoercion;
@@ -751,19 +769,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     WeaverCommon::iCombiner* combiner)
   {
     {
-      CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique::Input> > 
-        inputIt (node.tech->GetInputs());
-      while (inputIt->HasNext())
-      {
-        const Snippet::Technique::Input& inp = inputIt->Next();
-        
-        csString newName;
-        newName.Format ("%s_%zu", inp.name.GetData(), renameNr++);
-        node.inputRenames.Put (inp.name, newName);
-        combiner->AddGlobal (newName, inp.type);
-      }
-    }
-    {
       CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique::Output> > 
         outputIt (node.tech->GetOutputs());
       while (outputIt->HasNext())
@@ -773,7 +778,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         csString newName;
         newName.Format ("%s_%zu", outp.name.GetData(), renameNr++);
         node.outputRenames.Put (outp.name, newName);
-        combiner->AddGlobal (newName, outp.type);
+        combiner->AddGlobal (newName, outp.type,
+          synth->GetAnnotation ("Unique name for snippet \"%s<%d>\" output \"%s\"", 
+            node.tech->snippetName, node.tech->priority, outp.name.GetData()));
       }
     }
   }
@@ -806,7 +813,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         Node* node = nodeAlloc.Alloc();
         *node = *nodes[oldIndex];
         nodes[oldIndex]->tech = 0;
-        nodes[oldIndex]->inputRenames.DeleteAll();
         nodes[oldIndex]->outputRenames.DeleteAll();
         techToNode.PutUnique (tech, nodes.Push (node));
       }
@@ -823,27 +829,47 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   void Synthesizer::SynthesizeNodeTree::AugmentCoerceChain (
     WeaverCompiler* compiler, 
     const Snippet::Technique::CombinerPlugin& combinerPlugin,
-    WeaverCommon::iCombiner* combiner, iDocumentNodeIterator* linkChain,  
-    TechniqueGraph& graph, 
-    const Snippet::Technique* inTech, const char* inName, 
-    const Snippet::Technique* outTech, LinkHash& links)
+    WeaverCommon::iCombiner* combiner, 
+    WeaverCommon::iCoerceChainIterator* linkChain,  
+    TechniqueGraph& graph, Node& inNode, 
+    const char* inName, const Snippet::Technique* outTech)
   {
     {
       TechniqueGraph::Connection conn;
       conn.from = outTech;
-      conn.to = inTech;
+      conn.to = inNode.tech;
       graph.RemoveConnection (conn);
     }
-  
+
     const Snippet::Technique* lastTech = outTech;
     while (linkChain->HasNext())
     {
-      csRef<iDocumentNode> link = linkChain->Next ();
-      
+      Snippet* snippet;
+
+      csRef<iDocumentNode> link;
+      if (compiler->annotateCombined)
+      {
+        const char* fromType = 0;
+        const char* toType = 0;
+
+        link = linkChain->Next (fromType, toType);
+        
+        csString snippetName;
+        snippetName.Format ("coerce %s to %s for \"%s<%d>\"",
+          fromType, toType,
+          inNode.tech->snippetName, inNode.tech->priority);
+        snippet = new Snippet (compiler, snippetName);
+      }
+      else
+      {
+        link = linkChain->Next ();
+        snippet = new Snippet (compiler, 0);
+      }
+      scratchSnippets.Push (snippet);
+
       Snippet::Technique* tech = 
-        Snippet::LoadLibraryTechnique (compiler, link, combinerPlugin);
+        snippet->LoadLibraryTechnique (compiler, link, combinerPlugin);
       augmentedTechniques.Push (tech);
-      WEAVER_PRINTF ("augment: %p\n", tech);
       graph.AddTechnique (tech);
       TechniqueGraph::Connection conn;
       conn.from = lastTech;
@@ -858,7 +884,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     }
     TechniqueGraph::Connection conn;
     conn.from = lastTech;
-    conn.to = inTech;
+    conn.to = inNode.tech;
     graph.AddConnection (conn);
     
     {
@@ -868,12 +894,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       {
         const Snippet::Technique::Output& outp = outputIt->Next();
         
-        Link link;
-        link.fromName = GetNodeForTech (lastTech).outputRenames.Get (outp.name,
-          (const char*)0);
-        link.toName = GetNodeForTech (inTech).inputRenames.Get (inName,
-          (const char*)0);
-        links.Put (lastTech, link);
+        const csString& linkFromName = 
+          GetNodeForTech (lastTech).outputRenames.Get (outp.name, (const char*)0);
+        inNode.inputLinks.Put (inName, linkFromName);
       }
       else
       {
@@ -931,7 +954,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         Node* node = nodeAlloc.Alloc();
         *node = *newNodes[oldIndex];
         newNodes[oldIndex]->tech = 0;
-        newNodes[oldIndex]->inputRenames.DeleteAll();
         newNodes[oldIndex]->outputRenames.DeleteAll();
         newTechToNode.PutUnique (tech, newNodes.Push (node));
       }
@@ -948,13 +970,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     techToNode = newTechToNode;
   }
   
-  BasicIterator<const Synthesizer::SynthesizeNodeTree::Node>* 
+  BasicIterator<Synthesizer::SynthesizeNodeTree::Node>* 
   Synthesizer::SynthesizeNodeTree::GetNodes()
   {
     return new NodesIterator<false> (nodes);
   }
   
-  BasicIterator<const Synthesizer::SynthesizeNodeTree::Node>* 
+  BasicIterator<Synthesizer::SynthesizeNodeTree::Node>* 
   Synthesizer::SynthesizeNodeTree::GetNodesReverse()
   {
     return new NodesIterator<true> (nodes);

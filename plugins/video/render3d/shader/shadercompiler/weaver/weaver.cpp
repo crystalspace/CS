@@ -139,6 +139,7 @@ bool WeaverCompiler::Initialize (iObjectRegistry* object_reg)
     
   csConfigAccess config (object_reg);
   doDumpWeaved = config->GetBool ("Video.ShaderWeaver.DumpWeavedXML");
+  annotateCombined = config->GetBool ("Video.ShaderWeaver.AnnotateOutput");
     
   return true;
 }

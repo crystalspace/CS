@@ -40,6 +40,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     class Technique
     {
     public:
+      const char* snippetName;
       int priority;
       struct CombinerPlugin
       {
@@ -79,7 +80,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         csString type;
       };
       
-      Technique() : priority (0) {}
+      Technique (const char* snippetName) : snippetName (snippetName), 
+        priority (0) {}
       virtual ~Technique() {}
       
       virtual bool IsCompound() const = 0;
@@ -100,7 +102,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       csArray<Input> inputs;
       csArray<Output> outputs;
     public:
-      AtomTechnique (const csMD5::Digest& id) : id (id) {}
+      AtomTechnique (const char* snippetName, const csMD5::Digest& id) : 
+        Technique (snippetName), id (id) {}
     
       virtual bool IsCompound() const { return false; }
       
@@ -139,6 +142,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       csArray<Snippet*> outSnippets;
       Technique::CombinerPlugin combiner;
     public:
+      CompoundTechnique (const char* snippetName) : Technique (snippetName) {}
       ~CompoundTechnique();
 
       virtual bool IsCompound() const { return true; }
@@ -154,28 +158,32 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       virtual BasicIterator<const Output>* GetOutputs() const;
     };
     
-    Snippet (WeaverCompiler* compiler, iDocumentNode* node, bool topLevel = false);
+    Snippet (WeaverCompiler* compiler, iDocumentNode* node, const char* name,
+      bool topLevel = false);
+    Snippet (WeaverCompiler* compiler, const char* name);
     virtual ~Snippet();
     
+    const char* GetName() const { return name; }
     bool IsCompound() const { return isCompound; }
     
     BasicIterator<const Technique*>* GetTechniques() const;
     
-    static Technique* LoadLibraryTechnique (WeaverCompiler* compiler,
-      iDocumentNode* node, const Technique::CombinerPlugin& combiner);
-    static Technique* CreatePassthrough (const char* varName, const char* type);
+    Technique* LoadLibraryTechnique (WeaverCompiler* compiler,
+      iDocumentNode* node, const Technique::CombinerPlugin& combiner) const;
+    Technique* CreatePassthrough (const char* varName, const char* type) const;
   private:
     WeaverCompiler* compiler;
     csStringHash& xmltokens;
+    csString name;
     typedef csPDelArray<Technique> TechniqueArray;
     TechniqueArray techniques;
     bool isCompound;
     
     void LoadAtomTechniques (iDocumentNode* node);
     void LoadAtomTechnique (iDocumentNode* node);
-    static AtomTechnique* ParseAtomTechnique (WeaverCompiler* compiler,
+    AtomTechnique* ParseAtomTechnique (WeaverCompiler* compiler,
       iDocumentNode* node, bool canOmitCombiner, 
-      const char* defaultCombinerName = 0);
+      const char* defaultCombinerName = 0) const;
     static bool ReadBlocks (WeaverCompiler* compiler, iDocumentNode* node,
       csArray<Technique::Block>& blocks, const char* defaultCombinerName = 0);
     

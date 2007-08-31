@@ -74,6 +74,7 @@ public:
 public:
   bool do_verbose;
   bool doDumpWeaved;
+  bool annotateCombined;
   /// XML Token and management
   csStringHash xmltokens;
 

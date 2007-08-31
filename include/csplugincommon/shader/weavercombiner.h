@@ -39,13 +39,22 @@ namespace CS
     namespace ShaderWeaver
     {
       static const uint NoCoercion = UINT_MAX;
+
+      struct iCoerceChainIterator : public iDocumentNodeIterator
+      {
+        SCF_INTERFACE (iCoerceChainIterator, 0, 1, 0);
+        
+        virtual csRef<iDocumentNode> Next () = 0;
+        virtual csRef<iDocumentNode> Next (const char*& fromType, 
+          const char*& toType) = 0;
+      };
     
       struct iCombiner : public virtual iBase
       {
-        SCF_INTERFACE (iCombiner, 0, 0, 2);
+        SCF_INTERFACE (iCombiner, 0, 1, 0);
         
         /// Start addition of a new snippet.
-        virtual void BeginSnippet () = 0;
+        virtual void BeginSnippet (const char* annotation = 0) = 0;
         /// Add an input of the snippet.
         virtual void AddInput (const char* name, const char* type) = 0;
         /// Add an output of the snippet.
@@ -58,7 +67,7 @@ namespace CS
          * Query a chain of coercions from a type to another.
          * Nodes are atom-snippet-esque.
          */
-        virtual csPtr<iDocumentNodeIterator> QueryCoerceChain (const char* fromType,
+        virtual csPtr<iCoerceChainIterator> QueryCoerceChain (const char* fromType,
           const char* toType) = 0;
         /**
          * Add a link from a variable (usually an output of the snippet) to
@@ -72,9 +81,11 @@ namespace CS
         virtual bool EndSnippet () = 0;
         
         /// Add a global variable.
-        virtual void AddGlobal (const char* name, const char* type) = 0;
+        virtual void AddGlobal (const char* name, const char* type,
+          const char* annotation = 0) = 0;
         /// Set output variable.
-        virtual void SetOutput (const char* name) = 0;
+        virtual void SetOutput (const char* name,
+          const char* annotation = 0) = 0;
         
         /**
          * Compute a cost for a coercion from one type to another.

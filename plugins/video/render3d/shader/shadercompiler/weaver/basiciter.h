@@ -30,7 +30,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     virtual ~BasicIterator() {}
   
     virtual bool HasNext() = 0;
-    virtual const T& Next() = 0;
+    virtual T& Next() = 0;
   };
   
   template<typename T, class ArrayType>
@@ -43,7 +43,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   
     virtual bool HasNext()
     { return pos < array.GetSize(); }
-    virtual const T& Next()
+    virtual T& Next()
     { return array[pos++]; }
   };
 }
