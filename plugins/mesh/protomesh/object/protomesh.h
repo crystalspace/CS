@@ -308,7 +308,6 @@ public:
   void Invalidate ();
   /** @} */
 
-  void GetObjectBoundingBox (csBox3& bbox);
   const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& b);
   void GetRadius (float& radius, csVector3& center);

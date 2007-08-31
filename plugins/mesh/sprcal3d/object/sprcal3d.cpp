@@ -975,12 +975,6 @@ void csSpriteCal3DMeshObject::RecalcBoundingBox (csBox3& bbox)
 }
 
 
-void csSpriteCal3DMeshObject::GetObjectBoundingBox (csBox3& bbox)
-{
-  RecalcBoundingBox (object_bbox);
-  bbox = object_bbox;
-}
-
 const csBox3& csSpriteCal3DMeshObject::GetObjectBoundingBox ()
 {
   RecalcBoundingBox (object_bbox);
@@ -999,7 +993,7 @@ void csSpriteCal3DMeshObjectFactory::GetRadius (float& rad, csVector3& cent)
   rad = 1.0f;
 }
 
-void csSpriteCal3DMeshObjectFactory::GetObjectBoundingBox (csBox3& bbox)
+const csBox3& csSpriteCal3DMeshObjectFactory::GetObjectBoundingBox ()
 {
   CalCoreSkeleton *skel = calCoreModel.getCoreSkeleton ();
   skel->calculateBoundingBoxes(&calCoreModel);
@@ -1008,16 +1002,11 @@ void csSpriteCal3DMeshObjectFactory::GetObjectBoundingBox (csBox3& bbox)
   CalVector p[8];
   calBoundingBox.computePoints(p);
 
-  bbox.Set (p[0].x, p[0].y, p[0].z, p[0].x, p[0].y, p[0].z);
+  obj_bbox.Set (p[0].x, p[0].y, p[0].z, p[0].x, p[0].y, p[0].z);
   for (int i=1; i<8; i++)
   {
-    bbox.AddBoundingVertexSmart(p[i].x, p[i].y, p[i].z);
+    obj_bbox.AddBoundingVertexSmart(p[i].x, p[i].y, p[i].z);
   }
-}
-
-const csBox3& csSpriteCal3DMeshObjectFactory::GetObjectBoundingBox ()
-{
-  obj_bbox = GetObjectBoundingBox ();
   return obj_bbox;
 }
 

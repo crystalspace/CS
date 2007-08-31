@@ -105,11 +105,6 @@ csRenderMesh** csLightningMeshObject::GetRenderMeshes (int &n,
 }
 
 
-void csLightningMeshObject::GetObjectBoundingBox (csBox3& retbbox)
-{
-  retbbox = GenMesh->GetObjectModel ()->GetObjectBoundingBox ();
-}
-
 const csBox3& csLightningMeshObject::GetObjectBoundingBox ()
 {
   return GenMesh->GetObjectModel ()->GetObjectBoundingBox ();

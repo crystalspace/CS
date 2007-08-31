@@ -358,13 +358,6 @@ void csProtoMeshObjectFactory::GetRadius (float& radius, csVector3& center)
   center = object_bbox.GetCenter();
 }
 
-void csProtoMeshObjectFactory::GetObjectBoundingBox (csBox3& bbox)
-{
-  SetupFactory ();
-  if (!object_bbox_valid) CalculateBBoxRadius ();
-  bbox = object_bbox;
-}
-
 const csBox3& csProtoMeshObjectFactory::GetObjectBoundingBox ()
 {
   SetupFactory ();

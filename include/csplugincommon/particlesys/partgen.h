@@ -285,11 +285,6 @@ public:
    */
   virtual void Update (csTicks elapsed_time);
 
-  virtual void GetObjectBoundingBox (csBox3& bbox)
-  {
-    SetupObject ();
-    bbox = csParticleSystem::bbox;
-  }
   virtual const csBox3& GetObjectBoundingBox ()
   {
     SetupObject ();

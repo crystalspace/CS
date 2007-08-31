@@ -1237,11 +1237,6 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   return renderMeshes.GetArray ();
 }
 
-void csGenmeshMeshObject::GetObjectBoundingBox (csBox3& bbox)
-{
-  bbox = factory->GetObjectBoundingBox ();
-}
-
 const csBox3& csGenmeshMeshObject::GetObjectBoundingBox ()
 {
   return factory->GetObjectBoundingBox ();

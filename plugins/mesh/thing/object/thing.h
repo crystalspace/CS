@@ -537,10 +537,6 @@ public:
   { return mixmode; }
 
   //-------------------- iObjectModel implementation --------------------------
-  virtual void GetObjectBoundingBox (csBox3& bbox)
-  {
-    bbox = GetBoundingBox ();
-  }
   virtual const csBox3& GetObjectBoundingBox ()
   {
     return GetBoundingBox ();

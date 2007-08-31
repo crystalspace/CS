@@ -281,7 +281,6 @@ public:
   bool IsLighting () const { return do_lighting; }
   void SetManualColors (bool m) { do_manual_colors = m; }
   bool IsManualColors () const { return do_manual_colors; }
-  void GetObjectBoundingBox (csBox3& bbox);
   const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent);
@@ -669,10 +668,6 @@ public:
 
   /**\name iObjectModel implementation
    * @{ */
-  virtual void GetObjectBoundingBox (csBox3& bbox)
-  {
-    bbox = GetObjectBoundingBox ();
-  }
   virtual const csBox3& GetObjectBoundingBox ();
   virtual void GetRadius (float& rad, csVector3& cent)
   {
