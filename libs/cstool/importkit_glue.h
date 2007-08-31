@@ -78,7 +78,7 @@ namespace Utility
 	}
 	~VfsRootMounter ()
 	{
-	  for (size_t i = 0; i < mounted->Length(); i++)
+	  for (size_t i = 0; i < mounted->GetSize (); i++)
 	    vfs->Unmount (mounted->Get (i), 0);
 	}
 	const csString& GetRootPath() { return rootPath; }

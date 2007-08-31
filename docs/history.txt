@@ -17,6 +17,8 @@ chronological order.
 	- Jorrit did more deprecation removals (including CS_LOAD_PLUGIN
 	  and related).
 	- Jorrit did more deprecation removals.
+	- Jorrit fixed several parts in CS for the recent deprecation removals.
+	- Jorrit fixed a few warnings.
 30-Aug-2007
 	- Genjix added api documentation about iSkeleton::SetTransformMode (...)
 	- Genjix added joystick define to initapp.h (CS_REQUEST_JOYSTICK)
