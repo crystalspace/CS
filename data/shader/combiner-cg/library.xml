@@ -148,6 +148,26 @@
     </block>
   </coercion>
   
+  <coercion from="direction_camera" to="direction_world" cost="3">
+    <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
+	 verbatim -->
+    <input name="ModelViewIT" type="float4x4" default="complex"
+	private="yes">
+      <block location="vertexIn">
+	<uniform type="float4x4" name="ModelViewIT" 
+	  binding="state.matrix.modelview.invtrans" />
+      </block>
+      
+      <block location="vertexMain">
+	ModelViewIT = vertexIn.ModelViewIT;
+      </block>
+    </input>
+    
+    <block location="vertexMain">
+      output = mul (ModelViewIT, float4 (input, 0)).xyz;
+    </block>
+  </coercion>
+  
   <!------------------------------------------------------------------------->
   
   <coercion from="normal_object" to="normal_tangent" cost="3">
