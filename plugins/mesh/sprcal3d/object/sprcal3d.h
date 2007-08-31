@@ -998,7 +998,7 @@ public:
   iSkeletonBone *GetBone (size_t i) {return bones[i];}
   iSkeletonBone *FindBone (const char *name);
   size_t FindBoneIndex (const char *name);
-  iSkeletonAnimation* Execute (const char *scriptname) {return 0;}
+  iSkeletonAnimation* Execute (const char *scriptname, float blend_factor = 0.0f) {return 0;}
   iSkeletonAnimation* Append (const char *scriptname) {return 0;}
   void ClearPendingAnimations () {;}
   size_t GetAnimationsCount () {return 0;}

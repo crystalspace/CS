@@ -130,55 +130,57 @@ void csSkeletonBone::UpdateTransform ()
   }
   else
   {
-    csQuaternion q;
-    float min = 0; float max = 0; float script_factors_total = 0;
-    bool slerp = false; bool updated = false;
-    csVector3 final_pos = csVector3 (0);
+    // blend_factor is a ratio of the existing weights
+    float total_factor = 0;
+    size_t num_anims = 0;
+    // compute the total factor of all running animations
+    for (size_t i = 0; i < scripts_len; i++)
+    {
+      csSkeletonAnimationInstance *script = skeleton->GetRunningScripts ().Get (i);
+      csSkeletonAnimationInstance::TransformHash& transforms = script->GetTransforms ();
+      // does this animation affect this bone?
+      if (transforms.Get (factory_bone, 0))
+      {
+        // accumulate the factors
+        total_factor += script->GetFactor ();
+        num_anims++;
+      }
+    }
+    // now each time we use the blend factor, we will divide it
+    // by total_factor to obtain a ratio
+
+    // the end quaternion used
+    csQuaternion quat;
+    // the final position used
+    csVector3 pos (0);
 
     for (size_t i = 0; i < scripts_len; i++)
     {
       csSkeletonAnimationInstance *script = skeleton->GetRunningScripts ().Get (i);
       csSkeletonAnimationInstance::TransformHash& transforms = script->GetTransforms ();
       bone_transform_data *b_tr = transforms.Get (factory_bone, 0);
-      if (b_tr && (script->GetFactor () > 0))
+      // we can either use the factor of the animation, or if it has none
+      // make sure there are no other factors for any other animations
+      if (b_tr && ((script->GetFactor () > 0) || total_factor <= 0))
       {
-        final_pos += b_tr->pos*script->GetFactor ();
-        script_factors_total += script->GetFactor ();
-        if (slerp)
-        {
-          float max_over_factor = max/script_factors_total;
-          if (script->GetFactor () >= min)
-          {
-            max = script->GetFactor ();
-            q = q.SLerp (b_tr->quat, max_over_factor);
-          }
-          else
-          {
-            min = script->GetFactor ();
-            q = b_tr->quat.SLerp (q, max_over_factor);
-          }
-          script_factors_total = min + max_over_factor;
-        }
+        // interpolation ratio
+        float i;
+        // if anims are using factors then compute this factor as a ratio
+        // compared to the total factor overall
+        if (total_factor > 0)
+          i = script->GetFactor () / total_factor;
+        // else, we can share the animation equally between all running
+        // animations on this bone
         else
-        {
-          slerp = true;
-          min = max = script->GetFactor ();
-          q = b_tr->quat;
-        }
-        updated = true; 
+          i = 1.0f / num_anims;
+        // interpolate the position
+        pos = (pos * (1 - i) + b_tr->pos * i);
+        quat = quat.SLerp (b_tr->quat, i);
       }
     }
-
-    if (updated)
-    {
-      rot_quat = q;
-      if (script_factors_total)
-      {
-        final_pos /= script_factors_total;
-      }
-      next_transform.SetO2T (csMatrix3 (rot_quat));
-      next_transform.SetOrigin (final_pos);
-    }
+    // use the transforms we calculated
+    next_transform.SetO2T (csMatrix3 (quat));
+    next_transform.SetOrigin (pos);
   }
 }
 
@@ -537,7 +539,7 @@ csSkeletonAnimationInstance::csSkeletonAnimationInstance (csSkeletonAnimation* a
   current_frame = -1;
   current_frame_time = 0;
   current_frame_duration = 0;
-  morph_factor = 1;
+  blend_factor = 1;
   time_factor = 1;
   current_frame_duration = 0;
   anim_state = CS_ANIM_STATE_PARSE_NEXT;
@@ -1020,7 +1022,7 @@ iSkeletonBone *csSkeleton::FindBone (const char *name)
   return 0;
 }
 
-iSkeletonAnimation* csSkeleton::Execute (const char *scriptname)
+iSkeletonAnimation* csSkeleton::Execute (const char *scriptname, float blend_factor)
 {
   csSkeletonAnimation* script = (csSkeletonAnimation*)(factory->FindAnimation (
     scriptname));
@@ -1032,6 +1034,7 @@ iSkeletonAnimation* csSkeleton::Execute (const char *scriptname)
 
   csSkeletonAnimationInstance *runnable = new csSkeletonAnimationInstance (
     script, this);
+  runnable->SetFactor (blend_factor);
   running_animations.Push (runnable);
   return script;
 }

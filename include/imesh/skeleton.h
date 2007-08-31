@@ -456,7 +456,7 @@ struct iSkeleton : public virtual iBase
   /**
    * Execute specific animation.
    */
-  virtual iSkeletonAnimation* Execute (const char *animation_name) = 0;
+  virtual iSkeletonAnimation* Execute (const char *animation_name, float blend_factor = 0.0f) = 0;
 
   /**
    * Append animation for execution.

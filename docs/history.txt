@@ -7,6 +7,11 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 31-Aug-2007
+	- Genjix added animation blending to genmeshanim2. Now the there is
+	  Execute("animname", blend_factor). By default this is 0, and if all
+	  running animations for a bone are 0 then it blends equally between
+	  them all, otherwise it computes ratios based on the blend_factor and
+	  the total blend factor of all animations affecting the bone.
 	- Jorrit started removing lots of deprecated stuff in CS.
 	- Jorrit fixed an infinite loop in sprcal3d GetObjectBoundingBox()
 	  for factories.

@@ -453,7 +453,7 @@ public:
   virtual float GetSpeed () { return time_factor; }
   virtual void SetSpeed (float speed)  {time_factor = speed;}
   virtual void SetFactor (float) {}
-  virtual float GetFactor () { return 0; }
+  virtual float GetFactor () { return 1; }
   virtual void SetLoop (bool loop)
   { csSkeletonAnimation::loop = loop; }
   virtual bool GetLoop ()
@@ -513,7 +513,7 @@ private:
   csSkeletonAnimation *animation;
   size_t current_instruction;
   int current_frame;
-  float morph_factor;
+  float blend_factor;
   float time_factor;
   csQuaternion zero_quat;
   int loop_times;
@@ -561,8 +561,8 @@ public:
   ~csSkeletonAnimationInstance ();
 
   const char *GetName () const { return animation->GetName (); }
-  float GetFactor () { return 1; }
-  void SetFactor (float factor) { }
+  float GetFactor () { return blend_factor; }
+  void SetFactor (float factor) { blend_factor = factor; }
   csTicks GetDuration () { return (csTicks) (animation->GetTime () * time_factor); }
   void SetDuration (csTicks time);
   float GetSpeed () {return time_factor; }
@@ -632,7 +632,7 @@ public:
   virtual iSkeletonBone *GetBone (size_t i) { return bones[i]; }
   virtual iSkeletonBone *FindBone (const char *name);
 
-  virtual iSkeletonAnimation* Execute (const char *scriptname);
+  virtual iSkeletonAnimation* Execute (const char *scriptname, float blend_factor = 0.0f);
   virtual iSkeletonAnimation* Append (const char *scriptname);
   virtual void ClearPendingAnimations ()
   { pending_scripts.DeleteAll(); }
