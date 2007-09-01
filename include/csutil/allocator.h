@@ -35,8 +35,8 @@ namespace CS
   {
     /**\page Allocators Memory allocators
      * Several Crystal Space utility classes take optional memory allocators
-     * (e.g. csArray<>). This allows to customize the memory allocation
-     * strategy used in a particular case. 
+     * (e.g. csArray<>). This allows clients to customize the memory 
+     * allocation strategy used in a particular case. 
     
      * For example, if you know that an array has a size below a certain 
      * threshold most of the time, you could utilize a LocalBufferAllocator<>
@@ -58,7 +58,7 @@ namespace CS
      *   invalid for an allocator.
      * - <tt>void* Realloc (void* p, size_t newSize)</tt> "resizes" the block
      *   at \a p to have a size of \a newSize bytes. If \a p is 0 then the call
-     *   shoule have the same effect as an Alloc() with the specifiec size.
+     *   should have the same effect as an Alloc() with the specified size.
      *   Be aware that the returned pointer may be different from \a p! Also, 
      *   if the reallocation fails, 0 is returned - however, the original 
      *   memory block is still valid!
