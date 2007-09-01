@@ -6,6 +6,8 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-Sep-2007
+	- Jorrit removed more deprecated stuff.
 31-Aug-2007
 	- Genjix bumped interface minor version.
 	- Genjix added animation blending to genmeshanim2. Now the there is
