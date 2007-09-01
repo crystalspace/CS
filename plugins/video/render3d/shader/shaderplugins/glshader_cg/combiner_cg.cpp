@@ -510,7 +510,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   
   ShaderCombinerCg::ShaderCombinerCg (ShaderCombinerLoaderCg* loader, 
                                       bool vp, bool fp) : 
-    scfImplementationType (this), loader (loader), writeVP (vp), writeFP (fp)
+    scfImplementationType (this), loader (loader), writeVP (vp), writeFP (fp),
+    uniqueCounter (0)
   {
   }
   
@@ -613,6 +614,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   
   bool ShaderCombinerCg::EndSnippet ()
   {
+    for (size_t n = 0; n < currentSnippet.vert2frag.GetSize(); n++)
+    {
+      iDocumentNode* node = currentSnippet.vert2frag[n];
+      if (node->GetType() == CS_NODE_ELEMENT)
+      {
+        const char* name = node->GetAttributeValue ("name");
+        if (name != 0)
+        {
+          csString uniqueName;
+          uniqueName.Format ("%s_%zu", name, uniqueCounter++);
+          currentSnippet.v2fMaps.PutUnique (name, uniqueName);
+        }
+      }
+    }
+
     snippets.Push (currentSnippet);
     currentSnippet = Snippet ();
     return true;
@@ -682,7 +698,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       appender.Append ("  void dummy() {}\n");
       for (size_t s = 0; s < snippets.GetSize(); s++)
       {
-        AppendProgramInput_V2FDecl (snippets[s].vert2frag, appender);
+        AppendProgramInput_V2FDecl (snippets[s], appender);
       }
       
       appender.Append ("};\n\n");
@@ -716,7 +732,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 	  appender.Append (snippets[s].locals);
           AppendSnippetMap (snippets[s].inputMaps, appender);
 	  appender.Append (snippets[s].vertexBody);
-          AppendProgramInput_V2FVP (snippets[s].vert2frag, appender);
+          AppendProgramInput_V2FVP (snippets[s], appender);
 	  AppendSnippetMap (snippets[s].outputMaps, appender);
 	  appender.Append ("}\n");
 	}
@@ -766,7 +782,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       appender.Append ("  void dummy() {}\n");
       for (size_t s = 0; s < snippets.GetSize(); s++)
       {
-        AppendProgramInput_V2FDecl (snippets[s].vert2frag, appender);
+        AppendProgramInput_V2FDecl (snippets[s], appender);
       }
       
       appender.Append ("};\n\n");
@@ -801,7 +817,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
             appender.Append ("// Locally used names for inputs + outputs\n");
 	  appender.Append (snippets[s].locals);
           AppendSnippetMap (snippets[s].inputMaps, appender);
-          AppendProgramInput_V2FFP (snippets[s].vert2frag, appender);
+          AppendProgramInput_V2FFP (snippets[s], appender);
 	  appender.Append (snippets[s].fragmentBody);
           AppendSnippetMap (snippets[s].outputMaps, appender);
 	  appender.Append ("}\n");
@@ -884,21 +900,38 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   }
   
   void ShaderCombinerCg::AppendProgramInput_V2FDecl (
-    const csRefArray<iDocumentNode>& nodes,
-    DocNodeCgAppender& appender)
+    const Snippet& snippet, DocNodeCgAppender& appender)
   {
     // FIXME: error handling here
-    for (size_t n = 0; n < nodes.GetSize(); n++)
+    for (size_t n = 0; n < snippet.vert2frag.GetSize(); n++)
     {
-      iDocumentNode* node = nodes[n];
+      iDocumentNode* node = snippet.vert2frag[n];
       if (node->GetType() == CS_NODE_ELEMENT)
       {
-        const char* name = node->GetAttributeValue ("name");
-        csString defineName;
-        defineName.Format ("PARAM_vertexToFragment_%s_UNUSED", name);
-        appender.AppendFmt ("#ifndef %s\n", defineName.GetData());
-        AppendProgramInput (node, appender);
-        appender.Append ("#endif\n");
+        csStringID id = loader->xmltokens.Request (node->GetValue());
+        if (id == ShaderCombinerLoaderCg::XMLTOKEN_VARYING)
+        {
+          csString name = node->GetAttributeValue ("name");
+          if (name.IsEmpty()) continue;
+          const csString& uniqueName = snippet.v2fMaps.Get (name, name);
+          csString defineName;
+          defineName.Format ("PARAM_vertexToFragment_%s_UNUSED", 
+            uniqueName.GetData());
+          appender.AppendFmt ("#ifndef %s\n", defineName.GetData());
+	  const char* type = node->GetAttributeValue ("type");
+	  const char* binding = node->GetAttributeValue ("binding");
+	  if (type && *type)
+	  {
+	    csString bindingStr;
+	    if (binding) bindingStr.Format (" : %s", binding);
+	    csString str;
+            str.Format ("varying %s %s%s;\n", 
+              CgType (type).GetData(), uniqueName.GetData(), 
+              bindingStr.GetDataSafe());
+  	    appender.Append (str);
+          }
+          appender.Append ("#endif\n");
+        }
       }
       else
       {
@@ -908,22 +941,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   }
   
   void ShaderCombinerCg::AppendProgramInput_V2FVP (
-    const csRefArray<iDocumentNode>& nodes, DocNodeCgAppender& appender)
+    const Snippet& snippet, DocNodeCgAppender& appender)
   {
     // FIXME: error handling here
-    for (size_t n = 0; n < nodes.GetSize(); n++)
+    for (size_t n = 0; n < snippet.vert2frag.GetSize(); n++)
     {
-      iDocumentNode* node = nodes[n];
+      iDocumentNode* node = snippet.vert2frag[n];
       if (node->GetType() == CS_NODE_ELEMENT)
       {
         csStringID id = loader->xmltokens.Request (node->GetValue());
         if (id == ShaderCombinerLoaderCg::XMLTOKEN_VARYING)
         {
-          const char* name = node->GetAttributeValue ("name");
+          csString name = node->GetAttributeValue ("name");
+          const csString& uniqueName = snippet.v2fMaps.Get (name, name);
           csString defineName;
-          defineName.Format ("PARAM_vertexToFragment_%s_UNUSED", name);
+          defineName.Format ("PARAM_vertexToFragment_%s_UNUSED", 
+            uniqueName.GetData());
           appender.AppendFmt ("#ifndef %s\n", defineName.GetData());
-          appender.AppendFmt ("vertexToFragment.%s = %s;\n", name, name);
+          appender.AppendFmt ("vertexToFragment.%s = %s;\n", 
+            uniqueName.GetData(), name.GetData());
           appender.Append ("#endif\n");
         }
       }
@@ -935,22 +971,25 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   }
   
   void ShaderCombinerCg::AppendProgramInput_V2FFP (
-    const csRefArray<iDocumentNode>& nodes, DocNodeCgAppender& appender)
+    const Snippet& snippet, DocNodeCgAppender& appender)
   {
     // FIXME: error handling here
-    for (size_t n = 0; n < nodes.GetSize(); n++)
+    for (size_t n = 0; n < snippet.vert2frag.GetSize(); n++)
     {
-      iDocumentNode* node = nodes[n];
+      iDocumentNode* node = snippet.vert2frag[n];
       if (node->GetType() == CS_NODE_ELEMENT)
       {
         csStringID id = loader->xmltokens.Request (node->GetValue());
         if (id == ShaderCombinerLoaderCg::XMLTOKEN_VARYING)
         {
-          const char* name = node->GetAttributeValue ("name");
+          csString name = node->GetAttributeValue ("name");
+          const csString& uniqueName = snippet.v2fMaps.Get (name, name);
           csString defineName;
-          defineName.Format ("PARAM_vertexToFragment_%s_UNUSED", name);
+          defineName.Format ("PARAM_vertexToFragment_%s_UNUSED", 
+            uniqueName.GetData());
           appender.AppendFmt ("#ifndef %s\n", defineName.GetData());
-          appender.AppendFmt ("%s = vertexToFragment.%s;\n", name, name);
+          appender.AppendFmt ("%s = vertexToFragment.%s;\n", 
+            name.GetData(), uniqueName.GetData());
           appender.Append ("#endif\n");
         }
       }

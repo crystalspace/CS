@@ -18,7 +18,7 @@
 -->
 <snippet type="compound">
   <technique priority="100">
-    <snippet id="eyeVecWorld" file="/shader/snippets/eye-direction-world3.xml" />
+    <snippet id="eyeVecWorld" file="/shader/snippets/eye-direction-world.xml" />
     
     <snippet id="reflect">
       <technique priority="100">

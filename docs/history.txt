@@ -20,6 +20,9 @@ chronological order.
 	- res made the Cg plugin emit warnings from the Cg compiler in verbose
 	  mode (previously it only reported issues from the compiler when an
 	  error occured).
+	- res made the Cg weaver combiner use unique identifier for 
+	  vertex-to-fragment data to avoid clashes.
+	- res fixed some snippets for that.
 27-Aug-2007
 	- res added a simple beautification step to the Cg weaver combiner.
 	  This makes the synthesized Cg programs more human-readable (and thus

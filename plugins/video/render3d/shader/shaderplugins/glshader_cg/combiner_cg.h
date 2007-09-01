@@ -140,6 +140,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       csRefArray<iDocumentNode> fragmentIn; 
       
       csSet<csString> localIDs;
+      csHash<csString, csString> v2fMaps;
       csString locals;
       csHash<csString, csString> inputMaps;
       csRefArray<iDocumentNode> vertexBody;
@@ -147,6 +148,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       csHash<csString, csString> outputMaps;
       csString links;
     };
+    size_t uniqueCounter;
     csArray<Snippet> snippets;
     Snippet currentSnippet;
     csRefArray<iDocumentNode> variableMaps;
@@ -185,11 +187,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   
     void AppendProgramInput (const csRefArray<iDocumentNode>& nodes, 
       DocNodeCgAppender& appender);
-    void AppendProgramInput_V2FDecl (const csRefArray<iDocumentNode>& nodes, 
+    void AppendProgramInput_V2FDecl (const Snippet& snippet, 
       DocNodeCgAppender& appender);
-    void AppendProgramInput_V2FVP (const csRefArray<iDocumentNode>& nodes, 
+    void AppendProgramInput_V2FVP (const Snippet& snippet, 
       DocNodeCgAppender& appender);
-    void AppendProgramInput_V2FFP (const csRefArray<iDocumentNode>& nodes, 
+    void AppendProgramInput_V2FFP (const Snippet& snippet, 
       DocNodeCgAppender& appender);
     void AppendProgramInput (iDocumentNode* node, DocNodeCgAppender& appender);
     csString CgType (const char* weaverType);

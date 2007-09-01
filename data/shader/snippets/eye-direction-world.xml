@@ -43,7 +43,7 @@
     <block location="cg:vertexMain">
       float4 eyePosObject = ModelViewIT[3];
       float4 eyePosWorld = mul (objectToWorld, eyePosObject);
-      eyeDirectionWorld = normalize (position - eyePosWorld);
+      eyeDirectionWorld = (position - eyePosWorld).xyz;
     </block>
   
     <output name="eyeDirectionWorld" type="direction_world" />
