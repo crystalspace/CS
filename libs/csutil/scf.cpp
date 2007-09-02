@@ -177,7 +177,7 @@ public:
 static scfLibraryVector *LibraryRegistry = 0;
 
 /// A object of this class represents a shared library
-class scfSharedLibrary
+class scfSharedLibrary : public CS::Memory::CustomAllocated
 {
   typedef void (*scfInitFunc)(iSCF*);
   typedef void (*scfFinisFunc)();
@@ -294,7 +294,7 @@ int scfLibraryVector::CompareName (scfSharedLibrary* const& Item,
 }
 
 /// This structure contains everything we need to know about a particular class
-class scfFactory : public iFactory
+class scfFactory : public iFactory, public CS::Memory::CustomAllocated
 {
 public:
   // Class identifier
@@ -396,11 +396,11 @@ scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
    * instance */
   ClassID = classIDs->Register (iClassID);
 #else
-  ClassID = csStrNew (iClassID);
+  ClassID = CS::StrDup (iClassID);
 #endif
-  Description = csStrNew (iDescription);
-  Dependencies = csStrNew (iDepend);
-  FactoryClass = csStrNew (iFactoryClass);
+  Description = CS::StrDup (iDescription);
+  Dependencies = CS::StrDup (iDepend);
+  FactoryClass = CS::StrDup (iFactoryClass);
   CreateFunc = iCreate;
   classContext = context;
   LibraryName =
@@ -434,11 +434,11 @@ scfFactory::~scfFactory ()
 
   if (Library)
     Library->DecRef ();
-  delete [] FactoryClass;
-  delete [] Dependencies;
-  delete [] Description;
+  cs_free (FactoryClass);
+  cs_free (Dependencies);
+  cs_free (Description);
 #ifndef CS_REF_TRACKER
-  delete [] ClassID;
+  cs_free (const_cast<char*> (ClassID));
 #endif
 
   csRefTrackerAccess::TrackDestruction (this, scfRefCount);

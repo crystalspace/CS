@@ -56,7 +56,7 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags,
 
 csGLTextureHandle::~csGLTextureHandle()
 {
-  delete[] origName;
+  cs_free (origName);
 }
 
 
@@ -64,7 +64,7 @@ void csGLTextureHandle::FreeImage ()
 {
   if (image.IsValid()) 
   {
-    origName = csStrNew (image->GetName());
+    origName = CS::StrDup (image->GetName());
     if (IsTransp() && !IsTranspSet())
     {
       int r,g,b;

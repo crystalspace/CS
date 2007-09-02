@@ -216,7 +216,7 @@ public:
 
   /// Set name of the File where it was loaded from.
   void SetFileName (const char* filename)
-  { this->filename = csStrNew(filename); }
+  { this->filename = CS::StrDup(filename); }
 
   virtual size_t GetTicket (const csRenderMeshModes& modes,
       const iShaderVarStack* stacks);
@@ -365,8 +365,8 @@ public:
   /// Set object description
   void SetDescription (const char *desc)
   {
-    delete [] allShaderMeta.description;
-    allShaderMeta.description = csStrNew (desc);
+    cs_free (allShaderMeta.description);
+    allShaderMeta.description = CS::StrDup (desc);
   }
 
   /// Return some info on this shader

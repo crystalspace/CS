@@ -29,16 +29,14 @@
 csVfsCacheManager::csVfsCacheManager (iObjectRegistry* object_reg,
 	const char* vfsdir)
   : scfImplementationType (this), object_reg (object_reg),
-  vfsdir (csStrNew (vfsdir)),
-  vfs (0), current_type (0), current_scope (0), readonly (false)
+  vfsdir (CS::StrDup (vfsdir)),
+  vfs (0), readonly (false)
 {
 }
 
 csVfsCacheManager::~csVfsCacheManager ()
 {
-  delete[] vfsdir;
-  delete[] current_type;
-  delete[] current_scope;
+  cs_free (vfsdir);
 }
 
 iVFS* csVfsCacheManager::GetVFS ()
@@ -64,20 +62,12 @@ void csVfsCacheManager::CacheName (csStringFast<512>& buf, const char* type,
 
 void csVfsCacheManager::SetCurrentType (const char* type)
 {
-  delete[] current_type;
-  if (type)
-    current_type = csStrNew (type);
-  else
-    current_type = 0;
+  current_type = type;
 }
 
 void csVfsCacheManager::SetCurrentScope (const char* scope)
 {
-  delete[] current_scope;
-  if (scope)
-    current_scope = csStrNew (scope);
-  else
-    current_scope = 0;
+  current_scope = scope;
 }
 
 bool csVfsCacheManager::CacheData (const void* data, size_t size,

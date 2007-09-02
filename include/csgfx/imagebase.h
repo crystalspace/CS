@@ -51,7 +51,7 @@ protected:
     scfImplementationType(this, 0), fName(0)
   { }
 public:
-  virtual ~csImageBase() { delete[] fName; }
+  virtual ~csImageBase() { cs_free (fName); }
 
   /* Commented out: should be implemented by all descendants.
   virtual const void *GetImageData () { return 0; }
@@ -63,7 +63,7 @@ public:
 
   virtual void SetName (const char *iName)
   {
-    delete[] fName; fName = csStrNew (iName);
+    cs_free (fName); fName = CS::StrDup (iName);
   }
   virtual const char *GetName () const { return fName; }
 

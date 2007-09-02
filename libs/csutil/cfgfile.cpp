@@ -32,7 +32,7 @@
 
 /* config node */
 
-class csConfigNode
+class csConfigNode : public CS::Memory::CustomAllocated
 {
 public:
   // create a new config node. Set name to 0 to create the initial node.
@@ -79,16 +79,16 @@ private:
 csConfigNode::csConfigNode(const char *Keyname)
 {
   Prev = Next = 0;
-  Name = csStrNew(Keyname);
+  Name = CS::StrDup (Keyname);
   Data = Comment = 0;
 }
 
 csConfigNode::~csConfigNode()
 {
   Remove();
-  delete[] Name;
-  delete[] Data;
-  delete[] Comment;
+  cs_free (Name);
+  cs_free (Data);
+  cs_free (Comment);
 }
 
 const char *csConfigNode::GetName() const
@@ -130,8 +130,8 @@ void csConfigNode::Remove()
 
 void csConfigNode::SetStr(const char *s)
 {
-  delete[] Data;
-  Data = csStrNew(s);
+  cs_free (Data);
+  Data = CS::StrDup (s);
 }
 
 void csConfigNode::SetInt(int n)
@@ -170,8 +170,8 @@ void csConfigNode::SetTuple (iStringArray* Value)
 
 void csConfigNode::SetComment(const char *s)
 {
-  delete[] Comment;
-  Comment = csStrNew(s);
+  cs_free (Comment);
+  Comment = CS::StrDup (s);
 }
 
 const char *csConfigNode::GetStr() const
@@ -441,7 +441,7 @@ csConfigFile::~csConfigFile()
   // deleted there shouldn't be any iterators left.
   CS_ASSERT(Iterators->GetSize () == 0);
   delete Iterators;
-  delete[] Filename;
+  cs_free (Filename);
 }
 
 bool csConfigFile::IsEmpty() const
@@ -462,9 +462,9 @@ iVFS* csConfigFile::GetVFS() const
 
 void csConfigFile::SetFileName(const char *fName, iVFS *vfs)
 {
-  delete[] Filename;
+  cs_free (Filename);
 
-  Filename = csStrNew(fName);
+  Filename = CS::StrDup (fName);
   VFS = vfs;
   Dirty = true;
 }
@@ -597,7 +597,7 @@ void csConfigFile::Clear()
   }
   if (EOFComment)
   {
-    delete[] EOFComment;
+    cs_free (EOFComment);
     EOFComment = 0;
   }
   Dirty = true;
@@ -910,8 +910,8 @@ void csConfigFile::RemoveIterator(csConfigIterator *it) const
 
 void csConfigFile::SetEOFComment(const char *text)
 {
-  delete[] EOFComment;
-  EOFComment = (text ? csStrNew(text) : 0);
+  cs_free (EOFComment);
+  EOFComment = (text ? CS::StrDup(text) : 0);
   Dirty = true;
 }
 
