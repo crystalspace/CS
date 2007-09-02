@@ -11,6 +11,8 @@ chronological order.
 	  used multiple times with the same input all copies are collapsed
 	  into one.
 	- res added a hash computer and comparator for csMD5::Digest.
+	- res fixed the same node collapsing in the shader weaver to add 
+	  proper connections when collapsing two nodes.
 31-Aug-2007
 	- res augmented the Cg weaver combiner to contain a number of simple,
 	  "templated" coercions (for trivial stuff such as normalization).

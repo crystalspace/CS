@@ -996,6 +996,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         while (nodeIt.HasNext () && !found)
         {
           Node* seenNode = nodeIt.Next();
+          if (seenNode->tech == 0) continue;
           
           // Compare if inputs are the same.
           bool inputsEqual = true;
@@ -1037,6 +1038,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
                     (const char*)0);
                 }
               }
+
+              TechniqueGraph::Connection newConn;
+              newConn.from = seenNode->tech;
+              newConn.to = deps[d];
+              graph.AddConnection (newConn);
             }
             graph.RemoveTechnique (node->tech);
             node->tech = 0;
