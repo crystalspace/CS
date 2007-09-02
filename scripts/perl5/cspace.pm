@@ -742,7 +742,6 @@ sub DESTROY {
 *Contains = *cspacec::csStringSet_Contains;
 *Delete = *cspacec::csStringSet_Delete;
 *Empty = *cspacec::csStringSet_Empty;
-*Clear = *cspacec::csStringSet_Clear;
 *GetSize = *cspacec::csStringSet_GetSize;
 *IsEmpty = *cspacec::csStringSet_IsEmpty;
 sub DISOWN {
@@ -11320,7 +11319,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *Contains = *cspacec::iStringSet_Contains;
 *Delete = *cspacec::iStringSet_Delete;
 *Empty = *cspacec::iStringSet_Empty;
-*Clear = *cspacec::iStringSet_Clear;
 *GetSize = *cspacec::iStringSet_GetSize;
 *IsEmpty = *cspacec::iStringSet_IsEmpty;
 *scfGetVersion = *cspacec::iStringSet_scfGetVersion;

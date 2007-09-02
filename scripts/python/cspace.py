@@ -427,7 +427,6 @@ class csStringSet(_object):
     def Contains(*args): return _cspace.csStringSet_Contains(*args)
     def Delete(*args): return _cspace.csStringSet_Delete(*args)
     def Empty(*args): return _cspace.csStringSet_Empty(*args)
-    def Clear(*args): return _cspace.csStringSet_Clear(*args)
     def GetSize(*args): return _cspace.csStringSet_GetSize(*args)
     def IsEmpty(*args): return _cspace.csStringSet_IsEmpty(*args)
 csStringSet_swigregister = _cspace.csStringSet_swigregister
@@ -7429,7 +7428,6 @@ class iStringSet(iBase):
     def Contains(*args): return _cspace.iStringSet_Contains(*args)
     def Delete(*args): return _cspace.iStringSet_Delete(*args)
     def Empty(*args): return _cspace.iStringSet_Empty(*args)
-    def Clear(*args): return _cspace.iStringSet_Clear(*args)
     def GetSize(*args): return _cspace.iStringSet_GetSize(*args)
     def IsEmpty(*args): return _cspace.iStringSet_IsEmpty(*args)
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iStringSet_scfGetVersion
