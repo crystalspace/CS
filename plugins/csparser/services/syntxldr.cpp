@@ -1556,7 +1556,7 @@ bool csTextSyntaxService::WriteKey (iDocumentNode *node, iKeyValuePair *keyvalue
   if (keyvalue->GetEditorOnly ())
     node->SetAttribute ("editoronly", "yes");
   csRef<iStringArray> vnames = keyvalue->GetValueNames ();
-  for (size_t i=0; i<vnames->Length (); i++)
+  for (size_t i=0; i<vnames->GetSize (); i++)
   {
     const char* name = vnames->Get (i);
     node->SetAttribute (name, keyvalue->GetValue (name));

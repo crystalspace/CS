@@ -742,7 +742,6 @@ sub DESTROY {
 *Contains = *cspacec::csStringSet_Contains;
 *Delete = *cspacec::csStringSet_Delete;
 *Empty = *cspacec::csStringSet_Empty;
-*Clear = *cspacec::csStringSet_Clear;
 *GetSize = *cspacec::csStringSet_GetSize;
 *IsEmpty = *cspacec::csStringSet_IsEmpty;
 sub DISOWN {
@@ -1885,6 +1884,7 @@ sub new {
 *Invert = *cspacec::csPlane3_Invert;
 *Normalize = *cspacec::csPlane3_Normalize;
 *FindPoint = *cspacec::csPlane3_FindPoint;
+*FindOrthogonalPoints = *cspacec::csPlane3_FindOrthogonalPoints;
 *ClipPolygon = *cspacec::csPlane3_ClipPolygon;
 *Description = *cspacec::csPlane3_Description;
 *__div__ = *cspacec::csPlane3___div__;
@@ -1971,6 +1971,7 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SegmentPlane = *cspacec::csIntersect2_SegmentPlane;
 *SegmentPlaneNoTest = *cspacec::csIntersect2_SegmentPlaneNoTest;
 *PlanePlane = *cspacec::csIntersect2_PlanePlane;
+*SegmentBox = *cspacec::csIntersect2_SegmentBox;
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csIntersect2(@_);
@@ -7102,7 +7103,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetAnimationControl = *cspacec::iGeneralMeshState_SetAnimationControl;
 *GetAnimationControl = *cspacec::iGeneralMeshState_GetAnimationControl;
 *FindSubMesh = *cspacec::iGeneralMeshState_FindSubMesh;
-*AddSubMesh = *cspacec::iGeneralMeshState_AddSubMesh;
 *scfGetVersion = *cspacec::iGeneralMeshState_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -7586,18 +7586,13 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *Append = *cspacec::iSkeleton_Append;
 *Play = *cspacec::iSkeleton_Play;
 *ClearPendingAnimations = *cspacec::iSkeleton_ClearPendingAnimations;
-*ClearPendingScripts = *cspacec::iSkeleton_ClearPendingScripts;
 *GetAnimationsCount = *cspacec::iSkeleton_GetAnimationsCount;
-*GetScriptsCount = *cspacec::iSkeleton_GetScriptsCount;
 *GetAnimation = *cspacec::iSkeleton_GetAnimation;
-*GetScript = *cspacec::iSkeleton_GetScript;
 *FindAnimation = *cspacec::iSkeleton_FindAnimation;
-*FindScript = *cspacec::iSkeleton_FindScript;
 *FindSocket = *cspacec::iSkeleton_FindSocket;
 *StopAll = *cspacec::iSkeleton_StopAll;
 *Stop = *cspacec::iSkeleton_Stop;
 *GetFactory = *cspacec::iSkeleton_GetFactory;
-*SetScriptCallback = *cspacec::iSkeleton_SetScriptCallback;
 *SetAnimationCallback = *cspacec::iSkeleton_SetAnimationCallback;
 *AddUpdateCallback = *cspacec::iSkeleton_AddUpdateCallback;
 *GetUpdateCallbacksCount = *cspacec::iSkeleton_GetUpdateCallbacksCount;
@@ -7834,11 +7829,9 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetName = *cspacec::iSkeletonFactory_SetName;
 *CreateBone = *cspacec::iSkeletonFactory_CreateBone;
 *CreateAnimation = *cspacec::iSkeletonFactory_CreateAnimation;
-*CreateScript = *cspacec::iSkeletonFactory_CreateScript;
 *FindAnimation = *cspacec::iSkeletonFactory_FindAnimation;
 *GetAnimationsCount = *cspacec::iSkeletonFactory_GetAnimationsCount;
 *GetAnimation = *cspacec::iSkeletonFactory_GetAnimation;
-*FindScript = *cspacec::iSkeletonFactory_FindScript;
 *FindBone = *cspacec::iSkeletonFactory_FindBone;
 *FindBoneIndex = *cspacec::iSkeletonFactory_FindBoneIndex;
 *GetBonesCount = *cspacec::iSkeletonFactory_GetBonesCount;
@@ -11326,7 +11319,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *Contains = *cspacec::iStringSet_Contains;
 *Delete = *cspacec::iStringSet_Delete;
 *Empty = *cspacec::iStringSet_Empty;
-*Clear = *cspacec::iStringSet_Clear;
 *GetSize = *cspacec::iStringSet_GetSize;
 *IsEmpty = *cspacec::iStringSet_IsEmpty;
 *scfGetVersion = *cspacec::iStringSet_scfGetVersion;
@@ -12665,7 +12657,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %OWNER = ();
 %ITERATORS = ();
 *GetSize = *cspacec::iStringArray_GetSize;
-*Length = *cspacec::iStringArray_Length;
 *Push = *cspacec::iStringArray_Push;
 *Pop = *cspacec::iStringArray_Pop;
 *Get = *cspacec::iStringArray_Get;
@@ -12677,7 +12668,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *DeleteIndex = *cspacec::iStringArray_DeleteIndex;
 *Insert = *cspacec::iStringArray_Insert;
 *Empty = *cspacec::iStringArray_Empty;
-*DeleteAll = *cspacec::iStringArray_DeleteAll;
 *IsEmpty = *cspacec::iStringArray_IsEmpty;
 *scfGetVersion = *cspacec::iStringArray_scfGetVersion;
 sub DESTROY {
@@ -15648,7 +15638,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *CreatePlaneGeometry = *cspacec::iDynamicsSystemCollider_CreatePlaneGeometry;
 *CreateMeshGeometry = *cspacec::iDynamicsSystemCollider_CreateMeshGeometry;
 *CreateBoxGeometry = *cspacec::iDynamicsSystemCollider_CreateBoxGeometry;
-*CreateCCylinderGeometry = *cspacec::iDynamicsSystemCollider_CreateCCylinderGeometry;
 *CreateCapsuleGeometry = *cspacec::iDynamicsSystemCollider_CreateCapsuleGeometry;
 *SetCollisionCallback = *cspacec::iDynamicsSystemCollider_SetCollisionCallback;
 *SetFriction = *cspacec::iDynamicsSystemCollider_SetFriction;
@@ -17579,17 +17568,167 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::csPrimitives ##############
+############# Class : cspace::TextureMapper ##############
 
-package cspace::csPrimitives;
+package cspace::TextureMapper;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace );
 %OWNER = ();
 %ITERATORS = ();
-*GenerateBox = *cspacec::csPrimitives_GenerateBox;
-*GenerateQuad = *cspacec::csPrimitives_GenerateQuad;
-*GenerateCapsule = *cspacec::csPrimitives_GenerateCapsule;
-*GenerateSphere = *cspacec::csPrimitives_GenerateSphere;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_TextureMapper($self);
+        delete $OWNER{$self};
+    }
+}
+
+*Map = *cspacec::TextureMapper_Map;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::TableTextureMapper ##############
+
+package cspace::TableTextureMapper;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::TextureMapper cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_TableTextureMapper(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_TableTextureMapper($self);
+        delete $OWNER{$self};
+    }
+}
+
+*Map = *cspacec::TableTextureMapper_Map;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::DensityTextureMapper ##############
+
+package cspace::DensityTextureMapper;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::TextureMapper cspace );
+%OWNER = ();
+%ITERATORS = ();
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_DensityTextureMapper(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_DensityTextureMapper($self);
+        delete $OWNER{$self};
+    }
+}
+
+*Map = *cspacec::DensityTextureMapper_Map;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::Primitives ##############
+
+package cspace::Primitives;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*boxTable = *cspacec::Primitives_boxTable;
+*quadTable = *cspacec::Primitives_quadTable;
+*CS_PRIMBOX_INSIDE = *cspacec::Primitives_CS_PRIMBOX_INSIDE;
+*CS_PRIMBOX_SMOOTH = *cspacec::Primitives_CS_PRIMBOX_SMOOTH;
+*GenerateBox = *cspacec::Primitives_GenerateBox;
+*GenerateQuad = *cspacec::Primitives_GenerateQuad;
+*GenerateTesselatedQuad = *cspacec::Primitives_GenerateTesselatedQuad;
+*GenerateCapsule = *cspacec::Primitives_GenerateCapsule;
+*GenerateSphere = *cspacec::Primitives_GenerateSphere;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_Primitives(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_Primitives($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csPrimitives ##############
+
+package cspace::csPrimitives;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::Primitives cspace );
+%OWNER = ();
+%ITERATORS = ();
 sub new {
     my $pkg = shift;
     my $self = cspacec::new_csPrimitives(@_);
@@ -18177,6 +18316,16 @@ $iSCF_SCF= \%__iSCF_SCF_hash;
 bless $iSCF_SCF, cspace::iSCF;
 *CS_SNDSYS_STREAM_UNKNOWN_LENGTH = *cspacec::CS_SNDSYS_STREAM_UNKNOWN_LENGTH;
 *csInvalidStringID = *cspacec::csInvalidStringID;
+
+my %__Primitives_boxTable_hash;
+tie %__Primitives_boxTable_hash,"cspace::csVector2", $cspacec::Primitives_boxTable;
+$Primitives_boxTable= \%__Primitives_boxTable_hash;
+bless $Primitives_boxTable, cspace::csVector2;
+
+my %__Primitives_quadTable_hash;
+tie %__Primitives_quadTable_hash,"cspace::csVector2", $cspacec::Primitives_quadTable;
+$Primitives_quadTable= \%__Primitives_quadTable_hash;
+bless $Primitives_quadTable, cspace::csVector2;
 
   use Carp;
 

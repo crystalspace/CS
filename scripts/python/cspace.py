@@ -427,7 +427,6 @@ class csStringSet(_object):
     def Contains(*args): return _cspace.csStringSet_Contains(*args)
     def Delete(*args): return _cspace.csStringSet_Delete(*args)
     def Empty(*args): return _cspace.csStringSet_Empty(*args)
-    def Clear(*args): return _cspace.csStringSet_Clear(*args)
     def GetSize(*args): return _cspace.csStringSet_GetSize(*args)
     def IsEmpty(*args): return _cspace.csStringSet_IsEmpty(*args)
 csStringSet_swigregister = _cspace.csStringSet_swigregister
@@ -1116,6 +1115,8 @@ class csPlane3(_object):
     def Invert(*args): return _cspace.csPlane3_Invert(*args)
     def Normalize(*args): return _cspace.csPlane3_Normalize(*args)
     def FindPoint(*args): return _cspace.csPlane3_FindPoint(*args)
+    __swig_getmethods__["FindOrthogonalPoints"] = lambda x: _cspace.csPlane3_FindOrthogonalPoints
+    if _newclass:FindOrthogonalPoints = staticmethod(_cspace.csPlane3_FindOrthogonalPoints)
     def ClipPolygon(*args): return _cspace.csPlane3_ClipPolygon(*args)
     def Description(*args): return _cspace.csPlane3_Description(*args)
     def __imul__(*args): return _cspace.csPlane3___imul__(*args)
@@ -1126,6 +1127,7 @@ class csPlane3(_object):
 csPlane3_swigregister = _cspace.csPlane3_swigregister
 csPlane3_swigregister(csPlane3)
 csPlane3_Classify = _cspace.csPlane3_Classify
+csPlane3_FindOrthogonalPoints = _cspace.csPlane3_FindOrthogonalPoints
 
 class csMath2(_object):
     __swig_setmethods__ = {}
@@ -1186,6 +1188,8 @@ class csIntersect2(_object):
     if _newclass:SegmentPlaneNoTest = staticmethod(_cspace.csIntersect2_SegmentPlaneNoTest)
     __swig_getmethods__["PlanePlane"] = lambda x: _cspace.csIntersect2_PlanePlane
     if _newclass:PlanePlane = staticmethod(_cspace.csIntersect2_PlanePlane)
+    __swig_getmethods__["SegmentBox"] = lambda x: _cspace.csIntersect2_SegmentBox
+    if _newclass:SegmentBox = staticmethod(_cspace.csIntersect2_SegmentBox)
     def __init__(self, *args): 
         this = _cspace.new_csIntersect2(*args)
         try: self.this.append(this)
@@ -1201,6 +1205,7 @@ csIntersect2_LineLine = _cspace.csIntersect2_LineLine
 csIntersect2_SegmentPlane = _cspace.csIntersect2_SegmentPlane
 csIntersect2_SegmentPlaneNoTest = _cspace.csIntersect2_SegmentPlaneNoTest
 csIntersect2_PlanePlane = _cspace.csIntersect2_PlanePlane
+csIntersect2_SegmentBox = _cspace.csIntersect2_SegmentBox
 
 class csPoly2D(_object):
     __swig_setmethods__ = {}
@@ -4727,7 +4732,6 @@ class iGeneralMeshState(iGeneralMeshCommonState):
     def SetAnimationControl(*args): return _cspace.iGeneralMeshState_SetAnimationControl(*args)
     def GetAnimationControl(*args): return _cspace.iGeneralMeshState_GetAnimationControl(*args)
     def FindSubMesh(*args): return _cspace.iGeneralMeshState_FindSubMesh(*args)
-    def AddSubMesh(*args): return _cspace.iGeneralMeshState_AddSubMesh(*args)
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iGeneralMeshState_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iGeneralMeshState_scfGetVersion)
     __swig_destroy__ = _cspace.delete_iGeneralMeshState
@@ -5041,18 +5045,13 @@ class iSkeleton(iBase):
     def Append(*args): return _cspace.iSkeleton_Append(*args)
     def Play(*args): return _cspace.iSkeleton_Play(*args)
     def ClearPendingAnimations(*args): return _cspace.iSkeleton_ClearPendingAnimations(*args)
-    def ClearPendingScripts(*args): return _cspace.iSkeleton_ClearPendingScripts(*args)
     def GetAnimationsCount(*args): return _cspace.iSkeleton_GetAnimationsCount(*args)
-    def GetScriptsCount(*args): return _cspace.iSkeleton_GetScriptsCount(*args)
     def GetAnimation(*args): return _cspace.iSkeleton_GetAnimation(*args)
-    def GetScript(*args): return _cspace.iSkeleton_GetScript(*args)
     def FindAnimation(*args): return _cspace.iSkeleton_FindAnimation(*args)
-    def FindScript(*args): return _cspace.iSkeleton_FindScript(*args)
     def FindSocket(*args): return _cspace.iSkeleton_FindSocket(*args)
     def StopAll(*args): return _cspace.iSkeleton_StopAll(*args)
     def Stop(*args): return _cspace.iSkeleton_Stop(*args)
     def GetFactory(*args): return _cspace.iSkeleton_GetFactory(*args)
-    def SetScriptCallback(*args): return _cspace.iSkeleton_SetScriptCallback(*args)
     def SetAnimationCallback(*args): return _cspace.iSkeleton_SetAnimationCallback(*args)
     def AddUpdateCallback(*args): return _cspace.iSkeleton_AddUpdateCallback(*args)
     def GetUpdateCallbacksCount(*args): return _cspace.iSkeleton_GetUpdateCallbacksCount(*args)
@@ -5214,11 +5213,9 @@ class iSkeletonFactory(iBase):
     def SetName(*args): return _cspace.iSkeletonFactory_SetName(*args)
     def CreateBone(*args): return _cspace.iSkeletonFactory_CreateBone(*args)
     def CreateAnimation(*args): return _cspace.iSkeletonFactory_CreateAnimation(*args)
-    def CreateScript(*args): return _cspace.iSkeletonFactory_CreateScript(*args)
     def FindAnimation(*args): return _cspace.iSkeletonFactory_FindAnimation(*args)
     def GetAnimationsCount(*args): return _cspace.iSkeletonFactory_GetAnimationsCount(*args)
     def GetAnimation(*args): return _cspace.iSkeletonFactory_GetAnimation(*args)
-    def FindScript(*args): return _cspace.iSkeletonFactory_FindScript(*args)
     def FindBone(*args): return _cspace.iSkeletonFactory_FindBone(*args)
     def FindBoneIndex(*args): return _cspace.iSkeletonFactory_FindBoneIndex(*args)
     def GetBonesCount(*args): return _cspace.iSkeletonFactory_GetBonesCount(*args)
@@ -7431,7 +7428,6 @@ class iStringSet(iBase):
     def Contains(*args): return _cspace.iStringSet_Contains(*args)
     def Delete(*args): return _cspace.iStringSet_Delete(*args)
     def Empty(*args): return _cspace.iStringSet_Empty(*args)
-    def Clear(*args): return _cspace.iStringSet_Clear(*args)
     def GetSize(*args): return _cspace.iStringSet_GetSize(*args)
     def IsEmpty(*args): return _cspace.iStringSet_IsEmpty(*args)
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iStringSet_scfGetVersion
@@ -8413,7 +8409,6 @@ class iStringArray(iBase):
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetSize(*args): return _cspace.iStringArray_GetSize(*args)
-    def Length(*args): return _cspace.iStringArray_Length(*args)
     def Push(*args): return _cspace.iStringArray_Push(*args)
     def Pop(*args): return _cspace.iStringArray_Pop(*args)
     def Get(*args): return _cspace.iStringArray_Get(*args)
@@ -8425,7 +8420,6 @@ class iStringArray(iBase):
     def DeleteIndex(*args): return _cspace.iStringArray_DeleteIndex(*args)
     def Insert(*args): return _cspace.iStringArray_Insert(*args)
     def Empty(*args): return _cspace.iStringArray_Empty(*args)
-    def DeleteAll(*args): return _cspace.iStringArray_DeleteAll(*args)
     def IsEmpty(*args): return _cspace.iStringArray_IsEmpty(*args)
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iStringArray_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iStringArray_scfGetVersion)
@@ -10501,7 +10495,6 @@ class iDynamicsSystemCollider(iBase):
     def CreatePlaneGeometry(*args): return _cspace.iDynamicsSystemCollider_CreatePlaneGeometry(*args)
     def CreateMeshGeometry(*args): return _cspace.iDynamicsSystemCollider_CreateMeshGeometry(*args)
     def CreateBoxGeometry(*args): return _cspace.iDynamicsSystemCollider_CreateBoxGeometry(*args)
-    def CreateCCylinderGeometry(*args): return _cspace.iDynamicsSystemCollider_CreateCCylinderGeometry(*args)
     def CreateCapsuleGeometry(*args): return _cspace.iDynamicsSystemCollider_CreateCapsuleGeometry(*args)
     def SetCollisionCallback(*args): return _cspace.iDynamicsSystemCollider_SetCollisionCallback(*args)
     def SetFriction(*args): return _cspace.iDynamicsSystemCollider_SetFriction(*args)
@@ -11806,20 +11799,101 @@ csevJoystickEvent = _cspace.csevJoystickEvent
 CS_LOAD_PLUGIN_ALWAYS = _cspace.CS_LOAD_PLUGIN_ALWAYS
 CS_FX_SETALPHA = _cspace.CS_FX_SETALPHA
 CS_FX_SETALPHA_INT = _cspace.CS_FX_SETALPHA_INT
-class csPrimitives(_object):
+class TextureMapper(_object):
     __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, TextureMapper, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, TextureMapper, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    __swig_destroy__ = _cspace.delete_TextureMapper
+    __del__ = lambda self : None;
+    def Map(*args): return _cspace.TextureMapper_Map(*args)
+TextureMapper_swigregister = _cspace.TextureMapper_swigregister
+TextureMapper_swigregister(TextureMapper)
+
+class TableTextureMapper(TextureMapper):
+    __swig_setmethods__ = {}
+    for _s in [TextureMapper]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, TableTextureMapper, name, value)
+    __swig_getmethods__ = {}
+    for _s in [TextureMapper]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, TableTextureMapper, name)
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _cspace.new_TableTextureMapper(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_TableTextureMapper
+    __del__ = lambda self : None;
+    def Map(*args): return _cspace.TableTextureMapper_Map(*args)
+TableTextureMapper_swigregister = _cspace.TableTextureMapper_swigregister
+TableTextureMapper_swigregister(TableTextureMapper)
+
+class DensityTextureMapper(TextureMapper):
+    __swig_setmethods__ = {}
+    for _s in [TextureMapper]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, DensityTextureMapper, name, value)
+    __swig_getmethods__ = {}
+    for _s in [TextureMapper]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, DensityTextureMapper, name)
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _cspace.new_DensityTextureMapper(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_DensityTextureMapper
+    __del__ = lambda self : None;
+    def Map(*args): return _cspace.DensityTextureMapper_Map(*args)
+DensityTextureMapper_swigregister = _cspace.DensityTextureMapper_swigregister
+DensityTextureMapper_swigregister(DensityTextureMapper)
+
+class Primitives(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, Primitives, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, Primitives, name)
+    __repr__ = _swig_repr
+    __swig_setmethods__["boxTable"] = _cspace.Primitives_boxTable_set
+    __swig_getmethods__["boxTable"] = _cspace.Primitives_boxTable_get
+    if _newclass:boxTable = property(_cspace.Primitives_boxTable_get, _cspace.Primitives_boxTable_set)
+    __swig_setmethods__["quadTable"] = _cspace.Primitives_quadTable_set
+    __swig_getmethods__["quadTable"] = _cspace.Primitives_quadTable_get
+    if _newclass:quadTable = property(_cspace.Primitives_quadTable_get, _cspace.Primitives_quadTable_set)
+    CS_PRIMBOX_INSIDE = _cspace.Primitives_CS_PRIMBOX_INSIDE
+    CS_PRIMBOX_SMOOTH = _cspace.Primitives_CS_PRIMBOX_SMOOTH
+    __swig_getmethods__["GenerateBox"] = lambda x: _cspace.Primitives_GenerateBox
+    if _newclass:GenerateBox = staticmethod(_cspace.Primitives_GenerateBox)
+    __swig_getmethods__["GenerateQuad"] = lambda x: _cspace.Primitives_GenerateQuad
+    if _newclass:GenerateQuad = staticmethod(_cspace.Primitives_GenerateQuad)
+    __swig_getmethods__["GenerateTesselatedQuad"] = lambda x: _cspace.Primitives_GenerateTesselatedQuad
+    if _newclass:GenerateTesselatedQuad = staticmethod(_cspace.Primitives_GenerateTesselatedQuad)
+    __swig_getmethods__["GenerateCapsule"] = lambda x: _cspace.Primitives_GenerateCapsule
+    if _newclass:GenerateCapsule = staticmethod(_cspace.Primitives_GenerateCapsule)
+    __swig_getmethods__["GenerateSphere"] = lambda x: _cspace.Primitives_GenerateSphere
+    if _newclass:GenerateSphere = staticmethod(_cspace.Primitives_GenerateSphere)
+    def __init__(self, *args): 
+        this = _cspace.new_Primitives(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_Primitives
+    __del__ = lambda self : None;
+Primitives_swigregister = _cspace.Primitives_swigregister
+Primitives_swigregister(Primitives)
+Primitives_GenerateBox = _cspace.Primitives_GenerateBox
+Primitives_GenerateQuad = _cspace.Primitives_GenerateQuad
+Primitives_GenerateTesselatedQuad = _cspace.Primitives_GenerateTesselatedQuad
+Primitives_GenerateCapsule = _cspace.Primitives_GenerateCapsule
+Primitives_GenerateSphere = _cspace.Primitives_GenerateSphere
+
+class csPrimitives(Primitives):
+    __swig_setmethods__ = {}
+    for _s in [Primitives]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, csPrimitives, name, value)
     __swig_getmethods__ = {}
+    for _s in [Primitives]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csPrimitives, name)
     __repr__ = _swig_repr
-    __swig_getmethods__["GenerateBox"] = lambda x: _cspace.csPrimitives_GenerateBox
-    if _newclass:GenerateBox = staticmethod(_cspace.csPrimitives_GenerateBox)
-    __swig_getmethods__["GenerateQuad"] = lambda x: _cspace.csPrimitives_GenerateQuad
-    if _newclass:GenerateQuad = staticmethod(_cspace.csPrimitives_GenerateQuad)
-    __swig_getmethods__["GenerateCapsule"] = lambda x: _cspace.csPrimitives_GenerateCapsule
-    if _newclass:GenerateCapsule = staticmethod(_cspace.csPrimitives_GenerateCapsule)
-    __swig_getmethods__["GenerateSphere"] = lambda x: _cspace.csPrimitives_GenerateSphere
-    if _newclass:GenerateSphere = staticmethod(_cspace.csPrimitives_GenerateSphere)
     def __init__(self, *args): 
         this = _cspace.new_csPrimitives(*args)
         try: self.this.append(this)
@@ -11828,10 +11902,6 @@ class csPrimitives(_object):
     __del__ = lambda self : None;
 csPrimitives_swigregister = _cspace.csPrimitives_swigregister
 csPrimitives_swigregister(csPrimitives)
-csPrimitives_GenerateBox = _cspace.csPrimitives_GenerateBox
-csPrimitives_GenerateQuad = _cspace.csPrimitives_GenerateQuad
-csPrimitives_GenerateCapsule = _cspace.csPrimitives_GenerateCapsule
-csPrimitives_GenerateSphere = _cspace.csPrimitives_GenerateSphere
 
 CS_QUERY_REGISTRY = _cspace.CS_QUERY_REGISTRY
 CS_QUERY_REGISTRY_TAG_INTERFACE = _cspace.CS_QUERY_REGISTRY_TAG_INTERFACE

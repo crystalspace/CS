@@ -6,8 +6,6 @@
   </variables>
 
   <plugins>
-    <plugin name="thingFact">crystalspace.mesh.loader.factory.thing</plugin>
-    <plugin name="thing">crystalspace.mesh.loader.thing</plugin>
     <plugin name="genmeshFactory">crystalspace.mesh.loader.factory.genmesh</plugin>
     <plugin name="genmesh">crystalspace.mesh.loader.genmesh</plugin>
     <plugin name="terrainFact">crystalspace.mesh.loader.factory.terrain</plugin>

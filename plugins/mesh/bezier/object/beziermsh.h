@@ -644,7 +644,6 @@ public:
 
   /** \name iObjectModel implementation
    * @{ */
-  void GetObjectBoundingBox (csBox3& box) { box = GetBoundingBox (); }
   const csBox3& GetObjectBoundingBox () { return GetBoundingBox (); }
   void SetObjectBoundingBox (const csBox3& box) { SetBoundingBox (box); }
   /** @} */

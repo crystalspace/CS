@@ -409,7 +409,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
           //only calculate last, other have no effect
           const size_t lightNum = csMin((size_t)lightsActive, numLights)-1;
 
-          if ((disableMask.Length() <= lightNum) 
+          if ((disableMask.GetSize() <= lightNum) 
             || !disableMask.IsBitSet (lightNum))
           {
             csLightProperties light (lightNum, shaderPlugin->lsvCache, stack);
@@ -425,7 +425,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
           LightMixmode useMixMode = LIGHTMIXMODE_ADD;
           for (size_t i = 0; i < (csMin((size_t)lightsActive, numLights)); i++)
           {
-            if ((disableMask.Length() > i) && disableMask.IsBitSet (i))
+            if ((disableMask.GetSize() > i) && disableMask.IsBitSet (i))
             {
               useMixMode = lightMixMode;
               continue;

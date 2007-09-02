@@ -213,11 +213,6 @@ public:
     iMovable* movable, uint32 frustum_mask);
 
   //--------------------- For csMeshObject ------------------------------//
-  virtual void GetObjectBoundingBox (csBox3& bbox)
-  {
-    Prepare ();
-    bbox = object_bbox;
-  }
   virtual const csBox3& GetObjectBoundingBox ()
   {
     Prepare ();

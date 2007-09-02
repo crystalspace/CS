@@ -83,7 +83,7 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
   csRef<iPluginManager> plugin_mgr (
   	csQueryRegistry<iPluginManager> (object_reg));
 
-  xwin = CS_LOAD_PLUGIN (plugin_mgr, CS_XWIN_SCF_ID, iXWindow);
+  xwin = csLoadPlugin<iXWindow> (plugin_mgr, CS_XWIN_SCF_ID);
   if (!xwin)
   {
     Report (CS_REPORTER_SEVERITY_ERROR,
@@ -96,8 +96,8 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
   bool do_shm;
   // Query system settings
   csConfigAccess Config(object_reg, "/config/video.cfg");
-  csRef<iCommandLineParser> cmdline (
-						   csQueryRegistry<iCommandLineParser> (object_reg));
+  csRef<iCommandLineParser> cmdline = csQueryRegistry<iCommandLineParser> (
+    object_reg);
   sim_depth = Config->GetInt ("Video.SimulateDepth", 0);
 
   do_shm = Config->GetBool ("Video.XSHM", true);
@@ -110,7 +110,7 @@ bool csGraphics2DXLib::Initialize (iObjectRegistry *object_reg)
     if (XQueryExtension (dpy, CS_XEXT_SHM,
 			&opcode, &first_event, &first_error))
     {
-      xshm = CS_LOAD_PLUGIN (plugin_mgr, CS_XEXT_SHM_SCF_ID, iXExtSHM);
+      xshm = csLoadPlugin<iXExtSHM> (plugin_mgr, CS_XEXT_SHM_SCF_ID);
       if (xshm)
 	xshm->SetDisplayScreen (dpy, screen_num);
     }

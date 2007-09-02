@@ -58,7 +58,7 @@ csGLShader_CG::csGLShader_CG (iBase* parent) :
 
 csGLShader_CG::~csGLShader_CG()
 {
-  delete[] dumpDir;
+  cs_free (dumpDir);
   cgDestroyContext (context);
 }
 
@@ -334,7 +334,7 @@ bool csGLShader_CG::Open()
 
   debugDump = config->GetBool ("Video.OpenGL.Shader.Cg.DebugDump", false);
   if (debugDump)
-    dumpDir = csStrNew (config->GetStr ("Video.OpenGL.Shader.Cg.DebugDumpDir",
+    dumpDir = CS::StrDup (config->GetStr ("Video.OpenGL.Shader.Cg.DebugDumpDir",
     "/tmp/cgdump/"));
  
   // Determining what profile to use:

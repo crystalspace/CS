@@ -306,14 +306,16 @@ bool csSndSysRendererSoftware::Initialize (iObjectRegistry *obj_reg)
   // Try to load the specified driver exactly as specified
   DriverFullName=drv;
   RecordEvent(SSEL_DEBUG, "Attempting to load driver plugin [%s]", DriverFullName.GetData());
-  m_pSoundDriver = CS_LOAD_PLUGIN (plugin_mgr, DriverFullName.GetData(), iSndSysSoftwareDriver);
+  m_pSoundDriver = csLoadPlugin<iSndSysSoftwareDriver> (plugin_mgr,
+    DriverFullName.GetData());
 
   // Try to load the driver with "crystalspace.sndsys.software.driver." prepended
   if (!m_pSoundDriver)
   {
     DriverFullName.Format("crystalspace.sndsys.software.driver.%s", drv);
     RecordEvent(SSEL_DEBUG, "Attempting to load driver plugin [%s]", DriverFullName.GetData());
-    m_pSoundDriver = CS_LOAD_PLUGIN (plugin_mgr, DriverFullName.GetData(), iSndSysSoftwareDriver);
+    m_pSoundDriver = csLoadPlugin<iSndSysSoftwareDriver> (plugin_mgr,
+      DriverFullName.GetData());
   }
 
   // If we still failed, report an error

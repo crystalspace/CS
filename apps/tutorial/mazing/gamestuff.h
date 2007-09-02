@@ -116,9 +116,10 @@ public:
   bool IsSpaceFree (const RoomCoordinate& rc) const;
 
   bool CreateGeometry ();
-  bool CreateWallOrPortal (iThingFactoryState* factory_state,
+  bool CreateWallOrPortal (iGeneralFactoryState* factory_state,
   	const csVector3& v1, const csVector3& v2,
   	const csVector3& v3, const csVector3& v4,
+	CS::Geometry::TextureMapper* mapper,
 	bool do_portal,
 	const RoomCoordinate& source,
 	const RoomCoordinate& dest);

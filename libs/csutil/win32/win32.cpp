@@ -153,17 +153,13 @@ public:
 //static Win32Assistant* GLOBAL_ASSISTANT = 0;
 static csRefArray<Win32Assistant> assistants;
 
-static inline void ToLower (char *dst, const char *src) 
+static void ToLower (csString& s)
 {
-  char *d=dst;
-  const char *s=src;
-  for(; *s; s++, d++) {
-    *d = (char)tolower(*s);
-  }
-  *d=0;
+  for (size_t i = 0; i < s.Length(); i++)
+    s[i] = tolower (s[i]);
 }
 
-static inline bool AddToPathEnv (csString dir, char **pathEnv)
+static inline bool AddToPathEnv (csString dir, csString& pathEnv)
 {
   // check if installdir is in the path.
   bool gotpath = false;
@@ -172,23 +168,23 @@ static inline bool AddToPathEnv (csString dir, char **pathEnv)
   // csGetInstallDir() might return "" (current dir)
   if (dlen != 0)
   {
-    dir.Downcase();
+    ToLower (dir);
   
-    if (*pathEnv)
+    if (!pathEnv.IsEmpty())
     {
-      char *mypath = new char[strlen(*pathEnv) + 1];
-      ToLower (mypath, *pathEnv);
+      csString mypath (pathEnv);
+      ToLower (mypath);
 
-      char* ppos = strstr (mypath, dir);
+      const char* ppos = strstr (mypath.GetData(), dir);
       while (!gotpath && ppos)
       {
-        char* npos = strchr (ppos, ';');
-        if (npos) *npos = 0;
+        const char* npos = strchr (ppos, ';');
+        size_t len = npos ? npos - ppos : strlen (ppos);
 
-        if ((strlen (ppos) == dlen) || (strlen (ppos) == dlen+1))
+        if ((len == dlen) || (len == dlen+1))
         {
-	  if (ppos[dlen] == '\\') ppos[dlen] = 0;
-	  if (!strcmp (ppos, dir))
+          if (ppos[len] == '\\') len--;
+	  if (!strncmp (ppos, dir, len))
 	  {
 	    // found it
 	    gotpath = true;
@@ -196,18 +192,16 @@ static inline bool AddToPathEnv (csString dir, char **pathEnv)
         }
         ppos = npos ? strstr (npos+1, dir) : 0;
       }
-      delete[] mypath;
     }
 
     if (!gotpath)
     {
       // put CRYSTAL path into PATH environment.
-      char *newpath = new char[(*pathEnv?strlen(*pathEnv):0) + strlen(dir) + 2];
-      strcpy (newpath, dir);
-      strcat (newpath, ";");
-      if (*pathEnv) strcat (newpath, *pathEnv);
-      delete[] *pathEnv;
-      *pathEnv = newpath;
+      csString newpath;
+      newpath.Append (dir);
+      newpath.Append (";");
+      newpath.Append (pathEnv);
+      pathEnv = newpath;
       return true;
     }
   }
@@ -272,16 +266,15 @@ bool csPlatformStartup(iObjectRegistry* r)
 
   if (needPATHpatch)
   {
-    char* pathEnv = csStrNew (getenv("PATH"));
+    csString pathEnv (getenv("PATH"));
     bool pathChanged = false;
 
     for (size_t i = 0; i < pluginpaths->Length(); i++)
     {
       // @@@ deal with path recursion here?
-      if (AddToPathEnv ((*pluginpaths)[i].path, &pathEnv)) pathChanged = true;
+      if (AddToPathEnv ((*pluginpaths)[i].path, pathEnv)) pathChanged = true;
     }
     if (pathChanged) SetEnvironmentVariable ("PATH", pathEnv);
-    delete[] pathEnv;
   }
 
   delete pluginpaths;

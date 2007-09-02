@@ -16,6 +16,10 @@ chronological order.
 	- res fixed coerce chain creation in the Cg weaver combiner: chains
 	  could get complicated (e.g. A->B->A->C where A->C would suffice)
 	  and were incorrectly returned (the 1st and 2nd step were the same).
+	- res changed csStrNew()/new char[] to CS::StrDup()/cs_malloc() in a
+	  few places.
+1-Sep-2007
+	- Jorrit removed more deprecated stuff.
 31-Aug-2007
 	- res augmented the Cg weaver combiner to contain a number of simple,
 	  "templated" coercions (for trivial stuff such as normalization).
@@ -33,6 +37,51 @@ chronological order.
 	- res made the Cg weaver combiner use unique identifier for 
 	  vertex-to-fragment data to avoid clashes.
 	- res fixed some snippets for that.
+	- Genjix bumped interface minor version.
+	- Genjix added animation blending to genmeshanim2. Now the there is
+	  Execute("animname", blend_factor). By default this is 0, and if all
+	  running animations for a bone are 0 then it blends equally between
+	  them all, otherwise it computes ratios based on the blend_factor and
+	  the total blend factor of all animations affecting the bone.
+	- Jorrit started removing lots of deprecated stuff in CS.
+	- Jorrit fixed an infinite loop in sprcal3d GetObjectBoundingBox()
+	  for factories.
+	- Jorrit did more deprecation removals (including legacy submesh
+	  support in genmesh).
+	- Jorrit did more deprecation removals (including SCF_QUERY_INTERFACE,
+	  CS_QUERY_REGISTRY and related).
+	- Jorrit did more deprecation removals (including CS_LOAD_PLUGIN
+	  and related).
+	- Jorrit did more deprecation removals.
+	- Jorrit fixed several parts in CS for the recent deprecation removals.
+	- Jorrit fixed a few warnings.
+30-Aug-2007
+	- Genjix added api documentation about iSkeleton::SetTransformMode (...)
+	- Genjix added joystick define to initapp.h (CS_REQUEST_JOYSTICK)
+	- Genjix hid public data member and added an accessor instead.
+	- Genjix removed useless line of code from csSkeleton.
+	- Genjix replaced type integer with an easier to understand
+	  enum value.
+29-Aug-2007
+	- Piotr changed remaining Win32 call to *A version.
+	- res reverted r27508, but also made sure all Win32 calls are
+	  explicitly using the *A versions of functions.
+	- res updated the winlibs version link for 1.2_002.
+28-Aug-2007
+	- res made the CS::Geometry::TextureMapper destructor virtual (to
+	  silence a gcc complaint).
+	- res marked the new CS::Geometry::Primitive and TextureMapper stuff
+	  as dllexported.
+	- res added a missing include to wxtest, as found by DaHoC.
+	- res added a missing "msvc warning off" include to thing.h, fixing
+	  some MSVC #pragma warnings.
+	- res added a page about allocators, better specifying what the
+	  methods an allocator must provide and how they should behave.
+	  Updated some allocators to follow that specification.
+	- res fixed csArray<> to properly deal with allocator Realloc()
+	  calls returning 0.
+	- Vincent changed joywin plugin so that it doesn't assert when there's
+	  no window. Fixes crash when used with null renderer (trac #369).
 27-Aug-2007
 	- res added a simple beautification step to the Cg weaver combiner.
 	  This makes the synthesized Cg programs more human-readable (and thus
@@ -43,6 +92,46 @@ chronological order.
 	- res made another optimization to the RM: the "used shader variables"
 	  is not recomputed again if subsequent meshes have the same shader/
 	  ticket.
+	- Jorrit added ptpdlight to 'jam walkall'.
+24-Aug-2007
+	- Jorrit ran gemneshify on nearly all levels in CS. All usage of
+	  thing has been eliminated.
+	- Jorrit changed simplept to use genmesh instead of thing.
+	- Jorrit removed the infinite maze from walktest. It was broken
+	  anyway and removing it is the fastest way to remove the usage
+	  of thing :-)
+	- Jorrit deprecated thing.
+23-Aug-2007
+	- Jorrit completely rewrote the GeneralMeshBuilder class and split
+	  every primitive in its own class. This simplifies the usage
+	  considerably and is better design in general. New classes (in
+	  namespace CS::Geometry) are now:
+	    - Box
+	    - TesselatedBox
+	    - TesselatedQuad
+	    - Capsule
+	    - Sphere
+	- Jorrit deprecated iEngine->CreateSectorWallsMesh() and
+	  iEngine->CreateThingMesh().
+	- Jorrit removed (nearly) all uses of CreateThingMesh() and
+	  CreateSectorWallsMesh() in CS.
+	- Jorrit removed usage of CreateSectorWallsMesh() in mazing tutorial
+	  (code and documentation).
+22-Aug-2007
+	- Jorrit deprecated csPrimitives and added CS::Geometry::Primitives
+	  instead.
+	- Jorrit added csPlane3::FindOrthogonalPoints().
+	- Jorrit added a new CS::Geometry::DensityTextureMapper class
+	  which computes texture mapping on a surface based on fixed
+	  density.
+	- Jorrit fixed a texture mapping bug in Primitives::GenerateQuad().
+	- Jorrit added GeneralMeshBuilder::GenerateTesselatedQuad().
+	- Jorrit renamed GeneralMeshBuilder::GenerateBla() methods to Bla().
+	- Jorrit modified simple1 and simple2 to use the new
+	  GeneralMeshBuilder. Also modified the tutorial documentation
+	  for this.
+21-Aug-2007
+	- Marten rewrote the way lighter2 handles border elements.
 20-Aug-2007
 	- res fixed an issue in the shader weaver where sometimes the same 
 	  output of a node was used twice, tho it shouldn't have.
@@ -55,6 +144,12 @@ chronological order.
 	- res added a glassy teapot to parallaxtest.
 	- res made a small optimization to the RM rendering: multiple meshes
 	  with the same shader + ticket are now rendered in "bulk".
+	- Jorrit fixed decals so they work fine on 64-bit.
+	- Jorrit added CS::Geometry::TextureMapper. This class works
+	  together with csPrimitives so that you can specify alternative
+	  ways to do the texture mapping for the generated primites.
+	  Also extended the GeneralMeshBuilder functions with a texture
+	  mapper parameter.
 17-Aug-2007
 	- res augmented iView to support mesh filtering.
 	- res fixed cubemap support in the gl3d fbo render-to-texture path.
@@ -73,6 +168,10 @@ chronological order.
 	- res added a weaver-based shader that reflects the environment.
 	- res made the "reflect" shader use the new environment texture.
 	- res updated walktest to use the render manager.
+	- Jorrit fixed a bug in genmesh. Decals didn't work on submeshes.
+	  This prevented decals from working on levels treated with
+	  lighter2.
+	- Jorrit fixed a crash bug in lighter2.
 15-Aug-2007
 	- res made CS::RenderManager::RenderView dllexported.
 	- res fixed an uninitialized struct member in glshader_fixed.
@@ -88,11 +187,31 @@ chronological order.
 	  ticket from a shader.
 	- Marten did some initial work on simple portals in the RM branch.
 	- res fixed TinyXML to build on gcc 4.1.2 again (issue found by Darek).
+	- Jorrit added iEngine->CreateGenMesh() and
+	  iEngine->CreateGenMeshFactory() (alternative to the current
+	  iEngine->CreateThingMesh()).
+	- Jorrit added csGeneralMeshPrimitives class. This class complements
+	  csPrimitives with the ability to directly populate a genmesh
+	  factory.
+	- Jorrit added an optional 'flags' parameter to
+	  csPrimitives::GenerateBox() so that you can create a box visible from
+	  the inside and also can disable the smooth option for normals.
+	- Jorrit added (ifdeffed out) a first try at converting simple1 to
+	  use this instead of a thing for the room.
+	- res made the fractional element areas in lighter2 swappable. (On
+	  large levels they can account for a significant portion of the
+	  used memory).
+	- Jorrit put csGeneralMeshPrimitives into the new namespace
+	  CS::Geometry. Also renamed it to GeneralMeshBuilder.
+	- Jorrit removed the new iEngine functions (CreateGenMesh() and
+	  CreateGenMeshFactory()) and added CS::Geometry::GeneralMeshBuilder
+	  functions CreateMesh() and CreateFactory().
 12-Aug-2007
 	- res added CS::SubRectangles::IsEmpty().
 	- res sped up the lighter2 object lightmap layouting. (Replaced a
 	  linear search with a binary search when determining the primitives
 	  that can be layouted together.)
+	- res fixed TinyXML to build on gcc 4.1.2 again (issue found by Darek).
 11-Aug-2007
 	- res changed csFixedSizeAllocator<> to allow construction from a
 	  given memory allocator.

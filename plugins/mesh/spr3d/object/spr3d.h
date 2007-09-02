@@ -632,7 +632,6 @@ public:
   void SetupLODListeners (iSharedVariable* varm, iSharedVariable* vara);
 
   void SetupFactory ();
-  void GetObjectBoundingBox (csBox3& bbox);
   const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3 &cent);
@@ -1378,7 +1377,6 @@ public:
   void ClearLODListeners ();
   void SetupLODListeners (iSharedVariable* varm, iSharedVariable* vara);
 
-  void GetObjectBoundingBox (csBox3& bbox);
   const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3 &cent);

@@ -77,7 +77,7 @@ csArchive::csArchive (const char *filename)
 {
   comment = 0;
   comment_length = 0;
-  csArchive::filename = csStrNew (filename);
+  csArchive::filename = CS::StrDup (filename);
 
   file = fopen (filename, "rb");
   if (!file)       			/* Create new archive file */
@@ -88,8 +88,8 @@ csArchive::csArchive (const char *filename)
 
 csArchive::~csArchive ()
 {
-  delete [] filename;
-  delete [] comment;
+  cs_free (filename);
+  cs_free (comment);
   if (file) fclose (file);
 
   size_t i;
@@ -329,7 +329,7 @@ bool csArchive::ReadArchiveComment (FILE *infile, size_t zipfile_comment_length)
 {
   if (comment && (comment_length != zipfile_comment_length))
   {
-    delete [] comment;
+    cs_free (comment);
     comment = 0;
   }
 
@@ -338,7 +338,7 @@ bool csArchive::ReadArchiveComment (FILE *infile, size_t zipfile_comment_length)
     return true;
 
   if (!comment)
-    comment = new char [zipfile_comment_length];
+    comment = (char*)cs_malloc (zipfile_comment_length);
   return (fread (comment, 1, zipfile_comment_length, infile) ==
   	zipfile_comment_length);
 }
@@ -564,10 +564,10 @@ bool csArchive::WriteZipArchive ()
       if (!ReadLFH (lfh, file))
         goto temp_failed;
 
-      char *this_name = new char[lfh.filename_length + 1];
+      char *this_name = (char*)cs_malloc (lfh.filename_length + 1);
       if (fread (this_name, 1, lfh.filename_length, file) < lfh.filename_length)
       {
-        delete [] this_name;
+        cs_free (this_name);
         goto temp_failed;
       }
       this_name[lfh.filename_length] = 0;
@@ -577,7 +577,7 @@ bool csArchive::WriteZipArchive ()
 skip_entry:
         bytes_to_skip = lfh.extra_field_length + lfh.csize;
         bytes_to_copy = 0;
-        delete [] this_name;
+        cs_free (this_name);
       }
       else
       {
@@ -593,7 +593,7 @@ skip_entry:
            */
           goto skip_entry;
 
-        delete [] this_name;
+        cs_free (this_name);
         if (this_file->info.csize != lfh.csize)
           goto temp_failed;   /* Broken archive */
         this_file->ReadExtraField (file, lfh.extra_field_length);
@@ -895,8 +895,7 @@ bool csArchive::WriteECDR (ZIP_end_central_dir_record & ecdr, FILE *outfile)
 csArchive::ArchiveEntry::ArchiveEntry (const char *name,
   ZIP_central_directory_file_header &cdfh)
 {
-  filename = new char[strlen (name) + 1];
-  strcpy (filename, name);
+  filename = CS::StrDup (name);
   info = cdfh;
   buffer = 0;
   extrafield = 0;
@@ -909,9 +908,9 @@ csArchive::ArchiveEntry::ArchiveEntry (const char *name,
 csArchive::ArchiveEntry::~ArchiveEntry ()
 {
   FreeBuffer ();
-  delete [] comment;
-  delete [] extrafield;
-  delete [] filename;
+  cs_free (comment);
+  cs_free (extrafield);
+  cs_free (filename);
 }
 
 void csArchive::ArchiveEntry::FreeBuffer ()
@@ -1031,14 +1030,14 @@ bool csArchive::ArchiveEntry::ReadExtraField (FILE *infile,
 {
   if (extrafield && (info.extra_field_length != extra_field_length))
   {
-    delete [] extrafield;
+    cs_free (extrafield);
     extrafield = 0;
   }
   info.extra_field_length = (ush)extra_field_length;
   if (extra_field_length)
   {
     if (!extrafield)
-      extrafield = new char[extra_field_length];
+      extrafield = (char*)cs_malloc (extra_field_length);
     return (fread (extrafield, 1, extra_field_length, infile) ==
     	extra_field_length);
   }
@@ -1050,14 +1049,14 @@ bool csArchive::ArchiveEntry::ReadFileComment (FILE *infile,
 {
   if (comment && (info.file_comment_length != file_comment_length))
   {
-    delete [] comment;
+    cs_free (comment);
     comment = 0;
   }
   info.file_comment_length = (ush)file_comment_length;
   if (file_comment_length)
   {
     if (!comment)
-      comment = new char[file_comment_length];
+      comment = (char*)cs_malloc (file_comment_length);
     return (fread (comment, 1, file_comment_length, infile) ==
     	file_comment_length);
   }

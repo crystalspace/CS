@@ -432,12 +432,12 @@ void csTerrainCell::LerpHelper (const csVector2& pos, int& x1, int& x2,
   if (x > gridWidth - 1) x = gridWidth - 1;
   if (y > gridHeight - 1) y = gridHeight - 1;
 
-  x1 = floorf (x);
-  x2 = ceilf (x);
+  x1 = int (floorf (x));
+  x2 = int (ceilf (x));
   xfrac = x - x1;
 
-  y1 = floorf (y);
-  y2 = ceilf (y);
+  y1 = int (floorf (y));
+  y2 = int (ceilf (y));
   yfrac = y - y1;
 }
 

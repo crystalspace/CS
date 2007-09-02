@@ -1206,6 +1206,9 @@ csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
 			     iStreamSource*,
 			     iLoaderContext* ldr_context, iBase* context)
 {
+  synldr->Report ("crystalspace.thingloader.parse",
+		CS_REPORTER_SEVERITY_WARNING,
+		node, "Thing objects are deprecated! Please use genmesh instead!");
   ThingLoadInfo info;
   info.load_factory = false;
   info.global_factory = false;
@@ -1286,6 +1289,9 @@ csPtr<iBase> csThingFactoryLoader::Parse (iDocumentNode* node,
 			     iStreamSource*,
 			     iLoaderContext* ldr_context, iBase*)
 {
+  synldr->Report ("crystalspace.thingloader.parse",
+		CS_REPORTER_SEVERITY_WARNING,
+		node, "Thing objects are deprecated! Please use genmesh instead!");
   ThingLoadInfo info;
   info.load_factory = true;
   info.global_factory = false;

@@ -717,13 +717,6 @@ struct iDynamicsSystemCollider : public virtual iBase
   /// Create Collider Geometry with given box (given by its size)
   virtual bool CreateBoxGeometry (const csVector3& box_size) = 0;
 
-  /**
-   * Create Collider Geometry with Cylinder (given by its length and radius).
-   * \deprecated CreateCCylinderGeometry is deprecated, use CreateCapsuleGeometry instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("CreateCCylinderGeometry is deprecated, use CreateCapsuleGeometry instead")
-  virtual bool CreateCCylinderGeometry (float length, float radius) = 0;
-  
   /// Create Capsule Collider Geometry.
   virtual bool CreateCapsuleGeometry (float length, float radius) = 0;
 

@@ -104,14 +104,6 @@ public:
    */
   void Empty ();
 
-  /**
-   * Remove all stored strings.
-   * \deprecated Use Empty() instead.
-   */
-  /*CS_DEPRECATED_METHOD("Use Empty() instead.")*/
-  void Clear ()
-  { Empty(); }
-
   /// Get the number of elements in the hash.
   size_t GetSize () const
   { return registry.GetSize (); }

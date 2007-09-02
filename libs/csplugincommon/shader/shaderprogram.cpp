@@ -388,10 +388,10 @@ csPtr<iDataBuffer> csShaderProgram::GetProgramData ()
 
   if (programNode.IsValid())
   {
-    char* data = csStrNew (programNode->GetContentsValue ());
+    char* data = CS::StrDup (programNode->GetContentsValue ());
 
     csRef<iDataBuffer> newbuff;
-    newbuff.AttachNew (new csDataBuffer (data, data ? strlen (data) : 0));
+    newbuff.AttachNew (new CS::DataBuffer<> (data, data ? strlen (data) : 0));
     return csPtr<iDataBuffer> (newbuff);
   }
 

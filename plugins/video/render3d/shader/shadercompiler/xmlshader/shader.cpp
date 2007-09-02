@@ -326,7 +326,7 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler,
     wrappedNode.AttachNew (compiler->wrapperFact->CreateWrapper (source, 
     resolver, resolver->evaluator, extraNodes, 0));
   shaderSource = wrappedNode;
-  vfsStartDir = csStrNew (compiler->vfs->GetCwd ());
+  vfsStartDir = CS::StrDup (compiler->vfs->GetCwd ());
 
   //Load global shadervars block
   csRef<iDocumentNode> varNode = shaderSource->GetNode(
@@ -350,10 +350,10 @@ csXMLShader::~csXMLShader ()
     delete variants[i].tech;
   }
 
-  delete[] filename;
+  cs_free (filename);
   delete resolver;
-  delete[] vfsStartDir;
-  delete[] allShaderMeta.description;
+  cs_free (vfsStartDir);
+  cs_free (allShaderMeta.description);
 }
 
 void csXMLShader::SelfDestruct ()

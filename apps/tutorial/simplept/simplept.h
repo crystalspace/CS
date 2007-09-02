@@ -61,8 +61,7 @@ private:
   csRef<iTextureWrapper> targetTexture;
   csRef<iView> targetView;
 
-  void CreatePolygon (iThingFactoryState *th, int v1, int v2, int v3, int v4,
-    iMaterialWrapper *mat);
+  void CreatePolygon (iGeneralFactoryState *th, int v1, int v2, int v3, int v4);
 
   int genmesh_resolution;
   csVector3 genmesh_scale;

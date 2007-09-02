@@ -30,14 +30,12 @@
 #include "iengine/sector.h"
 #include "imesh/objmodel.h"
 #include "imesh/object.h"
-#include "imesh/thing.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
 #include "ivaria/collider.h"
 #include "ivaria/view.h"
 
 #include "walktest.h"
-#include "infmaze.h"
 
 extern WalkTest *Sys;
 

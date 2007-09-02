@@ -117,6 +117,9 @@ struct iVerbosityManager;
 /// Request standard console output.
 #define CS_REQUEST_CONSOLEOUT \
   CS_REQUEST_PLUGIN("crystalspace.console.output.standard", iConsoleOutput)
+/// Request joystick plugin
+#define CS_REQUEST_JOYSTICK \
+  CS_REQUEST_PLUGIN("crystalspace.device.joystick", iEventPlug)
 /** @} */
 
 /**
