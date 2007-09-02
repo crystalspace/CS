@@ -13,6 +13,9 @@ chronological order.
 	- res added a hash computer and comparator for csMD5::Digest.
 	- res fixed the same node collapsing in the shader weaver to add 
 	  proper connections when collapsing two nodes.
+	- res fixed coerce chain creation in the Cg weaver combiner: chains
+	  could get complicated (e.g. A->B->A->C where A->C would suffice)
+	  and were incorrectly returned (the 1st and 2nd step were the same).
 31-Aug-2007
 	- res augmented the Cg weaver combiner to contain a number of simple,
 	  "templated" coercions (for trivial stuff such as normalization).

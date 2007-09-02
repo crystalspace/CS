@@ -464,7 +464,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 	}
       }
     }
-    
+
+    // To avoid unnecessary complicated each type can only appear once.
+    csSet<csString> seenTypes;
+    seenTypes.Add (from);
+    // Keep track of used coercions to prevent loops.
     csSet<csConstPtrKey<CoerceItem> > checkedItems;
     while (sourcesToTest.GetSize() > 0)
     {
@@ -487,22 +491,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 	    size_t h = testFrom.hierarchy;
 	    while (d-- > 0)
 	    {
-	      chain[d] = hierarchy[h].item;
 	      h = hierarchy[h].parent;
+              const CoerceItem* hItem = hierarchy[h].item;
+	      chain[d] = hItem;
 	    }
-	    return;
+            return;
 	  }
 	  else
 	  {
 	    // Otherwise, search if no match is found.
-	    sourcesToTest.Push (TestSource<CoerceItem> (item,
-	      testFrom.depth+1, 
-	      hierarchy.Push (Hierarchy<CoerceItem> (&item, 
-	        testFrom.hierarchy))));
+            if (!seenTypes.Contains (item.toType))
+            {
+	      sourcesToTest.Push (TestSource<CoerceItem> (item,
+	        testFrom.depth+1, 
+	        hierarchy.Push (Hierarchy<CoerceItem> (&item, 
+	          testFrom.hierarchy))));
+            }
 	  }
 	}
       }
       checkedItems.AddNoTest (testFrom.item);
+      seenTypes.Add (testFrom.type);
     }
   }
   
