@@ -29,6 +29,8 @@
 #include "csutil/array.h"
 #include "csutil/scf_implementation.h"
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**\addtogroup util_containers
  * @{ */
 
@@ -279,6 +281,8 @@ public:
   }
   /** @} */
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /** @} */
 

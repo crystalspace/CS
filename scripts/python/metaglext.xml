@@ -86,6 +86,7 @@
     </function>
   </extension>
   <extension name="GL_version_1_3" type="GLver">
+    <depends ext="GL_version_1_2" />
     <token name="GL_TEXTURE0" value="33984" />
     <token name="GL_TEXTURE1" value="33985" />
     <token name="GL_TEXTURE2" value="33986" />
@@ -425,6 +426,927 @@
       <arg name="level" type="GLint" const="false" pointer="false" />
       <arg name="img" type="GLvoid" const="false" pointer="true" />
     </function>
+  </extension>
+  <extension name="GL_version_1_4" type="GLver">
+    <depends ext="GL_version_1_3" />
+    <!-- Promoted: SGIS_generate_mipmap -->
+    <token name="GL_GENERATE_MIPMAP" value="33169" />
+    <!-- Promoted: NV_blend_square -->
+    <!-- Promoted: ARB_depth_texture -->
+    <token name="GL_DEPTH_COMPONENT16" value="33189" />
+    <token name="GL_DEPTH_COMPONENT24" value="33190" />
+    <token name="GL_DEPTH_COMPONENT32" value="33191" />
+    <token name="GL_TEXTURE_DEPTH_SIZE" value="34890" />
+    <!-- Promoted: ARB_shadow -->
+    <token name="GL_DEPTH_TEXTURE_MODE" value="34891" />
+    <token name="GL_TEXTURE_COMPARE_MODE" value="34892" />
+    <token name="GL_TEXTURE_COMPARE_FUNC" value="34893" />
+    <token name="GL_COMPARE_R_TO_TEXTURE" value="34894" />
+    <!-- Promoted: EXT_fog_coord -->
+    <token name="GL_FOG_COORDINATE_SOURCE" value="33872" />
+    <token name="GL_FOG_COORDINATE" value="33873" />
+    <token name="GL_FRAGMENT_DEPTH" value="33874" />
+    <token name="GL_CURRENT_FOG_COORDINATE" value="33875" />
+    <token name="GL_FOG_COORDINATE_ARRAY_TYPE" value="33876" />
+    <token name="GL_FOG_COORDINATE_ARRAY_STRIDE" value="33877" />
+    <token name="GL_FOG_COORDINATE_ARRAY_POINTER" value="33878" />
+    <token name="GL_FOG_COORDINATE_ARRAY" value="33879" />
+    <function name="glFogCoordf" return="GLvoid" pointer="false">
+      <arg name="coord" type="GLfloat" const="false" pointer="false" />
+    </function>
+    <function name="glFogCoordd" return="GLvoid" pointer="false">
+      <arg name="coord" type="GLdouble" const="false" pointer="false" />
+    </function>
+    <function name="glFogCoordfv" return="GLvoid" pointer="false">
+      <arg name="coord" type="GLfloat" const="false" pointer="false" />
+    </function>
+    <function name="glFogCoorddv" return="GLvoid" pointer="false">
+      <arg name="coord" type="GLdouble" const="false" pointer="false" />
+    </function>
+    <function name="glFogCoordPointer" return="GLvoid" pointer="false">
+      <arg name="type" type="GLenum" const="false" pointer="false" />
+      <arg name="stride" type="GLsizei" const="false" pointer="false" />
+      <arg name="pointer" type="GLvoid" const="false" pointer="true" />
+    </function>
+    <!-- Promoted: EXT_multi_draw_arrays -->
+    <function name="glMultiDrawArrays" return="GLvoid" pointer="false">
+      <arg name="mode" type="GLenum" const="false" pointer="false" />
+      <arg name="first" type="GLint" const="false" pointer="true" />
+      <arg name="count" type="GLsizei" const="false" pointer="true" />
+      <arg name="primcount" type="GLsizei" const="false" pointer="false" />
+    </function>
+    <function name="glMultiDrawElements" return="GLvoid" pointer="false">
+      <arg name="mode" type="GLenum" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="true" />
+      <arg name="type" type="GLenum" const="false" pointer="false" />
+      <arg name="indices" type="GLvoid" const="true" pointer="true" />
+      <arg name="primcount" type="GLsizei" const="false" pointer="false" />
+    </function>
+    <!-- Promoted: ARB_point_parameters -->
+    <token name="GL_POINT_SIZE_MIN" value="33062" />
+    <token name="GL_POINT_SIZE_MAX" value="33063" />
+    <token name="GL_POINT_FADE_THRESHOLD_SIZE" value="33064" />
+    <token name="GL_POINT_DISTANCE_ATTENUATION" value="33065" />
+    <function name="glPointParameterf" return="GLvoid" pointer="false">
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+      <arg name="param" type="GLfloat" const="false" pointer="false" />
+    </function>
+    <function name="glPointParameterfv" return="GLvoid" pointer="false">
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+      <arg name="params" type="GLfloat" const="false" pointer="true" />
+    </function>
+    <!-- Promoted: EXT_secondary_color -->
+    <token name="GL_COLOR_SUM" value="33880" />
+    <token name="GL_CURRENT_SECONDARY_COLOR" value="33881" />
+    <token name="GL_SECONDARY_COLOR_ARRAY_SIZE" value="33882" />
+    <token name="GL_SECONDARY_COLOR_ARRAY_TYPE" value="33883" />
+    <token name="GL_SECONDARY_COLOR_ARRAY_STRIDE" value="33884" />
+    <token name="GL_SECONDARY_COLOR_ARRAY_POINTER" value="33885" />
+    <token name="GL_SECONDARY_COLOR_ARRAY" value="33886" />
+    <function name="glSecondaryColor3b" return="GLvoid" pointer="false">
+      <arg name="components" type="GLbyte" const="false" pointer="false" />
+    </function>
+    <function name="glSecondaryColor3s" return="GLvoid" pointer="false">
+      <arg name="components" type="GLshort" const="false" pointer="false" />
+    </function>
+    <function name="glSecondaryColor3i" return="GLvoid" pointer="false">
+      <arg name="components" type="GLint" const="false" pointer="false" />
+    </function>
+    <function name="glSecondaryColor3f" return="GLvoid" pointer="false">
+      <arg name="components" type="GLfloat" const="false" pointer="false" />
+    </function>
+    <function name="glSecondaryColor3d" return="GLvoid" pointer="false">
+      <arg name="components" type="GLdouble" const="false" pointer="false" />
+    </function>
+    <function name="glSecondaryColor3ub" return="GLvoid" pointer="false">
+      <arg name="components" type="GLubyte" const="false" pointer="false" />
+    </function>
+    <function name="glSecondaryColor3us" return="GLvoid" pointer="false">
+      <arg name="components" type="GLushort" const="false" pointer="false" />
+    </function>
+    <function name="glSecondaryColor3ui" return="GLvoid" pointer="false">
+      <arg name="components" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glSecondaryColor3bv" return="GLvoid" pointer="false">
+      <arg name="components" type="GLbyte" const="false" pointer="false" />
+    </function>
+    <function name="glSecondaryColor3sv" return="GLvoid" pointer="false">
+      <arg name="components" type="GLshort" const="false" pointer="false" />
+    </function>
+    <function name="glSecondaryColor3iv" return="GLvoid" pointer="false">
+      <arg name="components" type="GLint" const="false" pointer="false" />
+    </function>
+    <function name="glSecondaryColor3fv" return="GLvoid" pointer="false">
+      <arg name="components" type="GLfloat" const="false" pointer="false" />
+    </function>
+    <function name="glSecondaryColor3dv" return="GLvoid" pointer="false">
+      <arg name="components" type="GLdouble" const="false" pointer="false" />
+    </function>
+    <function name="glSecondaryColor3ubv" return="GLvoid" pointer="false">
+      <arg name="components" type="GLubyte" const="false" pointer="false" />
+    </function>
+    <function name="glSecondaryColor3usv" return="GLvoid" pointer="false">
+      <arg name="components" type="GLushort" const="false" pointer="false" />
+    </function>
+    <function name="glSecondaryColor3uiv" return="GLvoid" pointer="false">
+      <arg name="components" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glSecondaryColorPointer" return="GLvoid" pointer="false">
+      <arg name="size" type="GLint" const="false" pointer="false" />
+      <arg name="type" type="GLenum" const="false" pointer="false" />
+      <arg name="stride" type="GLsizei" const="false" pointer="false" />
+      <arg name="pointer" type="GLvoid" const="false" pointer="true" />
+    </function>
+    <!-- Promoted: EXT_blend_func_separate -->
+    <token name="GL_BLEND_DST_RGB" value="0x80C8" />
+    <token name="GL_BLEND_SRC_RGB" value="0x80C9" />
+    <token name="GL_BLEND_DST_ALPHA" value="0x80CA" />
+    <token name="GL_BLEND_SRC_ALPHA" value="0x80CB" />
+    <function name="glBlendFuncSeparate" return="GLvoid" pointer="false">
+      <arg name="sFactorRGB" type="GLenum" const="false" pointer="false" />
+      <arg name="dFactorRGB" type="GLenum" const="false" pointer="false" />
+      <arg name="sFactorAlpha" type="GLenum" const="false" pointer="false" />
+      <arg name="dFactorAlpha" type="GLenum" const="false" pointer="false" />
+    </function>
+    <!-- Promoted: EXT_stencil_wrap -->
+    <token name="GL_INCR_WRAP" value="34055" />
+    <token name="GL_DECR_WRAP" value="34056" />
+    <!-- Promoted: ARB_texture_env_crossbar -->
+    <!-- Promoted: EXT_texture_lod_bias -->
+    <token name="GL_TEXTURE_FILTER_CONTROL" value="34048" />
+    <token name="GL_TEXTURE_LOD_BIAS" value="34049" />
+    <token name="GL_MAX_TEXTURE_LOD_BIAS" value="34045" />
+    <!-- Promoted: ARB_texture_mirrored_repeat -->
+    <token name="GL_MIRRORED_REPEAT" value="33648" />
+    <!-- Promoted: ARB_window_pos -->
+    <function name="glWindowPos2d" return="GLvoid" pointer="false">
+      <arg name="x" type="GLdouble" const="false" pointer="false" />
+      <arg name="y" type="GLdouble" const="false" pointer="false" />
+    </function>
+    <function name="glWindowPos2f" return="GLvoid" pointer="false">
+      <arg name="x" type="GLfloat" const="false" pointer="false" />
+      <arg name="y" type="GLfloat" const="false" pointer="false" />
+    </function>
+    <function name="glWindowPos2i" return="GLvoid" pointer="false">
+      <arg name="x" type="GLint" const="false" pointer="false" />
+      <arg name="y" type="GLint" const="false" pointer="false" />
+    </function>
+    <function name="glWindowPos2s" return="GLvoid" pointer="false">
+      <arg name="x" type="GLshort" const="false" pointer="false" />
+      <arg name="y" type="GLshort" const="false" pointer="false" />
+    </function>
+    <function name="glWindowPos2dv" return="GLvoid" pointer="false">
+      <arg name="p" type="GLdouble" const="true" pointer="true" />
+    </function>
+    <function name="glWindowPos2fv" return="GLvoid" pointer="false">
+      <arg name="p" type="GLfloat" const="true" pointer="true" />
+    </function>
+    <function name="glWindowPos2iv" return="GLvoid" pointer="false">
+      <arg name="p" type="GLint" const="true" pointer="true" />
+    </function>
+    <function name="glWindowPos2sv" return="GLvoid" pointer="false">
+      <arg name="p" type="GLshort" const="true" pointer="true" />
+    </function>
+    <function name="glWindowPos3d" return="GLvoid" pointer="false">
+      <arg name="x" type="GLdouble" const="false" pointer="false" />
+      <arg name="y" type="GLdouble" const="false" pointer="false" />
+      <arg name="z" type="GLdouble" const="false" pointer="false" />
+    </function>
+    <function name="glWindowPos3f" return="GLvoid" pointer="false">
+      <arg name="x" type="GLfloat" const="false" pointer="false" />
+      <arg name="y" type="GLfloat" const="false" pointer="false" />
+      <arg name="z" type="GLfloat" const="false" pointer="false" />
+    </function>
+    <function name="glWindowPos3i" return="GLvoid" pointer="false">
+      <arg name="x" type="GLint" const="false" pointer="false" />
+      <arg name="y" type="GLint" const="false" pointer="false" />
+      <arg name="z" type="GLint" const="false" pointer="false" />
+    </function>
+    <function name="glWindowPos3s" return="GLvoid" pointer="false">
+      <arg name="x" type="GLshort" const="false" pointer="false" />
+      <arg name="y" type="GLshort" const="false" pointer="false" />
+      <arg name="z" type="GLshort" const="false" pointer="false" />
+    </function>
+    <function name="glWindowPos3dv" return="GLvoid" pointer="false">
+      <arg name="p" type="GLdouble" const="true" pointer="true" />
+    </function>
+    <function name="glWindowPos3fv" return="GLvoid" pointer="false">
+      <arg name="p" type="GLfloat" const="true" pointer="true" />
+    </function>
+    <function name="glWindowPos3iv" return="GLvoid" pointer="false">
+      <arg name="p" type="GLint" const="true" pointer="true" />
+    </function>
+    <function name="glWindowPos3sv" return="GLvoid" pointer="false">
+      <arg name="p" type="GLshort" const="true" pointer="true" />
+    </function>
+  </extension>
+  <extension name="GL_version_1_5" type="GLver">
+    <depends ext="GL_version_1_4" />
+    <!-- Promoted: ARB_vertex_buffer_object -->
+    <token name="GL_ARRAY_BUFFER" value="34962" />
+    <token name="GL_ELEMENT_ARRAY_BUFFER" value="34963" />
+    <token name="GL_ARRAY_BUFFER_BINDING" value="34964" />
+    <token name="GL_ELEMENT_ARRAY_BUFFER_BINDING" value="34965" />
+    <token name="GL_VERTEX_ARRAY_BUFFER_BINDING" value="34966" />
+    <token name="GL_NORMAL_ARRAY_BUFFER_BINDING" value="34967" />
+    <token name="GL_COLOR_ARRAY_BUFFER_BINDING" value="34968" />
+    <token name="GL_INDEX_ARRAY_BUFFER_BINDING" value="34969" />
+    <token name="GL_TEXTURE_COORD_ARRAY_BUFFER_BINDING" value="34970" />
+    <token name="GL_EDGE_FLAG_ARRAY_BUFFER_BINDING" value="34971" />
+    <token name="GL_SECONDARY_COLOR_ARRAY_BUFFER_BINDING" value="34972" />
+    <token name="GL_FOG_COORDINATE_ARRAY_BUFFER_BINDING" value="34973" />
+    <token name="GL_WEIGHT_ARRAY_BUFFER_BINDING" value="34974" />
+    <token name="GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING" value="34975" />
+    <token name="GL_STREAM_DRAW" value="35040" />
+    <token name="GL_STREAM_READ" value="35041" />
+    <token name="GL_STREAM_COPY" value="35042" />
+    <token name="GL_STATIC_DRAW" value="35044" />
+    <token name="GL_STATIC_READ" value="35045" />
+    <token name="GL_STATIC_COPY" value="35046" />
+    <token name="GL_DYNAMIC_DRAW" value="35048" />
+    <token name="GL_DYNAMIC_READ" value="35049" />
+    <token name="GL_DYNAMIC_COPY" value="35050" />
+    <token name="GL_READ_ONLY" value="35000" />
+    <token name="GL_WRITE_ONLY" value="35001" />
+    <token name="GL_READ_WRITE" value="35002" />
+    <token name="GL_BUFFER_SIZE" value="34660" />
+    <token name="GL_BUFFER_USAGE" value="34661" />
+    <token name="GL_BUFFER_ACCESS" value="35003" />
+    <token name="GL_BUFFER_MAPPED" value="35004" />
+    <token name="GL_BUFFER_MAP_POINTER" value="35005" />
+    <function name="glBindBuffer" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="buffer" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glDeleteBuffers" return="GLvoid" pointer="false">
+      <arg name="n" type="GLsizei" const="false" pointer="false" />
+      <arg name="buffers" type="GLuint" const="true" pointer="true" />
+    </function>
+    <function name="glGenBuffers" return="GLvoid" pointer="false">
+      <arg name="n" type="GLsizei" const="false" pointer="false" />
+      <arg name="buffers" type="GLuint" const="false" pointer="true" />      
+    </function>
+    <function name="glBufferData" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="size" type="GLsizei" const="false" pointer="false" />
+      <arg name="data" type="GLvoid" const="true" pointer="true" />
+      <arg name="usage" type="GLenum" const="false" pointer="false" />
+    </function>
+    <function name="glBufferSubData" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="offset" type="GLsizei" const="false" pointer="false" />
+      <arg name="size" type="GLsizei" const="false" pointer="false" />
+      <arg name="data" type="GLvoid" const="true" pointer="true" />
+    </function>
+    <function name="glMapBuffer" return="GLvoid" pointer="true">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="access" type="GLenum" const="false" pointer="false" />
+    </function>
+    <function name="glUnmapBuffer" return="GLboolean" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+    </function>
+    <function name="glIsBuffer" return="GLboolean" pointer="false">
+      <arg name="buffer" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glGetBufferSubData" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="offset" type="GLsizei" const="false" pointer="false" />
+      <arg name="size" type="GLsizei" const="false" pointer="false" />
+      <arg name="data" type="GLvoid" const="false" pointer="true" />
+    </function>
+    <function name="glGetBufferPointerv" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+      <arg name="params" type="GLvoid*" const="false" pointer="true" />
+    </function>     
+    <function name="glGetBufferParameteriv" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+      <arg name="params" type="GLint" const="false" pointer="true" />
+    </function>
+    <!-- Promoted: ARB_occlusion_query -->
+    <token name="GL_SAMPLES_PASSED" value="0x8914" />
+    <token name="GL_QUERY_COUNTER_BITS" value="0x8864" />
+    <token name="GL_CURRENT_QUERY" value="0x8865" />
+    <token name="GL_QUERY_RESULT" value="0x8866" />
+    <token name="GL_QUERY_RESULT_AVAILABLE" value="0x8867" />
+    <function name="glGenQueries" return="GLvoid" pointer="false">
+      <arg name="n" type="GLsizei" const="false" pointer="false" />
+      <arg name="ids" type="GLuint" const="false" pointer="true" />
+    </function>
+    <function name="glDeleteQueries" return="GLvoid" pointer="false">
+      <arg name="n" type="GLsizei" const="false" pointer="false" />
+      <arg name="ids" type="GLuint" const="false" pointer="true" />
+    </function>
+    <function name="glIsQuery" return="GLboolean" pointer="false">
+      <arg name="id" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glBeginQuery" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="id" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glEndQuery" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+    </function>
+    <function name="glGetQueryiv" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+      <arg name="params" type="GLint" const="false" pointer="true" />
+    </function>
+    <function name="glGetQueryObjectiv" return="GLvoid" pointer="false">
+      <arg name="id" type="GLuint" const="false" pointer="false" />
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+      <arg name="params" type="GLint" const="false" pointer="true" />
+    </function>
+    <function name="glGetQueryObjectuiv" return="GLvoid" pointer="false">
+      <arg name="id" type="GLuint" const="false" pointer="false" />
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+      <arg name="params" type="GLuint" const="false" pointer="true" />
+    </function>
+    <!-- Promoted: EXT_shadow_funcs -->
+    <!-- Renamed tokens -->
+    <token name="GL_FOG_COORD_SOURCE" value="GL_FOG_COORDINATE_SOURCE" />
+    <token name="GL_FOG_COORD" value="GL_FOG_COORDINATE" />
+    <token name="GL_CURRENT_FOG_COORD" value="GL_CURRENT_FOG_COORDINATE" />
+    <token name="GL_FOG_COORD_ARRAY_TYPE" value="GL_FOG_COORDINATE_ARRAY_TYPE" />
+    <token name="GL_FOG_COORD_ARRAY_STRIDE" value="GL_FOG_COORDINATE_ARRAY_STRIDE" />
+    <token name="GL_FOG_COORD_ARRAY_POINTER" value="GL_FOG_COORDINATE_ARRAY_POINTER" />
+    <token name="GL_FOG_COORD_ARRAY" value="GL_FOG_COORDINATE_ARRAY" />
+    <token name="GL_FOG_COORD_ARRAY_BUFFER_BINDING" value="GL_FOG_COORDINATE_ARRAY_BUFFER_BINDING_ARB" />
+    <token name="GL_SRC0_RGB" value="GL_SOURCE0_RGB" />
+    <token name="GL_SRC1_RGB" value="GL_SOURCE1_RGB" />
+    <token name="GL_SRC2_RGB" value="GL_SOURCE2_RGB" />
+    <token name="GL_SRC0_ALPHA" value="GL_SOURCE0_ALPHA" />
+    <token name="GL_SRC1_ALPHA" value="GL_SOURCE1_ALPHA" />
+    <token name="GL_SRC2_ALPHA" value="GL_SOURCE2_ALPHA" />
+  </extension>
+  <extension name="GL_version_2_0" type="GLver">
+    <depends ext="GL_version_1_5" />
+    <!-- Promoted: ARB_shader_objects -->
+    <token name="GL_PROGRAM_OBJECT" value="0x8B40" />
+    <token name="GL_OBJECT_TYPE" value="0x8B4E" />
+    <token name="GL_OBJECT_SUBTYPE" value="0x8B4F" />
+    <token name="GL_OBJECT_DELETE_STATUS" value="0x8B80" />
+    <token name="GL_OBJECT_COMPILE_STATUS" value="0x8B81" />
+    <token name="GL_OBJECT_LINK_STATUS" value="0x8B82" />
+    <token name="GL_OBJECT_VALIDATE_STATUS" value="0x8B83" />
+    <token name="GL_OBJECT_INFO_LOG_LENGTH" value="0x8B84" />
+    <token name="GL_OBJECT_ATTACHED_OBJECTS" value="0x8B85" />
+    <token name="GL_OBJECT_ACTIVE_UNIFORMS" value="0x8B86" />
+    <token name="GL_OBJECT_ACTIVE_UNIFORMS_MAX_LENGTH" value="0x8B87" />
+    <token name="GL_OBJECT_SHADER_SOURCE_LENGTH" value="0x8B88" />
+    <token name="GL_SHADER_OBJECT" value="0x8B48" />
+    <token name="GL_FLOAT_VEC2" value="0x8B50" />
+    <token name="GL_FLOAT_VEC3" value="0x8B51" />
+    <token name="GL_FLOAT_VEC4" value="0x8B52" />
+    <token name="GL_INT_VEC2" value="0x8B53" />
+    <token name="GL_INT_VEC3" value="0x8B54" />
+    <token name="GL_INT_VEC4" value="0x8B55" />
+    <token name="GL_BOOL" value="0x8B56" />
+    <token name="GL_BOOL_VEC2" value="0x8B57" />
+    <token name="GL_BOOL_VEC3" value="0x8B58" />
+    <token name="GL_BOOL_VEC4" value="0x8B59" />
+    <token name="GL_FLOAT_MAT2" value="0x8B5A" />
+    <token name="GL_FLOAT_MAT3" value="0x8B5B" />
+    <token name="GL_FLOAT_MAT4" value="0x8B5C" />
+    <function name="glDeleteShader" return="GLvoid" pointer="false">
+      <arg name="obj" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glGetHandle" return="GLuint" pointer="false">
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+    </function>
+    <function name="glDetachShader" return="GLvoid" pointer="false">
+      <arg name="containerObj" type="GLuint" const="false" pointer="false" />
+      <arg name="attachedObj" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glCreateShader" return="GLuint" pointer="false">
+      <arg name="shaderType" type="GLenum" const="false" pointer="false" />
+    </function>
+    <function name="glShaderSource" return="GLvoid" pointer="false">
+      <arg name="shaderObj" type="GLuint" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="false" />
+      <arg name="string" type="GLchar*" const="true" pointer="true" />
+      <arg name="length" type="GLint" const="true" pointer="true" />
+    </function>
+    <function name="glCompileShader" return="GLvoid" pointer="false">
+      <arg name="shaderObj" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glCreateProgramObject" return="GLuint" pointer="false" />
+    <function name="glAttachShader" return="GLvoid" pointer="false">
+      <arg name="containerObj" type="GLuint" const="false" pointer="false" />
+      <arg name="Obj" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glLinkProgram" return="GLvoid" pointer="false">
+      <arg name="programObj" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glUseProgram" return="GLvoid" pointer="false">
+      <arg name="programObj" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glDeleteProgram" return="GLvoid" pointer="false">
+      <arg name="programObj" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glValidateProgram" return="GLvoid" pointer="false">
+      <arg name="programObj" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glUniform1f" return="GLvoid" pointer="false">
+      <arg name="location" type="GLint" const="false" pointer="false" />
+      <arg name="v0" type="GLfloat" const="false" pointer="false" />
+    </function>
+    <function name="glUniform2f" return="GLvoid" pointer="false">
+      <arg name="location" type="GLint" const="false" pointer="false" />
+      <arg name="v0" type="GLfloat" const="false" pointer="false" />
+      <arg name="v1" type="GLfloat" const="false" pointer="false" />
+    </function>
+    <function name="glUniform3f" return="GLvoid" pointer="false">
+      <arg name="location" type="GLint" const="false" pointer="false" />
+      <arg name="v0" type="GLfloat" const="false" pointer="false" />
+      <arg name="v1" type="GLfloat" const="false" pointer="false" />
+      <arg name="v2" type="GLfloat" const="false" pointer="false" />
+    </function>
+    <function name="glUniform4f" return="GLvoid" pointer="false">
+      <arg name="location" type="GLint" const="false" pointer="false" />
+      <arg name="v0" type="GLfloat" const="false" pointer="false" />
+      <arg name="v1" type="GLfloat" const="false" pointer="false" />
+      <arg name="v2" type="GLfloat" const="false" pointer="false" />
+      <arg name="v3" type="GLfloat" const="false" pointer="false" />
+    </function>
+    <function name="glUniform1i" return="GLvoid" pointer="false">
+      <arg name="location" type="GLint" const="false" pointer="false" />
+      <arg name="v0" type="GLint" const="false" pointer="false" />
+    </function>
+    <function name="glUniform2i" return="GLvoid" pointer="false">
+      <arg name="location" type="GLint" const="false" pointer="false" />
+      <arg name="v0" type="GLint" const="false" pointer="false" />
+      <arg name="v1" type="GLint" const="false" pointer="false" />
+    </function>
+    <function name="glUniform3i" return="GLvoid" pointer="false">
+      <arg name="location" type="GLint" const="false" pointer="false" />
+      <arg name="v0" type="GLint" const="false" pointer="false" />
+      <arg name="v1" type="GLint" const="false" pointer="false" />
+      <arg name="v2" type="GLint" const="false" pointer="false" />
+    </function>
+    <function name="glUniform4i" return="GLvoid" pointer="false">
+      <arg name="location" type="GLint" const="false" pointer="false" />
+      <arg name="v0" type="GLint" const="false" pointer="false" />
+      <arg name="v1" type="GLint" const="false" pointer="false" />
+      <arg name="v2" type="GLint" const="false" pointer="false" />
+      <arg name="v3" type="GLint" const="false" pointer="false" />
+    </function>
+    <function name="glUniform1fv" return="GLvoid" pointer="false">
+      <arg name="location" type="GLint" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="false" />
+      <arg name="value" type="GLfloat" const="false" pointer="true" />
+    </function>
+    <function name="glUniform2fv" return="GLvoid" pointer="false">
+      <arg name="location" type="GLint" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="false" />
+      <arg name="value" type="GLfloat" const="false" pointer="true" />
+    </function>
+    <function name="glUniform3fv" return="GLvoid" pointer="false">
+      <arg name="location" type="GLint" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="false" />
+      <arg name="value" type="GLfloat" const="false" pointer="true" />
+    </function>
+    <function name="glUniform4fv" return="GLvoid" pointer="false">
+      <arg name="location" type="GLint" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="false" />
+      <arg name="value" type="GLfloat" const="false" pointer="true" />
+    </function>
+    <function name="glUniform1iv" return="GLvoid" pointer="false">
+      <arg name="location" type="GLint" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="false" />
+      <arg name="value" type="GLint" const="false" pointer="true" />
+    </function>
+    <function name="glUniform2iv" return="GLvoid" pointer="false">
+      <arg name="location" type="GLint" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="false" />
+      <arg name="value" type="GLint" const="false" pointer="true" />
+    </function>
+    <function name="glUniform3iv" return="GLvoid" pointer="false">
+      <arg name="location" type="GLint" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="false" />
+      <arg name="value" type="GLint" const="false" pointer="true" />
+    </function>
+    <function name="glUniform4iv" return="GLvoid" pointer="false">
+      <arg name="location" type="GLint" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="false" />
+      <arg name="value" type="GLint" const="false" pointer="true" />
+    </function>
+    <function name="glUniformMatrix2fv" return="GLvoid" pointer="false">
+      <arg name="location" type="GLint" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="false" />
+      <arg name="transpose" type="GLboolean" const="false" pointer="false" />
+      <arg name="value" type="GLfloat" const="false" pointer="true" />
+    </function>
+    <function name="glUniformMatrix3fv" return="GLvoid" pointer="false">
+      <arg name="location" type="GLint" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="false" />
+      <arg name="transpose" type="GLboolean" const="false" pointer="false" />
+      <arg name="value" type="GLfloat" const="false" pointer="true" />
+    </function>
+    <function name="glUniformMatrix4fv" return="GLvoid" pointer="false">
+      <arg name="location" type="GLint" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="false" />
+      <arg name="transpose" type="GLboolean" const="false" pointer="false" />
+      <arg name="value" type="GLfloat" const="false" pointer="true" />
+    </function>
+    <function name="glGetObjectParameterfv" return="GLvoid" pointer="false">
+      <arg name="obj" type="GLuint" const="false" pointer="false" />
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+      <arg name="params" type="GLfloat" const="false" pointer="true" />
+    </function>
+    <function name="glGetObjectParameteriv" return="GLvoid" pointer="false">
+      <arg name="obj" type="GLuint" const="false" pointer="false" />
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+      <arg name="params" type="GLint" const="false" pointer="true" />
+    </function>
+    <function name="glGetInfoLog" return="GLvoid" pointer="false">
+      <arg name="obj" type="GLuint" const="false" pointer="false" />
+      <arg name="maxLength" type="GLsizei" const="false" pointer="false" />
+      <arg name="length" type="GLsizei" const="false" pointer="true" />
+      <arg name="infoLog" type="GLchar" const="false" pointer="true" />
+    </function>
+    <function name="glGetAttachedObjects" return="GLvoid" pointer="false">
+      <arg name="containerObj" type="GLuint" const="false" pointer="false" />
+      <arg name="maxCount" type="GLsizei" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="true" />
+      <arg name="obj" type="GLuint" const="false" pointer="true" />
+    </function>
+    <function name="glGetUniformLocation" return="GLint" pointer="false">
+      <arg name="programObj" type="GLuint" const="false" pointer="false" />
+      <arg name="name" type="GLchar" const="true" pointer="true" />
+    </function>
+    <function name="glGetActiveUniform" return="GLvoid" pointer="false">
+      <arg name="programObj" type="GLuint" const="false" pointer="false" />
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="maxLength" type="GLsizei" const="false" pointer="false" />
+      <arg name="length" type="GLsizei" const="false" pointer="true" />
+      <arg name="size" type="GLint" const="false" pointer="true" />
+      <arg name="type" type="GLenum" const="false" pointer="true" />
+      <arg name="name" type="GLchar" const="false" pointer="true" />
+    </function>
+    <function name="glGetUniformfv" return="GLint" pointer="false">
+      <arg name="programObj" type="GLuint" const="false" pointer="false" />
+      <arg name="location" type="GLint" const="false" pointer="false" />
+      <arg name="params" type="GLfloat" const="false" pointer="true" />
+    </function>
+    <function name="glGetUniformiv" return="GLint" pointer="false">
+      <arg name="programObj" type="GLuint" const="false" pointer="false" />
+      <arg name="location" type="GLint" const="false" pointer="false" />
+      <arg name="params" type="GLint" const="false" pointer="true" />
+    </function>
+    <function name="glGetShaderSource" return="GLvoid" pointer="false">
+      <arg name="obj" type="GLuint" const="false" pointer="false" />
+      <arg name="maxLength" type="GLsizei" const="false" pointer="false" />
+      <arg name="length" type="GLsizei" const="false" pointer="true" />
+      <arg name="source" type="GLchar" const="false" pointer="true" />
+    </function>
+    <!-- Promoted: ARB_fragment_shader -->
+    <token name="GL_FRAGMENT_SHADER" value="0x8B30" />
+    <token name="GL_MAX_FRAGMENT_UNIFORM_COMPONENTS" value="0x8B49" />
+    <token name="GL_MAX_TEXTURE_COORDS" value="0x8871" />
+    <token name="GL_MAX_TEXTURE_IMAGE_UNITS" value="0x8872" />
+    <token name="GL_OBJECT_TYPE" value="0x8B4E" />
+    <token name="GL_OBJECT_SUBTYPE" value="0x8B4F" />
+    <token name="GL_SHADER_OBJECT" value="0x8B48" />
+    <!-- Promoted: ARB_vertex_shader -->
+    <token name="GL_VERTEX_SHADER" value="0x8B31" />
+    <token name="GL_MAX_VERTEX_UNIFORM_COMPONENTS" value="0x8B4A" />
+    <token name="GL_MAX_VARYING_FLOATS" value="0x8B4B" />
+    <token name="GL_MAX_VERTEX_ATTRIBS" value="0x8869" />
+    <token name="GL_MAX_TEXTURE_IMAGE_UNITS" value="0x8872" />
+    <token name="GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS" value="0x884C" />
+    <token name="GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS" value="0x884D" />
+    <token name="GL_MAX_TEXTURE_COORDS" value="0x8871" />
+    <token name="GL_VERTEX_PROGRAM_POINT_SIZE" value="0x8642" />
+    <token name="GL_VERTEX_PROGRAM_TWO_SIDE" value="0x8643" />
+    <token name="GL_OBJECT_TYPE" value="0x8B4E" />
+    <token name="GL_OBJECT_SUBTYPE" value="0x8B4F" />
+    <token name="GL_OBJECT_ACTIVE_ATTRIBUTES" value="0x8B89" />
+    <token name="GL_OBJECT_ACTIVE_ATTRIBUTE_MAX_LENGTH" value="0x8B8A" />
+    <token name="GL_SHADER_OBJECT" value="0x8B48" />
+    <token name="GL_VERTEX_ATTRIB_ARRAY_ENABLED" value="0x8622" />
+    <token name="GL_VERTEX_ATTRIB_ARRAY_SIZE" value="0x8623" />
+    <token name="GL_VERTEX_ATTRIB_ARRAY_STRIDE" value="0x8624" />
+    <token name="GL_VERTEX_ATTRIB_ARRAY_TYPE" value="0x8625" />
+    <token name="GL_VERTEX_ATTRIB_ARRAY_NORMALIZED" value="0x886A" />
+    <token name="GL_CURRENT_VERTEX_ATTRIB" value="0x8626" />
+    <token name="GL_VERTEX_ATTRIB_ARRAY_POINTER" value="0x8645" />
+    <token name="GL_FLOAT_VEC2" value="0x8B50" />
+    <token name="GL_FLOAT_VEC3" value="0x8B51" />
+    <token name="GL_FLOAT_VEC4" value="0x8B52" />
+    <token name="GL_FLOAT_MAT2" value="0x8B5A" />
+    <token name="GL_FLOAT_MAT3" value="0x8B5B" />
+    <token name="GL_FLOAT_MAT4" value="0x8B5C" />
+    <function name="glVertexAttrib1s" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLshort" const="false" pointer="false" />
+    </function>
+    <function name="glVertexAttrib1f" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLfloat" const="false" pointer="false" />
+    </function>
+    <function name="glVertexAttrib1d" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLdouble" const="false" pointer="false" />
+    </function>
+    <function name="glVertexAttrib2s" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLshort" const="false" pointer="false" />
+      <arg name="y" type="GLshort" const="false" pointer="false" />
+    </function>
+    <function name="glVertexAttrib2f" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLfloat" const="false" pointer="false" />
+      <arg name="y" type="GLfloat" const="false" pointer="false" />
+    </function>
+    <function name="glVertexAttrib2d" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLdouble" const="false" pointer="false" />
+      <arg name="y" type="GLdouble" const="false" pointer="false" />
+    </function>
+    <function name="glVertexAttrib3s" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLshort" const="false" pointer="false" />
+      <arg name="y" type="GLshort" const="false" pointer="false" />
+      <arg name="z" type="GLshort" const="false" pointer="false" />
+    </function>
+    <function name="glVertexAttrib3f" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLfloat" const="false" pointer="false" />
+      <arg name="y" type="GLfloat" const="false" pointer="false" />
+      <arg name="z" type="GLfloat" const="false" pointer="false" />
+    </function>
+    <function name="glVertexAttrib3d" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLdouble" const="false" pointer="false" />
+      <arg name="y" type="GLdouble" const="false" pointer="false" />
+      <arg name="z" type="GLdouble" const="false" pointer="false" />
+    </function>
+    <function name="glVertexAttrib4s" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLshort" const="false" pointer="false" />
+      <arg name="y" type="GLshort" const="false" pointer="false" />
+      <arg name="z" type="GLshort" const="false" pointer="false" />
+      <arg name="w" type="GLshort" const="false" pointer="false" />
+    </function>
+    <function name="glVertexAttrib4f" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLfloat" const="false" pointer="false" />
+      <arg name="y" type="GLfloat" const="false" pointer="false" />
+      <arg name="z" type="GLfloat" const="false" pointer="false" />
+      <arg name="w" type="GLfloat" const="false" pointer="false" />
+    </function>
+    <function name="glVertexAttrib4d" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLdouble" const="false" pointer="false" />
+      <arg name="y" type="GLdouble" const="false" pointer="false" />
+      <arg name="z" type="GLdouble" const="false" pointer="false" />
+      <arg name="w" type="GLdouble" const="false" pointer="false" />
+    </function>
+    <function name="glVertexAttrib4Nub" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="x" type="GLubyte" const="false" pointer="false" />
+      <arg name="y" type="GLubyte" const="false" pointer="false" />
+      <arg name="z" type="GLubyte" const="false" pointer="false" />
+      <arg name="w" type="GLubyte" const="false" pointer="false" />
+    </function>
+    <function name="glVertexAttrib1sv" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLshort" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib1fv" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLfloat" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib1dv" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLdouble" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib2sv" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLshort" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib2fv" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLfloat" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib2dv" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLdouble" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib3sv" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLshort" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib3fv" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLfloat" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib3dv" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLdouble" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4bv" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLbyte" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4sv" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLshort" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4iv" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLint" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4ubv" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLubyte" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4usv" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLushort" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4uiv" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLuint" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4fv" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLfloat" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4dv" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLdouble" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4Nbv" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLbyte" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4Nsv" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLshort" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4Niv" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLint" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4Nubv" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLubyte" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4Nusv" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLushort" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttrib4Nuiv" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="v" type="GLuint" const="true" pointer="true" />
+    </function>
+    <function name="glVertexAttribPointer" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="size" type="GLint" const="false" pointer="false" />
+      <arg name="type" type="GLenum" const="false" pointer="false" />
+      <arg name="normalized" type="GLboolean" const="false" pointer="false" />
+      <arg name="stride" type="GLsizei" const="false" pointer="false" />
+      <arg name="pointer" type="GLvoid" const="true" pointer="true" />
+    </function>
+    <function name="glEnableVertexAttribArray" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glDisableVertexAttribArray" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glBindAttribLocation" return="GLvoid" pointer="false">
+      <arg name="programObj" type="GLuint" const="false" pointer="false" />
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="name" type="GLchar" const="true" pointer="true" />
+    </function>
+    <function name="glGetActiveAttrib" return="GLvoid" pointer="false">
+      <arg name="programObj" type="GLuint" const="false" pointer="false" />
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="maxLength" type="GLsizei" const="false" pointer="false" />
+      <arg name="length" type="GLsizei" const="false" pointer="true" />
+      <arg name="size" type="GLint" const="false" pointer="true" />
+      <arg name="type" type="GLenum" const="false" pointer="true" />
+      <arg name="name" type="GLchar" const="false" pointer="true" />
+    </function>
+    <function name="glGetAttribLocation" return="GLint" pointer="false">
+      <arg name="programObj" type="GLuint" const="false" pointer="false" />
+      <arg name="name" type="GLchar" const="true" pointer="true" />
+    </function>
+    <function name="glGetVertexAttribPointerv" return="GLvoid" pointer="false">
+      <arg name="index" type="GLuint" const="false" pointer="false" />
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+      <arg name="pointer" type="GLvoid*" const="false" pointer="true" />
+    </function>
+    <!-- Promoted: ARB_shading_language_100 -->
+    <!-- Promoted: ARB_draw_buffers -->
+    <token name="GL_MAX_DRAW_BUFFERS" value="0x8824" />
+    <token name="GL_DRAW_BUFFER0" value="0x8825" />
+    <token name="GL_DRAW_BUFFER1" value="0x8826" />
+    <token name="GL_DRAW_BUFFER2" value="0x8827" />
+    <token name="GL_DRAW_BUFFER3" value="0x8828" />
+    <token name="GL_DRAW_BUFFER4" value="0x8829" />
+    <token name="GL_DRAW_BUFFER5" value="0x882A" />
+    <token name="GL_DRAW_BUFFER6" value="0x882B" />
+    <token name="GL_DRAW_BUFFER7" value="0x882C" />
+    <token name="GL_DRAW_BUFFER8" value="0x882D" />
+    <token name="GL_DRAW_BUFFER9" value="0x882E" />
+    <token name="GL_DRAW_BUFFER10" value="0x882F" />
+    <token name="GL_DRAW_BUFFER11" value="0x8830" />
+    <token name="GL_DRAW_BUFFER12" value="0x8831" />
+    <token name="GL_DRAW_BUFFER13" value="0x8832" />
+    <token name="GL_DRAW_BUFFER14" value="0x8833" />
+    <token name="GL_DRAW_BUFFER15" value="0x8834" />
+    <!-- Promoted: ARB_texture_non_power_of_two -->
+    <!-- Promoted: ARB_point_sprite -->
+    <token name="GL_POINT_SPRITE" value="0x8861" />
+    <token name="GL_COORD_REPLACE" value="0x8862" />
+    <token name="GL_POINT_SPRITE_COORD_ORIGIN" value="0x8CA0" />
+    <token name="GL_LOWER_LEFT" value="0x8CA1" />
+    <token name="GL_UPPER_LEFT" value="0x8CA2" />
+    <!-- Promoted: EXT_blend_equation_separate -->
+    <function name="glBlendEquationSeparate" return="GLvoid" pointer="false">
+      <arg name="modeRGB" type="GLenum" const="false" pointer="false" />
+      <arg name="modeAlpha" type="GLenum" const="false" pointer="false" />
+    </function>
+    <token name="GL_BLEND_EQUATION_RGB" value="BLEND_EQUATION" />
+    <token name="GL_BLEND_EQUATION_ALPHA" value="0x883D" />
+    <!-- New: separate stencil -->
+    <token name="GL_STENCIL_BACK_REF" value="0x8CA3" />
+    <token name="GL_STENCIL_BACK_VALUE_MASK" value="0x8CA4" />
+    <token name="GL_STENCIL_BACK_WRITEMASK" value="0x8CA5" />
+    <function name="glStencilFuncSeparate" return="GLvoid" pointer="false">
+      <arg name="face" type="GLenum" const="false" pointer="false" />
+      <arg name="func" type="GLenum" const="false" pointer="false" />
+      <arg name="ref" type="GLint" const="false" pointer="false" />
+      <arg name="mask" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glStencilOpSeparate" return="GLvoid" pointer="false">
+      <arg name="face" type="GLenum" const="false" pointer="false" />
+      <arg name="sfail" type="GLenum" const="false" pointer="false" />
+      <arg name="dpfail" type="GLenum" const="false" pointer="false" />
+      <arg name="dppass" type="GLenum" const="false" pointer="false" />
+    </function>
+  </extension>
+  <extension name="GL_version_2_1" type="GLver">
+    <depends ext="GL_version_2_0" />
+    <!-- New: non-square matrices -->
+    <function name="glUniformMatrix2x3fv" return="GLvoid" pointer="false">
+      <arg name="location" type="GLint" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="false" />
+      <arg name="transpose" type="GLboolean" const="false" pointer="false" />
+      <arg name="value" type="GLfloat" const="false" pointer="true" />
+    </function>
+    <function name="glUniformMatrix3x2fv" return="GLvoid" pointer="false">
+      <arg name="location" type="GLint" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="false" />
+      <arg name="transpose" type="GLboolean" const="false" pointer="false" />
+      <arg name="value" type="GLfloat" const="false" pointer="true" />
+    </function>
+    <function name="glUniformMatrix2x4fv" return="GLvoid" pointer="false">
+      <arg name="location" type="GLint" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="false" />
+      <arg name="transpose" type="GLboolean" const="false" pointer="false" />
+      <arg name="value" type="GLfloat" const="false" pointer="true" />
+    </function>
+    <function name="glUniformMatrix4x2fv" return="GLvoid" pointer="false">
+      <arg name="location" type="GLint" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="false" />
+      <arg name="transpose" type="GLboolean" const="false" pointer="false" />
+      <arg name="value" type="GLfloat" const="false" pointer="true" />
+    </function>
+    <function name="glUniformMatrix3x4fv" return="GLvoid" pointer="false">
+      <arg name="location" type="GLint" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="false" />
+      <arg name="transpose" type="GLboolean" const="false" pointer="false" />
+      <arg name="value" type="GLfloat" const="false" pointer="true" />
+    </function>
+    <function name="glUniformMatrix4x3fv" return="GLvoid" pointer="false">
+      <arg name="location" type="GLint" const="false" pointer="false" />
+      <arg name="count" type="GLsizei" const="false" pointer="false" />
+      <arg name="transpose" type="GLboolean" const="false" pointer="false" />
+      <arg name="value" type="GLfloat" const="false" pointer="true" />
+    </function>
+    <!-- promoted: ARB_pixel_buffer_objects -->
+    <token name="GL_PIXEL_PACK_BUFFER" value="0x88EB" />
+    <token name="GL_PIXEL_UNPACK_BUFFER" value="0x88EC" />
+    <token name="GL_PIXEL_PACK_BUFFER_BINDING" value="0x88ED" />
+    <token name="GL_PIXEL_UNPACK_BUFFER_BINDING" value="0x88EF" />
+    <!-- promoted: EXT_texture_sRGB -->
+    <token name="GL_SRGB" value="0x8C40" />
+    <token name="GL_SRGB8" value="0x8C41" />
+    <token name="GL_SRGB_ALPHA" value="0x8C42" />
+    <token name="GL_SRGB8_ALPHA8" value="0x8C43" />
+    <token name="GL_SLUMINANCE_ALPHA" value="0x8C44" />
+    <token name="GL_SLUMINANCE8_ALPHA8" value="0x8C45" />
+    <token name="GL_SLUMINANCE" value="0x8C46" />
+    <token name="GL_SLUMINANCE8" value="0x8C47" />
+    <token name="GL_COMPRESSED_SRGB" value="0x8C48" />
+    <token name="GL_COMPRESSED_SRGB_ALPHA" value="0x8C49" />
+    <token name="GL_COMPRESSED_SLUMINANCE" value="0x8C4A" />
+    <token name="GL_COMPRESSED_SLUMINANCE_ALPHA" value="0x8C4B" />
   </extension>
   <extension name="GL_ARB_imaging" type="GL">
     <token name="GL_CONSTANT_COLOR" value="32769" />
@@ -1864,16 +2786,16 @@
     <token name="GL_FOG_COORDINATE_ARRAY_STRIDE_EXT" value="33877" />
     <token name="GL_FOG_COORDINATE_ARRAY_POINTER_EXT" value="33878" />
     <token name="GL_FOG_COORDINATE_ARRAY_EXT" value="33879" />
-    <function name="glFogCoordfEXfloat" return="GLvoid" pointer="false">
+    <function name="glFogCoordfEXT" return="GLvoid" pointer="false">
       <arg name="coord" type="GLfloat" const="false" pointer="false" />
     </function>
-    <function name="glFogCoorddEXdouble" return="GLvoid" pointer="false">
+    <function name="glFogCoorddEXT" return="GLvoid" pointer="false">
       <arg name="coord" type="GLdouble" const="false" pointer="false" />
     </function>
-    <function name="glFogCoordfvEXfloat" return="GLvoid" pointer="false">
+    <function name="glFogCoordfvEXT" return="GLvoid" pointer="false">
       <arg name="coord" type="GLfloat" const="false" pointer="false" />
     </function>
-    <function name="glFogCoorddvEXdouble" return="GLvoid" pointer="false">
+    <function name="glFogCoorddvEXT" return="GLvoid" pointer="false">
       <arg name="coord" type="GLdouble" const="false" pointer="false" />
     </function>
     <function name="glFogCoordPointerEXT" return="GLvoid" pointer="false">
@@ -6396,5 +7318,90 @@
     <token name="GL_TEXTURE_BINDING_RECTANGLE_EXT" value="0x84F6" />
     <token name="GL_PROXY_TEXTURE_RECTANGLE_EXT" value="0x84F7" />
     <token name="GL_MAX_RECTANGLE_TEXTURE_SIZE_EXT" value="0x84F8" />
+  </extension>
+  <extension name="GL_ARB_occlusion_query" type="GL">
+    <token name="GL_SAMPLES_PASSED_ARB" value="0x8914" />
+    <token name="GL_QUERY_COUNTER_BITS_ARB" value="0x8864" />
+    <token name="GL_CURRENT_QUERY_ARB" value="0x8865" />
+    <token name="GL_QUERY_RESULT_ARB" value="0x8866" />
+    <token name="GL_QUERY_RESULT_AVAILABLE_ARB" value="0x8867" />
+    <function name="glGenQueriesARB" return="GLvoid" pointer="false">
+      <arg name="n" type="GLsizei" const="false" pointer="false" />
+      <arg name="ids" type="GLuint" const="false" pointer="true" />
+    </function>
+    <function name="glDeleteQueriesARB" return="GLvoid" pointer="false">
+      <arg name="n" type="GLsizei" const="false" pointer="false" />
+      <arg name="ids" type="GLuint" const="false" pointer="true" />
+    </function>
+    <function name="glIsQueryARB" return="GLboolean" pointer="false">
+      <arg name="id" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glBeginQueryARB" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="id" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glEndQueryARB" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+    </function>
+    <function name="glGetQueryivARB" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+      <arg name="params" type="GLint" const="false" pointer="true" />
+    </function>
+    <function name="glGetQueryObjectivARB" return="GLvoid" pointer="false">
+      <arg name="id" type="GLuint" const="false" pointer="false" />
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+      <arg name="params" type="GLint" const="false" pointer="true" />
+    </function>
+    <function name="glGetQueryObjectuivARB" return="GLvoid" pointer="false">
+      <arg name="id" type="GLuint" const="false" pointer="false" />
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+      <arg name="params" type="GLuint" const="false" pointer="true" />
+    </function>
+  </extension>
+  <extension name="GL_ARB_draw_buffers" type="GL">
+    <token name="GL_MAX_DRAW_BUFFERS_ARB" value="0x8824" />
+    <token name="GL_DRAW_BUFFER0_ARB" value="0x8825" />
+    <token name="GL_DRAW_BUFFER1_ARB" value="0x8826" />
+    <token name="GL_DRAW_BUFFER2_ARB" value="0x8827" />
+    <token name="GL_DRAW_BUFFER3_ARB" value="0x8828" />
+    <token name="GL_DRAW_BUFFER4_ARB" value="0x8829" />
+    <token name="GL_DRAW_BUFFER5_ARB" value="0x882A" />
+    <token name="GL_DRAW_BUFFER6_ARB" value="0x882B" />
+    <token name="GL_DRAW_BUFFER7_ARB" value="0x882C" />
+    <token name="GL_DRAW_BUFFER8_ARB" value="0x882D" />
+    <token name="GL_DRAW_BUFFER9_ARB" value="0x882E" />
+    <token name="GL_DRAW_BUFFER10_ARB" value="0x882F" />
+    <token name="GL_DRAW_BUFFER11_ARB" value="0x8830" />
+    <token name="GL_DRAW_BUFFER12_ARB" value="0x8831" />
+    <token name="GL_DRAW_BUFFER13_ARB" value="0x8832" />
+    <token name="GL_DRAW_BUFFER14_ARB" value="0x8833" />
+    <token name="GL_DRAW_BUFFER15_ARB" value="0x8834" />
+  </extension>
+  <extension name="GL_EXT_blend_equation_separate" type="GL">
+    <function name="glBlendEquationSeparateEXT" return="GLvoid" pointer="false">
+      <arg name="modeRGB" type="GLenum" const="false" pointer="false" />
+      <arg name="modeAlpha" type="GLenum" const="false" pointer="false" />
+    </function>
+    <token name="GL_BLEND_EQUATION_RGB_EXT" value="BLEND_EQUATION" />
+    <token name="GL_BLEND_EQUATION_ALPHA_EXT" value="0x883D" />
+  </extension>
+  <extension name="GL_EXT_texture_sRGB" type="GL">
+    <token name="GL_SRGB_EXT" value="0x8C40" />
+    <token name="GL_SRGB8_EXT" value="0x8C41" />
+    <token name="GL_SRGB_ALPHA_EXT" value="0x8C42" />
+    <token name="GL_SRGB8_ALPHA8_EXT" value="0x8C43" />
+    <token name="GL_SLUMINANCE_ALPHA_EXT" value="0x8C44" />
+    <token name="GL_SLUMINANCE8_ALPHA8_EXT" value="0x8C45" />
+    <token name="GL_SLUMINANCE_EXT" value="0x8C46" />
+    <token name="GL_SLUMINANCE8_EXT" value="0x8C47" />
+    <token name="GL_COMPRESSED_SRGB_EXT" value="0x8C48" />
+    <token name="GL_COMPRESSED_SRGB_ALPHA_EXT" value="0x8C49" />
+    <token name="GL_COMPRESSED_SLUMINANCE_EXT" value="0x8C4A" />
+    <token name="GL_COMPRESSED_SLUMINANCE_ALPHA_EXT" value="0x8C4B" />
+    <token name="GL_COMPRESSED_SRGB_S3TC_DXT1_EXT" value="0x8C4C" />
+    <token name="GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT" value="0x8C4D" />
+    <token name="GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT" value="0x8C4E" />
+    <token name="GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT" value="0x8C4F" />
   </extension>
 </extensionlist>

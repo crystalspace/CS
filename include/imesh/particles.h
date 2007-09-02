@@ -137,6 +137,33 @@ enum csParticleIntegrationMode
 };
 
 /**
+ * Particle transformation mode.
+ * Controls how and when particles are transformed, and thereby also controls
+ * the coordinate system for particles, emitters and effectors.
+ */
+enum csParticleTransformMode
+{
+  /**
+   * Fully local mode. 
+   * All positions and coordinates are relative to particle system.
+   */
+  CS_PARTICLE_LOCAL_MODE,
+  /**
+   * Mixed coordinate mode.
+   * Particle position and effectors are specified in world space, while
+   * emitters operate in local mode.
+   * \warning Do note that this mode will introduce extra overhead compared
+   * to the other two modes and use only when neccesary.
+   */
+  CS_PARTICLE_LOCAL_EMITTER,
+  /**
+   * Fully global mode.
+   * All coordinates are in world space (absolute space).
+   */
+  CS_PARTICLE_WORLD_MODE
+};
+
+/**
  * Data representation of a single particle.
  */
 struct csParticle
@@ -310,7 +337,8 @@ struct iParticleEmitter : public virtual iBase
    * Spawn new particles.
    */
   virtual void EmitParticles (iParticleSystemBase* system,
-    const csParticleBuffer& particleBuffer, float dt, float totalTime) = 0;
+    const csParticleBuffer& particleBuffer, float dt, float totalTime,
+    const csReversibleTransform* const emitterToParticle = 0) = 0;
 
 };
 
@@ -376,21 +404,11 @@ struct iParticleSystemBase : public virtual iBase
   /// Get the common direction
   virtual const csVector3& GetCommonDirection () const = 0;
 
-  /**
-   * Set if particle system should be in local transform mode.
-   * 
-   * When a particle system is in local transform mode all positions and
-   * orientations, including emitters, effectors and common directory,
-   * will be relative to the particle system. This is useful for particle
-   * effects that should follow another entity around.
-   *
-   * The opposite to local mode is global mode, where all coordinates will be
-   * in world coordinates.
-   */
-  virtual void SetLocalMode (bool local) = 0;
+  /// Set transform mode
+  virtual void SetTransformMode (csParticleTransformMode mode) = 0;
 
-  /// Get local mode
-  virtual bool GetLocalMode () const = 0;
+  /// Get transform mode
+  virtual csParticleTransformMode GetTransformMode () const = 0;
 
   /// Set if particles should use specified or their own size
   virtual void SetUseIndividualSize (bool individual) = 0;

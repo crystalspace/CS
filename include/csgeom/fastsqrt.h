@@ -36,11 +36,10 @@
   #pragma message ("FastSqrt is deprecated. Use sqrtf instead.")
 #endif
 
-/// declare table of square roots
-CS_CRYSTALSPACE_EXPORT void BuildSqrtTable ()
-{}
-/// fast square root, looks up table build by BuildSqrtTable().
-CS_CRYSTALSPACE_EXPORT float FastSqrt (float n)
+///\deprecated Use sqrtf instead
+static CS_DEPRECATED_METHOD void BuildSqrtTable () {}
+///\deprecated Use sqrtf instead
+static CS_DEPRECATED_METHOD float FastSqrt (float n)
 {
   return sqrtf(n);
 }

@@ -278,7 +278,7 @@ bool csAnimControlRunnable::Do (csTicks current, bool& stop)
 	  ac_color_execution m;
 	  m.final = current + inst.color.duration;
 	  m.group = groups[inst.color.group_id];
-	  csColor4 current_col = m.group->GetColor ();
+	  csColor current_col = m.group->GetColor ();
 	  m.final_color.Set (inst.color.red, inst.color.green,
 	  	inst.color.blue);
 	  if (inst.color.duration == 0)
@@ -936,7 +936,7 @@ csGenmeshAnimationControlType::~csGenmeshAnimationControlType ()
   {
     csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q)
-      RemoveWeakListener (q, weakEventHandler);
+      CS::RemoveWeakListener (q, weakEventHandler);
   }
 }
 
@@ -949,7 +949,7 @@ bool csGenmeshAnimationControlType::Initialize (iObjectRegistry* object_reg)
   // \todo It looks like @csGenmeshAnimationControlType doesn't actually handle any events.  So why does it register an event listener?
   if (q != 0) {
     csEventID events[] = { Frame, PreProcess, CS_EVENTLIST_END };
-    RegisterWeakListener (q, this, events, weakEventHandler);
+    CS::RegisterWeakListener (q, this, events, weakEventHandler);
   }
   return true;
 }

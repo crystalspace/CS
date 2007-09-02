@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GUILayout>
+    <Window Type="DefaultWindow" Name="root">
+        <Property Name="UnifiedMaxSize" Value="{{1,0},{1,0}}" />
+        <Property Name="UnifiedAreaRect" Value="{{0,0},{0,0},{1,0},{1,0}}" />
+ 
+        <Window Type="ice/FrameWindow" Name="Form" >
+            <Property Name="Text" Value="ViewMesh" />
+            <Property Name='UnifiedSize' Value='{{0.0,164.0},{0.0,350.0}}'/>
+	    <Property Name='UnifiedPosition' Value='{{0.01,0.0},{0.01,0.0}}'/>
+            <Property Name="CloseButtonEnabled" Value="False" />
+            <Property Name='SizingEnabled' Value='False'/>
+             <Window Type="ice/TabControl" Name="Root/Control/Tabs" >
+             	<Property Name='UnifiedSize' Value='{{0.000000,154.000000},{0.000000,318.000000}}'/>
+	     	<Property Name='UnifiedPosition' Value='{{0.000000,5.000000},{0.000000,30.000000}}'/>
+	     	<Property Name='TabHeight' Value='{0.05,0}'/>
+		<Property Name='TabTextPadding' Value='{0.02,0}'/>
+ 
+	         <Window Type="DefaultWindow" Name="Root/Control/Tabs/Tab1" > 
+	           <Property Name="Text" Value="Main" />
+	             <Window Type="ice/StaticImage" Name="Root/Control/Tabs/Tab1/main" >
+		   	<Property Name='UnifiedSize' Value='{{1.0,0.0},{1.0,0.0}'/>
+	     	        <Property Name='UnifiedPosition' Value='{{0.0,0.0},{0.0,0.0}}'/>
+ 
+	     	        <Window Type="ice/Button" Name="Tab1/LoadButton" >
+				<Property Name="Text" Value="Load" />
+			        <Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,25.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,5.0}}'/>
+                       </Window>
+                       <Window Type="ice/Button" Name="Tab1/SaveButton" >
+		       		<Property Name="Text" Value="Save XML" />
+		       		<Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,25.0}}'/>
+		       		<Property Name='UnifiedPosition' Value='{{0.0,77.0},{0.0,5.0}}'/>
+                       </Window>
+ 
+	     	        <Window Type="ice/Button" Name="Tab1/LoadLibButton" >
+				<Property Name="Text" Value="Load Lib" />
+			        <Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,25.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,35.0}}'/>
+                       </Window>
+                       <Window Type="ice/Button" Name="Tab1/SaveBinaryButton" >
+		       		<Property Name="Text" Value="Save Binary" />
+		       		<Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,25.0}}'/>
+		       		<Property Name='UnifiedPosition' Value='{{0.0,77.0},{0.0,35.0}}'/>
+                       </Window>                  
+ 
+ 
+ 
+	     	        <Window Type="ice/StaticText" Name="Tab1/ScaleSpriteLable" >
+				<Property Name="Text" Value="Scale" />
+				<Property Name="BackgroundEnabled" Value="False" />
+				<Property Name="FrameEnabled" Value="False" />				
+			        <Property Name='UnifiedSize' Value='{{0.0,40.0},{0.0,32.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,100.0}}'/>
+                       </Window> 
+	     	        <Window Type="ice/Editbox" Name="Tab1/ScaleSprite" >
+			        <Property Name='UnifiedSize' Value='{{0.0,100.0},{0.0,32.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,47.0},{0.0,100.0}}'/>
+                       </Window>  
+ 
+ 
+ 
+                       <Window Type="ice/RadioButton" Name="Tab1/NormalMovementRadio" >
+		                <Property Name="Text" Value="Normal Movement" />
+		                <Property Name='UnifiedSize' Value='{{0.0,140.0},{0.0,25.0}}'/>
+		       		<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,205.0}}'/>
+                        </Window>
+                        <Window Type="ice/RadioButton" Name="Tab1/LooktooriginRadio" >
+				<Property Name="Text" Value="Look to origin" />
+				<Property Name='UnifiedSize' Value='{{0.0,140.0},{0.0,25.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,230.0}}'/>
+                        </Window>
+                        <Window Type="ice/RadioButton" Name="Tab1/RotateRadio" >
+				<Property Name="Text" Value="Rotate" />
+				<Property Name='UnifiedSize' Value='{{0.0,140.0},{0.0,25.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,255.0}}'/>
+                        </Window>
+ 
+                     </Window>
+	         </Window>
+ 
+ 
+	         <Window Type="DefaultWindow" Name="Root/Control/Tabs/Tab2" > 
+	           <Property Name="Text" Value="Ani" />
+	             <Window Type="ice/StaticImage" Name="Root/Control/Tabs/Tab2/main" >
+		   	<Property Name='UnifiedSize' Value='{{1.0,0.0},{1.0,0.0}'/>
+	     	        <Property Name='UnifiedPosition' Value='{{0.0,0.0},{0.0,0.0}}'/>
+ 
+	     	        <Window Type="ice/Listbox" Name="Tab2/List" >
+				<Property Name="Text" Value="Set" />
+				<Property Name='UnifiedSize' Value='{{0.0,144.0},{0.0,150.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,5.0}}'/>
+                       </Window>
+ 
+ 
+ 
+	     	        <Window Type="ice/Button" Name="Tab2/SetAnimation" >
+				<Property Name="Text" Value="Set" />
+			        <Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,25.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,165.0}}'/>
+                       </Window>
+                       <Window Type="ice/Button" Name="Tab2/AddAnimation" >
+		       		<Property Name="Text" Value="Add" />
+		       		<Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,25.0}}'/>
+		       		<Property Name='UnifiedPosition' Value='{{0.0,77.0},{0.0,165.0}}'/>
+                       </Window>
+	     	        <Window Type="ice/Button" Name="Tab2/RemoveAnimation" >
+				<Property Name="Text" Value="Remove" />
+			        <Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,25.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,195.0}}'/>
+                       </Window>
+                       <Window Type="ice/Button" Name="Tab2/ClearAnimation" >
+		       		<Property Name="Text" Value="Clear" />
+		       		<Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,25.0}}'/>
+		       		<Property Name='UnifiedPosition' Value='{{0.0,77.0},{0.0,195.0}}'/>
+                       </Window>  
+ 
+ 
+ 
+	     	        <Window Type="ice/Button" Name="Tab2/FasterAnimation" >
+				<Property Name="Text" Value="Faster" />
+			        <Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,25.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,235.0}}'/>
+                       </Window>
+                       <Window Type="ice/Button" Name="Tab2/SlowerAnimation" >
+		       		<Property Name="Text" Value="Slower" />
+		       		<Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,25.0}}'/>
+		       		<Property Name='UnifiedPosition' Value='{{0.0,77.0},{0.0,235.0}}'/>
+                       </Window>
+	     	        <Window Type="ice/Button" Name="Tab2/ReverseAnimation" >
+				<Property Name="Text" Value="Reverse" />
+			        <Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,25.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,265.0}}'/>
+                       </Window>
+                       <Window Type="ice/Button" Name="Tab2/StopAnimation" >
+		       		<Property Name="Text" Value="Stop" />
+		       		<Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,25.0}}'/>
+		       		<Property Name='UnifiedPosition' Value='{{0.0,77.0},{0.0,265.0}}'/>
+                       </Window>                         
+ 
+                     </Window>
+	         </Window>
+ 
+ 
+              <Window Type="DefaultWindow" Name="Root/Control/Tabs/Tab3" > 
+	           <Property Name="Text" Value="Sck" />
+	             <Window Type="ice/StaticImage" Name="Root/Control/Tabs/Tab3/main" >
+		   	<Property Name='UnifiedSize' Value='{{1.0,0.0},{1.0,0.0}'/>
+	     	        <Property Name='UnifiedPosition' Value='{{0.0,0.0},{0.0,0.0}}'/>
+ 
+	     	        <Window Type="ice/Listbox" Name="Tab3/List" >
+				<Property Name="Text" Value="Set" />
+				<Property Name='UnifiedSize' Value='{{0.0,144.0},{0.0,110.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,5.0}}'/>
+                       </Window>
+ 
+ 
+	     	        <Window Type="ice/Editbox" Name="Tab3/RenameSocket/Input" >
+			        <Property Name='UnifiedSize' Value='{{0.0,110.0},{0.0,32.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,120.0}}'/>
+                       </Window> 
+	     	        <Window Type="ice/Button" Name="Tab3/RenameSocket" >
+	     	                <Property Name="Text" Value="OK" />
+			        <Property Name='UnifiedSize' Value='{{0.0,30.0},{0.0,32.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,117.0},{0.0,120.0}}'/>
+                       </Window>  
+ 
+	     	        <Window Type="ice/Button" Name="Tab3/AddSocket" >
+				<Property Name="Text" Value="Add" />
+			        <Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,25.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,155.0}}'/>
+                       </Window>
+                       <Window Type="ice/Button" Name="Tab3/DelSocket" >
+		       		<Property Name="Text" Value="Delete" />
+		       		<Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,25.0}}'/>
+		       		<Property Name='UnifiedPosition' Value='{{0.0,77.0},{0.0,155.0}}'/>
+                       </Window>  
+ 
+ 
+	     	        <Window Type="ice/StaticText" Name="Tab3/Mesh/StaticText" >
+				<Property Name="Text" Value="Mesh" />
+				<Property Name="BackgroundEnabled" Value="False" />
+				<Property Name="FrameEnabled" Value="False" />
+			        <Property Name='UnifiedSize' Value='{{0.0,46.0},{0.0,20.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,175.0}}'/>
+                       </Window> 
+	     	        <Window Type="ice/Editbox" Name="Tab3/Mesh/Input" >
+			        <Property Name='UnifiedSize' Value='{{0.0,46.0},{0.0,28.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,195.0}}'/>
+                       </Window> 
+	     	        <Window Type="ice/StaticText" Name="Tab3/Sub/StaticText" >
+				<Property Name="Text" Value="Sub" />
+				<Property Name="BackgroundEnabled" Value="False" />
+				<Property Name="FrameEnabled" Value="False" />
+			        <Property Name='UnifiedSize' Value='{{0.0,46.0},{0.0,20.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,53.0},{0.0,175.0}}'/>
+                       </Window> 
+	     	        <Window Type="ice/Editbox" Name="Tab3/Sub/Input" >
+			        <Property Name='UnifiedSize' Value='{{0.0,46.0},{0.0,28.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,53.0},{0.0,195.0}}'/>
+                       </Window>                        
+	     	        <Window Type="ice/StaticText" Name="Tab3/Tria/StaticText" >
+				<Property Name="Text" Value="Tria" />
+				<Property Name="BackgroundEnabled" Value="False" />
+				<Property Name="FrameEnabled" Value="False" />
+			        <Property Name='UnifiedSize' Value='{{0.0,46.0},{0.0,20.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,101.0},{0.0,175.0}}'/>
+                       </Window> 
+	     	        <Window Type="ice/Editbox" Name="Tab3/Tria/Input" >
+			        <Property Name='UnifiedSize' Value='{{0.0,46.0},{0.0,28.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,101.0},{0.0,195.0}}'/>
+                       </Window>                         
+ 
+ 
+	     	        <Window Type="ice/StaticText" Name="Tab3/RotX/StaticText" >
+				<Property Name="Text" Value="RotX" />
+				<Property Name="BackgroundEnabled" Value="False" />
+				<Property Name="FrameEnabled" Value="False" />
+			        <Property Name='UnifiedSize' Value='{{0.0,46.0},{0.0,20.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,220.0}}'/>
+                       </Window> 
+	     	        <Window Type="ice/Editbox" Name="Tab3/RotX/Input" >
+			        <Property Name='UnifiedSize' Value='{{0.0,46.0},{0.0,28.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,240.0}}'/>
+                       </Window> 
+	     	        <Window Type="ice/StaticText" Name="Tab3/RotY/StaticText" >
+				<Property Name="Text" Value="RotY" />
+				<Property Name="BackgroundEnabled" Value="False" />
+				<Property Name="FrameEnabled" Value="False" />
+			        <Property Name='UnifiedSize' Value='{{0.0,46.0},{0.0,20.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,53.0},{0.0,220.0}}'/>
+                       </Window> 
+	     	        <Window Type="ice/Editbox" Name="Tab3/RotY/Input" >
+			        <Property Name='UnifiedSize' Value='{{0.0,46.0},{0.0,28.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,53.0},{0.0,240.0}}'/>
+                       </Window>
+	     	        <Window Type="ice/StaticText" Name="Tab3/RotZ/StaticText" >
+				<Property Name="Text" Value="RotZ" />
+				<Property Name="BackgroundEnabled" Value="False" />
+				<Property Name="FrameEnabled" Value="False" />
+			        <Property Name='UnifiedSize' Value='{{0.0,46.0},{0.0,20.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,101.0},{0.0,220.0}}'/>
+                       </Window> 
+	     	        <Window Type="ice/Editbox" Name="Tab3/RotZ/Input" >
+			        <Property Name='UnifiedSize' Value='{{0.0,46.0},{0.0,28.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,101.0},{0.0,240.0}}'/>
+                       </Window>                         
+ 
+ 
+	     	        <Window Type="ice/Button" Name="Tab3/DetachButton" >
+				<Property Name="Text" Value="Detach" />
+			        <Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,25.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,270.0}}'/>
+                       </Window>
+                       <Window Type="ice/Button" Name="Tab3/AttachButton" >
+		       		<Property Name="Text" Value="Attach" />
+		       		<Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,25.0}}'/>
+		       		<Property Name='UnifiedPosition' Value='{{0.0,77.0},{0.0,270.0}}'/>
+                       </Window>                        
+ 
+ 
+ 
+                     </Window>
+	         </Window>
+ 
+ 
+ 
+<Window Type="DefaultWindow" Name="Root/Control/Tabs/Tab4" > 
+	           <Property Name="Text" Value="Morph" />
+	             <Window Type="ice/StaticImage" Name="Root/Control/Tabs/Tab4/main" >
+		   	<Property Name='UnifiedSize' Value='{{1.0,0.0},{1.0,0.0}'/>
+	     	        <Property Name='UnifiedPosition' Value='{{0.0,0.0},{0.0,0.0}}'/>
+ 
+	     	        <Window Type="ice/Listbox" Name="Tab4/List" >
+				<Property Name="Text" Value="Set" />
+				<Property Name='UnifiedSize' Value='{{0.0,144.0},{0.0,150.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,5.0}}'/>
+                       </Window>
+ 
+ 
+	     	        <Window Type="ice/Editbox" Name="Tab4/WeightInput" >
+			        <Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,32.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,160.0}}'/>
+                       </Window> 
+	     	        <Window Type="ice/Editbox" Name="Tab4/DelayInput" >
+			        <Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,32.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,77.0},{0.0,160.0}}'/>
+                       </Window>  
+ 
+	     	        <Window Type="ice/Button" Name="Tab4/BlendButton" >
+				<Property Name="Text" Value="Blend" />
+			        <Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,25.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,195.0}}'/>
+                       </Window>
+                       <Window Type="ice/Button" Name="Tab4/ClearButton" >
+		       		<Property Name="Text" Value="Clear" />
+		       		<Property Name='UnifiedSize' Value='{{0.0,70.0},{0.0,25.0}}'/>
+		       		<Property Name='UnifiedPosition' Value='{{0.0,77.0},{0.0,195.0}}'/>
+                       </Window>  
+ 
+ 
+ 
+                     </Window>
+	         </Window>
+ 
+ 
+ 
+           </Window>
+        </Window>
+        <Window Type="ice/FrameWindow" Name="StdDlg" >
+            <Property Name="Text" Value="Select File" />
+            <Property Name='UnifiedSize' Value='{{0.0,224.0},{0.0,330.0}}'/>
+	    <Property Name='UnifiedPosition' Value='{{0.01,0.0},{0.01,0.0}}'/>
+            <Property Name="CloseButtonEnabled" Value="False" />
+            <Property Name='SizingEnabled' Value='False'/>
+            <Property Name='Visible' Value='False'/>
+             <Window Type="ice/StaticImage" Name="StdDlg/Main" >
+             	<Property Name='UnifiedSize' Value='{{0.0,214.0},{0.0,298.0}}'/>
+	     	<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,30.0}}'/>
+ 
+ 
+	     	        <Window Type="ice/StaticText" Name="StdDlg/PathLable" >
+				<Property Name="Text" Value="Path" />
+				<Property Name="BackgroundEnabled" Value="False" />
+				<Property Name="FrameEnabled" Value="False" />
+			        <Property Name='UnifiedSize' Value='{{0.0,200.0},{0.0,20.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,2.0}}'/>
+                       </Window> 
+	     	        <Window Type="ice/Editbox" Name="StdDlg/Path" >
+			        <Property Name='UnifiedSize' Value='{{0.0,200.0},{0.0,28.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,22.0}}'/>
+                       </Window> 
+	     	        <Window Type="ice/StaticText" Name="StdDlg/FileLable" >
+				<Property Name="Text" Value="File" />
+				<Property Name="BackgroundEnabled" Value="False" />
+				<Property Name="FrameEnabled" Value="False" />
+			        <Property Name='UnifiedSize' Value='{{0.0,200.0},{0.0,20.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,50.0}}'/>
+                       </Window> 
+	     	        <Window Type="ice/Editbox" Name="StdDlg/File" >
+			        <Property Name='UnifiedSize' Value='{{0.0,200.0},{0.0,28.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,70.0}}'/>
+                       </Window>
+ 
+ 
+	     	        <Window Type="ice/Listbox" Name="StdDlg/DirSelect" >
+			        <Property Name='UnifiedSize' Value='{{0.0,100.0},{0.0,150.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,5.0},{0.0,107.0}}'/>
+                       </Window>  
+	     	        <Window Type="ice/Listbox" Name="StdDlg/FileSelect" >
+			        <Property Name='UnifiedSize' Value='{{0.0,100.0},{0.0,150.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,107.0},{0.0,107.0}}'/>
+                       </Window>                        
+ 
+ 
+ 
+	     	        <Window Type="ice/Button" Name="StdDlg/CancleButton" >
+				<Property Name="Text" Value="Cancel" />
+			        <Property Name='UnifiedSize' Value='{{0.0,80.0},{0.0,25.0}}'/>
+				<Property Name='UnifiedPosition' Value='{{0.0,10.0},{0.0,265.0}}'/>
+                       </Window>
+                       <Window Type="ice/Button" Name="StdDlg/OkButton" >
+		       		<Property Name="Text" Value="OK" />
+		       		<Property Name='UnifiedSize' Value='{{0.0,50.0},{0.0,25.0}}'/>
+		       		<Property Name='UnifiedPosition' Value='{{0.0,150.0},{0.0,265.0}}'/>
+                       </Window>                       
+ 
+ 
+ 
+ 
+                     </Window>
+	         </Window>
+    </Window>
+</GUILayout>
+

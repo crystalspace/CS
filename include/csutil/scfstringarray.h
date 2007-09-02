@@ -56,6 +56,7 @@ public:
    * Get array length.
    * \deprecated Use GetSize() instead.
    */
+  /*CS_DEPRECATED_METHOD_MSG("Use GetSize() instead.")*/
   virtual size_t Length () const
   {
     return GetSize ();
@@ -163,6 +164,7 @@ public:
    * Remove all strings from array.
    * \deprecated Use Empty() instead.
    */
+  CS_DEPRECATED_METHOD_MSG("Use Empty() instead.")
   virtual void DeleteAll ()
   {
     Empty();

@@ -89,7 +89,8 @@ public:
    * Set string maximal capacity to current string length.
    * \deprecated Use ShrinkBestFit() instead.
    */
-  CS_DEPRECATED_METHOD virtual void Reclaim ()
+  CS_DEPRECATED_METHOD_MSG("Use ShrinkBestFit() instead.")
+  virtual void Reclaim ()
   { ShrinkBestFit(); }
 
   /// Clear the string (so that it contains only ending 0 character).
@@ -99,7 +100,8 @@ public:
    * Clear the string (so that it contains only ending 0 character).
    * \deprecated Use Empty() instead.
    */
-  /* CS_DEPRECATED_METHOD */ virtual void Clear ()
+  /* CS_DEPRECATED_METHOD_MSG("Use Empty() instead.") */ 
+  virtual void Clear ()
   { Empty(); }
 
   /// Get a copy of this string

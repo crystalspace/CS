@@ -607,7 +607,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (iDocumentNode* node,
 	float correct = 1.0f / tot;
 	for (i = 1 ; i < num ; i++) list[i] *= correct;
 
-	np->SetTimeValues (list);
+	np->SetTimes (list);
 	delete[] list;
         break;
       }
@@ -651,7 +651,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (iDocumentNode* node,
 	  list[i] = tot / totlen;
 	  v0 = v1;
 	}
-	np->SetTimeValues (list);
+	np->SetTimes (list);
 	delete[] list;
         break;
       }
@@ -686,7 +686,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (iDocumentNode* node,
 	  	"TIMES should use %d entries in path '%s'!", num, pName);
 	  exit (0);
 	}
-	np->SetTimeValues (list);
+	np->SetTimes (list);
         delete[] list;
 	break;
       }

@@ -1295,6 +1295,23 @@ struct iEngine : public virtual iBase
    * This function will also remove the object from the region it may be in.
    */
   virtual bool RemoveObject (iBase* object) = 0;
+
+  /**
+   * This function can be used to remove an object after a specific amount
+   * of time. This is mostly useful for particle systems (like explosions)
+   * that you want to live for a specific time before they are automatically
+   * cleaned up by the engine. Note that calling this function will cause
+   * the engine to keep an additional reference until it is time to delete
+   * the object.
+   */
+  virtual void DelayedRemoveObject (csTicks delay, iBase* object) = 0;
+
+  /**
+   * Clear all delayed removals.
+   * \param remove if true then the objects will also be removed from engine.
+   * Otherwise they are simply removed from this list.
+   */
+  virtual void RemoveDelayedRemoves (bool remove = false) = 0;
  
   /// Delete everything in the engine.
   virtual void DeleteAll () = 0;

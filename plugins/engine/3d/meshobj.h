@@ -62,7 +62,7 @@ class csMeshList : public scfImplementation1<csMeshList, iMeshList>
 {
 private:
   csRefArrayObject<iMeshWrapper> list;
-  csHash<iMeshWrapper*,csStrKey> meshes_hash;
+  csHash<iMeshWrapper*, csString> meshes_hash;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,
   	iObjectNameChangeListener>
@@ -121,7 +121,7 @@ class csMeshFactoryList : public scfImplementation1<csMeshFactoryList,
 {
 private:
   csRefArrayObject<iMeshFactoryWrapper> list;
-  csHash<iMeshFactoryWrapper*,csStrKey>
+  csHash<iMeshFactoryWrapper*, csString>
   	factories_hash;
 
   class NameChangeListener : public scfImplementation1<NameChangeListener,

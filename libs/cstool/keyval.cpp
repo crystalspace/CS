@@ -51,7 +51,8 @@ void csKeyValuePair::SetKey (const char *s)
 
 const char *csKeyValuePair::GetValue (const char* vname) const
 {
-  return values.Get (vname, 0);
+  const csString* val = values.GetElementPointer (vname);
+  return val ? val->GetData() : 0;
 }
 
 const char *csKeyValuePair::GetValue () const
@@ -63,7 +64,8 @@ void csKeyValuePair::SetValue (const char* value)
 {
   values.PutUnique ("value", value);
   names.Add ("value");
-  m_Value = values.Get ("value", 0);
+  const csString* val = values.GetElementPointer ("value");
+  m_Value = val ? val->GetData() : 0;
 }
 
 void csKeyValuePair::SetValue (const char* vname, const char* value)
@@ -81,7 +83,7 @@ csRef<iStringArray> csKeyValuePair::GetValueNames () const
 {
   csRef<iStringArray> ret;
   ret.AttachNew (new scfStringArray ());
-  csSet<csStrKey>::GlobalIterator it = names.GetIterator ();
+  csSet<csString>::GlobalIterator it = names.GetIterator ();
   while (it.HasNext ())
   {
     ret->Push (it.Next ());

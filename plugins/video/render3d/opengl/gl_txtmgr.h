@@ -417,7 +417,7 @@ private:
 
     TextureFormat (GLenum fmt, bool supp) : format (fmt), supported (supp) {}
   };
-  csHash<TextureFormat, csStrKey> textureFormats;
+  csHash<TextureFormat, csString> textureFormats;
 
   GLenum ParseTextureFormat (const char* formatName, GLenum defaultFormat);
   void ReadTextureClasses (iConfigFile* config);

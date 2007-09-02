@@ -34,6 +34,9 @@ AC_PREREQ([2.56])
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_CSWIN32LIBS],
     [AC_REQUIRE([AC_CANONICAL_HOST])
+    # ensure PKGCONFIG is set since we may meddle with it
+    AC_REQUIRE([_CS_CHECK_PKG_CONFIG_PREPARE_PATH]) 
+    AC_REQUIRE([CS_CHECK_MNO_CYGWIN])
     case $host_os in
     mingw*|cygwin*)
         CS_CHECK_TOOLS([CSLIBS_CONFIG], [cslibs-config])
@@ -43,17 +46,27 @@ AC_DEFUN([CS_CHECK_CSWIN32LIBS],
         AC_CACHE_CHECK([for cslibs package], [cs_cv_cslibs],
 	    [AS_IF([test -n "$CSLIBS_CONFIG"],
 	       [cs_cv_cslibs=yes
+               AS_IF([test "x$cs_mno_cygwin" = "xyes"],
+                    [AS_IF(
+			[$CSLIBS_CONFIG -mno-cygwin --cflags >/dev/null 2>&1],
+                        [cs_cv_cslibs_compiler="-mno-cygwin $cs_cv_cslibs_compiler"])])
 	       cs_cv_cslibs_cflags=CS_RUN_PATH_NORMALIZE(
 		    [$CSLIBS_CONFIG --cflags $cs_cv_cslibs_compiler])
 	       cs_cv_cslibs_lflags=CS_RUN_PATH_NORMALIZE(
 		    [$CSLIBS_CONFIG --lflags $cs_cv_cslibs_compiler])
 	       cs_cv_cslibs_binpath=CS_RUN_PATH_NORMALIZE(
-		    [$CSLIBS_CONFIG --binpath $cs_cv_cslibs_compiler])],
+		    [$CSLIBS_CONFIG --binpath $cs_cv_cslibs_compiler])
+               AS_IF([$CSLIBS_CONFIG --pcpath >/dev/null 2>&1],
+                    [cs_cv_cslibs_pcpath=CS_RUN_PATH_NORMALIZE(
+                        [$CSLIBS_CONFIG --pcpath $cs_cv_cslibs_compiler])])],
 	       [cs_cv_cslibs=no])])
         AS_IF([test $cs_cv_cslibs = yes],
 	    [CFLAGS="$CFLAGS $cs_cv_cslibs_cflags"
 	    CPPFLAGS="$CPPFLAGS $cs_cv_cslibs_cflags"
 	    LDFLAGS="$LDFLAGS $cs_cv_cslibs_lflags"
-	    PATH="$cs_cv_cslibs_binpath$PATH_SEPARATOR$PATH"])
+	    PATH="$cs_cv_cslibs_binpath$PATH_SEPARATOR$PATH"
+	    AS_IF([test -n "$cs_cv_cslibs_pcpath"],
+		[PKG_CONFIG_PATH="$cs_cv_cslibs_pcpath$PATH_SEPARATOR$PKG_CONFIG_PATH"
+		export PKG_CONFIG_PATH])])
         ;;
     esac])

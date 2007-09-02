@@ -193,7 +193,8 @@ public:
   void AddAdjacent (const csRect &rect);
   
   ///\deprecated Misspelling; use AddAdjacent() instead
-  CS_DEPRECATED_METHOD void AddAdjanced (const csRect &rect)
+  CS_DEPRECATED_METHOD_MSG("Misspelling; use AddAdjacent() instead")
+  void AddAdjanced (const csRect &rect)
   { AddAdjacent (rect); }
 
   /// Test equality of two rectangles.

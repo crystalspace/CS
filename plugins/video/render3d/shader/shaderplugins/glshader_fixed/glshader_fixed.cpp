@@ -148,10 +148,10 @@ void csGLShader_FIXED::Open()
       texUnits = useTextureUnits;
     }
 
-    ext->InitGL_version_1_3();
-    if (!ext->CS_GL_version_1_3)
+    ext->InitGL_version_1_4();
+    if (!ext->CS_GL_version_1_4)
       ext->InitGL_ARB_texture_env_crossbar();
-    enableCrossbar = ext->CS_GL_version_1_3 
+    enableCrossbar = ext->CS_GL_version_1_4
       || ext->CS_GL_ARB_texture_env_crossbar;
   }
   

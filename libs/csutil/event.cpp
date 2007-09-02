@@ -519,6 +519,9 @@ public:
   { return parent->InstanceSucc(hr, nr, id); }
 };
 
+namespace CS
+{
+
 csHandlerID RegisterWeakListener (iEventQueue *q, iEventHandler *listener,
   csRef<iEventHandler> &handler)
 {
@@ -544,3 +547,5 @@ void RemoveWeakListener (iEventQueue *q, csRef<iEventHandler> &handler)
 {
   q->RemoveListener(handler);
 }
+
+} // namespace CS

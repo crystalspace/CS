@@ -26,6 +26,7 @@
 
 #include "csextern.h"
 
+#include "csutil/csstring.h"
 #include "csutil/parray.h"
 #include "csutil/stringarray.h"
 #include "csutil/zip.h"

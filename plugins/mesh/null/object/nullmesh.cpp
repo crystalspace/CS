@@ -37,7 +37,7 @@ CS_IMPLEMENT_PLUGIN
 
 csNullmeshMeshObject::csNullmeshMeshObject (csNullmeshMeshFactory* factory,
                                             iMeshObjectType* parent)
-  : scfImplementationType(this), logparent (0), nullmesh_type (parent),
+  : scfImplementationType(this), nullmesh_type (parent), logparent (0),
   vis_cb (0)
 {
   csNullmeshMeshObject::factory = factory;

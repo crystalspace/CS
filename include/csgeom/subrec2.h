@@ -25,5 +25,5 @@
 #endif
 
 #include "subrec.h"
-typedef csSubRect csSubRect2;
-typedef csSubRectangles csSubRectangles2;
+typedef CS_DEPRECATED_TYPE csSubRect csSubRect2;
+typedef CS_DEPRECATED_TYPE csSubRectangles csSubRectangles2;

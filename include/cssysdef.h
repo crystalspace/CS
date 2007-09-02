@@ -893,14 +893,15 @@ inline void* operator new[] (size_t s)
  * Use the CS_DEPRECATED_TYPE macro after type declarations to
  * indicate that they are deprecated. Example:
  * \code
- * typedef csFoo csBar CS_DEPRECATED_TYPE;
+ * typedef CS_DEPRECATED_TYPE csFoo csBar;
+ * class CS_DEPRECATED_TYPE csBaz { };
  * \endcode
  * Compilers which are capable of flagging deprecation will exhibit a warning
  * when it encounters client code using types so tagged.
  */
 #if !defined(CS_DEPRECATED_TYPE) || defined(DOXYGEN_RUN)
 #  if defined(CS_COMPILER_MSVC)
-#    define CS_DEPRECATED_TYPE
+#    define CS_DEPRECATED_TYPE __declspec(deprecated)
 #  else
 #    define CS_DEPRECATED_TYPE
 #  endif
@@ -911,7 +912,11 @@ inline void* operator new[] (size_t s)
  * on compilers that support it.
  */
 #if !defined(CS_DEPRECATED_TYPE_MSG) || defined(DOXYGEN_RUN)
-#  define CS_DEPRECATED_TYPE_MSG(msg) CS_DEPRECATED_TYPE
+#  if defined(CS_COMPILER_MSVC) && _MSC_VER >= 1400
+#    define CS_DEPRECATED_TYPE_MSG(msg) __declspec(deprecated(msg))
+#  else
+#    define CS_DEPRECATED_TYPE_MSG(msg) CS_DEPRECATED_TYPE
+#  endif
 #endif
 
 /**\def CS_CONST_METHOD

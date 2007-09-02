@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 
+#include "csgeom/transfrm.h"
 #include "csutil/scf.h"
 #include "csutil/floatrand.h"
 #include "csutil/randomgen.h"
@@ -29,7 +30,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
   // General random number generators
   CS_IMPLEMENT_STATIC_VAR(GetVGen, csRandomVectorGen,);
   CS_IMPLEMENT_STATIC_VAR(GetFGen, csRandomFloatGen,);
-  //CS_IMPLEMENT_STATIC_VAR(GetIGen, csRandomGen,);  
 
   /**
    * Small helper-function to calculate x^(1/3) using Newton iteration.
@@ -87,16 +87,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 
 
   void ParticleEmitterSphere::EmitParticles (iParticleSystemBase* system,
-    const csParticleBuffer& particleBuffer, float dt, float totalTime)
+    const csParticleBuffer& particleBuffer, float dt, float totalTime,
+    const csReversibleTransform* const emitterToParticle)
   {
     const csVector2& size = system->GetParticleSize ();
+
+    const csVector3 center = (emitterToParticle ? emitterToParticle->GetOrigin() : 
+                                                  csVector3 (0.0f)) + position;
 
     for (size_t idx = 0; idx < particleBuffer.particleCount; ++idx)
     {
       csParticle& particle = particleBuffer.particleData[idx];
       csParticleAux& particleAux = particleBuffer.particleAuxData[idx];
 
-      particle.position = position;
+      particle.position = center;
       particle.orientation.SetIdentity ();
 
       csVector3 posOffset = GetVGen()->Get ();
@@ -143,12 +147,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 
 
   void ParticleEmitterBox::EmitParticles (iParticleSystemBase* system,
-    const csParticleBuffer& particleBuffer, float dt, float totalTime)
+    const csParticleBuffer& particleBuffer, float dt, float totalTime,
+    const csReversibleTransform* const emitterToParticle)
   {
     const csVector2& size = system->GetParticleSize ();
     const csVector3& boxSize = genBox.GetSize ();
 
     csVector3 globalPos = position + genBox.GetCenter ();
+    csMatrix3 mat = genBox.GetMatrix ();
+    const csReversibleTransform& e2p = emitterToParticle ? *emitterToParticle :
+      csReversibleTransform ();
+
+    if (emitterToParticle)
+    {
+      globalPos = emitterToParticle->This2Other (globalPos);
+      mat = emitterToParticle->GetT2O () * mat;
+    }
 
     for (size_t idx = 0; idx < particleBuffer.particleCount; ++idx)
     {
@@ -160,8 +174,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 
       csVector3 posOffset (0.0f);
       csVector3 velVector;
-
-      const csMatrix3& mat = genBox.GetMatrix ();
 
       if (placement == CS_PARTICLE_BUILTIN_VOLUME)
       {
@@ -189,14 +201,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 
       if (uniformVelocity)
       {
-        particle.linearVelocity = initialLinearVelocity;
+        particle.linearVelocity = e2p.This2OtherRelative (initialLinearVelocity);
       }
       else
       {
         particle.linearVelocity = mat * (posOffset.UnitAxisClamped () * initialVelocityMag);
       }
 
-      particle.angularVelocity = initialAngularVelocity;
+      particle.angularVelocity = e2p.This2OtherRelative (initialAngularVelocity);
 
       particle.timeToLive = GetFGen ()->Get (initialTTLMin, initialTTLMax);
       particle.mass = GetFGen ()->Get (initialMassMin, initialMassMax);
@@ -231,9 +243,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
   }
 
   void ParticleEmitterCylinder::EmitParticles (iParticleSystemBase* system,
-    const csParticleBuffer& particleBuffer, float dt, float totalTime)
+    const csParticleBuffer& particleBuffer, float dt, float totalTime,
+    const csReversibleTransform* const emitterToParticle)
   {
     const csVector2& size = system->GetParticleSize ();
+
+    const csReversibleTransform& e2p = emitterToParticle ? *emitterToParticle :
+      csReversibleTransform ();
+    csVector3 ext, n0, n1, center (0);
+    if (emitterToParticle)
+    {
+      ext = emitterToParticle->This2OtherRelative (extent);
+      n0 = emitterToParticle->This2OtherRelative (normal0);
+      n1 = emitterToParticle->This2OtherRelative (normal1);
+      center = emitterToParticle->GetOrigin ();
+    }
+    else
+    {
+      ext = extent;
+      n0 = normal0;
+      n1 = normal1;
+    }
 
     for (size_t idx = 0; idx < particleBuffer.particleCount; ++idx)
     {
@@ -244,13 +274,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       particle.orientation.SetIdentity ();
 
       //Offset along axis
-      csVector3 posOffset = GetFGen ()->Get (-1, 1) * extent;
+      csVector3 posOffset = GetFGen ()->Get (-1, 1) * ext + center;
 
       //Point along circle
       float phi = GetFGen ()->GetAngle ();
       csVector2 circlePoint (cosf (phi), sinf (phi));
 
-      csVector3 radialVec = normal0 * circlePoint.x + normal1 * circlePoint.y;
+      csVector3 radialVec = n0 * circlePoint.x + n1 * circlePoint.y;
 
       if (placement == CS_PARTICLE_BUILTIN_VOLUME)
       {
@@ -265,14 +295,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 
       if (uniformVelocity)
       {
-        particle.linearVelocity = initialLinearVelocity;
+        particle.linearVelocity = e2p.This2OtherRelative (initialLinearVelocity);
       }
       else
       {
         particle.linearVelocity = radialVec * initialVelocityMag;
       }
 
-      particle.angularVelocity = initialAngularVelocity;
+      particle.angularVelocity = e2p.This2OtherRelative (initialAngularVelocity);
 
       particle.timeToLive = GetFGen ()->Get (initialTTLMin, initialTTLMax);
       particle.mass = GetFGen ()->Get (initialMassMin, initialMassMax);
@@ -307,9 +337,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
   }
 
   void ParticleEmitterCone::EmitParticles (iParticleSystemBase* system,
-    const csParticleBuffer& particleBuffer, float dt, float totalTime)
+    const csParticleBuffer& particleBuffer, float dt, float totalTime,
+    const csReversibleTransform* const emitterToParticle)
   {
     const csVector2& size = system->GetParticleSize ();
+
+    const csReversibleTransform& e2p = emitterToParticle ? *emitterToParticle :
+      csReversibleTransform ();
 
     const float tanConeAngTimeExt = tanf (coneAngle) * extent.Norm ();
 
@@ -358,6 +392,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 
       particleAux.color = csColor4 (1.0f, 1.0f, 1.0f);
       particleAux.particleSize = size;
+
+      // Transform
+      particle.position = e2p.This2Other (particle.position);
+      particle.linearVelocity = e2p.This2OtherRelative (particle.linearVelocity);
+      particle.angularVelocity = e2p.This2OtherRelative (particle.angularVelocity);
     }
   }
 

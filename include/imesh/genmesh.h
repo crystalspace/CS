@@ -411,7 +411,9 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
    * \remarks SubMeshes added to an instance of a genmesh will override
    * the submeshes from the factory (i.e. the submeshes of the factory will
    * be completely ignored as soon as the instance has submeshes).
-   * \param indices Render buffer with the triangle index data for the submesh.
+   * \param indices Render buffer holding the geometry for the submesh 
+   *  in usual render buffer formatting, ie for triangles three vertices for
+   *  every triangle.
    * \param material Material to assign to the submesh.
    * \param name (Optional) Name to identify the submesh.
    * \param mixmode (Optional) Mixmode to override the mesh's mixmode.
@@ -470,6 +472,11 @@ struct iGenMeshAnimationControl : public virtual iBase
   virtual bool AnimatesNormals () const = 0;
   /// Returns true if this control animates colors.
   virtual bool AnimatesColors () const = 0;
+
+  /**
+   * General update method
+   */
+  virtual void Update (csTicks current) = 0;
 
   /**
    * Given the factory vertex data, return the animated data.

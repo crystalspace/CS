@@ -59,6 +59,8 @@ struct iMaterialWrapper;
     { return new factclass (Engine, object_reg, this); }                    \
   };
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * This is an abstract implementation of iMeshObject. It can be used to
  * write custom mesh object implementations more easily. Currently it
@@ -264,6 +266,8 @@ public:
   virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
 
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * This is the abstract implementation of iMeshObjectFactory. Like

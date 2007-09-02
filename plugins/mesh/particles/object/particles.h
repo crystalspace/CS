@@ -197,14 +197,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       return commonDirection;
     }
 
-    virtual void SetLocalMode (bool local)
+    virtual void SetTransformMode (csParticleTransformMode mode)
     {
-      localMode = local;
+      transformMode = mode;
     }
 
-    virtual bool GetLocalMode () const
+    virtual csParticleTransformMode GetTransformMode () const
     {
-      return localMode;
+      return transformMode;
     }
 
     virtual void SetUseIndividualSize (bool individual)
@@ -294,8 +294,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     csParticleRotationMode rotationMode;
     csParticleSortMode sortMode;
     csParticleIntegrationMode integrationMode;
+    csParticleTransformMode transformMode;
     csVector3 commonDirection;
-    bool localMode;
     bool individualSize;
     csVector2 particleSize;
     csBox3 minBB;
@@ -479,6 +479,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     virtual void SetParticleRenderOrientation (csParticleRenderOrientation o)
     {
       particleOrientation = o;
+      InvalidateVertexSetup ();
     }
 
     virtual csParticleRenderOrientation GetParticleRenderOrientation () const
@@ -489,6 +490,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     virtual void SetRotationMode (csParticleRotationMode mode)
     {
       rotationMode = mode;
+      InvalidateVertexSetup ();
     }
 
     virtual csParticleRotationMode GetRotationMode () const
@@ -499,6 +501,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     virtual void SetSortMode (csParticleSortMode mode)
     {
       sortMode = mode;
+      InvalidateVertexSetup ();
     }
 
     virtual csParticleSortMode GetSortMode () const
@@ -519,6 +522,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     virtual void SetCommonDirection (const csVector3& direction)
     {
       commonDirection = direction;
+      InvalidateVertexSetup ();
     }
 
     virtual const csVector3& GetCommonDirection () const
@@ -526,15 +530,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       return commonDirection;
     }
 
-
-    virtual void SetLocalMode (bool local)
+    virtual void SetTransformMode (csParticleTransformMode mode)
     {
-      localMode = local;
+      transformMode = mode;
     }
 
-    virtual bool GetLocalMode () const
+    virtual csParticleTransformMode GetTransformMode () const
     {
-      return localMode;
+      return transformMode;
     }
 
     virtual void SetUseIndividualSize (bool individual)
@@ -551,6 +554,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     virtual void SetParticleSize (const csVector2& size)
     {
       particleSize = size;
+      InvalidateVertexSetup ();
     }
 
     virtual const csVector2& GetParticleSize () const
@@ -650,6 +654,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     csParticleRotationMode rotationMode;
     csParticleIntegrationMode integrationMode;
     csParticleSortMode sortMode;
+    csParticleTransformMode transformMode;
     csVector3 commonDirection;
     bool localMode;
     bool individualSize;

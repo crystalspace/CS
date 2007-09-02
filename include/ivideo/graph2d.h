@@ -337,7 +337,8 @@ struct iGraphics2D : public virtual iBase
    * \deprecated
    * Instead, use Write() with the #CS_WRITE_BASELINE flag set.
    */
-  CS_DEPRECATED_METHOD virtual void WriteBaseline (iFont *font, 
+  CS_DEPRECATED_METHOD_MSG("Use Write() with CS_WRITE_BASELINE flag instead")
+  virtual void WriteBaseline (iFont *font, 
     int x, int y, int fg, int bg, const char *str) = 0;
 
   /// Enable/disable canvas resizing

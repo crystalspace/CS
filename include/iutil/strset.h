@@ -111,7 +111,8 @@ struct iStringSet : public virtual iBase
    * Remove all stored strings.
    * \deprecated Use Empty() instead.
    */
-  /*CS_DEPRECATED_METHOD*/ virtual void Clear() = 0;
+  /*CS_DEPRECATED_METHOD_MSG("Use Empty() instead.")*/
+  virtual void Clear() = 0;
 
   /// Get the number of elements in the hash.
   virtual size_t GetSize () const = 0;

@@ -96,7 +96,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 
     ParticleEmitterHelper ()
       : base (this),
-      isEnabled (true), startTime (-1), duration (FLT_MAX),
+      isEnabled (true), startTime (0), duration (FLT_MAX),
       initialTTLMin(1.0f), initialTTLMax (1.0f), initialMassMin (1.0f), 
       initialMassMax (1.0f),
       position (0.0f), placement (CS_PARTICLE_BUILTIN_VOLUME), 
@@ -256,7 +256,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     virtual csPtr<iParticleEmitter> Clone () const;
 
     virtual void EmitParticles (iParticleSystemBase* system,
-      const csParticleBuffer& particleBuffer, float dt, float totalTime);
+      const csParticleBuffer& particleBuffer, float dt, float totalTime,
+      const csReversibleTransform* const emitterToParticle);
 
     //-- iParticleBuiltinEmitterSphere
     virtual void SetRadius (float radius) 
@@ -284,7 +285,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     virtual csPtr<iParticleEmitter> Clone () const;
 
     virtual void EmitParticles (iParticleSystemBase* system,
-      const csParticleBuffer& particleBuffer, float dt, float totalTime);
+      const csParticleBuffer& particleBuffer, float dt, float totalTime,
+      const csReversibleTransform* const emitterToParticle);
 
 
     //-- iParticleBuiltinEmitterBox
@@ -313,7 +315,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     virtual csPtr<iParticleEmitter> Clone () const;
 
     virtual void EmitParticles (iParticleSystemBase* system,
-      const csParticleBuffer& particleBuffer, float dt, float totalTime);
+      const csParticleBuffer& particleBuffer, float dt, float totalTime,
+      const csReversibleTransform* const emitterToParticle);
 
     //-- iParticleBuiltinEmitterCylinder
     virtual void SetRadius (float radius)
@@ -350,7 +353,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     virtual csPtr<iParticleEmitter> Clone () const;
 
     virtual void EmitParticles (iParticleSystemBase* system,
-      const csParticleBuffer& particleBuffer, float dt, float totalTime);
+      const csParticleBuffer& particleBuffer, float dt, float totalTime,
+      const csReversibleTransform* const emitterToParticle);
 
     //-- iParticleBuiltinEmitterCone
     virtual void SetExtent (const csVector3& extent);

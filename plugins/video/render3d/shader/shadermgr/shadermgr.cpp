@@ -167,7 +167,7 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   
   csString cfgKey;
   const csString keyPrefix ("Video.ShaderManager.Tags.");
-  csSet<csStrKey> knownKeys;
+  csSet<csString> knownKeys;
   csRef<iConfigIterator> it (config->Enumerate (keyPrefix));
   while (it->Next ())
   {

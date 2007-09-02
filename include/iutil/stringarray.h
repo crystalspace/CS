@@ -40,6 +40,7 @@ struct iStringArray : public virtual iBase
    * Get array length.
    * \deprecated Use GetSize() instead.
    */
+  /*CS_DEPRECATED_METHOD_MSG("Use GetSize() instead.")*/
   virtual size_t Length () const = 0;
 
   /// Push a string onto the stack.
@@ -111,6 +112,7 @@ struct iStringArray : public virtual iBase
    * Remove all strings from array.
    * \deprecated Use Empty() instead.
    */
+  /*CS_DEPRECATED_METHOD_MSG("Use Empty() instead.")*/
   virtual void DeleteAll () = 0;
 
   /**

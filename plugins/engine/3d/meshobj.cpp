@@ -1487,7 +1487,7 @@ iMeshWrapper* csMeshList::FindByNameWithChild (const char *Name) const
   csString firstName;
   firstName.Append (Name, firstsize);
 
-  iMeshWrapper* m = meshes_hash.Get (csStrKey (firstName), 0);
+  iMeshWrapper* m = meshes_hash.Get (firstName, 0);
   if (!m) return 0;
   return m->FindChildByName (p+1);
 }

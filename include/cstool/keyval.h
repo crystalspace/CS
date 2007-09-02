@@ -26,6 +26,7 @@
 #include "csextern.h"
 
 #include "csutil/csobject.h"
+#include "csutil/csstring.h"
 #include "csutil/hash.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/set.h"
@@ -44,8 +45,8 @@ class CS_CRYSTALSPACE_EXPORT csKeyValuePair :
 {
 private:
   const char *m_Value;	// Points to a string in the hash below.
-  csHash<csStrKey, csStrKey> values;
-  csSet<csStrKey> names;
+  csHash<csString, csString> values;
+  csSet<csString> names;
 
 public:
   /// The constructor. Requires both key and value. Data is being copied!

@@ -161,6 +161,8 @@ struct iObjectModel : public virtual iBase
    * Get the bounding box in object space for this mesh object.
    * \deprecated Use GetObjectBoundingBox() (without parameters) instead.
    */
+  CS_DEPRECATED_METHOD_MSG("Use GetObjectBoundingBox() (without parameters) "
+			   "instead.")
   virtual void GetObjectBoundingBox (csBox3& bbox) = 0;
 
   /**

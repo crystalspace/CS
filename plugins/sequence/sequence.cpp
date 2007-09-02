@@ -190,7 +190,7 @@ csSequenceManager::~csSequenceManager ()
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
     if (q != 0)
-      RemoveWeakListener (q, weakEventHandler);
+      CS::RemoveWeakListener (q, weakEventHandler);
   }
   Clear ();
   main_sequence->DecRef ();
@@ -203,7 +203,7 @@ bool csSequenceManager::Initialize (iObjectRegistry *r)
   CS_INITIALIZE_EVENT_SHORTCUTS (object_reg);
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
-    RegisterWeakListener (q, this, FinalProcess, weakEventHandler);
+    CS::RegisterWeakListener (q, this, FinalProcess, weakEventHandler);
   return true;
 }
 

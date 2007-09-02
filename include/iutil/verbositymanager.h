@@ -73,7 +73,7 @@ struct iVerbosityManager : public virtual iBase
    * \deprecated Use instead the more generic Enabled() method, which accepts
    *   any granularity of class breakdown; not just major and minor components.
    */
-  CS_DEPRECATED_METHOD
+  CS_DEPRECATED_METHOD_MSG("Use Enabled() instead")
   virtual bool CheckFlag(char const* major, char const* minor) const = 0;
 };
 

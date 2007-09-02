@@ -21,9 +21,16 @@
 #include "viewmesh.h"
 
 #include "csutil/cscolor.h"
+#include "csutil/common_handlers.h"
+#include "csutil/event.h"
 #include "csutil/scfstr.h"
+#include "imesh/object.h"
+#include "imesh/thing.h"
 #include "iutil/eventq.h"
+#include "iutil/object.h"
+#include "iutil/stringarray.h"
 #include "iengine/scenenode.h"
+#include "ivideo/graph2d.h"
 
 // Hack: work around problems caused by #defining 'new'
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
@@ -83,15 +90,6 @@ void ViewMesh::ProcessFrame()
 {
   csTicks elapsed_time = vc->GetElapsedTicks ();
   float speed = (elapsed_time / 1000.0) * (0.06 * 20);
-
-  iGraphics2D* g2d = g3d->GetDriver2D ();
-
-  if (g2d->GetHeight() != y || g2d->GetWidth() != x)
-  {
-    x = g2d->GetWidth();
-    y = g2d->GetHeight();
-    aws->SetupCanvas(0, g3d->GetDriver2D (), g3d);
-  }
 
   iCamera* c = view->GetCamera();
 
@@ -209,9 +207,7 @@ void ViewMesh::ProcessFrame()
   if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) 
     return;
 
-  aws->Redraw ();
-  aws->Print (g3d, 64);
-
+  cegui->Render();
 }
 
 void ViewMesh::FinishFrame ()
@@ -235,14 +231,6 @@ bool ViewMesh::OnKeyboard(iEvent& ev)
     }
   }
   return false;
-}
-
-bool ViewMesh::HandleEvent (iEvent &event)
-{
-  if (aws)
-    if (aws->HandleEvent (event))
-      return true;
-  return csBaseEventHandler::HandleEvent(event);;
 }
 
 void ViewMesh::Help ()
@@ -347,7 +335,7 @@ bool ViewMesh::OnInitialize(int /*argc*/, char* /*argv*/ [])
     CS_REQUEST_LEVELSAVER,
     CS_REQUEST_REPORTER,
     CS_REQUEST_REPORTERLISTENER,
-    CS_REQUEST_PLUGIN("crystalspace.window.alternatemanager", iAws),
+    CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
     CS_REQUEST_END))
     return ReportError("Failed to initialize plugins!");
 
@@ -389,8 +377,8 @@ bool ViewMesh::Application()
   saver = CS_QUERY_REGISTRY(GetObjectRegistry(), iSaver);
   if (!saver) return ReportError("Failed to locate Saver!");
 
-  aws = CS_QUERY_REGISTRY(GetObjectRegistry(), iAws);
-  if (!aws) return ReportError("Failed to locate AWS!");
+  cegui = CS_QUERY_REGISTRY(GetObjectRegistry(), iCEGUI);
+  if (!cegui) return ReportError("Failed to locate CEGUI plugin");
   
   view.AttachNew(new csView (engine, g3d));
   iGraphics2D* g2d = g3d->GetDriver2D ();
@@ -451,83 +439,210 @@ void ViewMesh::CreateRoom ()
   ll->Add (light);
 }
 
-void ViewMesh::CreateGui ()
+void ViewMesh::CreateGui()
 {
-  aws->SetupCanvas(0, g3d->GetDriver2D (), g3d);
+  // Initialize CEGUI wrapper
+  cegui->Initialize ();
 
-  iAwsSink* sink;
+  // Set the logging level
+  cegui->GetLoggerPtr ()->setLoggingLevel(CEGUI::Informative);
 
-  //GENERAL
-  sink = aws->GetSinkMgr ()->CreateSink ((intptr_t)this);
-  sink->RegisterTrigger ("CameraMode", &CameraMode);
-  sink->RegisterTrigger ("LoadButton", &LoadButton);
-  sink->RegisterTrigger ("LoadLibButton", &LoadLibButton);
-  sink->RegisterTrigger ("SaveButton", &SaveButton);
-  sink->RegisterTrigger ("SaveBinaryButton", &SaveBinaryButton);
-  sink->RegisterTrigger ("ScaleSprite", &SetScaleSprite);
-  aws->GetSinkMgr ()->RegisterSink ("General", sink);
+#if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR >= 5)
+  // Use the 0.5 version of the skin
+  vfs->ChDir ("/ceguitest/0.5/");
+#else
+  // Use the old version of the skin
+  vfs->ChDir ("/ceguitest/");
+#endif
 
-  //ANIMATION
-  sink = aws->GetSinkMgr ()->CreateSink ((intptr_t)this);
-  sink->RegisterTrigger ("ReversAnimation", &ReversAnimation);
-  sink->RegisterTrigger ("StopAnimation", &StopAnimation);
-  sink->RegisterTrigger ("SlowerAnimation", &SlowerAnimation);
-  sink->RegisterTrigger ("AddAnimation", &AddAnimation);
-  sink->RegisterTrigger ("FasterAnimation", &FasterAnimation);
-  sink->RegisterTrigger ("SetAnimation", &SetAnimation);
-  sink->RegisterTrigger ("RemoveAnimation", &RemoveAnimation);
-  sink->RegisterTrigger ("ClearAnimation", &ClearAnimation);
-  sink->RegisterTrigger ("SelAnimation", &SelAnimation);
-  aws->GetSinkMgr ()->RegisterSink ("Anim", sink);
+  // Load the ice skin (which uses Falagard skinning system)
+  cegui->GetSchemeManagerPtr ()->loadScheme("ice.scheme");
 
-  //SOCKET
-  sink = aws->GetSinkMgr ()->CreateSink ((intptr_t)this);
-  sink->RegisterTrigger ("SetMesh", &SetMesh);
-  sink->RegisterTrigger ("SetSubMesh", &SetSubMesh);
-  sink->RegisterTrigger ("SetTriangle", &SetTriangle);
-  sink->RegisterTrigger ("SetRotX", &SetRotX);
-  sink->RegisterTrigger ("SetRotY", &SetRotY);
-  sink->RegisterTrigger ("SetRotZ", &SetRotZ);
-  sink->RegisterTrigger ("AttachButton", &AttachButton);
-  sink->RegisterTrigger ("DetachButton", &DetachButton);
-  sink->RegisterTrigger ("AddSocket", &AddSocket);
-  sink->RegisterTrigger ("DelSocket", &DelSocket);
-  sink->RegisterTrigger ("SelSocket", &SelSocket);
-  sink->RegisterTrigger ("RenameSocket", &RenameSocket);
-  aws->GetSinkMgr ()->RegisterSink ("Socket", sink);
+  cegui->GetSystemPtr ()->setDefaultMouseCursor("ice", "MouseArrow");
 
-  //SOCKET
-  sink = aws->GetSinkMgr ()->CreateSink ((intptr_t)this);
-  sink->RegisterTrigger ("SelMorph", &SelMorph);
-  sink->RegisterTrigger ("BlendButton", &BlendButton);
-  sink->RegisterTrigger ("ClearButton", &ClearButton);
-  aws->GetSinkMgr ()->RegisterSink ("Morph", sink);
+#if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR >= 5)
+  CEGUI::Font* font = cegui->GetFontManagerPtr ()->createFont("FreeType",
+    "Vera", "/fonts/ttf/Vera.ttf");
+  font->setProperty("PointSize", "10");
+  font->load();
+#else
+  cegui->GetFontManagerPtr ()->createFont("Vera", "/fonts/ttf/Vera.ttf", 10,
+    CEGUI::Default);
+#endif
 
-  //STDDLG
-  sink = aws->GetSinkMgr ()->CreateSink ((intptr_t)this);
-  sink->RegisterTrigger ("OkButton", &StdDlgOkButton);
-  sink->RegisterTrigger ("CancleButton", &StdDlgCancleButton);
-  sink->RegisterTrigger ("FileSelect", &StdDlgFileSelect);
-  sink->RegisterTrigger ("DirSelect", &StdDlgDirSelect);
-  aws->GetSinkMgr ()->RegisterSink ("StdDlg", sink);
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
-  if (!aws->GetPrefMgr()->Load ("/aws/windows_skin.def"))
-    ReportError("couldn't load skin definition file!");
-  if (!aws->GetPrefMgr()->Load ("/varia/viewmesh.def"))
-    ReportError("couldn't load ViewMesh AWS definition file!");
-  if (!aws->GetPrefMgr()->Load ("/aws/stddlg.def"))
-    ReportError("couldn't load Standard Dialog AWS definition file!");
-  aws->GetPrefMgr ()->SelectDefaultSkin ("Windows");
+  // Load layout and set as root
+  cegui->GetSystemPtr ()->setGUISheet(winMgr->loadWindowLayout("viewmesh.layout"));
 
-  form = aws->CreateWindowFrom ("Form1");
-  stddlg = aws->CreateWindowFrom ("StdDlg");
-  form->Show();
+  form = winMgr->getWindow("Form");
+  stddlg = winMgr->getWindow("StdDlg");
 
-  iAwsComponent* InputPath = stddlg->FindChild("InputPath");
-  csRef<iString> valuePath(new scfString(vfs->GetCwd()));
-  if (InputPath) InputPath->SetProperty("Text",(intptr_t)(iString*)valuePath);
+  CEGUI::Window* btn = 0;
+  // ----[ GENERAL ]---------------------------------------------------------
 
-  StdDlgUpdateLists(valuePath->GetData());
+  btn = winMgr->getWindow("Tab1/SaveButton");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ViewMesh::SaveButton, this));
+
+  btn = winMgr->getWindow("Tab1/LoadButton");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ViewMesh::LoadButton, this));
+
+  btn = winMgr->getWindow("Tab1/SaveBinaryButton");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ViewMesh::SaveBinaryButton, this));
+
+  btn = winMgr->getWindow("Tab1/LoadLibButton");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ViewMesh::LoadLibButton, this));
+
+  btn = winMgr->getWindow("Tab1/NormalMovementRadio");
+  btn->subscribeEvent(CEGUI::RadioButton::EventSelectStateChanged,
+    CEGUI::Event::Subscriber(&ViewMesh::CameraModeMoveNormal, this));
+
+  btn = winMgr->getWindow("Tab1/LooktooriginRadio");
+  btn->subscribeEvent(CEGUI::RadioButton::EventSelectStateChanged,
+    CEGUI::Event::Subscriber(&ViewMesh::CameraModeMoveOrigin, this));
+
+  btn = winMgr->getWindow("Tab1/RotateRadio");
+  btn->subscribeEvent(CEGUI::RadioButton::EventSelectStateChanged,
+    CEGUI::Event::Subscriber(&ViewMesh::CameraModeRotate, this));
+
+  btn = winMgr->getWindow("Tab1/ScaleSprite");
+  btn->subscribeEvent(CEGUI::Editbox::EventTextAccepted,
+    CEGUI::Event::Subscriber(&ViewMesh::SetScaleSprite, this));
+
+  // ----[ ANIMATION ]-------------------------------------------------------
+
+  btn = winMgr->getWindow("Tab2/ReverseAnimation");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ViewMesh::ReversAnimation, this));
+
+  btn = winMgr->getWindow("Tab2/StopAnimation");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ViewMesh::StopAnimation, this));
+
+  btn = winMgr->getWindow("Tab2/SlowerAnimation");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ViewMesh::SlowerAnimation, this));
+
+  btn = winMgr->getWindow("Tab2/AddAnimation");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ViewMesh::AddAnimation, this));
+
+  btn = winMgr->getWindow("Tab2/FasterAnimation");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ViewMesh::FasterAnimation, this));
+
+  btn = winMgr->getWindow("Tab2/SetAnimation");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ViewMesh::SetAnimation, this));
+
+  btn = winMgr->getWindow("Tab2/RemoveAnimation");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ViewMesh::RemoveAnimation, this));
+
+  btn = winMgr->getWindow("Tab2/ClearAnimation");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ViewMesh::ClearAnimation, this));
+
+  btn = winMgr->getWindow("Tab2/List");
+  btn->subscribeEvent(CEGUI::Listbox::EventSelectionChanged,
+    CEGUI::Event::Subscriber(&ViewMesh::SelAnimation, this));
+
+  // ----[ SOCKET ]----------------------------------------------------------
+
+  btn = winMgr->getWindow("Tab3/RotX/Input");
+  btn->subscribeEvent(CEGUI::Editbox::EventTextAccepted,
+    CEGUI::Event::Subscriber(&ViewMesh::SetRotX, this));
+
+  btn = winMgr->getWindow("Tab3/RotY/Input");
+  btn->subscribeEvent(CEGUI::Editbox::EventTextAccepted,
+    CEGUI::Event::Subscriber(&ViewMesh::SetRotY, this));
+
+  btn = winMgr->getWindow("Tab3/RotZ/Input");
+  btn->subscribeEvent(CEGUI::Editbox::EventTextAccepted,
+    CEGUI::Event::Subscriber(&ViewMesh::SetRotZ, this));
+
+  btn = winMgr->getWindow("Tab3/Mesh/Input");
+  btn->subscribeEvent(CEGUI::Editbox::EventTextAccepted,
+    CEGUI::Event::Subscriber(&ViewMesh::SetMesh, this));
+
+  btn = winMgr->getWindow("Tab3/Sub/Input");
+  btn->subscribeEvent(CEGUI::Editbox::EventTextAccepted,
+    CEGUI::Event::Subscriber(&ViewMesh::SetSubMesh, this));
+
+  btn = winMgr->getWindow("Tab3/Tria/Input");
+  btn->subscribeEvent(CEGUI::Editbox::EventTextAccepted,
+    CEGUI::Event::Subscriber(&ViewMesh::SetTriangle, this));
+
+  btn = winMgr->getWindow("Tab3/AttachButton");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ViewMesh::AttachButton, this));
+
+  btn = winMgr->getWindow("Tab3/DetachButton");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ViewMesh::DetachButton, this));
+
+  btn = winMgr->getWindow("Tab3/AddSocket");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ViewMesh::AddSocket, this));
+
+  btn = winMgr->getWindow("Tab3/DelSocket");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ViewMesh::DelSocket, this));
+
+  btn = winMgr->getWindow("Tab3/List");
+  btn->subscribeEvent(CEGUI::Listbox::EventSelectionChanged,
+    CEGUI::Event::Subscriber(&ViewMesh::SelSocket, this));
+
+  btn = winMgr->getWindow("Tab3/RenameSocket");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ViewMesh::RenameSocket, this));
+
+  // ----[ Morph ]----------------------------------------------------------
+
+  btn = winMgr->getWindow("Tab4/List");
+  btn->subscribeEvent(CEGUI::Listbox::EventSelectionChanged,
+    CEGUI::Event::Subscriber(&ViewMesh::SelMorph, this));
+
+  btn = winMgr->getWindow("Tab4/BlendButton");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ViewMesh::BlendButton, this));
+
+  btn = winMgr->getWindow("Tab4/ClearButton");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ViewMesh::ClearButton, this));
+
+  // ----[ STDDLG ]----------------------------------------------------------
+
+  btn = winMgr->getWindow("StdDlg/OkButton");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ViewMesh::StdDlgOkButton, this));
+
+  btn = winMgr->getWindow("StdDlg/CancleButton");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&ViewMesh::StdDlgCancleButton, this));
+
+  btn = winMgr->getWindow("StdDlg/FileSelect");
+  btn->subscribeEvent(CEGUI::Listbox::EventSelectionChanged,
+    CEGUI::Event::Subscriber(&ViewMesh::StdDlgFileSelect, this));
+
+  btn = winMgr->getWindow("StdDlg/DirSelect");
+  btn->subscribeEvent(CEGUI::Listbox::EventSelectionChanged,
+    CEGUI::Event::Subscriber(&ViewMesh::StdDlgDirSelect, this));
+
+  btn = winMgr->getWindow("StdDlg/Path");
+  btn->subscribeEvent(CEGUI::Editbox::EventTextAccepted,
+    CEGUI::Event::Subscriber(&ViewMesh::StdDlgDirChange, this));
+
+  // ------------------------------------------------------------------------
+
+  vfs->ChDir ("/this/");
+  btn = winMgr->getWindow("StdDlg/Path");
+  btn->setProperty("Text", vfs->GetCwd());
+  StdDlgUpdateLists(vfs->GetCwd());
 }
 
 void ViewMesh::LoadSprite (const char* filename)
@@ -809,11 +924,11 @@ void ViewMesh::AttachMesh (const char* file)
 
 void ViewMesh::UpdateSocketList ()
 {
-  iAwsComponent* list = form->FindChild("SocketList");
-  iAwsParmList* pl = aws->CreateParmList();
-  if (!list) return;
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
-  list->Execute("ClearList", pl);
+  CEGUI::Listbox* list = (CEGUI::Listbox*)winMgr->getWindow("Tab3/List");
+
+  list->resetList();
 
   if (sprite)
   {
@@ -824,9 +939,11 @@ void ViewMesh::UpdateSocketList ()
 
       if (i==0) SelectSocket(sock->GetName());
 
-      pl->AddString("text0", sock->GetName());
-      list->Execute("InsertItem", pl);
-      pl->Clear();
+      CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(sock->GetName());
+      item->setTextColours(CEGUI::colour(0,0,0));
+      item->setSelectionBrushImage("ice", "TextSelectionBrush");
+      item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+      list->addItem(item);
     }
   }
   else if (cal3dsprite)
@@ -838,24 +955,28 @@ void ViewMesh::UpdateSocketList ()
 
       if (i==0) SelectSocket(sock->GetName());
 
-      pl->AddString("text0", sock->GetName());
-      list->Execute("InsertItem", pl);
-      pl->Clear();
+      CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(sock->GetName());
+      item->setTextColours(CEGUI::colour(0,0,0));
+      item->setSelectionBrushImage("ice", "TextSelectionBrush");
+      item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+      list->addItem(item);
     }
   }
 }
 
 void ViewMesh::UpdateAnimationList ()
 {
-  iAwsComponent* list = form->FindChild("AnimList");
-  iAwsParmList* pl = aws->CreateParmList();
-  if (!list) return;
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
-  list->Execute("ClearList", pl);
+  CEGUI::Listbox* list = (CEGUI::Listbox*)winMgr->getWindow("Tab2/List");
 
-  pl->AddString("text0", "default");
-  list->Execute("InsertItem", pl);
-  pl->Clear();
+  list->resetList();
+
+  CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem("default");
+  item->setTextColours(CEGUI::colour(0,0,0));
+  item->setSelectionBrushImage("ice", "TextSelectionBrush");
+  item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+  list->addItem(item);
 
   if (sprite)
   {
@@ -864,9 +985,11 @@ void ViewMesh::UpdateAnimationList ()
       iSpriteAction* action = sprite->GetAction(i);
       if (!action) continue;
 
-      pl->AddString("text0", action->GetName ());
-      list->Execute("InsertItem", pl);
-      pl->Clear();
+      item = new CEGUI::ListboxTextItem(action->GetName());
+      item->setTextColours(CEGUI::colour(0,0,0));
+      item->setSelectionBrushImage("ice", "TextSelectionBrush");
+      item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+      list->addItem(item);
     }
   }
   else if (cal3dsprite)
@@ -876,24 +999,28 @@ void ViewMesh::UpdateAnimationList ()
       const char* animname = cal3dstate->GetAnimName(i);
       if (!animname) continue;
 
-      pl->AddString("text0", animname);
-      list->Execute("InsertItem", pl);
-      pl->Clear();
+      item = new CEGUI::ListboxTextItem(animname);
+      item->setTextColours(CEGUI::colour(0,0,0));
+      item->setSelectionBrushImage("ice", "TextSelectionBrush");
+      item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+      list->addItem(item);
     }
   }
 }
 
 void ViewMesh::UpdateMorphList ()
 {
-  iAwsComponent* list = form->FindChild("MorphList");
-  iAwsParmList* pl = aws->CreateParmList();
-  if (!list) return;
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
-  list->Execute("ClearList", pl);
+  CEGUI::Listbox* list = (CEGUI::Listbox*)winMgr->getWindow("Tab4/List");
 
-  pl->AddString("text0", "default");
-  list->Execute("InsertItem", pl);
-  pl->Clear();
+  list->resetList();
+
+  CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem("default");
+  item->setTextColours(CEGUI::colour(0,0,0));
+  item->setSelectionBrushImage("ice", "TextSelectionBrush");
+  item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+  list->addItem(item);
 
   if (cal3dsprite)
   {
@@ -902,9 +1029,11 @@ void ViewMesh::UpdateMorphList ()
       const char* morphname = cal3dsprite->GetMorphAnimationName(i);
       if (!morphname) continue;
 
-      pl->AddString("text0", morphname);
-      list->Execute("InsertItem", pl);
-      pl->Clear();
+      item = new CEGUI::ListboxTextItem(morphname);
+      item->setTextColours(CEGUI::colour(0,0,0));
+      item->setSelectionBrushImage("ice", "TextSelectionBrush");
+      item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+      list->addItem(item);
     }
   }
 }
@@ -928,51 +1057,51 @@ void ViewMesh::SelectSocket (const char* newsocket)
 
 void ViewMesh::UpdateSocket ()
 {
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
   if (selectedSocket)
   {
-    iAwsComponent* InputName = form->FindChild("InputName");
+    CEGUI::Window* InputName = winMgr->getWindow("Tab3/RenameSocket/Input");
     const char* name = selectedSocket->GetName();
-    csRef<iString> valueName(new scfString(name));
-    InputName->SetProperty("Text",(intptr_t)(iString*)valueName);
+    InputName->setProperty("Text", name);
 
-    iAwsComponent* InputTriangle = form->FindChild("InputTriangle");
+    CEGUI::Window* InputTriangle = winMgr->getWindow("Tab3/Tria/Input");
     csRef<iString> valueTriangle(new scfString());
     valueTriangle->Format("%d", selectedSocket->GetTriangleIndex());
-    InputTriangle->SetProperty("Text",(intptr_t)(iString*)valueTriangle);
+    InputTriangle->setProperty("Text", valueTriangle->GetData());
   }
   else if (selectedCal3dSocket)
   {
-    iAwsComponent* InputName = form->FindChild("InputName");
+    CEGUI::Window* InputName = winMgr->getWindow("Tab3/RenameSocket/Input");
     const char* name = selectedCal3dSocket->GetName();
-    csRef<iString> valueName(new scfString(name));
-    InputName->SetProperty("Text",(intptr_t)(iString*)valueName);
+    InputName->setProperty("Text", name);
 
-    iAwsComponent* InputMesh = form->FindChild("InputMesh");
+    CEGUI::Window* InputMesh = winMgr->getWindow("Tab3/Mesh/Input");
     csRef<iString> valueMesh(new scfString());
     valueMesh->Format("%d", selectedCal3dSocket->GetMeshIndex());
-    InputMesh->SetProperty("Text",(intptr_t)(iString*)valueMesh);
+    InputMesh->setProperty("Text", valueMesh->GetData());
 
-    iAwsComponent* InputSubMesh = form->FindChild("InputSubMesh");
+    CEGUI::Window* InputSubMesh = winMgr->getWindow("Tab3/Sub/Input");
     csRef<iString> valueSubmesh(new scfString());
     valueSubmesh->Format("%d", selectedCal3dSocket->GetSubmeshIndex());
-    InputSubMesh->SetProperty("Text",(intptr_t)(iString*)valueSubmesh);
+    InputSubMesh->setProperty("Text", valueSubmesh->GetData());
 
-    iAwsComponent* InputTriangle = form->FindChild("InputTriangle");
+    CEGUI::Window* InputTriangle = winMgr->getWindow("Tab3/Tria/Input");
     csRef<iString> valueTriangle(new scfString());
     valueTriangle->Format("%d", selectedCal3dSocket->GetTriangleIndex());
-    InputTriangle->SetProperty("Text",(intptr_t)(iString*)valueTriangle);
+    InputTriangle->setProperty("Text", valueTriangle->GetData());
   }
 }
 
 void ViewMesh::ScaleSprite (float newScale)
 {
-  csMatrix3 scalingHt; scalingHt.Identity(); scalingHt *= newScale/scale;
+  csMatrix3 scalingHt; scalingHt.Identity(); scalingHt *= scale/newScale;
   csReversibleTransform rTH;
   rTH.SetT2O (scalingHt);
   if (spritewrapper)
     spritewrapper->HardTransform (rTH);
 
-  csMatrix3 scaling; scaling.Identity(); scaling *= newScale;
+  csMatrix3 scaling; scaling.Identity(); scaling /= newScale;
   csReversibleTransform rT;
   rT.SetT2O (scaling);
   if (spritewrapper)
@@ -980,589 +1109,603 @@ void ViewMesh::ScaleSprite (float newScale)
 
   scale = newScale;
 
-  iAwsComponent* InputMesh = form->FindChild("InputScale");
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  CEGUI::Window* component = winMgr->getWindow("Tab1/ScaleSprite");
   csRef<iString> valueMesh(new scfString());
   valueMesh->Format("%.2f", scale);
-  InputMesh->SetProperty("Text",(intptr_t)(iString*)valueMesh);
+  component->setProperty("Text", valueMesh->GetData());
 }
 
 //---------------------------------------------------------------------------
 
-void ViewMesh::ReversAnimation (unsigned long, intptr_t awst, iAwsSource* /*source*/)
+bool ViewMesh::ReversAnimation (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
-  if (tut->cal3dstate)
+
+  if (cal3dstate)
   {
-    tut->cal3dstate->SetAnimationTime(-1);
+    cal3dstate->SetAnimationTime(-1);
   }
-  else if (tut->state)
+  else if (state)
   {
-    tut->state->SetReverseAction(tut->state->GetReverseAction()^true);
+    state->SetReverseAction(state->GetReverseAction()^true);
   }
+  return true;
 }
 
-void ViewMesh::StopAnimation (unsigned long, intptr_t awst, iAwsSource* /*source*/)
+bool ViewMesh::StopAnimation (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
-  tut->move_sprite_speed = 0;
+  move_sprite_speed = 0;
+  return true;
 }
 
-void ViewMesh::SlowerAnimation (unsigned long, intptr_t awst, iAwsSource* /*source*/)
+bool ViewMesh::SlowerAnimation (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
-  tut->move_sprite_speed -= 0.5f;
+  move_sprite_speed -= 0.5f;
+  return true;
 }
 
-void ViewMesh::AddAnimation (unsigned long, intptr_t awst, iAwsSource* /*source*/)
+bool ViewMesh::AddAnimation (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
-  if (tut->cal3dstate)
+  if (cal3dstate)
   {
-    if (!tut->selectedAnimation) return;
-    int anim = tut->cal3dstate->FindAnim(tut->selectedAnimation);
-    tut->cal3dstate->AddAnimCycle(anim,1,3);
+    if (!selectedAnimation) return false;
+    int anim = cal3dstate->FindAnim(selectedAnimation);
+    cal3dstate->AddAnimCycle(anim,1,3);
   }
+  return true;
 }
 
-void ViewMesh::FasterAnimation (unsigned long, intptr_t awst, iAwsSource* /*source*/)
+bool ViewMesh::FasterAnimation (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
-  tut->move_sprite_speed += 0.5f;
+  move_sprite_speed += 0.5f;
+  return true;
 }
 
-void ViewMesh::SetAnimation (unsigned long, intptr_t awst, iAwsSource* /*source*/)
+bool ViewMesh::SetAnimation (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
-  if (tut->cal3dstate)
+  if (cal3dstate)
   {
-    if (!tut->selectedAnimation) return;
-    int anim = tut->cal3dstate->FindAnim(tut->selectedAnimation);
-    tut->cal3dstate->SetAnimAction(anim,1,1);
+    if (!selectedAnimation) return false;
+    int anim = cal3dstate->FindAnim(selectedAnimation);
+    cal3dstate->SetAnimAction(anim,1,1);
   }
-  else if (tut->state)
+  else if (state)
   {
-    if (!tut->selectedAnimation) return;
-    tut->state->SetAction(tut->selectedAnimation);
+    if (!selectedAnimation) return false;
+    state->SetAction(selectedAnimation);
   }
+  return true;
 }
 
-void ViewMesh::RemoveAnimation (unsigned long, intptr_t awst, iAwsSource* /*source*/)
+bool ViewMesh::RemoveAnimation (const CEGUI::EventArgs& e)
 {
   //TODO: Implement it.
-  ViewMesh* tut = (ViewMesh*)awst;
-  tut->ReportWarning("Removal of Animation is not yet implemented");
+
+  ReportWarning("Removal of Animation is not yet implemented");
+  return true;
 }
 
-void ViewMesh::ClearAnimation (unsigned long, intptr_t awst, iAwsSource* /*source*/)
+bool ViewMesh::ClearAnimation (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
-  if (tut->cal3dstate)
+  if (cal3dstate)
   {
-    if (!tut->selectedAnimation) return;
-    int anim = tut->cal3dstate->FindAnim(tut->selectedAnimation);
-    tut->cal3dstate->ClearAnimCycle(anim,3);
+    if (!selectedAnimation) return false;
+    int anim = cal3dstate->FindAnim(selectedAnimation);
+    cal3dstate->ClearAnimCycle(anim,3);
   }
+  return true;
 }
 
-void ViewMesh::SelAnimation (unsigned long, intptr_t awst, iAwsSource* /*source*/)
+bool ViewMesh::SelAnimation (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
-  iString* text;
-  iAwsComponent* list = tut->form->FindChild("AnimList");
-  iAwsParmList* pl = tut->aws->CreateParmList();
-  if (!list) return;
+  CEGUI::Listbox* list = (CEGUI::Listbox*)winMgr->getWindow("Tab2/List");
 
-  pl->AddString("text0","");
-  list->Execute("GetSelectedItem", pl);
-  pl->GetString("text0",&text);
+  CEGUI::ListboxItem* item = list->getFirstSelectedItem();
+  const CEGUI::String& text = item->getText();
+  if (text.empty()) return false;
 
-  if (!text->GetData()) return;
-
-  tut->selectedAnimation = text->GetData();
+  selectedAnimation = text.c_str();
+  return true;
 }
 
 //---------------------------------------------------------------------------
 
-void ViewMesh::SetMesh (unsigned long, intptr_t awst, iAwsSource *s)
+bool ViewMesh::SetMesh (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
+  if (!selectedCal3dSocket) return false;
 
-  if (!tut->selectedCal3dSocket) return;
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
-  iString* text;
-  if (!s->GetComponent()->GetProperty("Text",(intptr_t*)&text)) return;
+  CEGUI::Window* component = winMgr->getWindow("Tab3/Mesh/Input");
+  CEGUI::String text = component->getProperty("Text");
 
-  if (!text->GetData()) return;
+  if (!text.c_str()) return false;
 
   int i;
-  if (sscanf(text->GetData(),"%d", &i) != 1) return;
+  if (sscanf(text.c_str(),"%d", &i) != 1) return false;
 
-  tut->selectedCal3dSocket->SetMeshIndex(i);
-  tut->UpdateSocket();
+  selectedCal3dSocket->SetMeshIndex(i);
+  UpdateSocket();
+  return true;
 }
 
-void ViewMesh::SetSubMesh (unsigned long, intptr_t awst, iAwsSource *s)
+bool ViewMesh::SetSubMesh (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
+  if (!selectedCal3dSocket) return false;
 
-  if (!tut->selectedCal3dSocket) return;
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
-  iString* text;
-  if (!s->GetComponent()->GetProperty("Text",(intptr_t*)&text)) return;
+  CEGUI::Window* component = winMgr->getWindow("Tab3/Sub/Input");
+  CEGUI::String text = component->getProperty("Text");
 
-  if (!text->GetData()) return;
+  if (!text.c_str()) return false;
 
   int i;
-  if (sscanf(text->GetData(),"%d", &i) != 1) return;
+  if (sscanf(text.c_str(),"%d", &i) != 1) return false;
 
-  tut->selectedCal3dSocket->SetSubmeshIndex(i);
-  tut->UpdateSocket();
+  selectedCal3dSocket->SetSubmeshIndex(i);
+  UpdateSocket();
+  return true;
 }
 
-void ViewMesh::SetTriangle (unsigned long, intptr_t awst, iAwsSource *s)
+bool ViewMesh::SetTriangle (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
-  iString* text;
-  if (!s->GetComponent()->GetProperty("Text",(intptr_t*)&text)) return;
+  CEGUI::Window* component = winMgr->getWindow("Tab3/Tria/Input");
+  CEGUI::String text = component->getProperty("Text");
 
-  if (!text->GetData()) return;
+  if (!text.c_str()) return false;
 
   int i;
-  if (sscanf(text->GetData(),"%d", &i) != 1) return;
+  if (sscanf(text.c_str(),"%d", &i) != 1) return false;
 
-  if (tut->selectedCal3dSocket)
-    tut->selectedCal3dSocket->SetTriangleIndex(i);
-  else if (tut->selectedSocket)
-    tut->selectedSocket->SetTriangleIndex(i);
+  if (selectedCal3dSocket)
+    selectedCal3dSocket->SetTriangleIndex(i);
+  else if (selectedSocket)
+    selectedSocket->SetTriangleIndex(i);
 
-  tut->UpdateSocket();
+  UpdateSocket();
+  return true;
 }
 
-void ViewMesh::SetRotX (unsigned long, intptr_t awst, iAwsSource *s)
+bool ViewMesh::SetRotX (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
-  iString* text;
-  if (!s->GetComponent()->GetProperty("Text",(intptr_t*)&text)) return;
+  CEGUI::Window* component = winMgr->getWindow("Tab3/RotX/Input");
+  CEGUI::String text = component->getProperty("Text");
 
-  if (!text->GetData()) return;
+  if (!text.c_str()) return false;
 
   float f;
-  if (sscanf(text->GetData(),"%f", &f) != 1) return;
+  if (sscanf(text.c_str(),"%f", &f) != 1) return false;
 
-  if (tut->selectedCal3dSocket && tut->selectedCal3dSocket->GetMeshWrapper())
+  if (selectedCal3dSocket && selectedCal3dSocket->GetMeshWrapper())
   {
-    csRef<iMeshWrapper> meshWrap = tut->selectedCal3dSocket->GetMeshWrapper();
+    csRef<iMeshWrapper> meshWrap = selectedCal3dSocket->GetMeshWrapper();
     meshWrap->QuerySceneNode ()->SetParent (0);
     csReversibleTransform Tr;
-    Tr.RotateOther(csVector3(0,0,1),-tut->meshTz);
-    Tr.RotateOther(csVector3(0,1,0),-tut->meshTy);
-    Tr.RotateOther(csVector3(1,0,0),-tut->meshTx);
+    Tr.RotateOther(csVector3(0,0,1),-meshTz);
+    Tr.RotateOther(csVector3(0,1,0),-meshTy);
+    Tr.RotateOther(csVector3(1,0,0),-meshTx);
     Tr.RotateOther(csVector3(1,0,0),f);
-    Tr.RotateOther(csVector3(0,1,0),tut->meshTy);
-    Tr.RotateOther(csVector3(0,0,1),tut->meshTz);
+    Tr.RotateOther(csVector3(0,1,0),meshTy);
+    Tr.RotateOther(csVector3(0,0,1),meshTz);
     meshWrap->GetMeshObject()->HardTransform(Tr);
     meshWrap->GetFactory()->GetMeshObjectFactory()->HardTransform(Tr);
-    meshWrap->QuerySceneNode ()->SetParent (tut->spritewrapper
+    meshWrap->QuerySceneNode ()->SetParent (spritewrapper
     	->QuerySceneNode ());
-    tut->selectedCal3dSocket->SetMeshWrapper( meshWrap );
-    tut->spritewrapper->GetMovable()->UpdateMove();
-    tut->meshTx = f;
+    selectedCal3dSocket->SetMeshWrapper( meshWrap );
+    spritewrapper->GetMovable()->UpdateMove();
+    meshTx = f;
   }
-  else if (tut->selectedSocket && tut->selectedSocket->GetMeshWrapper())
+  else if (selectedSocket && selectedSocket->GetMeshWrapper())
   {
-    csRef<iMeshWrapper> meshWrap = tut->selectedSocket->GetMeshWrapper();
+    csRef<iMeshWrapper> meshWrap = selectedSocket->GetMeshWrapper();
     meshWrap->QuerySceneNode ()->SetParent (0);
     csReversibleTransform Tr;
-    Tr.RotateOther(csVector3(0,0,1),-tut->meshTz);
-    Tr.RotateOther(csVector3(0,1,0),-tut->meshTy);
-    Tr.RotateOther(csVector3(1,0,0),-tut->meshTx);
+    Tr.RotateOther(csVector3(0,0,1),-meshTz);
+    Tr.RotateOther(csVector3(0,1,0),-meshTy);
+    Tr.RotateOther(csVector3(1,0,0),-meshTx);
     Tr.RotateOther(csVector3(1,0,0),f);
-    Tr.RotateOther(csVector3(0,1,0),tut->meshTy);
-    Tr.RotateOther(csVector3(0,0,1),tut->meshTz);
+    Tr.RotateOther(csVector3(0,1,0),meshTy);
+    Tr.RotateOther(csVector3(0,0,1),meshTz);
     meshWrap->GetMeshObject()->HardTransform(Tr);
     meshWrap->GetFactory()->GetMeshObjectFactory()->HardTransform(Tr);
-    meshWrap->QuerySceneNode ()->SetParent (tut->spritewrapper
+    meshWrap->QuerySceneNode ()->SetParent (spritewrapper
     	->QuerySceneNode ());
-    tut->selectedSocket->SetMeshWrapper( meshWrap );
-    tut->spritewrapper->GetMovable()->UpdateMove();
-    tut->meshTx = f;
+    selectedSocket->SetMeshWrapper( meshWrap );
+    spritewrapper->GetMovable()->UpdateMove();
+    meshTx = f;
   }
+  return true;
 }
 
-void ViewMesh::SetRotY (unsigned long, intptr_t awst, iAwsSource *s)
+bool ViewMesh::SetRotY (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
-  iString* text;
-  if (!s->GetComponent()->GetProperty("Text",(intptr_t*)&text)) return;
+  CEGUI::Window* component = winMgr->getWindow("Tab3/RotY/Input");
+  CEGUI::String text = component->getProperty("Text");
 
-  if (!text->GetData()) return;
+  if (!text.c_str()) return false;
 
   float f;
-  if (sscanf(text->GetData(),"%f", &f) != 1) return;
+  if (sscanf(text.c_str(),"%f", &f) != 1) return false;
 
-  if (tut->selectedCal3dSocket && tut->selectedCal3dSocket->GetMeshWrapper())
+  if (selectedCal3dSocket && selectedCal3dSocket->GetMeshWrapper())
   {
-    csRef<iMeshWrapper> meshWrap = tut->selectedCal3dSocket->GetMeshWrapper();
+    csRef<iMeshWrapper> meshWrap = selectedCal3dSocket->GetMeshWrapper();
     meshWrap->QuerySceneNode ()->SetParent (0);
     csReversibleTransform Tr;
-    Tr.RotateOther(csVector3(0,0,1),-tut->meshTz);
-    Tr.RotateOther(csVector3(0,1,0),-tut->meshTy);
-    Tr.RotateOther(csVector3(1,0,0),-tut->meshTx);
-    Tr.RotateOther(csVector3(1,0,0),tut->meshTx);
+    Tr.RotateOther(csVector3(0,0,1),-meshTz);
+    Tr.RotateOther(csVector3(0,1,0),-meshTy);
+    Tr.RotateOther(csVector3(1,0,0),-meshTx);
+    Tr.RotateOther(csVector3(1,0,0),meshTx);
     Tr.RotateOther(csVector3(0,1,0),f);
-    Tr.RotateOther(csVector3(0,0,1),tut->meshTz);
+    Tr.RotateOther(csVector3(0,0,1),meshTz);
     meshWrap->GetMeshObject()->HardTransform(Tr);
     meshWrap->GetFactory()->GetMeshObjectFactory()->HardTransform(Tr);
-    meshWrap->QuerySceneNode ()->SetParent (tut->spritewrapper
+    meshWrap->QuerySceneNode ()->SetParent (spritewrapper
     	->QuerySceneNode ());
-    tut->selectedCal3dSocket->SetMeshWrapper( meshWrap );
-    tut->spritewrapper->GetMovable()->UpdateMove();
-    tut->meshTy = f;
+    selectedCal3dSocket->SetMeshWrapper( meshWrap );
+    spritewrapper->GetMovable()->UpdateMove();
+    meshTy = f;
   }
-  else if (tut->selectedSocket && tut->selectedSocket->GetMeshWrapper())
+  else if (selectedSocket && selectedSocket->GetMeshWrapper())
   {
-    csRef<iMeshWrapper> meshWrap = tut->selectedSocket->GetMeshWrapper();
+    csRef<iMeshWrapper> meshWrap = selectedSocket->GetMeshWrapper();
     meshWrap->QuerySceneNode ()->SetParent (0);
     csReversibleTransform Tr;
-    Tr.RotateOther(csVector3(0,0,1),-tut->meshTz);
-    Tr.RotateOther(csVector3(0,1,0),-tut->meshTy);
-    Tr.RotateOther(csVector3(1,0,0),-tut->meshTx);
-    Tr.RotateOther(csVector3(1,0,0),tut->meshTx);
+    Tr.RotateOther(csVector3(0,0,1),-meshTz);
+    Tr.RotateOther(csVector3(0,1,0),-meshTy);
+    Tr.RotateOther(csVector3(1,0,0),-meshTx);
+    Tr.RotateOther(csVector3(1,0,0),meshTx);
     Tr.RotateOther(csVector3(0,1,0),f);
-    Tr.RotateOther(csVector3(0,0,1),tut->meshTz);
+    Tr.RotateOther(csVector3(0,0,1),meshTz);
     meshWrap->GetMeshObject()->HardTransform(Tr);
     meshWrap->GetFactory()->GetMeshObjectFactory()->HardTransform(Tr);
-    meshWrap->QuerySceneNode ()->SetParent (tut->spritewrapper
+    meshWrap->QuerySceneNode ()->SetParent (spritewrapper
     	->QuerySceneNode ());
-    tut->selectedSocket->SetMeshWrapper( meshWrap );
-    tut->spritewrapper->GetMovable()->UpdateMove();
-    tut->meshTy = f;
+    selectedSocket->SetMeshWrapper( meshWrap );
+    spritewrapper->GetMovable()->UpdateMove();
+    meshTy = f;
   }
+  return true;
 }
 
-void ViewMesh::SetRotZ (unsigned long, intptr_t awst, iAwsSource *s)
+bool ViewMesh::SetRotZ (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
-  iString* text;
-  if (!s->GetComponent()->GetProperty("Text",(intptr_t*)&text)) return;
+  CEGUI::Window* component = winMgr->getWindow("Tab3/RotZ/Input");
+  CEGUI::String text = component->getProperty("Text");
 
-  if (!text->GetData()) return;
+  if (!text.c_str()) return false;
 
   float f;
-  if (sscanf(text->GetData(),"%f", &f) != 1) return;
+  if (sscanf(text.c_str(),"%f", &f) != 1) return false;
 
-  if (tut->selectedCal3dSocket && tut->selectedCal3dSocket->GetMeshWrapper())
+  if (selectedCal3dSocket && selectedCal3dSocket->GetMeshWrapper())
   {
-    csRef<iMeshWrapper> meshWrap = tut->selectedCal3dSocket->GetMeshWrapper();
+    csRef<iMeshWrapper> meshWrap = selectedCal3dSocket->GetMeshWrapper();
     meshWrap->QuerySceneNode ()->SetParent (0);
     csReversibleTransform Tr;
-    Tr.RotateOther(csVector3(0,0,1),-tut->meshTz);
-    Tr.RotateOther(csVector3(0,1,0),-tut->meshTy);
-    Tr.RotateOther(csVector3(1,0,0),-tut->meshTx);
-    Tr.RotateOther(csVector3(1,0,0),tut->meshTx);
-    Tr.RotateOther(csVector3(0,1,0),tut->meshTy);
+    Tr.RotateOther(csVector3(0,0,1),-meshTz);
+    Tr.RotateOther(csVector3(0,1,0),-meshTy);
+    Tr.RotateOther(csVector3(1,0,0),-meshTx);
+    Tr.RotateOther(csVector3(1,0,0),meshTx);
+    Tr.RotateOther(csVector3(0,1,0),meshTy);
     Tr.RotateOther(csVector3(0,0,1),f);
     meshWrap->GetMeshObject()->HardTransform(Tr);
     meshWrap->GetFactory()->GetMeshObjectFactory()->HardTransform(Tr);
-    meshWrap->QuerySceneNode ()->SetParent (tut->spritewrapper
+    meshWrap->QuerySceneNode ()->SetParent (spritewrapper
     	->QuerySceneNode ());
-    tut->selectedCal3dSocket->SetMeshWrapper( meshWrap );
-    tut->spritewrapper->GetMovable()->UpdateMove();
-    tut->meshTz = f;
+    selectedCal3dSocket->SetMeshWrapper( meshWrap );
+    spritewrapper->GetMovable()->UpdateMove();
+    meshTz = f;
   }
-  else if (tut->selectedSocket && tut->selectedSocket->GetMeshWrapper())
+  else if (selectedSocket && selectedSocket->GetMeshWrapper())
   {
-    csRef<iMeshWrapper> meshWrap = tut->selectedSocket->GetMeshWrapper();
+    csRef<iMeshWrapper> meshWrap = selectedSocket->GetMeshWrapper();
     meshWrap->QuerySceneNode ()->SetParent (0);
     csReversibleTransform Tr;
-    Tr.RotateOther(csVector3(0,0,1),-tut->meshTz);
-    Tr.RotateOther(csVector3(0,1,0),-tut->meshTy);
-    Tr.RotateOther(csVector3(1,0,0),-tut->meshTx);
-    Tr.RotateOther(csVector3(1,0,0),tut->meshTx);
-    Tr.RotateOther(csVector3(0,1,0),tut->meshTy);
+    Tr.RotateOther(csVector3(0,0,1),-meshTz);
+    Tr.RotateOther(csVector3(0,1,0),-meshTy);
+    Tr.RotateOther(csVector3(1,0,0),-meshTx);
+    Tr.RotateOther(csVector3(1,0,0),meshTx);
+    Tr.RotateOther(csVector3(0,1,0),meshTy);
     Tr.RotateOther(csVector3(0,0,1),f);
     meshWrap->GetMeshObject()->HardTransform(Tr);
     meshWrap->GetFactory()->GetMeshObjectFactory()->HardTransform(Tr);
-    meshWrap->QuerySceneNode ()->SetParent (tut->spritewrapper
+    meshWrap->QuerySceneNode ()->SetParent (spritewrapper
     	->QuerySceneNode ());
-    tut->selectedSocket->SetMeshWrapper( meshWrap );
-    tut->spritewrapper->GetMovable()->UpdateMove();
-    tut->meshTz = f;
+    selectedSocket->SetMeshWrapper( meshWrap );
+    spritewrapper->GetMovable()->UpdateMove();
+    meshTz = f;
   }
+  return true;
 }
 
-void ViewMesh::AttachButton (unsigned long, intptr_t awst, iAwsSource* /*s*/)
+bool ViewMesh::AttachButton (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
-  tut->form->Hide();
-  tut->stddlg->Show();
-  tut->stddlgPurpose=attach;
+  form->hide();
+  stddlg->show();
+  stddlgPurpose=attach;
+  return true;
 }
 
-void ViewMesh::DetachButton (unsigned long, intptr_t awst, iAwsSource* /*s*/)
+bool ViewMesh::DetachButton (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
-
   csRef<iMeshWrapper> meshWrapOld;
-  if (tut->selectedCal3dSocket)
-    meshWrapOld = tut->selectedCal3dSocket->GetMeshWrapper();
-  else if (tut->selectedSocket)
-    meshWrapOld = tut->selectedSocket->GetMeshWrapper();
+  if (selectedCal3dSocket)
+    meshWrapOld = selectedCal3dSocket->GetMeshWrapper();
+  else if (selectedSocket)
+    meshWrapOld = selectedSocket->GetMeshWrapper();
   
-  if (!meshWrapOld ) return;
+  if (!meshWrapOld ) return false;
 
   meshWrapOld->QuerySceneNode ()->SetParent (0);
 
-  tut->engine->RemoveObject(meshWrapOld);
-  tut->engine->RemoveObject(meshWrapOld->GetFactory());
+  engine->RemoveObject(meshWrapOld);
+  engine->RemoveObject(meshWrapOld->GetFactory());
 
-  if (tut->selectedCal3dSocket)
-    tut->selectedCal3dSocket->SetMeshWrapper( 0 );    
-  else if (tut->selectedSocket)
-    tut->selectedSocket->SetMeshWrapper( 0 );    
+  if (selectedCal3dSocket)
+    selectedCal3dSocket->SetMeshWrapper( 0 );    
+  else if (selectedSocket)
+    selectedSocket->SetMeshWrapper( 0 );    
+  return true;
 }
 
-void ViewMesh::AddSocket (unsigned long, intptr_t awst, iAwsSource* /*s*/)
+bool ViewMesh::AddSocket (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
+  ReportWarning("Adding sockets is not yet implemented");
 
-  tut->ReportWarning("Adding sockets is not yet implemented");
-
-  if (tut->cal3dsprite)
+  if (cal3dsprite)
   {
-    //tut->cal3dsprite->AddSocket()->SetName("NewSocket");
-    //tut->cal3dstate->AddSocket()->SetName("NewSocket");
-    //tut->SelectSocket("NewSocket");
+    //cal3dsprite->AddSocket()->SetName("NewSocket");
+    //cal3dstate->AddSocket()->SetName("NewSocket");
+    //SelectSocket("NewSocket");
   }
-  else if (tut->sprite)
+  else if (sprite)
   {
-    //iSpriteSocket* newsocket = tut->sprite->AddSocket();
+    //iSpriteSocket* newsocket = sprite->AddSocket();
     //newsocket->SetName("NewSocket");
-    //tut->SelectSocket(newsocket->GetName());
+    //SelectSocket(newsocket->GetName());
   }
-  tut->UpdateSocketList();
+  UpdateSocketList();
+  return true;
 }
 
-void ViewMesh::DelSocket (unsigned long, intptr_t awst, iAwsSource* /*s*/)
+bool ViewMesh::DelSocket (const CEGUI::EventArgs& e)
 {
   //Change API of iSpriteCal3DFactoryState to enable this!
-  ViewMesh* tut = (ViewMesh*)awst;
-  tut->ReportWarning("Deleting sockets is not yet implemented");
-  //tut->socket->DelSocket(selectedCal3dSocket);
+
+  ReportWarning("Deleting sockets is not yet implemented");
+  //socket->DelSocket(selectedCal3dSocket);
   //selectedCal3dSocket = 0;
-  tut->UpdateSocketList();
+  UpdateSocketList();
+  return true;
 }
 
-void ViewMesh::SelSocket (unsigned long, intptr_t awst, iAwsSource* /*s*/)
+bool ViewMesh::SelSocket (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
-  iString* text;
-  iAwsComponent* list = tut->form->FindChild("SocketList");
-  iAwsParmList* pl = tut->aws->CreateParmList();
-  if (!list) return;
+  CEGUI::Listbox* list = (CEGUI::Listbox*)winMgr->getWindow("Tab3/List");
 
-  pl->AddString("text0","");
-  list->Execute("GetSelectedItem", pl);
-  pl->GetString("text0",&text);
+  CEGUI::ListboxItem* item = list->getFirstSelectedItem();
+  const CEGUI::String& text = item->getText();
+  if (text.empty()) return false;
 
-  if (!text->GetData()) return;
-
-  tut->SelectSocket(text->GetData());
+  SelectSocket(text.c_str());
+  return true;
 }
 
 
-void ViewMesh::RenameSocket (unsigned long, intptr_t awst, iAwsSource* /*s*/)
+bool ViewMesh::RenameSocket (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+  CEGUI::Window* textfield = winMgr->getWindow("Tab3/RenameSocket/Input");
 
-  iAwsComponent* textfield = tut->form->FindChild("InputName");
-  if (!textfield) return;
+  CEGUI::String text = textfield->getProperty("Text");
 
-  iString* text;
-  if (!textfield->GetComponent()->GetProperty("Text",(intptr_t*)&text)) return;
+  if (text.empty()) return false;
 
-  if (!text->GetData()) return;
-
-  if (tut->selectedSocket)
+  if (selectedSocket)
   {
-    tut->selectedSocket->SetName(*text);
+    selectedSocket->SetName(text.c_str());
   }
-  else if (tut->selectedCal3dSocket)
+  else if (selectedCal3dSocket)
   {
-    const char* name = tut->selectedCal3dSocket->GetName();
-    tut->cal3dsprite->FindSocket(name)->SetName(*text);
-    tut->cal3dstate->FindSocket(name)->SetName(*text);
-    tut->selectedCal3dSocket = tut->cal3dsprite->FindSocket(*text);
+    const char* name = selectedCal3dSocket->GetName();
+    cal3dsprite->FindSocket(name)->SetName(text.c_str());
+    cal3dstate->FindSocket(name)->SetName(text.c_str());
+    selectedCal3dSocket = cal3dsprite->FindSocket(text.c_str());
   }
 
-  tut->UpdateSocketList();
+  UpdateSocketList();
+  return true;
 }
 
 //---------------------------------------------------------------------------
 
-void ViewMesh::CameraMode (unsigned long, intptr_t awst, iAwsSource *s)
+bool ViewMesh::CameraModeRotate (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
-  bool* state;
-  if (!s->GetComponent()->GetProperty("State",(intptr_t*)&state)) return;
+  CEGUI::RadioButton* radio = 
+    (CEGUI::RadioButton*) winMgr->getWindow("Tab1/RotateRadio");
 
-  if (!state) return;
-
-  iString* caption;
-  if (!s->GetComponent()->GetProperty("Caption",(intptr_t*)&caption)) return;
-
-  if (!caption->GetData()) return;
-
-  if (!strcmp (*caption, "Rotate"))
-    tut->camMode = rotateorigin;
-  else if (!strcmp (*caption, "Look to Origin"))
-    tut->camMode = moveorigin;
-  else if (!strcmp (*caption, "Normal Movement"))
-    tut->camMode = movenormal;
+  if (radio->getSelectedButtonInGroup() == radio)
+    camMode = rotateorigin;
+  return true;
 }
 
-void ViewMesh::LoadButton (unsigned long, intptr_t awst, iAwsSource* /*s*/)
+bool ViewMesh::CameraModeMoveOrigin (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
-  tut->form->Hide();
-  tut->stddlg->Show();
-  tut->stddlgPurpose=load;
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  CEGUI::RadioButton* radio = 
+    (CEGUI::RadioButton*) winMgr->getWindow("Tab1/LooktooriginRadio");
+
+  if (radio->getSelectedButtonInGroup() == radio)
+    camMode = moveorigin;
+  return true;
 }
 
-void ViewMesh::LoadLibButton (unsigned long, intptr_t awst, iAwsSource* /*s*/)
+bool ViewMesh::CameraModeMoveNormal (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
-  tut->form->Hide();
-  tut->stddlg->Show();
-  tut->stddlgPurpose=loadlib;
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  CEGUI::RadioButton* radio = 
+    (CEGUI::RadioButton*) winMgr->getWindow("Tab1/NormalMovementRadio");
+
+  if (radio->getSelectedButtonInGroup() == radio)
+    camMode = movenormal;
+  return true;
 }
 
-void ViewMesh::SaveButton (unsigned long, intptr_t awst, iAwsSource* /*s*/)
+bool ViewMesh::LoadButton (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
-  tut->form->Hide();
-  tut->stddlg->Show();
-  tut->stddlgPurpose=save;
+  form->hide();
+  stddlg->show();
+  stddlgPurpose=load;
+  return true;
 }
 
-void ViewMesh::SaveBinaryButton (unsigned long, intptr_t awst, iAwsSource* /*s*/)
+bool ViewMesh::LoadLibButton (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
-  tut->form->Hide();
-  tut->stddlg->Show();
-  tut->stddlgPurpose=savebinary;
+  form->hide();
+  stddlg->show();
+  stddlgPurpose=loadlib;
+  return true;
 }
 
-void ViewMesh::SetScaleSprite (unsigned long, intptr_t awst, iAwsSource *s)
+bool ViewMesh::SaveButton (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
+  form->hide();
+  stddlg->show();
+  stddlgPurpose=save;
+  return true;
+}
 
-  iString* text;
-  if (!s->GetComponent()->GetProperty("Text",(intptr_t*)&text)) return;
+bool ViewMesh::SaveBinaryButton (const CEGUI::EventArgs& e)
+{
+  form->hide();
+  stddlg->show();
+  stddlgPurpose=savebinary;
+  return true;
+}
 
-  if (!text->GetData()) return;
+bool ViewMesh::SetScaleSprite (const CEGUI::EventArgs& e)
+{
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  CEGUI::Editbox* component = (CEGUI::Editbox*)winMgr->getWindow("Tab1/ScaleSprite");
+  const CEGUI::String& text = component->getText();
+
+  if (text.empty()) return false;
 
   float f;
-  if (sscanf(text->GetData(),"%f", &f) != 1) return;
+  if (sscanf(text.c_str(),"%f", &f) != 1) return false;
 
-  tut->ScaleSprite(f);
+  ScaleSprite(f);
+  return true;
 }
 
 //---------------------------------------------------------------------------
-void ViewMesh::SelMorph (unsigned long, intptr_t awst, iAwsSource* /*s*/)
+bool ViewMesh::SelMorph (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
-  iString* text;
-  iAwsComponent* list = tut->form->FindChild("MorphList");
-  iAwsParmList* pl = tut->aws->CreateParmList();
-  if (!list) return;
+  CEGUI::Listbox* list = (CEGUI::Listbox*)winMgr->getWindow("Tab4/List");
 
-  pl->AddString("text0","");
-  list->Execute("GetSelectedItem", pl);
-  pl->GetString("text0",&text);
+  CEGUI::ListboxItem* item = list->getFirstSelectedItem();
+  const CEGUI::String& text = item->getText();
+  if (text.empty()) return false;
 
-  if (!text->GetData()) return;
-
-  tut->selectedMorphTarget = text->GetData();
+  selectedMorphTarget = text.c_str();
+  return true;
 }
 
-void ViewMesh::BlendButton (unsigned long, intptr_t awst, iAwsSource* /*s*/)
+bool ViewMesh::BlendButton (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
-  if (!tut->cal3dstate) return;
+  if (!cal3dstate) return false;
 
-  iString *Sweight=0, *Sdelay=0;
   float weight=1, delay=1;
 
-  iAwsComponent* component;
-  component = tut->stddlg->FindChild("InputWeight");
-  if (component) component->GetProperty("Text",(intptr_t*)&Sweight);
-  if (Sweight && Sweight->GetData())
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  CEGUI::Window* component = winMgr->getWindow("Tab4/WeightInput");
+  CEGUI::String Sweight = component->getProperty("Text");
+
+  if (! Sweight.empty())
   {
-    if(sscanf(Sweight->GetData(), "%f", &weight) != 1) weight = 1;
+    if(sscanf(Sweight.c_str(), "%f", &weight) != 1) weight = 1;
   }
 
-  component = tut->stddlg->FindChild("InputDelay");
-  if (component) component->GetProperty("Text",(intptr_t*)&Sdelay);
-  if (Sdelay && Sdelay->GetData())
+  component = winMgr->getWindow("Tab4/DelayInput");
+  CEGUI::String Sdelay = component->getProperty("Text");
+  if (! Sdelay.empty())
   {
-    if(sscanf(Sdelay->GetData(), "%f", &delay) != 1) delay = 1;
+    if(sscanf(Sdelay.c_str(), "%f", &delay) != 1) delay = 1;
   }
 
   int target =
-    tut->cal3dsprite->FindMorphAnimationName(tut->selectedMorphTarget);
+    cal3dsprite->FindMorphAnimationName(selectedMorphTarget);
 
-  if (target == -1) return;
+  if (target == -1) return false;
 
-  tut->cal3dstate->BlendMorphTarget(target, weight, delay);
+  cal3dstate->BlendMorphTarget(target, weight, delay);
+  return true;
 }
 
-void ViewMesh::ClearButton (unsigned long, intptr_t awst, iAwsSource* /*s*/)
+bool ViewMesh::ClearButton (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
-  if (!tut->cal3dstate) return;
+  if (!cal3dstate) return false;
 
-  iString *Sweight=0;
   float weight=1;
 
-  iAwsComponent* component;
-  component = tut->stddlg->FindChild("InputWeight");
-  if (component) component->GetProperty("Text",(intptr_t*)&Sweight);
-  if (Sweight && Sweight->GetData())
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  CEGUI::Window* component = winMgr->getWindow("Tab4/WeightInput");
+  CEGUI::String Sweight = component->getProperty("Text");
+
+  if (! Sweight.empty())
   {
-    if(sscanf(Sweight->GetData(), "%f", &weight) != 1) weight = 1;
+    if(sscanf(Sweight.c_str(), "%f", &weight) != 1) weight = 1;
   }
 
   int target =
-    tut->cal3dsprite->FindMorphAnimationName(tut->selectedMorphTarget);
+    cal3dsprite->FindMorphAnimationName(selectedMorphTarget);
 
-  if (target == -1) return;
+  if (target == -1) return false;
 
-  tut->cal3dstate->ClearMorphTarget(target, weight);
+  cal3dstate->ClearMorphTarget(target, weight);
+  return true;
 }
 //---------------------------------------------------------------------------
 
 void ViewMesh::StdDlgUpdateLists(const char* filename)
 {
-  iAwsComponent* dirlist = stddlg->FindChild("DirList");
-  iAwsComponent* filelist = stddlg->FindChild("FileList");
-  iAwsParmList* pl = aws->CreateParmList();
-  if (!dirlist || !filelist) return;
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
-  dirlist->Execute("ClearList", pl);
-  filelist->Execute("ClearList", pl);
+  CEGUI::Listbox* dirlist = (CEGUI::Listbox*)winMgr->getWindow("StdDlg/DirSelect");
+  CEGUI::Listbox* filelist = (CEGUI::Listbox*)winMgr->getWindow("StdDlg/FileSelect");
 
-  pl->AddString("text0", "..");
-  dirlist->Execute("InsertItem", pl);
-  pl->Clear();
+  dirlist->resetList();
+  filelist->resetList();
+
+  CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem("..");
+  item->setTextColours(CEGUI::colour(0,0,0));
+  //item->setSelectionBrushImage("ice", "TextSelectionBrush");
+  //item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+  dirlist->addItem(item);
 
   csRef<iStringArray> files = vfs->FindFiles(filename);
   
@@ -1581,129 +1724,136 @@ void ViewMesh::StdDlgUpdateLists(const char* filename)
     if (file[strlen(file)-1] == '/')
     {
       file[strlen(file)-1]='\0';
-      pl->AddString("text0", file);
-      dirlist->Execute("InsertItem", pl);
-      pl->Clear();
+      CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(file);
+      item->setTextColours(CEGUI::colour(0,0,0));
+      //item->setSelectionBrushImage("ice", "TextSelectionBrush");
+      //item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+      dirlist->addItem(item);
     }
     else
     {
-      pl->AddString("text0", file);
-      filelist->Execute("InsertItem", pl);
-      pl->Clear();
+      CEGUI::ListboxTextItem* item = new CEGUI::ListboxTextItem(file);
+      item->setTextColours(CEGUI::colour(0,0,0));
+      //item->setSelectionBrushImage("ice", "TextSelectionBrush");
+      //item->setSelectionColours(CEGUI::colour(0.5f,0.5f,1));
+      filelist->addItem(item);
     }
   }
 }
 
 //---------------------------------------------------------------------------
 
-void ViewMesh::StdDlgOkButton (unsigned long, intptr_t awst, iAwsSource* /*s*/)
+bool ViewMesh::StdDlgOkButton (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
+  form->show();
+  stddlg->hide();
 
-  iString* path=0;
-  iString* file=0;
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
-  tut->form->Show();
-  tut->stddlg->Hide();
+  CEGUI::Window* inputpath = winMgr->getWindow("StdDlg/Path");
+  CEGUI::String path = inputpath->getProperty("Text");
+  if (path.empty()) return false;
 
-  iAwsComponent* inputpath = tut->stddlg->FindChild("InputPath");
-  if (inputpath) inputpath->GetProperty("Text",(intptr_t*)&path);
-  if (!path || !path->GetData()) return;
-  tut->vfs->ChDir (path->GetData ());
+  vfs->ChDir (path.c_str());
 
-  iAwsComponent* inputfile = tut->stddlg->FindChild("InputFile");
-  if (inputfile) inputfile->GetProperty("Text",(intptr_t*)&file);
-  if (!file || !file->GetData()) return;
+  CEGUI::Window* inputfile = winMgr->getWindow("StdDlg/File");
+  CEGUI::String file = inputfile->getProperty("Text");
+  if (path.empty()) return false;
 
-  switch (tut->stddlgPurpose)
+  switch (stddlgPurpose)
   {
   case save:
-    tut->SaveSprite(*file, false);
+    SaveSprite(file.c_str(), false);
     break;
   case savebinary:
-    tut->SaveSprite(*file, true);
+    SaveSprite(file.c_str(), true);
     break;
   case load:
-    tut->LoadSprite(*file);
+    LoadSprite(file.c_str());
     break;
   case loadlib:
-    tut->LoadLibrary(*file);
+    LoadLibrary(file.c_str());
     break;
   case attach:
-    tut->AttachMesh(*file);
+    AttachMesh(file.c_str());
     break;
   }
+  return true;
 }
 
-void ViewMesh::StdDlgCancleButton (unsigned long, intptr_t awst, iAwsSource* /*s*/)
+bool ViewMesh::StdDlgCancleButton (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
-
-  tut->form->Show();
-  tut->stddlg->Hide();
+  form->show();
+  stddlg->hide();
+  return true;
 }
 
-void ViewMesh::StdDlgFileSelect (unsigned long, intptr_t awst, iAwsSource* /*s*/)
+bool ViewMesh::StdDlgFileSelect (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
-  iString* text;
-  iAwsComponent* list = tut->stddlg->FindChild("FileList");
-  iAwsParmList* pl = tut->aws->CreateParmList();
-  if (!list) return;
+  CEGUI::Listbox* list = (CEGUI::Listbox*) winMgr->getWindow("StdDlg/FileSelect");
+  CEGUI::ListboxItem* item = list->getFirstSelectedItem();
+  CEGUI::String text = item->getText();
+  if (text.empty()) return false;
 
-  pl->AddString("text0","");
-  list->Execute("GetSelectedItem", pl);
-  pl->GetString("text0",&text);
-
-  if (!text->GetData()) return;
-
-  iAwsComponent* InputPath = tut->stddlg->FindChild("InputFile");
-  InputPath->SetProperty("Text", (intptr_t)text);
+  CEGUI::Window* file = winMgr->getWindow("StdDlg/File");
+  file->setProperty("Text", text);
+  return true;
 }
 
-void ViewMesh::StdDlgDirSelect (unsigned long, intptr_t awst, iAwsSource* /*s*/)
+bool ViewMesh::StdDlgDirSelect (const CEGUI::EventArgs& e)
 {
-  ViewMesh* tut = (ViewMesh*)awst;
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
 
-  iString* text;
-  iAwsComponent* list = tut->stddlg->FindChild("DirList");
-  iAwsParmList* pl = tut->aws->CreateParmList();
-  if (!list) return;
+  CEGUI::Listbox* list = (CEGUI::Listbox*) winMgr->getWindow("StdDlg/DirSelect");
+  CEGUI::ListboxItem* item = list->getFirstSelectedItem();
+  CEGUI::String text = item->getText();
+  if (text.empty()) return false;
 
-  pl->AddString("text0","");
-  list->Execute("GetSelectedItem", pl);
-  pl->GetString("text0",&text);
+  csPrintf("cd %s\n",text.c_str());
 
-  if (!text->GetData()) return;
+  CEGUI::Window* inputpath = winMgr->getWindow("StdDlg/Path");
+  CEGUI::String path = inputpath->getProperty("Text");
+  if (path.empty()) return false;
 
-  csPrintf("cd %s\n",text->GetData());
+  csString newpath(path.c_str());
 
-  iString* path = 0;
-  iAwsComponent* inputpath = tut->stddlg->FindChild("InputPath");
-  if (inputpath) inputpath->GetProperty("Text",(intptr_t*)&path);
-  if (!path || !path->GetData()) return;
-
-  csRef<iString> newpath = path;
-
-  if (csString("..") == *text)
+  if (csString("..") == text.c_str())
   {
-    size_t i = newpath->Slice(0,newpath->Length()-1)->FindLast('/')+1;
+    size_t i = newpath.Slice(0,newpath.Length()-1).FindLast('/')+1;
     csPrintf("%zu", i);
-    newpath = newpath->Slice(0,i);
+    newpath = newpath.Slice(0,i);
   }
   else
   {
-     newpath->Append(text);
-     newpath->Append("/");
+    newpath.Append(text.c_str());
+    newpath.Append("/");
   }
 
-  if (!newpath->GetData()) newpath->Append("/");
-  tut->vfs->ChDir (newpath->GetData ());
+  if (!newpath.GetData()) newpath.Append("/");
+  vfs->ChDir (newpath.GetData ());
 
-  iAwsComponent* InputPath = tut->stddlg->FindChild("InputPath");
-  if (InputPath) InputPath->SetProperty("Text", (intptr_t)(iString*)newpath);
-  tut->StdDlgUpdateLists(newpath->GetData());
+  inputpath->setProperty("Text", newpath.GetData());
+  StdDlgUpdateLists(newpath.GetData());
+  return true;
+}
+
+bool ViewMesh::StdDlgDirChange (const CEGUI::EventArgs& e)
+{
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  CEGUI::Window* inputpath = winMgr->getWindow("StdDlg/Path");
+  CEGUI::String path = inputpath->getProperty("Text");
+  if (path.empty()) return false;
+
+  csPrintf("cd %s\n",path.c_str());
+
+  vfs->ChDir (path.c_str ());
+
+  inputpath->setProperty("Text", path.c_str());
+  StdDlgUpdateLists(path.c_str());
+  return true;
 }
 
 //---------------------------------------------------------------------------

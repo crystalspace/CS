@@ -50,7 +50,7 @@ private:
     One
   };
 
-  csHash<csRef<csConfigDocument>, csStrKey> configs;
+  csHash<csRef<csConfigDocument>, csString> configs;
 public:
   CS_LEAKGUARD_DECLARE (csDriverDBReader);
 

@@ -21,6 +21,7 @@
 #include "csutil/cfgmgr.h"
 #include "csutil/csstring.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/scfstringarray.h"
 #include "csutil/strhash.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
@@ -436,6 +437,14 @@ bool csConfigManager::GetBool(const char *Key, bool Def) const
   return Def;
 }
 
+csPtr<iStringArray> csConfigManager::GetTuple(const char *Key) const
+{
+  for (csConfigDomain *d=LastDomain; d!=0; d=d->Prev)
+    if (d->Cfg && d->Cfg->KeyExists(Key))
+      return d->Cfg->GetTuple(Key);
+  return 0;
+}
+
 const char *csConfigManager::GetComment(const char *Key) const
 {
   for (csConfigDomain *d=LastDomain; d!=0; d=d->Prev) {
@@ -467,6 +476,12 @@ void csConfigManager::SetFloat (const char *Key, float Value)
 void csConfigManager::SetBool (const char *Key, bool Value)
 {
   DynamicDomain->Cfg->SetBool(Key, Value);
+  ClearKeyAboveDynamic(Key);
+}
+
+void csConfigManager::SetTuple (const char *Key, iStringArray* Value)
+{
+  DynamicDomain->Cfg->SetTuple(Key, Value);
   ClearKeyAboveDynamic(Key);
 }
 

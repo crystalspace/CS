@@ -22,6 +22,7 @@
 #include "csutil/databuf.h"
 #include "csutil/physfile.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/scfstringarray.h"
 #include "csutil/snprintf.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
@@ -51,12 +52,14 @@ public:
   void SetInt(int);
   void SetFloat(float);
   void SetBool(bool);
+  void SetTuple (iStringArray* Value);
   void SetComment(const char*);
   // get data
   const char *GetStr() const;
   int GetInt() const;
   float GetFloat() const;
   bool GetBool() const;
+  csPtr<iStringArray> GetTuple() const;
   const char *GetComment() const;
   // return prev and next node
   csConfigNode *GetPrev() const;
@@ -150,6 +153,21 @@ void csConfigNode::SetBool(bool b)
   SetStr(b ? "true" : "false");
 }
 
+void csConfigNode::SetTuple (iStringArray* Value)
+{
+  // this should output a string like
+  // abc, def, ghi
+  csString s;
+  while (!Value->IsEmpty ())
+  {
+    csString i = Value->Pop ();
+    if (!Value->IsEmpty ())
+      i.Append (", ");
+    s.Append(i);
+  }
+  SetStr (s);
+}
+
 void csConfigNode::SetComment(const char *s)
 {
   delete[] Comment;
@@ -180,6 +198,38 @@ bool csConfigNode::GetBool() const
      strcasecmp(Data, "1"   ) == 0));
 }
 
+csPtr<iStringArray> csConfigNode::GetTuple() const
+{
+  if (!Data)
+    return 0;
+
+  scfStringArray *items = new scfStringArray;		// the output list
+  csString item;
+
+  char *sinp = Data;
+  char *comp;
+  size_t len;
+  bool finished = false;
+
+  while (!finished)
+  {
+    comp = strchr (sinp, ',');
+    if (!comp)
+    {
+      finished = true;
+      comp = &sinp [strlen (sinp)];
+    }
+    len = strlen (sinp) - strlen (comp);
+    item = csString (sinp, len);
+    item.Trim ();
+    sinp = comp + 1;
+    items->Push (item);
+  }
+
+  csPtr<iStringArray> v(items);
+  return v;
+}
+
 const char *csConfigNode::GetComment() const
 {
   return Comment;
@@ -187,7 +237,7 @@ const char *csConfigNode::GetComment() const
 
 /* config iterator */
 
-class csConfigIterator : public scfImplementation1<csConfigIterator, 
+class csConfigIterator : public scfImplementation1<csConfigIterator,
                                                    iConfigIterator>
 {
 public:
@@ -217,6 +267,8 @@ public:
   virtual const char *GetStr() const;
   /// Get a boolean value from the configuration.
   virtual bool GetBool() const;
+  /// Get a tuple set from the configuration.
+  virtual csPtr<iStringArray> GetTuple() const;
   /// Get the comment of the given key, or 0 if no comment exists.
   virtual const char *GetComment() const;
 
@@ -340,6 +392,11 @@ bool csConfigIterator::GetBool() const
   return Node->GetBool();
 }
 
+csPtr<iStringArray> csConfigIterator::GetTuple() const
+{
+  return Node->GetTuple();
+}
+
 const char *csConfigIterator::GetComment() const
 {
   return Node->GetComment();
@@ -442,10 +499,10 @@ bool csConfigFile::Save()
 {
   if (!Dirty)
     return true;
-  
+
   if (!SaveNow(Filename, VFS))
     return false;
-  
+
   Dirty = false;
   return true;
 }
@@ -585,6 +642,12 @@ bool csConfigFile::GetBool(const char *Key, bool Def) const
   return Node ? Node->GetBool() : Def;
 }
 
+csPtr<iStringArray> csConfigFile::GetTuple(const char *Key) const
+{
+  csConfigNode *Node = FindNode(Key);
+  return Node ? Node->GetTuple() : 0;
+}
+
 const char *csConfigFile::GetComment(const char *Key) const
 {
   csConfigNode *Node = FindNode(Key);
@@ -638,6 +701,50 @@ void csConfigFile::SetBool (const char *Key, bool Value)
   if (Node && (Create || Value != Node->GetBool()))
   {
     Node->SetBool(Value);
+    Dirty = true;
+  }
+}
+
+void csConfigFile::SetTuple (const char *Key, iStringArray* Value)
+{
+  csConfigNode *Node = FindNode(Key);
+  bool const Create = !Node;
+  if (Create) Node = CreateNode(Key);
+
+  bool changed = false;
+  // This checks to see whether the thing
+  // we're saving is the same as the saved
+  if (Node)
+  {
+    csRef<iStringArray> sa = Node->GetTuple ();
+    // was the tuple valid ?
+    if (sa)
+    {
+      // its different if lengths differ
+      if (sa->Length () != Value->Length ())
+      {
+        changed = true;
+      }
+      else
+      {
+        for (uint i = 0 ; i < sa->Length (); i++)
+        {
+          // found 2 different strings in tuple
+          if (sa->Get (i) != Value->Get (i))
+          {
+            changed = true;
+            break;
+          }
+        }
+      }
+    }
+    else
+      changed = true;
+  }
+
+  if (Node && (Create || changed))
+  {
+    Node->SetTuple(Value);
     Dirty = true;
   }
 }

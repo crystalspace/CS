@@ -180,7 +180,8 @@ public:
   size_t Length () const { return paths.Length(); }
   size_t GetSize () const { return paths.Length(); }
   //@}
-  CS_DEPRECATED_METHOD size_t GetCount () const { return Length(); }
+  CS_DEPRECATED_METHOD_MSG("Use Length() instead") 
+  size_t GetCount () const { return Length(); }
   //@{
   /// Retrieve the n'th path record.
   Entry const& operator [] (size_t n) const { return paths[n]; }

@@ -189,7 +189,7 @@ public:
    * \deprecated Use instead the more generic Enabled() method, which accepts
    *   any granularity of class breakdown; not just major and minor components.
    */
-  CS_DEPRECATED_METHOD
+  CS_DEPRECATED_METHOD_MSG("Use Enabled() instead")
   bool CheckFlag(char const* major, char const* minor) const
   {
     Str flag; flag << major << '.' << minor;
@@ -302,7 +302,7 @@ public:
    * \deprecated Use instead the more generic Enabled() method, which accepts
    *   any granularity of class breakdown; not just major and minor components.
    */
-  CS_DEPRECATED_METHOD
+  CS_DEPRECATED_METHOD_MSG("Use Enabled() instead")
   virtual bool CheckFlag(char const* major, char const* minor) const
   {
     csStringFast<128> flag; flag << major << '.' << minor;

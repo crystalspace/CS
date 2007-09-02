@@ -288,14 +288,16 @@ public:
    * Tell the string to re-size its buffer exponentially as needed.
    * \deprecated Use SetGrowsBy(0) instead.
    */
-  CS_DEPRECATED_METHOD void SetGrowsExponentially(bool b)
+  CS_DEPRECATED_METHOD_MSG("Use SetGrowsBy(0) instead.") 
+  void SetGrowsExponentially(bool b)
   { SetGrowsBy(b ? 0 : DEFAULT_GROW_BY); }
 
   /**
    * Returns true if exponential growth is enabled.
    * \deprecated Use GetGrowsBy() instead.
    */
-  CS_DEPRECATED_METHOD bool GetGrowsExponentially() const
+  CS_DEPRECATED_METHOD_MSG("Use GetGrowsBy() instead.") 
+  bool GetGrowsExponentially() const
   { return GetGrowsBy() == 0; }
 
   /**
@@ -545,7 +547,7 @@ public:
    * \return First position of \p search, or (size_t)-1 if not found.
    * \deprecated Use Find() instead.
    */
-  /* CS_DEPRECATED_METHOD */
+  /* CS_DEPRECATED_METHOD_MSG("Use Find() instead.") */
   size_t FindStr (const char* search, size_t pos = 0) const
   { return Find(search, pos); }
 
@@ -560,7 +562,7 @@ public:
    * \p replacement.
    * \deprecated Use ReplaceAll() instead.
    */
-  /* CS_DEPRECATED_METHOD */
+  /* CS_DEPRECATED_METHOD_MSG("Use ReplaceAll() instead.") */
   void FindReplace (const char* search, const char* replacement)
   { ReplaceAll(search, replacement); }
 

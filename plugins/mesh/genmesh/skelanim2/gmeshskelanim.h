@@ -149,6 +149,7 @@ public:
 	virtual bool AnimatesColors () const { return animates_colors; }
 	virtual bool AnimatesTangents () const { return animates_tangents; }
 	virtual bool AnimatesBiTangents () const { return animates_bitangents; }
+	virtual void Update (csTicks current);
 	virtual const csVector3* UpdateVertices (csTicks current,
 		const csVector3* verts, int num_verts, uint32 version_id);
 	virtual const csVector2* UpdateTexels (csTicks current,

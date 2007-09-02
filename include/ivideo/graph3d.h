@@ -505,14 +505,10 @@ enum G3D_RENDERSTATEOPTION
 /// Information about 3d renderer capabilities.
 struct csGraphics3DCaps
 {
-  bool CanClip;
+  /// Minimum texture dimensions
   int minTexHeight, minTexWidth;
+  /// Maximum texture dimensions
   int maxTexHeight, maxTexWidth;
-  bool NeedsPO2Maps;
-  int MaxAspectRatio;
-
-  // The following caps are only used by NR
-
   /**
    * Whether point sprites are supported. If \a true, geometry of the type
    * CS_MESHTYPE_POINT_SPRITES can be drawn.

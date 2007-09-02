@@ -386,8 +386,10 @@ struct iSector : public virtual iBase
    * containing the 'start' point. 'isect' will be the intersection point
    * if a polygon is returned. This function returns -1 if no polygon
    * was hit or the polygon index otherwise.
+   * \deprecated Use the csSectorHitBeamResult version instead
    */
-  CS_DEPRECATED_METHOD virtual iMeshWrapper* HitBeamPortals (
+  CS_DEPRECATED_METHOD_MSG("Use the csSectorHitBeamResult version instead")
+  virtual iMeshWrapper* HitBeamPortals (
   	const csVector3& start, const csVector3& end, csVector3& isect,
 	int* polygon_idx, iSector** final_sector = 0) = 0;
 
@@ -397,8 +399,10 @@ struct iSector : public virtual iBase
    * filled with the indices of the polygon that was hit.
    * If polygon_idx is null then the polygon will not be filled in.
    * This function doesn't support portals.
+   * \deprecated Use the csSectorHitBeamResult version instead
    */
-  CS_DEPRECATED_METHOD virtual iMeshWrapper* HitBeam (const csVector3& start,
+  CS_DEPRECATED_METHOD_MSG("Use the csSectorHitBeamResult version instead")
+  virtual iMeshWrapper* HitBeam (const csVector3& start,
   	const csVector3& end, csVector3& intersect, int* polygon_idx,
 	bool accurate = false) = 0;
 

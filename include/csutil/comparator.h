@@ -75,6 +75,14 @@ class csComparatorString
 public:
   static int Compare (T const& r1, T const& r2)
   {
+    if (((const char*)r1) == 0)
+    {
+      return (((const char*)r2) == 0) ? 0 : 1;
+    }
+    else if (((const char*)r2) == 0)
+    {
+      return -1;
+    }
     return strcmp ((const char*)r1, (const char*)r2);
   }
 };

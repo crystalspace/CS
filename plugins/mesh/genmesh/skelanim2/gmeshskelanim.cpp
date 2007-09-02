@@ -168,12 +168,20 @@ void csGenmeshSkelAnimationControl::UpdateVertNormArrays (int /*num_norms*/)
 {
 }
 
-const csVector3* csGenmeshSkelAnimationControl::UpdateVertices (csTicks current,
-                                                                const csVector3* verts, int num_verts, uint32 version_id)
+void csGenmeshSkelAnimationControl::Update (csTicks current)
 {
+  if (last_update_time != current)
+  {
+     last_update_time = current;
+  }
+  else
+  {
+    return;
+  }
+
   if (!mesh_obj->GetMeshWrapper())
   {
-    return verts;
+    return;
   }
 
   Initialize();
@@ -199,7 +207,8 @@ const csVector3* csGenmeshSkelAnimationControl::UpdateVertices (csTicks current,
   }
   else
   {
-    _bones = csPtr<csShaderVariable> (new csShaderVariable(bones_name));
+    csRef<csShaderVariable> _bones;
+    _bones.AttachNew(new csShaderVariable(bones_name));
     _bones->SetType (csShaderVariable::ARRAY);
 
     _bones->SetArraySize (used_bones.Length()*2);
@@ -211,7 +220,8 @@ const csVector3* csGenmeshSkelAnimationControl::UpdateVertices (csTicks current,
         skeleton->GetBone(bone_idx)->GetFactory()->GetFullTransform().GetInverse()*
         skeleton->GetBone(bone_idx)->GetFullTransform();
 
-      csRef<csShaderVariable> boneQuat = csPtr<csShaderVariable> (new csShaderVariable(csInvalidStringID));
+      csRef<csShaderVariable> boneQuat;
+      boneQuat.AttachNew(new csShaderVariable(csInvalidStringID));
       _bones->SetArrayElement (i*2+0, boneQuat);
       csQuaternion quat;
       if (quat.v.x != 0 || quat.v.y != 0 || quat.v.z != 0 || quat.w != 0)
@@ -219,7 +229,8 @@ const csVector3* csGenmeshSkelAnimationControl::UpdateVertices (csTicks current,
         boneQuat->SetValue(csVector4 (quat.v.x, quat.v.y, quat.v.z, quat.w));
       }
 
-      csRef<csShaderVariable> boneOffs = csPtr<csShaderVariable> (new csShaderVariable(csInvalidStringID));
+      csRef<csShaderVariable> boneOffs;
+       boneOffs.AttachNew(new csShaderVariable(csInvalidStringID));
       _bones->SetArrayElement (i*2+1, boneOffs);
       csVector3 offset_pos = offset_tr.GetOrigin();
       boneOffs->SetValue(csVector4(offset_pos.x, offset_pos.y, offset_pos.z, 0));
@@ -227,6 +238,11 @@ const csVector3* csGenmeshSkelAnimationControl::UpdateVertices (csTicks current,
     mesh_obj->GetMeshWrapper()->GetSVContext ()->AddVariable (_bones);
     vertices_mapped = true;
   }
+}
+
+const csVector3* csGenmeshSkelAnimationControl::UpdateVertices (csTicks current,
+  const csVector3* verts, int /*num_verts*/, uint32 /*version_id*/)
+{
   return verts;
 }
 

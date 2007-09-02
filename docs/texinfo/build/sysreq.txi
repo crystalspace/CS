@@ -18,7 +18,10 @@ System.  Currently Crystal Space supports: Windows (32 bit), Unix
 may download a pre-built @sc{sdk} package.  If you are using the @sc{svn}
 version of Crystal Space, then you will need to build it yourself.  To do so
 you will need a supported C++ compiler such as the @sc{gnu} Compiler Collection
-(@sc{gcc}) or Microsoft Visual C++.  If you plan to use the scripting
+(@sc{gcc} - versions known to work well are 3.4 and above, with the exception
+of versions 4.0.0 and 4.0.1 which produce buggy code for Crystal Space) or 
+Microsoft Visual C++, version 7.0 (aka .net 2002) and above (version 6 is not
+supported).  If you plan to use the scripting
 capabilities of Crystal Space you will also need an interpreter for each
 scripting language you use.
 

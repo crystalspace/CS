@@ -241,24 +241,30 @@ public:
 struct iEventQueue;
 struct iObjectRegistry;
 
+namespace CS
+{
+
 /**
  * Helper function for registering an event handler using a weak reference.
  * Use RemoveWeakListener() to remove an event handler registered with this
  * function.
  */
-csHandlerID RegisterWeakListener (iEventQueue *q, iEventHandler *listener,
-  csRef<iEventHandler> &handler);
-csHandlerID RegisterWeakListener (iEventQueue *q, iEventHandler *listener,
-  const csEventID &ename, csRef<iEventHandler> &handler);
-csHandlerID RegisterWeakListener (iEventQueue *q, iEventHandler *listener,
-  const csEventID ename[], csRef<iEventHandler> &handler);
+csHandlerID CS_CRYSTALSPACE_EXPORT RegisterWeakListener (iEventQueue *q, 
+  iEventHandler *listener, csRef<iEventHandler> &handler);
+csHandlerID CS_CRYSTALSPACE_EXPORT RegisterWeakListener (iEventQueue *q, 
+  iEventHandler *listener, const csEventID &ename, csRef<iEventHandler> &handler);
+csHandlerID CS_CRYSTALSPACE_EXPORT RegisterWeakListener (iEventQueue *q, 
+  iEventHandler *listener, const csEventID ename[], csRef<iEventHandler> &handler);
 
 /**
  * Helper function for removing an event handler that was registered with
  * RegisterWeakListener().
  */
-void RemoveWeakListener (iEventQueue *q, csRef<iEventHandler> &handler);
- 
+void CS_CRYSTALSPACE_EXPORT RemoveWeakListener (iEventQueue *q, 
+  csRef<iEventHandler> &handler);
+
+} // namespace CS
+  
 /** @} */
 
 #endif // __CS_CSUTIL_EVENT_H__

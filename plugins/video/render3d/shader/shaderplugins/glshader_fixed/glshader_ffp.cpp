@@ -540,11 +540,11 @@ void csGLShaderFFP::CompactLayers()
       }
     }
 
-    csHash<int, csStrKey>::GlobalIterator layerNameIt 
+    csHash<int, csString>::GlobalIterator layerNameIt 
       = layerNames.GetIterator();
     while (layerNameIt.HasNext())
     {
-      csStrKey key;
+      csString key;
       int layerNum = layerNameIt.Next (key);
       layerNames.PutUnique (key, layerMap[layerNum]);
     }

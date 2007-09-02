@@ -583,6 +583,7 @@ public:
    * Return the number of elements in the array.
    * \deprecated Use GetSize() instead.
    */
+  /*CS_DEPRECATED_METHOD_MSG("Use GetSize() instead.")*/
   size_t Length () const
   {
     return GetSize();
@@ -664,7 +665,9 @@ public:
    * Set the actual number of items in this array.
    * \deprecated Use SetSize() instead.
    */
+  /*CS_DEPRECATED_METHOD_MSG("Use SetSize() instead.")*/
   void SetLength (size_t n, T const& what) { SetSize(n, what); }
+  /*CS_DEPRECATED_METHOD_MSG("Use SetSize() instead.")*/
   void SetLength (size_t n) { SetSize(n); }
   /** @} */
 
@@ -1130,6 +1133,7 @@ public:
    *   faster to keep the array sorted, search for \c item using
    *   FindSortedKey(), and then remove it using the plain DeleteIndex().
    */
+  CS_DEPRECATED_METHOD_MSG("'Fast' is illusory. See documentation")
   bool DeleteFast (T const& item)
   {
     size_t const n = Find (item);
@@ -1151,7 +1155,7 @@ public:
     { currentelem = r.currentelem; array = r.array; return *this; }
 
     /** Returns true if the next Next() call will return an element */
-    bool HasNext()
+    bool HasNext() const
     { return currentelem < array.Length(); }
 
     /** Returns the next element in the array. */
@@ -1185,7 +1189,7 @@ public:
     { currentelem = r.currentelem; array = r.array; return *this; }
 
     /** Returns true if the next Next() call will return an element */
-    bool HasNext()
+    bool HasNext() const
     { return currentelem < array.Length(); }
 
     /** Returns the next element in the array. */

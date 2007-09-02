@@ -1,5 +1,10 @@
 SubDir TOP apps tutorial simpvs ;
 
-Description simpvs : "tutorial, video selector" ;
-Application simpvs : [ Wildcard *.cpp *.h ] : noinstall ;
-LinkWith simpvs : crystalspace ;
+if $(CEGUI.AVAILABLE) = "yes"
+{
+  Description simpvs : "tutorial, video selector" ;
+  Application simpvs : [ Wildcard *.cpp *.h ] : noinstall ;
+  LinkWith simpvs : crystalspace ;
+  CFlags simpvs : $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
+  ExternalLibs simpvs : CEGUI ;
+}

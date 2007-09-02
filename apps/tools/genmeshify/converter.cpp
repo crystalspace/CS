@@ -572,8 +572,7 @@ namespace genmeshify
         }
         else
           submeshName.Format ("%zu", submeshNum);
-        iGeneralMeshSubMesh* submesh = 
-          to->AddSubMesh (indexBuffer, key.material, submeshName);
+        to->AddSubMesh (indexBuffer, key.material, submeshName);
         submeshNum++;
       }
       csRef<csRenderBuffer> tclmBuffer = csRenderBuffer::CreateRenderBuffer (

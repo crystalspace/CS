@@ -79,7 +79,7 @@ csFancyConsole::~csFancyConsole ()
   {
     csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-      RemoveWeakListener (q, weakEventHandler);
+      CS::RemoveWeakListener (q, weakEventHandler);
   }
 }
 
@@ -113,7 +113,7 @@ bool csFancyConsole::Initialize (iObjectRegistry *object_reg)
   if (q != 0)
   {
     csEventID events[3] = { SystemOpen, SystemClose, CS_EVENTLIST_END };
-    RegisterWeakListener (q, this, events, weakEventHandler);
+    CS::RegisterWeakListener (q, this, events, weakEventHandler);
   }
 
   int x, y, w, h;

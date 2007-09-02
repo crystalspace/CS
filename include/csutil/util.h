@@ -207,7 +207,7 @@ CS_CRYSTALSPACE_EXPORT void csReplaceAll (char *dest, const char *src,
  * string.  \p max is size in bytes of \p dest.
  * \deprecated Use csReplaceAll() instead.
  */
-CS_DEPRECATED_METHOD 
+CS_DEPRECATED_METHOD_MSG("Use csReplaceAll() instead.")
 inline void csFindReplace (char *dest, const char *src,
   const char *search, const char *replace, int max)
 { csReplaceAll(dest, src, search, replace, max); }

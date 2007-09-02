@@ -31,6 +31,7 @@
 #include "iengine/material.h"
 #include "iengine/camera.h"
 #include "iengine/rview.h"
+#include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rendermesh.h"
@@ -71,9 +72,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     materialWrapper (0), mixMode (0),
     deepCreation (false), particleOrientation (CS_PARTICLE_CAMERAFACE_APPROX), 
     rotationMode (CS_PARTICLE_ROTATE_NONE), sortMode (CS_PARTICLE_SORT_NONE),
-    integrationMode (CS_PARTICLE_INTEGRATE_LINEAR),
-    commonDirection (1.0f,0,0),
-    localMode (true), individualSize (false), particleSize (1.0f)
+    integrationMode (CS_PARTICLE_INTEGRATE_LINEAR), 
+    transformMode (CS_PARTICLE_LOCAL_MODE),
+    commonDirection (1.0f,0,0), individualSize (false), particleSize (1.0f)
   {
   }
 
@@ -93,8 +94,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     mesh->rotationMode = rotationMode;
     mesh->sortMode = sortMode;
     mesh->integrationMode = integrationMode;
+    mesh->transformMode = transformMode;
     mesh->commonDirection = commonDirection;
-    mesh->localMode = localMode;
     mesh->individualSize = individualSize;
     mesh->particleSize = particleSize;
     mesh->minBB = minBB;
@@ -137,7 +138,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     newFact->sortMode = sortMode;
     newFact->integrationMode = integrationMode;
     newFact->commonDirection = commonDirection;
-    newFact->localMode = localMode;
+    newFact->transformMode = transformMode;
     newFact->individualSize = individualSize;
     newFact->particleSize = particleSize;
     newFact->minBB = minBB;
@@ -177,8 +178,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     externalControl (false),
     particleOrientation (CS_PARTICLE_CAMERAFACE_APPROX), rotationMode (CS_PARTICLE_ROTATE_NONE), 
     integrationMode (CS_PARTICLE_INTEGRATE_LINEAR), 
-    sortMode (CS_PARTICLE_SORT_NONE), commonDirection (1.0f,0,0), localMode (true), 
-    individualSize (false), particleSize (1.0f)
+    sortMode (CS_PARTICLE_SORT_NONE), transformMode (CS_PARTICLE_LOCAL_MODE), 
+    commonDirection (1.0f,0,0), individualSize (false), particleSize (1.0f)
   {
     particleBuffer.particleCount = 0;
   }
@@ -488,7 +489,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     iCamera* camera = rview->GetCamera ();
     csReversibleTransform obj2world;
 
-    if(localMode)
+    if (transformMode == CS_PARTICLE_LOCAL_MODE)
       obj2world = movable->GetFullTransform ();
 
     csReversibleTransform obj2cam = camera->GetTransform () / obj2world;
@@ -537,7 +538,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       return;
 
     if (lastFrameNumber == 0 ||
-        lastFrameNumber + 1 < currentFrame)
+        lastUpdateTime == current_time)
     {
       lastFrameNumber = currentFrame;
       lastUpdateTime = current_time;
@@ -547,6 +548,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     lastFrameNumber = currentFrame;
     currentDt = current_time - lastUpdateTime;
     lastUpdateTime = current_time;
+
+    // Some artificial limiting of dt
+    if (currentDt > 500) currentDt = 500;
 
     float dt = currentDt/1000.0f;
     totalParticleTime += dt;
@@ -578,6 +582,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     }
 
     // Apply emitters
+    csReversibleTransform t = meshWrapper->GetMovable ()->GetFullTransform ();
+    csReversibleTransform* tptr = transformMode == CS_PARTICLE_LOCAL_EMITTER ? 
+      &t : 0;
     for (size_t idx = 0; idx < emitters.GetSize (); ++idx)
     {
       iParticleEmitter* emitter = emitters[idx];
@@ -592,7 +599,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       tmpBuf.particleData = particleBuffer.particleData + particleBuffer.particleCount;
       tmpBuf.particleAuxData = particleBuffer.particleAuxData + particleBuffer.particleCount;
       
-      emitter->EmitParticles (this, tmpBuf, dt, totalParticleTime);
+      emitter->EmitParticles (this, tmpBuf, dt, totalParticleTime, tptr);
 
       particleBuffer.particleCount += numParticles;
     }

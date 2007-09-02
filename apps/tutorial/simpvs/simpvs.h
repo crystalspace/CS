@@ -20,7 +20,7 @@
 #define __SIMPVS_H__
 
 #include <crystalspace.h>
-#include "vidprefs.h"
+#include "ivaria/icegui.h"
 
 class Simple : public csApplicationFramework, public csBaseEventHandler
 {
@@ -30,14 +30,18 @@ private:
   csRef<iGraphics3D> g3d;
   csRef<iKeyboardDriver> kbd;
   csRef<iVirtualClock> vc;
-  iSector* room;
+  csRef<iVFS> vfs;
   csRef<iView> view;
-  
+  csRef<iCEGUI> cegui;
+
+  iSector* room;
+
+  csString mode;
+
   bool HandleEvent (iEvent& ev);
   void SetupFrame ();
   void FinishFrame ();
   
-  csVideoPreferences* vidprefs;
   void SaveVideoPreference();
   
   bool Setup ();
@@ -47,6 +51,11 @@ private:
   csEventID KeyboardDown;
   csEventID Quit;
   
+  void CreateGui();
+
+  bool SetSoftware (const CEGUI::EventArgs& e);
+  bool SetOpenGL (const CEGUI::EventArgs& e);
+
 public:
   Simple ();
   virtual ~Simple ();

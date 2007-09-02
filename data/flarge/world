@@ -15836,7 +15836,7 @@
         <factory>particlesFactory</factory>
         <material>spark</material>
         <particlesize x="0.025" y="0.025" />
-        <localmode/>
+        <transformmode>local</transformmode>
         <mixmode>
           <add />
         </mixmode>
@@ -16100,7 +16100,7 @@
                 <factory>particlesFactory</factory>
                 <material>spark</material>
                 <particlesize x="0.05" y="0.05" />
-                <localmode />
+                <transformmode>local</transformmode>
                 <mixmode>
                   <add />
                 </mixmode>
@@ -16188,7 +16188,7 @@
               <params>
                 <factory>particlesFactory</factory>
                 <material>raindrop</material>
-                <localmode />
+                <transformmode>local</transformmode>
                 <particlesize x="0.02" y="0.04" />
                 <commondirection x="0" y="1" z="0" />
                 <!-- <renderorientation>common approx</renderorientation> -->

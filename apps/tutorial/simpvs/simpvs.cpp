@@ -25,12 +25,10 @@ CS_IMPLEMENT_APPLICATION
 Simple::Simple ()
 {
   SetApplicationName ("CrystalSpace.SimpVS");
-  vidprefs = 0;
 }
 
 Simple::~Simple ()
 {
-  delete vidprefs;
 }
 
 bool Simple::Setup ()
@@ -56,6 +54,14 @@ bool Simple::Setup ()
   g3d = CS_QUERY_REGISTRY (GetObjectRegistry (), iGraphics3D);
   if (!g3d)
     return ReportError("No iGraphics3D plugin!");
+
+  vfs = CS_QUERY_REGISTRY(GetObjectRegistry(), iVFS);
+  if (!vfs) 
+    return ReportError("Failed to locate Virtual FileSystem!");
+
+  cegui = CS_QUERY_REGISTRY(GetObjectRegistry(), iCEGUI);
+  if (!cegui) 
+    return ReportError("Failed to locate CEGUI plugin");
 
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
@@ -96,12 +102,7 @@ bool Simple::Setup ()
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
-  vidprefs = new csVideoPreferences ();
-  if (!vidprefs->Setup (GetObjectRegistry ()))
-  {
-    delete vidprefs;
-    vidprefs = 0;
-  }
+  CreateGui();
 
   return true;
 }
@@ -134,6 +135,11 @@ void Simple::SetupFrame ()
 
   // Tell the camera to render into the frame buffer.
   view->Draw ();
+
+  if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) 
+    return;
+
+  cegui->Render();
 }
 
 void Simple::FinishFrame ()
@@ -164,25 +170,15 @@ bool Simple::HandleEvent (iEvent& ev)
     res = true;
   }
 
-  if (((ev.Name != csevQuit(object_reg))) && vidprefs)
-  {
-    if (vidprefs->HandleEvent (ev))
-    {
-      SaveVideoPreference();
-      Restart();
-      return true;
-    }
-  }
   return res;
 }
 
 void Simple::SaveVideoPreference()
 {
-  if (!vidprefs) return;
   csRef<iConfigFile> userConfig (csGetPlatformConfig (GetApplicationName()));
   csConfigAccess config (GetObjectRegistry (), userConfig, 
     iConfigManager::ConfigPriorityUserApp);
-  config->SetStr ("System.Plugins.iGraphics3D", vidprefs->GetModePlugin());
+  config->SetStr ("System.Plugins.iGraphics3D", mode);
 }
 
 bool Simple::OnInitialize(int /*argc*/, char* /*argv*/ [])
@@ -202,6 +198,7 @@ bool Simple::OnInitialize(int /*argc*/, char* /*argv*/ [])
 	CS_REQUEST_FONTSERVER,
 	CS_REQUEST_IMAGELOADER,
 	CS_REQUEST_LEVELLOADER,
+	CS_REQUEST_PLUGIN ("crystalspace.cegui.wrapper", iCEGUI),
 	CS_REQUEST_REPORTER,
 	CS_REQUEST_REPORTERLISTENER,
 	CS_REQUEST_END))
@@ -215,6 +212,54 @@ bool Simple::OnInitialize(int /*argc*/, char* /*argv*/ [])
   return true;
 }
 
+void Simple::CreateGui()
+{
+  // Initialize CEGUI wrapper
+  cegui->Initialize ();
+
+  // Set the logging level
+  cegui->GetLoggerPtr ()->setLoggingLevel(CEGUI::Informative);
+
+#if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR >= 5)
+  // Use the 0.5 version of the skin
+  vfs->ChDir ("/ceguitest/0.5/");
+#else
+  // Use the old version of the skin
+  vfs->ChDir ("/ceguitest/");
+#endif
+
+  // Load the ice skin (which uses Falagard skinning system)
+  cegui->GetSchemeManagerPtr ()->loadScheme("ice.scheme");
+
+  cegui->GetSystemPtr ()->setDefaultMouseCursor("ice", "MouseArrow");
+
+#if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR >= 5)
+  CEGUI::Font* font = cegui->GetFontManagerPtr ()->createFont("FreeType",
+    "Vera", "/fonts/ttf/Vera.ttf");
+  font->setProperty("PointSize", "10");
+  font->load();
+#else
+  cegui->GetFontManagerPtr ()->createFont("Vera", "/fonts/ttf/Vera.ttf", 10,
+    CEGUI::Default);
+#endif
+
+  CEGUI::WindowManager* winMgr = cegui->GetWindowManagerPtr ();
+
+  // Load layout and set as root
+  cegui->GetSystemPtr ()->setGUISheet(winMgr->loadWindowLayout("simpvs.layout"));
+
+  CEGUI::Window* btn = 0;
+  // ----[ GENERAL ]---------------------------------------------------------
+
+  btn = winMgr->getWindow("Root/ButtonPane/SoftwareButton");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&Simple::SetSoftware, this));
+
+  btn = winMgr->getWindow("Root/ButtonPane/OpenGLButton");
+  btn->subscribeEvent(CEGUI::PushButton::EventClicked,
+    CEGUI::Event::Subscriber(&Simple::SetOpenGL, this));
+}
+
 bool Simple::Application()
 {
   // Open the main system. This will open all the previously loaded plug-ins.
@@ -225,6 +270,30 @@ bool Simple::Application()
     return false;
 
   Run();
+
+  return true;
+}
+
+bool Simple::SetSoftware (const CEGUI::EventArgs& e)
+{
+  csPrintf ("Software mode!\n"); fflush (stdout);
+
+  mode = "crystalspace.graphics3d.software";
+
+  SaveVideoPreference();
+  Restart();
+
+  return true;
+}
+
+bool Simple::SetOpenGL (const CEGUI::EventArgs& e)
+{
+  csPrintf ("OpenGL mode!\n"); fflush (stdout);
+
+  mode = "crystalspace.graphics3d.opengl";
+
+  SaveVideoPreference();
+  Restart();
 
   return true;
 }
