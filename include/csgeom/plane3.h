@@ -81,6 +81,14 @@ public:
     norm = v2 % v3; DD = 0;
   }
 
+  /**
+   * Compare two planes
+   */
+  bool operator==(const csPlane3& other) const
+  {
+    return (norm * other.norm) > 0.999f && fabsf(DD - other.DD) < 0.001f;
+  }
+
   /// Return the normal vector of this plane.
   inline csVector3& Normal () { return norm; }
   /// Return the normal vector of this plane.

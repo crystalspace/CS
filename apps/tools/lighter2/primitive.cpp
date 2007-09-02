@@ -130,10 +130,10 @@ namespace lighter
   {
     csPrintf("\n");
 
-    for (int r = 0; r < vc; ++r)
+    for (uint r = 0; r < vc; ++r)
     {
       int rowOffset= r*uc;
-      for (int c = 0; c < uc; ++c)
+      for (uint c = 0; c < uc; ++c)
       {
         bool isSet = bits.IsBitSet (2*(rowOffset+c));
         bool isFull = bits.IsBitSet (2*(rowOffset+c)+1);
@@ -143,214 +143,71 @@ namespace lighter
     }
   }
 
-  static float FractionToNext (float x)
+  struct Scanline
   {
-    float frac = ceilf(x) - x;
-    if (frac < FLT_EPSILON)
-      frac = 1.0f;
-
-    return frac;
-  }
-
-  
-  struct RowIterator
-  {
-    const csVector2* vertices;
-
-    struct Edge
-    {
-      // Start and ending vertex number
-      uint startV, endV;
-
-      // Final row
-      uint endY;
-
-      // dx/dy (edge direction)
-      float dxdy;
-
-      // X coordinate at start and then current X coordinate
-      float currX, lastX;
-
-      void Setup (const csVector2& start, const csVector2& end)
-      {
-        // Setup the edge between start and end vertices
-        lastX = start.x;
-
-        if ( fabsf(floorf(start.y) - floorf(end.y)) < FLT_EPSILON)
-        {
-          // Same row
-          currX = end.x;
-          dxdy = 0;
-        }
-        else
-        {
-          dxdy = (end.x - start.x) / (end.y - start.y);
-          // First offset
-          currX = lastX - dxdy * FractionToNext(start.y);
-        }
-      }
-
-      void Advance ()
-      {
-        // Step one step towards the end
-        lastX = currX;
-        currX -= dxdy;
-      }
-    } L, R;
-
-    uint currY;
-    uint finalY;
-
-    csVector2 minBB, maxBB;
-    uint topV, botV;
-
-    bool haveTrap;
-
-    RowIterator (const csVector2* vertices)
-      : vertices (vertices), currY (0), haveTrap (false)
-    {
-      // Find min/max
-      minBB = vertices[2];
-      maxBB = vertices[2];
-      topV = botV = 2;
-
-      const csVector2& v1 = vertices[0];
-      const csVector2& v2 = vertices[1];
-
-      // Setup y mins
-      if (v1.y > v2.y)
-      {
-        if (v1.y > maxBB.y)
-        {
-          maxBB.y = v1.y;
-          topV = 0;
-        }
-        if (v2.y < minBB.y)
-        {
-          minBB.y = v2.y;
-          botV = 1;
-        }
-      }
-      else
-      {
-        if (v2.y > maxBB.y)
-        {
-          maxBB.y = v2.y;
-          topV = 1;
-        }
-        if (v1.y < minBB.y)
-        {
-          minBB.y = v1.y;
-          botV = 0;
-        }
-      }
-
-      if (v1.x > v2.x)
-      {
-        if (v1.x > maxBB.x) maxBB.x = v1.x;
-        if (v2.x < minBB.x) minBB.x = v2.x;
-      }
-      else
-      {
-        if (v2.x > maxBB.x) maxBB.x = v2.x;
-        if (v1.x < minBB.x) minBB.x = v1.x;
-      }
-
-      L.startV = R.startV = topV;
-      L.endV = R.endV = topV;
-      currY = L.endY = R.endY = (int)floorf(vertices[topV].y);
-
-      SetupTrap ();
-    }
-
-    bool NextLine ()
-    {
-      if (!haveTrap)
-      {
-        if (!SetupTrap ())
-          return false;
-      }
-      else
-      {
-        if (currY > finalY)
-        {
-          return true;
-        }
-        else
-        {
-          haveTrap = false;
-          return NextLine ();
-        }
-      }
-
-      return true;
-    }
-
-    bool SetupTrap ()
-    {
-      // Initialize next part
-      bool leave;
-      do 
-      {
-        leave = true;
-        if (currY <= R.endY)
-        {
-          if (R.endV == botV)
-            return false; //Triangle finished
-
-          R.startV = R.endV;
-          if (++R.endV >= 3)
-            R.endV = 0;           
-
-          leave = false;
-          R.endY = (int)floorf(vertices[R.endV].y);            
-
-          if (currY <= R.endY)
-            continue;
-
-          R.Setup (vertices[R.startV], vertices[R.endV]);
-        }
-        if (currY <= L.endY)
-        {
-          if (L.endV == botV)
-            return false; //Triangle finished
-
-          L.startV = L.endV;
-          if (--L.endV > 3) //L.endV is unsigned.. wraps around
-            L.endV = 2;
-
-          leave = false;
-          L.endY = (int)floorf(vertices[L.endV].y);            
-
-          if (currY <= L.endY)
-            continue;
-
-          L.Setup (vertices[L.startV], vertices[L.endV]);
-        }
-      } while(!leave);
-
-      if (L.endY > R.endY)
-        finalY = L.endY;
-      else
-        finalY = R.endY;
-
-      haveTrap = true;
-
-      return true;
-    }
-
-    void PostLine ()
-    { 
-      L.Advance ();
-      R.Advance ();
-
-      L.currX = csClamp(L.currX, maxBB.x, minBB.x);
-      R.currX = csClamp(R.currX, maxBB.x, minBB.x);
-
-      currY--;
-    }
-
+    int min, max;
   };
+
+  void ScanConvert(Scanline* scanBuf, const csVector2& v1, const csVector2& v2, size_t vc)
+  {
+    uint fy, ly;
+
+    const csVector2* f;
+    const csVector2* l;
+
+    // Skip horizontal edge (for now ;))
+    if(v1.y >= v2.y - FLT_EPSILON &&
+       v1.y <= v2.y + FLT_EPSILON) 
+      return;
+
+    // Increasing Y order
+    if (v1.y < v2.y)
+    {
+      f = &v1;
+      l = &v2;
+    }
+    else
+    {
+      f = &v2;
+      l = &v1;
+    }
+
+    fy = (uint)floorf(f->y);
+    ly = (uint)ceilf(l->y);
+
+    // Clip or reject
+    if (fy >= vc) 
+      return;
+    if (ly < 0) 
+      return;
+    if (ly >= vc) 
+      ly = (uint)vc;
+
+    // Calculate slope
+    float slopeX, x;
+    x = f->x;
+    slopeX = (l->x - f->x) / (l->y - f->y);
+
+    if (fy< 0)
+    {
+      x += slopeX * (0 - fy);
+      fy = 0;
+    }
+
+
+    for (uint i = fy; i < ly; ++i)
+    {
+      int sx = (int)x;
+      if (sx < scanBuf[i].min)
+        scanBuf[i].min = sx;
+      if ((sx+1) > scanBuf[i].max)
+        scanBuf[i].max = (sx+1);
+
+      x += slopeX;
+    }
+
+
+  }
 
   void Primitive::Prepare ()
   {
@@ -379,75 +236,60 @@ namespace lighter
 
     countU = uc;
     countV = vc;
-       
+
+    elementClassification.SetSize (2*uc*vc);
+
     // Compute the lm-uv offsets, 
     csVector2 verts[] = {
       vdata.lightmapUVs[triangle.a] - minUV,
       vdata.lightmapUVs[triangle.b] - minUV,
       vdata.lightmapUVs[triangle.c] - minUV
-    };
+    };  
 
-    if (csMath2::Area2 (verts[0], verts[1], verts[2]) > 0)
-      CS::Swap (verts[1], verts[2]);
+    CS_ALLOC_STACK_ARRAY(Scanline, scanBuffer, vc);
 
-    elementClassification.SetSize (2*uc*vc);
-
-    RowIterator ri (verts);
-
-    // Handle the row which contains the start
-    if (fabsf(verts[ri.topV].y - ri.currY) > FLT_EPSILON)
+    // Zero out the scan-buffer
+    for (uint i = 0; i < vc; ++i)
     {
-      uint startLBorder = (uint)floorf(csMin(ri.L.lastX, ri.L.currX));   
-      uint endRBorder = (uint)ceilf(csMax(ri.R.lastX, ri.R.currX));
-
-      size_t rowOffset = ri.currY*uc;
-      for (size_t i = startLBorder; i <= endRBorder; ++i)
-      {
-        elementClassification.SetBit (2*(rowOffset+i));
-      }
-
-      ri.PostLine ();
+      scanBuffer[i].min = INT_MAX;
+      scanBuffer[i].max = INT_MIN;
     }
 
-    while (ri.NextLine ())
+    ScanConvert (scanBuffer, verts[0], verts[1], vc);
+    ScanConvert (scanBuffer, verts[1], verts[2], vc);
+    ScanConvert (scanBuffer, verts[2], verts[0], vc);
+
+    uint maxRow = (uint)ceilf(csMax(verts[0].y, csMax(verts[1].y, verts[2].y)));
+
+    for (uint row = 0; row < maxRow; ++row)
     {
-      uint startLBorder = (uint)floorf(csMin(ri.L.lastX, ri.L.currX));
-      uint endLBorder = (uint)ceilf(csMax(ri.L.lastX, ri.L.currX));
-      uint startRBorder = (uint)floorf(csMin(ri.R.lastX, ri.R.currX));
-      uint endRBorder = (uint)ceilf(csMax(ri.R.lastX, ri.R.currX));     
-      size_t rowOffset = ri.currY*uc;
+      // Get start and ends
+      int min = scanBuffer[row].min;
+      int max = scanBuffer[row].max;
 
-      for (size_t i = startLBorder; i < endLBorder; ++i)
+      // Clip
+      if (min >= uc) continue;
+      if (max < 0) continue;
+
+      if (min < 0)
+         min = 0;
+      if (max >= uc)
+        max = uc;
+
+      size_t rowOffset = row*uc;
+
+      // Left border
+      elementClassification.SetBit (2*(rowOffset+min));
+
+      for (int col = (int)(min+1); col < max; ++col)
       {
-        elementClassification.SetBit (2*(rowOffset+i));
+        elementClassification.SetBit (2*(rowOffset+col));
+        if (row > 0 && row < (maxRow-1))
+          elementClassification.SetBit (2*(rowOffset+col)+1);
       }
 
-      for (size_t i = endLBorder; i < startRBorder; ++i)
-      {
-        elementClassification.SetBit (2*(rowOffset+i));
-        elementClassification.SetBit (2*(rowOffset+i)+1);
-      }
-
-      for (size_t i = startRBorder; i < endRBorder; ++i)
-      {
-        elementClassification.SetBit (2*(rowOffset+i));
-      }
-
-      ri.PostLine ();
-    }    
-
-    // Handle the row which contains the end
-    if (fabsf(verts[ri.botV].y - ri.currY - 1) > FLT_EPSILON)
-    {
-      uint startLBorder = (uint)floorf(csMin(ri.L.lastX, ri.L.currX));   
-      uint endRBorder = (uint)ceilf(csMax(ri.R.lastX, ri.R.currX));
-
-      for (size_t i = startLBorder; i <= endRBorder; ++i)
-      {
-        elementClassification.SetBit (2*(ri.currY+i));
-        elementClassification.ClearBit (2*(ri.currY+i)+1);
-      }
-
+      // Right border
+      elementClassification.SetBit (2*(rowOffset+max));
     }
 
     //PrintElements (elementClassification, uc, vc);
@@ -842,7 +684,7 @@ namespace lighter
           anyClip = true;
           float denom = edgeN * edgeN;
           
-          csVector2 lineOffset = edgeN * (dist / denom)*1.01f;
+          csVector2 lineOffset = edgeN * (dist / denom)*0.99f;
 
           offsets[i] -= lineOffset;
         }
@@ -854,20 +696,36 @@ namespace lighter
 
   float Primitive::ComputeElementFraction (size_t index) const
   {
-    csVector2 cornerOffsets[4] = {
-      csVector2(-0.5f, -0.5f),
-      csVector2(-0.5f,  0.5f),
-      csVector2( 0.5f,  0.5f),
-      csVector2( 0.5f, -0.5f)
+    
+    const ObjectVertexData& vdata = GetVertexData ();
+
+    size_t u, v;
+    GetElementUV(index, u, v);
+
+    csBox2 uvBox (u + minUV.x, v + minUV.y,
+                  u + minUV.x + 1, v + minUV.y + 1);
+
+    csVector2 verts[3] = {
+      vdata.lightmapUVs[triangle[0]],
+      vdata.lightmapUVs[triangle[1]],
+      vdata.lightmapUVs[triangle[2]]
     };
 
-    if (!RecomputeQuadrantOffset (index, cornerOffsets))
-      return 1.0f;
+    csVector2 outVerts[6];
+
+    size_t numVert = 0;
+
+    csBoxClipper clipper (uvBox);
+    clipper.Clip(verts, 3, outVerts, numVert);
 
     float area = 0.0;
-    // triangulize the polygon, triangles are (0,1,2), (0,2,3), (0,3,4), etc..
-    for (size_t i = 0; i < 2; ++i)
-      area += fabsf(csMath2::Area2 (cornerOffsets[0], cornerOffsets[i + 1], cornerOffsets[i + 2]));
+    if (numVert >= 3)
+    {
+      // triangulize the polygon, triangles are (0,1,2), (0,2,3), (0,3,4), etc..
+      for (size_t i = 0; i < numVert - 2; ++i)
+        area += fabsf(csMath2::Area2 (outVerts[0], outVerts[i + 1], outVerts[i + 2]));
+    }
+    
     return area / 2.0f;
   }
 }

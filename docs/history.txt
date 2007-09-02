@@ -12,6 +12,7 @@ chronological order.
 	- res added an optimization to shader weaver: if the same snippet is
 	  used multiple times with the same input all copies are collapsed
 	  into one.
+	- Marten did a few more changes to the border handling in lighter2.
 1-Sep-2007
 	- Jorrit removed more deprecated stuff.
 	- res added a hash computer and comparator for csMD5::Digest.
