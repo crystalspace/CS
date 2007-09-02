@@ -29,13 +29,17 @@
 
 #include "iutil/comp.h"
 
+#include "beautify_cg.h"
+
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 {
+  namespace WeaverCommon = CS::PluginCommon::ShaderWeaver;
+
   struct FindCoerceChainHelper;
 
   class ShaderCombinerLoaderCg : 
     public scfImplementation2<ShaderCombinerLoaderCg, 
-			      CS::PluginCommon::ShaderWeaver::iCombinerLoader,
+			      WeaverCommon::iCombinerLoader,
 			      iComponent>
   {
   public:
@@ -45,6 +49,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   #include "cstool/tokenlist.h"
   #undef CS_TOKEN_ITEM_FILE
     csStringHash xmltokens;
+
+    bool annotateCombined;
     
     CS_LEAKGUARD_DECLARE (ShaderCombinerLoaderCg);
   
@@ -52,8 +58,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     
     /**\name CS::PluginCommon::ShaderWeaver::iCombinerLoader implementation
     * @{ */
-    csPtr<CS::PluginCommon::ShaderWeaver::iCombiner> GetCombiner (
-      iDocumentNode* params);
+    csPtr<WeaverCommon::iCombiner> GetCombiner (iDocumentNode* params);
     /** @} */
   
     /**\name iComponent implementation
@@ -67,21 +72,30 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     void Report (int severity, iDocumentNode* node, const char* msg, ...) 
       CS_GNUC_PRINTF(4, 5);
     
-    csPtr<iDocumentNodeIterator> QueryCoerceChain (const char* fromType,
-      const char* toType);
+    csPtr<WeaverCommon::iCoerceChainIterator> QueryCoerceChain (
+      const char* fromType, const char* toType);
     uint CoerceCost (const char* fromType, const char* toType);
   private:
+    csStringHash typesSet;
+    const char* StoredTypeName (const char* type)
+    { return typesSet.Register (type); }
+
     struct CoerceItem
     {
       uint cost;
-      csString toType;
+      const char* fromType;
+      const char* toType;
       csRef<iDocumentNode> node;
     };
     typedef csArray<CoerceItem> CoerceItems;
-    csHash<CoerceItems, csString> coercions;
+    csHash<CoerceItems, const char*> coercions;
   
     bool LoadCoercionLibrary (const char* path);
     bool ParseCoercion (iDocumentNode* node);
+    typedef csHash<csRef<iDocumentNode>, csString> CoercionTemplates;
+    bool ParseCoercionTemplates (iDocumentNode* node, 
+      CoercionTemplates& templates);
+    bool SynthesizeDefaultCoercions (const CoercionTemplates& templates);
     
     static int CoerceItemCompare (CoerceItem const& i1, CoerceItem const& i2);
     
@@ -90,16 +104,22 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       
     class CoerceChainIterator : 
       public scfImplementation1<CoerceChainIterator,
-                                iDocumentNodeIterator>
+                                WeaverCommon::iCoerceChainIterator>
     {
       size_t pos;
     public:
-      csRefArray<iDocumentNode> nodes;
+      csArray<const CoerceItem*> nodes;
       
       CoerceChainIterator() : scfImplementationType (this), pos (0) {}
       
       bool HasNext() { return pos < nodes.GetSize(); }
-      csRef<iDocumentNode> Next () { return nodes[pos++]; }
+      csRef<iDocumentNode> Next () { return nodes[pos++]->node; }
+      csRef<iDocumentNode> Next (const char*& fromType, const char*& toType)
+      {
+        fromType = nodes[pos]->fromType;
+        toType = nodes[pos]->toType;
+        return nodes[pos++]->node;
+      }
       size_t GetNextPosition () { return pos; }
       size_t GetEndPosition () { return nodes.GetSize(); }
     };
@@ -114,18 +134,21 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     
     struct Snippet
     {
+      csString annotation;
       csRefArray<iDocumentNode> vert2frag;
       csRefArray<iDocumentNode> vertexIn;
       csRefArray<iDocumentNode> fragmentIn; 
       
       csSet<csString> localIDs;
+      csHash<csString, csString> v2fMaps;
       csString locals;
-      csString inputMaps;
+      csHash<csString, csString> inputMaps;
       csRefArray<iDocumentNode> vertexBody;
       csRefArray<iDocumentNode> fragmentBody;
-      csString outputMaps;
+      csHash<csString, csString> outputMaps;
       csString links;
     };
+    size_t uniqueCounter;
     csArray<Snippet> snippets;
     Snippet currentSnippet;
     csRefArray<iDocumentNode> variableMaps;
@@ -136,19 +159,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   public:
     ShaderCombinerCg (ShaderCombinerLoaderCg* loader, bool vp, bool fp);
     
-    void BeginSnippet ();
+    void BeginSnippet (const char* annotation = 0);
     void AddInput (const char* name, const char* type);
     void AddOutput (const char* name, const char* type);
     void InputRename (const char* fromName, const char* toName);
     void OutputRename (const char* fromName, const char* toName);
-    csPtr<iDocumentNodeIterator> QueryCoerceChain (const char* fromType,
-      const char* toType);
+    csPtr<WeaverCommon::iCoerceChainIterator> QueryCoerceChain (
+      const char* fromType, const char* toType);
     void Link (const char* fromName, const char* toName);
     void WriteBlock (const char* location, iDocumentNode* blockNodes);
     bool EndSnippet ();
         
-    void AddGlobal (const char* name, const char* type);
-    void SetOutput (const char* name);
+    void AddGlobal (const char* name, const char* type,
+          const char* annotation = 0);
+    void SetOutput (const char* name, const char* annotation = 0);
     
     uint CoerceCost (const char* fromType, const char* toType);
         
@@ -159,25 +183,47 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     csRef<iString> QueryInputTag (const char* location, 
       iDocumentNode* blockNodes);
   private:
-    class DocNodeAppender;
+    class DocNodeCgAppender;
   
     void AppendProgramInput (const csRefArray<iDocumentNode>& nodes, 
-      DocNodeAppender& appender);
+      DocNodeCgAppender& appender);
+    void AppendProgramInput_V2FDecl (const Snippet& snippet, 
+      DocNodeCgAppender& appender);
+    void AppendProgramInput_V2FVP (const Snippet& snippet, 
+      DocNodeCgAppender& appender);
+    void AppendProgramInput_V2FFP (const Snippet& snippet, 
+      DocNodeCgAppender& appender);
+    void AppendProgramInput (iDocumentNode* node, DocNodeCgAppender& appender);
     csString CgType (const char* weaverType);
+
+    csString annotateStr;
+    const char* MakeComment (const char* s);
+    void AppendSnippetMap (const csHash<csString, csString>& map, 
+      DocNodeCgAppender& appender);
     
-    class DocNodeAppender
+    class DocNodeCgAppender
     {
       csRef<iDocumentNode> node;
       csString stringAppend;
+      CgBeautifier beautifier;
       
       void FlushAppendString ();
     public:
-      DocNodeAppender (iDocumentNode* node);
-      ~DocNodeAppender ();
+      DocNodeCgAppender (iDocumentNode* node);
+      ~DocNodeCgAppender ();
     
       void Append (const char* str);
       void Append (iDocumentNode* appendNode);
       void Append (const csRefArray<iDocumentNode>& nodes);
+      void AppendFmt (const char* str, ...)
+      {
+        va_list args;
+        va_start (args, str);
+        csString s;
+        s.FormatV (str, args);
+        va_end (args);
+        Append (s);
+      }
     };
   };
 }

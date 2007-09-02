@@ -66,6 +66,7 @@
 
 #include "csextern.h"
 #include "csutil/csstring.h"
+#include "csutil/hash.h"
 
 /**
  * This is an encapsulation of a C-implementation of MD5 digest algorithm by
@@ -123,6 +124,14 @@ public:
   /// Encode a buffer.
   static Digest Encode(const void*, size_t nbytes);
 };
+
+template<>
+class csHashComputer<csMD5::Digest> : 
+  public csHashComputerStruct<csMD5::Digest> {};
+
+template<>
+class csComparator<csMD5::Digest> : 
+  public csComparatorStruct<csMD5::Digest> {};
 
 #endif // __CS_CSMD5_H__
 

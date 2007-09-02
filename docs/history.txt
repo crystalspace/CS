@@ -9,8 +9,17 @@ chronological order.
 2-Sep-2007
 	- res changed csStrNew()/new char[] to CS::StrDup()/cs_malloc() in a
 	  few places.
+	- res added an optimization to shader weaver: if the same snippet is
+	  used multiple times with the same input all copies are collapsed
+	  into one.
 1-Sep-2007
 	- Jorrit removed more deprecated stuff.
+	- res added a hash computer and comparator for csMD5::Digest.
+	- res fixed the same node collapsing in the shader weaver to add 
+	  proper connections when collapsing two nodes.
+	- res fixed coerce chain creation in the Cg weaver combiner: chains
+	  could get complicated (e.g. A->B->A->C where A->C would suffice)
+	  and were incorrectly returned (the 1st and 2nd step were the same).
 31-Aug-2007
 	- Genjix bumped interface minor version.
 	- Genjix added animation blending to genmeshanim2. Now the there is
@@ -30,6 +39,16 @@ chronological order.
 	- Jorrit did more deprecation removals.
 	- Jorrit fixed several parts in CS for the recent deprecation removals.
 	- Jorrit fixed a few warnings.
+	- res augmented the Cg weaver combiner to contain a number of simple,
+	  "templated" coercions (for trivial stuff such as normalization).
+	- res added "annotations" to the shader weaver: when enabled comments
+	  are added to the generated shader code that make it easier to follow
+	  it.
+	- res made the weaver-generated shader code slightly more readable by
+	  removing some indirections.
+	- res fixed an issue in shader weaver where dependencies, inserted
+	  between snippets to reuse program inputs, were also, incorrectly,
+	  used when resolving candidates for inputs.
 30-Aug-2007
 	- Genjix added api documentation about iSkeleton::SetTransformMode (...)
 	- Genjix added joystick define to initapp.h (CS_REQUEST_JOYSTICK)
@@ -57,6 +76,16 @@ chronological order.
 	  calls returning 0.
 	- Vincent changed joywin plugin so that it doesn't assert when there's
 	  no window. Fixes crash when used with null renderer (trac #369).
+	- res made the Cg plugin emit warnings from the Cg compiler in verbose
+	  mode (previously it only reported issues from the compiler when an
+	  error occured).
+	- res made the Cg weaver combiner use unique identifier for 
+	  vertex-to-fragment data to avoid clashes.
+	- res fixed some snippets for that.
+27-Aug-2007
+	- res added a simple beautification step to the Cg weaver combiner.
+	  This makes the synthesized Cg programs more human-readable (and thus
+	  can make debugging easier).
 26-Aug-2007
 	- Jorrit added ptpdlight to 'jam walkall'.
 24-Aug-2007
@@ -105,6 +134,14 @@ chronological order.
 	  ways to do the texture mapping for the generated primites.
 	  Also extended the GeneralMeshBuilder functions with a texture
 	  mapper parameter.
+	- res added new weaver snippets for additive blending, fresnel term,
+	  environment reflection and refraction, a glass shader, and made
+	  adjustments to properly support the discarding of unused vertex-to-
+	  fragment data.
+	- res fixed an issue in the shader weaver where sometimes the same 
+	  output of a node was used twice, tho it shouldn't have.
+	- res augmented the Cg weaver combiner to discard unused vertex-to-
+	  fragment data.
 17-Aug-2007
 	- Jorrit fixed a bug in genmesh. Decals didn't work on submeshes.
 	  This prevented decals from working on levels treated with

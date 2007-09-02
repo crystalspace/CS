@@ -20,31 +20,17 @@
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
-    <input name="inputColor" type="rgba" />
-    
-    <input name="primaryColor" type="rgba" default="complex" private="yes">
-      <block location="pass">
-	<buffer source="primary color" destination="vertexIn.primaryColor" />
-      </block>
+    <input name="a" type="rgba" />
+    <input name="b" type="rgba" />
       
-      <block location="cg:vertexIn">
-	<varying type="rgba" name="primaryColor" binding="COLOR" />
-      </block>
-      
-      <block location="cg:vertexToFragment">
-	<varying type="rgba" name="primaryColor" binding="COLOR" />
-      </block>
-      
-      <block location="cg:vertexMain">
-	primaryColor = vertexIn.primaryColor;
-      </block>
-    </input>
-    
     <block location="cg:fragmentMain">
-      outputColor.rgb = inputColor.rgb;
-      outputColor.a = inputColor.a * primaryColor.a;
+      result = a+b;
+    </block>
+
+    <block location="cg:vertexMain">
+      result = a+b;
     </block>
     
-    <output name="outputColor" type="rgba" />
+    <output name="result" type="rgba" />
   </technique>
 </snippet>

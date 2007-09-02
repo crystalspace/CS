@@ -20,7 +20,7 @@
   <technique priority="100">
     <snippet id="eyeVecWorld" file="/shader/snippets/eye-direction-world.xml" />
     
-    <snippet id="reflect">
+    <snippet id="refract">
       <technique priority="100">
 	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
 	
@@ -28,18 +28,45 @@
 	<input name="eyeVec" type="direction_world" />
 	<!-- Surface normal -->
 	<input name="normal" type="normal_world" />
+	<!-- Index of refraction -->
+	<input name="eta" type ="float" default="complex">
+	  <block location="cg:variablemap">
+	    <variablemap variable="refraction index" 
+	      destination="fragmentIn.eta" />
+	    <variablemap variable="refraction index" 
+	      destination="vertexIn.eta" />
+	  </block>
+	  
+	  <block location="cg:fragmentIn">
+	    <uniform type="float" name="eta" />
+	  </block>
+	  <block location="cg:vertexIn">
+	    <uniform type="float" name="eta" />
+	  </block>
+	  
+	  <block location="cg:fragmentMain">
+	    eta = fragmentIn.eta;
+	  </block>
+	  <block location="cg:vertexMain">
+	    eta = vertexIn.eta;
+	  </block>
+	</input>
+	
+	<block location="cg:definitions">
+	  <?Include /shader/snippets/cg-common.cginc?>
+	</block>
 	
 	<block location="cg:vertexMain">
-	  reflected = reflect (normalize (eyeVec), normal);
+	  refracted = refraction (normalize (eyeVec), normal, eta, eta*eta);
 	</block>
 	
 	<block location="cg:fragmentMain">
-	  reflected = reflect (normalize (eyeVec), normal);
+	  refracted = refraction (normalize (eyeVec), normal, eta, eta*eta);
 	</block>
 	
-	<output name="reflected" type="direction_world" />
+	<output name="refracted" type="direction_world" />
       </technique>
     </snippet>
-    <connection from="eyeVecWorld" to="reflect" />
+    <connection from="eyeVecWorld" to="refract" />
   </technique>
 </snippet>

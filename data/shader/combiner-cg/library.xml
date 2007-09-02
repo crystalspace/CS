@@ -18,9 +18,14 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 -->
 <combinerlibrary>
-  <coercion from="rgb" to="rgba" cost="1">
-    <input name="input" type="rgb" />
 
+  <!-- Note on costs: try to set the number of asm instructions as the cost 
+       for a coercion. -->
+       
+  <!-- Each coercion implicitly has an input named "input" and and output 
+       named "output". Type is the "from" resp. "to" one. -->
+
+  <coercion from="rgb" to="rgba" cost="1">
     <block location="fragmentMain">
       output = float4 (input, 1);
     </block>
@@ -28,15 +33,31 @@
     <block location="vertexMain">
       output = float4 (input, 1);
     </block>
-    
-    <output name="output" type="rgba" />
+  </coercion>
+
+  <coercion from="float" to="rgb" cost="0">
+    <block location="fragmentMain">
+      output = float3 (input);
+    </block>
+
+    <block location="vertexMain">
+      output = float3 (input);
+    </block>
+  </coercion>
+  
+  <coercion from="float" to="rgba" cost="0">
+    <block location="fragmentMain">
+      output = float4 (input);
+    </block>
+
+    <block location="vertexMain">
+      output = float4 (input);
+    </block>
   </coercion>
   
   <!------------------------------------------------------------------------->
   
   <coercion from="position4_world" to="position4_screen" cost="4">
-    <input name="input" type="position4_world" />
-
     <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
 	 verbatim -->
     <input name="ModelViewProj" type="float4x4" default="complex"
@@ -53,13 +74,9 @@
     <block location="vertexMain">
       output = mul (ModelViewProj, input);
     </block>
-    
-    <output name="output" type="position4_screen" />
   </coercion>
   
   <coercion from="position4_world" to="position4_camera" cost="4">
-    <input name="input" type="position4_world" />
-
     <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
 	 verbatim -->
     <input name="ModelView" type="float4x4" default="complex"
@@ -86,15 +103,11 @@
     <block location="fragmentMain">
       output = mul (ModelView, input);
     </block>
-    
-    <output name="output" type="position4_camera" />
   </coercion>
   
   <!------------------------------------------------------------------------->
   
   <coercion from="direction_object" to="direction_tangent" cost="3">
-    <input name="input" type="direction_object" />
-
     <input file="/shader/combiner-cg/Normal.inp" private="yes" />
     <input file="/shader/combiner-cg/Tangent.inp" private="yes" />
     <input file="/shader/combiner-cg/Bitangent.inp" private="yes" />
@@ -114,13 +127,9 @@
       obj2tang[2] = Normal;
       output =  mul (obj2tang, input);
     </block>
-    
-    <output name="output" type="direction_tangent" />
   </coercion>
   
   <coercion from="direction_world" to="direction_camera" cost="3">
-    <input name="input" type="direction_world" />
-
     <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
 	 verbatim -->
     <input name="ModelView" type="float4x4" default="complex"
@@ -137,15 +146,31 @@
     <block location="vertexMain">
       output = mul (ModelView, float4 (input, 0)).xyz;
     </block>
+  </coercion>
+  
+  <coercion from="direction_camera" to="direction_world" cost="3">
+    <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
+	 verbatim -->
+    <input name="ModelViewIT" type="float4x4" default="complex"
+	private="yes">
+      <block location="vertexIn">
+	<uniform type="float4x4" name="ModelViewIT" 
+	  binding="state.matrix.modelview.invtrans" />
+      </block>
+      
+      <block location="vertexMain">
+	ModelViewIT = vertexIn.ModelViewIT;
+      </block>
+    </input>
     
-    <output name="output" type="direction_camera" />
+    <block location="vertexMain">
+      output = mul (ModelViewIT, float4 (input, 0)).xyz;
+    </block>
   </coercion>
   
   <!------------------------------------------------------------------------->
   
   <coercion from="normal_object" to="normal_tangent" cost="3">
-    <input name="input" type="normal_object" />
-
     <input file="/shader/combiner-cg/Normal.inp" private="yes" />
     <input file="/shader/combiner-cg/Tangent.inp" private="yes" />
     <input file="/shader/combiner-cg/Bitangent.inp" private="yes" />
@@ -165,13 +190,9 @@
       obj2tang[2] = Normal;
       output =  mul (obj2tang, input);
     </block>
-    
-    <output name="output" type="normal_tangent" />
   </coercion>
   
   <coercion from="normal_tangent" to="normal_object" cost="3">
-    <input name="input" type="normal_tangent" />
-
     <input file="/shader/combiner-cg/Normal.inp" private="yes" />
     <input file="/shader/combiner-cg/Tangent.inp" private="yes" />
     <input file="/shader/combiner-cg/Bitangent.inp" private="yes" />
@@ -195,40 +216,10 @@
       obj2tang[2] = Normal;
       output = mul (input, obj2tang);
     </block>
-    
-    <output name="output" type="normal_object" />
   </coercion>
   
   <coercion from="normal_object" to="normal_world" cost="3">
-    <input name="input" type="normal_object" />
-
-    <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
-	 verbatim -->
-    <input name="objectToWorld" type="float4x4" default="complex" 
-	private="yes">
-      <block location="vertexIn">
-	<uniform type="float4x4" name="objectToWorld" />
-      </block>
-      
-      <block location="fragmentIn">
-	<uniform type="float4x4" name="objectToWorld" />
-      </block>
-      
-      <block location="vertexMain">
-	objectToWorld = vertexIn.objectToWorld;
-      </block>
-
-      <block location="fragmentMain">
-	objectToWorld = fragmentIn.objectToWorld;
-      </block>
-
-      <block location="variablemap">
-	<variablemap variable="object2world transform" 
-	  destination="vertexIn.objectToWorld" />
-	<variablemap variable="object2world transform" 
-	  destination="fragmentIn.objectToWorld" />
-      </block>
-    </input>
+    <input file="/shader/combiner-cg/objectToWorld.inp" private="yes" />
     
     <block location="vertexMain">
       output =  mul (objectToWorld, float4 (input, 0)).xyz;
@@ -237,13 +228,9 @@
     <block location="fragmentMain">
       output =  mul (objectToWorld, float4 (input, 0)).xyz;
     </block>
-    
-    <output name="output" type="normal_world" />
   </coercion>
   
   <coercion from="normal_world" to="normal_camera" cost="3">
-    <input name="input" type="normal_object" />
-
     <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
 	 verbatim -->
     <input name="worldToCamera" type="float4x4" default="complex" 
@@ -279,13 +266,9 @@
     <block location="fragmentMain">
       output =  mul (worldToCamera, float4 (input, 0)).xyz;
     </block>
-    
-    <output name="output" type="normal_camera" />
   </coercion>
   
   <coercion from="normal_object" to="normal_camera" cost="3">
-    <input name="input" type="normal_object" />
-
     <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
 	 verbatim -->
     <input name="ModelView" type="float4x4" default="complex"
@@ -314,15 +297,11 @@
     <block location="fragmentMain">
       output = mul (ModelView, float4 (input, 0)).xyz;
     </block>
-    
-    <output name="output" type="normal_camera" />
   </coercion>
   
   <!------------------------------------------------------------------------->
   
-  <coercion from="direction" to="normal" cost="1">
-    <input name="input" type="direction" />
-
+  <coerciontemplate name="normalize" cost="3">
     <block location="vertexMain">
       output = normalize (input);
     </block>
@@ -330,22 +309,16 @@
     <block location="fragmentMain">
       output = normalize (input);
     </block>
-    
-    <output name="output" type="normal" />
-  </coercion>
+  </coerciontemplate>
   
-  <coercion from="direction_tangent" to="normal_tangent" cost="1">
-    <input name="input" type="direction_tangent" />
-
+  <coerciontemplate name="passthrough" cost="0">
     <block location="vertexMain">
-      output = normalize (input);
+      output = input;
     </block>
     
     <block location="fragmentMain">
-      output = normalize (input);
+      output = input;
     </block>
-    
-    <output name="output" type="normal_tangent" />
-  </coercion>
+  </coerciontemplate>
   
 </combinerlibrary>

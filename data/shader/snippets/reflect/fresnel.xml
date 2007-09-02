@@ -20,7 +20,7 @@
   <technique priority="100">
     <snippet id="eyeVecWorld" file="/shader/snippets/eye-direction-world.xml" />
     
-    <snippet id="reflect">
+    <snippet id="fresnel">
       <technique priority="100">
 	<combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
 	
@@ -28,18 +28,28 @@
 	<input name="eyeVec" type="direction_world" />
 	<!-- Surface normal -->
 	<input name="normal" type="normal_world" />
-	
-	<block location="cg:vertexMain">
-	  reflected = reflect (normalize (eyeVec), normal);
+	  
+	<block location="cg:definitions">
+	  <?Include /shader/snippets/cg-common.cginc?>
 	</block>
 	
 	<block location="cg:fragmentMain">
-	  reflected = reflect (normalize (eyeVec), normal);
+	  // Calculated from 1.3333, which is approx. refraction index for water
+	  // R0 is: 
+	  // float const R0 =  pow(1.0-refractionIndexRatio, 2.0)  
+	  //                 / pow(1.0+refractionIndexRatio, 2.0); 
+	  const float R0 = 0.02040781341208;
+	  result = fresnel_2 (normalize (eyeVec), normal, 1.0-R0, R0, 2);
+	</block>
+    
+	<block location="cg:vertexMain">
+	  const float R0 = 0.02040781341208;
+	  result = fresnel_2 (normalize (eyeVec), normal, 1.0-R0, R0, 2);
 	</block>
 	
-	<output name="reflected" type="direction_world" />
+	<output name="result" type="float" />
       </technique>
     </snippet>
-    <connection from="eyeVecWorld" to="reflect" />
+    <connection from="eyeVecWorld" to="fresnel" />
   </technique>
 </snippet>
