@@ -663,6 +663,12 @@ void csSprite3DMeshObjectFactory::GetObjectBoundingBox (csBox3& b)
   b = global_bbox;
 }
 
+const csBox3& csSprite3DMeshObjectFactory::GetObjectBoundingBox ()
+{
+  SetupFactory ();
+  return global_bbox;
+}
+
 void csSprite3DMeshObjectFactory::SetObjectBoundingBox (const csBox3& b)
 {
   SetupFactory ();
@@ -671,8 +677,8 @@ void csSprite3DMeshObjectFactory::SetObjectBoundingBox (const csBox3& b)
 
 void csSprite3DMeshObjectFactory::GetRadius (float& rad, csVector3& cent)
 {
-  float r; csBox3 bbox;
-  GetObjectBoundingBox (bbox);
+  float r;
+  const csBox3& bbox = GetObjectBoundingBox ();
   cent = bbox.GetCenter();
 
   csSpriteFrame* cframe = ((csSpriteAction2*)GetAction (0))->GetCsFrame (0);
@@ -948,8 +954,7 @@ void csSprite3DMeshObject::GetTransformedBoundingBox (
 
   CS_ASSERT (cur_action != 0);
   csSpriteFrame* cframe = cur_action->GetCsFrame (cur_frame);
-  csBox3 box;
-  cframe->GetBoundingBox (box);
+  const csBox3& box = cframe->GetBoundingBox ();
   camera_bbox.StartBoundingBox (trans * box.GetCorner (0));
   camera_bbox.AddBoundingVertexSmart (trans * box.GetCorner (1));
   camera_bbox.AddBoundingVertexSmart (trans * box.GetCorner (2));
@@ -1015,6 +1020,13 @@ void csSprite3DMeshObject::GetObjectBoundingBox (csBox3& b)
   cframe->GetBoundingBox (b);
 }
 
+const csBox3& csSprite3DMeshObject::GetObjectBoundingBox ()
+{
+  CS_ASSERT (cur_action != 0);
+  csSpriteFrame* cframe = cur_action->GetCsFrame (cur_frame);
+  return cframe->GetBoundingBox ();
+}
+
 void csSprite3DMeshObject::SetObjectBoundingBox (const csBox3&)
 {
   // @@@ TODO
@@ -1022,8 +1034,8 @@ void csSprite3DMeshObject::SetObjectBoundingBox (const csBox3&)
 
 void csSprite3DMeshObject::GetRadius (float& rad, csVector3& cent)
 {
-  float r; csBox3 bbox;
-  GetObjectBoundingBox(bbox);
+  float r;
+  const csBox3& bbox = GetObjectBoundingBox();
   cent = bbox.GetCenter();
 
   CS_ASSERT (cur_action != 0);
@@ -1144,8 +1156,7 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n,
   if (IsLodEnabled ())
   {
     // reduce LOD based on distance from camera to center of sprite
-    csBox3 obox;
-    GetObjectBoundingBox (obox);
+    const csBox3& obox = GetObjectBoundingBox ();
     csVector3 obj_center = (obox.Min () + obox.Max ()) / 2;
     csVector3 wor_center;
     if (movable->IsFullTransformIdentity ())
@@ -1615,8 +1626,7 @@ void csSprite3DMeshObject::UpdateLightingFast (
   // convert frame number in current action to absolute frame number
   int tf_idx = cur_action->GetCsFrame (cur_frame)->GetAnmIndex();
 
-  csBox3 obox;
-  GetObjectBoundingBox (obox);
+  const csBox3& obox = GetObjectBoundingBox ();
   csVector3 obj_center = (obox.Min () + obox.Max ()) / 2;
   csVector3 wor_center;
   csReversibleTransform movtrans;
@@ -1741,8 +1751,7 @@ void csSprite3DMeshObject::UpdateLightingLQ (
   int tf_idx = cur_action->GetCsFrame     (cur_frame)->GetAnmIndex ();
   int nf_idx = cur_action->GetCsNextFrame (cur_frame)->GetAnmIndex ();
 
-  csBox3 obox;
-  GetObjectBoundingBox (obox);
+  const csBox3& obox = GetObjectBoundingBox ();
   csVector3 obj_center = (obox.Min () + obox.Max ()) / 2;
   csVector3 wor_center;
   csReversibleTransform movtrans;

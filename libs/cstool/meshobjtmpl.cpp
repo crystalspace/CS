@@ -120,6 +120,11 @@ void csMeshObject::GetObjectBoundingBox (csBox3& bbox)
   bbox = boundingbox;
 }
 
+const csBox3& csMeshObject::GetObjectBoundingBox ()
+{
+  return boundingbox;
+}
+
 void csMeshObject::SetObjectBoundingBox (const csBox3& bbox)
 {
   boundingbox = bbox;
@@ -127,8 +132,7 @@ void csMeshObject::SetObjectBoundingBox (const csBox3& bbox)
 
 void csMeshObject::GetRadius (float& radius, csVector3& center)
 {
-  csBox3 b;
-  GetObjectBoundingBox (b);
+  csBox3 b (GetObjectBoundingBox ());
   radius = csQsqrt (csSquaredDist::PointPoint (b.Max (), b.Min ())) * 0.5f;
   center = b.GetCenter ();
 }

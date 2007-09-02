@@ -32,6 +32,7 @@
 #include "csgeom/vector3.h"
 
 class csString;
+struct csVertexStatus;
 
 /**
  * A plane in 3D space.
@@ -202,6 +203,24 @@ public:
    * is set to true then the positive side will be used instead.
    */
   bool ClipPolygon (csVector3*& pverts, int& num_verts, bool reversed = false);
+
+  /**
+   * Clip the polygon in \p InVerts (having \p InCount vertices) to this plane.
+   * Method returns one of #CS_CLIP_OUTSIDE, #CS_CLIP_INSIDE, 
+   * #CS_CLIP_CLIPPED depending on whether all, none or some vertices were 
+   * clipped.
+   * If the polygon is clipped, the resulting polygon is returned in 
+   * \p OutPolygon and the number of vertices in \p OutCount. 
+   * \p OutCount must be initialized with the maximum number 
+   * of output vertices. \p OutStatus will return additional information for 
+   * clipped vertices.
+   * Normally this function will consider the polygon visible
+   * if it is on the negative side of the plane (Classify()). If \p reversed
+   * is set to true then the positive side will be used instead.
+   */
+  uint8 ClipPolygon (const csVector3* InVerts, size_t InCount,
+    csVector3* OutPolygon, size_t& OutCount, csVertexStatus* OutStatus,
+    bool reversed = false) const;
 
   /// Return a textual representation of the plane in the form "aa,bb,cc,dd".
   csString Description() const;

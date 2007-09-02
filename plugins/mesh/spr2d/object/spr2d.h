@@ -126,6 +126,7 @@ private:
   bool initialized;
   csRef<iMeshObjectDrawCallback> vis_cb;
   float radius;
+  csBox3 obj_bbox;
   float current_lod;
   uint32 current_features;
   csBox2 bbox_2d;
@@ -180,6 +181,7 @@ public:
   /**\name iObjectModel implementation
    * @{ */
   void GetObjectBoundingBox (csBox3& bbox);
+  const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent)
   { rad = radius; cent.Set (0,0,0); }

@@ -446,7 +446,7 @@ void csStencil2ShadowStep::Perform (iRenderView* /*rview*/, iSector* /*sector*/,
 
 void csStencil2ShadowStep::ModelInFrustum(
 	csVector3 &light_pos, float shadow_length, csPlane3* frustum_planes, 
-        uint32& frustum_mask, csBox3 &model_bounding_box,
+        uint32& frustum_mask, const csBox3 &model_bounding_box,
 	bool & front_cap_in_frustum, bool & extrusion_in_frustum,
 	bool & back_cap_in_frustum)
 {
@@ -527,7 +527,7 @@ void csStencil2ShadowStep::ModelInFrustum(
 
 int csStencil2ShadowStep::CalculateShadowMethod(
 	iRenderView *rview, csVector3 &light_pos, 
-        const csReversibleTransform &t, csBox3 &model_bounding_box)
+        const csReversibleTransform &t, const csBox3 &model_bounding_box)
 {
   float lx, rx, ty, dy;
   rview->GetFrustum(lx, rx, ty, dy);
@@ -702,9 +702,8 @@ void csStencil2ShadowStep::Perform (iRenderView* rview, iSector* sector,
           continue;
         }
 
-        csBox3 model_bounding_box;
-        sp->GetMeshObject()->GetObjectModel()
-		->GetObjectBoundingBox(model_bounding_box);
+        const csBox3& model_bounding_box = sp->GetMeshObject()->GetObjectModel()
+		->GetObjectBoundingBox();
 
         const csReversibleTransform& tf = sp->GetMovable ()->GetTransform ();
 

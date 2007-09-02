@@ -28,6 +28,7 @@
 #include "sft3dcom.h"
 #include "types.h"
 #include "scan_blend.h"
+#include "vertices_ltn.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 {
@@ -40,17 +41,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
     const iScanlineRenderer::RenderInfoMesh& srim;
     const iScanlineRenderer::RenderInfoTriangle& srit;
     const VertexBuffer* inBuffers;
-    BuffersMask buffersMask;
-    size_t floatsPerVert;
     const Pix& pix;
+    VerticesLTN* linearBuffers;
 
     SLLogic_ScanlineRenderer (const Pix& pix,
-    const iScanlineRenderer::RenderInfoMesh& srim,
-    const iScanlineRenderer::RenderInfoTriangle& srit,
-      const VertexBuffer* inBuffers, BuffersMask buffersMask,
-      size_t floatsPerVert) : 
-      srim (srim), srit (srit), inBuffers (inBuffers), 
-      buffersMask (buffersMask), floatsPerVert (floatsPerVert), pix (pix) {}
+      const iScanlineRenderer::RenderInfoMesh& srim,
+      const iScanlineRenderer::RenderInfoTriangle& srit,
+      VerticesLTN* linearBuffers) : 
+      srim (srim), srit (srit), pix (pix), linearBuffers (linearBuffers) {}
 
     CS_FORCEINLINE_TEMPLATEMETHOD
     void RenderScanline (InterpolateEdgePersp& L, InterpolateEdgePersp& R, 
@@ -95,30 +93,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
  	_dest++;
       } /* endwhile */
     }
-    void LinearizeBuffers (float* linearBuffers, size_t vertNum)
-    {
-      const size_t* compNum = srim.bufferComps;
-      size_t bufOfs = 0;
-      for (size_t i = 0; i < maxBuffers; i++)
-      {
-	if (!(buffersMask & (1 << i))) continue;
-	float* dest = &linearBuffers[bufOfs];
-	uint8* src = inBuffers[i].data;
-	for (size_t v = 0; v < vertNum; v++)
-	{
-	  memcpy (dest, src, *compNum * sizeof (float));
-	  src += inBuffers[i].comp * sizeof (float);
-	  dest += floatsPerVert;
-	}
-	bufOfs += *compNum;
-	compNum++;
-      }
-    }
-    size_t GetFloatsPerVert() const { return floatsPerVert; }
   };
 
   struct SLLogic_ZFill
   {
+    VerticesLTN* linearBuffers;
+    SLLogic_ZFill() : linearBuffers (0) {}
+
     CS_FORCEINLINE_TEMPLATEMETHOD
     void RenderScanline (InterpolateEdgePersp& L, InterpolateEdgePersp& R, 
       int ipolStep, int ipolShift, uint32* /*temp*/, void* /*dest*/, uint len, 
@@ -134,21 +115,18 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 	zbuff++;
       } /* endwhile */
     }
-    void LinearizeBuffers (float* /*linearBuffers*/, size_t /*vertNum*/)
-    { }
-    size_t GetFloatsPerVert() const { return 0; }
   };
 
   struct ScanlineIter
   {
     int vertNum;
     const csVector3* vertices;
-    const size_t floatsPerVert;
     int height;
     size_t top, bot;
     int ipolStep;
     int ipolShift;
-    float* linearBuffers;
+    const float* linearBuffers;
+    size_t floatsPerVert;
     //-----
     // Scan from top to bottom.
     // The following structure contains all the data for one side
@@ -217,11 +195,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
     }
 
     ScanlineIter (size_t vertNum, const csVector3* vertices,
-      const size_t floatsPerVert, float* linearBuffers, int height) : 
-      vertNum ((int)vertNum), vertices (vertices), 
-      floatsPerVert (floatsPerVert), height (height),
-      linearBuffers (linearBuffers), haveTrapezoid (false)
+      VerticesLTN* linearBuffers, int height) : 
+    vertNum ((int)vertNum), vertices (vertices), 
+      height (height), haveTrapezoid (false)
     {
+      this->linearBuffers = linearBuffers ? linearBuffers->GetData() : 0;
+      floatsPerVert = linearBuffers ? linearBuffers->GetFloatsPerVertex() : 0;
       //-----
       // Get the values from the polygon for more convenient local access.
       // Also look for the top-most and bottom-most vertices.
@@ -359,8 +338,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 	    if (sy <= R.fy)
 	      continue;
     
-	    R.edge.Setup (vertices, linearBuffers, floatsPerVert, 
-	      R.sv, R.fv, sy);
+            R.edge.Setup (vertices, linearBuffers, floatsPerVert,
+              R.sv, R.fv, sy);
 	  } /* endif */
 	  if (sy <= L.fy)
 	  {
@@ -375,8 +354,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 	    if (sy <= L.fy)
 	      continue;
     
-	    L.edge.Setup (vertices, linearBuffers, floatsPerVert, 
-	      L.sv, L.fv, sy);
+	    L.edge.Setup (vertices, linearBuffers, floatsPerVert,
+              L.sv, L.fv, sy);
 	  } /* endif */
 	} while (!leave); /* enddo */
 
@@ -413,6 +392,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
       screenY++;
     }
   };
+
   template <typename ScanlineLogic>
   class PolygonRasterizer
   {
@@ -424,7 +404,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
     int pixel_shift;
     uint32* line_buffer;
     int line_buffer_width;
-
   public:
     PolygonRasterizer() : do_interlaced(-1), line_buffer(0), 
       line_buffer_width (-1)
@@ -441,12 +420,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
       CS_ASSERT_MSG ("Degenerate polygon", vertNum >= 3);
       ScanlineLogic sll (logic);
 
-      const size_t floatsPerVert = sll.GetFloatsPerVert();
-      CS_ALLOC_STACK_ARRAY(float, linearBuffers, floatsPerVert * vertNum);
-      sll.LinearizeBuffers (linearBuffers, vertNum);
-      
-      ScanlineIter si (vertNum, vertices, floatsPerVert, linearBuffers, 
-	height);
+      ScanlineIter si (vertNum, vertices, logic.linearBuffers, height);
 
       //-----
       // Main scanline loop.

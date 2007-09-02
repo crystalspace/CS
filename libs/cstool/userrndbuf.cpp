@@ -106,7 +106,8 @@ csStringID BufferNameIter::Next (csRef<iRenderBuffer>* buf)
 {
   if (index < names.Length())
   {
-    if (buf != 0) *buf = buffers[index];
+    csRef<iRenderBuffer> tmp (buffers[index]);
+    if (buf != 0) (*buf) = tmp;
     return names[index++];
   }
   else

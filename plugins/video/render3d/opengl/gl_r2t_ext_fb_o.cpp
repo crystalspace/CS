@@ -33,14 +33,23 @@ csGLRender2TextureEXTfbo::~csGLRender2TextureEXTfbo()
 void csGLRender2TextureEXTfbo::FreeBuffers()
 {
   if (depthRB != 0)
+  {
     G3D->ext->glDeleteRenderbuffersEXT (1, &depthRB);
+    depthRB = 0;
+  }
   if (stencilRB != 0)
+  {
     G3D->ext->glDeleteRenderbuffersEXT (1, &stencilRB);
+    stencilRB = 0;
+  }
   if (framebuffer != 0)
+  {
     G3D->ext->glDeleteFramebuffersEXT (1, &framebuffer);
+    framebuffer = 0;
+  }
 }
 
-static const char* FBStatusStr (GLenum status)
+const char* csGLRender2TextureEXTfbo::FBStatusStr (GLenum status)
 {
   switch (status)
   {
@@ -66,16 +75,15 @@ static const char* FBStatusStr (GLenum status)
       return "error";
     default:
       {
-	static csString msg;
-	msg.Format ("unknown %lx", (unsigned long)status);
-	return msg;
+	fboMsg.Format ("unknown %lx", (unsigned long)status);
+	return fboMsg;
       }
   }
 }
 
 void csGLRender2TextureEXTfbo::SetRenderTarget (iTextureHandle* handle, 
-						bool persistent,
-						int subtexture)
+                                                bool persistent,
+                                                int subtexture)
 {
   if (enableFBO)
   {
@@ -88,73 +96,94 @@ void csGLRender2TextureEXTfbo::SetRenderTarget (iTextureHandle* handle,
     {
       handle->GetRendererDimensions (txt_w, txt_h);
       csGLTextureHandle* tex_mm = (csGLTextureHandle *)
-	handle->GetPrivateObject ();
+        handle->GetPrivateObject ();
       if (!tex_mm->IsWasRenderTarget())
       {
-	tex_mm->SetupAutoMipping();
-	tex_mm->SetWasRenderTarget (true);
-	G3D->statecache->SetTexture (GL_TEXTURE_2D, tex_mm->GetHandle());
-	glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA8, txt_w, txt_h, 
-	  0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	G3D->statecache->SetTexture (GL_TEXTURE_2D, 0);
+        tex_mm->SetupAutoMipping();
+        tex_mm->SetWasRenderTarget (true);
+        G3D->statecache->SetTexture (GL_TEXTURE_2D, tex_mm->GetHandle());
+	// FIXME: Take persistence into account?
+        glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA8, txt_w, txt_h, 
+          0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+	// FIXME: Only use GL_LINEAR if mipmaps aren't generated
+        glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        G3D->statecache->SetTexture (GL_TEXTURE_2D, 0);
       }
 
-      if ((framebuffer == 0) || (txt_w > fb_w) || (txt_h > fb_h))
+      if ((framebuffer == 0) || (txthandle != handle))
       {
-	FreeBuffers();
+        csGLRender2TextureEXTfbo::txthandle = handle;
+        if ((txt_w > fb_w) || (txt_h > fb_h))
+        {
+          FreeBuffers();
 
-	G3D->ext->glGenFramebuffersEXT (1, &framebuffer);
-	G3D->ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer);
-	G3D->ext->glGenRenderbuffersEXT (1, &depthRB);
-	G3D->ext->glGenRenderbuffersEXT (1, &stencilRB);
+          G3D->ext->glGenFramebuffersEXT (1, &framebuffer);
+          G3D->ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer);
+          G3D->ext->glGenRenderbuffersEXT (1, &depthRB);
+          G3D->ext->glGenRenderbuffersEXT (1, &stencilRB);
 
-	G3D->ext->glBindRenderbufferEXT (GL_RENDERBUFFER_EXT, depthRB);
-	G3D->ext->glRenderbufferStorageEXT (GL_RENDERBUFFER_EXT, 
-	  GL_DEPTH_COMPONENT24_ARB, txt_w, txt_h);
+          G3D->ext->glBindRenderbufferEXT (GL_RENDERBUFFER_EXT, depthRB);
+	  // FIXME: Storage shouldn't really be hardcoded
+          G3D->ext->glRenderbufferStorageEXT (GL_RENDERBUFFER_EXT, 
+            GL_DEPTH_COMPONENT24_ARB, txt_w, txt_h);
 
-	/*G3D->ext->glBindRenderbufferEXT (GL_RENDERBUFFER_EXT, stencilRB);
-	G3D->ext->glRenderbufferStorageEXT (GL_RENDERBUFFER_EXT, 
-	  GL_STENCIL_INDEX8_EXT, txt_w, txt_h);*/
+	  // FIXME: Stencil support
+	  // FIXME: Storage shouldn't really be hardcoded
+          /*G3D->ext->glBindRenderbufferEXT (GL_RENDERBUFFER_EXT, stencilRB);
+          G3D->ext->glRenderbufferStorageEXT (GL_RENDERBUFFER_EXT, 
+          GL_STENCIL_INDEX8_EXT, txt_w, txt_h);*/
 
-	//G3D->ext->glBindRenderbufferEXT (GL_RENDERBUFFER_EXT, 0);
-	fb_w = txt_w; fb_h = txt_h;
+          //G3D->ext->glBindRenderbufferEXT (GL_RENDERBUFFER_EXT, 0);
+          fb_w = txt_w; fb_h = txt_h;
+        }
+        //glReadBuffer (GL_NONE);
+        G3D->ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer);
+        //csPrintf ("framebuffer status(%d): %s\n", __LINE__,
+        //FBStatusStr (G3D->ext->glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT)));
+	// FIXME: Support cube map faces, rect textures etc. at some point
+        G3D->ext->glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, 
+          GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, tex_mm->GetHandle(), 0);
+
+        // initialize depth renderbuffer
+	// FIXME: is that binding really needed?
+        G3D->ext->glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, depthRB);
+        G3D->ext->glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, 
+          GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, depthRB);
+        //G3D->ext->glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, 
+        //GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, stencilRB);
+
+        GLenum fbStatus = G3D->ext->glCheckFramebufferStatusEXT (
+          GL_FRAMEBUFFER_EXT);
+        if (fbStatus != GL_FRAMEBUFFER_COMPLETE_EXT)
+        {
+          G3D->ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
+          enableFBO = false;
+          //glReadBuffer (GL_BACK);
+	  // FIXME: This should prolly rather be a Report()
+          csPrintf ("framebuffer status: %s\n", FBStatusStr (fbStatus));
+	  FreeBuffers();
+        }
       }
-      //glReadBuffer (GL_NONE);
-      G3D->ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer);
-      //csPrintf ("framebuffer status(%d): %s\n", __LINE__,
-	//FBStatusStr (G3D->ext->glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT)));
-      G3D->ext->glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, 
-	GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, tex_mm->GetHandle(), 0);
-      G3D->ext->glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, 
-	GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, depthRB);
-      //G3D->ext->glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, 
-	//GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, stencilRB);
-
-      GLenum fbStatus = G3D->ext->glCheckFramebufferStatusEXT (
-	GL_FRAMEBUFFER_EXT);
-      if (fbStatus != GL_FRAMEBUFFER_COMPLETE_EXT)
+      else
       {
-	G3D->ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
-	enableFBO = false;
-	//glReadBuffer (GL_BACK);
-	csPrintf ("framebuffer status: %s\n", FBStatusStr (fbStatus));
+	// The framebuffer should still be set up for txthandle
+        G3D->ext->glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, framebuffer);
       }
     }
   }
   if (enableFBO)
     csGLRender2TextureFramebuf::SetRenderTarget (handle, false, subtexture);
   else
-  {
     csGLRender2TextureFramebuf::SetRenderTarget (handle, persistent, subtexture);
-  }
 }
 
 void csGLRender2TextureEXTfbo::FinishDraw ()
 {
   if (enableFBO)
     rt_onscreen = false;
+
   csGLRender2TextureFramebuf::FinishDraw();
+  //G3D->ext->glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
   //csGLTextureHandle* tex_mm = (csGLTextureHandle *)
   //  render_target->GetPrivateObject ();

@@ -764,7 +764,7 @@ void csSkeleton::UpdateBones ()
 
   for (i = 0 ; i < parent_bones.Length () ; i++)
   {
-    csRef<csSkeletonBone> parent_bone = bones[parent_bones[i]];
+    csRef<csSkeletonBone> parent_bone (bones[parent_bones[i]]);
     {
       parent_bone->UpdateBones ();
       //break;

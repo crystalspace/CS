@@ -68,6 +68,10 @@ public:
   {
     bbox = box;
   }
+  virtual const csBox3& GetObjectBoundingBox ()
+  {
+    return box;
+  }
   virtual void SetObjectBoundingBox (const csBox3& bbox)
   {
     box = bbox;

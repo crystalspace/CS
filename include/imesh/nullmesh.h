@@ -36,7 +36,7 @@ SCF_VERSION (iNullMeshState, 0, 0, 2);
 /**
  * This interface describes the API for the null mesh object.
  */
-struct iNullMeshState : public iBase
+struct iNullMeshState : public virtual iBase
 {
   /**
    * Set the radius of the sphere represented by this object.

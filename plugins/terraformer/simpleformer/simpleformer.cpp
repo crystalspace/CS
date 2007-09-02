@@ -85,11 +85,11 @@ static float BiCubicData (float* data, int width, int height, float x, float z)
   float deltaX = x-floor (x);
   float deltaZ = z-floor (z);
 
-  // If deltaX/Z is close to 0, we're pretty much 
+  // If deltaX/Z is close to 0, we're pretty much
   // right on a heightmap sample point, which means it's useless to blend
   // Jorrit: Disabled this because it gives small irregularities.
 #if 0
-  if (fabs (deltaX) <= SMALL_EPSILON && 
+  if (fabs (deltaX) <= SMALL_EPSILON &&
     fabs (deltaZ) <= SMALL_EPSILON)
   {
     int intX = (int) floor (x + 0.5);
@@ -147,14 +147,14 @@ static float BiCubicData (float* data, int width, int height, float x, float z)
 
 SCF_IMPLEMENT_FACTORY (csSimpleFormer)
 
-csSimpleFormer::csSimpleFormer (iBase* parent) : 
+csSimpleFormer::csSimpleFormer (iBase* parent) :
   scfImplementationType (this, parent), objectRegistry (0), scale (1),
   offset (0)
 {
 }
 
 csSimpleFormer::~csSimpleFormer ()
-{ 
+{
 }
 
 bool csSimpleFormer::SetIntegerMap (csStringID type, iImage* map,
@@ -207,7 +207,7 @@ bool csSimpleFormer::SetIntegerMap (csStringID type, iImage* map,
     {
       for (x = 0; x < width; ++x)
       {
-        intmap.data[x+y*width] = 
+        intmap.data[x+y*width] =
           int (data[x+y*width]) * scale + offset;
       }
     }
@@ -274,7 +274,7 @@ bool csSimpleFormer::SetFloatMap (csStringID type, iImage* map,
       for (x = 0; x < width; ++x)
       {
         // Grab height from R,G,B (triplet is effectively a 24-bit number)
-        // We're reversing Y to later get negative Y in heightmap image 
+        // We're reversing Y to later get negative Y in heightmap image
         // to positive Z in terrain - sampler space has an inverted Y
         // axis in comparison to image space.
         const csRGBpixel& heixel = data[index2++];
@@ -301,9 +301,9 @@ bool csSimpleFormer::SetFloatMap (csStringID type, iImage* map,
       for (x = 0; x < width; ++x)
       {
         // Grab the intensity as height
-        // We're reversing Y to later get negative Y in heightmap image 
+        // We're reversing Y to later get negative Y in heightmap image
         // to positive Z in terrain
-        floatmap.data[x+(height-y-1)*width] = 
+        floatmap.data[x+(height-y-1)*width] =
           palette[data[x+y*width]].Intensity () * scale / 255.0 + offset;
       }
     }
@@ -316,7 +316,7 @@ void csSimpleFormer::SetHeightmap (float* data, unsigned int width,
                                    unsigned int height)
 {
   size_t heightmap_idx = (size_t)~0;
-  
+
   for(size_t i = 0; i< floatmaps.Length(); i++)
   {
     if(floatmaps[i].type == stringHeights)
@@ -343,7 +343,7 @@ void csSimpleFormer::SetHeightmap (float* data, unsigned int width,
 void csSimpleFormer::SetHeightmap (iImage *heightmap)
 {
   size_t heightmap_idx = (size_t)~0;
-  
+
   for(size_t i = 0; i< floatmaps.Length(); i++)
   {
     if(floatmaps[i].type == stringHeights)
@@ -360,7 +360,7 @@ void csSimpleFormer::SetHeightmap (iImage *heightmap)
   floatmap.type = stringHeights;
   height = floatmap.height = heightmap->GetHeight ();
   width = floatmap.width = heightmap->GetWidth ();
-  
+
   // Allocate data
   delete[] floatmap.data;
   floatmap.data = new float[width*height];
@@ -382,7 +382,7 @@ void csSimpleFormer::SetHeightmap (iImage *heightmap)
       for (x = 0; x < width; ++x)
       {
         // Grab height from R,G,B (triplet is effectively a 24-bit number)
-        // We're reversing Y to later get negative Y in heightmap image 
+        // We're reversing Y to later get negative Y in heightmap image
         // to positive Z in terrain - sampler space has an inverted Y
         // axis in comparison to image space.
         const csRGBpixel& heixel = data[index2++];
@@ -406,7 +406,7 @@ void csSimpleFormer::SetHeightmap (iImage *heightmap)
       for (x = 0; x < width; ++x)
       {
         // Grab the index value as height
-        // We're reversing Y to later get negative Y in heightmap image 
+        // We're reversing Y to later get negative Y in heightmap image
         // to positive Z in terrain - sampler space has an inverted Y
         // axis in comparison to image space.
         floatmap.data[index1++] = (float)data[index2++] / 255.0;
@@ -451,14 +451,14 @@ bool csSimpleFormer::Initialize (iObjectRegistry* objectRegistry)
   return true;
 }
 
-csPtr<iTerraSampler> csSimpleFormer::GetSampler (csBox2 region, 
+csPtr<iTerraSampler> csSimpleFormer::GetSampler (csBox2 region,
                                      unsigned int resx, uint resy)
 {
   // Create a new sampler and return it
   return new csSimpleSampler (this, region, resx, resy);
 }
 
-bool csSimpleFormer::SampleFloat (csStringID type, float x, float z, 
+bool csSimpleFormer::SampleFloat (csStringID type, float x, float z,
                                   float &value)
 {
   if (type == stringHeights)
@@ -469,7 +469,7 @@ bool csSimpleFormer::SampleFloat (csStringID type, float x, float z,
     z = ((z-offset.z)/scale.z+1)*(height/2);
 
     // Calculate height and return it
-    value = BiLinearData (heightData, width, height, x, z) * 
+    value = BiLinearData (heightData, width, height, x, z) *
       scale.y + offset.y;
     return true;
   }
@@ -493,8 +493,8 @@ bool csSimpleFormer::SampleFloat (csStringID type, float x, float z,
 
 
 
-        value = (type == stringHeights)? 
-          BiLinearData (floatmaps[i].data, width, height, x, z) * scale.y + offset.y 
+        value = (type == stringHeights)?
+          BiLinearData (floatmaps[i].data, width, height, x, z) * scale.y + offset.y
           : BiLinearData (floatmaps[i].data, width, height, x, z);
         return true;
       }
@@ -509,7 +509,7 @@ bool csSimpleFormer::SampleVector2 (csStringID /*type*/, float /*x*/,
   return false;
 }
 
-bool csSimpleFormer::SampleVector3 (csStringID type, float x, float z, 
+bool csSimpleFormer::SampleVector3 (csStringID type, float x, float z,
                                     csVector3 &value)
 {
   if (type == stringVertices)
@@ -521,10 +521,10 @@ bool csSimpleFormer::SampleVector3 (csStringID type, float x, float z,
   return false;
 }
 
-bool csSimpleFormer::SampleInteger (csStringID type, float x, float z, 
+bool csSimpleFormer::SampleInteger (csStringID type, float x, float z,
                                     int &value)
 {
-  
+
   // Check if it is one of the int maps.
   for (size_t i = 0 ; i < intmaps.Length () ; i++)
   {
@@ -550,7 +550,7 @@ bool csSimpleFormer::SampleInteger (csStringID type, float x, float z,
 //////////////////////////////////////////////////////////////////////////
 
 csSimpleSampler::csSimpleSampler (csSimpleFormer *terraFormer, csBox2 region,
-                                  uint resx, uint resz) : 
+                                  uint resx, uint resz) :
                                   scfImplementationType (this)
 {
   // Initialize members
@@ -653,7 +653,7 @@ void csSimpleSampler::CachePositions ()
         // our output buffer, and if we are, store it in the edge buffer
         if (i>0 && i<resz+1 && j>0 && j<resx+1)
         {
-          positions[posIdx++] = 
+          positions[posIdx++] =
             csVector3 (xr,
             BiCubicData (terraFormer->heightData,
             terraFormer->width,
@@ -663,7 +663,7 @@ void csSimpleSampler::CachePositions ()
         }
         else
         {
-          edgePositions[edgeIdx++] = 
+          edgePositions[edgeIdx++] =
             csVector3 (xr,
             BiCubicData (terraFormer->heightData,
             terraFormer->width,
@@ -780,11 +780,11 @@ void csSimpleSampler::CacheTexCoords ()
   csVector2 texCoord;
   texCoord.y = minCorner.z / (float)(terraFormer->height);
   const csVector2 tcStep (
-    sampleDistanceHeight.x / (float)(terraFormer->width), 
+    sampleDistanceHeight.x / (float)(terraFormer->width),
     sampleDistanceHeight.z / (float)(terraFormer->height));
   for (unsigned int i = 0; i<resz; ++i)
   {
-    texCoord.x = startx; 
+    texCoord.x = startx;
     for (unsigned int j = 0; j<resx; ++j)
     {
       // Just assign the texture coordinate
@@ -857,7 +857,7 @@ const int *csSimpleSampler::SampleInteger (csStringID type)
 {
   // Get the shared string repository
   csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    terraFormer->objectRegistry, "crystalspace.shared.stringset", 
+    terraFormer->objectRegistry, "crystalspace.shared.stringset",
     iStringSet);
 
   csString typestring = csString(strings->Request(type));
@@ -878,20 +878,21 @@ const int *csSimpleSampler::SampleInteger (csStringID type)
         int* original = terraFormer->intmaps[i].data;
         int* map = new int[resx*resz];
         uint to = 0;
-        float stepx = terraFormer->intmaps[i].width / resx;
-        float stepz = (terraFormer->intmaps[i].height / resz)
-                         * terraFormer->intmaps[i].height;
+        float stepx = terraFormer->intmaps[i].width / (float)resx;
+        float stepz = terraFormer->intmaps[i].height / (float)resz;
 
         for (uint a = 0; a < resz; a++)
         {
           for (uint b = 0; b < resx; b++)
           {
-            map[to] = original[(uint)(a*stepz + b*stepx + 0.5)];
+            int from =
+              (int)(a*stepz) * terraFormer->intmaps[i].width + int (b*stepx);
+            map[to] = original[from];
             to ++;
           }
         }
 //@@@
-/*  
+/*
   int* tests = map;
 
   csImageMemory pic = csImageMemory(resx,resz);

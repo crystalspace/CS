@@ -56,7 +56,7 @@ namespace aws
 
       while(pos < (path.GetData () + path.Length ()))
       {      
-        float x, y;
+        float x=0, y=0;
 
         // Skip whitespace
         if (isspace (*pos) || *pos == ',') 

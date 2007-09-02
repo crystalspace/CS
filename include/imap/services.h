@@ -33,6 +33,7 @@ class csBox3;
 class csColor;
 class csColor4;
 class csMatrix3;
+class csOBB;
 class csPlane3;
 class csShaderVariable;
 class csVector2;
@@ -206,6 +207,16 @@ struct iSyntaxService : public virtual iBase
    * Write a box description. Returns true if successful.
    */
   virtual bool WriteBox (iDocumentNode* node, const csBox3& v) = 0;
+
+  /**
+   * Parse a box description. Returns true if successful.
+   */
+  virtual bool ParseBox (iDocumentNode* node, csOBB &b) = 0;
+
+  /**
+   * Write a box description. Returns true if successful.
+   */
+  virtual bool WriteBox (iDocumentNode* node, const csOBB& b) = 0;
 
   /**
    * Parse a color description. Returns true if successful.

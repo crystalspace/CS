@@ -183,8 +183,26 @@ public:
     { 
       return parent ? parent->HandleEvent(e) : false; 
     }
-    CS_EVENTHANDLER_NAMES("crystalspace.console");
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
+    CS_EVENTHANDLER_NAMES("crystalspace.console")
+    CS_CONST_METHOD virtual const csHandlerID * GenericPrec(
+      csRef<iEventHandlerRegistry> &r1, csRef<iEventNameRegistry> &r2,
+      csEventID e) const
+    {
+      if (e == csevSystemOpen (r2)) {
+        /* TODO : not thread-safe */
+        static csHandlerID precs[2] =
+          { r1->GetGenericID("crystalspace.graphics3d"), CS_HANDLERLIST_END };
+        return precs;
+      } else {
+        return 0;
+      }
+    }
+    CS_CONST_METHOD virtual const csHandlerID * GenericSucc(
+      csRef<iEventHandlerRegistry> &, csRef<iEventNameRegistry> &,
+      csEventID) const
+    { return 0; }
+    
+    CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
   };
   csRef<EventHandler> eventHandler;
 

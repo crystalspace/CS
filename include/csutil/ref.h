@@ -158,6 +158,16 @@ public:
   {
     CSREF_TRACK_INCREF (obj, this);
   }
+
+  /**
+  * Construct a smart pointer from a raw object reference with a compatible
+  * type. Calls IncRef() on the object.
+  */
+  template <class T2>
+  csRef (T2* newobj) : obj ((T2*)newobj)
+  {
+    CSREF_TRACK_INCREF (obj, this);
+  }
   
   /**
    * Smart pointer copy constructor from assignment-compatible csRef<T2>.

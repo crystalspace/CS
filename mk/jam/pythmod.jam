@@ -1,0 +1,94 @@
+#============================================================================
+# Rules for creating python modules.
+# Copyright (C) 2006 by Jorrit Tyberghein
+#
+#    This library is free software; you can redistribute it and/or modify it
+#    under the terms of the GNU Library General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or (at your
+#    option) any later version.
+#
+#    This library is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+#    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library General Public
+#    License for more details.
+#
+#    You should have received a copy of the GNU Library General Public License
+#    along with this library; if not, write to the Free Software Foundation,
+#    Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#============================================================================
+# PythMod rule
+# Can be used to create cspace python modules.
+
+# Auxiliary rule
+rule InstallPythMod
+{
+  local plugindir = $(appdatadir) ; # Temporary override of global plugindir.
+  SystemInstallPlugin $(1) : $(2) ;
+}
+
+# USAGE:
+# Pythmod targetname : dll name : src files : LinkWith : ExternalLibs : desc
+#
+# EXAMPLES:
+# PythMod ceguimod : _cscegui : ceguimod.cpp cs_cegui.cpp : : CEGUI : desc
+# PythMod pythmod : _cspace : pythmod.cpp : crystalspace_python : : desc
+rule PythMod
+{
+  local desc = $(6) ;
+  local target = $(2) ;
+  local cleantarget ;
+  if [ Property build : projgen ]
+  {
+    Description $(2) : $(desc) ;
+    MSVCGEN.PLUGIN_EXT.$(2) = .pyd ;
+    Plugin $(2) : $(3) ;
+    LinkWith $(2) : crystalspace $(4) ;
+    ExternalLibs $(2) : PYTHON $(5) ;
+    Depends $(2) : $(1) ;
+  }
+  else
+  {
+    Description $(<) : $(desc) ;
+    Help $(<) : "Build the $(desc)" ;
+    local sources = [ DoSourceGrist $(3) ] ;
+    local objects = [ CompileObjects $(sources) ] ;
+    if $(PYTHON.MODULE_EXT)
+    {
+      target = $(target:S=$(PYTHON.MODULE_EXT)) ;
+    }
+    else
+    {
+      target = [ ConstructPluginTarget $(target) ] ;
+    }
+    $(<)_TARGET = $(target) ;
+    $(<)_SOURCES = $(sources) ;
+    $(<)_OBJECTS = $(objects) ;
+    LinkWith $(<) : crystalspace $(4) ;
+    ExternalLibs $(<) : PYTHON $(5) ;
+    CFlags $(<) : $(PLUGIN.CFLAGS) ;
+    LFlags $(<) : $(PLUGIN.LFLAGS) $(LINKLIBS) ;
+    NotFile $(<) ;
+    Depends $(<) : $(target) ;
+    Depends plugins : $(<) ;
+    MakeLocate $(target) : $(LOCATE.TARGETS) ;
+    Depends $(target) : $(objects) ;
+    LinkPlugin $(target) : $(objects) ;
+    if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
+    {
+      local debugfile = [ SplitDebugInfo $(target) ] ;
+      cleantarget += $(debugfile) ;
+      NoCare $(debugfile) ;
+      Depends install_plugin : [ DoInstall $(debugfile) :
+                                  $(appdatadir) bindings python :
+                                  $(INSTALL_DATA) ] ;
+    }
+  }
+  InstallPythMod $(target) : bindings python ;
+
+  Always $(<)clean ;
+  NotFile $(<)clean ;
+  Clean $(<)clean : $(target) $(objects) $(cleantarget) ;
+  Depends clean : $(<)clean ;
+}
+

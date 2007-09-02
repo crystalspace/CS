@@ -131,7 +131,7 @@ void csImageVolumeMaker::AppendPending ()
     curAlpha = newAlpha + (Depth * slicePix);
   for (size_t i = 0; i < pendingImages.Length(); i++)
   {
-    csRef<iImage> image = pendingImages[i];
+    csRef<iImage> image (pendingImages[i]);
     if (image->HasKeyColor())
     {
       Format = Format | CS_IMGFMT_ALPHA;

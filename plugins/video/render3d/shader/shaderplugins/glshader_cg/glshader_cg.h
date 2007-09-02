@@ -95,6 +95,7 @@ public:
   {
     return (profile >= CG_PROFILE_PS_1_1) && (profile <= CG_PROFILE_PS_1_3);
   }
+  bool IsRoutedProfileSupported (CGprofile profile);
 };
 
 }

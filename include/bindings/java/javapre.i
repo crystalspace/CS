@@ -36,15 +36,6 @@
 %include "enumsimple.swg"
 #endif
 
-// Following are declared as constants here to prevent javac complaining about
-// finding a 'long' where an 'int' is expected.
-%constant int CS_CRYSTAL_PROTOCOL = 0x43533032;
-%constant int CS_MUSCLE_PROTOCOL = 0x504d3030;
-%constant int CS_XML_PROTOCOL = 0x584d4d30;
-%ignore CS_CRYSTAL_PROTOCOL;
-%ignore CS_MUSCLE_PROTOCOL;
-%ignore CS_XML_PROTOCOL;
-
 %typemap(javabase) iBase "cspace";
 
 %ignore operator[];
@@ -298,6 +289,17 @@ IEVENTOUTLET_JAVACODE
 %enddef
 ICONFIGMANAGER_JAVACODE
 
+#undef CSINITIALIZER_JAVACODE
+%define CSINITIALIZER_JAVACODE
+%typemap(javacode) csInitializer
+%{
+  public static boolean SetupEventHandler(iObjectRegistry arg0, iEventHandler arg1, long[] arg2) {
+    return _SetupEventHandler(arg0, arg1, arg2);
+  }
+%}
+%enddef
+CSINITIALIZER_JAVACODE
+
 // Should probably be rewritten using csString for className
 %typemap(in) (const char * iface, int iface_ver) (char className[1024])
 {
@@ -357,5 +359,7 @@ ICONFIGMANAGER_JAVACODE
 %typemap(jtype) (int argc, char const * const argv []) "String[]"
 %typemap(jstype) (int argc, char const * const argv []) "String[]"
 %typemap(javain) (int argc, char const * const argv []) "$javainput"
+
+%include "arrays_java.i"
 
 #endif // SWIGJAVA

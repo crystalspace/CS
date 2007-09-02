@@ -283,17 +283,22 @@ public:
    */
   virtual void Update (csTicks elapsed_time);
 
-  void GetObjectBoundingBox (csBox3& bbox)
+  virtual void GetObjectBoundingBox (csBox3& bbox)
   {
     SetupObject ();
     bbox = csParticleSystem::bbox;
   }
-  void SetObjectBoundingBox (const csBox3& bbox)
+  virtual const csBox3& GetObjectBoundingBox ()
+  {
+    SetupObject ();
+    return bbox;
+  }
+  virtual void SetObjectBoundingBox (const csBox3& bbox)
   {
     csParticleSystem::bbox = bbox;
     ShapeChanged ();
   }
-  void GetRadius (float& rad, csVector3& cent)
+  virtual void GetRadius (float& rad, csVector3& cent)
   {
     SetupObject ();
     rad = radius;

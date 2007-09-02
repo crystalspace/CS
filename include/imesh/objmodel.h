@@ -159,8 +159,14 @@ struct iObjectModel : public virtual iBase
 
   /**
    * Get the bounding box in object space for this mesh object.
+   * \deprecated Use GetObjectBoundingBox() (without parameters) instead.
    */
   virtual void GetObjectBoundingBox (csBox3& bbox) = 0;
+
+  /**
+   * Get the bounding box in object space for this mesh object.
+   */
+  virtual const csBox3& GetObjectBoundingBox () = 0;
 
   /**
    * Override the bounding box of this mesh object in object space.

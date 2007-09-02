@@ -12,7 +12,7 @@ AC_PREREQ([2.56])
 # cs_version_number
 #	Keep this value synchronized with CS/include/csver.h.
 #------------------------------------------------------------------------------
-m4_define([cs_version_number], [0.99])
+m4_define([cs_version_number], [1.1])
 
 
 
@@ -165,6 +165,28 @@ AS_IF([test $cs_cv_sys_pthread_mutex_recursive != no],
 	[$cs_cv_sys_pthread_mutex_recursive])])
 CS_CHECK_PTHREAD_ATFORK([cs_cv_sys_pthread_atfork])
 CS_EMIT_BUILD_PROPERTY([PTHREAD.ATFORK.AVAILABLE], [$cs_cv_sys_pthread_atfork])
+
+
+
+#------------------------------------------------------------------------------
+# Determine whether to link base g++ libraries statically
+#------------------------------------------------------------------------------
+AC_MSG_CHECKING([whether to link base g++ libraries statically])
+AC_ARG_ENABLE([static-baselibs], [AC_HELP_STRING([--enable-static-baselibs],
+    [Link statically againts libgcc and libstdc++. Use with caution; enabling 
+    this option may cause issues when dynamically linking against other C++
+    modules. (default NO)])],
+    [], [enable_static_baselibs=no])
+AC_MSG_RESULT([$enable_static_baselibs])
+AS_IF([test $enable_static_baselibs = yes],
+    [CS_EMIT_BUILD_FLAGS([for -static-libgcc],
+        [cs_cv_prog_link_static_libgcc], [CS_CREATE_TUPLE([-static-libgcc])],
+        [C], [COMPILER.LFLAGS], [+])
+    libstdcxx=`$CXX -print-file-name=libstdc++.a`
+    CS_EMIT_BUILD_FLAGS([for static libstdc++],
+        [cs_cv_prog_link_static_libstdcxx],
+        CS_CREATE_TUPLE([$libstdcxx]),
+        [C++], [COMPILER.LFLAGS], [+])])
 
 
 
@@ -604,16 +626,6 @@ CS_EMIT_BUILD_FLAGS([if missing symbols can be reported as warnings],
 
 
 #------------------------------------------------------------------------------
-# Check if linker recognizes "--as-needed" which only links dynamic libs that
-# are really honestly needed.
-#------------------------------------------------------------------------------
-#CS_EMIT_BUILD_FLAGS([if --as-needed is supported], 
-#    [cs_cv_prog_link_as_needed], [CS_CREATE_TUPLE([],[-Wl,--as-needed])], 
-#    [C++], [COMPILER.LFLAGS], [+])
-
-
-
-#------------------------------------------------------------------------------
 # Check if C++ function inlining can be enabled and disabled. Apparently, with
 # some versions of GNU build tools on Windows, the Crystal Space Python plugin
 # fails to link and emits the error message "Error: 0-bit reloc in dll". In
@@ -684,12 +696,19 @@ AS_IF([test $cs_cv_prog_cxx_visibility_inlines_hidden_buggy != yes],
 # Check how to set default symbol visibility, and how to override the setting
 # in code.
 #------------------------------------------------------------------------------
-CS_CHECK_BUILD_FLAGS([for symbol visibility flag],
+CS_CHECK_BUILD_FLAGS([for "hidden" symbol visibility flag],
     [cs_cv_prog_cc_visibility_hidden],
     [CS_CREATE_TUPLE([-fvisibility=hidden])])
 AS_IF([test -n "$cs_cv_prog_cc_visibility_hidden"],
     [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], 
 	[$cs_cv_prog_cc_visibility_hidden], [+])])
+	
+CS_CHECK_BUILD_FLAGS([for "default" symbol visibility flag],
+    [cs_cv_prog_cc_visibility_default],
+    [CS_CREATE_TUPLE([-fvisibility=default])])
+AS_IF([test -n "$cs_cv_prog_cc_visibility_default"],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS.VISIBILITY_DEFAULT], 
+	[$cs_cv_prog_cc_visibility_default])])
 
 CS_SYMBOL_QUALIFIER([how to declare default visibility],
     [cs_cv_prog_cxx_declare_visible_def],
@@ -845,19 +864,16 @@ CS_CHECK_OPTIMIZE_FLAGS
 #------------------------------------------------------------------------------
 # Check for compiler debug flags.
 #------------------------------------------------------------------------------
-binutils_recent=no
-AS_IF([test -n "$OBJCOPY"],
-    [CS_CHECK_PROG_VERSION([binutils], [$OBJCOPY -V], [2.16], [9.9|.9|.9|.9],
-        [binutils_recent=yes])])
+CS_CHECK_BINUTILS_2_17
 
 AC_MSG_CHECKING([whether to split debug information])
 AC_ARG_ENABLE([separate-debug-info], 
     [AC_HELP_STRING([--enable-separate-debug-info],
         [split debug information into separate files. (default YES if 
-        binutils >= 2.16 detected and not on Cygwin, otherwise default NO)])])
+        binutils >= 2.17 detected and not on Cygwin, otherwise default NO)])])
 AS_IF([test -z "$enable_separate_debug_info"], 
     AS_IF([test -z `uname | grep -i CYGWIN`],
-        [enable_separate_debug_info=$binutils_recent],
+        [enable_separate_debug_info=$cs_cv_binutils_2_17],
         [enable_separate_debug_info=no]))
 AC_MSG_RESULT([$enable_separate_debug_info])
 

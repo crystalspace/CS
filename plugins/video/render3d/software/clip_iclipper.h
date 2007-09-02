@@ -36,21 +36,17 @@ class ClipMeatiClipper
   size_t maxClipVertices;
 
   CS_FORCEINLINE size_t CopyTri (const csTriangle& tri, 
-    BuffersMask buffersMask, VertexOutputBase& voutPersp, 
-    VertexOutputBase* vout)
+    VertexOutputPersp& voutPersp, 
+    const VerticesLTN* inBuffers, VerticesLTN* outBuffers)
   {
     voutPersp.Copy (tri.a);
     voutPersp.Copy (tri.b);
     voutPersp.Copy (tri.c);
-    int n = 0;
-    while (buffersMask != 0)
-    {
-      vout[n].Copy (tri.a);
-      vout[n].Copy (tri.b);
-      vout[n].Copy (tri.c);
-      buffersMask >>= 1;
-      n++;
-    }
+    const float* inData = inBuffers->GetData();
+    size_t stride = inBuffers->GetStride();
+    outBuffers->AddVertex (inData + tri.a * stride);
+    outBuffers->AddVertex (inData + tri.b * stride);
+    outBuffers->AddVertex (inData + tri.c * stride);
     return 3;
   }
   CS_FORCEINLINE 
@@ -76,12 +72,12 @@ public:
   }
 
   size_t DoClip (const csTriangle& tri, const csVector3* inPersp,
-    VertexOutputBase& voutPersp, const VertexBuffer* /*inBuffers*/,
-    const size_t* /*inStrides*/, BuffersMask buffersMask, 
-    VertexOutputBase* vout)
+    VertexOutputPersp& voutPersp, 
+    const VerticesLTN* inBuffers, VerticesLTN* outBuffers
+    )
   {
     if (!clipper)
-      return CopyTri (tri, buffersMask, voutPersp, vout);
+      return CopyTri (tri, voutPersp, inBuffers, outBuffers);
 
     const csVector3 v[3] = 
     {
@@ -107,14 +103,20 @@ public:
     if (boxClassify == -1)
       return 0;
     else if (boxClassify == 1)
-      return CopyTri (tri, buffersMask, voutPersp, vout);
+      return CopyTri (tri, /*buffersMask, voutPersp, vout*/
+      voutPersp, inBuffers, outBuffers);
 
     uint clip_result = clipper->Clip (inpoly, 3, outPoly, outNum, outStatus);
     CS_ASSERT(outNum <= maxClipVertices);
 
     if (clip_result == CS_CLIP_OUTSIDE) return 0;
     if (clip_result == CS_CLIP_INSIDE)
-      return CopyTri (tri, buffersMask, voutPersp, vout);
+      return CopyTri (tri, voutPersp, inBuffers, outBuffers);
+
+    const float* inData = inBuffers->GetData();
+    size_t stride = inBuffers->GetStride();
+
+    CS_ALLOC_STACK_ARRAY(float, outV, stride);
 
     for (size_t i = 0 ; i < outNum; i++)
     {
@@ -125,15 +127,9 @@ public:
 	    const size_t vt = Tri[outStatus[i].Vertex];
 	    csVector3 vn (outPoly[i].x, outPoly[i].y,
 	      v[outStatus[i].Vertex].z);
-	    voutPersp.Write ((float*)&vn);
-	    for (size_t n = 0; n < maxBuffers; n++)
-	    {
-	      if (buffersMask & (1 << n))
-	      {
-		vout[n].Copy (vt);
-	      }
-	    }
-	  }
+	    voutPersp.Write (vn);
+            outBuffers->AddVertex (inData + vt * stride);
+          }
 	  break;
 	case CS_VERTEX_ONEDGE:
 	  {
@@ -143,7 +139,7 @@ public:
 	    const float t = outStatus[i].Pos;
 
 	    csVector3 vn;
-	    voutPersp.LerpTo ((float*)&vn, vt, vt2, t);
+	    voutPersp.LerpTo (&vn, vt, vt2, t);
 
 #ifdef CLIP_DEBUG
 	    if ((ABS(vn.x - outPoly[i].x) > EPSILON)
@@ -153,16 +149,11 @@ public:
 
 	    vn.x = outPoly[i].x;
 	    vn.y = outPoly[i].y;
-	    voutPersp.Write ((float*)&vn);
+	    voutPersp.Write (vn);
 
-	    for (size_t n = 0; n < maxBuffers; n++)
-	    {
-	      if (buffersMask & (1 << n))
-	      {
-		vout[n].Lerp (vt, vt2, t);
-	      }
-	    }
-	    break;
+            inBuffers->LerpTo (outV, vt, vt2, t);
+            outBuffers->AddVertex (outV);
+            break;
 	  }
 	case CS_VERTEX_INSIDE:
 	  {
@@ -214,21 +205,15 @@ public:
 	    const int vt22 = Tri[edge2[1]];
 
 	    csVector3 vn;
-	    voutPersp.Lerp3To ((float*)&vn, vt11, vt12, t1,
+	    voutPersp.Lerp3To (&vn, vt11, vt12, t1,
 	      vt21, vt22, t2, t);
 	    vn.x = x;
 	    vn.y = y;
-	    voutPersp.Write ((float*)&vn);
+	    voutPersp.Write (vn);
 
-	    for (size_t n = 0; n < maxBuffers; n++)
-	    {
-	      if (buffersMask & (1 << n))
-	      {
-		vout[n].Lerp3 (vt11, vt12, t1,
-		  vt21, vt22, t2, t);
-	      }
-	    }
-	  }
+            inBuffers->Lerp3To (outV, vt11, vt12, t1, vt21, vt22, t2, t);
+            outBuffers->AddVertex (outV);
+          }
 	  break;
 	default:
 	  CS_ASSERT(false);

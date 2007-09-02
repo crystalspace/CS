@@ -156,8 +156,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     polygonCache.Empty();
     for (size_t s = 0; s < subMeshes.GetSubMeshCount(); s++)
     {
-      SubMesh* subMesh = subMeshes.GetSubMesh (s);
-      iRenderBuffer* buffer = subMesh->GetIndices();
       size_t bufferTris = triangleCache.GetSize();
       for (size_t t = 0; t < bufferTris; t++)
       {

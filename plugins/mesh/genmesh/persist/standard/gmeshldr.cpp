@@ -18,6 +18,8 @@
 
 #include "cssysdef.h"
 
+#include <ctype.h>
+
 #include "csgeom/math3d.h"
 #include "csgeom/tri.h"
 #include "csgeom/vector2.h"
@@ -28,6 +30,7 @@
 #include "csutil/refarr.h"
 #include "csutil/scanstr.h"
 #include "csutil/sysfunc.h"
+#include "csutil/stringreader.h"
 
 #include "iengine/engine.h"
 #include "iengine/material.h"
@@ -218,6 +221,64 @@ static float GetDef (iDocumentNode* node, const char* attrname, float def)
     return def;
 }
 
+static bool GetFloat (char*& p, float& f)
+{
+  while (*p && isspace (*p)) p++;
+  if (!*p) return false;
+  char* start = p;
+  while (*p && !isspace (*p)) p++;
+  char old = *p;
+  *p = 0;
+  f = atof (start);
+  *p = old;
+  return true;
+}
+
+static bool GetInt (char*& p, int& f)
+{
+  while (*p && isspace (*p)) p++;
+  if (!*p) return false;
+  f = 0;
+  while (*p && !isspace (*p))
+  {
+    f = f * 10 + (*p - '0');
+    p++;
+  }
+  return true;
+}
+
+static bool GetVector3 (char*& p, csVector3& v)
+{
+  if (!GetFloat (p, v.x)) return false;
+  if (!GetFloat (p, v.y)) return false;
+  if (!GetFloat (p, v.z)) return false;
+  return true;
+}
+
+static bool GetVector2 (char*& p, csVector2& v)
+{
+  if (!GetFloat (p, v.x)) return false;
+  if (!GetFloat (p, v.y)) return false;
+  return true;
+}
+
+static bool GetColor (char*& p, csColor4& v)
+{
+  if (!GetFloat (p, v.red)) return false;
+  if (!GetFloat (p, v.green)) return false;
+  if (!GetFloat (p, v.blue)) return false;
+  if (!GetFloat (p, v.alpha)) return false;
+  return true;
+}
+
+static bool GetTri (char*& p, csTriangle& v)
+{
+  if (!GetInt (p, v.a)) return false;
+  if (!GetInt (p, v.b)) return false;
+  if (!GetInt (p, v.c)) return false;
+  return true;
+}
+
 csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */)
 {
@@ -398,6 +459,35 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_RENDERBUFFER:
         ParseRenderBuffer(child, state);
         break;
+      case XMLTOKEN_TRIANGLES:
+	if (num_tri_given)
+	{
+	  synldr->ReportError (
+		"crystalspace.genmeshfactoryloader.parse.frame.badformat",
+		child, "Don't use 'numtri' in combination with 'triangles'!");
+	  return 0;
+	}
+	else
+	{
+	  char* tris = (char*)child->GetContentsValue ();
+	  csTriangle tri;
+	  while (true)
+	  {
+	    if (!GetTri (tris, tri)) break;
+	    if (tri.a >= state->GetVertexCount () ||
+	        tri.b >= state->GetVertexCount () ||
+	        tri.c >= state->GetVertexCount ())
+	    {
+	      synldr->ReportError (
+		      "crystalspace.genmeshfactoryloader.parse.frame.badvt",
+		      child, "Bad vertex index for triangle in genmesh factory!"
+		      );
+	      return 0;
+	    }
+	    state->AddTriangle (tri);
+	  }
+	}
+	break;
       case XMLTOKEN_T:
 	{
 	  if (num_tri_given)
@@ -498,6 +588,60 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	    alpha = 1.0f;
 	  co[num_col].Set (r, g, b, alpha);
 	  num_col++;
+	}
+	break;
+      case XMLTOKEN_VERTICES:
+	if (num_vt_given)
+	{
+	  synldr->ReportError (
+		"crystalspace.genmeshfactoryloader.parse.frame.badformat",
+		child, "Don't use 'numvt' in combination with 'vertices'!");
+	  return 0;
+	}
+	else
+	{
+	  const char* format = child->GetAttributeValue ("format");
+	  // @@@ Handle format.
+	  if (*format != 'v')
+	  {
+	    synldr->ReportError (
+		"crystalspace.genmeshfactoryloader.parse.frame.badformat",
+		child,
+		"Format specifier must start with 'v'. Vertices are not optional!");
+	    return 0;
+	  }
+	  format++;
+	  bool douv = false;
+	  if (*format == 'u') { douv = true; format++; }
+	  bool donormals = false;
+	  if (*format == 'n') { donormals = true; format++; }
+	  bool docolors = false;
+	  if (*format == 'c') { docolors = true; format++; }
+	  if (*format != 0)
+	  {
+	    synldr->ReportError (
+		"crystalspace.genmeshfactoryloader.parse.frame.badformat",
+		child,
+		"Wrong format specifier. Must be a string similar to 'vunc'!");
+	    return 0;
+	  }
+
+	  char* vertices = (char*)child->GetContentsValue ();
+	  csVector3 n (0);
+	  csVector2 uv (0);
+	  csColor4 col (0, 0, 0, 1);
+	  while (true)
+	  {
+	    csVector3 v;
+	    if (!GetVector3 (vertices, v)) break;
+	    if (douv)
+	      if (!GetVector2 (vertices, uv)) break;
+	    if (donormals)
+	      if (!GetVector3 (vertices, n)) break;
+	    if (docolors)
+	      if (!GetColor (vertices, col)) break;
+	    state->AddVertex (v, uv, n, col);
+	  }
 	}
 	break;
       case XMLTOKEN_V:

@@ -84,19 +84,39 @@ protected:
   {
     csGraphics2DGLCommon* parent;
 
-    GLPixelFormat currentValues;
+    /*
     size_t nextValueIndices[glpfvValueCount];
     csArray<int> values[glpfvValueCount];
-    bool currentValid;
+    
 
     char* order;
     size_t orderPos;
-    size_t orderNum;
+    size_t orderNum;*/
+
+    // Hold properties for a single pixelformat property
+    struct PixelFormatPropertySet
+    {
+      GLPixelFormatValue valueType;
+      size_t nextIndex;
+      size_t firstIndex;
+      csArray<int> possibleValues;
+    };
+
+    /* Pixel format properties, however this is _not_ indexed by 
+    GLPixelFormatValue but sorted by order */
+    PixelFormatPropertySet pixelFormats[glpfvValueCount];
+
+    // Remapping table from real GLPixelFormatValue to index in table above
+    size_t pixelFormatIndexTable[glpfvValueCount]; 
+
+    GLPixelFormat currentValues;
+    bool currentValid;
 
     void ReadStartValues ();
     void ReadPickerValues ();
     void ReadPickerValue (const char* valuesStr, csArray<int>& values);
     void SetInitialIndices ();
+    void SetupIndexTable (const char* orderStr);
     bool PickNextFormat ();
   public:
     csGLPixelFormatPicker (csGraphics2DGLCommon* parent);

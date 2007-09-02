@@ -117,15 +117,19 @@ rule SystemLinkSharedLibrary
 {
   LFlags $(<) : $(LINKLIBS) ;
   Depends $(<) : $(>) ;
-  local response = $(<).resp ;
-  MakeLocate $(response) : $(LOCATE.OBJECTS)/libs ;
-  ResponseFile $(response) : $(>) ;
-  # @@@ FIXME: response files are only supported on newer binutils
-  # But quite useful to avoid blowing jam's 10240 max action length.
-  #Depends $(response) : $(>) ;
-  #Depends $(<) : $(response) ;
-  #LinkSharedLibrary $(<) : $(response) ;
-  LinkSharedLibrary $(<) : $(>) ;
+  if $(LINKER.RESPONSEFILES) = "yes"
+  {
+    local response = $(<).resp ;
+    MakeLocate $(response) : $(LOCATE.OBJECTS)/libs ;
+    ResponseFile $(response) : $(>) ;
+    Depends $(response) : $(>) ;
+    Depends $(<) : $(response) ;
+    LinkSharedLibraryRsp $(<) : $(response) ;
+  }
+  else
+  {
+    LinkSharedLibrary $(<) : $(>) ;
+  }
 
   Clean clean : $(<) ;
   Clean $(<)clean : $(<) ;
@@ -155,5 +159,11 @@ else
 actions LinkSharedLibrary bind NEEDLIBS bind EXTRAOBJECTS
 {
   $(CMD.LINK) -shared -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS) \
+    -Wl,-soname,$(<:BS)
+}
+
+actions LinkSharedLibraryRsp bind NEEDLIBS bind EXTRAOBJECTS
+{
+  $(CMD.LINK) -shared -o $(<) -Wl,@$(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS) \
     -Wl,-soname,$(<:BS)
 }

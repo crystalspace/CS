@@ -840,6 +840,12 @@ void csHazeMeshObject::GetObjectBoundingBox (csBox3& retbbox)
   retbbox = bbox;
 }
 
+const csBox3& csHazeMeshObject::GetObjectBoundingBox ()
+{
+  SetupObject ();
+  return bbox;
+}
+
 void csHazeMeshObject::SetObjectBoundingBox (const csBox3& inbbox)
 {
   bbox = inbbox;

@@ -26,7 +26,7 @@
       <buffer source="normal" destination="normal" />
       <buffer source="tangent" destination="texture coordinate 1" />
       <buffer source="binormal" destination="texture coordinate 2" />
-      <vp plugin="glcg" file="/shader/specular/bump_attn.cgvp" />
+      <vp plugin="glcg" file="/shader/specular/bump.cgvp" />
       <texture destination="TexNormal" name="tex normal" />
       <texture destination="TexDiffuse" name="tex diffuse" />
       <texture destination="TexAttn" name="light 0 attenuationtex" />

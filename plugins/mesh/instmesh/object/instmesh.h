@@ -309,7 +309,6 @@ public:
 
   /// Calculate bounding box and radius.
   void CalculateBBoxRadius ();
-  const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   float GetRadius ();
   /**\name iObjectModel implementation
@@ -318,6 +317,7 @@ public:
   {
     bbox = GetObjectBoundingBox ();
   }
+  virtual const csBox3& GetObjectBoundingBox ();
 
   virtual iObjectModel* GetObjectModel () { return this; }
 

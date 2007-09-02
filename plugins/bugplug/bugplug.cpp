@@ -1590,9 +1590,8 @@ bool csBugPlug::HandleFrame (iEvent& /*event*/)
       if (do_bbox)
       {
         int bbox_color = G3D->GetDriver2D ()->FindRGB (0, 255, 255);
-        csBox3 bbox;
-        selected_meshes[k]->GetMeshObject ()->GetObjectModel ()->
-    	  GetObjectBoundingBox (bbox);
+        const csBox3& bbox = selected_meshes[k]->GetMeshObject ()
+	  ->GetObjectModel ()->GetObjectBoundingBox ();
         csVector3 vxyz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xyz);
         csVector3 vXyz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_Xyz);
         csVector3 vxYz = tr_o2c * bbox.GetCorner (CS_BOX_CORNER_xYz);
@@ -2226,8 +2225,7 @@ void csBugPlug::Dump (int indent, iMeshWrapper* mesh)
       Report (CS_REPORTER_SEVERITY_DEBUG, "%*s        Plugin '%s'",
   	  indent, "",
           fact->QueryDescription () ? fact->QueryDescription () : "0");
-    csBox3 bbox;
-    obj->GetObjectModel ()->GetObjectBoundingBox (bbox);
+    const csBox3& bbox = obj->GetObjectModel ()->GetObjectBoundingBox ();
     Report (CS_REPORTER_SEVERITY_DEBUG, "%*s        Object bounding box:",
       indent, "");
     Dump (indent+8, bbox);

@@ -141,6 +141,11 @@ public:
   void GetBoundingBox (csBox3& b) const { b = box; }
 
   /**
+   * Get the bounding box in object space.
+   */
+  const csBox3& GetBoundingBox () const { return box; }
+
+  /**
    * Set the radius of this frame in object space.
    */
   void SetRadius (float r) { radius = r; }
@@ -625,6 +630,7 @@ public:
 
   void SetupFactory ();
   void GetObjectBoundingBox (csBox3& bbox);
+  const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3 &cent);
 
@@ -1377,6 +1383,7 @@ public:
   void SetupLODListeners (iSharedVariable* varm, iSharedVariable* vara);
 
   void GetObjectBoundingBox (csBox3& bbox);
+  const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3 &cent);
 

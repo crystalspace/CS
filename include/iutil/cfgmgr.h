@@ -124,6 +124,8 @@ struct iConfigManager : public iConfigFile
    * balance the IncRef() it performed when the domain was added.  If the
    * domain is not registered, the RemoveDomain() request is ignored.  It is
    * not legal to remove the dynamic domain.
+   * Note that if optimize is on then this removal will not take place until
+   * FlushRemoved() is called.
    */
   virtual void RemoveDomain(iConfigFile*) = 0;
   /// Remove a configuration domain.

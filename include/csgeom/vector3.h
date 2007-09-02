@@ -312,6 +312,17 @@ public:
     else
       return csVector3 (0, 0, z / fabsf (z)); //Z biggest
   }
+
+  /// Return index of the largest axis
+  inline size_t DominantAxis () const
+  {
+    if (fabsf (x) > fabsf (y) && fabsf (x) > fabsf (z))
+      return CS_AXIS_X;
+    else if (fabsf (y) > fabsf (z))
+      return CS_AXIS_Y;
+    else
+      return CS_AXIS_Z;
+  }
 };
 
 /** @} */

@@ -368,6 +368,13 @@ void csProtoMeshObjectFactory::GetObjectBoundingBox (csBox3& bbox)
   bbox = object_bbox;
 }
 
+const csBox3& csProtoMeshObjectFactory::GetObjectBoundingBox ()
+{
+  SetupFactory ();
+  if (!object_bbox_valid) CalculateBBoxRadius ();
+  return object_bbox;
+}
+
 void csProtoMeshObjectFactory::SetObjectBoundingBox (const csBox3& bbox)
 {
   object_bbox_valid = true;

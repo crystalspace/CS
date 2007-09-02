@@ -87,17 +87,6 @@
 	</OpenGL>
       </Video>
     </config>
-    <config name="crappyintelgraphics">
-      <Video>
-	<ShaderManager>
-	  <Tags>
-	    <crappy_intel_graphics>
-	      <Presence>forbidden</Presence>
-	    </crappy_intel_graphics>
-	  </Tags>
-	</ShaderManager>
-      </Video>
-    </config>
     <config name="noinvertedfog">
       <Video>
 	<ShaderManager>
@@ -401,7 +390,6 @@
 	<usecfg>nolinearfog</usecfg>
 	<usecfg>enableIntensityBlendText</usecfg>
 	<usecfg>disableMipmapGeneration</usecfg>
-	<usecfg>crappyintelgraphics</usecfg>
       </applicable>
     </rule>
     

@@ -27,6 +27,7 @@
 #include "ivaria/reporter.h"
 
 #include "csgeom/csrect.h"
+#include "csgeom/math.h"
 #include "csplugincommon/canvas/scrshot.h"
 #include "csplugincommon/opengl/glcommon2d.h"
 #include "csplugincommon/opengl/glstates.h"
@@ -905,16 +906,13 @@ bool csGraphics2DGLCommon::Resize (int width, int height)
 
 
 csGraphics2DGLCommon::csGLPixelFormatPicker::csGLPixelFormatPicker(
-  csGraphics2DGLCommon* parent) : order(0)
+  csGraphics2DGLCommon* parent) : parent (parent)
 {
-  csGLPixelFormatPicker::parent = parent;
-
   Reset();
 }
 
 csGraphics2DGLCommon::csGLPixelFormatPicker::~csGLPixelFormatPicker()
 {
-  delete[] order;
 }
 
 void csGraphics2DGLCommon::csGLPixelFormatPicker::ReadStartValues ()
@@ -937,25 +935,43 @@ void csGraphics2DGLCommon::csGLPixelFormatPicker::ReadStartValues ()
 
 void csGraphics2DGLCommon::csGLPixelFormatPicker::ReadPickerValues ()
 {
-  order = csStrNew (parent->config->GetStr (
-    "Video.OpenGL.FormatPicker.ReductionOrder", "ACmasdc"));
-  orderNum = strlen (order);
-  orderPos = 0;
+  const char* order = parent->config->GetStr (
+    "Video.OpenGL.FormatPicker.ReductionOrder", "ACmasdc");
+  SetupIndexTable (order);
 
   ReadPickerValue (parent->config->GetStr (
-    "Video.OpenGL.FormatPicker.ColorBits"), values[glpfvColorBits]);
+    "Video.OpenGL.FormatPicker.ColorBits"), 
+    pixelFormats[pixelFormatIndexTable[glpfvColorBits]].possibleValues);
+
   ReadPickerValue (parent->config->GetStr (
-    "Video.OpenGL.FormatPicker.AlphaBits"), values[glpfvAlphaBits]);
+    "Video.OpenGL.FormatPicker.AlphaBits"), 
+    pixelFormats[pixelFormatIndexTable[glpfvAlphaBits]].possibleValues);
+
   ReadPickerValue (parent->config->GetStr (
-    "Video.OpenGL.FormatPicker.DepthBits"), values[glpfvDepthBits]);
+    "Video.OpenGL.FormatPicker.DepthBits"), 
+    pixelFormats[pixelFormatIndexTable[glpfvDepthBits]].possibleValues);
+
   ReadPickerValue (parent->config->GetStr (
-    "Video.OpenGL.FormatPicker.StencilBits"), values[glpfvStencilBits]);
+    "Video.OpenGL.FormatPicker.StencilBits"), 
+    pixelFormats[pixelFormatIndexTable[glpfvStencilBits]].possibleValues);
+
   ReadPickerValue (parent->config->GetStr (
-    "Video.OpenGL.FormatPicker.AccumColorBits"), values[glpfvAccumColorBits]);
+    "Video.OpenGL.FormatPicker.AccumColorBits"), 
+    pixelFormats[pixelFormatIndexTable[glpfvAccumColorBits]].possibleValues);
+
   ReadPickerValue (parent->config->GetStr (
-    "Video.OpenGL.FormatPicker.AccumAlphaBits"), values[glpfvAccumAlphaBits]);
+    "Video.OpenGL.FormatPicker.AccumAlphaBits"), 
+    pixelFormats[pixelFormatIndexTable[glpfvAccumAlphaBits]].possibleValues);
+
   ReadPickerValue (parent->config->GetStr (
-    "Video.OpenGL.FormatPicker.MultiSamples"), values[glpfvMultiSamples]);
+    "Video.OpenGL.FormatPicker.MultiSamples"), 
+    pixelFormats[pixelFormatIndexTable[glpfvMultiSamples]].possibleValues);
+}
+
+template<class T>
+static int ReverseCompare(T const& r1, T const& r2)
+{
+  return csComparator<T,T>::Compare(r2,r1);
 }
 
 void csGraphics2DGLCommon::csGLPixelFormatPicker::ReadPickerValue (
@@ -984,90 +1000,127 @@ void csGraphics2DGLCommon::csGLPixelFormatPicker::ReadPickerValue (
 
   if (values.Length() == 0)
     values.Push (0);
+
+  values.Sort (ReverseCompare<int>);
 }
 
 void csGraphics2DGLCommon::csGLPixelFormatPicker::SetInitialIndices ()
 {
-  for (size_t v = 0; v < glpfvValueCount; v++)
+  for (size_t format = 0; format < glpfvValueCount; ++format)
   {
-    size_t closestIndex = 0;
-    int closestDiff = 0x7fffffff;
+    size_t formatIdx = pixelFormatIndexTable[format];
 
-    for (size_t i = 0; i < values[v].Length(); i++)
+    const csArray<int>& values = pixelFormats[formatIdx].possibleValues;
+
+    size_t closestIndex = values.GetSize () - 1;   
+
+    for (size_t i = 0; i < values.GetSize (); ++i)
     {
-      int currentDiff = values[v][i] - currentValues[v];
-      if (abs (currentDiff) < closestDiff)
+      // find first which is less than value
+      if (values[i] <= currentValues[format])
       {
-	closestDiff = abs (currentDiff);
-	closestIndex = i;
-	if (currentDiff >= 0) closestIndex++;
+        closestIndex = i;
+        break;
       }
-      if (currentDiff == 0) break;
     }
-    nextValueIndices[v] = closestIndex;
+
+    //pixelFormats[formatIdx].firstIndex = csMin (firstIndex, values.GetSize () - 1);
+    pixelFormats[formatIdx].firstIndex = closestIndex;
+    pixelFormats[formatIdx].nextIndex = pixelFormats[formatIdx].firstIndex;
+  }
+}
+
+void csGraphics2DGLCommon::csGLPixelFormatPicker::SetupIndexTable (
+  const char* orderStr)
+{
+  size_t orderIdx = 0;
+
+  while (*orderStr != 0 && orderIdx < glpfvValueCount)
+  {
+    char orderVal = *orderStr;
+
+    // Map character to value type
+    GLPixelFormatValue val = glpfvColorBits;
+    switch (orderVal)
+    {
+    case 'c':
+      val = glpfvColorBits;
+      break;
+    case 'a':
+      val = glpfvAlphaBits;
+      break;
+    case 'd':
+      val = glpfvDepthBits;
+      break;
+    case 's':
+      val = glpfvStencilBits;
+      break;
+    case 'C':
+      val = glpfvAccumColorBits;
+      break;
+    case 'A':
+      val = glpfvAccumAlphaBits;
+      break;
+    case 'm':
+      val = glpfvMultiSamples;
+      break;
+    }
+
+    //Now map orderIdx to val
+    pixelFormatIndexTable[val] = orderIdx;
+
+    //Set it to be this value too
+    pixelFormats[orderIdx].valueType = val;
+
+    orderStr++;
+    orderIdx++;
   }
 }
 
 bool csGraphics2DGLCommon::csGLPixelFormatPicker::PickNextFormat ()
 {
-  size_t startOrderPos = orderPos;
-
   bool formatPicked = false;
-  do
-  {
-    int nextValue = 0;
-    switch (order[orderPos++])
-    {
-      case 'c':
-	nextValue = glpfvColorBits;
-	break;
-      case 'a':
-	nextValue = glpfvAlphaBits;
-	break;
-      case 'd':
-	nextValue = glpfvDepthBits;
-	break;
-      case 's':
-	nextValue = glpfvStencilBits;
-	break;
-      case 'C':
-	nextValue = glpfvAccumColorBits;
-	break;
-      case 'A':
-	nextValue = glpfvAccumAlphaBits;
-	break;
-      case 'm':
-	nextValue = glpfvMultiSamples;
-	break;
-      default:
-	continue;
-    }
-    const size_t nextIndex = nextValueIndices[nextValue];
-    if (nextIndex < values[nextValue].Length())
-    {
-      currentValues[nextValue] = values[nextValue][nextIndex];
-      nextValueIndices[nextValue]++;
-      formatPicked = true;
-    }
-  }
-  while ((startOrderPos != (orderPos = orderPos % orderNum)) &&
-    !formatPicked);
 
-  return formatPicked;
+  for (size_t i = 0; i < glpfvValueCount; ++i)
+  {
+    currentValues[pixelFormats[i].valueType] = 
+      pixelFormats[i].possibleValues[pixelFormats[i].nextIndex];
+  }
+
+  // Increment
+  bool incComplete = true;
+  size_t indexToInc = 0;
+
+  do 
+  {
+    pixelFormats[indexToInc].nextIndex++;
+    incComplete = true;
+
+    if (pixelFormats[indexToInc].nextIndex >= 
+      pixelFormats[indexToInc].possibleValues.GetSize ())
+    {
+      //roll around
+      pixelFormats[indexToInc].nextIndex = pixelFormats[indexToInc].firstIndex;
+      incComplete = false;
+      indexToInc++;
+    }
+
+  } while(!incComplete && indexToInc < glpfvValueCount);
+
+  return incComplete;
 }
 
 void csGraphics2DGLCommon::csGLPixelFormatPicker::Reset()
 {
-  delete[] order;
-
   for (size_t v = 0; v < glpfvValueCount; v++)
   {
-    values[v].DeleteAll();
+    pixelFormats[v].possibleValues.DeleteAll();
   }
 
   ReadStartValues();
   ReadPickerValues();
   SetInitialIndices();
+  PickNextFormat ();
 }
 
 bool csGraphics2DGLCommon::csGLPixelFormatPicker::GetNextFormat (

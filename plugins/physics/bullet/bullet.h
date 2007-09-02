@@ -118,7 +118,7 @@ public:
   void AttachCollider (iDynamicsSystemCollider* collider);
   csRef<iDynamicsSystemCollider> CreateCollider ();
   csRef<iDynamicsSystemCollider> GetCollider (unsigned int index) 
-  {return colliders[index];}
+  {return csRef<iDynamicsSystemCollider> (colliders[index]);}
   int GetColliderCount () 
   {return (int) colliders.GetSize ();}
 

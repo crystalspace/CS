@@ -70,7 +70,7 @@ if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(JAVA) && $(JAVAC) && $(CMD.SWIG) &&
   Swig $(common) :
     [ DoSourceGrist cspace.i ] :
     java :
-    -c++ -java -package org.crystalspace3d :
+    -c++ -java -cpperraswarn -package org.crystalspace3d :
     [ ConcatDirs $(TOP) include ]
     [ ConcatDirs $(BUILDTOP) include ] :
     [ ConcatDirs $(TOP) include bindings ] :
@@ -95,7 +95,9 @@ if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(JAVA) && $(JAVAC) && $(CMD.SWIG) &&
   javamod_OBJECTS = $(javamodobj) ;
   LinkWith javamod : crystalspace ;
   ExternalLibs javamod : JAVA ;
-  CFlags javamod : $(PLUGIN.CFLAGS) $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) ;
+  CFlags javamod : $(COMPILER.CFLAGS.VISIBILITY_DEFAULT) $(PLUGIN.CFLAGS) 
+    $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) 
+    $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE) ;
   LFlags javamod : $(PLUGIN.LFLAGS) $(LINKLIBS) $(CSJAVA.LFLAGS) ;
   Depends csjava : $(javamod) ;
   MakeLocate $(javamod) : $(LOCATE.TARGETS) ;
