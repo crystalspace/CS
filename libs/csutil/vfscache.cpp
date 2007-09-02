@@ -77,8 +77,8 @@ bool csVfsCacheManager::CacheData (const void* data, size_t size,
   csStringFast<512> buf;
   GetVFS ()->PushDir ();
   GetVFS ()->ChDir (vfsdir);
-  CacheName (buf, type ? type : current_type,
-  	scope ? scope : current_scope, id);
+  CacheName (buf, type ? type : current_type.GetData(),
+  	scope ? scope : current_scope.GetData(), id);
   csRef<iFile> cf = GetVFS ()->Open (buf, VFS_FILE_WRITE);
   GetVFS ()->PopDir ();
 
@@ -108,8 +108,8 @@ csPtr<iDataBuffer> csVfsCacheManager::ReadCache (
   csStringFast<512> buf;
   GetVFS ()->PushDir ();
   GetVFS ()->ChDir (vfsdir);
-  CacheName (buf, type ? type : current_type,
-  	scope ? scope : current_scope, id);
+  CacheName (buf, type ? type : current_type.GetData(),
+  	scope ? scope : current_scope.GetData(), id);
   csRef<iDataBuffer> data (GetVFS ()->ReadFile (buf, false));
   GetVFS ()->PopDir ();
 
