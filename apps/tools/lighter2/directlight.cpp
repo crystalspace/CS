@@ -19,9 +19,10 @@
 #include "crystalspace.h"
 
 #include "directlight.h"
+#include "lightprop.h"
+#include "raytracer.h"
 #include "scene.h"
 #include "statistics.h"
-#include "raytracer.h"
 
 namespace lighter
 {
@@ -49,23 +50,72 @@ namespace lighter
         continue;
 
       // Iterate over primitives
-      float primProgressStep = lightProgressStep / prims.GetSize ();
-      for (unsigned i = 0; i < prims.GetSize (); i++)
+      switch (radLight->attenuation)
       {
-        globalStats.IncTaskProgress (primProgressStep);
-        ShadeRadPrimitive (rayTracer, *prims[i], radLight);
-        globalTUI.Redraw (TUI::TUI_DRAW_RAYCORE | TUI::TUI_DRAW_PROGRESS);
+        default:
+        case CS_ATTN_NONE:
+          {
+            NoAttenuation attn (*radLight);
+            ShadeRadPrimitives (sector, attn, rayTracer, prims, radLight, 
+              lightProgressStep);
+          }
+          break;
+        case CS_ATTN_LINEAR:
+          {
+            LinearAttenuation attn (*radLight);
+            ShadeRadPrimitives (sector, attn, rayTracer, prims, radLight, 
+              lightProgressStep);
+          }
+          break;
+        case CS_ATTN_INVERSE:
+          {
+            InverseAttenuation attn (*radLight);
+            ShadeRadPrimitives (sector, attn, rayTracer, prims, radLight, 
+              lightProgressStep);
+          }
+          break;
+        case CS_ATTN_REALISTIC:
+          {
+            RealisticAttenuation attn (*radLight);
+            ShadeRadPrimitives (sector, attn, rayTracer, prims, radLight, 
+              lightProgressStep);
+          }
+          break;
+        case CS_ATTN_CLQ:
+          {
+            CLQAttenuation attn (*radLight);
+            ShadeRadPrimitives (sector, attn, rayTracer, prims, radLight, 
+              lightProgressStep);
+          }
+          break;
       }
-
     }
   }
 
-  void DirectLighting::ShadeRadPrimitive(Raytracer &tracer, RadPrimitive &prim, 
+  template<class Attenuation>
+  void DirectLighting::ShadeRadPrimitives (Sector* sector, 
+                                           const Attenuation& attn, 
+                                           Raytracer &rayTracer, 
+                                           RadPrimitivePtrArray& prims, 
+                                           Light* light, 
+                                           float progressStep)
+  {
+    float primProgressStep = progressStep / prims.GetSize ();
+    for (unsigned i = 0; i < prims.GetSize (); i++)
+    {
+      globalStats.IncTaskProgress (primProgressStep);
+      ShadeRadPrimitive (sector, attn, rayTracer, *prims[i], light);
+      globalTUI.Redraw (TUI::TUI_DRAW_RAYCORE | TUI::TUI_DRAW_PROGRESS);
+    }
+  }
+
+  template<class Attenuation>
+  void DirectLighting::ShadeRadPrimitive (Sector* sector, 
+    const Attenuation& attn, Raytracer &tracer, RadPrimitive &prim, 
     Light *light)
   {
     // Compute shading for each point on the primitive, using normal Phong shading
     // for diffuse surfaces
-
     csVector3 elementCenter = prim.GetMinCoord () + prim.GetuFormVector () * 0.5f + prim.GetvFormVector () * 0.5f;
 
     int minU, minV, maxU, maxV;
@@ -96,14 +146,14 @@ namespace lighter
         //float visFact = 1.0f;
         
         // refl = reflectance * lightsource * cos(theta) / distance^2 * visfact
-        float phongConst = cosTheta_j / distSq;
+        float phongConst = attn (cosTheta_j, distSq);
 
         // energy
         csColor energy = light->freeEnergy * phongConst * visFact;
         csColor reflected = energy * prim.GetOriginalPrimitive ()->GetReflectanceColor();
 
         // Store the reflected color
-        Lightmap * lm = prim.GetRadObject ()->GetLightmaps ()[prim.GetLightmapID ()];
+        Lightmap * lm = sector->scene->GetLightmaps ()[prim.GetGlobalLightmapID ()];
         lm->GetData ()[v*lm->GetWidth ()+u] += reflected;
         
 

@@ -107,17 +107,6 @@
 #define WINVER 0x0400
 #endif
 
-// Although MSVC6 generally supports templated functions within templated
-// classes, nevertheless it crashes and burns horribly when arguments to those
-// functions are function-pointers or functors.  In fact, such usage triggers a
-// slew of bugs, mostly "internal compiler error" but also several other
-// Worse, the bugs manifest in "random" locations throughout the project, often
-// in completely unrelated code.  Consequently, instruct csArray<> to avoid
-// such usage for MSVC6.
-#if defined(CS_COMPILER_MSVC) && (_MSC_VER < 1300)
-#define CSARRAY_INHIBIT_TYPED_KEYS
-#endif
-
 // So many things require this. IF you have an issue with something defined
 // in it then undef that def here.
 

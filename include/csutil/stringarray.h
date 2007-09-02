@@ -108,7 +108,7 @@ public:
    * \return csArrayItemNotFound if not found, else item index.
    * \remarks The array must be sorted.
    */
-  size_t FindSortedKey (csArrayCmpDecl(char const*, char const*) comparekey,
+  size_t FindSortedKey (csArrayCmp<char const*, char const*> comparekey,
     size_t* candidate = 0) const
   {
     return superclass::FindSortedKey(comparekey, candidate);

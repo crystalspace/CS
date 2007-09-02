@@ -156,7 +156,7 @@ struct iConfigFile : public virtual iBase
  */
 struct iConfigIterator : public virtual iBase
 {
-  SCF_INTERFACE(iConfigIterator, 2,0,0);
+  SCF_INTERFACE(iConfigIterator, 2,1,0);
   /// Returns the configuration object for this iterator.
   virtual iConfigFile *GetConfigFile () const = 0;
   /// Returns the subsection in the configuration.
@@ -166,6 +166,9 @@ struct iConfigIterator : public virtual iBase
   virtual void Rewind () = 0;
   /// Move to the next valid key. Returns false if no more keys exist.
   virtual bool Next() = 0;
+  /// Return whether there is another valid key.
+  virtual bool HasNext() = 0;
+
 
   /**
    * Get the current key name.  Set Local to true to return only the local name
@@ -182,6 +185,8 @@ struct iConfigIterator : public virtual iBase
   virtual const char *GetStr () const = 0;
   /// Get a boolean value from the configuration.
   virtual bool GetBool () const = 0;
+  /// Get a tuple set from the configuration.
+  virtual csPtr<iStringArray> GetTuple() const = 0;
   /// Get the comment of the given key, or 0 if no comment exists.
   virtual const char *GetComment () const = 0;
 };

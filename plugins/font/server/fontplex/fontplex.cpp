@@ -141,8 +141,9 @@ bool csFontServerMultiplexer::Initialize (iObjectRegistry *object_reg)
   if (fontset) mapKey << fontset << '.';
   
   csRef<iConfigIterator> mapEnum (config->Enumerate (mapKey));
-  while (mapEnum->Next ())
+  while (mapEnum->HasNext ())
   {
+    mapEnum->Next();
     const char* pluginName = mapEnum->GetStr ();
     csRef<iFontServer> fs = csLoadPluginCheck<iFontServer> (object_reg, 
       pluginName);

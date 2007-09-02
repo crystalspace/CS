@@ -38,7 +38,7 @@
 
 #ifndef CSHASHCOMPUTER_EVENTENGINE_IDS
 #define CSHASHCOMPUTER_EVENTENGINE_IDS
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<const csEventID>
 {
 public:

@@ -41,6 +41,7 @@ public:
   bool enableCombine;
   bool enableCrossbar;
   GLint texUnits;
+  bool fixedFunctionForcefulEnable;
 
   csLightShaderVarCache lsvCache;
 

@@ -134,6 +134,9 @@ public:
   /// Set additional float map.
   bool SetFloatMap (csStringID type, iImage* map, float scale, float offset);
 
+  /// Get the integer map dimensions.
+  virtual csVector2 GetIntegerMapSize (csStringID type);
+
   /// Set the directory containing the heightmaps
   void SetIntmapDir (csStringID type, const char* path);
 

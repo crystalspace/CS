@@ -458,10 +458,10 @@
       <arg name="coord" type="GLdouble" const="false" pointer="false" />
     </function>
     <function name="glFogCoordfv" return="GLvoid" pointer="false">
-      <arg name="coord" type="GLfloat" const="false" pointer="false" />
+      <arg name="coord" type="GLfloat" const="false" pointer="true" />
     </function>
     <function name="glFogCoorddv" return="GLvoid" pointer="false">
-      <arg name="coord" type="GLdouble" const="false" pointer="false" />
+      <arg name="coord" type="GLdouble" const="false" pointer="true" />
     </function>
     <function name="glFogCoordPointer" return="GLvoid" pointer="false">
       <arg name="type" type="GLenum" const="false" pointer="false" />
@@ -528,28 +528,28 @@
       <arg name="components" type="GLuint" const="false" pointer="false" />
     </function>
     <function name="glSecondaryColor3bv" return="GLvoid" pointer="false">
-      <arg name="components" type="GLbyte" const="false" pointer="false" />
+      <arg name="components" type="GLbyte" const="false" pointer="true" />
     </function>
     <function name="glSecondaryColor3sv" return="GLvoid" pointer="false">
-      <arg name="components" type="GLshort" const="false" pointer="false" />
+      <arg name="components" type="GLshort" const="false" pointer="true" />
     </function>
     <function name="glSecondaryColor3iv" return="GLvoid" pointer="false">
-      <arg name="components" type="GLint" const="false" pointer="false" />
+      <arg name="components" type="GLint" const="false" pointer="true" />
     </function>
     <function name="glSecondaryColor3fv" return="GLvoid" pointer="false">
-      <arg name="components" type="GLfloat" const="false" pointer="false" />
+      <arg name="components" type="GLfloat" const="false" pointer="true" />
     </function>
     <function name="glSecondaryColor3dv" return="GLvoid" pointer="false">
-      <arg name="components" type="GLdouble" const="false" pointer="false" />
+      <arg name="components" type="GLdouble" const="false" pointer="true" />
     </function>
     <function name="glSecondaryColor3ubv" return="GLvoid" pointer="false">
-      <arg name="components" type="GLubyte" const="false" pointer="false" />
+      <arg name="components" type="GLubyte" const="false" pointer="true" />
     </function>
     <function name="glSecondaryColor3usv" return="GLvoid" pointer="false">
-      <arg name="components" type="GLushort" const="false" pointer="false" />
+      <arg name="components" type="GLushort" const="false" pointer="true" />
     </function>
     <function name="glSecondaryColor3uiv" return="GLvoid" pointer="false">
-      <arg name="components" type="GLuint" const="false" pointer="false" />
+      <arg name="components" type="GLuint" const="false" pointer="true" />
     </function>
     <function name="glSecondaryColorPointer" return="GLvoid" pointer="false">
       <arg name="size" type="GLint" const="false" pointer="false" />
@@ -2793,10 +2793,10 @@
       <arg name="coord" type="GLdouble" const="false" pointer="false" />
     </function>
     <function name="glFogCoordfvEXT" return="GLvoid" pointer="false">
-      <arg name="coord" type="GLfloat" const="false" pointer="false" />
+      <arg name="coord" type="GLfloat" const="false" pointer="true" />
     </function>
     <function name="glFogCoorddvEXT" return="GLvoid" pointer="false">
-      <arg name="coord" type="GLdouble" const="false" pointer="false" />
+      <arg name="coord" type="GLdouble" const="false" pointer="true" />
     </function>
     <function name="glFogCoordPointerEXT" return="GLvoid" pointer="false">
       <arg name="type" type="GLenum" const="false" pointer="false" />
@@ -3009,28 +3009,28 @@
       <arg name="components" type="GLuint" const="false" pointer="false" />
     </function>
     <function name="glSecondaryColor3bvEXT" return="GLvoid" pointer="false">
-      <arg name="components" type="GLbyte" const="false" pointer="false" />
+      <arg name="components" type="GLbyte" const="false" pointer="true" />
     </function>
     <function name="glSecondaryColor3svEXT" return="GLvoid" pointer="false">
-      <arg name="components" type="GLshort" const="false" pointer="false" />
+      <arg name="components" type="GLshort" const="false" pointer="true" />
     </function>
     <function name="glSecondaryColor3ivEXT" return="GLvoid" pointer="false">
-      <arg name="components" type="GLint" const="false" pointer="false" />
+      <arg name="components" type="GLint" const="false" pointer="true" />
     </function>
     <function name="glSecondaryColor3fvEXT" return="GLvoid" pointer="false">
-      <arg name="components" type="GLfloat" const="false" pointer="false" />
+      <arg name="components" type="GLfloat" const="false" pointer="true" />
     </function>
     <function name="glSecondaryColor3dvEXT" return="GLvoid" pointer="false">
-      <arg name="components" type="GLdouble" const="false" pointer="false" />
+      <arg name="components" type="GLdouble" const="false" pointer="true" />
     </function>
     <function name="glSecondaryColor3ubvEXT" return="GLvoid" pointer="false">
-      <arg name="components" type="GLubyte" const="false" pointer="false" />
+      <arg name="components" type="GLubyte" const="false" pointer="true" />
     </function>
     <function name="glSecondaryColor3usvEXT" return="GLvoid" pointer="false">
-      <arg name="components" type="GLushort" const="false" pointer="false" />
+      <arg name="components" type="GLushort" const="false" pointer="true" />
     </function>
     <function name="glSecondaryColor3uivEXT" return="GLvoid" pointer="false">
-      <arg name="components" type="GLuint" const="false" pointer="false" />
+      <arg name="components" type="GLuint" const="false" pointer="true" />
     </function>
     <function name="glSecondaryColorPointerEXT" return="GLvoid" pointer="false">
       <arg name="size" type="GLint" const="false" pointer="false" />
@@ -7403,5 +7403,11 @@
     <token name="GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT" value="0x8C4D" />
     <token name="GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT" value="0x8C4E" />
     <token name="GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT" value="0x8C4F" />
+  </extension>
+  <extension name="GL_EXT_packed_depth_stencil" type="GL">
+    <token name="GL_DEPTH_STENCIL_EXT" value="0x84F9" />
+    <token name="GL_UNSIGNED_INT_24_8_EXT" value="0x84FA" />
+    <token name="GL_DEPTH24_STENCIL8_EXT" value="0x88F0" />
+    <token name="GL_TEXTURE_STENCIL_SIZE_EXT" value="0x88F1" />
   </extension>
 </extensionlist>

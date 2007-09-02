@@ -24,6 +24,7 @@
 #include "csutil/scf_implementation.h"
 #include "csutil/flags.h"
 #include "csutil/radixsort.h"
+#include "csutil/weakref.h"
 
 #include "imesh/object.h"
 #include "imesh/particles.h"
@@ -304,15 +305,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     csRefArray<iParticleEffector> effectors;
   };
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
   /**
   * Particle mesh object
   */
-  class ParticlesMeshObject : public scfImplementationExt4<ParticlesMeshObject,
+  class ParticlesMeshObject : public scfImplementationExt3<ParticlesMeshObject,
                                                            csObjectModel,
                                                            iMeshObject,
                                                            iParticleSystem,
-                                                           scfFakeInterface<iParticleSystemBase>,
-                                                           iRenderBufferAccessor>
+                                                           scfFakeInterface<iParticleSystemBase> >
   {
   public:
     /// Constructor
@@ -614,10 +616,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
       return effectors.GetSize ();
     }
 
-    //-- iRenderBufferAccessor
-    virtual void PreGetBuffer (csRenderBufferHolder* holder, 
-      csRenderBufferName buffer);
-
+    
   private:
     friend class ParticlesMeshFactory;
     ParticlesMeshFactory* factory;
@@ -669,7 +668,36 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     //-- iRenderBufferAccessor
     csRef<iRenderBuffer> tcBuffer;
     csRef<iRenderBuffer> colorBuffer;
+
+    //-- iRenderBufferAccessor
+    void PreGetBuffer (csRenderBufferHolder* holder, 
+      csRenderBufferName buffer);
+
+
+    class RenderBufferAccessor : 
+      public scfImplementation1<RenderBufferAccessor, iRenderBufferAccessor>
+    {
+    public:
+      CS_LEAKGUARD_DECLARE (RenderBufferAccessor);
+      csWeakRef<ParticlesMeshObject> parent;
+      virtual ~RenderBufferAccessor () { }
+      RenderBufferAccessor (ParticlesMeshObject* parent)
+        : scfImplementationType (this)
+      {
+        this->parent = parent;
+      }
+      virtual void PreGetBuffer (csRenderBufferHolder* holder,
+        csRenderBufferName buffer)
+      {
+        if (parent) parent->PreGetBuffer (holder, buffer);
+      }
+    };
+    csRef<RenderBufferAccessor> renderBufferAccessor;
+
   };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
+
 }
 CS_PLUGIN_NAMESPACE_END(Particles)
 

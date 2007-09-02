@@ -46,7 +46,7 @@ private:
     size_t get_granularity() const { return S::size; }
     size_t get_element_size() const { return S::elsize; }
     size_t get_block_size() const { return S::blocksize; }
-    size_t get_block_count() const { return S::blocks.GetSize(); }
+    size_t get_block_count() const { return S::blocks.b.GetSize(); }
     csBitArray get_allocation_map() const { return S::GetAllocationMap(); }
   };
 

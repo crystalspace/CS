@@ -6,6 +6,264 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Oct-2006
+	- res fixed genmesh to also support Compress() when submeshes are
+	  present.
+10-Oct-2006
+	- mdmkolbe fixed searching of Cygwin paths.
+	- mdmkolbe added CS_CONFIGDIR to configuration search paths on Cygwin.
+	- Marten added a "outward spiral" term to spiral particle effector.
+9-Oct-2006
+	- res fixed a problem in the iConfigIterator::HasNext() which
+	  manifested itself in scrambled "could not load plugin" messages
+	  and subsequent crash on startup.
+	- res updated the documentation transform script for the new site
+	  search URL.
+	- res slightly tweaked the API docs search box style.
+	- Marten added a "velocity-field" particle effector.
+8-Oct-2006
+	- res added iConfigIterator::HasNext(), loosely based on a patch by
+	  Timothy "kiolakin" Whitfield.
+7-Oct-2006
+	- Jorrit added a test to csPhysicalFile so that it no longer
+	  succeeds on directories.
+	- res fixed the font cache to more gracefully handle nested 
+	  CacheGlyph() calls. Fixes trac #164.
+	- res changed the reporter to avoid nested calls into listeners (ie
+	  when Report() is called while being inside Report()) since that may
+	  "confuse" the listeners and lead to weird side effects. Instead,
+	  queue up messages that are reported while in the reporter.
+6-Oct-2006
+	- Genjix added iVFS::SymbolicLink function.
+	- caedes added kwartz and castle to Jamfiles.
+	- Marten added a RK45 ODE solver to be used in particle effector.
+	- res slightly reworded the section on procedural textures. Also added
+	  "performance hints".
+	- res changed the genmesh loader and saver to also accept factory 
+	  submeshes without a material.
+	- res made the following changes to lighter2, among others:
+	    - Support light attenuation.
+	    - Lightmaps are now distributed globally (and not one lightmap per
+	      mesh object).
+	    - Genmesh submeshes are handled better.
+	    - Better handle unknown mesh types.
+5-Oct-2006
+        - Genjix added csPython::LoadModule (path, file).
+	- Marten changed win32 version resource generation so it strips
+	  any RCxxx tags, appearantly they trip the mingw resource
+	  compiler.
+        - Piotr does bug fixes after yesterdays joints commit. Additionally he
+          comments out unnecessary code in phystut.
+	- mdmkolbe added a comment to the code explaining why one of the
+	  reinterpret_casts was used.
+	- Erroroman changed render buffer "bones indices" elements type from
+	  int to float because of slow hardware animation reported by people
+	  that uses Windows and ATI video cards. Nvidia cards doesn't have
+	  such problem so probably cases about driver problem.
+	- Erroroman adopted kwartz model and the animation shaders to the new
+	  type of the render buffer.
+	- Erroroman improoved the script for exporting skeletal meshes from
+	  3ds max (still not fully finished)and added some more info to 
+	  the README file.
+4-Oct-2006
+	- Jorrit updated startme:
+	    - Made the icons show from top to bottom.
+	    - Removed particles and awstest demos.
+	    - Changed screenshot for walktest to castle screenshot.
+	- mdmkolbe eliminated improper reinterpret_cast calls with extreme
+	  prejudice.  (Casting from a 'void*' should use static_cast.)
+	- Marten reverted one of mdmkolbes changes. _beginthreadex does
+	  not always return a void*, on some versions of MSVC it gives
+	  uintptr_t and therefor needs the reinterpret_cast.
+	- Marten hopefully fixed the particle "clumping" when emitting 
+	  particles with velocity.
+        - Piotr added angular constraint axis joint parameter which should
+          be anchored to specyfied body (it lets angular stops to be effective
+          when joint have free rotation along all axes in ode dynamics 
+          implementation - "ball joint" limitation).
+        - Piotr cleaned iODEJointState interface (it lets user to change ode
+          specyfic parameters for joints made via iJoint interface).
+3-Oct-2006
+	- mdmkolbe fixed an uninitialized variable that broke procedural
+	  textures on Cygwin.
+	- Jorrit committed a new extrudeGlow shader from Anders Wisur.
+	  Still experimental.
+	- Jorrit added a few missing Jamfile's in the data/shader directory.
+	- Jorrit changed all the attenuation based shaders (parallaxAtt,
+	  specular, character, ...) to calculate attenuation a bit
+	  differently so that the resulting lighting is brighter for the
+	  same radius of the light. This makes the lighting intensity
+	  more matched up with the lighting as calculated by the lightmapper.
+	  Another benefit of this change is that it improves speed as
+	  you can now reduce the light radius with same visual effect.
+	- Jorrit reduces the light radius in castle level.
+	- Marten fixed a corner case in csQuaternion::Exp and 
+	  csQuaternion::Log as well as some accuracy and efficiency parts in
+	  skeleton spline calculation.
+	- Jorrit added a fallback for light_bumpmap to the light specular
+	  shader. That means that parallaxAtt will also correctly fallback
+	  to light_bumpmap if CG is not available or fails.
+	- Marten fixed a bug in the shader manager which caused shader manager
+	  (the global) SVs not to be properly pushed to the SV stack.
+2-Oct-2006
+	- res removed the resolution and windowed vs fullscreen message from
+	  null3d.
+	- Marten fixed csQuaternion::Exp and csQuaternion::Log to actually be
+	  the exponential and logarithmic functions.
+1-Oct-2006
+	- Marten implemented pthread thread and condition variables classes 
+	  with new interface. The new improved implementation of threading
+	  should now be fully functional.
+	- res silenced more MSVC deprecation warnings.
+	- res fixed some locals in CS::TriangleIndicesStream to use the 
+	  template parameter.
+	- res added iShaderVariableContext::RemoveVariable (csShaderVariable*).
+	- caedes removed stdtex from data Jamfile.
+30-Sep-2006
+	- res fixed some MSVC warnings.
+	- res fixed some wrong GL extension function declarations and added
+	  the GL_EXT_packed_depth_stencil ext.
+	- res changed scfImplementationPooled to use C++ cast operators and
+	  the CS memory allocator.
+	- res changed makeGLMatrix to optionally convert to a row-major 
+	  matrix.
+	- res copied a more elaborate version of GetTuple() into 
+	  csWin32RegistryIterator.
+	- res changed the Cg plugin to define a preprocessor macro
+	  PROGRAM_TYPE_FRAGMENT or PROGRAM_TYPE_VERTEX, depending on the type.
+29-Sep-2006
+	- res removed the following compatiblity hacks for older compilers
+	  (which would likely not be able to cope with CS' use of advanced
+	  C++ features anyway): 'typename_qualifier', fake 'explicit' 
+	  keyword, CS_SPECIALIZE_TEMPLATE instead of template<>, 
+	  CSARRAY_INHIBIT_TYPED_KEYS. Adresses trac #16.
+	- Jorrit added a workaround for GetTuple() in windows so that
+	  it at least compiles. MacOS/X is still broken and the GetTuple()
+	  implementation in Windows just returns 0.
+	- Jorrit changed flarge to use the new kwartz model. The kwartz
+	  model is also updated to work nicely with software lighting.
+	- Jorrit added kwartz model to isotest app. Unfortunatelly it is not
+	  yet lit there though. Still have to check why.
+	- Jorrit added textures from new castle level to CS. Castle level
+	  will soon follow.
+	- Jorrit merged stdtex.zip into standard.zip.
+	- Jorrit added the indoor castle level from Anders Wisur to svn
+	  and made it default.
+	- Jorrit added license note to castle level and castle textures.
+	  Castle uses Creative Commons NC:
+	  http://creativecommons.org/licenses/by-nc/2.5
+	- Jorrit made castle default level in walktest now.
+	- Erroroman optimized character_bump2.cgvp by calculating bitangent
+	  as cross product of normal and tangent. Also removed bitangent
+	  from tehnique 150 in character_bump2.xml.
+	- Jorrit added a 'arb128_limit' tag to gldrivers.xml and enabled
+	  it for Intel Graphics. This tag means that the 3D card will
+	  not support ARB assembly programs of more then 128 instructions.
+	  The character2 shaders use this tag in the 150 technique (hardware
+	  animation). This means that on Intel Graphics software animation
+	  will be used.
+	- Jorrit got a patch from res2k which makes sure that CG techniques
+	  that generate programs that are too big for the card will really
+	  fail now. That means that the workaround in gldrivers.xml is
+	  no longer required.
+	- Erroroman added more API docs in skeleton.h
+	- Marten added first part of reimplemented threading subsystem.
+	- Marten fixed compilation on MSVC after res cleanup earlier.
+28-Sep-2006
+	- mdmkolbe changed walktest to exit with code 0 on normal exits.
+	- mdmkolbe blind committed a change by Timothy "kiolakin" Whitfield
+	  that will allow for skyboxes by letting each mesh specify its own
+	  zbuffer mode.
+	- mdmkolbe converted plugins/bugplug to the new SCF.
+	- caedes added std_character2 and std_character_fixed2 shaders so
+	  genmesh animation system can be used with standard lighting.
+	- res changed gl3d DeactivateBuffers() to also deactivate vertex 
+	  attributes.
+	- Erroroman added Log, Exp and Squad methods to csQuaternion.
+	- Erroroman made spline rotatin of skeleton animation and 
+	  improved a bit the skeleton the code. 
+	- Erroroman added basic API docs to the skeleton interface.
+	- res changed the Cg plugin to cache the profile of a program.
+	- res devised an alternative workaround for corruption occuring on
+	  ATI cards. Further investigation leads to that the corruption shows 
+	  up after ARB programs are disabled; apparently this does not work 
+	  correctly. A workaround is to change a fixed function state and call 
+	  glBegin()/glEnd() without specifying any vertices. Hopefully helps
+	  for trac #18.
+27-Sep-2006
+	- mdmkolbe enabled separate debug info by default on compatible
+	  versions of Cygwin's binutils.
+	- Jorrit removed the particles level after merging the particles
+	  there with partsys.
+	- Jorrit removed the fountain mesh object.
+	- Jorrit removed csNewParticleSystem since this class is no longer
+	  being used.
+	- Genjix corrected iutil/iConfigIterator not implementing GetTuple.
+26-Sep-2006
+	- Timothy Whitfield (kiokalin) fixed the paging former so that it
+	  actually works now. It is also seamless.
+	- Jorrit removed the fire particle system.
+	- res disabled strict aliasing for wxgl and wxtest (some WX headers
+	  cause aliasing warnings in optimize mode with gcc 4.1.1).
+	- res committed a patch from <oh.hello.joe@gmail.com> to add a
+	  driver DB entry to work around a crash on some old version of the
+	  i810 DRI driver.
+25-Sep-2006
+	- Jorrit added the new kwartz.zip to vfs.
+24-Sep-2006
+        - Piotr did some tweaks to phystut app, now walls colliders should
+          work better with ode engine.
+	- Jorrit changed the flame command in walktest to use new particles.
+	- Jorrit replaced the two fire particle systems in partsys
+	  with new particles.
+23-Sep-2006
+	- Marten disabled global overridden malloc and free.
+22-Sep-2006
+	- Jorrit changed the built-in force effector for new particles so
+	  that the random acceleration is now a vector. That means you can
+	  get different magnitude for the random acceleration in x, y, and
+	  z direction. This affects the method
+	  iParticleBuiltinEffectorForce->SetRandomAcceleration().
+	  The loader is also changed. The old syntax of using a single value
+	  is still supported (and will automatically be interpreted as using
+	  a vector with three identical values). If you specify x, y, and z
+	  attributes in the <randomacceleration> tag then it will be
+	  interpreted as a vector.
+	- Jorrit fixed rain so that the particles start at the top and also
+	  made sure that the time to live is exactly long enough for the
+	  height of the current sector.
+	- Jorrit changed the snow in partsys to use new particles.
+	- Jorrit changed the snow in walktest (snow console command) to use
+	  new particles.
+	- Jorrit added documentation about converting snow to new particles.
+	- Jorrit removed the old snow mesh object.
+21-Sep-2006
+	- Jorrit added a new section to the API mod doc which explains how
+	  to convert old particle systems to the new particle system.
+	  Only the explosion particle system is documented for now.
+	- Jorrit removed the explosion particle system from CS.
+	- Marten fixed the box emitter in the new particle system so that it
+	  isn't double as big as it should be.
+	- Jorrit converted the rain particle system in partsys and the
+	  code in walktest to create rain to use the new particle system.
+	- Jorrit removed the rain particle system and documented how to convert
+	  from rain to new particles.
+	- caedes augmented CS_CHECK_PROG_VERSION so that it exports a variable
+	  with found version for the checked program.
+	- caedes made some more changes to pycegui configure test to make it
+	  more robust.
+20-Sep-2006
+	- Marten disabled the global overrides of operator new and operator
+	  delete due to the interoperability problems it causes.
+	- Marten fixed unit tests to compile and run, trac #85.
+	- Marten fixed circular ref problem in particles, trac #143.
+	- res changed the configure platform check to normalize powerpc* to
+	  powerpc. Adresses trac #137.
+	- res fixed the Cg shader plugin to also take compiler options from
+	  the configuration when fragment program routing is used.
+	- res added the definition of a preprocessor macro that contains the
+	  fragment program version when compiling fragment progtams to the Cg
+	  shader plugin.
 19-Sep-2006
         - Genjix documented a little csIntersect3 behaviour.
 	- caedes added cscript/pycscegui, an additional python module that
@@ -2208,7 +2466,7 @@ chronological order.
 	  GNU/Linux, gcc 3.4.4.
 	- res fixed a couple of shared lib issues.
 2-Mar-2006
-	- Fossi commited another backup of the paging terrain.
+	- Fossi committed another backup of the paging terrain.
 	- Fossi copied priority 50 to terrain_fixed_base, so that terrain
 	  does at least show on old hardware.
 	- Jorrit fixed iObjectRegistryIterator so that it doesn't skip the
@@ -2264,7 +2522,7 @@ chronological order.
 28-Feb-2006
 	- Jorrit fixed csStringArray::SplitString() with option delimIgnore
 	  so that it actually does what it is advertized to do.
-	- Jorrit commited the workarounds for CG related problems on some
+	- Jorrit committed the workarounds for CG related problems on some
 	  3d cards. This should fix disco effects on terrainf, incorrect
 	  point sprites and incorrect portals. Note that these are
 	  workarounds! We need real fixes.
@@ -2322,7 +2580,7 @@ chronological order.
 	- res added csApplicationFramework::OnCommandLineHelp().
 	- res modernized pysimp.
 23-Feb-2006
-	- caedes commited a patch he prepared with rhohr that fixes the python
+	- caedes committed a patch he prepared with rhohr that fixes the python
 	  SetupEventHandler, the python event handler itself and the python
 	  tutorials. All this was broken since last event system changes. Now
 	  python only cs apps can again be made.
@@ -3331,7 +3589,7 @@ chronological order.
         - BigG Removed unnecessary call to Texture Manager in sndtest.cpp
         - BigG modified g2d.cpp - csGraphics2DDDraw3::PerformExtensionV to
           meet code standards. Removed unused variables.
-	- caedes commited changes to pysimp script, as he forgot after fixing
+	- caedes committed changes to pysimp script, as he forgot after fixing
 	  it on 15-Dec-2005.
 	- Jorrit continued work on the mesh generator. Still not functional.
 	  Removed the iMeshGeneratorMapping interface.
@@ -5134,7 +5392,7 @@ chronological order.
 	  members to 0.
 	- res changed the names of the "STANDARD_LIGHT_0_FOO" shader variables
 	  to "light 0 foo".
-	- Marten commited recent work to the lighter. It is right now added
+	- Marten committed recent work to the lighter. It is right now added
 	  as lighter2 but later it will replace the current ligter. Also
 	  applied older changes to old lighter.
 	- Marten added two helpers which operates on iDocument* structures

@@ -373,7 +373,7 @@ template <class Interface>
 class scfInterfaceTraits
 {
 public:
-  typedef typename_qualifier Interface::InterfaceTraits::InterfaceType 
+  typedef typename Interface::InterfaceTraits::InterfaceType 
     InterfaceType;
 
   /*
@@ -445,7 +445,7 @@ private:
  */
 #define SCF_VERSION(Name,Major,Minor,Micro)                \
 struct Name;                                               \
-CS_SPECIALIZE_TEMPLATE                                     \
+template<>                                                 \
 class scfInterfaceTraits<Name>                             \
 {                                                          \
 public:                                                    \

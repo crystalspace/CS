@@ -26,7 +26,9 @@
 namespace lighter
 {
   class LightmapUVLayouter;
+  class LightmapUVLayoutFactory;
   class RadObject;
+  class Scene;
 
   /**
    * Hold per object vertex data
@@ -101,11 +103,7 @@ namespace lighter
   public:
     RadObjectFactory ();
 
-    // Compute lightmap coordinates for this factory. Returns true on success
-    virtual bool ComputeLightmapUV (LightmapUVLayouter* layoutEngine);
-
-    // Renormalize lightmap UVs
-    virtual void RenormalizeLightmapUVs ();
+    virtual bool PrepareLightmapUV (LightmapUVLayouter* uvlayout);
 
     // Get a new object
     virtual RadObject* CreateObject ();
@@ -122,13 +120,10 @@ namespace lighter
   protected:
 
     // All faces, untransformed
-    RadPrimitiveArray allPrimitives;
+    csArray<RadPrimitiveArray> allPrimitives;
 
     // Vertex data for above faces
     RadObjectVertexData vertexData;
-
-    // Size of the required lightmaps
-    LightmapPtrDelArray lightmapTemplates;
 
     // Lightmap masks
     LightmapMaskArray lightmapMasks;
@@ -139,7 +134,9 @@ namespace lighter
 
     // String identifying the saver plugin. Should be set from derived
     // classes
-    csString saverPluginName;
+    const char* saverPluginName;
+
+    csPDelArray<LightmapUVLayoutFactory> lightmaplayouts;
 
     friend class RadObject;
   };
@@ -160,28 +157,27 @@ namespace lighter
 
     // Initialize the RadObject from factory and wrapper. Call only after
     // constructor and ParseMesh have been called
-    virtual void Initialize ();
+    virtual bool Initialize ();
+
+    // Renormalize lightmap UVs
+    virtual void RenormalizeLightmapUVs (const LightmapPtrDelArray& lightmaps);
+
+    // Remove lightmap SVs. Add names of used lightmap textures to set
+    virtual void StripLightmaps (csSet<csString>& lms);
 
     // Parse data
     virtual void ParseMesh (iMeshWrapper *wrapper);
 
     // Write out the data again
-    virtual void SaveMesh (iDocumentNode *node);
+    virtual void SaveMesh (Scene* scene, iDocumentNode *node);
 
     // Fixup the lightmap borders
-    virtual void FixupLightmaps ();
+    virtual void FixupLightmaps (LightmapPtrDelArray& lightmaps);
 
-    // Accessor 
-    const LightmapPtrDelArray& GetLightmaps () const 
-    { return lightmaps; }
-
-    LightmapPtrDelArray& GetLightmaps () 
-    { return lightmaps; }
-
-    const RadPrimitiveArray& GetPrimitives () const
+    const csArray<RadPrimitiveArray>& GetPrimitives () const
     { return allPrimitives; }
 
-    RadPrimitiveArray& GetPrimitives ()
+    csArray<RadPrimitiveArray>& GetPrimitives ()
     { return allPrimitives; }
     
     const RadObjectVertexData& GetVertexData () const
@@ -195,13 +191,11 @@ namespace lighter
 
   protected:
     // All faces, already transformed
-    RadPrimitiveArray allPrimitives;
+    csArray<RadPrimitiveArray> allPrimitives;
+    csArray<uint> lightmapIDs;
 
     // Vertex data for above, transformed
     RadObjectVertexData vertexData;
-
-    // Lightmaps associated with this mesh
-    LightmapPtrDelArray lightmaps;
 
     // Factory we where created from
     RadObjectFactory* factory;
@@ -209,32 +203,14 @@ namespace lighter
     // Reference to the mesh
     iMeshWrapper *meshWrapper;
 
+    // String identifying the saver plugin. Should be set from derived
+    // classes
+    const char* saverPluginName;
+
     friend class  RadObjectFactory;
   };
   typedef csRefArray<RadObject> RadObjectRefArray;
   typedef csHash<csRef<RadObject>, csString> RadObjectHash;
-
-  //////////////////////////////////////////////////////////////////////////
-  // SPECIFIC VERISONS
-  //////////////////////////////////////////////////////////////////////////
-  
-  //////////////   Genmesh     /////////////////////////////////////////////
-  class RadObjectFactory_Genmesh : public RadObjectFactory
-  {
-  public:
-    RadObjectFactory_Genmesh ();
-
-    // Parse data
-    virtual void ParseFactory (iMeshFactoryWrapper *factory);
-
-    // Write out the data again
-    virtual void SaveFactory (iDocumentNode *node);
-  protected:
-
-    // Extra data saved
-    csVector3 *normals;
-  };
-
 }
 
-#endif
+#endif // __RADOBJECT_H__

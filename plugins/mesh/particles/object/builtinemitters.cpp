@@ -151,7 +151,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
     const csReversibleTransform* const emitterToParticle)
   {
     const csVector2& size = system->GetParticleSize ();
-    const csVector3& boxSize = genBox.GetSize ();
+    const csVector3 boxSize = genBox.GetSize () * 0.5f;
 
     csVector3 globalPos = position + genBox.GetCenter ();
     csMatrix3 mat = genBox.GetMatrix ();

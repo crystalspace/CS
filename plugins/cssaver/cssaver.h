@@ -39,7 +39,7 @@ class csSaver : public scfImplementation2<csSaver, iSaver, iComponent>
   csRef<iEngine> engine;
   csRef<iSyntaxService> synldr;
   csRef<iPluginManager> plugin_mgr;
-  csHash<csStrKey, csStrKey> plugins;
+  csHash<csString, csString> plugins;
   csRef<iDocumentNode> before;
   iRegion* curRegion;
   int fileType;

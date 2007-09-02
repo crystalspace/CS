@@ -82,31 +82,31 @@ public:
 /**
  * csHashComputer<> specialization for an integral type.
  */
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<void*> : public csHashComputerIntegral<void*> {};
   
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<int> : public csHashComputerIntegral<int> {}; 
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<unsigned int> : 
   public csHashComputerIntegral<unsigned int> {}; 
     
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<long> : public csHashComputerIntegral<long> {}; 
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<unsigned long> : 
   public csHashComputerIntegral<unsigned long> {}; 
 
 #if (CS_LONG_SIZE < 8)    
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<longlong> : 
   public csHashComputerIntegral<longlong> {}; 
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<ulonglong> : 
   public csHashComputerIntegral<ulonglong> {}; 
 #endif
     
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<float>
 {
 public:
@@ -122,7 +122,7 @@ public:
     return float2uint.u;
   }
 };
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<double>
 {
 public:
@@ -185,7 +185,7 @@ public:
 /**
  * csHashComputer<> specialization for strings that uses csHashCompute().
  */
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<const char*> : public csHashComputerString<const char*> {};
 
 /**
@@ -237,7 +237,7 @@ public:
 /**
  * csComparator<> specialization for csStrKey that uses strcmp().
  */
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csComparator<csStrKey, csStrKey> : public csComparatorString<csStrKey> {};
 
 #include "csutil/win32/msvc_deprecated_warn_on.h"
@@ -362,8 +362,8 @@ public:
   /// Get all the elements with the given key, or empty if there are none.
   csArray<T> GetAll (const K& key) const
   {
-    return GetAll<typename_qualifier csArray<T>::ElementHandlerType, 
-      typename_qualifier csArray<T>::AllocatorType> (key);
+    return GetAll<typename csArray<T>::ElementHandlerType, 
+      typename csArray<T>::AllocatorType> (key);
   }
 
   /// Get all the elements with the given key, or empty if there are none.

@@ -53,10 +53,20 @@ namespace lighter
     csRef<iReporter> reporter;
     csRef<iVFS> vfs;
     iObjectRegistry *objectRegistry;
+    csRef<iStringSet> strings;
+
+    // FIXME: move to class Configuration
+    struct Settings
+    {
+      bool keepGenmeshSubmeshes;
+    };
+    Settings settings;
 
   protected:
     // Parse the commandline and load any files specified
     bool LoadFiles ();
+
+    void LoadSettings ();
 
     Scene *scene;
   };

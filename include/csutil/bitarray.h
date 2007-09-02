@@ -612,7 +612,7 @@ public:
  * csComparator<> specialization for csBitArray to allow its use as 
  * e.g. hash key type.
  */
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csComparator<csBitArray, csBitArray> : 
   public csComparatorBitArray<csBitArray> { };
 
@@ -621,7 +621,7 @@ class csComparator<csBitArray, csBitArray> :
  * csHashComputer<> specialization for csBitArray to allow its use as 
  * hash key type.
  */
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<csBitArray> : 
   public csHashComputerBitArray<csBitArray> { };
 

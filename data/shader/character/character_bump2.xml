@@ -5,7 +5,6 @@
         <buffer source="texture coordinate 0" destination="texture coordinate 0" />
         <buffer source="normal" destination="normal" />
         <buffer source="tangent" destination="texture coordinate 1" />
-        <buffer source="binormal" destination="texture coordinate 2" />
         <buffer source="bones indices" destination="IN.BonesIndices" />
         <buffer source="bones weights" destination="IN.BonesWeights" />
         <vp plugin="glcg" file="/shader/character/character_bump2.cgvp" />

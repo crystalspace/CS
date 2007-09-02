@@ -708,6 +708,17 @@ void csGLShaderFFP::Activate ()
   {
     statecache->Enable_GL_FOG ();
   }
+  else
+  {
+    if (shaderPlug->fixedFunctionForcefulEnable)
+    {
+      const GLenum state = GL_FOG;
+      GLboolean s = glIsEnabled (state);
+      if (s) glDisable (state); else glEnable (state);
+      glBegin (GL_TRIANGLES);  glEnd ();
+      if (s) glEnable (state); else glDisable (state);
+    }
+  }
   if (colorSum)
     statecache->Enable_GL_COLOR_SUM_EXT ();
 }

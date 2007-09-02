@@ -439,6 +439,8 @@ public:
   { wrappedSVC.ReplaceVariable (variable); }
   void Clear ()
   { wrappedSVC.Clear(); }
+  bool RemoveVariable (csShaderVariable *variable)
+  { return wrappedSVC.RemoveVariable (variable); }
 };
 
 void csXMLShader::ParseGlobalSVs (iDocumentNode* node)

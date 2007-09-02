@@ -189,6 +189,26 @@ bool csPython::LoadModule(const char* name)
   return RunText(s);
 }
 
+bool csPython::LoadModule (const char *path, const char *name)
+{
+  csRef<iVFS> vfs(CS_QUERY_REGISTRY(object_reg, iVFS));
+  if (!vfs.IsValid())
+    return false;
+  csRef<iDataBuffer> rpath = vfs->GetRealPath (path);
+
+  // Alternative from `embedding' in py c api docs:
+  //   Must provide custom implementation of
+  //  Py_GetPath(), Py_GetPrefix(), Py_GetExecPrefix(),
+  //  and Py_GetProgramFullPath()
+  csString import;
+  import << "import sys\n"
+         << "paths = sys.path\n"
+         << "sys.path = ['" << rpath->GetData () << "']\n"
+         << "import " << name << "\n"
+         << "sys.path = paths\n";
+  return RunText(import);
+}
+
 void csPython::Print(bool Error, const char *msg)
 {
   csReport (object_reg, Error ? CS_REPORTER_SEVERITY_ERROR : Mode,

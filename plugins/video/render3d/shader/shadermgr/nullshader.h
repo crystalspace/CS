@@ -79,6 +79,7 @@ public:
   bool IsEmpty() const { return true; }
   void ReplaceVariable (csShaderVariable*) {}
   void Clear () { }
+  bool RemoveVariable (csShaderVariable*) { return false; }
   /** @} */
 
   /**\name iSelfDestruct implementation

@@ -30,11 +30,14 @@ class csConfigDocumentIterator : public scfImplementation1<
 	csConfigDocumentIterator, iConfigIterator>
 {
   csRef<csConfigDocument> doc;
-  csHash<csConfigDocument::KeyInfo, csString>::GlobalIterator* iterator;
-  char* subsection;
-  size_t subsectionLen;
+  csHash<csConfigDocument::KeyInfo, csString>::GlobalIterator iterator;
+  csString subsection;
   const csConfigDocument::KeyInfo* currentKey;
+  const csConfigDocument::KeyInfo* nextKey;
   const char* currentKeyName;
+  const char* nextKeyName;
+
+  void FetchNext ();
 public:
 
   csConfigDocumentIterator (csConfigDocument* doc, const char* Subsection);
@@ -45,6 +48,7 @@ public:
 
   virtual void Rewind ();
   virtual bool Next();
+  virtual bool HasNext();
   virtual const char *GetKey (bool Local = false) const;
   virtual int GetInt () const;
   virtual float GetFloat () const;
@@ -56,19 +60,36 @@ public:
 
 
 csConfigDocumentIterator::csConfigDocumentIterator (csConfigDocument* d,
-						    const char* Subsection)
-  : scfImplementationType (this), doc (d), currentKey (0), currentKeyName(0)
+						    const char* Subsection) : 
+  scfImplementationType (this), doc (d), iterator (d->keys.GetIterator()),
+  subsection (Subsection), currentKey (0), nextKey (0), 
+  currentKeyName(0), nextKeyName (0)
 {
-  subsection = csStrNew (Subsection);
-  subsectionLen = subsection ? strlen (subsection) : 0;
-  iterator = new csHash<csConfigDocument::KeyInfo,
-    csString>::GlobalIterator (doc->keys.GetIterator ());
+  FetchNext ();
 }
 
 csConfigDocumentIterator::~csConfigDocumentIterator()
 {
-  delete[] subsection;
-  delete iterator;
+}
+
+void csConfigDocumentIterator::FetchNext ()
+{
+  while (iterator.HasNext ())
+  {
+    const csConfigDocument::KeyInfo* key = &iterator.Next ();
+
+    if ((subsection.IsEmpty()) ||
+      (strncasecmp (key->originalKey, subsection, subsection.Length()) == 0))
+    {
+      if (!key->cachedStringValue) continue;
+
+      nextKey = key;
+      nextKeyName = key->originalKey;
+      return;
+    }
+  }
+  nextKey = 0;
+  nextKeyName = 0;
 }
 
 iConfigFile* csConfigDocumentIterator::GetConfigFile () const
@@ -85,11 +106,13 @@ void csConfigDocumentIterator::Rewind ()
 {
   currentKey = 0;
   currentKeyName = 0;
-  iterator->Reset();
+  iterator.Reset();
+  FetchNext ();
 }
 
 bool csConfigDocumentIterator::Next()
 {
+#if 0
   while (iterator->HasNext ())
   {
     const csConfigDocument::KeyInfo* key = &iterator->Next ();
@@ -105,11 +128,21 @@ bool csConfigDocumentIterator::Next()
     }
   }
   return false;
+#endif
+  currentKey = nextKey;
+  currentKeyName = nextKeyName;
+  FetchNext ();
+  return currentKey != 0;
+}
+
+bool csConfigDocumentIterator::HasNext()
+{
+  return nextKey != 0;
 }
 
 const char* csConfigDocumentIterator::GetKey (bool Local) const
 {
-  return ((const char*)currentKeyName) + (Local ? subsectionLen : 0);
+  return ((const char*)currentKeyName) + (Local ? subsection.Length() : 0);
 }
 
 int csConfigDocumentIterator::GetInt () const

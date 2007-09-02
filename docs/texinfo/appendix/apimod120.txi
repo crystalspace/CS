@@ -1,0 +1,28 @@
+@c -*-texinfo-*-
+@node Release Notes 120, Release Notes 100, Release Notes, Release Notes
+@appendixsec Release Notes from 1.00 to 1.20
+@cindex Release Notes
+
+@noindent
+@emph{Written Marten Svanfeldt, @email{developer@@svanfeldt.com},
+with contributions from others.}
+
+This section documents the major changes between versions 1.0 and 1.2 of of
+Crystal Space.
+
+@menu
+* Api120 Threading:: Threading changes
+@end menu
+
+@node Api120 Threading, , Release Notes 120, Release Notes 120
+@subsection Threading changes
+
+For the 1.2 release the threading subsystem in Crystal Space have been entirely
+rewritten from scratch. The main rationale for this change is to clear up
+some outstanding issues in the code as well as making it a bit more efficient.
+
+@subsubheading Atomic operations
+A header (@file{include/csutil/atomicops.h}) containing definitions of operations
+with guranteed atomicity such as CAS (Compare-And-Set) and increment.
+
+Full documentation in @xref{Threading}.

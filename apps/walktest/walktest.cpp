@@ -1509,6 +1509,6 @@ int main (int argc, char* argv[])
 
   Cleanup ();
 
-  return 1;
+  return 0;
 }
 

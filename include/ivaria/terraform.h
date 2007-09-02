@@ -50,6 +50,11 @@ struct iTerraFormer : public virtual iBase
     unsigned int resx, unsigned int resy = 0) = 0;
 
   /**
+   * Get the integer map dimensions.
+   */
+  virtual csVector2 GetIntegerMapSize (csStringID type) = 0;
+
+  /**
    * Sample float data at a given spot on the terrain.
    * Note that this should only be used when single heights are needed.
    * For multiple samples in a grid a sampler should be used.

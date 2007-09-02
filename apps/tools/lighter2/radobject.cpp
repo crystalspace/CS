@@ -35,19 +35,30 @@ namespace lighter
   {
   }
 
+  bool RadObjectFactory::PrepareLightmapUV (LightmapUVLayouter* uvlayout)
+  {
+    size_t oldSize = allPrimitives.GetSize();
+    for (size_t i = 0; i < oldSize; i++)
+    {
+      csArray<RadPrimitiveArray> newPrims;
+      LightmapUVLayoutFactory* lightmaplayout = 
+        uvlayout->LayoutFactory (allPrimitives[i], vertexData, newPrims);
+      if (!lightmaplayout) return false;
+
+      for (size_t n = 0; n < newPrims.GetSize(); n++)
+      {
+        allPrimitives.Push (newPrims[n]);
+        lightmaplayouts.Push (lightmaplayout);
+      }
+    }
+    while (oldSize-- > 0) allPrimitives.DeleteIndexFast (oldSize);
+
+    return true;
+  }
+
   RadObject* RadObjectFactory::CreateObject ()
   {
     return new RadObject (this);
-  }
-
-  bool RadObjectFactory::ComputeLightmapUV (LightmapUVLayouter* layoutEngine)
-  {
-    // Default implementation
-    bool res = layoutEngine->LayoutUVOnPrimitives (allPrimitives, vertexData,
-      lightmapTemplates);
-    if (!res) return false;
-
-    return true;
   }
 
   void RadObjectFactory::ParseFactory (iMeshFactoryWrapper *factory)
@@ -76,36 +87,16 @@ namespace lighter
     }
   }
 
-  void RadObjectFactory::RenormalizeLightmapUVs ()
-  {
-    BoolArray vertexProcessed;
-    vertexProcessed.SetSize (vertexData.vertexArray.GetSize (),false);
-
-    // Iterate over lightmaps and renormalize UVs
-    for (size_t j = 0; j < allPrimitives.GetSize (); ++j)
-    {
-      //TODO make sure no vertex is used in several lightmaps.. 
-      const RadPrimitive &prim = allPrimitives.Get (j);
-      const SizeTDArray &indexArray = prim.GetIndexArray ();
-      const Lightmap* lm= lightmapTemplates[prim.GetLightmapID ()];
-      for (size_t i = 0; i < indexArray.GetSize (); ++i)
-      {
-        csVector2 &lmUV = vertexData.vertexArray[indexArray[i]].lightmapUV;
-        lmUV.x /= lm->GetWidth ();
-        lmUV.y /= lm->GetHeight ();
-      }
-    }
-  }
-
+  //-------------------------------------------------------------------------
 
   RadObject::RadObject (RadObjectFactory* fact)
     : factory (fact)
   {
   }
   
-  void RadObject::Initialize ()
+  bool RadObject::Initialize ()
   {
-    if (!factory || !meshWrapper) return;
+    if (!factory || !meshWrapper) return false;
     const csReversibleTransform transform = meshWrapper->GetMovable ()->
       GetFullTransform ();
 
@@ -115,26 +106,77 @@ namespace lighter
     vertexData.Transform (transform);
 
     unsigned int i = 0;
-    for(i = 0; i < factory->allPrimitives.GetSize (); ++i)
+    for(size_t j = 0; j < factory->allPrimitives.GetSize (); ++j)
     {
-      RadPrimitive newPrim (vertexData);
-      
-      RadPrimitive& prim = allPrimitives[allPrimitives.Push (newPrim)];
-      prim.SetOriginalPrimitive (&factory->allPrimitives[i]);
-      prim.GetIndexArray () = factory->allPrimitives[i].GetIndexArray ();
-      prim.ComputePlane ();
-      prim.ComputeUVTransform ();
-      prim.SetRadObject (this);
-      prim.Prepare (globalConfig.GetRadProperties ().uPatchResolution, 
-        globalConfig.GetRadProperties ().vPatchResolution);
+      RadPrimitiveArray& factPrims = factory->allPrimitives[j];
+      RadPrimitiveArray& allPrimitives =
+        this->allPrimitives.GetExtend (j);
+      for (i = 0; i < factPrims.GetSize(); i++)
+      {
+        RadPrimitive newPrim (vertexData);
+        
+        RadPrimitive& prim = allPrimitives[allPrimitives.Push (newPrim)];
+        prim.SetOriginalPrimitive (&factPrims[i]);
+        prim.GetIndexArray () = factPrims[i].GetIndexArray ();
+        prim.ComputePlane ();
+      }
+
+      // FIXME: probably separate out to allow for better progress display
+      bool res = factory->lightmaplayouts[j]->LayoutUVOnPrimitives (
+        allPrimitives, vertexData, lightmapIDs.GetExtend (j));
+      if (!res) return false;
+
+      for (i = 0; i < allPrimitives.GetSize(); i++)
+      {
+        RadPrimitive& prim = allPrimitives[i];
+        prim.ComputeUVTransform ();
+        prim.SetRadObject (this);
+        prim.Prepare (
+          globalConfig.GetRadProperties ().uPatchResolution, 
+          globalConfig.GetRadProperties ().vPatchResolution);
+      }
     }
 
-    // Create and init lightmaps
-    for (i = 0; i < factory->lightmapTemplates.GetSize (); ++i)
+    return true;
+  }
+
+  void RadObject::RenormalizeLightmapUVs (const LightmapPtrDelArray& lightmaps)
+  {
+    BoolArray vertexProcessed;
+    vertexProcessed.SetSize (vertexData.vertexArray.GetSize (),false);
+
+    for (size_t p = 0; p < allPrimitives.GetSize (); p++)
     {
-      Lightmap *lm = new Lightmap (*(factory->lightmapTemplates.Get (i)));
-      lm->Initialize ();
-      lightmaps.Push (lm);
+      const Lightmap* lm = lightmaps[lightmapIDs[p]];
+      const RadPrimitiveArray& prims = allPrimitives[p];
+      // Iterate over lightmaps and renormalize UVs
+      for (size_t j = 0; j < prims.GetSize (); ++j)
+      {
+        //TODO make sure no vertex is used in several lightmaps.. 
+        const RadPrimitive &prim = prims.Get (j);
+        const SizeTDArray &indexArray = prim.GetIndexArray ();
+        for (size_t i = 0; i < indexArray.GetSize (); ++i)
+        {
+          csVector2 &lmUV = vertexData.vertexArray[indexArray[i]].lightmapUV;
+          lmUV.x /= lm->GetWidth ();
+          lmUV.y /= lm->GetHeight ();
+        }
+      }
+    }
+  }
+
+  void RadObject::StripLightmaps (csSet<csString>& lms)
+  {
+    iShaderVariableContext* svc = meshWrapper->GetSVContext();
+    csShaderVariable* sv = svc->GetVariable (
+      globalLighter->strings->Request ("tex lightmap"));
+    if (sv != 0)
+    {
+      iTextureWrapper* tex;
+      sv->GetValue (tex);
+      if (tex != 0)
+        lms.Add (tex->QueryObject()->GetName());
+      svc->RemoveVariable (sv);
     }
   }
 
@@ -144,52 +186,114 @@ namespace lighter
     this->meshName = wrapper->QueryObject ()->GetName ();
   }
 
-  void RadObject::SaveMesh (iDocumentNode* /*node*/)
+  static void CloneNode (iDocumentNode* from, iDocumentNode* to)
   {
-
+    to->SetValue (from->GetValue ());
+    csRef<iDocumentNodeIterator> it = from->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      csRef<iDocumentNode> child_clone = to->CreateNodeBefore (
+    	  child->GetType (), 0);
+      CloneNode (child, child_clone);
+    }
+    csRef<iDocumentAttributeIterator> atit = from->GetAttributes ();
+    while (atit->HasNext ())
+    {
+      csRef<iDocumentAttribute> attr = atit->Next ();
+      to->SetAttribute (attr->GetName (), attr->GetValue ());
+    }
   }
 
-  void RadObject::FixupLightmaps ()
+  void RadObject::SaveMesh (Scene* /*scene*/, iDocumentNode* node)
+  {
+    // Save out the object to the node
+    csRef<iSaverPlugin> saver = 
+      csQueryPluginClass<iSaverPlugin> (globalLighter->pluginManager,
+      saverPluginName);      
+    if (!saver) 
+      saver = csLoadPlugin<iSaverPlugin> (globalLighter->pluginManager,
+      saverPluginName);
+    if (saver) 
+    {
+      // Write new mesh
+      csRef<iDocumentNode> paramChild = node->GetNode ("params");
+      saver->WriteDown(meshWrapper->GetMeshObject (), node, 0/*ssource*/);
+      if (paramChild) 
+      {
+        // Move all nodes after the old params node to after the new params node
+        csRef<iDocumentNodeIterator> nodes = node->GetNodes();
+        while (nodes->HasNext())
+        {
+          csRef<iDocumentNode> child = nodes->Next();
+          if (child->Equals (paramChild)) break;
+        }
+        // Skip <params>
+        if (nodes->HasNext()) 
+        {
+          // Actual moving
+          while (nodes->HasNext())
+          {
+            csRef<iDocumentNode> child = nodes->Next();
+            if ((child->GetType() == CS_NODE_ELEMENT)
+              && (strcmp (child->GetValue(), "params") == 0))
+              break;
+            csRef<iDocumentNode> newNode = node->CreateNodeBefore (
+              child->GetType(), 0);
+            CloneNode (child, newNode);
+            node->RemoveNode (child);
+          }
+        }
+        node->RemoveNode (paramChild);
+      }
+    }
+  }
+
+  void RadObject::FixupLightmaps (LightmapPtrDelArray& lightmaps)
   {
     //Create one
     LightmapMaskArray masks;
     LightmapPtrDelArray::Iterator lmIt = lightmaps.GetIterator ();
     while (lmIt.HasNext ())
     {
-      masks.Push (LightmapMask (*(lmIt.Next ())));
+      const Lightmap* lm = lmIt.Next ();
+      masks.Push (LightmapMask (*lm));
     }
 
     float totalArea = 0;
 
     // And fill it with data
-    RadPrimitiveArray::Iterator primIt = allPrimitives.GetIterator ();
-    while (primIt.HasNext ())
+    for (size_t i = 0; i < allPrimitives.GetSize(); i++)
     {
-      const RadPrimitive &prim = primIt.Next ();
-      LightmapMask &mask = masks[prim.GetLightmapID ()];
-      totalArea = (prim.GetuFormVector ()%prim.GetvFormVector ()).Norm ();
-
-      int minu,maxu,minv,maxv;
-      prim.ComputeMinMaxUV (minu,maxu,minv,maxv);
-      uint findex = 0;
-
-      // Go through all lightmap cells and add their element areas to the mask
-      for (uint v = minv; v <= (uint)maxv;v++)
+      LightmapMask &mask = masks[lightmapIDs[i]];
+      RadPrimitiveArray::Iterator primIt = allPrimitives[i].GetIterator ();
+      while (primIt.HasNext ())
       {
-        uint vindex = v * mask.width;
-        for (uint u = minu; u <= (uint)maxu; u++, findex++)
+        const RadPrimitive &prim = primIt.Next ();
+        totalArea = (prim.GetuFormVector ()%prim.GetvFormVector ()).Norm ();
+
+        int minu,maxu,minv,maxv;
+        prim.ComputeMinMaxUV (minu,maxu,minv,maxv);
+        uint findex = 0;
+
+        // Go through all lightmap cells and add their element areas to the mask
+        for (uint v = minv; v <= (uint)maxv;v++)
         {
-          if (prim.GetElementAreas ()[findex] < FLT_EPSILON) continue; // No area, skip
+          uint vindex = v * mask.width;
+          for (uint u = minu; u <= (uint)maxu; u++, findex++)
+          {
+            if (prim.GetElementAreas ()[findex] < FLT_EPSILON) continue; // No area, skip
 
-          mask.maskData[vindex+u] += prim.GetElementAreas ()[findex]; //Accumulate
+            mask.maskData[vindex+u] += prim.GetElementAreas ()[findex]; //Accumulate
+          }
+
         }
-
       }
     }
 
     // Ok, here we are sure to have a mask
     
-    // Un-antialis
+    // Un-antialias
     uint i;
  /*   for (i = 0; i < lightmaps.GetSize (); i++)
     {
@@ -249,129 +353,14 @@ namespace lighter
             if (u < lmw-1 && mmData[(v+1)*lmw+(u+1)] > FLT_EPSILON) newColor += lmData[(v+1)*lmw+(u+1)], count++;
           }
 
-          if (count > 0) newColor *= (1.0f/count);
-          else newColor.Set (0.0f, 0.0f, 0.0f);
-          lmData[idx] = newColor;
+          if (count > 0) 
+          {
+            newColor *= (1.0f/count);
+            lmData[idx] = newColor;
+          }
         }
       }
     }
   }
 
-  //////////////////////////////////////////////////////////////////////////
-  // SPECIFIC VERISONS
-  //////////////////////////////////////////////////////////////////////////
-  
-  //////////////   Genmesh     /////////////////////////////////////////////
-  
-  RadObjectFactory_Genmesh::RadObjectFactory_Genmesh()
-    : normals (0)
-  {
-    saverPluginName = "crystalspace.mesh.saver.factory.genmesh";
-  }
-
-  void RadObjectFactory_Genmesh::ParseFactory (iMeshFactoryWrapper *factory)
-  {
-    RadObjectFactory::ParseFactory (factory);
-
-    // Very dumb parser, just disconnect all triangles etc
-    csRef<iGeneralFactoryState> genFact = 
-      scfQueryInterface<iGeneralFactoryState> (factory->GetMeshObjectFactory ());
-    
-    if (!genFact) return; // bail
-
-    csTriangle *tris = genFact->GetTriangles ();
-    csVector3 *verts = genFact->GetVertices ();
-    csVector2 *uv = genFact->GetTexels ();
-    csVector3 *factNormals = genFact->GetNormals ();
-
-    int i = 0;
-
-    // Here we should save extra per-vertex stuff!
-    vertexData.vertexArray.SetSize (genFact->GetVertexCount ());
-    
-    for (i = 0; i < genFact->GetVertexCount (); i++)
-    {
-      RadObjectVertexData::Vertex &vertex = vertexData.vertexArray[i];
-      vertex.position = verts[i];
-      vertex.normal = factNormals[i];
-      vertex.textureUV = uv[i];
-    }
-
-    
-    for (i=0; i<genFact->GetTriangleCount ();i++)
-    {
-      RadPrimitive newPrim (vertexData);
-      newPrim.GetIndexArray ().Push (tris[i].a);
-      newPrim.GetIndexArray ().Push (tris[i].b);
-      newPrim.GetIndexArray ().Push (tris[i].c);
-
-      newPrim.ComputePlane ();
-      
-      allPrimitives.Push (newPrim);
-    }
-  }
-
-  void RadObjectFactory_Genmesh::SaveFactory (iDocumentNode *node)
-  {
-    csRef<iGeneralFactoryState> genFact = 
-      scfQueryInterface<iGeneralFactoryState> (
-      factoryWrapper->GetMeshObjectFactory ());
-    
-    if (!genFact) return; // bail
-
-    // For now, just dump.. later we should preserve extra attributes etc :)
-    
-    RenormalizeLightmapUVs ();
-
-    genFact->SetVertexCount ((int)vertexData.vertexArray.GetSize ());
-
-    csVector3 *verts = genFact->GetVertices ();
-    csVector2 *textureUV = genFact->GetTexels ();
-    csRef<csRenderBuffer> lightmapBuffer = csRenderBuffer::CreateRenderBuffer (
-      genFact->GetVertexCount (), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
-    genFact->RemoveRenderBuffer ("texture coordinate lightmap");
-    genFact->AddRenderBuffer ("texture coordinate lightmap", lightmapBuffer);
-    
-    csVector3 *factNormals = genFact->GetNormals ();
-
-    {
-      csRenderBufferLock<csVector2> bufferLock(lightmapBuffer);
-      csVector2 *lightmapUV = bufferLock.Lock ();
-      // Save vertex-data
-      for (int i = 0; i < genFact->GetVertexCount (); ++i)
-      {
-        const RadObjectVertexData::Vertex &vertex = vertexData.vertexArray[i];
-        verts[i] = vertex.position;
-        textureUV[i] = vertex.textureUV;
-        lightmapUV[i] = vertex.lightmapUV;
-        factNormals[i] = vertex.normal;
-      }
-    }
-
-    // Save primitives, trianglate on the fly
-    IntDArray indexArray;
-    indexArray.SetCapacity (allPrimitives.GetSize ());
-    for (uint i = 0; i < allPrimitives.GetSize (); ++i)
-    {
-      SizeTDArray& indices = allPrimitives[i].GetIndexArray ();
-      if (indices.GetSize () == 3)
-      {
-        //Triangle, easy case
-        indexArray.Push ((int)indices[0]);
-        indexArray.Push ((int)indices[1]);
-        indexArray.Push ((int)indices[2]);
-      }
-      else
-      {
-        //TODO: Implement this case, use a triangulator
-      }
-    }
-
-    genFact->SetTriangleCount ((int)indexArray.GetSize ()/3);
-    csTriangle *gentri = genFact->GetTriangles ();
-    std::copy (indexArray.GetArray (), indexArray.GetArray () + indexArray.GetSize (),
-      (int*)gentri);
-
-    RadObjectFactory::SaveFactory (node);
-  }
 }

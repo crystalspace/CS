@@ -216,6 +216,14 @@ struct iScript : public virtual iBase
   virtual bool LoadModule (const char *name) = 0;
 
   /**
+    * Load a module in the script interpreter.
+    * Only works for python.
+    * @param path Virtual filesystem path to python script.
+    * @param name Filename of python script.
+    */
+  virtual bool LoadModule (const char *path, const char *name) = 0;
+
+  /**
    * Call a subroutine in the script, with no return value.
    * Returns false if the subroutine named does not exist.
    * Format is a printf-style format string for the arguments.

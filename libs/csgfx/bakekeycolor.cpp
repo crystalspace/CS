@@ -42,7 +42,7 @@ template<int D> struct ArrayMul
     return *v * ArrayMul<D-1>::Mul (v+1);
   }
 };
-CS_SPECIALIZE_TEMPLATE struct ArrayMul<0>
+template<> struct ArrayMul<0>
 {
   static inline int Mul (const int* v)
   {
@@ -58,7 +58,7 @@ template<int D> struct CoordSplitter
     CoordSplitter<D-1>::Split (destCoords, coord % dim[D], dim);
   }
 };
-CS_SPECIALIZE_TEMPLATE struct CoordSplitter<0>
+template<> struct CoordSplitter<0>
 {
   static inline void Split (int* destCoords, size_t coord, const int* dim)
   {
@@ -76,7 +76,7 @@ template<int D> struct DimPixCompute
     dimPix[D] = dimPix[D-1] * sizes[D-1];
   }
 };
-CS_SPECIALIZE_TEMPLATE struct DimPixCompute<0>
+template<> struct DimPixCompute<0>
 {
   static inline void Compute (int* dimPix, const int* /*sizes*/)
   {

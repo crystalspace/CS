@@ -328,84 +328,110 @@ struct iODEJointState : public virtual iBase
 
   virtual ODEJointType GetType() = 0;
 
-  // Baaad interface. Are those number axes? If so, perhaps pass it as
-  // parameter.
-  virtual void SetLoStop (float value) = 0;
-  virtual void SetHiStop (float value) = 0;
-  virtual void SetVel (float value) = 0;
-  virtual void SetFMax (float value) = 0;
-  virtual void SetFudgeFactor (float value) = 0;
-  virtual void SetBounce (float value) = 0;
-  virtual void SetCFM (float value) = 0;
-  virtual void SetStopERP (float value) = 0;
-  virtual void SetStopCFM (float value) = 0;
-  virtual void SetSuspensionERP (float value) = 0;
-  virtual void SetSuspensionCFM (float value) = 0;
+  /**
+   * Set low stop angle or position. For rotational joints, this
+   * stop must be greater than - pi to be effective.
+   */
+  virtual void SetLoStop (const csVector3 &value) = 0;
 
-  virtual void SetLoStop2 (float value) = 0;
-  virtual void SetHiStop2 (float value) = 0;
-  virtual void SetVel2 (float value) = 0;
-  virtual void SetFMax2 (float value) = 0;
-  virtual void SetFudgeFactor2 (float value) = 0;
-  virtual void SetBounce2 (float value) = 0;
-  virtual void SetCFM2 (float value) = 0;
-  virtual void SetStopERP2 (float value) = 0;
-  virtual void SetStopCFM2 (float value) = 0;
-  virtual void SetSuspensionERP2 (float value) = 0;
-  virtual void SetSuspensionCFM2 (float value) = 0;
+  /**
+   * Set high stop angle or position. For rotational joints, this stop must
+   * be less than pi to be effective. If the high stop is less than the low
+   * stop then both stops will be ineffective.
+   */
+  virtual void SetHiStop (const csVector3 &value) = 0;
 
-  virtual void SetLoStop3 (float value) = 0;
-  virtual void SetHiStop3 (float value) = 0;
-  virtual void SetVel3 (float value) = 0;
-  virtual void SetFMax3 (float value) = 0;
-  virtual void SetFudgeFactor3 (float value) = 0;
-  virtual void SetBounce3 (float value) = 0;
-  virtual void SetCFM3 (float value) = 0;
-  virtual void SetStopERP3 (float value) = 0;
-  virtual void SetStopCFM3 (float value) = 0;
-  virtual void SetSuspensionERP3 (float value) = 0;
-  virtual void SetSuspensionCFM3 (float value) = 0;
+  /// Set desired motor velocity (this will be an angular or linear velocity).
+  virtual void SetVel (const csVector3 &value) = 0;
 
-  virtual float GetLoStop () = 0;
-  virtual float GetHiStop () = 0;
-  virtual float GetVel () = 0;
-  virtual float GetFMax () = 0;
-  virtual float GetFudgeFactor () = 0;
-  virtual float GetBounce () = 0;
-  virtual float GetCFM () = 0;
-  virtual float GetStopERP () = 0;
-  virtual float GetStopCFM () = 0;
-  virtual float GetSuspensionERP () = 0;
-  virtual float GetSuspensionCFM () = 0;
+  /**
+   * Set the maximum force or torque that the motor will use to achieve the
+   * desired velocity. This must always be greater than or equal to zero.
+   * Setting this to zero turns off the motor.
+   */
+  virtual void SetFMax (const csVector3 &value) = 0;
 
-  virtual float GetLoStop2 () = 0;
-  virtual float GetHiStop2 () = 0;
-  virtual float GetVel2 () = 0;
-  virtual float GetFMax2 () = 0;
-  virtual float GetFudgeFactor2 () = 0;
-  virtual float GetBounce2 () = 0;
-  virtual float GetCFM2 () = 0;
-  virtual float GetStopERP2 () = 0;
-  virtual float GetStopCFM2 () = 0;
-  virtual float GetSuspensionERP2 () = 0;
-  virtual float GetSuspensionCFM2 () = 0;
+  /**
+   * Set the fudge factor. The current joint stop/motor implementation has a
+   * small problem: when the joint is at one stop and the motor is set to move
+   * it away from the stop, too much force may be applied for one time step,
+   * causing a ``jumping'' motion. This fudge factor is used to scale this
+   * excess force. It should have a value between zero and one (the default
+   * value). If the jumping motion is too visible in a
+   * joint, the value can be reduced. Making this value too small can prevent
+   * the motor from being able to move the joint away from a stop.
+   */
+  virtual void SetFudgeFactor (const csVector3 &value) = 0;
 
-  virtual float GetLoStop3 () = 0;
-  virtual float GetHiStop3 () = 0;
-  virtual float GetVel3 () = 0;
-  virtual float GetFMax3 () = 0;
-  virtual float GetFudgeFactor3 () = 0;
-  virtual float GetBounce3 () = 0;
-  virtual float GetCFM3 () = 0;
-  virtual float GetStopERP3 () = 0;
-  virtual float GetStopCFM3 () = 0;
-  virtual float GetSuspensionERP3 () = 0;
-  virtual float GetSuspensionCFM3 () = 0;
+  /**
+   * Set the bouncyness of the stops. This is a restitution parameter in the
+   * range 0..1. 0 means the stops are not bouncy at all, 1 means maximum
+   * bouncyness.
+   */
+  virtual void SetBounce (const csVector3 &value) = 0;
 
-  // This is a very ugly hack quite specific to NmS
-  virtual void SetHinge2Axis1 (const csVector3& axis) = 0;
-  virtual void SetHinge2Axis2 (const csVector3& axis) = 0;
-  virtual void SetHinge2Anchor (const csVector3& point) = 0;
+  /**
+   * Set the constraint force mixing (CFM) value for joint used when not at a
+   * stop.
+   */
+  virtual void SetCFM (const csVector3 &value) = 0;
+
+  /// Set the error reduction parameter (ERP) used by the stops.
+  virtual void SetStopERP (const csVector3 &value) = 0;
+
+  /**
+   * Set the constraint force mixing (CFM) value for joint used by the stops.
+   * Together with the ERP value this can be used to get spongy or soft stops.
+   * Note that this is intended for unpowered joints, it does not really work
+   * as expected when a powered joint reaches its limit.
+   */
+  virtual void SetStopCFM (const csVector3 &value) = 0;
+
+  /// Set suspension error reduction parameter (ERP).
+  virtual void SetSuspensionERP (const csVector3 &value) = 0;
+
+  /// Set suspension constraint force mixing (CFM) value.
+  virtual void SetSuspensionCFM (const csVector3 &value) = 0;
+
+  /// Get low stop angle or position.
+  virtual csVector3 GetLowStop () = 0;
+
+  /// Get high stop angle or position.
+  virtual csVector3 GetHighStop () = 0;
+
+  /// Get desired motor velocity (this will be an angular or linear velocity).
+  virtual csVector3 GetVel () = 0;
+
+  /**
+   * Get the maximum force or torque that the motor will use to achieve the
+   * desired velocity.
+   */
+  virtual csVector3 GetMaxForce () = 0;
+
+  /// Get the fudge factor.
+  virtual csVector3 GetFudgeFactor () = 0;
+
+  /// Get the bouncyness of the stops.
+  virtual csVector3 GetBounce () = 0;
+
+  /**
+   * Get the constraint force mixing (CFM) value for joint used when not
+   * at a stop.
+   */
+  virtual csVector3 GetCFM () = 0;
+
+  /// Get the error reduction parameter (ERP) used by the stops.
+  virtual csVector3 GetStopERP () = 0;
+
+  /// Get the constraint force mixing (CFM) value for joint used by the stops.
+  virtual csVector3 GetStopCFM () = 0;
+
+  /// Get suspension error reduction parameter (ERP).
+  virtual csVector3 GetSuspensionERP () = 0;
+
+  /// Get suspension constraint force mixing (CFM) value.
+  virtual csVector3 GetSuspensionCFM () = 0;
+
 };
 
 /**

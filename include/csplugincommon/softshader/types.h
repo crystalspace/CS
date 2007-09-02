@@ -275,7 +275,7 @@ namespace PluginCommon
       const ScanlineComp* GetFloat (size_t i) const { return &floats[i]; }
     };
 
-    CS_SPECIALIZE_TEMPLATE
+    template<>
     struct InterpolateScanlinePersp<0> : public InterpolateScanlinePerspCommon
     {
       /// Interpolation step

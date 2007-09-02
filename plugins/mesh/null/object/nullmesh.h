@@ -76,6 +76,8 @@ private:
   csFlags factory_flags;
 };
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * Nullmesh version of mesh object.
  */
@@ -164,6 +166,7 @@ private:
   csFlags object_flags;
 };
 
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * Genmesh type. This is the plugin you have to use to create instances

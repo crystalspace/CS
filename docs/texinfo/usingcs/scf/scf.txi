@@ -16,7 +16,7 @@ General Public License (@sc{lgpl}).  @xref{Licenses}.}
 @email{sunshine@@sunshineco.com}.  Last updated September 24, 2003.}
 
 @noindent
-@emph{@sc{SCF} implementation revised by MArten Svanfeldt and Michael Adams 
+@emph{@sc{SCF} implementation revised by M@aa{}rten Svanfeldt and Michael Adams
 2005-2006}
 
 This library is intended for separating C++ class implementations from programs

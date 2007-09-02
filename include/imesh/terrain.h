@@ -160,6 +160,12 @@ struct iTerrainObjectState : public virtual iBase
    */
   virtual const char* GetMaterialMapFile (int& width, int& height,
     bool& raw) = 0;
+
+  virtual void SetTopNeighbor(iTerrainObjectState *top)=0;
+  virtual void SetRightNeighbor(iTerrainObjectState *right)=0;
+  virtual void SetLeftNeighbor(iTerrainObjectState *left)=0;
+  virtual void SetBottomNeighbor(iTerrainObjectState *bottom)=0;
+
 };
 
 /**

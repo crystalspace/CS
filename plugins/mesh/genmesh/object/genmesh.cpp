@@ -1709,16 +1709,39 @@ void csGenmeshMeshObjectFactory::SetupFactory ()
   }
 }
 
+template<typename T>
+static void RemapIndexBuffer (csRef<iRenderBuffer>& index_buffer,
+                              csCompressVertexInfo* vt)
+{
+  csRef<iRenderBuffer> newBuffer;
+  {
+    csRenderBufferLock<T> indices (index_buffer);
+    size_t rangeMin = (size_t)~0, rangeMax = 0;
+    for (size_t n = 0; n < indices.GetSize(); n++)
+    {
+      size_t index = size_t (indices[n]);
+      size_t newIndex = vt[index].new_idx;
+      if (newIndex < rangeMin)
+        rangeMin = newIndex;
+      else if (newIndex > rangeMax)
+        rangeMax = newIndex;
+    }
+    newBuffer = csRenderBuffer::CreateIndexRenderBuffer (
+      index_buffer->GetElementCount(), index_buffer->GetBufferType(), 
+      index_buffer->GetComponentType(), rangeMin, rangeMax);
+    csRenderBufferLock<T> newIndices (newBuffer);
+    for (size_t n = 0; n < indices.GetSize(); n++)
+    {
+      size_t index = size_t (indices[n]);
+      size_t newIndex = vt[index].new_idx;
+      newIndices[n] = T (newIndex);
+    }
+  }
+  index_buffer = newBuffer;
+}
+
 void csGenmeshMeshObjectFactory::Compress ()
 {
-  if (subMeshes.GetSize () > 0)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-    	"crystalspace.genmesh.compress",
-	"WARNING! Compress ignored because there are subMeshes!");
-    return;
-  }
-
   size_t old_num = mesh_vertices.Length ();
   csCompressVertexInfo* vt = csVertexCompressor::Compress (
     	mesh_vertices, mesh_texels, mesh_normals, mesh_colors);
@@ -1727,13 +1750,52 @@ void csGenmeshMeshObjectFactory::Compress ()
     printf ("From %d to %d\n", int (old_num), int (mesh_vertices.Length ()));
     fflush (stdout);
 
-    // Now we can remap the vertices in all triangles.
-    size_t i;
-    for (i = 0 ; i < mesh_triangles.Length () ; i++)
+    if (subMeshes.GetSize () == 0)
     {
-      mesh_triangles[i].a = (int)vt[mesh_triangles[i].a].new_idx;
-      mesh_triangles[i].b = (int)vt[mesh_triangles[i].b].new_idx;
-      mesh_triangles[i].c = (int)vt[mesh_triangles[i].c].new_idx;
+      // Now we can remap the vertices in all triangles.
+      size_t i;
+      for (i = 0 ; i < mesh_triangles.Length () ; i++)
+      {
+        mesh_triangles[i].a = (int)vt[mesh_triangles[i].a].new_idx;
+        mesh_triangles[i].b = (int)vt[mesh_triangles[i].b].new_idx;
+        mesh_triangles[i].c = (int)vt[mesh_triangles[i].c].new_idx;
+      }
+    }
+    else
+    {
+      for (size_t s = 0; s < subMeshes.GetSize(); s++)
+      {
+        SubMesh* subMesh = subMeshes[s];
+        csRenderBufferComponentType compType = 
+          subMesh->index_buffer->GetComponentType ();
+        switch (compType)
+        {
+          case CS_BUFCOMP_BYTE:
+            RemapIndexBuffer<char> (subMesh->index_buffer, vt);
+            break;
+          case CS_BUFCOMP_UNSIGNED_BYTE:
+            RemapIndexBuffer<unsigned char> (subMesh->index_buffer, vt);
+            break;
+          case CS_BUFCOMP_SHORT:
+            RemapIndexBuffer<short> (subMesh->index_buffer, vt);
+            break;
+          case CS_BUFCOMP_UNSIGNED_SHORT:
+            RemapIndexBuffer<unsigned short> (subMesh->index_buffer, vt);
+            break;
+          case CS_BUFCOMP_INT:
+            RemapIndexBuffer<int> (subMesh->index_buffer, vt);
+            break;
+          case CS_BUFCOMP_UNSIGNED_INT:
+            RemapIndexBuffer<unsigned int> (subMesh->index_buffer, vt);
+            break;
+          case CS_BUFCOMP_FLOAT:
+            RemapIndexBuffer<float> (subMesh->index_buffer, vt);
+            break;
+          case CS_BUFCOMP_DOUBLE:
+            RemapIndexBuffer<double> (subMesh->index_buffer, vt);
+            break;
+        }
+      }
     }
     delete[] vt;
   }

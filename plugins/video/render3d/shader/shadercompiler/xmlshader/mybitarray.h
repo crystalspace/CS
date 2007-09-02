@@ -117,19 +117,19 @@ CS_PLUGIN_NAMESPACE_END(XMLShader)
 
 #define XMLSNS CS_PLUGIN_NAMESPACE_NAME(XMLShader)
 
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csComparator<XMLSNS::MyBitArrayMalloc, XMLSNS::MyBitArrayMalloc> : 
   public csComparatorBitArray<XMLSNS::MyBitArrayMalloc> { };
 
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<XMLSNS::MyBitArrayMalloc> : 
   public csHashComputerBitArray<XMLSNS::MyBitArrayMalloc> { };
 
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csComparator<XMLSNS::MyBitArrayTemp, XMLSNS::MyBitArrayTemp> : 
   public csComparatorBitArray<XMLSNS::MyBitArrayTemp> { };
 
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<XMLSNS::MyBitArrayTemp> : 
   public csHashComputerBitArray<XMLSNS::MyBitArrayTemp> { };
 

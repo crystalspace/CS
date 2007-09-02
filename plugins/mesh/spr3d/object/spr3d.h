@@ -285,6 +285,8 @@ public:
 
 class csSprite3DMeshObject;
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * A 3D sprite based on a triangle mesh with a single texture.
  * Animation is done with frames.
@@ -734,6 +736,8 @@ public:
 
   /** @} */
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * A 3D sprite based on a triangle mesh with a single texture.

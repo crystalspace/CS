@@ -86,7 +86,7 @@ struct csVertexTexel
   }
 };
 
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<csVertexTexel>
 {
 public:

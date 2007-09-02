@@ -222,11 +222,13 @@ public:
  * Debugger plugin. Loading this plugin is sufficient to get debugging
  * functionality in your application.
  */
-class csBugPlug : public scfImplementation2<csBugPlug, iBugPlug, iComponent>
+class csBugPlug : public scfImplementation3<csBugPlug,
+  iBugPlug, iComponent, iEventHandler>
 {
 private:
   iObjectRegistry *object_reg;
   csRef<iEngine> Engine;
+  csRef<iEventHandler> weakEventHandler;
   csRef<iGraphics3D> G3D;
   csRef<iGraphics2D> G2D;
   csRef<iConsoleOutput> Conout;
@@ -499,37 +501,16 @@ public:
 
   bool ExecCommand (const char* command);
 
-  // This is not an embedded interface in order to avoid
-  // a circular reference between this registered event handler
-  // and the parent object.
-  class EventHandler : public scfImplementation1<EventHandler,iEventHandler>
-  {
-  private:
-    csBugPlug* parent;
-  public:
-    EventHandler (csBugPlug* parent)
-      :scfImplementationType (this)
-    {
-      EventHandler::parent = parent;
-    }
-    virtual ~EventHandler ()
-    {
-    }
-    virtual bool HandleEvent (iEvent& ev)
-    {
-      return parent->HandleEvent (ev);
-    }
-    CS_EVENTHANDLER_NAMES("crystalspace.bugplug")
-    CS_CONST_METHOD virtual const csHandlerID * GenericPrec(
-    	csRef<iEventHandlerRegistry>&, 
-	csRef<iEventNameRegistry>&,
-	csEventID) const;
-    CS_CONST_METHOD virtual const csHandlerID * GenericSucc(
-    	csRef<iEventHandlerRegistry>&, 
-	csRef<iEventNameRegistry>&,
-	csEventID) const;
-    CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
-  } *scfiEventHandler;
+  CS_EVENTHANDLER_NAMES("crystalspace.bugplug")
+  CS_CONST_METHOD virtual const csHandlerID * GenericPrec(
+    csRef<iEventHandlerRegistry>&, 
+    csRef<iEventNameRegistry>&,
+    csEventID) const;
+  CS_CONST_METHOD virtual const csHandlerID * GenericSucc(
+    csRef<iEventHandlerRegistry>&, 
+    csRef<iEventNameRegistry>&,
+    csEventID) const;
+  CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
 
   CS_DECLARE_EVENT_SHORTCUTS;
 };

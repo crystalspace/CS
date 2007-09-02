@@ -20,20 +20,69 @@
 #include "cssysdef.h"
 #include "csutil/csstring.h"
 #include "csutil/util.h"
+#include "csutil/scfstringarray.h"
 #include "csutil/sysfunc.h"
 #include "csutil/win32/registrycfg.h"
 
+/**
+ * Iterates over a registry key subkeys and values.
+ * \remarks This class provides functionality specific to the Win32 
+ *  platform. To ensure that code using this functionality compiles properly 
+ *  on all other platforms, the use of the interface and inclusion of the 
+ *  header file should be surrounded by appropriate 
+ *  '\#if defined(CS_PLATFORM_WIN32) ... \#endif' statements.
+ */
+class csWin32RegistryIterator : 
+  public scfImplementation1<csWin32RegistryIterator, iConfigIterator>
+{
+  csRef<csWin32RegistryConfig> owner;
+
+  typedef struct 
+  {
+    csStringHash strings;
+  } riStatus;
+  mutable riStatus status;
+
+  DWORD EnumIndex, nextEnumIndex;
+
+  csString SubsectionName;
+
+  // shortcut to RegEnumValue/RegQueryValueEx
+  bool GetCurrentData (DWORD& type, 
+    csWin32RegistryConfig::Block_O_Mem& data) const;
+
+  void NextIndex();
+public:
+
+  csWin32RegistryIterator (csWin32RegistryConfig* Owner, 
+    const char* Subsection);
+  virtual ~csWin32RegistryIterator();
+
+  virtual iConfigFile *GetConfigFile () const;
+  virtual const char *GetSubsection () const;
+
+  virtual void Rewind ();
+  virtual bool Next();
+  virtual bool HasNext();
+
+  virtual const char *GetKey (bool Local = false) const;
+  virtual int GetInt () const;
+  virtual float GetFloat () const;
+  virtual const char *GetStr () const;
+  virtual bool GetBool () const;
+  virtual csPtr<iStringArray> GetTuple() const;
+  virtual const char *GetComment () const;
+};
 
 csWin32RegistryConfig::csWin32RegistryConfig ()
   : scfImplementationType (this), hKey (0), hKeyParent (HKEY_CURRENT_USER), 
-  Prefix (0), writeAccess (false), Key (0), status (new rcStatus)
+  Prefix (0), writeAccess (false), Key (0)
 {
 }
 
 csWin32RegistryConfig::~csWin32RegistryConfig()
 {
   Close();
-  delete status;
 }
 
 void csWin32RegistryConfig::ReplaceSeparators (char* key) const
@@ -271,15 +320,15 @@ const char* csWin32RegistryConfig::RegToStr (DWORD type, Block_O_Mem& data,
   switch (type)
   {
   case REG_SZ:
-    return status->strings.Register ((char*)data.data, 0);
+    return status.strings.Register ((char*)data.data, 0);
     break;
   case REG_DWORD:
     buf.Format ("%d", *((int*)data.data));
-    return status->strings.Register (buf, 0);
+    return status.strings.Register (buf, 0);
     break;
   case REG_BINARY:
     buf.Format ("%g", *((float*)data.data));
-    return status->strings.Register (buf, 0);
+    return status.strings.Register (buf, 0);
     break;
   default:
     return Def;
@@ -460,18 +509,48 @@ void csWin32RegistryConfig::SetEOFComment (const char * /*Text*/)
 {
 }
 
+//---------------------------------------------------------------------------
+
 csWin32RegistryIterator::csWin32RegistryIterator (csWin32RegistryConfig* Owner, 
   const char* Subsection)
-  : scfImplementationType (this), owner (Owner), status (new riStatus), EnumIndex (0), 
-  SubsectionName (csStrNew (Subsection))
+  : scfImplementationType (this), owner (Owner), EnumIndex (0), 
+    nextEnumIndex (0), SubsectionName (csStrNew (Subsection))
 {
+  NextIndex();
 }
 
 csWin32RegistryIterator::~csWin32RegistryIterator()
 {
   owner->iters.Delete (this);
   delete[] SubsectionName;
-  delete status;
+}
+
+void csWin32RegistryIterator::NextIndex()
+{
+  LONG err;
+
+  char Name[256];
+  DWORD namelen;
+
+  if (nextEnumIndex == (DWORD)~0) return;
+    
+  do
+  {
+    namelen = sizeof (Name);
+
+    if ((err = RegEnumValue (owner->hKey, nextEnumIndex,
+      Name, &namelen, 0, 0, 0, 0)) != ERROR_SUCCESS)
+    {
+      nextEnumIndex = (DWORD)~0;
+      return;
+    }
+    nextEnumIndex++;
+    if (strncasecmp (Name, SubsectionName, SubsectionName.Length()) == 0)
+    {
+      return;
+    }
+  }
+  while (true);
 }
 
 iConfigFile* csWin32RegistryIterator::GetConfigFile () const
@@ -486,33 +565,21 @@ const char *csWin32RegistryIterator::GetSubsection () const
 
 void csWin32RegistryIterator::Rewind ()
 {
-  EnumIndex = 0;
+  EnumIndex = nextEnumIndex = 0;
+  NextIndex();
 }
 
 // navigate though the reg key to the next value entry
 bool csWin32RegistryIterator::Next()
 {
-  LONG err;
+  EnumIndex = nextEnumIndex;
+  NextIndex();
+  return EnumIndex != (DWORD)~0;
+}
 
-  char Name[256];
-  DWORD namelen;
-    
-  do
-  {
-    namelen = sizeof (Name);
-
-    if ((err = RegEnumValue (owner->hKey, EnumIndex,
-      Name, &namelen, 0, 0, 0, 0)) != ERROR_SUCCESS)
-    {
-      return false;
-    }
-    EnumIndex++;
-    if (strncasecmp (Name, SubsectionName, strlen (SubsectionName)) == 0)
-    {
-      return true;
-    }
-  }
-  while (true);
+bool csWin32RegistryIterator::HasNext()
+{
+  return nextEnumIndex != (DWORD)~0;
 }
 
 const char *csWin32RegistryIterator::GetKey (bool Local) const
@@ -529,7 +596,7 @@ const char *csWin32RegistryIterator::GetKey (bool Local) const
     return 0;
   }
 
-  const char* str = status->strings.Register (Name, 0);
+  const char* str = status.strings.Register (Name, 0);
 
   return (Local ? (str + strlen (SubsectionName)) : str);
 }
@@ -608,6 +675,37 @@ bool csWin32RegistryIterator::GetBool () const
     return Def;
 
   return owner->RegToBool (type, data, Def);
+}
+
+csPtr<iStringArray> csWin32RegistryIterator::GetTuple() const
+{
+  const char* Data = GetStr();
+
+  scfStringArray *items = new scfStringArray;		// the output list
+  csString item;
+
+  const char *sinp = Data;
+  const char *comp;
+  size_t len;
+  bool finished = false;
+
+  while (!finished)
+  {
+    comp = strchr (sinp, ',');
+    if (!comp)
+    {
+      finished = true;
+      comp = &sinp [strlen (sinp)];
+    }
+    len = strlen (sinp) - strlen (comp);
+    item = csString (sinp, len);
+    item.Trim ();
+    sinp = comp + 1;
+    items->Push (item);
+  }
+
+  csPtr<iStringArray> v(items);
+  return v;
 }
 
 const char *csWin32RegistryIterator::GetComment () const

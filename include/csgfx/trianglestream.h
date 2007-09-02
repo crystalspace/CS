@@ -168,7 +168,7 @@ namespace CS
 	  break;
 	case CS_MESHTYPE_TRIANGLESTRIP:
 	  {
-	    const uint cur = GetNextIndex();
+	    const T cur = GetNextIndex();
             a = old1;
             b = old2;
             c = cur;
@@ -182,7 +182,7 @@ namespace CS
 	  break;
 	case CS_MESHTYPE_TRIANGLEFAN:
 	  {
-	    const uint cur = GetNextIndex();
+	    const T cur = GetNextIndex();
             a = old2;
             b = old1;
             c = cur;

@@ -56,7 +56,7 @@ class csPoolEvent;
  */
 #define DEF_EVENT_QUEUE_LENGTH  256
 
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<iEventHandler *> : public csHashComputerIntegral<iEventHandler *> {};
 
 /**

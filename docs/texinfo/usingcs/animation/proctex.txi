@@ -18,9 +18,8 @@ there or manually clear screen every frame).  Note that all textures
 can be updated with this technique. i.e. you don't need to mark a texture
 as being procedural.
 
-@subsubheading Updating a Texture Image
+@subsubheading Updating a Texture Image with 2D and 3D graphics
 @cindex @code{SetRenderTarget()}
-@cindex @code{Blit()}
 
 The following code demonstrates how you can update a texture image:
 
@@ -37,13 +36,10 @@ The following code demonstrates how you can update a texture image:
   @}
 @end example
 
-It is also possible to do 3D graphics on a procedural texture. Note that
-the code above overwrites what is currently displayed on screen!  So make
-sure to do it before anything you need is rendered.
+Similarly, it is also possible to do 3D graphics on a procedural texture. 
 
-A useful function with procedural textures is @code{iGraphics2D->Blit()}
-which can copy a @sc{rgb} buffer from memory directly to the screen.  This
-is often useful for procedural textures.
+Note that the code above may overwrite what is currently displayed on screen!  
+So make sure to do it before anything you need is rendered.
 
 @code{SetRenderTarget} also has a second parameter which is called
 @samp{persistant} and which is set to false by default.  If you set this to
@@ -52,6 +48,15 @@ That means you can make modifications to an existing texture.  With this
 parameter set to false (default) you have to create the entire texture
 again.  Note that setting @samp{persistant} to true is slower if you intend
 to update the entire texture area anyway.
+
+@subsubheading Updating a Texture Image with @sc{rgba} Pixel Data
+@cindex @code{Blit()}
+
+Another way to realize procedural textures is to use the function 
+@code{iTextureHandle->Blit()} which can copy a @sc{rgba} or @sc{bgra} buffer 
+from memory directly to a texture.  This is useful for procedural textures 
+where you compute the pixel data directly or obtain it from some external 
+source and hence don't need the 2D or 3D graphics functions.
 
 @subsubheading Using csProcTexture
 @cindex @code{csProcTexture}
@@ -116,3 +121,19 @@ manually calling @code{Animate} for example.
 Another way to fix this is by letting your procedural texture subclass
 set the @samp{always_animate} flag to true.  Of course this will make
 things slower.
+
+@subsubheading Performance Hints
+
+When supported by the hardware, mipmaps are generated for procedural textures.
+While this improves the display quality it may have a noticeable impact on
+performance. You can use the @code{CS_TEXTURE_NOMIPMAPS} texture flag to 
+disable this behaviour.
+
+@code{iTextureHandle->Blit()} performance might differ depending on hardware
+and data format.  For example, @sc{nvidia} hardware is fastest with @sc{bgra}
+data but may suffer greatly when using @sc{rgba} data.  On the other hand,
+documentation from @sc{ati}'s Software Development Kit suggests that modern
+@sc{ati} hardware supports @sc{rgba} and @sc{bgra} equally well.  This means
+there is no ``universal fastest format'' for using 
+@code{iTextureHandle->Blit()}, albeit for the most widespread graphics chips
+@sc{bgra} seems to be the most practical choice.

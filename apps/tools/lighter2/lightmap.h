@@ -29,7 +29,7 @@ namespace lighter
   public:
     Lightmap (uint width, uint height)
       : width (0), height (0), maxUsedU (0), maxUsedV (0), 
-      lightmapAllocator (csRect (0,0,1,1))
+      lightmapAllocator (csRect (0,0,1,1)), texture (0)
     {
       Grow (width, height);
     }
@@ -84,7 +84,10 @@ namespace lighter
     inline const csSubRectangles& GetAllocator () const { return lightmapAllocator; }
 
     inline const csString& GetFilename () { return filename; }
+    inline csString GetTextureName () 
+    { return GetTextureNameFromFilename (filename); }
 
+    iTextureWrapper* GetTexture();
   protected:
     // The color data itself
     ColorDArray data;
@@ -100,6 +103,9 @@ namespace lighter
 
     // Filename
     csString filename;
+
+    iTextureWrapper* texture;
+    csString GetTextureNameFromFilename (const csString& file);
   };
   typedef csArray<Lightmap> LightmapArray;
   typedef csPDelArray<Lightmap> LightmapPtrDelArray;
@@ -112,7 +118,7 @@ namespace lighter
       : width (lm.GetWidth ()), height (lm.GetHeight ())
     {
       // Copy over the size from the lightmap
-      maskData.SetSize (lm.GetWidth ()*lm.GetHeight (), 0);
+      maskData.SetSize (width*height, 0);
     }
     
     csDirtyAccessArray<float> maskData;

@@ -4,12 +4,18 @@
     <?if vars."glow pulse speed" ?>
     <shadervars>
       <shadervar name="glow alpha" type="expression">
-       <sin>
-         <mul>
-	   <atom type="var">standard time</atom>
-	   <atom type="var">glow pulse speed</atom>
-	 </mul>
-       </sin>
+       <div>
+         <add>
+           <sin>
+             <mul>
+	         <atom type="var">standard time</atom>
+	         <atom type="var">glow pulse speed</atom>
+	       </mul>
+	     </sin>
+	     <atom type="num">1</atom>
+	   </add>
+	   <atom type="num">2</atom>
+       </div>
       </shadervar>
      </shadervars>
     <?endif?>

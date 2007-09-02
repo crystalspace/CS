@@ -125,6 +125,7 @@ public:
 
   void ReplaceVariable (csShaderVariable *variable) { }
   void Clear () { }
+  bool RemoveVariable  (csShaderVariable *) { return false; }
 };
 
 #include "csutil/win32/msvc_deprecated_warn_off.h"

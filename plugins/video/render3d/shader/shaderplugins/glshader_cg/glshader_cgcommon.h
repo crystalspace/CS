@@ -53,6 +53,7 @@ protected:
   csGLShader_CG* shaderPlug;
 
   CGprogram program;
+  CGprofile programProfile;
   csString cg_profile;
   csString entrypoint;
 

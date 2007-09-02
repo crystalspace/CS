@@ -151,6 +151,8 @@ csSimpleFormer::csSimpleFormer (iBase* parent) :
   scfImplementationType (this, parent), objectRegistry (0), scale (1),
   offset (0)
 {
+  // This was the only way to add this feature without breaking the API.
+  materialScaleSet = false;
 }
 
 csSimpleFormer::~csSimpleFormer ()
@@ -425,11 +427,22 @@ void csSimpleFormer::SetHeightmap (iImage *heightmap)
 void csSimpleFormer::SetScale (csVector3 scale)
 {
   csSimpleFormer::scale = scale;
+  if(!materialScaleSet)
+  {
+    materialScale.x=scale.x;
+	materialScale.y=scale.z;
+  }
 }
 
 void csSimpleFormer::SetOffset (csVector3 offset)
 {
   csSimpleFormer::offset = offset;
+}
+
+void csSimpleFormer::SetMaterialScale(csVector2 scale)
+{
+  csSimpleFormer::materialScale = scale;
+  materialScaleSet = true;
 }
 
 bool csSimpleFormer::Initialize (iObjectRegistry* objectRegistry)
@@ -544,6 +557,39 @@ bool csSimpleFormer::SampleInteger (csStringID type, float x, float z,
   }
   return false;
 }
+
+csVector2 csSimpleFormer::GetIntegerMapSize (csStringID type)
+{
+  // Get the shared string repository
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    objectRegistry, "crystalspace.shared.stringset",
+    iStringSet);
+
+  csString typestring = csString(strings->Request(type));
+
+  // Check what we're supposed to return
+  if (type == stringMaterialIndices)
+  {
+    // This isn't implemented yet. We just return 0
+    return 0;
+  }
+  else if (typestring.Find("alphamap") == 0 ||
+           type == strings->Request("materialmap"))
+  {
+    for (uint i = 0; i < intmaps.Length(); i++)
+    {
+      if (intmaps[i].type == type)
+        return csVector2(intmaps[i].width,intmaps[i].height);
+    }
+    return csVector2(0,0);
+  }
+  else
+  {
+    // Something we can't return was requested
+    return csVector2(0,0);
+  }
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 //                            csSimpleSampler
@@ -769,7 +815,52 @@ void csSimpleSampler::CacheTexCoords ()
   // The positions aren't really needed, but CachePositions
   // calculates some other useful stuff too, so we just assume
   // positions will be needed eventually too
-  CachePositions ();
+  //CachePositions ();
+
+  // Recompute this stuff so that the material can be scaled seperate.
+  // Compute region corners
+  minCorner = csVector3 (region.MinX (), 0, region.MinY ());
+  maxCorner = csVector3 (region.MaxX (), 0, region.MaxY ());
+
+  // Compute distance between sample points
+  sampleDistanceReal = (resx == 1) ? 0 :
+    (maxCorner.x-minCorner.x)/(float)(resx-1);
+  sampleDistanceReal = (resz == 1) ? 0 :
+    (maxCorner.z-minCorner.z)/(float)(resz-1);
+
+  // We wanna compute our region in heightmap space
+  // Heightmap -> real space is computed by:
+  // 1. Divide by size/2 to get to 0..2
+  // 2. Subtract by 1 to get to -1..1
+  // 3. Multiply by scale
+  // 4. Add offset
+  // We're now doing it all backwards to get to heightmap space.
+
+  // 4. Add offset
+  minCorner -= terraFormer->offset;
+  maxCorner -= terraFormer->offset;
+
+  // 3. Multiply by scale
+  minCorner.x /= terraFormer->materialScale.x;
+  maxCorner.x /= terraFormer->materialScale.x;
+  minCorner.z /= terraFormer->materialScale.y;
+  maxCorner.z /= terraFormer->materialScale.y;
+
+  // 2. Subtract by 1 to get to -1..1
+  minCorner += csVector3 (1, 0, 1);
+  maxCorner += csVector3 (1, 0, 1);
+
+  // 1. Divide by size/2 to get to 0..2
+  minCorner.x *= (float)terraFormer->width/2;
+  maxCorner.x *= (float)terraFormer->width/2;
+  minCorner.z *= (float)terraFormer->height/2;
+  maxCorner.z *= (float)terraFormer->height/2;
+
+  // Compute distance between sample points in heightmap space
+  sampleDistanceHeight.x = (resx == 1) ? 0 :
+    (maxCorner.x-minCorner.x)/(float)(resx-1);
+  sampleDistanceHeight.z = (resz == 1) ? 0 :
+    (maxCorner.z-minCorner.z)/(float)(resz-1);
 
   // Keep index counter to avoid uneccessary x+y*w calculations
   int idx = 0;
@@ -780,15 +871,15 @@ void csSimpleSampler::CacheTexCoords ()
   csVector2 texCoord;
   texCoord.y = minCorner.z / (float)(terraFormer->height);
   const csVector2 tcStep (
-    sampleDistanceHeight.x / (float)(terraFormer->width),
-    sampleDistanceHeight.z / (float)(terraFormer->height));
+	  sampleDistanceHeight.x / (float)(terraFormer->width),
+	  sampleDistanceHeight.z / (float)(terraFormer->height));
   for (unsigned int i = 0; i<resz; ++i)
   {
     texCoord.x = startx;
     for (unsigned int j = 0; j<resx; ++j)
     {
       // Just assign the texture coordinate
-      texCoords[idx++].Set (texCoord.x, 1.0f-texCoord.y); //= texCoord;
+		texCoords[idx++].Set (texCoord.x, 1.0f-texCoord.y); //= texCoord;
       texCoord.x += tcStep.x;
     }
     texCoord.y += tcStep.y;

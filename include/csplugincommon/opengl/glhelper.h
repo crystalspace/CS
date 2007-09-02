@@ -33,54 +33,75 @@
 
 /// Make an OpenGL matrix from a CS transform
 static inline void makeGLMatrix (const csReversibleTransform& t, 
-  float matrix[16])
+  float matrix[16], bool rowMajor = false)
 {
   const csMatrix3 &orientation = t.GetO2T();
   const csVector3 &translation = t.GetO2TTranslation();
 
-  matrix[0] = orientation.m11;
-  matrix[1] = orientation.m12;
-  matrix[2] = orientation.m13;
-  matrix[3] = 0.0f;
+  int row, col;
+  if (rowMajor)
+  {
+    col = 1; row = 4;
+  }
+  else
+  {
+    col = 4; row = 1;
+  }
 
-  matrix[4] = orientation.m21;
-  matrix[5] = orientation.m22;
-  matrix[6] = orientation.m23;
-  matrix[7] = 0.0f;
+  matrix[col*0+row*0] = orientation.m11;
+  matrix[col*0+row*1] = orientation.m12;
+  matrix[col*0+row*2] = orientation.m13;
+  matrix[col*0+row*3] = 0.0f;
 
-  matrix[8] = orientation.m31;
-  matrix[9] = orientation.m32;
-  matrix[10] = orientation.m33;
-  matrix[11] = 0.0f;
+  matrix[col*1+row*0] = orientation.m21;
+  matrix[col*1+row*1] = orientation.m22;
+  matrix[col*1+row*2] = orientation.m23;
+  matrix[col*1+row*3] = 0.0f;
 
-  matrix[12] = translation.x;
-  matrix[13] = translation.y;
-  matrix[14] = translation.z;
-  matrix[15] = 1.0f;
+  matrix[col*2+row*0] = orientation.m31;
+  matrix[col*2+row*1] = orientation.m32;
+  matrix[col*2+row*2] = orientation.m33;
+  matrix[col*2+row*3] = 0.0f;
+
+  matrix[col*3+row*0] = translation.x;
+  matrix[col*3+row*1] = translation.y;
+  matrix[col*3+row*2] = translation.z;
+  matrix[col*3+row*3] = 1.0f;
 }
 
 /// Make an OpenGL matrix from a CS matrix
-static inline void makeGLMatrix (const csMatrix3& m, float matrix[16])
+static inline void makeGLMatrix (const csMatrix3& m, float matrix[16], 
+                                 bool rowMajor = false)
 {
-  matrix[0] = m.m11;
-  matrix[1] = m.m12;
-  matrix[2] = m.m13;
-  matrix[3] = 0.0f;
+  int row, col;
+  if (rowMajor)
+  {
+    col = 1; row = 4;
+  }
+  else
+  {
+    col = 4; row = 1;
+  }
 
-  matrix[4] = m.m21;
-  matrix[5] = m.m22;
-  matrix[6] = m.m23;
-  matrix[7] = 0.0f;
+  matrix[col*0+row*0] = m.m11;
+  matrix[col*0+row*1] = m.m12;
+  matrix[col*0+row*2] = m.m13;
+  matrix[col*0+row*3] = 0.0f;
 
-  matrix[8] = m.m31;
-  matrix[9] = m.m32;
-  matrix[10] = m.m33;
-  matrix[11] = 0.0f;
+  matrix[col*1+row*0] = m.m21;
+  matrix[col*1+row*1] = m.m22;
+  matrix[col*1+row*2] = m.m23;
+  matrix[col*1+row*3] = 0.0f;
 
-  matrix[12] = 0.0f;
-  matrix[13] = 0.0f;
-  matrix[14] = 0.0f;
-  matrix[15] = 1.0f;
+  matrix[col*2+row*0] = m.m31;
+  matrix[col*2+row*1] = m.m32;
+  matrix[col*2+row*2] = m.m33;
+  matrix[col*2+row*3] = 0.0f;
+
+  matrix[col*3+row*0] = 0.0f;
+  matrix[col*3+row*1] = 0.0f;
+  matrix[col*3+row*2] = 0.0f;
+  matrix[col*3+row*3] = 1.0f;
 }
 
 /** @} */

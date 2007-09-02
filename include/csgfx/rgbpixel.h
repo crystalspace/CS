@@ -115,7 +115,7 @@ struct csRGBcolor
 /**
  * csComparator<> specialization for csRGBcolor.
  */
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csComparator<csRGBcolor, csRGBcolor>
 {
 public:
@@ -135,7 +135,7 @@ public:
  * csComparator<> specialization for csColor*. Mostly for compatibility with
  * now-defunct csRGBVector class.
  */
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csComparator<csRGBcolor*, csRGBcolor*> 
 {
 public:

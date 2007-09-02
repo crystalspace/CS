@@ -60,8 +60,20 @@ actions GenerateWin32VersionRc
 // This file is generated automatically.
 
 1 VERSIONINFO
-FILEVERSION $(PACKAGE_VERSION_LIST[1]), $(PACKAGE_VERSION_LIST[2]), $(PACKAGE_VERSION_LIST[3]), $(PACKAGE_VERSION_LIST[4])
-PRODUCTVERSION $(PACKAGE_VERSION_LIST[1]), $(PACKAGE_VERSION_LIST[2]), $(PACKAGE_VERSION_LIST[3]), $(PACKAGE_VERSION_LIST[4])
+FILEVERSION 
+__EOF__
+
+	# Remove any RC tag
+	echo '$(PACKAGE_VERSION_LIST[1]),$(PACKAGE_VERSION_LIST[2]),$(PACKAGE_VERSION_LIST[3]),$(PACKAGE_VERSION_LIST[4])' | $(SED) 's/RC\([0-9]\)//g' | $(SED) 's/[^0123456789._,]//g' >> $(<)
+
+cat >> $(<) << __EOF__
+PRODUCTVERSION 
+__EOF__
+
+	# Remove any RC tag
+	echo '$(PACKAGE_VERSION_LIST[1]),$(PACKAGE_VERSION_LIST[2]),$(PACKAGE_VERSION_LIST[3]),$(PACKAGE_VERSION_LIST[4])' | $(SED) 's/RC\([0-9]\)//g' | $(SED) 's/[^0123456789._,]//g' >> $(<)
+
+cat >> $(<) << __EOF__
 #ifdef CS_DEBUG
 FILEFLAGS 0x1
 #else
@@ -108,7 +120,7 @@ __EOF__
 
     # Filter out non-numerical characters from the version number. Windows does
     # not like them.
-    echo '$(PACKAGE_VERSION_LIST[1]).$(PACKAGE_VERSION_LIST[2]).$(PACKAGE_VERSION_LIST[3]).$(PACKAGE_VERSION_LIST[4])' | $(SED) 's/[^0123456789.]//g' | $(SED) 's/\(.*\)/    version="\1"/' >> $(<)
+    echo '$(PACKAGE_VERSION_LIST[1]).$(PACKAGE_VERSION_LIST[2]).$(PACKAGE_VERSION_LIST[3]).$(PACKAGE_VERSION_LIST[4])' | $(SED) 's/RC\([0-9]\)//g' | $(SED) 's/[^0123456789.]//g' | $(SED) 's/\(.*\)/    version="\1"/' >> $(<)
   
     cat >> $(<) << __EOF__
     processorArchitecture="X86"

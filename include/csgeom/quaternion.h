@@ -258,6 +258,23 @@ public:
    */
   csQuaternion SLerp (const csQuaternion& q2, float t) const;
 
+  /**
+   * Get quaternion log
+   */
+  csQuaternion Log () const;
+
+  /**
+   * Get quaternion exp
+   */
+  csQuaternion Exp () const;
+
+  /**
+   * Interpolate this quaternion with another (q) using cubic linear
+   * interpolation (squad) using given interpolation factor (t)
+   * and tangents (t1 and t2)
+   */
+  csQuaternion Squad (const csQuaternion & t1, const csQuaternion & t2,
+    const csQuaternion & q, float t) const;
 
   // Data
   csVector3 v;

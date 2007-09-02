@@ -92,7 +92,7 @@
   <?CgSetVertexFunc VertexMain ?>
   <?CgSetFragmentFunc FragmentMain ?>
 
-  <?! Finally, this will write the technique with the given priority (150). ?>
+  <?! Finally, this will write the technique with the given priority (300). ?>
   <?WriteShaderTechnique 300?>
   
   <?! Now, basically the same, just without parallax mapping now. ?>

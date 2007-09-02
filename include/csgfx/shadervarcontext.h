@@ -55,6 +55,7 @@ namespace CS
     virtual bool IsEmpty() const { return variables.Length() == 0; }  
     virtual void ReplaceVariable (csShaderVariable *variable);
     virtual void Clear () { variables.Empty(); }
+    virtual bool RemoveVariable (csShaderVariable* variable);
   };
 }
 

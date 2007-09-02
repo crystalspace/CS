@@ -179,9 +179,10 @@ void csEventQueueTest::testPhaseHandlers ()
   handlers = new csList<csString *> ();
   queue->Process ();
 
+#ifdef ADB_DEBUG
   csEventTree *frameEvent = queue->EventTree->FindNode(csevFrame (objreg), queue);
-
   frameEvent->fatRecord->SubscriberGraph->Dump (objreg);
+#endif
 
   CPPUNIT_ASSERT_MESSAGE ("List is empty", !handlers->IsEmpty());
 

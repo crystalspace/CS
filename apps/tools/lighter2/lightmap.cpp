@@ -48,7 +48,8 @@ namespace lighter
     filename = fname;
     //write it out
 
-    ApplyExposureFunction (1.8f, 1.0f);
+    // 0.5 to account for the fact that the shader does *2
+    ApplyExposureFunction (1.8f, 0.5f); 
 
     // first we downsample to LDR csRGBpixel RGBA
     csRGBpixel *pixelData = new csRGBpixel[width*height];
@@ -72,5 +73,25 @@ namespace lighter
       file->Flush ();
     }
     delete[] pixelData;
+  }
+
+  iTextureWrapper* Lightmap::GetTexture()
+  {
+    if (texture == 0)
+    {
+      texture = globalLighter->engine->CreateBlackTexture (
+        GetTextureName(), 1, 1, 0, CS_TEXTURE_3D);
+    }
+    return texture;
+  }
+
+  csString Lightmap::GetTextureNameFromFilename (const csString& file)
+  {
+    csString out (file);
+    out.ReplaceAll ("\\", "_"); //replace bad characters
+    out.ReplaceAll ("/", "_"); 
+    out.ReplaceAll (" ", "_"); 
+    out.ReplaceAll (".", "_"); 
+    return out;
   }
 }

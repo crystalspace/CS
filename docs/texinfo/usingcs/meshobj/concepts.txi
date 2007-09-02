@@ -83,8 +83,8 @@ appropriate name).
 @subsubheading Mesh Object Type
 
 The @dfn{Mesh Object Type} describes a specific kind of Mesh Object plug-in.
-For example, Crystal Space supports several types of Mesh Objects: snow
-particle system, fountain particle system, cube, ball, etc.  The Mesh Object
+For example, Crystal Space supports several types of Mesh Objects: particle
+system, ball, terrain, genmesh, etc.  The Mesh Object
 Type corresponds directly to the plug-in itself.  It is the class' responsible
 for creating all Mesh Object Factories.  Mesh Object Types implement the
 @sc{scf} interface @samp{iMeshObjectType}.

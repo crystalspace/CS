@@ -246,7 +246,7 @@ namespace lighter
       back.illuminationColor = illuminationColor;
       back.reflectanceColor = reflectanceColor;
       back.originalPrim = originalPrim;
-      back.lightmapID = lightmapID;
+      back.globalLightmapID = globalLightmapID;
     }
 
     return true;

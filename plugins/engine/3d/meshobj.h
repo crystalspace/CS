@@ -681,6 +681,12 @@ public:
   void ReplaceVariable (csShaderVariable *variable)
   { svcontext.ReplaceVariable (variable); }
   void Clear () { svcontext.Clear(); }
+  
+  bool RemoveVariable (csShaderVariable* variable)
+  { 
+    // @@@ Also remove from factory?
+    return svcontext.RemoveVariable (variable); 
+  }
   /** @} */
 
   //--------------------- iSelfDestruct implementation -------------------//
@@ -761,11 +767,13 @@ public:
 /**
  * The holder class for all implementations of iMeshObjectFactory.
  */
-class csMeshFactoryWrapper : public scfImplementationExt3<csMeshFactoryWrapper,
-                                                          csObject, 
-                                                          iMeshFactoryWrapper,
-                                                          iShaderVariableContext,
-							  iSelfDestruct>
+class csMeshFactoryWrapper : 
+  public scfImplementationExt3<csMeshFactoryWrapper,
+                               csObject, 
+                               iMeshFactoryWrapper,
+                               scfFakeInterface<iShaderVariableContext>,
+			       iSelfDestruct>,
+  public CS::ShaderVariableContextImpl
 {
 private:
   /// Mesh object factory corresponding with this csMeshFactoryWrapper.
@@ -790,8 +798,6 @@ private:
   long render_priority;
   /// Suggestion for new children created from factory.
   csZBufMode zbufMode;
-
-  csShaderVariableContext svcontext;
 
   csFlags flags;
 
@@ -883,35 +889,6 @@ public:
   //--------------------- iSelfDestruct implementation -------------------//
 
   virtual void SelfDestruct ();
-
-  /**\name iShaderVariableContext implementation
-   * @{ */
-  /// Add a variable to this context
-  void AddVariable (csShaderVariable *variable)
-  { svcontext.AddVariable (variable); }
-
-  /// Get a named variable from this context
-  csShaderVariable* GetVariable (csStringID name) const
-  { return svcontext.GetVariable (name); }
-
-  /// Get Array of all ShaderVariables
-  const csRefArray<csShaderVariable>& GetShaderVariables () const
-  { return svcontext.GetShaderVariables (); }
-
-  /**
-   * Push the variables of this context onto the variable stacks
-   * supplied in the "stacks" argument
-   */
-  void PushVariables (iShaderVarStack* stacks) const
-  { svcontext.PushVariables (stacks); }
-
-  bool IsEmpty () const 
-  { return svcontext.IsEmpty(); }
-
-  void ReplaceVariable (csShaderVariable *variable)
-  { svcontext.ReplaceVariable (variable); }
-  void Clear () { svcontext.Clear(); }
-  /** @} */
 };
 
 #endif // __CS_MESHOBJ_H__

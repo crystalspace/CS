@@ -38,7 +38,6 @@
 #include "csplugincommon/iopengl/driverdb.h"
 #include "csplugincommon/iopengl/openglinterface.h"
 #include "csplugincommon/particlesys/partgen.h"
-#include "csplugincommon/particlesys/particle.h"
 #include "csplugincommon/render3d/normalizationcube.h"
 #include "csplugincommon/render3d/txtmgr.h"
 #include "csplugincommon/renderstep/basesteploader.h"

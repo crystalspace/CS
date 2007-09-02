@@ -27,24 +27,28 @@ namespace lighter
 {
 
   // Very simple layouter.. just map "flat" on the lightmap
-  bool SimpleUVLayouter::LayoutUVOnPrimitives (RadPrimitiveArray &prims, 
-    RadObjectVertexData& vdata,
-    LightmapPtrDelArray& lightmaps)
+  LightmapUVLayoutFactory* SimpleUVLayouter::LayoutFactory (
+    const RadPrimitiveArray& inPrims, RadObjectVertexData& vertexData,
+    csArray<RadPrimitiveArray>& outPrims)
   {
-    if (prims.GetSize () == 0) return false;
+    if (inPrims.GetSize () == 0) return 0;
+
+    outPrims.Empty();
+
+    LightmapPtrDelArray localLightmaps;
 
     // This is really dumb.. make sure every vertex have unqiue UV
     size_t i;
 
     BoolDArray vused;
-    vused.SetSize (vdata.vertexArray.GetSize (), false);
+    vused.SetSize (vertexData.vertexArray.GetSize (), false);
 
     //TODO Reimplement simple UV-layouter
     
     // Layout every primitive by itself    
-    for (i = 0; i < prims.GetSize (); i++)
+    for (i = 0; i < inPrims.GetSize (); i++)
     {
-      RadPrimitive &prim = prims[i];
+      RadPrimitive prim (inPrims[i]);
       bool lmCoordsGood = false;
       int its = 0; //number of iterations
       
@@ -78,31 +82,27 @@ namespace lighter
         csRect lmArea; 
         int lmID;
         bool res;
-        res = AllocLightmap (lightmaps, (int)ceilf (uvSize.x), 
+        res = AllocLightmap (localLightmaps, (int)ceilf (uvSize.x), 
 	  (int)ceilf (uvSize.y), lmArea, lmID);
         if (!res) continue; 
 
-        lightmaps[lmID]->SetMaxUsedUV (lmArea.xmax, lmArea.ymax);
-
-        // Ok, now remap our coords
-        csVector2 uvRemap = csVector2(lmArea.xmin, lmArea.ymin) - minuv + csVector2(1.0f,1.0f);
-        prim.RemapUVs (uvRemap);
-        //prim.QuantizeUVs ();
-        prim.SetLightmapID (lmID);
+        RadPrimitiveArray& outArray = outPrims.GetExtend (lmID);
+        outArray.Push (prim);
+        //prim.SetLightmapID (lmID);
       }
     }
 
     // Set the size of the lightmaps..
-    for (i = 0; i < lightmaps.GetSize (); i++)
+    /*for (i = 0; i < lightmaps.GetSize (); i++)
     {
       Lightmap *lm = lightmaps[i];
       // Calculate next pow2 size
       uint newWidth = csFindNearestPowerOf2 (lm->GetMaxUsedU ());
       uint newHeight = csFindNearestPowerOf2 (lm->GetMaxUsedV ());
       lm->SetSize (newWidth, newHeight);
-    }
+    }*/
 
-    return true;
+    return new SimpleUVLayoutFactory (this);
   }
 
   bool SimpleUVLayouter::AllocLightmap (LightmapPtrDelArray& lightmaps, 
@@ -185,6 +185,64 @@ namespace lighter
       lightmapUV.y = position[selY] * vscale;
     
     }
+    return true;
+  }
+
+  //-------------------------------------------------------------------------
+
+  bool SimpleUVLayoutFactory::LayoutUVOnPrimitives (RadPrimitiveArray &prims, 
+    RadObjectVertexData& vertexData, uint& lmID)
+  {
+    LightmapPtrDelArray& globalLightmaps = parent->globalLightmaps;
+
+    csArray<csSubRectangles::SubRect*> subRects;
+
+    size_t lightmapIndex = 0;
+    bool successful = false;
+    while (!successful)
+    {
+      while (!successful && (lightmapIndex < globalLightmaps.GetSize()))
+      {
+        successful = true;
+        Lightmap* lm = globalLightmaps[lightmapIndex];
+        for (size_t i = 0; i < prims.GetSize () && successful; i++)
+        {
+          RadPrimitive &prim = prims[i];
+
+          csVector2 minuv, maxuv, uvSize;
+          prim.ComputeMinMaxUV (minuv, maxuv);
+          uvSize = (maxuv-minuv)+csVector2(2.0f,2.0f);
+
+          csRect lmArea; 
+          csSubRectangles::SubRect* res = 
+            lm->GetAllocator().Alloc ((int)ceilf (uvSize.x), 
+	        (int)ceilf (uvSize.y), lmArea);
+          if (res == 0)
+          {
+            lightmapIndex++;
+            successful = false;
+            for (size_t r = 0; r < subRects.GetSize(); r++)
+              lm->GetAllocator().Reclaim (subRects[r]);
+            subRects.Empty();
+          }
+          else
+          {
+            subRects.Push (res);
+
+            csVector2 uvRemap = csVector2(lmArea.xmin, lmArea.ymin) - minuv + csVector2(1.0f,1.0f);
+            prim.RemapUVs (uvRemap);
+            prim.SetGlobalLightmapID (uint (lightmapIndex));
+          }
+        }
+      }
+      if (!successful && lightmapIndex >= globalLightmaps.GetSize())
+      {
+        Lightmap *newL = new Lightmap (globalConfig.GetLMProperties ().maxLightmapU,
+                                       globalConfig.GetLMProperties ().maxLightmapV);
+        globalLightmaps.Push (newL);
+      }
+    }
+    lmID = uint (lightmapIndex);
     return true;
   }
 

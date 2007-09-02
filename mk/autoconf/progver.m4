@@ -202,10 +202,12 @@ AS_IF([test -n "$cs_prog_$4_is_version"],
 #                        to not try stuff like space, slash or comma.
 #
 # The test results in cs_cv_prog_PROG_version_ok being either yes or no.
+# Also the cs_prog_PROG_version variable is emitted with the found version.
 ##############################################################################
 AC_DEFUN([CS_CHECK_PROG_VERSION],
 [AC_CACHE_CHECK([if $1 version m4_default([$7],[>=]) $3],
     [AS_TR_SH([cs_cv_prog_$1_version_$3_ok_annotated])],
     [CS_VCHK_EXTRACTVERSION([$2], [$3], [$4], AS_TR_SH([$1]),
 	m4_default([$7],[>=]))])
-AS_IF([test "$AS_TR_SH([cs_cv_prog_$1_version_$3_ok])" = yes], [$5], [$6])])
+AS_IF([test "$AS_TR_SH([cs_cv_prog_$1_version_$3_ok])" = yes], [$5]
+      m4_define([cs_prog_$1_version],[$cs_prog_$1_is_version]),[$6])])

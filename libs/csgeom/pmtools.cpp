@@ -422,7 +422,7 @@ struct AdjacencyCounter
   }
 };
 
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csComparator<PolyEdge, PolyEdge>
 {
 public:
@@ -435,7 +435,7 @@ public:
   }
 };
 
-CS_SPECIALIZE_TEMPLATE
+template<>
 class csHashComputer<PolyEdge>
 {
 public:

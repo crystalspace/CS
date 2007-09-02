@@ -5,6 +5,7 @@ if $(WX.AVAILABLE) = "yes"
   Description wxtest : "WxWidgets Canvas Test" ;
   Application wxtest : [ Wildcard *.cpp *.h ] : noinstall ;
   ExternalLibs wxtest : WX ;
+  CFlags wxtest : $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE) ;
   LinkWith wxtest : crystalspace ;
   Win32Resource wxtest : [ ConcatDirs $(SUBDIR) wxtest.rc ] ;
   # To locate wx.rc

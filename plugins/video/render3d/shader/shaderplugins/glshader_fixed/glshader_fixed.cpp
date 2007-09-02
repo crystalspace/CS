@@ -159,6 +159,21 @@ void csGLShader_FIXED::Open()
     object_reg, "crystalspace.shared.stringset");
   lsvCache.SetStrings (strings);
 
+  bool verbose = false;
+  csRef<iVerbosityManager> verbosemgr (
+    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+  if (verbosemgr) 
+    verbose = verbosemgr->Enabled ("renderer.shader");
+
+#define LQUOT   "\xe2\x80\x9c"
+#define RQUOT   "\xe2\x80\x9d"
+  fixedFunctionForcefulEnable = 
+    config->GetBool ("Video.OpenGL.FixedFunctionForcefulEnable", false);
+  if (verbose)
+    Report (CS_REPORTER_SEVERITY_NOTIFY, 
+      LQUOT "Forceful" RQUOT " fixed function enable: %s",
+      fixedFunctionForcefulEnable ? "yes" : "no");
+
   isOpen = true;
 }
 
