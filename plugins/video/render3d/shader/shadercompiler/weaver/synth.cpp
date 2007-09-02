@@ -438,6 +438,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	defaultCombiner->EndSnippet ();
       }
     }
+    synthTree.Collapse (graph);
     {
       csArray<const Snippet::Technique*> outputs;
       outputs.Push (generatedOutput);
@@ -969,6 +970,90 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     nodes = newNodes;
     techToNode = newTechToNode;
+  }
+  
+  void Synthesizer::SynthesizeNodeTree::Collapse (TechniqueGraph& graph)
+  {
+    typedef csHash<Node*, csMD5::Digest> SeenNodesHash;
+    bool tryCollapse = true;
+
+    while (tryCollapse)
+    {
+      tryCollapse = false;
+      SeenNodesHash seenNodes;
+      for (size_t i = 0; i < nodes.GetSize(); i++)
+      {
+        Node* node = nodes[i];
+        const Snippet::Technique* tech = node->tech;
+        if (tech == 0) continue;
+        CS_ASSERT(!tech->IsCompound());
+        const Snippet::AtomTechnique* atomTech =
+          static_cast<const Snippet::AtomTechnique*> (tech);
+
+        bool found = false;
+        SeenNodesHash::Iterator nodeIt (seenNodes.GetIterator (
+          atomTech->GetID()));
+        while (nodeIt.HasNext () && !found)
+        {
+          Node* seenNode = nodeIt.Next();
+          
+          // Compare if inputs are the same.
+          bool inputsEqual = true;
+	  {
+	    CS::Utility::ScopedDelete<BasicIterator<const Snippet::Technique::Input> > 
+	      inputIt (node->tech->GetInputs());
+	    while (inputIt->HasNext())
+	    {
+	      const Snippet::Technique::Input& inp = inputIt->Next();
+              if (node->inputLinks.Get (inp.name, (const char*)0)
+                != seenNode->inputLinks.Get (inp.name, (const char*)0))
+              {
+                inputsEqual = false;
+                break;
+              }
+	    }
+	  }
+          if (inputsEqual)
+          {
+            /* Inputs are the same - we can remove the new node, but have to 
+               make sure the nodes that depend on it get fixed up. */
+            csArray<const Snippet::Technique*> deps;
+            graph.GetDependants (node->tech, deps);
+            for (size_t d = 0; d < deps.GetSize(); d++)
+            {
+              Node& dependentNode = GetNodeForTech (deps[d]);
+              StringStringHash::GlobalIterator inputLinkIt (
+                dependentNode.inputLinks.GetIterator());
+              while (inputLinkIt.HasNext ())
+              {
+                csString inputName;
+                csString& outputName = inputLinkIt.Next (inputName);
+
+                const csString* orgOutput = node->outputRenames.GetKeyPointer (
+                  outputName);
+                if (orgOutput)
+                {
+                  outputName = seenNode->outputRenames.Get (*orgOutput, 
+                    (const char*)0);
+                }
+              }
+            }
+            graph.RemoveTechnique (node->tech);
+            node->tech = 0;
+
+            // We changed the tree, so do another collapse pass
+            tryCollapse = true;
+            break;
+          }
+
+          found = inputsEqual;
+        }
+        if (!found)
+        {
+          seenNodes.Put (atomTech->GetID(), node);
+        }
+      }
+    }
   }
   
   BasicIterator<Synthesizer::SynthesizeNodeTree::Node>* 

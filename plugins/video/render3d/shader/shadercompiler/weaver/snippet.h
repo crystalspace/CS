@@ -106,6 +106,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         Technique (snippetName), id (id) {}
     
       virtual bool IsCompound() const { return false; }
+      const csMD5::Digest& GetID() const { return id; }
       
       void SetCombiner (const CombinerPlugin& comb) { combiner = comb; }
       void AddBlock (const Block& block) { blocks.Push (block); }
@@ -202,7 +203,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   public:
     struct Connection
     {
-      // If a connection is weak, don't use it for input/output matching.
+      /* If a connection is weak, don't use it for input/output matching.
+         (But it still affects ordering.) */
       bool weak;
       const Snippet::Technique* from;
       const Snippet::Technique* to;
@@ -214,6 +216,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     };
     
     void AddTechnique (const Snippet::Technique* tech);
+    void RemoveTechnique (const Snippet::Technique* tech);
     void AddConnection (const Connection& conn);
     void RemoveConnection (const Connection& conn);
     
@@ -225,11 +228,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     { outTechs = outTechniques; }
     void GetDependencies (const Snippet::Technique* tech, csArray<const Snippet::Technique*>& deps,
       bool strongOnly = true) const;
+    void GetDependants (const Snippet::Technique* tech, csArray<const Snippet::Technique*>& deps,
+      bool strongOnly = true) const;
   private:
-    csArray<const Snippet::Technique*> techniques;
+    typedef csArray<const Snippet::Technique*> TechniquePtrArray;
+    TechniquePtrArray techniques;
     csArray<Connection> connections;
-    csArray<const Snippet::Technique*> inTechniques;
-    csArray<const Snippet::Technique*> outTechniques;
+    TechniquePtrArray inTechniques;
+    TechniquePtrArray outTechniques;
   };
 
   class TechniqueGraphBuilder

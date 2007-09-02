@@ -21,6 +21,7 @@
 
 #include "csplugincommon/shader/weavercombiner.h"
 #include "csutil/blockallocator.h"
+#include "csutil/hashr.h"
 #include "csutil/strhash.h"
 
 #include "snippet.h"
@@ -57,6 +58,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       const Snippet* snippet, const TechniqueGraph& graph);
     
     typedef csHash<csString, csString> StringStringHash;
+    typedef csHashReversible<csString, csString> StringStringHashRev;
     class SynthesizeNodeTree
     {
     public:
@@ -65,7 +67,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         csString annotation;
         const Snippet::Technique* tech;
         StringStringHash inputLinks;
-        StringStringHash outputRenames;
+        StringStringHashRev outputRenames;
       };
       typedef csArray<Node*> NodeArray;
     private:
@@ -92,7 +94,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         CS::PluginCommon::ShaderWeaver::iCoerceChainIterator* linkChain, 
         TechniqueGraph& graph, Node& inNode, 
         const char* inName, const Snippet::Technique* outTech);
-      const Node& GetNodeForTech (const Snippet::Technique* tech)
+      Node& GetNodeForTech (const Snippet::Technique* tech)
       { return *nodes[techToNode.Get (tech, csArrayItemNotFound)]; }
 
       void ReverseNodeArray();
@@ -100,6 +102,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       void Rebuild (const TechniqueGraph& graph,
         const csArray<const Snippet::Technique*>& outputs);
         
+      void Collapse (TechniqueGraph& graph);
+
       BasicIterator<Node>* GetNodes();
       BasicIterator<Node>* GetNodesReverse();
     private:

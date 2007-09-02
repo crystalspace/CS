@@ -595,6 +595,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     inTechniques.Push (tech);
     outTechniques.Push (tech);
   }
+
+  void TechniqueGraph::RemoveTechnique (const Snippet::Technique* tech)
+  {
+    techniques.Delete (tech);
+    inTechniques.Delete (tech);
+    outTechniques.Delete (tech);
+
+    size_t c = 0;
+    while (c < connections.GetSize())
+    {
+      Connection& conn = connections[c];
+      if ((conn.to == tech) || (conn.from == tech))
+        connections.DeleteIndex (c);
+      else
+        c++;
+    }
+  }
   
   void TechniqueGraph::AddConnection (const Connection& conn)
   {
@@ -632,7 +649,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       }
     }
   }
-  
+
+  void TechniqueGraph::GetDependants (const Snippet::Technique* tech, 
+    csArray<const Snippet::Technique*>& deps, bool strongOnly) const
+  {
+    csSet<csConstPtrKey<Snippet::Technique> > addedDeps;
+    for (size_t c = 0; c < connections.GetSize(); c++)
+    {
+      const Connection& conn = connections[c];
+      if ((conn.from == tech) && (!addedDeps.Contains (conn.to))
+        && (!strongOnly || !conn.weak))
+      {
+        deps.Push (conn.to);
+        addedDeps.AddNoTest (conn.to);
+      }
+    }
+  }
+
   //-------------------------------------------------------------------
   
   void TechniqueGraphBuilder::GraphInfo::Merge (const GraphInfo& other)
