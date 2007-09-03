@@ -1101,6 +1101,7 @@ class csPlane3(_object):
         this = _cspace.new_csPlane3(*args)
         try: self.this.append(this)
         except: self.this = this
+    def __eq__(*args): return _cspace.csPlane3___eq__(*args)
     def Normal(*args): return _cspace.csPlane3_Normal(*args)
     def A(*args): return _cspace.csPlane3_A(*args)
     def B(*args): return _cspace.csPlane3_B(*args)

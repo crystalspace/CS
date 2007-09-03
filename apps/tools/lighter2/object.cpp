@@ -378,9 +378,7 @@ namespace lighter
       PrimitiveArray::Iterator primIt = allPrimitives[i].GetIterator ();
       while (primIt.HasNext ())
       {
-        const Primitive &prim = primIt.Next ();
-        totalArea = (prim.GetuFormVector ()%prim.GetvFormVector ()).Norm ();
-        float area2pixel = 1.0f / totalArea;
+        const Primitive &prim = primIt.Next ();        
 
         int minu,maxu,minv,maxv;
         prim.ComputeMinMaxUV (minu,maxu,minv,maxv);
@@ -391,11 +389,7 @@ namespace lighter
         {
           uint vindex = v * mask.GetWidth();
           for (uint u = minu; u <= (uint)maxu; u++, findex++)
-          {
-            //const float elemArea = prim.GetElementAreas ().GetElementArea (findex);
-            //if (elemArea == 0) continue; // No area, skip
-
-            //maskData[vindex+u] += elemArea * area2pixel; //Accumulate
+          {            
             //@@TODO
             Primitive::ElementType type = prim.GetElementType (findex);
             if (type == Primitive::ELEMENT_EMPTY)
@@ -409,7 +403,7 @@ namespace lighter
             else
             {
               maskData[vindex+u] += 1.0f;
-            }            
+            }
           }
         } 
       }

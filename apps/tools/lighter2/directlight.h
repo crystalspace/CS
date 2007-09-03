@@ -83,10 +83,7 @@ namespace lighter
     // Static methods...
     inline static csColor ShadeLight (Light* light, const csVector3& point,
       const csVector3& normal, SamplerSequence<2>& lightSampler,
-      const Primitive* shadowIgnorePrimitive = 0);
-    inline static csColor ShadeLight (Light* light, const csVector3& point,
-      const csVector3& normal, SamplerSequence<2>& lightSampler,
-      PartialElementIgnoreCallback* ignoreCB);
+      const Primitive* shadowIgnorePrimitive = 0, bool fullIgnore = false);
 
     inline static void CollectShadowLight (Light* light, const csVector3& point,
       const csVector3& normal, SamplerSequence<2>& lightSampler, 

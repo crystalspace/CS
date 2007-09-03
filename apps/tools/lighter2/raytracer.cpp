@@ -20,6 +20,7 @@
 
 #include "raytracer.h"
 #include "kdtree.h"
+#include "primitive.h"
 
 namespace lighter
 {
@@ -115,10 +116,14 @@ namespace lighter
       if (ray.ignoreFlags & (prim->normal_K & KDPRIM_FLAG_MASK)) 
         continue; 
 
-      if (ignoreCB (prim->primPointer) ||
-        ray.ignorePrimitive == prim->primPointer ||
-        state.mailbox.PutPrimitiveRay (prim->primPointer, ray.rayID))
+      if (ray.ignorePrimitive == prim->primPointer ||
+        state.mailbox.PutPrimitiveRay (prim->primPointer, ray.rayID) ||
+        ignoreCB (prim->primPointer))
           continue;
+
+      if (ray.ignorePrimitive && 
+        ray.ignorePrimitive->GetPlane () == prim->primPointer->GetPlane ())
+        continue;
 
       haveHit = IntersectPrimitiveRay (*prim, ray, thisHit);
       if (haveHit)
@@ -294,7 +299,7 @@ namespace lighter
     else
     {
       IgnoreCallbackNone ignCB;
-      return TraceFunction<false> (tree, ray, hit, hitCB, ignCB);;
+      return TraceFunction<false> (tree, ray, hit, hitCB, ignCB);
     }
   }
 

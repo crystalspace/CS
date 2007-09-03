@@ -1856,6 +1856,7 @@ sub ACQUIRE {
 package cspace::csPlane3;
 use overload
     "/" => sub { $_[0]->__div__($_[1])},
+    "==" => sub { $_[0]->__eq__($_[1])},
     "fallback" => 1;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( cspace );
@@ -1871,6 +1872,7 @@ sub new {
     bless $self, $pkg if defined($self);
 }
 
+*__eq__ = *cspacec::csPlane3___eq__;
 *Normal = *cspacec::csPlane3_Normal;
 *A = *cspacec::csPlane3_A;
 *B = *cspacec::csPlane3_B;

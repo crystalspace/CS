@@ -387,8 +387,7 @@ scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
   const char *iDepend, csStringID context)
 {
   csRefTrackerAccess::SetDescription (this, CS_TYPENAME(*this));
-  csRefTrackerAccess::TrackConstruction (this);
-  // Don't use SCF_CONSTRUCT_IBASE (0) since it will call IncRef()
+  csRefTrackerAccess::TrackConstruction (this);  
   scfWeakRefOwners = 0;
   scfRefCount = 0;
 #ifdef CS_REF_TRACKER

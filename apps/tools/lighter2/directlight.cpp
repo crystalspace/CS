@@ -213,9 +213,27 @@ namespace lighter
     return res * 0.25f;
   }
 
+  class DirectLightingBorderIgnoreCb : public HitIgnoreCallback
+  {
+  public:
+    explicit DirectLightingBorderIgnoreCb (const Primitive* ignorePrim)
+      : ignorePrim (ignorePrim)
+    {}
+
+    virtual bool IgnoreHit (const Primitive* prim)
+    {
+      return (prim != ignorePrim) ||
+             (ignorePrim && 
+               !(prim->GetPlane () == ignorePrim->GetPlane ()));
+    }
+
+  private:
+    const Primitive* ignorePrim;
+  };
+
   csColor DirectLighting::ShadeLight (Light* light, const csVector3& point,
     const csVector3& normal, SamplerSequence<2>& lightSampler,
-    const Primitive* shadowIgnorePrimitive)
+    const Primitive* shadowIgnorePrimitive, bool fullIgnore)
   {
     // Some variables..
     VisibilityTester visTester;
@@ -232,14 +250,27 @@ namespace lighter
       (cosineTerm = normal * lightVec) > 0)
     {
       //@@TODO add material...
-      if (visTester.Unoccluded (shadowIgnorePrimitive))
+      if (fullIgnore)
       {
-        if (light->IsDeltaLight ())
-          return lightColor * fabsf (cosineTerm) / lightPdf;
-        else
-          // Properly handle area sources! See pbrt page 732
-          return lightColor * fabsf (cosineTerm) / lightPdf;
+        DirectLightingBorderIgnoreCb icb (shadowIgnorePrimitive);
+        if (!visTester.Unoccluded (&icb))
+        {
+          return csColor (0,0,0); 
+        }
       }
+      else
+      {
+        if (!visTester.Unoccluded (shadowIgnorePrimitive))
+        {
+          return csColor (0,0,0); 
+        }
+      }
+
+      if (light->IsDeltaLight ())
+        return lightColor * fabsf (cosineTerm) / lightPdf;
+      else
+        // Properly handle area sources! See pbrt page 732
+        return lightColor * fabsf (cosineTerm) / lightPdf;
     }
 
     return csColor (0,0,0);
@@ -376,7 +407,15 @@ namespace lighter
 
           // Shade non-PD lights
           csColor c;        
-          c = lmElementShader (sector, ep, masterSampler);          
+          c = lmElementShader (sector, ep, masterSampler);
+          /*if (elemType == Primitive::ELEMENT_BORDER)
+          {
+            c.Set (1,0,0);
+          }
+          else
+          {
+            c.Set (0,0,1);
+          }*/
 
           normalLM->SetAddPixel (u, v, c * pixelAreaPart);
 
