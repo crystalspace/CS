@@ -287,6 +287,26 @@ public:
   }
 
   /**
+   * Return the number of stored bits.
+   * \deprecated Deprecated in 1.3. Use GetSize() instead.
+   */
+  CS_DEPRECATED_METHOD_MSG("Use GetSize() instead.")
+  size_t Length () const
+  {
+    return GetSize();
+  }
+
+  /**
+   * Set the number of stored bits.
+   * \deprecated Deprecated in 1.3. Use SetSize() instead.
+   */
+  CS_DEPRECATED_METHOD_MSG("Use SetSize() instead.")
+  void SetLength (size_t newSize)
+  {
+    SetSize (newSize);
+  }
+
+  /**
    * Set the number of stored bits.
    * \remarks If the new size is larger than the old size, the newly added
    *    bits are cleared.
