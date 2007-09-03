@@ -7,6 +7,11 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 3-Sep-2007
+	- res partially reverted r27524 and r27534: some methods that have not
+	  been fully deprecated have been removed by these changesets. Notably,
+	  a commented out CS_DEPRECATED_METHOD does not count as a deprecation
+	  as the user obviously can't get a deprecation warning for a method
+	  because the marker for it is commented out!
 	- res fixed a deallocation mismatch in VFS.
 2-Sep-2007
 	- res added a hash computer and comparator for csMD5::Digest.
