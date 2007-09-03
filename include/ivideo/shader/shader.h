@@ -31,6 +31,7 @@
 
 #include "csgfx/shadervar.h"
 #include "csutil/array.h"
+#include "csutil/bitarray.h"
 #include "csutil/refarr.h"
 #include "csutil/set.h"
 #include "csutil/strset.h"
@@ -362,7 +363,7 @@ struct csShaderMetadata
  */
 struct iShader : public virtual iShaderVariableContext
 {
-  SCF_INTERFACE(iShader, 3, 1, 1);
+  SCF_INTERFACE(iShader, 3, 2, 0);
 
   /// Query the object.
   virtual iObject* QueryObject () = 0;
@@ -412,16 +413,16 @@ struct iShader : public virtual iShaderVariableContext
   /**
    * Request all shader variables used by a certain shader ticket.
    * \param ticket The ticket for which to retrieve the information.
-   * \param names Buffer that will take the shader variable names.
-   *   A good size would be the number of strings in the shader variable 
-   *   string set.
-   * \param namesCount Number of shader variable names fitting into \a names.
-   * \param returnedNames Amount of variable names actually returned.
-   * \return Whether all variable names were returned. In other words, 
-   *   <tt>false</tt> indicates that the provided buffer was too small.
+   * \param bits Bit array with one bit for each shader variable set; if a 
+   *   shader variable is used, the bit corresponding to the name of the
+   *   variable is note set. Please note: first, the array passed in must 
+   *   initially have enough bits for all possible shader variables, it will 
+   *   not be resized - thus a good size would be the number of strings in the
+   *   shader variable string set. Second, bits corresponding to unused
+   *   shader variables will not be reset. It is the responsibility of the 
+   *   caller to do so.
    */
-  virtual bool GetUsedShaderVars (size_t ticket, csStringID* names,
-    size_t namesCount, size_t& returnedNames) const = 0;
+  virtual void GetUsedShaderVars (size_t ticket, csBitArray& bits) const = 0;
 };
 
 

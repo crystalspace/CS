@@ -67,14 +67,15 @@ public:
 
   virtual const char* GetProgramType() { return "fragment"; }
 
-  virtual bool GetUsedShaderVars (csStringID* names,
-    size_t namesCount, size_t& returnedNames) const
+  virtual void GetUsedShaderVars (csBitArray& bits) const
   {
     if (pswrap.IsValid())
-      return pswrap->GetUsedShaderVars (names, namesCount, returnedNames);
+    {
+      pswrap->GetUsedShaderVars (bits);
+      return;
+    }
 
-    return csShaderGLCGCommon::GetUsedShaderVars (names, namesCount, 
-      returnedNames);
+    csShaderGLCGCommon::GetUsedShaderVars (bits);
   }
 };
 

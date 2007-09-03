@@ -1014,61 +1014,41 @@ bool csGLShaderFVP::Compile()
   return true;
 }
 
-bool csGLShaderFVP::GetUsedShaderVars (csStringID* names,
-                                       size_t namesCount, 
-                                       size_t& returnedNames) const
+void csGLShaderFVP::GetUsedShaderVars (csBitArray& bits) const
 {
-  returnedNames = 0;
+  // FIXME: not necessarily used ...
+  TryAddUsedShaderVarName (ambientvar, bits);
+  // FIXME: not necessarily used ...
+  TryAddUsedShaderVarName (string_world2camera, bits);
+  // FIXME: not necessarily used ...
+  TryAddUsedShaderVarName (string_object2world, bits);
 
-  // FIXME: not necessarily used ...
-  if (!TryAddUsedShaderVarName (ambientvar, names, namesCount, 
-      returnedNames)) return false;
-  // FIXME: not necessarily used ...
-  if (!TryAddUsedShaderVarName (string_world2camera, names, namesCount, 
-      returnedNames)) return false;
-  // FIXME: not necessarily used ...
-  if (!TryAddUsedShaderVarName (string_object2world, names, namesCount, 
-      returnedNames)) return false;
-
-  if (!TryAddUsedShaderVarName (primcolvar, names, namesCount, 
-      returnedNames)) return false;
+  TryAddUsedShaderVarName (primcolvar, bits);
 
   for (size_t l = 0; l < lights.GetSize(); l++)
   {
     for (size_t p = 0; p < gllpCount; p++)
     {
-      if (!TryAddUsedShaderVarProgramParam (lights[l].params[p],
-        names, namesCount, returnedNames)) return false;
+      TryAddUsedShaderVarProgramParam (lights[l].params[p], bits);
     }
   }
 
-  if (!TryAddUsedShaderVarProgramParam (matAmbient,
-    names, namesCount, returnedNames)) return false;
-  if (!TryAddUsedShaderVarProgramParam (matDiffuse,
-    names, namesCount, returnedNames)) return false;
-  if (!TryAddUsedShaderVarProgramParam (matEmission,
-    names, namesCount, returnedNames)) return false;
-  if (!TryAddUsedShaderVarProgramParam (matSpecular,
-    names, namesCount, returnedNames)) return false;
-  if (!TryAddUsedShaderVarProgramParam (matSpecularExp,
-    names, namesCount, returnedNames)) return false;
+  TryAddUsedShaderVarProgramParam (matAmbient, bits);
+  TryAddUsedShaderVarProgramParam (matDiffuse, bits);
+  TryAddUsedShaderVarProgramParam (matEmission, bits);
+  TryAddUsedShaderVarProgramParam (matSpecular, bits);
+  TryAddUsedShaderVarProgramParam (matSpecularExp, bits);
 
   for (size_t l = 0; l < layers.GetSize(); l++)
   {
-    if (!TryAddUsedShaderVarProgramParam (layers[l].constcolor,
-      names, namesCount, returnedNames)) return false;
-    if (!TryAddUsedShaderVarName (layers[l].fogdensity, names, namesCount, 
-        returnedNames)) return false;
-    if (!TryAddUsedShaderVarName (layers[l].fogplane, names, namesCount, 
-        returnedNames)) return false;
+    TryAddUsedShaderVarProgramParam (layers[l].constcolor, bits);
+    TryAddUsedShaderVarName (layers[l].fogdensity, bits);
+    TryAddUsedShaderVarName (layers[l].fogplane, bits);
 
     for (size_t o = 0; o < layers[l].texMatrixOps.GetSize(); o++)
     {
-      if (!TryAddUsedShaderVarProgramParam (layers[l].texMatrixOps[o].param,
-        names, namesCount, returnedNames)) return false;
+      TryAddUsedShaderVarProgramParam (layers[l].texMatrixOps[o].param, bits);
     }
   }
-
-  return true;
 }
 

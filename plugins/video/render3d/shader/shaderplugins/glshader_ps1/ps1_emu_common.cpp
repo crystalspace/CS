@@ -112,17 +112,12 @@ bool csShaderGLPS1_Common::Compile ()
 }
 
 
-bool csShaderGLPS1_Common::GetUsedShaderVars (csStringID* names,
-                                              size_t namesCount, 
-                                              size_t& returnedNames) const
+void csShaderGLPS1_Common::GetUsedShaderVars (csBitArray& bits) const
 {
-  returnedNames = 0;
   for (size_t c = 0; c < MAX_CONST_REGS; c++)
   {
-    if (!TryAddUsedShaderVarProgramParam (constantRegs[c], names, namesCount,
-      returnedNames)) return false;
+    TryAddUsedShaderVarProgramParam (constantRegs[c], bits);
   }
-  return true;
 }
 
 }

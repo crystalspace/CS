@@ -670,22 +670,12 @@ bool csGLShaderFFP::Compile ()
   return true;
 }
 
-bool csGLShaderFFP::GetUsedShaderVars (csStringID* names,
-                                       size_t namesCount, 
-                                       size_t& returnedNames) const
+void csGLShaderFFP::GetUsedShaderVars (csBitArray& bits) const
 {
-  returnedNames = 0;
-
-  if (!TryAddUsedShaderVarProgramParam (fog.density, names, namesCount, 
-      returnedNames)) return false;
-  if (!TryAddUsedShaderVarProgramParam (fog.start, names, namesCount, 
-      returnedNames)) return false;
-  if (!TryAddUsedShaderVarProgramParam (fog.end, names, namesCount, 
-      returnedNames)) return false;
-  if (!TryAddUsedShaderVarProgramParam (fog.color, names, namesCount, 
-      returnedNames)) return false;
-
-  return true;
+  TryAddUsedShaderVarProgramParam (fog.density, bits);
+  TryAddUsedShaderVarProgramParam (fog.start, bits);
+  TryAddUsedShaderVarProgramParam (fog.end, bits);
+  TryAddUsedShaderVarProgramParam (fog.color, bits);
 }
 
 void csGLShaderFFP::ActivateTexFunc (const mtexlayer::TexFunc& tf, 

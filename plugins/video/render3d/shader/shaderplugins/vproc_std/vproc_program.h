@@ -69,8 +69,7 @@ public:
   /// Compile a program
   virtual bool Compile();
 
-  virtual bool GetUsedShaderVars (csStringID* names,
-    size_t namesCount, size_t& returnedNames) const;
+  virtual void GetUsedShaderVars (csBitArray& bits) const;
 private:
   csVProc_Std *shaderPlugin;
 
@@ -134,8 +133,8 @@ private:
   iRenderBuffer* GetBuffer (const BufferName& name,
     csRenderMeshModes& modes, 
     const csShaderVariableStack& stack);
-  bool TryAddUsedShaderVarBufferName (const BufferName& name,
-    csStringID*& names, size_t& namesCount, size_t& returnedNames) const;
+  void TryAddUsedShaderVarBufferName (const BufferName& name,
+    csBitArray& bits) const;
   bool UpdateSkinnedVertices (csRenderMeshModes& modes,
                            const csShaderVariableStack& stack);
 };

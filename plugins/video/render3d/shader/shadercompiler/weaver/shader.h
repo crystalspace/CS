@@ -117,10 +117,9 @@ public:
     return realShader->GetMetadata (ticket);
   }
 
-  virtual bool GetUsedShaderVars (size_t ticket, csStringID* names,
-    size_t namesCount, size_t& returnedNames) const
+  virtual void GetUsedShaderVars (size_t ticket, csBitArray& bits) const
   {
-    return realShader->GetUsedShaderVars (ticket, names, namesCount, returnedNames);
+    realShader->GetUsedShaderVars (ticket, bits);
   }
 
   friend class csXMLShaderCompiler;

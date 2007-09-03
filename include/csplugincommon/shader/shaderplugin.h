@@ -65,7 +65,7 @@ struct iShaderDestinationResolver : public virtual iBase
  */
 struct iShaderProgram : public virtual iBase
 {
-  SCF_INTERFACE(iShaderProgram, 2, 1, 0);
+  SCF_INTERFACE(iShaderProgram, 2, 2, 0);
   /// Sets this program to be the one used when rendering
   virtual void Activate() = 0;
 
@@ -92,17 +92,18 @@ struct iShaderProgram : public virtual iBase
   virtual bool Compile () = 0;
   
   /**
-   * Request all shader variables used by this program.
-   * \param names Buffer that will take the shader variable names.
-   *   A good size would be the number of strings in the shader variable 
-   *   string set.
-   * \param namesCount Number of shader variable names fitting into \a names.
-   * \param returnedNames Amount of variable names actually returned.
-   * \return Whether all variable names were returned. In other words, 
-   *   <tt>false</tt> indicates that the provided buffer was too small.
+   * Request all shader variables used by a certain shader ticket.
+   * \param ticket The ticket for which to retrieve the information.
+   * \param bits Bit array with one bit for each shader variable set; if a 
+   *   shader variable is used, the bit corresponding to the name of the
+   *   variable is note set. Please note: first, the array passed in must 
+   *   initially have enough bits for all possible shader variables, it will 
+   *   not be resized - thus a good size would be the number of strings in the
+   *   shader variable string set. Second, bits corresponding to unused
+   *   shader variables will not be reset. It is the responsibility of the 
+   *   caller to do so.
    */
-  virtual bool GetUsedShaderVars (csStringID* names,
-    size_t namesCount, size_t& returnedNames) const = 0;
+  virtual void GetUsedShaderVars (csBitArray& bits) const = 0;
 };
 
 /**

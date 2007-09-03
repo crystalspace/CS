@@ -279,20 +279,19 @@ public:
       return allShaderMeta;
   }
 
-  virtual bool GetUsedShaderVars (size_t ticket, csStringID* names,
-    size_t namesCount, size_t& returnedNames) const
+  virtual void GetUsedShaderVars (size_t ticket, csBitArray& bits) const
   {
     if (IsFallbackTicket (ticket))
-      return fallbackShader->GetUsedShaderVars (GetFallbackTicket (ticket),
-        names, namesCount, returnedNames);
+    {
+      fallbackShader->GetUsedShaderVars (GetFallbackTicket (ticket),
+        bits);
+      return;
+    }
 
     csXMLShaderTech* tech = (ticket != csArrayItemNotFound) ? 
       variants[ticket].tech : 0;
     if (tech != 0)
-      return tech->GetUsedShaderVars (names, namesCount, returnedNames);
-
-    returnedNames = 0;
-    return true;
+      tech->GetUsedShaderVars (bits);
   }
 
   friend class csXMLShaderCompiler;

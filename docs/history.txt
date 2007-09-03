@@ -14,6 +14,8 @@ chronological order.
 	  a snippet).
 	- res fixed usages of the wrong string set (shared instead of SV names
 	  and vice versa) in genmesh and lighter2.
+	- res changed the "used shader var" iShader method to take a bit array
+	  to fill instead an array of string IDs.
 2-Sep-2007
 	- res added a hash computer and comparator for csMD5::Digest.
 	- res fixed the same node collapsing in the shader weaver to add 

@@ -836,45 +836,29 @@ CS_PLUGIN_NAMESPACE_BEGIN(VProc_std)
     return 0;
   }
 
-  bool csVProcStandardProgram::TryAddUsedShaderVarBufferName (const BufferName& name,
-    csStringID*& names, size_t& namesCount, size_t& returnedNames) const
+  void csVProcStandardProgram::TryAddUsedShaderVarBufferName (const BufferName& name,
+    csBitArray& bits) const
   {
     if (name.defaultName == CS_BUFFER_NONE)
     {
-      return TryAddUsedShaderVarName (name.userName, names, namesCount, returnedNames);
+      TryAddUsedShaderVarName (name.userName, bits);
     }
-    return true;
   }
 
-  bool csVProcStandardProgram::GetUsedShaderVars (csStringID* names,
-    size_t namesCount, size_t& returnedNames) const
+  void csVProcStandardProgram::GetUsedShaderVars (csBitArray& bits) const
   {
-    returnedNames = 0;
+    TryAddUsedShaderVarProgramParam (finalLightFactor, bits);
+    TryAddUsedShaderVarProgramParam (shininessParam, bits);
 
-    if (!TryAddUsedShaderVarProgramParam (finalLightFactor, names, namesCount,
-      returnedNames)) return false;
-    if (!TryAddUsedShaderVarProgramParam (shininessParam, names, namesCount,
-      returnedNames)) return false;
+    TryAddUsedShaderVarName (bones_indices_name, bits);
+    TryAddUsedShaderVarName (bones_weights_name, bits);
+    TryAddUsedShaderVarName (bones_name, bits);
 
-    if (!TryAddUsedShaderVarName (bones_indices_name, names, namesCount,
-      returnedNames)) return false;
-    if (!TryAddUsedShaderVarName (bones_weights_name, names, namesCount,
-      returnedNames)) return false;
-    if (!TryAddUsedShaderVarName (bones_name, names, namesCount,
-      returnedNames)) return false;
-
-    if (!TryAddUsedShaderVarBufferName (positionBuffer, names, namesCount,
-      returnedNames)) return false;
-    if (!TryAddUsedShaderVarBufferName (normalBuffer, names, namesCount,
-      returnedNames)) return false;
-    if (!TryAddUsedShaderVarBufferName (colorBuffer, names, namesCount,
-      returnedNames)) return false;
-    if (!TryAddUsedShaderVarBufferName (tangentBuffer, names, namesCount,
-      returnedNames)) return false;
-    if (!TryAddUsedShaderVarBufferName (bitangentBuffer, names, namesCount,
-      returnedNames)) return false;
-
-    return true;
+    TryAddUsedShaderVarBufferName (positionBuffer, bits);
+    TryAddUsedShaderVarBufferName (normalBuffer, bits);
+    TryAddUsedShaderVarBufferName (colorBuffer, bits);
+    TryAddUsedShaderVarBufferName (tangentBuffer, bits);
+    TryAddUsedShaderVarBufferName (bitangentBuffer, bits);
   }
 
 }

@@ -53,7 +53,11 @@ namespace RenderManager
 
       FnMeshTraverser (iShaderManager* shaderManager, Fn& function) : 
         BaseType (*this), shaderManager (shaderManager), 
-        function (function) {}
+        function (function) 
+      {
+        size_t numSVs = shaderManager->GetSVNameStringset()->GetSize();
+        names.SetSize (numSVs);
+      }
 
       void operator() (const typename Tree::TreeTraitsType::MeshNodeKeyType& key,
         typename Tree::MeshNode* node, typename Tree::ContextNode& ctxNode, Tree& tree)
@@ -74,31 +78,27 @@ namespace RenderManager
 
         if ((shader != lastShader) || (ticket != lastTicket))
         {
-          size_t numSVs = shaderManager->GetSVNameStringset()->GetSize();
-          names.SetSize (numSVs);
-
-          size_t returnedNames = 0;
-          shader->GetUsedShaderVars (ticket, names.GetArray(), 
-            names.GetSize(), returnedNames);
-          names.SetSize (returnedNames);
+          names.Clear();
+          shader->GetUsedShaderVars (ticket, names);
         }
 
         csShaderVariableStack varStack;
         ctxNode.svArrays.SetupSVStck (varStack, index);
 
-        for (size_t j = 0; j < names.GetSize(); j++)
+        size_t name = csMin (names.GetSize(), varStack.GetSize());
+        while (name-- > 0)
         {
-          csStringID name = names[j];
-          if (name >= varStack.GetSize()) continue;
-          csShaderVariable* sv = varStack[name];
-          if (sv == 0) continue;
-          function (sv);
+          if (names.IsBitSet (name))
+          {
+            csShaderVariable* sv = varStack[name];
+            if (sv != 0) function (sv);
+          }
         }
       }
 
       iShader* lastShader;
       size_t lastTicket;
-      ShaderVariableNameArray names;
+      csBitArray names;
     };
   public:
     TraverseAllUsedSVs (Fn& function, iShaderManager* shaderManager) : 

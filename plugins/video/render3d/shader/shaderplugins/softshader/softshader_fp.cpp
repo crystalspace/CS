@@ -143,25 +143,15 @@ bool csSoftShader_FP::Compile()
   return true;
 }
 
-bool csSoftShader_FP::GetUsedShaderVars (csStringID* names,
-                                         size_t namesCount, 
-                                         size_t& returnedNames) const
+void csSoftShader_FP::GetUsedShaderVars (csBitArray& bits) const
 {
-  returnedNames = 0;
-
-  if (!TryAddUsedShaderVarProgramParam (flatColor, names, namesCount, 
-    returnedNames)) return false;
-  if (!TryAddUsedShaderVarProgramParam (cfactor, names, namesCount, 
-    returnedNames)) return false;
-  if (!TryAddUsedShaderVarProgramParam (afactor, names, namesCount, 
-    returnedNames)) return false;
+  TryAddUsedShaderVarProgramParam (flatColor, bits);
+  TryAddUsedShaderVarProgramParam (cfactor, bits);
+  TryAddUsedShaderVarProgramParam (afactor, bits);
   if (doConstColor)
   {
-    if (!TryAddUsedShaderVarProgramParam (constColor, names, namesCount, 
-      returnedNames)) return false;
+    TryAddUsedShaderVarProgramParam (constColor, bits);
   }
-
-  return true;
 }
 
 }

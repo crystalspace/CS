@@ -761,9 +761,7 @@ bool csXMLShaderTech::TeardownPass ()
   return true;
 }
 
-bool csXMLShaderTech::GetUsedShaderVars (csStringID* names,
-                                         size_t namesCount, 
-                                         size_t& returnedNames) const
+void csXMLShaderTech::GetUsedShaderVars (csBitArray& bits) const
 {
   csDirtyAccessArray<csStringID> allNames;
 
@@ -773,66 +771,36 @@ bool csXMLShaderTech::GetUsedShaderVars (csStringID* names,
 
     if(thispass->vproc)
     {
-      size_t namesStart = allNames.GetSize();
-      allNames.SetSize (namesStart + namesCount);
-      size_t vprocNames;
-      thispass->vproc->GetUsedShaderVars (allNames.GetArray() + namesStart,
-        namesCount, vprocNames);
-      allNames.SetSize (namesStart + vprocNames);
+      thispass->vproc->GetUsedShaderVars (bits);
     }
 
     for (size_t i = 0; i < thispass->custommapping_attrib.GetSize (); i++)
     {
-      if (thispass->custommapping_id[i] != csInvalidStringID)
+      csStringID id = thispass->custommapping_id[i];
+      if ((id != csInvalidStringID) && (bits.GetSize() > id))
       {
-        allNames.Push (thispass->custommapping_id[i]);
+        bits.SetBit (id);
       }
     }
     for (int j = 0; j < thispass->textureCount; j++)
     {
-      if (thispass->textureID[j] != csInvalidStringID)
+      csStringID id = thispass->textureID[j];
+      if ((id != csInvalidStringID) && (bits.GetSize() > id))
       {
-        allNames.Push (thispass->textureID[j]);
+        bits.SetBit (id);
       }
     }
 
     if(thispass->vp)
     {
-      size_t namesStart = allNames.GetSize();
-      allNames.SetSize (namesStart + namesCount);
-      size_t vpNames;
-      thispass->vp->GetUsedShaderVars (allNames.GetArray() + namesStart,
-        namesCount, vpNames);
-      allNames.SetSize (namesStart + vpNames);
+      thispass->vp->GetUsedShaderVars (bits);
     }
 
     if(thispass->fp)
     {
-      size_t namesStart = allNames.GetSize();
-      allNames.SetSize (namesStart + namesCount);
-      size_t fpNames;
-      thispass->fp->GetUsedShaderVars (allNames.GetArray() + namesStart,
-        namesCount, fpNames);
-      allNames.SetSize (namesStart + fpNames);
+      thispass->fp->GetUsedShaderVars (bits);
     }
   }
-
-  allNames.Sort ();
-  csStringID lastSeen = csInvalidStringID;
-  size_t i = allNames.GetSize();
-  while (i-- > 0)
-  {
-    if (allNames[i] == lastSeen)
-    {
-      allNames.DeleteIndexFast (i);
-    }
-    else
-      lastSeen = allNames[i];
-  }
-
-  returnedNames = csMin (namesCount, allNames.GetSize());
-  memcpy (names, allNames.GetArray(), returnedNames * sizeof (csStringID));
-  return allNames.GetSize() <= namesCount;
 }
 
 int csXMLShaderTech::GetPassNumber (shaderPass* pass)

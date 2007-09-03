@@ -165,30 +165,22 @@ protected:
   /// Variable mappings
   csArray<VariableMapEntry> variablemap;
 
-  bool TryAddUsedShaderVarName (csStringID name,
-    csStringID*& names, size_t& namesCount, size_t& returnedNames) const
+  void TryAddUsedShaderVarName (csStringID name, csBitArray& bits) const
   {
     if (name != csInvalidStringID)
     {
-      if (namesCount == 0) return false;
-      *names++ = name;
-      namesCount--;
-      returnedNames++;
+      if (bits.GetSize() > name) bits.SetBit (name);
     }
-    return true;
   }
-  bool TryAddUsedShaderVarProgramParam (const ProgramParam& param,
-    csStringID*& names, size_t& namesCount, size_t& returnedNames) const
+  void TryAddUsedShaderVarProgramParam (const ProgramParam& param, 
+    csBitArray& bits) const
   {
     if (param.valid)
     {
-      return TryAddUsedShaderVarName (param.name, names, namesCount, 
-        returnedNames);
+      TryAddUsedShaderVarName (param.name, bits);
     }
-    return true;
   }
-  bool GetUsedShaderVarsFromVariableMappings (csStringID* names,
-    size_t namesCount, size_t& returnedNames) const;
+  void GetUsedShaderVarsFromVariableMappings (csBitArray& bits) const;
 
   /// Program description
   csString description;
@@ -288,8 +280,7 @@ public:
   virtual csVertexAttrib ResolveBufferDestination (const char* /*binding*/)
   { return CS_VATTRIB_INVALID; }
 
-  virtual bool GetUsedShaderVars (csStringID* names,
-    size_t namesCount, size_t& returnedNames) const;
+  virtual void GetUsedShaderVars (csBitArray& bits) const;
 };
 
 /** @} */
