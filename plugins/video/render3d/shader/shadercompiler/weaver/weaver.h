@@ -88,6 +88,13 @@ public:
 #define CS_TOKEN_ITEM_FILE \
   "plugins/video/render3d/shader/shadercompiler/weaver/weaver.tok"
 #include "cstool/tokenlist.h"
+
+  /* When loading a snippet, sometimes document nodes have to be created.
+     These are created from this "auto document".
+   */
+  csRef<iDocumentSystem> autoDocSys;
+  csRef<iDocumentNode> autoDocRoot;
+  csRef<iDocumentNode> CreateAutoNode (csDocumentNodeType type);
 };
 
 }

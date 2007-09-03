@@ -196,6 +196,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     void HandleSnippetNode (CompoundTechnique& tech, iDocumentNode* node);
     void HandleConnectionNode (CompoundTechnique& tech, iDocumentNode* node);
     void HandleCombinerNode (CompoundTechnique& tech, iDocumentNode* node);
+    void HandleParameterNode (CompoundTechnique& tech, iDocumentNode* node);
   };
 
   class TechniqueGraph
