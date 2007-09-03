@@ -7,6 +7,12 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 2-Sep-2007
+	- res added a hash computer and comparator for csMD5::Digest.
+	- res fixed the same node collapsing in the shader weaver to add 
+	  proper connections when collapsing two nodes.
+	- res fixed coerce chain creation in the Cg weaver combiner: chains
+	  could get complicated (e.g. A->B->A->C where A->C would suffice)
+	  and were incorrectly returned (the 1st and 2nd step were the same).
 	- res changed csStrNew()/new char[] to CS::StrDup()/cs_malloc() in a
 	  few places.
 	- res added an optimization to shader weaver: if the same snippet is
@@ -16,13 +22,13 @@ chronological order.
 	- Marten did a few cleanups.
 1-Sep-2007
 	- Jorrit removed more deprecated stuff.
-	- res added a hash computer and comparator for csMD5::Digest.
-	- res fixed the same node collapsing in the shader weaver to add 
-	  proper connections when collapsing two nodes.
-	- res fixed coerce chain creation in the Cg weaver combiner: chains
-	  could get complicated (e.g. A->B->A->C where A->C would suffice)
-	  and were incorrectly returned (the 1st and 2nd step were the same).
 31-Aug-2007
+	- res made the Cg plugin emit warnings from the Cg compiler in verbose
+	  mode (previously it only reported issues from the compiler when an
+	  error occured).
+	- res made the Cg weaver combiner use unique identifier for 
+	  vertex-to-fragment data to avoid clashes.
+	- res fixed some snippets for that.
 	- Genjix bumped interface minor version.
 	- Genjix added animation blending to genmeshanim2. Now the there is
 	  Execute("animname", blend_factor). By default this is 0, and if all
@@ -78,12 +84,6 @@ chronological order.
 	  calls returning 0.
 	- Vincent changed joywin plugin so that it doesn't assert when there's
 	  no window. Fixes crash when used with null renderer (trac #369).
-	- res made the Cg plugin emit warnings from the Cg compiler in verbose
-	  mode (previously it only reported issues from the compiler when an
-	  error occured).
-	- res made the Cg weaver combiner use unique identifier for 
-	  vertex-to-fragment data to avoid clashes.
-	- res fixed some snippets for that.
 27-Aug-2007
 	- res added a simple beautification step to the Cg weaver combiner.
 	  This makes the synthesized Cg programs more human-readable (and thus
