@@ -9,6 +9,11 @@ chronological order.
 3-Sep-2007
 	- res fixed some Cg errors and warnings in some weaver snippets 
 	  due the recent weaver changes.
+	- res augmented the shader weaver to allow a simpler way for custom
+	  inputs (e.g. if some shader var value should serve as an input for
+	  a snippet).
+	- res fixed usages of the wrong string set (shared instead of SV names
+	  and vice versa) in genmesh and lighter2.
 2-Sep-2007
 	- res added a hash computer and comparator for csMD5::Digest.
 	- res fixed the same node collapsing in the shader weaver to add 

@@ -377,7 +377,7 @@ namespace lighter
     genMesh->RemoveRenderBuffer ("texture coordinate lightmap");
 
    // Still may need to fix up submesh materials...
-    CS::ShaderVarName lightmapName (globalLighter->strings, "tex lightmap");
+    CS::ShaderVarName lightmapName (globalLighter->svStrings, "tex lightmap");
 
     for (uint i = 0; i < allPrimitives.GetSize (); ++i)
     {
@@ -597,7 +597,7 @@ namespace lighter
         csRef<iShaderVariableContext> svc = 
           scfQueryInterface<iShaderVariableContext> (subMesh);
         csShaderVariable* sv = svc->GetVariable (
-          globalLighter->strings->Request ("tex lightmap"));
+          globalLighter->svStrings->Request ("tex lightmap"));
         if (sv != 0)
         {
           iTextureWrapper* tex;

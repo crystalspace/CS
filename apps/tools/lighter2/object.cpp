@@ -270,7 +270,7 @@ namespace lighter
   {
     iShaderVariableContext* svc = meshWrapper->GetSVContext();
     csShaderVariable* sv = svc->GetVariable (
-      globalLighter->strings->Request ("tex lightmap"));
+      globalLighter->svStrings->Request ("tex lightmap"));
     if (sv != 0)
     {
       iTextureWrapper* tex;

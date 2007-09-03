@@ -461,7 +461,7 @@ public:
   csDirtyAccessArray<csTriangle> mesh_triangles;
 
   csWeakRef<iGraphics3D> g3d;
-  csRef<iStringSet> strings;
+  csRef<iStringSet> svstrings;
 
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
@@ -623,8 +623,8 @@ public:
   { return user_buffer_names; }
   const csUserRenderBufferManager& GetUserBuffers()
   { return userBuffers; }
-  iStringSet* GetStrings()
-  { return strings; }
+  iStringSet* GetSVStrings()
+  { return svstrings; }
 
   void ClearSubMeshes ();
   void AddSubMesh (unsigned int *triangles,

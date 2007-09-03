@@ -161,9 +161,9 @@ namespace lighter
     vfs = csQueryRegistry<iVFS> (objectRegistry);
     if (!vfs) return Report ("No iVFS!");
 
-    strings = csQueryRegistryTagInterface<iStringSet> (
-      objectRegistry, "crystalspace.shared.stringset");
-    if (!strings) return Report ("No shared string set!");
+    svStrings = csQueryRegistryTagInterface<iStringSet> (
+      objectRegistry, "crystalspace.shader.variablenameset");
+    if (!svStrings) return Report ("No SV names string set!");
 
     // Open the systems
     if (!csInitializer::OpenApplication (objectRegistry))

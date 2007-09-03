@@ -540,7 +540,7 @@ void csGenmeshMeshObject::SetupShaderVariableContext ()
   uint bufferMask = (uint)CS_BUFFER_ALL_MASK;
 
   size_t i;
-  iStringSet* strings = factory->GetStrings();
+  iStringSet* strings = factory->GetSVStrings();
   const csArray<csStringID>& factoryUBNs = factory->GetUserBufferNames();
   // Set up factorys user buffers...
   for (i = 0; i < factoryUBNs.GetSize (); i++)
@@ -1548,7 +1548,7 @@ iGeneralMeshSubMesh* csGenmeshMeshObject::FindSubMesh (const char* name) const
 bool csGenmeshMeshObject::AddRenderBuffer (const char *name,
 					   iRenderBuffer* buffer)
 {
-  csStringID bufID = factory->GetStrings()->Request (name);
+  csStringID bufID = factory->GetSVStrings()->Request (name);
   if (userBuffers.AddRenderBuffer (bufID, buffer))
   {
     user_buffer_names.Push (bufID);
@@ -1560,7 +1560,7 @@ bool csGenmeshMeshObject::AddRenderBuffer (const char *name,
 
 bool csGenmeshMeshObject::RemoveRenderBuffer (const char *name)
 {
-  csStringID bufID = factory->GetStrings()->Request (name);
+  csStringID bufID = factory->GetSVStrings()->Request (name);
   if (userBuffers.RemoveRenderBuffer (bufID))
   {
     user_buffer_names.Delete (bufID);
@@ -1579,7 +1579,7 @@ csRef<iRenderBuffer> csGenmeshMeshObject::GetRenderBuffer (int index)
 csRef<iString> csGenmeshMeshObject::GetRenderBufferName (int index) const
 {
   csRef<iString> name; 
-  name.AttachNew (new scfString (factory->GetStrings ()->Request 
+  name.AttachNew (new scfString (factory->GetSVStrings ()->Request 
     (user_buffer_names[index])));
   return name;
 }
@@ -1613,7 +1613,7 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (
   back2front_tree = 0;
 
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
-  strings = csQueryRegistryTagInterface<iStringSet>
+  svstrings = csQueryRegistryTagInterface<iStringSet>
     (object_reg, "crystalspace.shader.variablenameset");
 
   mesh_vertices_dirty_flag = false;
@@ -2231,7 +2231,7 @@ void csGenmeshMeshObjectFactory::GenerateBox (const csBox3& box)
 bool csGenmeshMeshObjectFactory::AddRenderBuffer (const char *name,
 						  iRenderBuffer* buffer)
 {
-  csStringID bufID = strings->Request (name);
+  csStringID bufID = svstrings->Request (name);
   if (userBuffers.AddRenderBuffer (bufID, buffer))
   {
     user_buffer_names.Push (bufID);
@@ -2243,7 +2243,7 @@ bool csGenmeshMeshObjectFactory::AddRenderBuffer (const char *name,
 
 bool csGenmeshMeshObjectFactory::RemoveRenderBuffer (const char *name)
 {
-  csStringID bufID = strings->Request (name);
+  csStringID bufID = svstrings->Request (name);
   if (userBuffers.RemoveRenderBuffer (bufID))
   {
     user_buffer_names.Delete (bufID);
@@ -2262,7 +2262,7 @@ csRef<iRenderBuffer> csGenmeshMeshObjectFactory::GetRenderBuffer (int index)
 csRef<iString> csGenmeshMeshObjectFactory::GetRenderBufferName (int index) const
 {
   csRef<iString> name; 
-  name.AttachNew (new scfString (strings->Request (user_buffer_names[index])));
+  name.AttachNew (new scfString (svstrings->Request (user_buffer_names[index])));
   return name;
 }
 
@@ -2352,7 +2352,7 @@ bool csGenmeshMeshObjectType::Initialize (iObjectRegistry* object_reg)
 {
   csGenmeshMeshObjectType::object_reg = object_reg;
   csRef<iStringSet> strset = csQueryRegistryTagInterface<iStringSet> (
-      object_reg, "crystalspace.shader.variablenameset");
+      object_reg, "crystalspace.shared.stringset");
   base_id = strset->Request ("base");
   csRef<iVerbosityManager> verbosemgr (
     csQueryRegistry<iVerbosityManager> (object_reg));
