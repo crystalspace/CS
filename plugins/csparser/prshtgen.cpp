@@ -435,7 +435,7 @@ bool csLoader::ParseHeightgen (iLoaderContext* ldr_context, iDocumentNode* node)
           
           csString cache_enable = child->GetAttributeValue ("cache");
           csRef<iImage> img;
-          csRef<iImageIO> imageio (CS_QUERY_REGISTRY (object_reg, iImageIO));
+          csRef<iImageIO> imageio (csQueryRegistry<iImageIO> (object_reg));
 
           // get from cache
           if(Engine && cache_enable == "yes")

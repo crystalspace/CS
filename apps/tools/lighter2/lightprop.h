@@ -29,7 +29,7 @@ namespace lighter
    */
   struct NoAttenuation
   {
-    NoAttenuation (const Light& /*light*/)
+    NoAttenuation (const Light_old& /*light*/)
     {}
 
     CS_FORCEINLINE_TEMPLATEMETHOD 
@@ -45,7 +45,7 @@ namespace lighter
    */
   struct LinearAttenuation
   {
-    LinearAttenuation (const Light& light)
+    LinearAttenuation (const Light_old& light)
     {
       invrad = 1/light.attenuationConsts.x;
     }
@@ -65,7 +65,7 @@ namespace lighter
    */
   struct InverseAttenuation
   {
-    InverseAttenuation (const Light& /*light*/)
+    InverseAttenuation (const Light_old& /*light*/)
     {}
 
     CS_FORCEINLINE_TEMPLATEMETHOD
@@ -82,7 +82,7 @@ namespace lighter
    */
   struct RealisticAttenuation
   {
-    RealisticAttenuation (const Light& /*light*/)
+    RealisticAttenuation (const Light_old& /*light*/)
     {}
 
     CS_FORCEINLINE_TEMPLATEMETHOD
@@ -98,7 +98,7 @@ namespace lighter
    */
   struct CLQAttenuation
   {
-    CLQAttenuation (const Light& light)
+    CLQAttenuation (const Light_old& light)
       : attnVec (light.attenuationConsts)
     {}
 

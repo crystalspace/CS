@@ -314,7 +314,7 @@ public:
   }
 
   /// Return index of the largest axis
-  inline size_t DominantAxis () const
+  inline int DominantAxis () const
   {
     if (fabsf (x) > fabsf (y) && fabsf (x) > fabsf (z))
       return CS_AXIS_X;

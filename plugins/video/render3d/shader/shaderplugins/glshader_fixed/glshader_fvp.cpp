@@ -746,8 +746,8 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
   string_world2camera = strings->Request ("world2camera transform");
   string_object2world = strings->Request ("object2world transform");
 
-  csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(
-  	objectReg, iShaderManager);
+  csRef<iShaderManager> shadermgr = 
+  	csQueryRegistry<iShaderManager> (objectReg);
 
   csRef<iDocumentNode> variablesnode = program->GetNode("fixedvp");
   if(variablesnode)
@@ -1005,10 +1005,10 @@ bool csGLShaderFVP::Compile()
     && !shaderPlug->ext->CS_GL_EXT_separate_specular_color)
     return false;
 
-  g3d = CS_QUERY_REGISTRY (objectReg, iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (objectReg);
 
   //get a statecache
-  csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY (objectReg, iGraphics2D);
+  csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (objectReg);
   g2d->PerformExtension ("getstatecache", &statecache);
 
   return true;

@@ -204,7 +204,7 @@ Help install : "Install $(PACKAGE_INSTALL_NAME)" ;
 
 actions Install1
 {
-  $(INSTALL_APP) $(INSTALLFLAGS) $(>) $(<)
+  $(INSTALL_APP) $(INSTALLFLAGS) "$(>)" "$(<)"
 }
 
 actions CopyDirs

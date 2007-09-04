@@ -32,9 +32,9 @@ csEngineProcTex::~csEngineProcTex ()
 
 bool csEngineProcTex::LoadLevel ()
 {
-  Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
-  csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
-  csRef<iLoader> loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  Engine = csQueryRegistry<iEngine> (object_reg);
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+  csRef<iLoader> loader = csQueryRegistry<iLoader> (object_reg);
   // load a map file to display
   vfs->PushDir ();
   vfs->ChDir ("/lev/flarge/");

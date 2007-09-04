@@ -60,8 +60,8 @@ csSimpleFormerLoader::~csSimpleFormerLoader ()
 bool csSimpleFormerLoader::Initialize (iObjectRegistry* object_reg)
 {
   objreg = object_reg;
-  synldr = CS_QUERY_REGISTRY (objreg, iSyntaxService);
-  pluginmgr = CS_QUERY_REGISTRY (objreg, iPluginManager);
+  synldr = csQueryRegistry<iSyntaxService> (objreg);
+  pluginmgr = csQueryRegistry<iPluginManager> (objreg);
 
   InitTokenTable (xmltokens);
   return true;
@@ -79,8 +79,8 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
       node, "Could not loader crystalspace.terraformer.simple plugin");
     return 0;
   }
-  csRef<iSimpleFormerState> state = SCF_QUERY_INTERFACE (former, 
-        iSimpleFormerState);
+  csRef<iSimpleFormerState> state =  
+        scfQueryInterface<iSimpleFormerState> (former);
 
   uint alphamapcount = 0;
   bool material_map_set = false;
@@ -108,7 +108,7 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
 	if ((format == 0) || (strcmp (format, "image") == 0))
 	{
 	  const char *image = child->GetContentsValue ();
-	  csRef<iLoader> loader = CS_QUERY_REGISTRY (objreg, iLoader);
+	  csRef<iLoader> loader = csQueryRegistry<iLoader> (objreg);
 	  csRef<iImage> map = loader->LoadImage (image, CS_IMGFMT_ANY);
 	  if (map == 0) 
 	  {
@@ -170,7 +170,7 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_INTMAP: 
       {
         const char *image = child->GetContentsValue ();
-	csRef<iLoader> loader = CS_QUERY_REGISTRY (objreg, iLoader);
+	csRef<iLoader> loader = csQueryRegistry<iLoader> (objreg);
         csRef<iImage> map = loader->LoadImage (image);
         if (map == 0) 
         {
@@ -181,8 +181,8 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
 	int scale = child->GetAttributeValueAsInt ("scale");
 	int offset = child->GetAttributeValueAsInt ("offset");
 	const char* typestring = child->GetAttributeValue ("type");
-        csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-	  objreg, "crystalspace.shared.stringset", iStringSet);
+        csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+	  objreg, "crystalspace.shared.stringset");
         csStringID type = strings->Request (typestring);
         state->SetIntegerMap (type, map, scale, offset);
         break;
@@ -190,7 +190,7 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_FLOATMAP: 
       {
         const char *image = child->GetContentsValue ();
-	csRef<iLoader> loader = CS_QUERY_REGISTRY (objreg, iLoader);
+	csRef<iLoader> loader = csQueryRegistry<iLoader> (objreg);
         csRef<iImage> map = loader->LoadImage (image);
         if (map == 0) 
         {
@@ -201,8 +201,8 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
 	float scale = child->GetAttributeValueAsFloat ("scale");
 	float offset = child->GetAttributeValueAsFloat ("offset");
 	const char* typestring = child->GetAttributeValue ("type");
-        csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-	  objreg, "crystalspace.shared.stringset", iStringSet);
+        csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+	  objreg, "crystalspace.shared.stringset");
         csStringID type = strings->Request (typestring);
         state->SetFloatMap (type, map, scale, offset);
         break;
@@ -250,7 +250,7 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
         int height = child->GetAttributeValueAsInt ("height");
         if (imagefile != 0)
         {
-          csRef<iLoader> loader = CS_QUERY_REGISTRY (objreg, iLoader);
+          csRef<iLoader> loader = csQueryRegistry<iLoader> (objreg);
           csRef<iImage> map = loader->LoadImage(imagefile,CS_IMGFMT_PALETTED8);
           if (map == 0)
           {
@@ -260,8 +260,8 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
             return 0;
           }
 
-          csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-            objreg, "crystalspace.shared.stringset", iStringSet);
+          csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+            objreg, "crystalspace.shared.stringset");
 
           state->SetIntegerMap(strings->Request("materialmap"), map);
 //          state->SetMaterialMapFile (imagefile, map->GetWidth (),
@@ -273,7 +273,7 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
         synldr->ReportError ("crystalspace.terrain.factory.loader",
               child, "Using raw files is broken! Complain to Fossi.");
         return 0;
-          csRef<iVFS> vfs = CS_QUERY_REGISTRY (objreg, iVFS);
+          csRef<iVFS> vfs = csQueryRegistry<iVFS> (objreg);
           csRef<iFile> file = vfs->Open (arrayfile, VFS_FILE_READ);
           if (file == 0)
           {
@@ -306,7 +306,7 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
         const char* imagefile = child->GetAttributeValue ("image");
         if (imagefile != 0)
         {
-          csRef<iLoader> loader = CS_QUERY_REGISTRY (objreg, iLoader);
+          csRef<iLoader> loader = csQueryRegistry<iLoader> (objreg);
           csRef<iImage> map = loader->LoadImage(imagefile,CS_IMGFMT_PALETTED8);
           if (map == 0)
           {
@@ -318,8 +318,8 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
           csString id = csString("alphamap ");
           id += alphamapcount++;
 
-          csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-            objreg, "crystalspace.shared.stringset", iStringSet);
+          csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+            objreg, "crystalspace.shared.stringset");
 
           state->SetIntegerMap(strings->Request(id), map);
         }
@@ -452,7 +452,7 @@ public:
 csRef<iDataBuffer> csSimpleFormerLoader::GetDataBuffer (iDocumentNode* child)
 {
   const char *filename = child->GetContentsValue ();
-  csRef<iVFS> vfs = CS_QUERY_REGISTRY (objreg, iVFS);
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (objreg);
   csRef<iDataBuffer> buf = vfs->ReadFile (filename, false);
   if (buf == 0) 
   {

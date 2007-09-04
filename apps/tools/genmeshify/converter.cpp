@@ -651,7 +651,7 @@ namespace genmeshify
           pdLights.Put (pdLight, pdSLM);
         }
         else
-          pdSLM = pdLights.Get (pdLight, 0);
+          pdSLM = pdLights.Get (pdLight, (csImageMemory*)0);
         pdSLM->Copy (pdMap, lm.rectOnSLM.xmin, lm.rectOnSLM.ymin,
           lm.rectOnSLM.Width(), lm.rectOnSLM.Height());
       }

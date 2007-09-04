@@ -317,7 +317,7 @@ const char *csConfigIterator::GetSubsection() const
 
 void csConfigIterator::Rewind ()
 {
-  Node = Config->FirstNode;
+  nextNode = Config->FirstNode;
   Next();
 }
 

@@ -30,7 +30,7 @@ namespace lighter
   {
     //Setup defaults
     lighterProperties.doDirectLight = true;
-    lighterProperties.doRadiosity = false;
+    lighterProperties.doiosity = false;
 
     lmProperties.uTexelPerUnit = 16.0f;
     lmProperties.vTexelPerUnit = 16.0f;
@@ -39,9 +39,6 @@ namespace lighter
 
     diProperties.pointLightMultiplier = 1.0f;
     diProperties.areaLightMultiplier = 1.0f;
-
-    radProperties.uPatchResolution = 4;
-    radProperties.vPatchResolution = 4;
   }
 
   void Configuration::Initialize (const csStringArray& /*files*/)

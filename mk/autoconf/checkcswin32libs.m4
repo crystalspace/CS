@@ -1,6 +1,6 @@
 # checkcswin32libs.m4                                         -*- Autoconf -*-
 #==============================================================================
-# Copyright (C)2005 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C)2005,2006 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This library is free software; you can redistribute it and/or modify it
 #    under the terms of the GNU Library General Public License as published by
@@ -27,10 +27,22 @@ AC_PREREQ([2.56])
 #	etc.) usable by MSVC, Mingw/MSYS, and Cygwin users as well as in cross-
 #	compile environments.  It saves users the bother of having to install 
 #	these packages manually one at a time.
-#	The package provides a script 'cslibs-config' which can report the 
-#	compiler and linker flags necessary to utilize the contained 
-#	third-party libraries. If this script is found, the reported flags are
-#	added to the global CFLAGS, CPPFLAGS and LDFLAGS variables.
+#
+#	The package provides a script 'cslibs-config' which can report the
+#	compiler and linker flags necessary to utilize the contained
+#	third-party libraries. If this script is found, the reported flags and
+#	paths are added to the CFLAGS, CPPFLAGS, LDFLAGS, PATH, and
+#	PKG_CONFIG_PATH shell variables.
+#
+#       This macro exports the following shell variables containing the results
+#       of the test:
+#
+#           cs_cv_cslibs ('yes' or 'no')
+#           cs_cv_cslibs_cflags
+#           cs_cv_cslibs_lflags
+#           cs_cv_cslibs_binpath
+#           cs_cv_cslibs_incpath (header search list)
+#           cs_cv_cslibs_pcpath (pkgconfig search list)
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_CSWIN32LIBS],
     [AC_REQUIRE([AC_CANONICAL_HOST])
@@ -56,9 +68,14 @@ AC_DEFUN([CS_CHECK_CSWIN32LIBS],
 		    [$CSLIBS_CONFIG --lflags $cs_cv_cslibs_compiler])
 	       cs_cv_cslibs_binpath=CS_RUN_PATH_NORMALIZE(
 		    [$CSLIBS_CONFIG --binpath $cs_cv_cslibs_compiler])
+               AS_IF([$CSLIBS_CONFIG --incpath >/dev/null 2>&1],
+                    [cs_cv_cslibs_incpath=CS_RUN_PATH_NORMALIZE(
+                        [$CSLIBS_CONFIG --incpath $cs_cv_cslibs_compiler])],
+                    [cs_cv_cslibs_incpath=''])
                AS_IF([$CSLIBS_CONFIG --pcpath >/dev/null 2>&1],
                     [cs_cv_cslibs_pcpath=CS_RUN_PATH_NORMALIZE(
-                        [$CSLIBS_CONFIG --pcpath $cs_cv_cslibs_compiler])])],
+                        [$CSLIBS_CONFIG --pcpath $cs_cv_cslibs_compiler])],
+                    [cs_cv_cslibs_pcpath=''])],
 	       [cs_cv_cslibs=no])])
         AS_IF([test $cs_cv_cslibs = yes],
 	    [CFLAGS="$CFLAGS $cs_cv_cslibs_cflags"

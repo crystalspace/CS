@@ -24,23 +24,27 @@
 #include "lighter.h"
 #include "lightmap.h"
 #include "lightmapuv.h"
-#include "radobject.h"
+#include "object.h"
 #include "config.h"
+
+// Debugging: uncomment to disable border smoothing
+//#define NOSMOOTH
 
 namespace lighter
 {
 
-  RadObjectFactory::RadObjectFactory ()
-    : lightmapMaskArrayValid (false), factoryWrapper (0)
+  ObjectFactory::ObjectFactory ()
+    : lightmapMaskArrayValid (false), factoryWrapper (0), 
+      lightPerVertex (false)
   {
   }
 
-  bool RadObjectFactory::PrepareLightmapUV (LightmapUVLayouter* uvlayout)
+  bool ObjectFactory::PrepareLightmapUV (LightmapUVLayouter* uvlayout)
   {
     size_t oldSize = allPrimitives.GetSize();
     for (size_t i = 0; i < oldSize; i++)
     {
-      csArray<RadPrimitiveArray> newPrims;
+      csArray<PrimitiveArray> newPrims;
       LightmapUVLayoutFactory* lightmaplayout = 
         uvlayout->LayoutFactory (allPrimitives[i], vertexData, newPrims);
       if (!lightmaplayout) return false;
@@ -49,6 +53,7 @@ namespace lighter
       {
         allPrimitives.Push (newPrims[n]);
         lightmaplayouts.Push (lightmaplayout);
+        lightmaplayoutGroups.Push (n);
       }
     }
     while (oldSize-- > 0) allPrimitives.DeleteIndexFast (oldSize);
@@ -56,19 +61,33 @@ namespace lighter
     return true;
   }
 
-  RadObject* RadObjectFactory::CreateObject ()
+  Object* ObjectFactory::CreateObject ()
   {
-    return new RadObject (this);
+    return new Object (this);
   }
 
-  void RadObjectFactory::ParseFactory (iMeshFactoryWrapper *factory)
+  void ObjectFactory::ParseFactory (iMeshFactoryWrapper *factory)
   {
     this->factoryWrapper = factory;
     // Get the name
     this->factoryName = factoryWrapper->QueryObject ()->GetName ();
+    csRef<iObjectIterator> objiter = 
+      factoryWrapper->QueryObject ()->GetIterator();
+    while (objiter->HasNext())
+    {
+      iObject* obj = objiter->Next();
+      csRef<iKeyValuePair> kvp = 
+        scfQueryInterface<iKeyValuePair> (obj);
+      if (kvp.IsValid())
+      {
+        const char* vVertexlight = kvp->GetValue ("vertexlight");
+        if (vVertexlight != 0)
+          lightPerVertex = (strcmp (vVertexlight, "yes") == 0);
+      }
+    }
   }
 
-  void RadObjectFactory::SaveFactory (iDocumentNode *node)
+  void ObjectFactory::SaveFactory (iDocumentNode *node)
   {
     // Save out the factory to the node
     csRef<iSaverPlugin> saver = 
@@ -89,12 +108,17 @@ namespace lighter
 
   //-------------------------------------------------------------------------
 
-  RadObject::RadObject (RadObjectFactory* fact)
-    : factory (fact)
+  Object::Object (ObjectFactory* fact)
+    : factory (fact), lightPerVertex (fact->lightPerVertex), litColors (0)
   {
   }
   
-  bool RadObject::Initialize ()
+  Object::~Object ()
+  {
+    delete litColors;
+  }
+
+  bool Object::Initialize ()
   {
     if (!factory || !meshWrapper) return false;
     const csReversibleTransform transform = meshWrapper->GetMovable ()->
@@ -108,64 +132,83 @@ namespace lighter
     unsigned int i = 0;
     for(size_t j = 0; j < factory->allPrimitives.GetSize (); ++j)
     {
-      RadPrimitiveArray& factPrims = factory->allPrimitives[j];
-      RadPrimitiveArray& allPrimitives =
+      PrimitiveArray& factPrims = factory->allPrimitives[j];
+      PrimitiveArray& allPrimitives =
         this->allPrimitives.GetExtend (j);
       for (i = 0; i < factPrims.GetSize(); i++)
       {
-        RadPrimitive newPrim (vertexData);
+        Primitive newPrim (vertexData);
         
-        RadPrimitive& prim = allPrimitives[allPrimitives.Push (newPrim)];
+        Primitive& prim = allPrimitives[allPrimitives.Push (newPrim)];
         prim.SetOriginalPrimitive (&factPrims[i]);
-        prim.GetIndexArray () = factPrims[i].GetIndexArray ();
+        prim.SetTriangle (factPrims[i].GetTriangle ()); 
         prim.ComputePlane ();
       }
 
-      // FIXME: probably separate out to allow for better progress display
-      bool res = factory->lightmaplayouts[j]->LayoutUVOnPrimitives (
-        allPrimitives, vertexData, lightmapIDs.GetExtend (j));
-      if (!res) return false;
+      if (!lightPerVertex)
+      {
+        // FIXME: probably separate out to allow for better progress display
+        bool res = factory->lightmaplayouts[j]->LayoutUVOnPrimitives (
+          allPrimitives, factory->lightmaplayoutGroups[j], vertexData, 
+          lightmapIDs.GetExtend (j));
+        if (!res) return false;
+      }
 
       for (i = 0; i < allPrimitives.GetSize(); i++)
       {
-        RadPrimitive& prim = allPrimitives[i];
+        Primitive& prim = allPrimitives[i];
         prim.ComputeUVTransform ();
-        prim.SetRadObject (this);
-        prim.Prepare (
-          globalConfig.GetRadProperties ().uPatchResolution, 
-          globalConfig.GetRadProperties ().vPatchResolution);
+        prim.SetObject (this);
+        prim.Prepare ();
       }
+    }
+
+    if (lightPerVertex)
+    {
+      litColors = new LitColorArray();
+      litColors->SetSize (vertexData.vertexArray.GetSize(), 
+        csColor (0.0f, 0.0f, 0.0f));
     }
 
     return true;
   }
 
-  void RadObject::RenormalizeLightmapUVs (const LightmapPtrDelArray& lightmaps)
+  void Object::RenormalizeLightmapUVs (const LightmapPtrDelArray& lightmaps)
   {
+    if (lightPerVertex) return;
+
     BoolArray vertexProcessed;
     vertexProcessed.SetSize (vertexData.vertexArray.GetSize (),false);
 
     for (size_t p = 0; p < allPrimitives.GetSize (); p++)
     {
       const Lightmap* lm = lightmaps[lightmapIDs[p]];
-      const RadPrimitiveArray& prims = allPrimitives[p];
+      const float factorX = 1.0f / lm->GetWidth ();
+      const float factorY = 1.0f / lm->GetHeight ();
+      const PrimitiveArray& prims = allPrimitives[p];
+      csSet<size_t> indicesRemapped;
       // Iterate over lightmaps and renormalize UVs
       for (size_t j = 0; j < prims.GetSize (); ++j)
       {
         //TODO make sure no vertex is used in several lightmaps.. 
-        const RadPrimitive &prim = prims.Get (j);
-        const SizeTDArray &indexArray = prim.GetIndexArray ();
-        for (size_t i = 0; i < indexArray.GetSize (); ++i)
+        const Primitive &prim = prims.Get (j);
+        const Primitive::TriangleType& t = prim.GetTriangle ();
+        for (size_t i = 0; i < 3; ++i)
         {
-          csVector2 &lmUV = vertexData.vertexArray[indexArray[i]].lightmapUV;
-          lmUV.x /= lm->GetWidth ();
-          lmUV.y /= lm->GetHeight ();
+          size_t index = t[i];
+          if (!indicesRemapped.Contains (index))
+          {
+            csVector2 &lmUV = vertexData.vertexArray[index].lightmapUV;
+            lmUV.x = (lmUV.x + 0.5f) * factorX;
+            lmUV.y = (lmUV.y + 0.5f) * factorY;
+            indicesRemapped.AddNoTest (index);
+          }
         }
       }
     }
   }
 
-  void RadObject::StripLightmaps (csSet<csString>& lms)
+  void Object::StripLightmaps (csSet<csString>& lms)
   {
     iShaderVariableContext* svc = meshWrapper->GetSVContext();
     csShaderVariable* sv = svc->GetVariable (
@@ -180,10 +223,24 @@ namespace lighter
     }
   }
 
-  void RadObject::ParseMesh (iMeshWrapper *wrapper)
+  void Object::ParseMesh (iMeshWrapper *wrapper)
   {
     this->meshWrapper = wrapper;
     this->meshName = wrapper->QueryObject ()->GetName ();
+    csRef<iObjectIterator> objiter = 
+      wrapper->QueryObject ()->GetIterator();
+    while (objiter->HasNext())
+    {
+      iObject* obj = objiter->Next();
+      csRef<iKeyValuePair> kvp = 
+        scfQueryInterface<iKeyValuePair> (obj);
+      if (kvp.IsValid())
+      {
+        const char* vVertexlight = kvp->GetValue ("vertexlight");
+        if (vVertexlight != 0)
+          lightPerVertex = (strcmp (vVertexlight, "yes") == 0);
+      }
+    }
   }
 
   static void CloneNode (iDocumentNode* from, iDocumentNode* to)
@@ -205,7 +262,7 @@ namespace lighter
     }
   }
 
-  void RadObject::SaveMesh (Scene* /*scene*/, iDocumentNode* node)
+  void Object::SaveMesh (Scene* /*scene*/, iDocumentNode* node)
   {
     // Save out the object to the node
     csRef<iSaverPlugin> saver = 
@@ -249,11 +306,13 @@ namespace lighter
     }
   }
 
-  void RadObject::FixupLightmaps (LightmapPtrDelArray& lightmaps)
+  void Object::FixupLightmaps (csArray<LightmapPtrDelArray*>& lightmaps)
   {
+    if (lightPerVertex) return;
+
     //Create one
     LightmapMaskArray masks;
-    LightmapPtrDelArray::Iterator lmIt = lightmaps.GetIterator ();
+    LightmapPtrDelArray::Iterator lmIt = lightmaps[0]->GetIterator ();
     while (lmIt.HasNext ())
     {
       const Lightmap* lm = lmIt.Next ();
@@ -266,11 +325,12 @@ namespace lighter
     for (size_t i = 0; i < allPrimitives.GetSize(); i++)
     {
       LightmapMask &mask = masks[lightmapIDs[i]];
-      RadPrimitiveArray::Iterator primIt = allPrimitives[i].GetIterator ();
+      PrimitiveArray::Iterator primIt = allPrimitives[i].GetIterator ();
       while (primIt.HasNext ())
       {
-        const RadPrimitive &prim = primIt.Next ();
+        const Primitive &prim = primIt.Next ();
         totalArea = (prim.GetuFormVector ()%prim.GetvFormVector ()).Norm ();
+        float area2pixel = 1.0f / totalArea;
 
         int minu,maxu,minv,maxv;
         prim.ComputeMinMaxUV (minu,maxu,minv,maxv);
@@ -282,12 +342,12 @@ namespace lighter
           uint vindex = v * mask.width;
           for (uint u = minu; u <= (uint)maxu; u++, findex++)
           {
-            if (prim.GetElementAreas ()[findex] < FLT_EPSILON) continue; // No area, skip
+            const float elemArea = prim.GetElementAreas ()[findex];
+            if (elemArea < FLT_EPSILON) continue; // No area, skip
 
-            mask.maskData[vindex+u] += prim.GetElementAreas ()[findex]; //Accumulate
+            mask.maskData[vindex+u] += elemArea * area2pixel; //Accumulate
           }
-
-        }
+        } 
       }
     }
 
@@ -295,72 +355,90 @@ namespace lighter
     
     // Un-antialias
     uint i;
- /*   for (i = 0; i < lightmaps.GetSize (); i++)
+#ifndef DUMP_NORMALS
+    for (size_t l = 0; l < lightmaps.GetSize (); l++)
     {
-      csColor* lmData = lightmaps[i]->GetData ().GetArray ();
-      float* mmData = masks[i].maskData.GetArray ();
-      const size_t size = lightmaps[i]->GetData ().GetSize ();
-
-      for (uint j = 0; j < size; j++, lmData++, mmData++)
+      for (i = 0; i < lightmaps[l]->GetSize(); i++)
       {
-        if (*mmData < FLT_EPSILON || *mmData >= totalArea) continue;
+        csColor* lmData = lightmaps[l]->Get (i)->GetData ().GetArray ();
+        const float* mmData = masks[i].maskData.GetArray ();
+        const size_t size = lightmaps[l]->Get (i)->GetData ().GetSize ();
 
-        *lmData *= (totalArea / *mmData);
-      }
-    }*/
-
-    // Do the filtering
-    for (i = 0; i < lightmaps.GetSize (); i++)
-    {
-      csColor* lmData = lightmaps[i]->GetData ().GetArray ();
-      float* mmData = masks[i].maskData.GetArray ();
-            
-      uint lmw = lightmaps[i]->GetWidth ();
-      uint lmh = lightmaps[i]->GetHeight ();
-
-      
-      for (uint v = 0; v < lmh; v++)
-      {
-        // now scan over the row
-        for (uint u = 0; u < lmw; u++)
+        for (uint j = 0; j < size; j++, lmData++, mmData++)
         {
-          const uint idx = v*lmw+u;
-          
-          // Only try to fix non-masked
-          if (mmData[idx]>0) continue;
+          if (*mmData < FLT_EPSILON || *mmData >= 1.0f) continue;
 
-          uint count = 0;
-          csColor newColor (0.0f,0.0f,0.0f);
+          *lmData *= (1.0f / *mmData);
+        }
+      }
+    }
+#endif
 
-          // We have a row above to use
-          if (v > 0)
+#ifndef NOSMOOTH
+    // Do the filtering
+    for (size_t l = 0; l < lightmaps.GetSize (); l++)
+    {
+      for (i = 0; i < lightmaps[l]->GetSize(); i++)
+      {
+        csColor* lmData = lightmaps[l]->Get (i)->GetData ().GetArray ();
+        const float* mmData = masks[i].maskData.GetArray ();
+              
+        uint lmw = lightmaps[l]->Get (i)->GetWidth ();
+        uint lmh = lightmaps[l]->Get (i)->GetHeight ();
+        
+        for (uint v = 0; v < lmh; v++)
+        {
+          // now scan over the row
+          for (uint u = 0; u < lmw; u++)
           {
-            // We have a column to the left
-            if (u > 0 && mmData[(v-1)*lmw+(u-1)] > FLT_EPSILON) newColor += lmData[(v-1)*lmw+(u-1)], count++;
-            if (mmData[(v-1)*lmw+(u)] > FLT_EPSILON) newColor += lmData[(v-1)*lmw+(u)], count++;
-            if (u < lmw-1 && mmData[(v-1)*lmw+(u+1)] > FLT_EPSILON) newColor += lmData[(v-1)*lmw+(u+1)], count++;
-          }
+            const uint idx = v*lmw+u;
+            
+            // Only try to fix non-masked
+            if (mmData[idx]>0) continue;
 
-          //current row
-          if (u > 0 && mmData[v*lmw+(u-1)] > FLT_EPSILON) newColor += lmData[v*lmw+(u-1)], count++;
-          if (u < lmw-1 && mmData[v*lmw+(u+1)] > FLT_EPSILON) newColor += lmData[v*lmw+(u+1)], count++;
+            uint count = 0;
+            csColor newColor (0.0f,0.0f,0.0f);
 
-          // We have a row below
-          if (v < (lmh-1))
-          {
-            if (u > 0 && mmData[(v+1)*lmw+(u-1)] > FLT_EPSILON) newColor += lmData[(v+1)*lmw+(u-1)], count++;
-            if (mmData[(v+1)*lmw+(u)] > FLT_EPSILON) newColor += lmData[(v+1)*lmw+(u)], count++;
-            if (u < lmw-1 && mmData[(v+1)*lmw+(u+1)] > FLT_EPSILON) newColor += lmData[(v+1)*lmw+(u+1)], count++;
-          }
+            // We have a row above to use
+            if (v > 0)
+            {
+              // We have a column to the left
+              if (u > 0 && mmData[(v-1)*lmw+(u-1)] > FLT_EPSILON) newColor += lmData[(v-1)*lmw+(u-1)], count++;
+              if (mmData[(v-1)*lmw+(u)] > FLT_EPSILON) newColor += lmData[(v-1)*lmw+(u)], count++;
+              if (u < lmw-1 && mmData[(v-1)*lmw+(u+1)] > FLT_EPSILON) newColor += lmData[(v-1)*lmw+(u+1)], count++;
+            }
 
-          if (count > 0) 
-          {
-            newColor *= (1.0f/count);
-            lmData[idx] = newColor;
+            //current row
+            if (u > 0 && mmData[v*lmw+(u-1)] > FLT_EPSILON) newColor += lmData[v*lmw+(u-1)], count++;
+            if (u < lmw-1 && mmData[v*lmw+(u+1)] > FLT_EPSILON) newColor += lmData[v*lmw+(u+1)], count++;
+
+            // We have a row below
+            if (v < (lmh-1))
+            {
+              if (u > 0 && mmData[(v+1)*lmw+(u-1)] > FLT_EPSILON) newColor += lmData[(v+1)*lmw+(u-1)], count++;
+              if (mmData[(v+1)*lmw+(u)] > FLT_EPSILON) newColor += lmData[(v+1)*lmw+(u)], count++;
+              if (u < lmw-1 && mmData[(v+1)*lmw+(u+1)] > FLT_EPSILON) newColor += lmData[(v+1)*lmw+(u+1)], count++;
+            }
+
+            if (count > 0) 
+            {
+#ifndef DUMP_NORMALS
+              newColor *= (1.0f/count);
+#else
+              csVector3 v (
+                newColor.red*2.0f-float (count), 
+                newColor.green*2.0f-float (count), 
+                newColor.blue*2.0f-float (count));
+              v.Normalize();
+              newColor.Set (v.x*0.5f+0.5f, v.y*0.5f+0.5f, v.z*0.5f+0.5f);
+#endif
+              lmData[idx] = newColor;
+            }
           }
         }
       }
     }
+#endif // NOSMOOTH
   }
 
 }

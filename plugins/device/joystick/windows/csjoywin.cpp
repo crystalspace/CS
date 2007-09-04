@@ -182,7 +182,7 @@ static BOOL CALLBACK dev_callback(LPCDIDEVICEINSTANCE lpddi, LPVOID pvRef)
 
 bool csWindowsJoystick::Init ()
 {
-  csRef<iWin32Assistant> win32 = CS_QUERY_REGISTRY(object_reg, iWin32Assistant);
+  csRef<iWin32Assistant> win32 = csQueryRegistry<iWin32Assistant> (object_reg);
   HRESULT hr = DirectInputCreate (win32->GetInstance (), DIRECTINPUT_VERSION, 
     &lpdin, 0);
   if (SUCCEEDED (hr))
@@ -243,7 +243,7 @@ bool csWindowsJoystick::Init ()
     PreProcess = csevPreProcess (object_reg);
     if (njoys > 0)
     {
-      eq = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+      eq = csQueryRegistry<iEventQueue> (object_reg);
       if (eq)
       {
 	eq->RegisterListener (this, PreProcess);

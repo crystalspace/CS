@@ -76,7 +76,7 @@ const int AWSTEST_CANVAS=AWSTEST_SCREEN;
 //-----------------------------------------------------------------------------
 
 #define  QUERY_REG(myPlug, iFace, errMsg) \
-  myPlug = CS_QUERY_REGISTRY (object_reg, iFace); \
+  myPlug = csQueryRegistry<iFace> (object_reg); \
   if (!myPlug) \
   { \
     Report (CS_REPORTER_SEVERITY_ERROR, errMsg); \
@@ -149,9 +149,9 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   }
 
   // The virtual clock.
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
   csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+  	csQueryRegistry<iPluginManager> (object_reg));
 
   // Load the engine plugin.
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading engine...");
@@ -382,7 +382,7 @@ awsTest::SetupFrame()
   aws->Print(myG3D, 64);
   /*if (AWSTEST_SINGLEPROCTEXCANVAS)
   {
-    csRef<iTextureWrapper> tex (SCF_QUERY_INTERFACE(awsCanvas, iTextureWrapper));
+    csRef<iTextureWrapper> tex (scfQueryInterface<iTextureWrapper> (awsCanvas));
     if (tex)
     {
       myG3D->DrawPixmap(tex->GetTextureHandle(),
@@ -406,7 +406,7 @@ awsTest::HandleEvent (iEvent &Event)
   if ((Event.Name == KeyboardDown) && 
       (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_ESC))
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
     if (q)
       q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
     return true;
@@ -421,7 +421,7 @@ awsTest::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
+  csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
   if (rep)
     rep->ReportV (severity, "crystalspace.application.awstest", msg, arg);
   else

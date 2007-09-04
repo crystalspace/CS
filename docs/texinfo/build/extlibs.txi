@@ -19,6 +19,8 @@ Freetype2
 @item
 @sc{ode}
 @item
+Bullet
+@item
 Cal3D
 @item
 lib3ds
@@ -27,9 +29,9 @@ Ogg/Vorbis
 @item
 libmng
 @item
-MikMod
-@item
 @sc{cegui}
+@item
+wxWidgets
 @item
 @sc{caca}
 @end itemize
@@ -43,6 +45,22 @@ with these libraries pre-installed.  If the libraries are not already available
 on your system, then see the following sections for information about how to
 obtain them.
 
+If you need to install some of the libraries yourself pay attention to the
+versions states below. 
+
+@itemize @bullet
+@item 
+``Required'' means that you need to install exactly 
+the version stated, otherwise Crystal Space can not use the library. 
+@item 
+``Recommended'' means that the version stated is known to work well with 
+Crystal Space, however, older or newer versions may work as well. If you have
+a choice between multiple versions for a library, pick the recommended one.
+@item
+``Minimum'' means that a library needs to be at least of the version stated,
+but newer versions are very likely to work as well and can be chosen.
+@end itemize
+
 @subheading The ``cs-win32libs'' Package
 @cindex Windows, Building
 @anchor{cs-win32libs}
@@ -50,21 +68,25 @@ obtain them.
 Rather than having to install these components manually, Microsoft Visual C++ 
 7/7.1/8, MinGW/MSYS, and Cygwin users can download a single package which
 contains all common headers, pre-built library files, and dynamic link 
-libraries in pre-compiled form from the following location:
+libraries in pre-compiled form, all in versions known to work with this
+particular release of Crystal Space. You can obtain it from the following
+location:
 
 @noindent
 @ifnottex
-@uref{http://www.crystalspace3d.org/downloads/cs-win32libs/cs-win32libs-1.0rc1_001.exe}
+@uref{http://www.crystalspace3d.org/downloads/cs-win32libs/cs-win32libs-1.0_001.exe}
 @end ifnottex
 @iftex
 @code{http://www.crystalspace3d.org/downloads/cs-win32libs/}@*
-@code{cs-win32libs-1.0rc1_001.exe}
+@code{cs-win32libs-1.0_001.exe}
 @end iftex
 
 @subheading zlib
 @cindex zlib
 @cindex Libraries, zlib
 @cindex Compression library, zlib
+
+@emph{Version:} 1.0 minimum
 
 Crystal Space relies upon the @code{zlib} library for reading @sc{zip} files,
 and for a few other uses.  You can download @code{zlib} from:
@@ -80,6 +102,8 @@ you have permission to do so, it is best to install the library.
 @cindex libpng
 @cindex Libraries, libpng
 @cindex PNG library
+
+@emph{Version:} 1.2.x minimum
 
 Crystal Space relies upon the @code{libpng} library for reading @sc{png}
 graphic files.  You can download @code{libpng} from:
@@ -97,6 +121,8 @@ best to install the library.
 @cindex Libraries, libjpeg
 @cindex JPEG library
 
+@emph{Version:} 6b minimum
+
 Crystal Space relies upon the @code{libjpeg} library for reading @sc{jpeg}
 graphic files.  You can download @code{libjpeg} from:
 
@@ -111,6 +137,8 @@ if you have permission to do so, it is best to install the library.
 @cindex Freetype2
 @cindex Libraries, Freetype2
 
+@emph{Version:} 2.1.x minimum
+
 Crystal Space can utilize the FreeType2 library to display TrueType fonts. You
 can get the latest version at:
 
@@ -122,20 +150,23 @@ can get the latest version at:
 @cindex Libraries, @sc{cg}
 @cindex CG library
 
+@emph{Version:} 1.4.1 recommended
+
 Many Crystal Space shaders require the @sc{cg} library from nVidia.
 Crystal Space depends on the @sc{cg} library with version number at least
-equal to 1.4. If you're on GNU/Linux then you probably will not find a package
-with that version available (latest stable on Gentoo is 1.2 for example) so
-you have to directly download this from
-@url{http://developer.nvidia.com/object/cg_toolkit.html#downloads}.
+equal to 1.4. If you're on GNU/Linux then you may not find a package
+with that version available, in this case you have to directly download this 
+from @url{http://developer.nvidia.com/object/cg_toolkit.html#downloads}.
 
 @subheading @sc{ode}
 @cindex @sc{ode}
 @cindex Libraries, @sc{ode}
 @cindex Physics library
 
+@emph{Version:} 0.7 recommended
+
 Crystal Space contains a plugin providing physics through @sc{ode}. You can get
-the required latest @sc{svn} code at:
+the required version at:
 
 @noindent
 @uref{http://www.ode.org/}
@@ -143,12 +174,27 @@ the required latest @sc{svn} code at:
 @emph{Note:} You @emph{must} compile @sc{ode} with @sc{opcode} support enabled
 in order to use the library with Crystal Space.
 
+@subheading Bullet
+@cindex Bullet
+@cindex Libraries, Bullet
+@cindex Physics library
+
+@emph{Version:} 1.9f recommended
+
+Crystal Space can also provide physics through Bullet. You can get
+the required version at:
+
+@noindent
+@uref{http://www.continuousphysics.com/}
+
 @subheading Cal3D
 @cindex Cal3D
 @cindex Libraries, Cal3D
 
+@emph{Version:} 0.11.x required
+
 Crystal Space supports skeletal animation using the Cal3D library. You
-can obtain the required the @sc{svn} code at:
+can obtain the required version at:
 
 @noindent
 @uref{https://gna.org/projects/cal3d/}
@@ -156,6 +202,8 @@ can obtain the required the @sc{svn} code at:
 @subheading lib3ds
 @cindex lib3ds
 @cindex Libraries, lib3ds
+
+@emph{Version:} 1.2.0 recommended
 
 Crystal Space has support for the popular 3ds model format using the lib3ds
 library. It is recommended that you use the 1.2.0 release.
@@ -166,6 +214,8 @@ library. It is recommended that you use the 1.2.0 release.
 @subheading Ogg/Vorbis libraries
 @cindex Ogg/Vorbis
 @cindex Libraries, Ogg/Vorbis
+
+@emph{Version:} 1.1.x recommended
 
 With this libraries you can use the Ogg/Vorbis sound plugin. You can get the
 latest version at:
@@ -178,6 +228,8 @@ latest version at:
 @cindex Libraries, libmng
 @cindex @sc{mng}/@sc{jng} library
 @anchor{GettingLibmng}
+
+@emph{Version:} 1.0.9 recommended
 
 Crystal Space can optionally utilize the @code{libmng} library for reading
 @sc{mng}/@sc{jng} graphic files.  You can download @code{libmng} from:
@@ -193,10 +245,40 @@ if you have permission to do so, it is best to install the library.
 This library is used for 2D rendering in text mode.  This is optional and only
 needed for fun. libcaca can be downloaded from:
 
+@emph{Version:} 0.9 recommended
+
 @noindent
 @uref{http://sam.zoy.org/libcaca/}
 
-@strong{Maps}: Needed if you want to see examples of Crystal Space at work.
+@subheading @sc{cegui}
+@cindex @sc{cegui}
+@cindex Libraries, @sc{cegui}
+
+@emph{Version:} 0.5.x required
+
+Crystal Space uses @sc{cegui} for some of it's own tool programs (e.g. 
+@file{viewmesh}) but also allows external programs to utilize @sc{cegui} for
+their user interface.
+
+@noindent
+@uref{http://cegui.org.uk}
+
+@subheading wxWidgets
+@cindex wxWidgets
+@cindex Libraries, wxWidgets
+
+@emph{Version:} 2.6.x recommended
+
+Integration into wxWidgets is supported; a special canvas is provided that
+creates a WX window into which Crystal Space can render graphics. To compile
+this canvas, wxWidgets is required.
+
+@noindent
+@uref{http://wxwidgets.org}
+
+@subheading Maps
+
+Needed if you want to see examples of Crystal Space at work.
 A few data files are provided in the Crystal Space release itself, but more can
 be downloaded from the @file{maps} subdirectory of each release.  Most files
 can just be placed in the @file{CS/data} directory.

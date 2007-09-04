@@ -87,7 +87,7 @@ csPtr<iBase> csLightIterRSLoader::Parse (iDocumentNode* node,
   csRef<iLightIterRenderStep> step;
   step.AttachNew (new csLightIterRenderStep (object_reg));
   csRef<iRenderStepContainer> steps =
-    SCF_QUERY_INTERFACE (step, iRenderStepContainer);
+    scfQueryInterface<iRenderStepContainer> (step);
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -160,10 +160,10 @@ void csLightIterRenderStep::Init ()
   {
     initialized = true;
 
-    g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+    g3d = csQueryRegistry<iGraphics3D> (object_reg);
 
-    csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-      object_reg, "crystalspace.shared.stringset", iStringSet);
+    csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+      object_reg, "crystalspace.shared.stringset");
 
     csStringID posname = strings->Request ("light 0 position");
     csStringID poswname = strings->Request ("light 0 position world");
@@ -175,10 +175,11 @@ void csLightIterRenderStep::Init ()
     csStringID atxname = strings->Request ("light 0 attenuationtex");
     csStringID infallname = strings->Request ("light 0 inner falloff");
     csStringID ofallname = strings->Request ("light 0 outer falloff");
-	trw_inv_name = strings->Request ("light 0 transform inverse world");
+    trw_inv_name = strings->Request ("light 0 transform inverse world");
+    CS::ShaderVarName lightcountname (strings, "light count");
 
-    shadermgr = CS_QUERY_REGISTRY (
-    	object_reg, iShaderManager);
+    shadermgr = 
+    	csQueryRegistry<iShaderManager> (object_reg);
 
     shvar_light_0_position = shadermgr->GetVariable (posname);
     if (!shvar_light_0_position)
@@ -259,6 +260,15 @@ void csLightIterRenderStep::Init ()
       shvar_light_0_outer_falloff->SetType (csShaderVariable::FLOAT);
       shadermgr->AddVariable (shvar_light_0_outer_falloff);
     }
+
+    csRef<csShaderVariable> svLightCount (
+      shadermgr->GetVariable (lightcountname));
+    if (!svLightCount)
+    {
+      svLightCount = new csShaderVariable (lightcountname);
+      shadermgr->AddVariable (svLightCount);
+    }
+    svLightCount->SetValue (1);
   }
 }
 
@@ -350,7 +360,7 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
 size_t csLightIterRenderStep::AddStep (iRenderStep* step)
 {
   csRef<iLightRenderStep> lrs = 
-    SCF_QUERY_INTERFACE (step, iLightRenderStep);
+    scfQueryInterface<iLightRenderStep> (step);
   if (!lrs) return csArrayItemNotFound;
   return steps.Push (lrs);
 }
@@ -358,7 +368,7 @@ size_t csLightIterRenderStep::AddStep (iRenderStep* step)
 bool csLightIterRenderStep::DeleteStep (iRenderStep* step)
 {
   csRef<iLightRenderStep> lrs = 
-    SCF_QUERY_INTERFACE (step, iLightRenderStep);
+    scfQueryInterface<iLightRenderStep> (step);
   if (!lrs) return false;
   return steps.Delete(lrs);
 }
@@ -371,7 +381,7 @@ iRenderStep* csLightIterRenderStep::GetStep (size_t n) const
 size_t csLightIterRenderStep::Find (iRenderStep* step) const
 {
   csRef<iLightRenderStep> lrs = 
-    SCF_QUERY_INTERFACE (step, iLightRenderStep);
+    scfQueryInterface<iLightRenderStep> (step);
   if (!lrs) return csArrayItemNotFound;
   return steps.Find(lrs);
 }

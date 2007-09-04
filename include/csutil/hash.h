@@ -168,7 +168,7 @@ public:
  * string types (must support cast to const char*).
  * Example:
  * \code
- * CS_SPECIALIZE_TEMPLATE csHashComputer<MyString> : 
+ * template<> csHashComputer<MyString> : 
  *   public csHashComputerString<MyString> {};
  * \endcode
  */
@@ -255,6 +255,12 @@ template <class T, class K = unsigned int,
   class ArrayMemoryAlloc = CS::Memory::AllocatorMalloc> 
 class csHash
 {
+public:
+  typedef csHash<T, K, ArrayMemoryAlloc> ThisType;
+  typedef T ValueType;
+  typedef K KeyType;
+  typedef ArrayMemoryAlloc AllocatorType;
+
 protected:
   struct Element
   {

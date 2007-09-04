@@ -85,8 +85,8 @@ bool SndSysDriverALSA::Initialize (iObjectRegistry *pObjectReg)
   Config.AddConfig(m_pObjectReg, "/config/sound.cfg");
 
   // check for optional output device name from the commandline
-  csRef<iCommandLineParser> CMDLine (CS_QUERY_REGISTRY (m_pObjectReg,
-    iCommandLineParser));
+  csRef<iCommandLineParser> CMDLine (
+    csQueryRegistry<iCommandLineParser> (m_pObjectReg));
   const char *OutputDeviceName = CMDLine->GetOption ("alsadevice");
   if (!OutputDeviceName)
     OutputDeviceName = Config->GetStr("SndSys.Driver.ALSA.Device", "default");

@@ -37,7 +37,7 @@ awsParser::~awsParser ()
 
 bool awsParser::Initialize (const char* filename)
 {
-  csRef<iVFS> vfs (CS_QUERY_REGISTRY (objreg, iVFS));
+  csRef<iVFS> vfs (csQueryRegistry<iVFS> (objreg));
   if (!vfs)
     return false;
   

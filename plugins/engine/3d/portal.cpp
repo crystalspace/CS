@@ -512,17 +512,22 @@ iMeshWrapper* csPortal::HitBeamPortals (
     csVector3 new_end = warp_wor.Other2This (end);
     csSectorHitBeamResult hbresult = sector->HitBeamPortals (new_start, new_end);
     if (final_sector) *final_sector = hbresult.final_sector;
-    
-    if (hbresult.mesh && hbresult.polygon_idx != -1)
+    if (hbresult.mesh)
+    {
+      if (polygon_idx) *polygon_idx = hbresult.polygon_idx;
       isect = warp_wor.This2Other (hbresult.isect);
-    if (hbresult.mesh && polygon_idx) *polygon_idx = hbresult.polygon_idx;
+    }
     return hbresult.mesh;
   }
   else
   {    
     csSectorHitBeamResult hbresult = sector->HitBeamPortals (start, end);
     if (final_sector) *final_sector = hbresult.final_sector;
-    if (hbresult.mesh && polygon_idx) *polygon_idx = hbresult.polygon_idx;
+    if (hbresult.mesh)
+    {
+      if (polygon_idx) *polygon_idx = hbresult.polygon_idx;
+      isect = hbresult.isect;
+    }
     return hbresult.mesh;
   }
 }
@@ -585,7 +590,7 @@ void csPortal::CheckFrustum (iFrustumView *lview,
     copied_frustums = true;
 
     iFrustumViewUserdata *ud = lview->GetUserdata ();
-    if (ud) linfo = SCF_QUERY_INTERFACE (ud, iLightingProcessInfo);
+    if (ud) linfo = scfQueryInterface<iLightingProcessInfo> (ud);
     if (linfo)
     {
       if (alpha)

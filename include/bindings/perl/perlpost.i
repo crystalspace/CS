@@ -83,19 +83,6 @@
  ****************************************************************************/
 #ifndef CS_MICRO_SWIG
 %{
-  static const int csInitializer_SetupEventHandler_DefaultMask
-    = CSMASK_Nothing
-    | CSMASK_Broadcast
-    | CSMASK_MouseUp
-    | CSMASK_MouseDown
-    | CSMASK_MouseMove
-    | CSMASK_Keyboard
-    | CSMASK_MouseClick
-    | CSMASK_MouseDoubleClick
-    | CSMASK_JoystickMove
-    | CSMASK_JoystickDown
-    | CSMASK_JoystickUp;
-
   static SV * pl_csInitializer_EventHandler = 0;
 
   bool csInitializer_EventHandler (iEvent &event)
@@ -131,7 +118,8 @@
     dTARG;
     SV *reg_ref = ST (0);
     SV *func_rv = ST (1);
-    SV *mask_sv = ST (2);
+    /* FIXME: Update event mask to use new array of desired events */
+    /*SV *mask_sv = ST (2);*/
     if (! (reg_ref && func_rv))
       croak ("SetupEventHandler needs at least 2 arguments");
 
@@ -139,17 +127,17 @@
     if (SWIG_ConvertPtr(reg_ref,(void**)&reg,SWIGTYPE_p_iObjectRegistry,0) < 0)
       croak("Type error. Argument 1 must be iObjectRegistry.\n");
 
-    unsigned int mask;
+    /*unsigned int mask;
     if (mask_sv)
       mask = SvUV (mask_sv);
     else
-      mask = csInitializer_SetupEventHandler_DefaultMask;
+      mask = csInitializer_SetupEventHandler_DefaultMask;*/
 
     SV *func = SvRV (func_rv);
     pl_csInitializer_EventHandler = func;
 
     bool ok = csInitializer::SetupEventHandler
-      (reg, csInitializer_EventHandler, mask);
+      (reg, csInitializer_EventHandler/*, mask*/);
     XSRETURN_IV (ok ? 1 : 0);
   }
 %}

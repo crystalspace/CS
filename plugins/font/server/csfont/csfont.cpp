@@ -192,7 +192,7 @@ void csDefaultFontServer::NotifyDelete (csDefaultFont *font)
 
 csDefaultFont *csDefaultFontServer::ReadFontFile(const char *file)
 {
-  csRef<iVFS> VFS (CS_QUERY_REGISTRY (object_reg, iVFS));
+  csRef<iVFS> VFS (csQueryRegistry<iVFS> (object_reg));
   csRef<iDataBuffer> fntfile (VFS->ReadFile (file, false));
   if (!fntfile)
   {

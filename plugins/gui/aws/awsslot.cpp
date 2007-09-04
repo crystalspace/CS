@@ -40,8 +40,7 @@ awsSinkManager::~awsSinkManager ()
 
 bool awsSinkManager::Setup (iObjectRegistry* r)
 {
-  strset = CS_QUERY_REGISTRY_TAG_INTERFACE(r, "crystalspace.shared.stringset",
-    iStringSet);
+  strset = csQueryRegistryTagInterface<iStringSet> (r, "crystalspace.shared.stringset");
   if (!strset.IsValid())
   {
     csReport (r, CS_REPORTER_SEVERITY_ERROR, "crystalspace.aws",

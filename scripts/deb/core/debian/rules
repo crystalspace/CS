@@ -163,7 +163,7 @@ install-indep:
 	# Add here commands to install the indep part of the package into
 	# debian/<package>-doc.
 	#INSTALLDOC#
-	cd CS; DESTDIR=$(CURDIR)/debian/crystalspace-doc $(MAKE) install_doc
+	cd CS; DESTDIR=$(CURDIR)/debian/crystalspace-doc/usr/share $(MAKE) install_doc
 
 install-arch:
 	dh_testdir
@@ -175,22 +175,22 @@ install-arch:
 	cd CS; DESTDIR=$(CURDIR)/debian/crystalspace $(MAKE) install_bin 
 	cd CS; DESTDIR=$(CURDIR)/debian/crystalspace $(MAKE) install_lib 
 	cd CS; DESTDIR=$(CURDIR)/debian/crystalspace $(MAKE) install_plugin 
-	cd CS; DESTDIR=$(CURDIR)/debian/crystalspace $(MAKE) install_data 
+	cd CS; DESTDIR=$(CURDIR)/debian/crystalspace/usr/share $(MAKE) install_data 
 	cd CS; DESTDIR=$(CURDIR)/debian/crystalspace $(MAKE) install_config 
 
 	cd CS; DESTDIR=$(CURDIR)/debian/crystalspace-dev $(MAKE) install_include
 
 	# Let's fix some things
-	chmod +x $(CURDIR)/debian/crystalspace/usr/share/crystalspace/bindings/python/tutor*.py
-	rm -f $(CURDIR)/debian/crystalspace/usr/share/doc/crystalspace-0.99/LICENSE.gz
-	rm -f $(CURDIR)/debian/crystalspace-doc/usr/share/doc/crystalspace-0.99/LICENSE.gz
-	chmod +x $(CURDIR)/debian/crystalspace/usr/share/crystalspace/build/autoconf/config.guess
-	chmod +x $(CURDIR)/debian/crystalspace/usr/share/crystalspace/build/autoconf/config.sub
-	chmod +x $(CURDIR)/debian/crystalspace/usr/share/crystalspace/build/autoconf/install-sh
-	chmod +x $(CURDIR)/debian/crystalspace/usr/share/crystalspace/build/jamtemplate/autogen.template
-	[ ! -d $(CURDIR)/debian/crystalspace/usr/share/crystalspace/data/maps/flarge/factories ] && \
-		cp -r $(CURDIR)/CS/data/flarge/factories \
-		$(CURDIR)/debian/crystalspace/usr/share/crystalspace/data/maps/flarge 
+	#chmod +x $(CURDIR)/debian/crystalspace/usr/share/crystalspace/bindings/python/tutor*.py
+	#rm -f $(CURDIR)/debian/crystalspace/usr/share/doc/crystalspace-0.99/LICENSE.gz
+	#rm -f $(CURDIR)/debian/crystalspace-doc/usr/share/doc/crystalspace-0.99/LICENSE.gz
+	#chmod +x $(CURDIR)/debian/crystalspace/usr/share/crystalspace/build/autoconf/config.guess
+	#chmod +x $(CURDIR)/debian/crystalspace/usr/share/crystalspace/build/autoconf/config.sub
+	#chmod +x $(CURDIR)/debian/crystalspace/usr/share/crystalspace/build/autoconf/install-sh
+	#chmod +x $(CURDIR)/debian/crystalspace/usr/share/crystalspace/build/jamtemplate/autogen.template
+	#[ ! -d $(CURDIR)/debian/crystalspace/usr/share/crystalspace/data/maps/flarge/factories ] && \
+	#	cp -r $(CURDIR)/CS/data/flarge/factories \
+	#	$(CURDIR)/debian/crystalspace/usr/share/crystalspace/data/maps/flarge 
 
 	# Calculate ligths
 	cd $(CURDIR)/CS ; ./cslight -video=null \

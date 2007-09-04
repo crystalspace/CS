@@ -187,10 +187,10 @@ void MD32spr::Main()
   bool head = false, torso = false, leg = false;
   //csString baseName;
 
-  cmdline = CS_QUERY_REGISTRY(object_reg, iCommandLineParser);
+  cmdline = csQueryRegistry<iCommandLineParser> (object_reg);
 
-  vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
-  out = CS_QUERY_REGISTRY(object_reg, iVFS);
+  vfs = csQueryRegistry<iVFS> (object_reg);
+  out = csQueryRegistry<iVFS> (object_reg);
   /*
      Currently we handle only .zip files. Because of the difficulty in
      accessing and reading directories consistently across platforms.

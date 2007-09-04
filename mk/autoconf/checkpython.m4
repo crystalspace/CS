@@ -80,10 +80,11 @@ AC_DEFUN([CS_CHECK_PYTHON],
 		print distutils.sysconfig.get_python_lib(0,1)'])
 	    cs_cv_pybase_sysprefix=CS_RUN_PATH_NORMALIZE([$PYTHON -c \
 		'import sys; print sys.prefix'])
-	    cs_cv_pybase_lflags=''
-	    _CS_CHECK_PYTHON_LIBDIR([cs_cv_pybase_lflags],
+	    cs_cv_pybase_lflags_base=''
+	    _CS_CHECK_PYTHON_LIBDIR([cs_cv_pybase_lflags_base],
 		[cs_cv_pybase_syslib])
-	    _CS_CHECK_PYTHON_LIBDIR([cs_cv_pybase_lflags],
+	    cs_cv_pybase_lflags_ext='$cs_cv_pybase_lflags_base'
+	    _CS_CHECK_PYTHON_LIBDIR([cs_cv_pybase_lflags_ext],
 		[cs_cv_pybase_syslib], [config])
 	    _CS_CHECK_PYTHON_LIBDIR([cs_cv_pybase_sysprefix_lflags],
 		[cs_cv_pybase_sysprefix], [lib])
@@ -122,23 +123,36 @@ AC_DEFUN([CS_CHECK_PYTHON],
 		[], [], CS_EMITTER_OPTIONAL([$1]))
 	    cs_pywinlib=`echo "$cs_cv_pybase" | sed 's/\.//g'`
 	    cs_pyflags="$cs_pyflags CS_CREATE_TUPLE([],[],
-	       [$cs_cv_pybase_lflags -framework Python])"
+	       [$cs_cv_pybase_lflags_base -framework Python])"
 	    cs_pyflags="$cs_pyflags CS_CREATE_TUPLE([],[],
 	       [$cs_cv_pybase_sysprefix_lflags -framework Python])"
 	    cs_pyflags="$cs_pyflags CS_CREATE_TUPLE([],[],
-	       [$cs_cv_pybase_lflags -l$cs_cv_pybase])"
+	       [$cs_cv_pybase_lflags_ext -framework Python])"
+	    
+	    cs_pyflags="$cs_pyflags CS_CREATE_TUPLE([],[],
+	       [$cs_cv_pybase_lflags_base -l$cs_cv_pybase])"
 	    cs_pyflags="$cs_pyflags CS_CREATE_TUPLE([],[],
 	       [$cs_cv_pybase_sysprefix_lflags -l$cs_cv_pybase])"
 	    cs_pyflags="$cs_pyflags CS_CREATE_TUPLE([],[],
-	       [$cs_cv_pybase_lflags -l$cs_pywinlib])"
+	       [$cs_cv_pybase_lflags_ext -l$cs_cv_pybase])"
+	    
+	    cs_pyflags="$cs_pyflags CS_CREATE_TUPLE([],[],
+	       [$cs_cv_pybase_lflags_base -l$cs_pywinlib])"
 	    cs_pyflags="$cs_pyflags CS_CREATE_TUPLE([],[],
 	       [$cs_cv_pybase_sysprefix_lflags -l$cs_pywinlib])"
+	    cs_pyflags="$cs_pyflags CS_CREATE_TUPLE([],[],
+	       [$cs_cv_pybase_lflags_ext -l$cs_pywinlib])"
+	    
 	    cs_pyflags="$cs_pyflags CS_CREATE_TUPLE(
 	       [],[-bundle -flat_namespace -undefined suppress],
-	       [$cs_cv_pybase_lflags])"
+	       [$cs_cv_pybase_lflags_base])"
 	    cs_pyflags="$cs_pyflags CS_CREATE_TUPLE(
 	       [],[-bundle -flat_namespace -undefined suppress],
 	       [$cs_cv_pybase_sysprefix_lflags])"
+	    cs_pyflags="$cs_pyflags CS_CREATE_TUPLE(
+	       [],[-bundle -flat_namespace -undefined suppress],
+	       [$cs_cv_pybase_lflags_ext])"
+	       
 	    CS_CHECK_BUILD([if python SDK is usable], [cs_cv_python],
 		[AC_LANG_PROGRAM([[#include <Python.h>]],
 		    [Py_Initialize(); Py_Finalize();])],

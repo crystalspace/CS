@@ -78,7 +78,7 @@ bool csGraphics2DCaca::Initialize (iObjectRegistry *object_reg)
   _GetPixelAt = GetPixelAt32;
 
   // create event outlet
-  csRef<iEventQueue> q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
   if (q != 0)
   {
     if (!EventOutlet.IsValid())

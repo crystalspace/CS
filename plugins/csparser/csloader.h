@@ -84,6 +84,7 @@ struct iSequenceTrigger;
 struct iSequenceWrapper;
 struct iEngineSequenceParameters;
 struct iSharedVariable;
+struct iSceneNodeArray;
 
 class csLoader;
 struct csLoaderPluginRec;
@@ -182,6 +183,8 @@ public:
   virtual bool IsError () { return error; }
 };
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * The loader for Crystal Space maps.
  */
@@ -266,6 +269,24 @@ private:
   csLoadedPluginVector loaded_plugins;
 
   //------------------------------------------------------------------------
+
+  /**
+   * Parse a key/value pair.
+   * Takes "editoronly" attribute into account: KVPs should only be parsed 
+   * if they're not editor-only or when the engine is in "saveable" mode.
+   */
+  bool ParseKey (iDocumentNode* node, iObject* obj);
+/*
+          iKeyValuePair* kvp = 0;
+          SyntaxService->ParseKey (child, kvp);
+          if (kvp)
+          {
+            Engine->QueryObject()->ObjAdd (kvp->QueryObject ());
+	    kvp->DecRef ();
+          }
+	  else
+	    return false;
+*/
 
   /// Parse a quaternion definition
   bool ParseQuaternion (iDocumentNode* node, csQuaternion &q);
@@ -520,7 +541,7 @@ private:
    * Add children to the region.
    */
   void AddChildrenToRegion (iLoaderContext* ldr_context,
-	const csRefArray<iSceneNode>& children);
+    const iSceneNodeArray* children);
 
   /// Report any error.
   void ReportError (const char* id, const char* description, ...)
@@ -600,6 +621,7 @@ public:
   	int mode3d);
   virtual iSndSysWrapper* LoadSoundWrapper (const char *name, const char *fname,
   	int mode3d);
+  virtual iSndSysWrapper* LoadSoundWrapper (const char *name, const char *fname);
 
   virtual csPtr<iLoaderStatus> ThreadedLoadMapFile (const char* filename,
 	iRegion* region, bool curRegOnly, bool checkDupes);
@@ -648,5 +670,7 @@ public:
   virtual csPtr<iMeshWrapper> LoadMeshObject (const char* fname,
   	iStreamSource* ssource);
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_CSLOADER_H__

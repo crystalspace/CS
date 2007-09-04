@@ -44,7 +44,7 @@ void csMeshObject::WantToDie ()
   // @@@ Ugly!
   if (Engine)
   {
-    csRef<iMeshWrapper> m = SCF_QUERY_INTERFACE (LogParent, iMeshWrapper);
+    csRef<iMeshWrapper> m = scfQueryInterface<iMeshWrapper> (LogParent);
     if (m) Engine->WantToDie (m);
   }
 }
@@ -189,7 +189,7 @@ csMeshType::~csMeshType ()
 
 bool csMeshType::Initialize (iObjectRegistry* reg)
 {
-  csRef<iEngine> e = CS_QUERY_REGISTRY (reg, iEngine);
+  csRef<iEngine> e = csQueryRegistry<iEngine> (reg);
   Engine = e;
   object_reg = reg;
   return true;

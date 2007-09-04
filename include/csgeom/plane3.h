@@ -174,7 +174,7 @@ public:
   { return ABS (Classify (pt)); }
 
   /**
-   * Reverses the direction of the plane while maintianing the plane itself.
+   * Reverses the direction of the plane while maintaining the plane itself.
    * This will basically reverse the result of Classify().
    */
   inline void Invert () { norm = -norm;  DD = -DD; }

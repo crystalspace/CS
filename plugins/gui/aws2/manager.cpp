@@ -93,7 +93,7 @@ awsManager2::~awsManager2 ()
 {
   if (scfiEventHandler)
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
     if (q)
       q->RemoveListener (scfiEventHandler);
 

@@ -56,7 +56,7 @@ csPython::csPython(iBase *iParent) : scfImplementationType (this, iParent),
 
 csPython::~csPython()
 {
-  csRef<iEventQueue> queue = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  csRef<iEventQueue> queue = csQueryRegistry<iEventQueue> (object_reg);
   if (queue.IsValid())
     queue->RemoveListener (eventHandler);
   Mode = CS_REPORTER_SEVERITY_BUG;
@@ -85,7 +85,7 @@ bool csPython::Initialize(iObjectRegistry* object_reg)
   csPython::object_reg = object_reg;
 
   csRef<iCommandLineParser> cmdline(
-    CS_QUERY_REGISTRY(object_reg, iCommandLineParser));
+    csQueryRegistry<iCommandLineParser> (object_reg));
   bool const reporter = cmdline->GetOption("python-enable-reporter") != 0;
   use_debugger = cmdline->GetOption("python-enable-debugger") != 0;
 
@@ -96,7 +96,7 @@ bool csPython::Initialize(iObjectRegistry* object_reg)
   if (!LoadModule ("sys")) return false;
 
   csString cmd;
-  csRef<iVFS> vfs(CS_QUERY_REGISTRY(object_reg, iVFS));
+  csRef<iVFS> vfs(csQueryRegistry<iVFS> (object_reg));
   if (vfs.IsValid())
   {
     csRef<iStringArray> paths(vfs->GetRealMountPaths("/scripts"));
@@ -121,7 +121,7 @@ bool csPython::Initialize(iObjectRegistry* object_reg)
   Store("cspace.object_reg", object_reg, (void *) "iObjectRegistry *");
 
   eventHandler.AttachNew (new EventHandler (this));
-  csRef<iEventQueue> queue = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  csRef<iEventQueue> queue = csQueryRegistry<iEventQueue> (object_reg);
   if (queue.IsValid())
     queue->RegisterListener(eventHandler, csevCommandLineHelp(object_reg));
   return true;
@@ -191,7 +191,7 @@ bool csPython::LoadModule(const char* name)
 
 bool csPython::LoadModule (const char *path, const char *name)
 {
-  csRef<iVFS> vfs(CS_QUERY_REGISTRY(object_reg, iVFS));
+  csRef<iVFS> vfs(csQueryRegistry<iVFS> (object_reg));
   if (!vfs.IsValid())
     return false;
   csRef<iDataBuffer> rpath = vfs->GetRealPath (path);

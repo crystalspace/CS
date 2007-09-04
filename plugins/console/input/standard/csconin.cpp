@@ -67,7 +67,7 @@ bool csConsoleInput::Initialize (iObjectRegistry *object_reg)
   name_reg = csEventNameRegistry::GetRegistry (object_reg);
 
   csRef<iKeyboardDriver> currentKbd = 
-    CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+    csQueryRegistry<iKeyboardDriver> (object_reg);
   if (currentKbd == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,

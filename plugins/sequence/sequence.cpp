@@ -188,7 +188,7 @@ csSequenceManager::~csSequenceManager ()
 {
   if (object_reg)
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
     if (q != 0)
       CS::RemoveWeakListener (q, weakEventHandler);
   }
@@ -199,9 +199,9 @@ csSequenceManager::~csSequenceManager ()
 bool csSequenceManager::Initialize (iObjectRegistry *r)
 {
   object_reg = r;
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
   CS_INITIALIZE_EVENT_SHORTCUTS (object_reg);
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0)
     CS::RegisterWeakListener (q, this, FinalProcess, weakEventHandler);
   return true;

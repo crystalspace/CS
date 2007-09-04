@@ -241,7 +241,7 @@ struct iVFS : public virtual iBase
   virtual csPtr<iDataBuffer> ExpandPath (
     const char *Path, bool IsDir = false) const = 0;
 
-  /// Check whenever a file exists
+  /// Check whether a file exists
   virtual bool Exists (const char *Path) const = 0;
 
   /**

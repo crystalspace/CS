@@ -156,8 +156,8 @@ csBezierMesh::csBezierMesh (iBase *parent, csBezierMeshObjectType* thing_type) :
   dynamic_ambient_version = 0;
 
   csRef<iStringSet> strings;
-  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (thing_type->object_reg,
-    "crystalspace.shared.stringset", iStringSet);
+  strings = csQueryRegistryTagInterface<iStringSet>
+    (thing_type->object_reg, "crystalspace.shared.stringset");
 
   if ((vertex_name == csInvalidStringID) ||
     (texel_name == csInvalidStringID) ||
@@ -1002,7 +1002,7 @@ void csBezierMesh::MergeTemplate (
   static_data->curves_scale = tpl->GetCurvesScale ();
 
   //@@@ TEMPORARY
-  csRef<iBezierState> ith = SCF_QUERY_INTERFACE (tpl, iBezierState);
+  csRef<iBezierState> ith = scfQueryInterface<iBezierState> (tpl);
   ParentTemplate = (csBezierMesh*)(iBezierState*)ith;
 
   for (i = 0; i < tpl->GetCurveVertexCount (); i++)
@@ -1057,15 +1057,15 @@ csBezierMeshObjectType::~csBezierMeshObjectType ()
 bool csBezierMeshObjectType::Initialize (iObjectRegistry *object_reg)
 {
   csBezierMeshObjectType::object_reg = object_reg;
-  csRef<iEngine> e = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iEngine> e = csQueryRegistry<iEngine> (object_reg);
   engine = e;	// We don't want a real ref here to avoid circular refs.
-  csRef<iGraphics3D> g = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> g = csQueryRegistry<iGraphics3D> (object_reg);
   G3D = g;
 
   lightpatch_pool = new csBezierLightPatchPool ();
 
   csRef<iVerbosityManager> verbosemgr (
-    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+    csQueryRegistry<iVerbosityManager> (object_reg));
   if (verbosemgr) 
     do_verbose = verbosemgr->Enabled ("bezier");
 
@@ -1081,8 +1081,8 @@ void csBezierMeshObjectType::Clear ()
 csPtr<iMeshObjectFactory> csBezierMeshObjectType::NewFactory ()
 {
   csBezierMesh *cm = new csBezierMesh (this, this);
-  csRef<iMeshObjectFactory> ifact (SCF_QUERY_INTERFACE (
-      cm, iMeshObjectFactory));
+  csRef<iMeshObjectFactory> ifact (
+    scfQueryInterface<iMeshObjectFactory> (cm));
   cm->DecRef ();
   return csPtr<iMeshObjectFactory> (ifact);
 }

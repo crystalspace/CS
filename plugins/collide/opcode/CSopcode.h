@@ -53,7 +53,8 @@ class csOPCODECollideSystem :
 {
 
   bool Collide (csOPCODECollider* collider1,
-    const csReversibleTransform* trans1, csTerraFormerCollider* terraformer);
+    const csReversibleTransform* trans1, csTerraFormerCollider* terraformer,
+    const csReversibleTransform* trans2);
   
   bool TestTriangleTerraFormer (csVector3 triangle[3],
     csTerraFormerCollider* c, csCollisionPair* pair);

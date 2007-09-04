@@ -177,22 +177,22 @@ bool PicView::Application()
   if (!OpenApplication(GetObjectRegistry()))
     return ReportError("Error opening system!");
 
-  g3d = CS_QUERY_REGISTRY(GetObjectRegistry(), iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry());
   if (!g3d) return ReportError("Failed to locate 3D renderer!");
 
-  engine = CS_QUERY_REGISTRY(GetObjectRegistry(), iEngine);
+  engine = csQueryRegistry<iEngine> (GetObjectRegistry());
   if (!engine) return ReportError("Failed to locate 3D engine!");
 
-  kbd = CS_QUERY_REGISTRY(GetObjectRegistry(), iKeyboardDriver);
+  kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry());
   if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
 
-  vfs = CS_QUERY_REGISTRY(GetObjectRegistry(), iVFS);
+  vfs = csQueryRegistry<iVFS> (GetObjectRegistry());
   if (!vfs) return ReportError("Failed to locate Virtual FileSystem!");
 
-  imgloader = CS_QUERY_REGISTRY(GetObjectRegistry(), iImageIO);
+  imgloader = csQueryRegistry<iImageIO> (GetObjectRegistry());
   if (!imgloader) return ReportError("Failed to locate Image Loader!");
 
-  aws = CS_QUERY_REGISTRY(GetObjectRegistry(), iAws2);
+  aws = csQueryRegistry<iAws2> (GetObjectRegistry());
   if (!aws) return ReportError("Failed to locate Alternative Windowing System 2!");
 
   vfs->ChDir ("/tmp");
@@ -293,7 +293,7 @@ void PicView::LoadNextImage (bool rewind, int step)
 
 // void PicView::ButtonQuit (unsigned long, intptr_t /*app*/, iAwsSource* /*source*/)
 // {
-//   csRef<iEventQueue> q = CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
+//   csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (GetObjectRegistry());
 //   if (q.IsValid()) q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
 // }
 

@@ -77,7 +77,7 @@ csGLVBOBufferManager::csGLVBOBufferManager (csGLExtensionManager *ext,
   verbose (false), superVerbose (false)
 {
   csRef<iVerbosityManager> verbosemgr (
-    CS_QUERY_REGISTRY (p, iVerbosityManager));
+    csQueryRegistry<iVerbosityManager> (p));
   if (verbosemgr)
   {
     verbose = verbosemgr->Enabled ("renderer");

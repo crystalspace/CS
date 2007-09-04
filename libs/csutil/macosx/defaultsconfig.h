@@ -67,12 +67,16 @@ public:
   virtual float GetFloat (const char* Key, float Def = 0.0) const;
   virtual const char* GetStr (const char* Key, const char* Def = "") const;
   virtual bool GetBool (const char* Key, bool Def = false) const;
+  virtual csPtr<iStringArray> GetTuple(const char* Key) const;
+   
   virtual const char* GetComment (const char* Key) const;
 
   virtual void SetStr (const char* Key, const char* Val);
   virtual void SetInt (const char* Key, int Value);
   virtual void SetFloat (const char* Key, float Value);
   virtual void SetBool (const char* Key, bool Value);
+   virtual void SetTuple (const char *Key, iStringArray* Value);
+   
   virtual bool SetComment (const char* Key, const char* Text);
   virtual void DeleteKey (const char* Key);
   virtual const char* GetEOFComment () const;
@@ -92,6 +96,7 @@ class csDefaultsIterator : public iConfigIterator
   
   NSEnumerator* keyenum;
   NSString* currentkey;
+  NSString* nextkey;
 public:
   SCF_DECLARE_IBASE;
 
@@ -103,12 +108,14 @@ public:
 
   virtual void Rewind ();
   virtual bool Next();
+  virtual bool HasNext();
 
   virtual const char* GetKey (bool Local = false) const;
   virtual int GetInt () const;
   virtual float GetFloat () const;
   virtual const char* GetStr () const;
   virtual bool GetBool () const;
+  virtual csPtr<iStringArray> GetTuple() const;
   virtual const char* GetComment () const;
 };
 

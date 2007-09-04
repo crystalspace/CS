@@ -400,6 +400,7 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
 	  || !disableMask.IsBitSet (lightNum))
 	{
 	  csLightProperties light (lightNum, shaderPlugin->lsvCache, Stacks);
+          FixupLightWorldPos (light, lightNum, stacks, mesh->object2world);
 	  iVertexLightCalculator *calc = 
 	    shaderPlugin->GetLightCalculator (light, useAttenuation);
 	  calc->CalculateLighting (light, eyePosObject, shininess, elementCount, 
@@ -418,6 +419,7 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
 	  }
 	  
 	  csLightProperties light (i, shaderPlugin->lsvCache, Stacks);
+          FixupLightWorldPos (light, i, stacks, mesh->object2world);
 	  iVertexLightCalculator *calc = 
 	    shaderPlugin->GetLightCalculator (light, useAttenuation);
 
@@ -521,6 +523,28 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
 	modes.buffers->GetAccessorMask() & ~(1 << specularOutputBuffer));
       modes.buffers->SetRenderBuffer (specularOutputBuffer, specBuf);
     }
+  }
+}
+
+void csVProcStandardProgram::FixupLightWorldPos (csLightProperties& light, 
+  size_t lightNum, const iArrayReadOnly<csShaderVariable*>* stacks, 
+  const csReversibleTransform& object2world)
+{
+  csStringID idLightPosObj = shaderPlugin->lsvCache.GetLightSVId (
+    lightNum, csLightShaderVarCache::lightPosition);
+  if ((stacks->GetSize() <= idLightPosObj)
+    || (stacks->Get (idLightPosObj) == 0))
+  {
+    csStringID idLightPosWorld = shaderPlugin->lsvCache.GetLightSVId (
+      lightNum, csLightShaderVarCache::lightPositionWorld);
+    csShaderVariable* sv;
+    csVector3 lightPosWorld;
+    if ((stacks->GetSize() > idLightPosWorld) 
+      && ((sv = stacks->Get (idLightPosWorld)) != 0))
+      sv->GetValue (lightPosWorld);
+    else
+      lightPosWorld.Set (0, 0, 0);
+    light.posObject = object2world.Other2This (lightPosWorld);
   }
 }
 

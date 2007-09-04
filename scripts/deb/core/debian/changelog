@@ -1,3 +1,9 @@
+crystalspace (0.99-20061023-1) unstable; urgency=low
+
+  * New upstream 1.0 prerelease, switch to SVN
+
+ -- Christian Bayle <bayle@debian.org>  Mon, 23 Oct 2006 21:29:27 +0200
+
 crystalspace (0.99-20060125-2) unstable; urgency=low
 
   * added build-depends on libalut-dev (Closes: #359292) 

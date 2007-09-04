@@ -78,6 +78,29 @@ namespace lighter
       /// Number of uS spent raytracing
       uint64 usRaytracing;
     } raytracer;
+
+    struct KDTree
+    {
+      KDTree ()
+        : numNodes (0), leafNodes (0), maxDepth (0), sumDepth (0),
+        numPrimitives (0)
+      {}
+
+      /// Number of inner nodes
+      size_t numNodes;
+
+      /// Number of leaf nodes
+      size_t leafNodes;
+
+      /// Max depth of leaf node
+      size_t maxDepth;
+
+      /// Sum depth of leaf-nodes
+      size_t sumDepth;
+
+      /// Total number of primitives in leafs
+      size_t numPrimitives;     
+    } kdtree;
   };
 
   extern Statistics globalStats;

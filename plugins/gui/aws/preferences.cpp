@@ -35,7 +35,7 @@ bool preferences::load(iObjectRegistry* objreg, const std::string& filename)
 {
 	csPrintf("aws: Loading definitions file \"%s\"...\n", filename.c_str());
 
-	csRef<iVFS> vfs (CS_QUERY_REGISTRY (objreg, iVFS));
+	csRef<iVFS> vfs (csQueryRegistry<iVFS> (objreg));
 
 	if (!vfs)
 	{

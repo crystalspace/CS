@@ -115,10 +115,10 @@ public:
   virtual iMaterialWrapper *FindMaterial (const char *iName);
   /// Find a camera position in this region by name
   virtual iCameraPosition *FindCameraPosition (const char *iName);
+#include "csutil/win32/msvc_deprecated_warn_off.h"
   /// Find a collection in this region by name
   virtual iCollection *FindCollection (const char *iName);
-
-
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 };
 
 

@@ -77,7 +77,7 @@ namespace aws
 
   bool preferences::load (iObjectRegistry* objreg, const scfString& filename)
   {	
-    csRef<iVFS> vfs (CS_QUERY_REGISTRY (objreg, iVFS));
+    csRef<iVFS> vfs (csQueryRegistry<iVFS> (objreg));
 
     if (!vfs)
     {

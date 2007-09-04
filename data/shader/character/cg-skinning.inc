@@ -26,7 +26,7 @@
 struct Vert_Skinning
 {
   <?if vars."bones"?> 
-  varying float4 BonesIndices;
+  varying short4 BonesIndices;
   varying float4 BonesWeights;
   uniform float4 Bones[78];
   <?endif?>
@@ -49,10 +49,10 @@ struct Skinning
   float4 SkinnedPosition (float4 pos)
   {
    <?if vars."bones"?> 
-        int idx1 = int(skinningVert.BonesIndices.x)*2;
-        int idx2 = int(skinningVert.BonesIndices.y)*2;
-        int idx3 = int(skinningVert.BonesIndices.z)*2;
-        int idx4 = int(skinningVert.BonesIndices.w)*2;
+        short idx1 = skinningVert.BonesIndices.x*2;
+        short idx2 = skinningVert.BonesIndices.y*2;
+        short idx3 = skinningVert.BonesIndices.z*2;
+        short idx4 = skinningVert.BonesIndices.w*2;
 
         float4 Pos;
         Pos.xyz =  (QuatMultVert(skinningVert.Bones[idx1], pos.xyz) + 

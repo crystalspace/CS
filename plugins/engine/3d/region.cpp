@@ -121,9 +121,8 @@ bool csRegion::PrepareTextures ()
   iter = GetIterator ();
   while (iter->HasNext ())
   {
-    csRef<iTextureWrapper> csth (SCF_QUERY_INTERFACE (
-        iter->Next (),
-        iTextureWrapper));
+    csRef<iTextureWrapper> csth (scfQueryInterface<iTextureWrapper> (
+        iter->Next ()));
     if (csth)
     {
       if (!csth->GetTextureHandle ()) csth->Register (txtmgr);
@@ -218,12 +217,16 @@ iCameraPosition *csRegion::FindCameraPosition (const char *iName)
   return cp;	// DecRef is ok here.
 }
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 iCollection *csRegion::FindCollection (const char *iName)
 {
   csRef<iCollection> col (CS_GET_NAMED_CHILD_OBJECT (
       this, iCollection, iName));
   return col;	// DecRef is ok here.
 }
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 bool csRegion::IsInRegion (iObject *iobj)
 {

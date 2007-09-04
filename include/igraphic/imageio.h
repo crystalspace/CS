@@ -62,6 +62,17 @@ typedef csArray<csImageIOFileFormatDescription const*>
 
 /**
  * The iImageIO interface is used to save and load graphic files.
+ *
+ * Main creators of instances implementing this interface:
+ * - Image loader multiplexer plugin 
+ *   (crystalspace.graphic.image.io.multiplexer) and all image loader plugins.
+ *
+ * Main ways to get pointers to this interface:
+ * - csQueryRegistry<iImageIO> ()
+ *
+ * Main users of this interface:
+ * - Application.
+ * - Loader.
  */
 struct iImageIO : public virtual iBase
 {

@@ -73,7 +73,7 @@ public:
 #if defined(CS_PLATFORM_WIN32)
 # include "csutil/threading/win32_thread.h"
 #elif defined(CS_PLATFORM_UNIX) || \
-  defined(CS_PLATFORM_OSX)
+  defined(CS_PLATFORM_MACOSX)
 # include "csutil/threading/pthread_thread.h"
 #else
 #error "No threading implementation for your platform"

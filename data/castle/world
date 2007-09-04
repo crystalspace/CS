@@ -402,7 +402,7 @@
   <sounds/>
   <settings>
     <clearscreen>no</clearscreen>
-    <clearzbuf>no</clearzbuf>
+    <clearzbuf>yes</clearzbuf>
   </settings>
   <library>factories/genCube</library>
   <library>factories/genMesh.002</library>

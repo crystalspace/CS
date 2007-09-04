@@ -24,7 +24,7 @@
 
 #if !defined(CS_PLATFORM_WIN32)
 #error "This file is only for Windows and requires you to include csysdefs.h before"
-#endif
+#else
 
 namespace CS
 {
@@ -194,4 +194,6 @@ namespace Implementation
 } // namespace Threading
 } // namespace CS
 
-#endif
+#endif // !defined(CS_PLATFORM_WIN32)
+
+#endif // __CS_CSUTIL_THREADING_WIN32_MUTEX_H__

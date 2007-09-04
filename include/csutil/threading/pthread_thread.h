@@ -19,6 +19,8 @@
 #ifndef __CS_CSUTIL_THREADING_PTHREAD_THREAD_H__
 #define __CS_CSUTIL_THREADING_PTHREAD_THREAD_H__
 
+#ifndef DOXYGEN_RUN
+
 #include <pthread.h>
 
 namespace CS
@@ -32,7 +34,7 @@ namespace Threading
 namespace Implementation
 {
 
-  // Thread base-class for win32
+  // Thread base-class for pthreads
   class ThreadBase
   {
   public:
@@ -63,4 +65,6 @@ namespace Implementation
 }
 }
 
-#endif
+#endif // DOXYGEN_RUN
+
+#endif // __CS_CSUTIL_THREADING_PTHREAD_THREAD_H__

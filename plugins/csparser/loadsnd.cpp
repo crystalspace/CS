@@ -89,12 +89,36 @@ iSndSysWrapper* csLoader::LoadSoundWrapper (const char* name, const char* fname,
   if (!SndSysManager) return 0;
 
   // load the sound handle
-  csRef<iSndSysStream> Sound = LoadSoundStream (fname, mode3d);
-  if (!Sound) return 0;
+  csRef<iSndSysData> data = LoadSoundSysData (fname);
+  if (!data) return 0;
+  /* register the sound */
+  csRef<iSndSysStream> stream = SndSysRender->CreateStream (data, mode3d);
+  if (!stream)
+  {
+    ReportError (
+	      "crystalspace.maploader.parse.sound",
+	      "Cannot register sound '%s'!", fname);
+    return 0;
+  }
 
   // build wrapper object
   iSndSysWrapper* wrapper = SndSysManager->CreateSound (name);
-  wrapper->SetStream (Sound);
+  wrapper->SetStream (stream);
+  wrapper->SetData (data);
+  return wrapper;
+}
+
+iSndSysWrapper* csLoader::LoadSoundWrapper (const char* name, const char* fname)
+{
+  if (!SndSysManager) return 0;
+
+  // load the sound handle
+  csRef<iSndSysData> data = LoadSoundSysData (fname);
+  if (!data) return 0;
+
+  // build wrapper object
+  iSndSysWrapper* wrapper = SndSysManager->CreateSound (name);
+  wrapper->SetData (data);
   return wrapper;
 }
 

@@ -125,8 +125,8 @@ iLight* StdLoaderContext::FindLight (const char *name)
 
 iShader* StdLoaderContext::FindShader (const char *name)
 {
-  csRef<iShaderManager> shaderMgr = CS_QUERY_REGISTRY (
-  	app->objectRegistry, iShaderManager);
+  csRef<iShaderManager> shaderMgr = 
+  	csQueryRegistry<iShaderManager> (app->objectRegistry);
   if (!shaderMgr) return 0;
   iShader* shader = shaderMgr->GetShader (name);
   return shader;

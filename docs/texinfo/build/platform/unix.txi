@@ -29,8 +29,8 @@ between Windows and Unix safely
 @subsubheading Compiling on Unix
 
 Crystal Space can be built with either @file{make} or Jam (@pxref{GettingJam}).
-Both tools work equally well.  In the examples below, wherever @samp{make -k}
-is used, you can instead substitute @file{jam} (without the @samp{-k}) if you
+Both tools work equally well.  In the examples below, wherever @samp{jam}
+is used, you can instead substitute @file{make -k} (with the @samp{-k}) if you
 so desire.
 
 You first need to configure the project for your platform.  You do this
@@ -68,13 +68,7 @@ cd $HOME/builddir
 Now, you can actually build the entire project:
 
 @example
-make -k all
-@end example
-
-Alternately, if you have Jam installed:
-
-@example
-jam all
+jam
 @end example
 
 The build process will create an executable for each demonstration program or
@@ -87,8 +81,8 @@ Finally, if you want to utilize Crystal Space as a software development kit
 process:
 
 @example
-make install
-make distclean
+jam install
+jam distclean
 @end example
 
 You can now try running the @file{walktest} demonstration. @xref{Quick Start}.

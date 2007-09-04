@@ -36,6 +36,7 @@ namespace CS
     name = csStrNewW (other.name);
     glueModel = other.glueModel;
     meshes = other.meshes;
+    type = other.type;
   }
 
   //-------------------------------------------------------------------------

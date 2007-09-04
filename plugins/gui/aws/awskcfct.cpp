@@ -32,7 +32,7 @@ awsKeyFactory::~awsKeyFactory ()
 void awsKeyFactory::Initialize (const char* name, const char* component_type)
 {
   awsComponentNode* n = new awsComponentNode (wmgr, name, component_type);
-  base = SCF_QUERY_INTERFACE (n, iAwsComponentNode);
+  base = scfQueryInterface<iAwsComponentNode> (n);
   CS_ASSERT (base);
   // We have a ref for n and one for base we don't want the one for n though.
   n->DecRef ();
@@ -64,7 +64,7 @@ void awsKeyFactory::AddIntKey (const char* name, int v)
   if (base)
   {
     awsIntKey* temp = new awsIntKey (wmgr, name, v);
-    csRef<iAwsIntKey> key (SCF_QUERY_INTERFACE (temp, iAwsIntKey));
+    csRef<iAwsIntKey> key (scfQueryInterface<iAwsIntKey> (temp));
     CS_ASSERT (key);
 
     base->Add (key);
@@ -78,7 +78,7 @@ void awsKeyFactory::AddStringKey (const char* name, const char* v)
   if (base)
   {
     awsStringKey* temp = new awsStringKey (wmgr, name, v);
-    csRef<iAwsStringKey> key (SCF_QUERY_INTERFACE (temp, iAwsStringKey));
+    csRef<iAwsStringKey> key (scfQueryInterface<iAwsStringKey> (temp));
     CS_ASSERT (key);
 
     base->Add (key);
@@ -92,7 +92,7 @@ void awsKeyFactory::AddRectKey (const char* name, csRect v)
   if (base)
   {
     awsRectKey* temp = new awsRectKey (wmgr, name, v);
-    csRef<iAwsRectKey> key (SCF_QUERY_INTERFACE (temp, iAwsRectKey));
+    csRef<iAwsRectKey> key (scfQueryInterface<iAwsRectKey> (temp));
     CS_ASSERT (key);
 
     base->Add (key);
@@ -110,7 +110,7 @@ void awsKeyFactory::AddRGBKey (
   if (base)
   {
     awsRGBKey* temp = new awsRGBKey (wmgr, name, r, g, b);
-    csRef<iAwsRGBKey> key (SCF_QUERY_INTERFACE (temp, iAwsRGBKey));
+    csRef<iAwsRGBKey> key (scfQueryInterface<iAwsRGBKey> (temp));
     CS_ASSERT (key);
 
     base->Add (key);
@@ -124,7 +124,7 @@ void awsKeyFactory::AddPointKey (const char* name, csVector2 v)
   if (base)
   {
     awsPointKey* temp = new awsPointKey (wmgr, name, v);
-    csRef<iAwsPointKey> key (SCF_QUERY_INTERFACE (temp, iAwsPointKey));
+    csRef<iAwsPointKey> key (scfQueryInterface<iAwsPointKey> (temp));
     CS_ASSERT (key);
 
     base->Add (key);
@@ -142,7 +142,7 @@ void awsKeyFactory::AddConnectionKey (
   if (base)
   {
     awsConnectionKey* temp = new awsConnectionKey (wmgr, name, s, t, sig);
-    csRef<iAwsConnectionKey> key(SCF_QUERY_INTERFACE(temp, iAwsConnectionKey));
+    csRef<iAwsConnectionKey> key(scfQueryInterface<iAwsConnectionKey> (temp));
     CS_ASSERT (key);
 
     base->Add (key);

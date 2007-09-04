@@ -225,8 +225,7 @@ public:
   {     
     if (GenMeshFact)
     {
-      GenFactState = SCF_QUERY_INTERFACE(
-          GenMeshFact, iGeneralFactoryState);      
+      GenFactState = scfQueryInterface<iGeneralFactoryState> (GenMeshFact);      
       GenFactState->SetVertexCount(MaxPoints * 2);
       GenFactState->SetTriangleCount((MaxPoints - 1) * 2);
             

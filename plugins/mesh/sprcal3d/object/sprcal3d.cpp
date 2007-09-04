@@ -175,7 +175,7 @@ csSpriteCal3DMeshObjectFactory::csSpriteCal3DMeshObjectFactory (
 
   csSpriteCal3DMeshObjectFactory::object_reg = object_reg;
 
-  light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
+  light_mgr = csQueryRegistry<iLightManager> (object_reg);
 }
 
 csSpriteCal3DMeshObjectFactory::~csSpriteCal3DMeshObjectFactory ()
@@ -355,6 +355,8 @@ void csSpriteCal3DMeshObjectFactory::CalculateAllBoneBoundingBoxes()
   calCoreModel.getCoreSkeleton()->calculateBoundingBoxes(&calCoreModel);
 }
 
+#include "csutil/custom_new_disable.h"
+
 int csSpriteCal3DMeshObjectFactory::AddMorphAnimation(const char *name)
 {
   int id = calCoreModel.addCoreMorphAnimation(new (allocPlatform)
@@ -362,6 +364,8 @@ int csSpriteCal3DMeshObjectFactory::AddMorphAnimation(const char *name)
   morph_animation_names.Push(name);
   return id;
 }
+
+#include "csutil/custom_new_enable.h"
 
 bool csSpriteCal3DMeshObjectFactory::AddMorphTarget( int morphanimation_index,
                                                  const char *mesh_name, 
@@ -557,6 +561,7 @@ int csSpriteCal3DMeshObjectFactory::FindMorphAnimationName (
   return -1;
 }
 
+#include "csutil/custom_new_disable.h"
 
 bool csSpriteCal3DMeshObjectFactory::AddCoreMaterial(iMaterialWrapper *mat)
 {
@@ -572,6 +577,8 @@ bool csSpriteCal3DMeshObjectFactory::AddCoreMaterial(iMaterialWrapper *mat)
   calCoreModel.addCoreMaterial(newmat);
   return true;
 }
+
+#include "csutil/custom_new_enable.h"
 
 void csSpriteCal3DMeshObjectFactory::BindMaterials()
 {
@@ -604,7 +611,7 @@ csPtr<iMeshObject> csSpriteCal3DMeshObjectFactory::NewInstance ()
   spr->updateanim_sqdistance3 = sprcal3d_type->updateanim_sqdistance3;
   spr->updateanim_skip3 = sprcal3d_type->updateanim_skip3;
 
-  csRef<iMeshObject> im (SCF_QUERY_INTERFACE (spr, iMeshObject));
+  csRef<iMeshObject> im (scfQueryInterface<iMeshObject> (spr));
   spr->DecRef ();
   return csPtr<iMeshObject> (im);
 }

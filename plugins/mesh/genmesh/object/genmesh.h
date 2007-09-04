@@ -589,6 +589,8 @@ public:
 
   void Invalidate ();
   void CalculateNormals (bool compress);
+  void DisableAutoNormals ()
+  { autonormals = false; }
   void Compress ();
   void GenerateBox (const csBox3& box);
   void GenerateSphere (const csEllipsoid& ellips, int rim_vertices,

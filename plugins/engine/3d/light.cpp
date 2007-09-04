@@ -526,7 +526,7 @@ iCrossHalo *csLight::CreateCrossHalo (float intensity, float cross)
   csCrossHalo *halo = new csCrossHalo (intensity, cross);
   SetHalo (halo);
 
-  csRef<iCrossHalo> ihalo (SCF_QUERY_INTERFACE (halo, iCrossHalo));
+  csRef<iCrossHalo> ihalo (scfQueryInterface<iCrossHalo> (halo));
   return ihalo; // DecRef is ok here.
 }
 
@@ -538,7 +538,7 @@ iNovaHalo *csLight::CreateNovaHalo (
   csNovaHalo *halo = new csNovaHalo (seed, num_spokes, roundness);
   SetHalo (halo);
 
-  csRef<iNovaHalo> ihalo (SCF_QUERY_INTERFACE (halo, iNovaHalo));
+  csRef<iNovaHalo> ihalo (scfQueryInterface<iNovaHalo> (halo));
   return ihalo; // DecRef is ok here.
 }
 
@@ -547,7 +547,7 @@ iFlareHalo *csLight::CreateFlareHalo ()
   csFlareHalo *halo = new csFlareHalo ();
   SetHalo (halo);
 
-  csRef<iFlareHalo> ihalo (SCF_QUERY_INTERFACE (halo, iFlareHalo));
+  csRef<iFlareHalo> ihalo (scfQueryInterface<iFlareHalo> (halo));
   return ihalo; // DecRef is ok here.
 }
 
@@ -595,10 +595,22 @@ void csLight::CalculateLighting ()
   ctxt->SetNewLightFrustum (new csFrustum (GetFullCenter ()));
   ctxt->GetLightFrustum ()->MakeInfinite ();
 
+  iSector* sect = GetSector ();
+  if (!sect)
+  {
+    if (movable.GetParent ())
+    {
+      iSectorList* sl = movable.GetParent ()->GetSectors ();
+      if (sl && sl->GetCount () > 0)
+	sect = sl->Get (0);
+    }
+  }
+  if (!sect) return;	// Do nothing.
+
   if (dynamicType == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
   {
     csRef<iMeshWrapperIterator> it = engine->GetNearbyMeshes (
-      GetSector (), GetFullCenter (), GetCutoffDistance ());
+      sect, GetFullCenter (), GetCutoffDistance ());
     while (it->HasNext ())
     {
       iMeshWrapper* m = it->Next ();
@@ -613,7 +625,7 @@ void csLight::CalculateLighting ()
   }
   else
   {
-    GetSector ()->CheckFrustum ((iFrustumView *) &lview);
+    sect->CheckFrustum ((iFrustumView *) &lview);
     lpi->FinalizeLighting ();
   }
 }
@@ -657,7 +669,7 @@ csLightList::~csLightList ()
 void csLightList::NameChanged (iObject* object, const char* oldname,
   	const char* newname)
 {
-  csRef<iLight> light = SCF_QUERY_INTERFACE (object, iLight);
+  csRef<iLight> light = scfQueryInterface<iLight> (object);
   CS_ASSERT (light != 0);
   if (oldname) lights_hash.Delete (oldname, light);
   if (newname) lights_hash.Put (newname, light);

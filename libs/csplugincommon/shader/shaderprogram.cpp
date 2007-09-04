@@ -40,12 +40,12 @@ csShaderProgram::csShaderProgram (iObjectRegistry* objectReg)
   InitCommonTokens (commonTokens);
 
   csShaderProgram::objectReg = objectReg;
-  synsrv = CS_QUERY_REGISTRY (objectReg, iSyntaxService);
-  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (objectReg, 
-    "crystalspace.shared.stringset", iStringSet);
+  synsrv = csQueryRegistry<iSyntaxService> (objectReg);
+  strings = csQueryRegistryTagInterface<iStringSet> 
+    (objectReg, "crystalspace.shared.stringset");
   
   csRef<iVerbosityManager> verbosemgr (
-    CS_QUERY_REGISTRY (objectReg, iVerbosityManager));
+    csQueryRegistry<iVerbosityManager> (objectReg));
   if (verbosemgr) 
     doVerbose = verbosemgr->Enabled("renderer.shader");
   else
@@ -117,7 +117,6 @@ bool csShaderProgram::ParseProgramParam (iDocumentNode* node,
   {
     // Parse exp and save it
     csRef<iShaderVariableAccessor> acc = synsrv->ParseShaderVarExpr (node);
-    var->SetType (csShaderVariable::VECTOR4);
     var->SetAccessor (acc);
     param.var = var;
     param.valid = true;
@@ -323,7 +322,7 @@ bool csShaderProgram::ParseCommon (iDocumentNode* child)
 	{
 	  programFileName = filename;
 
-	  csRef<iVFS> vfs = CS_QUERY_REGISTRY (objectReg, iVFS);
+	  csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectReg);
 	  csRef<iFile> file = vfs->Open (filename, VFS_FILE_READ);
 	  if (!file.IsValid())
 	  {
@@ -357,8 +356,8 @@ iDocumentNode* csShaderProgram::GetProgramNode ()
 
   if (programFile.IsValid ())
   {
-    csRef<iDocumentSystem> docsys = CS_QUERY_REGISTRY (objectReg, 
-      iDocumentSystem);
+    csRef<iDocumentSystem> docsys =  
+      csQueryRegistry<iDocumentSystem> (objectReg);
     if (!docsys)
       docsys.AttachNew (new csTinyDocumentSystem ());
     csRef<iDocument> doc (docsys->CreateDocument ());

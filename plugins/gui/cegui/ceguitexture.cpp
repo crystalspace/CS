@@ -63,7 +63,7 @@ CEGUI::ushort csCEGUITexture::getHeight () const
 void csCEGUITexture::loadFromFile (const CEGUI::String &filename, 
                                    const CEGUI::String& /*resourceGroup*/)
 {
-  csRef<iLoader> loader = CS_QUERY_REGISTRY(obj_reg, iLoader);
+  csRef<iLoader> loader = csQueryRegistry<iLoader> (obj_reg);
   if (!loader)
     return;
 
@@ -83,7 +83,7 @@ void csCEGUITexture::loadFromMemory (const void *buffPtr,
   CEGUI::uint buffWidth, CEGUI::uint buffHeight, CEGUI::Texture::PixelFormat pixFmt)
 #endif
 {
-  csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY(obj_reg, iGraphics3D);
+  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (obj_reg);
   if (!g3d)
     return;
 

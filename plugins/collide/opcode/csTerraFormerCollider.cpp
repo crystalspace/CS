@@ -17,8 +17,8 @@ csTerraFormerCollider::csTerraFormerCollider (iTerraFormer* terraformer,
   csTerraFormerCollider::object_reg = object_reg;
   former = terraformer;
   // Get the shared string repository
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
   stringHeights = strings->Request ("heights");
   stringVertices = strings->Request ("vertices");
 

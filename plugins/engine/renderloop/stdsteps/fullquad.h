@@ -109,7 +109,8 @@ class csFullScreenQuadRSLoader :
 #define CS_TOKEN_ITEM_FILE "plugins/engine/renderloop/stdsteps/fullquad.tok"
 #include "cstool/tokenlist.h"
 
-  bool ParseStep (iDocumentNode* node, 
+  bool ParseStep (iLoaderContext* ldr_context,
+    iDocumentNode* node, 
     csFullScreenQuadRenderStep* step, 
     csFullScreenQuadRenderStep::DrawSettings& settings,
     bool firstPass);

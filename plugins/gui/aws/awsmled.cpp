@@ -210,7 +210,7 @@ bool awsMultiLineEdit::Setup (iAws *wmgr, iAwsComponentNode *settings)
   if (!awsComponent::Setup (wmgr, settings)) return false;
 
   csRef<iKeyboardDriver> currentKbd = 
-    CS_QUERY_REGISTRY (wmgr->GetObjectRegistry (), iKeyboardDriver);
+    csQueryRegistry<iKeyboardDriver> (wmgr->GetObjectRegistry ());
   if (currentKbd == 0)
   {
     return false;

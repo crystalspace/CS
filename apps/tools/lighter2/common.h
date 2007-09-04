@@ -58,4 +58,7 @@ namespace lighter
 
 }
 
+// Debugging: uncomment to have normals dumped to the lightmaps
+//#define DUMP_NORMALS
+
 #endif

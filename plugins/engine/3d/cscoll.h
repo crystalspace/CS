@@ -30,6 +30,8 @@ class csCollectionList;
 class csEngine;
 class csSector;
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * A collection object is for convenience of the script language.
  * It simply groups objects which are related in some way.
@@ -84,5 +86,7 @@ private:
 
   csCollectionList* collections;
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_CSCOLL_H__

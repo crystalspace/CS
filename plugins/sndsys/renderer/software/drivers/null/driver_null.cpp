@@ -64,8 +64,8 @@ bool SndSysDriverNull::Initialize (iObjectRegistry *pObjectReg)
   // Make sure sound.cfg is available
   Config.AddConfig(m_pObjectReg, "/config/sound.cfg");
 
-  csRef<iCommandLineParser> CMDLine (CS_QUERY_REGISTRY (m_pObjectReg,
-    iCommandLineParser));
+  csRef<iCommandLineParser> CMDLine (
+    csQueryRegistry<iCommandLineParser> (m_pObjectReg));
 
   m_BufferLengthms=0;
   if (CMDLine)

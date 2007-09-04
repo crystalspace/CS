@@ -137,7 +137,7 @@ bool Simple::HandleEvent (iEvent& ev)
   else if ((ev.Name == csevKeyboardDown (object_reg)) && 
     (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
     if (q)
       q->GetEventOutlet()->Broadcast (csevQuit(object_reg));
     return true;
@@ -217,7 +217,7 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
   }
 
   // The collision detection system.
-  cdsys = CS_QUERY_REGISTRY (object_reg, iCollideSystem);
+  cdsys = csQueryRegistry<iCollideSystem> (object_reg);
   if (!cdsys)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -227,7 +227,7 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
   }
 
   // The virtual clock.
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
   if (!vc)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -237,7 +237,7 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
   }
 
   // Find the pointer to engine plugin
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = csQueryRegistry<iEngine> (object_reg);
   if (!engine)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -246,7 +246,7 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
     return false;
   }
 
-  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  loader = csQueryRegistry<iLoader> (object_reg);
   if (!loader)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -255,7 +255,7 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
     return false;
   }
 
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
   if (!g3d)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -264,7 +264,7 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
     return false;
   }
 
-  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  kbd = csQueryRegistry<iKeyboardDriver> (object_reg);
   if (!kbd)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -362,8 +362,8 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
   parent_sprite = engine->CreateMeshWrapper (
   	imeshfact, "Parent", room,
 	csVector3 (0, 5, 3.5));
-  spstate = SCF_QUERY_INTERFACE (parent_sprite->GetMeshObject (),
-  	iSprite3DState);
+  spstate = 
+  	scfQueryInterface<iSprite3DState> (parent_sprite->GetMeshObject ());
   spstate->SetAction ("default");
   parent_sprite->GetMovable ()->Transform (csZRotMatrix3 (PI/2.));
   parent_sprite->GetMovable ()->UpdateMove ();
@@ -373,7 +373,7 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
   sprite1->GetMovable ()->SetPosition (csVector3 (0, -.5, -.5));
   sprite1->GetMovable ()->Transform (csZRotMatrix3 (PI/2.));
   sprite1->GetMovable ()->UpdateMove ();
-  spstate = SCF_QUERY_INTERFACE (sprite1->GetMeshObject (), iSprite3DState);
+  spstate = scfQueryInterface<iSprite3DState> (sprite1->GetMeshObject ());
   spstate->SetAction ("default");
   sprite1->QuerySceneNode ()->SetParent (parent_sprite->QuerySceneNode ());
 
@@ -382,7 +382,7 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
   sprite2->GetMovable ()->SetPosition (csVector3 (0, .5, -.5));
   sprite2->GetMovable ()->Transform (csZRotMatrix3 (PI/2.));
   sprite2->GetMovable ()->UpdateMove ();
-  spstate = SCF_QUERY_INTERFACE (sprite2->GetMeshObject (), iSprite3DState);
+  spstate = scfQueryInterface<iSprite3DState> (sprite2->GetMeshObject ());
   spstate->SetAction ("default");
   sprite2->QuerySceneNode ()->SetParent (parent_sprite->QuerySceneNode ());
 

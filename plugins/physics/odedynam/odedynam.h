@@ -1862,8 +1862,8 @@ struct ODEHingeJoint : public csStrictODEJoint, iODEHingeJoint
  * This implements the joint.  It does this by determining
  * which type of ODE joint best represents that described
  */
-class csODEJoint : public scfImplementation1<
-  csODEJoint, iJoint> 
+class csODEJoint : public scfImplementation2<
+  csODEJoint, iJoint, iODEJointState> 
 {
   dJointID jointID;
   dJointID motor_jointID;
@@ -1935,7 +1935,7 @@ public:
   void SetAngularConstraintAxis (const csVector3 &axis, int body); 
   csVector3 GetAngularConstraintAxis (int body);
 
-  //----------------iODEIAJointState----------------
+  //----------------iODEJointState----------------
   ODEJointType GetType();
   void SetLoStop (const csVector3 &value) 
   { 

@@ -110,7 +110,7 @@ bool csLinuxJoystick::Init ()
 {
   bool verbose = false;
   csRef<iVerbosityManager> verbosemgr (
-    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+    csQueryRegistry<iVerbosityManager> (object_reg));
   if (verbosemgr) 
     verbose = verbosemgr->Enabled ("joystick");
 
@@ -203,7 +203,7 @@ bool csLinuxJoystick::Init ()
 
     // hook into eventqueue
     PreProcess = csevPreProcess (object_reg);
-    csRef<iEventQueue> eq (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+    csRef<iEventQueue> eq (csQueryRegistry<iEventQueue> (object_reg));
     if (eq != 0)
     {
       eq->RegisterListener (static_cast<iEventHandler*> (this), PreProcess);
@@ -224,7 +224,7 @@ bool csLinuxJoystick::Close ()
 {
   if (bHooked)
   {
-    csRef<iEventQueue> eq (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+    csRef<iEventQueue> eq (csQueryRegistry<iEventQueue> (object_reg));
     if (eq != 0)
       eq->RemoveListener (static_cast<iEventHandler*> (this));
     bHooked = false;

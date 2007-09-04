@@ -37,22 +37,22 @@ bool Simple::Setup ()
   // from the object registry. The RequestPlugins() call we did earlier
   // registered all loaded plugins with the object registry.
   // The virtual clock.
-  g3d = CS_QUERY_REGISTRY (GetObjectRegistry(), iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (GetObjectRegistry());
   if (!g3d) return ReportError ("Failed to locate 3D renderer!");
 
-  engine = CS_QUERY_REGISTRY (GetObjectRegistry(), iEngine);
+  engine = csQueryRegistry<iEngine> (GetObjectRegistry());
   if (!engine) return ReportError ("Failed to locate 3D engine!");
 
-  vc = CS_QUERY_REGISTRY (GetObjectRegistry(), iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (GetObjectRegistry());
   if (!vc) return ReportError ("Failed to locate Virtual Clock!");
 
-  kbd = CS_QUERY_REGISTRY (GetObjectRegistry(), iKeyboardDriver);
+  kbd = csQueryRegistry<iKeyboardDriver> (GetObjectRegistry());
   if (!kbd) return ReportError ("Failed to locate Keyboard Driver!");
 
-  loader = CS_QUERY_REGISTRY (GetObjectRegistry(), iLoader);
+  loader = csQueryRegistry<iLoader> (GetObjectRegistry());
   if (!loader) return ReportError ("Failed to locate Loader!");
 
-  cdsys = CS_QUERY_REGISTRY (GetObjectRegistry(), iCollideSystem);
+  cdsys = csQueryRegistry<iCollideSystem> (GetObjectRegistry());
   if (!cdsys) return ReportError ("Failed to locate CD system!");
 
   // We need a View to the virtual world.
@@ -181,7 +181,7 @@ bool Simple::OnKeyboard(iEvent& ev)
       // main runloop to stop. To do that we get the event queue from
       // the object registry and then post the event.
       csRef<iEventQueue> q = 
-        CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
+        csQueryRegistry<iEventQueue> (GetObjectRegistry());
       if (q.IsValid()) q->GetEventOutlet()->Broadcast(csevQuit(GetObjectRegistry()));
     }
   }
@@ -245,7 +245,7 @@ bool Simple::Application()
 bool Simple::LoadMap ()
 {
   // Set VFS current directory to the level we want to load.
-  csRef<iVFS> VFS (CS_QUERY_REGISTRY (GetObjectRegistry (), iVFS));
+  csRef<iVFS> VFS (csQueryRegistry<iVFS> (GetObjectRegistry ()));
   VFS->ChDir ("/lev/flarge");
   // Load the level file which is called 'world'.
   if (!loader->LoadMapFile ("world"))

@@ -80,7 +80,7 @@ csShaderManager::~csShaderManager()
   shaders.DeleteAll ();
   if (weakEventHandler)
   {
-    csRef<iEventQueue> q = CS_QUERY_REGISTRY (objectreg, iEventQueue);
+    csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (objectreg);
     if (q)
       RemoveWeakListener (q, weakEventHandler);
   }
@@ -98,11 +98,11 @@ void csShaderManager::Report (int severity, const char* msg, ...)
 bool csShaderManager::Initialize(iObjectRegistry *objreg)
 {
   objectreg = objreg;
-  vc = CS_QUERY_REGISTRY (objectreg, iVirtualClock);
-  txtmgr = CS_QUERY_REGISTRY (objectreg, iTextureManager);
+  vc = csQueryRegistry<iVirtualClock> (objectreg);
+  txtmgr = csQueryRegistry<iTextureManager> (objectreg);
 
   csRef<iVerbosityManager> verbosemgr (
-    CS_QUERY_REGISTRY (objectreg, iVerbosityManager));
+    csQueryRegistry<iVerbosityManager> (objectreg));
   if (verbosemgr) 
     do_verbose = verbosemgr->Enabled ("renderer.shader");
   else
@@ -116,7 +116,7 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
     csQueryRegistry<iEventHandlerRegistry> (objectreg);
   eventSucc[0] = handlerReg->GetGenericID ("crystalspace.graphics3d");
 
-  csRef<iEventQueue> q = CS_QUERY_REGISTRY (objectreg, iEventQueue);
+  csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (objectreg);
   if (q)
   {
     csEventID events[] = { PreProcess, SystemOpen, SystemClose, 
@@ -124,11 +124,11 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
     RegisterWeakListener (q, this, events, weakEventHandler);
   }
 
-  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY  (objectreg,
-	iPluginManager);
+  csRef<iPluginManager> plugin_mgr = 
+	csQueryRegistry<iPluginManager> (objectreg);
 
-  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    objectreg, "crystalspace.shared.stringset", iStringSet);
+  strings = csQueryRegistryTagInterface<iStringSet> (
+    objectreg, "crystalspace.shared.stringset");
 
   {
     csRef<csNullShader> nullShader;

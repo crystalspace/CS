@@ -18,7 +18,10 @@
 
 #include "cssysdef.h"
 #include "csutil/util.h"
+#include "csutil/scfstringarray.h"
 #include "defaultsconfig.h"
+
+
 
 #import <Foundation/NSEnumerator.h>
 
@@ -121,8 +124,8 @@ void csDefaultsConfig::Clear ()
 
 csPtr<iConfigIterator> csDefaultsConfig::Enumerate (const char* Subsection)
 {
-  if (!SubsectionExists (Subsection))
-    return 0;
+  //if (!SubsectionExists (Subsection))
+  //  return 0;
   return new csDefaultsIterator (this, Subsection);
 }
 
@@ -196,6 +199,38 @@ bool csDefaultsConfig::GetBool (const char* Key, bool Def) const
   return Def;
 }
 
+csPtr<iStringArray> csDefaultsConfig::GetTuple(const char* Key) const
+{
+
+
+ scfStringArray *items = new scfStringArray;		// the output list
+  csString item;
+
+  const char *sinp = GetStr(Key, 0);
+  const char *comp;
+  size_t len;
+  bool finished = (sinp == 0);
+
+  while (!finished)
+  {
+    comp = strchr (sinp, ',');
+    if (!comp)
+    {
+      finished = true;
+      comp = &sinp [strlen (sinp)];
+    }
+    len = strlen (sinp) - strlen (comp);
+    item = csString (sinp, len);
+    item.Trim ();
+    sinp = comp + 1;
+    items->Push (item);
+  }
+
+  csPtr<iStringArray> v(items);
+  return v;
+
+}
+
 const char* csDefaultsConfig::GetComment (const char* Key) const
 {
   return 0;
@@ -232,6 +267,22 @@ void csDefaultsConfig::SetBool (const char* Key, bool Value)
   if (Writable(keystr))
     [dict setObject:valstr forKey:keystr];
 }
+
+void csDefaultsConfig::SetTuple (const char* Key, iStringArray* Value)
+{
+  // this should output a string like
+  // abc, def, ghi
+  csString s;
+  while (!Value->IsEmpty ())
+  {
+    csString i = Value->Pop ();
+    if (!Value->IsEmpty ())
+      i.Append (", ");
+    s.Append(i);
+  }
+  SetStr (Key, s);
+}
+
 
 bool csDefaultsConfig::SetComment (const char* Key, const char* Text)
 {
@@ -280,6 +331,8 @@ csDefaultsIterator::csDefaultsIterator (
   // Nil out the rest.
   keyenum = nil;
   currentkey = nil;
+  nextkey = nil;
+  Next();
 }
 
 csDefaultsIterator::~csDefaultsIterator()
@@ -309,6 +362,7 @@ void csDefaultsIterator::Rewind ()
     [keyenum release];
   keyenum = nil;
   currentkey = nil;
+  nextkey = nil;
 }
 
 // Navigate though the reg key to the next value entry.
@@ -317,8 +371,16 @@ bool csDefaultsIterator::Next()
   // Create the iterator if we haven't got one.
   if (keyenum == nil)
     keyenum = [[config->dict keyEnumerator] retain];
-  currentkey = [keyenum nextObject];
+    
+  currentkey = nextkey;
+  nextkey = [keyenum nextObject];
   return currentkey != nil;
+  
+}
+
+bool csDefaultsIterator::HasNext()
+{
+    return nextkey != nil;
 }
 
 const char* csDefaultsIterator::GetKey (bool Local) const
@@ -344,6 +406,11 @@ const char* csDefaultsIterator::GetStr () const
 bool csDefaultsIterator::GetBool () const
 {
   return config->GetBool([currentkey lossyCString], false);
+}
+
+csPtr<iStringArray> csDefaultsIterator::GetTuple () const
+{
+  return config->GetTuple([currentkey lossyCString]);
 }
 
 const char* csDefaultsIterator::GetComment () const

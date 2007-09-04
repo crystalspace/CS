@@ -20,6 +20,7 @@
 
 #ifndef CS_MICRO_SWIG
 
+#ifndef SWIGIMPORTED
 %inline %{
 
   struct _csPyEventHandler : public iEventHandler
@@ -90,11 +91,6 @@
 
 %pythoncode %{
 
-  def csevCommandLineHelp(reg):
-    csEventNameRegistry.GetID(reg, "crystalspace.application.commandlinehelp")
-    
-  CS_EVENTLIST_END = csInvalidStringID
-  
   class csPyEventHandler (_csPyEventHandler):
     """Python version of iEventHandler implementation.
        This class can be used as base class for event handlers in Python.
@@ -130,6 +126,16 @@
   csInitializer.SetupEventHandler = \
     staticmethod(_csInitializer_SetupEventHandler)
 
+%}
+
+#endif // SWIGIMPORTED
+
+%pythoncode %{
+
+  def csevCommandLineHelp(reg):
+    csEventNameRegistry.GetID(reg, "crystalspace.application.commandlinehelp")
+    
+  CS_EVENTLIST_END = csInvalidStringID
 %}
 
 #ifdef USE_DIRECTORS

@@ -39,7 +39,7 @@ namespace CS
    * see csShaderVariableContext.
    */
   class CS_CRYSTALSPACE_EXPORT ShaderVariableContextImpl :
-    public iShaderVariableContext
+    public virtual iShaderVariableContext
   {
   protected:
     csRefArray<csShaderVariable> variables;

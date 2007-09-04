@@ -88,6 +88,8 @@ namespace lighter
     { return GetTextureNameFromFilename (filename); }
 
     iTextureWrapper* GetTexture();
+
+    bool IsNull () const;
   protected:
     // The color data itself
     ColorDArray data;

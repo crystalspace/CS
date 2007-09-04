@@ -125,6 +125,8 @@ private:
   iLight* FetchNext ();
 };
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * List of collections for the engine. This class implements iCollectionList.
  */
@@ -150,6 +152,8 @@ public:
 private:
   csRefArrayObject<iCollection> collections;
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 struct csSectorPos
 {
@@ -201,6 +205,8 @@ public:
   virtual void FreeMesh (iMeshWrapper*);
 };
 
+
+#include "csutil/win32/msvc_deprecated_warn_off.h"
 
 /**
  * The 3D engine.
@@ -768,6 +774,12 @@ public:
   csRef<iGraphics3D> G3D;
   /// Pointer to the shader manager
   csRef<iShaderManager> shaderManager;
+  
+  /// Store virtual clock to speed up time queries.
+  csRef<iVirtualClock> virtualClock;
+
+  /// Store engine shadervar names
+  csStringID id_creation_time;
   /**
    * This is the Virtual File System object where all the files
    * used by the engine live. Textures, models, data, everything -
@@ -879,9 +891,6 @@ private:
    */
   csRef<iReporter> reporter;
 
-  /// Store virtual clock to speed up time queries.
-  csRef<iVirtualClock> virtualClock;
-
   /// Default render loop
   csRef<iRenderLoop> defaultRenderLoop;
   csString override_renderloop;
@@ -988,5 +997,7 @@ private:
   csEventID CanvasClose;
   csRef<iEventHandler> weakEventHandler;
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_ENGINE_H__

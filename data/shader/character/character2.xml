@@ -1,4 +1,5 @@
 <shader compiler="xmlshader" name="character2">
+  <!--
   <technique priority="150">
     <pass>
       <mixmode><copy /></mixmode>
@@ -19,6 +20,7 @@
 	    </fp>
     </pass>
   </technique>
+  -->
   <technique priority="100">
     <pass>
       <mixmode><copy /></mixmode>

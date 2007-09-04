@@ -120,9 +120,9 @@ AC_DEFUN([CS_PROG_LINK],[
 	[AC_HELP_STRING([--enable-as-needed],
 	    [Utilize --as-needed linker flag, if supported by linker and if
 	    the used binutils version is recent enough to support it properly
-	    (default NO)])])
+	    (default YES)])])
     AS_IF([test -z "$enable_as_needed"], 
-	[enable_as_needed=no])
+	[enable_as_needed=yes])
     AS_IF([test "$enable_as_needed" != "no"],
 	[AC_REQUIRE([CS_CHECK_BINUTILS_2_17])
 	AS_IF([test "$cs_cv_binutils_2_17" = "yes"],

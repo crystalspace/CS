@@ -916,7 +916,7 @@ const char* csGenmeshAnimationControlFactory::Load (iDocumentNode* node)
 
 const char* csGenmeshAnimationControlFactory::Save (iDocumentNode* parent)
 {
-  csRef<iFactory> plugin = SCF_QUERY_INTERFACE(type, iFactory);
+  csRef<iFactory> plugin = scfQueryInterface<iFactory> (type);
   if (!plugin) return "Couldn't get Class ID";
   parent->SetAttribute("plugin", plugin->QueryClassID());
   return "Not implemented yet!";
@@ -934,7 +934,7 @@ csGenmeshAnimationControlType::~csGenmeshAnimationControlType ()
 {
   if (weakEventHandler)
   {
-    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
     if (q)
       CS::RemoveWeakListener (q, weakEventHandler);
   }
@@ -945,7 +945,7 @@ bool csGenmeshAnimationControlType::Initialize (iObjectRegistry* object_reg)
   this->object_reg = object_reg;
   Frame = csevFrame (object_reg);
   PreProcess = csevPreProcess (object_reg);
-  csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
   // \todo It looks like @csGenmeshAnimationControlType doesn't actually handle any events.  So why does it register an event listener?
   if (q != 0) {
     csEventID events[] = { Frame, PreProcess, CS_EVENTLIST_END };

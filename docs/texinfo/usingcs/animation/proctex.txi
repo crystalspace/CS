@@ -27,7 +27,7 @@ The following code demonstrates how you can update a texture image:
   bool UpdateTexture (iTextureWrapper* tex)
   @{
     g3d->SetRenderTarget (tex->GetTextureHandle ());
-    if (!g3d->BeginDraw (CDRAW_2DGRAPHICS)) return false;
+    if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return false;
     @dots{}
     // Do various operations on g2d.
     @dots{}

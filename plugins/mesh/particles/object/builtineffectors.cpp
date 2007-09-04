@@ -30,7 +30,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 {
   SCF_IMPLEMENT_FACTORY(ParticleEffectorFactory);
 
-  CS_IMPLEMENT_STATIC_VAR(GetVGen, csRandomVectorGen,);
+  CS_IMPLEMENT_STATIC_VAR(GetVGen, csRandomVectorGen, ());
 
   csPtr<iParticleBuiltinEffectorForce> ParticleEffectorFactory::CreateForce () const
   {
@@ -211,7 +211,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
         const csVector3& oldPos = particle.position;
 
          //Calculate new position
-        float err = CS::Math::Ode45::Step<FnType, float> 
+        /*float err = */CS::Math::Ode45::Step<FnType, float> 
           (fn, dt, t0, oldPos, particle.position);
           
       }

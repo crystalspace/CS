@@ -5,14 +5,11 @@
 @cindex Bug Reporting
 
 If you find a bug in Crystal Space there are two ways to report it to the
-developers. The preferred method of reporting bugs is to use the SourceForge
-support request mechanism that can be found at:
+developers. The preferred method of reporting bugs is to use the Crystal Space
+bug tracker:
 
 @noindent
-@uref{https://sourceforge.net/tracker/?group_id=649&atid=100649}
-
-To use the SourceForge trackers, you must have a SourceForge user id,
-and be logged in.
+@uref{http://trac.crystalspace3d.org/trac/CS/}
 
 Additionally, you can send a message to the main Crystal Space mailing list
 (@pxref{Mailing Lists}) at @email{crystal-main@@lists.sourceforge.net}.

@@ -195,7 +195,7 @@ bool Simple::HandleEvent (iEvent& ev)
     if((ev.Name == KeyboardDown) &&
        (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
     {
-      csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+      csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
       if (q) q->GetEventOutlet()->Broadcast (csevQuit(object_reg));
       return true;
     }
@@ -269,7 +269,7 @@ bool Simple::Initialize ()
   }
 
   // The virtual clock.
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
   if (vc == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -279,7 +279,7 @@ bool Simple::Initialize ()
   }
 
   // Find the pointer to engine plugin
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = csQueryRegistry<iEngine> (object_reg);
   if (engine == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -288,7 +288,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  loader = csQueryRegistry<iLoader> (object_reg);
   if (loader == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -297,7 +297,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
   if (g3d == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -306,7 +306,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  kbd = csQueryRegistry<iKeyboardDriver> (object_reg);
   if (kbd == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -321,7 +321,7 @@ bool Simple::Initialize ()
   panel->Show(true);
 
   iGraphics2D* g2d = g3d->GetDriver2D();
-  csRef<iWxWindow> wxwin = SCF_QUERY_INTERFACE(g2d, iWxWindow);
+  csRef<iWxWindow> wxwin = scfQueryInterface<iWxWindow> (g2d);
   if( !wxwin )
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -397,10 +397,10 @@ bool Simple::Initialize ()
 
 void Simple::PushFrame ()
 {
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (!q)
     return ;
-  csRef<iVirtualClock> vc (CS_QUERY_REGISTRY(object_reg, iVirtualClock));
+  csRef<iVirtualClock> vc (csQueryRegistry<iVirtualClock> (object_reg));
 
   if (vc)
     vc->Advance();

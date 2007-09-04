@@ -394,10 +394,10 @@ struct iODEJointState : public virtual iBase
   virtual void SetSuspensionCFM (const csVector3 &value) = 0;
 
   /// Get low stop angle or position.
-  virtual csVector3 GetLowStop () = 0;
+  virtual csVector3 GetLoStop () = 0;
 
   /// Get high stop angle or position.
-  virtual csVector3 GetHighStop () = 0;
+  virtual csVector3 GetHiStop () = 0;
 
   /// Get desired motor velocity (this will be an angular or linear velocity).
   virtual csVector3 GetVel () = 0;

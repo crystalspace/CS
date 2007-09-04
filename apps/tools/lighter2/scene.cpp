@@ -22,7 +22,7 @@
 #include "lighter.h"
 #include "kdtree.h"
 #include "statistics.h"
-#include "radobject_genmesh.h"
+#include "object_genmesh.h"
 
 using namespace CS;
 
@@ -31,22 +31,28 @@ namespace lighter
   void Sector::Initialize ()
   {
     // Initialize objects
-    RadObjectHash::GlobalIterator objIt = allObjects.GetIterator ();
+    ObjectHash::GlobalIterator objIt = allObjects.GetIterator ();
     while (objIt.HasNext ())
     {
-      csRef<RadObject> obj = objIt.Next ();
+      csRef<Object> obj = objIt.Next ();
       obj->Initialize ();
     }
 
     // Build KD-tree
     objIt.Reset ();
-    kdTree = KDTreeBuilder::BuildTree (objIt);
+    KDTreeBuilder builder;
+    kdTree = builder.BuildTree (objIt);
   }
 
 
   Scene::Scene ()
   {
-    
+    PDLightmapsHash::GlobalIterator pdlIt = pdLightmaps.GetIterator();
+    while (pdlIt.HasNext())
+    {
+      LightmapPtrDelArray* lm = pdlIt.Next();
+      delete lm;
+    }
   }
 
   void Scene::AddFile (const char* directory)
@@ -155,6 +161,42 @@ namespace lighter
     return true;
   }
 
+  Lightmap* Scene::GetLightmap (uint lightmapID, Light_old* light)
+  {
+    if (!light->pseudoDynamic)
+      return lightmaps[lightmapID];
+
+    LightmapPtrDelArray* pdLights = pdLightmaps.Get (light, 0);
+    if (pdLights == 0)
+    {
+      pdLights = new LightmapPtrDelArray;
+      for (size_t i = 0; i < lightmaps.GetSize(); i++)
+      {
+        Lightmap* lm = new Lightmap (lightmaps[i]->GetWidth(), 
+          lightmaps[i]->GetHeight());
+        lm->Initialize ();
+        pdLights->Push (lm);
+      }
+      pdLightmaps.Put (light, pdLights);
+    }
+    return pdLights->Get (lightmapID);
+  }
+
+  csArray<LightmapPtrDelArray*> Scene::GetAllLightmaps ()
+  {
+    csArray<LightmapPtrDelArray*> allLms;
+    allLms.Push (&lightmaps);
+
+    PDLightmapsHash::GlobalIterator pdlIt = pdLightmaps.GetIterator();
+    while (pdlIt.HasNext())
+    {
+      LightmapPtrDelArray* lm = pdlIt.Next();
+      allLms.Push (lm);
+    }
+
+    return allLms;
+  }
+
   void Scene::ParseSector (iSector *sector)
   {
     if (!sector) return;
@@ -180,19 +222,25 @@ namespace lighter
     for (i = 0; i < lightList->GetCount (); i++)
     {
       iLight *light = lightList->Get (i);
-      csRef<Light> radLight; radLight.AttachNew (new Light);
+      if (light->GetDynamicType() == CS_LIGHT_DYNAMICTYPE_DYNAMIC) continue;
+      csRef<Light_old> radLight; radLight.AttachNew (new Light_old);
       radLight->position = light->GetMovable ()->GetFullPosition ();
-      radLight->color = light->GetColor ();
       radLight->attenuation = light->GetAttenuationMode ();
       radLight->attenuationConsts = light->GetAttenuationConstants();
+      radLight->pseudoDynamic = 
+        light->GetDynamicType() == CS_LIGHT_DYNAMICTYPE_PSEUDO;
+      memcpy (radLight->lightId.data, light->GetLightID(), 
+        csMD5::Digest::DigestLen);
+      radLight->color = 
+        radLight->pseudoDynamic ? csColor (1, 1, 1) : light->GetColor ();
 
       // Only point-lights for now
       float r = light->GetCutoffDistance ();
-      radLight->boundingBox.SetSize (csVector3 (r));
+      radLight->boundingBox.SetSize (csVector3 (2*r));
       radLight->boundingBox.SetCenter (radLight->position);
      
       //add more
-      radSector->allLights.Push (radLight);
+      radSector->allLightsOld.Push (radLight);
     }
   }
 
@@ -201,13 +249,13 @@ namespace lighter
     if (!sector || !mesh) return Failure;
 
     // Get the factory
-    RadObjectFactory *factory = 0;
+    ObjectFactory *factory = 0;
     MeshParseResult parseFact = ParseMeshFactory (mesh->GetFactory (), factory);
     if (parseFact != Success) return parseFact;
     if (!factory) return Failure;
 
     // Construct a new mesh
-    RadObject* obj = factory->CreateObject ();
+    Object* obj = factory->CreateObject ();
     if (!obj) return Failure;
 
     obj->ParseMesh (mesh);
@@ -220,13 +268,13 @@ namespace lighter
   }
 
   Scene::MeshParseResult Scene::ParseMeshFactory (iMeshFactoryWrapper *factory,
-                                                  RadObjectFactory*& radFact)
+                                                  ObjectFactory*& radFact)
   {
     if (!factory) return Failure;
 
     // Check for duplicate
     csString factName = factory->QueryObject ()->GetName ();
-    radFact = radFactories.Get (factName, 0);
+    radFact = radFactories.Get (factName, (ObjectFactory*)0);
     if (radFact) return Success;
 
     csRef<iFactory> ifact = scfQueryInterface<iFactory> (
@@ -237,7 +285,7 @@ namespace lighter
     if (!strcasecmp (type, "crystalspace.mesh.object.genmesh"))
     {
       // Genmesh
-      radFact = new RadObjectFactory_Genmesh ();
+      radFact = new ObjectFactory_Genmesh ();
     }
     else
       return NotAGenMesh;
@@ -261,15 +309,14 @@ namespace lighter
 
   void Scene::SaveSceneToDom (iDocumentNode* r, LoadedFile* fileInfo)
   {
+    csStringSet pdlightNums;
     for (unsigned int i = 0; i < lightmaps.GetSize (); i++)
     {
       csString textureFilename;
       // Save the lightmap
-      {
-        textureFilename = "lightmaps/";
-        textureFilename += i;
-        textureFilename += ".png";
-      }
+      textureFilename = "lightmaps/";
+      textureFilename += i;
+      textureFilename += ".png";
       {
         // Texture file name is relative to world file
         csVfsDirectoryChanger chdir (globalLighter->vfs);
@@ -279,6 +326,31 @@ namespace lighter
       SaveTexture savetex;
       savetex.filename = textureFilename;
       savetex.texname = lightmaps[i]->GetTextureName();
+
+      PDLightmapsHash::GlobalIterator pdlIt = pdLightmaps.GetIterator();
+      while (pdlIt.HasNext())
+      {
+        csPtrKey<Light_old> key;
+        LightmapPtrDelArray* lm = pdlIt.Next(key);
+        if (lm->Get (i)->IsNull()) continue;
+
+        csString lmID (key->lightId.HexString());
+        textureFilename = "lightmaps/";
+        textureFilename += i;
+        textureFilename += "_";
+        textureFilename += pdlightNums.Request (lmID);
+        textureFilename += ".png";
+
+        {
+          // Texture file name is relative to world file
+          csVfsDirectoryChanger chdir (globalLighter->vfs);
+          chdir.ChangeTo (fileInfo->directory);
+          lm->Get (i)->SaveLightmap (textureFilename);
+        }
+        savetex.pdLightmapFiles.Push (textureFilename);
+        savetex.pdLightIDs.Push (lmID);
+      }
+
       texturesToSave.Push (savetex);
     }
 
@@ -319,12 +391,32 @@ namespace lighter
 
     for (unsigned int i = 0; i < texturesToSave.GetSize (); i++)
     {
-      const csString& textureFile = texturesToSave[i].filename;
-      const csString& textureName = texturesToSave[i].texname;
-      csRef<iDocumentNode> textureNode = 
-        texturesNode->CreateNodeBefore (CS_NODE_ELEMENT);
-      textureNode->SetValue ("texture");
-      textureNode->SetAttribute ("name", textureName.GetData ());
+      const SaveTexture& textureToSave = texturesToSave[i];
+      csRef<iDocumentNode> textureNode;
+      {
+        csRef<iDocumentNodeIterator> textureNodes = 
+          texturesNode->GetNodes ("texture");
+        while (textureNodes->HasNext())
+        {
+          csRef<iDocumentNode> texNode = textureNodes->Next();
+          if (texNode->GetType() != CS_NODE_ELEMENT) continue;
+          const char* texName = texNode->GetAttributeValue ("name");
+          if (texName 
+            && (strcmp (texName, textureToSave.texname.GetData ()) == 0))
+          {
+            textureNode = texNode;
+            break;
+          }
+        }
+      }
+      if (!textureNode.IsValid())
+      {
+        textureNode = texturesNode->CreateNodeBefore (CS_NODE_ELEMENT);
+        textureNode->SetValue ("texture");
+      }
+      else
+        textureNode->RemoveNodes ();
+      textureNode->SetAttribute ("name", textureToSave.texname.GetData ());
            
       csRef<iDocumentNode> classNode = 
         textureNode->CreateNodeBefore (CS_NODE_ELEMENT);
@@ -339,9 +431,43 @@ namespace lighter
 
       csRef<iDocumentNode> filenameNode =
         fileNode->CreateNodeBefore (CS_NODE_TEXT);
-      filenameNode->SetValue (textureFile.GetData ());
+      filenameNode->SetValue (textureToSave.filename.GetData ());
 
-      texturesToClean.Delete (textureName);
+      csRef<iDocumentNode> mipmapNode = 
+        textureNode->CreateNodeBefore (CS_NODE_ELEMENT);
+      mipmapNode->SetValue ("mipmap");
+
+      csRef<iDocumentNode> mipmapContents =
+        mipmapNode->CreateNodeBefore (CS_NODE_TEXT);
+      mipmapContents->SetValue ("no");
+
+      if (textureToSave.pdLightmapFiles.GetSize() > 0)
+      {
+        csRef<iDocumentNode> typeNode = 
+          textureNode->CreateNodeBefore (CS_NODE_ELEMENT, fileNode);
+        typeNode->SetValue ("type");
+        csRef<iDocumentNode> typeContent = 
+          typeNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+        typeContent->SetValue ("crystalspace.texture.loader.pdlight");
+
+        csRef<iDocumentNode> pdlightParamsNode = 
+          textureNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+        pdlightParamsNode->SetValue ("params");
+
+        for (size_t p = 0; p < textureToSave.pdLightmapFiles.GetSize(); p++)
+        {
+          csRef<iDocumentNode> mapNode = 
+            pdlightParamsNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+          mapNode->SetValue ("map");
+          mapNode->SetAttribute ("lightid", textureToSave.pdLightIDs[p]);
+
+          csRef<iDocumentNode> mapContents = 
+            mapNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+          mapContents->SetValue (textureToSave.pdLightmapFiles[p]);
+        }
+      }
+
+      texturesToClean.Delete (textureToSave.texname.GetData ());
     }
 
     // Clean out old lightmap textures
@@ -360,6 +486,29 @@ namespace lighter
           csRef<iDocumentNode> fileNode = child->GetNode ("file");
           if (fileNode.IsValid())
             texFileNames.Push (fileNode->GetContentsValue());
+          csRef<iDocumentNode> typeNode = child->GetNode ("type");
+          if (typeNode.IsValid())
+          {
+            const char* typeStr = typeNode->GetContentsValue();
+            if (typeStr && (strcmp (typeStr,
+                "crystalspace.texture.loader.pdlight") == 0))
+            {
+              csRef<iDocumentNode> paramsNode = child->GetNode ("params");
+              if (paramsNode.IsValid())
+              {
+                csRef<iDocumentNodeIterator> mapNodes = 
+                  paramsNode->GetNodes ("maps");
+                while (mapNodes->HasNext())
+                {
+                  csRef<iDocumentNode> mapNode = mapNodes->Next();
+                  if (mapNode->GetType() != CS_NODE_ELEMENT) continue;
+                  const char* mapName = mapNode->GetContentsValue();
+                  if (mapName != 0)
+                    texFileNames.Push (mapName);
+                }
+              }
+            }
+          }
           nodesToDelete.Push (child);
         }
       }
@@ -378,7 +527,8 @@ namespace lighter
   {
     // Save a single factory to the dom
     csString name = factNode->GetAttributeValue ("name");
-    csRef<RadObjectFactory> radFact = radFactories.Get (name, 0);
+    csRef<ObjectFactory> radFact = radFactories.Get (name, 
+      (ObjectFactory*)0);
     if (radFact)
     {
       // We do have one
@@ -397,7 +547,7 @@ namespace lighter
   void Scene::SaveSectorToDom (iDocumentNode* sectorNode, LoadedFile* fileInfo)
   {
     csString name = sectorNode->GetAttributeValue ("name");
-    csRef<Sector> sector = sectors.Get (name, 0);
+    csRef<Sector> sector = sectors.Get (name, (Sector*)0);
     if (sector)
     {
       //ok, have the sector, try to save all objects
@@ -414,7 +564,7 @@ namespace lighter
   {
     // Save the mesh
     csString name = objNode->GetAttributeValue ("name");
-    csRef<RadObject> radObj = sect->allObjects.Get (name, 0);
+    csRef<Object> radObj = sect->allObjects.Get (name, (Object*)0);
     if (radObj)
     {
       // We do have one

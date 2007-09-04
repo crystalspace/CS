@@ -54,9 +54,6 @@ CS_MASTER_HEADER_REJECTS +=
   [ ConcatDirs csutil objpool.h      ]
   ;
 
-# Excluded because of name clash with gmeshskel.h
-CS_MASTER_HEADER_REJECTS += [ ConcatDirs imesh gmeshskel2.h ] ;
-
 {
   local CSWIN32LIBS_REJECTS =
     caca.h

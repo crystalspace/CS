@@ -108,13 +108,17 @@ void csNullmeshMeshObject::GetRadius (float& rad, csVector3& cent)
 csNullmeshMeshFactory::csNullmeshMeshFactory (csNullmeshMeshObjectType* type)
 : scfImplementationType(this), nullmesh_type (type)
 {
+  csVector3 b1 (-1, -1, -1);
+  csVector3 b2 (1, 1, 1);
+  SetBoundingBox (csBox3 (b1, b2));
 }
 
 
 void csNullmeshMeshFactory::SetRadius (float radius)
 {
   csNullmeshMeshFactory::radius = radius;
-  box.Set (-radius, -radius, -radius, radius, radius, radius);
+  float r = radius / sqrt (3.0);
+  box.Set (-r, -r, -r, r, r, r);
 }
 
 void csNullmeshMeshFactory::SetBoundingBox (const csBox3& box)
@@ -152,7 +156,7 @@ csPtr<iMeshObjectFactory> csNullmeshMeshObjectType::NewFactory ()
 {
   csNullmeshMeshFactory* cm = new csNullmeshMeshFactory (this);
   csRef<iMeshObjectFactory> ifact (
-  	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
+  	scfQueryInterface<iMeshObjectFactory> (cm));
   cm->DecRef ();
   return csPtr<iMeshObjectFactory> (ifact);
 }

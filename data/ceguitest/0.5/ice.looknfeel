@@ -3207,8 +3207,8 @@
     ***************************************************
     -->
     <WidgetLook name="ice/TabContentPane">
-        <PropertyDefinition name="EnableTop" initialValue="0" redrawOnWrite="true" layoutOnwrite="true" />
-        <PropertyDefinition name="EnableBottom" initialValue="0" redrawOnWrite="true" layoutOnwrite="true" />
+        <PropertyDefinition name="EnableTop" initialValue="0" redrawOnWrite="true" layoutOnWrite="true" />
+        <PropertyDefinition name="EnableBottom" initialValue="0" redrawOnWrite="true" layoutOnWrite="true" />
         <ImagerySection name="normal">
             <FrameComponent>
                 <Area>
@@ -3297,8 +3297,8 @@
     ***************************************************
     -->
     <WidgetLook name="ice/TabButtonPane">
-        <PropertyDefinition name="EnableTop" initialValue="1" redrawOnWrite="true" layoutOnwrite="true" />
-        <PropertyDefinition name="EnableBottom" initialValue="1" redrawOnWrite="true" layoutOnwrite="true" />
+        <PropertyDefinition name="EnableTop" initialValue="1" redrawOnWrite="true" layoutOnWrite="true" />
+        <PropertyDefinition name="EnableBottom" initialValue="1" redrawOnWrite="true" layoutOnWrite="true" />
         <ImagerySection name="normal">
             <FrameComponent>
                 <Area>
@@ -3497,7 +3497,7 @@
                 <Dim type="Width">
                     <ImageDim imageset="ice" image="TabButtonScrollLeftNormal" dimension="Width" />
                 </Dim>
-                <Dim type="Height"><AbsoluteDim value="0" />
+                <Dim type="Height">
                     <ImageDim imageset="ice" image="TabButtonScrollLeftNormal" dimension="Height" />
                 </Dim>
             </Area>

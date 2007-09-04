@@ -66,6 +66,15 @@ class csWrapPtr(_object):
 csWrapPtr_swigregister = _cspace.csWrapPtr_swigregister
 csWrapPtr_swigregister(csWrapPtr)
 
+def fix_args(funct):
+    def _inner(self, args):
+        if type(args) == tuple:
+            args = (self,) + args
+        else:
+            args = (self, args)
+        return funct(*args)
+    return _inner
+
 class csArrayThresholdVariable(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csArrayThresholdVariable, name, value)
@@ -288,6 +297,7 @@ class csColor(_object):
     def Set(*args): return _cspace.csColor_Set(*args)
     def Clamp(*args): return _cspace.csColor_Clamp(*args)
     def ClampDown(*args): return _cspace.csColor_ClampDown(*args)
+    def IsBlack(*args): return _cspace.csColor_IsBlack(*args)
     def assign(*args): return _cspace.csColor_assign(*args)
     def __iadd__(*args): return _cspace.csColor___iadd__(*args)
     def __isub__(*args): return _cspace.csColor___isub__(*args)
@@ -564,6 +574,64 @@ class csVector3(_object):
     __del__ = lambda self : None;
 csVector3_swigregister = _cspace.csVector3_swigregister
 csVector3_swigregister(csVector3)
+
+class csVector4Float(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csVector4Float, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csVector4Float, name)
+    __repr__ = _swig_repr
+    __swig_setmethods__["x"] = _cspace.csVector4Float_x_set
+    __swig_getmethods__["x"] = _cspace.csVector4Float_x_get
+    if _newclass:x = property(_cspace.csVector4Float_x_get, _cspace.csVector4Float_x_set)
+    __swig_setmethods__["y"] = _cspace.csVector4Float_y_set
+    __swig_getmethods__["y"] = _cspace.csVector4Float_y_get
+    if _newclass:y = property(_cspace.csVector4Float_y_get, _cspace.csVector4Float_y_set)
+    __swig_setmethods__["z"] = _cspace.csVector4Float_z_set
+    __swig_getmethods__["z"] = _cspace.csVector4Float_z_get
+    if _newclass:z = property(_cspace.csVector4Float_z_get, _cspace.csVector4Float_z_set)
+    __swig_setmethods__["w"] = _cspace.csVector4Float_w_set
+    __swig_getmethods__["w"] = _cspace.csVector4Float_w_get
+    if _newclass:w = property(_cspace.csVector4Float_w_get, _cspace.csVector4Float_w_set)
+    def __init__(self, *args): 
+        this = _cspace.new_csVector4Float(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_csVector4Float
+    __del__ = lambda self : None;
+csVector4Float_swigregister = _cspace.csVector4Float_swigregister
+csVector4Float_swigregister(csVector4Float)
+
+class csVector4(csVector4Float):
+    __swig_setmethods__ = {}
+    for _s in [csVector4Float]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csVector4, name, value)
+    __swig_getmethods__ = {}
+    for _s in [csVector4Float]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, csVector4, name)
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _cspace.new_csVector4(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    def assign(*args): return _cspace.csVector4_assign(*args)
+    def __add__(*args): return _cspace.csVector4___add__(*args)
+    def __sub__(*args): return _cspace.csVector4___sub__(*args)
+    def __mul__(*args): return _cspace.csVector4___mul__(*args)
+    def __div__(*args): return _cspace.csVector4___div__(*args)
+    def __eq__(*args): return _cspace.csVector4___eq__(*args)
+    def __ne__(*args): return _cspace.csVector4___ne__(*args)
+    def __lt__(*args): return _cspace.csVector4___lt__(*args)
+    def __gt__(*args): return _cspace.csVector4___gt__(*args)
+    def __rmul__(*args): return _cspace.csVector4___rmul__(*args)
+    def __abs__(*args): return _cspace.csVector4___abs__(*args)
+    def __getitem__(*args): return _cspace.csVector4___getitem__(*args)
+    def __setitem__(*args): return _cspace.csVector4___setitem__(*args)
+    def __nonzero__(*args): return _cspace.csVector4___nonzero__(*args)
+    __swig_destroy__ = _cspace.delete_csVector4
+    __del__ = lambda self : None;
+csVector4_swigregister = _cspace.csVector4_swigregister
+csVector4_swigregister(csVector4)
 
 class csMatrix2(_object):
     __swig_setmethods__ = {}
@@ -1425,27 +1493,43 @@ csVector3Array_swigregister = _cspace.csVector3Array_swigregister
 csVector3Array_swigregister(csVector3Array)
 csVector3Array_CompressVertices = _cspace.csVector3Array_CompressVertices
 
-class csTriangle(_object):
+class TriangleInt(_object):
     __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, TriangleInt, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, TriangleInt, name)
+    __repr__ = _swig_repr
+    __swig_setmethods__["a"] = _cspace.TriangleInt_a_set
+    __swig_getmethods__["a"] = _cspace.TriangleInt_a_get
+    if _newclass:a = property(_cspace.TriangleInt_a_get, _cspace.TriangleInt_a_set)
+    __swig_setmethods__["b"] = _cspace.TriangleInt_b_set
+    __swig_getmethods__["b"] = _cspace.TriangleInt_b_get
+    if _newclass:b = property(_cspace.TriangleInt_b_get, _cspace.TriangleInt_b_set)
+    __swig_setmethods__["c"] = _cspace.TriangleInt_c_set
+    __swig_getmethods__["c"] = _cspace.TriangleInt_c_get
+    if _newclass:c = property(_cspace.TriangleInt_c_get, _cspace.TriangleInt_c_set)
+    def Set(*args): return _cspace.TriangleInt_Set(*args)
+    def __init__(self, *args): 
+        this = _cspace.new_TriangleInt(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_TriangleInt
+    __del__ = lambda self : None;
+TriangleInt_swigregister = _cspace.TriangleInt_swigregister
+TriangleInt_swigregister(TriangleInt)
+
+class csTriangle(TriangleInt):
+    __swig_setmethods__ = {}
+    for _s in [TriangleInt]: __swig_setmethods__.update(_s.__swig_setmethods__)
     __setattr__ = lambda self, name, value: _swig_setattr(self, csTriangle, name, value)
     __swig_getmethods__ = {}
+    for _s in [TriangleInt]: __swig_getmethods__.update(_s.__swig_getmethods__)
     __getattr__ = lambda self, name: _swig_getattr(self, csTriangle, name)
     __repr__ = _swig_repr
-    __swig_setmethods__["a"] = _cspace.csTriangle_a_set
-    __swig_getmethods__["a"] = _cspace.csTriangle_a_get
-    if _newclass:a = property(_cspace.csTriangle_a_get, _cspace.csTriangle_a_set)
-    __swig_setmethods__["b"] = _cspace.csTriangle_b_set
-    __swig_getmethods__["b"] = _cspace.csTriangle_b_get
-    if _newclass:b = property(_cspace.csTriangle_b_get, _cspace.csTriangle_b_set)
-    __swig_setmethods__["c"] = _cspace.csTriangle_c_set
-    __swig_getmethods__["c"] = _cspace.csTriangle_c_get
-    if _newclass:c = property(_cspace.csTriangle_c_get, _cspace.csTriangle_c_set)
     def __init__(self, *args): 
         this = _cspace.new_csTriangle(*args)
         try: self.this.append(this)
         except: self.this = this
-    def assign(*args): return _cspace.csTriangle_assign(*args)
-    def Set(*args): return _cspace.csTriangle_Set(*args)
     __swig_destroy__ = _cspace.delete_csTriangle
     __del__ = lambda self : None;
 csTriangle_swigregister = _cspace.csTriangle_swigregister
@@ -1812,6 +1896,8 @@ class csBox3(_object):
     def Set(*args): return _cspace.csBox3_Set(*args)
     def SetMin(*args): return _cspace.csBox3_SetMin(*args)
     def SetMax(*args): return _cspace.csBox3_SetMax(*args)
+    def GetMin(*args): return _cspace.csBox3_GetMin(*args)
+    def GetMax(*args): return _cspace.csBox3_GetMax(*args)
     def Description(*args): return _cspace.csBox3_Description(*args)
     def Split(*args): return _cspace.csBox3_Split(*args)
     def TestSplit(*args): return _cspace.csBox3_TestSplit(*args)
@@ -1981,7 +2067,6 @@ class csShaderVariable(csRefCount):
     UNKNOWN = _cspace.csShaderVariable_UNKNOWN
     INT = _cspace.csShaderVariable_INT
     FLOAT = _cspace.csShaderVariable_FLOAT
-    COLOR = _cspace.csShaderVariable_COLOR
     TEXTURE = _cspace.csShaderVariable_TEXTURE
     RENDERBUFFER = _cspace.csShaderVariable_RENDERBUFFER
     VECTOR2 = _cspace.csShaderVariable_VECTOR2
@@ -1990,6 +2075,7 @@ class csShaderVariable(csRefCount):
     MATRIX = _cspace.csShaderVariable_MATRIX
     TRANSFORM = _cspace.csShaderVariable_TRANSFORM
     ARRAY = _cspace.csShaderVariable_ARRAY
+    COLOR = _cspace.csShaderVariable_COLOR
     def __init__(self, *args): 
         this = _cspace.new_csShaderVariable(*args)
         try: self.this.append(this)
@@ -2002,7 +2088,6 @@ class csShaderVariable(csRefCount):
     def SetAccessor(*args): return _cspace.csShaderVariable_SetAccessor(*args)
     def SetName(*args): return _cspace.csShaderVariable_SetName(*args)
     def GetName(*args): return _cspace.csShaderVariable_GetName(*args)
-    def GetValue(*args): return _cspace.csShaderVariable_GetValue(*args)
     def SetValue(*args): return _cspace.csShaderVariable_SetValue(*args)
     def AddVariableToArray(*args): return _cspace.csShaderVariable_AddVariableToArray(*args)
     def RemoveFromArray(*args): return _cspace.csShaderVariable_RemoveFromArray(*args)
@@ -2010,6 +2095,7 @@ class csShaderVariable(csRefCount):
     def GetArraySize(*args): return _cspace.csShaderVariable_GetArraySize(*args)
     def GetArrayElement(*args): return _cspace.csShaderVariable_GetArrayElement(*args)
     def SetArrayElement(*args): return _cspace.csShaderVariable_SetArrayElement(*args)
+    def GetValue(*args): return _cspace.csShaderVariable_GetValue(*args)
 csShaderVariable_swigregister = _cspace.csShaderVariable_swigregister
 csShaderVariable_swigregister(csShaderVariable)
 
@@ -3020,18 +3106,14 @@ class csPath(scfPath):
     __swig_destroy__ = _cspace.delete_csPath
     __del__ = lambda self : None;
     def Length(*args): return _cspace.csPath_Length(*args)
-    def GetPointCount(*args): return _cspace.csPath_GetPointCount(*args)
     def CalculateAtTime(*args): return _cspace.csPath_CalculateAtTime(*args)
     def Calculate(*args): return _cspace.csPath_Calculate(*args)
     def GetCurrentIndex(*args): return _cspace.csPath_GetCurrentIndex(*args)
     def GetTime(*args): return _cspace.csPath_GetTime(*args)
-    def GetTimeValue(*args): return _cspace.csPath_GetTimeValue(*args)
     def SetTime(*args): return _cspace.csPath_SetTime(*args)
     def SetTimeValue(*args): return _cspace.csPath_SetTimeValue(*args)
     def SetTimes(*args): return _cspace.csPath_SetTimes(*args)
-    def SetTimeValues(*args): return _cspace.csPath_SetTimeValues(*args)
     def GetTimes(*args): return _cspace.csPath_GetTimes(*args)
-    def GetTimeValues(*args): return _cspace.csPath_GetTimeValues(*args)
     def SetPositionVectors(*args): return _cspace.csPath_SetPositionVectors(*args)
     def SetUpVectors(*args): return _cspace.csPath_SetUpVectors(*args)
     def SetForwardVectors(*args): return _cspace.csPath_SetForwardVectors(*args)
@@ -3524,6 +3606,7 @@ class iSector(iBase):
     def AddLightVisibleCallback(*args): return _cspace.iSector_AddLightVisibleCallback(*args)
     def RemoveLightVisibleCallback(*args): return _cspace.iSector_RemoveLightVisibleCallback(*args)
     def GetSVContext(*args): return _cspace.iSector_GetSVContext(*args)
+    def PrecacheDraw(*args): return _cspace.iSector_PrecacheDraw(*args)
     __swig_destroy__ = _cspace.delete_iSector
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSector_scfGetVersion
@@ -4768,6 +4851,7 @@ class iGeneralFactoryState(iGeneralMeshCommonState):
     def DeleteSubMesh(*args): return _cspace.iGeneralFactoryState_DeleteSubMesh(*args)
     def GetSubMeshCount(*args): return _cspace.iGeneralFactoryState_GetSubMeshCount(*args)
     def GetSubMesh(*args): return _cspace.iGeneralFactoryState_GetSubMesh(*args)
+    def DisableAutoNormals(*args): return _cspace.iGeneralFactoryState_DisableAutoNormals(*args)
     __swig_destroy__ = _cspace.delete_iGeneralFactoryState
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iGeneralFactoryState_scfGetVersion
@@ -4835,6 +4919,402 @@ class iGenMeshAnimationControlType(iBase):
     __del__ = lambda self : None;
 iGenMeshAnimationControlType_swigregister = _cspace.iGenMeshAnimationControlType_swigregister
 iGenMeshAnimationControlType_swigregister(iGenMeshAnimationControlType)
+
+CS_BTT_NONE = _cspace.CS_BTT_NONE
+CS_BTT_SCRIPT = _cspace.CS_BTT_SCRIPT
+CS_BTT_RIGID_BODY = _cspace.CS_BTT_RIGID_BODY
+CS_BGT_NONE = _cspace.CS_BGT_NONE
+CS_BGT_BOX = _cspace.CS_BGT_BOX
+CS_BGT_SPHERE = _cspace.CS_BGT_SPHERE
+CS_BGT_CYLINDER = _cspace.CS_BGT_CYLINDER
+class iSkeletonBone(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonBone, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonBone, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetName(*args): return _cspace.iSkeletonBone_GetName(*args)
+    def SetName(*args): return _cspace.iSkeletonBone_SetName(*args)
+    def GetTransform(*args): return _cspace.iSkeletonBone_GetTransform(*args)
+    def SetTransform(*args): return _cspace.iSkeletonBone_SetTransform(*args)
+    def GetFullTransform(*args): return _cspace.iSkeletonBone_GetFullTransform(*args)
+    def SetParent(*args): return _cspace.iSkeletonBone_SetParent(*args)
+    def GetParent(*args): return _cspace.iSkeletonBone_GetParent(*args)
+    def GetChildrenCount(*args): return _cspace.iSkeletonBone_GetChildrenCount(*args)
+    def GetChild(*args): return _cspace.iSkeletonBone_GetChild(*args)
+    def FindChild(*args): return _cspace.iSkeletonBone_FindChild(*args)
+    def FindChildIndex(*args): return _cspace.iSkeletonBone_FindChildIndex(*args)
+    def SetSkinBox(*args): return _cspace.iSkeletonBone_SetSkinBox(*args)
+    def GetSkinBox(*args): return _cspace.iSkeletonBone_GetSkinBox(*args)
+    def SetUpdateCallback(*args): return _cspace.iSkeletonBone_SetUpdateCallback(*args)
+    def GetUpdateCallback(*args): return _cspace.iSkeletonBone_GetUpdateCallback(*args)
+    def GetFactory(*args): return _cspace.iSkeletonBone_GetFactory(*args)
+    def SetTransformMode(*args): return _cspace.iSkeletonBone_SetTransformMode(*args)
+    def GetTransformMode(*args): return _cspace.iSkeletonBone_GetTransformMode(*args)
+    __swig_destroy__ = _cspace.delete_iSkeletonBone
+    __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSkeletonBone_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iSkeletonBone_scfGetVersion)
+iSkeletonBone_swigregister = _cspace.iSkeletonBone_swigregister
+iSkeletonBone_swigregister(iSkeletonBone)
+iSkeletonBone_scfGetVersion = _cspace.iSkeletonBone_scfGetVersion
+
+class iSkeletonBoneUpdateCallback(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonBoneUpdateCallback, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonBoneUpdateCallback, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def UpdateTransform(*args): return _cspace.iSkeletonBoneUpdateCallback_UpdateTransform(*args)
+    __swig_destroy__ = _cspace.delete_iSkeletonBoneUpdateCallback
+    __del__ = lambda self : None;
+iSkeletonBoneUpdateCallback_swigregister = _cspace.iSkeletonBoneUpdateCallback_swigregister
+iSkeletonBoneUpdateCallback_swigregister(iSkeletonBoneUpdateCallback)
+
+class iSkeletonScriptKeyFrame(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonScriptKeyFrame, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonScriptKeyFrame, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetName(*args): return _cspace.iSkeletonScriptKeyFrame_GetName(*args)
+    def SetName(*args): return _cspace.iSkeletonScriptKeyFrame_SetName(*args)
+    def GetDuration(*args): return _cspace.iSkeletonScriptKeyFrame_GetDuration(*args)
+    def SetDuration(*args): return _cspace.iSkeletonScriptKeyFrame_SetDuration(*args)
+    def GetTransformsCount(*args): return _cspace.iSkeletonScriptKeyFrame_GetTransformsCount(*args)
+    def AddTransform(*args): return _cspace.iSkeletonScriptKeyFrame_AddTransform(*args)
+    def GetTransform(*args): return _cspace.iSkeletonScriptKeyFrame_GetTransform(*args)
+    def SetTransform(*args): return _cspace.iSkeletonScriptKeyFrame_SetTransform(*args)
+    def GetKeyFrameData(*args): return _cspace.iSkeletonScriptKeyFrame_GetKeyFrameData(*args)
+    __swig_destroy__ = _cspace.delete_iSkeletonScriptKeyFrame
+    __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSkeletonScriptKeyFrame_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iSkeletonScriptKeyFrame_scfGetVersion)
+iSkeletonScriptKeyFrame_swigregister = _cspace.iSkeletonScriptKeyFrame_swigregister
+iSkeletonScriptKeyFrame_swigregister(iSkeletonScriptKeyFrame)
+iSkeletonScriptKeyFrame_scfGetVersion = _cspace.iSkeletonScriptKeyFrame_scfGetVersion
+
+class iSkeletonScript(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonScript, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonScript, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetName(*args): return _cspace.iSkeletonScript_GetName(*args)
+    def SetName(*args): return _cspace.iSkeletonScript_SetName(*args)
+    def GetTime(*args): return _cspace.iSkeletonScript_GetTime(*args)
+    def SetTime(*args): return _cspace.iSkeletonScript_SetTime(*args)
+    def GetSpeed(*args): return _cspace.iSkeletonScript_GetSpeed(*args)
+    def SetSpeed(*args): return _cspace.iSkeletonScript_SetSpeed(*args)
+    def SetFactor(*args): return _cspace.iSkeletonScript_SetFactor(*args)
+    def GetFactor(*args): return _cspace.iSkeletonScript_GetFactor(*args)
+    def SetLoop(*args): return _cspace.iSkeletonScript_SetLoop(*args)
+    def GetLoop(*args): return _cspace.iSkeletonScript_GetLoop(*args)
+    def CreateFrame(*args): return _cspace.iSkeletonScript_CreateFrame(*args)
+    def GetFramesCount(*args): return _cspace.iSkeletonScript_GetFramesCount(*args)
+    def GetFrame(*args): return _cspace.iSkeletonScript_GetFrame(*args)
+    def FindFrameIndex(*args): return _cspace.iSkeletonScript_FindFrameIndex(*args)
+    def RemoveFrame(*args): return _cspace.iSkeletonScript_RemoveFrame(*args)
+    def RecalcSpline(*args): return _cspace.iSkeletonScript_RecalcSpline(*args)
+    __swig_destroy__ = _cspace.delete_iSkeletonScript
+    __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSkeletonScript_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iSkeletonScript_scfGetVersion)
+iSkeletonScript_swigregister = _cspace.iSkeletonScript_swigregister
+iSkeletonScript_swigregister(iSkeletonScript)
+iSkeletonScript_scfGetVersion = _cspace.iSkeletonScript_scfGetVersion
+
+class iSkeletonScriptCallback(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonScriptCallback, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonScriptCallback, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def Execute(*args): return _cspace.iSkeletonScriptCallback_Execute(*args)
+    def OnFinish(*args): return _cspace.iSkeletonScriptCallback_OnFinish(*args)
+    __swig_destroy__ = _cspace.delete_iSkeletonScriptCallback
+    __del__ = lambda self : None;
+iSkeletonScriptCallback_swigregister = _cspace.iSkeletonScriptCallback_swigregister
+iSkeletonScriptCallback_swigregister(iSkeletonScriptCallback)
+
+class iSkeletonUpdateCallback(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonUpdateCallback, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonUpdateCallback, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def Execute(*args): return _cspace.iSkeletonUpdateCallback_Execute(*args)
+    __swig_destroy__ = _cspace.delete_iSkeletonUpdateCallback
+    __del__ = lambda self : None;
+iSkeletonUpdateCallback_swigregister = _cspace.iSkeletonUpdateCallback_swigregister
+iSkeletonUpdateCallback_swigregister(iSkeletonUpdateCallback)
+
+class iSkeleton(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeleton, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSkeleton, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetName(*args): return _cspace.iSkeleton_GetName(*args)
+    def SetName(*args): return _cspace.iSkeleton_SetName(*args)
+    def GetBonesCount(*args): return _cspace.iSkeleton_GetBonesCount(*args)
+    def GetBone(*args): return _cspace.iSkeleton_GetBone(*args)
+    def FindBone(*args): return _cspace.iSkeleton_FindBone(*args)
+    def FindBoneIndex(*args): return _cspace.iSkeleton_FindBoneIndex(*args)
+    def Execute(*args): return _cspace.iSkeleton_Execute(*args)
+    def Append(*args): return _cspace.iSkeleton_Append(*args)
+    def ClearPendingScripts(*args): return _cspace.iSkeleton_ClearPendingScripts(*args)
+    def GetScriptsCount(*args): return _cspace.iSkeleton_GetScriptsCount(*args)
+    def GetScript(*args): return _cspace.iSkeleton_GetScript(*args)
+    def FindScript(*args): return _cspace.iSkeleton_FindScript(*args)
+    def FindSocket(*args): return _cspace.iSkeleton_FindSocket(*args)
+    def StopAll(*args): return _cspace.iSkeleton_StopAll(*args)
+    def Stop(*args): return _cspace.iSkeleton_Stop(*args)
+    def GetFactory(*args): return _cspace.iSkeleton_GetFactory(*args)
+    def SetScriptCallback(*args): return _cspace.iSkeleton_SetScriptCallback(*args)
+    def AddUpdateCallback(*args): return _cspace.iSkeleton_AddUpdateCallback(*args)
+    def GetUpdateCallbacksCount(*args): return _cspace.iSkeleton_GetUpdateCallbacksCount(*args)
+    def GetUpdateCallback(*args): return _cspace.iSkeleton_GetUpdateCallback(*args)
+    def RemoveUpdateCallback(*args): return _cspace.iSkeleton_RemoveUpdateCallback(*args)
+    __swig_destroy__ = _cspace.delete_iSkeleton
+    __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSkeleton_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iSkeleton_scfGetVersion)
+iSkeleton_swigregister = _cspace.iSkeleton_swigregister
+iSkeleton_swigregister(iSkeleton)
+iSkeleton_scfGetVersion = _cspace.iSkeleton_scfGetVersion
+
+class iSkeletonSocket(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonSocket, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonSocket, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetName(*args): return _cspace.iSkeletonSocket_GetName(*args)
+    def SetName(*args): return _cspace.iSkeletonSocket_SetName(*args)
+    def GetTransform(*args): return _cspace.iSkeletonSocket_GetTransform(*args)
+    def SetTransform(*args): return _cspace.iSkeletonSocket_SetTransform(*args)
+    def GetFullTransform(*args): return _cspace.iSkeletonSocket_GetFullTransform(*args)
+    def SetBone(*args): return _cspace.iSkeletonSocket_SetBone(*args)
+    def GetBone(*args): return _cspace.iSkeletonSocket_GetBone(*args)
+    def SetSceneNode(*args): return _cspace.iSkeletonSocket_SetSceneNode(*args)
+    def GetSceneNode(*args): return _cspace.iSkeletonSocket_GetSceneNode(*args)
+    def GetFactory(*args): return _cspace.iSkeletonSocket_GetFactory(*args)
+    __swig_destroy__ = _cspace.delete_iSkeletonSocket
+    __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSkeletonSocket_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iSkeletonSocket_scfGetVersion)
+iSkeletonSocket_swigregister = _cspace.iSkeletonSocket_swigregister
+iSkeletonSocket_swigregister(iSkeletonSocket)
+iSkeletonSocket_scfGetVersion = _cspace.iSkeletonSocket_scfGetVersion
+
+class iSkeletonBoneRagdollInfo(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonBoneRagdollInfo, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonBoneRagdollInfo, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetEnabled(*args): return _cspace.iSkeletonBoneRagdollInfo_SetEnabled(*args)
+    def GetEnabled(*args): return _cspace.iSkeletonBoneRagdollInfo_GetEnabled(*args)
+    def SetAttachToParent(*args): return _cspace.iSkeletonBoneRagdollInfo_SetAttachToParent(*args)
+    def GetAttachToParent(*args): return _cspace.iSkeletonBoneRagdollInfo_GetAttachToParent(*args)
+    def SetGeomName(*args): return _cspace.iSkeletonBoneRagdollInfo_SetGeomName(*args)
+    def GetGeomName(*args): return _cspace.iSkeletonBoneRagdollInfo_GetGeomName(*args)
+    def SetGeomType(*args): return _cspace.iSkeletonBoneRagdollInfo_SetGeomType(*args)
+    def GetGeomType(*args): return _cspace.iSkeletonBoneRagdollInfo_GetGeomType(*args)
+    def SetGeomDimensions(*args): return _cspace.iSkeletonBoneRagdollInfo_SetGeomDimensions(*args)
+    def GetGeomDimensions(*args): return _cspace.iSkeletonBoneRagdollInfo_GetGeomDimensions(*args)
+    def SetFriction(*args): return _cspace.iSkeletonBoneRagdollInfo_SetFriction(*args)
+    def GetFriction(*args): return _cspace.iSkeletonBoneRagdollInfo_GetFriction(*args)
+    def SetElasticity(*args): return _cspace.iSkeletonBoneRagdollInfo_SetElasticity(*args)
+    def GetElasticity(*args): return _cspace.iSkeletonBoneRagdollInfo_GetElasticity(*args)
+    def SetSoftness(*args): return _cspace.iSkeletonBoneRagdollInfo_SetSoftness(*args)
+    def GetSoftness(*args): return _cspace.iSkeletonBoneRagdollInfo_GetSoftness(*args)
+    def SetSlip(*args): return _cspace.iSkeletonBoneRagdollInfo_SetSlip(*args)
+    def GetSlip(*args): return _cspace.iSkeletonBoneRagdollInfo_GetSlip(*args)
+    def SetBodyName(*args): return _cspace.iSkeletonBoneRagdollInfo_SetBodyName(*args)
+    def GetBodyName(*args): return _cspace.iSkeletonBoneRagdollInfo_GetBodyName(*args)
+    def SetBodyMass(*args): return _cspace.iSkeletonBoneRagdollInfo_SetBodyMass(*args)
+    def GetBodyMass(*args): return _cspace.iSkeletonBoneRagdollInfo_GetBodyMass(*args)
+    def SetBodyGravmode(*args): return _cspace.iSkeletonBoneRagdollInfo_SetBodyGravmode(*args)
+    def GetBodyGravmode(*args): return _cspace.iSkeletonBoneRagdollInfo_GetBodyGravmode(*args)
+    def SetJointName(*args): return _cspace.iSkeletonBoneRagdollInfo_SetJointName(*args)
+    def GetJointName(*args): return _cspace.iSkeletonBoneRagdollInfo_GetJointName(*args)
+    def SetJointMinRotContraints(*args): return _cspace.iSkeletonBoneRagdollInfo_SetJointMinRotContraints(*args)
+    def GetJointMinRotContraints(*args): return _cspace.iSkeletonBoneRagdollInfo_GetJointMinRotContraints(*args)
+    def SetJointMaxRotContraints(*args): return _cspace.iSkeletonBoneRagdollInfo_SetJointMaxRotContraints(*args)
+    def GetJointMaxRotContraints(*args): return _cspace.iSkeletonBoneRagdollInfo_GetJointMaxRotContraints(*args)
+    def SetJointMinTransContraints(*args): return _cspace.iSkeletonBoneRagdollInfo_SetJointMinTransContraints(*args)
+    def GetJointMinTransContraints(*args): return _cspace.iSkeletonBoneRagdollInfo_GetJointMinTransContraints(*args)
+    def SetJointMaxTransContraints(*args): return _cspace.iSkeletonBoneRagdollInfo_SetJointMaxTransContraints(*args)
+    def GetJointMaxTransContraints(*args): return _cspace.iSkeletonBoneRagdollInfo_GetJointMaxTransContraints(*args)
+    __swig_destroy__ = _cspace.delete_iSkeletonBoneRagdollInfo
+    __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSkeletonBoneRagdollInfo_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iSkeletonBoneRagdollInfo_scfGetVersion)
+iSkeletonBoneRagdollInfo_swigregister = _cspace.iSkeletonBoneRagdollInfo_swigregister
+iSkeletonBoneRagdollInfo_swigregister(iSkeletonBoneRagdollInfo)
+iSkeletonBoneRagdollInfo_scfGetVersion = _cspace.iSkeletonBoneRagdollInfo_scfGetVersion
+
+class iSkeletonBoneFactory(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonBoneFactory, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonBoneFactory, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetName(*args): return _cspace.iSkeletonBoneFactory_GetName(*args)
+    def SetName(*args): return _cspace.iSkeletonBoneFactory_SetName(*args)
+    def GetTransform(*args): return _cspace.iSkeletonBoneFactory_GetTransform(*args)
+    def SetTransform(*args): return _cspace.iSkeletonBoneFactory_SetTransform(*args)
+    def GetFullTransform(*args): return _cspace.iSkeletonBoneFactory_GetFullTransform(*args)
+    def SetParent(*args): return _cspace.iSkeletonBoneFactory_SetParent(*args)
+    def GetParent(*args): return _cspace.iSkeletonBoneFactory_GetParent(*args)
+    def GetChildrenCount(*args): return _cspace.iSkeletonBoneFactory_GetChildrenCount(*args)
+    def GetChild(*args): return _cspace.iSkeletonBoneFactory_GetChild(*args)
+    def FindChild(*args): return _cspace.iSkeletonBoneFactory_FindChild(*args)
+    def FindChildIndex(*args): return _cspace.iSkeletonBoneFactory_FindChildIndex(*args)
+    def SetSkinBox(*args): return _cspace.iSkeletonBoneFactory_SetSkinBox(*args)
+    def GetSkinBox(*args): return _cspace.iSkeletonBoneFactory_GetSkinBox(*args)
+    def GetRagdollInfo(*args): return _cspace.iSkeletonBoneFactory_GetRagdollInfo(*args)
+    __swig_destroy__ = _cspace.delete_iSkeletonBoneFactory
+    __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSkeletonBoneFactory_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iSkeletonBoneFactory_scfGetVersion)
+iSkeletonBoneFactory_swigregister = _cspace.iSkeletonBoneFactory_swigregister
+iSkeletonBoneFactory_swigregister(iSkeletonBoneFactory)
+iSkeletonBoneFactory_scfGetVersion = _cspace.iSkeletonBoneFactory_scfGetVersion
+
+class iSkeletonSocketFactory(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonSocketFactory, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonSocketFactory, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetName(*args): return _cspace.iSkeletonSocketFactory_GetName(*args)
+    def SetName(*args): return _cspace.iSkeletonSocketFactory_SetName(*args)
+    def GetTransform(*args): return _cspace.iSkeletonSocketFactory_GetTransform(*args)
+    def SetTransform(*args): return _cspace.iSkeletonSocketFactory_SetTransform(*args)
+    def GetFullTransform(*args): return _cspace.iSkeletonSocketFactory_GetFullTransform(*args)
+    def SetBone(*args): return _cspace.iSkeletonSocketFactory_SetBone(*args)
+    def GetBone(*args): return _cspace.iSkeletonSocketFactory_GetBone(*args)
+    __swig_destroy__ = _cspace.delete_iSkeletonSocketFactory
+    __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSkeletonSocketFactory_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iSkeletonSocketFactory_scfGetVersion)
+iSkeletonSocketFactory_swigregister = _cspace.iSkeletonSocketFactory_swigregister
+iSkeletonSocketFactory_swigregister(iSkeletonSocketFactory)
+iSkeletonSocketFactory_scfGetVersion = _cspace.iSkeletonSocketFactory_scfGetVersion
+
+class iSkeletonFactory(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonFactory, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonFactory, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetName(*args): return _cspace.iSkeletonFactory_GetName(*args)
+    def SetName(*args): return _cspace.iSkeletonFactory_SetName(*args)
+    def CreateBone(*args): return _cspace.iSkeletonFactory_CreateBone(*args)
+    def CreateScript(*args): return _cspace.iSkeletonFactory_CreateScript(*args)
+    def FindScript(*args): return _cspace.iSkeletonFactory_FindScript(*args)
+    def FindBone(*args): return _cspace.iSkeletonFactory_FindBone(*args)
+    def FindBoneIndex(*args): return _cspace.iSkeletonFactory_FindBoneIndex(*args)
+    def GetBonesCount(*args): return _cspace.iSkeletonFactory_GetBonesCount(*args)
+    def GetBone(*args): return _cspace.iSkeletonFactory_GetBone(*args)
+    def GetGraveyard(*args): return _cspace.iSkeletonFactory_GetGraveyard(*args)
+    def CreateSocket(*args): return _cspace.iSkeletonFactory_CreateSocket(*args)
+    def FindSocket(*args): return _cspace.iSkeletonFactory_FindSocket(*args)
+    def GetSocket(*args): return _cspace.iSkeletonFactory_GetSocket(*args)
+    def RemoveSocket(*args): return _cspace.iSkeletonFactory_RemoveSocket(*args)
+    def GetSocketsCount(*args): return _cspace.iSkeletonFactory_GetSocketsCount(*args)
+    __swig_destroy__ = _cspace.delete_iSkeletonFactory
+    __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSkeletonFactory_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iSkeletonFactory_scfGetVersion)
+iSkeletonFactory_swigregister = _cspace.iSkeletonFactory_swigregister
+iSkeletonFactory_swigregister(iSkeletonFactory)
+iSkeletonFactory_scfGetVersion = _cspace.iSkeletonFactory_scfGetVersion
+
+class iSkeletonGraveyard(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSkeletonGraveyard, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSkeletonGraveyard, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetFactoriesCount(*args): return _cspace.iSkeletonGraveyard_GetFactoriesCount(*args)
+    def CreateFactory(*args): return _cspace.iSkeletonGraveyard_CreateFactory(*args)
+    def LoadFactory(*args): return _cspace.iSkeletonGraveyard_LoadFactory(*args)
+    def FindFactory(*args): return _cspace.iSkeletonGraveyard_FindFactory(*args)
+    def CreateSkeleton(*args): return _cspace.iSkeletonGraveyard_CreateSkeleton(*args)
+    __swig_destroy__ = _cspace.delete_iSkeletonGraveyard
+    __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSkeletonGraveyard_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iSkeletonGraveyard_scfGetVersion)
+iSkeletonGraveyard_swigregister = _cspace.iSkeletonGraveyard_swigregister
+iSkeletonGraveyard_swigregister(iSkeletonGraveyard)
+iSkeletonGraveyard_scfGetVersion = _cspace.iSkeletonGraveyard_scfGetVersion
+
+class iGenMeshSkeletonControlState(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iGenMeshSkeletonControlState, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iGenMeshSkeletonControlState, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetAnimatedVertices(*args): return _cspace.iGenMeshSkeletonControlState_GetAnimatedVertices(*args)
+    def GetAnimatedVerticesCount(*args): return _cspace.iGenMeshSkeletonControlState_GetAnimatedVerticesCount(*args)
+    def GetAnimatedFaceNormals(*args): return _cspace.iGenMeshSkeletonControlState_GetAnimatedFaceNormals(*args)
+    def GetAnimatedFaceNormalsCount(*args): return _cspace.iGenMeshSkeletonControlState_GetAnimatedFaceNormalsCount(*args)
+    def GetAnimatedVertNormals(*args): return _cspace.iGenMeshSkeletonControlState_GetAnimatedVertNormals(*args)
+    def GetAnimatedVertNormalsCount(*args): return _cspace.iGenMeshSkeletonControlState_GetAnimatedVertNormalsCount(*args)
+    def GetSkeleton(*args): return _cspace.iGenMeshSkeletonControlState_GetSkeleton(*args)
+    __swig_destroy__ = _cspace.delete_iGenMeshSkeletonControlState
+    __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iGenMeshSkeletonControlState_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iGenMeshSkeletonControlState_scfGetVersion)
+iGenMeshSkeletonControlState_swigregister = _cspace.iGenMeshSkeletonControlState_swigregister
+iGenMeshSkeletonControlState_swigregister(iGenMeshSkeletonControlState)
+iGenMeshSkeletonControlState_scfGetVersion = _cspace.iGenMeshSkeletonControlState_scfGetVersion
 
 class csSprite2DVertexArrayReadOnly(iBase):
     __swig_setmethods__ = {}
@@ -5949,6 +6429,7 @@ class iParticleSystem(iParticleSystemBase):
     def GetParticle(*args): return _cspace.iParticleSystem_GetParticle(*args)
     def GetParticleAux(*args): return _cspace.iParticleSystem_GetParticleAux(*args)
     def LockForExternalControl(*args): return _cspace.iParticleSystem_LockForExternalControl(*args)
+    def Advance(*args): return _cspace.iParticleSystem_Advance(*args)
     __swig_destroy__ = _cspace.delete_iParticleSystem
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iParticleSystem_scfGetVersion
@@ -6463,6 +6944,8 @@ class iSndSysWrapper(iBase):
     def QueryObject(*args): return _cspace.iSndSysWrapper_QueryObject(*args)
     def GetStream(*args): return _cspace.iSndSysWrapper_GetStream(*args)
     def SetStream(*args): return _cspace.iSndSysWrapper_SetStream(*args)
+    def GetData(*args): return _cspace.iSndSysWrapper_GetData(*args)
+    def SetData(*args): return _cspace.iSndSysWrapper_SetData(*args)
     __swig_destroy__ = _cspace.delete_iSndSysWrapper
     __del__ = lambda self : None;
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSndSysWrapper_scfGetVersion
@@ -7029,6 +7512,7 @@ iObjectRegistryIterator_swigregister = _cspace.iObjectRegistryIterator_swigregis
 iObjectRegistryIterator_swigregister(iObjectRegistryIterator)
 
 csQueryRegistryTag = _cspace.csQueryRegistryTag
+CS_QUERY_REGISTRY_TAG_is_deprecated = _cspace.CS_QUERY_REGISTRY_TAG_is_deprecated
 class iVirtualClock(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -7542,6 +8026,7 @@ class csKeyModifiers(_object):
     __swig_setmethods__["modifiers"] = _cspace.csKeyModifiers_modifiers_set
     __swig_getmethods__["modifiers"] = _cspace.csKeyModifiers_modifiers_get
     if _newclass:modifiers = property(_cspace.csKeyModifiers_modifiers_get, _cspace.csKeyModifiers_modifiers_set)
+    def __getitem__(*args): return _cspace.csKeyModifiers___getitem__(*args)
     def __init__(self, *args): 
         this = _cspace.new_csKeyModifiers(*args)
         try: self.this.append(this)
@@ -7852,8 +8337,11 @@ class iJoystickDriver(iBase):
     def DoMotion(*args): return _cspace.iJoystickDriver_DoMotion(*args)
     __swig_destroy__ = _cspace.delete_iJoystickDriver
     __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iJoystickDriver_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iJoystickDriver_scfGetVersion)
 iJoystickDriver_swigregister = _cspace.iJoystickDriver_swigregister
 iJoystickDriver_swigregister(iJoystickDriver)
+iJoystickDriver_scfGetVersion = _cspace.iJoystickDriver_scfGetVersion
 
 class iConfigFile(iBase):
     __swig_setmethods__ = {}
@@ -8602,6 +9090,7 @@ class csSimpleRenderMesh(_object):
         this = _cspace.new_csSimpleRenderMesh(*args)
         try: self.this.append(this)
         except: self.this = this
+    def SetWithGenmeshFactory(*args): return _cspace.csSimpleRenderMesh_SetWithGenmeshFactory(*args)
     __swig_destroy__ = _cspace.delete_csSimpleRenderMesh
     __del__ = lambda self : None;
 csSimpleRenderMesh_swigregister = _cspace.csSimpleRenderMesh_swigregister
@@ -9190,6 +9679,120 @@ class iImage(iBase):
 iImage_swigregister = _cspace.iImage_swigregister
 iImage_swigregister(iImage)
 iImage_scfGetVersion = _cspace.iImage_scfGetVersion
+
+class csImageBaseBase(iImage):
+    __swig_setmethods__ = {}
+    for _s in [iImage]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csImageBaseBase, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iImage]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, csImageBaseBase, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def IncRef(*args): return _cspace.csImageBaseBase_IncRef(*args)
+    def DecRef(*args): return _cspace.csImageBaseBase_DecRef(*args)
+    def GetRefCount(*args): return _cspace.csImageBaseBase_GetRefCount(*args)
+    def QueryInterface(*args): return _cspace.csImageBaseBase_QueryInterface(*args)
+    def AddRefOwner(*args): return _cspace.csImageBaseBase_AddRefOwner(*args)
+    def RemoveRefOwner(*args): return _cspace.csImageBaseBase_RemoveRefOwner(*args)
+csImageBaseBase_swigregister = _cspace.csImageBaseBase_swigregister
+csImageBaseBase_swigregister(csImageBaseBase)
+
+class csImageBase(csImageBaseBase):
+    __swig_setmethods__ = {}
+    for _s in [csImageBaseBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csImageBase, name, value)
+    __swig_getmethods__ = {}
+    for _s in [csImageBaseBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, csImageBase, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    __swig_destroy__ = _cspace.delete_csImageBase
+    __del__ = lambda self : None;
+    def GetDepth(*args): return _cspace.csImageBase_GetDepth(*args)
+    def SetName(*args): return _cspace.csImageBase_SetName(*args)
+    def GetName(*args): return _cspace.csImageBase_GetName(*args)
+    def GetPalette(*args): return _cspace.csImageBase_GetPalette(*args)
+    def GetAlpha(*args): return _cspace.csImageBase_GetAlpha(*args)
+    def HasKeyColor(*args): return _cspace.csImageBase_HasKeyColor(*args)
+    def HasKeycolor(*args): return _cspace.csImageBase_HasKeycolor(*args)
+    def GetKeyColor(*args): return _cspace.csImageBase_GetKeyColor(*args)
+    def GetKeycolor(*args): return _cspace.csImageBase_GetKeycolor(*args)
+    def HasMipmaps(*args): return _cspace.csImageBase_HasMipmaps(*args)
+    def GetMipmap(*args): return _cspace.csImageBase_GetMipmap(*args)
+    def GetRawFormat(*args): return _cspace.csImageBase_GetRawFormat(*args)
+    def GetRawData(*args): return _cspace.csImageBase_GetRawData(*args)
+    def GetImageType(*args): return _cspace.csImageBase_GetImageType(*args)
+    def HasSubImages(*args): return _cspace.csImageBase_HasSubImages(*args)
+    def GetSubImage(*args): return _cspace.csImageBase_GetSubImage(*args)
+csImageBase_swigregister = _cspace.csImageBase_swigregister
+csImageBase_swigregister(csImageBase)
+
+class csImageMemoryBase(csImageBase):
+    __swig_setmethods__ = {}
+    for _s in [csImageBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csImageMemoryBase, name, value)
+    __swig_getmethods__ = {}
+    for _s in [csImageBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, csImageMemoryBase, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def IncRef(*args): return _cspace.csImageMemoryBase_IncRef(*args)
+    def DecRef(*args): return _cspace.csImageMemoryBase_DecRef(*args)
+    def GetRefCount(*args): return _cspace.csImageMemoryBase_GetRefCount(*args)
+    def QueryInterface(*args): return _cspace.csImageMemoryBase_QueryInterface(*args)
+    def AddRefOwner(*args): return _cspace.csImageMemoryBase_AddRefOwner(*args)
+    def RemoveRefOwner(*args): return _cspace.csImageMemoryBase_RemoveRefOwner(*args)
+csImageMemoryBase_swigregister = _cspace.csImageMemoryBase_swigregister
+csImageMemoryBase_swigregister(csImageMemoryBase)
+
+class csImageMemory(csImageMemoryBase):
+    __swig_setmethods__ = {}
+    for _s in [csImageMemoryBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csImageMemory, name, value)
+    __swig_getmethods__ = {}
+    for _s in [csImageMemoryBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, csImageMemory, name)
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _cspace.new_csImageMemory(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_csImageMemory
+    __del__ = lambda self : None;
+    def GetImagePtr(*args): return _cspace.csImageMemory_GetImagePtr(*args)
+    def GetPalettePtr(*args): return _cspace.csImageMemory_GetPalettePtr(*args)
+    def GetAlphaPtr(*args): return _cspace.csImageMemory_GetAlphaPtr(*args)
+    def GetImageData(*args): return _cspace.csImageMemory_GetImageData(*args)
+    def GetWidth(*args): return _cspace.csImageMemory_GetWidth(*args)
+    def GetHeight(*args): return _cspace.csImageMemory_GetHeight(*args)
+    def GetDepth(*args): return _cspace.csImageMemory_GetDepth(*args)
+    def GetFormat(*args): return _cspace.csImageMemory_GetFormat(*args)
+    def GetPalette(*args): return _cspace.csImageMemory_GetPalette(*args)
+    def GetAlpha(*args): return _cspace.csImageMemory_GetAlpha(*args)
+    def HasKeyColor(*args): return _cspace.csImageMemory_HasKeyColor(*args)
+    def GetKeyColor(*args): return _cspace.csImageMemory_GetKeyColor(*args)
+    def Clear(*args): return _cspace.csImageMemory_Clear(*args)
+    def CheckAlpha(*args): return _cspace.csImageMemory_CheckAlpha(*args)
+    def SetFormat(*args): return _cspace.csImageMemory_SetFormat(*args)
+    def SetKeyColor(*args): return _cspace.csImageMemory_SetKeyColor(*args)
+    def SetKeycolor(*args): return _cspace.csImageMemory_SetKeycolor(*args)
+    def ClearKeyColor(*args): return _cspace.csImageMemory_ClearKeyColor(*args)
+    def ClearKeycolor(*args): return _cspace.csImageMemory_ClearKeycolor(*args)
+    def ApplyKeyColor(*args): return _cspace.csImageMemory_ApplyKeyColor(*args)
+    def ApplyKeycolor(*args): return _cspace.csImageMemory_ApplyKeycolor(*args)
+    def GetImageType(*args): return _cspace.csImageMemory_GetImageType(*args)
+    def SetImageType(*args): return _cspace.csImageMemory_SetImageType(*args)
+    def HasMipmaps(*args): return _cspace.csImageMemory_HasMipmaps(*args)
+    def GetMipmap(*args): return _cspace.csImageMemory_GetMipmap(*args)
+    def SetMipmap(*args): return _cspace.csImageMemory_SetMipmap(*args)
+    def Copy(*args): return _cspace.csImageMemory_Copy(*args)
+    def CopyScale(*args): return _cspace.csImageMemory_CopyScale(*args)
+    def CopyTile(*args): return _cspace.csImageMemory_CopyTile(*args)
+    def ConvertFromRGBA(*args): return _cspace.csImageMemory_ConvertFromRGBA(*args)
+    def ConvertFromPal8(*args): return _cspace.csImageMemory_ConvertFromPal8(*args)
+csImageMemory_swigregister = _cspace.csImageMemory_swigregister
+csImageMemory_swigregister(csImageMemory)
 
 class csImageIOFileFormatDescriptions(_object):
     __swig_setmethods__ = {}
@@ -10021,8 +10624,8 @@ class iODEJointState(iBase):
     def SetStopCFM(*args): return _cspace.iODEJointState_SetStopCFM(*args)
     def SetSuspensionERP(*args): return _cspace.iODEJointState_SetSuspensionERP(*args)
     def SetSuspensionCFM(*args): return _cspace.iODEJointState_SetSuspensionCFM(*args)
-    def GetLowStop(*args): return _cspace.iODEJointState_GetLowStop(*args)
-    def GetHighStop(*args): return _cspace.iODEJointState_GetHighStop(*args)
+    def GetLoStop(*args): return _cspace.iODEJointState_GetLoStop(*args)
+    def GetHiStop(*args): return _cspace.iODEJointState_GetHiStop(*args)
     def GetVel(*args): return _cspace.iODEJointState_GetVel(*args)
     def GetMaxForce(*args): return _cspace.iODEJointState_GetMaxForce(*args)
     def GetFudgeFactor(*args): return _cspace.iODEJointState_GetFudgeFactor(*args)
@@ -10180,8 +10783,11 @@ class iODEHinge2Joint(iODEGeneralJointState):
     def GetAnchorError(*args): return _cspace.iODEHinge2Joint_GetAnchorError(*args)
     __swig_destroy__ = _cspace.delete_iODEHinge2Joint
     __del__ = lambda self : None;
+    __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iODEHinge2Joint_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_cspace.iODEHinge2Joint_scfGetVersion)
 iODEHinge2Joint_swigregister = _cspace.iODEHinge2Joint_swigregister
 iODEHinge2Joint_swigregister(iODEHinge2Joint)
+iODEHinge2Joint_scfGetVersion = _cspace.iODEHinge2Joint_scfGetVersion
 
 class iODEHingeJoint(iODEGeneralJointState):
     __swig_setmethods__ = {}
@@ -10771,24 +11377,47 @@ class csPixmap(_object):
     __setattr__ = lambda self, name, value: _swig_setattr(self, csPixmap, name, value)
     __swig_getmethods__ = {}
     __getattr__ = lambda self, name: _swig_getattr(self, csPixmap, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def __init__(self, *args): 
-        this = _cspace.new_csPixmap(*args)
-        try: self.this.append(this)
-        except: self.this = this
     __swig_destroy__ = _cspace.delete_csPixmap
     __del__ = lambda self : None;
-    def SetTextureHandle(*args): return _cspace.csPixmap_SetTextureHandle(*args)
-    def SetTextureRectangle(*args): return _cspace.csPixmap_SetTextureRectangle(*args)
-    def DrawScaled(*args): return _cspace.csPixmap_DrawScaled(*args)
-    def DrawTiled(*args): return _cspace.csPixmap_DrawTiled(*args)
     def Width(*args): return _cspace.csPixmap_Width(*args)
     def Height(*args): return _cspace.csPixmap_Height(*args)
     def Advance(*args): return _cspace.csPixmap_Advance(*args)
     def GetTextureHandle(*args): return _cspace.csPixmap_GetTextureHandle(*args)
+    def DrawScaled(*args): return _cspace.csPixmap_DrawScaled(*args)
+    def DrawScaledAlign(*args): return _cspace.csPixmap_DrawScaledAlign(*args)
+    def Draw(*args): return _cspace.csPixmap_Draw(*args)
+    def DrawAlign(*args): return _cspace.csPixmap_DrawAlign(*args)
+    def DrawTiled(*args): return _cspace.csPixmap_DrawTiled(*args)
 csPixmap_swigregister = _cspace.csPixmap_swigregister
 csPixmap_swigregister(csPixmap)
 csfxShadeVert = _cspace.csfxShadeVert
+
+class csSimplePixmap(csPixmap):
+    __swig_setmethods__ = {}
+    for _s in [csPixmap]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csSimplePixmap, name, value)
+    __swig_getmethods__ = {}
+    for _s in [csPixmap]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, csSimplePixmap, name)
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _cspace.new_csSimplePixmap(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_csSimplePixmap
+    __del__ = lambda self : None;
+    def SetTextureHandle(*args): return _cspace.csSimplePixmap_SetTextureHandle(*args)
+    def SetTextureRectangle(*args): return _cspace.csSimplePixmap_SetTextureRectangle(*args)
+    def DrawScaled(*args): return _cspace.csSimplePixmap_DrawScaled(*args)
+    def DrawTiled(*args): return _cspace.csSimplePixmap_DrawTiled(*args)
+    def Width(*args): return _cspace.csSimplePixmap_Width(*args)
+    def Height(*args): return _cspace.csSimplePixmap_Height(*args)
+    def Advance(*args): return _cspace.csSimplePixmap_Advance(*args)
+    def GetTextureHandle(*args): return _cspace.csSimplePixmap_GetTextureHandle(*args)
+csSimplePixmap_swigregister = _cspace.csSimplePixmap_swigregister
+csSimplePixmap_swigregister(csSimplePixmap)
 
 CS_IS_KEYBOARD_EVENT = _cspace.CS_IS_KEYBOARD_EVENT
 CS_IS_MOUSE_EVENT = _cspace.CS_IS_MOUSE_EVENT
@@ -10813,6 +11442,30 @@ CS_QUERY_REGISTRY_TAG = _cspace.CS_QUERY_REGISTRY_TAG
 CS_LOAD_PLUGIN_ALWAYS = _cspace.CS_LOAD_PLUGIN_ALWAYS
 CS_FX_SETALPHA = _cspace.CS_FX_SETALPHA
 CS_FX_SETALPHA_INT = _cspace.CS_FX_SETALPHA_INT
+class csPrimitives(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csPrimitives, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csPrimitives, name)
+    __repr__ = _swig_repr
+    __swig_getmethods__["GenerateBox"] = lambda x: _cspace.csPrimitives_GenerateBox
+    if _newclass:GenerateBox = staticmethod(_cspace.csPrimitives_GenerateBox)
+    __swig_getmethods__["GenerateQuad"] = lambda x: _cspace.csPrimitives_GenerateQuad
+    if _newclass:GenerateQuad = staticmethod(_cspace.csPrimitives_GenerateQuad)
+    __swig_getmethods__["GenerateSphere"] = lambda x: _cspace.csPrimitives_GenerateSphere
+    if _newclass:GenerateSphere = staticmethod(_cspace.csPrimitives_GenerateSphere)
+    def __init__(self, *args): 
+        this = _cspace.new_csPrimitives(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cspace.delete_csPrimitives
+    __del__ = lambda self : None;
+csPrimitives_swigregister = _cspace.csPrimitives_swigregister
+csPrimitives_swigregister(csPrimitives)
+csPrimitives_GenerateBox = _cspace.csPrimitives_GenerateBox
+csPrimitives_GenerateQuad = _cspace.csPrimitives_GenerateQuad
+csPrimitives_GenerateSphere = _cspace.csPrimitives_GenerateSphere
+
 CS_QUERY_REGISTRY = _cspace.CS_QUERY_REGISTRY
 CS_QUERY_REGISTRY_TAG_INTERFACE = _cspace.CS_QUERY_REGISTRY_TAG_INTERFACE
 SCF_QUERY_INTERFACE = _cspace.SCF_QUERY_INTERFACE
@@ -10868,11 +11521,6 @@ _csPyEventHandler_swigregister(_csPyEventHandler)
 _csPyEventHandler_StaticHandlerName = _cspace._csPyEventHandler_StaticHandlerName
 _csPyEventHandler_StaticID = _cspace._csPyEventHandler_StaticID
 
-def csevCommandLineHelp(reg):
-  csEventNameRegistry.GetID(reg, "crystalspace.application.commandlinehelp")
-  
-CS_EVENTLIST_END = csInvalidStringID
-
 class csPyEventHandler (_csPyEventHandler):
   """Python version of iEventHandler implementation.
      This class can be used as base class for event handlers in Python.
@@ -10908,6 +11556,11 @@ def _csInitializer_SetupEventHandler (reg, obj,
 csInitializer.SetupEventHandler = \
   staticmethod(_csInitializer_SetupEventHandler)
 
+
+def csevCommandLineHelp(reg):
+  csEventNameRegistry.GetID(reg, "crystalspace.application.commandlinehelp")
+  
+CS_EVENTLIST_END = csInvalidStringID
 
 def _csInitializer_RequestPlugins (reg, plugins):
   """Replacement of C++ version."""

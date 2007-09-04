@@ -580,8 +580,8 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
     Sys->selected_polygon = sel;
 
     iMeshObject* obj = mesh->GetMeshObject ();
-    csRef<iObject> psobj = SCF_QUERY_INTERFACE (obj->GetMeshWrapper (),
-    	iObject);
+    csRef<iObject> psobj = 
+    	scfQueryInterface<iObject> (obj->GetMeshWrapper ());
     Sys->Report (CS_REPORTER_SEVERITY_DEBUG, "Hit polygon '%s/%s'",
     	psobj ? psobj->GetName () : "<null>",
 	ps ? ps->GetPolygonName (sel) : "<null>");

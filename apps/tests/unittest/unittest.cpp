@@ -45,7 +45,7 @@ static void Test (iBase* obj, const char* name)
     fflush (stdout);
     return;
   }
-  csRef<iDebugHelper> dbghelp (SCF_QUERY_INTERFACE (obj, iDebugHelper));
+  csRef<iDebugHelper> dbghelp (scfQueryInterface<iDebugHelper> (obj));
   if (dbghelp && (dbghelp->GetSupportedTests () & CS_DBGHELP_UNITTEST))
   {
     csRef<iString> str (dbghelp->UnitTest ());
@@ -73,7 +73,7 @@ static void Benchmark (iBase* obj, const char* name, int num_iterations)
     fflush (stdout);
     return;
   }
-  csRef<iDebugHelper> dbghelp (SCF_QUERY_INTERFACE (obj, iDebugHelper));
+  csRef<iDebugHelper> dbghelp (scfQueryInterface<iDebugHelper> (obj));
   if (dbghelp && (dbghelp->GetSupportedTests () & CS_DBGHELP_BENCHMARK))
   {
     csTicks t = dbghelp->Benchmark (num_iterations);
@@ -88,7 +88,7 @@ static void Benchmark (iBase* obj, const char* name, int num_iterations)
 static int DoStuff (iObjectRegistry* object_reg)
 {
   csRef<iPluginManager> plugmgr (
-  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+  	csQueryRegistry<iPluginManager> (object_reg));
   if (!plugmgr)
   {
     csInitializer::DestroyApplication (object_reg);
@@ -103,7 +103,7 @@ static int DoStuff (iObjectRegistry* object_reg)
 
   csPrintf ("================================================================\n");
 
-  csRef<iEngine> engine (CS_QUERY_REGISTRY (object_reg, iEngine));
+  csRef<iEngine> engine (csQueryRegistry<iEngine> (object_reg));
   Test (engine, "Engine");
 
   csPrintf ("================================================================\n");

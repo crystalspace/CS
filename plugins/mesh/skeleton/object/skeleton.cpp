@@ -1163,7 +1163,7 @@ void csSkeleton::DestroyRagdoll()
 
 csSkeletonFactory::csSkeletonFactory (csSkeletonGraveyard* graveyard, 
                                       iObjectRegistry* object_reg) :
-  scfImplementationType(this, graveyard)
+  scfImplementationType(this)
 {
   csSkeletonFactory::graveyard = graveyard;
   csSkeletonFactory::object_reg = object_reg;
@@ -1294,7 +1294,7 @@ csSkeletonGraveyard::~csSkeletonGraveyard ()
   skeletons.DeleteAll();
   if (object_reg && evhandler)
   {
-    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
     if (q)
       q->RemoveListener (evhandler);
     evhandler = 0;
@@ -1304,9 +1304,9 @@ csSkeletonGraveyard::~csSkeletonGraveyard ()
 bool csSkeletonGraveyard::Initialize (iObjectRegistry* object_reg)
 {
   this->object_reg = object_reg;
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
   PreProcess = csevPreProcess (object_reg);
-  csRef<iEventQueue> eq (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+  csRef<iEventQueue> eq (csQueryRegistry<iEventQueue> (object_reg));
   if (eq == 0) return false;
   evhandler.AttachNew (new csSkelEventHandler (this));
   eq->RegisterListener (evhandler, PreProcess);

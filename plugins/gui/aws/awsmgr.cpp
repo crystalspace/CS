@@ -97,7 +97,7 @@ awsManager::~awsManager ()
 {
   if (scfiEventHandler)
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
     if (q)
       q->RemoveListener (scfiEventHandler);
 
@@ -127,8 +127,8 @@ bool awsManager::Initialize (iObjectRegistry *object_reg)
   GroupOff = awsGroupOff (object_reg);
   FrameStart = awsFrameStart (object_reg);
 
-  prefmgr = SCF_CREATE_INSTANCE("crystalspace.window.preferencemanager",
-				iAwsPrefManager);
+  prefmgr = scfCreateInstance<iAwsPrefManager> (
+    "crystalspace.window.preferencemanager");
   if (!prefmgr)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.aws",
@@ -140,8 +140,8 @@ bool awsManager::Initialize (iObjectRegistry *object_reg)
   if (!prefmgr->Setup (object_reg))
     return false;
 
-  sinkmgr = SCF_CREATE_INSTANCE ("crystalspace.window.sinkmanager",
-			        iAwsSinkManager);
+  sinkmgr = scfCreateInstance<iAwsSinkManager> (
+    "crystalspace.window.sinkmanager");
   if (!sinkmgr)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.aws",
@@ -152,8 +152,8 @@ bool awsManager::Initialize (iObjectRegistry *object_reg)
   if (!sinkmgr->Setup (object_reg))
     return false;
 
-  strset = CS_QUERY_REGISTRY_TAG_INTERFACE(object_reg,
-    "crystalspace.shared.stringset", iStringSet);
+  strset = csQueryRegistryTagInterface<iStringSet>
+    (object_reg, "crystalspace.shared.stringset");
   if (!strset.IsValid())
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.aws",
@@ -917,7 +917,7 @@ void awsManager::CreateChildrenFromDef (
     if (key->Type () == KEY_COMPONENT)
     {
       csRef<iAwsComponentNode> comp_node (
-      	SCF_QUERY_INTERFACE(key, iAwsComponentNode));
+      	scfQueryInterface<iAwsComponentNode> (key));
       CS_ASSERT(comp_node);
       iAwsComponentFactory *factory = FindComponentFactory (
           comp_node->ComponentTypeName ()->GetData ());
@@ -939,14 +939,14 @@ void awsManager::CreateChildrenFromDef (
     {
       int j;
       csRef<iAwsKeyContainer> conmap (
-      	SCF_QUERY_INTERFACE(key, iAwsKeyContainer));
+      	scfQueryInterface<iAwsKeyContainer> (key));
       CS_ASSERT(conmap);
       awsSlot *slot = new awsSlot ();
 
       for (j = 0; j < conmap->Length (); ++j)
       {
         csRef<iAwsConnectionKey> con (
-		SCF_QUERY_INTERFACE(conmap->GetAt (j), iAwsConnectionKey));
+		scfQueryInterface<iAwsConnectionKey> (conmap->GetAt (j)));
         CS_ASSERT(con);
 
         slot->Connect (parent, con->Signal (), con->Sink (), con->Trigger ());

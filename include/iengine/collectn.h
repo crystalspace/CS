@@ -42,8 +42,11 @@ struct iObject;
  * Main users of this interface:
  * - Engine stores them.
  * - Application uses them.
+ *
+ * \deprecated Don't use collections. They are obsolete.
  */
-struct iCollection : public virtual iBase
+struct CS_DEPRECATED_TYPE_MSG ("Collections are obsolete. Don't use then")
+	iCollection : public virtual iBase
 {
   SCF_INTERFACE(iCollection, 2,0,0);
   /// Query the iObject for this collection
@@ -65,6 +68,8 @@ struct iCollection : public virtual iBase
   virtual iObject* GetObject (int i) const = 0;
 };
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * iCollection list.
  *
@@ -75,7 +80,8 @@ struct iCollection : public virtual iBase
  *   - Engine stores them.
  *   - Application uses them.
  */
-struct iCollectionList : public virtual iBase
+struct CS_DEPRECATED_TYPE_MSG ("Collections are obsolete. Don't use then")
+  iCollectionList : public virtual iBase
 {
   SCF_INTERFACE(iCollectionList,2,0,0);
   /// Create a new collection.
@@ -105,6 +111,8 @@ struct iCollectionList : public virtual iBase
   /// Find a collection by name.
   virtual iCollection *FindByName (const char *Name) const = 0;
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_IENGINE_COLLECTN_H__
 

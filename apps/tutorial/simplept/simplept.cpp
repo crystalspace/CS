@@ -48,8 +48,8 @@ bool Simple::CreateGenMesh (iMaterialWrapper* mat)
 	"Can't make genmesh factory!");
     return false;
   }
-  factstate = SCF_QUERY_INTERFACE (genmesh_fact->GetMeshObjectFactory (),
-  	iGeneralFactoryState);
+  factstate = 
+  	scfQueryInterface<iGeneralFactoryState> (genmesh_fact->GetMeshObjectFactory ());
   if (!factstate)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -116,8 +116,8 @@ bool Simple::CreateGenMesh (iMaterialWrapper* mat)
     return false;
   }
   csRef<iGeneralMeshState> state (
-  	SCF_QUERY_INTERFACE (genmesh->GetMeshObject (),
-  	iGeneralMeshState));
+  	
+  	scfQueryInterface<iGeneralMeshState> (genmesh->GetMeshObject ()));
   if (!state)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -244,10 +244,10 @@ bool Simple::Initialize ()
   }
 
   // The virtual clock.
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
 
   // Find the pointer to engine plugin
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = csQueryRegistry<iEngine> (object_reg);
   if (!engine)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -256,7 +256,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  loader = csQueryRegistry<iLoader> (object_reg);
   if (!loader)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -265,7 +265,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
   if (!g3d)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -274,7 +274,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  kbd = csQueryRegistry<iKeyboardDriver> (object_reg);
   if (!kbd)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -319,7 +319,7 @@ bool Simple::Initialize ()
   // Create the procedural texture and a material for it
   ProcTexture = new csEngineProcTex ();
   // Find the pointer to VFS.
-  csRef<iVFS> VFS (CS_QUERY_REGISTRY (object_reg, iVFS));
+  csRef<iVFS> VFS (csQueryRegistry<iVFS> (object_reg));
   if (!VFS)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -387,7 +387,7 @@ bool Simple::HandleEvent (iEvent& Event)
   if ((Event.Name == csevKeyboardDown(object_reg)) && 
     (csKeyEventHelper::GetCookedCode (&Event) == CSKEY_ESC))
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
     if (q)
       q->GetEventOutlet()->Broadcast (csevQuit(object_reg));
     return true;

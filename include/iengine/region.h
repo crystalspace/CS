@@ -38,7 +38,6 @@ struct iObject;
 struct iSector;
 struct iTextureWrapper;
 
-
 /**
  * A region. A region is basically a collection of objects in the
  * 3D engine that can be treated as a unit.
@@ -106,8 +105,10 @@ struct iRegion : public virtual iBase
   virtual iMaterialWrapper *FindMaterial (const char *iName) = 0;
   /// Find a camera position in this region by name
   virtual iCameraPosition *FindCameraPosition (const char *iName) = 0;
+#include "csutil/win32/msvc_deprecated_warn_off.h"
   /// Find a collection in this region by name
   virtual iCollection *FindCollection (const char *iName) = 0;
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
   /**
    * Check if some object is in this region.

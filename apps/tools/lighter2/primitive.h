@@ -16,38 +16,41 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __RADPRIMITIVE_H__
-#define __RADPRIMITIVE_H__
+#ifndef __PRIMITIVE_H__
+#define __PRIMITIVE_H__
 
 #include "common.h"
-#include "radpatch.h"
 #include "csutil/set.h"
 
 
 
 namespace lighter
 {
-  class RadObject;
-  struct RadObjectVertexData;
+  class Object;
+  struct ObjectVertexData;
+  struct ElementProxy;
 
   /**
   * Primitive in the radiosity world.
   * Represents a single primitive (face) in the radiosity world.
   */
-  class RadPrimitive
+  class Primitive
   {
   public:
+    typedef CS::TriangleT<size_t> TriangleType;
+
     // Constructors
-    inline RadPrimitive (RadObjectVertexData &dataHolder) 
+    inline Primitive (ObjectVertexData &dataHolder) 
       : vertexData(dataHolder),
       uFormVector (0), vFormVector (0), illuminationColor (0,0,0),
-      reflectanceColor (1.0f,1.0f,1.0f), uPatches (0), vPatches (0), minCoord (0),
+      reflectanceColor (1.0f,1.0f,1.0f), minCoord (0),
       minUV (0,0), maxUV (0,0), originalPrim (0), radObject (0)
     {
     }
 
-    ///Split primitive into two. Front side is kept in current
-    bool Split (const csPlane3& plane, RadPrimitive &back);
+    /// Split primitive into two.
+    bool Split (const csPlane3& splitPlane, csArray<Primitive>& front,
+      csArray<Primitive>& back) const;
 
     /// Calculate min-max UV-coords
     void ComputeMinMaxUV (csVector2 &min, csVector2 &max) const;
@@ -59,24 +62,9 @@ namespace lighter
       ComputeMinMaxUV (min, max);
       minU = (int)floor (min.x);
       minV = (int)floor (min.y);
-      maxU = (int)floor (max.x);
-      maxV = (int)floor (max.y);
+      maxU = (int)ceil (max.x);
+      maxV = (int)ceil (max.y);
     }
-
-    /// Fix down the min/max to ints..
-/*    inline void QuantizeUVs ()
-    {
-      //TODO Move to per object
-      for (uint i = 0; i < lightmapUVs.GetSize (); i++)
-      {
-        csVector2 &uv = lightmapUVs[i];
-        uv.x = int(uv.x+0.5);
-        uv.y = int(uv.y+0.5);
-      }
-    }*/
-
-    /// Remap (in linear fashion) the UVs
-    void RemapUVs (csVector2 &move);
 
     /// Calculate and save primitive plane
     void ComputePlane ();
@@ -93,37 +81,43 @@ namespace lighter
     /// Calculate the u/v form vectors
     void ComputeUVTransform ();
 
-    /// Prepare the primitive, create patches and elements
-    void Prepare (uint uResolution, uint vResolution);
-
-    /// Prepare the primitive wihtout creating new patches (just make sure elements are right)
-    void PrepareNoPatches ();
-
-    /// Build a 
-    csPoly3D BuildPoly3D () const;
+    /**
+     * Prepare the primitive, create elements.
+     */
+    void Prepare ();
 
     /// Classify with respect to another plane
     int Classify (const csPlane3 &plane) const;
 
-    /// Return triangles (triangulated version)
-    csArray<csTriangle> BuildTriangulated() const;
+    /// Compute the two barycentric coordinates given a point
+    void ComputeBaryCoords (const csVector3& v, float& lambda, float& my) const;
 
-    // Data accessors
-    /*
-    inline Vector3DArray& GetVertices () { return vertices; }
-    inline const Vector3DArray& GetVertices () const { return vertices; }
+    /// Compute if point is inside primitive or not
+    bool PointInside (const csVector3& pt) const;
 
-    inline Vector2DArray& GetUVs () { return lightmapUVs; }
-    inline const Vector2DArray& GetUVs () const { return lightmapUVs; }
+    /// Given a point, compute the element index
+    size_t ComputeElementIndex (const csVector3& pt) const;
 
-    inline IntDArray& GetExtraData () { return extraData; }
-    inline const IntDArray& GetExtraData () const { return extraData; }
-*/
-    inline SizeTDArray& GetIndexArray () { return indexArray; }
-    inline const SizeTDArray& GetIndexArray () const { return indexArray; }
+    /// Given an element index, compute center point
+    csVector3 ComputeElementCenter (size_t index) const;
 
-    inline RadObjectVertexData& GetVertexData () { return vertexData; }
-    inline const RadObjectVertexData& GetVertexData () const { return vertexData; }
+    /// Get an element proxy given element index
+    ElementProxy GetElement (size_t index);
+
+    /// Get an element proxy given point
+    ElementProxy GetElement (const csVector3& pt);
+
+    size_t GetElementCount () const
+    {
+      return elementAreas.GetSize ();
+    }
+
+    inline TriangleType& GetTriangle () { return triangle; }
+    inline const TriangleType& GetTriangle () const { return triangle; }
+    inline void SetTriangle (const TriangleType& t) { triangle = t; }
+
+    inline ObjectVertexData& GetVertexData () { return vertexData; }
+    inline const ObjectVertexData& GetVertexData () const { return vertexData; }
 
     inline const csPlane3& GetPlane () const { return plane; }
 
@@ -135,38 +129,31 @@ namespace lighter
 
     inline const FloatDArray& GetElementAreas () const { return elementAreas; }
 
-    inline const RadPatchArray& GetPatches () const { return patches; }
-    inline RadPatchArray& GetPatches () { return patches; }
-    inline uint GetuPatches () const { return uPatches; }
-    inline uint GetvPatches () const { return vPatches; }
-
     inline const csVector3& GetMinCoord () const { return minCoord; }
     inline const csVector2& GetMinUV () const { return minUV; }
     inline const csVector2& GetMaxUV () const { return maxUV; }
 
-    inline const RadPrimitive* GetOriginalPrimitive () const { return originalPrim; }
-    inline void SetOriginalPrimitive (RadPrimitive *p) { originalPrim = p; }
+    inline const Primitive* GetOriginalPrimitive () const { return originalPrim; }
+    inline void SetOriginalPrimitive (Primitive *p) { originalPrim = p; }
 
-    inline const RadObject* GetRadObject () const { return radObject; }
-    inline RadObject* GetRadObject () { return radObject; }
-    inline void SetRadObject (RadObject *obj) { radObject = obj; }
+    inline const Object* GetObject () const { return radObject; }
+    inline Object* GetObject () { return radObject; }
+    inline void SetObject (Object *obj) { radObject = obj; }
 
     inline uint GetGlobalLightmapID () const { return globalLightmapID; }
     inline void SetGlobalLightmapID (uint id) { globalLightmapID = id; }
+
+    
   protected:
-    // Lightmap texture coordinates
-    //Vector2DArray lightmapUVs;
-
-    // Extra per-vertex data (meshtype specific)
-    //IntDArray extraData;
-
     /// Vertex data holder
-    RadObjectVertexData& vertexData;
+    ObjectVertexData& vertexData;
 
     /// Index array for this primitive
-    SizeTDArray indexArray;
+    TriangleType triangle;
 
     /// Computed plane
+    /* Plane normal seems to point into opposite direction compared to e.g.
+     * auto-computed vertex normals. (FIXME?) */
     csPlane3 plane;
 
     /// Mapping vectors
@@ -180,33 +167,56 @@ namespace lighter
     /// Elements
     FloatDArray elementAreas;
 
-    /// Patches
-    RadPatchArray patches;
-    uint uPatches;
-    uint vPatches;
-
     /// Min/max data
     csVector3 minCoord;
     csVector2 minUV;
     csVector2 maxUV;
 
     /// Pointer to unchanged prim
-    RadPrimitive *originalPrim;
+    Primitive *originalPrim;
 
     /// Original object
-    RadObject* radObject;
+    Object* radObject;
 
     /// GLobal lightmap id
     // @@@ Only meaningful for object primitives
     uint globalLightmapID;
+
+    /* Coefficients to computer barycentric coordinates for a point on the
+     * primitive. 
+     * \remarks
+     * Also see http://en.wikipedia.org/wiki/Barycentric_coordinates_%28mathematics%29
+     *
+     * Tho, the formulae used in this code are, in comparison to those given,
+     * in the above article, quite mangled.
+     */
+    csVector3 lambdaCoeffTV, myCoeffTV;
+
+    void ComputeBaryCoeffs ();
   };
 
-  typedef csArray<RadPrimitive> RadPrimitiveArray;
-  typedef csArray<RadPrimitive*> RadPrimitivePtrArray;
-  typedef csSet<RadPrimitive*> RadPrimitivePtrSet;
+  typedef csArray<Primitive> PrimitiveArray;
+  typedef csArray<Primitive*> PrimitivePtrArray;
+  typedef csSet<Primitive*> PrimitivePtrSet;
+
+
+  /// Small helper that acts as a reference to a single element (pixel)
+  struct ElementProxy
+  {
+    ElementProxy (Primitive& p, size_t e)
+      : primitive (p), element (e)
+    {
+    }
+
+    /// Primitive we are a part of
+    Primitive& primitive;
+
+    /// Primitive index
+    size_t element;
+  };
 }
 
 template<>
-class csHashComputer<lighter::RadPrimitive*> : public csHashComputerIntegral<lighter::RadPrimitive*> {};
+class csHashComputer<lighter::Primitive*> : public csHashComputerIntegral<lighter::Primitive*> {};
 
 #endif

@@ -92,8 +92,8 @@ csPhysicsLoader::~csPhysicsLoader ()
 bool csPhysicsLoader::Initialize (iObjectRegistry* object_reg)
 {
   csPhysicsLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
   xmltokens.Register ("system", XMLTOKEN_SYSTEM);
   xmltokens.Register ("gravity", XMLTOKEN_GRAVITY);
@@ -138,9 +138,9 @@ csPtr<iBase> csPhysicsLoader::Parse (iDocumentNode* node,
 		iStreamSource*, iLoaderContext* /*ldr_context*/,
 		iBase* /*context*/)
 {
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = csQueryRegistry<iEngine> (object_reg);
   CS_ASSERT (engine != 0);
-  csRef<iDynamics> dynamics = CS_QUERY_REGISTRY (object_reg, iDynamics);
+  csRef<iDynamics> dynamics = csQueryRegistry<iDynamics> (object_reg);
   if (dynamics == 0)
   {
     synldr->ReportError ("crystalspace.dynamics.loader",
@@ -186,8 +186,8 @@ bool csPhysicsLoader::ParseSystem (iDocumentNode* node, iDynamicSystem* system)
   const char *name = node->GetAttributeValue ("name");
   system->QueryObject()->SetName (name);
   // Look for ODE specific properties
-  csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (
-			system, iODEDynamicSystemState);
+  csRef<iODEDynamicSystemState> osys = 
+    scfQueryInterface<iODEDynamicSystemState> (system);
   if (osys)
   {
     if (node->GetAttribute("cfm"))
@@ -296,8 +296,8 @@ bool csPhysicsLoader::ParseSystem (iDocumentNode* node, iDynamicSystem* system)
       }
       case XMLTOKEN_AUTODISABLE:
       {
-	csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (
-			system, iODEDynamicSystemState);
+	csRef<iODEDynamicSystemState> osys =
+          scfQueryInterface<iODEDynamicSystemState> (system);
 	if (osys)
 	{
 	  bool autodisable;
@@ -317,8 +317,8 @@ bool csPhysicsLoader::ParseSystem (iDocumentNode* node, iDynamicSystem* system)
     	const char* sm = child->GetContentsValue ();
 	csStringID sm_id = xmltokens.Request (sm);
 
-	csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (
-			system, iODEDynamicSystemState);
+	csRef<iODEDynamicSystemState> osys =
+          scfQueryInterface<iODEDynamicSystemState> (system);
 	if (osys)
 	{
 	  switch (sm_id)

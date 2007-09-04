@@ -60,11 +60,11 @@ bool csCursor::Initialize (iObjectRegistry *objreg)
   reg = objreg;
 
   // Get image IO
-  io = CS_QUERY_REGISTRY (reg, iImageIO);
+  io = csQueryRegistry<iImageIO> (reg);
   if (!io) return false;
 
   // Get event queue
-  eventq = CS_QUERY_REGISTRY (reg, iEventQueue);
+  eventq = csQueryRegistry<iEventQueue> (reg);
   if (!eventq) return false;
   csEventID events[3] = { csevPostProcess(reg), csevMouseEvent(reg), 
 			  CS_EVENTLIST_END };
@@ -75,7 +75,7 @@ bool csCursor::Initialize (iObjectRegistry *objreg)
 
 bool csCursor::ParseConfigFile (iConfigFile* ini)
 {
-  csRef<iVFS> VFS = CS_QUERY_REGISTRY (reg, iVFS);
+  csRef<iVFS> VFS = csQueryRegistry<iVFS> (reg);
   if (!VFS)
       return false;
 
@@ -234,9 +234,9 @@ bool csCursor::HandleEvent (iEvent &ev)
 	}
 	ci->pixmap = pixmap;
       }
-      csRef<iVirtualClock> vc = CS_QUERY_REGISTRY (reg, iVirtualClock);
+      csRef<iVirtualClock> vc = csQueryRegistry<iVirtualClock> (reg);
       ci->pixmap->Advance (vc->GetElapsedTicks ());
-      csRef<iMouseDriver> mouse = CS_QUERY_REGISTRY (reg, iMouseDriver);
+      csRef<iMouseDriver> mouse = csQueryRegistry<iMouseDriver> (reg);
 
       ci->pixmap->Draw (g3d, (int)(mouse->GetLastX() - ci->hotspot.x),
                              (int)(mouse->GetLastY() - ci->hotspot.y),

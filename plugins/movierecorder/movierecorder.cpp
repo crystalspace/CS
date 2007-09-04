@@ -52,7 +52,7 @@ void csMovieRecorder::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
+  csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
   if (rep)
     rep->ReportV (severity, "crystalspace.movierecorder", msg, arg);
   else
@@ -81,7 +81,7 @@ csMovieRecorder::~csMovieRecorder ()
     
   if (eventHandler)
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
     if (q)
       q->RemoveListener (eventHandler);
   }
@@ -107,7 +107,7 @@ bool csMovieRecorder::Initialize (iObjectRegistry* iobject_reg)
   {
     eventHandler.AttachNew (new EventHandler (this));
   }
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0)
   {
     csEventID events[4] = { KeyboardEvent,
@@ -141,16 +141,16 @@ void csMovieRecorder::SetupPlugin()
 {
   if (initialized) return;
 
-  if (!Engine) Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  if (!Engine) Engine = csQueryRegistry<iEngine> (object_reg);
 
-  if (!G2D) G2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
+  if (!G2D) G2D = csQueryRegistry<iGraphics2D> (object_reg);
   if (!G2D)
   {
     csPrintf ("No G2D!\n");
     return;
   }
 
-  if (!VFS) VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  if (!VFS) VFS = csQueryRegistry<iVFS> (object_reg);
   if (!VFS)
   {
     csPrintf ("No VFS!\n");

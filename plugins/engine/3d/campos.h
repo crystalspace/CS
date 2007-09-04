@@ -79,7 +79,7 @@ public:
 
 private:
   /// The sector this camera points to
-  char* sector;
+  csString sector;
   /// The camera position
   csVector3 position;
   /// Camera orientation: forward vector

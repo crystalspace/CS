@@ -29,4 +29,8 @@
 /// Hook to resolve certain VFS vars on some platforms. (E.g. HOME on Win32)
 CS_CRYSTALSPACE_EXPORT const char* csCheckPlatformVFSVar(const char* VarName);
 
+/// Hook to expand VFS mount paths on some platforms.
+/// (E.g. Cygwin filenames to Win32 filenames)
+void csExpandPlatformFilename(const char *inputFilename, char *outputFilename);
+
 #endif // __CS_CSUTIL_VFSPLAT_H__

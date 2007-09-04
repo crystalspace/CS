@@ -19,6 +19,8 @@
 #ifndef __CS_CSUTIL_THREADING_PTHREAD_MUTEX_H__
 #define __CS_CSUTIL_THREADING_PTHREAD_MUTEX_H__
 
+#ifndef DOXYGEN_RUN
+
 #include <pthread.h>
 
 namespace CS
@@ -209,4 +211,6 @@ namespace Implementation
 } // namespace Threading
 } // namespace CS
 
-#endif
+#endif // DOXYGEN_RUN
+
+#endif // __CS_CSUTIL_THREADING_PTHREAD_MUTEX_H__

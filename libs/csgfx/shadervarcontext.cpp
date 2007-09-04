@@ -103,7 +103,9 @@ csShaderVariableContext::csShaderVariableContext () :
 {}
 
 csShaderVariableContext::csShaderVariableContext (
-  const csShaderVariableContext& other) : scfImplementationType(this)
+  const csShaderVariableContext& other) :
+  iBase(), iShaderVariableContext(),
+  scfImplementationType(this), CS::ShaderVariableContextImpl()
 {
   variables = other.variables;
 }

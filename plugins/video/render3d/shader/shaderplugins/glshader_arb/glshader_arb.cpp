@@ -100,9 +100,9 @@ bool csGLShader_ARB::Initialize(iObjectRegistry* reg)
 {
   object_reg = reg;
 
-  csRef<iGraphics3D> r = CS_QUERY_REGISTRY(object_reg,iGraphics3D);
+  csRef<iGraphics3D> r = csQueryRegistry<iGraphics3D> (object_reg);
 
-  csRef<iFactory> f = SCF_QUERY_INTERFACE (r, iFactory);
+  csRef<iFactory> f = scfQueryInterface<iFactory> (r);
   if (f != 0 && strcmp ("crystalspace.graphics3d.opengl", 
       f->QueryClassID ()) == 0)
     enable = true;
