@@ -519,7 +519,6 @@ bool csIntersect3::SegmentPlane (
   csVector3 &isect,
   float &dist)
 {
-  float counter = normal * (u - a);
   float divider = normal * (v - u);
   if (divider == 0)
   {
@@ -527,6 +526,7 @@ bool csIntersect3::SegmentPlane (
     return false;
   }
 
+  float counter = normal * (u - a);
   dist = -counter / divider;
   isect = u + dist * (v - u);
   return true;
@@ -559,6 +559,39 @@ bool csIntersect3::SegmentPlane (
 
   isect = u + dist * -uv;
   return true;
+}
+
+bool csIntersect3::SegmentPlane (
+  const csPlane3& plane,
+  csSegment3& segment)
+{
+  const csVector3& start = segment.Start ();
+  const csVector3& end = segment.End ();
+
+  csVector3 isec;
+  float dist;
+
+  if (SegmentPlane (start, end, plane, isec, dist))
+  {
+    // Have an intersection, update segment
+    const csVector3 d = end - start;
+    const float dd = d * plane.norm;
+
+    if (dd > 0)
+    {
+      // Plane pointing opposite to segment, update end
+      segment.SetEnd (isec);
+    }
+    else
+    {
+      segment.SetStart (isec);
+    }
+
+    return true;
+  }
+
+
+  return false;
 }
 
 bool csIntersect3::ThreePlanes (
@@ -772,10 +805,10 @@ int csIntersect3::BoxSegment (
           isect.y = r * (v.y - u.y) + u.y;
           isect.z = r * (v.z - u.z) + u.z;
           if (
-            isect.y >= box.MinY () &&
-            isect.y <= box.MaxY () &&
-            isect.z >= box.MinZ () &&
-            isect.z <= box.MaxZ ())
+            isect.y + EPSILON >= box.MinY () &&
+            isect.y - EPSILON <= box.MaxY () &&
+            isect.z + EPSILON >= box.MinZ () &&
+            isect.z - EPSILON <= box.MaxZ ())
           {
             if (pr) *pr = r;
             return sides[i];
@@ -844,10 +877,10 @@ bool csIntersect3::BoxFrustum (const csBox3& box, const csFrustum* frustum)
   csVector3 d = box.Max ()-m;		// Half-diagonal.
 
   const csVector3& origin = frustum->GetOrigin ();
-  int vtcount = frustum->GetVertexCount ();
+  size_t vtcount = frustum->GetVertexCount ();
   csVector3* vts = frustum->GetVertices ();
-  int i1 = vtcount-1;
-  int i;
+  size_t i1 = vtcount-1;
+  size_t i;
   for (i = 0 ; i < vtcount ; i++)
   {
     csPlane3 p (origin, vts[i], vts[i1]);
@@ -866,7 +899,7 @@ bool csIntersect3::BoxFrustum (const csBox3& box, const csFrustum* frustum)
   return true;
 }
 
-bool csIntersect3::BoxFrustum (const csBox3& box, csPlane3* f,
+bool csIntersect3::BoxFrustum (const csBox3& box, const csPlane3* f,
 	uint32 inClipMask, uint32& outClipMask)
 {
   csVector3 m = box.GetCenter ();

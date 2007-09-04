@@ -30,7 +30,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
 {
   VertexTransform::VertexTransform() : do_near_plane (false)
   {
-    bufferPtrs.SetLength (activeBufferCount);
+    bufferPtrs.SetSize (activeBufferCount);
   }
 
   inline void VertexLTNToVector3 (csVector3& out, const float* data)

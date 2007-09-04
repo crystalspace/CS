@@ -25,42 +25,50 @@
 namespace lighter
 {
 
+  struct ObjectFactoryVertexData;
   struct ObjectVertexData;
   
-  class LightmapUVLayoutFactory;
+  class LightmapUVObjectLayouter;
+  class ObjectFactory;
 
-  class LightmapUVLayouter 
+  class LightmapUVFactoryLayouter : public csRefCount
   {
   public:
-    virtual ~LightmapUVLayouter() {}
+    virtual ~LightmapUVFactoryLayouter () {}
     /**
      * Lay out lightmaps for a factory.
      * This should split vertices as necessary and assign primitives
      * to lightmaps.
      * \param inPrims Input primitives.
      * \param inPrims Input vertex data.
+     * \param factory Factory object primitives are part of
      * \param outPrims Output primitives. A number of primitive arrays. All
      *   primitives of a sub-array would fit on a single lightmap.
      */
-    virtual LightmapUVLayoutFactory* LayoutFactory (
-      const PrimitiveArray& inPrims, ObjectVertexData& vertexData,
-      csArray<PrimitiveArray>& outPrims) = 0;
+    virtual csPtr<LightmapUVObjectLayouter> LayoutFactory (
+      const FactoryPrimitiveArray& inPrims, ObjectFactoryVertexData& vertexData,
+      const ObjectFactory* factory, csArray<FactoryPrimitiveArray>& outPrims,
+      csBitArray& usedVerts) = 0;
+
+    virtual void PrepareLighting (Statistics::Progress& progress) = 0;
   };
 
-  class LightmapUVLayoutFactory
+  class LightmapUVObjectLayouter : public csRefCount
   {
   public:
-    virtual ~LightmapUVLayoutFactory() {}
     /**
-     * Lay out lightmaps for primitives of ab object.
+     * Lay out lightmaps for primitives of an object.
      * \param prims Input primitives.
      * \param groupNum Index of the primitive arrays as returned by 
      *   LightmapUVLayouter::LayoutFactory.
-     * \param inPrims Input vertex data.
+     * \param vertexData Input vertex data.
      * \param lmID Output global lightmap ID onto which all primitives were
      *   layouted.
      */
-    virtual bool LayoutUVOnPrimitives (PrimitiveArray &prims, 
+    virtual size_t LayoutUVOnPrimitives (PrimitiveArray &prims, 
+      size_t groupNum, Sector* sector, const csBitArray& pdBits) = 0;
+
+    virtual void FinalLightmapLayout (PrimitiveArray &prims, size_t layoutID,
       size_t groupNum, ObjectVertexData& vertexData, uint& lmID) = 0;
   };
 

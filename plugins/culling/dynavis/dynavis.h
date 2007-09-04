@@ -278,6 +278,8 @@ private:
 
   // Given an occluder, update it in the coverage buffer.
   void UpdateCoverageBuffer (csVisibilityObjectWrapper* obj);
+  void UpdateCoverageBufferPoly (csVisibilityObjectWrapper* obj);
+  void UpdateCoverageBufferTri (csVisibilityObjectWrapper* obj);
 
   // Given an occluder, update it in the coverage buffer. Using the outline.
   void UpdateCoverageBufferOutline (csVisibilityObjectWrapper* obj);

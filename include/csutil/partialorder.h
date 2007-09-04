@@ -93,16 +93,16 @@ public:
   void Dump (iObjectRegistry *objreg)
   {
     std::cerr << "Dumping PO Graph..." << std::endl;
-    for (size_t i=0 ; i<Nodes.Length() ; i++)
+    for (size_t i=0 ; i<Nodes.GetSize () ; i++)
     {
       std::cerr << "  NODE: " << csEventHandlerRegistry::GetRegistry(objreg)->GetString(Nodes[i].self) << std::endl;
       std::cerr << "    pre: ";
-      for (size_t j=0 ; j<Nodes[i].pre.Length() ; j++) 
+      for (size_t j=0 ; j<Nodes[i].pre.GetSize () ; j++) 
       {
 	std::cerr << csEventHandlerRegistry::GetRegistry(objreg)->GetString(Nodes[Nodes[i].pre[j]].self) << " ";
       }
       std::cerr << std::endl << "    post: ";
-      for (size_t j=0 ; j<Nodes[i].post.Length() ; j++)
+      for (size_t j=0 ; j<Nodes[i].post.GetSize () ; j++)
       {
 	std::cerr << csEventHandlerRegistry::GetRegistry(objreg)->GetString(Nodes[Nodes[i].post[j]].self) << " ";
       }
@@ -151,7 +151,7 @@ public:
       return false;
     size_t PreIdx = NodeMap.Get (pre, csArrayItemNotFound);
     size_t PostIdx = NodeMap.Get (post, csArrayItemNotFound);
-    for (size_t i=0 ; i<Nodes[PreIdx].post.Length() ; i++)
+    for (size_t i=0 ; i<Nodes[PreIdx].post.GetSize () ; i++)
     {
       if (Nodes[PreIdx].post[i] == PostIdx)
       {
@@ -167,16 +167,16 @@ public:
     SanityCheck();
     size_t p = NodeMap.Get(node, csArrayItemNotFound);
     CS_ASSERT(p!=csArrayItemNotFound);
-    CS_ASSERT(p < Nodes.Length());
+    CS_ASSERT(p < Nodes.GetSize ());
     // delete all posts pointing to node
-    for (size_t iter=0 ; iter<Nodes[p].pre.Length() ; iter++) 
+    for (size_t iter=0 ; iter<Nodes[p].pre.GetSize () ; iter++) 
     {
       Nodes[Nodes[p].pre[iter]].post.Delete(p);
     }
     // delete node's pre's
     Nodes[p].pre.DeleteAll();
     // delete all pres pointing to node
-    for (size_t iter=0 ; iter<Nodes[p].post.Length() ; iter++) 
+    for (size_t iter=0 ; iter<Nodes[p].post.GetSize () ; iter++) 
     {
       Nodes[Nodes[p].post[iter]].pre.Delete(p);
     }
@@ -188,21 +188,21 @@ public:
     // update NodeMap accordingly by killing the lookup for the deleted node
     // and updating the lookup for the node that moved into its place...
     NodeMap.Delete(node, p);
-    if (Nodes.Length() > p)
+    if (Nodes.GetSize () > p)
     {
       // who got moved into "p"?
       size_t moved = NodeMap.Get(Nodes[p].self, csArrayItemNotFound);
       CS_ASSERT (moved != csArrayItemNotFound);
 
       // change references to "moved" to reference "p"
-      for (size_t iter=0 ; iter<Nodes.Length() ; iter++)
+      for (size_t iter=0 ; iter<Nodes.GetSize () ; iter++)
       {
-	for (size_t iter2=0 ; iter2<Nodes[iter].pre.Length() ; iter2++)
+	for (size_t iter2=0 ; iter2<Nodes[iter].pre.GetSize () ; iter2++)
 	{
 	  if (Nodes[iter].pre[iter2] == moved)
 	    Nodes[iter].pre[iter2] = p;
 	}
-	for (size_t iter2=0 ; iter2<Nodes[iter].post.Length() ; iter2++)
+	for (size_t iter2=0 ; iter2<Nodes[iter].post.GetSize () ; iter2++)
 	{
 	  if (Nodes[iter].post[iter2] == moved)
 	    Nodes[iter].post[iter2] = p;
@@ -263,7 +263,7 @@ public:
   /// Number of nodes in the graph
   size_t Size ()
   {
-    return Nodes.Length();
+    return Nodes.GetSize ();
   }
 
   /// Return a node with a given index (0 through Size()-1)
@@ -279,7 +279,7 @@ public:
   void Solve (csList<const T> & result)
   {
     SanityCheck();
-    for (size_t iter=0 ; iter<Nodes.Length() ; iter++) 
+    for (size_t iter=0 ; iter<Nodes.GetSize () ; iter++) 
     {
       Nodes[iter].output = false;
     }
@@ -288,12 +288,12 @@ public:
     do 
     {
       done = true;
-      for (size_t iter=0 ; iter<Nodes.Length() ; iter++) 
+      for (size_t iter=0 ; iter<Nodes.GetSize () ; iter++) 
       {
 	if (Nodes[iter].output == false) 
 	{
 	  int canoutput = true;
-	  for (size_t i2=0 ; i2<Nodes[iter].pre.Length() ; i2++) 
+	  for (size_t i2=0 ; i2<Nodes[iter].pre.GetSize () ; i2++) 
 	  {
 	    if (!Nodes[Nodes[iter].pre[i2]].output) 
 	    {
@@ -325,7 +325,7 @@ public:
   {
     size_t i = NodeMap.Get(node, csArrayItemNotFound);
     CS_ASSERT(i != csArrayItemNotFound);
-    CS_ASSERT(i < Nodes.Length());
+    CS_ASSERT(i < Nodes.GetSize ());
     Nodes[i].marked = true;
   }
   
@@ -336,7 +336,7 @@ public:
   {
     size_t i = NodeMap.Get(node, csArrayItemNotFound);
     CS_ASSERT(i != csArrayItemNotFound);
-    CS_ASSERT(i < Nodes.Length());
+    CS_ASSERT(i < Nodes.GetSize ());
     return Nodes[i].marked;
   }
   
@@ -347,7 +347,7 @@ public:
   {
     size_t i = NodeMap.Get(node, csArrayItemNotFound);
     CS_ASSERT(i != csArrayItemNotFound);
-    CS_ASSERT(i < Nodes.Length());
+    CS_ASSERT(i < Nodes.GetSize ());
     Nodes[i].marked = false;
   }
   
@@ -356,7 +356,7 @@ public:
    */
   void ClearMark ()
   {
-    for (size_t i=0 ; i<Nodes.Length() ; i++) 
+    for (size_t i=0 ; i<Nodes.GetSize () ; i++) 
     {
       Nodes[i].marked = false;
     }
@@ -378,7 +378,7 @@ public:
    */
   bool HasEnabled()
   {
-    for (size_t i=0 ; i<Nodes.Length() ; i++) 
+    for (size_t i=0 ; i<Nodes.GetSize () ; i++) 
     {
       if (InternalIsEnabled(i))
 	return true;
@@ -391,7 +391,7 @@ public:
    */
   const T GetEnabled(T fail)
   {
-    for (size_t i=0 ; i<Nodes.Length() ; i++) 
+    for (size_t i=0 ; i<Nodes.GetSize () ; i++) 
     {
       if (InternalIsEnabled(i))
 	return Nodes[i].self;
@@ -404,19 +404,19 @@ protected:
   {
 #ifdef CS_DEBUG
     CS_ASSERT_MSG ("NodeMap has different size from Node list", 
-		   NodeMap.GetSize() == Nodes.Length());
-    for (size_t i1=0; i1<Nodes.Length() ; i1++)
+		   NodeMap.GetSize() == Nodes.GetSize ());
+    for (size_t i1=0; i1<Nodes.GetSize () ; i1++)
     {
       CS_ASSERT_MSG ("NodeMap names wrong location for node",
 		     NodeMap.Get(Nodes[i1].self, csArrayItemNotFound) == i1);
-      for (size_t i2=0 ; i2<Nodes[i1].pre.Length() ; i2++)
+      for (size_t i2=0 ; i2<Nodes[i1].pre.GetSize () ; i2++)
       {
 	CS_ASSERT_MSG ("Node prefix index less than zero", 
 		       Nodes[i1].pre[i2] >= 0);
 	CS_ASSERT_MSG ("Node prefix index larger than Nodes list",
-		       Nodes[i1].pre[i2] < Nodes.Length());
+		       Nodes[i1].pre[i2] < Nodes.GetSize ());
 	bool reciprocal_post_exists = false;
-	for (size_t i3=0 ; i3<Nodes[Nodes[i1].pre[i2]].post.Length() ; i3++)
+	for (size_t i3=0 ; i3<Nodes[Nodes[i1].pre[i2]].post.GetSize () ; i3++)
 	{
 	  if (Nodes[Nodes[i1].pre[i2]].post[i3] == i1)
           {
@@ -427,14 +427,14 @@ protected:
 	CS_ASSERT_MSG ("Node prefix does not have reciprocal postfix", 
 		       reciprocal_post_exists);
       }
-      for (size_t i2=0 ; i2<Nodes[i1].post.Length() ; i2++)
+      for (size_t i2=0 ; i2<Nodes[i1].post.GetSize () ; i2++)
       {
 	CS_ASSERT_MSG ("Node postfix index less than zero",
 		       Nodes[i1].post[i2] >= 0);
 	CS_ASSERT_MSG ("Node postfix index larger than Nodes list",
-		       Nodes[i1].post[i2] < Nodes.Length());
+		       Nodes[i1].post[i2] < Nodes.GetSize ());
 	bool reciprocal_pre_exists = false;
-	for (size_t i3=0 ; i3<Nodes[Nodes[i1].post[i2]].pre.Length() ; i3++)
+	for (size_t i3=0 ; i3<Nodes[Nodes[i1].post[i2]].pre.GetSize () ; i3++)
 	{
 	  if (Nodes[Nodes[i1].post[i2]].pre[i3] == i1)
           {
@@ -452,7 +452,7 @@ protected:
     {
       size_t idx = iter.Next();
       CS_ASSERT_MSG ("NodeMap contains an index larger than Nodes list",
-		     idx < Nodes.Length());
+		     idx < Nodes.GetSize ());
     }
 #endif /* CS_DEBUG */
   }
@@ -468,7 +468,7 @@ protected:
   {
     if (Nodes[i].marked)
       return false;
-    for (size_t j=0 ; j<Nodes[i].pre.Length() ; j++) 
+    for (size_t j=0 ; j<Nodes[i].pre.GetSize () ; j++) 
     {
       if (!Nodes[Nodes[i].pre[j]].marked)
 	return false;
@@ -481,7 +481,7 @@ protected:
     // n1 is the inserted node, see if n2 hits n1 again...
     if (n1==n2)
       return true;
-    for (size_t i=0 ; i<Nodes[n2].post.Length() ; i++) 
+    for (size_t i=0 ; i<Nodes[n2].post.GetSize () ; i++) 
     {
       if (InternalCycleTest(n1, Nodes[n2].post[i]))
 	return true;
@@ -490,7 +490,7 @@ protected:
   }
   bool InternalCycleTest(size_t n)
   {
-    for (size_t i=0 ; i<Nodes[n].post.Length() ; i++) 
+    for (size_t i=0 ; i<Nodes[n].post.GetSize () ; i++) 
     {
       if (InternalCycleTest(n, Nodes[n].post[i]))
 	return true;

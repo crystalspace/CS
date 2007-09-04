@@ -22,6 +22,7 @@
 #include "csutil/noncopyable.h"
 
 #include "primitive.h"
+#include "raytracer.h"
 #include "sampler.h"
 
 namespace lighter
@@ -29,36 +30,118 @@ namespace lighter
   class Sector;
   class Raytracer;
   class Primitive;
-  class Light_old;
   class Light;
+
+  class PartialElementIgnoreCallback;  
   
   // Class to calculate direct lighting
   class DirectLighting : private CS::NonCopyable
   {
   public:
+    // Setup
+    static void Initialize ();
 
     // Shade by using all primitives within range
-    static void ShootDirectLighting (Sector* sector, float progressStep);
+    static void ShadeDirectLighting (Sector* sector, 
+      Statistics::Progress& progress);
+
+    //-- Shade a point
+    typedef csColor (*PVLPointShader)(Sector* sector, 
+      const csVector3& point, const csVector3& normal, 
+      SamplerSequence<2>& lightSampler);
 
     // Shade a single point in space with direct lighting
-    static csColor UniformShadeAllLights (Sector* sector, const csVector3& point,
-      const csVector3& normal, SamplerSequence<2>& lightSampler, Raytracer& rt);
+    static csColor UniformShadeAllLightsNonPD (Sector* sector, const csVector3& point,
+      const csVector3& normal, SamplerSequence<2>& lightSampler);
 
     // Shade a single point in space with direct lighting using a single light
-    static csColor UniformShadeOneLight (Sector* sector, const csVector3& point,
-      const csVector3& normal, SamplerSequence<3>& lightSampler, Raytracer& rt);
+    static csColor UniformShadeRndLightNonPD (Sector* sector, const csVector3& point,
+      const csVector3& normal, SamplerSequence<2>& lightSampler);
+
+    //-- Shade a lightmap element
+    typedef csColor (*LMElementShader)(Sector* sector, ElementProxy element,
+      SamplerSequence<2>& lightSampler, 
+      PartialElementIgnoreCallback* ignoreCB);
 
     // Shade a primitive element with direct lighting
-    static csColor UniformShadeAllLights (Sector* sector, ElementProxy element,
-      SamplerSequence<4>& lightSampler, Raytracer& rt);
+    static csColor UniformShadeAllLightsNonPD (Sector* sector, ElementProxy element,
+      SamplerSequence<2>& lightSampler,
+      PartialElementIgnoreCallback* ignoreCB = 0);
 
     // Shade a primitive element with direct lighting using a single light
+    static csColor UniformShadeRndLightNonPD (Sector* sector, ElementProxy element,
+      SamplerSequence<2>& lightSampler, 
+      PartialElementIgnoreCallback* ignoreCB = 0);
+
+    //-- Collect potentially shadowing primitives
+    typedef void (*LMElementCollectShadowPrims)(Sector* sector, ElementProxy element,
+      SamplerSequence<2>& lightSampler, PartialElementIgnoreCallback* ignoreCB);
+
+    static void CollectShadowAllLightsNonPD(Sector* sector, ElementProxy element,
+      SamplerSequence<2>& lightSampler, PartialElementIgnoreCallback* ignoreCB);
+    static void CollectShadowRndLightNonPD(Sector* sector, ElementProxy element,
+      SamplerSequence<2>& lightSampler, PartialElementIgnoreCallback* ignoreCB);
+    static void CollectShadowOneLight(Sector* sector, ElementProxy element,
+      Light* light, SamplerSequence<2>& lightSampler, 
+      PartialElementIgnoreCallback* ignoreCB);
+
+    //-- Shade using one light
+    // Shade a primitive element with direct lighting
+    static csColor UniformShadeOneLight (Sector* sector, const csVector3& point,
+      const csVector3& normal, Light* light, SamplerSequence<2>& lightSampler);
+
+    // Shade a primitive element with direct lighting
     static csColor UniformShadeOneLight (Sector* sector, ElementProxy element,
-      SamplerSequence<5>& lightSampler, Raytracer& rt);
+      Light* light, SamplerSequence<2>& lightSampler, 
+      PartialElementIgnoreCallback* ignoreCB = 0);
 
   private:
-    static csColor ShadeLight (Light* light, const csVector3& point,
-      const csVector3& normal, Raytracer& rt, float* lightSamples);
+    // Static methods...
+    inline static csColor ShadeLight (Light* light, const csVector3& point,
+      const csVector3& normal, SamplerSequence<2>& lightSampler,
+      const Primitive* shadowIgnorePrimitive = 0);
+    inline static csColor ShadeLight (Light* light, const csVector3& point,
+      const csVector3& normal, SamplerSequence<2>& lightSampler,
+      PartialElementIgnoreCallback* ignoreCB);
+
+    inline static void CollectShadowLight (Light* light, const csVector3& point,
+      const csVector3& normal, SamplerSequence<2>& lightSampler, 
+      PartialElementIgnoreCallback* ignoreCB);
+
+    class ProgressState
+    {
+      Statistics::Progress& progress;
+      size_t updateFreq;
+      size_t u;
+      float progressStep;
+
+    public:
+      ProgressState (Statistics::Progress& progress, size_t total) : 
+        progress (progress), 
+        updateFreq (progress.GetUpdateFrequency (total)), u (updateFreq),
+        progressStep (float (updateFreq) / total) {}
+
+      CS_FORCEINLINE void Advance ()
+      {
+        if (--u == 0)
+        {
+          progress.IncProgress (progressStep);
+          u = updateFreq;
+          globalTUI.Redraw (TUI::TUI_DRAW_RAYCORE);
+        }
+      }
+    };
+
+    static void ShadeLightmap (Sector* sector, Object* obj, 
+      SamplerSequence<2>& masterSampler, ProgressState& progress);
+
+    static void ShadePerVertex (Sector* sector, Object* obj,
+      SamplerSequence<2>& masterSampler, ProgressState& progress);
+
+    // Static data
+    static PVLPointShader pvlPointShader;
+    static LMElementShader lmElementShader;
+    static LMElementCollectShadowPrims lmElementCollect;
   };
 }
 

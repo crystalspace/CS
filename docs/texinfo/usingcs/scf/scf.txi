@@ -16,7 +16,7 @@ General Public License (@sc{lgpl}).  @xref{Licenses}.}
 @email{sunshine@@sunshineco.com}.  Last updated September 24, 2003.}
 
 @noindent
-@emph{@sc{SCF} implementation revised by M@aa{}rten Svanfeldt and Michael Adams
+@emph{@sc{scf} implementation revised by M@aa{}rten Svanfeldt and Michael Adams
 2005-2006}
 
 This library is intended for separating C++ class implementations from programs
@@ -254,24 +254,35 @@ Example:
 struct iTest : public virtual iBase
 @{
   SCF_INTERFACE (iTest, 1, 0, 0);
-  @dots{}
-  virtual void SomeFunction () = 0;
+
+  virtual void Foo () = 0;
 @};
 
 // Concrete implementation header (test.h)
 class Test : public scfImplementation1<Test, iTest>
 @{
 public:
-  Test () : scfImplementationType (this)
-  @{
-  @}
-  virtual ~Test ()
-  @{
-  @}
+  Test (iBase* p = 0);
+  virtual ~Test ();
+
+  virtual void Foo ();
 @};
 
 // Concrete implementation source (test.cpp)
 SCF_IMPLEMENT_FACTORY(Test)
+
+Test::Test (iBase* p)
+  : scfImplementationType (this, p)
+@{
+@}
+Test::~Test ()
+@{
+@}
+
+void Test::Foo ()
+@{
+  puts ("Foo");
+@}
 @end example
 
 @node SCF Multiple Interfaces, SCF Interface and implementation inheritance, SCF Using, SCF

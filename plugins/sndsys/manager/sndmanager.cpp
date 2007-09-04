@@ -74,7 +74,7 @@ iSndSysWrapper* csSndSysManager::FindSoundByName (const char* name)
 {
   // @@@ Optimize with hash.
   size_t i;
-  for (i = 0 ; i < sounds.Length () ; i++)
+  for (i = 0 ; i < sounds.GetSize () ; i++)
     if (!strcmp (name, sounds[i]->GetName ()))
       return sounds[i];
   return 0;

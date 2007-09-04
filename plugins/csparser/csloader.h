@@ -21,24 +21,25 @@
 #define __CS_CSLOADER_H__
 
 #include <stdarg.h>
-#include "ivideo/graph3d.h"
-#include "imap/loader.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
-#include "csutil/csstring.h"
-#include "csutil/util.h"
-#include "csutil/strhash.h"
-#include "csutil/hash.h"
-#include "csutil/array.h"
-#include "csutil/refarr.h"
-#include "csutil/scopedmutexlock.h"
-#include "csutil/scf_implementation.h"
+
 #include "csgeom/quaternion.h"
-#include "iutil/plugin.h"
-#include "imap/services.h"
+#include "csutil/array.h"
+#include "csutil/csstring.h"
+#include "csutil/hash.h"
+#include "csutil/refarr.h"
+#include "csutil/scf_implementation.h"
+#include "csutil/threading/thread.h"
+#include "csutil/strhash.h"
+#include "csutil/util.h"
 #include "imap/ldrctxt.h"
-#include "ivaria/engseq.h"
+#include "imap/loader.h"
+#include "imap/services.h"
 #include "isndsys/ss_renderer.h"
+#include "iutil/comp.h"
+#include "iutil/eventh.h"
+#include "iutil/plugin.h"
+#include "ivaria/engseq.h"
+#include "ivideo/graph3d.h"
 
 class csGenerateImageTexture;
 class csGenerateImageValue;
@@ -63,14 +64,15 @@ struct iDocumentNode;
 struct iDocument;
 struct iFile;
 struct iPolygonMesh;
+struct iTriangleMesh;
 struct iShaderManager;
 struct iMeshGenerator;
 struct iSceneNode;
 struct iRenderLoop;
+struct iImposter;
 
 struct iObject;
 struct iThingState;
-struct iCollection;
 struct iMaterialWrapper;
 struct iMeshFactoryWrapper;
 struct iMeshWrapper;
@@ -210,7 +212,8 @@ private:
   /// Pointer to built-in image texture loader.
   csRef<iLoaderPlugin> BuiltinImageTexLoader;
   /// Pointer to built-in checkerboard texture loader.
-  csRef<iLoaderPlugin> BuiltinCheckerTexLoader;
+  //csRef<iLoaderPlugin> BuiltinCheckerTexLoader;
+  csRef<iLoaderPlugin> BuiltinErrorTexLoader;
 
   /// Auto regions flag
   bool autoRegions;
@@ -219,8 +222,8 @@ private:
   //the hierarchy of meshes starting from 'meshWrapper'.
   void CollectAllChildren (iMeshWrapper* meshWrapper, csRefArray<iMeshWrapper>&
     meshesArray);
-  //Two useful private functions to set the CS_POLYMESH_CLOSED and
-  //CS_POLYMESH_CONVEX flags on a single mesh wrapper.
+  //Two useful private functions to set the CS_TRIMESH_CLOSED and
+  //CS_TRIMESH_CONVEX flags on a single mesh wrapper.
   void ConvexFlags (iMeshWrapper* mesh);
   void ClosedFlags (iMeshWrapper* mesh);
 
@@ -228,7 +231,7 @@ private:
   {
   private:
     /// Mutex to make the plugin vector thread-safe.
-    csRef<csMutex> mutex;
+    CS::Threading::RecursiveMutex mutex;
     iObjectRegistry* object_reg;
 
     csArray<csLoaderPluginRec*> vector;
@@ -331,7 +334,7 @@ private:
   /// Process the attributes of one shared variable
   bool ParseSharedVariable (iLoaderContext* ldr_context, iDocumentNode* node);
   /// Process the attributes of an <imposter> tag in a mesh specification.
-  bool ParseImposterSettings(iMeshWrapper* mesh,iDocumentNode *node);
+  bool ParseImposterSettings(iImposter* mesh, iDocumentNode *node);
 
   /// Parse a texture definition and add the texture to the engine
   iTextureWrapper* ParseTexture (iLoaderContext* ldr_context,
@@ -352,9 +355,6 @@ private:
   	iDocumentNode* node, const char* prefix = 0);
   /// Parse a renderloop.
   iRenderLoop* ParseRenderLoop (iDocumentNode* node, bool& set);
-  /// Parse a collection definition and add the collection to the engine
-  iCollection* ParseCollection (iLoaderContext* ldr_context,
-  	iDocumentNode* node);
   /// Parse a camera position.
   bool ParseStart (iDocumentNode* node, iCameraPosition* campos);
   /// Parse a static light definition and add the light to the engine
@@ -379,19 +379,21 @@ private:
   /// Find the named shared variable and verify its type if specified
   iSharedVariable *FindSharedVariable(const char *colvar,
 				      int verify_type );
-  /// Parse a 'polymesh' block.
-  bool ParsePolyMesh (iDocumentNode* node, iObjectModel* objmodel);
-  bool ParsePolyMeshChildBox (iDocumentNode* child,
-	csRef<iPolygonMesh>& polymesh);
-  bool ParsePolyMeshChildMesh (iDocumentNode* child,
-	csRef<iPolygonMesh>& polymesh);
+  /// Parse a 'trimesh' block.
+  bool ParseTriMesh (iDocumentNode* node, iObjectModel* objmodel);
+  bool ParseTriMeshChildBox (iDocumentNode* child,
+	csRef<iPolygonMesh>& polymesh, csRef<iTriangleMesh>& trimesh);
+  bool ParseTriMeshChildMesh (iDocumentNode* child,
+	csRef<iPolygonMesh>& polymesh, csRef<iTriangleMesh>& trimesh);
 
   /// -----------------------------------------------------------------------
   /// Parse a shaderlist
+  bool LoadShaderExpressions (iLoaderContext* ldr_context,
+  	iDocumentNode* node);
   bool ParseShaderList (iLoaderContext* ldr_context, iDocumentNode* node);
   bool ParseShader (iLoaderContext* ldr_context, iDocumentNode* node,
     iShaderManager* shaderMgr);
-  virtual bool LoadShader (const char* filename);
+  virtual csRef<iShader> LoadShader (const char* filename, bool registerShader = true);
 
   /// For heightgen.
   csGenerateImageTexture* ParseHeightgenTexture (iDocumentNode* node);
@@ -436,9 +438,9 @@ private:
   	iMeshWrapper* mesh, iMeshWrapper* parent, iDocumentNode* node,
 	iStreamSource* ssource);
   /**
-   * Load the polymesh object from the map file.
+   * Load the trimesh object from the map file.
    */
-  bool LoadPolyMeshInSector (iLoaderContext* ldr_context,
+  bool LoadTriMeshInSector (iLoaderContext* ldr_context,
   	iMeshWrapper* mesh, iDocumentNode* node, iStreamSource* ssource);
 
   /**
@@ -618,8 +620,6 @@ public:
 
   virtual csPtr<iSndSysData> LoadSoundSysData (const char *fname);
   virtual csPtr<iSndSysStream> LoadSoundStream (const char *fname,
-  	int mode3d);
-  virtual iSndSysWrapper* LoadSoundWrapper (const char *name, const char *fname,
   	int mode3d);
   virtual iSndSysWrapper* LoadSoundWrapper (const char *name, const char *fname);
 

@@ -39,8 +39,10 @@ struct iMeshWrapper;
 
 namespace CS
 {
-  namespace ImportKitImpl 
-  { 
+namespace Utility
+{ 
+  namespace Implementation
+  {
     struct GluedModel
     {
       csDirtyAccessArray<csVector3> allVertices;
@@ -54,7 +56,7 @@ namespace CS
     {
       iObjectRegistry* objectReg;
       csRef<iVFS> vfs;
-      csBlockAllocator<ImportKitImpl::GluedModel> glueModelPool;
+      csBlockAllocator<GluedModel> glueModelPool;
       csHash<size_t, csPtrKey<iMaterialWrapper> > material2texture;
       csHash<size_t, csPtrKey<iTextureWrapper> > texture2id;
       size_t texId;
@@ -119,7 +121,8 @@ namespace CS
 	const char* path, ImportKit::Container& container);
     };
 
-  } // namespace ImportKitImpl 
+  } // namespace Implementation
+} // namespace Utility
 } // namespace CS
 
 #endif // __CS_LIBS_CSTOOL_IMPORTKIT_GLUE_H__

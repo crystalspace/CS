@@ -27,6 +27,7 @@
 #ifdef CS_BUILD_SHARED_LIBS
 #define GUID_NULL	_DEFAULT_GUID_NULL
 #endif
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #ifdef CS_BUILD_SHARED_LIBS
 #undef GUID_NULL

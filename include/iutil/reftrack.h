@@ -30,7 +30,7 @@
  */
 struct iRefTracker : public virtual iBase
 {
-  SCF_INTERFACE(iRefTracker, 2,0,0);
+  SCF_INTERFACE(iRefTracker, 2,0,1);
   /// Called by an object if it has been IncRef()ed.
   virtual void TrackIncRef (void* object, int refCount) = 0;
   /// Called by an object if it has been DecRef()ed.
@@ -63,8 +63,19 @@ struct iRefTracker : public virtual iBase
    */
   virtual void RemoveAlias (void* obj, void* mapTo) = 0;
 
-  /// \todo Document me!
+  /**
+   * Set description for an object.
+   * \remarks Currently the provided description pointer is 
+   *  <b>stored as-is</b>. That means the string must be constant!
+   */
   virtual void SetDescription (void* obj, const char* description) = 0;
+  /**
+   * Set description for an object, but only if no description has been set 
+   * yet.
+   * \remarks Currently the provided description pointer is 
+   *  <b>stored as-is</b>. That means the string must be constant!
+   */
+  virtual void SetDescriptionWeak (void* obj, const char* description) = 0;
 };
 
 #endif // __CS_IUTIL_REFTRACK_H__

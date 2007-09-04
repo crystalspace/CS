@@ -59,7 +59,7 @@ public:
   size_t GetIndexByName (const char* name) const
   {
     size_t i;
-    for (i = 0 ; i < this->Length () ; i++) // see *1*
+    for (i = 0 ; i < this->GetSize () ; i++) // see *1*
     {
       T* o = (*this)[i];
       const char* n = o->QueryObject ()->GetName ();

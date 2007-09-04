@@ -323,7 +323,7 @@ csFreeType2Font::csFreeType2Font (csFreeType2Server* server,
 
 csFreeType2Font::~csFreeType2Font ()
 {
-  size_t i = DeleteCallbacks.Length ();
+  size_t i = DeleteCallbacks.GetSize ();
   while (i-- > 0)
   {
     iFontDeleteNotify* delnot = DeleteCallbacks[i];
@@ -664,7 +664,7 @@ void csFreeType2Font::AddDeleteCallback (iFontDeleteNotify* func)
 
 bool csFreeType2Font::RemoveDeleteCallback (iFontDeleteNotify* func)
 {
-  size_t i = DeleteCallbacks.Length ();
+  size_t i = DeleteCallbacks.GetSize ();
   while (i-- > 0)
   {
     iFontDeleteNotify* delnot = DeleteCallbacks[i];

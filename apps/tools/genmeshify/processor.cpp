@@ -291,8 +291,25 @@ namespace genmeshify
               CloneNode (child, child_clone);
               if (!shallow)
               {
-                csRef<iDataBuffer> fullPath = app->vfs->ExpandPath (
-                  child->GetContentsValue ());
+                csRef<iDataBuffer> fullPath;
+                const char* file = child->GetAttributeValue ("file");
+                if (file)
+                {
+                  csVfsDirectoryChanger changer (app->vfs);
+                  const char* path = child->GetAttributeValue ("path");
+
+                  if (path)
+                  {
+                    changer.PushDir ();
+                    app->vfs->ChDir (path);
+                  }
+                  fullPath = app->vfs->ExpandPath (file);
+                }
+                else
+                {
+                  fullPath = app->vfs->ExpandPath (
+                    child->GetContentsValue ());
+                }
                 if (fullPath.IsValid())
                   if (!Process (fullPath->GetData(), shallow, true)) return false;
               }

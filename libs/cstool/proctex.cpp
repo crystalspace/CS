@@ -186,29 +186,36 @@ bool csProcTexture::Initialize (iObjectRegistry* object_reg)
   csProcTexture::object_reg = object_reg;
   proceh = SetupProcEventHandler (object_reg);
 
-  if (!proc_image.IsValid())
-    proc_image.AttachNew (new csImageMemory (mat_w, mat_h));
-
   g3d = csQueryRegistry<iGraphics3D> (object_reg);
   g2d = csQueryRegistry<iGraphics2D> (object_reg);
 
   csRef<iEngine> engine (csQueryRegistry<iEngine> (object_reg));
-  tex = engine->GetTextureList ()->NewTexture (proc_image);
-  proc_image = 0;
+  if (proc_image)
+  {
+    tex = engine->GetTextureList()->NewTexture (proc_image);
+    tex->SetFlags (CS_TEXTURE_3D | texFlags);
+    proc_image = 0;
+  }
+  else
+  {
+    csRef<iTextureHandle> texHandle = 
+      g3d->GetTextureManager()->CreateTexture (mat_w, mat_h, csimg2D, "rgb8",
+      CS_TEXTURE_3D | texFlags);
+    tex = engine->GetTextureList()->NewTexture (texHandle);
+  }
   if (!tex)
     return false;
 
   if (key_color)
     tex->SetKeyColor (key_red, key_green, key_blue);
 
-  tex->SetFlags (tex->GetFlags() | texFlags);
   tex->QueryObject ()->SetName (GetName ());
   if (use_cb)
   {
-    csProcTexCallback* cb = new csProcTexCallback ();
+    csRef<csProcTexCallback> cb;
+    cb.AttachNew (new csProcTexCallback ());
     cb->pt = this;
     tex->SetUseCallback (cb);
-    cb->DecRef ();
   }
   ptReady = true;
   return true;

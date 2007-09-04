@@ -233,7 +233,7 @@ do
 					2>/dev/null \
 					> $CURDIR/debian/man/$bin.sgml.$SECTION
 					;;
-				cs-config|mdl2spr|partedit|md22spr|md32spr|3ds2lev|makedep|csfgen|map2cs|cspicview|nettut|unittest|phystut|levtool|maya2spr|milk2spr|python.cex|csbench|docconv|csdemo|lighter)
+				cs-config|mdl2spr|partedit|md22spr|md32spr|3ds2lev|makedep|csfgen|map2cs|cspicview|nettut|unittest|phystut|levtool|maya2spr|milk2spr|python.cex|csbench|docconv|csdemo|lighter|csstartme|genmeshify|partconv)
 					export TYPE="Not standart"
 					echo "Not yet documented" > $CURDIR/debian/man/$bin.txt
 					gensgml $CURDIR/debian/man/$bin.txt \

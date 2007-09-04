@@ -31,7 +31,7 @@
       <file>/lev/terrain/grass.png</file>
     </texture>
     <texture name="materialmap_base.png">
-      <file>/lev/terrain/materialmap_base.png</file>
+      <file>materialmap_base.png</file>
     </texture>
         <texture name="clouds">
             <file>clouddome.jpg</file>

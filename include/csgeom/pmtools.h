@@ -25,6 +25,8 @@
 #include "csgeom/polymesh.h"
 #include "csutil/array.h"
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 struct csTriangle;
 
 /**\file 
@@ -41,8 +43,9 @@ struct iPolygonMesh;
 
 /**
  * A definition of one edge.
+ * \deprecated Use csTriangleMeshEdge instead.
  */
-struct CS_CRYSTALSPACE_EXPORT csPolygonMeshEdge
+struct CS_DEPRECATED_TYPE_MSG("csPolygonMeshEdge is deprecated; use csTriangleMeshEdge instead") CS_CRYSTALSPACE_EXPORT csPolygonMeshEdge
 {
   /**
    * Indices of the two vertices forming the edge.
@@ -74,8 +77,9 @@ struct CS_CRYSTALSPACE_EXPORT csTriangleMinMax : public csTriangle
 
 /**
  * A set of tools to work with iPolygonMesh instances.
+ * \deprecated Use csTriangleMeshTools instead.
  */
-class CS_CRYSTALSPACE_EXPORT csPolygonMeshTools
+class CS_DEPRECATED_TYPE_MSG("csPolygonMeshTools is deprecated; use csTriangleMeshTools instead") CS_CRYSTALSPACE_EXPORT csPolygonMeshTools
 {
 private:
   static void CalculatePlanes (csVector3* vertices,
@@ -238,7 +242,15 @@ public:
   	csVector3* vertices,
   	csTriangleMinMax* tris, int tri_count,
 	csPlane3* planes);
+
+  /* Create a table of vertex connections for this mesh. The resulting
+   * data structure must be freed by user after using it. 
+   */
+  static csArray<csArray<int> > *CalculateVertexConnections (
+		  				iPolygonMesh* mesh);
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /** @} */
 

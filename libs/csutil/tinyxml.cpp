@@ -118,11 +118,8 @@ void TiXmlBase::PutString( const TiXmlString& str, TiXmlString* outString )
 }
 
 
-TiDocumentNode::TiDocumentNode( )
+TiDocumentNode::TiDocumentNode( ) : refcount (1), parent (0)
 {
-  parent = 0;
-  prev = 0;
-  next = 0;
 }
 
 
@@ -130,6 +127,121 @@ TiDocumentNode::~TiDocumentNode()
 {
 }
 
+void TiDocumentNode::DecRef ()
+{
+  csRefTrackerAccess::TrackDecRef (this, refcount);
+  refcount--;
+  if (refcount <= 0)
+    GetDocument()->DeleteNode (this);
+}
+
+const char* TiDocumentNode::Value() const
+{
+  switch (type)
+  {
+    case DOCUMENT:
+      return static_cast<const TiDocument*> (this)->Value ();
+    case ELEMENT:
+      return static_cast<const TiXmlElement*> (this)->Value ();
+    case COMMENT:
+      return static_cast<const TiXmlComment*> (this)->Value ();
+    case UNKNOWN:
+      return static_cast<const TiXmlUnknown*> (this)->Value ();
+    case TEXT:
+      return static_cast<const TiXmlText*> (this)->Value ();
+    case CDATA:
+      return static_cast<const TiXmlCData*> (this)->Value ();
+    case DECLARATION:
+      return static_cast<const TiXmlDeclaration*> (this)->Value ();
+    default:
+      CS_ASSERT(false);
+      return 0;
+  }
+}
+
+void TiDocumentNode::SetValue (const char* v)
+{
+  switch (type)
+  {
+    case DOCUMENT:
+      static_cast<TiDocument*> (this)->SetValue (v);
+      break;
+    case ELEMENT:
+      static_cast<TiXmlElement*> (this)->SetValue (v);
+      break;
+    case COMMENT:
+      static_cast<TiXmlComment*> (this)->SetValue (v);
+      break;
+    case UNKNOWN:
+      static_cast<TiXmlUnknown*> (this)->SetValue (v);
+      break;
+    case TEXT:
+      static_cast<TiXmlText*> (this)->SetValue (v);
+      break;
+    case CDATA:
+      static_cast<TiXmlCData*> (this)->SetValue (v);
+      break;
+    case DECLARATION:
+      static_cast<TiXmlDeclaration*> (this)->SetValue (v);
+      break;
+    default:
+      CS_ASSERT(false);
+  }
+}
+
+csPtr<TiDocumentNode> TiDocumentNode::Clone (TiDocument* doc) const
+{
+  switch (type)
+  {
+    case DOCUMENT:
+      return static_cast<const TiDocument*> (this)->Clone (doc);
+    case ELEMENT:
+      return static_cast<const TiXmlElement*> (this)->Clone (doc);
+    case COMMENT:
+      return static_cast<const TiXmlComment*> (this)->Clone (doc);
+    case UNKNOWN:
+      return static_cast<const TiXmlUnknown*> (this)->Clone (doc);
+    case TEXT:
+      return static_cast<const TiXmlText*> (this)->Clone (doc);
+    case CDATA:
+      return static_cast<const TiXmlCData*> (this)->Clone (doc);
+    case DECLARATION:
+      return static_cast<const TiXmlDeclaration*> (this)->Clone (doc);
+    default:
+      CS_ASSERT(false);
+      return 0;
+  }
+}
+
+void TiDocumentNode::Print( iString* cfile, int depth ) const
+{
+  switch (type)
+  {
+    case DOCUMENT:
+      static_cast<const TiDocument*> (this)->Print (cfile, depth);
+      break;
+    case ELEMENT:
+      static_cast<const TiXmlElement*> (this)->Print (cfile, depth);
+      break;
+    case COMMENT:
+      static_cast<const TiXmlComment*> (this)->Print (cfile, depth);
+      break;
+    case UNKNOWN:
+      static_cast<const TiXmlUnknown*> (this)->Print (cfile, depth);
+      break;
+    case TEXT:
+      static_cast<const TiXmlText*> (this)->Print (cfile, depth);
+      break;
+    case CDATA:
+      static_cast<const TiXmlCData*> (this)->Print (cfile, depth);
+      break;
+    case DECLARATION:
+      static_cast<const TiXmlDeclaration*> (this)->Print (cfile, depth);
+      break;
+    default:
+      CS_ASSERT(false);
+  }
+}
 
 TiDocumentNode* TiDocumentNode::NextSibling( const char * value ) const
 {
@@ -144,19 +256,7 @@ TiDocumentNode* TiDocumentNode::NextSibling( const char * value ) const
 }
 
 
-TiDocumentNode* TiDocumentNode::PreviousSibling( const char * value ) const
-{
-  TiDocumentNode* node;
-  for ( node = prev; node; node = node->prev )
-  {
-    const char* node_val = node->Value ();
-    if (node_val && strcmp (node_val, value) == 0)
-      return node;
-  }
-  return 0;
-}
-
-TiDocumentNode* TiDocumentNodeChildren::Identify( TiDocument* document,
+csPtr<TiDocumentNode> TiDocumentNodeChildren::Identify( TiDocument* document,
 	const char* p )
 {
   TiDocumentNode* returnNode = 0;
@@ -190,7 +290,8 @@ TiDocumentNode* TiDocumentNodeChildren::Identify( TiDocument* document,
   }
   else if (    isalpha( *(p+1) ) || *(p+1) == '_' )
   {
-    returnNode = document->blk_element.Alloc ();
+    void* p = document->blk_element.Alloc (sizeof (TiXmlElement));
+    returnNode = new (p) TiXmlElement ();
   }
   else if ( StringEqual ( p, commentHeader) )
   {
@@ -217,66 +318,27 @@ TiDocumentNode* TiDocumentNodeChildren::Identify( TiDocument* document,
 // -------------------------------------------------------------------------
 TiDocumentNodeChildren::TiDocumentNodeChildren ()
 {
-  firstChild = 0;
-  lastChild = 0;
 }
 
 TiDocumentNodeChildren::~TiDocumentNodeChildren()
 {
-  TiDocumentNode* node = firstChild;
-  TiDocumentNode* temp = 0;
-
-  TiDocument* doc = GetDocument ();
-  while ( node )
-  {
-    temp = node;
-    node = node->next;
-    doc->DeleteNode (temp);
-  }  
 }
 
 void TiDocumentNodeChildren::Clear()
 {
-  TiDocumentNode* node = firstChild;
-  TiDocumentNode* temp = 0;
-
-  TiDocument* doc = GetDocument ();
-  while ( node )
-  {
-    temp = node;
-    node = node->next;
-    doc->DeleteNode (temp);
-  }
-
   firstChild = 0;
-  lastChild = 0;
 }
 
-TiDocumentNode* TiDocumentNodeChildren::LinkEndChild( TiDocumentNode* node )
+void TiDocumentNodeChildren::InsertAfterChild( TiDocumentNode* afterThis,
+                                               TiDocumentNode* addThis )
 {
-  node->parent = this;
+  addThis->parent = this;
+  addThis->next = 0;
 
-  node->prev = lastChild;
-  node->next = 0;
-
-  if ( lastChild )
-    lastChild->next = node;
+  if ( afterThis )
+    afterThis->next = addThis;
   else
-    firstChild = node;      // it was an empty list.
-
-  lastChild = node;
-  return node;
-}
-
-
-TiDocumentNode* TiDocumentNodeChildren::InsertEndChild(
-	const TiDocumentNode& addThis )
-{
-  TiDocumentNode* node = addThis.Clone(GetDocument ());
-  if ( !node )
-    return 0;
-
-  return LinkEndChild( node );
+    firstChild = addThis;      // it was an empty list.
 }
 
 
@@ -286,26 +348,35 @@ TiDocumentNode* TiDocumentNodeChildren::InsertBeforeChild(
   if ( !beforeThis || beforeThis->parent != this )
     return 0;
 
-  TiDocumentNode* node = addThis.Clone(GetDocument ());
+  csRef<TiDocumentNode> node = addThis.Clone(GetDocument ());
   if ( !node )
     return 0;
   node->parent = this;
 
   node->next = beforeThis;
-  node->prev = beforeThis->prev;
-  if ( beforeThis->prev )
+  TiDocumentNode* beforeThisPrev = Previous (beforeThis);
+  if ( beforeThisPrev )
   {
-    beforeThis->prev->next = node;
+    beforeThisPrev->next = node;
   }
   else
   {
     assert( firstChild == beforeThis );
     firstChild = node;
   }
-  beforeThis->prev = node;
   return node;
 }
 
+TiDocumentNode* TiDocumentNodeChildren::InsertAfterChild(
+  TiDocumentNode* afterThis, const TiDocumentNode& addThis )
+{
+  csRef<TiDocumentNode> node = addThis.Clone(GetDocument ());
+  if ( !node )
+    return 0;
+
+  InsertAfterChild (afterThis, node);
+  return node;
+}
 
 bool TiDocumentNodeChildren::RemoveChild( TiDocumentNode* removeThis )
 {
@@ -315,17 +386,15 @@ bool TiDocumentNodeChildren::RemoveChild( TiDocumentNode* removeThis )
     return false;
   }
 
-  if ( removeThis->next )
-    removeThis->next->prev = removeThis->prev;
-  else
-    lastChild = removeThis->prev;
-
-  if ( removeThis->prev )
-    removeThis->prev->next = removeThis->next;
+  TiDocumentNode* removeThisPrev = Previous (removeThis);
+  if ( removeThisPrev )
+    removeThisPrev->next = removeThis->next;
   else
     firstChild = removeThis->next;
 
-  GetDocument ()->DeleteNode (removeThis);
+  // Needed to make freeing work ... but right?
+  removeThis->parent = GetDocument();
+  removeThis->next = 0;
 
   return true;
 }
@@ -339,6 +408,35 @@ TiDocumentNode* TiDocumentNodeChildren::FirstChild( const char * value ) const
     if (node_val && strcmp (node_val, value) == 0)
       return node;
   }
+  return 0;
+}
+
+TiDocumentNode* TiDocumentNodeChildren::Previous (TiDocumentNode* child)
+{
+  TiDocumentNode* prev = 0;
+  TiDocumentNode* node = firstChild;
+
+  while (node != 0)
+  {
+    if (node == child) return prev;
+    prev = node;
+    node = node->next;
+  }
+
+  return 0;
+}
+
+TiDocumentNode* TiDocumentNodeChildren::LastChild ()
+{
+  TiDocumentNode* node = firstChild;
+
+  while (node != 0)
+  {
+    TiDocumentNode* next = node->next;
+    if (next == 0) return node;
+    node = next;
+  }
+
   return 0;
 }
 
@@ -481,12 +579,12 @@ void TiXmlElement::SetAttribute (TiDocument* document,
 
 static void StrPrintf (iString* file, const char* msg, ...)
 {
-  scfString str;
+  csString str;
+  str.SetGrowsBy (0);
   va_list args;
   va_start (args, msg);
   str.FormatV (msg, args);
   va_end (args);
-  file->SetGrowsBy(0);
   file->Append (str);
 }
 
@@ -505,7 +603,7 @@ void TiXmlElement::Print( iString* cfile, int depth ) const
 
   StrPrintf ( cfile, "<%s", value );
 
-  for (size_t i = 0 ; i < attributeSet.set.Length () ; i++)
+  for (size_t i = 0 ; i < attributeSet.set.GetSize () ; i++)
   {
     const TiDocumentAttribute& attrib = attributeSet.set[i];
     StrPrintf ( cfile, " " );
@@ -521,7 +619,7 @@ void TiXmlElement::Print( iString* cfile, int depth ) const
   {
     StrPrintf ( cfile, " />" );
   }
-  else if ( firstChild == lastChild && firstChild->ToText() )
+  else if ( (firstChild->next == 0) && firstChild->ToText() )
   {
     StrPrintf ( cfile, ">" );
     firstChild->Print( cfile, depth + 1 );
@@ -546,9 +644,11 @@ void TiXmlElement::Print( iString* cfile, int depth ) const
   }
 }
 
-TiDocumentNode* TiXmlElement::Clone(TiDocument* document) const
+csPtr<TiDocumentNode> TiXmlElement::Clone(TiDocument* document) const
 {
-  TiXmlElement* clone = document->blk_element.Alloc ();
+  csRef<TiXmlElement> clone;
+  void* p = document->blk_element.Alloc (sizeof (TiXmlElement));
+  clone.AttachNew (new (p) TiXmlElement ());
   if ( !clone )
     return 0;
 
@@ -557,23 +657,26 @@ TiDocumentNode* TiXmlElement::Clone(TiDocument* document) const
 
   // Clone the attributes, then clone the children.
   size_t i;
-  for (i = 0 ; i < attributeSet.set.Length () ; i++)
+  for (i = 0 ; i < attributeSet.set.GetSize () ; i++)
   {
     const TiDocumentAttribute& attrib = attributeSet.set[i];
     clone->GetAttributeRegistered (attrib.Name ()).
       SetValue (attrib.Value ());
   }
 
-  TiDocumentNode* node = 0;
-  for ( node = firstChild; node; node = node->NextSibling() )
+  TiDocumentNode* lastNode = 0;
+  for (TiDocumentNode*  node = firstChild; node; node = node->NextSibling() )
   {
-    clone->LinkEndChild( node->Clone(document) );
+    csRef<TiDocumentNode> newNode = node->Clone(document);
+    clone->InsertAfterChild (lastNode, newNode);
+    lastNode = newNode;
   }
-  return clone;
+  return csPtr<TiDocumentNode> (clone);
 }
 
 
 TiDocument::TiDocument() :
+  deleteNest (0),
   strings (3541),
   blk_element (1000),
   blk_text (1000)
@@ -599,11 +702,15 @@ TiDocument::~TiDocument ()
   // Call explicit clear so that all children are destroyed
   // before 'blk_element' and 'blk_text' are destroyed.
   Clear ();
+  // The Clear() call may have enqueue a number of nodes to delete,
+  // and it needs to be emptied *before* we're destructed.
+  EmptyDestroyQueue ();
 }
 
-TiDocumentNode* TiDocument::Clone(TiDocument* document) const
+csPtr<TiDocumentNode> TiDocument::Clone(TiDocument* document) const
 {
-  TiDocument* clone = new TiDocument();
+  csRef<TiDocument> clone;
+  clone.AttachNew (new TiDocument());
   if ( !clone )
     return 0;
 
@@ -611,12 +718,14 @@ TiDocumentNode* TiDocument::Clone(TiDocument* document) const
   clone->error = error;
   clone->errorDesc = errorDesc.c_str ();
 
-  TiDocumentNode* node = 0;
-  for ( node = firstChild; node; node = node->NextSibling() )
+  TiDocumentNode* lastNode = 0;
+  for (TiDocumentNode*  node = firstChild; node; node = node->NextSibling() )
   {
-    clone->LinkEndChild( node->Clone(document) );
+    csRef<TiDocumentNode> newNode = node->Clone(document);
+    clone->InsertAfterChild (lastNode, newNode);
+    lastNode = newNode;
   }
-  return clone;
+  return csPtr<TiDocumentNode> (clone);
 }
 
 
@@ -678,15 +787,16 @@ void TiXmlComment::Print( iString* cfile, int depth ) const
   StrPrintf ( cfile, "<!--%s-->", value );
 }
 
-TiDocumentNode* TiXmlComment::Clone(TiDocument* /*document*/) const
+csPtr<TiDocumentNode> TiXmlComment::Clone(TiDocument* /*document*/) const
 {
-  TiXmlComment* clone = new TiXmlComment();
+  csRef<TiXmlComment> clone;
+  clone.AttachNew (new TiXmlComment());
 
   if ( !clone )
     return 0;
 
   CopyToClone( clone );
-  return clone;
+  return csPtr<TiDocumentNode> (clone);
 }
 
 
@@ -723,16 +833,17 @@ void TiXmlText::Print( iString* cfile, int /*depth*/ ) const
 }
 
 
-TiDocumentNode* TiXmlText::Clone(TiDocument* document) const
+csPtr<TiDocumentNode> TiXmlText::Clone(TiDocument* document) const
 {  
-  TiXmlText* clone = 0;
-  clone = document->blk_text.Alloc ();
+  csRef<TiXmlText> clone;
+  void* p = document->blk_text.Alloc (sizeof (TiXmlText));
+  clone.AttachNew (new (p) TiXmlText ());
 
   if ( !clone )
     return 0;
 
   CopyToClone( clone );
-  return clone;
+  return csPtr<TiDocumentNode> (clone);
 }
 
 
@@ -760,9 +871,10 @@ void TiXmlDeclaration::Print( iString* cfile, int /*depth*/ ) const
   StrPrintf  (cfile, "?>");
 }
 
-TiDocumentNode* TiXmlDeclaration::Clone(TiDocument* /*document*/) const
+csPtr<TiDocumentNode> TiXmlDeclaration::Clone(TiDocument* /*document*/) const
 {  
-  TiXmlDeclaration* clone = new TiXmlDeclaration();
+  csRef<TiXmlDeclaration> clone;
+  clone.AttachNew (new TiXmlDeclaration());
 
   if ( !clone )
     return 0;
@@ -771,7 +883,7 @@ TiDocumentNode* TiXmlDeclaration::Clone(TiDocument* /*document*/) const
   clone->version = version;
   clone->encoding = encoding;
   clone->standalone = standalone;
-  return clone;
+  return csPtr<TiDocumentNode> (clone);
 }
 
 
@@ -782,22 +894,23 @@ void TiXmlUnknown::Print( iString* cfile, int depth ) const
   StrPrintf ( cfile, "<%s>", value.c_str() );
 }
 
-TiDocumentNode* TiXmlUnknown::Clone(TiDocument* /*document*/) const
+csPtr<TiDocumentNode> TiXmlUnknown::Clone(TiDocument* /*document*/) const
 {
-  TiXmlUnknown* clone = new TiXmlUnknown();
+  csRef<TiXmlUnknown> clone;
+  clone.AttachNew (new TiXmlUnknown());
 
   if ( !clone )
     return 0;
 
   CopyToClone( clone );
-  return clone;
+  return csPtr<TiDocumentNode> (clone);
 }
 
 
 size_t TiDocumentAttributeSet::Find (const char * name) const
 {
   size_t i;
-  for (i = 0 ; i < set.Length () ; i++)
+  for (i = 0 ; i < set.GetSize () ; i++)
   {
     if (strcmp (set[i].name, name) == 0) return i;
   }
@@ -807,7 +920,7 @@ size_t TiDocumentAttributeSet::Find (const char * name) const
 size_t TiDocumentAttributeSet::FindExact (const char * reg_name) const
 {
   size_t i;
-  for (i = 0 ; i < set.Length () ; i++)
+  for (i = 0 ; i < set.GetSize () ; i++)
   {
     if (set[i].name == reg_name) return i;
   }

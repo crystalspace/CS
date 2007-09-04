@@ -26,25 +26,22 @@
 namespace lighter
 {
   class KDTree;
+  class Scene;
+  class Sector;
 
-  // A lightsource
-  class Light_old : public csRefCount
+  class Portal : public csRefCount
   {
   public:
-    csVector3 position;
-    csColor color;
-    csLightAttenuationMode attenuation;
-    csVector3 attenuationConsts;
-    bool pseudoDynamic;
-    csMD5::Digest lightId;
+    Portal ()
+    {}
 
-    csColor freeEnergy;
-
-    csBox3 boundingBox;
+    Sector* sourceSector;
+    Sector* destSector;
+    csReversibleTransform wrapTransform;
+    Vector3DArray worldVertices;
+    csPlane3 portalPlane;
   };
-  typedef csRefArray<Light_old> LightOldRefArray;
-
-  class Scene;
+  typedef csRefArray<Portal> PortalRefArray;
 
   // Representation of sector in our local setup
   class Sector : public csRefCount
@@ -60,16 +57,24 @@ namespace lighter
     }
 
     // Initialize any extra data in the sector
-    void Initialize ();
+    void Initialize (Statistics::Progress& progress);
+
+    void PrepareLighting (Statistics::Progress& progress);
+
+    // Build kd tree for Sector
+    void BuildKDTree (Statistics::Progress& progress);
 
     // All objects in sector
     ObjectHash allObjects;
 
-    // All lightsources (old)
-    LightOldRefArray allLightsOld;
+    // All light sources (no PD lights)
+    LightRefArray allNonPDLights;
 
-    // All light sources
-    LightRefArray allLights;
+    // All PD light sources
+    LightRefArray allPDLights;
+
+    // All portals in sector
+    PortalRefArray allPortals;
 
     // KD-tree of all primitives in sector
     KDTree *kdTree;
@@ -85,18 +90,27 @@ namespace lighter
   {
   public:
     Scene ();
+    ~Scene ();
 
     // Add a file for later loading
     void AddFile (const char* directory);
 
     // Load all files, and parse the loaded info
-    bool LoadFiles ();
+    bool LoadFiles (Statistics::Progress& progress);
 
-    // Save all files we've loaded. Will save any changed factory and mesh
-    bool SaveFiles ();
+    /* Save all files we've loaded. Will save any changed factory. */
+    bool SaveWorldFactories (Statistics::Progress& progress);
+    /* Save all files we've loaded. Will save any changed mesh. */
+    bool SaveWorldMeshes (Statistics::Progress& progress);
+    /* Save all files we've loaded. Writes out document to a temporary file. */
+    bool FinishWorldSaving (Statistics::Progress& progress);
 
-    // Parse in our scene from the engine
-    bool ParseEngine ();
+    // Copy the temporary file created in SaveWorld() over the actual world file.
+    bool ApplyWorldChanges (Statistics::Progress& progress);
+    // Write the generated lightmaps out.
+    bool SaveLightmaps (Statistics::Progress& progress);
+    // Save any mesh data that can only be saved after lighting.
+    bool SaveMeshesPostLighting (Statistics::Progress& progress);
 
     // Data access
     inline ObjectFactoryHash& GetFactories () 
@@ -115,8 +129,40 @@ namespace lighter
     LightmapPtrDelArray& GetLightmaps () 
     { return lightmaps; }
 
-    Lightmap* GetLightmap (uint lightmapID, Light_old* light);
+    Lightmap* GetLightmap (uint lightmapID, Light* light);
+
     csArray<LightmapPtrDelArray*> GetAllLightmaps ();
+
+    /**
+     * Helper class to perform some lightmap postprocessing
+     * (exposure + ambient term).
+     */
+    class LightingPostProcessor
+    {
+    private:
+      friend class Scene;
+      Scene* scene;
+
+      LightingPostProcessor (Scene* scene);
+    public:
+      //@{
+      /// Apply exposure function
+      void ApplyExposure (Lightmap* lightmap);
+      void ApplyExposure (csColor* colors, size_t numColors);
+      //@}
+
+      //@{
+      /**
+       * Apply ambient term.
+       * Ambient may be a hack to approximate indirect lighting, but then, 
+       * as long as that is not supported, or disabled by the user later on, 
+       * ambient can still serve a purpose.
+       */
+      void ApplyAmbient (Lightmap* lightmap);
+      void ApplyAmbient (csColor* colors, size_t numColors);
+      //@}
+    };
+    LightingPostProcessor lightmapPostProc;
   protected:
     
     //  factories
@@ -124,9 +170,11 @@ namespace lighter
  
     // All sectors
     SectorHash sectors;
+    typedef csHash<Sector*, csPtrKey<iSector> > SectorOrigSectorHash;
+    SectorOrigSectorHash originalSectorHash;
 
     LightmapPtrDelArray lightmaps;
-    typedef csHash<LightmapPtrDelArray*, csPtrKey<Light_old> > PDLightmapsHash;
+    typedef csHash<LightmapPtrDelArray*, csPtrKey<Light> > PDLightmapsHash;
     PDLightmapsHash pdLightmaps;
 
     struct LoadedFile
@@ -134,38 +182,54 @@ namespace lighter
       csRef<iDocumentNode> rootNode;
       csRef<iDocument> document;
       csString directory; //VFS name, full path
+      csSet<csString> texturesToClean;
+      csSet<csString> texFileNamesToDelete;
+      csArray<Object*> fileObjects;
     };
 
     // All files loaded into scene
     csArray<LoadedFile> sceneFiles;
-    // Helper variable
-    struct SaveTexture
-    {
-      csString filename;
-      csString texname;
-      csStringArray pdLightmapFiles;
-      csStringArray pdLightIDs;
-    };
-    csArray<SaveTexture> texturesToSave;
-    csSet<csString> texturesToClean;
 
     // Save functions
-    void CleanOldLightmaps (LoadedFile* fileInfo, 
-      const csStringArray& texFileNames);
-    void SaveSceneToDom (iDocumentNode* root, LoadedFile* fileInfo);
-    void SaveMeshFactoryToDom (iDocumentNode* factNode, LoadedFile* fileInfo);
-    void SaveSectorToDom (iDocumentNode* sectorNode, LoadedFile* fileInfo);
-    void SaveMeshObjectToDom (iDocumentNode *objNode, Sector* sect, LoadedFile* fileInfo);
+    void CollectDeleteTextures (iDocumentNode* textureNode,
+                                csSet<csString>& filesToDelete);
+    void BuildLightmapTextureList (csStringArray& texturesToSave);
+    void CleanOldLightmaps (LoadedFile* fileInfo);
+    void SaveSceneFactoriesToDom (iDocumentNode* root, LoadedFile* fileInfo,
+                                  Statistics::Progress& progress);
+    void SaveSceneMeshesToDom (iDocumentNode* root, LoadedFile* fileInfo,
+                               Statistics::Progress& progress);
+    bool SaveSceneLibrary (csSet<csString>& savedFactories, 
+                           const char* libFile, LoadedFile* fileInfo,
+                           Statistics::Progress& progress);
+    void HandleLibraryNode (csSet<csString>& savedFactories, 
+                            iDocumentNode* node, LoadedFile* fileInfo,
+                            Statistics::Progress& progress);
+    void SaveMeshFactoryToDom (csSet<csString>& savedObjects, 
+                               iDocumentNode* factNode, LoadedFile* fileInfo);
+    void SaveSectorToDom (iDocumentNode* sectorNode, LoadedFile* fileInfo,
+                          Statistics::Progress& progress);
+    void SaveMeshObjectToDom (csSet<csString>& savedObjects, iDocumentNode *objNode, 
+                              Sector* sect, LoadedFile* fileInfo);
+
+    csStringHash solidColorFiles;
+    const char* GetSolidColorFile (const csColor& col);
+    void SaveLightmapsToDom (iDocumentNode* root, LoadedFile* fileInfo,
+                             Statistics::Progress& progress);
     
     // Load functions
-    void ParseSector (iSector *sector);
+    bool ParseEngine (Statistics::Progress& progress);
+    void ParseSector (iSector *sector, Statistics::Progress& progress);
+    void ParsePortals (iSector *srcSect, Sector* sector);
     enum MeshParseResult
     {
       Failure, Success, NotAGenMesh
     };
-    MeshParseResult ParseMesh (Sector *sector, iMeshWrapper *mesh);
+    MeshParseResult ParseMesh (Sector *sector,  iMeshWrapper *mesh,
+      csRef<Object>& obj);
     MeshParseResult ParseMeshFactory (iMeshFactoryWrapper *factory, 
-      ObjectFactory*& radFact);
+      csRef<ObjectFactory>& radFact);
+    void PropagateLight (Light* light, const csFrustum& lightFrustum);
 
   };
 }

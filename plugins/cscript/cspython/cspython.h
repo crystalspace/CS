@@ -24,13 +24,14 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/csinput.h"
+#include "csplugincommon/script/scriptcommon.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(cspython)
 {
 
-class csPython : public scfImplementation2<csPython, 
-                                           iScript,
-                                           iComponent> 
+class csPython : public scfImplementationExt1<csPython,
+					      csScriptCommon,
+					      iComponent> 
 {
 public:
   csPython(iBase *iParent);
@@ -41,60 +42,31 @@ public:
   int Mode;
   bool use_debugger;
 
-  virtual bool Initialize(iObjectRegistry* object_reg);
-  virtual bool HandleEvent(iEvent&);
+  virtual bool Initialize(iObjectRegistry*); // implements iComponent
+
   virtual bool RunText(const char *Text);
   virtual bool LoadModule(const char *Text);
-  virtual bool LoadModule (const char *path, const char *name);
-  virtual bool Store(const char* name, void* data, void* tag);
+  virtual bool LoadModule(const char *path, const char *name);
+  virtual bool LoadModuleNative(const char *path, const char *name);
 
-  /*
-    @@@ New functions not yet implemented
-  */
-  virtual bool Call(const char *name, const char *fmt, ...)
-    { return false; }
-  virtual bool Call(const char *name, int &ret, const char *fmt, ...)
-    { return false; }
-  virtual bool Call(const char *name, float &ret, const char *fmt, ...)
-    { return false; }
-  virtual bool Call(const char *name, double &ret, const char *fmt, ...)
-    { return false; }
-  virtual bool Call(const char *name, csRef<iString> &ref,
-    const char *fmt, ...)
-    { return false; }
-  virtual bool Call(const char *name, csRef<iScriptObject> &ref,
-    const char *fmt, ...)
-    { return false; }
-  virtual csRef<iScriptObject> NewObject(const char *type,
-    const char *fmt, ...)
-    { return 0; }
-  virtual bool Store(const char *name, int data)
-    { return false; }
-  virtual bool Store(const char *name, float data)
-    { return false; }
-  virtual bool Store(const char *name, double data)
-    { return false; }
-  virtual bool Store(const char *name, char const *data)
-    { return false; }
-  virtual bool Store(const char *name, iScriptObject *data)
-    { return false; }
-  virtual bool SetTruth(const char *name, bool data)
-    { return false; }
-  virtual bool Retrieve(const char *name, int &data) const
-    { return false; }
-  virtual bool Retrieve(const char *name, float &data) const
-    { return false; }
-  virtual bool Retrieve(const char *name, double &data) const
-    { return false; }
-  virtual bool Retrieve(const char *name, csRef<iString> &data) const
-    { return false; }
-  virtual bool Retrieve(const char *name, csRef<iScriptObject> &data) const
-    { return false; }
-  virtual bool GetTruth(const char *name, bool &data) const
-    { return false; }
-  virtual bool Remove(const char *name)
-    { return false; }
+  //@@@ The following 11 methods are new additions to iScript and not yet
+  //@@@ implemented.
+  virtual bool Store (const char *name, iScriptValue *value) { return false; }
+  virtual csPtr<iScriptValue> Retrieve (const char *name) { return 0; }
+  virtual bool Remove (const char *name) { return false; }
+  virtual csPtr<iScriptValue> Call (const char *name,
+	const csRefArray<iScriptValue> &args) { return 0; }
+  virtual csPtr<iScriptObject> New (const char *type,
+	const csRefArray<iScriptValue> &args) { return 0; }
+  virtual csPtr<iScriptValue> RValue (int value) { return 0; }
+  virtual csPtr<iScriptValue> RValue (float value) { return 0; }
+  virtual csPtr<iScriptValue> RValue (double value) { return 0; }
+  virtual csPtr<iScriptValue> RValue (const char *value) { return 0; }
+  virtual csPtr<iScriptValue> RValue (bool value) { return 0; }
+  virtual csPtr<iScriptValue> RValue (iScriptObject *value) { return 0; }
 
+  bool HandleEvent(iEvent&);
+  bool Store(const char* name, void* data, void* tag);
   void ShowError();
   void Print(bool Error, const char *msg);
 

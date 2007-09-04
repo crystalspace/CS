@@ -83,7 +83,7 @@ T csClamp (const T& a, T max, T min)
 }
 
 /**
- * Preforms a smooth interpolation of a on range min to max.
+ * Performs a smooth interpolation of a on range min to max.
  * \return Smooth interporlated value if \a min \< \a a \< \a max, 
  *  and 0 resp. 1 if \a a is smaller than \a min resp. larger than \a max.
  */
@@ -101,6 +101,16 @@ T csSmoothStep (const T& a, T max, T min)
     tmp = tmp2*tmp2 * (3.0 - 2.0*tmp2);
   }
   return tmp;
+}
+
+/**
+ * Performs a linear interpolation between \a a and \a b with the factor
+ * \a f.
+ */
+template<class T, class Tfactor>
+T csLerp (const T& a, const T& b, const Tfactor& f)
+{
+  return (a + (b - a) * f);
 }
 
 /**

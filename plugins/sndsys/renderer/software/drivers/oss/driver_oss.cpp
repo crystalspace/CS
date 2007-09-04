@@ -246,7 +246,7 @@ bool SndSysDriverOSS::StartThread()
 
   m_bRunning=true;
   SndSysDriverRunnable* runnable = new SndSysDriverRunnable (this);
-  m_pBackgroundThread = csThread::Create(runnable);
+  m_pBackgroundThread.AttachNew (new CS::Threading::Thread (runnable, false));
   runnable->DecRef ();
 
   m_pBackgroundThread->Start();

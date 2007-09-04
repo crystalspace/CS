@@ -27,6 +27,7 @@
 
 #include "csutil/scf.h"
 
+#include "iutil/databuff.h"
 #include "ivideo/graph3d.h"
 
 class csBox3;
@@ -72,7 +73,7 @@ struct iThingFactoryState;
  */
 struct iSyntaxService : public virtual iBase
 {
-  SCF_INTERFACE (iSyntaxService, 2, 1, 1);
+  SCF_INTERFACE (iSyntaxService, 2, 1, 2);
   
   /**\name Parse reporting helpers
    * @{ */
@@ -346,6 +347,11 @@ struct iSyntaxService : public virtual iBase
 
   /**
    * Write a render buffer.
+   * When the render buffer exhibits an iRenderBufferPersistence interface,
+   * the render buffer data may not be stored inline in the document but in
+   * an external file. To prevent this behaviour you must provided a render
+   * buffer that exhibits an iRenderBufferPersistence interface and does not
+   * return a filename.
    */
   virtual bool WriteRenderBuffer (iDocumentNode* node, iRenderBuffer* buffer) = 0;
   
@@ -367,6 +373,19 @@ struct iSyntaxService : public virtual iBase
    * returned if successful.
    */
   virtual csPtr<iKeyValuePair> ParseKey (iDocumentNode* node) = 0;
+  
+  /**
+   * Read a render buffer from a data buffer. Usually the buffer comes from
+   * a persistent storage (e.g. disk). It must have been written with 
+   * StoreRenderBuffer().   
+   */
+  virtual csRef<iRenderBuffer> ReadRenderBuffer (iDataBuffer* buf) = 0;
+  
+  /**
+   * Store a render buffer to a data buffer. Usually this buffer is then 
+   * stored to a persistent storage (e.g. disk).
+   */
+  virtual csRef<iDataBuffer> StoreRenderBuffer (iRenderBuffer* rbuf) = 0;
 };
 
 /** @} */

@@ -167,7 +167,7 @@ namespace Threading
       // Get a job
       {
         MutexScopedLock lock (ownerQueue->jobMutex);
-        while (ownerQueue->jobQueue.Length () == 0)
+        while (ownerQueue->jobQueue.GetSize () == 0)
         {
           if (ownerQueue->shutdownQueue)
             return;

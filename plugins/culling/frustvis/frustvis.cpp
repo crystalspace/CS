@@ -95,14 +95,14 @@ public:
     if (position == (size_t)-1) return 0;
     iVisibilityObject* vo = vector->Get (position);
     position++;
-    if (position == vector->Length ())
+    if (position == vector->GetSize ())
       position = (size_t)-1;
     return vo;
   }
 
   virtual void Reset()
   {
-    if (vector == 0 || vector->Length () < 1)
+    if (vector == 0 || vector->GetSize () < 1)
       position = (size_t)-1;
     else
       position = 0;
@@ -110,7 +110,7 @@ public:
 
   virtual bool HasNext () const
   {
-    return ((position != (size_t)-1) && position <= vector->Length ());
+    return ((position != (size_t)-1) && position <= vector->GetSize ());
   }
 };
 
@@ -170,16 +170,15 @@ csFrustumVis::~csFrustumVis ()
       CS::RemoveWeakListener (q, weakEventHandler);
   }
 
-  while (visobj_vector.Length () > 0)
+  while (visobj_vector.GetSize () > 0)
   {
-    csFrustVisObjectWrapper* visobj_wrap = visobj_vector.Pop ();
+    csRef<csFrustVisObjectWrapper> visobj_wrap = visobj_vector.Pop ();
     iVisibilityObject* visobj = visobj_wrap->visobj;
     visobj->GetObjectModel ()->RemoveListener (
 		      (iObjectModelListener*)visobj_wrap);
     iMovable* movable = visobj->GetMovable ();
     movable->RemoveListener ((iMovableListener*)visobj_wrap);
     kdtree->RemoveObject (visobj_wrap->child);
-    visobj->DecRef ();
   }
   delete kdtree;
 }
@@ -216,9 +215,9 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
   }
 
   kdtree = new csKDTree ();
-  csFrustVisObjectDescriptor* desc = new csFrustVisObjectDescriptor ();
+  csRef<csFrustVisObjectDescriptor> desc;
+  desc.AttachNew (new csFrustVisObjectDescriptor ());
   kdtree->SetObjectDescriptor (desc);
-  desc->DecRef ();
 
   csRef<iGraphics2D> g2d = csQueryRegistry<iGraphics2D> (object_reg);
   if (g2d)
@@ -262,7 +261,7 @@ void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
 {
 #ifdef CS_DEBUG
   size_t i;
-  for (i = 0 ; i < visobj_vector.Length () ; i++)
+  for (i = 0 ; i < visobj_vector.GetSize () ; i++)
   {
     if (visobj_vector[i]->visobj == visobj)
     {
@@ -270,10 +269,9 @@ void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
     }
   }
 #endif
-  csFrustVisObjectWrapper* visobj_wrap = new csFrustVisObjectWrapper (
-		  this);
+  csRef<csFrustVisObjectWrapper> visobj_wrap;
+  visobj_wrap.AttachNew (new csFrustVisObjectWrapper (this));
   visobj_wrap->visobj = visobj;
-  visobj->IncRef ();
   iMovable* movable = visobj->GetMovable ();
   visobj_wrap->update_number = movable->GetUpdateNumber ();
   visobj_wrap->shape_number = visobj->GetObjectModel ()->GetShapeNumber ();
@@ -303,7 +301,7 @@ void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
 void csFrustumVis::UnregisterVisObject (iVisibilityObject* visobj)
 {
   size_t i;
-  for (i = 0 ; i < visobj_vector.Length () ; i++)
+  for (i = 0 ; i < visobj_vector.GetSize () ; i++)
   {
     csFrustVisObjectWrapper* visobj_wrap = visobj_vector[i];
     if (visobj_wrap->visobj == visobj)
@@ -314,7 +312,6 @@ void csFrustumVis::UnregisterVisObject (iVisibilityObject* visobj)
       iObjectModel* objmodel = visobj->GetObjectModel ();
       objmodel->RemoveListener ((iObjectModelListener*)visobj_wrap);
       kdtree->RemoveObject (visobj_wrap->child);
-      visobj->DecRef ();
 #ifdef CS_DEBUG
       // To easily recognize that the vis wrapper has been deleted:
       visobj_wrap->frustvis = (csFrustumVis*)0xdeadbeef;
@@ -1081,7 +1078,7 @@ struct CastShadows_Front2BackData
   iFrustumView* fview;
   csPlane3 planes[32];
   ShadObj* shadobjs;
-  int num_shadobjs;
+  size_t num_shadobjs;
 };
 
 static int compare_shadobj (const void* el1, const void* el2)
@@ -1189,13 +1186,13 @@ void csFrustumVis::CastShadows (iFrustumView* fview)
   // the receivers are processed.
   //======================================
 
-  data.shadobjs = new ShadObj [visobj_vector.Length () * 2];
+  data.shadobjs = new ShadObj [visobj_vector.GetSize () * 2];
   data.num_shadobjs = 0;
 
   // First check if we need to do frustum clipping.
   csFrustum* lf = fview->GetFrustumContext ()->GetLightFrustum ();
   uint32 planes_mask = 0;
-  int i;
+  size_t i;
 
   // Traverse the kd-tree to find all relevant objects.
   // @@@ What if the frustum is bigger???
@@ -1206,7 +1203,7 @@ void csFrustumVis::CastShadows (iFrustumView* fview)
     fflush (stdout);
     return;
   }
-  int i1 = lf->GetVertexCount () - 1;
+  size_t i1 = lf->GetVertexCount () - 1;
   for (i = 0 ; i < lf->GetVertexCount () ; i1 = i, i++)
   {
     planes_mask = (planes_mask<<1)|1;

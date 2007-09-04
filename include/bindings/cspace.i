@@ -172,8 +172,6 @@
 // list. Please keep the list sorted alphabetically.
 #ifndef CS_MINI_SWIG
 %define APPLY_FOR_EACH_INTERFACE
-  INTERFACE_APPLY(iAws)
-  INTERFACE_APPLY(iAwsKey)
   INTERFACE_APPLY(iBase)
   INTERFACE_APPLY(iBinaryLoaderPlugin)
   INTERFACE_APPLY(iBodyGroup)
@@ -188,12 +186,19 @@
   INTERFACE_APPLY(iConfigIterator)
   INTERFACE_APPLY(iConfigManager)
   INTERFACE_APPLY(iDataBuffer)
+  INTERFACE_APPLY(iDecalManager)
+  INTERFACE_APPLY(iDecalTemplate)
   INTERFACE_APPLY(iDebugHelper)
   INTERFACE_APPLY(iDocument)
+  INTERFACE_APPLY(iDocumentAttribute)
+  INTERFACE_APPLY(iDocumentAttributeIterator)
+  INTERFACE_APPLY(iDocumentNode)
+  INTERFACE_APPLY(iDocumentNodeIterator)
   INTERFACE_APPLY(iDocumentSystem)
   INTERFACE_APPLY(iDynamics)
   INTERFACE_APPLY(iDynamicSystem)
   INTERFACE_APPLY(iEngine)
+  INTERFACE_APPLY(iEngineSequenceManager)
   INTERFACE_APPLY(iEvent)
   INTERFACE_APPLY(iEventHandler)
   INTERFACE_APPLY(iEventQueue)
@@ -275,6 +280,7 @@
   INTERFACE_APPLY(iSimpleFormerState)
   INTERFACE_APPLY(iSector)
   INTERFACE_APPLY(iSectorList)
+  INTERFACE_APPLY(iShader)
   INTERFACE_APPLY(iShaderManager)
   INTERFACE_APPLY(iShaderVariableContext)
   INTERFACE_APPLY(iSkeleton)
@@ -283,8 +289,6 @@
   INTERFACE_APPLY(iSkeletonBoneRagdollInfo)
   INTERFACE_APPLY(iSkeletonFactory)
   INTERFACE_APPLY(iSkeletonGraveyard)
-  INTERFACE_APPLY(iSkeletonScript)
-  INTERFACE_APPLY(iSkeletonScriptKeyFrame)
   INTERFACE_APPLY(iSkeletonSocket)
   INTERFACE_APPLY(iSkeletonSocketFactory)
   INTERFACE_APPLY(iSndSysData)
@@ -314,6 +318,8 @@
   INTERFACE_APPLY(iTextureWrapper)
   INTERFACE_APPLY(iThingState)
   INTERFACE_APPLY(iThingFactoryState)
+  INTERFACE_APPLY(iTriangleMesh)
+  INTERFACE_APPLY(iTriangleMeshIterator)
   INTERFACE_APPLY(iVFS)
   INTERFACE_APPLY(iView)
   INTERFACE_APPLY(iVirtualClock)
@@ -474,8 +480,6 @@
     csRef<iBase> Ref;
     const char *Type;
     scfInterfaceVersion Version;
-    csWrapPtr (const char *t, scfInterfaceVersion v, iBase *r)
-    : Ref (r), Type (t), Version(v) {}
     csWrapPtr (const char *t, scfInterfaceVersion v, csPtr<iBase> r)
     : Ref (r), Type (t), Version(v) {}
     csWrapPtr (const char *t, scfInterfaceVersion v, csRef<iBase> r)
@@ -498,6 +502,10 @@
 #define TYPEMAP_OUTARG_ARRAY_PTR_CNT(a,b,c)
 #define TYPEMAP_ARGOUT_PTR(T)
 #define APPLY_TYPEMAP_ARGOUT_PTR(T,Args)
+#define ITERATOR_FUNCTIONS(T)
+#define ARRAY_OBJECT_FUNCTIONS(classname,typename)
+#define LIST_OBJECT_FUNCTIONS(classname,typename)
+#define SET_OBJECT_FUNCTIONS(classname,typename)
 
 #if defined(SWIGPYTHON)
   %include "bindings/python/pythpre.i"
@@ -509,18 +517,28 @@
   %include "bindings/tcl/tclpre.i"
 #elif defined(SWIGJAVA)
   %include "bindings/java/javapre.i"
+#elif defined(SWIGLUA)
+  %include "bindings/lua/luapre.i"
 #endif
 
 // Handle arrays as input arguments.
+// The second parameter is for putting in an extra dereference operator if the
+// array is an array of objects. If it is an array of _pointers to_ objects,
+// then the second parameter should be empty. This is the inverse of the
+// third parameter in the TYPEMAP_OUTARG_ARRAY_... macros below.
 TYPEMAP_IN_ARRAY_CNT_PTR((int num_layers, iTextureWrapper ** wrappers), /**/)
 TYPEMAP_IN_ARRAY_PTR_CNT((csVector2 * InPolygon, int InCount), *)
 TYPEMAP_IN_ARRAY_PTR_CNT((csVector3* vertices, int num_vertices), *)
 TYPEMAP_IN_ARRAY_PTR_CNT((csVector3* vertices, int num), *)
 
 // Handle arrays as output arguments.
+// The third parameter is for putting in an extra dereference operator if the
+// array is an array of _pointers to_ objects. If it is just array of objects,
+// then the third parameter should be empty. This is the inverse of the
+// second parameter in the TYPEMAP_IN_ARRAY_... macros above.
 TYPEMAP_OUTARG_ARRAY_PTR_CNT(
   (csVector2 * OutPolygon, int & OutCount),
-  new csVector2[MAX_OUTPUT_VERTICES], *
+  new csVector2[MAX_OUTPUT_VERTICES], /**/
 )
 
 %ignore csPtr::csPtr;
@@ -572,6 +590,7 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csArray::InitRegion;
 %ignore csArray::InsertSorted;
 %ignore csArray::Iterator;
+%ignore csArray::Length;
 %ignore csArray::PushSmart;
 %ignore csArray::Section;
 %ignore csArray::SetCapacity;
@@ -683,7 +702,6 @@ SET_HELPER(csStringID)
 %ignore csStringBase;
 %ignore csStringBase::operator [] (size_t);
 %ignore csStringBase::operator [] (size_t) const;
-%ignore csStringFast;
 %ignore csString::csString (size_t);
 %ignore csString::csString (char);
 %ignore csString::csString (unsigned char);
@@ -896,6 +914,7 @@ namespace CS
 }
 %template(TriangleInt) CS::TriangleT<int >;
 %warnfilter(302) TriangleT; // redefined
+%ignore CS::TriangleT::operator[];
 %include "csgeom/tri.h"
 
 %ignore csRect::AddAdjanced; // Deprecated misspelling.
@@ -966,6 +985,8 @@ iArrayChangeElements<csShaderVariable * >;
 %feature("compactdefaultargs") csInitializer::SetupConfigManager;
 %include "cstool/initapp.h"
 %typemap(default) const char * configName;
+
+%include "csutil/customallocated.h"
 %ignore csArray<csPluginRequest>::Capacity;
 %ignore csArray<csPluginRequest>::DefaultCompare;
 %ignore csArray<csPluginRequest>::Delete;
@@ -996,21 +1017,45 @@ iArrayChangeElements<csShaderVariable * >;
 %ignore csArray<csPluginRequest>::operator[];
 %template(csPluginRequestArray) csArray<csPluginRequest>;
 
-#ifndef CS_MINI_SWIG
-%include "iaws/aws.h"
+%ignore iPen::Rotate;
 
+#ifndef CS_MINI_SWIG
 %include "igeom/clip2d.h"
+%include "ivaria/decal.h"
 %include "imesh/objmodel.h"
 %include "igeom/path.h"
 %template(scfPath) scfImplementation1<csPath,iPath >;
+#ifndef CS_SWIG_PUBLISH_IGENERAL_FACTORY_STATE_ARRAYS
+%ignore iPolygonMesh::GetTriangles;
+%ignore iPolygonMesh::GetVertices;
+%ignore iPolygonMesh::GetPolygons;
+%ignore iTriangleMesh::GetTriangles;
+%ignore iTriangleMesh::GetVertices;
+#endif
 %include "igeom/polymesh.h"
+%include "igeom/trimesh.h"
 /*Ignore some deprecated functions*/
 %ignore csPath::GetPointCount;
 %ignore csPath::GetTimeValue;
 %ignore csPath::SetTimeValues;
 %ignore csPath::GetTimeValues;
 %include "csgeom/path.h"
+%template(pycsPolygonMesh) scfImplementation1<csPolygonMesh, iPolygonMesh>;
+%template(pycsPolygonMeshBox) scfImplementation1<csPolygonMeshBox, iPolygonMesh>;
+%template(pycsTriangleMesh) scfImplementation1<csTriangleMesh, iTriangleMesh>;
+%template(pycsTriangleMeshBox) scfImplementation1<csTriangleMeshBox, iTriangleMesh>;
 %include "csgeom/polymesh.h"
+%include "csgeom/trimesh.h"
+
+%ignore csArray<csArray<int> >::Contains;
+%template(csIntArray) csArray<int>;
+%template(csIntArrayArray) csArray<csArray<int> >;
+ARRAY_OBJECT_FUNCTIONS(csArray<int>,int)
+ARRAY_OBJECT_FUNCTIONS(csArray<csArray<int> >,csArray<int>)
+%newobject csPolygonMeshTools::CalculateVertexConnections;
+%newobject csTriangleMeshTools::CalculateVertexConnections;
+%include "csgeom/pmtools.h"
+%include "csgeom/trimeshtools.h"
 %include "csgeom/spline.h"
 
 %include "iengine/fview.h"
@@ -1055,6 +1100,19 @@ iArrayChangeElements<csShaderVariable * >;
 %include "iengine/viscull.h"
 %include "iengine/portal.h"
 %include "iengine/portalcontainer.h"
+
+%extend iVisibilityObjectIterator {
+  ITERATOR_FUNCTIONS(iVisibilityObjectIterator)
+}
+%extend iLightIterator {
+  ITERATOR_FUNCTIONS(iLightIterator)
+}
+%extend iSectorIterator {
+  ITERATOR_FUNCTIONS(iSectorIterator)
+}
+%extend iMeshWrapperIterator {
+  ITERATOR_FUNCTIONS(iMeshWrapperIterator)
+}
 
 #ifndef CS_SWIG_PUBLISH_IGENERAL_FACTORY_STATE_ARRAYS
 %ignore iGeneralFactoryState::GetVertices;
@@ -1109,6 +1167,7 @@ iArrayChangeElements<csSprite2DVertex>;
 %include "iutil/object.h"
 %include "iutil/strset.h"
 #endif // CS_MINI_SWIG
+%ignore CS_QUERY_REGISTRY_TAG_is_deprecated;
 %include "iutil/objreg.h"
 #ifndef CS_MINI_SWIG
 %include "iutil/virtclk.h"
@@ -1151,6 +1210,10 @@ iArrayChangeElements<csSprite2DVertex>;
 TYPEMAP_ARGOUT_PTR(csKeyModifiers)
 APPLY_TYPEMAP_ARGOUT_PTR(csKeyModifiers,csKeyModifiers& modifiers)
 
+/* this one is for preventing swig from generating int32_t* for int32*
+   (trips compilation on msvc) */
+typedef int int32_t;
+
 %include "csutil/event.h"
 %extend iEvent {
 	csEventError RetrieveString(const char *name, char *&v)
@@ -1163,6 +1226,14 @@ APPLY_TYPEMAP_ARGOUT_PTR(csKeyModifiers,csKeyModifiers& modifiers)
 %include "iutil/evdefs.h"
 %include "iutil/eventq.h"
 %ignore csStrKey::operator const char*;
+%ignore csHash::ConstGlobalIterator;
+%ignore csHash::GlobalIterator;
+%ignore csHash::Iterator;
+%ignore csHash::PutFirst;
+%ignore csHash::GetIterator;
+%ignore csHash::DeleteElement;
+%ignore csHash::Get (const K& key, T& fallback);
+%ignore csHash::csHash (const csHash<T> &o);
 %include "csutil/hash.h"
 %include "iutil/eventnames.h"
 %include "csutil/eventnames.h"
@@ -1176,6 +1247,20 @@ APPLY_TYPEMAP_ARGOUT_PTR(csKeyModifiers,csKeyModifiers& modifiers)
 %include "iutil/cfgmgr.h"
 %include "iutil/stringarray.h"
 %include "iutil/document.h"
+
+%template(scfConfigFile) scfImplementation1<csConfigFile,iConfigFile >;
+%include "csutil/cfgfile.h"
+%include "csutil/radixsort.h"
+
+%extend iDocumentAttributeIterator
+{
+  ITERATOR_FUNCTIONS(iDocumentAttributeIterator)
+}
+
+%extend iDocumentNodeIterator
+{
+  ITERATOR_FUNCTIONS(iDocumentNodeIterator)
+}
 
 %include "csutil/xmltiny.h"
 
@@ -1267,24 +1352,31 @@ APPLY_TYPEMAP_ARGOUT_PTR(csKeyModifiers,csKeyModifiers& modifiers)
 %include "ivaria/simpleformer.h"
 %include "ivaria/terraform.h"
 
+%template(pycsObject) scfImplementation1<csObject,iObject >;
 %include "csutil/csobject.h"
 
 %ignore csColliderHelper::TraceBeam (iCollideSystem*, iSector*,
   const csVector3&, const csVector3&, bool, csIntersectingTriangle&,
   csVector3&, iMeshWrapper**);
+%template(pycsColliderWrapper) scfImplementationExt1<csColliderWrapper,csObject,scfFakeInterface<csColliderWrapper> >;
 %include "cstool/collider.h"
 %include "cstool/csview.h"
 %include "cstool/csfxscr.h"
 
 %include "cstool/cspixmap.h"
+%include "cstool/enginetools.h"
 
+%include "cstool/pen.h"
 #endif // CS_MINI_SWIG
+
+%ignore iBase::~iBase(); // We replace iBase dtor with one that calls DecRef().
+			 // Swig already knows not to delete an SCF pointer.
 
 %define INTERFACE_POST(T)
   %extend T
   {
-    virtual ~T() { if (self) self->DecRef(); }
     static int scfGetVersion() { return scfInterfaceTraits<T>::GetVersion(); }
+    virtual ~T() { if (self) self->DecRef (); }
   }
 %enddef
 
@@ -1322,11 +1414,31 @@ APPLY_FOR_EACH_INTERFACE
   { return &(self->GetColors()[index]); }
 }
 
-// iaws/aws.h
-%extend iAws
+%extend iPolygonMesh
 {
-  bool SetupCanvas (iGraphics2D *g2d=0, iGraphics3D *g3d=0)
-  { return self->SetupCanvas(0, g2d, g3d); }
+  csVector3 *GetVertexByIndex(int index)
+  { return &(self->GetVertices()[index]); }
+
+  csMeshedPolygon *GetPolygonByIndex(int index)
+  { return &(self->GetPolygons()[index]); }
+
+  csTriangle *GetTriangleByIndex(int index)
+  { return &(self->GetTriangles()[index]); }
+}
+
+%extend iTriangleMesh
+{
+  csVector3 *GetVertexByIndex(int index)
+  { return &(self->GetVertices()[index]); }
+
+  csTriangle *GetTriangleByIndex(int index)
+  { return &(self->GetTriangles()[index]); }
+}
+
+%extend csMeshedPolygon
+{
+  int GetVertexByIndex(int index)
+  { return self->vertices[index]; }
 }
 
 // iutil/csinput.h
@@ -1369,6 +1481,30 @@ APPLY_FOR_EACH_INTERFACE
   }
 %}
 
+
+// iutil/evdefs.h
+#define _CSKEY_SHIFT_NUM(n) CSKEY_SHIFT_NUM(n)
+#undef CSKEY_SHIFT_NUM
+int CSKEY_SHIFT_NUM(int n);
+#define _CSKEY_CTRL_NUM(n) CSKEY_CTRL_NUM(n)
+#undef CSKEY_CTRL_NUM
+int CSKEY_CTRL_NUM(int n);
+#define _CSKEY_ALT_NUM(n) CSKEY_ALT_NUM(n)
+#undef CSKEY_ALT_NUM
+int CSKEY_ALT_NUM(int n);
+
+#define _CSKEY_SPECIAL(n) CSKEY_SPECIAL(n)
+#undef CSKEY_SPECIAL
+int CSKEY_SPECIAL(int n);
+
+#define _CSKEY_SPECIAL_NUM(code) CSKEY_SPECIAL_NUM(code)
+#undef CSKEY_SPECIAL_NUM
+int CSKEY_SPECIAL_NUM(int code);
+
+#define _CSKEY_MODIFIER(type,num) CSKEY_MODIFIER(type,num)
+#undef CSKEY_MODIFIER
+int CSKEY_MODIFIER(int type,int num);
+
 // csutil/eventnames.h
 #define _CS_IS_KEYBOARD_EVENT(reg,e) CS_IS_KEYBOARD_EVENT(reg,e)
 #undef CS_IS_KEYBOARD_EVENT
@@ -1382,6 +1518,7 @@ bool _CS_IS_JOYSTICK_EVENT (iObjectRegistry *,const iEvent &);
 #define _CS_IS_INPUT_EVENT(reg,e) CS_IS_INPUT_EVENT(reg,e)
 #undef CS_IS_INPUT_EVENT
 bool _CS_IS_INPUT_EVENT (iObjectRegistry *,const iEvent &);
+
 
 /*
  New Macros for to use instead of event type masks
@@ -1453,11 +1590,6 @@ csEventID _csevMouseMove (iObjectRegistry *,uint x);
 #undef csevJoystickEvent
 csEventID _csevJoystickEvent (iObjectRegistry *);
 
-// iutil/objreg.h
-#define _CS_QUERY_REGISTRY_TAG(a, b) CS_QUERY_REGISTRY_TAG(a, b)
-#undef CS_QUERY_REGISTRY_TAG
-csPtr<iBase> _CS_QUERY_REGISTRY_TAG (iObjectRegistry *, const char *);
-
 // iutil/plugin.h
 #define _CS_LOAD_PLUGIN_ALWAYS(a, b) CS_LOAD_PLUGIN_ALWAYS(a, b)
 #undef CS_LOAD_PLUGIN_ALWAYS
@@ -1490,7 +1622,7 @@ uint _CS_FX_SETALPHA_INT (uint);
   V operator - (const V & v) const { return *self - v; }
   float operator * (const V & v) const { return *self * v; }
   V operator * (float f) const { return *self * f; }
-  V operator / (float f) const { return *self * f; }
+  V operator / (float f) const { return *self / f; }
   bool operator == (const V & v) const { return *self == v; }
   bool operator != (const V & v) const { return *self != v; }
   bool operator < (float f) const { return *self < f; }
@@ -1657,14 +1789,14 @@ LIST_OBJECT_FUNCTIONS(iTextureList,iTextureWrapper)
 csWrapPtr CS_QUERY_REGISTRY (iObjectRegistry *reg, const char *iface,
   int iface_ver)
 {
-  iBase *b = reg->Get(iface, iSCF::SCF->GetInterfaceID (iface), iface_ver);
+  csPtr<iBase> b (reg->Get(iface, iSCF::SCF->GetInterfaceID(iface), iface_ver));
   return csWrapPtr (iface, iface_ver, b);
 }
 
 csWrapPtr CS_QUERY_REGISTRY_TAG_INTERFACE (iObjectRegistry *reg,
   const char *tag, const char *iface, int iface_ver)
 {
-  iBase *b = reg->Get(tag, iSCF::SCF->GetInterfaceID (iface), iface_ver);
+  csPtr<iBase> b (reg->Get(tag, iSCF::SCF->GetInterfaceID(iface), iface_ver));
   return csWrapPtr (iface, iface_ver, b);
 }
 
@@ -1675,57 +1807,58 @@ csWrapPtr SCF_QUERY_INTERFACE (iBase *obj, const char *iface, int iface_ver)
   // object layout reasons the void pointer returned by QueryInterface
   // can't be wrapped inside the csWrapPtr so obj must be wrapped.
   if (obj->QueryInterface(iSCF::SCF->GetInterfaceID(iface), iface_ver))
-    return csWrapPtr (iface, iface_ver, obj);
+    return csWrapPtr (iface, iface_ver, csPtr<iBase> (obj));
   else
-    return csWrapPtr (iface, iface_ver, 0);
+    return csWrapPtr (iface, iface_ver, csPtr<iBase> (0));
 }
 
 csWrapPtr SCF_QUERY_INTERFACE_SAFE (iBase *obj, const char *iface,
   int iface_ver)
 {
   if (!obj)
-    return csWrapPtr (iface, iface_ver, 0);
+    return csWrapPtr (iface, iface_ver, csPtr<iBase> (0));
 
   // This call to QueryInterface ensures that IncRef is called and that
   // the object supports the interface.  However, for type safety and
   // object layout reasons the void pointer returned by QueryInterface
   // can't be wrapped inside the csWrapPtr so obj must be wrapped.
   if (obj->QueryInterface(iSCF::SCF->GetInterfaceID(iface), iface_ver))
-    return csWrapPtr (iface, iface_ver, obj);
+    return csWrapPtr (iface, iface_ver, csPtr<iBase> (obj));
   else
-    return csWrapPtr (iface, iface_ver, 0);
+    return csWrapPtr (iface, iface_ver, csPtr<iBase> (0));
 }
 
 csWrapPtr CS_QUERY_PLUGIN_CLASS (iPluginManager *obj, const char *id,
   const char *iface, int iface_ver)
 {
-  return csWrapPtr (iface, iface_ver, obj->QueryPlugin (id, iface, iface_ver));
+  return csWrapPtr (iface, iface_ver,
+    csPtr<iBase> (obj->QueryPlugin (id, iface, iface_ver)));
 }
 
 csWrapPtr CS_LOAD_PLUGIN (iPluginManager *obj, const char *id,
   const char *iface, int iface_ver)
 {
-  return csWrapPtr (iface, iface_ver, obj->LoadPlugin(id));
+  return csWrapPtr (iface, iface_ver, csPtr<iBase> (obj->LoadPlugin (id)));
 }
 
 csWrapPtr CS_GET_CHILD_OBJECT (iObject *obj, const char *iface, int iface_ver)
 {
-  return csWrapPtr (iface, iface_ver, obj->GetChild(iSCF::SCF->GetInterfaceID (iface),
-    iface_ver));
+  return csWrapPtr (iface, iface_ver, csRef<iBase> (
+    obj->GetChild(iSCF::SCF->GetInterfaceID (iface), iface_ver)));
 }
 
 csWrapPtr CS_GET_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
   int iface_ver, const char *name)
 {
-  return csWrapPtr (iface, iface_ver, obj->GetChild(iSCF::SCF->GetInterfaceID (iface),
-    iface_ver, name));
+  return csWrapPtr (iface, iface_ver, csRef<iBase> (
+    obj->GetChild(iSCF::SCF->GetInterfaceID (iface), iface_ver, name)));
 }
 
 csWrapPtr CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
   int iface_ver, const char *name)
 {
-  return csWrapPtr (iface, iface_ver, obj->GetChild(iSCF::SCF->GetInterfaceID (iface),
-    iface_ver, name, true));
+  return csWrapPtr (iface, iface_ver, csRef<iBase> (
+    obj->GetChild(iSCF::SCF->GetInterfaceID (iface), iface_ver, name, true)));
 }
 %}
 
@@ -1739,4 +1872,6 @@ csWrapPtr CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
   %include "bindings/tcl/tclpost.i"
 #elif defined(SWIGJAVA)
   %include "bindings/java/javapost.i"
+#elif defined(SWIGLUA)
+  %include "bindings/lua/luapost.i"
 #endif

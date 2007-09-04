@@ -183,7 +183,7 @@ bool csWin32RegistryConfig::Save (const char * /*iFileName*/, iVFS*)
 void csWin32RegistryConfig::Clear ()
 {
   size_t i;
-  for (i = 0; i < iters.Length(); i++)
+  for (i = 0; i < iters.GetSize (); i++)
   {
     iters.Get(i)->Rewind();
   }

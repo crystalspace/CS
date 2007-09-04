@@ -115,8 +115,14 @@ bool csLoader::ParseTextureList (iLoaderContext* ldr_context,
 	        return false;
         break;
       case XMLTOKEN_HEIGHTGEN:
+	SyntaxService->Report (
+	  "crystalspace.maploader.parse.texture",
+	  CS_REPORTER_SEVERITY_WARNING,
+	  child,
+	  "<heightmap> is obsolete: it was intended for use together with the "
+	  "'terrfunc' mesh which is long gone.");
         if (!ParseHeightgen (ldr_context, child))
-	        return false;
+	  return false;
         break;
       case XMLTOKEN_CUBEMAP:
         if (!ParseCubemap (ldr_context, child))
@@ -429,14 +435,22 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
       CS_REPORTER_SEVERITY_WARNING,
       node, "Could not load texture '%s', using checkerboard instead", txtname);
 
-    if (!BuiltinCheckerTexLoader)
+    /*if (!BuiltinCheckerTexLoader)
     {
       csCheckerTextureLoader* ctl = new csCheckerTextureLoader (0);
       ctl->Initialize (object_reg);
       BuiltinCheckerTexLoader.AttachNew (ctl);
     }
     csRef<iBase> b = BuiltinCheckerTexLoader->Parse (ParamsNode,
-      0/*ssource*/, ldr_context, static_cast<iBase*> (&context));
+      0, ldr_context, static_cast<iBase*> (&context));*/
+    if (!BuiltinErrorTexLoader)
+    {
+      csMissingTextureLoader* mtl = new csMissingTextureLoader (0);
+      mtl->Initialize (object_reg);
+      BuiltinErrorTexLoader.AttachNew (mtl);
+    }
+    csRef<iBase> b = BuiltinErrorTexLoader->Parse (ParamsNode,
+      0, ldr_context, static_cast<iBase*> (&context));
     CS_ASSERT(b);
     tex = scfQueryInterface<iTextureWrapper> (b);
     CS_ASSERT(tex);
@@ -461,7 +475,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     AddToRegion (ldr_context, tex->QueryObject ());
 
     size_t i;
-    for (i = 0 ; i < key_nodes.Length () ; i++)
+    for (i = 0 ; i < key_nodes.GetSize () ; i++)
     {
       if (!ParseKey (key_nodes[i], tex->QueryObject()))
 	return 0;
@@ -616,15 +630,15 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   }
   
   size_t i;
-  for (i=0; i<shaders.Length (); i++)
+  for (i=0; i<shaders.GetSize (); i++)
     //if (shaders[i]->Prepare ())
       material->SetShader (shadertypes[i], shaders[i]);
-  for (i=0; i<shadervars.Length (); i++)
+  for (i=0; i<shadervars.GetSize (); i++)
     material->AddVariable (shadervars[i]);
 
   // dereference material since mat already incremented it
 
-  for (i = 0 ; i < key_nodes.Length () ; i++)
+  for (i = 0 ; i < key_nodes.GetSize () ; i++)
   {
     if (!ParseKey (key_nodes[i], mat->QueryObject()))
       return 0;

@@ -350,6 +350,14 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
   virtual void GenerateBox (const csBox3& box) = 0;
 
   /**
+   * Automatically generate a capsule of given length and radius.
+   * \param l Capsule length.
+   * \param r Capsule radius.
+   * \param sides Number of sides.
+   */
+  virtual void GenerateCapsule (float l, float r, uint sides) = 0;
+
+  /**
    * Automatically generate a sphere. This will set the apropriate number 
    * of vertices and generate vertices, texels, normals, and triangles.
    * The vertex colors are set to black.
@@ -530,6 +538,8 @@ struct iGenMeshAnimationControl : public virtual iBase
    * changes. The animation control can use this to optimize the animation
    * calculation by caching the animated version of the array and returning
    * that one.
+   * \remarks \a colors may be 0. In this case all color values should be
+   *   assumed to be (0, 0, 0, 1).
    */
   virtual const csColor4* UpdateColors (csTicks current,
   	const csColor4* colors, int num_colors, uint32 version_id) = 0;

@@ -27,7 +27,7 @@
 #include "csutil/callstack.h"
 #include "csutil/hash.h"
 #include "csutil/scf_implementation.h"
-#include "csutil/thread.h"
+#include "csutil/threading/mutex.h"
 
 class CS_CRYSTALSPACE_EXPORT csRefTracker : 
   public scfImplementation1<csRefTracker, iRefTracker>
@@ -56,10 +56,16 @@ class CS_CRYSTALSPACE_EXPORT csRefTracker :
   {
     csArray<RefAction> actions;
     int refCount;
-    bool destructed;
+    uint flags;
     const char* descr;
 
-    RefInfo() : destructed (false), descr(0) { }
+    enum 
+    { 
+      /// Object was destructed (ie TrackDestruction() called)
+      flagDestructed = 1
+    };
+
+    RefInfo() : refCount (0), flags (0), descr(0) { }
   };
   csBlockAllocator<RefInfo> riAlloc;
   csHash<void*, void*> aliases;
@@ -70,8 +76,8 @@ class CS_CRYSTALSPACE_EXPORT csRefTracker :
     RefInfo* ri;
   };
   csArray<OldRefInfo> oldData;
-  //csRef<csMutex> mutex;
-  csMutex* mutex;
+  
+  CS::Threading::RecursiveMutex mutex;
   
   RefInfo& GetObjRefInfo (void* obj);
 
@@ -92,6 +98,7 @@ public:
   virtual void RemoveAlias (void* obj, void* mapTo);
 
   virtual void SetDescription (void* obj, const char* description);
+  virtual void SetDescriptionWeak (void* obj, const char* description);
 
   void Report ();
 };

@@ -27,6 +27,9 @@
 #include "gl_txtmgr.h"
 #include "gl_r2t_framebuf.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
+{
+
 void csGLRender2TextureFramebuf::SetRenderTarget (iTextureHandle* handle, 
 						  bool persistent,
 						  int subtexture)
@@ -42,8 +45,8 @@ void csGLRender2TextureFramebuf::SetRenderTarget (iTextureHandle* handle,
 
     G3D->GetDriver2D()->GetClipRect (rt_old_minx, rt_old_miny, 
       rt_old_maxx, rt_old_maxy);
-    if ((rt_old_minx != 0) && (rt_old_miny != 0)
-      && (rt_old_maxx != txt_w) && (rt_old_maxy != txt_h))
+    if ((rt_old_minx != 0) || (rt_old_miny != 0)
+      || (rt_old_maxx != txt_w) || (rt_old_maxy != txt_h))
     {
       G3D->GetDriver2D()->SetClipRect (0, 0, txt_w, txt_h);
     }
@@ -84,8 +87,9 @@ void csGLRender2TextureFramebuf::BeginDraw (int drawflags)
     G3D->statecache->Disable_GL_BLEND ();
     G3D->SetZMode (CS_ZBUF_NONE);
 
-	csGLTextureHandle* tex_mm = (csGLTextureHandle *)(render_target->GetPrivateObject ());
-	GLenum textarget = tex_mm->GetGLTextureTarget();
+    csGLBasicTextureHandle* tex_mm = 
+      static_cast<csGLBasicTextureHandle*> (render_target->GetPrivateObject ());
+    GLenum textarget = tex_mm->GetGLTextureTarget();
 
     GLint oldMagFilt, oldMinFilt;
     glGetTexParameteriv (textarget, GL_TEXTURE_MAG_FILTER, &oldMagFilt);
@@ -121,8 +125,8 @@ void csGLRender2TextureFramebuf::FinishDraw ()
   if (rt_onscreen)
   {
     rt_onscreen = false;
-    csGLTextureHandle* tex_mm = (csGLTextureHandle *)
-      render_target->GetPrivateObject ();
+    csGLBasicTextureHandle* tex_mm = 
+      static_cast<csGLBasicTextureHandle*> (render_target->GetPrivateObject ());
     tex_mm->Precache ();
     // Texture is in tha cache, update texture directly.
     G3D->ActivateTexture (tex_mm);
@@ -132,7 +136,7 @@ void csGLRender2TextureFramebuf::FinishDraw ()
     {
       // @@@ Processing sucks, but how else to handle keycolor?
       const size_t numPix = txt_w * txt_h;
-      pixelScratch.SetLength (numPix * 4);
+      pixelScratch.SetSize (numPix * 4);
       glReadPixels (0, 0, txt_w, txt_h, GL_RGBA, 
 	GL_UNSIGNED_BYTE, pixelScratch.GetArray());
       csRGBpixel key;
@@ -204,3 +208,6 @@ void csGLRender2TextureFramebuf::SetupClipPortalDrawing ()
   glScalef (1, -1, 1);
   //G3D->statecache->SetCullFace (GL_BACK);
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(gl3d)

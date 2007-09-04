@@ -49,14 +49,14 @@ public:
   /// Get array length.
   virtual size_t GetSize () const
   {
-    return v.Length ();
+    return v.GetSize ();
   }
 
   /**
    * Get array length.
    * \deprecated Use GetSize() instead.
    */
-  /*CS_DEPRECATED_METHOD_MSG("Use GetSize() instead.")*/
+  CS_DEPRECATED_METHOD_MSG("Use GetSize() instead.")
   virtual size_t Length () const
   {
     return GetSize ();

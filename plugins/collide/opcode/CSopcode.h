@@ -36,6 +36,7 @@
 #include "csutil/scf_implementation.h"
 #include "ivaria/collider.h"
 #include "csgeom/transfrm.h"
+#include "imesh/terrain2.h"
 #include "CSopcodecollider.h"
 #include "csTerraFormerCollider.h"
 #include "Opcode.h"
@@ -56,6 +57,9 @@ class csOPCODECollideSystem :
     const csReversibleTransform* trans1, csTerraFormerCollider* terraformer,
     const csReversibleTransform* trans2);
   
+  bool Collide (csOPCODECollider* collider1, const csReversibleTransform*
+    trans1, iTerrainSystem* terrain, const csReversibleTransform* terrainTrans);
+
   bool TestTriangleTerraFormer (csVector3 triangle[3],
     csTerraFormerCollider* c, csCollisionPair* pair);
 
@@ -68,6 +72,8 @@ public:
   csArray<int> collision_faces;
   csArray<csIntersectingTriangle> intersecting_triangles;
   iObjectRegistry *object_reg;
+  csStringID trianglemesh_id;
+  csStringID basemesh_id;
  
   static iObjectRegistry* rep_object_reg;
   static void OpcodeReportV (int severity, const char* message, 
@@ -81,10 +87,16 @@ public:
   // to 'pairs'.
   void CopyCollisionPairs (csOPCODECollider* col1, csOPCODECollider* col2);
 
-  void CopyCollisionPairs (csOPCODECollider* col2, csTerraFormerCollider* terraformer);
+  void CopyCollisionPairs (csOPCODECollider* col2,
+      csTerraFormerCollider* terraformer);
+
+  virtual csStringID GetTriangleDataID () { return trianglemesh_id; }
+  virtual csStringID GetBaseDataID () { return basemesh_id; }
 
   virtual csPtr<iCollider> CreateCollider (iPolygonMesh* mesh);
+  virtual csPtr<iCollider> CreateCollider (iTriangleMesh* mesh);
   virtual csPtr<iCollider> CreateCollider (iTerraFormer* mesh);
+  virtual csPtr<iCollider> CreateCollider (iTerrainSystem* mesh);
 
   /**
    * Test collision between two colliders.

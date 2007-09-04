@@ -32,18 +32,30 @@
 
 #include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/hash.h"
+#include "iutil/strset.h"
+#include "iutil/objreg.h"
 #include "imesh/objmodel.h"
 #include "igeom/polymesh.h"
+#include "igeom/trimesh.h"
 
 struct iTerraFormer;
+
+// for iPolygonMesh
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
+class csTMIterator;
 
 /**
  * Helper class to make it easier to implement iObjectModel in mesh
  * objects. This class does not implement the bounding box and radius
  * functions. 
  */
-class csObjectModel : public scfImplementation1<csObjectModel,iObjectModel>
+class CS_CRYSTALSPACE_EXPORT csObjectModel : 
+  public scfImplementation1<csObjectModel,iObjectModel>
 {
+  friend class csTMIterator;
+
 private:
   long shapenr;
   iPolygonMesh* polymesh_base;
@@ -51,6 +63,8 @@ private:
   csRef<iPolygonMesh> polymesh_viscull;
   csRef<iPolygonMesh> polymesh_shadows;
   csRefArray<iObjectModelListener> listeners;
+
+  csHash<csRef<iTriangleMesh>,csStringID> trimesh;
 
 public:
   /**
@@ -63,6 +77,26 @@ public:
   }
 
   virtual ~csObjectModel () {}
+
+  /**
+   * Conveniance method to fetch the standard string registry from the
+   * object registry.
+   */
+  csRef<iStringSet> GetStandardStringSet (iObjectRegistry* object_reg)
+  {
+    return csQueryRegistryTagInterface<iStringSet> (object_reg,
+	"crystalspace.shared.stringset");
+  }
+
+  /**
+   * Conveniance method to fetch the base string ID given the object
+   * registry.
+   */
+  csStringID GetBaseID (iObjectRegistry* object_reg)
+  {
+    csRef<iStringSet> strings = GetStandardStringSet (object_reg);
+    return strings->Request ("base");
+  }
 
   /**
    * Set the pointer to the base polygon mesh.
@@ -95,11 +129,17 @@ public:
   void FireListeners ()
   {
     size_t i;
-    for (i = 0 ; i < listeners.Length () ; i++)
+    for (i = 0 ; i < listeners.GetSize () ; i++)
       listeners[i]->ObjectModelChanged (this);
   }
 
   virtual long GetShapeNumber () const { return shapenr; }
+  virtual iTriangleMesh* GetTriangleData (csStringID);
+  virtual csPtr<iTriangleMeshIterator> GetTriangleDataIterator ();
+  virtual void SetTriangleData (csStringID, iTriangleMesh*);
+  virtual bool IsTriangleDataSet (csStringID);
+  virtual void ResetTriangleData (csStringID);
+
   virtual iPolygonMesh* GetPolygonMeshBase () { return polymesh_base; }
   virtual iPolygonMesh* GetPolygonMeshColldet () { return polymesh_colldet; }
   virtual void SetPolygonMeshColldet (iPolygonMesh* polymesh)
@@ -133,9 +173,13 @@ public:
   {
     return 0;
   }
+  virtual iTerrainSystem* GetTerrainColldet () { return 0; }
 };
 
 /** @} */
+
+// for iPolygonMesh
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_CSTOOL_OBJMODEL_H__
 

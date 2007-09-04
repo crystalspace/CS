@@ -31,7 +31,7 @@
 
 #include "csutil/cfgacc.h"
 
-#include "docwrap.h"
+#include "cpi/docwrap.h"
 #include "shader.h"
 #include "xmlshader.h"
 
@@ -55,7 +55,7 @@ csXMLShaderCompiler::csXMLShaderCompiler(iBase* parent) :
   // Set up builtin constants
 #define BUILTIN_CONSTANT(Type, Value)					    \
   condConstants.AddConstant (#Value, (Type)Value);
-#include "condconstbuiltin.inc"
+#include "cpi/condconstbuiltin.inc"
 #undef BUILTIN_CONSTANT
 }
 
@@ -103,6 +103,7 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
   csConfigAccess config (object_reg);
   doDumpXML = config->GetBool ("Video.XMLShader.DumpVariantXML");
   doDumpConds = config->GetBool ("Video.XMLShader.DumpConditions");
+  doDumpValues = config->GetBool ("Video.XMLShader.DumpPossibleValues");
   debugInstrProcessing = 
     config->GetBool ("Video.XMLShader.DebugInstructionProcessing");
 
@@ -160,7 +161,7 @@ public:
   {
   }
 
-  virtual size_t GetCount () const { return priorities.Length (); }
+  virtual size_t GetCount () const { return priorities.GetSize (); }
   virtual int GetPriority (size_t idx) const { return priorities[idx]; }
 };
 

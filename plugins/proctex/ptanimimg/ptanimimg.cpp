@@ -22,6 +22,7 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/texture.h"
+#include "csutil/scfstr.h"
 #include "iutil/document.h"
 #include "iutil/objreg.h"
 #include "iengine/engine.h"
@@ -125,8 +126,16 @@ csPtr<iBase> csAnimateProctexLoader::Parse (iDocumentNode* node,
     csRef<iTextureManager> tm = G3D->GetTextureManager();
     if (!tm) return 0;
     int texFlags = (ctx && ctx->HasFlags()) ? ctx->GetFlags() : CS_TEXTURE_3D;
-    csRef<iTextureHandle> TexHandle (tm->RegisterTexture (img, texFlags));
-    if (!TexHandle) return 0;
+    csRef<scfString> fail_reason;
+    fail_reason.AttachNew (new scfString ());
+    csRef<iTextureHandle> TexHandle (tm->RegisterTexture (img, texFlags,
+	  fail_reason));
+    if (!TexHandle)
+    {
+      Report (CS_REPORTER_SEVERITY_ERROR, node, 
+	"Couldn't create texture: %s", fail_reason->GetData ());
+      return 0;
+    }
 
     pt->GetTextureWrapper()->SetTextureHandle (TexHandle);
 

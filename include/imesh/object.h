@@ -29,6 +29,7 @@
  * \addtogroup meshplugins
  * @{ */
 
+struct iDecalBuilder;
 struct iLight;
 struct iMaterialWrapper;
 struct iMeshWrapper;
@@ -107,7 +108,7 @@ struct iMeshObjectDrawCallback : public iBase
  */
 struct iMeshObject : public virtual iBase
 {
-  SCF_INTERFACE(iMeshObject, 2,0,0);
+  SCF_INTERFACE(iMeshObject, 2,1,0);
   /**
    * Get the reference to the factory that created this mesh object.
    */
@@ -270,6 +271,14 @@ struct iMeshObject : public virtual iBase
    * it's current state.
    */
   virtual void PositionChild (iMeshObject* child,csTicks current_time) = 0;
+
+  /**
+   * This mesh is being asked to build a decal for its own geometry.  The
+   * mesh is given a position and radius of the decal and must create
+   * geometry through the provided iDecalBuilder.
+   */
+  virtual void BuildDecal(const csVector3* pos, float decalRadius,
+	iDecalBuilder* decalBuilder) = 0;
 };
 
 /**

@@ -167,6 +167,7 @@ bool Simple::Initialize ()
 	CS_REQUEST_LEVELLOADER,
 	CS_REQUEST_REPORTER,
 	CS_REQUEST_REPORTERLISTENER,
+	CS_REQUEST_PLUGIN ("crystalspace.device.joystick", iEventPlug),
 	CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -200,8 +201,9 @@ bool Simple::Initialize ()
     return false;
   }
 
+  /// @@@ (ge) This is a redundant way to load a joystick.
   // Attempt to load a joystick plugin.
-  csRef<iStringArray> joystickClasses =
+  /*csRef<iStringArray> joystickClasses =
     iSCF::SCF->QueryClassList ("crystalspace.device.joystick.");
   if (joystickClasses.IsValid())
   {
@@ -217,7 +219,7 @@ bool Simple::Initialize ()
 	className, (b != 0) ? "successful" : "failed");
       if (b != 0) b->DecRef ();
     }
-  }
+  }*/
 
   // The virtual clock.
   vc = csQueryRegistry<iVirtualClock> (object_reg);

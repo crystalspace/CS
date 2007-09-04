@@ -31,7 +31,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include <CcdPhysics/CcdPhysicsController.h>
 #include <Dynamics/RigidBody.h>
 #include <CcdPhysics/CcdPhysicsEnvironment.h>
-#include <ConstraintSolver/SimpleConstraintSolver.h>
 #include <BroadphaseCollision/SimpleBroadphase.h>
 #include <CollisionShapes/BoxShape.h>
 #include <CollisionShapes/EmptyShape.h>
@@ -109,6 +108,12 @@ void csBulletDynamics::Step (float stepsize)
   for (size_t i = 0; i < systems.GetSize (); i++)
   {
     systems[i]->Step (stepsize);
+  }
+  //step callbacks
+  step_callbacks.Compact ();
+  for (size_t i = 0; i < step_callbacks.GetSize (); i++)
+  {
+    step_callbacks[i]->Step (stepsize);
   }
 }
 //-------------------------------csBulletDynamicsSystem----------------------------------------------//
@@ -733,7 +738,7 @@ bool csBulletCollider::CreateBoxGeometry (const csVector3& size)
 
   return true;
 }
-bool csBulletCollider::CreateCCylinderGeometry (float /*length*/,
+bool csBulletCollider::CreateCapsuleGeometry (float /*length*/,
   float /*radius*/)
 {
   return false;

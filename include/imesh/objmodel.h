@@ -30,9 +30,12 @@
  
 #include "csutil/scf_interface.h"
 #include "csutil/ref.h"
+#include "iutil/strset.h"
 
 struct iPolygonMesh;
+struct iTriangleMesh;
 struct iTerraFormer;
+struct iTerrainSystem;
 struct iObjectModel;
 
 class csBox3;
@@ -50,6 +53,31 @@ struct iObjectModelListener : public virtual iBase
 };
 
 /**
+ * Iterator to iterate over all data mesh ID's in an object model.
+ * This is returned by iObjectModel::GetTriangleDataIterator().
+ * This iterator will return all data meshes that are set. That includes
+ * data meshes that are set but still 0.
+ */
+struct iTriangleMeshIterator : public virtual iBase
+{
+  SCF_INTERFACE(iTriangleMeshIterator, 0, 0, 1);
+
+  /// Return true if the iterator has more elements.
+  virtual bool HasNext () = 0;
+
+  /**
+   * Return next element. The id of the triangle mesh will be returned
+   * in 'id'. Note that this function can return 0. This doesn't mean
+   * that the iterator has ended. It just means that for the given 'id'
+   * the mesh was set to 0.
+   */
+  virtual iTriangleMesh* Next (csStringID& id) = 0;
+};
+
+// for iPolygonMesh
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
+/**
  * This interface represents data related to some geometry in object
  * space. It is a generic way to describe meshes in the engine. By using
  * this interface you can make sure your code works on all engine geometry.
@@ -64,7 +92,7 @@ struct iObjectModelListener : public virtual iBase
  */
 struct iObjectModel : public virtual iBase
 {
-  SCF_INTERFACE(iObjectModel, 2, 0, 0);
+  SCF_INTERFACE(iObjectModel, 2, 0, 2);
   /**
    * Returns a number that will change whenever the shape of this object
    * changes. If that happens then the data in all the returned polygon
@@ -73,16 +101,80 @@ struct iObjectModel : public virtual iBase
   virtual long GetShapeNumber () const = 0;
 
   /**
+   * Get a triangle mesh representing the geometry of the object.
+   * The ID indicates the type of mesh that is desired. Use the
+   * string registry (iStringSet from object registry with tag
+   * 'crystalspace.shared.stringset') to convert the ID string to a
+   * csStringID identification. Some common possibilities are:
+   * - 'base'
+   * - 'colldet'
+   * - 'viscull'
+   * - 'shadows'
+   * \return the triangle mesh for that id. If this is 0 then there
+   * are two possibilities: either the mesh was never set and in this
+   * case the subsystem can pick the base mesh as a fallback. Another
+   * possibility is that the triangle data was explicitelly cleared
+   * with SetTriangleData(id,0). In that case the mesh is assumed to
+   * be empty and usually that means that the specific subsystem will
+   * ignore it. To distinguish between these two cases use
+   * IsTriangleDataSet(id).
+   */
+  virtual iTriangleMesh* GetTriangleData (csStringID id) = 0;
+
+  /**
+   * Get an iterator to iterate over all triangle meshes in this
+   * object model. This includes triangle meshes that are 0.
+   */
+  virtual csPtr<iTriangleMeshIterator> GetTriangleDataIterator () = 0;
+
+  /**
+   * Set a triangle mesh representing the geometry of the object.
+   * The ID indicates the type of mesh that you want to change. Note that
+   * the base mesh (ID equal to 'base')
+   * cannot be modified.
+   * \param id is a numer id you can fetch from the string registry
+   *        (iStringSet from object registry with tag\
+   *        'crystalspace.shared.stringset').
+   * \param trimesh is the new mesh. The reference count will be increased.
+   *        If you pass in 0 here then this means that the mesh for this
+   *        specific ID is disabled. If you want to reset this then
+   *        call ResetTriangleData(id). When no mesh is set or
+   *        ResetTriangleData() is called many subsystems will use
+   *        the base mesh instead. However if you set 0 here then this
+   *        means that this mesh is disabled.
+   */
+  virtual void SetTriangleData (csStringID id, iTriangleMesh* trimesh) = 0;
+
+  /**
+   * Return true if the triangle data was set for this id. This can
+   * be used to distinguish between an empty mesh as set with
+   * SetTriangleData() or SetTriangleData() not being called at all.
+   * Calling ResetTriangleData() will clear this.
+   */
+  virtual bool IsTriangleDataSet (csStringID id) = 0;
+
+  /**
+   * Reset triangle data. After calling this it is as if the triangle
+   * data was never set.
+   */
+  virtual void ResetTriangleData (csStringID id) = 0;
+
+  /**
    * Get a polygon mesh representing the basic geometry of the object.
    * Can return 0 if this object model doesn't support that.
+   * \deprecated Use GetTriangleData(id) with id the interned string 'base'.
    */
+  CS_DEPRECATED_METHOD_MSG("Use GetTriangleData() instead.")
   virtual iPolygonMesh* GetPolygonMeshBase () = 0;
 
   /**
    * Get a polygon mesh representing the geometry of the object.
    * This mesh is useful for collision detection.
    * Can return 0 if this object model doesn't support that.
+   * \deprecated Use GetTriangleData(id) with id the interned string
+   *   'colldet'.
    */
+  CS_DEPRECATED_METHOD_MSG("Use GetTriangleData() instead.")
   virtual iPolygonMesh* GetPolygonMeshColldet () = 0;
 
   /**
@@ -93,6 +185,13 @@ struct iObjectModel : public virtual iBase
   virtual iTerraFormer* GetTerraFormerColldet () = 0;
 
   /**
+   * Get a terrain representing the geometry of the object.
+   * This class is useful for collision detection.
+   * Can return 0 if this object model doesn't support that.
+   */
+  virtual iTerrainSystem* GetTerrainColldet () = 0;
+
+  /**
    * Set a polygon mesh representing the geometry of the object.
    * This mesh is useful for collision detection.
    * This can be used to replace the default polygon mesh returned
@@ -100,7 +199,10 @@ struct iObjectModel : public virtual iBase
    * even to support polygon mesh for mesh objects that otherwise don't
    * support it. The object model will keep a reference to the
    * given polymesh.
+   * \deprecated Use SetTriangleData(id) with id the interned string
+   *   'colldet'.
    */
+  CS_DEPRECATED_METHOD_MSG("Use SetTriangleData() instead.")
   virtual void SetPolygonMeshColldet (iPolygonMesh* polymesh) = 0;
 
   /**
@@ -112,7 +214,10 @@ struct iObjectModel : public virtual iBase
    * in a visibility culling system.
    * Can return 0 if this object model doesn't support that. In that
    * case the object will not be used for visibility culling.
+   * \deprecated Use GetTriangleData(id) with id the interned string
+   *   'viscull'.
    */
+  CS_DEPRECATED_METHOD_MSG("Use GetTriangleData() instead.")
   virtual iPolygonMesh* GetPolygonMeshViscull () = 0;
 
   /**
@@ -123,7 +228,10 @@ struct iObjectModel : public virtual iBase
    * even to support polygon mesh for mesh objects that otherwise don't
    * support it. The object model will keep a reference to the
    * given polymesh.
+   * \deprecated Use SetTriangleData(id) with id the interned string
+   *   'viscull'.
    */
+  CS_DEPRECATED_METHOD_MSG("Use SetTriangleData() instead.")
   virtual void SetPolygonMeshViscull (iPolygonMesh* polymesh) = 0;
 
   /**
@@ -133,7 +241,10 @@ struct iObjectModel : public virtual iBase
    * mesh in red and this one in blue you should not see any blue anywhere.
    * Can return 0 if this object model doesn't support that. In that
    * case the object will not be used for shadow casting.
+   * \deprecated Use GetTriangleData(id) with id the interned string
+   *   'shadows'.
    */
+  CS_DEPRECATED_METHOD_MSG("Use GetTriangleData() instead.")
   virtual iPolygonMesh* GetPolygonMeshShadows () = 0;
 
   /**
@@ -144,7 +255,10 @@ struct iObjectModel : public virtual iBase
    * even to support polygon mesh for mesh objects that otherwise don't
    * support it. The object model will keep a reference to the
    * given polymesh.
+   * \deprecated Use SetTriangleData(id) with id the interned string
+   *   'shadows'.
    */
+  CS_DEPRECATED_METHOD_MSG("Use SetTriangleData() instead.")
   virtual void SetPolygonMeshShadows (iPolygonMesh* polymesh) = 0;
 
   /**
@@ -154,7 +268,9 @@ struct iObjectModel : public virtual iBase
    * 1 for highest detail. This function may return the same polygon
    * mesh as GetPolygonMeshColldet() (but with ref count incremented by one).
    * Can return 0 if this object model doesn't support that.
+   * \deprecated This method was never implemented and is misplaced.
    */
+  CS_DEPRECATED_METHOD_MSG("Deprecated because unimplemented.")
   virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float detail) = 0;
 
   /**
@@ -195,6 +311,9 @@ struct iObjectModel : public virtual iBase
 };
 
 /** @} */
+
+// for iPolygonMesh
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_IMESH_OBJMODEL_H__
 

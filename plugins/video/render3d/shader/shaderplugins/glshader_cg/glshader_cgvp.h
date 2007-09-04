@@ -27,15 +27,6 @@
 #include "csutil/strhash.h"
 #include "csutil/leakguard.h"
 
-#include <Cg/cg.h>
-/* WIN32is used in an "#if" inside <cgGL.h>, however, it is sometimes defined
- * without value. */
-#ifdef WIN32
-#undef WIN32
-#define WIN32 1
-#endif 
-#include <Cg/cgGL.h>
-
 #include "glshader_cgcommon.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)

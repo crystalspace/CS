@@ -87,7 +87,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
     const csVector4 zero (0, 0, 0, 1);
     const csVector4 one (1);
 
-    for(i = 0; i < lights.Length(); ++i)
+    for(i = 0; i < lights.GetSize (); ++i)
     {
       GLenum glLight = (GLenum)GL_LIGHT0+i;
       glEnable (glLight);
@@ -153,13 +153,13 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
     statecache->Enable_GL_LIGHTING ();
   }
 
-  for (i=0; i<layers.Length (); i++)
+  for (i=0; i<layers.GetSize (); i++)
   {
     statecache->SetCurrentTU ((int)i);
     statecache->ActivateTU (tuFlags);
     if (layers[i].texgen == TEXGEN_PROJECTION)
     {
-        if (!lights.Length())
+        if (!lights.GetSize ())
         {
 	  continue;
         }
@@ -230,7 +230,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
     }
     else if (layers[i].texgen == TEXGEN_TEXTURE3D)
     {
-        if (!lights.Length())
+        if (!lights.GetSize ())
         {
 	  continue;
         }
@@ -446,11 +446,11 @@ void csGLShaderFVP::SetupState (const csRenderMesh* /*mesh*/,
       }
     }
 
-    if (layers[i].texMatrixOps.Length() > 0)
+    if (layers[i].texMatrixOps.GetSize () > 0)
     {
       statecache->SetMatrixMode (GL_TEXTURE);
 
-      for (size_t j = 0; j < layers[i].texMatrixOps.Length(); j++)
+      for (size_t j = 0; j < layers[i].texMatrixOps.GetSize (); j++)
       {
 	TexMatrixOp& op = layers[i].texMatrixOps[j];
 
@@ -548,7 +548,7 @@ void csGLShaderFVP::ResetState ()
 
   if (do_lighting)
   {
-    for (i = 0; i < lights.Length(); ++i)
+    for (i = 0; i < lights.GetSize (); ++i)
       glDisable ((GLenum)GL_LIGHT0+i);
 
     if (colorMaterial != 0)
@@ -559,13 +559,13 @@ void csGLShaderFVP::ResetState ()
     statecache->Disable_GL_LIGHTING ();
   }
 
-  i = layers.Length ();
+  i = layers.GetSize ();
   while (i-- > 0)
   {
     statecache->SetCurrentTU ((int)i);
     statecache->ActivateTU (tuFlags);
     if ((layers[i].texgen != TEXGEN_NONE) ||
-      (layers[i].texMatrixOps.Length() > 0))
+      (layers[i].texMatrixOps.GetSize () > 0))
     {
       statecache->Disable_GL_TEXTURE_GEN_S ();
       statecache->Disable_GL_TEXTURE_GEN_T ();
@@ -764,7 +764,7 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
         case XMLTOKEN_LIGHT:
           {
             do_lighting = true;
-	    LightingEntry& entry = lights.GetExtend (lights.Length());
+	    LightingEntry& entry = lights.GetExtend (lights.GetSize ());
 
             entry.lightnum = child->GetAttributeValueAsInt("num");
 
@@ -799,8 +799,8 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
 		variablesnode, "'layer' attribute invalid");
 	      return false;
 	    }
-            if (layers.Length ()<= (size_t)layer)
-              layers.SetLength (layer+1);
+            if (layers.GetSize ()<= (size_t)layer)
+              layers.SetSize (layer+1);
 	    if (!ParseProgramParam (child, layers[layer].constcolor, ParamFloat | 
 	      ParamVector3 | ParamVector4 | ParamShaderExp))
 	      return false;
@@ -826,8 +826,8 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
 		variablesnode, "'layer' attribute invalid");
 	      return false;
 	    }
-            if (layers.Length () <= (size_t)layer)
-              layers.SetLength (layer+1);
+            if (layers.GetSize () <= (size_t)layer)
+              layers.SetSize (layer+1);
             const char* str;
             if ((str = child->GetAttributeValue ("type")))
             {
@@ -891,8 +891,8 @@ bool csGLShaderFVP::Load(iShaderDestinationResolver* resolve,
 		variablesnode, "'layer' attribute invalid");
 	      return false;
 	    }
-            if (layers.Length () <= (size_t)layer)
-              layers.SetLength (layer+1);
+            if (layers.GetSize () <= (size_t)layer)
+              layers.SetSize (layer+1);
 	    if (!ParseTexMatrix (child, layers[layer].texMatrixOps))
 	      return false;
 	  }
@@ -993,10 +993,10 @@ bool csGLShaderFVP::Compile()
 
   size_t i;
 
-  if (layers.Length () > (size_t)shaderPlug->texUnits)
+  if (layers.GetSize () > (size_t)shaderPlug->texUnits)
     return false;
 
-  for (i=0; i<layers.Length (); i++)
+  for (i=0; i<layers.GetSize (); i++)
     if ((layers[i].texgen == TEXGEN_REFLECT_CUBE) &&
       !shaderPlug->ext->CS_GL_ARB_texture_cube_map)
       return false;

@@ -79,8 +79,6 @@ public:
   /// Execute script code contained in the given CEGUI::String object.
   virtual void executeString (const CEGUI::String &str);
 
-#if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR >= 5)
-
   /// Subscribes the named Event to a scripted function.
   virtual CEGUI::Event::Connection subscribeEvent(CEGUI::EventSet* target,
     const CEGUI::String& name, const CEGUI::String& subscriber_name);
@@ -89,8 +87,6 @@ public:
   virtual CEGUI::Event::Connection subscribeEvent(CEGUI::EventSet* target,
     const CEGUI::String& name, CEGUI::Event::Group group,
     const CEGUI::String& subscriber_name);
-
-#endif  
 
 
 protected:

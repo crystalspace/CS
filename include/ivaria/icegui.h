@@ -28,8 +28,6 @@
 #include <CEGUI.h>
 #include "csutil/custom_new_enable.h"
 
-SCF_VERSION (iCEGUI, 0, 0, 1);
-
 struct iObjectRegistry;
 struct iScript;
 
@@ -38,6 +36,8 @@ struct iScript;
  */
 struct iCEGUI : public virtual iBase
 {
+  SCF_INTERFACE (iCEGUI, 1, 0, 0);
+
   /**
    * Initialize the plugin.
    * \param script iScript plugin to use as a scripting module.
@@ -73,6 +73,18 @@ struct iCEGUI : public virtual iBase
 
   /// Get a pointer to the CEGUI::WindowManager singleton.
   virtual CEGUI::WindowManager* GetWindowManagerPtr () const = 0;
+
+  /// Allow CEGUI to capture mouse events.
+  virtual void EnableMouseCapture () = 0;
+
+  /// Keep CEGUI from capturing mouse events.
+  virtual void DisableMouseCapture () = 0;
+
+  /// Allow CEGUI to capture keyboard events.
+  virtual void EnableKeyboardCapture () = 0;
+
+  /// Keep CEGUI from capturing keyboard events.
+  virtual void DisableKeyboardCapture () = 0;
 };
 
 #endif

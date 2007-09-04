@@ -21,6 +21,8 @@
 
 #include "csutil/refcount.h"
 
+#include "statistics.h"
+
 namespace lighter
 {
   class Scene;
@@ -28,12 +30,15 @@ namespace lighter
   class Light_old;
   class Primitive;
   class Raytracer;
+  class SwapManager;
 
   class Lighter : public csRefCount
   {
   public:
     Lighter (iObjectRegistry *objectRegistry);
     ~Lighter ();
+
+    int Run ();
 
     // Initialize and load plugins we want
     bool Initialize ();
@@ -52,23 +57,50 @@ namespace lighter
     csRef<iPluginManager> pluginManager;
     csRef<iReporter> reporter;
     csRef<iVFS> vfs;
+    csRef<iCommandLineParser> cmdLine;
+    csRef<iConfigManager> configMgr;
     iObjectRegistry *objectRegistry;
     csRef<iStringSet> strings;
 
-    // FIXME: move to class Configuration
-    struct Settings
-    {
-      bool keepGenmeshSubmeshes;
-    };
-    Settings settings;
+    SwapManager* swapManager;
 
   protected:
-    // Parse the commandline and load any files specified
-    bool LoadFiles ();
+    // Cleanup and prepare for shutdown
+    void CleanUp ();
 
-    void LoadSettings ();
+    // Parse the commandline and load any files specified
+    bool LoadFiles (Statistics::Progress& progress);
+
+    void LoadConfiguration ();
+
+    void CommandLineHelp () const;
 
     Scene *scene;
+
+    Statistics::Progress progStartup;
+    Statistics::Progress progLoadFiles;
+    Statistics::Progress progLightmapLayout;
+    Statistics::Progress progSaveFactories;
+    Statistics::Progress progInitializeMain;
+    Statistics::Progress progInitialize;
+    Statistics::Progress progInitializeLightmaps;
+    Statistics::Progress progInitializeLM;
+    Statistics::Progress progPrepareLighting;
+    Statistics::Progress progPrepareLightingUVL;
+    Statistics::Progress progPrepareLightingSector;
+    Statistics::Progress progSaveMeshesMain;
+    Statistics::Progress progSaveMeshes;
+    Statistics::Progress progSaveFinish;
+    Statistics::Progress progBuildKDTree;
+    Statistics::Progress progDirectLighting;
+    Statistics::Progress progPostproc;
+    Statistics::Progress progPostprocSector;
+    Statistics::Progress progPostprocLM;
+    Statistics::Progress progSaveResult;
+    Statistics::Progress progSaveMeshesPostLight;
+    Statistics::Progress progApplyWorldChanges;
+    Statistics::Progress progCleanup;
+    Statistics::Progress progFinished;
   };
 
   // Global lighter

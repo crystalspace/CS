@@ -950,9 +950,7 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
         ->SetValue("localshadows");
 
     //Writedown ManualColor tag
-    if (gfact->IsManualColors())
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)
-        ->SetValue("manualcolors");
+    synldr->WriteBool(paramsNode, "manualcolors", gfact->IsManualColors(), false);
 
     //Writedown AnimationControl tag
     iGenMeshAnimationControlFactory* aniconfact = 
@@ -1097,10 +1095,15 @@ bool csGeneralMeshLoader::ParseLegacySubMesh(iDocumentNode *node,
   if(!node) return false;
   if (!state)
   {
-    synldr->ReportError ("crystalspace.genmeshloader.parse",
+    synldr->ReportError ("crystalspace.genmeshloader.parselegacysubmesh",
       node, "Submesh must be specified _after_ factory tag.");
     return false;
   }
+
+  synldr->Report ("crystalspace.genmeshloader.parselegacysubmesh", 
+    CS_REPORTER_SEVERITY_WARNING, node, 
+    "Using deprecated legacy submesh syntax.");
+
 
   csRef<iMeshObject> mo = scfQueryInterface<iMeshObject> (state);
   csRef<iGeneralFactoryState> factstate =
@@ -1126,7 +1129,7 @@ bool csGeneralMeshLoader::ParseLegacySubMesh(iDocumentNode *node,
         if (tri > factstate->GetTriangleCount ())
         {
           synldr->ReportError (
-            "crystalspace.genmeshloader.parse.invalidindex",
+            "crystalspace.genmeshloader.parselegacysubmesh.invalidindex",
             child, "Invalid triangle index in genmesh submesh!");
           return false;
         }
@@ -1145,7 +1148,7 @@ bool csGeneralMeshLoader::ParseLegacySubMesh(iDocumentNode *node,
         if (!material.IsValid ())
         {
           synldr->ReportError (
-            "crystalspace.genmeshloader.parse.unknownmaterial",
+            "crystalspace.genmeshloader.parselegacysubmesh.unknownmaterial",
             node, "Couldn't find material '%s'!", matname);
           return false;
         }
@@ -1165,10 +1168,10 @@ bool csGeneralMeshLoader::ParseLegacySubMesh(iDocumentNode *node,
   }
 
   if (do_mixmode)
-    state->AddSubMesh (triangles.GetArray (), (int)triangles.Length (),
+    state->AddSubMesh (triangles.GetArray (), (int)triangles.GetSize (),
   	  material, mixmode);
   else
-    state->AddSubMesh (triangles.GetArray (), (int)triangles.Length (),
+    state->AddSubMesh (triangles.GetArray (), (int)triangles.GetSize (),
   	  material);
 
   return true;
@@ -1378,6 +1381,50 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 	CHECK_MESH(meshstate);
         ParseSubMesh (child, meshstate, ldr_context);
         break;
+      case XMLTOKEN_ANIMCONTROL:
+        {
+	  const char* pluginname = child->GetAttributeValue ("plugin");
+	  if (!pluginname)
+	  {
+	    synldr->ReportError (
+		    "crystalspace.genmeshfactoryloader.parse",
+		    child, "Plugin name missing for <animcontrol>!");
+	    return 0;
+	  }
+	  csRef<iGenMeshAnimationControlType> type =
+	  	csLoadPluginCheck<iGenMeshAnimationControlType> (
+		object_reg, pluginname, false);
+	  if (!type)
+	  {
+	    synldr->ReportError (
+		"crystalspace.genmeshloader.parse",
+		child, "Could not load animation control plugin '%s'!",
+		pluginname);
+	    return 0;
+    	  }
+	  csRef<iGenMeshAnimationControlFactory> anim_ctrl_fact = type->
+	  	CreateAnimationControlFactory ();
+	  const char* error = anim_ctrl_fact->Load (child);
+	  if (error)
+	  {
+	    synldr->ReportError (
+		"crystalspace.genmeshloader.parse",
+		child, "Error loading animation control factory: '%s'!",
+		error);
+	    return 0;
+	  }
+          csRef<iGenMeshAnimationControl> animctrl = 
+            anim_ctrl_fact->CreateAnimationControl (mesh);
+	  if (!type)
+	  {
+	    synldr->ReportError (
+		"crystalspace.genmeshloader.parse",
+		child, "Could not create animation control");
+	    return 0;
+    	  }
+          meshstate->SetAnimationControl (animctrl);
+	}
+	break;
       default:
         synldr->ReportBadToken (child);
 	return 0;
@@ -1461,8 +1508,8 @@ bool csGeneralMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     synldr->WriteColor(colorNode, col);
 
     //Writedown ManualColor tag
-    synldr->WriteBool(paramsNode, "manualcolors",
-                      gmesh->IsManualColors(), true);
+    synldr->WriteBool(paramsNode, "manualcolors", gmesh->IsManualColors(), 
+      gfact->IsManualColors());
 
     //Writedown Material tag
     iMaterialWrapper* mat = mesh->GetMaterialWrapper();

@@ -93,7 +93,7 @@ bool csConsoleInput::HandleEvent (iEvent &Event)
 	      if (HistoryPos > 0)
 		HistoryPos--;
 	      else
-		HistoryPos = History.Length () - 1;
+		HistoryPos = History.GetSize () - 1;
 	      line.Replace (History.Get (HistoryPos));
 
 	      // Set cursor to end of line
@@ -113,7 +113,7 @@ bool csConsoleInput::HandleEvent (iEvent &Event)
 	    break;
 	  case CSKEY_DOWN:
 	    {
-	      if (HistoryPos < History.Length () - 1)
+	      if (HistoryPos < History.GetSize () - 1)
 		HistoryPos++;
 	      else
 		HistoryPos = 0;
@@ -190,10 +190,10 @@ bool csConsoleInput::HandleEvent (iEvent &Event)
 	    if (line.Length () > 0)
 	    {
 	      HistoryPos = History.Push (csStrNew (line)) + 1;
-	      while (History.Length () > MaxLines)
+	      while (History.GetSize () > MaxLines)
 		History.DeleteIndex (0);
-  	      if(HistoryPos >= History.Length ())
-    	        HistoryPos = History.Length ();
+  	      if(HistoryPos >= History.GetSize ())
+    	        HistoryPos = History.GetSize ();
 	    }
 	    line.Replace ("");
 	    strCursorPos = 0;
@@ -301,22 +301,22 @@ void csConsoleInput::Bind (iConsoleOutput *iCon)
 
 const char *csConsoleInput::GetText (int iLine) const
 {
-  return ((iLine >= -1) && ((size_t)(iLine + 1) <= History.Length ())) ?
-         History.Get (iLine == -1 ? History.Length () - 1 : iLine) : 0;
+  return ((iLine >= -1) && ((size_t)(iLine + 1) <= History.GetSize ())) ?
+         History.Get (iLine == -1 ? History.GetSize () - 1 : iLine) : 0;
 }
 
 int csConsoleInput::GetCurLine () const
 {
-  return (int)History.Length () - 1;
+  return (int)History.GetSize () - 1;
 }
 
 void csConsoleInput::SetBufferSize (int iSize)
 {
   MaxLines = (iSize >= 0) ? iSize : 0;
-  while (History.Length () > MaxLines)
+  while (History.GetSize () > MaxLines)
     History.DeleteIndex (0);
-  if(HistoryPos >= History.Length ())
-    HistoryPos = History.Length () - 1;
+  if(HistoryPos >= History.GetSize ())
+    HistoryPos = History.GetSize () - 1;
 }
 
 void csConsoleInput::Clear ()

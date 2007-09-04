@@ -69,6 +69,9 @@ void scfString::SetAt (size_t iPos, char iChar)
 char scfString::GetAt (size_t iPos) const
 { return s.GetAt (iPos); }
 
+void scfString::DeleteAt (size_t iPos, size_t iCount)
+{ s.DeleteAt (iPos, iCount); }
+
 void scfString::Insert (size_t iPos, iString const* iStr)
 { s.Insert (iPos, iStr->GetData ()); }
 
@@ -174,6 +177,18 @@ bool scfString::Compare (const iString* iStr) const
 
 bool scfString::CompareNoCase (const iString* iStr) const
 { return s.CompareNoCase (iStr->GetData ()); }
+
+bool scfString::Compare (const char* iStr) const
+{ return s.Compare (iStr); }
+
+bool scfString::CompareNoCase (const char* iStr) const
+{ return s.CompareNoCase (iStr); }
+
+bool scfString::StartsWith (const iString* iStr, bool ignore_case) const
+{ return s.StartsWith (iStr->GetData (), ignore_case); }
+
+bool scfString::StartsWith (const char* iStr, bool ignore_case) const
+{ return s.StartsWith (iStr, ignore_case); }
 
 void scfString::operator += (const iString& iStr)
 { Append (&iStr); }

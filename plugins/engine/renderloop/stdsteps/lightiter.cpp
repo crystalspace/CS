@@ -23,6 +23,7 @@
 
 #include "csgeom/sphere.h"
 #include "csgfx/imagememory.h"
+#include "cstool/rviewclipper.h"
 #include "csutil/cscolor.h"
 #include "iengine/camera.h"
 #include "iengine/light.h"
@@ -178,8 +179,8 @@ void csLightIterRenderStep::Init ()
     trw_inv_name = strings->Request ("light 0 transform inverse world");
     CS::ShaderVarName lightcountname (strings, "light count");
 
-    shadermgr = 
-    	csQueryRegistry<iShaderManager> (object_reg);
+    shadermgr = csQueryRegistry<iShaderManager> (object_reg);
+    lightmgr = csQueryRegistry<iLightManager> (object_reg);
 
     shvar_light_0_position = shadermgr->GetVariable (posname);
     if (!shvar_light_0_position)
@@ -292,14 +293,18 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
 
   // @@@ This code is ignoring dynamic lights. Perhaps we need a better
   // way to represent those.
-  iLightList* lights = sector->GetLights();
-  int nlights = lights->GetCount();
+  //iLightList* lights = sector->GetLights();
+  //int nlights = lights->GetCount();
+  const csArray<iLightSectorInfluence*>& lights = lightmgr->GetRelevantLights (sector,
+      -1, false);
+  size_t nlights = lights.GetSize ();
 
   csArray<iLight*> lightList (16);
 
   while (nlights-- > 0)
   {
-    iLight* light = lights->Get (nlights);
+    //iLight* light = lights->Get (nlights);
+    iLight* light = lights.Get (nlights)->GetLight ();
     const csVector3 lightPos = light->GetMovable ()->GetFullPosition ();
 
     /* 
@@ -346,10 +351,11 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
     lightList.Empty ();
 
     csSphere lightSphere (lightPos, light->GetCutoffDistance ());
-    if (rview->TestBSphere (camTransR, lightSphere))
+    if (CS::RenderViewClipper::TestBSphere (rview->GetRenderContext (),
+	  camTransR, lightSphere))
     {
       size_t i;
-      for (i = 0; i < steps.Length(); i++)
+      for (i = 0; i < steps.GetSize (); i++)
       {
         steps[i]->Perform (rview, sector, light, stacks);
       }
@@ -388,7 +394,7 @@ size_t csLightIterRenderStep::Find (iRenderStep* step) const
 
 size_t csLightIterRenderStep::GetStepCount () const
 {
-  return steps.Length();
+  return steps.GetSize ();
 }
 
 csPtr<iTextureHandle> csLightIterRenderStep::GetAttenuationTexture (

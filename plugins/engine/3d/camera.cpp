@@ -65,7 +65,7 @@ csCamera::csCamera (const csCamera &c) :
     // Make a copy of the plane.
     fp = new csPlane3 (*fp);
   }
-  
+ 
   cameranr = cur_cameranr++;
 }
 
@@ -77,7 +77,7 @@ csCamera::~csCamera ()
 void csCamera::FireCameraSectorListeners (iSector* sector)
 {
   size_t i;
-  for (i = 0 ; i < listeners.Length () ; i++)
+  for (i = 0 ; i < listeners.GetSize () ; i++)
     listeners[i]->NewSector ((iCamera*)this, sector);
 }
 

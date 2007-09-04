@@ -29,6 +29,8 @@
 
 namespace CS
 {
+namespace Utility
+{
 
 /**
  * This is a class which provides basic weak reference-counting semantics.
@@ -39,12 +41,6 @@ namespace CS
  */
 class WeakReferenced
 {
-private:
-  typedef csArray<void**,
-    csArrayElementHandler<void**>,
-    CS::Memory::AllocatorMalloc,
-    csArrayCapacityLinear<csArrayThresholdFixed<4> > > WeakRefOwnerArray;
-  WeakRefOwnerArray* weakref_owners;
 public:
   WeakReferenced () : weakref_owners (0) {}
   ~WeakReferenced ()
@@ -76,8 +72,16 @@ public:
     if (index != csArrayItemNotFound)
       weakref_owners->DeleteIndex (index);
   }
+
+private:
+  typedef csArray<void**,
+    csArrayElementHandler<void**>,
+    CS::Memory::AllocatorMalloc,
+    csArrayCapacityLinear<csArrayThresholdFixed<4> > > WeakRefOwnerArray;
+  WeakRefOwnerArray* weakref_owners;
 };
 
-}
+} // namespace Utility
+} // namespace CS
 
 #endif // __CS_CSUTIL_WEAKREFERENCED_H__

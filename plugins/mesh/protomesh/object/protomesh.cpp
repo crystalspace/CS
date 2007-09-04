@@ -25,6 +25,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/trimesh.h"
 #include "csgfx/renderbuffer.h"
 #include "csgfx/shadervarcontext.h"
+#include "cstool/rviewclipper.h"
 #include "iengine/camera.h"
 #include "iengine/material.h"
 #include "iengine/mesh.h"
@@ -147,8 +148,8 @@ csRenderMesh** csProtoMeshObject::GetRenderMeshes (
   iCamera* camera = rview->GetCamera ();
 
   int clip_portal, clip_plane, clip_z_plane;
-  rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
-    clip_z_plane);
+  CS::RenderViewClipper::CalculateClipSettings (rview->GetRenderContext (),
+      frustum_mask, clip_portal, clip_plane, clip_z_plane);
 
   const csReversibleTransform o2wt = movable->GetFullTransform ();
   const csVector3& wo = o2wt.GetOrigin ();
@@ -271,12 +272,9 @@ void csProtoMeshObject::PreGetBuffer (csRenderBufferHolder *holder,
     {
       if (!color_buffer)
       {
-        // Here we create a render buffer that copies the data
-        // since we don't keep a local copy of the color buffer here.
-        // (final 'true' parameter).
         color_buffer = csRenderBuffer::CreateRenderBuffer (
           PROTO_VERTS, CS_BUF_STATIC,
-          CS_BUFCOMP_FLOAT, 3, true);
+          CS_BUFCOMP_FLOAT, 3);
       }
       mesh_colors_dirty_flag = false;
       const csColor* factory_colors = factory->colors;
@@ -284,6 +282,8 @@ void csProtoMeshObject::PreGetBuffer (csRenderBufferHolder *holder,
       csColor colors[PROTO_VERTS];
       for (i = 0 ; i < PROTO_VERTS ; i++)
         colors[i] = factory_colors[i]+color;
+      // Copy the data into the render buffer
+      // since we don't keep a local copy of the color buffer here.
       color_buffer->CopyInto (colors, PROTO_VERTS);
     }
     holder->SetRenderBuffer (CS_BUFFER_COLOR, color_buffer);
@@ -296,18 +296,23 @@ void csProtoMeshObject::PreGetBuffer (csRenderBufferHolder *holder,
 
 //----------------------------------------------------------------------
 
-csProtoMeshObjectFactory::csProtoMeshObjectFactory (iMeshObjectType *pParent,
-                                                    iObjectRegistry* object_reg) :
-scfImplementationType (this, pParent)
+csProtoMeshObjectFactory::csProtoMeshObjectFactory (
+    iMeshObjectType *pParent, iObjectRegistry* object_reg)
+  : scfImplementationType (this, pParent)
 {
   csProtoMeshObjectFactory::object_reg = object_reg;
 
-  csRef<PolyMesh> polyMesh;
   polyMesh.AttachNew (new PolyMesh (this));
   SetPolygonMeshBase (polyMesh);
   SetPolygonMeshColldet (polyMesh);
   SetPolygonMeshViscull (polyMesh);
   SetPolygonMeshShadows (polyMesh);
+
+  csStringID base_mesh_id = GetBaseID (object_reg);
+  csRef<csTriangleMeshPointer> trimesh_base;
+  trimesh_base.AttachNew (new csTriangleMeshPointer (
+	vertices, PROTO_VERTS, triangles, PROTO_TRIS));
+  SetTriangleData (base_mesh_id, trimesh_base);
 
   logparent = 0;
   proto_type = pParent;
@@ -401,12 +406,12 @@ void csProtoMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder,
       mesh_normals_dirty_flag = false;
       if (!normal_buffer)
       {
-        // Create a buffer that doesn't copy the data.
         normal_buffer = csRenderBuffer::CreateRenderBuffer (
           PROTO_VERTS, CS_BUF_STATIC,
-          CS_BUFCOMP_FLOAT, 3, false);
+          CS_BUFCOMP_FLOAT, 3);
       }
-      normal_buffer->CopyInto (normals, PROTO_VERTS);
+      // Don't copy the data, have the buffer store a pointer instead.
+      normal_buffer->SetData (normals);
     }
     holder->SetRenderBuffer (CS_BUFFER_NORMAL, normal_buffer);
   }

@@ -26,6 +26,7 @@
 #include <sys/select.h>
 #include <sys/stat.h>
 #include <dirent.h>
+#include <stdarg.h>
 
 #ifndef F_OK
 #  define F_OK 0

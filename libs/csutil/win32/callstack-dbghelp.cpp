@@ -28,6 +28,7 @@
 #include "csutil/win32/callstack.h"
 #include "csutil/win32/wintools.h"
 
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
 #include "csutil/win32/DbgHelpAPI.h"
@@ -189,7 +190,7 @@ static bool CreateCallStack (HANDLE hProc, HANDLE hThread, CONTEXT& context,
     {
       CallStackEntry entry;
       entry.address = (void*)(uintptr_t)frame.AddrPC.Offset;
-      entry.paramOffs = params.Length();
+      entry.paramOffs = params.GetSize ();
       entry.paramNum = fast ? csParamUnknown : GetParams (frame, params) ;
       entries.Push (entry);
     }
@@ -601,7 +602,7 @@ void* CallStackNameResolverDbgHelp::OpenParamSymbols (void* addr)
 bool CallStackNameResolverDbgHelp::GetParamName (void* h, size_t n, csString& str)
 {
   csArray<csString>* names = (csArray<csString>*)h;
-  if (n >=  names->Length()) return false;
+  if (n >=  names->GetSize ()) return false;
   str = names->Get (n);
   return true;
 }

@@ -33,6 +33,7 @@
 
 #include "iengine/material.h"
 #include "igeom/polymesh.h"
+#include "igeom/trimesh.h"
 #include "imesh/genmesh.h"
 #include "ivideo/rndbuf.h"
 
@@ -225,6 +226,36 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     virtual int GetPolygonCount ();
     virtual csMeshedPolygon* GetPolygons ();
     virtual int GetTriangleCount ();
+    virtual csTriangle* GetTriangles ();
+    virtual void Lock () { }
+    virtual void Unlock () { }
+    
+    virtual csFlags& GetFlags () { return flags;  }
+    virtual uint32 GetChangeNumber() const { return subMeshes.GetChangeNum(); }
+  };
+
+  struct SubMeshesTriMesh : 
+    public scfImplementation1<SubMeshesTriMesh, iTriangleMesh>
+  {
+  private:
+    csWeakRef<csGenmeshMeshObjectFactory> factory;
+    csFlags flags;
+    const SubMeshesContainer& subMeshes;
+    csDirtyAccessArray<csTriangle> triangleCache;
+    uint triChangeNum;
+
+    void CacheTriangles ();
+  public:
+    SubMeshesTriMesh (csGenmeshMeshObjectFactory* Factory,
+      const SubMeshesContainer& subMeshes) : 
+      scfImplementationType (this), factory (Factory), subMeshes (subMeshes),
+      triChangeNum (~0)
+    {
+    }
+
+    virtual size_t GetVertexCount ();
+    virtual csVector3* GetVertices ();
+    virtual size_t GetTriangleCount ();
     virtual csTriangle* GetTriangles ();
     virtual void Lock () { }
     virtual void Unlock () { }

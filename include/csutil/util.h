@@ -41,17 +41,52 @@ CS_CRYSTALSPACE_EXPORT char *csStrNew (const char *s);
 /**
  * Allocate a new char [] and copy an UTF-8 version of the string into 
  * the newly allocated storage.
+ * \sa csStrNew(const char*)
  */
 CS_CRYSTALSPACE_EXPORT char *csStrNew (const wchar_t *s);
 /**
- * Allocate a new widechar [] and the string into the newly allocated storage.
+ * Allocate a new widechar [] and copy the string into the newly allocated 
+ * storage.
+ * \sa csStrNew(const char*)
  */
 CS_CRYSTALSPACE_EXPORT wchar_t* csStrNewW (const wchar_t *s);
 /**
  * Allocate a new widechar [] and copy the string converted from UTF-8 into 
  * the newly allocated storage.
+ * \sa csStrNew(const char*)
  */
 CS_CRYSTALSPACE_EXPORT wchar_t* csStrNewW (const char *s);
+
+namespace CS
+{
+  /**
+   * Allocate a char string with cs_malloc() and copy the string into the 
+   * newly allocated storage.
+   * This is a handy method for copying strings, in fact it is an analogue
+   * of the strdup() function from string.h, but using cs_malloc(). (Also,
+   * strdup() is not present on some platforms). To free the pointer the 
+   * caller should call cs_free().
+   */
+  CS_CRYSTALSPACE_EXPORT char* StrDup (const char *s);
+  /**
+   * Allocate a char string with cs_malloc() and copy an UTF-8 version of the 
+   * string into the newly allocated storage.
+   * \sa StrDup(const char*)
+   */
+  CS_CRYSTALSPACE_EXPORT char* StrDup (const wchar_t *s);
+  /**
+   * Allocate a wide char string with cs_malloc() and copy the string into 
+   * the newly allocated storage.
+   * \sa StrDup(const char*)
+   */
+  CS_CRYSTALSPACE_EXPORT wchar_t* StrDupW (const wchar_t *s);
+  /**
+   * Allocate a wide char string with cs_malloc() and copy the string 
+   * converted from UTF-8 into the newly allocated storage.
+   * \sa StrDup(const char*)
+   */
+  CS_CRYSTALSPACE_EXPORT wchar_t* StrDupW (const char *s);
+}
 
 /**
  * Perform case-insensitive string comparison. Returns a negative number if \p
@@ -169,29 +204,29 @@ CS_CRYSTALSPACE_EXPORT bool csGlobMatches (const char *fName,
  * Finds the smallest number that is a power of two and is larger or
  * equal to n.
  */
-CS_CRYSTALSPACE_EXPORT int csFindNearestPowerOf2 (int n);
+static inline int csFindNearestPowerOf2 (int n)
+{
+  int v=n;
+
+  v--;
+  v |= v >> 1;
+  v |= v >> 2;
+  v |= v >> 4;
+  v |= v >> 8;
+  v |= v >> 16;
+  v++;
+
+  return v;
+}
 
 /// Returns true if n is a power of two.
-CS_CRYSTALSPACE_EXPORT bool csIsPowerOf2 (int n);
+static inline bool csIsPowerOf2 (int n)
+{
+  return !(n & (n - 1)) && n;	// (n-1) ^ n >= n;
+}
 
 /// Find the log2 of 32bit argument.
-static inline int csLog2 (int n)
-{
-  const unsigned int b[] = {0x2, 0xC, 0xF0, 0xFF00, 0xFFFF0000};
-  const unsigned int S[] = {1, 2, 4, 8, 16};
-  int i;
-
-  register unsigned int c = 0; // result of log2(v) will go here
-  for (i = 4; i >= 0; i--) // unroll for speed...
-  {
-    if (n & b[i])
-    {
-      n >>= S[i];
-      c |= S[i];
-    } 
-  }
-  return c;
-}
+CS_CRYSTALSPACE_EXPORT int csLog2 (int n);
 
 /**
  * Given \p src and \p dest, which are already allocated, copy \p source to \p
@@ -201,16 +236,6 @@ static inline int csLog2 (int n)
 CS_CRYSTALSPACE_EXPORT void csReplaceAll (char *dest, const char *src,
   const char *search, const char *replace, int max);
 
-/**
- * Given \p src and \p dest, which are already allocated, copy \p source to \p
- * dest.  But, do not copy \p search, instead replace that with \p replace
- * string.  \p max is size in bytes of \p dest.
- * \deprecated Use csReplaceAll() instead.
- */
-CS_DEPRECATED_METHOD_MSG("Use csReplaceAll() instead.")
-inline void csFindReplace (char *dest, const char *src,
-  const char *search, const char *replace, int max)
-{ csReplaceAll(dest, src, search, replace, max); }
 
 /** @} */
   

@@ -19,28 +19,37 @@
 #ifndef __KDTREE_H__
 #define __KDTREE_H__
 
-#include "object.h"
-
 // For debugging:
 //#define KDTREE_ASSERT(x)    CS_ASSERT(x)
 // For a tad more speed:
 #define KDTREE_ASSERT(x)  (void)0
 
+#include "csutil/compileassert.h"
+
+#include "statistics.h"
+
 namespace lighter
 {
   class Primitive;
+  class Object;
+
+  enum
+  {
+    KDPRIM_FLAG_NOSHADOW = 0x04,
+    KDPRIM_FLAG_MASK = 0xFFFFFFFC
+  };
 
   /**
-   * Optimized KD-tree primitive
-   * \todo
-   * Make more efficient on 64 bit platforms!
-   */
+  * Optimized KD-tree primitive
+  * \todo
+  * Make more efficient on 64 bit platforms!
+  */
   struct KDTreePrimitive
   {
     /// Normal u, v and d components. Normalized.
     float normal_U, normal_V, normal_D;
 
-    /// Index of biggest normal component
+    /// Index of biggest normal component, and flags
     int32 normal_K;
 
     /// Edge A u, v and d components
@@ -206,8 +215,8 @@ namespace lighter
     /*
     Take an object iterator and build a kd-tree from that
     */
-    KDTree* BuildTree (ObjectHash::GlobalIterator& objects);
-
+    KDTree* BuildTree (csHash<csRef<Object>, csString>::GlobalIterator& objects,
+      Statistics::Progress& progress);
 
   private:
 
@@ -220,7 +229,27 @@ namespace lighter
       PRIMS_PER_LEAF = 4,
       NODE_SIZE_EPSILON = 1000 //*1e-9
     };
-    
+
+    //Internal node representing a kd-tree node (inner or leaf) while building
+    struct KDNode
+    {
+      // CS_AXIS_* 
+      uint splitDimension;
+
+      // Split plane location (world space)
+      float splitLocation;
+
+      // Left-right pointer
+      KDNode *leftChild, *rightChild;
+
+      // Primitives
+      csArray<Primitive*> primitives;
+
+      KDNode()
+        : splitDimension(0), splitLocation(0.0f), leftChild(0), rightChild(0)
+      {}
+    };
+
     class PrimBox;
     // Represent an end-point of triangle along given axis
     class EndPoint
@@ -258,10 +287,10 @@ namespace lighter
       }
 
       /*
-       Get the (probable) location of the primbox by realigning the this pointer
-       to an even 64/128 byte boundary.
-       Can be dangerous, use with care!
-       */
+      Get the (probable) location of the primbox by realigning the this pointer
+      to an even 64/128 byte boundary.
+      Can be dangerous, use with care!
+      */
       PrimBox* GetBox ()
       {
         return reinterpret_cast<PrimBox*> ( reinterpret_cast<size_t> (this) &
@@ -283,8 +312,7 @@ namespace lighter
       float position[3];
 
 #if (CS_PROCESSOR_SIZE == 64)
-      enum {BOX_ALIGN = ~0x7f};
-      float pad0; //For 64-bit we pad this to have a size dividable by even 4 bytes
+      enum {BOX_ALIGN = ~0x7f};      
 #else
       enum {BOX_ALIGN = ~0x3f};
 #endif
@@ -307,7 +335,7 @@ namespace lighter
           side[1].SetSide (i, EndPoint::SIDE_END);
         } 
       }
-      
+
       enum
       {
         STATE_LEFT = 0,
@@ -317,17 +345,23 @@ namespace lighter
       };
 
       //End-point [min/max]
-      EndPoint side[2];             //48 / 96
-      Primitive* primitive;      // 4 /  8
-      int32 flags;                  // 4 /  4
+      EndPoint side[2];             //48 / 80
+      Primitive* primitive;         // 4 /  8     
       PrimBox* clone;               // 4 /  8 
-
       uint8 pad[4];                 // 4 /  4
+
+      int32 flags;                  // 4 /  4
 #if (CS_PROCESSOR_SIZE == 64)
       //Bit unfortunate, but we need an even pot-2 alignment
-      uint8 pad0[8];                // 0 / 8
+      uint8 pad0[24];               // 0 / 24
 #endif
     }; //sizeof = 64 / 128
+#if (CS_PROCESSOR_SIZE == 64)
+    CS_COMPILE_ASSERT(sizeof (PrimBox) == 128);
+#else
+    CS_COMPILE_ASSERT(sizeof (PrimBox) == 64);
+#endif
+
 
     // Helper class for clipping primitives and computing primitive AABB
     struct PrimHelper
@@ -335,7 +369,7 @@ namespace lighter
       PrimHelper ()
       {
       }
-      
+
       //Init with a Prrimitive
       void Init (const Primitive* prim);
 
@@ -352,9 +386,9 @@ namespace lighter
     } primHelper;
 
     /**
-     * Holder for the sorted end point lists.
-     * The lists are sorted by position followed by side.
-     */
+    * Holder for the sorted end point lists.
+    * The lists are sorted by position followed by side.
+    */
     struct EndPointList
     {
       void Insert (size_t axis, EndPoint* ep);
@@ -363,34 +397,13 @@ namespace lighter
 
       EndPoint* head[3];
       EndPoint* tail[3];
-     
+
       EndPointList ()
       {
         head[0] = head[1] = head[2] = 0;
         tail[0] = tail[1] = tail[2] = 0;
       }
     } endPointList;
-
-    //Internal node representing a kd-tree node (inner or leaf) while building
-    struct KDNode
-    {
-      // CS_AXIS_* 
-      uint splitDimension;
-
-      // Split plane location (world space)
-      float splitLocation;
-
-      // Left-right pointer
-      KDNode *leftChild, *rightChild;
-
-      // Primitives
-      PrimitivePtrArray primitives;
-
-      KDNode()
-        : splitDimension(0), splitLocation(0.0f), leftChild(0), rightChild(0)
-      {}
-    };
-
 
     //Allocator for boxes
     typedef csBlockAllocator<PrimBox, CS::Memory::AllocatorAlign<128> >
@@ -407,11 +420,13 @@ namespace lighter
     size_t numPrimitives;
 
     //Private functions
-    bool SetupEndpoints (ObjectHash::GlobalIterator& objects);
+    bool SetupEndpoints (csHash<csRef<Object>, csString>::GlobalIterator& objects);
     bool BuildKDNodeRecursive (EndPointList* epList, KDNode* node, 
       csBox3 aabb, size_t numPrim, size_t treeDepth);
     KDTree* SetupRealTree (KDNode* rootNode);
 
+    friend struct CopyFunctor;
+    friend struct CountFunctor;
   };
 
   // Helper to do operations on a kd-tree
@@ -421,7 +436,7 @@ namespace lighter
 
     // Collect all primitives within given AABB
     static bool CollectPrimitives (const KDTree *tree, 
-      PrimitivePtrArray& primArray, const csBox3& overlapAABB);
+      csArray<Primitive*>& primArray, const csBox3& overlapAABB);
 
   private:
     KDTreeHelper ();
@@ -429,7 +444,7 @@ namespace lighter
 
     // Traverse a node, collect any prims within AABB
     static void CollectPrimitives (const KDTree *tree, const KDTreeNode* node, 
-      csBox3 currentBox, PrimitivePtrSet& outPrims, const csBox3& overlapAABB);
+      csBox3 currentBox, csSet<Primitive*>& outPrims, const csBox3& overlapAABB);
   };
 
 }

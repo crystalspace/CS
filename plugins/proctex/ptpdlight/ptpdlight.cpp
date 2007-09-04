@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2003-2006 by Jorrit Tyberghein
-	      (C) 2003-2006 by Frank Richter
+	      (C) 2003-2007 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,241 +20,276 @@
 #include "cssysdef.h"
 #include <limits.h>
 
-#include "ivideo/graph3d.h"
-#include "ivideo/graph2d.h"
 #include "ivideo/texture.h"
-#include "iutil/document.h"
-#include "iutil/objreg.h"
 #include "iengine/engine.h"
-#include "iengine/material.h"
-#include "iengine/texture.h"
-#include "imap/loader.h"
-#include "imap/services.h"
+#include "ivaria/profile.h"
 #include "ivaria/reporter.h"
-#include "itexture/itexloaderctx.h"
+
 #include "csgeom/fixed.h"
 #include "csgeom/math.h"
+#include "csgfx/imageautoconvert.h"
 #include "csutil/cscolor.h"
 #include "csutil/csstring.h"
-#include "csutil/scf.h"
 
 #include "ptpdlight.h"
+#include "ptpdlight_loader.h"
 
-// Plugin stuff
-
-CS_IMPLEMENT_PLUGIN
+CS_DECLARE_PROFILER
+CS_DECLARE_PROFILER_ZONE(ProctexPDLight_Animate)
+CS_DECLARE_PROFILER_ZONE(ProctexPDLight_Animate_inner)
+CS_DECLARE_PROFILER_ZONE(ProctexPDLight_Animate_Blit)
 
 CS_PLUGIN_NAMESPACE_BEGIN(PTPDLight)
 {
 
-SCF_IMPLEMENT_FACTORY(ProctexPDLightLoader)
-
-
-//----------------------------------------------------------------------------
-
-ProctexPDLightLoader::ProctexPDLightLoader (iBase *p) :
-  scfImplementationType(this, p)
-{
-}
-
-ProctexPDLightLoader::~ProctexPDLightLoader ()
-{
-}
-
-bool ProctexPDLightLoader::Initialize(iObjectRegistry *object_reg)
-{
-  ProctexPDLightLoader::object_reg = object_reg;
-
-  return true;
-}
-
-csPtr<iBase> ProctexPDLightLoader::Parse (iDocumentNode* node,  
-				          iStreamSource*,
-					  iLoaderContext* /*ldr_context*/,
-  					  iBase* context)
-{
-  csRef<iLoader> LevelLoader = csQueryRegistry<iLoader> (object_reg);
-  if (!LevelLoader) 
+  TileHelper::TileHelper (int w, int h)
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, 0, "No level loader");
-    return false;
+    this->w = w; this->h = h;
+    tx = (w + tileSizeX - 1) / tileSizeX;
   }
 
-  csRef<iTextureLoaderContext> ctx;
-  if (context)
+  size_t TileHelper::ComputeTileCount () const
   {
-    ctx = csPtr<iTextureLoaderContext>
-      (scfQueryInterface<iTextureLoaderContext> (context));
+    int ty = (h + tileSizeY - 1) / tileSizeY;
+    return tx * ty;
   }
 
-  csRef<iImage> img = (ctx && ctx->HasImage()) ? ctx->GetImage() : 0;
-  if (!img)
+  void TileHelper::MarkTilesBits (const csRect& r, csBitArray& bits) const
   {
-    csRef<iDocumentNode> file = 
-      node ? node->GetNode ("file") : csRef<iDocumentNode> (0);
-    if (!file) 
+    int x1 = (r.xmin) / tileSizeX;
+    int y1 = (r.ymin) / tileSizeY;
+    int x2 = (r.xmax + tileSizeX - 1) / tileSizeX;
+    int y2 = (r.ymax + tileSizeY - 1) / tileSizeY;
+    for (int y = y1; y < y2; y++)
     {
-      Report (CS_REPORTER_SEVERITY_WARNING, node, 
-	"Please provide a <file> node in the <texture> or <params> block");
-      return 0;
-    }
-    const char* fname;
-    if (!(fname = file->GetContentsValue())) 
-    {
-      Report (CS_REPORTER_SEVERITY_WARNING, file, "Empty <file> node");
-      return 0;
-    }
-
-    img = LevelLoader->LoadImage (fname);
-    if (!img) 
-    {
-      Report (CS_REPORTER_SEVERITY_WARNING, file, 
-	"Couldn't load image '%s'", fname);
-      return 0;
-    }
-  }
-
-  csRef<ProctexPDLight> pt;
-  pt.AttachNew (new ProctexPDLight (img));
-  if (pt->Initialize (object_reg))
-  {
-    csRef<iGraphics3D> G3D = csQueryRegistry<iGraphics3D> (object_reg);
-    if (!G3D) return 0;
-    csRef<iTextureManager> tm = G3D->GetTextureManager();
-    if (!tm) return 0;
-    int texFlags = (ctx && ctx->HasFlags()) ? ctx->GetFlags() : CS_TEXTURE_3D;
-    csRef<iTextureHandle> TexHandle (tm->RegisterTexture (img, 
-      texFlags));
-    if (!TexHandle) return 0;
-
-    pt->GetTextureWrapper()->SetTextureHandle (TexHandle);
-
-    if (node)
-    {
-      csRef<iDocumentNodeIterator> nodes = node->GetNodes ();
-      while (nodes->HasNext())
+      for (int x = x1; x < x2; x++)
       {
-        csRef<iDocumentNode> child = nodes->Next ();
-        if (child->GetType() != CS_NODE_ELEMENT) continue;
-        if (strcmp (child->GetValue(), "map") == 0)
-        {
-          const char* lightId = child->GetAttributeValue ("lightid");
-          const char* image = child->GetContentsValue ();
-          csRef<iImage> map = LevelLoader->LoadImage (image, 
-            CS_IMGFMT_TRUECOLOR);
-          if (!map)
-          {
-            Report (CS_REPORTER_SEVERITY_WARNING, child, 
-	      "Couldn't load image '%s'", image);
-            return 0;
-          }
-          ProctexPDLight::MappedLight light;
-          light.map = map;
-          light.lightId = new csString (lightId);
-          const char* err = pt->AddLight (light);
-          if (err != 0)
-          {
-            Report (CS_REPORTER_SEVERITY_WARNING, child, 
-              "Couldn't add map '%s' for light '%s': %s", image, lightId, err);
-          }
-        }
+        bits.SetBit (y * tx + x);
       }
     }
-
-    csRef<iTextureWrapper> tw = pt->GetTextureWrapper ();
-    return csPtr<iBase> (tw);
   }
-  return 0;
-}
 
-void ProctexPDLightLoader::Report (int severity, iDocumentNode* node,
-				   const char* msg, ...)
-{
-  static const char msgId[] = "crystalspace.proctex.loader.pdlight";
-
-  va_list arg;
-  va_start (arg, msg);
-
-  csRef<iSyntaxService> synserv;
-
-  if (node)
-    synserv = csQueryRegistry<iSyntaxService> (object_reg);
-
-  if (node && synserv)
+  void TileHelper::GetTileRect (size_t n, csRect& r) const
   {
-    csString text;
-    text.FormatV (msg, arg);
-    synserv->Report (msgId, severity, node, "%s", (const char*)text);
+    int x = int (n) % tx;
+    int y = int (n) / tx;
+    r.xmin = x * tileSizeX;
+    r.ymin = y * tileSizeY;
+    r.xmax = csMin ((x+1) * tileSizeX, w);
+    r.ymax = csMin ((y+1) * tileSizeY, h);
   }
-  else
-  {
-    csReportV (object_reg, severity, msgId, msg, arg);
-  }
-
-  va_end (arg);
-}
 
 //---------------------------------------------------------------------------
 
 CS_IMPLEMENT_STATIC_CLASSVAR_REF(ProctexPDLight, lightmapScratch, GetScratch,
                                  ProctexPDLight::LightmapScratch, ());
 
-void ProctexPDLight::PDMap::ComputeValueBounds ()
+void ProctexPDLight::PDMap::ComputeValueBounds (const csRect& area, 
+                                                csRGBcolor& maxValue, 
+                                                csRect& nonNullArea)
 {
-  csRect r (0, 0, imageW, imageH);
-  ComputeValueBounds (r);
-}
-
-void ProctexPDLight::PDMap::ComputeValueBounds (const csRect& area)
-{
+  const int width = imageW;
   maxValue.Set (0, 0, 0);
   nonNullArea.Set (INT_MAX, INT_MAX, INT_MIN, INT_MIN);
-  if (!imageData) return;
-
-  const int width = imageW;
-  const Lumel* map = imageData->data + area.ymin * width + area.xmin;
+  
   int mapPitch = width - area.Width ();
-  for (int y = area.ymin; y < area.ymax; y++)
+  if (imageData->IsGray())
   {
-    for (int x = area.xmin; x < area.xmax; x++)
+    const uint8* map = 
+      static_cast<LumelBufferGray*> ((LumelBufferBase*)imageData)->GetData() 
+      + area.ymin * width + area.xmin;
+    for (int y = area.ymin; y < area.ymax; y++)
     {
-      const Lumel& p = *map++;
-
-      if (p.red > maxValue.red)
-        maxValue.red = p.red;
-      if (p.green > maxValue.green)
-        maxValue.green = p.green;
-      if (p.blue > maxValue.blue)
-        maxValue.blue = p.blue;
-
-      if (p.red + p.green + p.blue > 0)
+      for (int x = area.xmin; x < area.xmax; x++)
       {
-        nonNullArea.Extend (x, y);
+	uint8 v = *map++;
+  
+	if (v > maxValue.red)
+          maxValue.Set (v, v, v);
+  
+	if (v > 0)
+	{
+	  nonNullArea.Extend (x, y);
+	}
       }
+      map += mapPitch;
     }
-    map += mapPitch;
+  }
+  else
+  {
+    const Lumel* map = 
+      static_cast<LumelBufferRGB*> ((LumelBufferBase*)imageData)->GetData() 
+      + area.ymin * width + area.xmin;
+    for (int y = area.ymin; y < area.ymax; y++)
+    {
+      for (int x = area.xmin; x < area.xmax; x++)
+      {
+	const Lumel& p = *map++;
+  
+	if (p.c.red > maxValue.red)
+	  maxValue.red = p.c.red;
+	if (p.c.green > maxValue.green)
+	  maxValue.green = p.c.green;
+	if (p.c.blue > maxValue.blue)
+	  maxValue.blue = p.c.blue;
+  
+	if (p.c.red + p.c.green + p.c.blue > 0)
+	{
+	  nonNullArea.Extend (x, y);
+	}
+      }
+      map += mapPitch;
+    }
   }
 }
 
-void ProctexPDLight::PDMap::SetImage (iImage* img)
+void ProctexPDLight::PDMap::ComputeValueBounds (const TileHelper& tiles)
 {
-  CS::ImageAutoConvert useImage (img, CS_IMGFMT_TRUECOLOR);
-  imageW = useImage->GetWidth();
-  imageH = useImage->GetHeight();
-  size_t numPixels = imageW * imageH;
-  imageData.AttachNew (new (numPixels) LumelBuffer);
-  const csRGBpixel* src = (csRGBpixel*)useImage->GetImageData();
-  Lumel* dst = imageData->data;
-  while (numPixels-- > 0)
+  csRect r (0, 0, imageW, imageH);
+  ComputeValueBounds (tiles, r);
+}
+
+void ProctexPDLight::PDMap::ComputeValueBounds (const TileHelper& tiles, 
+                                                const csRect& area)
+{
+  maxValues.SetSize (tileNonNull.GetSize());
+  nonNullAreas.SetSize (tileNonNull.GetSize());
+  if (!imageData) 
   {
-    dst->red = src->red;
-    dst->green = src->green;
-    dst->blue = src->blue;
-    dst->alpha = 0xff;
-    dst++;
-    src++;
+    for (size_t t = 0; t < tileNonNull.GetSize(); t++)
+    {
+      maxValues[t].Set (0, 0, 0);
+      nonNullAreas[t].Set (INT_MAX, INT_MAX, INT_MIN, INT_MIN);
+    }
+    return;
   }
-  ComputeValueBounds (); 
+
+  for (size_t t = 0; t < tileNonNull.GetSize(); t++)
+  {
+    csRect r;
+    tiles.GetTileRect (t, r);
+    r.Intersect (area);
+    if (r.IsEmpty()) 
+    {
+      maxValues[t].Set (0, 0, 0);
+      nonNullAreas[t].Set (INT_MAX, INT_MAX, INT_MIN, INT_MIN);
+      continue;
+    }
+
+    csRGBcolor maxValue;
+    csRect nonNullArea;
+    ComputeValueBounds (r, maxValue, nonNullArea);
+    maxValues[t] = maxValue;
+    nonNullAreas[t] = nonNullArea;
+    if (maxValue.red + maxValue.green + maxValue.blue > 0)
+    {
+      CS_ASSERT (!nonNullArea.IsEmpty());
+      tileNonNull.SetBit (t);
+    }
+    else
+    {
+      CS_ASSERT (nonNullArea.IsEmpty());
+    }
+  }
+}
+
+void ProctexPDLight::PDMap::SetImage (const TileHelper& tiles, iImage* img)
+{
+  imageW = img->GetWidth();
+  imageH = img->GetHeight();
+  size_t numPixels = imageW * imageH;
+  if ((img->GetFormat() & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
+  {
+    // Assume grayscale map
+    LumelBufferGray* imageDataGray = new (numPixels) LumelBufferGray;
+    imageData.AttachNew (imageDataGray);
+    const uint8* src = (uint8*)img->GetImageData();
+    uint8* dst = imageDataGray->GetData();
+    memcpy (dst, src, numPixels);
+  }
+  else
+  {
+    LumelBufferRGB* imageDataRGB = new (numPixels) LumelBufferRGB;
+    imageData.AttachNew (imageDataRGB);
+    const csRGBpixel* src = (csRGBpixel*)img->GetImageData();
+    Lumel* dst = imageDataRGB->GetData();
+    while (numPixels-- > 0)
+    {
+      dst->c.red = src->red;
+      dst->c.green = src->green;
+      dst->c.blue = src->blue;
+      dst->c.alpha = 0;
+      dst++;
+      src++;
+    }
+  }
+  ComputeValueBounds (tiles); 
+}
+
+void ProctexPDLight::PDMap::Crop ()
+{
+  csRect nonNullArea (INT_MAX, INT_MAX, INT_MIN, INT_MIN);
+  for (size_t t = 0; t < tileNonNull.GetSize(); t++)
+  {
+    if (!tileNonNull.IsBitSet (t)) continue;
+    nonNullArea.Union (nonNullAreas[t]);
+  }
+  if (nonNullArea.IsEmpty()) return;
+
+  if (imageData->IsGray())
+  {
+    csRef<LumelBufferGray> newData;
+    newData.AttachNew (
+      new (nonNullArea.Width() * nonNullArea.Height()) LumelBufferGray);
+    const uint8* srcMap = 
+      static_cast<LumelBufferGray*> ((LumelBufferBase*)imageData)->GetData() 
+      + nonNullArea.ymin * imageW + nonNullArea.xmin;
+    int rowSize = nonNullArea.Width ();
+    uint8* dstMap = newData->GetData();
+    for (int y = nonNullArea.Height(); y-- > 0; )
+    {
+      memcpy (dstMap, srcMap, rowSize);
+      dstMap += rowSize;
+      srcMap += imageW;
+    }
+  
+    imageData = newData;
+  }
+  else
+  {
+    csRef<LumelBufferRGB> newData;
+    newData.AttachNew (
+      new (nonNullArea.Width() * nonNullArea.Height()) LumelBufferRGB);
+    const Lumel* srcMap = 
+      static_cast<LumelBufferRGB*> ((LumelBufferBase*)imageData)->GetData() 
+      + nonNullArea.ymin * imageW + nonNullArea.xmin;
+    int rowSize = nonNullArea.Width ();
+    Lumel* dstMap = newData->GetData();
+    for (int y = nonNullArea.Height(); y-- > 0; )
+    {
+      memcpy (dstMap, srcMap, rowSize * sizeof (Lumel));
+      dstMap += rowSize;
+      srcMap += imageW;
+    }
+  
+    imageData = newData;
+  }
+  imageX = nonNullArea.xmin;
+  imageY = nonNullArea.ymin;
+  imageW = nonNullArea.Width();
+  imageH = nonNullArea.Height();
+}
+
+void ProctexPDLight::PDMap::GetMaxValue (csRGBcolor& maxValue)
+{
+  maxValue.Set (0, 0, 0);
+  for (size_t m = 0; m < maxValues.GetSize(); m++)
+  {
+    const csRGBcolor& color = maxValues[m];
+    if (color.red > maxValue.red) maxValue.red = color.red;
+    if (color.green > maxValue.green) maxValue.green = color.green;
+    if (color.blue > maxValue.blue) maxValue.blue = color.blue;
+  }
 }
 
 void ProctexPDLight::Report (int severity, const char* msg, ...)
@@ -267,93 +302,44 @@ void ProctexPDLight::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-bool ProctexPDLight::HexToLightID (char* lightID, const csString& lightIDHex)
-{
-  bool valid = lightIDHex.Length() == 32;
-  if (valid)
-  {
-    for (size_t i = 0; i < 16; i++)
-    {
-      uint8 v;
-      char digit16 = lightIDHex[i*2];
-      char digit1 = lightIDHex[i*2+1];
-
-      if ((digit16 >= '0') && (digit16 <= '9'))
-        v = 16*(digit16-'0');
-      else if ((digit16 >= 'a') && (digit16 <= 'f'))
-        v = 16*(digit16-'a'+10);
-      else if ((digit16 >= 'A') && (digit16 <= 'F'))
-        v = 16*(digit16-'A'+10);
-      else
-      {
-        valid = false; 
-        break;
-      }
-
-      if ((digit1 >= '0') && (digit1 <= '9'))
-        v += (digit1-'0');
-      else if ((digit1 >= 'a') && (digit1 <= 'f'))
-        v += (digit1-'a'+10);
-      else if ((digit1 >= 'A') && (digit1 <= 'F'))
-        v += (digit1-'A'+10);
-      else
-      {
-        valid = false; 
-        break;
-      }
-      lightID[i] = char (v);
-    }
-  }
-  if (valid)
-    return true;
-  else
-  {
-    Report (CS_REPORTER_SEVERITY_WARNING, 
-      "Invalid light ID: '%s'", lightIDHex.GetData());
-    return false;
-  }
-}
-
-void ProctexPDLight::UpdateAffectedArea ()
-{
-  if (!state.Check (stateAffectedAreaDirty)) return;
-
-  totalAffectedAreas.Set (INT_MAX, INT_MAX, INT_MIN, INT_MIN);
-  for (size_t i = 0; i < lights.GetSize(); i++)
-  {
-    totalAffectedAreas.Union (lights[i].map.nonNullArea);
-  }
-  lightmapSize = csMax (totalAffectedAreas.Width(), 0) * 
-    csMax (totalAffectedAreas.Height(), 0);
-  if (lightmapSize > 0)
-    baseMap.ComputeValueBounds (totalAffectedAreas);
-
-  state.Reset (stateAffectedAreaDirty);
-}
-
 const char* ProctexPDLight::AddLight (const MappedLight& light)
 {
-  if ((light.map.imageW != baseMap.imageW)
-    || (light.map.imageH != baseMap.imageH))
+  if ((light.map.imageW != mat_w)
+    || (light.map.imageH != mat_h))
     return "PD lightmap dimensions don't correspond to base lightmap dimensions";
-  lights.Push (light);
-  state.Set (stateAffectedAreaDirty);
+
+  if (light.map.tileNonNull.AllBitsFalse())
+    return 0; //Silently ignore totally black maps
+
+  size_t n = lights.Push (light);
+  lights[n].map.Crop();
   return 0;
 }
 
-ProctexPDLight::ProctexPDLight (iImage* img) : 
-  scfImplementationType (this, (iTextureFactory*)0, img), baseMap (img), 
-  state (stateAffectedAreaDirty | stateDirty)
+ProctexPDLight::ProctexPDLight (ProctexPDLightLoader* loader, iImage* img) : 
+  scfImplementationType (this, (iTextureFactory*)0, img), loader (loader),
+  tiles (img->GetWidth(), img->GetHeight()),
+  tilesDirty (tiles.ComputeTileCount()),
+  baseColor (0, 0, 0), baseMap (tilesDirty.GetSize(), tiles, img),
+  state (stateDirty)
 {
-  if (img)
-  {
-    mat_w = img->GetWidth();
-    mat_h = img->GetHeight();
-  }
+  mat_w = img->GetWidth();
+  mat_h = img->GetHeight();
+}
+
+ProctexPDLight::ProctexPDLight (ProctexPDLightLoader* loader, int w, int h) : 
+  scfImplementationType (this), loader (loader),
+  tiles (w, h), tilesDirty (tiles.ComputeTileCount()),
+  baseColor (0, 0, 0), baseMap (tilesDirty.GetSize()), 
+  state (stateDirty)
+{
+  mat_w = w;
+  mat_h = h;
 }
 
 ProctexPDLight::~ProctexPDLight ()
 {
+  loader->UnqueuePT (this);
 }
 
 bool ProctexPDLight::PrepareAnim ()
@@ -369,29 +355,40 @@ bool ProctexPDLight::PrepareAnim ()
     return false;
   }
 
-  if (!baseMap.imageData) return false;
-  lightmapSize = baseMap.imageW * baseMap.imageH;
+  size_t lightmapSize = mat_w * mat_h;
+  if (lightmapSize == 0) return false;
   for (size_t i = 0; i < lights.GetSize(); )
   {
     MappedLight& light = lights[i];
-    char lightID[16];
     bool success = false;
-    if (HexToLightID (lightID, *light.lightId))
+    light.light = engine->FindLightID (light.lightId);
+    if (light.light)
     {
-      light.light = engine->FindLightID (lightID);
-      if (light.light)
-      {
-        success = true;
-        light.light->AddAffectedLightingInfo (
-          static_cast<iLightingInfo*> (this));
-      }
-      else
-      {
-        Report (CS_REPORTER_SEVERITY_WARNING, 
-          "Could not find light with ID '%s'", light.lightId->GetData());
-      }
+      success = true;
+      light.light->AddAffectedLightingInfo (
+        static_cast<iLightingInfo*> (this));
+      dirtyLights.Add ((iLight*)light.light);
+
+      LightColorState colorState;
+      colorState.lastColor.Set (0, 0, 0);
+      csRGBcolor maxValue;
+      light.map.GetMaxValue (maxValue);
+      /* When a component changes by this amount the change is visible
+       * (assuming 8 bits per component precision). */
+      colorState.minChangeThresh.Set (1.0f/maxValue.red, 
+        1.0f/maxValue.green,
+        1.0f/maxValue.blue);
+      lightColorStates.Put ((iLight*)light.light, colorState);
     }
-    delete light.lightId;
+    else
+    {
+      csString hexId;
+      for (int i = 0; i < 16; i++)
+        hexId.AppendFmt ("%02x", light.lightId[i]);
+      Report (CS_REPORTER_SEVERITY_WARNING, 
+        "Could not find light with ID '%s'", hexId.GetData());
+    }
+    delete[] light.lightId; light.lightId = 0;
     if (success)
     {
       i++;
@@ -400,115 +397,396 @@ bool ProctexPDLight::PrepareAnim ()
       lights.DeleteIndexFast (i);
   }
   lights.ShrinkBestFit();
+  lightBits.SetSize (lights.GetSize ());
   state.Set (statePrepared);
   return true;
 }
 
-void ProctexPDLight::Animate (csTicks /*current_time*/)
+#if defined(CS_LITTLE_ENDIAN)
+static const int shiftR = 16;
+static const int shiftG =  8;
+static const int shiftB =  0;
+static const uint32 grayToRGBmul = 0x00010101;
+static const uint32 grayToRGBalpha = 0xff000000;
+#else
+static const int shiftR =  8;
+static const int shiftG = 16;
+static const int shiftB = 24;
+static const uint32 grayToRGBmul = 0x01010100;
+static const uint32 grayToRGBalpha = 0x000000ff;
+#endif
+
+template<int shift>
+static void ComputeLUT (csFixed16 v, uint32* lut)
+{
+  for (int x = 0; x < 256; x++)
+  {
+    *lut++ = csMin (int (v * x), 255) << shift;
+  }
+}
+
+enum
+{
+  safeR = 1,
+  safeG = 2,
+  safeB = 4,
+
+  safeAll = safeR | safeG | safeB
+};
+
+template<int safeMask>
+static void MultiplyAddLumels (ProctexPDLight::Lumel* dst, size_t dstPitch,
+                               const ProctexPDLight::Lumel* map, size_t mapPitch,
+                               int columns, int rows,
+                               const uint32* lutR, 
+                               const uint32* lutG, 
+                               const uint32* lutB)
+{
+  for (int y = 0; y < rows; y++)
+  {
+    for (int x = 0; x < columns; x++)
+    {
+      const ProctexPDLight::Lumel mapVal = *map++;
+      uint32 dstVal = dst->ui;
+      if (safeMask & safeR)
+      {
+        // Possible overflow may occur
+        uint32 r = dstVal & (0xff << shiftR);
+        r += lutR[mapVal.c.red];
+        if (r > (0xff << shiftR)) r = (0xff << shiftR);
+        dstVal &= ~(0xff << shiftR);
+        dstVal |= r;
+      }
+      else
+        // Overflow can't occur
+        dstVal += lutR[mapVal.c.red];
+
+      if (safeMask & safeG)
+      {
+        uint32 g = dstVal & (0xff << shiftG);
+        g += lutG[mapVal.c.green];
+        if (g > (0xff << shiftG)) g = (0xff << shiftG);
+        dstVal &= ~(0xff << shiftG);
+        dstVal |= g;
+      }
+      else
+        dstVal += lutG[mapVal.c.green];
+
+      if (safeMask & safeB)
+      {
+        uint32 b = dstVal & (0xff << shiftB);
+        b += lutB[mapVal.c.blue];
+        if (b > (0xff << shiftB)) b = (0xff << shiftB);
+        dstVal &= ~(0xff << shiftB);
+        dstVal |= b;
+      }
+      else
+        dstVal += lutB[mapVal.c.blue];
+
+      (dst++)->ui = dstVal;
+    }
+    dst += dstPitch;
+    map += mapPitch;
+  }
+}
+
+template<int safeMask>
+static void MultiplyAddLumels8 (ProctexPDLight::Lumel* dst, size_t dstPitch,
+                                const uint8* map, size_t mapPitch,
+                                int columns, int rows,
+                                const uint32* lutR, 
+                                const uint32* lutG, 
+                                const uint32* lutB)
+{
+  for (int y = 0; y < rows; y++)
+  {
+    for (int x = 0; x < columns; x++)
+    {
+      const uint8 v = *map++;
+      uint32 dstVal = dst->ui;
+      if (safeMask & safeR)
+      {
+        // Possible overflow may occur
+        uint32 r = dstVal & (0xff << shiftR);
+        r += lutR[v];
+        if (r > (0xff << shiftR)) r = (0xff << shiftR);
+        dstVal &= ~(0xff << shiftR);
+        dstVal |= r;
+      }
+      else
+        // Overflow can't occur
+        dstVal += lutR[v];
+
+      if (safeMask & safeG)
+      {
+        uint32 g = dstVal & (0xff << shiftG);
+        g += lutG[v];
+        if (g > (0xff << shiftG)) g = (0xff << shiftG);
+        dstVal &= ~(0xff << shiftG);
+        dstVal |= g;
+      }
+      else
+        dstVal += lutG[v];
+
+      if (safeMask & safeB)
+      {
+        uint32 b = dstVal & (0xff << shiftB);
+        b += lutB[v];
+        if (b > (0xff << shiftB)) b = (0xff << shiftB);
+        dstVal &= ~(0xff << shiftB);
+        dstVal |= b;
+      }
+      else
+        dstVal += lutB[v];
+
+      (dst++)->ui = dstVal;
+    }
+    dst += dstPitch;
+    map += mapPitch;
+  }
+}
+
+typedef void (*MultiplyAddProc) (ProctexPDLight::Lumel* dst, size_t dstPitch,
+                                 const ProctexPDLight::Lumel* map, size_t mapPitch,
+                                 int columns, int rows,
+                                 const uint32* lutR, 
+                                 const uint32* lutG, 
+                                 const uint32* lutB);
+typedef void (*MultiplyAddProc8) (ProctexPDLight::Lumel* dst, size_t dstPitch,
+                                  const uint8* map, size_t mapPitch,
+                                  int columns, int rows,
+                                  const uint32* lutR, 
+                                  const uint32* lutG, 
+                                  const uint32* lutB);
+
+static const MultiplyAddProc maProcs[8] = {
+  MultiplyAddLumels<0>, MultiplyAddLumels<1>, 
+  MultiplyAddLumels<2>, MultiplyAddLumels<3>, 
+  MultiplyAddLumels<4>, MultiplyAddLumels<5>, 
+  MultiplyAddLumels<6>, MultiplyAddLumels<7>
+};
+
+static const MultiplyAddProc8 maProcs8[8] = {
+  MultiplyAddLumels8<0>, MultiplyAddLumels8<1>, 
+  MultiplyAddLumels8<2>, MultiplyAddLumels8<3>, 
+  MultiplyAddLumels8<4>, MultiplyAddLumels8<5>, 
+  MultiplyAddLumels8<6>, MultiplyAddLumels8<7>
+};
+
+void ProctexPDLight::Animate (csTicks current_time)
 {
   if (state.Check (stateDirty))
   {
-    UpdateAffectedArea ();
-    if (lightmapSize > 0)
+    if (!loader->UpdatePT (this, current_time)) return;
+
+    csTicks startTime = csGetTicks();
+
+    CS_PROFILER_ZONE(ProctexPDLight_Animate)
+    lightBits.Clear();
+    for (size_t l = 0; l < lights.GetSize(); )
     {
-      int scratchW = totalAffectedAreas.Width();
-      LightmapScratch& scratch = GetScratch();
-      scratch.SetSize (lightmapSize);
+      MappedLight& light = lights[l];
+      if (!light.light)
       {
-        Lumel* basePtr = (baseMap.imageData->data) +
-          totalAffectedAreas.ymin * mat_w + totalAffectedAreas.xmin;
-        int lines = totalAffectedAreas.Height();
-        Lumel* scratchPtr = scratch.GetArray();
-        for (int y = 0; y < lines; y++)
-        {
-          memcpy (scratchPtr, basePtr, scratchW * sizeof (Lumel));
-          scratchPtr += scratchW;
-          basePtr += mat_w;
-        }
+        tilesDirty |= light.map.tileNonNull;
+        lightColorStates.DeleteAll ((iLight*)light.light);
+        lights.DeleteIndexFast (l);
+        lightBits.SetSize (lights.GetSize ());
+        continue;
       }
-      csRGBcolor scratchMax = baseMap.maxValue;
-
-      for (size_t i = 0; i < lights.GetSize(); )
+      if (dirtyLights.Contains ((iLight*)light.light))
       {
-        MappedLight& light = lights[i];
-        if (!light.light)
-        {
-          lights.DeleteIndexFast (i);
-          state.Set (stateAffectedAreaDirty);
-          continue;
-        }
-        else
-          i++;
-        csFixed16 lightR = light.light->GetColor ().red;
-        csFixed16 lightG = light.light->GetColor ().green;
-        csFixed16 lightB = light.light->GetColor ().blue;
-
-        int mapW = light.map.nonNullArea.Width();
-        const Lumel* mapPtr = (light.map.imageData->data) +
-          light.map.nonNullArea.ymin * mat_w +
-          light.map.nonNullArea.xmin;
-        int lines = light.map.nonNullArea.Height();
-        int mapPitch = mat_w - mapW;
-
-        Lumel* scratchPtr = scratch.GetArray() + 
-          (light.map.nonNullArea.ymin - totalAffectedAreas.ymin) * scratchW +
-           light.map.nonNullArea.xmin - totalAffectedAreas.xmin;
-        int scratchPitch = scratchW - mapW;
-
-        csRGBcolor mapMax = light.map.maxValue;
-        mapMax.red = int (lightR * int (mapMax.red));
-        mapMax.green = int (lightG * int (mapMax.green));
-        mapMax.blue = int (lightB * int (mapMax.blue));
-        if ((scratchMax.red + mapMax.red <= 255)
-          && (scratchMax.green + mapMax.green <= 255)
-          && (scratchMax.blue + mapMax.blue <= 255))
-        {
-          // Safe to add values w/o overflow check
-          for (int y = 0; y < lines; y++)
-          {
-            for (int x = 0; x < mapW; x++)
-            {
-              scratchPtr->UnsafeAdd (
-                int (lightR * int (mapPtr->red)),
-                int (lightG * int (mapPtr->green)),
-                int (lightB * int (mapPtr->blue)));
-              scratchPtr++;
-              mapPtr++;
-            }
-            scratchPtr += scratchPitch;
-            mapPtr += mapPitch;
-          }
-        }
-        else
-        {
-          // Need overflow check for each pixel
-          for (int y = 0; y < lines; y++)
-          {
-            for (int x = 0; x < mapW; x++)
-            {
-              scratchPtr->SafeAdd (
-                int (lightR * int (mapPtr->red)),
-                int (lightG * int (mapPtr->green)),
-                int (lightB * int (mapPtr->blue)));
-              scratchPtr++;
-              mapPtr++;
-            }
-            scratchPtr += scratchPitch;
-            mapPtr += mapPitch;
-          }
-        }
-        scratchMax.SafeAdd (mapMax);
+        tilesDirty |= light.map.tileNonNull;
+        lightBits.SetBit (l);
       }
-
-      tex->GetTextureHandle ()->Blit (totalAffectedAreas.xmin, 
-        totalAffectedAreas.ymin, 
-        totalAffectedAreas.Width(), totalAffectedAreas.Height(),
-        (uint8*)scratch.GetArray(),
-        iTextureHandle::BGRA8888);
+      l++;
     }
 
+    LightmapScratch& scratch = GetScratch();
+    scratch.SetSize (TileHelper::tileSizeX * TileHelper::tileSizeY);
+    for (size_t t = 0; t < tilesDirty.GetSize(); t++)
+    {
+      if (!tilesDirty.IsBitSet (t)) continue;
+
+      csRect tileRect;
+      tiles.GetTileRect (t, tileRect);
+
+      int scratchW = tileRect.Width();
+      csRGBcolor scratchMax;
+      {
+        int lines = tileRect.Height();
+        Lumel* scratchPtr = scratch.GetArray();
+        if (baseMap.imageData.IsValid())
+        {
+          if (baseMap.imageData->IsGray())
+          {
+	    uint8* basePtr = static_cast<LumelBufferGray*> (
+		(LumelBufferBase*)baseMap.imageData)->GetData()
+	      + tileRect.ymin * mat_w + tileRect.xmin;
+	    for (int y = 0; y < lines; y++)
+	    {
+              for (int x = 0; x < scratchW; x++)
+              {
+                uint8 v = basePtr[x];
+                scratchPtr[x].ui = (grayToRGBmul * v) | grayToRGBalpha;
+              }
+	      scratchPtr += scratchW;
+	      basePtr += mat_w;
+	    }
+          }
+          else
+          {
+	    Lumel* basePtr = static_cast<LumelBufferRGB*> (
+		(LumelBufferBase*)baseMap.imageData)->GetData()
+	      + tileRect.ymin * mat_w + tileRect.xmin;
+	    for (int y = 0; y < lines; y++)
+	    {
+	      memcpy (scratchPtr, basePtr, scratchW * sizeof (Lumel));
+	      scratchPtr += scratchW;
+	      basePtr += mat_w;
+	    }
+	  }
+	  scratchMax = baseMap.maxValues[t];
+        }
+        else
+        {
+          Lumel baseLumel;
+          baseLumel.c.red   = baseColor.red;
+          baseLumel.c.green = baseColor.green;
+          baseLumel.c.blue  = baseColor.blue;
+          baseLumel.c.alpha = 0;
+          for (int y = 0; y < lines; y++)
+          {
+            for (int x = 0; x < scratchW; x++)
+            {
+              scratchPtr->ui = baseLumel.ui;
+              scratchPtr++;
+            }
+          }
+          scratchMax = baseColor;
+        }
+      }
+      for (size_t i = 0; i < lights.GetSize(); i++)
+      {
+        if (!lightBits.IsBitSet (i)) continue;
+        MappedLight& light = lights[i];
+        if (!light.map.tileNonNull.IsBitSet (t)) continue;
+
+        const csRect& lightInTile (light.map.nonNullAreas[t]);
+        uint32 lutR[256];
+        uint32 lutG[256];
+        uint32 lutB[256];
+
+        const csColor& lightColor = light.light->GetColor ();
+        lightColorStates.GetElementPointer ((iLight*)light.light)->lastColor =
+          lightColor;
+        ComputeLUT<shiftR> (lightColor.red,   lutR);
+        ComputeLUT<shiftG> (lightColor.green, lutG);
+        ComputeLUT<shiftB> (lightColor.blue,  lutB);
+
+        int mapW = csMin (lightInTile.xmax, light.map.imageX + light.map.imageW)
+          - csMax (lightInTile.xmin, light.map.imageX);
+        int lines = csMin (lightInTile.ymax, light.map.imageY + light.map.imageH)
+          - csMax (lightInTile.ymin, light.map.imageY);
+        int mapPitch = light.map.imageW - mapW;
+
+        Lumel* scratchPtr = scratch.GetArray() + 
+          (lightInTile.ymin - tileRect.ymin) * scratchW +
+           lightInTile.xmin - tileRect.xmin;
+        int scratchPitch = scratchW - mapW;
+
+        csRGBcolor mapMax = light.map.maxValues[t];
+        mapMax.red   = lutR[mapMax.red]   >> shiftR;
+        mapMax.green = lutG[mapMax.green] >> shiftG;
+        mapMax.blue  = lutB[mapMax.blue]  >> shiftB;
+        
+        CS_PROFILER_ZONE(ProctexPDLight_Animate_inner)
+        if (light.map.imageData->IsGray())
+        {
+	  const uint8* mapPtr = static_cast<LumelBufferGray*> (
+		  (LumelBufferBase*)light.map.imageData)->GetData()
+	    + (lightInTile.ymin - light.map.imageY) * light.map.imageW
+	    + (lightInTile.xmin - light.map.imageX) ;
+	  
+          int safeMask = 0;
+          if (scratchMax.red   + mapMax.red   > 255) safeMask |= safeR;
+          if (scratchMax.green + mapMax.green > 255) safeMask |= safeG;
+          if (scratchMax.blue  + mapMax.blue  > 255) safeMask |= safeB;
+          MultiplyAddProc8 maProc = maProcs8[safeMask];
+          maProc (scratchPtr, scratchPitch, mapPtr, mapPitch,
+            mapW, lines, lutR, lutG, lutB);
+
+          if (safeMask == 0)
+            scratchMax.UnsafeAdd (mapMax);
+          else
+            scratchMax.SafeAdd (mapMax);
+        }
+        else
+        {
+	  const Lumel* mapPtr = static_cast<LumelBufferRGB*> (
+		  (LumelBufferBase*)light.map.imageData)->GetData()
+	    + (lightInTile.ymin - light.map.imageY) * light.map.imageW
+	    + (lightInTile.xmin - light.map.imageX) ;
+	  
+          int safeMask = 0;
+          if (scratchMax.red   + mapMax.red   > 255) safeMask |= safeR;
+          if (scratchMax.green + mapMax.green > 255) safeMask |= safeG;
+          if (scratchMax.blue  + mapMax.blue  > 255) safeMask |= safeB;
+          MultiplyAddProc maProc = maProcs[safeMask];
+          maProc (scratchPtr, scratchPitch, mapPtr, mapPitch,
+            mapW, lines, lutR, lutG, lutB);
+
+          if (safeMask == 0)
+            scratchMax.UnsafeAdd (mapMax);
+          else
+            scratchMax.SafeAdd (mapMax);
+        }
+      }
+
+      {
+        CS_PROFILER_ZONE(ProctexPDLight_Animate_Blit)
+        tex->GetTextureHandle ()->Blit (tileRect.xmin, 
+          tileRect.ymin, 
+          tileRect.Width(), tileRect.Height(),
+          (uint8*)scratch.GetArray(),
+          iTextureHandle::BGRA8888);
+      }
+    }
     state.Reset (stateDirty);
+    dirtyLights.DeleteAll ();
+    tilesDirty.Clear ();
+
+    csTicks endTime = csGetTicks();
+    loader->RecordUpdateTime (endTime-startTime);
   }
+}
+
+void ProctexPDLight::DisconnectAllLights ()
+{ 
+  lights.DeleteAll ();
+  lightBits.SetSize (0); 
+  tilesDirty.Clear ();
+  tilesDirty.FlipAllBits ();
+  dirtyLights.DeleteAll ();
+  lightColorStates.DeleteAll ();
+}
+
+void ProctexPDLight::LightChanged (iLight* light) 
+{ 
+  dirtyLights.Add (light);
+  const LightColorState& colorState = 
+    *lightColorStates.GetElementPointer (light);
+  const csColor& lightColor = light->GetColor ();
+  /* When the light color difference to the value last used at updating
+     is below the amount needed for a visible difference an update of the
+     texture because of this light isn't needed. */
+  if ((fabsf (colorState.lastColor.red - lightColor.red) 
+      >= colorState.minChangeThresh.red)
+    || (fabsf (colorState.lastColor.green - lightColor.green) 
+      >= colorState.minChangeThresh.green)
+    || (fabsf (colorState.lastColor.blue - lightColor.blue) 
+      >= colorState.minChangeThresh.blue))
+    state.Set (stateDirty); 
 }
 
 void ProctexPDLight::LightDisconnect (iLight* light)
@@ -518,7 +796,10 @@ void ProctexPDLight::LightDisconnect (iLight* light)
     if (lights[i].light == light)
     {
       lights.DeleteIndexFast (i);
-      state.Set (stateAffectedAreaDirty);
+      lightColorStates.DeleteAll (light);
+      state.Set (stateDirty);
+      dirtyLights.Add (light);
+      lightBits.SetSize (lights.GetSize ());
       return;
     }
   }

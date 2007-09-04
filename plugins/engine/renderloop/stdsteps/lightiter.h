@@ -28,6 +28,7 @@
 #include "iengine/renderloop.h"
 #include "iengine/rendersteps/irenderstep.h"
 #include "iengine/rendersteps/ilightiter.h"
+#include "iengine/lightmgr.h"
 #include "ivideo/shader/shader.h"
 
 #include "csplugincommon/renderstep/basesteptype.h"
@@ -105,6 +106,7 @@ private:
 
 
   csRef<iShaderManager> shadermgr;
+  csRef<iLightManager> lightmgr;
   bool initialized;
 
   class LightSVAccessor :

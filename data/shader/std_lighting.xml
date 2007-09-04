@@ -133,7 +133,7 @@
      * Compute lit color: fetch diffuse from surface, multiply with lighting
      * value, and apply mixmode alpha.
      */
-    float4 color = V2F.surfClassic.GetDiffuse (V2F.parallax.GetTCOffset()) * 
+    float4 color = V2F.surfClassic.GetDiffuse (V2F.parallax.GetTCOffset()) *
       float4 (V2F.lightClassic.IllumAmbient()+V2F.lightClassic.IllumDiffuse(), 
 	GetMixmodeAlpha());
     /// If we have fog, apply it.

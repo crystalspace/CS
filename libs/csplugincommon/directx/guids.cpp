@@ -22,6 +22,7 @@
 #define INITGUID
 #include "csplugincommon/directx/guids.h"
 
+#include <mmsystem.h>
 #include <ddraw.h>
 #include <d3d.h>
 #include <dsound.h>

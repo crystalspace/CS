@@ -31,11 +31,11 @@
 
 struct iGraphics2D;
 
-SCF_VERSION (iXExtSHM, 1, 0, 0);
-
 /// Document me!@@@
-struct iXExtSHM : public iBase
+struct iXExtSHM : public virtual iBase
 {
+  SCF_INTERFACE(iXExtSHM, 2,0,0);
+
   virtual void SetDisplayScreen (Display *dpy, int screen_num) = 0;
   /// Create Shared Memory
   virtual unsigned char *CreateMemory (int Width, int Height) = 0;

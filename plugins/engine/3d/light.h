@@ -84,6 +84,7 @@ public:
     cent.Set (0, 0, 0);	// @@@ FIXME!
   }
   virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
+  virtual iTerrainSystem* GetTerrainColldet () { return 0; }
 };
 
 #include "csutil/win32/msvc_deprecated_warn_on.h"
@@ -308,6 +309,11 @@ public:
   }
 
   /**
+   * Get the current full sector (including parents).
+   */
+  iSector* GetFullSector ();
+
+  /**
    * Set the center position.
    */
   void SetCenter (const csVector3& v)
@@ -511,7 +517,7 @@ public:
 
   int GetLightCallbackCount () const
   {
-    return (int)light_cb_vector.Length ();
+    return (int)light_cb_vector.GetSize ();
   }
   
   iLightCallback* GetLightCallback (int idx) const
@@ -642,7 +648,7 @@ public:
   /// Override FreeLight
   virtual void FreeLight (iLight*) { }
 
-  virtual int GetCount () const { return (int)list.Length (); }
+  virtual int GetCount () const { return (int)list.GetSize (); }
   virtual iLight *Get (int n) const { return list.Get (n); }
   virtual int Add (iLight *obj);
   virtual bool Remove (iLight *obj);

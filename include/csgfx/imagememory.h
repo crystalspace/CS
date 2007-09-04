@@ -63,7 +63,7 @@ protected:
    * this is an internal state only. No operation should fail due
    * undefined image data (although the data may stay undefined).
    */
-  void* Image;
+  csRef<iDataBuffer> databuf;
   /// The image palette or 0
   csRGBpixel *Palette;
   /// The alpha map
@@ -80,7 +80,7 @@ protected:
   csImageType imageType;
   /// Mip map images.
   /* @@@ This is not csRefArray<iImage> as this does not return csRef<iImage>&
-   * from GetExtend() or operator[], which is needed here.
+   * from GetExtend() or operator[], which is needed here. (See trac #71)
    */
   csArray<csRef<iImage> > mipmaps;
 
@@ -109,6 +109,10 @@ protected:
    * Free all image data: pixels and palette. Takes care of image data format.
    */
   void FreeImage ();
+
+  void InternalConvertFromRGBA (iDataBuffer* imageData);
+  void InternalConvertFromPal8 (iDataBuffer* imageData, uint8* alpha, 
+    csRGBpixel* iPalette, int nPalColors = 256);
 public:
   CS_LEAKGUARD_DECLARE (csImageMemory);
 
@@ -180,6 +184,18 @@ public:
   virtual int GetHeight () const { return Height; }
   virtual int GetDepth () const { return Depth; }
 
+  virtual const char* GetRawFormat() const 
+  { 
+    if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
+      return "a8b8g8r8"; 
+    else
+      return 0;
+  }
+  virtual csRef<iDataBuffer> GetRawData() const 
+  { 
+    // Should this also call EnsureImage()?
+    return databuf; 
+  }
   virtual int GetFormat () const { return Format; }
   virtual const csRGBpixel* GetPalette () { return GetPalettePtr(); }
   virtual const uint8* GetAlpha () { return GetAlphaPtr(); }
@@ -224,14 +240,14 @@ public:
 
   virtual uint HasMipmaps () const 
   { 
-    size_t num = mipmaps.Length();
+    size_t num = mipmaps.GetSize ();
     while ((num > 0) && (mipmaps[num-1] == 0)) num--;
     return (uint)num; 
   }
   virtual csRef<iImage> GetMipmap (uint num) 
   { 
     if (num == 0) return this;
-    if (num <= mipmaps.Length()) return mipmaps[num-1];
+    if (num <= mipmaps.GetSize ()) return mipmaps[num-1];
     return 0; 
   }
   /**

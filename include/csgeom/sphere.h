@@ -29,7 +29,8 @@
 #include "csextern.h"
 
 #include "cstypes.h"
-#include "vector3.h"
+#include "csgeom/math3d.h"
+#include "csgeom/vector3.h"
 
 class csTransform;
 
@@ -81,6 +82,13 @@ public:
   {
     Union (s.center, s.radius);
     return *this;
+  }
+  
+  /// Test if the two spheres have an intersection.
+  bool TestIntersect (const csSphere& sphere) const
+  {
+    float sqDist = csSquaredDist::PointPoint (center, sphere.center);
+    return (sqDist - (csSquare (radius + sphere.radius))) < 0;
   }
 };
 

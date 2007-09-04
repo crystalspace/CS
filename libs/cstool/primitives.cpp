@@ -30,9 +30,9 @@ void csPrimitives::GenerateBox (
       csDirtyAccessArray<csVector3>& mesh_normals,
       csDirtyAccessArray<csTriangle>& mesh_triangles)
 {
-  mesh_vertices.SetLength (24);
-  mesh_texels.SetLength (24);
-  mesh_normals.SetLength (24);
+  mesh_vertices.SetSize (24);
+  mesh_texels.SetSize (24);
+  mesh_normals.SetSize (24);
   csVector3* vertices = mesh_vertices.GetArray ();
   vertices[0].Set(box.MinX(), box.MaxY(), box.MinZ());
   vertices[1].Set(box.MinX(), box.MaxY(), box.MinZ());
@@ -101,7 +101,7 @@ void csPrimitives::GenerateBox (
   texels[22].Set(1, 1); // 3
   texels[23].Set(0, 1); // 6
 
-  mesh_triangles.SetLength (12);
+  mesh_triangles.SetSize (12);
   csTriangle* triangles = mesh_triangles.GetArray ();
   triangles[0].a = 0; triangles[0].b = 9; triangles[0].c = 18;
   triangles[1].a = 0; triangles[1].b = 18; triangles[1].c = 21;
@@ -154,7 +154,123 @@ void csPrimitives::GenerateBox (
   normals[22].Set(box.MinX(),box.MinY(),box.MinZ()); normals[22].Normalize();
   normals[23].Set(box.MinX(),box.MinY(),box.MinZ()); normals[23].Normalize();
 }
+void csPrimitives::GenerateCapsule (float l, float r, uint sides,
+      csDirtyAccessArray<csVector3>& mesh_vertices,
+      csDirtyAccessArray<csVector2>& mesh_texels,
+      csDirtyAccessArray<csVector3>& mesh_normals,
+      csDirtyAccessArray<csTriangle>& mesh_triangles)
+{
+  const uint n = sides * 4;
+  l *= 0.5;
+  float a = float(PI*2.0)/float(n);
+  float sa = (float) sin(a);
+  float ca = (float) cos(a);
 
+  mesh_normals.DeleteAll ();
+  mesh_texels.DeleteAll ();
+  mesh_normals.DeleteAll ();
+  mesh_triangles.DeleteAll ();
+  mesh_vertices.DeleteAll ();
+
+  // cylinder body
+  float ny = 1, nz = 0;
+  for (uint i = 0; i < n; i++)
+  {
+    mesh_normals.Push (csVector3 (0, ny, nz));
+    int v1 = int (mesh_vertices.Push (csVector3 (l, ny * r, nz * r)));
+    mesh_normals.Push (csVector3 (0, ny, nz));
+    int v2 = int (mesh_vertices.Push (csVector3 (-l, ny * r, nz * r)));
+
+    float tmp =  ca * ny - sa * nz;
+    nz = sa*ny + ca*nz;
+    ny = tmp;
+    
+    if (i > 0)
+    {
+      mesh_triangles.Push (csTriangle (v2, v1, v1 - 2));
+      mesh_triangles.Push (csTriangle (v1 - 1, v2, v1));
+      mesh_triangles.Push (csTriangle (v1 - 2, v1 -1, v2));
+      mesh_triangles.Push (csTriangle (v1, v1 - 2, v1 - 1));
+      if (i == n - 1)
+      {
+        mesh_triangles.Push (csTriangle (1, 0, v1));
+        mesh_triangles.Push (csTriangle (v2, 1, 0));
+        mesh_triangles.Push (csTriangle (v1, v2, 1));
+        mesh_triangles.Push (csTriangle (0, v1, v2));
+      }
+    }
+  }
+
+  // top cap
+  float start_nx = 0;
+  float start_ny = 1;
+  for (uint j = 0; j <= sides; j++) 
+  {
+    float start_nx2 =  ca*start_nx + sa*start_ny;
+    float start_ny2 = -sa*start_nx + ca*start_ny;
+    float nx = start_nx; ny = start_ny; nz = 0;
+    float nx2 = start_nx2, ny2 = start_ny2, nz2 = 0;
+    for (uint i = 0; i <= n; i++) 
+    {
+      mesh_normals.Push (csVector3 (nx2, ny2, nz2));
+      int v1 = int (mesh_vertices.Push (csVector3 (l+nx2*r, ny2*r, nz2*r)));
+      mesh_normals.Push (csVector3 (nx, ny, nz));
+      int v2 = int (mesh_vertices.Push (csVector3 (l+nx*r, ny*r, nz*r)));
+
+      float tmp = ca*ny - sa*nz;
+      nz = sa*ny + ca*nz;
+      ny = tmp;
+      tmp = ca*ny2- sa*nz2;
+      nz2 = sa*ny2 + ca*nz2;
+      ny2 = tmp;
+
+      if (i > 0)
+      {
+        mesh_triangles.Push (csTriangle (v2, v1, v1 - 2));
+        mesh_triangles.Push (csTriangle (v1 - 1, v2, v1));
+        mesh_triangles.Push (csTriangle (v1 - 2, v1 -1, v2));
+        mesh_triangles.Push (csTriangle (v1, v1 - 2, v1 - 1));
+      }
+    }
+    start_nx = start_nx2;
+    start_ny = start_ny2;
+  }
+
+  // second cap
+  start_nx = 0;
+  start_ny = 1;
+  for (uint j = 0; j <= sides; j++) 
+  {
+    float start_nx2 =  ca*start_nx - sa*start_ny;
+    float start_ny2 = sa*start_nx + ca*start_ny;
+    float nx = start_nx; ny = start_ny; nz = 0;
+    float nx2 = start_nx2, ny2 = start_ny2, nz2 = 0;
+    for (uint i = 0; i <= n; i++) 
+    {
+      mesh_normals.Push (csVector3 (nx, ny, nz));
+      int v1 = int (mesh_vertices.Push (csVector3 (-l+nx*r, ny*r, nz*r)));
+      mesh_normals.Push (csVector3 (nx2, ny2, nz2));
+      int v2 = int (mesh_vertices.Push (csVector3 (-l+nx2*r, ny2*r, nz2*r)));
+
+      float tmp = ca*ny - sa*nz;
+      nz = sa*ny + ca*nz;
+      ny = tmp;
+      tmp = ca*ny2 - sa*nz2;
+      nz2 = sa*ny2 + ca*nz2;
+      ny2 = tmp;
+
+      if (i > 0)
+      {
+        mesh_triangles.Push (csTriangle (v2, v1, v1 - 2));
+        mesh_triangles.Push (csTriangle (v1 - 1, v2, v1));
+        mesh_triangles.Push (csTriangle (v1 - 2, v1 -1, v2));
+        mesh_triangles.Push (csTriangle (v1, v1 - 2, v1 - 1));
+      }
+    }
+    start_nx = start_nx2;
+    start_ny = start_ny2;
+  }
+}
 void csPrimitives::GenerateQuad (const csVector3 &v1, const csVector3 &v2,
                           const csVector3 &v3, const csVector3 &v4,
                           csDirtyAccessArray<csVector3>& mesh_vertices,
@@ -162,10 +278,10 @@ void csPrimitives::GenerateQuad (const csVector3 &v1, const csVector3 &v2,
                           csDirtyAccessArray<csVector3>& mesh_normals,
                           csDirtyAccessArray<csTriangle>& mesh_triangles)
 {
-  mesh_vertices.SetLength (4);
-  mesh_texels.SetLength (4);
-  mesh_normals.SetLength (4);
-  mesh_triangles.SetLength (4);
+  mesh_vertices.SetSize (4);
+  mesh_texels.SetSize (4);
+  mesh_normals.SetSize (4);
+  mesh_triangles.SetSize (4);
 
   mesh_normals[0] = mesh_vertices[0] = v1;
   mesh_normals[1] = mesh_vertices[1] = v2;
@@ -394,7 +510,7 @@ void csPrimitives::GenerateSphere (const csEllipsoid& ellips, int num,
     }
 
   // Scale and shift all the vertices.
-  mesh_normals.SetLength (num_vertices);
+  mesh_normals.SetSize (num_vertices);
   const csVector3& sphere_radius = ellips.GetRadius ();
   for (i = 0 ; i < num_vertices ; i++)
   {
@@ -416,8 +532,8 @@ void csPrimitives::GenerateSphere (const csEllipsoid& ellips, int num,
     }
   }
 
-  mesh_vertices.SetLength (num_vertices);
-  mesh_texels.SetLength (num_vertices);
+  mesh_vertices.SetSize (num_vertices);
+  mesh_texels.SetSize (num_vertices);
   csVector3* genmesh_vertices = mesh_vertices.GetArray ();
   memcpy (genmesh_vertices, vertices.GetArray (),
       sizeof(csVector3)*num_vertices);
@@ -426,7 +542,7 @@ void csPrimitives::GenerateSphere (const csEllipsoid& ellips, int num,
   memcpy (genmesh_texels, uvverts.GetArray (),
       sizeof(csVector2)*num_vertices);
 
-  mesh_triangles.SetLength (num_triangles);
+  mesh_triangles.SetSize (num_triangles);
   csTriangle* ball_triangles = mesh_triangles.GetArray ();
   memcpy (ball_triangles, triangles.GetArray (),
       sizeof(csTriangle)*num_triangles);

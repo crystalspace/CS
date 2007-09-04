@@ -28,7 +28,7 @@
 #include "csgfx/shadervarcontext.h"
 #include "cstool/rendermeshholder.h"
 #include "cstool/userrndbuf.h"
-#include "csutil/cscolor.h"
+#include "csutil/cscolor.h" 
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/flags.h"
 #include "csutil/hash.h"
@@ -47,6 +47,7 @@
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
 #include "iutil/virtclk.h"
+#include "iutil/strset.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rendermesh.h"
 #include "ivideo/rndbuf.h"
@@ -141,11 +142,13 @@ class csGenmeshMeshObject : public scfImplementation5<csGenmeshMeshObject,
 						      iGeneralMeshState>
 {
 private:
+
   csRenderMeshHolder rmHolder;
   csRef<csShaderVariableContext> svcontext;
   csRef<csRenderBufferHolder> bufferHolder;
   csWeakRef<iGraphics3D> g3d;
   bool mesh_colors_dirty_flag;
+  bool mesh_user_rb_dirty_flag;
 
   uint buffers_version;
   csRef<iRenderBuffer> sorted_index_buffer;	// Only if factory back2front
@@ -156,6 +159,8 @@ private:
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
   csRef<iRenderBuffer> normal_buffer;
+
+  size_t factory_user_rb_state;
 
   csRef<iRenderBuffer> color_buffer;
   iMovable* lighting_movable;
@@ -388,6 +393,9 @@ public:
    * does nothing.
    */
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
+
+  virtual void BuildDecal(const csVector3* pos, float decalRadius,
+          iDecalBuilder* decalBuilder);
   /** @} */
 
   class RenderBufferAccessor : 
@@ -445,12 +453,11 @@ class csGenmeshMeshObjectFactory :
                                iMeshObjectFactory,
                                iGeneralFactoryState>
 {
-private:
+public:
   csRef<iMaterialWrapper> material;
   csDirtyAccessArray<csVector3> mesh_vertices;
   csDirtyAccessArray<csVector2> mesh_texels;
   csDirtyAccessArray<csVector3> mesh_normals;
-  csDirtyAccessArray<csColor4> mesh_colors;
 
   bool autonormals;
   bool autonormals_compress;
@@ -488,6 +495,8 @@ private:
   bool default_shadowcasting;
   bool default_shadowreceiving;
 
+  size_t user_buffer_change;
+
   float radius;
   csBox3 object_bbox;
   bool object_bbox_valid;
@@ -511,7 +520,8 @@ private:
    * Setup this factory. This function will check if setup is needed.
    */
   void SetupFactory ();
-
+private:
+  csDirtyAccessArray<csColor4> mesh_colors;
 public:
   CS_LEAKGUARD_DECLARE (csGenmeshMeshObjectFactory);
 
@@ -555,7 +565,7 @@ public:
       const csVector2& uv, const csVector3& normal,
       const csColor4& color);
   void SetVertexCount (int n);
-  int GetVertexCount () const { return (int)mesh_vertices.Length (); }
+  int GetVertexCount () const { return (int)mesh_vertices.GetSize (); }
   csVector3* GetVertices ()
   {
     SetupFactory ();
@@ -571,16 +581,25 @@ public:
     SetupFactory ();
     return mesh_normals.GetArray ();
   }
+  csColor4* GetColors (bool ensureValid)
+  {
+    if (ensureValid && (mesh_colors.GetSize() == 0))
+    {
+      mesh_colors.SetCapacity (mesh_vertices.GetSize());
+      mesh_colors.SetSize (mesh_vertices.GetSize(), csColor4 (0, 0, 0, 1));
+    }
+    return mesh_colors.GetArray();
+  }
   csColor4* GetColors ()
   {
     SetupFactory ();
-    return mesh_colors.GetArray ();
+    return GetColors (true);
   }
 
   void AddTriangle (const csTriangle& tri);
   void SetTriangleCount (int n);
 
-  int GetTriangleCount () const { return (int)mesh_triangles.Length (); }
+  int GetTriangleCount () const { return (int)mesh_triangles.GetSize (); }
   csTriangle* GetTriangles ()
   {
     SetupFactory ();
@@ -593,6 +612,7 @@ public:
   { autonormals = false; }
   void Compress ();
   void GenerateBox (const csBox3& box);
+  void GenerateCapsule (float l, float r, uint sides);
   void GenerateSphere (const csEllipsoid& ellips, int rim_vertices,
       	bool cyl_mapping = false, bool toponly = false,
 	bool reversed = false);
@@ -745,8 +765,6 @@ public:
     csGenmeshMeshObjectFactory* factory;
     csFlags flags;
   public:
-    //SCF_DECLARE_IBASE;
-
     void SetFactory (csGenmeshMeshObjectFactory* Factory)
     { factory = Factory; }
 
@@ -847,6 +865,7 @@ public:
   bool do_verbose;
   MergedSVContext::Pool mergedSVContextPool;
   csStringHash submeshNamePool;
+  csStringID base_id;
 
   /// Constructor.
   csGenmeshMeshObjectType (iBase*);

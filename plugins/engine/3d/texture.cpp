@@ -137,12 +137,18 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
     }
   }
 
-  handle = txtmgr->RegisterTexture (image, flags);
+  csRef<scfString> fail_reason;
+  fail_reason.AttachNew (new scfString ());
+  handle = txtmgr->RegisterTexture (image, flags, fail_reason);
   if (handle)
   {
     SetKeyColor (key_col_r, key_col_g, key_col_b);
     handle->SetTextureClass (texClass);
     delete[] texClass; texClass = 0; 
+  }
+  else
+  {
+    engine->Error ("Error creating texture: %s", fail_reason->GetData ());
   }
 
   if (!keep_image)
@@ -197,7 +203,7 @@ iTextureWrapper *csTextureList::NewTexture (iTextureHandle *ith)
 
 int csTextureList::GetCount () const
 {
-  return (int)this->Length ();
+  return (int)this->GetSize ();
 }
 
 iTextureWrapper *csTextureList::Get (int n) const

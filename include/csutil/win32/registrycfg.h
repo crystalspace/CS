@@ -30,9 +30,6 @@
 #include "csutil/strhash.h"
 #include "csutil/array.h"
 
-#include <windows.h>
-#include "sanity.inc"
-
 class csWin32RegistryIterator;
 
 /**

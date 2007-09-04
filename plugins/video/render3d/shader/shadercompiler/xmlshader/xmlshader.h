@@ -26,7 +26,7 @@
 #include "csutil/weakref.h"
 #include "csutil/scf_implementation.h"
 
-#include "condition.h"
+#include "cpi/condition.h"
 
 struct iSyntaxService;
 struct iLoaderContext;
@@ -79,6 +79,7 @@ public:
   bool do_verbose;
   bool doDumpXML;
   bool doDumpConds;
+  bool doDumpValues;
   /// XML Token and management
   csStringHash xmltokens;
   bool debugInstrProcessing;

@@ -307,7 +307,7 @@ void SndSysBasicStream::QueueNotificationEvent(StreamNotificationType NotifyType
 void SndSysBasicStream::ProcessNotifications()
 {
   StreamNotificationEvent *pEvent;
-  size_t CallbackCount=m_CallbackList.Length();
+  size_t CallbackCount=m_CallbackList.GetSize ();
 
   // Empty the queue of notification events
   while ((pEvent=m_NotificationQueue.DequeueEntry()) != 0)

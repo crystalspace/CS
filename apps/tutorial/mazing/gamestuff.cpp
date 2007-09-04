@@ -266,7 +266,7 @@ Player::Player (AppMazing* app)
 bool Player::InitCollisionDetection ()
 {
   float ps = PLAYER_SIZE / 2.0;
-  csPolygonMeshBox* box = new csPolygonMeshBox (csBox3 (
+  csTriangleMeshBox* box = new csTriangleMeshBox (csBox3 (
   	csVector3 (-ps, -ps, -ps), csVector3 (ps, ps, ps)));
   player_collider = app->GetCollisionDetectionSystem ()
   	->CreateCollider (box);
@@ -408,7 +408,7 @@ void Adversary::ThinkAndMove (float elapsed_seconds)
     Maze* maze = app->GetGame ().GetMaze ();
     const csArray<RoomCoordinate>& connections = maze->GetConnections (
 	current_location);
-    size_t moveto = (rand () >> 3) % connections.Length ();
+    size_t moveto = (rand () >> 3) % connections.GetSize ();
     if (maze->IsSpaceFree (connections[moveto]))
     {
       start.x = float (current_location.x) * ROOM_DIMENSION;
@@ -563,8 +563,9 @@ bool Game::CreateFactories ()
   fstate->SetColor (csColor (1.0, 1.0, 1.0));
   // We don't want to hit the player against the laserbeam when it is
   // visible so we disable the collision detection mesh here.
+  csStringID colldet_id = app->GetStrings ()->Request ("colldet");
   laserbeam_factory->GetMeshObjectFactory ()->GetObjectModel ()
-  	->SetPolygonMeshColldet (0);
+  	->SetTriangleData (colldet_id, 0);
 
   if (!loader->LoadTexture ("laserbeam_texture", "/lib/stdtex/blobby.jpg"))
     return app->ReportError ("Error loading 'blobby' texture!");
@@ -698,7 +699,7 @@ void Game::StartExplosion (iSector* sector, const csVector3& pos)
 void Game::HandleExplosions (csTicks elapsed_ticks)
 {
   size_t i = 0;
-  while (i < explosions.Length ())
+  while (i < explosions.GetSize ())
   {
     if (explosions[i].Handle (elapsed_ticks)) i++;
     else
@@ -724,7 +725,7 @@ void Game::Handle (csTicks elapsed_ticks)
 
   // Let all the adversaries think about what to do.
   size_t i;
-  for (i = 0 ; i < adversaries.Length () ; i++)
+  for (i = 0 ; i < adversaries.GetSize () ; i++)
     adversaries[i]->ThinkAndMove (elapsed_seconds);
 }
 

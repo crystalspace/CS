@@ -1,6 +1,6 @@
 /*
     Crystal Space 3D engine
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000-2007 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -95,8 +95,9 @@ enum
  * A polygon. Note that this structure is only valid if used
  * in combination with a vertex table. The vertex array then
  * contains indices in that table.
+ * \deprecated csMeshedPolygon is deprecated.
  */
-struct csMeshedPolygon
+struct CS_DEPRECATED_TYPE_MSG("csMeshedPolygon is deprecated") csMeshedPolygon
 {
   int num_vertices;
   int* vertices;
@@ -104,6 +105,8 @@ struct csMeshedPolygon
 
 class csVector3;
 struct csTriangle;
+
+#include "csutil/win32/msvc_deprecated_warn_off.h"
 
 /**
  * This interface reprents a mesh of polygons. It is useful to communicate
@@ -134,8 +137,10 @@ struct csTriangle;
  * - Collision detection plugins (iCollideSystem)
  * - Visibility culler plugins (iVisibilityCuller)
  * - Shadow stencil plugin
+ *
+ * \deprecated iPolygonMesh is deprecated; use iTriangleMesh instead.
  */
-struct iPolygonMesh : public virtual iBase
+struct CS_DEPRECATED_TYPE_MSG("iPolygonMesh is deprecated; use iTriangleMesh instead") iPolygonMesh : public virtual iBase
 {
   SCF_INTERFACE(iPolygonMesh, 2, 0, 0);
   /// Get the number of vertices for this mesh.
@@ -186,6 +191,8 @@ struct iPolygonMesh : public virtual iBase
 };
 
 /** @} */
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_IGEOM_POLYMESH_H__
 

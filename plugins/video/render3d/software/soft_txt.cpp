@@ -22,10 +22,12 @@
 #include "csgfx/imagemanipulate.h"
 #include "csgfx/imagememory.h"
 #include "csgfx/packrgb.h"
+#include "csgfx/textureformatstrings.h"
 #include "csgfx/xorpat.h"
 #include "iutil/cfgfile.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
+#include "iutil/string.h"
 #include "igraphic/image.h"
 #include "ivaria/reporter.h"
 #include "csqint.h"
@@ -51,7 +53,7 @@ void csSoftwareTexture::ImageToBitmap (iImage *Image)
     img = Image;
 
   size_t pixNum = w * h;
-  bitmap = new uint32[pixNum];
+  bitmap = (uint32*)cs_malloc (pixNum * sizeof (uint32));
 #ifdef CS_LITTLE_ENDIAN
   if (csPackRGBA::IsRGBpixelSane() 
     && !parent->texman->G3D->pixelBGR)
@@ -115,6 +117,27 @@ csSoftwareTextureHandle::csSoftwareTextureHandle (
     alphaType = csAlphaMode::alphaNone;
 }
 
+csSoftwareTextureHandle::csSoftwareTextureHandle (
+  csSoftwareTextureManager *texman, int w, int h,
+  bool alpha, int flags) : csTextureHandle (texman, 
+    flags | CS_TEXTURE_NOMIPMAPS), texman (texman)
+{
+  if (flags & CS_TEXTURE_3D)
+  {
+    int newwidth = 0, newheight = 0, newdepth = 0;
+    AdjustSizePo2 (w, h, 1, newwidth, newheight, newdepth);
+    w = newwidth; h = newheight;
+  }
+  memset (tex, 0, sizeof (tex));
+  tex[0] = new csSoftwareTexture (this, w, h);
+  prepared = true;
+
+  if (alpha)
+    alphaType = csAlphaMode::alphaSmooth;
+  else
+    alphaType = csAlphaMode::alphaNone;
+}
+
 csSoftwareTextureHandle::~csSoftwareTextureHandle ()
 {
   if (texman) texman->UnregisterTexture (this);
@@ -169,6 +192,13 @@ void csSoftwareTextureHandle::CreateMipmaps ()
       }
 
       tex [i] = new csSoftwareTexture (this, newImage);
+    }
+  }
+  else
+  {
+    for (int i = 1; i < 4; i++)
+    {
+      tex [i] = 0;
     }
   }
 }
@@ -305,20 +335,49 @@ uint32 csSoftwareTextureManager::encode_rgb (int r, int g, int b)
 }
 
 csPtr<iTextureHandle> csSoftwareTextureManager::RegisterTexture (iImage* image,
-  int flags)
+  int flags, iString* fail_reason)
 {
   if (!image)
   {
-    G3D->Report(CS_REPORTER_SEVERITY_BUG,
-      "BAAAD!!! csSoftwareTextureManager::RegisterTexture with 0 image!");
-
-    csRef<iImage> im (csCreateXORPatternImage(32, 32, 5));
-    image = im;
-    im->IncRef ();	// Avoid smart pointer cleanup. @@@ UGLY
+    if (fail_reason) fail_reason->Replace (
+      "No image given to RegisterTexture!");
+    return 0;
   }
 
   csSoftwareTextureHandle *txt = new csSoftwareTextureHandle (
   	this, image, flags);
+  textures.Push (txt);
+  return csPtr<iTextureHandle> (txt);
+}
+
+csPtr<iTextureHandle> csSoftwareTextureManager::CreateTexture (int w, int h,
+      csImageType imagetype, const char* format, int flags,
+      iString* fail_reason)
+{
+  CS::StructuredTextureFormat texFormat (
+    CS::TextureFormatStrings::ConvertStructured (format));
+  if (!texFormat.IsValid()) 
+  {
+    if (fail_reason) fail_reason->Replace ("invalid texture format");
+    return 0;
+  }
+
+  uint compMask = texFormat.GetComponentMask();
+  if ((compMask != CS::StructuredTextureFormat::compRGB)
+    && (compMask != CS::StructuredTextureFormat::compRGBA))
+  {
+    if (fail_reason) fail_reason->Replace ("texture format must be RGB or RGBA");
+    return 0;
+  }
+
+  if (imagetype != csimg2D)
+  {
+    if (fail_reason) fail_reason->Replace ("only 2D textures are supported");
+    return 0;
+  }
+
+  csSoftwareTextureHandle *txt = new csSoftwareTextureHandle (
+    this, w, h, compMask == CS::StructuredTextureFormat::compRGBA, flags);
   textures.Push (txt);
   return csPtr<iTextureHandle> (txt);
 }

@@ -138,7 +138,7 @@ csDirtyAccessArray<float> ReadData (char* buf, uint w, uint h)
 {
   const size_t num = w * h;
   csDirtyAccessArray<float> fdata;
-  fdata.SetLength (num);
+  fdata.SetSize (num);
   for (size_t i = 0; i < num; i++)
   {
     Tgetter::Get (buf, fdata[i]);

@@ -107,7 +107,7 @@ void csTerraFormerCollider::InitOPCODEModel ()
   delete indexholder;
   delete opcode_model;
   indexholder = new unsigned int[3* 2 * (resolution-1) * (resolution-1)];
-  vertices.SetLength (resolution*resolution);
+  vertices.SetSize (resolution*resolution);
 
   opcode_model = new Opcode::Model;
 

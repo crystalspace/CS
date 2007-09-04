@@ -57,7 +57,7 @@
 %ignore csString::operator[];
 
 %{
-PyObject *
+CS_EXPORT_SYM PyObject *
 _csRef_to_Python (const csRef<iBase> & ref, void * ptr, const char * name)
 {
   if (!ref.IsValid())
@@ -119,6 +119,26 @@ _csRef_to_Python (const csRef<iBase> & ref, void * ptr, const char * name)
   }
 %enddef
 
+/***@@@***
+Oktal has commented out some lines of the following function on 12-Apr-2007
+until someone who knows more about Python can look at it and make sure I'm
+right about those lines being superfluous and possibly erroneous.
+
+There is a big comment (starting with "This is a bit tricky") that talks about
+having to create a second Python object and call its IncRef method, so that
+the result object owns one reference to the wrapper pointer.
+
+Except, the second Python object is destroyed at the end of the function,
+which causes its DecRef method to be called, so that whole section looks
+to me to be entirely pointless.
+
+That big comment also talks about calling IncRef twice, but I can only see one
+call to IncRef in the code :-/
+
+As long as we don't call DecRef after QueryInterface, the object should end up
+with the correct reference count. That's how I understand it, anyway, but I
+know practically nothing about Python.
+ ***@@@***/
 %{
 PyObject *
 _csWrapPtr_to_Python (const csWrapPtr & wp)
@@ -130,7 +150,7 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
   }
   iBase * ibase = (iBase *)wp.Ref;
   void * ptr = ibase->QueryInterface(iSCF::SCF->GetInterfaceID(wp.Type), wp.Version);
-  ibase->DecRef(); // Undo IncRef from QueryInterface
+//  ibase->DecRef(); // Undo IncRef from QueryInterface
 
   // This is a bit tricky: We want the generated Python 'result' object
   // to own one reference to the wrapped object, so we want to call
@@ -151,17 +171,17 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
   CS_ALLOC_STACK_ARRAY(char, type_name, strlen(wp.Type) + 3);
   strcat(strcpy(type_name, wp.Type), " *");
   PyObject *result = SWIG_NewPointerObj(ptr, SWIG_TypeQuery(type_name), 1);
-  PyObject * ibase_obj = SWIG_NewPointerObj (
-    ptr, SWIG_TypeQuery(type_name), 1);
-  PyObject * res_obj = PyObject_CallMethod(ibase_obj, "IncRef", "()");
-  if (!res_obj)
-  {
-    // Calling Python IncRef() failed; something wrong here.
-    Py_XDECREF(result);
-    result = 0;
-  }
-  Py_XDECREF(ibase_obj);
-  Py_XDECREF(res_obj);
+//  PyObject * ibase_obj = SWIG_NewPointerObj (
+//    ptr, SWIG_TypeQuery(type_name), 1);
+//  PyObject * res_obj = PyObject_CallMethod(ibase_obj, "IncRef", "()");
+//  if (!res_obj)
+//  {
+//    // Calling Python IncRef() failed; something wrong here.
+//    Py_XDECREF(result);
+//    result = 0;
+//  }
+//  Py_XDECREF(ibase_obj);
+//  Py_XDECREF(res_obj);
   return result;
 }
 %}
@@ -232,8 +252,8 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
   PyObject * arr = PyList_New(cnt);
   for (int i = 0; i < cnt; ++i)
   {
-    base_type * item = new base_type(to_item ptr[i]);
-    PyObject* o = SWIG_NewPointerObj((void*)item, $descriptor(basetype*), 1);
+    base_type * item = new base_type(to_item (ptr[i]));
+    PyObject* o = SWIG_NewPointerObj((void*)item, $descriptor(base_type*), 1);
     PyList_SetItem(arr, i, o);
   }
   PyList_Append(l, arr);
@@ -398,15 +418,55 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
 %feature("shadow") iGeneralFactoryState::GetColors()
 %{
   def GetColors(self):
-    return CSMutableArrayHelper(self.GetNormalByIndex, self.GetVertexCount)
+    return CSMutableArrayHelper(self.GetColorByIndex, self.GetVertexCount)
 %}
+
+%feature("shadow") iPolygonMesh::GetTriangles()
+%{
+  def GetTriangles(self):
+    return CSMutableArrayHelper(self.GetTriangleByIndex, self.GetTriangleCount)
+%}
+%feature("shadow") iPolygonMesh::GetPolygons()
+%{
+  def GetPolygons(self):
+    return CSMutableArrayHelper(self.GetPolygonByIndex, self.GetPolygonCount)
+%}
+%feature("shadow") iPolygonMesh::GetVertices()
+%{
+  def GetVertices(self):
+    return CSMutableArrayHelper(self.GetVertexByIndex, self.GetVertexCount)
+%}
+
+%feature("shadow") iTriangleMesh::GetTriangles()
+%{
+  def GetTriangles(self):
+    return CSMutableArrayHelper(self.GetTriangleByIndex, self.GetTriangleCount)
+%}
+%feature("shadow") iTriangleMesh::GetVertices()
+%{
+  def GetVertices(self):
+    return CSMutableArrayHelper(self.GetVertexByIndex, self.GetVertexCount)
+%}
+
+/* Macro to add an iterator to a python proxy
+   requires the class to have __len__ and __getitem__ methods */
+%define PYITERATOR_PROTOCOL(classname)
+%extend classname
+{
+    %pythoncode %{
+        def content_iterator(self):
+                for idx in xrange(len(self)):
+                        yield self.__getitem__(idx)
+        def __iter__(self): return self.content_iterator()  %}
+}
+%enddef
 
 /* List Methods*/
 
 %define PYLIST_BASE_FUNCTIONS(classname,typename,idxtype,countmethod,getmethod,addmethod,removemethod,findmethod)
 %extend classname {
-        typename *__getitem__( idxtype n) {return self-> ## getmethod ## (n);}
-	bool __contains__(typename *obj) {
+        typename __getitem__( idxtype n) {return self-> ## getmethod ## (n);}
+	bool __contains__(typename obj) {
 		if (self-> ## findmethod ## (obj) == 
 				(idxtype)csArrayItemNotFound)
 			return false;
@@ -414,17 +474,13 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
 	}
         bool __delitem__(idxtype n) { return self-> ## removemethod ## (n); }
         int __len__() { return self-> ## countmethod ## (); }
-        void append(typename *e) { self-> ## addmethod ## (e); }
-        %pythoncode %{
-        def content_iterator(self):
-                for idx in xrange(len(self)):
-                        yield self. ## getmethod ## (idx)
-        def __iter__(self): return self.content_iterator()  %}
+        void append(typename e) { self-> ## addmethod ## (e); }
 }
+PYITERATOR_PROTOCOL(classname)
 %enddef
 %define PYLIST_BYNAME_FUNCTIONS(classname,typename,findbynamemethod)
 %extend classname {
-	typename *__getitem__( const char* name) {return self-> ## findbynamemethod ## (name);}
+	typename __getitem__( const char* name) {return self-> ## findbynamemethod ## (name);}
 	bool __contains__(const char *name) {
 		if (self-> ## findbynamemethod ## (name))
 			return true;
@@ -432,10 +488,19 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
 	}
 }
 %enddef
-%define LIST_OBJECT_FUNCTIONS(classname,typename)
-        PYLIST_BASE_FUNCTIONS(classname,typename,int,GetCount,Get,Add,Remove,Find)
-        PYLIST_BYNAME_FUNCTIONS(classname,typename,FindByName)
+/* Array Functions */
+#undef ARRAY_OBJECT_FUNCTIONS
+%define ARRAY_OBJECT_FUNCTIONS(classname,typename)
+        PYLIST_BASE_FUNCTIONS(classname,typename,size_t,GetSize,Get,Push,Delete,Find)
 %enddef
+/* Pseudo-List Functions */
+#undef LIST_OBJECT_FUNCTIONS
+%define LIST_OBJECT_FUNCTIONS(classname,typename)
+        PYLIST_BASE_FUNCTIONS(classname,typename *,int,GetCount,Get,Add,Remove,Find)
+        PYLIST_BYNAME_FUNCTIONS(classname,typename *,FindByName)
+%enddef
+/* Pseudo-Set Functions */
+#undef SET_OBJECT_FUNCTIONS
 %define SET_OBJECT_FUNCTIONS(classname,typename)
 %extend classname {
 	int __len__() {return self->GetSize();}
@@ -468,6 +533,36 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
 %define APPLY_TYPEMAP_ARGOUT_PTR(Type,Args)
 %apply Type * ARGOUT { Args };
 %enddef
+
+/*
+ * Macro for implementing the python iterator protocol for objects
+ * with Next and HasNext functions.
+ * Must be used inside an %extend block for ClassName.
+*/
+#undef ITERATOR_FUNCTIONS
+%define ITERATOR_FUNCTIONS(ClassName)
+%pythoncode %{
+def __iter__(self):
+    while self.HasNext():
+        yield self.Next() %}
+%enddef
+
+// csStringFast typemaps
+%typemap(out) csStringFast *
+{
+        const char *res = $1->GetData();
+        $result = SWIG_FromCharPtr(res);
+}
+
+%typemap(in) csStringFast *
+{
+        $1 = new $1_basetype (PyString_AsString($input));
+}
+
+%typemap(freearg) csStringFast *
+{
+   delete $1;
+}
 
 #endif // ifndef CS_MINI_SWIG
 

@@ -1,6 +1,6 @@
 /*
-  Copyright (C) 2003 by Marten Svanfeldt
-                        Anders Stenberg
+  Copyright (C) 2003, 2007 by Marten Svanfeldt
+                2003 by Anders Stenberg
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -24,643 +24,600 @@
 #include "gl_render3d.h"
 #include "gl_renderbuffer.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
+{
+
 CS_LEAKGUARD_IMPLEMENT (csGLVBOBufferManager);
 
-//-----------------------------------------------------------------
 
-void csGLVBOBufferManager::ParseByteSize (const char* sizeStr, size_t& size)
+#if 1
+const size_t csGLVBOBufferManager::VBO_SLOT_PER_BUFFER[] = 
 {
-  const char* end = sizeStr + strspn (sizeStr, "0123456789"); 	 
-  size_t sizeFactor = 1; 	 
-  if ((*end == 'k') || (*end == 'K')) 	 
-    sizeFactor = 1024; 	 
-  else if ((*end == 'm') || (*end == 'M')) 	 
-    sizeFactor = 1024*1024; 	 
-  else if (*end != 0)
-  { 	 
-    Report (CS_REPORTER_SEVERITY_WARNING, 	 
-      "Unknown suffix '%s' in maximum buffer size '%s'.", end, sizeStr); 	 
-    sizeFactor = 0; 	 
-  } 	 
-  if (sizeFactor != 0) 	 
-  { 	 
-    unsigned long tmp;
-    if (sscanf (sizeStr, "%lu", &tmp) != 0)
-    {
-      size = tmp;
-      size *= sizeFactor; 	 
-    }
-    else 	 
-      Report (CS_REPORTER_SEVERITY_WARNING, 	 
-        "Invalid buffer size '%s'.", sizeStr); 	 
-  }
-}
+  512,  //256b
+  512,  //512b
+  512,  //1kb
+  512,  //2kb
+  256,  //4kb
+  128,  //8kb
+  64,  //16kb
+  32,  //32kb
+  16,  //64kb
+  8,  //128kb
+  4,  //256kb
+  4,  //512kb
+  2,  //1MB
+};
+#else
 
-static csString ByteFormat (size_t n)
+const size_t csGLVBOBufferManager::VBO_SLOT_PER_BUFFER[] = 
 {
-  csString str;
-  unsigned long size = (unsigned long)n;
-  if (size >= 1024*1024)
-    str.Format ("%lu MB", size / (1024*1024));
-  else if (size >= 1024)
-    str.Format ("%lu KB", size / (1024));
-  else
-    str.Format ("%lu Byte", size);
-  return str;
-}
+  2,  //256b
+  2,  //512b
+  2,  //1kb
+  2,  //2kb
+  2,  //4kb
+  2,  //8kb
+  2,  //16kb
+  2,  //32kb
+  2,  //64kb
+  2,  //128kb
+  2,  //256kb
+  2,  //512kb
+  2,  //1MB
+};
+#endif
+
+static const GLenum VBO_BUFFER_GL_TYPE[] = {
+  GL_ARRAY_BUFFER_ARB, 
+  GL_ELEMENT_ARRAY_BUFFER};
 
 csGLVBOBufferManager::csGLVBOBufferManager (csGLExtensionManager *ext, 
-					    csGLStateCache *state,
-                                            iObjectRegistry* p) :
-  scfImplementationType (this),
-  ext (ext), statecache (state), config(p), object_reg (p),
-  verbose (false), superVerbose (false)
+                                            csGLStateCache *state,
+                                            size_t maxAllocation)                                            
+  : scfImplementationType (this), extensionManager (ext), stateCache (state),
+  currentVBOAllocation (0), maxVBOAllocation (maxAllocation)
 {
-  csRef<iVerbosityManager> verbosemgr (
-    csQueryRegistry<iVerbosityManager> (p));
-  if (verbosemgr)
-  {
-    verbose = verbosemgr->Enabled ("renderer");
-    if (verbose) superVerbose = verbosemgr->Enabled ("renderer.vbo");
-  }
-
-  size_t vbSize = 8*1024*1024;
-  ParseByteSize (config->GetStr ("Video.OpenGL.VBO.VBsize", "8m"), vbSize);
-  size_t ibSize = 8*1024*1024;
-  ParseByteSize (config->GetStr ("Video.OpenGL.VBO.IBsize", "8m"), ibSize);
-
-  if (verbose) Report (CS_REPORTER_SEVERITY_NOTIFY, 
-    "Setting up VBO buffers, VB: %s IB: %s",
-    ByteFormat (vbSize).GetData(), ByteFormat (ibSize).GetData());
-
-  vertexBuffer.bufmgr = this;
-  vertexBuffer.Setup (GL_ARRAY_BUFFER_ARB, vbSize, ext);
-  indexBuffer.bufmgr = this;
-  indexBuffer.Setup (GL_ELEMENT_ARRAY_BUFFER_ARB, ibSize, ext);
+  memset (&vboBufferList, 0, sizeof(vboBufferList));
 }
 
 csGLVBOBufferManager::~csGLVBOBufferManager ()
 {
+  // Deallocate stuff@@@
+  for (size_t type = 0; type < 1; ++type)
+  {
+    for (size_t i = 0; i < VBO_NUM_SLOT_SIZES; ++i)
+    {
+      VBOBuffer* buffer = vboBufferList[type][i];
+
+      while (buffer)
+      {
+        VBOBuffer* next = buffer->nextBuffer;
+        FreeVBOBuffer (buffer);
+        buffer = next;
+      }
+    }
+
+    for (size_t i = 0; i < vboBigBuffers[type].GetSize (); ++i)
+    {
+      FreeVBOBuffer (vboBigBuffers[type][i]);
+    }
+  }
 }
 
-bool csGLVBOBufferManager::ActivateBuffer (iRenderBuffer *buffer)
+
+void* csGLVBOBufferManager::RenderLock (iRenderBuffer* buffer, 
+                                        csGLRenderBufferLockType type)
 {
-  csGLVBOBufferSlot *slot = 0;
-  RenderBufferAux* auxData = bufferData.GetElementPointer (buffer);
-  if ((auxData != 0) && (auxData->vboSlot != 0) 
-    && (auxData->vboSlot->renderBuffer == buffer))
+  iRenderBuffer* masterBuffer = buffer->GetMasterBuffer ();
+  iRenderBuffer* effectiveBuffer = masterBuffer ? masterBuffer : buffer;
+
+  // Check that size haven't changed!
+
+  // Make sure we lock it right way
+  CS_ASSERT ((type==CS_GLBUF_RENDERLOCK_ELEMENTS) == effectiveBuffer->IsIndexBuffer ());
+
+  // Mark render buffer as locked so it cannot be recycled
+  lockedRenderBuffers.Add (effectiveBuffer);
+
+  // Get a slot
+  VBOSlot* slot = GetVBOSlot (effectiveBuffer);
+
+  if (slot)
   {
-    slot = auxData->vboSlot;
-    //we already have a slot, use it
-    if (buffer->GetVersion() != slot->lastCachedVersion)
-    {
-      Precache (buffer, slot);
-    }
+    // Get VBO ID and offset from slot
+    GLuint vboID = 0;
+    size_t offset = 0;
+
+    GetSlotIdAndOffset (slot, vboID, offset);
+
+    // Activate the buffer
+    stateCache->SetBufferARB (VBO_BUFFER_GL_TYPE[type], vboID);
+  
+    CS_ASSERT (slot->renderBuffer == effectiveBuffer);
+    CS_ASSERT (slot->vboBuffer->slotSize >= effectiveBuffer->GetSize ());
+
+    return (void*)(((uint8*)offset) + buffer->GetOffset ());
   }
   else
   {
-    if (buffer->GetSize () == 0)
-      return false;
+    // Didn't get any slot, so go with sysmem buffer for now
+    stateCache->SetBufferARB (VBO_BUFFER_GL_TYPE[type], 0);
 
-    //need a new slot
-    slot = FindEmptySlot (buffer->GetSize(), buffer->IsIndexBuffer());
-    AttachBuffer (slot, buffer);
-    Precache (buffer, slot);
+    uint8* data = (uint8*)effectiveBuffer->Lock (CS_BUF_LOCK_READ);
+    if (data != (uint8*)-1)
+      return data + buffer->GetOffset ();
+    else
+      return (void*)-1;
   }
-  ActivateVBOSlot (slot);
-  return true;
-}
 
-bool csGLVBOBufferManager::DeactivateBuffer (iRenderBuffer *buffer)
-{
-  RenderBufferAux* auxData = bufferData.GetElementPointer (buffer);
-  if ((auxData != 0) && (auxData->vboSlot != 0)
-    && (auxData->vboSlot->renderBuffer == buffer))
-  {
-    DeactivateVBOSlot (auxData->vboSlot);
-  }
-  return true;
-}
-
-void csGLVBOBufferManager::BufferRemoved (iRenderBuffer *buffer)
-{
-  RenderBufferAux* auxData = bufferData.GetElementPointer (buffer);
-  if ((auxData != 0) && (auxData->vboSlot != 0)
-    && (auxData->vboSlot->renderBuffer == buffer))
-  {
-    DeactivateBuffer (buffer);
-    if (auxData->vboSlot->separateVBO)
-    {
-      ext->glDeleteBuffersARB (0, &auxData->vboSlot->vboID);
-    }
-    delete auxData->vboSlot;
-    auxData->vboSlot = 0;
-  }  
-}
-
-void csGLVBOBufferManager::DeactivateVBO ()
-{
-  statecache->SetBufferARB (GL_ARRAY_BUFFER_ARB, 0);
-  statecache->SetBufferARB (GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
-}
-
-void* csGLVBOBufferManager::RenderLock (iRenderBuffer* buffer, 
-					csGLRenderBufferLockType /*type*/)
-{
-  iRenderBuffer* master = buffer->GetMasterBuffer();
-  iRenderBuffer* useBuffer = master ? master : buffer;
-  ActivateBuffer (useBuffer);
-  RenderBufferAux* auxData = bufferData.GetElementPointer (useBuffer);
-  if (auxData == 0) return (void*)-1;
-  return (void*)(auxData->vbooffset + buffer->GetOffset());
+  return (void*)-1;
 }
 
 void csGLVBOBufferManager::RenderRelease (iRenderBuffer* buffer)
 {
-  iRenderBuffer* master = buffer->GetMasterBuffer();
-  DeactivateBuffer (master ? master : buffer);
+  // Remove lock
+  iRenderBuffer* masterBuffer = buffer->GetMasterBuffer ();
+  iRenderBuffer* effectiveBuffer = masterBuffer ? masterBuffer : buffer;
+
+  lockedRenderBuffers.Delete (effectiveBuffer);
+  effectiveBuffer->Release (); // Just to be sure if we didn't actually use a VBO
 }
 
-void csGLVBOBufferManager::ActivateVBOSlot (csGLVBOBufferSlot *slot)
+void csGLVBOBufferManager::DeactivateVBO ()
 {
-  statecache->SetBufferARB (slot->vboTarget, slot->vboID);
-  
-  slot->locked = true;
+  stateCache->SetBufferARB (GL_ARRAY_BUFFER_ARB, 0);
+  stateCache->SetBufferARB (GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 
-  if (slot->separateVBO) return;
-  TouchSlot (slot);
-
-  //some stats
-  if (slot->indexBuffer) indexBuffer.slots[slot->listIdx].slotsActivatedThisFrame++;
-  else vertexBuffer.slots[slot->listIdx].slotsActivatedThisFrame++;
+  // No buffers can be locked now
+  lockedRenderBuffers.Empty ();
 }
 
-void csGLVBOBufferManager::DeactivateVBOSlot (csGLVBOBufferSlot *slot)
+csGLVBOBufferManager::VBOSlot* csGLVBOBufferManager::GetVBOSlot (
+  iRenderBuffer* buffer)
 {
-  slot->locked = false;
-}
+  // See if an existing slot exists
+  VBOSlot* slot = 0;
 
-void csGLVBOBufferManager::Precache (iRenderBuffer *buffer, 
-                                     csGLVBOBufferSlot *slot)
-{
-  //slot must be active first
-  ActivateVBOSlot (slot);
+  slot = renderBufferMappings.Get (buffer, 0);
+  const size_t slotType = buffer->IsIndexBuffer () ?
+    VBO_BUFFER_INDEX : VBO_BUFFER_VERTEX;
 
-  void* bufferData = buffer->Lock (CS_BUF_LOCK_READ);
-  ext->glBufferSubDataARB (slot->vboTarget, (GLsizei)slot->offset, 
-    (GLsizei)buffer->GetSize(), bufferData);
-  buffer->Release ();
-
-  slot->lastCachedVersion = buffer->GetVersion();
-}
-
-csGLVBOBufferSlot* csGLVBOBufferManager::FindEmptySlot 
-  (size_t size, bool ib)
-{
-  csGLVBOBufferSlot *slot = 0;
-  if (ib)
+  if (!slot)
   {
-    if (size<=VBO_BIGGEST_SLOT_SIZE) slot = indexBuffer.FindEmptySlot (size);
-  }
-  else
-  {
-    if (size<=VBO_BIGGEST_SLOT_SIZE) slot = vertexBuffer.FindEmptySlot (size);
-  }
-
-  if (size>VBO_BIGGEST_SLOT_SIZE || slot == 0)
-  {
-    GLuint vboid = AllocateVBOBuffer (size, ib);
-    slot = new csGLVBOBufferSlot;
-    slot->vboID = vboid;
-    slot->indexBuffer = ib;
-    slot->vboTarget = ib ? GL_ELEMENT_ARRAY_BUFFER_ARB : GL_ARRAY_BUFFER_ARB;
-    slot->offset = 0;
-    slot->separateVBO = true;
-  }
-
-  return slot;
-}
-
-GLuint csGLVBOBufferManager::AllocateVBOBuffer (size_t size, bool ib)
-{
-  GLuint vboid;
-  GLenum usage = ib ? GL_ELEMENT_ARRAY_BUFFER_ARB : GL_ARRAY_BUFFER_ARB;
-  ext->glGenBuffersARB (1, &vboid);
-  ext->glBindBufferARB (usage, vboid);
-  ext->glBufferDataARB (usage, (GLsizei)size, 0, GL_DYNAMIC_DRAW_ARB);
-  ext->glBindBufferARB (usage, 0);
-  return vboid;
-}
-
-void csGLVBOBufferManager::DetachBuffer (csGLVBOBufferSlot *slot)
-{
-  RenderBufferAux* auxData = bufferData.GetElementPointer (
-    slot->renderBufferPtr);
-  if (auxData == 0) return;
-  slot->renderBuffer = 0;
-  slot->renderBufferPtr = 0;
-  slot->lastCachedVersion = 0;
-  bufferData.DeleteAll (slot->renderBufferPtr);
-}
-
-void csGLVBOBufferManager::AttachBuffer (csGLVBOBufferSlot *slot, 
-					 iRenderBuffer* buffer)
-{
-  RenderBufferAux auxData;
-  if ((slot->inUse) && slot->renderBuffer && (slot->renderBuffer != buffer))
-    DetachBuffer (slot);
-  slot->renderBuffer = buffer;
-  slot->renderBufferPtr = buffer;
-  auxData.vboSlot = slot;
-  auxData.vbooffset = slot->offset;
-  bufferData.PutUnique (buffer, auxData);
-}
-
-void csGLVBOBufferManager::DumpStats ()
-{
-  Report (CS_REPORTER_SEVERITY_DEBUG, "-------------------------------------------");
-  Report (CS_REPORTER_SEVERITY_DEBUG, " VBO statistics ");
-  Report (CS_REPORTER_SEVERITY_DEBUG, "-------------------------------------------");
-  Report (CS_REPORTER_SEVERITY_DEBUG, "Vertex storage: %zu MB (%zu byte)", 
-    vertexBuffer.size/(1024*1024), vertexBuffer.size);
-  Report (CS_REPORTER_SEVERITY_DEBUG, "Index storage:  %zu MB (%zu byte)", 
-    indexBuffer.size/(1024*1024), indexBuffer.size);
-  
-  if (superVerbose)
-  {
-    Report (CS_REPORTER_SEVERITY_DEBUG, "-------------------------------------------");
-    Report (CS_REPORTER_SEVERITY_DEBUG, " Vertex storage - Allocation report ");
-    Report (CS_REPORTER_SEVERITY_DEBUG, "-------------------------------------------");
-    Report (CS_REPORTER_SEVERITY_DEBUG, " Slotsize Count    Total    Allocated  Used  Reused");
-    unsigned int i;
-    unsigned int countTotal = 0;
+    const size_t slotSize = buffer->GetSize ();
+    const size_t slotSizePO2 = GetSlotSizePO2 (slotSize);
     
-    for (i=0;i<VBO_NUMBER_OF_SLOTS;i++)
-    {
-      Report (CS_REPORTER_SEVERITY_DEBUG, " %8zu %5u   %8zu    %5u   %5u  %5u",
-        vertexBuffer.slots[i].slotSize, vertexBuffer.slots[i].totalCount,
-        vertexBuffer.slots[i].slotSize * vertexBuffer.slots[i].totalCount,
-        vertexBuffer.slots[i].usedSlots, vertexBuffer.slots[i].slotsActivatedLastFrame,
-        vertexBuffer.slots[i].slotsReusedLastFrame);
-      countTotal += vertexBuffer.slots[i].totalCount;
+
+    // No existing, try to get a new one
+    slot = GetFreeVBOSlot (slotSizePO2, slotType);
+
+    // No free one, try to allocate a buffer
+    if (!slot)
+    {     
+      VBOBuffer* vboBuffer = GetNewVBOBuffer (slotSize, slotSizePO2, slotType);
+
+      if (!vboBuffer)
+      {
+        // Try to evict a slot and use that
+        slot = TryFreeVBOSlot (slotSizePO2, slotType);
+      }
+      else
+      {
+        slot = vboBuffer->vboSlots;        
+      }      
     }
-    Report (CS_REPORTER_SEVERITY_DEBUG, "-------------------------------------------");
-    Report (CS_REPORTER_SEVERITY_DEBUG, " Total:   %5u   %8zu",
-      countTotal, vertexBuffer.size);
-    Report (CS_REPORTER_SEVERITY_DEBUG, "-------------------------------------------");
 
-
-    Report (CS_REPORTER_SEVERITY_DEBUG, "-------------------------------------------");
-    Report (CS_REPORTER_SEVERITY_DEBUG, " Index storage - Allocation report ");
-    Report (CS_REPORTER_SEVERITY_DEBUG, "-------------------------------------------");
-    Report (CS_REPORTER_SEVERITY_DEBUG, " Slotsize Count    Total    Allocated  Used  Reused");
-    countTotal = 0;
-
-    for (i=0;i<VBO_NUMBER_OF_SLOTS;i++)
+    if (slot)
     {
-      Report (CS_REPORTER_SEVERITY_DEBUG, " %8zu %5u   %8zu    %5u   %5u  %5u",
-        indexBuffer.slots[i].slotSize, indexBuffer.slots[i].totalCount,
-        indexBuffer.slots[i].slotSize * indexBuffer.slots[i].totalCount,
-        indexBuffer.slots[i].usedSlots, indexBuffer.slots[i].slotsActivatedLastFrame,
-        indexBuffer.slots[i].slotsReusedLastFrame);
-      countTotal += indexBuffer.slots[i].totalCount;
-    }
-    Report (CS_REPORTER_SEVERITY_DEBUG, "-------------------------------------------");
-    Report (CS_REPORTER_SEVERITY_DEBUG, " Total:   %5u   %8zu",
-      countTotal, indexBuffer.size);
-    Report (CS_REPORTER_SEVERITY_DEBUG, "-------------------------------------------");
+      slot->renderBuffer = buffer;
+      slot->bufferVersion = ~0;
+      slot->slotAge = ~0;
+      SetSlotUsed (slot);
 
-  }
-}
-
-void csGLVBOBufferManager::ResetFrameStats ()
-{
-  unsigned int i;
-  for (i = 0; i < VBO_NUMBER_OF_SLOTS; i++)
-  {
-    vertexBuffer.slots[i].slotsActivatedLastFrame = vertexBuffer.slots[i].slotsActivatedThisFrame;
-    vertexBuffer.slots[i].slotsActivatedThisFrame = 0;
-
-    vertexBuffer.slots[i].slotsReusedLastFrame = vertexBuffer.slots[i].slotsReusedThisFrame;
-    vertexBuffer.slots[i].slotsReusedThisFrame = 0;
-  }
-
-  for (i = 0; i < VBO_NUMBER_OF_SLOTS; i++)
-  {
-    indexBuffer.slots[i].slotsActivatedLastFrame = indexBuffer.slots[i].slotsActivatedThisFrame;
-    indexBuffer.slots[i].slotsActivatedThisFrame = 0;
-
-    indexBuffer.slots[i].slotsReusedLastFrame = indexBuffer.slots[i].slotsReusedThisFrame;
-    indexBuffer.slots[i].slotsReusedThisFrame = 0;
-  }
-}
-
-csGLVBOBufferManager::csGLVBOBuffer::~csGLVBOBuffer ()
-{
-  for (unsigned int i = 0; i < VBO_NUMBER_OF_SLOTS; i++)
-  {
-    csGLVBOBufferSlot *c = slots[i].head, *t;
-    while (c)
-    {
-      t = c;
-      c = c->next;
-      delete t;
-    }
-  }
-}
-
-void csGLVBOBufferManager::csGLVBOBuffer::Setup (GLenum usage, 
-  size_t totalSize, csGLExtensionManager *ext)
-{
-  bool isIndex = (usage == GL_ELEMENT_ARRAY_BUFFER_ARB ? true:false);
-  vboTarget = usage;
-
-  //round to lower 4mb boundary (for simplicity)
-  unsigned int numBlocks = ((uint)totalSize/(8*1024*1024)); //number of 8Mb chunks to use
-  if (numBlocks == 0) numBlocks = 1;
-  size = numBlocks * (8*1024*1024);
-
-  ext->glGenBuffersARB (1, &vboID);
-  ext->glBindBufferARB (usage, vboID);
-  ext->glBufferDataARB (usage, (GLsizei)size, 0, GL_DYNAMIC_DRAW_ARB);
-  ext->glBindBufferARB (usage, 0);
-
-  //setup initial layout like below
-  /* Size       Num     Total
-      256      1024     262144 
-      512       512     262144
-     1024       512     524288
-     2048       512    1048576
-     4096       128     524288
-     8192        64     524288
-    16384        32     524288
-    32768        16     524288
-    65536        16     524288
-   131072         8     524288
-   262144         4    1048576
-   524288         2    1048576
-   Total: 8mb
-   */
-  uint countTable[VBO_NUMBER_OF_SLOTS] = 
-    {1024, 512, 512, 512, 128, 64, 32, 16, 16, 8, 4, 2};
-  size_t currentOffset = 0;
-  unsigned int i;
-  for (i = 0; i < VBO_NUMBER_OF_SLOTS; i++)
-  {
-    size_t currSize = GetSizeFromIndex (i);
-    uint count = countTable[i]*numBlocks;
-    slots[i].totalCount = count;
-    slots[i].slotSize = currSize;
-
-    while (count--)
-    {
-      csGLVBOBufferSlot *newslot = new csGLVBOBufferSlot;
-      newslot->indexBuffer = isIndex;
-      newslot->vboID = vboID;
-      newslot->vboTarget = usage;
-      newslot->offset = currentOffset;
-      newslot->listIdx = i;
+      buffer->SetCallback (this);
+      renderBufferMappings.Put (buffer, slot);
       
-      slots[i].PushFront (newslot);
 
-      currentOffset += currSize;
     }
-  }
-}
-
-//comparefunction used below
-int VBOSlotCompare(csGLVBOBufferSlot* const& r1, csGLVBOBufferSlot* const& r2)
-{
-  if (r1->offset < r2->offset) return -1;
-  else if (r1->offset > r2->offset) return 1;
-  else return 0;
-}
-
-//helperstruct to method below
-struct SlotSortStruct
-{
-  csArray<csGLVBOBufferSlot*> slotList;
-  size_t firstOffset;
-  size_t lastOffset;
-  SlotSortStruct() : firstOffset (0), lastOffset (0) {}
-
-  static int CompareFunc (SlotSortStruct* const& r1, SlotSortStruct* const& r2)
-  {
-    if (r1->firstOffset < r2->firstOffset) return -1;
-    else if (r1->firstOffset > r2->firstOffset) return -1;
-    else return 0;
-  }
-};
-
-csGLVBOBufferSlot* csGLVBOBufferManager::csGLVBOBuffer::FindEmptySlot (
-  size_t size, bool splitStarted)
-{
-  uint idx = GetIndexFromSize (size);
-  CS_ASSERT (idx < VBO_NUMBER_OF_SLOTS);
-  csGLVBOBufferSlot * slot = slots[idx].head;
-
-  if (!slot || slot->inUse)
-  {
-    float totalCount = (float)slots[idx].totalCount;
-    float useRate = 0;
-    float reuseRate = 0;
-    if (slots[idx].totalCount>0)
-    {
-      useRate = (float)slots[idx].usedSlots / totalCount;
-      reuseRate = (float)slots[idx].slotsReusedLastFrame / totalCount;
-    }
-
-    //need to find a new one..
-    int idx2 = idx+1;
-  
-    if ((reuseRate>0.25 || useRate>1.25 || totalCount <= 1 || !slot || slot->locked) )
-    {
-      csGLVBOBufferSlot *biggerSlot = 0;
-      if (idx2 < VBO_NUMBER_OF_SLOTS) 
-        biggerSlot = FindEmptySlot (GetSizeFromIndex (idx2), true);
-
-      if (biggerSlot)
-      {
-	bufmgr->DetachBuffer (biggerSlot);
-
-        size_t currentOffset = biggerSlot->offset;
-        //split biggerSlot
-        slots[idx2].Remove (biggerSlot);
-        slots[idx2].totalCount--;
-        if (biggerSlot->inUse) slots[idx2].usedSlots--;
-
-        for (int a=0;a<2;a++)
-        {
-          csGLVBOBufferSlot *newslot = new csGLVBOBufferSlot;
-          
-          newslot->indexBuffer = biggerSlot->indexBuffer;
-          newslot->vboID = vboID;
-          newslot->vboTarget = biggerSlot->vboTarget;
-          newslot->offset = currentOffset;
-          newslot->listIdx = idx;
-
-          slots[idx].PushFront (newslot);
-          slots[idx].totalCount++;
-
-          currentOffset += slots[idx].slotSize;
-        }
-        delete biggerSlot;
-      }
-      else if (!splitStarted && idx != 0)
-      {
-        //only try to merge if we are not in the process of splitting blocks
-        idx2 = idx-1;
-        uint blocksToMerge = 0;
-        int minIdx = -1;
-        float blockMergePercent = 0, minBlockMergePercent = 1;
-        float mergeDestFullPercent = 0;
-        //try to determin best block to merge from
-        do
-        {
-          if (slots[idx2].totalCount == 0) continue;
-          blocksToMerge = 1<<(idx-idx2);
-          blockMergePercent = (float)blocksToMerge / (float)slots[idx2].totalCount;
-          mergeDestFullPercent = (float)slots[idx2].usedSlots / (float)slots[idx2].totalCount;
-          if (blockMergePercent < 0.4 && mergeDestFullPercent < 0.6)
-          {
-            if (blockMergePercent < minBlockMergePercent)
-            {
-              minBlockMergePercent = blockMergePercent;
-              minIdx = idx2;
-            }
-          }
-        } while (idx2-- > 0);
-
-        if (minIdx >= 0)
-        {
-          blocksToMerge = 1<<(idx-minIdx);
-          //found a block, merge them
-          //start by sorting all blocks in order of offset
-          
-          //try to find blocksToMerge blocks after eachother
-          size_t blocksize = GetSizeFromIndex (minIdx);
-          int sortSlotidx = -1;
-          uint j = 0;
-
-          csGLVBOBufferSlot* tmpSlot = slots[minIdx].head;
-
-          //loop over all slots, try to map up "blocksToMerge" slots in order
-          csPDelArray<SlotSortStruct> sortList;
-
-          while (tmpSlot && sortSlotidx < 0)
-          {
-            if (!tmpSlot->locked)
-            {
-              bool handled = false;
-              //check if we follow on any of the already existant slots
-              for (j = 0; j<sortList.Length (); j++)
-              {
-                SlotSortStruct *t = sortList[j];
-                if (tmpSlot->offset == (t->lastOffset+blocksize))
-                {
-                  //follows directly
-                  t->lastOffset = tmpSlot->offset;
-                  t->slotList.Push (tmpSlot);
-                  handled = true;
-                }
-                if (tmpSlot->offset == (t->firstOffset-blocksize))
-                {
-                  //follows directly
-                  t->firstOffset = tmpSlot->offset;
-                  t->slotList.Push (tmpSlot);
-                  handled = true;
-                }
-                
-                if (t->slotList.Length ()>=blocksToMerge)
-                {
-                  sortSlotidx = j;
-                  break;
-                }
-
-                if (tmpSlot->offset < t->firstOffset ||handled) break;
-              }
-
-              //ok, don't follow, add it to a new pile
-              if (!handled)
-              {
-                SlotSortStruct* st = new SlotSortStruct;
-                st->firstOffset = st->lastOffset = tmpSlot->offset;
-                st->slotList.Push (tmpSlot);
-                sortList.InsertSorted (st, SlotSortStruct::CompareFunc);
-              }
-
-              //then run through all slotSortStructs and merge them,
-              //stop if we find one with enough slots to merge
-              for (j = 0; j<sortList.Length ()-1; j++)
-              {
-                SlotSortStruct* s = sortList[j];
-                SlotSortStruct* s2 = sortList[j+1];
-                if ((sortList[j]->lastOffset+blocksize) 
-                     == sortList[j+1]->firstOffset)
-                {
-                  sortList.DeleteIndex (j+1);
-                  s->lastOffset = s2->lastOffset;
-                  for (uint n=0; n < s2->slotList.Length (); n++)
-                  {
-                    s->slotList.Push (s2->slotList[n]);
-                  }
-                  delete s2;
-                }
-
-                if (sortList[j]->slotList.Length ()>blocksToMerge)
-                {
-                  sortSlotidx = j;
-                  break;
-                }
-              }
-            }
-            tmpSlot = tmpSlot->next;
-          }
-
-
-          if (sortSlotidx >= 0)
-          {
-            sortList[sortSlotidx]->slotList.Sort (VBOSlotCompare);
-            //ok, really found enough blocks, so merge them
-            csGLVBOBufferSlot *newslot = new csGLVBOBufferSlot;
-            tmpSlot = sortList[sortSlotidx]->slotList[0];
-
-            newslot->indexBuffer = tmpSlot->indexBuffer;
-            newslot->vboID = vboID;
-            newslot->vboTarget = tmpSlot->vboTarget;
-            newslot->offset = tmpSlot->offset;
-            newslot->listIdx = idx;
-
-            slots[idx].PushFront (newslot);
-            slots[idx].totalCount++;
-
-            for (uint i = 0; i < sortList[sortSlotidx]->slotList.Length (); i++)
-            {
-              tmpSlot = sortList[sortSlotidx]->slotList[i];
-              //remove old
-              slots[minIdx].Remove (tmpSlot);
-              slots[minIdx].totalCount--;
-              if (tmpSlot->inUse) slots[minIdx].usedSlots--;
-              delete tmpSlot;
-            }
-          }
-        }
-      }
-    }
-    slot = slots[idx].head;
   }
 
   if (slot)
   {
-    TouchSlot (slot);
+    // Managed to get one, mark it as used
+    slot->slotAge |= 0x80000000;
 
-    if (!splitStarted)
+    if (slot->bufferVersion != buffer->GetVersion ())
     {
-      if (slot->inUse) slots[idx].slotsReusedThisFrame++;
-      else slots[idx].usedSlots++;
+      GLuint vboID;
+      size_t offset;
 
-      slot->inUse = true;
+      GetSlotIdAndOffset (slot, vboID, offset);
+      stateCache->SetBufferARB (VBO_BUFFER_GL_TYPE[slotType], vboID);
+
+      //Copy data into it
+      void* bufferData = buffer->Lock (CS_BUF_LOCK_READ);
+      extensionManager->glBufferSubDataARB (VBO_BUFFER_GL_TYPE[slotType],
+        (GLsizei)offset, (GLsizei)buffer->GetSize (), bufferData);
+      buffer->Release ();
+
+      slot->bufferVersion = buffer->GetVersion ();
     }
   }
+
   return slot;
 }
+
+csGLVBOBufferManager::VBOSlot* csGLVBOBufferManager::GetFreeVBOSlot (
+  size_t slotSizePO2, size_t slotType)
+{
+  // We don't cache and reuse big buffers, so theres never any free slots
+  if (slotSizePO2 > VBO_MAX_SLOT_SIZE_PO2)
+    return 0;
+
+  // Scan VBO buffers of given type for one with free slots
+  const size_t slotSizeIdx = slotSizePO2 - VBO_MIN_SLOT_SIZE_PO2;
+  const size_t numSlots = VBO_SLOT_PER_BUFFER[slotSizeIdx];
+  const size_t numSlotBitmap = (numSlots + 31) / 32;
+
+  VBOBuffer* buffer = vboBufferList[slotType][slotSizeIdx];
+
+  // Scan over the buffers to find one with slots
+  while (buffer)
+  {
+    uint32* bitmap = buffer->freeBitmap;
+    // Scan the bitmap to find empty slots
+    // Scan 32 bits at a time
+    for (size_t bunchIdx = 0; bunchIdx < numSlotBitmap; bunchIdx++, bitmap++)
+    {
+      size_t localIndex;
+      bool foundSlot = CS::Utility::BitOps::ScanBitForward (*bitmap, localIndex);
+      if (foundSlot)
+      {
+        size_t slotIndex = 32*bunchIdx + localIndex;
+        return buffer->vboSlots + slotIndex;
+      }
+    }
+
+    buffer = buffer->nextBuffer;
+  }
+
+  return 0;//none found..let caller allocate one
+}
+
+csGLVBOBufferManager::VBOSlot* csGLVBOBufferManager::TryFreeVBOSlot (
+  size_t slotSizePO2, size_t slotType)
+{
+  // We don't cache and reuse big buffers, so theres never any free slots
+  if (slotSizePO2 > VBO_MAX_SLOT_SIZE_PO2)
+    return 0;
+
+  const size_t slotSizeIdx = slotSizePO2 - VBO_MIN_SLOT_SIZE_PO2;
+  const size_t numSlots = VBO_SLOT_PER_BUFFER[slotSizeIdx];
+  VBOBuffer* buffer = vboBufferList[slotType][slotSizeIdx];
+
+  VBOSlot* lowestSlot = 0;
+  size_t lowestSlotAge = ~0;
+  
+  while (buffer)
+  {
+    for (size_t i = 0; i < numSlots; ++i)
+    {
+      VBOSlot* slot = &buffer->vboSlots[i];
+      size_t age = (slot->slotAge >>= 1);
+
+      if ((age < lowestSlotAge) &&
+        !lockedRenderBuffers.Contains (slot->renderBuffer))
+      {
+        lowestSlot = slot;
+        lowestSlotAge = age;
+      }
+    }
+
+    buffer = buffer->nextBuffer;
+  }
+
+  // We might (or might not) have a slot to use here
+  if (lowestSlot)
+  {
+    // Release it without deallocating it
+    ReleaseVBOSlot (lowestSlot, false);
+  }
+
+  return lowestSlot;
+}
+
+void csGLVBOBufferManager::ReleaseVBOSlot (VBOSlot* slot, bool deallocate /* = true */)
+{
+  // Mark it as free
+  VBOBuffer* buffer = slot->vboBuffer;
+
+  ClearSlotUsed (slot);
+
+  renderBufferMappings.DeleteAll (slot->renderBuffer);
+  slot->renderBuffer = 0;
+  slot->slotAge = 0;
+
+  // Deallocate it
+  const size_t buffSizePO2 = GetSlotSizePO2 (buffer->slotSize);
+  if (buffSizePO2 > VBO_MAX_SLOT_SIZE_PO2)
+  {
+    // Big buffer
+    vboBigBuffers[buffer->bufferType].DeleteIndexFast ((size_t)buffer->nextBuffer);
+  }
+  else
+  {
+    if (buffer->prevBuffer == 0 && buffer->nextBuffer == 0)
+      return; // Don't remove last one
+
+    if (!deallocate)
+      return;
+
+    // Clean up buffer if empty
+    // Check first 0 to n-2 buffer bitmaps
+    uint32* bitmap = buffer->freeBitmap;
+    size_t numSlots = buffer->numberOfSlots;
+    const size_t numSlotBitmaps = (numSlots+31)/32;
+    for (size_t i = 0; i < numSlotBitmaps-1; ++i)
+    {
+      numSlots -= 32;
+      if (~(*bitmap++))
+        return; // One of the bitmaps contained a 0, meaning non-free slot, no removal
+    }
+    for (size_t i = 0; i < numSlots; ++i)
+    {
+      if (!(*bitmap & (1<<i)))
+        return; // One of the allocated slots are not free, no removal
+    }
+
+    // Normal one
+    // Start by unlinking it
+    if (buffer->prevBuffer)
+      buffer->prevBuffer->nextBuffer = buffer->nextBuffer;
+    else
+      // No prev, must be first
+      vboBufferList[buffer->bufferType][buffSizePO2 - VBO_MIN_SLOT_SIZE_PO2] = buffer->nextBuffer;
+
+    if (buffer->nextBuffer)
+      buffer->nextBuffer->prevBuffer = buffer->prevBuffer;
+  }
+
+  // Remove it
+  FreeVBOBuffer (buffer);
+}
+
+csGLVBOBufferManager::VBOBuffer* csGLVBOBufferManager::GetNewVBOBuffer (
+  size_t slotSize, size_t slotSizePO2, size_t slotType)
+{
+  VBOBuffer* buffer = 0;
+
+  size_t numSlots;
+  size_t numSlotBitmap;
+  bool bigBuffer = false;
+
+  const size_t slotSizeIdx = slotSizePO2 - VBO_MIN_SLOT_SIZE_PO2;
+  if (slotSizePO2 <= VBO_MAX_SLOT_SIZE_PO2)
+  {    
+    numSlots = VBO_SLOT_PER_BUFFER[slotSizeIdx];
+    numSlotBitmap = (numSlots + 31) / 32;
+    bigBuffer = false;
+    slotSize = (1 << slotSizePO2);
+  }
+  else
+  {
+    // Bigger, get a separate one
+    numSlots = 1;
+    numSlotBitmap = 1;
+    bigBuffer = true;
+  }
+
+  if (numSlots*slotSize+currentVBOAllocation > maxVBOAllocation)
+  {
+    // hit limit, bail
+    return 0;
+  }
+
+  const size_t allocationSize = sizeof (VBOBuffer) + 
+    sizeof (uint32) * numSlotBitmap + sizeof (VBOSlot) * numSlots;
+
+  // Allocate it all in one call
+  uint8* rawBuffer = static_cast<uint8*> (cs_malloc (allocationSize));
+  memset (rawBuffer, 0, allocationSize);
+
+  buffer = reinterpret_cast<VBOBuffer*> (rawBuffer);
+  buffer->slotSize = slotSize;
+  buffer->numberOfSlots = numSlots;
+  buffer->bufferType = slotType;
+  buffer->freeBitmap = reinterpret_cast<uint32*> (rawBuffer + sizeof (VBOBuffer));
+  buffer->vboSlots = reinterpret_cast<VBOSlot*> (
+    rawBuffer + sizeof (VBOBuffer) + sizeof (uint32) * numSlotBitmap);    
+
+  // Set slot defaults
+  for (size_t slotIndex = 0; slotIndex < numSlots; ++slotIndex)
+  {
+    const size_t slotBitmapIdx = slotIndex >> 5;
+    const size_t slotBitIdx = slotIndex & 31;
+
+    buffer->freeBitmap[slotBitmapIdx] |= 1 << slotBitIdx;
+    buffer->vboSlots[slotIndex].vboBuffer = buffer;
+  }
+
+  // Save it
+  if (bigBuffer)
+  {
+    buffer->nextBuffer = (VBOBuffer*)vboBigBuffers[slotType].Push (buffer);
+  }
+  else
+  {
+    buffer->nextBuffer = vboBufferList[slotType][slotSizeIdx];
+    buffer->prevBuffer = 0;
+
+    if (vboBufferList[slotType][slotSizeIdx])
+      vboBufferList[slotType][slotSizeIdx]->prevBuffer = buffer;
+    vboBufferList[slotType][slotSizeIdx] = buffer;
+  }
+
+  // Setup VBO area
+  extensionManager->glGenBuffersARB (1, &(buffer->vboID));
+  CS_ASSERT(buffer->vboID);
+  stateCache->SetBufferARB (VBO_BUFFER_GL_TYPE[slotType], buffer->vboID);
+  extensionManager->glBufferDataARB (VBO_BUFFER_GL_TYPE[slotType], 
+    (GLsizei)(buffer->slotSize*buffer->numberOfSlots), 0, GL_DYNAMIC_DRAW_ARB);
+  stateCache->SetBufferARB (VBO_BUFFER_GL_TYPE[slotType], 0);
+
+  currentVBOAllocation += buffer->slotSize*buffer->numberOfSlots;
+
+  return buffer;
+}
+
+void csGLVBOBufferManager::FreeVBOBuffer (VBOBuffer* buffer)
+{
+  for (size_t i = 0; i < 1; ++i)
+  {
+    if (stateCache->GetBufferARB (VBO_BUFFER_GL_TYPE[i]) == buffer->vboID)
+      stateCache->SetBufferARB (VBO_BUFFER_GL_TYPE[i], 0);
+  }
+
+  currentVBOAllocation -= buffer->slotSize * buffer->numberOfSlots;
+
+  extensionManager->glDeleteBuffersARB (1, &(buffer->vboID));
+  cs_free (buffer);
+}
+
+void csGLVBOBufferManager::RenderBufferDestroyed (iRenderBuffer* buffer)
+{
+  // Remove it from the slots
+  VBOSlot* slot = renderBufferMappings.Get (buffer, 0);
+
+  if (slot)
+  {
+    ReleaseVBOSlot (slot);
+  }
+}
+
+static csString ByteFormat (size_t size)
+{
+  csString str;
+  if (size >= 1024*1024)
+    str.Format ("%4zu MB", size / (1024*1024));
+  else if (size >= 1024)
+    str.Format ("%4zu KB", size / (1024));
+  else
+    str.Format ("%4zu By", size);
+  return str;
+}
+
+
+void csGLVBOBufferManager::DumpStats ()
+{
+  csPrintf ("VBO memory statistics:\n");
+  csPrintf ("VB Buffers\n");
+  DumpStatsBufferType (VBO_BUFFER_VERTEX);
+
+  csPrintf ("IB Buffers\n");
+  DumpStatsBufferType (VBO_BUFFER_INDEX);
+
+  csPrintf ("VBO allocation: %s / %s (%3u %%)\n", 
+    ByteFormat (currentVBOAllocation).GetDataSafe (),
+    ByteFormat (maxVBOAllocation).GetDataSafe (),
+    (uint)((float)currentVBOAllocation/maxVBOAllocation*100));
+}
+
+
+
+namespace
+{
+  struct SizeCountStruct
+  {
+    SizeCountStruct (size_t s) : size (s), count (0)
+    {
+    }
+
+    bool operator< (const SizeCountStruct& other)
+    {
+      return size < other.size;
+    }
+
+    size_t size;
+    size_t count;
+  };
+}
+
+void csGLVBOBufferManager::DumpStatsBufferType (size_t type)
+{
+  csPrintf ("Fixed size buffers\n");
+  csPrintf ("SS            NB       NS       SU      SU%%\n");
+
+  size_t vboSize = 0;
+  size_t sysmemSize = 0;
+
+  for (size_t i = 0; i < VBO_NUM_SLOT_SIZES; ++i)
+  {
+    VBOBuffer* buffer = vboBufferList[type][i];
+
+    size_t numberOfSlots = buffer ? buffer->numberOfSlots : 0;
+    const size_t slotSize = 1 << (i + VBO_MIN_SLOT_SIZE_PO2);
+    const size_t slotBitmapSize = (numberOfSlots + 31) / 32;
+    size_t numBuffers = 0;
+    size_t numSlotsUsed = 0;
+
+    // Accumulate statistics
+    while (buffer)
+    {
+      numBuffers++;
+      numSlotsUsed += numberOfSlots;
+
+      vboSize += slotSize * numberOfSlots;
+      sysmemSize += sizeof (VBOBuffer) + sizeof(VBOSlot) * numberOfSlots + 
+        sizeof(int32) * slotBitmapSize;
+
+      uint32* bitmap = buffer->freeBitmap;
+      for (size_t i = 0; i < slotBitmapSize; ++i)
+        numSlotsUsed -= CS::Utility::BitOps::ComputeBitsSet (*bitmap++);
+
+      buffer = buffer->nextBuffer;
+    } 
+    int percentSU = (!numberOfSlots || !numBuffers) ? 0 : 
+      int(100.0f * numSlotsUsed / (numberOfSlots*numBuffers));
+
+    csPrintf ("%s %8zu %8zu %8zu %8zu\n", ByteFormat (slotSize).GetDataSafe (),
+      numBuffers, numberOfSlots, numSlotsUsed, percentSU);
+  }
+
+  if (vboBigBuffers[type].GetSize ())
+  {
+    csArray<size_t> bigBufferSizes;
+    for (size_t i = 0; i < vboBigBuffers[type].GetSize (); ++i)
+    {    
+      size_t size = vboBigBuffers[type][i]->slotSize;
+      bigBufferSizes.Push (size);
+
+      vboSize += size;
+      sysmemSize += sizeof (VBOBuffer) + sizeof(VBOSlot) + sizeof(int32);
+    }
+    bigBufferSizes.Sort ();
+
+    csPrintf ("Big buffers\n");
+    size_t count = 0;
+    size_t size;
+    for (size_t i = 0; i < bigBufferSizes.GetSize () - 1; ++i)
+    {
+      count++;
+      size = bigBufferSizes[i];
+      if (size != bigBufferSizes[i+1])
+      {
+        csPrintf ("%s %8u\n", ByteFormat (size).GetDataSafe (), count);
+        count = 0;
+      }
+    }
+    if (count > 0)
+    {
+      csPrintf ("%s %8u\n", ByteFormat (size).GetDataSafe (), count);
+    }
+  }
+
+  csPrintf ("Total VBO size:    %s\n", ByteFormat (vboSize).GetDataSafe ());
+  csPrintf ("Total sysmem size: %s\n", ByteFormat (sysmemSize).GetDataSafe ());
+}
+
+}
+CS_PLUGIN_NAMESPACE_END(gl3d)

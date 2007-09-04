@@ -64,6 +64,18 @@ public:
       csDirtyAccessArray<csTriangle>& mesh_triangles);
 
   /**
+   * Generate a capsule of given length and radius.
+   * \param l Capsule length.
+   * \param r Capsule radius.
+   * \param sides Number of sides.
+   */
+  static void GenerateCapsule (float l, float r, uint sides,
+      csDirtyAccessArray<csVector3>& mesh_vertices,
+      csDirtyAccessArray<csVector2>& mesh_texels,
+      csDirtyAccessArray<csVector3>& mesh_normals,
+      csDirtyAccessArray<csTriangle>& mesh_triangles);
+
+  /**
    * Generate a sphere with 'num' vertices on the rim.
    * \param ellips Properties of the ellipsoid to create.
    * \param num Number of vertices in the generated  mesh.

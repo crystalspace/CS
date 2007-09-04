@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2001 by Jorrit Tyberghein
+    Copyright (C) 1998-2001,2007 by Jorrit Tyberghein
               (C) 2005 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
@@ -32,9 +32,9 @@
 #include "csutil/scf_implementation.h"
 #include "csutil/stringarray.h"
 #include "csutil/weakref.h"
+#include "csutil/weakrefarr.h"
 #include "csutil/eventnames.h"
 #include "iengine/campos.h"
-#include "iengine/collectn.h"
 #include "iengine/engine.h"
 #include "iengine/renderloop.h"
 #include "igraphic/imageio.h"
@@ -54,6 +54,7 @@
 #include "ivideo/shader/shader.h"
 #include "plugins/engine/3d/halo.h"
 #include "plugins/engine/3d/meshobj.h"
+#include "plugins/engine/3d/meshfact.h"
 #include "plugins/engine/3d/region.h"
 #include "plugins/engine/3d/renderloop.h"
 #include "plugins/engine/3d/rview.h"
@@ -125,36 +126,6 @@ private:
   iLight* FetchNext ();
 };
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
-
-/**
- * List of collections for the engine. This class implements iCollectionList.
- */
-class csCollectionList : public scfImplementation1<csCollectionList,
-                                                   iCollectionList>
-{
-public:
-  /// constructor
-  csCollectionList ();
-  virtual ~csCollectionList ();
-
-  //-- iCollectionList
-  virtual iCollection* NewCollection (const char* name);
-  virtual int GetCount () const;
-  virtual iCollection *Get (int n) const;
-  virtual int Add (iCollection *obj);
-  virtual bool Remove (iCollection *obj);
-  virtual bool Remove (int n);
-  virtual void RemoveAll ();
-  virtual int Find (iCollection *obj) const;
-  virtual iCollection *FindByName (const char *Name) const;
-
-private:
-  csRefArrayObject<iCollection> collections;
-};
-
-#include "csutil/win32/msvc_deprecated_warn_on.h"
-
 struct csSectorPos
 {
   iSector* sector;
@@ -207,6 +178,12 @@ public:
 
 
 #include "csutil/win32/msvc_deprecated_warn_off.h"
+
+struct csImposterUpdateQueue
+{
+  csRef<iRenderView> rview;
+  csWeakRefArray<csImposterProcTex> queue;
+};
 
 /**
  * The 3D engine.
@@ -562,17 +539,12 @@ public:
 
   virtual iSharedVariableList* GetVariableList () const;
 
-  virtual iCollectionList* GetCollections ()
-  { return &collections; }
-  
-  virtual iCollection* FindCollection (const char* name,
-  	iRegion* region = 0);
-
   virtual bool RemoveObject (iBase* object);
   virtual void DelayedRemoveObject (csTicks delay, iBase *object);
   virtual void RemoveDelayedRemoves (bool remove = false);
 
   virtual void DeleteAll ();
+  void DeleteAllForce ();
 
   virtual void ResetWorldSpecificSettings(); 
 
@@ -660,6 +632,17 @@ public:
     return renderLoopManager;
   }
 
+  /**
+   * Add an imposter to the update queue.
+   */
+  void AddImposterToUpdateQueue (csImposterProcTex* imptex,
+      iRenderView* rview);
+
+  /**
+   * Handle imposters.
+   */
+  void HandleImposters ();
+
 private:
   // -- PRIVATE METHODS
 
@@ -675,8 +658,7 @@ private:
   // Renderloop loading/creation
   csPtr<iRenderLoop> CreateDefaultRenderLoop ();
   void LoadDefaultRenderLoop (const char* fileName);
-  csRef<iShader> LoadShader (iDocumentSystem* docsys, iShaderCompiler* shcom,
-    const char* filename);
+  csRef<iShader> LoadShader (iDocumentSystem* docsys, const char* filename);
 
   /**
    * Setup for starting a Draw or DrawFunc.
@@ -780,6 +762,10 @@ public:
 
   /// Store engine shadervar names
   csStringID id_creation_time;
+  /// For triangle meshes.
+  csStringID colldet_id;
+  csStringID viscull_id;
+  csStringID base_id;
   /**
    * This is the Virtual File System object where all the files
    * used by the engine live. Textures, models, data, everything -
@@ -806,9 +792,16 @@ public:
    */
   int lightAmbientBlue;
 
+  /// Default shader to attach to all materials
+  // \todo move back to private and make accessible
+  csRef<iShader> defaultShader;
+
 private:
 
   // -- PRIVATE MEMBERS
+
+  /// Pool from which to allocate render views.
+  csRenderView::Pool rviewPool;
 
   // -- Object lists
   /**
@@ -817,12 +810,6 @@ private:
    * to add sectors to the engine.
    */
   csSectorList sectors;
-
-  /**
-   * List of all collections in the engine. This vector contains objects
-   * of type iCollection*.
-   */
-  csCollectionList collections;
 
   /**
    * List of mesh object factories. This vector contains objects of
@@ -917,9 +904,6 @@ private:
   /// Flag set when window requires resizing.
   bool resize;
 
-  /// Default shader to attach to all materials
-  csRef<iShader> defaultShader;
-
   /// 'Saveable' flag
   bool worldSaveable;
 
@@ -991,6 +975,12 @@ private:
   
   /// Current render context (proc texture) or 0 if global.
   iTextureHandle* currentRenderContext; 
+
+  /**
+   * List of imposters that need to be rendered to texture.
+   * There is a different list for every distinct camera instance.
+   */
+  csHash<csImposterUpdateQueue,long> imposterUpdateQueue;
 
   CS_DECLARE_SYSTEM_EVENT_SHORTCUTS;
   csEventID CanvasResize;

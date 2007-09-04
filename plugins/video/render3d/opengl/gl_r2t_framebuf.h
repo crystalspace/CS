@@ -24,6 +24,9 @@
 
 #include "gl_r2t_backend.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
+{
+
 /// Render2texture backend using the framebuffer
 class csGLRender2TextureFramebuf : public csGLRender2TextureBackend
 {
@@ -53,5 +56,8 @@ public:
   virtual void SetClipRect (const csRect& clipRect);
   virtual void SetupClipPortalDrawing ();
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(gl3d)
 
 #endif // __CS_GL_R2T_FRAMEBUF_H__

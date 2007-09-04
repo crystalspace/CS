@@ -23,7 +23,7 @@ case you should divide the elapsed time with the delta and perform that
 number of steps one by one. It is also very important to make sure that
 the delta you pass to the @code{Step()} function is constant. If this
 number is variable then @sc{ode} will not behave well and you get stability
-errors. Here below I present a possible code snipped that will ensure
+errors. Here below I present a possible code snippet that will ensure
 that the delta is constant and also makes sure that no time is lost so
 that the speed of physics simulation is constant even with variable
 framerate:

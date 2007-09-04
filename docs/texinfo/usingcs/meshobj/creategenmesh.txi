@@ -17,7 +17,8 @@ Genmeshes are very useful for static or semi-static geometry (chests,
 doors, candles, swords, etc.) which can sometimes require a lot of detail.
 
 Genmeshes use vertex lighting (or stencil if you use a stencil lighting
-shader).
+shader). You can also use lightmaps on genmeshes with the @samp{lighter2}
+application. @xref{Using lighter2}.
 
 Genmesh objects always have to be created through a factory. So, first
 you create the actual geometry in a genmesh factory and then you create one
@@ -33,8 +34,6 @@ Here is an example of how to create a cube genmesh in a map file:
 <meshfact name="cubeFact">
   <plugin>crystalspace.mesh.loader.factory.genmesh</plugin>
   <params>
-    <numvt>8</numvt>
-    <numtri>12</numtri>
     <v x="-0.1" y="0.1" z="0.1" u="0" v="0" />
     <v x="-0.1" y="0.1" z="-0.1" u="1" v="0" />
     <v x="0.1" y="0.1" z="-0.1" u="0" v="1" />

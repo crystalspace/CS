@@ -20,10 +20,9 @@
 #include "csqint.h"
 
 #include "csgeom/frustum.h"
-#include "csgeom/polymesh.h"
+#include "csgeom/trimesh.h"
 #include "csutil/csendian.h"
 #include "csutil/csmd5.h"
-#include "csutil/debug.h"
 #include "csutil/memfile.h"
 
 #include "engine.h"
@@ -48,7 +47,7 @@ void csLight::UpdateViscullMesh ()
   // in case of a spot light. The geometry specified here should be at
   // least as big as that shape (for example, a box in case of a point light
   // would be fine).
-  csRef<iPolygonMesh> m;
+  csRef<iTriangleMesh> m;
   switch (type)
   {
     case CS_LIGHT_POINTLIGHT:
@@ -56,7 +55,7 @@ void csLight::UpdateViscullMesh ()
         object_model->box.Set (
 		-cutoffDistance, -cutoffDistance, -cutoffDistance,
 		cutoffDistance, cutoffDistance, cutoffDistance);
-        m.AttachNew (new csPolygonMeshBox (object_model->box));
+        m.AttachNew (new csTriangleMeshBox (object_model->box));
 	object_model->radius = cutoffDistance;
       }
       break;
@@ -67,7 +66,7 @@ void csLight::UpdateViscullMesh ()
       // @@@ TODO
       break;
   }
-  object_model->SetPolygonMeshViscull (m);
+  object_model->SetTriangleData (engine->viscull_id, m);
   object_model->ShapeChanged ();
 }
 
@@ -102,12 +101,12 @@ csLight::~csLight ()
   // Copy the array because we are going to unlink the children.
   csRefArray<iSceneNode> children = movable.GetChildren ();
   size_t j;
-  for (j = 0 ; j < children.Length () ; j++)
+  for (j = 0 ; j < children.GetSize () ; j++)
     children[j]->SetParent (0);
 
   CleanupLSI ();
 
-  int i = (int)light_cb_vector.Length ()-1;
+  int i = (int)light_cb_vector.GetSize ()-1;
   while (i >= 0)
   {
     iLightCallback* cb = light_cb_vector[i];
@@ -188,7 +187,7 @@ void csLight::FindLSI ()
 {
   CleanupLSI ();
 
-  iSector* sector = GetSector ();
+  iSector* sector = GetFullSector ();
   if (!sector) return;
   const csVector3 center = GetFullCenter ();
 
@@ -422,7 +421,7 @@ void csLight::OnSetPosition ()
 {
   FindLSI ();
   csVector3 pos = GetFullCenter ();
-  size_t i = light_cb_vector.Length ();
+  size_t i = light_cb_vector.GetSize ();
   while (i-- > 0)
   {
     iLightCallback* cb = light_cb_vector[i];
@@ -434,7 +433,7 @@ void csLight::OnSetPosition ()
 
 void csLight::OnSetSector (iSector *sector)
 {
-  size_t i = light_cb_vector.Length ();
+  size_t i = light_cb_vector.GetSize ();
   while (i-- > 0)
   {
     iLightCallback* cb = light_cb_vector[i];
@@ -446,7 +445,7 @@ void csLight::OnSetSector (iSector *sector)
 
 void csLight::SetColor (const csColor& col) 
 {
-  size_t i = light_cb_vector.Length ();
+  size_t i = light_cb_vector.GetSize ();
   while (i-- > 0)
   {
     iLightCallback* cb = light_cb_vector[i];
@@ -483,7 +482,7 @@ void csLight::SetAttenuationMode (csLightAttenuationMode a)
   attenuation = a;
   CalculateAttenuationVector();
 
-  size_t i = light_cb_vector.Length ();
+  size_t i = light_cb_vector.GetSize ();
   while (i-- > 0)
   {
     iLightCallback* cb = light_cb_vector[i];
@@ -499,7 +498,7 @@ void csLight::SetAttenuationConstants (const csVector3& attenv)
   influenceValid = false;*/
   attenuationConstants = attenv;
 
-  size_t i = light_cb_vector.Length ();
+  size_t i = light_cb_vector.GetSize ();
   while (i-- > 0)
   {
     iLightCallback* cb = light_cb_vector[i];
@@ -510,7 +509,7 @@ void csLight::SetAttenuationConstants (const csVector3& attenv)
 void csLight::SetCutoffDistance (float radius)
 {
   if (radius <= 0) return;
-  size_t i = light_cb_vector.Length ();
+  size_t i = light_cb_vector.GetSize ();
   while (i-- > 0)
   {
     iLightCallback* cb = light_cb_vector[i];
@@ -569,6 +568,25 @@ static void object_light_func (iMeshWrapper *mesh, iFrustumView *lview,
   cmw->InvalidateRelevantLights ();
 }
 
+iSector* csLight::GetFullSector ()
+{
+  iSector* s = GetSector ();
+  if (s) return s;
+  iSceneNode* node = (iSceneNode*)this;
+  iSceneNode* parent = node->GetParent ();
+  while (parent)
+  {
+    iSectorList* sl = parent->GetMovable ()->GetSectors ();
+    if (sl && sl->GetCount () > 0)
+    {
+      return sl->Get (0);
+    }
+
+    parent = parent->GetParent ();
+  }
+  return 0;
+}
+
 void csLight::CalculateLighting ()
 {
   csFrustumView lview;
@@ -595,16 +613,7 @@ void csLight::CalculateLighting ()
   ctxt->SetNewLightFrustum (new csFrustum (GetFullCenter ()));
   ctxt->GetLightFrustum ()->MakeInfinite ();
 
-  iSector* sect = GetSector ();
-  if (!sect)
-  {
-    if (movable.GetParent ())
-    {
-      iSectorList* sl = movable.GetParent ()->GetSectors ();
-      if (sl && sl->GetCount () > 0)
-	sect = sl->Get (0);
-    }
-  }
+  iSector* sect = GetFullSector ();
   if (!sect) return;	// Do nothing.
 
   if (dynamicType == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
@@ -678,7 +687,7 @@ void csLightList::NameChanged (iObject* object, const char* oldname,
 iLight *csLightList::FindByID (const char* id) const
 {
   size_t i;
-  for (i = 0; i < list.Length (); i++)
+  for (i = 0; i < list.GetSize (); i++)
   {
     iLight *l = list.Get (i);
     if (memcmp (l->GetLightID (), id, 16) == 0) return l;
@@ -721,7 +730,7 @@ bool csLightList::Remove (int n)
 void csLightList::RemoveAll ()
 {
   size_t i;
-  for (i = 0 ; i < list.Length () ; i++)
+  for (i = 0 ; i < list.GetSize () ; i++)
   {
     list[i]->QueryObject ()->RemoveNameChangeListener (listener);
     FreeLight (list[i]);
@@ -761,7 +770,7 @@ csPtr<iLightingProcessData> csLightingProcessInfo::QueryUserdata (
   scfInterfaceID id, int version)
 {
   size_t i;
-  for (i = 0 ; i < userdatas.Length () ; i++)
+  for (i = 0 ; i < userdatas.GetSize () ; i++)
   {
     iLightingProcessData* ptr = (iLightingProcessData*)(
       userdatas[i]->QueryInterface (id, version));
@@ -776,7 +785,7 @@ csPtr<iLightingProcessData> csLightingProcessInfo::QueryUserdata (
 void csLightingProcessInfo::FinalizeLighting ()
 {
   size_t i;
-  for (i = 0 ; i < userdatas.Length () ; i++)
+  for (i = 0 ; i < userdatas.GetSize () ; i++)
   {
     userdatas[i]->FinalizeLighting ();
   }

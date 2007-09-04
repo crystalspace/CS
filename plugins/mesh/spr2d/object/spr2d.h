@@ -245,6 +245,10 @@ public:
    * does nothing.
    */
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
+  virtual void BuildDecal(const csVector3* pos, float decalRadius,
+          iDecalBuilder* decalBuilder)
+  {
+  }
 
   /**\name iSprite2DState implementation
    * @{ */
@@ -339,7 +343,7 @@ public:
   /// Has this sprite lighting?
   bool HasLighting () const { return lighting; }
 
-  int GetUVAnimationCount () const {return (int)vAnims.Length ();}
+  int GetUVAnimationCount () const {return (int)vAnims.GetSize ();}
   iSprite2DUVAnimation *CreateUVAnimation ()
   {
     csSprite2DUVAnimation *p = new csSprite2DUVAnimation (0);

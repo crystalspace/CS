@@ -42,14 +42,18 @@ struct iMeshWrapper;
 struct iMovable;
 struct iObject;
 struct iPolygonMesh;
+struct iTriangleMesh;
 struct iRegion;
 struct iSector;
+struct iTerrainSystem;
 
 struct csCollisionPair;
 class csReversibleTransform;
 
 struct csIntersectingTriangle;
 
+// for iPolygonMesh
+#include "csutil/win32/msvc_deprecated_warn_off.h"
 
 /**
  * This is a convenience object that you can use in your own
@@ -64,8 +68,8 @@ struct csIntersectingTriangle;
  * attach itself to the given object. You can use
  * csColliderWrapper::GetCollider() later to get the collider again.
  */
-class CS_CRYSTALSPACE_EXPORT csColliderWrapper : 
-  public scfImplementationExt1<csColliderWrapper, 
+class CS_CRYSTALSPACE_EXPORT csColliderWrapper :
+  public scfImplementationExt1<csColliderWrapper,
                                csObject,
                                scfFakeInterface<csColliderWrapper> >
 {
@@ -74,21 +78,45 @@ private:
   csRef<iCollider> collider;
 
 public:
-  SCF_INTERFACE(csColliderWrapper, 2,0,0);
+  SCF_INTERFACE(csColliderWrapper, 2,1,0);
 
   CS_LEAKGUARD_DECLARE (csColliderWrapper);
 
-  /// Create a collider based on a mesh.
+  /**
+   * Create a collider based on a mesh.
+   * \deprecated Use version with iTriangleMesh instead.
+   */
+  CS_DEPRECATED_METHOD_MSG("Use version with iTriangleMesh instead.")
   csColliderWrapper (csObject& parent, iCollideSystem* collide_system,
   	iPolygonMesh* mesh);
 
-  /// Create a collider based on a mesh.
+  /**
+   * Create a collider based on a mesh.
+   * \deprecated Use version with iTriangleMesh instead.
+   */
+  CS_DEPRECATED_METHOD_MSG("Use version with iTriangleMesh instead.")
   csColliderWrapper (iObject* parent, iCollideSystem* collide_system,
   	iPolygonMesh* mesh);
+
+  /**
+   * Create a collider based on a mesh.
+   */
+  csColliderWrapper (csObject& parent, iCollideSystem* collide_system,
+  	iTriangleMesh* mesh);
+
+  /**
+   * Create a collider based on a mesh.
+   */
+  csColliderWrapper (iObject* parent, iCollideSystem* collide_system,
+  	iTriangleMesh* mesh);
 
   /// Create a collider based on a terrain.
   csColliderWrapper (iObject* parent, iCollideSystem* collide_system,
   	iTerraFormer* terrain);
+
+  /// Create a collider based on a terrain.
+  csColliderWrapper (iObject* parent, iCollideSystem* collide_system,
+  	iTerrainSystem* terrain);
 
   /**
    * Create a collider based on a collider. Note that it is legal to pass
@@ -143,7 +171,26 @@ public:
    * Otherwise 0 is returned.
    */
   static csColliderWrapper* GetColliderWrapper (iObject* object);
+
+  /**
+   * Update collider from a polymesh.
+   * \deprecated Use version with iTriangleMesh instead.
+   */
+  CS_DEPRECATED_METHOD_MSG("Use version with iTriangleMesh instead.")
+  void UpdateCollider (iPolygonMesh* mesh);
+
+  /**
+   * Update collider from a triangle mesh.
+   */
+  void UpdateCollider (iTriangleMesh* mesh);
+
+  /// Update collider from a terraformer.
+  void UpdateCollider (iTerraFormer* terrain);
+
 };
+
+// for iPolygonMesh
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * Return structure for the csColliderHelper::TraceBeam() method.

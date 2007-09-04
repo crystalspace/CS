@@ -23,7 +23,7 @@
 #include "csutil/cfgfile.h"
 #include "csutil/parray.h"
 #include "csutil/scf_implementation.h"
-#include "csutil/scopedmutexlock.h"
+#include "csutil/threading/mutex.h"
 #include "csutil/stringarray.h"
 #include "iutil/vfs.h"
 #include "iutil/eventh.h"
@@ -118,7 +118,7 @@ private:
   friend class VfsNode;
 
   /// Mutex to make VFS thread-safe.
-  csRef<csMutex> mutex;
+  mutable CS::Threading::RecursiveMutex mutex;
 
   // A vector of VFS nodes
   class VfsVector : public csPDelArray<VfsNode>

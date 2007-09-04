@@ -42,7 +42,7 @@ AC_PREREQ([2.56])
 #	file. As a convenience, if EMITTER is the literal value "emit" or
 #	"yes", then CS_EMIT_BUILD_RESULT()'s default emitter will be used.
 #	When EMITTER is provided, the following properties are emitted to the
-#	output file: PTYHON (the actual interpreter), PYTHON.AVAILABLE ("yes"
+#	output file: PYTHON (the actual interpreter), PYTHON.AVAILABLE ("yes"
 #	or "no"), PYTHON.CFLAGS, PYTHON.LFLAGS, and PYTHON.MODULE_EXT.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_PYTHON],

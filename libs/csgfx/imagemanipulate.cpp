@@ -70,7 +70,7 @@ csRef<iImage> csImageManipulate::Rescale2D (iImage* source, int newwidth,
       RESIZE (csRGBpixel, source->GetImageData(), newImg->GetImagePtr())
       break;
     case CS_IMGFMT_PALETTED8:
-      RESIZE (uint8, source->GetPalette(), newImg->GetPalettePtr())
+      RESIZE (uint8, source->GetImageData(), newImg->GetImagePtr())
       break;
   }
   if (source->GetAlpha())

@@ -190,6 +190,10 @@ public:
   {
     // We don't support sockets.
   }
+  virtual void BuildDecal(const csVector3* pos, float decalRadius,
+          iDecalBuilder* decalBuilder)
+  {
+  }
   /** @} */
 
   /**\name iRenderBufferAccessor implementation
@@ -369,8 +373,10 @@ public:
     virtual ~PolyMesh () { }
   };
   friend struct PolyMesh;
+  csRef<PolyMesh> polyMesh;
 
   virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
+  virtual iTerrainSystem* GetTerrainColldet () { return 0; }
   virtual iObjectModel* GetObjectModel () { return this; }
 
   void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);

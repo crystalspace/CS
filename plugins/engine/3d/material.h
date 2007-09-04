@@ -57,7 +57,6 @@ private:
 
   struct SVNamesHolder
   {
-    CS::ShaderVarName flatcolor;
     CS::ShaderVarName diffuseTex;
   };
   CS_DECLARE_STATIC_CLASSVAR_REF(svNames, SVNames, SVNamesHolder);
@@ -114,10 +113,6 @@ public:
    */
   virtual iTextureHandle *GetTexture (csStringID name);
 
-  /// Get flat color.
-  virtual void GetFlatColor (csRGBpixel &oColor, bool useTextureMean = true);
-  /// Set the flat shading color
-  virtual void SetFlatColor (const csRGBcolor& col);
   /** @} */
 
   /**
@@ -222,7 +217,7 @@ public:
 
   virtual iMaterialWrapper* NewMaterial (iMaterial* material,
   	const char* name);
-  virtual int GetCount () const { return (int)list.Length (); }
+  virtual int GetCount () const { return (int)list.GetSize (); }
   virtual iMaterialWrapper *Get (int n) const { return list[n]; }
   virtual int Add (iMaterialWrapper *obj);
   virtual bool Remove (iMaterialWrapper *obj);

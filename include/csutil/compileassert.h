@@ -22,25 +22,30 @@
 /**\file 
  * Compile time assert macro.
  */
-namespace CrystalSpace
+namespace CS
 {
+namespace Utility
+{
+namespace Implementation
+{
+  
+  template <bool x> 
+  struct CompileAssertFailure;
 
-template <bool x> 
-struct COMPILE_ASSERT_FAILURE
-{
-};
+  template <> 
+  struct CompileAssertFailure<true>
+  {
+    enum { value = 1};
+  };
 
-template <> 
-struct COMPILE_ASSERT_FAILURE<true>
-{
-  enum { value = 1};
-};
+  template <int x>
+  struct CompileAssertTest
+  {
+  };
 
-template <int x>
-struct CompileAssertTest
-{
-};
-}
+} // namespace Implementation
+} // namespace Utility
+} // namespace CS
 
 
 #define CS_JOIN( X, Y ) CS_DO_JOIN( X, Y )
@@ -48,9 +53,9 @@ struct CompileAssertTest
 #define CS_DO_JOIN2( X, Y ) X##Y
 
 #define CS_COMPILE_ASSERT(B) \
-  typedef CrystalSpace::CompileAssertTest< \
-    sizeof(CrystalSpace::COMPILE_ASSERT_FAILURE<(bool)(B)>)> \
+  typedef CS::Utility::Implementation::CompileAssertTest< \
+    sizeof(CS::Utility::Implementation::CompileAssertFailure<(bool)(B)>)> \
     CS_JOIN(CrystalSpaceCompileAssertTypedef, __LINE__)
 
 
-#endif
+#endif // __CSUTIL_COMPILEASSERT_H__

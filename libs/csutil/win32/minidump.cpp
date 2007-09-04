@@ -38,6 +38,7 @@
 
 #include "cachedll.h"
 
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <tlhelp32.h>
 
@@ -454,8 +455,6 @@ const char* cswinMinidumpWriter::WriteWrappedMinidump (
 }
 
 //#define TEST_EXCEPTION_HANDLER
-
-extern "C" BOOL WINAPI IsDebuggerPresent();
 
 LONG WINAPI cswinMinidumpWriter::ExceptionFilter (
   struct _EXCEPTION_POINTERS* ExceptionInfo)

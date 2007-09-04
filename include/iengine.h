@@ -24,7 +24,6 @@
 #include "cssysdef.h"
 #include "iengine/camera.h"
 #include "iengine/campos.h"
-#include "iengine/collectn.h"
 #include "iengine/engine.h"
 #include "iengine/fview.h"
 #include "iengine/halo.h"

@@ -86,7 +86,7 @@ struct iVerbosityManager;
   CS_REQUEST_PLUGIN("crystalspace.kernel.vfs", iVFS)
 /// Request default font server.
 #define CS_REQUEST_FONTSERVER \
-  CS_REQUEST_PLUGIN("crystalspace.font.server.default", iFontServer)
+  CS_REQUEST_PLUGIN("crystalspace.font.server.multiplexer", iFontServer)
 /// Request default image loader.
 #define CS_REQUEST_IMAGELOADER \
   CS_REQUEST_PLUGIN("crystalspace.graphic.image.io.multiplexer", iImageIO)

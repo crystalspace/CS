@@ -468,7 +468,7 @@ const char *csSkeletonFactoryLoader::ParseScript (iDocumentNode* node,
   if (!script_name)
     return "Name of the script is missing!";
 
-  iSkeletonScript *script = skel_fact->CreateScript(script_name);
+  iSkeletonAnimation *script = skel_fact->CreateAnimation (script_name);
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -496,7 +496,7 @@ const char *csSkeletonFactoryLoader::ParseScript (iDocumentNode* node,
 }
 
 const char *csSkeletonFactoryLoader::ParseFrame (iDocumentNode* node, 
-  iSkeletonFactory *skel_fact, iSkeletonScript *script)
+  iSkeletonFactory *skel_fact, iSkeletonAnimation *script)
 {
   const char* frame_name = node->GetAttributeValue ("name");
   if (!frame_name)
@@ -505,7 +505,7 @@ const char *csSkeletonFactoryLoader::ParseFrame (iDocumentNode* node,
   }
   int duration = node->GetAttributeValueAsInt ("duration");
 
-  iSkeletonScriptKeyFrame *frame = script->CreateFrame(frame_name);
+  iSkeletonAnimationKeyFrame *frame = script->CreateFrame(frame_name);
   frame->SetDuration(duration);
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();

@@ -51,7 +51,7 @@ public:
 
   bool PrepareSector (iSector* item);
 
-  virtual int GetCount () const { return (int)Length (); }
+  virtual int GetCount () const { return (int)GetSize (); }
   virtual iSector *Get (int n) const { return (*this)[n]; }
   virtual int Add (iSector *obj);
   virtual bool Remove (iSector *obj);
@@ -202,7 +202,7 @@ public:
   bool InSector () const
   {
     if (parent) return parent->InSector ();
-    else return sectors.Length () > 0;
+    else return sectors.GetSize () > 0;
   }
 
   /**

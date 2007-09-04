@@ -95,9 +95,9 @@ public:
   /// Get the mesh array for the numerical lod.
   csArray<iMeshWrapper*>& GetMeshesForLOD (int lod)
   {
-    if (lod >= (int)meshes_for_lod.Length ())
+    if (lod >= (int)meshes_for_lod.GetSize ())
     {
-      meshes_for_lod.SetLength (lod+1);
+      meshes_for_lod.SetSize (lod+1);
     }
     return meshes_for_lod[lod];
   }
@@ -105,7 +105,7 @@ public:
   /// Get the mesh array for a lod between 0 and 1.
   csArray<iMeshWrapper*>& GetMeshesForLOD (float lod)
   {
-    int l = (int)meshes_for_lod.Length ();
+    int l = (int)meshes_for_lod.GetSize ();
     int idx = int (lod * l);
     if (idx < 0) idx = 0;
     else if (idx >= l) idx = l-1;
@@ -115,7 +115,7 @@ public:
   /// Get number of lod levels we have.
   int GetLODCount ()
   {
-    return (int)meshes_for_lod.Length ();
+    return (int)meshes_for_lod.GetSize ();
   }
 };
 
@@ -157,9 +157,9 @@ public:
   /// Get the mesh array for the numerical lod.
   csArray<iMeshFactoryWrapper*>& GetMeshesForLOD (int lod)
   {
-    if (lod >= (int)meshes_for_lod.Length ())
+    if (lod >= (int)meshes_for_lod.GetSize ())
     {
-      meshes_for_lod.SetLength (lod+1);
+      meshes_for_lod.SetSize (lod+1);
     }
     return meshes_for_lod[lod];
   }
@@ -167,7 +167,7 @@ public:
   /// Get number of lod levels we have.
   int GetLODCount ()
   {
-    return (int)meshes_for_lod.Length ();
+    return (int)meshes_for_lod.GetSize ();
   }
 };
 

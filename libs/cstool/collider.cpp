@@ -50,6 +50,26 @@ CS_LEAKGUARD_IMPLEMENT (csColliderWrapper);
 
 csColliderWrapper::csColliderWrapper (csObject& parent,
 	iCollideSystem* collide_system,
+	iTriangleMesh* mesh)
+  : scfImplementationType (this)
+{
+  parent.ObjAdd (this);
+  csColliderWrapper::collide_system = collide_system;
+  collider = collide_system->CreateCollider (mesh);
+}
+
+csColliderWrapper::csColliderWrapper (iObject* parent,
+        iCollideSystem* collide_system,
+        iTriangleMesh* mesh)
+  : scfImplementationType (this)
+{
+  parent->ObjAdd (this);
+  csColliderWrapper::collide_system = collide_system;
+  collider = collide_system->CreateCollider (mesh);
+}
+
+csColliderWrapper::csColliderWrapper (csObject& parent,
+	iCollideSystem* collide_system,
 	iPolygonMesh* mesh)
   : scfImplementationType (this)
 {
@@ -72,6 +92,16 @@ csColliderWrapper::csColliderWrapper (iObject* parent,
 csColliderWrapper::csColliderWrapper (iObject* parent,
 	iCollideSystem* collide_system,
 	iTerraFormer* terrain)
+  : scfImplementationType (this)
+{
+  parent->ObjAdd (this);
+  csColliderWrapper::collide_system = collide_system;
+  collider = collide_system->CreateCollider (terrain);
+}
+
+csColliderWrapper::csColliderWrapper (iObject* parent,
+    iCollideSystem* collide_system,
+  	iTerrainSystem* terrain)
   : scfImplementationType (this)
 {
   parent->ObjAdd (this);
@@ -139,17 +169,69 @@ csColliderWrapper* csColliderWrapper::GetColliderWrapper (iObject* object)
   return w;	// This will DecRef() but that's ok in this case.
 }
 
+void csColliderWrapper::UpdateCollider (iPolygonMesh* mesh)
+{
+  collider = collide_system->CreateCollider (mesh);
+}
+
+void csColliderWrapper::UpdateCollider (iTriangleMesh* mesh)
+{
+  collider = collide_system->CreateCollider (mesh);
+}
+
+void csColliderWrapper::UpdateCollider (iTerraFormer* terrain)
+{
+  collider = collide_system->CreateCollider (terrain);
+}
 //----------------------------------------------------------------------
 
 csColliderWrapper* csColliderHelper::InitializeCollisionWrapper (
 	iCollideSystem* colsys, iMeshWrapper* mesh)
 {
-  iObjectModel* obj_objmodel = mesh->GetMeshObject ()->GetObjectModel ();
-  iPolygonMesh* obj_polymesh = obj_objmodel->GetPolygonMeshColldet ();
-  iTerraFormer* obj_terraformer = obj_objmodel->GetTerraFormerColldet ();
-
   iMeshFactoryWrapper* factory = mesh->GetFactory ();
-  csColliderWrapper* cw = 0;
+
+  iObjectModel* obj_objmodel = mesh->GetMeshObject ()->GetObjectModel ();
+  csStringID basemesh_id = colsys->GetBaseDataID ();
+  csStringID trianglemesh_id = colsys->GetTriangleDataID ();
+
+  // do_trimesh will be set to true if we're using the new trianglemesh
+  // system (instead of polygonmesh). We detect that we want to use the
+  // new system when the base mesh of the object model is given (even
+  // if the collision detection mesh might not be set).
+  bool do_trimesh = obj_objmodel->IsTriangleDataSet (basemesh_id);
+  // Also check factory.
+  if (!do_trimesh && factory)
+  {
+    iObjectModel* fact_objmodel = factory->GetMeshObjectFactory ()
+      ->GetObjectModel ();
+    if (fact_objmodel)
+      do_trimesh = fact_objmodel->IsTriangleDataSet (basemesh_id);
+  }
+
+  iTriangleMesh* obj_trimesh;
+  iPolygonMesh* obj_polymesh;
+  bool obj_trimesh_set = false;
+  if (do_trimesh)
+  {
+    // If the collision detection triangle mesh is not set then we
+    // use the base mesh instead.
+    obj_trimesh_set = obj_objmodel->IsTriangleDataSet (trianglemesh_id);
+    if (obj_trimesh_set)
+      obj_trimesh = obj_objmodel->GetTriangleData (trianglemesh_id);
+    else
+      obj_trimesh = obj_objmodel->GetTriangleData (basemesh_id);
+    obj_polymesh = 0;
+  }
+  else
+  {
+    obj_polymesh = obj_objmodel->GetPolygonMeshColldet ();
+    obj_trimesh = 0;
+  }
+
+  iTerraFormer* obj_terraformer = obj_objmodel->GetTerraFormerColldet ();
+  iTerrainSystem* obj_terrain = obj_objmodel->GetTerrainColldet ();
+
+  csRef<csColliderWrapper> cw;
   if (factory)
   {
     iObjectModel* fact_objmodel = factory->GetMeshObjectFactory ()
@@ -184,10 +266,10 @@ csColliderWrapper* csColliderHelper::InitializeCollisionWrapper (
           // Now add the collider wrapper to the mesh. We need a new
           // csColliderWrapper because the csObject system is strictly
           // a tree and one csColliderWrapper cannot have multiple parents.
-          cw = new csColliderWrapper (mesh->QueryObject (),
-            colsys, collider);
+          cw.AttachNew (new csColliderWrapper (mesh->QueryObject (),
+            colsys, collider));
           cw->SetName (mesh->QueryObject ()->GetName());
-          cw->DecRef ();
+          cw = 0;
           // Clear object polygon mesh so we will no longer try to create
           // a collider from that (we already have a collider).
           obj_terraformer = 0;
@@ -195,55 +277,102 @@ csColliderWrapper* csColliderHelper::InitializeCollisionWrapper (
       }
       else 
       {
-        iPolygonMesh* fact_polymesh = fact_objmodel->GetPolygonMeshColldet ();
-        if (fact_polymesh && (fact_polymesh == obj_polymesh || !obj_polymesh))
-        {
-          // First check if the parent factory has a collider wrapper.
-          iCollider* collider;
-          csColliderWrapper* cw_fact = csColliderWrapper::GetColliderWrapper (
-            factory->QueryObject ());
-          if (cw_fact)
-          {
-            collider = cw_fact->GetCollider ();
-          }
-          else
-          {
-            csColliderWrapper *cw_fact = new csColliderWrapper (
-              factory->QueryObject (), colsys, fact_polymesh);
-            cw_fact->SetName (factory->QueryObject ()->GetName());
-            collider = cw_fact->GetCollider ();
-            cw_fact->DecRef ();
-          }
+	if (do_trimesh)
+	{
+	  if (!obj_trimesh_set)
+	  {
+	    bool fact_trimesh_set = fact_objmodel->IsTriangleDataSet (
+	        trianglemesh_id);
+            iTriangleMesh* fact_trimesh;
+	    // If the collision detection triangle mesh is not set then we
+	    // use the base mesh instead.
+	    if (fact_trimesh_set)
+	      fact_trimesh  = fact_objmodel->GetTriangleData (trianglemesh_id);
+	    else
+	      fact_trimesh  = fact_objmodel->GetTriangleData (basemesh_id);
 
-          // Now add the collider wrapper to the mesh. We need a new
-          // csColliderWrapper because the csObject system is strictly
-          // a tree and one csColliderWrapper cannot have multiple parents.
-          cw = new csColliderWrapper (mesh->QueryObject (),
-            colsys, collider);
-          cw->SetName (mesh->QueryObject ()->GetName());
-          cw->DecRef ();
-          // Clear object polygon mesh so we will no longer try to create
-          // a collider from that (we already have a collider).
-          obj_polymesh = 0;
-        }
+	    if (fact_trimesh)
+	    {
+              // First check if the parent factory has a collider wrapper.
+              iCollider* collider;
+              csColliderWrapper* cw_fact =
+		csColliderWrapper::GetColliderWrapper (factory->QueryObject ());
+              if (cw_fact)
+              {
+                collider = cw_fact->GetCollider ();
+              }
+              else
+              {
+                csColliderWrapper *cw_fact = new csColliderWrapper (
+                  factory->QueryObject (), colsys, fact_trimesh);
+                cw_fact->SetName (factory->QueryObject ()->GetName());
+                collider = cw_fact->GetCollider ();
+                cw_fact->DecRef ();
+              }
+
+              // Now add the collider wrapper to the mesh. We need a new
+              // csColliderWrapper because the csObject system is strictly
+              // a tree and one csColliderWrapper cannot have multiple parents.
+              cw.AttachNew (new csColliderWrapper (mesh->QueryObject (),
+                colsys, collider));
+              cw->SetName (mesh->QueryObject ()->GetName());
+	    }
+            // Clear object polygon mesh so we will no longer try to create
+            // a collider from that (we already have a collider).
+            obj_trimesh = 0;
+	  }
+	}
+	else
+	{
+          iPolygonMesh* fact_polymesh = fact_objmodel->GetPolygonMeshColldet ();
+          if (fact_polymesh && (fact_polymesh == obj_polymesh || !obj_polymesh))
+          {
+            // First check if the parent factory has a collider wrapper.
+            iCollider* collider;
+            csColliderWrapper* cw_fact = csColliderWrapper::GetColliderWrapper (
+              factory->QueryObject ());
+            if (cw_fact)
+            {
+              collider = cw_fact->GetCollider ();
+            }
+            else
+            {
+              csColliderWrapper *cw_fact = new csColliderWrapper (
+                factory->QueryObject (), colsys, fact_polymesh);
+              cw_fact->SetName (factory->QueryObject ()->GetName());
+              collider = cw_fact->GetCollider ();
+              cw_fact->DecRef ();
+            }
+
+            // Now add the collider wrapper to the mesh. We need a new
+            // csColliderWrapper because the csObject system is strictly
+            // a tree and one csColliderWrapper cannot have multiple parents.
+            cw.AttachNew (new csColliderWrapper (mesh->QueryObject (),
+              colsys, collider));
+            cw->SetName (mesh->QueryObject ()->GetName());
+            // Clear object polygon mesh so we will no longer try to create
+            // a collider from that (we already have a collider).
+            obj_polymesh = 0;
+          }
+	}
       }
     }
   }
 
   if (obj_terraformer)
-  {
-    cw = new csColliderWrapper (mesh->QueryObject (),
-      colsys, obj_terraformer);
-    cw->SetName (mesh->QueryObject ()->GetName());
-    cw->DecRef ();
-  }
+    cw.AttachNew (new csColliderWrapper (mesh->QueryObject (),
+      colsys, obj_terraformer));
+  else if (obj_terrain)
+    cw.AttachNew (new csColliderWrapper (mesh->QueryObject (),
+      colsys, obj_terrain));
+  else if (do_trimesh && obj_trimesh)
+    cw.AttachNew (new csColliderWrapper (mesh->QueryObject (),
+      colsys, obj_trimesh));
   else if (obj_polymesh)
-  {
-    cw = new csColliderWrapper (mesh->QueryObject (),
-      colsys, obj_polymesh);
+    cw.AttachNew (new csColliderWrapper (mesh->QueryObject (),
+      colsys, obj_polymesh));
+  if (cw)
     cw->SetName (mesh->QueryObject ()->GetName());
-    cw->DecRef ();
-  }
 
   const csRef<iSceneNodeArray> ml = 
     mesh->QuerySceneNode ()->GetChildrenArray ();
@@ -433,7 +562,7 @@ float csColliderHelper::TraceBeam (iCollideSystem* cdsys, iSector* sector,
 	const csArray<csIntersectingTriangle>& tris = cdsys->
 		GetIntersectingTriangles ();
 	size_t i;
-	for (i = 0 ; i < tris.Length () ; i++)
+	for (i = 0 ; i < tris.GetSize () ; i++)
 	{
 	  csVector3 isect;
 	  csIntersectingTriangle tri;
@@ -952,7 +1081,7 @@ bool csColliderActor::AdjustForCollisions (
   localvel -= maxmove - oldpos;
   csVector3 correctedVel(localvel);
 
-  for (i = 0; i < our_cd_contact.Length () ; i++ )
+  for (i = 0; i < our_cd_contact.GetSize () ; i++ )
   {
     csCollisionPair& cd = our_cd_contact[i];
     csPlane3 obstacle (cd.a2, cd.b2, cd.c2);
@@ -1022,13 +1151,15 @@ bool csColliderActor::AdjustForCollisions (
   while (hits > 0 && newpos.y < maxJump)
   {
     bool adjust = false;
-    for (i = 0; i < our_cd_contact.Length (); i++ )
+    for (i = 0; i < our_cd_contact.GetSize (); i++ )
     {
       csCollisionPair cd = our_cd_contact[i];
       csPlane3 obstacle (cd.a2, cd.b2, cd.c2);
       csVector3 normal = obstacle.Normal();
       float norm = normal.Norm ();
-      if (fabs (norm) < SMALL_EPSILON) continue;
+
+      // Ensure this is a big-enough triangle to count as a collision.
+      if (fabs (norm) < 1e-4f ) continue;
 
       csVector3 n = normal / norm;
 
@@ -1106,7 +1237,7 @@ bool csColliderActor::AdjustForCollisions (
     cd = 0;
 
   hits = 0;
-  for (i = 0; i < our_cd_contact.Length () ; i++ )
+  for (i = 0; i < our_cd_contact.GetSize () ; i++ )
   {
     csCollisionPair& cd = our_cd_contact[i];
     csPlane3 obstacle (cd.a2, cd.b2, cd.c2);

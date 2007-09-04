@@ -21,6 +21,7 @@
 #define SNDSYS_SOFTWARE_DRIVER_OSS_H
 
 #include "csutil/cfgacc.h"
+#include "csutil/threading/thread.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 
@@ -35,29 +36,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(SndSysOSS)
 
 class SndSysDriverOSS;
 
-class SndSysDriverRunnable : public csRunnable
+class SndSysDriverRunnable : public CS::Threading::Runnable
 {
 private:
   SndSysDriverOSS* parent;
-  int ref_count;
-
+  
 public:
   SndSysDriverRunnable (SndSysDriverOSS* parent) :
-  	parent (parent), ref_count (1) { }
+  	parent (parent) { }
   virtual ~SndSysDriverRunnable () { }
 
   virtual void Run ();
-  virtual void IncRef() { ++ref_count; }
-  /// Decrement reference count.
-  virtual void DecRef()
-  {
-    --ref_count;
-    if (ref_count <= 0)
-      delete this;
-  }
-
-  /// Get reference count.
-  virtual int GetRefCount() { return ref_count; }
 };
 
 
@@ -156,7 +145,7 @@ protected:
   volatile bool m_bRunning;
 
   /// Handle to the csThread object that controls execution of our background thread
-  csRef<csThread> m_pBackgroundThread;
+  csRef<CS::Threading::Thread> m_pBackgroundThread;
 
   /// The event recorder interface, if active
   csRef<iSndSysEventRecorder> m_EventRecorder;

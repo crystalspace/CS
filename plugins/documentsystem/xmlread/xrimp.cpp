@@ -95,11 +95,11 @@ csRef<iDocumentAttribute> csXmlReadAttributeIterator::Next ()
 csXmlReadNodeIterator::csXmlReadNodeIterator (
 	csXmlReadDocument* doc, TrDocumentNodeChildren* parent,
 	const char* value) :
-  scfImplementationType(this)
+  scfImplementationType(this), currentPos (0), endPos ((size_t)~0)
 {
   csXmlReadNodeIterator::doc = doc;
   csXmlReadNodeIterator::parent = parent;
-  csXmlReadNodeIterator::value = value ? csStrNew (value) : 0;
+  csXmlReadNodeIterator::value = value ? CS::StrDup (value) : 0;
   use_contents_value = false;
   if (!parent)
     current = 0;
@@ -121,7 +121,7 @@ csXmlReadNodeIterator::csXmlReadNodeIterator (
 
 csXmlReadNodeIterator::~csXmlReadNodeIterator ()
 {
-  delete[] value;
+  cs_free (value);
 }
 
 bool csXmlReadNodeIterator::HasNext ()
@@ -137,6 +137,7 @@ csRef<iDocumentNode> csXmlReadNodeIterator::Next ()
     node = csPtr<iDocumentNode> (doc->Alloc (current, true));
     use_contents_value = false;
     current = parent->FirstChild ();
+    currentPos++;
   }
   else if (current != 0)
   {
@@ -145,11 +146,30 @@ csRef<iDocumentNode> csXmlReadNodeIterator::Next ()
       current = current->NextSibling (value);
     else
       current = current->NextSibling ();
+    currentPos++;
   }
   return node;
 }
 
-//------------------------------------------------------------------------
+size_t csXmlReadNodeIterator::GetEndPosition ()
+{
+  if (endPos == (size_t)~0)
+  {
+    if (use_contents_value)
+      endPos = 1;
+    else
+    {
+      endPos = currentPos;
+      TrDocumentNode* node = current;
+      while (node != 0)
+      {
+        endPos++;
+        node = node->NextSibling ();
+      }
+    }
+  }
+  return endPos;
+}
 
 //------------------------------------------------------------------------
 
@@ -426,23 +446,23 @@ csRef<iDocumentNode> csXmlReadDocument::GetRoot ()
 const char* csXmlReadDocument::Parse (iFile* file, bool collapse)
 {
   size_t want_size = file->GetSize ();
-  char *data = new char [want_size + 1];
+  char *data = (char*)cs_malloc (want_size + 1);
   size_t real_size = file->Read (data, want_size);
   if (want_size != real_size)
   {
-    delete[] data;
+    cs_free (data);
     return "Unexpected EOF encountered";
   }
   data[real_size] = '\0';
 #ifdef CS_DEBUG
   if (strlen (data) != real_size)
   {
-    delete[] data;
+    cs_free (data);
     return "File contains one or more null characters";
   }
 #endif
   const char *error = Parse (data, collapse);
-  delete[] data;
+  cs_free (data);
   return error;
 }
 
@@ -458,11 +478,10 @@ const char* csXmlReadDocument::Parse (iString* str, bool collapse)
 
 const char* csXmlReadDocument::Parse (const char* buf, bool collapse)
 {
-  CreateRoot (csStrNew (buf));
-  bool const old_collapse = root->IsWhiteSpaceCondensed();
+  CreateRoot (CS::StrDup (buf));
   root->SetCondenseWhiteSpace(collapse);
-  root->Parse (root, root->input_data);
-  root->SetCondenseWhiteSpace(old_collapse);
+  ParseInfo parse;
+  root->Parse (parse, root->input_data);
   if (root->Error ())
     return root->ErrorDesc ();
   return 0;
@@ -471,10 +490,9 @@ const char* csXmlReadDocument::Parse (const char* buf, bool collapse)
 const char* csXmlReadDocument::ParseInPlace (char* buf, bool collapse)
 {
   CreateRoot (buf);
-  bool const old_collapse = root->IsWhiteSpaceCondensed();
   root->SetCondenseWhiteSpace(collapse);
-  root->Parse (root, root->input_data);
-  root->SetCondenseWhiteSpace(old_collapse);
+  ParseInfo parse;
+  root->Parse (parse, root->input_data);
   if (root->Error ())
     return root->ErrorDesc ();
   return 0;

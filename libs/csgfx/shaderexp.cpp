@@ -343,8 +343,8 @@ bool csShaderExpression::Parse(iDocumentNode * node)
 
   oper_arg tmp;
   tmp.type = TYPE_INVALID;
-  tmp.vec4.Set(0.0f);
-  accstack.SetLength(MAX(acc_top, accstack_max) + 1, tmp);
+  tmp.vec4.Set (0.0f);
+  accstack.SetSize (MAX(acc_top, accstack_max) + 1, tmp);
 
   destruct_cons(head);
 
@@ -368,7 +368,7 @@ bool csShaderExpression::Evaluate(csShaderVariable* var,
 #endif
 
   errorMsg.Empty();
-  if (!opcodes.Length())
+  if (!opcodes.GetSize ())
   {
     EvalError ("Empty expression");
     return false;

@@ -29,8 +29,6 @@
 #include "csutil/array.h"
 #include "csutil/scf_implementation.h"
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
-
 /**\addtogroup util_containers
  * @{ */
 
@@ -136,8 +134,6 @@ public:
   { return storage.DeleteIndexFast  (n); }
   virtual bool Delete (ContainedType const& item)
   { return storage.Delete (item); }
-  virtual bool DeleteFast (ContainedType const& item)
-  { return storage.DeleteFast (item); }
   /** @} */
 };
 
@@ -228,8 +224,6 @@ public:
   { return storage.DeleteIndexFast  (n); }
   virtual bool Delete (ContainedType const& item)
   { return storage.Delete (item); }
-  virtual bool DeleteFast (ContainedType const& item)
-  { return storage.DeleteFast (item); }
   /** @} */
 };
 
@@ -281,8 +275,6 @@ public:
   }
   /** @} */
 };
-
-#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /** @} */
 

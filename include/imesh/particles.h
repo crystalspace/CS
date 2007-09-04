@@ -38,6 +38,9 @@ struct iParticleSystemBase;
 /**\addtogroup meshplugins
  * @{ */
 
+/**\name Particle systems
+ * @{ */
+
 /**
  * Sorting modes for particle renderer
  */
@@ -491,7 +494,9 @@ struct iParticleSystem : public iParticleSystemBase
 
   /**
    * Lock the particles and take external control over them.
-   * 
+   * \param maxParticles Amount of particles for which memory is allocated in
+   *   the returned particles buffer. (The actual number of provided particles 
+   *   must be set there; obviously it can't exceed \a maxParticles.)
    */
   virtual csParticleBuffer* LockForExternalControl (size_t maxParticles) = 0;
   
@@ -505,10 +510,9 @@ struct iParticleSystem : public iParticleSystemBase
   virtual void Advance (csTicks time) = 0;
 };
 
-
 /** @} */
 
-/**\addtogroup defaultemitters
+/**\name Default particle system emitters
 * @{ */
 
 /// Set where in the emitter the builtin emitters should spawn their particles
@@ -642,7 +646,7 @@ struct iParticleBuiltinEmitterFactory : public virtual iBase
 
 /** @} */
 
-/**\addtogroup defaulteffectors
+/**\name Default particle system effectors
 * @{ */
 
 /**
@@ -807,6 +811,8 @@ struct iParticleBuiltinEffectorFactory : public virtual iBase
   virtual csPtr<iParticleBuiltinEffectorLinColor> CreateLinColor () const = 0;
   virtual csPtr<iParticleBuiltinEffectorVelocityField> CreateVelocityField () const = 0;
 };
+
+/** @} */
 
 /** @} */
 

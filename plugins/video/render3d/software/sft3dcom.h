@@ -136,6 +136,8 @@ protected:
   long z_buf_size;
   csZBufMode zBufMode;
 
+  int current_drawflags;
+
   /**
    * Addresses of all lines for this frame. This table is used to avoid
    * calls to GetPixelAt in the main renderer loop. It is filled every frame
@@ -349,6 +351,9 @@ public:
   virtual void Print (csRect const* area);
   /// End the frame and do a page swap.
   virtual void FinishDraw ();
+
+  /// Return draw flags from current BeginDraw
+  virtual int GetCurrentDrawFlags() const;
 
   /// Draw a line in camera space.
   virtual void DrawLine (const csVector3& v1, const csVector3& v2,

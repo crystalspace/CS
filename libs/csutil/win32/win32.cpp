@@ -37,12 +37,13 @@
 #include "ivideo/natwin.h"
 #include "ivideo/cursor.h"
 
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <imm.h>
 
 #include "csutil/win32/wintools.h"
 #include "win32kbd.h"
 #include "cachedll.h"
-
-#include <windows.h>
 
 #include <stdio.h>
 #include <time.h>
@@ -324,7 +325,7 @@ BOOL WINAPI Win32Assistant::ConsoleHandlerRoutine (DWORD dwCtrlType)
     case CTRL_LOGOFF_EVENT:
     case CTRL_SHUTDOWN_EVENT:
       {
-	for (size_t i = 0; i < assistants.Length(); i++)
+	for (size_t i = 0; i < assistants.GetSize (); i++)
 	{
 	  assistants[i]->GetEventOutlet()->ImmediateBroadcast (
 	    csevQuit (assistants[i]->registry), 0);
@@ -403,7 +404,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r)
       if (!IsStdHandleRedirected (STD_OUTPUT_HANDLE)) 
         freopen("CONOUT$", "a", stdout);
       if (!IsStdHandleRedirected (STD_INPUT_HANDLE)) 
-        freopen("CONIN$", "a", stdin);
+        freopen("CONIN$", "r", stdin);
     }
   }
 
@@ -451,7 +452,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r)
     {
       strcat (apppath, ".ico");
     }
-    appIcon = (HICON)LoadImage (ModuleHandle, apppath, IMAGE_ICON,
+    appIcon = (HICON)LoadImageA (ModuleHandle, apppath, IMAGE_ICON,
       0, 0, LR_DEFAULTSIZE | LR_LOADFROMFILE);
   }
   // finally the default one

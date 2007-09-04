@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2002 by Mat Sutcliffe <oktal@gmx.co.uk>
+    Copyright (C) 2002, 2007 by Mat Sutcliffe <oktal@gmx.co.uk>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -26,8 +26,6 @@
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 
-#include <stdio.h>
-
 CS_IMPLEMENT_APPLICATION
 
 int main (int argc, char *argv[])
@@ -39,12 +37,12 @@ int main (int argc, char *argv[])
     return 1;
   }
 
-  bool plugins_ok = csInitializer::RequestPlugins (objreg,
+  bool ok = csInitializer::RequestPlugins (objreg,
     CS_REQUEST_REPORTER,
     CS_REQUEST_REPORTERLISTENER,
     CS_REQUEST_PLUGIN ("crystalspace.script.perl5", iScript),
     CS_REQUEST_END);
-  if (! plugins_ok)
+  if (! ok)
   {
     csFPrintf (stderr, "Failed to load plugins!\n");
     return 2;
@@ -64,8 +62,9 @@ int main (int argc, char *argv[])
       return 3;
     }
 
-    bool module_ok = script->LoadModule ("cspace");
-    if (! module_ok)
+    ok = script->LoadModule ("cspace");
+    //ok = script->LoadModule ("scripts/perl5", "cspace.pm");
+    if (! ok)
     {
       csFPrintf (stderr, "Failed to load perl5 cspace module!\n");
       return 4;
@@ -73,43 +72,106 @@ int main (int argc, char *argv[])
 
     csInitializer::OpenApplication (objreg);
 
-    char const *text = "Hello, world!";
-    csPrintf ("Testing Store:\n");
-    script->Store ("text", text);
-    csPrintf ("text = %s\n", text);
+    //====================================================================//
+    csPrintf ("Testing RValue/Store/Retrieve:\n");
 
-    csRef<iString> rettext;
-    csPrintf ("Testing Retrieve:\n");
-    script->Retrieve ("text", rettext);
-    csPrintf ("text = %s\n", rettext->GetData());
+    int test_int = 3;
+    float test_float = 3.0;
+    double test_double = 3.0;
+    bool test_bool = true;
+    const char *test_str = "hello";
 
-    puts("");
+    csPrintf ("  Int: ");
+    csRef<iScriptValue> int_value (script->RValue (test_int));
+    ok = script->Store("i", int_value);
+    int_value.AttachNew (script->Retrieve ("i"));
+    csPrintf ("%d == %d\n", test_int, int_value->GetInt ());
 
-    csPrintf ("Testing NewObject:\n");
-    csRef<iScriptObject> obj =
-      script->NewObject ("cspace::csVector3", "%g%g%g", 1.0f, 2.0f, 3.0f);
-    csPrintf ("new csVector3 (1.0f, 2.0f, 3.0f)\n");
+    csPrintf ("  Float: ");
+    csRef<iScriptValue> float_value (script->RValue (test_float));
+    ok = script->Store("f", float_value);
+    float_value.AttachNew (script->Retrieve ("f"));
+    csPrintf ("%f == %f\n", test_float, float_value->GetFloat ());
 
-    puts("");
+    csPrintf ("  Double: ");
+    csRef<iScriptValue> double_value (script->RValue (test_double));
+    ok = script->Store("d", double_value);
+    double_value.AttachNew (script->Retrieve ("d"));
+    csPrintf ("%lf == %lf\n", test_double, double_value->GetDouble ());
 
-    csPrintf ("Testing Get:\n");
-    float x = 0.0f, y = 0.0f, z = 0.0f;
-    obj->Get ("x", x);
-    obj->Get ("y", y);
-    obj->Get ("z", z);
-    csPrintf ("x=%g, y=%g, z=%g\n", x, y, z);
+    csPrintf ("  String: ");
+    csRef<iScriptValue> str_value (script->RValue (test_str));
+    ok = script->Store("s", str_value);
+    str_value.AttachNew (script->Retrieve ("s"));
+    csPrintf ("%s == %s\n", test_str, str_value->GetString ()->GetData ());
 
-    puts("");
+    csPrintf ("  Bool: ");
+    csRef<iScriptValue> bool_value (script->RValue (test_bool));
+    ok = script->Store("b", bool_value);
+    bool_value.AttachNew (script->Retrieve ("b"));
+    csPrintf ("%s == %s\n\n", test_bool ? "true" : "false",
+			      bool_value->GetBool () ? "true" : "false");
 
-    csPrintf("Testing Set:\n");
-    obj->Set ("x", 3.0f);
-    obj->Set ("y", 2.0f);
-    obj->Set ("z", 1.0f);
+    //====================================================================//
+    csPrintf ("Testing Remove:\n");
 
-    obj->Get ("x", x);
-    obj->Get ("y", y);
-    obj->Get ("z", z);
-    csPrintf ("x=%g, y=%g, z=%g\n", x, y, z);
+    ok = script->Remove ("i") && script->Remove ("f") && script->Remove ("d")
+      && script->Remove ("s") && script->Remove ("b");
+    csPrintf ("  %s\n", ok ? "ok" : "failed");
+
+    int_value.AttachNew (script->Retrieve ("i"));
+    csPrintf ("  %s\n", int_value.IsValid () ? "failed" : "ok");
+
+    //====================================================================//
+    csPrintf ("Testing New(csVector3):\n");
+
+    csRef<iScriptObject> obj (script->New ("csVector3"));
+    csPrintf ("  %s\n", obj.IsValid () ? "ok" : "failed");
+
+    //====================================================================//
+    csPrintf ("Testing GetClass/IsA:\n");
+
+    csRef<iString> classname (obj->GetClass ());
+    csPrintf ("  %s\n", classname->GetData ());
+
+    csPrintf ("  %s\n", obj->IsA ("csVector3") ? "ok" : "failed");
+
+    //====================================================================//
+    csPrintf ("Testing Set/Get:\n");
+
+    csPrintf ("  %f == ", float_value->GetFloat ());
+
+    ok = obj->Set ("x", float_value);
+    float_value.AttachNew (obj->Get ("x"));
+
+    csPrintf ("%f\n", float_value->GetFloat ());
+
+    //====================================================================//
+    csPrintf ("Testing Call(csVector3::Set):\n");
+
+    csRefArray<iScriptValue> args;
+    args.Push (float_value);
+
+    csRef<iScriptValue> ret (obj->Call ("Set", args));
+    csPrintf ("  %f\n", float_value->GetFloat ());
+
+    //====================================================================//
+    csPrintf ("Testing Call(csVector3::Norm):\n");
+
+    ret.AttachNew (obj->Call ("Norm"));
+    csPrintf ("  %f\n", ret->GetFloat ());
+
+    //====================================================================//
+    csPrintf ("Testing GetPointer:\n");
+
+    csVector3 &vector = * (csVector3 *) obj->GetPointer ();
+
+    vector.Normalize ();
+
+    csPrintf ("  %f %f %f\n", vector[0], vector[1], vector[2]);
+    csPrintf ("  ok\n");
+
+    csPrintf ("All Done!\n");
   }
 
   csInitializer::DestroyApplication (objreg);

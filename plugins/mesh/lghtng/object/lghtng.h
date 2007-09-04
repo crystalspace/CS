@@ -87,6 +87,7 @@ public:
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent);
   virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
+  virtual iTerrainSystem* GetTerrainColldet () { return 0; }
 
   ///--------------------- iMeshObject implementation ------------------------
   virtual iMeshObjectFactory* GetFactory () const { return ifactory; }
@@ -130,6 +131,10 @@ public:
    * does nothing.
    */
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
+  virtual void BuildDecal(const csVector3* pos, float decalRadius,
+          iDecalBuilder* decalBuilder)
+  {
+  }
 
   //------------------------- iLightningState implementation ----------------
   virtual void SetOrigin(const csVector3& pos) { this->origin = pos; }

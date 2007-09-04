@@ -75,19 +75,19 @@ csCommandLineOption*
 csCommandLineParser::FindOption (const char *name, size_t iIndex) const
 {
   size_t idx;
-  for (idx = 0 ; idx < Options.Length () ; idx++)
+  for (idx = 0 ; idx < Options.GetSize () ; idx++)
   {
     csCommandLineOption* cl = Options[idx];
     if (!strcmp (cl->Name, name))
       break;
   }
 
-  if (idx < Options.Length ())
+  if (idx < Options.GetSize ())
   {
     while (iIndex)
     {
       idx++;
-      if (idx >= Options.Length ())
+      if (idx >= Options.GetSize ())
         return 0;
       if (!strcmp (Options.Get (idx)->Name,  name))
         iIndex--;
@@ -113,7 +113,7 @@ bool csCommandLineParser::ReplaceOption (
 
 bool csCommandLineParser::ReplaceName (const char *iValue, size_t iIndex)
 {
-  if (iIndex < Names.Length ())
+  if (iIndex < Names.GetSize ())
   {
     Names.Put (iIndex, iValue);
     return true;
@@ -130,7 +130,7 @@ const char *csCommandLineParser::GetOption(const char *iName, size_t iIndex) con
 
 const char *csCommandLineParser::GetName (size_t iIndex) const
 {
-  if (iIndex < Names.Length ())
+  if (iIndex < Names.GetSize ())
     return Names[iIndex];
   return 0;
 }
@@ -152,7 +152,7 @@ bool csCommandLineParser::GetBoolOption(const char *iName, bool defaultValue)
   csString negName;
   negName << "no" << iName;
   size_t idx;
-  for (idx = Options.Length (); idx > 0; idx--)
+  for (idx = Options.GetSize (); idx > 0; idx--)
   {
     csCommandLineOption* cl = Options[idx - 1];
     if (!strcmp (cl->Name, iName))
@@ -189,4 +189,10 @@ const char* csCommandLineParser::GetOptionName (size_t iIndex) const
 {
   if (iIndex >= Options.GetSize()) return 0;
   return Options[iIndex]->Name;
+}
+
+const char* csCommandLineParser::GetOption (size_t iIndex) const
+{
+  if (iIndex >= Options.GetSize()) return 0;
+  return Options[iIndex]->Value;
 }

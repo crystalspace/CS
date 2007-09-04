@@ -16,11 +16,12 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "crystalspace.h"
+#include "common.h"
 
 #include "kdtree.h"
 #include "primitive.h"
 #include "statistics.h"
+#include "object.h"
 
 #include "csutil/alignedalloc.h"
 
@@ -35,8 +36,10 @@ namespace lighter
     CS::Memory::AlignedFree (this->nodeList);
   }
 
-  KDTree* KDTreeBuilder::BuildTree (ObjectHash::GlobalIterator& objects)
+  KDTree* KDTreeBuilder::BuildTree (ObjectHash::GlobalIterator& objects,
+                                    Statistics::Progress& progress)
   {
+    progress.SetProgress (0);
     objects.Reset ();
 
     if (!objects.HasNext ())
@@ -44,10 +47,12 @@ namespace lighter
 
     // Collect all primitives into endpoints and boxes for building
     SetupEndpoints (objects);
+    progress.SetProgress (0.33f);
 
     // Recursively build internal nodes from the boxes lists
     KDNode* rootNode = nodeAllocator.Alloc ();
     BuildKDNodeRecursive (&endPointList, rootNode, objectExtents, numPrimitives, 0);
+    progress.SetProgress (0.66f);
 
     // Optimize them and create a real kd-tree and nodes
     KDTree* tree = SetupRealTree (rootNode);
@@ -55,6 +60,8 @@ namespace lighter
     //Clean up some memory
     boxAllocator.Empty ();
     nodeAllocator.Empty ();
+
+    progress.SetProgress (1);
     return tree;
   }
 
@@ -243,7 +250,7 @@ namespace lighter
       }
     }
 
-    if (bestSide == -1 || numPrim <= PRIMS_PER_LEAF || treeDepth == MAX_DEPTH)
+    if (bestSide == (uint)~0 || numPrim <= PRIMS_PER_LEAF || treeDepth == MAX_DEPTH)
     {
       //No best side, make a leaf
       EndPoint* ep = epList->head[0];
@@ -455,40 +462,146 @@ namespace lighter
     return true;
   }
 
+  //Copy the tree
+  struct CopyFunctor
+  {
+    CopyFunctor (KDTree* t)
+      : tree (t), usedNodes (2  ), usedPrims (0)
+    {
+    }
+
+    void CopyNodes (KDTreeBuilder::KDNode* node, KDTreeNode* newNode)
+    {
+      if (!node)
+        return;
+
+      //Copy node
+      if (node->leftChild)
+      {
+        // inner node
+        KDTreeNode_Op::SetLeaf (newNode, false);
+        KDTreeNode_Op::SetDimension (newNode, node->splitDimension);
+        KDTreeNode_Op::SetLocation (newNode, node->splitLocation);
+
+        // Get nodes for children
+        KDTreeNode* left = tree->nodeList + usedNodes++;
+        KDTreeNode* right = tree->nodeList + usedNodes++;
+
+        KDTreeNode_Op::SetLeft (newNode, left);
+
+        CopyNodes (node->leftChild, left);
+        CopyNodes (node->rightChild, right);
+      }
+      else
+      {
+        // leaf node
+        KDTreeNode_Op::SetLeaf (newNode, true);
+        KDTreeNode_Op::SetPrimitiveListSize (newNode, 
+          node->primitives.GetSize ());
+
+        KDTreePrimitive* prims = tree->primitives + usedPrims;
+        usedPrims += node->primitives.GetSize ();
+
+        KDTreeNode_Op::SetPrimitiveList (newNode, prims);
+
+        // Setup all primitives
+        for (size_t i = 0; i < node->primitives.GetSize (); ++i)
+        {
+          Primitive* prim = node->primitives[i];
+
+          KDTreePrimitive &optPrim = prims[i];
+
+          // Setup optimized
+          optPrim.primPointer = prim;
+
+          int32 kdFlags = 0;
+
+          if (prim->GetObject ()->GetFlags ().Check (OBJECT_FLAG_NOSHADOW))
+            kdFlags |= KDPRIM_FLAG_NOSHADOW;
+
+          //Extract our info
+          const csVector3& N = prim->GetPlane ().Normal ();
+          ObjectVertexData &vdata = prim->GetVertexData ();
+          const Primitive::TriangleType& t = prim->GetTriangle ();
+          const csVector3& A = vdata.positions[t.a];
+          const csVector3& B = vdata.positions[t.b];
+          const csVector3& C = vdata.positions[t.c];
+
+          // Find max normal direction
+          int k = N.DominantAxis ();
+
+          optPrim.normal_K = k | kdFlags;
+
+          size_t u = (k+1)%3;
+          size_t v = (k+2)%3;
+
+          // precalc normal
+          float nkinv = 1.0f/N[k];
+          optPrim.normal_U = N[u] * nkinv;
+          optPrim.normal_V = N[v] * nkinv;
+          optPrim.normal_D = (N * A) * nkinv;
+
+
+          csVector3 bb = C - A;
+          csVector3 cc = B - A;
+
+          float tmp = 1.0f/(bb[u] * cc[v] - bb[v] * cc[u]);
+
+          // edge 1
+          optPrim.edgeA_U = -bb[v] * tmp;
+          optPrim.edgeA_V = bb[u] * tmp;
+          optPrim.edgeA_D = (bb[v] * A[u] - bb[u] * A[v]) * tmp;
+
+          // edge 2
+          optPrim.edgeB_U = cc[v] * tmp;
+          optPrim.edgeB_V = -cc[u] * tmp;
+          optPrim.edgeB_D = (cc[u] * A[v] - cc[v] * A[u]) * tmp;
+
+        }
+      }
+
+    }
+
+    KDTree* tree;
+    size_t usedNodes, usedPrims;
+  };
+
+  //Count number of nodes and number of primitive slots  
+  struct CountFunctor
+  {
+    CountFunctor ()
+      : numNodes (0), numPrimSlots (0), maxDepth (0), sumDepth (0)
+    {
+    }
+    
+    void CountNode (KDTreeBuilder::KDNode* node, size_t depth = 0)
+    {
+      if (!node)
+        return;
+
+      numNodes++;
+      numPrimSlots += node->primitives.GetSize ();
+
+      //At the same time, collect global statistics
+      if (!node->leftChild)
+      {
+        // Leaf
+        globalStats.kdtree.leafNodes++;
+        sumDepth += depth;
+        maxDepth = csMax (maxDepth, depth);
+      }
+
+
+      CountNode (node->leftChild, depth+1);
+      CountNode (node->rightChild, depth+1);
+    }
+
+    size_t numNodes, numPrimSlots, maxDepth, sumDepth;
+  };
+
   KDTree* KDTreeBuilder::SetupRealTree (KDNode* rootNode)
   {
-    //Count number of nodes and number of primitive slots  
-    struct CountFunctor
-    {
-      CountFunctor ()
-        : numNodes (0), numPrimSlots (0), maxDepth (0), sumDepth (0)
-      {
-      }
-      
-      void CountNode (KDNode* node, size_t depth = 0)
-      {
-        if (!node)
-          return;
-
-        numNodes++;
-        numPrimSlots += node->primitives.GetSize ();
-
-        //At the same time, collect global statistics
-        if (!node->leftChild)
-        {
-          // Leaf
-          globalStats.kdtree.leafNodes++;
-          sumDepth += depth;
-          maxDepth = csMax (maxDepth, depth);
-        }
-
-
-        CountNode (node->leftChild, depth+1);
-        CountNode (node->rightChild, depth+1);
-      }
-
-      size_t numNodes, numPrimSlots, maxDepth, sumDepth;
-    } counter;
+    CountFunctor counter;
     counter.CountNode (rootNode);
 
     globalStats.kdtree.numNodes += counter.numNodes;
@@ -504,104 +617,7 @@ namespace lighter
     newTree->primitives = static_cast<KDTreePrimitive*> (
       CS::Memory::AlignedMalloc (sizeof(KDTreePrimitive) * counter.numPrimSlots, 32));
 
-    //Copy the tree
-    struct CopyFunctor
-    {
-      CopyFunctor (KDTree* t)
-        : tree (t), usedNodes (2  ), usedPrims (0)
-      {
-      }
-
-      void CopyNodes (KDNode* node, KDTreeNode* newNode)
-      {
-        if (!node)
-          return;
-
-        //Copy node
-        if (node->leftChild)
-        {
-          // inner node
-          KDTreeNode_Op::SetLeaf (newNode, false);
-          KDTreeNode_Op::SetDimension (newNode, node->splitDimension);
-          KDTreeNode_Op::SetLocation (newNode, node->splitLocation);
-
-          // Get nodes for children
-          KDTreeNode* left = tree->nodeList + usedNodes++;
-          KDTreeNode* right = tree->nodeList + usedNodes++;
-
-          KDTreeNode_Op::SetLeft (newNode, left);
-
-          CopyNodes (node->leftChild, left);
-          CopyNodes (node->rightChild, right);
-        }
-        else
-        {
-          // leaf node
-          KDTreeNode_Op::SetLeaf (newNode, true);
-          KDTreeNode_Op::SetPrimitiveListSize (newNode, 
-            node->primitives.GetSize ());
-
-          KDTreePrimitive* prims = tree->primitives + usedPrims;
-          usedPrims += node->primitives.GetSize ();
-
-          KDTreeNode_Op::SetPrimitiveList (newNode, prims);
-
-          // Setup all primitives
-          for (size_t i = 0; i < node->primitives.GetSize (); ++i)
-          {
-            Primitive* prim = node->primitives[i];
-
-            KDTreePrimitive &optPrim = prims[i];
-
-            // Setup optimized
-            optPrim.primPointer = prim;
-
-            //Extract our info
-            const csVector3& N = prim->GetPlane ().Normal ();
-            ObjectVertexData &vdata = prim->GetVertexData ();
-            const Primitive::TriangleType& t = prim->GetTriangle ();
-            const csVector3& A = vdata.vertexArray[t.a].position;
-            const csVector3& B = vdata.vertexArray[t.b].position;
-            const csVector3& C = vdata.vertexArray[t.c].position;
-
-            // Find max normal direction
-            int k = N.DominantAxis ();
-
-            optPrim.normal_K = k;
-
-            size_t u = (k+1)%3;
-            size_t v = (k+2)%3;
-
-            // precalc normal
-            float nkinv = 1.0f/N[k];
-            optPrim.normal_U = N[u] * nkinv;
-            optPrim.normal_V = N[v] * nkinv;
-            optPrim.normal_D = (N * A) * nkinv;
-
-
-            csVector3 bb = C - A;
-            csVector3 cc = B - A;
-
-            float tmp = 1.0f/(bb[u] * cc[v] - bb[v] * cc[u]);
-
-            // edge 1
-            optPrim.edgeA_U = -bb[v] * tmp;
-            optPrim.edgeA_V = bb[u] * tmp;
-            optPrim.edgeA_D = (bb[v] * A[u] - bb[u] * A[v]) * tmp;
-
-            // edge 2
-            optPrim.edgeB_U = cc[v] * tmp;
-            optPrim.edgeB_V = -cc[u] * tmp;
-            optPrim.edgeB_D = (cc[u] * A[v] - cc[v] * A[u]) * tmp;
-
-          }
-        }
-
-      }
-
-      KDTree* tree;
-      size_t usedNodes, usedPrims;
-    } copyer (newTree);
+    CopyFunctor copyer (newTree);
     copyer.CopyNodes (rootNode, newTree->nodeList);
 
     return newTree;
@@ -769,9 +785,9 @@ namespace lighter
   {
     const ObjectVertexData &vdata = prim->GetVertexData ();
     const Primitive::TriangleType& t = prim->GetTriangle ();
-    const csVector3& A = vdata.vertexArray[t.a].position;
-    const csVector3& B = vdata.vertexArray[t.b].position;
-    const csVector3& C = vdata.vertexArray[t.c].position;
+    const csVector3& A = vdata.positions[t.a];
+    const csVector3& B = vdata.positions[t.b];
+    const csVector3& C = vdata.positions[t.c];
 
     vertices[0] = A;
     vertices[1] = B;

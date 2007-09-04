@@ -57,43 +57,36 @@
  *   csRef<csFoo> foo; foo.AttachNew (new (fooPool) csFoo);
  * \endcode
  */
-template<typename Super>
+template<typename Super, typename Allocator = CS::Memory::AllocatorMalloc>
 class scfImplementationPooled : public Super
 {
   typedef typename Super::scfClassType scfClassType;
 public:
-  typedef scfImplementationPooled<Super> scfPooledImplementationType;
+  typedef scfImplementationPooled<Super, Allocator> scfPooledImplementationType;
 
   class Pool
   {
-    friend class scfImplementationPooled<Super>;
+    friend class scfImplementationPooled<Super, Allocator>;
     struct Entry
     {
       Entry* next;
     };
-    Entry* pool;
+    CS::Memory::AllocatorPointerWrapper<Entry, Allocator> pool;
     size_t allocedEntries;
-  #ifdef CS_MEMORY_TRACKER
-    csMemTrackerInfo* mti;
-  #endif
   public:
-    Pool () : pool (0), allocedEntries (0) 
+    Pool () : pool ((Entry*)0), allocedEntries (0) 
     {
-  #ifdef CS_MEMORY_TRACKER
-      mti = 0;
-  #endif
+    }
+    Pool (const Allocator& alloc) : pool (alloc, 0), allocedEntries (0) 
+    {
     }
     ~Pool () 
     {
-      while (pool != 0)
+      while (pool.p != 0)
       {
-	Entry* n = pool->next;
-	cs_free (pool);
-      #ifdef CS_MEMORY_TRACKER
-        mtiUpdateAmount (mti, -1, 
-          -int(sizeof (scfClassType) + sizeof (Entry)));
-      #endif
-	pool = n;
+	Entry* n = pool.p->next;
+	pool.Free (pool.p);
+	pool.p = n;
       }
       CS_ASSERT_MSG ("not all SCF-pooled instances released",
 	allocedEntries == 0);
@@ -110,22 +103,14 @@ public:
     CS_ASSERT_MSG ("Alloc size mismatches class size expected for pooled "
       "allocation", n == sizeof (scfClassType));
     PoolEntry* newEntry;
-    if (p.pool != 0)
+    if (p.pool.p != 0)
     {
-      newEntry = p.pool;
-      p.pool = p.pool->next;
+      newEntry = p.pool.p;
+      p.pool.p = p.pool.p->next;
     }
     else
     {
-      newEntry = static_cast<PoolEntry*> (cs_malloc (n));
-    #ifdef CS_MEMORY_TRACKER
-      if (p.mti == 0)
-      {
-        p.mti = mtiRegisterAlloc (n, typeid (Pool).name());
-      }
-      else
-        mtiUpdateAmount (p.mti, 1, (int)n);
-    #endif
+      newEntry = static_cast<PoolEntry*> (p.pool.Alloc (n));
     }
     p.allocedEntries++;
     scfClassType* newInst = reinterpret_cast<scfClassType*> (newEntry);
@@ -141,8 +126,8 @@ public:
   {
     typedef typename Pool::Entry PoolEntry;
     PoolEntry* entry = static_cast<PoolEntry*> (instance);
-    entry->next = p.pool;
-    p.pool = entry;
+    entry->next = p.pool.p;
+    p.pool.p = entry;
     p.allocedEntries--;
   }
   inline void operator delete (void* instance) 
@@ -156,12 +141,12 @@ public:
   /// DecRef() implementation that returns the object to the pool.
   void DecRef ()
   {
-    if (this->scfRefCount == 1)
+    csRefTrackerAccess::TrackDecRef (this->scfObject, this->scfRefCount);
+    this->scfRefCount--;
+    if (this->scfRefCount == 0)
     {
       delete this->scfObject;
-      return;
     }
-    this->scfRefCount--;
   }
 
   //@{

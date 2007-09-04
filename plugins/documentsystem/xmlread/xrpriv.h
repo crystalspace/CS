@@ -117,6 +117,7 @@ private:
   TrDocumentNodeChildren* parent;
   char* value;
 
+  size_t currentPos, endPos;
 public:
   csXmlReadNodeIterator (csXmlReadDocument* doc,
 	TrDocumentNodeChildren* parent, const char* value);
@@ -124,6 +125,9 @@ public:
 
   virtual bool HasNext ();
   virtual csRef<iDocumentNode> Next ();
+
+  size_t GetNextPosition () { return currentPos; }
+  size_t GetEndPosition ();
 };
 
 /**

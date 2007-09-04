@@ -11,8 +11,10 @@ AC_PREREQ([2.56])
 #------------------------------------------------------------------------------
 # cs_version_number
 #	Keep this value synchronized with CS/include/csver.h.
+#       Also, mk/autoconf/crystal.m4 should be updated with the current version
+#         number.
 #------------------------------------------------------------------------------
-m4_define([cs_version_number], [1.1])
+m4_define([cs_version_number], [1.3])
 
 
 
@@ -22,7 +24,7 @@ m4_define([cs_version_number], [1.1])
 AC_INIT([crystalspace], [cs_version_number],
         [crystal-main@lists.sourceforge.net])
 CS_PACKAGEINFO([Crystal Space],
-    [Copyright (C)1998-2006 Jorrit Tyberghein and others],
+    [Copyright (C)1998-2007 Jorrit Tyberghein and others],
     [http://www.crystalspace3d.org/])
 AC_CONFIG_SRCDIR([libs/Jamfile])
 AC_CONFIG_AUX_DIR([mk/autoconf])
@@ -75,12 +77,7 @@ AS_IF([test -n "$SWIG"],
     [CS_CHECK_PROG_VERSION([swig], [$SWIG -version 2>&1], [1.3.21],
 	[9.9|.9], [CS_EMIT_BUILD_PROPERTY([CMD.SWIG], [$SWIG])])])
 
-CS_CHECK_PROGS([RSVG], [rsvg])
-CS_EMIT_BUILD_PROPERTY([CMD.RSVG], [$RSVG])
-
-CS_CHECK_PROGS([CONVERT], [convert])
-CS_EMIT_BUILD_PROPERTY([CMD.CONVERT], [$CONVERT])
-
+CS_CHECK_COMMON_TOOLS_ICONS
 
 #------------------------------------------------------------------------------
 # In order to avoid alienating users by forcing them to install and use Jam,
@@ -143,6 +140,7 @@ CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [$LDFLAGS], [+])
 AC_LANG_PUSH([C++])
 AC_CHECK_HEADERS([cmath], [CS_HEADER_PROPERTY([CS_HAVE_CMATH_H])])
 AC_CHECK_HEADERS([math.h], [CS_HEADER_PROPERTY([CS_HAVE_MATH_H])])
+AC_CHECK_HEADERS([ieeefp.h], [CS_HEADER_PROPERTY([CS_HAVE_IEEEFP_H])])
 AC_LANG_POP([C++])
 
 CS_CHECK_COMMON_LIBS
@@ -248,7 +246,7 @@ CS_EMIT_BUILD_PROPERTY([PERL5], [$PERL])
 CS_EMIT_BUILD_PROPERTY([PERL], [$PERL])
 CS_EMIT_BUILD_PROPERTY([CMD.PERL5], [$PERL])
 
-# csperl5 fails to build on many platforms, so default is NO for now.
+# csperl5 is experimental/testing so default is NO for now.
 AC_ARG_WITH([perl], [AC_HELP_STRING([--with-perl],
     [use Perl5 scripting interface (default NO)])])
 AS_IF([test -z "$with_perl"], [with_perl=no])
@@ -588,20 +586,6 @@ CS_EMIT_BUILD_FLAGS([how to export all dynamic symbols],
 
 
 #------------------------------------------------------------------------------
-# Check whether the linker needs -Bsymbolic. This binds "references to global 
-# symbols to the definition within the shared library" (from man ld). If this
-# flag is not set, it can happen that symbols in plugins get bound against
-# symbols from other modules (including the application executable itself),
-# causing side-effects such as violating the "memory allocation and freeing in
-# the same module" rule.
-#------------------------------------------------------------------------------
-CS_EMIT_BUILD_FLAGS([for -Bsymbolic linker flag],
-    [cs_cv_prog_link_Bsymbolic], [CS_CREATE_TUPLE([-Wl,-Bsymbolic])],
-    [C++], [COMPILER.LFLAGS], [+])
-
-
-
-#------------------------------------------------------------------------------
 # Check if linker recognizes --kill-at which is needed to make csjava.dll
 # usable by JNI on Windows.  Without this, JNI is unable to find the exported
 # JNI glue functions in csjava.dll.
@@ -620,11 +604,11 @@ CS_CHECK_BUILD([if --kill-at is accepted], [cs_cv_prog_link_kill_at], [],
 #------------------------------------------------------------------------------
 CS_EMIT_BUILD_FLAGS([if reporting missing symbols is supported], 
     [cs_cv_prog_link_z_defs], [CS_CREATE_TUPLE([],[-Wl,-z,defs])], 
-    [C++], [COMPILER.LFLAGS], [+])
+    [C++], [COMPILER.LFLAGS.PRIVATE], [+])
 CS_EMIT_BUILD_FLAGS([if missing symbols can be reported as warnings], 
     [cs_cv_prog_link_warn_unresolved_symbols], 
     [CS_CREATE_TUPLE([],[-Wl,--warn-unresolved-symbols])], 
-    [C++], [COMPILER.LFLAGS], [+])
+    [C++], [COMPILER.LFLAGS.PRIVATE], [+])
 
 
 
@@ -647,7 +631,7 @@ CS_EMIT_BUILD_FLAGS([how to disable function inlining],
 #
 # IMPLEMENTATION NOTES
 #
-# There is an obscure bug in gcc 3.4.x and 4.0.x where
+# There is an obscure bug in gcc 3.4.x and at least up to 4.1.1 where
 # -fvisibility-inlines-hidden on AMD64 in combination with -fPIC and -shared
 # flags causes the linker to fail with a bogus error stating that the target
 # library needs to be built with -fPIC even when it has been built using that
@@ -658,12 +642,13 @@ CS_EMIT_BUILD_FLAGS([how to disable function inlining],
 # -fvisibility-inlines-hidden if the test program fails to link, however,
 # practical experience has shown that this test is not 100% reliable for all
 # such installations. Instead, for simplicity, we disable this flag presently
-# for all versions of gcc on AMD64.  References:
+# for gcc on AMD64.  References:
 #
 #     http://dev.gentoo.org/~kugelfang/pappy-visibility.txt
 #     http://www.gnu.org/software/gcc/gcc-4.0/changes.html#visibility
 #     http://www.nedprod.com/programs/gccvisibility.html
 #     http://bugs.gentoo.org/show_bug.cgi?id=78720
+#     http://trac.crystalspace3d.org/trac/CS/ticket/333
 #
 # Furthermore, there seems to be a bug on MacOS/X with gcc 4.0.x where use of
 # -fvisibility-inlines-hidden causes link problems with external clients which
@@ -680,10 +665,17 @@ CS_CHECK_BUILD_FLAGS([for inline visibility flag],
     [CS_CREATE_TUPLE([-fvisibility-inlines-hidden])],[C++])
 
 AS_IF([test -n "$cs_cv_prog_cxx_visibility_inlines_hidden"],
-    [AC_CACHE_CHECK([if $cs_cv_prog_cxx_visibility_inlines_hidden is buggy],
+    [# The test below can be uncommented and adjusted once a non-buggy gcc 
+    # version is found.
+    #CS_CHECK_PROG_VERSION([g++], [$CXX --version], [4.1], [9.9|.9],
+    #   [cs_cv_gxx_version_buggy=no],
+    #   [cs_cv_gxx_version_buggy=yes])
+    cs_cv_gxx_version_buggy=yes
+    AC_CACHE_CHECK([if $cs_cv_prog_cxx_visibility_inlines_hidden is buggy],
 	[cs_cv_prog_cxx_visibility_inlines_hidden_buggy],
 	[AS_IF([test $ac_compiler_gnu = yes],
-	    [AS_IF([test $host_cpu = x86_64 || test x$cs_host_macosx = xyes],
+	    [AS_IF([test \( $host_cpu = x86_64 -a cs_cv_gxx_version_buggy = yes \) \
+		    || test x$cs_host_macosx = xyes],
 		[cs_cv_prog_cxx_visibility_inlines_hidden_buggy=yes],
 		[cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])],
 	    [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])])],
@@ -787,9 +779,11 @@ AS_IF([test $enable_cpu_specific_optimizations != no],
     [AC_CACHE_CHECK([for code generation flags], [cs_cv_prog_cxx_code_gen],
 	[cs_cv_prog_cxx_code_gen=no
 	AS_IF([test $enable_cpu_specific_optimizations = maximum],
-	    [CS_CHECK_CODE_GEN_FLAG([athlon], [-march=athlon])
+	    [CS_CHECK_CODE_GEN_FLAG([athlon], [-march=athlon -mtune=generic])
+	    CS_CHECK_CODE_GEN_FLAG([athlon], [-march=athlon])
 	    CS_CHECK_CODE_GEN_FLAG([athlon], [-mcpu=athlon -march=athlon])
 	    CS_CHECK_CODE_GEN_FLAG([athlon], [-mcpu=athlon])
+	    CS_CHECK_CODE_GEN_FLAG([*686], [-march=i686 -mtune=generic])
 	    CS_CHECK_CODE_GEN_FLAG([*686], [-march=i686])
 	    CS_CHECK_CODE_GEN_FLAG([*686], [-mcpu=pentiumpro -march=i686])
 	    CS_CHECK_CODE_GEN_FLAG([*686], [-mcpu=pentiumpro])
@@ -806,6 +800,7 @@ AS_IF([test $enable_cpu_specific_optimizations != no],
 	    CS_CHECK_CODE_GEN_FLAG([[*[3-9]86]], [-march=i686])])
 	CS_CHECK_CODE_GEN_FLAG([x86_64], [-march=k8])
 	CS_CHECK_CODE_GEN_FLAG([x86_64], [-mtune=k8])
+	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-march=i586 -mtune=generic])
 	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-march=i586])
 	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-mcpu=pentium -march=i586])
 	CS_CHECK_CODE_GEN_FLAG([[*[5-6]86]], [-mcpu=pentium])
@@ -1552,7 +1547,7 @@ AS_IF([test $cs_cv_libwx = yes],
 	    #endif
 	    #include "wx/glcanvas.h"
 	    ]],
-	    [wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY); glVertex3f(0,0,0)])],
+	    [wxGLCanvas* f = new wxGLCanvas(0, wxID_ANY, wxPoint()); glVertex3f(0,0,0)])],
 	[CS_CREATE_TUPLE(
 	    [$cs_cv_libwx_cflags],
 	    [$cs_cv_libwx_lflags],
@@ -1585,7 +1580,11 @@ AS_IF([test $cs_cv_libCEGUI = yes],
     [CS_CHECK_BUILD([if CEGUI is sufficiently recent], [cs_cv_CEGUI_recent],
 	[AC_LANG_PROGRAM(
 	    [[#include <falagard/CEGUIFalWidgetLookManager.h>]],
-	    [CEGUI::WidgetLookManager::getSingleton();])],
+	    [CEGUI::WidgetLookManager::getSingleton();
+	    #if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR < 5)
+	    who took the ram from the ramalamadingdong?
+	    #endif
+	    ])],
 	[], [C++],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libCEGUI], [CEGUI])], [], [],
 	[$cs_cv_libCEGUI_cflags],
@@ -1621,18 +1620,29 @@ AS_IF([test $cs_host_family != windows],
 
 #------------------------------------------------------------------------------
 # Check for Cg shader package.
+#
+# A note on the 'log()' call: on Linux, libCg.so itself doesn't depend on
+# the libm's shared object. However, if the --as-needed flag is used in 
+# LDFLAGS, and the app itself doesn't use a function from libm, it's symbols 
+# won't be available, causing problems. Normally any app calls some libm
+# function. However, the default test program doesn't, so the link test fails.
+# And the same applies to pthread, too.
+# The workaround is to explicitly strip -Wl,--as-needed from LDFLAGS.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_LIBCG],
     [AC_REQUIRE([CS_CHECK_COMMON_LIBS])
     AC_REQUIRE([CS_CHECK_PTHREAD])
+    AC_REQUIRE([CS_PROG_LINK])
+    LDFLAGS_BACKUP="$LDFLAGS"
+    LDFLAGS=`echo "$LDFLAGS" | sed s/-Wl,--as-needed//`
     CS_CHECK_LIB_WITH([Cg],
-	[AC_LANG_PROGRAM(
-	    [[#include <Cg/cg.h>]],
-	    [CGcontext c = cgCreateContext()])],
-	[], [], [], [],
-	[$cs_cv_libm_cflags $cs_cv_sys_pthread_cflags], 
-	[$cs_cv_libm_lflags $cs_cv_sys_pthread_lflags], 
-	[$cs_cv_libm_libs   $cs_cv_sys_pthread_libs],
+    	[AC_LANG_PROGRAM(
+    	    [[#include <Cg/cg.h>]],
+	   [CGcontext c = cgCreateContext();])],
+    	[], [], [], [],
+    	[$cs_cv_libm_cflags $cs_cv_sys_pthread_cflags], 
+    	[$cs_cv_libm_lflags $cs_cv_sys_pthread_lflags], 
+    	[$cs_cv_libm_libs   $cs_cv_sys_pthread_libs],
 	[cg, CG])
 
     AS_IF([test $cs_cv_libCg = yes],
@@ -1656,7 +1666,9 @@ AC_DEFUN([CS_CHECK_LIBCG],
 	    [$cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags],
 	    [$cs_cv_libCg_lflags $cs_cv_libgl_lflags $cs_cv_libglu_lflags],
 	    [$cs_cv_libCg_libs   $cs_cv_libgl_libs   $cs_cv_libglu_libs],
-	    [cggl, cgGL, CGGL, Cg, cg, CG])])])
+	    [cggl, cgGL, CGGL, Cg, cg, CG])])
+	    
+    LDFLAGS="$LDFLAGS_BACKUP"])
 
 CS_CHECK_LIBCG
 
@@ -1715,21 +1727,6 @@ CS_CHECK_LIB_WITH([caca],
     [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libcaca], [LIBCACA])], [], [], [], [],
     [libcaca])
 
-
-
-#------------------------------------------------------------------------------
-# Check for SpiderMonkey JavaScript library.
-#------------------------------------------------------------------------------
-case $cs_host_family in
-    windows) cs_spidermonkey_platform='XP_WIN' ;;
-    *) cs_spidermonkey_platform='XP_UNIX' ;;
-esac
-
-CS_CHECK_LIB_WITH([js],
-    [AC_LANG_PROGRAM([[#include <js/jsapi.h>]], 
-    [JS_NewRuntime(0)])],
-    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libjs], [JS])], [], 
-    [-D$cs_spidermonkey_platform])
 
 
 
@@ -1901,6 +1898,7 @@ AC_DEFUN([CS_CHECK_HOST_CPU],
     case $host_cpu in
 	[[Ii][3-9]86*|[Xx]86*]) cs_host_cpu=x86 ;;
 	powerpc*) cs_host_cpu=powerpc ;;
+	sparc*) cs_host_cpu=sparc ;;
 	*) cs_host_cpu=$host_cpu ;;
     esac
     cs_host_cpu_normalized="AS_TR_CPP([$cs_host_cpu])"])
@@ -2170,6 +2168,18 @@ CS_SYMBOL_QUALIFIER([how to declare pure functions],
 
 
 #------------------------------------------------------------------------------
+# Check if the "malloc" attribute is available.
+#------------------------------------------------------------------------------
+CS_SYMBOL_QUALIFIER([for "malloc" attribute],
+    [cs_cv_prog_c_attr_malloc],
+    [__attribute__((malloc))], [], [C])
+AS_IF([test $cs_cv_prog_c_attr_malloc != no],
+    [CS_HEADER_PROPERTY([CS_ATTRIBUTE_MALLOC],
+	[$cs_cv_prog_c_attr_malloc])])
+
+
+
+#------------------------------------------------------------------------------
 # CS_CHECK_QSQRT
 #	Check if compiler is able to understand the assembly code in csqsqrt.h.
 #	The MacOS/X PowerPC version of csQsqrt() requires the
@@ -2214,6 +2224,9 @@ AC_DEFUN([CS_CHECK_FINITE],
 	    #endif
 	    #if HAVE_MATH_H
 	    #include <math.h>
+	    #endif
+	    #if HAVE_IEEEFP_H
+	    #include <ieeefp.h>
 	    #endif]],
 	    [float f; $1(f)])],
 	[], [C++], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_HAVE_$1]))], [], [],
@@ -2226,6 +2239,9 @@ CS_CHECK_BUILD([for std::isfinite], [cs_cv_func_std__isfinite],
 	#endif
 	#if HAVE_MATH_H
 	#include <math.h>
+	#endif
+	#if HAVE_IEEEFP_H
+	#include <ieeefp.h>
 	#endif]],
 	[float f; std::isfinite(f)])],
     [], [C++], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_HAVE_STD__ISFINITE]))],

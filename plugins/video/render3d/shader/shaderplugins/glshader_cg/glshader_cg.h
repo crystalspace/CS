@@ -27,9 +27,10 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iutil/comp.h"
 #include "ivideo/shader/shader.h"
 
+#define WIN32_LEAN_AND_MEAN
 #include <Cg/cg.h>
-/* WIN32is used in an "#if" inside <cgGL.h>, however, it is sometimes defined
- * without value. */
+/* WIN32 is used in an "#if" inside <cgGL.h>, however, it is sometimes defined
+* without value. */
 #ifdef WIN32
 #undef WIN32
 #define WIN32 1

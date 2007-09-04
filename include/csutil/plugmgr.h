@@ -27,7 +27,7 @@
 #include "csutil/parray.h"
 #include "csutil/scf.h"
 #include "csutil/scf_implementation.h"
-#include "csutil/thread.h"
+#include "csutil/threading/mutex.h"
 #include "iutil/plugin.h"
 #include "iutil/pluginconfig.h"
 
@@ -43,7 +43,7 @@ class CS_CRYSTALSPACE_EXPORT csPluginManager :
 {
 private:
   /// Mutex to make the plugin manager thread-safe.
-  csRef<csMutex> mutex;
+  CS::Threading::RecursiveMutex mutex;
 
   /**
    * This is a private structure used to keep the list of plugins.

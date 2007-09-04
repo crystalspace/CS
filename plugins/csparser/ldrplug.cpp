@@ -54,7 +54,6 @@ struct csLoaderPluginRec
 csLoader::csLoadedPluginVector::csLoadedPluginVector ()
 {
   plugin_mgr = 0;
-  mutex = csMutex::Create (true);
 }
 
 csLoader::csLoadedPluginVector::~csLoadedPluginVector ()
@@ -64,9 +63,9 @@ csLoader::csLoadedPluginVector::~csLoadedPluginVector ()
 
 void csLoader::csLoadedPluginVector::DeleteAll ()
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   size_t i;
-  for (i = 0 ; i < vector.Length () ; i++)
+  for (i = 0 ; i < vector.GetSize () ; i++)
   {
     csLoaderPluginRec* rec = vector[i];
     if (rec->Component && plugin_mgr)
@@ -83,9 +82,9 @@ void csLoader::csLoadedPluginVector::DeleteAll ()
 csLoaderPluginRec* csLoader::csLoadedPluginVector::FindPluginRec (
 	const char* name)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   size_t i;
-  for (i=0 ; i<vector.Length () ; i++)
+  for (i=0 ; i<vector.GetSize () ; i++)
   {
     csLoaderPluginRec* pl = vector.Get (i);
     if ((!pl->ShortName.IsEmpty ()) && !strcmp (name, pl->ShortName))
@@ -125,7 +124,7 @@ bool csLoader::csLoadedPluginVector::FindPlugin (
 	const char* Name, iLoaderPlugin*& plug,
 	iBinaryLoaderPlugin*& binplug, iDocumentNode*& defaults)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   // look if there is already a loading record for this plugin
   csLoaderPluginRec* pl = FindPluginRec (Name);
   if (pl)
@@ -137,14 +136,14 @@ bool csLoader::csLoadedPluginVector::FindPlugin (
   // create a new loading record
   vector.Push (new csLoaderPluginRec (0, Name, 0, 0, 0));
   defaults = 0;
-  return GetPluginFromRec (vector.Get(vector.Length()-1),
+  return GetPluginFromRec (vector.Get(vector.GetSize ()-1),
   	plug, binplug);
 }
 
 void csLoader::csLoadedPluginVector::NewPlugin
 	(const char *ShortName, iDocumentNode* child)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   csRef<iDocumentNode> id = child->GetNode ("id");
   csRef<iDocumentNode> defaults = child->GetNode ("defaults");
 

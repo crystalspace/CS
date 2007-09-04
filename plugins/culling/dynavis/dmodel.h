@@ -20,6 +20,7 @@
 #define __CS_DMODEL_H__
 
 #include "csgeom/obb.h"
+#include "csgeom/trimeshtools.h"
 #include "csutil/hash.h"
 #include "csutil/scf.h"
 
@@ -35,6 +36,7 @@ class csObjectModelManager;
 struct csPolygonMeshEdge;
 struct iMeshWrapper;
 struct iObjectModel;
+struct iTriangleMesh;
 
 /**
  * Outline information.
@@ -63,8 +65,8 @@ private:
   }
 
 public:
-  int num_outline_edges;
-  int* outline_edges;
+  size_t num_outline_edges;
+  size_t* outline_edges;
   bool* outline_verts;
   float valid_radius;
   csVector3 outline_pos;
@@ -83,7 +85,7 @@ private:
   iObjectModel* imodel;
   long shape_number;	// Last used shape_number from model.
   int ref_cnt;		// Number of objects in vis system using this model.
-  int num_planes;
+  size_t num_planes;
   csPlane3* planes;	// Planes for this model.
 
   bool dirty_obb;	// If true obb is dirty and requires calculation.
@@ -95,6 +97,11 @@ private:
   // attached) in which case we use the polygon based culler.
   bool use_outline_filler;
 
+  // If true then we use the new iTriangleMesh system (as opposed to
+  // iPolygonMesh).
+  bool use_trianglemesh;
+  iTriangleMesh* trianglemesh;
+
   // If true then object is empty and we can't do coverage culling.
   bool empty_object;
 
@@ -102,7 +109,8 @@ private:
   bool single_polygon;
 
   csPolygonMeshEdge* edges;
-  int num_edges;
+  csTriangleMeshEdge* tri_edges;
+  size_t num_edges;
 
   // Outline information (may in future move to a separate class).
   csOutlineInfo outline_info;
@@ -117,6 +125,14 @@ public:
   long GetShapeNumber () const { return shape_number; }
   /// Get the planes.
   const csPlane3* GetPlanes () const { return planes; }
+
+  /// Has viscull mesh.
+  bool HasVisCullMesh (iObjectModel* obj_model);
+  /// Use triangle mesh.
+  iTriangleMesh* GetTriangleMesh ()
+  {
+    return use_trianglemesh ? trianglemesh : 0;
+  }
 
   /// Update outline from the given position. Possibly reuse old outline.
   void UpdateOutline (const csVector3& pos);
@@ -150,10 +166,14 @@ class csObjectModelManager
 private:
   typedef csHash<csDynavisObjectModel*, csPtrKey<iObjectModel> > ModelHash;
   ModelHash models;
+  csStringID base_id;
+  csStringID viscull_id;
 
 public:
   csObjectModelManager ();
   ~csObjectModelManager ();
+
+  void Initialize (iObjectRegistry* object_reg);
 
   /**
    * Find the model for this iObjectModel. If it already exists, increase

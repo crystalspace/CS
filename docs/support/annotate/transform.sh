@@ -19,13 +19,13 @@ for d in $DIRS; do
 <table cellspacing=\"0\" border=\"0\">\
 <tr><td><label>Search:</label></td>\
 <td><input class=\"search\" type=\"text\" name=\"q\" value=\"\" size=\"20\"/>
-<input type=\"hidden\" name=\"ul\" value=\"/docs/\" /></td></tr>\
+<input type=\"hidden\" name=\"tag\" value=\"docs\" /></td></tr>\
 </table></form></li>!" \
       -e "s!( \? </a>]</td>)!\$1
 <td align=\"left\" valign=\"middle\">[ Search: \
 <form style=\"display:inline;\" class=\"search\" action=\"/cgi-bin/search.cgi\" method=\"get\">\
 <input class=\"search\" type=\"text\" name=\"q\" value=\"\" size=\"20\"/>\
-<input type=\"hidden\" name=\"ul\" value=\"/docs/\" />\
+<input type=\"hidden\" name=\"tag\" value=\"docs\" />\
 </form> ]</td>!i" \
       $d
     cp docs/support/annotate/*.php $d

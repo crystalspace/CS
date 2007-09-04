@@ -69,6 +69,8 @@ WalkTest::WalkTest () :
 
   do_edges = false;
   do_show_coord = false;
+  do_object_move = false;
+  object_move_speed = 1.0f;
   busy_perf_test = false;
   do_show_z = false;
   do_show_palette = false;
@@ -141,16 +143,7 @@ void WalkTest::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
-  if (rep)
-  {
-    rep->ReportV (severity, "crystalspace.system", msg, arg);
-  }
-  else
-  {
-    csPrintfV (msg, arg);
-    csPrintf ("\n");
-  }
+  csReportV(object_reg, severity, "crystalspace.system", msg, arg);
   va_end (arg);
 }
 
@@ -267,7 +260,7 @@ void WalkTest::SetupFrame ()
   {
     // Emit recorded commands directly to the CommandHandler
     if (cfg_playrecording > 0 &&
-	recording.Length () > 0)
+	recording.GetSize () > 0)
     {
       csRecordedCamera* reccam = (csRecordedCamera*)recording[
       	cfg_playrecording];
@@ -339,12 +332,12 @@ void WalkTest::MoveSystems (csTicks elapsed_time, csTicks current_time)
   size_t i;
   busy_vector.DeleteAll ();
   csWalkEntity* wentity;
-  for (i = 0 ; i < busy_entities.Length () ; i++)
+  for (i = 0 ; i < busy_entities.GetSize () ; i++)
   {
     wentity = busy_entities[i];
     busy_vector.Push (wentity);
   }
-  for (i = 0 ; i < busy_vector.Length () ; i++)
+  for (i = 0 ; i < busy_vector.GetSize () ; i++)
   {
     wentity = busy_vector[i];
     wentity->NextFrame (elapsed_time);
@@ -414,13 +407,6 @@ void WalkTest::DrawFrameDebug ()
     extern void DrawPalette ();
     DrawPalette ();
   }
-  //if (selected_polygon || selected_light)
-    //view->GetEngine ()->DrawFunc (view->GetCamera (),
-      //view->GetClipper (), draw_edges, (void*)1);
-  if (cfg_debug_check_frustum)
-  {
-    // @@@
-  }
   if (do_show_debug_boxes)
   {
     extern void DrawDebugBoxes (iCamera* cam, bool do3d);
@@ -463,6 +449,19 @@ void WalkTest::DrawFrameConsole ()
     int fw, fh;
     Font->GetMaxSize (fw, fh);
 
+    if (do_object_move || closestMesh)
+    {
+      csString buffer;
+      if (closestMesh)
+        buffer.Format ("[%s%s]", do_object_move ? "O:" : "",
+	    closestMesh->QueryObject ()->GetName ());
+      else
+        buffer.Format ("[%s]", do_object_move ? "O:" : "");
+      GfxWrite ( FRAME_WIDTH / 3, FRAME_HEIGHT - fh - 3, 0, -1, 
+                 "%s", buffer.GetData ());
+      GfxWrite ( FRAME_WIDTH / 3, FRAME_HEIGHT - fh - 3, fgcolor_stats, -1, 
+                 "%s", buffer.GetData ());
+    }
     if (do_show_coord)
     {
       csString buffer;
@@ -572,7 +571,7 @@ void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
 
   // Apply lighting BEFORE the very first frame
   size_t i;
-  for (i = 0 ; i < dynamic_lights.Length () ; i++)
+  for (i = 0 ; i < dynamic_lights.GetSize () ; i++)
   {
     iLight* dyn = dynamic_lights[i];
     extern bool HandleDynLight (iLight*, iEngine*);
@@ -673,12 +672,12 @@ void WalkTest::DrawFrame (csTicks elapsed_time, csTicks current_time)
       recorded_cmd = recorded_arg = 0;
       recording.Push (reccam);
     }
-    if (cfg_playrecording >= 0 && recording.Length () > 0)
+    if (cfg_playrecording >= 0 && recording.GetSize () > 0)
     {
       csRecordedCamera* reccam = (csRecordedCamera*)recording[cfg_playrecording];
       cfg_playrecording++;
       record_frame_count++;
-      if ((size_t)cfg_playrecording >= recording.Length ())
+      if ((size_t)cfg_playrecording >= recording.GetSize ())
       {
 	csTicks t1 = record_start_time;
 	csTicks t2 = csGetTicks ();
@@ -758,13 +757,19 @@ void WalkTest::PrepareFrame (csTicks elapsed_time, csTicks /*current_time*/)
 
   int shift, ctrl;
   float speed = 1;
+  object_move_speed = .01;
 
   ctrl = kbd->GetKeyState (CSKEY_CTRL);
   shift = kbd->GetKeyState (CSKEY_SHIFT);
   if (ctrl)
+  {
     speed = .5;
+  }
   if (shift)
+  {
     speed = 2;
+    object_move_speed = 1.0;
+  }
 
   float delta = float (elapsed_time) / 1000.0f;
   collider_actor.Move (delta, speed, velocity, angle_velocity);
@@ -779,7 +784,7 @@ void perf_test (int num)
   int i;
   for (i = 0 ; i < num ; i++)
   {
-    if (Sys->cfg_playrecording >= 0 && Sys->recording.Length () > 0)
+    if (Sys->cfg_playrecording >= 0 && Sys->recording.GetSize () > 0)
     {
       Sys->record_frame_count++;
     }
@@ -904,45 +909,6 @@ bool WalkTest::SetMapDir (const char* map_dir)
   }
   return true;
 }
-
-#if 0
-
-#include "csutil/thread.h"
-#include "csutil/sysfunc.h"
-#include "iutil/document.h"
-
-class MyThread : public csRunnable
-{
-private:
-  int ref;
-
-public:
-  csRef<iDocument> doc;
-  csRef<iDataBuffer> buf;
-
-public:
-  MyThread () : ref (1) { }
-  virtual ~MyThread () { }
-  virtual void Run ()
-  {
-    csSleep (2000);
-    csPrintf ("================ START PARSING!\n"); fflush (stdout);
-    const char* error = doc->Parse (buf, true);
-    if (error != 0)
-    {
-      csPrintf ("Document system error for file '%s'!", error);
-    }
-    csPrintf ("================ END PARSING!\n"); fflush (stdout);
-  }
-  virtual void IncRef () { ref++; }
-  virtual void DecRef () { ref--; if (ref <= 0) delete this; }
-};
-
-static csRef<csThread> thread1;
-static csRef<csThread> thread2;
-static csRef<csThread> thread3;
-
-#endif
 
 bool WalkTest::Initialize (int argc, const char* const argv[],
 	const char *iConfigName)
@@ -1352,7 +1318,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 	  cp->Load(views[1]->GetCamera (), Engine))
 	camok = true;
     }
-    if (!camok) 
+    if (!camok)
     {
       iSector* room = Engine->GetSectors ()->FindByName ("room");
       if (room)

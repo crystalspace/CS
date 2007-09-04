@@ -22,6 +22,9 @@
 
 #include "gl_r2t_framebuf.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
+{
+
 class csGLRender2TextureEXTfbo : public csGLRender2TextureFramebuf
 {
   bool enableFBO;
@@ -42,6 +45,9 @@ public:
   	int subtexture);
   virtual void FinishDraw ();
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(gl3d)
 
 #endif // __CS_GL_R2T_EXT_FB_O_H__
 

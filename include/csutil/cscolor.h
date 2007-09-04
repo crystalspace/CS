@@ -76,6 +76,11 @@ public:
   {
     return (red == 0 && green == 0 && blue == 0);
   }
+  /// Check if color is all black (red green and blue all below threshold)
+  bool IsBlack (float threshold) const
+  {
+    return (red < threshold && green < threshold && blue < threshold);
+  }
   /// Assign one color object to another.
   csColor& operator= (const csColor& c)
   { red = c.red; green = c.green; blue = c.blue; return *this; }
@@ -112,6 +117,9 @@ public:
   /// Subtract given R,G,B components from color.
   void Subtract (float r, float g, float b)
   { red -= r; green -= g; blue -= b; }
+  /// Return luminance of pixel (assuming sRGB color space)
+  float Luminance() const
+  { return red*0.2126f + green*0.7152f + blue*0.0722f; }
 };
 
 /// Divide a color by a scalar.

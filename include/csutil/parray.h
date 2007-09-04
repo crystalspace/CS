@@ -104,40 +104,40 @@ public:
   /// Pop an element from tail end of array.
   T* Pop ()
   {
-    CS_ASSERT (this->Length () > 0);
-    T* ret = GetAndClear (this->Length () - 1); // see *1*
-    Truncate (this->Length () - 1);
+    CS_ASSERT (this->GetSize () > 0);
+    T* ret = GetAndClear (this->GetSize () - 1); // see *1*
+    Truncate (this->GetSize () - 1);
     return ret;
+  }
+
+  /**
+   * Set the actual number of items in this array. This can be used to shrink
+   * an array (like Truncate()) or to enlarge an array, in which case it will
+   * properly construct all new items using their default (zero-argument)
+   * constructor.
+   * \param n New array length.
+   */
+  void SetSize (size_t n)
+  {
+    superclass::SetSize (0);
   }
 
   /**
    * Variant of SetLength() which copies the pointed-to object instead of
    * the actual pointer.
    */
-  void SetLength (size_t n, T const &what)
+  void SetSize (size_t n, T const &what)
   {
-    if (n <= this->Length ()) // see *1*
+    if (n <= this->GetSize ()) // see *1*
     {
       this->Truncate (n);
     }
     else
     {
-      size_t old_len = this->Length (); // see *1*
-      superclass::SetLength (n);
+      size_t old_len = this->GetSize (); // see *1*
+      superclass::SetSize (n);
       for (size_t i = old_len ; i < n ; i++) this->Get(i) = new T (what);
     }
-  }
-
-  /// Call csArray<T*>::SetLength(n, w).
-  void SetLength (size_t n, T* const &w)
-  {
-    superclass::SetLength(n, w);
-  }
-
-  /// Call csArray<T*>::SetLength(n).
-  void SetLength (size_t n)
-  {
-    superclass::SetLength(n);
   }
 };
 

@@ -77,8 +77,6 @@ void csCEGUIScriptModule::executeString (const CEGUI::String &str)
   scripting->RunText (str.c_str ());
 }
 
-#if (CEGUI_VERSION_MAJOR == 0) && (CEGUI_VERSION_MINOR >= 5)
-
 CEGUI::Event::Connection csCEGUIScriptModule::subscribeEvent(
   CEGUI::EventSet* target, const CEGUI::String& name,
   const CEGUI::String& subscriber_name)
@@ -95,6 +93,3 @@ CEGUI::Event::Connection csCEGUIScriptModule::subscribeEvent(
   // @@@: Not implemented
   return 0;
 }
-
-#endif
-

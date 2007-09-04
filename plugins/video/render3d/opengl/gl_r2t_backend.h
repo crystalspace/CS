@@ -22,9 +22,12 @@
 
 #include "csgeom/csrect.h"
 
-class csGLGraphics3D;
-
 struct iTextureHandle;
+
+CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
+{
+
+class csGLGraphics3D;
 
 /// Superclass for all render2texture backends
 class csGLRender2TextureBackend
@@ -43,5 +46,8 @@ public:
   virtual void SetClipRect (const csRect& clipRect) = 0;
   virtual void SetupClipPortalDrawing () = 0;
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(gl3d)
 
 #endif // __CS_GL_R2T_BACKEND_H__

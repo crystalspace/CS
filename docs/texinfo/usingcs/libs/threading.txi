@@ -14,7 +14,7 @@ namespace.
 
 @subsubheading Atomic operations
 Atomic operations are the basic and smallest operations behind threading safe
-code. Atomic in this context means that they are guranteed to complete with a
+code. Atomic in this context means that they are guaranteed to complete with a
 deterministic result in relation to other threads and even cores doing other
 atomic operations on the same data.
 
@@ -26,7 +26,7 @@ operations, namely:
 @item Operation @tab Function @tab Description
 @item Set
 @tab @code{AtomicOperations::Set}
-@tab Atomically set the content of a poiner or 32 bit integer variable and 
+@tab Atomically set the content of a pointer or 32 bit integer variable and 
 return the value it had before setting it.
 
 @item Read
@@ -55,7 +55,7 @@ to decrementation.
 
 @subsubheading Threads
 A thread is the smallest unit of execution when looking at multithreaded
-execution. Each thread is a "lane" of sequencial execution and by having multiple
+execution. Each thread is a "lane" of sequential execution and by having multiple
 threads executing at the same time you get the effect of simultaneous 
 execution.
 
@@ -95,7 +95,7 @@ Here is an example of a simple thread and creation
 
 using namespace CS::Threading;
 
-class MyRunner : Runnable
+class MyRunner : public Runnable
 @{
   void Run ()
   @{
@@ -118,13 +118,13 @@ int main (int argc, char* argv[])
   csRef<Thread> thread; thread.AttachNew (new Thread (r));
   
   // Start the thread
-  thread.Start ();
+  thread->Start ();
   
   // Wait for a while to let it run
   csSleep (500);
   
   // Wait for the thread to finish running
-  thread.End ();
+  thread->Wait ();
 @}
 @end example
 
@@ -211,7 +211,7 @@ int main (int argc, char* argv[])
   csRef<Thread> thread; thread.AttachNew (new Thread (r));
   
   // Start the thread
-  thread.Start ();
+  thread->Start ();
   
   // Give it some data
   for (int i = 0; i < 100; ++i)

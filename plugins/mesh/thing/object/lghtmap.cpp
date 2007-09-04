@@ -20,7 +20,6 @@
 
 #include "csgfx/packrgb.h"
 #include "csutil/csendian.h"
-#include "csutil/debug.h"
 #include "csutil/memfile.h"
 #include "csutil/util.h"
 
@@ -550,7 +549,7 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
   csRGBcolor* static_lm = GetStaticMap();
 
   long lm_size = lwidth * lheight;
-  finalLM.SetLength (lm_size);
+  finalLM.SetSize (lm_size);
 
   //---
   // First copy the static lightmap to the real lightmap.

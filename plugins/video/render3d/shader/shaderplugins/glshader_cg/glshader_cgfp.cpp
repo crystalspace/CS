@@ -118,7 +118,7 @@ bool csShaderGLCGFP::Compile ()
 
     csArray<csShaderVarMapping> mappings;
     
-    for (i = 0; i < variablemap.Length (); i++)
+    for (i = 0; i < variablemap.GetSize (); i++)
     {
       // Get the Cg parameter
       CGparameter parameter = cgGetNamedParameter (

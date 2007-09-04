@@ -21,6 +21,7 @@
 #define __CS_LIBS_CSUTIL_BFDSYMBOLS_H__
 
 #include "csutil/csstring.h"
+#include "csutil/customallocated.h"
 
 #include <bfd.h>
 
@@ -30,7 +31,7 @@ namespace CS
   {
     
     /// Class to obtain symbols from an object file via libbfd.
-    class BfdSymbols
+    class BfdSymbols : public CS::Memory::CustomAllocated
     {
       bfd* abfd;
       asymbol** syms;

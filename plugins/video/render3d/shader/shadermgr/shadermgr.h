@@ -49,6 +49,8 @@
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderManager)
 {
 
+typedef csHash<csRef<iShaderVariableAccessor>,csStringBase> csSVAHash;
+
 class csShaderManager : 
   public scfImplementation3<csShaderManager,
 			    iShaderManager,
@@ -90,6 +92,9 @@ private:
   csSet<csStringID>& GetTagSet (csShaderTagPresence presence);
   csHash<TagInfo, csStringID> tagInfo;
 
+  // We maintain a hash of shader variable accessors.
+  csSVAHash sva_hash;
+
   csArray<iLight*> activeLights;
 
   csEventID PreProcess;
@@ -112,6 +117,7 @@ public:
    */
   virtual void RegisterShader (iShader* shader);
   virtual void UnregisterShader (iShader* shader);
+  virtual void UnregisterShaders ();
   /// Get a shader by name
   virtual iShader* GetShader (const char* name);
   /// Returns all shaders that have been created
@@ -122,6 +128,14 @@ public:
   virtual void RegisterCompiler (iShaderCompiler* compiler);
   /// Get a shadercompiler by name
   virtual iShaderCompiler* GetCompiler (const char* name);
+
+  virtual void RegisterShaderVariableAccessor (const char* name,
+      iShaderVariableAccessor* accessor);
+  virtual void UnregisterShaderVariableAccessor (const char* name,
+      iShaderVariableAccessor* accessor);
+  virtual iShaderVariableAccessor* GetShaderVariableAccessor (
+      const char* name);
+  virtual void UnregisterShaderVariableAcessors ();
 
   /// Report a message.
   void Report (int severity, const char* msg, ...);

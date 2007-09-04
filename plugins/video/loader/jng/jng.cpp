@@ -912,7 +912,7 @@ bool ImageJngFile::Animate (csTicks time, csRect* dirtyrect)
   {
     if (csPackRGBA::IsRGBpixelSane())
     {
-      memcpy (Image, NewImage, Width * Height * sizeof (csRGBpixel));
+      memcpy (databuf->GetData(), NewImage, Width * Height * sizeof (csRGBpixel));
     }
     else
     {

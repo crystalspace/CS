@@ -50,6 +50,8 @@
 #ifdef WIN32
 #include "csutil/win32/win32.h"
 #include "csutil/win32/wintools.h"
+#include <GL/gl.h>
+#include "csplugincommon/opengl/glcommon2d.h"
 #elif !defined(CS_PLATFORM_MACOSX)
 #define USE_GLX
 #endif
@@ -182,12 +184,63 @@ bool csGraphics2DWX::Open()
     ((accumBits % 32) == 0) ? accumBits / 4 : accumBits / 3;
   */
 
+#ifdef WIN32
+
+  csGLPixelFormatPicker picker (this);
+
+  int pixelFormat = -1;
+
+  PIXELFORMATDESCRIPTOR pfd;
+  pixelFormat = FindPixelFormat (picker, pfd);
+
+  currentFormat[glpfvColorBits] = pfd.cColorBits;
+  currentFormat[glpfvAlphaBits] = pfd.cAlphaBits;
+  currentFormat[glpfvDepthBits] = pfd.cDepthBits;
+  currentFormat[glpfvStencilBits] = pfd.cStencilBits;
+  currentFormat[glpfvAccumColorBits] = pfd.cAccumBits;
+  currentFormat[glpfvAccumAlphaBits] = pfd.cAccumAlphaBits;
+
+  Depth = pfd.cColorBits; 
+
+  pfmt.PixelBytes = (pfd.cColorBits == 32) ? 4 : (pfd.cColorBits + 7) >> 3;
+  pfmt.RedBits = pfd.cRedBits;
+  pfmt.RedShift = pfd.cRedShift;
+  pfmt.RedMask = ((1 << pfd.cRedBits) - 1) << pfd.cRedShift;
+  pfmt.GreenBits = pfd.cGreenBits;
+  pfmt.GreenShift = pfd.cGreenShift;
+  pfmt.GreenMask = ((1 << pfd.cGreenBits) - 1) << pfd.cGreenShift;
+  pfmt.BlueBits = pfd.cBlueBits;
+  pfmt.BlueShift = pfd.cBlueShift;
+  pfmt.BlueMask = ((1 << pfd.cBlueBits) - 1) << pfd.cBlueShift;
+  pfmt.AlphaBits = pfd.cAlphaBits;
+  pfmt.AlphaShift = pfd.cAlphaShift;
+  pfmt.AlphaMask = ((1 << pfd.cAlphaBits) - 1) << pfd.cAlphaShift;
+  pfmt.PalEntries = 0;
+ 
   int desired_attributes[] =
+  {
+      WX_GL_RGBA,
+      WX_GL_DOUBLEBUFFER,
+      WX_GL_DEPTH_SIZE, currentFormat[glpfvDepthBits],
+      WX_GL_MIN_RED, pfd.cRedBits,
+      WX_GL_MIN_BLUE, pfd.cBlueBits,
+      WX_GL_MIN_GREEN, pfd.cGreenBits,
+      WX_GL_MIN_ALPHA, currentFormat[glpfvAlphaBits],
+      WX_GL_STENCIL_SIZE, currentFormat[glpfvStencilBits],
+      WX_GL_MIN_ACCUM_RED, pfd.cAccumRedBits,
+      WX_GL_MIN_ACCUM_BLUE, pfd.cAccumBlueBits,
+      WX_GL_MIN_ACCUM_GREEN, pfd.cAccumGreenBits,
+      WX_GL_MIN_ACCUM_ALPHA, currentFormat[glpfvAccumAlphaBits],
+      0
+  };
+#else
+    int desired_attributes[] =
     {
       WX_GL_RGBA,
       WX_GL_DOUBLEBUFFER,
       0
     };
+#endif
 
   /*WX_GL_DEPTH_SIZE, format[glpfvDepthBits],
     WX_GL_MIN_RED, colorComponentSize,
@@ -213,34 +266,10 @@ bool csGraphics2DWX::Open()
                              wxPoint(0, 0), wxSize(w, h), 0, wxT(""), desired_attributes);
 
   if(theCanvas == 0) Report(CS_REPORTER_SEVERITY_ERROR, "Failed creating GL Canvas!");
-  theCanvas->Show(true);
+  theCanvas->Show (true);
+  theCanvas->SetCurrent ();
 
 #ifdef WIN32
-  {
-    HDC hDC = (HDC)theCanvas->GetHDC();
-    PIXELFORMATDESCRIPTOR pfd;
-    if (DescribePixelFormat (hDC, ::GetPixelFormat (hDC),
-      sizeof(PIXELFORMATDESCRIPTOR), &pfd) == 0)
-    {
-      DWORD error = GetLastError();
-      char* msg = cswinGetErrorMessage (error);
-      Report (CS_REPORTER_SEVERITY_ERROR,
-  "DescribePixelFormat failed: %s [%" PRId32 "]",
-  msg, error);
-      delete[] msg;
-    }
-    else
-    {
-      currentFormat[glpfvColorBits] = pfd.cColorBits;
-      currentFormat[glpfvAlphaBits] = pfd.cAlphaBits;
-      currentFormat[glpfvDepthBits] = pfd.cDepthBits;
-      currentFormat[glpfvStencilBits] = pfd.cStencilBits;
-      currentFormat[glpfvAccumColorBits] = pfd.cAccumBits;
-      currentFormat[glpfvAccumAlphaBits] = pfd.cAccumAlphaBits;
-
-      Depth = pfd.cColorBits;
-    }
-  }
 #elif defined(USE_GLX)
   {
     Display* dpy = (Display*) wxGetDisplay ();
@@ -353,6 +382,124 @@ bool csGraphics2DWX::Open()
 
   return true;
 }
+#ifdef WIN32
+
+struct DummyWndInfo
+{
+  int pixelFormat;
+  csGraphics2DWX* this_;
+  csGraphics2DGLCommon::GLPixelFormat* chosenFormat;
+};
+int csGraphics2DWX::FindPixelFormatGDI (HDC hDC, 
+                                        csGLPixelFormatPicker& picker)
+{
+  int newPixelFormat = 0;
+  GLPixelFormat& format = currentFormat;
+  while (picker.GetNextFormat (format))
+  {
+    PIXELFORMATDESCRIPTOR pfd = {
+      sizeof(PIXELFORMATDESCRIPTOR),  /* size */
+      1,                              /* version */
+      PFD_SUPPORT_OPENGL |
+      PFD_DOUBLEBUFFER |              /* support double-buffering */
+      PFD_DRAW_TO_WINDOW,
+      PFD_TYPE_RGBA,                  /* color type */
+      format[glpfvColorBits],         /* prefered color depth */
+      0, 0, 0, 0, 0, 0,               /* color bits (ignored) */
+      format[glpfvAlphaBits],         /* no alpha buffer */
+      0,                              /* alpha bits (ignored) */
+      format[glpfvAccumColorBits],	/* accumulation buffer */
+      0, 0, 0,			/* accum bits (ignored) */
+      format[glpfvAccumAlphaBits],	/* accum alpha bits */
+      format[glpfvDepthBits],         /* depth buffer */
+      format[glpfvStencilBits],	/* stencil buffer */
+      0,                              /* no auxiliary buffers */
+      PFD_MAIN_PLANE,                 /* main layer */
+      0,                              /* reserved */
+      0, 0, 0                         /* no layer, visible, damage masks */
+    };
+
+    newPixelFormat = ChoosePixelFormat (hDC, &pfd);
+
+    if (newPixelFormat == 0)
+    {
+      DWORD error = GetLastError();
+      char* msg = cswinGetErrorMessage (error);
+      Report (CS_REPORTER_SEVERITY_ERROR,
+        "ChoosePixelFormat failed: %s [%" PRId32 "]",
+        msg, error);
+      delete[] msg;
+    }
+
+    if (DescribePixelFormat (hDC, newPixelFormat, 
+      sizeof(PIXELFORMATDESCRIPTOR), &pfd) == 0)
+    {
+      DWORD error = GetLastError();
+      char* msg = cswinGetErrorMessage (error);
+      Report (CS_REPORTER_SEVERITY_ERROR,
+        "DescribePixelFormat failed: %s [%" PRId32 "]",
+        msg, error);
+      delete[] msg;
+    }
+
+    if (!(pfd.dwFlags & PFD_GENERIC_FORMAT) ||
+      (pfd.dwFlags & PFD_GENERIC_ACCELERATED))
+    {
+      return newPixelFormat;
+    }
+  }
+
+  return newPixelFormat;
+}
+
+
+int csGraphics2DWX::FindPixelFormat (csGLPixelFormatPicker& picker, PIXELFORMATDESCRIPTOR& pfd)
+{
+  static const char* dummyClassName = "CSGL_DummyWindow";
+
+  HINSTANCE ModuleHandle = GetModuleHandle(0);
+
+  WNDCLASS wc;
+  wc.hCursor        = 0;
+  wc.hIcon	    = 0;
+  wc.lpszMenuName   = 0;
+  wc.lpszClassName  = dummyClassName;
+  wc.hbrBackground  = (HBRUSH)(COLOR_BTNFACE + 1);
+  wc.hInstance      = ModuleHandle;
+  wc.style          = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+  wc.lpfnWndProc    = DefWindowProc;
+  wc.cbClsExtra     = 0;
+  wc.cbWndExtra     = 0;
+
+  if (!RegisterClassA (&wc)) return false;
+
+  HWND wnd = CreateWindow (dummyClassName, 0, 0, CW_USEDEFAULT, 
+    CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 0, 0,
+    ModuleHandle, 0);
+
+  int pixel_format = FindPixelFormatGDI (GetDC (wnd), picker);
+
+  if (DescribePixelFormat (GetDC (wnd), pixel_format,
+    sizeof(PIXELFORMATDESCRIPTOR), &pfd) == 0)
+  {
+    DWORD error = GetLastError();
+    char* msg = cswinGetErrorMessage (error);
+    Report (CS_REPORTER_SEVERITY_ERROR,
+      "DescribePixelFormat failed: %s [%" PRId32 "]",
+      msg, error);
+    delete[] msg;
+  }
+
+  DestroyWindow (wnd);
+
+  UnregisterClassA (dummyClassName, ModuleHandle);
+
+  ext.Reset();
+
+  return 0;
+}
+
+#endif
 
 void csGraphics2DWX::Close(void)
 {
@@ -586,7 +733,9 @@ static bool wxCodeToCSCode(int wxkey, utf32_char& raw, utf32_char& cooked)
     MAP (NUMPAD_DOWN,     PAD2,         DOWN)
     MAPC (NUMPAD3,        PAD3,         '3')
     MAP (NUMPAD_NEXT,     PAD3,         PGDN)
+#if wxVERSION_NUMBER < 2700
     MAP (NUMPAD_PAGEDOWN, PAD3,         PGDN)
+#endif
     MAPC (NUMPAD4,        PAD4,         '4')
     MAP (NUMPAD_LEFT,     PAD4,         LEFT)
     MAPC (NUMPAD5,        PAD5,         '5')
@@ -598,7 +747,9 @@ static bool wxCodeToCSCode(int wxkey, utf32_char& raw, utf32_char& cooked)
     MAP (NUMPAD_UP,       PAD8,         UP)
     MAPC (NUMPAD9,        PAD9,         '9')
     MAP (NUMPAD_PRIOR,    PAD9,         PGUP)
+#if wxVERSION_NUMBER < 2700
     MAP (NUMPAD_PAGEUP,   PAD9,         PGUP)
+#endif
     MAPC (MULTIPLY,       PADMULT,      '*')
     MAPC (NUMPAD_MULTIPLY,PADMULT,      '*')
     MAPC (ADD,            PADPLUS,      '+')
@@ -624,8 +775,10 @@ static bool wxCodeToCSCode(int wxkey, utf32_char& raw, utf32_char& cooked)
     MAP (F12,             F12,          F12)
     MAP (NUMLOCK,         PADNUM,       PADNUM)
     MAP (SCROLL,          SCROLLLOCK,   SCROLLLOCK)
+#if wxVERSION_NUMBER < 2700
     MAP (PAGEUP,          PGUP,         PGUP)
     MAP (PAGEDOWN,        PGDN,         PGDN)
+#endif
     MAP (NUMPAD_ENTER,    PADENTER,     ENTER)
     default: return false;
   }

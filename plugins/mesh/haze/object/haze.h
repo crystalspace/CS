@@ -291,6 +291,7 @@ public:
   void GetRadius (float& rad, csVector3& cent)
   { rad = radius; cent = bbox.GetCenter (); }
   virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
+  virtual iTerrainSystem* GetTerrainColldet () { return 0; }
 
   ///--------------------- iMeshObject implementation ------------------------
   virtual iMeshObjectFactory* GetFactory () const { return ifactory; }
@@ -351,6 +352,10 @@ public:
    * does nothing.
    */
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
+  virtual void BuildDecal(const csVector3* pos, float decalRadius,
+          iDecalBuilder* decalBuilder)
+  {
+  }
 
   //------------------------- iHazeState implementation ----------------
   virtual void SetOrigin(const csVector3& pos) { this->origin = pos; }
@@ -359,7 +364,7 @@ public:
   { this->directional=pos;}
   virtual const csVector3& GetDirectional() const
   {return this->directional;}
-  virtual size_t GetLayerCount() const {return this->layers.Length();}
+  virtual size_t GetLayerCount() const {return this->layers.GetSize ();}
   virtual void AddLayer(iHazeHull *hull, float scale)
   {
     csHazeLayer *lay = new csHazeLayer(hull, scale);
@@ -439,7 +444,7 @@ public:
   { this->directional=pos;}
   virtual const csVector3& GetDirectional() const
   {return this->directional;}
-  virtual size_t GetLayerCount() const {return this->layers.Length();}
+  virtual size_t GetLayerCount() const {return this->layers.GetSize ();}
   virtual void AddLayer(iHazeHull *hull, float scale)
   {
     csHazeLayer *lay = new csHazeLayer(hull, scale);

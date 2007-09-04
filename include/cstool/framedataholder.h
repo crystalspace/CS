@@ -25,6 +25,7 @@
  * used in a frame.
  */
 
+#include "csgeom/math.h"
 #include "csutil/array.h"
 
 /**
@@ -68,7 +69,7 @@ class csFrameDataHolder
     {
       /* lastData is reset every frame, so it gives a good indicator
        * on how much has been used the last frame */
-      data.Truncate (lastData+1);
+      data.Truncate (csMin(lastData+1, data.GetSize ()));
       data.ShrinkBestFit ();
       nextShrink = (uint)~0;
     }

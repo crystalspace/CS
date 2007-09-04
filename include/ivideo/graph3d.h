@@ -340,7 +340,7 @@ enum
 #define CS_FX_ADD \
     (CS_MIXMODE_BLEND(ONE, ONE) | CS_MIXMODE_ALPHATEST_DISABLE)
 /** 
- * Alpha blending. Formula: <tt>=(1-srcAlpha)*SRC + srcAlpha*DST</tt>
+ * Alpha blending. Formula: <tt>=srcAlpha*SRC + (1-srcAlpha)*DST</tt>
  * \remarks Usually used with a non-zero alpha part.
  *  \see CS_FX_MASK_ALPHA, \see CS_FX_SETALPHA
  */
@@ -700,7 +700,7 @@ struct csSimpleRenderMesh
  */
 struct iGraphics3D : public virtual iBase
 {
-  SCF_INTERFACE(iGraphics3D, 2, 1, 0);
+  SCF_INTERFACE(iGraphics3D, 2, 1, 1);
   
   /// Open the 3D graphics display.
   virtual bool Open () = 0;
@@ -1004,6 +1004,10 @@ struct iGraphics3D : public virtual iBase
    * \remarks 'this' space is world space, 'other' space is camera space
    */
   virtual const csReversibleTransform& GetWorldToCamera () = 0;
+  /**
+   * Get the current drawflags
+   */
+  virtual int GetCurrentDrawFlags() const = 0;
 };
 
 /** @} */

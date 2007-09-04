@@ -5,7 +5,7 @@
 @noindent
 Originally written by Philip Wyett @email{philipwyett@@blueyonder.co.uk}.
 @noindent
-@emph{Last updated 13 Dec 2004.}
+@emph{Last updated 20 May 2007.}
 
 These instructions are for building Crystal Space with Cygwin a @sc{gnu}
 compiler for Windows created by Red Hat Inc. and other third party
@@ -170,8 +170,17 @@ installation process.
 
 @subsubheading Using ``cs-win32libs''
 
-You can use the ``cs-win32libs'' package to obtain the third-party libraries
-to build Crystal Space.  @xref{cs-win32libs}.
+It is recommended to use the ``cs-win32libs'' package to obtain the required
+and optional third-party libraries needed to build Crystal Space.  
+@xref{cs-win32libs}.
+
+Crystal Space can also be built using some of the libraries from Cygwin (basic
+libraries like @file{zlib}, @file{libpng}, @dots{}) and/or custom-built third
+party libraries.  However you need to take into account that Crystal Space is
+by default built using the @samp{-mno-cygwin} flag; you must either built
+Crystal Space without that flag or build the third party libraries
+accordingly. See the @file{configure} help for details on how to disable the
+flag.
 
 You may want to select ``Cygwin typical'' in the ``Select Components'' screen
 when installing @file{cs-win32libs}.  You can further adjust the selection of
@@ -184,104 +193,26 @@ helper script named @file{cslibs-config} can be found when configuring Crystal
 Space.  The Crystal Space configure script queries @file{cslibs-config} to
 determine where the @file{cs-win32libs} resources are located.
 
-Alternatively, you can use the @code{zlib}, @code{libpng} and @code{libjpg}
-libraries which ship with Cygwin and compile the remaining third-party
-libraries yourself.  In this case, follow the instructions in the following
-sections; otherwise, you can skip to the section
-@ref{Cygwin: Building Crystal Space}.
-
-@subsubheading Installing DirectX 8 @sc{sdk} for Cygwin
-
-The Microsoft DirectX 8 @sc{sdk} which the Cygwin port uses is one created
-especially for it.  You can download it via the following link.
-
-@noindent
-@uref{http://www.crystalspace3d.org/support/cygwin/DXforCygwin.zip}
-
-To install, extract the archive to a location of your choice.  Open a Cygwin
-Bash prompt and navigate to where you extracted the files (that is, the
-directory which contains the @file{Makefile}).  Next, at the command prompt
-type @samp{make install}.
-
-@subsubheading Open Dynamics Engine (required for physics plugin)
-
-The Open Dynamics Engine library is required for successful compilation of the
-Crystal Space @sc{ode} physics plugin.  You can obtain the latest source
-archive at:
-
-@noindent
-@uref{http://opende.sourceforge.net/}
-
-In order to successfully build it, you will need to perform a couple additional
-tasks.  Open a Cygwin Bash prompt and navigate to where you extracted the files
-(that is, the directory which contains the @file{Makefile}).
-
-Sadly, though the @file{lib} directory will be created during configuration on
-all other platforms, this will not happen on Cygwin, so you must do it
-yourself.  At the command prompt enter the following command and hit return.
-
-@example
-mkdir lib
-@end example
-
-Next, it is necessary to update the configuration for the Cygwin platform.
-Open the file @file{config/user-settings} in your favorite editor and change
-the following line from:
-
-@example
-PLATFORM=unix-gcc
-@end example
-
-to:
-
-@example
-PLATFORM=cygwin
-@end example
-
-Make sure you are back in the directory containing the @file{Makefile} before
-continuing. From the Bash prompt issue the following command and then hit
-return.
-
-@example
-make configure
-@end example
-
-Once configuration is complete and you have been returned to the Bash prompt,
-enter the following command and hit return inorder to compile the @sc{ode}
-library.
-
-@example
-make ode-lib
-@end example
-
-Again at the Bash prompt, you can proceed and install
-@sc{ode} into Cygwin.  The easiest way to install @sc{ode} is as follows.  Copy
-the @file{lib} and @file{include} directories and paste them into your Cygwin
-@emph{/usr} directory.  You will be prompted about overwriting files, and
-you should just answer @file{Yes to All}.
-
-@subsubheading Installing the @sc{mng} Library (optional)
-
-In order to successfully build the optional Crystal Space @emph{jng} plugin,
-you must have libmng installed on your system. @xref{GettingLibmng}.
-
-To install, extract the archive to a location of your choice.  Open a Cygwin
-Bash prompt and navigate to where you extracted the files (that is, the
-directory which contains the @file{install-sh}).  Next, at the command prompt
-type @samp{make install}.
-
 @subsubheading Building Crystal Space
 @anchor{Cygwin: Building Crystal Space}
 
 Crystal Space can be built with either @file{make} or Jam (@pxref{GettingJam}).
 Both tools work equally well.  The @file{cs-win32libs} package contains a
 pre-built version of Jam which you can invoke simply by typing @samp{jam} at
-the Cygwin Bash prompt.  In the examples below, wherever @samp{make -k}
-is used, you can instead substitute @file{jam} if you so desire.
+the Cygwin Bash prompt.  These instructions assume you have installed the
+``cs-win32libs'' and are using @file{jam}.  However, if you don't, you can
+substitute @samp{make -k} wherever @samp{jam} is used in the examples below.
 
 Open a Cygwin Bash prompt via the desktop shortcut or the via item in the
 Programs menu.  Navigate to the @file{CS/} directory and issue the following
 commands:
+
+@example
+./configure
+jam all
+@end example
+
+Alternately, if you wish to use Jam to build the project:
 
 @example
 ./configure
@@ -293,19 +224,12 @@ project builder to ignore errors and continue compiling regardless.  This can
 be useful in cases when localized errors appear in the project since often they
 affect only a single module.
 
-Alternately, if you wish to use Jam to build the project:
-
-@example
-./configure
-jam all
-@end example
-
 If you prefer to build a @dfn{debug} version of Crystal Space, substitute
 the following commands for those shown above:
 
 @example
 ./configure --enable-debug
-make -k all
+jam
 @end example
 
 If the Crystal Space source directory is read-only, if it is shared between
@@ -317,7 +241,7 @@ For instance:
 mkdir $HOME/builddir
 cd $HOME/builddir
 /path/to/CS/configure --enable-debug
-make -k all
+jam
 @end example
 
 Finally, if you want to utilize Crystal Space as a software development kit
@@ -325,8 +249,8 @@ Finally, if you want to utilize Crystal Space as a software development kit
 process:
 
 @example
-make install
-make distclean
+jam install
+jam distclean
 @end example
 
 @subsubheading Additional Build Options
@@ -335,8 +259,8 @@ Sometimes it is a good idea to remove all of the built programs and executable
 files and start from scratch.  You can do this with the following commands:
 
 @example
-make clean
-make -k all
+jam clean
+jam
 @end example
 
 Once in a while it is even a good idea to completely clean and re-configure the
@@ -344,7 +268,7 @@ project.  This may be required if you are using the bleeding-edge version of
 Crystal Space from the @sc{svn} repository after some radical change.
 
 @example
-make distclean
+jam distclean
 ./configure
-make -k all
+jam
 @end example

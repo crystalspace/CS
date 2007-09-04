@@ -114,6 +114,8 @@ public:									\
   virtual int GetRefCount ();						\
   virtual void AddRefOwner (void** ref_owner);				\
   virtual void RemoveRefOwner (void** ref_owner);			\
+  scfInterfaceMetadataList* GetInterfaceMetadata () \
+  { return 0; } \
   virtual void *QueryInterface (scfInterfaceID iInterfaceID, int iVersion)
 
 /**
@@ -212,7 +214,7 @@ void Class::DecRef ()							\
 void Class::scfRemoveRefOwners ()					\
 {									\
   if (!scfWeakRefOwners) return;					\
-  for (size_t i = 0 ; i < scfWeakRefOwners->Length () ; i++)		\
+  for (size_t i = 0 ; i < scfWeakRefOwners->GetSize () ; i++)		\
   {									\
     void** p = (*scfWeakRefOwners)[i];					\
     *p = 0;								\

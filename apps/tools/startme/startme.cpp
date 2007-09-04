@@ -79,7 +79,7 @@ void StartMe::ProcessFrame ()
   }
 
   float dr = elapsed_seconds / star_maxage;
-  size_t j = star_queue.Length ();
+  size_t j = star_queue.GetSize ();
   while (j > 0)
   {
     j--;
@@ -135,7 +135,7 @@ void StartMe::ProcessFrame ()
   if (sqdist >= 0 && sel_mesh)
   {
     const char* name = sel_mesh->QueryObject ()->GetName ();
-    for (i = 0 ; i < demos.Length () ; i++)
+    for (i = 0 ; i < demos.GetSize () ; i++)
       if (!strcmp (demos[i].name, name))
       {
         demos[i].spinning_speed += elapsed_seconds / 80.0f;
@@ -146,7 +146,7 @@ void StartMe::ProcessFrame ()
   }
   last_selected = sel;
 
-  for (i = 0 ; i < demos.Length () ; i++)
+  for (i = 0 ; i < demos.GetSize () ; i++)
   {
     if (sel != i)
     {
@@ -273,7 +273,7 @@ bool StartMe::LoadTextures ()
 
   vfs->ChDir ("/lib/startme");
   size_t i;
-  for (i = 0 ; i < demos.Length () ; i++)
+  for (i = 0 ; i < demos.GetSize () ; i++)
   {
     if (!loader->LoadTexture (demos[i].name, demos[i].image))
       return ReportError ("Error loading '%s' texture!", demos[i].image);
@@ -464,11 +464,11 @@ void StartMe::CreateRoom ()
   box_state->CalculateNormals ();
 
   int cols = 4;
-  int rows = int (demos.Length ()-1) / cols + 1;
+  int rows = int (demos.GetSize ()-1) / cols + 1;
   float dx = (DEMO_MESH_MAXX-DEMO_MESH_MINX) / float (cols-1);
   float dy = (DEMO_MESH_MAXY-DEMO_MESH_MINY) / float (rows-1);
   int x = 0, y = rows-1;
-  for (i = 0 ; i < demos.Length () ; i++)
+  for (i = 0 ; i < demos.GetSize () ; i++)
   {
     demos[i].mesh = CreateDemoMesh (demos[i].name,
       	csVector3 (DEMO_MESH_MINX + dx * float (x),

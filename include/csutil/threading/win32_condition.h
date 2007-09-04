@@ -77,7 +77,7 @@ namespace Implementation
     }
 
     template<typename LockType>
-    void Wait (LockType& lock)
+    bool Wait (LockType& lock, csTicks timeout)
     {
       WaitListEntry waitEntry;
 
@@ -90,10 +90,13 @@ namespace Implementation
       {
         AddEntryHelper<LockType> entryGuard (this, waitEntry, lock);
 
+	DWORD r;
         // Loop until notified
         while (!AtomicOperations::Read (&waitEntry.notified) &&
-                Implementation::SleepEx (INFINITE, true) == WAIT_IO_COMPLETION)
+          (r = Implementation::SleepEx (timeout == 0 ? INFINITE : timeout, 
+	    true)) == WAIT_IO_COMPLETION)
           ;
+	return r != 0;
       }
     }
 

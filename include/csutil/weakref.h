@@ -36,11 +36,15 @@ struct iBase;
  * all weak references pointing to that object are cleared. This kind of
  * reference is useful if you want to maintain some kind of cached objects
  * that can safely be removed as soon as the last reference to it is gone.
- * <p>
+ * 
  * Note: this class assumes that the T type implements at least the following
  * functions:
  * - AddRefOwner()
  * - RemoveRefOwner()
+ *
+ * \remarks An extended explanation on smart pointers - how they work and what
+ *   type to use in what scenario - is contained in the User's manual, 
+ *   section "Correctly Using Smart Pointers".
  */
 template <class T>
 class csWeakRef
@@ -51,6 +55,9 @@ private:
     T* obj;
     void* obj_void;
   };
+#if defined(CS_DEBUG)
+  void* this_saved;
+#endif
 
   /**
    * Unlink the object pointed to by this weak reference so that
@@ -74,13 +81,21 @@ public:
   /**
    * Construct an empty weak reference.
    */
-  csWeakRef () : obj (0) {}
+  csWeakRef () : obj (0) 
+  {
+#if defined(CS_DEBUG)
+    this_saved = this;
+#endif
+  }
 
   /**
    * Construct a weak reference from a normal pointer.
    */
   csWeakRef (T* newobj)
   {
+#if defined(CS_DEBUG)
+    this_saved = this;
+#endif
     obj = newobj;
     Link ();
   }
@@ -90,6 +105,9 @@ public:
    */
   csWeakRef (csRef<T> const& newobj)
   {
+#if defined(CS_DEBUG)
+    this_saved = this;
+#endif
     obj = newobj;
     Link ();
   }
@@ -99,6 +117,9 @@ public:
    */
   csWeakRef (csWeakRef const& other) : obj (other.obj)
   {
+#if defined(CS_DEBUG)
+    this_saved = this;
+#endif
     Link ();
   }
 
@@ -108,6 +129,9 @@ public:
    */
   csWeakRef (const csPtr<T>& newobj)
   {
+#if defined(CS_DEBUG)
+    this_saved = this;
+#endif
     csRef<T> r = newobj;
     obj = r;
     Link ();
@@ -118,6 +142,10 @@ public:
    */
   ~csWeakRef ()
   {
+#if defined(CS_DEBUG)
+    CS_ASSERT_MSG ("A csWeakRef<> was memcpy()ed, which is not allowed",
+      this_saved == this);
+#endif
     Unlink ();
   }
 

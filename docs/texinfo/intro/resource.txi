@@ -120,7 +120,7 @@ Reference Manual} can be converted to @sc{html} format by invoking the
 These makefile targets place the generated output in appropriately named
 subdirectories of @file{$@{builddir@}/out/docs}.
 
-@node Mailing Lists, Internet Relay Chat (IRC), Where to Get, CS Introduction
+@node Mailing Lists, IRC, Where to Get, CS Introduction
 @section Mailing Lists
 @cindex Mailing Lists
 
@@ -207,7 +207,7 @@ unsubscribing.
 
 @uref{http://lists.sourceforge.net/mailman/listinfo/crystal-tracker/}
 
-@node Internet Relay Chat (IRC), Feedback, Mailing Lists, CS Introduction
+@node IRC, Feedback, Mailing Lists, CS Introduction
 @section Internet Relay Chat (@sc{irc})
 @cindex Internet Relay Chat (@sc{irc})
 @cindex @sc{irc}

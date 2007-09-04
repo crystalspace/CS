@@ -66,6 +66,9 @@ struct LightingClassic
   <?if vars."tex lightmap".texture ?>
     light_diffuse = 2 * tex2D (lightingClassicFrag.lightmap, 
       texCoordLM).rgb;
+    /*float grid_x = (frac (texCoordLM.x * 1024) &lt; 0.02) ? 0 : 1;
+    float grid_y = (frac (texCoordLM.y * 1024) &lt; 0.02) ? 0 : 1;
+    light_diffuse = light_diffuse * grid_x * grid_y;*/
   <?else?>
     light_diffuse = primaryColor.rgb;
   <?endif?>
