@@ -13,6 +13,8 @@ chronological order.
 	  as the user obviously can't get a deprecation warning for a method
 	  because the marker for it is commented out!
 	- res fixed a deallocation mismatch in VFS.
+	- res fixed some Cg errors and warnings in some weaver snippets 
+	  due the recent weaver changes.
 2-Sep-2007
 	- res added a hash computer and comparator for csMD5::Digest.
 	- res fixed the same node collapsing in the shader weaver to add 

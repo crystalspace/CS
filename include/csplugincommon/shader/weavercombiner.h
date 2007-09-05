@@ -21,6 +21,7 @@
 #define __CS_CSPLUGINCOMMON_SHADER_WEAVERCOMBINER_H__
 
 #include "csutil/scf.h"
+#include "csgeom/vector4.h"
 #include <limits.h>
 
 /**\file
@@ -67,6 +68,9 @@ namespace CS
          * Query a chain of coercions from a type to another.
          * Nodes are atom-snippet-esque.
          */
+        /* @@@ FIXME: A bit of a design issue that weaver nodes are returned,
+                      since that means combiners have to "know" the syntax of
+                      weaver input docs! */
         virtual csPtr<iCoerceChainIterator> QueryCoerceChain (const char* fromType,
           const char* toType) = 0;
         /**
@@ -116,9 +120,17 @@ namespace CS
       
       struct iCombinerLoader : public virtual iBase
       {
-        SCF_INTERFACE (iCombinerLoader, 0, 0, 1);
+        SCF_INTERFACE (iCombinerLoader, 0, 0, 2);
         
         virtual csPtr<iCombiner> GetCombiner (iDocumentNode* params) = 0;
+
+        virtual void GenerateConstantInputBlocks (iDocumentNode* node,
+          const char* locationPrefix, const csVector4& value,
+          int usedComponents, const char* outputName) = 0;
+        virtual void GenerateSVInputBlocks (iDocumentNode* node,
+          const char* locationPrefix, const char* svName, 
+          const char* outputType, const char* outputName, 
+          const char* uniqueTag) = 0;
       };
     } // namespace ShaderWeaver
   } // namespace PluginCommon

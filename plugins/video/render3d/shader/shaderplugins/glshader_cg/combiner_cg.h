@@ -59,6 +59,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     /**\name CS::PluginCommon::ShaderWeaver::iCombinerLoader implementation
     * @{ */
     csPtr<WeaverCommon::iCombiner> GetCombiner (iDocumentNode* params);
+
+    void GenerateConstantInputBlocks (iDocumentNode* node,
+      const char* locationPrefix, const csVector4& value,
+      int usedComponents, const char* outputName);
+    void GenerateSVInputBlocks (iDocumentNode* node,
+      const char* locationPrefix, const char* svName, 
+      const char* outputType, const char* outputName, 
+      const char* uniqueTag);
     /** @} */
   
     /**\name iComponent implementation

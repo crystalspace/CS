@@ -56,8 +56,8 @@ csShaderProgram::~csShaderProgram ()
 {
 }
 
-bool csShaderProgram::ParseProgramParam (iDocumentNode* node,
-  ProgramParam& param, uint types)
+bool csShaderProgram::ProgramParamParser::ParseProgramParam (
+  iDocumentNode* node, ProgramParam& param, uint types)
 {
   const char* type = node->GetAttributeValue ("type");
   if (type == 0)

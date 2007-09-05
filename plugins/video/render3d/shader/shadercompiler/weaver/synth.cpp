@@ -66,6 +66,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     shaderNode->SetValue ("shader");
     CS::DocSystem::CloneAttributes (sourceNode, shaderNode);
     shaderNode->SetAttribute ("compiler", "xmlshader");
+
+    csRef<iDocumentNodeIterator> shaderVarNodes = 
+      sourceNode->GetNodes ("shadervar");
+    while (shaderVarNodes->HasNext ())
+    {
+      csRef<iDocumentNode> svNode = shaderVarNodes->Next ();
+      csRef<iDocumentNode> newNode = 
+        shaderNode->CreateNodeBefore (svNode->GetType ());
+      CS::DocSystem::CloneNode (svNode, newNode);
+    }
     
     if (graphs.GetSize() > 0)
     {

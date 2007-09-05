@@ -74,6 +74,7 @@ protected:
   csRef<iSyntaxService> synsrv;
   csRef<iStringSet> strings;
 
+public:
   /**
    * Expected/accepted types for a program parameter 
    */
@@ -107,9 +108,36 @@ protected:
     ProgramParam() : valid (false), name(csInvalidStringID) { }
   };
 
-  /// Parse program parameter node
+  class CS_CRYSTALSPACE_EXPORT ProgramParamParser
+  {
+    iSyntaxService* synsrv;
+    iStringSet* stringsSvName;
+  public:
+    ProgramParamParser (iSyntaxService* synsrv, iStringSet* stringsSvName) :
+        synsrv (synsrv), stringsSvName (stringsSvName) {}
+
+    /**
+     * Parse program parameter node.
+     * \param node Node to parse.
+     * \param param Output program parameter.
+     * \param types Combination of ProgramParamType flags, specifying the 
+     *   allowed parameter types.
+     */
+    bool ParseProgramParam (iDocumentNode* node,
+      ProgramParam& param, uint types = ~0);
+  };
+
+protected:
+  /**
+   * Parse program parameter node
+   * \sa ProgramParamParser::ParseProgramParam
+   */
   bool ParseProgramParam (iDocumentNode* node,
-    ProgramParam& param, uint types = ~0);
+    ProgramParam& param, uint types = ~0)
+  {
+    ProgramParamParser parser (synsrv, stringsSvName);
+    return parser.ParseProgramParam (node, param, types);
+  }
 
   /**
    * Holder of variable mapping 
