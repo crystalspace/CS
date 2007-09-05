@@ -27,6 +27,7 @@
 #include "ivaria/reporter.h"
 
 #include "csplugincommon/shader/weavertypes.h"
+#include "csutil/cfgacc.h"
 #include "csutil/documenthelper.h"
 #include "csutil/fifo.h"
 #include "csutil/scfstr.h"
@@ -88,7 +89,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   {
     object_reg = reg;
     
-    csRef<iConfigManager> config(csQueryRegistry<iConfigManager> (object_reg));
+    csConfigAccess config (object_reg);
     
     const char* libraryPath =
       config->GetStr ("Video.OpenGL.Shader.Cg.Combiner.CoerceLibrary");
@@ -101,6 +102,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     if (!LoadCoercionLibrary (libraryPath))
       return false;
     
+    annotateCombined = config->GetBool ("Video.ShaderWeaver.AnnotateOutput");
+
     return true;
   }
   
@@ -139,19 +142,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     va_end (args);
   }
     
-  csPtr<iDocumentNodeIterator> ShaderCombinerLoaderCg::QueryCoerceChain (
-    const char* fromType, const char* toType)
+  csPtr<WeaverCommon::iCoerceChainIterator> 
+  ShaderCombinerLoaderCg::QueryCoerceChain (const char* fromType, 
+                                            const char* toType)
   {
-    csArray<const CoerceItem*> chain;
-    
-    FindCoerceChain (fromType, toType, chain);
-    
     csRef<CoerceChainIterator> iterator;
     iterator.AttachNew (new CoerceChainIterator);
-    for (size_t i = 0; i < chain.GetSize(); i++)
-      iterator->nodes.Push (chain[i]->node);
-      
-    return csPtr<iDocumentNodeIterator> (iterator);
+    
+    FindCoerceChain (fromType, toType, iterator->nodes);
+    
+    return csPtr<WeaverCommon::iCoerceChainIterator> (iterator);
   }
   
   uint ShaderCombinerLoaderCg::CoerceCost (const char* fromType, 
@@ -204,6 +204,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       return false;
     }
     
+    CoercionTemplates templates;
     csRef<iDocumentNodeIterator> nodes = startNode->GetNodes();
     while (nodes->HasNext())
     {
@@ -217,6 +218,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
           if (!ParseCoercion (child))
             return false;
           break;
+        case XMLTOKEN_COERCIONTEMPLATE:
+          if (!ParseCoercionTemplates (child, templates))
+            return false;
+          break;
 	default:
 	  {
 	    csRef<iSyntaxService> synsrv = csQueryRegistry<iSyntaxService> (
@@ -227,7 +232,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 	  }
       }
     }
-    return true;
+    return SynthesizeDefaultCoercions (templates);
   }
   
   bool ShaderCombinerLoaderCg::ParseCoercion (iDocumentNode* node)
@@ -258,19 +263,111 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     {
       cost = costAttr->GetValueAsInt ();
     }
+
+    csRef<iDocumentNode> inputNode = 
+      node->CreateNodeBefore (CS_NODE_ELEMENT);
+    inputNode->SetValue ("input");
+    inputNode->SetAttribute ("name", "input");
+    inputNode->SetAttribute ("type", from);
+    
+    csRef<iDocumentNode> outputNode = 
+      node->CreateNodeBefore (CS_NODE_ELEMENT);
+    outputNode->SetValue ("output");
+    outputNode->SetAttribute ("name", "output");
+    outputNode->SetAttribute ("type", to);
     
     CoerceItem item;
-    item.toType = to;
+    item.fromType = StoredTypeName (from);
+    item.toType = StoredTypeName (to);
     item.cost = cost;
     item.node = node;
     CoerceItems* items = coercions.GetElementPointer (from);
     if (items == 0)
     {
-      coercions.Put (from, CoerceItems());
+      coercions.Put (StoredTypeName (from), CoerceItems());
       items = coercions.GetElementPointer (from);
     }
     items->InsertSorted (item, &CoerceItemCompare);
     
+    return true;
+  }
+
+  bool ShaderCombinerLoaderCg::ParseCoercionTemplates (iDocumentNode* node, 
+    CoercionTemplates& templates)
+  {
+    const char* name = node->GetAttributeValue ("name");
+    if (!name || !*name)
+    {
+      Report (CS_REPORTER_SEVERITY_ERROR, node, 
+        "Non-empty 'name' attribute expeected");
+      return false;
+    }
+    templates.PutUnique (name, node);
+    return true;
+  }
+
+  bool ShaderCombinerLoaderCg::SynthesizeDefaultCoercions (
+    const CoercionTemplates& templates)
+  {
+    iDocumentNode* templNormalize = templates.Get ("normalize", 
+      (iDocumentNode*)0);
+    if (!templNormalize)
+    {
+      Report (CS_REPORTER_SEVERITY_ERROR, 
+        "No 'normalize' coercion template");
+      return false;
+    }
+    iDocumentNode* templPassthrough = templates.Get ("passthrough", 
+      (iDocumentNode*)0);
+    if (!templPassthrough)
+    {
+      Report (CS_REPORTER_SEVERITY_ERROR, 
+        "No 'passthrough' coercion template");
+      return false;
+    }
+
+    csRef<iDocumentSystem> docsys (
+      csQueryRegistry<iDocumentSystem> (object_reg));
+    if (!docsys.IsValid())
+      docsys.AttachNew (new csTinyDocumentSystem);
+
+    ShaderWeaver::TypeInfoIterator typeIt;
+    while (typeIt.HasNext())
+    {
+      csString type;
+      const ShaderWeaver::TypeInfo& typeInfo = *typeIt.Next (type);
+      iDocumentNode* templ = 0;
+      ShaderWeaver::TypeInfo newTypeInfo (typeInfo);
+      if (typeInfo.semantics == ShaderWeaver::TypeInfo::Direction)
+      {
+        if (typeInfo.unit)
+        {
+          templ = templPassthrough;
+          newTypeInfo.unit = false;
+        }
+        else
+        {
+          templ = templNormalize;
+          newTypeInfo.unit = true;
+        }
+      }
+      else if (typeInfo.space != ShaderWeaver::TypeInfo::NoSpace)
+      {
+        templ = templPassthrough;
+        newTypeInfo.space = ShaderWeaver::TypeInfo::NoSpace;
+      }
+      const char* newTypeName = ShaderWeaver::QueryType (newTypeInfo);
+      if( (templ != 0) && (newTypeName != 0))
+      {
+        csRef<iDocument> doc = docsys->CreateDocument();
+        csRef<iDocumentNode> root = doc->CreateRoot ();
+        csRef<iDocumentNode> main = root->CreateNodeBefore (CS_NODE_ELEMENT);
+        CS::DocSystem::CloneNode (templ, main);
+        main->SetAttribute ("from", type);
+        main->SetAttribute ("to", newTypeName);
+        ParseCoercion (main);
+      }
+    }
     return true;
   }
 
@@ -351,7 +448,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       // Search for direct match
       for (size_t i = 0; i < items->GetSize(); i++)
       {
-	if (items->Get (i).toType == to)
+	if (strcmp (items->Get (i).toType, to) == 0)
 	{
 	  chain.Push (&items->Get (i));
 	  return;
@@ -367,7 +464,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 	}
       }
     }
-    
+
+    // To avoid unnecessary complicated each type can only appear once.
+    csSet<csString> seenTypes;
+    seenTypes.Add (from);
+    // Keep track of used coercions to prevent loops.
     csSet<csConstPtrKey<CoerceItem> > checkedItems;
     while (sourcesToTest.GetSize() > 0)
     {
@@ -380,7 +481,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 	for (size_t i = 0; i < items->GetSize(); i++)
 	{
           const CoerceItem& item = items->Get (i);
-	  if (item.toType == to)
+	  if (strcmp (item.toType, to) == 0)
 	  {
 	    // Generate chain
 	    size_t d = testFrom.depth+1;
@@ -390,22 +491,27 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 	    size_t h = testFrom.hierarchy;
 	    while (d-- > 0)
 	    {
-	      chain[d] = hierarchy[h].item;
 	      h = hierarchy[h].parent;
+              const CoerceItem* hItem = hierarchy[h].item;
+	      chain[d] = hItem;
 	    }
-	    return;
+            return;
 	  }
 	  else
 	  {
 	    // Otherwise, search if no match is found.
-	    sourcesToTest.Push (TestSource<CoerceItem> (item,
-	      testFrom.depth+1, 
-	      hierarchy.Push (Hierarchy<CoerceItem> (&item, 
-	        testFrom.hierarchy))));
+            if (!seenTypes.Contains (item.toType))
+            {
+	      sourcesToTest.Push (TestSource<CoerceItem> (item,
+	        testFrom.depth+1, 
+	        hierarchy.Push (Hierarchy<CoerceItem> (&item, 
+	          testFrom.hierarchy))));
+            }
 	  }
 	}
       }
       checkedItems.AddNoTest (testFrom.item);
+      seenTypes.Add (testFrom.type);
     }
   }
   
@@ -413,12 +519,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   
   ShaderCombinerCg::ShaderCombinerCg (ShaderCombinerLoaderCg* loader, 
                                       bool vp, bool fp) : 
-    scfImplementationType (this), loader (loader), writeVP (vp), writeFP (fp)
+    scfImplementationType (this), loader (loader), writeVP (vp), writeFP (fp),
+    uniqueCounter (0)
   {
   }
   
-  void ShaderCombinerCg::BeginSnippet ()
+  void ShaderCombinerCg::BeginSnippet (const char* annotation)
   {
+    currentSnippet.annotation = annotation;
   }
   
   void ShaderCombinerCg::AddInput (const char* name, const char* type)
@@ -426,6 +534,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     if (!currentSnippet.localIDs.Contains (name))
     {
       currentSnippet.localIDs.AddNoTest (name);
+      if (loader->annotateCombined)
+        currentSnippet.locals.AppendFmt ("// Input: %s %s\n", type, name);
       currentSnippet.locals.AppendFmt ("%s %s;\n", 
 	CgType (type).GetData(), name);
     }
@@ -436,6 +546,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     if (!currentSnippet.localIDs.Contains (name))
     {
       currentSnippet.localIDs.AddNoTest (name);
+      if (loader->annotateCombined)
+        currentSnippet.locals.AppendFmt ("// Output: %s %s\n", type, name);
       currentSnippet.locals.AppendFmt ("%s %s;\n", 
 	CgType (type).GetData(), name);
     }
@@ -444,19 +556,17 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   void ShaderCombinerCg::InputRename (const char* fromName, 
                                       const char* toName)
   {
-    currentSnippet.inputMaps.AppendFmt ("%s = %s;\n",
-      toName, fromName);
+    currentSnippet.inputMaps.Put (fromName, toName);
   }
   
   void ShaderCombinerCg::OutputRename (const char* fromName, 
 				      const char* toName)
   {
-    currentSnippet.outputMaps.AppendFmt ("%s = %s;\n",
-      toName, fromName);
+    currentSnippet.outputMaps.Put (fromName, toName);
   }
   
-  csPtr<iDocumentNodeIterator> ShaderCombinerCg::QueryCoerceChain (
-    const char* fromType, const char* toType)
+  csPtr<WeaverCommon::iCoerceChainIterator> 
+  ShaderCombinerCg::QueryCoerceChain (const char* fromType, const char* toType)
   {
     return loader->QueryCoerceChain (fromType, toType);
   }
@@ -513,23 +623,43 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
   
   bool ShaderCombinerCg::EndSnippet ()
   {
+    for (size_t n = 0; n < currentSnippet.vert2frag.GetSize(); n++)
+    {
+      iDocumentNode* node = currentSnippet.vert2frag[n];
+      if (node->GetType() == CS_NODE_ELEMENT)
+      {
+        const char* name = node->GetAttributeValue ("name");
+        if (name != 0)
+        {
+          csString uniqueName;
+          uniqueName.Format ("%s_%zu", name, uniqueCounter++);
+          currentSnippet.v2fMaps.PutUnique (name, uniqueName);
+        }
+      }
+    }
+
     snippets.Push (currentSnippet);
     currentSnippet = Snippet ();
     return true;
   }
     
-  void ShaderCombinerCg::AddGlobal (const char* name, const char* type)
+  void ShaderCombinerCg::AddGlobal (const char* name, const char* type,
+                                    const char* annotation)
   {
     if (!globalIDs.Contains (name))
     {
       globalIDs.AddNoTest (name);
+      if (annotation) globals.AppendFmt (MakeComment (annotation));
       globals.AppendFmt ("%s %s;\n", CgType (type).GetData(), name);
     }
   }
     
-  void ShaderCombinerCg::SetOutput (const char* name)
+  void ShaderCombinerCg::SetOutput (const char* name,
+                                    const char* annotation)
   {
-    outputAssign.Format ("outputColor = %s;\n", name);
+    outputAssign.Empty();
+    if (annotation) outputAssign.AppendFmt (MakeComment (annotation));
+    outputAssign.AppendFmt ("outputColor = %s;\n", name);
   }
   
   uint ShaderCombinerCg::CoerceCost (const char* fromType, const char* toType)
@@ -563,7 +693,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       csRef<iDocumentNode> programNode = cgvpNode->CreateNodeBefore (CS_NODE_ELEMENT);
       programNode->SetValue ("program");
       
-      DocNodeAppender appender (programNode);
+      DocNodeCgAppender appender (programNode);
 
       if (definitions.GetSize() > 0)
       {
@@ -577,7 +707,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       appender.Append ("  void dummy() {}\n");
       for (size_t s = 0; s < snippets.GetSize(); s++)
       {
-        AppendProgramInput (snippets[s].vert2frag, appender);
+        AppendProgramInput_V2FDecl (snippets[s], appender);
       }
       
       appender.Append ("};\n\n");
@@ -603,14 +733,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
           || (snippets[s].vertexBody.GetSize() > 0)
           || !snippets[s].outputMaps.IsEmpty())
 	{
+          if (!snippets[s].annotation.IsEmpty())
+            appender.AppendFmt (MakeComment (snippets[s].annotation.GetData()));
 	  appender.Append ("{\n");
+          if (loader->annotateCombined)
+            appender.Append ("// Locally used names for inputs + outputs\n");
 	  appender.Append (snippets[s].locals);
-	  appender.Append (snippets[s].inputMaps);
+          AppendSnippetMap (snippets[s].inputMaps, appender);
 	  appender.Append (snippets[s].vertexBody);
-	  appender.Append (snippets[s].outputMaps);
+          AppendProgramInput_V2FVP (snippets[s], appender);
+	  AppendSnippetMap (snippets[s].outputMaps, appender);
 	  appender.Append ("}\n");
 	}
 	appender.Append (snippets[s].links);
+        appender.Append ("\n");
       }
       
       appender.Append ("  return vertexToFragment;\n");
@@ -641,7 +777,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       csRef<iDocumentNode> programNode = cgfpNode->CreateNodeBefore (CS_NODE_ELEMENT);
       programNode->SetValue ("program");
       
-      DocNodeAppender appender (programNode);
+      DocNodeCgAppender appender (programNode);
       
       if (definitions.GetSize() > 0)
       {
@@ -655,7 +791,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       appender.Append ("  void dummy() {}\n");
       for (size_t s = 0; s < snippets.GetSize(); s++)
       {
-        AppendProgramInput (snippets[s].vert2frag, appender);
+        AppendProgramInput_V2FDecl (snippets[s], appender);
       }
       
       appender.Append ("};\n\n");
@@ -671,6 +807,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       
       appender.Append ("float4 fragmentMain (vertex2fragment vertexToFragment, FragmentInput fragmentIn) : COLOR\n");
       appender.Append ("{\n");
+      if (loader->annotateCombined)
+        appender.Append ("// Fragment program output\n");
       appender.Append ("  float4 outputColor;\n");
       appender.Append (globals);
       
@@ -681,14 +819,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
           || (snippets[s].fragmentBody.GetSize() > 0)
           || !snippets[s].outputMaps.IsEmpty())
 	{
+          if (!snippets[s].annotation.IsEmpty())
+            appender.AppendFmt (MakeComment (snippets[s].annotation.GetData()));
 	  appender.Append ("{\n");
+          if (loader->annotateCombined)
+            appender.Append ("// Locally used names for inputs + outputs\n");
 	  appender.Append (snippets[s].locals);
-	  appender.Append (snippets[s].inputMaps);
+          AppendSnippetMap (snippets[s].inputMaps, appender);
+          AppendProgramInput_V2FFP (snippets[s], appender);
 	  appender.Append (snippets[s].fragmentBody);
-	  appender.Append (snippets[s].outputMaps);
+          AppendSnippetMap (snippets[s].outputMaps, appender);
 	  appender.Append ("}\n");
 	}
 	appender.Append (snippets[s].links);
+        appender.Append ("\n");
       }
       
       appender.Append (outputAssign);
@@ -754,42 +898,149 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 
   void ShaderCombinerCg::AppendProgramInput (
     const csRefArray<iDocumentNode>& nodes,
-    DocNodeAppender& appender)
+    DocNodeCgAppender& appender)
   {
     // FIXME: error handling here
     for (size_t n = 0; n < nodes.GetSize(); n++)
     {
       iDocumentNode* node = nodes[n];
+      AppendProgramInput (node, appender);
+    }
+  }
+  
+  void ShaderCombinerCg::AppendProgramInput_V2FDecl (
+    const Snippet& snippet, DocNodeCgAppender& appender)
+  {
+    // FIXME: error handling here
+    for (size_t n = 0; n < snippet.vert2frag.GetSize(); n++)
+    {
+      iDocumentNode* node = snippet.vert2frag[n];
       if (node->GetType() == CS_NODE_ELEMENT)
       {
-	csStringID id = loader->xmltokens.Request (node->GetValue());
-	switch (id)
-	{
-	  case ShaderCombinerLoaderCg::XMLTOKEN_UNIFORM:
-	  case ShaderCombinerLoaderCg::XMLTOKEN_VARYING:
-	    {
-	      const char* name = node->GetAttributeValue ("name");
-	      const char* type = node->GetAttributeValue ("type");
-	      const char* binding = node->GetAttributeValue ("binding");
-	      if (name && *name && type && *type)
-	      {
-	        csString bindingStr;
-	        if (binding) bindingStr.Format (" : %s", binding);
-	        csString str;
-		str.Format ("%s %s %s%s;\n", 
-		  (id == ShaderCombinerLoaderCg::XMLTOKEN_UNIFORM) ? "uniform" :
-		    "varying",
-		  CgType (type).GetData(), name, bindingStr.GetDataSafe());
-		appender.Append (str);
-	      }
-	    }
-	    break;
-	}
+        csStringID id = loader->xmltokens.Request (node->GetValue());
+        if (id == ShaderCombinerLoaderCg::XMLTOKEN_VARYING)
+        {
+          csString name = node->GetAttributeValue ("name");
+          if (name.IsEmpty()) continue;
+          const csString& uniqueName = snippet.v2fMaps.Get (name, name);
+          csString defineName;
+          defineName.Format ("PARAM_vertexToFragment_%s_UNUSED", 
+            uniqueName.GetData());
+          appender.AppendFmt ("#ifndef %s\n", defineName.GetData());
+	  const char* type = node->GetAttributeValue ("type");
+	  const char* binding = node->GetAttributeValue ("binding");
+	  if (type && *type)
+	  {
+	    csString bindingStr;
+	    if (binding) bindingStr.Format (" : %s", binding);
+	    csString str;
+            str.Format ("varying %s %s%s;\n", 
+              CgType (type).GetData(), uniqueName.GetData(), 
+              bindingStr.GetDataSafe());
+  	    appender.Append (str);
+          }
+          appender.Append ("#endif\n");
+        }
       }
       else
       {
-        appender.Append (node);
+        AppendProgramInput (node, appender);
       }
+    }
+  }
+  
+  void ShaderCombinerCg::AppendProgramInput_V2FVP (
+    const Snippet& snippet, DocNodeCgAppender& appender)
+  {
+    // FIXME: error handling here
+    for (size_t n = 0; n < snippet.vert2frag.GetSize(); n++)
+    {
+      iDocumentNode* node = snippet.vert2frag[n];
+      if (node->GetType() == CS_NODE_ELEMENT)
+      {
+        csStringID id = loader->xmltokens.Request (node->GetValue());
+        if (id == ShaderCombinerLoaderCg::XMLTOKEN_VARYING)
+        {
+          csString name = node->GetAttributeValue ("name");
+          const csString& uniqueName = snippet.v2fMaps.Get (name, name);
+          csString defineName;
+          defineName.Format ("PARAM_vertexToFragment_%s_UNUSED", 
+            uniqueName.GetData());
+          appender.AppendFmt ("#ifndef %s\n", defineName.GetData());
+          appender.AppendFmt ("vertexToFragment.%s = %s;\n", 
+            uniqueName.GetData(), name.GetData());
+          appender.Append ("#endif\n");
+        }
+      }
+      else
+      {
+        AppendProgramInput (node, appender);
+      }
+    }
+  }
+  
+  void ShaderCombinerCg::AppendProgramInput_V2FFP (
+    const Snippet& snippet, DocNodeCgAppender& appender)
+  {
+    // FIXME: error handling here
+    for (size_t n = 0; n < snippet.vert2frag.GetSize(); n++)
+    {
+      iDocumentNode* node = snippet.vert2frag[n];
+      if (node->GetType() == CS_NODE_ELEMENT)
+      {
+        csStringID id = loader->xmltokens.Request (node->GetValue());
+        if (id == ShaderCombinerLoaderCg::XMLTOKEN_VARYING)
+        {
+          csString name = node->GetAttributeValue ("name");
+          const csString& uniqueName = snippet.v2fMaps.Get (name, name);
+          csString defineName;
+          defineName.Format ("PARAM_vertexToFragment_%s_UNUSED", 
+            uniqueName.GetData());
+          appender.AppendFmt ("#ifndef %s\n", defineName.GetData());
+          appender.AppendFmt ("%s = vertexToFragment.%s;\n", 
+            name.GetData(), uniqueName.GetData());
+          appender.Append ("#endif\n");
+        }
+      }
+      else
+      {
+        AppendProgramInput (node, appender);
+      }
+    }
+  }
+  
+  void ShaderCombinerCg::AppendProgramInput (iDocumentNode* node,
+    DocNodeCgAppender& appender)
+  {
+    if (node->GetType() == CS_NODE_ELEMENT)
+    {
+      csStringID id = loader->xmltokens.Request (node->GetValue());
+      switch (id)
+      {
+	case ShaderCombinerLoaderCg::XMLTOKEN_UNIFORM:
+	case ShaderCombinerLoaderCg::XMLTOKEN_VARYING:
+          {
+	    const char* name = node->GetAttributeValue ("name");
+	    const char* type = node->GetAttributeValue ("type");
+	    const char* binding = node->GetAttributeValue ("binding");
+	    if (name && *name && type && *type)
+	    {
+	      csString bindingStr;
+	      if (binding) bindingStr.Format (" : %s", binding);
+	      csString str;
+              str.Format ("%s %s %s%s;\n", 
+	        (id == ShaderCombinerLoaderCg::XMLTOKEN_UNIFORM) ? "uniform" :
+	        "varying",
+	      CgType (type).GetData(), name, bindingStr.GetDataSafe());
+    	      appender.Append (str);
+            }
+          }
+          break;
+      }
+    }
+    else
+    {
+      appender.Append (node);
     }
   }
   
@@ -824,10 +1075,47 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     }
     return weaverType; // @@@ Hmmm... what fallback, if any?
   }
+
+  const char* ShaderCombinerCg::MakeComment (const char* s)
+  {
+    const char* linebreak;
+    linebreak = strpbrk (s, "\r\n");
+    if (strpbrk (s, "\r\n") == 0)
+    {
+      annotateStr.Format ("// %s\n", s);
+    }
+    else
+    {
+      annotateStr.Replace ("/* ");
+      const char* lineStart = s;
+      while (linebreak != 0)
+      {
+        annotateStr.Append (lineStart, linebreak - lineStart);
+        annotateStr.Append ("\n   ");
+        lineStart = linebreak+1;
+        linebreak = strpbrk (lineStart, "\r\n");
+      }
+      annotateStr.Append (lineStart);
+        annotateStr.Append ("\n */\n");
+    }
+    return annotateStr;
+  }
+
+  void ShaderCombinerCg::AppendSnippetMap (const csHash<csString, csString>& map, 
+                                           DocNodeCgAppender& appender)
+  {
+    csHash<csString, csString>::ConstGlobalIterator it = map.GetIterator ();
+    while (it.HasNext())
+    {
+      csString fromName;
+      const csString& toName = it.Next (fromName);
+      appender.AppendFmt ("%s = %s;\n", toName.GetData(), fromName.GetData());
+    }
+  }
   
   //-------------------------------------------------------------------------
   
-  void ShaderCombinerCg::DocNodeAppender::FlushAppendString ()
+  void ShaderCombinerCg::DocNodeCgAppender::FlushAppendString ()
   {
     if (!stringAppend.IsEmpty ())
     {
@@ -837,22 +1125,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     }
   }
   
-  ShaderCombinerCg::DocNodeAppender::DocNodeAppender (iDocumentNode* node) :
-    node (node)
+  ShaderCombinerCg::DocNodeCgAppender::DocNodeCgAppender (iDocumentNode* node) :
+    node (node), beautifier (stringAppend)
   {
+    stringAppend.SetGrowsBy (0);
   }
   
-  ShaderCombinerCg::DocNodeAppender::~DocNodeAppender ()
+  ShaderCombinerCg::DocNodeCgAppender::~DocNodeCgAppender ()
   {
     FlushAppendString();
   }
 
-  void ShaderCombinerCg::DocNodeAppender::Append (const char* str)
+  void ShaderCombinerCg::DocNodeCgAppender::Append (const char* str)
   {
-    stringAppend += str;
+    if (str == 0) return;
+    beautifier.Append (str);
   }
   
-  void ShaderCombinerCg::DocNodeAppender::Append (iDocumentNode* appendNode)
+  void ShaderCombinerCg::DocNodeCgAppender::Append (iDocumentNode* appendNode)
   {
     csDocumentNodeType nodeType = appendNode->GetType();
     if (nodeType == CS_NODE_TEXT)
@@ -872,7 +1162,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     }
   }
 
-  void ShaderCombinerCg::DocNodeAppender::Append (
+  void ShaderCombinerCg::DocNodeCgAppender::Append (
     const csRefArray<iDocumentNode>& nodes)
   {
     for (size_t n = 0; n < nodes.GetSize(); n++)

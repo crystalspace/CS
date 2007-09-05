@@ -22,12 +22,11 @@ CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
-void Simple::CreatePolygon (iThingFactoryState *th,
-	int v1, int v2, int v3, int v4, iMaterialWrapper *mat)
+void Simple::CreatePolygon (iGeneralFactoryState *th,
+	int v1, int v2, int v3, int v4)
 {
-  th->AddPolygon (4, v1, v2, v3, v4);
-  th->SetPolygonMaterial (CS_POLYRANGE_LAST, mat);
-  th->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 6);
+  th->AddTriangle (csTriangle (v1, v2, v3));
+  th->AddTriangle (csTriangle (v1, v3, v4));
 }
 
 static float frand (float range)
@@ -48,8 +47,8 @@ bool Simple::CreateGenMesh (iMaterialWrapper* mat)
 	"Can't make genmesh factory!");
     return false;
   }
-  factstate = 
-  	scfQueryInterface<iGeneralFactoryState> (genmesh_fact->GetMeshObjectFactory ());
+  factstate = scfQueryInterface<iGeneralFactoryState> (
+      genmesh_fact->GetMeshObjectFactory ());
   if (!factstate)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -341,27 +340,45 @@ bool Simple::Initialize ()
   ProcTexture->LoadLevel ();
   ProcTexture->DecRef ();
   room = engine->CreateSector ("proctex-room");
-  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingFactoryState> walls_state = 
-    scfQueryInterface<iThingFactoryState> (walls->GetMeshObject ()->GetFactory());
+  csRef<iMeshWrapper> walls = CS::Geometry::GeneralMeshBuilder
+    ::CreateFactoryAndMesh (engine, room, "walls", "walls_factory");
+  iMeshFactoryWrapper* walls_factory = walls->GetFactory ();
+  csRef<iGeneralFactoryState> walls_state = 
+    scfQueryInterface<iGeneralFactoryState> (
+	walls_factory->GetMeshObjectFactory ());
+  walls->GetMeshObject ()->SetMaterialWrapper (tm);
+  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
+    iGeneralMeshState> (walls->GetMeshObject ());
+  mesh_state->SetShadowReceiving (true);
 
-  walls_state->CreateVertex (csVector3 (-8, -8, -5));
-  walls_state->CreateVertex (csVector3 (-3, -3, +8));
-  walls_state->CreateVertex (csVector3 (+3, -3, +8));
-  walls_state->CreateVertex (csVector3 (+8, -8, -5));
-  walls_state->CreateVertex (csVector3 (-8, +8, -5));
-  walls_state->CreateVertex (csVector3 (-3, +3, +8));
-  walls_state->CreateVertex (csVector3 (+3, +3, +8));
-  walls_state->CreateVertex (csVector3 (+8, +8, -5));
+  csColor4 black (0, 0, 0);
+  walls_state->AddVertex (csVector3 (-8, -8, -5), csVector2 (0, 0),
+      csVector3 (0), black);
+  walls_state->AddVertex (csVector3 (-3, -3, +8), csVector2 (1, 0),
+      csVector3 (0), black);
+  walls_state->AddVertex (csVector3 (+3, -3, +8), csVector2 (1, 0),
+      csVector3 (0), black);
+  walls_state->AddVertex (csVector3 (+8, -8, -5), csVector2 (0, 0),
+      csVector3 (0), black);
+  walls_state->AddVertex (csVector3 (-8, +8, -5), csVector2 (0, 1),
+      csVector3 (0), black);
+  walls_state->AddVertex (csVector3 (-3, +3, +8), csVector2 (1, 1),
+      csVector3 (0), black);
+  walls_state->AddVertex (csVector3 (+3, +3, +8), csVector2 (1, 1),
+      csVector3 (0), black);
+  walls_state->AddVertex (csVector3 (+8, +8, -5), csVector2 (0, 1),
+      csVector3 (0), black);
 
-  CreatePolygon (walls_state, 0, 1, 2, 3, tm);
-  CreatePolygon (walls_state, 1, 0, 4, 5, tm);
+  CreatePolygon (walls_state, 0, 1, 2, 3);
+  CreatePolygon (walls_state, 1, 0, 4, 5);
+  CreatePolygon (walls_state, 3, 2, 6, 7);
+  CreatePolygon (walls_state, 0, 3, 7, 4);
+  CreatePolygon (walls_state, 7, 6, 5, 4);
+  walls_state->CalculateNormals ();
+
   genmesh_resolution = 15;
   genmesh_scale.Set (6, 6, 0);
   CreateGenMesh (ProcMat);
-  CreatePolygon (walls_state, 3, 2, 6, 7, tm);
-  CreatePolygon (walls_state, 0, 3, 7, 4, tm);
-  CreatePolygon (walls_state, 7, 6, 5, 4, tm);
 
   csRef<iLight> light;
   light = engine->CreateLight (0, csVector3 (0, 0, 0), 20,

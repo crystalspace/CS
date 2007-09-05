@@ -104,8 +104,8 @@ bool csLoader::csLoadedPluginVector::GetPluginFromRec (
     rec->Component = csQueryRegistryTag (object_reg, rec->ClassID);
     if (!rec->Component)
     {
-      csRef<iComponent> comp = CS_LOAD_PLUGIN (plugin_mgr,
-    	  rec->ClassID, iComponent);
+      csRef<iComponent> comp = csLoadPlugin<iComponent> (plugin_mgr,
+    	  rec->ClassID);
       rec->Component = comp;
     }
     if (rec->Component)

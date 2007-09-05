@@ -35,10 +35,11 @@ struct iGraphics2D;
  * This interface describes actions specific to the Windows platform.
  * \remarks As the name suggests, this interface provides functionality
  *  specific to the Win32 platform. It can be retrieved from the object
- *  registry via CS_QUERY_REGISTRY(), as an instance of this object will be 
- *  registered with the tag `iWin32Assistant'. To ensure that code using this 
- *  functionality compiles properly on all other platforms, the use of the
- *  header file should be surrounded by appropriate 
+ *  registry via csQueryRegistry<iWin32Assistant>(), as an instance of
+ *  this object will be registered with the tag `iWin32Assistant'. To
+ *  ensure that code using this functionality compiles properly on
+ *  all other platforms, the use of the header file should be
+ *  surrounded by appropriate 
  *  '\#if defined(CS_PLATFORM_WIN32) ... \#endif' statements.
  */
 struct iWin32Assistant : public virtual iBase
@@ -94,10 +95,11 @@ struct iWin32Assistant : public virtual iBase
  * This interface provides some extra functionality for Win32 canvases.
  * \remarks As the name suggests, this interface provides functionality
  *  specific to the Win32 platform. It can be retrieved from the object
- *  registry via CS_QUERY_REGISTRY(), as an instance of this object will be 
- *  registered with the tag `iWin32Assistant'. To ensure that code using this 
- *  functionality compiles properly on all other platforms, the use of the
- *  header file should be surrounded by appropriate 
+ *  registry via csQueryRegistry<iWin32Assistant>(), as an instance of
+ *  this object will be registered with the tag `iWin32Assistant'.
+ *  To ensure that code using this functionality compiles properly
+ *  on all other platforms, the use of the header file should be
+ *  surrounded by appropriate 
  *  '\#if defined(CS_PLATFORM_WIN32) ... \#endif' statements.
  */
 struct iWin32Canvas : public virtual iBase

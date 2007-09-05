@@ -23,10 +23,13 @@
 #include <string.h>
 #include <ctype.h>
 
+#define CS_DEPRECATION_SUPPRESS_HACK
+#include "csgeom/trimesh.h"
+#undef CS_DEPRECATION_SUPPRESS_HACK
+
 #include "csgeom/box.h"
 #include "csgeom/plane3.h"
 #include "csgeom/tri.h"
-#include "csgeom/trimesh.h"
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
 #include "csgeom/math3d.h"
@@ -59,7 +62,6 @@
 #include "iengine/sector.h"
 #include "iengine/viscull.h"
 #include "iengine/scenenode.h"
-#include "igeom/polymesh.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "imap/saver.h"
@@ -1250,7 +1252,8 @@ void csBugPlug::CaptureScreen ()
 		name.GetData());
       }
       else
-        Report (CS_REPORTER_SEVERITY_NOTIFY, "Wrote screenshot %s", name.GetData());
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "Wrote screenshot %s",
+	    name.GetData());
     }
     else
     {
@@ -1751,29 +1754,6 @@ bool csBugPlug::HandleFrame (iEvent& /*event*/)
 		    "base"));
 	      break;
           }
-	}
-	else
-	{
-          iPolygonMesh* pm = 0;
-          switch (show_polymesh)
-          {
-	    case BUGPLUG_POLYMESH_CD:
-	      pm = objmodel->GetPolygonMeshColldet ();
-	      break;
-	    case BUGPLUG_POLYMESH_VIS:
-	      pm = objmodel->GetPolygonMeshViscull ();
-	      break;
-	    case BUGPLUG_POLYMESH_SHAD:
-	      pm = objmodel->GetPolygonMeshShadows ();
-	      break;
-	    case BUGPLUG_POLYMESH_BASE:
-	      pm = objmodel->GetPolygonMeshBase ();
-	      break;
-          }
-	  if (pm)
-	  {
-	    trimesh.AttachNew (new csTriangleMeshPolyMesh (pm));
-	  }
 	}
         if (trimesh)
         {

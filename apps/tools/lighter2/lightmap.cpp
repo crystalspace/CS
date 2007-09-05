@@ -116,21 +116,24 @@ namespace lighter
   void Lightmap::FixupLightmap (const LightmapMask& mask)
   {
     ScopedSwapLock<Lightmap> l (*this);
+    ScopedSwapLock<LightmapMask> m (mask);
     csColor* lmData = colorArray;
-    const float* mmData = mask.maskData.GetArray ();
+    const float* mmData = mask.GetMaskData();
 
     const size_t size = width*height;
 
     for (uint j = 0; j < size; j++, lmData++, mmData++)
     {
-      if (*mmData < FLT_EPSILON || *mmData >= 1.0f) continue;
+      if (*mmData == 0 /*|| *mmData >= 1.0f*/)
+        continue;
 
       *lmData *= (1.0f / *mmData);
     }
 
     // Reset
+    
     lmData = colorArray;
-    mmData = mask.maskData.GetArray ();
+    mmData = mask.GetMaskData();
 
     for (int v = 0; v < height; v++)
     {

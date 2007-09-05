@@ -167,8 +167,8 @@ void csBMPImageIO::SetDithering (bool)
 {
 }
 
-csPtr<iDataBuffer> csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescription *,
-  const char* extraoptions)
+csPtr<iDataBuffer> csBMPImageIO::Save (iImage *Image,
+    iImageIO::FileFormatDescription *, const char* extraoptions)
 {
   extraoptions = 0;
 

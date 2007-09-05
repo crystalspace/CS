@@ -71,8 +71,8 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
 		iStreamSource*, iLoaderContext* /*ldr_context*/,
 		iBase* /*context*/)
 {
-  csRef<iTerraFormer> former = CS_LOAD_PLUGIN (pluginmgr, 
-  	"crystalspace.terraformer.simple", iTerraFormer);
+  csRef<iTerraFormer> former = csLoadPlugin<iTerraFormer> (pluginmgr, 
+  	"crystalspace.terraformer.simple");
   if (!former) 
   {
     synldr->ReportError ("crystalspace.terraformer.simple.loader",

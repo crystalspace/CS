@@ -36,11 +36,7 @@
       </block>
       
       <block location="cg:vertexMain">
-	vertexToFragment.primaryColor = vertexIn.primaryColor;
-      </block>
-      
-      <block location="cg:fragmentMain">
-	primaryColor = vertexToFragment.primaryColor;
+	primaryColor = vertexIn.primaryColor;
       </block>
     </input>
     

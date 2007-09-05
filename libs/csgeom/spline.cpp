@@ -280,7 +280,10 @@ void csBSpline::Calculate (float time)
     if (time >= time_points[idx] && time <= time_points[idx + 1]) break;
   }
 
-  t = 1.0f - (time_points[idx + 1] - time)
+  if (idx == num_points-1)
+    t = 1.0f;
+  else
+    t = 1.0f - (time_points[idx + 1] - time)
   	/ (time_points[idx + 1] - time_points[idx]);
 }
 
@@ -299,7 +302,7 @@ float csBSpline::GetInterpolatedDimension (int dim) const
       pp = p[0] - (p[1] - p[0]);
     else if (id == -2)
       pp = p[0] - 2 * (p[1] - p[0]);
-    else if (id == num_points)
+    else if (id >= num_points)
       pp = p[num_points - 1] - (p[num_points - 2] - p[num_points - 1]);
     else
       pp = p[id];

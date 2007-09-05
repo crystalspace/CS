@@ -43,7 +43,7 @@ CS_LEAKGUARD_IMPLEMENT (csShaderGLCGCommon);
 
 csShaderGLCGCommon::csShaderGLCGCommon (csGLShader_CG* shaderPlug, 
 					const char* type) :
-  csShaderProgram (shaderPlug->object_reg), programType (type)
+  scfImplementationType (this, shaderPlug->object_reg), programType (type)
 {
   validProgram = true;
   this->shaderPlug = shaderPlug;
@@ -333,12 +333,31 @@ void csShaderGLCGCommon::ResetState()
 {
 }
 
-bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr, 
-  CGGLenum type, CGprofile maxProfile, bool compiled, bool doLoad)
+bool csShaderGLCGCommon::DefaultLoadProgram (
+  iShaderDestinationResolverCG* cgResolve,
+  const char* programStr, CGGLenum type, CGprofile maxProfile, 
+  bool compiled, bool doLoad)
 {
   if (!programStr || !*programStr) return false;
 
   size_t i;
+  csString augmentedProgramStr;
+  if (cgResolve != 0)
+  {
+    const csArray<csString>& unusedParams = cgResolve->GetUnusedParameters ();
+    for (size_t i = 0; i < unusedParams.GetSize(); i++)
+    {
+      csString param (unusedParams[i]);
+      for (size_t j = 0; j < param.Length(); j++)
+      {
+        if (param[j] == '.') param[j] = '_';
+      }
+      augmentedProgramStr.AppendFmt ("#define PARAM_%s_UNUSED\n",
+        param.GetData());
+    }
+    augmentedProgramStr.Append (programStr);
+    programStr = augmentedProgramStr;
+  }
 
   CGprofile profile = CG_PROFILE_UNKNOWN;
 
@@ -364,6 +383,10 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
     args.Push (compilerArgs[i]);
   args.Push (0);
  
+  if (program)
+  {
+    cgDestroyProgram (program);
+  }
   program = cgCreateProgram (shaderPlug->context, 
     compiled ? CG_OBJECT : CG_SOURCE, programStr, 
     profile, !entrypoint.IsEmpty() ? entrypoint : "main", args.GetArray());
@@ -381,6 +404,13 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
     cgGLLoadProgram (program);
     if (cgGetError() != CG_NO_ERROR) return false;
     if (!cgGLIsProgramLoaded (program)) return false;
+  }
+
+  const char* listing = cgGetLastListing (shaderPlug->context);
+  if (listing && *listing && shaderPlug->doVerbose)
+  {
+    shaderPlug->Report (CS_REPORTER_SEVERITY_WARNING,
+      "%s", listing);
   }
 
   i = 0;
@@ -513,7 +543,7 @@ void csShaderGLCGCommon::WriteAdditionalDumpInfo (const char* description,
   }
 }
 
-bool csShaderGLCGCommon::Load (iShaderDestinationResolver*, 
+bool csShaderGLCGCommon::Load (iShaderDestinationResolver* resolve, 
 			       iDocumentNode* program)
 {
   if(!program)
@@ -551,7 +581,24 @@ bool csShaderGLCGCommon::Load (iShaderDestinationResolver*,
     }
   }
 
+  cgResolve = scfQueryInterfaceSafe<iShaderDestinationResolverCG> (resolve);
+
   return true;
+}
+
+void csShaderGLCGCommon::CollectUnusedParameters ()
+{
+  unusedParams.DeleteAll ();
+  CGparameter param = cgGetFirstLeafParameter (program, CG_PROGRAM);
+  while (param)
+  {
+    if (!cgIsParameterUsed (param, program))
+    {
+      unusedParams.Push (cgGetParameterName (param));
+    }
+
+    param = cgGetNextLeafParameter (param);
+  }
 }
 
 }

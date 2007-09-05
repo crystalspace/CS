@@ -44,7 +44,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   
     virtual bool HasNext()
     { return pos < array.GetSize(); }
-    virtual const T& Next()
+    virtual T& Next()
     { 
       storage = array[pos++]; 
       return storage;
@@ -54,8 +54,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   //-------------------------------------------------------------------
 
   Snippet::Snippet (WeaverCompiler* compiler, iDocumentNode* node, 
-                    bool topLevel) : compiler (compiler), 
-    xmltokens (compiler->xmltokens), isCompound (false)
+                    const char* name, bool topLevel) : compiler (compiler), 
+    xmltokens (compiler->xmltokens), name (name), isCompound (false)
   {
     bool okay = true;
     if (topLevel)
@@ -95,6 +95,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     }
   }
   
+  Snippet::Snippet (WeaverCompiler* compiler, const char* name) : compiler (compiler), 
+    xmltokens (compiler->xmltokens), name (name), isCompound (false)
+  {
+  }
+
   Snippet::~Snippet()
   {
   }
@@ -106,7 +111,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
   
   Snippet::Technique* Snippet::LoadLibraryTechnique (WeaverCompiler* compiler, 
-    iDocumentNode* node, const Technique::CombinerPlugin& combiner)
+    iDocumentNode* node, const Technique::CombinerPlugin& combiner) const
   {
     Snippet::AtomTechnique* technique = 
       ParseAtomTechnique (compiler, node, true, combiner.name);
@@ -115,11 +120,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
   
   Snippet::Technique* Snippet::CreatePassthrough (const char* varName, 
-                                                  const char* type)
+                                                  const char* type) const
   {
     csString hashStr;
     hashStr.Format ("__passthrough_%s_%s__", varName, type);
-    AtomTechnique* newTech = new AtomTechnique (csMD5::Encode (hashStr));
+    AtomTechnique* newTech = new AtomTechnique ("(passthrough)", 
+      csMD5::Encode (hashStr));
     
     {
       Technique::Input newInput;
@@ -168,9 +174,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   
   Snippet::AtomTechnique* Snippet::ParseAtomTechnique (
     WeaverCompiler* compiler, iDocumentNode* node, bool canOmitCombiner,
-    const char* defaultCombinerName)
+    const char* defaultCombinerName) const
   {
-    AtomTechnique newTech (
+    AtomTechnique newTech (GetName(),
       csMD5::Encode (CS::DocSystem::FlattenNode (node)));
     
     newTech.priority = node->GetAttributeValueAsInt ("priority");
@@ -393,7 +399,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   
   void Snippet::LoadCompoundTechnique (iDocumentNode* node)
   {
-    CompoundTechnique* newTech = new CompoundTechnique;
+    CompoundTechnique* newTech = new CompoundTechnique (GetName());
   
     csRef<iDocumentNodeIterator> nodes = node->GetNodes ();
     while (nodes->HasNext ())
@@ -464,7 +470,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     else
       snippetNode = node;
       
-    Snippet* newSnippet = new Snippet (compiler, snippetNode);
+    csString snippetName;
+    if (!name.IsEmpty ())
+    {
+      snippetName.AppendFmt ("%s<%d> -> ",  name.GetData(), tech.priority);
+    }
+    snippetName += id ? id : filename;
+    Snippet* newSnippet = new Snippet (compiler, snippetNode, 
+      snippetName);
     tech.AddSnippet (id, newSnippet);
   }
     
@@ -582,6 +595,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     inTechniques.Push (tech);
     outTechniques.Push (tech);
   }
+
+  void TechniqueGraph::RemoveTechnique (const Snippet::Technique* tech)
+  {
+    techniques.Delete (tech);
+    inTechniques.Delete (tech);
+    outTechniques.Delete (tech);
+
+    size_t c = 0;
+    while (c < connections.GetSize())
+    {
+      Connection& conn = connections[c];
+      if ((conn.to == tech) || (conn.from == tech))
+        connections.DeleteIndex (c);
+      else
+        c++;
+    }
+  }
   
   void TechniqueGraph::AddConnection (const Connection& conn)
   {
@@ -605,20 +635,37 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
   
   void TechniqueGraph::GetDependencies (const Snippet::Technique* tech, 
-    csArray<const Snippet::Technique*>& deps) const
+    csArray<const Snippet::Technique*>& deps, bool strongOnly) const
   {
     csSet<csConstPtrKey<Snippet::Technique> > addedDeps;
     for (size_t c = 0; c < connections.GetSize(); c++)
     {
       const Connection& conn = connections[c];
-      if ((conn.to == tech) && (!addedDeps.Contains (conn.from)))
+      if ((conn.to == tech) && (!addedDeps.Contains (conn.from))
+        && (!strongOnly || !conn.weak))
       {
         deps.Push (conn.from);
         addedDeps.AddNoTest (conn.from);
       }
     }
   }
-  
+
+  void TechniqueGraph::GetDependants (const Snippet::Technique* tech, 
+    csArray<const Snippet::Technique*>& deps, bool strongOnly) const
+  {
+    csSet<csConstPtrKey<Snippet::Technique> > addedDeps;
+    for (size_t c = 0; c < connections.GetSize(); c++)
+    {
+      const Connection& conn = connections[c];
+      if ((conn.from == tech) && (!addedDeps.Contains (conn.to))
+        && (!strongOnly || !conn.weak))
+      {
+        deps.Push (conn.to);
+        addedDeps.AddNoTest (conn.to);
+      }
+    }
+  }
+
   //-------------------------------------------------------------------
   
   void TechniqueGraphBuilder::GraphInfo::Merge (const GraphInfo& other)

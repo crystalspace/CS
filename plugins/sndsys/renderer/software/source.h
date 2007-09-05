@@ -93,7 +93,7 @@ public:
 
 class SndSysSourceSoftwareBasic :
   public scfImplementation2<SndSysSourceSoftwareBasic, 
-                            iSndSysSource,
+                            scfFakeInterface<iSndSysSource>,
                             iSndSysSourceSoftware >
 {
 public:
@@ -172,7 +172,7 @@ protected:
 
 class SndSysSourceSoftware3D :
   public scfImplementation4<SndSysSourceSoftware3D,
-                            iSndSysSource,
+                            scfFakeInterface<iSndSysSource>,
                             iSndSysSource3D,
                             iSndSysSource3DDirectionalSimple,
                             iSndSysSourceSoftware >

@@ -35,20 +35,6 @@ typedef void* OSXAssistantHandle;
 #define NSD_PROTO(RET,FUNC) extern "C" RET OSXAssistant_##FUNC
 #define NSD_ASSIST(HANDLE) ((iOSXAssistant*)(HANDLE))
 
-SCF_IMPLEMENT_IBASE(OSXAssistant)
-  SCF_IMPLEMENTS_INTERFACE(iOSXAssistant)
-  SCF_IMPLEMENTS_INTERFACE(iOSXAssistantLocal)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventPlug)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE(OSXAssistant::eiEventPlug)
-  SCF_IMPLEMENTS_INTERFACE(iEventPlug)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE(OSXAssistant::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE(iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 //-----------------------------------------------------------------------------
 // Constructor
@@ -57,7 +43,7 @@ OSXAssistant::OSXAssistant(iObjectRegistry* r)
   : scfImplementationType (this), registry(r),event_queue(0), event_outlet(0), 
   virtual_clock(0), should_shutdown(false)
 {
-  controller = OSXDelegate_startup(this);
+  controller = OSXDelegate_startup(static_cast<iOSXAssistant*>(this));
 
   run_always = false;
   quitEventID = csevQuit(registry);
@@ -286,9 +272,9 @@ NSD_PROTO(void,application_unhidden)(OSXAssistantHandle h)
 //=============================================================================
 // iEventPlug Implementation
 //=============================================================================
-uint OSXAssistant::eiEventPlug::GetPotentiallyConflictingEvents()
+uint OSXAssistant::GetPotentiallyConflictingEvents()
   { return (CSEVTYPE_Keyboard | CSEVTYPE_Mouse); }
-uint OSXAssistant::eiEventPlug::QueryEventPriority(uint)
+uint OSXAssistant::QueryEventPriority(uint)
   { return 150; }
 
 
@@ -297,7 +283,7 @@ uint OSXAssistant::eiEventPlug::QueryEventPriority(uint)
 //=============================================================================
 bool OSXAssistant::HandleEvent(iEvent& e)
 {
-  if (e.Name == Quit)
+  if (e.Name == quitEventID)
     should_shutdown = true;
   return false;
 }

@@ -45,6 +45,7 @@ public:
   virtual void FinishDraw () = 0;
   virtual void SetClipRect (const csRect& clipRect) = 0;
   virtual void SetupClipPortalDrawing () = 0;
+  virtual bool HasStencil() = 0;
 };
 
 }

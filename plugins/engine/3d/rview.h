@@ -37,8 +37,6 @@ struct iGraphics2D;
 struct iSector;
 struct iClipper2D;
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
-
 /**
  * This structure represents all information needed for drawing
  * a scene. It is modified while rendering according to
@@ -216,22 +214,6 @@ public:
    */
   void ResetFogInfo () { ctxt->added_fog_info = false; }
 
-  /**
-   * Check if the given bounding sphere (in camera and world space coordinates)
-   * is visibile in this render view. If the sphere is visible this
-   * function will also initialize the clip_plane, clip_z_plane, and
-   * clip_portal fields which can be used for the renderer.
-   */
-  bool ClipBSphere (
-	const csSphere &cam_sphere,
-	const csSphere &world_sphere,
-	int& clip_portal, int& clip_plane, int& clip_z_plane)
-  {
-    return CS::RenderViewClipper::CullBSphere (ctxt,
-	cam_sphere, world_sphere, clip_portal, clip_plane,
-	clip_z_plane);
-  }
-
   /// Get the current render context.
   virtual csRenderContext* GetRenderContext () { return ctxt; }
 
@@ -261,38 +243,6 @@ public:
    * Get the current camera.
    */
   virtual iCamera* GetCamera () { return ctxt->icamera; }
-  /**
-   * Test if the given bounding sphere (in world space coordinates)
-   * is visibile in this render view. The transformation will
-   * transform world to camera space.
-   */
-  virtual bool TestBSphere (const csReversibleTransform& w2c,
-    const csSphere& sphere)
-  {
-    return CS::RenderViewClipper::TestBSphere (ctxt, w2c, sphere);
-  }
-
-  virtual void CalculateClipSettings (uint32 frustum_mask,
-    int &clip_portal, int &clip_plane, int &clip_z_plane)
-  {
-    CS::RenderViewClipper::CalculateClipSettings (ctxt,
-	frustum_mask, clip_portal, clip_plane, clip_z_plane);
-  }
-
-  virtual bool ClipBBox (const csPlane3* planes, uint32& frustum_mask,
-  	const csBox3& obox,
-        int& clip_portal, int& clip_plane, int& clip_z_plane)
-  {
-    return CS::RenderViewClipper::CullBBox (ctxt, planes, frustum_mask,
-	obox, clip_portal, clip_plane, clip_z_plane);
-  }
-
-  virtual void SetupClipPlanes (const csReversibleTransform& tr_o2c,
-  	csPlane3* planes, uint32& frustum_mask)
-  {
-    CS::RenderViewClipper::SetupClipPlanes (ctxt, tr_o2c,
-	planes, frustum_mask);
-  }
 
   /**
    * Get current sector.
@@ -310,7 +260,5 @@ public:
   /// Get the number of the current frame.
   virtual uint GetCurrentFrameNumber () const;
 };
-
-#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_RVIEW_H__

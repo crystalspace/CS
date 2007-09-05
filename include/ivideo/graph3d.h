@@ -235,6 +235,11 @@ enum csVertexAttrib
  */
 #define CS_MIXMODE_TYPE_BLENDOP (0x40000000)
 /**
+ * When blending with a blending operation, signinify that separate factors
+ * for the alpha channel are present.
+ */
+#define CS_MIXMODE_FLAG_BLENDOP_ALPHA (0x08000000)
+/**
  * Use the mix mode of the mesh mix mode.
  * \warning NOT VALID AS MESH MIXMODE - only for shader pass mixmodes.
  */
@@ -314,6 +319,26 @@ enum
 #define CS_MIXMODE_BLENDOP_SRC(mode)	((mode >> 20) & CS_MIXMODE_FACT_MASK)
 /// Helper macro to extract the \c dstFactor from a blending op mixmode.
 #define CS_MIXMODE_BLENDOP_DST(mode)	((mode >> 16) & CS_MIXMODE_FACT_MASK)
+
+/**
+ * Helper macro to construct alpha factoes for a blending operation mixmode
+ * \a Src and \a Dst are 
+ * \link #CS_MIXMODE_FACT_ZERO blending op factors \endlink, however sans the
+ * CS_MIXMODE_FACT_ prefix. E.g.:
+ * \code
+ * uint mixmode = CS_MIXMODE_BLEND(SRCALPHA, SRCALPHA_INV)
+ *   | CS_MIXMODE_BLEND_ALPHA(ONE, SRCALPHA_INV);
+ * \endcode
+ * will generate a blending operation for alpha blending with the written
+ * destination alpha values suitable for use for premultiplied alpha blending.
+ */
+#define CS_MIXMODE_BLEND_ALPHA(Src, Dst)				\
+  (CS_MIXMODE_FLAG_BLENDOP_ALPHA					\
+  | (CS_MIXMODE_FACT_ ## Src << 12) | (CS_MIXMODE_FACT_ ## Dst << 8))
+/// Helper macro to extract the alpha \c srcFactor from a blending op mixmode.
+#define CS_MIXMODE_BLENDOP_ALPHA_SRC(mode)	((mode >> 12) & CS_MIXMODE_FACT_MASK)
+/// Helper macro to extract the alpha \c dstFactor from a blending op mixmode.
+#define CS_MIXMODE_BLENDOP_ALPHA_DST(mode)	((mode >> 8) & CS_MIXMODE_FACT_MASK)
 /** @} */
 
 /**\name Mix mode: Default modes
@@ -345,7 +370,8 @@ enum
  *  \see CS_FX_MASK_ALPHA, \see CS_FX_SETALPHA
  */
 #define CS_FX_ALPHA \
-    (CS_MIXMODE_BLEND(SRCALPHA, SRCALPHA_INV) | CS_MIXMODE_ALPHATEST_DISABLE)
+    (CS_MIXMODE_BLEND(SRCALPHA, SRCALPHA_INV) \
+    | CS_MIXMODE_BLEND_ALPHA(ONE, SRCALPHA_INV) | CS_MIXMODE_ALPHATEST_DISABLE)
 /**
  * Transparent blending (keep framebuffer unmodified). 
  * Formula: <tt>=DST</tt>
@@ -375,7 +401,8 @@ enum
  *  those two "extremes" by appropriate choice of the color and alpha values.
  */
 #define CS_FX_PREMULTALPHA \
-    (CS_MIXMODE_BLEND(ONE, SRCALPHA_INV) | CS_MIXMODE_ALPHATEST_DISABLE)
+    (CS_MIXMODE_BLEND(ONE, SRCALPHA_INV) | \
+    CS_MIXMODE_BLEND_ALPHA(ONE, SRCALPHA_INV) | CS_MIXMODE_ALPHATEST_DISABLE)
 /**
  * Use the mix mode of the mesh mix mode.
  * \warning NOT VALID AS MESH MIXMODE - only for shader pass mixmodes.
@@ -399,7 +426,7 @@ enum
  * Bit mask for bits relevant to mix mode comparison; contains type, alpha
  * test flags and blending op factors.
  */
-#define CS_FX_MASK_MIXMODE (0xf0ff0000)
+#define CS_FX_MASK_MIXMODE (0xf8ffff00)
 /** @} */
 
 /**\name Mix mode: alpha helpers

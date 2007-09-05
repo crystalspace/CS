@@ -21,7 +21,6 @@
 #include "cssysdef.h"
 
 #include "csgeom/math3d.h"
-#include "csgeom/pmtools.h"
 #include "csgeom/sphere.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/vector4.h"
@@ -121,7 +120,7 @@ void csStencil2ShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
 
   meshShadows = false;
 
-  // Try to get a MeshShadow polygonmesh
+  // Try to get a MeshShadow triangle mesh.
   csRef<iTriangleMesh> trimesh;
   if (use_trimesh)
   {
@@ -133,12 +132,6 @@ void csStencil2ShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
     {
       trimesh = 0;
     }
-  }
-  else
-  {
-    iPolygonMesh* mesh = model->GetPolygonMeshShadows ();
-    if (mesh)
-      trimesh.AttachNew (new csTriangleMeshPolyMesh (mesh));
   }
 
   if (!trimesh) return;	// No shadow casting for this object.
@@ -947,9 +940,8 @@ csPtr<iBase> csStencil2ShadowLoader::Parse (iDocumentNode* node,
 {
   csRef<iPluginManager> plugin_mgr (
     csQueryRegistry<iPluginManager> (object_reg));
-  csRef<iRenderStepType> type (CS_LOAD_PLUGIN (plugin_mgr,
-    "crystalspace.renderloop.step.shadow.stencil2.type", 
-    iRenderStepType));
+  csRef<iRenderStepType> type = csLoadPlugin<iRenderStepType> (plugin_mgr,
+    "crystalspace.renderloop.step.shadow.stencil2.type");
 
   csRef<iRenderStepFactory> factory = type->NewFactory();
   csRef<iRenderStep> step = factory->Create ();

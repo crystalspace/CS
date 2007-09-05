@@ -65,7 +65,7 @@ struct iSndSysSource : public virtual iBase
 /**
  * Sound source extensions for the software renderer.
  */
-struct iSndSysSourceSoftware : public virtual iBase
+struct iSndSysSourceSoftware : public iSndSysSource
 {
   /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
   SCF_INTERFACE(iSndSysSourceSoftware,2,0,0);

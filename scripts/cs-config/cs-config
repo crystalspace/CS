@@ -6,16 +6,21 @@ else
   PATH_SEPARATOR=":"
 fi
 
+# Poor man's (portable) 'dirname' command.
+dirpart()
+{
+   expr "$1" : '\(..*\)[/\\].*'
+}
+
+BASE_DIR=`dirpart $0`
 TEMP_PREFIX=/tmp/cs-config$$
 
 # Collect executables starting with 'cs-config-' from $CRYSTAL and $PATH
 # @@@ FIXME: What about $CRYSTAL_x_y env vars?
 OLD_IFS="$IFS"
 IFS=$PATH_SEPARATOR
-for p in $CRYSTAL$PATH_SEPARATOR$CRYSTAL/bin$PATH_SEPARATOR$PATH ; do
+for p in $CRYSTAL$PATH_SEPARATOR$CRYSTAL/bin$PATH_SEPARATOR$BASE_DIR$PATH_SEPARATOR$PATH ; do
   if [ -d "$p" ] ; then
-    # The -executable predicate would do what we like, but is not available
-    # with older find versions.
     for s in "$p"/cs-config-* ; do
       if [ -x "$s" ] ; then
 	echo "$s" >> ${TEMP_PREFIX}_find
@@ -24,6 +29,11 @@ for p in $CRYSTAL$PATH_SEPARATOR$CRYSTAL/bin$PATH_SEPARATOR$PATH ; do
   fi
 done
 IFS="$OLD_IFS"
+
+if [ ! -e ${TEMP_PREFIX}_find ] ; then
+  echo "No cs-config-* scripts found" >&2
+  exit -1
+fi
 
 # Reorder for sorting
 cat ${TEMP_PREFIX}_find | sed 's!\(.*\)/cs-config-\(.*\)\.\(.*\)!\2:\3:\1!g' >> ${TEMP_PREFIX}_split

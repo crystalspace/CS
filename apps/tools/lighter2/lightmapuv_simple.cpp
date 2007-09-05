@@ -22,29 +22,10 @@
 #include "object.h"
 #include "config.h"
 
+#include "lightmapuv_simple_util.h"
+
 namespace lighter
 {
-  struct SizeAndIndex
-  {
-    csVector2 uvsize;
-    size_t index;
-  };
-
-  template<typename T>
-  static int SortByUVSize (T const& s1, T const& s2)
-  {
-    float dx = s1.uvsize.x - s2.uvsize.x;
-    if (dx > 0)
-      return -1;
-    else if (dx < 0)
-      return 1;
-    float dy = s1.uvsize.y - s2.uvsize.y;
-    if (dy > 0)
-      return -1;
-    else if (dy < 0)
-      return 1;
-    return 0;
-  }
 
   /* Idea for future:
      Take what PD lights affect the object's instances of a set of 
@@ -77,6 +58,7 @@ namespace lighter
     //TODO Reimplement simple UV-FactoryLayouter
 
     csArray<SizeAndIndex> sizes;
+    csArray<csVector2> minuvs;
 
     // Layout every primitive by itself    
     for (size_t i = 0; i < coplanarPrims.GetSize (); i++)
@@ -128,6 +110,14 @@ namespace lighter
         newSize.uvsize = uvSize;
         newSize.index = i;
         sizes.Push (newSize);
+
+        /* Subtle: causes lumels to be aligned on a world space grid.
+         * The intention is that the lightmap coordinates for vertices 
+         * for two adjacent faces are lined up nicely.
+         * @@@ Does not take object translation into account. */
+        minuv.x = floor (minuv.x);
+        minuv.y = floor (minuv.y);
+        minuvs.GetExtend (i) = minuv;
       }
     }
     // The rectangle packer works better when the rects are sorted by size.
@@ -155,17 +145,27 @@ namespace lighter
         thisGroup.Push (outIdx);
       }
       thisGroup.ShrinkBestFit();
+
+      csArray<csVector2>& groupUVsizes = 
+        newFactory->uvsizes.GetExtend (lmID);
+      groupUVsizes.Push (sizes[s].uvsize);
+
+      /*csArray<csVector2>& groupMinUVs = 
+        newFactory->minuvs.GetExtend (lmID);
+      groupMinUVs.Push (minuvs[sizes[s].index]);*/
     }
 
-    // Set the size of the lightmaps..
-    /*for (i = 0; i < lightmaps.GetSize (); i++)
+#ifdef DUMP_SUBRECTANGLES
+    static int counter = 0;
+    for (size_t i = 0; i < localLightmaps.GetSize (); i++)
     {
-      Lightmap *lm = lightmaps[i];
-      // Calculate next pow2 size
-      uint newWidth = csFindNearestPowerOf2 (lm->GetMaxUsedU ());
-      uint newHeight = csFindNearestPowerOf2 (lm->GetMaxUsedV ());
-      lm->SetSize (newWidth, newHeight);
-    }*/
+      Lightmap *lm = localLightmaps[i];
+      csString str;
+      str.Format ("locallightmap_%i_%zu", counter, i);
+      lm->GetAllocator().Dump (str);
+    }
+    counter++;
+#endif
 
     return csPtr<LightmapUVObjectLayouter> (newFactory);
   }
@@ -222,7 +222,7 @@ namespace lighter
     
     for (size_t e = 0; e < 3; e++)
     {
-      Edge edge (startPrim, t[e], t[(e+1) % 3]);
+      Edge edge (startPrim, t[e], t[CS::Math::NextModulo3(e)]);
       outsideEdges.Push (edge);
     }
   }
@@ -244,7 +244,7 @@ namespace lighter
     const Primitive::TriangleType& t = prim.GetTriangle ();
     for (size_t e = 0; e < 3; e++)
     {
-      Edge edge (prim, t[e], t[(e+1) % 3]);
+      Edge edge (prim, t[e], t[CS::Math::NextModulo3 (e)]);
       bool found = false;
       /* If edge is an "outside edge", remove from the outside list
        * Otherwise add it */
@@ -310,7 +310,7 @@ namespace lighter
             const FactoryPrimitive::TriangleType& t = prim.GetTriangle ();
             for (size_t e = 0; e < 3; e++)
             {
-              Edge edge (prim, t[e], t[(e+1) % 3]);
+              Edge edge (prim, t[e], t[CS::Math::NextModulo3(e)]);
               if (ubp.UsesEdge (edge))
               {
                 ubp.AddPrimitive (prim);
@@ -330,36 +330,44 @@ namespace lighter
     }
   }
 
+  class ArraysOneUV
+  {
+  public:
+    class ArrayType
+    {
+      int u, v;
+    public:
+      ArrayType (int u, int v) : u (u), v (v) {}
+
+      size_t GetSize () const { return 1; }
+      csVector2 GetUVSize (size_t n) const 
+      { 
+        return csVector2 (u, v);
+      }
+    };
+    ArrayType pseudoArray;
+    ArraysOneUV (int u, int v) : pseudoArray (u, v) {}
+
+    size_t GetSize() const { return 1; }
+    ArrayType Get (size_t index) const 
+    { return pseudoArray; }
+  };
+
   bool SimpleUVFactoryLayouter::AllocLightmap (LightmapPtrDelArray& lightmaps, 
     int u, int v, csRect &lightmapArea, int &lightmapID)
   {
-    // Now see if we can get some space in the already allocated lightmaps
-    CS::SubRectangles::SubRect *rect;
-    for (unsigned int i = 0; i < lightmaps.GetSize (); i++)
-    {
-      rect = lightmaps[i]->GetAllocator ().Alloc (u,v,lightmapArea);
-      if (rect)
-      {
-        //We have a space, use it
-        lightmapID = i;
-        return true;
-      }
-    }
+    AllocLightmapArray<false> allocLM (lightmaps);
+    AllocResultHash results;
+    bool b = AllocAllPrims (ArraysOneUV (u, v), allocLM, results, 0, allocDefault);
+    
+    const AllocResult& result = *results.GetElementPointer (0);
+    lightmapArea.xmin = int (result.positions[0].x);
+    lightmapArea.ymin = int (result.positions[0].y);
+    lightmapArea.xmax = lightmapArea.xmin + u;
+    lightmapArea.ymax = lightmapArea.ymin + v;
+    lightmapID = int (result.allocIndex);
 
-    // Still here, need a new lightmap
-    Lightmap *newL = new Lightmap (globalConfig.GetLMProperties ().maxLightmapU,
-                                   globalConfig.GetLMProperties ().maxLightmapV);
-    lightmaps.Push (newL);
-
-    rect = newL->GetAllocator ().Alloc (u,v,lightmapArea);
-    if (rect)
-    {
-      //We have a space, use it
-      lightmapID = (int)lightmaps.GetSize () - 1;
-      return true;
-    }
-
-    return false;
+    return b;
   }
 
   bool SimpleUVFactoryLayouter::ProjectPrimitives (FactoryPrimitiveArray& prims, 
@@ -385,11 +393,14 @@ namespace lighter
     else if (fabsf (normal.z) > fabsf (normal.x))
       projDimension = 2; //z biggest
 
-    size_t selX = (projDimension + 1) % 3;
-    size_t selY = (projDimension + 2) % 3;
+    size_t selX = CS::Math::NextModulo3(projDimension);
+    size_t selY = CS::Math::NextModulo3(selX);
 
     csSet<size_t> primsUsedVerts;
     csArray<size_t> indexMap;
+
+    csVector2 minUV (FLT_MAX, FLT_MAX);
+    csVector2 maxUV (-FLT_MAX, -FLT_MAX);
 
     for (size_t p = 0; p < prims.GetSize(); p++)
     {
@@ -429,7 +440,23 @@ namespace lighter
 
         lightmapUV.x = position[selX] * lmscale;
         lightmapUV.y = position[selY] * lmscale;
-      
+
+        minUV.x = csMin (minUV.x, lightmapUV.x);
+        minUV.y = csMin (minUV.y, lightmapUV.y);
+        maxUV.x = csMax (maxUV.x, lightmapUV.x);
+        maxUV.y = csMax (maxUV.y, lightmapUV.y);
+      }
+    }
+    if ((maxUV.x - minUV.x) > (maxUV.y - minUV.y))
+    {
+      csSet<size_t>::GlobalIterator it (primsUsedVerts.GetIterator());
+      while (it.HasNext())
+      {
+        size_t index = it.Next();
+        csVector2& lightmapUV = lightmapUVs[index];
+        float t = lightmapUV.x;
+        lightmapUV.x = lightmapUV.y;
+        lightmapUV.y = t;
       }
     }
     csSet<size_t>::GlobalIterator it (primsUsedVerts.GetIterator());
@@ -477,7 +504,16 @@ namespace lighter
     queuedPrims.uvsizes = uvsizes;
     SectorAndPDBits s;
     s.pdBits = pdBits;
-    s.sector = sector;
+    /* The originating sector is only relevant for PD-affected queues
+     * (since PD lights are stored in the sector PD bits can only be 
+     * compared for queues originating in the same sector, but when no
+     * bits are set, this doesn't matter much). 
+     * But PD-unaffected queues can be merged here already.
+     */
+    if (pdBits.AllBitsFalse())
+      s.sector = 0;
+    else
+      s.sector = sector;
     QueuedPDPArray* q = pdQueues.GetElementPointer (s);
     if (q == 0)
     {
@@ -493,12 +529,12 @@ namespace lighter
     size_t groupNum, Sector* sector, const csBitArray& pdBits)
   {
     // Prims will be layouted later...
-    csArray<csVector2> uvsizes;
-    size_t layoutID = minuvs.GetSize ();
-    ComputeSizes (prims, groupNum, uvsizes, minuvs.GetExtend (layoutID));
+    size_t layoutID = minuvs.GetSize();
+    // Update minimum UVs for this particular layout
+    ComputeMinUVs (prims, groupNum, minuvs.GetExtend (layoutID));
 
     parent->QueuePDPrimitives (this, prims, layoutID, groupNum, sector, pdBits,
-      uvsizes);
+      this->uvsizes[groupNum]);
 
     return layoutID;
   }
@@ -542,17 +578,16 @@ namespace lighter
     }
   }
 
-  void SimpleUVObjectLayouter::ComputeSizes (PrimitiveArray& prims, 
-                                             size_t groupNum,
-                                             csArray<csVector2>& uvsizes, 
-                                             csArray<csVector2>& minuvs)
+  void SimpleUVObjectLayouter::ComputeMinUVs (PrimitiveArray& prims, 
+                                              size_t groupNum,
+                                              csArray<csVector2>& minuvs)
   {
     const csArray<csArray<size_t> >& coplanarGroup = coplanarGroups[groupNum];
 
     for (size_t c = 0; c < coplanarGroup.GetSize(); c++)
     {
       const csArray<size_t>& coPrim = coplanarGroup[c];
-      csVector2 minuv, maxuv, uvSize;
+      csVector2 minuv, maxuv;
 
       // Compute uv-size
       Primitive& prim0 = prims[coPrim[0]];
@@ -567,8 +602,7 @@ namespace lighter
         maxuv.x = csMax (maxuv.x, pmaxuv.x);
         maxuv.y = csMax (maxuv.y, pmaxuv.y);
       }
-      uvSize = (maxuv-minuv)+csVector2(2.0f,2.0f);
-      uvsizes.Push (uvSize);
+      
       /* Subtle: causes lumels to be aligned on a world space grid.
        * The intention is that the lightmap coordinates for vertices 
        * for two adjacent faces are lined up nicely.
@@ -583,7 +617,7 @@ namespace lighter
     size_t layoutID, size_t groupNum, size_t lightmap, 
     const csArray<csVector2>& positions, int dx, int dy)
   {
-    const csArray<csVector2>& minuvs = this->minuvs[layoutID];
+    const csArray<csVector2>& minuvs = this->minuvs[/*groupNum*/layoutID];
     PDLayoutedGroup layouted;
     layouted.lmID = uint (lightmap);
     layouted.remaps = positions;

@@ -127,7 +127,7 @@ bool csSndSysRendererOpenAL::Initialize (iObjectRegistry *obj_reg)
   SndSysSourceOpenAL2D::Configure( m_Config );
 
   // Register for event callbacks.
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY(m_ObjectRegistry, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (m_ObjectRegistry));
   evSystemOpen = csevSystemOpen(m_ObjectRegistry);
   evSystemClose = csevSystemClose(m_ObjectRegistry);
   evFrame = csevFrame(m_ObjectRegistry);

@@ -33,12 +33,11 @@
 #include "csutil/refarr.h"
 #include "csutil/memfile.h"
 
+#include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
 
 struct iFont;
-struct iGraphics2D;
-struct iGraphics3D;
 
 enum CS_PEN_TEXT_ALIGN 
 { 

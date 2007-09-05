@@ -330,10 +330,10 @@ bool ASndTest::Application()
   loader = csQueryRegistry<iLoader> (GetObjectRegistry());
   if (!loader) return ReportError("Failed to locate Loader!");
 
-  sndrenderer = CS_QUERY_REGISTRY(GetObjectRegistry(), iSndSysRenderer);
+  sndrenderer = csQueryRegistry<iSndSysRenderer> (GetObjectRegistry());
   if (!sndrenderer) return ReportError("Failed to locate Sound renderer!");
 
-  sndloader = CS_QUERY_REGISTRY(GetObjectRegistry(), iSndSysLoader);
+  sndloader = csQueryRegistry<iSndSysLoader> (GetObjectRegistry());
   if (!sndloader) return ReportError("Failed to locate Sound loader!");
 
 engine->SetLightingCacheMode (0);

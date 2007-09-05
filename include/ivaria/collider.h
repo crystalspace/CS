@@ -30,7 +30,6 @@
 #include "csutil/ref.h"
 #include "iutil/strset.h"
 
-struct iPolygonMesh;
 struct iTriangleMesh;
 struct iTerraFormer;
 struct iMeshObject;
@@ -95,9 +94,6 @@ struct iCollider : public virtual iBase
   virtual csColliderType GetColliderType () = 0;
 };
 
-// for iPolygonMesh
-#include "csutil/win32/msvc_deprecated_warn_off.h"
-
 /**
  * This is the Collide plug-in. This plugin is a factory for creating
  * iCollider entities. A collider represents an entity in the
@@ -116,7 +112,7 @@ struct iCollider : public virtual iBase
  */
 struct iCollideSystem : public virtual iBase
 {
-  SCF_INTERFACE (iCollideSystem, 2, 1, 1);
+  SCF_INTERFACE (iCollideSystem, 2, 2, 1);
 
   /**
    * Get the ID that the collision detection system prefers for getting
@@ -133,19 +129,6 @@ struct iCollideSystem : public virtual iBase
    * is a reference to the standard string set.
    */
   virtual csStringID GetBaseDataID () = 0;
-
-  /**
-   * Create a iCollider for the given mesh geometry.
-   * \param mesh is a structure describing the geometry from which the
-   * collider will be made. You can get such a mesh either by making your
-   * own subclass of iPolygonMesh, by getting a mesh from
-   * iMeshObject->GetObjectModel()->GetPolygonMeshColldet(), or else
-   * by using csPolygonMesh, or csPolygonMeshBox.
-   * \return a reference to a collider that you have to store.
-   * \deprecated Use CreateCollider(iTriangleMesh*) instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use CreateCollider(iTriangleMesh*) instead.")
-  virtual csPtr<iCollider> CreateCollider (iPolygonMesh* mesh) = 0;
 
   /**
    * Create a iCollider for the given mesh geometry.
@@ -279,9 +262,6 @@ struct iCollideSystem : public virtual iBase
    */
   virtual bool GetOneHitOnly () = 0;
 };
-
-// for iPolygonMesh
-#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_IVARIA_COLLIDER_H__
 

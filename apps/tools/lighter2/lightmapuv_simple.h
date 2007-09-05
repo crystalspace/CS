@@ -22,6 +22,9 @@
 #include "primitive.h"
 #include "lightmapuv.h"
 
+// Uncomment to dump subrectangles used during PrepareLighting()
+//#define DUMP_SUBRECTANGLES
+
 namespace lighter
 {
 
@@ -211,6 +214,20 @@ namespace lighter
         delete queue.maps[index].alloc;
         queue.maps.DeleteIndex (index);
       }
+      void CleanEmpty ()
+      {
+        size_t i = 0;
+        while (i < queue.maps.GetSize())
+        {
+          if (queue.maps[i].alloc->IsEmpty())
+          {
+            delete queue.maps[i].alloc;
+            queue.maps.DeleteIndex (i);
+          }
+          else
+            i++;
+        }
+      }
     };
     class ArraysLQ
     {
@@ -304,10 +321,15 @@ namespace lighter
       csArray<csVector2> remaps;
     };
     csHash<PDLayoutedGroup, size_t> pdLayouts;
+    csArray<csArray<csVector2> > uvsizes;
+    /**
+     * Minimum UVs for each *layout* (since a group can appear multiple times
+     * on lightmaps)
+     */
     csArray<csArray<csVector2> > minuvs;
 
-    void ComputeSizes (PrimitiveArray& prims, size_t groupNum,
-      csArray<csVector2>& uvsizes, csArray<csVector2>& minuvs);
+    void ComputeMinUVs (PrimitiveArray& prims, size_t groupNum,
+      csArray<csVector2>& minuvs);
 
     void LayoutQueuedPrims (PrimitiveArray &prims, size_t groupNum, 
       size_t layoutID, size_t lightmap, const csArray<csVector2>& positions, 

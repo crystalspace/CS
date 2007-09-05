@@ -69,7 +69,7 @@ rule csConfigGen
   libaddstrings on $(<) = $(libaddstrings) ;
   libbasestrs on $(<) = $(libbasestrs) ;
   libswitchcase on $(<) = $(libswitchcase) ;
-  ENV_VERSION on $(<) = $(PACKAGE_VERSION_LIST[0])_$(PACKAGE_VERSION_LIST[1]) ;
+  ENV_VERSION on $(<) = $(PACKAGE_VERSION_LIST[1])_$(PACKAGE_VERSION_LIST[2]) ;
 
   csConfigGen1 $(<) : $(>) ;
 }

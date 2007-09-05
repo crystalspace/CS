@@ -105,8 +105,8 @@ bool PySimple::Application()
   csRef<iPluginManager> plugin_mgr (
   	csQueryRegistry<iPluginManager> (GetObjectRegistry()));
   // Initialize the python plugin.
-  csRef<iScript> is (CS_LOAD_PLUGIN (plugin_mgr,
-      "crystalspace.script.python", iScript));
+  csRef<iScript> is = csLoadPlugin<iScript> (plugin_mgr,
+      "crystalspace.script.python");
   if (is)
   {
     char const* module = "pysimp";

@@ -356,7 +356,6 @@ public:
   /**\name iObjectModel implementation
    * @{ */
   void GetObjectBoundingBox (csBox3& bbox, csVector3 *verts,int vertCount);
-  void GetObjectBoundingBox (csBox3& bbox);
   const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent);
@@ -410,7 +409,7 @@ private:
     float weight;
   };
 
-  iMeshObjectDrawCallback* vis_cb;
+  csRef<iMeshObjectDrawCallback> vis_cb;
   uint32 current_features;  // LOD Control thing
   iMeshWrapper* logparent;
   CalModel calModel;
@@ -646,8 +645,6 @@ public:
     iMovable* movable, uint32 frustum_mask);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
-    if (cb) cb->IncRef ();
-    if (vis_cb) vis_cb->DecRef ();
     vis_cb = cb;
   }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const
@@ -744,7 +741,8 @@ public:
   }
   CalModel *GetCal3DModel () { return &calModel; }
 
-  csPtr<iSkeleton> GetSkeleton () {return scfQueryInterface<iSkeleton> (skeleton);}
+  csPtr<iSkeleton> GetSkeleton () {return scfQueryInterface<iSkeleton> (
+      skeleton);}
 
   void SetAnimTimeUpdateHandler (iAnimTimeUpdateHandler*);
   /** @} */
@@ -774,7 +772,6 @@ public:
   /**\name iObjectModel implementation
    * @{ */
   void GetObjectBoundingBox (csBox3& bbox, csVector3 *verts, int vertCount);
-  void GetObjectBoundingBox (csBox3& bbox);
   const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent);
@@ -810,9 +807,7 @@ public:
   void SetName (const char* name) {csCal3dSkeletonFactory::name = name;}
   iSkeletonBoneFactory *CreateBone (const char *name) {return 0;}
   iSkeletonAnimation *CreateAnimation (const char *name);
-  iSkeletonAnimation *CreateScript(const char *name) {return CreateAnimation (name);}
   iSkeletonAnimation *FindAnimation (const char *name);
-  iSkeletonAnimation *FindScript (const char *name) {return FindAnimation (name);}
   iSkeletonBoneFactory *FindBone (const char *name);
   size_t FindBoneIndex (const char *name);
   size_t GetBonesCount () const {return bones_factories.GetSize ();}
@@ -1003,22 +998,17 @@ public:
   iSkeletonBone *GetBone (size_t i) {return bones[i];}
   iSkeletonBone *FindBone (const char *name);
   size_t FindBoneIndex (const char *name);
-  iSkeletonAnimation* Execute (const char *scriptname) {return 0;}
+  iSkeletonAnimation* Execute (const char *scriptname, float blend_factor = 0.0f) {return 0;}
   iSkeletonAnimation* Append (const char *scriptname) {return 0;}
   void ClearPendingAnimations () {;}
-  void ClearPendingScripts () {ClearPendingAnimations ();}
   size_t GetAnimationsCount () {return 0;}
-  size_t GetScriptsCount () {return GetAnimationsCount ();}
   iSkeletonAnimation* GetAnimation (size_t i) {return 0;}
-  iSkeletonAnimation* GetScript (size_t i) {return GetAnimation (i);}
   iSkeletonAnimation* FindAnimation (const char *scriptname) {return 0;}
-  iSkeletonAnimation* FindScript (const char *scriptname) {return FindAnimation (scriptname);}
   iSkeletonSocket* FindSocket (const char *socketname) {return 0;}
   void StopAll () {;}
   void Stop (const char* scriptname) {;}
   iSkeletonFactory *GetFactory () {return skeleton_factory;}
   void SetAnimationCallback (iSkeletonAnimationCallback *cb) {;}
-  void SetScriptCallback (iSkeletonAnimationCallback *cb) {SetAnimationCallback (cb);}
   size_t AddUpdateCallback(iSkeletonUpdateCallback *update_callback) 
   {return update_callbacks.Push (update_callback);}
   size_t GetUpdateCallbacksCount () 
@@ -1082,26 +1072,6 @@ public:
   /// New Factory.
   virtual csPtr<iMeshObjectFactory> NewFactory ();
   /** @} */
-
-  struct NullPolyMesh : public scfImplementation1<NullPolyMesh, iPolygonMesh>
-  {
-    int GetVertexCount() { return 0; }
-    csVector3* GetVertices () { return 0; }
-    int GetPolygonCount () { return 0; }
-    int GetTriangleCount () { return 0; }
-    csMeshedPolygon* GetPolygons () { return 0; }
-    csTriangle* GetTriangles () { return 0; }
-    void Lock () {}
-    void Unlock () {}
-
-    csFlags polymesh_flags;
-    csFlags& GetFlags () { return polymesh_flags; }
-    uint32 GetChangeNumber() const { return 0; }
-
-    NullPolyMesh (iBase* parent) : scfImplementationType (this, parent),
-      polymesh_flags (CS_POLYMESH_TRIANGLEMESH) {}
-  };
-  csRef<iPolygonMesh> nullPolyMesh;
 };
 
 }

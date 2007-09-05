@@ -63,7 +63,7 @@ csPtr<iRenderStep> csRenderStepParser::Parse (
   }
 
   csRef<iLoaderPlugin> loader =
-    CS_LOAD_PLUGIN (plugmgr, pluginID, iLoaderPlugin);
+    csLoadPlugin<iLoaderPlugin> (plugmgr, pluginID);
   /*
     @@@ This means a full ClassID has to be specified in <plugin>.
     Would be nice if the shortcuts from the loader could be used as

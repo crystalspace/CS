@@ -127,7 +127,7 @@ public:
  * weak references.
  */
 template<class Class>
-class CS_CRYSTALSPACE_EXPORT scfImplementation : public virtual iBase,
+class scfImplementation : public virtual iBase,
   public CS::Memory::CustomAllocated
 {
 public:

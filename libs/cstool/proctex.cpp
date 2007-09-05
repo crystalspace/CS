@@ -171,23 +171,18 @@ struct csProcTexCallback :
   virtual iProcTexture* GetProcTexture() const;
 };
 
-
 void csProcTexCallback::UseTexture (iTextureWrapper*)
 {
-  pt->UseTexture ();
+  if (pt) pt->UseTexture ();
 }
 iProcTexture* csProcTexCallback::GetProcTexture() const
 {
   return pt;
 }
 
-bool csProcTexture::Initialize (iObjectRegistry* object_reg)
+iTextureWrapper* csProcTexture::CreateTexture (iObjectRegistry* object_reg)
 {
-  csProcTexture::object_reg = object_reg;
-  proceh = SetupProcEventHandler (object_reg);
-
-  g3d = csQueryRegistry<iGraphics3D> (object_reg);
-  g2d = csQueryRegistry<iGraphics2D> (object_reg);
+  iTextureWrapper* tex;
 
   csRef<iEngine> engine (csQueryRegistry<iEngine> (object_reg));
   if (proc_image)
@@ -203,6 +198,19 @@ bool csProcTexture::Initialize (iObjectRegistry* object_reg)
       CS_TEXTURE_3D | texFlags);
     tex = engine->GetTextureList()->NewTexture (texHandle);
   }
+
+  return tex;
+}
+
+bool csProcTexture::Initialize (iObjectRegistry* object_reg)
+{
+  csProcTexture::object_reg = object_reg;
+  proceh = SetupProcEventHandler (object_reg);
+
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
+  g2d = csQueryRegistry<iGraphics2D> (object_reg);
+
+  tex = CreateTexture (object_reg);
   if (!tex)
     return false;
 

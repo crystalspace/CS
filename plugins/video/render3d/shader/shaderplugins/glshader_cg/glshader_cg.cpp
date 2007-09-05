@@ -58,7 +58,7 @@ csGLShader_CG::csGLShader_CG (iBase* parent) :
 
 csGLShader_CG::~csGLShader_CG()
 {
-  delete[] dumpDir;
+  cs_free (dumpDir);
   cgDestroyContext (context);
 }
 
@@ -81,7 +81,7 @@ void csGLShader_CG::ErrorHandler (CGcontext context, CGerror error,
   if (error == CG_COMPILER_ERROR)
   {
     const char* listing = cgGetLastListing (context);
-    if (listing)
+    if (listing && *listing)
     {
       csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
 	"crystalspace.graphics3d.shader.glcg",
@@ -334,7 +334,7 @@ bool csGLShader_CG::Open()
 
   debugDump = config->GetBool ("Video.OpenGL.Shader.Cg.DebugDump", false);
   if (debugDump)
-    dumpDir = csStrNew (config->GetStr ("Video.OpenGL.Shader.Cg.DebugDumpDir",
+    dumpDir = CS::StrDup (config->GetStr ("Video.OpenGL.Shader.Cg.DebugDumpDir",
     "/tmp/cgdump/"));
  
   // Determining what profile to use:

@@ -339,9 +339,6 @@ public:
   /// A sprite to display the Crystal Space Logo
   csPixmap* cslogo;
 
-  /// Our infinite maze object if used.
-  InfiniteMaze* infinite_maze;
-
   /// Some sounds.
   iSndSysWrapper* wMissile_boom;
   iSndSysWrapper* wMissile_whoosh;
@@ -356,7 +353,6 @@ public:
   bool busy_perf_test;
   bool do_show_z;
   bool do_show_palette;
-  bool do_infinite;
   bool do_huge;
   bool do_freelook;
   bool do_light_frust;

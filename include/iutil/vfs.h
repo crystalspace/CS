@@ -200,7 +200,7 @@ struct iFile : public virtual iBase
  * - The VFS plugin (crystalspace.kernel.vfs)
  *
  * Main ways to get pointers to this interface:
- * - CS_QUERY_REGISTRY()
+ * - csQueryRegistry<iVFS>()
  */
 struct iVFS : public virtual iBase
 {

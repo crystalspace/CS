@@ -103,9 +103,9 @@ public:
   virtual iSkeletonBone *GetChild (size_t i) { return bones[i]; }
   virtual iSkeletonBone *FindChild (const char *name);
   virtual void SetUpdateCallback (iSkeletonBoneUpdateCallback *callback) 
-    { cb = callback; }
+  { cb = callback; }
   virtual iSkeletonBoneUpdateCallback *GetUpdateCallback () 
-    { return cb; };
+  { return cb; };
   virtual iSkeletonBoneFactory *GetFactory();
   virtual size_t FindChildIndex (iSkeletonBone *child);
   virtual void SetSkinBox (csBox3 & box) { skin_box = box; }
@@ -345,7 +345,6 @@ class csSkeletonAnimationKeyFrame :
     //csArray<bone_key_info> bones_frame_transforms;
     //csArray<bone_key_info> bones_frame_transforms;
     BoneKeyHash bones_frame_transforms;
-    csReversibleTransform fallback_transform;
   public:
 
     bone_key_info & GetKeyInfo(iSkeletonBoneFactory *bone_fact)
@@ -389,10 +388,6 @@ class csSkeletonAnimationKeyFrame :
       dst_trans = csReversibleTransform (csMatrix3 (bki.rot), bki.pos);
 
       return true;
-    }
-    virtual csReversibleTransform & GetTransform(iSkeletonBoneFactory *bone_fact)
-    {
-      return fallback_transform;
     }
 
     virtual void SetTransform(iSkeletonBoneFactory *bone_fact, 
@@ -458,7 +453,7 @@ public:
   virtual float GetSpeed () { return time_factor; }
   virtual void SetSpeed (float speed)  {time_factor = speed;}
   virtual void SetFactor (float) {}
-  virtual float GetFactor () { return 0; }
+  virtual float GetFactor () { return 1; }
   virtual void SetLoop (bool loop)
   { csSkeletonAnimation::loop = loop; }
   virtual bool GetLoop ()
@@ -496,7 +491,12 @@ struct sac_transform_execution
   csQuaternion tangent;
   csQuaternion curr_quat;
   csTicks elapsed_ticks;
-  int type;
+
+  enum TransformType
+  {
+    CS_TRANS_RELATIVE,
+    CS_TRANS_FIXED
+  } type;
 };
 
 class csSkeletonAnimationInstance :
@@ -513,7 +513,7 @@ private:
   csSkeletonAnimation *animation;
   size_t current_instruction;
   int current_frame;
-  float morph_factor;
+  float blend_factor;
   float time_factor;
   csQuaternion zero_quat;
   int loop_times;
@@ -561,8 +561,8 @@ public:
   ~csSkeletonAnimationInstance ();
 
   const char *GetName () const { return animation->GetName (); }
-  float GetFactor () { return 1; }
-  void SetFactor (float factor) { }
+  float GetFactor () { return blend_factor; }
+  void SetFactor (float factor) { blend_factor = factor; }
   csTicks GetDuration () { return (csTicks) (animation->GetTime () * time_factor); }
   void SetDuration (csTicks time);
   float GetSpeed () {return time_factor; }
@@ -632,17 +632,13 @@ public:
   virtual iSkeletonBone *GetBone (size_t i) { return bones[i]; }
   virtual iSkeletonBone *FindBone (const char *name);
 
-  virtual iSkeletonAnimation* Execute (const char *scriptname);
+  virtual iSkeletonAnimation* Execute (const char *scriptname, float blend_factor = 0.0f);
   virtual iSkeletonAnimation* Append (const char *scriptname);
   virtual void ClearPendingAnimations ()
   { pending_scripts.DeleteAll(); }
-  virtual void ClearPendingScripts () {ClearPendingAnimations (); }
   virtual size_t GetAnimationsCount () { return running_animations.GetSize (); }
-  virtual size_t GetScriptsCount () { return GetAnimationsCount (); }
   virtual iSkeletonAnimation* GetAnimation (size_t i);
-  virtual iSkeletonAnimation* GetScript (size_t i) {return GetAnimation (i);}
   virtual iSkeletonAnimation* FindAnimation (const char *scriptname);
-  virtual iSkeletonAnimation* FindScript (const char *scriptname) {return FindAnimation (scriptname);}
   virtual void StopAll ();
   virtual void Stop (const char* scriptname);
   virtual void Stop (iSkeletonAnimation *script);
@@ -650,8 +646,6 @@ public:
   virtual iSkeletonFactory *GetFactory();
   virtual void SetAnimationCallback (iSkeletonAnimationCallback *cb)
   { script_callback = cb; }
-  virtual void SetScriptCallback(iSkeletonAnimationCallback *cb)
-  { SetAnimationCallback (cb); }
   virtual iSkeletonSocket* FindSocket (const char *socketname);
     //virtual void CreateRagdoll(iODEDynamicSystem *dyn_sys, csReversibleTransform & transform);
   //virtual void DestroyRagdoll();
@@ -713,10 +707,8 @@ public:
 
   size_t GetAnimationsCount () {return scripts.GetSize ();}
   iSkeletonAnimation *GetAnimation (size_t idx) {return scripts[idx];}
-  virtual iSkeletonAnimation *CreateScript(const char *name) {return CreateAnimation (name);}
   virtual iSkeletonAnimation *CreateAnimation (const char *name);
   virtual iSkeletonAnimation *FindAnimation (const char *name);
-  virtual iSkeletonAnimation *FindScript (const char *name) {return FindAnimation (name);}
 
   virtual iSkeletonSocketFactory *CreateSocket(const char *name, iSkeletonBoneFactory *bone);
   virtual iSkeletonSocketFactory *FindSocket(const char *name);
@@ -778,7 +770,8 @@ public:
   virtual iSkeleton *CreateSkeleton(iSkeletonFactory *fact, const char *name);
   virtual void SetManualUpdates (bool man_updates) {manual_updates = man_updates;}
   virtual void Update (csTicks time);
-  void AddSkeleton (iSkeleton *skeleton) {skeletons.Push (skeleton);}
+  void AddSkeleton (iSkeleton *skeleton);
+  void RemoveSkeleton (iSkeleton* skeleton);
 
   class csSkelEventHandler : public scfImplementation1<csSkelEventHandler,
   	iEventHandler>

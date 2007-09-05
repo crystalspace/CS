@@ -692,7 +692,7 @@ bool csEngine::HandleEvent (iEvent &Event)
     // We must free all material and texture handles since after
     // G3D->Close() they all become invalid, no matter whenever
     // we did or didn't an IncRef on them.
-    DeleteAll ();
+    DeleteAllForce ();
     return true;
   }
   else if (G2D)
@@ -1527,7 +1527,7 @@ csPtr<iRenderLoop> csEngine::CreateDefaultRenderLoop ()
 
   char const* const stdstep = "crystalspace.renderloop.step.generic.type";
   csRef<iRenderStepType> genType =
-    CS_LOAD_PLUGIN (plugin_mgr, stdstep, iRenderStepType);
+    csLoadPlugin<iRenderStepType> (plugin_mgr, stdstep);
 
   if (genType.IsValid())
   {

@@ -20,6 +20,7 @@
 
 #include "raytracer.h"
 #include "kdtree.h"
+#include "primitive.h"
 
 namespace lighter
 {
@@ -51,14 +52,12 @@ namespace lighter
     CS::Memory::AlignedFree (traversalStack);
   }
 
-  static const uint mod5[] = {0,1,2,0,1};
-
   static bool IntersectPrimitiveRay (const KDTreePrimitive &primitive, const Ray &ray,
     HitPoint &hit)
   {
     const uint k = primitive.normal_K & ~KDPRIM_FLAG_MASK;
-    const uint ku = mod5[k+1];
-    const uint kv = mod5[k+2];
+    const uint ku = CS::Math::NextModulo3(k);  // ku = (k+1) % 3
+    const uint kv = CS::Math::NextModulo3(ku); // kv = (k+2) % 3
 
     // prefetch?
 
@@ -117,10 +116,14 @@ namespace lighter
       if (ray.ignoreFlags & (prim->normal_K & KDPRIM_FLAG_MASK)) 
         continue; 
 
-      if (ignoreCB (prim->primPointer) ||
-        ray.ignorePrimitive == prim->primPointer ||
-        state.mailbox.PutPrimitiveRay (prim->primPointer, ray.rayID))
+      if (ray.ignorePrimitive == prim->primPointer ||
+        state.mailbox.PutPrimitiveRay (prim->primPointer, ray.rayID) ||
+        ignoreCB (prim->primPointer))
           continue;
+
+      if (ray.ignorePrimitive && 
+        ray.ignorePrimitive->GetPlane () == prim->primPointer->GetPlane ())
+        continue;
 
       haveHit = IntersectPrimitiveRay (*prim, ray, thisHit);
       if (haveHit)
@@ -296,7 +299,7 @@ namespace lighter
     else
     {
       IgnoreCallbackNone ignCB;
-      return TraceFunction<false> (tree, ray, hit, hitCB, ignCB);;
+      return TraceFunction<false> (tree, ray, hit, hitCB, ignCB);
     }
   }
 

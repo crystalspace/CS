@@ -179,7 +179,9 @@ namespace lighter
   void Lighter::CleanUp ()
   {
     delete scene; scene = 0;
+    
     delete swapManager; swapManager = 0;
+    
     engine.Invalidate ();
   }
 
@@ -309,12 +311,12 @@ namespace lighter
     progPostproc.SetProgress (0);
     // De-antialias the lightmaps
     {
-      LightmapMaskArray lmMasks;
+      LightmapMaskPtrDelArray lmMasks;
       LightmapPtrDelArray::Iterator lmIt = scene->GetLightmaps ().GetIterator ();
       while (lmIt.HasNext ())
       {
         const Lightmap* lm = lmIt.Next ();
-        lmMasks.Push (LightmapMask (*lm));
+        lmMasks.Push (new LightmapMask (*lm));
       }
 
       progPostprocSector.SetProgress (0);
@@ -359,7 +361,7 @@ namespace lighter
 
         for (size_t lmI = 0; lmI < lightmaps.GetSize (); ++lmI)
         {
-          lightmaps[lmI]->FixupLightmap (lmMasks[lmI]);
+          lightmaps[lmI]->FixupLightmap (*(lmMasks[lmI]));
           if (--u == 0)
           {
             progLM->IncProgress (progressStep);

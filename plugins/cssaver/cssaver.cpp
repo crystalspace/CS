@@ -63,7 +63,6 @@
 #include "ivideo/txtmgr.h"
 #include "plugins/engine/3d/halo.h"
 #include "csutil/flags.h"
-#include "igeom/polymesh.h"
 #include "igeom/trimesh.h"
 #include "csgeom/tri.h"
 
@@ -757,7 +756,7 @@ bool csSaver::SaveSectors(iDocumentNode *parent)
       synldr->WriteColor (CreateNode (sectorNode, "ambient"), ambient);
     }
     
-    // TBD: cullerp, polymesh, node
+    // TBD: cullerp, trimesh, node
 
     if (sector->HasFog ())
     {

@@ -100,7 +100,7 @@ bool csPython::Initialize(iObjectRegistry* object_reg)
   if (vfs.IsValid())
   {
     csRef<iStringArray> paths(vfs->GetRealMountPaths("/scripts"));
-    for (size_t i = 0, n = paths->Length(); i < n; i++)
+    for (size_t i = 0, n = paths->GetSize(); i < n; i++)
     {
       csString path = paths->Get(i);
       cmd << "sys.path.append('" << path_append(path, "python") << "')\n";

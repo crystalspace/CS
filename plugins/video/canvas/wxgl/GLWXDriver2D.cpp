@@ -459,7 +459,7 @@ int csGraphics2DWX::FindPixelFormat (csGLPixelFormatPicker& picker, PIXELFORMATD
 
   HINSTANCE ModuleHandle = GetModuleHandle(0);
 
-  WNDCLASS wc;
+  WNDCLASSA wc;
   wc.hCursor        = 0;
   wc.hIcon	    = 0;
   wc.lpszMenuName   = 0;
@@ -473,7 +473,7 @@ int csGraphics2DWX::FindPixelFormat (csGLPixelFormatPicker& picker, PIXELFORMATD
 
   if (!RegisterClassA (&wc)) return false;
 
-  HWND wnd = CreateWindow (dummyClassName, 0, 0, CW_USEDEFAULT, 
+  HWND wnd = CreateWindowA (dummyClassName, 0, 0, CW_USEDEFAULT, 
     CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 0, 0,
     ModuleHandle, 0);
 

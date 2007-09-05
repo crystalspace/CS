@@ -823,7 +823,7 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
               p.instance_id, p.position, rotation_matrices[p.rotation]);
 
 /*
-  csRef<iImposter> imposter = SCF_QUERY_INTERFACE (mesh, iImposter);
+  csRef<iImposter> imposter = scfQueryInterface<iImposter> (mesh);
     imposter->SetImposterActive (true);
   iSharedVariable *var = engine->GetVariableList()->FindByName 
     ("Std Thing Range");
@@ -853,7 +853,7 @@ void csMeshGenerator::AllocateMeshes (int cidx, csMGCell& cell,
               p.position, rotation_matrices[p.rotation]);
 /*
 printf("case 2\n");
-  csRef<iImposter> imposter = SCF_QUERY_INTERFACE (mesh, iImposter);
+  csRef<iImposter> imposter = scfQueryInterface<iImposter> (mesh);
     imposter->SetImposterActive (true);
   iSharedVariable *var = engine->GetVariableList()->FindByName 
     ("Std Thing Range");
