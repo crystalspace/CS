@@ -6,6 +6,9 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Sep-2007
+	- res applied a patch from 'sarah' to fix compiling after merging some
+	  weaver changes from render manager branch (trac #384).
 3-Sep-2007
 	- res partially reverted r27524 and r27534: some methods that have not
 	  been fully deprecated have been removed by these changesets. Notably,

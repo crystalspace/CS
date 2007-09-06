@@ -85,7 +85,7 @@ bool csShaderProgram::ProgramParamParser::ParseProgramParam (
 	"Node has no contents");
       return false;
     }
-    param.name = strings->Request (value);
+    param.name = stringsSvName->Request (value);
     param.valid = true;
     return true;
   }

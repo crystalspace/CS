@@ -135,7 +135,7 @@ protected:
   bool ParseProgramParam (iDocumentNode* node,
     ProgramParam& param, uint types = ~0)
   {
-    ProgramParamParser parser (synsrv, stringsSvName);
+    ProgramParamParser parser (synsrv, strings);
     return parser.ParseProgramParam (node, param, types);
   }
 
