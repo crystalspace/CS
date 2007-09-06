@@ -307,10 +307,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       return false;
     }
     
-    csRef<iDocumentSystem> docsys (
-      csQueryRegistry<iDocumentSystem> (object_reg));
-    if (!docsys.IsValid())
-      docsys.AttachNew (new csTinyDocumentSystem);
+    csRef<iDocumentSystem> docsys;
+    docsys.AttachNew (new csTinyDocumentSystem);
     csRef<iDocument> doc = docsys->CreateDocument();
     {
       const char* err = doc->Parse (libfile);
@@ -452,10 +450,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       return false;
     }
 
-    csRef<iDocumentSystem> docsys (
-      csQueryRegistry<iDocumentSystem> (object_reg));
-    if (!docsys.IsValid())
-      docsys.AttachNew (new csTinyDocumentSystem);
+    csRef<iDocumentSystem> docsys;
+    docsys.AttachNew (new csTinyDocumentSystem);
 
     ShaderWeaver::TypeInfoIterator typeIt;
     while (typeIt.HasNext())
