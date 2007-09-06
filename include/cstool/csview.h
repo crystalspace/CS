@@ -67,7 +67,7 @@ private:
   /// State of the automatic resizing
   bool AutoResize;
 
-  FilterMode meshFilterMode;
+  iViewFilterMode meshFilterMode;
   // FIXME: csRef<> prolly not a good idea
   csSet<csRef<iMeshWrapper> > filteredMeshes;
 public:
@@ -111,9 +111,9 @@ public:
   virtual void Draw (iMeshWrapper* mesh = 0);
 
 
-  virtual void SetMeshFilterModer (FilterMode mode)
+  virtual void SetMeshFilterModer (iViewFilterMode mode)
   { meshFilterMode = mode; }
-  virtual FilterMode SetMeshFilterModer ()
+  virtual iViewFilterMode SetMeshFilterModer ()
   { return meshFilterMode; }
 
   virtual void AddFilterMesh (iMeshWrapper* mesh)

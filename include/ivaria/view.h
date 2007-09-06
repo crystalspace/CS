@@ -32,6 +32,12 @@ struct iGraphics3D;
 struct iClipper2D;
 struct iMeshWrapper;
 
+enum iViewFilterMode
+{
+  filterExcludeSpecified,
+  filterOnlySpecified
+};
+
 /**
  * The iView class encapsulates the top-level Crystal Space
  * renderer interface. It is basically a camera and a clipper.
@@ -100,14 +106,8 @@ struct iView : public virtual iBase
    */
   virtual void SetAutoResize (bool state) = 0;
 
-  enum FilterMode
-  {
-    filterExcludeSpecified,
-    filterOnlySpecified
-  };
-
-  virtual void SetMeshFilterModer (FilterMode mode) = 0;
-  virtual FilterMode SetMeshFilterModer () = 0;
+  virtual void SetMeshFilterModer (iViewFilterMode mode) = 0;
+  virtual iViewFilterMode SetMeshFilterModer () = 0;
 
   virtual void AddFilterMesh (iMeshWrapper* mesh) = 0;
   virtual void RemoveFilterMesh (iMeshWrapper* mesh) = 0;

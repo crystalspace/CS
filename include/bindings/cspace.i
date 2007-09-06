@@ -268,6 +268,7 @@
   INTERFACE_APPLY(iPluginManager)
   INTERFACE_APPLY(iPortal)
   INTERFACE_APPLY(iPortalContainer)
+  INTERFACE_APPLY(iRenderManager)
   INTERFACE_APPLY(iReporter)
   INTERFACE_APPLY(iReporterIterator)
   INTERFACE_APPLY(iReporterListener)
@@ -586,6 +587,7 @@ TYPEMAP_OUT_csWrapPtr
 %ignore csArray::GetExtend;
 %ignore csArray::GetIndex;
 %ignore csArray::GetIterator;
+%ignore csArray::GetReverseIterator;
 %ignore csArray::InitRegion;
 %ignore csArray::InsertSorted;
 %ignore csArray::Iterator;
@@ -998,6 +1000,7 @@ iArrayChangeElements<csShaderVariable * >;
 %ignore csArray<csPluginRequest>::GetExtend;
 %ignore csArray<csPluginRequest>::GetIndex;
 %ignore csArray<csPluginRequest>::GetIterator;
+%ignore csArray<csPluginRequest>::GetReverseIterator;
 %ignore csArray<csPluginRequest>::InitRegion;
 %ignore csArray<csPluginRequest>::InsertSorted;
 %ignore csArray<csPluginRequest>::Iterator;
@@ -1053,6 +1056,7 @@ ARRAY_OBJECT_FUNCTIONS(csArray<csArray<int> >,csArray<int>)
 %include "iengine/light.h"
 %include "iengine/sector.h"
 %include "iengine/engine.h"
+%include "iengine/rendermanager.h"
 
 %ignore iCamera::GetTransform (); // Non-const.
 %ignore iCamera::Perspective (const csVector3&, csVector2&) const;
@@ -1351,6 +1355,8 @@ typedef int int32_t;
   csVector3&, iMeshWrapper**);
 %template(pycsColliderWrapper) scfImplementationExt1<csColliderWrapper,csObject,scfFakeInterface<csColliderWrapper> >;
 %include "cstool/collider.h"
+%template(scfView) scfImplementation1<csView,iView >;
+
 %include "cstool/csview.h"
 %include "cstool/csfxscr.h"
 
