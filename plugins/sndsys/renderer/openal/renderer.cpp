@@ -329,7 +329,7 @@ void csSndSysRendererOpenAL::Update()
   if (err != ALC_NO_ERROR)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "An OpenAL error occured: %s", alcGetString (m_Device, err));
-    CS_ASSERT (err == ALC_NO_ERROR)
+    CS_ASSERT (err == ALC_NO_ERROR);
   }
 
 }
@@ -381,7 +381,7 @@ void csSndSysRendererOpenAL::Open()
   if (err != ALC_NO_ERROR)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "An OpenAL error occured: %s", alcGetString (m_Device, err));
-    CS_ASSERT (err == ALC_NO_ERROR)
+    CS_ASSERT (err == ALC_NO_ERROR);
   }
 
   // Create a listener
