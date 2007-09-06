@@ -427,6 +427,7 @@ class csStringSet(_object):
     def Contains(*args): return _cspace.csStringSet_Contains(*args)
     def Delete(*args): return _cspace.csStringSet_Delete(*args)
     def Empty(*args): return _cspace.csStringSet_Empty(*args)
+    def Clear(*args): return _cspace.csStringSet_Clear(*args)
     def GetSize(*args): return _cspace.csStringSet_GetSize(*args)
     def IsEmpty(*args): return _cspace.csStringSet_IsEmpty(*args)
 csStringSet_swigregister = _cspace.csStringSet_swigregister
@@ -7429,6 +7430,7 @@ class iStringSet(iBase):
     def Contains(*args): return _cspace.iStringSet_Contains(*args)
     def Delete(*args): return _cspace.iStringSet_Delete(*args)
     def Empty(*args): return _cspace.iStringSet_Empty(*args)
+    def Clear(*args): return _cspace.iStringSet_Clear(*args)
     def GetSize(*args): return _cspace.iStringSet_GetSize(*args)
     def IsEmpty(*args): return _cspace.iStringSet_IsEmpty(*args)
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iStringSet_scfGetVersion
@@ -8410,6 +8412,7 @@ class iStringArray(iBase):
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetSize(*args): return _cspace.iStringArray_GetSize(*args)
+    def Length(*args): return _cspace.iStringArray_Length(*args)
     def Push(*args): return _cspace.iStringArray_Push(*args)
     def Pop(*args): return _cspace.iStringArray_Pop(*args)
     def Get(*args): return _cspace.iStringArray_Get(*args)
@@ -8421,6 +8424,7 @@ class iStringArray(iBase):
     def DeleteIndex(*args): return _cspace.iStringArray_DeleteIndex(*args)
     def Insert(*args): return _cspace.iStringArray_Insert(*args)
     def Empty(*args): return _cspace.iStringArray_Empty(*args)
+    def DeleteAll(*args): return _cspace.iStringArray_DeleteAll(*args)
     def IsEmpty(*args): return _cspace.iStringArray_IsEmpty(*args)
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iStringArray_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iStringArray_scfGetVersion)

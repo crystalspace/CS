@@ -274,7 +274,6 @@ namespace RenderManager
       TraverseAllTextures<Tree, TextureTraverser> traverseAllTextures (texTraverse, 
         shaderManager);
       renderTree.TraverseContexts (contexts, traverseAllTextures);
-      //traverseAllTextures (, renderTree);
     }
   };
 
