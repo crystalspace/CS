@@ -56,8 +56,8 @@ csShaderProgram::~csShaderProgram ()
 {
 }
 
-bool csShaderProgram::ParseProgramParam (iDocumentNode* node,
-  ProgramParam& param, uint types)
+bool csShaderProgram::ProgramParamParser::ParseProgramParam (
+  iDocumentNode* node, ProgramParam& param, uint types)
 {
   const char* type = node->GetAttributeValue ("type");
   if (type == 0)
@@ -85,7 +85,7 @@ bool csShaderProgram::ParseProgramParam (iDocumentNode* node,
 	"Node has no contents");
       return false;
     }
-    param.name = strings->Request (value);
+    param.name = stringsSvName->Request (value);
     param.valid = true;
     return true;
   }

@@ -20,28 +20,7 @@
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
     
-    <input name="primaryColor" type="rgba" default="complex"
-	condition='!vars."tex lightmap".texture'>
-      <block location="pass">
-	<buffer source="primary color" destination="vertexIn.primaryColor" />
-      </block>
-      
-      <block location="cg:vertexIn">
-	<varying type="rgba" name="primaryColor" binding="COLOR" />
-      </block>
-      
-      <block location="cg:vertexToFragment">
-	<varying type="rgba" name="primaryColor" binding="COLOR" />
-      </block>
-      
-      <block location="cg:vertexMain">
-	vertexToFragment.primaryColor = vertexIn.primaryColor;
-      </block>
-      
-      <block location="cg:fragmentMain">
-	primaryColor = vertexToFragment.primaryColor;
-      </block>
-    </input>
+    <input file="/shader/snippets/primaryColor.inp" />
     
     <input name="ambient" type="rgb" default="complex">
       <block location="cg:variablemap">
@@ -57,6 +36,7 @@
       </block>
     </input>
     
+    <!-- Keep non-private? -->
     <input name="texCoordLM" type="texcoord2" default="complex"
 	condition='vars."tex lightmap".texture'>
       <block location="pass">
@@ -65,7 +45,7 @@
       </block>
       
       <block location="cg:vertexToFragment">
-	float2 texcoordLM;
+	<varying type="texcoord2" name="texCoordLM" />
       </block>
       
       <block location="cg:vertexIn">
@@ -73,14 +53,11 @@
       </block>
       
       <block location="cg:vertexMain">
-	vertexToFragment.texcoordLM = vertexIn.texcoordLM;
-      </block>
-      
-      <block location="cg:fragmentMain">
-	texCoordLM = vertexToFragment.texcoordLM;
+	texCoordLM = vertexIn.texcoordLM;
       </block>
     </input>
     
+    <!-- Keep non-private? -->
     <input name="lightmap" type="tex2d" default="complex"
 	condition='vars."tex lightmap".texture'>
       <block location="pass">
@@ -96,13 +73,17 @@
       </block>
     </input>
       
+    <block location="cg:vertexMain">
+      illumination = float3 (0);
+    </block>
+    
     <block location="cg:fragmentMain">
       <?if vars."tex lightmap".texture ?>
 	float3 illum_ambient = ambient;
 	float3 illum_diffuse = 2 * tex2D (lightmap, texCoordLM).rgb;
       <?else?>
 	float3 illum_ambient = float3 (0, 0, 0);
-	float3 illum_diffuse = vertexToFragment.primaryColor.rgb;
+	float3 illum_diffuse = primaryColor.rgb;
       <?endif?>
       illumination = illum_ambient + illum_diffuse;
     </block>

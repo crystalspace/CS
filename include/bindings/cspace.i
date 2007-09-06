@@ -1570,9 +1570,15 @@ csEventID _csevMouseMove (iObjectRegistry *,uint x);
 csEventID _csevJoystickEvent (iObjectRegistry *);
 
 // iutil/plugin.h
-#define _CS_LOAD_PLUGIN_ALWAYS(a, b) CS_LOAD_PLUGIN_ALWAYS(a, b)
-#undef CS_LOAD_PLUGIN_ALWAYS
-csPtr<iBase> _CS_LOAD_PLUGIN_ALWAYS (iPluginManager *, const char *);
+%inline
+%{
+  csPtr<iBase> CS_LOAD_PLUGIN_ALWAYS (iPluginManager *p, const char *i)
+  {
+    printf("CS_LOAD_PLUGIN_ALWAYS is deprecated, use \
+                csLoadPluginAlways instead\n");
+    return csLoadPluginAlways(p,i);
+  }
+%}
 #endif // CS_MICRO_SWIG
 
 #ifndef CS_MINI_SWIG

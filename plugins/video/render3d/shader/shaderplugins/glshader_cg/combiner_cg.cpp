@@ -85,6 +85,132 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     return csPtr<ShaderWeaver::iCombiner> (newCombiner);
   }
 
+  void ShaderCombinerLoaderCg::GenerateConstantInputBlocks (
+    iDocumentNode* node, const char* locationPrefix, const csVector4& value,
+    int usedComponents, const char* outputName)
+  {
+    csString code;
+    code << outputName;
+    code << " = ";
+    if (usedComponents > 1) code << "float" << usedComponents << '(';
+    code << value[0];
+    for (int i = 1; i < usedComponents; i++)
+      code << ", " << value[i];
+    if (usedComponents > 1) code << ')';
+    code << ';';
+
+    csRef<iDocumentNode> blockNode;
+    csRef<iDocumentNode> contents;
+
+    blockNode = node->CreateNodeBefore (CS_NODE_ELEMENT);
+    blockNode->SetValue ("block");
+    blockNode->SetAttribute ("location", 
+      csString().Format ("%s:fragmentMain", locationPrefix));
+    contents = blockNode->CreateNodeBefore (CS_NODE_TEXT);
+    contents->SetValue (code);
+
+    blockNode = node->CreateNodeBefore (CS_NODE_ELEMENT);
+    blockNode->SetValue ("block");
+    blockNode->SetAttribute ("location", 
+      csString().Format ("%s:vertexMain", locationPrefix));
+    contents = blockNode->CreateNodeBefore (CS_NODE_TEXT);
+    contents->SetValue (code);
+  }
+
+  static inline bool IsAlpha (char c)
+  { return ((c >= 'A') && (c <= 'Z')) || ((c >= 'a') || (c <= 'z')); }
+
+  static inline bool IsAlNum (char c)
+  { return ((c >= '0') && (c <= '9')) || IsAlpha (c); }
+
+  static csString MakeIdentifier (const char* s)
+  {
+    csString res;
+    if (!IsAlpha (*s)) res << '_';
+    while (*s != 0)
+    {
+      char ch = *s++;
+      if (IsAlNum (ch))
+        res << ch;
+      else
+        res.AppendFmt ("_%02x", ch);
+    }
+    return res;
+  }
+
+  void ShaderCombinerLoaderCg::GenerateSVInputBlocks (iDocumentNode* node, 
+    const char* locationPrefix, const char* svName, const char* outputType, 
+    const char* outputName, const char* uniqueTag)
+  {
+    csString cgIdent = MakeIdentifier (uniqueTag);
+
+    csRef<iDocumentNode> blockNode;
+
+    blockNode = node->CreateNodeBefore (CS_NODE_ELEMENT);
+    blockNode->SetValue ("block");
+    blockNode->SetAttribute ("location", 
+      csString().Format ("%s:variablemap", locationPrefix));
+    {
+      csRef<iDocumentNode> varMapNode;
+
+      varMapNode = blockNode->CreateNodeBefore (CS_NODE_ELEMENT);
+      varMapNode->SetValue ("variablemap");
+      varMapNode->SetAttribute ("variable", svName);
+      varMapNode->SetAttribute ("destination", 
+        csString().Format ("vertexIn.%s", cgIdent.GetData()));
+
+      varMapNode = blockNode->CreateNodeBefore (CS_NODE_ELEMENT);
+      varMapNode->SetValue ("variablemap");
+      varMapNode->SetAttribute ("variable", svName);
+      varMapNode->SetAttribute ("destination", 
+        csString().Format ("fragmentIn.%s", cgIdent.GetData()));
+    }
+
+    {
+      csRef<iDocumentNode> uniformNode;
+
+      blockNode = node->CreateNodeBefore (CS_NODE_ELEMENT);
+      blockNode->SetValue ("block");
+      blockNode->SetAttribute ("location", 
+        csString().Format ("%s:fragmentIn", locationPrefix));
+
+      uniformNode = blockNode->CreateNodeBefore (CS_NODE_ELEMENT);
+      uniformNode->SetValue ("uniform");
+      uniformNode->SetAttribute ("type", outputType);
+      uniformNode->SetAttribute ("name", cgIdent);
+
+      blockNode = node->CreateNodeBefore (CS_NODE_ELEMENT);
+      blockNode->SetValue ("block");
+      blockNode->SetAttribute ("location", 
+        csString().Format ("%s:vertexIn", locationPrefix));
+
+      uniformNode = blockNode->CreateNodeBefore (CS_NODE_ELEMENT);
+      uniformNode->SetValue ("uniform");
+      uniformNode->SetAttribute ("type", outputType);
+      uniformNode->SetAttribute ("name", cgIdent);
+    }
+
+    {
+      csRef<iDocumentNode> contents;
+
+      blockNode = node->CreateNodeBefore (CS_NODE_ELEMENT);
+      blockNode->SetValue ("block");
+      blockNode->SetAttribute ("location", 
+        csString().Format ("%s:fragmentMain", locationPrefix));
+      contents = blockNode->CreateNodeBefore (CS_NODE_TEXT);
+      contents->SetValue (csString().Format ("%s = fragmentIn.%s;",
+        outputName, cgIdent.GetData()));
+
+      blockNode = node->CreateNodeBefore (CS_NODE_ELEMENT);
+      blockNode->SetValue ("block");
+      blockNode->SetAttribute ("location", 
+        csString().Format ("%s:vertexMain", locationPrefix));
+      contents = blockNode->CreateNodeBefore (CS_NODE_TEXT);
+      contents->SetValue (csString().Format ("%s = vertexIn.%s;",
+        outputName, cgIdent.GetData()));
+    }
+  }
+
   bool ShaderCombinerLoaderCg::Initialize (iObjectRegistry* reg)
   {
     object_reg = reg;
@@ -999,6 +1125,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
           appender.AppendFmt ("#ifndef %s\n", defineName.GetData());
           appender.AppendFmt ("%s = vertexToFragment.%s;\n", 
             name.GetData(), uniqueName.GetData());
+          appender.Append ("#else\n");
+          appender.AppendFmt ("%s = %s(0);\n", 
+            name.GetData(), 
+            CgType (node->GetAttributeValue ("type")).GetData());
           appender.Append ("#endif\n");
         }
       }
