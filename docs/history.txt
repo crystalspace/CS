@@ -13,6 +13,7 @@ chronological order.
 	  CS_LOAD_PLUGIN_ALWAYS, the function remains in the bindings but is
 	  deprecated now (otherwise some people might not have a chance to
 	  update).
+	- Mike Gist fixed bug #351 (wxgl compilation problem).
 3-Sep-2007
 	- res partially reverted r27524 and r27534: some methods that have not
 	  been fully deprecated have been removed by these changesets. Notably,
