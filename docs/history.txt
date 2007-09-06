@@ -14,6 +14,7 @@ chronological order.
 	  deprecated now (otherwise some people might not have a chance to
 	  update).
 	- Mike Gist fixed bug #351 (wxgl compilation problem).
+	- res fixed a null pointer access in null3d when null2d is not present.
 3-Sep-2007
 	- res partially reverted r27524 and r27534: some methods that have not
 	  been fully deprecated have been removed by these changesets. Notably,

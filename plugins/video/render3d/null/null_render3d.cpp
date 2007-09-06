@@ -48,7 +48,6 @@ csNullGraphics3D::csNullGraphics3D (iBase *iParent) :
   scfImplementationType (this, iParent)
 {
   scfiEventHandler = 0;
-  txtmgr = 0;
 
   Caps.minTexHeight = 2;
   Caps.minTexWidth = 2;
@@ -63,8 +62,7 @@ csNullGraphics3D::csNullGraphics3D (iBase *iParent) :
 
 csNullGraphics3D::~csNullGraphics3D ()
 {
-  txtmgr->Clear ();
-  txtmgr->DecRef (); txtmgr = 0;
+  txtmgr.Invalidate();
   if (scfiEventHandler)
   {
     csRef<iEventQueue> q = csQueryRegistry<iEventQueue> (object_reg);
@@ -124,7 +122,7 @@ bool csNullGraphics3D::Initialize (iObjectRegistry* objreg)
 
   object_reg->Register (G2D, "iGraphics2D");
 
-  txtmgr = new csTextureManagerNull (object_reg, G2D, config);
+  txtmgr.AttachNew (new csTextureManagerNull (object_reg, G2D, config));
 
   return true;
 }
