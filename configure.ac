@@ -649,12 +649,10 @@ AS_IF([test -n "$cs_cv_prog_cxx_visibility_inlines_hidden"],
     #CS_CHECK_PROG_VERSION([g++], [$CXX --version], [4.1], [9.9|.9],
     #   [cs_cv_gxx_version_buggy=no],
     #   [cs_cv_gxx_version_buggy=yes])
-    cs_cv_gxx_version_buggy=yes
     AC_CACHE_CHECK([if $cs_cv_prog_cxx_visibility_inlines_hidden is buggy],
 	[cs_cv_prog_cxx_visibility_inlines_hidden_buggy],
 	[AS_IF([test $ac_compiler_gnu = yes],
-	    [AS_IF([test \( $host_cpu = x86_64 -a cs_cv_gxx_version_buggy = yes \) \
-		    || test x$cs_host_macosx = xyes],
+	    [AS_IF([test $host_cpu = x86_64 || test x$cs_host_macosx = xyes], 
 		[cs_cv_prog_cxx_visibility_inlines_hidden_buggy=yes],
 		[cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])],
 	    [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])])],
