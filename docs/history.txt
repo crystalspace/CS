@@ -8,6 +8,7 @@ chronological order.
 
 6-Sep-2007
 	- Mike Gist fixed bug #351 (wxgl compilation problem).
+	- res fixed a null pointer access in null3d when null2d is not present.
 29-Aug-2007
         - Piotr changed remaining Win32 call to *A version.
 	- res reverted r27508, but also made sure all Win32 calls are

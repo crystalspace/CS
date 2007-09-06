@@ -2,6 +2,7 @@
 
 6-Sep-2007
 	- Jorrit merged r27571 into 1.2 (fix for #351, wxgl compilation).
+	- res merged r27577 into 1.2 (null3d crash fix).
 31-Aug-2007
 	- Vincent merged r27336 into 1.2 (Add PyCSCegui generation to jobber).
 29-Aug-2007
