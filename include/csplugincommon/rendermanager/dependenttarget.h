@@ -32,11 +32,12 @@ namespace RenderManager
   /**
    * Traverse all the shader variables used in a certain render context.
    */
-  template<typename Tree, typename Fn>
+  template<typename Tree, typename Fn, typename BitArray = csBitArray>
   class TraverseAllUsedSVs
   {
     iShaderManager* shaderManager;
     Fn& function;
+    BitArray& nameStorage;
     
     /**
      * The actual workhorse: for each mesh in the context construct the SV
@@ -51,12 +52,10 @@ namespace RenderManager
       iShaderManager* shaderManager;
       Fn& function;
 
-      FnMeshTraverser (iShaderManager* shaderManager, Fn& function) : 
-        BaseType (*this), shaderManager (shaderManager), 
-        function (function) 
+      FnMeshTraverser (iShaderManager* shaderManager, Fn& function, 
+        BitArray& names) : BaseType (*this), shaderManager (shaderManager), 
+        function (function), names (names)
       {
-        size_t numSVs = shaderManager->GetSVNameStringset()->GetSize();
-        names.SetSize (numSVs);
       }
 
       void operator() (const typename Tree::TreeTraitsType::MeshNodeKeyType& key,
@@ -98,25 +97,27 @@ namespace RenderManager
 
       iShader* lastShader;
       size_t lastTicket;
-      csBitArray names;
+      BitArray& names;
     };
   public:
-    TraverseAllUsedSVs (Fn& function, iShaderManager* shaderManager) : 
-      shaderManager (shaderManager), function (function) {}
+    TraverseAllUsedSVs (Fn& function, iShaderManager* shaderManager,
+      BitArray& nameStorage) : shaderManager (shaderManager), 
+      function (function), nameStorage (nameStorage) {}
 
     void operator() (typename Tree::ContextNode* contextNode, Tree& tree)
     {
-      FnMeshTraverser traverse (shaderManager, function);
+      FnMeshTraverser traverse (shaderManager, function, nameStorage);
       tree.TraverseMeshNodes (traverse, contextNode);
     }
 
   };
 
-  template<typename Tree, typename Fn>
+  template<typename Tree, typename Fn, typename BitArray = csBitArray>
   class TraverseAllTextures
   {
     Fn& function;
     iShaderManager* shaderManager;
+    BitArray& names;
 
     struct FnShaderVarTraverser
     {
@@ -137,14 +138,15 @@ namespace RenderManager
       }
     };
   public:
-    TraverseAllTextures (Fn& function, iShaderManager* shaderManager) : 
-      function (function), shaderManager (shaderManager) {}
+    TraverseAllTextures (Fn& function, iShaderManager* shaderManager, 
+      BitArray& names) : function (function), shaderManager (shaderManager),
+      names (names) {}
 
     void operator() (typename Tree::ContextNode* contextNode, Tree& tree)
     {
       FnShaderVarTraverser svTraverser (function);
-      TraverseAllUsedSVs<Tree, FnShaderVarTraverser> traverseSVs (svTraverser, 
-        shaderManager);
+      TraverseAllUsedSVs<Tree, FnShaderVarTraverser, BitArray> traverseSVs (
+        svTraverser, shaderManager, names);
       traverseSVs (contextNode, tree);
     }
   };
@@ -154,6 +156,8 @@ namespace RenderManager
   {
     friend struct TextureTraverser;
 
+    /* FIXME: better handle multiple views per target
+	      'flags' per subtexture seems odd */
     struct RenderTargetInfo
     {
       struct ViewInfo
@@ -164,10 +168,34 @@ namespace RenderManager
       typedef csHash<ViewInfo, int> ViewsHash;
       ViewsHash views;
     };
-    csHash<RenderTargetInfo, csRef<iTextureHandle> > targets;
+    typedef csHash<RenderTargetInfo, csRef<iTextureHandle> > TargetsHash;
+    TargetsHash targets;
+    TargetsHash oneTimeTargets;
     CS::RenderManager::RenderView::Pool renderViewPool;
-
-    typedef csSet<csPtrKey<iTextureHandle> > HandledTargetsSet;
+    
+    class HandledTargetsSet
+    {
+      csArray<iTextureHandle*> set;
+    public:
+      void SetCapacity (size_t n) { set.SetCapacity (n); }
+      void Empty () { set.Empty(); }
+      
+      void Insert (size_t index, iTextureHandle* texh)
+      {
+        set.Insert (index, texh);
+      }
+      bool Find (iTextureHandle* texh, size_t& candidate) const
+      {
+        return set.FindSortedKey (
+          csArrayCmp<iTextureHandle*, iTextureHandle*> (texh), &candidate)
+          != csArrayItemNotFound;
+      }
+    };
+    
+    // Storage for used SV names
+    csBitArray names;
+    // Storage for handled targets
+    HandledTargetsSet handledTargets;
 
     struct TextureTraverser
     {
@@ -188,50 +216,63 @@ namespace RenderManager
 
       void operator() (iTextureHandle* texh)
       {
-        RenderTargetInfo* targetInfo = parent.targets.GetElementPointer (texh);
-        if ((targetInfo == 0) || handledTargets.Contains (texh)) return;
-        handledTargets.Add (texh);
-
-        typename RenderTargetInfo::ViewsHash::GlobalIterator viewsIt (
+        RenderTargetInfo* targetInfo;
+        targetInfo = parent.targets.GetElementPointer (texh);
+        if (targetInfo != 0)
+        {
+          HandleTarget (targetInfo, texh);
+          return;
+        }
+        targetInfo = parent.oneTimeTargets.GetElementPointer (texh);
+        if (targetInfo != 0)
+        {
+          HandleTarget (targetInfo, texh);
+        }
+      }
+    private:
+      void HandleTarget (const RenderTargetInfo* targetInfo,
+			 iTextureHandle* texh)
+      {
+        size_t insertPos;
+        if (handledTargets.Find (texh, insertPos)) return;
+        
+        typename RenderTargetInfo::ViewsHash::ConstGlobalIterator viewsIt (
           targetInfo->views.GetIterator());
         while (viewsIt.HasNext ())
         {
           int subtexture;
-          typename RenderTargetInfo::ViewInfo viewInfo (
-            viewsIt.NextNoAdvance (subtexture));
-          if (viewInfo.flags & iRenderManager::updateOnce)
-            targetInfo->views.DeleteElement (viewsIt);
-          else
-            viewsIt.Advance();
-          csRef<iView> targetView = viewInfo.view;
-          if (!targetView.IsValid ()) continue;
-
-          // Setup a rendering view
-          csRef<CS::RenderManager::RenderView> rview;
-
-          typename Tree::ContextsContainer* targetContexts = 
-            renderTree.CreateContextContainer ();
-          targetContexts->renderTarget = texh;
-          targetContexts->subtexture = subtexture;
-          targetContexts->view = targetView;
-
-          rview.AttachNew (new (parent.renderViewPool) 
-            CS::RenderManager::RenderView (targetView));
-          targetView->UpdateClipper ();
-          typename Tree::ContextNode* context = 
-            renderTree.CreateContext (targetContexts, rview);
-  
-          contextSetup (renderTree, context, targetContexts, rview->GetThisSector (), rview);
-
-          TraverseAllTextures<Tree, TextureTraverser> traverseAllTextures (
-            *this, shaderManager);
-          renderTree.TraverseContexts (targetContexts, traverseAllTextures);
-          //traverseAllTextures (targetContexts, renderTree);
+          const typename RenderTargetInfo::ViewInfo& viewInfo (
+            viewsIt.Next (subtexture));
+	  HandleView (viewInfo, texh, subtexture);
         }
-        if (targetInfo->views.IsEmpty())
-        {
-          parent.targets.DeleteAll (texh);
-        }
+        handledTargets.Insert (insertPos, texh);
+      }
+      void HandleView (const typename RenderTargetInfo::ViewInfo& viewInfo,
+                       iTextureHandle* texh, int subtexture)
+      {
+	csRef<iView> targetView = viewInfo.view;
+	if (!targetView.IsValid ()) return;
+
+	// Setup a rendering view
+	csRef<CS::RenderManager::RenderView> rview;
+
+	typename Tree::ContextsContainer* targetContexts = 
+	  renderTree.CreateContextContainer ();
+	targetContexts->renderTarget = texh;
+	targetContexts->subtexture = subtexture;
+	targetContexts->view = targetView;
+
+	rview.AttachNew (new (parent.renderViewPool) 
+	  CS::RenderManager::RenderView (targetView));
+	targetView->UpdateClipper ();
+	typename Tree::ContextNode* context = 
+	  renderTree.CreateContext (targetContexts, rview);
+
+	contextSetup (renderTree, context, targetContexts, rview->GetThisSector (), rview);
+
+	TraverseAllTextures<Tree, TextureTraverser> 
+	  traverseAllTextures (*this, shaderManager, parent.names);
+	renderTree.TraverseContexts (targetContexts, traverseAllTextures);
       }
     };
   public:
@@ -240,13 +281,22 @@ namespace RenderManager
     {
       typename RenderTargetInfo::ViewInfo newView;
       newView.view = view;
-      newView.flags = flags;
-      RenderTargetInfo* targetInfo = targets.GetElementPointer (target);
+      newView.flags = flags & ~iRenderManager::updateOnce;
+      TargetsHash* targets;
+      if (flags & iRenderManager::updateOnce)
+      {
+        targets = &oneTimeTargets;
+      }
+      else
+      {
+        targets = &this->targets;
+      }
+      RenderTargetInfo* targetInfo = targets->GetElementPointer (target);
       if (targetInfo == 0)
       {
         RenderTargetInfo newInfo;
         newInfo.views.Put (subtexture, newView);
-        targets.PutUnique (target, newInfo);
+        targets->PutUnique (target, newInfo);
       }
       else
       {
@@ -261,6 +311,13 @@ namespace RenderManager
       {
         targetInfo->views.DeleteAll (subtexture);
         if (targetInfo->views.IsEmpty()) targets.DeleteAll (target);
+        return;
+      }
+      targetInfo = oneTimeTargets.GetElementPointer (target);
+      if (targetInfo != 0)
+      {
+        targetInfo->views.DeleteAll (subtexture);
+        if (targetInfo->views.IsEmpty()) oneTimeTargets.DeleteAll (target);
       }
     }
 
@@ -268,12 +325,18 @@ namespace RenderManager
       Tree& renderTree, ContextSetup<Tree>& contextSetup, 
       iShaderManager* shaderManager)
     {
-      HandledTargetsSet handledTargets;
+      size_t numSVs = shaderManager->GetSVNameStringset()->GetSize();
+      names.SetSize (numSVs);
+    
+      handledTargets.Empty();
+      handledTargets.SetCapacity (targets.GetSize() + oneTimeTargets.GetSize());
       TextureTraverser texTraverse (*this, shaderManager, handledTargets,
         contextSetup, renderTree);
       TraverseAllTextures<Tree, TextureTraverser> traverseAllTextures (texTraverse, 
-        shaderManager);
+        shaderManager, names);
       renderTree.TraverseContexts (contexts, traverseAllTextures);
+      
+      oneTimeTargets.DeleteAll ();
     }
   };
 
