@@ -27,6 +27,9 @@ chronological order.
 	  library" and creating the default coercions - needed since the 
 	  document structure is augmented after loading (resp. created from
 	  scratch).
+	- Jorrit fixed a bug in terrainf caused by genmeshify. Apparently
+	  genmeshify tried to put specific material overrides in the
+	  mesh object.
 3-Sep-2007
 	- res partially reverted r27524 and r27534: some methods that have not
 	  been fully deprecated have been removed by these changesets. Notably,

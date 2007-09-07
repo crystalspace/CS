@@ -373,21 +373,6 @@
                 <mixmode>
                     <copy />
                 </mixmode>
-                <submesh name="0">
-                    <material>sky_back</material>
-                </submesh>
-                <submesh name="0">
-                    <material>sky_back</material>
-                </submesh>
-                <submesh name="0">
-                    <material>sky_back</material>
-                </submesh>
-                <submesh name="0">
-                    <material>sky_back</material>
-                </submesh>
-                <submesh name="0">
-                    <material>sky_back</material>
-                </submesh>
             </params>
             <camera />
             <zfill />
