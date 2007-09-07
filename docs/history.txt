@@ -6,6 +6,10 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Sep-2007
+	- res fixed the debug info splitting to put the debug info file into
+	  the same file as the binary (fixes separate debug info for shared
+	  libs).
 6-Sep-2007
 	- res applied a patch from 'sarah' to fix compiling after merging some
 	  weaver changes from render manager branch (trac #384).
