@@ -25,7 +25,7 @@
 struct iSkeleton;
 struct iSkeletonGraveyard;
 struct iSkeletonFactory;
-struct iSkeletonBoneFactory;
+struct csSkeletonBoneFactory;
 struct iSkeletonSocket;
 struct iSkeletonSocketFactory;
 struct iSceneNode;
@@ -41,12 +41,15 @@ enum csBoneGeomType
   CS_BGT_CYLINDER
 };
 
+//struct csSkeletonBone;
+//struct csSkeletonBoneFactory;
+#if 0
 /**
  * The skeleton bone class.
  */
-struct iSkeletonBone : public virtual iBase
+struct csSkeletonBone : public virtual iBase
 {
-  SCF_INTERFACE (iSkeletonBone, 1, 0, 1);
+  SCF_INTERFACE (csSkeletonBone, 1, 0, 1);
 
   /**
    * Get name of the bone.
@@ -76,12 +79,12 @@ struct iSkeletonBone : public virtual iBase
   /**
    * Set parent bone.
    */
-  virtual void SetParent (iSkeletonBone *parent) = 0;
+  virtual void SetParent (csSkeletonBone *parent) = 0;
 
   /**
    * Get parent bone
    */
-  virtual iSkeletonBone *GetParent () = 0;
+  virtual csSkeletonBone *GetParent () = 0;
 
   /**
    * Get number of children bones.
@@ -91,17 +94,17 @@ struct iSkeletonBone : public virtual iBase
   /**
    * Set child bone by index.
    */
-  virtual iSkeletonBone *GetChild (size_t i) = 0;
+  virtual csSkeletonBone *GetChild (size_t i) = 0;
 
   /**
    * Find child bone by name.
    */
-  virtual iSkeletonBone *FindChild (const char *name) = 0;
+  virtual csSkeletonBone *FindChild (const char *name) = 0;
 
   /**
    * Find child bone index.
    */
-  virtual size_t FindChildIndex (iSkeletonBone *child) = 0;
+  virtual size_t FindChildIndex (csSkeletonBone *child) = 0;
 
   /**
    * Set skin bbox (usefull for creating collider or ragdoll object).
@@ -116,8 +119,9 @@ struct iSkeletonBone : public virtual iBase
   /**
    * Get skeleton factory.
    */
-  virtual iSkeletonBoneFactory *GetFactory() = 0;
+  virtual csSkeletonBoneFactory *GetFactory() = 0;
 };
+#endif
 
 /**
  * The script key frame contains all bones that will be transformed in 
@@ -155,27 +159,27 @@ struct iSkeletonAnimationKeyFrame : public virtual iBase
   /**
    * Add new bone transform to the key frame.
    */
-  virtual void AddTransform (iSkeletonBoneFactory *bone, 
+  virtual void AddTransform (csSkeletonBoneFactory *bone, 
     csReversibleTransform &transform, bool relative = false) = 0;
 
   /**
    * Get the transform of a bone. Returns 'false' when there won't be 
    * any transform data for given bone.
    */
-  virtual bool GetTransform (iSkeletonBoneFactory *bone,
+  virtual bool GetTransform (csSkeletonBoneFactory *bone,
       csReversibleTransform &dst_trans) = 0;
 
   /**
    * Set the transform of a bone.
    */
-  virtual void SetTransform(iSkeletonBoneFactory *bone, 
+  virtual void SetTransform(csSkeletonBoneFactory *bone, 
     csReversibleTransform &transform) = 0;
 
   /**
    * Get key frame specific data. Returns false when frame don't have
    * data for given bone.
    */
-  virtual bool GetKeyFrameData (iSkeletonBoneFactory *bone_fact, 
+  virtual bool GetKeyFrameData (csSkeletonBoneFactory *bone_fact, 
     csQuaternion & rot, csVector3 & pos, csQuaternion & tangent,
     bool & relative) = 0;
 };
@@ -365,6 +369,9 @@ struct iSkeleton : public virtual iBase
 {
   SCF_INTERFACE (iSkeleton, 1, 0, 0);
 
+  // @@@genjix@@@ hackety
+  virtual csReversibleTransform GetBoneOffsetTransform (size_t i) = 0;
+
   /**
    * Get skeleton name.
    */
@@ -383,12 +390,12 @@ struct iSkeleton : public virtual iBase
   /**
    * Get bone by index.
    */
-  virtual iSkeletonBone *GetBone (size_t i) = 0;
+//  virtual csSkeletonBone *GetBone (size_t i) = 0;
 
   /**
    * Find bone by name.
    */
-  virtual iSkeletonBone *FindBone (const char *name) = 0;
+//  virtual csSkeletonBone *FindBone (const char *name) = 0;
 
   /**
    * Find bine index by name.
@@ -534,12 +541,12 @@ struct iSkeletonSocket : public virtual iBase
   /**
    * Set parent bone.
    */
-  virtual void SetBone (iSkeletonBone *bone) = 0;
+//  virtual void SetBone (csSkeletonBone *bone) = 0;
 
   /**
    * Get parent bone.
    */
-  virtual iSkeletonBone *GetBone () = 0;
+//  virtual csSkeletonBone *GetBone () = 0;
 
   /**
    * Set scene node (mesh, camera or light).
@@ -557,13 +564,14 @@ struct iSkeletonSocket : public virtual iBase
   virtual iSkeletonSocketFactory *GetFactory () = 0;
 };
 
+#if 0
 /**
  * The skeleton bone factory is class that is used to create
  * skeleton bones of a iSkeleton object.
  */
-struct iSkeletonBoneFactory : public virtual iBase
+struct csSkeletonBoneFactory : public virtual iBase
 {
-  SCF_INTERFACE (iSkeletonBoneFactory, 1, 0, 0);
+  SCF_INTERFACE (csSkeletonBoneFactory, 1, 0, 0);
 
   /**
    * Get bone factory name.
@@ -593,12 +601,12 @@ struct iSkeletonBoneFactory : public virtual iBase
   /**
    * Set parent bone factory .
    */
-  virtual  void SetParent (iSkeletonBoneFactory *parent) = 0;
+  virtual  void SetParent (csSkeletonBoneFactory *parent) = 0;
 
   /**
    * Get parent bone factory .
    */
-  virtual iSkeletonBoneFactory *GetParent () = 0;
+  virtual csSkeletonBoneFactory *GetParent () = 0;
 
   /**
    * Get number of children factories.
@@ -608,17 +616,17 @@ struct iSkeletonBoneFactory : public virtual iBase
   /**
    * Get factory child by index.
    */
-  virtual iSkeletonBoneFactory *GetChild (size_t i) = 0;
+  virtual csSkeletonBoneFactory *GetChild (size_t i) = 0;
 
   /**
    * Find child by name.
    */
-  virtual iSkeletonBoneFactory *FindChild (const char *name) = 0;
+  virtual csSkeletonBoneFactory *FindChild (const char *name) = 0;
 
   /**
    * Find child index.
    */
-  virtual size_t FindChildIndex (iSkeletonBoneFactory *child) = 0;
+  virtual size_t FindChildIndex (csSkeletonBoneFactory *child) = 0;
 
   /**
    * Set skin bbox.
@@ -630,6 +638,7 @@ struct iSkeletonBoneFactory : public virtual iBase
    */
   virtual csBox3 & GetSkinBox () = 0;
 };
+#endif
 
 /**
  * The skeleton socket factory is class that is used to create
@@ -667,12 +676,12 @@ struct iSkeletonSocketFactory : public virtual iBase
   /**
    * Set parent bone factory.
    */
-  virtual void SetBone (iSkeletonBoneFactory *bone) = 0;
+  virtual void SetBone (csSkeletonBoneFactory *bone) = 0;
 
   /**
    * Get parent bone factory.
    */
-  virtual iSkeletonBoneFactory *GetBone () = 0;
+  virtual csSkeletonBoneFactory *GetBone () = 0;
 };
 
 /**
@@ -696,7 +705,7 @@ struct iSkeletonFactory : public virtual iBase
   /**
    * Create new bone factory.
    */
-  virtual iSkeletonBoneFactory *CreateBone (const char *name) = 0;
+  virtual csSkeletonBoneFactory *CreateBone (const char *name) = 0;
 
   /**
    * Create new animation.
@@ -721,7 +730,7 @@ struct iSkeletonFactory : public virtual iBase
   /**
    * Find bone factory by name.
    */
-  virtual iSkeletonBoneFactory *FindBone (const char *name) = 0;
+  virtual csSkeletonBoneFactory *FindBone (const char *name) = 0;
 
   /**
    * Find bone facotry index by name.
@@ -736,7 +745,7 @@ struct iSkeletonFactory : public virtual iBase
   /**
    * Get bone factory by index.
    */
-  virtual iSkeletonBoneFactory *GetBone(size_t i) = 0;
+  virtual csSkeletonBoneFactory *GetBone(size_t i) = 0;
 
   /**
    * Get the Graveyard.
@@ -747,7 +756,7 @@ struct iSkeletonFactory : public virtual iBase
    * Create new socket factory.
    */
   virtual iSkeletonSocketFactory *CreateSocket(const char *name,
-      iSkeletonBoneFactory *bone) = 0;
+      csSkeletonBoneFactory *bone) = 0;
 
   /**
    * Find socket factory by name.

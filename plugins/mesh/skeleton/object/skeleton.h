@@ -48,8 +48,7 @@ class csSkeletonBoneFactory;
 class csSkeletonGraveyard;
 class csSkeletonSocketFactory;
 
-class csSkeletonBone :
-  public scfImplementation1<csSkeletonBone, iSkeletonBone>
+class csSkeletonBone : public csRefCount
 {
 private:
   csString name;
@@ -86,14 +85,14 @@ public:
   }
   virtual csReversibleTransform &GetFullTransform () 
     { return full_transform; }
-  virtual void SetParent (iSkeletonBone* par);
-  virtual iSkeletonBone* GetParent () { return parent; }
+  virtual void SetParent (csSkeletonBone* par);
+  virtual csSkeletonBone* GetParent () { return parent; }
   virtual size_t GetChildrenCount () { return bones.GetSize () ;}
-  virtual iSkeletonBone *GetChild (size_t i) { return bones[i]; }
-  virtual iSkeletonBone *FindChild (const char *name);
+  virtual csSkeletonBone *GetChild (size_t i) { return bones[i]; }
+  virtual csSkeletonBone *FindChild (const char *name);
 
-  virtual iSkeletonBoneFactory *GetFactory();
-  virtual size_t FindChildIndex (iSkeletonBone *child);
+  virtual csSkeletonBoneFactory *GetFactory();
+  virtual size_t FindChildIndex (csSkeletonBone *child);
   virtual void SetSkinBox (csBox3 & box) { skin_box = box; }
   virtual csBox3 & GetSkinBox () { return skin_box; }
 };
@@ -107,7 +106,7 @@ private:
   csString name;
   csReversibleTransform transform;
   csReversibleTransform full_transform;
-  iSkeletonBone *bone;
+  csSkeletonBone *bone;
   iSceneNode *node;
   csSkeletonSocketFactory *factory;
 public:
@@ -123,9 +122,9 @@ public:
   { csSkeletonSocket::transform = transform; }
   virtual csReversibleTransform &GetFullTransform ()
   { return full_transform; }
-  virtual void SetBone (iSkeletonBone *bone)
+  virtual void SetBone (csSkeletonBone *bone)
   { csSkeletonSocket::bone = bone; }
-  virtual iSkeletonBone *GetBone ()
+  virtual csSkeletonBone *GetBone ()
   { return bone; }
     virtual void SetSceneNode (iSceneNode *node)
   { csSkeletonSocket::node = node; }
@@ -136,8 +135,7 @@ public:
 
 
 //----------------------------- csSkeletonBoneFactory -------------------------------
-class csSkeletonBoneFactory :
-  public scfImplementation1<csSkeletonBoneFactory, iSkeletonBoneFactory>
+class csSkeletonBoneFactory : public csRefCount
 {
 private:
   csString name;
@@ -164,12 +162,12 @@ public:
   virtual void SetTransform (const csReversibleTransform &transform) 
   { csSkeletonBoneFactory::transform = transform; }
   virtual csReversibleTransform &GetFullTransform () { return full_transform; }
-  virtual  void SetParent (iSkeletonBoneFactory *par);
-  virtual iSkeletonBoneFactory* GetParent () { return parent; }
+  virtual  void SetParent (csSkeletonBoneFactory *par);
+  virtual csSkeletonBoneFactory* GetParent () { return parent; }
   virtual size_t GetChildrenCount () { return bones.GetSize (); }
-  virtual iSkeletonBoneFactory *GetChild (size_t i) { return bones[i]; }
-  virtual iSkeletonBoneFactory *FindChild (const char *name);
-  virtual size_t FindChildIndex (iSkeletonBoneFactory *child);
+  virtual csSkeletonBoneFactory *GetChild (size_t i) { return bones[i]; }
+  virtual csSkeletonBoneFactory *FindChild (const char *name);
+  virtual size_t FindChildIndex (csSkeletonBoneFactory *child);
   virtual void SetSkinBox (csBox3 & box) { skin_box = box; }
   virtual csBox3 & GetSkinBox () { return skin_box; }
 };
@@ -180,14 +178,14 @@ struct bone_key_info
   csQuaternion rot;
   csVector3 pos;
   csQuaternion tangent;
-  iSkeletonBoneFactory *bone;
+  csSkeletonBoneFactory *bone;
 };
 
 class csSkeletonAnimationKeyFrame :
   public scfImplementation1<csSkeletonAnimationKeyFrame, iSkeletonAnimationKeyFrame>
 {
 public:
-    typedef csHash<bone_key_info, csPtrKey<iSkeletonBoneFactory> > 
+    typedef csHash<bone_key_info, csPtrKey<csSkeletonBoneFactory> > 
       BoneKeyHash;
 private:
   csString name;
@@ -196,7 +194,7 @@ private:
   //csArray<bone_key_info> bones_frame_transforms;
   BoneKeyHash bones_frame_transforms;
 public:
-  bone_key_info &GetKeyInfo(iSkeletonBoneFactory *bone_fact)
+  bone_key_info &GetKeyInfo(csSkeletonBoneFactory *bone_fact)
   {
     bone_key_info fallback;
     return bones_frame_transforms.Get(bone_fact, fallback);
@@ -213,7 +211,7 @@ public:
   virtual size_t GetTransformsCount() 
     { return bones_frame_transforms.GetSize(); }
 
-  virtual void AddTransform(iSkeletonBoneFactory *bone, 
+  virtual void AddTransform(csSkeletonBoneFactory *bone, 
     csReversibleTransform &transform, bool relative)
   {
     bone_key_info bf;
@@ -226,7 +224,7 @@ public:
     bones_frame_transforms.Put(bone, bf);
   }
 
-  bool GetTransform (iSkeletonBoneFactory *bone_fact, csReversibleTransform &dst_trans) 
+  bool GetTransform (csSkeletonBoneFactory *bone_fact, csReversibleTransform &dst_trans) 
   {
     bone_key_info fallback;
     fallback.bone = 0;
@@ -239,7 +237,7 @@ public:
     return true;
   }
 
-  virtual void SetTransform(iSkeletonBoneFactory *bone_fact,
+  virtual void SetTransform(csSkeletonBoneFactory *bone_fact,
     csReversibleTransform &transform)
   {
     bone_key_info fallback;
@@ -250,7 +248,7 @@ public:
     bki.pos = transform.GetOrigin ();
   }
 
-  virtual bool GetKeyFrameData(iSkeletonBoneFactory *bone_fact, 
+  virtual bool GetKeyFrameData(csSkeletonBoneFactory *bone_fact, 
       csQuaternion & rot, csVector3 & pos, csQuaternion & tangent,
       bool & relative)
   {
@@ -467,12 +465,18 @@ public:
   csSkeleton (csSkeletonFactory* fact);
   virtual ~csSkeleton ();
 
+  virtual csReversibleTransform GetBoneOffsetTransform (size_t i)
+  {
+    return bones[i]->GetFactory()->GetFullTransform().GetInverse() *
+      bones[i]->GetFullTransform();
+  }
+
   virtual const char* GetName () const { return name; }
   virtual void SetName (const char* name) 
     { csSkeleton::name = name; }
   virtual size_t GetBonesCount () { return bones.GetSize (); }
-  virtual iSkeletonBone *GetBone (size_t i) { return bones[i]; }
-  virtual iSkeletonBone *FindBone (const char *name);
+  virtual csSkeletonBone *GetBone (size_t i) { return bones[i]; }
+  virtual csSkeletonBone *FindBone (const char *name);
 
   virtual iSkeletonAnimation* Execute (const char *scriptname, float blend_factor = 0.0f);
   virtual iSkeletonAnimation* Append (const char *scriptname);
@@ -525,7 +529,7 @@ public:
     iObjectRegistry* object_reg);
   virtual ~csSkeletonFactory ();
 
-  virtual iSkeletonBoneFactory *CreateBone(const char *name);
+  virtual csSkeletonBoneFactory *CreateBone(const char *name);
   virtual const char* GetName () const { return name; }
   virtual void SetName (const char* name) 
     { csSkeletonFactory::name = name; }
@@ -539,10 +543,10 @@ public:
 
   virtual size_t GetBonesCount() const
     { return bones.GetSize (); }
-  virtual iSkeletonBoneFactory * GetBone(size_t i)
+  virtual csSkeletonBoneFactory * GetBone(size_t i)
     { return bones[i]; }
   virtual size_t FindBoneIndex (const char* bonename);
-  virtual iSkeletonBoneFactory *FindBone (const char *name);
+  virtual csSkeletonBoneFactory *FindBone (const char *name);
 
   virtual iSkeletonGraveyard *GetGraveyard  ();
 
@@ -552,7 +556,7 @@ public:
   virtual iSkeletonAnimation *CreateAnimation (const char *name);
   virtual iSkeletonAnimation *FindAnimation (const char *name);
 
-  virtual iSkeletonSocketFactory *CreateSocket(const char *name, iSkeletonBoneFactory *bone);
+  virtual iSkeletonSocketFactory *CreateSocket(const char *name, csSkeletonBoneFactory *bone);
   virtual iSkeletonSocketFactory *FindSocket(const char *name);
   virtual iSkeletonSocketFactory *GetSocket (int i);
   virtual void RemoveSocket (int i);
@@ -568,9 +572,9 @@ private:
   csString name;
   csReversibleTransform transform;
   csReversibleTransform full_transform;
-  iSkeletonBoneFactory *bone;
+  csSkeletonBoneFactory *bone;
 public:
-  csSkeletonSocketFactory (const char *name, iSkeletonBoneFactory *bone);
+  csSkeletonSocketFactory (const char *name, csSkeletonBoneFactory *bone);
   virtual ~csSkeletonSocketFactory ();
   virtual const char* GetName () const
   { return name; }
@@ -582,9 +586,9 @@ public:
   { csSkeletonSocketFactory::transform = transform; }
   virtual csReversibleTransform &GetFullTransform ()
   { return full_transform; }
-  virtual void SetBone (iSkeletonBoneFactory *bone)
+  virtual void SetBone (csSkeletonBoneFactory *bone)
   { csSkeletonSocketFactory::bone = bone; }
-  virtual iSkeletonBoneFactory *GetBone ()
+  virtual csSkeletonBoneFactory *GetBone ()
   { return bone; }
 };
 

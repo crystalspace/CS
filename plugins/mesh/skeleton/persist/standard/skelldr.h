@@ -50,7 +50,7 @@ public:
     iStreamSource*, iLoaderContext* ldr_context, iBase* context);
 
   const char *ParseBone (iDocumentNode* node, 
-    iSkeletonFactory *skel_fact, iSkeletonBoneFactory *parent_bone);
+    iSkeletonFactory *skel_fact, csSkeletonBoneFactory *parent_bone);
 
   const char *ParseScript (iDocumentNode* node, iSkeletonFactory *skel_fact);
   const char *ParseFrame (iDocumentNode* node, iSkeletonFactory *skel_fact, 

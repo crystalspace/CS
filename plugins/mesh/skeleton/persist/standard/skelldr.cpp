@@ -46,6 +46,7 @@
 #include "imesh/skeleton.h"
 
 #include "skelldr.h"
+#include "../../object/skeleton.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -129,7 +130,7 @@ bool csSkeletonFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 const char *csSkeletonFactoryLoader::ParseBone (iDocumentNode* node, 
-  iSkeletonFactory *skel_fact, iSkeletonBoneFactory *parent_bone)
+  iSkeletonFactory *skel_fact, csSkeletonBoneFactory *parent_bone)
 {
 
   const char* bonename = node->GetAttributeValue ("name");
@@ -137,7 +138,7 @@ const char *csSkeletonFactoryLoader::ParseBone (iDocumentNode* node,
   if (!bonename)
     return "Name of the bone is missing!";
 
-  iSkeletonBoneFactory *bone = skel_fact->CreateBone(bonename);
+  csSkeletonBoneFactory *bone = skel_fact->CreateBone(bonename);
   bone->SetParent(parent_bone);
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -323,7 +324,7 @@ const char *csSkeletonFactoryLoader::ParseFrame (iDocumentNode* node,
       csReversibleTransform key_transform;
 	  bool relative = false;
 
-      iSkeletonBoneFactory *bone_fact = skel_fact->FindBone(bone_name);
+      csSkeletonBoneFactory *bone_fact = skel_fact->FindBone(bone_name);
       if (!bone_fact)
       {
       continue;

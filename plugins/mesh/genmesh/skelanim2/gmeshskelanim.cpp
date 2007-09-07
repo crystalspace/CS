@@ -196,9 +196,10 @@ void csGenmeshSkelAnimationControl::Update (csTicks current)
     for (size_t i=0; i< used_bones.GetSize (); ++i)
     {
       int bone_idx = used_bones[i];
-      csReversibleTransform offset_tr = 
-        skeleton->GetBone(bone_idx)->GetFactory()->GetFullTransform().GetInverse()*
-        skeleton->GetBone(bone_idx)->GetFullTransform();
+      csReversibleTransform offset_tr =
+        skeleton->GetBoneOffsetTransform (bone_idx);
+        //skeleton->GetBone(bone_idx)->GetFactory()->GetFullTransform().GetInverse()*
+        //skeleton->GetBone(bone_idx)->GetFullTransform();
 
       csShaderVariable* boneQuat = _bones->GetArrayElement (i*2+0);
       csQuaternion quat; quat.SetMatrix(offset_tr.GetT2O());
@@ -220,9 +221,10 @@ void csGenmeshSkelAnimationControl::Update (csTicks current)
     for (size_t i=0; i< used_bones.GetSize (); ++i)
     {
       int bone_idx = used_bones[i];
-      csReversibleTransform offset_tr = 
-        skeleton->GetBone(bone_idx)->GetFactory()->GetFullTransform().GetInverse()*
-        skeleton->GetBone(bone_idx)->GetFullTransform();
+      csReversibleTransform offset_tr =
+        skeleton->GetBoneOffsetTransform (bone_idx);
+        //skeleton->GetBone(bone_idx)->GetFactory()->GetFullTransform().GetInverse()*
+        //skeleton->GetBone(bone_idx)->GetFullTransform();
 
       csRef<csShaderVariable> boneQuat;
       boneQuat.AttachNew(new csShaderVariable(csInvalidStringID));
