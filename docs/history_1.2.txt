@@ -3,6 +3,7 @@
 7-Sep-2007
 	- Jorrit reverted r27161 (quotes for javac detection). This fixes
 	  both #377 and #378.
+	- res removed a remnant of the shader weaver from glshader_cg.csplugin.
 6-Sep-2007
 	- Jorrit merged r27571 into 1.2 (fix for #351, wxgl compilation).
 	- res merged r27577 into 1.2 (null3d crash fix).
