@@ -66,8 +66,8 @@ IsoTest::IsoTest (iObjectRegistry* object_reg)
 {
   IsoTest::object_reg = object_reg;
 
-  current_view = 0;
-  views[0].SetOrigOffset (csVector3 (-4, 4, -4)); // true isometric perspective.
+  current_view = 1;
+  views[0].SetOrigOffset (csVector3 (-2, 3, -2)); // true isometric perspective.
   views[1].SetOrigOffset (csVector3 (-9, 9, -9)); // zoomed out.
   views[2].SetOrigOffset (csVector3 (4, 3, -4)); // diablo style perspective.
   views[3].SetOrigOffset (csVector3 (0, 4, -4)); // zelda style perspective.
@@ -107,26 +107,26 @@ void IsoTest::SetupFrame ()
     if (kbd->GetKeyState (CSKEY_RIGHT))
     {
       moved = true;
-      actor->GetMovable ()->MovePosition (csVector3 (speed, 0, 0));
-      facing = 270.f;
+      //actor->GetMovable ()->MovePosition (csVector3 (speed, 0, 0));
+      facing = 90.f;
     }
     if (kbd->GetKeyState (CSKEY_LEFT))
     {
       moved = true;
-      actor->GetMovable ()->MovePosition (csVector3 (-speed, 0, 0));
-      facing = 90.f;
+      //actor->GetMovable ()->MovePosition (csVector3 (-speed, 0, 0));
+      facing = 270.f;
     }
     if (kbd->GetKeyState (CSKEY_UP))
     {
       moved = true;
-      actor->GetMovable ()->MovePosition (csVector3 (0, 0, speed));
-      facing = 0.f;
+      //actor->GetMovable ()->MovePosition (csVector3 (0, 0, speed));
+      facing = 180.f;
     }
     if (kbd->GetKeyState (CSKEY_DOWN))
     {
       moved = true;
-      actor->GetMovable ()->MovePosition (csVector3 (0, 0, -speed));
-      facing = 180.f;
+      //actor->GetMovable ()->MovePosition (csVector3 (0, 0, -speed));
+      facing = 0.f;
     }
 
     if(kbd->GetKeyState (CSKEY_DOWN) && kbd->GetKeyState (CSKEY_LEFT))
@@ -141,13 +141,12 @@ void IsoTest::SetupFrame ()
     if(moved)
     {
       csYRotMatrix3 r(facing*PI/180.0);
-      actor->GetMovable ()->SetTransform(r);
+      actor->GetMovable ()->SetTransform(r * csXRotMatrix3 (-PI/2));
     }
     // update animation state
     csRef<iGeneralMeshState> spstate (
       scfQueryInterface<iGeneralMeshState> (actor->GetMeshObject ()));
     csRef<iGenMeshSkeletonControlState> animcontrol (
-       
       scfQueryInterface<iGenMeshSkeletonControlState> (spstate->GetAnimationControl ()));
     iSkeleton* skeleton = animcontrol->GetSkeleton ();
     if(actor_is_walking && !moved)
@@ -160,25 +159,30 @@ void IsoTest::SetupFrame ()
       skeleton->StopAll();
       skeleton->Execute("run");
     }
+    /*if (kbd->GetKeyState ('a'))
+    {
+      //skeleton->StopAll();
+      skeleton->Execute("wave", 1.0f);
+    }*/
     actor_is_walking = moved;
   }
 
   // Make sure actor is constant distance above plane.
   csVector3 actor_pos = actor->GetMovable ()->GetPosition ();
-  actor_pos.y += 10.0;	// Make sure we start beam high enough.
+/*  actor_pos.y += 10.0;	// Make sure we start beam high enough.
   csVector3 end_pos, isect;
   end_pos = actor_pos; end_pos.y -= 100.0;
   csHitBeamResult rc = plane->HitBeamObject (actor_pos, end_pos);
   actor_pos.y = rc.isect.y;
 
   actor->GetMovable ()->SetPosition (actor_pos);
-  actor->GetMovable ()->UpdateMove ();
+  actor->GetMovable ()->UpdateMove ();*/
 
   // Move the light.
   actor_light->SetCenter (actor_pos+csVector3 (0, 2, -1));
 
   CameraIsoLookat(view->GetCamera(), views[current_view], actor_pos); 
-  
+
   // Tell 3D driver we're going to display 3D things.
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
     return;
@@ -245,6 +249,26 @@ bool IsoTest::HandleEvent (iEvent& ev)
     {
       current_view++;
       if (current_view >= 4) current_view = 0;
+    }
+    else if (c == 'a')
+    {
+      csRef<iGeneralMeshState> spstate (
+        scfQueryInterface<iGeneralMeshState> (actor->GetMeshObject ()));
+      csRef<iGenMeshSkeletonControlState> animcontrol (
+        scfQueryInterface<iGenMeshSkeletonControlState> (spstate->GetAnimationControl ()));
+      iSkeleton* skeleton = animcontrol->GetSkeleton ();
+      //skeleton->StopAll();
+      skeleton->Execute("wave", 1.0f);
+    }
+    else if (c == 's')
+    {
+      csRef<iGeneralMeshState> spstate (
+        scfQueryInterface<iGeneralMeshState> (actor->GetMeshObject ()));
+      csRef<iGenMeshSkeletonControlState> animcontrol (
+        scfQueryInterface<iGenMeshSkeletonControlState> (spstate->GetAnimationControl ()));
+      iSkeleton* skeleton = animcontrol->GetSkeleton ();
+      skeleton->StopAll();
+      skeleton->Execute("wave");
     }
   }
 
@@ -339,7 +363,7 @@ bool IsoTest::LoadMap ()
   view->GetCamera ()->GetTransform ().SetOrigin (pos);
 
   iLightList* ll = room->GetLights ();
-  actor_light = engine->CreateLight (0, csVector3 (-3, 5, 0), 5,
+  actor_light = engine->CreateLight (0, csVector3 (-3, 10, 0), 20,
     csColor (1, 1, 1));
   ll->Add (actor_light);
 
@@ -357,8 +381,8 @@ bool IsoTest::CreateActor ()
 {
   csRef<iVFS> vfs (csQueryRegistry<iVFS> (object_reg));
   vfs->PushDir ();
-  vfs->ChDir ("/lib/kwartz");
-  if (!loader->LoadLibraryFile ("kwartz.lib"))
+  vfs->ChDir ("/lib/kirchdorfer");
+  if (!loader->LoadLibraryFile ("kirchdorfer.lib"))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
         "crystalspace.application.isotest",
@@ -367,7 +391,7 @@ bool IsoTest::CreateActor ()
   }
   vfs->PopDir ();
 
-  iMeshFactoryWrapper* imeshfact = engine->FindMeshFactory ("kwartz_fact");
+  iMeshFactoryWrapper* imeshfact = engine->FindMeshFactory ("genkirchdorfer");
 
   //csMatrix3 m; m.Identity ();
   //imeshfact->HardTransform (csReversibleTransform (m, csVector3 (0, -1, 0)));
@@ -375,6 +399,8 @@ bool IsoTest::CreateActor ()
   // Create the sprite and add it to the engine.
   actor = engine->CreateMeshWrapper (
     imeshfact, "MySprite", room, csVector3 (-3, 1, 3));
+  csXRotMatrix3 r(-PI/2);
+  actor->GetMovable ()->SetTransform(r);
   actor->GetMovable ()->UpdateMove ();
   csRef<iGeneralMeshState> spstate (
     scfQueryInterface<iGeneralMeshState> (actor->GetMeshObject ()));

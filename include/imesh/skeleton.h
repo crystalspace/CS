@@ -26,25 +26,12 @@ struct iSkeleton;
 struct iSkeletonGraveyard;
 struct iSkeletonFactory;
 struct iSkeletonBoneFactory;
-struct iSkeletonBoneUpdateCallback;
 struct iSkeletonSocket;
 struct iSkeletonSocketFactory;
 struct iSceneNode;
-//struct iSkeletonBoneRagdollInfo;
 
-/*
-struct iODEGeom;
-struct iODERigidBody;
-struct iODEJoint;
-struct iODEDynamicSystem;
-*/
-
-enum csBoneTransformType
-{
-  CS_BTT_NONE = 0,
-  CS_BTT_SCRIPT,
-  CS_BTT_RIGID_BODY
-};
+struct csQuaternion;
+struct csReversibleTransform;
 
 enum csBoneGeomType
 {
@@ -53,8 +40,6 @@ enum csBoneGeomType
   CS_BGT_SPHERE,
   CS_BGT_CYLINDER
 };
-
-class csReversibleTransform;
 
 /**
  * The skeleton bone class.
@@ -129,53 +114,10 @@ struct iSkeletonBone : public virtual iBase
   virtual csBox3 &GetSkinBox () = 0;
 
   /**
-   * Set callback to the bone. By default there
-   * is callback that sets bone transform when updating.
-   */
-  virtual void SetUpdateCallback (iSkeletonBoneUpdateCallback *callback) = 0;
-
-  /**
-   * Get update callback.
-   */
-  virtual iSkeletonBoneUpdateCallback *GetUpdateCallback () = 0;
-
-  /**
    * Get skeleton factory.
    */
   virtual iSkeletonBoneFactory *GetFactory() = 0;
-
-  /**
-   * Set bone transform mode.
-   * Possible values are:
-   * - #CS_BTT_NONE: Same as CS_BTT_SCRIPT.
-   * - #CS_BTT_SCRIPT: Normal default behaviour. Animations control the bone.
-   * - #CS_BTT_RIGID_BODY: Unimplemented rigid body ragdoll.
-   */
-  virtual void SetTransformMode(csBoneTransformType mode) = 0;
-
-  /**
-   * Get bone transform mode.
-   */
-  virtual csBoneTransformType GetTransformMode() = 0;
-
-  //virtual void SetRigidBody(iODERigidBody *rigid_body, const csReversibleTransform & offset_transform) = 0;
-  //virtual iODERigidBody *GetRigidBody() = 0;
-  //virtual void SetJoint(iODEJoint *joint) = 0;
-  //virtual iODEJoint *GetJoint() = 0;
 };
-
-/**
- * This callback fires every time when bone changes it's transform.
- */
-struct iSkeletonBoneUpdateCallback : public virtual iBase
-{
-  SCF_INTERFACE  (iSkeletonBoneUpdateCallback, 0, 0, 1);
-
-  virtual void UpdateTransform(iSkeletonBone *bone,
-      const csReversibleTransform & transform) = 0;
-};
-
-class csQuaternion;
 
 /**
  * The script key frame contains all bones that will be transformed in 
@@ -518,9 +460,6 @@ struct iSkeleton : public virtual iBase
    */
   virtual void SetAnimationCallback (iSkeletonAnimationCallback *cb) = 0;
 
-  //virtual void CreateRagdoll(iODEDynamicSystem *dyn_sys, csReversibleTransform & transform) = 0;
-  //virtual void DestroyRagdoll() = 0;
-
   /**
    * Adds skeleton update callback.
    */
@@ -618,50 +557,6 @@ struct iSkeletonSocket : public virtual iBase
   virtual iSkeletonSocketFactory *GetFactory () = 0;
 };
 
-struct iSkeletonBoneRagdollInfo : public virtual iBase
-{
-  SCF_INTERFACE (iSkeletonBoneRagdollInfo, 1, 0, 0);
-
-  virtual void SetEnabled(bool enabled) = 0;
-  virtual bool GetEnabled() = 0;
-  virtual void SetAttachToParent(bool attach) = 0;
-  virtual bool GetAttachToParent() = 0;
-
-  virtual void SetGeomName(const char *name) = 0;
-  virtual const char *GetGeomName() = 0;
-  virtual void SetGeomType(int geom_type) = 0;
-  virtual int GetGeomType() = 0;
-  virtual void SetGeomDimensions(csVector3 &size) = 0;
-  virtual csVector3 &GetGeomDimensions() = 0;
-
-  virtual void SetFriction(float friction) = 0;
-  virtual float GetFriction() = 0;
-  virtual void SetElasticity(float elasticity) = 0;
-  virtual float GetElasticity() = 0;
-  virtual void SetSoftness(float softness) = 0;
-  virtual float GetSoftness() = 0;
-  virtual void SetSlip(float slip) = 0;
-  virtual float GetSlip() = 0;
-
-  virtual void SetBodyName(const char *name) = 0;
-  virtual const char *GetBodyName() = 0;
-  virtual void SetBodyMass(float mass) = 0;
-  virtual float GetBodyMass() = 0;
-  virtual void SetBodyGravmode(int gravmode) = 0;
-  virtual int GetBodyGravmode() = 0;
-
-  virtual void SetJointName(const char *name) = 0;
-  virtual const char *GetJointName() = 0;
-  virtual void SetJointMinRotContraints(csVector3 & constraints) = 0;
-  virtual csVector3 & GetJointMinRotContraints() = 0;
-  virtual void SetJointMaxRotContraints(csVector3 & constraints) = 0;
-  virtual csVector3 & GetJointMaxRotContraints() = 0;
-  virtual void SetJointMinTransContraints(csVector3 & constraints) = 0;
-  virtual csVector3 & GetJointMinTransContraints() = 0;
-  virtual void SetJointMaxTransContraints(csVector3 & constraints) = 0;
-  virtual csVector3 & GetJointMaxTransContraints() = 0;
-};
-
 /**
  * The skeleton bone factory is class that is used to create
  * skeleton bones of a iSkeleton object.
@@ -734,11 +629,6 @@ struct iSkeletonBoneFactory : public virtual iBase
    * Get skin bbox.
    */
   virtual csBox3 & GetSkinBox () = 0;
-
-  /**
-   * Get ragdoll data.
-   */
-  virtual iSkeletonBoneRagdollInfo *GetRagdollInfo() = 0;
 };
 
 /**

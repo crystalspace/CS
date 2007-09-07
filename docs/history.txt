@@ -12,6 +12,11 @@ chronological order.
 	  libs).
 	- res fixed the bezier mesh sometimes returning incompletely setup
 	  render meshes.
+	- Genjix created a skeleton branch with various refactors. Disabled cal3d.
+	  Some skeleton changes that I'm playing with and additional added
+	  comments. Many features have been taken out (commented physics,
+	  fixed transforms, per bone callbacks), and some additional
+	  optimisation (removed duplicate transforms, SQuad->SLerp)
 6-Sep-2007
 	- res applied a patch from 'sarah' to fix compiling after merging some
 	  weaver changes from render manager branch (trac #384).
