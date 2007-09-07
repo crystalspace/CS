@@ -14,6 +14,8 @@ chronological order.
 	  render meshes.
 	- Genjix changed joytest to use CS_REQUEST_JOYSTICK as an example for
 	  the users.
+	- Jorrit reverted r27048 (quotes for javac detection). This fixes
+	  both #377 and #378.
 6-Sep-2007
 	- res applied a patch from 'sarah' to fix compiling after merging some
 	  weaver changes from render manager branch (trac #384).

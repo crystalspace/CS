@@ -13145,11 +13145,11 @@ else
 else
   if test -n "$JAVAC"; then
   cs_java_dir=`$as_dirname -- "$JAVAC" ||
-$as_expr X"$JAVAC" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
-	 X"$JAVAC" : 'X\(//\)[^/]' \| \
-	 X"$JAVAC" : 'X\(//\)$' \| \
-	 X"$JAVAC" : 'X\(/\)' \| . 2>/dev/null ||
-echo X"$JAVAC" |
+$as_expr X$JAVAC : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
+	 X$JAVAC : 'X\(//\)[^/]' \| \
+	 X$JAVAC : 'X\(//\)$' \| \
+	 X$JAVAC : 'X\(/\)' \| . 2>/dev/null ||
+echo X$JAVAC |
     sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{
 	    s//\1/
 	    q
@@ -13167,12 +13167,12 @@ echo X"$JAVAC" |
 	    q
 	  }
 	  s/.*/./; q'`
-		cs_java_dir=`$as_dirname -- "$cs_java_dir" ||
-$as_expr X"$cs_java_dir" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
-	 X"$cs_java_dir" : 'X\(//\)[^/]' \| \
-	 X"$cs_java_dir" : 'X\(//\)$' \| \
-	 X"$cs_java_dir" : 'X\(/\)' \| . 2>/dev/null ||
-echo X"$cs_java_dir" |
+		cs_java_dir=`$as_dirname -- $cs_java_dir ||
+$as_expr X$cs_java_dir : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
+	 X$cs_java_dir : 'X\(//\)[^/]' \| \
+	 X$cs_java_dir : 'X\(//\)$' \| \
+	 X$cs_java_dir : 'X\(/\)' \| . 2>/dev/null ||
+echo X$cs_java_dir |
     sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{
 	    s//\1/
 	    q
