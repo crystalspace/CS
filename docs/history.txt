@@ -12,6 +12,8 @@ chronological order.
 	  libs).
 	- res fixed the bezier mesh sometimes returning incompletely setup
 	  render meshes.
+	- Genjix changed joytest to use CS_REQUEST_JOYSTICK as an example for
+	  the users.
 6-Sep-2007
 	- res applied a patch from 'sarah' to fix compiling after merging some
 	  weaver changes from render manager branch (trac #384).
