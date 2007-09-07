@@ -153,7 +153,7 @@ csBezierMesh::csBezierMesh (iBase *parent, csBezierMeshObjectType* thing_type) :
 
   csRef<iStringSet> strings;
   strings = csQueryRegistryTagInterface<iStringSet>
-    (thing_type->object_reg, "crystalspace.shared.stringset");
+    (thing_type->object_reg, "crystalspace.shader.variablenameset");
 
   if ((vertex_name == csInvalidStringID) ||
     (texel_name == csInvalidStringID) ||
@@ -740,7 +740,8 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
   bool listCreated;
   csDirtyAccessArray<csRenderMesh*>& meshes = rmListHolder.GetUnusedData (
     listCreated, currentFrame);
-  meshes.SetSize (GetCurveCount(), 0);
+  meshes.Empty();
+  meshes.SetCapacity (GetCurveCount());
 
   iSector* s = movable->GetSectors ()->Get (0);
   csColor ambient = s->GetDynamicAmbientLight ();
@@ -750,12 +751,20 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
     update_ambient = true;
     dynamic_ambient_version = s->GetDynamicAmbientVersion ();
   }
-  csCurve *c;
+  
   for (i = 0; i < GetCurveCount (); i++)
   {
+    csCurve* c = curves.Get (i);
+
+    // First get a bounding box in camera space.
+    csBox3 cbox;
+    csBox2 sbox;
+    if (c->GetScreenBoundingBox (obj_cam, icam, cbox, sbox) < 0)
+      continue;                                 // Not visible.
+
     bool meshCreated;
     csRenderMesh*& rm = rmHolder.GetUnusedMesh (meshCreated, currentFrame);
-    meshes[i] = rm;
+    meshes.Push (rm);
     if (meshCreated)
     {
       rm->buffers.AttachNew (new csRenderBufferHolder);
@@ -767,14 +776,6 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
     rm->clip_z_plane = clip_z_plane;
     rm->do_mirror = icam->IsMirrored ();
     rm->object2world = movtrans;
-
-    c = curves.Get (i);
-
-    // First get a bounding box in camera space.
-    csBox3 cbox;
-    csBox2 sbox;
-    if (c->GetScreenBoundingBox (obj_cam, icam, cbox, sbox) < 0)
-      continue;                                 // Not visible.
 
     // If we have a dirty lightmap recombine the curves and the shadow maps.
     bool updated_lm = c->RecalculateDynamicLights ();

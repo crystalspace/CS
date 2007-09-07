@@ -10,6 +10,8 @@ chronological order.
 	- res fixed the debug info splitting to put the debug info file into
 	  the same file as the binary (fixes separate debug info for shared
 	  libs).
+	- res fixed the bezier mesh sometimes returning incompletely setup
+	  render meshes.
 6-Sep-2007
 	- res applied a patch from 'sarah' to fix compiling after merging some
 	  weaver changes from render manager branch (trac #384).
