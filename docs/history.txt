@@ -16,6 +16,8 @@ chronological order.
 	  the users.
 	- Jorrit reverted r27048 (quotes for javac detection). This fixes
 	  both #377 and #378.
+	- Vincent commented explicit OSS driver for software sound renderer in
+	  OpenAL branch. Also added examples for other drivers requests.
 6-Sep-2007
 	- res applied a patch from 'sarah' to fix compiling after merging some
 	  weaver changes from render manager branch (trac #384).
