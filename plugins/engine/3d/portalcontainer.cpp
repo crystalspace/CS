@@ -818,7 +818,21 @@ bool csPortalContainer::ExtraVisTest (iRenderView* rview,
 {
   Prepare ();
 
-  csRenderView* csrview = (csRenderView*)rview;
+  csRenderView* csrview = static_cast<csRenderView*>(rview);
+  csSphere cam_sphere, world_sphere;
+  GetBoundingSpheres (csrview, &tr_o2c, &camera_origin, world_sphere, 
+    cam_sphere);
+
+  return CS::RenderViewClipper::CullBSphere (csrview->GetRenderContext (),
+      cam_sphere, world_sphere, clip_portal, clip_plane, clip_z_plane);
+}
+  
+void csPortalContainer::GetBoundingSpheres (csRenderView* rview, 
+                                            csReversibleTransform* tr_o2c,
+					    csVector3* camera_origin, 
+					    csSphere& world_sphere, 
+					    csSphere& cam_sphere)
+{
   iCamera* camera = rview->GetCamera ();
   const csReversibleTransform& camtrans = camera->GetTransform ();
   const csMovable& cmovable = meshwrapper->GetCsMovable ();
@@ -828,26 +842,28 @@ bool csPortalContainer::ExtraVisTest (iRenderView* rview,
     ObjectToWorld (cmovable, movtrans);
   }
 
-  csSphere sphere, world_sphere;
+  csSphere sphere;
   sphere.SetCenter (object_bbox.GetCenter ());
   sphere.SetRadius (object_radius);
 
-  tr_o2c = camtrans;
+  uint8 local_t2c[sizeof(csReversibleTransform)];
+  if (tr_o2c == 0) 
+  {
+    tr_o2c = new (local_t2c) csReversibleTransform;
+  }
+  *tr_o2c = camtrans;
   if (!movable_identity)
   {
     const csReversibleTransform movtrans = cmovable.GetFullTransform ();
-    tr_o2c /= movtrans;
+    *tr_o2c /= movtrans;
     world_sphere = movtrans.This2Other (sphere);
   }
   else
   {
     world_sphere = sphere;
   }
-  csSphere cam_sphere = tr_o2c.Other2This (sphere);
-  camera_origin = cam_sphere.GetCenter ();
-
-  return CS::RenderViewClipper::CullBSphere (csrview->GetRenderContext (),
-      cam_sphere, world_sphere, clip_portal, clip_plane, clip_z_plane);
+  cam_sphere = tr_o2c->Other2This (sphere);
+  if (camera_origin) *camera_origin = cam_sphere.GetCenter ();
 }
 
 bool csPortalContainer::Draw (iRenderView* rview, iMovable* /*movable*/,
@@ -1003,3 +1019,121 @@ void csPortalContainer::GetRadius (float& radius, csVector3& center)
   radius = object_radius;
 }
 
+class ScreenPolyOutputHelper
+{
+  csVector2* verts;
+  size_t vertsSize;
+  size_t* numVerts;
+public:
+  ScreenPolyOutputHelper (csVector2* verts, size_t vertsSize,
+    size_t* numVerts) : verts (verts), vertsSize (vertsSize),
+    numVerts (numVerts) {}
+  
+  void AddPoly (const csPoly2D& poly)
+  {
+    size_t numVertsToCopy = csMin (vertsSize, poly.GetVertexCount());
+    memcpy (verts, poly.GetVertices(), numVertsToCopy * sizeof (csVector2));
+    vertsSize -= numVertsToCopy;
+    verts += numVertsToCopy;
+    *numVerts++ = numVertsToCopy;
+  }
+  void AddEmpty ()
+  {
+    *numVerts++ = 0;
+  }
+};
+
+void csPortalContainer::ComputeScreenPolygons (iRenderView* rview,
+                                               csVector2* verts, 
+                                               size_t vertsSize,
+                                               size_t* numVerts)
+{
+  Prepare ();
+  
+  csRenderView* csrview = static_cast<csRenderView*> (rview);
+  csSphere world_sphere, cam_sphere;
+  GetBoundingSpheres (csrview, 0, 0, world_sphere, cam_sphere);
+  
+  CS::RenderViewClipper::CullBSphere (csrview->GetRenderContext (),
+    cam_sphere, world_sphere, clip_portal, clip_plane, clip_z_plane);
+
+  // We assume here that ObjectToWorld has already been called.
+  iCamera* camera = rview->GetCamera ();
+  const csReversibleTransform& camtrans = camera->GetTransform ();
+
+  WorldToCamera (camera, camtrans);
+
+  // Setup clip and far plane.
+  csPlane3 portal_plane, *pportal_plane;
+  bool do_portal_plane = ((csRenderView*)rview)->GetClipPlane (portal_plane);
+  if (do_portal_plane)
+    pportal_plane = &portal_plane;
+  else
+    pportal_plane = 0;
+
+  csPlane3 *farplane = camera->GetFarPlane ();
+  bool mirrored = camera->IsMirrored ();
+  int fov = camera->GetFOV ();
+  float shift_x = camera->GetShiftX ();
+  float shift_y = camera->GetShiftY ();
+
+  ScreenPolyOutputHelper outHelper (verts, vertsSize, numVerts);
+  size_t i;
+  csPoly2D poly;
+  if (clip_plane || clip_portal || clip_z_plane || do_portal_plane || farplane)
+  {
+    for (i = 0 ; i < portals.GetSize () ; i++)
+    {
+      csVector3 *verts;
+      int num_verts;
+      if (ClipToPlane ((int)i, pportal_plane, camtrans.GetOrigin (),
+	verts, num_verts))
+      {
+	// The far plane is defined negative. So if the portal is entirely
+	// in front of the far plane it is not visible. Otherwise we will render
+	// it.
+	if (!farplane ||
+	  csPoly3D::Classify (*farplane, verts, num_verts) != CS_POL_FRONT)
+	{
+	  poly.MakeEmpty();
+	  if (DoPerspective (verts, num_verts, &poly, mirrored, fov,
+		shift_x, shift_y, camera_planes[i]) &&
+	      poly.ClipAgainst (rview->GetClipper ()))
+	  {
+	    outHelper.AddPoly (poly);
+	  }
+	  else
+	   outHelper.AddEmpty ();
+	}
+	else
+	 outHelper.AddEmpty ();
+      }
+      else
+	outHelper.AddEmpty ();
+    }
+  }
+  else
+  {
+    for (i = 0 ; i < portals.GetSize () ; i++)
+    {
+      poly.MakeEmpty();
+      csPortal* prt = portals[i];
+      csDirtyAccessArray<int>& vt = prt->GetVertexIndices ();
+      int num_vertices = (int)vt.GetSize ();
+      int j;
+      for (j = 0 ; j < num_vertices ; j++)
+	AddPerspective (&poly, camera_vertices[vt[j]], fov, shift_x, shift_y);
+      outHelper.AddPoly (poly);
+    }
+  }
+}
+
+size_t csPortalContainer::GetTotalVertexCount () const
+{
+  size_t n = 0;
+  for (size_t i = 0 ; i < portals.GetSize () ; i++)
+  {
+    n += portals[i]->GetVertexIndicesCount();
+  }
+  return n;
+}

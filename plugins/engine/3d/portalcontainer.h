@@ -153,6 +153,8 @@ private:
   bool ExtraVisTest (iRenderView* rview, csReversibleTransform& tr_o2c,
   	csVector3& camera_origin);
 
+  void GetBoundingSpheres (csRenderView* rview, csReversibleTransform* tr_o2c, 
+    csVector3* camera_origin, csSphere& world_sphere, csSphere& cam_sphere);
 protected:
   /**
    * Destructor.  This is private in order to force clients to use DecRef()
@@ -224,6 +226,25 @@ public:
     ShapeChanged ();
   }
   virtual void GetRadius (float& radius, csVector3& center);
+  
+  /**
+   * Compute the screen-space polygons for all portals.
+   * \param rview Render view for which to compute the screen space polys.
+   * \param verts Output buffer receiving the screen space coordinates.
+   * \param vertsSize Size of the \a verts buffer.
+   * \param numVerts Output buffer receiving the number of vertices in each
+   *   polygon.
+   * \remarks The polygon vertices are stored in a flat fashion. To obtain
+   *  the vertices for a certain polygon, sum up the vertex numbers for all
+   *  previous polygons and use that as an index into the vertices array.
+   */
+  void ComputeScreenPolygons (iRenderView* rview,
+    csVector2* verts, size_t vertsSize, size_t* numVerts);
+  
+  /**
+   * Get the total amount of vertices used by all portals.
+   */
+  size_t GetTotalVertexCount () const;
 };
 
 #endif // __CS_PORTALCONTAINER_H__

@@ -30,7 +30,6 @@ namespace CS
 {
 namespace RenderManager
 {
-  
   template<typename RenderTreeType>
   class ContextSetup
   {
@@ -38,7 +37,8 @@ namespace RenderManager
     ContextSetup (iShaderManager* shaderManager, iShader* defaultShader, 
       csStringID defaultShaderName)
       : shaderManager (shaderManager), 
-        defaultShader (defaultShader), defaultShaderName (defaultShaderName)
+        defaultShader (defaultShader), defaultShaderName (defaultShaderName),
+        recurseCount (0)
     {
   
     }
@@ -48,6 +48,9 @@ namespace RenderManager
       typename RenderTreeType::ContextsContainer* container, 
       iSector* sector, CS::RenderManager::RenderView* rview)
     {
+      // @@@ FIXME: Of course, don't hardcode.
+      if (recurseCount > 5) return;
+    
       int numSectorCB = sector->GetSectorCallbackCount ();
       while (numSectorCB-- > 0)
       {
@@ -79,12 +82,24 @@ namespace RenderManager
       SetupStandarShaderAndTicket (renderTree, *context, shaderManager, 
 	defaultShaderName, defaultShader);
   
+      csDirtyAccessArray<csVector2> allPortalVerts2d (64);
+      csDirtyAccessArray<size_t> allPortalVertsNums;
       // Handle all portals
       for (size_t pc = 0; pc < context->allPortals.GetSize (); ++pc)
       {
 	typename RenderTreeType::ContextNode::PortalHolder& holder = context->allPortals[pc];
+	const size_t portalCount = holder.portalContainer->GetPortalCount ();
+	
+	size_t allPortalVertices = holder.portalContainer->GetTotalVertexCount ();
+	allPortalVerts2d.SetSize (allPortalVertices * 3);
+	allPortalVertsNums.SetSize (portalCount);
+	
+	holder.portalContainer->ComputeScreenPolygons (rview, 
+	  allPortalVerts2d.GetArray(), allPortalVerts2d.GetSize(), 
+	  allPortalVertsNums.GetArray());
+	csVector2* portalVerts2d = allPortalVerts2d.GetArray();
   
-	for (size_t pi = 0; pi < (size_t)holder.portalContainer->GetPortalCount (); ++pi)
+	for (size_t pi = 0; pi < portalCount; ++pi)
 	{
 	  iPortal* portal = holder.portalContainer->GetPortal (pi);
   
@@ -94,43 +109,37 @@ namespace RenderManager
 	    if (!portal->CompleteSector (rview))
 	      continue;
   
+            size_t orgCount = allPortalVertsNums[pi];
+            if (orgCount == 0) continue;
 	    // Setup a bounding box, in screen-space
-	    const csVector3* portalVerts = portal->GetWorldVertices ();
-	    int* indices = portal->GetVertexIndices ();
-	    size_t indexCount = portal->GetVertexIndicesCount ();
-  
-	    csDirtyAccessArray<csVector2> portalVerts2d (64);
-	    const csOrthoTransform& camTrans = rview->GetCamera ()->GetTransform ();
 	    csBox2 screenBox;
-	    for (size_t i = 0; i < indexCount; ++i)
+	    for (size_t i = 0; i < orgCount; ++i)
 	    {
-	      const csVector3 cameraVert = camTrans.Other2This (portalVerts[indices[i]]);
-	      const csVector2 screenVert = rview->GetCamera ()->Perspective (cameraVert);
-	      portalVerts2d.Push (screenVert);
-	      screenBox.AddBoundingVertex (screenVert);
+	      screenBox.AddBoundingVertex (portalVerts2d[i]);
 	    }
-  
-	    size_t count = portalVerts2d.GetSize ();
-	    if ((rview->GetClipper ()->ClipInPlace (portalVerts2d.GetArray (), count, screenBox) == CS_CLIP_OUTSIDE) ||
+	    
+	    size_t count = orgCount;
+	    if ((rview->GetClipper ()->ClipInPlace (portalVerts2d, count, screenBox) == CS_CLIP_OUTSIDE) ||
 	      count == 0)
 	      continue;
   
-	    portalVerts2d.SetSize (count);
-	    
 	    // Setup simple portal
 	    rview->CreateRenderContext ();
 	    rview->SetLastPortal (portal);
 	    rview->SetPreviousSector (sector);
-	    csPolygonClipper newView (portalVerts2d.GetArray (), count);
+	    csPolygonClipper newView (portalVerts2d, count);
 	    rview->SetClipper (&newView);
   
 	    typename RenderTreeType::ContextNode* portalCtx = 
               renderTree.CreateContext (container, rview);
   
+            recurseCount++;
 	    // Setup the new context
 	    (*this)(renderTree, portalCtx, container, portal->GetSector (), rview);
+	    recurseCount--;
   
 	    rview->RestoreRenderContext ();
+	    portalVerts2d += orgCount;
 	  }
 	  else
 	  {
@@ -150,6 +159,7 @@ namespace RenderManager
     iShaderManager* shaderManager;
     iShader* defaultShader;
     csStringID defaultShaderName;
+    int recurseCount;
   };
   
   template<typename RenderTreeType>

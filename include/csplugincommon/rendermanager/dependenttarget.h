@@ -192,6 +192,7 @@ namespace RenderManager
       }
     };
     
+    int nestLevel;
     // Storage for used SV names
     csBitArray names;
     // Storage for handled targets
@@ -235,6 +236,7 @@ namespace RenderManager
       {
         size_t insertPos;
         if (handledTargets.Find (texh, insertPos)) return;
+        handledTargets.Insert (insertPos, texh);
         
         typename RenderTargetInfo::ViewsHash::ConstGlobalIterator viewsIt (
           targetInfo->views.GetIterator());
@@ -245,7 +247,6 @@ namespace RenderManager
             viewsIt.Next (subtexture));
 	  HandleView (viewInfo, texh, subtexture);
         }
-        handledTargets.Insert (insertPos, texh);
       }
       void HandleView (const typename RenderTargetInfo::ViewInfo& viewInfo,
                        iTextureHandle* texh, int subtexture)
@@ -276,6 +277,8 @@ namespace RenderManager
       }
     };
   public:
+    DependentTargetManager () : nestLevel (0) {}
+  
     void RegisterRenderTarget (iTextureHandle* target, 
       iView* view, int subtexture = 0, uint flags = 0)
     {
@@ -325,18 +328,23 @@ namespace RenderManager
       Tree& renderTree, ContextSetup<Tree>& contextSetup, 
       iShaderManager* shaderManager)
     {
-      size_t numSVs = shaderManager->GetSVNameStringset()->GetSize();
-      names.SetSize (numSVs);
-    
-      handledTargets.Empty();
-      handledTargets.SetCapacity (targets.GetSize() + oneTimeTargets.GetSize());
+      if (nestLevel == 0)
+      {
+        size_t numSVs = shaderManager->GetSVNameStringset()->GetSize();
+        names.SetSize (numSVs);
+        handledTargets.Empty();
+        handledTargets.SetCapacity (targets.GetSize() + oneTimeTargets.GetSize());
+      }
+      
+      nestLevel++;
       TextureTraverser texTraverse (*this, shaderManager, handledTargets,
         contextSetup, renderTree);
       TraverseAllTextures<Tree, TextureTraverser> traverseAllTextures (texTraverse, 
         shaderManager, names);
       renderTree.TraverseContexts (contexts, traverseAllTextures);
+      nestLevel--;
       
-      oneTimeTargets.DeleteAll ();
+      if (nestLevel == 0) oneTimeTargets.DeleteAll ();
     }
   };
 

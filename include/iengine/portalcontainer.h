@@ -49,7 +49,7 @@ struct iRenderView;
  */
 struct iPortalContainer : public virtual iBase
 {
-  SCF_INTERFACE(iPortalContainer, 2,0,0);
+  SCF_INTERFACE(iPortalContainer, 2,0,1);
   /// Get the number of portals in this contain.
   virtual int GetPortalCount () const = 0;
 
@@ -64,6 +64,12 @@ struct iPortalContainer : public virtual iBase
 
   /// Render the portal container
   virtual void Draw (iRenderView* rview) = 0;
+
+  	
+  virtual bool ComputeScreenPolygons (iRenderView* rview,
+    csVector2* verts, size_t vertsSize, size_t* numVerts) = 0;
+  
+  virtual size_t GetTotalVertexCount () const = 0;
 };
 
 /** @} */

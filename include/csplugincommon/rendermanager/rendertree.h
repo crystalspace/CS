@@ -106,6 +106,9 @@ namespace RenderManager
        */
       struct PortalHolder
       {
+      #ifdef CS_DEBUG
+        const char* db_mesh_name;
+      #endif
         iPortalContainer* portalContainer;
         iMeshWrapper* meshWrapper;
       };
@@ -338,15 +341,25 @@ namespace RenderManager
       // Get the meshes
       int numMeshes;
       csRenderMesh** meshList = imesh->GetRenderMeshes (numMeshes, renderView, frustum_mask);
+    #ifdef CS_DEBUG
+      const char* const db_mesh_name = imesh->QueryObject()->GetName();
+    #endif
 
       // Add it to the appropriate meshnode
       for (int i = 0; i < numMeshes; ++i)
       {
         csRenderMesh* rm = meshList[i];
+      #ifdef CS_DEBUG
+        rm->db_mesh_name = db_mesh_name;
+      #endif
 
         if (rm->portal)
         {
+        #ifdef CS_DEBUG
+          typename ContextNode::PortalHolder h = {db_mesh_name, rm->portal, imesh};
+        #else
           typename ContextNode::PortalHolder h = {rm->portal, imesh};
+	#endif
           context->allPortals.Push (h);
           continue;
         }
