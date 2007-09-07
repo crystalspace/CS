@@ -345,8 +345,8 @@ AC_DEFUN([CS_JAVA_FLAGS],
 	[AS_IF([test -n "$JAVA_HOME"],
 	    [$1_dir="$JAVA_HOME"],
 	    [AS_IF([test -n "$2"],
-		[$1_dir=`AS_DIRNAME(["$2"])`
-		$1_dir=`AS_DIRNAME(["$$1_dir"])`],
+		[$1_dir=`AS_DIRNAME([$2])`
+		$1_dir=`AS_DIRNAME([$$1_dir])`],
 		[$1_dir=''])])
 	AS_IF([test -n "$$1_dir"],
 	    [$1_cflags="-I$$1_dir/include"
