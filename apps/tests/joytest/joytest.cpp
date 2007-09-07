@@ -167,7 +167,7 @@ bool Simple::Initialize ()
 	CS_REQUEST_LEVELLOADER,
 	CS_REQUEST_REPORTER,
 	CS_REQUEST_REPORTERLISTENER,
-	CS_REQUEST_PLUGIN ("crystalspace.device.joystick", iEventPlug),
+	CS_REQUEST_JOYSTICK,
 	CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
