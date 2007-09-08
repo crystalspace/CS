@@ -10,6 +10,9 @@ chronological order.
 	- res fixed a crash in bezier plugin caused by a rendermanager-only
 	  change accidentally slipping in.
 	- Genjix added doxygen comment for genmeshanim2 Append(animname) function.
+	- iceeey made the cssaver save plugin references with the short name
+	  from the original world file, if it was loaded with the saveable
+	  flag set. This makes saving and then loading 'castle' work.
 7-Sep-2007
 	- res fixed the debug info splitting to put the debug info file into
 	  the same file as the binary (fixes separate debug info for shared

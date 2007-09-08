@@ -252,6 +252,8 @@ private:
      */
     bool FindPlugin (const char* Name, iLoaderPlugin*& plug,
     	iBinaryLoaderPlugin*& binplug, iDocumentNode*& defaults);
+    /// Find a plugin's class ID by its name. Returns 0 if it is not found.
+    const char* FindPluginClassID (const char* Name);
     // add a new plugin record
     void NewPlugin (const char* ShortName, iDocumentNode* child);
     /**

@@ -140,6 +140,18 @@ bool csLoader::csLoadedPluginVector::FindPlugin (
   	plug, binplug);
 }
 
+const char* csLoader::csLoadedPluginVector::FindPluginClassID (const char* Name)
+{
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
+  // look if there is already a loading record for this plugin
+  csLoaderPluginRec* pl = FindPluginRec (Name);
+  if (pl)
+    return pl->ClassID;
+  
+  return 0;
+}
+    
+
 void csLoader::csLoadedPluginVector::NewPlugin
 	(const char *ShortName, iDocumentNode* child)
 {
