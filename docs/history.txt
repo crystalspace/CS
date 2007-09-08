@@ -6,6 +6,9 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Sep-2007
+	- res fixed a crash in bezier plugin caused by a rendermanager-only
+	  change accidentally slipping in.
 7-Sep-2007
 	- res fixed the debug info splitting to put the debug info file into
 	  the same file as the binary (fixes separate debug info for shared
