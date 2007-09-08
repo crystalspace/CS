@@ -3,9 +3,9 @@
     <move>
       <v x="0.0" y="0.0" z="0.0" />
       <matrix>
-        <rotx>-0.169645974665</rotx>
-        <rotz>-1.18923435781e-08</rotz>
-        <roty>6.94271617612e-08</roty>
+        <rotx>1.4011503022</rotx>
+        <rotz>6.94271617612e-08</rotz>
+        <roty>1.18923406018e-08</roty>
       </matrix>
     </move>
     <bone name="Head" >
@@ -23,9 +23,9 @@
     <move>
       <v x="0.0" y="0.0" z="0.0" />
       <matrix>
-        <rotx>-1.57078420941</rotx>
-        <rotz>1.44310507622</rotz>
-        <roty>-1.19322699793e-05</roty>
+        <rotx>2.01049977713e-07</rotx>
+        <rotz>-1.56286484563e-06</rotz>
+        <roty>-1.44310507622</roty>
       </matrix>
     </move>
     <bone name="Claw.R" >
@@ -43,9 +43,9 @@
     <move>
       <v x="0.0" y="0.0" z="0.0" />
       <matrix>
-        <rotx>-1.57079139995</rotx>
-        <rotz>-1.44310494306</rotz>
-        <roty>4.83973734052e-06</roty>
+        <rotx>8.26110283825e-08</rotx>
+        <rotz>6.59670017587e-07</rotz>
+        <roty>1.44310494306</roty>
       </matrix>
     </move>
     <bone name="Claw.L" >
@@ -75,9 +75,9 @@
       <bone name="Neck" >
         <move>
           <matrix>
-            <rotx>0.0376005680584</rotx>
-            <rotz>2.64789824202e-09</rotz>
-            <roty>7.03885351396e-08</roty>
+            <rotx>1.60839696559</rotx>
+            <rotz>7.03885351396e-08</rotz>
+            <roty>-2.64790121833e-09</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -95,9 +95,9 @@
       <bone name="Arm.R" >
         <move>
           <matrix>
-            <rotx>-1.57078420941</rotx>
-            <rotz>1.44310507622</rotz>
-            <roty>-1.19322699793e-05</roty>
+            <rotx>2.01049977713e-07</rotx>
+            <rotz>-1.56286484563e-06</rotz>
+            <roty>-1.44310507622</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -115,9 +115,9 @@
       <bone name="Arm.L" >
         <move>
           <matrix>
-            <rotx>-1.57079139995</rotx>
-            <rotz>-1.44310494306</rotz>
-            <roty>4.83973734052e-06</roty>
+            <rotx>8.26110283825e-08</rotx>
+            <rotz>6.59670017587e-07</rotz>
+            <roty>1.44310494306</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -137,9 +137,9 @@
       <bone name="Neck" >
         <move>
           <matrix>
-            <rotx>-0.0821733584296</rotx>
-            <rotz>-5.78164063013e-09</rotz>
-            <roty>7.02006463609e-08</roty>
+            <rotx>1.48862302662</rotx>
+            <rotz>7.02006463609e-08</rotz>
+            <roty>5.78163765381e-09</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -157,9 +157,9 @@
       <bone name="Arm.R" >
         <move>
           <matrix>
-            <rotx>-1.57078420941</rotx>
-            <rotz>1.44310507622</rotz>
-            <roty>-1.19322699793e-05</roty>
+            <rotx>2.01049977713e-07</rotx>
+            <rotz>-1.56286484563e-06</rotz>
+            <roty>-1.44310507622</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -177,9 +177,9 @@
       <bone name="Arm.L" >
         <move>
           <matrix>
-            <rotx>-1.57079139995</rotx>
-            <rotz>-1.44310494306</rotz>
-            <roty>4.83973734052e-06</roty>
+            <rotx>8.26110283825e-08</rotx>
+            <rotz>6.59670017587e-07</rotz>
+            <roty>1.44310494306</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -199,9 +199,9 @@
       <bone name="Neck" >
         <move>
           <matrix>
-            <rotx>0.0376005680584</rotx>
-            <rotz>2.64789824202e-09</rotz>
-            <roty>7.03885351396e-08</roty>
+            <rotx>1.60839696559</rotx>
+            <rotz>7.03885351396e-08</rotz>
+            <roty>-2.64790121833e-09</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -219,9 +219,9 @@
       <bone name="Arm.R" >
         <move>
           <matrix>
-            <rotx>-1.57078420941</rotx>
-            <rotz>1.44310507622</rotz>
-            <roty>-1.19322699793e-05</roty>
+            <rotx>2.01049977713e-07</rotx>
+            <rotz>-1.56286484563e-06</rotz>
+            <roty>-1.44310507622</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -239,9 +239,9 @@
       <bone name="Arm.L" >
         <move>
           <matrix>
-            <rotx>-1.57079139995</rotx>
-            <rotz>-1.44310494306</rotz>
-            <roty>4.83973734052e-06</roty>
+            <rotx>8.26110283825e-08</rotx>
+            <rotz>6.59670017587e-07</rotz>
+            <roty>1.44310494306</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -264,9 +264,9 @@
       <bone name="Neck" >
         <move>
           <matrix>
-            <rotx>-0.169645974665</rotx>
-            <rotz>-1.18923435781e-08</rotz>
-            <roty>6.94271617612e-08</roty>
+            <rotx>1.4011503022</rotx>
+            <rotz>6.94271617612e-08</rotz>
+            <roty>1.18923406018e-08</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -284,9 +284,9 @@
       <bone name="Arm.R" >
         <move>
           <matrix>
-            <rotx>-1.1643987434</rotx>
-            <rotz>1.02040947958</rotz>
-            <roty>0.119549026695</roty>
+            <rotx>0.508424516471</rotx>
+            <rotz>0.0624178338875</rotz>
+            <roty>-1.02359734999</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -304,9 +304,9 @@
       <bone name="Arm.L" >
         <move>
           <matrix>
-            <rotx>-0.91172281286</rotx>
-            <rotz>-1.86918661587</rotz>
-            <roty>0.198438224803</roty>
+            <rotx>0.469190194791</rotx>
+            <rotz>-0.0579876154799</rotz>
+            <roty>1.86366308661</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -326,9 +326,9 @@
       <bone name="Neck" >
         <move>
           <matrix>
-            <rotx>-0.169645974665</rotx>
-            <rotz>-1.18923435781e-08</rotz>
-            <roty>6.94271617612e-08</roty>
+            <rotx>1.4011503022</rotx>
+            <rotz>6.94271617612e-08</rotz>
+            <roty>1.18923406018e-08</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -346,9 +346,9 @@
       <bone name="Arm.R" >
         <move>
           <matrix>
-            <rotx>-1.2313960201</rotx>
-            <rotz>1.21508415842</rotz>
-            <roty>0.359468224196</roty>
+            <rotx>0.678096606759</rotx>
+            <rotz>0.122817466044</rotz>
+            <roty>-1.23610994839</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -366,9 +366,9 @@
       <bone name="Arm.L" >
         <move>
           <matrix>
-            <rotx>-0.422178111148</rotx>
-            <rotz>-1.66305821381</rotz>
-            <roty>0.68670474235</roty>
+            <rotx>0.464002356987</rotx>
+            <rotz>-0.0584435486585</rotz>
+            <roty>1.64222736724</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -388,9 +388,9 @@
       <bone name="Neck" >
         <move>
           <matrix>
-            <rotx>-0.169645974665</rotx>
-            <rotz>-1.18923435781e-08</rotz>
-            <roty>6.94271617612e-08</roty>
+            <rotx>1.4011503022</rotx>
+            <rotz>6.94271617612e-08</rotz>
+            <roty>1.18923406018e-08</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -408,9 +408,9 @@
       <bone name="Arm.R" >
         <move>
           <matrix>
-            <rotx>-0.883388709654</rotx>
-            <rotz>1.90841577767</rotz>
-            <roty>-0.189444629933</roty>
+            <rotx>0.508424483181</rotx>
+            <rotz>0.062417800598</rotz>
+            <roty>-1.90281315253</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -428,9 +428,9 @@
       <bone name="Arm.L" >
         <move>
           <matrix>
-            <rotx>-1.18003376268</rotx>
-            <rotz>-0.933102004301</rotz>
-            <roty>-0.0975016731039</roty>
+            <rotx>0.46919026137</rotx>
+            <rotz>-0.0579876154799</rotz>
+            <roty>0.935377742032</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -450,9 +450,9 @@
       <bone name="Neck" >
         <move>
           <matrix>
-            <rotx>-0.169645974665</rotx>
-            <rotz>-1.18923435781e-08</rotz>
-            <roty>6.94271617612e-08</roty>
+            <rotx>1.4011503022</rotx>
+            <rotz>6.94271617612e-08</rotz>
+            <roty>1.18923406018e-08</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -470,9 +470,9 @@
       <bone name="Arm.R" >
         <move>
           <matrix>
-            <rotx>-0.59283417288</rotx>
-            <rotz>1.70800251931</rotz>
-            <roty>-0.47354672686</roty>
+            <rotx>0.50823699664</rotx>
+            <rotz>0.0624165772084</rotz>
+            <roty>-1.69306298455</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -490,9 +490,9 @@
       <bone name="Arm.L" >
         <move>
           <matrix>
-            <rotx>-1.23261321787</rotx>
-            <rotz>-1.15259454818</rotz>
-            <roty>-0.364411850127</roty>
+            <rotx>0.673588274508</rotx>
+            <rotz>-0.145250503618</rotz>
+            <roty>1.17722639142</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -512,9 +512,9 @@
       <bone name="Neck" >
         <move>
           <matrix>
-            <rotx>-0.169645974665</rotx>
-            <rotz>-1.18923435781e-08</rotz>
-            <roty>6.94271617612e-08</roty>
+            <rotx>1.4011503022</rotx>
+            <rotz>6.94271617612e-08</rotz>
+            <roty>1.18923406018e-08</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -532,9 +532,9 @@
       <bone name="Arm.R" >
         <move>
           <matrix>
-            <rotx>-1.1643987434</rotx>
-            <rotz>1.02040947958</rotz>
-            <roty>0.119549026695</roty>
+            <rotx>0.508424516471</rotx>
+            <rotz>0.0624178338875</rotz>
+            <roty>-1.02359734999</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -552,9 +552,9 @@
       <bone name="Arm.L" >
         <move>
           <matrix>
-            <rotx>-0.91172281286</rotx>
-            <rotz>-1.86918661587</rotz>
-            <roty>0.198438224803</roty>
+            <rotx>0.469190194791</rotx>
+            <rotz>-0.0579876154799</rotz>
+            <roty>1.86366308661</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -576,9 +576,9 @@
       <bone name="Arm.L" >
         <move>
           <matrix>
-            <rotx>-1.57079139995</rotx>
-            <rotz>-1.44310494306</rotz>
-            <roty>4.83973734052e-06</roty>
+            <rotx>8.26110283825e-08</rotx>
+            <rotz>6.59670017587e-07</rotz>
+            <roty>1.44310494306</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -598,9 +598,9 @@
       <bone name="Arm.L" >
         <move>
           <matrix>
-            <rotx>-1.5707915331</rotx>
-            <rotz>-1.44310494306</rotz>
-            <roty>-0.633208627112</roty>
+            <rotx>0.629318814023</rotx>
+            <rotz>-0.0754256156295</rotz>
+            <roty>1.46766421516</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -620,9 +620,9 @@
       <bone name="Arm.L" >
         <move>
           <matrix>
-            <rotx>-1.5707915331</rotx>
-            <rotz>-1.44310494306</rotz>
-            <roty>-0.633208627112</roty>
+            <rotx>0.629318814023</rotx>
+            <rotz>-0.0754256156295</rotz>
+            <roty>1.46766421516</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -642,9 +642,9 @@
       <bone name="Arm.L" >
         <move>
           <matrix>
-            <rotx>-1.5707915331</rotx>
-            <rotz>-1.44310494306</rotz>
-            <roty>-0.633208627112</roty>
+            <rotx>0.629318814023</rotx>
+            <rotz>-0.0754256156295</rotz>
+            <roty>1.46766421516</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>
@@ -664,9 +664,9 @@
       <bone name="Arm.L" >
         <move>
           <matrix>
-            <rotx>-1.5707915331</rotx>
-            <rotz>-1.44310494306</rotz>
-            <roty>-0.633208627112</roty>
+            <rotx>0.629318814023</rotx>
+            <rotz>-0.0754256156295</rotz>
+            <roty>1.46766421516</roty>
           </matrix>
           <v x="0.0" y="0.0" z="0.0" />
         </move>

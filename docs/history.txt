@@ -7,6 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 9-Sep-2007
+	- Genjix corrected kirchdorfer test mesh for correct rotation.
 	- Genjix fixed a bug and made all transforms for bones relative to their
 	  parent. Also add cool skeleton test mesh.
 8-Sep-2007

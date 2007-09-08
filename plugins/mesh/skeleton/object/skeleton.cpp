@@ -566,7 +566,6 @@ bool csSkeletonAnimationInstance::Do (long elapsed, bool& stop, long &left)
     {
       // otherwise just use start keyframe
       m.bone_transform->pos = m.final_position;
-      m.bone_transform->quat = m.quat;
       runnable_transforms.DeleteIndexFast (i);
     }
     mod = true;
