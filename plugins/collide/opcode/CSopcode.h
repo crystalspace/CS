@@ -93,7 +93,6 @@ public:
   virtual csStringID GetTriangleDataID () { return trianglemesh_id; }
   virtual csStringID GetBaseDataID () { return basemesh_id; }
 
-  virtual csPtr<iCollider> CreateCollider (iPolygonMesh* mesh);
   virtual csPtr<iCollider> CreateCollider (iTriangleMesh* mesh);
   virtual csPtr<iCollider> CreateCollider (iTerraFormer* mesh);
   virtual csPtr<iCollider> CreateCollider (iTerrainSystem* mesh);
@@ -107,6 +106,15 @@ public:
 
   bool CollideRaySegment (
   	iCollider* collider, const csReversibleTransform* trans,
+	const csVector3& start, const csVector3& end, bool use_ray);
+  bool CollideRaySegment (
+  	csOPCODECollider* collider, const csReversibleTransform* trans,
+	const csVector3& start, const csVector3& end, bool use_ray);
+  bool CollideRaySegment (
+  	iTerrainSystem* terrain, const csReversibleTransform* trans,
+	const csVector3& start, const csVector3& end, bool use_ray);
+  bool CollideRaySegment (
+  	csTerraFormerCollider* terraformer, const csReversibleTransform* trans,
 	const csVector3& start, const csVector3& end, bool use_ray);
   virtual bool CollideRay (
   	iCollider* collider, const csReversibleTransform* trans,

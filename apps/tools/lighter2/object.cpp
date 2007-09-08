@@ -220,10 +220,10 @@ namespace lighter
         LightmapUVObjectLayouter* layout = 
           factory->layoutedPrimitives[j].factory;
         const size_t group = factory->layoutedPrimitives[j].group;
-        lmLayouts.Push (LMLayoutingInfo (layout, group));
-        bool res = layout->LayoutUVOnPrimitives (allPrimitives, 
+        size_t layoutID = layout->LayoutUVOnPrimitives (allPrimitives, 
           group, sector, pdBits);
-        if (!res) return false;
+        if (layoutID == (size_t)~0) return false;
+        lmLayouts.Push (LMLayoutingInfo (layout, layoutID, group));
       }
 
     }
@@ -243,7 +243,8 @@ namespace lighter
       if (!lightPerVertex)
       {
         lmLayouts[j].layouter->FinalLightmapLayout (allPrimitives, 
-          lmLayouts[j].group, vertexData, lightmapIDs.GetExtend (j));
+          lmLayouts[j].layoutID, lmLayouts[j].group, vertexData, 
+          lightmapIDs.GetExtend (j));
       }
 
       for (size_t i = 0; i < allPrimitives.GetSize(); i++)
@@ -361,7 +362,7 @@ namespace lighter
     meshWrapper.Invalidate();
   }
 
-  void Object::FillLightmapMask (LightmapMaskArray& masks)
+  void Object::FillLightmapMask (LightmapMaskPtrDelArray& masks)
   {
     if (lightPerVertex) return;
 
@@ -370,13 +371,14 @@ namespace lighter
     // And fill it with data
     for (size_t i = 0; i < allPrimitives.GetSize(); i++)
     {
-      LightmapMask &mask = masks[lightmapIDs[i]];
+      LightmapMask& mask = *(masks[lightmapIDs[i]]);
+      ScopedSwapLock<LightmapMask> m (mask);
+      float* maskData = mask.GetMaskData();
+
       PrimitiveArray::Iterator primIt = allPrimitives[i].GetIterator ();
       while (primIt.HasNext ())
       {
-        const Primitive &prim = primIt.Next ();
-        totalArea = (prim.GetuFormVector ()%prim.GetvFormVector ()).Norm ();
-        float area2pixel = 1.0f / totalArea;
+        const Primitive &prim = primIt.Next ();        
 
         int minu,maxu,minv,maxv;
         prim.ComputeMinMaxUV (minu,maxu,minv,maxv);
@@ -385,13 +387,23 @@ namespace lighter
         // Go through all lightmap cells and add their element areas to the mask
         for (uint v = minv; v <= (uint)maxv;v++)
         {
-          uint vindex = v * mask.width;
+          uint vindex = v * mask.GetWidth();
           for (uint u = minu; u <= (uint)maxu; u++, findex++)
-          {
-            const float elemArea = prim.GetElementAreas ().GetElementArea (findex);
-            if (elemArea == 0) continue; // No area, skip
-
-            mask.maskData[vindex+u] += elemArea * area2pixel; //Accumulate
+          {            
+            //@@TODO
+            Primitive::ElementType type = prim.GetElementType (findex);
+            if (type == Primitive::ELEMENT_EMPTY)
+            {
+              continue;
+            }
+            else if (type == Primitive::ELEMENT_BORDER)
+            {
+              maskData[vindex+u] += prim.ComputeElementFraction (findex);
+            }
+            else
+            {
+              maskData[vindex+u] += 1.0f;
+            }
           }
         } 
       }

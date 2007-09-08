@@ -142,7 +142,7 @@ struct iReporterIterator : public virtual iBase
  * - Reporter plugin (crystalspace.utilities.reporter)
  *   
  * Main ways to get pointers to this interface:
- * - CS_QUERY_REGISTRY()
+ * - csQueryRegistry<iReporter>()
  *   
  * Main users of this interface:
  * - Entire CS and application.

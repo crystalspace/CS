@@ -432,7 +432,7 @@ struct iDocument : public virtual iBase
  *       (crystalspace.documentsystem.multiplexer)
  *
  * Main ways to get pointers to this interface:
- * - CS_QUERY_REGISTRY()
+ * - csQueryRegistry<iDocumentSystem>()
  */
 struct iDocumentSystem : public virtual iBase
 {

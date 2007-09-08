@@ -181,6 +181,12 @@ public:
   virtual void Clear ();
 
   /**
+   * Returns whether the allocator is empty (ie no rectangles have been 
+   * allocated at all or all allocated rectangles have been reclaimed).
+   */
+  bool IsEmpty() const { return root->IsReclaimed(); }
+
+  /**
    * Allocate a new rectangle. Returns 0 if there is no room
    */
   virtual SubRect* Alloc (int w, int h, csRect& rect);
@@ -222,7 +228,15 @@ public:
 
   /**
    * For debugging: dump all free rectangles.
-   * Has no effect if CS_DEBUG was not defined.
+   * \param object_reg Object registry. Used to obtain some required plugins.
+   * \param tag String appended to the filename dumped to.
+   */
+  void Dump (iObjectRegistry* object_reg, const char* tag = 0);
+
+  /**
+   * For debugging: dump all free rectangles.
+   * Works the same as Dump(iObjectRegistry*, const char*), although has no 
+   * effect Crystal Space was not compiled in debug mode.
    */
   void Dump (const char* tag = 0);
 };

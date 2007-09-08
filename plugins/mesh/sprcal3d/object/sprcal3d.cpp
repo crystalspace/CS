@@ -170,11 +170,6 @@ csSpriteCal3DMeshObjectFactory::csSpriteCal3DMeshObjectFactory (
   scfImplementationType (this, (iBase*)pParent), sprcal3d_type (pParent), 
   calCoreModel("no name")
 {
-  SetPolygonMeshBase (sprcal3d_type->nullPolyMesh);
-  SetPolygonMeshColldet (sprcal3d_type->nullPolyMesh);
-  SetPolygonMeshViscull (0);
-  SetPolygonMeshShadows (0);
-
   csSpriteCal3DMeshObjectFactory::object_reg = object_reg;
 
   light_mgr = csQueryRegistry<iLightManager> (object_reg);
@@ -854,12 +849,6 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
 {
   csSpriteCal3DMeshObject::object_reg = object_reg;
 
-  //  scfiPolygonMesh.SetFactory (this);
-  //  scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
-  //  scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
-  //  scfiObjectModel.SetPolygonMeshViscull (0);
-  //  scfiObjectModel.SetPolygonMeshShadows (0);
-
   // create the model instance from the loaded core model
 //  if(!calModel.create (&calCoreModel))
 //  {
@@ -986,12 +975,6 @@ void csSpriteCal3DMeshObject::RecalcBoundingBox (csBox3& bbox)
 }
 
 
-void csSpriteCal3DMeshObject::GetObjectBoundingBox (csBox3& bbox)
-{
-  RecalcBoundingBox (object_bbox);
-  bbox = object_bbox;
-}
-
 const csBox3& csSpriteCal3DMeshObject::GetObjectBoundingBox ()
 {
   RecalcBoundingBox (object_bbox);
@@ -1010,7 +993,7 @@ void csSpriteCal3DMeshObjectFactory::GetRadius (float& rad, csVector3& cent)
   rad = 1.0f;
 }
 
-void csSpriteCal3DMeshObjectFactory::GetObjectBoundingBox (csBox3& bbox)
+const csBox3& csSpriteCal3DMeshObjectFactory::GetObjectBoundingBox ()
 {
   CalCoreSkeleton *skel = calCoreModel.getCoreSkeleton ();
   skel->calculateBoundingBoxes(&calCoreModel);
@@ -1019,16 +1002,11 @@ void csSpriteCal3DMeshObjectFactory::GetObjectBoundingBox (csBox3& bbox)
   CalVector p[8];
   calBoundingBox.computePoints(p);
 
-  bbox.Set (p[0].x, p[0].y, p[0].z, p[0].x, p[0].y, p[0].z);
+  obj_bbox.Set (p[0].x, p[0].y, p[0].z, p[0].x, p[0].y, p[0].z);
   for (int i=1; i<8; i++)
   {
-    bbox.AddBoundingVertexSmart(p[i].x, p[i].y, p[i].z);
+    obj_bbox.AddBoundingVertexSmart(p[i].x, p[i].y, p[i].z);
   }
-}
-
-const csBox3& csSpriteCal3DMeshObjectFactory::GetObjectBoundingBox ()
-{
-  obj_bbox = GetObjectBoundingBox ();
   return obj_bbox;
 }
 
@@ -2348,24 +2326,30 @@ void csSpriteCal3DMeshObject::MeshAccessor::PreGetBuffer
 }
 
 //---------------------------csCal3dSkeleton---------------------------
-csCal3dSkeleton::csCal3dSkeleton (CalSkeleton* skeleton, csCal3dSkeletonFactory* skel_factory,
-                                  csSpriteCal3DMeshObject *mesh_object) :
-scfImplementationType(this), skeleton(skeleton), skeleton_factory (skel_factory) 
+csCal3dSkeleton::csCal3dSkeleton (CalSkeleton* skeleton,
+    csCal3dSkeletonFactory* skel_factory,
+    csSpriteCal3DMeshObject *mesh_object) :
+      scfImplementationType(this), skeleton(skeleton),
+      skeleton_factory (skel_factory) 
 {
   csCal3dSkeleton::mesh_object = mesh_object;
   graveyard = csQueryRegistry<iSkeletonGraveyard> (mesh_object->object_reg);
   if (graveyard)
+    // @@@ This is a memory leak! There is a circular reference between
+    // this Cal3DSkeleton and the list of skeletons in the graveyard.
     graveyard->AddSkeleton (this);
 
   std::vector<CalBone*> cal_bones = skeleton->getVectorBone ();
   for (size_t i = 0; i < cal_bones.size (); i++)
   {
-    bones.Push (new csCal3dSkeletonBone (cal_bones[i], skel_factory->GetBone (i), this));
+    bones.Push (new csCal3dSkeletonBone (cal_bones[i],
+	  skel_factory->GetBone (i), this));
   }
   for (size_t i = 0; i < cal_bones.size (); i++)
   {
     bones[i]->Initialize ();
-    bones_names.Put (csHashComputer<const char*>::ComputeHash (bones[i]->GetName ()), i);
+    bones_names.Put (csHashComputer<const char*>::ComputeHash (
+	  bones[i]->GetName ()), i);
   }
 }
 
@@ -2457,7 +2441,7 @@ SCF_IMPLEMENT_FACTORY (csSpriteCal3DMeshObjectType)
 csSpriteCal3DMeshObjectType::csSpriteCal3DMeshObjectType (iBase* pParent) :
   scfImplementationType (this, pParent)
 {
-  nullPolyMesh.AttachNew (new NullPolyMesh (pParent));
+  //nullPolyMesh.AttachNew (new NullPolyMesh (pParent));
 }
 
 csSpriteCal3DMeshObjectType::~csSpriteCal3DMeshObjectType ()

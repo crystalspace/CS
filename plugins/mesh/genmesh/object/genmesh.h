@@ -40,7 +40,6 @@
 #include "iengine/light.h"
 #include "iengine/lightmgr.h"
 #include "iengine/shadcast.h"
-#include "igeom/polymesh.h"
 #include "imesh/genmesh.h"
 #include "imesh/lighting.h"
 #include "imesh/object.h"
@@ -57,7 +56,6 @@
 class csBSPTree;
 class csColor;
 class csColor4;
-class csPolygonMesh;
 struct iCacheManager;
 struct iEngine;
 struct iMaterialWrapper;
@@ -128,8 +126,6 @@ public:
   void Clear () { }
   bool RemoveVariable  (csShaderVariable *) { return false; }
 };
-
-#include "csutil/win32/msvc_deprecated_warn_off.h"
 
 /**
  * Genmesh version of mesh object.
@@ -283,7 +279,6 @@ public:
   bool IsLighting () const { return do_lighting; }
   void SetManualColors (bool m) { do_manual_colors = m; }
   bool IsManualColors () const { return do_manual_colors; }
-  void GetObjectBoundingBox (csBox3& bbox);
   const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent);
@@ -292,13 +287,6 @@ public:
   void SetShadowReceiving (bool m) { do_shadow_rec = m; }
   bool IsShadowReceiving () const { return do_shadow_rec; }
   iGeneralMeshSubMesh* FindSubMesh (const char* name) const; 
-  void AddSubMesh (unsigned int *triangles, int tricount, 
-    iMaterialWrapper *material, uint mixmode);
-  void AddSubMesh (unsigned int *triangles, int tricount, 
-    iMaterialWrapper *material)
-  {
-    AddSubMesh (triangles, tricount, material, (uint)~0);
-  }
   /** @} */
 
   iVirtualClock* vc;
@@ -511,8 +499,6 @@ public:
     return anim_ctrl_fact;
   }
 
-  csMeshedPolygon* polygons;
-
   /// Calculate bounding box and radius.
   void CalculateBBoxRadius ();
 
@@ -673,10 +659,6 @@ public:
 
   /**\name iObjectModel implementation
    * @{ */
-  virtual void GetObjectBoundingBox (csBox3& bbox)
-  {
-    bbox = GetObjectBoundingBox ();
-  }
   virtual const csBox3& GetObjectBoundingBox ();
   virtual void GetRadius (float& rad, csVector3& cent)
   {
@@ -684,11 +666,6 @@ public:
     cent = object_bbox.GetCenter ();
   }
   /** @} */
-
-  /**
-   * Calculate polygons for iPolygonMesh.
-   */
-  csMeshedPolygon* GetPolygons ();
 
   void SetMixMode (uint mode)
   {
@@ -758,40 +735,6 @@ public:
   { return logparent; }
   virtual iMeshObjectType* GetMeshObjectType () const; 
 
-  //------------------ iPolygonMesh interface implementation ----------------//
-  struct PolyMesh : public scfImplementation1<PolyMesh, iPolygonMesh>
-  {
-  private:
-    csGenmeshMeshObjectFactory* factory;
-    csFlags flags;
-  public:
-    //SCF_DECLARE_IBASE;
-
-    void SetFactory (csGenmeshMeshObjectFactory* Factory)
-    { factory = Factory; }
-
-    virtual int GetVertexCount ();
-    virtual csVector3* GetVertices ();
-    virtual int GetPolygonCount ();
-    virtual csMeshedPolygon* GetPolygons ();
-    virtual int GetTriangleCount ();
-    virtual csTriangle* GetTriangles ();
-    virtual void Lock () { }
-    virtual void Unlock () { }
-    
-    virtual csFlags& GetFlags () { return flags;  }
-    virtual uint32 GetChangeNumber() const { return 0; }
-
-    PolyMesh () : scfImplementationType (this)
-    {
-      flags.Set (CS_POLYMESH_TRIANGLEMESH);
-    }
-    virtual ~PolyMesh ()
-    {
-    }
-  };
-  csRef<iPolygonMesh> polygonMesh;
-  friend struct PolyMesh;
   enum { Standard, Submeshes } polyMeshType;
 
   void SetPolyMeshStandard ();
@@ -850,8 +793,6 @@ public:
 
   void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
 };
-
-#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * Genmesh type. This is the plugin you have to use to create instances

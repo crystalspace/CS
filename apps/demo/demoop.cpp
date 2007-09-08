@@ -30,7 +30,6 @@
 #include "iengine/movable.h"
 #include "iengine/sector.h"
 #include "imesh/object.h"
-#include "imesh/thing.h"
 #include "ivaria/conout.h"
 #include "ivaria/reporter.h"
 #include "ivaria/view.h"

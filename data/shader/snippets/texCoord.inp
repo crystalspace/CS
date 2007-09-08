@@ -24,7 +24,7 @@
   </block>
   
   <block location="cg:vertexToFragment">
-    float2 texCoord;
+    <varying type="texcoord2" name="texCoord" />
   </block>
   
   <block location="cg:vertexIn">
@@ -32,10 +32,6 @@
   </block>
   
   <block location="cg:vertexMain">
-    vertexToFragment.texCoord = texCoord = vertexIn.texCoord;
-  </block>
-  
-  <block location="cg:fragmentMain">
-    texCoord = vertexToFragment.texCoord;
+    texCoord = vertexIn.texCoord;
   </block>
 </input>

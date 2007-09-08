@@ -95,7 +95,7 @@ Here is an example of a simple thread and creation
 
 using namespace CS::Threading;
 
-class MyRunner : Runnable
+class MyRunner : public Runnable
 @{
   void Run ()
   @{

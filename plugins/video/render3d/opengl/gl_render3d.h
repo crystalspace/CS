@@ -267,7 +267,6 @@ private:
   //csReversibleTransform object2camera;
   csReversibleTransform world2camera;
 
-  bool verbose;
   csGraphics3DCaps rendercaps;
   GLint maxNpotsTexSize;
 
@@ -355,8 +354,6 @@ private:
   //                         Private helpers
   ////////////////////////////////////////////////////////////////////
 	
-  void Report (int severity, const char* msg, ...);
-
   void ParseByteSize (const char* sizeStr, size_t& size);
 
   int GetMaxTextureSize () const { return rendercaps.maxTexWidth; }
@@ -483,6 +480,7 @@ public:
   static csGLStateCache* statecache;
   static csGLExtensionManager* ext;
   csRef<csGLTextureManager> txtmgr;
+  bool verbose;
 
   csGLGraphics3D (iBase *parent);
   virtual ~csGLGraphics3D ();
@@ -492,6 +490,7 @@ public:
     int line, const char* message);
   static void OutputMarkerString (const char* function, const wchar_t* file,
     int line, MakeAString& message);
+  void Report (int severity, const char* msg, ...);
 
   ////////////////////////////////////////////////////////////////////
   //                            iGraphics3D

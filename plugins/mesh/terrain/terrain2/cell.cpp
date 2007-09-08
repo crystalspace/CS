@@ -375,9 +375,25 @@ bool csTerrainCell::CollideSegment (const csVector3& start,
   return collider->CollideSegment (this, start, end, oneHit, points);  
 }
 
+csTerrainColliderCollideSegmentResult csTerrainCell::CollideSegment (
+    const csVector3& start, const csVector3& end)
+{
+  iTerrainCollider* collider = terrain->GetCollider ();
+
+  if (!collider || !collisionProperties->GetCollidable ()) 
+  {
+    csTerrainColliderCollideSegmentResult rc;
+    rc.hit = false;
+    return rc;
+  }
+
+  return collider->CollideSegment (this, start, end);
+}
+
 bool csTerrainCell::CollideTriangles (const csVector3* vertices,
   size_t tri_count, const unsigned int* indices, float radius,
-  const csReversibleTransform& trans, bool oneHit, iTerrainCollisionPairArray* pairs)
+  const csReversibleTransform& trans, bool oneHit,
+  iTerrainCollisionPairArray* pairs)
 {
   iTerrainCollider* collider = terrain->GetCollider ();
 
@@ -416,12 +432,12 @@ void csTerrainCell::LerpHelper (const csVector2& pos, int& x1, int& x2,
   if (x > gridWidth - 1) x = gridWidth - 1;
   if (y > gridHeight - 1) y = gridHeight - 1;
 
-  x1 = floorf (x);
-  x2 = ceilf (x);
+  x1 = int (floorf (x));
+  x2 = int (ceilf (x));
   xfrac = x - x1;
 
-  y1 = floorf (y);
-  y2 = ceilf (y);
+  y1 = int (floorf (y));
+  y2 = int (ceilf (y));
   yfrac = y - y1;
 }
 

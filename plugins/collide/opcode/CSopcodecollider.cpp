@@ -34,7 +34,6 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/tri.h"
 #include "CSopcodecollider.h"
-#include "igeom/polymesh.h"
 #include "igeom/trimesh.h"
 #include "ivaria/collider.h"
 
@@ -46,22 +45,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(csOpcode)
 using namespace Opcode;
 
 csOPCODECollider::csOPCODECollider (iTriangleMesh* mesh) :
-  scfImplementationType(this)
-{
-  m_pCollisionModel = 0;
-  indexholder = 0;
-  vertholder = 0;
-  //transform.m[0][3] = 0;
-  //transform.m[1][3] = 0;
-  //transform.m[2][3] = 0;
-  //transform.m[3][3] = 1;
-
-  opcMeshInt.SetCallback (&MeshCallback, this);
-
-  GeometryInitialize (mesh);
-}
-
-csOPCODECollider::csOPCODECollider (iPolygonMesh* mesh) :
   scfImplementationType(this)
 {
   m_pCollisionModel = 0;
@@ -136,16 +119,6 @@ void csOPCODECollider::GeometryInitialize (csVector3* vertices,
 }
 
 void csOPCODECollider::GeometryInitialize (iTriangleMesh* mesh)
-{
-  // first, count the number of triangles polyset contains
-  csVector3* vertices = mesh->GetVertices ();
-  size_t vertcount = mesh->GetVertexCount ();
-  csTriangle* triangles = mesh->GetTriangles ();
-  size_t tri_count = mesh->GetTriangleCount ();
-  GeometryInitialize (vertices, vertcount, triangles, tri_count);
-}
-
-void csOPCODECollider::GeometryInitialize (iPolygonMesh* mesh)
 {
   // first, count the number of triangles polyset contains
   csVector3* vertices = mesh->GetVertices ();

@@ -55,6 +55,9 @@ csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
   G3D->ext->InitGL_ARB_texture_compression ();
   if (G3D->ext->CS_GL_ARB_texture_compression)
     G3D->ext->InitGL_EXT_texture_compression_s3tc (); 
+  G3D->ext->InitGL_ARB_texture_float();
+  /*if (G3D->ext->CS_GL_ARB_texture_float)
+    G3D->ext->InitGL_ARB_half_float_pixel();*/
 
 #define CS_GL_TEXTURE_FORMAT(fmt)					    \
   textureFormats.Put (#fmt, TextureFormat (fmt, true));		

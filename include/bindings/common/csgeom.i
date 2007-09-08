@@ -194,13 +194,9 @@ namespace CS
 %ignore csPath::SetTimeValues;
 %ignore csPath::GetTimeValues;
 %include "csgeom/path.h"
-%template(pycsPolygonMesh) scfImplementation1<csPolygonMesh, iPolygonMesh>;
-%template(pycsPolygonMeshBox) scfImplementation1<csPolygonMeshBox, iPolygonMesh>;
 %template(pycsTriangleMesh) scfImplementation1<csTriangleMesh, iTriangleMesh>;
 %template(pycsTriangleMeshBox) scfImplementation1<csTriangleMeshBox, iTriangleMesh>;
-%include "csgeom/polymesh.h"
 %template (scfTriangleMeshPointer) scfImplementation1<csTriangleMeshPointer,iTriangleMesh >;
-%template (scfTriangleMeshPolyMesh) scfImplementation1<csTriangleMeshPolyMesh,iTriangleMesh >;
 %include "csgeom/trimesh.h"
 
 %ignore csArray<csArray<int> >::Contains;
@@ -208,9 +204,7 @@ namespace CS
 %template(csIntArrayArray) csArray<csArray<int> >;
 ARRAY_OBJECT_FUNCTIONS(csArray<int>,int)
 ARRAY_OBJECT_FUNCTIONS(csArray<csArray<int> >,csArray<int>)
-%newobject csPolygonMeshTools::CalculateVertexConnections;
 %newobject csTriangleMeshTools::CalculateVertexConnections;
-%include "csgeom/pmtools.h"
 %include "csgeom/trimeshtools.h"
 
 %include "csgeom/spline.h"

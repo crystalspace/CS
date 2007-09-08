@@ -19,7 +19,7 @@
 //	application delegate.
 //
 //-----------------------------------------------------------------------------
-#include "csutil/scf.h"
+#include "csutil/scf_interface.h"
 
 /**\file
  */
@@ -28,8 +28,6 @@
 typedef void* OSXEvent;
 /// An opaque handle to an Objective-C view object represented in C++.
 typedef void* OSXView;
-
-SCF_VERSION (iOSXAssistant, 0, 0, 2);
 
 /**
  * This is an interface for an object which provides assistance to
@@ -45,8 +43,10 @@ SCF_VERSION (iOSXAssistant, 0, 0, 2);
  *  interface and inclusion of the header file should be surrounded by
  *  appropriate '\#if defined(CS_PLATFORM_MACOSX) ... \#endif' statements.
  */
-struct iOSXAssistant : public iBase
+struct iOSXAssistant : public virtual iBase
 {
+  SCF_INTERFACE(iOSXAssistant, 2,0,0);
+
   /**
    * Ask to have both the AppKit and Crystal Space event-loops terminated.
    */

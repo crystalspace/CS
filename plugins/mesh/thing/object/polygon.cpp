@@ -1307,7 +1307,7 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
   csVector3 *lf_verts = lf->GetVertices ();
   csVector3 lf_normals[100];  // @@@ HARDCODED!
   i1 = lf->GetVertexCount () - 1;
-  for (i = 0; i < lf->GetVertexCount (); i++)
+  for (i = 0; i < (int)lf->GetVertexCount (); i++)
   {
     lf_normals[i1] = lf_verts[i1] % lf_verts[i];
     i1 = i;

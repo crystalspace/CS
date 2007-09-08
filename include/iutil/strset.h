@@ -110,9 +110,9 @@ struct iStringSet : public virtual iBase
 
   /**
    * Remove all stored strings.
-   * \deprecated Use Empty() instead.
+   * \deprecated Deprecated in 1.3. Use Empty() instead.
    */
-  /*CS_DEPRECATED_METHOD_MSG("Use Empty() instead.")*/
+  CS_DEPRECATED_METHOD_MSG("Use Empty() instead.")
   virtual void Clear() = 0;
 
   /// Get the number of elements in the hash.

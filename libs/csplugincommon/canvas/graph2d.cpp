@@ -136,6 +136,9 @@ bool csGraphics2D::Initialize (iObjectRegistry* r)
   return true;
 }
 
+// For iOffscreenCanvasCallback
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 bool csGraphics2D::Initialize (iObjectRegistry* r, int width, int height,
     int depth, void* memory, iOffscreenCanvasCallback* ofscb)
 {
@@ -213,6 +216,8 @@ bool csGraphics2D::Initialize (iObjectRegistry* r, int width, int height,
 
   return true;
 }
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 void csGraphics2D::ChangeDepth (int d)
 {
@@ -308,12 +313,17 @@ bool csGraphics2D::BeginDraw ()
   return true;
 }
 
+// For iOffscreenCanvasCallback
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 void csGraphics2D::FinishDraw ()
 {
   if (FrameBufferLocked)
     FrameBufferLocked--;
   if (ofscb) ofscb->FinishDraw (this);
 }
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 void csGraphics2D::Clear(int color)
 {
@@ -789,6 +799,9 @@ void csGraphics2D::FreeArea (csImageArea *Area)
   } /* endif */
 }
 
+// For iOffscreenCanvasCallback
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 void csGraphics2D::SetRGB (int i, int r, int g, int b)
 {
   Palette[i].red = r;
@@ -797,6 +810,8 @@ void csGraphics2D::SetRGB (int i, int r, int g, int b)
   PaletteAlloc[i] = true;
   if (ofscb) ofscb->SetRGB (this, i, r, g, b);
 }
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 void csGraphics2D::GetRGB (int color, int& r, int& g, int& b)
 {
@@ -1113,6 +1128,9 @@ int csGraphics2D::FindRGBPalette (int r, int g, int b)
   return best_idx;
 }
 
+// For iOffscreenCanvasCallback
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 csPtr<iGraphics2D> csGraphics2D::CreateOffscreenCanvas (
     void* memory, int width, int height, int depth,
     iOffscreenCanvasCallback* ofscb)
@@ -1129,6 +1147,8 @@ csPtr<iGraphics2D> csGraphics2D::CreateOffscreenCanvas (
     return 0;
   }
 }
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 bool csGraphics2D::DebugCommand (const char* /*cmd*/)
 {

@@ -59,6 +59,8 @@ namespace lighter
     void Lock (iSwappable* obj);
     /// Mark object as "unlocked" so it can be swapped out
     void Unlock (iSwappable* obj);
+    /// Notify of a size change of an object
+    void UpdateSize (iSwappable* obj);
 
     /// Free memory, around \a desiredAmount bytes
     void FreeMemory (size_t desiredAmount);
@@ -183,6 +185,11 @@ namespace lighter
         globalLighter->swapManager->Unlock (
           const_cast<iSwappable*> ((iSwappable*)this));
     }
+    void UpdateSizeInSwapManager () const
+    {
+      globalLighter->swapManager->UpdateSize (
+          const_cast<iSwappable*> ((iSwappable*)this));
+    }
   };
 
   /// Helper class to lock some data in a scope.
@@ -218,6 +225,16 @@ namespace lighter
         this->SetCapacity (in_capacity);
         Unlock ();
       }
+    }
+    SwappableArray (const SwappableArray& other) : 
+      csDirtyAccessArray<T, ElementHandler, SwappableHeap, 
+        CapacityHandler> (0, CapacityHandler()) 
+    {
+      Lock ();
+      this->SetCapacity (other.GetSize());
+      for (size_t i=0 ; i<other.GetSize () ; i++)
+        Push (other[i]);
+      Unlock ();
     }
     ~SwappableArray ()
     {

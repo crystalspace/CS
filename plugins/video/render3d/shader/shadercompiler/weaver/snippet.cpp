@@ -21,9 +21,13 @@
 
 #include "imap/services.h"
 #include "iutil/document.h"
+#include "iutil/plugin.h"
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 
+#include "csplugincommon/shader/shaderprogram.h"
+#include "csplugincommon/shader/weavercombiner.h"
+#include "cstool/identstrings.h"
 #include "csutil/documenthelper.h"
 #include "csutil/scopeddelete.h"
 
@@ -32,7 +36,8 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 {
-  
+  namespace WeaverCommon = CS::PluginCommon::ShaderWeaver;
+
   template<typename T, class ArrayType>
   class BasicIteratorImplCopyValue : public BasicIterator<T>
   {
@@ -44,7 +49,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   
     virtual bool HasNext()
     { return pos < array.GetSize(); }
-    virtual const T& Next()
+    virtual T& Next()
     { 
       storage = array[pos++]; 
       return storage;
@@ -54,8 +59,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   //-------------------------------------------------------------------
 
   Snippet::Snippet (WeaverCompiler* compiler, iDocumentNode* node, 
-                    bool topLevel) : compiler (compiler), 
-    xmltokens (compiler->xmltokens), isCompound (false)
+                    const char* name, bool topLevel) : compiler (compiler), 
+    xmltokens (compiler->xmltokens), name (name), isCompound (false)
   {
     bool okay = true;
     if (topLevel)
@@ -95,6 +100,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     }
   }
   
+  Snippet::Snippet (WeaverCompiler* compiler, const char* name) : compiler (compiler), 
+    xmltokens (compiler->xmltokens), name (name), isCompound (false)
+  {
+  }
+
   Snippet::~Snippet()
   {
   }
@@ -106,7 +116,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
   
   Snippet::Technique* Snippet::LoadLibraryTechnique (WeaverCompiler* compiler, 
-    iDocumentNode* node, const Technique::CombinerPlugin& combiner)
+    iDocumentNode* node, const Technique::CombinerPlugin& combiner) const
   {
     Snippet::AtomTechnique* technique = 
       ParseAtomTechnique (compiler, node, true, combiner.name);
@@ -115,11 +125,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
   
   Snippet::Technique* Snippet::CreatePassthrough (const char* varName, 
-                                                  const char* type)
+                                                  const char* type) const
   {
     csString hashStr;
     hashStr.Format ("__passthrough_%s_%s__", varName, type);
-    AtomTechnique* newTech = new AtomTechnique (csMD5::Encode (hashStr));
+    AtomTechnique* newTech = new AtomTechnique ("(passthrough)", 
+      csMD5::Encode (hashStr));
     
     {
       Technique::Input newInput;
@@ -168,9 +179,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   
   Snippet::AtomTechnique* Snippet::ParseAtomTechnique (
     WeaverCompiler* compiler, iDocumentNode* node, bool canOmitCombiner,
-    const char* defaultCombinerName)
+    const char* defaultCombinerName) const
   {
-    AtomTechnique newTech (
+    AtomTechnique newTech (GetName(),
       csMD5::Encode (CS::DocSystem::FlattenNode (node)));
     
     newTech.priority = node->GetAttributeValueAsInt ("priority");
@@ -393,7 +404,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   
   void Snippet::LoadCompoundTechnique (iDocumentNode* node)
   {
-    CompoundTechnique* newTech = new CompoundTechnique;
+    CompoundTechnique* newTech = new CompoundTechnique (GetName());
   
     csRef<iDocumentNodeIterator> nodes = node->GetNodes ();
     while (nodes->HasNext ())
@@ -419,6 +430,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	    HandleConnectionNode (*newTech, child);
 	  }
 	  break;
+        case WeaverCompiler::XMLTOKEN_PARAMETER:
+          {
+            HandleParameterNode (*newTech, child);
+          }
+          break;
         default:
           compiler->synldr->ReportBadToken (child);
       }
@@ -435,7 +451,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     if (id == 0)
     {
 	compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
-	  "Referenced snippets must have 'id' attribute");
+	  "Referenced snippets must have an 'id' attribute");
 	return;
     }
     if (tech.GetSnippet (id) != 0)
@@ -464,7 +480,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     else
       snippetNode = node;
       
-    Snippet* newSnippet = new Snippet (compiler, snippetNode);
+    csString snippetName;
+    if (!name.IsEmpty ())
+    {
+      snippetName.AppendFmt ("%s<%d> -> ",  name.GetData(), tech.priority);
+    }
+    snippetName += id ? id : filename;
+    Snippet* newSnippet = new Snippet (compiler, snippetNode, 
+      snippetName);
     tech.AddSnippet (id, newSnippet);
   }
     
@@ -532,6 +555,128 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     if (tech.combiner.classId.IsEmpty())
       tech.combiner = newCombiner;
   }
+
+  CS_IDENT_STRING_LIST(SVTypes)
+    CS_IDENT_STRING(csShaderVariable::UNKNOWN)
+    //CS_IDENT_STRING(csShaderVariable::INT)
+    //CS_IDENT_STRING(csShaderVariable::FLOAT)
+    CS_IDENT_STRING(csShaderVariable::TEXTURE)
+    CS_IDENT_STRING(csShaderVariable::RENDERBUFFER)
+    //CS_IDENT_STRING(csShaderVariable::VECTOR2)
+    //CS_IDENT_STRING(csShaderVariable::VECTOR3)
+    //CS_IDENT_STRING(csShaderVariable::VECTOR4)
+    CS_IDENT_STRING(csShaderVariable::MATRIX)
+    CS_IDENT_STRING(csShaderVariable::TRANSFORM)
+    CS_IDENT_STRING(csShaderVariable::ARRAY)
+  CS_IDENT_STRING_LIST_END(SVTypes)
+  
+  void Snippet::HandleParameterNode (CompoundTechnique& tech, 
+				     iDocumentNode* node)
+  {
+    if (tech.combiner.classId.IsEmpty())
+    {
+      compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
+	"Need a combiner to use <parameter>");
+      return;
+    }
+
+    const char* id = node->GetAttributeValue ("id");
+    if (!id || !*id)
+    {
+	compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
+	  "Parameters must have an 'id' attribute");
+	return;
+    }
+    if (tech.GetSnippet (id) != 0)
+    {
+	compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
+	  "Duplicate snippet id '%s'", id);
+	return;
+    }
+
+    csShaderProgram::ProgramParamParser paramParser (compiler->synldr,
+      compiler->strings);
+    csShaderProgram::ProgramParam param;
+    if (!paramParser.ParseProgramParam (node, param, 
+      csShaderProgram::ParamVector | csShaderProgram::ParamShaderExp)) return;
+    if (!param.valid) return;
+
+    csRef<WeaverCommon::iCombinerLoader> combinerLoader = 
+      csLoadPluginCheck<WeaverCommon::iCombinerLoader> (compiler->objectreg,
+        tech.combiner.classId);
+    if (!combinerLoader.IsValid())
+    {
+      // Don't complain, will happen later anyway
+      return;
+    }
+
+    csRef<iDocumentNode> snippetNode = 
+      compiler->CreateAutoNode (CS_NODE_ELEMENT);
+    snippetNode->SetValue ("snippet");
+    snippetNode->SetAttribute ("id", id);
+    csRef<iDocumentNode> techNode = 
+      snippetNode->CreateNodeBefore (CS_NODE_ELEMENT);
+    techNode->SetValue ("technique");
+    {
+      csRef<iDocumentNode> combinerNode = 
+        techNode->CreateNodeBefore (CS_NODE_ELEMENT);
+      combinerNode->SetValue ("combiner");
+      combinerNode->SetAttribute ("name", "c");
+      combinerNode->SetAttribute ("plugin", tech.combiner.classId);
+    }
+    csString weaverType;
+
+    if (param.name == csInvalidStringID)
+    {
+      int numComps = 0;
+      csShaderVariable::VariableType svType = param.var->GetType ();
+      switch (svType)
+      {
+        case csShaderVariable::INT:
+        case csShaderVariable::FLOAT:   numComps = 1; break;
+        case csShaderVariable::VECTOR2: numComps = 2; break;
+        case csShaderVariable::VECTOR3: numComps = 3; break;
+        case csShaderVariable::VECTOR4: numComps = 4; break;
+        default:
+          // Should not happen really, but who knows...
+          compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
+	    "Constant parameter of unsupported type %s", 
+            SVTypes.StringForIdent (svType));
+          return;
+      }
+      if (numComps > 1)
+        weaverType.Format ("float%d", numComps);
+      else
+        weaverType = "float";
+
+      csVector4 v;
+      param.var->GetValue (v);
+      combinerLoader->GenerateConstantInputBlocks (techNode, "c", v, 
+        numComps, "output");
+    }
+    else
+    {
+      weaverType = node->GetAttributeValue ("weavertype");
+      if (weaverType.IsEmpty())
+      {
+        compiler->Report (CS_REPORTER_SEVERITY_WARNING, node,
+	  "Need a 'weavertype' attribute for non-constant parameters");
+        return;
+      }
+      combinerLoader->GenerateSVInputBlocks (techNode, "c", 
+        compiler->strings->Request (param.name), weaverType, "output", id);
+    }
+
+    {
+      csRef<iDocumentNode> outputNode = 
+        techNode->CreateNodeBefore (CS_NODE_ELEMENT);
+      outputNode->SetValue ("output");
+      outputNode->SetAttribute ("type", weaverType);
+      outputNode->SetAttribute ("name", "output");
+    }
+    
+    HandleSnippetNode (tech, snippetNode);
+  }
   
   //-------------------------------------------------------------------
 
@@ -582,6 +727,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     inTechniques.Push (tech);
     outTechniques.Push (tech);
   }
+
+  void TechniqueGraph::RemoveTechnique (const Snippet::Technique* tech)
+  {
+    techniques.Delete (tech);
+    inTechniques.Delete (tech);
+    outTechniques.Delete (tech);
+
+    size_t c = 0;
+    while (c < connections.GetSize())
+    {
+      Connection& conn = connections[c];
+      if ((conn.to == tech) || (conn.from == tech))
+        connections.DeleteIndex (c);
+      else
+        c++;
+    }
+  }
   
   void TechniqueGraph::AddConnection (const Connection& conn)
   {
@@ -605,20 +767,37 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   }
   
   void TechniqueGraph::GetDependencies (const Snippet::Technique* tech, 
-    csArray<const Snippet::Technique*>& deps) const
+    csArray<const Snippet::Technique*>& deps, bool strongOnly) const
   {
     csSet<csConstPtrKey<Snippet::Technique> > addedDeps;
     for (size_t c = 0; c < connections.GetSize(); c++)
     {
       const Connection& conn = connections[c];
-      if ((conn.to == tech) && (!addedDeps.Contains (conn.from)))
+      if ((conn.to == tech) && (!addedDeps.Contains (conn.from))
+        && (!strongOnly || !conn.weak))
       {
         deps.Push (conn.from);
         addedDeps.AddNoTest (conn.from);
       }
     }
   }
-  
+
+  void TechniqueGraph::GetDependants (const Snippet::Technique* tech, 
+    csArray<const Snippet::Technique*>& deps, bool strongOnly) const
+  {
+    csSet<csConstPtrKey<Snippet::Technique> > addedDeps;
+    for (size_t c = 0; c < connections.GetSize(); c++)
+    {
+      const Connection& conn = connections[c];
+      if ((conn.from == tech) && (!addedDeps.Contains (conn.to))
+        && (!strongOnly || !conn.weak))
+      {
+        deps.Push (conn.to);
+        addedDeps.AddNoTest (conn.to);
+      }
+    }
+  }
+
   //-------------------------------------------------------------------
   
   void TechniqueGraphBuilder::GraphInfo::Merge (const GraphInfo& other)

@@ -27,7 +27,6 @@
 #include "csutil/cfgfile.h"
 #include "csutil/scanstr.h"
 #include "csutil/scfstr.h"
-#include "cstool/gentrtex.h"
 #include "cstool/keyval.h"
 #include "cstool/mapnode.h"
 #include "cstool/saverfile.h"
@@ -78,9 +77,7 @@
 #include "imesh/nullmesh.h"
 #include "ivaria/reporter.h"
 #include "csgeom/poly3d.h"
-#include "csgeom/polymesh.h"
 #include "csgeom/trimesh.h"
-#include "igeom/polymesh.h"
 #include "imesh/objmodel.h"
 #include "ivaria/terraform.h"
 
@@ -1562,9 +1559,22 @@ bool csLoader::LoadPlugins (iDocumentNode* node)
     switch (id)
     {
       case XMLTOKEN_PLUGIN:
-	loaded_plugins.NewPlugin (child->GetAttributeValue ("name"),
-			child);
+        {
+          const char* plugin_name = child->GetAttributeValue ("name");
+          loaded_plugins.NewPlugin (plugin_name, child);
+          if (Engine->GetSaveableFlag ())
+          {
+            const char* plugin_id = loaded_plugins.FindPluginClassID (plugin_name);
+            if (plugin_id)
+            {
+              csRef<iPluginReference> pluginref;
+              pluginref.AttachNew (new csPluginReference (plugin_name, plugin_id));
+              object_reg->Register (pluginref, csString ("_plugref_") + plugin_id);
+            }
+          }
+        }
         break;
+      
       default:
 	SyntaxService->ReportBadToken (child);
 	return false;
@@ -1718,69 +1728,17 @@ bool csLoader::LoadLodControl (iLODControl* lodctrl, iDocumentNode* node)
 
 //--------------------------------------------------------------------
 
-// Private class implementing iPolygonMesh for a general triangle mesh.
-class PolygonMeshMesh :
-  public scfImplementation1<PolygonMeshMesh, iPolygonMesh>
-{
-private:
-  csVector3* vertices;
-  csMeshedPolygon* polygons;
-  csTriangle* vertex_indices;
-  int num_verts;
-  int num_tris;
-  csFlags flags;
-
-public:
-  PolygonMeshMesh (int num_verts, int num_tris) :
-    scfImplementationType(this)
-  {
-    PolygonMeshMesh::num_verts = num_verts;
-    PolygonMeshMesh::num_tris = num_tris;
-    vertices = new csVector3[num_verts];
-    polygons = new csMeshedPolygon[num_tris];
-    vertex_indices = new csTriangle[num_tris];
-
-    int i;
-    for (i = 0 ; i < num_tris ; i++)
-    {
-      polygons[i].num_vertices = 3;
-      polygons[i].vertices = (int*)&vertex_indices[i];
-    }
-    flags.Set (CS_POLYMESH_TRIANGLEMESH);
-  }
-  virtual ~PolygonMeshMesh ()
-  {
-    delete[] vertices;
-    delete[] polygons;
-    delete[] vertex_indices;
-  }
-
-  virtual int GetVertexCount () { return num_verts; }
-  virtual csVector3* GetVertices () { return vertices; }
-  virtual int GetPolygonCount () { return num_tris; }
-  virtual csMeshedPolygon* GetPolygons () { return polygons; }
-  virtual int GetTriangleCount () { return num_tris; }
-  virtual csTriangle* GetTriangles () { return vertex_indices; }
-  virtual void Lock () { }
-  virtual void Unlock () { }
-  virtual csFlags& GetFlags () { return flags; }
-  virtual uint32 GetChangeNumber () const { return 0; }
-};
-
 bool csLoader::ParseTriMeshChildBox (iDocumentNode* child,
-	csRef<iPolygonMesh>& polymesh,
 	csRef<iTriangleMesh>& trimesh)
 {
   csBox3 b;
   if (!SyntaxService->ParseBox (child, b))
     return false;
-  polymesh = csPtr<iPolygonMesh> (new csPolygonMeshBox (b));
   trimesh = csPtr<iTriangleMesh> (new csTriangleMeshBox (b));
   return true;
 }
 
 bool csLoader::ParseTriMeshChildMesh (iDocumentNode* child,
-	csRef<iPolygonMesh>& polymesh,
 	csRef<iTriangleMesh>& trimesh)
 {
   int num_vt = 0;
@@ -1802,12 +1760,9 @@ bool csLoader::ParseTriMeshChildMesh (iDocumentNode* child,
     }
   }
 
-  polymesh.AttachNew (new PolygonMeshMesh (num_vt, num_tri));
   csTriangleMesh* cstrimesh = new csTriangleMesh ();
   trimesh.AttachNew (cstrimesh);
   
-  csVector3* vt = polymesh->GetVertices ();
-  csMeshedPolygon* po = polymesh->GetPolygons ();
   num_vt = 0;
   num_tri = 0;
 
@@ -1821,19 +1776,19 @@ bool csLoader::ParseTriMeshChildMesh (iDocumentNode* child,
     switch (child_id)
     {
       case XMLTOKEN_V:
-	if (!SyntaxService->ParseVector (child_child, vt[num_vt]))
-	  return false;
-	cstrimesh->AddVertex (vt[num_vt]);
-	num_vt++;
+	{
+	  csVector3 vt;
+	  if (!SyntaxService->ParseVector (child_child, vt))
+	    return false;
+	  cstrimesh->AddVertex (vt);
+	  num_vt++;
+	}
 	break;
       case XMLTOKEN_T:
 	{
 	  int a = child_child->GetAttributeValueAsInt ("v1");
 	  int b = child_child->GetAttributeValueAsInt ("v2");
 	  int c = child_child->GetAttributeValueAsInt ("v3");
-	  po[num_tri].vertices[0] = a;
-	  po[num_tri].vertices[1] = b;
-	  po[num_tri].vertices[2] = c;
 	  cstrimesh->AddTriangle (a, b, c);
 	  num_tri++;
 	}
@@ -1846,18 +1801,6 @@ bool csLoader::ParseTriMeshChildMesh (iDocumentNode* child,
   return true;
 }
 
-#undef CS_CLO
-#undef CS_CON
-#define CS_CLO (CS_POLYMESH_CLOSED|CS_POLYMESH_NOTCLOSED)
-#define CS_CON (CS_POLYMESH_CONVEX|CS_POLYMESH_NOTCONVEX)
-static void SetPolyMeshFlags (csFlags& flags, bool closed, bool notclosed,
-    bool convex, bool notconvex)
-{
-  if (closed) flags.Set (CS_CLO, CS_POLYMESH_CLOSED);
-  if (notclosed) flags.Set (CS_CLO, CS_POLYMESH_NOTCLOSED);
-  if (convex) flags.Set (CS_CON, CS_POLYMESH_CONVEX);
-  if (notconvex) flags.Set (CS_CON, CS_POLYMESH_NOTCONVEX);
-}
 #undef CS_CLO
 #undef CS_CON
 #define CS_CLO (CS_TRIMESH_CLOSED|CS_TRIMESH_NOTCLOSED)
@@ -1875,7 +1818,6 @@ static void SetTriMeshFlags (csFlags& flags, bool closed, bool notclosed,
 
 bool csLoader::ParseTriMesh (iDocumentNode* node, iObjectModel* objmodel)
 {
-  csRef<iPolygonMesh> polymesh;
   csRef<iTriangleMesh> trimesh;
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   bool convex = false;
@@ -1893,7 +1835,7 @@ bool csLoader::ParseTriMesh (iDocumentNode* node, iObjectModel* objmodel)
     switch (id)
     {
       case XMLTOKEN_DEFAULT:
-        if (polymesh || trimesh)
+        if (trimesh)
 	{
 	  SyntaxService->ReportError (
 	    "crystalspace.maploader.parse.trimesh", child,
@@ -1903,25 +1845,25 @@ bool csLoader::ParseTriMesh (iDocumentNode* node, iObjectModel* objmodel)
 	use_default_mesh = true;
         break;
       case XMLTOKEN_BOX:
-        if (polymesh || trimesh || use_default_mesh)
+        if (trimesh || use_default_mesh)
 	{
 	  SyntaxService->ReportError (
 	    "crystalspace.maploader.parse.trimesh", child,
 	    "Use either <default>, <box>, or <mesh>!");
 	  return false;
 	}
-        if (!ParseTriMeshChildBox (child, polymesh, trimesh))
+        if (!ParseTriMeshChildBox (child, trimesh))
 	  return false;
         break;
       case XMLTOKEN_MESH:
-        if (polymesh || trimesh || use_default_mesh)
+        if (trimesh || use_default_mesh)
 	{
 	  SyntaxService->ReportError (
 	    "crystalspace.maploader.parse.trimesh", child,
 	    "Use either <default>, <box>, or <mesh>!");
 	  return false;
 	}
-        if (!ParseTriMeshChildMesh (child, polymesh, trimesh))
+        if (!ParseTriMeshChildMesh (child, trimesh))
 	  return false;
         break;
       case XMLTOKEN_CLOSED:
@@ -1973,29 +1915,11 @@ bool csLoader::ParseTriMesh (iDocumentNode* node, iObjectModel* objmodel)
 	node, "No id's for this triangle mesh!");
     return false;
   }
-  csStringID cd_id = stringSet->Request ("colldet");
-  csStringID vis_id = stringSet->Request ("viscull");
-  csStringID shad_id = stringSet->Request ("shadows");
   size_t i;
   if (use_default_mesh)
   {
     for (i = 0 ; i < ids.GetSize () ; i++)
     {
-      if (ids[i] == cd_id && objmodel->GetPolygonMeshColldet ())
-      {
-        csFlags& flags = objmodel->GetPolygonMeshColldet ()->GetFlags ();
-        SetPolyMeshFlags (flags, closed, notclosed, convex, notconvex);
-      }
-      if (ids[i] == vis_id && objmodel->GetPolygonMeshViscull ())
-      {
-        csFlags& flags = objmodel->GetPolygonMeshViscull ()->GetFlags ();
-        SetPolyMeshFlags (flags, closed, notclosed, convex, notconvex);
-      }
-      if (ids[i] == shad_id && objmodel->GetPolygonMeshShadows ())
-      {
-        csFlags& flags = objmodel->GetPolygonMeshShadows ()->GetFlags ();
-        SetPolyMeshFlags (flags, closed, notclosed, convex, notconvex);
-      }
       if (objmodel->GetTriangleData (ids[i]))
       {
         csFlags& flags = objmodel->GetTriangleData (ids[i])->GetFlags ();
@@ -2005,11 +1929,6 @@ bool csLoader::ParseTriMesh (iDocumentNode* node, iObjectModel* objmodel)
   }
   else
   {
-    if (polymesh)
-    {
-      csFlags& flags = polymesh->GetFlags ();
-      SetPolyMeshFlags (flags, closed, notclosed, convex, notconvex);
-    }
     if (trimesh)
     {
       csFlags& flags = trimesh->GetFlags ();
@@ -2017,15 +1936,7 @@ bool csLoader::ParseTriMesh (iDocumentNode* node, iObjectModel* objmodel)
     }
 
     for (i = 0 ; i < ids.GetSize () ; i++)
-    {
-      if (ids[i] == cd_id)
-        objmodel->SetPolygonMeshColldet (polymesh);
-      if (ids[i] == vis_id)
-        objmodel->SetPolygonMeshViscull (polymesh);
-      if (ids[i] == shad_id)
-        objmodel->SetPolygonMeshShadows (polymesh);
       objmodel->SetTriangleData (ids[i], trimesh);
-    }
   }
 
   return true;
@@ -2250,18 +2161,13 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
         }
         break;
 
-      case XMLTOKEN_POLYMESH:
-	ReportWarning (
-	        "crystalspace.maploader.parse.meshfactory",
-                child, "<polymesh> is deprecated. Use <trimesh> instead.");
-	// FALL THRU!
       case XMLTOKEN_TRIMESH:
         {
 	  if (!stemp->GetMeshObjectFactory ())
 	  {
             SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.meshfactory",
-              child, "Please use 'params' before specifying 'polymesh'!");
+              child, "Please use 'params' before specifying 'trimesh'!");
 	    return false;
 	  }
 	  iObjectModel* objmodel = stemp->GetMeshObjectFactory ()
@@ -2270,7 +2176,7 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	  {
             SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.meshfactory", child,
-	      "This factory doesn't support setting of other 'polymesh'!");
+	      "This factory doesn't support setting of other 'trimesh'!");
 	    return false;
 	  }
 	  if (!ParseTriMesh (child, objmodel))
@@ -2301,15 +2207,6 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	    if (trimesh) trimesh->GetFlags ().Set (
 	      CS_TRIMESH_CLOSED | CS_TRIMESH_NOTCLOSED, CS_TRIMESH_CLOSED);
 	  }
-          if (objmodel->GetPolygonMeshShadows ())
-            objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
-	      CS_POLYMESH_CLOSED | CS_POLYMESH_NOTCLOSED, CS_POLYMESH_CLOSED);
-          if (objmodel->GetPolygonMeshViscull ())
-            objmodel->GetPolygonMeshViscull ()->GetFlags ().Set (
-	      CS_POLYMESH_CLOSED | CS_POLYMESH_NOTCLOSED, CS_POLYMESH_CLOSED);
-          if (objmodel->GetPolygonMeshShadows ())
-            objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
-	      CS_POLYMESH_CLOSED | CS_POLYMESH_NOTCLOSED, CS_POLYMESH_CLOSED);
         }
         break;
       case XMLTOKEN_CONVEX:
@@ -2332,15 +2229,6 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	    if (trimesh) trimesh->GetFlags ().Set (
 	      CS_TRIMESH_CONVEX | CS_TRIMESH_NOTCONVEX, CS_TRIMESH_CONVEX);
 	  }
-          if (objmodel->GetPolygonMeshShadows ())
-            objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
-	      CS_POLYMESH_CONVEX | CS_POLYMESH_NOTCONVEX, CS_POLYMESH_CONVEX);
-          if (objmodel->GetPolygonMeshViscull ())
-            objmodel->GetPolygonMeshViscull ()->GetFlags ().Set (
-	      CS_POLYMESH_CONVEX | CS_POLYMESH_NOTCONVEX, CS_POLYMESH_CONVEX);
-          if (objmodel->GetPolygonMeshShadows ())
-            objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
-	      CS_POLYMESH_CONVEX | CS_POLYMESH_NOTCONVEX, CS_POLYMESH_CONVEX);
         }
         break;
       case XMLTOKEN_MATERIAL:
@@ -3199,7 +3087,6 @@ bool csLoader::LoadTriMeshInSector (iLoaderContext* ldr_context,
 	iMeshWrapper* mesh, iDocumentNode* node, iStreamSource* ssource)
 {
   iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
-  csRef<iPolygonMesh> polymesh;
   csRef<iTriangleMesh> trimesh;
   csArray<csStringID> ids;
 
@@ -3250,11 +3137,11 @@ bool csLoader::LoadTriMeshInSector (iLoaderContext* ldr_context,
         break;
       }
       case XMLTOKEN_BOX:
-        if (!ParseTriMeshChildBox (child, polymesh, trimesh))
+        if (!ParseTriMeshChildBox (child, trimesh))
 	  return false;
         break;
       case XMLTOKEN_MESH:
-        if (!ParseTriMeshChildMesh (child, polymesh, trimesh))
+        if (!ParseTriMeshChildMesh (child, trimesh))
 	  return false;
         break;
       case XMLTOKEN_COLLDET:
@@ -3291,7 +3178,7 @@ bool csLoader::LoadTriMeshInSector (iLoaderContext* ldr_context,
 	node, "No id's for this triangle mesh!");
     return false;
   }
-  if (!polymesh || !trimesh)
+  if (!trimesh)
   {
     SyntaxService->ReportError (
 	"crystalspace.maploader.parse.sector.trimesh",
@@ -3299,17 +3186,9 @@ bool csLoader::LoadTriMeshInSector (iLoaderContext* ldr_context,
     return false;
   }
 
-  csStringID cd_id = stringSet->Request ("colldet");
-  csStringID vis_id = stringSet->Request ("viscull");
-  csStringID shad_id = stringSet->Request ("shadows");
   size_t i;
   for (i = 0 ; i < ids.GetSize () ; i++)
-  {
-    if (ids[i] == cd_id) objmodel->SetPolygonMeshColldet (polymesh);
-    if (ids[i] == vis_id) objmodel->SetPolygonMeshViscull (polymesh);
-    if (ids[i] == shad_id) objmodel->SetPolygonMeshShadows (polymesh);
     objmodel->SetTriangleData (ids[i], trimesh);
-  }
 
   csRef<iNullMeshState> nullmesh = scfQueryInterface<iNullMeshState> (
     	mesh->GetMeshObject ());
@@ -3638,18 +3517,13 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	}
         break;
 
-      case XMLTOKEN_POLYMESH:
-	ReportWarning (
-	        "crystalspace.maploader.parse.mesh",
-                child, "<polymesh> is deprecated. Use <trimesh> instead.");
-	// FALL THRU!
       case XMLTOKEN_TRIMESH:
         {
 	  if (!mesh->GetMeshObject ())
 	  {
             SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.mesh",
-              child, "Please use 'params' before specifying 'polymesh'!");
+              child, "Please use 'params' before specifying 'trimesh'!");
 	    return false;
 	  }
 	  iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
@@ -3657,7 +3531,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	  {
             SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.mesh", child,
-	      "This mesh doesn't support setting of other 'polymesh'!");
+	      "This mesh doesn't support setting of other 'trimesh'!");
 	    return false;
 	  }
 	  if (!ParseTriMesh (child, objmodel))
@@ -5232,19 +5106,14 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	  Engine->AddMeshAndChildren (mesh);
         }
         break;
-      case XMLTOKEN_POLYMESH:
-	ReportWarning (
-	        "crystalspace.maploader.parse.sector",
-                child, "<polymesh> is deprecated. Use <trimesh> instead.");
-	// FALL THRU!
       case XMLTOKEN_TRIMESH:
         {
 	  const char* meshname = child->GetAttributeValue ("name");
 	  if (!meshname)
 	  {
       	    SyntaxService->ReportError (
-	      	"crystalspace.maploader.load.polymesh",
-		child, "'polymesh' requires a name in sector '%s'!",
+	      	"crystalspace.maploader.load.trimesh",
+		child, "'trimesh' requires a name in sector '%s'!",
 		secname ? secname : "<noname>");
 	    return 0;
 	  }
@@ -5758,15 +5627,6 @@ void csLoader::ClosedFlags (iMeshWrapper* mesh)
     if (trimesh) trimesh->GetFlags ().Set (
       CS_TRIMESH_CLOSED | CS_TRIMESH_NOTCLOSED, CS_TRIMESH_CLOSED);
   }
-  if (objmodel->GetPolygonMeshShadows ())
-    objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
-    CS_POLYMESH_CLOSED | CS_POLYMESH_NOTCLOSED, CS_POLYMESH_CLOSED);
-  if (objmodel->GetPolygonMeshViscull ())
-    objmodel->GetPolygonMeshViscull ()->GetFlags ().Set (
-    CS_POLYMESH_CLOSED | CS_POLYMESH_NOTCLOSED, CS_POLYMESH_CLOSED);
-  if (objmodel->GetPolygonMeshShadows ())
-    objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
-    CS_POLYMESH_CLOSED | CS_POLYMESH_NOTCLOSED, CS_POLYMESH_CLOSED);
 }
 
 void csLoader::ConvexFlags (iMeshWrapper* mesh)
@@ -5780,15 +5640,6 @@ void csLoader::ConvexFlags (iMeshWrapper* mesh)
     if (trimesh) trimesh->GetFlags ().Set (
       CS_TRIMESH_CONVEX | CS_TRIMESH_NOTCONVEX, CS_TRIMESH_CONVEX);
   }
-  if (objmodel->GetPolygonMeshShadows ())
-    objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
-    CS_POLYMESH_CONVEX | CS_POLYMESH_NOTCONVEX, CS_POLYMESH_CONVEX);
-  if (objmodel->GetPolygonMeshViscull ())
-    objmodel->GetPolygonMeshViscull ()->GetFlags ().Set (
-    CS_POLYMESH_CONVEX | CS_POLYMESH_NOTCONVEX, CS_POLYMESH_CONVEX);
-  if (objmodel->GetPolygonMeshShadows ())
-    objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
-    CS_POLYMESH_CONVEX | CS_POLYMESH_NOTCONVEX, CS_POLYMESH_CONVEX);
 }
 
 bool csLoader::ParseKey (iDocumentNode* node, iObject* obj)

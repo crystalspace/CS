@@ -26,6 +26,7 @@
 #include "cstool/collider.h"
 #include "csutil/cscolor.h"
 #include "csutil/parray.h"
+#include "csutil/weakref.h"
 #include "wentity.h"
 #include "iengine/engine.h"
 #include "iengine/fview.h"
@@ -338,19 +339,20 @@ public:
   /// A sprite to display the Crystal Space Logo
   csPixmap* cslogo;
 
-  /// Our infinite maze object if used.
-  InfiniteMaze* infinite_maze;
-
   /// Some sounds.
   iSndSysWrapper* wMissile_boom;
   iSndSysWrapper* wMissile_whoosh;
 
+  /// for object movement.
+  csWeakRef<iMeshWrapper> closestMesh;
+  float object_move_speed;
+
   /// Some flags.
   bool do_show_coord;
+  bool do_object_move;
   bool busy_perf_test;
   bool do_show_z;
   bool do_show_palette;
-  bool do_infinite;
   bool do_huge;
   bool do_freelook;
   bool do_light_frust;

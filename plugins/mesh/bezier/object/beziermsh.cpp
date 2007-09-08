@@ -118,14 +118,6 @@ csBezierMesh::csBezierMesh (iBase *parent, csBezierMeshObjectType* thing_type) :
   static_data = new csBezierMeshStatic (
   	thing_type, (iBezierFactoryState*)this);
 
-  polygonMesh.AttachNew (new BezierPolyMeshHelper ());
-  polygonMeshLOD.AttachNew (new BezierPolyMeshHelper ());
-  polygonMesh->SetThing (this);
-  polygonMeshLOD->SetThing (this);
-  SetPolygonMeshBase (polygonMesh);
-  SetPolygonMeshColldet (polygonMesh);
-  SetPolygonMeshViscull (polygonMeshLOD);
-  SetPolygonMeshShadows (polygonMeshLOD);
   csRef<BezierTriMeshHelper> trimesh;
   trimesh.AttachNew (new BezierTriMeshHelper ());
   trimesh->SetThing (this);
@@ -271,9 +263,6 @@ void csBezierMesh::Prepare ()
 
   prepared = true;
 
-  polygonMeshLOD->Cleanup ();
-  polygonMesh->Cleanup ();
-
   static_data_nr = static_data->static_data_nr;
 
   if (cached_movable) movablenr = cached_movable->GetUpdateNumber ()-1;
@@ -346,8 +335,6 @@ void csBezierMesh::InvalidateThing ()
   prepared = false;
   static_data->obj_bbox_valid = false;
 
-  polygonMeshLOD->Cleanup ();
-  polygonMesh->Cleanup ();
   ShapeChanged ();
 }
 
@@ -612,93 +599,6 @@ void csBezierMesh::GetBoundingBox (iMovable *movable, csBox3 &box)
 
 //-------------------------------------------------------------------------
 
-void BezierPolyMeshHelper::Setup ()
-{
-  if (polygons)
-  {
-    // Already set up.
-    return ;
-  }
-
-  polygons = 0;
-  vertices = 0;
-
-  // Count the number of needed polygons and vertices.
-  num_verts = 0;
-  num_poly = 0;
-
-  int i, j;
-
-  // Check curves.
-  for (i = 0; i < thing->GetCurveCount (); i++)
-  {
-    csCurve *c = thing->curves.Get (i);
-    csCurveTesselated *tess = c->Tesselate (1000);    // @@@ High quality?
-    num_poly += (int)tess->GetTriangleCount ();
-    num_verts += (int)tess->GetVertexCount ();
-  }
-
-  if (!num_verts || !num_poly) return;
-
-  // Allocate the arrays and the copy the data.
-  vertices = new csVector3[num_verts];
-  polygons = new csMeshedPolygon[num_poly];
-
-  num_verts = 0;
-  num_poly = 0;
-  for (i = 0; i < thing->GetCurveCount (); i++)
-  {
-    csCurve *c = thing->curves.Get (i);
-    csCurveTesselated *tess = c->Tesselate (1000);  // @@@ High quality?
-    csTriangle *tris = tess->GetTriangles ();
-    int tri_count = (int)tess->GetTriangleCount ();
-    for (j = 0; j < tri_count; j++)
-    {
-      polygons[num_poly].num_vertices = 3;
-      polygons[num_poly].vertices = new int[3];
-
-      // Adjust indices to skip the original polygon set vertices and
-      // preceeding curves.
-      polygons[num_poly].vertices[0] = tris[j].a + num_verts;
-      polygons[num_poly].vertices[1] = tris[j].b + num_verts;
-      polygons[num_poly].vertices[2] = tris[j].c + num_verts;
-      num_poly++;
-    }
-
-    csVector3 *vts = tess->GetVertices ();
-    int num_vt = (int)tess->GetVertexCount ();
-    memcpy (vertices + num_verts, vts, sizeof (csVector3) * num_vt);
-    num_verts += num_vt;
-  }
-}
-
-void BezierPolyMeshHelper::Cleanup ()
-{
-  int i;
-
-  // Delete all polygons which were generated from curved surfaces.
-  // The other polygons just have a reference to the original polygons
-  // from the parent.
-  if (polygons)
-  {
-    for (i = 0; i < num_poly; i++)
-    {
-      delete[] polygons[i].vertices;
-    }
-
-    delete[] polygons;
-    polygons = 0;
-  }
-
-  delete[] vertices;
-  vertices = 0;
-
-  delete[] triangles;
-  triangles = 0;
-}
-
-//-------------------------------------------------------------------------
-
 void BezierTriMeshHelper::Setup ()
 {
   if (triangles)
@@ -840,7 +740,8 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
   bool listCreated;
   csDirtyAccessArray<csRenderMesh*>& meshes = rmListHolder.GetUnusedData (
     listCreated, currentFrame);
-  meshes.SetSize (GetCurveCount(), 0);
+  meshes.Empty();
+  meshes.SetCapacity (GetCurveCount());
 
   iSector* s = movable->GetSectors ()->Get (0);
   csColor ambient = s->GetDynamicAmbientLight ();
@@ -850,12 +751,20 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
     update_ambient = true;
     dynamic_ambient_version = s->GetDynamicAmbientVersion ();
   }
-  csCurve *c;
+  
   for (i = 0; i < GetCurveCount (); i++)
   {
+    csCurve* c = curves.Get (i);
+
+    // First get a bounding box in camera space.
+    csBox3 cbox;
+    csBox2 sbox;
+    if (c->GetScreenBoundingBox (obj_cam, icam, cbox, sbox) < 0)
+      continue;                                 // Not visible.
+
     bool meshCreated;
     csRenderMesh*& rm = rmHolder.GetUnusedMesh (meshCreated, currentFrame);
-    meshes[i] = rm;
+    meshes.Push (rm);
     if (meshCreated)
     {
       rm->buffers.AttachNew (new csRenderBufferHolder);
@@ -867,14 +776,6 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
     rm->clip_z_plane = clip_z_plane;
     rm->do_mirror = icam->IsMirrored ();
     rm->object2world = movtrans;
-
-    c = curves.Get (i);
-
-    // First get a bounding box in camera space.
-    csBox3 cbox;
-    csBox2 sbox;
-    if (c->GetScreenBoundingBox (obj_cam, icam, cbox, sbox) < 0)
-      continue;                                 // Not visible.
 
     // If we have a dirty lightmap recombine the curves and the shadow maps.
     bool updated_lm = c->RecalculateDynamicLights ();

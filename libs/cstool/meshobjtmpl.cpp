@@ -115,11 +115,6 @@ iMaterialWrapper* csMeshObject::GetMaterialWrapper () const
   return 0;
 }
 
-void csMeshObject::GetObjectBoundingBox (csBox3& bbox)
-{
-  bbox = boundingbox;
-}
-
 const csBox3& csMeshObject::GetObjectBoundingBox ()
 {
   return boundingbox;

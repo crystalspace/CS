@@ -21,6 +21,7 @@
 
 #include "csplugincommon/shader/weavercombiner.h"
 #include "csutil/blockallocator.h"
+#include "csutil/hashr.h"
 #include "csutil/strhash.h"
 
 #include "snippet.h"
@@ -41,24 +42,32 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     csPtr<iDocument> Synthesize (iDocumentNode* sourceNode);
   private:
+    csString annotateString;
+    const char* GetAnnotation (const char* fmt, ...) CS_GNUC_PRINTF (2, 3)
+    {
+      if (!compiler->annotateCombined) return 0;
+
+      va_list args;
+      va_start (args, fmt);
+      annotateString.FormatV (fmt, args);
+      va_end (args);
+      return annotateString.GetData();
+    }
+
     bool SynthesizeTechnique (iDocumentNode* passNode,
       const Snippet* snippet, const TechniqueGraph& graph);
     
-    struct Link
-    {
-      csString fromName;
-      csString toName;
-    };
-    typedef csHash<Link, csConstPtrKey<Snippet::Technique> > LinkHash;
-  
+    typedef csHash<csString, csString> StringStringHash;
+    typedef csHashReversible<csString, csString> StringStringHashRev;
     class SynthesizeNodeTree
     {
     public:
       struct Node
       {
+        csString annotation;
         const Snippet::Technique* tech;
-        csHash<csString, csString> inputRenames;
-        csHash<csString, csString> outputRenames;
+        StringStringHash inputLinks;
+        StringStringHashRev outputRenames;
       };
       typedef csArray<Node*> NodeArray;
     private:
@@ -67,12 +76,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       NodeArray nodes;
       csHash<size_t, csConstPtrKey<Snippet::Technique> > techToNode;
       /// Techs created in an augmentation, to be cleaned up later
+      csPDelArray<Snippet> scratchSnippets;
       csPDelArray<Snippet::Technique> augmentedTechniques;
-      
+      Synthesizer* synth;
+
       void ComputeRenames (Node& node,
         CS::PluginCommon::ShaderWeaver::iCombiner* combiner);
     public:
-      SynthesizeNodeTree () : renameNr (0) {}
+      SynthesizeNodeTree (Synthesizer* synth) : renameNr (0), synth (synth) {}
     
       void AddAllInputNodes (const TechniqueGraph& graph,
         const Snippet::Technique* tech,
@@ -80,10 +91,10 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       void AugmentCoerceChain (WeaverCompiler* compiler, 
         const Snippet::Technique::CombinerPlugin& combinerPlugin,
         CS::PluginCommon::ShaderWeaver::iCombiner* combiner,
-        iDocumentNodeIterator* linkChain, TechniqueGraph& graph,
-        const Snippet::Technique* inTech, const char* inName,
-        const Snippet::Technique* outTech, LinkHash& links);
-      const Node& GetNodeForTech (const Snippet::Technique* tech)
+        CS::PluginCommon::ShaderWeaver::iCoerceChainIterator* linkChain, 
+        TechniqueGraph& graph, Node& inNode, 
+        const char* inName, const Snippet::Technique* outTech);
+      Node& GetNodeForTech (const Snippet::Technique* tech)
       { return *nodes[techToNode.Get (tech, csArrayItemNotFound)]; }
 
       void ReverseNodeArray();
@@ -91,11 +102,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       void Rebuild (const TechniqueGraph& graph,
         const csArray<const Snippet::Technique*>& outputs);
         
-      BasicIterator<const Node>* GetNodes();
-      BasicIterator<const Node>* GetNodesReverse();
+      void Collapse (TechniqueGraph& graph);
+
+      BasicIterator<Node>* GetNodes();
+      BasicIterator<Node>* GetNodesReverse();
     private:
       template<bool reverse>
-      class NodesIterator : public BasicIterator<const Node>
+      class NodesIterator : public BasicIterator<Node>
       {
         const NodeArray& array;
         size_t nextItem;
@@ -122,15 +135,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 
         bool HasNext()
         { return reverse ? (nextItem > 0) : (nextItem < array.GetSize()); }
-        const Node& Next()
+        Node& Next()
         { 
-          const Node* val = reverse ? array[--nextItem] : array[nextItem++];
+          Node* val = reverse ? array[--nextItem] : array[nextItem++];
           SeekNext();
           return *val; 
         }
       };
     };
-    
+
     bool FindOutput (const TechniqueGraph& graph,
       const char* desiredType,
       CS::PluginCommon::ShaderWeaver::iCombiner* combiner,
@@ -140,6 +153,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     typedef csSet<csConstPtrKey<Snippet::Technique::Output> > UsedOutputsHash;
     bool FindInput (const TechniqueGraph& graph,
       CS::PluginCommon::ShaderWeaver::iCombiner* combiner,
+      csString& nodeAnnotation,
       const Snippet::Technique* receivingTech, 
       const Snippet::Technique::Input& input,
       const Snippet::Technique*& sourceTech,
@@ -161,6 +175,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       const SynthesizeNodeTree::Node* node;
       const Snippet::Technique::Input* input;
       csArray<csString> conditions;
+      csString tag;
     };
   public:
     WeaverCompiler* compiler;

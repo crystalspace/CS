@@ -25,7 +25,7 @@ Putting the mesh at some position in the world using
 Basic setup of a Crystal Space application using @code{csApplicationFramework}.
 Crystal Space has the concept of mesh factories and meshes. A mesh is basically
 some kind of 3D object. Crystal Space supports several kinds of meshes. In
-the previous tutorial we used the thing mesh to create the geometry of
+the previous tutorial we used the genmesh mesh to create the geometry of
 our room. In this tutorial we will use the 3D sprite mesh. A mesh
 factory is like a blue-print for a mesh (or sprite). It defines how the mesh
 looks and how it animates. Before you can use a mesh you need to have a
@@ -187,7 +187,7 @@ it a name, and correctly place it at the given position in the world.
 The name of a mesh can be useful for scripting so that a script can refer
 to objects with their names.
 
-Moving meshes (and things) is done through the @code{iMovable} interface to
+Moving meshes is done through the @code{iMovable} interface to
 which you can get a reference by doing @code{sprite->GetMovable()}.  The calls
 to @code{SetTransform()} and @code{SetPosition()} set up a transformation
 matrix and vector to correctly place the mesh in the room.  In this

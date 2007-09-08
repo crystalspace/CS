@@ -63,7 +63,7 @@ public:
    * keyboard modifiers struct.
    * \sa CSMASK_ALT etc.
    */
-  CS_CONST_METHOD static uint32 GetModifiersBits (
+  static uint32 GetModifiersBits (
     const csKeyModifiers& modifiers);
   /**
    * Get a bitmask corresponding to the pressed modifier keys from the event.

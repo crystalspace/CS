@@ -32,14 +32,14 @@ struct iImage;
 class csVector3;
 class csSimpleFormer;
 
-SCF_VERSION (iPagingFormerState, 0, 0, 3);
-
 /**
  * iPagingFormerState exposes implementation specific methods
  * for the PagingTerraformer plugin
  */
 struct iPagingFormerState : public virtual iBase
 {
+  SCF_INTERFACE (iPagingFormerState, 0, 0, 3);
+
   /**
    * Set a dir that contains only the heightmaps named x0y0 and so on.
    * The optional second parameter can indicate raw heightmaps.

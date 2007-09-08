@@ -33,7 +33,6 @@
 
 class csDynavisObjectModel;
 class csObjectModelManager;
-struct csPolygonMeshEdge;
 struct iMeshWrapper;
 struct iObjectModel;
 struct iTriangleMesh;
@@ -97,9 +96,6 @@ private:
   // attached) in which case we use the polygon based culler.
   bool use_outline_filler;
 
-  // If true then we use the new iTriangleMesh system (as opposed to
-  // iPolygonMesh).
-  bool use_trianglemesh;
   iTriangleMesh* trianglemesh;
 
   // If true then object is empty and we can't do coverage culling.
@@ -108,7 +104,6 @@ private:
   // If true then object is single polygon.
   bool single_polygon;
 
-  csPolygonMeshEdge* edges;
   csTriangleMeshEdge* tri_edges;
   size_t num_edges;
 
@@ -131,7 +126,7 @@ public:
   /// Use triangle mesh.
   iTriangleMesh* GetTriangleMesh ()
   {
-    return use_trianglemesh ? trianglemesh : 0;
+    return trianglemesh;
   }
 
   /// Update outline from the given position. Possibly reuse old outline.

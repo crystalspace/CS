@@ -712,6 +712,7 @@ static void ConvertFloatBufferDataFromLE (const T1* source, T2* dest,
   }
 }
 
+#if !defined(CS_LITTLE_ENDIAN) || !defined(CS_IEEE_DOUBLE_FORMAT)
 static void ConvertBufferDataToLE (csRenderBufferComponentType compType, 
                                    const void* source, void* dest, 
                                    size_t totalElementCount)
@@ -739,6 +740,7 @@ static void ConvertBufferDataToLE (csRenderBufferComponentType compType,
         "A buffer component type is not supported by this code");
   }
 }
+#endif
 
 static const size_t RenderBufferComponentSizesOnDisk[CS_BUFCOMP_TYPECOUNT] = 
 {
@@ -855,6 +857,7 @@ csRef<iDataBuffer> csTextSyntaxService::StoreRenderBuffer (iRenderBuffer* rbuf)
   uint8* outPtr = outBuf->GetUint8();
 
   RenderBufferHeaderCommon commonHeader;
+  commonHeader.magic = 0;
   commonHeader.compType = rbuf->GetComponentType();
   commonHeader.compCount = rbuf->GetComponentCount();
   commonHeader.elementCount = 

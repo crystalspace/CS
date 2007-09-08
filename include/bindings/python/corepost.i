@@ -178,15 +178,6 @@ class CSMutableArrayHelper:
 
 #ifndef CS_MINI_SWIG
 
-/* allow using csMeshedPolygon as a (vert index) list */
-%extend csMeshedPolygon {
-  int __getitem__(int index)
-  { return self->vertices[index]; }
-  int __len__()
-  { return self->num_vertices; }
-}
-PYITERATOR_PROTOCOL(csMeshedPolygon)
-
 /* work around broken Rotate function with swig 1.3.28 */
 /*
 %extend iPen {

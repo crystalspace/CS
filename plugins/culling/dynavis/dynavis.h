@@ -51,7 +51,6 @@ class csCoverageBuffer;
 class csTiledCoverageBuffer;
 class csDynaVis;
 struct csTestRectData;
-struct iPolygonMesh;
 struct iMovable;
 struct iMeshWrapper;
 struct iBugPlug;
@@ -278,7 +277,6 @@ private:
 
   // Given an occluder, update it in the coverage buffer.
   void UpdateCoverageBuffer (csVisibilityObjectWrapper* obj);
-  void UpdateCoverageBufferPoly (csVisibilityObjectWrapper* obj);
   void UpdateCoverageBufferTri (csVisibilityObjectWrapper* obj);
 
   // Given an occluder, update it in the coverage buffer. Using the outline.

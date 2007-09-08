@@ -2,7 +2,7 @@
 @c %**start of header
 @setfilename cs
 @import{version.txi}
-@settitle Crystal Space
+@settitle Crystal Space @value{VERSION}
 @setchapternewpage odd
 @tex
 \global\hbadness = 8000

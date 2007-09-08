@@ -689,13 +689,9 @@ iArrayChangeElements<csShaderVariable * >;
 %include "igeom/path.h"
 %template(scfPath) scfImplementation1<csPath,iPath >;
 #ifndef CS_SWIG_PUBLISH_IGENERAL_FACTORY_STATE_ARRAYS
-%ignore iPolygonMesh::GetTriangles;
-%ignore iPolygonMesh::GetVertices;
-%ignore iPolygonMesh::GetPolygons;
 %ignore iTriangleMesh::GetTriangles;
 %ignore iTriangleMesh::GetVertices;
 #endif
-%include "igeom/polymesh.h"
 %include "igeom/trimesh.h"
 
 /*
@@ -935,18 +931,6 @@ typedef int int32_t;
 CORE_APPLY_FOR_EACH_INTERFACE
 */
 
-%extend iPolygonMesh
-{
-  csVector3 *GetVertexByIndex(int index)
-  { return &(self->GetVertices()[index]); }
-
-  csMeshedPolygon *GetPolygonByIndex(int index)
-  { return &(self->GetPolygons()[index]); }
-
-  csTriangle *GetTriangleByIndex(int index)
-  { return &(self->GetTriangles()[index]); }
-}
-
 %extend iTriangleMesh
 {
   csVector3 *GetVertexByIndex(int index)
@@ -954,12 +938,6 @@ CORE_APPLY_FOR_EACH_INTERFACE
 
   csTriangle *GetTriangleByIndex(int index)
   { return &(self->GetTriangles()[index]); }
-}
-
-%extend csMeshedPolygon
-{
-  int GetVertexByIndex(int index)
-  { return self->vertices[index]; }
 }
 
 // iutil/csinput.h
@@ -1110,9 +1088,15 @@ csEventID _csevMouseMove (iObjectRegistry *,uint x);
 csEventID _csevJoystickEvent (iObjectRegistry *);
 
 // iutil/plugin.h
-#define _CS_LOAD_PLUGIN_ALWAYS(a, b) CS_LOAD_PLUGIN_ALWAYS(a, b)
-#undef CS_LOAD_PLUGIN_ALWAYS
-csPtr<iBase> _CS_LOAD_PLUGIN_ALWAYS (iPluginManager *, const char *);
+%inline
+%{
+  csPtr<iBase> CS_LOAD_PLUGIN_ALWAYS (iPluginManager *p, const char *i)
+  {
+    printf("CS_LOAD_PLUGIN_ALWAYS is deprecated, use \
+                csLoadPluginAlways instead\n");
+    return csLoadPluginAlways(p,i);
+  }
+%}
 
 /*
 // ivideo/graph3d.h

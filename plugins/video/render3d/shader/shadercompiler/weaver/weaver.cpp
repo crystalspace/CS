@@ -107,6 +107,20 @@ csPtr<iDocumentNode> WeaverCompiler::LoadDocumentFromFile (
   return csPtr<iDocumentNode> (doc->GetRoot ());
 }
 
+csRef<iDocumentNode> WeaverCompiler::CreateAutoNode (csDocumentNodeType type)
+{
+  if (!autoDocSys.IsValid())
+    autoDocSys.AttachNew (new csTinyDocumentSystem);
+  if (!autoDocRoot.IsValid ())
+  {
+    csRef<iDocument> autoDoc = autoDocSys->CreateDocument ();
+    csRef<iDocumentNode> root = autoDoc->CreateRoot ();
+    autoDocRoot = root->CreateNodeBefore (CS_NODE_ELEMENT);
+    autoDocRoot->SetValue ("(auto)");
+  }
+  return autoDocRoot->CreateNodeBefore (type);
+}
+
 bool WeaverCompiler::Initialize (iObjectRegistry* object_reg)
 {
   objectreg = object_reg;
@@ -139,6 +153,7 @@ bool WeaverCompiler::Initialize (iObjectRegistry* object_reg)
     
   csConfigAccess config (object_reg);
   doDumpWeaved = config->GetBool ("Video.ShaderWeaver.DumpWeavedXML");
+  annotateCombined = config->GetBool ("Video.ShaderWeaver.AnnotateOutput");
     
   return true;
 }
@@ -152,7 +167,9 @@ csPtr<iShader> WeaverCompiler::CompileShader (
   csRef<WeaverShader> shader;
   if (do_verbose) startTime = csGetTicks();
   shader.AttachNew (new WeaverShader (this));
-  if (!shader->Load (ldr_context, templ, forcepriority))
+  bool loadRet = shader->Load (ldr_context, templ, forcepriority);
+  autoDocRoot .Invalidate ();
+  if (!loadRet)
     return 0;
   if (do_verbose) endTime = csGetTicks();
   shader->SetName (templ->GetAttributeValue ("name"));

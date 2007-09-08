@@ -26,19 +26,25 @@
 #include "iutil/event.h"
 #include "iutil/eventh.h"
 #include "csutil/csstring.h"
+#include "csutil/scf_implementation.h"
 struct iEventQueue;
 struct iObjectRegistry;
 struct iVirtualClock;
 struct iConfigFile;
 typedef void* OSXDelegateHandle;
 
-SCF_VERSION (iOSXAssistantLocal, 0, 0, 2);
+
 struct iOSXAssistantLocal : public iOSXAssistant
 {
+  SCF_INTERFACE(iOSXAssistantLocal, 1,0,0);
   virtual void start_event_loop() = 0;
 };
 
-class OSXAssistant : public iOSXAssistantLocal
+class OSXAssistant : public scfImplementation4<OSXAssistant,
+                                               iOSXAssistantLocal,
+                                               scfFakeInterface<iOSXAssistant>,
+                                               iEventHandler,
+                                               iEventPlug>
 {
 private:
   OSXDelegateHandle controller;		// Application & window delegate.
@@ -77,24 +83,13 @@ public:
   virtual void mouse_up(int button, int x, int y);
   virtual void mouse_moved(int x, int y);
 
-  struct eiEventPlug : public iEventPlug
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(OSXAssistant);
-    virtual uint GetPotentiallyConflictingEvents();
-    virtual uint QueryEventPriority(uint type);
-  } scfiEventPlug;
-
-  struct eiEventHandler : public iEventHandler
-  {
-    SCF_DECLARE_EMBEDDED_IBASE(OSXAssistant);
-    csEventID Quit;
-    virtual bool HandleEvent(iEvent&);
-    CS_EVENTHANDLER_NAMES ("crystalspace.macosx")
-    CS_EVENTHANDLER_NIL_CONSTRAINTS
-  } scfiEventHandler;
-  friend struct eiEventHandler;
-
-  SCF_DECLARE_IBASE;
+  virtual uint GetPotentiallyConflictingEvents();
+  virtual uint QueryEventPriority(uint type);
+  
+  csEventID quitEventID;
+  virtual bool HandleEvent(iEvent&);
+  CS_EVENTHANDLER_NAMES ("crystalspace.macosx")
+  CS_EVENTHANDLER_NIL_CONSTRAINTS  
 };
 
 #else // __cplusplus

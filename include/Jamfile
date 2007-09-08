@@ -46,9 +46,23 @@ CS_MASTER_HEADER_REJECTS =
 # List of headers that should not appear in the master-headers because they 
 # are deprecated.
 CS_MASTER_HEADER_REJECTS +=
-  [ ConcatDirs csutil  debug.h        ]
-  [ ConcatDirs csutil  profile.h      ]
   [ ConcatDirs iengine collectn.h     ]
+  ;
+  
+# List of headers that should not appear in the master-headers because they 
+# are platform-specific.
+CS_MASTER_HEADER_REJECTS +=
+  [ ConcatDirs csutil threading atomicops_gcc_ppc.h ]
+  [ ConcatDirs csutil threading atomicops_gcc_x86.h ]
+  [ ConcatDirs csutil threading atomicops_msvc.h    ]
+  [ ConcatDirs csutil threading atomicops_sparc.h   ]
+  [ ConcatDirs csutil threading pthread_condition.h ]
+  [ ConcatDirs csutil threading pthread_mutex.h     ]
+  [ ConcatDirs csutil threading pthread_thread.h    ]
+  [ ConcatDirs csutil threading win32_apifuncs.h    ]
+  [ ConcatDirs csutil threading win32_condition.h   ]
+  [ ConcatDirs csutil threading win32_mutex.h       ]
+  [ ConcatDirs csutil threading win32_thread.h      ]  
   ;
 
 {
@@ -140,7 +154,8 @@ rule MasterHeaderCsUtil
     lines += "#endif" ;
   }
   return [ MasterHeader csutil :
-    [ Filter [ Wildcard csutil : *.h ] : $(rejects) ] :
+    [ Filter [ Wildcard csutil : *.h ] : $(rejects) ] 
+    [ Filter [ Wildcard [ ConcatDirs csutil threading ] : *.h ] : $(rejects) ] :
     $(CS_MASTER_HEADER_BOILERPLATE)
     $(CS_MASTER_HEADER_DOC_DIRECTORY) 
     $(CS_MASTER_HEADER_INCLUDE_CSSYSDEF_H) : 

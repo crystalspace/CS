@@ -35,40 +35,23 @@ typedef void* OSXAssistantHandle;
 #define NSD_PROTO(RET,FUNC) extern "C" RET OSXAssistant_##FUNC
 #define NSD_ASSIST(HANDLE) ((iOSXAssistant*)(HANDLE))
 
-SCF_IMPLEMENT_IBASE(OSXAssistant)
-  SCF_IMPLEMENTS_INTERFACE(iOSXAssistant)
-  SCF_IMPLEMENTS_INTERFACE(iOSXAssistantLocal)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventPlug)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE(OSXAssistant::eiEventPlug)
-  SCF_IMPLEMENTS_INTERFACE(iEventPlug)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE(OSXAssistant::eiEventHandler)
-  SCF_IMPLEMENTS_INTERFACE(iEventHandler)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-OSXAssistant::OSXAssistant(iObjectRegistry* r) : registry(r),
-  event_queue(0), event_outlet(0), virtual_clock(0), should_shutdown(false)
+OSXAssistant::OSXAssistant(iObjectRegistry* r) 
+  : scfImplementationType (this), registry(r),event_queue(0), event_outlet(0), 
+  virtual_clock(0), should_shutdown(false)
 {
-  SCF_CONSTRUCT_IBASE(0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventPlug);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
-
-  controller = OSXDelegate_startup(this);
+  controller = OSXDelegate_startup(static_cast<iOSXAssistant*>(this));
 
   run_always = false;
-  scfiEventHandler.Quit = csevQuit(registry);
+  quitEventID = csevQuit(registry);
   csRef<iEventQueue> q = get_event_queue();
   if (q.IsValid())
   {
-    event_outlet = q->CreateEventOutlet(&scfiEventPlug);
-    q->RegisterListener(&scfiEventHandler, csevQuit(registry));
+    event_outlet = q->CreateEventOutlet(this);
+    q->RegisterListener(this, csevQuit(registry));
   }
 }
 
@@ -81,11 +64,7 @@ OSXAssistant::~OSXAssistant()
   OSXDelegate_shutdown(controller);
 
   if (event_queue.IsValid())
-    event_queue->RemoveListener(&scfiEventHandler);
-
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiEventHandler);
-  SCF_DESTRUCT_EMBEDDED_IBASE(scfiEventPlug);
-  SCF_DESTRUCT_IBASE();
+    event_queue->RemoveListener(this);
 }
 
 
@@ -293,19 +272,19 @@ NSD_PROTO(void,application_unhidden)(OSXAssistantHandle h)
 //=============================================================================
 // iEventPlug Implementation
 //=============================================================================
-uint OSXAssistant::eiEventPlug::GetPotentiallyConflictingEvents()
+uint OSXAssistant::GetPotentiallyConflictingEvents()
   { return (CSEVTYPE_Keyboard | CSEVTYPE_Mouse); }
-uint OSXAssistant::eiEventPlug::QueryEventPriority(uint)
+uint OSXAssistant::QueryEventPriority(uint)
   { return 150; }
 
 
 //=============================================================================
 // iEventHandler Implementation
 //=============================================================================
-bool OSXAssistant::eiEventHandler::HandleEvent(iEvent& e)
+bool OSXAssistant::HandleEvent(iEvent& e)
 {
-  if (e.Name == Quit)
-    scfParent->should_shutdown = true;
+  if (e.Name == quitEventID)
+    should_shutdown = true;
   return false;
 }
 

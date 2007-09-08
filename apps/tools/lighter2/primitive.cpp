@@ -21,158 +21,10 @@
 #include "primitive.h"
 #include "object.h"
 
+#include <algorithm>
+
 namespace lighter
 {
-  // Helpers for element calculations
-
-  // Cut a polygon in two parts
-  static void PolygonSplitWithPlane (const csPlane3& plane, 
-    const csVector3* inPoly, size_t inPolySize,
-    csVector3* outPoly1, size_t& outPoly1Size,
-    csVector3* outPoly2, size_t& outPoly2Size)
-  {
-    outPoly1Size = 0;
-    outPoly2Size = 0;
-
-    if (inPolySize == 0)
-      return;
-
-    csVector3 ptA, ptB;
-    float sideA, sideB;
-
-    ptA = inPoly[inPolySize - 1];
-    sideA = plane.Classify (ptA);
-    if (fabsf (sideA) < SMALL_EPSILON)
-      sideA = 0;
-
-    for (size_t i = 0; i < inPolySize; ++i)
-    {
-      ptB = inPoly[i];
-      sideB = plane.Classify (ptB);
-
-      if (fabsf (sideB) < SMALL_EPSILON)
-        sideB = 0;
-
-      if (((sideB > 0) && (sideA < 0)) ||
-          ((sideB < 0) && (sideA > 0))) 
-      {
-        //Opposite sides, split
-        const csVector3 d = ptB - ptA;
-
-        float sect = -plane.Classify (ptA) / (plane.norm * d);
-
-        const csVector3 v = ptA + d*sect;
-
-        outPoly1[outPoly1Size++] = v;
-        outPoly2[outPoly2Size++] = v;
-      }
-     
-      if (sideB > 0)
-      {
-        outPoly2[outPoly2Size++] = ptB;
-      }
-      else if (sideB < 0)
-      {
-        outPoly1[outPoly1Size++] = ptB;
-      }
-      else
-      {
-        outPoly1[outPoly1Size++] = ptB;
-        outPoly2[outPoly2Size++] = ptB;
-      }
-
-      ptA = ptB;
-      sideA = sideB;
-    }
-  }
-
-  static float PolygonArea (const csVector3* vertices, size_t verticesCount)
-  {
-    if (verticesCount < 3)
-      return 0;
-
-    float area = 0.0f;
-    for (size_t i = 0; i < verticesCount-2; ++i)
-    {
-      area += csMath3::DoubleArea3 (vertices[0], vertices[i+1], vertices[i+2]);
-    }
-
-    return area / 2.0f;
-  }
-
-
-  void ElementAreas::DeleteAll()
-  {
-    elementsBits.SetSize (0);
-    fractionalElements.DeleteAll ();
-    elementCount = 0;
-  }
-
-  void ElementAreas::SetSize (size_t count)
-  {
-    elementCount = count;
-    elementsBits.SetSize (2*count);
-  }
-
-  void ElementAreas::SetElementArea (size_t element, float area)
-  {
-    if (area == 0)
-    {
-      elementsBits.SetBit (2*element);
-    }
-    else if (fabsf (area - fullArea) < SMALL_EPSILON)
-    {
-      elementsBits.SetBit (2*element+1);
-    }
-    else
-    {
-      ElementFloatPair elem;
-      elem.area = area;
-      elem.element = element;
-      fractionalElements.InsertSorted (elem, ElementFloatPairCompare);
-    }
-  }
-
-  void ElementAreas::ShrinkBestFit ()
-  {
-    fractionalElements.ShrinkBestFit ();
-  }
-
-  int ElementAreas::ElementFloatPairCompare (const ElementFloatPair& i1,
-                                             const ElementFloatPair& i2)
-  {
-    if (i1.element > i2.element)
-      return 1;
-    else if (i1.element < i2.element)
-      return -1;
-    else
-      return 0;
-  }
-  
-  int ElementAreas::ElementFloatPairSearch (const ElementFloatPair& item,
-                                            const size_t& key)
-  {
-    if (item.element > key)
-      return 1;
-    else if (item.element < key)
-      return -1;
-    else
-      return 0;
-  }
-
-  float ElementAreas::GetElementArea (size_t element) const
-  {
-    if (elementsBits.IsBitSet (2*element))
-      return 0;
-    else if (elementsBits.IsBitSet (2*element+1))
-      return fullArea;
-    else
-    {
-      size_t index = fractionalElements.FindSortedKey (
-        csArrayCmp<ElementFloatPair, size_t> (element, ElementFloatPairSearch));
-      return fractionalElements[index].area;
-    }
-  }
 
   //-------------------------------------------------------------------------
 
@@ -274,122 +126,173 @@ namespace lighter
 
   //-------------------------------------------------------------------------
 
+  void PrintElements (const csBitArray& bits, uint uc, uint vc)
+  {
+    csPrintf("\n");
+
+    for (uint r = 0; r < vc; ++r)
+    {
+      int rowOffset= r*uc;
+      for (uint c = 0; c < uc; ++c)
+      {
+        bool isSet = bits.IsBitSet (2*(rowOffset+c));
+        bool isFull = bits.IsBitSet (2*(rowOffset+c)+1);
+        csPrintf (isSet ? isFull ? "x" : "b" : "." );
+      }
+      csPrintf ("\n");
+    }
+  }
+
+  struct Scanline
+  {
+    int min, max;
+  };
+
+  void ScanConvert(Scanline* scanBuf, const csVector2& v1, const csVector2& v2, size_t vc)
+  {
+    uint fy, ly;
+
+    const csVector2* f;
+    const csVector2* l;
+
+    // Skip horizontal edge (for now ;))
+    if(v1.y >= v2.y - FLT_EPSILON &&
+       v1.y <= v2.y + FLT_EPSILON) 
+      return;
+
+    // Increasing Y order
+    if (v1.y < v2.y)
+    {
+      f = &v1;
+      l = &v2;
+    }
+    else
+    {
+      f = &v2;
+      l = &v1;
+    }
+
+    fy = (uint)floorf(f->y);
+    ly = (uint)ceilf(l->y);
+
+    // Clip or reject
+    if (fy >= vc) 
+      return;
+    if (ly < 0) 
+      return;
+    if (ly >= vc) 
+      ly = (uint)vc;
+
+    // Calculate slope
+    float slopeX, x;
+    x = f->x;
+    slopeX = (l->x - f->x) / (l->y - f->y);
+
+    if (fy< 0)
+    {
+      x += slopeX * (0 - fy);
+      fy = 0;
+    }
+
+
+    for (uint i = fy; i < ly; ++i)
+    {
+      int sx = (int)x;
+      if (sx < scanBuf[i].min)
+        scanBuf[i].min = sx;
+      if ((sx+1) > scanBuf[i].max)
+        scanBuf[i].max = (sx+1);
+
+      x += slopeX;
+    }
+
+
+  }
+
   void Primitive::Prepare ()
   {
     // Reset current data
-    elementAreas.DeleteAll ();
-    elementAreas.SetFullArea ((uFormVector % vFormVector).Norm());
-
+    
     // Compute min/max uv
     uint uc, vc;
     int maxu, minu, maxv, minv;
+    
     ComputeMinMaxUV (minu, maxu, minv, maxv);
-
-    uc = maxu - minu + 1;
-    vc = maxv - minv + 1;
 
     minUV.x = minu; minUV.y = minv;
     maxUV.x = maxu; maxUV.y = maxv;
+    
+    ObjectVertexData& vdata = GetVertexData();
 
     // Min xyz
-    csVector2 d = minUV - 
-      (GetVertexData().lightmapUVs[triangle.a] + csVector2 (0.5f));
-    minCoord = GetVertexData().positions[triangle.a] 
+    csVector2 d = minUV -
+      (vdata.lightmapUVs[triangle.a] + csVector2(0.5f,0.5f));
+    
+    minCoord = vdata.positions[triangle.a]
       + uFormVector * d.x + vFormVector * d.y;
-
-    // Set some default info
-    elementAreas.SetSize (uc * vc);
-
-    // Create our splitplanes
-    csPlane3 uCut (plane.Normal () % vFormVector);
-    uCut.Normalize ();
-    csVector3 uCutOrigin = minCoord;
-    uCut.SetOrigin (uCutOrigin);
     
-    csPlane3 vCut (plane.Normal () % uFormVector);
-    vCut.Normalize ();
-    csVector3 vCutOrigin = minCoord;
-    vCut.SetOrigin (vCutOrigin);
+    uc = maxu - minu + 1;
+    vc = maxv - minv + 1;
 
-    // Make sure they face correct way
-    csVector3 primCenter = GetCenter ();
-    if (uCut.Classify (primCenter) < 0) uCut.Normal () = -uCut.Normal ();
-    if (vCut.Classify (primCenter) < 0) vCut.Normal () = -vCut.Normal ();
+    countU = uc;
+    countV = vc;
 
-    // Start slicing
-    csPlane3 evCut = vCut;
+    elementClassification.SetSize (2*uc*vc);
 
-    csVector3 tmpArray[40];
-    csVector3* fullPoly = &tmpArray[0];
-    csVector3* rest = &tmpArray[10];
-    csVector3* elementRow = &tmpArray[20];
-    csVector3* element = &tmpArray[30];
+    // Compute the lm-uv offsets, 
+    csVector2 verts[] = {
+      vdata.lightmapUVs[triangle.a] - minUV,
+      vdata.lightmapUVs[triangle.b] - minUV,
+      vdata.lightmapUVs[triangle.c] - minUV
+    };  
 
-    size_t polygonSize = 0, restSize, elementRowSize, elementSize;
-    
-    // Add the originalpoly
-    fullPoly[polygonSize++] = GetVertexData().positions[triangle.a];
-    fullPoly[polygonSize++] = GetVertexData().positions[triangle.b];
-    fullPoly[polygonSize++] = GetVertexData().positions[triangle.c];
+    CS_ALLOC_STACK_ARRAY(Scanline, scanBuffer, vc);
 
-
-    size_t elNum = 0;
-    for (uint v = 0; v  < vc; v++)
+    // Zero out the scan-buffer
+    for (uint i = 0; i < vc; ++i)
     {
-      vCutOrigin += vFormVector;
-      evCut.SetOrigin (vCutOrigin);
-      
-      // Cut of a row      
-      if (v < (vc-1)) 
-      {
-        PolygonSplitWithPlane (evCut,
-          fullPoly, polygonSize,
-          elementRow, elementRowSize, 
-          rest, restSize);
-
-        // make rest into new poly
-        csVector3* tmp = rest; rest = fullPoly; fullPoly = tmp;
-        polygonSize = restSize;
-      }
-      else
-      {
-        // Row is rest of polygon
-        csVector3* tmp = elementRow; elementRow = fullPoly; fullPoly = tmp;
-        elementRowSize = polygonSize;
-      }
-
-      // Cut into elements
-      csPlane3 euCut = uCut;
-      csVector3 euOrigin = uCutOrigin;
-      for (uint u = 0; u < uc; u++)
-      {
-        //if (elRow.GetVertexCount () == 0) break; //no idea to try to clip it
-        euOrigin += uFormVector;
-        euCut.SetOrigin (euOrigin);
-        
-        if (u < (uc-1))
-        {
-          PolygonSplitWithPlane (euCut,
-            elementRow, elementRowSize,
-            element, elementSize,
-            rest, restSize);
-
-          // make rest into new row
-          csVector3* tmp = rest; rest = elementRow; elementRow = tmp;
-          elementRowSize = restSize;
-        }
-        else
-        {
-          csVector3* tmp = element; element = elementRow; elementRow = tmp;
-          elementSize = elementRowSize;          
-        }
-        
-        float elArea = PolygonArea (element, elementSize);
-        elementAreas.SetElementArea (elNum++, elArea);
-      }
+      scanBuffer[i].min = INT_MAX;
+      scanBuffer[i].max = INT_MIN;
     }
 
-    elementAreas.ShrinkBestFit ();
+    ScanConvert (scanBuffer, verts[0], verts[1], vc);
+    ScanConvert (scanBuffer, verts[1], verts[2], vc);
+    ScanConvert (scanBuffer, verts[2], verts[0], vc);
+
+    uint maxRow = (uint)ceilf(csMax(verts[0].y, csMax(verts[1].y, verts[2].y)));
+
+    for (uint row = 0; row < maxRow; ++row)
+    {
+      // Get start and ends
+      int min = scanBuffer[row].min;
+      int max = scanBuffer[row].max;
+
+      // Clip
+      if (min >= uc) continue;
+      if (max < 0) continue;
+
+      if (min < 0)
+         min = 0;
+      if (max >= uc)
+        max = uc;
+
+      size_t rowOffset = row*uc;
+
+      // Left border
+      elementClassification.SetBit (2*(rowOffset+min));
+
+      for (int col = (int)(min+1); col < max; ++col)
+      {
+        elementClassification.SetBit (2*(rowOffset+col));
+        if (row > 0 && row < (maxRow-1))
+          elementClassification.SetBit (2*(rowOffset+col)+1);
+      }
+
+      // Right border
+      elementClassification.SetBit (2*(rowOffset+max));
+    }
+
+    //PrintElements (elementClassification, uc, vc);
 
     ComputeBaryCoeffs();
   }
@@ -417,6 +320,10 @@ namespace lighter
   {
     float lambda, my;
     ComputeBaryCoords (point, lambda, my);
+
+    // Clamp lambda/my
+    lambda = csClamp (lambda, 1.0f, 0.0f);
+    my = csClamp (my, 1.0f, 0.0f);
 
     csVector3 norm;
 
@@ -736,4 +643,91 @@ namespace lighter
     }
   }
 
+  bool Primitive::RecomputeQuadrantOffset (size_t element, csVector2 offsets[4]) const
+  {
+    const ObjectVertexData& vdata = GetVertexData ();
+
+    bool anyClip = false;
+
+    size_t u, v;
+    GetElementUV(element, u, v);
+
+    //PrintElements (elementClassification, countU, countV);
+    float uvArea = csMath2::Area2 (vdata.lightmapUVs[triangle.a],
+      vdata.lightmapUVs[triangle.b], vdata.lightmapUVs[triangle.c]);
+
+    csVector2 elementCenter = minUV + csVector2(u+0.5f,v+0.5f);
+    
+    // Traverse the triangle edges, clip the offsets to the edge
+    for (size_t e1 = 0; e1 < 3; ++e1)
+    {
+      size_t e2 = CS::Math::NextModulo3 (e1);
+
+      csVector2 uv1 = vdata.lightmapUVs[triangle[e1]];
+      csVector2 uv2 = vdata.lightmapUVs[triangle[e2]];
+
+      // Possible violating edge        
+      csVector2 edgeD = uv2-uv1;
+      csVector2 edgeN (edgeD.y, -edgeD.x); 
+
+      for (size_t i = 0; i < 4; ++i)
+      {
+        csVector2 absOffset;
+        absOffset = offsets[i] + elementCenter;
+
+        // Compute edge-point distance
+        csVector2 pointUV1Offset = absOffset - uv1;  
+        float dist = edgeN * pointUV1Offset;        
+
+        if (dist*uvArea > 0)
+        {
+          anyClip = true;
+          float denom = edgeN * edgeN;
+          
+          csVector2 lineOffset = edgeN * (dist / denom)*0.99f;
+
+          offsets[i] -= lineOffset;
+        }
+      }
+    }
+
+    return anyClip;
+  }
+
+  float Primitive::ComputeElementFraction (size_t index) const
+  {
+    
+    const ObjectVertexData& vdata = GetVertexData ();
+
+    size_t u, v;
+    GetElementUV(index, u, v);
+
+    csBox2 uvBox (u + minUV.x, v + minUV.y,
+                  u + minUV.x + 1, v + minUV.y + 1);
+
+    csVector2 verts[3] = {
+      vdata.lightmapUVs[triangle[0]],
+      vdata.lightmapUVs[triangle[1]],
+      vdata.lightmapUVs[triangle[2]]
+    };
+
+    csVector2 outVerts[6];
+
+    size_t numVert = 0;
+
+    csBoxClipper clipper (uvBox);
+    clipper.Clip(verts, 3, outVerts, numVert);
+
+    float area = 0.0;
+    if (numVert >= 3)
+    {
+      // triangulize the polygon, triangles are (0,1,2), (0,2,3), (0,3,4), etc..
+      for (size_t i = 0; i < numVert - 2; ++i)
+        area += fabsf(csMath2::Area2 (outVerts[0], outVerts[i + 1], outVerts[i + 2]));
+    }
+    
+    return area / 2.0f;
+  }
 }
+
+

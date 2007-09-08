@@ -6,8 +6,6 @@
   </variables>
 
   <plugins>
-    <plugin name="thingFact">crystalspace.mesh.loader.factory.thing</plugin>
-    <plugin name="thing">crystalspace.mesh.loader.thing</plugin>
     <plugin name="genmeshFactory">crystalspace.mesh.loader.factory.genmesh</plugin>
     <plugin name="genmesh">crystalspace.mesh.loader.genmesh</plugin>
     <plugin name="terrainFact">crystalspace.mesh.loader.factory.terrain</plugin>
@@ -60,29 +58,6 @@
       <shader type="terrain splat">terrain_fixed_splatting</shader>
     </material>
   </materials>
-
-  <renderpriorities>
-    <priority name="sky">
-      <level>1</level>
-      <sort>NONE</sort>
-    </priority>
-    <priority name="mirror">
-      <level>2</level>
-      <sort>FRONT2BACK</sort>
-    </priority>
-    <priority name="wall">
-      <level>3</level>
-      <sort>NONE</sort>
-    </priority>
-    <priority name="object">
-      <level>4</level>
-      <sort>NONE</sort>
-    </priority>
-    <priority name="alpha">
-      <level>5</level>
-      <sort>BACK2FRONT</sort>
-    </priority>
-  </renderpriorities>
 
   <addon>
     <plugin>crystalspace.renderloop.loop.loader</plugin>
@@ -193,7 +168,7 @@
       <zfill />
       <priority>sky</priority>
       <camera />
-      <polymesh> <colldet/> </polymesh>
+      <trimesh> <id>colldet</id> </trimesh>
     </meshobj>
 
     <meshobj name="Terrain">

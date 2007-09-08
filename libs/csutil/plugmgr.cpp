@@ -38,13 +38,13 @@
 csPluginManager::csPlugin::csPlugin (iComponent *obj, const char *classID)
 {
   Plugin = obj;
-  ClassID = csStrNew (classID);
+  ClassID = CS::StrDup (classID);
 }
 
 csPluginManager::csPlugin::~csPlugin ()
 {
   //csPrintf ("DecRef %08p/'%s' ref=%d\n", Plugin, ClassID, Plugin->GetRefCount ()); fflush (stdout);
-  delete [] ClassID;
+  cs_free (ClassID);
 }
 
 //------------------------------------------------------------------------

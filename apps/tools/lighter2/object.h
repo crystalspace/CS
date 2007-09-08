@@ -156,7 +156,7 @@ namespace lighter
     virtual void SaveMeshPostLighting (Scene* scene) { }
 
     // Fill lightmap mask with primitive sub-pixel area coverage
-    virtual void FillLightmapMask (LightmapMaskArray& masks);
+    virtual void FillLightmapMask (LightmapMaskPtrDelArray& masks);
 
     //-- Getters for data
     inline const csArray<PrimitiveArray>& GetPrimitives () const
@@ -200,10 +200,12 @@ namespace lighter
     struct LMLayoutingInfo
     {
       csRef<LightmapUVObjectLayouter> layouter;
+      size_t layoutID;
       size_t group;
 
-      LMLayoutingInfo (LightmapUVObjectLayouter* layouter, size_t group) :
-      layouter (layouter), group (group) {}
+      LMLayoutingInfo (LightmapUVObjectLayouter* layouter, size_t layoutID,
+        size_t group) :
+        layouter (layouter), layoutID (layoutID), group (group) {}
     };
     csArray<LMLayoutingInfo> lmLayouts;
 

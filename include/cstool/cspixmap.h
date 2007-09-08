@@ -27,9 +27,9 @@
 #include "csextern.h"
 
 #include "csutil/ref.h"
+#include "ivideo/texture.h"
 
 struct iGraphics3D;
-struct iTextureHandle;
 
 /**
  * This class is an simple set of inline routines good as an abstraction

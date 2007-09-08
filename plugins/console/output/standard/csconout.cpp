@@ -50,7 +50,7 @@ SCF_IMPLEMENT_FACTORY (csConsoleOutput)
 
 
 csConsoleOutput::csConsoleOutput (iBase *base) : 
-  scfImplementationType (this, base)
+  scfImplementationType (this, base), buffer (0)
 {
   fg_rgb.Set (255, 255, 255);	// Foreground defaults to white
   bg_rgb.Set (0, 0, 0, 192);	// Background defaults to black, slightly transparent

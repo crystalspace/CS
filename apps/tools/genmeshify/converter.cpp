@@ -323,7 +323,7 @@ namespace genmeshify
      * source file to pick it up). */
     mfwObject->SetName (oldFactoryName);
 
-    if (!WritePolyMeshes (newObj->GetObjectModel(), to)) return false;
+    if (!WriteTriMeshes (newObj->GetObjectModel(), to)) return false;
 
     if (!ExtractPortals (meshWrap, sectorNode)) return false;
 
@@ -357,8 +357,8 @@ namespace genmeshify
   {
     typedef csHash<csArray<Poly>, PolyHashKey> MatPolyHash;
 
-    bool needColldetPolymesh = false;
-    bool needViscullPolymesh = false;
+    bool needColldetTrimesh = false;
+    bool needViscullTrimesh = false;
     int polycount = from->GetPolygonCount();
     int polyVertexCount = 0;
 
@@ -383,41 +383,29 @@ namespace genmeshify
         dim.GrowTo (lm.rectOnSLM.xmax, lm.rectOnSLM.ymax);
       }
       const csFlags& polyflags = from->GetPolygonFlags (p);
-      needColldetPolymesh |= !polyflags.Check (CS_POLY_COLLDET);
-      needViscullPolymesh |= !polyflags.Check (CS_POLY_VISCULL);
+      needColldetTrimesh |= !polyflags.Check (CS_POLY_COLLDET);
+      needViscullTrimesh |= !polyflags.Check (CS_POLY_VISCULL);
     }
 
     // Step 2: collect all polygons, sorted by materials + superlightmap
-    //  Also create polymeshes
-    csRef<csPolygonMesh> polyMeshColldet;
-    int* colldetVertPtr = 0;
-    csMeshedPolygon* colldetMeshedPoly = 0;
-    int colldetPolyCount = 0;
-    if (needColldetPolymesh) 
+    //  Also create trimeshes
+    csRef<csTriangleMesh> triMeshColldet;
+    if (needColldetTrimesh) 
     {
+      triMeshColldet.AttachNew (new csTriangleMesh);
       int vc = from->GetVertexCount ();
-      csVector3* vt = new csVector3[vc];
-      memcpy (vt, from->GetVertices (), vc * sizeof (csVector3));
-      polyMeshColldet.AttachNew (new csPolygonMesh);
-      polyMeshColldet->SetVertices (vt, vc, true);
-      polyMeshColldet->SetPolygonIndexCount (polyVertexCount);
-      colldetVertPtr = polyMeshColldet->GetPolygonIndices ();
-      colldetMeshedPoly = new csMeshedPolygon[polycount];
+      const csVector3* vt = from->GetVertices ();
+      for (int i = 0 ; i < vc ; i++)
+	triMeshColldet->AddVertex (vt[i]);
     }
-    csRef<csPolygonMesh> polyMeshViscull;
-    int* viscullVertPtr = 0;
-    csMeshedPolygon* viscullMeshedPoly = 0;
-    int viscullPolyCount = 0;
-    if (needViscullPolymesh) 
+    csRef<csTriangleMesh> triMeshViscull;
+    if (needViscullTrimesh) 
     {
+      triMeshViscull.AttachNew (new csTriangleMesh);
       int vc = from->GetVertexCount ();
-      csVector3* vt = new csVector3[vc];
-      memcpy (vt, from->GetVertices (), vc * sizeof (csVector3));
-      polyMeshViscull.AttachNew (new csPolygonMesh);
-      polyMeshViscull->SetVertices (vt, vc, true);
-      polyMeshViscull->SetPolygonIndexCount (polyVertexCount);
-      viscullVertPtr = polyMeshViscull->GetPolygonIndices ();
-      viscullMeshedPoly = new csMeshedPolygon[polycount];
+      const csVector3* vt = from->GetVertices ();
+      for (int i = 0 ; i < vc ; i++)
+	triMeshViscull->AddVertex (vt[i]);
     }
     bool pmColldetSameAsViscull = true;
 
@@ -432,21 +420,21 @@ namespace genmeshify
       const int* vtIndex = from->GetPolygonVertexIndices (p);
 
       const csFlags& polyflags = from->GetPolygonFlags (p);
-      if (needColldetPolymesh && polyflags.Check (CS_POLY_COLLDET))
+      if (needColldetTrimesh && polyflags.Check (CS_POLY_COLLDET))
       {
-        memcpy (colldetVertPtr, vtIndex, vc * sizeof (int));
-        colldetMeshedPoly[colldetPolyCount].num_vertices = vc;
-        colldetMeshedPoly[colldetPolyCount].vertices = colldetVertPtr;
-        colldetVertPtr += vc;
-        colldetPolyCount++;
+	for (int i = 0 ; i < vc-2 ; i++)
+	{
+	  triMeshColldet->AddTriangle (vtIndex[0], vtIndex[1],
+	      vtIndex[i+2]);
+	}
       }
-      if (needViscullPolymesh && polyflags.Check (CS_POLY_VISCULL))
+      if (needViscullTrimesh && polyflags.Check (CS_POLY_VISCULL))
       {
-        memcpy (viscullVertPtr, vtIndex, vc * sizeof (int));
-        viscullMeshedPoly[viscullPolyCount].num_vertices = vc;
-        viscullMeshedPoly[viscullPolyCount].vertices = viscullVertPtr;
-        viscullVertPtr += vc;
-        viscullPolyCount++;
+	for (int i = 0 ; i < vc-2 ; i++)
+	{
+	  triMeshViscull->AddTriangle (vtIndex[0], vtIndex[1],
+	      vtIndex[i+2]);
+	}
       }
       pmColldetSameAsViscull &= 
         polyflags.Check (CS_POLY_COLLDET) == polyflags.Check (CS_POLY_VISCULL);
@@ -495,21 +483,26 @@ namespace genmeshify
       else
         matPolies->Push (newPoly);
     }
-    // set polymeshes
+    // set trimeshes
+    csRef<iStringSet> globalStringSet
+      = csQueryRegistryTagInterface<iStringSet> (
+      app->objectRegistry, "crystalspace.shared.stringset");
+    csStringID colldet_id = globalStringSet->Request ("colldet");
+    csStringID viscull_id = globalStringSet->Request ("viscull");
     csRef<iMeshObjectFactory> mof = scfQueryInterface<iMeshObjectFactory> (to);
-    if (needColldetPolymesh)
+    if (needColldetTrimesh)
     {
-      polyMeshColldet->SetPolygons (colldetMeshedPoly, colldetPolyCount, true);
-      mof->GetObjectModel()->SetPolygonMeshColldet (polyMeshColldet);
+      //triMeshColldet->SetPolygons (colldetMeshedPoly, colldetPolyCount, true);
+      mof->GetObjectModel()->SetTriangleData (colldet_id, triMeshColldet);
     }
-    if (needViscullPolymesh)
+    if (needViscullTrimesh)
     {
       if (pmColldetSameAsViscull)
-        mof->GetObjectModel()->SetPolygonMeshViscull (polyMeshColldet);
+        mof->GetObjectModel()->SetTriangleData (viscull_id, triMeshColldet);
       else
       {
-        polyMeshViscull->SetPolygons (viscullMeshedPoly, viscullPolyCount, true);
-        mof->GetObjectModel()->SetPolygonMeshViscull (polyMeshViscull);
+        //triMeshViscull->SetPolygons (viscullMeshedPoly, viscullPolyCount, true);
+        mof->GetObjectModel()->SetTriangleData (viscull_id, triMeshViscull);
       }
     }
 
@@ -807,9 +800,9 @@ namespace genmeshify
     return true;
   }
 
-  typedef csHash<csFlags, csPtrKey<iPolygonMesh> > PolyMeshMeaning;
+  typedef csHash<csFlags, csPtrKey<iTriangleMesh> > PolyMeshMeaning;
 
-  inline void AddFlag (PolyMeshMeaning& hash, iPolygonMesh* key, uint32 flag)
+  inline void AddFlag (PolyMeshMeaning& hash, iTriangleMesh* key, uint32 flag)
   {
     csFlags* flagsPtr = hash.GetElementPointer (key);
     if (!flagsPtr)
@@ -818,32 +811,40 @@ namespace genmeshify
       flagsPtr->SetBool (flag, true);
   }
 
-  bool Converter::WritePolyMeshes (iObjectModel* objmodel, iDocumentNode* to)
+  bool Converter::WriteTriMeshes (iObjectModel* objmodel, iDocumentNode* to)
   {
-    iPolygonMesh* pmBase = objmodel->GetPolygonMeshBase ();
+    csRef<iStringSet> globalStringSet
+      = csQueryRegistryTagInterface<iStringSet> (
+      app->objectRegistry, "crystalspace.shared.stringset");
+    csStringID base_id = globalStringSet->Request ("base");
+    csStringID colldet_id = globalStringSet->Request ("colldet");
+    csStringID viscull_id = globalStringSet->Request ("viscull");
+    csStringID shadows_id = globalStringSet->Request ("shadows");
+
+    iTriangleMesh* pmBase = objmodel->GetTriangleData (base_id);
     PolyMeshMeaning pmMeaning;
-    
-    iPolygonMesh* pm;
-    pm = objmodel->GetPolygonMeshColldet ();
+
+    iTriangleMesh* pm;
+    pm = objmodel->GetTriangleData (colldet_id);
     if ((pm != 0) && (pm != pmBase)) 
       AddFlag (pmMeaning, pm, 1 << 0);
-    pm = objmodel->GetPolygonMeshShadows ();
+    pm = objmodel->GetTriangleData (shadows_id);
     if ((pm != 0) && (pm != pmBase)) 
       AddFlag (pmMeaning, pm, 1 << 1);
-    pm = objmodel->GetPolygonMeshViscull ();
+    pm = objmodel->GetTriangleData (viscull_id);
     if ((pm != 0) && (pm != pmBase)) 
       AddFlag (pmMeaning, pm, 1 << 2);
 
     PolyMeshMeaning::GlobalIterator it (pmMeaning.GetIterator ());
     while (it.HasNext ())
     {
-      csPtrKey<iPolygonMesh> key;
+      csPtrKey<iTriangleMesh> key;
       const csFlags& meaning = it.Next (key);
       
       csRef<iDocumentNode> polymeshNode = 
         to->CreateNodeBefore (CS_NODE_ELEMENT, 0);
       polymeshNode->SetValue ("trimesh");
-      if (!WritePolyMesh (key, polymeshNode)) return false;
+      if (!WriteTriMesh (key, polymeshNode)) return false;
 
       static const char* const meaningKeys[] = {"colldet", "shadows", "viscull" };
       for (size_t i = 0; i < sizeof (meaningKeys)/sizeof (meaningKeys[0]); i++)
@@ -862,13 +863,13 @@ namespace genmeshify
     return true;
   }
 
-  bool Converter::WritePolyMesh (iPolygonMesh* polyMesh, iDocumentNode* to)
+  bool Converter::WriteTriMesh (iTriangleMesh* triMesh, iDocumentNode* to)
   {
     csRef<iDocumentNode> meshNode = to->CreateNodeBefore (CS_NODE_ELEMENT, 0);
     meshNode->SetValue ("mesh");
 
-    int vc = polyMesh->GetVertexCount();
-    const csVector3* vertices = polyMesh->GetVertices ();
+    int vc = triMesh->GetVertexCount();
+    const csVector3* vertices = triMesh->GetVertices ();
     for (int v = 0; v < vc; v++)
     {
       csRef<iDocumentNode> vertNode = 
@@ -877,8 +878,8 @@ namespace genmeshify
       if (!app->synsrv->WriteVector (vertNode, vertices[v])) return false;
     }
 
-    int tc = polyMesh->GetTriangleCount ();
-    const csTriangle* tris = polyMesh->GetTriangles ();
+    int tc = triMesh->GetTriangleCount ();
+    const csTriangle* tris = triMesh->GetTriangles ();
     for (int t = 0; t < tc; t++)
     {
       csRef<iDocumentNode> triNode = 

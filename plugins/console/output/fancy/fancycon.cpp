@@ -96,7 +96,7 @@ bool csFancyConsole::Initialize (iObjectRegistry *object_reg)
     "crystalspace.console.output.standard");
   csRef<iPluginManager> plugin_mgr (
   	csQueryRegistry<iPluginManager> (object_reg));
-  base = CS_LOAD_PLUGIN (plugin_mgr, baseclass, iConsoleOutput);
+  base = csLoadPlugin<iConsoleOutput> (plugin_mgr, baseclass);
   if (!base)
     return false;
 
@@ -127,19 +127,19 @@ bool csFancyConsole::HandleEvent (iEvent &Event)
 {
   if (Event.Name == SystemOpen)
   {
-          system_ready = true;
-	  if (!pix_loaded)
-	  {
-            ImageLoader = csQueryRegistry<iImageIO> (object_reg);
-	    LoadPix ();
-	    pix_loaded = true;
-	  }
-          return true;
+    system_ready = true;
+    if (!pix_loaded)
+    {
+      ImageLoader = csQueryRegistry<iImageIO> (object_reg);
+      LoadPix ();
+      pix_loaded = true;
+    }
+    return true;
   }
   else if (Event.Name == SystemClose)
   {
-          system_ready = false;
-          return true;
+    system_ready = false;
+    return true;
   }
   return false;
 }

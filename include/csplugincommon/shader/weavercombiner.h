@@ -21,6 +21,7 @@
 #define __CS_CSPLUGINCOMMON_SHADER_WEAVERCOMBINER_H__
 
 #include "csutil/scf.h"
+#include "csgeom/vector4.h"
 #include <limits.h>
 
 /**\file
@@ -39,13 +40,22 @@ namespace CS
     namespace ShaderWeaver
     {
       static const uint NoCoercion = UINT_MAX;
+
+      struct iCoerceChainIterator : public iDocumentNodeIterator
+      {
+        SCF_INTERFACE (iCoerceChainIterator, 0, 1, 0);
+        
+        virtual csRef<iDocumentNode> Next () = 0;
+        virtual csRef<iDocumentNode> Next (const char*& fromType, 
+          const char*& toType) = 0;
+      };
     
       struct iCombiner : public virtual iBase
       {
-        SCF_INTERFACE (iCombiner, 0, 0, 2);
+        SCF_INTERFACE (iCombiner, 0, 1, 0);
         
         /// Start addition of a new snippet.
-        virtual void BeginSnippet () = 0;
+        virtual void BeginSnippet (const char* annotation = 0) = 0;
         /// Add an input of the snippet.
         virtual void AddInput (const char* name, const char* type) = 0;
         /// Add an output of the snippet.
@@ -58,7 +68,10 @@ namespace CS
          * Query a chain of coercions from a type to another.
          * Nodes are atom-snippet-esque.
          */
-        virtual csPtr<iDocumentNodeIterator> QueryCoerceChain (const char* fromType,
+        /* @@@ FIXME: A bit of a design issue that weaver nodes are returned,
+                      since that means combiners have to "know" the syntax of
+                      weaver input docs! */
+        virtual csPtr<iCoerceChainIterator> QueryCoerceChain (const char* fromType,
           const char* toType) = 0;
         /**
          * Add a link from a variable (usually an output of the snippet) to
@@ -72,9 +85,11 @@ namespace CS
         virtual bool EndSnippet () = 0;
         
         /// Add a global variable.
-        virtual void AddGlobal (const char* name, const char* type) = 0;
+        virtual void AddGlobal (const char* name, const char* type,
+          const char* annotation = 0) = 0;
         /// Set output variable.
-        virtual void SetOutput (const char* name) = 0;
+        virtual void SetOutput (const char* name,
+          const char* annotation = 0) = 0;
         
         /**
          * Compute a cost for a coercion from one type to another.
@@ -105,9 +120,17 @@ namespace CS
       
       struct iCombinerLoader : public virtual iBase
       {
-        SCF_INTERFACE (iCombinerLoader, 0, 0, 1);
+        SCF_INTERFACE (iCombinerLoader, 0, 0, 2);
         
         virtual csPtr<iCombiner> GetCombiner (iDocumentNode* params) = 0;
+
+        virtual void GenerateConstantInputBlocks (iDocumentNode* node,
+          const char* locationPrefix, const csVector4& value,
+          int usedComponents, const char* outputName) = 0;
+        virtual void GenerateSVInputBlocks (iDocumentNode* node,
+          const char* locationPrefix, const char* svName, 
+          const char* outputType, const char* outputName, 
+          const char* uniqueTag) = 0;
       };
     } // namespace ShaderWeaver
   } // namespace PluginCommon

@@ -1154,46 +1154,6 @@ bool csInstmeshMeshObject::HitBeamObject (const csVector3& start,
   return true;
 }
 
-int csInstmeshMeshObject::PolyMesh::GetVertexCount ()
-{
-  return (int)parent->factory->GetVertexCount ();
-}
-
-csVector3* csInstmeshMeshObject::PolyMesh::GetVertices ()
-{
-  //@@@FIXME: data must come from mesh itself. Not factory
-  return 0;
-  //return scfParent->factory->GetVertices ();
-}
-
-int csInstmeshMeshObject::PolyMesh::GetPolygonCount ()
-{
-  //@@@FIXME: data from mesh instead of factory
-  return 0;
-  //return scfParent->factory->GetTriangleCount ();
-}
-
-csMeshedPolygon* csInstmeshMeshObject::PolyMesh::GetPolygons ()
-{
-  //@@@FIXME: data from mesh instead of factory
-  return 0;
-  //return scfParent->factory->GetPolygons ();
-}
-
-int csInstmeshMeshObject::PolyMesh::GetTriangleCount ()
-{
-  //@@@FIXME: data from mesh instead of factory
-  return 0;
-  //return scfParent->factory->GetTriangleCount ();
-}
-
-csTriangle* csInstmeshMeshObject::PolyMesh::GetTriangles ()
-{
-  //@@@FIXME: data from mesh instead of factory
-  return 0;
-  //return scfParent->factory->GetTriangles ();
-}
-
 size_t csInstmeshMeshObject::TriMesh::GetVertexCount ()
 {
   return parent->factory->GetVertexCount ();
@@ -1447,7 +1407,7 @@ void csInstmeshMeshObjectFactory::AddVertex (const csVector3& v,
 
 void csInstmeshMeshObjectFactory::Compress ()
 {
-  size_t old_num = fact_vertices.GetSize ();
+  //size_t old_num = fact_vertices.GetSize ();
   csCompressVertexInfo* vt = csVertexCompressor::Compress (
     	fact_vertices, fact_texels, fact_normals, fact_colors);
   if (vt)
@@ -1479,7 +1439,8 @@ void csInstmeshMeshObjectFactory::CalculateNormals (bool compress)
 void csInstmeshMeshObjectFactory::GenerateSphere (const csEllipsoid& sphere,
     int num, bool cyl_mapping, bool toponly, bool reversed)
 {
-  csPrimitives::GenerateSphere (sphere, num, fact_vertices, fact_texels,
+  CS::Geometry::Primitives::GenerateSphere (
+      sphere, num, fact_vertices, fact_texels,
       fact_normals, fact_triangles, cyl_mapping, toponly, reversed);
   fact_colors.SetSize (fact_vertices.GetSize ());
   memset (fact_colors.GetArray (), 0, sizeof (csColor4)*fact_vertices.GetSize ());
@@ -1488,14 +1449,15 @@ void csInstmeshMeshObjectFactory::GenerateSphere (const csEllipsoid& sphere,
 void csInstmeshMeshObjectFactory::GenerateQuad (const csVector3& v1, const csVector3& v2, 
                   const csVector3& v3, const csVector3& v4)
 {
-  csPrimitives::GenerateQuad (v1, v2, v3, v4, fact_vertices, fact_texels,
+  CS::Geometry::Primitives::GenerateQuad (
+      v1, v2, v3, v4, fact_vertices, fact_texels,
       fact_normals, fact_triangles);
   fact_colors.SetSize (fact_vertices.GetSize ());
   memset (fact_colors.GetArray (), 0, sizeof (csColor4)*fact_vertices.GetSize ());
 }
 void csInstmeshMeshObjectFactory::GenerateBox (const csBox3& box)
 {
-  csPrimitives::GenerateBox (box, fact_vertices, fact_texels,
+  CS::Geometry::Primitives::GenerateBox (box, fact_vertices, fact_texels,
       fact_normals, fact_triangles);
   fact_colors.SetSize (fact_vertices.GetSize ());
   memset (fact_colors.GetArray (), 0, sizeof (csColor4)*fact_vertices.GetSize ());

@@ -92,13 +92,17 @@ csGenmeshSkelAnimationControl::csGenmeshSkelAnimationControl (
 
   if (!use_parent)
   {
-    skeleton = factory->gr->CreateSkeleton(factory->GetSkeletonFactory(), "");
+    skeleton = factory->GetSkeletonGraveyard()->CreateSkeleton(factory->GetSkeletonFactory(), "");
   }
 
 }
 
 csGenmeshSkelAnimationControl::~csGenmeshSkelAnimationControl ()
 {
+  if (skeleton && factory && factory->GetSkeletonGraveyard())
+  {
+    factory->GetSkeletonGraveyard()->RemoveSkeleton (skeleton);
+  }
   delete[] animated_verts;
   delete[] animated_colors;
   delete[] animated_vert_norms;
@@ -294,6 +298,7 @@ csGenmeshSkelAnimationControlFactory::csGenmeshSkelAnimationControlFactory (
   flags.SetAll(0);
   skeleton_factory = 0;
   use_parent = false;
+  the_graveyard = 0;
 }
 
 csGenmeshSkelAnimationControlFactory::~csGenmeshSkelAnimationControlFactory ()
@@ -321,8 +326,8 @@ const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
 
   if (!ldr_plg)
   {
-    ldr_plg = CS_LOAD_PLUGIN(plugin_mgr, 
-      "crystalspace.graveyard.loader", iLoaderPlugin);
+    ldr_plg = csLoadPlugin<iLoaderPlugin> (plugin_mgr, 
+      "crystalspace.graveyard.loader");
     if (!ldr_plg )
     {
       printf("Missing <crystalspace.graveyard.loader> plugin!\n");
@@ -361,7 +366,7 @@ const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
         {
           csRef<iBase> skf = ldr_plg->Parse(child, 0, 0, 0);
           skeleton_factory = scfQueryInterface<iSkeletonFactory> (skf);
-          gr = skeleton_factory->GetGraveyard();
+          the_graveyard = skeleton_factory->GetGraveyard();
         }
       }
       break;
@@ -388,7 +393,7 @@ const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
           {
             csRef<iBase> skf = ldr_plg->Parse(doc->GetRoot(), 0, 0, 0);
             skeleton_factory = scfQueryInterface<iSkeletonFactory> (skf);
-            gr = skeleton_factory->GetGraveyard();
+            the_graveyard = skeleton_factory->GetGraveyard();
           }
           else
           {

@@ -55,7 +55,7 @@ AC_DEFUN([CS_EMIT_PACKAGEINFO],
     _CS_EMIT_PACKAGEINFO([$1], [PACKAGE_LONGNAME], [$PACKAGE_LONGNAME])
     _CS_EMIT_PACKAGEINFO([$1], [PACKAGE_HOMEPAGE], [$PACKAGE_HOMEPAGE])
     _CS_EMIT_PACKAGEINFO([$1], [PACKAGE_COPYRIGHT], [$PACKAGE_COPYRIGHT])
-    for cs_veritem in m4_translit(AC_PACKAGE_VERSION, [.], [ ]); do
+    for cs_veritem in m4_translit(patsubst(AC_PACKAGE_VERSION, [[^0-9.]+.*$]), [.], [ ]); do
 	_CS_EMIT_PACKAGEINFO([$1], [PACKAGE_VERSION_LIST], [$cs_veritem], [+])
     done
     ])

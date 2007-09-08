@@ -30,7 +30,6 @@
 #include "cssysdef.h"
 #include "CSopcode.h"
 #include "csqsqrt.h"
-#include "igeom/polymesh.h"
 #include "csgeom/transfrm.h"
 #include "csutil/scfstr.h"
 #include "iutil/string.h"
@@ -107,13 +106,6 @@ bool csOPCODECollideSystem::Initialize (iObjectRegistry* iobject_reg)
 }
 
 csPtr<iCollider> csOPCODECollideSystem::CreateCollider (iTriangleMesh* mesh)
-{
-  csOPCODECollider* col = new csOPCODECollider (mesh);
-  // here we must store the caches (and the trees)?
-  return csPtr<iCollider> (col);
-}
-
-csPtr<iCollider> csOPCODECollideSystem::CreateCollider (iPolygonMesh* mesh)
 {
   csOPCODECollider* col = new csOPCODECollider (mesh);
   // here we must store the caches (and the trees)?
@@ -425,13 +417,9 @@ static void ray_cb (const CollisionFace& hit, void* user_data)
 }
 
 bool csOPCODECollideSystem::CollideRaySegment (
-  	iCollider* collider, const csReversibleTransform* trans,
+  	csOPCODECollider* col, const csReversibleTransform* trans,
 	const csVector3& start, const csVector3& end, bool use_ray)
 {
-  if (!collider) return false;
-  if (collider->GetColliderType () != CS_MESH_COLLIDER) return false;
-  
-  csOPCODECollider* col = (csOPCODECollider*) collider;
   ColCache.Model0 = col->m_pCollisionModel;
 
   csMatrix3 m;
@@ -511,6 +499,144 @@ bool csOPCODECollideSystem::CollideRaySegment (
   {
     return false;
   }
+}
+
+bool csOPCODECollideSystem::CollideRaySegment (
+  	iTerrainSystem* terrain, const csReversibleTransform* trans,
+	const csVector3& start, const csVector3& end, bool use_ray)
+{
+  csVector3 s, e;
+  if (trans)
+  {
+    s = trans->Other2This (start);
+    e = trans->Other2This (end);
+  }
+  else
+  {
+    s = start;
+    e = end;
+  }
+  csTerrainColliderCollideSegmentResult rc = terrain->CollideSegment (s, e);
+  if (!rc.hit) return false;
+  
+  intersecting_triangles.SetSize (0);
+  size_t idx = intersecting_triangles.Push (csIntersectingTriangle ());
+  intersecting_triangles[idx].a = rc.a;
+  intersecting_triangles[idx].b = rc.b;
+  intersecting_triangles[idx].c = rc.c;
+
+  return true;
+}
+
+bool csOPCODECollideSystem::CollideRaySegment (
+  	csTerraFormerCollider* terraformer, const csReversibleTransform* trans,
+	const csVector3& start, const csVector3& end, bool use_ray)
+{
+  terraformer->UpdateOPCODEModel (start, sqrtf (csSquaredDist::PointPoint (
+	  start, end)));
+  ColCache.Model0 = terraformer->opcode_model;
+
+  csMatrix3 m;
+  if (trans) m = trans->GetT2O ();
+  csVector3 u;
+
+  IceMaths::Matrix4x4 transform;
+  transform.m[0][3] = 0;
+  transform.m[1][3] = 0;
+  transform.m[2][3] = 0;
+  transform.m[3][3] = 1;
+  u = m.Row1 ();
+  transform.m[0][0] = u.x;
+  transform.m[1][0] = u.y;
+  transform.m[2][0] = u.z;
+  u = m.Row2 ();
+  transform.m[0][1] = u.x;
+  transform.m[1][1] = u.y;
+  transform.m[2][1] = u.z;
+  u = m.Row3 ();
+  transform.m[0][2] = u.x;
+  transform.m[1][2] = u.y;
+  transform.m[2][2] = u.z;
+
+  if (trans) u = trans->GetO2TTranslation ();
+  else u.Set (0, 0, 0);
+  transform.m[3][0] = u.x;
+  transform.m[3][1] = u.y;
+  transform.m[3][2] = u.z;
+
+  Ray ray (Point (start.x, start.y, start.z),
+  	   Point (end.x-start.x, end.y-start.y, end.z-start.z));
+
+  RayCol.SetHitCallback (ray_cb);
+  RayCol.SetUserData ((void*)&collision_faces);
+  intersecting_triangles.SetSize (0);
+  collision_faces.SetSize (0);
+  if (use_ray)
+  {
+    max_dist = MAX_FLOAT;
+    RayCol.SetMaxDist ();
+  }
+  else
+  {
+    max_dist = csQsqrt (csSquaredDist::PointPoint (start, end));
+    RayCol.SetMaxDist (max_dist);
+  }
+  bool isOk = RayCol.Collide (ray, *ColCache.Model0, &transform);
+  if (isOk)
+  {
+    bool status = (RayCol.GetContactStatus () != FALSE);
+    if (status)
+    {
+      // Now calculate the real intersection points for all hit faces.
+      Point* vertholder = terraformer->vertices.GetArray ();
+      if (!vertholder) return true;
+      udword* indexholder = terraformer->indexholder;
+      if (!indexholder) return true;
+      if (collision_faces.GetSize () == 0) return false;
+      Point* c;
+      size_t i;
+      for (i = 0 ; i < collision_faces.GetSize () ; i++)
+      {
+        int idx = collision_faces[i] * 3;
+	int it_idx = (int)intersecting_triangles.Push (csIntersectingTriangle ());
+	c = &vertholder[indexholder[idx+0]];
+	intersecting_triangles[it_idx].a.Set (c->x, c->y, c->z);
+	c = &vertholder[indexholder[idx+1]];
+	intersecting_triangles[it_idx].b.Set (c->x, c->y, c->z);
+	c = &vertholder[indexholder[idx+2]];
+	intersecting_triangles[it_idx].c.Set (c->x, c->y, c->z);
+      }
+    }
+    return status;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+bool csOPCODECollideSystem::CollideRaySegment (
+  	iCollider* collider, const csReversibleTransform* trans,
+	const csVector3& start, const csVector3& end, bool use_ray)
+{
+  if (!collider) return false;
+  if (collider->GetColliderType () == CS_MESH_COLLIDER)
+  {
+    return CollideRaySegment ((csOPCODECollider*) collider,
+	trans, start, end, use_ray);
+  }
+  else if (collider->GetColliderType () == CS_TERRAIN_COLLIDER)
+  {
+    csRef<iTerrainSystem> terrain = scfQueryInterface<iTerrainSystem> (
+	  collider);
+    return CollideRaySegment (terrain, trans, start, end, use_ray);
+  }
+  else if (collider->GetColliderType () == CS_TERRAFORMER_COLLIDER)
+  {
+    return CollideRaySegment ((csTerraFormerCollider*) collider,
+	trans, start, end, use_ray);
+  }
+  return false;
 }
 
 void csOPCODECollideSystem::CopyCollisionPairs (csOPCODECollider* col1,

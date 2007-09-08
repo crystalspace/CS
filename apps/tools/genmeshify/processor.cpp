@@ -43,52 +43,21 @@ namespace genmeshify
     region->DeleteAll();
   }
 
-  static bool IsVfsDir (iVFS* vfs, const char* path)
-  {
-    if (!vfs->Exists (path)) return false;
-    csRef<iFile> probe = vfs->Open (path, VFS_FILE_READ);
-    return !probe.IsValid();
-  }
-
   csRef<iFile> Processor::OpenPath (App* app, const char* path, 
                                     csString& fileNameToOpen)
   {
-    csString filename (path);
-    csStringArray paths;
-    paths.Push ("/lev/");
-
-    //Change path
-    bool dirSet = false;
-    size_t slashPos = filename.FindLast ('/');
-    if (slashPos != (size_t)-1)
+    const char* actualFilename;
+    csRef<iFile> file (CS::Utility::SmartFileOpen (app->vfs, path,
+      "world", &actualFilename));
+    fileNameToOpen = actualFilename;
+    if (!file.IsValid ())
     {
-      csString dir, base;
-      filename.SubString (dir, 0, slashPos);
-      filename.SubString (base, slashPos + 1);
-      fileNameToOpen = base;
-      dirSet = app->vfs->ChDirAuto (dir, &paths, 0, base);
-    }
-    bool isDir = IsVfsDir (app->vfs, fileNameToOpen);
-    if (!dirSet || fileNameToOpen.IsEmpty() || isDir)
-    {
-      if (isDir) app->vfs->ChDir (fileNameToOpen);
-      fileNameToOpen = "world";
-      dirSet = app->vfs->ChDirAuto (filename, &paths, 0, "world");
-    }
-    if (!dirSet)
-    {
-      app->Report ("Error opening '%s'!", filename.GetData());
+      app->Report ("Could not open a '%s' file at given path '%s'.", 
+        actualFilename, path);
       return 0;
     }
 
-    // Load it
-    csRef<iFile> buf = app->vfs->Open (fileNameToOpen, VFS_FILE_READ);
-    if (!buf) 
-    {
-      app->Report ("Error opening file 'world' for reading!");
-      return 0;
-    }
-    return buf;
+    return file;
   }
 
   bool Processor::Preload (App* app, const csStringArray& paths)

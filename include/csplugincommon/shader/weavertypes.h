@@ -86,10 +86,22 @@ namespace CS
         } space;
         /// Whether the values should be normalized
         bool unit;
+
+        bool operator==(const TypeInfo& other) const
+        {
+          return (baseType == other.baseType)
+            && (samplerIsCube == other.samplerIsCube)
+            && (dimensions == other.dimensions)
+            && (semantics == other.semantics)
+            && (space == other.space)
+            && (unit == other.unit);
+        }
       };
       
       CS_CRYSTALSPACE_EXPORT const TypeInfo* QueryTypeInfo (
         const char* type);
+      CS_CRYSTALSPACE_EXPORT const char* QueryType (
+        const TypeInfo& typeInfo);
         
       class CS_CRYSTALSPACE_EXPORT TypeInfoIterator
       {

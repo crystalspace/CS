@@ -14,7 +14,7 @@ AC_PREREQ([2.56])
 #       Also, mk/autoconf/crystal.m4 should be updated with the current version
 #         number.
 #------------------------------------------------------------------------------
-m4_define([cs_version_number], [1.1])
+m4_define([cs_version_number], [1.3])
 
 
 
@@ -24,7 +24,7 @@ m4_define([cs_version_number], [1.1])
 AC_INIT([crystalspace], [cs_version_number],
         [crystal-main@lists.sourceforge.net])
 CS_PACKAGEINFO([Crystal Space],
-    [Copyright (C)1998-2006 Jorrit Tyberghein and others],
+    [Copyright (C)1998-2007 Jorrit Tyberghein and others],
     [http://www.crystalspace3d.org/])
 AC_CONFIG_SRCDIR([libs/Jamfile])
 AC_CONFIG_AUX_DIR([mk/autoconf])
@@ -491,27 +491,6 @@ CS_EMIT_BUILD_FLAGS([how to enforce C++ standards conformance],
 
 
 #------------------------------------------------------------------------------
-# Check if the linker recognizes "-multiply_defined suppress".  This is
-# required for MacOS/X 10.1 to avoid warning messages when linking a program
-# with "-framework Foundation" if that program does not actually employ any
-# Objective-C. Note that we first attempt the uglier equivalent
-# "-Wl,-multiply_defined,suppress" in order to make life simpler for external
-# projects using cs-config (which reports this linker option in response to
-# --libs) in conjunction with GNU libtool. The problem with "-multiply_defined
-# suppress" for GNU libtool users is that libtool re-orders linker arguments,
-# not realizing that "suppress" must follow immediately after
-# "-multiply_defined". The uglier equivalent does not suffer from this problem
-# in the hands of libtool since it contains no whitespace.
-#------------------------------------------------------------------------------
-CS_EMIT_BUILD_FLAGS([if -multiply_defined suppress is needed],
-    [cs_cv_prog_link_suppress_multiple],
-    [CS_CREATE_TUPLE([], [-Wl,-multiply_defined,suppress]) \
-    CS_CREATE_TUPLE([], [-multiply_defined suppress])],
-    [], [COMPILER.LFLAGS], [+])
-
-
-
-#------------------------------------------------------------------------------
 # Check if the linker recognizes "-force_cpusubtype_ALL".  This is required on
 # MacOS/X since the Crystal Space's PowerPC implementation of csQsqrt() uses
 # the `frsqrte' instruction which is only valid when the -force_cpusubtype_ALL
@@ -670,12 +649,10 @@ AS_IF([test -n "$cs_cv_prog_cxx_visibility_inlines_hidden"],
     #CS_CHECK_PROG_VERSION([g++], [$CXX --version], [4.1], [9.9|.9],
     #   [cs_cv_gxx_version_buggy=no],
     #   [cs_cv_gxx_version_buggy=yes])
-    cs_cv_gxx_version_buggy=yes
     AC_CACHE_CHECK([if $cs_cv_prog_cxx_visibility_inlines_hidden is buggy],
 	[cs_cv_prog_cxx_visibility_inlines_hidden_buggy],
 	[AS_IF([test $ac_compiler_gnu = yes],
-	    [AS_IF([test \( $host_cpu = x86_64 -a cs_cv_gxx_version_buggy = yes \) \
-		    || test x$cs_host_macosx = xyes],
+	    [AS_IF([test $host_cpu = x86_64 || test x$cs_host_macosx = xyes], 
 		[cs_cv_prog_cxx_visibility_inlines_hidden_buggy=yes],
 		[cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])],
 	    [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])])],
@@ -2199,6 +2176,7 @@ AC_DEFUN([CS_CHECK_QSQRT],
 		    [[#define CS_PROCESSOR_$cs_host_cpu_normalized
 		    #define CS_COMPILER_GCC
 		    #define __CS_CSSYSDEF_H__
+		    #define CS_FORCEINLINE
 		    #include <csqsqrt.h>]],
 		    [float n = csQsqrt(1.0f); (void)n;])],
 		[CS_CREATE_TUPLE([-I$srcdir/include])], [C++],
@@ -2213,10 +2191,12 @@ AS_IF([test $cs_cv_cxx_qsqrt_ok = no],
 
 
 #------------------------------------------------------------------------------
-# Check how to determine whether a floating point value is finite.
+# Check how to determine whether a floating point value is finite or nan.
 #------------------------------------------------------------------------------
-# CS_CHECK_FINITE(FUNCTION)
-AC_DEFUN([CS_CHECK_FINITE],
+# CS_CHECK_SPECIAL_FLOAT(FUNCTION)
+# CS_CHECK_STD_SPECIAL_FLOAT(FUNCTION)
+
+AC_DEFUN([CS_CHECK_SPECIAL_FLOAT],
     [CS_CHECK_BUILD([for $1], [cs_cv_func_$1],
 	[AC_LANG_PROGRAM(
 	    [[#if HAVE_CMATH
@@ -2229,28 +2209,39 @@ AC_DEFUN([CS_CHECK_FINITE],
 	    #include <ieeefp.h>
 	    #endif]],
 	    [float f; $1(f)])],
-	[], [C++], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_HAVE_$1]))], [], [],
-	[$cs_cv_prog_cxx_enable_pedantic])])
+	[], [C++], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_HAVE_$1]))],
+	[], [], [$cs_cv_prog_cxx_enable_pedantic])])
 
-CS_CHECK_BUILD([for std::isfinite], [cs_cv_func_std__isfinite],
-    [AC_LANG_PROGRAM(
-	[[#if HAVE_CMATH
-	#include <cmath>
-	#endif
-	#if HAVE_MATH_H
-	#include <math.h>
-	#endif
-	#if HAVE_IEEEFP_H
-	#include <ieeefp.h>
-	#endif]],
-	[float f; std::isfinite(f)])],
-    [], [C++], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_HAVE_STD__ISFINITE]))],
-    [], [], [$cs_cv_prog_cxx_enable_pedantic])
+AC_DEFUN([CS_CHECK_STD_SPECIAL_FLOAT],
+    [CS_CHECK_BUILD([for std::$1], [cs_cv_func_std__$1],
+	[AC_LANG_PROGRAM(
+	    [[#if HAVE_CMATH
+	    #include <cmath>
+	    #endif
+	    #if HAVE_MATH_H
+	    #include <math.h>
+	    #endif
+	    #if HAVE_IEEEFP_H
+	    #include <ieeefp.h>
+	    #endif]],
+	    [float f; std::$1(f)])],
+	[], [C++], [CS_HEADER_PROPERTY(AS_TR_CPP([CS_HAVE_STD__$1]))],
+	[], [], [$cs_cv_prog_cxx_enable_pedantic])])
 
-CS_CHECK_FINITE([isfinite])
-CS_CHECK_FINITE([finitef])
-CS_CHECK_FINITE([finite])
-CS_CHECK_FINITE([_finite])
+CS_CHECK_SPECIAL_FLOAT([isfinite])
+CS_CHECK_SPECIAL_FLOAT([finitef])
+CS_CHECK_SPECIAL_FLOAT([finite])
+CS_CHECK_SPECIAL_FLOAT([_finite])
+CS_CHECK_STD_SPECIAL_FLOAT([isfinite])
+
+CS_CHECK_SPECIAL_FLOAT([isnan])
+CS_CHECK_SPECIAL_FLOAT([isnanf])
+CS_CHECK_SPECIAL_FLOAT([_isnan])
+CS_CHECK_STD_SPECIAL_FLOAT([isnan])
+
+CS_CHECK_SPECIAL_FLOAT([isnormal])
+CS_CHECK_SPECIAL_FLOAT([normalf])
+CS_CHECK_STD_SPECIAL_FLOAT([isnormal])
 
 
 

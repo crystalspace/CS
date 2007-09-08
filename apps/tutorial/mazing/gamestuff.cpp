@@ -67,9 +67,10 @@ bool Maze::IsSpaceFree (const RoomCoordinate& rc) const
   return !occupied[rc.x][rc.y][rc.z];
 }
 
-bool Maze::CreateWallOrPortal (iThingFactoryState* factory_state,
+bool Maze::CreateWallOrPortal (iGeneralFactoryState* factory_state,
   	const csVector3& v1, const csVector3& v2,
   	const csVector3& v3, const csVector3& v4,
+	CS::Geometry::TextureMapper* mapper,
 	bool do_portal,
 	const RoomCoordinate& source,
 	const RoomCoordinate& dest)
@@ -92,7 +93,10 @@ bool Maze::CreateWallOrPortal (iThingFactoryState* factory_state,
   }
   else
   {
-    factory_state->AddQuad (v1, v2, v3, v4);
+    CS::Geometry::TesselatedQuad quad (v1, v2, v4);
+    quad.SetLevel (5);
+    quad.SetMapper (mapper);
+    quad.Append (factory_state);
   }
   return true;
 }
@@ -101,15 +105,24 @@ bool Maze::CreateRoom (iMaterialWrapper* wall_material,
 	int x, int y, int z, char* portals)
 {
   iSector* room = GetSector (x, y, z);
-  csRef<iMeshWrapper> walls = app->GetEngine ()
-  	->CreateSectorWallsMesh (room, "walls");
+
+  using namespace CS::Geometry;
+  csRef<iMeshFactoryWrapper> walls_factory = GeneralMeshBuilder::
+    CreateFactory (app->GetEngine (), "walls_factory");
+  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateMesh (
+      app->GetEngine (), room, "walls", walls_factory);
   if (!walls)
     return app->ReportError ("Couldn't create the walls for the room!");
 
-  csRef<iThingState> object_state = scfQueryInterface<iThingState> (
-  	walls->GetMeshObject ());
-  csRef<iThingFactoryState> factory_state = scfQueryInterface<
-  	iThingFactoryState> (walls->GetMeshObject ()->GetFactory ());
+  csRef<iGeneralMeshState> object_state = scfQueryInterface<
+    iGeneralMeshState> (walls->GetMeshObject ());
+  object_state->SetShadowReceiving (true);
+  walls->GetMeshObject ()->SetMaterialWrapper (wall_material);
+  csRef<iGeneralFactoryState> factory_state = scfQueryInterface<
+    iGeneralFactoryState> (walls_factory->GetMeshObjectFactory ());
+
+  DensityTextureMapper mapper (.3);
+
   float sx = float (x) * ROOM_DIMENSION;
   float sy = float (y) * ROOM_DIMENSION;
   float sz = float (z) * ROOM_DIMENSION;
@@ -124,6 +137,7 @@ bool Maze::CreateRoom (iMaterialWrapper* wall_material,
     	box.GetCorner (CS_BOX_CORNER_XYz),
     	box.GetCorner (CS_BOX_CORNER_XYZ),
     	box.GetCorner (CS_BOX_CORNER_xYZ),
+	&mapper,
 	portals[PORTAL_UP] == '#',
 	start_rc, RoomCoordinate (x+0, y+1, z+0)))
     return false;
@@ -132,6 +146,7 @@ bool Maze::CreateRoom (iMaterialWrapper* wall_material,
     	box.GetCorner (CS_BOX_CORNER_XyZ),
     	box.GetCorner (CS_BOX_CORNER_Xyz),
     	box.GetCorner (CS_BOX_CORNER_xyz),
+	&mapper,
 	portals[PORTAL_DOWN] == '#',
 	start_rc, RoomCoordinate (x+0, y-1, z+0)))
     return false;
@@ -140,6 +155,7 @@ bool Maze::CreateRoom (iMaterialWrapper* wall_material,
     	box.GetCorner (CS_BOX_CORNER_xyZ),
     	box.GetCorner (CS_BOX_CORNER_xYZ),
     	box.GetCorner (CS_BOX_CORNER_XYZ),
+	&mapper,
 	portals[PORTAL_FRONT] == '#',
 	start_rc, RoomCoordinate (x+0, y+0, z+1)))
     return false;
@@ -148,6 +164,7 @@ bool Maze::CreateRoom (iMaterialWrapper* wall_material,
     	box.GetCorner (CS_BOX_CORNER_Xyz),
     	box.GetCorner (CS_BOX_CORNER_XYz),
     	box.GetCorner (CS_BOX_CORNER_xYz),
+	&mapper,
 	portals[PORTAL_BACK] == '#',
 	start_rc, RoomCoordinate (x+0, y+0, z-1)))
     return false;
@@ -156,6 +173,7 @@ bool Maze::CreateRoom (iMaterialWrapper* wall_material,
     	box.GetCorner (CS_BOX_CORNER_xyz),
     	box.GetCorner (CS_BOX_CORNER_xYz),
     	box.GetCorner (CS_BOX_CORNER_xYZ),
+	&mapper,
 	portals[PORTAL_LEFT] == '#',
 	start_rc, RoomCoordinate (x-1, y+0, z+0)))
     return false;
@@ -164,12 +182,10 @@ bool Maze::CreateRoom (iMaterialWrapper* wall_material,
     	box.GetCorner (CS_BOX_CORNER_XyZ),
     	box.GetCorner (CS_BOX_CORNER_XYZ),
     	box.GetCorner (CS_BOX_CORNER_XYz),
+	&mapper,
 	portals[PORTAL_RIGHT] == '#',
 	start_rc, RoomCoordinate (x+1, y+0, z+0)))
     return false;
-
-  factory_state->SetPolygonMaterial (CS_POLYRANGE_ALL, wall_material);
-  factory_state->SetPolygonTextureMapping (CS_POLYRANGE_ALL, rd);
 
   return true;
 }

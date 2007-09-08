@@ -670,8 +670,8 @@ static inline void ComputeIntervals (const csVector3 tri[3], float d[3],
 {
   // Convert sign-class into an index
   size_t signIdx = (size_t)signs;
-  size_t other1 = (signIdx + 1) % 3;
-  size_t other2 = (signIdx + 2) % 3;
+  size_t other1 = CS::Math::NextModulo3 (signIdx);
+  size_t other2 = CS::Math::NextModulo3 (other1);
 
   // Setup new triangle
   const csVector3 newTri[3] = {tri[signIdx], 
@@ -744,8 +744,8 @@ static inline bool HandleCoplanar (const csPlane3& plane,
   // All computations are done in 2d projected system, get the two projection
   // axes to use
   size_t maxNormal = plane.norm.DominantAxis ();
-  size_t k = (maxNormal + 1) % 3;
-  size_t l = (maxNormal + 2) % 3;
+  size_t k = CS::Math::NextModulo3 (maxNormal);
+  size_t l = CS::Math::NextModulo3 (k);
 
   // Check verts against tris 
   for (size_t tidx = 0; tidx < 1; ++tidx)
@@ -765,7 +765,7 @@ static inline bool HandleCoplanar (const csPlane3& plane,
   // Check edges pairwise until we get our two points
   for (size_t oe = 0; oe < 3; ++oe)
   {
-    size_t oe2 = (oe+1) % 3;
+    size_t oe2 = CS::Math::NextModulo3 (oe);
 
     csVector2 A;
 
@@ -774,7 +774,7 @@ static inline bool HandleCoplanar (const csPlane3& plane,
     for (size_t ie = 0; ie < 3; ++ie)
     {
       // Test edge [oe - oe+1] against [ie - ie+1]
-      size_t ie2 = (ie+1) % 3;
+      size_t ie2 = CS::Math::NextModulo3 (ie);
 
       csVector2 B, C;
       B.x = tri2[ie][k] - tri2[ie2][k];

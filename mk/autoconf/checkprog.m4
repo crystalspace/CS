@@ -30,7 +30,7 @@ AC_PREREQ([2.56])
 #	/sw/bin -- Fink, the MacOS/X manager of Unix packages, installs
 #		executables here.
 #------------------------------------------------------------------------------
-m4_define([cs_bin_paths_default], [/usr/local/bin, /sw/bin])
+m4_define([cs_bin_paths_default], [/usr/local/bin, /sw/bin, ${srcdir}/bin])
 
 
 #------------------------------------------------------------------------------

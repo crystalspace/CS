@@ -64,6 +64,7 @@ csXMLShaderTech::csXMLShaderTech (csXMLShader* parent) :
 csXMLShaderTech::~csXMLShaderTech()
 {
   delete[] passes;
+  cs_free (metadata.description);
 }
 
 static inline bool IsDestalphaMixmode (uint mode)
@@ -560,7 +561,7 @@ bool csXMLShaderTech::Load (iLoaderContext* ldr_context,
     parent->compiler->LoadSVBlock (ldr_context, varNode, &svcontext);
 
   // copy over metadata from parent
-  metadata.description = csStrNew (parent->allShaderMeta.description);
+  metadata.description = CS::StrDup (parent->allShaderMeta.description);
   metadata.numberOfLights = node->GetAttributeValueAsInt ("lights");
 
   //alloc passes

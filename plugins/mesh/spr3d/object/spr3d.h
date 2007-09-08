@@ -632,7 +632,6 @@ public:
   void SetupLODListeners (iSharedVariable* varm, iSharedVariable* vara);
 
   void SetupFactory ();
-  void GetObjectBoundingBox (csBox3& bbox);
   const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3 &cent);
@@ -649,61 +648,6 @@ public:
   virtual iMeshFactoryWrapper* GetMeshFactoryWrapper () const
   { return logparent; }
   virtual iMeshObjectType* GetMeshObjectType () const { return spr3d_type; }
-  /** @} */
-
-  /**\name iPolygonMesh implementation
-   * @{ */
-  struct PolyMesh : public scfImplementation1<PolyMesh, iPolygonMesh>
-  {
-  private:
-    csSprite3DMeshObjectFactory* factory;
-    csFlags flags;
-
-  public:
-    virtual int GetVertexCount ()
-    {
-      return factory->GetVertexCount ();
-    }
-    virtual csVector3* GetVertices ()
-    {
-      return factory->GetVertices (0);
-    }
-    virtual int GetPolygonCount ()
-    {
-      return factory->GetTriangleCount ();
-    }
-
-    virtual csMeshedPolygon* GetPolygons ();
-
-    virtual int GetTriangleCount ()
-    {
-      return factory->GetTriangleCount ();
-    }
-    virtual csTriangle* GetTriangles ()
-    {
-      return factory->GetTriangles ();
-    }
-
-    virtual void Lock () { } //PM@@@
-    virtual void Unlock () { }
- 
-    virtual csFlags& GetFlags () { return flags;  }
-    virtual uint32 GetChangeNumber() const { return 0; }
-
-    PolyMesh (csSprite3DMeshObjectFactory* Factory) : 
-      scfImplementationType (this), factory(Factory), polygons (0)
-    {
-      flags.Set (CS_POLYMESH_TRIANGLEMESH);
-    }
-    virtual ~PolyMesh ()
-    {
-      Cleanup ();
-    }
-    void Cleanup () { delete[] polygons; polygons = 0; }
-
-    csMeshedPolygon* polygons;
-  };
-  friend struct PolyMesh;
   /** @} */
 
   /**\name iTriangleMesh implementation
@@ -1077,7 +1021,7 @@ private:
   ///
   bool force_otherskin;
 
-  iMeshObjectDrawCallback* vis_cb;
+  csRef<iMeshObjectDrawCallback> vis_cb;
 
   /**
    * Camera space bounding box is cached here.
@@ -1433,7 +1377,6 @@ public:
   void ClearLODListeners ();
   void SetupLODListeners (iSharedVariable* varm, iSharedVariable* vara);
 
-  void GetObjectBoundingBox (csBox3& bbox);
   const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3 &cent);
@@ -1468,8 +1411,6 @@ public:
     iMovable* movable, uint32 frustum_mask);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
-    if (cb) cb->IncRef ();
-    if (vis_cb) vis_cb->DecRef ();
     vis_cb = cb;
   }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const

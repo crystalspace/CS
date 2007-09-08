@@ -842,23 +842,32 @@ namespace CS
   {
     extern void CS_CRYSTALSPACE_EXPORT AssertMessage (const char* expr, 
       const char* filename, int line, const char* msg = 0);
+    
+    /**
+     * Break execution for debugging purposes.
+     * Causes a signal/exception/fault (which depends on the exact 
+     * nomenclature used on a platform) with the intention to break into an
+     * attached debugger.
+     */
+    static inline void DebugBreak ()
+    {
+    #  if defined (CS_PLATFORM_WIN32)
+      ::DebugBreak();
+    #  elif defined (CS_PROCESSOR_X86)
+    #    if defined (CS_COMPILER_GCC)
+      asm ("int $3");
+    #    else
+      _asm int 3;
+    #    endif
+    #  else
+      static int x = 0; x /= x;
+    #  endif
+    }
   } // namespace Debug
 } // namespace CS
 
-#ifdef CS_DEBUG
-#  if !defined (CS_DEBUG_BREAK)
-#    if defined (CS_PLATFORM_WIN32)
-#      define CS_DEBUG_BREAK ::DebugBreak()
-#    elif defined (CS_PROCESSOR_X86)
-#      if defined (CS_COMPILER_GCC)
-#        define CS_DEBUG_BREAK asm ("int $3")
-#      else
-#        define CS_DEBUG_BREAK _asm int 3
-#      endif
-#    else
-#      define CS_DEBUG_BREAK { static int x = 0; x /= x; }
-#    endif
-#  endif
+#if defined(CS_DEBUG) || defined(CS_WITH_ASSERTIONS)
+#  define CS_DEBUG_BREAK	CS::Debug::DebugBreak()
 #  if !defined (CS_ASSERT_MSG)
 #   define CS_ASSERT_MSG(msg,x) 					\
       if (!(x)) CS::Debug::AssertMessage (#x, __FILE__, __LINE__, msg);

@@ -183,7 +183,6 @@
   INTERFACE_APPLY(iObjectRegistry)
   INTERFACE_APPLY(iPath)
   INTERFACE_APPLY(iPluginManager)
-  INTERFACE_APPLY(iPolygonMesh)
   INTERFACE_APPLY(iReporter)
   INTERFACE_APPLY(iReporterIterator)
   INTERFACE_APPLY(iReporterListener)

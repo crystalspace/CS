@@ -114,6 +114,8 @@ public:									\
   virtual int GetRefCount ();						\
   virtual void AddRefOwner (void** ref_owner);				\
   virtual void RemoveRefOwner (void** ref_owner);			\
+  scfInterfaceMetadataList* GetInterfaceMetadata () \
+  { return 0; } \
   virtual void *QueryInterface (scfInterfaceID iInterfaceID, int iVersion)
 
 /**
@@ -776,18 +778,6 @@ inline csPtr<Interface> scfQueryInterface (ClassPtr object)
   return csPtr<Interface> (x);
 }
 
-template<class Interface, class ClassPtr>
-inline CS_DEPRECATED_METHOD_MSG ("SCF_QUERY_INTERFACE macro is deprecated")
-csPtr<Interface> SCF_QUERY_INTERFACE_is_deprecated (ClassPtr object)
-{
-  return scfQueryInterface<Interface> (object);
-}
-/**
- * \deprecated Compatibility macro for scfQueryInterface
- */
-#define SCF_QUERY_INTERFACE(Object,Interface) \
-  SCF_QUERY_INTERFACE_is_deprecated<Interface> (Object)
-
 /**
  * Helper function around iBase::QueryInterface which also 
  * does null-check of object.
@@ -802,18 +792,6 @@ inline csPtr<Interface> scfQueryInterfaceSafe (ClassPtr object)
     scfInterfaceTraits<Interface>::GetVersion ());
   return csPtr<Interface> (x);
 }
-
-template<class Interface, class ClassPtr>
-inline CS_DEPRECATED_METHOD_MSG ("SCF_QUERY_INTERFACE_SAFE macro is deprecated")
-csPtr<Interface> SCF_QUERY_INTERFACE_SAFE_is_deprecated (ClassPtr object)
-{
-  return scfQueryInterfaceSafe<Interface> (object);
-}
-/**
- * \deprecated Compatibility macro for scfQueryInterfaceSafe
- */
-#define SCF_QUERY_INTERFACE_SAFE(Object,Interface) \
-  SCF_QUERY_INTERFACE_SAFE_is_deprecated<Interface> (Object)
 
 /**
  * Handy function to create an instance of a shared class.

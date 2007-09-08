@@ -36,7 +36,7 @@ struct iObjectRegistry;
  * - All plugins implement this interface.
  *
  * Main ways to get pointers to this interface:
- * - SCF_QUERY_INTERFACE() from a plugin instance.
+ * - scfQueryInterface() from a plugin instance.
  *
  * Main users of this interface:
  * - csPluginManager

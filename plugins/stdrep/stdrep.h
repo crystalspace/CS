@@ -51,14 +51,14 @@ public:
   csTimedMessage () : msg (0) { }
   csTimedMessage (const char* m)
   {
-    msg = csStrNew (m);
+    msg = CS::StrDup (m);
     time = 0;
   }
 
 protected:
   virtual ~csTimedMessage ()
   {
-    delete[] msg;
+    cs_free (msg);
   }
 };
 

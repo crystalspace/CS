@@ -62,7 +62,7 @@ csVector3 camera_pos (3, 5, 1);
 csVector3 look_at_pos (3, 5, 10);
 csVector3 up (0, 1, 0);
 camera->GetTransform ().Move (camera_pos);
-camera->GetTransform ().LookAt (camera_pos - look_at_pos, up);
+camera->GetTransform ().LookAt (look_at_pos - camera_pos, up);
 @end example
 
 @subsubheading Include Files
