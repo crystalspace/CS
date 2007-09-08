@@ -17,6 +17,8 @@ chronological order.
 	  to out/.../bindings/python.
 	- res added two new targets: "bindings" and "install_bindings" to build
 	  resp. install bindings.
+	- res changed the output/install directory to bindings/python/cspace.
+	- res added a 'bindingsclean' target.
 7-Sep-2007
 	- res fixed the debug info splitting to put the debug info file into
 	  the same file as the binary (fixes separate debug info for shared
