@@ -19,6 +19,8 @@ chronological order.
 	  resp. install bindings.
 	- res changed the output/install directory to bindings/python/cspace.
 	- res added a 'bindingsclean' target.
+	- res changed the python modules to not abuse the plugin rule under
+	  MSVC to get built as a DLL any more.
 7-Sep-2007
 	- res fixed the debug info splitting to put the debug info file into
 	  the same file as the binary (fixes separate debug info for shared

@@ -39,12 +39,14 @@ rule PythMod
   local cleantarget ;
   if [ Property build : projgen ]
   {
+    RegisterCompileGroups bindings ;
+    
     Description $(2) : $(desc) ;
-    MSVCGEN.PLUGIN_EXT.$(2) = .pyd ;
-    Plugin $(2) : $(3) ;
+    DLL $(2) : $(3) : .pyd ;
     LinkWith $(2) : $(4) ;
     ExternalLibs $(2) : PYTHON $(6) ;
     Depends $(2) : $(1) ;
+    CompileGroups $(2) : all bindings ;
   }
   else
   {
@@ -91,3 +93,9 @@ rule PythMod
   Depends clean : $(<)clean ;
 }
 
+
+# Construct pseudo target plugins
+# @@@ Here?
+Depends exe : bindings ;
+NotFile bindings ;
+Help bindings : "Build all bindings for other languages" ;

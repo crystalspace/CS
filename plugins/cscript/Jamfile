@@ -1,9 +1,5 @@
 SubDir TOP plugins cscript ;
 
-# Construct pseudo target bindings
-NotFile bindings ;
-Help bindings : "Build all bindings for other languages" ;
-
 if $(PYTHON.AVAILABLE) = "yes"
 {
   ##  PyBindingModule target : module name : glue : LinkWith : ExternalLibs : desc ;
