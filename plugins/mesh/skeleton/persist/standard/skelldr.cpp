@@ -366,7 +366,7 @@ const char *csSkeletonFactoryLoader::ParseFrame (iDocumentNode* node,
         break;
       }
       }
-        frame->AddTransform(bone_fact, key_transform, relative);
+        frame->AddTransform(bone_fact, key_transform);
         }
         break;
     }

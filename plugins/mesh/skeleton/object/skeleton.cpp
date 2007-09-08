@@ -186,7 +186,7 @@ void csSkeletonBone::UpdateBones ()
   while (it.HasNext ())
   {
     csSkeletonBone *bone = it.Next ();
-    bone->GetFullTransform () = bone->GetTransform () * transform;
+    bone->GetFullTransform () = bone->GetTransform () * full_transform;
     bone->UpdateBones ();
   }
 }

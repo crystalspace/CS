@@ -1,0 +1,2096 @@
+<skelfact>
+<bone name="base">
+<move>
+<v x="-5.63910340645e-08" y="0.968464016914" z="0.308514803648" />
+<matrix>
+<rotx>3.13526365126</rotx>
+<rotz>5.75769364692e-05</rotz>
+<roty>1.81631025979e-07</roty>
+</matrix>
+</move>
+<bone name=" pelvis">
+<move>
+<v x="-9.58329664513e-08" y="-0.00166445341893" z="0.262991577387" />
+<matrix>
+<rotx>-1.05736889577</rotx>
+<rotz>5.74368254902e-05</rotz>
+<roty>-2.50576627999e-07</roty>
+</matrix>
+</move>
+<bone name="abdomen">
+<move>
+<v x="-5.23465355552e-16" y="3.82389053755e-08" z="0.0740292444825" />
+<matrix>
+<rotx>-0.394370281862</rotx>
+<rotz>9.98108003776e-08</rotz>
+<roty>-7.81870822026e-08</roty>
+</matrix>
+</move>
+<bone name="chest">
+<move>
+<v x="-5.23962299194e-16" y="1.02497410559e-09" z="0.1278411448" />
+<matrix>
+<rotx>-0.180787209217</rotx>
+<rotz>3.59447591483e-08</rotz>
+<roty>-3.06277182277e-08</roty>
+</matrix>
+</move>
+<bone name="neck">
+<move>
+<v x="-6.6540658405e-18" y="1.69699110319e-09" z="0.211406782269" />
+<matrix>
+<rotx>0.185195856019</rotx>
+<rotz>-3.04980322702e-08</rotz>
+<roty>3.76324881791e-08</roty>
+</matrix>
+</move>
+<bone name="head">
+<move>
+<v x="-1.60666225875e-15" y="-2.16760209781e-09" z="0.205132573843" />
+<matrix>
+<rotx>1.55995326642</rotx>
+<rotz>2.43766407818e-07</rotz>
+<roty>-3.63808042954e-06</roty>
+</matrix>
+</move>
+</bone>
+</bone>
+<bone name="shoulder.L">
+<move>
+<v x="-1.33892170863e-15" y="1.69699110319e-09" z="0.211406782269" />
+<matrix>
+<rotx>0.138314891448</rotx>
+<rotz>-1.63561380614</rotz>
+<roty>1.84021941269</roty>
+</matrix>
+</move>
+<bone name="uarm.L">
+<move>
+<v x="-2.68854005725e-09" y="6.01253091759e-08" z="0.187517657876" />
+<matrix>
+<rotx>0.152351090296</rotx>
+<rotz>0.151657553213</rotz>
+<roty>-0.00309511073458</roty>
+</matrix>
+</move>
+<bone name="arm.L">
+<move>
+<v x="-3.30020855088e-09" y="4.4205489047e-08" z="0.282872885466" />
+<matrix>
+<rotx>0.0425233922051</rotx>
+<rotz>0.0434707576674</rotz>
+<roty>0.042802241816</roty>
+</matrix>
+</move>
+<bone name="hand.L">
+<move>
+<v x="-1.27665100713e-09" y="-1.00552446369e-08" z="0.220042392612" />
+<matrix>
+<rotx>-0.104603158598</rotx>
+<rotz>-0.101171975139</rotz>
+<roty>-0.0496935830943</roty>
+</matrix>
+</move>
+<bone name="ufingers.L">
+<move>
+<v x="9.08501052166e-10" y="-1.49802104055e-09" z="0.0494092032313" />
+<matrix>
+<rotx>-0.0850855833383</rotx>
+<rotz>-0.0844028903152</rotz>
+<roty>-0.010556819455</roty>
+</matrix>
+</move>
+<bone name="mfingers.L">
+<move>
+<v x="5.49026379915e-09" y="-2.14873860926e-08" z="0.0237137433141" />
+<matrix>
+<rotx>0.0783360928387</rotx>
+<rotz>0.07796760289</rotz>
+<roty>-0.000703189415614</roty>
+</matrix>
+</move>
+<bone name="fingers.L">
+<move>
+<v x="3.86755694137e-09" y="-9.16697260323e-08" z="0.0236427672207" />
+<matrix>
+<rotx>-0.163253955285</rotx>
+<rotz>-0.158979165617</rotz>
+<roty>-0.024530426735</roty>
+</matrix>
+</move>
+</bone>
+</bone>
+</bone>
+</bone>
+</bone>
+</bone>
+</bone>
+<bone name="shoulder.R">
+<move>
+<v x="-8.6231689107e-13" y="1.69699110319e-09" z="0.211406782269" />
+<matrix>
+<rotx>0.139058504281</rotx>
+<rotz>1.63493416743</rotz>
+<roty>-1.8402841275</roty>
+</matrix>
+</move>
+<bone name="uarm.R">
+<move>
+<v x="8.46183922931e-09" y="-4.17495868987e-08" z="0.1855828017" />
+<matrix>
+<rotx>0.149927314098</rotx>
+<rotz>-0.149317833038</rotz>
+<roty>0.00279133820111</roty>
+</matrix>
+</move>
+<bone name="arm.R">
+<move>
+<v x="7.45217054732e-10" y="-3.93437709079e-08" z="0.276810020208" />
+<matrix>
+<rotx>0.0536038317826</rotx>
+<rotz>-0.0550014545615</rotz>
+<roty>-0.0401250824854</roty>
+</matrix>
+</move>
+<bone name="hand.R">
+<move>
+<v x="1.94018721089e-08" y="-6.20472384583e-09" z="0.227362245321" />
+<matrix>
+<rotx>-0.183845799794</rotx>
+<rotz>0.176438400315</rotz>
+<roty>0.0636826856025</roty>
+</matrix>
+</move>
+<bone name="ufingers.R">
+<move>
+<v x="7.40531103105e-09" y="3.61721386177e-09" z="0.048360478133" />
+<matrix>
+<rotx>0.0587625371005</rotx>
+<rotz>-0.059079931807</rotz>
+<roty>-0.00283450923872</roty>
+</matrix>
+</move>
+<bone name="mfingers.R">
+<move>
+<v x="2.52027421155e-09" y="1.89977082954e-08" z="0.0257751625031" />
+<matrix>
+<rotx>-0.0391656038013</rotx>
+<rotz>0.0391139967328</rotz>
+<roty>0.00341296499239</roty>
+</matrix>
+</move>
+<bone name="fingers.R">
+<move>
+<v x="-9.02329055918e-09" y="-7.72598411913e-08" z="0.0223210640252" />
+<matrix>
+<rotx>-0.143396327643</rotx>
+<rotz>0.140201749403</rotz>
+<roty>0.032667601013</roty>
+</matrix>
+</move>
+</bone>
+</bone>
+</bone>
+</bone>
+</bone>
+</bone>
+</bone>
+</bone>
+</bone>
+</bone>
+<bone name="hip.L">
+<move>
+<v x="-8.75091004104e-08" y="-0.00166445341893" z="0.262991577387" />
+<matrix>
+<rotx>1.40483718241</rotx>
+<rotz>0.803652268457</rotz>
+<roty>-0.184000745836</roty>
+</matrix>
+</move>
+<bone name="thigh.L">
+<move>
+<v x="7.53082218807e-09" y="2.88951307326e-09" z="0.119804374874" />
+<matrix>
+<rotx>0.150651477533</rotx>
+<rotz>-0.199628624521</rotz>
+<roty>-0.694880580318</roty>
+</matrix>
+</move>
+<bone name="leg.L">
+<move>
+<v x="9.68446123295e-09" y="2.5947866078e-09" z="0.441814571619" />
+<matrix>
+<rotx>0.0809155058349</rotx>
+<rotz>1.07921587146</rotz>
+<roty>-0.217275495562</roty>
+</matrix>
+</move>
+<bone name="foot.L">
+<move>
+<v x="-2.97942559513e-09" y="-8.38485103571e-09" z="0.39102396369" />
+<matrix>
+<rotx>-0.977956494698</rotx>
+<rotz>-1.1717373501</rotz>
+<roty>0.0793279955091</roty>
+</matrix>
+</move>
+</bone>
+</bone>
+</bone>
+</bone>
+<bone name="hip.R">
+<move>
+<v x="-8.75091004104e-08" y="-0.00166445341893" z="0.262991577387" />
+<matrix>
+<rotx>1.4048032271</rotx>
+<rotz>-0.803539017532</rotz>
+<roty>0.183974114225</roty>
+</matrix>
+</move>
+<bone name="thigh.R">
+<move>
+<v x="2.54793253163e-08" y="-6.44517061943e-09" z="0.119804501534" />
+<matrix>
+<rotx>0.150653591417</rotx>
+<rotz>0.199637446242</rotz>
+<roty>0.694878915842</roty>
+</matrix>
+</move>
+<bone name="leg.R">
+<move>
+<v x="1.50811363397e-08" y="-2.3556137041e-09" z="0.441814720631" />
+<matrix>
+<rotx>0.167126923879</rotx>
+<rotz>-1.33938600388</rotz>
+<roty>0.308661468894</roty>
+</matrix>
+</move>
+<bone name="foot.R">
+<move>
+<v x="-1.27707711073e-09" y="6.10739148144e-09" z="0.391024917364" />
+<matrix>
+<rotx>-0.831192549922</rotx>
+<rotz>1.43145374645</rotz>
+<roty>-0.221936060759</roty>
+</matrix>
+</move>
+</bone>
+</bone>
+</bone>
+</bone>
+</bone>
+<script name="attack_fists">
+<frame duration="0.0">
+<bone name="head"><move><matrix><rotx>1.55995326642</rotx><rotz>2.43766471312e-07</rotz><roty>-3.63808068352e-06</roty></matrix>
+<v x="-1.92817717348e-09" y="8.57729443027e-09" z="0.205132618546"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.185195856019</rotx><rotz>-3.0498030286e-08</rotz><roty>3.76324881791e-08</roty></matrix>
+<v x="9.23865151048e-10" y="2.72247824284e-09" z="0.211406812072"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.222622989873</rotx><rotz>0.155395566119</rotz><roty>1.51119185212</roty></matrix>
+<v x="-8.11380740373e-09" y="-1.54886570236e-09" z="0.0236427839845"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.476407561082</rotx><rotz>0.110050721187</rotz><roty>1.47507153142</roty></matrix>
+<v x="-8.51801829072e-08" y="-9.07463526545e-09" z="0.0237137321383"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>-0.000995576415278</rotx><rotz>-0.342612112261</rotz><roty>0.0797711621593</roty></matrix>
+<v x="-3.61839376239e-08" y="-5.60647350767e-09" z="0.0494092144072"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>-0.079070650924</rotx><rotz>-0.0967567952694</rotz><roty>-0.100521223405</roty></matrix>
+<v x="-4.47447767726e-08" y="2.11946193929e-09" z="0.220042318106"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>1.71353576911</rotx><rotz>0.232882551656</rotz><roty>1.19151265277</roty></matrix>
+<v x="9.95198057296e-09" y="4.51214177133e-09" z="0.282872885466"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>0.92910087108</rotx><rotz>0.474644082387</rotz><roty>1.32861431622</roty></matrix>
+<v x="-1.46878766927e-08" y="-2.60703245658e-08" z="0.187517672777"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>0.034248582433</rotx><rotz>-2.08206533234</rotz><roty>1.46980965773</roty></matrix>
+<v x="-3.26037472576e-08" y="9.02905625821e-08" z="0.211406826973"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.0887939935443</rotx><rotz>0.31034275578</rotz><roty>-1.52775631463</roty></matrix>
+<v x="-1.17801879362e-11" y="1.91143172401e-08" z="0.0223211031407"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>-0.0363600343331</rotx><rotz>0.271842184915</rotz><roty>-1.26042594072</roty></matrix>
+<v x="-4.56855353548e-08" y="1.94933775788e-08" z="0.025775199756"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.100555303544</rotx><rotz>0.0257368761595</rotz><roty>-0.304726149041</roty></matrix>
+<v x="1.97741361063e-08" y="-9.31604660082e-09" z="0.0483604967594"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>0.082951442554</rotx><rotz>0.147785383567</rotz><roty>0.0483928660896</roty></matrix>
+<v x="-1.70028524593e-08" y="2.44447786457e-08" z="0.227362260222"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>1.98236390482</rotx><rotz>-0.897802003789</rotz><roty>-0.225009415236</roty></matrix>
+<v x="1.06431086166e-09" y="-4.65002543137e-08" z="0.276809990406"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>0.370343841718</rotx><rotz>0.177214245719</rotz><roty>-1.99270589144</roty></matrix>
+<v x="2.29614407488e-08" y="1.31433020023e-09" z="0.185582816601"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>0.460295835961</rotx><rotz>2.11693023891</rotz><roty>-2.00972482238</roty></matrix>
+<v x="2.8404593877e-07" y="-1.10526677588e-07" z="0.211406171322"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.171805249032</rotx><rotz>3.40129882061e-08</rotz><roty>-3.3249609186e-08</roty></matrix>
+<v x="-9.8512742408e-10" y="3.49758733087e-09" z="0.127841189504"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.520352848283</rotx><rotz>9.87318903573e-08</rotz><roty>-6.92547498177e-08</roty></matrix>
+<v x="-2.50419307513e-09" y="4.47374848278e-09" z="0.0740292444825"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.01275255855</rotx><rotz>5.74388491935e-05</rotz><roty>-2.47170962329e-07</roty></matrix>
+<v x="-9.72460014736e-08" y="-0.00166441360489" z="0.262991577387"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>-0.322876790292</rotx><rotz>-1.03369938579</rotz><roty>0.617862361067</roty></matrix>
+<v x="-2.85423329416e-09" y="-8.26719492864e-09" z="0.391023933887"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.337013515149</rotx><rotz>1.16142399246</rotz><roty>-0.118542643086</roty></matrix>
+<v x="1.19193250825e-08" y="-1.61999462733e-08" z="0.441814661026"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.678605403685</rotx><rotz>-0.267168104175</rotz><roty>-0.606713902691</roty></matrix>
+<v x="-2.46939979576e-09" y="2.631989382e-08" z="0.11980445683"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.25873536606</rotx><rotz>0.636639044912</rotz><roty>-0.0998430411105</roty></matrix>
+<v x="-1.58718492571e-07" y="-0.00166450510733" z="0.262991249561"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>1.56128950749</rotx><rotz>0.324509407909</rotz><roty>-2.76508106394</roty></matrix>
+<v x="-2.88859052233e-08" y="-5.19785858799e-09" z="0.391024976969"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>0.719909767191</rotx><rotz>-1.11878491919</rotz><roty>0.640107612494</roty></matrix>
+<v x="3.56593066186e-09" y="-2.98997342441e-08" z="0.441814720631"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.227641600434</rotx><rotz>0.0470374877035</rotz><roty>0.646776833654</roty></matrix>
+<v x="1.1055296234e-08" y="3.42880213111e-09" z="0.119804538786"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.78219046412</rotx><rotz>-0.602304839769</rotz><roty>0.721221507186</roty></matrix>
+<v x="7.03699754467e-07" y="-0.00166427262593" z="0.262990295887"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.13526365126</rotx><rotz>5.75769364692e-05</rotz><roty>1.81631025979e-07</roty></matrix>
+<v x="0.0270796343684" y="0.167875692248" z="0.0172589886934"/>
+</move></bone></frame>
+<frame duration="125.0">
+<bone name="head"><move><matrix><rotx>1.55995326642</rotx><rotz>2.45939704693e-07</rotz><roty>-3.642094565e-06</roty></matrix>
+<v x="-4.33977334069e-08" y="7.17023169727e-08" z="0.205132544041"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.0543145670597</rotx><rotz>-0.0098246342879</rotz><roty>0.0356887429685</roty></matrix>
+<v x="2.89005974707e-08" y="-6.90555239657e-08" z="0.211406782269"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.222622973228</rotx><rotz>0.155395566119</rotz><roty>1.51119185212</roty></matrix>
+<v x="-1.00366150946e-08" y="-6.83281129454e-08" z="0.0236427653581"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.476407594372</rotx><rotz>0.110050729509</rotz><roty>1.47507153142</roty></matrix>
+<v x="2.86986558962e-08" y="-5.1545214319e-08" z="0.0237137190998"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>-0.00099558317721</rotx><rotz>-0.342612078971</rotz><roty>0.0797711954488</roty></matrix>
+<v x="1.03136752472e-08" y="8.70469492043e-08" z="0.0494092851877"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>0.0763598525399</rotx><rotz>-0.0821028096279</rotz><roty>-0.0586065299561</roty></matrix>
+<v x="-6.18213107373e-08" y="2.61702535198e-08" z="0.220042228699"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>1.77411069969</rotx><rotz>0.681731688489</rotz><roty>0.648914486482</roty></matrix>
+<v x="6.51794138662e-08" y="-1.15495808473e-07" z="0.282873094082"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>0.507787521627</rotx><rotz>0.0895260549161</rotz><roty>1.80855709049</roty></matrix>
+<v x="-1.40484260669e-07" y="-4.51370638643e-08" z="0.187517747283"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>0.206895941727</rotx><rotz>-2.09808903998</rotz><roty>1.88521232088</roty></matrix>
+<v x="2.81745702324e-08" y="-7.66815233533e-08" z="0.211406812072"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.0887940351562</rotx><rotz>0.31034275578</rotz><roty>-1.52775631463</roty></matrix>
+<v x="-1.29926593928e-08" y="-1.35266560619e-07" z="0.0223211012781"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>-0.0363600676226</rotx><rotz>0.271842184915</rotz><roty>-1.26042594072</roty></matrix>
+<v x="1.36123418315e-07" y="7.59556186836e-08" z="0.0257752742618"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.100555295222</rotx><rotz>0.0257369614639</rotz><roty>-0.304726149041</roty></matrix>
+<v x="-1.96636698035e-08" y="-4.74118344584e-09" z="0.0483604855835"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.103636364543</rotx><rotz>0.149922869948</rotz><roty>0.197463224883</roty></matrix>
+<v x="-8.05463002962e-08" y="-7.6490863421e-08" z="0.227362200618"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>1.1417464278</rotx><rotz>-1.22238428244</rotz><roty>-0.6829519489</roty></matrix>
+<v x="2.14684821032e-08" y="-1.28528412802e-07" z="0.276809990406"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>0.359354573796</rotx><rotz>1.04946410102</rotz><roty>-0.956003325463</roty></matrix>
+<v x="-2.1127392813e-07" y="4.17584438139e-08" z="0.185582771897"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>0.362754531691</rotx><rotz>2.0202668124</rotz><roty>-1.51753869763</roty></matrix>
+<v x="2.76057136261e-07" y="-8.07572178019e-08" z="0.211406156421"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.163835806049</rotx><rotz>0.0841960209552</rotz><roty>0.0465805308723</roty></matrix>
+<v x="4.37450040636e-08" y="-2.41448674387e-07" z="0.127841204405"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.464363115447</rotx><rotz>0.158609169317</rotz><roty>0.0817411190623</roty></matrix>
+<v x="-7.3867840733e-09" y="-3.88293628362e-08" z="0.0740293264389"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.01278152043</rotx><rotz>0.000607283952322</rotz><roty>0.0869318613759</roty></matrix>
+<v x="-9.63045962976e-08" y="-0.00166442396585" z="0.262991666794"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>0.822751261373</rotx><rotz>-1.19505878492</rotz><roty>1.85339060849</roty></matrix>
+<v x="3.05860687888e-08" y="1.41344713711e-11" z="0.39102396369"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.834136674507</rotx><rotz>1.08800603411</rotz><roty>-0.551923324715</roty></matrix>
+<v x="-5.41451683489e-09" y="-3.0837480125e-08" z="0.441814661026"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.575157241407</rotx><rotz>-0.248993294737</rotz><roty>-0.680546515225</roty></matrix>
+<v x="-3.918141811e-09" y="-4.71610057673e-08" z="0.119804412127"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.0470480147</rotx><rotz>0.484611328952</rotz><roty>-0.185190096934</roty></matrix>
+<v x="-1.5777708029e-07" y="-0.00166451488622" z="0.262991428375"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>0.989497103545</rotx><rotz>1.14863056606</rotz><roty>-1.8903994929</roty></matrix>
+<v x="-3.73717199409e-08" y="-1.32742510317e-08" z="0.391024917364"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>0.347794424005</rotx><rotz>-1.28483208105</rotz><roty>0.112350618782</roty></matrix>
+<v x="2.93117405903e-08" y="-7.62796048548e-09" z="0.441814661026"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.619036415634</rotx><rotz>0.28273096844</rotz><roty>0.601678331123</roty></matrix>
+<v x="1.19297709489e-08" y="-1.82933810322e-08" z="0.119804531336"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.57046116797</rotx><rotz>-0.714537239166</rotz><roty>0.384661528371</roty></matrix>
+<v x="7.04641195171e-07" y="-0.00166428252123" z="0.262990474701"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.13526365126</rotx><rotz>5.75769364692e-05</rotz><roty>1.81631025979e-07</roty></matrix>
+<v x="0.0270731635392" y="0.0675112977624" z="-1.92201387882"/>
+</move></bone></frame>
+<frame duration="83.3333333333">
+<bone name="head"><move><matrix><rotx>1.55995326642</rotx><rotz>2.54534523019e-07</rotz><roty>-3.64266703329e-06</roty></matrix>
+<v x="-7.43252499547e-08" y="3.45063604357e-08" z="0.205132588744"/>
+</move></bone><bone name="neck"><move><matrix><rotx>-0.0169943497612</rotx><rotz>-0.0171336892623</rotz><roty>0.0545515218177</roty></matrix>
+<v x="-2.1934285499e-08" y="1.56968511078e-07" z="0.211406752467"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.222623039807</rotx><rotz>0.155395566119</rotz><roty>1.51119185212</roty></matrix>
+<v x="-4.98019367967e-08" y="8.13954272871e-08" z="0.0236425790936"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.476407561082</rotx><rotz>0.110050771121</rotz><roty>1.47507153142</roty></matrix>
+<v x="6.3378337245e-08" y="1.41718572877e-07" z="0.0237137451768"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>-0.000995592019737</rotx><rotz>-0.34261214555</rotz><roty>0.0797711704816</roty></matrix>
+<v x="2.94467071171e-07" y="1.20019933547e-07" z="0.0494095273316"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>0.160832958762</rotx><rotz>-0.0714232506958</rotz><roty>-0.0368516205808</roty></matrix>
+<v x="-1.89311855081e-08" y="1.78408654961e-07" z="0.220042526722"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>1.96853810402</rotx><rotz>0.884388793222</rotz><roty>0.237894720697</roty></matrix>
+<v x="2.58355257188e-08" y="-6.84258267825e-08" z="0.282872736454"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>0.367175379101</rotx><rotz>-0.175994551229</rotz><roty>1.99220881242</roty></matrix>
+<v x="1.33157641358e-07" y="-4.60050486595e-08" z="0.187517717481"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>0.288321209884</rotx><rotz>-2.12088450049</rotz><roty>2.09969732297</roty></matrix>
+<v x="-2.84924794869e-09" y="1.67955889196e-07" z="0.211406767368"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.0887940101891</rotx><rotz>0.31034272249</rotz><roty>-1.52775631463</roty></matrix>
+<v x="-6.93853507983e-08" y="6.27402201303e-08" z="0.0223207883537"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>-0.03635998856</rotx><rotz>0.271842184915</rotz><roty>-1.26042594072</roty></matrix>
+<v x="2.92558688386e-08" y="5.73977914087e-08" z="0.02577508986"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.100555328511</rotx><rotz>0.0257369260938</rotz><roty>-0.304726149041</roty></matrix>
+<v x="-2.53637395531e-08" y="-9.72639782049e-08" z="0.0483604706824"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.20487387009</rotx><rotz>0.139529151425</rotz><roty>0.278134768517</roty></matrix>
+<v x="-1.44490257981e-07" y="-1.48938084976e-07" z="0.227362141013"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>0.211263076506</rotx><rotz>-1.03528523164</rotz><roty>-0.202006644282</roty></matrix>
+<v x="2.99528437608e-08" y="5.89389550498e-08" z="0.276809990406"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>0.944694345052</rotx><rotz>0.640650497883</rotz><roty>-0.832123258144</roty></matrix>
+<v x="-2.03335481785e-08" y="6.56180674241e-08" z="0.185582950711"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>0.256758656356</rotx><rotz>1.98176748989</rotz><roty>-1.20068204956</roty></matrix>
+<v x="3.13183022627e-07" y="-2.6527711583e-08" z="0.211406096816"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.157786169317</rotx><rotz>0.13000713546</rotz><roty>0.0724817407158</roty></matrix>
+<v x="7.14785119982e-09" y="-9.07406345618e-08" z="0.127841174603"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.438739444439</rotx><rotz>0.246885818853</rotz><roty>0.123538208982</roty></matrix>
+<v x="1.62873572407e-08" y="-5.19491578643e-08" z="0.0740291178226"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.01281740653</rotx><rotz>0.000905160145712</rotz><roty>0.134426518131</roty></matrix>
+<v x="-9.64643689372e-08" y="-0.00166442722548" z="0.26299148798"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>-1.81313213493</rotx><rotz>-2.10884221867</rotz><roty>-0.733429171307</roty></matrix>
+<v x="7.04381832861e-08" y="1.68170473103e-08" z="0.391024023294"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>1.03489461249</rotx><rotz>1.01629815807</rotz><roty>-0.717220107648</roty></matrix>
+<v x="-5.58905099979e-08" y="2.68904898348e-07" z="0.441814631224"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.519537388357</rotx><rotz>-0.235997850921</rotz><roty>-0.719787661255</roty></matrix>
+<v x="2.81537770874e-09" y="-8.39473202063e-08" z="0.119804471731"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>0.932348795766</rotx><rotz>0.409167936722</rotz><roty>-0.243319746285</roty></matrix>
+<v x="-1.5793669661e-07" y="-0.00166451535188" z="0.262991249561"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>-0.213055533723</rotx><rotz>1.12782235635</rotz><roty>-0.550741080928</roty></matrix>
+<v x="-2.66036570551e-09" y="-6.32375076748e-08" z="0.391024917364"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>-0.0649053012471</rotx><rotz>-1.32767714983</rotz><roty>-0.383778290995</roty></matrix>
+<v x="8.03716382336e-09" y="-4.56112481118e-09" z="0.441814780235"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.848719012793</rotx><rotz>0.397691942821</rotz><roty>0.535523412274</roty></matrix>
+<v x="-5.46279110836e-09" y="5.88757416153e-08" z="0.11980458349"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.43021830602</rotx><rotz>-0.748879766687</rotz><roty>0.178639735982</roty></matrix>
+<v x="7.0448140832e-07" y="-0.00166428578086" z="0.262990295887"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.13526365126</rotx><rotz>5.75769364692e-05</rotz><roty>1.81631025979e-07</roty></matrix>
+<v x="0.0270696077496" y="0.0119750304148" z="-2.86765265465"/>
+</move></bone></frame>
+<frame duration="291.666666667">
+<bone name="head"><move><matrix><rotx>1.55995326642</rotx><rotz>2.43766471312e-07</rotz><roty>-3.63808068352e-06</roty></matrix>
+<v x="-1.92817717348e-09" y="8.57729443027e-09" z="0.205132618546"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.185195856019</rotx><rotz>-3.0498030286e-08</rotz><roty>3.76324881791e-08</roty></matrix>
+<v x="9.23865151048e-10" y="2.72247824284e-09" z="0.211406812072"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.222622989873</rotx><rotz>0.155395566119</rotz><roty>1.51119185212</roty></matrix>
+<v x="-8.11380740373e-09" y="-1.54886570236e-09" z="0.0236427839845"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.476407561082</rotx><rotz>0.110050721187</rotz><roty>1.47507153142</roty></matrix>
+<v x="-8.51801829072e-08" y="-9.07463526545e-09" z="0.0237137321383"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>-0.000995576415278</rotx><rotz>-0.342612112261</rotz><roty>0.0797711621593</roty></matrix>
+<v x="-3.61839376239e-08" y="-5.60647350767e-09" z="0.0494092144072"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>-0.079070650924</rotx><rotz>-0.0967567952694</rotz><roty>-0.100521223405</roty></matrix>
+<v x="-4.47447767726e-08" y="2.11946193929e-09" z="0.220042318106"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>1.71353576911</rotx><rotz>0.232882551656</rotz><roty>1.19151265277</roty></matrix>
+<v x="9.95198057296e-09" y="4.51214177133e-09" z="0.282872885466"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>0.92910087108</rotx><rotz>0.474644082387</rotz><roty>1.32861431622</roty></matrix>
+<v x="-1.46878766927e-08" y="-2.60703245658e-08" z="0.187517672777"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>0.034248582433</rotx><rotz>-2.08206533234</rotz><roty>1.46980965773</roty></matrix>
+<v x="-3.26037472576e-08" y="9.02905625821e-08" z="0.211406826973"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.0887939935443</rotx><rotz>0.31034275578</rotz><roty>-1.52775631463</roty></matrix>
+<v x="-1.17801879362e-11" y="1.91143172401e-08" z="0.0223211031407"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>-0.0363600343331</rotx><rotz>0.271842184915</rotz><roty>-1.26042594072</roty></matrix>
+<v x="-4.56855353548e-08" y="1.94933775788e-08" z="0.025775199756"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.100555303544</rotx><rotz>0.0257368761595</rotz><roty>-0.304726149041</roty></matrix>
+<v x="1.97741361063e-08" y="-9.31604660082e-09" z="0.0483604967594"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>0.082951442554</rotx><rotz>0.147785383567</rotz><roty>0.0483928660896</roty></matrix>
+<v x="-1.70028524593e-08" y="2.44447786457e-08" z="0.227362260222"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>1.98236390482</rotx><rotz>-0.897802003789</rotz><roty>-0.225009415236</roty></matrix>
+<v x="1.06431086166e-09" y="-4.65002543137e-08" z="0.276809990406"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>0.370343841718</rotx><rotz>0.177214245719</rotz><roty>-1.99270589144</roty></matrix>
+<v x="2.29614407488e-08" y="1.31433020023e-09" z="0.185582816601"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>0.460295835961</rotx><rotz>2.11693023891</rotz><roty>-2.00972482238</roty></matrix>
+<v x="2.8404593877e-07" y="-1.10526677588e-07" z="0.211406171322"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.171805249032</rotx><rotz>3.40129882061e-08</rotz><roty>-3.3249609186e-08</roty></matrix>
+<v x="-9.8512742408e-10" y="3.49758733087e-09" z="0.127841189504"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.520352848283</rotx><rotz>9.87318903573e-08</rotz><roty>-6.92547498177e-08</roty></matrix>
+<v x="-2.50419307513e-09" y="4.47374848278e-09" z="0.0740292444825"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.01275255855</rotx><rotz>5.74388491935e-05</rotz><roty>-2.47170962329e-07</roty></matrix>
+<v x="-9.72460014736e-08" y="-0.00166441360489" z="0.262991577387"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>-0.322876790292</rotx><rotz>-1.03369938579</rotz><roty>0.617862361067</roty></matrix>
+<v x="-2.85423329416e-09" y="-8.26719492864e-09" z="0.391023933887"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.337013515149</rotx><rotz>1.16142399246</rotz><roty>-0.118542643086</roty></matrix>
+<v x="1.19193250825e-08" y="-1.61999462733e-08" z="0.441814661026"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.678605403685</rotx><rotz>-0.267168104175</rotz><roty>-0.606713902691</roty></matrix>
+<v x="-2.46939979576e-09" y="2.631989382e-08" z="0.11980445683"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.25873536606</rotx><rotz>0.636639044912</rotz><roty>-0.0998430411105</roty></matrix>
+<v x="-1.58718492571e-07" y="-0.00166450510733" z="0.262991249561"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>1.56128950749</rotx><rotz>0.324509407909</rotz><roty>-2.76508106394</roty></matrix>
+<v x="-2.88859052233e-08" y="-5.19785858799e-09" z="0.391024976969"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>0.719909767191</rotx><rotz>-1.11878491919</rotz><roty>0.640107612494</roty></matrix>
+<v x="3.56593066186e-09" y="-2.98997342441e-08" z="0.441814720631"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.227641600434</rotx><rotz>0.0470374877035</rotz><roty>0.646776833654</roty></matrix>
+<v x="1.1055296234e-08" y="3.42880213111e-09" z="0.119804538786"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.78219046412</rotx><rotz>-0.602304839769</rotz><roty>0.721221507186</roty></matrix>
+<v x="7.03699754467e-07" y="-0.00166427262593" z="0.262990295887"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.13526365126</rotx><rotz>5.75769364692e-05</rotz><roty>1.81631025979e-07</roty></matrix>
+<v x="0.0270796343684" y="0.167875692248" z="0.0172589886934"/>
+</move></bone></frame>
+</script>
+<script name="default">
+<frame duration="0.0">
+<bone name="head"><move><matrix><rotx>1.55995326642</rotx><rotz>2.4376637607e-07</rotz><roty>-3.63808042954e-06</roty></matrix>
+<v x="8.72234522022e-13" y="1.55095563059e-08" z="0.205132514238"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.185195856019</rotx><rotz>-3.0498030286e-08</rotz><roty>3.76324881791e-08</roty></matrix>
+<v x="-2.50392392096e-14" y="-1.78455505928e-09" z="0.211406797171"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.213040320415</rotx><rotz>0.215367507089</rotz><roty>1.51015521667</roty></matrix>
+<v x="-8.75491323882e-09" y="1.5021056754e-07" z="0.0236427541822"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.445384530702</rotx><rotz>0.110218849876</rotz><roty>1.53112774341</roty></matrix>
+<v x="-2.04242276425e-08" y="7.94326240339e-08" z="0.0237137395889"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>-0.0402836820507</rotx><rotz>-0.230753071404</rotz><roty>-0.120105277823</roty></matrix>
+<v x="1.57907020792e-11" y="-2.8276687658e-08" z="0.049409199506"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>-0.104603150276</rotx><rotz>-0.101171975139</rotz><roty>-0.0496935830943</roty></matrix>
+<v x="5.54173773537e-09" y="-4.44516530251e-08" z="0.220042318106"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>0.0883434948788</rotx><rotz>-0.0592298552928</rotz><roty>0.203284062788</roty></matrix>
+<v x="-2.05193639857e-10" y="-8.79603234694e-08" z="0.282872915268"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>-0.0589787150408</rotx><rotz>0.213200259883</rotz><roty>1.44995312865</roty></matrix>
+<v x="-1.31095934108e-09" y="-8.80826860339e-08" z="0.187517657876"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>0.138314816546</rotx><rotz>-1.63561380614</rotz><roty>1.84021941269</roty></matrix>
+<v x="-2.50392392096e-14" y="-1.78455505928e-09" z="0.211406797171"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.0950366511989</rotx><rotz>0.204104815746</rotz><roty>-1.08371488264</roty></matrix>
+<v x="-3.98292350212e-08" y="3.4102011881e-08" z="0.0223210304976"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>0.342787248392</rotx><rotz>0.0708913092352</rotz><roty>-1.66547716303</roty></matrix>
+<v x="-6.18280093789e-09" y="-8.85405171402e-08" z="0.0257752016187"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.162571753282</rotx><rotz>-0.0119830254426</rotz><roty>-0.0295452714197</roty></matrix>
+<v x="-5.37496758213e-09" y="8.15519918262e-09" z="0.0483604855835"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.183845799794</rotx><rotz>0.176438400315</rotz><roty>0.0636826897637</roty></matrix>
+<v x="-7.49960271662e-09" y="-8.53554809055e-08" z="0.227362200618"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>-0.0652223297689</rotx><rotz>-0.907197103483</rotz><roty>-0.204551361282</roty></matrix>
+<v x="7.89235699017e-08" y="9.65093427396e-09" z="0.276810020208"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>-0.0783621668503</rotx><rotz>0.892687935548</rotz><roty>-1.40814616006</roty></matrix>
+<v x="4.02122113385e-10" y="6.01792322641e-08" z="0.1855828017"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>0.139058504281</rotx><rotz>1.63493430059</rotz><roty>-1.8402841275</roty></matrix>
+<v x="-2.50392392096e-14" y="-1.78455505928e-09" z="0.211406797171"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.137011332351</rotx><rotz>3.42432795446e-08</rotz><roty>-3.30231553089e-08</roty></matrix>
+<v x="1.75962705778e-12" y="1.81291459622e-09" z="0.127841204405"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.577481182353</rotx><rotz>9.71526896566e-08</rotz><roty>-6.9812947672e-08</roty></matrix>
+<v x="1.71109578329e-12" y="-1.05769659697e-09" z="0.074029199779"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.05736889577</rotx><rotz>5.74368254902e-05</rotz><roty>-2.50576627999e-07</roty></matrix>
+<v x="-9.58384447358e-08" y="-0.00166442454793" z="0.262991577387"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>-1.05679977824</rotx><rotz>-1.03664044774</rotz><roty>-0.0290835791552</roty></matrix>
+<v x="1.61831770207e-10" y="-5.85169868117e-09" z="0.391023933887"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.183788458607</rotx><rotz>1.07352196647</rotz><roty>-0.337725544556</roty></matrix>
+<v x="3.89935728151e-09" y="1.12351050685e-09" z="0.441814690828"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.196782004921</rotx><rotz>-0.182416880711</rotz><roty>-0.596730577291</roty></matrix>
+<v x="5.48528733546e-09" y="5.82457415632e-09" z="0.119804449379"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.31626936614</rotx><rotz>0.574015277932</rotz><roty>-0.162424413895</roty></matrix>
+<v x="-8.75129302358e-08" y="-0.00166442454793" z="0.262991577387"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>-1.02698648879</rotx><rotz>1.84575971986</rotz><roty>-0.017572431528</roty></matrix>
+<v x="1.76472014779e-09" y="3.68563988218e-08" z="0.391024857759"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>0.131682072371</rotx><rotz>-1.18608992416</rotz><roty>0.36282993244</roty></matrix>
+<v x="1.76251901962e-10" y="5.49050582777e-08" z="0.441814720631"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.770001164134</rotx><rotz>0.0766066693163</rotz><roty>0.776634698935</roty></matrix>
+<v x="2.65877222461e-08" y="9.41590971859e-11" z="0.119804523885"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.83791990625</rotx><rotz>-0.617762825421</rotz><roty>1.08890012386</roty></matrix>
+<v x="-8.75129302358e-08" y="-0.00166442454793" z="0.262991577387"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.13526365126</rotx><rotz>5.75769364692e-05</rotz><roty>1.81631025979e-07</roty></matrix>
+<v x="-1.62547294167e-05" y="0.687124550343" z="0.308514803648"/>
+</move></bone></frame>
+</script>
+<script name="_temp_action">
+<frame duration="0.0">
+<bone name="head"><move><matrix><rotx>1.55995326642</rotx><rotz>2.43766407818e-07</rotz><roty>-3.63808042954e-06</roty></matrix>
+<v x="-1.60666225875e-15" y="-2.16760209781e-09" z="0.205132573843"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.185195856019</rotx><rotz>-3.04980322702e-08</rotz><roty>3.76324881791e-08</roty></matrix>
+<v x="-6.6540658405e-18" y="1.69699110319e-09" z="0.211406782269"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>-0.163253955285</rotx><rotz>-0.158979165617</rotz><roty>-0.024530426735</roty></matrix>
+<v x="3.86755694137e-09" y="-9.16697260323e-08" z="0.0236427672207"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>0.0783360928387</rotx><rotz>0.07796760289</rotz><roty>-0.000703189415614</roty></matrix>
+<v x="5.49026379915e-09" y="-2.14873860926e-08" z="0.0237137433141"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>-0.0850855833383</rotx><rotz>-0.0844028903152</rotz><roty>-0.010556819455</roty></matrix>
+<v x="9.08501052166e-10" y="-1.49802104055e-09" z="0.0494092032313"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>-0.104603158598</rotx><rotz>-0.101171975139</rotz><roty>-0.0496935830943</roty></matrix>
+<v x="-1.27665100713e-09" y="-1.00552446369e-08" z="0.220042392612"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>0.0425233922051</rotx><rotz>0.0434707576674</rotz><roty>0.042802241816</roty></matrix>
+<v x="-3.30020855088e-09" y="4.4205489047e-08" z="0.282872885466"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>0.152351090296</rotx><rotz>0.151657553213</rotz><roty>-0.00309511073458</roty></matrix>
+<v x="-2.68854005725e-09" y="6.01253091759e-08" z="0.187517657876"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>0.138314891448</rotx><rotz>-1.63561380614</rotz><roty>1.84021941269</roty></matrix>
+<v x="-1.33892170863e-15" y="1.69699110319e-09" z="0.211406782269"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>-0.143396327643</rotx><rotz>0.140201749403</rotz><roty>0.032667601013</roty></matrix>
+<v x="-9.02329055918e-09" y="-7.72598411913e-08" z="0.0223210640252"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>-0.0391656038013</rotx><rotz>0.0391139967328</rotz><roty>0.00341296499239</roty></matrix>
+<v x="2.52027421155e-09" y="1.89977082954e-08" z="0.0257751625031"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.0587625371005</rotx><rotz>-0.059079931807</rotz><roty>-0.00283450923872</roty></matrix>
+<v x="7.40531103105e-09" y="3.61721386177e-09" z="0.048360478133"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.183845799794</rotx><rotz>0.176438400315</rotz><roty>0.0636826856025</roty></matrix>
+<v x="1.94018721089e-08" y="-6.20472384583e-09" z="0.227362245321"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>0.0536038317826</rotx><rotz>-0.0550014545615</rotz><roty>-0.0401250824854</roty></matrix>
+<v x="7.45217054732e-10" y="-3.93437709079e-08" z="0.276810020208"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>0.149927314098</rotx><rotz>-0.149317833038</rotz><roty>0.00279133820111</roty></matrix>
+<v x="8.46183922931e-09" y="-4.17495868987e-08" z="0.1855828017"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>0.139058504281</rotx><rotz>1.63493416743</rotz><roty>-1.8402841275</roty></matrix>
+<v x="-8.6231689107e-13" y="1.69699110319e-09" z="0.211406782269"/>
+</move></bone><bone name="chest"><move><matrix><rotx>-0.180787209217</rotx><rotz>3.59447591483e-08</rotz><roty>-3.06277182277e-08</roty></matrix>
+<v x="-5.23962299194e-16" y="1.02497410559e-09" z="0.1278411448"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.394370281862</rotx><rotz>9.98108003776e-08</rotz><roty>-7.81870822026e-08</roty></matrix>
+<v x="-5.23465355552e-16" y="3.82389053755e-08" z="0.0740292444825"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.05736889577</rotx><rotz>5.74368254902e-05</rotz><roty>-2.50576627999e-07</roty></matrix>
+<v x="-9.58329664513e-08" y="-0.00166445341893" z="0.262991577387"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>-0.977956494698</rotx><rotz>-1.1717373501</rotz><roty>0.0793279955091</roty></matrix>
+<v x="-2.97942559513e-09" y="-8.38485103571e-09" z="0.39102396369"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.0809155058349</rotx><rotz>1.07921587146</rotz><roty>-0.217275495562</roty></matrix>
+<v x="9.68446123295e-09" y="2.5947866078e-09" z="0.441814571619"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.150651477533</rotx><rotz>-0.199628624521</rotz><roty>-0.694880580318</roty></matrix>
+<v x="7.53082218807e-09" y="2.88951307326e-09" z="0.119804374874"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.40483718241</rotx><rotz>0.803652268457</rotz><roty>-0.184000745836</roty></matrix>
+<v x="-8.75091004104e-08" y="-0.00166445341893" z="0.262991577387"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>-0.831192549922</rotx><rotz>1.43145374645</rotz><roty>-0.221936060759</roty></matrix>
+<v x="-1.27707711073e-09" y="6.10739148144e-09" z="0.391024917364"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>0.167126923879</rotx><rotz>-1.33938600388</rotz><roty>0.308661468894</roty></matrix>
+<v x="1.50811363397e-08" y="-2.3556137041e-09" z="0.441814720631"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.150653591417</rotx><rotz>0.199637446242</rotz><roty>0.694878915842</roty></matrix>
+<v x="2.54793253163e-08" y="-6.44517061943e-09" z="0.119804501534"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.4048032271</rotx><rotz>-0.803539017532</rotz><roty>0.183974114225</roty></matrix>
+<v x="-8.75091004104e-08" y="-0.00166445341893" z="0.262991577387"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.13526365126</rotx><rotz>5.75769364692e-05</rotz><roty>1.81631025979e-07</roty></matrix>
+<v x="-5.63910340645e-08" y="0.968464016914" z="0.308514803648"/>
+</move></bone></frame>
+</script>
+<script name="attack_sword_s">
+<frame duration="0.0">
+<bone name="head"><move><matrix><rotx>1.55995326642</rotx><rotz>2.43766471312e-07</rotz><roty>-3.63808068352e-06</roty></matrix>
+<v x="5.3765121695e-12" y="-7.82921549813e-09" z="0.205132573843"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.185195856019</rotx><rotz>-3.0498030286e-08</rotz><roty>3.76324881791e-08</roty></matrix>
+<v x="-1.16793747796e-14" y="1.14075671132e-09" z="0.211406767368"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.242936134574</rotx><rotz>0.199832572726</rotz><roty>1.35601558067</roty></matrix>
+<v x="-1.0078636592e-08" y="1.06448219128e-08" z="0.0236427877098"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.436803925538</rotx><rotz>0.0728163585844</rotz><roty>1.49691451236</roty></matrix>
+<v x="8.11885243479e-08" y="3.21689306304e-08" z="0.0237137414515"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>0.0683898353128</rotx><rotz>-0.214173678551</rotz><roty>0.183038262773</roty></matrix>
+<v x="-2.79023488758e-08" y="1.9800836526e-09" z="0.0494092702866"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>-0.104603166921</rotx><rotz>-0.101171950172</rotz><roty>-0.0496935706107</roty></matrix>
+<v x="2.95134672257e-08" y="2.15482875987e-09" z="0.220042333007"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>0.976780309603</rotx><rotz>0.736501926572</rotz><roty>1.21637938682</roty></matrix>
+<v x="2.47328628689e-08" y="2.92166930649e-08" z="0.282872855663"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>0.650970247107</rotx><rotz>0.216031283346</rotz><roty>0.820988248731</roty></matrix>
+<v x="-3.73428843403e-09" y="-2.57083208055e-08" z="0.187517657876"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>0.138314833191</rotx><rotz>-1.63561380614</rotz><roty>1.84021941269</roty></matrix>
+<v x="-1.16793747796e-14" y="1.14075671132e-09" z="0.211406767368"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.417491380393</rotx><rotz>0.161261328223</rotz><roty>-1.513592825</roty></matrix>
+<v x="5.88471937846e-09" y="2.68844875251e-08" z="0.022321023047"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>0.342787215102</rotx><rotz>0.0708913009128</rotz><roty>-1.66547716303</roty></matrix>
+<v x="1.28006938382e-10" y="1.41539366894e-08" z="0.0257752072066"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.0826083275371</rotx><rotz>-0.0289116554621</rotz><roty>-0.321183752208</roty></matrix>
+<v x="-1.48396139821e-09" y="4.45698447038e-08" z="0.0483604595065"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.0453235812556</rotx><rotz>0.148130912074</rotz><roty>0.0752182802163</roty></matrix>
+<v x="-9.60848911546e-09" y="1.86414066405e-08" z="0.227362260222"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>1.61017569089</rotx><rotz>-0.870634897772</rotz><roty>-0.0836731259199</roty></matrix>
+<v x="1.0926285654e-08" y="-1.0979973375e-08" z="0.276810020208"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>-0.58531007701</rotx><rotz>0.530730854156</rotz><roty>-1.07002663411</roty></matrix>
+<v x="2.26365637346e-09" y="-6.2908391385e-08" z="0.1855828017"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>0.139058520926</rotx><rotz>1.63493430059</rotz><roty>-1.8402841275</roty></matrix>
+<v x="-1.16793747796e-14" y="1.14075671132e-09" z="0.211406767368"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.171805249032</rotx><rotz>3.40129882061e-08</rotz><roty>-3.3249609186e-08</roty></matrix>
+<v x="-7.99742555708e-14" y="9.59570645165e-10" z="0.127841189504"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.520352848283</rotx><rotz>9.87318903573e-08</rotz><roty>-6.92547498177e-08</roty></matrix>
+<v x="3.19281233396e-12" y="-6.7425385275e-09" z="0.0740292295814"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.01275255855</rotx><rotz>5.74388491935e-05</rotz><roty>-2.47170962329e-07</roty></matrix>
+<v x="-9.58312114108e-08" y="-0.00166442082264" z="0.262991577387"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>-0.219602582367</rotx><rotz>-1.07004241334</rotz><roty>0.694867264513</roty></matrix>
+<v x="1.00813757342e-08" y="-1.87504909377e-08" z="0.39102396369"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.510058365799</rotx><rotz>1.08260953763</rotz><roty>-0.392938799486</roty></matrix>
+<v x="8.59927329344e-09" y="-8.78323547227e-09" z="0.441814690828"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.678605403685</rotx><rotz>-0.267168070885</rotz><roty>-0.60671396927</roty></matrix>
+<v x="-3.39679750994e-09" y="2.80198042546e-09" z="0.119804479182"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.31626936614</rotx><rotz>0.574015277932</rotz><roty>-0.162424413895</roty></matrix>
+<v x="-8.75075159001e-08" y="-0.00166442082264" z="0.262991577387"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>1.48038001042</rotx><rotz>0.406768927922</rotz><roty>-2.74853244725</roty></matrix>
+<v x="2.30177725768e-08" y="-1.4896124334e-09" z="0.391024917364"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>0.416372320103</rotx><rotz>-1.17712852025</rotz><roty>0.502882078768</roty></matrix>
+<v x="4.69037475526e-09" y="1.03063957368e-09" z="0.441814720631"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.182502301603</rotx><rotz>0.0271226416297</rotz><roty>0.630739410728</roty></matrix>
+<v x="-7.35752880843e-09" y="-1.89659421501e-09" z="0.119804531336"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.78219046412</rotx><rotz>-0.602304839769</rotz><roty>0.721221507186</roty></matrix>
+<v x="-8.75075159001e-08" y="-0.00166442082264" z="0.262991577387"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.13526365126</rotx><rotz>5.75769364692e-05</rotz><roty>1.81631025979e-07</roty></matrix>
+<v x="-4.61507988803e-05" y="0.16787725687" z="0.308514803648"/>
+</move></bone></frame>
+<frame duration="83.3333333333">
+<bone name="head"><move><matrix><rotx>1.55995326642</rotx><rotz>2.39032289988e-07</rotz><roty>-3.62906875258e-06</roty></matrix>
+<v x="-1.71407528171e-08" y="-2.41723299155e-08" z="0.205132603645"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.185195856019</rotx><rotz>-2.0856799325e-08</rotz><roty>3.94151100515e-08</roty></matrix>
+<v x="1.1246447329e-08" y="1.95599625386e-09" z="0.211406767368"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.242936167864</rotx><rotz>0.199832572726</rotz><roty>1.35601558067</roty></matrix>
+<v x="-2.79411835891e-08" y="2.55782488523e-08" z="0.0236427374184"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.436803925538</rotx><rotz>0.0728163752292</rotz><roty>1.49691451236</roty></matrix>
+<v x="4.04978663937e-08" y="-7.02027094235e-08" z="0.02371375449"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>0.0683898477964</rotx><rotz>-0.214173645262</rotz><roty>0.183038262773</roty></matrix>
+<v x="3.37210934731e-08" y="9.86332295838e-08" z="0.0494092553854"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>-0.104603166921</rotx><rotz>-0.101171958494</rotz><roty>-0.0496935830943</roty></matrix>
+<v x="8.62235225441e-08" y="5.37100319775e-08" z="0.220042288303"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>0.966459828009</rotx><rotz>0.757257871739</rotz><roty>1.19756575161</roty></matrix>
+<v x="-1.88385094191e-08" y="-4.07235347666e-08" z="0.282872885466"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>0.619102928082</rotx><rotz>0.200897321174</rotz><roty>0.840424863894</roty></matrix>
+<v x="-6.94675392765e-08" y="-1.00981779383e-07" z="0.187517657876"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>0.138314949705</rotx><rotz>-1.63561380614</rotz><roty>1.84021954585</roty></matrix>
+<v x="1.1246447329e-08" y="1.95599625386e-09" z="0.211406767368"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.417491380393</rotx><rotz>0.161261294934</rotz><roty>-1.513592825</roty></matrix>
+<v x="-5.41433884393e-08" y="1.03121600148e-08" z="0.0223210826516"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>0.342787215102</rotx><rotz>0.0708912925904</rotz><roty>-1.66547716303</roty></matrix>
+<v x="9.40246351888e-08" y="5.54860193347e-08" z="0.0257752109319"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.082608260958</rotx><rotz>-0.0289116492203</rotz><roty>-0.321183785498</roty></matrix>
+<v x="5.49162102459e-08" y="1.77358323583e-08" z="0.0483603924513"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.0453235562885</rotx><rotz>0.148130928719</rotz><roty>0.0752182802163</roty></matrix>
+<v x="4.13226359797e-08" y="5.07229671598e-08" z="0.227362245321"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>1.43676914967</rotx><rotz>-0.618337668743</rotz><roty>0.169044399864</roty></matrix>
+<v x="-1.15719032578e-07" y="-7.53636442141e-09" z="0.276809990406"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>-0.607626767733</rotx><rotz>0.574509427472</rotz><roty>-0.601513148556</roty></matrix>
+<v x="2.64803343697e-08" y="-1.94255243002e-08" z="0.185582756996"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>0.139058454347</rotx><rotz>1.63493416743</rotz><roty>-1.8402841275</roty></matrix>
+<v x="1.1246447329e-08" y="1.95599625386e-09" z="0.211406767368"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.182741520048</rotx><rotz>-0.233740522291</rotz><roty>0.0156504885066</roty></matrix>
+<v x="-1.14055006759e-11" y="-7.71204327066e-08" z="0.127841189504"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.515206356055</rotx><rotz>-0.000133029301458</rotz><roty>9.93967396383e-06</roty></matrix>
+<v x="2.24572248818e-12" y="-1.70746918826e-08" z="0.0740292221308"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.01275255855</rotx><rotz>5.74388491935e-05</rotz><roty>-2.47170962329e-07</roty></matrix>
+<v x="-9.583427385e-08" y="-0.00166444620118" z="0.262991607189"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>-0.333062449355</rotx><rotz>-1.13829084312</rotz><roty>0.737422448203</roty></matrix>
+<v x="-3.365062895e-08" y="-2.38357547033e-08" z="0.391023993492"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.510058365799</rotx><rotz>1.08260953763</rotz><roty>-0.392938799486</roty></matrix>
+<v x="3.63335295184e-09" y="5.47489911185e-08" z="0.441814631224"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.447441589617</rotx><rotz>-0.238753440345</rotz><roty>-0.65953856844</roty></matrix>
+<v x="5.56394574858e-09" y="3.58016158941e-08" z="0.119804434478"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.31626936614</rotx><rotz>0.574015277932</rotz><roty>-0.162424413895</roty></matrix>
+<v x="-8.75087593499e-08" y="-0.00166444620118" z="0.262991607189"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>-0.0179838087732</rotx><rotz>2.25860641416</rotz><roty>-1.28459505972</roty></matrix>
+<v x="3.2396041405e-08" y="-1.77755890007e-08" z="0.391024917364"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>0.9606002744</rotx><rotz>-1.17020203773</rotz><roty>0.729756072952</roty></matrix>
+<v x="2.96028757063e-09" y="-3.87479062169e-08" z="0.441814720631"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.455310032216</rotx><rotz>0.109916456256</rotz><roty>0.699698638204</roty></matrix>
+<v x="4.34207549915e-08" y="8.24100876429e-09" z="0.119804576039"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.74632101318</rotx><rotz>-0.487174321895</rotz><roty>0.712701522226</roty></matrix>
+<v x="-8.75087593499e-08" y="-0.00166444620118" z="0.262991607189"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.13526365126</rotx><rotz>5.75769364692e-05</rotz><roty>1.81631025979e-07</roty></matrix>
+<v x="-2.90513653454e-05" y="0.472886055708" z="-0.958444952965"/>
+</move></bone></frame>
+<frame duration="83.3333333333">
+<bone name="head"><move><matrix><rotx>1.55995326642</rotx><rotz>2.65401499482e-07</rotz><roty>-3.65409938251e-06</roty></matrix>
+<v x="8.50414068054e-08" y="8.20785075462e-08" z="0.205132573843"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.185195839375</rotx><rotz>-2.29224111596e-08</rotz><roty>3.21215483089e-08</roty></matrix>
+<v x="2.60352521764e-08" y="7.7461862702e-08" z="0.211406752467"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.242936134574</rotx><rotz>0.199832589371</rotz><roty>1.35601558067</roty></matrix>
+<v x="9.69241895632e-08" y="-2.4720628744e-07" z="0.0236427150667"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.436803925538</rotx><rotz>0.0728163252949</rotz><roty>1.49691451236</roty></matrix>
+<v x="1.31509182211e-07" y="1.18779503566e-07" z="0.023713786155"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>0.0683898727635</rotx><rotz>-0.214173711841</rotz><roty>0.183038246128</roty></matrix>
+<v x="-5.98724625434e-08" y="-7.61118386094e-08" z="0.0494091920555"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>-0.104603175243</rotx><rotz>-0.101171983462</rotz><roty>-0.0496935830943</roty></matrix>
+<v x="5.19483407402e-08" y="-8.8459110259e-08" z="0.220042333007"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>0.966459894588</rotx><rotz>0.757257938318</rotz><roty>1.19756575161</roty></matrix>
+<v x="4.26673487652e-08" y="6.8386936114e-09" z="0.282872766256"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>0.619102928082</rotx><rotz>0.200897321174</rotz><roty>0.840424863894</roty></matrix>
+<v x="-1.51535019199e-07" y="-2.42501059233e-08" z="0.187517598271"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>0.138315265955</rotx><rotz>-1.63561380614</rotz><roty>1.84021888006</roty></matrix>
+<v x="2.60352521764e-08" y="7.7461862702e-08" z="0.211406752467"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.417491380393</rotx><rotz>0.161261344868</rotz><roty>-1.513592825</roty></matrix>
+<v x="-6.79006291193e-08" y="-3.26332951772e-08" z="0.0223210733384"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>0.342787281681</rotx><rotz>0.0708913175576</rotz><roty>-1.66547716303</roty></matrix>
+<v x="8.64989573302e-08" y="-8.62410587388e-09" z="0.0257752481848"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.0826082359909</rotx><rotz>-0.028911620092</rotz><roty>-0.321183818787</roty></matrix>
+<v x="-7.90787737515e-08" y="1.41542502163e-08" z="0.0483604632318"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.0453235188378</rotx><rotz>0.148130912074</rotz><roty>0.0752182802163</roty></matrix>
+<v x="7.36617167263e-08" y="1.68150506852e-08" z="0.227362215519"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>0.43973117234</rotx><rotz>0.536938616078</rotz><roty>-0.270318424007</roty></matrix>
+<v x="6.70058994956e-08" y="5.61718671577e-09" z="0.276810109615"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>-0.0950358688954</rotx><rotz>0.888935941046</rotz><roty>0.367755781771</roty></matrix>
+<v x="-1.47205227563e-07" y="-1.13064322349e-08" z="0.185582816601"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>0.13905818803</rotx><rotz>1.63493430059</rotz><roty>-1.84028479329</roty></matrix>
+<v x="2.60352521764e-08" y="7.7461862702e-08" z="0.211406752467"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.264461017572</rotx><rotz>-0.415497438395</rotz><roty>0.0675493541563</roty></matrix>
+<v x="-4.81234756905e-12" y="-2.78695981848e-08" z="0.127841189504"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.515206356055</rotx><rotz>-0.000133029301458</rotz><roty>9.93967396383e-06</roty></matrix>
+<v x="2.38460640123e-12" y="4.91268075109e-08" z="0.0740293115377"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.01275255855</rotx><rotz>5.74388491935e-05</rotz><roty>-2.47170962329e-07</roty></matrix>
+<v x="-9.5836668379e-08" y="-0.00166446296498" z="0.262991547585"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>0.355713999297</rotx><rotz>-1.08644342434</rotz><roty>1.51889224926</roty></matrix>
+<v x="-1.31669565917e-07" y="-2.57310563967e-08" z="0.391023933887"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.421649207355</rotx><rotz>1.06681965553</rotz><roty>-0.415508956567</roty></matrix>
+<v x="1.7050844292e-08" y="9.66100444089e-08" z="0.441814661026"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.2851675611</rotx><rotz>-0.21179803899</rotz><roty>-0.692119614637</roty></matrix>
+<v x="-9.84677583915e-09" y="-4.24697681467e-08" z="0.119804441929"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.31626936614</rotx><rotz>0.574015277932</rotz><roty>-0.162424413895</roty></matrix>
+<v x="-8.75111538789e-08" y="-0.00166446296498" z="0.262991547585"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>0.0575012931366</rotx><rotz>2.26251193989</rotz><roty>-1.00020740534</roty></matrix>
+<v x="-2.37676527348e-08" y="-2.42161544151e-08" z="0.391024947166"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>0.451496618562</rotx><rotz>-1.15007173568</rotz><roty>0.522874362492</roty></matrix>
+<v x="1.01357384708e-08" y="-3.76598308094e-08" z="0.441814720631"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.727867958318</rotx><rotz>0.245931591589</rotz><roty>0.736822837484</roty></matrix>
+<v x="1.02080946363e-07" y="-8.57853965641e-09" z="0.119804568589"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.74632101318</rotx><rotz>-0.487174321895</rotz><roty>0.712701522226</roty></matrix>
+<v x="-8.75111538789e-08" y="-0.00166446296498" z="0.262991547585"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.13526365126</rotx><rotz>5.75769364692e-05</rotz><roty>1.81631025979e-07</roty></matrix>
+<v x="-2.52467416431e-05" y="0.543272733688" z="-1.63884925842"/>
+</move></bone></frame>
+<frame duration="83.3333333333">
+<bone name="head"><move><matrix><rotx>1.55995326642</rotx><rotz>2.43775932024e-07</rotz><roty>-3.63808703299e-06</roty></matrix>
+<v x="1.64310492295e-12" y="1.23187163581e-07" z="0.205132648349"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.185195839375</rotx><rotz>-3.04901569422e-08</rotz><roty>3.76309246219e-08</roty></matrix>
+<v x="1.06050940599e-11" y="-5.96541624986e-08" z="0.211406767368"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.242936184509</rotx><rotz>0.199832589371</rotz><roty>1.35601558067</roty></matrix>
+<v x="-4.52431585529e-08" y="-1.71182445996e-08" z="0.0236427728087"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.436803925538</rotx><rotz>0.0728163585844</rotz><roty>1.49691451236</roty></matrix>
+<v x="7.57382423444e-08" y="-2.13666353943e-07" z="0.023713786155"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>0.0683898561187</rotx><rotz>-0.214173611972</rotz><roty>0.183038262773</roty></matrix>
+<v x="-1.08359643036e-07" y="1.32821583065e-07" z="0.0494092591107"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>-0.104603150276</rotx><rotz>-0.101171966817</rotz><roty>-0.0496935789331</roty></matrix>
+<v x="1.13365921095e-07" y="2.61252154132e-07" z="0.220042258501"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>0.966459894588</rotx><rotz>0.75725780516</rotz><roty>1.19756575161</roty></matrix>
+<v x="3.64341197212e-08" y="9.93838966679e-08" z="0.282872885466"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>0.619102928082</rotx><rotz>0.200897337819</rotz><roty>0.840424863894</roty></matrix>
+<v x="-4.11995159766e-07" y="8.19053269652e-10" z="0.187517672777"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>0.138314858158</rotx><rotz>-1.63561380614</rotz><roty>1.84021941269</roty></matrix>
+<v x="1.06050940599e-11" y="-5.96541624986e-08" z="0.211406767368"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.417491413682</rotx><rotz>0.161261311578</rotz><roty>-1.513592825</roty></matrix>
+<v x="-6.29548821962e-08" y="6.9171946393e-08" z="0.0223210025579"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>0.342787248392</rotx><rotz>0.0708913092352</rotz><roty>-1.66547716303</roty></matrix>
+<v x="1.67836788023e-07" y="-1.95697012373e-07" z="0.0257751848549"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.0826083025699</rotx><rotz>-0.0289116346562</rotz><roty>-0.321183785498</roty></matrix>
+<v x="-2.69752575832e-08" y="-2.083904036e-07" z="0.0483604557812"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.0453236020616</rotx><rotz>0.148130962008</rotz><roty>0.0752182802163</roty></matrix>
+<v x="7.13423542464e-09" y="1.23705916621e-07" z="0.22736209631"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>0.439731238919</rotx><rotz>0.536938549499</rotz><roty>-0.270318424007</roty></matrix>
+<v x="-4.66080280148e-07" y="-1.16949678386e-07" z="0.276810079813"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>-0.0950358772178</rotx><rotz>0.888936007625</rotz><roty>0.367755781771</roty></matrix>
+<v x="7.53380930973e-08" y="-8.59529158959e-09" z="0.1855828017"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>0.139058545893</rotx><rotz>1.63493430059</rotz><roty>-1.8402841275</roty></matrix>
+<v x="1.06050940599e-11" y="-5.96541624986e-08" z="0.211406767368"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.171805249032</rotx><rotz>6.16266046939e-09</rotz><roty>-3.35575565371e-08</roty></matrix>
+<v x="1.69970600095e-11" y="3.30081576294e-07" z="0.127841219306"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.515206356055</rotx><rotz>-0.000133029301458</rotz><roty>9.93966685242e-06</roty></matrix>
+<v x="-1.79292377386e-12" y="-7.01454538898e-09" z="0.0740291103721"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.01275255855</rotx><rotz>5.74388491935e-05</rotz><roty>-2.47170962329e-07</roty></matrix>
+<v x="-9.58295345299e-08" y="-0.00166442699265" z="0.262991577387"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>1.23719239021</rotx><rotz>-0.848066804642</rotz><roty>2.51242271027</roty></matrix>
+<v x="-1.00010012716e-07" y="8.8147211752e-10" z="0.391023933887"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.611381425396</rotx><rotz>1.101336953</rotz><roty>-0.370597807418</roty></matrix>
+<v x="2.9679819491e-08" y="1.80029175567e-07" z="0.441814690828"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.0206614632853</rotx><rotz>-0.157135176233</rotz><roty>-0.734703560467</roty></matrix>
+<v x="2.87104162666e-09" y="1.43658212437e-07" z="0.119804419577"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.31626923298</rotx><rotz>0.574015277932</rotz><roty>-0.16242443054</roty></matrix>
+<v x="-8.75058390193e-08" y="-0.00166442699265" z="0.262991577387"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>0.0839380438693</rotx><rotz>2.26063600922</rotz><roty>-0.900616432429</roty></matrix>
+<v x="-1.22753354148e-08" y="-1.45161145326e-08" z="0.391025066376"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>0.804340429283</rotx><rotz>-1.16861798951</rotz><roty>0.664284321502</roty></matrix>
+<v x="7.36755509934e-08" y="1.37351122476e-07" z="0.441814571619"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.913134021922</rotx><rotz>0.340085271729</rotz><roty>0.740141735413</roty></matrix>
+<v x="1.86708533079e-08" y="3.16776464615e-07" z="0.119804531336"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.74632101318</rotx><rotz>-0.487174321895</rotz><roty>0.712701522226</roty></matrix>
+<v x="-8.75058390193e-08" y="-0.00166442699265" z="0.262991577387"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.1250903759</rotx><rotz>5.75787976261e-05</rotz><roty>1.81652264959e-07</roty></matrix>
+<v x="-5.30333309143e-05" y="0.0740283504128" z="-3.75044894218"/>
+</move></bone></frame>
+<frame duration="83.3333333333">
+<bone name="head"><move><matrix><rotx>1.55995326642</rotx><rotz>2.25074676851e-07</rotz><roty>-3.63758999641e-06</roty></matrix>
+<v x="-7.47793578171e-08" y="-9.0327056057e-08" z="0.205132603645"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.1218636549</rotx><rotz>0.00144307362803</rotz><roty>0.0249452223971</roty></matrix>
+<v x="1.32403641828e-07" y="-1.44575651007e-07" z="0.211406812072"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.242936184509</rotx><rotz>0.199832572726</rotz><roty>1.35601558067</roty></matrix>
+<v x="-4.24390478315e-08" y="-2.91639906891e-07" z="0.0236427150667"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.436803925538</rotx><rotz>0.072816350262</rotz><roty>1.49691451236</roty></matrix>
+<v x="-3.07298222424e-08" y="-7.69107515453e-08" z="0.0237136762589"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>0.0683898269904</rotx><rotz>-0.214173628617</rotz><roty>0.183038279418</roty></matrix>
+<v x="9.9670970144e-08" y="2.33262113625e-07" z="0.0494091957808"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>-0.104603183565</rotx><rotz>-0.101171966817</rotz><roty>-0.049693553966</roty></matrix>
+<v x="1.88007494017e-08" y="9.12800928177e-08" z="0.220042318106"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>0.966459961167</rotx><rotz>0.757257938318</rotz><roty>1.19756575161</roty></matrix>
+<v x="-2.05928230912e-07" y="5.95740416998e-08" z="0.282872736454"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>0.619102928082</rotx><rotz>0.200897321174</rotz><roty>0.840424730736</roty></matrix>
+<v x="1.61011854516e-07" y="9.07190766952e-09" z="0.187517747283"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>0.138314608487</rotx><rotz>-1.63561380614</rotz><roty>1.84021888006</roty></matrix>
+<v x="1.32403641828e-07" y="-1.44575651007e-07" z="0.211406812072"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.417491446972</rotx><rotz>0.161261328223</rotz><roty>-1.513592825</roty></matrix>
+<v x="1.42105189838e-08" y="-3.43827963434e-07" z="0.0223210360855"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>0.342787248392</rotx><rotz>0.0708913009128</rotz><roty>-1.66547716303</roty></matrix>
+<v x="-7.06724563315e-08" y="2.1044069598e-08" z="0.0257752239704"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.0826082692804</rotx><rotz>-0.0289116450591</rotz><roty>-0.321183785498</roty></matrix>
+<v x="-1.5029206768e-09" y="-1.10361973782e-07" z="0.0483603961766"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.0453235521273</rotx><rotz>0.148130928719</rotz><roty>0.0752182802163</roty></matrix>
+<v x="-4.92007110608e-08" y="-6.42032631504e-08" z="0.227362141013"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>0.439731238919</rotx><rotz>0.536938616078</rotz><roty>-0.270318424007</roty></matrix>
+<v x="-5.33839106254e-08" y="-1.91563671592e-07" z="0.276810020208"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>-0.0950358522506</rotx><rotz>0.888936074204</rotz><roty>0.367755781771</roty></matrix>
+<v x="-9.02854608853e-08" y="-5.9119379614e-08" z="0.185582727194"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>0.139058637439</rotx><rotz>1.63493430059</rotz><roty>-1.84028466014</roty></matrix>
+<v x="1.32403641828e-07" y="-1.44575651007e-07" z="0.211406812072"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.158740130264</rotx><rotz>0.365563700588</rotz><roty>-0.0903916488494</roty></matrix>
+<v x="1.69970600095e-11" y="3.30081576294e-07" z="0.127841219306"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.515206356055</rotx><rotz>-0.000133029301458</rotz><roty>9.93966685242e-06</roty></matrix>
+<v x="-1.79292377386e-12" y="-7.01454538898e-09" z="0.0740291103721"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.01275255855</rotx><rotz>5.74388491935e-05</rotz><roty>-2.47170962329e-07</roty></matrix>
+<v x="-9.58295345299e-08" y="-0.00166442699265" z="0.262991577387"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>1.23719239021</rotx><rotz>-0.848066804642</rotz><roty>2.51242271027</roty></matrix>
+<v x="-1.00010012716e-07" y="8.8147211752e-10" z="0.391023933887"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.611381425396</rotx><rotz>1.101336953</rotz><roty>-0.370597807418</roty></matrix>
+<v x="2.9679819491e-08" y="1.80029175567e-07" z="0.441814690828"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.0206614632853</rotx><rotz>-0.157135176233</rotz><roty>-0.734703560467</roty></matrix>
+<v x="2.87104162666e-09" y="1.43658212437e-07" z="0.119804419577"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.31626923298</rotx><rotz>0.574015277932</rotz><roty>-0.16242443054</roty></matrix>
+<v x="-8.75058390193e-08" y="-0.00166442699265" z="0.262991577387"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>-1.51335806735</rotx><rotz>1.95442827709</rotz><roty>0.431371110204</roty></matrix>
+<v x="-7.55741851322e-08" y="-4.78212420774e-08" z="0.391024827957"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>0.6673795139</rotx><rotz>-1.15595931906</rotz><roty>0.618678553362</roty></matrix>
+<v x="-2.20058886669e-08" y="1.49732741761e-07" z="0.441814720631"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.810677820571</rotx><rotz>0.0951231040658</rotz><roty>0.789155883696</roty></matrix>
+<v x="2.06858899787e-07" y="2.48395821245e-07" z="0.11980445683"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.78219046412</rotx><rotz>-0.602304906348</rotz><roty>0.721221507186</roty></matrix>
+<v x="-8.75058390193e-08" y="-0.00166442699265" z="0.262991577387"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.1250903759</rotx><rotz>5.75787976261e-05</rotz><roty>1.81652264959e-07</roty></matrix>
+<v x="-5.30333309143e-05" y="0.0740283504128" z="-3.75044894218"/>
+</move></bone></frame>
+<frame duration="83.3333333333">
+<bone name="head"><move><matrix><rotx>1.55995326642</rotx><rotz>2.12542123074e-07</rotz><roty>-3.64263350808e-06</roty></matrix>
+<v x="7.97488652893e-08" y="-9.72830136448e-08" z="0.205132588744"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.119851878045</rotx><rotz>0.00146300117301</rotz><roty>0.0257386509067</roty></matrix>
+<v x="-1.61822200084e-08" y="-1.00268138681e-07" z="0.211406737566"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.242936134574</rotx><rotz>0.199832572726</rotz><roty>1.35601558067</roty></matrix>
+<v x="3.24445679212e-08" y="-1.37085933716e-07" z="0.0236428063363"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.436803925538</rotx><rotz>0.0728163419396</rotz><roty>1.49691451236</roty></matrix>
+<v x="2.86200190658e-07" y="1.8248843503e-07" z="0.0237136203796"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>0.0683898727635</rotx><rotz>-0.214173645262</rotz><roty>0.183038279418</roty></matrix>
+<v x="-2.50303049398e-08" y="-9.21952434396e-08" z="0.0494091771543"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>-0.104603150276</rotx><rotz>-0.101171958494</rotz><roty>-0.0496935830943</roty></matrix>
+<v x="8.51956301062e-08" y="-8.37210407667e-08" z="0.220042511821"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>0.966459961167</rotx><rotz>0.757257871739</rotz><roty>1.19756575161</roty></matrix>
+<v x="1.5122927266e-07" y="-3.44635253668e-09" z="0.282872855663"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>0.619102994661</rotx><rotz>0.20089730453</rotz><roty>0.840424863894</roty></matrix>
+<v x="-2.42950960683e-07" y="-9.11528772463e-08" z="0.187517464161"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>0.138314858158</rotx><rotz>-1.63561380614</rotz><roty>1.84021901321</roty></matrix>
+<v x="-1.61822200084e-08" y="-1.00268138681e-07" z="0.211406737566"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.417491413682</rotx><rotz>0.161261311578</rotz><roty>-1.513592825</roty></matrix>
+<v x="-2.06568202543e-08" y="-2.34459349713e-08" z="0.0223209243268"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>0.342787248392</rotx><rotz>0.0708913175576</rotz><roty>-1.66547716303</roty></matrix>
+<v x="4.45109051839e-08" y="-8.13925424836e-08" z="0.0257751569152"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.0826082692804</rotx><rotz>-0.0289116513009</rotz><roty>-0.321183752208</roty></matrix>
+<v x="-3.89881833485e-08" y="1.15680443002e-07" z="0.048360478133"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.0453235604497</rotx><rotz>0.148130912074</rotz><roty>0.0752182635715</roty></matrix>
+<v x="-4.27376889434e-08" y="2.35295800621e-07" z="0.227362200618"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>0.319485987013</rotx><rotz>0.0287183286923</rotz><roty>-0.191445362991</roty></matrix>
+<v x="1.35189665684e-07" y="5.6834045381e-07" z="0.276810020208"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>1.62854537714</rotx><rotz>0.972134425081</rotz><roty>-1.3873816262</roty></matrix>
+<v x="3.92963439566e-09" y="8.23007155759e-08" z="0.185582667589"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>0.13905888711</rotx><rotz>1.63493430059</rotz><roty>-1.84028466014</roty></matrix>
+<v x="-1.61822200084e-08" y="-1.00268138681e-07" z="0.211406737566"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.0365423152262</rotx><rotz>0.373361103365</rotz><roty>-0.0462288354832</roty></matrix>
+<v x="-3.07151457046e-11" y="-4.31805879941e-08" z="0.127841249108"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.309219301274</rotx><rotz>-0.000128161847916</rotz><roty>3.69584634049e-05</roty></matrix>
+<v x="-1.79292377386e-12" y="-7.01454538898e-09" z="0.0740291103721"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.01275255855</rotx><rotz>5.74388491935e-05</rotz><roty>-2.47170962329e-07</roty></matrix>
+<v x="-9.58295345299e-08" y="-0.00166442699265" z="0.262991577387"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>1.23719239021</rotx><rotz>-0.848066804642</rotz><roty>2.51242271027</roty></matrix>
+<v x="-1.00010012716e-07" y="8.8147211752e-10" z="0.391023933887"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.611381425396</rotx><rotz>1.101336953</rotz><roty>-0.370597807418</roty></matrix>
+<v x="2.9679819491e-08" y="1.80029175567e-07" z="0.441814690828"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.0206614632853</rotx><rotz>-0.157135176233</rotz><roty>-0.734703560467</roty></matrix>
+<v x="2.87104162666e-09" y="1.43658212437e-07" z="0.119804419577"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.31626923298</rotx><rotz>0.574015277932</rotz><roty>-0.16242443054</roty></matrix>
+<v x="-8.75058390193e-08" y="-0.00166442699265" z="0.262991577387"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>-1.51335806735</rotx><rotz>1.95442827709</rotz><roty>0.431371110204</roty></matrix>
+<v x="-7.55741851322e-08" y="-4.78212420774e-08" z="0.391024827957"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>0.6673795139</rotx><rotz>-1.15595931906</rotz><roty>0.618678553362</roty></matrix>
+<v x="-2.20058886669e-08" y="1.49732741761e-07" z="0.441814720631"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.810677820571</rotx><rotz>0.0951231040658</rotz><roty>0.789155883696</roty></matrix>
+<v x="2.06858899787e-07" y="2.48395821245e-07" z="0.11980445683"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.78219046412</rotx><rotz>-0.602304906348</rotz><roty>0.721221507186</roty></matrix>
+<v x="-8.75058390193e-08" y="-0.00166442699265" z="0.262991577387"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.1250903759</rotx><rotz>5.75787976261e-05</rotz><roty>1.81652264959e-07</roty></matrix>
+<v x="-5.30333309143e-05" y="0.0740283504128" z="-3.75044894218"/>
+</move></bone></frame>
+<frame duration="83.3333333333">
+<bone name="head"><move><matrix><rotx>1.55995326642</rotx><rotz>2.29803969083e-07</rotz><roty>-3.64281611887e-06</roty></matrix>
+<v x="-1.19792218811e-07" y="5.46023386505e-08" z="0.205132558942"/>
+</move></bone><bone name="neck"><move><matrix><rotx>-0.0544818010926</rotx><rotz>-0.0135568870678</rotz><roty>0.118947851369</roty></matrix>
+<v x="2.92501445287e-09" y="4.40827463422e-08" z="0.211406707764"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.242936151219</rotx><rotz>0.199832589371</rotz><roty>1.35601558067</roty></matrix>
+<v x="-1.60799316973e-07" y="8.80932589098e-08" z="0.0236428491771"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.436803892249</rotx><rotz>0.0728163169725</rotz><roty>1.49691451236</roty></matrix>
+<v x="-8.09773581523e-09" y="-1.96841568822e-07" z="0.0237137954682"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>0.0683898644411</rotx><rotz>-0.214173661906</rotz><roty>0.183038262773</roty></matrix>
+<v x="-3.57246321414e-09" y="-1.11780892098e-07" z="0.049409493804"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>-0.104603158598</rotx><rotz>-0.101171975139</rotz><roty>-0.0496935498048</roty></matrix>
+<v x="2.13545110483e-08" y="-3.50749616018e-08" z="0.220042273402"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>0.874355866447</rotx><rotz>1.02165297607</rotz><roty>0.950138645269</roty></matrix>
+<v x="1.87673833807e-07" y="9.58022923214e-08" z="0.282873094082"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>0.256876234919</rotx><rotz>-0.0273288493607</rotz><roty>1.03308559374</roty></matrix>
+<v x="1.36348646151e-07" y="7.2589557476e-08" z="0.187517717481"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>0.138314891448</rotx><rotz>-1.63561380614</rotz><roty>1.840219679</roty></matrix>
+<v x="2.92501445287e-09" y="4.40827463422e-08" z="0.211406707764"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.417491413682</rotx><rotz>0.161261328223</rotz><roty>-1.513592825</roty></matrix>
+<v x="5.55853603146e-08" y="-5.51556063044e-08" z="0.0223211422563"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>0.342787248392</rotx><rotz>0.0708913425247</rotz><roty>-1.66547716303</roty></matrix>
+<v x="2.9642097843e-07" y="-1.34489042125e-08" z="0.0257751755416"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.0826082942475</rotx><rotz>-0.0289116471397</rotz><roty>-0.321183685629</roty></matrix>
+<v x="4.78621409172e-08" y="-7.57981588606e-09" z="0.0483603104949"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.045323589578</rotx><rotz>0.148130912074</rotz><roty>0.0752182552492</roty></matrix>
+<v x="7.46864259327e-08" y="-2.1865339761e-07" z="0.227362275124"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>-0.21794057011</rotx><rotz>-0.91577408009</rotz><roty>-0.614501651508</roty></matrix>
+<v x="-3.45031097027e-08" y="-7.49912345555e-08" z="0.27681016922"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>0.84490683085</rotx><rotz>0.671102546525</rotz><roty>-2.43263307243</roty></matrix>
+<v x="-1.73738740727e-07" y="-1.42816233506e-07" z="0.185582891107"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>0.139058695696</rotx><rotz>1.63493416743</rotz><roty>-1.84028399434</roty></matrix>
+<v x="2.87294366075e-09" y="4.40567333726e-08" z="0.211406707764"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.0769374588909</rotx><rotz>0.463435403281</rotz><roty>-0.0381854939411</roty></matrix>
+<v x="3.08733760779e-10" y="-1.41767104722e-08" z="0.127841278911"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.160227539022</rotx><rotz>-0.00162661002988</rotz><roty>0.000684950923336</roty></matrix>
+<v x="-1.79292377386e-12" y="-7.01454538898e-09" z="0.0740291103721"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.01275255855</rotx><rotz>5.74388491935e-05</rotz><roty>-2.47170962329e-07</roty></matrix>
+<v x="-9.58295345299e-08" y="-0.00166442699265" z="0.262991577387"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>1.23719239021</rotx><rotz>-0.848066804642</rotz><roty>2.51242271027</roty></matrix>
+<v x="-1.00010012716e-07" y="8.8147211752e-10" z="0.391023933887"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.611381425396</rotx><rotz>1.101336953</rotz><roty>-0.370597807418</roty></matrix>
+<v x="2.9679819491e-08" y="1.80029175567e-07" z="0.441814690828"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.0206614632853</rotx><rotz>-0.157135176233</rotz><roty>-0.734703560467</roty></matrix>
+<v x="2.87104162666e-09" y="1.43658212437e-07" z="0.119804419577"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.31626923298</rotx><rotz>0.574015277932</rotz><roty>-0.16242443054</roty></matrix>
+<v x="-8.75058390193e-08" y="-0.00166442699265" z="0.262991577387"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>-1.51335806735</rotx><rotz>1.95442827709</rotz><roty>0.431371110204</roty></matrix>
+<v x="-7.55741851322e-08" y="-4.78212420774e-08" z="0.391024827957"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>0.6673795139</rotx><rotz>-1.15595931906</rotz><roty>0.618678553362</roty></matrix>
+<v x="-2.20058886669e-08" y="1.49732741761e-07" z="0.441814720631"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.810677820571</rotx><rotz>0.0951231040658</rotz><roty>0.789155883696</roty></matrix>
+<v x="2.06858899787e-07" y="2.48395821245e-07" z="0.11980445683"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.78219046412</rotx><rotz>-0.602304906348</rotz><roty>0.721221507186</roty></matrix>
+<v x="-8.75058390193e-08" y="-0.00166442699265" z="0.262991577387"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.1250903759</rotx><rotz>5.75787976261e-05</rotz><roty>1.81652264959e-07</roty></matrix>
+<v x="-5.30333309143e-05" y="0.0740283504128" z="-3.75044894218"/>
+</move></bone></frame>
+<frame duration="208.333333333">
+<bone name="head"><move><matrix><rotx>1.55995326642</rotx><rotz>2.43766471312e-07</rotz><roty>-3.63808068352e-06</roty></matrix>
+<v x="5.3765121695e-12" y="-7.82921549813e-09" z="0.205132573843"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.185195856019</rotx><rotz>-3.0498030286e-08</rotz><roty>3.76324881791e-08</roty></matrix>
+<v x="-1.16793747796e-14" y="1.14075671132e-09" z="0.211406767368"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.242936134574</rotx><rotz>0.199832572726</rotz><roty>1.35601558067</roty></matrix>
+<v x="-1.0078636592e-08" y="1.06448219128e-08" z="0.0236427877098"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.436803925538</rotx><rotz>0.0728163585844</rotz><roty>1.49691451236</roty></matrix>
+<v x="8.11885243479e-08" y="3.21689306304e-08" z="0.0237137414515"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>0.0683898353128</rotx><rotz>-0.214173678551</rotz><roty>0.183038262773</roty></matrix>
+<v x="-2.79023488758e-08" y="1.9800836526e-09" z="0.0494092702866"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>-0.104603166921</rotx><rotz>-0.101171950172</rotz><roty>-0.0496935706107</roty></matrix>
+<v x="2.95134672257e-08" y="2.15482875987e-09" z="0.220042333007"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>0.976780309603</rotx><rotz>0.736501926572</rotz><roty>1.21637938682</roty></matrix>
+<v x="2.47328628689e-08" y="2.92166930649e-08" z="0.282872855663"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>0.650970247107</rotx><rotz>0.216031283346</rotz><roty>0.820988248731</roty></matrix>
+<v x="-3.73428843403e-09" y="-2.57083208055e-08" z="0.187517657876"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>0.138314833191</rotx><rotz>-1.63561380614</rotz><roty>1.84021941269</roty></matrix>
+<v x="-1.16793747796e-14" y="1.14075671132e-09" z="0.211406767368"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.417491380393</rotx><rotz>0.161261328223</rotz><roty>-1.513592825</roty></matrix>
+<v x="5.88471937846e-09" y="2.68844875251e-08" z="0.022321023047"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>0.342787215102</rotx><rotz>0.0708913009128</rotz><roty>-1.66547716303</roty></matrix>
+<v x="1.28006938382e-10" y="1.41539366894e-08" z="0.0257752072066"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.0826083275371</rotx><rotz>-0.0289116554621</rotz><roty>-0.321183752208</roty></matrix>
+<v x="-1.48396139821e-09" y="4.45698447038e-08" z="0.0483604595065"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.0453235812556</rotx><rotz>0.148130912074</rotz><roty>0.0752182802163</roty></matrix>
+<v x="-9.60848911546e-09" y="1.86414066405e-08" z="0.227362260222"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>1.61017569089</rotx><rotz>-0.870634897772</rotz><roty>-0.0836731259199</roty></matrix>
+<v x="1.0926285654e-08" y="-1.0979973375e-08" z="0.276810020208"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>-0.58531007701</rotx><rotz>0.530730854156</rotz><roty>-1.07002663411</roty></matrix>
+<v x="2.26365637346e-09" y="-6.2908391385e-08" z="0.1855828017"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>0.139058520926</rotx><rotz>1.63493430059</rotz><roty>-1.8402841275</roty></matrix>
+<v x="-1.16793747796e-14" y="1.14075671132e-09" z="0.211406767368"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.171805249032</rotx><rotz>3.40129882061e-08</rotz><roty>-3.3249609186e-08</roty></matrix>
+<v x="-7.99742555708e-14" y="9.59570645165e-10" z="0.127841189504"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.520352848283</rotx><rotz>9.87318903573e-08</rotz><roty>-6.92547498177e-08</roty></matrix>
+<v x="3.19281233396e-12" y="-6.7425385275e-09" z="0.0740292295814"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.01275255855</rotx><rotz>5.74388491935e-05</rotz><roty>-2.47170962329e-07</roty></matrix>
+<v x="-9.58312114108e-08" y="-0.00166442082264" z="0.262991577387"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>-0.219602582367</rotx><rotz>-1.07004241334</rotz><roty>0.694867264513</roty></matrix>
+<v x="1.00813757342e-08" y="-1.87504909377e-08" z="0.39102396369"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.510058365799</rotx><rotz>1.08260953763</rotz><roty>-0.392938799486</roty></matrix>
+<v x="8.59927329344e-09" y="-8.78323547227e-09" z="0.441814690828"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.678605403685</rotx><rotz>-0.267168070885</rotz><roty>-0.60671396927</roty></matrix>
+<v x="-3.39679750994e-09" y="2.80198042546e-09" z="0.119804479182"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.31626936614</rotx><rotz>0.574015277932</rotz><roty>-0.162424413895</roty></matrix>
+<v x="-8.75075159001e-08" y="-0.00166442082264" z="0.262991577387"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>1.48038001042</rotx><rotz>0.406768927922</rotz><roty>-2.74853244725</roty></matrix>
+<v x="2.30177725768e-08" y="-1.4896124334e-09" z="0.391024917364"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>0.416372320103</rotx><rotz>-1.17712852025</rotz><roty>0.502882078768</roty></matrix>
+<v x="4.69037475526e-09" y="1.03063957368e-09" z="0.441814720631"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.182502301603</rotx><rotz>0.0271226416297</rotz><roty>0.630739410728</roty></matrix>
+<v x="-7.35752880843e-09" y="-1.89659421501e-09" z="0.119804531336"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.78219046412</rotx><rotz>-0.602304839769</rotz><roty>0.721221507186</roty></matrix>
+<v x="-8.75075159001e-08" y="-0.00166442082264" z="0.262991577387"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.13526365126</rotx><rotz>5.75769364692e-05</rotz><roty>1.81631025979e-07</roty></matrix>
+<v x="-4.61507988803e-05" y="0.16787725687" z="0.308514803648"/>
+</move></bone></frame>
+</script>
+<script name="attack_sword_t">
+<frame duration="0.0">
+<bone name="head"><move><matrix><rotx>1.5304026978</rotx><rotz>0.36805425555</rotz><roty>0.158436546544</roty></matrix>
+<v x="-1.82983583841e-09" y="2.43223539087e-08" z="0.205132544041"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.179804952183</rotx><rotz>0.226256573575</rotz><roty>0.0474408941908</roty></matrix>
+<v x="3.75047903844e-09" y="1.86243731548e-09" z="0.211406767368"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.208044613039</rotx><rotz>0.208578959667</rotz><roty>1.3400145099</roty></matrix>
+<v x="-9.53673406912e-09" y="8.61905036231e-09" z="0.0236427821219"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.41839778727</rotx><rotz>0.142402435925</rotz><roty>1.41688891845</roty></matrix>
+<v x="2.70191087282e-08" y="4.41193481748e-09" z="0.0237137619406"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>-0.0399398055361</rotx><rotz>-0.206166069141</rotz><roty>0.241539589543</roty></matrix>
+<v x="-6.71282895937e-09" y="-1.82692758699e-08" z="0.0494092181325"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>0.263544091208</rotx><rotz>0.117253631507</rotz><roty>-0.0903384105947</roty></matrix>
+<v x="5.84119774771e-08" y="2.64300297204e-08" z="0.220042303205"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>0.36601530613</rotx><rotz>-0.234166761224</rotz><roty>0.666215912241</roty></matrix>
+<v x="8.8119698205e-09" y="5.83744963478e-09" z="0.282872885466"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>1.33888825907</rotx><rotz>0.703185515019</rotz><roty>0.926065067174</roty></matrix>
+<v x="8.12356937274e-09" y="2.28946781533e-08" z="0.187517672777"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>-2.19042536235</rotx><rotz>-1.53920790732</rotz><roty>-0.805244905368</roty></matrix>
+<v x="1.07813626471e-07" y="-4.46031052093e-08" z="0.211406752467"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.417491413682</rotx><rotz>0.161261294934</rotz><roty>-1.513592825</roty></matrix>
+<v x="8.03867692412e-08" y="3.88661192119e-09" z="0.0223210323602"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>0.342787248392</rotx><rotz>0.0708913009128</rotz><roty>-1.66547716303</roty></matrix>
+<v x="-5.7332520953e-09" y="-1.26920802757e-08" z="0.0257751848549"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.0826082776028</rotx><rotz>-0.0289116991546</rotz><roty>-0.321183785498</roty></matrix>
+<v x="1.93902849333e-08" y="5.17844744863e-09" z="0.0483605340123"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.0453235729332</rotx><rotz>0.148130912074</rotz><roty>0.0752182802163</roty></matrix>
+<v x="1.83624280226e-08" y="-1.48607517403e-08" z="0.227362155914"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>1.78702476729</rotx><rotz>-0.544569904181</rotz><roty>-0.0702065605847</roty></matrix>
+<v x="-2.41826185743e-08" y="-4.08043776545e-09" z="0.276810020208"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>-0.0086069054399</rotx><rotz>0.610545325972</rotz><roty>-1.51711099396</roty></matrix>
+<v x="-8.73219363484e-09" y="-3.97247745809e-09" z="0.185582786798"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>-2.39199403315</rotx><rotz>1.50648657911</rotz><roty>0.793806428749</roty></matrix>
+<v x="3.75047903844e-09" y="1.86243731548e-09" z="0.211406767368"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.171805265677</rotx><rotz>3.38165177207e-09</rotz><roty>-3.40437672659e-08</roty></matrix>
+<v x="1.1255363308e-10" y="-1.21984533585e-10" z="0.127841189504"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.64967368713</rotx><rotz>-0.587168497398</rotz><roty>-0.421983001308</roty></matrix>
+<v x="3.19281233396e-12" y="-6.7425385275e-09" z="0.0740292295814"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.01275255855</rotx><rotz>5.74388491935e-05</rotz><roty>-2.47170962329e-07</roty></matrix>
+<v x="-9.58312114108e-08" y="-0.00166442082264" z="0.262991577387"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>0.241048985336</rotx><rotz>-1.09017324802</rotz><roty>1.18006891641</roty></matrix>
+<v x="1.41787088737e-08" y="-9.30690369216e-09" z="0.391023904085"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.51005829922</rotx><rotz>1.08260953763</rotz><roty>-0.392938866065</roty></matrix>
+<v x="9.65305346767e-09" y="3.37898908853e-09" z="0.441814690828"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.573197154845</rotx><rotz>-0.20762398339</rotz><roty>-0.792033362674</roty></matrix>
+<v x="-2.89736545867e-09" y="1.01481267833e-08" z="0.119804479182"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.97538003117</rotx><rotz>0.674665922643</rotz><roty>-0.497534684326</roty></matrix>
+<v x="-8.75075159001e-08" y="-0.00166442082264" z="0.262991577387"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>-1.48086124362</rotx><rotz>2.67062886009</rotz><roty>0.387336740265</roty></matrix>
+<v x="3.87044885031e-09" y="-2.41683508762e-08" z="0.391024887562"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>0.661948130015</rotx><rotz>-1.06978561804</rotz><roty>0.864048900397</roty></matrix>
+<v x="1.88647941712e-08" y="-7.27704785319e-10" z="0.441814720631"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.187031939144</rotx><rotz>0.0650346601358</rotz><roty>0.91099323988</roty></matrix>
+<v x="5.39012345868e-09" y="-5.98463811841e-09" z="0.119804531336"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.17617031489</rotx><rotz>-0.63293698468</rotz><roty>0.417407091344</roty></matrix>
+<v x="-8.75075159001e-08" y="-0.00166442082264" z="0.262991577387"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.13526365126</rotx><rotz>5.75769364692e-05</rotz><roty>1.81631025979e-07</roty></matrix>
+<v x="-4.61507988803e-05" y="0.16787725687" z="0.308514803648"/>
+</move></bone></frame>
+<frame duration="125.0">
+<bone name="head"><move><matrix><rotx>1.54461665433</rotx><rotz>0.26918995943</rotz><roty>0.113135344164</roty></matrix>
+<v x="2.87714607694e-09" y="-3.2430449437e-08" z="0.205132573843"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.157785636684</rotx><rotz>0.161006530286</rotz><roty>0.0515796129723</roty></matrix>
+<v x="5.0064907775e-09" y="5.14576203869e-09" z="0.211406856775"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.208044596395</rotx><rotz>0.208578992957</rotz><roty>1.34001437674</roty></matrix>
+<v x="1.68468847761e-08" y="2.17002735781e-08" z="0.0236428361386"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.418397820559</rotx><rotz>0.14240241928</rotz><roty>1.41688891845</roty></matrix>
+<v x="-7.4882278156e-10" y="3.47528157363e-08" z="0.0237137377262"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>-0.0399397264735</rotx><rotz>-0.206166069141</rotz><roty>0.241539622833</roty></matrix>
+<v x="-6.16734894265e-08" y="4.02490663021e-08" z="0.0494092851877"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>-0.101901048777</rotx><rotz>1.08197963346</rotz><roty>-0.0663944410601</roty></matrix>
+<v x="1.52933790076e-08" y="1.69971219321e-08" z="0.220042333007"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>0.619172569744</rotx><rotz>-0.226286167952</rotz><roty>0.848602033442</roty></matrix>
+<v x="6.49594582569e-08" y="-5.67506788229e-08" z="0.282872885466"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>1.64254761236</rotx><rotz>0.751724022731</rotz><roty>1.14441092047</roty></matrix>
+<v x="1.29939166982e-07" y="-8.55777315678e-09" z="0.187517732382"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>0.0311781595138</rotx><rotz>-1.76842791339</rotz><roty>1.27265717382</roty></matrix>
+<v x="-8.35503115582e-08" y="-4.10186551392e-08" z="0.211406961083"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.417491380393</rotx><rotz>0.161261344868</rotz><roty>-1.513592825</roty></matrix>
+<v x="2.5264208503e-08" y="1.06288233326e-07" z="0.0223210565746"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>0.342787248392</rotx><rotz>0.0708912842681</rotz><roty>-1.66547716303</roty></matrix>
+<v x="2.45340050498e-08" y="-4.93200218443e-08" z="0.0257751848549"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.0826082526357</rotx><rotz>-0.0289116346562</rotz><roty>-0.321183752208</roty></matrix>
+<v x="1.70217262507e-09" y="-6.4284876089e-08" z="0.0483605079353"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.102624613001</rotx><rotz>0.208013187739</rotz><roty>0.138303889264</roty></matrix>
+<v x="3.13325116963e-08" y="1.87856290523e-08" z="0.227362215519"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>2.27901874496</rotx><rotz>-0.4526164778</rotz><roty>-0.172931949265</roty></matrix>
+<v x="-2.59617802811e-08" y="-4.10768166148e-08" z="0.276810020208"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>0.240050283283</rotx><rotz>0.68286639485</rotz><roty>-1.64154692958</roty></matrix>
+<v x="-3.71364947682e-08" y="-1.06907069863e-08" z="0.185582771897"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>-2.57006629943</rotx><rotz>1.18829475523</rotz><roty>0.643386496429</roty></matrix>
+<v x="-1.97439305794e-07" y="-2.73285706953e-07" z="0.211407035589"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.176696294177</rotx><rotz>0.000121129665727</rotz><roty>-0.00418741483813</roty></matrix>
+<v x="2.48225511257e-08" y="6.27746672421e-08" z="0.127841159701"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.54603334449</rotx><rotz>-0.439336358708</rotz><roty>-0.298773118477</roty></matrix>
+<v x="-1.86519868994e-10" y="-1.01162225263e-08" z="0.0740292146802"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.01275255855</rotx><rotz>5.74382924719e-05</rotz><roty>-2.4810566793e-07</roty></matrix>
+<v x="-9.62770911883e-08" y="-0.00166444154456" z="0.262991607189"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>0.485155812236</rotx><rotz>-1.11563626384</rotz><roty>1.55803219516</roty></matrix>
+<v x="1.63569744416e-08" y="-1.47961465302e-08" z="0.391023933887"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.937926453774</rotx><rotz>1.01614788921</rotz><roty>-0.640178386</roty></matrix>
+<v x="7.84277265353e-09" y="2.45267228749e-09" z="0.441814690828"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.633716025878</rotx><rotz>-0.239974965758</rotz><roty>-0.84894644675</roty></matrix>
+<v x="2.71379008154e-08" y="-6.8567986844e-09" z="0.119804494083"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.86577537283</rotx><rotz>0.672227132875</rotz><roty>-0.48446289101</roty></matrix>
+<v x="-8.78951880168e-08" y="-0.00166444154456" z="0.262991607189"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>-2.08399852097</rotx><rotz>1.89924491614</rotz><roty>0.7140174567</roty></matrix>
+<v x="-3.68589283539e-08" y="-5.88413984204e-10" z="0.391024917364"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>1.02585231506</rotx><rotz>-1.16975742298</rotz><roty>0.792066119556</roty></matrix>
+<v x="1.56772479443e-08" y="6.45336726279e-08" z="0.441814750433"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.30295008691</rotx><rotz>0.109331609436</rotz><roty>0.891557223928</roty></matrix>
+<v x="-1.41585685398e-08" y="-2.94789668231e-08" z="0.119804538786"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.27781225474</rotx><rotz>-0.640534450638</rotz><roty>0.418655980737</roty></matrix>
+<v x="-8.78951880168e-08" y="-0.00166444154456" z="0.262991607189"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.13526365126</rotx><rotz>5.75769364692e-05</rotz><roty>1.81631025979e-07</roty></matrix>
+<v x="0.00697702355683" y="0.275295764208" z="-0.464972943068"/>
+</move></bone></frame>
+<frame duration="166.666666667">
+<bone name="head"><move><matrix><rotx>1.55962556444</rotx><rotz>-0.0400390665434</rotz><roty>-0.0163708662993</roty></matrix>
+<v x="-6.56177157055e-09" y="-2.37075823861e-07" z="0.20513266325"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.0923943792787</rotx><rotz>-0.0390324207797</rotz><roty>0.0552704629599</roty></matrix>
+<v x="-1.29553090478e-09" y="-9.66260955693e-08" z="0.211406886578"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.208044563105</rotx><rotz>0.208579009602</rotz><roty>1.34001437674</roty></matrix>
+<v x="2.55910848068e-08" y="1.92683458522e-07" z="0.0236425753683"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.418397820559</rotx><rotz>0.14240241928</rotz><roty>1.41688891845</roty></matrix>
+<v x="2.00293062136e-08" y="-3.09537959708e-08" z="0.0237137563527"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>-0.0399398221809</rotx><rotz>-0.206166019206</rotz><roty>0.241539639478</roty></matrix>
+<v x="-6.90954991001e-08" y="1.16472691047e-07" z="0.0494092330337"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>-0.0970366768552</rotx><rotz>1.08201824929</rotz><roty>-0.0675412856105</roty></matrix>
+<v x="2.12321808135e-07" y="3.96829200611e-08" z="0.220042392612"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>0.633369681778</rotx><rotz>-0.216169418182</rotz><roty>0.863599025909</roty></matrix>
+<v x="4.25397885806e-08" y="9.6744720679e-08" z="0.282872855663"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>1.64611065558</rotx><rotz>0.750705230456</rotz><roty>1.14814427284</roty></matrix>
+<v x="-7.86997986779e-08" y="-9.78906466997e-09" z="0.187517717481"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>0.010250585058</rotx><rotz>-1.77212970731</rotz><roty>1.26687531793</roty></matrix>
+<v x="-1.0598296285e-07" y="-1.29444870822e-07" z="0.211406946182"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.417491446972</rotx><rotz>0.161261311578</rotz><roty>-1.513592825</roty></matrix>
+<v x="-2.93048181277e-08" y="-2.52937901735e-08" z="0.0223210621625"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>0.342787248392</rotx><rotz>0.0708912759457</rotz><roty>-1.66547716303</roty></matrix>
+<v x="4.88524385389e-08" y="-3.41470283161e-08" z="0.0257750917226"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.0826083025699</rotx><rotz>-0.0289116762681</rotz><roty>-0.321183752208</roty></matrix>
+<v x="2.18163975774e-09" y="-1.93782305757e-08" z="0.0483604669571"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.102624621323</rotx><rotz>0.208013171094</rotz><roty>0.138303939198</roty></matrix>
+<v x="5.47417293717e-08" y="-2.34196839699e-08" z="0.227362319827"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>2.27901874496</rotx><rotz>-0.4526164778</rotz><roty>-0.172931932621</roty></matrix>
+<v x="-6.57422773997e-08" y="-1.688292528e-08" z="0.276810020208"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>0.240050283283</rotx><rotz>0.68286639485</rotz><roty>-1.64154692958</roty></matrix>
+<v x="-1.45272508689e-07" y="-3.93319155023e-09" z="0.185582906008"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>-2.57006656575</rotx><rotz>1.18829475523</rotz><roty>0.643386629587</roty></matrix>
+<v x="-2.00590747568e-07" y="-4.51372557109e-07" z="0.211407080293"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.191531649411</rotx><rotz>0.000363216259066</rotz><roty>-0.0168892422831</roty></matrix>
+<v x="-8.01167487907e-09" y="4.46854429015e-08" z="0.127841204405"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.351550712854</rotx><rotz>0.0947676219946</rotz><roty>-0.0215954962975</roty></matrix>
+<v x="-1.74843572953e-09" y="1.88482189856e-07" z="0.0740292519331"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.01275255855</rotx><rotz>5.74366101162e-05</rotz><roty>-2.50940135204e-07</roty></matrix>
+<v x="-9.43741937931e-08" y="-0.00166445388459" z="0.262991398573"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>0.485155845526</rotx><rotz>-1.11563626384</rotz><roty>1.55803206201</roty></matrix>
+<v x="1.34054886303e-07" y="3.30627401013e-08" z="0.391023844481"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.937926453774</rotx><rotz>1.01614788921</rotz><roty>-0.640178186263</roty></matrix>
+<v x="-5.16534282013e-09" y="-4.24852117931e-08" z="0.44181445241"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.633716025878</rotx><rotz>-0.239974999048</rotz><roty>-0.848946380171</roty></matrix>
+<v x="9.54840331246e-08" y="-2.70618016884e-07" z="0.119804516435"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.5287833627</rotx><rotz>0.657884745403</rotz><roty>-0.447482202824</roty></matrix>
+<v x="-8.69236131962e-08" y="-0.00166445388459" z="0.262991398573"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>0.750443841195</rotx><rotz>1.16961760703</rotz><roty>-1.9505343361</roty></matrix>
+<v x="8.70976037959e-08" y="-5.04129271661e-09" z="0.391024827957"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>0.950254026723</rotx><rotz>-1.26712818508</rotz><roty>0.753645160562</roty></matrix>
+<v x="6.13214510281e-08" y="1.02895967302e-08" z="0.441814720631"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.426006172188</rotx><rotz>0.159148709109</rotz><roty>0.871292165929</roty></matrix>
+<v x="-6.98741331462e-08" y="8.9462879771e-08" z="0.119804508984"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.60171336336</rotx><rotz>-0.662770913634</rotz><roty>0.436192397173</roty></matrix>
+<v x="-8.69236131962e-08" y="-0.00166445388459" z="0.262991398573"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.13526365126</rotx><rotz>5.75769364692e-05</rotz><roty>1.81631025979e-07</roty></matrix>
+<v x="0.0254050921649" y="0.444577991962" z="-2.38031220436"/>
+</move></bone></frame>
+<frame duration="250.0">
+<bone name="head"><move><matrix><rotx>1.5304026978</rotx><rotz>-0.368053822786</rotz><roty>-0.158443803658</roty></matrix>
+<v x="-6.13756867551e-08" y="3.26793525574e-08" z="0.205132752657"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.0210897557647</rotx><rotz>-0.252726946716</rotz><roty>0.0445003690344</roty></matrix>
+<v x="5.2267381534e-09" y="-1.65012394859e-07" z="0.211406677961"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.208044563105</rotx><rotz>0.208578976312</rotz><roty>1.3400145099</roty></matrix>
+<v x="1.32719250701e-07" y="5.56978960731e-08" z="0.0236427634954"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.418397820559</rotx><rotz>0.14240241928</rotz><roty>1.41688891845</roty></matrix>
+<v x="4.29227249299e-08" y="3.13314103551e-07" z="0.0237136185169"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>-0.0399397722466</rotx><rotz>-0.206166069141</rotz><roty>0.241539606188</roty></matrix>
+<v x="7.00787765595e-08" y="-1.99883089635e-07" z="0.0494091808796"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>-0.0277455237998</rotx><rotz>-0.0767047901578</rotz><roty>-0.0869452853723</roty></matrix>
+<v x="4.14730969567e-08" y="-2.57188048636e-08" z="0.220042571425"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>1.31849816566</rotx><rotz>0.595221164165</rotz><roty>0.643548949255</roty></matrix>
+<v x="2.78410055898e-07" y="5.4397958138e-08" z="0.282872885466"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>-0.00113274891205</rotx><rotz>-0.632840178775</rotz><roty>1.49866700552</roty></matrix>
+<v x="4.62344971197e-08" y="2.23819156986e-07" z="0.187517344952"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>0.713637090717</rotx><rotz>-1.64798139309</rotz><roty>2.30747462121</roty></matrix>
+<v x="-4.06422415722e-08" y="-8.9876812126e-07" z="0.211406588554"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.417491380393</rotx><rotz>0.161261294934</rotz><roty>-1.513592825</roty></matrix>
+<v x="-4.05873272769e-08" y="-6.34344630157e-08" z="0.0223208256066"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>0.342787248392</rotx><rotz>0.0708913092352</rotz><roty>-1.66547729619</roty></matrix>
+<v x="-4.05800136605e-07" y="2.16654441942e-07" z="0.0257754139602"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.0826083358594</rotx><rotz>-0.0289115951249</rotz><roty>-0.321183785498</roty></matrix>
+<v x="-2.57228247591e-08" y="-4.12625780655e-07" z="0.0483604744077"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.26466305163</rotx><rotz>0.11375366359</rotz><roty>0.162063272606</roty></matrix>
+<v x="2.10833974279e-07" y="-3.28876723188e-07" z="0.22736209631"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>0.67590908624</rotx><rotz>0.181687091349</rotz><roty>-0.700697190455</roty></matrix>
+<v x="-2.91531677021e-07" y="8.07346452802e-07" z="0.276809990406"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>1.36736064692</rotx><rotz>-0.715329862485</rotz><roty>-0.940294270299</roty></matrix>
+<v x="-2.65717602588e-07" y="2.55871441368e-07" z="0.18558268249"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>-1.93961710669</rotx><rotz>1.4970292946</rotz><roty>0.503466309732</roty></matrix>
+<v x="-1.00517763002e-08" y="-1.0251218896e-07" z="0.211406573653"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.207455838057</rotx><rotz>0.000413328290306</rotz><roty>-0.0305238520429</roty></matrix>
+<v x="-7.28701010644e-08" y="-1.61856121395e-07" z="0.127841055393"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.291184840425</rotx><rotz>0.682236690411</rotz><roty>0.20769582216</roty></matrix>
+<v x="2.18258779106e-11" y="-1.89128243733e-07" z="0.0740291252732"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.01275255855</rotx><rotz>5.74348017869e-05</rotz><roty>-2.53982309541e-07</roty></matrix>
+<v x="-9.67156950082e-08" y="-0.00166443199851" z="0.262991309166"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>-1.61045612175</rotx><rotz>-2.43152013741</rotz><roty>-0.459997195735</roty></matrix>
+<v x="-3.19926698467e-08" y="-2.40915660754e-08" z="0.39102396369"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.401670871937</rotx><rotz>0.852959031564</rotz><roty>-0.63892590134</roty></matrix>
+<v x="-1.15275426538e-07" y="1.42334641851e-07" z="0.441814631224"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.18703185592</rotx><rotz>-0.0650255845822</rotz><roty>-0.91099457146</roty></matrix>
+<v x="-1.71222431788e-08" y="-9.13251199108e-08" z="0.119804389775"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.17623116812</rotx><rotz>0.633041646911</rotz><roty>-0.417445340995</roty></matrix>
+<v x="-8.92651144113e-08" y="-0.00166443211492" z="0.262991309166"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>0.829240719159</rotx><rotz>1.12472270316</rotz><roty>-1.70924088922</roty></matrix>
+<v x="8.45155696538e-08" y="7.62716290126e-09" z="0.391024917364"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>0.781634983619</rotx><rotz>-1.32784759214</rotz><roty>0.658721910092</roty></matrix>
+<v x="1.31625661481e-08" y="6.46665725412e-08" z="0.441814571619"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.573198353267</rotx><rotz>0.207632954914</rotz><roty>0.792032031094</roty></matrix>
+<v x="2.20536975348e-08" y="-2.31218351132e-07" z="0.119804576039"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.97530679424</rotx><rotz>-0.674565321733</rotz><roty>0.497486614268</roty></matrix>
+<v x="-8.92651144113e-08" y="-0.00166443211492" z="0.262991309166"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.13526365126</rotx><rotz>5.75769364692e-05</rotz><roty>1.81631025979e-07</roty></matrix>
+<v x="0.0456175655127" y="0.167874649167" z="-4.39502477646"/>
+</move></bone></frame>
+<frame duration="166.666666667">
+<bone name="head"><move><matrix><rotx>1.55336300798</rotx><rotz>-0.178196685845</rotz><roty>-0.0737416156485</roty></matrix>
+<v x="3.19860653519e-08" y="-3.04961922382e-08" z="0.205132186413"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.0631967627333</rotx><rotz>-0.128222351477</rotz><roty>0.0526876960453</roty></matrix>
+<v x="-9.01415262433e-08" y="-8.98725076581e-08" z="0.211406797171"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.20804457975</rotx><rotz>0.208578992957</rotz><roty>1.34001437674</roty></matrix>
+<v x="-1.06434434599e-07" y="8.83731701151e-08" z="0.0236428137869"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.418397820559</rotx><rotz>0.142402435925</rotz><roty>1.41688891845</roty></matrix>
+<v x="-1.1828568347e-08" y="8.21155623498e-08" z="0.0237137656659"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>-0.0399397722466</rotx><rotz>-0.20616610243</rotz><roty>0.241539622833</roty></matrix>
+<v x="1.71430052376e-08" y="-3.19225051726e-07" z="0.0494093038142"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>-0.00137655636843</rotx><rotz>-0.0930760403268</rotz><roty>-0.0535671176103</roty></matrix>
+<v x="-6.32378061027e-08" y="6.55289724705e-08" z="0.220042347908"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>1.33634786971</rotx><rotz>0.466147566535</rotz><roty>0.318766001413</roty></matrix>
+<v x="-6.83608121221e-08" y="2.70083866383e-08" z="0.282872766256"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>0.278842220616</rotx><rotz>-0.229947581688</rotz><roty>1.56188032978</roty></matrix>
+<v x="5.73243070789e-08" y="-7.75150752474e-08" z="0.187517628074"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>-2.00251418057</rotx><rotz>-1.49278381635</rotz><roty>-0.437112153145</roty></matrix>
+<v x="-9.38610043022e-08" y="-6.32239334664e-07" z="0.211406752467"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.417491413682</rotx><rotz>0.161261278289</rotz><roty>-1.513592825</roty></matrix>
+<v x="1.29144783756e-09" y="-3.2237133496e-07" z="0.022320959717"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>0.342787215102</rotx><rotz>0.07089132588</rotz><roty>-1.66547729619</roty></matrix>
+<v x="2.25728882697e-07" y="1.34318582923e-07" z="0.0257751792669"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.0826083192147</rotx><rotz>-0.028911609689</rotz><roty>-0.321183752208</roty></matrix>
+<v x="4.03610798116e-08" y="-2.9912177979e-07" z="0.0483604855835"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.232714539481</rotx><rotz>-0.0665681290975</rotz><roty>0.0581105245254</roty></matrix>
+<v x="1.8482710118e-07" y="-1.74709157363e-07" z="0.227362275124"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>0.929843826445</rotx><rotz>-0.0962383027723</rotz><roty>-0.664699175421</roty></matrix>
+<v x="-1.08783515529e-08" y="-7.93688670342e-08" z="0.276810020208"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>0.89370419782</rotx><rotz>-0.519494544753</rotz><roty>-1.30764937948</roty></matrix>
+<v x="-2.19333884388e-07" y="-1.18757981227e-08" z="0.185582891107"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>-1.87069915821</rotx><rotz>1.50865479171</rotz><roty>0.367087627943</roty></matrix>
+<v x="-8.44757508389e-08" y="-5.98339937596e-08" z="0.211406752467"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.198142164513</rotx><rotz>0.00041037576402</rotz><roty>-0.0225492699912</roty></matrix>
+<v x="-1.03938489815e-07" y="-1.49848588649e-07" z="0.127841293812"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.309516077288</rotx><rotz>0.346137571622</rotz><roty>0.0755789554517</roty></matrix>
+<v x="-1.6991476004e-09" y="3.12297743221e-07" z="0.0740292072296"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.01275255855</rotx><rotz>5.74358624025e-05</rotz><roty>-2.52202997331e-07</roty></matrix>
+<v x="-9.43802476172e-08" y="-0.00166442024056" z="0.262991398573"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>-1.7710541897</rotx><rotz>-2.24693431173</rotz><roty>-0.678543218874</roty></matrix>
+<v x="3.1413478041e-07" y="-8.79759198824e-09" z="0.391023695469"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.435290118195</rotx><rotz>0.911520346039</rotz><roty>-0.577660479674</roty></matrix>
+<v x="-8.74710508469e-08" y="4.06290723731e-07" z="0.441814720631"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.285337038014</rotx><rotz>-0.106384280735</rotz><roty>-0.885674966871</roty></matrix>
+<v x="-6.12882145035e-09" y="-2.66530264525e-07" z="0.119804680347"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.38005713426</rotx><rotz>0.648513414422</rotz><roty>-0.433494814726</roty></matrix>
+<v x="-8.69296670203e-08" y="-0.00166442024056" z="0.262991398573"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>1.15865710124</rotx><rotz>0.972096208719</rotz><roty>-2.41938491127</roty></matrix>
+<v x="-2.98012068356e-08" y="4.04326314651e-08" z="0.391025006771"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>1.54777236706</rotx><rotz>-1.15303037449</rotz><roty>1.08162343566</roty></matrix>
+<v x="-3.70251984627e-09" y="-1.50203149474e-07" z="0.441814810038"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.687237774043</rotx><rotz>0.138919537206</rotz><roty>0.501718477109</roty></matrix>
+<v x="8.28654478369e-08" y="-3.60371243957e-09" z="0.119804546237"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.77615707267</rotx><rotz>-0.357467224821</rotz><roty>0.507614449446</roty></matrix>
+<v x="-8.69296670203e-08" y="-0.00166442024056" z="0.262991398573"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.13526365126</rotx><rotz>5.75769364692e-05</rotz><roty>1.81631025979e-07</roty></matrix>
+<v x="0.0336889326572" y="0.168189719319" z="-3.21561694145"/>
+</move></bone></frame>
+<frame duration="166.666666667">
+<bone name="head"><move><matrix><rotx>1.55421695059</rotx><rotz>0.166357586575</rotz><roty>0.0687734428619</roty></matrix>
+<v x="-8.88877860206e-09" y="9.30807786403e-08" z="0.205132633448"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.135679959865</rotx><rotz>0.0940376495398</rotz><roty>0.0542873487212</roty></matrix>
+<v x="-6.52704823523e-09" y="1.42132057235e-08" z="0.211406812072"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.208044613039</rotx><rotz>0.208578992957</rotz><roty>1.34001437674</roty></matrix>
+<v x="1.9820863173e-08" y="-1.30369910423e-08" z="0.0236427430063"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.418397820559</rotx><rotz>0.142402435925</rotz><roty>1.41688891845</roty></matrix>
+<v x="-1.58147869911e-07" y="3.70266626248e-08" z="0.02371375449"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>-0.039939780569</rotx><rotz>-0.20616610243</rotz><roty>0.241539622833</roty></matrix>
+<v x="6.45542712618e-08" y="8.2866314699e-08" z="0.0494092367589"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>-0.151166982296</rotx><rotz>0.190918373346</rotz><roty>0.0112055654966</roty></matrix>
+<v x="-7.6361743595e-08" y="-1.17663532251e-08" z="0.220042303205"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>0.671683848012</rotx><rotz>0.0426798154684</rotz><roty>0.633212022642</roty></matrix>
+<v x="6.19729263462e-08" y="-8.99538150634e-08" z="0.282872885466"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>0.868078063389</rotx><rotz>0.430611476792</rotz><roty>1.29956016083</roty></matrix>
+<v x="4.78974371276e-08" y="6.60968453303e-08" z="0.187517657876"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>-2.18021946326</rotx><rotz>-1.50494207883</rotz><roty>-0.736984691099</roty></matrix>
+<v x="1.45926284389e-08" y="-2.33446769471e-07" z="0.211406737566"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.417491380393</rotx><rotz>0.161261344868</rotz><roty>-1.513592825</roty></matrix>
+<v x="-6.53849525634e-08" y="9.07818673568e-08" z="0.0223211534321"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>0.342787248392</rotx><rotz>0.0708913175576</rotz><roty>-1.66547729619</roty></matrix>
+<v x="-2.28784848844e-08" y="6.25400353726e-09" z="0.0257751513273"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.0826083025699</rotx><rotz>-0.0289116450591</rotz><roty>-0.321183752208</roty></matrix>
+<v x="-1.40577363084e-08" y="1.4639762469e-07" z="0.0483603365719"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.126922445904</rotx><rotz>0.0420185733757</rotz><roty>0.0624115796202</roty></matrix>
+<v x="-2.20218634439e-08" y="-8.16582801377e-09" z="0.22736223042"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>1.41070279471</rotx><rotz>-0.441641291342</rotz><roty>-0.362612718363</roty></matrix>
+<v x="2.95248270277e-09" y="2.09129797923e-08" z="0.276809990406"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>0.323729933947</rotx><rotz>0.161245648862</rotz><roty>-1.57640081615</roty></matrix>
+<v x="-1.03715564137e-07" y="-5.20699714457e-08" z="0.185582786798"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>-2.17383839613</rotx><rotz>1.51170664116</rotz><roty>0.610735409095</roty></matrix>
+<v x="-3.00524893859e-09" y="1.3082070538e-08" z="0.211406812072"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.181680217064</rotx><rotz>0.000223478795519</rotz><roty>-0.0084544982443</roty></matrix>
+<v x="-3.83178679897e-08" y="-1.28573844904e-07" z="0.127841219306"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.462750471538</rotx><rotz>-0.270806764528</rotz><roty>-0.192308393632</roty></matrix>
+<v x="-7.74900754674e-10" y="-3.10449657093e-08" z="0.074029199779"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.01275255855</rotx><rotz>5.7437727623e-05</rotz><roty>-2.49057993313e-07</roty></matrix>
+<v x="-9.60601624911e-08" y="-0.00166441686451" z="0.262991636992"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>0.747959511372</rotx><rotz>-1.11028397584</rotz><roty>1.74275583943</roty></matrix>
+<v x="-3.06064755762e-08" y="8.30189250678e-09" z="0.39102396369"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.48668802868</rotx><rotz>1.01774538639</rotz><roty>-0.465162163642</roty></matrix>
+<v x="-4.65638416713e-09" y="-5.5960347467e-09" z="0.441814601421"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.463901955814</rotx><rotz>-0.172944399543</rotz><roty>-0.830652727169</roty></matrix>
+<v x="-5.38248778881e-09" y="9.17106248721e-08" z="0.11980445683"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.75286546525</rotx><rotz>0.668545512405</rotz><roty>-0.471421957074</roty></matrix>
+<v x="-8.76782593195e-08" y="-0.00166441686451" z="0.262991636992"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>-1.62371693292</rotx><rotz>2.48654397501</rotz><roty>0.439444582917</roty></matrix>
+<v x="8.58918127733e-08" y="-1.25505392745e-08" z="0.391024947166"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>1.07930422182</rotx><rotz>-1.12189269503</rotz><roty>0.946462617437</roty></matrix>
+<v x="1.36203901491e-08" y="5.14830027498e-08" z="0.441814810038"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.432296092629</rotx><rotz>0.12752841492</rotz><roty>0.711870083334</roty></matrix>
+<v x="-1.04303357062e-08" y="-1.88743438656e-08" z="0.119804516435"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.77615707267</rotx><rotz>-0.357467224821</rotz><roty>0.507614449446</roty></matrix>
+<v x="-8.76782593195e-08" y="-0.00166441686451" z="0.262991636992"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.13526365126</rotx><rotz>5.75769364692e-05</rotz><roty>1.81631025979e-07</roty></matrix>
+<v x="0.0118826385587" y="0.168407082558" z="-1.00376629829"/>
+</move></bone></frame>
+<frame duration="166.666666667">
+<bone name="head"><move><matrix><rotx>1.5304026978</rotx><rotz>0.36805425555</rotz><roty>0.158436546544</roty></matrix>
+<v x="-1.82983583841e-09" y="2.43223539087e-08" z="0.205132544041"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.179804952183</rotx><rotz>0.226256573575</rotz><roty>0.0474408941908</roty></matrix>
+<v x="3.75047903844e-09" y="1.86243731548e-09" z="0.211406767368"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.208044596395</rotx><rotz>0.208578992957</rotz><roty>1.3400145099</roty></matrix>
+<v x="2.66638942037e-08" y="7.27070093021e-09" z="0.0236427839845"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.41839778727</rotx><rotz>0.142402369346</rotz><roty>1.41688891845</roty></matrix>
+<v x="1.00720285445e-08" y="-7.66406493824e-10" z="0.0237137619406"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>-0.0399398180197</rotx><rotz>-0.20616610243</rotz><roty>0.241539622833</roty></matrix>
+<v x="3.00322655633e-09" y="-5.90733151284e-09" z="0.0494092442095"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>0.262690897619</rotx><rotz>0.117055617157</rotz><roty>-0.09107160381</roty></matrix>
+<v x="-7.48200434941e-09" y="-2.05025081357e-08" z="0.220042333007"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>0.36346030267</rotx><rotz>-0.235792005213</rotz><roty>0.662491681194</roty></matrix>
+<v x="3.98403088298e-08" y="7.63221308375e-09" z="0.282872885466"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>1.33833085945</rotx><rotz>0.702500949461</rotz><roty>0.925901881978</roty></matrix>
+<v x="-1.25251924388e-08" y="-2.64688182483e-08" z="0.187517687678"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>-2.25310964967</rotx><rotz>-1.54168105186</rotz><roty>-0.87316749739</roty></matrix>
+<v x="5.56865664691e-08" y="-3.69037032044e-08" z="0.211406752467"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.417491413682</rotx><rotz>0.161261294934</rotz><roty>-1.513592825</roty></matrix>
+<v x="8.03867692412e-08" y="3.88661192119e-09" z="0.0223210323602"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>0.342787248392</rotx><rotz>0.0708913009128</rotz><roty>-1.66547716303</roty></matrix>
+<v x="-5.7332520953e-09" y="-1.26920802757e-08" z="0.0257751848549"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.0826082776028</rotx><rotz>-0.0289116991546</rotz><roty>-0.321183785498</roty></matrix>
+<v x="1.93902849333e-08" y="5.17844744863e-09" z="0.0483605340123"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.0453235729332</rotx><rotz>0.148130912074</rotz><roty>0.0752182802163</roty></matrix>
+<v x="1.83624280226e-08" y="-1.48607517403e-08" z="0.227362155914"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>1.78702476729</rotx><rotz>-0.544569904181</rotz><roty>-0.0702065605847</roty></matrix>
+<v x="-2.41826185743e-08" y="-4.08043776545e-09" z="0.276810020208"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>-0.0086069054399</rotx><rotz>0.610545325972</rotz><roty>-1.51711099396</roty></matrix>
+<v x="-8.73219363484e-09" y="-3.97247745809e-09" z="0.185582786798"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>-2.39199403315</rotx><rotz>1.50648657911</rotz><roty>0.793806428749</roty></matrix>
+<v x="3.75047903844e-09" y="1.86243731548e-09" z="0.211406767368"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.171805265677</rotx><rotz>3.38165177207e-09</rotz><roty>-3.40437672659e-08</roty></matrix>
+<v x="1.1255363308e-10" y="-1.21984533585e-10" z="0.127841189504"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.64967368713</rotx><rotz>-0.587168497398</rotz><roty>-0.421983001308</roty></matrix>
+<v x="3.19281233396e-12" y="-6.7425385275e-09" z="0.0740292295814"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.01275255855</rotx><rotz>5.74388491935e-05</rotz><roty>-2.47170962329e-07</roty></matrix>
+<v x="-9.58312114108e-08" y="-0.00166442082264" z="0.262991577387"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>0.241048985336</rotx><rotz>-1.09017324802</rotz><roty>1.18006891641</roty></matrix>
+<v x="1.41787088737e-08" y="-9.30690369216e-09" z="0.391023904085"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.51005829922</rotx><rotz>1.08260953763</rotz><roty>-0.392938866065</roty></matrix>
+<v x="9.65305346767e-09" y="3.37898908853e-09" z="0.441814690828"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.573197154845</rotx><rotz>-0.20762398339</rotz><roty>-0.792033362674</roty></matrix>
+<v x="-2.89736545867e-09" y="1.01481267833e-08" z="0.119804479182"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.97538003117</rotx><rotz>0.674665922643</rotz><roty>-0.497534684326</roty></matrix>
+<v x="-8.75075159001e-08" y="-0.00166442082264" z="0.262991577387"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>-1.48086124362</rotx><rotz>2.67062886009</rotz><roty>0.387336740265</roty></matrix>
+<v x="3.87044885031e-09" y="-2.41683508762e-08" z="0.391024887562"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>0.661948130015</rotx><rotz>-1.06978561804</rotz><roty>0.864048900397</roty></matrix>
+<v x="1.88647941712e-08" y="-7.27704785319e-10" z="0.441814720631"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.187031939144</rotx><rotz>0.0650346601358</rotz><roty>0.91099323988</roty></matrix>
+<v x="5.39012345868e-09" y="-5.98463811841e-09" z="0.119804531336"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.17617031489</rotx><rotz>-0.63293698468</rotz><roty>0.417407091344</roty></matrix>
+<v x="-8.75075159001e-08" y="-0.00166442082264" z="0.262991577387"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.13526365126</rotx><rotz>5.75769364692e-05</rotz><roty>1.81631025979e-07</roty></matrix>
+<v x="-4.61507988803e-05" y="0.16787725687" z="0.308514803648"/>
+</move></bone></frame>
+</script>
+<script name="run">
+        <loop/>
+<frame duration="0.0">
+<bone name="head"><move><matrix><rotx>1.55995326642</rotx><rotz>2.43766439565e-07</rotz><roty>-3.63808042954e-06</roty></matrix>
+<v x="-4.45803680429e-12" y="-7.0185164347e-09" z="0.205132588744"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.185195856019</rotx><rotz>-3.04980322702e-08</rotz><roty>3.76324921475e-08</roty></matrix>
+<v x="4.08322030701e-12" y="-2.58764631944e-09" z="0.211406797171"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.21304033706</rotx><rotz>0.215367490444</rotz><roty>1.51015521667</roty></matrix>
+<v x="3.10589811647e-08" y="1.02300390381e-11" z="0.0236427392811"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.445384530702</rotx><rotz>0.110218849876</rotz><roty>1.53112774341</roty></matrix>
+<v x="7.44198658253e-09" y="4.17262135954e-08" z="0.023713760078"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>-0.0402836695671</rotx><rotz>-0.230753088049</rotz><roty>-0.120105286145</roty></matrix>
+<v x="5.0587600775e-09" y="1.81679169486e-08" z="0.0494092851877"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>-0.104603158598</rotx><rotz>-0.101171975139</rotz><roty>-0.0496935830943</roty></matrix>
+<v x="-1.78786041527e-10" y="1.62934155057e-09" z="0.220042318106"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>0.0883435032012</rotx><rotz>-0.0592298469704</rotz><roty>0.203284062788</roty></matrix>
+<v x="4.53914150711e-09" y="-5.8266444114e-08" z="0.282872855663"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>-0.058978719202</rotx><rotz>0.213200276528</rotz><roty>1.44995312865</roty></matrix>
+<v x="2.28622920595e-09" y="-2.9941733537e-09" z="0.187517672777"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>0.138314858158</rotx><rotz>-1.63561380614</rotz><roty>1.84021941269</roty></matrix>
+<v x="4.08322030701e-12" y="-2.58764631944e-09" z="0.211406797171"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.417491480261</rotx><rotz>0.161261328223</rotz><roty>-1.513592825</roty></matrix>
+<v x="-5.1207639018e-08" y="3.88836944865e-08" z="0.0223210249096"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>0.342787215102</rotx><rotz>0.07089132588</rotz><roty>-1.66547716303</roty></matrix>
+<v x="-4.11087874852e-08" y="-7.87128584534e-08" z="0.025775115937"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.082608260958</rotx><rotz>-0.0289116492203</rotz><roty>-0.321183785498</roty></matrix>
+<v x="4.28893542903e-09" y="-6.10902333165e-08" z="0.0483604744077"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.183845766505</rotx><rotz>0.176438400315</rotz><roty>0.0636826897637</roty></matrix>
+<v x="-5.6694298145e-09" y="-1.58224402469e-08" z="0.22736223042"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>0.159641327332</rotx><rotz>-0.902626186946</rotz><roty>-0.30185908968</roty></matrix>
+<v x="6.21658990951e-09" y="2.74859637273e-08" z="0.276810020208"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>0.470681731449</rotx><rotz>0.878634101581</rotz><roty>-1.88864100763</roty></matrix>
+<v x="-1.06894382235e-09" y="-1.22402017411e-08" z="0.185582786798"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>0.139058470991</rotx><rotz>1.63493416743</rotz><roty>-1.8402841275</roty></matrix>
+<v x="4.08322030701e-12" y="-2.58764631944e-09" z="0.211406797171"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.210722804345</rotx><rotz>3.37462389996e-08</rotz><roty>-3.34932443344e-08</roty></matrix>
+<v x="5.07601285223e-13" y="1.22511434331e-09" z="0.127841189504"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.577481182353</rotx><rotz>9.71526896566e-08</rotz><roty>-6.9812947672e-08</roty></matrix>
+<v x="3.19281233396e-12" y="-6.7425385275e-09" z="0.0740292295814"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.01275255855</rotx><rotz>5.74388491935e-05</rotz><roty>-2.47170962329e-07</roty></matrix>
+<v x="-9.58312114108e-08" y="-0.00166442082264" z="0.262991577387"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>-0.625672014385</rotx><rotz>-1.15223808407</rotz><roty>0.0508198339193</roty></matrix>
+<v x="2.08077688413e-09" y="-2.42449775811e-08" z="0.39102396369"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.1340932901</rotx><rotz>1.07921813514</rotz><roty>-0.217275944971</roty></matrix>
+<v x="5.84785109226e-09" y="-8.74804229056e-09" z="0.441814661026"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.57358351294</rotx><rotz>-0.206507985735</rotz><roty>-0.692221946602</roty></matrix>
+<v x="1.53904782252e-08" y="2.75599121302e-09" z="0.11980445683"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.40483718241</rotx><rotz>0.803652268457</rotz><roty>-0.184000745836</roty></matrix>
+<v x="-8.75075159001e-08" y="-0.00166442082264" z="0.262991577387"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>-1.19799385476</rotx><rotz>1.42636724193</rotz><roty>-0.265588500109</roty></matrix>
+<v x="-3.40568284685e-09" y="4.48319781299e-09" z="0.391024947166"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>0.157735253006</rotx><rotz>-1.33566996205</rotz><roty>0.249123323577</roty></matrix>
+<v x="8.82759110254e-09" y="3.00261016051e-09" z="0.441814690828"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.300905877747</rotx><rotz>0.33795933681</rotz><roty>0.890992500619</roty></matrix>
+<v x="-5.10023134837e-10" y="-4.02834610114e-09" z="0.119804531336"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.70157484686</rotx><rotz>-1.06587756229</rotz><roty>0.929793825595</roty></matrix>
+<v x="-8.75075159001e-08" y="-0.00166442082264" z="0.262991577387"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.13526365126</rotx><rotz>5.75769364692e-05</rotz><roty>1.81631025979e-07</roty></matrix>
+<v x="-4.61507988803e-05" y="0.16787725687" z="0.308514803648"/>
+</move></bone></frame>
+<frame duration="416.666666667">
+<bone name="head"><move><matrix><rotx>1.55995326642</rotx><rotz>2.45381506839e-07</rotz><roty>-3.64622375287e-06</roty></matrix>
+<v x="-8.88116957753e-09" y="-8.32012791996e-11" z="0.205132544041"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.183728321101</rotx><rotz>-0.0215510756027</rotz><roty>-0.135975321075</roty></matrix>
+<v x="4.18984291706e-10" y="4.86374551745e-10" z="0.211406797171"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.199551209757</rotx><rotz>0.219158716638</rotz><roty>1.22354195857</roty></matrix>
+<v x="-5.41875131432e-08" y="-3.73575659296e-08" z="0.0236427560449"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.376352499059</rotx><rotz>0.161935174558</rotz><roty>1.52738853208</roty></matrix>
+<v x="-4.99388974617e-09" y="-1.26994308403e-08" z="0.0237137749791"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>-0.147995124148</rotx><rotz>-0.00867812159238</rotz><roty>-0.0895019283411</roty></matrix>
+<v x="9.04087826825e-09" y="4.93666263424e-08" z="0.0494092144072"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>-0.104603141953</rotx><rotz>-0.101171975139</rotz><roty>-0.0496935830943</roty></matrix>
+<v x="-1.56842752119e-08" y="-3.2963367147e-08" z="0.220042362809"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>0.399802997327</rotx><rotz>-0.166097079486</rotz><roty>0.274668997254</roty></matrix>
+<v x="3.93297376888e-08" y="-1.2380606762e-08" z="0.282872885466"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>-0.0381005765531</rotx><rotz>0.368755865339</rotz><roty>1.42401740174</roty></matrix>
+<v x="2.6518671703e-09" y="-1.03837036747e-08" z="0.187517687678"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>0.138314858158</rotx><rotz>-1.63561380614</rotz><roty>1.84021927953</roty></matrix>
+<v x="4.18984291706e-10" y="4.86374551745e-10" z="0.211406797171"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.417491413682</rotx><rotz>0.161261328223</rotz><roty>-1.513592825</roty></matrix>
+<v x="1.30563346801e-08" y="2.86523924586e-08" z="0.0223210398108"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>0.342787248392</rotx><rotz>0.0708912925904</rotz><roty>-1.66547716303</roty></matrix>
+<v x="7.96435806194e-09" y="-3.16775299325e-08" z="0.0257752425969"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.0826082692804</rotx><rotz>-0.0289116450591</rotz><roty>-0.321183785498</roty></matrix>
+<v x="-7.07029945701e-09" y="-5.93538409532e-08" z="0.0483604744077"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.183845816439</rotx><rotz>0.176438416959</rotz><roty>0.0636826772801</roty></matrix>
+<v x="1.4010164584e-08" y="3.66542529662e-08" z="0.22736223042"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>0.204249292236</rotx><rotz>-0.823071040441</rotz><roty>-0.213763851349</roty></matrix>
+<v x="-1.20919523283e-08" y="1.77429200221e-08" z="0.276810020208"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>-0.228011763181</rotx><rotz>0.694442956372</rotz><roty>-1.35129539396</roty></matrix>
+<v x="1.35228250819e-09" y="4.81862905133e-08" z="0.185582786798"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>0.139058520926</rotx><rotz>1.63493416743</rotz><roty>-1.84028426066</roty></matrix>
+<v x="4.18984291706e-10" y="4.86374551745e-10" z="0.211406797171"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.0460948535133</rotx><rotz>0.0639932476363</rotz><roty>0.0284533254385</roty></matrix>
+<v x="-1.10671527498e-10" y="1.27880750433e-09" z="0.127841189504"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.394363990144</rotx><rotz>-0.0026320692045</rotz><roty>0.00473781923516</roty></matrix>
+<v x="3.19281233396e-12" y="-6.7425385275e-09" z="0.0740292295814"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.01275255855</rotx><rotz>5.74388491935e-05</rotz><roty>-2.47170962329e-07</roty></matrix>
+<v x="-9.58312114108e-08" y="-0.00166442082264" z="0.262991577387"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>-0.937721456949</rotx><rotz>-1.16954823168</rotz><roty>0.0771646265319</roty></matrix>
+<v x="-3.84174914103e-09" y="-1.94733118519e-11" z="0.391023933887"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.137231958602</rotx><rotz>1.07921813514</rotz><roty>-0.217275928326</roty></matrix>
+<v x="9.21540532772e-09" y="-5.70330982441e-09" z="0.441814631224"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.258392988383</rotx><rotz>-0.162834407545</rotz><roty>-0.471828288877</roty></matrix>
+<v x="3.15419157459e-09" y="2.53704857123e-09" z="0.119804471731"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.48323891385</rotx><rotz>0.610858846611</rotz><roty>-0.254262725138</roty></matrix>
+<v x="-8.75075159001e-08" y="-0.00166442082264" z="0.262991577387"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>-1.44874764878</rotx><rotz>1.46799524608</rotz><roty>-0.191939629045</roty></matrix>
+<v x="9.15665943069e-09" y="9.98220173187e-10" z="0.391024857759"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>1.2841963845</rotx><rotz>-1.34330018489</rotz><roty>0.25540730184</roty></matrix>
+<v x="1.41676439469e-08" y="4.00338429074e-09" z="0.441814750433"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.896911575879</rotx><rotz>0.419633727042</rotz><roty>1.03269078011</roty></matrix>
+<v x="-1.88101600962e-09" y="3.293643136e-11" z="0.119804546237"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.73555505132</rotx><rotz>-1.14618551786</rotz><roty>0.854697210229</roty></matrix>
+<v x="-8.75075159001e-08" y="-0.00166442082264" z="0.262991577387"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.13526365126</rotx><rotz>5.75769364692e-05</rotz><roty>1.81631025979e-07</roty></matrix>
+<v x="-4.61507988803e-05" y="0.16787725687" z="0.308514803648"/>
+</move></bone></frame>
+<frame duration="416.666666667">
+<bone name="head"><move><matrix><rotx>1.55995326642</rotx><rotz>2.43766439565e-07</rotz><roty>-3.63808042954e-06</roty></matrix>
+<v x="-1.56847961268e-12" y="-1.04776285426e-08" z="0.205132603645"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.18519582273</rotx><rotz>-3.02691814678e-08</rotz><roty>3.75896173457e-08</roty></matrix>
+<v x="3.42907126305e-12" y="5.65755797766e-09" z="0.211406767368"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.198073937655</rotx><rotz>0.257966349976</rotz><roty>1.26641965107</roty></matrix>
+<v x="3.14120676137e-08" y="4.77766199936e-08" z="0.0236427728087"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.3074202028</rotx><rotz>0.177928472234</rotz><roty>1.59666187941</roty></matrix>
+<v x="-4.25941593107e-09" y="-1.70658616128e-08" z="0.0237137004733"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>-0.167135945337</rotx><rotz>0.121889678977</rotz><roty>0.0185456317335</roty></matrix>
+<v x="-8.47178949215e-09" y="-4.28096349481e-08" z="0.0494092702866"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>-0.104603191888</rotx><rotz>-0.101171975139</rotz><roty>-0.0496935830943</roty></matrix>
+<v x="-6.63950583402e-09" y="-1.50375569774e-08" z="0.220042333007"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>0.130021574787</rotx><rotz>0.868796051619</rotz><roty>0.335459261047</roty></matrix>
+<v x="1.38607809674e-08" y="-3.3209097694e-08" z="0.282872885466"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>0.202558750865</rotx><rotz>-0.855037562216</rotz><roty>1.61228877605</roty></matrix>
+<v x="-3.36979955051e-09" y="3.28332916411e-08" z="0.187517672777"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>0.138314858158</rotx><rotz>-1.63561380614</rotz><roty>1.84021941269</roty></matrix>
+<v x="3.42907126305e-12" y="5.65755797766e-09" z="0.211406767368"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.417491413682</rotx><rotz>0.161261344868</rotz><roty>-1.51359269184</roty></matrix>
+<v x="3.3135139077e-09" y="4.85630025082e-08" z="0.0223210304976"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>0.342787215102</rotx><rotz>0.0708913175576</rotz><roty>-1.66547716303</roty></matrix>
+<v x="-3.18691455448e-08" y="-8.33272295608e-09" z="0.0257751513273"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.0826083192147</rotx><rotz>-0.0289116533815</rotz><roty>-0.321183685629</roty></matrix>
+<v x="-1.56189816636e-09" y="-6.52678799895e-09" z="0.0483605116606"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.183845766505</rotx><rotz>0.176438400315</rotz><roty>0.0636826856025</roty></matrix>
+<v x="8.38360225686e-09" y="-4.03264657223e-08" z="0.227362215519"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>0.0978060640941</rotx><rotz>0.0503082614798</rotz><roty>-0.21209581369</roty></matrix>
+<v x="-9.14201603308e-09" y="-1.80474639677e-08" z="0.276810050011"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>-0.358709889075</rotx><rotz>-0.316392791986</rotz><roty>-1.51909824477</roty></matrix>
+<v x="-5.25177457078e-09" y="-2.24190639386e-08" z="0.1855828017"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>0.139058520926</rotx><rotz>1.63493430059</rotz><roty>-1.8402841275</roty></matrix>
+<v x="3.42907126305e-12" y="5.65755797766e-09" z="0.211406767368"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.217732943414</rotx><rotz>2.10461405451e-08</rotz><roty>-3.0352466683e-08</roty></matrix>
+<v x="2.29900435711e-13" y="1.07985620446e-09" z="0.127841189504"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.577481182353</rotx><rotz>1.02553168577e-07</rotz><roty>-8.67444624614e-08</roty></matrix>
+<v x="3.19281233396e-12" y="-6.7425385275e-09" z="0.0740292295814"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.01275255855</rotx><rotz>5.74388491935e-05</rotz><roty>-2.47170962329e-07</roty></matrix>
+<v x="-9.58312114108e-08" y="-0.00166442082264" z="0.262991577387"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>-1.37168921579</rotx><rotz>-1.1677018621</rotz><roty>0.0970139401174</roty></matrix>
+<v x="1.00640207279e-08" y="1.25549215468e-08" z="0.391023993492"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.104434788561</rotx><rotz>1.07455114507</rotz><roty>-0.188864709961</roty></matrix>
+<v x="3.96333010855e-09" y="-3.26925997385e-09" z="0.441814690828"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.300905544851</rotx><rotz>-0.337950348641</rotz><roty>-0.890993765621</roty></matrix>
+<v x="6.91840862377e-10" y="6.24587714881e-09" z="0.119804479182"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.70176925762</rotx><rotz>1.06594480711</rotz><roty>-0.929966331855</roty></matrix>
+<v x="-8.75075159001e-08" y="-0.00166442082264" z="0.262991577387"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>-0.543020210743</rotx><rotz>1.41336289316</rotz><roty>-0.130665302434</roty></matrix>
+<v x="-1.09548281557e-08" y="-6.55459508891e-09" z="0.391024887562"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>0.220306322686</rotx><rotz>-1.33938826757</rotz><roty>0.308663666002</roty></matrix>
+<v x="1.32486048798e-08" y="1.00029549088e-08" z="0.441814750433"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.57358557689</rotx><rotz>0.206516807456</rotz><roty>0.692220282126</roty></matrix>
+<v x="9.99163329851e-09" y="-3.13511305805e-09" z="0.119804546237"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.4048032271</rotx><rotz>-0.803539017532</rotz><roty>0.183974114225</roty></matrix>
+<v x="-8.75075159001e-08" y="-0.00166442082264" z="0.262991577387"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.13526365126</rotx><rotz>5.75769364692e-05</rotz><roty>1.81631025979e-07</roty></matrix>
+<v x="-4.61507988803e-05" y="0.16787725687" z="0.308514803648"/>
+</move></bone></frame>
+<frame duration="416.666666667">
+<bone name="head"><move><matrix><rotx>1.55995326642</rotx><rotz>2.4441689523e-07</rotz><roty>-3.6375722179e-06</roty></matrix>
+<v x="-8.61405791142e-09" y="-1.88391471312e-08" z="0.205132648349"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.183728304456</rotx><rotz>0.0215510131849</rotz><roty>0.135975379332</roty></matrix>
+<v x="-6.7529903891e-10" y="-3.26366467185e-09" z="0.211406812072"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.20405905931</rotx><rotz>0.215558888503</rotz><roty>1.31501941148</roty></matrix>
+<v x="7.23781168332e-09" y="1.72628560335e-08" z="0.0236427728087"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.431786796361</rotx><rotz>0.11726228678</rotz><roty>1.56396771544</roty></matrix>
+<v x="-9.98767735183e-10" y="-6.1816933794e-08" z="0.0237137358636"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>-0.0684474428161</rotx><rotz>-0.173925857629</rotz><roty>-0.0324410617116</roty></matrix>
+<v x="1.52137502596e-08" y="-2.19080487085e-08" z="0.0494092404842"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>-0.104603150276</rotx><rotz>-0.101171975139</rotz><roty>-0.0496935830943</roty></matrix>
+<v x="-7.79590170197e-09" y="3.25231361842e-08" z="0.220042333007"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>0.166399464783</rotx><rotz>0.807867053777</rotz><roty>0.261671339685</roty></matrix>
+<v x="1.25562529263e-08" y="-2.27000391817e-08" z="0.282872885466"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>-0.271849908082</rotx><rotz>-0.687431585591</rotz><roty>1.31013464141</roty></matrix>
+<v x="1.62833746487e-10" y="6.73410349705e-09" z="0.187517672777"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>0.13831475829</rotx><rotz>-1.63561380614</rotz><roty>1.84021941269</roty></matrix>
+<v x="-6.7529903891e-10" y="-3.26366467185e-09" z="0.211406812072"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.417491380393</rotx><rotz>0.161261344868</rotz><roty>-1.513592825</roty></matrix>
+<v x="3.28331175581e-08" y="2.12187369897e-08" z="0.0223210360855"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>0.342787248392</rotx><rotz>0.0708913175576</rotz><roty>-1.66547716303</roty></matrix>
+<v x="3.02842408928e-08" y="1.57172603821e-08" z="0.0257752183825"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.0826082859252</rotx><rotz>-0.0289116429786</rotz><roty>-0.321183752208</roty></matrix>
+<v x="6.89639234608e-09" y="-1.37774431863e-08" z="0.0483604967594"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.183845799794</rotx><rotz>0.176438433604</rotz><roty>0.0636826897637</roty></matrix>
+<v x="2.76514491304e-08" y="2.80856582435e-08" z="0.227362185717"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>0.39997806688</rotx><rotz>0.170149362045</rotz><roty>-0.191085919468</roty></matrix>
+<v x="8.14265455062e-09" y="1.71685616834e-08" z="0.276810020208"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>-0.064024119499</rotx><rotz>-0.375949130023</rotz><roty>-1.4241540219</roty></matrix>
+<v x="4.69483651955e-09" y="-5.05914350413e-08" z="0.185582816601"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>0.139058587505</rotx><rotz>1.63493416743</rotz><roty>-1.84028439382</roty></matrix>
+<v x="-6.7529903891e-10" y="-3.26366467185e-09" z="0.211406812072"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.0283187941916</rotx><rotz>-0.0591845399423</rotz><roty>-0.0386083165373</roty></matrix>
+<v x="2.53040338682e-10" y="3.05099323583e-09" z="0.127841174603"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.394345647622</rotx><rotz>-0.00523703762402</rotz><roty>0.00942703265953</roty></matrix>
+<v x="3.19281233396e-12" y="-6.7425385275e-09" z="0.0740292295814"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.01275255855</rotx><rotz>5.74388491935e-05</rotz><roty>-2.47170962329e-07</roty></matrix>
+<v x="-9.58312114108e-08" y="-0.00166442082264" z="0.262991577387"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>-1.58765466913</rotx><rotz>-1.20738922077</rotz><roty>0.0557114366634</roty></matrix>
+<v x="2.09033323983e-09" y="2.53694114605e-08" z="0.391023933887"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>1.22667303706</rotx><rotz>1.08224914536</rotz><roty>-0.191013731158</roty></matrix>
+<v x="4.40499636767e-09" y="8.11066058759e-09" z="0.441814661026"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.896912574564</rotx><rotz>-0.419624738873</rotz><roty>-1.03269157906</roty></matrix>
+<v x="-1.3704807067e-08" y="2.1433694819e-09" z="0.119804464281"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.73577063421</rotx><rotz>1.14625982005</rotz><roty>-0.854895882046</roty></matrix>
+<v x="-8.75075159001e-08" y="-0.00166442082264" z="0.262991577387"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>-0.797086777422</rotx><rotz>1.4294079061</rotz><roty>-0.213733574536</roty></matrix>
+<v x="5.12108577766e-09" y="1.24816523783e-09" z="0.391024917364"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>0.223444708227</rotx><rotz>-1.33938826757</rotz><roty>0.308663399686</roty></matrix>
+<v x="2.50591973838e-08" y="-2.31800578732e-09" z="0.441814720631"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.258397082993</rotx><rotz>0.162842513541</rotz><roty>0.471826424664</roty></matrix>
+<v x="-3.88220078307e-09" y="-3.52754270239e-10" z="0.119804553688"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.48320069748</rotx><rotz>-0.61074739332</rotz><roty>0.254238490372</roty></matrix>
+<v x="-8.75075159001e-08" y="-0.00166442082264" z="0.262991577387"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.13526365126</rotx><rotz>5.75769364692e-05</rotz><roty>1.81631025979e-07</roty></matrix>
+<v x="-4.61507988803e-05" y="0.16787725687" z="0.308514803648"/>
+</move></bone></frame>
+<frame duration="416.666666667">
+<bone name="head"><move><matrix><rotx>1.55995326642</rotx><rotz>2.43766439565e-07</rotz><roty>-3.63808042954e-06</roty></matrix>
+<v x="-4.45803680429e-12" y="-7.0185164347e-09" z="0.205132588744"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.185195856019</rotx><rotz>-3.04980322702e-08</rotz><roty>3.76324921475e-08</roty></matrix>
+<v x="4.08322030701e-12" y="-2.58764631944e-09" z="0.211406797171"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.21304033706</rotx><rotz>0.215367490444</rotz><roty>1.51015521667</roty></matrix>
+<v x="3.10589811647e-08" y="1.02300390381e-11" z="0.0236427392811"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.445384530702</rotx><rotz>0.110218849876</rotz><roty>1.53112774341</roty></matrix>
+<v x="7.44198658253e-09" y="4.17262135954e-08" z="0.023713760078"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>-0.0402836695671</rotx><rotz>-0.230753088049</rotz><roty>-0.120105286145</roty></matrix>
+<v x="5.0587600775e-09" y="1.81679169486e-08" z="0.0494092851877"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>-0.104603158598</rotx><rotz>-0.101171975139</rotz><roty>-0.0496935830943</roty></matrix>
+<v x="-1.78786041527e-10" y="1.62934155057e-09" z="0.220042318106"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>0.0883435032012</rotx><rotz>-0.0592298469704</rotz><roty>0.203284062788</roty></matrix>
+<v x="4.53914150711e-09" y="-5.8266444114e-08" z="0.282872855663"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>-0.058978719202</rotx><rotz>0.213200276528</rotz><roty>1.44995312865</roty></matrix>
+<v x="2.28622920595e-09" y="-2.9941733537e-09" z="0.187517672777"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>0.138314858158</rotx><rotz>-1.63561380614</rotz><roty>1.84021941269</roty></matrix>
+<v x="4.08322030701e-12" y="-2.58764631944e-09" z="0.211406797171"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.417491480261</rotx><rotz>0.161261328223</rotz><roty>-1.513592825</roty></matrix>
+<v x="-5.1207639018e-08" y="3.88836944865e-08" z="0.0223210249096"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>0.342787215102</rotx><rotz>0.07089132588</rotz><roty>-1.66547716303</roty></matrix>
+<v x="-4.11087874852e-08" y="-7.87128584534e-08" z="0.025775115937"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.082608260958</rotx><rotz>-0.0289116492203</rotz><roty>-0.321183785498</roty></matrix>
+<v x="4.28893542903e-09" y="-6.10902333165e-08" z="0.0483604744077"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.183845766505</rotx><rotz>0.176438400315</rotz><roty>0.0636826897637</roty></matrix>
+<v x="-5.6694298145e-09" y="-1.58224402469e-08" z="0.22736223042"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>0.159641327332</rotx><rotz>-0.902626186946</rotz><roty>-0.30185908968</roty></matrix>
+<v x="6.21658990951e-09" y="2.74859637273e-08" z="0.276810020208"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>0.470681731449</rotx><rotz>0.878634101581</rotz><roty>-1.88864100763</roty></matrix>
+<v x="-1.06894382235e-09" y="-1.22402017411e-08" z="0.185582786798"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>0.139058470991</rotx><rotz>1.63493416743</rotz><roty>-1.8402841275</roty></matrix>
+<v x="4.08322030701e-12" y="-2.58764631944e-09" z="0.211406797171"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.210722804345</rotx><rotz>3.37462389996e-08</rotz><roty>-3.34932443344e-08</roty></matrix>
+<v x="5.07601285223e-13" y="1.22511434331e-09" z="0.127841189504"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.577481182353</rotx><rotz>9.71526896566e-08</rotz><roty>-6.9812947672e-08</roty></matrix>
+<v x="3.19281233396e-12" y="-6.7425385275e-09" z="0.0740292295814"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.01275255855</rotx><rotz>5.74388491935e-05</rotz><roty>-2.47170962329e-07</roty></matrix>
+<v x="-9.58312114108e-08" y="-0.00166442082264" z="0.262991577387"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>-0.625672014385</rotx><rotz>-1.15223808407</rotz><roty>0.0508198339193</roty></matrix>
+<v x="2.08077688413e-09" y="-2.42449775811e-08" z="0.39102396369"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.1340932901</rotx><rotz>1.07921813514</rotz><roty>-0.217275944971</roty></matrix>
+<v x="5.84785109226e-09" y="-8.74804229056e-09" z="0.441814661026"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.57358351294</rotx><rotz>-0.206507985735</rotz><roty>-0.692221946602</roty></matrix>
+<v x="1.53904782252e-08" y="2.75599121302e-09" z="0.11980445683"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.40483718241</rotx><rotz>0.803652268457</rotz><roty>-0.184000745836</roty></matrix>
+<v x="-8.75075159001e-08" y="-0.00166442082264" z="0.262991577387"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>-1.19799385476</rotx><rotz>1.42636724193</rotz><roty>-0.265588500109</roty></matrix>
+<v x="-3.40568284685e-09" y="4.48319781299e-09" z="0.391024947166"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>0.157735253006</rotx><rotz>-1.33566996205</rotz><roty>0.249123323577</roty></matrix>
+<v x="8.82759110254e-09" y="3.00261016051e-09" z="0.441814690828"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.300905877747</rotx><rotz>0.33795933681</rotz><roty>0.890992500619</roty></matrix>
+<v x="-5.10023134837e-10" y="-4.02834610114e-09" z="0.119804531336"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.70157484686</rotx><rotz>-1.06587756229</rotz><roty>0.929793825595</roty></matrix>
+<v x="-8.75075159001e-08" y="-0.00166442082264" z="0.262991577387"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.13526365126</rotx><rotz>5.75769364692e-05</rotz><roty>1.81631025979e-07</roty></matrix>
+<v x="-4.61507988803e-05" y="0.16787725687" z="0.308514803648"/>
+</move></bone></frame>
+</script>
+<script name="idle">
+<loop/>
+<frame duration="0.0">
+<bone name="head"><move><matrix><rotx>1.55995326642</rotx><rotz>2.4376637607e-07</rotz><roty>-3.63808042954e-06</roty></matrix>
+<v x="8.72234522022e-13" y="1.55095563059e-08" z="0.205132514238"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.185195856019</rotx><rotz>-3.0498030286e-08</rotz><roty>3.76324881791e-08</roty></matrix>
+<v x="-2.50392392096e-14" y="-1.78455505928e-09" z="0.211406797171"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.213040320415</rotx><rotz>0.215367507089</rotz><roty>1.51015521667</roty></matrix>
+<v x="-8.75491323882e-09" y="1.5021056754e-07" z="0.0236427541822"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.445384530702</rotx><rotz>0.110218849876</rotz><roty>1.53112774341</roty></matrix>
+<v x="-2.04242276425e-08" y="7.94326240339e-08" z="0.0237137395889"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>-0.0402836820507</rotx><rotz>-0.230753071404</rotz><roty>-0.120105277823</roty></matrix>
+<v x="1.57907020792e-11" y="-2.8276687658e-08" z="0.049409199506"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>-0.104603150276</rotx><rotz>-0.101171975139</rotz><roty>-0.0496935830943</roty></matrix>
+<v x="5.54173773537e-09" y="-4.44516530251e-08" z="0.220042318106"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>0.0883434948788</rotx><rotz>-0.0592298552928</rotz><roty>0.203284062788</roty></matrix>
+<v x="-2.05193639857e-10" y="-8.79603234694e-08" z="0.282872915268"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>-0.0589787150408</rotx><rotz>0.213200259883</rotz><roty>1.44995312865</roty></matrix>
+<v x="-1.31095934108e-09" y="-8.80826860339e-08" z="0.187517657876"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>0.138314816546</rotx><rotz>-1.63561380614</rotz><roty>1.84021941269</roty></matrix>
+<v x="-2.50392392096e-14" y="-1.78455505928e-09" z="0.211406797171"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.0950366511989</rotx><rotz>0.204104815746</rotz><roty>-1.08371488264</roty></matrix>
+<v x="-3.98292350212e-08" y="3.4102011881e-08" z="0.0223210304976"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>0.342787248392</rotx><rotz>0.0708913092352</rotz><roty>-1.66547716303</roty></matrix>
+<v x="-6.18280093789e-09" y="-8.85405171402e-08" z="0.0257752016187"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.162571753282</rotx><rotz>-0.0119830254426</rotz><roty>-0.0295452714197</roty></matrix>
+<v x="-5.37496758213e-09" y="8.15519918262e-09" z="0.0483604855835"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.183845799794</rotx><rotz>0.176438400315</rotz><roty>0.0636826897637</roty></matrix>
+<v x="-7.49960271662e-09" y="-8.53554809055e-08" z="0.227362200618"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>-0.0652223297689</rotx><rotz>-0.907197103483</rotz><roty>-0.204551361282</roty></matrix>
+<v x="7.89235699017e-08" y="9.65093427396e-09" z="0.276810020208"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>-0.0783621668503</rotx><rotz>0.892687935548</rotz><roty>-1.40814616006</roty></matrix>
+<v x="4.02122113385e-10" y="6.01792322641e-08" z="0.1855828017"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>0.139058504281</rotx><rotz>1.63493430059</rotz><roty>-1.8402841275</roty></matrix>
+<v x="-2.50392392096e-14" y="-1.78455505928e-09" z="0.211406797171"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.137011332351</rotx><rotz>3.42432795446e-08</rotz><roty>-3.30231553089e-08</roty></matrix>
+<v x="1.75962705778e-12" y="1.81291459622e-09" z="0.127841204405"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.577481182353</rotx><rotz>9.71526896566e-08</rotz><roty>-6.9812947672e-08</roty></matrix>
+<v x="1.71109578329e-12" y="-1.05769659697e-09" z="0.074029199779"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.05736889577</rotx><rotz>5.74368254902e-05</rotz><roty>-2.50576627999e-07</roty></matrix>
+<v x="-9.58384447358e-08" y="-0.00166442454793" z="0.262991577387"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>-1.05679977824</rotx><rotz>-1.03664044774</rotz><roty>-0.0290835791552</roty></matrix>
+<v x="1.61831770207e-10" y="-5.85169868117e-09" z="0.391023933887"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.183788458607</rotx><rotz>1.07352196647</rotz><roty>-0.337725544556</roty></matrix>
+<v x="3.89935728151e-09" y="1.12351050685e-09" z="0.441814690828"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.196782004921</rotx><rotz>-0.182416880711</rotz><roty>-0.596730577291</roty></matrix>
+<v x="5.48528733546e-09" y="5.82457415632e-09" z="0.119804449379"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.31626936614</rotx><rotz>0.574015277932</rotz><roty>-0.162424413895</roty></matrix>
+<v x="-8.75129302358e-08" y="-0.00166442454793" z="0.262991577387"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>-1.02698648879</rotx><rotz>1.84575971986</rotz><roty>-0.017572431528</roty></matrix>
+<v x="1.76472014779e-09" y="3.68563988218e-08" z="0.391024857759"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>0.131682072371</rotx><rotz>-1.18608992416</rotz><roty>0.36282993244</roty></matrix>
+<v x="1.76251901962e-10" y="5.49050582777e-08" z="0.441814720631"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.770001164134</rotx><rotz>0.0766066693163</rotz><roty>0.776634698935</roty></matrix>
+<v x="2.65877222461e-08" y="9.41590971859e-11" z="0.119804523885"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.83791990625</rotx><rotz>-0.617762825421</rotz><roty>1.08890012386</roty></matrix>
+<v x="-8.75129302358e-08" y="-0.00166442454793" z="0.262991577387"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.13526365126</rotx><rotz>5.75769364692e-05</rotz><roty>1.81631025979e-07</roty></matrix>
+<v x="-1.62547294167e-05" y="0.687124550343" z="0.308514803648"/>
+</move></bone></frame>
+<frame duration="375.0">
+<bone name="head"><move><matrix><rotx>1.55995326642</rotx><rotz>2.36969902494e-07</rotz><roty>-3.63956391991e-06</roty></matrix>
+<v x="-2.39381359179e-09" y="6.5176695152e-09" z="0.20513252914"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.185195856019</rotx><rotz>-2.67457112885e-08</rotz><roty>3.75662870089e-08</roty></matrix>
+<v x="-1.07565109597e-10" y="-6.36203578708e-09" z="0.211406797171"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.21304030377</rotx><rotz>0.215367490444</rotz><roty>1.51015521667</roty></matrix>
+<v x="-6.05445782398e-09" y="2.29288836806e-08" z="0.0236427690834"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.445384530702</rotx><rotz>0.110218849876</rotz><roty>1.53112774341</roty></matrix>
+<v x="-1.41559866051e-08" y="-5.7891210048e-08" z="0.0237138103694"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>-0.0402836986955</rotx><rotz>-0.230753088049</rotz><roty>-0.120105286145</roty></matrix>
+<v x="7.9678867948e-09" y="1.2082121259e-07" z="0.0494092218578"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>-0.104603158598</rotx><rotz>-0.101171975139</rotz><roty>-0.0496935830943</roty></matrix>
+<v x="-1.0100679404e-08" y="-1.55853896899e-07" z="0.220042303205"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>0.0883434948788</rotx><rotz>-0.0592298469704</rotz><roty>0.203284079433</roty></matrix>
+<v x="2.6008095233e-08" y="-7.04301683641e-08" z="0.282872885466"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>-0.0589787150408</rotx><rotz>0.213200243238</rotz><roty>1.44995312865</roty></matrix>
+<v x="1.122182125e-09" y="-1.24651350575e-07" z="0.187517672777"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>0.138314908093</rotx><rotz>-1.63561380614</rotz><roty>1.84021954585</roty></matrix>
+<v x="-1.07565109597e-10" y="-6.36203578708e-09" z="0.211406797171"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.0950366678437</rotx><rotz>0.204104749167</rotz><roty>-1.08371474948</roty></matrix>
+<v x="-2.20909814885e-08" y="-1.13531328338e-07" z="0.022321049124"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>0.342787281681</rotx><rotz>0.0708913175576</rotz><roty>-1.66547716303</roty></matrix>
+<v x="1.36549243024e-08" y="-2.2301634317e-08" z="0.0257751755416"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.162571753282</rotx><rotz>-0.0119830587321</rotz><roty>-0.0295452693391</roty></matrix>
+<v x="1.61432076595e-08" y="-5.92408824218e-08" z="0.0483604855835"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.18384578315</rotx><rotz>0.176438416959</rotz><roty>0.0636826856025</roty></matrix>
+<v x="1.23158172549e-09" y="3.01973415162e-08" z="0.227362245321"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>-0.0652223006406</rotx><rotz>-0.907197170062</rotz><roty>-0.204551377927</roty></matrix>
+<v x="-8.16250711466e-09" y="-1.59265436395e-08" z="0.276810050011"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>-0.0783621585279</rotx><rotz>0.892687935548</rotz><roty>-1.40814616006</roty></matrix>
+<v x="-1.78122816497e-09" y="6.25187865921e-08" z="0.185582816601"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>0.13905839609</rotx><rotz>1.63493430059</rotz><roty>-1.8402841275</roty></matrix>
+<v x="-1.36601424616e-10" y="-6.36005870192e-09" z="0.211406797171"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.13701136564</rotx><rotz>4.02789238106e-08</rotz><roty>-3.31680462648e-08</roty></matrix>
+<v x="-1.29047675324e-10" y="5.22296428329e-09" z="0.127841114998"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.578467750379</rotx><rotz>-0.0595439751433</rotz><roty>-0.0331253255836</roty></matrix>
+<v x="1.71109578329e-12" y="-1.05769659697e-09" z="0.074029199779"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.05736889577</rotx><rotz>5.74368254902e-05</rotz><roty>-2.50576627999e-07</roty></matrix>
+<v x="-9.58384447358e-08" y="-0.00166442454793" z="0.262991577387"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>-1.05679977824</rotx><rotz>-1.03664044774</rotz><roty>-0.0290835791552</roty></matrix>
+<v x="1.61831770207e-10" y="-5.85169868117e-09" z="0.391023933887"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.183788458607</rotx><rotz>1.07352196647</rotz><roty>-0.337725544556</roty></matrix>
+<v x="3.89935728151e-09" y="1.12351050685e-09" z="0.441814690828"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.196782004921</rotx><rotz>-0.182416880711</rotz><roty>-0.596730577291</roty></matrix>
+<v x="5.48528733546e-09" y="5.82457415632e-09" z="0.119804449379"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.31626936614</rotx><rotz>0.574015277932</rotz><roty>-0.162424413895</roty></matrix>
+<v x="-8.75129302358e-08" y="-0.00166442454793" z="0.262991577387"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>-1.02698648879</rotx><rotz>1.84575971986</rotz><roty>-0.017572431528</roty></matrix>
+<v x="1.76472014779e-09" y="3.68563988218e-08" z="0.391024857759"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>0.131682072371</rotx><rotz>-1.18608992416</rotz><roty>0.36282993244</roty></matrix>
+<v x="1.76251901962e-10" y="5.49050582777e-08" z="0.441814720631"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.770001164134</rotx><rotz>0.0766066693163</rotz><roty>0.776634698935</roty></matrix>
+<v x="2.65877222461e-08" y="9.41590971859e-11" z="0.119804523885"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.83791990625</rotx><rotz>-0.617762825421</rotz><roty>1.08890012386</roty></matrix>
+<v x="-8.75129302358e-08" y="-0.00166442454793" z="0.262991577387"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.13526365126</rotx><rotz>5.75769364692e-05</rotz><roty>1.81631025979e-07</roty></matrix>
+<v x="-1.62547294167e-05" y="0.687124550343" z="0.308514803648"/>
+</move></bone></frame>
+<frame duration="416.666666667">
+<bone name="head"><move><matrix><rotx>1.55995326642</rotx><rotz>2.4376637607e-07</rotz><roty>-3.63808042954e-06</roty></matrix>
+<v x="8.72234522022e-13" y="1.55095563059e-08" z="0.205132514238"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.185195856019</rotx><rotz>-3.0498030286e-08</rotz><roty>3.76324881791e-08</roty></matrix>
+<v x="-2.50392392096e-14" y="-1.78455505928e-09" z="0.211406797171"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.213040320415</rotx><rotz>0.215367507089</rotz><roty>1.51015521667</roty></matrix>
+<v x="-8.75491323882e-09" y="1.5021056754e-07" z="0.0236427541822"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.445384530702</rotx><rotz>0.110218849876</rotz><roty>1.53112774341</roty></matrix>
+<v x="-2.04242276425e-08" y="7.94326240339e-08" z="0.0237137395889"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>-0.0402836820507</rotx><rotz>-0.230753071404</rotz><roty>-0.120105277823</roty></matrix>
+<v x="1.57907020792e-11" y="-2.8276687658e-08" z="0.049409199506"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>-0.104603150276</rotx><rotz>-0.101171975139</rotz><roty>-0.0496935830943</roty></matrix>
+<v x="5.54173773537e-09" y="-4.44516530251e-08" z="0.220042318106"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>0.0883434948788</rotx><rotz>-0.0592298552928</rotz><roty>0.203284062788</roty></matrix>
+<v x="-2.05193639857e-10" y="-8.79603234694e-08" z="0.282872915268"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>-0.0589787150408</rotx><rotz>0.213200259883</rotz><roty>1.44995312865</roty></matrix>
+<v x="-1.31095934108e-09" y="-8.80826860339e-08" z="0.187517657876"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>0.138314816546</rotx><rotz>-1.63561380614</rotz><roty>1.84021941269</roty></matrix>
+<v x="-2.50392392096e-14" y="-1.78455505928e-09" z="0.211406797171"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.0950366511989</rotx><rotz>0.204104815746</rotz><roty>-1.08371488264</roty></matrix>
+<v x="-3.98292350212e-08" y="3.4102011881e-08" z="0.0223210304976"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>0.342787248392</rotx><rotz>0.0708913092352</rotz><roty>-1.66547716303</roty></matrix>
+<v x="-6.18280093789e-09" y="-8.85405171402e-08" z="0.0257752016187"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.162571753282</rotx><rotz>-0.0119830254426</rotz><roty>-0.0295452714197</roty></matrix>
+<v x="-5.37496758213e-09" y="8.15519918262e-09" z="0.0483604855835"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.183845799794</rotx><rotz>0.176438400315</rotz><roty>0.0636826897637</roty></matrix>
+<v x="-7.49960271662e-09" y="-8.53554809055e-08" z="0.227362200618"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>-0.0652223297689</rotx><rotz>-0.907197103483</rotz><roty>-0.204551361282</roty></matrix>
+<v x="7.89235699017e-08" y="9.65093427396e-09" z="0.276810020208"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>-0.0783621668503</rotx><rotz>0.892687935548</rotz><roty>-1.40814616006</roty></matrix>
+<v x="4.02122113385e-10" y="6.01792322641e-08" z="0.1855828017"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>0.139058504281</rotx><rotz>1.63493430059</rotz><roty>-1.8402841275</roty></matrix>
+<v x="-2.50392392096e-14" y="-1.78455505928e-09" z="0.211406797171"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.137011332351</rotx><rotz>3.42432795446e-08</rotz><roty>-3.30231553089e-08</roty></matrix>
+<v x="1.75962705778e-12" y="1.81291459622e-09" z="0.127841204405"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.577481182353</rotx><rotz>9.71526896566e-08</rotz><roty>-6.9812947672e-08</roty></matrix>
+<v x="1.71109578329e-12" y="-1.05769659697e-09" z="0.074029199779"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.05736889577</rotx><rotz>5.74368254902e-05</rotz><roty>-2.50576627999e-07</roty></matrix>
+<v x="-9.58384447358e-08" y="-0.00166442454793" z="0.262991577387"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>-1.05679977824</rotx><rotz>-1.03664044774</rotz><roty>-0.0290835791552</roty></matrix>
+<v x="1.61831770207e-10" y="-5.85169868117e-09" z="0.391023933887"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.183788458607</rotx><rotz>1.07352196647</rotz><roty>-0.337725544556</roty></matrix>
+<v x="3.89935728151e-09" y="1.12351050685e-09" z="0.441814690828"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.196782004921</rotx><rotz>-0.182416880711</rotz><roty>-0.596730577291</roty></matrix>
+<v x="5.48528733546e-09" y="5.82457415632e-09" z="0.119804449379"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.31626936614</rotx><rotz>0.574015277932</rotz><roty>-0.162424413895</roty></matrix>
+<v x="-8.75129302358e-08" y="-0.00166442454793" z="0.262991577387"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>-1.02698648879</rotx><rotz>1.84575971986</rotz><roty>-0.017572431528</roty></matrix>
+<v x="1.76472014779e-09" y="3.68563988218e-08" z="0.391024857759"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>0.131682072371</rotx><rotz>-1.18608992416</rotz><roty>0.36282993244</roty></matrix>
+<v x="1.76251901962e-10" y="5.49050582777e-08" z="0.441814720631"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.770001164134</rotx><rotz>0.0766066693163</rotz><roty>0.776634698935</roty></matrix>
+<v x="2.65877222461e-08" y="9.41590971859e-11" z="0.119804523885"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.83791990625</rotx><rotz>-0.617762825421</rotz><roty>1.08890012386</roty></matrix>
+<v x="-8.75129302358e-08" y="-0.00166442454793" z="0.262991577387"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.13526365126</rotx><rotz>5.75769364692e-05</rotz><roty>1.81631025979e-07</roty></matrix>
+<v x="-1.62547294167e-05" y="0.687124550343" z="0.308514803648"/>
+</move></bone></frame>
+<frame duration="416.666666667">
+<bone name="head"><move><matrix><rotx>1.55995326642</rotx><rotz>2.42923134597e-07</rotz><roty>-3.63850736796e-06</roty></matrix>
+<v x="-5.02049735118e-10" y="5.16718934307e-09" z="0.205132558942"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.185195839375</rotx><rotz>-2.90777350139e-08</rotz><roty>3.77755655674e-08</roty></matrix>
+<v x="1.4633746992e-10" y="5.15629050568e-09" z="0.211406677961"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.213040353704</rotx><rotz>0.215367490444</rotz><roty>1.51015521667</roty></matrix>
+<v x="-1.26019230606e-08" y="1.36443034648e-07" z="0.0236427541822"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.445384497412</rotx><rotz>0.110218841553</rotz><roty>1.53112774341</roty></matrix>
+<v x="-1.31249677793e-10" y="-5.22667882308e-08" z="0.0237137842923"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>-0.0402836820507</rotx><rotz>-0.230753071404</rotz><roty>-0.120105269501</roty></matrix>
+<v x="5.48520073806e-09" y="1.20442336993e-07" z="0.0494091846049"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>-0.104603158598</rotx><rotz>-0.101171966817</rotz><roty>-0.0496935789331</roty></matrix>
+<v x="-6.66771415858e-10" y="-8.22513541721e-08" z="0.220042288303"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>0.0883434782341</rotx><rotz>-0.0592298552928</rotz><roty>0.203284046143</roty></matrix>
+<v x="-2.53040859377e-08" y="1.92708682789e-07" z="0.282872915268"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>-0.0589787316855</rotx><rotz>0.213200243238</rotz><roty>1.44995312865</roty></matrix>
+<v x="-2.11828332652e-10" y="2.617233541e-08" z="0.187517687678"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>0.138314841514</rotx><rotz>-1.63561380614</rotz><roty>1.84021941269</roty></matrix>
+<v x="1.4633746992e-10" y="5.15629050568e-09" z="0.211406677961"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.0950366678437</rotx><rotz>0.204104749167</rotz><roty>-1.08371474948</roty></matrix>
+<v x="9.73025660045e-09" y="2.6442323886e-08" z="0.0223210398108"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>0.342787248392</rotx><rotz>0.0708913175576</rotz><roty>-1.66547716303</roty></matrix>
+<v x="5.02657471202e-09" y="-6.79440930185e-08" z="0.0257752202451"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.162571753282</rotx><rotz>-0.0119830171202</rotz><roty>-0.0295452714197</roty></matrix>
+<v x="3.81538605154e-08" y="-1.4656656333e-08" z="0.0483605079353"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.183845799794</rotx><rotz>0.176438433604</rotz><roty>0.0636826897637</roty></matrix>
+<v x="1.16595515465e-08" y="4.80448747453e-08" z="0.227362245321"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>-0.0652223297689</rotx><rotz>-0.907197170062</rotz><roty>-0.204551377927</roty></matrix>
+<v x="4.74993449018e-08" y="3.13761638893e-09" z="0.276810020208"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>-0.0783621502055</rotx><rotz>0.892687935548</rotz><roty>-1.40814602691</roty></matrix>
+<v x="1.92972582358e-10" y="5.48007399459e-08" z="0.185582786798"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>0.139058520926</rotx><rotz>1.63493430059</rotz><roty>-1.84028426066</roty></matrix>
+<v x="1.4633746992e-10" y="5.15629050568e-09" z="0.211406677961"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.137011348996</rotx><rotz>3.28446280312e-08</rotz><roty>-3.32119726977e-08</roty></matrix>
+<v x="-1.91083787682e-10" y="3.50963813567e-09" z="0.127841204405"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.577695766558</rotx><rotz>0.0277916589045</rotz><roty>0.0154442807756</roty></matrix>
+<v x="1.71109578329e-12" y="-1.05769659697e-09" z="0.074029199779"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.05736889577</rotx><rotz>5.74368254902e-05</rotz><roty>-2.50576627999e-07</roty></matrix>
+<v x="-9.58384447358e-08" y="-0.00166442454793" z="0.262991577387"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>-1.05679977824</rotx><rotz>-1.03664044774</rotz><roty>-0.0290835791552</roty></matrix>
+<v x="1.61831770207e-10" y="-5.85169868117e-09" z="0.391023933887"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.183788458607</rotx><rotz>1.07352196647</rotz><roty>-0.337725544556</roty></matrix>
+<v x="3.89935728151e-09" y="1.12351050685e-09" z="0.441814690828"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.196782004921</rotx><rotz>-0.182416880711</rotz><roty>-0.596730577291</roty></matrix>
+<v x="5.48528733546e-09" y="5.82457415632e-09" z="0.119804449379"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.31626936614</rotx><rotz>0.574015277932</rotz><roty>-0.162424413895</roty></matrix>
+<v x="-8.75129302358e-08" y="-0.00166442454793" z="0.262991577387"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>-1.02698648879</rotx><rotz>1.84575971986</rotz><roty>-0.017572431528</roty></matrix>
+<v x="1.76472014779e-09" y="3.68563988218e-08" z="0.391024857759"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>0.131682072371</rotx><rotz>-1.18608992416</rotz><roty>0.36282993244</roty></matrix>
+<v x="1.76251901962e-10" y="5.49050582777e-08" z="0.441814720631"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.770001164134</rotx><rotz>0.0766066693163</rotz><roty>0.776634698935</roty></matrix>
+<v x="2.65877222461e-08" y="9.41590971859e-11" z="0.119804523885"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.83791990625</rotx><rotz>-0.617762825421</rotz><roty>1.08890012386</roty></matrix>
+<v x="-8.75129302358e-08" y="-0.00166442454793" z="0.262991577387"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.13526365126</rotx><rotz>5.75769364692e-05</rotz><roty>1.81631025979e-07</roty></matrix>
+<v x="-1.62547294167e-05" y="0.687124550343" z="0.308514803648"/>
+</move></bone></frame>
+<frame duration="416.666666667">
+<bone name="head"><move><matrix><rotx>1.55995326642</rotx><rotz>2.4376637607e-07</rotz><roty>-3.63808042954e-06</roty></matrix>
+<v x="8.72234522022e-13" y="1.55095563059e-08" z="0.205132514238"/>
+</move></bone><bone name="neck"><move><matrix><rotx>0.185195856019</rotx><rotz>-3.0498030286e-08</rotz><roty>3.76324881791e-08</roty></matrix>
+<v x="-2.50392392096e-14" y="-1.78455505928e-09" z="0.211406797171"/>
+</move></bone><bone name="fingers.L"><move><matrix><rotx>0.213040320415</rotx><rotz>0.215367507089</rotz><roty>1.51015521667</roty></matrix>
+<v x="-8.75491323882e-09" y="1.5021056754e-07" z="0.0236427541822"/>
+</move></bone><bone name="mfingers.L"><move><matrix><rotx>-0.445384530702</rotx><rotz>0.110218849876</rotz><roty>1.53112774341</roty></matrix>
+<v x="-2.04242276425e-08" y="7.94326240339e-08" z="0.0237137395889"/>
+</move></bone><bone name="ufingers.L"><move><matrix><rotx>-0.0402836820507</rotx><rotz>-0.230753071404</rotz><roty>-0.120105277823</roty></matrix>
+<v x="1.57907020792e-11" y="-2.8276687658e-08" z="0.049409199506"/>
+</move></bone><bone name="hand.L"><move><matrix><rotx>-0.104603150276</rotx><rotz>-0.101171975139</rotz><roty>-0.0496935830943</roty></matrix>
+<v x="5.54173773537e-09" y="-4.44516530251e-08" z="0.220042318106"/>
+</move></bone><bone name="arm.L"><move><matrix><rotx>0.0883434948788</rotx><rotz>-0.0592298552928</rotz><roty>0.203284062788</roty></matrix>
+<v x="-2.05193639857e-10" y="-8.79603234694e-08" z="0.282872915268"/>
+</move></bone><bone name="uarm.L"><move><matrix><rotx>-0.0589787150408</rotx><rotz>0.213200259883</rotz><roty>1.44995312865</roty></matrix>
+<v x="-1.31095934108e-09" y="-8.80826860339e-08" z="0.187517657876"/>
+</move></bone><bone name="shoulder.L"><move><matrix><rotx>0.138314816546</rotx><rotz>-1.63561380614</rotz><roty>1.84021941269</roty></matrix>
+<v x="-2.50392392096e-14" y="-1.78455505928e-09" z="0.211406797171"/>
+</move></bone><bone name="fingers.R"><move><matrix><rotx>0.0950366511989</rotx><rotz>0.204104815746</rotz><roty>-1.08371488264</roty></matrix>
+<v x="-3.98292350212e-08" y="3.4102011881e-08" z="0.0223210304976"/>
+</move></bone><bone name="mfingers.R"><move><matrix><rotx>0.342787248392</rotx><rotz>0.0708913092352</rotz><roty>-1.66547716303</roty></matrix>
+<v x="-6.18280093789e-09" y="-8.85405171402e-08" z="0.0257752016187"/>
+</move></bone><bone name="ufingers.R"><move><matrix><rotx>0.162571753282</rotx><rotz>-0.0119830254426</rotz><roty>-0.0295452714197</roty></matrix>
+<v x="-5.37496758213e-09" y="8.15519918262e-09" z="0.0483604855835"/>
+</move></bone><bone name="hand.R"><move><matrix><rotx>-0.183845799794</rotx><rotz>0.176438400315</rotz><roty>0.0636826897637</roty></matrix>
+<v x="-7.49960271662e-09" y="-8.53554809055e-08" z="0.227362200618"/>
+</move></bone><bone name="arm.R"><move><matrix><rotx>-0.0652223297689</rotx><rotz>-0.907197103483</rotz><roty>-0.204551361282</roty></matrix>
+<v x="7.89235699017e-08" y="9.65093427396e-09" z="0.276810020208"/>
+</move></bone><bone name="uarm.R"><move><matrix><rotx>-0.0783621668503</rotx><rotz>0.892687935548</rotz><roty>-1.40814616006</roty></matrix>
+<v x="4.02122113385e-10" y="6.01792322641e-08" z="0.1855828017"/>
+</move></bone><bone name="shoulder.R"><move><matrix><rotx>0.139058504281</rotx><rotz>1.63493430059</rotz><roty>-1.8402841275</roty></matrix>
+<v x="-2.50392392096e-14" y="-1.78455505928e-09" z="0.211406797171"/>
+</move></bone><bone name="chest"><move><matrix><rotx>0.137011332351</rotx><rotz>3.42432795446e-08</rotz><roty>-3.30231553089e-08</roty></matrix>
+<v x="1.75962705778e-12" y="1.81291459622e-09" z="0.127841204405"/>
+</move></bone><bone name="abdomen"><move><matrix><rotx>-0.577481182353</rotx><rotz>9.71526896566e-08</rotz><roty>-6.9812947672e-08</roty></matrix>
+<v x="1.71109578329e-12" y="-1.05769659697e-09" z="0.074029199779"/>
+</move></bone><bone name=" pelvis"><move><matrix><rotx>-1.05736889577</rotx><rotz>5.74368254902e-05</rotz><roty>-2.50576627999e-07</roty></matrix>
+<v x="-9.58384447358e-08" y="-0.00166442454793" z="0.262991577387"/>
+</move></bone><bone name="foot.L"><move><matrix><rotx>-1.05679977824</rotx><rotz>-1.03664044774</rotz><roty>-0.0290835791552</roty></matrix>
+<v x="1.61831770207e-10" y="-5.85169868117e-09" z="0.391023933887"/>
+</move></bone><bone name="leg.L"><move><matrix><rotx>0.183788458607</rotx><rotz>1.07352196647</rotz><roty>-0.337725544556</roty></matrix>
+<v x="3.89935728151e-09" y="1.12351050685e-09" z="0.441814690828"/>
+</move></bone><bone name="thigh.L"><move><matrix><rotx>0.196782004921</rotx><rotz>-0.182416880711</rotz><roty>-0.596730577291</roty></matrix>
+<v x="5.48528733546e-09" y="5.82457415632e-09" z="0.119804449379"/>
+</move></bone><bone name="hip.L"><move><matrix><rotx>1.31626936614</rotx><rotz>0.574015277932</rotz><roty>-0.162424413895</roty></matrix>
+<v x="-8.75129302358e-08" y="-0.00166442454793" z="0.262991577387"/>
+</move></bone><bone name="foot.R"><move><matrix><rotx>-1.02698648879</rotx><rotz>1.84575971986</rotz><roty>-0.017572431528</roty></matrix>
+<v x="1.76472014779e-09" y="3.68563988218e-08" z="0.391024857759"/>
+</move></bone><bone name="leg.R"><move><matrix><rotx>0.131682072371</rotx><rotz>-1.18608992416</rotz><roty>0.36282993244</roty></matrix>
+<v x="1.76251901962e-10" y="5.49050582777e-08" z="0.441814720631"/>
+</move></bone><bone name="thigh.R"><move><matrix><rotx>0.770001164134</rotx><rotz>0.0766066693163</rotz><roty>0.776634698935</roty></matrix>
+<v x="2.65877222461e-08" y="9.41590971859e-11" z="0.119804523885"/>
+</move></bone><bone name="hip.R"><move><matrix><rotx>1.83791990625</rotx><rotz>-0.617762825421</rotz><roty>1.08890012386</roty></matrix>
+<v x="-8.75129302358e-08" y="-0.00166442454793" z="0.262991577387"/>
+</move></bone><bone name="base"><move><matrix><rotx>3.13526365126</rotx><rotz>5.75769364692e-05</rotz><roty>1.81631025979e-07</roty></matrix>
+<v x="-1.62547294167e-05" y="0.687124550343" z="0.308514803648"/>
+</move></bone></frame>
+</script>
+</skelfact>

@@ -141,7 +141,7 @@ void IsoTest::SetupFrame ()
     if(moved)
     {
       csYRotMatrix3 r(facing*PI/180.0);
-      actor->GetMovable ()->SetTransform(r * csXRotMatrix3 (-PI/2));
+      actor->GetMovable ()->SetTransform(r); // * csXRotMatrix3 (-PI/2));
     }
     // update animation state
     csRef<iGeneralMeshState> spstate (
@@ -399,9 +399,9 @@ bool IsoTest::CreateActor ()
   // Create the sprite and add it to the engine.
   actor = engine->CreateMeshWrapper (
     imeshfact, "MySprite", room, csVector3 (-3, 1, 3));
-  csXRotMatrix3 r(-PI/2);
-  actor->GetMovable ()->SetTransform(r);
-  actor->GetMovable ()->UpdateMove ();
+  //csXRotMatrix3 r(-PI/2);
+  //actor->GetMovable ()->SetTransform(r);
+  //actor->GetMovable ()->UpdateMove ();
   csRef<iGeneralMeshState> spstate (
     scfQueryInterface<iGeneralMeshState> (actor->GetMeshObject ()));
   csRef<iGenMeshSkeletonControlState> animcontrol (

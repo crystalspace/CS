@@ -63,6 +63,7 @@ private:
 public:
   const csQuaternion GetQuaternion ()
   {
+    //return rot_quat;
     csQuaternion q;
     q.SetMatrix (transform.GetO2T ());
     return q;
@@ -86,7 +87,7 @@ public:
   virtual void SetTransform (const csReversibleTransform &transform)
   {
     csSkeletonBone::transform = transform;
-    //rot_quat.SetMatrix (transform.GetO2T());
+    rot_quat.SetMatrix (transform.GetO2T());
   }
   virtual csReversibleTransform &GetFullTransform () 
     { return full_transform; }
@@ -179,7 +180,6 @@ public:
 
 struct bone_key_info
 {
-  bool relative;
   csQuaternion rot;
   csVector3 pos;
   csSkeletonBoneFactory *bone;
@@ -216,7 +216,7 @@ public:
     { return bones_frame_transforms.GetSize(); }
 
   virtual void AddTransform(csSkeletonBoneFactory *bone, 
-    csReversibleTransform &transform, bool relative)
+    csReversibleTransform &transform)
   {
     bone_key_info bf;
     csQuaternion q;
@@ -224,7 +224,6 @@ public:
     bf.rot = q;
     bf.pos = transform.GetOrigin();
     bf.bone = bone;
-    bf.relative = relative;
     bones_frame_transforms.Put(bone, bf);
   }
 

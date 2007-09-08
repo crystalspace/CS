@@ -160,7 +160,7 @@ struct iSkeletonAnimationKeyFrame : public virtual iBase
    * Add new bone transform to the key frame.
    */
   virtual void AddTransform (csSkeletonBoneFactory *bone, 
-    csReversibleTransform &transform, bool relative = false) = 0;
+    csReversibleTransform &transform) = 0;
 
   /**
    * Get the transform of a bone. Returns 'false' when there won't be 
