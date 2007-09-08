@@ -61,7 +61,12 @@ private:
   csQuaternion rot_quat;
   csBox3 skin_box;
 public:
-  csQuaternion &GetQuaternion () { return rot_quat; };
+  const csQuaternion GetQuaternion ()
+  {
+    csQuaternion q;
+    q.SetMatrix (transform.GetO2T ());
+    return q;
+  }
   void AddBone (csSkeletonBone *bone) { bones.Push (bone); }
   csArray<csSkeletonBone *> & GetBones () { return bones; }
 
@@ -81,7 +86,7 @@ public:
   virtual void SetTransform (const csReversibleTransform &transform)
   {
     csSkeletonBone::transform = transform;
-    rot_quat.SetMatrix (transform.GetO2T());
+    //rot_quat.SetMatrix (transform.GetO2T());
   }
   virtual csReversibleTransform &GetFullTransform () 
     { return full_transform; }
@@ -177,7 +182,6 @@ struct bone_key_info
   bool relative;
   csQuaternion rot;
   csVector3 pos;
-  csQuaternion tangent;
   csSkeletonBoneFactory *bone;
 };
 
@@ -249,8 +253,7 @@ public:
   }
 
   virtual bool GetKeyFrameData(csSkeletonBoneFactory *bone_fact, 
-      csQuaternion & rot, csVector3 & pos, csQuaternion & tangent,
-      bool & relative)
+      csQuaternion & rot, csVector3 & pos)
   {
     bone_key_info fallback;
     fallback.bone = 0;
@@ -260,8 +263,6 @@ public:
 
     rot = bki.rot;
     pos = bki.pos;
-    tangent = bki.tangent;
-    relative = bki.relative;
     return true;
   }
 };
@@ -314,7 +315,6 @@ public:
   { key_frames.DeleteIndexFast(i); }
   void RemoveAllFrames () 
   { key_frames.DeleteAll (); }
-  virtual void RecalcSpline();
 };
 
 struct bone_transform_data

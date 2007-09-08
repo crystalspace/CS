@@ -116,7 +116,6 @@ void csSkeletonBone::UpdateTransform ()
     bone_transform_data *b_tr = transforms.Get (factory_bone, 0);
     if (b_tr)
     {
-      rot_quat = b_tr->quat;
       transform.SetO2T (csMatrix3 (b_tr->quat));
       transform.SetOrigin(b_tr->pos);
     }
@@ -352,88 +351,6 @@ void csSkeletonAnimation::SetTime (csTicks time)
     time_factor = time / f_time;
   }
 }
-void csSkeletonAnimation::RecalcSpline()
-{
-  const csRefArray<csSkeletonBoneFactory>& bones = fact->GetBones ();
-  for (size_t i = 0; i < bones.GetSize () ; i++)
-  {
-    csArray<bone_key_info *> tmp_arr;
-    for (size_t j= 0; j < key_frames.GetSize (); j++)
-    {
-      csRef<csSkeletonAnimationKeyFrame> key_frame = key_frames[j];
-      bone_key_info & bt = key_frame->GetKeyInfo(bones[i]);
-      tmp_arr.Push(&bt);
-    }
-
-    if (tmp_arr.GetSize () < 2)
-    {
-      continue;
-    }
-
-    //check for backward quaternions
-    for (size_t j = 0; j < tmp_arr.GetSize () - 1; j++)
-    {
-      csQuaternion q1 = tmp_arr[j]->rot;
-      csQuaternion q2 = tmp_arr[j+1]->rot;
-      float a = (q1-q2).SquaredNorm ();
-      float b = (q1+q2).SquaredNorm ();
-      if (a > b)
-      {
-        tmp_arr[j+1]->rot = -1*q2;
-      }
-    }
-
-    //build the spline
-    size_t num = tmp_arr.GetSize ();
-    for(size_t j = 0; j < num; j++)
-    {
-      csQuaternion p1, p2;
-
-      bone_key_info& boneinfo = *tmp_arr[j];
-      const csQuaternion& p = boneinfo.rot;
-
-      csQuaternion inv = p.GetConjugate();
-      if (j == 0)
-      {
-        if (loop)
-        {
-          p1 = tmp_arr[1]->rot;
-          p2 = tmp_arr[num-1]->rot;
-        }
-        else
-        {
-          // No difference to use, reuse ourselves as tangent
-          boneinfo.tangent = p;
-          continue;
-        }
-      }
-      else if (j == (num-1))
-      {
-        if (loop)
-        {
-          p1 = tmp_arr[0]->rot;
-          p2 = tmp_arr[j-1]->rot;
-        }
-        else
-        {
-          // No difference to use, reuse ourselves as tangent
-          boneinfo.tangent = p;
-          continue;
-        }
-      }
-      else
-      {
-        p1 = tmp_arr[j+1]->rot;
-        p2 = tmp_arr[j-1]->rot;
-      }
-
-      p1 = (inv * p1).Log();
-      p2 = (inv * p2).Log();
-
-      tmp_arr[j]->tangent = p*((p1 + p2)/-4.0f).Exp ();
-    }
-  }
-}
 
 //------------------------csSkeletonAnimationInstance-------------------------------------
 
@@ -471,10 +388,9 @@ void csSkeletonAnimationInstance::ParseFrame(csSkeletonAnimationKeyFrame *frame)
     csSkeletonBoneFactory * bone_fact = skeleton->GetFactory()->GetBone(i);
 
     //key frame bone data
-    csQuaternion rot, tangent;
+    csQuaternion rot;
     csVector3 pos;
-    bool relative;
-    if (frame->GetKeyFrameData(bone_fact, rot, pos, tangent, relative))
+    if (frame->GetKeyFrameData(bone_fact, rot, pos))
     {
       //current transform data
       bone_transform_data *bone_transform = GetBoneTransform ((csSkeletonBoneFactory *)bone_fact);
@@ -487,10 +403,9 @@ void csSkeletonAnimationInstance::ParseFrame(csSkeletonAnimationKeyFrame *frame)
         sac_transform_execution m;
         m.bone_transform = bone_transform;
         m.elapsed_ticks = 0;
-        m.curr_quat = m.bone_transform->quat;
+        m.curr_quat = bone_transform->quat;
         m.position = bone_transform->pos;
         m.quat = rot;
-        m.tangent = tangent;
         m.final_position = pos;
 
         csVector3 delta = m.final_position - m.position;
@@ -545,7 +460,7 @@ csSkeletonAnimationKeyFrame *csSkeletonAnimationInstance::NextFrame()
     // is not looping forever.
     if (!animation->GetLoop() && loop_times > 0)
     {
-      loop_times -= 1;
+      loop_times--;
     }
     current_frame = 0;
   }
@@ -635,23 +550,23 @@ bool csSkeletonAnimationInstance::Do (long elapsed, bool& stop, long &left)
   {
     i--;
     sac_transform_execution& m = runnable_transforms[i];
+    // if we need to interpolate
     if (delta)
     {
       csVector3 current_pos = 
         m.final_position - delta * m.delta_per_tick;
       m.bone_transform->pos = current_pos;
 
+      // use slerp interpolation
       float slerp =
         (float)current_frame_time / (float) current_frame_duration;
       m.bone_transform->quat = m.curr_quat.SLerp (m.quat, slerp);
-      //m.bone_transform->quat = m.curr_quat.Squad(m.bone_transform->tangent, 
-      //  m.tangent, m.quat, slerp);
     }
     else
     {
+      // otherwise just use start keyframe
       m.bone_transform->pos = m.final_position;
       m.bone_transform->quat = m.quat;
-      m.bone_transform->tangent = m.tangent;
       runnable_transforms.DeleteIndexFast (i);
     }
     mod = true;
@@ -669,7 +584,6 @@ bone_transform_data *csSkeletonAnimationInstance::GetBoneTransform(
       ->FindBoneIndex(bone_fact);
     b_tr = new bone_transform_data ();
     b_tr->quat = ((csSkeletonBone *)skeleton->GetBone(index))->GetQuaternion ();
-    b_tr->tangent = b_tr->quat;
     b_tr->pos = ((csSkeletonBone *)skeleton->GetBone(index))
       ->GetTransform ().GetOrigin ();
     transforms.Put (bone_fact, b_tr);
@@ -827,6 +741,7 @@ bool csSkeleton::UpdateAnimation (csTicks current)
       i--;
       bool stop = false;
       long left;
+      // 
       if (running_animations[i]->Do (elapsed, stop, left))
       {
         while (left)

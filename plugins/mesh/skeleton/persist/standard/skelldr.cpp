@@ -292,7 +292,6 @@ const char *csSkeletonFactoryLoader::ParseScript (iDocumentNode* node,
         break;
   }
   }
-  script->RecalcSpline();
   return 0;
 }
 

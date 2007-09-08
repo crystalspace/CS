@@ -180,8 +180,7 @@ struct iSkeletonAnimationKeyFrame : public virtual iBase
    * data for given bone.
    */
   virtual bool GetKeyFrameData (csSkeletonBoneFactory *bone_fact, 
-    csQuaternion & rot, csVector3 & pos, csQuaternion & tangent,
-    bool & relative) = 0;
+    csQuaternion & rot, csVector3 & pos) = 0;
 };
 
 /**
@@ -270,13 +269,6 @@ struct iSkeletonAnimation : public virtual iBase
    * Remove all frames.
    */
   virtual void RemoveAllFrames () = 0;
-
-  /**
-   * Recalculates spline for bones rotations.
-   * Needs to be called every time when new 
-   * frames are added or removed.
-   */
-  virtual void RecalcSpline () = 0;
 };
 
 /**

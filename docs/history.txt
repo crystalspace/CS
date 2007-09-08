@@ -9,6 +9,7 @@ chronological order.
 8-Sep-2007
 	- Genjix made iSkeletonBone(Factory) not use scf. Needs more refactoring
 	  and cleanup to make it look nicer though.
+	- Genjix did some variable cleanup, commenting and a switch to SLerp.
 7-Sep-2007
 	- res fixed the debug info splitting to put the debug info file into
 	  the same file as the binary (fixes separate debug info for shared
