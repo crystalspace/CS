@@ -13,6 +13,10 @@ chronological order.
 	- iceeey made the cssaver save plugin references with the short name
 	  from the original world file, if it was loaded with the saveable
 	  flag set. This makes saving and then loading 'castle' work.
+	- res changed the output directory of the Python modules and .py glue
+	  to out/.../bindings/python.
+	- res added two new targets: "bindings" and "install_bindings" to build
+	  resp. install bindings.
 7-Sep-2007
 	- res fixed the debug info splitting to put the debug info file into
 	  the same file as the binary (fixes separate debug info for shared

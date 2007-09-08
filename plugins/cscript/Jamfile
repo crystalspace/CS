@@ -1,8 +1,73 @@
 SubDir TOP plugins cscript ;
 
+# Construct pseudo target bindings
+NotFile bindings ;
+Help bindings : "Build all bindings for other languages" ;
+
+if $(PYTHON.AVAILABLE) = "yes"
+{
+  ##  PyBindingModule target : module name : glue : LinkWith : ExternalLibs : desc ;
+  rule PyBindingModule
+  {
+    local target = $(1) ;
+    local module = $(2) ;
+    #--------
+    # Swig-generated files for 'target'.
+    #--------
+    local common = cs_$(module).cpp ;
+    local modulepy = [ DoSourceGrist $(module).py ] ;
+    MakeLocate $(modulepy) : [ ConcatDirs $(LOCATE.OBJECTS) bindings python ] ;
+  
+    if ! [ Property build : projgen ]
+    {
+      common = [ DoSourceGrist $(common) ] ;
+  
+      if $(CMD.SWIG)
+      {
+	Swig $(common) $(modulepy) :
+	  [ DoSourceGrist $(module).i ] :
+	  python :
+	  -c++ -shadow :
+	  [ ConcatDirs $(TOP) include ]
+	  [ ConcatDirs $(BUILDTOP) include ] :
+	  [ ConcatDirs $(TOP) include bindings ]
+	  [ ConcatDirs $(TOP) include bindings python ] :
+	  $(SEARCH_SOURCE) [ ConcatDirs $(TOP) scripts python ] :
+	  $(module) :
+	  [ on $(modulepy) GetVar LOCATE ] ;
+	Depends modulepyclean : pythonswigclean ;
+      }
+      else
+      {
+	SEARCH on $(common) = $(SEARCH_SOURCE) ;
+	local frozenpy = $(modulepy:G=frozenmodulepy) ;
+	SEARCH on $(frozenpy) = [ ConcatDirs $(TOP) scripts python ] ;
+	Copy $(modulepy) : $(frozenpy) ;
+	Depends $(modulepy) : $(frozenpy) ;
+      }
+    }
+    Clean modulepyclean : $(modulepy) ;
+    Depends clean : modulepyclean ;
+  
+    InstallBindingsData $(modulepy) : [ on $(<) GetVar LOCATE ] : bindings python ;
+  
+  
+    #--------
+    # core -- Pure Python module
+    #--------
+    PythMod $(target) : _$(module) : 
+	  $(3) $(common) : 
+	  crystalspace $(4) : 
+	  $(5) : 
+	  $(6) ;
+    Depends $(target) : $(modulepy) ;
+    CFlags $(target) : [ FDefines SWIG_GLOBAL ] $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE) ;
+  }
+}
+
 SubInclude TOP plugins cscript csjava ;
 SubInclude TOP plugins cscript csperl5 ;
-SubInclude TOP plugins cscript cspython ;
+#SubInclude TOP plugins cscript cspython ;
 SubInclude TOP plugins cscript pycscegui ;
 SubInclude TOP plugins cscript pycore ;
 SubInclude TOP plugins cscript pyimesh ;

@@ -23,20 +23,19 @@
 # Auxiliary rule
 rule InstallPythMod
 {
-  local plugindir = $(appdatadir) ; # Temporary override of global plugindir.
-  SystemInstallPlugin $(1) : $(2) ;
+  InstallBindingsModule $(1) : $(2) ;
 }
 
 # USAGE:
-# Pythmod targetname : dll name : src files : LinkWith : ExternalLibs : desc
+# Pythmod targetname : module name : src files : LinkWith : ExternalLibs : desc
 #
 # EXAMPLES:
 # PythMod ceguimod : _cscegui : ceguimod.cpp cs_cegui.cpp : : CEGUI : desc
 # PythMod pythmod : _cspace : pythmod.cpp : crystalspace_python : : desc
 rule PythMod
 {
+  local module = $(2) ;
   local desc = $(6) ;
-  local target = $(2) ;
   local cleantarget ;
   if [ Property build : projgen ]
   {
@@ -55,13 +54,13 @@ rule PythMod
     local objects = [ CompileObjects $(sources) ] ;
     if $(PYTHON.MODULE_EXT)
     {
-      target = $(target:S=$(PYTHON.MODULE_EXT)) ;
+      module = $(module:S=$(PYTHON.MODULE_EXT)) ;
     }
     else
     {
-      target = [ ConstructPluginTarget $(target) ] ;
+      module = [ ConstructPluginTarget $(module) ] ;
     }
-    $(<)_TARGET = $(target) ;
+    $(<)_TARGET = $(module) ;
     $(<)_SOURCES = $(sources) ;
     $(<)_OBJECTS = $(objects) ;
     LinkWith $(<) : $(4) ;
@@ -69,26 +68,26 @@ rule PythMod
     CFlags $(<) : $(PLUGIN.CFLAGS) ;
     LFlags $(<) : $(PLUGIN.LFLAGS) $(LINKLIBS) ;
     NotFile $(<) ;
-    Depends $(<) : $(target) ;
-    Depends plugins : $(<) ;
-    MakeLocate $(target) : $(LOCATE.TARGETS) ;
-    Depends $(target) : $(objects) ;
-    LinkPlugin $(target) : $(objects) ;
-    InstallPythMod $(target) : bindings python ;
+    Depends $(<) : $(module) ;
+    Depends bindings : $(<) ;
+    MakeLocate $(module) : [ ConcatDirs $(LOCATE.OBJECTS) bindings python ] ;
+    Depends $(module) : $(objects) ;
+    LinkPlugin $(module) : $(objects) ;
+    InstallBindingsModule $(module) : bindings python ;
     if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
     {
-      local debugfile = [ SplitDebugInfo $(target) ] ;
+      local debugfile = [ SplitDebugInfo $(module) ] ;
       cleantarget += $(debugfile) ;
       NoCare $(debugfile) ;
-      Depends install_plugin : [ DoInstall $(debugfile) :
-                                  $(appdatadir) bindings python :
-                                  $(INSTALL_DATA) ] ;
+      Depends install_bindings : [ DoInstall $(debugfile) :
+                                    $(appdatadir) bindings python :
+                                    $(INSTALL_DATA) ] ;
     }
   }
 
   Always $(<)clean ;
   NotFile $(<)clean ;
-  Clean $(<)clean : $(target) $(objects) $(cleantarget) ;
+  Clean $(<)clean : $(module) $(objects) $(cleantarget) ;
   Depends clean : $(<)clean ;
 }
 
