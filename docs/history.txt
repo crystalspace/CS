@@ -25,6 +25,8 @@ chronological order.
 	  bindings package (scripts/python/cspace/).
 	- res removed the crystalspace_python library and made cspython use the
 	  external python modules.
+	- res made the cspace __init__.py being copied into the
+	  bindings/python/out directory (in out/ resp. the install directory).
 7-Sep-2007
 	- res fixed the debug info splitting to put the debug info file into
 	  the same file as the binary (fixes separate debug info for shared

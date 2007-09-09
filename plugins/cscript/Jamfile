@@ -92,3 +92,20 @@ Description pythmod : "build all python bindings modules" ;
 PythModDepends coremod imeshmod isndsysmod ivariamod ienginemod cstoolmod
   ivideomod imapmod csgfxmod csgeommod ;
 Depends bindings : pythmod ;
+
+rule CopyCspaceInitPy
+{
+  local init_py = __init__.py ;
+  local init_py_dir = [ ConcatDirs $(TOP) scripts python cspace ] ;
+  SEARCH on $(init_py:G=src) = $(init_py_dir) ;
+  
+  MakeLocate $(init_py:G=out) : [ ConcatDirs $(LOCATE.OBJECTS) bindings python cspace ] ;
+  Copy $(init_py:G=out) : $(init_py:G=src) ;
+  Depends $(init_py:G=out) : $(init_py:G=src) ;
+  Depends pythmod : $(init_py:G=out) ;
+  Depends pythmodclean : $(init_py:G=out) ;
+  InstallBindingsData $(init_py:G=src) : $(init_py_dir) : bindings python cspace ;
+}
+
+CopyCspaceInitPy ;
+
