@@ -84,6 +84,20 @@ _csRef_to_Python (const csRef<iBase> & ref, void * ptr, const char * name)
   ref->IncRef();
   return SWIG_NewPointerObj((void *)ptr, SWIG_TypeQuery(name), 1);
 }
+/* Funtions to set the modules global SCF pointer, this is needed
+   when working on a pure scripting environment, as then this code
+   lives in a non-cs dll, thus the pointer isnt initialized
+   by cs itself, and scf stuff wont work unless the pointer is
+   initialized manually. Use it after CreateEnvironment call. */
+void SetSCFPointer(iSCF* pscf)
+{
+  iSCF::SCF = pscf;
+}
+
+iSCF* GetSCFPointer()
+{
+  return iSCF::SCF;
+}
 %}
 %enddef
 

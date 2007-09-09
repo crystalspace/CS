@@ -209,6 +209,7 @@
 
 // output arguments
 %apply unsigned long { utf32_char };
+%apply unsigned long { uint32 };
 %apply unsigned char * OUTPUT { uint8 & red };
 %apply unsigned char * OUTPUT { uint8 & green };
 %apply unsigned char * OUTPUT { uint8 & blue };
@@ -477,7 +478,7 @@ csArrayCapacityLinear<csArrayThresholdVariable >;
 %include "csutil/array.h"
 
 %ignore scfInitialize;
-%immutable iSCF::SCF;
+/*%immutable iSCF::SCF;*/
 %include "csutil/scf_interface.h"
 %include "csutil/scf.h"
 
@@ -497,6 +498,8 @@ csArrayCapacityLinear<csArrayThresholdVariable >;
 
 %include "csutil/cmdhelp.h"
 %include "csutil/comparator.h"
+
+%include "csutil/flags.h"
 
 %ignore csStringSet::GlobalIterator;
 %ignore csStringSet::GetIterator;

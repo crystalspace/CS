@@ -30,6 +30,8 @@
 %include "cstool/cspixmap.h"
 %include "cstool/enginetools.h"
 
+%include "cstool/genmeshbuilder.h"
+
 /*%template(csPluginRequestArray) csArray<csPluginRequest>;*/
 %ignore iPen::Rotate;
 

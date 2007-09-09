@@ -66,7 +66,7 @@ if $(PYTHON.AVAILABLE) = "yes"
 
 SubInclude TOP plugins cscript csjava ;
 SubInclude TOP plugins cscript csperl5 ;
-#SubInclude TOP plugins cscript cspython ;
+SubInclude TOP plugins cscript cspython ;
 SubInclude TOP plugins cscript pycscegui ;
 SubInclude TOP plugins cscript pycore ;
 SubInclude TOP plugins cscript pyimesh ;
@@ -79,3 +79,16 @@ SubInclude TOP plugins cscript pyimap ;
 SubInclude TOP plugins cscript pycsgfx ;
 SubInclude TOP plugins cscript pycsgeom ;
 
+rule PythModDepends
+{
+  for d in $(1)
+  {
+    Depends pythmod : $(1) ;
+    Depends pythmodclean : $(1)clean ;
+  }
+}
+
+Description pythmod : "build all python bindings modules" ;
+PythModDepends coremod imeshmod isndsysmod ivariamod ienginemod cstoolmod
+  ivideomod imapmod csgfxmod csgeommod ;
+Depends bindings : pythmod ;

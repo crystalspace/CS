@@ -39,6 +39,11 @@
 #include "cspython.h"
 #include "pytocs.h"
 
+extern "C"
+{
+  #include "swigpyruntime.h"
+}
+
 CS_IMPLEMENT_PLUGIN
 
 CS_PLUGIN_NAMESPACE_BEGIN(cspython)
@@ -64,10 +69,12 @@ csPython::~csPython()
   object_reg = 0;
 }
 
-extern "C"
+PyObject* csWrapTypedObject(void* objectptr, const char *typetag,
+  int own)
 {
-  PyObject* csWrapTypedObject(void *objptr, const char *tagtype, int own);
-  void SWIG_init_cspace();
+  swig_type_info *ti = SWIG_TypeQuery (typetag);
+  PyObject *obj = SWIG_NewPointerObj (objectptr, ti, own);
+  return obj;
 }
 
 static csString const& path_append(csString& path, char const* component)
@@ -117,6 +124,10 @@ bool csPython::Initialize(iObjectRegistry* object_reg)
 
   Mode = CS_REPORTER_SEVERITY_NOTIFY;
 
+  // Inject iSCF::SCF
+  // @@@ Ugly... shouldn't have to Store/assign from py, just Store.
+  Store("cspace.__corecvar_iSCF_SCF", iSCF::SCF, (void*)"iSCF *");
+  RunText("cspace.corecvar.iSCF_SCF = cspace.__corecvar_iSCF_SCF");
   // Store the object registry pointer in 'cspace.object_reg'.
   Store("cspace.object_reg", object_reg, (void *) "iObjectRegistry *");
 
@@ -169,7 +180,7 @@ bool csPython::Store(const char* name, void* data, void* tag)
   bool ok = false;
   PyObject *obj = csWrapTypedObject(data, (const char*)tag, 0);
   char *mod_name = csStrNew(name);
-  char *var_name = strrchr(mod_name, '.');
+  char *var_name = strchr(mod_name, '.');
   if (var_name)
   {
     *var_name = '\0';

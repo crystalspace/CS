@@ -192,6 +192,14 @@ class CSMutableArrayHelper:
 
 %pythoncode %{
   csReport = csReporterHelper.Report
+  csmodules = []
+  def AddCsModule(csmodule):
+      csmodules.append(module)
+      csmodule.SetSCFPointer(corecvar.iSCF_SCF)
+  def SyncSCFPointers():
+      for csmodule in csmodules:
+          csmodule.SetSCFPointer(corecvar.iSCF_SCF)
+  SCF = property(SetSCFPointer)
 %}
 
 #endif // CS_MINI_SWIG

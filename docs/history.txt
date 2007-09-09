@@ -23,6 +23,8 @@ chronological order.
 	  MSVC to get built as a DLL any more.
 	- caedes added an initial __init__.py file for the new python
 	  bindings package (scripts/python/cspace/).
+	- res removed the crystalspace_python library and made cspython use the
+	  external python modules.
 7-Sep-2007
 	- res fixed the debug info splitting to put the debug info file into
 	  the same file as the binary (fixes separate debug info for shared

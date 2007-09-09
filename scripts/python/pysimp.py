@@ -23,11 +23,16 @@ def CreateRoom(matname):
     print 'Start creating polygons from Python script...'
     engine = CS_QUERY_REGISTRY(object_reg, iEngine)
     room = engine.GetSectors().FindByName("room")
-    walls = engine.CreateSectorWallsMesh(room,"walls")
+    
+    mapper = DensityTextureMapper (0.3)
+    box = TesselatedBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5))
+    box.SetLevel (3)
+    box.SetMapper (mapper)
+    box.SetFlags (Primitives.CS_PRIMBOX_INSIDE)
+
+    walls = GeneralMeshBuilder.CreateFactoryAndMesh (engine, room, 
+      "walls", "walls_factory", box)
     walls_factory = walls.GetMeshObject().GetFactory()
     material = engine.GetMaterialList().FindByName(matname)
-    walls_state = SCF_QUERY_INTERFACE(walls_factory, iThingFactoryState)
-    walls_state.AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5))
-    walls_state.SetPolygonMaterial (CS_POLYRANGE_LAST, material);
-    walls_state.SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
+    walls.GetMeshObject().SetMaterialWrapper(material)
     print 'Finished!'
