@@ -3184,6 +3184,8 @@ sub new {
 *__eq__ = *cspacec::csRGBcolor___eq__;
 *__ne__ = *cspacec::csRGBcolor___ne__;
 *__add__ = *cspacec::csRGBcolor___add__;
+*UnsafeAdd = *cspacec::csRGBcolor_UnsafeAdd;
+*SafeAdd = *cspacec::csRGBcolor_SafeAdd;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -10473,6 +10475,43 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iSndSysListenerDoppler ##############
+
+package cspace::iSndSysListenerDoppler;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*SetVelocity = *cspacec::iSndSysListenerDoppler_SetVelocity;
+*SetDopplerFactor = *cspacec::iSndSysListenerDoppler_SetDopplerFactor;
+*SetSpeedOfSound = *cspacec::iSndSysListenerDoppler_SetSpeedOfSound;
+*GetVelocity = *cspacec::iSndSysListenerDoppler_GetVelocity;
+*GetDopplerFactor = *cspacec::iSndSysListenerDoppler_GetDopplerFactor;
+*GetSpeedOfSound = *cspacec::iSndSysListenerDoppler_GetSpeedOfSound;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSndSysListenerDoppler($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iSndSysLoader ##############
 
 package cspace::iSndSysLoader;
@@ -10589,8 +10628,6 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *SetVolume = *cspacec::iSndSysSource_SetVolume;
 *GetVolume = *cspacec::iSndSysSource_GetVolume;
 *GetStream = *cspacec::iSndSysSource_GetStream;
-*AddOutputFilter = *cspacec::iSndSysSource_AddOutputFilter;
-*RemoveOutputFilter = *cspacec::iSndSysSource_RemoveOutputFilter;
 *GetPtr = *cspacec::iSndSysSource_GetPtr;
 *scfGetVersion = *cspacec::iSndSysSource_scfGetVersion;
 sub DESTROY {
@@ -10626,6 +10663,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 %ITERATORS = ();
 *MergeIntoBuffer = *cspacec::iSndSysSourceSoftware_MergeIntoBuffer;
 *ProcessOutputFilters = *cspacec::iSndSysSourceSoftware_ProcessOutputFilters;
+*AddOutputFilter = *cspacec::iSndSysSourceSoftware_AddOutputFilter;
+*RemoveOutputFilter = *cspacec::iSndSysSourceSoftware_RemoveOutputFilter;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -10650,30 +10689,164 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::iSndSysSourceSoftware3D ##############
+############# Class : cspace::iSndSysSourceOpenAL ##############
 
-package cspace::iSndSysSourceSoftware3D;
+package cspace::iSndSysSourceOpenAL;
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
-@ISA = qw( cspace::iSndSysSourceSoftware cspace );
+@ISA = qw( cspace::iBase cspace );
 %OWNER = ();
 %ITERATORS = ();
-*SetPosition = *cspacec::iSndSysSourceSoftware3D_SetPosition;
-*GetPosition = *cspacec::iSndSysSourceSoftware3D_GetPosition;
-*SetDirection = *cspacec::iSndSysSourceSoftware3D_SetDirection;
-*GetDirection = *cspacec::iSndSysSourceSoftware3D_GetDirection;
-*SetDirectionalRadiation = *cspacec::iSndSysSourceSoftware3D_SetDirectionalRadiation;
-*GetDirectionalRadiation = *cspacec::iSndSysSourceSoftware3D_GetDirectionalRadiation;
-*SetMinimumDistance = *cspacec::iSndSysSourceSoftware3D_SetMinimumDistance;
-*SetMaximumDistance = *cspacec::iSndSysSourceSoftware3D_SetMaximumDistance;
-*GetMinimumDistance = *cspacec::iSndSysSourceSoftware3D_GetMinimumDistance;
-*GetMaximumDistance = *cspacec::iSndSysSourceSoftware3D_GetMaximumDistance;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
     return unless defined $self;
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
-        cspacec::delete_iSndSysSourceSoftware3D($self);
+        cspacec::delete_iSndSysSourceOpenAL($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSndSysSource3D ##############
+
+package cspace::iSndSysSource3D;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*SetPosition = *cspacec::iSndSysSource3D_SetPosition;
+*GetPosition = *cspacec::iSndSysSource3D_GetPosition;
+*SetMinimumDistance = *cspacec::iSndSysSource3D_SetMinimumDistance;
+*SetMaximumDistance = *cspacec::iSndSysSource3D_SetMaximumDistance;
+*GetMinimumDistance = *cspacec::iSndSysSource3D_GetMinimumDistance;
+*GetMaximumDistance = *cspacec::iSndSysSource3D_GetMaximumDistance;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSndSysSource3D($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSndSysSource3DDirectionalSimple ##############
+
+package cspace::iSndSysSource3DDirectionalSimple;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*SetDirection = *cspacec::iSndSysSource3DDirectionalSimple_SetDirection;
+*GetDirection = *cspacec::iSndSysSource3DDirectionalSimple_GetDirection;
+*SetDirectionalRadiation = *cspacec::iSndSysSource3DDirectionalSimple_SetDirectionalRadiation;
+*GetDirectionalRadiation = *cspacec::iSndSysSource3DDirectionalSimple_GetDirectionalRadiation;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSndSysSource3DDirectionalSimple($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSndSysSource3DDirectional ##############
+
+package cspace::iSndSysSource3DDirectional;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*SetDirection = *cspacec::iSndSysSource3DDirectional_SetDirection;
+*GetDirection = *cspacec::iSndSysSource3DDirectional_GetDirection;
+*SetDirectionalRadiationInnerCone = *cspacec::iSndSysSource3DDirectional_SetDirectionalRadiationInnerCone;
+*SetDirectionalRadiationOuterCone = *cspacec::iSndSysSource3DDirectional_SetDirectionalRadiationOuterCone;
+*SetDirectionalRadiationOuterGain = *cspacec::iSndSysSource3DDirectional_SetDirectionalRadiationOuterGain;
+*GetDirectionalRadiationInnerCone = *cspacec::iSndSysSource3DDirectional_GetDirectionalRadiationInnerCone;
+*GetDirectionalRadiationOuterCone = *cspacec::iSndSysSource3DDirectional_GetDirectionalRadiationOuterCone;
+*GetDirectionalRadiationOuterGain = *cspacec::iSndSysSource3DDirectional_GetDirectionalRadiationOuterGain;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSndSysSource3DDirectional($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSndSysSource3DDoppler ##############
+
+package cspace::iSndSysSource3DDoppler;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*SetVelocity = *cspacec::iSndSysSource3DDoppler_SetVelocity;
+*GetVelocity = *cspacec::iSndSysSource3DDoppler_GetVelocity;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSndSysSource3DDoppler($self);
         delete $OWNER{$self};
     }
 }
@@ -10919,6 +11092,39 @@ sub DESTROY {
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
         cspacec::delete_iSndSysRendererSoftware($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iSndSysRendererOpenAL ##############
+
+package cspace::iSndSysRendererOpenAL;
+use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
+@ISA = qw( cspace::iBase cspace );
+%OWNER = ();
+%ITERATORS = ();
+*LockWait = *cspacec::iSndSysRendererOpenAL_LockWait;
+*Release = *cspacec::iSndSysRendererOpenAL_Release;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSndSysRendererOpenAL($self);
         delete $OWNER{$self};
     }
 }
@@ -17767,7 +17973,14 @@ sub ACQUIRE {
 
 package cspace;
 
+sub CS_COMPILER_NAME () { $cspacec::CS_COMPILER_NAME }
+sub CS_PLATFORM_NAME () { $cspacec::CS_PLATFORM_NAME }
+sub CS_PROCESSOR_SIZE () { $cspacec::CS_PROCESSOR_SIZE }
+sub CS_LONG_SIZE () { $cspacec::CS_LONG_SIZE }
+sub CS_PROCESSOR_NAME () { $cspacec::CS_PROCESSOR_NAME }
 sub CS_WCHAR_T_SIZE () { $cspacec::CS_WCHAR_T_SIZE }
+sub CS_PACKAGE_NAME () { $cspacec::CS_PACKAGE_NAME }
+sub CS_PACKAGE_VERSION () { $cspacec::CS_PACKAGE_VERSION }
 sub SCF_STATIC_CLASS_CONTEXT () { $cspacec::SCF_STATIC_CLASS_CONTEXT }
 sub SCF_VERBOSE_NONE () { $cspacec::SCF_VERBOSE_NONE }
 sub SCF_VERBOSE_PLUGIN_SCAN () { $cspacec::SCF_VERBOSE_PLUGIN_SCAN }
