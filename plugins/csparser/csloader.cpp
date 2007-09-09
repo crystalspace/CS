@@ -1559,9 +1559,22 @@ bool csLoader::LoadPlugins (iDocumentNode* node)
     switch (id)
     {
       case XMLTOKEN_PLUGIN:
-	loaded_plugins.NewPlugin (child->GetAttributeValue ("name"),
-			child);
+        {
+          const char* plugin_name = child->GetAttributeValue ("name");
+          loaded_plugins.NewPlugin (plugin_name, child);
+          if (Engine->GetSaveableFlag ())
+          {
+            const char* plugin_id = loaded_plugins.FindPluginClassID (plugin_name);
+            if (plugin_id)
+            {
+              csRef<iPluginReference> pluginref;
+              pluginref.AttachNew (new csPluginReference (plugin_name, plugin_id));
+              object_reg->Register (pluginref, csString ("_plugref_") + plugin_id);
+            }
+          }
+        }
         break;
+      
       default:
 	SyntaxService->ReportBadToken (child);
 	return false;

@@ -153,7 +153,7 @@ csBezierMesh::csBezierMesh (iBase *parent, csBezierMeshObjectType* thing_type) :
 
   csRef<iStringSet> strings;
   strings = csQueryRegistryTagInterface<iStringSet>
-    (thing_type->object_reg, "crystalspace.shader.variablenameset");
+    (thing_type->object_reg, "crystalspace.shared.stringset");
 
   if ((vertex_name == csInvalidStringID) ||
     (texel_name == csInvalidStringID) ||
