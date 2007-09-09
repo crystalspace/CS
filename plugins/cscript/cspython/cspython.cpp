@@ -95,6 +95,13 @@ bool csPython::Initialize(iObjectRegistry* object_reg)
     csQueryRegistry<iCommandLineParser> (object_reg));
   bool const reporter = cmdline->GetOption("python-enable-reporter") != 0;
   use_debugger = cmdline->GetOption("python-enable-debugger") != 0;
+  
+#ifdef DEFAULT_PYTHMOD_PATH
+  csString PYTHONPATH (getenv ("PYTHONPATH"));
+  PYTHONPATH.Insert (0, CS_PATH_SEPARATOR);
+  PYTHONPATH.Insert (0, DEFAULT_PYTHMOD_PATH);
+  setenv ("PYTHONPATH", PYTHONPATH, true);
+#endif
 
   Py_SetProgramName("Crystal Space -- Python");
   Py_Initialize();

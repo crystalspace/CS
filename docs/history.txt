@@ -27,6 +27,10 @@ chronological order.
 	  external python modules.
 	- res made the cspace __init__.py being copied into the
 	  bindings/python/out directory (in out/ resp. the install directory).
+	- res changed cspython plugin to augment the PYTHONPATH env var with
+	  the location for the python module files in the build path.
+	- res fixed the cspython build to properly locate the swig runtime
+	  header.
 7-Sep-2007
 	- res fixed the debug info splitting to put the debug info file into
 	  the same file as the binary (fixes separate debug info for shared
