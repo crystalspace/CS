@@ -42,7 +42,14 @@ except AttributeError:
 del types
 
 
+CS_COMPILER_NAME = _cspace.CS_COMPILER_NAME
+CS_PLATFORM_NAME = _cspace.CS_PLATFORM_NAME
+CS_PROCESSOR_SIZE = _cspace.CS_PROCESSOR_SIZE
+CS_LONG_SIZE = _cspace.CS_LONG_SIZE
+CS_PROCESSOR_NAME = _cspace.CS_PROCESSOR_NAME
 CS_WCHAR_T_SIZE = _cspace.CS_WCHAR_T_SIZE
+CS_PACKAGE_NAME = _cspace.CS_PACKAGE_NAME
+CS_PACKAGE_VERSION = _cspace.CS_PACKAGE_VERSION
 class csWrapPtr(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csWrapPtr, name, value)
@@ -2081,6 +2088,8 @@ class csRGBcolor(_object):
     def __eq__(*args): return _cspace.csRGBcolor___eq__(*args)
     def __ne__(*args): return _cspace.csRGBcolor___ne__(*args)
     def __add__(*args): return _cspace.csRGBcolor___add__(*args)
+    def UnsafeAdd(*args): return _cspace.csRGBcolor_UnsafeAdd(*args)
+    def SafeAdd(*args): return _cspace.csRGBcolor_SafeAdd(*args)
     __swig_destroy__ = _cspace.delete_csRGBcolor
     __del__ = lambda self : None;
 csRGBcolor_swigregister = _cspace.csRGBcolor_swigregister
@@ -6884,6 +6893,26 @@ iSndSysListener_swigregister = _cspace.iSndSysListener_swigregister
 iSndSysListener_swigregister(iSndSysListener)
 iSndSysListener_scfGetVersion = _cspace.iSndSysListener_scfGetVersion
 
+class iSndSysListenerDoppler(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysListenerDoppler, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysListenerDoppler, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetVelocity(*args): return _cspace.iSndSysListenerDoppler_SetVelocity(*args)
+    def SetDopplerFactor(*args): return _cspace.iSndSysListenerDoppler_SetDopplerFactor(*args)
+    def SetSpeedOfSound(*args): return _cspace.iSndSysListenerDoppler_SetSpeedOfSound(*args)
+    def GetVelocity(*args): return _cspace.iSndSysListenerDoppler_GetVelocity(*args)
+    def GetDopplerFactor(*args): return _cspace.iSndSysListenerDoppler_GetDopplerFactor(*args)
+    def GetSpeedOfSound(*args): return _cspace.iSndSysListenerDoppler_GetSpeedOfSound(*args)
+    __swig_destroy__ = _cspace.delete_iSndSysListenerDoppler
+    __del__ = lambda self : None;
+iSndSysListenerDoppler_swigregister = _cspace.iSndSysListenerDoppler_swigregister
+iSndSysListenerDoppler_swigregister(iSndSysListenerDoppler)
+
 class iSndSysLoader(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -6958,8 +6987,6 @@ class iSndSysSource(iBase):
     def SetVolume(*args): return _cspace.iSndSysSource_SetVolume(*args)
     def GetVolume(*args): return _cspace.iSndSysSource_GetVolume(*args)
     def GetStream(*args): return _cspace.iSndSysSource_GetStream(*args)
-    def AddOutputFilter(*args): return _cspace.iSndSysSource_AddOutputFilter(*args)
-    def RemoveOutputFilter(*args): return _cspace.iSndSysSource_RemoveOutputFilter(*args)
     def GetPtr(*args): return _cspace.iSndSysSource_GetPtr(*args)
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iSndSysSource_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iSndSysSource_scfGetVersion)
@@ -6980,34 +7007,102 @@ class iSndSysSourceSoftware(iSndSysSource):
     __repr__ = _swig_repr
     def MergeIntoBuffer(*args): return _cspace.iSndSysSourceSoftware_MergeIntoBuffer(*args)
     def ProcessOutputFilters(*args): return _cspace.iSndSysSourceSoftware_ProcessOutputFilters(*args)
+    def AddOutputFilter(*args): return _cspace.iSndSysSourceSoftware_AddOutputFilter(*args)
+    def RemoveOutputFilter(*args): return _cspace.iSndSysSourceSoftware_RemoveOutputFilter(*args)
     __swig_destroy__ = _cspace.delete_iSndSysSourceSoftware
     __del__ = lambda self : None;
 iSndSysSourceSoftware_swigregister = _cspace.iSndSysSourceSoftware_swigregister
 iSndSysSourceSoftware_swigregister(iSndSysSourceSoftware)
 
-class iSndSysSourceSoftware3D(iSndSysSourceSoftware):
+class iSndSysSourceOpenAL(iBase):
     __swig_setmethods__ = {}
-    for _s in [iSndSysSourceSoftware]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysSourceSoftware3D, name, value)
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysSourceOpenAL, name, value)
     __swig_getmethods__ = {}
-    for _s in [iSndSysSourceSoftware]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysSourceSoftware3D, name)
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysSourceOpenAL, name)
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def SetPosition(*args): return _cspace.iSndSysSourceSoftware3D_SetPosition(*args)
-    def GetPosition(*args): return _cspace.iSndSysSourceSoftware3D_GetPosition(*args)
-    def SetDirection(*args): return _cspace.iSndSysSourceSoftware3D_SetDirection(*args)
-    def GetDirection(*args): return _cspace.iSndSysSourceSoftware3D_GetDirection(*args)
-    def SetDirectionalRadiation(*args): return _cspace.iSndSysSourceSoftware3D_SetDirectionalRadiation(*args)
-    def GetDirectionalRadiation(*args): return _cspace.iSndSysSourceSoftware3D_GetDirectionalRadiation(*args)
-    def SetMinimumDistance(*args): return _cspace.iSndSysSourceSoftware3D_SetMinimumDistance(*args)
-    def SetMaximumDistance(*args): return _cspace.iSndSysSourceSoftware3D_SetMaximumDistance(*args)
-    def GetMinimumDistance(*args): return _cspace.iSndSysSourceSoftware3D_GetMinimumDistance(*args)
-    def GetMaximumDistance(*args): return _cspace.iSndSysSourceSoftware3D_GetMaximumDistance(*args)
-    __swig_destroy__ = _cspace.delete_iSndSysSourceSoftware3D
+    __swig_destroy__ = _cspace.delete_iSndSysSourceOpenAL
     __del__ = lambda self : None;
-iSndSysSourceSoftware3D_swigregister = _cspace.iSndSysSourceSoftware3D_swigregister
-iSndSysSourceSoftware3D_swigregister(iSndSysSourceSoftware3D)
+iSndSysSourceOpenAL_swigregister = _cspace.iSndSysSourceOpenAL_swigregister
+iSndSysSourceOpenAL_swigregister(iSndSysSourceOpenAL)
+
+class iSndSysSource3D(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysSource3D, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysSource3D, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetPosition(*args): return _cspace.iSndSysSource3D_SetPosition(*args)
+    def GetPosition(*args): return _cspace.iSndSysSource3D_GetPosition(*args)
+    def SetMinimumDistance(*args): return _cspace.iSndSysSource3D_SetMinimumDistance(*args)
+    def SetMaximumDistance(*args): return _cspace.iSndSysSource3D_SetMaximumDistance(*args)
+    def GetMinimumDistance(*args): return _cspace.iSndSysSource3D_GetMinimumDistance(*args)
+    def GetMaximumDistance(*args): return _cspace.iSndSysSource3D_GetMaximumDistance(*args)
+    __swig_destroy__ = _cspace.delete_iSndSysSource3D
+    __del__ = lambda self : None;
+iSndSysSource3D_swigregister = _cspace.iSndSysSource3D_swigregister
+iSndSysSource3D_swigregister(iSndSysSource3D)
+
+class iSndSysSource3DDirectionalSimple(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysSource3DDirectionalSimple, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysSource3DDirectionalSimple, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetDirection(*args): return _cspace.iSndSysSource3DDirectionalSimple_SetDirection(*args)
+    def GetDirection(*args): return _cspace.iSndSysSource3DDirectionalSimple_GetDirection(*args)
+    def SetDirectionalRadiation(*args): return _cspace.iSndSysSource3DDirectionalSimple_SetDirectionalRadiation(*args)
+    def GetDirectionalRadiation(*args): return _cspace.iSndSysSource3DDirectionalSimple_GetDirectionalRadiation(*args)
+    __swig_destroy__ = _cspace.delete_iSndSysSource3DDirectionalSimple
+    __del__ = lambda self : None;
+iSndSysSource3DDirectionalSimple_swigregister = _cspace.iSndSysSource3DDirectionalSimple_swigregister
+iSndSysSource3DDirectionalSimple_swigregister(iSndSysSource3DDirectionalSimple)
+
+class iSndSysSource3DDirectional(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysSource3DDirectional, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysSource3DDirectional, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetDirection(*args): return _cspace.iSndSysSource3DDirectional_SetDirection(*args)
+    def GetDirection(*args): return _cspace.iSndSysSource3DDirectional_GetDirection(*args)
+    def SetDirectionalRadiationInnerCone(*args): return _cspace.iSndSysSource3DDirectional_SetDirectionalRadiationInnerCone(*args)
+    def SetDirectionalRadiationOuterCone(*args): return _cspace.iSndSysSource3DDirectional_SetDirectionalRadiationOuterCone(*args)
+    def SetDirectionalRadiationOuterGain(*args): return _cspace.iSndSysSource3DDirectional_SetDirectionalRadiationOuterGain(*args)
+    def GetDirectionalRadiationInnerCone(*args): return _cspace.iSndSysSource3DDirectional_GetDirectionalRadiationInnerCone(*args)
+    def GetDirectionalRadiationOuterCone(*args): return _cspace.iSndSysSource3DDirectional_GetDirectionalRadiationOuterCone(*args)
+    def GetDirectionalRadiationOuterGain(*args): return _cspace.iSndSysSource3DDirectional_GetDirectionalRadiationOuterGain(*args)
+    __swig_destroy__ = _cspace.delete_iSndSysSource3DDirectional
+    __del__ = lambda self : None;
+iSndSysSource3DDirectional_swigregister = _cspace.iSndSysSource3DDirectional_swigregister
+iSndSysSource3DDirectional_swigregister(iSndSysSource3DDirectional)
+
+class iSndSysSource3DDoppler(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysSource3DDoppler, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysSource3DDoppler, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetVelocity(*args): return _cspace.iSndSysSource3DDoppler_SetVelocity(*args)
+    def GetVelocity(*args): return _cspace.iSndSysSource3DDoppler_GetVelocity(*args)
+    __swig_destroy__ = _cspace.delete_iSndSysSource3DDoppler
+    __del__ = lambda self : None;
+iSndSysSource3DDoppler_swigregister = _cspace.iSndSysSource3DDoppler_swigregister
+iSndSysSource3DDoppler_swigregister(iSndSysSource3DDoppler)
 
 CSSNDSYS_SAMPLE_LITTLE_ENDIAN = _cspace.CSSNDSYS_SAMPLE_LITTLE_ENDIAN
 CSSNDSYS_SAMPLE_BIG_ENDIAN = _cspace.CSSNDSYS_SAMPLE_BIG_ENDIAN
@@ -7167,6 +7262,22 @@ class iSndSysRendererSoftware(iBase):
     __del__ = lambda self : None;
 iSndSysRendererSoftware_swigregister = _cspace.iSndSysRendererSoftware_swigregister
 iSndSysRendererSoftware_swigregister(iSndSysRendererSoftware)
+
+class iSndSysRendererOpenAL(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iSndSysRendererOpenAL, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iSndSysRendererOpenAL, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def LockWait(*args): return _cspace.iSndSysRendererOpenAL_LockWait(*args)
+    def Release(*args): return _cspace.iSndSysRendererOpenAL_Release(*args)
+    __swig_destroy__ = _cspace.delete_iSndSysRendererOpenAL
+    __del__ = lambda self : None;
+iSndSysRendererOpenAL_swigregister = _cspace.iSndSysRendererOpenAL_swigregister
+iSndSysRendererOpenAL_swigregister(iSndSysRendererOpenAL)
 
 class iSndSysSoftwareDriver(iBase):
     __swig_setmethods__ = {}
