@@ -36,6 +36,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Skeleton)
 
 class BoneFactory;
 class SkeletonFactory;
+class AnimationFactory;
 
 class Bone
 {
@@ -74,6 +75,19 @@ struct KeyFrame
 class Animation
 {
 public:
+  Animation (const AnimationFactory *anim, const SkeletonAnimationParams &p);
+
+  const SkeletonAnimationParams &GetParameters ();
+
+  void Advance (csTicks elapsed);
+private:
+  const AnimationFactory* anim;
+  SkeletonAnimationParams p;
+  csTicks current_time;
+};
+class AnimationFactory
+{
+public:
   void SetName (const char* n);
   const char* GetName () const;
 
@@ -82,19 +96,6 @@ private:
   csString name;
   csArray<KeyFrame> keyframes;
 };
-class AnimationInstance
-{
-public:
-  AnimationInstance (const Animation *anim, const SkeletonAnimationParams &p);
-
-  const SkeletonAnimationParams &GetParameters ();
-
-  void Advance (csTicks elapsed);
-private:
-  const Animation* anim;
-  SkeletonAnimationParams p;
-  csTicks current_time;
-};
 class AnimationMixer
 {
 protected:
@@ -102,11 +103,11 @@ protected:
 
   void UpdateMixer (csTicks current);
 
-  void AddAnimation (const AnimationInstance &anim, 
+  void AddAnimation (const Animation &anim, 
       iNewSkeleton::MixLayerType mixtype);
 private:
   // blend and overwrite mix layers
-  csArray<AnimationInstance> blend, overwrite;
+  csArray<Animation> blend, overwrite;
   // sum of blend weights from blend layer
   float sum_blends;
   // the time of the last update for this skeleton. is -1 on creation of this.
@@ -144,14 +145,14 @@ public:
 
   BoneFactory* FindBone (const char* name);
 
-  const csArray<Animation>::Iterator GetAnimIterator ();
+  const csArray<AnimationFactory>::Iterator GetAnimFactIterator ();
 
   void SetName (const char* n);
   const char* GetName ();
 private:
   csArray<BoneFactory> bones;
   csArray<size_t> parent_bones;
-  csArray<Animation> anims;
+  csArray<AnimationFactory> anims;
   csString name;
 };
 class SkeletonGraveyard :

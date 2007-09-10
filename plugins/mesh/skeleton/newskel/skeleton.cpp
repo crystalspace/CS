@@ -56,33 +56,33 @@ const char* BoneFactory::GetName ()
   return name.GetData ();
 }
 
-void Animation::SetName (const char* n)
+void AnimationFactory::SetName (const char* n)
 {
   name = n;
 }
-const char* Animation::GetName () const
+const char* AnimationFactory::GetName () const
 {
   return name.GetData ();
 }
-KeyFrame &Animation::CreateKeyFrame ()
+KeyFrame &AnimationFactory::CreateKeyFrame ()
 {
   // extend array by 1 element
   keyframes.SetSize (keyframes.GetSize ());
   return keyframes.Top ();
 }
 
-AnimationInstance::AnimationInstance (const Animation *anim,
+Animation::Animation (const AnimationFactory *anim,
     const SkeletonAnimationParams &p)
   : anim (anim), p (p), current_time (0)
 {
 }
 
-const SkeletonAnimationParams &AnimationInstance::GetParameters ()
+const SkeletonAnimationParams &Animation::GetParameters ()
 {
   return p;
 }
 
-void AnimationInstance::Advance (csTicks elapsed)
+void Animation::Advance (csTicks elapsed)
 {
   current_time += elapsed;
 }
@@ -107,7 +107,7 @@ void AnimationMixer::UpdateMixer (csTicks current)
   }
 }
 
-void AnimationMixer::AddAnimation (const AnimationInstance &anim, 
+void AnimationMixer::AddAnimation (const Animation &anim, 
       iNewSkeleton::MixLayerType mixtype)
 {
   if (mixtype == iNewSkeleton::BLEND)
@@ -117,7 +117,7 @@ void AnimationMixer::AddAnimation (const AnimationInstance &anim,
 
   // recalculate the blend weights
   sum_blends = 0.0f;
-  for (csArray<AnimationInstance>::Iterator it = blend.GetIterator ();
+  for (csArray<Animation>::Iterator it = blend.GetIterator ();
       it.HasNext (); )
   {
     const SkeletonAnimationParams &p = it.Next ().GetParameters ();
@@ -140,13 +140,13 @@ bool Skeleton::PlayAnimation (const char* anim, SkeletonAnimationParams params,
 {
   if (!fact)
     return false;
-  for (csArray<Animation>::Iterator it = fact->GetAnimIterator ();
+  for (csArray<AnimationFactory>::Iterator it = fact->GetAnimFactIterator ();
       it.HasNext (); )
   {
-    const Animation &a = it.Next ();
+    const AnimationFactory &a = it.Next ();
     if (!strcmp (a.GetName (), anim))
     {
-      AnimationInstance animinst (&a, params);
+      Animation animinst (&a, params);
       return true;
     }
   }
@@ -172,12 +172,12 @@ void SkeletonFactory::CreateAnimation (const char* name,
 {
   // extend array by 1 element
   anims.SetSize (anims.GetSize ());
-  Animation &animation = anims.Top ();
+  AnimationFactory &animfact = anims.Top ();
   for (csArray<SkeletonAnimationKeyFrame>::ConstIterator it =
     keyframes.GetIterator (); it.HasNext ();)
   {
     const SkeletonAnimationKeyFrame &kf = it.Next ();
-    KeyFrame &nkf = animation.CreateKeyFrame ();
+    KeyFrame &nkf = animfact.CreateKeyFrame ();
     nkf.time = kf.time;
     // we need to do this here so we can lookup the skeleton factory pointer
     for (csArray<SkeletonAnimationKeyFrame::BoneDescription>::ConstIterator bit 
@@ -204,7 +204,7 @@ BoneFactory* SkeletonFactory::FindBone (const char* name)
   return 0;
 }
 
-const csArray<Animation>::Iterator SkeletonFactory::GetAnimIterator ()
+const csArray<AnimationFactory>::Iterator SkeletonFactory::GetAnimFactIterator ()
 {
   return anims.GetIterator ();
 }

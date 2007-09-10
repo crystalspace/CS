@@ -9,6 +9,7 @@ chronological order.
 10-Sep-2007
 	- Genjix added newer skeleton system and some cleanup and commenting of
 	  the old one.
+	- Genjix swapped Animation/AnimationInstance for AnimationFactory/Animation.
 9-Sep-2007
 	- Genjix corrected kirchdorfer test mesh for correct rotation.
 	- Genjix fixed a bug and made all transforms for bones relative to their
