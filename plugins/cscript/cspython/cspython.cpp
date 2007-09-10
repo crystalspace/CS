@@ -134,7 +134,7 @@ bool csPython::Initialize(iObjectRegistry* object_reg)
   // Inject iSCF::SCF
   // @@@ Ugly... shouldn't have to Store/assign from py, just Store.
   Store("cspace.__corecvar_iSCF_SCF", iSCF::SCF, (void*)"iSCF *");
-  RunText("cspace.corecvar.iSCF_SCF = cspace.__corecvar_iSCF_SCF");
+  RunText("cspace.SetSCFPointer(cspace.__corecvar_iSCF_SCF)");
   // Store the object registry pointer in 'cspace.object_reg'.
   Store("cspace.object_reg", object_reg, (void *) "iObjectRegistry *");
 

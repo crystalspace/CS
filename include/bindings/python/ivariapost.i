@@ -12,5 +12,15 @@
       return pairs
   %}
 }
+
+%pythoncode %{
+  def CS_REQUEST_REPORTERLISTENER ():
+    return core.CS_REQUEST_PLUGIN("crystalspace.utilities.stdrep",
+      iStandardReporterListener)
+  def CS_REQUEST_CONSOLEOUT ():
+    return core.CS_REQUEST_PLUGIN("crystalspace.console.output.standard",
+      iConsoleOutput)
+%}
+
 #endif
 

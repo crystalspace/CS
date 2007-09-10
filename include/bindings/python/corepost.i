@@ -21,7 +21,6 @@
   See include/bindings/cspace.i
 */
 
-#ifdef SWIGPYTHON
 %include "pyeventh.i"
 %pythoncode %{
 
@@ -41,59 +40,36 @@
 
   csInitializer.RequestPlugins = staticmethod(_csInitializer_RequestPlugins)
 
+  def _csInitializer_CreateEnvironment (*args):
+    oreg = _core.csInitializer__CreateEnvironment(*args)
+    SyncSCFPointers()
+    return oreg
+  csInitializer.CreateEnvironment = staticmethod(_csInitializer_CreateEnvironment)
+
+  def _csInitializer_InitializeSCF (*args):
+    res = _core.csInitializer__InitializeSCF(*args)
+    SyncSCFPointers()
+    return res
+  csInitializer.InitializeSCF = staticmethod(_csInitializer_CreateEnvironment)
+
 %}
-#ifndef CS_MINI_SWIG
-/*%include "pyshadervar.i"*/
-#endif
 
 %pythoncode %{
   corecvar = cvar
   def CS_REQUEST_PLUGIN (name, intf):
-    return (name, intf.__name__, corecvar.iSCF_SCF.GetInterfaceID(intf.__name__),
-      intf.scfGetVersion())
-
+    return (name, intf.__name__, 
+       corecvar.iSCF_SCF.GetInterfaceID(intf.__name__),intf.scfGetVersion())
   def CS_REQUEST_VFS ():
     return CS_REQUEST_PLUGIN("crystalspace.kernel.vfs", iVFS)
-
-  def CS_REQUEST_FONTSERVER ():
-    return CS_REQUEST_PLUGIN("crystalspace.font.server.default", iFontServer)
-
   def CS_REQUEST_IMAGELOADER ():
     return CS_REQUEST_PLUGIN("crystalspace.graphic.image.io.multiplexer",
       iImageIO)
-
-  def CS_REQUEST_NULL3D ():
-    return CS_REQUEST_PLUGIN("crystalspace.graphics3d.null", iGraphics3D)
-
-  def CS_REQUEST_SOFTWARE3D ():
-    return CS_REQUEST_PLUGIN("crystalspace.graphics3d.software", iGraphics3D)
-
-  def CS_REQUEST_OPENGL3D ():
-    return CS_REQUEST_PLUGIN("crystalspace.graphics3d.opengl", iGraphics3D)
-
-  def CS_REQUEST_ENGINE ():
-    return CS_REQUEST_PLUGIN("crystalspace.engine.3d", iEngine)
-
-  def CS_REQUEST_LEVELLOADER ():
-    return CS_REQUEST_PLUGIN("crystalspace.level.loader", iLoader)
-
   def CS_REQUEST_LEVELSAVER ():
     return CS_REQUEST_PLUGIN("crystalspace.level.saver", iSaver)
-
   def CS_REQUEST_REPORTER ():
     return CS_REQUEST_PLUGIN("crystalspace.utilities.reporter", iReporter)
-
-  def CS_REQUEST_REPORTERLISTENER ():
-    return CS_REQUEST_PLUGIN("crystalspace.utilities.stdrep",
-      iStandardReporterListener)
-
-  def CS_REQUEST_CONSOLEOUT ():
-    return CS_REQUEST_PLUGIN("crystalspace.console.output.standard",
-      iConsoleOutput)
-
 %}
 
-#ifndef CS_MINI_SWIG
 %extend csKeyModifiers {
   unsigned int __getitem__ (size_t i) const
   {
@@ -153,8 +129,6 @@ class CSMutableArrayHelper:
   # We do not implement __delitem__ because we cannot delete items.
 %}
 
-#endif // CS_MINI_SWIG
-
 // csutil/csstring.h
 %extend csString
 {
@@ -176,33 +150,25 @@ class CSMutableArrayHelper:
   size_t __len__() { return self->GetSize(); }
 }
 
-#ifndef CS_MINI_SWIG
-
-/* work around broken Rotate function with swig 1.3.28 */
-/*
-%extend iPen {
-        void _Rotate(float a)
-        { self->Rotate(a); }
-    %pythoncode %{
-    def Rotate(self,a):
-         return _cspace.iPen__Rotate(a)
-    %}
-}
-*/
-
 %pythoncode %{
   csReport = csReporterHelper.Report
-  csmodules = []
-  def AddCsModule(csmodule):
-      csmodules.append(module)
-      csmodule.SetSCFPointer(corecvar.iSCF_SCF)
+  _csmodules = []
+  def AddSCFLink(csmodule):
+      """Add a callback to set SCF pointer from a module"""
+      _csmodules.append(csmodule)
+      csmodule(corecvar.iSCF_SCF)
   def SyncSCFPointers():
-      for csmodule in csmodules:
-          csmodule.SetSCFPointer(corecvar.iSCF_SCF)
-  SCF = property(SetSCFPointer)
+      """Sync the SCF pointers for all registered modules"""
+      for csmodule in _csmodules:
+          csmodule(corecvar.iSCF_SCF)
+  def SetSCFPointer(scf_pointer):
+      """Set SCF Pointer to all CrystalSpace modules"""
+      corecvar.iSCF_SCF = scf_pointer
+      SyncSCFPointers()
+  def GetSCFPointer():
+      """Get SCF Pointer"""
+      return corecvar.iSCF_SCF
 %}
-
-#endif // CS_MINI_SWIG
 
 /*
  csWrapTypedObject is used to wrap a c++ object and pass it around as a Python 
@@ -230,7 +196,3 @@ CS_EXPORT_SYM PyObject* csWrapTypedObject(void* objectptr, const char *typetag,
 
 %}
 
-/*
-%include "bindings/python/pythvarg.i"
-*/
-#endif // SWIGPYTHON

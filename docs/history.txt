@@ -6,6 +6,16 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Sep-2007
+	- caedes made some changes to the swig interface files:
+	    - added SetSCFPointer and GetSCFPointer to all modules so
+	      their SCF pointers can be set.
+	    - added a system for python modules to automatically get
+	      their SCF pointers updated, use SetSCFPointer to get that
+	      updated instead of the old cvar.iSCF_SCF.
+	    - cleaned up some old commented code.
+	- caedes modified cspython to set SCF pointer in python modules
+	  using the new SetSCFPointer function.
 8-Sep-2007
 	- res fixed a crash in bezier plugin caused by a rendermanager-only
 	  change accidentally slipping in.

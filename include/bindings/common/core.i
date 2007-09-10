@@ -168,37 +168,7 @@
 %}
 
 %include "bindings/common/allinterfaces.i"
-/*
-%define INTERFACE_POST(T)
-  %extend T
-  {
-    static int scfGetVersion() { return scfInterfaceTraits<T>::GetVersion(); }
-    virtual ~T() { if (self) self->DecRef (); }
-  }
-%enddef
 
-
-%define %cs_lang_post(file)
-  #ifndef SWIGIMPORTED
-    #undef INTERFACE_APPLY
-    #define INTERFACE_APPLY INTERFACE_POST
-    APPLY_FOR_ALL_INTERFACES_POST
-  #endif
-  #if defined(SWIGPYTHON)
-    %include bindings/python/ ## file ## post.i
-  #elif defined(SWIGPERL5)
-    %include bindings/perl/ ## file ## post.i
-  #elif defined(SWIGRUBY)
-    %include bindings/ruby/ ## file ## post.i
-  #elif defined(SWIGTCL8)
-    %include bindings/tcl/ ## file ## post.i
-  #elif defined(SWIGJAVA)
-    %include bindings/java/ ## file ## post.i
-  #elif defined(SWIGLUA)
-    %include bindings/lua/ ## file ## post.i
-  #endif
-%enddef
-*/
 %ignore iBase::~iBase(); // We replace iBase dtor with one that calls DecRef().
                          // Swig already knows not to delete an SCF pointer.
 %include "typemaps.i"
@@ -373,6 +343,29 @@
 #elif defined(SWIGLUA)
   %include "bindings/lua/luapre.i"
 #endif
+
+%define INLINE_FUNCTIONS
+LANG_FUNCTIONS
+%inline %{
+/* Funtions to set the modules global SCF pointer, this is needed
+   when working on a pure scripting environment, as then this code
+   lives in a non-cs dll, thus the pointer isnt initialized
+   by cs itself, and scf stuff wont work unless the pointer is
+   initialized manually. Use it after CreateEnvironment call. */
+void SetSCFPointer(iSCF* pscf)
+{
+  iSCF::SCF = pscf;
+}
+
+iSCF* GetSCFPointer()
+{
+  return iSCF::SCF;
+}
+%}
+%pythoncode %{
+core.AddSCFLink(_SetSCFPointer)
+%}
+%enddef
 
 // Handle arrays as input arguments.
 // The second parameter is for putting in an extra dereference operator if the
@@ -616,17 +609,6 @@ SET_HELPER(csStringID)
 
 %include "csutil/refcount.h"
 
-/*
-%rename(asRGBcolor) csRGBpixel::operator csRGBcolor;
-%include "csgfx/rgbpixel.h"
-%ignore ShaderVarName;
-%include "csgfx/shadervar.h"
-%template(csShaderVariableArrayReadOnly) iArrayReadOnly<csShaderVariable * >;
-%template(csShaderVariableArrayChangeElements) 
-iArrayChangeElements<csShaderVariable * >;
-%template(csShaderVariableArray) iArrayChangeAll<csShaderVariable * >;
-*/
-
 %ignore csGetPlatformConfig;
 %ignore csPrintfV;
 %ignore csFPrintfV;
@@ -684,10 +666,7 @@ iArrayChangeElements<csShaderVariable * >;
 %ignore csArray<csPluginRequest>::operator=;
 %ignore csArray<csPluginRequest>::operator[];
 %template(csPluginRequestArray) csArray<csPluginRequest>;
-/*
 
-%ignore iPen::Rotate;
-*/
 %include "igeom/clip2d.h"
 %include "igeom/path.h"
 %template(scfPath) scfImplementation1<csPath,iPath >;
@@ -697,70 +676,9 @@ iArrayChangeElements<csShaderVariable * >;
 #endif
 %include "igeom/trimesh.h"
 
-/*
-%include "iengine/fview.h"
-%include "iengine/light.h"
-%include "iengine/sector.h"
-%include "iengine/engine.h"
-
-%ignore iCamera::GetTransform (); // Non-const.
-%ignore iCamera::Perspective (const csVector3&, csVector2&) const;
-%ignore iCamera::InvPerspective (const csVector2&, float, csVector3&) const;
-%include "iengine/camera.h"
-
-%include "iengine/campos.h"
-%include "iengine/texture.h"
-%include "iengine/material.h"
-%template(iSceneNodeArrayReadOnly) iArrayReadOnly<iSceneNode * >;
-%include "iengine/scenenode.h"
-
-// Swig 1.3.24 doesn't handle pointer default args well unless we tell it
-// to use an alternate way for that function
-%feature("compactdefaultargs") HitBeamObject;
-%ignore iMeshWrapper::HitBeamBBox (const csVector3&, const csVector3&,
-  csVector3&, float*);
-%ignore iMeshWrapper::HitBeamOutline (const csVector3&, const csVector3&,
-  csVector3&, float*);
-%ignore iMeshWrapper::HitBeam (const csVector3&, const csVector3&,
-  csVector3&, float*);
-%ignore iMeshWrapper::HitBeam (const csVector3&, const csVector3&,
-  csVector3&, float*);
-%ignore iMeshWrapper::GetRadius (csVector3&, csVector3&) const;
-%ignore iMeshWrapper::GetWorldBoundingBox (csBox3&) const;
-%ignore iMeshWrapper::GetTransformedBoundingBox (
-  const csReversibleTransform&, csBox3&);
-%ignore iMeshWrapper::GetScreenBoundingBox (iCamera*, csBox2&, csBox3&);
-%include "iengine/mesh.h"
-
-%include "iengine/movable.h"
-%include "iengine/region.h"
-// Swig 1.3.24 doesn't handle pointer default args well unless we tell it
-// to use an alternate way for that function
-%feature("compactdefaultargs") IntersectSegment;
-%include "iengine/viscull.h"
-%include "iengine/portal.h"
-%include "iengine/portalcontainer.h"
-
-%extend iVisibilityObjectIterator {
-  ITERATOR_FUNCTIONS(iVisibilityObjectIterator)
-}
-%extend iLightIterator {
-  ITERATOR_FUNCTIONS(iLightIterator)
-}
-%extend iSectorIterator {
-  ITERATOR_FUNCTIONS(iSectorIterator)
-}
-%extend iMeshWrapperIterator {
-  ITERATOR_FUNCTIONS(iMeshWrapperIterator)
-}
-*/
 %ignore iReporter::ReportV;
 %ignore csReporterHelper::ReportV;
 %include "ivaria/reporter.h"
-
-/* %include "bindings/imesh.i" */
-/* %include "bindings/imap.i" */
-/* %include "bindings/isndsys.i" */
 
 %include "iutil/comp.h"
 %include "iutil/cache.h"
@@ -863,39 +781,7 @@ typedef int int32_t;
 
 %ignore iDataBuffer::GetInt8;
 %include "iutil/databuff.h"
-/*
-%ignore iGraphics2D::PerformExtensionV;
-%ignore iGraphics3D::PerformExtensionV;
-%rename(GetRGBA) iGraphics2D::GetRGB(int, int&, int&, int&, int&);
-%include "ivideo/graph2d.h"
-%include "ivideo/graph3d.h"
-%include "ivideo/cursor.h"
-
-%ignore iNativeWindowManager::AlertV;
-%include "ivideo/natwin.h"
-
-%ignore GetGlyphSize(uint8, int &, int &);
-%ignore GetGlyphBitmap(uint8, int &, int &);
-%ignore GetGlyphAlphaBitmap(uint8, int &, int &);
-%ignore GetDimensions(char const *, int &, int &);
-%include "ivideo/fontserv.h"
-
-%include "ivideo/halo.h"
-%include "ivideo/shader/shader.h"
-
-%rename(GetKeyColorStatus) iTextureHandle::GetKeyColor() const;
-%include "ivideo/texture.h"
-
-%include "ivideo/txtmgr.h"
-%include "ivideo/material.h"
-*/
 %include "igraphic/image.h"
-/*
-%template(csImageBaseBase) scfImplementation1<csImageBase, iImage>;
-%include "csgfx/imagebase.h"
-%template(csImageMemoryBase) scfImplementationExt0<csImageMemory, csImageBase>;
-%include "csgfx/imagememory.h"
-*/
 %immutable csImageIOFileFormatDescription::mime;
 %immutable csImageIOFileFormatDescription::subtype;
 %template (csImageIOFileFormatDescriptions) csArray<csImageIOFileFormatDescription const*>;
@@ -903,36 +789,8 @@ typedef int int32_t;
 
 %template(pycsObject) scfImplementation1<csObject,iObject >;
 %include "csutil/csobject.h"
-/*
-%ignore csColliderHelper::TraceBeam (iCollideSystem*, iSector*,
-  const csVector3&, const csVector3&, bool, csIntersectingTriangle&,
-  csVector3&, iMeshWrapper**);
-%template(pycsColliderWrapper) scfImplementationExt1<csColliderWrapper,csObject,scfFakeInterface<csColliderWrapper> >;
-%include "cstool/collider.h"
-%include "cstool/csview.h"
-%include "cstool/csfxscr.h"
-
-%include "cstool/cspixmap.h"
-%include "cstool/enginetools.h"
-
-%include "cstool/pen.h"
-*/
 %ignore iBase::~iBase(); // We replace iBase dtor with one that calls DecRef().
 			 // Swig already knows not to delete an SCF pointer.
-
-/*
-%define INTERFACE_POST(T)
-  %extend T
-  {
-    static int scfGetVersion() { return scfInterfaceTraits<T>::GetVersion(); }
-    virtual ~T() { if (self) self->DecRef (); }
-  }
-%enddef
-
-#undef INTERFACE_APPLY
-#define INTERFACE_APPLY(x) INTERFACE_POST(x)
-CORE_APPLY_FOR_EACH_INTERFACE
-*/
 
 %extend iTriangleMesh
 {
@@ -1101,16 +959,6 @@ csEventID _csevJoystickEvent (iObjectRegistry *);
   }
 %}
 
-/*
-// ivideo/graph3d.h
-#define _CS_FX_SETALPHA(a) CS_FX_SETALPHA(a)
-#undef CS_FX_SETALPHA
-uint _CS_FX_SETALPHA (uint);
-#define _CS_FX_SETALPHA_INT(a) CS_FX_SETALPHA_INT(a)
-#undef CS_FX_SETALPHA_INT
-uint _CS_FX_SETALPHA_INT (uint);
-*/
-
 // csutil/cscolor.h
 %extend csColor
 {
@@ -1119,33 +967,7 @@ uint _CS_FX_SETALPHA_INT (uint);
 }
 
 %include "cstool/primitives.h"
-/*
-%extend csSimpleRenderMesh
-{
-  void SetWithGenmeshFactory(iGeneralFactoryState *factory) 
-  {
-    self->vertices = factory->GetVertices(); 
-    self->vertexCount = factory->GetVertexCount(); 
-    self->indices = (uint *)factory->GetTriangles();
-    self->indexCount = factory->GetTriangleCount()*3; 
-    self->texcoords = factory->GetTexels();
-  }
-}
-*/
 /* List Methods */
-/*
-LIST_OBJECT_FUNCTIONS(iMeshList,iMeshWrapper)
-LIST_OBJECT_FUNCTIONS(iMeshFactoryList,iMeshFactoryWrapper)
-LIST_OBJECT_FUNCTIONS(iMaterialList,iMaterialWrapper)
-LIST_OBJECT_FUNCTIONS(iRegionList,iRegion)
-LIST_OBJECT_FUNCTIONS(iLightList,iLight)
-LIST_OBJECT_FUNCTIONS(iCameraPositionList,iCameraPosition)
-LIST_OBJECT_FUNCTIONS(iSectorList,iSector)
-LIST_OBJECT_FUNCTIONS(iTextureList,iTextureWrapper)
-// Not wrapping yet:
-//LIST_OBJECT_FUNCTIONS(iCollectionList,iCollection) 
-//LIST_OBJECT_FUNCTIONS(iSharedVariableList,iSharedVariable)
-*/
 /****************************************************************************
  * These functions are replacements for CS's macros of the same names.
  * These functions can be wrapped by Swig but the macros can't.
@@ -1237,18 +1059,3 @@ csWrapPtr CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
 }
 %}
 
-/*
-#if defined(SWIGPYTHON)
-  %include "bindings/python/pythpost.i"
-#elif defined(SWIGPERL5)
-  %include "bindings/perl/perlpost.i"
-#elif defined(SWIGRUBY)
-  %include "bindings/ruby/rubypost.i"
-#elif defined(SWIGTCL8)
-  %include "bindings/tcl/tclpost.i"
-#elif defined(SWIGJAVA)
-  %include "bindings/java/javapost.i"
-#elif defined(SWIGLUA)
-  %include "bindings/lua/luapost.i"
-#endif
-*/

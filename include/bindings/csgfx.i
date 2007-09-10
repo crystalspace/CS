@@ -3,7 +3,10 @@
 %{
 #include "crystalspace.h"
 %}
-LANG_FUNCTIONS
+
+#ifndef SWIGIMPORTED
+INLINE_FUNCTIONS
+#endif
 
 %include "bindings/common/csgfx.i"
 

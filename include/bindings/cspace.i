@@ -10,8 +10,8 @@
 %include "bindings/common/csgeom.i"
 %include "bindings/common/cstool.i"
 
-#undef APPLY_FOR_ALL_INTERFACES_POST
+/*#undef APPLY_FOR_ALL_INTERFACES_POST
 #define APPLY_FOR_ALL_INTERFACES_POST APPLY_FOR_ALL_INTERFACES
 %include "bindings/common/basepost.i"
 cs_lang_include(corepost.i)
-
+*/
