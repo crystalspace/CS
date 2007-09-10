@@ -403,9 +403,20 @@ void csSkeletonAnimationInstance::ParseFrame(csSkeletonAnimationKeyFrame *frame)
         sac_transform_execution m;
         m.bone_transform = bone_transform;
         m.elapsed_ticks = 0;
-        m.curr_quat = bone_transform->quat;
+        m.prev_quat = bone_transform->quat;
         m.position = bone_transform->pos;
-        m.quat = rot;
+
+        /*size_t frames_count = animation->GetFramesCount();
+        if (frames_count > 0)
+        {
+          size_t prev_frame = current_frame - 1;
+          if (current_frame <= 1)
+            prev_frame = frames_count - 1;
+          csSkeletonAnimationKeyFrame *pframe =
+            (csSkeletonAnimationKeyFrame *)animation->GetFrame (prev_frame);
+          if (!pframe->GetKeyFrameData (bone_fact, m.prev_quat, m.position))
+        }*/
+        m.next_quat = rot;
         m.final_position = pos;
 
         csVector3 delta = m.final_position - m.position;
@@ -560,12 +571,13 @@ bool csSkeletonAnimationInstance::Do (long elapsed, bool& stop, long &left)
       // use slerp interpolation
       float slerp =
         (float)current_frame_time / (float) current_frame_duration;
-      m.bone_transform->quat = m.curr_quat.SLerp (m.quat, slerp);
+      m.bone_transform->quat = m.prev_quat.SLerp (m.next_quat, slerp);
     }
     else
     {
-      // otherwise just use start keyframe
+      // otherwise just use end keyframe
       m.bone_transform->pos = m.final_position;
+      m.bone_transform->quat = m.next_quat;
       runnable_transforms.DeleteIndexFast (i);
     }
     mod = true;

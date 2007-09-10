@@ -4,7 +4,7 @@
   <scf>
     <classes>
       <class>
-        <name>crystalspace.graveyard.loader</name>
+        <name>crystalspace.skeleton.graveyard.loader</name>
         <implementation>csSkeletonFactoryLoader</implementation>
         <description>Crystal Space General Skeleton Factory Loader</description>
       </class>

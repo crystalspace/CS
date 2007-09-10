@@ -4,8 +4,8 @@
   <scf>
     <classes>
       <class>
-        <name>crystalspace.skeleton.graveyard</name>
-        <implementation>csSkeletonGraveyard</implementation>
+        <name>crystalspace.skeleton.amirsgraveyard</name>
+        <implementation>SkeletonGraveyard</implementation>
         <description>Crystal Space Graveyard class</description>
       </class>
     </classes>

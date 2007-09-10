@@ -378,7 +378,7 @@ csPtr<iBase> csSkeletonFactoryLoader::Parse (iDocumentNode* node,
   iStreamSource*, iLoaderContext* /*ldr_context*/, iBase* /*context*/)
 {
   csRef<iSkeletonGraveyard> graveyard = csLoadPluginCheck<iSkeletonGraveyard> (
-  	object_reg, "crystalspace.graveyard", false);
+  	object_reg, "crystalspace.skeleton.graveyard", false);
   if (!graveyard)
   {
     synldr->ReportError (

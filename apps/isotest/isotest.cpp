@@ -38,6 +38,7 @@
 #include "imesh/object.h"
 #include "imesh/sprite3d.h"
 #include "imesh/skeleton.h"
+#include "imesh/skeleton_new.h"
 #include "iutil/csinput.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
@@ -432,6 +433,7 @@ bool IsoTest::Initialize ()
 	"crystalspace.font.server.default", "iFontServer.2", 
 	  scfInterfaceTraits<iFontServer>::GetID(), 
 	  scfInterfaceTraits<iFontServer>::GetVersion(),
+	CS_REQUEST_PLUGIN("crystalspace.skeleton.amirsgraveyard", iNewSkeletonGraveyard),
 	CS_REQUEST_FONTSERVER,
 	CS_REQUEST_IMAGELOADER,
 	CS_REQUEST_LEVELLOADER,
@@ -534,6 +536,16 @@ bool IsoTest::Initialize ()
     ("/fonts/ttf/Vera.ttf", 10);
   if(!font) // fallback
     font = g3d->GetDriver2D ()->GetFontServer()->LoadFont(CSFONT_LARGE);
+
+  csRef<iNewSkeletonGraveyard> gy = csQueryRegistry<iNewSkeletonGraveyard> (object_reg);
+  if (!gy)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.application.isotest",
+      "Error opening la graveyard!");
+    return false;
+  }
+  //return false;
 
   if (!LoadMap ()) return false;
   if (!CreateActor ()) return false;

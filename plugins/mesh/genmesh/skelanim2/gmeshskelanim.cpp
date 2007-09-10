@@ -324,15 +324,15 @@ const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
     csQueryRegistry<iPluginManager> (object_reg));
 
   csRef<iLoaderPlugin> ldr_plg = CS_QUERY_PLUGIN_CLASS(plugin_mgr, 
-    "crystalspace.graveyard.loader", iLoaderPlugin);
+    "crystalspace.skeleton.graveyard.loader", iLoaderPlugin);
 
   if (!ldr_plg)
   {
     ldr_plg = csLoadPlugin<iLoaderPlugin> (plugin_mgr, 
-      "crystalspace.graveyard.loader");
+      "crystalspace.skeleton.graveyard.loader");
     if (!ldr_plg )
     {
-      printf("Missing <crystalspace.graveyard.loader> plugin!\n");
+      printf("Missing <crystalspace.skeleton.graveyard.loader> plugin!\n");
       return 0;
     }
   }

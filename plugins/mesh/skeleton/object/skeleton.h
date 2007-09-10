@@ -332,9 +332,9 @@ struct sac_transform_execution
   csVector3 delta_per_tick;
   csVector3 final_position;
   csVector3 position;
-  csQuaternion quat;
+  csQuaternion next_quat;
   csQuaternion tangent;
-  csQuaternion curr_quat;
+  csQuaternion prev_quat;
   csTicks elapsed_ticks;
 };
 
@@ -426,7 +426,6 @@ private:
   uint32 last_version_id;
   long elapsed;
 
-  static csArray<csReversibleTransform> bone_transforms;
   csRefArray<csSkeletonBone> bones;
   csRefArray<csSkeletonSocket> sockets;
   csArray<size_t> parent_bones;
@@ -434,8 +433,6 @@ private:
   csRef<iSkeletonAnimationCallback> script_callback;
 
   csRefArray<iSkeletonUpdateCallback> update_callbacks;
-
-  //iODEDynamicSystem *dynamic_system;
 
   bool bones_updated;
   bool force_bone_update;
