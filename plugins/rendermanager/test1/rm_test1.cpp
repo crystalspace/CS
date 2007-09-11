@@ -46,6 +46,9 @@ bool RMTest1::RenderView (iView* view)
 
   iSector* startSector = rview->GetThisSector ();
 
+  if (!startSector)
+    return false;
+
   // Pre-setup culling graph
   RenderTreeType renderTree (treePersistent);
   RenderTreeType::ContextsContainer* screenContexts = 

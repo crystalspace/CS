@@ -50,18 +50,16 @@ namespace RenderManager
     {
       // @@@ FIXME: Of course, don't hardcode.
       if (recurseCount > 5) return;
+
+      sector->CallSectorCallbacks (rview);
     
-      int numSectorCB = sector->GetSectorCallbackCount ();
-      while (numSectorCB-- > 0)
-      {
-        iSectorCallback* cb = sector->GetSectorCallback (numSectorCB);
-        cb->Traverse (sector, rview);
-      }
+      // Make sure the clip-planes are ok
+      CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext ());
 
       // Do the culling
       iVisibilityCuller* culler = sector->GetVisibilityCuller ();
       renderTree.Viscull (container, context, rview, culler);
-  
+
       // Sort the mesh lists  
       {
 	StandardMeshSorter<RenderTreeType> mySorter (rview->GetEngine (), rview->GetCamera ());
@@ -81,7 +79,7 @@ namespace RenderManager
       // Setup shaders and tickets
       SetupStandarShaderAndTicket (renderTree, *context, shaderManager, 
 	defaultShaderName, defaultShader);
-  
+
       csDirtyAccessArray<csVector2> allPortalVerts2d (64);
       csDirtyAccessArray<size_t> allPortalVertsNums;
       // Handle all portals
@@ -188,7 +186,7 @@ namespace RenderManager
     {
       iView* view = contexts->view;
       iGraphics3D* g3d = view->GetContext ();
-      int drawFlags = view->GetEngine ()->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS;
+      int drawFlags = view->GetEngine ()->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | CSDRAW_CLEARSCREEN;
 
       SetupRenderTarget<RenderTreeType> setupTarget (contexts, g3d);
       iCamera* cam = view->GetCamera();

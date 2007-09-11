@@ -67,10 +67,9 @@ namespace RenderManager
     {
       iTextureHandle* renderTarget;
       int subtexture;
-      csRef<iView> view;
       
-      ContextsContainerExtraDataType() : renderTarget (0), subtexture (0),
-        view (0) {}
+      ContextsContainerExtraDataType() : renderTarget (0), subtexture (0)
+      {}
     };
 
     // Any extra data per mesh in a mesh node

@@ -25,6 +25,7 @@
  * Generic Array Template
  */
 
+#include <algorithm>
 #include "csutil/allocator.h"
 #include "csutil/comparator.h"
 #include "csutil/customallocated.h"
@@ -891,6 +892,15 @@ public:
   {
     qsort (root.p, GetSize (), sizeof(T),
       (int (*)(void const*, void const*))compare);
+  }
+
+  /**
+   * Sort array using a binary predicate
+   */
+  template<typename Pred>
+  void Sort (Pred& pred)
+  {
+    std::sort (root.p, root.p + GetSize (), pred);
   }
 
   /**

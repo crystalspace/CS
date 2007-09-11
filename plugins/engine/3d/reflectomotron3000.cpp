@@ -127,7 +127,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
         cam->SetFOVAngle (90, textureSize);
         cam->SetPerspectiveCenter (textureSize / 2, textureSize/ 2);
         sideView->SetRectangle (0, 0, textureSize, textureSize);
-        sideView->AddFilterMesh (meshwrap);
+        sideView->GetMeshFilter ().AddFilterMesh (meshwrap);
 
         csOrthoTransform& camTF = cam->GetTransform();
         camTF.LookAt (lookAtVecs[i*2], lookAtVecs[i*2 + 1]);

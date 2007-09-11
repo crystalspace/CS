@@ -25,18 +25,13 @@
  */
 
 #include "csutil/scf_interface.h"
+#include "cstool/meshfilter.h"
 
 struct iCamera;
 struct iEngine;
 struct iGraphics3D;
 struct iClipper2D;
 struct iMeshWrapper;
-
-enum iViewFilterMode
-{
-  filterExcludeSpecified,
-  filterOnlySpecified
-};
 
 /**
  * The iView class encapsulates the top-level Crystal Space
@@ -106,14 +101,7 @@ struct iView : public virtual iBase
    */
   virtual void SetAutoResize (bool state) = 0;
 
-  virtual void SetMeshFilterModer (iViewFilterMode mode) = 0;
-  virtual iViewFilterMode SetMeshFilterModer () = 0;
-
-  virtual void AddFilterMesh (iMeshWrapper* mesh) = 0;
-  virtual void RemoveFilterMesh (iMeshWrapper* mesh) = 0;
-
-  virtual void FilterMeshes (iMeshWrapper** inMeshes, size_t meshNum,
-    iMeshWrapper** outMeshes, size_t& outNum) = 0;
+  virtual CS::Utility::MeshFilter& GetMeshFilter () = 0;
 };
 
 #endif // __CS_IVARIA_VIEW_H__

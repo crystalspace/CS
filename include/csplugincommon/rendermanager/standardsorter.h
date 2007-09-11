@@ -21,6 +21,7 @@
 
 #include "iengine/camera.h"
 #include "ivideo/rendermesh.h"
+#include "csgeom/vector3.h"
 
 namespace CS
 {
@@ -32,18 +33,18 @@ namespace RenderManager
   {
   public:
     StandardMeshSorter (iEngine* engine, iCamera* camera)
+      : engine (engine)
     {
       // Build table of sorting options
       renderPriorityCount = engine->GetRenderPriorityCount ();
-      sortingTypeTable = new csRenderPrioritySorting[renderPriorityCount];
+      sortingTypeTable = new int[renderPriorityCount];
       
       for (int i = 0; i < renderPriorityCount; ++i)
-      {
-        //TODO: Consider lazy evaluation of this
-        sortingTypeTable[i] = engine->GetRenderPrioritySorting (i);
+      {       
+        sortingTypeTable[i] = -1;
       }
 
-      sort_cameraOrigin = camera->GetTransform ().GetOrigin ();
+      cameraOrigin = camera->GetTransform ().GetOrigin ();
     }
 
     ~StandardMeshSorter ()
@@ -56,24 +57,23 @@ namespace RenderManager
     {
       // Get the render priority for node
       int renderPrio = meshNode->priority;
-      CS_ASSERT(renderPrio >= 0 && renderPrio < renderPriorityCount);
       
-      switch (sortingTypeTable[renderPrio])
+      
+      switch (GetSorting (renderPrio))
       {
       case CS_RENDPRI_SORT_NONE:
         {
-          // Do normal sorting
-          meshNode->meshes.Sort (SortMeshNormal);
+          meshNode->meshes.Sort (NormalSorter());
         }
         break;
       case CS_RENDPRI_SORT_BACK2FRONT:
         {
-          // 
+          meshNode->meshes.Sort (DistanceSorter(cameraOrigin, 1));
         }
         break;
       case CS_RENDPRI_SORT_FRONT2BACK:
         {
-
+          meshNode->meshes.Sort (DistanceSorter(cameraOrigin, -1));
         }
         break;
       default:
@@ -81,34 +81,80 @@ namespace RenderManager
       }
     }
 
-    static int SortMeshNormal (typename Tree::MeshNode::SingleMesh const& m1,
-      typename Tree::MeshNode::SingleMesh const& m2)
-    {
-      const csRenderMesh* rm1 = m1.renderMesh;
-      const csRenderMesh* rm2 = m2.renderMesh;
-
-      if (rm1->material > rm2->material)
-        return 1;
-      else if (rm1->material < rm2->material)
-        return -1;
-      
-      if (rm1->geometryInstance > rm2->geometryInstance)
-        return 1;
-      else if (rm1->geometryInstance < rm2->geometryInstance)
-        return -1;
-
-      return 0;
-    }
+    
 
   private:
-    int renderPriorityCount;
-    csRenderPrioritySorting* sortingTypeTable;
 
-    static csVector3 sort_cameraOrigin;
+    class NormalSorter
+    {
+    public:
+      bool operator() (typename Tree::MeshNode::SingleMesh const& m1,
+        typename Tree::MeshNode::SingleMesh const& m2)
+      {
+        const csRenderMesh* rm1 = m1.renderMesh;
+        const csRenderMesh* rm2 = m2.renderMesh;
+
+        if(rm1->material < rm2->material)
+          return true;
+
+        if((rm1->material == rm2->material) &&
+          (rm1->geometryInstance < rm2->geometryInstance))
+          return true;
+
+        return false;
+      }
+
+    };
+
+    class DistanceSorter : NormalSorter
+    {
+    public:
+      DistanceSorter (const csVector3& cameraOrigin, const float scaleFactor)
+        : cameraOrigin (cameraOrigin), scaleFactor (scaleFactor)
+      {}
+
+      bool operator() (typename Tree::MeshNode::SingleMesh const& m1,
+        typename Tree::MeshNode::SingleMesh const& m2)
+      {
+        const csRenderMesh* rm1 = m1.renderMesh;
+        const csRenderMesh* rm2 = m2.renderMesh;
+
+        const float distSqRm1 = scaleFactor*(rm1->worldspace_origin - cameraOrigin).SquaredNorm ();
+        const float distSqRm2 = scaleFactor*(rm2->worldspace_origin - cameraOrigin).SquaredNorm ();
+
+        if (distSqRm1 < distSqRm2)
+          return true;
+
+        if (distSqRm2 < distSqRm1)
+          return false;
+
+        return NormalSorter::operator () (m1, m2);
+      }
+
+
+    private:
+      const csVector3& cameraOrigin;
+      const float scaleFactor;
+    };
+  
+    csRenderPrioritySorting GetSorting (int renderPrio)
+    {
+      CS_ASSERT(renderPrio >= 0 && renderPrio < renderPriorityCount);
+
+      if (sortingTypeTable[renderPrio] < 0)
+      {
+        sortingTypeTable[renderPrio] = engine->GetRenderPrioritySorting (renderPrio);
+      }
+
+      return (csRenderPrioritySorting)sortingTypeTable[renderPrio];
+    }
+
+    int renderPriorityCount;
+    int* sortingTypeTable;
+    iEngine* engine;
+    csVector3 cameraOrigin;
   };
 
-  template<typename Tree>
-  csVector3 StandardMeshSorter<Tree>::sort_cameraOrigin; 
 }
 }
 

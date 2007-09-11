@@ -125,12 +125,11 @@ namespace RenderManager
       ContextNode() : totalRenderMeshes (0) {}
     };
 
-    class ContextsContainer : 
+    struct ContextsContainer : 
       public EBOptHelper<typename TreeTraits::ContextsContainerExtraDataType>
     {
-    protected:
-      friend class RenderTree;
-      csArray<ContextNode*>   contextNodeList;
+      csArray<ContextNode*> contextNodeList;
+      csRef<iView> view;
     };
 
     //---- Methods
@@ -171,29 +170,10 @@ namespace RenderManager
     bool Viscull (ContextsContainer* contexts, ContextNode* context, iRenderView* rw, 
       iVisibilityCuller* culler)
     {
-      csArray<CulledObject> culledObjects;
-      ViscullCallback cb (culledObjects);
+      ViscullCallback cb (*this, context, rw, &contexts->view->GetMeshFilter ());
       
       culler->VisTest (rw, &cb);
 
-      csDirtyAccessArray<iMeshWrapper*> meshObjs;
-      meshObjs.SetSize (culledObjects.GetSize() * 2);
-      for (size_t i = 0; i < culledObjects.GetSize(); i++)
-        meshObjs[i] = culledObjects[i].imesh;
-
-      size_t numFiltered;
-      iMeshWrapper** filtered = meshObjs.GetArray()+culledObjects.GetSize();
-      contexts->view->FilterMeshes (meshObjs.GetArray(), 
-        culledObjects.GetSize(), filtered, numFiltered);
-      
-      size_t c = 0;
-      for (size_t i = 0; i < numFiltered; i++)
-      {
-        while (culledObjects[c].imesh != filtered[i]) { c++; }
-        ViscullObjectVisible (culledObjects[c].imesh, culledObjects[c].frustum_mask,
-          rw, context);
-        c++;
-      }
       return true;
     }
 
@@ -310,9 +290,11 @@ namespace RenderManager
     class ViscullCallback : public scfImplementation1<ViscullCallback, iVisibilityCullerListener>
     {
     public:
-      ViscullCallback (csArray<CulledObject>& culledObjects)
+      ViscullCallback (ThisType& ownerTree, ContextNode* context, iRenderView* currentRenderView,
+        CS::Utility::MeshFilter* filter)
         : scfImplementation1<ViscullCallback, iVisibilityCullerListener> (this), 
-        culledObjects (culledObjects)
+        ownerTree (ownerTree), context (context), currentRenderView (currentRenderView),
+        filter (filter)
       {}
 
 
@@ -320,15 +302,17 @@ namespace RenderManager
         iMeshWrapper *mesh, uint32 frustum_mask)
       {
         // Call uppwards
-        //ownerTree.ViscullObjectVisible (visobject, mesh, frustum_mask, currentRenderView, context);
-        CulledObject culled;
-        culled.imesh = mesh;
-        culled.frustum_mask = frustum_mask;
-        culledObjects.Push (culled);
+        if (!(filter && filter->IsMeshFiltered (mesh)))
+        {
+          ownerTree.ViscullObjectVisible (mesh, frustum_mask, currentRenderView, context);
+        }        
       }
 
     private:
-      csArray<CulledObject>& culledObjects;
+      ThisType& ownerTree;
+      ContextNode* context;
+      iRenderView* currentRenderView;
+      CS::Utility::MeshFilter* filter;
     };
 
     void ViscullObjectVisible (iMeshWrapper *imesh, uint32 frustum_mask, 

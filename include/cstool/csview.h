@@ -67,9 +67,7 @@ private:
   /// State of the automatic resizing
   bool AutoResize;
 
-  iViewFilterMode meshFilterMode;
-  // FIXME: csRef<> prolly not a good idea
-  csSet<csRef<iMeshWrapper> > filteredMeshes;
+  CS::Utility::MeshFilter meshFilter;
 public:
   /// Constructor.
   csView (iEngine *iEngine, iGraphics3D* ig3d);
@@ -111,22 +109,10 @@ public:
   virtual void Draw (iMeshWrapper* mesh = 0);
 
 
-  virtual void SetMeshFilterModer (iViewFilterMode mode)
-  { meshFilterMode = mode; }
-  virtual iViewFilterMode SetMeshFilterModer ()
-  { return meshFilterMode; }
-
-  virtual void AddFilterMesh (iMeshWrapper* mesh)
+  virtual CS::Utility::MeshFilter& GetMeshFilter ()
   {
-    filteredMeshes.Add (mesh);
+    return meshFilter;
   }
-  virtual void RemoveFilterMesh (iMeshWrapper* mesh)
-  {
-    filteredMeshes.Delete (mesh);
-  }
-
-  virtual void FilterMeshes (iMeshWrapper** inMeshes, size_t meshNum,
-    iMeshWrapper** outMeshes, size_t& outNum);
 };
 
 #endif // __CS_CSVIEW_H__

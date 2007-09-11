@@ -105,6 +105,8 @@ bool Simple::Setup ()
   collider_actor.InitializeColliders (view->GetCamera (),
   	legs, body, shift);
 
+  collider_actor.SetGravity (0);
+
   return true;
 }
 void Simple::ProcessFrame ()
@@ -249,7 +251,7 @@ bool Simple::LoadMap ()
 {
   // Set VFS current directory to the level we want to load.
   csRef<iVFS> VFS (csQueryRegistry<iVFS> (GetObjectRegistry ()));
-  VFS->ChDir ("/lev/parallaxtest");
+  VFS->ChDir ("/lev/partsys");
   // Load the level file which is called 'world'.
   if (!loader->LoadMapFile ("world"))
     ReportError("Error couldn't load level!");

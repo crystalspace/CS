@@ -64,9 +64,8 @@ struct iPortalContainer : public virtual iBase
 
   /// Render the portal container
   virtual void Draw (iRenderView* rview) = 0;
-
-  	
-  virtual bool ComputeScreenPolygons (iRenderView* rview,
+  
+  virtual void ComputeScreenPolygons (iRenderView* rview,
     csVector2* verts, size_t vertsSize, size_t* numVerts) = 0;
   
   virtual size_t GetTotalVertexCount () const = 0;

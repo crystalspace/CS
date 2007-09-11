@@ -106,7 +106,7 @@ namespace RenderManager
     iShaderManager* shaderManager,
     csStringID defaultShaderType, iShader* defaultShader = 0)
   {
-   
+
     context.shaderArray.SetSize (context.totalRenderMeshes);
     context.ticketArray.SetSize (context.totalRenderMeshes);
 
@@ -117,12 +117,9 @@ namespace RenderManager
       TicketSetup<Tree> ticketSetup (context.svArrays, shaderManager->GetShaderVariableStack (),
         context.shaderArray, context.ticketArray);
 
-    // Ugly: to work around gcc err'ing when using temporarys in a reference
-    typedef CS::Meta::Implementation::CompositeFunctorImpl<ShaderSetup<Tree>, ShaderSVSetup<Tree> > Functor1;
-    typedef CS::Meta::Implementation::CompositeFunctorImpl<Functor1, TicketSetup<Tree> > Functor2;
-      Functor1 functor1 (shaderSetup, shaderSVSetup);
-      Functor2 functor2 (functor1, ticketSetup);
-      tree.TraverseMeshNodes (functor2, &context);
+      tree.TraverseMeshNodes (
+        CS::Meta::CompositeFunctor (shaderSetup, shaderSVSetup, ticketSetup), 
+        &context);
     }
   }
 

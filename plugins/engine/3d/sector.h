@@ -258,6 +258,16 @@ public:
 
   virtual iSectorCallback* GetSectorCallback (int idx) const
   { return sectorCallbackList.Get (idx); }
+
+  virtual void CallSectorCallbacks (iRenderView* rview)
+  {
+    int numSectorCB = (int)sectorCallbackList.GetSize ();
+    while (numSectorCB-- > 0)
+    {
+      iSectorCallback* cb = sectorCallbackList.Get (numSectorCB);
+      cb->Traverse (this, rview);
+    }
+  }
   /** @} */
 
   /**\name Lighting

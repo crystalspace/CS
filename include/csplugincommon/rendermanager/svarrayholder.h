@@ -80,6 +80,9 @@ namespace RenderManager
 
     void ReplicateSet (size_t from, size_t start, size_t end = (size_t)-1)
     {
+      if (numSets == 1)
+        return;
+
       if (end == (size_t)-1)
         end = numSets-1;
 
@@ -88,8 +91,8 @@ namespace RenderManager
 
       /*memcpy (svArray + start*numSVNames, svArray + from*numSVNames,
         sizeof(csShaderVariable*)*numSVNames*(end-start+1));*/
-      for (size_t i = start, j = from; i <= end; i++, j++)
-        memcpy (svArray + i*numSVNames, svArray + j*numSVNames,
+      for (size_t i = start; i <= end; i++)
+        memcpy (svArray + i*numSVNames, svArray + from*numSVNames,
           sizeof(csShaderVariable*)*numSVNames);
     }
 

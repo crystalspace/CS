@@ -8,6 +8,13 @@ chronological order.
 
 11-Sep-2007
 	- Marten fixed a small error regarding deprecation warnings in thing.
+	- Marten made a number of improvements to the RM:
+	   - Improved the mesh filter to reduce the number of virtual calls
+	     and temporary storage arrays.
+	   - Unified the sector callback calling.
+	   - Handle the case of a single mesh.
+	   - Implemented proper distance sorting.
+	   - Made the sorting table be lazy evaluation.
 7-Sep-2007
 	- res fixed the debug info splitting to put the debug info file into
 	  the same file as the binary (fixes separate debug info for shared

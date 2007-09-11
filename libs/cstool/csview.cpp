@@ -29,8 +29,7 @@
 
 csView::csView (iEngine *e, iGraphics3D* ig3d) 
   : scfImplementationType (this),
-  Engine (e), G3D (ig3d), RectView (0), PolyView (0), AutoResize (true),
-  meshFilterMode (filterExcludeSpecified)
+  Engine (e), G3D (ig3d), RectView (0), PolyView (0), AutoResize (true)
 {
   Camera = e->CreateCamera ();
 
@@ -202,33 +201,4 @@ iClipper2D* csView::GetClipper ()
 {
   UpdateClipper ();
   return Clipper;
-}
-
-void csView::FilterMeshes (iMeshWrapper** inMeshes, size_t meshNum,
-                           iMeshWrapper** outMeshes, size_t& outNum)
-{
-  outNum = 0;
-  switch (meshFilterMode)
-  {
-    case filterExcludeSpecified:
-      {
-        for (size_t i = 0; i < meshNum; i++)
-        {
-          iMeshWrapper* m = inMeshes[i];
-          if (!filteredMeshes.Contains (m))
-            outMeshes[outNum++] = m;
-        }
-      }
-      break;
-    case filterOnlySpecified:
-      {
-        for (size_t i = 0; i < meshNum; i++)
-        {
-          iMeshWrapper* m = inMeshes[i];
-          if (filteredMeshes.Contains (m))
-            outMeshes[outNum++] = m;
-        }
-      }
-      break;
-  }
 }
