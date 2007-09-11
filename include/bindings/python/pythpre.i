@@ -89,6 +89,12 @@ _csRef_to_Python (const csRef<iBase> & ref, void * ptr, const char * name)
   return SWIG_NewPointerObj((void *)ptr, SWIG_TypeQuery(name), 1);
 }
 %}
+%pythoncode %{
+if not "core" in dir():
+    core = __import__("cspace").__dict__["core"]
+core.AddSCFLink(_SetSCFPointer)
+CSMutableArrayHelper = core.CSMutableArrayHelper
+%}
 %enddef
 
 

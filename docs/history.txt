@@ -6,6 +6,11 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Sep-2007
+	- caedes fixed setting of pythonpath inside cspython for new build 
+	  location.
+	- caedes fixed some problems in swig interface files related to
+	  building external modules, also cleaned them up a bit more.
 10-Sep-2007
 	- caedes made some changes to the swig interface files:
 	    - added SetSCFPointer and GetSCFPointer to all modules so

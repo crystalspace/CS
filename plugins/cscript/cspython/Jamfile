@@ -32,7 +32,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   LinkWith cspython : crystalspace ;
   ExternalLibs cspython : PYTHON ;
   CFlags cspython : $(CSPYTHON.CFLAGS) ;
-  local bindingspath = [ ConcatDirs $(LOCATE.OBJECTS) bindings python cspace ] ;
+  local bindingspath = [ ConcatDirs $(LOCATE.OBJECTS) bindings python ] ;
   CFlags cspython : [ FDefines "DEFAULT_PYTHMOD_PATH=\\\"$(bindingspath)\\\"" ] ;
   MsvcCFlags cspython : "/DDEFAULT_PYTHMOD_PATH=\\\".\\\"" ;
   HDRS = $(save_HDRS) ;

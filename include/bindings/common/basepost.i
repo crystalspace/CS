@@ -84,31 +84,9 @@
 %ignore iBase::~iBase(); // We replace iBase dtor with one that calls DecRef().
 			 // Swig already knows not to delete an SCF pointer.
 
-%define INTERFACE_POST(T)
-  %extend T
-  {
-    static int scfGetVersion() { return scfInterfaceTraits<T>::GetVersion(); }
-    virtual ~T() { if (self) self->DecRef (); }
-  }
-%enddef
-
 #undef INTERFACE_APPLY
 #define INTERFACE_APPLY(x) INTERFACE_POST(x)
-/*
-#if defined(SWIGPYTHON)
-  %include "bindings/python/pythpost.i"
-#elif defined(SWIGPERL5)
-  %include "bindings/perl/perlpost.i"
-#elif defined(SWIGRUBY)
-  %include "bindings/ruby/rubypost.i"
-#elif defined(SWIGTCL8)
-  %include "bindings/tcl/tclpost.i"
-#elif defined(SWIGJAVA)
-  %include "bindings/java/javapost.i"
-#elif defined(SWIGLUA)
-  %include "bindings/lua/luapost.i"
-#endif
-*/
+
 %define cs_lang_include(file)
 APPLY_FOR_ALL_INTERFACES_POST
   #if defined(SWIGPYTHON)

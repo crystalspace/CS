@@ -344,8 +344,15 @@
   %include "bindings/lua/luapre.i"
 #endif
 
+%define INTERFACE_POST(T)
+  %extend T
+  {
+    static int scfGetVersion() { return scfInterfaceTraits<T>::GetVersion(); }
+    virtual ~T() { if (self) self->DecRef (); }
+  }
+%enddef
+
 %define INLINE_FUNCTIONS
-LANG_FUNCTIONS
 %inline %{
 /* Funtions to set the modules global SCF pointer, this is needed
    when working on a pure scripting environment, as then this code
@@ -362,9 +369,7 @@ iSCF* GetSCFPointer()
   return iSCF::SCF;
 }
 %}
-%pythoncode %{
-core.AddSCFLink(_SetSCFPointer)
-%}
+LANG_FUNCTIONS
 %enddef
 
 // Handle arrays as input arguments.
