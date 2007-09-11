@@ -555,8 +555,6 @@ public:
   virtual iTerrainSystem* GetTerrainColldet () { return 0; }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
-
 /**
  * A Thing is a set of polygons. A thing can be used for the
  * outside of a sector or else to augment the sector with
