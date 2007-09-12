@@ -6,10 +6,14 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Sep-2007
+	- Jorrit merged the CS AI branch into trunk (basically only a small
+	  change in PriorityQueue).
 8-Sep-2007
 	- res fixed a crash in bezier plugin caused by a rendermanager-only
 	  change accidentally slipping in.
-	- Genjix added doxygen comment for genmeshanim2 Append(animname) function.
+	- Genjix added doxygen comment for genmeshanim2 Append(animname)
+	  function.
 	- iceeey made the cssaver save plugin references with the short name
 	  from the original world file, if it was loaded with the saveable
 	  flag set. This makes saving and then loading 'castle' work.
