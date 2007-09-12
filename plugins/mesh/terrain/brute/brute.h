@@ -359,7 +359,6 @@ public:
 
   int CollisionDetect (iMovable *m, csTransform *p);
 
-  void GetObjectBoundingBox (csBox3& bbox);
   const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent);
@@ -593,7 +592,6 @@ public:
   /**\name iObjectModel implementation
    * @{ */
   iTerraFormer* GetTerraFormerColldet () { return terraformer; }
-  void GetObjectBoundingBox (csBox3& /*bbox*/) { }
   const csBox3& GetObjectBoundingBox () { return obj_bbox; }
   void SetObjectBoundingBox (const csBox3& /*bbox*/) { }
   void GetRadius (float& /*rad*/, csVector3& /*cent*/) { }

@@ -464,8 +464,8 @@
 %inline %{
 
   // This pointer wrapper can be used to prevent code-bloat by macros
-  // acting as template functions.  Examples are SCF_QUERY_INTERFACE()
-  // and CS_QUERY_REGISTRY().  Also note that CS should never need to
+  // acting as template functions.  Examples are scfQueryInterface()
+  // and csQueryRegistry().  Also note that CS should never need to
   // use virtual inheritance as long as it has SCF.
   //
   // Ref - A managed reference to the iBase pointer of the wrapped
@@ -1591,9 +1591,15 @@ csEventID _csevMouseMove (iObjectRegistry *,uint x);
 csEventID _csevJoystickEvent (iObjectRegistry *);
 
 // iutil/plugin.h
-#define _CS_LOAD_PLUGIN_ALWAYS(a, b) CS_LOAD_PLUGIN_ALWAYS(a, b)
-#undef CS_LOAD_PLUGIN_ALWAYS
-csPtr<iBase> _CS_LOAD_PLUGIN_ALWAYS (iPluginManager *, const char *);
+%inline
+%{
+  csPtr<iBase> CS_LOAD_PLUGIN_ALWAYS (iPluginManager *p, const char *i)
+  {
+    printf("CS_LOAD_PLUGIN_ALWAYS is deprecated, use \
+                csLoadPluginAlways instead\n");
+    return csLoadPluginAlways(p,i);
+  }
+%}
 #endif // CS_MICRO_SWIG
 
 #ifndef CS_MINI_SWIG

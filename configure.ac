@@ -399,8 +399,8 @@ AC_DEFUN([CS_JAVA_FLAGS],
 	[AS_IF([test -n "$JAVA_HOME"],
 	    [$1_dir="$JAVA_HOME"],
 	    [AS_IF([test -n "$2"],
-		[$1_dir=`AS_DIRNAME(["$2"])`
-		$1_dir=`AS_DIRNAME(["$$1_dir"])`],
+		[$1_dir=`AS_DIRNAME([$2])`
+		$1_dir=`AS_DIRNAME([$$1_dir])`],
 		[$1_dir=''])])
 	AS_IF([test -n "$$1_dir"],
 	    [$1_cflags="-I$$1_dir/include"
@@ -703,12 +703,10 @@ AS_IF([test -n "$cs_cv_prog_cxx_visibility_inlines_hidden"],
     #CS_CHECK_PROG_VERSION([g++], [$CXX --version], [4.1], [9.9|.9],
     #   [cs_cv_gxx_version_buggy=no],
     #   [cs_cv_gxx_version_buggy=yes])
-    cs_cv_gxx_version_buggy=yes
     AC_CACHE_CHECK([if $cs_cv_prog_cxx_visibility_inlines_hidden is buggy],
 	[cs_cv_prog_cxx_visibility_inlines_hidden_buggy],
 	[AS_IF([test $ac_compiler_gnu = yes],
-	    [AS_IF([test \( $host_cpu = x86_64 -a cs_cv_gxx_version_buggy = yes \) \
-		    || test x$cs_host_macosx = xyes],
+	    [AS_IF([test $host_cpu = x86_64 || test x$cs_host_macosx = xyes], 
 		[cs_cv_prog_cxx_visibility_inlines_hidden_buggy=yes],
 		[cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])],
 	    [cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no])])],

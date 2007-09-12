@@ -97,8 +97,8 @@ static int DoStuff (iObjectRegistry* object_reg)
 
   csPrintf ("================================================================\n");
 
-  csRef<iCollideSystem> cdsys (CS_LOAD_PLUGIN (plugmgr,
-  	"crystalspace.collisiondetection.opcode", iCollideSystem));
+  csRef<iCollideSystem> cdsys = csLoadPlugin<iCollideSystem> (plugmgr,
+  	"crystalspace.collisiondetection.opcode");
   Test (cdsys, "Opcode");
 
   csPrintf ("================================================================\n");
@@ -114,14 +114,14 @@ static int DoStuff (iObjectRegistry* object_reg)
 
   csPrintf ("================================================================\n");
 
-  csRef<iSyntaxService> syntax (CS_LOAD_PLUGIN (plugmgr,
-	"crystalspace.syntax.loader.service.text", iSyntaxService));
+  csRef<iSyntaxService> syntax = csLoadPlugin<iSyntaxService> (plugmgr,
+	"crystalspace.syntax.loader.service.text");
   Test (syntax, "Syntax Services");
 
   csPrintf ("================================================================\n");
 
-  csRef<iVisibilityCuller> viscull (CS_LOAD_PLUGIN (plugmgr,
-  	"crystalspace.culling.dynavis", iVisibilityCuller));
+  csRef<iVisibilityCuller> viscull = csLoadPlugin<iVisibilityCuller> (plugmgr,
+  	"crystalspace.culling.dynavis");
   Test (viscull, "DynaVis");
   //Benchmark (viscull, "DynaVis", 100);
 

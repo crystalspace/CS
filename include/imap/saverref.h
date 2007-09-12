@@ -28,6 +28,29 @@
 struct iObject;
 
 /**
+ * This interface represents a reference to a plugin.
+ */
+struct iPluginReference : public virtual iBase
+{
+  SCF_INTERFACE (iPluginReference, 0, 0, 1);
+  
+  /**
+   * Get the name of the plugin reference.
+   */
+  virtual const char* GetName () const = 0;
+  
+  /**
+   * Get the Class ID of the plugin.
+   */
+  virtual const char* GetClassID () const = 0;
+  
+  /**
+   * Get the iObject for this interface.
+   */
+  virtual iObject* QueryObject () = 0;
+};
+
+/**
  * This interface represents a reference to a library file.
  */
 struct iLibraryReference : public virtual iBase

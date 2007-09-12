@@ -741,7 +741,10 @@ struct iEngine : public virtual iBase
    * Assign to a csRef.
    * \param sector the sector to add walls to
    * \param name the engine name of the walls mesh that will be created
+   * \deprecated Deprecated in 1.3. Use CS::Geometry::GeneralMeshBuilder
+   * instead.
    */
+  CS_DEPRECATED_METHOD_MSG("Use CS::Geometry::GeneralMeshBuilder instead")
   virtual csPtr<iMeshWrapper> CreateSectorWallsMesh (iSector* sector,
       const char* name) = 0;
 
@@ -753,7 +756,10 @@ struct iEngine : public virtual iBase
    * Assign to a csRef.
    * \param sector the sector to add the object to
    * \param name the engine name of the mesh that will be created
+   * \deprecated Deprecated in 1.3. Use CS::Geometry::GeneralMeshBuilder
+   * instead.
    */
+  CS_DEPRECATED_METHOD_MSG("Use CS::Geometry::GeneralMeshBuilder instead")
   virtual csPtr<iMeshWrapper> CreateThingMesh (iSector* sector,
   	const char* name) = 0;
 
@@ -956,8 +962,8 @@ struct iEngine : public virtual iBase
   
   /**
    * Convenience function to create a portal from one sector to another
-   * and make this portal a child mesh of another mesh. Use SCF_QUERY_INTERFACE
-   * with iPortalContainer on the returned mesh for more control over the
+   * and make this portal a child mesh of another mesh. Use scfQueryInterface<
+   * iPortalContainer> on the returned mesh for more control over the
    * portal(s) in the portal object.
    * \param name is the name of the portal container mesh to create the portal
    * in. If the parentMesh already has a mesh with that name then that will
@@ -981,7 +987,7 @@ struct iEngine : public virtual iBase
 
   /**
    * Convenience function to create a portal from one sector to another.
-   * Use SCF_QUERY_INTERFACE with iPortalContainer on the returned mesh for
+   * Use scfQueryInterface<iPortalContainer> on the returned mesh for
    * more control over the portal(s) in the portal object.
    * \param name is the name of the portal container mesh to create the portal
    * in. If the sourceSector already has a mesh with that name then that will
@@ -1007,8 +1013,8 @@ struct iEngine : public virtual iBase
 
   /**
    * Create an empty portal container in some sector. Use this portal
-   * container to create portals to other sectors. Use SCF_QUERY_INTERFACE with
-   * iPortalContainer on the mesh object inside the returned mesh to
+   * container to create portals to other sectors. Use scfQueryInterface<
+   * iPortalContainer> on the mesh object inside the returned mesh to
    * control the portals.
    * \param name of the portal mesh.
    * \param sector is the location of the portal object and not the sector
@@ -1190,12 +1196,12 @@ struct iEngine : public virtual iBase
    * all objects that are within a radius of a given position.
    * The current implementation only does meshes but in future
    * lights will also be supported.
-   * You can use #SCF_QUERY_INTERFACE to get any interface from the
+   * You can use #scfQueryInterface to get any interface from the
    * returned objects. If crossPortals is true it will search through
    * portals. Otherwise it will limit the search to the sector passed in.
    * If you only want to have meshes then it is more efficient to
    * call GetNearbyMeshes() as you can then avoid the call to
-   * #SCF_QUERY_INTERFACE.
+   * #scfQueryInterface.
    */
   virtual csPtr<iObjectIterator> GetNearbyObjects (iSector* sector,
     const csVector3& pos, float radius, bool crossPortals = true ) = 0;
@@ -1206,7 +1212,7 @@ struct iEngine : public virtual iBase
    * This routine returns an iterator to iterate over
    * all objects that are potentially visible as seen from a given position.
    * This routine assumes full 360 degree visibility.
-   * You can use #SCF_QUERY_INTERFACE to get any interface from the
+   * You can use #scfQueryInterface to get any interface from the
    * returned objects.<p>
    * If you only want meshes then use GetVisibleMeshes().
    * CURRENTLY NOT IMPLEMENTED!
@@ -1227,7 +1233,7 @@ struct iEngine : public virtual iBase
    * This routine returns an iterator to iterate over
    * all objects that are potentially visible as seen from a given position.
    * This routine has a frustum restricting the view.
-   * You can use #SCF_QUERY_INTERFACE to get any interface from the
+   * You can use #scfQueryInterface to get any interface from the
    * returned objects.<p>
    * If you only want meshes then use GetVisibleMeshes().
    * CURRENTLY NOT IMPLEMENTED!

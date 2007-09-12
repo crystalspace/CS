@@ -40,18 +40,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   public:
     CombinerDefault (WeaverCompiler* compiler);
     
-    void BeginSnippet ();
+    void BeginSnippet (const char* annotation);
     void AddInput (const char* name, const char* type) {}
     void AddOutput (const char* name, const char* type) {}
     void InputRename (const char* fromName, const char* toName);
     void OutputRename (const char* fromName, const char* toName);
-    csPtr<iDocumentNodeIterator> QueryCoerceChain (const char* fromType,
-      const char* toType) { return 0; }
+    csPtr<CS::PluginCommon::ShaderWeaver::iCoerceChainIterator> 
+      QueryCoerceChain (const char* fromType, const char* toType) { return 0; }
     void Link (const char* fromName, const char* toName) {}
     void WriteBlock (const char* location, iDocumentNode* blockNodes);
     bool EndSnippet ();
-    void AddGlobal (const char* name, const char* type) {}
-    void SetOutput (const char* name) {}
+    void AddGlobal (const char* name, const char* type, 
+      const char* annotation) {}
+    void SetOutput (const char* name, const char* annotation) {}
     uint CoerceCost (const char* fromType, const char* toType);
     void WriteToPass (iDocumentNode* pass);
     bool CompatibleParams (iDocumentNode* params);

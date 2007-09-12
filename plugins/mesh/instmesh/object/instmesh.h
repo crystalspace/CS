@@ -331,10 +331,6 @@ public:
 
   /**\name iObjectModel implementation
    * @{ */
-  virtual void GetObjectBoundingBox (csBox3& bbox)
-  {
-    bbox = GetObjectBoundingBox ();
-  }
   virtual const csBox3& GetObjectBoundingBox ();
   /** @} */
 

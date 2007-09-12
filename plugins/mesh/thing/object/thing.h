@@ -88,6 +88,8 @@ struct RepMaterial
   	old_mat (o), new_mat (n) { }
 };
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * A helper class for iPolygonMesh implementations used by csThing.
  */
@@ -629,10 +631,6 @@ public:
   csRef<PolyMeshHelper> polygonMeshLOD;
 
   //-------------------- iObjectModel implementation --------------------------
-  virtual void GetObjectBoundingBox (csBox3& bbox)
-  {
-    bbox = GetBoundingBox ();
-  }
   virtual const csBox3& GetObjectBoundingBox ()
   {
     return GetBoundingBox ();

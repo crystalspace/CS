@@ -241,31 +241,22 @@ void Simple::CreateRoom ()
 
   // Creating the walls for our room.
 
-#if 0
-  // First we make the factory containing our geometry.
+  // First we make a primitive for our geometry.
   using namespace CS::Geometry;
-  csRef<iMeshFactoryWrapper> walls_fact = GeneralMeshBuilder::CreateFactory (
-  	engine, "walls_factory");
-  csRef<iGeneralFactoryState> fact_state = scfQueryInterface<
-    iGeneralFactoryState> (walls_fact->GetMeshObjectFactory ());
-  GeneralMeshBuilder::GenerateBox (fact_state, false,
-      csBox3 (csVector3 (-5, 0, -5), csVector3 (5, 20, 5)),
-      csPrimitives::CS_PRIMBOX_INSIDE);
+  DensityTextureMapper mapper (0.3f);
+  TesselatedBox box (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
+  box.SetLevel (3);
+  box.SetMapper (&mapper);
+  box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
 
-  // Now we make a single mesh from that factory.
-  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateMesh (engine,
-  	room, "walls", "walls_factory");
+  // Now we make a factory and a mesh at once.
+  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
+      engine, room, "walls", "walls_factory", &box);
+
+  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
+    iGeneralMeshState> (walls->GetMeshObject ());
+  mesh_state->SetShadowReceiving (true);
   walls->GetMeshObject ()->SetMaterialWrapper (tm);
-#else
-  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
-  iMeshObject* walls_object = walls->GetMeshObject ();
-  iMeshObjectFactory* walls_factory = walls_object->GetFactory();
-  csRef<iThingFactoryState> walls_state = 
-    scfQueryInterface<iThingFactoryState> (walls_factory);
-  walls_state->AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
-  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
-  walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
-#endif
 
   // Now we need light to see something.
   csRef<iLight> light;

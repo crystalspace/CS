@@ -3440,7 +3440,7 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
     if (!driver)
       driver = config->GetStr ("Video.OpenGL.Canvas", CS_OPENGL_2D_DRIVER);
 
-    G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, iGraphics2D);
+    G2D = csLoadPlugin<iGraphics2D> (plugin_mgr, driver);
     if (G2D.IsValid())
       object_reg->Register(G2D, "iGraphics2D");
     else

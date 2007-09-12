@@ -1799,8 +1799,8 @@ bool csEngineSequenceManager::Initialize (iObjectRegistry *r)
 
   csRef<iPluginManager> plugin_mgr (
   	csQueryRegistry<iPluginManager> (object_reg));
-  seqmgr = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.utilities.sequence",
-  	iSequenceManager);
+  seqmgr = csLoadPlugin<iSequenceManager> (plugin_mgr,
+    "crystalspace.utilities.sequence");
   if (!seqmgr)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,

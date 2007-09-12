@@ -21,7 +21,7 @@
   <technique priority="100">
     <combiner name="cg" plugin="crystalspace.graphics3d.shader.combiner.glcg" />
   
-    <input name="position" type="position4_world" />
+    <input name="position" type="position4_object" />
     
     <!-- Slightly dirty: float4x4 is no weaver type, so gets written out 
 	 verbatim -->
@@ -37,7 +37,12 @@
     </input>
     
     <block location="cg:vertexMain">
-      eyeDirectionObj = float3 (ModelViewIT[3] - position);
+      eyeDirectionObj = float3 (position - ModelViewIT[3]);
+    </block>
+    
+    <block location="cg:fragmentMain">
+      // @@@ Hm, use V2F?
+      eyeDirectionObj = float3 (0, 0, 0);
     </block>
   
     <output name="eyeDirectionObj" type="direction_object" />

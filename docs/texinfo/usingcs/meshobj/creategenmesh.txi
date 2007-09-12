@@ -3,6 +3,7 @@
 @subsection Creating a Genmesh Mesh
 @cindex @code{iGeneralFactoryState}
 @cindex @code{iGeneralMeshState}
+@cindex @samp{GeneralMeshBuilder}
 @cindex genmesh mesh
 
 This section describes how to create a Genmesh mesh.
@@ -130,10 +131,27 @@ meshstate->SetLighting (true);
 
 This will basically create the same cube as in the map file example.
 
+However, there is a much easier way by using the @samp{GeneralMeshBuilder}
+class:
+
+@example
+using namespace CS::Geometry;
+Box box (csVector3 (-.1, -.1, -.1), csVector3 (.1, .1, .1));
+
+// Now we make a factory and a mesh at once.
+csRef<iMeshWrapper> mesh = GeneralMeshBuilder::CreateFactoryAndMesh (
+      engine, room, "cube", "cubeFact", &box);
+mesh->GetMeshObject ()->SetMaterialWrapper (myMaterial);
+csRef<iGeneralMeshState> meshstate = scfQueryInterface<iGeneralMeshState> (
+  mesh->GetMeshObject ());
+meshstate->SetLighting (true);
+@end example
+
 @subsubheading Include Files
 
 The include files useful for this section are:
 
 @example
 #include <imesh/genmesh.h>
+#include <cstool/genmeshbuilder.h>
 @end example

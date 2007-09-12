@@ -36,6 +36,7 @@
 #include "iengine/light.h"
 #include "iengine/light.h"
 #include "iengine/material.h"
+#include "iengine/portal.h"
 #include "iengine/movable.h"
 #include "iengine/portalcontainer.h"
 #include "iengine/sector.h"
@@ -48,7 +49,6 @@
 #include "imap/saver.h"
 #include "imesh/object.h"
 #include "imesh/sprite3d.h"
-#include "imesh/thing.h"
 #include "isndsys.h"
 #include "iutil/databuff.h"
 #include "iutil/pluginconfig.h"
@@ -65,7 +65,6 @@
 
 #include "bot.h"
 #include "command.h"
-#include "infmaze.h"
 #include "walktest.h"
 #include "wentity.h"
 
@@ -1296,7 +1295,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!csStrCaseCmp (cmd, "bugplug"))
   {
-    csRef<iBase> plug = CS_LOAD_PLUGIN_ALWAYS (Sys->plugin_mgr,
+    csRef<iBase> plug = csLoadPluginAlways (Sys->plugin_mgr,
     	"crystalspace.utilities.bugplug");
     plug->IncRef ();	// Avoid smart pointer release (@@@)
   }
@@ -2391,7 +2390,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     csRef<iSaver> saver = csQueryRegistry<iSaver> (Sys->object_reg);
     if (!saver.IsValid ())
     {
-      saver = CS_LOAD_PLUGIN(Sys->plugin_mgr, "crystalspace.level.saver", iSaver);
+      saver = csLoadPlugin<iSaver> (Sys->plugin_mgr, "crystalspace.level.saver");
       if (!saver.IsValid ())
       {
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,

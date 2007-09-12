@@ -33,6 +33,7 @@
 #include "iengine/movable.h"
 #include "iengine/region.h"
 #include "iengine/sector.h"
+#include "iengine/portal.h"
 #include "iengine/sharevar.h"
 #include "imesh/objmodel.h"
 #include "igeom/polymesh.h"
@@ -54,7 +55,6 @@
 
 #include "bot.h"
 #include "command.h"
-#include "infmaze.h"
 #include "walktest.h"
 
 extern WalkTest* Sys;

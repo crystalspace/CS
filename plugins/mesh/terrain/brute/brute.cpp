@@ -2545,12 +2545,6 @@ csRenderMesh** csTerrainObject::GetRenderMeshes (int &n,
   return returnMeshes->GetArray ();
 }
 
-void csTerrainObject::GetObjectBoundingBox (csBox3& bbox)
-{
-  SetupObject ();
-  bbox = global_bbox;
-}
-
 const csBox3& csTerrainObject::GetObjectBoundingBox ()
 {
   SetupObject ();

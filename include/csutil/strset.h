@@ -106,9 +106,9 @@ public:
 
   /**
    * Remove all stored strings.
-   * \deprecated Use Empty() instead.
+   * \deprecated Deprecated in 1.3. Use Empty() instead.
    */
-  /*CS_DEPRECATED_METHOD("Use Empty() instead.")*/
+  CS_DEPRECATED_METHOD_MSG("Use Empty() instead.")
   void Clear ()
   { Empty(); }
 

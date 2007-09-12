@@ -242,13 +242,14 @@ private:
 
   csString error_buf;
   iMeshObjectFactory *mesh_fact;
+  iSkeletonGraveyard *the_graveyard;
 
   bool use_parent;
 public:
-    csArray<int> & GetUsedBones() { return used_bones; }
-  iSkeletonGraveyard *gr;
-    virtual bool GetUseParent() { return use_parent; }
-    virtual iSkeletonFactory* GetSkelFact() { return skeleton_factory; }
+  csArray<int> & GetUsedBones() { return used_bones; }
+  virtual bool GetUseParent() { return use_parent; }
+  virtual iSkeletonFactory* GetSkelFact() { return skeleton_factory; }
+  inline iSkeletonGraveyard* GetSkeletonGraveyard () { return the_graveyard; }
 
   //csAnimationUpdateLevel & GetAULevel() { return always_update_level; }
   iSkeletonFactory * GetSkeletonFactory() {return skeleton_factory; }

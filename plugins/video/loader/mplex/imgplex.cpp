@@ -45,7 +45,7 @@ csImageIOMultiplexer::csImageIOMultiplexer (iBase *pParent) :
 
 csImageIOMultiplexer::~csImageIOMultiplexer ()
 {
-  if (classlist) classlist->DeleteAll ();
+  if (classlist) classlist->Empty ();
 }
 
 bool csImageIOMultiplexer::Initialize (iObjectRegistry *object_reg)
@@ -84,7 +84,7 @@ bool csImageIOMultiplexer::LoadNextPlugin ()
     do
     {
       if (classname) classlist->DeleteIndex (0);
-      if (classlist->Length() == 0)
+      if (classlist->GetSize () == 0)
       {
 	classlist = 0;
 	plugin_mgr = 0;

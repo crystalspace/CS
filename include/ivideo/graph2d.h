@@ -171,7 +171,7 @@ iOffscreenCanvasCallback : public virtual iBase
  *       the right instance of the canvas that it requires.
  *
  * Main ways to get pointers to this interface:
- * - CS_QUERY_REGISTRY()
+ * - csQueryRegistry<iGraphics2D>()
  * - iGraphics3D::GetDriver2D()
  *
  * Main users of this interface:

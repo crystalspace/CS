@@ -177,7 +177,7 @@ public:
 static scfLibraryVector *LibraryRegistry = 0;
 
 /// A object of this class represents a shared library
-class scfSharedLibrary
+class scfSharedLibrary : public CS::Memory::CustomAllocated
 {
   typedef void (*scfInitFunc)(iSCF*);
   typedef void (*scfFinisFunc)();
@@ -294,7 +294,7 @@ int scfLibraryVector::CompareName (scfSharedLibrary* const& Item,
 }
 
 /// This structure contains everything we need to know about a particular class
-class scfFactory : public iFactory
+class scfFactory : public iFactory, public CS::Memory::CustomAllocated
 {
 public:
   // Class identifier
@@ -387,8 +387,7 @@ scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
   const char *iDepend, csStringID context)
 {
   csRefTrackerAccess::SetDescription (this, CS_TYPENAME(*this));
-  csRefTrackerAccess::TrackConstruction (this);
-  // Don't use SCF_CONSTRUCT_IBASE (0) since it will call IncRef()
+  csRefTrackerAccess::TrackConstruction (this);  
   scfWeakRefOwners = 0;
   scfRefCount = 0;
 #ifdef CS_REF_TRACKER
@@ -396,11 +395,11 @@ scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
    * instance */
   ClassID = classIDs->Register (iClassID);
 #else
-  ClassID = csStrNew (iClassID);
+  ClassID = CS::StrDup (iClassID);
 #endif
-  Description = csStrNew (iDescription);
-  Dependencies = csStrNew (iDepend);
-  FactoryClass = csStrNew (iFactoryClass);
+  Description = CS::StrDup (iDescription);
+  Dependencies = CS::StrDup (iDepend);
+  FactoryClass = CS::StrDup (iFactoryClass);
   CreateFunc = iCreate;
   classContext = context;
   LibraryName =
@@ -434,11 +433,11 @@ scfFactory::~scfFactory ()
 
   if (Library)
     Library->DecRef ();
-  delete [] FactoryClass;
-  delete [] Dependencies;
-  delete [] Description;
+  cs_free (FactoryClass);
+  cs_free (Dependencies);
+  cs_free (Description);
 #ifndef CS_REF_TRACKER
-  delete [] ClassID;
+  cs_free (const_cast<char*> (ClassID));
 #endif
 
   csRefTrackerAccess::TrackDestruction (this, scfRefCount);
@@ -625,23 +624,23 @@ void csSCF::ScanPluginsInt (csPathsList const* pluginPaths,
       }
 
       if (plugins)
-        plugins->DeleteAll();
+        plugins->Empty();
 
       csRef<iStringArray> messages =
         csScanPluginDir (pathrec.path, plugins, pathrec.scanRecursive);
       scannedDirs.Request(pathrec.path);
 
-      if ((messages != 0) && (messages->Length() > 0))
+      if ((messages != 0) && (messages->GetSize () > 0))
       {
         csPrintfErr("SCF_WARNING: the following issue(s) arose while "
           "scanning '%s':", pathrec.path.GetData());
-        for (j = 0; j < messages->Length(); j++)
+        for (j = 0; j < messages->GetSize (); j++)
           csPrintfErr(" %s\n", messages->Get (j));
       }
 
       csRef<iDocument> metadata;
       csRef<iString> msg;
-      for (j = 0; j < plugins->Length(); j++)
+      for (j = 0; j < plugins->GetSize (); j++)
       {
         char const* plugin = plugins->Get(j);
         msg = csGetPluginMetadata (plugin, metadata);

@@ -663,12 +663,6 @@ void csSprite3DMeshObjectFactory::HardTransform (const csReversibleTransform& t)
   ShapeChanged ();
 }
 
-void csSprite3DMeshObjectFactory::GetObjectBoundingBox (csBox3& b)
-{
-  SetupFactory ();
-  b = global_bbox;
-}
-
 const csBox3& csSprite3DMeshObjectFactory::GetObjectBoundingBox ()
 {
   SetupFactory ();
@@ -1017,13 +1011,6 @@ float csSprite3DMeshObject::GetScreenBoundingBox (
   }
 
   return cbox.MaxZ ();
-}
-
-void csSprite3DMeshObject::GetObjectBoundingBox (csBox3& b)
-{
-  CS_ASSERT (cur_action != 0);
-  csSpriteFrame* cframe = cur_action->GetCsFrame (cur_frame);
-  cframe->GetBoundingBox (b);
 }
 
 const csBox3& csSprite3DMeshObject::GetObjectBoundingBox ()

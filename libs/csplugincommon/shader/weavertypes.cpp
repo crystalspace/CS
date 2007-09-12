@@ -106,6 +106,16 @@ namespace CS
 	}
         return 0;
       }
+
+      const char* QueryType (const TypeInfo& typeInfo)
+      {
+        for (size_t i = 0; i < numTypeInfos; i++)
+        {
+          if (typeInfoMap[i].typeInfo == typeInfo) 
+            return typeInfoMap[i].typeName;
+        }
+        return 0;
+      }
     
       TypeInfoIterator::TypeInfoIterator () : n(0) {}
       

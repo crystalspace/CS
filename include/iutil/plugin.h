@@ -228,13 +228,6 @@ inline csPtr<Interface> csLoadPluginCheck (iObjectRegistry* object_reg,
 }
 
 /**
- * \deprecated Compatibility macro.
- * \sa csLoadPlugin<Interface> (mgr, ClassID);
- */
-#define CS_LOAD_PLUGIN(Object,ClassID,Interface)			\
-  csLoadPlugin<Interface> (Object, ClassID)
-
-/**
  * Same as csLoadPlugin() but does not bother asking for a interface.
  * This is useful for unconditionally loading plugins.
  */
@@ -244,13 +237,6 @@ inline csPtr<iBase> csLoadPluginAlways (iPluginManager *mgr,
   iBase* base = mgr->LoadPlugin (ClassID);
   return csPtr<iBase> (base);
 }
-
-/**
- * \deprecated Compatibility macro.
- * \sa csLoadPluginAlways (mgr, ClassID);
- */
-#define CS_LOAD_PLUGIN_ALWAYS(Object,ClassID)				\
-  csLoadPluginAlways (Object, ClassID)
 
 /**
  * Use this macro to query the object registry, loading a plugin if needed.  If

@@ -114,7 +114,6 @@ namespace lighter
         200)*1024*1024;
       swapManager = new SwapManager (maxSwapSize);
     }
-    elementAreasAlloc = new ElementAreasAlloc;
 
     // Initialize the TUI
     globalTUI.Redraw ();
@@ -180,7 +179,6 @@ namespace lighter
   void Lighter::CleanUp ()
   {
     delete scene; scene = 0;
-    delete elementAreasAlloc; elementAreasAlloc = 0;
     
     delete swapManager; swapManager = 0;
     

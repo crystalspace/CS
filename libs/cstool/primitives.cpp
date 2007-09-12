@@ -18,9 +18,34 @@
 #include "cssysdef.h"
 #include "csqsqrt.h"
 #include "csgeom/math3d.h"
+#include "csgeom/plane3.h"
 #include "csgeom/sphere.h"
 #include "csgeom/trimesh.h"
 #include "cstool/primitives.h"
+
+namespace CS
+{
+namespace Geometry
+{
+
+//------------------------------------------------------------------------
+
+csVector2 DensityTextureMapper::Map (const csVector3& p,
+    const csVector3& n, size_t)
+{
+  csVector3 a1, a2;
+  csPlane3::FindOrthogonalPoints (n, a1, a2);
+  // Calculate the closest point from point 'p' on the plane given
+  // by 'n' and the origin.
+  csVector3 closest = p - n * (n * p);
+
+  csVector2 uv;
+  uv.x = a1 * closest * density;
+  uv.y = a2 * closest * density;
+  return uv;
+}
+
+//------------------------------------------------------------------------
 
 static void TriSwap (csTriangle*& tr, const csTriangle tri, bool in)
 {
@@ -45,7 +70,7 @@ static void NormSwap (csVector3& n, bool in)
   if (in) n = -n;
 }
 
-csVector2 csPrimitives::boxTable[] =
+csVector2 Primitives::boxTable[] =
 {
   csVector2 ( 0, 0 ), csVector2 ( 0, 1 ), csVector2 ( 1, 0 ),
   csVector2 ( 0, 0 ), csVector2 ( 0, 0 ), csVector2 ( 1, 0 ),
@@ -57,24 +82,24 @@ csVector2 csPrimitives::boxTable[] =
   csVector2 ( 0, 1 ), csVector2 ( 1, 1 ), csVector2 ( 0, 1 )
 };
 
-csVector2 csPrimitives::quadTable[] =
+csVector2 Primitives::quadTable[] =
 {
   csVector2 (0,0), csVector2 (0,1), csVector2 (1,1), csVector2 (1,0)
 };
 
-void csPrimitives::GenerateBox (
+void Primitives::GenerateBox (
       const csBox3& box,
       csDirtyAccessArray<csVector3>& mesh_vertices,
       csDirtyAccessArray<csVector2>& mesh_texels,
       csDirtyAccessArray<csVector3>& mesh_normals,
       csDirtyAccessArray<csTriangle>& mesh_triangles,
-      uint32 flags, CS::Geometry::TextureMapper* mapper)
+      uint32 flags, TextureMapper* mapper)
 {
   bool alloced = false;
   if (!mapper)
   {
     alloced = true;
-    mapper = new CS::Geometry::TableTextureMapper (boxTable);
+    mapper = new TableTextureMapper (boxTable);
   }
 
   mesh_vertices.SetSize (24);
@@ -223,12 +248,12 @@ void csPrimitives::GenerateBox (
   if (alloced) delete mapper;
 }
 
-void csPrimitives::GenerateCapsule (float l, float r, uint sides,
+void Primitives::GenerateCapsule (float l, float r, uint sides,
       csDirtyAccessArray<csVector3>& mesh_vertices,
       csDirtyAccessArray<csVector2>& mesh_texels,
       csDirtyAccessArray<csVector3>& mesh_normals,
       csDirtyAccessArray<csTriangle>& mesh_triangles,
-      CS::Geometry::TextureMapper* mapper)
+      TextureMapper* mapper)
 {
   const uint n = sides * 4;
   l *= 0.5;
@@ -348,19 +373,19 @@ void csPrimitives::GenerateCapsule (float l, float r, uint sides,
   }
 }
 
-void csPrimitives::GenerateQuad (const csVector3 &v1, const csVector3 &v2,
+void Primitives::GenerateQuad (const csVector3 &v1, const csVector3 &v2,
                           const csVector3 &v3, const csVector3 &v4,
                           csDirtyAccessArray<csVector3>& mesh_vertices,
                           csDirtyAccessArray<csVector2>& mesh_texels,
                           csDirtyAccessArray<csVector3>& mesh_normals,
                           csDirtyAccessArray<csTriangle>& mesh_triangles,
-			  CS::Geometry::TextureMapper* mapper)
+			  TextureMapper* mapper)
 {
   bool alloced = false;
   if (!mapper)
   {
     alloced = true;
-    mapper = new CS::Geometry::TableTextureMapper (quadTable);
+    mapper = new TableTextureMapper (quadTable);
   }
 
   mesh_vertices.SetSize (4);
@@ -379,9 +404,9 @@ void csPrimitives::GenerateQuad (const csVector3 &v1, const csVector3 &v2,
   mesh_normals[3].Normalize ();
 
   mesh_texels[0] = mapper->Map (mesh_vertices[0], mesh_normals[0], 0);
-  mesh_texels[1] = mapper->Map (mesh_vertices[1], mesh_normals[1], 0);
-  mesh_texels[2] = mapper->Map (mesh_vertices[2], mesh_normals[2], 0);
-  mesh_texels[3] = mapper->Map (mesh_vertices[3], mesh_normals[3], 0);
+  mesh_texels[1] = mapper->Map (mesh_vertices[1], mesh_normals[1], 1);
+  mesh_texels[2] = mapper->Map (mesh_vertices[2], mesh_normals[2], 2);
+  mesh_texels[3] = mapper->Map (mesh_vertices[3], mesh_normals[3], 3);
 
   mesh_triangles[0].a = 3; mesh_triangles[0].b = 0; mesh_triangles[0].c = 1;
   mesh_triangles[1].a = 0; mesh_triangles[1].b = 1; mesh_triangles[1].c = 2;
@@ -391,13 +416,76 @@ void csPrimitives::GenerateQuad (const csVector3 &v1, const csVector3 &v2,
   if (alloced) delete mapper;
 }
 
-void csPrimitives::GenerateSphere (const csEllipsoid& ellips, int num,
+void Primitives::GenerateTesselatedQuad (const csVector3 &v0,
+                          const csVector3 &v1, const csVector3 &v2,
+			  int tesselations,
+                          csDirtyAccessArray<csVector3>& mesh_vertices,
+                          csDirtyAccessArray<csVector2>& mesh_texels,
+                          csDirtyAccessArray<csVector3>& mesh_normals,
+                          csDirtyAccessArray<csTriangle>& mesh_triangles,
+			  TextureMapper* mapper)
+{
+  bool alloced = false;
+  if (!mapper)
+  {
+    alloced = true;
+    mapper = new DensityTextureMapper (1.0f);
+  }
+
+  size_t num_verts = (tesselations+1) * (tesselations+1);
+  size_t num_tri = tesselations * tesselations * 2;
+  mesh_vertices.SetSize (num_verts);
+  mesh_texels.SetSize (num_verts);
+  mesh_normals.SetSize (num_verts);
+  mesh_triangles.SetSize (num_tri);
+
+  csPlane3 plane (v0, v1, v2);
+  csVector3 normal = plane.Normal ();
+  normal.Normalize ();
+  float d = 1.0f / float (tesselations);
+  csVector3 v1_d = d * (v1-v0);
+  int x, y;
+  size_t i = 0;
+  for (y = 0 ; y <= tesselations ; y++)
+  {
+    csVector3 v0_v2_y = v0 + float (y) * d * (v2-v0);
+    for (x = 0 ; x <= tesselations ; x++)
+    {
+      mesh_vertices[i] = v0_v2_y;
+      v0_v2_y += v1_d;
+      mesh_normals[i] = normal;
+      i++;
+    }
+  }
+
+  i = 0;
+  for (y = 0 ; y < tesselations ; y++)
+  {
+    int yt = y * (tesselations+1);
+    for (x = 0 ; x < tesselations ; x++)
+    {
+      int p1 = yt + x;
+      int p2 = yt + x + 1;
+      int p3 = tesselations + 1 + p1;
+      int p4 = tesselations + 1 + p2;
+      mesh_triangles[i++].Set (p1, p2, p4);
+      mesh_triangles[i++].Set (p1, p4, p3);
+    }
+  }
+
+  for (i = 0 ; i < num_verts ; i++)
+    mesh_texels[i] = mapper->Map (mesh_vertices[i], mesh_normals[i], i);
+
+  if (alloced) delete mapper;
+}
+
+void Primitives::GenerateSphere (const csEllipsoid& ellips, int num,
       csDirtyAccessArray<csVector3>& mesh_vertices,
       csDirtyAccessArray<csVector2>& mesh_texels,
       csDirtyAccessArray<csVector3>& mesh_normals,
       csDirtyAccessArray<csTriangle>& mesh_triangles,
       bool cyl_mapping, bool toponly, bool reversed,
-      CS::Geometry::TextureMapper* mapper)
+      TextureMapper* mapper)
 {
   int num_vertices = 0;
   int num_triangles = 0;
@@ -658,5 +746,8 @@ void csPrimitives::GenerateSphere (const csEllipsoid& ellips, int num,
   memcpy (ball_triangles, triangles.GetArray (),
       sizeof(csTriangle)*num_triangles);
 }
+
+} // namespace Geometry
+} // namespace CS
 
 //---------------------------------------------------------------------------

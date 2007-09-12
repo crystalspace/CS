@@ -105,10 +105,6 @@ public:
     norm = do_normals;
   }
 
-  void GetObjectBoundingBox (csBox3& bbox)
-  {
-    bbox.Set (-100000, -100000, -100000, 100000, 100000, 100000);
-  }
   const csBox3& GetObjectBoundingBox ()
   {
     bbox.Set (-100000, -100000, -100000, 100000, 100000, 100000);

@@ -34,7 +34,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
   {
   }
   
-  void CombinerDefault::BeginSnippet ()
+  void CombinerDefault::BeginSnippet (const char* annotation)
   {
   }
   

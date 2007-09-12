@@ -134,33 +134,6 @@ csGenmeshMeshObject::~csGenmeshMeshObject ()
   ClearPseudoDynLights ();
 }
 
-void csGenmeshMeshObject::AddSubMesh (unsigned int *triangles,
-                                      int tricount,
-                                      iMaterialWrapper *material,
-				      uint mixmode)
-{
-  csRef<iRenderBuffer> index_buffer = 
-    csRenderBuffer::CreateIndexRenderBuffer (tricount*3,
-    CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 0, factory->GetVertexCount() - 1);
-  csTriangle *triangleData =
-    (csTriangle*)index_buffer->Lock(CS_BUF_LOCK_NORMAL);
-
-  for (int i=0; i<tricount; ++i)
-  {
-    triangleData[i] = factory->GetTriangles ()[triangles[i]];
-  }
-  index_buffer->Release ();
-
-  LegacySubmesh lms;
-  lms.indexbuffer = index_buffer;
-  lms.material = material;
-  lms.mixmode = mixmode;
-  lms.bufferHolder.AttachNew (new csRenderBufferHolder);
-  lms.bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX,
-    index_buffer);
-  legacySubmeshes.Push (lms);
-}
-
 const csVector3* csGenmeshMeshObject::AnimControlGetVertices ()
 {
   return anim_ctrl->UpdateVertices (vc->GetCurrentTicks (),
@@ -1237,11 +1210,6 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   return renderMeshes.GetArray ();
 }
 
-void csGenmeshMeshObject::GetObjectBoundingBox (csBox3& bbox)
-{
-  bbox = factory->GetObjectBoundingBox ();
-}
-
 const csBox3& csGenmeshMeshObject::GetObjectBoundingBox ()
 {
   return factory->GetObjectBoundingBox ();
@@ -2261,7 +2229,8 @@ void csGenmeshMeshObjectFactory::CalculateNormals (bool compress)
 }
 void csGenmeshMeshObjectFactory::GenerateCapsule (float l, float r, uint sides)
 {
-  csPrimitives::GenerateCapsule (l, r, sides, mesh_vertices, mesh_texels,
+  CS::Geometry::Primitives::GenerateCapsule (
+      l, r, sides, mesh_vertices, mesh_texels,
       mesh_normals, mesh_triangles);
   mesh_colors.DeleteAll ();
   Invalidate ();
@@ -2269,7 +2238,8 @@ void csGenmeshMeshObjectFactory::GenerateCapsule (float l, float r, uint sides)
 void csGenmeshMeshObjectFactory::GenerateSphere (const csEllipsoid& ellips,
     int num, bool cyl_mapping, bool toponly, bool reversed)
 {
-  csPrimitives::GenerateSphere (ellips, num, mesh_vertices, mesh_texels,
+  CS::Geometry::Primitives::GenerateSphere (
+      ellips, num, mesh_vertices, mesh_texels,
       mesh_normals, mesh_triangles, cyl_mapping, toponly, reversed);
   mesh_colors.DeleteAll();
   Invalidate();
@@ -2277,7 +2247,7 @@ void csGenmeshMeshObjectFactory::GenerateSphere (const csEllipsoid& ellips,
 
 void csGenmeshMeshObjectFactory::GenerateBox (const csBox3& box)
 {
-  csPrimitives::GenerateBox (box, mesh_vertices, mesh_texels,
+  CS::Geometry::Primitives::GenerateBox (box, mesh_vertices, mesh_texels,
       mesh_normals, mesh_triangles);
   mesh_colors.DeleteAll();
   Invalidate();
