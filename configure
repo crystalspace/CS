@@ -15225,12 +15225,12 @@ else
   cs_java_dir="$JAVA_HOME"
 else
   if test -n "$JAVAC"; then
-  cs_java_dir=`$as_dirname -- "$JAVAC" ||
-$as_expr X"$JAVAC" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
-	 X"$JAVAC" : 'X\(//\)[^/]' \| \
-	 X"$JAVAC" : 'X\(//\)$' \| \
-	 X"$JAVAC" : 'X\(/\)' \| . 2>/dev/null ||
-echo X"$JAVAC" |
+  cs_java_dir=`$as_dirname -- $JAVAC ||
+$as_expr X$JAVAC : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
+	 X$JAVAC : 'X\(//\)[^/]' \| \
+	 X$JAVAC : 'X\(//\)$' \| \
+	 X$JAVAC : 'X\(/\)' \| . 2>/dev/null ||
+echo X$JAVAC |
     sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{
 	    s//\1/
 	    q
@@ -15248,12 +15248,12 @@ echo X"$JAVAC" |
 	    q
 	  }
 	  s/.*/./; q'`
-		cs_java_dir=`$as_dirname -- "$cs_java_dir" ||
-$as_expr X"$cs_java_dir" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
-	 X"$cs_java_dir" : 'X\(//\)[^/]' \| \
-	 X"$cs_java_dir" : 'X\(//\)$' \| \
-	 X"$cs_java_dir" : 'X\(/\)' \| . 2>/dev/null ||
-echo X"$cs_java_dir" |
+		cs_java_dir=`$as_dirname -- $cs_java_dir ||
+$as_expr X$cs_java_dir : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
+	 X$cs_java_dir : 'X\(//\)[^/]' \| \
+	 X$cs_java_dir : 'X\(//\)$' \| \
+	 X$cs_java_dir : 'X\(/\)' \| . 2>/dev/null ||
+echo X$cs_java_dir |
     sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{
 	    s//\1/
 	    q
@@ -19414,15 +19414,13 @@ if test -n "$cs_cv_prog_cxx_visibility_inlines_hidden"; then
     #CS_CHECK_PROG_VERSION([g++], [$CXX --version], [4.1], [9.9|.9],
     #   [cs_cv_gxx_version_buggy=no],
     #   [cs_cv_gxx_version_buggy=yes])
-    cs_cv_gxx_version_buggy=yes
     { echo "$as_me:$LINENO: checking if $cs_cv_prog_cxx_visibility_inlines_hidden is buggy" >&5
 echo $ECHO_N "checking if $cs_cv_prog_cxx_visibility_inlines_hidden is buggy... $ECHO_C" >&6; }
 if test "${cs_cv_prog_cxx_visibility_inlines_hidden_buggy+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   if test $ac_compiler_gnu = yes; then
-  if test \( $host_cpu = x86_64 -a cs_cv_gxx_version_buggy = yes \) \
-		    || test x$cs_host_macosx = xyes; then
+  if test $host_cpu = x86_64 || test x$cs_host_macosx = xyes; then
   cs_cv_prog_cxx_visibility_inlines_hidden_buggy=yes
 else
   cs_cv_prog_cxx_visibility_inlines_hidden_buggy=no
