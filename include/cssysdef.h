@@ -92,6 +92,13 @@
 # define CS_ATTRIBUTE_MALLOC
 #endif
 
+// Set up deprecation macros
+#ifdef CS_COMPILER_GCC
+#  define CS_DEPRECATED_METHOD    CS_ATTRIBUTE_DEPRECATED
+#  define CS_DEPRECATED_TYPE      CS_ATTRIBUTE_DEPRECATED
+#  define CS_DEPRECATED_VAR(decl) decl CS_ATTRIBUTE_DEPRECATED
+#endif
+
 /**\def CS_DEPRECATED_METHOD
  * Use the CS_DEPRECATED_METHOD macro in front of method declarations to
  * indicate that they are deprecated. Example:
@@ -155,6 +162,39 @@
 #    define CS_DEPRECATED_TYPE_MSG(msg) __declspec(deprecated(msg))
 #  else
 #    define CS_DEPRECATED_TYPE_MSG(msg) CS_DEPRECATED_TYPE
+#  endif
+#endif
+
+/**\def CS_DEPRECATED_VAR
+ * Use the CS_DEPRECATED_VAR macro tol indicate that a variable or 
+ * class/struct is deprecated. Example:
+ * \code
+ * struct MyStuff
+ * {
+ *   int newStuff;
+ *   CS_DEPRECATED_VAR(int oldStuff);
+ * };
+ * \endcode
+ * Compilers which are capable of flagging deprecation will exhibit a warning
+ * when it encounters client code using types so tagged.
+ */
+#if !defined(CS_DEPRECATED_VAR) || defined(DOXYGEN_RUN)
+#  if defined(CS_COMPILER_MSVC)
+#    define CS_DEPRECATED_VAR(decl) __declspec(deprecated) decl
+#  else
+#    define CS_DEPRECATED_VAR(decl)
+#  endif
+#endif
+
+/**\def CS_DEPRECATED_VAR_MSG
+ * A variant of CS_DEPRECATED_VAR that also emits the message \a msg
+ * on compilers that support it.
+ */
+#if !defined(CS_DEPRECATED_VAR_MSG) || defined(DOXYGEN_RUN)
+#  if defined(CS_COMPILER_MSVC) && _MSC_VER >= 1400
+#    define CS_DEPRECATED_VAR_MSG(msg, decl) __declspec(deprecated(msg)) decl
+#  else
+#    define CS_DEPRECATED_VAR_MSG(msg, decl) CS_DEPRECATED_VAR(decl)
 #  endif
 #endif
 

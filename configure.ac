@@ -2113,9 +2113,7 @@ AC_CHECK_HEADERS([byteswap.h],
 CS_SYMBOL_QUALIFIER([how to declare deprecations],
     [cs_cv_prog_cxx_declare_deprecated],
     [__attribute__((deprecated))], [], [C++],
-    [CS_HEADER_PROPERTY([CS_DEPRECATED_METHOD],
-	[$cs_cv_prog_cxx_declare_deprecated])
-    CS_HEADER_PROPERTY([CS_DEPRECATED_TYPE],
+    [CS_HEADER_PROPERTY([CS_ATTRIBUTE_DEPRECATED],
 	[$cs_cv_prog_cxx_declare_deprecated])])
 
 
