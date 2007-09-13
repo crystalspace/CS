@@ -17,6 +17,7 @@ chronological order.
 	- res added a "glvendor" version that can be used by the GL driver DB.
 	- res tweaked the GL driver DB to work around apparent font corruption
 	  with Mesa 6.5.2 (all drivers).
+	- res added Description() methods to csMatrix3 and csTransform.
 12-Sep-2007
 	- Jorrit merged the CS AI branch into trunk (basically only a small
 	  change in PriorityQueue).
