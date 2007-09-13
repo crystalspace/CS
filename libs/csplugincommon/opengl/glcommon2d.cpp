@@ -455,8 +455,7 @@ const char* csGraphics2DGLCommon::GetRendererString (const char* str)
   {
     return CS_PLATFORM_NAME;
   }
-  else
-    return 0;
+  return 0;
 }
 
 const char* csGraphics2DGLCommon::GetVersionString (const char* ver)
@@ -465,8 +464,15 @@ const char* csGraphics2DGLCommon::GetVersionString (const char* ver)
   {
     return (char*)glGetString (GL_VERSION);
   }
-  else
-    return 0;
+  else if (strcmp (ver, "glvendor") == 0)
+  {
+    /* The "vendor" part of the GL version
+     * (separated from the normal version by a space) */
+    const char* glv = (char*)glGetString (GL_VERSION);
+    const char* space = strchr (glv, ' ');
+    if (space) return space+1;
+  }
+  return 0;
 }
 
 void csGraphics2DGLCommon::Clear (int color)

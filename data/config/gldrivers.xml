@@ -596,7 +596,7 @@
                     broken. Since S3TC may also be used through generic
 		    compression formats, disable TC completely.
       -->
-    <rule description="Disable texture compression for Intel DRI">
+    <rule description="Intel DRI: Disable texture compression">
       <conditions>
         <regexp string="renderer" pattern="Mesa.*Intel" />
         <regexp string="glversion" pattern="Mesa 6\.5\.." />
@@ -612,7 +612,7 @@
                     Since S3TC may also be used through generic
                     compression formats, disable TC completely.
       -->
-    <rule description="Disable texture compression for Mesa DRI 200">
+    <rule description="Mesa R200 DRI: Disable texture compression">
         <conditions fulfill="all">
           <regexp string="renderer" pattern="^Mesa DRI R200" />
           <regexp string="glversion" pattern="Mesa 6\.4\.." />
@@ -626,7 +626,7 @@
       * 2006-11-24: AFP support in Intel DRI (at least in Mesa 6.5.1) is 
                     broken.
       -->
-    <rule description="Disable ARB_fragment_program for Intel DRI">
+    <rule description="Intel DRI: Disable ARB_fragment_program">
       <conditions>
         <regexp string="renderer" pattern="Mesa.*Intel" />
         <regexp string="glversion" pattern="Mesa 6\.5\.." />
@@ -641,11 +641,15 @@
                     vendor: Tungsten Graphics, Inc.
                     renderer: Mesa DRI Radeon 20061018 AGP 1x x86/MMX+/3DNow!+/SSE TCL
                     version: 1.3 Mesa 6.5.2
+      * 2007-09-13: Intel DRI on Mesa 6.5.2 exhibits garbled text.
+                    renderer: Mesa DRI Intel(R) 915GM 20061017 x86/MMX/SSE2
+		    vendor: Tungsten Graphics, Inc
+		    version: 1.3 Mesa 6.5.2
       -->
-    <rule description="ATI: Radeon 7200 series exhibits garbled text">
+    <rule description="Mesa 6.5.2: garbled text">
       <conditions>
-        <regexp string="renderer" pattern="Mesa.*Radeon" />
-        <regexp string="glversion" pattern="Mesa 6\.5\.2" />
+        <regexp string="renderer" pattern="Mesa.*" />
+        <comparever version="glvendor" relation="ge Mesa 6.5.2" />
       </conditions>
       <applicable>
         <usecfg>disableMTtext</usecfg>
