@@ -308,7 +308,7 @@ public:
   virtual csPtr<iMeshObject> Clone () { return 0; }
   virtual bool PreGetRenderMeshes (iRenderView* rview, iMovable* movable,
   	uint32 frustum_mask);
-  virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview,
+  virtual CS::RenderMesh** GetRenderMeshes (int& n, iRenderView* rview,
     iMovable* movable, uint32 frustum_mask);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {

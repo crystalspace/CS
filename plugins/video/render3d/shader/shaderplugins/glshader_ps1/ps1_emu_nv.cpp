@@ -62,8 +62,8 @@ void csShaderGLPS1_NV::Deactivate()
   glDisable (GL_TEXTURE_SHADER_NV);
 }
 
-void csShaderGLPS1_NV::SetupState (const csRenderMesh* /*mesh*/, 
-                                   csRenderMeshModes& /*modes*/,
+void csShaderGLPS1_NV::SetupState (const CS::RenderMesh* /*mesh*/, 
+                                   CS::RenderMeshModes& /*modes*/,
 	                           const iShaderVarStack* stacks)
 {
   csGLExtensionManager *ext = shaderPlug->ext;

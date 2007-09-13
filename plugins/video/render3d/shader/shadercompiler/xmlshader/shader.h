@@ -84,7 +84,7 @@ class csShaderConditionResolver : public iConditionResolver
   size_t nextVariant;
   csHash<size_t, MyBitArrayTemp, TempHeapAlloc> variantIDs;
 
-  const csRenderMeshModes* modes;
+  const CS::RenderMeshModes* modes;
   const iShaderVarStack* stacks;
 
   csString lastError;
@@ -114,7 +114,7 @@ public:
 
   void ResetEvaluationCache() { evaluator.ResetEvaluationCache(); }
 
-  void SetEvalParams (const csRenderMeshModes* modes,
+  void SetEvalParams (const CS::RenderMeshModes* modes,
     const iShaderVarStack* stacks);
   size_t GetVariant ();
   size_t GetVariantCount () const
@@ -218,7 +218,7 @@ public:
   void SetFileName (const char* filename)
   { this->filename = CS::StrDup(filename); }
 
-  virtual size_t GetTicket (const csRenderMeshModes& modes,
+  virtual size_t GetTicket (const CS::RenderMeshModes& modes,
       const iShaderVarStack* stacks);
 
   /// Get number of passes this shader have
@@ -235,8 +235,8 @@ public:
   virtual bool ActivatePass (size_t ticket, size_t number);
 
   /// Setup a pass.
-  virtual bool SetupPass (size_t ticket, const csRenderMesh *mesh,
-    csRenderMeshModes& modes,
+  virtual bool SetupPass (size_t ticket, const CS::RenderMesh *mesh,
+    CS::RenderMeshModes& modes,
     const iShaderVarStack* stacks)
   { 
     if (IsFallbackTicket (ticket))

@@ -9,6 +9,11 @@ chronological order.
 13-Sep-2007
 	- res added a macro to deprecate struct members and variables
 	  (CS_DEPRECATED_VAR and CS_DEPRECATED_VAR_MSG).
+	- res made the cull flipping flag in render meshes more flexible -
+	  now, there's a 3rd mode "disable".
+	- res made render priority a render mesh field.
+	- res added support for per-submesh render priorities and z modes to
+	  genmesh.
 12-Sep-2007
 	- Jorrit merged the CS AI branch into trunk (basically only a small
 	  change in PriorityQueue).

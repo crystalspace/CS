@@ -37,32 +37,65 @@
 struct iMaterialWrapper;
 struct iPortalContainer;
 
+namespace CS
+{
+  typedef int RenderPriority;
+  
+  enum MeshCullMode
+  {
+    cullNormal,
+    cullFlipped,
+    cullDisabled
+  };
+  
+  /**
+   * Returns inverse culling mode for a given culling mode.
+   * Specifically, for "normal" culling, "flipped" is returned; for "flipped"
+   * culling, "normal" is returned.
+   */
+  static inline MeshCullMode GetFlippedCullMode (MeshCullMode cullMode)
+  {
+    switch (cullMode)
+    {
+      case cullNormal:   return cullFlipped;
+      case cullFlipped:  return cullNormal;
+      case cullDisabled: return cullDisabled;
+    }
+    // Should not happen ...
+    return cullNormal;
+  }
+
 /**
  * Mesh render mode information. Contains the Z, mix and alpha modes to use
  * for rendering a mesh. 
- * \remarks Is separate from csCoreRenderMesh to allow preprocessing steps 
+ * \remarks Is separate from CS::CoreRenderMesh to allow preprocessing steps 
  *  to modify the mode data. 
  */
-struct csRenderMeshModes
+struct RenderMeshModes
 {
-  csRenderMeshModes ()
+  RenderMeshModes () : z_buf_mode (CS_ZBUF_NONE), mixmode (CS_FX_COPY),
+    renderPrio (-1), flipCulling (false), cullMode (CS::cullNormal),
+    alphaType (csAlphaMode::alphaNone)
   {
-    z_buf_mode = CS_ZBUF_NONE;
-    mixmode = CS_FX_COPY;
-    flipCulling = false;
-    alphaType = csAlphaMode::alphaNone;
   }
 
-  ~csRenderMeshModes () { }
+  ~RenderMeshModes () { }
 
   /// Z mode to use
   csZBufMode z_buf_mode;
 
   /// mixmode to use
   uint mixmode;
+  
+  /// Mesh render priority
+  CS::RenderPriority renderPrio;
 
-  /// Backface flipping mode
-  bool flipCulling;
+  // Deprecated in 1.3
+  CS_DEPRECATED_VAR_MSG("Use cullMode instead",
+    bool flipCulling);
+  
+  /// Mesh culling mode
+  CS::MeshCullMode cullMode;
 
   /// Alpha mode this mesh is drawn.
   csAlphaMode::AlphaType alphaType;
@@ -74,7 +107,7 @@ struct csRenderMeshModes
 /**
  * Data required by the renderer to draw a mesh.
  */
-struct csCoreRenderMesh
+struct CoreRenderMesh
 {
   /**
    * To make debugging easier we add the name of the mesh object
@@ -82,17 +115,13 @@ struct csCoreRenderMesh
    */
   const char* db_mesh_name;
 
-  csCoreRenderMesh () 
+  CoreRenderMesh () : db_mesh_name ("<unknown>"), clip_portal (0), 
+    clip_plane (0), clip_z_plane (0), do_mirror (false), indexstart (0), 
+    indexend (0)
   {
-    clip_portal = 0;
-    clip_plane = 0;
-    clip_z_plane = 0;
-    do_mirror = false;
-    indexstart = indexend = 0;
-    db_mesh_name = "<unknown>";
   }
 
-  ~csCoreRenderMesh () {}
+  ~CoreRenderMesh () {}
 
   /// Clipping parameter
   int clip_portal;
@@ -103,6 +132,7 @@ struct csCoreRenderMesh
   /// Clipping parameter
   int clip_z_plane;
 
+  // @@@ FIXME: should prolly be handled by component managing rendering
   /**
    * Mirror mode - whether the mesh should be mirrored.
    * Essentially toggles between back- and front-face culling. 
@@ -151,15 +181,13 @@ struct csCoreRenderMesh
  * Mesh data as returned by mesh plugins. Contains both the data needed for
  * rendering as well as some additional data for preprocessing.
  */
-struct csRenderMesh : public csCoreRenderMesh, public csRenderMeshModes
+struct RenderMesh : public CoreRenderMesh, public RenderMeshModes
 {
-  csRenderMesh () 
+  RenderMesh () : geometryInstance (0), portal (0)
   {
-    portal = 0;
-    geometryInstance = 0;
   }
 
-  ~csRenderMesh () {}
+  ~RenderMesh () {}
 
   /**
    * Some unique ID for the geometry used to render this mesh.
@@ -177,6 +205,11 @@ struct csRenderMesh : public csCoreRenderMesh, public csRenderMeshModes
   /// Worldspace origin of the mesh
   csVector3 worldspace_origin;
 };
+} // namespace CS
+
+typedef CS::RenderMeshModes csRenderMeshModes;
+typedef CS::CoreRenderMesh csCoreRenderMesh;
+typedef CS::RenderMesh csRenderMesh;
 
 /** @} */
 

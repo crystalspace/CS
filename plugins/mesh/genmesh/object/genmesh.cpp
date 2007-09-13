@@ -1163,6 +1163,8 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
 
       uint smMixMode = subMesh.SubMeshProxy::GetMixmode();
       meshPtr->mixmode = (smMixMode != (uint)~0) ? smMixMode : MixMode;
+      meshPtr->z_buf_mode = subMesh.SubMeshProxy::GetZMode();
+      meshPtr->renderPrio = subMesh.SubMeshProxy::GetRenderPriority();
       meshPtr->clip_portal = clip_portal;
       meshPtr->clip_plane = clip_plane;
       meshPtr->clip_z_plane = clip_z_plane;

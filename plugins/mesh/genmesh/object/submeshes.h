@@ -34,6 +34,7 @@
 #include "iengine/material.h"
 #include "igeom/trimesh.h"
 #include "imesh/genmesh.h"
+#include "ivideo/rendermesh.h"
 #include "ivideo/rndbuf.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
@@ -53,12 +54,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
 
     // Override mixmode from parent.
     uint MixMode;
+    csZBufMode zmode;
+    CS::RenderPriority renderPrio;
 
     SubMesh () : scfImplementationType (this), name (0)
     { }
     SubMesh (const SubMesh& other) : scfImplementationType (this), 
       name (other.name), index_buffer (other.index_buffer), 
-      material (other.material), MixMode (other.MixMode)
+      material (other.material), MixMode (other.MixMode), zmode (other.zmode),
+      renderPrio (other.renderPrio)
     { }
     const char* GetName() const { return name; }
 
@@ -70,6 +74,13 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     { return MixMode; }
     void SetMaterial (iMaterialWrapper* material)
     { this->material = material; }
+    csZBufMode GetZMode () const
+    { return zmode; }
+    void SetZMode (csZBufMode mode) { zmode = mode; }
+    CS::RenderPriority GetRenderPriority () const
+    { return renderPrio; }
+    void SetRenderPriority (CS::RenderPriority prio) { renderPrio = prio; }
+    void SetMixmode (uint mode) { MixMode = mode; }
   };
 
   class SubMeshesContainer
@@ -112,11 +123,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     enum
     {
       bitMaterial = 0,
-      bitMixMode
+      bitMixMode,
+      bitZMode,
+      bitRenderPrio
     };
     csRef<iMaterialWrapper> material;
     // Override mixmode from parent.
     uint MixMode;
+    csZBufMode zmode;
+    CS::RenderPriority renderPrio;
     csFlags overrideFlags;
     csRef<csRenderBufferHolder> bufferHolder;
 
@@ -137,40 +152,65 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
 
     const char* GetName() const 
     { 
-      if (parentSubMesh) return parentSubMesh->GetName();
+      if (parentSubMesh) return parentSubMesh->SubMesh::GetName();
       return 0;
     }
     iRenderBuffer* GetIndices () const
     { 
-      if (parentSubMesh) return parentSubMesh->GetIndices();
+      if (parentSubMesh) return parentSubMesh->SubMesh::GetIndices();
       return 0;
     }
     iMaterialWrapper* GetMaterial () const
     { 
       if (GetOverrideFlag (bitMaterial)) return material; 
-      return parentSubMesh->GetMaterial ();
+      return parentSubMesh->SubMesh::GetMaterial ();
     }
     virtual uint GetMixmode () const
     { 
       if (GetOverrideFlag (bitMixMode)) return MixMode; 
-      return parentSubMesh->GetMixmode ();
+      return parentSubMesh->SubMesh::GetMixmode ();
     }
     void SetMaterial (iMaterialWrapper* material)
     { 
       SetOverrideFlag (bitMaterial, material != 0);
       this->material = material; 
     }
+    csZBufMode GetZMode () const
+    { 
+      if (GetOverrideFlag (bitZMode)) return zmode; 
+      return parentSubMesh->SubMesh::GetZMode ();
+    }
+    void SetZMode (csZBufMode mode)
+    { 
+      SetOverrideFlag (bitZMode, mode != (csZBufMode)~0);
+      zmode = mode;
+    }
+    CS::RenderPriority GetRenderPriority () const
+    { 
+      if (GetOverrideFlag (bitRenderPrio)) return renderPrio;
+      return parentSubMesh->SubMesh::GetRenderPriority (); 
+    }
+    void SetRenderPriority (CS::RenderPriority prio)
+    {
+      SetOverrideFlag (bitRenderPrio, prio >= 0);
+      renderPrio = prio; 
+    }
+    void SetMixmode (uint mode)
+    {
+      SetOverrideFlag (bitMixMode, mode != (uint)~0);
+      MixMode = mode;
+    }
 
     virtual csShaderVariable* GetVariable (csStringID name) const
     {
       csShaderVariable* var = 
         CS::ShaderVariableContextImpl::GetVariable (name);
-      if (var == 0) var = parentSubMesh->GetVariable (name);
+      if (var == 0) var = parentSubMesh->SubMesh::GetVariable (name);
       return var;
     }
     virtual void PushVariables (iShaderVarStack* stacks) const
     {
-      parentSubMesh->PushVariables (stacks);
+      parentSubMesh->SubMesh::PushVariables (stacks);
       CS::ShaderVariableContextImpl::PushVariables (stacks);
     }
     virtual bool IsEmpty() const 

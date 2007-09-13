@@ -132,7 +132,7 @@ public:
   virtual void SetMeshWrapper (iMeshWrapper* lp) { logparent = lp; }
   virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
 
-  virtual csRenderMesh **GetRenderMeshes (int &num, iRenderView*, 
+  virtual CS::RenderMesh **GetRenderMeshes (int &num, iRenderView*, 
     iMovable*, uint32)
   {
     num = 0;

@@ -139,8 +139,8 @@ public:
   size_t GetNumberOfPasses()
   { return passesCount; }
   bool ActivatePass (size_t number);
-  bool SetupPass  (const csRenderMesh *mesh,
-    csRenderMeshModes& modes,
+  bool SetupPass  (const CS::RenderMesh *mesh,
+    CS::RenderMeshModes& modes,
     const iShaderVarStack* stacks);
   bool TeardownPass();
   bool DeactivatePass();

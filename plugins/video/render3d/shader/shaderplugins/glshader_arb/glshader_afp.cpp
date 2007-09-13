@@ -58,8 +58,8 @@ void csShaderGLAFP::Deactivate()
   glDisable (GL_FRAGMENT_PROGRAM_ARB);
 }
 
-void csShaderGLAFP::SetupState (const csRenderMesh* /*mesh*/, 
-                                csRenderMeshModes& /*modes*/,
+void csShaderGLAFP::SetupState (const CS::RenderMesh* /*mesh*/, 
+                                CS::RenderMeshModes& /*modes*/,
 	                        const iShaderVarStack* stacks)
 {
   size_t i;

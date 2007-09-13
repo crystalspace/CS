@@ -32,6 +32,7 @@
 #include "csgeom/vector3.h"
 
 #include "ivideo/graph3d.h"
+#include "ivideo/rendermesh.h"
 
 struct iCamera;
 struct iLightingInfo;
@@ -52,8 +53,6 @@ struct iShadowReceiver;
 struct iSharedVariable;
 struct iSceneNode;
 struct iMaterialWrapper;
-
-struct csRenderMesh;
 
 class csEllipsoid;
 class csFlags;
@@ -256,7 +255,7 @@ struct csScreenBoxResult
  */
 struct iMeshWrapper : public virtual iBase
 {
-  SCF_INTERFACE(iMeshWrapper, 2, 2, 0);
+  SCF_INTERFACE(iMeshWrapper, 2, 3, 0);
 
   /**
    * Get the iObject for this mesh object. This can be used to get the
@@ -447,17 +446,17 @@ struct iMeshWrapper : public virtual iBase
    *   using some other transparency system are rendered after that. They
    *   are usually rendered using ZTEST.
    */
-  virtual void SetRenderPriority (long rp) = 0;
+  virtual void SetRenderPriority (CS::RenderPriority rp) = 0;
   /**
    * Get the render priority.
    */
-  virtual long GetRenderPriority () const = 0;
+  virtual CS::RenderPriority GetRenderPriority () const = 0;
 
   /**
    * Same as SetRenderPriority() but this version will recursively set
    * render priority for the children too.
    */
-  virtual void SetRenderPriorityRecursive (long rp) = 0;
+  virtual void SetRenderPriorityRecursive (CS::RenderPriority rp) = 0;
 
   /**
    * Get flags for this meshwrapper. The following flags are supported:
@@ -655,23 +654,38 @@ struct iMeshWrapper : public virtual iBase
    * This list is used for special cases (like decals) where additional
    * things need to be renderered for the mesh in an abstract way.
    */
-  virtual void AddExtraRenderMesh(csRenderMesh* renderMesh, long priority, 
-          csZBufMode zBufMode) = 0;
+  virtual size_t AddExtraRenderMesh(CS::RenderMesh* renderMesh, 
+    csZBufMode zBufMode) = 0;
+  /// \deprecated Deprecated in 1.3. Pass render priority in render mesh
+  CS_DEPRECATED_METHOD_MSG("Pass render priority in render mesh")
+  virtual void AddExtraRenderMesh(CS::RenderMesh* renderMesh, 
+    CS::RenderPriority priority, csZBufMode zBufMode) = 0;
+          
+  /// Get a specific extra render mesh.
+  virtual CS::RenderMesh* GetExtraRenderMesh (size_t idx) const = 0;
+
+  /// Get number of extra render meshes.
+  virtual size_t GetExtraRenderMeshCount () const = 0;
 
   /** 
    * Gets the priority of a specific extra rendermesh.
+   * \deprecated Deprecated in 1.3. Obtain render priority from render mesh
    */
-  virtual long GetExtraRenderMeshPriority(size_t idx) const = 0;
+  CS_DEPRECATED_METHOD_MSG("Obtain render priority from render mesh")
+  virtual CS::RenderPriority GetExtraRenderMeshPriority(size_t idx) const = 0;
 
   /**
    * Gets the z-buffer mode of a specific extra rendermesh
    */
   virtual csZBufMode GetExtraRenderMeshZBufMode(size_t idx) const = 0;
 
+  //@{
   /**
    * Deletes a specific extra rendermesh
    */
-  virtual void RemoveExtraRenderMesh(csRenderMesh* renderMesh) = 0;
+  virtual void RemoveExtraRenderMesh(CS::RenderMesh* renderMesh) = 0;
+  virtual void RemoveExtraRenderMesh(size_t idx) = 0;
+  //@}
 };
 
 /**

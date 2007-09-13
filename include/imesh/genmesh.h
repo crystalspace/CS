@@ -24,6 +24,7 @@
  */ 
 
 #include "csutil/scf_interface.h"
+#include "ivideo/rendermesh.h"
 
 struct iDocumentNode;
 struct iGenMeshAnimationControl;
@@ -46,7 +47,7 @@ class csEllipsoid;
 
 struct iGeneralMeshSubMesh : public virtual iBase
 {
-  SCF_INTERFACE (iGeneralMeshSubMesh, 1, 0, 1);
+  SCF_INTERFACE (iGeneralMeshSubMesh, 1, 0, 2);
   
   /// Get the index render buffer
   virtual iRenderBuffer* GetIndices () const = 0;
@@ -62,6 +63,22 @@ struct iGeneralMeshSubMesh : public virtual iBase
 
   /// Set the material, or 0 to use default.
   virtual void SetMaterial (iMaterialWrapper* material) = 0;
+  
+  /// Get the Z buffer mode (or (csZBufMode)~0 if none was specified)
+  virtual csZBufMode GetZMode () const = 0;
+  
+  /// Set the Z buffer mode ((csZBufMode)~0 to use default)
+  virtual void SetZMode (csZBufMode mode) = 0;
+  
+  /// Get the render priority (or -1 if none was specified)
+  virtual CS::RenderPriority GetRenderPriority () const = 0;
+
+  /// Set the render priority (-1 to use default)
+  virtual void SetRenderPriority (CS::RenderPriority prio) = 0;
+
+  /// Set the mixmode (or (uint)~0 to use default)
+  virtual void SetMixmode (uint mode) = 0;
+
 };
 
 /**

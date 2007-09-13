@@ -413,7 +413,7 @@ void csMeshWrapper::SetZBufModeRecursive (csZBufMode mode)
   }
 }
 
-void csMeshWrapper::SetRenderPriorityRecursive (long rp)
+void csMeshWrapper::SetRenderPriorityRecursive (CS::RenderPriority rp)
 {
   SetRenderPriority (rp);
   const csRefArray<iSceneNode>& children = movable.GetChildren ();
@@ -426,7 +426,7 @@ void csMeshWrapper::SetRenderPriorityRecursive (long rp)
   }
 }
 
-void csMeshWrapper::SetRenderPriority (long rp)
+void csMeshWrapper::SetRenderPriority (CS::RenderPriority rp)
 {
   render_priority = rp;
 
@@ -664,7 +664,7 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
     parent = parent->GetParent ();
   }
 
-  csRenderMesh** rmeshes = meshobj->GetRenderMeshes (n, rview, &movable,
+  CS::RenderMesh** rmeshes = meshobj->GetRenderMeshes (n, rview, &movable,
   	old_ctxt != 0 ? 0 : frustum_mask);
   if (old_ctxt)
   {
@@ -674,18 +674,17 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
   return rmeshes;
 }
 
-void csMeshWrapper::AddExtraRenderMesh(csRenderMesh* renderMesh, long priority,
-        csZBufMode zBufMode)
+size_t csMeshWrapper::AddExtraRenderMesh(CS::RenderMesh* renderMesh, 
+					 csZBufMode zBufMode)
 {
   ExtraRenderMeshData data;
   extraRenderMeshes.Push(renderMesh);
 
-  data.priority = priority;
   data.zBufMode = zBufMode;
-  extraRenderMeshData.Push(data);
+  return extraRenderMeshData.Push(data);
 }
 
-csRenderMesh** csMeshWrapper::GetExtraRenderMeshes (size_t& num, 
+CS::RenderMesh** csMeshWrapper::GetExtraRenderMeshes (size_t& num, 
                     iRenderView* rview, uint32 frustum_mask)
 {
   // Here we check the CS_ENTITY_NOCLIP flag. If that flag is set
@@ -735,9 +734,14 @@ csRenderMesh** csMeshWrapper::GetExtraRenderMeshes (size_t& num,
   return extraRenderMeshes.GetArray();
 }
 
-long csMeshWrapper::GetExtraRenderMeshPriority(size_t idx) const
+CS::RenderMesh* csMeshWrapper::GetExtraRenderMesh (size_t idx) const
 {
-    return extraRenderMeshData[idx].priority;
+  return extraRenderMeshes[idx];
+}
+
+CS::RenderPriority csMeshWrapper::GetExtraRenderMeshPriority(size_t idx) const
+{
+    return extraRenderMeshes[idx]->renderPrio;
 }
 
 csZBufMode csMeshWrapper::GetExtraRenderMeshZBufMode(size_t idx) const
@@ -753,16 +757,17 @@ void csMeshWrapper::RemoveExtraRenderMesh(csRenderMesh* renderMesh)
         if (extraRenderMeshes[a] != renderMesh)
             continue;
 
-        // copy last value in list over top of the one we're removing
-        extraRenderMeshes[a] = extraRenderMeshes[len-1];
-        extraRenderMeshData[a] = extraRenderMeshData[len-1];
-
-        // remove the last one
-        extraRenderMeshes.DeleteIndexFast(len-1);
-        extraRenderMeshData.DeleteIndexFast(len-1);
+        extraRenderMeshes.DeleteIndexFast(a);
+        extraRenderMeshData.DeleteIndexFast(a);
 
         return;
     }
+}
+
+void csMeshWrapper::RemoveExtraRenderMesh(size_t index)
+{
+  extraRenderMeshes.DeleteIndexFast(index);
+  extraRenderMeshData.DeleteIndexFast(index);
 }
 
 //----- Min/Max Distance Range ----------------------------------------------

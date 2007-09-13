@@ -122,7 +122,6 @@ struct LSIAndDist
 
 struct ExtraRenderMeshData
 {
-    long            priority;
     csZBufMode      zBufMode;
 };
 
@@ -163,7 +162,7 @@ protected:
    * later. There are a few predefined slots which the application is
    * free to use or not.
    */
-  long render_priority;
+  CS::RenderPriority render_priority;
 
   /// For NR: Cached value from DrawTest
   bool draw_test;
@@ -375,11 +374,11 @@ public:
   }
 
   /// Set the render priority for this object.
-  virtual void SetRenderPriority (long rp);
+  virtual void SetRenderPriority (CS::RenderPriority rp);
   /// Set the render priority for this object and children.
-  virtual void SetRenderPriorityRecursive (long rp);
+  virtual void SetRenderPriorityRecursive (CS::RenderPriority rp);
   /// Get the render priority for this object.
-  virtual long GetRenderPriority () const
+  virtual CS::RenderPriority GetRenderPriority () const
   {
     return render_priority;
   }
@@ -449,41 +448,53 @@ public:
   /// Return true if there is a parent mesh that has static lod.
   bool SomeParentHasStaticLOD () const;
 
-  /**
-   * Draw the zpass for the object.  If this object doesn't use lighting
-   * then it can be drawn fully here.
-   */
-  virtual csRenderMesh** GetRenderMeshes (int& num, iRenderView* rview,
+  virtual CS::RenderMesh** GetRenderMeshes (int& num, iRenderView* rview,
   	uint32 frustum_mask);
   /**
    * Adds a render mesh to the list of extra render meshes.
    * This list is used for special cases (like decals) where additional
    * things need to be renderered for the mesh in an abstract way.
    */
-  virtual void AddExtraRenderMesh(csRenderMesh* renderMesh, long priority, 
+  virtual size_t AddExtraRenderMesh(CS::RenderMesh* renderMesh, 
           csZBufMode zBufMode);
+  virtual void AddExtraRenderMesh(CS::RenderMesh* renderMesh, 
+    CS::RenderPriority priority, csZBufMode zBufMode)
+  {
+    renderMesh->renderPrio = priority;
+    AddExtraRenderMesh (renderMesh, zBufMode);
+  }
 
   /**
    * Grabs any additional render meshes this mesh might have on top
    * of the normal rendermeshes through GetRenderMeshes.
    */
-  virtual csRenderMesh** GetExtraRenderMeshes (size_t& num, iRenderView* rview,
+  virtual CS::RenderMesh** GetExtraRenderMeshes (size_t& num, iRenderView* rview,
     uint32 frustum_mask);
+
+  /// Get a specific extra render mesh.
+  virtual CS::RenderMesh* GetExtraRenderMesh (size_t idx) const;
+  
+  /// Get number of extra render meshes.
+  virtual size_t GetExtraRenderMeshCount () const
+  { return extraRenderMeshes.GetSize(); }
 
   /** 
    * Gets the priority of a specific extra rendermesh.
    */
-  virtual long GetExtraRenderMeshPriority(size_t idx) const;
+  virtual CS::RenderPriority GetExtraRenderMeshPriority(size_t idx) const;
 
   /**
    * Gets the z-buffer mode of a specific extra rendermesh
    */
   virtual csZBufMode GetExtraRenderMeshZBufMode(size_t idx) const;
 
+  //@{
   /**
    * Deletes a specific extra rendermesh
    */
-  virtual void RemoveExtraRenderMesh(csRenderMesh* renderMesh);
+  virtual void RemoveExtraRenderMesh(CS::RenderMesh* renderMesh);
+  virtual void RemoveExtraRenderMesh(size_t idx);
+  //@}
 
   /**
    * Do a hard transform of this object.

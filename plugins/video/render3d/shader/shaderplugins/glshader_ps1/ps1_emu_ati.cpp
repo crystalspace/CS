@@ -52,8 +52,8 @@ void csShaderGLPS1_ATI::Deactivate()
   glDisable(GL_FRAGMENT_SHADER_ATI);
 }
 
-void csShaderGLPS1_ATI::SetupState (const csRenderMesh* /*mesh*/, 
-                                    csRenderMeshModes& /*modes*/,
+void csShaderGLPS1_ATI::SetupState (const CS::RenderMesh* /*mesh*/, 
+                                    CS::RenderMeshModes& /*modes*/,
 	                            const iShaderVarStack* stacks)
 {
   csGLExtensionManager *ext = shaderPlug->ext;

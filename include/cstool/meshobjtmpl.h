@@ -121,7 +121,7 @@ public:
    * See imesh/object.h for specification. The default implementation
    * does nothing and always returns 0.
    */
-  virtual csRenderMesh** GetRenderMeshes (int& num, iRenderView*, iMovable*,
+  virtual CS::RenderMesh** GetRenderMeshes (int& num, iRenderView*, iMovable*,
   	uint32)
   {
     num = 0;

@@ -76,6 +76,7 @@ bool csGeneralFactoryLoader::Initialize (iObjectRegistry* object_reg)
   csGeneralFactoryLoader::object_reg = object_reg;
   reporter = csQueryRegistry<iReporter> (object_reg);
   synldr = csQueryRegistry<iSyntaxService> (object_reg);
+  engine = csQueryRegistry<iEngine> (object_reg);
 
   InitTokenTable (xmltokens);
   return true;
@@ -88,8 +89,9 @@ bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
   if(!node) return false;
 
   csRef<iMaterialWrapper> material;
-  bool do_mixmode = false;
-  uint mixmode = CS_FX_COPY;
+  uint mixmode = (uint)~0;
+  csZBufMode zmode = (csZBufMode)~0;
+  CS::RenderPriority renderPrio = -1;
   csRef<iRenderBuffer> indexbuffer;
   csRefArray<csShaderVariable> shadervars;
 
@@ -105,7 +107,6 @@ bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
     case XMLTOKEN_MIXMODE:
       if (!synldr->ParseMixmode (child, mixmode))
         return 0;
-      do_mixmode = true;
       break;
     case XMLTOKEN_MATERIAL:
       {
@@ -141,13 +142,19 @@ bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
         shadervars.Push (sv);
         break;
       }
+    case XMLTOKEN_PRIORITY:
+      renderPrio = engine->GetRenderPriority (child->GetContentsValue ());
+      break;
     default:
+      if (synldr->ParseZMode (child, zmode)) break;
       synldr->ReportBadToken (child);
     }
   }
 
   iGeneralMeshSubMesh* submesh = factstate->AddSubMesh (indexbuffer, material, 
-    node->GetAttributeValue ("name"), do_mixmode ? mixmode : (uint)~0);
+    node->GetAttributeValue ("name"), mixmode);
+  submesh->SetZMode (zmode);
+  submesh->SetRenderPriority (renderPrio);
   csRef<iShaderVariableContext> svc = 
     scfQueryInterface<iShaderVariableContext> (submesh);
   for (size_t i = 0; i < shadervars.GetSize(); i++)
@@ -773,11 +780,12 @@ bool csGeneralFactorySaver::Initialize (iObjectRegistry* object_reg)
   csGeneralFactorySaver::object_reg = object_reg;
   reporter = csQueryRegistry<iReporter> (object_reg);
   synldr = csQueryRegistry<iSyntaxService> (object_reg);
+  engine = csQueryRegistry<iEngine> (object_reg);
   return true;
 }
 
-static void WriteSubMesh (iSyntaxService* synldr, iGeneralMeshSubMesh* submesh, 
-                          iDocumentNode* submeshNode)
+void csGeneralFactorySaver::WriteSubMesh (iGeneralMeshSubMesh* submesh, 
+                                          iDocumentNode* submeshNode)
 {
   const char* submeshName = submesh->GetName ();
   if (submeshName != 0)
@@ -801,6 +809,23 @@ static void WriteSubMesh (iSyntaxService* synldr, iGeneralMeshSubMesh* submesh,
       submeshNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
     mixmodeNode->SetValue ("mixmode");
     synldr->WriteMixmode (mixmodeNode, mixmode, true);
+  }
+  
+  csZBufMode zmode = submesh->GetZMode ();
+  if (zmode != (csZBufMode)~0)
+  {
+    synldr->WriteZMode (submeshNode, zmode, false);
+  }
+  
+  int renderPrio = submesh->GetRenderPriority ();
+  if (renderPrio >= 0)
+  {
+    csRef<iDocumentNode> prioNode = 
+      submeshNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+    prioNode->SetValue ("priority");
+    csRef<iDocumentNode> prioContents =
+      prioNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+    prioContents->SetValue (engine->GetRenderPriorityName (renderPrio));
   }
 
   csRef<iDocumentNode> indexBufferNode = 
@@ -998,7 +1023,7 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
         submeshNode->SetValue("submesh");
 
         iGeneralMeshSubMesh* submesh = gfact->GetSubMesh (s);
-        WriteSubMesh (synldr, submesh, submeshNode);
+        WriteSubMesh (submesh, submeshNode);
       }
     }
 
@@ -1034,6 +1059,7 @@ bool csGeneralMeshLoader::Initialize (iObjectRegistry* object_reg)
   csGeneralMeshLoader::object_reg = object_reg;
   reporter = csQueryRegistry<iReporter> (object_reg);
   synldr = csQueryRegistry<iSyntaxService> (object_reg);
+  engine = csQueryRegistry<iEngine> (object_reg);
 
   InitTokenTable (xmltokens);
   return true;
@@ -1104,6 +1130,9 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
 
   csRef<iShaderVariableContext> svc = 
     scfQueryInterface<iShaderVariableContext> (subMesh);
+  uint mixmode = (uint)~0;
+  csZBufMode zmode = (csZBufMode)~0;
+  CS::RenderPriority renderPrio = -1;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -1147,10 +1176,24 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
         svc->AddVariable (sv);
         break;
       }
+    case XMLTOKEN_MIXMODE:
+      if (!synldr->ParseMixmode (child, mixmode)) return false;
+      break;
+    case XMLTOKEN_PRIORITY:
+      renderPrio = engine->GetRenderPriority (child->GetContentsValue ());
+      break;
     default:
+      if (synldr->ParseZMode (child, zmode)) break;
       synldr->ReportBadToken (child);
     }
   }
+  
+  if (mixmode != (uint)~0)
+    subMesh->SetMixmode (mixmode);
+  if (renderPrio >= 0)
+    subMesh->SetRenderPriority (renderPrio);
+  if (zmode != (csZBufMode)~0)
+    subMesh->SetZMode (zmode);
 
   return true;
 }
@@ -1353,6 +1396,7 @@ bool csGeneralMeshSaver::Initialize (iObjectRegistry* object_reg)
   csGeneralMeshSaver::object_reg = object_reg;
   reporter = csQueryRegistry<iReporter> (object_reg);
   synldr = csQueryRegistry<iSyntaxService> (object_reg);
+  engine = csQueryRegistry<iEngine> (object_reg);
   return true;
 }
 
@@ -1454,10 +1498,16 @@ bool csGeneralMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
             svc->GetShaderVariables ();
 
           iMaterialWrapper* smMaterial = objSubMesh->GetMaterial();
+          uint mixmode = objSubMesh->GetMixmode ();
+          csZBufMode zmode = objSubMesh->GetZMode ();
+	  int renderPrio = objSubMesh->GetRenderPriority ();
           /* @@@ FIXME: shadervars.IsEmpty() only works for same reasons as 
            * below */
           bool interesting = !shadervars.IsEmpty() 
-            || (smMaterial != factSubMesh->GetMaterial());
+            || (smMaterial != factSubMesh->GetMaterial())
+            || (mixmode != factSubMesh->GetMixmode())
+            || (zmode != factSubMesh->GetZMode())
+            || (renderPrio != factSubMesh->GetRenderPriority());
 
           if (interesting)
           {
@@ -1477,6 +1527,29 @@ bool csGeneralMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
                 smMaterial->QueryObject()->GetName());
             }
 
+	    if (mixmode != (uint)~0)
+	    {
+	      csRef<iDocumentNode> mixmodeNode = 
+		submeshNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	      mixmodeNode->SetValue ("mixmode");
+	      synldr->WriteMixmode (mixmodeNode, mixmode, true);
+	    }
+	    
+	    if (zmode != (csZBufMode)~0)
+	    {
+	      synldr->WriteZMode (submeshNode, zmode, false);
+	    }
+	    
+	    if (renderPrio >= 0)
+	    {
+	      csRef<iDocumentNode> prioNode = 
+		submeshNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	      prioNode->SetValue ("priority");
+	      csRef<iDocumentNode> prioContents =
+		prioNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+	      prioContents->SetValue (engine->GetRenderPriorityName (renderPrio));
+	    }
+	  
             /* @@@ FIXME: This loop only works b/c GetShaderVariables() does 
              * not return parent's SVs. Once it does, this code needs to 
              * change, since only really the different SVs should be written 

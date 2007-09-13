@@ -1242,6 +1242,8 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
   else
     delayClearFlags = clearMask;
 
+  statecache->SetCullFace (GL_FRONT);
+
   /* Note: this function relies on the canvas and/or the R2T backend to setup
    * matrices etc. So be careful when changing stuff. */
 
@@ -1803,17 +1805,29 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     mirrorflag = !mymesh->do_mirror;
   else
     mirrorflag = mymesh->do_mirror;
-
-  // Flip culling if shader wants it
+    
   if (modes.flipCulling)
     mirrorflag = !mirrorflag;
-
-  // Flip face culling if we do mirroring
+    
   GLenum cullFace;
   statecache->GetCullFace (cullFace);
+    
+  CS::MeshCullMode cullMode = modes.cullMode;
+  // Flip face culling if we do mirroring
   if (mirrorflag)
+    cullMode = CS::GetFlippedCullMode (cullMode);
+  
+  if (cullMode == CS::cullDisabled)
   {
-    statecache->SetCullFace ((cullFace == GL_FRONT) ? GL_BACK : GL_FRONT);
+    statecache->Disable_GL_CULL_FACE ();
+  }
+  else
+  {
+    statecache->Enable_GL_CULL_FACE ();
+    
+    // Flip culling if shader wants it
+    if (cullMode == CS::cullFlipped)
+      statecache->SetCullFace ((cullFace == GL_FRONT) ? GL_BACK : GL_FRONT);
   }
 
   const uint mixmode = modes.mixmode;
@@ -1867,7 +1881,8 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     glPopMatrix ();
   //indexbuf->RenderRelease ();
   RenderRelease (iIndexbuf);
-  statecache->SetCullFace (cullFace);
+  // Restore cull mode
+  if (cullMode == CS::cullFlipped) statecache->SetCullFace (cullFace);
   //statecache->Disable_GL_POLYGON_OFFSET_FILL ();
 }
 

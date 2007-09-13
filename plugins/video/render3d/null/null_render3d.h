@@ -118,8 +118,8 @@ public:
   {
   }
   void SetTextureState (int* units, iTextureHandle** textures, int count);
-  void DrawMesh (const csCoreRenderMesh* mymesh,
-    const csRenderMeshModes& modes,
+  void DrawMesh (const CS::CoreRenderMesh* mymesh,
+    const CS::RenderMeshModes& modes,
     const iShaderVarStack* stacks);
   void SetWriteMask (bool red, bool green, bool blue, bool alpha);
   void GetWriteMask (bool& red, bool& green, bool& blue, bool& alpha) const;
