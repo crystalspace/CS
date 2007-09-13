@@ -1,5 +1,8 @@
 1.2 branch log.
 
+13-Sep-2007
+        - Mike Gist merged r27635 into 1.2 (fix for font corruption with
+          Mesa 6.5.2).
 7-Sep-2007
 	- Jorrit reverted r27161 (quotes for javac detection). This fixes
 	  both #377 and #378.
