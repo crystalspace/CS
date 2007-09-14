@@ -11,6 +11,10 @@ chronological order.
 	  Also fixed a bug where the "before" setting would always overwrite
 	  the "after" one if specified last.
 	- res moved RenderMesh to the CS::Graphics namespace.
+	- Eric Sunshine added "authorship" attribution for Frank and Marten to
+	  the CS manual, and removed copyright notices for a couple people
+	  whose work is no longer present in the manual. Also fixed a couple
+	  Texinfo mark-up errors in perl.txi.
 13-Sep-2007
 	- res added a macro to deprecate struct members and variables
 	  (CS_DEPRECATED_VAR and CS_DEPRECATED_VAR_MSG).
