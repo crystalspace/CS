@@ -55,7 +55,7 @@ public:
 
   virtual size_t GetTicket (const CS::Graphics::RenderMeshModes&, 
     const csShaderVariableStack&) { return 0; }
-  virtual size_t GetTicket (const csRenderMeshModes& modes,
+  virtual size_t GetTicket (const CS::Graphics::RenderMeshModes& modes,
     csShaderVariable** stacks)
   {
     return 0;
