@@ -42,7 +42,7 @@ csRenderMeshList::~csRenderMeshList ()
 }
 
 void csRenderMeshList::AddRenderMeshes (csRenderMesh** meshes, int num,
-					CS::RenderPriority defaultRenderPriority, 
+					CS::Graphics::RenderPriority defaultRenderPriority, 
 					csZBufMode z_buf_mode, 
 					iMeshWrapper* mesh)
 {
@@ -50,7 +50,7 @@ void csRenderMeshList::AddRenderMeshes (csRenderMesh** meshes, int num,
 
   for (int i = 0; i < num; ++i)
   {
-    CS::RenderPriority renderPriority = meshes[i]->renderPrio;
+    CS::Graphics::RenderPriority renderPriority = meshes[i]->renderPrio;
     if (renderPriority < 0) renderPriority = defaultRenderPriority;
   
     //check if we have rp or need to add it

@@ -130,7 +130,7 @@ public:
   // ------------ iMeshObject implementation ------------
 
   virtual iMeshObjectFactory* GetFactory () const;
-  virtual CS::RenderMesh** GetRenderMeshes (int& num, iRenderView* rview, 
+  virtual CS::Graphics::RenderMesh** GetRenderMeshes (int& num, iRenderView* rview, 
     iMovable* movable, uint32 frustum_mask);
 
   virtual bool HitBeamOutline (const csVector3& start,

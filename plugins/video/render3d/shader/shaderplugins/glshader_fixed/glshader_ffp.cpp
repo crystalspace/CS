@@ -753,8 +753,8 @@ void csGLShaderFFP::Deactivate()
 
 static const csVector4 defVector (0.0f, 0.0f, 0.0f, 1.0f);
 
-void csGLShaderFFP::SetupState (const CS::RenderMesh* /*mesh*/, 
-                                CS::RenderMeshModes& /*modes*/,
+void csGLShaderFFP::SetupState (const CS::Graphics::RenderMesh* /*mesh*/, 
+                                CS::Graphics::RenderMeshModes& /*modes*/,
                                 const iShaderVarStack* stacks)
 {
   if (fog.mode != CS_FOG_MODE_NONE)

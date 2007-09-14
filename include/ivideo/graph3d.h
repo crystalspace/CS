@@ -57,8 +57,11 @@ class csVector4;
 
 namespace CS
 {
-  struct CoreRenderMesh;
-  struct RenderMeshModes;
+  namespace Graphics
+  {
+    struct CoreRenderMesh;
+    struct RenderMeshModes;
+  } // namespace Graphics
 } // namespace CS
 class csRenderBufferHolder;
 
@@ -828,8 +831,8 @@ struct iGraphics3D : public virtual iBase
   virtual void Print (csRect const* area) = 0;
 
   /// Drawroutine. Only way to draw stuff
-  virtual void DrawMesh (const CS::CoreRenderMesh* mymesh,
-                         const CS::RenderMeshModes& modes,
+  virtual void DrawMesh (const CS::Graphics::CoreRenderMesh* mymesh,
+                         const CS::Graphics::RenderMeshModes& modes,
                          const iShaderVarStack* stacks) = 0;
   /**
   * Draw a csSimpleRenderMesh on the screen.

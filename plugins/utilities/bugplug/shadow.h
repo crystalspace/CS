@@ -120,7 +120,7 @@ public:
   virtual iMeshObjectFactory* GetFactory () const { return 0; }
   virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> Clone () { return 0; }
-  virtual CS::RenderMesh** GetRenderMeshes (int& n, iRenderView* rview, 
+  virtual CS::Graphics::RenderMesh** GetRenderMeshes (int& n, iRenderView* rview, 
     iMovable* movable, uint32);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback*) { }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const { return 0; }

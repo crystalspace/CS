@@ -264,7 +264,7 @@ public:
   csPolygonRenderer (csThingObjectType* parent);
   virtual ~csPolygonRenderer ();
 
-  void PrepareRenderMesh (CS::RenderMesh& mesh);
+  void PrepareRenderMesh (CS::Graphics::RenderMesh& mesh);
   void SetupBufferHolder (csThing* instance,
     csRenderBufferHolder* holder, bool lit);
   

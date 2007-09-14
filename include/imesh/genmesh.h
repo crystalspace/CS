@@ -71,10 +71,10 @@ struct iGeneralMeshSubMesh : public virtual iBase
   virtual void SetZMode (csZBufMode mode) = 0;
   
   /// Get the render priority (or -1 if none was specified)
-  virtual CS::RenderPriority GetRenderPriority () const = 0;
+  virtual CS::Graphics::RenderPriority GetRenderPriority () const = 0;
 
   /// Set the render priority (-1 to use default)
-  virtual void SetRenderPriority (CS::RenderPriority prio) = 0;
+  virtual void SetRenderPriority (CS::Graphics::RenderPriority prio) = 0;
 
   /// Set the mixmode (or (uint)~0 to use default)
   virtual void SetMixmode (uint mode) = 0;

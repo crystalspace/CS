@@ -91,7 +91,7 @@ bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
   csRef<iMaterialWrapper> material;
   uint mixmode = (uint)~0;
   csZBufMode zmode = (csZBufMode)~0;
-  CS::RenderPriority renderPrio = -1;
+  CS::Graphics::RenderPriority renderPrio = -1;
   csRef<iRenderBuffer> indexbuffer;
   csRefArray<csShaderVariable> shadervars;
 
@@ -1132,7 +1132,7 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
     scfQueryInterface<iShaderVariableContext> (subMesh);
   uint mixmode = (uint)~0;
   csZBufMode zmode = (csZBufMode)~0;
-  CS::RenderPriority renderPrio = -1;
+  CS::Graphics::RenderPriority renderPrio = -1;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())

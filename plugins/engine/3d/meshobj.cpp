@@ -413,7 +413,7 @@ void csMeshWrapper::SetZBufModeRecursive (csZBufMode mode)
   }
 }
 
-void csMeshWrapper::SetRenderPriorityRecursive (CS::RenderPriority rp)
+void csMeshWrapper::SetRenderPriorityRecursive (CS::Graphics::RenderPriority rp)
 {
   SetRenderPriority (rp);
   const csRefArray<iSceneNode>& children = movable.GetChildren ();
@@ -426,7 +426,7 @@ void csMeshWrapper::SetRenderPriorityRecursive (CS::RenderPriority rp)
   }
 }
 
-void csMeshWrapper::SetRenderPriority (CS::RenderPriority rp)
+void csMeshWrapper::SetRenderPriority (CS::Graphics::RenderPriority rp)
 {
   render_priority = rp;
 
@@ -664,7 +664,7 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
     parent = parent->GetParent ();
   }
 
-  CS::RenderMesh** rmeshes = meshobj->GetRenderMeshes (n, rview, &movable,
+  CS::Graphics::RenderMesh** rmeshes = meshobj->GetRenderMeshes (n, rview, &movable,
   	old_ctxt != 0 ? 0 : frustum_mask);
   if (old_ctxt)
   {
@@ -674,7 +674,7 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
   return rmeshes;
 }
 
-size_t csMeshWrapper::AddExtraRenderMesh(CS::RenderMesh* renderMesh, 
+size_t csMeshWrapper::AddExtraRenderMesh(CS::Graphics::RenderMesh* renderMesh, 
 					 csZBufMode zBufMode)
 {
   ExtraRenderMeshData data;
@@ -684,7 +684,7 @@ size_t csMeshWrapper::AddExtraRenderMesh(CS::RenderMesh* renderMesh,
   return extraRenderMeshData.Push(data);
 }
 
-CS::RenderMesh** csMeshWrapper::GetExtraRenderMeshes (size_t& num, 
+CS::Graphics::RenderMesh** csMeshWrapper::GetExtraRenderMeshes (size_t& num, 
                     iRenderView* rview, uint32 frustum_mask)
 {
   // Here we check the CS_ENTITY_NOCLIP flag. If that flag is set
@@ -734,12 +734,12 @@ CS::RenderMesh** csMeshWrapper::GetExtraRenderMeshes (size_t& num,
   return extraRenderMeshes.GetArray();
 }
 
-CS::RenderMesh* csMeshWrapper::GetExtraRenderMesh (size_t idx) const
+CS::Graphics::RenderMesh* csMeshWrapper::GetExtraRenderMesh (size_t idx) const
 {
   return extraRenderMeshes[idx];
 }
 
-CS::RenderPriority csMeshWrapper::GetExtraRenderMeshPriority(size_t idx) const
+CS::Graphics::RenderPriority csMeshWrapper::GetExtraRenderMeshPriority(size_t idx) const
 {
     return extraRenderMeshes[idx]->renderPrio;
 }

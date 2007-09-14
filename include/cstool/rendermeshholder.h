@@ -30,7 +30,10 @@
 
 namespace CS
 {
-  struct RenderMesh;
+  namespace Graphics
+  {
+    struct RenderMesh;
+  }
 }
 
 /**
@@ -42,7 +45,7 @@ class CS_CRYSTALSPACE_EXPORT csRenderMeshHolder
 {
   struct CS_CRYSTALSPACE_EXPORT csRenderMeshPtr
   {
-    CS::RenderMesh* ptr;
+    CS::Graphics::RenderMesh* ptr;
 
     csRenderMeshPtr ();
     csRenderMeshPtr (csRenderMeshPtr const& other);
@@ -58,7 +61,7 @@ public:
    * \param frameNumber Current frame number - used to determine unused 
    *  meshes.
    */
-  CS::RenderMesh*& GetUnusedMesh (bool& created, uint frameNumber);
+  CS::Graphics::RenderMesh*& GetUnusedMesh (bool& created, uint frameNumber);
 };
 
 #endif // __CS_CSTOOL_RENDERMESHHOLDER_H__

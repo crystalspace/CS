@@ -39,6 +39,9 @@ struct iPortalContainer;
 
 namespace CS
 {
+namespace Graphics
+{
+  
   typedef int RenderPriority;
   
   enum MeshCullMode
@@ -68,13 +71,13 @@ namespace CS
 /**
  * Mesh render mode information. Contains the Z, mix and alpha modes to use
  * for rendering a mesh. 
- * \remarks Is separate from CS::CoreRenderMesh to allow preprocessing steps 
+ * \remarks Is separate from CS::Graphics::CoreRenderMesh to allow preprocessing steps 
  *  to modify the mode data. 
  */
 struct RenderMeshModes
 {
   RenderMeshModes () : z_buf_mode (CS_ZBUF_NONE), mixmode (CS_FX_COPY),
-    renderPrio (-1), flipCulling (false), cullMode (CS::cullNormal),
+    renderPrio (-1), flipCulling (false), cullMode (cullNormal),
     alphaType (csAlphaMode::alphaNone)
   {
   }
@@ -88,14 +91,14 @@ struct RenderMeshModes
   uint mixmode;
   
   /// Mesh render priority
-  CS::RenderPriority renderPrio;
+  RenderPriority renderPrio;
 
   // Deprecated in 1.3
   CS_DEPRECATED_VAR_MSG("Use cullMode instead",
     bool flipCulling);
   
   /// Mesh culling mode
-  CS::MeshCullMode cullMode;
+  MeshCullMode cullMode;
 
   /// Alpha mode this mesh is drawn.
   csAlphaMode::AlphaType alphaType;
@@ -205,11 +208,12 @@ struct RenderMesh : public CoreRenderMesh, public RenderMeshModes
   /// Worldspace origin of the mesh
   csVector3 worldspace_origin;
 };
+} // namespace Graphics
 } // namespace CS
 
-typedef CS::RenderMeshModes csRenderMeshModes;
-typedef CS::CoreRenderMesh csCoreRenderMesh;
-typedef CS::RenderMesh csRenderMesh;
+typedef CS::Graphics::RenderMeshModes csRenderMeshModes;
+typedef CS::Graphics::CoreRenderMesh csCoreRenderMesh;
+typedef CS::Graphics::RenderMesh csRenderMesh;
 
 /** @} */
 

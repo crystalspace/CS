@@ -446,17 +446,17 @@ struct iMeshWrapper : public virtual iBase
    *   using some other transparency system are rendered after that. They
    *   are usually rendered using ZTEST.
    */
-  virtual void SetRenderPriority (CS::RenderPriority rp) = 0;
+  virtual void SetRenderPriority (CS::Graphics::RenderPriority rp) = 0;
   /**
    * Get the render priority.
    */
-  virtual CS::RenderPriority GetRenderPriority () const = 0;
+  virtual CS::Graphics::RenderPriority GetRenderPriority () const = 0;
 
   /**
    * Same as SetRenderPriority() but this version will recursively set
    * render priority for the children too.
    */
-  virtual void SetRenderPriorityRecursive (CS::RenderPriority rp) = 0;
+  virtual void SetRenderPriorityRecursive (CS::Graphics::RenderPriority rp) = 0;
 
   /**
    * Get flags for this meshwrapper. The following flags are supported:
@@ -654,15 +654,15 @@ struct iMeshWrapper : public virtual iBase
    * This list is used for special cases (like decals) where additional
    * things need to be renderered for the mesh in an abstract way.
    */
-  virtual size_t AddExtraRenderMesh(CS::RenderMesh* renderMesh, 
+  virtual size_t AddExtraRenderMesh(CS::Graphics::RenderMesh* renderMesh, 
     csZBufMode zBufMode) = 0;
   /// \deprecated Deprecated in 1.3. Pass render priority in render mesh
   CS_DEPRECATED_METHOD_MSG("Pass render priority in render mesh")
-  virtual void AddExtraRenderMesh(CS::RenderMesh* renderMesh, 
-    CS::RenderPriority priority, csZBufMode zBufMode) = 0;
+  virtual void AddExtraRenderMesh(CS::Graphics::RenderMesh* renderMesh, 
+    CS::Graphics::RenderPriority priority, csZBufMode zBufMode) = 0;
           
   /// Get a specific extra render mesh.
-  virtual CS::RenderMesh* GetExtraRenderMesh (size_t idx) const = 0;
+  virtual CS::Graphics::RenderMesh* GetExtraRenderMesh (size_t idx) const = 0;
 
   /// Get number of extra render meshes.
   virtual size_t GetExtraRenderMeshCount () const = 0;
@@ -672,7 +672,7 @@ struct iMeshWrapper : public virtual iBase
    * \deprecated Deprecated in 1.3. Obtain render priority from render mesh
    */
   CS_DEPRECATED_METHOD_MSG("Obtain render priority from render mesh")
-  virtual CS::RenderPriority GetExtraRenderMeshPriority(size_t idx) const = 0;
+  virtual CS::Graphics::RenderPriority GetExtraRenderMeshPriority(size_t idx) const = 0;
 
   /**
    * Gets the z-buffer mode of a specific extra rendermesh
@@ -683,7 +683,7 @@ struct iMeshWrapper : public virtual iBase
   /**
    * Deletes a specific extra rendermesh
    */
-  virtual void RemoveExtraRenderMesh(CS::RenderMesh* renderMesh) = 0;
+  virtual void RemoveExtraRenderMesh(CS::Graphics::RenderMesh* renderMesh) = 0;
   virtual void RemoveExtraRenderMesh(size_t idx) = 0;
   //@}
 };

@@ -376,7 +376,7 @@ struct iTerrainRenderer : public virtual iBase
    *
    * \return array of render meshes
    */
-  virtual CS::RenderMesh** GetRenderMeshes (int& n, iRenderView* rview,
+  virtual CS::Graphics::RenderMesh** GetRenderMeshes (int& n, iRenderView* rview,
                                    iMovable* movable, uint32 frustum_mask,
                                    const csArray<iTerrainCell*> cells) = 0;
 

@@ -58,8 +58,8 @@ public:
   /**
    * Add a new set of rendermeshes to the lists
    */
-  void AddRenderMeshes (CS::RenderMesh** meshes, int num, 
-    CS::RenderPriority defaultRenderPriority,
+  void AddRenderMeshes (CS::Graphics::RenderMesh** meshes, int num, 
+    CS::Graphics::RenderPriority defaultRenderPriority,
     csZBufMode z_buf_mode, iMeshWrapper* mesh);
 
   /**
@@ -71,7 +71,7 @@ public:
   /**
    * After sorting the meshes fetch them with this function.
    */
-  void GetSortedMeshes (CS::RenderMesh** meshes, iMeshWrapper** imeshes);
+  void GetSortedMeshes (CS::Graphics::RenderMesh** meshes, iMeshWrapper** imeshes);
 
   /**
    * Empty the meshlist. It will still hold the list of renderpriorities.
@@ -81,10 +81,10 @@ public:
 private:
   struct meshListEntry
   {
-    CS::RenderMesh* rm;
+    CS::Graphics::RenderMesh* rm;
     iMeshWrapper* mesh;
 
-    meshListEntry (CS::RenderMesh* mesh, iMeshWrapper* imesh) 
+    meshListEntry (CS::Graphics::RenderMesh* mesh, iMeshWrapper* imesh) 
       : rm(mesh), mesh(imesh) {}
   };
 

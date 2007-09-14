@@ -73,8 +73,8 @@ struct iShaderProgram : public virtual iBase
   virtual void Deactivate() = 0;
 
   /// Setup states needed for proper operation of the shaderprogram
-  virtual void SetupState (const CS::RenderMesh* mesh, 
-                           CS::RenderMeshModes& modes,
+  virtual void SetupState (const CS::Graphics::RenderMesh* mesh, 
+                           CS::Graphics::RenderMeshModes& modes,
                            const iShaderVarStack* stacks) = 0;
 
   /// Reset states to original

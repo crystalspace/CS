@@ -55,7 +55,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     // Override mixmode from parent.
     uint MixMode;
     csZBufMode zmode;
-    CS::RenderPriority renderPrio;
+    CS::Graphics::RenderPriority renderPrio;
 
     SubMesh () : scfImplementationType (this), name (0)
     { }
@@ -77,9 +77,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     csZBufMode GetZMode () const
     { return zmode; }
     void SetZMode (csZBufMode mode) { zmode = mode; }
-    CS::RenderPriority GetRenderPriority () const
+    CS::Graphics::RenderPriority GetRenderPriority () const
     { return renderPrio; }
-    void SetRenderPriority (CS::RenderPriority prio) { renderPrio = prio; }
+    void SetRenderPriority (CS::Graphics::RenderPriority prio) { renderPrio = prio; }
     void SetMixmode (uint mode) { MixMode = mode; }
   };
 
@@ -131,7 +131,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     // Override mixmode from parent.
     uint MixMode;
     csZBufMode zmode;
-    CS::RenderPriority renderPrio;
+    CS::Graphics::RenderPriority renderPrio;
     csFlags overrideFlags;
     csRef<csRenderBufferHolder> bufferHolder;
 
@@ -185,12 +185,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
       SetOverrideFlag (bitZMode, mode != (csZBufMode)~0);
       zmode = mode;
     }
-    CS::RenderPriority GetRenderPriority () const
+    CS::Graphics::RenderPriority GetRenderPriority () const
     { 
       if (GetOverrideFlag (bitRenderPrio)) return renderPrio;
       return parentSubMesh->SubMesh::GetRenderPriority (); 
     }
-    void SetRenderPriority (CS::RenderPriority prio)
+    void SetRenderPriority (CS::Graphics::RenderPriority prio)
     {
       SetOverrideFlag (bitRenderPrio, prio >= 0);
       renderPrio = prio; 

@@ -1812,12 +1812,12 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   GLenum cullFace;
   statecache->GetCullFace (cullFace);
     
-  CS::MeshCullMode cullMode = modes.cullMode;
+  CS::Graphics::MeshCullMode cullMode = modes.cullMode;
   // Flip face culling if we do mirroring
   if (mirrorflag)
-    cullMode = CS::GetFlippedCullMode (cullMode);
+    cullMode = CS::Graphics::GetFlippedCullMode (cullMode);
   
-  if (cullMode == CS::cullDisabled)
+  if (cullMode == CS::Graphics::cullDisabled)
   {
     statecache->Disable_GL_CULL_FACE ();
   }
@@ -1826,7 +1826,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     statecache->Enable_GL_CULL_FACE ();
     
     // Flip culling if shader wants it
-    if (cullMode == CS::cullFlipped)
+    if (cullMode == CS::Graphics::cullFlipped)
       statecache->SetCullFace ((cullFace == GL_FRONT) ? GL_BACK : GL_FRONT);
   }
 
@@ -1882,7 +1882,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   //indexbuf->RenderRelease ();
   RenderRelease (iIndexbuf);
   // Restore cull mode
-  if (cullMode == CS::cullFlipped) statecache->SetCullFace (cullFace);
+  if (cullMode == CS::Graphics::cullFlipped) statecache->SetCullFace (cullFace);
   //statecache->Disable_GL_POLYGON_OFFSET_FILL ();
 }
 

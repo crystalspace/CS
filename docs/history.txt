@@ -10,6 +10,7 @@ chronological order.
 	- res added a nicer variant of iSyntaxService::HandlePortalParameter().
 	  Also fixed a bug where the "before" setting would always overwrite
 	  the "after" one if specified last.
+	- res moved RenderMesh to the CS::Graphics namespace.
 13-Sep-2007
 	- res added a macro to deprecate struct members and variables
 	  (CS_DEPRECATED_VAR and CS_DEPRECATED_VAR_MSG).
