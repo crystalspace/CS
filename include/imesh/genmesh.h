@@ -47,7 +47,7 @@ class csEllipsoid;
 
 struct iGeneralMeshSubMesh : public virtual iBase
 {
-  SCF_INTERFACE (iGeneralMeshSubMesh, 1, 0, 2);
+  SCF_INTERFACE (iGeneralMeshSubMesh, 1, 0, 3);
   
   /// Get the index render buffer
   virtual iRenderBuffer* GetIndices () const = 0;
@@ -79,6 +79,14 @@ struct iGeneralMeshSubMesh : public virtual iBase
   /// Set the mixmode (or (uint)~0 to use default)
   virtual void SetMixmode (uint mode) = 0;
 
+  /**
+   * Set back-to-front sorting for submesh. If 'false', factory setting will be
+   * used.
+   */
+  virtual void SetBack2Front (bool enable) = 0;
+  
+  /// Get back-to-front sorting for submesh.
+  virtual bool GetBack2Front () const = 0;
 };
 
 /**

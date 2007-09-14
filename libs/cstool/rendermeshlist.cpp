@@ -75,7 +75,8 @@ void csRenderMeshList::AddRenderMeshes (csRenderMesh** meshes, int num,
       entry = renderList.Get ((uint32)renderPriority);
     }
 
-    meshes[i]->z_buf_mode = z_buf_mode;
+    if (meshes[i]->z_buf_mode == (csZBufMode)~0)
+      meshes[i]->z_buf_mode = z_buf_mode;
     entry->meshList.Push (meshListEntry (meshes[i], mesh));
   }
 }

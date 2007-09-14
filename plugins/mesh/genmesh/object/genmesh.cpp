@@ -972,6 +972,8 @@ void csGenmeshMeshObject::UpdateLighting (
   }
 }
 
+#include "csutil/custom_new_disable.h"
+
 csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
 	int& n, iRenderView* rview, 
 	iMovable* movable, uint32 frustum_mask)
@@ -1139,6 +1141,9 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   }
   else
   {
+    const bool factoryB2F = factory->back2front;
+    const csVector3 b2fPos (o2wt.Other2This (camera->GetTransform ().GetOrigin()));
+    uint frameNum = rview->GetCurrentFrameNumber ();
     renderMeshes.SetSize (sm.GetSize ());
 
     for (size_t i = 0; i<sm.GetSize (); ++i)
@@ -1156,10 +1161,17 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
 
       bool rmCreated;
       csRenderMesh*& meshPtr = subMesh.rmHolder.GetUnusedMesh (rmCreated,
-        rview->GetCurrentFrameNumber ());
-
-      iRenderBuffer* index_buffer = subMesh.SubMeshProxy::GetIndices();
+        frameNum);
+        
+      iRenderBuffer* index_buffer;
+      bool b2f = subMesh.SubMeshProxy::GetBack2Front () || factoryB2F;
+      if (b2f)
+        index_buffer = subMesh.SubMeshProxy::GetIndicesB2F (b2fPos, frameNum,
+          factory->GetVertices(), factory->GetVertexCount());
+      else
+        index_buffer = subMesh.SubMeshProxy::GetIndices();
       csRenderBufferHolder* smBufferHolder = subMesh.SubMeshProxy::GetBufferHolder();
+      smBufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, index_buffer);
 
       uint smMixMode = subMesh.SubMeshProxy::GetMixmode();
       meshPtr->mixmode = (smMixMode != (uint)~0) ? smMixMode : MixMode;
@@ -1176,15 +1188,9 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
       CS_ASSERT (mater != 0);
       meshPtr->worldspace_origin = wo;
       csRef<MergedSVContext> mergedSVContext;
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-# undef new
-#endif
       mergedSVContext.AttachNew (
         new (factory->genmesh_type->mergedSVContextPool) MergedSVContext (
         static_cast<iShaderVariableContext*> (&subMesh), svcontext));
-#if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
-# define new CS_EXTENSIVE_MEMDEBUG_NEW
-#endif
       meshPtr->variablecontext = mergedSVContext;
       meshPtr->object2world = o2wt;
 
@@ -1211,6 +1217,8 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   n = (int)renderMeshes.GetSize ();
   return renderMeshes.GetArray ();
 }
+
+#include "csutil/custom_new_enable.h"
 
 const csBox3& csGenmeshMeshObject::GetObjectBoundingBox ()
 {

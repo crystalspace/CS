@@ -94,6 +94,7 @@ bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
   CS::Graphics::RenderPriority renderPrio = -1;
   csRef<iRenderBuffer> indexbuffer;
   csRefArray<csShaderVariable> shadervars;
+  bool b2f = false;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -145,6 +146,10 @@ bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
     case XMLTOKEN_PRIORITY:
       renderPrio = engine->GetRenderPriority (child->GetContentsValue ());
       break;
+    case XMLTOKEN_BACK2FRONT:
+      if (!synldr->ParseBool (child, b2f, true))
+	return 0;
+      break;
     default:
       if (synldr->ParseZMode (child, zmode)) break;
       synldr->ReportBadToken (child);
@@ -155,6 +160,7 @@ bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
     node->GetAttributeValue ("name"), mixmode);
   submesh->SetZMode (zmode);
   submesh->SetRenderPriority (renderPrio);
+  submesh->SetBack2Front (b2f);
   csRef<iShaderVariableContext> svc = 
     scfQueryInterface<iShaderVariableContext> (submesh);
   for (size_t i = 0; i < shadervars.GetSize(); i++)
@@ -827,6 +833,13 @@ void csGeneralFactorySaver::WriteSubMesh (iGeneralMeshSubMesh* submesh,
       prioNode->CreateNodeBefore (CS_NODE_TEXT, 0);
     prioContents->SetValue (engine->GetRenderPriorityName (renderPrio));
   }
+  
+  bool b2f = submesh->GetBack2Front ();
+  if (b2f)
+  {
+    submeshNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)
+      ->SetValue("back2front");
+  }
 
   csRef<iDocumentNode> indexBufferNode = 
     submeshNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
@@ -1133,6 +1146,7 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
   uint mixmode = (uint)~0;
   csZBufMode zmode = (csZBufMode)~0;
   CS::Graphics::RenderPriority renderPrio = -1;
+  bool b2f = false;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -1182,6 +1196,10 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
     case XMLTOKEN_PRIORITY:
       renderPrio = engine->GetRenderPriority (child->GetContentsValue ());
       break;
+    case XMLTOKEN_BACK2FRONT:
+      if (!synldr->ParseBool (child, b2f, true))
+	return 0;
+      break;
     default:
       if (synldr->ParseZMode (child, zmode)) break;
       synldr->ReportBadToken (child);
@@ -1194,6 +1212,8 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
     subMesh->SetRenderPriority (renderPrio);
   if (zmode != (csZBufMode)~0)
     subMesh->SetZMode (zmode);
+  if (b2f)
+    subMesh->SetBack2Front (b2f);
 
   return true;
 }
@@ -1501,13 +1521,16 @@ bool csGeneralMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
           uint mixmode = objSubMesh->GetMixmode ();
           csZBufMode zmode = objSubMesh->GetZMode ();
 	  int renderPrio = objSubMesh->GetRenderPriority ();
+          bool b2f = objSubMesh->GetBack2Front ();
+
           /* @@@ FIXME: shadervars.IsEmpty() only works for same reasons as 
            * below */
           bool interesting = !shadervars.IsEmpty() 
             || (smMaterial != factSubMesh->GetMaterial())
             || (mixmode != factSubMesh->GetMixmode())
             || (zmode != factSubMesh->GetZMode())
-            || (renderPrio != factSubMesh->GetRenderPriority());
+            || (renderPrio != factSubMesh->GetRenderPriority())
+            || (b2f != factSubMesh->GetBack2Front());
 
           if (interesting)
           {
@@ -1548,6 +1571,11 @@ bool csGeneralMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
 	      csRef<iDocumentNode> prioContents =
 		prioNode->CreateNodeBefore (CS_NODE_TEXT, 0);
 	      prioContents->SetValue (engine->GetRenderPriorityName (renderPrio));
+	    }
+	    if (b2f)
+	    {
+	      synldr->WriteBool (submeshNode, "back2front", b2f, 
+	        factSubMesh->GetBack2Front ());
 	    }
 	  
             /* @@@ FIXME: This loop only works b/c GetShaderVariables() does 

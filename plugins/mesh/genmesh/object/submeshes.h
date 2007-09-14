@@ -20,6 +20,7 @@
 #ifndef __CS_SUBMESHES_H__
 #define __CS_SUBMESHES_H__
 
+#include "csgeom/bsptree.h"
 #include "csgeom/tri.h"
 #include "csgfx/shadervarcontext.h"
 #include "cstool/rendermeshholder.h"
@@ -56,15 +57,32 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     uint MixMode;
     csZBufMode zmode;
     CS::Graphics::RenderPriority renderPrio;
+    bool back2front;
+    // Cache b2f tree for rendering
+    csBSPTree* b2fTree;
+    csFrameDataHolder<csRef<iRenderBuffer> > b2fIndices;
 
-    SubMesh () : scfImplementationType (this), name (0)
+    SubMesh () : scfImplementationType (this), name (0), MixMode ((uint)~0),
+      zmode ((csZBufMode)~0), renderPrio (-1), back2front (false), b2fTree (0)
     { }
     SubMesh (const SubMesh& other) : scfImplementationType (this), 
       name (other.name), index_buffer (other.index_buffer), 
       material (other.material), MixMode (other.MixMode), zmode (other.zmode),
-      renderPrio (other.renderPrio)
+      renderPrio (other.renderPrio), back2front (other.back2front), b2fTree (0)
     { }
+    ~SubMesh()
+    {
+      delete b2fTree;
+    }
     const char* GetName() const { return name; }
+    
+    void ClearB2F()
+    {
+      delete b2fTree; b2fTree = 0;
+      b2fIndices.Clear ();
+    }    
+    iRenderBuffer* GetIndicesB2F (const csVector3& pos, uint frameNum,
+      const csVector3* vertices, size_t vertNum);
 
     iRenderBuffer* GetIndices () const
     { return index_buffer; }
@@ -81,6 +99,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     { return renderPrio; }
     void SetRenderPriority (CS::Graphics::RenderPriority prio) { renderPrio = prio; }
     void SetMixmode (uint mode) { MixMode = mode; }
+    void SetBack2Front (bool enable)
+    { 
+      if (back2front && !enable) ClearB2F();
+      back2front = enable;
+    }
+    bool GetBack2Front () const { return back2front; }
   };
 
   class SubMeshesContainer
@@ -125,7 +149,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
       bitMaterial = 0,
       bitMixMode,
       bitZMode,
-      bitRenderPrio
+      bitRenderPrio,
+      bitBack2Front
     };
     csRef<iMaterialWrapper> material;
     // Override mixmode from parent.
@@ -134,6 +159,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     CS::Graphics::RenderPriority renderPrio;
     csFlags overrideFlags;
     csRef<csRenderBufferHolder> bufferHolder;
+    bool back2front;
 
     void SetOverrideFlag (uint bit, bool flag) 
     { overrideFlags.SetBool (1 << bit, flag); }
@@ -141,6 +167,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     { return overrideFlags.Check (1 << bit); }
   public:
     csWeakRef<SubMesh> parentSubMesh;
+    // Stuff below is used by GM for rendering
     csRenderMeshHolder rmHolder;
 
     SubMeshProxy () : scfImplementationType (this), overrideFlags (0)
@@ -158,6 +185,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     iRenderBuffer* GetIndices () const
     { 
       if (parentSubMesh) return parentSubMesh->SubMesh::GetIndices();
+      return 0;
+    }
+    iRenderBuffer* GetIndicesB2F (const csVector3& pos, uint frameNum,
+      const csVector3* vertices, size_t vertNum)
+    {
+      if (parentSubMesh) 
+        return parentSubMesh->SubMesh::GetIndicesB2F (pos, frameNum, vertices,
+          vertNum);
       return 0;
     }
     iMaterialWrapper* GetMaterial () const
@@ -199,6 +234,16 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
     {
       SetOverrideFlag (bitMixMode, mode != (uint)~0);
       MixMode = mode;
+    }
+    void SetBack2Front (bool enable)
+    {
+      SetOverrideFlag (bitBack2Front, enable);
+      back2front = enable; 
+    }
+    bool GetBack2Front () const
+    {
+      if (GetOverrideFlag (bitBack2Front)) return back2front;
+      return parentSubMesh->SubMesh::GetBack2Front ();
     }
 
     virtual csShaderVariable* GetVariable (csStringID name) const
