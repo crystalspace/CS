@@ -4813,15 +4813,10 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
   iSector* destSector = 0;
   csPoly3D poly;
 
-  csMatrix3 m_w; m_w.Identity ();
-  csVector3 v_w_before (0, 0, 0);
-  csVector3 v_w_after (0, 0, 0);
-  uint32 flags = 0;
-  bool do_warp = false;
-  bool do_mirror = false;
-  int msv = -1;
+  CS::Utility::PortalParameters params;
+  csRef<csRefCount> parseState;
   scfString destSectorName;
-  bool autoresolve = true;
+  params.destSector = &destSectorName;
 
   // Array of keys we need to parse later.
   csRefArray<iDocumentNode> key_nodes;
@@ -4833,8 +4828,7 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
     if (child->GetType () != CS_NODE_ELEMENT) continue;
     bool handled;
     if (!SyntaxService->HandlePortalParameter (child, ldr_context,
-        flags, do_mirror, do_warp, msv, m_w, v_w_before, v_w_after,
-	&destSectorName, handled, autoresolve))
+        parseState, params, handled))
     {
       return false;
     }
@@ -4865,7 +4859,7 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
   iPortal* portal;
   // If autoresolve is true we clear the sector since we want the callback
   // to be used.
-  if (autoresolve)
+  if (params.autoresolve)
     destSector = 0;
   else
     destSector = ldr_context->FindSector (destSectorName.GetData ());
@@ -4906,23 +4900,23 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
     // portal is first used.
     csRef<csMissingSectorCallback> missing_cb;
     missing_cb.AttachNew (new csMissingSectorCallback (
-      ldr_context, destSectorName.GetData (), autoresolve));
+      ldr_context, destSectorName.GetData (), params.autoresolve));
     portal->SetMissingSectorCallback (missing_cb);
   }
 
-  portal->GetFlags ().Set (flags);
-  if (do_mirror)
+  portal->GetFlags ().Set (params.flags);
+  if (params.mirror)
   {
     csPlane3 p = poly.ComputePlane ();
     portal->SetWarp (csTransform::GetReflect (p));
   }
-  else if (do_warp)
+  else if (params.warp)
   {
-    portal->SetWarp (m_w, v_w_before, v_w_after);
+    portal->SetWarp (params.m, params.before, params.after);
   }
-  if (msv != -1)
+  if (params.msv != -1)
   {
-    portal->SetMaximumSectorVisit (msv);
+    portal->SetMaximumSectorVisit (params.msv);
   }
 
   size_t i;
