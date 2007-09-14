@@ -16,6 +16,9 @@ chronological order.
 	  whose work is no longer present in the manual. Also fixed a couple
 	  Texinfo mark-up errors in perl.txi.
 	- res added CS::TriangleIndicesStreamRandom<>.
+	- res tweaked csBSPTree to not use EPSILON for triangle classification
+	  against planes; this fixes overzealous classification of triangles
+	  as coplanar.
 13-Sep-2007
 	- res added a macro to deprecate struct members and variables
 	  (CS_DEPRECATED_VAR and CS_DEPRECATED_VAR_MSG).
