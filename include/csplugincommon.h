@@ -45,6 +45,7 @@
 #include "csplugincommon/rendermanager/rendertree.h"
 #include "csplugincommon/rendermanager/renderview.h"
 #include "csplugincommon/rendermanager/render.h"
+#include "csplugincommon/rendermanager/renderlayers.h"
 #include "csplugincommon/rendermanager/standardsorter.h"
 #include "csplugincommon/rendermanager/standardtreetraits.h"
 #include "csplugincommon/rendermanager/svarrayholder.h"

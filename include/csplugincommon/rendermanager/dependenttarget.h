@@ -203,16 +203,16 @@ namespace RenderManager
       DependentTargetManager& parent;
       iShaderManager* shaderManager;
       HandledTargetsSet& handledTargets;
-      StandardContextSetup<Tree>& contextSetup;
+//      StandardContextSetup<Tree>& contextSetup;
       Tree& renderTree;
 
       TextureTraverser (DependentTargetManager& parent,
         iShaderManager* shaderManager,
         HandledTargetsSet& handledTargets,
-        StandardContextSetup<Tree>& contextSetup,
+        //StandardContextSetup<Tree>& contextSetup,
         Tree& renderTree) : parent (parent), 
         shaderManager (shaderManager), handledTargets (handledTargets),
-        contextSetup (contextSetup),
+        //contextSetup (contextSetup),
         renderTree (renderTree) {}
 
       void operator() (iTextureHandle* texh)
@@ -269,7 +269,7 @@ namespace RenderManager
 	typename Tree::ContextNode* context = 
 	  renderTree.CreateContext (targetContexts, rview);
 
-	contextSetup (renderTree, context, targetContexts, rview->GetThisSector (), rview);
+	//contextSetup (renderTree, context, targetContexts, rview->GetThisSector (), rview);
 
 	TraverseAllTextures<Tree, TextureTraverser> 
 	  traverseAllTextures (*this, shaderManager, parent.names);
@@ -325,7 +325,7 @@ namespace RenderManager
     }
 
     void AddDependentTargetsToTree (typename Tree::ContextsContainer* contexts,
-      Tree& renderTree, StandardContextSetup<Tree>& contextSetup, 
+      Tree& renderTree/*, StandardContextSetup<Tree>& contextSetup*/, 
       iShaderManager* shaderManager)
     {
       if (nestLevel == 0)
@@ -337,11 +337,11 @@ namespace RenderManager
       }
       
       nestLevel++;
-      TextureTraverser texTraverse (*this, shaderManager, handledTargets,
+ /*     TextureTraverser texTraverse (*this, shaderManager, handledTargets,
         contextSetup, renderTree);
       TraverseAllTextures<Tree, TextureTraverser> traverseAllTextures (texTraverse, 
         shaderManager, names);
-      renderTree.TraverseContexts (contexts, traverseAllTextures);
+      renderTree.TraverseContexts (contexts, traverseAllTextures);*/
       nestLevel--;
       
       if (nestLevel == 0) oneTimeTargets.DeleteAll ();

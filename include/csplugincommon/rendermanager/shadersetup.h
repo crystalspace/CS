@@ -26,20 +26,18 @@ namespace CS
 namespace RenderManager
 {
 
-  template<typename Tree>
-  class ShaderSetup : public NumberedMeshTraverser<Tree, ShaderSetup<Tree> >
+  template<typename Tree, typename LayerConfigType>
+  class ShaderSetup : public NumberedMeshTraverser<Tree, ShaderSetup<Tree, LayerConfigType> >
   {
   public:
     typedef csArray<iShader*> ShaderArrayType;
-    typedef NumberedMeshTraverser<Tree, ShaderSetup<Tree> > BaseType;
+    typedef NumberedMeshTraverser<Tree, ShaderSetup<Tree, LayerConfigType> > BaseType;
 
-    ShaderSetup (ShaderArrayType& shaderArray, csStringID shaderName, 
-      iShader* defaultShader = 0)
-      : BaseType (*this), shaderArray (shaderArray), shaderName (shaderName),
-      defaultShader (defaultShader)
+    ShaderSetup (ShaderArrayType& shaderArray, const LayerConfigType& layerConfig)
+      : BaseType (*this), shaderArray (shaderArray), layerConfig (layerConfig)
+
     {
     }
-
 
     // Need to unhide this one
     using BaseType::operator();
@@ -50,29 +48,37 @@ namespace RenderManager
     {
       // Get the shader
       csRenderMesh* rm = mesh.renderMesh;
-      iShader* shader = rm->material->GetMaterial ()->GetShader (shaderName);
-      shaderArray[index] = shader ? shader : defaultShader;
+
+      for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)
+      {
+        size_t layerOffset = layer*ctxNode.totalRenderMeshes;
+
+        iShader* shader = rm->material->GetMaterial ()->GetShader (
+          layerConfig.GetShaderName (layer));
+        shaderArray[index+layerOffset] = shader ? shader : layerConfig.GetDefaultShader (layer);
+      }
     }
 
   private:
     ShaderArrayType& shaderArray;
-    csStringID shaderName;
-    iShader* defaultShader;
+    const LayerConfigType& layerConfig;
   };
 
   typedef csArray<size_t> TicketArrayType;
   typedef csArray<iShader*> ShaderArrayType;
 
-  template<typename Tree>
-  class TicketSetup : public NumberedMeshTraverser<Tree, TicketSetup<Tree> >
+  template<typename Tree, typename LayerConfigType>
+  class TicketSetup : public NumberedMeshTraverser<Tree, TicketSetup<Tree, LayerConfigType> >
   {
   public:
-    typedef NumberedMeshTraverser<Tree, TicketSetup<Tree> > BaseType;
+    typedef NumberedMeshTraverser<Tree, TicketSetup<Tree, LayerConfigType> > BaseType;
 
-    TicketSetup (SVArrayHolder& svArrays, csShaderVariableStack& varStack, 
-      const ShaderArrayType& shaderArray, TicketArrayType& tickets)
-      : BaseType (*this), svArrays (svArrays), varStack (varStack),
-      shaderArray (shaderArray), ticketArray (tickets)
+    TicketSetup (SVArrayHolder& svArrays, csShaderVariableStack& varStack,       
+      const ShaderArrayType& shaderArray, TicketArrayType& tickets, 
+      const LayerConfigType& layerConfig)
+      : BaseType (*this), svArrays (svArrays), varStack (varStack), 
+      shaderArray (shaderArray), ticketArray (tickets),
+      layerConfig (layerConfig)
     {
     }
 
@@ -84,12 +90,17 @@ namespace RenderManager
       const typename Tree::MeshNode::SingleMesh& mesh, size_t index,
       typename Tree::ContextNode& ctxNode, const Tree& tree)
     {
-      // Setup the shader array
-      svArrays.SetupSVStck (varStack, index);
+      for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)
+      {
+        size_t layerOffset = layer*ctxNode.totalRenderMeshes;
+        
+        // Setup the shader array
+        svArrays.SetupSVStck (varStack, layer, index);
 
-      // Get the ticket
-      iShader* shader = shaderArray[index];
-      ticketArray[index] = shader ? shader->GetTicket (*mesh.renderMesh, varStack) : ~0;
+        // Get the ticket
+        iShader* shader = shaderArray[index];
+        ticketArray[index+layerOffset] = shader ? shader->GetTicket (*mesh.renderMesh, varStack) : ~0;
+      }
     }
 
   private:
@@ -97,30 +108,30 @@ namespace RenderManager
     csShaderVariableStack& varStack;
     const ShaderArrayType& shaderArray;
     TicketArrayType& ticketArray;
+    const LayerConfigType& layerConfig;
   };
 
 
   // Setup the standard shader, shader SV and ticket
-  template<typename Tree>
+  template<typename Tree, typename LayerConfigType>
   static void SetupStandarShaderAndTicket (Tree& tree, typename Tree::ContextNode& context, 
     iShaderManager* shaderManager,
-    csStringID defaultShaderType, iShader* defaultShader = 0)
+    const LayerConfigType& layerConfig)
   {
-
-    context.shaderArray.SetSize (context.totalRenderMeshes);
-    context.ticketArray.SetSize (context.totalRenderMeshes);
+    context.shaderArray.SetSize (context.totalRenderMeshes*layerConfig.GetLayerCount ());
+    context.ticketArray.SetSize (context.totalRenderMeshes*layerConfig.GetLayerCount ());
 
     // Shader, sv and ticket setup
-    {
-      ShaderSetup<Tree> shaderSetup (context.shaderArray, defaultShaderType, defaultShader);
-      ShaderSVSetup<Tree> shaderSVSetup (context.svArrays, context.shaderArray);
-      TicketSetup<Tree> ticketSetup (context.svArrays, shaderManager->GetShaderVariableStack (),
-        context.shaderArray, context.ticketArray);
+    ShaderSetup<Tree, LayerConfigType> shaderSetup (context.shaderArray, layerConfig);
 
-      tree.TraverseMeshNodes (
-        CS::Meta::CompositeFunctor (shaderSetup, shaderSVSetup, ticketSetup), 
-        &context);
-    }
+    ShaderSVSetup<Tree, LayerConfigType> shaderSVSetup (context.svArrays, context.shaderArray, layerConfig);
+      
+    TicketSetup<Tree, LayerConfigType> ticketSetup (context.svArrays, shaderManager->GetShaderVariableStack (),
+      context.shaderArray, context.ticketArray, layerConfig);
+
+    tree.TraverseMeshNodes (
+      CS::Meta::CompositeFunctor (shaderSetup, shaderSVSetup, ticketSetup), 
+      &context);
   }
 
   typedef csDirtyAccessArray<csStringID> ShaderVariableNameArray;

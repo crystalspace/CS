@@ -29,11 +29,11 @@ namespace RenderManager
   class SVArrayHolder
   {
   public:
-    SVArrayHolder (size_t numSVNames = 0, size_t numSets = 0)
-      : numSVNames (numSVNames), numSets (numSets), svArray (0)
+    SVArrayHolder (size_t numLayers = 1, size_t numSVNames = 0, size_t numSets = 0)
+      : numLayers (numLayers), numSVNames (numSVNames), numSets (numSets), svArray (0)
     {
-      if (numSVNames && numSets)
-        Setup (numSVNames, numSets);
+      if (numSVNames && numSets && numLayers)
+        Setup (numLayers, numSVNames, numSets);
     }
 
     SVArrayHolder (const SVArrayHolder& other)
@@ -51,10 +51,11 @@ namespace RenderManager
     {
       cs_free (svArray);
 
+      numLayers = other.numLayers;
       numSVNames = other.numSVNames;
       numSets = other.numSets;
 
-      const size_t arraySize = sizeof(csShaderVariable*)*numSVNames*numSets;
+      const size_t arraySize = sizeof(csShaderVariable*)*numLayers*numSVNames*numSets;
       svArray = static_cast<csShaderVariable**> (cs_malloc (arraySize));
 
       memcpy (svArray, other.svArray, arraySize);
@@ -62,24 +63,26 @@ namespace RenderManager
       return *this;
     }
 
-    void Setup (size_t numSVNames, size_t numSets)
+    void Setup (size_t numLayers, size_t numSVNames, size_t numSets)
     {
+      this->numLayers = numLayers;
       this->numSVNames = numSVNames;
       this->numSets = numSets;
 
-      const size_t arraySize = sizeof(csShaderVariable*)*numSVNames*numSets;
+      const size_t arraySize = sizeof(csShaderVariable*)*numLayers*numSVNames*numSets;
       svArray = static_cast<csShaderVariable**> (cs_malloc (arraySize));
       memset (svArray, 0, arraySize);
     }
 
-    void SetupSVStck (csShaderVariableStack& stack, size_t set)
+    void SetupSVStck (csShaderVariableStack& stack, size_t layer, size_t set)
     {
+      CS_ASSERT (layer < numLayers);
       CS_ASSERT (set < numSets);
 
-      stack.Setup (svArray + numSVNames*set, numSVNames);
+      stack.Setup (svArray + (layer*numSets + set)*numSVNames, numSVNames);
     }
 
-    void ReplicateSet (size_t from, size_t start, size_t end = (size_t)-1)
+    void ReplicateSet (size_t layer, size_t from, size_t start, size_t end = (size_t)-1)
     {
       if (numSets == 1)
         return;
@@ -87,12 +90,28 @@ namespace RenderManager
       if (end == (size_t)-1)
         end = numSets-1;
 
+      CS_ASSERT (layer < numLayers);
       CS_ASSERT (from < numSets && start < numSets && end < numSets);
       CS_ASSERT (from < start || from > end);
 
+      size_t layerStart = layer*numSets*numSVNames;
+
       for (size_t i = start; i <= end; i++)
-        memcpy (svArray + i*numSVNames, svArray + from*numSVNames,
+        memcpy (svArray + layerStart + i*numSVNames, svArray + layerStart + from*numSVNames,
           sizeof(csShaderVariable*)*numSVNames);
+    }
+
+    void ReplicateLayerZero ()
+    {
+      if (numLayers == 1)
+        return;
+
+      size_t layerSize = numSets*numSVNames;
+
+      for (size_t layer = 1; layer < numLayers; ++layer)
+      {
+        memcpy (svArray + layer*layerSize, svArray, sizeof(csShaderVariable*)*layerSize);
+      }
     }
 
     size_t GetNumSVNames () const
@@ -101,8 +120,9 @@ namespace RenderManager
     }
 
   private:
+    size_t numLayers;
     size_t numSVNames;
-    size_t numSets;
+    size_t numSets;    
     csShaderVariable** svArray;
   };
 

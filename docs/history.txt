@@ -8,6 +8,9 @@ chronological order.
 
 14-Sep-2007
 	- Marten factored out some portal setup code.
+	- Marten implemented scene-level multipass rendering in the RM.
+	  This corresponds to having multiple render-steps in the old RL-
+	  system.
 11-Sep-2007
 	- Marten fixed a small error regarding deprecation warnings in thing.
 	- Marten made a number of improvements to the RM:

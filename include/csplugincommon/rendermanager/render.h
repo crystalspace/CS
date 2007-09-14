@@ -56,8 +56,8 @@ namespace RenderManager
   public:
     typedef NumberedMeshTraverser<Tree, SimpleRender<Tree> > BaseType;
 
-    SimpleRender (iGraphics3D* g3d, csShaderVariableStack& varStack)
-      : BaseType (*this), g3d (g3d), varStack (varStack)
+    SimpleRender (iGraphics3D* g3d, csShaderVariableStack& varStack, size_t meshLayer)
+      : BaseType (*this), g3d (g3d), varStack (varStack), meshLayer (meshLayer)
     {
     }
 
@@ -79,10 +79,12 @@ namespace RenderManager
       const typename Tree::MeshNode::SingleMesh& mesh, size_t index,
       typename Tree::ContextNode& ctxNode, const Tree& tree)
     {
+      size_t layerOffset = ctxNode.totalRenderMeshes*meshLayer;
+
       // Get the shader, ticket and sv array
-      iShader* shader = ctxNode.shaderArray[index];
+      iShader* shader = ctxNode.shaderArray[index+layerOffset];
       if (!shader) return;
-      size_t ticket = ctxNode.ticketArray[index];
+      size_t ticket = ctxNode.ticketArray[index+layerOffset];
 
       // Render meshes if shader or ticket differ
       if ((shader != lastShader) || (ticket != lastTicket))
@@ -114,7 +116,7 @@ namespace RenderManager
   
 	  for (size_t m = 0; m < meshesToRender.GetSize(); m++)
 	  {
-	    ctxNode.svArrays.SetupSVStck (varStack, firstMeshIndex + m);
+	    ctxNode.svArrays.SetupSVStck (varStack, meshLayer, firstMeshIndex + m);
   
 	    csRenderMesh* mesh = meshesToRender[m].mesh;
 	    csRenderMeshModes modes (*mesh);
@@ -134,6 +136,8 @@ namespace RenderManager
 
     iGraphics3D* g3d;
     csShaderVariableStack& varStack;
+
+    size_t meshLayer;
 
     iShader* lastShader;
     size_t lastTicket;

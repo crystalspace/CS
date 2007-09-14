@@ -29,6 +29,77 @@ using namespace CS::RenderManager;
 
 SCF_IMPLEMENT_FACTORY(RMTest1)
 
+template<typename RenderTreeType, typename LayerConfigType>
+class StandardContextSetup
+{
+public:
+  typedef StandardContextSetup<RenderTreeType, LayerConfigType> ThisType;
+
+  StandardContextSetup (iShaderManager* shaderManager, const LayerConfigType& layerConfig)
+    : shaderManager (shaderManager), 
+    layerConfig (layerConfig),
+    recurseCount (0)
+  {
+
+  }
+
+  void operator() (RenderTreeType& renderTree, 
+    typename RenderTreeType::ContextNode* context, 
+    typename RenderTreeType::ContextsContainer* container, 
+    iSector* sector, CS::RenderManager::RenderView* rview)
+  {
+    // @@@ FIXME: Of course, don't hardcode.
+    if (recurseCount > 5) return;
+
+    sector->CallSectorCallbacks (rview);
+
+    // Make sure the clip-planes are ok
+    CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext ());
+
+    // Do the culling
+    iVisibilityCuller* culler = sector->GetVisibilityCuller ();
+    renderTree.Viscull (container, context, rview, culler);
+
+    // Sort the mesh lists  
+    {
+      StandardMeshSorter<RenderTreeType> mySorter (rview->GetEngine (), rview->GetCamera ());
+      renderTree.TraverseMeshNodes (mySorter, context);
+    }
+
+    // Setup the SV arrays
+    // Push the default stuff
+    SetupStandardSVs<RenderTreeType> (layerConfig, *context, shaderManager, sector);
+
+    // Setup the material&mesh SVs
+    {
+      StandardSVSetup<RenderTreeType, SingleRenderLayer> svSetup (context->svArrays, layerConfig);
+      renderTree.TraverseMeshNodes (svSetup, context);
+    }
+
+    // Setup shaders and tickets
+    SetupStandarShaderAndTicket (renderTree, *context, shaderManager, 
+      layerConfig);
+
+    {
+      recurseCount++;
+      StandardPortalSetup<RenderTreeType, ThisType> portalSetup (*this);
+      portalSetup (renderTree, context, container, sector, rview);
+      recurseCount--;
+    }
+
+  }
+
+
+private:
+
+
+  iShaderManager* shaderManager;
+  const LayerConfigType& layerConfig;
+  int recurseCount;
+};
+
+
+
 RMTest1::RMTest1 (iBase* parent)
 : scfImplementationType (this, parent)
 {
@@ -49,6 +120,8 @@ bool RMTest1::RenderView (iView* view)
   if (!startSector)
     return false;
 
+  SingleRenderLayer renderLayer (defaultShaderName, defaultShader);
+
   // Pre-setup culling graph
   RenderTreeType renderTree (treePersistent);
   RenderTreeType::ContextsContainer* screenContexts = 
@@ -59,21 +132,20 @@ bool RMTest1::RenderView (iView* view)
 
   // Setup the main context
   {
-    StandardContextSetup<RenderTreeType> contextSetup (shaderManager, 
-      defaultShader, defaultShaderName);
+    StandardContextSetup<RenderTreeType, SingleRenderLayer> contextSetup (shaderManager, 
+      renderLayer);
     contextSetup (renderTree, startContext, screenContexts, startSector, rview);
   
-    targets.AddDependentTargetsToTree (screenContexts, renderTree, 
-      contextSetup, shaderManager);
+    //targets.AddDependentTargetsToTree (screenContexts, renderTree, 
+    //  contextSetup, shaderManager);
   }
 
   // Render all contexts, back to front
   {
     view->GetContext()->SetZMode (CS_ZBUF_MESH);
 
-    ContextRender<RenderTreeType> render (shaderManager);
+    ContextRender<RenderTreeType, SingleRenderLayer> render (shaderManager, renderLayer);
     renderTree.TraverseContextContainersReverse (render);
-    //renderTree.TraverseMeshNodes (render, mainContext);
   }
 
   return true;

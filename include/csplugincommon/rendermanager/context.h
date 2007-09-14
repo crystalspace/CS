@@ -119,76 +119,6 @@ namespace RenderManager
   };
 
 
-  template<typename RenderTreeType>
-  class StandardContextSetup
-  {
-  public:
-    typedef StandardContextSetup<RenderTreeType> ThisType;
-
-    StandardContextSetup (iShaderManager* shaderManager, iShader* defaultShader, 
-      csStringID defaultShaderName)
-      : shaderManager (shaderManager), 
-        defaultShader (defaultShader), defaultShaderName (defaultShaderName),
-        recurseCount (0)
-    {
-  
-    }
-  
-    void operator() (RenderTreeType& renderTree, 
-      typename RenderTreeType::ContextNode* context, 
-      typename RenderTreeType::ContextsContainer* container, 
-      iSector* sector, CS::RenderManager::RenderView* rview)
-    {
-      // @@@ FIXME: Of course, don't hardcode.
-      if (recurseCount > 5) return;
-
-      sector->CallSectorCallbacks (rview);
-    
-      // Make sure the clip-planes are ok
-      CS::RenderViewClipper::SetupClipPlanes (rview->GetRenderContext ());
-
-      // Do the culling
-      iVisibilityCuller* culler = sector->GetVisibilityCuller ();
-      renderTree.Viscull (container, context, rview, culler);
-
-      // Sort the mesh lists  
-      {
-	StandardMeshSorter<RenderTreeType> mySorter (rview->GetEngine (), rview->GetCamera ());
-	renderTree.TraverseMeshNodes (mySorter, context);
-      }
-  
-      // Setup the SV arrays
-      // Push the default stuff
-      SetupStandardSVs<RenderTreeType> (*context, shaderManager, sector);
-  
-      // Setup the material&mesh SVs
-      {
-	StandardSVSetup<RenderTreeType> svSetup (context->svArrays);
-	renderTree.TraverseMeshNodes (svSetup, context);
-      }
-  
-      // Setup shaders and tickets
-      SetupStandarShaderAndTicket (renderTree, *context, shaderManager, 
-	defaultShaderName, defaultShader);
-
-      {
-        recurseCount++;
-        StandardPortalSetup<RenderTreeType, ThisType> portalSetup (*this);
-        portalSetup (renderTree, context, container, sector, rview);
-        recurseCount--;
-      }
-     
-    }
-  
-  
-  private:
-    
-  
-    iShaderManager* shaderManager;
-    iShader* defaultShader;
-    csStringID defaultShaderName;
-    int recurseCount;
-  };
   
   template<typename RenderTreeType>
   class SetupRenderTarget
@@ -202,12 +132,13 @@ namespace RenderManager
     }
   };
     
-  template<typename RenderTreeType>
+  template<typename RenderTreeType, typename LayerConfigType>
   class ContextRender
   {
   public:
-    ContextRender (iShaderManager* shaderManager)
-      : shaderManager (shaderManager)
+    ContextRender (iShaderManager* shaderManager, 
+      const LayerConfigType& layerConfig)
+      : shaderManager (shaderManager), layerConfig (layerConfig)
     {
     }
   
@@ -228,8 +159,11 @@ namespace RenderManager
 
       g3d->SetWorldToCamera (cam->GetTransform ().GetInverse ());
 
-      ContextCB cb (*this, g3d);
-      tree.TraverseContextsReverse (contexts, cb);
+      for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)
+      {
+        ContextCB cb (*this, g3d, layer);
+        tree.TraverseContextsReverse (contexts, cb);
+      }      
     }
   
   private:
@@ -255,15 +189,17 @@ namespace RenderManager
     {
       ContextRender& parent;
       iGraphics3D* g3d;
+      size_t layer;
 
-      ContextCB (ContextRender& parent, iGraphics3D* g3d) : parent (parent),
-        g3d (g3d) {}
+      ContextCB (ContextRender& parent, iGraphics3D* g3d, size_t layer) 
+        : parent (parent), g3d (g3d), layer (layer)
+      {}
 
       void operator() (typename RenderTreeType::ContextNode* node, 
         RenderTreeType& tree)
       {
         SimpleRender<RenderTreeType> render (g3d, 
-          parent.shaderManager->GetShaderVariableStack ());
+          parent.shaderManager->GetShaderVariableStack (), layer);
     
         MeshNodeCB<SimpleRender<RenderTreeType> > cb (render, node, tree);
         node->meshNodes.TraverseInOrder (cb);
@@ -271,6 +207,7 @@ namespace RenderManager
     };
 
     iShaderManager* shaderManager;
+    const LayerConfigType& layerConfig;
   };
 
 } // namespace RenderManager
