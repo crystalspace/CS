@@ -1296,6 +1296,7 @@ sub new {
     bless $self, $pkg if defined($self);
 }
 
+*Description = *cspacec::csMatrix3_Description;
 *Row1 = *cspacec::csMatrix3_Row1;
 *Row2 = *cspacec::csMatrix3_Row2;
 *Row3 = *cspacec::csMatrix3_Row3;
@@ -1591,6 +1592,7 @@ sub new {
     bless $self, $pkg if defined($self);
 }
 
+*Description = *cspacec::csTransform_Description;
 *Identity = *cspacec::csTransform_Identity;
 *IsIdentity = *cspacec::csTransform_IsIdentity;
 *GetO2T = *cspacec::csTransform_GetO2T;
@@ -6371,6 +6373,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *RemoveMeshFromStaticLOD = *cspacec::iMeshWrapper_RemoveMeshFromStaticLOD;
 *GetSVContext = *cspacec::iMeshWrapper_GetSVContext;
 *AddExtraRenderMesh = *cspacec::iMeshWrapper_AddExtraRenderMesh;
+*GetExtraRenderMesh = *cspacec::iMeshWrapper_GetExtraRenderMesh;
+*GetExtraRenderMeshCount = *cspacec::iMeshWrapper_GetExtraRenderMeshCount;
 *GetExtraRenderMeshPriority = *cspacec::iMeshWrapper_GetExtraRenderMeshPriority;
 *GetExtraRenderMeshZBufMode = *cspacec::iMeshWrapper_GetExtraRenderMeshZBufMode;
 *RemoveExtraRenderMesh = *cspacec::iMeshWrapper_RemoveExtraRenderMesh;
@@ -7028,6 +7032,11 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetName = *cspacec::iGeneralMeshSubMesh_GetName;
 *GetMixmode = *cspacec::iGeneralMeshSubMesh_GetMixmode;
 *SetMaterial = *cspacec::iGeneralMeshSubMesh_SetMaterial;
+*GetZMode = *cspacec::iGeneralMeshSubMesh_GetZMode;
+*SetZMode = *cspacec::iGeneralMeshSubMesh_SetZMode;
+*GetRenderPriority = *cspacec::iGeneralMeshSubMesh_GetRenderPriority;
+*SetRenderPriority = *cspacec::iGeneralMeshSubMesh_SetRenderPriority;
+*SetMixmode = *cspacec::iGeneralMeshSubMesh_SetMixmode;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
