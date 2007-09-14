@@ -37,6 +37,7 @@ namespace RenderManager
     }
 
     SVArrayHolder (const SVArrayHolder& other)
+      : svArray (0)
     {
       *this = other;
     }
@@ -89,8 +90,6 @@ namespace RenderManager
       CS_ASSERT (from < numSets && start < numSets && end < numSets);
       CS_ASSERT (from < start || from > end);
 
-      /*memcpy (svArray + start*numSVNames, svArray + from*numSVNames,
-        sizeof(csShaderVariable*)*numSVNames*(end-start+1));*/
       for (size_t i = start; i <= end; i++)
         memcpy (svArray + i*numSVNames, svArray + from*numSVNames,
           sizeof(csShaderVariable*)*numSVNames);

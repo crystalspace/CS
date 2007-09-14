@@ -30,11 +30,102 @@ namespace CS
 {
 namespace RenderManager
 {
-  template<typename RenderTreeType>
-  class ContextSetup
+  template<typename RenderTreeType, typename ContextSetup>
+  class StandardPortalSetup
   {
   public:
-    ContextSetup (iShaderManager* shaderManager, iShader* defaultShader, 
+    StandardPortalSetup (ContextSetup& cfun)
+      : contextFunction (cfun)
+    {}
+
+    void operator() (RenderTreeType& renderTree, 
+      typename RenderTreeType::ContextNode* context, 
+      typename RenderTreeType::ContextsContainer* container, 
+      iSector* sector, CS::RenderManager::RenderView* rview)
+    {
+      csDirtyAccessArray<csVector2> allPortalVerts2d (64);
+      csDirtyAccessArray<size_t> allPortalVertsNums;
+      // Handle all portals
+      for (size_t pc = 0; pc < context->allPortals.GetSize (); ++pc)
+      {
+        typename RenderTreeType::ContextNode::PortalHolder& holder = context->allPortals[pc];
+        const size_t portalCount = holder.portalContainer->GetPortalCount ();
+
+        size_t allPortalVertices = holder.portalContainer->GetTotalVertexCount ();
+        allPortalVerts2d.SetSize (allPortalVertices * 3);
+        allPortalVertsNums.SetSize (portalCount);
+
+        holder.portalContainer->ComputeScreenPolygons (rview, 
+          allPortalVerts2d.GetArray(), allPortalVerts2d.GetSize(), 
+          allPortalVertsNums.GetArray());
+        csVector2* portalVerts2d = allPortalVerts2d.GetArray();
+
+        for (size_t pi = 0; pi < portalCount; ++pi)
+        {
+          iPortal* portal = holder.portalContainer->GetPortal (pi);
+
+          if (IsSimplePortal (portal))
+          {
+            // Finish up the sector
+            if (!portal->CompleteSector (rview))
+              continue;
+
+            size_t orgCount = allPortalVertsNums[pi];
+            if (orgCount == 0) continue;
+            // Setup a bounding box, in screen-space
+            csBox2 screenBox;
+            for (size_t i = 0; i < orgCount; ++i)
+            {
+              screenBox.AddBoundingVertex (portalVerts2d[i]);
+            }
+
+            size_t count = orgCount;
+            if ((rview->GetClipper ()->ClipInPlace (portalVerts2d, count, screenBox) == CS_CLIP_OUTSIDE) ||
+              count == 0)
+              continue;
+
+            // Setup simple portal
+            rview->CreateRenderContext ();
+            rview->SetLastPortal (portal);
+            rview->SetPreviousSector (sector);
+            csPolygonClipper newView (portalVerts2d, count);
+            rview->SetClipper (&newView);
+
+            typename RenderTreeType::ContextNode* portalCtx = 
+              renderTree.CreateContext (container, rview);
+
+
+            // Setup the new context
+            contextFunction(renderTree, portalCtx, container, portal->GetSector (), rview);
+
+            rview->RestoreRenderContext ();
+            portalVerts2d += orgCount;
+          }
+          else
+          {
+            // Setup heavy portal @@TODO
+          }
+        }
+      }
+    }
+
+  private:
+    ContextSetup& contextFunction;
+
+    bool IsSimplePortal (iPortal* portal)
+    {
+      return true;
+    }
+  };
+
+
+  template<typename RenderTreeType>
+  class StandardContextSetup
+  {
+  public:
+    typedef StandardContextSetup<RenderTreeType> ThisType;
+
+    StandardContextSetup (iShaderManager* shaderManager, iShader* defaultShader, 
       csStringID defaultShaderName)
       : shaderManager (shaderManager), 
         defaultShader (defaultShader), defaultShaderName (defaultShaderName),
@@ -80,79 +171,18 @@ namespace RenderManager
       SetupStandarShaderAndTicket (renderTree, *context, shaderManager, 
 	defaultShaderName, defaultShader);
 
-      csDirtyAccessArray<csVector2> allPortalVerts2d (64);
-      csDirtyAccessArray<size_t> allPortalVertsNums;
-      // Handle all portals
-      for (size_t pc = 0; pc < context->allPortals.GetSize (); ++pc)
       {
-	typename RenderTreeType::ContextNode::PortalHolder& holder = context->allPortals[pc];
-	const size_t portalCount = holder.portalContainer->GetPortalCount ();
-	
-	size_t allPortalVertices = holder.portalContainer->GetTotalVertexCount ();
-	allPortalVerts2d.SetSize (allPortalVertices * 3);
-	allPortalVertsNums.SetSize (portalCount);
-	
-	holder.portalContainer->ComputeScreenPolygons (rview, 
-	  allPortalVerts2d.GetArray(), allPortalVerts2d.GetSize(), 
-	  allPortalVertsNums.GetArray());
-	csVector2* portalVerts2d = allPortalVerts2d.GetArray();
-  
-	for (size_t pi = 0; pi < portalCount; ++pi)
-	{
-	  iPortal* portal = holder.portalContainer->GetPortal (pi);
-  
-	  if (IsSimplePortal (portal))
-	  {
-	    // Finish up the sector
-	    if (!portal->CompleteSector (rview))
-	      continue;
-  
-            size_t orgCount = allPortalVertsNums[pi];
-            if (orgCount == 0) continue;
-	    // Setup a bounding box, in screen-space
-	    csBox2 screenBox;
-	    for (size_t i = 0; i < orgCount; ++i)
-	    {
-	      screenBox.AddBoundingVertex (portalVerts2d[i]);
-	    }
-	    
-	    size_t count = orgCount;
-	    if ((rview->GetClipper ()->ClipInPlace (portalVerts2d, count, screenBox) == CS_CLIP_OUTSIDE) ||
-	      count == 0)
-	      continue;
-  
-	    // Setup simple portal
-	    rview->CreateRenderContext ();
-	    rview->SetLastPortal (portal);
-	    rview->SetPreviousSector (sector);
-	    csPolygonClipper newView (portalVerts2d, count);
-	    rview->SetClipper (&newView);
-  
-	    typename RenderTreeType::ContextNode* portalCtx = 
-              renderTree.CreateContext (container, rview);
-  
-            recurseCount++;
-	    // Setup the new context
-	    (*this)(renderTree, portalCtx, container, portal->GetSector (), rview);
-	    recurseCount--;
-  
-	    rview->RestoreRenderContext ();
-	    portalVerts2d += orgCount;
-	  }
-	  else
-	  {
-	    // Setup heavy portal @@TODO
-	  }
-	}
+        recurseCount++;
+        StandardPortalSetup<RenderTreeType, ThisType> portalSetup (*this);
+        portalSetup (renderTree, context, container, sector, rview);
+        recurseCount--;
       }
+     
     }
   
   
   private:
-    bool IsSimplePortal (iPortal* portal)
-    {
-      return true;
-    }
+    
   
     iShaderManager* shaderManager;
     iShader* defaultShader;

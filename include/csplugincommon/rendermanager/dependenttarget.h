@@ -203,13 +203,13 @@ namespace RenderManager
       DependentTargetManager& parent;
       iShaderManager* shaderManager;
       HandledTargetsSet& handledTargets;
-      ContextSetup<Tree>& contextSetup;
+      StandardContextSetup<Tree>& contextSetup;
       Tree& renderTree;
 
       TextureTraverser (DependentTargetManager& parent,
         iShaderManager* shaderManager,
         HandledTargetsSet& handledTargets,
-        ContextSetup<Tree>& contextSetup,
+        StandardContextSetup<Tree>& contextSetup,
         Tree& renderTree) : parent (parent), 
         shaderManager (shaderManager), handledTargets (handledTargets),
         contextSetup (contextSetup),
@@ -325,7 +325,7 @@ namespace RenderManager
     }
 
     void AddDependentTargetsToTree (typename Tree::ContextsContainer* contexts,
-      Tree& renderTree, ContextSetup<Tree>& contextSetup, 
+      Tree& renderTree, StandardContextSetup<Tree>& contextSetup, 
       iShaderManager* shaderManager)
     {
       if (nestLevel == 0)

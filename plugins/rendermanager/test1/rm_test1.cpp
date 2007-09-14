@@ -59,7 +59,7 @@ bool RMTest1::RenderView (iView* view)
 
   // Setup the main context
   {
-    ContextSetup<RenderTreeType> contextSetup (shaderManager, 
+    StandardContextSetup<RenderTreeType> contextSetup (shaderManager, 
       defaultShader, defaultShaderName);
     contextSetup (renderTree, startContext, screenContexts, startSector, rview);
   
