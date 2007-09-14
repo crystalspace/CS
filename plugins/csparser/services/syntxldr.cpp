@@ -795,69 +795,77 @@ bool csTextSyntaxService::WriteMixmode (iDocumentNode* node, uint mixmode,
   return true;
 }
 
-bool csTextSyntaxService::HandlePortalParameter (
-	iDocumentNode* child, iLoaderContext* /*ldr_context*/,
-	uint32 &flags, bool &mirror, bool &warp, int& msv,
-	csMatrix3 &m, csVector3 &before, csVector3 &after,
-	iString* destSector, bool& handled, bool& autoresolve)
+struct HandlePortalParameterState : public csRefCount
+{
+  bool ww_given;
+  
+  HandlePortalParameterState () : ww_given (false) {}
+};
+
+bool csTextSyntaxService::HandlePortalParameter (iDocumentNode* child, 
+  iLoaderContext* /*ldr_context*/, csRef<csRefCount>& parseState, 
+  CS::Utility::PortalParameters& params, bool& handled)
 {
   handled = true;
   const char* value = child->GetValue ();
-  bool ww_given = false;
+  if (!parseState.IsValid()) parseState.AttachNew (new HandlePortalParameterState);
+  HandlePortalParameterState* state =
+    static_cast<HandlePortalParameterState*> ((csRefCount*)parseState);
   csStringID id = xmltokens.Request (value);
   switch (id)
   {
     case XMLTOKEN_MAXVISIT:
-      msv = child->GetContentsValueAsInt ();
+      params.msv = child->GetContentsValueAsInt ();
       break;
     case XMLTOKEN_MATRIX:
-      ParseMatrix (child, m);
-      mirror = false;
-      warp = true;
+      ParseMatrix (child, params.m);
+      params.mirror = false;
+      params.warp = true;
       break;
     case XMLTOKEN_WV:
-      ParseVector (child, before);
-      if (!ww_given) after = before;
-      mirror = false;
-      warp = true;
+      ParseVector (child, params.before);
+      if (!state->ww_given) params.after = params.before;
+      params.mirror = false;
+      params.warp = true;
       break;
     case XMLTOKEN_WW:
-      ParseVector (child, after);
-      ww_given = true;
-      mirror = false;
-      warp = true;
+      ParseVector (child, params.after);
+      state->ww_given = true;
+      params.mirror = false;
+      params.warp = true;
       break;
     case XMLTOKEN_AUTORESOLVE:
-      if (!ParseBool (child, autoresolve, true))
+      if (!ParseBool (child, params.autoresolve, true))
         return false;
       break;
     case XMLTOKEN_MIRROR:
-      if (!ParseBool (child, mirror, true))
+      if (!ParseBool (child, params.mirror, true))
         return false;
       break;
     case XMLTOKEN_CLIPSTRADDLING:
-      flags |= CS_PORTAL_CLIPSTRADDLING;
+      params.flags |= CS_PORTAL_CLIPSTRADDLING;
       break;
     case XMLTOKEN_COLLDET:
-      flags |= CS_PORTAL_COLLDET;
+      params.flags |= CS_PORTAL_COLLDET;
       break;
     case XMLTOKEN_VISCULL:
-      flags |= CS_PORTAL_VISCULL;
+      params.flags |= CS_PORTAL_VISCULL;
       break;
     case XMLTOKEN_STATIC:
-      flags |= CS_PORTAL_STATICDEST;
+      params.flags |= CS_PORTAL_STATICDEST;
       break;
     case XMLTOKEN_FLOAT:
-      flags |= CS_PORTAL_FLOAT;
+      params.flags |= CS_PORTAL_FLOAT;
       break;
     case XMLTOKEN_ZFILL:
-      flags |= CS_PORTAL_ZFILL;
+      params.flags |= CS_PORTAL_ZFILL;
       break;
     case XMLTOKEN_CLIP:
-      flags |= CS_PORTAL_CLIPDEST;
+      params.flags |= CS_PORTAL_CLIPDEST;
       break;
     case XMLTOKEN_SECTOR:
-      destSector->Append (child->GetContentsValue ());
+      if (params.destSector)
+        params.destSector->Append (child->GetContentsValue ());
       break;
     default:
       handled = false;

@@ -7,10 +7,42 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 14-Sep-2007
+	- andres fixed compilation in mingw (and maybe others) after res' 
+	  changes as suggested by res.
+	- res added a nicer variant of iSyntaxService::HandlePortalParameter().
+	  Also fixed a bug where the "before" setting would always overwrite
+	  the "after" one if specified last.
+	- res moved RenderMesh to the CS::Graphics namespace.
+	- Eric Sunshine added "authorship" attribution for Frank and Marten to
+	  the CS manual, and removed copyright notices for a couple people
+	  whose work is no longer present in the manual. Also fixed a couple
+	  Texinfo mark-up errors in perl.txi.
+	- res added CS::TriangleIndicesStreamRandom<>.
+	- res tweaked csBSPTree to not use EPSILON for triangle classification
+	  against planes; this fixes overzealous classification of triangles
+	  as coplanar.
+	- res fixed genmesh per-submesh z mode support to actually work.
+	- res added support for genmesh per-submesh back-to-front triangle
+	  sorting.
 	- Marten factored out some portal setup code.
 	- Marten implemented scene-level multipass rendering in the RM.
 	  This corresponds to having multiple render-steps in the old RL-
 	  system.
+13-Sep-2007
+	- res added a macro to deprecate struct members and variables
+	  (CS_DEPRECATED_VAR and CS_DEPRECATED_VAR_MSG).
+	- res made the cull flipping flag in render meshes more flexible -
+	  now, there's a 3rd mode "disable".
+	- res made render priority a render mesh field.
+	- res added support for per-submesh render priorities and z modes to
+	  genmesh.
+	- res added a "glvendor" version that can be used by the GL driver DB.
+	- res tweaked the GL driver DB to work around apparent font corruption
+	  with Mesa 6.5.2 (all drivers).
+	- res added Description() methods to csMatrix3 and csTransform.
+12-Sep-2007
+	- Jorrit merged the CS AI branch into trunk (basically only a small
+	  change in PriorityQueue).
 11-Sep-2007
 	- Marten fixed a small error regarding deprecation warnings in thing.
 	- Marten made a number of improvements to the RM:
@@ -20,12 +52,24 @@ chronological order.
 	   - Handle the case of a single mesh.
 	   - Implemented proper distance sorting.
 	   - Made the sorting table be lazy evaluation.
+8-Sep-2007
+	- res fixed a crash in bezier plugin caused by a rendermanager-only
+	  change accidentally slipping in.
+	- Genjix added doxygen comment for genmeshanim2 Append(animname)
+	  function.
+	- iceeey made the cssaver save plugin references with the short name
+	  from the original world file, if it was loaded with the saveable
+	  flag set. This makes saving and then loading 'castle' work.
 7-Sep-2007
 	- res fixed the debug info splitting to put the debug info file into
 	  the same file as the binary (fixes separate debug info for shared
 	  libs).
 	- res fixed the bezier mesh sometimes returning incompletely setup
 	  render meshes.
+	- Genjix changed joytest to use CS_REQUEST_JOYSTICK as an example for
+	  the users.
+	- Jorrit reverted r27048 (quotes for javac detection). This fixes
+	  both #377 and #378.
 6-Sep-2007
 	- res applied a patch from 'sarah' to fix compiling after merging some
 	  weaver changes from render manager branch (trac #384).
@@ -43,6 +87,9 @@ chronological order.
 	  of caedes).
 	- res reduced the number of memory allocations required by the
 	  dependent target stuff.
+	- Jorrit fixed a bug in terrainf caused by genmeshify. Apparently
+	  genmeshify tried to put specific material overrides in the
+	  mesh object.
 3-Sep-2007
 	- res partially reverted r27524 and r27534: some methods that have not
 	  been fully deprecated have been removed by these changesets. Notably,

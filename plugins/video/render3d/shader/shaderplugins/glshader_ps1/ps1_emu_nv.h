@@ -118,8 +118,8 @@ public:
   virtual void Deactivate();
 
   /// Setup states needed for proper operation of the shader
-  virtual void SetupState (const csRenderMesh* mesh,
-    csRenderMeshModes& modes,
+  virtual void SetupState (const CS::Graphics::RenderMesh* mesh,
+    CS::Graphics::RenderMeshModes& modes,
     const csShaderVariableStack& stack);
 
   /// Reset states to original

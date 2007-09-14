@@ -833,7 +833,7 @@ bool csConditionEvaluator::IsConditionPartOf (csConditionID condition,
 }
 
 bool csConditionEvaluator::Evaluate (csConditionID condition, 
-				     const csRenderMeshModes& modes,
+				     const CS::Graphics::RenderMeshModes& modes,
 				     const csShaderVariableStack* stack)
 {
   if (condition == csCondAlwaysTrue)

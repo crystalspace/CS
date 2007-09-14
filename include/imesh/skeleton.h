@@ -459,7 +459,9 @@ struct iSkeleton : public virtual iBase
   virtual iSkeletonAnimation* Execute (const char *animation_name, float blend_factor = 0.0f) = 0;
 
   /**
-   * Append animation for execution.
+   * Append animation for execution. Plays after all current animations
+   * have finished. Then the first Append'ed animation is played...
+   * then the next... and so on.
    */
   virtual iSkeletonAnimation* Append (const char *animation_name) = 0;
 

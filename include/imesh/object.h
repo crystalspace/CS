@@ -42,7 +42,13 @@ struct iObjectModel;
 struct iPortal;
 struct iRenderView;
 
-struct csRenderMesh;
+namespace CS
+{
+  namespace Graphics
+  {
+    struct RenderMesh;
+  }
+}
 
 class csColor;
 class csFlags;
@@ -135,7 +141,7 @@ struct iMeshObject : public virtual iBase
    * all relevant planes for the given object. These planes correspond
    * with the clip planes kept by iRenderView.
    */
-  virtual csRenderMesh** GetRenderMeshes (int& num, iRenderView* rview, 
+  virtual CS::Graphics::RenderMesh** GetRenderMeshes (int& num, iRenderView* rview, 
     iMovable* movable, uint32 frustum_mask) = 0;
 
   /**

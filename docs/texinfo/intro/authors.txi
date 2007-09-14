@@ -45,6 +45,12 @@ have been very extensive, and he is responsible for the manual's current
 organization, look, and feel.  He also created several utilities and Texinfo
 extension packages which allow the documentation to build cleanly on all
 platforms supported by Crystal Space.
+
+@item
+Frank Richter (@email{res@@crystalspace3d.org})
+
+Frank has written much @sc{api} documentation, as well as having contributed
+material to the Crystal Space manual.
 @end itemize
 
 The following list of people have contributed to the Crystal Space
@@ -54,6 +60,12 @@ absent from this manual, but we thank them anyhow.  This list is ordered
 alphabetically by surname.
 
 @itemize @bullet
+@item
+M@aa{}rten Svanfeldt (@email{developer@@svanfeldt.com})
+
+M@aa{}rten contributed material describing the rendering mechanism, the
+revised @sc{scf} implementation, and initiated the @sc{csep} initiative.
+
 @item
 Robert Bate (@email{rbate@@mac.com})
 

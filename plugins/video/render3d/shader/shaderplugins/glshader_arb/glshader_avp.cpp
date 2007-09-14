@@ -56,8 +56,8 @@ void csShaderGLAVP::Deactivate()
   glDisable (GL_VERTEX_PROGRAM_ARB);
 }
 
-void csShaderGLAVP::SetupState (const csRenderMesh* /*mesh*/, 
-                                csRenderMeshModes& /*modes*/,
+void csShaderGLAVP::SetupState (const CS::Graphics::RenderMesh* /*mesh*/, 
+                                CS::Graphics::RenderMeshModes& /*modes*/,
 	                        const csShaderVariableStack& stack)
 {
   size_t i;

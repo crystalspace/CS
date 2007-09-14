@@ -53,7 +53,7 @@ public:
   const char* GetFileName () { return 0; }
   void SetFileName (const char* /*filename*/) {  }
 
-  virtual size_t GetTicket (const csRenderMeshModes&, 
+  virtual size_t GetTicket (const CS::Graphics::RenderMeshModes&, 
     const csShaderVariableStack&) { return 0; }
   virtual size_t GetTicket (const csRenderMeshModes& modes,
     csShaderVariable** stacks)
@@ -63,8 +63,8 @@ public:
 
   virtual size_t GetNumberOfPasses (size_t) { return 0; }
   virtual bool ActivatePass (size_t, size_t) { return false; }
-  virtual bool SetupPass (size_t, const csRenderMesh*,
-    csRenderMeshModes&, const csShaderVariableStack&)
+  virtual bool SetupPass (size_t, const CS::Graphics::RenderMesh*,
+    CS::Graphics::RenderMeshModes&, const csShaderVariableStack&)
   { return false; }
   virtual bool TeardownPass (size_t)
   { return false; }

@@ -624,8 +624,8 @@ public:
   void Print (csRect const* area);
 
   /// Drawroutine. Only way to draw stuff
-  void DrawMesh (const csCoreRenderMesh* mymesh,
-    const csRenderMeshModes& modes,
+  void DrawMesh (const CS::Graphics::CoreRenderMesh* mymesh,
+    const CS::Graphics::RenderMeshModes& modes,
     const csShaderVariableStack& stack);
 
   /// Draw a 2D sprite

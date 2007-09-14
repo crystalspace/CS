@@ -68,6 +68,9 @@ public:
   /// Construct a matrix with a quaternion.
   explicit csMatrix3 (const csQuaternion &quat) { Set (quat); }
 
+  /// Return a textual representation of the matrix
+  csString Description() const;
+  
   /// Get the first row of this matrix as a vector.
   inline csVector3 Row1() const { return csVector3 (m11,m12,m13); }
 

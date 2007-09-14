@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 
+#include "csgfx/renderbuffer.h"
 #include "cstool/rbuflock.h"
 
 #include "submeshes.h"
@@ -26,6 +27,41 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
 {
+  iRenderBuffer* SubMesh::GetIndicesB2F (const csVector3& pos, uint frameNum,
+                                         const csVector3* vertices, size_t vertNum)
+  {
+    if (!b2fTree)
+    {
+      CS::TriangleIndicesStream<int> triangles (index_buffer,
+	CS_MESHTYPE_TRIANGLES);
+      b2fTree = new csBSPTree;
+      b2fTree->Build (triangles, vertices);
+    }
+    
+    const csDirtyAccessArray<int>& triidx = b2fTree->Back2Front (pos);
+    
+    bool bufCreated;
+    csRef<iRenderBuffer>& newIndexBuffer = b2fIndices.GetUnusedData (bufCreated, frameNum);
+    if (bufCreated || newIndexBuffer->GetElementCount() != triidx.GetSize()*3)
+    {
+      newIndexBuffer = csRenderBuffer::CreateIndexRenderBuffer (triidx.GetSize()*3,
+        CS_BUF_STREAM, CS_BUFCOMP_UNSIGNED_INT, 0, vertNum-1);
+    }
+    csRenderBufferLock<int> indices (newIndexBuffer);
+    CS::TriangleIndicesStreamRandom<int> triangles (index_buffer,
+      CS_MESHTYPE_TRIANGLES);
+    for (size_t t = 0; t < triidx.GetSize(); t++)
+    {
+      const TriangleT<int> tri (triangles[triidx[t]]);
+      *(indices++) = tri.a;
+      *(indices++) = tri.b;
+      *(indices++) = tri.c;
+    }
+    return newIndexBuffer;
+  }
+  
+  //-------------------------------------------------------------------------
+  
   static int SubmeshSubmeshCompare (SubMesh* const& A, 
                                     SubMesh* const& B)
   {
@@ -83,11 +119,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Genmesh)
 
   csRenderBufferHolder* SubMeshProxy::GetBufferHolder()
   {
-    if (!bufferHolder.IsValid())
-    {
-      bufferHolder.AttachNew (new csRenderBufferHolder);
-      bufferHolder->SetRenderBuffer(CS_BUFFER_INDEX, GetIndices ());
-    }
+    if (!bufferHolder.IsValid()) bufferHolder.AttachNew (
+      new csRenderBufferHolder);
     return bufferHolder;
   }
 

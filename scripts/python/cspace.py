@@ -786,6 +786,7 @@ class csMatrix3(_object):
         this = _cspace.new_csMatrix3(*args)
         try: self.this.append(this)
         except: self.this = this
+    def Description(*args): return _cspace.csMatrix3_Description(*args)
     def Row1(*args): return _cspace.csMatrix3_Row1(*args)
     def Row2(*args): return _cspace.csMatrix3_Row2(*args)
     def Row3(*args): return _cspace.csMatrix3_Row3(*args)
@@ -934,6 +935,7 @@ class csTransform(_object):
         this = _cspace.new_csTransform(*args)
         try: self.this.append(this)
         except: self.this = this
+    def Description(*args): return _cspace.csTransform_Description(*args)
     def Identity(*args): return _cspace.csTransform_Identity(*args)
     def IsIdentity(*args): return _cspace.csTransform_IsIdentity(*args)
     def GetO2T(*args): return _cspace.csTransform_GetO2T(*args)
@@ -4245,6 +4247,8 @@ class iMeshWrapper(iBase):
     def RemoveMeshFromStaticLOD(*args): return _cspace.iMeshWrapper_RemoveMeshFromStaticLOD(*args)
     def GetSVContext(*args): return _cspace.iMeshWrapper_GetSVContext(*args)
     def AddExtraRenderMesh(*args): return _cspace.iMeshWrapper_AddExtraRenderMesh(*args)
+    def GetExtraRenderMesh(*args): return _cspace.iMeshWrapper_GetExtraRenderMesh(*args)
+    def GetExtraRenderMeshCount(*args): return _cspace.iMeshWrapper_GetExtraRenderMeshCount(*args)
     def GetExtraRenderMeshPriority(*args): return _cspace.iMeshWrapper_GetExtraRenderMeshPriority(*args)
     def GetExtraRenderMeshZBufMode(*args): return _cspace.iMeshWrapper_GetExtraRenderMeshZBufMode(*args)
     def RemoveExtraRenderMesh(*args): return _cspace.iMeshWrapper_RemoveExtraRenderMesh(*args)
@@ -4690,6 +4694,11 @@ class iGeneralMeshSubMesh(iBase):
     def GetName(*args): return _cspace.iGeneralMeshSubMesh_GetName(*args)
     def GetMixmode(*args): return _cspace.iGeneralMeshSubMesh_GetMixmode(*args)
     def SetMaterial(*args): return _cspace.iGeneralMeshSubMesh_SetMaterial(*args)
+    def GetZMode(*args): return _cspace.iGeneralMeshSubMesh_GetZMode(*args)
+    def SetZMode(*args): return _cspace.iGeneralMeshSubMesh_SetZMode(*args)
+    def GetRenderPriority(*args): return _cspace.iGeneralMeshSubMesh_GetRenderPriority(*args)
+    def SetRenderPriority(*args): return _cspace.iGeneralMeshSubMesh_SetRenderPriority(*args)
+    def SetMixmode(*args): return _cspace.iGeneralMeshSubMesh_SetMixmode(*args)
     __swig_destroy__ = _cspace.delete_iGeneralMeshSubMesh
     __del__ = lambda self : None;
 iGeneralMeshSubMesh_swigregister = _cspace.iGeneralMeshSubMesh_swigregister
