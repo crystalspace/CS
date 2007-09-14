@@ -245,6 +245,7 @@ void csGLGraphics3D::SetZModeInternal (csZBufMode mode)
 {
   switch (mode)
   {
+    default:
     case CS_ZBUF_NONE:
       statecache->Disable_GL_DEPTH_TEST ();
       break;
@@ -268,8 +269,6 @@ void csGLGraphics3D::SetZModeInternal (csZBufMode mode)
       statecache->Enable_GL_DEPTH_TEST ();
       statecache->SetDepthFunc (GL_GEQUAL);
       statecache->SetDepthMask ((mode == CS_ZBUF_USE) ? GL_TRUE : GL_FALSE);
-      break;
-    default:
       break;
   }
 }

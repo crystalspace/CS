@@ -19,6 +19,7 @@ chronological order.
 	- res tweaked csBSPTree to not use EPSILON for triangle classification
 	  against planes; this fixes overzealous classification of triangles
 	  as coplanar.
+	- res fixed genmesh per-submesh z mode support to actually work.
 13-Sep-2007
 	- res added a macro to deprecate struct members and variables
 	  (CS_DEPRECATED_VAR and CS_DEPRECATED_VAR_MSG).
