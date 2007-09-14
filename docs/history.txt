@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 14-Sep-2007
+	- andres fixed compilation in mingw (and maybe others) after res' 
+	  changes as suggested by res.
 	- res added a nicer variant of iSyntaxService::HandlePortalParameter().
 	  Also fixed a bug where the "before" setting would always overwrite
 	  the "after" one if specified last.

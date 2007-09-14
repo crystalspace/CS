@@ -444,7 +444,7 @@ public:
     {
       TriangleIndicesStream<T>::BeginTriangulate (indexStart, indexEnd, stride,
         compType, meshtype);
-      streamIndex = this->indexStart = index;
+      streamIndex = this->indexStart = this->index;
       streamTriangleNum = triangleNum = 0;
     }
     
@@ -463,7 +463,7 @@ public:
     {
       TriangleIndicesStream<T>::BeginTriangulate (indices, meshtype, 
         indexStart, indexEnd);
-      streamIndex = this->indexStart = index;
+      streamIndex = this->indexStart = this->index;
       streamTriangleNum = triangleNum = 0;
     }
     
