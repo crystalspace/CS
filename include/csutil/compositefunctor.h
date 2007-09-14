@@ -24,121 +24,116 @@ namespace CS
 namespace Meta
 {
 
-  namespace Implementation
+  template<typename Fn1, typename Fn2>
+  class CompositeFunctorType2
   {
-    template<typename Fn1, typename Fn2>
-    class CompositeFunctorImpl2
+  public:
+    CompositeFunctorType2 (Fn1& fn1, Fn2& fn2)
+      : fn1 (fn1), fn2 (fn2)
+    {}
+
+    void operator() ()
     {
-    public:
-      CompositeFunctorImpl2 (Fn1& fn1, Fn2& fn2)
-        : fn1 (fn1), fn2 (fn2)
-      {}
+      fn1();
+      fn2();
+    }
 
-      void operator() ()
-      {
-        fn1();
-        fn2();
-      }
-
-      template<typename A1>
-      void operator() (A1& a1)
-      {
-        fn1(a1);
-        fn2(a1);
-      }
-
-      template<typename A1, typename A2>
-      void operator() (A1& a1, A2& a2)
-      {
-        fn1(a1, a2);
-        fn2(a1, a2);
-      }
-
-      template<typename A1, typename A2, typename A3>
-      void operator() (A1& a1, A2& a2, A3& a3)
-      {
-        fn1(a1, a2, a3);
-        fn2(a1, a2, a3);
-      }
-
-      template<typename A1, typename A2, typename A3, typename A4>
-      void operator() (A1& a1, A2& a2, A3& a3, A4& a4)
-      {
-        fn1(a1, a2, a3, a4);
-        fn2(a1, a2, a3, a4);
-      }
-
-    private:
-      Fn1& fn1;
-      Fn2& fn2;
-    };
-
-    template<typename Fn1, typename Fn2, typename Fn3>
-    class CompositeFunctorImpl3
+    template<typename A1>
+    void operator() (A1& a1)
     {
-    public:
-      CompositeFunctorImpl3 (Fn1& fn1, Fn2& fn2, Fn3& fn3)
-        : fn1 (fn1), fn2 (fn2), fn3 (fn3)
-      {}
+      fn1(a1);
+      fn2(a1);
+    }
 
-      void operator() ()
-      {
-        fn1();
-        fn2();
-        fn3();
-      }
+    template<typename A1, typename A2>
+    void operator() (A1& a1, A2& a2)
+    {
+      fn1(a1, a2);
+      fn2(a1, a2);
+    }
 
-      template<typename A1>
-      void operator() (A1& a1)
-      {
-        fn1(a1);
-        fn2(a1);
-        fn3(a1);
-      }
+    template<typename A1, typename A2, typename A3>
+    void operator() (A1& a1, A2& a2, A3& a3)
+    {
+      fn1(a1, a2, a3);
+      fn2(a1, a2, a3);
+    }
 
-      template<typename A1, typename A2>
-      void operator() (A1& a1, A2& a2)
-      {
-        fn1(a1, a2);
-        fn2(a1, a2);
-        fn3(a1, a2);
-      }
+    template<typename A1, typename A2, typename A3, typename A4>
+    void operator() (A1& a1, A2& a2, A3& a3, A4& a4)
+    {
+      fn1(a1, a2, a3, a4);
+      fn2(a1, a2, a3, a4);
+    }
 
-      template<typename A1, typename A2, typename A3>
-      void operator() (A1& a1, A2& a2, A3& a3)
-      {
-        fn1(a1, a2, a3);
-        fn2(a1, a2, a3);
-        fn3(a1, a2, a3);
-      }
+  private:
+    Fn1& fn1;
+    Fn2& fn2;
+  };
 
-      template<typename A1, typename A2, typename A3, typename A4>
-      void operator() (A1& a1, A2& a2, A3& a3, A4& a4)
-      {
-        fn1(a1, a2, a3, a4);
-        fn2(a1, a2, a3, a4);
-        fn3(a1, a2, a3, a4);
-      }
+  template<typename Fn1, typename Fn2, typename Fn3>
+  class CompositeFunctorType3
+  {
+  public:
+    CompositeFunctorType3 (Fn1& fn1, Fn2& fn2, Fn3& fn3)
+      : fn1 (fn1), fn2 (fn2), fn3 (fn3)
+    {}
 
-    private:
-      Fn1& fn1;
-      Fn2& fn2;
-      Fn3& fn3;
-    };
-  }
+    void operator() ()
+    {
+      fn1();
+      fn2();
+      fn3();
+    }
+
+    template<typename A1>
+    void operator() (A1& a1)
+    {
+      fn1(a1);
+      fn2(a1);
+      fn3(a1);
+    }
+
+    template<typename A1, typename A2>
+    void operator() (A1& a1, A2& a2)
+    {
+      fn1(a1, a2);
+      fn2(a1, a2);
+      fn3(a1, a2);
+    }
+
+    template<typename A1, typename A2, typename A3>
+    void operator() (A1& a1, A2& a2, A3& a3)
+    {
+      fn1(a1, a2, a3);
+      fn2(a1, a2, a3);
+      fn3(a1, a2, a3);
+    }
+
+    template<typename A1, typename A2, typename A3, typename A4>
+    void operator() (A1& a1, A2& a2, A3& a3, A4& a4)
+    {
+      fn1(a1, a2, a3, a4);
+      fn2(a1, a2, a3, a4);
+      fn3(a1, a2, a3, a4);
+    }
+
+  private:
+    Fn1& fn1;
+    Fn2& fn2;
+    Fn3& fn3;
+  };
 
   template<typename Fn1, typename Fn2>
-  Implementation::CompositeFunctorImpl2<Fn1, Fn2> 
-  CompositeFunctor (Fn1& fn1, Fn2& fn2)
+  CompositeFunctorType2<Fn1, Fn2> CompositeFunctor (Fn1& fn1, Fn2& fn2)
   {
-    return Implementation::CompositeFunctorImpl2<Fn1, Fn2> (fn1, fn2);
+    return CompositeFunctorType2<Fn1, Fn2> (fn1, fn2);
   }
 
   template<typename Fn1, typename Fn2, typename Fn3>
-  Implementation::CompositeFunctorImpl3<Fn1, Fn2, Fn3>
-  CompositeFunctor (Fn1& fn1, Fn2& fn2, Fn3& fn3)
+  CompositeFunctorType3<Fn1, Fn2, Fn3> CompositeFunctor (Fn1& fn1, Fn2& fn2, Fn3& fn3)
   {
-    return Implementation::CompositeFunctorImpl3<Fn1, Fn2, Fn3> (fn1, fn2, fn3);
+    return CompositeFunctorType3<Fn1, Fn2, Fn3> (fn1, fn2, fn3);
   }
 }
 }

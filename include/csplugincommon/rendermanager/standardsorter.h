@@ -63,17 +63,20 @@ namespace RenderManager
       {
       case CS_RENDPRI_SORT_NONE:
         {
-          meshNode->meshes.Sort (NormalSorter());
+          NormalSorter sorter;
+          meshNode->meshes.Sort (sorter);
         }
         break;
       case CS_RENDPRI_SORT_BACK2FRONT:
         {
-          meshNode->meshes.Sort (DistanceSorter(cameraOrigin, 1));
+          DistanceSorter sorter (cameraOrigin, 1);
+          meshNode->meshes.Sort (sorter);
         }
         break;
       case CS_RENDPRI_SORT_FRONT2BACK:
         {
-          meshNode->meshes.Sort (DistanceSorter(cameraOrigin, -1));
+          DistanceSorter sorter (cameraOrigin, -1);
+          meshNode->meshes.Sort (sorter);
         }
         break;
       default:

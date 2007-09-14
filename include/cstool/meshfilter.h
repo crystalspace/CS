@@ -34,7 +34,7 @@ namespace Utility
     MESH_FILTER_INCLUDE
   };
 
-  class MeshFilter
+  class CS_CRYSTALSPACE_EXPORT MeshFilter
   {
   public:
     MeshFilter();

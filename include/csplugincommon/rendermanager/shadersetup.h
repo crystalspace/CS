@@ -122,16 +122,20 @@ namespace RenderManager
     context.ticketArray.SetSize (context.totalRenderMeshes*layerConfig.GetLayerCount ());
 
     // Shader, sv and ticket setup
-    ShaderSetup<Tree, LayerConfigType> shaderSetup (context.shaderArray, layerConfig);
+    typedef ShaderSetup<Tree, LayerConfigType> ShaderSetupType;
+    ShaderSetupType shaderSetup (context.shaderArray, layerConfig);
 
-    ShaderSVSetup<Tree, LayerConfigType> shaderSVSetup (context.svArrays, context.shaderArray, layerConfig);
+    typedef ShaderSVSetup<Tree, LayerConfigType> ShaderSVSetupType;
+    ShaderSVSetupType shaderSVSetup (context.svArrays, context.shaderArray, layerConfig);
       
-    TicketSetup<Tree, LayerConfigType> ticketSetup (context.svArrays, shaderManager->GetShaderVariableStack (),
+    typedef TicketSetup<Tree, LayerConfigType> TicketSetupType;
+    TicketSetupType ticketSetup (context.svArrays, shaderManager->GetShaderVariableStack (),
       context.shaderArray, context.ticketArray, layerConfig);
 
-    tree.TraverseMeshNodes (
-      CS::Meta::CompositeFunctor (shaderSetup, shaderSVSetup, ticketSetup), 
-      &context);
+    CS::Meta::CompositeFunctorType3<ShaderSetupType, ShaderSVSetupType, 
+      TicketSetupType> functor (CS::Meta::CompositeFunctor (shaderSetup, 
+        shaderSVSetup, ticketSetup));
+    tree.TraverseMeshNodes (functor, &context);
   }
 
   typedef csDirtyAccessArray<csStringID> ShaderVariableNameArray;
