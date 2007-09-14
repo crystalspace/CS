@@ -1,5 +1,8 @@
 1.2 branch log.
 
+14-Sep-2007
+	- Eric Sunshine merged r27642 into 1.2 (authorship attribution and
+	  copyrights in CS manual).
 13-Sep-2007
         - Mike Gist merged r27635 into 1.2 (fix for font corruption with
           Mesa 6.5.2).
