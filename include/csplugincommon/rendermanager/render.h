@@ -116,7 +116,7 @@ namespace RenderManager
   
 	  for (size_t m = 0; m < meshesToRender.GetSize(); m++)
 	  {
-	    ctxNode.svArrays.SetupSVStck (varStack, meshLayer, firstMeshIndex + m);
+	    ctxNode.svArrays.SetupSVStack (varStack, meshLayer, firstMeshIndex + m);
   
 	    csRenderMesh* mesh = meshesToRender[m].mesh;
 	    csRenderMeshModes modes (*mesh);

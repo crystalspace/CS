@@ -27,7 +27,9 @@
 CS_PLUGIN_NAMESPACE_BEGIN(RMTest1)
 {
 
-  class RMTest1 : public scfImplementation2<RMTest1, iRenderManager, iComponent>
+  class RMTest1 : public scfImplementation2<RMTest1, 
+                                            iRenderManager, 
+                                            iComponent>
   {
   public:
     RMTest1 (iBase* parent);
@@ -49,8 +51,19 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMTest1)
     //---- iComponent ----
     virtual bool Initialize (iObjectRegistry*);
 
+    // Target manager handler
+    bool HandleTargetSetup (csStringID svName, csShaderVariable* sv, 
+      iTextureHandle* textureHandle, iView*& localView)
+    {
+      return false;
+    }
+
     typedef CS::RenderManager::RenderTree<> RenderTreeType;
-  protected:
+  protected:    
+
+    bool HandleTarget (RenderTreeType& renderTree, csStringID svName, 
+      RenderTreeType::ContextsContainer* contexts);
+
     CS::RenderManager::RenderView::Pool renderViewPool;
 
     RenderTreeType::PersistentData treePersistent;
@@ -62,7 +75,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMTest1)
     csStringID              defaultShaderName;
     csRef<iShader>          defaultShader;
 
-    CS::RenderManager::DependentTargetManager<RenderTreeType> targets;
+    CS::RenderManager::DependentTargetManager<RenderTreeType, RMTest1> targets;
 
   };
 

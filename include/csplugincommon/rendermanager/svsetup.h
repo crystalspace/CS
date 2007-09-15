@@ -52,7 +52,7 @@ namespace RenderManager
 
       for (size_t layer = 0; layer < layerConfig.GetLayerCount (); ++layer)
       {
-        svArrays.SetupSVStck (localStack, layer, index);
+        svArrays.SetupSVStack (localStack, layer, index);
 
         // Push all contexts here @@TODO: get more of them
         localStack[tree.GetObjectToWorldName()] = mesh.svObjectToWorld;
@@ -103,7 +103,7 @@ namespace RenderManager
         
           // Back-merge it onto the real one
           csShaderVariableStack localStack;
-          svArrays.SetupSVStck (localStack, layer, index);
+          svArrays.SetupSVStack (localStack, layer, index);
           localStack.MergeFront (tempStack);
         }
       }
@@ -129,7 +129,7 @@ namespace RenderManager
     csShaderVariableStack& svStack = shaderManager->GetShaderVariableStack ();
 
     {
-      context.svArrays.SetupSVStck (svStack, 0, 0);
+      context.svArrays.SetupSVStack (svStack, 0, 0);
 
       shaderManager->PushVariables (svStack);
       sector->GetSVContext ()->PushVariables (svStack);

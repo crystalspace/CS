@@ -77,7 +77,7 @@ public:
   }
 
   /// Return the number of elements in the FIFO.
-  size_t GetSize()
+  size_t GetSize() const
   {
     return a1.GetSize() + a2.GetSize();
   }
@@ -87,7 +87,7 @@ public:
    * \deprecated Use GetSize() instead.
    */
   CS_DEPRECATED_METHOD_MSG("Use GetSize() instead.")
-  size_t Length()
+  size_t Length() const
   {
     return GetSize();
   }

@@ -95,7 +95,7 @@ namespace RenderManager
         size_t layerOffset = layer*ctxNode.totalRenderMeshes;
         
         // Setup the shader array
-        svArrays.SetupSVStck (varStack, layer, index);
+        svArrays.SetupSVStack (varStack, layer, index);
 
         // Get the ticket
         iShader* shader = shaderArray[index];

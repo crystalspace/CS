@@ -36,8 +36,7 @@ public:
   typedef StandardContextSetup<RenderTreeType, LayerConfigType> ThisType;
 
   StandardContextSetup (iShaderManager* shaderManager, const LayerConfigType& layerConfig)
-    : shaderManager (shaderManager), 
-    layerConfig (layerConfig),
+    : shaderManager (shaderManager), layerConfig (layerConfig),
     recurseCount (0)
   {
 
@@ -49,7 +48,7 @@ public:
     iSector* sector, CS::RenderManager::RenderView* rview)
   {
     // @@@ FIXME: Of course, don't hardcode.
-    if (recurseCount > 5) return;
+    if (recurseCount > 30) return;
 
     sector->CallSectorCallbacks (rview);
 
@@ -85,14 +84,11 @@ public:
       StandardPortalSetup<RenderTreeType, ThisType> portalSetup (*this);
       portalSetup (renderTree, context, container, sector, rview);
       recurseCount--;
-    }
-
+    } 
   }
 
 
 private:
-
-
   iShaderManager* shaderManager;
   const LayerConfigType& layerConfig;
   int recurseCount;
@@ -101,7 +97,7 @@ private:
 
 
 RMTest1::RMTest1 (iBase* parent)
-: scfImplementationType (this, parent)
+: scfImplementationType (this, parent), targets (*this)
 {
 
 }
@@ -136,10 +132,22 @@ bool RMTest1::RenderView (iView* view)
       renderLayer);
     contextSetup (renderTree, startContext, screenContexts, startSector, rview);
   
-    //targets.AddDependentTargetsToTree (screenContexts, renderTree, 
-    //  contextSetup, shaderManager);
+    targets.PrepareQueues (shaderManager);
+    targets.EnqueueTargetsInContext (screenContexts, renderTree, shaderManager, renderLayer);  
   }
 
+  // Setup all dependent targets
+  while (targets.HaveMoreTargets ())
+  {
+    csStringID svName;
+    RenderTreeType::ContextsContainer* contexts;
+    targets.GetNextTarget (svName, contexts);
+
+    HandleTarget (renderTree, svName, contexts);    
+  }
+
+
+  targets.PostCleanupQueues ();
   // Render all contexts, back to front
   {
     view->GetContext()->SetZMode (CS_ZBUF_MESH);
@@ -147,6 +155,34 @@ bool RMTest1::RenderView (iView* view)
     ContextRender<RenderTreeType, SingleRenderLayer> render (shaderManager, renderLayer);
     renderTree.TraverseContextContainersReverse (render);
   }
+
+  return true;
+}
+
+bool RMTest1::HandleTarget (RenderTreeType& renderTree, csStringID svName, 
+                            RenderTreeType::ContextsContainer* contexts)
+{
+  SingleRenderLayer renderLayer (defaultShaderName, defaultShader);
+
+  // Prepare
+  contexts->view->UpdateClipper ();
+  csRef<CS::RenderManager::RenderView> rview;
+  rview.AttachNew (new (renderViewPool) CS::RenderManager::RenderView(contexts->view));
+
+  iSector* startSector = rview->GetThisSector ();
+
+  if (!startSector)
+    return false;
+
+  RenderTreeType::ContextNode* startContext = renderTree.CreateContext (contexts,
+    rview);
+
+  // Setup
+  StandardContextSetup<RenderTreeType, SingleRenderLayer> contextSetup (shaderManager, 
+    renderLayer);
+  contextSetup (renderTree, startContext, contexts, startSector, rview);
+
+  targets.EnqueueTargetsInContext (contexts, renderTree, shaderManager, renderLayer);
 
   return true;
 }

@@ -74,7 +74,7 @@ namespace RenderManager
       memset (svArray, 0, arraySize);
     }
 
-    void SetupSVStck (csShaderVariableStack& stack, size_t layer, size_t set)
+    void SetupSVStack (csShaderVariableStack& stack, size_t layer, size_t set)
     {
       CS_ASSERT (layer < numLayers);
       CS_ASSERT (set < numSets);
@@ -117,6 +117,11 @@ namespace RenderManager
     size_t GetNumSVNames () const
     {
       return numSVNames;
+    }
+
+    size_t GetNumLayers () const
+    {
+      return numLayers;
     }
 
   private:
