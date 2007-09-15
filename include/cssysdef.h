@@ -182,7 +182,7 @@
 #  if defined(CS_COMPILER_MSVC)
 #    define CS_DEPRECATED_VAR(decl) __declspec(deprecated) decl
 #  else
-#    define CS_DEPRECATED_VAR(decl)
+#    define CS_DEPRECATED_VAR(decl) decl
 #  endif
 #endif
 
