@@ -1064,3 +1064,11 @@ csWrapPtr CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
 }
 %}
 
+/* POST */
+#ifndef SWIGIMPORTED
+#undef APPLY_FOR_ALL_INTERFACES_POST
+#define APPLY_FOR_ALL_INTERFACES_POST CORE_APPLY_FOR_EACH_INTERFACE
+%include "bindings/common/basepost.i"
+cs_lang_include(corepost.i)
+#endif
+
