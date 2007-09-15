@@ -9,6 +9,8 @@ chronological order.
 15-Sep-2007
 	- res fixed a crash in the GL driver DB when <comparever> was used
 	  with an unrecognized version type.
+	- res tweaked some GL driver DB entries to take advantage of the
+	  new "glvendor" type.
 14-Sep-2007
 	- andres fixed compilation in mingw (and maybe others) after res' 
 	  changes as suggested by res.
