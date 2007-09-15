@@ -331,6 +331,17 @@ bool csDriverDBReader::ParseCompareVer (iDocumentNode* node, bool& result)
 
   result = false;
   const char* curpos1 = db->ogl2d->GetVersionString (version);
+  if (curpos1 == 0)
+  {
+    /* @@@ Hmm... a version may just be unknown on some platforms...
+       (e.g. win32_driver on Linux) */
+    /*synsrv->Report (
+      "crystalspace.canvas.openglcommon.driverdb",
+      CS_REPORTER_SEVERITY_WARNING,
+      node,
+      "Unknown version type '%s'", version);*/
+    return false;
+  }
   const char* curpos2 = relation + rellen + 1;
   // Skip leading non-digits
   curpos1 += strcspn (curpos1, digits);

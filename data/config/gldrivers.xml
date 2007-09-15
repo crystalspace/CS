@@ -312,10 +312,10 @@
 	  <comparever version="win32_driver" relation="lt 6.14.10.7801" />
 	  <conditions fulfill="all">
 	    <regexp string="platform" pattern="Unix" />
-	    <comparever version="gl" relation="lt 2.0.0 NVIDIA 76.67" />
+	    <comparever version="glvendor" relation="lt NVIDIA 76.67" />
 	    <!-- Note: comparever is dumb, it just compares numbers, nothing
 		 in between. 
-		 E.g. "2.0.0 ATI 78.90" would make the comparison above, true,
+		 E.g. "ATI 78.90" would make the comparison above, true,
 		 too. -->
 	  </conditions>
 	</conditions>
@@ -336,7 +336,7 @@
       <conditions fulfill="all">
 	<regexp string="platform" pattern="Unix" />
 	<regexp string="renderer" pattern="^GeForce 6600" />
-	<regexp string="glversion" pattern="NVIDIA 97.55" />
+	<comparever string="glvendor" pattern="eq NVIDIA 97.55" />
       </conditions>
       <applicable>
         <usecfg>novbo</usecfg>
