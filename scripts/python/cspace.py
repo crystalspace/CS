@@ -4699,6 +4699,8 @@ class iGeneralMeshSubMesh(iBase):
     def GetRenderPriority(*args): return _cspace.iGeneralMeshSubMesh_GetRenderPriority(*args)
     def SetRenderPriority(*args): return _cspace.iGeneralMeshSubMesh_SetRenderPriority(*args)
     def SetMixmode(*args): return _cspace.iGeneralMeshSubMesh_SetMixmode(*args)
+    def SetBack2Front(*args): return _cspace.iGeneralMeshSubMesh_SetBack2Front(*args)
+    def GetBack2Front(*args): return _cspace.iGeneralMeshSubMesh_GetBack2Front(*args)
     __swig_destroy__ = _cspace.delete_iGeneralMeshSubMesh
     __del__ = lambda self : None;
 iGeneralMeshSubMesh_swigregister = _cspace.iGeneralMeshSubMesh_swigregister

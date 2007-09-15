@@ -7037,6 +7037,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *GetRenderPriority = *cspacec::iGeneralMeshSubMesh_GetRenderPriority;
 *SetRenderPriority = *cspacec::iGeneralMeshSubMesh_SetRenderPriority;
 *SetMixmode = *cspacec::iGeneralMeshSubMesh_SetMixmode;
+*SetBack2Front = *cspacec::iGeneralMeshSubMesh_SetBack2Front;
+*GetBack2Front = *cspacec::iGeneralMeshSubMesh_GetBack2Front;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
