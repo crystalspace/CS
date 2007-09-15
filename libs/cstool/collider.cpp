@@ -24,6 +24,7 @@
 #include "csgeom/quaternion.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/trimesh.h"
+#include "csutil/sysfunc.h"
 
 #include "cstool/collider.h"
 #include "iengine/camera.h"
@@ -678,8 +679,10 @@ void csColliderActor::SetCamera (iCamera* camera, bool adjustRotation)
   this->camera = camera; 
   if (adjustRotation)
   {
+    csPrintf ("T2O = %s\n", camera->GetTransform().GetT2O().Description().GetData());
     csQuaternion quat; quat.SetMatrix (camera->GetTransform().GetT2O());
     rotation = quat.GetEulerAngles ();
+    csPrintf ("rotation = %s\n", rotation.Description().GetData());
     // Angle fixups.
     /* @@@ FIXME: Are those right in the math sense or do they indicate
      * csQuaternion bugs? */
@@ -1291,7 +1294,13 @@ bool csColliderActor::MoveV (float delta,
     if (movable)
       movable->SetSector (new_sector);
     else
+    {
       camera->SetSector (new_sector);
+      SetCamera (camera); // To update rotation
+    }
+    /*c->SetMirrored (imirror != 0);
+    c->GetTransform ().SetO2T (m);
+    c->GetTransform ().SetOrigin (v);*/
   }
 
   if (!onground)
