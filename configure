@@ -13144,7 +13144,7 @@ else
   cs_java_dir="$JAVA_HOME"
 else
   if test -n "$JAVAC"; then
-  cs_java_dir=`$as_dirname -- "$JAVAC" ||
+  cs_java_dir=`$as_dirname -- $JAVAC ||
 $as_expr X$JAVAC : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
 	 X$JAVAC : 'X\(//\)[^/]' \| \
 	 X$JAVAC : 'X\(//\)$' \| \
@@ -70437,9 +70437,7 @@ fi
 { echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_declare_deprecated" >&5
 echo "${ECHO_T}$cs_cv_prog_cxx_declare_deprecated" >&6; }
     if test $cs_cv_prog_cxx_declare_deprecated != no; then
-  cs_header_text="${cs_header_text}#define CS_DEPRECATED_METHOD $cs_cv_prog_cxx_declare_deprecated
-"
-    cs_header_text="${cs_header_text}#define CS_DEPRECATED_TYPE $cs_cv_prog_cxx_declare_deprecated
+  cs_header_text="${cs_header_text}#define CS_ATTRIBUTE_DEPRECATED $cs_cv_prog_cxx_declare_deprecated
 "
 fi
 

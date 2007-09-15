@@ -25,7 +25,13 @@
 #include "csgeom/plane3.h"
 #include "csgeom/sphere.h"
 #include "csgeom/transfrm.h"
+#include "csutil/csstring.h"
 
+csString csTransform::Description() const
+{
+  return csString().Format ("m_o2t: %s  v_o2t: %s",
+    m_o2t.Description().GetData(), v_o2t.Description().GetData());
+}
 
 //---------------------------------------------------------------------------
 csTransform csTransform::GetReflect (const csPlane3 &pl)

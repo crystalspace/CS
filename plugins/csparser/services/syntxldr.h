@@ -101,7 +101,35 @@ public:
 	iDocumentNode* child, iLoaderContext* ldr_context,
 	uint32 &flags, bool &mirror, bool &warp, int& msv,
 	csMatrix3 &m, csVector3 &before, csVector3 &after,
-	iString* destSector, bool& handled, bool& autoresolve);
+	iString* destSector, bool& handled, bool& autoresolve)
+  {
+    csRef<csRefCount> state;
+    CS::Utility::PortalParameters params;
+    params.flags = flags;
+    params.mirror = mirror;
+    params.warp = warp;
+    params.msv = msv;
+    params.m = m;
+    params.before = before;
+    params.after = after;
+    params.destSector = destSector;
+    params.autoresolve = autoresolve;
+    bool ret = HandlePortalParameter (child, ldr_context, state, params, handled);
+    flags = params.flags;
+    mirror = params.mirror;
+    warp = params.warp;
+    msv = params.msv;
+    m = params.m;
+    before = params.before;
+    after = params.after;
+    destSector = params.destSector;
+    autoresolve = params.autoresolve;
+    return ret;
+  }
+  virtual bool HandlePortalParameter (
+    iDocumentNode* child, iLoaderContext* ldr_context,
+    csRef<csRefCount>& parseState, CS::Utility::PortalParameters& params,
+    bool& handled);
   virtual bool ParseGradient (iDocumentNode* node, iGradient* gradient);
   virtual bool WriteGradient (iDocumentNode* node, iGradient* gradient);
   virtual bool ParseShaderVar (iLoaderContext* ldr_context,

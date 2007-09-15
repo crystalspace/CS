@@ -67,13 +67,35 @@ struct iThingFactoryState;
 #define CSTEX_UV_SHIFT 8 
 /** @} */
 
+namespace CS
+{
+  namespace Utility
+  {
+    struct PortalParameters
+    {
+      uint32 flags;
+      bool mirror;
+      bool warp;
+      int msv;
+      csMatrix3 m;
+      csVector3 before;
+      csVector3 after;
+      iString* destSector;
+      bool autoresolve;
+      
+      PortalParameters() : flags (0), mirror (false), warp (false), msv (-1),
+        destSector (0), autoresolve (true) {}
+    };
+  } // namespace CS
+} // namespace CS
+
 /**
  * This component provides services for other loaders to easily parse
  * properties of standard CS world syntax.
  */
 struct iSyntaxService : public virtual iBase
 {
-  SCF_INTERFACE (iSyntaxService, 2, 1, 2);
+  SCF_INTERFACE (iSyntaxService, 2, 1, 3);
   
   /**\name Parse reporting helpers
    * @{ */
@@ -256,7 +278,14 @@ struct iSyntaxService : public virtual iBase
    * flags: contains all flags found in the description.
    * Returns false on failure. Returns false in 'handled' if it couldn't
    * understand the token.
+   * \deprecated Deprecated in 1.3. Use bool HandlePortalParameter
+   *    (iDocumentNode*, iLoaderContext*, 
+   *     CS::Utility::PortalParametersParseState&, 
+   *     CS::Utility::PortalParameters&) instead
    */
+  CS_DEPRECATED_METHOD_MSG("Use bool HandlePortalParameter "
+    "(iDocumentNode*, iLoaderContext*, csRef<csRefCount>&, "
+    "CS::Utility::PortalParameters&, bool&) instead ")
   virtual bool HandlePortalParameter (
 	iDocumentNode* child, iLoaderContext* ldr_context,
 	uint32 &flags, bool &mirror, bool &warp, int& msv,
@@ -386,6 +415,23 @@ struct iSyntaxService : public virtual iBase
    * stored to a persistent storage (e.g. disk).
    */
   virtual csRef<iDataBuffer> StoreRenderBuffer (iRenderBuffer* rbuf) = 0;
+  
+  /**
+   * Handles a common portal parameter.
+   * Returns false on failure. Returns false in 'handled' if it couldn't
+   * understand the token.
+   * \param child Child node to parse.
+   * \param ldr_context Loader context.
+   * \param parseState Internal parse state. This should be a null ref the
+   *   first time HandlePortalParameter is called. The method will
+   *   automatically set the variable to a state object. Do NOT pass in an
+   *   instance of csRefCount you created yourself.
+   * \param handled Whether the token was handled by this method.
+   */
+  virtual bool HandlePortalParameter (
+    iDocumentNode* child, iLoaderContext* ldr_context,
+    csRef<csRefCount>& parseState, CS::Utility::PortalParameters& params,
+    bool& handled) = 0;
 };
 
 /** @} */
