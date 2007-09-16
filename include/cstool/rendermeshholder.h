@@ -28,7 +28,13 @@
 
 #include "cstool/framedataholder.h"
 
-struct csRenderMesh;
+namespace CS
+{
+  namespace Graphics
+  {
+    struct RenderMesh;
+  }
+}
 
 /**
  * Helper class to retrieve an unused csRenderMesh.
@@ -39,7 +45,7 @@ class CS_CRYSTALSPACE_EXPORT csRenderMeshHolder
 {
   struct CS_CRYSTALSPACE_EXPORT csRenderMeshPtr
   {
-    csRenderMesh* ptr;
+    CS::Graphics::RenderMesh* ptr;
 
     csRenderMeshPtr ();
     csRenderMeshPtr (csRenderMeshPtr const& other);
@@ -55,7 +61,7 @@ public:
    * \param frameNumber Current frame number - used to determine unused 
    *  meshes.
    */
-  csRenderMesh*& GetUnusedMesh (bool& created, uint frameNumber);
+  CS::Graphics::RenderMesh*& GetUnusedMesh (bool& created, uint frameNumber);
 };
 
 #endif // __CS_CSTOOL_RENDERMESHHOLDER_H__

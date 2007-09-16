@@ -161,8 +161,8 @@ my $vector = new cspace::csVector3 (1, 2, 3);
 
 print $vector->[0] . $vector->[1] . $vector->[2] . "\n";
 
-my @reversed = reverse @@$vector;
-print "@reversed\n";
+my @@reversed = reverse @@$vector;
+print "@@reversed\n";
 
 # Output:
 # 123

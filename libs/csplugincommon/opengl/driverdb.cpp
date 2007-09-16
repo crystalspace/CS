@@ -268,6 +268,8 @@ static size_t NextBlock (const char* str, const char* charSet)
 
 bool csDriverDBReader::ParseCompareVer (iDocumentNode* node, bool& result)
 {
+  static const char digits[] = "0123456789";
+
   const char* version = node->GetAttributeValue ("version");
   if (version == 0)
   {
@@ -329,14 +331,26 @@ bool csDriverDBReader::ParseCompareVer (iDocumentNode* node, bool& result)
 
   result = false;
   const char* curpos1 = db->ogl2d->GetVersionString (version);
+  if (curpos1 == 0)
+  {
+    /* @@@ Hmm... a version may just be unknown on some platforms...
+       (e.g. win32_driver on Linux) */
+    /*synsrv->Report (
+      "crystalspace.canvas.openglcommon.driverdb",
+      CS_REPORTER_SEVERITY_WARNING,
+      node,
+      "Unknown version type '%s'", version);*/
+    return false;
+  }
   const char* curpos2 = relation + rellen + 1;
+  // Skip leading non-digits
+  curpos1 += strcspn (curpos1, digits);
+  curpos2 += strcspn (curpos2, digits);
 
   if (curpos1 && (*curpos1 != 0) && curpos2 && (*curpos2 != 0))
   {
     while (1)
     {
-      static const char digits[] = "0123456789";
-
       size_t nextpos1 = NextBlock (curpos1, digits);
       if (nextpos1 == 0) break;
       size_t nextnextpos1 = NextBlock (curpos1 + nextpos1, digits);
