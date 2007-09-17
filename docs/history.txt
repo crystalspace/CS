@@ -17,6 +17,7 @@ chronological order.
 	- res added support for relaying external libraries using relaytool
 	  (that is, they're dynamically loaded, allowing graceful handling
 	  of inavailability).
+	- res changed the xwindow plugin to have the Xaw library relayed.
 15-Sep-2007
 	- res fixed a crash in the GL driver DB when <comparever> was used
 	  with an unrecognized version type.

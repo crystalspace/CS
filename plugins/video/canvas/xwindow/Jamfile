@@ -2,30 +2,29 @@ SubDir TOP plugins video canvas xwindow ;
 
 if $(X11.AVAILABLE) = "yes"
 {
-  local XWIN_XALERT = ;
-  local XWIN_EXTERN = ;
-
   if $(XAW.AVAILABLE) = "yes"
   {
-    XWIN_XALERT = [ Wildcard xalert_xaw : *.cpp *.h *.c ] ;
-    XWIN_EXTERN = XAW ;
-  }
-  else
-  {
-    XWIN_XALERT = [ Wildcard xalert_null : *.cpp *.h ] ;
+    XAW_FILES = [ Wildcard xalert_xaw : *.cpp *.h *.c ] ;
   }
 
   Description xwin : "X Window Plugin" ;
-  Plugin xwin : [ Wildcard *.cpp *.h ] $(XWIN_XALERT) ;
+  Plugin xwin : 
+    [ Wildcard *.cpp *.h ] 
+    $(XAW_FILES) ;
   LinkWith xwin : crystalspace ;
   CompileGroups xwin : canvases softcanvas openglcanvas ;
   if $(XFREE86VM.AVAILABLE) = "yes"
   {
     CFlags xwin : [ FDefines XFREE86VM ] ;
-    ExternalLibs xwin : $(XWIN_EXTERN) XFREE86VM ;
+    ExternalLibs xwin : XFREE86VM ;
   }
   else
   {
-    ExternalLibs xwin : $(XWIN_EXTERN) X11 ;
+    ExternalLibs xwin : X11 ;
+  }
+  if $(XAW.AVAILABLE) = "yes"
+  {
+    RelayLibs xwin : XAW : Xaw7 ;
+    CFlags xwin : [ FDefines HAVE_XAW ] ;
   }
 }

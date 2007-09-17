@@ -73,10 +73,14 @@ static String top_trans =
 
 extern "C" Widget make_queryform(Widget parent, const char* message, 
 				 const char* button, const char* title);
+				 
+extern "C" int libXaw7_is_present;
 
-bool csXWindow::AlertV (int /*type*/, const char* title, const char* okMsg, 
-			const char* msg, va_list args)
+bool csXWindow::AlertV_Xaw (int /*type*/, const char* title, const char* okMsg, 
+			    const char* msg, va_list args)
 {
+    if (!libXaw7_is_present) return false;
+
     Widget top, queryform;
     XtAppContext app_con;
     csString msgStr;
