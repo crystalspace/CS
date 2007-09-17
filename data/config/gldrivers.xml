@@ -564,8 +564,8 @@
       <conditions>
 	<regexp string="vendor" pattern="^ATI" />
 	<conditions fulfill="one">
-	  <regexp string="renderer" pattern="^R\(ADEON\|adeon\) 9\(5\|6\|7\|8\).*" />
-	  <regexp string="renderer" pattern="^R\(ADEON\|adeon\) X.*" />
+	  <regexp string="renderer" pattern="R\(ADEON\|adeon\) 9\(5\|6\|7\|8\).*" />
+	  <regexp string="renderer" pattern="R\(ADEON\|adeon\) X.*" />
 	</conditions>
 	<comparever version="gl" relation="ge 2.0.5885" />
       </conditions>
