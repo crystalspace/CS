@@ -6,6 +6,8 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Sep-2007
+	- res made the GL renderer support more than 16 texture image units.
 15-Sep-2007
 	- Marten reimplemented dependent target handling.
 	- Marten fixed a few missing consts in csFIFO.
@@ -69,6 +71,13 @@ chronological order.
 	  libs).
 	- res fixed the bezier mesh sometimes returning incompletely setup
 	  render meshes.
+	- res changed the rendermanager context setup to use a method in the
+	  portal container to obtain the screen space coordinates for portals,
+	  enabling better support for cases where e.g. the portal intersects
+	  the camera plane.
+	- res added preliminary support for limiting the portal recursion level
+	  to the context setup.
+	- res made the context setup to set debug mesh names in render meshes.
 	- Genjix changed joytest to use CS_REQUEST_JOYSTICK as an example for
 	  the users.
 	- Jorrit reverted r27048 (quotes for javac detection). This fixes
