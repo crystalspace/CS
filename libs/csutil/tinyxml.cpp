@@ -313,7 +313,7 @@ csPtr<TiDocumentNode> TiDocumentNodeChildren::Identify( TiDocument* document,
   }
   else
   {
-    document->SetError( TIXML_ERROR_OUT_OF_MEMORY );
+    document->SetError( TIXML_ERROR_OUT_OF_MEMORY, this );
   }
   return returnNode;
 }
@@ -684,7 +684,7 @@ TiDocument::TiDocument() :
   blk_element (1000, DocHeapAlloc (&docHeap)),
   blk_text (1000, DocHeapAlloc (&docHeap))
 {
-  error = false;
+  errorId = TIXML_NO_ERROR;
   //  ignoreWhiteSpace = true;
   type = DOCUMENT;
 }
@@ -697,7 +697,7 @@ TiDocument::TiDocument( const char * documentName ) :
 {
   //  ignoreWhiteSpace = true;
   value = documentName;
-  error = false;
+  errorId = TIXML_NO_ERROR;
   type = DOCUMENT;
 }
 
@@ -719,7 +719,7 @@ csPtr<TiDocumentNode> TiDocument::Clone(TiDocument* document) const
     return 0;
 
   CopyToClone( clone );
-  clone->error = error;
+  clone->errorId = errorId;
   clone->errorDesc = errorDesc.c_str ();
 
   TiDocumentNode* lastNode = 0;

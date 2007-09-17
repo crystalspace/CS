@@ -27,7 +27,10 @@ distribution.
 #include "xr.h"
 #include "csutil/scfstr.h"
 
-const char* TrXmlBase::errorString[ TIXML_ERROR_STRING_COUNT ] =
+CS_PLUGIN_NAMESPACE_BEGIN(XMLRead)
+{
+
+const char* const TrXmlBase::errorString[ TIXML_ERROR_STRING_COUNT ] =
 {
   "No error",
   "Error",
@@ -123,7 +126,7 @@ TrDocumentNode* TrDocumentNodeChildren::Identify (const ParseInfo& parse,
   }
   else
   {
-    parse.document->SetError( TIXML_ERROR_OUT_OF_MEMORY );
+    parse.document->SetError( TIXML_ERROR_OUT_OF_MEMORY, this );
   }
   return returnNode;
 }
@@ -264,7 +267,7 @@ TrDocument::TrDocument(char* buf) :
   blk_element (7000),
   blk_text (100)
 {
-  error = false;
+  errorId = TIXML_NO_ERROR;
   //  ignoreWhiteSpace = true;
   type = DOCUMENT;
   input_data = buf;
@@ -322,3 +325,6 @@ size_t TrDocumentAttributeSet::FindExact (const char * reg_name) const
   return csArrayItemNotFound;
 }
 
+
+}
+CS_PLUGIN_NAMESPACE_END(XMLRead)

@@ -271,14 +271,14 @@ const char* TiDocument::Parse( TiDocument*,  const char* p )
 
   if ( !p || !*p )
   {
-    SetError( TIXML_ERROR_DOCUMENT_EMPTY );
+    SetError( TIXML_ERROR_DOCUMENT_EMPTY, 0 );
     return 0;
   }
 
   p = SkipWhiteSpace( p );
   if ( !p )
   {
-    SetError( TIXML_ERROR_DOCUMENT_EMPTY );
+    SetError( TIXML_ERROR_DOCUMENT_EMPTY, 0 );
     return 0;
   }
 
@@ -309,7 +309,7 @@ const char* TiXmlElement::Parse( TiDocument* document, const char* p )
 
   if ( !p || !*p || *p != '<' )
   {
-    document->SetError( TIXML_ERROR_PARSING_ELEMENT );
+    document->SetError( TIXML_ERROR_PARSING_ELEMENT, this );
     return 0;
   }
 
@@ -320,7 +320,7 @@ const char* TiXmlElement::Parse( TiDocument* document, const char* p )
   p = ReadName( p, inname );
   if ( inname.IsEmpty() )
   {
-    document->SetError( TIXML_ERROR_FAILED_TO_READ_ELEMENT_NAME );
+    document->SetError( TIXML_ERROR_FAILED_TO_READ_ELEMENT_NAME, this );
     return 0;
   }
   csStringID name_id = document->strings.Request (inname);
@@ -338,7 +338,7 @@ const char* TiXmlElement::Parse( TiDocument* document, const char* p )
     p = SkipWhiteSpace( p );
     if ( !p || !*p )
     {
-      document->SetError( TIXML_ERROR_READING_ATTRIBUTES );
+      document->SetError( TIXML_ERROR_READING_ATTRIBUTES, this );
       return 0;
     }
     if ( *p == '/' )
@@ -347,7 +347,7 @@ const char* TiXmlElement::Parse( TiDocument* document, const char* p )
       // Empty tag.
       if ( *p  != '>' )
       {
-        document->SetError( TIXML_ERROR_PARSING_EMPTY );    
+        document->SetError( TIXML_ERROR_PARSING_EMPTY, this );    
         return 0;
       }
       attributeSet.set.ShrinkBestFit ();
@@ -376,7 +376,7 @@ const char* TiXmlElement::Parse( TiDocument* document, const char* p )
       }
       else
       {
-        document->SetError( TIXML_ERROR_READING_END_TAG );
+        document->SetError( TIXML_ERROR_READING_END_TAG, this );
         return 0;
       }
     }
@@ -385,11 +385,11 @@ const char* TiXmlElement::Parse( TiDocument* document, const char* p )
       // Try to read an element:
       TiDocumentAttribute attrib;
       // @@@ OPTIMIZE
-      p = attrib.Parse( document, p );
+      p = attrib.Parse( document, this, p );
 
       if ( !p || !*p )
       {
-        document->SetError( TIXML_ERROR_PARSING_ELEMENT );
+        document->SetError( TIXML_ERROR_PARSING_ELEMENT, this );
         return 0;
       }
       GetAttributeRegistered (attrib.Name()).
@@ -424,7 +424,7 @@ const char* TiXmlElement::ReadValue( TiDocument* document, const char* p )
 
       if ( !textNode )
       {
-        document->SetError( TIXML_ERROR_OUT_OF_MEMORY );
+        document->SetError( TIXML_ERROR_OUT_OF_MEMORY, this );
         return 0;
       }
 
@@ -446,7 +446,7 @@ const char* TiXmlElement::ReadValue( TiDocument* document, const char* p )
 
       if ( !cdataNode )
       {
-        document->SetError( TIXML_ERROR_OUT_OF_MEMORY );
+        document->SetError( TIXML_ERROR_OUT_OF_MEMORY, this );
         return 0;
       }
 
@@ -493,7 +493,7 @@ const char* TiXmlElement::ReadValue( TiDocument* document, const char* p )
 
   if ( !p )
   {
-    document->SetError( TIXML_ERROR_READING_ELEMENT_VALUE );
+    document->SetError( TIXML_ERROR_READING_ELEMENT_VALUE, this );
   }  
   return p;
 }
@@ -504,7 +504,7 @@ const char* TiXmlUnknown::Parse( TiDocument* document, const char* p )
   p = SkipWhiteSpace( p );
   if ( !p || !*p || *p != '<' )
   {
-    document->SetError( TIXML_ERROR_PARSING_UNKNOWN );
+    document->SetError( TIXML_ERROR_PARSING_UNKNOWN, this );
     return 0;
   }
   ++p;
@@ -518,7 +518,7 @@ const char* TiXmlUnknown::Parse( TiDocument* document, const char* p )
 
   if ( !p )
   {
-    document->SetError( TIXML_ERROR_PARSING_UNKNOWN );
+    document->SetError( TIXML_ERROR_PARSING_UNKNOWN, this );
   }
   if ( *p == '>' )
     return p+1;
@@ -533,7 +533,7 @@ const char* TiXmlComment::Parse( TiDocument* document, const char* p )
 
   if ( !StringEqual ( p, startTag) )
   {
-    document->SetError( TIXML_ERROR_PARSING_COMMENT );
+    document->SetError( TIXML_ERROR_PARSING_COMMENT, this );
     return 0;
   }
   p += strlen( startTag );
@@ -545,7 +545,8 @@ const char* TiXmlComment::Parse( TiDocument* document, const char* p )
 }
 
 
-const char* TiDocumentAttribute::Parse( TiDocument* document, const char* p )
+const char* TiDocumentAttribute::Parse( TiDocument* document, TiDocumentNode* node,
+                                        const char* p )
 {
   p = TiXmlBase::SkipWhiteSpace( p );
   if ( !p || !*p ) return 0;
@@ -556,7 +557,7 @@ const char* TiDocumentAttribute::Parse( TiDocument* document, const char* p )
 
   if ( inname.IsEmpty() )
   {
-    document->SetError( TIXML_ERROR_READING_ATTRIBUTES );
+    document->SetError( TIXML_ERROR_READING_ATTRIBUTES, node );
     return 0;
   }
 
@@ -566,7 +567,7 @@ const char* TiDocumentAttribute::Parse( TiDocument* document, const char* p )
   p = TiXmlBase::SkipWhiteSpace( p );
   if ( !p || !*p || *p != '=' )
   {
-    document->SetError( TIXML_ERROR_READING_ATTRIBUTES );
+    document->SetError( TIXML_ERROR_READING_ATTRIBUTES, node );
     return 0;
   }
 
@@ -574,7 +575,7 @@ const char* TiDocumentAttribute::Parse( TiDocument* document, const char* p )
   p = TiXmlBase::SkipWhiteSpace( p );
   if ( !p || !*p )
   {
-    document->SetError( TIXML_ERROR_READING_ATTRIBUTES );
+    document->SetError( TIXML_ERROR_READING_ATTRIBUTES, node );
     return 0;
   }
   
@@ -596,7 +597,7 @@ const char* TiDocumentAttribute::Parse( TiDocument* document, const char* p )
   }
   else
   {
-    document->SetError( TIXML_ERROR_READING_ATTRIBUTES );
+    document->SetError( TIXML_ERROR_READING_ATTRIBUTES, node );
     return 0;
   }
   value = buf.GetNewCopy ();
@@ -649,7 +650,7 @@ const char* TiXmlDeclaration::Parse( TiDocument* document, const char* p )
   // the stuff in-between.
   if ( !p || !*p || !StringEqual( p, "<?xml") )
   {
-    document->SetError( TIXML_ERROR_PARSING_DECLARATION );
+    document->SetError( TIXML_ERROR_PARSING_DECLARATION, this );
     return 0;
   }
 
@@ -674,21 +675,21 @@ const char* TiXmlDeclaration::Parse( TiDocument* document, const char* p )
     {
 //      p += 7;
       TiDocumentAttribute attrib;
-      p = attrib.Parse( document, p );    
+      p = attrib.Parse( document, this, p );    
       version = attrib.Value();
     }
     else if ( StringEqual( p, "encoding") )
     {
 //      p += 8;
       TiDocumentAttribute attrib;
-      p = attrib.Parse( document, p );    
+      p = attrib.Parse( document, this, p );    
       encoding = attrib.Value();
     }
     else if ( StringEqual( p, "standalone") )
     {
 //      p += 10;
       TiDocumentAttribute attrib;
-      p = attrib.Parse( document, p );    
+      p = attrib.Parse( document, this, p );    
       standalone = attrib.Value();
     }
     else

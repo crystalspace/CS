@@ -30,6 +30,9 @@
 #include "iutil/databuff.h"
 #include "xr.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(XMLRead)
+{
+
 //------------------------------------------------------------------------
 
 csXmlReadDocumentSystem::csXmlReadDocumentSystem (iBase* parent) :
@@ -532,3 +535,6 @@ void csXmlReadDocument::Free (csXmlReadNode* n)
 
 //------------------------------------------------------------------------
 
+
+}
+CS_PLUGIN_NAMESPACE_END(XMLRead)

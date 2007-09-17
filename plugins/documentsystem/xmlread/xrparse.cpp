@@ -29,6 +29,9 @@ distribution.
 
 #include "xr.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(XMLRead)
+{
+
 TrXmlBase::Entity TrXmlBase::entity[ NUM_ENTITY ] = 
 {
   { "&amp;",  5, '&' },
@@ -229,14 +232,14 @@ char* TrDocument::Parse( const ParseInfo&,  char* p )
 
   if ( !p || !*p )
   {
-    SetError( TIXML_ERROR_DOCUMENT_EMPTY );
+    SetError( TIXML_ERROR_DOCUMENT_EMPTY, 0 );
     return 0;
   }
 
   p = SkipWhiteSpace( p );
   if ( !p )
   {
-    SetError( TIXML_ERROR_DOCUMENT_EMPTY );
+    SetError( TIXML_ERROR_DOCUMENT_EMPTY, 0 );
     return 0;
   }
 
@@ -270,7 +273,7 @@ char* TrXmlElement::Parse( const ParseInfo& parse,  char* p )
 
   if ( !p || !*p || *p != '<' )
   {
-    parse.document->SetError( TIXML_ERROR_PARSING_ELEMENT );
+    parse.document->SetError( TIXML_ERROR_PARSING_ELEMENT, this );
     return 0;
   }
 
@@ -283,7 +286,7 @@ char* TrXmlElement::Parse( const ParseInfo& parse,  char* p )
 
   if ( !p || !*p )
   {
-    parse.document->SetError( TIXML_ERROR_FAILED_TO_READ_ELEMENT_NAME );
+    parse.document->SetError( TIXML_ERROR_FAILED_TO_READ_ELEMENT_NAME, this );
     return 0;
   }
 
@@ -306,7 +309,7 @@ char* TrXmlElement::Parse( const ParseInfo& parse,  char* p )
     p = SkipWhiteSpace( p );
     if ( !p || !*p )
     {
-      parse.document->SetError( TIXML_ERROR_READING_ATTRIBUTES );
+      parse.document->SetError( TIXML_ERROR_READING_ATTRIBUTES, this );
       return 0;
     }
     if ( *p == '/' )
@@ -315,7 +318,7 @@ char* TrXmlElement::Parse( const ParseInfo& parse,  char* p )
       // Empty tag.
       if ( *p  != '>' )
       {
-        parse.document->SetError( TIXML_ERROR_PARSING_EMPTY );    
+        parse.document->SetError( TIXML_ERROR_PARSING_EMPTY, this );    
         return 0;
       }
       attributeSet.set.ShrinkBestFit ();
@@ -345,7 +348,7 @@ char* TrXmlElement::Parse( const ParseInfo& parse,  char* p )
       }
       else
       {
-        parse.document->SetError( TIXML_ERROR_READING_END_TAG );
+        parse.document->SetError( TIXML_ERROR_READING_END_TAG, this );
         return 0;
       }
     }
@@ -354,11 +357,11 @@ char* TrXmlElement::Parse( const ParseInfo& parse,  char* p )
       // Try to read an element:
       TrDocumentAttribute attrib;
       // @@@ OPTIMIZE
-      p = attrib.Parse( parse, p );
+      p = attrib.Parse( parse, this, p );
 
       if ( !p || !*p )
       {
-        parse.document->SetError( TIXML_ERROR_PARSING_ELEMENT );
+        parse.document->SetError( TIXML_ERROR_PARSING_ELEMENT, this );
         return 0;
       }
       GetAttributeRegistered (attrib.Name()).
@@ -402,7 +405,7 @@ char* TrXmlElement::ReadValue( const ParseInfo& parse, char* p )
 	TrXmlText* textNode = parse.document->blk_text.Alloc ();
 	if ( !textNode )
 	{
-	  parse.document->SetError( TIXML_ERROR_OUT_OF_MEMORY );
+	  parse.document->SetError( TIXML_ERROR_OUT_OF_MEMORY, this );
 	  return 0;
 	}
 	p = textNode->Parse( parse, orig_p );
@@ -415,7 +418,7 @@ char* TrXmlElement::ReadValue( const ParseInfo& parse, char* p )
 
       if ( !cdataNode )
       {
-        parse.document->SetError( TIXML_ERROR_OUT_OF_MEMORY );
+        parse.document->SetError( TIXML_ERROR_OUT_OF_MEMORY, this );
         return 0;
       }
 
@@ -458,7 +461,7 @@ char* TrXmlElement::ReadValue( const ParseInfo& parse, char* p )
 
   if ( !p )
   {
-    parse.document->SetError( TIXML_ERROR_READING_ELEMENT_VALUE );
+    parse.document->SetError( TIXML_ERROR_READING_ELEMENT_VALUE, this );
   }
 
   return p;
@@ -470,7 +473,7 @@ char* TrXmlUnknown::Parse( const ParseInfo& parse,  char* p )
   p = SkipWhiteSpace( p );
   if ( !p || !*p || *p != '<' )
   {
-    parse.document->SetError( TIXML_ERROR_PARSING_UNKNOWN );
+    parse.document->SetError( TIXML_ERROR_PARSING_UNKNOWN, this );
     return 0;
   }
   ++p;
@@ -484,7 +487,7 @@ char* TrXmlUnknown::Parse( const ParseInfo& parse,  char* p )
 
   if ( !p )
   {
-    parse.document->SetError( TIXML_ERROR_PARSING_UNKNOWN );
+    parse.document->SetError( TIXML_ERROR_PARSING_UNKNOWN, this );
   }
   if ( *p == '>' )
     return p+1;
@@ -499,7 +502,7 @@ char* TrXmlComment::Parse( const ParseInfo& parse, char* p )
 
   if ( !StringEqual ( p, startTag) )
   {
-    parse.document->SetError( TIXML_ERROR_PARSING_COMMENT );
+    parse.document->SetError( TIXML_ERROR_PARSING_COMMENT, this );
     return 0;
   }
   p += strlen( startTag );
@@ -508,7 +511,7 @@ char* TrXmlComment::Parse( const ParseInfo& parse, char* p )
 }
 
 
-char* TrDocumentAttribute::Parse( const ParseInfo& parse, char* p )
+char* TrDocumentAttribute::Parse( const ParseInfo& parse, TrDocumentNode* node, char* p )
 {
   p = TrXmlBase::SkipWhiteSpace( p );
   if ( !p || !*p ) return 0;
@@ -520,14 +523,14 @@ char* TrDocumentAttribute::Parse( const ParseInfo& parse, char* p )
 
   if ( !p || !*p )
   {
-    parse.document->SetError( TIXML_ERROR_READING_ATTRIBUTES );
+    parse.document->SetError( TIXML_ERROR_READING_ATTRIBUTES, node );
     return 0;
   }
 
   p = TrXmlBase::SkipWhiteSpace( p );
   if ( !p || !*p || *p != '=' )
   {
-    parse.document->SetError( TIXML_ERROR_READING_ATTRIBUTES );
+    parse.document->SetError( TIXML_ERROR_READING_ATTRIBUTES, node );
     return 0;
   }
 
@@ -536,7 +539,7 @@ char* TrDocumentAttribute::Parse( const ParseInfo& parse, char* p )
   p = TrXmlBase::SkipWhiteSpace( p );
   if ( !p || !*p )
   {
-    parse.document->SetError( TIXML_ERROR_READING_ATTRIBUTES );
+    parse.document->SetError( TIXML_ERROR_READING_ATTRIBUTES, node );
     return 0;
   }
  
@@ -558,7 +561,7 @@ char* TrDocumentAttribute::Parse( const ParseInfo& parse, char* p )
   }
   else
   {
-    parse.document->SetError( TIXML_ERROR_READING_ATTRIBUTES );
+    parse.document->SetError( TIXML_ERROR_READING_ATTRIBUTES, node );
     return 0;
   }
   value = buf;
@@ -599,7 +602,7 @@ char* TrXmlDeclaration::Parse( const ParseInfo& parse, char* p )
   // the stuff in-between.
   if ( !p || !*p || !StringEqual( p, "<?xml") )
   {
-    parse.document->SetError( TIXML_ERROR_PARSING_DECLARATION );
+    parse.document->SetError( TIXML_ERROR_PARSING_DECLARATION, this );
     return 0;
   }
 
@@ -624,21 +627,21 @@ char* TrXmlDeclaration::Parse( const ParseInfo& parse, char* p )
     {
 //      p += 7;
       TrDocumentAttribute attrib;
-      p = attrib.Parse( parse, p );    
+      p = attrib.Parse( parse, this, p );    
       version = attrib.Value();
     }
     else if ( StringEqual( p, "encoding") )
     {
 //      p += 8;
       TrDocumentAttribute attrib;
-      p = attrib.Parse( parse, p );    
+      p = attrib.Parse( parse, this, p );    
       encoding = attrib.Value();
     }
     else if ( StringEqual( p, "standalone") )
     {
 //      p += 10;
       TrDocumentAttribute attrib;
-      p = attrib.Parse( parse, p );    
+      p = attrib.Parse( parse, this, p );    
       standalone = attrib.Value();
     }
     else
@@ -659,3 +662,6 @@ bool TrXmlText::Blank() const
   return true;
 }
 
+
+}
+CS_PLUGIN_NAMESPACE_END(XMLRead)

@@ -40,6 +40,10 @@ distribution.
 #include <csutil/util.h>
 #include <csutil/array.h>
 #include <csutil/blockallocator.h>
+#include "csutil/csstring.h"
+
+CS_PLUGIN_NAMESPACE_BEGIN(XMLRead)
+{
 
 class TrDocument;
 class TrDocumentNodeChildren;
@@ -159,7 +163,7 @@ protected:
   static bool StringEqual(const char* p, const char* endTag);
   static bool StringEqualIgnoreCase(const char* p, const char* endTag);
 
-  static const char* errorString[ TIXML_ERROR_STRING_COUNT ];
+  static const char* const errorString[ TIXML_ERROR_STRING_COUNT ];
 
 private:
   struct Entity
@@ -347,7 +351,7 @@ public:
    * Attribute parsing starts: first letter of the name
    * returns: the next char after the value end quote
    */
-  char* Parse( const ParseInfo& parse, char* p );
+  char* Parse( const ParseInfo& parse, TrDocumentNode* node, char* p );
 
 private:
   const char* name;
@@ -651,7 +655,7 @@ public:
   virtual char* Parse( const ParseInfo& parse,  char* p );
 
   /// If, during parsing, a error occurs, Error will be set to true.
-  bool Error() const { return error; }
+  bool Error() const { return errorId != TIXML_NO_ERROR; }
 
   /// Contains a textual (english) description of the error if one occurs.
   const char * ErrorDesc() const { return errorDesc; }
@@ -663,14 +667,34 @@ public:
   const int ErrorId() const { return errorId; }
 
   /// If you have handled the error, it can be reset with this call.
-  void ClearError() { error = false; errorId = 0; errorDesc = ""; }
+  void ClearError() { errorId = TIXML_NO_ERROR; errorDesc = ""; }
 
   // [internal use]
-  void SetError( int err )
+  void SetError( int err, TrDocumentNode* errorNode )
   {
-    error   = true;
     errorId = err;
     errorDesc = errorString[ errorId ];
+    if (errorNode != 0)
+    {
+      csString errorPath;
+      
+      while (errorNode != 0)
+      {
+        const char* nodeVal;
+        if ((errorNode->type == ELEMENT)
+          && (nodeVal = errorNode->Value()) && *nodeVal)
+        {
+          if (!errorPath.IsEmpty ())
+            errorPath.Insert (0, " -> ");
+	  errorPath.Insert (0, nodeVal);
+        }
+        errorNode = errorNode->parent;
+      }
+      
+      errorDesc += " (in: ";
+      errorDesc += errorPath.GetDataSafe();
+      errorDesc += ")";
+    }
   }
 
   /**
@@ -686,14 +710,16 @@ public:
   bool IsWhiteSpaceCondensed()
   { return parse.condenseWhiteSpace; }
 private:
-  bool error;
   int  errorId;
-  const char* errorDesc;
+  csString errorDesc;
   ParseInfo parse;
 
   static char* ReadName_ISO_8859_1 (char* p);
   static bool IsNameStart_ISO_8859_1 (const char* p);
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(XMLRead)
 
 #endif
 

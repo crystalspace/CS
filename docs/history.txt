@@ -11,6 +11,9 @@ chronological order.
 	  (now rather old) ATI drivers (see trac #261).
 	- res tweaked the driver DB to enabled "hidden Radeon NPOTS" for newer
 	  ATI drivers (which have a slightly different renderer string).
+	- res made the XML parsers errors slightly more helpful by having the
+	  error message contain the hierarchy of elements in which the error
+	  occured.
 15-Sep-2007
 	- res fixed a crash in the GL driver DB when <comparever> was used
 	  with an unrecognized version type.

@@ -37,6 +37,7 @@ distribution.
 #include <assert.h>
 #include "iutil/string.h"
 #include "csutil/array.h"
+#include "csutil/csstring.h"
 #include "csutil/fifo.h"
 #include "csutil/fixedsizeallocator.h"
 #include "csutil/memheap.h"
@@ -421,7 +422,7 @@ public:
    * Attribute parsing starts: first letter of the name
    * returns: the next char after the value end quote
    */
-  const char* Parse( TiDocument* document, const char* p );
+  const char* Parse( TiDocument* document, TiDocumentNode* node, const char* p );
 
 private:
   friend class TiXmlElement;
@@ -897,7 +898,7 @@ public:
   const char* Parse( TiDocument* document,  const char* p );
 
   /// If, during parsing, a error occurs, Error will be set to true.
-  bool Error() const { return error; }
+  bool Error() const { return errorId != TIXML_NO_ERROR; }
 
   /// Contains a textual (english) description of the error if one occurs.
   const char * ErrorDesc() const { return errorDesc.c_str (); }
@@ -909,16 +910,36 @@ public:
   int ErrorId() const { return errorId; }
 
   /// If you have handled the error, it can be reset with this call.
-  void ClearError() { error = false; errorId = 0; errorDesc = ""; }
+  void ClearError() { errorId = TIXML_NO_ERROR; errorDesc = ""; }
 
   // [internal use]
   void Print( iString* cfile, int depth = 0 ) const;
   // [internal use]
-  void SetError( int err )
+  void SetError( int err, TiDocumentNode* errorNode )
   {
-    error   = true;
     errorId = err;
     errorDesc = errorString[ errorId ];
+    if (errorNode != 0)
+    {
+      csString errorPath;
+      
+      while (errorNode != 0)
+      {
+        const char* nodeVal;
+        if ((errorNode->type == ELEMENT)
+          && (nodeVal = errorNode->Value()) && *nodeVal)
+        {
+          if (!errorPath.IsEmpty ())
+            errorPath.Insert (0, " -> ");
+	  errorPath.Insert (0, nodeVal);
+        }
+        errorNode = errorNode->parent;
+      }
+      
+      errorDesc += " (in: ";
+      errorDesc += errorPath.GetDataSafe();
+      errorDesc += ")";
+    }
   }
 
 protected :
@@ -928,7 +949,6 @@ protected :
   csPtr<TiDocumentNode> Clone(TiDocument* document) const;
 
 private:
-  bool error;
   int  errorId;
   TiXmlString errorDesc;
   TiXmlString value;
