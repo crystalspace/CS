@@ -24,8 +24,11 @@
 
 CS_IMPLEMENT_PLUGIN
 
-using namespace CS::Plugin::RMTest1;
+//using namespace CS::Plugin::RMTest1;
 using namespace CS::RenderManager;
+
+CS_PLUGIN_NAMESPACE_BEGIN(RMTest1)
+{
 
 SCF_IMPLEMENT_FACTORY(RMTest1)
 
@@ -35,8 +38,8 @@ class StandardContextSetup
 public:
   typedef StandardContextSetup<RenderTreeType, LayerConfigType> ThisType;
 
-  StandardContextSetup (iShaderManager* shaderManager, const LayerConfigType& layerConfig)
-    : shaderManager (shaderManager), layerConfig (layerConfig),
+  StandardContextSetup (RMTest1* rmanager, const LayerConfigType& layerConfig)
+    : rmanager (rmanager), layerConfig (layerConfig),
     recurseCount (0)
   {
 
@@ -49,6 +52,8 @@ public:
   {
     // @@@ FIXME: Of course, don't hardcode.
     if (recurseCount > 30) return;
+    
+    iShaderManager* shaderManager = rmanager->shaderManager;
 
     sector->CallSectorCallbacks (rview);
 
@@ -59,6 +64,15 @@ public:
     iVisibilityCuller* culler = sector->GetVisibilityCuller ();
     renderTree.Viscull (container, context, rview, culler);
 
+    // Set up all portals
+    {
+      recurseCount++;
+      StandardPortalSetup<RenderTreeType, ThisType> portalSetup (
+        rmanager->portalPersistent, *this);
+      portalSetup (renderTree, context, container, sector, rview);
+      recurseCount--;
+    }
+    
     // Sort the mesh lists  
     {
       StandardMeshSorter<RenderTreeType> mySorter (rview->GetEngine (), rview->GetCamera ());
@@ -71,25 +85,19 @@ public:
 
     // Setup the material&mesh SVs
     {
-      StandardSVSetup<RenderTreeType, SingleRenderLayer> svSetup (context->svArrays, layerConfig);
+      StandardSVSetup<RenderTreeType, SingleRenderLayer> svSetup (
+        context->svArrays, layerConfig);
       renderTree.TraverseMeshNodes (svSetup, context);
     }
 
     // Setup shaders and tickets
     SetupStandarShaderAndTicket (renderTree, *context, shaderManager, 
       layerConfig);
-
-    {
-      recurseCount++;
-      StandardPortalSetup<RenderTreeType, ThisType> portalSetup (*this);
-      portalSetup (renderTree, context, container, sector, rview);
-      recurseCount--;
-    } 
   }
 
 
 private:
-  iShaderManager* shaderManager;
+  RMTest1* rmanager;
   const LayerConfigType& layerConfig;
   int recurseCount;
 };
@@ -105,11 +113,12 @@ RMTest1::RMTest1 (iBase* parent)
 bool RMTest1::RenderView (iView* view)
 {
   // Setup a rendering view
-  csRef<CS::RenderManager::RenderView> rview;
-  rview.AttachNew (new (renderViewPool) CS::RenderManager::RenderView(view));
-  view->GetEngine ()->UpdateNewFrame ();
-
   view->UpdateClipper ();
+  csRef<CS::RenderManager::RenderView> rview;
+  rview.AttachNew (new (treePersistent.renderViewPool) 
+    CS::RenderManager::RenderView(view));
+  view->GetEngine ()->UpdateNewFrame ();
+  portalPersistent.UpdateNewFrame ();
 
   iSector* startSector = rview->GetThisSector ();
 
@@ -122,13 +131,14 @@ bool RMTest1::RenderView (iView* view)
   RenderTreeType renderTree (treePersistent);
   RenderTreeType::ContextsContainer* screenContexts = 
     renderTree.CreateContextContainer ();
-  screenContexts->view = view;
+  screenContexts->rview = rview;
   RenderTreeType::ContextNode* startContext = renderTree.CreateContext (screenContexts,
     rview);
 
   // Setup the main context
   {
-    StandardContextSetup<RenderTreeType, SingleRenderLayer> contextSetup (shaderManager, 
+    //StandardContextSetup<RenderTreeType, SingleRenderLayer>
+    ContextSetupType contextSetup (this, 
       renderLayer);
     contextSetup (renderTree, startContext, screenContexts, startSector, rview);
   
@@ -165,9 +175,7 @@ bool RMTest1::HandleTarget (RenderTreeType& renderTree, csStringID svName,
   SingleRenderLayer renderLayer (defaultShaderName, defaultShader);
 
   // Prepare
-  contexts->view->UpdateClipper ();
-  csRef<CS::RenderManager::RenderView> rview;
-  rview.AttachNew (new (renderViewPool) CS::RenderManager::RenderView(contexts->view));
+  csRef<CS::RenderManager::RenderView> rview = contexts->rview;
 
   iSector* startSector = rview->GetThisSector ();
 
@@ -178,7 +186,7 @@ bool RMTest1::HandleTarget (RenderTreeType& renderTree, csStringID svName,
     rview);
 
   // Setup
-  StandardContextSetup<RenderTreeType, SingleRenderLayer> contextSetup (shaderManager, 
+  StandardContextSetup<RenderTreeType, SingleRenderLayer> contextSetup (this,
     renderLayer);
   contextSetup (renderTree, startContext, contexts, startSector, rview);
 
@@ -196,11 +204,16 @@ bool RMTest1::Initialize(iObjectRegistry* objectReg)
     "crystalspace.shared.stringset");
 
   shaderManager = csQueryRegistry<iShaderManager> (objectReg);
-
+  
   defaultShaderName = stringSet->Request("standard");  
   defaultShader = shaderManager->GetShader ("std_lighting");
 
+  csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objectReg);
   treePersistent.Initialize (shaderManager);
+  portalPersistent.Initialize (shaderManager, g3d);
 
   return true;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(RMTest1)

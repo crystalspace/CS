@@ -71,6 +71,7 @@ namespace RenderManager
 
       iShaderManager* shaderManager;
       Fn& function;
+      BitArray& names;
       size_t layer;
 
       FnMeshTraverser (iShaderManager* shaderManager, Fn& function, 
@@ -122,7 +123,6 @@ namespace RenderManager
 
       iShader* lastShader;
       size_t lastTicket;
-      BitArray& names;
     };
   };
 
@@ -279,7 +279,6 @@ namespace RenderManager
     typedef csHash<RenderTargetInfo, csRef<iTextureHandle> > TargetsHash;
     TargetsHash targets;
     TargetsHash oneTimeTargets;
-    CS::RenderManager::RenderView::Pool renderViewPool;
     
     class HandledTargetsSet
     {
@@ -385,18 +384,21 @@ namespace RenderManager
         if (!targetView) return;
 
         // Setup a rendering view
+        targetView->UpdateClipper ();
         csRef<CS::RenderManager::RenderView> rview;
+        rview.AttachNew (new (renderTree.GetPersistentData().renderViewPool)
+          RenderView (targetView));
 
-        typename Tree::ContextsContainer* targetContexts = 
-          renderTree.CreateContextContainer ();
-        targetContexts->renderTarget = texh;
-        targetContexts->subtexture = subtexture;
-        targetContexts->view = targetView;        
+	typename Tree::ContextsContainer* targetContexts = 
+	  renderTree.CreateContextContainer ();
+	targetContexts->renderTarget = texh;
+	targetContexts->subtexture = subtexture;
+	targetContexts->rview = rview;
 
         TargetQueueEntry e;
         e.contexts = targetContexts;
         e.targetSVName = svName;
-
+	
         parent.targetQueue.Push (e);
       }
 

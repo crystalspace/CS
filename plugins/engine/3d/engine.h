@@ -654,6 +654,8 @@ public:
    */
   void HandleImposters ();
 
+  iMaterialWrapper* GetDefaultPortalMaterial () const
+  { return defaultPortalMaterial; }
 private:
   // -- PRIVATE METHODS
 
@@ -754,7 +756,6 @@ private:
   iMeshObjectType* GetThingType ();
 
   iRenderManager* GetRenderManager () { return renderManager; }
-
 public:
   // -- PUBLIC MEMBERS. THESE ARE FOR CONVENIANCE WITHIN ENGINE PLUGIN
 
@@ -995,7 +996,10 @@ private:
   csRef<iMeshObjectType> thingMeshType;
   
   /// Current render context (proc texture) or 0 if global.
-  iTextureHandle* currentRenderContext; 
+  iTextureHandle* currentRenderContext;
+  
+  /// Default portal material
+  csRef<iMaterialWrapper> defaultPortalMaterial;
 
   /**
    * List of imposters that need to be rendered to texture.

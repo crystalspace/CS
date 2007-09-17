@@ -10,6 +10,11 @@ chronological order.
 	- res made the GL renderer support more than 16 texture image units.
 	- res made the GL framebuffer render-to-texture support work slightly
 	  better with textures larger than the framebuffer.
+	- res added materials to portals.
+	- res made portal containers return camera space coordinates in
+	  addition to screen space coordinates for all portals.
+	- res added some initial support for "heavy" (render-to-texture)
+	  portals.
 15-Sep-2007
 	- Marten reimplemented dependent target handling.
 	- Marten fixed a few missing consts in csFIFO.

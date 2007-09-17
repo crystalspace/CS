@@ -743,6 +743,7 @@ void csEngine::DeleteAllForce ()
   sectors.RemoveAll ();
   cameraPositions.RemoveAll ();
 
+  defaultPortalMaterial.Invalidate ();
   delete materials;
   materials = new csMaterialList ();
   delete textures;
@@ -812,6 +813,15 @@ void csEngine::DeleteAll ()
     csRef<iShader> portal_shader = LoadShader (docsys, shaderPath);
     if (!portal_shader.IsValid())
       Warn ("Default shader %s not available", shaderPath);
+      
+    csRef<csMaterial> portalMat;
+    portalMat.AttachNew (new csMaterial (this));
+    // FIXME: hardcoded shader type; prolly move to render manager
+    portalMat->SetShader (globalStringSet->Request ("standard"),
+      portal_shader);
+    csRef<iMaterialWrapper> portalMaterialWrapper;
+    portalMaterialWrapper = materials->NewMaterial (portalMat, 0);
+    defaultPortalMaterial = portalMaterialWrapper;
 
     // Now, try to load the user-specified default render loop.
     const char* configLoop = cfg->GetStr ("Engine.RenderLoop.Default", 0);

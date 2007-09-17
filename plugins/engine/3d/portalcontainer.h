@@ -35,6 +35,9 @@
 class csMeshWrapper;
 class csMovable;
 
+CS_PLUGIN_NAMESPACE_BEGIN(Engine)
+{
+
 /**
  * A helper class for iTriangleMesh implementations used by csPortalContainer.
  */
@@ -138,9 +141,9 @@ private:
   // Drawing stuff...
   bool ClipToPlane (int portal_idx, csPlane3 *portal_plane,
 	const csVector3 &v_w2c, csVector3 * &pverts, int &num_verts);
-  bool DoPerspective (csVector3 *source, int num_verts,
+  /*bool DoPerspective (csVector3 *source, int num_verts,
 	csPoly2D *dest, bool mirror, int fov,
-	float shift_x, float shift_y, const csPlane3& plane_cam);
+	float shift_x, float shift_y, const csPlane3& plane_cam);*/
   void DrawOnePortal (csPortal* po, const csPoly2D& poly,
 	const csReversibleTransform& movtrans, iRenderView *rview,
 	const csPlane3& camera_plane);
@@ -227,24 +230,13 @@ public:
   }
   virtual void GetRadius (float& radius, csVector3& center);
   
-  /**
-   * Compute the screen-space polygons for all portals.
-   * \param rview Render view for which to compute the screen space polys.
-   * \param verts Output buffer receiving the screen space coordinates.
-   * \param vertsSize Size of the \a verts buffer.
-   * \param numVerts Output buffer receiving the number of vertices in each
-   *   polygon.
-   * \remarks The polygon vertices are stored in a flat fashion. To obtain
-   *  the vertices for a certain polygon, sum up the vertex numbers for all
-   *  previous polygons and use that as an index into the vertices array.
-   */
   void ComputeScreenPolygons (iRenderView* rview,
-    csVector2* verts, size_t vertsSize, size_t* numVerts);
+    csVector2* verts2D, csVector3* verts3D, size_t vertsSize, size_t* numVerts);
   
-  /**
-   * Get the total amount of vertices used by all portals.
-   */
   size_t GetTotalVertexCount () const;
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(Engine)
 
 #endif // __CS_PORTALCONTAINER_H__

@@ -53,7 +53,9 @@ namespace RenderManager
       {
         size_t layerOffset = layer*ctxNode.totalRenderMeshes;
 
-        iShader* shader = rm->material->GetMaterial ()->GetShader (
+        iShader* shader = 0;
+        if (rm->material)
+          shader = rm->material->GetMaterial ()->GetShader (
           layerConfig.GetShaderName (layer));
         shaderArray[index+layerOffset] = shader ? shader : layerConfig.GetDefaultShader (layer);
       }

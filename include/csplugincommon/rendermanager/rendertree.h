@@ -71,7 +71,10 @@ namespace RenderManager
       csBlockAllocator<ContextsContainer> contextsContainerAllocator;
 
       csStringID svObjectToWorldName;
-
+    
+      RenderView::Pool renderViewPool;
+      csRenderMeshHolder rmHolder;
+      
       void Initialize (iShaderManager* shmgr)
       {
         svObjectToWorldName = 
@@ -129,7 +132,7 @@ namespace RenderManager
       public EBOptHelper<typename TreeTraits::ContextsContainerExtraDataType>
     {
       csArray<ContextNode*> contextNodeList;
-      csRef<iView> view;
+      csRef<RenderView> rview;
     };
 
     //---- Methods
@@ -170,7 +173,8 @@ namespace RenderManager
     bool Viscull (ContextsContainer* contexts, ContextNode* context, iRenderView* rw, 
       iVisibilityCuller* culler)
     {
-      ViscullCallback cb (*this, context, rw, &contexts->view->GetMeshFilter ());
+      CS::Utility::MeshFilter* filter = &rw->meshFilter;
+      ViscullCallback cb (*this, context, rw, filter);
       
       culler->VisTest (rw, &cb);
 
@@ -267,11 +271,14 @@ namespace RenderManager
       return totalRenderMeshes;
     }
 
-    csStringID GetObjectToWorldName() const
+    PersistentData& GetPersistentData()
     {
-      return persistentData.svObjectToWorldName;
+      return persistentData;
     }
-
+    const PersistentData& GetPersistentData() const
+    {
+      return persistentData;
+    }
   protected:    
     PersistentData&         persistentData;
     csArray<ContextsContainer*> contexts;
@@ -320,6 +327,7 @@ namespace RenderManager
     {
       // Todo: Handle static lod & draw distance
       csZBufMode zmode = imesh->GetZBufMode ();
+      CS::Graphics::RenderPriority renderPrio = imesh->GetRenderPriority ();
       csRef<csShaderVariable> svObjectToWorld;
 
       // Get the meshes
@@ -329,6 +337,10 @@ namespace RenderManager
       const char* const db_mesh_name = imesh->QueryObject()->GetName();
     #endif
 
+      typename MeshNode::SingleMesh sm;
+      sm.meshObjSVs = imesh->GetSVContext();
+      sm.zmode = zmode;
+      
       // Add it to the appropriate meshnode
       for (int i = 0; i < numMeshes; ++i)
       {
@@ -348,39 +360,48 @@ namespace RenderManager
           continue;
         }
 
-        typename TreeTraits::MeshNodeKeyType meshKey = 
-          TreeTraits::GetMeshNodeKey (imesh, *rm);
-
-        // Get the mesh node
-        MeshNode* meshNode = context->meshNodes.Get (meshKey, 0);
-        if (!meshNode)
-        {
-          // Get a new one
-          meshNode = persistentData.meshNodeAllocator.Alloc ();
-
-          TreeTraits::SetupMeshNode(*meshNode, imesh, *rm);
-          context->meshNodes.Put (meshKey, meshNode);
-
-          totalMeshNodes++;
-        }
-
-        svObjectToWorld.AttachNew (new csShaderVariable (
-          persistentData.svObjectToWorldName));
-        svObjectToWorld->SetValue (rm->object2world);
- 
-        typename MeshNode::SingleMesh sm;
-        sm.renderMesh = rm;
-        sm.zmode = zmode;
-        sm.meshObjSVs = imesh->GetSVContext();
-        sm.svObjectToWorld = svObjectToWorld;
-
-        meshNode->meshes.Push (sm);
+        AddRenderMeshToContext (context, rm, renderPrio, sm);
       }
-
-      context->totalRenderMeshes += numMeshes;
-      totalRenderMeshes += numMeshes;
     }
     
+  public:
+    void AddRenderMeshToContext (ContextNode* context, csRenderMesh* rm,
+				 CS::Graphics::RenderPriority renderPrio,
+				 typename MeshNode::SingleMesh& singleMeshTemplate)
+    {
+      typename TreeTraits::MeshNodeKeyType meshKey = 
+	TreeTraits::GetMeshNodeKey (renderPrio, *rm);
+      csRef<csShaderVariable> svObjectToWorld;
+
+      // Get the mesh node
+      MeshNode* meshNode = context->meshNodes.Get (meshKey, 0);
+      if (!meshNode)
+      {
+	// Get a new one
+	meshNode = persistentData.meshNodeAllocator.Alloc ();
+
+	TreeTraits::SetupMeshNode(*meshNode, renderPrio, *rm);
+	context->meshNodes.Put (meshKey, meshNode);
+
+	totalMeshNodes++;
+      }
+
+      svObjectToWorld.AttachNew (new csShaderVariable (
+	persistentData.svObjectToWorldName));
+      svObjectToWorld->SetValue (rm->object2world);
+
+      typename MeshNode::SingleMesh sm (singleMeshTemplate);
+      sm.renderMesh = rm;
+      sm.svObjectToWorld = svObjectToWorld;
+      if (rm->z_buf_mode != (csZBufMode)~0) sm.zmode = rm->z_buf_mode;
+
+      meshNode->meshes.Push (sm);
+      
+      context->totalRenderMeshes++;
+      totalRenderMeshes++;
+    }
+    
+  protected:
     template<typename Fn>
     struct TraverseMeshNodesWalker
     {

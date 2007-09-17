@@ -75,7 +75,7 @@ RenderView::RenderView (iCamera *c, iClipper2D *v, iGraphics3D *ig3d, iGraphics2
 }
 
 RenderView::RenderView (iView* v) : 
-  scfPooledImplementationType (this)
+  scfPooledImplementationType (this), meshFilter (v->GetMeshFilter ())
 {
   engine = v->GetEngine ();
   g3d = v->GetContext ();

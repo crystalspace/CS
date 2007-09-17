@@ -22,6 +22,7 @@
 #include "csgeom/poly3d.h"
 #include "csgeom/poly2d.h"
 #include "csgeom/transfrm.h"
+#include "igeom/clip2d.h"
 #include "imesh/objmodel.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
@@ -32,6 +33,9 @@
 #include "plugins/engine/3d/meshobj.h"
 #include "plugins/engine/3d/engine.h"
 #include "cstool/rviewclipper.h"
+
+CS_PLUGIN_NAMESPACE_BEGIN(Engine)
+{
 
 // ---------------------------------------------------------------------------
 // csPortalContainerTriMeshHelper
@@ -202,6 +206,7 @@ iPortal* csPortalContainer::CreatePortal (csVector3* vertices, int num)
 {
   prepared = false;
   csPortal* prt = new csPortal (this);
+  prt->SetMaterial (static_cast<csEngine*> (Engine)->GetDefaultPortalMaterial ());
   portals.Push (prt);
   movable_nr--;	// Make sure the movable information is updated for new portal!
 
@@ -403,36 +408,58 @@ bool csPortalContainer::ClipToPlane (
   return true;
 }
 
-static void Perspective (const csVector3& v, csVector2& p, int
-	aspect, float shift_x, float shift_y)
-{
-  float iz = aspect / v.z;
-  p.x = v.x * iz + shift_x;
-  p.y = v.y * iz + shift_y;
-}
-
-static void AddPerspective (csPoly2D* dest, const csVector3 &v,
-	int aspect, float shift_x, float shift_y)
-{
-  csVector2 p;
-  Perspective (v, p, aspect, shift_x, shift_y);
-  dest->AddVertex (p);
-}
-
 #define EXPERIMENTAL_BUG_FIX  1
 
-bool csPortalContainer::DoPerspective (
-  csVector3 *source,
-  int num_verts,
-  csPoly2D *dest,
-  bool mirror,
-  int fov, float shift_x, float shift_y,
-  const csPlane3& plane_cam)
+class PerspectiveOutlet2D
+{
+protected:
+  int fov;
+  float shift_x;
+  float shift_y;
+  csPoly2D& dest;
+  
+  static void Perspective (const csVector3& v, csVector2& p, int
+	  aspect, float shift_x, float shift_y)
+  {
+    float iz = aspect / v.z;
+    p.x = v.x * iz + shift_x;
+    p.y = v.y * iz + shift_y;
+  }
+public:
+  PerspectiveOutlet2D (int fov, float shift_x, float shift_y,
+    csPoly2D& dest) : fov (fov), shift_x (shift_x), shift_y (shift_y),
+    dest (dest) {}
+
+  void MakeEmpty () { dest.MakeEmpty(); }
+  void Add (const csVector3 &v)
+  {
+    csVector2 p;
+    Perspective (v, p, fov, shift_x, shift_y);
+    dest.AddVertex (p);
+  }
+  void AddVertex (float x, float y)
+  {
+    dest.AddVertex (x, y);
+  }
+  const csVector2* GetLast() { return dest.GetLast(); }
+  void Perspective (const csVector3& v, csVector2& p)
+  {
+    Perspective (v, p, fov, shift_x, shift_y);
+  }
+  bool ClipAgainst (iClipper2D* clipper)
+  {
+    return dest.ClipAgainst (clipper);
+  }
+};
+
+template<typename Outlet>
+static bool DoPerspective (Outlet& outlet, csVector3 *source, int num_verts,
+  bool mirror, const csPlane3& plane_cam)
 {
   csVector3 *ind, *end = source + num_verts;
 
   if (num_verts == 0) return false;
-  dest->MakeEmpty ();
+  outlet.MakeEmpty ();
 
   // Classify all points as NORMAL (z>=SMALL_Z), NEAR (0<=z<SMALL_Z), or
   // BEHIND (z<0).  Use several processing algorithms: trivially accept if all
@@ -445,7 +472,7 @@ bool csPortalContainer::DoPerspective (
   while (ind < end)
   {
     if (ind->z >= SMALL_Z)
-      AddPerspective (dest, *ind, fov, shift_x, shift_y);
+      outlet.Add (*ind);
     else
       break;
     ind++;
@@ -460,7 +487,7 @@ bool csPortalContainer::DoPerspective (
   // easier this way! @@@ CHANGE IN FUTURE).
 
   csVector3 *exit = 0, *exitn = 0, *reenter = 0, *reentern = 0;
-  csVector2 *evert = 0;
+  const csVector2 *evert = 0;
 
   if (ind == source)
   {
@@ -480,7 +507,7 @@ bool csPortalContainer::DoPerspective (
   {
     exit = ind;
     exitn = ind - 1;
-    evert = dest->GetLast ();
+    evert = outlet.GetLast ();
   }
 
   // Check if mixed processing is required
@@ -520,7 +547,7 @@ bool csPortalContainer::DoPerspective (
       while (ind < end)
       {
         if (ind->z >= SMALL_Z)
-          AddPerspective (dest, *ind, fov, shift_x, shift_y);
+          outlet.Add (*ind);
         else
         {
           exit = ind;
@@ -537,7 +564,7 @@ bool csPortalContainer::DoPerspective (
         exitn = ind - 1;
       }
 
-      evert = dest->GetLast ();
+      evert = outlet.GetLast ();
     }
 
     // Add the NEAR points appropriately.
@@ -581,10 +608,8 @@ bool csPortalContainer::DoPerspective (
     float rx, ry, rpointx, rpointy;
 
     // Perspective correct the point.
-    float iz = fov / reentern->z;
     csVector2 rvert;
-    rvert.x = reentern->x * iz + shift_x;
-    rvert.y = reentern->y * iz + shift_y;
+    outlet.Perspective (*reentern, rvert);
 
     if (reenter == exit && reenter->z > -SMALL_EPSILON)
     {
@@ -630,7 +655,7 @@ bool csPortalContainer::DoPerspective (
 
 #define QUADRANT(x, y)  ((y < x ? 1 : 0) ^ (x < -y ? 3 : 0))
 #define MQUADRANT(x, y) ((y < x ? 3 : 0) ^ (x < -y ? 1 : 0))
-    dest->AddVertex (epointx, epointy);
+    outlet.AddVertex (epointx, epointy);
 #if EXPERIMENTAL_BUG_FIX
     if (mirror)
     {
@@ -646,7 +671,7 @@ bool csPortalContainer::DoPerspective (
       {
         epointx = float((quad & 2) ? MAX_VALUE : -MAX_VALUE);
         epointy = float((quad == 0 || quad == 3) ? MAX_VALUE : -MAX_VALUE);
-        dest->AddVertex (epointx, epointy);
+        outlet.AddVertex (epointx, epointy);
         quad = (quad + 1) & 3;
       }
     }
@@ -664,16 +689,16 @@ bool csPortalContainer::DoPerspective (
       {
         epointx = float((quad & 2) ? -MAX_VALUE : MAX_VALUE);
         epointy = float((quad == 0 || quad == 3) ? MAX_VALUE : -MAX_VALUE);
-        dest->AddVertex (epointx, epointy);
+        outlet.AddVertex (epointx, epointy);
         quad = (quad + 1) & 3;
       }
     }
 #endif
-    dest->AddVertex (rpointx, rpointy);
+    outlet.AddVertex (rpointx, rpointy);
 
     // Add the rest of the vertices, which are all NORMAL points.
     if (needfinish)
-      while (ind < end) AddPerspective (dest, *ind++, fov, shift_x, shift_y);
+      while (ind < end) outlet.Add(*ind++);
   } /* if (exit || reenter) */
 
   // Do special processing (all points are NEAR or BEHIND)
@@ -687,10 +712,10 @@ bool csPortalContainer::DoPerspective (
             (ind2->y) - (ind->y - ind2->y) *
             (ind2->x) > -SMALL_EPSILON)
           return false;
-      dest->AddVertex (MAX_VALUE, -MAX_VALUE);
-      dest->AddVertex (MAX_VALUE, MAX_VALUE);
-      dest->AddVertex (-MAX_VALUE, MAX_VALUE);
-      dest->AddVertex (-MAX_VALUE, -MAX_VALUE);
+      outlet.AddVertex (MAX_VALUE, -MAX_VALUE);
+      outlet.AddVertex (MAX_VALUE, MAX_VALUE);
+      outlet.AddVertex (-MAX_VALUE, MAX_VALUE);
+      outlet.AddVertex (-MAX_VALUE, -MAX_VALUE);
     }
     else
     {
@@ -700,10 +725,10 @@ bool csPortalContainer::DoPerspective (
             (ind2->y) - (ind->y - ind2->y) *
             (ind2->x) < SMALL_EPSILON)
           return false;
-      dest->AddVertex (-MAX_VALUE, -MAX_VALUE);
-      dest->AddVertex (-MAX_VALUE, MAX_VALUE);
-      dest->AddVertex (MAX_VALUE, MAX_VALUE);
-      dest->AddVertex (MAX_VALUE, -MAX_VALUE);
+      outlet.AddVertex (-MAX_VALUE, -MAX_VALUE);
+      outlet.AddVertex (-MAX_VALUE, MAX_VALUE);
+      outlet.AddVertex (MAX_VALUE, MAX_VALUE);
+      outlet.AddVertex (MAX_VALUE, -MAX_VALUE);
     }
   }
 
@@ -894,6 +919,8 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* /*movable*/,
   const csReversibleTransform movtrans = 
     meshwrapper->GetCsMovable ().GetFullTransform ();
 
+  csPoly2D poly;
+  PerspectiveOutlet2D outlet (fov, shift_x, shift_y, poly);
   size_t i;
   if (clip_plane || clip_portal || clip_z_plane || do_portal_plane || farplane)
   {
@@ -910,12 +937,10 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* /*movable*/,
         if (!farplane ||
           csPoly3D::Classify (*farplane, verts, num_verts) != CS_POL_FRONT)
         {
-	  csPoly2D clip;
-	  if (DoPerspective (verts, num_verts, &clip, mirrored, fov,
-	  	shift_x, shift_y, camera_planes[i]) &&
-	      clip.ClipAgainst (rview->GetClipper ()))
+	  if (DoPerspective (outlet, verts, num_verts, mirrored,
+	  	camera_planes[i]) && outlet.ClipAgainst (rview->GetClipper ()))
 	  {
-	    DrawOnePortal (portals[i], clip,
+	    DrawOnePortal (portals[i], poly,
 	      movtrans, rview, camera_planes[i]);
 	  }
         }
@@ -926,13 +951,13 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* /*movable*/,
   {
     for (i = 0 ; i < portals.GetSize () ; i++)
     {
-      csPoly2D poly;
       csPortal* prt = portals[i];
       csDirtyAccessArray<int>& vt = prt->GetVertexIndices ();
       int num_vertices = (int)vt.GetSize ();
       int j;
+      outlet.MakeEmpty ();
       for (j = 0 ; j < num_vertices ; j++)
-        AddPerspective (&poly, camera_vertices[vt[j]], fov, shift_x, shift_y);
+         outlet.Add (camera_vertices[vt[j]]);
       DrawOnePortal (portals[i], poly, movtrans, rview, camera_planes[i]);
     }
   }
@@ -1021,20 +1046,23 @@ void csPortalContainer::GetRadius (float& radius, csVector3& center)
 
 class ScreenPolyOutputHelper
 {
-  csVector2* verts;
+  csVector2* verts2D;
+  csVector3* verts3D;
   size_t vertsSize;
   size_t* numVerts;
 public:
-  ScreenPolyOutputHelper (csVector2* verts, size_t vertsSize,
-    size_t* numVerts) : verts (verts), vertsSize (vertsSize),
-    numVerts (numVerts) {}
+  ScreenPolyOutputHelper (csVector2* verts2D, csVector3* verts3D,
+    size_t vertsSize, size_t* numVerts) : verts2D (verts2D), verts3D (verts3D),
+    vertsSize (vertsSize), numVerts (numVerts) {}
   
-  void AddPoly (const csPoly2D& poly)
+  void AddPoly (const csPoly2D& poly2D, const csPoly3D& poly3D)
   {
-    size_t numVertsToCopy = csMin (vertsSize, poly.GetVertexCount());
-    memcpy (verts, poly.GetVertices(), numVertsToCopy * sizeof (csVector2));
+    size_t numVertsToCopy = csMin (vertsSize, poly2D.GetVertexCount());
+    memcpy (verts2D, poly2D.GetVertices(), numVertsToCopy * sizeof (csVector2));
+    memcpy (verts3D, poly3D.GetVertices(), numVertsToCopy * sizeof (csVector3));
     vertsSize -= numVertsToCopy;
-    verts += numVertsToCopy;
+    verts2D += numVertsToCopy;
+    verts3D += numVertsToCopy;
     *numVerts++ = numVertsToCopy;
   }
   void AddEmpty ()
@@ -1043,8 +1071,117 @@ public:
   }
 };
 
+class PerspectiveOutlet2D3D : public PerspectiveOutlet2D
+{
+  csPoly3D& dest3D;
+  iCamera* cam;
+public:
+  PerspectiveOutlet2D3D (iCamera* cam, csPoly2D& dest2D, csPoly3D& dest3D) : 
+    PerspectiveOutlet2D (cam->GetFOV(), cam->GetShiftX(), cam->GetShiftY(), 
+      dest2D), dest3D (dest3D), cam (cam) {}
+
+  void MakeEmpty () 
+  { 
+    PerspectiveOutlet2D::MakeEmpty ();
+    dest3D.MakeEmpty();
+  }
+  void Add (const csVector3 &v)
+  {
+    PerspectiveOutlet2D::Add (v);
+    dest3D.AddVertex (v);
+  }
+  void AddVertex (float x, float y)
+  {
+    PerspectiveOutlet2D::AddVertex (x, y);
+    csVector2 p (x, y);
+    dest3D.AddVertex (cam->InvPerspective (p, SMALL_Z));
+  }
+  bool ClipAgainst (iClipper2D* clipper)
+  {
+    CS_ALLOC_STACK_ARRAY(csVector2, clipOut, dest.GetVertexCount());
+    CS_ALLOC_STACK_ARRAY(csVertexStatus, clipOutStatus, dest.GetVertexCount());
+    size_t outNum;
+    uint8 clipRes = clipper->Clip (dest.GetVertices(), dest.GetVertexCount(), clipOut,
+      outNum, clipOutStatus);
+    if (clipRes == CS_CLIP_OUTSIDE) return false;
+    if (clipRes == CS_CLIP_INSIDE) return true;
+    
+    csPoly2D orgDest2D (dest);
+    csPoly3D orgDest3D (dest3D);
+    MakeEmpty ();
+      
+    for (size_t i = 0 ; i < outNum; i++)
+    {
+      dest.AddVertex (clipOut[i]);
+      switch (clipOutStatus[i].Type)
+      {
+	case CS_VERTEX_ORIGINAL:
+	  {
+	    const size_t vt = clipOutStatus[i].Vertex;
+	    dest3D.AddVertex (orgDest3D[vt]);
+          }
+	  break;
+	case CS_VERTEX_ONEDGE:
+	  {
+	    const size_t vt = clipOutStatus[i].Vertex;
+	    const size_t vt2 = (vt+1) % orgDest3D.GetVertexCount();
+	    const float t = clipOutStatus[i].Pos;
+
+            dest3D.AddVertex (csLerp (orgDest3D[vt], orgDest3D[vt2], t));
+	  }
+          break;
+	case CS_VERTEX_INSIDE:
+	  {
+	    float x = clipOut[i].x;
+	    float y = clipOut[i].y;
+	    size_t edge[2][2];
+	    int edgeToFind = 0;
+	    // Determine edges from which to interpolate the vertex data
+	    size_t lastVert = orgDest2D.GetVertexCount() - 1;
+	    for (size_t v = 0; v < orgDest2D.GetVertexCount(); v++)
+	    {
+	      if ((fabs(orgDest2D[lastVert].y - orgDest2D[v].y) > EPSILON) 
+		&& ((y >= orgDest2D[lastVert].y && y <= orgDest2D[v].y)
+		|| (y <= orgDest2D[lastVert].y && y >= orgDest2D[v].y)))
+	      {
+		edge[edgeToFind][0] = lastVert;
+		edge[edgeToFind][1] = v;
+		edgeToFind++;
+		if (edgeToFind >= 2) break;
+	      }
+	      lastVert = v;
+	    }
+	    CS_ASSERT(edgeToFind >= 2);
+	    const csVector2& A = orgDest2D[edge[0][0]];
+	    const csVector2& B = orgDest2D[edge[0][1]];
+	    const csVector2& C = orgDest2D[edge[1][0]];
+	    const csVector2& D = orgDest2D[edge[1][1]];
+	    // Coefficients
+	    const float t1 = (y - A.y) / (B.y - A.y);
+	    const float t2 = (y - C.y) / (D.y - C.y);
+	    const float x1 = A.x + t1 * (B.x - A.x);
+	    const float x2 = C.x + t2 * (D.x - C.x);
+	    const float dx = (x2 - x1);
+	    const float t = dx ? ((x - x1) / dx) : 0.0f;
+	    
+	    dest3D.AddVertex (csLerp (
+	      csLerp (orgDest3D[edge[0][0]], orgDest3D[edge[0][1]], t1),
+	      csLerp (orgDest3D[edge[1][0]], orgDest3D[edge[1][1]], t2),
+	      t));
+          }
+	  break;
+	default:
+	  CS_ASSERT(false);
+      }
+    }
+      
+    return true;
+  }
+};
+
 void csPortalContainer::ComputeScreenPolygons (iRenderView* rview,
-                                               csVector2* verts, 
+                                               csVector2* verts2D,
+                                               csVector3* verts3D,  
                                                size_t vertsSize,
                                                size_t* numVerts)
 {
@@ -1073,13 +1210,12 @@ void csPortalContainer::ComputeScreenPolygons (iRenderView* rview,
 
   csPlane3 *farplane = camera->GetFarPlane ();
   bool mirrored = camera->IsMirrored ();
-  int fov = camera->GetFOV ();
-  float shift_x = camera->GetShiftX ();
-  float shift_y = camera->GetShiftY ();
 
-  ScreenPolyOutputHelper outHelper (verts, vertsSize, numVerts);
+  ScreenPolyOutputHelper outHelper (verts2D, verts3D, vertsSize, numVerts);
   size_t i;
-  csPoly2D poly;
+  csPoly2D poly2D;
+  csPoly3D poly3D;
+  PerspectiveOutlet2D3D outlet (camera, poly2D, poly3D);
   if (clip_plane || clip_portal || clip_z_plane || do_portal_plane || farplane)
   {
     for (i = 0 ; i < portals.GetSize () ; i++)
@@ -1095,12 +1231,10 @@ void csPortalContainer::ComputeScreenPolygons (iRenderView* rview,
 	if (!farplane ||
 	  csPoly3D::Classify (*farplane, verts, num_verts) != CS_POL_FRONT)
 	{
-	  poly.MakeEmpty();
-	  if (DoPerspective (verts, num_verts, &poly, mirrored, fov,
-		shift_x, shift_y, camera_planes[i]) &&
-	      poly.ClipAgainst (rview->GetClipper ()))
+	  if (DoPerspective (outlet, verts, num_verts, mirrored,
+		camera_planes[i]) && outlet.ClipAgainst (rview->GetClipper ()))
 	  {
-	    outHelper.AddPoly (poly);
+	    outHelper.AddPoly (poly2D, poly3D);
 	  }
 	  else
 	   outHelper.AddEmpty ();
@@ -1116,14 +1250,14 @@ void csPortalContainer::ComputeScreenPolygons (iRenderView* rview,
   {
     for (i = 0 ; i < portals.GetSize () ; i++)
     {
-      poly.MakeEmpty();
+      outlet.MakeEmpty();
       csPortal* prt = portals[i];
       csDirtyAccessArray<int>& vt = prt->GetVertexIndices ();
       int num_vertices = (int)vt.GetSize ();
       int j;
       for (j = 0 ; j < num_vertices ; j++)
-	AddPerspective (&poly, camera_vertices[vt[j]], fov, shift_x, shift_y);
-      outHelper.AddPoly (poly);
+	outlet.Add (camera_vertices[vt[j]]);
+      outHelper.AddPoly (poly2D, poly3D);
     }
   }
 }
@@ -1137,3 +1271,6 @@ size_t csPortalContainer::GetTotalVertexCount () const
   }
   return n;
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(Engine)

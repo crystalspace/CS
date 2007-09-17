@@ -70,6 +70,7 @@ namespace RenderManager
     */
     void UpdateFrustum ();
 
+    CS::Utility::MeshFilter meshFilter;
   public:
     ///
     RenderView ();
@@ -258,6 +259,8 @@ namespace RenderManager
     virtual uint GetCurrentFrameNumber () const;
 
     virtual void DestroyRenderContext (csRenderContext* context);
+
+    CS::Utility::MeshFilter& GetMeshFilter () { return meshFilter; }
   };
 
 }

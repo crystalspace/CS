@@ -26,6 +26,8 @@
 
 CS_PLUGIN_NAMESPACE_BEGIN(RMTest1)
 {
+  template<typename RenderTreeType, typename LayerConfigType>
+  class StandardContextSetup;
 
   class RMTest1 : public scfImplementation2<RMTest1, 
                                             iRenderManager, 
@@ -59,18 +61,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMTest1)
     }
 
     typedef CS::RenderManager::RenderTree<> RenderTreeType;
+    typedef StandardContextSetup<RenderTreeType, 
+      CS::RenderManager::SingleRenderLayer> ContextSetupType;
+    typedef CS::RenderManager::StandardPortalSetup<RenderTreeType, 
+      ContextSetupType> PortalSetupType;
   protected:    
 
     bool HandleTarget (RenderTreeType& renderTree, csStringID svName, 
       RenderTreeType::ContextsContainer* contexts);
 
-    CS::RenderManager::RenderView::Pool renderViewPool;
-
+  public:
     RenderTreeType::PersistentData treePersistent;
+    PortalSetupType::PersistentData portalPersistent;
 
     csRef<iStringSet>       svNameStringSet;
     csRef<iStringSet>       stringSet;
     csRef<iShaderManager>   shaderManager;
+    csRef<iEngine>          engine;
 
     csStringID              defaultShaderName;
     csRef<iShader>          defaultShader;

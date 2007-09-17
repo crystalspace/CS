@@ -34,8 +34,9 @@ namespace RenderManager
   public:
     typedef NumberedMeshTraverser<Tree, StandardSVSetup<Tree, LayerConfigType> > BaseType;
 
-    StandardSVSetup (SVArrayHolder& svArrays, const LayerConfigType& layerConfig)
-      : BaseType (*this), svArrays (svArrays), layerConfig (layerConfig)
+    StandardSVSetup (SVArrayHolder& svArrays, 
+      const LayerConfigType& layerConfig) : BaseType (*this), 
+      svArrays (svArrays), layerConfig (layerConfig)
     {
     }
 
@@ -55,11 +56,13 @@ namespace RenderManager
         svArrays.SetupSVStack (localStack, layer, index);
 
         // Push all contexts here @@TODO: get more of them
-        localStack[tree.GetObjectToWorldName()] = mesh.svObjectToWorld;
-        rm->material->GetMaterial ()->PushVariables (localStack);
+        localStack[tree.GetPersistentData().svObjectToWorldName] = mesh.svObjectToWorld;
+        if (rm->material)
+          rm->material->GetMaterial ()->PushVariables (localStack);
         if (rm->variablecontext)
           rm->variablecontext->PushVariables (localStack);
-        mesh.meshObjSVs->PushVariables (localStack);
+	if (mesh.meshObjSVs)
+          mesh.meshObjSVs->PushVariables (localStack);
       }
     }
 
@@ -124,6 +127,8 @@ namespace RenderManager
     // Setup SV arrays
     context.svArrays.Setup (layerConfig.GetLayerCount(), 
       shaderManager->GetSVNameStringset ()->GetSize (), context.totalRenderMeshes);
+      
+    if (context.totalRenderMeshes == 0) return;
 
     // Push the default stuff
     csShaderVariableStack& svStack = shaderManager->GetShaderVariableStack ();

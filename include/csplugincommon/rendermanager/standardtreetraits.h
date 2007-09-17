@@ -24,6 +24,7 @@
 #include "ivideo/rendermesh.h"
 #include "csutil/comparator.h"
 #include "csutil/compileassert.h"
+#include "csplugincommon/rendermanager/renderview.h"
 #include "csplugincommon/rendermanager/svarrayholder.h"
 
 namespace CS
@@ -92,11 +93,15 @@ namespace RenderManager
     //-- Standard functions
     // Given a iMeshWrapper and a csRenderMesh, get the correct mesh node index
     static CS_FORCEINLINE 
-    MeshNodeKeyType GetMeshNodeKey (iMeshWrapper* imesh, const csRenderMesh& rendermesh)
+    MeshNodeKeyType GetMeshNodeKey (CS::Graphics::RenderPriority defaultPriority, 
+				    const csRenderMesh& rendermesh)
     {
       MeshNodeKeyType result = {0};
 
-      result.priority = imesh->GetRenderPriority ();
+      if (rendermesh.renderPrio >= 0)
+        result.priority = rendermesh.renderPrio;
+      else
+        result.priority = defaultPriority;
       result.isPortal = rendermesh.portal != 0;
       
       return result;
@@ -105,9 +110,13 @@ namespace RenderManager
     // Setup a new mesh node from the first iMeshWrapper and csRenderMesh
     template<typename T>
     static CS_FORCEINLINE_TEMPLATEMETHOD 
-    void SetupMeshNode (T& meshNode, iMeshWrapper* imesh, const csRenderMesh& rendermesh)
+    void SetupMeshNode (T& meshNode, CS::Graphics::RenderPriority defaultPriority, 
+                        const csRenderMesh& rendermesh)
     {
-      meshNode.priority = imesh->GetRenderPriority ();
+      if (rendermesh.renderPrio >= 0)
+        meshNode.priority = rendermesh.renderPrio;
+      else
+        meshNode.priority = defaultPriority;
     }
 
   private:
