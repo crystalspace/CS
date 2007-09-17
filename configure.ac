@@ -79,6 +79,9 @@ AS_IF([test -n "$SWIG"],
 
 CS_CHECK_COMMON_TOOLS_ICONS
 
+# CS ships with a copy of relaytool.
+CS_EMIT_BUILD_PROPERTY([CMD.RELAYTOOL], [$srcdir/bin/relaytool])
+
 #------------------------------------------------------------------------------
 # In order to avoid alienating users by forcing them to install and use Jam,
 # config.status is instructed (see far below) to build Jam on the user's behalf

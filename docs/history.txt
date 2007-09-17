@@ -14,6 +14,9 @@ chronological order.
 	- res made the XML parsers errors slightly more helpful by having the
 	  error message contain the hierarchy of elements in which the error
 	  occured.
+	- res added support for relaying external libraries using relaytool
+	  (that is, they're dynamically loaded, allowing graceful handling
+	  of inavailability).
 15-Sep-2007
 	- res fixed a crash in the GL driver DB when <comparever> was used
 	  with an unrecognized version type.
