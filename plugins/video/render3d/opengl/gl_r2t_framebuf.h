@@ -39,6 +39,8 @@ protected:
   int rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy;
   /// Render target dimensions
   int txt_w, txt_h;
+  /// Framebuffer dimensions
+  int framebufW, framebufH;
 
   int sub_texture_id;
   csDirtyAccessArray<uint8> pixelScratch;

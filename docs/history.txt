@@ -8,6 +8,8 @@ chronological order.
 
 17-Sep-2007
 	- res made the GL renderer support more than 16 texture image units.
+	- res made the GL framebuffer render-to-texture support work slightly
+	  better with textures larger than the framebuffer.
 15-Sep-2007
 	- Marten reimplemented dependent target handling.
 	- Marten fixed a few missing consts in csFIFO.
