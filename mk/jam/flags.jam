@@ -163,7 +163,7 @@ rule RelayLibs
   if ! $(CMD.RELAYTOOL)
   {
     # Create fake libwhatever_is_present() symbols
-    local stubfile = [ DoObjectGrist $(>)_stub.c ] ;
+    local stubfile = [ DoObjectGrist $(>).fake_stub.c ] ;
     MakeLocate $(stubfile) : $(LOCATE_TARGET) ;
     WHATEVER on $(stubfile) = $(3) ;
     WriteRelayLibStub $(stubfile) ;
@@ -195,9 +195,9 @@ rule RelayLibs
 actions WriteRelayLibStub
 {
   echo "" > $(<)
-  whatever = `echo "$(WHATEVER)" | tr '-' '_' | tr '.' '_' `
-  echo "int lib\${whatever}_is_present = 1;" >> $(<)
-  echo "int lib\${whatever}_symbol_is_present (char* s) { return 1; }" >> $(<)
+  whatever=`echo "$(WHATEVER)" | tr '-' '_' | tr '.' '_' `
+  echo "int lib${whatever}_is_present = 1;" >> $(<)
+  echo "int lib${whatever}_symbol_is_present (char* s) { return 1; }" >> $(<)
 }
 
 #----------------------------------------------------------------------------
