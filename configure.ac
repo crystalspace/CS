@@ -1288,7 +1288,14 @@ AS_IF([test $cs_cv_lib3ds = yes],
     [CS_CHECK_BUILD([if lib3ds is sufficiently recent], [cs_cv_lib3ds_recent],
 	[AC_LANG_PROGRAM([[#include <lib3ds/io.h>]], [lib3ds_io_free(0);])],
 	[], [], [CS_EMIT_BUILD_RESULT([cs_cv_lib3ds], [3DS])], [], [],
-	[$cs_cv_lib3ds_cflags], [$cs_cv_lib3ds_lflags], [$cs_cv_lib3ds_libs])])
+	[$cs_cv_lib3ds_cflags], [$cs_cv_lib3ds_lflags], [$cs_cv_lib3ds_libs])
+	AS_IF([test $cs_cv_lib3ds_recent = yes],
+	    [CS_CHECK_BUILD([if lib3ds version is >= 1.3.0], [cs_cv_lib3ds_1_3],
+	    [AC_LANG_PROGRAM([[#include <lib3ds/io.h>
+	        size_t DataReadFunc (void *self, void *buffer, size_t size) {}]],
+	        [lib3ds_io_new (0, 0, 0, 0, DataReadFunc, 0)])],
+	    [], [], [CS_EMIT_BUILD_PROPERTY([LIB3DS.ONE_THREE_OH], [yes])], [], [],
+	    [$cs_cv_lib3ds_cflags], [$cs_cv_lib3ds_lflags], [$cs_cv_lib3ds_libs])])])
 
 
 
