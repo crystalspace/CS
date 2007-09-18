@@ -20,6 +20,8 @@ chronological order.
 	  xmlread error strings. Addresses trac #123.
 	- res changed the configure relaytool test to use CS_PATH_TOOL instead
 	  of hardcoding the path.
+	- res made csparser not assert/crash when the default missing texture
+	  can't be loaded - it merely displays an error message now.
 17-Sep-2007
 	- res added a driver DB tweak to disable EXT_framebuffer_object for
 	  (now rather old) ATI drivers (see trac #261).

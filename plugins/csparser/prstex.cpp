@@ -441,9 +441,20 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     }
     csRef<iBase> b = BuiltinErrorTexLoader->Parse (ParamsNode,
       0, ldr_context, static_cast<iBase*> (&context));
-    CS_ASSERT(b);
+    if (!b.IsValid())
+    {
+      static bool noMissingWarned = false;
+      if (!noMissingWarned)
+      {
+	SyntaxService->Report (
+	  "crystalspace.maploader.parse.texture",
+	  CS_REPORTER_SEVERITY_ERROR,
+	  node, "Could not create default texture!");
+	noMissingWarned = true;
+	return 0;
+      }
+    }
     tex = scfQueryInterface<iTextureWrapper> (b);
-    CS_ASSERT(tex);
   }
 
   if (tex)
