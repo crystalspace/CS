@@ -135,7 +135,7 @@ namespace lighter
         csQueryRegistryOrLoad<iStandardReporterListener> (objectRegistry, 
         "crystalspace.utilities.stdrep");
       // Set up standard listener to also report to lighter2.log
-      stdrep->SetDebugFile ("lighter2.log");
+      stdrep->SetDebugFile ("/this/lighter2.log");
       stdrep->SetMessageDestination (CS_REPORTER_SEVERITY_BUG, false, false, 
         false, false, true, false);
       stdrep->SetMessageDestination (CS_REPORTER_SEVERITY_ERROR, false, false, 

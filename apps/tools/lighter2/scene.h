@@ -208,10 +208,10 @@ namespace lighter
                                Statistics::Progress& progress);
     bool SaveSceneLibrary (csSet<csString>& savedFactories, 
                            const char* libFile, LoadedFile* fileInfo,
-                           Statistics::Progress& progress);
+                           Statistics::Progress& progress, bool noModify);
     void HandleLibraryNode (csSet<csString>& savedFactories, 
                             iDocumentNode* node, LoadedFile* fileInfo,
-                            Statistics::Progress& progress);
+                            Statistics::Progress& progress, bool noModify);
     void SaveMeshFactoryToDom (csSet<csString>& savedObjects, 
                                iDocumentNode* factNode, LoadedFile* fileInfo);
     void SaveSectorToDom (iDocumentNode* sectorNode, LoadedFile* fileInfo,
@@ -235,14 +235,17 @@ namespace lighter
     };
     MeshParseResult ParseMesh (LoadedFile* fileInfo, Sector *sector,  
       iMeshWrapper *mesh, csRef<Object>& obj);
-    MeshParseResult ParseMeshFactory (iMeshFactoryWrapper *factory, 
-      csRef<ObjectFactory>& radFact);
+    MeshParseResult ParseMeshFactory (LoadedFile* fileInfo, 
+      iMeshFactoryWrapper *factory, csRef<ObjectFactory>& radFact);
     void PropagateLight (Light* light, const csFrustum& lightFrustum)
     { 
       PropageState state;
       PropagateLight (light, lightFrustum, state);
     }
 
+    iRegion* GetRegion (iObject* obj);
+    bool IsObjectFromBaseDir (iObject* obj, const char* baseDir);
+    bool IsFilenameFromBaseDir (const char* filename, const char* baseDir);
   };
 }
 

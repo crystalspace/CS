@@ -143,7 +143,7 @@ namespace lighter
       // Load it
       csRef<iFile> buf = globalLighter->vfs->Open ("world", VFS_FILE_READ);
       if (!buf) return globalLighter->Report ("Error opening file 'world'!");
-
+      
       csRef<iDocument> doc = globalLighter->docSystem->CreateDocument ();
       const char* error = doc->Parse (buf, true);
       if (error != 0)
@@ -827,7 +827,8 @@ namespace lighter
 
     // Get the factory
     csRef<ObjectFactory> factory;
-    MeshParseResult parseFact = ParseMeshFactory (mesh->GetFactory (), factory);
+    MeshParseResult parseFact = ParseMeshFactory (fileInfo, mesh->GetFactory (), 
+      factory);
     if (parseFact != Success) return parseFact;
     if (!factory) return Failure;
 
@@ -844,7 +845,8 @@ namespace lighter
     return Success;
   }
 
-  Scene::MeshParseResult Scene::ParseMeshFactory (iMeshFactoryWrapper *factory,
+  Scene::MeshParseResult Scene::ParseMeshFactory (LoadedFile* fileInfo, 
+                                                  iMeshFactoryWrapper *factory,
                                                   csRef<ObjectFactory>& radFact)
   {
     if (!factory) return Failure;
@@ -867,6 +869,10 @@ namespace lighter
     else
       return NotAGenMesh;
     radFact->ParseFactory (factory);
+    if (!IsObjectFromBaseDir (factory->QueryObject(), fileInfo->directory))
+    {
+      radFact->noModify = true;
+    }
     radFactories.Put (radFact->factoryName, radFact);
 
     return Success;
@@ -957,7 +963,8 @@ namespace lighter
           {
             Statistics::Progress* progLibrary = 
               progress.CreateProgress (nodeStep);
-            HandleLibraryNode (savedFactories, node, fileInfo, *progLibrary);
+            HandleLibraryNode (savedFactories, node, fileInfo, *progLibrary,
+              false);
             delete progLibrary;
           }
         }
@@ -1076,7 +1083,7 @@ namespace lighter
 
   bool Scene::SaveSceneLibrary (csSet<csString>& savedFactories, 
                                 const char* libFile, LoadedFile* fileInfo,
-                                Statistics::Progress& progress)
+                                Statistics::Progress& progress, bool noModify)
   {
     csRef<iFile> buf = globalLighter->vfs->Open (libFile, VFS_FILE_READ);
     if (!buf) 
@@ -1121,7 +1128,8 @@ namespace lighter
         {
           Statistics::Progress* progLibrary = 
             progress.CreateProgress (nodeStep);
-          HandleLibraryNode (savedFactories, node, fileInfo, *progLibrary);
+          HandleLibraryNode (savedFactories, node, fileInfo, *progLibrary,
+            noModify);
           delete progLibrary;
         }
         else if (!strcasecmp (nodeName, "meshfact"))
@@ -1132,17 +1140,20 @@ namespace lighter
       progress.SetProgress (nextPos * nodeStep);
     }
 
-    buf = globalLighter->vfs->Open (libFile, VFS_FILE_WRITE);
-    if (!buf) 
+    if (!noModify)
     {
-      globalLighter->Report ("Error opening file '%s' for writing!", libFile);
-      return false;
-    }
-    error = doc->Write (buf);
-    if (error != 0)
-    {
-      globalLighter->Report ("Document system error: %s!", error);
-      return false;
+      buf = globalLighter->vfs->Open (libFile, VFS_FILE_WRITE);
+      if (!buf) 
+      {
+	globalLighter->Report ("Error opening file '%s' for writing!", libFile);
+	return false;
+      }
+      error = doc->Write (buf);
+      if (error != 0)
+      {
+	globalLighter->Report ("Document system error: %s!", error);
+	return false;
+      }
     }
     progress.SetProgress (1);
 
@@ -1151,7 +1162,7 @@ namespace lighter
 
   void Scene::HandleLibraryNode (csSet<csString>& savedFactories, 
                                  iDocumentNode* node, LoadedFile* fileInfo,
-                                 Statistics::Progress& progress)
+                                 Statistics::Progress& progress, bool noModify)
   {
     const char* file = node->GetAttributeValue ("file");
     if (file)
@@ -1164,12 +1175,14 @@ namespace lighter
         changer.PushDir ();
         globalLighter->vfs->ChDir (path);
       }
-      SaveSceneLibrary (savedFactories, file, fileInfo, progress);
+      SaveSceneLibrary (savedFactories, file, fileInfo, progress,
+        noModify || !(IsFilenameFromBaseDir (file, fileInfo->directory)));
     }
     else
     {
-      SaveSceneLibrary (savedFactories, node->GetContentsValue (), fileInfo, 
-        progress);
+      file = node->GetContentsValue ();
+      SaveSceneLibrary (savedFactories, file, fileInfo, progress,
+        noModify || !(IsFilenameFromBaseDir (file, fileInfo->directory)));
     }
   }
 
@@ -1522,7 +1535,43 @@ namespace lighter
 
     progress.SetProgress (1);
   }
-
+    
+  iRegion* Scene::GetRegion (iObject* obj)
+  {
+    iRegionList* regions = globalLighter->engine->GetRegions ();
+    for (int i = 0; i < regions->GetCount(); i++)
+    {
+      iRegion* reg = regions->Get (i);
+      if (reg->IsInRegion (obj)) return reg;
+    }
+    return 0;
+  }
+  
+  bool Scene::IsObjectFromBaseDir (iObject* obj, const char* baseDir)
+  {
+    iRegion* reg = GetRegion (obj);
+    if (reg == 0) return false;
+    
+    csRef<iSaverFile> saverFile (CS::GetChildObject<iSaverFile> (reg->QueryObject()));
+    if (saverFile.IsValid()) return false;
+    
+    return strncmp (saverFile->GetFile(), baseDir, strlen (baseDir)) == 0;
+  }
+  
+  bool Scene::IsFilenameFromBaseDir (const char* filename, const char* baseDir)
+  {
+    const size_t fnLen = strlen (filename);
+    CS_ALLOC_STACK_ARRAY(char, fnDir, fnLen+1);
+    CS_ALLOC_STACK_ARRAY(char, fnName, fnLen+1);
+    csSplitPath (filename, fnDir, fnLen+1, fnName, fnLen+1);
+    
+    globalLighter->vfs->PushDir ();
+    globalLighter->vfs->ChDir (fnDir);
+    bool ret = strncmp (globalLighter->vfs->GetCwd(), baseDir, strlen (baseDir)) == 0;
+    globalLighter->vfs->PopDir ();
+    return ret;
+  }
+  
   //-------------------------------------------------------------------------
 
   Scene::LightingPostProcessor::LightingPostProcessor (Scene* scene) : scene (scene)

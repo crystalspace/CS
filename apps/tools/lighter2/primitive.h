@@ -32,6 +32,10 @@ namespace lighter
 
   class Primitive;
   
+  enum PrimitiveFlags
+  {
+  };
+
 
   /**
    * Primitive in the radiosity world.
@@ -89,6 +93,8 @@ namespace lighter
     inline const ObjectBaseVertexData& GetVertexData () const 
     { return *vertexData; }
 
+    inline csFlags& GetFlags () { return flags; }
+    inline const csFlags& GetFlags () const { return flags; }
   protected:
     /// Vertex data holder
     ObjectBaseVertexData* vertexData;
@@ -100,6 +106,8 @@ namespace lighter
     /* Plane normal seems to point into opposite direction compared to e.g.
      * auto-computed vertex normals. (FIXME?) */
     csPlane3 plane;
+    
+    csFlags flags;
   };
 
   class FactoryPrimitive : public PrimitiveBase

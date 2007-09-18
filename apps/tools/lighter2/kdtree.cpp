@@ -114,17 +114,20 @@ namespace lighter
       }
     }
 
-    //Finish and sort the lists
-    for (size_t a = 0; a < 3; ++a)
+    if (box != 0)
     {
-      //Finish last box
-      box->side[1].SetNext (a, 0);
-      if (box->side[0].GetSide (a) == EndPoint::SIDE_PLANAR)
-        box->side[0].SetNext (a, 0);
-
-      //Save first and sort
-      endPointList.head[a] = &first->side[0];
-      endPointList.SortList (a);
+      //Finish and sort the lists
+      for (size_t a = 0; a < 3; ++a)
+      {
+	//Finish last box
+	box->side[1].SetNext (a, 0);
+	if (box->side[0].GetSide (a) == EndPoint::SIDE_PLANAR)
+	  box->side[0].SetNext (a, 0);
+  
+	//Save first and sort
+	endPointList.head[a] = &first->side[0];
+	endPointList.SortList (a);
+      }
     }
 
     return true;

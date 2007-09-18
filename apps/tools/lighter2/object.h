@@ -72,6 +72,9 @@ namespace lighter
 
     /// Whether to light meshes of this factory per vertex
     bool lightPerVertex;
+    
+    /// Whether to avoid modifying this factory
+    bool noModify;
   protected:
 
     // Begin remapping of submeshes
