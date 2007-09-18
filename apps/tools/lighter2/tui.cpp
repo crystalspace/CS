@@ -104,7 +104,7 @@ namespace lighter
 
       buf.Append (TUI_SEVERITY_TEXT[severity]);
       csString tmp(descrSplit[i]);
-      buf.Append (tmp.Slice (0,75).PadRight (75));
+      buf.Append (tmp.Slice (0,74).PadRight (74));
 
       if (simpleMode)
       {
