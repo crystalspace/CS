@@ -195,8 +195,9 @@ rule RelayLibs
 actions WriteRelayLibStub
 {
   echo "" > $(<)
-  echo "int lib$(WHATEVER)_is_present = 1;" >> $(<)
-  echo "int lib$(WHATEVER)_symbol_is_present (char* s) { return 1; }" >> $(<)
+  whatever = `echo "$(WHATEVER)" | tr '-' '_' | tr '.' '_' `
+  echo "int lib\${whatever}_is_present = 1;" >> $(<)
+  echo "int lib\${whatever}_symbol_is_present (char* s) { return 1; }" >> $(<)
 }
 
 #----------------------------------------------------------------------------
