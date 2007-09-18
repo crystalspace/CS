@@ -1,5 +1,7 @@
 1.2 branch log.
 
+18-Sep-2007
+        - Mike Gist merged r27669 and r27670 into 1.2 (ATI gldriver tweaks).
 15-Sep-2007
         - Mike Gist merged r27657 and r27658 into 1.2 (<comparever> fix and
           'glvendor' tweaks).
