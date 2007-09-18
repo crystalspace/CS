@@ -156,7 +156,8 @@ namespace lighter
         factory->GetMeshObjectFactory()->GetMaterialWrapper();
       for (int i=0; i < genFact->GetTriangleCount ();i++)
       {
-        AddPrimitive (tris[i].a, tris[i].b, tris[i].c, material);
+        AddPrimitive (tris[i].a, tris[i].b, tris[i].c, 
+          (iMaterialWrapper*)0);
       }
     }
   }
