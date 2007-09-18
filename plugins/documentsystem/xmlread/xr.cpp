@@ -73,18 +73,18 @@ TrDocumentNode* TrDocumentNode::NextSibling( const char * value ) const
 }
 
 
-TrDocumentNode* TrDocumentNodeChildren::Identify (const ParseInfo& parse,
+TrDocumentNode* TrDocumentNodeChildren::Identify (ParseInfo& parse,
 	const char* p)
 {
   TrDocumentNode* returnNode = 0;
 
-  p = SkipWhiteSpace( p );
+  p = SkipWhiteSpace( parse, p );
   if( !p || !*p || *p != '<' )
   {
     return 0;
   }
 
-  p = SkipWhiteSpace( p );
+  p = SkipWhiteSpace( parse, p );
 
   if ( !p || !*p )
   {
@@ -126,7 +126,7 @@ TrDocumentNode* TrDocumentNodeChildren::Identify (const ParseInfo& parse,
   }
   else
   {
-    parse.document->SetError( TIXML_ERROR_OUT_OF_MEMORY, this );
+    parse.document->SetError( TIXML_ERROR_OUT_OF_MEMORY, this, p );
   }
   return returnNode;
 }

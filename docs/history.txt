@@ -16,6 +16,8 @@ chronological order.
 	  select the appropriate variant. Fixes trac #361.
 	- res fixed "fake relay stub" generation for when relaytool is not
 	  available.
+	- res added the line number + column reporting to the TinyXML and 
+	  xmlread error strings. Addresses trac #123.
 17-Sep-2007
 	- res added a driver DB tweak to disable EXT_framebuffer_object for
 	  (now rather old) ATI drivers (see trac #261).

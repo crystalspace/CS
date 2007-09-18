@@ -36,6 +36,10 @@ distribution.
 
 namespace CS
 {
+namespace Implementation
+{
+namespace TinyXml
+{
 
 /*
  TiXmlString is an emulation of the std::string template.
@@ -204,6 +208,8 @@ protected :
 
 } ;
 
+} // namespace TinyXml
+} // namespace Implementation
 } // namespace CS
 
 #endif	// TIXML_STRING_INCLUDED

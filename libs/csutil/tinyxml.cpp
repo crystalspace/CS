@@ -29,6 +29,10 @@ distribution.
 
 namespace CS
 {
+namespace Implementation
+{
+namespace TinyXml
+{
 
 const char* const TiXmlBase::errorString[ TIXML_ERROR_STRING_COUNT ] =
 {
@@ -47,8 +51,6 @@ const char* const TiXmlBase::errorString[ TIXML_ERROR_STRING_COUNT ] =
   "Error parsing Declaration.",
   "Error document empty."
 };
-
-bool TiXmlBase::condenseWhiteSpace = true;
 
 void TiXmlBase::PutString( const TiXmlString& str, TiXmlString* outString )
 {
@@ -256,18 +258,18 @@ TiDocumentNode* TiDocumentNode::NextSibling( const char * value ) const
 }
 
 
-csPtr<TiDocumentNode> TiDocumentNodeChildren::Identify( TiDocument* document,
+csPtr<TiDocumentNode> TiDocumentNodeChildren::Identify( ParseInfo& parse,
 	const char* p )
 {
   TiDocumentNode* returnNode = 0;
 
-  p = SkipWhiteSpace( p );
+  p = SkipWhiteSpace( parse, p );
   if( !p || !*p || *p != '<' )
   {
     return 0;
   }
 
-  p = SkipWhiteSpace( p );
+  p = SkipWhiteSpace( parse, p );
 
   if ( !p || !*p )
   {
@@ -286,22 +288,22 @@ csPtr<TiDocumentNode> TiDocumentNodeChildren::Identify( TiDocument* document,
 
   if ( StringEqual( p, xmlHeader) )
   {
-    void* ptr = document->docHeap.Alloc (sizeof (TiXmlDeclaration));
+    void* ptr = parse.document->docHeap.Alloc (sizeof (TiXmlDeclaration));
     returnNode = new (ptr) TiXmlDeclaration();
   }
   else if (    isalpha( *(p+1) ) || *(p+1) == '_' )
   {
-    void* p = document->blk_element.Alloc (sizeof (TiXmlElement));
+    void* p = parse.document->blk_element.Alloc (sizeof (TiXmlElement));
     returnNode = new (p) TiXmlElement ();
   }
   else if ( StringEqual ( p, commentHeader) )
   {
-    void* ptr = document->docHeap.Alloc (sizeof (TiXmlComment));
+    void* ptr = parse.document->docHeap.Alloc (sizeof (TiXmlComment));
     returnNode = new (ptr) TiXmlComment();
   }
   else
   {
-    void* ptr = document->docHeap.Alloc (sizeof (TiXmlUnknown));
+    void* ptr = parse.document->docHeap.Alloc (sizeof (TiXmlUnknown));
     returnNode = new (ptr) TiXmlUnknown();
   }
 
@@ -313,7 +315,7 @@ csPtr<TiDocumentNode> TiDocumentNodeChildren::Identify( TiDocument* document,
   }
   else
   {
-    document->SetError( TIXML_ERROR_OUT_OF_MEMORY, this );
+    parse.document->SetError( TIXML_ERROR_OUT_OF_MEMORY, this, p );
   }
   return returnNode;
 }
@@ -687,6 +689,7 @@ TiDocument::TiDocument() :
   errorId = TIXML_NO_ERROR;
   //  ignoreWhiteSpace = true;
   type = DOCUMENT;
+  parse.document = this;
 }
 
 TiDocument::TiDocument( const char * documentName ) :
@@ -699,6 +702,7 @@ TiDocument::TiDocument( const char * documentName ) :
   value = documentName;
   errorId = TIXML_NO_ERROR;
   type = DOCUMENT;
+  parse.document = this;
 }
 
 TiDocument::~TiDocument ()
@@ -934,4 +938,6 @@ size_t TiDocumentAttributeSet::FindExact (const char * reg_name) const
   return (size_t)-1;
 }
 
+}
+}
 } // namespace CS

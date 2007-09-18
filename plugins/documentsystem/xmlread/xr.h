@@ -84,6 +84,12 @@ struct ParseInfo
 
   ReadNameFunc* ReadName;
   IsNameStartFunc* IsNameStart;
+
+  const char* startOfLine;
+  int linenum;
+  
+  void BeginParse (const char* p)
+  { startOfLine = p; linenum = 1; }
 };
 
 /**
@@ -119,8 +125,8 @@ public:
   TrXmlBase () {}
   virtual ~TrXmlBase () {}
 
-  static const char* SkipWhiteSpace( const char* );
-  static char* SkipWhiteSpace( char* );
+  static const char* SkipWhiteSpace( ParseInfo& parse, const char* );
+  static char* SkipWhiteSpace( ParseInfo& parse, char* );
 
   /**
    * Reads an XML name into the string provided. Returns
@@ -135,11 +141,11 @@ public:
    * This version parses in place (i.e. it modifies the in buffer and
    * returns a pointer inside that).
    */
-  static char* ReadText(char* in, char*& buf, 
+  static char* ReadText(ParseInfo& parse, char* in, char*& buf, 
     int& buflen, bool ignoreWhiteSpace, const char* endTag);
 
 protected:
-  virtual char* Parse( const ParseInfo& parse, char* p ) = 0;
+  virtual char* Parse( ParseInfo& parse, char* p ) = 0;
 
   // If an entity has been found, transform it into a character.
   static char* GetEntity( char* in, char* value );
@@ -293,7 +299,7 @@ public:
 protected:
   // Figure out what is at *p, and parse it. Returns null if it is not an xml
   // node.
-  TrDocumentNode* Identify( const ParseInfo& parse, const char* start );
+  TrDocumentNode* Identify( ParseInfo& parse, const char* start );
 
   // The node is passed in by ownership. This object will delete it.
   TrDocumentNode* LinkEndChild( TrDocumentNode* lastChild,
@@ -351,7 +357,7 @@ public:
    * Attribute parsing starts: first letter of the name
    * returns: the next char after the value end quote
    */
-  char* Parse( const ParseInfo& parse, TrDocumentNode* node, char* p );
+  char* Parse( ParseInfo& parse, TrDocumentNode* node, char* p );
 
 private:
   const char* name;
@@ -440,13 +446,13 @@ protected:
    * Attribtue parsing starts: next char past '<'
    * returns: next char past '>'
    */
-  virtual char* Parse( const ParseInfo& parse, char* p );
+  virtual char* Parse( ParseInfo& parse, char* p );
 
   /*  [internal use]
    * Reads the "value" of the element -- another element, or text.
    * This should terminate with the current end tag.
    */
-  char* ReadValue( const ParseInfo& parse, char* in );
+  char* ReadValue( ParseInfo& parse, char* in );
 
 private:
   TrDocumentAttributeSet attributeSet;
@@ -476,7 +482,7 @@ protected:
    * Attribtue parsing starts: at the ! of the !--
    * returns: next char past '>'
    */
-  virtual char* Parse( const ParseInfo& parse, char* p );
+  virtual char* Parse( ParseInfo& parse, char* p );
 
   char* value;
   int vallen;
@@ -508,7 +514,7 @@ protected :
    * Attribtue parsing starts: First char of the text
    * returns: next char past '>'
    */
-  virtual char* Parse( const ParseInfo& parse,  char* p );
+  virtual char* Parse( ParseInfo& parse,  char* p );
 
   char* value;
   int vallen;
@@ -531,7 +537,7 @@ public:
   virtual ~TrXmlCData() {}
 
 protected :
-  virtual char* Parse( const ParseInfo& parse,  char* p );
+  virtual char* Parse( ParseInfo& parse,  char* p );
 };
 
 /**
@@ -580,7 +586,7 @@ protected:
   //  [internal use]
   //  Attribtue parsing starts: next char past '<'
   //           returns: next char past '>'
-  virtual char* Parse( const ParseInfo& parse,  char* p );
+  virtual char* Parse( ParseInfo& parse,  char* p );
 
 private:
   const char* version;
@@ -608,7 +614,7 @@ protected:
    * Attribute parsing starts: First char of the text
    * returns: next char past '>'
    */
-  virtual char* Parse( const ParseInfo& parse,  char* p );
+  virtual char* Parse( ParseInfo& parse,  char* p );
 
   char* value;
   int vallen;
@@ -651,8 +657,15 @@ public:
 
   virtual const char * Value () { return 0; }
 
+private:
   /// Parse the given null terminated block of xml data.
-  virtual char* Parse( const ParseInfo& parse,  char* p );
+  virtual char* Parse( ParseInfo& parse,  char* p );
+public:
+  char* Parse( char* p )
+  { 
+    parse.BeginParse (p);
+    return Parse (parse, p);
+  }
 
   /// If, during parsing, a error occurs, Error will be set to true.
   bool Error() const { return errorId != TIXML_NO_ERROR; }
@@ -670,7 +683,7 @@ public:
   void ClearError() { errorId = TIXML_NO_ERROR; errorDesc = ""; }
 
   // [internal use]
-  void SetError( int err, TrDocumentNode* errorNode )
+  void SetError( int err, TrDocumentNode* errorNode, const char* errorPos )
   {
     errorId = err;
     errorDesc = errorString[ errorId ];
@@ -692,7 +705,16 @@ public:
       }
       
       errorDesc += " (in: ";
-      errorDesc += errorPath.GetDataSafe();
+      csString location;
+      location.Format ("line %d", parse.linenum);
+      if (errorPos != 0)
+        location.AppendFmt (":%zu", errorPos - parse.startOfLine + 1);
+      errorDesc += location.GetDataSafe();
+      if (!errorPath.IsEmpty())
+      {
+        errorDesc += "; ";
+        errorDesc += errorPath.GetDataSafe();
+      }
       errorDesc += ")";
     }
   }
