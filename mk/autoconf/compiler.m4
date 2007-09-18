@@ -147,7 +147,7 @@ AC_DEFUN([CS_PROG_LINK],[
     
     # Check if linker supports --gc-sections.
     AC_ARG_ENABLE([gc-sections], 
-	[AC_HELP_STRING([--enable-as-needed],
+	[AC_HELP_STRING([--enable-gc-sections],
 	    [Utilize --gc-sections linker flag for some targets (default YES)])])
     AS_IF([test -z "$enable_gc_sections"], 
 	[enable_gc_sections=yes])
