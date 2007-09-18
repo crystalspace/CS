@@ -2,15 +2,20 @@ SubDir TOP plugins video canvas xwindow ;
 
 if $(X11.AVAILABLE) = "yes"
 {
+  ALERT_FILES = ;
   if $(XAW.AVAILABLE) = "yes"
   {
-    XAW_FILES = [ Wildcard xalert_xaw : *.cpp *.h *.c ] ;
+    ALERT_FILES += [ Wildcard xalert_xaw : *.cpp *.h *.c ] ;
+  }
+  if $(GTK.AVAILABLE) = "yes"
+  {
+    ALERT_FILES += [ Wildcard xalert_gtk : *.cpp *.h ] ;
   }
 
   Description xwin : "X Window Plugin" ;
   Plugin xwin : 
     [ Wildcard *.cpp *.h ] 
-    $(XAW_FILES) ;
+    $(ALERT_FILES) ;
   LinkWith xwin : crystalspace ;
   CompileGroups xwin : canvases softcanvas openglcanvas ;
   if $(XFREE86VM.AVAILABLE) = "yes"
@@ -26,5 +31,14 @@ if $(X11.AVAILABLE) = "yes"
   {
     RelayLibs xwin : XAW : Xaw7 ;
     CFlags xwin : [ FDefines HAVE_XAW ] ;
+  }
+  if $(GTK.AVAILABLE) = "yes"
+  {
+    RelayLibs xwin : GTK : gtk-x11-2.0 ;
+    CFlags xwin : [ FDefines HAVE_GTK ] ;
+    if $(GTK.MESSAGE_HAS_SECONDARY) = "yes"
+    {
+      CFlags xwin : [ FDefines GTK_MESSAGE_HAS_SECONDARY ] ;
+    }
   }
 }

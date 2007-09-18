@@ -1573,6 +1573,28 @@ AS_IF([test $cs_cv_libCEGUI = yes],
 
 
 
+#----------------------------------------------------------------------------
+# Check for GTK.
+#----------------------------------------------------------------------------
+CS_CHECK_LIB_WITH([GTK],
+    [AC_LANG_PROGRAM([[#include <gtk/gtk.h>]],
+    [gtk_message_dialog_new (0, 0, 0, 0, 0);])], [], [],
+    [CS_EMIT_BUILD_RESULT([cs_cv_libGTK], [GTK])], [], [], [], [], [gtk+-2.0])
+
+AS_IF([test $cs_cv_libGTK = yes],
+    [CS_CHECK_BUILD([if gtk_message_dialog_format_secondary_text is available], 
+        [cs_cv_GTK_gtk_message_dialog_format_secondary_text],
+	[AC_LANG_PROGRAM(
+	    [[#include <gtk/gtk.h>]],
+	    [gtk_message_dialog_format_secondary_text (0, 0);])],
+	[], [],
+	[CS_EMIT_BUILD_PROPERTY([GTK.MESSAGE_HAS_SECONDARY], [yes])], [], [],
+	[$cs_cv_libGTK_cflags],
+	[$cs_cv_libGTK_lflags],
+	[$cs_cv_libGTK_libs])])
+
+
+
 #------------------------------------------------------------------------------
 # Check if GNU/Linux joystick API is present.
 #------------------------------------------------------------------------------

@@ -152,6 +152,10 @@ public:
   bool AlertV_Xaw (int type, const char* title, const char* okMsg,
   	const char* msg, va_list arg) CS_GNUC_PRINTF (5, 0);
 #endif
+#ifdef HAVE_GTK
+  bool AlertV_GTK (int type, const char* title, const char* okMsg,
+  	const char* msg, va_list arg) CS_GNUC_PRINTF (5, 0);
+#endif
 
   struct EventHandler : 
     public scfImplementation1<EventHandler, 

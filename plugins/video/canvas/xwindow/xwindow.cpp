@@ -875,6 +875,9 @@ bool csXWindow::SetMouseCursor (iImage *image, const csRGBcolor* keycolor,
 bool csXWindow::AlertV (int type, const char* title, const char* okMsg,
 			const char* msg, va_list arg)
 {
+#ifdef HAVE_GTK
+  if (AlertV_GTK (type, title, okMsg, msg, arg)) return true;
+#endif
 #ifdef HAVE_XAW
   if (AlertV_Xaw (type, title, okMsg, msg, arg)) return true;
 #endif
