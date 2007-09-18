@@ -1252,15 +1252,30 @@ namespace lighter
     csRef<Object> radObj = sect->allObjects.Get (name, (Object*)0);
     if (radObj)
     {
+      csRef<iMeshWrapper> meshwrap = radObj->GetMeshWrapper();
       // We do have one
       radObj->SaveMesh (sect, objNode);
       radObj->FreeNotNeededForLighting ();
       savedObjects.AddNoTest (name);
 
-      // Remove any old lightmap svs
+      // Remove any old svs...
       objNode->RemoveNodes (DocSystem::FilterDocumentNodeIterator (
         objNode->GetNodes ("shadervar"),
         DocSystem::NodeAttributeRegexpTest ("name", "tex lightmap.*")));
+        
+      // ...and add current one
+      iShaderVariableContext* meshSVs = meshwrap->GetSVContext ();
+      CS::ShaderVarName lightmapName (globalLighter->strings, "tex lightmap");
+      csRef<csShaderVariable> lightmapSV = meshSVs->GetVariable (lightmapName);
+      if (lightmapSV.IsValid())
+      {
+        csRef<iDocumentNode> shadervarNode = objNode->CreateNodeBefore (
+          CS_NODE_ELEMENT, 0);
+	shadervarNode->SetValue ("shadervar");
+	csRef<iSyntaxService> synsrv = 
+	  csQueryRegistry<iSyntaxService> (globalLighter->objectRegistry);
+	synsrv->WriteShaderVar (shadervarNode, *lightmapSV);
+      }
     }
 
     // Check if we have any child factories
@@ -1550,10 +1565,10 @@ namespace lighter
   bool Scene::IsObjectFromBaseDir (iObject* obj, const char* baseDir)
   {
     iRegion* reg = GetRegion (obj);
-    if (reg == 0) return false;
+    if (reg == 0) return true;
     
     csRef<iSaverFile> saverFile (CS::GetChildObject<iSaverFile> (reg->QueryObject()));
-    if (saverFile.IsValid()) return false;
+    if (saverFile.IsValid()) return true;
     
     return strncmp (saverFile->GetFile(), baseDir, strlen (baseDir)) == 0;
   }

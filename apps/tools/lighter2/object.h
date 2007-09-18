@@ -173,6 +173,8 @@ namespace lighter
 
     inline ObjectVertexData& GetVertexData ()
     { return vertexData; }
+    
+    inline iMeshWrapper* GetMeshWrapper () { return meshWrapper; }
 
     inline const csSphere& GetBoundingSphere () const
     { return bsphere; }
