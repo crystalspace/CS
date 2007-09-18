@@ -24,41 +24,12 @@
  */
 /**\addtogroup util
  * @{ */
+#include "csutil/scf.h"
 #include "csutil/scf_interface.h"
 #include "csutil/ref.h"
 
 struct iObjectIterator;
 struct iObject;
-
-/**
- * You can use this macro to get a child object from a csObject. The returned
- * object will be IncRef'ed. This version requires a correctly set-up interface
- * ID variable.
- */
-#define CS_GET_CHILD_OBJECT(object,Interface)                        \
-  scfQueryInterfaceSafe<Interface>((object)->GetChild(               \
-    scfInterfaceTraits<Interface>::GetID(),                          \
-    scfInterfaceTraits<Interface>::GetVersion()))
-
-/**
- * You can use this macro to get a child object with the given name and
- * interface from a csObject. The returned object will be IncRef'ed.
- */
-#define CS_GET_NAMED_CHILD_OBJECT(object,Interface,name)             \
-  scfQueryInterfaceSafe<Interface>((object)->GetChild(               \
-    scfInterfaceTraits<Interface>::GetID(),                          \
-    scfInterfaceTraits<Interface>::GetVersion(),                     \
-    name))
-
-/**
- * This is the same as CS_GET_CHILD_OBJECT, but stops at the first object
- * with the given name, even if it does not implement the requested interface.
- */
-#define CS_GET_FIRST_NAMED_CHILD_OBJECT(object,Interface,name)       \
-  scfQueryInterfaceSafe<Interface>((object)->GetChild(               \
-    scfInterfaceTraits<Interface>::GetID(),                          \
-    scfInterfaceTraits<Interface>::GetVersion(),                     \
-    name, true))
 
 /**
  * A callback that you can implement to get notified of name changes
@@ -91,7 +62,7 @@ struct iObjectNameChangeListener : public virtual iBase
  */
 struct iObject : public virtual iBase
 {
-  SCF_INTERFACE(iObject,2,0,1);
+  SCF_INTERFACE(iObject,2,0,2);
 
   /// Set object name
   virtual void SetName (const char *iName) = 0;
@@ -130,10 +101,13 @@ struct iObject : public virtual iBase
    * if it did not implement the requested type. Note that the returned
    * object must still be queried for the requested type. <p>
    *
-   * Note that the returned object will be IncRef'ed.
+   * \deprecated Deprecated in 1.3. Use GetChild(const char*) if you need
+   *   "first" functionality, GetChild(int, int, const char*) otherwise.
    */
+  CS_DEPRECATED_METHOD_MSG("Use GetChild(const char*) if you need \"first\" "
+    "functionality, GetChild(int, int, const char*) otherwise.")
   virtual iObject* GetChild (int iInterfaceID, int iVersion,
-    const char *Name = 0, bool FirstName = false) const = 0;
+    const char *Name, bool FirstName) const = 0;
 
   /// Return the first child object with the given name
   virtual iObject* GetChild (const char *Name) const = 0;
@@ -158,6 +132,14 @@ struct iObject : public virtual iBase
    */
   virtual void RemoveNameChangeListener (
   	iObjectNameChangeListener* listener) = 0;
+  
+  /**
+   * Look for a child object that implements the given interface. You can
+   * optionally pass a name to look for.
+   */
+  virtual iObject* GetChild (int iInterfaceID, int iVersion,
+    const char *Name = 0) const = 0;
+
 };
 
 
@@ -194,6 +176,72 @@ struct iObjectIterator : public virtual iBase
    */
   virtual iObject* FindName (const char* name) = 0;
 };
+
+namespace CS
+{
+  /**
+   * Get a child from an object that implements a specific interface.
+   */
+  template<typename Interface>
+  static inline csPtr<Interface> GetChildObject (iObject* object)
+  {
+    return scfQueryInterfaceSafe<Interface> (object->GetChild (
+      scfInterfaceTraits<Interface>::GetID(),
+      scfInterfaceTraits<Interface>::GetVersion()));
+  }
+
+  /**
+   * Get a child from an object that has the given name and implements a 
+   * specific interface.
+   */
+  template<typename Interface>
+  static inline csPtr<Interface> GetNamedChildObject (iObject* object,
+                                                      const char* name)
+  {
+    return scfQueryInterfaceSafe<Interface> (object->GetChild (name));
+  }
+}
+
+template<typename Interface>
+inline CS_DEPRECATED_METHOD_MSG ("CS_GET_CHILD_OBJECT macro is deprecated")
+csPtr<Interface> CS_GET_CHILD_OBJECT_is_deprecated (iObject* Object)
+{
+  return CS::GetChildObject<Interface> (Object);
+}
+/**
+ * \deprecated Compatibility macro
+ * \sa CS::GetChildObject
+ */
+#define CS_GET_CHILD_OBJECT(Object, Interface) \
+  (CS_GET_CHILD_OBJECT_is_deprecated<Interface> (Object))
+
+template<typename Interface>
+inline CS_DEPRECATED_METHOD_MSG ("CS_GET_NAMED_CHILD_OBJECT macro is deprecated")
+csPtr<Interface> CS_GET_NAMED_CHILD_OBJECT_is_deprecated (iObject* Object,
+  const char* Name)
+{
+  return CS::GetNamedChildObject<Interface> (Object, Name);
+}
+/**
+ * \deprecated Compatibility macro
+ * \sa iObject::GetChild
+ */
+#define CS_GET_NAMED_CHILD_OBJECT(Object, Interface, Name) \
+  (CS_GET_NAMED_CHILD_OBJECT_is_deprecated<Interface> (Object, Name))
+
+template<typename Interface>
+inline CS_DEPRECATED_METHOD_MSG ("CS_GET_FIRST_NAMED_CHILD_OBJECT macro is deprecated")
+csPtr<Interface> CS_GET_FIRST_NAMED_CHILD_OBJECT_is_deprecated (iObject* Object,
+  const char* Name)
+{
+  return scfQueryInterfaceSafe<Interface> (Object->GetChild (Name));
+}
+/**
+ * \deprecated Compatibility macro
+ * \sa CS::GetNamedChildObject
+ */
+#define CS_GET_FIRST_NAMED_CHILD_OBJECT(Object, Interface, Name) \
+  (CS_GET_FIRST_NAMED_CHILD_OBJECT_is_deprecated<Interface> (Object, Name))
 
 /** @} */
 
