@@ -11256,11 +11256,11 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *ObjRemove = *cspacec::iObject_ObjRemove;
 *ObjRemoveAll = *cspacec::iObject_ObjRemoveAll;
 *ObjAddChildren = *cspacec::iObject_ObjAddChildren;
-*GetChild = *cspacec::iObject_GetChild;
 *GetIterator = *cspacec::iObject_GetIterator;
 *ObjReleaseOld = *cspacec::iObject_ObjReleaseOld;
 *AddNameChangeListener = *cspacec::iObject_AddNameChangeListener;
 *RemoveNameChangeListener = *cspacec::iObject_RemoveNameChangeListener;
+*GetChild = *cspacec::iObject_GetChild;
 *scfGetVersion = *cspacec::iObject_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
@@ -16936,11 +16936,11 @@ sub DESTROY {
 *ObjRemove = *cspacec::csObject_ObjRemove;
 *ObjRemoveAll = *cspacec::csObject_ObjRemoveAll;
 *ObjAddChildren = *cspacec::csObject_ObjAddChildren;
-*GetChild = *cspacec::csObject_GetChild;
 *GetIterator = *cspacec::csObject_GetIterator;
 *AddNameChangeListener = *cspacec::csObject_AddNameChangeListener;
 *RemoveNameChangeListener = *cspacec::csObject_RemoveNameChangeListener;
 *ObjReleaseOld = *cspacec::csObject_ObjReleaseOld;
+*GetChild = *cspacec::csObject_GetChild;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);

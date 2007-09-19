@@ -7396,11 +7396,11 @@ class iObject(iBase):
     def ObjRemove(*args): return _cspace.iObject_ObjRemove(*args)
     def ObjRemoveAll(*args): return _cspace.iObject_ObjRemoveAll(*args)
     def ObjAddChildren(*args): return _cspace.iObject_ObjAddChildren(*args)
-    def GetChild(*args): return _cspace.iObject_GetChild(*args)
     def GetIterator(*args): return _cspace.iObject_GetIterator(*args)
     def ObjReleaseOld(*args): return _cspace.iObject_ObjReleaseOld(*args)
     def AddNameChangeListener(*args): return _cspace.iObject_AddNameChangeListener(*args)
     def RemoveNameChangeListener(*args): return _cspace.iObject_RemoveNameChangeListener(*args)
+    def GetChild(*args): return _cspace.iObject_GetChild(*args)
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iObject_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iObject_scfGetVersion)
     __swig_destroy__ = _cspace.delete_iObject
@@ -11368,11 +11368,11 @@ class csObject(pycsObject):
     def ObjRemove(*args): return _cspace.csObject_ObjRemove(*args)
     def ObjRemoveAll(*args): return _cspace.csObject_ObjRemoveAll(*args)
     def ObjAddChildren(*args): return _cspace.csObject_ObjAddChildren(*args)
-    def GetChild(*args): return _cspace.csObject_GetChild(*args)
     def GetIterator(*args): return _cspace.csObject_GetIterator(*args)
     def AddNameChangeListener(*args): return _cspace.csObject_AddNameChangeListener(*args)
     def RemoveNameChangeListener(*args): return _cspace.csObject_RemoveNameChangeListener(*args)
     def ObjReleaseOld(*args): return _cspace.csObject_ObjReleaseOld(*args)
+    def GetChild(*args): return _cspace.csObject_GetChild(*args)
 csObject_swigregister = _cspace.csObject_swigregister
 csObject_swigregister(csObject)
 
