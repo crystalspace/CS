@@ -1339,6 +1339,11 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   //thread2->Start ();
 }
 #endif
+
+  // Lastly set the camera to the collider so its transform is
+  // updated to the camera's one.
+  collider_actor.SetCamera (view->GetCamera (), true);
+
   return true;
 }
 
