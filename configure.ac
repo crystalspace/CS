@@ -1304,7 +1304,7 @@ AS_IF([test $cs_cv_lib3ds = yes],
 	    [AC_LANG_PROGRAM([[#include <lib3ds/io.h>
 	        size_t DataReadFunc (void *self, void *buffer, size_t size) {}]],
 	        [lib3ds_io_new (0, 0, 0, 0, DataReadFunc, 0)])],
-	    [], [], [CS_EMIT_BUILD_PROPERTY([LIB3DS.ONE_THREE_OH], [yes])], [], [],
+	    [], [C++], [CS_EMIT_BUILD_PROPERTY([LIB3DS.ONE_THREE_OH], [yes])], [], [],
 	    [$cs_cv_lib3ds_cflags], [$cs_cv_lib3ds_lflags], [$cs_cv_lib3ds_libs])])])
 
 

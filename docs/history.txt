@@ -8,11 +8,13 @@ chronological order.
 
 20-Sep-2007
 	- caedes, Genjix and iceeey removed some stupid code :D
-	      csQuaternion quat;
-          if (quat.v.x != 0 || quat.v.y != 0 || quat.v.z != 0 || quat.w != 0)
-            // ...
+	  csQuaternion quat;
+	  if (quat.v.x != 0 || quat.v.y != 0 || quat.v.z != 0 || quat.w != 0)
+	    // ...
 	- Genjix fixed bug in walktest where it doesn't look where the camera is
 	  when you move left and right at start!
+	- Vincent applied res' fix for configure which detected lib3ds-1.3.0
+	  when lib3ds-1.2.0 was installed.
 18-Sep-2007
 	- res added support for the --gc-sections linker flag and made targets
 	  on unix use it.
