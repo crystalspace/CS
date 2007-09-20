@@ -7,6 +7,10 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 20-Sep-2007
+	- caedes, Genjix and iceeey removed some stupid code :D
+	      csQuaternion quat;
+          if (quat.v.x != 0 || quat.v.y != 0 || quat.v.z != 0 || quat.w != 0)
+            // ...
 	- Genjix fixed bug in walktest where it doesn't look where the camera is
 	  when you move left and right at start!
 18-Sep-2007
