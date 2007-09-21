@@ -22,6 +22,9 @@ chronological order.
 	- res added "partial" shadow support to lighter2: the alpha channel of
 	  a surface's texture is taken into consideration when casting the
 	  shadow.
+	- res added the possibility to instruct the engine to "keep images" on
+	  texture wrappers by default. Useful for apps that need the actual
+	  image data.
 20-Sep-2007
 	- caedes, Genjix and iceeey removed some stupid code :D
 	  csQuaternion quat;

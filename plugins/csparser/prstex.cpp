@@ -462,7 +462,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     CS_ASSERT_MSG("Texture loader did not register texture", 
       tex->GetTextureHandle());
     tex->QueryObject ()->SetName (txtname);
-    tex->SetKeepImage (keep_image);
+    if (keep_image) tex->SetKeepImage (true);
     if (do_transp)
       tex->SetKeyColor (csQint (transp.red * 255.99),
         csQint (transp.green * 255.99), csQint (transp.blue * 255.99));
@@ -486,8 +486,6 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
   if (tm)
   {
     if (!tex->GetTextureHandle ()) tex->Register (tm);
-    if (!tex->KeepImage ())
-      tex->SetImageFile (0);
   }
   return tex;
 }
