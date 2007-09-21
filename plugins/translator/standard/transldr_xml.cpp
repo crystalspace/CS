@@ -82,13 +82,18 @@ csPtr<iBase> csTranslatorLoaderXml::Parse (iDocumentNode* node,
     Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't load iConfigManager!");
     return 0;
   }
-  const char* cfglang = 0;
-  cfglang = cfg->GetStr ("Translator.Language", 0);
-  if (!cfglang)
+  csString syslang = getenv ("LANG");  // linux only
+  syslang.Truncate (2);
+  if (!syslang)
   {
-    Report (CS_REPORTER_SEVERITY_ERROR,
-    	"Couldn't found 'Translator.Language' in the cfg!");
-    return 0;
+    // if we didn't find the system language then try to load
+    // it from the configuration.
+    syslang = cfg->GetStr ("Translator.Language", 0);
+    if (!syslang)
+    {
+      // still not found a language? use english then [not esperanto :( ]
+      syslang = "en";
+    }
   }
   csRef<iDocumentNodeIterator> it1 = node->GetNodes ();
   while (it1->HasNext ())
@@ -108,7 +113,7 @@ csPtr<iBase> csTranslatorLoaderXml::Parse (iDocumentNode* node,
           	node, "Missing 'name' attribute!");
           return 0;
         }
-        if (!strcmp (cfglang, language))
+        if (!strcmp (syslang.GetData (), language))
         {
           found_language = true;
           csRef<iDocumentNodeIterator> it2 = ch1->GetNodes ();
@@ -161,8 +166,7 @@ csPtr<iBase> csTranslatorLoaderXml::Parse (iDocumentNode* node,
   if (!found_language)
   {
     Report (CS_REPORTER_SEVERITY_ERROR,
-    	"Couldn't found '%s' language!", cfglang);
-    return 0;
+      "Couldn't found '%s' language!", syslang.GetData ());
   }
   csRef<iTranslator> old = csQueryRegistry<iTranslator> (object_reg);
   object_reg->Unregister (old, "iTranslator");
