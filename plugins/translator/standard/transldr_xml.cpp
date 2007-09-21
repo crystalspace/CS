@@ -82,21 +82,17 @@ csPtr<iBase> csTranslatorLoaderXml::Parse (iDocumentNode* node,
     Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't load iConfigManager!");
     return 0;
   }
-  csString syslang = getenv ("LANG");  // linux only
-  syslang.Truncate (2);
+  // try to load the system language from the configuration.
+  csString syslang = cfg->GetStr ("Translator.Language", 0);
   if (!syslang)
   {
-    // if we didn't find the system language then try to load
-    // it from the configuration.
-    syslang = cfg->GetStr ("Translator.Language", 0);
-    if (!syslang)
-    {
-      // still not found a language? use english then [not esperanto :( ]
-      syslang = "en";
-    }
+    // finally try to find the systems language to use
+    syslang = getenv ("LANG");  // linux only
+    syslang.Truncate (2);
+    syslang.ShrinkBestFit ();
   }
   csRef<iDocumentNodeIterator> it1 = node->GetNodes ();
-  while (it1->HasNext ())
+  while (syslang && it1->HasNext ())
   {
     csRef<iDocumentNode> ch1 = it1->Next ();
     if (ch1->GetType () != CS_NODE_ELEMENT) continue;
@@ -147,7 +143,7 @@ csPtr<iBase> csTranslatorLoaderXml::Parse (iDocumentNode* node,
                       return 0;
                   }
                 }
-                if (src && dst) trans->SetMsg (src, dst);
+                if (src && dst && src != dst) trans->SetMsg (src, dst);
               }
               break;
               default:
