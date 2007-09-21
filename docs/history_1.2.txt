@@ -1,5 +1,7 @@
 1.2 branch log.
 
+21-Sep-2007
+        - Mike Gist merged r27696 into 1.2 (GL driver DB fix).
 18-Sep-2007
         - Mike Gist merged r27669 and r27670 into 1.2 (ATI gldriver tweaks).
 15-Sep-2007
