@@ -88,7 +88,7 @@ csPtr<iBase> csTranslatorLoaderXml::Parse (iDocumentNode* node,
   {
     // finally try to find the systems language to use
     syslang = getenv ("LANG");  // linux only
-    syslang.Truncate (2);
+    syslang.Truncate (syslang.FindFirst ('_'));
     syslang.ShrinkBestFit ();
   }
   csRef<iDocumentNodeIterator> it1 = node->GetNodes ();

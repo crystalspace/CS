@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 21-Sep-2007
+	- Genjix added support for 3 character long locale codes at the behest
+	  or res2k (thanks!).
 	- Genjix swapped the precedence of checking system language and using
 	  config lanuage, and made a small optimisation in storage.
 	- Genjix slightly modified the behaviour of translator, namely adding
