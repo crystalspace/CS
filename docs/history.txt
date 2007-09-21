@@ -25,6 +25,7 @@ chronological order.
 	- res added the possibility to instruct the engine to "keep images" on
 	  texture wrappers by default. Useful for apps that need the actual
 	  image data.
+	- res made the GTK alert code also compile on GTK version 2.4.
 20-Sep-2007
 	- caedes, Genjix and iceeey removed some stupid code :D
 	  csQuaternion quat;
