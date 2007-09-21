@@ -761,7 +761,8 @@ namespace lighter
     srcSect->GetMeshes()->RemoveAll();
   }
 
-  void Scene::PropagateLight (Light* light, const csFrustum& lightFrustum)
+  void Scene::PropagateLight (Light* light, const csFrustum& lightFrustum, 
+                              PropageState& state)
   {
     //Propagate light through all portals in its current sector, setup proxy-lights in targets
     Sector* sourceSector = light->GetSector ();
@@ -771,6 +772,8 @@ namespace lighter
     while (it.HasNext ())
     {
       Portal* portal = it.Next ();
+      if (state.seenPortals.Contains (portal)) continue;
+      state.seenPortals.AddNoTest (portal);
       
       if (portal->portalPlane.Classify (lightCenter) < -0.01f && //light in front of portal
         true) //csIntersect3::BoxPlane (lightBB, portal->portalPlane)) //light at least cuts portal plane
@@ -801,7 +804,7 @@ namespace lighter
           else
             portal->destSector->allNonPDLights.Push (proxyLight);
 
-          PropagateLight (proxyLight, proxyLight->GetFrustum ());
+          PropagateLight (proxyLight, proxyLight->GetFrustum (), state);
         }
       }
     }

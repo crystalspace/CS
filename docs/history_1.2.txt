@@ -5,6 +5,8 @@
 	- res merged r27676 and r27694 into 1.2 (lib3ds 1.3.0 support).
 	- res merged r27683 into 1.2 (more graceful handling of default texture
 	  loading errors).
+	- res merged r27684 into 1.2 (fix infinite portal recursion in
+	  lighter2).
 18-Sep-2007
         - Mike Gist merged r27669 and r27670 into 1.2 (ATI gldriver tweaks).
 15-Sep-2007

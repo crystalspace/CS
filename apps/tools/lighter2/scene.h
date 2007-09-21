@@ -163,6 +163,13 @@ namespace lighter
       //@}
     };
     LightingPostProcessor lightmapPostProc;
+  
+    struct PropageState
+    {
+      csSet<csPtrKey<Portal> > seenPortals;
+    };
+    void PropagateLight (Light* light, const csFrustum& lightFrustum, 
+      PropageState& state);
   protected:
     
     //  factories
@@ -230,7 +237,11 @@ namespace lighter
       iMeshWrapper *mesh, csRef<Object>& obj);
     MeshParseResult ParseMeshFactory (iMeshFactoryWrapper *factory, 
       csRef<ObjectFactory>& radFact);
-    void PropagateLight (Light* light, const csFrustum& lightFrustum);
+    void PropagateLight (Light* light, const csFrustum& lightFrustum)
+    { 
+      PropageState state;
+      PropagateLight (light, lightFrustum, state);
+    }
 
   };
 }
