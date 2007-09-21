@@ -31,7 +31,7 @@
 /// This is a SCF-compatible interface for csString.
 struct iString : public virtual iBase
 {
-  SCF_INTERFACE(iString, 2,0,0);
+  SCF_INTERFACE(iString, 2,1,0);
   /**
    * Advise the string that it should allocate enough space to hold up to
    * NewSize characters.
@@ -86,32 +86,11 @@ struct iString : public virtual iBase
   virtual void ShrinkBestFit () = 0;
 
   /**
-   * Set string buffer capacity to hold exactly the current content.
-   * \remarks If the string length is greater than zero, then the buffer's
-   *   capacity will be adjusted to exactly that size.  If the string length is
-   *   zero, then the implementation may shrink the allocation so that it only
-   *   holds the implicit null terminator, or it may free the string's memory
-   *   completely.
-   * \deprecated Use ShrinkBestFit() instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use ShrinkBestFit() instead")
-  virtual void Reclaim () = 0;
-
-  /**
    * Clear the string (so that it contains only a null terminator).
    * \remarks This is typically shorthand for Truncate(0), but more idiomatic
    *   in terms of human language.
    */
   virtual void Empty () = 0;
-
-  /**
-   * Clear the string (so that it contains only a null terminator).
-   * \remarks This is typically shorthand for Truncate(0), but more idiomatic
-   *   in terms of human language.
-   * \deprecated Use Empty() instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use Empty() instead")
-  virtual void Clear () = 0;
 
   /// Get a copy of this string
   virtual csRef<iString> Clone () const = 0;
@@ -122,17 +101,6 @@ struct iString : public virtual iBase
    *   if the string represents a null-pointer.
    */
   virtual char const* GetData () const = 0;
-
-  /**
-   * Get a pointer to the null-terminated character array.
-   * \return A C-string pointer to the null-terminated character array; or zero
-   *   if the string represents a null-pointer.
-   * \warning This returns a non-const pointer, so use this function with care!
-   * \deprecated Use the 'const' version of GetData() instead.
-   */
-  /*CS_DEPRECATED_METHOD*/ 
-  // @@@ GCC and VC always seem to prefer this GetData() and barf "deprecated".
-  virtual char* GetData () = 0;
 
   /**
    * Query string length.
@@ -164,6 +132,13 @@ struct iString : public virtual iBase
 
   /// Get the n'th character.
   virtual char GetAt (size_t n) const = 0;
+
+  /**
+   * Delete a range of characters from the string.
+   * \param Pos Beginning of range to be deleted (zero-based).
+   * \param Count Number of characters to delete.
+   */
+  virtual void DeleteAt (size_t Pos, size_t Count = 1) = 0;
 
   /**
    * Insert another string into this one.
@@ -296,6 +271,22 @@ struct iString : public virtual iBase
    * \remarks The comparison is case-insensitive.
    */
   virtual bool CompareNoCase (const iString* Str) const = 0;
+
+  /**
+   * Check if this string starts with another one.
+   * \param Str Other string.
+   * \param ignore_case Causes the comparison to be case insensitive if true.
+   * \return True if they are equal up to the length of Str; false if not.
+   */
+  virtual bool StartsWith (const iString* Str, bool ignore_case = false) const = 0;
+
+  /**
+   * Check if this string starts with another null-terminated C-string.
+   * \param Str Other string.
+   * \param ignore_case Causes the comparison to be case insensitive if true.
+   * \return True if they are equal up to the length of Str; false if not.
+   */
+  virtual bool StartsWith (const char* Str, bool ignore_case = false) const = 0;
 
   /// Append another string to this one.
   virtual void operator += (const iString& iStr) = 0;

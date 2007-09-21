@@ -76,6 +76,8 @@ private:
   csFlags factory_flags;
 };
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * Nullmesh version of mesh object.
  */
@@ -91,7 +93,6 @@ public:
   /// Destructor.
   virtual ~csNullmeshMeshObject ();
 
-  void GetObjectBoundingBox (csBox3& bbox);
   const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent);
@@ -113,8 +114,6 @@ public:
   virtual csPtr<iMeshObject> Clone () { return 0; }
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
-    if (cb) cb->IncRef ();
-    if (vis_cb) vis_cb->DecRef ();
     vis_cb = cb;
   }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const
@@ -133,7 +132,7 @@ public:
   virtual void SetMeshWrapper (iMeshWrapper* lp) { logparent = lp; }
   virtual iMeshWrapper* GetMeshWrapper () const { return logparent; }
 
-  virtual csRenderMesh **GetRenderMeshes (int &num, iRenderView*, 
+  virtual CS::Graphics::RenderMesh **GetRenderMeshes (int &num, iRenderView*, 
     iMovable*, uint32)
   {
     num = 0;
@@ -152,18 +151,23 @@ public:
   * does nothing.
   */
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
+  virtual void BuildDecal(const csVector3* pos, float decalRadius,
+          iDecalBuilder* decalBuilder)
+  {
+  }
 
 
 private:
   iMeshObjectFactory* factory;
   iMeshObjectType* nullmesh_type;
   iMeshWrapper* logparent;
-  iMeshObjectDrawCallback* vis_cb;
+  csRef<iMeshObjectDrawCallback> vis_cb;
   float radius;
   csBox3 box;
   csFlags object_flags;
 };
 
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * Genmesh type. This is the plugin you have to use to create instances

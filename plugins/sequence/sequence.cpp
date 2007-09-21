@@ -188,7 +188,7 @@ csSequenceManager::~csSequenceManager ()
 {
   if (object_reg)
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
     if (q != 0)
       CS::RemoveWeakListener (q, weakEventHandler);
   }
@@ -199,9 +199,9 @@ csSequenceManager::~csSequenceManager ()
 bool csSequenceManager::Initialize (iObjectRegistry *r)
 {
   object_reg = r;
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
   CS_INITIALIZE_EVENT_SHORTCUTS (object_reg);
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (q != 0)
     CS::RegisterWeakListener (q, this, FinalProcess, weakEventHandler);
   return true;
@@ -244,7 +244,7 @@ void csSequenceManager::Clear ()
   main_time = 0;
   previous_time_valid = false;
   size_t i;
-  for (i = 0 ; i < sequences.Length () ; i++)
+  for (i = 0 ; i < sequences.GetSize () ; i++)
   {
     csWeakRef<csSequence>* seq = sequences[i];
     if (seq->IsValid())
@@ -312,11 +312,11 @@ csPtr<iSequence> csSequenceManager::NewSequence ()
   if (cnt >= 100)
   {
     cnt = 0;
-    if (sequences.Length () > 100)
+    if (sequences.GetSize () > 100)
     {
       size_t i;
       csArray<csWeakRef<csSequence>* > copy;
-      for (i = 0 ; i < sequences.Length () ; i++)
+      for (i = 0 ; i < sequences.GetSize () ; i++)
       {
         csWeakRef<csSequence>* seq = sequences[i];
 	if ((*seq) != 0) copy.Push (seq);

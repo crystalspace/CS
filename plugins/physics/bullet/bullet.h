@@ -26,7 +26,10 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/scf_implementation.h"
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
+#include "csutil/weakrefarr.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(Bullet)
+{
 
 /**
 * This is the implementation for the actual plugin.
@@ -38,6 +41,7 @@ private:
 
   iObjectRegistry* object_reg;
   csRefArrayObject<iDynamicSystem> systems;
+  csWeakRefArray<iDynamicsStepCallback> step_callbacks;
 
 public:
 
@@ -53,6 +57,12 @@ public:
   iDynamicSystem* FindSystem (const char *name);
 
   void Step (float stepsize);
+
+  void AddStepCallback (iDynamicsStepCallback *callback)
+  {step_callbacks.Push (callback);}
+
+  void RemoveStepCallback (iDynamicsStepCallback *callback)
+  {step_callbacks.Delete (callback);}
 
   // -- iComponent
   virtual bool Initialize (iObjectRegistry* object_reg);
@@ -317,7 +327,7 @@ public:
   bool CreatePlaneGeometry (const csPlane3& plane);
   bool CreateMeshGeometry (iMeshWrapper *mesh);
   bool CreateBoxGeometry (const csVector3& box_size);
-  bool CreateCCylinderGeometry (float length, float radius);
+  bool CreateCapsuleGeometry (float length, float radius);
 
   void SetCollisionCallback (
     iDynamicsColliderCollisionCallback* cb);
@@ -348,5 +358,8 @@ public:
 protected:
     void ResetShape ();
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(Bullet)
 
 #endif //__CS_BULLET_DYNAMICS_H__

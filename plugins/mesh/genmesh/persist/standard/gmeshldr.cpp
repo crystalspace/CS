@@ -74,8 +74,9 @@ csGeneralFactoryLoader::~csGeneralFactoryLoader ()
 bool csGeneralFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csGeneralFactoryLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
+  engine = csQueryRegistry<iEngine> (object_reg);
 
   InitTokenTable (xmltokens);
   return true;
@@ -88,10 +89,12 @@ bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
   if(!node) return false;
 
   csRef<iMaterialWrapper> material;
-  bool do_mixmode = false;
-  uint mixmode = CS_FX_COPY;
+  uint mixmode = (uint)~0;
+  csZBufMode zmode = (csZBufMode)~0;
+  CS::Graphics::RenderPriority renderPrio = -1;
   csRef<iRenderBuffer> indexbuffer;
   csRefArray<csShaderVariable> shadervars;
+  bool b2f = false;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -105,7 +108,6 @@ bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
     case XMLTOKEN_MIXMODE:
       if (!synldr->ParseMixmode (child, mixmode))
         return 0;
-      do_mixmode = true;
       break;
     case XMLTOKEN_MATERIAL:
       {
@@ -137,25 +139,28 @@ bool csGeneralFactoryLoader::ParseSubMesh(iDocumentNode *node,
       {
         csRef<csShaderVariable> sv;
         sv.AttachNew (new csShaderVariable);
-        if (!synldr->ParseShaderVar (child, *sv)) return false;
+        if (!synldr->ParseShaderVar (ldr_context, child, *sv)) return false;
         shadervars.Push (sv);
         break;
       }
+    case XMLTOKEN_PRIORITY:
+      renderPrio = engine->GetRenderPriority (child->GetContentsValue ());
+      break;
+    case XMLTOKEN_BACK2FRONT:
+      if (!synldr->ParseBool (child, b2f, true))
+	return 0;
+      break;
     default:
+      if (synldr->ParseZMode (child, zmode)) break;
       synldr->ReportBadToken (child);
     }
   }
 
-  if (!material.IsValid ())
-  {
-    synldr->ReportError (
-      "crystalspace.genmeshloader.parse.unknownmaterial",
-      node, "No material specified in genmesh submesh!");
-    return false;
-  }
-
   iGeneralMeshSubMesh* submesh = factstate->AddSubMesh (indexbuffer, material, 
-    node->GetAttributeValue ("name"), do_mixmode ? mixmode : (uint)~0);
+    node->GetAttributeValue ("name"), mixmode);
+  submesh->SetZMode (zmode);
+  submesh->SetRenderPriority (renderPrio);
+  submesh->SetBack2Front (b2f);
   csRef<iShaderVariableContext> svc = 
     scfQueryInterface<iShaderVariableContext> (submesh);
   for (size_t i = 0; i < shadervars.GetSize(); i++)
@@ -295,7 +300,7 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
   csRef<iGeneralFactoryState> state;
 
   fact = type->NewFactory ();
-  state = SCF_QUERY_INTERFACE (fact, iGeneralFactoryState);
+  state = scfQueryInterface<iGeneralFactoryState> (fact);
 
   bool num_tri_given = false;
   bool num_vt_given = false;
@@ -779,25 +784,29 @@ csGeneralFactorySaver::~csGeneralFactorySaver ()
 bool csGeneralFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csGeneralFactorySaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
+  engine = csQueryRegistry<iEngine> (object_reg);
   return true;
 }
 
-static void WriteSubMesh (iSyntaxService* synldr, iGeneralMeshSubMesh* submesh, 
-                          iDocumentNode* submeshNode)
+void csGeneralFactorySaver::WriteSubMesh (iGeneralMeshSubMesh* submesh, 
+                                          iDocumentNode* submeshNode)
 {
   const char* submeshName = submesh->GetName ();
   if (submeshName != 0)
     submeshNode->SetAttribute ("name", submeshName);
 
-  csRef<iDocumentNode> materialNode = 
-    submeshNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-  materialNode->SetValue("material");
-  csRef<iDocumentNode> materialNameNode = 
-    materialNode->CreateNodeBefore(CS_NODE_TEXT, 0);
-  materialNameNode->SetValue (
-    submesh->GetMaterial()->QueryObject()->GetName());
+  iMaterialWrapper* material = submesh->GetMaterial();
+  if (material != 0)
+  {
+    csRef<iDocumentNode> materialNode = 
+      submeshNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    materialNode->SetValue("material");
+    csRef<iDocumentNode> materialNameNode = 
+      materialNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+    materialNameNode->SetValue (material->QueryObject()->GetName());
+  }
 
   uint mixmode = submesh->GetMixmode ();
   if (mixmode != (uint)~0)
@@ -806,6 +815,30 @@ static void WriteSubMesh (iSyntaxService* synldr, iGeneralMeshSubMesh* submesh,
       submeshNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
     mixmodeNode->SetValue ("mixmode");
     synldr->WriteMixmode (mixmodeNode, mixmode, true);
+  }
+  
+  csZBufMode zmode = submesh->GetZMode ();
+  if (zmode != (csZBufMode)~0)
+  {
+    synldr->WriteZMode (submeshNode, zmode, false);
+  }
+  
+  int renderPrio = submesh->GetRenderPriority ();
+  if (renderPrio >= 0)
+  {
+    csRef<iDocumentNode> prioNode = 
+      submeshNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+    prioNode->SetValue ("priority");
+    csRef<iDocumentNode> prioContents =
+      prioNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+    prioContents->SetValue (engine->GetRenderPriorityName (renderPrio));
+  }
+  
+  bool b2f = submesh->GetBack2Front ();
+  if (b2f)
+  {
+    submeshNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)
+      ->SetValue("back2front");
   }
 
   csRef<iDocumentNode> indexBufferNode = 
@@ -838,9 +871,9 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
   if (obj)
   {
     csRef<iGeneralFactoryState> gfact = 
-      SCF_QUERY_INTERFACE (obj, iGeneralFactoryState);
+      scfQueryInterface<iGeneralFactoryState> (obj);
     csRef<iMeshObjectFactory> meshfact = 
-      SCF_QUERY_INTERFACE (obj, iMeshObjectFactory);
+      scfQueryInterface<iMeshObjectFactory> (obj);
     if (!gfact) return false;
     if (!meshfact) return false;
 
@@ -852,11 +885,15 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
       ->SetValueAsInt(gfact->GetVertexCount());
 
     //Write NumTri Tag
-    csRef<iDocumentNode> numtriNode = 
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    numtriNode->SetValue("numtri");
-    numtriNode->CreateNodeBefore(CS_NODE_TEXT, 0)
-      ->SetValueAsInt(gfact->GetTriangleCount());
+    bool writeTriangles = gfact->GetSubMeshCount() == 0;
+    if (writeTriangles)
+    {
+      csRef<iDocumentNode> numtriNode = 
+        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      numtriNode->SetValue("numtri");
+      numtriNode->CreateNodeBefore(CS_NODE_TEXT, 0)
+        ->SetValueAsInt(gfact->GetTriangleCount());
+    }
 
     int i;
     //Write Vertex Tags
@@ -886,15 +923,18 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
     }
 
     //Write Triangle Tags
-    for (i=0; i<gfact->GetTriangleCount(); i++)
+    if (writeTriangles)
     {
-      csRef<iDocumentNode> triaNode = 
-        paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      triaNode->SetValue("t");
-      csTriangle tria = gfact->GetTriangles()[i];
-      triaNode->SetAttributeAsInt("v1", tria.a);
-      triaNode->SetAttributeAsInt("v2", tria.b);
-      triaNode->SetAttributeAsInt("v3", tria.c);
+      for (i=0; i<gfact->GetTriangleCount(); i++)
+      {
+        csRef<iDocumentNode> triaNode = 
+          paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        triaNode->SetValue("t");
+        csTriangle tria = gfact->GetTriangles()[i];
+        triaNode->SetAttributeAsInt("v1", tria.a);
+        triaNode->SetAttributeAsInt("v2", tria.b);
+        triaNode->SetAttributeAsInt("v3", tria.c);
+      }
     }
 
     //Writedown DefaultColor tag
@@ -948,9 +988,7 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
         ->SetValue("localshadows");
 
     //Writedown ManualColor tag
-    if (gfact->IsManualColors())
-      paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0)
-        ->SetValue("manualcolors");
+    synldr->WriteBool(paramsNode, "manualcolors", gfact->IsManualColors(), false);
 
     //Writedown AnimationControl tag
     iGenMeshAnimationControlFactory* aniconfact = 
@@ -988,7 +1026,7 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
     //TBD: Writedown box tag
 
     // Write submeshes
-    if (gfact->GetSubMeshCount() > 0)
+    if (!writeTriangles)
     {
       size_t smc = gfact->GetSubMeshCount();
       for (size_t s = 0; s < smc; s++)
@@ -998,7 +1036,7 @@ bool csGeneralFactorySaver::WriteDown (iBase* obj, iDocumentNode* parent,
         submeshNode->SetValue("submesh");
 
         iGeneralMeshSubMesh* submesh = gfact->GetSubMesh (s);
-        WriteSubMesh (synldr, submesh, submeshNode);
+        WriteSubMesh (submesh, submeshNode);
       }
     }
 
@@ -1032,8 +1070,9 @@ csGeneralMeshLoader::~csGeneralMeshLoader ()
 bool csGeneralMeshLoader::Initialize (iObjectRegistry* object_reg)
 {
   csGeneralMeshLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
+  engine = csQueryRegistry<iEngine> (object_reg);
 
   InitTokenTable (xmltokens);
   return true;
@@ -1086,103 +1125,11 @@ bool csGeneralMeshLoader::ParseRenderBuffer(iDocumentNode *node,
   return true;
 }
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
-
-bool csGeneralMeshLoader::ParseLegacySubMesh(iDocumentNode *node,
-                                             iGeneralMeshState* state, 
-                                             iLoaderContext* ldr_context)
-{
-  if(!node) return false;
-  if (!state)
-  {
-    synldr->ReportError ("crystalspace.genmeshloader.parse",
-      node, "Submesh must be specified _after_ factory tag.");
-    return false;
-  }
-
-  csRef<iMeshObject> mo = scfQueryInterface<iMeshObject> (state);
-  csRef<iGeneralFactoryState> factstate =
-    scfQueryInterface<iGeneralFactoryState> (mo->GetFactory ());
-
-  csDirtyAccessArray<unsigned int> triangles;
-  csRef<iMaterialWrapper> material;
-  bool do_mixmode = false;
-  uint mixmode = CS_FX_COPY;
-
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  while (it->HasNext ())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-    case XMLTOKEN_T:
-      {
-        int tri = child->GetContentsValueAsInt ();
-        if (tri > factstate->GetTriangleCount ())
-        {
-          synldr->ReportError (
-            "crystalspace.genmeshloader.parse.invalidindex",
-            child, "Invalid triangle index in genmesh submesh!");
-          return false;
-        }
-        triangles.Push (tri);
-        break;
-      }
-    case XMLTOKEN_MIXMODE:
-      if (!synldr->ParseMixmode (child, mixmode))
-        return 0;
-      do_mixmode = true;
-      break;
-    case XMLTOKEN_MATERIAL:
-      {
-        const char* matname = child->GetContentsValue ();
-        material = ldr_context->FindMaterial (matname);
-        if (!material.IsValid ())
-        {
-          synldr->ReportError (
-            "crystalspace.genmeshloader.parse.unknownmaterial",
-            node, "Couldn't find material '%s'!", matname);
-          return false;
-        }
-        break;
-      }
-    default:
-      synldr->ReportBadToken (child);
-    }
-  }
-
-  if (!material.IsValid ())
-  {
-    synldr->ReportError (
-      "crystalspace.genmeshloader.parse.unknownmaterial",
-      node, "No material specified in genmesh submesh!");
-    return false;
-  }
-
-  if (do_mixmode)
-    state->AddSubMesh (triangles.GetArray (), (int)triangles.Length (),
-  	  material, mixmode);
-  else
-    state->AddSubMesh (triangles.GetArray (), (int)triangles.Length (),
-  	  material);
-
-  return true;
-}
-
-#include "csutil/win32/msvc_deprecated_warn_on.h"
-
 bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
                                        iGeneralMeshState* state,
                                        iLoaderContext* ldr_context)
 {
   if(!node) return false;
-
-  csRef<iDocumentNode> Tnode = node->GetNode ("t");
-  if (Tnode.IsValid()) 
-    return ParseLegacySubMesh(node, state, ldr_context);
 
   const char* name = node->GetAttributeValue ("name");
   csRef<iGeneralMeshSubMesh> subMesh = state->FindSubMesh (name);
@@ -1196,6 +1143,10 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
 
   csRef<iShaderVariableContext> svc = 
     scfQueryInterface<iShaderVariableContext> (subMesh);
+  uint mixmode = (uint)~0;
+  csZBufMode zmode = (csZBufMode)~0;
+  CS::Graphics::RenderPriority renderPrio = -1;
+  bool b2f = false;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -1235,14 +1186,34 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
       {
         csRef<csShaderVariable> sv;
         sv.AttachNew (new csShaderVariable);
-        if (!synldr->ParseShaderVar (child, *sv)) return false;
+        if (!synldr->ParseShaderVar (ldr_context, child, *sv)) return false;
         svc->AddVariable (sv);
         break;
       }
+    case XMLTOKEN_MIXMODE:
+      if (!synldr->ParseMixmode (child, mixmode)) return false;
+      break;
+    case XMLTOKEN_PRIORITY:
+      renderPrio = engine->GetRenderPriority (child->GetContentsValue ());
+      break;
+    case XMLTOKEN_BACK2FRONT:
+      if (!synldr->ParseBool (child, b2f, true))
+	return 0;
+      break;
     default:
+      if (synldr->ParseZMode (child, zmode)) break;
       synldr->ReportBadToken (child);
     }
   }
+  
+  if (mixmode != (uint)~0)
+    subMesh->SetMixmode (mixmode);
+  if (renderPrio >= 0)
+    subMesh->SetRenderPriority (renderPrio);
+  if (zmode != (csZBufMode)~0)
+    subMesh->SetZMode (zmode);
+  if (b2f)
+    subMesh->SetBack2Front (b2f);
 
   return true;
 }
@@ -1321,8 +1292,8 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find factory '%s'!", factname);
 	    return 0;
 	  }
-	  factstate = SCF_QUERY_INTERFACE (fact->GetMeshObjectFactory(), 
-	    iGeneralFactoryState);
+	  factstate =  
+	    scfQueryInterface<iGeneralFactoryState> (fact->GetMeshObjectFactory());
 	  if (!factstate)
 	  {
       	    synldr->ReportError (
@@ -1333,7 +1304,7 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
 	  CS_ASSERT (mesh != 0);
-          meshstate = SCF_QUERY_INTERFACE (mesh, iGeneralMeshState);
+          meshstate = scfQueryInterface<iGeneralMeshState> (mesh);
 	  if (!meshstate)
 	  {
       	    synldr->ReportError (
@@ -1376,6 +1347,50 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 	CHECK_MESH(meshstate);
         ParseSubMesh (child, meshstate, ldr_context);
         break;
+      case XMLTOKEN_ANIMCONTROL:
+        {
+	  const char* pluginname = child->GetAttributeValue ("plugin");
+	  if (!pluginname)
+	  {
+	    synldr->ReportError (
+		    "crystalspace.genmeshfactoryloader.parse",
+		    child, "Plugin name missing for <animcontrol>!");
+	    return 0;
+	  }
+	  csRef<iGenMeshAnimationControlType> type =
+	  	csLoadPluginCheck<iGenMeshAnimationControlType> (
+		object_reg, pluginname, false);
+	  if (!type)
+	  {
+	    synldr->ReportError (
+		"crystalspace.genmeshloader.parse",
+		child, "Could not load animation control plugin '%s'!",
+		pluginname);
+	    return 0;
+    	  }
+	  csRef<iGenMeshAnimationControlFactory> anim_ctrl_fact = type->
+	  	CreateAnimationControlFactory ();
+	  const char* error = anim_ctrl_fact->Load (child);
+	  if (error)
+	  {
+	    synldr->ReportError (
+		"crystalspace.genmeshloader.parse",
+		child, "Error loading animation control factory: '%s'!",
+		error);
+	    return 0;
+	  }
+          csRef<iGenMeshAnimationControl> animctrl = 
+            anim_ctrl_fact->CreateAnimationControl (mesh);
+	  if (!type)
+	  {
+	    synldr->ReportError (
+		"crystalspace.genmeshloader.parse",
+		child, "Could not create animation control");
+	    return 0;
+    	  }
+          meshstate->SetAnimationControl (animctrl);
+	}
+	break;
       default:
         synldr->ReportBadToken (child);
 	return 0;
@@ -1399,8 +1414,9 @@ csGeneralMeshSaver::~csGeneralMeshSaver ()
 bool csGeneralMeshSaver::Initialize (iObjectRegistry* object_reg)
 {
   csGeneralMeshSaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
+  engine = csQueryRegistry<iEngine> (object_reg);
   return true;
 }
 
@@ -1459,8 +1475,8 @@ bool csGeneralMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     synldr->WriteColor(colorNode, col);
 
     //Writedown ManualColor tag
-    synldr->WriteBool(paramsNode, "manualcolors",
-                      gmesh->IsManualColors(), true);
+    synldr->WriteBool(paramsNode, "manualcolors", gmesh->IsManualColors(), 
+      gfact->IsManualColors());
 
     //Writedown Material tag
     iMaterialWrapper* mat = mesh->GetMaterialWrapper();
@@ -1502,10 +1518,19 @@ bool csGeneralMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
             svc->GetShaderVariables ();
 
           iMaterialWrapper* smMaterial = objSubMesh->GetMaterial();
+          uint mixmode = objSubMesh->GetMixmode ();
+          csZBufMode zmode = objSubMesh->GetZMode ();
+	  int renderPrio = objSubMesh->GetRenderPriority ();
+          bool b2f = objSubMesh->GetBack2Front ();
+
           /* @@@ FIXME: shadervars.IsEmpty() only works for same reasons as 
            * below */
           bool interesting = !shadervars.IsEmpty() 
-            || (smMaterial != factSubMesh->GetMaterial());
+            || (smMaterial != factSubMesh->GetMaterial())
+            || (mixmode != factSubMesh->GetMixmode())
+            || (zmode != factSubMesh->GetZMode())
+            || (renderPrio != factSubMesh->GetRenderPriority())
+            || (b2f != factSubMesh->GetBack2Front());
 
           if (interesting)
           {
@@ -1525,6 +1550,34 @@ bool csGeneralMeshSaver::WriteDown (iBase* obj, iDocumentNode* parent,
                 smMaterial->QueryObject()->GetName());
             }
 
+	    if (mixmode != (uint)~0)
+	    {
+	      csRef<iDocumentNode> mixmodeNode = 
+		submeshNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	      mixmodeNode->SetValue ("mixmode");
+	      synldr->WriteMixmode (mixmodeNode, mixmode, true);
+	    }
+	    
+	    if (zmode != (csZBufMode)~0)
+	    {
+	      synldr->WriteZMode (submeshNode, zmode, false);
+	    }
+	    
+	    if (renderPrio >= 0)
+	    {
+	      csRef<iDocumentNode> prioNode = 
+		submeshNode->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	      prioNode->SetValue ("priority");
+	      csRef<iDocumentNode> prioContents =
+		prioNode->CreateNodeBefore (CS_NODE_TEXT, 0);
+	      prioContents->SetValue (engine->GetRenderPriorityName (renderPrio));
+	    }
+	    if (b2f)
+	    {
+	      synldr->WriteBool (submeshNode, "back2front", b2f, 
+	        factSubMesh->GetBack2Front ());
+	    }
+	  
             /* @@@ FIXME: This loop only works b/c GetShaderVariables() does 
              * not return parent's SVs. Once it does, this code needs to 
              * change, since only really the different SVs should be written 

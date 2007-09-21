@@ -41,9 +41,8 @@ void csFontCache::FontDeleteNotify::BeforeDelete (iFont* font)
 
 //---------------------------------------------------------------------------
 
-csFontCache::csFontCache () : LRUAlloc (512)
+csFontCache::csFontCache () : head (0), tail (0), LRUAlloc (512)
 {
-  head = tail = 0;
   deleteCallback = new FontDeleteNotify (this);
 }
 
@@ -60,11 +59,11 @@ void csFontCache::CleanupCache ()
     InternalUncacheGlyph (cacheData);
   }
 
-  for (size_t i = 0; i < knownFonts.Length(); i++)
+  for (size_t i = 0; i < knownFonts.GetSize (); i++)
   {
     knownFonts[i]->font->RemoveDeleteCallback (deleteCallback);
     PlaneGlyphsArray& planeGlyphs = knownFonts[i]->planeGlyphs;
-    for (size_t j = 0; j < planeGlyphs.Length(); j++)
+    for (size_t j = 0; j < planeGlyphs.GetSize (); j++)
     {
       delete planeGlyphs[j];
     }
@@ -85,7 +84,7 @@ void csFontCache::PurgeEmptyPlanes ()
     csPtrKey<KnownFont> knownFont = fontIt.Next ();
 
     PlaneGlyphsArray& planeGlyphs = knownFont->planeGlyphs;
-    for (size_t j = 0; j < planeGlyphs.Length(); j++)
+    for (size_t j = 0; j < planeGlyphs.GetSize (); j++)
     {
       PlaneGlyphs*& pg = planeGlyphs[j];
       if (pg != 0)
@@ -106,7 +105,7 @@ csFontCache::LRUEntry* csFontCache::FindLRUEntry (
 {
   size_t gidx1 = glyph >> GLYPH_INDEX_UPPER_SHIFT, 
     gidx2 = glyph & GLYPH_INDEX_LOWER_MASK;
-  if (font->planeGlyphs.Length () > gidx1)
+  if (font->planeGlyphs.GetSize () > gidx1)
   {
     PlaneGlyphs* pg = font->planeGlyphs[gidx1];
     return pg ? pg->entries[gidx2] : 0;
@@ -152,7 +151,7 @@ csFontCache::KnownFont* csFontCache::GetCachedFont (iFont* font)
   {
     if ((knownFont->fontSize - font->GetSize ()) > EPSILON)
     {
-      for (size_t i = 0; i < knownFont->planeGlyphs.Length (); i++)
+      for (size_t i = 0; i < knownFont->planeGlyphs.GetSize (); i++)
       {
 	PlaneGlyphs*& pg = knownFont->planeGlyphs[i];
 	if (pg != 0)
@@ -197,7 +196,7 @@ void csFontCache::UncacheFont (iFont* font)
   if (idx != csArrayItemNotFound)
   {
     KnownFont* knownFont = knownFonts[idx];
-    for (size_t i = 0; i < knownFont->planeGlyphs.Length (); i++)
+    for (size_t i = 0; i < knownFont->planeGlyphs.GetSize (); i++)
     {
       PlaneGlyphs*& pg = knownFont->planeGlyphs[i];
       if (pg != 0)
@@ -300,7 +299,7 @@ csFontCache::GlyphCacheData* csFontCache::GetLeastUsed ()
     gidx2 = cacheData->glyph & GLYPH_INDEX_LOWER_MASK;
 
   PlaneGlyphsArray& planeGlyphs = cacheData->font->planeGlyphs;
-  if (planeGlyphs.Length () > gidx1)
+  if (planeGlyphs.GetSize () > gidx1)
   {
     PlaneGlyphs*& pg = planeGlyphs[gidx1];
     if (pg != 0)
@@ -319,9 +318,17 @@ void csFontCache::AddCacheData (KnownFont* font, utf32_char glyph,
 				GlyphCacheData* cacheData)
 {
   CS_ASSERT (font != 0);
-  CS_ASSERT (FindLRUEntry (font, glyph) == 0);
+  LRUEntry* entry = FindLRUEntry (font, glyph);
 
-  LRUEntry* entry = LRUAlloc.Alloc ();
+  if (entry != 0)
+  {
+    // This may happen in case of nested CacheGlyph() calls
+    InternalUncacheGlyph (entry->cacheData);
+    entry->cacheData = cacheData;
+    return;
+  }
+
+  entry = LRUAlloc.Alloc ();
   entry->prev = 0;
   entry->next = head;
   if (head)
@@ -336,9 +343,9 @@ void csFontCache::AddCacheData (KnownFont* font, utf32_char glyph,
     gidx2 = glyph & GLYPH_INDEX_LOWER_MASK;
 
   PlaneGlyphsArray& planeGlyphs = font->planeGlyphs;
-  if (planeGlyphs.Length () <= gidx1)
+  if (planeGlyphs.GetSize () <= gidx1)
   {
-    planeGlyphs.SetLength (gidx1 + 1);
+    planeGlyphs.SetSize (gidx1 + 1);
   }
   PlaneGlyphs*& pg = planeGlyphs[gidx1];
   if (pg == 0)
@@ -447,7 +454,7 @@ void csFontCache::UncacheGlyph (GlyphCacheData* cacheData)
     gidx2 = cacheData->glyph & GLYPH_INDEX_LOWER_MASK;
 
   PlaneGlyphsArray& planeGlyphs = cacheData->font->planeGlyphs;
-  if (planeGlyphs.Length () > gidx1)
+  if (planeGlyphs.GetSize () > gidx1)
   {
     PlaneGlyphs*& pg = planeGlyphs[gidx1];
     if (pg != 0)

@@ -154,7 +154,7 @@ bool csGenmesh3DSFactoryLoader::LoadMeshObjectData (
     }
     size_t j;
     bool found = false;
-    for (j = 0 ; j < materials_and_tris.Length () ; j++)
+    for (j = 0 ; j < materials_and_tris.GetSize () ; j++)
     {
       csMatAndTris& mt = materials_and_tris[j];
       if (mt.material == mat)
@@ -278,15 +278,24 @@ static long DataTellFunc (void *self)
 }
 
 
+#ifdef NEW_DATA_CALLBACKS
+static size_t DataReadFunc (void *self, void *buffer, size_t size)
+#else
 static int DataReadFunc (void *self, Lib3dsByte *buffer, int size)
+#endif
 {
   iFile* pData = (iFile*)self;
   return (int)pData->Read ((char*)buffer, size );
 }
 
 
+#ifdef NEW_DATA_CALLBACKS
+static size_t DataWriteFunc (void* /*self*/, const void* /*buffer*/, 
+ 	size_t /*size*/)
+#else
 static int DataWriteFunc (void* /*self*/, const Lib3dsByte* /*buffer*/,
 	int /*size*/)
+#endif
 {
   // not yet implemented
   return 0;
@@ -382,11 +391,11 @@ csPtr<iBase> csGenmesh3DSFactoryLoader::Parse (iDataBuffer* buf,
   fact->SetMaterialWrapper (materials_and_tris[0].material);
   gmstate->Compress ();
   gmstate->CalculateNormals ();
-  if (materials_and_tris.Length () > 1)
-    for (j = 0 ; j < materials_and_tris.Length () ; j++)
+  if (materials_and_tris.GetSize () > 1)
+    for (j = 0 ; j < materials_and_tris.GetSize () ; j++)
     {
       csRef<iRenderBuffer> indexBuffer = csRenderBuffer::CreateIndexRenderBuffer (
-        materials_and_tris[j].tris.GetSize(), CS_BUF_STATIC, 
+        materials_and_tris[j].tris.GetSize()*3, CS_BUF_STATIC, 
         CS_BUFCOMP_UNSIGNED_INT, 0, gmstate->GetVertexCount() - 1);
       {
         csRenderBufferLock<uint> indices (indexBuffer);

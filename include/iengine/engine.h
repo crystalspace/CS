@@ -43,8 +43,6 @@ struct iCamera;
 struct iCameraPosition;
 struct iCameraPositionList;
 struct iClipper2D;
-struct iCollection;
-struct iCollectionList;
 struct iDataBuffer;
 struct iFrustumView;
 struct iLight;
@@ -175,7 +173,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine,2,0,0);
+  SCF_INTERFACE(iEngine,2,1,0);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
@@ -184,13 +182,15 @@ struct iEngine : public virtual iBase
    * @{ */
   
   /**
-   * Prepare the engine. This function must be called after
-   * you loaded/created the world. It will prepare all lightmaps
-   * for use and also free all images that were loaded for
-   * the texture manager (the texture manager should have them
-   * locally now). The optional progress meter will be used to
-   * report progress.
-   * <p>
+   * Prepare the engine. This function must be called after you loaded/created 
+   * the world and before it is rendered.
+   *
+   * Actions include:
+   * - Preparation of all lightmaps for use
+   * - Registering of textures with texture manager and freeing of loaded
+   *   images (as the texture manager will have created textures from them)
+   * The optional progress meter will be used to report progress.
+   *
    * The behaviour regarding cached lighting depends on the flag
    * you can set with the SetLightingCacheMode() function. The default
    * behaviour is to read the lightmap cache when present but don't
@@ -741,7 +741,10 @@ struct iEngine : public virtual iBase
    * Assign to a csRef.
    * \param sector the sector to add walls to
    * \param name the engine name of the walls mesh that will be created
+   * \deprecated Deprecated in 1.3. Use CS::Geometry::GeneralMeshBuilder
+   * instead.
    */
+  CS_DEPRECATED_METHOD_MSG("Use CS::Geometry::GeneralMeshBuilder instead")
   virtual csPtr<iMeshWrapper> CreateSectorWallsMesh (iSector* sector,
       const char* name) = 0;
 
@@ -753,7 +756,10 @@ struct iEngine : public virtual iBase
    * Assign to a csRef.
    * \param sector the sector to add the object to
    * \param name the engine name of the mesh that will be created
+   * \deprecated Deprecated in 1.3. Use CS::Geometry::GeneralMeshBuilder
+   * instead.
    */
+  CS_DEPRECATED_METHOD_MSG("Use CS::Geometry::GeneralMeshBuilder instead")
   virtual csPtr<iMeshWrapper> CreateThingMesh (iSector* sector,
   	const char* name) = 0;
 
@@ -956,8 +962,8 @@ struct iEngine : public virtual iBase
   
   /**
    * Convenience function to create a portal from one sector to another
-   * and make this portal a child mesh of another mesh. Use SCF_QUERY_INTERFACE
-   * with iPortalContainer on the returned mesh for more control over the
+   * and make this portal a child mesh of another mesh. Use scfQueryInterface<
+   * iPortalContainer> on the returned mesh for more control over the
    * portal(s) in the portal object.
    * \param name is the name of the portal container mesh to create the portal
    * in. If the parentMesh already has a mesh with that name then that will
@@ -981,7 +987,7 @@ struct iEngine : public virtual iBase
 
   /**
    * Convenience function to create a portal from one sector to another.
-   * Use SCF_QUERY_INTERFACE with iPortalContainer on the returned mesh for
+   * Use scfQueryInterface<iPortalContainer> on the returned mesh for
    * more control over the portal(s) in the portal object.
    * \param name is the name of the portal container mesh to create the portal
    * in. If the sourceSector already has a mesh with that name then that will
@@ -1007,8 +1013,8 @@ struct iEngine : public virtual iBase
 
   /**
    * Create an empty portal container in some sector. Use this portal
-   * container to create portals to other sectors. Use SCF_QUERY_INTERFACE with
-   * iPortalContainer on the mesh object inside the returned mesh to
+   * container to create portals to other sectors. Use scfQueryInterface<
+   * iPortalContainer> on the mesh object inside the returned mesh to
    * control the portals.
    * \param name of the portal mesh.
    * \param sector is the location of the portal object and not the sector
@@ -1190,12 +1196,12 @@ struct iEngine : public virtual iBase
    * all objects that are within a radius of a given position.
    * The current implementation only does meshes but in future
    * lights will also be supported.
-   * You can use #SCF_QUERY_INTERFACE to get any interface from the
+   * You can use #scfQueryInterface to get any interface from the
    * returned objects. If crossPortals is true it will search through
    * portals. Otherwise it will limit the search to the sector passed in.
    * If you only want to have meshes then it is more efficient to
    * call GetNearbyMeshes() as you can then avoid the call to
-   * #SCF_QUERY_INTERFACE.
+   * #scfQueryInterface.
    */
   virtual csPtr<iObjectIterator> GetNearbyObjects (iSector* sector,
     const csVector3& pos, float radius, bool crossPortals = true ) = 0;
@@ -1206,7 +1212,7 @@ struct iEngine : public virtual iBase
    * This routine returns an iterator to iterate over
    * all objects that are potentially visible as seen from a given position.
    * This routine assumes full 360 degree visibility.
-   * You can use #SCF_QUERY_INTERFACE to get any interface from the
+   * You can use #scfQueryInterface to get any interface from the
    * returned objects.<p>
    * If you only want meshes then use GetVisibleMeshes().
    * CURRENTLY NOT IMPLEMENTED!
@@ -1227,7 +1233,7 @@ struct iEngine : public virtual iBase
    * This routine returns an iterator to iterate over
    * all objects that are potentially visible as seen from a given position.
    * This routine has a frustum restricting the view.
-   * You can use #SCF_QUERY_INTERFACE to get any interface from the
+   * You can use #scfQueryInterface to get any interface from the
    * returned objects.<p>
    * If you only want meshes then use GetVisibleMeshes().
    * CURRENTLY NOT IMPLEMENTED!
@@ -1260,24 +1266,6 @@ struct iEngine : public virtual iBase
 
     /// Get the list of all shared variables.
   virtual iSharedVariableList* GetVariableList () const = 0;
-
-  /// Get the list of collections.
-  virtual iCollectionList* GetCollections () = 0;
-  
-  /**
-   * Find the given collection. The name can be a normal
-   * name. In that case this function will look in all regions
-   * except if region is not 0 in which case it will only
-   * look in that region.
-   * If the name is specified as 'regionname/objectname' then
-   * this function will only look in the specified region and return
-   * 0 if that region doesn't contain the object or the region
-   * doesn't exist. In this case the region parameter is ignored.
-   * \param name the engine name of the desired collection
-   * \param region if specified, search only this region (also see note above)
-   */
-  virtual iCollection* FindCollection (const char* name,
-  	iRegion* region = 0) = 0;
 
   /**
    * Convenience function to 'remove' a CS object from the engine.

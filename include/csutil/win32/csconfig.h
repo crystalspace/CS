@@ -61,8 +61,6 @@
 
 #undef  CS_HAVE_SOCKLEN_T
 #define CS_HAVE_MATH_H_FLOAT_FUNCS
-#define CS_HAVE_CXX_KEYWORD_EXPLICIT
-#define CS_HAVE_CXX_KEYWORD_TYPENAME
 #define CS_HAVE_WCHAR_H
 #define CS_HAVE_WCHAR_T
 #define CS_HAVE_WCSLEN
@@ -96,6 +94,7 @@
 // MSVC has only _finite
 #if defined(CS_COMPILER_MSVC)
 #define CS_HAVE__FINITE
+#define CS_HAVE__ISNAN
 #endif
 
 // --- Stuff that needs to go before *any* inclusion of VC standard headers:

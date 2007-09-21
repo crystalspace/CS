@@ -27,7 +27,6 @@
 #include "csutil/cfgfile.h"
 #include "csutil/scanstr.h"
 #include "csutil/scfstr.h"
-#include "cstool/gentrtex.h"
 #include "cstool/keyval.h"
 #include "cstool/mapnode.h"
 #include "cstool/saverfile.h"
@@ -47,7 +46,6 @@
 #include "iengine/region.h"
 #include "iengine/texture.h"
 #include "iengine/material.h"
-#include "iengine/collectn.h"
 #include "iengine/sector.h"
 #include "iengine/movable.h"
 #include "iengine/halo.h"
@@ -79,8 +77,7 @@
 #include "imesh/nullmesh.h"
 #include "ivaria/reporter.h"
 #include "csgeom/poly3d.h"
-#include "csgeom/polymesh.h"
-#include "igeom/polymesh.h"
+#include "csgeom/trimesh.h"
 #include "imesh/objmodel.h"
 #include "ivaria/terraform.h"
 
@@ -247,8 +244,8 @@ iLight* StdLoaderContext::FindLight (const char *name)
 
 iShader* StdLoaderContext::FindShader (const char *name)
 {
-  csRef<iShaderManager> shaderMgr = CS_QUERY_REGISTRY (
-  	loader->object_reg, iShaderManager);
+  csRef<iShaderManager> shaderMgr = 
+  	csQueryRegistry<iShaderManager> (loader->object_reg);
   if (!shaderMgr) return 0;
   if (!curRegOnly || !region)
   {
@@ -260,7 +257,7 @@ iShader* StdLoaderContext::FindShader (const char *name)
 
   csRefArray<iShader> shaders = shaderMgr->GetShaders ();
   size_t i;
-  for (i = 0 ; i < shaders.Length () ; i++)
+  for (i = 0 ; i < shaders.GetSize () ; i++)
   {
     iShader* s = shaders[i];
     if (region->IsInRegion (s->QueryObject ())
@@ -434,14 +431,14 @@ iLight* ThreadedLoaderContext::FindLight (const char *name)
 
 iShader* ThreadedLoaderContext::FindShader (const char *name)
 {
-  csRef<iShaderManager> shaderMgr = CS_QUERY_REGISTRY (
-  	loader->object_reg, iShaderManager);
+  csRef<iShaderManager> shaderMgr = 
+  	csQueryRegistry<iShaderManager> (loader->object_reg);
   if (!shaderMgr) return 0;
   if (!curRegOnly || !region) return shaderMgr->GetShader (name);
 
   csRefArray<iShader> shaders = shaderMgr->GetShaders ();
   size_t i;
-  for (i = 0 ; i < shaders.Length () ; i++)
+  for (i = 0 ; i < shaders.GetSize () ; i++)
   {
     iShader* s = shaders[i];
     if (region->IsInRegion (s->QueryObject ())
@@ -551,7 +548,7 @@ bool csLoader::LoadStructuredDoc (const char* file, iDataBuffer* buf,
 	csRef<iDocument>& doc)
 {
   csRef<iDocumentSystem> docsys (
-      CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
+      csQueryRegistry<iDocumentSystem> (object_reg));
   if (!docsys) docsys = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
   doc = docsys->CreateDocument ();
   const char* error = doc->Parse (buf, true);
@@ -573,7 +570,7 @@ bool csLoader::LoadStructuredDoc (const char* file, iFile* buf,
 	csRef<iDocument>& doc)
 {
   csRef<iDocumentSystem> docsys (
-      CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
+      csQueryRegistry<iDocumentSystem> (object_reg));
   if (!docsys) docsys = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
   doc = docsys->CreateDocument ();
   const char* error = doc->Parse (buf, true);
@@ -975,19 +972,20 @@ void csLoader::AddToRegion (iLoaderContext* ldr_context, iObject* obj)
 }
 
 void csLoader::AddChildrenToRegion (iLoaderContext* ldr_context,
-	const csRefArray<iSceneNode>& children)
+                                    const iSceneNodeArray* children)
 {
   size_t i;
-  for (i = 0 ; i < children.Length () ; i++)
+  for (i = 0 ; i < children->GetSize(); i++)
   {
-    iSceneNode* sn = children[i];
+    iSceneNode* sn = children->Get(i);
     iObject* obj = 0;
     if (sn->QueryMesh ()) obj = sn->QueryMesh ()->QueryObject ();
     else if (sn->QueryLight ()) obj = sn->QueryLight ()->QueryObject ();
     //else if (sn->QueryCamera ()) obj = sn->QueryCamera ()->QueryObject ();
     if (obj)
       AddToRegion (ldr_context, obj);
-    AddChildrenToRegion (ldr_context, sn->GetChildren ());
+    const csRef<iSceneNodeArray> nodeChildren = sn->GetChildrenArray ();
+    AddChildrenToRegion (ldr_context, nodeChildren);
   }
 }
 
@@ -1123,11 +1121,11 @@ csLoader::~csLoader()
 }
 
 #define GET_PLUGIN(var, intf, msgname)				\
-  var = CS_QUERY_REGISTRY(object_reg, intf);			\
+  var = csQueryRegistry<intf> (object_reg);			\
   if (!var && do_verbose) ReportNotify ("Could not get " msgname);
 
 #define GET_CRITICAL_PLUGIN(var, intf, msgname)			\
-  var = CS_QUERY_REGISTRY(object_reg, intf);			\
+  var = csQueryRegistry<intf> (object_reg);			\
   if (!var) { ReportError ("crystalspace.maploader",		\
     "Failed to initialize loader: "				\
     "Could not get " msgname); return false; }
@@ -1137,16 +1135,16 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   csLoader::object_reg = object_Reg;
   loaded_plugins.SetObjectRegistry (object_reg);
   csRef<iVerbosityManager> verbosemgr (
-    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+    csQueryRegistry<iVerbosityManager> (object_reg));
   if (verbosemgr) 
     do_verbose = verbosemgr->Enabled ("loader");
   else
     do_verbose = false;
 
   csRef<iPluginManager> plugin_mgr (
-  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+  	csQueryRegistry<iPluginManager> (object_reg));
 
-  Reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  Reporter = csQueryRegistry<iReporter> (object_reg);
 
   loaded_plugins.plugin_mgr = plugin_mgr;
 
@@ -1173,8 +1171,8 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
 
   InitTokenTable (xmltokens);
 
-  stringSet = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
+  stringSet = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
 
   return true;
 }
@@ -1207,6 +1205,10 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
+      case XMLTOKEN_SHADEREXPRESSIONS:
+	if (!LoadShaderExpressions (ldr_context, child))
+	  return false;
+        break;
       case XMLTOKEN_SETTINGS:
 	if (!LoadSettings (child))
 	  return false;
@@ -1273,10 +1275,6 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode,
         if (!ParseSector (ldr_context, child, ssource))
 	  return false;
         break;
-      case XMLTOKEN_COLLECTION:
-        if (!ParseCollection (ldr_context, child))
-	  return false;
-        break;
       case XMLTOKEN_SEQUENCES:
 	// Defer sequence parsing to later.
 	sequences = child;
@@ -1323,15 +1321,8 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* worldnode,
       }
       case XMLTOKEN_KEY:
       {
-        iKeyValuePair* kvp = 0;
-        SyntaxService->ParseKey (child, kvp);
-        if (kvp)
-        {
-          Engine->QueryObject()->ObjAdd (kvp->QueryObject ());
-	  kvp->DecRef ();
-        }
-	else
-	  return false;
+        if (!ParseKey (child, Engine->QueryObject()))
+          return false;
         break;
       }
       case XMLTOKEN_SHADERS:
@@ -1360,7 +1351,7 @@ bool csLoader::LoadLibraryFromNode (iLoaderContext* ldr_context,
 	iDocumentNode* child, iStreamSource* ssource,
 	iMissingLoaderData* missingdata)
 {
-  csRef<iVFS> vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
   const char* name = child->GetAttributeValue ("checkdupes");
   bool dupes = ldr_context->CheckDupes ();
   if (name)
@@ -1440,6 +1431,10 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* libnode,
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
+      case XMLTOKEN_SHADEREXPRESSIONS:
+	if (!LoadShaderExpressions (ldr_context, child))
+	  return false;
+        break;
       case XMLTOKEN_LIBRARY:
       {
 	if (!LoadLibraryFromNode (ldr_context, child, ssource, missingdata))
@@ -1564,9 +1559,22 @@ bool csLoader::LoadPlugins (iDocumentNode* node)
     switch (id)
     {
       case XMLTOKEN_PLUGIN:
-	loaded_plugins.NewPlugin (child->GetAttributeValue ("name"),
-			child);
+        {
+          const char* plugin_name = child->GetAttributeValue ("name");
+          loaded_plugins.NewPlugin (plugin_name, child);
+          if (Engine->GetSaveableFlag ())
+          {
+            const char* plugin_id = loaded_plugins.FindPluginClassID (plugin_name);
+            if (plugin_id)
+            {
+              csRef<iPluginReference> pluginref;
+              pluginref.AttachNew (new csPluginReference (plugin_name, plugin_id));
+              object_reg->Register (pluginref, csString ("_plugref_") + plugin_id);
+            }
+          }
+        }
         break;
+      
       default:
 	SyntaxService->ReportBadToken (child);
 	return false;
@@ -1605,6 +1613,9 @@ bool csLoader::LoadSounds (iDocumentNode* node)
 	  csRef<iDocumentAttribute> at = child->GetAttribute ("mode3d");
 	  if (at)
 	  {
+	    ReportWarning (
+	        "crystalspace.maploader.parse.sound",
+                child, "The 'mode3d' attribute is deprecated! Specify 2d/3d mode when playing sound.");
 	    const char* v = at->GetValue ();
 	    if (!strcasecmp ("disable", v))
 	      mode3d = CS_SND3D_DISABLE;
@@ -1621,53 +1632,37 @@ bool csLoader::LoadSounds (iDocumentNode* node)
 	    }
 	  }
 
-	  if (mode3d == -1)
+	  // New sound system.
+	  if (!SndSysLoader || !SndSysManager)
 	  {
-	    SyntaxService->Report (
-	      "crystalspace.maploader.parse.sound", 
-	      CS_REPORTER_SEVERITY_NOTIFY, child,
-	      "The old sound system is no longer supported. Use 'mode3d'!");
-	    return true;
-	  }
-	  else
-	  {
-	    // New sound system.
-	    if (!SndSysLoader)
-	    {
-	      //SyntaxService->ReportError (
+	    //SyntaxService->ReportError (
 	        //"crystalspace.maploader.parse.sound", child,
 	        //"New sound loader not loaded!");
-	      return true;
-	    }
-            iSndSysWrapper* snd = SndSysManager->FindSoundByName (name);
-            if (!snd)
-              snd = LoadSoundWrapper (name, filename, mode3d);
-            if (snd)
+	    return true;
+	  }
+          iSndSysWrapper* snd = SndSysManager->FindSoundByName (name);
+          if (!snd)
+	  {	    
+              snd = LoadSoundWrapper (name, filename);
+	  }
+          if (snd)
+          {
+            csRef<iDocumentNodeIterator> it2 (child->GetNodes ());
+            while (it2->HasNext ())
             {
-              csRef<iDocumentNodeIterator> it2 (child->GetNodes ());
-              while (it2->HasNext ())
+              csRef<iDocumentNode> child2 = it2->Next ();
+              if (child2->GetType () != CS_NODE_ELEMENT) continue;
+              switch (xmltokens.Request (child2->GetValue ()))
               {
-                csRef<iDocumentNode> child2 = it2->Next ();
-                if (child2->GetType () != CS_NODE_ELEMENT) continue;
-                switch (xmltokens.Request (child2->GetValue ()))
-                {
-                  case XMLTOKEN_KEY:
-                    {
-                      iKeyValuePair *kvp = 0;
-                      SyntaxService->ParseKey (child2, kvp);
-                      if (kvp)
-                      {
-                        snd->QueryObject ()->ObjAdd (kvp->QueryObject ());
-                        kvp->DecRef ();
-                      }
-		      else
-                        return false;
-                    }
-                    break;
-                }
+                case XMLTOKEN_KEY:
+                  {
+                    if (!ParseKey (child2, snd->QueryObject()))
+                      return false;
+                  }
+                  break;
               }
             }
-	  }
+          }
         }
         break;
       default:
@@ -1733,67 +1728,18 @@ bool csLoader::LoadLodControl (iLODControl* lodctrl, iDocumentNode* node)
 
 //--------------------------------------------------------------------
 
-// Private class implementing iPolygonMesh for a general triangle mesh.
-class PolygonMeshMesh :
-  public scfImplementation1<PolygonMeshMesh, iPolygonMesh>
-{
-private:
-  csVector3* vertices;
-  csMeshedPolygon* polygons;
-  csTriangle* vertex_indices;
-  int num_verts;
-  int num_tris;
-  csFlags flags;
-
-public:
-  PolygonMeshMesh (int num_verts, int num_tris) :
-    scfImplementationType(this)
-  {
-    PolygonMeshMesh::num_verts = num_verts;
-    PolygonMeshMesh::num_tris = num_tris;
-    vertices = new csVector3[num_verts];
-    polygons = new csMeshedPolygon[num_tris];
-    vertex_indices = new csTriangle[num_tris];
-
-    int i;
-    for (i = 0 ; i < num_tris ; i++)
-    {
-      polygons[i].num_vertices = 3;
-      polygons[i].vertices = (int*)&vertex_indices[i];
-    }
-    flags.Set (CS_POLYMESH_TRIANGLEMESH);
-  }
-  virtual ~PolygonMeshMesh ()
-  {
-    delete[] vertices;
-    delete[] polygons;
-    delete[] vertex_indices;
-  }
-
-  virtual int GetVertexCount () { return num_verts; }
-  virtual csVector3* GetVertices () { return vertices; }
-  virtual int GetPolygonCount () { return num_tris; }
-  virtual csMeshedPolygon* GetPolygons () { return polygons; }
-  virtual int GetTriangleCount () { return num_tris; }
-  virtual csTriangle* GetTriangles () { return vertex_indices; }
-  virtual void Lock () { }
-  virtual void Unlock () { }
-  virtual csFlags& GetFlags () { return flags; }
-  virtual uint32 GetChangeNumber () const { return 0; }
-};
-
-bool csLoader::ParsePolyMeshChildBox (iDocumentNode* child,
-	csRef<iPolygonMesh>& polymesh)
+bool csLoader::ParseTriMeshChildBox (iDocumentNode* child,
+	csRef<iTriangleMesh>& trimesh)
 {
   csBox3 b;
   if (!SyntaxService->ParseBox (child, b))
     return false;
-  polymesh = csPtr<iPolygonMesh> (new csPolygonMeshBox (b));
+  trimesh = csPtr<iTriangleMesh> (new csTriangleMeshBox (b));
   return true;
 }
 
-bool csLoader::ParsePolyMeshChildMesh (iDocumentNode* child,
-	csRef<iPolygonMesh>& polymesh)
+bool csLoader::ParseTriMeshChildMesh (iDocumentNode* child,
+	csRef<iTriangleMesh>& trimesh)
 {
   int num_vt = 0;
   int num_tri = 0;
@@ -1814,9 +1760,9 @@ bool csLoader::ParsePolyMeshChildMesh (iDocumentNode* child,
     }
   }
 
-  polymesh = csPtr<iPolygonMesh> (new PolygonMeshMesh (num_vt, num_tri));
-  csVector3* vt = polymesh->GetVertices ();
-  csMeshedPolygon* po = polymesh->GetPolygons ();
+  csTriangleMesh* cstrimesh = new csTriangleMesh ();
+  trimesh.AttachNew (cstrimesh);
+  
   num_vt = 0;
   num_tri = 0;
 
@@ -1830,15 +1776,22 @@ bool csLoader::ParsePolyMeshChildMesh (iDocumentNode* child,
     switch (child_id)
     {
       case XMLTOKEN_V:
-	if (!SyntaxService->ParseVector (child_child, vt[num_vt]))
-	  return false;
-	num_vt++;
+	{
+	  csVector3 vt;
+	  if (!SyntaxService->ParseVector (child_child, vt))
+	    return false;
+	  cstrimesh->AddVertex (vt);
+	  num_vt++;
+	}
 	break;
       case XMLTOKEN_T:
-	po[num_tri].vertices[0] = child_child->GetAttributeValueAsInt ("v1");
-	po[num_tri].vertices[1] = child_child->GetAttributeValueAsInt ("v2");
-	po[num_tri].vertices[2] = child_child->GetAttributeValueAsInt ("v3");
-	num_tri++;
+	{
+	  int a = child_child->GetAttributeValueAsInt ("v1");
+	  int b = child_child->GetAttributeValueAsInt ("v2");
+	  int c = child_child->GetAttributeValueAsInt ("v3");
+	  cstrimesh->AddTriangle (a, b, c);
+	  num_tri++;
+	}
 	break;
       default:
 	SyntaxService->ReportBadToken (child_child);
@@ -1848,18 +1801,31 @@ bool csLoader::ParsePolyMeshChildMesh (iDocumentNode* child,
   return true;
 }
 
-bool csLoader::ParsePolyMesh (iDocumentNode* node, iObjectModel* objmodel)
+#undef CS_CLO
+#undef CS_CON
+#define CS_CLO (CS_TRIMESH_CLOSED|CS_TRIMESH_NOTCLOSED)
+#define CS_CON (CS_TRIMESH_CONVEX|CS_TRIMESH_NOTCONVEX)
+static void SetTriMeshFlags (csFlags& flags, bool closed, bool notclosed,
+    bool convex, bool notconvex)
 {
-  csRef<iPolygonMesh> polymesh;
+  if (closed) flags.Set (CS_CLO, CS_TRIMESH_CLOSED);
+  if (notclosed) flags.Set (CS_CLO, CS_TRIMESH_NOTCLOSED);
+  if (convex) flags.Set (CS_CON, CS_TRIMESH_CONVEX);
+  if (notconvex) flags.Set (CS_CON, CS_TRIMESH_NOTCONVEX);
+}
+#undef CS_CLO
+#undef CS_CON
+
+bool csLoader::ParseTriMesh (iDocumentNode* node, iObjectModel* objmodel)
+{
+  csRef<iTriangleMesh> trimesh;
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  bool colldet = false;
-  bool viscull = false;
-  bool shadows = false;
   bool convex = false;
   bool notconvex = false;
   bool closed = false;
   bool notclosed = false;
   bool use_default_mesh = false;
+  csArray<csStringID> ids;
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
@@ -1869,35 +1835,35 @@ bool csLoader::ParsePolyMesh (iDocumentNode* node, iObjectModel* objmodel)
     switch (id)
     {
       case XMLTOKEN_DEFAULT:
-        if (polymesh)
+        if (trimesh)
 	{
 	  SyntaxService->ReportError (
-	    "crystalspace.maploader.parse.polymesh", child,
+	    "crystalspace.maploader.parse.trimesh", child,
 	    "Use either <default>, <box>, or <mesh>!");
 	  return false;
 	}
 	use_default_mesh = true;
         break;
       case XMLTOKEN_BOX:
-        if (polymesh || use_default_mesh)
+        if (trimesh || use_default_mesh)
 	{
 	  SyntaxService->ReportError (
-	    "crystalspace.maploader.parse.polymesh", child,
+	    "crystalspace.maploader.parse.trimesh", child,
 	    "Use either <default>, <box>, or <mesh>!");
 	  return false;
 	}
-        if (!ParsePolyMeshChildBox (child, polymesh))
+        if (!ParseTriMeshChildBox (child, trimesh))
 	  return false;
         break;
       case XMLTOKEN_MESH:
-        if (polymesh || use_default_mesh)
+        if (trimesh || use_default_mesh)
 	{
 	  SyntaxService->ReportError (
-	    "crystalspace.maploader.parse.polymesh", child,
+	    "crystalspace.maploader.parse.trimesh", child,
 	    "Use either <default>, <box>, or <mesh>!");
 	  return false;
 	}
-        if (!ParsePolyMeshChildMesh (child, polymesh))
+        if (!ParseTriMeshChildMesh (child, trimesh))
 	  return false;
         break;
       case XMLTOKEN_CLOSED:
@@ -1917,77 +1883,61 @@ bool csLoader::ParsePolyMesh (iDocumentNode* node, iObjectModel* objmodel)
         notconvex = true;
         break;
       case XMLTOKEN_COLLDET:
-        colldet = true;
+	ReportWarning (
+	        "crystalspace.maploader.parse.trimesh",
+                child, "<colldet> is deprecated. Use <id>colldet</id> instead.");
+	ids.Push (stringSet->Request ("colldet"));
 	break;
       case XMLTOKEN_VISCULL:
-        viscull = true;
+	ReportWarning (
+	        "crystalspace.maploader.parse.trimesh",
+                child, "<viscull> is deprecated. Use <id>viscull</id> instead.");
+	ids.Push (stringSet->Request ("viscull"));
 	break;
       case XMLTOKEN_SHADOWS:
-        shadows = true;
+	ReportWarning (
+	        "crystalspace.maploader.parse.trimesh",
+                child, "<shadows> is deprecated. Use <id>shadows</id> instead.");
+	ids.Push (stringSet->Request ("shadows"));
+	break;
+      case XMLTOKEN_ID:
+	ids.Push (stringSet->Request (child->GetContentsValue ()));
 	break;
       default:
 	SyntaxService->ReportBadToken (child);
         return false;
     }
   }
-  if (!colldet && !viscull && !shadows)
+  if (ids.GetSize () == 0)
   {
     SyntaxService->ReportError (
-	"crystalspace.maploader.parse.polymesh",
-	node, "Please specify either <shadows/>, <viscull/> or <colldet/>!");
+	"crystalspace.maploader.parse.trimesh",
+	node, "No id's for this triangle mesh!");
     return false;
   }
-#undef CS_CLO
-#undef CS_CON
-#define CS_CLO (CS_POLYMESH_CLOSED|CS_POLYMESH_NOTCLOSED)
-#define CS_CON (CS_POLYMESH_CONVEX|CS_POLYMESH_NOTCONVEX)
+  size_t i;
   if (use_default_mesh)
   {
-    if (colldet && objmodel->GetPolygonMeshColldet ())
+    for (i = 0 ; i < ids.GetSize () ; i++)
     {
-      csFlags& flags = objmodel->GetPolygonMeshColldet ()->GetFlags ();
-      if (closed) flags.Set (CS_CLO, CS_POLYMESH_CLOSED);
-      if (notclosed) flags.Set (CS_CLO, CS_POLYMESH_NOTCLOSED);
-      if (convex) flags.Set (CS_CON, CS_POLYMESH_CONVEX);
-      if (notconvex) flags.Set (CS_CON, CS_POLYMESH_NOTCONVEX);
-    }
-    if (viscull && objmodel->GetPolygonMeshViscull ())
-    {
-      csFlags& flags = objmodel->GetPolygonMeshViscull ()->GetFlags ();
-      if (closed) flags.Set (CS_CLO, CS_POLYMESH_CLOSED);
-      if (notclosed) flags.Set (CS_CLO, CS_POLYMESH_NOTCLOSED);
-      if (convex) flags.Set (CS_CON, CS_POLYMESH_CONVEX);
-      if (notconvex) flags.Set (CS_CON, CS_POLYMESH_NOTCONVEX);
-    }
-    if (shadows && objmodel->GetPolygonMeshShadows ())
-    {
-      csFlags& flags = objmodel->GetPolygonMeshShadows ()->GetFlags ();
-      if (closed) flags.Set (CS_CLO, CS_POLYMESH_CLOSED);
-      if (notclosed) flags.Set (CS_CLO, CS_POLYMESH_NOTCLOSED);
-      if (convex) flags.Set (CS_CON, CS_POLYMESH_CONVEX);
-      if (notconvex) flags.Set (CS_CON, CS_POLYMESH_NOTCONVEX);
+      if (objmodel->GetTriangleData (ids[i]))
+      {
+        csFlags& flags = objmodel->GetTriangleData (ids[i])->GetFlags ();
+        SetTriMeshFlags (flags, closed, notclosed, convex, notconvex);
+      }
     }
   }
   else
   {
-    if (polymesh)
+    if (trimesh)
     {
-      csFlags& flags = polymesh->GetFlags ();
-      if (closed) flags.Set (CS_CLO, CS_POLYMESH_CLOSED);
-      if (notclosed) flags.Set (CS_CLO, CS_POLYMESH_NOTCLOSED);
-      if (convex) flags.Set (CS_CON, CS_POLYMESH_CONVEX);
-      if (notconvex) flags.Set (CS_CON, CS_POLYMESH_NOTCONVEX);
+      csFlags& flags = trimesh->GetFlags ();
+      SetTriMeshFlags (flags, closed, notclosed, convex, notconvex);
     }
 
-    if (colldet)
-      objmodel->SetPolygonMeshColldet (polymesh);
-    if (viscull)
-      objmodel->SetPolygonMeshViscull (polymesh);
-    if (shadows)
-      objmodel->SetPolygonMeshShadows (polymesh);
+    for (i = 0 ; i < ids.GetSize () ; i++)
+      objmodel->SetTriangleData (ids[i], trimesh);
   }
-#undef CS_CLO
-#undef CS_CON
 
   return true;
 }
@@ -2030,9 +1980,8 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
               child, "Please use 'params' before specifying LOD!");
 	    return false;
 	  }
-	  csRef<iLODControl> lodctrl (SCF_QUERY_INTERFACE (
-	    	stemp->GetMeshObjectFactory (),
-		iLODControl));
+          csRef<iLODControl> lodctrl (scfQueryInterface<iLODControl> (
+	    	stemp->GetMeshObjectFactory ()));
 	  if (!lodctrl)
 	  {
             SyntaxService->ReportError (
@@ -2046,14 +1995,8 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
         break;
       case XMLTOKEN_KEY:
         {
-          iKeyValuePair* kvp = 0;
-          SyntaxService->ParseKey (child, kvp);
-	  if (kvp)
-          {
-            stemp->QueryObject()->ObjAdd (kvp->QueryObject ());
-	    kvp->DecRef ();
-          } else
-	    return false;
+          if (!ParseKey (child, stemp->QueryObject()))
+            return false;
         }
         break;
       case XMLTOKEN_ADDON:
@@ -2119,8 +2062,8 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	  csBox3 b;
 	  if (!SyntaxService->ParseBox (child, b))
 	    return false;
-	  csRef<iNullFactoryState> nullmesh = SCF_QUERY_INTERFACE (
-		fact, iNullFactoryState);
+          csRef<iNullFactoryState> nullmesh = 
+            scfQueryInterface<iNullFactoryState> (fact);
 	  nullmesh->SetBoundingBox (b);
 	}
         break;
@@ -2146,8 +2089,8 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	  }
 	  else
 	  {
-	    csRef<iMeshObjectFactory> mof2 (SCF_QUERY_INTERFACE (mof,
-	    	iMeshObjectFactory));
+	    csRef<iMeshObjectFactory> mof2 (
+	    	scfQueryInterface<iMeshObjectFactory> (mof));
 	    if (!mof2)
 	    {
               SyntaxService->ReportError (
@@ -2202,8 +2145,8 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	  }
 	  else
 	  {
-	    csRef<iMeshObjectFactory> mof2 (SCF_QUERY_INTERFACE (mof,
-	    	iMeshObjectFactory));
+	    csRef<iMeshObjectFactory> mof2 (
+	    	scfQueryInterface<iMeshObjectFactory> (mof));
 	    if (!mof2)
 	    {
               SyntaxService->ReportError (
@@ -2218,13 +2161,13 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
         }
         break;
 
-      case XMLTOKEN_POLYMESH:
+      case XMLTOKEN_TRIMESH:
         {
 	  if (!stemp->GetMeshObjectFactory ())
 	  {
             SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.meshfactory",
-              child, "Please use 'params' before specifying 'polymesh'!");
+              child, "Please use 'params' before specifying 'trimesh'!");
 	    return false;
 	  }
 	  iObjectModel* objmodel = stemp->GetMeshObjectFactory ()
@@ -2233,10 +2176,10 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	  {
             SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.meshfactory", child,
-	      "This factory doesn't support setting of other 'polymesh'!");
+	      "This factory doesn't support setting of other 'trimesh'!");
 	    return false;
 	  }
-	  if (!ParsePolyMesh (child, objmodel))
+	  if (!ParseTriMesh (child, objmodel))
 	  {
 	    // Error already reported.
 	    return false;
@@ -2256,15 +2199,14 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
         {
 	  iObjectModel* objmodel = stemp->GetMeshObjectFactory ()
 	  	->GetObjectModel ();
-          if (objmodel->GetPolygonMeshShadows ())
-            objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
-	      CS_POLYMESH_CLOSED | CS_POLYMESH_NOTCLOSED, CS_POLYMESH_CLOSED);
-          if (objmodel->GetPolygonMeshViscull ())
-            objmodel->GetPolygonMeshViscull ()->GetFlags ().Set (
-	      CS_POLYMESH_CLOSED | CS_POLYMESH_NOTCLOSED, CS_POLYMESH_CLOSED);
-          if (objmodel->GetPolygonMeshShadows ())
-            objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
-	      CS_POLYMESH_CLOSED | CS_POLYMESH_NOTCLOSED, CS_POLYMESH_CLOSED);
+	  csRef<iTriangleMeshIterator> it = objmodel->GetTriangleDataIterator ();
+	  while (it->HasNext ())
+	  {
+	    csStringID id;
+	    iTriangleMesh* trimesh = it->Next (id);
+	    if (trimesh) trimesh->GetFlags ().Set (
+	      CS_TRIMESH_CLOSED | CS_TRIMESH_NOTCLOSED, CS_TRIMESH_CLOSED);
+	  }
         }
         break;
       case XMLTOKEN_CONVEX:
@@ -2279,15 +2221,14 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
         {
 	  iObjectModel* objmodel = stemp->GetMeshObjectFactory ()
 	  	->GetObjectModel ();
-          if (objmodel->GetPolygonMeshShadows ())
-            objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
-	      CS_POLYMESH_CONVEX | CS_POLYMESH_NOTCONVEX, CS_POLYMESH_CONVEX);
-          if (objmodel->GetPolygonMeshViscull ())
-            objmodel->GetPolygonMeshViscull ()->GetFlags ().Set (
-	      CS_POLYMESH_CONVEX | CS_POLYMESH_NOTCONVEX, CS_POLYMESH_CONVEX);
-          if (objmodel->GetPolygonMeshShadows ())
-            objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
-	      CS_POLYMESH_CONVEX | CS_POLYMESH_NOTCONVEX, CS_POLYMESH_CONVEX);
+	  csRef<iTriangleMeshIterator> it = objmodel->GetTriangleDataIterator ();
+	  while (it->HasNext ())
+	  {
+	    csStringID id;
+	    iTriangleMesh* trimesh = it->Next (id);
+	    if (trimesh) trimesh->GetFlags ().Set (
+	      CS_TRIMESH_CONVEX | CS_TRIMESH_NOTCONVEX, CS_TRIMESH_CONVEX);
+	  }
         }
         break;
       case XMLTOKEN_MATERIAL:
@@ -2497,7 +2438,7 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	  //create a new variable
 	  csRef<csShaderVariable> var;
 	  var.AttachNew (new csShaderVariable);
-	  if (!SyntaxService->ParseShaderVar (child, *var))
+	  if (!SyntaxService->ParseShaderVar (ldr_context, child, *var))
 	  {
 	    break;
 	  }
@@ -2525,6 +2466,20 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
         break;
       case XMLTOKEN_DETAIL:
         stemp->GetFlags ().Set (CS_ENTITY_DETAIL, CS_ENTITY_DETAIL);
+        break;
+      case XMLTOKEN_IMPOSTER:
+        {
+          csRef<iImposter> imposter = scfQueryInterface<iImposter> (stemp);
+          if (!imposter)
+          {
+            SyntaxService->ReportError (
+	      "crystalspace.maploader.parse.meshfactory",
+	      node, "This factory doesn't implement impostering!");
+            return false;
+          }
+          if (!ParseImposterSettings (imposter, child))
+            return false;
+        }
         break;
       default:
 	SyntaxService->ReportBadToken (child);
@@ -2680,9 +2635,8 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
               child, "Mesh object is missing!");
 	  return false;
 	}
-	csRef<iLODControl> lodctrl (SCF_QUERY_INTERFACE (
-	    	mesh->GetMeshObject (),
-		iLODControl));
+        csRef<iLODControl> lodctrl (scfQueryInterface<iLODControl> (
+	    	mesh->GetMeshObject ()));
 	if (!lodctrl)
 	{
           SyntaxService->ReportError (
@@ -2773,17 +2727,13 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       else
         mesh->GetFlags ().Set (CS_ENTITY_DETAIL, CS_ENTITY_DETAIL);
       break;
-    case XMLTOKEN_IMPOSTER:
-      TEST_MISSING_MESH
-      if (!ParseImposterSettings (mesh, child))
-        return false;
-      break;
     case XMLTOKEN_ZFILL:
       TEST_MISSING_MESH
       if (priority.IsEmpty ()) priority = "wall";
       if (recursive)
       {
-        mesh->SetRenderPriorityRecursive (Engine->GetRenderPriority (priority));
+        mesh->SetRenderPriorityRecursive (
+		Engine->GetRenderPriority (priority));
         mesh->SetZBufModeRecursive (CS_ZBUF_FILL);
       }
       else
@@ -2860,11 +2810,11 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         //the meshes' hierarchy, starting from the 'mesh' mesh object.
         csRefArray<iMeshWrapper> meshesArray;
         CollectAllChildren (mesh, meshesArray);
-        size_t i, count = meshesArray.Length ();
+        size_t i, count = meshesArray.GetSize ();
         for (i = 0; i < count; i++)
         {
-          csRef<iVisibilityObject> visobj = SCF_QUERY_INTERFACE 
-            (meshesArray[i], iVisibilityObject);
+          csRef<iVisibilityObject> visobj = 
+            scfQueryInterface<iVisibilityObject> (meshesArray[i]);
           if (visobj)
             visobj->GetCullerFlags ().Set (CS_CULLER_HINT_BADOCCLUDER);
         }
@@ -2878,11 +2828,11 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         //the meshes' hierarchy, starting from the 'mesh' mesh object.
         csRefArray<iMeshWrapper> meshesArray;
         CollectAllChildren (mesh, meshesArray);
-        size_t i, count = meshesArray.Length ();
+        size_t i, count = meshesArray.GetSize ();
         for (i = 0; i < count; i++)
         {
-          csRef<iVisibilityObject> visobj = SCF_QUERY_INTERFACE 
-            (meshesArray[i], iVisibilityObject);
+          csRef<iVisibilityObject> visobj = 
+            scfQueryInterface<iVisibilityObject> (meshesArray[i]);
           if (visobj)
             visobj->GetCullerFlags ().Set (CS_CULLER_HINT_GOODOCCLUDER);
         }
@@ -2896,7 +2846,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         {
           csRefArray<iMeshWrapper> meshesArray;
           CollectAllChildren (mesh, meshesArray);
-          size_t i, count = meshesArray.Length ();
+          size_t i, count = meshesArray.GetSize ();
           for (i = 0; i < count; i++)
           {
             ClosedFlags (meshesArray[i]);
@@ -2914,7 +2864,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         {
           csRefArray<iMeshWrapper> meshesArray;
           CollectAllChildren (mesh, meshesArray);
-          size_t i, count = meshesArray.Length ();
+          size_t i, count = meshesArray.GetSize ();
           for (i = 0; i < count; i++)
           {
             ConvexFlags (meshesArray[i]);
@@ -2928,14 +2878,8 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       TEST_MISSING_MESH
       else
       {
-        iKeyValuePair* kvp = 0;
-        SyntaxService->ParseKey (child, kvp);
-	if (kvp)
-        {
-          mesh->QueryObject()->ObjAdd (kvp->QueryObject ());
-	  kvp->DecRef ();
-        } else
-	  return false;
+        if (!ParseKey (child, mesh->QueryObject()))
+          return false;
       }
       break;
     case XMLTOKEN_HARDMOVE:
@@ -3021,14 +2965,14 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       TEST_MISSING_MESH
       else
       {
-	csRef<iShaderVariableContext> svc = SCF_QUERY_INTERFACE (mesh,
-		iShaderVariableContext);
+	csRef<iShaderVariableContext> svc = 
+		scfQueryInterface<iShaderVariableContext> (mesh);
 	CS_ASSERT (svc.IsValid());
         //create a new variable
         const char* varname = child->GetAttributeValue ("name");
 	csRef<csShaderVariable> var;
 	var.AttachNew (new csShaderVariable (stringSet->Request (varname)));
-	if (!SyntaxService->ParseShaderVar (child, *var))
+	if (!SyntaxService->ParseShaderVar (ldr_context, child, *var))
         {
 	  SyntaxService->ReportError (
 	    "crystalspace.maploader.load.meshobject", child,
@@ -3098,8 +3042,8 @@ csRef<iMeshWrapper> csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_con
 	  {
 	    AddToRegion (ldr_context, mesh->QueryObject ());
 	    // Now also add the child mesh objects to the region.
-	    const csRefArray<iSceneNode>& children = mesh->QuerySceneNode ()->
-	    	GetChildren ();
+            const csRef<iSceneNodeArray> children = 
+              mesh->QuerySceneNode ()->GetChildrenArray ();
 	    AddChildrenToRegion (ldr_context, children);
 	  }
 	}
@@ -3125,7 +3069,7 @@ csRef<iMeshWrapper> csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_con
   {
     csRefArray<iMeshWrapper> meshesArray;
     CollectAllChildren (mesh, meshesArray);
-    size_t i, count = meshesArray.Length ();
+    size_t i, count = meshesArray.GetSize ();
     for (i = 0; i < count; i++)
     {
       iMeshWrapper* mesh = meshesArray[i];
@@ -3139,14 +3083,12 @@ csRef<iMeshWrapper> csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_con
   return mesh;
 }
 
-bool csLoader::LoadPolyMeshInSector (iLoaderContext* ldr_context,
+bool csLoader::LoadTriMeshInSector (iLoaderContext* ldr_context,
 	iMeshWrapper* mesh, iDocumentNode* node, iStreamSource* ssource)
 {
   iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
-  csRef<iPolygonMesh> polymesh;
-  bool colldet = false;
-  bool viscull = false;
-  bool shadows = false;
+  csRef<iTriangleMesh> trimesh;
+  csArray<csStringID> ids;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -3195,21 +3137,33 @@ bool csLoader::LoadPolyMeshInSector (iLoaderContext* ldr_context,
         break;
       }
       case XMLTOKEN_BOX:
-        if (!ParsePolyMeshChildBox (child, polymesh))
+        if (!ParseTriMeshChildBox (child, trimesh))
 	  return false;
         break;
       case XMLTOKEN_MESH:
-        if (!ParsePolyMeshChildMesh (child, polymesh))
+        if (!ParseTriMeshChildMesh (child, trimesh))
 	  return false;
         break;
       case XMLTOKEN_COLLDET:
-        colldet = true;
+	ReportWarning (
+	        "crystalspace.maploader.parse.trimesh",
+                child, "<colldet> is deprecated. Use <id>colldet</id> instead.");
+	ids.Push (stringSet->Request ("colldet"));
 	break;
       case XMLTOKEN_VISCULL:
-        viscull = true;
+	ReportWarning (
+	        "crystalspace.maploader.parse.trimesh",
+                child, "<viscull> is deprecated. Use <id>viscull</id> instead.");
+	ids.Push (stringSet->Request ("viscull"));
 	break;
       case XMLTOKEN_SHADOWS:
-        shadows = true;
+	ReportWarning (
+	        "crystalspace.maploader.parse.trimesh",
+                child, "<shadows> is deprecated. Use <id>shadows</id> instead.");
+	ids.Push (stringSet->Request ("shadows"));
+	break;
+      case XMLTOKEN_ID:
+	ids.Push (stringSet->Request (child->GetContentsValue ()));
 	break;
       default:
 	SyntaxService->ReportBadToken (child);
@@ -3217,36 +3171,32 @@ bool csLoader::LoadPolyMeshInSector (iLoaderContext* ldr_context,
     }
   }
 
-  if (!colldet && !viscull && !shadows)
+  if (ids.GetSize () == 0)
   {
     SyntaxService->ReportError (
-	"crystalspace.maploader.parse.polymesh",
-	node, "Please specify either <shadows/>, <viscull/> or <colldet/>!");
+	"crystalspace.maploader.parse.trimesh",
+	node, "No id's for this triangle mesh!");
     return false;
   }
-  if (!polymesh)
+  if (!trimesh)
   {
     SyntaxService->ReportError (
-	"crystalspace.maploader.parse.sector.polymesh",
+	"crystalspace.maploader.parse.sector.trimesh",
 	node, "Please specify either <mesh/> or <box/>!");
     return false;
   }
 
-  if (colldet)
-    objmodel->SetPolygonMeshColldet (polymesh);
-  if (viscull)
-    objmodel->SetPolygonMeshViscull (polymesh);
-  if (shadows)
-    objmodel->SetPolygonMeshShadows (polymesh);
+  size_t i;
+  for (i = 0 ; i < ids.GetSize () ; i++)
+    objmodel->SetTriangleData (ids[i], trimesh);
 
-  csRef<iNullMeshState> nullmesh = SCF_QUERY_INTERFACE (
-    	mesh->GetMeshObject (), iNullMeshState);
+  csRef<iNullMeshState> nullmesh = scfQueryInterface<iNullMeshState> (
+    	mesh->GetMeshObject ());
   CS_ASSERT (nullmesh != 0);
-  int i;
   csBox3 bbox;
-  csVector3* vt = polymesh->GetVertices ();
+  csVector3* vt = trimesh->GetVertices ();
   bbox.StartBoundingBox (vt[0]);
-  for (i = 1 ; i < polymesh->GetVertexCount () ; i++)
+  for (i = 1 ; i < trimesh->GetVertexCount () ; i++)
   {
     bbox.AddBoundingVertexSmart (vt[i]);
   }
@@ -3258,7 +3208,7 @@ bool csLoader::LoadPolyMeshInSector (iLoaderContext* ldr_context,
 bool csLoader::HandleMeshObjectPluginResult (iBase* mo, iDocumentNode* child,
 	iMeshWrapper* mesh, bool keepZbuf, bool keepPrio)
 {
-  csRef<iMeshObject> mo2 = SCF_QUERY_INTERFACE (mo, iMeshObject);
+  csRef<iMeshObject> mo2 = scfQueryInterface<iMeshObject> (mo);
   if (!mo2)
   {
     SyntaxService->ReportError (
@@ -3408,8 +3358,8 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	  csBox3 b;
 	  if (!SyntaxService->ParseBox (child, b))
 	    return false;
-	  csRef<iNullMeshState> nullmesh = SCF_QUERY_INTERFACE (
-		mo, iNullMeshState);
+          csRef<iNullMeshState> nullmesh = 
+            scfQueryInterface<iNullMeshState> (mo);
 	  if (nullmesh)
 	    nullmesh->SetBoundingBox (b);
 	}
@@ -3567,13 +3517,13 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	}
         break;
 
-      case XMLTOKEN_POLYMESH:
+      case XMLTOKEN_TRIMESH:
         {
 	  if (!mesh->GetMeshObject ())
 	  {
             SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.mesh",
-              child, "Please use 'params' before specifying 'polymesh'!");
+              child, "Please use 'params' before specifying 'trimesh'!");
 	    return false;
 	  }
 	  iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
@@ -3581,10 +3531,10 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	  {
             SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.mesh", child,
-	      "This mesh doesn't support setting of other 'polymesh'!");
+	      "This mesh doesn't support setting of other 'trimesh'!");
 	    return false;
 	  }
-	  if (!ParsePolyMesh (child, objmodel))
+	  if (!ParseTriMesh (child, objmodel))
 	  {
 	    // Error already reported.
 	    return false;
@@ -3640,16 +3590,9 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
   return true;
 }
 
-bool csLoader::ParseImposterSettings (iMeshWrapper* mesh, iDocumentNode *node)
+bool csLoader::ParseImposterSettings (iImposter* imposter,
+    iDocumentNode *node)
 {
-  csRef<iImposter> imposter = SCF_QUERY_INTERFACE (mesh, iImposter);
-  if (!imposter)
-  {
-    SyntaxService->ReportError (
-	    "crystalspace.maploader.parse.meshobject",
-	    node, "This mesh doesn't implement impostering!");
-    return false;
-  }
   const char *s = node->GetAttributeValue ("active");
   if (s && !strcmp (s, "no"))
     imposter->SetImposterActive (false);
@@ -3668,8 +3611,8 @@ bool csLoader::ParseImposterSettings (iMeshWrapper* mesh, iDocumentNode *node)
   imposter->SetMinDistance (var);
 
   s = node->GetAttributeValue ("tolerance");
-  iSharedVariable* var2 = Engine->GetVariableList ()->FindByName (s);
-  if (!var2)
+  var = Engine->GetVariableList ()->FindByName (s);
+  if (!var)
   {
     SyntaxService->ReportError (
 	    "crystalspace.maploader.parse.meshobject", node,
@@ -3677,17 +3620,25 @@ bool csLoader::ParseImposterSettings (iMeshWrapper* mesh, iDocumentNode *node)
 	    s);
     return false;
   }
-  imposter->SetRotationTolerance (var2);
-  char const* const name = mesh->QueryObject()->GetName ();
-  ReportWarning ("crystalspace.maploader.parse.meshobject", node, 
-    "Set mesh %s to imposter active=%s, range=%f, tolerance=%f", 
-    name ? name : "<noname>", imposter->GetImposterActive () ? "yes" : "no", 
-    var->Get (), var2->Get ());
+  imposter->SetRotationTolerance (var);
+
+  s = node->GetAttributeValue ("camera_tolerance");
+  var = Engine->GetVariableList ()->FindByName (s);
+  if (!var)
+  {
+    SyntaxService->ReportError (
+	    "crystalspace.maploader.parse.meshobject", node,
+	    "Imposter camera rotation tolerance variable (%s) doesn't exist!",
+	    s);
+    return false;
+  }
+  imposter->SetCameraRotationTolerance (var);
   return true;
 }
 
 bool csLoader::LoadMeshGenGeometry (iLoaderContext* ldr_context,
-                                    iDocumentNode* node, iMeshGenerator* meshgen)
+                                    iDocumentNode* node,
+				    iMeshGenerator* meshgen)
 {
   iMeshGeneratorGeometry* geom = meshgen->CreateGeometry ();
 
@@ -3740,8 +3691,8 @@ bool csLoader::LoadMeshGenGeometry (iLoaderContext* ldr_context,
         uint resx = child->GetAttributeValueAsInt ("resx");
         uint resy = child->GetAttributeValueAsInt ("resy");
         
-        csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-          object_reg, "crystalspace.shared.stringset", iStringSet);
+        csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+          object_reg, "crystalspace.shared.stringset");
 
         geom->AddPositionsFromMap (map, csBox2 (min.x, min.y, max.x, max.y), 
           resx, resy, value, strings->Request ("heights"));
@@ -3760,8 +3711,8 @@ bool csLoader::LoadMeshGenGeometry (iLoaderContext* ldr_context,
           return false;
         }
         float factor = child->GetAttributeValueAsFloat ("factor");
-        csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-        object_reg, "crystalspace.shared.stringset", iStringSet);
+        csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+        object_reg, "crystalspace.shared.stringset");
         geom->SetDensityMap (map_tf, factor, strings->Request ("densitymap"));
       }
       break;
@@ -4191,8 +4142,8 @@ bool csLoader::LoadSettings (iDocumentNode* node)
 	    csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
 	    	object_reg, "crystalspace.mesh.object.thing");
 	    if (!type) return false;
-	    csRef<iThingEnvironment> te = SCF_QUERY_INTERFACE (type,
-		iThingEnvironment);
+	    csRef<iThingEnvironment> te = 
+		scfQueryInterface<iThingEnvironment> (type);
 	    te->SetLightmapCellSize (cellsize);
 	  }
 	  else
@@ -4246,129 +4197,6 @@ bool csLoader::LoadSettings (iDocumentNode* node)
   }
 
   return true;
-}
-
-iCollection* csLoader::ParseCollection (iLoaderContext* ldr_context,
-	iDocumentNode* node)
-{
-  iCollection* collection = Engine->GetCollections ()->NewCollection (
-		  node->GetAttributeValue ("name"));
-  AddToRegion (ldr_context, collection->QueryObject ());
-
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  while (it->HasNext ())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-      case XMLTOKEN_ADDON:
-	SyntaxService->ReportError (
-		"crystalspace.maploader.parse.collection",
-         	child, "'addon' not yet supported in collection!");
-	return 0;
-      case XMLTOKEN_META:
-	SyntaxService->ReportError (
-		"crystalspace.maploader.parse.collection",
-         	child, "'addon' not yet supported in collection!");
-	return 0;
-      case XMLTOKEN_KEY:
-	{
-          iKeyValuePair* kvp = 0;
-          SyntaxService->ParseKey (child, kvp);
-          if (kvp)
-          {
-            collection->QueryObject ()->ObjAdd (kvp->QueryObject ());
-	    kvp->DecRef ();
-          } else
-	    return 0;
-	}
-        break;
-      case XMLTOKEN_MESHOBJ:
-#if 0
-	SyntaxService->ReportError (
-		"crystalspace.maploader.parse.collection",
-         	child, "'meshobj' not yet supported in collection!");
-#endif
-        break;
-      case XMLTOKEN_LIGHT:
-        {
-	  const char* lightname = child->GetContentsValue ();
-	  iLight* l = 0;
-	  iSectorList* sl = Engine->GetSectors ();
-	  int i;
-	  for (i = 0 ; i < sl->GetCount () ; i++)
-	  {
-	    iSector* sect = sl->Get (i);
-	    if ((!ldr_context->GetRegion ()) ||
-	    	(!ldr_context->CurrentRegionOnly ()) ||
-	        ldr_context->GetRegion ()->IsInRegion (sect->QueryObject ()))
-	    {
-	      l = sect->GetLights ()->FindByName (lightname);
-	      if (l) break;
-	    }
-	  }
-          if (!l)
-	  {
-	    SyntaxService->ReportError (
-		"crystalspace.maploader.parse.collection",
-            	child, "Light '%s' not found!", lightname);
-	    return 0;
-	  }
-	  else
-	  {
-	    collection->AddObject (l->QueryObject ());
-	  }
-        }
-        break;
-      case XMLTOKEN_SECTOR:
-        {
-	  const char* sectname = child->GetContentsValue ();
-	  iSector* s = ldr_context->FindSector (sectname);
-          if (!s)
-	  {
-	    SyntaxService->ReportError (
-		"crystalspace.maploader.parse.collection",
-            	child, "Sector '%s' not found!", sectname);
-	    return 0;
-	  }
-	  else
-	  {
-            collection->AddObject (s->QueryObject ());
-	  }
-        }
-        break;
-      case XMLTOKEN_COLLECTION:
-        {
-	  const char* colname = child->GetContentsValue ();
-	  iCollection* th;
-	  if (ldr_context->GetRegion () && ldr_context->CurrentRegionOnly ())
-	    th = ldr_context->GetRegion ()->FindCollection (colname);
-	  else
-            th = Engine->GetCollections ()->FindByName (colname);
-          if (!th)
-	  {
-	    SyntaxService->ReportError (
-		"crystalspace.maploader.parse.collection",
-            	child, "Collection '%s' not found!", colname);
-	    return 0;
-	  }
-	  else
-	  {
-            collection->AddObject (th->QueryObject());
-	  }
-        }
-        break;
-      default:
-	SyntaxService->ReportBadToken (child);
-	collection->DecRef ();
-	return 0;
-    }
-  }
-
-  return collection;
 }
 
 bool csLoader::ParseStart (iDocumentNode* node, iCameraPosition* campos)
@@ -4535,16 +4363,8 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 	}
         break;
       case XMLTOKEN_KEY:
-	{
-          iKeyValuePair* kvp = 0;
-          SyntaxService->ParseKey (child, kvp);
-          if (kvp)
-          {
-            Keys.ObjAdd (kvp->QueryObject ());
-	    kvp->DecRef ();
-          } else
-	    return 0;
-	}
+        if (!ParseKey (child, &Keys))
+          return false;
         break;
       case XMLTOKEN_HALO:
 	{
@@ -4783,7 +4603,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 	  const char* varname = child->GetAttributeValue ("name");
 	  csRef<csShaderVariable> var;
 	  var.AttachNew (new csShaderVariable (stringSet->Request (varname)));
-	  if (!SyntaxService->ParseShaderVar (child, *var))
+	  if (!SyntaxService->ParseShaderVar (ldr_context, child, *var))
 	  {
 	    SyntaxService->ReportError (
 	      "crystalspace.maploader.load.meshobject", child,
@@ -4815,7 +4635,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
   l->SetType (type);
   l->SetSpotLightFalloff (spotfalloffInner, spotfalloffOuter);
 
-  for (size_t i = 0; i < shader_variables.Length(); i++)
+  for (size_t i = 0; i < shader_variables.GetSize (); i++)
   {
      l->GetSVContext()->AddVariable(shader_variables[i]);
   }
@@ -4919,16 +4739,8 @@ iMapNode* csLoader::ParseNode (iDocumentNode* node, iSector* sec)
         	child, "'meta' not yet supported in node!");
 	return 0;
       case XMLTOKEN_KEY:
-        {
-          iKeyValuePair* kvp = 0;
-          SyntaxService->ParseKey (child, kvp);
-          if (kvp)
-          {
-            pNode->QueryObject ()->ObjAdd (kvp->QueryObject ());
-	    kvp->DecRef ();
-          } else
-	    return 0;
-	}
+        if (!ParseKey (child, pNode->QueryObject()))
+          return false;
         break;
       case XMLTOKEN_POSITION:
 	if (!SyntaxService->ParseVector (child, pos))
@@ -5001,15 +4813,10 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
   iSector* destSector = 0;
   csPoly3D poly;
 
-  csMatrix3 m_w; m_w.Identity ();
-  csVector3 v_w_before (0, 0, 0);
-  csVector3 v_w_after (0, 0, 0);
-  uint32 flags = 0;
-  bool do_warp = false;
-  bool do_mirror = false;
-  int msv = -1;
+  CS::Utility::PortalParameters params;
+  csRef<csRefCount> parseState;
   scfString destSectorName;
-  bool autoresolve = true;
+  params.destSector = &destSectorName;
 
   // Array of keys we need to parse later.
   csRefArray<iDocumentNode> key_nodes;
@@ -5021,8 +4828,7 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
     if (child->GetType () != CS_NODE_ELEMENT) continue;
     bool handled;
     if (!SyntaxService->HandlePortalParameter (child, ldr_context,
-        flags, do_mirror, do_warp, msv, m_w, v_w_before, v_w_after,
-	&destSectorName, handled, autoresolve))
+        parseState, params, handled))
     {
       return false;
     }
@@ -5053,7 +4859,7 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
   iPortal* portal;
   // If autoresolve is true we clear the sector since we want the callback
   // to be used.
-  if (autoresolve)
+  if (params.autoresolve)
     destSector = 0;
   else
     destSector = ldr_context->FindSector (destSectorName.GetData ());
@@ -5061,8 +4867,8 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
   if (container_mesh)
   {
     mesh = container_mesh;
-    csRef<iPortalContainer> pc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-    	iPortalContainer);
+    csRef<iPortalContainer> pc = 
+    	scfQueryInterface<iPortalContainer> (mesh->GetMeshObject ());
     CS_ASSERT (pc != 0);
     portal = pc->CreatePortal (poly.GetVertices (), (int)poly.GetVertexCount ());
     portal->SetSector (destSector);
@@ -5094,35 +4900,29 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
     // portal is first used.
     csRef<csMissingSectorCallback> missing_cb;
     missing_cb.AttachNew (new csMissingSectorCallback (
-      ldr_context, destSectorName.GetData (), autoresolve));
+      ldr_context, destSectorName.GetData (), params.autoresolve));
     portal->SetMissingSectorCallback (missing_cb);
   }
 
-  portal->GetFlags ().Set (flags);
-  if (do_mirror)
+  portal->GetFlags ().Set (params.flags);
+  if (params.mirror)
   {
     csPlane3 p = poly.ComputePlane ();
     portal->SetWarp (csTransform::GetReflect (p));
   }
-  else if (do_warp)
+  else if (params.warp)
   {
-    portal->SetWarp (m_w, v_w_before, v_w_after);
+    portal->SetWarp (params.m, params.before, params.after);
   }
-  if (msv != -1)
+  if (params.msv != -1)
   {
-    portal->SetMaximumSectorVisit (msv);
+    portal->SetMaximumSectorVisit (params.msv);
   }
 
   size_t i;
-  for (i = 0 ; i < key_nodes.Length () ; i++)
+  for (i = 0 ; i < key_nodes.GetSize () ; i++)
   {
-    iKeyValuePair* kvp = 0;
-    SyntaxService->ParseKey (key_nodes[i], kvp);
-    if (kvp)
-    {
-      container_mesh->QueryObject()->ObjAdd (kvp->QueryObject ());
-      kvp->DecRef ();
-    } else
+    if (!ParseKey (key_nodes[i], container_mesh->QueryObject()))
       return false;
   }
 
@@ -5300,20 +5100,20 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	  Engine->AddMeshAndChildren (mesh);
         }
         break;
-      case XMLTOKEN_POLYMESH:
+      case XMLTOKEN_TRIMESH:
         {
 	  const char* meshname = child->GetAttributeValue ("name");
 	  if (!meshname)
 	  {
       	    SyntaxService->ReportError (
-	      	"crystalspace.maploader.load.polymesh",
-		child, "'polymesh' requires a name in sector '%s'!",
+	      	"crystalspace.maploader.load.trimesh",
+		child, "'trimesh' requires a name in sector '%s'!",
 		secname ? secname : "<noname>");
 	    return 0;
 	  }
 	  csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (
 	  	"crystalspace.mesh.object.null", meshname);
-          if (!LoadPolyMeshInSector (ldr_context, mesh, child, ssource))
+          if (!LoadTriMeshInSector (ldr_context, mesh, child, ssource))
 	  {
 	    // Error is already reported.
 	    return 0;
@@ -5430,17 +5230,8 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
         }
         break;
       case XMLTOKEN_KEY:
-        {
-          iKeyValuePair* kvp = 0;
-          SyntaxService->ParseKey (child, kvp);
-	  if (kvp)
-          {
-            sector->QueryObject()->ObjAdd (kvp->QueryObject ());
-	    kvp->DecRef ();
-          }
-	  else
-	    return 0;
-        }
+        if (!ParseKey (child, sector->QueryObject()))
+          return 0;
         break;
       default:
 	SyntaxService->ReportBadToken (child);
@@ -5550,11 +5341,52 @@ bool csLoader::ParseSharedVariable (iLoaderContext* ldr_context,
 //========================================================================
 //========================================================================
 
+bool csLoader::LoadShaderExpressions (iLoaderContext* ldr_context,
+	iDocumentNode* node)
+{
+  csRef<iShaderManager> shaderMgr (
+    csQueryRegistry<iShaderManager> (csLoader::object_reg));
+
+  if(!shaderMgr)
+  {
+    ReportNotify ("iShaderManager not found, ignoring shader expressions!");
+    return true;
+  }
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_SHADEREXPRESSION:
+      {
+	csRef<iShaderVariableAccessor> ac = SyntaxService->
+		ParseShaderVarExpr (child);
+        if (!ac) return false;
+	const char* name = child->GetAttributeValue ("name");
+	csRef<iObject> obj = scfQueryInterface<iObject> (ac);
+	if (obj)
+	{
+	  obj->SetName (name);
+	  AddToRegion (ldr_context, obj);
+	}
+	shaderMgr->RegisterShaderVariableAccessor (name, ac);
+      }
+      break;
+    }
+  }
+  return true;
+}
+
 bool csLoader::ParseShaderList (iLoaderContext* ldr_context,
 	iDocumentNode* node)
 {
   csRef<iShaderManager> shaderMgr (
-    CS_QUERY_REGISTRY (csLoader::object_reg, iShaderManager));
+    csQueryRegistry<iShaderManager> (csLoader::object_reg));
 
   if(!shaderMgr)
   {
@@ -5581,7 +5413,7 @@ bool csLoader::ParseShaderList (iLoaderContext* ldr_context,
   return true;
 }
 
-bool csLoader::LoadShader (const char* filename)
+csRef<iShader> csLoader::LoadShader (const char* filename, bool registerShader)
 {
   csRef<iShaderManager> shaderMgr = csQueryRegistry<iShaderManager> (
   	object_reg);
@@ -5594,7 +5426,7 @@ bool csLoader::LoadShader (const char* filename)
   {
     ReportError ("crystalspace.maploader",
 	"Unable to open shader file '%s'!", filename);
-    return false;
+    return 0;
   }
 
   csRef<iDocumentSystem> docsys = csQueryRegistry<iDocumentSystem> (
@@ -5609,14 +5441,14 @@ bool csLoader::LoadShader (const char* filename)
     ReportError ("crystalspace.maploader",
 	"Could not parse shader file '%s': %s",
 	filename, err);
-    return false;
+    return 0;
   }
   csRef<iDocumentNode> shaderNode = shaderDoc->GetRoot ()->GetNode ("shader");
   if (!shaderNode)
   {
     ReportError ("crystalspace.maploader",
         "Shader file '%s' is not a valid shader XML file!", filename);
-    return false;
+    return 0;
   }
 
   dirChanger.ChangeTo (filename);
@@ -5627,16 +5459,21 @@ bool csLoader::LoadShader (const char* filename)
   if (type == 0)
     type = "xmlshader";
   csRef<iShaderCompiler> shcom = shaderMgr->GetCompiler (type);
-  csRef<iShader> shader = shcom->CompileShader (shaderNode);
+
+  csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
+	new StdLoaderContext (Engine, 0, true, this, false, 0));
+
+  csRef<iShader> shader = shcom->CompileShader (ldr_context, shaderNode);
   if (shader)
   {
     shader->SetFileName (filename);
-    shaderMgr->RegisterShader (shader);
-    return true;
+    if (registerShader)
+      shaderMgr->RegisterShader (shader);
+    return shader;
   }
   else 
   {
-    return false;
+    return 0;
   }
 }
 
@@ -5664,7 +5501,7 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
   csRef<iDocumentNode> fileChild = node->GetNode ("file");
 
   csRef<iVFS> vfs;
-  vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
+  vfs = csQueryRegistry<iVFS> (object_reg);
   csVfsDirectoryChanger dirChanger (vfs);
 
   if (fileChild)
@@ -5680,7 +5517,7 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
     }
 
     csRef<iDocumentSystem> docsys =
-      CS_QUERY_REGISTRY(object_reg, iDocumentSystem);
+      csQueryRegistry<iDocumentSystem> (object_reg);
     if (docsys == 0)
       docsys.AttachNew (new csTinyDocumentSystem ());
     csRef<iDocument> shaderDoc = docsys->CreateDocument ();
@@ -5738,7 +5575,7 @@ bool csLoader::ParseShader (iLoaderContext* ldr_context,
       "Could not get shader compiler '%s'", type);
     return false;
   }
-  csRef<iShader> shader = shcom->CompileShader (shaderNode);
+  csRef<iShader> shader = shcom->CompileShader (ldr_context, shaderNode);
   if (shader)
   {
     shader->SetFileName(fileChild->GetContentsValue ());
@@ -5756,15 +5593,15 @@ void csLoader::CollectAllChildren (iMeshWrapper* meshWrapper,
   size_t lastMeshVisited = 0;
   meshesArray.Push (meshWrapper);
     
-  while (lastMeshVisited < meshesArray.Length ())
+  while (lastMeshVisited < meshesArray.GetSize ())
   {
     // Get the children of the current mesh (ie 'mesh').
-    const csRefArray<iSceneNode>& ml = meshesArray[lastMeshVisited++]
-    	->QuerySceneNode ()->GetChildren ();
+    const csRef<iSceneNodeArray> ml = 
+      meshesArray[lastMeshVisited++]->QuerySceneNode ()->GetChildrenArray ();
     size_t i;
-    for (i = 0; i < ml.Length (); i++)
+    for (i = 0; i < ml->GetSize(); i++)
     {
-      iMeshWrapper* m = ml[i]->QueryMesh ();
+      iMeshWrapper* m = ml->Get(i)->QueryMesh ();
       if (m)
         meshesArray.Push (m);
     }
@@ -5776,27 +5613,38 @@ void csLoader::CollectAllChildren (iMeshWrapper* meshWrapper,
 void csLoader::ClosedFlags (iMeshWrapper* mesh)
 {
   iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
-  if (objmodel->GetPolygonMeshShadows ())
-    objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
-    CS_POLYMESH_CLOSED | CS_POLYMESH_NOTCLOSED, CS_POLYMESH_CLOSED);
-  if (objmodel->GetPolygonMeshViscull ())
-    objmodel->GetPolygonMeshViscull ()->GetFlags ().Set (
-    CS_POLYMESH_CLOSED | CS_POLYMESH_NOTCLOSED, CS_POLYMESH_CLOSED);
-  if (objmodel->GetPolygonMeshShadows ())
-    objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
-    CS_POLYMESH_CLOSED | CS_POLYMESH_NOTCLOSED, CS_POLYMESH_CLOSED);
+  csRef<iTriangleMeshIterator> it = objmodel->GetTriangleDataIterator ();
+  while (it->HasNext ())
+  {
+    csStringID id;
+    iTriangleMesh* trimesh = it->Next (id);
+    if (trimesh) trimesh->GetFlags ().Set (
+      CS_TRIMESH_CLOSED | CS_TRIMESH_NOTCLOSED, CS_TRIMESH_CLOSED);
+  }
 }
 
 void csLoader::ConvexFlags (iMeshWrapper* mesh)
 {
   iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
-  if (objmodel->GetPolygonMeshShadows ())
-    objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
-    CS_POLYMESH_CONVEX | CS_POLYMESH_NOTCONVEX, CS_POLYMESH_CONVEX);
-  if (objmodel->GetPolygonMeshViscull ())
-    objmodel->GetPolygonMeshViscull ()->GetFlags ().Set (
-    CS_POLYMESH_CONVEX | CS_POLYMESH_NOTCONVEX, CS_POLYMESH_CONVEX);
-  if (objmodel->GetPolygonMeshShadows ())
-    objmodel->GetPolygonMeshShadows ()->GetFlags ().Set (
-    CS_POLYMESH_CONVEX | CS_POLYMESH_NOTCONVEX, CS_POLYMESH_CONVEX);
+  csRef<iTriangleMeshIterator> it = objmodel->GetTriangleDataIterator ();
+  while (it->HasNext ())
+  {
+    csStringID id;
+    iTriangleMesh* trimesh = it->Next (id);
+    if (trimesh) trimesh->GetFlags ().Set (
+      CS_TRIMESH_CONVEX | CS_TRIMESH_NOTCONVEX, CS_TRIMESH_CONVEX);
+  }
+}
+
+bool csLoader::ParseKey (iDocumentNode* node, iObject* obj)
+{
+  csRef<iKeyValuePair> kvp = SyntaxService->ParseKey (node);
+  if (!kvp.IsValid())
+    return false;
+
+  bool editoronly = node->GetAttributeValueAsBool ("editoronly");
+  if (!editoronly || !Engine || Engine->GetSaveableFlag())
+    obj->ObjAdd (kvp->QueryObject ());
+
+  return true;
 }

@@ -51,7 +51,7 @@ public:
 
   virtual bool HasNext ()
   {
-    return idx < messages.Length ();
+    return idx < messages.GetSize ();
   }
 
   virtual void Next ()
@@ -78,15 +78,46 @@ public:
 //-----------------------------------------------------------------------
 
 csReporter::csReporter (iBase *iParent) :
-  scfImplementationType(this, iParent)
+  scfImplementationType(this, iParent), inReporting (false)
 {
   object_reg = 0;
-  mutex = csMutex::Create (true);
 }
 
 csReporter::~csReporter ()
 {
   Clear (-1);
+}
+
+void csReporter::ActualReport (const csRefArray<iReporterListener>& listeners,
+                               int severity, const char* msgId, 
+                               const char* buf)
+{
+  bool add_msg = true;
+  size_t i;
+  for (i = 0 ; i < listeners.GetSize () ; i++)
+  {
+    iReporterListener* listener = listeners[i];
+    if (listener->Report (this, severity, msgId, buf))
+    {
+      add_msg = false;
+      break;
+    }
+  }
+
+  if (add_msg)
+  {
+    csReporterMessage* msg = new csReporterMessage ();
+    msg->severity = severity;
+    msg->id = csStrNew (msgId);
+    msg->description = csStrNew (buf);
+    CS::Threading::RecursiveMutexScopedLock lock (mutex);
+    messages.Push (msg);
+    if (listeners.GetSize () == 0 && (severity == CS_REPORTER_SEVERITY_ERROR
+    	|| severity == CS_REPORTER_SEVERITY_BUG))
+    {
+      csPrintf ("%s\n", buf);
+    }
+  }
 }
 
 bool csReporter::Initialize (iObjectRegistry *object_reg)
@@ -110,53 +141,49 @@ void csReporter::ReportV (int severity, const char* msgId,
   csStringFast<768> buf;
   buf.FormatV (description, arg);
 
+  if (inReporting)
+  {
+    ReportedMessage msg;
+    msg.buf = buf;
+    msg.msgID = msgId;
+    msg.severity = severity;
+    messageQueue.Push (msg);
+    return;
+  }
+  inReporting = true;
+
   // To ensure thread-safety we first copy the listeners.
   csRefArray<iReporterListener> copy;
   {
-    csScopedMutexLock lock (mutex);
+    CS::Threading::RecursiveMutexScopedLock lock (mutex);
     size_t i;
-    for (i = 0 ; i < listeners.Length () ; i++)
+    for (i = 0 ; i < listeners.GetSize () ; i++)
     {
       iReporterListener* listener = listeners[i];
       copy.Push (listener);
     }
   }
 
-  bool add_msg = true;
-  size_t i;
-  for (i = 0 ; i < copy.Length () ; i++)
-  {
-    iReporterListener* listener = copy[i];
-    if (listener->Report (this, severity, msgId, buf))
-    {
-      add_msg = false;
-      break;
-    }
-  }
+  ActualReport (copy, severity, msgId, buf);
 
-  if (add_msg)
+  size_t n = 0;
+  while (n < messageQueue.GetSize())
   {
-    csReporterMessage* msg = new csReporterMessage ();
-    msg->severity = severity;
-    msg->id = csStrNew (msgId);
-    msg->description = csStrNew (buf);
-    csScopedMutexLock lock (mutex);
-    messages.Push (msg);
-    if (listeners.Length () == 0 && (severity == CS_REPORTER_SEVERITY_ERROR
-    	|| severity == CS_REPORTER_SEVERITY_BUG))
-    {
-      csPrintfV (description, arg);
-      csPrintf ("\n");
-    }
+    const ReportedMessage& msg = messageQueue[n];
+    ActualReport (copy, msg.severity, msg.msgID, msg.buf);
+    n++;
   }
+  messageQueue.DeleteAll();
+
+  inReporting = false;
 }
 
 void csReporter::Clear (int severity)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   size_t i = 0;
-  size_t len = messages.Length ();
+  size_t len = messages.GetSize ();
   while (i < len)
   {
     csReporterMessage* msg = messages[i];
@@ -174,9 +201,9 @@ void csReporter::Clear (int severity)
 
 void csReporter::Clear (const char* mask)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   size_t i = 0;
-  size_t len = messages.Length ();
+  size_t len = messages.GetSize ();
   while (i < len)
   {
     csReporterMessage* msg = messages[i];
@@ -194,10 +221,10 @@ void csReporter::Clear (const char* mask)
 
 csPtr<iReporterIterator> csReporter::GetMessageIterator ()
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   csReporterIterator* it = new csReporterIterator ();
   size_t i;
-  for (i = 0 ; i < messages.Length () ; i++)
+  for (i = 0 ; i < messages.GetSize () ; i++)
   {
     csReporterMessage* msg = new csReporterMessage ();
     msg->severity = messages[i]->severity;
@@ -210,13 +237,13 @@ csPtr<iReporterIterator> csReporter::GetMessageIterator ()
 
 void csReporter::AddReporterListener (iReporterListener* listener)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   listeners.Push (listener);
 }
 
 void csReporter::RemoveReporterListener (iReporterListener* listener)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   size_t idx = listeners.Find (listener);
   if (idx != csArrayItemNotFound)
   {
@@ -226,7 +253,7 @@ void csReporter::RemoveReporterListener (iReporterListener* listener)
 
 bool csReporter::FindReporterListener (iReporterListener* listener)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   size_t idx = listeners.Find (listener);
   return idx != csArrayItemNotFound;
 }

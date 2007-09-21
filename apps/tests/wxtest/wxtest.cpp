@@ -31,6 +31,7 @@
 #include "csutil/cscolor.h"
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
+#include "cstool/genmeshbuilder.h"
 #include "wxtest.h"
 #include "iutil/eventq.h"
 #include "iutil/event.h"
@@ -45,7 +46,6 @@
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "iengine/material.h"
-#include "imesh/thing.h"
 #include "imesh/object.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
@@ -195,7 +195,7 @@ bool Simple::HandleEvent (iEvent& ev)
     if((ev.Name == KeyboardDown) &&
        (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
     {
-      csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+      csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
       if (q) q->GetEventOutlet()->Broadcast (csevQuit(object_reg));
       return true;
     }
@@ -269,7 +269,7 @@ bool Simple::Initialize ()
   }
 
   // The virtual clock.
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
   if (vc == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -279,7 +279,7 @@ bool Simple::Initialize ()
   }
 
   // Find the pointer to engine plugin
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = csQueryRegistry<iEngine> (object_reg);
   if (engine == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -288,7 +288,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  loader = csQueryRegistry<iLoader> (object_reg);
   if (loader == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -297,7 +297,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
   if (g3d == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -306,7 +306,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  kbd = csQueryRegistry<iKeyboardDriver> (object_reg);
   if (kbd == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -321,7 +321,7 @@ bool Simple::Initialize ()
   panel->Show(true);
 
   iGraphics2D* g2d = g3d->GetDriver2D();
-  csRef<iWxWindow> wxwin = SCF_QUERY_INTERFACE(g2d, iWxWindow);
+  csRef<iWxWindow> wxwin = scfQueryInterface<iWxWindow> (g2d);
   if( !wxwin )
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -360,14 +360,23 @@ bool Simple::Initialize ()
   rotY = rotX = 0;
 
   room = engine->CreateSector ("room");
-  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iMeshObject> walls_object = walls->GetMeshObject ();
-  csRef<iMeshObjectFactory> walls_factory = walls_object->GetFactory();
-  csRef<iThingFactoryState> walls_state =
-    scfQueryInterface<iThingFactoryState> (walls_factory);
-  walls_state->AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
-  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
-  walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
+
+  // First we make a primitive for our geometry.
+  using namespace CS::Geometry;
+  DensityTextureMapper mapper (0.3f);
+  TesselatedBox box (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
+  box.SetLevel (3);
+  box.SetMapper (&mapper);
+  box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+
+  // Now we make a factory and a mesh at once.
+  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
+      engine, room, "walls", "walls_factory", &box);
+
+  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
+    iGeneralMeshState> (walls->GetMeshObject ());
+  mesh_state->SetShadowReceiving (true);
+  walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
   csRef<iLight> light;
   iLightList* ll = room->GetLights ();
@@ -397,10 +406,10 @@ bool Simple::Initialize ()
 
 void Simple::PushFrame ()
 {
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
   if (!q)
     return ;
-  csRef<iVirtualClock> vc (CS_QUERY_REGISTRY(object_reg, iVirtualClock));
+  csRef<iVirtualClock> vc (csQueryRegistry<iVirtualClock> (object_reg));
 
   if (vc)
     vc->Advance();

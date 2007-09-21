@@ -54,14 +54,14 @@ const csVector2 *csSprite2DUVAnimationFrame::GetUVCoo ()
 
 int csSprite2DUVAnimationFrame::GetUVCount ()
 {
-  return (int)vCoo.Length ();
+  return (int)vCoo.GetSize ();
 }
 
 void csSprite2DUVAnimationFrame::SetUV (int idx, float u, float v)
 {
   csVector2 uv (u, v);
 
-  if (idx == -1 || (size_t)idx >= vCoo.Length ())
+  if (idx == -1 || (size_t)idx >= vCoo.GetSize ())
     vCoo.Push (uv);
   else
     vCoo[MAX (0, idx)] = uv;
@@ -72,7 +72,7 @@ void csSprite2DUVAnimationFrame::SetFrameData (const char *name,
 {
   SetName (name);
   SetDuration (duration);
-  vCoo.SetLength (num);
+  vCoo.SetSize (num);
   memcpy (vCoo.GetArray (), uv, 2*num*sizeof(float));
 }
 
@@ -113,7 +113,7 @@ const char *csSprite2DUVAnimation::GetName () const
 
 int csSprite2DUVAnimation::GetFrameCount ()
 {
-  return (int)vFrames.Length ();
+  return (int)vFrames.GetSize ();
 }
 
 iSprite2DUVAnimationFrame *csSprite2DUVAnimation::GetFrame (int idx)
@@ -133,7 +133,7 @@ iSprite2DUVAnimationFrame *csSprite2DUVAnimation::GetFrame (const char *name)
 iSprite2DUVAnimationFrame *csSprite2DUVAnimation::CreateFrame (int idx)
 {
   csSprite2DUVAnimationFrame *p = new csSprite2DUVAnimationFrame (this);
-  if (idx == -1 || (size_t)idx >= vFrames.Length ())
+  if (idx == -1 || (size_t)idx >= vFrames.GetSize ())
     vFrames.Push (p);
   else
     vFrames.Insert (MAX (0, idx), p);
@@ -143,7 +143,7 @@ iSprite2DUVAnimationFrame *csSprite2DUVAnimation::CreateFrame (int idx)
 void csSprite2DUVAnimation::MoveFrame (int frame, int idx)
 {
   csSprite2DUVAnimationFrame* p = vFrames.Get (frame);
-  if (idx == -1 || (size_t)idx >= vFrames.Length ())
+  if (idx == -1 || (size_t)idx >= vFrames.GetSize ())
     vFrames.Push (p);
   else
     vFrames.Insert (MAX (0, idx), p);

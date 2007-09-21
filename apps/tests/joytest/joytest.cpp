@@ -20,6 +20,7 @@
 
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
+#include "cstool/genmeshbuilder.h"
 #include "csutil/cmdhelp.h"
 #include "csutil/cscolor.h"
 #include "csutil/event.h"
@@ -36,7 +37,6 @@
 #include "imap/loader.h"
 #include "imesh/object.h"
 #include "imesh/sprite3d.h"
-#include "imesh/thing.h"
 #include "iutil/csinput.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
@@ -106,7 +106,7 @@ void Simple::SetupFrame ()
 				   ((joy->GetLast (0,1)) / 32767.0) * speed);
     if (joy->GetLastButton (0,3))
     {
-      csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+      csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
       if (q) q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
     }
   }
@@ -140,7 +140,7 @@ bool Simple::HandleEvent (iEvent& ev)
   else if ((ev.Name == KeyboardDown) &&
 	   (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
     if (q) q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
     return true;
   }
@@ -167,6 +167,7 @@ bool Simple::Initialize ()
 	CS_REQUEST_LEVELLOADER,
 	CS_REQUEST_REPORTER,
 	CS_REQUEST_REPORTERLISTENER,
+	CS_REQUEST_JOYSTICK,
 	CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -200,13 +201,14 @@ bool Simple::Initialize ()
     return false;
   }
 
+  /// @@@ (ge) This is a redundant way to load a joystick.
   // Attempt to load a joystick plugin.
-  csRef<iStringArray> joystickClasses =
+  /*csRef<iStringArray> joystickClasses =
     iSCF::SCF->QueryClassList ("crystalspace.device.joystick.");
   if (joystickClasses.IsValid())
   {
-    csRef<iPluginManager> plugmgr = CS_QUERY_REGISTRY (object_reg,
-      iPluginManager);
+    csRef<iPluginManager> plugmgr = 
+      csQueryRegistry<iPluginManager> (object_reg);
     for (size_t i = 0; i < joystickClasses->Length (); i++)
     {
       const char* className = joystickClasses->Get (i);
@@ -217,10 +219,10 @@ bool Simple::Initialize ()
 	className, (b != 0) ? "successful" : "failed");
       if (b != 0) b->DecRef ();
     }
-  }
+  }*/
 
   // The virtual clock.
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
   if (vc == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -230,7 +232,7 @@ bool Simple::Initialize ()
   }
 
   // Find the pointer to engine plugin
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = csQueryRegistry<iEngine> (object_reg);
   if (engine == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -239,7 +241,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  loader = csQueryRegistry<iLoader> (object_reg);
   if (loader == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -248,7 +250,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
   if (g3d == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -257,7 +259,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  kbd = csQueryRegistry<iKeyboardDriver> (object_reg);
   if (kbd == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -265,7 +267,7 @@ bool Simple::Initialize ()
     	"No iKeyboardDriver plugin!");
     return false;
   }
-  joy= CS_QUERY_REGISTRY (object_reg,iJoystickDriver);
+  joy= csQueryRegistry<iJoystickDriver> (object_reg);
   if (joy==0)
   {
     csReport (object_reg,CS_REPORTER_SEVERITY_ERROR,
@@ -297,12 +299,23 @@ bool Simple::Initialize ()
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   room = engine->CreateSector ("room");
-  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingFactoryState> walls_state =
-    scfQueryInterface<iThingFactoryState> (walls->GetMeshObject ()->GetFactory());
-  walls_state->AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
-  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
-  walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
+
+  // First we make a primitive for our geometry.
+  using namespace CS::Geometry;
+  DensityTextureMapper mapper (0.3f);
+  TesselatedBox box (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
+  box.SetLevel (3);
+  box.SetMapper (&mapper);
+  box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+
+  // Now we make a factory and a mesh at once.
+  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
+      engine, room, "walls", "walls_factory", &box);
+
+  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
+    iGeneralMeshState> (walls->GetMeshObject ());
+  mesh_state->SetShadowReceiving (true);
+  walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
   csRef<iLight> light;
   iLightList* ll = room->GetLights ();
@@ -359,7 +372,7 @@ bool Simple::Initialize ()
   sprite->GetMovable ()->SetTransform (m);
   sprite->GetMovable ()->UpdateMove ();
   csRef<iSprite3DState> spstate (
-  	SCF_QUERY_INTERFACE (sprite->GetMeshObject (), iSprite3DState));
+  	scfQueryInterface<iSprite3DState> (sprite->GetMeshObject ()));
   spstate->SetAction ("default");
   //spstate->SetMixMode (CS_FX_SETALPHA (.5));
 

@@ -27,7 +27,10 @@ distribution.
 #include "xr.h"
 #include "csutil/scfstr.h"
 
-const char* TrXmlBase::errorString[ TIXML_ERROR_STRING_COUNT ] =
+CS_PLUGIN_NAMESPACE_BEGIN(XMLRead)
+{
+
+const char* const TrXmlBase::errorString[ TIXML_ERROR_STRING_COUNT ] =
 {
   "No error",
   "Error",
@@ -44,8 +47,6 @@ const char* TrXmlBase::errorString[ TIXML_ERROR_STRING_COUNT ] =
   "Error parsing Declaration.",
   "Error document empty."
 };
-
-bool TrXmlBase::condenseWhiteSpace = true;
 
 TrDocumentNode::TrDocumentNode( )
 {
@@ -72,18 +73,18 @@ TrDocumentNode* TrDocumentNode::NextSibling( const char * value ) const
 }
 
 
-TrDocumentNode* TrDocumentNodeChildren::Identify (TrDocument* document,
+TrDocumentNode* TrDocumentNodeChildren::Identify (ParseInfo& parse,
 	const char* p)
 {
   TrDocumentNode* returnNode = 0;
 
-  p = SkipWhiteSpace( p );
+  p = SkipWhiteSpace( parse, p );
   if( !p || !*p || *p != '<' )
   {
     return 0;
   }
 
-  p = SkipWhiteSpace( p );
+  p = SkipWhiteSpace( parse, p );
 
   if ( !p || !*p )
   {
@@ -104,10 +105,9 @@ TrDocumentNode* TrDocumentNodeChildren::Identify (TrDocument* document,
   {
     returnNode = new TrXmlDeclaration();
   }
-  else if (isalpha (*(p+1))
-        || *(p+1) == '_' )
+  else if (parse.IsNameStart (p+1))
   {
-    returnNode = document->blk_element.Alloc ();
+    returnNode = parse.document->blk_element.Alloc ();
   }
   else if (StringEqual (p, commentHeader))
   {
@@ -126,7 +126,7 @@ TrDocumentNode* TrDocumentNodeChildren::Identify (TrDocument* document,
   }
   else
   {
-    document->SetError( TIXML_ERROR_OUT_OF_MEMORY );
+    parse.document->SetError( TIXML_ERROR_OUT_OF_MEMORY, this, p );
   }
   return returnNode;
 }
@@ -267,7 +267,7 @@ TrDocument::TrDocument(char* buf) :
   blk_element (7000),
   blk_text (100)
 {
-  error = false;
+  errorId = TIXML_NO_ERROR;
   //  ignoreWhiteSpace = true;
   type = DOCUMENT;
   input_data = buf;
@@ -278,7 +278,7 @@ TrDocument::~TrDocument ()
   // Call explicit clear so that all children are destroyed
   // before 'blk_element' and 'blk_text' are destroyed.
   Clear ();
-  delete[] input_data;
+  if (input_data != 0) cs_free (input_data);
 }
 
 const int TrDocumentAttribute::IntValue() const
@@ -308,7 +308,7 @@ TrXmlDeclaration::TrXmlDeclaration( const char * _version,
 size_t TrDocumentAttributeSet::Find (const char * name) const
 {
   size_t i;
-  for (i = 0 ; i < set.Length () ; i++)
+  for (i = 0 ; i < set.GetSize () ; i++)
   {
     if (strcmp (set[i].name, name) == 0) return i;
   }
@@ -318,10 +318,13 @@ size_t TrDocumentAttributeSet::Find (const char * name) const
 size_t TrDocumentAttributeSet::FindExact (const char * reg_name) const
 {
   size_t i;
-  for (i = 0 ; i < set.Length () ; i++)
+  for (i = 0 ; i < set.GetSize () ; i++)
   {
     if (set[i].name == reg_name) return i;
   }
   return csArrayItemNotFound;
 }
 
+
+}
+CS_PLUGIN_NAMESPACE_END(XMLRead)

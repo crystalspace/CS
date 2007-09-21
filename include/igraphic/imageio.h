@@ -34,8 +34,6 @@ struct iDataBuffer;
 struct iImage;
 
 
-SCF_VERSION (iImageIO, 1, 0, 1);
-
 /** \internal
  * Format can be read.
  */
@@ -62,9 +60,22 @@ typedef csArray<csImageIOFileFormatDescription const*>
 
 /**
  * The iImageIO interface is used to save and load graphic files.
+ *
+ * Main creators of instances implementing this interface:
+ * - Image loader multiplexer plugin 
+ *   (crystalspace.graphic.image.io.multiplexer) and all image loader plugins.
+ *
+ * Main ways to get pointers to this interface:
+ * - csQueryRegistry<iImageIO> ()
+ *
+ * Main users of this interface:
+ * - Application.
+ * - Loader.
  */
 struct iImageIO : public virtual iBase
 {
+  SCF_INTERFACE (iImageIO, 1, 0, 1);
+
   /// Description for a file format supported by an image loader.
   typedef csImageIOFileFormatDescription FileFormatDescription;
 

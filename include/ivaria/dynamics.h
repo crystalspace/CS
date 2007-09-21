@@ -33,7 +33,6 @@ struct iMeshWrapper;
 struct iLight;
 struct iCamera;
 struct iObject;
-struct iPolygonMesh;
 struct iRigidBody;
 
 class csMatrix3;
@@ -44,6 +43,17 @@ class csVector3;
 struct iDynamicsCollisionCallback;
 struct iDynamicsMoveCallback;
 struct iDynamicSystem;
+
+
+/**
+ * This is the interface for a dynamics step callback.
+ */
+struct iDynamicsStepCallback : public virtual iBase
+{
+  SCF_INTERFACE (iDynamicsStepCallback, 0, 0, 1);
+
+  virtual void Step (float stepsize) = 0;
+};
 
 /**
  * This is the interface for the actual plugin.
@@ -75,6 +85,16 @@ struct iDynamics : public virtual iBase
 
   /// Step the simulation forward by stepsize.
   virtual void Step (float stepsize) = 0;
+
+  /**
+   * Add a callback to be executed dynamics is being stepped.
+   */
+  virtual void AddStepCallback (iDynamicsStepCallback *callback) = 0;
+
+  /**
+   * Remove dynamics step callback.
+   */
+  virtual void RemoveStepCallback (iDynamicsStepCallback *callback) = 0;
 };
 
 struct iDynamicsSystemCollider;
@@ -290,8 +310,6 @@ struct iDynamicsMoveCallback : public virtual iBase
   virtual void Execute (csOrthoTransform& t) = 0;
 };
 
-SCF_VERSION (iDynamicsCollisionCallback, 0, 0, 2);
-
 /**
  * This is the interface for attaching a collider callback to the body
  * 
@@ -302,10 +320,14 @@ SCF_VERSION (iDynamicsCollisionCallback, 0, 0, 2);
  * - iDynamicSystem
  *   
  */
-struct iDynamicsCollisionCallback : public iBase
+struct iDynamicsCollisionCallback : public virtual iBase
 {
+  SCF_INTERFACE (iDynamicsCollisionCallback, 0, 0, 2);
+
   /**
    * A collision occured.
+   * \param thisbody The body that received a collision.
+   * \param otherbody The body that collided with \a thisBody.
    * \param pos is the position on which the collision occured.
    * \param normal is the collision normal.
    * \param depth is the penetration depth.
@@ -313,8 +335,6 @@ struct iDynamicsCollisionCallback : public iBase
   virtual void Execute (iRigidBody *thisbody, iRigidBody *otherbody,
       const csVector3& pos, const csVector3& normal, float depth) = 0;
 };
-
-SCF_VERSION (iBodyGroup, 0, 0, 1);
 
 /**
  * Body Group is a collection of bodies which don't collide with
@@ -332,14 +352,16 @@ SCF_VERSION (iBodyGroup, 0, 0, 1);
  * Main users of this interface:
  * - iDynamicSystem
  */
-struct iBodyGroup : public iBase
+struct iBodyGroup : public virtual iBase
 {
-   /// Adds a body to this group
-   virtual void AddBody (iRigidBody *body) = 0;
-   /// Removes a body from this group
-   virtual void RemoveBody (iRigidBody *body) = 0;
-   /// Tells whether the body is in this group or not
-   virtual bool BodyInGroup (iRigidBody *body) = 0;
+  SCF_INTERFACE (iBodyGroup, 0, 1, 0);
+
+  /// Adds a body to this group
+  virtual void AddBody (iRigidBody *body) = 0;
+  /// Removes a body from this group
+  virtual void RemoveBody (iRigidBody *body) = 0;
+  /// Tells whether the body is in this group or not
+  virtual bool BodyInGroup (iRigidBody *body) = 0;
 };
 
 /**
@@ -605,6 +627,7 @@ struct iRigidBody : public virtual iBase
 
   /**
    * If there's a collision callback with this body, execute it
+   * \param other The body that collided.
    * \param pos is the position on which the collision occured.
    * \param normal is the collision normal.
    * \param depth is the penetration depth.
@@ -629,11 +652,10 @@ enum csColliderGeometryType
   PLANE_COLLIDER_GEOMETRY,
   TRIMESH_COLLIDER_GEOMETRY,
   CYLINDER_COLLIDER_GEOMETRY,
+  CAPSULE_COLLIDER_GEOMETRY,
   SPHERE_COLLIDER_GEOMETRY
 };
 
-
-SCF_VERSION (iDynamicsColliderCollisionCallback, 0, 0, 1);
 
 /**
  * This is the interface for attaching a collider callback to the body
@@ -644,8 +666,10 @@ SCF_VERSION (iDynamicsColliderCollisionCallback, 0, 0, 1);
  * Main users of this interface:
  * - iDynamicSystem
  */
-struct iDynamicsColliderCollisionCallback : public iBase
+struct iDynamicsColliderCollisionCallback : public virtual iBase
 {
+  SCF_INTERFACE (iDynamicsColliderCollisionCallback, 0, 0, 1);
+
   virtual void Execute (iDynamicsSystemCollider *thiscollider, 
     iDynamicsSystemCollider *othercollider) = 0;
   virtual void Execute (iDynamicsSystemCollider *thiscollider, 
@@ -693,8 +717,8 @@ struct iDynamicsSystemCollider : public virtual iBase
   /// Create Collider Geometry with given box (given by its size)
   virtual bool CreateBoxGeometry (const csVector3& box_size) = 0;
 
-  /// Create Collider Geometry with Cylinder (given by its length and radius)
-  virtual bool CreateCCylinderGeometry (float length, float radius) = 0;
+  /// Create Capsule Collider Geometry.
+  virtual bool CreateCapsuleGeometry (float length, float radius) = 0;
 
   //FIXME: This should be implememented, but it is not so obvious - it
   //should be valid also for static colliders.
@@ -792,8 +816,6 @@ struct iDynamicsSystemCollider : public virtual iBase
   virtual bool IsStatic () = 0;
 };
 
-SCF_VERSION (iJoint, 0, 0, 1);
-
 /**
  * This is the interface for a joint.  It works by constraining
  * the relative motion between the two bodies it attaches.  For
@@ -807,8 +829,10 @@ SCF_VERSION (iJoint, 0, 0, 1);
  * Main users of this interface:
  * - iDynamicSystem
  */
-struct iJoint : public iBase
+struct iJoint : public virtual iBase
 {
+  SCF_INTERFACE (iJoint, 0, 0, 1);
+
   /// Set which two bodies to be affected by this joint
   virtual void Attach (iRigidBody* body1, iRigidBody* body2) = 0;
   /// Get an attached body (valid values for body are 0 and 1)
@@ -864,6 +888,8 @@ struct iJoint : public iBase
   /// Gets the maximum constrained angle between bodies
   virtual csVector3 GetMaximumAngle () = 0;
 
+  //Motor parameters
+
   /** 
    * Sets the restitution of the joint's stop point (this is the 
    * elasticity of the joint when say throwing open a door how 
@@ -873,11 +899,16 @@ struct iJoint : public iBase
   /// Get the joint restitution
   virtual csVector3 GetBounce () = 0;
   /// Apply a motor velocity to joint (for instance on wheels)
-  virtual void SetDesiredVelocity (const csVector3 & velocity ) = 0;
+  virtual void SetDesiredVelocity (const csVector3 &velocity ) = 0;
   virtual csVector3 GetDesiredVelocity () = 0;
   /// Sets the force at which the desired velocity will be achieved
   virtual void SetMaxForce (const csVector3 & maxForce ) = 0;
   virtual csVector3 GetMaxForce () = 0;
+  /// Set custom angular constraint axis (have sense only with rotation free minimum along 2 axis)
+  virtual void SetAngularConstraintAxis (const csVector3 &axis, int body) = 0;
+  /// Get custom angular constraint axis.
+  virtual csVector3 GetAngularConstraintAxis (int body) = 0;
+
 };
 
 #endif // __CS_IVARIA_DYNAMICS_H__

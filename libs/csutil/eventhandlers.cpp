@@ -143,7 +143,8 @@ iEventHandler *csEventHandlerRegistry::GetHandler (csHandlerID id)
 {
   CS_ASSERT(IsInstance(id));
   const KnownEventHandler* knownHandler = idToHandler.GetElementPointer (id);
-  return knownHandler ? knownHandler->handler : 0;
+  return knownHandler ? (iEventHandler*)(knownHandler->handler) : 
+    (iEventHandler*)0;
 }
 
 bool const csEventHandlerRegistry::IsInstanceOf (csHandlerID instanceid,

@@ -71,7 +71,7 @@ bool csShaderGLPS1_Common::Load (iShaderDestinationResolver*,
   programBuffer.AttachNew (new csDataBuffer (csStrNew (program),
     strlen (program)));
 
-  for (size_t i = 0; i < mappings.Length(); i++)
+  for (size_t i = 0; i < mappings.GetSize (); i++)
   {
     variablemap.Push (VariableMapEntry (mappings[i]));
   }
@@ -83,7 +83,7 @@ bool csShaderGLPS1_Common::Load (iShaderDestinationResolver*,
 bool csShaderGLPS1_Common::Compile ()
 {
   
-  for (size_t i = 0; i < variablemap.Length (); i++)
+  for (size_t i = 0; i < variablemap.GetSize (); i++)
   {
     int dest;
     if ((sscanf (variablemap[i].destination, "register %d", &dest) != 1) &&

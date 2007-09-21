@@ -58,6 +58,8 @@ float4 GetInstancedPosition (float4 position)
     <?if vars."instancing transforms" ?>
       <instanceparam source="instancing transforms" 
 	destination="instancingVert.object2world0" />
+      <instanceparam source="fade factor" 
+	destination="primary color" />
     <?endif?>
   <?Endtemplate?>
   <?AddToList PassMappings Pass_Instancing?>

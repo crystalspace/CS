@@ -18,6 +18,9 @@
 */
 
 #include "cssysdef.h"
+
+
+#define WIN32_LEAN_AND_MEAN
 #include "csplugincommon/directx/guids.h"
 
 #include "csutil/csunicode.h"
@@ -25,6 +28,7 @@
 #include "csutil/util.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
+
 #include <stdlib.h>
 #include <windows.h>
 
@@ -93,7 +97,7 @@ const DirectDetectionDevice* DirectDetection::FindBestDevice (int displayNumber)
   {
     csString devName2d("\\\\.\\Display");
     devName2d.Append(displayNumber);
-    for (size_t i = 0; i < Devices.Length(); i++)
+    for (size_t i = 0; i < Devices.GetSize (); i++)
     {
       const DirectDetectionDevice& cur = Devices[i];
       char const* const s = cur.DeviceName2D;
@@ -103,7 +107,7 @@ const DirectDetectionDevice* DirectDetection::FindBestDevice (int displayNumber)
     // Requested display not found; fall through and search for primary.
   }
   
-  for (size_t i = 0; i < Devices.Length(); i++)
+  for (size_t i = 0; i < Devices.GetSize (); i++)
   {
     const DirectDetectionDevice& cur = Devices[i];
     if (cur.IsPrimary2D) 
@@ -254,7 +258,7 @@ bool DirectDetection::CheckDevices2D ()
   //Free the library.
   FreeLibrary (libraryHandle);
 
-  if (Devices.Length() == 0)
+  if (Devices.GetSize () == 0)
   {
     ReportResult (CS_REPORTER_SEVERITY_WARNING, 
       "No 2D devices found.",
@@ -267,7 +271,7 @@ bool DirectDetection::CheckDevices2D ()
 /// have 2d devices into list ?
 bool DirectDetection::Have2DDevice ()
 {
-  for (size_t i = 0; i < Devices.Length(); i++)
+  for (size_t i = 0; i < Devices.GetSize (); i++)
   {
     if (Devices[i].IsPrimary2D) return true;
   }

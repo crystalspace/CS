@@ -20,7 +20,7 @@
 #ifndef __CS_PORTALCONTAINER_H__
 #define __CS_PORTALCONTAINER_H__
 
-#include "csgeom/pmtools.h"
+#include "csgeom/trimeshtools.h"
 #include "csgeom/vector3.h"
 #include "cstool/meshobjtmpl.h"
 #include "cstool/rendermeshholder.h"
@@ -36,25 +36,24 @@ class csMeshWrapper;
 class csMovable;
 
 /**
- * A helper class for iPolygonMesh implementations used by csPortalContainer.
+ * A helper class for iTriangleMesh implementations used by csPortalContainer.
  */
-class csPortalContainerPolyMeshHelper : 
-  public scfImplementation1<csPortalContainerPolyMeshHelper,
-                            iPolygonMesh>
+class csPortalContainerTriMeshHelper : 
+  public scfImplementation1<csPortalContainerTriMeshHelper,
+                            iTriangleMesh>
 {
 public:
 
   /**
-   * Make a polygon mesh helper which will accept polygons which match
+   * Make a triangle mesh helper which will accept polygons which match
    * with the given flag (one of CS_POLY_COLLDET or CS_POLY_VISCULL).
    */
-  csPortalContainerPolyMeshHelper (uint32 flag) 
-    : scfImplementationType (this), polygons (0), vertices (0),
-      poly_flag (flag), 
-    triangles (0)
+  csPortalContainerTriMeshHelper (uint32 flag) 
+    : scfImplementationType (this), vertices (0),
+      poly_flag (flag), triangles (0)
   {
   }
-  virtual ~csPortalContainerPolyMeshHelper ()
+  virtual ~csPortalContainerTriMeshHelper ()
   {
     Cleanup ();
   }
@@ -62,34 +61,24 @@ public:
   void Setup ();
   void SetPortalContainer (csPortalContainer* pc);
 
-  virtual int GetVertexCount ()
+  virtual size_t GetVertexCount ()
   {
     Setup ();
-    return (int)vertices->Length ();
+    return vertices->GetSize ();
   }
   virtual csVector3* GetVertices ()
   {
     Setup ();
     return vertices->GetArray ();
   }
-  virtual int GetPolygonCount ()
+  virtual size_t GetTriangleCount ()
   {
     Setup ();
-    return num_poly;
-  }
-  virtual csMeshedPolygon* GetPolygons ()
-  {
-    Setup ();
-    return polygons;
-  }
-  virtual int GetTriangleCount ()
-  {
-    Triangulate ();
-    return tri_count;
+    return num_tri;
   }
   virtual csTriangle* GetTriangles ()
   {
-    Triangulate ();
+    Setup ();
     return triangles;
   }
   virtual void Lock () { }
@@ -103,20 +92,12 @@ public:
 private:
   csPortalContainer* parent;
   uint32 data_nr;		// To see if the portal container has changed.
-  csMeshedPolygon* polygons;	// Array of polygons.
   // Array of vertices from portal container.
   csDirtyAccessArray<csVector3>* vertices;
-  int num_poly;			// Total number of polygons.
+  size_t num_tri;		// Total number of triangles.
   uint32 poly_flag;		// Polygons must match with this flag.
   csFlags flags;
   csTriangle* triangles;
-  int tri_count;
-
-  void Triangulate ()
-  {
-    if (triangles) return;
-    csPolygonMeshTools::Triangulate (this, triangles, tri_count);
-  }
 };
 
 /**
@@ -203,20 +184,13 @@ public:
   bool Draw (iRenderView* rview, iMovable* movable, csZBufMode zbufMode);
 
 
-  //-------------------- iPolygonMesh interface implementation ---------------
-  csRef<csPortalContainerPolyMeshHelper> polygonMesh;
-  //------------------- CD iPolygonMesh implementation ---------------
-  csRef<csPortalContainerPolyMeshHelper> polygonMeshCD;
-  //------------------- LOD iPolygonMesh implementation ---------------
-  csRef<csPortalContainerPolyMeshHelper> polygonMeshLOD;
-
   //-------------------For iShadowReceiver ----------------------------//
   virtual void CastShadows (iMovable* movable, iFrustumView* fview);
 
   //-------------------For iPortalContainer ----------------------------//
   virtual iPortal* CreatePortal (csVector3* vertices, int num);
   virtual void RemovePortal (iPortal* portal);
-  virtual int GetPortalCount () const { return (int)portals.Length () ; }
+  virtual int GetPortalCount () const { return (int)portals.GetSize () ; }
   virtual iPortal* GetPortal (int idx) const { return (iPortal*)portals[idx]; }
   virtual void Draw (iRenderView* rview)
   {
@@ -239,11 +213,6 @@ public:
     iMovable* movable, uint32 frustum_mask);
 
   //--------------------- For csMeshObject ------------------------------//
-  virtual void GetObjectBoundingBox (csBox3& bbox)
-  {
-    Prepare ();
-    bbox = object_bbox;
-  }
   virtual const csBox3& GetObjectBoundingBox ()
   {
     Prepare ();

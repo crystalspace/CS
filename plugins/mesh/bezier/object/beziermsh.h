@@ -33,9 +33,8 @@
 #include "cstool/rendermeshholder.h"
 #include "cstool/framedataholder.h"
 #include "csgfx/shadervarcontext.h"
-#include "igeom/polymesh.h"
+#include "igeom/trimesh.h"
 #include "cstool/objmodel.h"
-#include "csgeom/pmtools.h"
 #include "iengine/mesh.h"
 #include "iengine/rview.h"
 #include "iengine/shadcast.h"
@@ -64,25 +63,24 @@ class csBezierMeshObjectType;
 class csBezierLightPatchPool;
 
 /**
- * A helper class for iPolygonMesh implementations used by csBezierMesh.
+ * A helper class for iTriangleMesh implementations used by csBezierMesh.
  */
-class BezierPolyMeshHelper : public scfImplementation1<BezierPolyMeshHelper, 
-                                                       iPolygonMesh>
+class BezierTriMeshHelper : public scfImplementation1<BezierTriMeshHelper, 
+                                                       iTriangleMesh>
 {
 public:
   /**
-   * Make a polygon mesh helper which will accept polygons which match
-   * with the given flag (one of CS_POLY_COLLDET or CS_POLY_VISCULL).
+   * Make a triangle mesh helper.
    */
-  BezierPolyMeshHelper () : scfImplementationType (this), polygons (0), 
+  BezierTriMeshHelper () : scfImplementationType (this),
     vertices (0), triangles (0) { }
-  virtual ~BezierPolyMeshHelper () { Cleanup (); }
+  virtual ~BezierTriMeshHelper () { Cleanup (); }
   void Cleanup ();
 
   void Setup ();
-  void SetThing (csBezierMesh* thing) { BezierPolyMeshHelper::thing = thing; }
+  void SetThing (csBezierMesh* thing) { BezierTriMeshHelper::thing = thing; }
 
-  virtual int GetVertexCount ()
+  virtual size_t GetVertexCount ()
   {
     Setup ();
     return num_verts;
@@ -92,26 +90,14 @@ public:
     Setup ();
     return vertices;
   }
-  virtual int GetPolygonCount ()
+  virtual size_t GetTriangleCount ()
   {
     Setup ();
-    return num_poly;
-  }
-  virtual csMeshedPolygon* GetPolygons ()
-  {
-    Setup ();
-    return polygons;
-  }
-  virtual int GetTriangleCount ()
-  {
-    Setup ();
-    Triangulate ();
-    return tri_count;
+    return num_tri;
   }
   virtual csTriangle* GetTriangles ()
   {
     Setup ();
-    Triangulate ();
     return triangles;
   }
 
@@ -123,19 +109,11 @@ public:
 
 private:
   csBezierMesh* thing;
-  csMeshedPolygon* polygons;	// Array of polygons.
   csVector3* vertices;		// Array of vertices.
-  int num_poly;			// Total number of polygons.
-  int num_verts;		// Total number of vertices.
+  size_t num_verts;		// Total number of vertices.
   csFlags flags;
   csTriangle* triangles;
-  int tri_count;
-
-  void Triangulate ()
-  {
-    if (triangles) return;
-    csPolygonMeshTools::Triangulate (this, triangles, tri_count);
-  }
+  size_t num_tri;
 };
 
 /**
@@ -277,6 +255,8 @@ public:
   virtual csFlags& GetFlags () { return object_flags; }
 };
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * A bezier is a set of bezier curves.
  */
@@ -290,7 +270,7 @@ class csBezierMesh : public scfImplementationExt6<csBezierMesh,
                                                   scfFakeInterface<iMeshObject> >,
 		     public csBezierMesh2
 {
-  friend class BezierPolyMeshHelper;
+  friend class BezierTriMeshHelper;
 
 public:
   /**
@@ -445,7 +425,7 @@ public:
 
   /// Get the number of curves in this thing.
   int GetCurveCount () const
-  { return (int)curves.Length (); }
+  { return (int)curves.GetSize (); }
 
   /// Get the specified curve from this set.
   iCurve* GetCurve (int idx) const
@@ -554,11 +534,6 @@ public:
    */
   void GetRadius (float& rad, csVector3& cent);
 
-  /**
-   * Get a write object for a vis culling system.
-   */
-  iPolygonMesh* GetWriteObject ();
-
   //----------------------------------------------------------------------
   // Drawing
   //----------------------------------------------------------------------
@@ -641,9 +616,6 @@ public:
   void LightDisconnect (iLight* light);
   void DisconnectAllLights ();
 
-  csRef<BezierPolyMeshHelper> polygonMesh;
-  csRef<BezierPolyMeshHelper> polygonMeshLOD;
-
   /** \name iBezierFactoryState implementation
    * @{ */
   virtual const csVector3& GetCurvesCenter () const
@@ -672,14 +644,14 @@ public:
 
   /** \name iObjectModel implementation
    * @{ */
-  void GetObjectBoundingBox (csBox3& box) { box = GetBoundingBox (); }
   const csBox3& GetObjectBoundingBox () { return GetBoundingBox (); }
   void SetObjectBoundingBox (const csBox3& box) { SetBoundingBox (box); }
   /** @} */
 
   /** \name iMeshObject interface implementation
    * @{ */
-  virtual iMeshObjectFactory* GetFactory () const { return (iMeshObjectFactory*)this; }
+  virtual iMeshObjectFactory* GetFactory () const
+  { return (iMeshObjectFactory*)this; }
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* /*cb*/) { }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const
   { return 0; }
@@ -718,6 +690,10 @@ public:
     * does nothing.
     */
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
+  virtual void BuildDecal(const csVector3* pos, float decalRadius,
+          iDecalBuilder* decalBuilder)
+  {
+  }
   /** @} */
 
   /** \name iMeshObjectFactory interface implementation
@@ -727,6 +703,8 @@ public:
   { return beziermsh_type; }
   /** @} */
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * Thing type. This is the plugin you have to use to create instances
@@ -748,6 +726,8 @@ public:
   csWeakRef<iGraphics3D> G3D;
   /// An object pool for lightpatches.
   csBezierLightPatchPool* lightpatch_pool;
+
+  csStringID base_id;
 
 public:
   /// Constructor.

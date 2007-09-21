@@ -595,7 +595,7 @@ sub svn_update {
     my $line = '-' x length($message);
     my $dirs = '';
     foreach my $task (@jobber_tasks) {
-	$dirs .= " @{$task->{'olddirs'}}" if exists $task->{'olddeirs'};
+	$dirs .= " @{$task->{'olddirs'}}" if exists $task->{'olddirs'};
     }
     if ($dirs) {
         print "$line\n$message\n";

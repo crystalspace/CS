@@ -44,7 +44,6 @@
 #include "imap/writer.h"
 #include "imesh/sprite3d.h"
 #include "imesh/spritecal3d.h"
-#include "imesh/thing.h"
 #include "ivaria/icegui.h"
 
 struct vmAnimCallback;
@@ -52,6 +51,21 @@ struct vmAnimCallback;
 class ViewMesh : public csApplicationFramework, public csBaseEventHandler
 {
  private:
+
+  csRef<iRegion> region;
+
+  csVector3 camTarget;
+  float     camDist;
+  float     camYaw;
+  float     camPitch;
+
+  bool      camModePan;
+  bool      camModeRotate;
+  bool      camModeZoom;
+
+  csString reloadFilename;
+
+  int       lastMouseX, lastMouseY;
 
   csRef<iEngine> engine;
   csRef<iLoader> loader;
@@ -88,7 +102,15 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
 
   vmAnimCallback* callback;
 
+  void ResetCamera();
+  void UpdateCamera();
+  void FixCameraForOrigin(const csVector3 & desiredOrigin);
+
   bool OnKeyboard (iEvent&);
+
+  bool OnMouseDown (iEvent&);
+  bool OnMouseUp (iEvent&);
+  bool OnMouseMove (iEvent&);
 
   void ProcessFrame ();
   void FinishFrame ();
@@ -105,6 +127,7 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   void AttachMesh (const char* file);
   void SelectSocket (const char* newsocket);
   void ScaleSprite (float newScale);
+  void MoveLights (const csVector3 &a, const csVector3 &b, const csVector3 &c);
   void UpdateSocketList ();
   void UpdateMorphList ();
   void UpdateAnimationList ();
@@ -114,6 +137,9 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   bool CameraModeRotate (const CEGUI::EventArgs& e);
   bool CameraModeMoveOrigin (const CEGUI::EventArgs& e);
   bool CameraModeMoveNormal (const CEGUI::EventArgs& e);
+  bool LightThreePoint (const CEGUI::EventArgs& e);
+  bool LightFrontBackTop (const CEGUI::EventArgs& e);
+  bool LightUnlit (const CEGUI::EventArgs& e);
   bool LoadButton (const CEGUI::EventArgs& e);
   bool LoadLibButton (const CEGUI::EventArgs& e);
   bool SaveButton (const CEGUI::EventArgs& e);
@@ -146,6 +172,8 @@ class ViewMesh : public csApplicationFramework, public csBaseEventHandler
   bool SelMorph (const CEGUI::EventArgs& e);
   bool BlendButton (const CEGUI::EventArgs& e);
   bool ClearButton (const CEGUI::EventArgs& e);
+  bool ResetCameraButton (const CEGUI::EventArgs& e);
+  bool ReloadButton (const CEGUI::EventArgs& e);
 
  public:
 
@@ -168,7 +196,18 @@ private:
   bool StdDlgDirChange (const CEGUI::EventArgs& e);
 
   CS_EVENTHANDLER_NAMES ("crystalspace.viewmesh")
-  CS_EVENTHANDLER_NIL_CONSTRAINTS
+  
+  CS_CONST_METHOD virtual const csHandlerID * GenericPrec (csRef<iEventHandlerRegistry> &r1, 
+    csRef<iEventNameRegistry> &r2, csEventID event) const 
+  {
+    static csHandlerID precConstraint[2];
+    
+    precConstraint[0] = r1->GetGenericID("crystalspace.cegui");
+    precConstraint[1] = CS_HANDLERLIST_END;
+    return precConstraint;
+  }
+
+  CS_EVENTHANDLER_DEFAULT_INSTANCE_CONSTRAINTS
 };
 
 #endif // __VIEWMESH_H__

@@ -45,6 +45,7 @@
 %}
 
 #ifndef CS_MINI_SWIG
+%include "pyshadervar.i"
 %pythoncode %{
   csReport = csReporterHelper.Report
 %}
@@ -97,6 +98,14 @@
 %}
 
 #ifndef CS_MINI_SWIG
+%extend csKeyModifiers {
+  unsigned int __getitem__ (size_t i) const
+  {
+      if (i<csKeyModifierTypeLast)
+          return self->modifiers[i];
+      return 0;
+  }
+}
 %extend iCollideSystem
 {
   %rename(_GetCollisionPairs) GetCollisionPairs;
@@ -131,6 +140,22 @@
   float __getitem__ (int i) const { return self->operator[](i); }
   void __setitem__ (int i, float v) { self->operator[](i) = v; }
   bool __nonzero__ () const { return !self->IsZero(); }
+}
+
+%extend csVector4
+{
+  VECTOR_PYTHON_OBJECT_FUNCTIONS(4)
+
+  float __getitem__ (int i) const { return self->operator[](i); }
+  void __setitem__ (int i, float v) { self->operator[](i) = v; }
+  bool __nonzero__ () const { return !self->IsZero(); }
+}
+
+%extend csTriangle
+{
+  int __getitem__ (int i) const { return self->operator[](i); }
+  void __setitem__ (int i, int v) { self->operator[](i) = v; }
+  bool __nonzero__ () const { return !(self->a||self->b||self->c); }
 }
 
 %extend csMatrix3
@@ -202,7 +227,10 @@ class CSMutableArrayHelper:
       raise IndexError('Length is ' + str(arrlen) + ', you asked for ' +
         str(key))
     return self.getFunc(key)
-
+  def content_iterator(self):
+    for idx in xrange(len(self)):
+      yield self.__getitem__(idx)
+  def __iter__(self): return self.content_iterator() 
   # We do not implement __setitem__ because the only legal action is to
   #  overwrite the object at the given location.  (The contents of the
   #  array are mutable, but the array is a single allocation of a single
@@ -220,6 +248,19 @@ class CSMutableArrayHelper:
   char __getitem__ (size_t i) const { return self->operator[](i); }
   void __setitem__ (size_t i, char c) { self->operator[](i) = c; }
   void __delitem__ (size_t i) { self->DeleteAt(i); }
+}
+
+// csutil/hash.h
+%extend csHash
+{
+  const T& __getitem__(const K& key) { return self->Get(key,T()); }
+  bool __delitem__(const K& key)
+  { return self->DeleteAll(key); }
+  void clear() { self->Empty(); }
+  bool __nonzero__ () { return self->IsEmpty(); }
+  void __setitem__(const K& key, const T &value) 
+  { self->PutUnique(key,value); }
+  size_t __len__() { return self->GetSize(); }
 }
 
 #ifndef CS_MINI_SWIG
@@ -243,6 +284,25 @@ class CSMutableArrayHelper:
 %pythoncode %{
   CS_POLYRANGE_LAST = csPolygonRange (-1, -1)
 %}
+
+/* allow using csMeshedPolygon as a (vert index) list */
+%extend csMeshedPolygon {
+  int __getitem__(int index)
+  { return self->vertices[index]; }
+  int __len__()
+  { return self->num_vertices; }
+}
+PYITERATOR_PROTOCOL(csMeshedPolygon)
+
+/* work around broken Rotate function with swig 1.3.28 */
+%extend iPen {
+        void _Rotate(float a)
+        { self->Rotate(a); }
+    %pythoncode %{
+    def Rotate(self,a):
+         return _cspace.iPen__Rotate(a)
+    %}
+}
 #endif // CS_MINI_SWIG
 
 /*
@@ -258,7 +318,7 @@ extern "C" {
 #endif
 
 // Not `static' because it is published for use by other clients in same DLL.
-PyObject* csWrapTypedObject(void* objectptr, const char *typetag,
+CS_EXPORT_SYM PyObject* csWrapTypedObject(void* objectptr, const char *typetag,
   int own)
 {
   swig_type_info *ti = SWIG_TypeQuery (typetag);

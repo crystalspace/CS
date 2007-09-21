@@ -21,9 +21,9 @@
 
 #include "csgeom/csrect.h"
 #include "cstool/objmodel.h"
-#include "csgeom/pmtools.h"
 #include "csgeom/subrec.h"
 #include "csgeom/transfrm.h"
+#include "igeom/trimesh.h"
 #include "csgfx/imagememory.h"
 #include "csgfx/shadervar.h"
 #include "csutil/array.h"
@@ -87,24 +87,25 @@ struct RepMaterial
   	old_mat (o), new_mat (n) { }
 };
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
- * A helper class for iPolygonMesh implementations used by csThing.
+ * A helper class for iTriangleMesh implementations used by csThing.
  */
-class PolyMeshHelper : 
-  public scfImplementation1<PolyMeshHelper, 
-			    iPolygonMesh>
+class TriMeshHelper : 
+  public scfImplementation1<TriMeshHelper, 
+			    iTriangleMesh>
 {
 public:
   /**
-   * Make a polygon mesh helper which will accept polygons which match
-   * with the given flag (one of CS_POLY_COLLDET or CS_POLY_VISCULL).
+   * Make a triangle mesh helper.
    */
-  PolyMeshHelper (uint32 flag) : scfImplementationType (this), 
-    polygons (0), vertices (0), poly_flag (flag), triangles (0),
+  TriMeshHelper (uint32 flag) : scfImplementationType (this), 
+    vertices (0), triangles (0), poly_flag (flag),
     locked (0)
   {
   }
-  virtual ~PolyMeshHelper ()
+  virtual ~TriMeshHelper ()
   {
     Cleanup ();
   }
@@ -112,7 +113,7 @@ public:
   void Setup ();
   void SetThing (csThingStatic* thing);
 
-  virtual int GetVertexCount ()
+  virtual size_t GetVertexCount ()
   {
     Setup ();
     return num_verts;
@@ -122,24 +123,14 @@ public:
     Setup ();
     return vertices;
   }
-  virtual int GetPolygonCount ()
+  virtual size_t GetTriangleCount ()
   {
     Setup ();
-    return num_poly;
-  }
-  virtual csMeshedPolygon* GetPolygons ()
-  {
-    Setup ();
-    return polygons;
-  }
-  virtual int GetTriangleCount ()
-  {
-    Triangulate ();
-    return tri_count;
+    return num_tri;
   }
   virtual csTriangle* GetTriangles ()
   {
-    Triangulate ();
+    Setup ();
     return triangles;
   }
   virtual void Lock () { locked++; }
@@ -154,21 +145,13 @@ public:
 private:
   csThingStatic* thing;
   uint32 static_data_nr;	// To see if the static thing has changed.
-  csMeshedPolygon* polygons;	// Array of polygons.
   csVector3* vertices;		// Array of vertices (points to obj_verts).
-  int num_poly;			// Total number of polygons.
-  int num_verts;		// Total number of vertices.
-  uint32 poly_flag;		// Polygons must match with this flag.
+  size_t num_verts;		// Total number of vertices.
   csFlags flags;
   csTriangle* triangles;
-  int tri_count;
+  size_t num_tri;
+  uint32 poly_flag;
   int locked;
-
-  void Triangulate ()
-  {
-    if (triangles) return;
-    csPolygonMeshTools::Triangulate (this, triangles, tri_count);
-  }
 };
 
 /**
@@ -260,7 +243,7 @@ public:
   struct StaticSuperLM
   {
     int width, height;
-    csSubRectangles* rects;
+    CS::SubRectangles* rects;
     int freeLumels;
 
     StaticSuperLM (int w, int h) : width(w), height(h)
@@ -273,11 +256,11 @@ public:
       delete rects;
     }
 
-    csSubRectangles* GetRects ()
+    CS::SubRectangles* GetRects ()
     {
       if (rects == 0)
       {
-	rects = new csSubRectangles (csRect (0, 0, width, height));
+	rects = new CS::SubRectangles (csRect (0, 0, width, height));
       }
       return rects;
     }
@@ -330,6 +313,7 @@ public:
     LightmapTexAccessor (csThing* instance, size_t polyIndex);
     void PreGetValue (csShaderVariable *variable);
   };
+
 public:
   csThingStatic (iBase* parent, csThingObjectType* thing_type);
   virtual ~csThingStatic ();
@@ -462,7 +446,7 @@ public:
     csVector3 &isect,
     float *pr);
 
-  virtual int GetPolygonCount () { return (int)static_polygons.Length (); }
+  virtual int GetPolygonCount () { return (int)static_polygons.GetSize (); }
   virtual void RemovePolygon (int idx);
   virtual void RemovePolygons ();
 
@@ -552,18 +536,7 @@ public:
   virtual uint GetMixMode () const
   { return mixmode; }
 
-  //-------------------- iPolygonMesh interface implementation ----------------
-  csRef<PolyMeshHelper> polygonMesh;
-  //-------------------- CD iPolygonMesh implementation -----------------------
-  csRef<PolyMeshHelper> polygonMeshCD;
-  //-------------------- Lower detail iPolygonMesh implementation -------------
-  csRef<PolyMeshHelper> polygonMeshLOD;
-
   //-------------------- iObjectModel implementation --------------------------
-  virtual void GetObjectBoundingBox (csBox3& bbox)
-  {
-    bbox = GetBoundingBox ();
-  }
   virtual const csBox3& GetObjectBoundingBox ()
   {
     return GetBoundingBox ();
@@ -579,7 +552,10 @@ public:
 
   virtual iObjectModel* GetObjectModel () { return (iObjectModel*)this; }
   virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
+  virtual iTerrainSystem* GetTerrainColldet () { return 0; }
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * A Thing is a set of polygons. A thing can be used for the
@@ -604,7 +580,6 @@ class csThing :
 			    iLightingInfo, 
 			    iShadowCaster>
 {
-  friend class PolyMeshHelper;
   friend class csPolygon3D;
   friend class csPolygonRenderer::BufferAccessor;
 
@@ -810,7 +785,7 @@ public:
 
   /// Get the number of polygons in this thing.
   int GetPolygonCount ()
-  { return (int)polygons.Length (); }
+  { return (int)polygons.GetSize (); }
 
   /// Get the specified polygon from this set.
   csPolygon3DStatic *GetPolygon3DStatic (int idx)
@@ -904,7 +879,7 @@ public:
    */
   iTextureHandle* GetPolygonTexture (size_t index)
   {
-    return index < litPolys.Length() ? litPolys[index]->SLM->GetTexture() : 0;
+    return index < litPolys.GetSize () ? litPolys[index]->SLM->GetTexture() : 0;
   }
   /// Ensure lightmap textures are up-to-date
   void UpdateDirtyLMs ();
@@ -1020,13 +995,8 @@ public:
   virtual bool SetMaterialWrapper (iMaterialWrapper*) { return false; }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return 0; }
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
-
-  //-------------------- iPolygonMesh interface implementation ----------------
-  //csRef<PolyMeshHelper> polygonMesh;
-  //-------------------- CD iPolygonMesh implementation -----------------------
-  //csRef<PolyMeshHelper> polygonMeshCD;
-  //-------------------- Lower detail iPolygonMesh implementation -------------
-  //csRef<PolyMeshHelper> polygonMeshLOD;
+  virtual void BuildDecal(const csVector3* pos, float decalRadius,
+	iDecalBuilder* decalBuilder);
 };
 
 struct intar2 { int ar[2]; };
@@ -1081,6 +1051,11 @@ public:
 
   int maxLightmapW, maxLightmapH;
   float maxSLMSpaceWaste;
+
+  csStringID base_id;
+  csStringID colldet_id;
+  csStringID viscull_id;
+
 public:
   /// Constructor.
   csThingObjectType (iBase*);

@@ -1,0 +1,9 @@
+SubDir TOP plugins utilities bugplug ;
+
+Description bugplug : "debugging plugin" ;
+
+Plugin bugplug
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith bugplug : crystalspace ;
+

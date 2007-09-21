@@ -24,7 +24,7 @@
 #include "csutil/scf_implementation.h"
 #include "csutil/parray.h"
 #include "csutil/refarr.h"
-#include "csutil/scopedmutexlock.h"
+#include "csutil/threading/mutex.h"
 #include "ivaria/reporter.h"
 
 /**
@@ -48,11 +48,24 @@ class csReporter :
   public scfImplementation2<csReporter, iReporter, iComponent>
 {
 private:
-  csRef<csMutex> mutex;
+  CS::Threading::RecursiveMutex mutex;
   iObjectRegistry *object_reg;
   csPDelArray<csReporterMessage> messages;
   csRefArray<iReporterListener> listeners;
 
+  /// Whether Report() call is nested
+  bool inReporting;
+  struct ReportedMessage
+  {
+    int severity;
+    csString msgID;
+    csStringFast<768> buf;
+  };
+  /// Queue of messages that were reported while nested
+  csArray<ReportedMessage> messageQueue;
+  /// Actually report a message to listeners and record
+  void ActualReport (const csRefArray<iReporterListener>& listeners,
+    int severity, const char* msgId, const char* buf);
 public:
   csReporter (iBase *iParent);
   virtual ~csReporter ();

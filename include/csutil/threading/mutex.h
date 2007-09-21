@@ -31,7 +31,7 @@
 #if defined(CS_PLATFORM_WIN32)
 # include "csutil/threading/win32_mutex.h"
 #elif defined(CS_PLATFORM_UNIX) || \
-      defined(CS_PLATFORM_OSX)
+      defined(CS_PLATFORM_MACOSX)
 # include "csutil/threading/pthread_mutex.h"
 #else
 #error "No threading implementation for your platform"
@@ -52,7 +52,7 @@ namespace Threading
    * Users are advised to use the ScopedLock helper class.
    */
   template<typename BaseMutex>
-  class MutexImpl : private BaseMutex, 
+  class MutexImpl : public BaseMutex, 
                     private CS::NonCopyable
   {
   public:
@@ -108,6 +108,7 @@ namespace Threading
       return BaseMutex::IsLocked ();
     }
   protected:
+    friend class ConditionBase;
   };
 
   /**
@@ -159,6 +160,10 @@ namespace Threading
   private:
     T& lockObj;
   };
+
+  // Standard lock
+  typedef ScopedLock<Mutex> MutexScopedLock;
+  typedef ScopedLock<RecursiveMutex> RecursiveMutexScopedLock;
 }
 }
 

@@ -104,9 +104,9 @@ public:
   /// Pop an element from tail end of array.
   csPtr<T> Pop ()
   {
-    CS_ASSERT (this->Length () > 0);
-    csRef<T> ret = this->Get (this->Length () - 1); // see *1*
-    SetLength (this->Length () - 1);
+    CS_ASSERT (this->GetSize () > 0);
+    csRef<T> ret = this->Get (this->GetSize () - 1); // see *1*
+    SetSize (this->GetSize () - 1);
     return csPtr<T> (ret);
   }
 };

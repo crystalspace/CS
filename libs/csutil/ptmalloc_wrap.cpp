@@ -37,24 +37,27 @@ namespace CS
 using namespace CS;
 
 #ifdef CS_DEBUG
-/* In debug mode, a small "cookie" is placed in front and after the memory
- * returned by the allocators in order to detect corruption, and, since
- * the cookie value is different per module, freeing memory across 
- * modules. */
-typedef uint32 CookieType;
-static CookieType cookie;
-CS_FORCEINLINE static CookieType CookieSwap (CookieType x)
+namespace
 {
-  return csSwapBytes::UInt32 (x);
+  /* In debug mode, a small "cookie" is placed in front and after the memory
+  * returned by the allocators in order to detect corruption, and, since
+  * the cookie value is different per module, freeing memory across 
+  * modules. */
+  typedef uint32 CookieType;
+  static CookieType cookie;
+  CS_FORCEINLINE static CookieType CookieSwap (CookieType x)
+  {
+    return csSwapBytes::UInt32 (x);
+  }
+  CS_FORCEINLINE static CookieType GetCookie (void* p)
+  {
+    return CookieType (intptr_t (&cookie) ^ intptr_t (p));
+  }
+  static const size_t cookieOverhead = 
+    sizeof (size_t) + 2*sizeof (CookieType);
+  // Maximum allocatable size, to avoid wraparound when the cookies are added
+  static const size_t maxRequest = (~(size_t)0) - cookieOverhead;
 }
-CS_FORCEINLINE static CookieType GetCookie (void* p)
-{
-  return CookieType (intptr_t (&cookie) ^ intptr_t (p));
-}
-static const size_t cookieOverhead = 
-  sizeof (size_t) + 2*sizeof (CookieType);
-// Maximum allocatable size, to avoid wraparound when the cookies are added
-static const size_t maxRequest = (~(size_t)0) - cookieOverhead;
 #endif
 
 void* ptmalloc (size_t n)
@@ -172,7 +175,7 @@ void* ptcalloc (size_t n, size_t s)
 #if defined(CS_PLATFORM_WIN32)
 
 /* Cygwin has funny issues with atexit() that ptmalloc seems to tickle.
- * So within ptmalloc we use own own single-use implementation of atexit()
+ * So within ptmalloc we use our own single-use implementation of atexit()
  * when on Cygwin.  Note that use of a static variable could lead to incorrect
  * cleanup order so we use the GCC "__attribute__ ((init_priority (101))"
  * extention to force atexitHandler to be constructed before other

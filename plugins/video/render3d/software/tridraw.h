@@ -67,7 +67,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Soft3D)
       size_t num_vertices = rangeEnd + 1;
   
       csDirtyAccessArray<csVector3>& persp = g3d->persp;
-      persp.SetLength (num_vertices);
+      persp.SetSize (num_vertices);
       const int width2 = g3d->persp_center_x;
       const int height2 = g3d->persp_center_y;
       const float aspect = g3d->aspect;

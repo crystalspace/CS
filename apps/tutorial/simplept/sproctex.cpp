@@ -18,6 +18,9 @@
 
 #include "simplept.h"
 
+// Uncomment to render to a float texture
+//#define FLOAT_TEXTURE
+
 csEngineProcTex::csEngineProcTex() : csProcTexture ()
 {
   mat_w = 256;
@@ -32,9 +35,9 @@ csEngineProcTex::~csEngineProcTex ()
 
 bool csEngineProcTex::LoadLevel ()
 {
-  Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
-  csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
-  csRef<iLoader> loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  Engine = csQueryRegistry<iEngine> (object_reg);
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+  csRef<iLoader> loader = csQueryRegistry<iLoader> (object_reg);
   // load a map file to display
   vfs->PushDir ();
   vfs->ChDir ("/lev/flarge/");
@@ -42,6 +45,24 @@ bool csEngineProcTex::LoadLevel ()
   vfs->PopDir ();
   if (!Success) return false;
   return true;
+}
+
+iTextureWrapper* csEngineProcTex::CreateTexture (iObjectRegistry* object_reg)
+{
+  iTextureWrapper* tex;
+
+  csRef<iEngine> engine (csQueryRegistry<iEngine> (object_reg));
+  csRef<iTextureHandle> texHandle = 
+    g3d->GetTextureManager()->CreateTexture (mat_w, mat_h, csimg2D, 
+#ifdef FLOAT_TEXTURE
+    "rgb16_f",
+#else
+    "rgb8",
+#endif
+    CS_TEXTURE_3D | texFlags);
+  tex = engine->GetTextureList()->NewTexture (texHandle);
+
+  return tex;
 }
 
 bool csEngineProcTex::PrepareAnim ()

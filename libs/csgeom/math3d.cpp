@@ -519,7 +519,6 @@ bool csIntersect3::SegmentPlane (
   csVector3 &isect,
   float &dist)
 {
-  float counter = normal * (u - a);
   float divider = normal * (v - u);
   if (divider == 0)
   {
@@ -527,6 +526,7 @@ bool csIntersect3::SegmentPlane (
     return false;
   }
 
+  float counter = normal * (u - a);
   dist = -counter / divider;
   isect = u + dist * (v - u);
   return true;
@@ -559,6 +559,39 @@ bool csIntersect3::SegmentPlane (
 
   isect = u + dist * -uv;
   return true;
+}
+
+bool csIntersect3::SegmentPlane (
+  const csPlane3& plane,
+  csSegment3& segment)
+{
+  const csVector3& start = segment.Start ();
+  const csVector3& end = segment.End ();
+
+  csVector3 isec;
+  float dist;
+
+  if (SegmentPlane (start, end, plane, isec, dist))
+  {
+    // Have an intersection, update segment
+    const csVector3 d = end - start;
+    const float dd = d * plane.norm;
+
+    if (dd > 0)
+    {
+      // Plane pointing opposite to segment, update end
+      segment.SetEnd (isec);
+    }
+    else
+    {
+      segment.SetStart (isec);
+    }
+
+    return true;
+  }
+
+
+  return false;
 }
 
 bool csIntersect3::ThreePlanes (
@@ -737,7 +770,8 @@ int csIntersect3::BoxSegment (
   const csBox3 &box,
   const csSegment3 &seg,
   csVector3 &isect,
-  float *pr)
+  float *pr,
+  bool use_ray)
 {
   const csVector3 &u = seg.Start ();
   const csVector3 &v = seg.End ();
@@ -767,15 +801,15 @@ int csIntersect3::BoxSegment (
         if (ABS (v.x - u.x) > SMALL_EPSILON)
         {
           r = (plane_pos - u.x) / (v.x - u.x);
-          if (r < 0 || r > 1) break;
+          if (r < 0 || ((!use_ray) && r > 1)) break;
           isect.x = plane_pos;
           isect.y = r * (v.y - u.y) + u.y;
           isect.z = r * (v.z - u.z) + u.z;
           if (
-            isect.y >= box.MinY () &&
-            isect.y <= box.MaxY () &&
-            isect.z >= box.MinZ () &&
-            isect.z <= box.MaxZ ())
+            isect.y + EPSILON >= box.MinY () &&
+            isect.y - EPSILON <= box.MaxY () &&
+            isect.z + EPSILON >= box.MinZ () &&
+            isect.z - EPSILON <= box.MaxZ ())
           {
             if (pr) *pr = r;
             return sides[i];
@@ -791,7 +825,7 @@ int csIntersect3::BoxSegment (
         if (ABS (v.y - u.y) > SMALL_EPSILON)
         {
           r = (plane_pos - u.y) / (v.y - u.y);
-          if (r < 0 || r > 1) break;
+          if (r < 0 || ((!use_ray) && r > 1)) break;
           isect.x = r * (v.x - u.x) + u.x;
           isect.y = plane_pos;
           isect.z = r * (v.z - u.z) + u.z;
@@ -815,7 +849,7 @@ int csIntersect3::BoxSegment (
         if (ABS (v.z - u.z) > SMALL_EPSILON)
         {
           r = (plane_pos - u.z) / (v.z - u.z);
-          if (r < 0 || r > 1) break;
+          if (r < 0 || ((!use_ray) && r > 1)) break;
           isect.x = r * (v.x - u.x) + u.x;
           isect.y = r * (v.y - u.y) + u.y;
           isect.z = plane_pos;
@@ -836,6 +870,84 @@ int csIntersect3::BoxSegment (
   return -1;
 }
 
+bool csIntersect3::ClipSegmentBox (csSegment3& segment, const csBox3& box,
+    bool use_ray)
+{
+  const csVector3& minBox = box.Min ();
+  const csVector3& maxBox = box.Max ();
+
+  float minLength = 0.0f;
+  float maxLength;
+  if (use_ray) maxLength = FLT_MAX * 0.9f;
+  else maxLength = sqrtf (csSquaredDist::PointPoint (segment.Start (),
+	segment.End ()));
+
+  const csVector3& origin = segment.Start ();
+  csVector3 direction = (segment.End () - segment.Start ()).Unit ();
+
+  float mint = minLength;
+  float maxt = maxLength;
+
+  // Check if ray have any chance of going through box
+  int i = 0;
+  for (i = 0; i < 3; i++)
+  {
+    if (direction[i] < 0)
+    {
+      if (origin[i] < minBox[i]) return false;
+    }
+    else if (direction[i] > 0)
+    {
+      if (origin[i] > maxBox[i]) return false;
+    }
+  }
+
+  // Clip one dimension at a time
+  for (i = 0; i < 3; i++)
+  {
+    float pos = origin[i] + direction[i] * maxt;
+
+    // Ray going "left"
+    if (direction[i] < 0)
+    {
+      // Clip end
+      if (pos < minBox[i])
+      {
+        maxt = mint + (maxt - mint) * ((origin[i] - minBox[i])
+	    / (origin[i] - pos));
+      }
+      // Clip start
+      if (origin[i] > maxBox[i])
+      {
+        mint += (maxt - mint) * ((origin[i] - maxBox[i])
+	    / (maxt * direction[i]));
+      }
+    }
+    else if (direction[i] > 0) // Ray going "right"
+    {
+      // Clip end
+      if (pos > maxBox[i])
+      {
+        maxt = mint + (maxt - mint) * ((maxBox[i] - origin[i])
+	    / (pos - origin[i]));
+      }
+      // Clip start
+      if (origin[i] < minBox[i])
+      {
+        mint += (maxt - mint) * ((minBox[i] - origin[i])
+	    / (maxt * direction[i]));
+      }
+    }
+    if (mint > maxt) return false;
+  }
+
+  segment.SetStart (origin + mint * direction);
+  segment.SetEnd (origin + maxt * direction);
+
+  return true;
+}
+
+
 bool csIntersect3::BoxFrustum (const csBox3& box, const csFrustum* frustum)
 {
   if (frustum->IsInfinite ()) return true;
@@ -844,10 +956,10 @@ bool csIntersect3::BoxFrustum (const csBox3& box, const csFrustum* frustum)
   csVector3 d = box.Max ()-m;		// Half-diagonal.
 
   const csVector3& origin = frustum->GetOrigin ();
-  int vtcount = frustum->GetVertexCount ();
+  size_t vtcount = frustum->GetVertexCount ();
   csVector3* vts = frustum->GetVertices ();
-  int i1 = vtcount-1;
-  int i;
+  size_t i1 = vtcount-1;
+  size_t i;
   for (i = 0 ; i < vtcount ; i++)
   {
     csPlane3 p (origin, vts[i], vts[i1]);
@@ -866,7 +978,7 @@ bool csIntersect3::BoxFrustum (const csBox3& box, const csFrustum* frustum)
   return true;
 }
 
-bool csIntersect3::BoxFrustum (const csBox3& box, csPlane3* f,
+bool csIntersect3::BoxFrustum (const csBox3& box, const csPlane3* f,
 	uint32 inClipMask, uint32& outClipMask)
 {
   csVector3 m = box.GetCenter ();

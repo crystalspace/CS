@@ -23,6 +23,8 @@
 
 using namespace CS;
 
+CS_LEAKGUARD_IMPLEMENT (csEmptyDocumentNodeIterator);
+CS_LEAKGUARD_IMPLEMENT (csEmptyDocumentAttributeIterator);
 
 csEmptyDocumentNodeIterator::csEmptyDocumentNodeIterator ()
   : scfImplementationType (this)
@@ -64,8 +66,8 @@ csRef<iDocumentNodeIterator> csDocumentNodeCommon::GetNodes (const char* value)
 {
   csRef<iDocumentNodeIterator> it = GetNodes();
   if (!it.IsValid()) return 0;
-  return DocumentHelper::FilterDocumentNodeIterator (it, 
-    DocumentHelper::NodeValueTest (value));
+  return DocSystem::FilterDocumentNodeIterator (it, 
+    DocSystem::NodeValueTest (value));
 }
 
 const char* csDocumentNodeCommon::GetContentsValue ()

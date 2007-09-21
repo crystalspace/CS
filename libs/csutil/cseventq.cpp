@@ -46,7 +46,6 @@ csEventQueue::csEventQueue (iObjectRegistry* r, size_t iLength) :
   EventQueue(0), evqHead(0), evqTail(0), Length(0),
   EventTree(0), EventPool(0)
 {
-  Mutex = csMutex::Create();
   Resize (iLength);
   // Create the default event outlet.
   EventOutlets.Push (new csEventOutlet (0, this, Registry));

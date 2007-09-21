@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node 3DSMax, md32spr Tutorial, Blender, Working with Engine Content
+@node 3DSMax, Using lighter2, Blender, Working with Engine Content
 @section Making Levels and Models in 3DSMax
 @cindex 3DSMax
 

@@ -32,8 +32,8 @@ vertex2fragment main (app2vertex IN,
 	objLight.xyz -= IN.Position.xyz;
 	
 	OUT.Position = mul (ModelViewProj, IN.Position);
-	OUT.Attenuation1.xy = -objLight.xy*Attenuation.y*0.8 + 0.5; 
-	OUT.Attenuation2.x = -objLight.z*Attenuation.y*0.8 + 0.5; 
+	OUT.Attenuation1.xy = -objLight.xy*Attenuation.y*0.4 + 0.5; 
+	OUT.Attenuation2.x = -objLight.z*Attenuation.y*0.4 + 0.5; 
 	OUT.Attenuation2.y = 0.5;
 
 	return OUT;

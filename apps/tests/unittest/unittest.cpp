@@ -45,7 +45,7 @@ static void Test (iBase* obj, const char* name)
     fflush (stdout);
     return;
   }
-  csRef<iDebugHelper> dbghelp (SCF_QUERY_INTERFACE (obj, iDebugHelper));
+  csRef<iDebugHelper> dbghelp (scfQueryInterface<iDebugHelper> (obj));
   if (dbghelp && (dbghelp->GetSupportedTests () & CS_DBGHELP_UNITTEST))
   {
     csRef<iString> str (dbghelp->UnitTest ());
@@ -73,7 +73,7 @@ static void Benchmark (iBase* obj, const char* name, int num_iterations)
     fflush (stdout);
     return;
   }
-  csRef<iDebugHelper> dbghelp (SCF_QUERY_INTERFACE (obj, iDebugHelper));
+  csRef<iDebugHelper> dbghelp (scfQueryInterface<iDebugHelper> (obj));
   if (dbghelp && (dbghelp->GetSupportedTests () & CS_DBGHELP_BENCHMARK))
   {
     csTicks t = dbghelp->Benchmark (num_iterations);
@@ -88,7 +88,7 @@ static void Benchmark (iBase* obj, const char* name, int num_iterations)
 static int DoStuff (iObjectRegistry* object_reg)
 {
   csRef<iPluginManager> plugmgr (
-  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+  	csQueryRegistry<iPluginManager> (object_reg));
   if (!plugmgr)
   {
     csInitializer::DestroyApplication (object_reg);
@@ -97,13 +97,13 @@ static int DoStuff (iObjectRegistry* object_reg)
 
   csPrintf ("================================================================\n");
 
-  csRef<iCollideSystem> cdsys (CS_LOAD_PLUGIN (plugmgr,
-  	"crystalspace.collisiondetection.opcode", iCollideSystem));
+  csRef<iCollideSystem> cdsys = csLoadPlugin<iCollideSystem> (plugmgr,
+  	"crystalspace.collisiondetection.opcode");
   Test (cdsys, "Opcode");
 
   csPrintf ("================================================================\n");
 
-  csRef<iEngine> engine (CS_QUERY_REGISTRY (object_reg, iEngine));
+  csRef<iEngine> engine (csQueryRegistry<iEngine> (object_reg));
   Test (engine, "Engine");
 
   csPrintf ("================================================================\n");
@@ -114,14 +114,14 @@ static int DoStuff (iObjectRegistry* object_reg)
 
   csPrintf ("================================================================\n");
 
-  csRef<iSyntaxService> syntax (CS_LOAD_PLUGIN (plugmgr,
-	"crystalspace.syntax.loader.service.text", iSyntaxService));
+  csRef<iSyntaxService> syntax = csLoadPlugin<iSyntaxService> (plugmgr,
+	"crystalspace.syntax.loader.service.text");
   Test (syntax, "Syntax Services");
 
   csPrintf ("================================================================\n");
 
-  csRef<iVisibilityCuller> viscull (CS_LOAD_PLUGIN (plugmgr,
-  	"crystalspace.culling.dynavis", iVisibilityCuller));
+  csRef<iVisibilityCuller> viscull = csLoadPlugin<iVisibilityCuller> (plugmgr,
+  	"crystalspace.culling.dynavis");
   Test (viscull, "DynaVis");
   //Benchmark (viscull, "DynaVis", 100);
 

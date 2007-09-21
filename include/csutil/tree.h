@@ -34,7 +34,7 @@ class csTreeNode
 public:
   /// Returns true if this node has no children.
   bool IsLeaf ()
-  { return children.Length () == 0; }
+  { return children.GetSize () == 0; }
 
   /// Remove a child node.
   void RemoveChild (csTreeNode *child)
@@ -54,7 +54,7 @@ public:
   virtual ~csTreeNode ()
   {
     size_t i;
-    for(i=children.Length (); i>0; i--)
+    for(i=children.GetSize (); i>0; i--)
       delete children.Get (i - 1);
     if (parent)
       parent->RemoveChild (this);
@@ -80,7 +80,7 @@ public:
     bool dive;
     if (TreeFunc (this, param, stopOnSuccess))
       foundNode = this;
-    while (i<children.Length () && !(foundNode && stopOnSuccess))
+    while (i<children.GetSize () && !(foundNode && stopOnSuccess))
     {
       dive = (SelBranch == 0) || SelBranch (children[i]);
       if (dive)
@@ -110,7 +110,7 @@ public:
     csArray<csTreeNode*> fifo;
 
     fifo.Push (this);
-    while (fifo.Length () > 0 && !(foundNode && stopOnSuccess))
+    while (fifo.GetSize () > 0 && !(foundNode && stopOnSuccess))
     {
       node = fifo[0]; fifo.DeleteIndex (0);
       if (TreeFunc (node, param, stopOnSuccess))
@@ -118,7 +118,7 @@ public:
       if (!node->IsLeaf () && (SelBranch==0 || SelBranch (node)))
       {
 	size_t i;
-        for (i=0; i < node->children.Length (); i++ )
+        for (i=0; i < node->children.GetSize (); i++ )
           fifo.Push (node->children[i]);
       }
     }

@@ -24,6 +24,7 @@
  */ 
 
 #include "csutil/scf_interface.h"
+#include "ivideo/rendermesh.h"
 
 struct iDocumentNode;
 struct iGenMeshAnimationControl;
@@ -46,7 +47,7 @@ class csEllipsoid;
 
 struct iGeneralMeshSubMesh : public virtual iBase
 {
-  SCF_INTERFACE (iGeneralMeshSubMesh, 1, 0, 1);
+  SCF_INTERFACE (iGeneralMeshSubMesh, 1, 0, 3);
   
   /// Get the index render buffer
   virtual iRenderBuffer* GetIndices () const = 0;
@@ -62,6 +63,30 @@ struct iGeneralMeshSubMesh : public virtual iBase
 
   /// Set the material, or 0 to use default.
   virtual void SetMaterial (iMaterialWrapper* material) = 0;
+  
+  /// Get the Z buffer mode (or (csZBufMode)~0 if none was specified)
+  virtual csZBufMode GetZMode () const = 0;
+  
+  /// Set the Z buffer mode ((csZBufMode)~0 to use default)
+  virtual void SetZMode (csZBufMode mode) = 0;
+  
+  /// Get the render priority (or -1 if none was specified)
+  virtual CS::Graphics::RenderPriority GetRenderPriority () const = 0;
+
+  /// Set the render priority (-1 to use default)
+  virtual void SetRenderPriority (CS::Graphics::RenderPriority prio) = 0;
+
+  /// Set the mixmode (or (uint)~0 to use default)
+  virtual void SetMixmode (uint mode) = 0;
+
+  /**
+   * Set back-to-front sorting for submesh. If 'false', factory setting will be
+   * used.
+   */
+  virtual void SetBack2Front (bool enable) = 0;
+  
+  /// Get back-to-front sorting for submesh.
+  virtual bool GetBack2Front () const = 0;
 };
 
 /**
@@ -175,46 +200,6 @@ struct iGeneralMeshState : public virtual iGeneralMeshCommonState
    */
   virtual iGeneralMeshSubMesh* FindSubMesh (const char* name) const = 0;
   /** @} */
-
-  /**\name Legacy submesh support
-   * @{ */
-  /**
-   * Add a submesh to this object. A submesh is a subset of the mesh triangles
-   * rendered with a certain material. When a mesh has one or more submeshes,
-   * only submeshes are drawn and not original geometry. That means submeshes
-   * should cover all original triangles to avoid holes in the mesh.
-   * triangles is an array of indices into the factory triangle list
-   * tricount is the number of triangles in "triangles"
-   * material is a material to assign to the mesh
-   * Note! SubMeshes added to an instance of a genmesh will override
-   * the submeshes from the factory (i.e. the submeshes of the factory will
-   * be completely ignored as soon as the instance has submeshes).
-   * \deprecated Use AddSubMesh from iGeneralFactoryState instead
-   */
-  CS_DEPRECATED_METHOD_MSG("Use AddSubMesh from iGeneralFactoryState instead")
-  virtual void AddSubMesh (unsigned int *triangles,
-    int tricount,
-    iMaterialWrapper *material) = 0;
-
-  /**
-   * Add a submesh to this object. A submesh is a subset of the mesh triangles
-   * rendered with a certain material. When a mesh has one or more submeshes,
-   * only submeshes are drawn and not original geometry. That means submeshes
-   * should cover all original triangles to avoid holes in the mesh.
-   * triangles is an array of indices into the factory triangle list
-   * tricount is the number of triangles in "triangles"
-   * material is a material to assign to the mesh
-   * Note! SubMeshes added to an instance of a genmesh will override
-   * the submeshes from the factory (i.e. the submeshes of the factory will
-   * be completely ignored as soon as the instance has submeshes).
-   * This version overrides the parent mixmode.
-   * \deprecated Use AddSubMesh from iGeneralFactoryState instead
-   */
-  CS_DEPRECATED_METHOD_MSG("Use AddSubMesh from iGeneralFactoryState instead")
-  virtual void AddSubMesh (unsigned int *triangles,
-    int tricount,
-    iMaterialWrapper *material, uint mixmode) = 0;
-  /** @} */
 };
 
 /**
@@ -241,7 +226,7 @@ struct iGeneralMeshState : public virtual iGeneralMeshCommonState
  */
 struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
 {
-  SCF_INTERFACE (iGeneralFactoryState, 1, 1, 0);
+  SCF_INTERFACE (iGeneralFactoryState, 1, 1, 1);
   
   /// Set the color to use. Will be added to the lighting values.
   virtual void SetColor (const csColor& col) = 0;
@@ -350,6 +335,14 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
   virtual void GenerateBox (const csBox3& box) = 0;
 
   /**
+   * Automatically generate a capsule of given length and radius.
+   * \param l Capsule length.
+   * \param r Capsule radius.
+   * \param sides Number of sides.
+   */
+  virtual void GenerateCapsule (float l, float r, uint sides) = 0;
+
+  /**
    * Automatically generate a sphere. This will set the apropriate number 
    * of vertices and generate vertices, texels, normals, and triangles.
    * The vertex colors are set to black.
@@ -440,6 +433,14 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
   /// Get a specific submesh
   virtual iGeneralMeshSubMesh* GetSubMesh (size_t index) const = 0;
   /** @} */
+
+  /**
+   * Disable auto-generated normals.
+   * This does not have an effect on the current normals, but only changes the
+   * return value of IsAutoNormals(). However, this affects saving of genmesh
+   * factories, as all vertex normals will be written out explicitly.
+   */
+  virtual void DisableAutoNormals () = 0;
 };
 
 /**
@@ -522,6 +523,8 @@ struct iGenMeshAnimationControl : public virtual iBase
    * changes. The animation control can use this to optimize the animation
    * calculation by caching the animated version of the array and returning
    * that one.
+   * \remarks \a colors may be 0. In this case all color values should be
+   *   assumed to be (0, 0, 0, 1).
    */
   virtual const csColor4* UpdateColors (csTicks current,
   	const csColor4* colors, int num_colors, uint32 version_id) = 0;

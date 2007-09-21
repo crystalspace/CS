@@ -32,7 +32,7 @@
 #include "iengine/rendersteps/ilightiter.h"
 #include "iengine/viscull.h"
 #include "imesh/objmodel.h"
-#include "igeom/polymesh.h"
+#include "igeom/trimesh.h"
 #include "csutil/hash.h"
 #include "csutil/csstring.h"
 #include "csutil/strhash.h"
@@ -55,6 +55,9 @@ private:
   csStencil2ShadowStep* parent;
   iObjectModel* model;
   iMeshWrapper* meshWrapper;
+
+  // If true we use the new triangle mesh system.
+  bool use_trimesh;
 
   struct csLightCacheEntry 
   {
@@ -87,7 +90,7 @@ private:
   csArray<csVector3> edge_midpoints;
   csArray<csVector3> edge_normals;
 
-  csStencil2PolygonMesh* closedMesh;
+  csStencil2TriangleMesh* closedMesh;
   bool enable_caps;
   bool meshShadows;
 
@@ -130,6 +133,10 @@ private:
   csWeakRef<iShaderManager> shmgr;
   csRef<csStencil2ShadowType> type;
 
+  // ID's for the triangle mesh system.
+  csStringID base_id;
+  csStringID shadows_id;
+
   bool enableShadows;
   csRefArray<iLightRenderStep> steps;
 
@@ -160,6 +167,8 @@ public:
   virtual ~csStencil2ShadowStep ();
 
   bool Initialize (iObjectRegistry* objreg);
+  csStringID GetBaseID () const { return base_id; }
+  csStringID GetShadowsID () const { return shadows_id; }
 
   void Perform (iRenderView* rview, iSector* sector,
     iShaderVarStack* stacks);

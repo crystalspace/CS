@@ -19,7 +19,6 @@
 #include "cssysdef.h"
 #include "csqint.h"
 
-#include "csutil/debug.h"
 #include "iengine/texture.h"
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
@@ -38,8 +37,6 @@ void csMaterial::SetupSVNames()
   {
     SVNames().diffuseTex = CS::ShaderVarName (engine->globalStringSet,
       CS_MATERIAL_TEXTURE_DIFFUSE);
-    SVNames().flatcolor = CS::ShaderVarName (engine->globalStringSet,
-      CS_MATERIAL_VARNAME_FLATCOLOR);
   }
 }
 
@@ -49,7 +46,6 @@ csMaterial::csMaterial (csEngine* engine) :
   SetupSVNames();
 
   SetTextureWrapper (0);
-  SetFlatColor (csRGBcolor (255, 255, 255));
 }
 
 csMaterial::csMaterial (csEngine* engine,
@@ -59,7 +55,6 @@ csMaterial::csMaterial (csEngine* engine,
   SetupSVNames();
 
   SetTextureWrapper (w);
-  SetFlatColor (csRGBcolor (255, 255, 255));
 }
 
 csMaterial::~csMaterial ()
@@ -76,32 +71,6 @@ csShaderVariable* csMaterial::GetVar (csStringID name, bool create)
     CS::ShaderVariableContextImpl::AddVariable (var);
   }
   return var;
-}
-
-void csMaterial::GetFlatColor (csRGBpixel &oColor, bool /*useTextureMean*/)
-{
-  csRGBcolor flat_color;
-  csShaderVariable* var = GetVar (SVNames().flatcolor);
-  if (var == 0) 
-  {
-    flat_color.Set (255, 255, 255);
-  }
-  else
-  {
-    csVector3 v;
-    var->GetValue (v);
-    flat_color.Set (csQint (v.x * 255.99f), csQint (v.y * 255.99f), 
-      csQint (v.z * 255.99f));
-  }
-  oColor = flat_color;
-}
-
-void csMaterial::SetFlatColor (const csRGBcolor& col)
-{ 
-  csShaderVariable* var = GetVar (SVNames().flatcolor, true);
-  csVector3 v (((float)col.red) / 255.0f, ((float)col.green) / 255.0f, 
-    ((float)col.blue) / 255.0f);
-  var->SetValue (v);
 }
 
 void csMaterial::SetTextureWrapper (iTextureWrapper *tex)
@@ -132,7 +101,7 @@ void csMaterial::SetShader (csStringID type, iShader* shd)
 
 iShader* csMaterial::GetShader(csStringID type)
 {
-  return shaders.Get (type, 0);
+  return shaders.Get (type, (iShader*)0);
 }
 
 iTextureHandle *csMaterial::GetTexture ()
@@ -195,7 +164,7 @@ csMaterialWrapper::csMaterialWrapper (iMaterialList* materials,
   scfImplementationType (this), materials (materials)
 {
   material = m;
-  matEngine = SCF_QUERY_INTERFACE (material, iMaterialEngine);
+  matEngine = scfQueryInterface<iMaterialEngine> (material);
 }
 
 csMaterialWrapper::~csMaterialWrapper ()
@@ -210,7 +179,7 @@ void csMaterialWrapper::SelfDestruct ()
 void csMaterialWrapper::SetMaterial (iMaterial *m)
 {
   material = m;
-  matEngine = SCF_QUERY_INTERFACE (material, iMaterialEngine);
+  matEngine = scfQueryInterface<iMaterialEngine> (material);
 }
 
 void csMaterialWrapper::Visit ()
@@ -293,7 +262,7 @@ bool csMaterialList::Remove (int n)
 void csMaterialList::RemoveAll ()
 {
   size_t i;
-  for (i = 0 ; i < list.Length () ; i++)
+  for (i = 0 ; i < list.GetSize () ; i++)
     list[i]->QueryObject ()->RemoveNameChangeListener (listener);
   list.DeleteAll ();
   mat_hash.DeleteAll ();

@@ -37,7 +37,7 @@ FrameBegin3DDraw::~FrameBegin3DDraw ()
   engine.Invalidate();
 }
 
-bool FrameBegin3DDraw::HandleEvent (iEvent &ev)
+bool FrameBegin3DDraw::HandleEvent (iEvent & /*ev*/)
 {
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
     return false;
@@ -59,7 +59,7 @@ FramePrinter::~FramePrinter()
   g3d.Invalidate();
 }
 
-bool FramePrinter::HandleEvent (iEvent &ev) {
+bool FramePrinter::HandleEvent (iEvent & /*ev*/) {
   g3d->FinishDraw ();
   g3d->Print (0);
   return false;

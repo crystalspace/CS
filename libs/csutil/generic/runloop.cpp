@@ -75,10 +75,10 @@ public:
 
 bool csDefaultRunLoop (iObjectRegistry* r)
 {
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY(r, iEventQueue));
+  csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (r));
   if (!q)
     return false;
-  csRef<iVirtualClock> vc (CS_QUERY_REGISTRY(r, iVirtualClock));
+  csRef<iVirtualClock> vc (csQueryRegistry<iVirtualClock> (r));
 
   csRef<csDefaultQuitEventHandler> eh;
   eh.AttachNew (new csDefaultQuitEventHandler (r));

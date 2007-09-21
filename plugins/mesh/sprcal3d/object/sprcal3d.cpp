@@ -23,6 +23,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/polyclip.h"
 #include "csgeom/quaternion.h"
 #include "csgeom/sphere.h"
+#include "cstool/rviewclipper.h"
 #include "csgfx/renderbuffer.h"
 #include "csgfx/shadervarcontext.h"
 #include "csutil/bitarray.h"
@@ -32,6 +33,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/memfile.h"
 #include "csutil/randomgen.h"
+#include "csutil/hash.h"
 #include "csutil/sysfunc.h"
 #include "cstool/rbuflock.h"
 
@@ -127,13 +129,13 @@ void csSpriteCal3DSocket::SetMeshWrapper (iMeshWrapper* mesh)
 size_t csSpriteCal3DSocket::AttachSecondary (iMeshWrapper * mesh, csReversibleTransform trans)
 {
   secondary_meshes.Push(csSpriteCal3DSocketMesh(mesh, trans));
-  return secondary_meshes.Length()-1;
+  return secondary_meshes.GetSize ()-1;
 }
 
 void csSpriteCal3DSocket::DetachSecondary (const char* mesh_name)
 {
   size_t a=FindSecondary(mesh_name);
-  if (a < secondary_meshes.Length())
+  if (a < secondary_meshes.GetSize ())
     secondary_meshes.DeleteIndex(a);
 }
 
@@ -144,13 +146,13 @@ void csSpriteCal3DSocket::DetachSecondary (size_t index)
 
 size_t csSpriteCal3DSocket::FindSecondary (const char* mesh_name)
 {
-  for (size_t a=0; a<secondary_meshes.Length(); ++a)
+  for (size_t a=0; a<secondary_meshes.GetSize (); ++a)
   {
     if (strcmp (secondary_meshes[a].mesh->QueryObject()->GetName(), 
       mesh_name) == 0)
       return a;
   }
-  return secondary_meshes.Length();
+  return secondary_meshes.GetSize ();
 }
 
 //--------------------------------------------------------------------------
@@ -168,14 +170,11 @@ csSpriteCal3DMeshObjectFactory::csSpriteCal3DMeshObjectFactory (
   scfImplementationType (this, (iBase*)pParent), sprcal3d_type (pParent), 
   calCoreModel("no name")
 {
-  SetPolygonMeshBase (sprcal3d_type->nullPolyMesh);
-  SetPolygonMeshColldet (sprcal3d_type->nullPolyMesh);
-  SetPolygonMeshViscull (0);
-  SetPolygonMeshShadows (0);
-
   csSpriteCal3DMeshObjectFactory::object_reg = object_reg;
 
-  light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
+  light_mgr = csQueryRegistry<iLightManager> (object_reg);
+
+  skel_factory.AttachNew (new csCal3dSkeletonFactory ());
 }
 
 csSpriteCal3DMeshObjectFactory::~csSpriteCal3DMeshObjectFactory ()
@@ -231,6 +230,7 @@ bool csSpriteCal3DMeshObjectFactory::LoadCoreSkeleton (iVFS *vfs,
     if (skel)
     {
       calCoreModel.setCoreSkeleton (skel.get());
+      skel_factory->SetSkeleton (&calCoreModel);
       return true;
     }
     else
@@ -322,7 +322,7 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMorphTarget (
     const char *filename,
     const char *name)
 {
-  if (mesh_index < 0 || meshes.Length() <= (size_t)mesh_index)
+  if (mesh_index < 0 || meshes.GetSize () <= (size_t)mesh_index)
   {
     return -1;
   }
@@ -357,8 +357,7 @@ void csSpriteCal3DMeshObjectFactory::CalculateAllBoneBoundingBoxes()
 
 int csSpriteCal3DMeshObjectFactory::AddMorphAnimation(const char *name)
 {
-  int id = calCoreModel.addCoreMorphAnimation(new (allocPlatform)
-    CalCoreMorphAnimation());
+  int id = calCoreModel.addCoreMorphAnimation(new CalCoreMorphAnimation());
   morph_animation_names.Push(name);
   return id;
 }
@@ -374,12 +373,12 @@ bool csSpriteCal3DMeshObjectFactory::AddMorphTarget( int morphanimation_index,
   }
   csArray<csString>& morph_target = meshes[mesh_index]->morph_target_name;
   size_t i;
-  for (i=0; i<morph_target.Length(); i++)
+  for (i=0; i<morph_target.GetSize (); i++)
   {
     if (morph_target[i] == morphtarget_name)
       break;
   }
-  if(i==morph_target.Length())
+  if(i==morph_target.GetSize ())
   {
     return false;
   }
@@ -390,16 +389,16 @@ bool csSpriteCal3DMeshObjectFactory::AddMorphTarget( int morphanimation_index,
 
 int csSpriteCal3DMeshObjectFactory::GetMorphTargetCount(int mesh_id)
 {
-  if (mesh_id < 0|| meshes.Length() <= (size_t)mesh_id)
+  if (mesh_id < 0|| meshes.GetSize () <= (size_t)mesh_id)
   {
     return -1;
   }
-  return (int)meshes[mesh_id]->morph_target_name.Length();
+  return (int)meshes[mesh_id]->morph_target_name.GetSize ();
 }
 
 const char *csSpriteCal3DMeshObjectFactory::GetMeshName(int idx)
 {
-  if ((size_t)idx >= meshes.Length())
+  if ((size_t)idx >= meshes.GetSize ())
     return 0;
 
   return meshes[idx]->name;
@@ -407,7 +406,7 @@ const char *csSpriteCal3DMeshObjectFactory::GetMeshName(int idx)
 
 bool csSpriteCal3DMeshObjectFactory::IsMeshDefault(int idx)
 {
-  if ((size_t)idx >= meshes.Length())
+  if ((size_t)idx >= meshes.GetSize ())
     return false;
 
   return meshes[idx]->attach_by_default;
@@ -515,7 +514,7 @@ iSpriteCal3DSocket* csSpriteCal3DMeshObjectFactory::FindSocket (
 
 int csSpriteCal3DMeshObjectFactory::FindMeshName (const char *meshName)
 {
-  for (size_t i=0; i<meshes.Length(); i++)
+  for (size_t i=0; i<meshes.GetSize (); i++)
   {
     if (meshes[i]->name == meshName)
       return (int)i;
@@ -540,7 +539,7 @@ const char* csSpriteCal3DMeshObjectFactory::GetDefaultMaterial (
 
 const char *csSpriteCal3DMeshObjectFactory::GetMorphAnimationName(int idx)
 {
-  if ((size_t)idx >= morph_animation_names.Length())
+  if ((size_t)idx >= morph_animation_names.GetSize ())
     return 0;
 
   return morph_animation_names[idx];
@@ -549,7 +548,7 @@ const char *csSpriteCal3DMeshObjectFactory::GetMorphAnimationName(int idx)
 int csSpriteCal3DMeshObjectFactory::FindMorphAnimationName (
     const char *meshName)
 {
-  for (size_t i=0; i<morph_animation_names.Length(); i++)
+  for (size_t i=0; i<morph_animation_names.GetSize (); i++)
   {
     if (morph_animation_names[i] == meshName)
       return (int)i;
@@ -557,10 +556,9 @@ int csSpriteCal3DMeshObjectFactory::FindMorphAnimationName (
   return -1;
 }
 
-
 bool csSpriteCal3DMeshObjectFactory::AddCoreMaterial(iMaterialWrapper *mat)
 {
-  CalCoreMaterial *newmat = new (allocPlatform) CalCoreMaterial;
+  CalCoreMaterial *newmat = new CalCoreMaterial;
   CalCoreMaterial::Map newmap;
   newmap.userData = mat;
 
@@ -604,7 +602,7 @@ csPtr<iMeshObject> csSpriteCal3DMeshObjectFactory::NewInstance ()
   spr->updateanim_sqdistance3 = sprcal3d_type->updateanim_sqdistance3;
   spr->updateanim_skip3 = sprcal3d_type->updateanim_skip3;
 
-  csRef<iMeshObject> im (SCF_QUERY_INTERFACE (spr, iMeshObject));
+  csRef<iMeshObject> im (scfQueryInterface<iMeshObject> (spr));
   spr->DecRef ();
   return csPtr<iMeshObject> (im);
 }
@@ -612,7 +610,7 @@ csPtr<iMeshObject> csSpriteCal3DMeshObjectFactory::NewInstance ()
 bool csSpriteCal3DMeshObjectFactory::RegisterAnimCallback(
     const char *anim, CalAnimationCallback *callback,float min_interval)
 {
-  for (size_t i=0; i<anims.Length(); i++)
+  for (size_t i=0; i<anims.GetSize (); i++)
   {
     if (anims[i]->name == anim)
     {
@@ -627,7 +625,7 @@ bool csSpriteCal3DMeshObjectFactory::RegisterAnimCallback(
 bool csSpriteCal3DMeshObjectFactory::RemoveAnimCallback(
     const char *anim, CalAnimationCallback *callback)
 {
-  for (size_t i=0; i<anims.Length(); i++)
+  for (size_t i=0; i<anims.GetSize (); i++)
   {
     if (anims[i]->name == anim)
     {
@@ -704,6 +702,136 @@ void csSpriteCal3DMeshObjectFactory::HardTransform (
 //  calCoreModel.getCoreSkeleton()->calculateBoundingBoxes(&calCoreModel);
 }
 
+//---------------------------csCal3dSkeletonFactory---------------------------
+
+csCal3dSkeletonFactory::csCal3dSkeletonFactory () :
+scfImplementationType(this), core_skeleton(0) 
+{
+}
+
+void csCal3dSkeletonFactory::SetSkeleton (CalCoreModel *model)
+{
+  core_model = model;
+  core_skeleton = model->getCoreSkeleton ();
+  std::vector<CalCoreBone*> bvect = core_skeleton->getVectorCoreBone ();
+  for (size_t i = 0; i < bvect.size (); i++)
+  {
+    bones_factories.Push (new csCal3dSkeletonBoneFactory (bvect[i], this));
+  }
+
+  //now we can setup parents and childres
+  for (size_t i = 0; i < bvect.size (); i++)
+  {
+    bones_factories[i]->Initialize ();
+    bones_names.Put (csHashComputer<const char*>::ComputeHash (bones_factories[i]->GetName ()), i);
+  }
+}
+int csCal3dSkeletonFactory::GetCoreBoneId (iSkeletonBoneFactory *core_bone)
+{
+  return core_skeleton->getCoreBoneId (core_bone->GetName ());
+}
+size_t csCal3dSkeletonFactory::FindBoneIndex (const char *name)
+{
+  size_t b_idx = bones_names.Get (
+    csHashComputer<const char*>::ComputeHash (name), csArrayItemNotFound);
+  return b_idx;
+}
+iSkeletonBoneFactory *csCal3dSkeletonFactory::FindBone (const char *name)
+{
+  size_t b_idx = bones_names.Get (
+    csHashComputer<const char*>::ComputeHash (name), csArrayItemNotFound);
+  if (b_idx != csArrayItemNotFound)
+    return bones_factories[b_idx];
+  return 0;
+}
+iSkeletonAnimation *csCal3dSkeletonFactory::CreateAnimation (const char *name)
+{
+  csCal3dSkeletonAnimation *anim = new csCal3dSkeletonAnimation (this);
+  anim->SetName (name);
+  animations_names.Put (csHashComputer<const char*>::ComputeHash (name),
+    animations.Push (anim));
+  core_model->addCoreAnimation (anim->GetCoreAnimation ());
+  return anim;
+}
+iSkeletonAnimation *csCal3dSkeletonFactory::FindAnimation (const char *name) 
+{
+  size_t idx = animations_names.Get (
+    csHashComputer<const char*>::ComputeHash (name), csArrayItemNotFound);
+  if (idx != csArrayItemNotFound)
+    return animations[idx];
+  return 0;
+}
+//---------------------------csCal3dSkeletonBoneFactory---------------------------
+
+csCal3dSkeletonBoneFactory::csCal3dSkeletonBoneFactory (CalCoreBone *core_bone,
+                                                        csCal3dSkeletonFactory* skelfact) :
+scfImplementationType(this), core_bone(core_bone), skeleton_factory(skelfact) 
+{
+}
+bool csCal3dSkeletonBoneFactory::Initialize ()
+{
+  std::list<int> children_ids = core_bone->getListChildId ();
+  for (std::list<int>::iterator it = children_ids.begin (); it != children_ids.end (); it++)
+  {
+    csRef<iSkeletonBoneFactory> skel_bone = skeleton_factory->GetBone ((*it));
+    children.Push (skel_bone);
+  }
+  int bid = core_bone->getParentId ();
+  if (bid != -1)
+    parent = skeleton_factory->GetBone (bid);
+  
+  return false;
+}
+//---------------------------csCal3dSkeletonAnimation---------------------------
+csCal3dSkeletonAnimation::csCal3dSkeletonAnimation (csCal3dSkeletonFactory *skel_fact) : 
+scfImplementationType(this), skel_fact(skel_fact) 
+{
+  animation = new CalCoreAnimation ();
+}
+csCal3dSkeletonAnimation::~csCal3dSkeletonAnimation ()
+{
+}
+iSkeletonAnimationKeyFrame *csCal3dSkeletonAnimation::CreateFrame (const char* name)
+{
+  csCal3dAnimationKeyFrame *frame = new csCal3dAnimationKeyFrame (this);
+  frames.Push (frame);
+  return frame;
+}
+//---------------------------csCal3dAnimationKeyFrame---------------------------
+void csCal3dAnimationKeyFrame::AddTransform (iSkeletonBoneFactory *bone,
+    csReversibleTransform &transform, bool relative)
+{
+  int b_id = animation->GetSkeletonFactory ()->GetCoreBoneId (bone);
+  if (b_id != -1)
+  {
+    CalCoreTrack *track = animation->GetCoreAnimation ()->getCoreTrack (b_id);
+    if (!track)
+    {
+      track = new CalCoreTrack ();
+      animation->GetCoreAnimation ()->addCoreTrack (track);
+    }
+    CalCoreKeyframe *keyframe = new CalCoreKeyframe ();
+    csVector3 pos = transform.GetOrigin ();
+    keyframe->setTranslation (CalVector (pos.x, pos.y, pos.z));
+
+    csQuaternion csquat;
+    csquat.SetMatrix (transform.GetO2T ());
+    csquat.Norm ();
+    keyframe->setRotation (CalQuaternion (csquat.v.x, csquat.v.y, csquat.v.z, csquat.w));
+    if (track->addCoreKeyframe (keyframe))
+    {
+      bones.Push (bone);
+      bones_key_frames.Push (keyframe);
+    }
+  }
+}
+void csCal3dAnimationKeyFrame::SetDuration (csTicks time)
+{
+  for (size_t i = 0; i < bones_key_frames.GetSize (); i++)
+  {
+    bones_key_frames[i]->setTime (CS_TIME_2_CAL_TIME (time));
+  }
+}
 //=============================================================================
 
 void csSpriteCal3DMeshObject::DefaultAnimTimeUpdateHandler::UpdatePosition(
@@ -720,12 +848,6 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
   scfImplementationType (this, pParent), calModel(&calCoreModel)
 {
   csSpriteCal3DMeshObject::object_reg = object_reg;
-
-  //  scfiPolygonMesh.SetFactory (this);
-  //  scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
-  //  scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
-  //  scfiObjectModel.SetPolygonMeshViscull (0);
-  //  scfiObjectModel.SetPolygonMeshShadows (0);
 
   // create the model instance from the loaded core model
 //  if(!calModel.create (&calCoreModel))
@@ -770,17 +892,17 @@ void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
 {
   factory = tmpl;
 
-  CalSkeleton *skeleton;
+  CalSkeleton *cal_skeleton;
   CalBone *bone;
-  skeleton = calModel.getSkeleton();
-  std::vector < CalBone *> &bones = skeleton->getVectorBone();
-  int i;
-  for (i=0; i < (int)bones.size(); i++)
+  cal_skeleton = calModel.getSkeleton();
+  std::vector < CalBone *> &bones = cal_skeleton->getVectorBone();
+
+  for (size_t i = 0; i < bones.size(); i++)
   {
     bone = bones[i];
     bone->calculateState ();
   }
-  skeleton->calculateState ();
+  cal_skeleton->calculateState ();
 
   // attach all default meshes to the model
   int meshId;
@@ -806,7 +928,7 @@ void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
 
   // Copy the sockets list down to the mesh
   iSpriteCal3DSocket *factory_socket,*new_socket;
-  for (i=0; i<tmpl->GetSocketCount(); i++)
+  for (int i = 0; i < tmpl->GetSocketCount(); i++)
   {
     factory_socket = tmpl->GetSocket(i);
     new_socket = AddSocket();  // mesh now
@@ -816,6 +938,8 @@ void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
     new_socket->SetMeshIndex (factory_socket->GetMeshIndex() );
     new_socket->SetMeshWrapper (0);
   }
+
+  skeleton = new csCal3dSkeleton (cal_skeleton, factory->skel_factory, this);
 }
 
 
@@ -851,12 +975,6 @@ void csSpriteCal3DMeshObject::RecalcBoundingBox (csBox3& bbox)
 }
 
 
-void csSpriteCal3DMeshObject::GetObjectBoundingBox (csBox3& bbox)
-{
-  RecalcBoundingBox (object_bbox);
-  bbox = object_bbox;
-}
-
 const csBox3& csSpriteCal3DMeshObject::GetObjectBoundingBox ()
 {
   RecalcBoundingBox (object_bbox);
@@ -875,7 +993,7 @@ void csSpriteCal3DMeshObjectFactory::GetRadius (float& rad, csVector3& cent)
   rad = 1.0f;
 }
 
-void csSpriteCal3DMeshObjectFactory::GetObjectBoundingBox (csBox3& bbox)
+const csBox3& csSpriteCal3DMeshObjectFactory::GetObjectBoundingBox ()
 {
   CalCoreSkeleton *skel = calCoreModel.getCoreSkeleton ();
   skel->calculateBoundingBoxes(&calCoreModel);
@@ -884,16 +1002,11 @@ void csSpriteCal3DMeshObjectFactory::GetObjectBoundingBox (csBox3& bbox)
   CalVector p[8];
   calBoundingBox.computePoints(p);
 
-  bbox.Set (p[0].x, p[0].y, p[0].z, p[0].x, p[0].y, p[0].z);
+  obj_bbox.Set (p[0].x, p[0].y, p[0].z, p[0].x, p[0].y, p[0].z);
   for (int i=1; i<8; i++)
   {
-    bbox.AddBoundingVertexSmart(p[i].x, p[i].y, p[i].z);
+    obj_bbox.AddBoundingVertexSmart(p[i].x, p[i].y, p[i].z);
   }
-}
-
-const csBox3& csSpriteCal3DMeshObjectFactory::GetObjectBoundingBox ()
-{
-  obj_bbox = GetObjectBoundingBox ();
   return obj_bbox;
 }
 
@@ -948,7 +1061,7 @@ void csSpriteCal3DMeshObject::UpdateLightingSubmesh (
   // center in object space is obviously at (0,0,0).
   csColor color;
 
-  size_t num_lights = lights.Length ();
+  size_t num_lights = lights.GetSize ();
 
   // Make sure colors array exists and set all to ambient
   InitSubmeshLighting (mesh, submesh, pCalRenderer, movable, colors);
@@ -1037,7 +1150,7 @@ bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
   bool hit = false;
   std::vector<CalBone *> vectorBone = calModel.getSkeleton()->getVectorBone();
   csArray<bool> bboxhits;
-  bboxhits.SetLength(vectorBone.size());
+  bboxhits.SetSize (vectorBone.size());
   int b = 0;
   std::vector<CalBone *>::iterator iteratorBone = vectorBone.begin();
   while (iteratorBone != vectorBone.end())
@@ -1076,7 +1189,7 @@ bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
     csVector3 tsect;
 
     size_t m;
-    for (m = 0; m < meshes.Length(); m++)
+    for (m = 0; m < meshes.GetSize (); m++)
     {
       if (!meshes[m].vertex_buffer)
         GetVertexBufferIndex (m, 0);
@@ -1165,7 +1278,7 @@ bool csSpriteCal3DMeshObject::HitBeamObject (const csVector3& start,
   bool hit = false;
   std::vector<CalBone *> vectorBone = calModel.getSkeleton()->getVectorBone();
   csArray<bool> bboxhits;
-  bboxhits.SetLength(vectorBone.size());
+  bboxhits.SetSize (vectorBone.size());
   int b = 0;
   std::vector<CalBone *>::iterator iteratorBone = vectorBone.begin();
   while (iteratorBone != vectorBone.end())
@@ -1206,7 +1319,7 @@ bool csSpriteCal3DMeshObject::HitBeamObject (const csVector3& start,
     csVector3 tsect;
 
     size_t m;
-    for (m = 0; m < meshes.Length(); m++)
+    for (m = 0; m < meshes.GetSize (); m++)
     {
       if (!meshes[m].vertex_buffer)
         GetVertexBufferIndex (m, 0);
@@ -1301,7 +1414,7 @@ void csSpriteCal3DMeshObject::PositionChild (iMeshObject* child,
 {
   iSpriteCal3DSocket* socket = 0;
   size_t i;
-  for ( i = 0; i < sockets.Length(); i++)
+  for ( i = 0; i < sockets.GetSize (); i++)
   {
     if(sockets[i]->GetMeshWrapper())
     {
@@ -1406,8 +1519,8 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
     tr_o2c /= movable->GetFullTransform ();
 
   int clip_portal, clip_plane, clip_z_plane;
-  rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
-    clip_z_plane);
+  CS::RenderViewClipper::CalculateClipSettings (rview->GetRenderContext (),
+      frustum_mask, clip_portal, clip_plane, clip_z_plane);
   csVector3 camera_origin = tr_o2c.GetT2OTranslation ();
 
   // Distance between camera and object. Use this for LOD.
@@ -1441,8 +1554,8 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
   const csReversibleTransform o2wt = movable->GetFullTransform ();
   const csVector3& wo = o2wt.GetOrigin ();
 
-  rendermeshes.SetSize (meshes.Length());
-  for (size_t m = 0; m < rendermeshes.Length(); m++)
+  rendermeshes.SetSize (meshes.GetSize ());
+  for (size_t m = 0; m < rendermeshes.GetSize (); m++)
   {
     csRenderMesh* rm = factory->sprcal3d_type->rmHolder.GetUnusedMesh (
       created, currentFrame);
@@ -1460,10 +1573,15 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
     ((MeshAccessor*)rm->buffers->GetAccessor())->movable = movable;
   }
 
-  n = (int)rendermeshes.Length();
+  n = (int)rendermeshes.GetSize ();
   return rendermeshes.GetArray();
 }
-
+void csSpriteCal3DMeshObject::NextFrame (csTicks current_time, const csVector3& /*new_pos*/,
+                                         uint /*currentFrame*/)
+{
+  if (!skeleton->UpdatedByGraveyard ())
+    Advance (current_time);
+}
 bool csSpriteCal3DMeshObject::Advance (csTicks current_time)
 {
   if (do_update != -1)
@@ -1482,6 +1600,8 @@ bool csSpriteCal3DMeshObject::Advance (csTicks current_time)
   // @@@ Optimization: Only when some animation or so is actually playing?
   if (anim_time_handler.IsValid())
     anim_time_handler->UpdatePosition (delta, &calModel);
+
+  skeleton->UpdateNotify (current_time);
 
   if (current_time)
     last_update_time = current_time;
@@ -1538,8 +1658,8 @@ int csSpriteCal3DMeshObject::FindAnim(const char *name)
 
 void csSpriteCal3DMeshObject::ClearAllAnims()
 {
-  while (active_anims.Length())
-    ClearAnimCyclePos ((int)(active_anims.Length() - 1), 0);
+  while (active_anims.GetSize ())
+    ClearAnimCyclePos ((int)(active_anims.GetSize () - 1), 0);
 
   if (last_locked_anim != -1)
   {
@@ -1585,7 +1705,7 @@ bool csSpriteCal3DMeshObject::AddAnimCycle(int idx, float weight, float delay)
 
 int csSpriteCal3DMeshObject::FindAnimCyclePos(int idx) const
 {
-  for (size_t i = active_anims.Length(); i-- > 0; )
+  for (size_t i = active_anims.GetSize (); i-- > 0; )
     if (active_anims[i].anim->index == idx)
       return (int)i;
   return -1;
@@ -1593,7 +1713,7 @@ int csSpriteCal3DMeshObject::FindAnimCyclePos(int idx) const
 
 int csSpriteCal3DMeshObject::FindAnimCycleNamePos(char const* name) const
 {
-  for (size_t i = active_anims.Length(); i-- > 0; )
+  for (size_t i = active_anims.GetSize (); i-- > 0; )
     if (active_anims[i].anim->name == name)
       return (int)i;
   return -1;
@@ -1626,7 +1746,7 @@ bool csSpriteCal3DMeshObject::ClearAnimCycle (const char *name, float delay)
 
 size_t csSpriteCal3DMeshObject::GetActiveAnimCount()
 {
-  return active_anims.Length();
+  return active_anims.GetSize ();
 }
 
 bool csSpriteCal3DMeshObject::GetActiveAnims (csSpriteCal3DActiveAnim* buffer, 
@@ -1635,7 +1755,7 @@ bool csSpriteCal3DMeshObject::GetActiveAnims (csSpriteCal3DActiveAnim* buffer,
   if ((buffer == 0) || (max_length == 0))
     return false;
 
-  size_t i, n = csMin (active_anims.Length(), max_length);
+  size_t i, n = csMin (active_anims.GetSize (), max_length);
 
   for (i=0; i<n; i++)
   {
@@ -1643,7 +1763,7 @@ bool csSpriteCal3DMeshObject::GetActiveAnims (csSpriteCal3DActiveAnim* buffer,
     buffer[i].index = a.anim->index;
     buffer[i].weight = a.weight;
   }
-  return i == active_anims.Length();
+  return i == active_anims.GetSize ();
 }
 
 void csSpriteCal3DMeshObject::SetActiveAnims(const csSpriteCal3DActiveAnim* buffer, 
@@ -1660,7 +1780,7 @@ void csSpriteCal3DMeshObject::SetActiveAnims(const csSpriteCal3DActiveAnim* buff
 bool csSpriteCal3DMeshObject::SetAnimAction(int idx, float delayIn,
                                             float delayOut)
 {
-  if (idx < 0 || (size_t)idx >=factory->anims.Length() )
+  if (idx < 0 || (size_t)idx >=factory->anims.GetSize () )
     return false;
 
   calModel.getMixer()->executeAction(idx,delayIn,delayOut,
@@ -1919,7 +2039,7 @@ int csSpriteCal3DMeshObject::ComputeVertexCount (int meshIdx)
 
 size_t csSpriteCal3DMeshObject::FindMesh( int mesh_id )
 {
-  for (size_t z = 0; z < meshes.Length(); z++)
+  for (size_t z = 0; z < meshes.GetSize (); z++)
   {
     if (meshes[z].calCoreMeshID == mesh_id)
       return z;
@@ -1998,7 +2118,7 @@ bool csSpriteCal3DMeshObject::BlendMorphTarget(int morph_animation_id,
     float weight, float delay)
 {
   if(morph_animation_id < 0||
-    factory->morph_animation_names.Length() <= (size_t)morph_animation_id)
+    factory->morph_animation_names.GetSize () <= (size_t)morph_animation_id)
   {
     return false;
   }
@@ -2009,7 +2129,7 @@ bool csSpriteCal3DMeshObject::ClearMorphTarget(int morph_animation_id,
     float delay)
 {
   if(morph_animation_id < 0||
-    factory->morph_animation_names.Length() <= (size_t)morph_animation_id)
+    factory->morph_animation_names.GetSize () <= (size_t)morph_animation_id)
   {
     return false;
   }
@@ -2205,6 +2325,115 @@ void csSpriteCal3DMeshObject::MeshAccessor::PreGetBuffer
     meshobj->factory->DefaultGetBuffer (mesh, holder, buffer);
 }
 
+//---------------------------csCal3dSkeleton---------------------------
+csCal3dSkeleton::csCal3dSkeleton (CalSkeleton* skeleton,
+    csCal3dSkeletonFactory* skel_factory,
+    csSpriteCal3DMeshObject *mesh_object) :
+      scfImplementationType(this), skeleton(skeleton),
+      skeleton_factory (skel_factory) 
+{
+  csCal3dSkeleton::mesh_object = mesh_object;
+  graveyard = csQueryRegistry<iSkeletonGraveyard> (mesh_object->object_reg);
+  if (graveyard)
+    // @@@ This is a memory leak! There is a circular reference between
+    // this Cal3DSkeleton and the list of skeletons in the graveyard.
+    graveyard->AddSkeleton (this);
+
+  std::vector<CalBone*> cal_bones = skeleton->getVectorBone ();
+  for (size_t i = 0; i < cal_bones.size (); i++)
+  {
+    bones.Push (new csCal3dSkeletonBone (cal_bones[i],
+	  skel_factory->GetBone (i), this));
+  }
+  for (size_t i = 0; i < cal_bones.size (); i++)
+  {
+    bones[i]->Initialize ();
+    bones_names.Put (csHashComputer<const char*>::ComputeHash (
+	  bones[i]->GetName ()), i);
+  }
+}
+
+void csCal3dSkeleton::UpdateNotify (const csTicks &current_ticks)
+{
+  for (size_t i = 0; i < update_callbacks.GetSize (); i++)
+  {
+    update_callbacks[i]->Execute (this, current_ticks);
+  }
+}
+size_t csCal3dSkeleton::FindBoneIndex (const char *name)
+{
+  size_t b_idx = bones_names.Get (
+    csHashComputer<const char*>::ComputeHash (name), csArrayItemNotFound);
+  return b_idx;
+}
+iSkeletonBone *csCal3dSkeleton::FindBone (const char *name)
+{
+  size_t b_idx = bones_names.Get (
+    csHashComputer<const char*>::ComputeHash (name), csArrayItemNotFound);
+  if (b_idx != csArrayItemNotFound)
+    return bones[b_idx];
+  return 0;
+}
+//---------------------------csCal3dSkeletonBone---------------------------
+
+csCal3dSkeletonBone::csCal3dSkeletonBone (CalBone *bone, iSkeletonBoneFactory *factory,
+                                          csCal3dSkeleton *skeleton) :
+scfImplementationType(this), bone(bone), factory(factory), skeleton(skeleton) 
+{
+}
+bool csCal3dSkeletonBone::Initialize ()
+{
+  std::list<int> children_ids = bone->getCoreBone ()->getListChildId ();
+  for (std::list<int>::iterator it = children_ids.begin (); it != children_ids.end (); it++)
+  {
+    csRef<iSkeletonBone> skel_bone = skeleton->GetBone ((*it));
+    children.Push (skel_bone);
+  }
+  int bid = bone->getCoreBone ()->getParentId ();
+  if (bid != -1)
+    parent = skeleton->GetBone (bid);
+
+  name = bone->getCoreBone ()->getName ().c_str ();
+
+  return true;
+}
+csReversibleTransform &csCal3dSkeletonBone::GetFullTransform ()
+{
+  CalQuaternion quat = bone->getRotationAbsolute ();
+  csQuaternion csquat (quat.x, quat.y, quat.z, quat.w);
+  csMatrix3 mat (csquat);
+
+  CalVector calv = bone->getTranslationAbsolute (); 
+  csVector3 csv (calv[0], calv[1], calv[2]); 
+
+  global_transform = csReversibleTransform (mat, csv); 
+  return global_transform;
+}
+csReversibleTransform &csCal3dSkeletonBone::GetTransform ()
+{
+  CalQuaternion quat = bone->getRotation();
+  csQuaternion csquat (quat.x, quat.y, quat.z, quat.w);
+  csMatrix3 mat (csquat);
+
+  CalVector calv = bone->getTranslation(); 
+	csVector3 csv (calv[0], calv[1], calv[2]); 
+  
+  local_transform = csReversibleTransform (mat, csv);
+  return local_transform;
+}
+
+void csCal3dSkeletonBone::SetTransform (const csReversibleTransform &transform)
+{
+  csQuaternion csquat;
+  csquat.SetMatrix (transform.GetO2T ());
+  csquat = csquat.Unit ();
+  CalQuaternion quat (csquat.v.x, csquat.v.y, csquat.v.z, csquat.w);
+  bone->setRotation (quat);
+  csVector3 vect = transform.GetOrigin();
+  bone->setTranslation (CalVector (vect[0], vect[1], vect[2]));
+  local_transform = transform;
+}
+
 //----------------------------------------------------------------------
 
 SCF_IMPLEMENT_FACTORY (csSpriteCal3DMeshObjectType)
@@ -2212,7 +2441,7 @@ SCF_IMPLEMENT_FACTORY (csSpriteCal3DMeshObjectType)
 csSpriteCal3DMeshObjectType::csSpriteCal3DMeshObjectType (iBase* pParent) :
   scfImplementationType (this, pParent)
 {
-  nullPolyMesh.AttachNew (new NullPolyMesh (pParent));
+  //nullPolyMesh.AttachNew (new NullPolyMesh (pParent));
 }
 
 csSpriteCal3DMeshObjectType::~csSpriteCal3DMeshObjectType ()

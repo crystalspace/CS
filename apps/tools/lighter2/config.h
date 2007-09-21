@@ -30,47 +30,64 @@ namespace lighter
   public:
     Configuration ();
 
-    // Initialize configuration from a list of config files.
-    void Initialize (const csStringArray& files);
+    // Initialize configuration
+    void Initialize ();
    
     // Settings of what to do
     struct LighterProperties
     {
       // Direct lighting from light sources
       bool doDirectLight;
-
-      // Indirect lighting by radiosity
-      bool doRadiosity;
     };
 
     // Lightmap and lightmap layout properties
     struct LightmapProperties
     {
-      // Density in u and v direction. u = uTexelPerUnit*x etc.. 
-      float uTexelPerUnit, vTexelPerUnit;
+      // Density in u and v direction (in lumels per world unit).
+      float lmDensity;
 
       // Max lightmap sizes
       uint maxLightmapU, maxLightmapV;
+
+      // Black threshold
+      float blackThreshold;
+
+      /* When the dot product of two normals is bigger than 1-tolerance
+         they're considered as equal. */
+      float normalsTolerance;
+
+      // Whether to store PD light maps as grayscale maps.
+      bool grayPDMaps;
     };
 
     // Direct light (direct illumination) calculation settings
     struct DIProperties
     {
       // Light multiplier for point light sources. A point light in this context
-      // is just the opposite to an area light (so it can be point, spot, even directional ,)
+      // is just the opposite to an area light (so it can be point, spot,)
       float pointLightMultiplier;
 
       // Light multiplier for area light sources.
       float areaLightMultiplier;
+
+      // Lighting routine to use for elements in lightmap sampling
+      enum
+      {
+        LM_LIGHT_ALL1,
+        LM_LIGHT_ALL4,
+        LM_LIGHT_RND1,
+        LM_LIGHT_RND4
+      } lmElementLighting;
+
+      // Lighting routine to use for per vertex lighting sampling
+      enum
+      {
+        PVL_LIGHT_ALL,
+        PVL_LIGHT_RND1
+      } pvlElementLighting;
+      
     };
 
-
-    // Radiosity settings
-    struct RadProperties
-    {
-      // Element/patch densities
-      uint uPatchResolution, vPatchResolution;
-    };
 
     // Public accessible (readable) properties
     const LighterProperties& GetLighterProperties () const
@@ -88,18 +105,11 @@ namespace lighter
       return diProperties;
     }
 
-    const RadProperties& GetRadProperties () const
-    {
-      return radProperties;
-    }
-
   protected:
     // Properties
     LighterProperties     lighterProperties;
     LightmapProperties    lmProperties;
     DIProperties          diProperties;
-    RadProperties         radProperties;
-
   };
 
 }

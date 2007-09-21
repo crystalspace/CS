@@ -141,18 +141,28 @@ public:
    * Parse a string for ANSI codes.
    * Looks if a string contains an ANSI code sequence at the beginning.
    * If yes, the ansiCommandLen parameter is filled with the length of the
-   * sequence. textLen contains the number of chars up to the next ANSI
-   * sequence or the end of the string of no sequence is found.
+   * sequence. 
+   * \param str String to parse.
+   * \param ansiCommandLen Returns number of chars that the ANSI command takes
+   *  up.
+   * \param cmdClass Returns the ANSI command class.
+   * \param textLen Contains the number of chars up to the next ANSI
+   *  sequence or the end of the string of no sequence was found.
+   * \return Whether the parsing was successful. 
    */
   static bool ParseAnsi (const char* str, size_t& ansiCommandLen, 
     CommandClass& cmdClass, size_t& textLen);
   /**
    * Decode an ANSI code sequence.
-   * Decodes a part of an ANSI code sequence, if known. Returns whether the
-   * decoding was was successful. \a cmd is updated to point to the start
-   * of the next sequence part.
+   * Decodes a part of an ANSI code sequence, if known. 
    * \remark Multiple sequences might occur, repeated call this function
    *  until <tt>false</tt> is returned.
+   * \param cmd String to decode. Updated to point to the start
+   *  of the next sequence part.
+   * \param cmdLen Returns length of the command in chars.
+   * \param command The decoded command.
+   * \param commandParams Parameters for the decoded command.
+   * \return Whether the decoding was successful. 
    */
   static bool DecodeCommand (const char*& cmd, size_t& cmdLen, 
     Command& command, CommandParams& commandParams);

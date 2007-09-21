@@ -27,6 +27,7 @@
 
 #include "csutil/allocator.h"
 #include "csutil/comparator.h"
+#include "csutil/customallocated.h"
 
 #include "csutil/custom_new_disable.h"
 
@@ -132,8 +133,17 @@ public:
   static T* ResizeRegion (Allocator& alloc, T* mem, size_t relevantcount, 
     size_t oldcount, size_t newcount)
   {
-    (void)relevantcount; (void)oldcount;
-    return (T*)alloc.Realloc (mem, newcount * sizeof(T));
+    (void)relevantcount; 
+    T* newp = (T*)alloc.Realloc (mem, newcount * sizeof(T));
+    if (newp != 0) return newp;
+    // Realloc() failed - allocate a new block
+    newp = (T*)alloc.Alloc (newcount * sizeof(T));
+    if (newcount < oldcount)
+      memcpy (newp, mem, newcount * sizeof(T));
+    else
+      memcpy (newp, mem, oldcount * sizeof(T));
+    alloc.Free (mem);
+    return newp;
   }
 
   /// Move elements inside a region.
@@ -189,8 +199,12 @@ public:
     {
       // Realloc is safe.
       T* newmem = (T*)alloc.Realloc (mem, newcount * sizeof (T));
-      CS_ASSERT (newmem == mem);
-      return newmem;
+      if (newmem != 0)
+      {
+	CS_ASSERT (newmem == mem);
+	return newmem;
+      }
+      // else Realloc() failed (probably not supported) - allocate a new block
     }
 
     T* newmem = (T*)alloc.Alloc (newcount * sizeof (T));
@@ -262,6 +276,9 @@ public:
   { (void)x; }
   /// Return the threshold.
   size_t GetThreshold() const { return N; }
+  // Work around VC7 bug apparently incorrectly copying this empty class
+  csArrayThresholdFixed& operator= (const csArrayThresholdFixed&) 
+  { return *this; }
 };
 
 /**
@@ -344,7 +361,7 @@ template <class T,
 	class ElementHandler = csArrayElementHandler<T>,
         class MemoryAllocator = CS::Memory::AllocatorMalloc,
         class CapacityHandler = csArrayCapacityDefault>
-class csArray
+class csArray : public CS::Memory::CustomAllocated
 {
 public:
   typedef csArray<T, ElementHandler, MemoryAllocator, CapacityHandler> ThisType;
@@ -384,14 +401,19 @@ protected:
   {
     ElementHandler::InitRegion (root.p+start, count);
   }
-
+  
+  /**
+   * Set the internal pointer to the data.
+   * \warning This is \em obviously dangerous.
+   */
+  void SetData (T* data) { root.p = data; }
 private:
   /// Copy from one array to this one, properly constructing the copied items.
   void CopyFrom (const csArray& source)
   {
     capacity.CopyFrom (source.capacity);
-    SetSizeUnsafe (source.Length ());
-    for (size_t i=0 ; i<source.Length() ; i++)
+    SetSizeUnsafe (source.GetSize ());
+    for (size_t i=0 ; i<source.GetSize () ; i++)
       ElementHandler::Construct (root.p + i, source[i]);
   }
 
@@ -528,16 +550,6 @@ public:
     return count;
   }
 
-  /**
-   * Return the number of elements in the array.
-   * \deprecated Use GetSize() instead.
-   */
-  /*CS_DEPRECATED_METHOD_MSG("Use GetSize() instead.")*/
-  size_t Length () const
-  {
-    return GetSize();
-  }
-
   /// Query vector capacity.  Note that you should rarely need to do this.
   size_t Capacity () const
   {
@@ -581,7 +593,7 @@ public:
     }
     else
     {
-      size_t old_len = Length ();
+      size_t old_len = GetSize ();
       SetSizeUnsafe (n);
       for (size_t i = old_len ; i < n ; i++)
         ElementHandler::Construct (root.p + i, what);
@@ -603,22 +615,12 @@ public:
     }
     else
     {
-      size_t old_len = Length ();
+      size_t old_len = GetSize ();
       SetSizeUnsafe (n);
       ElementHandler::InitRegion (root.p + old_len, n-old_len);
     }
   }
 
-  /** @{ */
-  /**
-   * Set the actual number of items in this array.
-   * \deprecated Use SetSize() instead.
-   */
-  /*CS_DEPRECATED_METHOD_MSG("Use SetSize() instead.")*/
-  void SetLength (size_t n, T const& what) { SetSize(n, what); }
-  /*CS_DEPRECATED_METHOD_MSG("Use SetSize() instead.")*/
-  void SetLength (size_t n) { SetSize(n); }
-  /** @} */
 
   /// Get an element (non-const).
   T& Get (size_t n)
@@ -643,6 +645,18 @@ public:
   {
     if (n >= count)
       SetSize (n+1);
+    return root.p[n];
+  }
+
+  /**
+   * Get an item from the array. If the number of elements in this array is too
+   * small the array will be automatically extended, and the newly added
+   * objects will be constructed based on the given item \a what.
+   */
+  T& GetExtend (size_t n, T const& what)
+  {
+    if (n >= count)
+      SetSize (n+1, what);
     return root.p[n];
   }
 
@@ -677,7 +691,7 @@ public:
   template <class K>
   size_t FindKey (csArrayCmp<T,K> comparekey) const
   {
-    for (size_t i = 0 ; i < Length () ; i++)
+    for (size_t i = 0 ; i < GetSize () ; i++)
       if (comparekey (root.p[i]) == 0)
         return i;
     return csArrayItemNotFound;
@@ -689,7 +703,7 @@ public:
    */
   size_t Push (T const& what)
   {
-    if (((&what >= root.p) && (&what < root.p + Length())) &&
+    if (((&what >= root.p) && (&what < root.p + GetSize())) &&
       (capacity.c < count + 1))
     {
       /*
@@ -780,7 +794,7 @@ public:
   size_t FindSortedKey (csArrayCmp<T,K> comparekey,
                         size_t* candidate = 0) const
   {
-    size_t m = 0, l = 0, r = Length ();
+    size_t m = 0, l = 0, r = GetSize ();
     while (l < r)
     {
       m = (l + r) / 2;
@@ -815,7 +829,7 @@ public:
     int (*compare)(T const&, T const&) = DefaultCompare,
     size_t* equal_index = 0)
   {
-    size_t m = 0, l = 0, r = Length ();
+    size_t m = 0, l = 0, r = GetSize ();
     while (l < r)
     {
       m = (l + r) / 2;
@@ -847,7 +861,7 @@ public:
    */
   size_t Find (T const& which) const
   {
-    for (size_t i = 0 ; i < Length () ; i++)
+    for (size_t i = 0 ; i < GetSize () ; i++)
       if (root.p[i] == which)
         return i;
     return csArrayItemNotFound;
@@ -875,7 +889,7 @@ public:
    */
   void Sort (int (*compare)(T const&, T const&) = DefaultCompare)
   {
-    qsort (root.p, Length(), sizeof(T),
+    qsort (root.p, GetSize (), sizeof(T),
       (int (*)(void const*, void const*))compare);
   }
 
@@ -945,7 +959,7 @@ public:
    */
   void SetCapacity (size_t n)
   {
-    if (n > Length ())
+    if (n > GetSize ())
       InternalSetCapacity (n);
   }
 
@@ -959,7 +973,7 @@ public:
   void SetMinimalCapacity (size_t n)
   {
     if (n < Capacity ()) return;
-    if (n > Length ())
+    if (n > GetSize ())
       InternalSetCapacity (n);
   }
 
@@ -1069,28 +1083,6 @@ public:
     return false;
   }
 
-  /**
-   * Delete the given element from the array.
-   * \remarks This is a special version of Delete() which does not
-   *   preserve the order of the remaining elements. This characteristic allows
-   *   deletions to be performed somewhat more quickly than by Delete(),
-   *   however the speed gain is largely mitigated by the fact that a linear
-   *   search is performed in order to locate \c item, thus this optimization
-   *   is mostly illusory.
-   * \deprecated The speed gain promised by this method is mostly illusory on
-   *   account of the linear search for the item. In many cases, it will be
-   *   faster to keep the array sorted, search for \c item using
-   *   FindSortedKey(), and then remove it using the plain DeleteIndex().
-   */
-  CS_DEPRECATED_METHOD_MSG("'Fast' is illusory. See documentation")
-  bool DeleteFast (T const& item)
-  {
-    size_t const n = Find (item);
-    if (n != csArrayItemNotFound)
-      return DeleteIndexFast (n);
-    return false;
-  }
-
   /** Iterator for the Array<> class */
   class Iterator
   {
@@ -1105,7 +1097,7 @@ public:
 
     /** Returns true if the next Next() call will return an element */
     bool HasNext() const
-    { return currentelem < array.Length(); }
+    { return currentelem < array.GetSize (); }
 
     /** Returns the next element in the array. */
     T& Next()
@@ -1116,13 +1108,13 @@ public:
     { currentelem = 0; }
 
   protected:
-    Iterator(csArray<T, ElementHandler>& newarray)
+    Iterator(csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>& newarray)
 	: currentelem(0), array(newarray) {}
-    friend class csArray<T, ElementHandler>;
+    friend class csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>;
 
   private:
     size_t currentelem;
-    csArray<T, ElementHandler>& array;
+    csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>& array;
   };
 
   /** Iterator for the Array<> class */
@@ -1139,7 +1131,7 @@ public:
 
     /** Returns true if the next Next() call will return an element */
     bool HasNext() const
-    { return currentelem < array.Length(); }
+    { return currentelem < array.GetSize (); }
 
     /** Returns the next element in the array. */
     const T& Next()
@@ -1150,13 +1142,13 @@ public:
     { currentelem = 0; }
 
   protected:
-    ConstIterator(const csArray<T, ElementHandler>& newarray)
+    ConstIterator(const csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>& newarray)
       : currentelem(0), array(newarray) {}
-    friend class csArray<T, ElementHandler>;
+    friend class csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>;
 
   private:
     size_t currentelem;
-    const csArray<T, ElementHandler>& array;
+    const csArray<T, ElementHandler, MemoryAllocator, CapacityHandler>& array;
   };
 
   /** Returns an Iterator which traverses the array. */

@@ -30,18 +30,20 @@
 #include "plugins/engine/3d/portalcontainer.h"
 #include "plugins/engine/3d/rview.h"
 #include "plugins/engine/3d/meshobj.h"
+#include "plugins/engine/3d/engine.h"
+#include "cstool/rviewclipper.h"
 
 // ---------------------------------------------------------------------------
-// csPortalContainerPolyMeshHelper
+// csPortalContainerTriMeshHelper
 // ---------------------------------------------------------------------------
 
-void csPortalContainerPolyMeshHelper::SetPortalContainer (csPortalContainer* pc)
+void csPortalContainerTriMeshHelper::SetPortalContainer (csPortalContainer* pc)
 {
   parent = pc;
   data_nr = pc->GetDataNumber ()-1;
 }
 
-void csPortalContainerPolyMeshHelper::Setup ()
+void csPortalContainerTriMeshHelper::Setup ()
 {
   parent->Prepare ();
   if (data_nr != parent->GetDataNumber () || !vertices)
@@ -50,40 +52,44 @@ void csPortalContainerPolyMeshHelper::Setup ()
     Cleanup ();
 
     vertices = parent->GetVertices ();
-    // Count number of needed polygons.
-    num_poly = 0;
+    // Count number of needed triangles.
+    num_tri = 0;
 
     size_t i;
     const csRefArray<csPortal>& portals = parent->GetPortals ();
-    for (i = 0 ; i < portals.Length () ; i++)
+    for (i = 0 ; i < portals.GetSize () ; i++)
     {
       csPortal *p = portals[i];
-      if (p->flags.CheckAll (poly_flag)) num_poly++;
+      if (p->flags.CheckAll (poly_flag))
+        num_tri += p->GetVertexIndicesCount ()-2;
     }
 
-    if (num_poly)
+    if (num_tri)
     {
-      polygons = new csMeshedPolygon[num_poly];
-      num_poly = 0;
-      for (i = 0 ; i < portals.Length () ; i++)
+      triangles = new csTriangle[num_tri];
+      num_tri = 0;
+      for (i = 0 ; i < portals.GetSize () ; i++)
       {
         csPortal *p = portals[i];
         if (p->flags.CheckAll (poly_flag))
         {
-	  csDirtyAccessArray<int>& vidx = p->GetVertexIndices ();
-          polygons[num_poly].num_vertices = (int)vidx.Length ();
-          polygons[num_poly].vertices = vidx.GetArray ();
-          num_poly++;
+          csDirtyAccessArray<int>& vi = p->GetVertexIndices ();
+          size_t j;
+          for (j = 1 ; j < (size_t)p->GetVertexIndicesCount ()-1 ; j++)
+          {
+	    triangles[num_tri].a = vi[0];
+	    triangles[num_tri].b = vi[j];
+	    triangles[num_tri].c = vi[j+1];
+            num_tri++;
+          }
         }
       }
     }
   }
 }
 
-void csPortalContainerPolyMeshHelper::Cleanup ()
+void csPortalContainerTriMeshHelper::Cleanup ()
 {
-  delete[] polygons;
-  polygons = 0;
   vertices = 0;
   delete[] triangles;
   triangles = 0;
@@ -98,13 +104,17 @@ csPortalContainer::csPortalContainer (iEngine* engine,
 	iObjectRegistry *object_reg) :
 	scfImplementationType (this, engine)
 {
-  polygonMesh.AttachNew (new csPortalContainerPolyMeshHelper (0));
-  polygonMeshCD.AttachNew (new csPortalContainerPolyMeshHelper (CS_PORTAL_COLLDET));
-  polygonMeshLOD.AttachNew (new csPortalContainerPolyMeshHelper (CS_PORTAL_VISCULL));
-  SetPolygonMeshBase (polygonMesh);
-  SetPolygonMeshColldet (polygonMeshCD);
-  SetPolygonMeshViscull (polygonMeshLOD);
-  SetPolygonMeshShadows (polygonMeshLOD);
+  csRef<csPortalContainerTriMeshHelper> trimesh;
+  trimesh.AttachNew (new csPortalContainerTriMeshHelper (0));
+  trimesh->SetPortalContainer (this);
+  csEngine* e = static_cast<csEngine*> (engine);
+  SetTriangleData (e->base_id, trimesh);
+  trimesh.AttachNew (new csPortalContainerTriMeshHelper (CS_PORTAL_COLLDET));
+  trimesh->SetPortalContainer (this);
+  SetTriangleData (e->colldet_id, trimesh);
+  trimesh.AttachNew (new csPortalContainerTriMeshHelper (CS_PORTAL_VISCULL));
+  trimesh->SetPortalContainer (this);
+  SetTriangleData (e->viscull_id, trimesh);
 
   prepared = false;
   data_nr = 0;
@@ -113,18 +123,12 @@ csPortalContainer::csPortalContainer (iEngine* engine,
 
   meshwrapper = 0;
 
-  polygonMesh->SetPortalContainer (this);
-  polygonMeshCD->SetPortalContainer (this);
-  polygonMeshLOD->SetPortalContainer (this);
-
-  shader_man = CS_QUERY_REGISTRY (object_reg, iShaderManager);
+  shader_man = csQueryRegistry<iShaderManager> (object_reg);
   fog_shader = shader_man->GetShader ("std_lighting_portal");
 
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
-    "crystalspace.shared.stringset", iStringSet);
-  fogplane_name = strings->Request ("fogplane");
-  fogdensity_name = strings->Request ("fog density");
-  fogcolor_name = strings->Request ("fog color");
+  fogplane_name = e->globalStringSet->Request ("fogplane");
+  fogdensity_name = e->globalStringSet->Request ("fog density");
+  fogcolor_name = e->globalStringSet->Request ("fog color");
 }
 
 csPortalContainer::~csPortalContainer ()
@@ -169,13 +173,13 @@ void csPortalContainer::Prepare ()
   data_nr++;
   csCompressVertex* vt = csVector3Array::CompressVertices (vertices);
   size_t i;
-  for (i = 0 ; i < portals.Length () ; i++)
+  for (i = 0 ; i < portals.GetSize () ; i++)
   {
     csPortal* prt = portals[i];
     size_t j;
     csArray<int>& vidx = prt->GetVertexIndices ();
     csPoly3D poly;
-    for (j = 0 ; j < vidx.Length () ; j++)
+    for (j = 0 ; j < vidx.GetSize () ; j++)
     {
       if (vt) vidx[j] = (int)vt[vidx[j]].new_idx;
       poly.AddVertex (vertices[vidx[j]]);
@@ -184,7 +188,7 @@ void csPortalContainer::Prepare ()
   }
   delete[] vt;
   object_bbox.StartBoundingBox ();
-  for (i = 0 ; i < vertices.Length () ; i++)
+  for (i = 0 ; i < vertices.GetSize () ; i++)
     object_bbox.AddBoundingVertex (vertices[i]);
 
   object_radius = csQsqrt (csSquaredDist::PointPoint (
@@ -235,11 +239,11 @@ void csPortalContainer::ObjectToWorld (const csMovable& movable,
   movable_nr = movable.GetUpdateNumber ();
   movable_identity = movable.IsFullTransformIdentity ();
   size_t i;
-  world_vertices.SetLength (vertices.Length ());
+  world_vertices.SetSize (vertices.GetSize ());
   if (movable_identity)
   {
     world_vertices = vertices;
-    for (i = 0 ; i < portals.Length () ; i++)
+    for (i = 0 ; i < portals.GetSize () ; i++)
     {
       csPortal* prt = portals[i];
       csPlane3 wp (prt->GetIntObjectPlane ());
@@ -248,9 +252,9 @@ void csPortalContainer::ObjectToWorld (const csMovable& movable,
   }
   else
   {
-    for (i = 0 ; i < vertices.Length () ; i++)
+    for (i = 0 ; i < vertices.GetSize () ; i++)
       world_vertices[i] = movtrans.This2Other (vertices[i]);
-    for (i = 0 ; i < portals.Length () ; i++)
+    for (i = 0 ; i < portals.GetSize () ; i++)
     {
       csPortal* prt = portals[i];
       csPlane3 p;
@@ -265,12 +269,12 @@ void csPortalContainer::ObjectToWorld (const csMovable& movable,
 void csPortalContainer::WorldToCamera (iCamera*,
 	const csReversibleTransform& camtrans)
 {
-  camera_vertices.SetLength (world_vertices.Length ());
+  camera_vertices.SetSize (world_vertices.GetSize ());
   size_t i;
-  for (i = 0 ; i < world_vertices.Length () ; i++)
+  for (i = 0 ; i < world_vertices.GetSize () ; i++)
     camera_vertices[i] = camtrans.Other2This (world_vertices[i]);
   camera_planes.Empty ();
-  for (i = 0 ; i < portals.Length () ; i++)
+  for (i = 0 ; i < portals.GetSize () ; i++)
   {
     csPortal* prt = portals[i];
     csPlane3 p;
@@ -304,7 +308,7 @@ bool csPortalContainer::ClipToPlane (
   cnt_vis = 0;
   csPortal* portal = portals[portal_idx];
   csDirtyAccessArray<int>& vt = portal->GetVertexIndices ();
-  num_vertices = (int)vt.Length ();
+  num_vertices = (int)vt.GetSize ();
   for (i = 0; i < num_vertices; i++)
     if (camera_vertices[vt[i]].z >= 0)
     {
@@ -743,10 +747,10 @@ void csPortalContainer::DrawOnePortal (
   {
     csSimpleRenderMesh mesh;
     mesh.meshtype = CS_MESHTYPE_TRIANGLEFAN;
-    mesh.indexCount = (uint)po->GetVertexIndices ().Length ();
+    mesh.indexCount = (uint)po->GetVertexIndices ().GetSize ();
     // @@@ Weirdo overloads approaching, captain!
     mesh.indices = (const uint*)(int*)po->GetVertexIndices ().GetArray ();
-    mesh.vertexCount = (uint)vertices.Length ();
+    mesh.vertexCount = (uint)vertices.GetSize ();
     mesh.vertices = vertices.GetArray ();
     mesh.texcoords = 0;
     mesh.texture = 0;
@@ -758,13 +762,13 @@ void csPortalContainer::DrawOnePortal (
     // @@@ Hackish...
     csShaderVariableContext varContext;
     const csRefArray<csShaderVariable>& globVars = shader_man->GetShaderVariables ();
-    for (size_t i = 0; i < globVars.Length (); i++)
+    for (size_t i = 0; i < globVars.GetSize (); i++)
     {
       varContext.AddVariable (globVars[i]);
     }
     const csRefArray<csShaderVariable>& sectorVars =
       rview->GetThisSector()->GetSVContext()->GetShaderVariables();
-    for (size_t i = 0; i < sectorVars.Length (); i++)
+    for (size_t i = 0; i < sectorVars.GetSize (); i++)
     {
       varContext.AddVariable (sectorVars[i]);
     }
@@ -800,7 +804,7 @@ void csPortalContainer::CastShadows (iMovable* movable, iFrustumView* fview)
   CheckMovable ();
 
   size_t i;
-  for (i = 0 ; i < portals.Length () ; i++)
+  for (i = 0 ; i < portals.GetSize () ; i++)
   {
     csPortal *p = portals[i];
     p->CastShadows (movable, fview);
@@ -842,8 +846,8 @@ bool csPortalContainer::ExtraVisTest (iRenderView* rview,
   csSphere cam_sphere = tr_o2c.Other2This (sphere);
   camera_origin = cam_sphere.GetCenter ();
 
-  return csrview->ClipBSphere (cam_sphere, world_sphere, clip_portal,
-      clip_plane, clip_z_plane);
+  return CS::RenderViewClipper::CullBSphere (csrview->GetRenderContext (),
+      cam_sphere, world_sphere, clip_portal, clip_plane, clip_z_plane);
 }
 
 bool csPortalContainer::Draw (iRenderView* rview, iMovable* /*movable*/,
@@ -877,7 +881,7 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* /*movable*/,
   size_t i;
   if (clip_plane || clip_portal || clip_z_plane || do_portal_plane || farplane)
   {
-    for (i = 0 ; i < portals.Length () ; i++)
+    for (i = 0 ; i < portals.GetSize () ; i++)
     {
       csVector3 *verts;
       int num_verts;
@@ -904,12 +908,12 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* /*movable*/,
   }
   else
   {
-    for (i = 0 ; i < portals.Length () ; i++)
+    for (i = 0 ; i < portals.GetSize () ; i++)
     {
       csPoly2D poly;
       csPortal* prt = portals[i];
       csDirtyAccessArray<int>& vt = prt->GetVertexIndices ();
-      int num_vertices = (int)vt.Length ();
+      int num_vertices = (int)vt.GetSize ();
       int j;
       for (j = 0 ; j < num_vertices ; j++)
         AddPerspective (&poly, camera_vertices[vt[j]], fov, shift_x, shift_y);
@@ -923,13 +927,13 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* /*movable*/,
 void csPortalContainer::HardTransform (const csReversibleTransform& t)
 {
   size_t i;
-  world_vertices.SetLength (vertices.Length ());
-  for (i = 0 ; i < vertices.Length () ; i++)
+  world_vertices.SetSize (vertices.GetSize ());
+  for (i = 0 ; i < vertices.GetSize () ; i++)
   {
     vertices[i] = t.This2Other (vertices[i]);
     world_vertices[i] = vertices[i];
   }
-  for (i = 0 ; i < portals.Length () ; i++)
+  for (i = 0 ; i < portals.GetSize () ; i++)
   {
     csPortal* prt = portals[i];
     csPlane3 new_plane;
@@ -949,7 +953,7 @@ bool csPortalContainer::HitBeamOutline (const csVector3& start,
 {
   Prepare ();
   size_t i;
-  for (i = 0; i < portals.Length (); i++)
+  for (i = 0; i < portals.GetSize (); i++)
   {
     csPortal *p = portals[i];
     if (p->IntersectSegment (start, end, isect, pr))
@@ -971,7 +975,7 @@ bool csPortalContainer::HitBeamObject (const csVector3& start,
   float best_r = 2000000000.;
   int best_p = -1;
 
-  for (i = 0; i < portals.Length (); i++)
+  for (i = 0; i < portals.GetSize (); i++)
   {
     csPortal *p = portals[i];
     float r;

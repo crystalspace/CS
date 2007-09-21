@@ -323,14 +323,14 @@ bool csDocumentSystemMultiplexer::Initialize (iObjectRegistry* object_reg)
 csRef<iDocumentSystem> csDocumentSystemMultiplexer::LoadNextPlugin (size_t num)
 {
   csRef<iDocumentSystem> res;
-  if (num < orderedlist.Length())
+  if (num < orderedlist.GetSize ())
   {
     res = orderedlist[num];
   }
   else
   {
-    size_t anum = num - orderedlist.Length();
-    if (anum < autolist.Length())
+    size_t anum = num - orderedlist.GetSize ();
+    if (anum < autolist.GetSize ())
     {
       res = autolist[anum];
     }
@@ -355,8 +355,8 @@ csRef<iDocumentSystem> csDocumentSystemMultiplexer::LoadNextPlugin (size_t num)
 void csDocumentSystemMultiplexer::RewardPlugin (size_t num)
 {
   size_t anum;
-  if ((num >= orderedlist.Length()) && 
-    (autolist.Length() - (anum = num - orderedlist.Length()) > 4))
+  if ((num >= orderedlist.GetSize ()) && 
+    (autolist.GetSize () - (anum = num - orderedlist.GetSize ()) > 4))
   {
     csRef<iDocumentSystem> plugin (autolist[anum]);
     autolist.Push (plugin);

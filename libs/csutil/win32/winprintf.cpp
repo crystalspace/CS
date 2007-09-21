@@ -26,7 +26,8 @@
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
 
-#include <windows.h>
+#define WIN32_LEAN_AND_MEAN
+#include <wincon.h>
 #include "csutil/win32/wintools.h"
 
 #if defined(__CYGWIN__) || defined(CS_COMPILER_BCC)
@@ -199,8 +200,8 @@ static int _cs_fputs (const char* string, FILE* stream)
 
               GetConsoleScreenBufferInfo (hCon, &csbi);
 
-              coord.X = csClamp<int> (commandParams.cursorVal.x, csbi.dwSize.X, 0);
-              coord.Y = csClamp<int> (commandParams.cursorVal.y, csbi.dwSize.Y, 0);
+              coord.X = csClamp<int> (commandParams.cursorVal.x-1, csbi.dwSize.X, 0);
+              coord.Y = csClamp<int> (commandParams.cursorVal.y-1, csbi.dwSize.Y, 0);
 
               //Set position
               SetConsoleCursorPosition (hCon, coord);

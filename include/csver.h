@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2002 by Jorrit Tyberghein
+    Copyright (C) 1998-2007 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -29,12 +29,12 @@
 
 /// Major version
 #define CS_VERSION_MAJOR CS_VER_QUOTE(1)
-/// Minor version (release, or "dev" for CVS version)
-#define CS_VERSION_MINOR CS_VER_QUOTE(1)
+/// Minor version (even are stable versions, odd are development versions)
+#define CS_VERSION_MINOR CS_VER_QUOTE(3)
 /// Maintenance release / RC
-#define CS_VERSION_BUILD CS_VER_QUOTE(dev)
+#define CS_VERSION_BUILD CS_VER_QUOTE(0)
 /// Date of release
-#define CS_RELEASE_DATE  CS_VER_QUOTE(Mon 30-Aug-2006)
+#define CS_RELEASE_DATE  CS_VER_QUOTE(Thu 24-May-2007)
 
 #define CS_VER_QUOTE(X) #X
 
@@ -67,7 +67,7 @@
 #endif
 
 /// A complete version number
-#define CS_VERSION_NUMBER CS_VERSION_MAJOR "." CS_VERSION_MINOR \
+#define CS_VERSION_NUMBER CS_VERSION_MAJOR "." CS_VERSION_MINOR "." \
   CS_VERSION_BUILD
 
 /// A complete version string, including platform, processor and compiler

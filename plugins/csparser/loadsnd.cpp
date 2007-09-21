@@ -83,18 +83,17 @@ csPtr<iSndSysStream> csLoader::LoadSoundStream (const char* filename,
   return csPtr<iSndSysStream> (stream);
 }
 
-iSndSysWrapper* csLoader::LoadSoundWrapper (const char* name, const char* fname,
-	int mode3d)
+iSndSysWrapper* csLoader::LoadSoundWrapper (const char* name, const char* fname)
 {
   if (!SndSysManager) return 0;
 
   // load the sound handle
-  csRef<iSndSysStream> Sound = LoadSoundStream (fname, mode3d);
-  if (!Sound) return 0;
+  csRef<iSndSysData> data = LoadSoundSysData (fname);
+  if (!data) return 0;
 
   // build wrapper object
   iSndSysWrapper* wrapper = SndSysManager->CreateSound (name);
-  wrapper->SetStream (Sound);
+  wrapper->SetData (data);
   return wrapper;
 }
 

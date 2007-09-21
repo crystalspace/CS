@@ -38,8 +38,15 @@
 struct iDocumentNode;
 struct iLight;
 struct iObject;
+struct iLoaderContext;
 
-struct csRenderMesh;
+namespace CS
+{
+  namespace Graphics
+  {
+    struct RenderMesh;
+  }
+}
 class csShaderVariable;
 
 struct iShader;
@@ -66,7 +73,7 @@ static inline csShaderVariable* csGetShaderVariableFromStack
   (const csShaderVarStack& stack, const csStringID &name)
 {
   if ((name != csInvalidStringID) &&
-      (name < (csStringID)stack.Length ()))
+      (name < (csStringID)stack.GetSize ()))
   {
     return stack[name];
   }
@@ -91,7 +98,7 @@ static inline csShaderVariable* csGetShaderVariableFromStack
  */
 struct iShaderVariableContext : public virtual iBase
 {
-  SCF_INTERFACE(iShaderVariableContext, 2, 1, 0);
+  SCF_INTERFACE(iShaderVariableContext, 2, 1, 1);
 
   /**
    * Add a variable to this context
@@ -140,6 +147,9 @@ struct iShaderVariableContext : public virtual iBase
   
   /// Remove all variables from this context.
   virtual void Clear() = 0;
+
+  /// Remove the given variable from this context.
+  virtual bool RemoveVariable (csShaderVariable* variable) = 0;
 };
 
 /**
@@ -169,7 +179,7 @@ enum csShaderTagPresence
  */
 struct iShaderManager : public virtual iShaderVariableContext
 {
-  SCF_INTERFACE (iShaderManager, 1, 1, 0);
+  SCF_INTERFACE (iShaderManager, 2, 0, 0);
   /**
    * Register a shader to the shadermanager.
    * Compiler should register all shaders
@@ -177,6 +187,8 @@ struct iShaderManager : public virtual iShaderVariableContext
   virtual void RegisterShader (iShader* shader) = 0;
   /// Unregister a shader.
   virtual void UnregisterShader (iShader* shader) = 0;
+  /// Remove all shaders.
+  virtual void UnregisterShaders () = 0;
   /// Get a shader by name
   virtual iShader* GetShader (const char* name) = 0;
   /// Returns all shaders that have been created
@@ -186,6 +198,27 @@ struct iShaderManager : public virtual iShaderVariableContext
   virtual void RegisterCompiler (iShaderCompiler* compiler) = 0;
   /// Get a shadercompiler by name
   virtual iShaderCompiler* GetCompiler(const char* name) = 0;
+
+  /**
+   * Register a named shader variable accessor.
+   */
+  virtual void RegisterShaderVariableAccessor (const char* name,
+      iShaderVariableAccessor* accessor) = 0;
+  /**
+   * Unregister a shader variable accessor.
+   */
+  virtual void UnregisterShaderVariableAccessor (const char* name,
+      iShaderVariableAccessor* accessor) = 0;
+  /**
+   * Find a shader variable accessor.
+   */
+  virtual iShaderVariableAccessor* GetShaderVariableAccessor (
+      const char* name) = 0;
+
+  /**
+   * Remove all shader variable accessors.
+   */
+  virtual void UnregisterShaderVariableAcessors () = 0;
 
   /// Get the shadervariablestack used to handle shadervariables on rendering
   virtual iShaderVarStack* GetShaderVariableStack () = 0;
@@ -277,7 +310,7 @@ struct iShader : public virtual iShaderVariableContext
    * to be provided to get the actual variant, which is then identified
    * by the "ticket".
    */
-  virtual size_t GetTicket (const csRenderMeshModes& modes,
+  virtual size_t GetTicket (const CS::Graphics::RenderMeshModes& modes,
     const iShaderVarStack* stacks) = 0;
 
   /// Get number of passes this shader have
@@ -287,8 +320,8 @@ struct iShader : public virtual iShaderVariableContext
   virtual bool ActivatePass (size_t ticket, size_t number) = 0;
 
   /// Setup a pass
-  virtual bool SetupPass (size_t ticket, const csRenderMesh *mesh,
-    csRenderMeshModes& modes,
+  virtual bool SetupPass (size_t ticket, const CS::Graphics::RenderMesh *mesh,
+    CS::Graphics::RenderMeshModes& modes,
     const iShaderVarStack* stacks) = 0;
 
   /**
@@ -336,8 +369,9 @@ struct iShaderCompiler : public virtual iBase
    * If no priority is forced then the highest priority technique
    * that works will be selected.
    */
-  virtual csPtr<iShader> CompileShader (iDocumentNode *templ,
-		  int forcepriority = -1) = 0;
+  virtual csPtr<iShader> CompileShader (
+	iLoaderContext* ldr_context, iDocumentNode *templ,
+	int forcepriority = -1) = 0;
 
   /// Validate if a template is a valid shader to this compiler
   virtual bool ValidateTemplate (iDocumentNode *templ) = 0;

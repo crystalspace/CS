@@ -24,11 +24,11 @@
 #include "csgeom/poly3d.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/transfrm.h"
+#include "csgeom/tri.h"
 #include "csutil/scfstr.h"
 #include "csutil/sysfunc.h"
 #include "iengine/camera.h"
 #include "iengine/movable.h"
-#include "igeom/polymesh.h"
 #include "iutil/string.h"
 
 #include "exvis.h"
@@ -229,7 +229,7 @@ static void Perspective (const csVector3& v, csVector2& p, float fov,
 }
 
 void csExactCuller::AddObject (void* obj,
-	iPolygonMesh* polymesh, iMovable* movable, iCamera* camera,
+	iTriangleMesh* trimesh, iMovable* movable, iCamera* camera,
 	const csPlane3* planes)
 {
   if (num_objects >= max_objects)
@@ -249,9 +249,9 @@ void csExactCuller::AddObject (void* obj,
   objects[num_objects].vispix = 0;
   num_objects++;
 
-  const csVector3* verts = polymesh->GetVertices ();
-  int vertex_count = polymesh->GetVertexCount ();
-  int poly_count = polymesh->GetPolygonCount ();
+  const csVector3* verts = trimesh->GetVertices ();
+  size_t vertex_count = trimesh->GetVertexCount ();
+  size_t tri_count = trimesh->GetTriangleCount ();
 
   csReversibleTransform movtrans = movable->GetFullTransform ();
   const csReversibleTransform& camtrans = camera->GetTransform ();
@@ -263,7 +263,7 @@ void csExactCuller::AddObject (void* obj,
   // Calculate camera position in object space.
   csVector3 campos_object = movtrans.Other2This (camtrans.GetOrigin ());
 
-  int i;
+  size_t i;
   // First check visibility of all vertices.
   bool* vis = new bool[vertex_count];
   for (i = 0 ; i < vertex_count ; i++)
@@ -273,32 +273,22 @@ void csExactCuller::AddObject (void* obj,
   }
 
   // Then insert all polygons.
-  csMeshedPolygon* poly = polymesh->GetPolygons ();
-  for (i = 0 ; i < poly_count ; i++, poly++)
+  csTriangle* tri = trimesh->GetTriangles ();
+  for (i = 0 ; i < tri_count ; i++, tri++)
   {
     if (planes[i].Classify (campos_object) >= 0.0)
       continue;
 
-    int num_verts = poly->num_vertices;
-    int* vi = poly->vertices;
-    int j;
-    int cnt_vis = 0;
-    for (j = 0 ; j < num_verts ; j++)
-    {
-      if (vis[vi[j]]) cnt_vis++;
-    }
-    if (cnt_vis > 0)
+    if (vis[tri->a] || vis[tri->b] || vis[tri->c])
     {
       // Here we need to clip the polygon.
       csPoly3D clippoly;
-      for (j = 0 ; j < num_verts ; j++)
-      {
-        csVector3 camv = trans.Other2This (verts[vi[j]]);
-        clippoly.AddVertex (camv);
-      }
+      clippoly.AddVertex (trans.Other2This (verts[tri->a]));
+      clippoly.AddVertex (trans.Other2This (verts[tri->b]));
+      clippoly.AddVertex (trans.Other2This (verts[tri->c]));
       csPoly3D front, back;
       csPoly3D* spoly;
-      if (cnt_vis < num_verts)
+      if (!(vis[tri->a] && vis[tri->b] && vis[tri->c]))
       {
         clippoly.SplitWithPlaneZ (front, back, 0.1f);
 	spoly = &back;

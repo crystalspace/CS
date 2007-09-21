@@ -85,8 +85,8 @@ SCF_IMPLEMENT_FACTORY (csBezierSaver)
 bool csBezierLoader::Initialize (iObjectRegistry* object_reg)
 {
   csBezierLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
   xmltokens.Register ("clone", XMLTOKEN_CLONE);
   xmltokens.Register ("cosfact", XMLTOKEN_COSFACT);
@@ -206,8 +206,9 @@ bool csBezierLoader::LoadThingPart (iDocumentNode* node,
               child, "Couldn't find bezier mesh factory '%s'!", factname);
             return false;
           }
-	  csRef<iBezierFactoryState> tmpl_thing_state (SCF_QUERY_INTERFACE (
-	  	fact->GetMeshObjectFactory (), iBezierFactoryState));
+	  csRef<iBezierFactoryState> tmpl_thing_state (
+            scfQueryInterface<iBezierFactoryState> (
+              fact->GetMeshObjectFactory ()));
 	  if (!tmpl_thing_state)
 	  {
 	    synldr->ReportError (
@@ -239,8 +240,9 @@ bool csBezierLoader::LoadThingPart (iDocumentNode* node,
             return false;
           }
 
-	  csRef<iBezierFactoryState> tmpl_thing_state (SCF_QUERY_INTERFACE (
-	  	wrap->GetMeshObject (), iBezierFactoryState));
+	  csRef<iBezierFactoryState> tmpl_thing_state (
+            scfQueryInterface<iBezierFactoryState> (
+              wrap->GetMeshObject ()));
 	  if (!tmpl_thing_state)
 	  {
 	    synldr->ReportError (
@@ -335,7 +337,7 @@ csPtr<iBase> csBezierLoader::Parse (iDocumentNode* node,
 		node, "Could not load the bezier mesh object plugin!");
     return 0;
   }
-  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iEngine> engine = csQueryRegistry<iEngine> (object_reg);
 
   csRef<iMeshObjectFactory> fact;
   csRef<iBezierState> thing_state;
@@ -344,8 +346,8 @@ csPtr<iBase> csBezierLoader::Parse (iDocumentNode* node,
   // We always do NewFactory() even for mesh objects.
   // That's because csThing implements both so a factory is a mesh object.
   fact = type->NewFactory ();
-  thing_state = SCF_QUERY_INTERFACE (fact, iBezierState);
-  thing_fact_state = SCF_QUERY_INTERFACE (fact, iBezierFactoryState);
+  thing_state = scfQueryInterface<iBezierState> (fact);
+  thing_fact_state = scfQueryInterface<iBezierFactoryState> (fact);
 
   BezierLoadInfo info;
   if (!LoadThingPart (node, ldr_context, object_reg, reporter, synldr, info,
@@ -361,8 +363,8 @@ csPtr<iBase> csBezierLoader::Parse (iDocumentNode* node,
 bool csBezierSaver::Initialize (iObjectRegistry* object_reg)
 {
   csBezierSaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
   return true;
 }
 //TBD
@@ -375,7 +377,7 @@ bool csBezierSaver::WriteDown (iBase* obj, iDocumentNode* parent,
     parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   paramsNode->SetValue("params");
 
-  csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
+  csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (obj);
 
   if (!mesh) return false;
 
@@ -383,8 +385,8 @@ bool csBezierSaver::WriteDown (iBase* obj, iDocumentNode* parent,
 
   if (objwrap) return WriteObject(obj, paramsNode);
 
-  csRef<iMeshObjectFactory> fact = SCF_QUERY_INTERFACE (obj,
-  	iMeshObjectFactory);
+  csRef<iMeshObjectFactory> fact = 
+  	scfQueryInterface<iMeshObjectFactory> (obj);
   if (fact)
   {
     iMeshFactoryWrapper* factwrap = fact->GetMeshFactoryWrapper ();
@@ -396,8 +398,8 @@ bool csBezierSaver::WriteDown (iBase* obj, iDocumentNode* parent,
 
 bool csBezierSaver::WriteObject (iBase* obj, iDocumentNode* parent)
 {
-  csRef<iMeshObject> mesh = SCF_QUERY_INTERFACE (obj, iMeshObject);
-  csRef<iBezierState> state = SCF_QUERY_INTERFACE (obj, iBezierState);
+  csRef<iMeshObject> mesh = scfQueryInterface<iMeshObject> (obj);
+  csRef<iBezierState> state = scfQueryInterface<iBezierState> (obj);
 
   parent->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
     ("iSaverPlugin not yet fully supported for bezier mesh");
@@ -428,7 +430,7 @@ bool csBezierSaver::WriteObject (iBase* obj, iDocumentNode* parent)
 bool csBezierSaver::WriteFactory (iBase* obj, iDocumentNode* parent)
 {
   csRef<iBezierFactoryState> fact = 
-    SCF_QUERY_INTERFACE (obj, iBezierFactoryState);
+    scfQueryInterface<iBezierFactoryState> (obj);
 
   if (fact)
   {

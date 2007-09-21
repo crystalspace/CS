@@ -138,7 +138,7 @@ sprite five units in front of you.
 
 @subsubheading Meaning of the Sprite
 
-Okay, we have an example of a an animation. As you can see from the example,
+Okay, we have an example of an animation. As you can see from the example,
 the sprite @emph{factory} declaration, the sprite consists of four frames
 each enclosed in the @samp{frame} keyword. Each frame defines the vertices
 of the pyramid in each frame. The @samp{v} token stands for @emph{vertex}.

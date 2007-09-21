@@ -38,7 +38,7 @@ float4 main (vertex2fragment IN,
  
 	float bump = dot(normLight, normBumpNormal);
 	<?if vars."specular" ?>
-		float spec = pow(dot(normalize(normEye + normLight), normBumpNormal), 32) * (bumpNormal.w+1)/2;
+		float spec = pow(saturate(dot(normalize(normEye + normLight), normBumpNormal)), 32) * (bumpNormal.w+1)/2;
 	<?endif?>
 	float4 outCol = saturate(lightcolor*bump.xxxx);
  

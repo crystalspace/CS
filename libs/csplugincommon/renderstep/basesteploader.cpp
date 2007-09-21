@@ -41,7 +41,7 @@ bool csBaseRenderStepLoader::Initialize(iObjectRegistry *object_reg)
   csBaseRenderStepLoader::object_reg = object_reg;
 
   csRef<iPluginManager> plugin_mgr = 
-    CS_QUERY_REGISTRY (object_reg, iPluginManager);
+    csQueryRegistry<iPluginManager> (object_reg);
 
   synldr = csQueryRegistryOrLoad<iSyntaxService> (object_reg,
   	"crystalspace.syntax.loader.service.text");

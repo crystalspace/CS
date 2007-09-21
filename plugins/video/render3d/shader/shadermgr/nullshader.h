@@ -53,20 +53,19 @@ public:
   const char* GetFileName () { return 0; }
   void SetFileName (const char* /*filename*/) {  }
 
-  virtual size_t GetTicket (const csRenderMeshModes&, 
+  virtual size_t GetTicket (const CS::Graphics::RenderMeshModes&, 
     const iShaderVarStack*) { return 0; }
 
   virtual size_t GetNumberOfPasses (size_t) { return 0; }
   virtual bool ActivatePass (size_t, size_t) { return false; }
-  virtual bool SetupPass (size_t, const csRenderMesh*,
-    csRenderMeshModes&, const iShaderVarStack*)
+  virtual bool SetupPass (size_t, const CS::Graphics::RenderMesh*,
+    CS::Graphics::RenderMeshModes&, const iShaderVarStack*)
   { return false; }
   virtual bool TeardownPass (size_t)
   { return false; }
   virtual bool DeactivatePass (size_t) { return false; }
   virtual const csShaderMetadata& GetMetadata (size_t) const
   { return allShaderMeta; }
-
 
   /**\name iShaderVariableContext implementation
    * @{ */
@@ -79,6 +78,7 @@ public:
   bool IsEmpty() const { return true; }
   void ReplaceVariable (csShaderVariable*) {}
   void Clear () { }
+  bool RemoveVariable (csShaderVariable*) { return false; }
   /** @} */
 
   /**\name iSelfDestruct implementation

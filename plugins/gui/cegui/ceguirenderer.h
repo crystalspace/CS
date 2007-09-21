@@ -124,6 +124,18 @@ public:
   virtual CEGUI::WindowManager* GetWindowManagerPtr () const
   {return CEGUI::WindowManager::getSingletonPtr();}
 
+  /// Allow CEGUI to capture mouse events.
+  void EnableMouseCapture ();
+
+  /// Keep CEGUI from capturing mouse events.
+  void DisableMouseCapture ();
+
+  /// Allow CEGUI to capture keyboard events.
+  void EnableKeyboardCapture ();
+
+  /// Keep CEGUI from capturing keyboard events.
+  void DisableKeyboardCapture ();
+
   /// Set the display size of the CEGUI render area.
   void setDisplaySize (const CEGUI::Size& sz);
 

@@ -104,7 +104,7 @@ csVerbosityParser::Str csVerbosityParser::Join(
   csStringArray const& tokens, Str delim)
 {
   Str name;
-  for (size_t i = 0, n = tokens.Length(); i < n; i++)
+  for (size_t i = 0, n = tokens.GetSize (); i < n; i++)
   {
     if (i != 0) name << delim;
     name << tokens[i];
@@ -140,7 +140,7 @@ void csVerbosityParser::Parse(char const* s)
     csStringArray names;
     if (Split(s, ',', name_p, true, names))
     {
-      for (size_t i = 0, n = names.Length(); i < n; i++)
+      for (size_t i = 0, n = names.GetSize (); i < n; i++)
       {
 	csStringArray tokens;
 	char const* flag = names[i];
@@ -178,7 +178,7 @@ bool csVerbosityParser::Enabled(char const* flag, bool fuzzy) const
     csStringArray tokens;
     if (ParseFlag(flag, tokens, true))
     {
-      for (size_t i = 0, n = tokens.Length(); i <= n; i++)
+      for (size_t i = 0, n = tokens.GetSize (); i <= n; i++)
       {
 	if (TestFlag(Join(tokens,"."), enable))
 	  break;

@@ -52,7 +52,7 @@ void Report (iObjectRegistry *object_reg, int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
+  csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
   if (rep)
     rep->ReportV (severity, "crystalspace.graphic.image.io.jpeg", 
       msg, arg);
@@ -187,8 +187,8 @@ void csJPGImageIO::SetDithering (bool enable)
   ImageJpgFile::dither = enable;
 }
 
-csPtr<iDataBuffer> csJPGImageIO::Save(iImage *Image, iImageIO::FileFormatDescription*,
-  const char* extraoptions)
+csPtr<iDataBuffer> csJPGImageIO::Save(iImage *Image,
+    iImageIO::FileFormatDescription*, const char* extraoptions)
 {
   int format = Image->GetFormat ();
   switch (format & CS_IMGFMT_MASK)

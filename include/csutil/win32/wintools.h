@@ -166,8 +166,12 @@ enum cswinWindowsVersion
   cswinWinNT = 40,
   /// Windows 2000
   cswinWin2K = 50,
-  /// Windows XP (or better)
-  cswinWinXP = 51
+  /// Windows XP
+  cswinWinXP = 51,
+  /// Windows Server 2003 
+  cswinWin2003 = 52,
+  /// Windows Vista (or newer)
+  cswinWinVista = 60
 };
 
 /**

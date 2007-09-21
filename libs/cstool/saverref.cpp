@@ -22,6 +22,29 @@
 //---------------------------------------------------------------------------
 
 
+csPluginReference::csPluginReference (const char* name, const char* id) :
+  scfImplementationType (this),
+  name (name), id (id)
+{
+}
+
+csPluginReference::~csPluginReference ()
+{
+}
+
+const char* csPluginReference::GetName () const
+{
+  return name;
+}
+
+const char* csPluginReference::GetClassID () const
+{
+  return id;
+}
+
+//---------------------------------------------------------------------------
+
+
 csLibraryReference::csLibraryReference (const char* file, const char* path,
     bool checkDupes) :
   scfImplementationType (this),

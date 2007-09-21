@@ -30,14 +30,12 @@
 #include "csutil/scf.h"
 
 struct iCameraPosition;
-struct iCollection;
 struct iMaterialWrapper;
 struct iMeshWrapper;
 struct iMeshFactoryWrapper;
 struct iObject;
 struct iSector;
 struct iTextureWrapper;
-
 
 /**
  * A region. A region is basically a collection of objects in the
@@ -51,7 +49,7 @@ struct iTextureWrapper;
  */
 struct iRegion : public virtual iBase
 {
-  SCF_INTERFACE(iRegion, 2,0,0);
+  SCF_INTERFACE(iRegion, 2,1,0);
   /// Get the iObject for this region.
   virtual iObject *QueryObject() = 0;
 
@@ -106,8 +104,6 @@ struct iRegion : public virtual iBase
   virtual iMaterialWrapper *FindMaterial (const char *iName) = 0;
   /// Find a camera position in this region by name
   virtual iCameraPosition *FindCameraPosition (const char *iName) = 0;
-  /// Find a collection in this region by name
-  virtual iCollection *FindCollection (const char *iName) = 0;
 
   /**
    * Check if some object is in this region.

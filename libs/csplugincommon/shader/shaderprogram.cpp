@@ -40,12 +40,12 @@ csShaderProgram::csShaderProgram (iObjectRegistry* objectReg)
   InitCommonTokens (commonTokens);
 
   csShaderProgram::objectReg = objectReg;
-  synsrv = CS_QUERY_REGISTRY (objectReg, iSyntaxService);
-  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (objectReg, 
-    "crystalspace.shared.stringset", iStringSet);
+  synsrv = csQueryRegistry<iSyntaxService> (objectReg);
+  strings = csQueryRegistryTagInterface<iStringSet> 
+    (objectReg, "crystalspace.shared.stringset");
   
   csRef<iVerbosityManager> verbosemgr (
-    CS_QUERY_REGISTRY (objectReg, iVerbosityManager));
+    csQueryRegistry<iVerbosityManager> (objectReg));
   if (verbosemgr) 
     doVerbose = verbosemgr->Enabled("renderer.shader");
   else
@@ -56,8 +56,8 @@ csShaderProgram::~csShaderProgram ()
 {
 }
 
-bool csShaderProgram::ParseProgramParam (iDocumentNode* node,
-  ProgramParam& param, uint types)
+bool csShaderProgram::ProgramParamParser::ParseProgramParam (
+  iDocumentNode* node, ProgramParam& param, uint types)
 {
   const char* type = node->GetAttributeValue ("type");
   if (type == 0)
@@ -85,7 +85,7 @@ bool csShaderProgram::ParseProgramParam (iDocumentNode* node,
 	"Node has no contents");
       return false;
     }
-    param.name = strings->Request (value);
+    param.name = stringsSvName->Request (value);
     param.valid = true;
     return true;
   }
@@ -117,7 +117,6 @@ bool csShaderProgram::ParseProgramParam (iDocumentNode* node,
   {
     // Parse exp and save it
     csRef<iShaderVariableAccessor> acc = synsrv->ParseShaderVarExpr (node);
-    var->SetType (csShaderVariable::VECTOR4);
     var->SetAccessor (acc);
     param.var = var;
     param.valid = true;
@@ -137,9 +136,9 @@ bool csShaderProgram::ParseProgramParam (iDocumentNode* node,
 
     //Save the params
     var->SetType (csShaderVariable::ARRAY);
-    var->SetArraySize (allParams.Length ());
+    var->SetArraySize (allParams.GetSize ());
 
-    for (uint i = 0; i < allParams.Length (); i++)
+    for (uint i = 0; i < allParams.GetSize (); i++)
     {
       var->SetArrayElement (i, allParams[i].var);
     }
@@ -323,7 +322,7 @@ bool csShaderProgram::ParseCommon (iDocumentNode* child)
 	{
 	  programFileName = filename;
 
-	  csRef<iVFS> vfs = CS_QUERY_REGISTRY (objectReg, iVFS);
+	  csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectReg);
 	  csRef<iFile> file = vfs->Open (filename, VFS_FILE_READ);
 	  if (!file.IsValid())
 	  {
@@ -357,8 +356,8 @@ iDocumentNode* csShaderProgram::GetProgramNode ()
 
   if (programFile.IsValid ())
   {
-    csRef<iDocumentSystem> docsys = CS_QUERY_REGISTRY (objectReg, 
-      iDocumentSystem);
+    csRef<iDocumentSystem> docsys =  
+      csQueryRegistry<iDocumentSystem> (objectReg);
     if (!docsys)
       docsys.AttachNew (new csTinyDocumentSystem ());
     csRef<iDocument> doc (docsys->CreateDocument ());
@@ -389,10 +388,10 @@ csPtr<iDataBuffer> csShaderProgram::GetProgramData ()
 
   if (programNode.IsValid())
   {
-    char* data = csStrNew (programNode->GetContentsValue ());
+    char* data = CS::StrDup (programNode->GetContentsValue ());
 
     csRef<iDataBuffer> newbuff;
-    newbuff.AttachNew (new csDataBuffer (data, data ? strlen (data) : 0));
+    newbuff.AttachNew (new CS::DataBuffer<> (data, data ? strlen (data) : 0));
     return csPtr<iDataBuffer> (newbuff);
   }
 
@@ -408,7 +407,7 @@ void csShaderProgram::DumpProgramInfo (csString& output)
 
 void csShaderProgram::DumpVariableMappings (csString& output)
 {
-  for (size_t v = 0; v < variablemap.Length(); v++)
+  for (size_t v = 0; v < variablemap.GetSize (); v++)
   {
     const VariableMapEntry& vme = variablemap[v];
 

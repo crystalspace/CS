@@ -1,0 +1,67 @@
+@c -*-texinfo-*-
+@node Renderer Mixmodes, , HOWTO Use custom font, 3D Renderer
+@subsection Mixmodes and Blending
+@cindex mixmode
+
+The @samp{mixmode} controls how a source (usually a texture) is blended on
+top of the destination (usually a screen buffer). Typically mixmodes are set
+on mesh factories or objects to control transparency of some kind.
+There are various modes defined in @file{include/ivideo/graph3d.h}.
+
+In the explanation below we use the following terms: @sc{src} is the source of
+the blend operation (usually the texture or material). @sc{dst} is the
+destination of the blend operation (usually the screen buffer or texture
+on which you are rendering). @samp{srcAlpha} is the alpha component
+of the source buffer. @samp{dstAlpha} is the alpha component of the destination
+buffer. The following mixmodes are supported:
+
+@itemize @bullet
+@item @samp{CS_FX_COPY}
+Blending function: @sc{src}. This mode is usually default. It simply
+copies the source to the destination without blending.
+@item @samp{CS_FX_MULTIPLY}
+Blending function: @sc{src}*@sc{dst}. This is a common blend mode to
+simulate lighting.
+@item @samp{CS_FX_MULTIPLY2}
+Blending function: 2*@sc{src}*@sc{dst}. This is a common blend mode
+to simulate brighter lighting.
+@item @samp{CS_FX_ADD}
+Blending function: @sc{src}+@sc{dst}. Add source and destination. This is a
+mode that allows for nice transparency effects. One of the big advantages (as
+opposed to @samp{alpha}) is that this mode doesn't require objects to be
+sorted from back to front.
+@item @samp{CS_FX_ALPHA}
+Blending function: @samp{alpha}*@sc{src} + (1-@samp{alpha})*@sc{dst}.
+The @samp{alpha} used in this formula is a combination of the @samp{srcAlpha}
+and the alpha given in the alpha mask of the mixmode. But this
+depends on the actual shader that is being used.
+@item @samp{CS_FX_SETALPHA(alpha)}
+Convenience macro to set @samp{CS_FX_ALPHA} and set the alpha value to the
+alpha mask (value is between 0 and 1).
+@item @samp{CS_FX_SETALPHA_INT(alpha)}
+Convenience macro to set @samp{CS_FX_ALPHA} and set the alpha value to the
+alpha mask (value is between 0 and 255).
+@item @samp{CS_FX_PREMULTALPHA}
+Blending function: @sc{src} + @sc{dst}*(1-@samp{srcAlpha}). When the
+source alpha component was multoplied into the source color then this acts
+like normal alpha blending. If it was not then it acts like additive
+blending. So this mixmode can be used to do both additive and alpha
+blending on the same triangle and even interpolate between these two
+extremes by appropriate choice of the color and alpha values.
+@item @samp{CS_FX_DESTALPHAADD}
+Blending function: @samp{dstAlpha}*@sc{src} + @sc{dst}.
+@item @samp{CS_FX_SRCALPHAADD}
+Blending function: @samp{srcAlpha}*@sc{src} + @sc{dst}.
+@item @samp{CS_FX_TRANSPARENT}
+Blending function: @sc{dst}. This mode will simply leave the destination
+unchanged (fully transparent) except that the z-buffer is modified!
+@item @samp{CS_FX_MESH}
+@@@@TODO
+@item @samp{CS_MIXMODE_ALPHATEST_AUTO}
+@@@@TODO
+@item @samp{CS_MIXMODE_ALPHATEST_ENABLE}
+@@@@TODO
+@item @samp{CS_MIXMODE_ALPHATEST_DISABLE}
+@@@@TODO
+@end itemize
+

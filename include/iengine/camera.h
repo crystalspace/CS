@@ -101,7 +101,7 @@ struct iCameraSectorListener : public virtual iBase
  */
 struct iCamera : public virtual iBase
 {
-  SCF_INTERFACE(iCamera, 2,0,0);
+  SCF_INTERFACE(iCamera, 2,1,0);
   /**
    * Create a clone of this camera. Note that the array of listeners
    * is not cloned.
@@ -238,20 +238,6 @@ struct iCamera : public virtual iBase
    */
   virtual long GetCameraNumber () const = 0;
 
-  /**
-   * Calculate perspective corrected point for this camera.
-   * \deprecated Use Perspective(const csVector3&) instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use Perspective(const csVector3&) instead")
-  virtual void Perspective (const csVector3& v, csVector2& p) const = 0;
-  /**
-   * Calculate inverse perspective corrected point for this camera.
-   * \deprecated Use InvPerspective(const csVector2&, float) instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use InvPerspective(const csVector2&, float) "
-                           "instead")
-  virtual void InvPerspective (const csVector2& p, float z,
-  	csVector3& v) const = 0;
   /// Calculate perspective corrected point for this camera.
   virtual csVector2 Perspective (const csVector3& v) const = 0;
   /// Calculate inverse perspective corrected point for this camera.

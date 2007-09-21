@@ -32,7 +32,6 @@
 #include "csgeom/box.h"
 #include "iengine/mesh.h"
 #include "iengine/meshgen.h"
-#include "imesh/instmesh.h"
 #include "ivaria/terraform.h"
 
 struct iSector;
@@ -43,6 +42,15 @@ struct csMGCell;
 #define USE_INSTANCING
 
 #define CS_GEOM_MAX_ROTATIONS 16
+
+/**
+ * Per-vertex information for instancing.
+ */
+struct csMGInstVertexInfo
+{
+  csRef<csShaderVariable> transformVar;
+  csRef<csShaderVariable> fadeFactorVar;
+};
 
 /**
  * A single geometry (for a single lod level).
@@ -63,9 +71,9 @@ struct csMGGeom
    */
   csRefArray<iMeshWrapper> mesh_setaside;
 #else
-  csRef<csShaderVariable> transformArray;
+  csMGInstVertexInfo vertexInfoArray;
   csRef<iMeshWrapper> mesh;
-  csRefArray<csShaderVariable> transform_setaside;
+  csArray<csMGInstVertexInfo> vertexinfo_setaside;
 #endif
 };
 
@@ -103,6 +111,8 @@ private:
 
   csArray<csVector2> *positions;
   int celldim;
+  
+  csStringID colldetID;
 
   void AddSVToMesh (iMeshWrapper* mesh, csShaderVariable* sv);
   void SetMeshBBox (iMeshWrapper* mesh, const csBox3& bbox);
@@ -125,7 +135,7 @@ public:
   void ResetManualPositions (int new_celldim);
 
   virtual void AddFactory (iMeshFactoryWrapper* factory, float maxdist);
-  virtual size_t GetFactoryCount () const { return factories.Length (); }
+  virtual size_t GetFactoryCount () const { return factories.GetSize (); }
   virtual void RemoveFactory (size_t idx);
   virtual iMeshFactoryWrapper* GetFactory (size_t idx)
   {
@@ -162,7 +172,7 @@ public:
    * instance from an instmesh.
    */
   csPtr<iMeshWrapper> AllocMesh (int cidx, const csMGCell& cell,
-      float sqdist, size_t& lod, csRef<csShaderVariable>& transformVar);
+      float sqdist, size_t& lod, csMGInstVertexInfo& vertexInfo);
 
   /**
    * Set aside the mesh temporarily. This is called if we have a mesh that
@@ -174,7 +184,7 @@ public:
    * haven't been reused.
    */
   void SetAsideMesh (int cidx, iMeshWrapper* mesh,
-      size_t lod, csShaderVariable* transformVar);
+      size_t lod, csMGInstVertexInfo& vertexInfo);
 
   /**
    * Free all meshes that were put aside and that were not reused by
@@ -186,7 +196,7 @@ public:
    * Move the mesh to some position.
    */
   void MoveMesh (int cidx, iMeshWrapper* mesh, size_t lod, 
-    csShaderVariable* transformVar, const csVector3& position, 
+    csMGInstVertexInfo& vertexInfo, const csVector3& position, 
     const csMatrix3& matrix);
 
   /**
@@ -240,7 +250,8 @@ struct csMGPosition
   /// The LOD level for the mesh above.
   size_t lod;
 
-  csRef<csShaderVariable> transformVar;
+  /// Vertex info for instancing.
+  csMGInstVertexInfo vertexInfo;
 
   csMGPosition () : last_mixmode (CS_FX_COPY), mesh (0) { }
 };
@@ -339,10 +350,6 @@ private:
   float alpha_mindist, sq_alpha_mindist, alpha_maxdist;
   float alpha_scale;
 
-  csEngine* engine;
-  csStringID varTransform;
- 
-
   csVector3 last_pos;
 
   /**
@@ -421,15 +428,19 @@ private:
   size_t CountPositions (int cidx, csMGCell& cell);
   size_t CountAllPositions ();
 
-  friend class csMeshGeneratorGeometry;
-
 public:
+  csEngine* engine;
+  csRef<iStringSet> strings;
+  csStringID varTransform;
+  csStringID varFadeFactor;
 
   csMeshGenerator (csEngine* engine);
   virtual ~csMeshGenerator ();
 
   void SetSector (iSector* sector) { csMeshGenerator::sector = sector; }
   iSector* GetSector () { return sector; }
+  
+  csRef<iStringSet> GetStringSet () { return strings; }
 
   /**
    * Allocate blocks. This function will allocate all blocks needed
@@ -462,7 +473,7 @@ public:
   int GetCellId (const csVector2& pos);
 
   virtual iMeshGeneratorGeometry* CreateGeometry ();
-  virtual size_t GetGeometryCount () const { return geometries.Length (); }
+  virtual size_t GetGeometryCount () const { return geometries.GetSize (); }
   virtual iMeshGeneratorGeometry* GetGeometry (size_t idx)
   {
     return geometries[idx];
@@ -470,7 +481,7 @@ public:
   virtual void RemoveGeometry (size_t idx);
 
   virtual void AddMesh (iMeshWrapper* mesh) { meshes.Push (mesh); }
-  virtual size_t GetMeshCount () const { return meshes.Length (); }
+  virtual size_t GetMeshCount () const { return meshes.GetSize (); }
   virtual iMeshWrapper* GetMesh (size_t idx) { return meshes[idx]; }
   virtual void RemoveMesh (size_t idx);
 

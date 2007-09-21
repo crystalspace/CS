@@ -203,22 +203,5 @@ inline csPtr<Interface> csQueryRegistryTagInterface (
   return csPtr<Interface> (x);
 }  
 
-/**
- * \deprecated Compatibility macro
- * \sa csQueryRegistryTag
- */
-#define CS_QUERY_REGISTRY_TAG(Reg, Tag) (csQueryRegistryTag(Reg, Tag))
-/**
- * \deprecated Compatibility macro
- * \sa csQueryRegistry
- */
-#define CS_QUERY_REGISTRY(Reg,Interface) (csQueryRegistry<Interface>(Reg))
-/**
- * \deprecated Compatibility macro
- * \sa csQueryRegistryTagInterface
- */
-#define CS_QUERY_REGISTRY_TAG_INTERFACE(Reg, Tag, Interface) \
-  (csQueryRegistryTagInterface<Interface>(Reg, Tag))
-
 #endif // __CS_IUTIL_OBJREG_H__
 

@@ -10,4 +10,8 @@ Plugin gmesh3ds
 LinkWith gmesh3ds : crystalspace ;
 ExternalLibs gmesh3ds : 3DS ;
 CompileGroups gmesh3ds :  meshes ;
+if $(LIB3DS.ONE_THREE_OH) = "yes"
+{
+  CFlags gmesh3ds : [ FDefines NEW_DATA_CALLBACKS ] ;
+}
 }

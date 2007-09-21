@@ -1,5 +1,9 @@
 Crystal Space detailed change log for "pseudoinstancing" branch.
 
+21-Sep-2007
+	- iceeey merged trunk into branch:
+            - Updated code for all API changes.
+	    - Added implementation of SetFade for instancing, not yet working.	
 30-Sep-2006
 	- res overhauled the instancing: 
 	    - Instancing targets and variables are now passed along as simple 

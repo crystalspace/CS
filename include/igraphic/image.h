@@ -44,7 +44,10 @@ struct csRGBpixel;
 #define CS_IMGFMT_MASK (0x0000ffff)
 /// We don't want the pixels at all, just (possibly) the alphamap
 #define CS_IMGFMT_NONE (0x00000000)
-/// Truecolor format (r/g/b/unused per each pixel)
+/**
+ * Truecolor format (r/g/b/unused resp. r/g/b/a per each pixel, depending on
+ * the presence of the CS_IMGFMT_ALPHA flag).
+ */
 #define CS_IMGFMT_TRUECOLOR (0x00000001)
 /// 8-bit indexed paletted image
 #define CS_IMGFMT_PALETTED8 (0x00000002)
@@ -92,7 +95,7 @@ enum csImageType
  */
 struct iImage : public virtual iBase
 {
-  SCF_INTERFACE (iImage, 3, 0, 0);
+  SCF_INTERFACE (iImage, 4, 0, 0);
 
   /**
    * Get image data: returns either (csRGBpixel *) or (unsigned char *)
@@ -129,22 +132,8 @@ struct iImage : public virtual iBase
   /// Check if image has a keycolour stored with it.
   virtual bool HasKeyColor () const = 0;
 
-  /**
-   * Check if image has a keycolour stored with it.
-   * \deprecated Use HasKeyColor() instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use HasKeyColor() instead")
-  virtual bool HasKeycolor () const = 0;
-
   /// Get the keycolour stored with the image.
   virtual void GetKeyColor (int &r, int &g, int &b) const = 0;
-
-  /**
-   * Get the keycolour stored with the image.
-   * \deprecated Use GetKeyColor() instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use GetKeyColor() instead")
-  virtual void GetKeycolor (int &r, int &g, int &b) const = 0;
 
   /**
    * Returns the number of mipmaps contained in the image (in case there exist
@@ -162,6 +151,9 @@ struct iImage : public virtual iBase
   /**
    * Get a string identifying the format of the raw data of the image
    * (or 0 if raw data is not provided).
+   * The format string must be compatible with that supported by
+   * iTextureManager::CreateTexture().
+   * \sa \ref TextureFormatStrings 
    */
   virtual const char* GetRawFormat() const = 0;
   /**

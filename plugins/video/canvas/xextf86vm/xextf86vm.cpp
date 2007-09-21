@@ -30,20 +30,9 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csXExtF86VM)
 
-
-SCF_IMPLEMENT_IBASE(csXExtF86VM)
-  SCF_IMPLEMENTS_INTERFACE(iXExtF86VM)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csXExtF86VM::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csXExtF86VM::csXExtF86VM (iBase* parent)
+  : scfImplementationType (this, parent)
 {
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   dpy = 0;
   screen_num = 0;
   width = height = 0;
@@ -52,8 +41,6 @@ csXExtF86VM::csXExtF86VM (iBase* parent)
 
 csXExtF86VM::~csXExtF86VM ()
 {
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csXExtF86VM::Initialize (iObjectRegistry *object_reg)
@@ -70,7 +57,7 @@ void csXExtF86VM::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
+  csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
   if (rep)
     rep->ReportV (severity, "crystalspace.window.x.extf86vm", msg, arg);
   else

@@ -32,17 +32,21 @@
 #include "csutil/scf_implementation.h"
 
 struct iSyntaxService;
+struct iTriangleMesh;
 
 class csSaver : public scfImplementation2<csSaver, iSaver, iComponent>
 {
   iObjectRegistry* object_reg;
   csRef<iEngine> engine;
   csRef<iSyntaxService> synldr;
+  csRef<iStringSet> strings;
   csRef<iPluginManager> plugin_mgr;
   csHash<csString, csString> plugins;
   csRef<iDocumentNode> before;
   iRegion* curRegion;
   int fileType;
+  
+  void InitializePluginsHash ();
 
 public:
   csSaver(iBase*);
@@ -58,6 +62,8 @@ public:
   const char* GetPluginName (const char* plugin, const char* type);
   bool SavePlugins (iDocumentNode* parent);
 
+  bool SaveTriMesh(iDocumentNode *parent, csStringID id,
+      iTriangleMesh* trimesh);
   bool SaveCameraPositions(iDocumentNode *parent);
   bool SaveLibraryReferences(iDocumentNode *parent);
   bool SaveAddons(iDocumentNode *parent);

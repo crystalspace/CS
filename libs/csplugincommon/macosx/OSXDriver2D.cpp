@@ -22,10 +22,6 @@
 #include <sys/time.h>
 
 
-SCF_IMPLEMENT_IBASE(OSXDriver2D::EventHandler)
-  SCF_IMPLEMENTS_INTERFACE(iEventHandler)
-SCF_IMPLEMENT_IBASE_END
-
 
 // Constructor
 // Initialize graphics driver
@@ -50,7 +46,7 @@ OSXDriver2D::~OSXDriver2D()
 {
     if (scfiEventHandler != 0)
     {
-        csRef<iEventQueue> queue = CS_QUERY_REGISTRY(objectReg, iEventQueue);
+        csRef<iEventQueue> queue = csQueryRegistry<iEventQueue> (objectReg);
         if (queue.IsValid())
             queue->RemoveListener(scfiEventHandler);
         scfiEventHandler->DecRef();
@@ -69,14 +65,14 @@ bool OSXDriver2D::Initialize(iObjectRegistry *reg)
     objectReg = reg;
 
     // Get assistant
-    assistant = CS_QUERY_REGISTRY(reg, iOSXAssistant);
+    assistant = csQueryRegistry<iOSXAssistant> (reg);
 
     // Create event handler
     if (scfiEventHandler == 0)
         scfiEventHandler = new EventHandler(this);
 
     // Listen for key down events
-    csRef<iEventQueue> queue = CS_QUERY_REGISTRY(reg, iEventQueue);
+    csRef<iEventQueue> queue = csQueryRegistry<iEventQueue> (reg);
     focusChangedEvt = csevFocusChanged(reg);
      commandLineHelpEvt = csevCommandLineHelp(reg);
      keyboardDownEvt = csevKeyboardDown(reg);
@@ -398,7 +394,7 @@ void OSXDriver2D::SaveGamma(CGDirectDisplayID disp, GammaTable &table)
 void OSXDriver2D::ChooseDisplay()
 {
     csRef<iCommandLineParser> parser = 
-	CS_QUERY_REGISTRY(objectReg, iCommandLineParser);
+	csQueryRegistry<iCommandLineParser> (objectReg);
     const char *s = parser->GetOption("screen");
     if (s != 0)
         screen = (unsigned int)atoi(s);

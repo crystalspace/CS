@@ -63,7 +63,8 @@
 #include "ivideo/txtmgr.h"
 #include "plugins/engine/3d/halo.h"
 #include "csutil/flags.h"
-#include "igeom/polymesh.h"
+#include "igeom/trimesh.h"
+#include "csgeom/tri.h"
 
 #include "cssaver.h"
 
@@ -86,9 +87,11 @@ csSaver::~csSaver()
 bool csSaver::Initialize(iObjectRegistry* p)
 {
   object_reg = p;
-  engine = CS_QUERY_REGISTRY(object_reg, iEngine);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-  plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  engine = csQueryRegistry<iEngine> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
+  plugin_mgr = csQueryRegistry<iPluginManager> (object_reg);
+  strings = csQueryRegistryTagInterface<iStringSet> (object_reg,
+      "crystalspace.shared.stringset");
 
   if (!engine->GetSaveableFlag())
   {
@@ -128,6 +131,28 @@ const char* csSaver::GetPluginName (const char* plugin, const char* type)
     plugins.PutUnique (plugintype.GetData (), pluginname.GetData ());
   }
   return plugins.Get (plugin, plugin);
+}
+
+void csSaver::InitializePluginsHash ()
+{
+  plugins.DeleteAll ();
+  
+  // Fill the hash with plugin references which are stored by the loader
+  // if the saveable flag is set.
+  // If saveable wasn't set, the names will be generated.
+  csRef<iObjectRegistryIterator> it = object_reg->Get (
+      scfInterfaceTraits<iPluginReference>::GetID (),
+      scfInterfaceTraits<iPluginReference>::GetVersion ());
+  while (it->HasNext ())
+  {
+    csRef<iBase> obj = it->Next ();
+    
+    csRef<iPluginReference> plugref = scfQueryInterface <iPluginReference> (obj);
+    if (plugref.IsValid ())
+    {
+      plugins.PutUnique (plugref->GetClassID (), plugref->GetName ());
+    }
+  }
 }
 
 bool csSaver::SavePlugins (iDocumentNode* parent)
@@ -281,7 +306,7 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
       if (!texCb) continue;
 
       csRef<iProcTexCallback> proctexCb = 
-	SCF_QUERY_INTERFACE(texCb, iProcTexCallback);
+	scfQueryInterface<iProcTexCallback> (texCb);
       if (!proctexCb) continue;
 
       iProcTexture* proctex = proctexCb->GetProcTexture();
@@ -293,7 +318,7 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
       iTextureType* textype = texfact->GetTextureType();
       if (!textype) continue;
 
-      csRef<iFactory> fact = SCF_QUERY_INTERFACE(textype, iFactory);
+      csRef<iFactory> fact = scfQueryInterface<iFactory> (textype);
       if (!fact) continue;
 
       csString loadername (fact->QueryClassID());
@@ -318,8 +343,8 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
 bool csSaver::SaveMaterials(iDocumentNode *parent)
 {
   csRef<iStringSet> stringset =
-    CS_QUERY_REGISTRY_TAG_INTERFACE(object_reg, 
-    "crystalspace.shared.stringset", iStringSet);
+    csQueryRegistryTagInterface<iStringSet> 
+    (object_reg, "crystalspace.shared.stringset");
 
   csStringID texdiffID = stringset->Request("tex diffuse");
   csStringID orlightID = stringset->Request("std_lighting");
@@ -337,7 +362,7 @@ bool csSaver::SaveMaterials(iDocumentNode *parent)
     
     iMaterial* mat = matWrap->GetMaterial();
     CS_ASSERT(mat);
-    csRef<iMaterialEngine>matEngine(SCF_QUERY_INTERFACE(mat,iMaterialEngine));
+    csRef<iMaterialEngine>matEngine(scfQueryInterface<iMaterialEngine> (mat));
     CS_ASSERT(matEngine);
 
     iTextureWrapper* texWrap = matEngine->GetTextureWrapper();
@@ -480,12 +505,12 @@ bool csSaver::SaveShaders (iDocumentNode *parent)
 
   csRef<iDocumentNode> shadersNode = CreateNode(parent, "shaders");
   csRef<iShaderManager> shaderMgr = 
-    CS_QUERY_REGISTRY (object_reg, iShaderManager);
+    csQueryRegistry<iShaderManager> (object_reg);
   if (!shaderMgr) return false;
 
   csRefArray<iShader> shaders = shaderMgr->GetShaders ();
   size_t i;
-  for (i = 0 ; i < shaders.Length () ; i++)
+  for (i = 0 ; i < shaders.GetSize () ; i++)
   {
     iShader* shader = shaders[i];
     
@@ -554,9 +579,51 @@ bool csSaver::SaveCameraPositions(iDocumentNode *parent)
   return true;
 }
 
-bool csSaver::SaveMeshFactories(iMeshFactoryList* factList, 
-                                iDocumentNode *parent, iMeshFactoryWrapper* parentfact)
+bool csSaver::SaveTriMesh (iDocumentNode *parent, csStringID id,
+    iTriangleMesh* trimesh)
 {
+  csRef<iDocumentNode> n = CreateNode (parent, "trimesh");
+  csRef<iDocumentNode> id_node = CreateNode (n, "id");
+  const char* idstring = strings->Request (id);
+  id_node->CreateNodeBefore (CS_NODE_TEXT)->SetValue (idstring);
+  if (trimesh)
+  {
+    if (trimesh->GetFlags ().Check (CS_TRIMESH_CLOSED))
+    {
+      csRef<iDocumentNode> closed_node = CreateNode (n, "closed");
+    }
+    if (trimesh->GetFlags ().Check (CS_TRIMESH_CONVEX))
+    {
+      csRef<iDocumentNode> convex_node = CreateNode (n, "convex");
+    }
+    csRef<iDocumentNode> mesh_node = CreateNode (n, "mesh");
+    size_t i;
+    size_t num_vt = trimesh->GetVertexCount ();
+    csVector3* verts = trimesh->GetVertices ();
+    for (i = 0 ; i < num_vt ; i++)
+    {
+      if (!synldr->WriteVector (CreateNode (mesh_node, "v"), *verts++))
+	return false;
+    }
+    size_t num_tri = trimesh->GetTriangleCount ();
+    csTriangle* tris = trimesh->GetTriangles ();
+    for (i = 0 ; i < num_tri ; i++)
+    {
+      csRef<iDocumentNode> tri_node = CreateNode (mesh_node, "t");
+      tri_node->SetAttributeAsInt ("v1", tris->a);
+      tri_node->SetAttributeAsInt ("v2", tris->b);
+      tri_node->SetAttributeAsInt ("v3", tris->c);
+      tris++;
+    }
+  }
+  return true;
+}
+
+bool csSaver::SaveMeshFactories(iMeshFactoryList* factList, 
+                                iDocumentNode *parent,
+				iMeshFactoryWrapper* parentfact)
+{
+  csStringID base_id = strings->Request ("base");
   for (int i=0; i<factList->GetCount(); i++)
   {
     csRef<iMeshFactoryWrapper> meshfactwrap = factList->Get(i);
@@ -577,7 +644,7 @@ bool csSaver::SaveMeshFactories(iMeshFactoryList* factList,
       factNode->SetAttribute("name", name);
 
     csRef<iFactory> factory = 
-      SCF_QUERY_INTERFACE(meshfact->GetMeshObjectType(), iFactory);
+      scfQueryInterface<iFactory> (meshfact->GetMeshObjectType());
 
     const char* pluginname = factory->QueryClassID();
 
@@ -589,13 +656,15 @@ bool csSaver::SaveMeshFactories(iMeshFactoryList* factList,
 
     // A special case for bruteblock
     char basepluginname[128] = "";
-    csReplaceAll(basepluginname, pluginname, ".terrain.bruteblock", ".terrain", 128);
+    csReplaceAll(basepluginname, pluginname, ".terrain.bruteblock",
+	".terrain", 128);
     
     //Add the plugin tag
     char loadername[128] = "";
     csReplaceAll(loadername, basepluginname, ".object.", ".loader.factory.",128);
 
-    pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(GetPluginName (loadername, "Fact"));
+    pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue(GetPluginName (
+	  loadername, "Fact"));
 
     char savername[128] = "";
     csReplaceAll(savername, basepluginname, ".object.", ".saver.factory.", 128);
@@ -612,26 +681,33 @@ bool csSaver::SaveMeshFactories(iMeshFactoryList* factList,
     synldr->WriteBool (factNode, "staticshape",
       meshfact->GetFlags ().Check (CS_FACTORY_STATICSHAPE), false);
 
-    csRef<iObjectModel> objmdl = meshfact->GetObjectModel ();
-    if (objmdl.IsValid ())
+    iObjectModel* objmdl = meshfact->GetObjectModel ();
+    if (objmdl)
     {
-      csRef<iPolygonMesh> poly = objmdl->GetPolygonMeshShadows ();
-      if (poly.IsValid ())
+      csRef<iTriangleMeshIterator> it = objmdl->GetTriangleDataIterator ();
+      while (it->HasNext ())
+      {
+	csStringID id;
+	iTriangleMesh* trimesh = it->Next (id);
+	if (!SaveTriMesh (factNode, id, trimesh)) return false;
+      }
+      iTriangleMesh* trimesh = objmdl->GetTriangleData (base_id);
+      if (trimesh)
       {
         synldr->WriteBool (factNode, "closed",
-          poly->GetFlags ().Check (CS_POLYMESH_CLOSED),
+          trimesh->GetFlags ().Check (CS_TRIMESH_CLOSED),
           false);
         synldr->WriteBool (factNode, "convex",
-          poly->GetFlags ().Check (CS_POLYMESH_CONVEX),
+          trimesh->GetFlags ().Check (CS_TRIMESH_CONVEX),
           false);
       }
-
-      //TBD: Polymesh
     }
 
-    const char* pname = engine->GetRenderPriorityName (meshfactwrap->GetRenderPriority ());
+    const char* pname = engine->GetRenderPriorityName (
+	meshfactwrap->GetRenderPriority ());
     if (pname && *pname)
-      CreateNode (factNode, "priority")->CreateNodeBefore (CS_NODE_TEXT)->SetValue (pname);
+      CreateNode (factNode, "priority")->CreateNodeBefore (CS_NODE_TEXT)
+	->SetValue (pname);
 
     csZBufMode zmode = meshfactwrap->GetZBufMode ();
     synldr->WriteZMode (factNode, zmode, false);
@@ -702,7 +778,7 @@ bool csSaver::SaveSectors(iDocumentNode *parent)
       synldr->WriteColor (CreateNode (sectorNode, "ambient"), ambient);
     }
     
-    // TBD: cullerp, polymesh, node
+    // TBD: cullerp, trimesh, node
 
     if (sector->HasFog ())
     {
@@ -749,7 +825,7 @@ bool csSaver::SaveSectorMeshes(iMeshList* meshList,
     
     //Check if it's a portal
     csRef<iPortalContainer> portal = 
-      SCF_QUERY_INTERFACE(meshwrapper->GetMeshObject(), iPortalContainer);
+      scfQueryInterface<iPortalContainer> (meshwrapper->GetMeshObject());
     if (portal) 
     {
       for (int i=0; i<portal->GetPortalCount(); i++)
@@ -774,7 +850,7 @@ bool csSaver::SaveSectorMeshes(iMeshList* meshList,
       meshwrapper->GetMeshObject()->GetFactory();
     if (meshobjectfactory)
       factory = 
-        SCF_QUERY_INTERFACE(meshobjectfactory->GetMeshObjectType(), iFactory);
+        scfQueryInterface<iFactory> (meshobjectfactory->GetMeshObjectType());
     else
     {
       csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -848,7 +924,7 @@ bool csSaver::SaveSectorMeshes(iMeshList* meshList,
     //Save all childmeshes
     const csRefArray<iSceneNode>& childlist = meshwrapper->QuerySceneNode ()->
 	    GetChildren ();
-    if (childlist.Length () > 0) SaveSectorMeshes(childlist, meshNode);
+    if (childlist.GetSize () > 0) SaveSectorMeshes(childlist, meshNode);
   }
   return true;
 }
@@ -856,7 +932,8 @@ bool csSaver::SaveSectorMeshes(iMeshList* meshList,
 bool csSaver::SaveSectorMeshes(const csRefArray<iSceneNode>& meshList,
 		iDocumentNode *parent)
 {
-  for (size_t i=0; i<meshList.Length(); i++)
+  csStringID base_id = strings->Request ("base");
+  for (size_t i=0; i<meshList.GetSize (); i++)
   {
     iMeshWrapper* meshwrapper = meshList[i]->QueryMesh ();
     if (!meshwrapper) continue;
@@ -866,7 +943,7 @@ bool csSaver::SaveSectorMeshes(const csRefArray<iSceneNode>& meshList,
     
     //Check if it's a portal
     csRef<iPortalContainer> portal = 
-      SCF_QUERY_INTERFACE(meshwrapper->GetMeshObject(), iPortalContainer);
+      scfQueryInterface<iPortalContainer> (meshwrapper->GetMeshObject());
     if (portal) 
     {
       for (int i=0; i<portal->GetPortalCount(); i++)
@@ -891,7 +968,7 @@ bool csSaver::SaveSectorMeshes(const csRefArray<iSceneNode>& meshList,
       meshwrapper->GetMeshObject()->GetFactory();
     if (meshobjectfactory)
       factory = 
-        SCF_QUERY_INTERFACE(meshobjectfactory->GetMeshObjectType(), iFactory);
+        scfQueryInterface<iFactory> (meshobjectfactory->GetMeshObjectType());
     else
     {
       csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -928,6 +1005,28 @@ bool csSaver::SaveSectorMeshes(const csRefArray<iSceneNode>& meshList,
       }
 
     }
+    iObjectModel* objmdl = meshwrapper->GetMeshObject ()->GetObjectModel ();
+    if (objmdl)
+    {
+      csRef<iTriangleMeshIterator> it = objmdl->GetTriangleDataIterator ();
+      while (it->HasNext ())
+      {
+	csStringID id;
+	iTriangleMesh* trimesh = it->Next (id);
+	if (!SaveTriMesh (meshNode, id, trimesh)) return false;
+      }
+      iTriangleMesh* trimesh = objmdl->GetTriangleData (base_id);
+      if (trimesh)
+      {
+        synldr->WriteBool (meshNode, "closed",
+          trimesh->GetFlags ().Check (CS_TRIMESH_CLOSED),
+          false);
+        synldr->WriteBool (meshNode, "convex",
+          trimesh->GetFlags ().Check (CS_TRIMESH_CONVEX),
+          false);
+      }
+    }
+
 
     csZBufMode zmode = meshwrapper->GetZBufMode ();
     synldr->WriteZMode (meshNode, zmode, false);
@@ -963,7 +1062,7 @@ bool csSaver::SaveSectorMeshes(const csRefArray<iSceneNode>& meshList,
     //Save all childmeshes
     const csRefArray<iSceneNode>& childlist = meshwrapper->QuerySceneNode ()->
 	    GetChildren ();
-    if (childlist.Length () > 0) SaveSectorMeshes(childlist, meshNode);
+    if (childlist.GetSize () > 0) SaveSectorMeshes(childlist, meshNode);
   }
   return true;
 }
@@ -1112,7 +1211,7 @@ bool csSaver::SaveSectorLights(iSector *s, iDocumentNode *parent)
       {
         case cshtCross:
         {
-          csRef<iCrossHalo> cross = SCF_QUERY_INTERFACE(halo, iCrossHalo);
+          csRef<iCrossHalo> cross = scfQueryInterface<iCrossHalo> (halo);
           csRef<iDocumentNode> typeNode = CreateNode(haloNode, "type");
           typeNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue("cross");
 
@@ -1130,7 +1229,7 @@ bool csSaver::SaveSectorLights(iSector *s, iDocumentNode *parent)
         }
         case cshtNova:
         {
-          csRef<iNovaHalo> nova = SCF_QUERY_INTERFACE(halo, iNovaHalo);
+          csRef<iNovaHalo> nova = scfQueryInterface<iNovaHalo> (halo);
           csRef<iDocumentNode> typeNode = CreateNode(haloNode, "type");
           typeNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue("nova");
 
@@ -1152,7 +1251,7 @@ bool csSaver::SaveSectorLights(iSector *s, iDocumentNode *parent)
         }
         case cshtFlare:
         {
-          csRef<iFlareHalo> flare = SCF_QUERY_INTERFACE(halo, iFlareHalo);
+          csRef<iFlareHalo> flare = scfQueryInterface<iFlareHalo> (halo);
           csRef<iDocumentNode> typeNode = CreateNode(haloNode, "type");
           typeNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue("flare");
 
@@ -1216,8 +1315,8 @@ bool csSaver::SaveSettings (iDocumentNode* node)
   csRef<iMeshObjectType> type = csLoadPluginCheck<iMeshObjectType> (
   	object_reg, "crystalspace.mesh.object.thing");
   if (!type) return false;
-  csRef<iThingEnvironment> te = SCF_QUERY_INTERFACE (type,
-    iThingEnvironment);
+  csRef<iThingEnvironment> te = 
+    scfQueryInterface<iThingEnvironment> (type);
   int cellsize = te->GetLightmapCellSize ();
   csRef<iDocumentNode> lghtmapcellNode = CreateNode(settingsNode, "lightmapcellsize");
   lghtmapcellNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValueAsInt(cellsize);
@@ -1246,7 +1345,7 @@ bool csSaver::SaveSequence(iDocumentNode* /*parent*/)
 {
 #if 0
   csRef<iEngineSequenceManager> eseqmgr =
-    CS_QUERY_REGISTRY (object_reg, iEngineSequenceManager);
+    csQueryRegistry<iEngineSequenceManager> (object_reg);
   if (!eseqmgr) return false;
 
   csRef<iDocumentNode> sequencesNode = CreateNode(parent, "sequences");
@@ -1272,7 +1371,7 @@ bool csSaver::SaveSequence(iDocumentNode* /*parent*/)
         paramNode->SetAttribute("name", paramname);
         iBase* param = params->GetParameter(j);
         if (!param) continue;
-        csRef<iLight> light = SCF_QUERY_INTERFACE(param, iLight);
+        csRef<iLight> light = scfQueryInterface<iLight> (param);
 
         if (light)
         {
@@ -1290,7 +1389,7 @@ bool csSaver::SaveTriggers(iDocumentNode* /*parent*/)
 {
 #if 0
   csRef<iEngineSequenceManager> eseqmgr =
-    CS_QUERY_REGISTRY (object_reg, iEngineSequenceManager);
+    csQueryRegistry<iEngineSequenceManager> (object_reg);
   if (!eseqmgr) return false;
 
   csRef<iDocumentNode> triggersNode = CreateNode(parent, "triggers");
@@ -1320,7 +1419,7 @@ bool csSaver::SaveTriggers(iDocumentNode* /*parent*/)
         const char* paramname = params->GetParameterName(j);
         paramNode->SetAttribute("name", paramname);
         iBase* param = params->GetParameter(j);
-        csRef<iLight> light = SCF_QUERY_INTERFACE(param, iLight);
+        csRef<iLight> light = scfQueryInterface<iLight> (param);
 
         if (light)
         {
@@ -1344,7 +1443,7 @@ bool csSaver::SaveKeys (iDocumentNode* node, iObject* object)
     if (curRegion && !curRegion->IsInRegion (obj))
       continue;
     
-    csRef<iKeyValuePair> key = SCF_QUERY_INTERFACE (obj, iKeyValuePair);
+    csRef<iKeyValuePair> key = scfQueryInterface<iKeyValuePair> (obj);
     if (key.IsValid ())
     {
       synldr->WriteKey (CreateNode (node, "key"), key);
@@ -1456,7 +1555,7 @@ csRef<iString> csSaver::SaveMapFile()
 
 bool csSaver::SaveMapFile(const char* filename)
 {
-  csRef<iVFS> vfs(CS_QUERY_REGISTRY(object_reg, iVFS));
+  csRef<iVFS> vfs(csQueryRegistry<iVFS> (object_reg));
   CS_ASSERT(vfs.IsValid());
 
   csRef<iString> str(SaveMapFile());
@@ -1468,7 +1567,7 @@ bool csSaver::SaveMapFile(const char* filename)
 
 bool csSaver::SaveMapFile(csRef<iDocumentNode> &root)
 {
-  plugins.DeleteAll (); // Clear plugin list
+  InitializePluginsHash ();
   csRef<iDocumentNode> parent = root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   parent->SetValue("world");
 
@@ -1537,7 +1636,7 @@ bool csSaver::SaveRegion(iRegion* region, int type, csRef<iDocumentNode>& root)
   if (!region)
     return false;
   
-  plugins.DeleteAll (); // Clear plugin list
+  InitializePluginsHash ();
   
   curRegion = region;
   fileType = type;
@@ -1595,7 +1694,7 @@ bool csSaver::SaveRegion(iRegion* region, int type, csRef<iDocumentNode>& root)
 
 bool csSaver::SaveRegionFile(iRegion* region, const char* file, int filetype)
 {
-  csRef<iVFS> vfs(CS_QUERY_REGISTRY(object_reg, iVFS));
+  csRef<iVFS> vfs(csQueryRegistry<iVFS> (object_reg));
   CS_ASSERT(vfs.IsValid());
   
   csRef<iString> str(SaveRegion(region, filetype));

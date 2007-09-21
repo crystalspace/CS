@@ -84,6 +84,11 @@ bool csSoftShader_FP::Load (iShaderDestinationResolver*,
 	    colorSum = b;
 	  }
 	  break;
+        case XMLTOKEN_CONSTCOLOR:
+	  if (!ParseProgramParam (child, constColor, ParamVector))
+	    return false;
+          doConstColor = true;
+	  break;
         default:
 	  {
 	    switch (commonTokens.Request (value))
@@ -125,6 +130,12 @@ void csSoftShader_FP::SetupState (const csRenderMesh* /*mesh*/,
     FactorToShift (GetParamFloatVal (stacks, cfactor, 1.0f)),
     FactorToShift (GetParamFloatVal (stacks, afactor, 1.0f)));
   shaderPlug->scanlineRenderer->SetColorSum (colorSum);
+  shaderPlug->scanlineRenderer->SetDoConstColor (doConstColor);
+  if (doConstColor)
+  {
+    v = GetParamVectorVal (stacks, constColor, csVector4 (1));
+    shaderPlug->scanlineRenderer->SetConstColor (v);
+  }
 }
 
 bool csSoftShader_FP::Compile()

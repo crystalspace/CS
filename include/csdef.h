@@ -33,6 +33,9 @@
 #else
 #include <math.h>
 #endif
+#if defined(CS_HAVE_IEEEFP_H)
+#include <ieeefp.h>
+#endif
 #include <time.h>
 #include <signal.h>
 #include <errno.h>

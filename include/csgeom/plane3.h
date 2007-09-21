@@ -81,6 +81,14 @@ public:
     norm = v2 % v3; DD = 0;
   }
 
+  /**
+   * Compare two planes
+   */
+  bool operator==(const csPlane3& other) const
+  {
+    return (norm * other.norm) > 0.999f && fabsf(DD - other.DD) < 0.001f;
+  }
+
   /// Return the normal vector of this plane.
   inline csVector3& Normal () { return norm; }
   /// Return the normal vector of this plane.
@@ -174,7 +182,7 @@ public:
   { return ABS (Classify (pt)); }
 
   /**
-   * Reverses the direction of the plane while maintianing the plane itself.
+   * Reverses the direction of the plane while maintaining the plane itself.
    * This will basically reverse the result of Classify().
    */
   inline void Invert () { norm = -norm;  DD = -DD; }
@@ -192,6 +200,14 @@ public:
    * Find a point on this plane.
    */
   csVector3 FindPoint () const;
+
+  /**
+   * Calculate two orthogonal points on the plane given by
+   * the normal 'norm' and going through the origin. This gives an
+   * axis on that plane.
+   */
+  static void FindOrthogonalPoints (const csVector3& norm,
+      csVector3& p, csVector3& q);
 
   /**
    * Clip the polygon in pverts (having num_verts vertices) to this plane.

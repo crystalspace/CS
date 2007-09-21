@@ -101,7 +101,7 @@ which is available from NVidia
 @sc{dds} plugins which are also available on the web 
 (@uref{http://nifelheim.dyndns.org/~cocidius/dds/}). Last but not least, CS'
 @sc{dds} plugin is also able to save @sc{dds} files, in conjunction with the
-@file{gfxtest} app you can have a simple @sc{dds} converter.
+@file{csimagetool} app you can have a simple @sc{dds} converter.
 
 @subsubheading Texture quality control
 As mentioned above, textures in CS are compressed before being uploaded to the 

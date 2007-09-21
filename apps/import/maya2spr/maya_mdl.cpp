@@ -221,14 +221,14 @@ bool Maya4Model::WriteSPR(const char* spritename, csArray<Animation*>& anims)
     }
 
     // Now write out animation actions
-    if (!anims.Length())
+    if (!anims.GetSize())
     {
       setError("At least one action animation is required.");    
       return false;
     }
 
     size_t i;
-    for (i=0;i<anims.Length();i++)
+    for (i=0;i<anims.GetSize ();i++)
     {
       Animation* anim = anims[i];
       
@@ -239,7 +239,7 @@ bool Maya4Model::WriteSPR(const char* spritename, csArray<Animation*>& anims)
 
         csPrintf("Writing out Animation %s\n",(const char *)name);
 
-        if (i != anims.Length()-1)
+        if (i != anims.GetSize ()-1)
             stop = anim->startframe-1;
         else
             stop = (animnode)?animnode->GetFrames():start;
@@ -258,7 +258,7 @@ bool Maya4Model::WriteSPR(const char* spritename, csArray<Animation*>& anims)
 	disg.stopframe =0;
 	disg.vertex=0;
 
-	DisplacementGroup &dg = (curr_anim->displacements.Length())? curr_anim->displacements[0] : disg;
+	DisplacementGroup &dg = (curr_anim->displacements.GetSize ())? curr_anim->displacements[0] : disg;
 	int displacementnum = 1;
 
         csFPrintf(f,"     <action name=\"%s\">\n",(const char *)name);
@@ -291,7 +291,7 @@ bool Maya4Model::WriteSPR(const char* spritename, csArray<Animation*>& anims)
     meshnode->WriteTriangles(f);
     
     // Now write out sockets
-    for (i=0;i<sockets.Length();i++)
+    for (i=0;i<sockets.GetSize ();i++)
     {
       Animation* socket = sockets[i];
       

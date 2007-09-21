@@ -9,6 +9,7 @@
 * Simple Map Example::
 * Blender:: Making Levels and Models in Blender
 * 3DSMax:: Making Levels and Models in 3DSMax
+* Using lighter2:: Using @code{lighter2}
 * md32spr Tutorial:: @code{md32spr} Tutorial
 * mdl2spr:: Quake Model Converter (@code{mdl2spr})
 * 3D Sprites::
@@ -20,6 +21,7 @@
 @imports{content,simpmap.txi}
 @imports{content,blender.txi}
 @imports{content,3dsmax.txi}
+@importss{content,lighter2,lighter2.txi}
 @imports{content,md32spr.txi}
 @imports{content,mdl2spr.txi}
 @importss{content,sprites,3dsprite.txi}

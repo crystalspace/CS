@@ -34,11 +34,15 @@ struct iMaterialWrapper;
 struct iMeshFactoryWrapper;
 struct iObject;
 struct iTextureWrapper;
+struct iThingFactoryState;
+struct iMeshWrapper;
 
 namespace CS
 {
-  namespace ImportKitImpl 
-  { 
+namespace Utility
+{ 
+  namespace Implementation
+  {
     struct GluedModel
     {
       csDirtyAccessArray<csVector3> allVertices;
@@ -52,7 +56,7 @@ namespace CS
     {
       iObjectRegistry* objectReg;
       csRef<iVFS> vfs;
-      csBlockAllocator<ImportKitImpl::GluedModel> glueModelPool;
+      csBlockAllocator<GluedModel> glueModelPool;
       csHash<size_t, csPtrKey<iMaterialWrapper> > material2texture;
       csHash<size_t, csPtrKey<iTextureWrapper> > texture2id;
       size_t texId;
@@ -74,7 +78,7 @@ namespace CS
 	}
 	~VfsRootMounter ()
 	{
-	  for (size_t i = 0; i < mounted->Length(); i++)
+	  for (size_t i = 0; i < mounted->GetSize (); i++)
 	    vfs->Unmount (mounted->Get (i), 0);
 	}
 	const csString& GetRootPath() { return rootPath; }
@@ -101,6 +105,14 @@ namespace CS
       /// Check whether an engine object is a Thing factory and handle if so
       bool ProbeThingFactory (ImportKit::Container& container, 
 	iMeshFactoryWrapper* fact, const char* name);
+      /// Convert thing factory geometry into importkit Mesh geometry
+      bool HandleThingFactory (ImportKit::Container::Model& newModel,
+        iThingFactoryState* thingFact);
+      /// Check whether an engine object is a mesh object and handle if so
+      bool ProbeMeshObject (ImportKit::Container& container, iObject* obj);
+      /// Check whether an engine object is a Thing object and handle if so
+      bool ProbeThingObject (ImportKit::Container& container, 
+	iMeshWrapper* wrap, const char* name);
     public:
       Glue (iObjectRegistry* objectReg);
       ~Glue();
@@ -109,7 +121,8 @@ namespace CS
 	const char* path, ImportKit::Container& container);
     };
 
-  } // namespace ImportKitImpl 
+  } // namespace Implementation
+} // namespace Utility
 } // namespace CS
 
 #endif // __CS_LIBS_CSTOOL_IMPORTKIT_GLUE_H__

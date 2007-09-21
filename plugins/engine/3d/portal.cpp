@@ -76,12 +76,12 @@ int* csPortal::GetVertexIndices () const
 
 int csPortal::GetVertexIndicesCount () const
 {
-  return (int)vertex_indices.Length ();
+  return (int)vertex_indices.GetSize ();
 }
 
 size_t csPortal::GetVerticesCount () const
 { 
-  return parent->GetVertices ()->Length(); 
+  return parent->GetVertices ()->GetSize (); 
 }
 
 bool csPortal::CompleteSector (iBase *context)
@@ -92,7 +92,7 @@ bool csPortal::CompleteSector (iBase *context)
     int i;
     // Callback are traversed in reverse order so that they can safely
     // delete themselves.
-    i = (int)portal_cb_vector.Length ()-1;
+    i = (int)portal_cb_vector.GetSize ()-1;
     while (i >= 0)
     {
       iPortalCallback* cb = portal_cb_vector[i];
@@ -107,7 +107,7 @@ bool csPortal::CompleteSector (iBase *context)
     bool rc = false;
     // Callback are traversed in reverse order so that they can safely
     // delete themselves.
-    int i = (int)sector_cb_vector.Length ()-1;
+    int i = (int)sector_cb_vector.GetSize ()-1;
     while (i >= 0)
     {
       iPortalCallback* cb = sector_cb_vector[i];
@@ -224,8 +224,8 @@ bool csPortal::PointOnPolygon (const csVector3& v)
   // Check if 'v' is on the same side of all edges.
   size_t i, i1;
   bool neg = false, pos = false;
-  i1 = vertex_indices.Length () - 1;
-  for (i = 0; i < vertex_indices.Length (); i++)
+  i1 = vertex_indices.GetSize () - 1;
+  for (i = 0; i < vertex_indices.GetSize (); i++)
   {
     float ar = csMath3::Direction3 (v, (*vt)[vertex_indices[i1]],
     	(*vt)[vertex_indices[i]]);
@@ -264,9 +264,9 @@ void csPortal::CastShadows (iMovable* movable, iFrustumView* fview)
   fview->CreateFrustumContext ();
   csFrustumContext *new_ctxt = fview->GetFrustumContext ();
 
-  size_t num_vertices = vertex_indices.Length ();
-  if (num_vertices > VectorArray->Length ())
-    VectorArray->SetLength (num_vertices);
+  size_t num_vertices = vertex_indices.GetSize ();
+  if (num_vertices > VectorArray->GetSize ())
+    VectorArray->SetSize (num_vertices);
 
   csVector3 *poly = VectorArray->GetArray ();
 
@@ -315,8 +315,8 @@ bool csPortal::IntersectRay (const csVector3 &start,
 
   csDirtyAccessArray<csVector3>* vt = parent->GetVertices ();
   size_t i, i1;
-  i1 = vertex_indices.Length () - 1;
-  for (i = 0; i < vertex_indices.Length (); i++)
+  i1 = vertex_indices.GetSize () - 1;
+  for (i = 0; i < vertex_indices.GetSize (); i++)
   {
     csMath3::CalcNormal (normal, start, (*vt)[vertex_indices[i1]],
     	(*vt)[vertex_indices[i]]);
@@ -512,17 +512,22 @@ iMeshWrapper* csPortal::HitBeamPortals (
     csVector3 new_end = warp_wor.Other2This (end);
     csSectorHitBeamResult hbresult = sector->HitBeamPortals (new_start, new_end);
     if (final_sector) *final_sector = hbresult.final_sector;
-    
-    if (hbresult.mesh && hbresult.polygon_idx != -1)
+    if (hbresult.mesh)
+    {
+      if (polygon_idx) *polygon_idx = hbresult.polygon_idx;
       isect = warp_wor.This2Other (hbresult.isect);
-    if (hbresult.mesh && polygon_idx) *polygon_idx = hbresult.polygon_idx;
+    }
     return hbresult.mesh;
   }
   else
   {    
     csSectorHitBeamResult hbresult = sector->HitBeamPortals (start, end);
     if (final_sector) *final_sector = hbresult.final_sector;
-    if (hbresult.mesh && polygon_idx) *polygon_idx = hbresult.polygon_idx;
+    if (hbresult.mesh)
+    {
+      if (polygon_idx) *polygon_idx = hbresult.polygon_idx;
+      isect = hbresult.isect;
+    }
     return hbresult.mesh;
   }
 }
@@ -585,7 +590,7 @@ void csPortal::CheckFrustum (iFrustumView *lview,
     copied_frustums = true;
 
     iFrustumViewUserdata *ud = lview->GetUserdata ();
-    if (ud) linfo = SCF_QUERY_INTERFACE (ud, iLightingProcessInfo);
+    if (ud) linfo = scfQueryInterface<iLightingProcessInfo> (ud);
     if (linfo)
     {
       if (alpha)

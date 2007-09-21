@@ -134,6 +134,22 @@ rule InstallProgram
     return [ DoInstall $(files) : $(dir) : $(INSTALL_PROGRAM) ] ;
 }
 
+##  InstallSymLink target : linksource
+rule InstallSymLink
+{
+    local dir gdir target ;
+    dir = [ ConcatDirs $(DESTDIR) $(<:D) ] ;
+
+    gdir = $(dir:G=dir) ;
+    MkDir $(gdir) ;
+  
+    target = $(<:BSD=$(dir):G=install) ;
+    Depends $(target) : $(gdir) ;
+    SymLink $(target) : $(>) ;
+    Always $(target) ;
+    return $(target) ;
+}
+
 ##  DoInstall sourcenames : directories [ : installapp : [ postinstallrules ]]
 ##    Creates a new install target for the given sources named by
 ##    `sourcenames'.  `directories' is a list of directory components
@@ -152,40 +168,62 @@ rule InstallProgram
 ##    already defines an action named Install :-/)
 rule DoInstall
 {
-    local targets target i dir gdir ;
+    local targets i ;
+
+    for i in $(1)
+    {
+        targets += [ DoInstallFile $(i) : $(2) : $(i) : $(3) : $(4) ] ;
+    }
+
+    return $(targets) ;
+}
+
+##  DoInstallFile sourcename : directory : destname [ : installapp : [ postinstallrules ]]
+##    Creates a new install target for the given source file named by
+##    `sourcename'.  `directories' is a list of directory components
+##    indicating the installation directory for `sourcename'.  `destname' is
+##    the destintation filename of the installed file. `installapp' is
+##    the actual program to run to install the sources.  If not specified, then
+##    $(INSTALL_DATA) is used.  If the optional `postinstallrules' is provided,
+##    it is a list of Jam rules to invoke on the installed target after it is
+##    installed.  Each rule is invoked with the installed target as the first
+##    argument, and the source target as the second. An obvious instance where
+##    `postinstallrules' proves useful is when the Ranlib rule should be
+##    invoked on just-installed static library (.a) files.  The DoInstall rule
+##    returns the name of the installed target, so it is convenient to use
+##    the results as the input for another rule
+rule DoInstallFile
+{
+    local target dir gdir ;
     dir = [ ConcatDirs $(DESTDIR) $(2) ] ;
 
     gdir = $(dir:G=dir) ;
     MkDir $(gdir) ;
   
-    for i in $(1)
+    target = $(3:BSR=$(dir):G=install) ;
+    Depends $(target) : $(gdir) $(1) ;
+    Install1 $(target) : $(1) ;
+
+    if "$(4)"
     {
-        target = $(i:BSR=$(dir):G=install) ;
-        targets += $(target) ;
-        Depends $(target) : $(gdir) $(i) ;
-        Install1 $(target) : $(i) ;
+	INSTALL_APP on $(target) = $(4) ;
+    }
+    else
+    {
+	INSTALL_APP on $(target) = $(INSTALL_DATA) ;
+    }
 
-        if "$(3)"
+    if "$(5)"
+    {
+	local postrule ;
+	for postrule in $(4)
 	{
-            INSTALL_APP on $(target) = $(3) ;
-        }
-	else
-	{
-            INSTALL_APP on $(target) = $(INSTALL_DATA) ;
-        }
-
-	if "$(4)"
-	{
-	    local postrule ;
-	    for postrule in $(4)
-	    {
-		$(postrule) $(target) : $(i) ;
-	    }
+	    $(postrule) $(target) : $(i) ;
 	}
     }
 
-    Always $(targets) ;
-    return $(targets) ;
+    Always $(target) ;
+    return $(target) ;
 }
 
 #----------------------------------------------------------------------------
@@ -204,7 +242,7 @@ Help install : "Install $(PACKAGE_INSTALL_NAME)" ;
 
 actions Install1
 {
-  $(INSTALL_APP) $(INSTALLFLAGS) $(>) $(<)
+  $(INSTALL_APP) $(INSTALLFLAGS) "$(>)" "$(<)"
 }
 
 actions CopyDirs

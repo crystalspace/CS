@@ -108,13 +108,15 @@ csSoftwareGraphics3DCommon::csSoftwareGraphics3DCommon (iBase* parent) :
   memset (processedColorsFlag, 0, sizeof (processedColorsFlag));
   memset (triDraw, 0, sizeof (triDraw));
   specifica = 0;
+
+  current_drawflags = 0;
 }
 
 csSoftwareGraphics3DCommon::~csSoftwareGraphics3DCommon ()
 {
   if (scfiEventHandler)
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
     if (q != 0)
       q->RemoveListener (scfiEventHandler);
     scfiEventHandler->DecRef ();
@@ -490,7 +492,7 @@ bool csSoftwareGraphics3DCommon::BeginDraw (int DrawFlags)
 {
   clipportal_dirty = true;
   clipportal_floating = 0;
-  CS_ASSERT (clipportal_stack.Length () == 0);
+  CS_ASSERT (clipportal_stack.GetSize () == 0);
 
   if ((G2D->GetWidth() != display_width) ||
       (G2D->GetHeight() != display_height))
@@ -502,6 +504,7 @@ bool csSoftwareGraphics3DCommon::BeginDraw (int DrawFlags)
     if (!G2D->BeginDraw())
       return false;
   }
+  current_drawflags = DrawFlags;
   bool wasSmallerActive = smallerActive;
   smallerActive = do_smaller_rendering 
     && ((DrawFlags & CSDRAW_MASK2D3D) == CSDRAW_3DGRAPHICS)
@@ -634,6 +637,7 @@ void csSoftwareGraphics3DCommon::FinishDraw ()
   if (DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
     G2D->FinishDraw ();
   DrawMode = 0;
+  current_drawflags = 0;
 }
 
 #define SMALL_D 0.01
@@ -673,10 +677,11 @@ void csSoftwareGraphics3DCommon::OpenPortal (size_t numVertices,
 
 void csSoftwareGraphics3DCommon::ClosePortal ()
 {
-  if (clipportal_stack.Length () <= 0) return;
+  if (clipportal_stack.GetSize () <= 0) return;
   csClipPortal* cp = clipportal_stack.Pop ();
 
-  if (cp->flags.Check(CS_OPENPORTAL_ZFILL))
+  if (cp->flags.Check(CS_OPENPORTAL_ZFILL)
+    && (DrawMode != 0)) // polyrast_ZFill is only valid after a BefinDraw()
   {
     CS_ALLOC_STACK_ARRAY(csVector3, vertices, cp->num_poly);
     for (int v = 0; v < cp->num_poly; v++)
@@ -1001,6 +1006,8 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     const csRenderMeshModes& modes,
     const iShaderVarStack* stacks)
 {
+  if (DrawMode == 0) return;
+
   ScanlineRendererHelper aNameThatDoesNotReallyMatter (this);
   if (!scanlineRenderer) return;
 
@@ -1138,6 +1145,12 @@ void csSoftwareGraphics3DCommon::DrawPixmap (iTextureHandle *hTex,
 {
   specifica->DrawPixmap (this, hTex, sx, sy, sw, sh, tx, ty, tw, th, Alpha);
 }
+
+int csSoftwareGraphics3DCommon::GetCurrentDrawFlags () const
+{
+  return current_drawflags;
+}
+
 
 }
 CS_PLUGIN_NAMESPACE_END(Soft3D)

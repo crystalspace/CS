@@ -72,7 +72,7 @@ void Report (iObjectRegistry *object_reg, int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep = csQueryRegistry<iReporter> (object_reg);
   if (rep)
     rep->ReportV (severity, "crystalspace.graphic.image.io.jng", 
       msg, arg);
@@ -773,7 +773,7 @@ ImageJngFile::ImageJngFile (int iFormat, iObjectRegistry* p) :
   scfImplementationType (this, iFormat)
 { 
   object_reg = p; 
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
 
   NewImage = 0;
   dirtyrect = 0;
@@ -912,7 +912,7 @@ bool ImageJngFile::Animate (csTicks time, csRect* dirtyrect)
   {
     if (csPackRGBA::IsRGBpixelSane())
     {
-      memcpy (Image, NewImage, Width * Height * sizeof (csRGBpixel));
+      memcpy (databuf->GetData(), NewImage, Width * Height * sizeof (csRGBpixel));
     }
     else
     {

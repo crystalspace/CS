@@ -1,8 +1,0 @@
-SubDir TOP apps tutorial awstut ;
-
-if $(STL.AVAILABLE) = yes
-{
-  Description awstut : "Alternate Windowing System Tutorial" ;
-  Application awstut : [ Wildcard *.cpp *.h ] : noinstall ;
-  LinkWith awstut : crystalspace ;
-}

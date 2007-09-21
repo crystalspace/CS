@@ -182,31 +182,31 @@ bool Simple::HandleEvent (iEvent& ev)
       }
       else if (csKeyEventHelper::GetCookedCode (&ev) == '1')
       { // Toggle stepfast.
-	csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (
-	  dynSys, iODEDynamicSystemState);
+        csRef<iODEDynamicSystemState> osys = 
+          scfQueryInterface<iODEDynamicSystemState> (dynSys);
 	osys->EnableStepFast (0);
 	solver=0;
 	return true;
       }
       else if (csKeyEventHelper::GetCookedCode (&ev) == '2')
       { // Toggle stepfast.
-	csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (
-	  dynSys, iODEDynamicSystemState);
+        csRef<iODEDynamicSystemState> osys = 
+          scfQueryInterface<iODEDynamicSystemState> (dynSys);
 	osys->EnableStepFast (1);
 	solver=1;
 	return true;
       }
       else if (csKeyEventHelper::GetCookedCode (&ev) == '3')
       { // Toggle quickstep.
-	csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (
-	  dynSys, iODEDynamicSystemState);
+        csRef<iODEDynamicSystemState> osys = 
+          scfQueryInterface<iODEDynamicSystemState> (dynSys);
 	osys->EnableQuickStep (1);
 	solver=2;
 	return true;
       }
       else if (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC)
       {
-	csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+	csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
 	if (q) q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
 	return true;
       }
@@ -267,22 +267,22 @@ bool Simple::Initialize ()
   }
 
   // Checking for choosen engine
-  csRef<iCommandLineParser> clp = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
+  csRef<iCommandLineParser> clp = csQueryRegistry<iCommandLineParser> (object_reg);
   phys_engine_name = clp->GetOption ("phys_engine");
   if (phys_engine_name == "bullet")
   {
     phys_engine_id = BULLET_ID;
-    csRef<iPluginManager> plugmgr = CS_QUERY_REGISTRY (object_reg,
-      iPluginManager);
-    dyn = CS_LOAD_PLUGIN (plugmgr, "crystalspace.dynamics.bullet", iDynamics);
+    csRef<iPluginManager> plugmgr = 
+      csQueryRegistry<iPluginManager> (object_reg);
+    dyn = csLoadPlugin<iDynamics> (plugmgr, "crystalspace.dynamics.bullet");
   }
   else 
   {
     phys_engine_name = "ode";
     phys_engine_id = ODE_ID;
-    csRef<iPluginManager> plugmgr = CS_QUERY_REGISTRY (object_reg,
-      iPluginManager);
-    dyn = CS_LOAD_PLUGIN (plugmgr, "crystalspace.dynamics.ode", iDynamics);
+    csRef<iPluginManager> plugmgr = 
+      csQueryRegistry<iPluginManager> (object_reg);
+    dyn = csLoadPlugin<iDynamics> (plugmgr, "crystalspace.dynamics.ode");
   }
   if (!dyn)
   {
@@ -293,7 +293,7 @@ bool Simple::Initialize ()
   }
 
   // The virtual clock.
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
   if (vc == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -303,7 +303,7 @@ bool Simple::Initialize ()
   }
 
   // Find the pointer to engine plugin
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = csQueryRegistry<iEngine> (object_reg);
   if (engine == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -312,7 +312,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  loader = csQueryRegistry<iLoader> (object_reg);
   if (loader == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -321,7 +321,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
   if (g3d == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -330,7 +330,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  g2d = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
+  g2d = csQueryRegistry<iGraphics2D> (object_reg);
   if (g2d == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -339,7 +339,7 @@ bool Simple::Initialize ()
     return false;
   }
 
-  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  kbd = csQueryRegistry<iKeyboardDriver> (object_reg);
   if (kbd == 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -382,12 +382,23 @@ bool Simple::Initialize ()
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   room = engine->CreateSector ("room");
-  walls = engine->CreateSectorWallsMesh (room, "walls");
-  csRef<iThingFactoryState> walls_state = 
-    scfQueryInterface<iThingFactoryState> (walls->GetMeshObject ()->GetFactory());
-  walls_state->AddInsideBox (csVector3 (-5, -5, -5), csVector3 (5, 5, 5));
-  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
-  walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
+
+  // First we make a primitive for our geometry.
+  using namespace CS::Geometry;
+  DensityTextureMapper mapper (0.3f);
+  TesselatedBox box (csVector3 (-5, -5, -5), csVector3 (5, 5, 5));
+  box.SetLevel (3);
+  box.SetMapper (&mapper);
+  box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+
+  // Now we make a factory and a mesh at once.
+  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
+      engine, room, "walls", "walls_factory", &box);
+
+  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
+    iGeneralMeshState> (walls->GetMeshObject ());
+  mesh_state->SetShadowReceiving (true);
+  walls->GetMeshObject ()->SetMaterialWrapper (tm);
 
   csRef<iLight> light;
   iLightList* ll = room->GetLights ();
@@ -466,8 +477,8 @@ bool Simple::Initialize ()
 
   if (phys_engine_id == ODE_ID)
   {
-    csRef<iODEDynamicSystemState> osys= SCF_QUERY_INTERFACE (dynSys,
-      iODEDynamicSystemState);
+    csRef<iODEDynamicSystemState> osys= 
+      scfQueryInterface<iODEDynamicSystemState> (dynSys);
     osys->SetContactMaxCorrectingVel (.1f);
     osys->SetContactSurfaceLayer (.0001f);
   }
@@ -632,8 +643,8 @@ void Simple::CreateWalls (const csVector3& /*radius*/)
 {
   csOrthoTransform t;
 
-  csRef<iThingFactoryState> walls_state = 
-    scfQueryInterface<iThingFactoryState> (walls->GetMeshObject ()->GetFactory());
+  //csRef<iThingFactoryState> walls_state = 
+    //scfQueryInterface<iThingFactoryState> (walls->GetMeshObject ()->GetFactory());
 
 #if 0
   // Enabling this will work, however, mesh<->mesh collision
@@ -661,7 +672,7 @@ void Simple::CreateWalls (const csVector3& /*radius*/)
   t.SetOrigin(csVector3(10.0f,0.0f,0.0f));
 
   //FIXME: this should work same in both engines (needs finishing bullet plugin)
-  if (phys_engine_id == ODE_ID)
+  if (0/*phys_engine_id == ODE_ID*/)
   {
     csRef<iDynamicsSystemCollider> collider = dynSys->CreateCollider ();
     collider->CreateBoxGeometry (size);
@@ -691,19 +702,20 @@ void Simple::CreateWalls (const csVector3& /*radius*/)
     collider = dynSys->CreateCollider ();
     collider->CreateBoxGeometry (size);
     collider->SetTransform (t);
+  }else
+  {
+    dynSys->AttachColliderBox (size, t, 10, 0);
+    t.SetOrigin(csVector3(-10.0f,0.0f,0.0f));
+    dynSys->AttachColliderBox (size, t, 10, 0);
+    t.SetOrigin(csVector3(0.0f,10.0f,0.0f));
+    dynSys->AttachColliderBox (size, t, 10, 0);
+    t.SetOrigin(csVector3(0.0f,-10.0f,0.0f));
+    dynSys->AttachColliderBox (size, t, 10, 0);
+    t.SetOrigin(csVector3(0.0f,0.0f,10.0f));
+    dynSys->AttachColliderBox (size, t, 10, 0);
+    t.SetOrigin(csVector3(0.0f,0.0f,-10.0f));
+    dynSys->AttachColliderBox (size, t, 10, 0);
   }
-
-  dynSys->AttachColliderBox (size, t, 10, 0);
-  t.SetOrigin(csVector3(-10.0f,0.0f,0.0f));
-  dynSys->AttachColliderBox (size, t, 10, 0);
-  t.SetOrigin(csVector3(0.0f,10.0f,0.0f));
-  dynSys->AttachColliderBox (size, t, 10, 0);
-  t.SetOrigin(csVector3(0.0f,-10.0f,0.0f));
-  dynSys->AttachColliderBox (size, t, 10, 0);
-  t.SetOrigin(csVector3(0.0f,0.0f,10.0f));
-  dynSys->AttachColliderBox (size, t, 10, 0);
-  t.SetOrigin(csVector3(0.0f,0.0f,-10.0f));
-  dynSys->AttachColliderBox (size, t, 10, 0);
 
 #endif
 

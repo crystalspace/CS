@@ -21,7 +21,6 @@
 #include "plugins/engine/3d/region.h"
 #include "plugins/engine/3d/engine.h"
 #include "iengine/sector.h"
-#include "iengine/collectn.h"
 #include "iengine/campos.h"
 #include "iengine/texture.h"
 #include "iengine/material.h"
@@ -57,7 +56,7 @@ void csRegion::DeleteAll ()
     copy.Push (o);
   }
 
-  size_t total = copy.Length ();
+  size_t total = copy.GetSize ();
 
   // Now we iterate over all objects in the 'copy' vector and
   // delete them. This will release them as csObject children
@@ -71,7 +70,7 @@ void csRegion::DeleteAll ()
 
   // The first loop is the most general one where we just use
   // engine->RemoveObject().
-  for (i = 0; i < copy.Length (); i++)
+  for (i = 0; i < copy.GetSize (); i++)
   {
     iBase* b = (iBase*)copy[i];
 #ifdef REGION_CHECK
@@ -86,7 +85,7 @@ void csRegion::DeleteAll ()
   }
 
 #ifdef REGION_CHECK
-  for (i = 0 ; i < copy.Length () ; i++)
+  for (i = 0 ; i < copy.GetSize () ; i++)
     if (rc[i].weakb != 0)
       printf ("Not Deleted %p '%s' ref=%d\n",
 	  (iBase*)rc[i].weakb, (const char*)rc[i].n,
@@ -101,7 +100,7 @@ void csRegion::DeleteAll ()
   {
     // Sanity check. There should be no more
     // non-0 references in the copy array now.
-    for (i = 0; i < copy.Length (); i++)
+    for (i = 0; i < copy.GetSize (); i++)
       if (copy[i])
       {
         iObject *o = copy[i];
@@ -121,9 +120,8 @@ bool csRegion::PrepareTextures ()
   iter = GetIterator ();
   while (iter->HasNext ())
   {
-    csRef<iTextureWrapper> csth (SCF_QUERY_INTERFACE (
-        iter->Next (),
-        iTextureWrapper));
+    csRef<iTextureWrapper> csth (scfQueryInterface<iTextureWrapper> (
+        iter->Next ()));
     if (csth)
     {
       if (!csth->GetTextureHandle ()) csth->Register (txtmgr);
@@ -218,13 +216,6 @@ iCameraPosition *csRegion::FindCameraPosition (const char *iName)
   return cp;	// DecRef is ok here.
 }
 
-iCollection *csRegion::FindCollection (const char *iName)
-{
-  csRef<iCollection> col (CS_GET_NAMED_CHILD_OBJECT (
-      this, iCollection, iName));
-  return col;	// DecRef is ok here.
-}
-
 bool csRegion::IsInRegion (iObject *iobj)
 {
   return iobj->GetObjectParent () == this;
@@ -245,7 +236,7 @@ csRegionList::~csRegionList()
 
 int csRegionList::GetCount () const
 {
-  return (int)regionList.Length ();
+  return (int)regionList.GetSize ();
 }
 
 iRegion *csRegionList::Get (int n) const

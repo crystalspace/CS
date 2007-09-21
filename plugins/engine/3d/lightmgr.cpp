@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "plugins/engine/3d/lightmgr.h"
 #include "plugins/engine/3d/meshobj.h"
+#include "plugins/engine/3d/sector.h"
 
 // ---------------------------------------------------------------------------
 
@@ -38,6 +39,15 @@ const csArray<iLightSectorInfluence*>& csLightManager::GetRelevantLights (
   if (!mw) return nolights;
   csMeshWrapper* cmw = (csMeshWrapper*)mw;
   return cmw->GetRelevantLights (maxLights, desireSorting);
+}
+
+const csArray<iLightSectorInfluence*>& csLightManager::GetRelevantLights (
+	iSector* sector,
+	int maxLights, bool desireSorting)
+{
+  if (!sector) return nolights;
+  csSector* csector = (csSector*)sector;
+  return csector->GetRelevantLights (maxLights, desireSorting);
 }
 
 // ---------------------------------------------------------------------------

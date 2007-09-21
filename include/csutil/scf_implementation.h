@@ -27,10 +27,14 @@
 #include "csextern.h"
 
 #include "csutil/array.h"
+#include "csutil/customallocated.h"
 #include "csutil/reftrackeraccess.h"
 
 // Needs to have iBase etc
 #include "csutil/scf_interface.h"
+
+// Control if we want to use preprocessed file or run generation each time
+#define SCF_IMPLGEN_PREPROCESSED
 
 #ifndef CS_TYPENAME
   #ifdef CS_REF_TRACKER
@@ -123,7 +127,8 @@ public:
  * weak references.
  */
 template<class Class>
-class CS_CRYSTALSPACE_EXPORT scfImplementation : public virtual iBase
+class scfImplementation : public virtual iBase,
+  public CS::Memory::CustomAllocated
 {
 public:
   /**
@@ -132,7 +137,7 @@ public:
    */
   scfImplementation (Class *object, iBase *parent = 0) :
       scfObject (object), scfRefCount (1), scfParent (parent), 
-        scfWeakRefOwners (0)
+        scfWeakRefOwners (0), metadataList (0)
   {
     csRefTrackerAccess::TrackConstruction (object);
     if (scfParent) scfParent->IncRef ();
@@ -159,6 +164,7 @@ public:
   {
     csRefTrackerAccess::TrackDestruction (scfObject, scfRefCount);
     scfRemoveRefOwners ();
+    CleanupMetadata ();
   }
 
   /**
@@ -217,6 +223,18 @@ public:
       scfWeakRefOwners->DeleteIndex (index);
   }
 
+  virtual scfInterfaceMetadataList* GetInterfaceMetadata ()
+  {
+    if (!metadataList)
+    {
+      // Need to set it up, do so
+      AllocMetadata (GetInterfaceMetadataCount ());
+      FillInterfaceMetadata (0);
+    }
+
+    return metadataList;
+  }
+
 protected:
   Class *scfObject;
 
@@ -228,12 +246,14 @@ protected:
     csArrayCapacityLinear<csArrayThresholdFixed<4> > > WeakRefOwnerArray;
   WeakRefOwnerArray* scfWeakRefOwners;
 
+  scfInterfaceMetadataList* metadataList;
+
   void scfRemoveRefOwners ()
   {
     if (!scfWeakRefOwners)
       return;
 
-    for (size_t i = 0; i < scfWeakRefOwners->Length (); i++)
+    for (size_t i = 0; i < scfWeakRefOwners->GetSize (); i++)
     {
       void** p = (*scfWeakRefOwners)[i];
       *p = 0;
@@ -245,7 +265,7 @@ protected:
   void *QueryInterface (scfInterfaceID iInterfaceID,
                         scfInterfaceVersion iVersion)
   {
-    // Default, just check iBase.. all objects have iBase
+    // Default, just check iBase.. all objects have iBase    
     if (iInterfaceID == scfInterfaceTraits<iBase>::GetID () &&
       scfCompatibleVersion (iVersion, scfInterfaceTraits<iBase>::GetVersion ()))
     {
@@ -259,15 +279,70 @@ protected:
 
     return 0;
   }
+
+
+  //-- Metadata handling
+  void AllocMetadata (size_t numEntries)
+  {
+    CleanupMetadata ();
+
+    uint8* ptr = (uint8*)cs_malloc (sizeof (scfInterfaceMetadataList) + 
+                                    sizeof (scfInterfaceMetadata)*numEntries);
+
+    metadataList = (scfInterfaceMetadataList*)ptr;
+
+    metadataList->metadata = (scfInterfaceMetadata*)(ptr + sizeof (scfInterfaceMetadataList));
+    metadataList->metadataCount = numEntries;
+  }
+
+  void CleanupMetadata ()
+  {
+    if (metadataList)
+    {
+      cs_free (metadataList);
+      metadataList = 0;
+    }
+  }
+
+  // Some virtual helpers for the metadata registry
+  virtual size_t GetInterfaceMetadataCount () const
+  {
+    return 1;
+  }
+
+  // Fill in interface metadata in the metadata table, starting at offset N
+  virtual void FillInterfaceMetadata (size_t n)
+  {
+    if (!metadataList)
+      return;
+
+    FillInterfaceMetadataIf<iBase> (metadataList->metadata, n);
+  }
+
+  template<typename IF>
+  CS_FORCEINLINE_TEMPLATEMETHOD static void FillInterfaceMetadataIf (
+    scfInterfaceMetadata* metadataArray, size_t pos)
+  {
+    metadataArray[pos].interfaceName = scfInterfaceTraits<IF>::GetName ();
+    metadataArray[pos].interfaceID = scfInterfaceTraits<IF>::GetID ();
+    metadataArray[pos].interfaceVersion = scfInterfaceTraits<IF>::GetVersion ();
+  }
+
 };
 
 
 /* Here the magic happens: generate scfImplementationN and 
- * scfImplementationExtN classed */
+* scfImplementationExtN classed */
 #define SCF_IN_IMPLEMENTATION_H 1
-// Generation is in separate file mostly for documentation generation purposes.
-#include "scf_implgen.h"
+#if defined(DOXYGEN_RUN) || !defined(SCF_IMPLGEN_PREPROCESSED)
+  // Generation is in separate file mostly for documentation generation purposes.
+  #include "scf_implgen.h"
+#else
+  #include "scf_implgen_p.h"
+#endif
+
 #undef SCF_IN_IMPLEMENTATION_H
+#undef SCF_IMPLGEN_PREPROCESSED
 
 /** @} */
 

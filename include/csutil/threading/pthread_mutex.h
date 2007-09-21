@@ -16,8 +16,10 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_CSUTIL_UNIX_PTHREAD_MUTEX_H__
-#define __CS_CSUTIL_UNIX_PTHREAD_MUTEX_H__
+#ifndef __CS_CSUTIL_THREADING_PTHREAD_MUTEX_H__
+#define __CS_CSUTIL_THREADING_PTHREAD_MUTEX_H__
+
+#ifndef DOXYGEN_RUN
 
 #include <pthread.h>
 
@@ -27,6 +29,7 @@ namespace Threading
 {
 namespace Implementation
 {
+  class ConditionBase;
 
   /**
    * Basic implementation of non-recursive mutex for pthread
@@ -70,6 +73,8 @@ namespace Implementation
     }
 
   protected:
+    friend class ConditionBase;
+
     pthread_mutex_t mutex;
     bool isLocked;
   };
@@ -206,4 +211,6 @@ namespace Implementation
 } // namespace Threading
 } // namespace CS
 
-#endif
+#endif // DOXYGEN_RUN
+
+#endif // __CS_CSUTIL_THREADING_PTHREAD_MUTEX_H__

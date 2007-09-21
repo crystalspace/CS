@@ -356,9 +356,9 @@ bool csSprite3DMD2FactoryLoader::Load (iSprite3DFactoryState* state,
                    csLittleEndian::Convert (y)/(float)Header.SkinHeight));
   }
   // Now map the read texels to the real data.
-  Texels.SetLength (mapped_vertices.Length ());
+  Texels.SetSize (mapped_vertices.GetSize ());
   size_t fi;
-  for (fi = 0 ; fi < mapped_vertices.Length () ; fi++)
+  for (fi = 0 ; fi < mapped_vertices.GetSize () ; fi++)
     Texels[fi] = intexels[mapped_vertices[fi].texel];
 
   // Now we read in the frames.  The number of frames is stored in 'num_object'
@@ -431,29 +431,29 @@ bool csSprite3DMD2FactoryLoader::Load (iSprite3DFactoryState* state,
       inframe.Push (v);
     }
     // Now map the read vertices to the real data.
-    frame.vertices.SetLength (mapped_vertices.Length ());
-    for (fi = 0 ; fi < mapped_vertices.Length () ; fi++)
+    frame.vertices.SetSize (mapped_vertices.GetSize ());
+    for (fi = 0 ; fi < mapped_vertices.GetSize () ; fi++)
       frame.vertices[fi] = inframe[mapped_vertices[fi].vt];
   }
 
   // Now fill the sprite.
-  state->SetTriangles (triangles.GetArray (), int (triangles.Length ()));
-  for (j = 0 ; j < int (frames.Length ()) ; j++)
+  state->SetTriangles (triangles.GetArray (), int (triangles.GetSize ()));
+  for (j = 0 ; j < int (frames.GetSize ()) ; j++)
   {
     csFrame& f = frames[j];
     iSpriteFrame* fr = state->AddFrame ();
     fr->SetName (f.name);
-    if (j == 0) state->AddVertices (int (mapped_vertices.Length ()));
+    if (j == 0) state->AddVertices (int (mapped_vertices.GetSize ()));
     state->SetVertices (f.vertices.GetArray (), j);
     state->SetTexels (Texels.GetArray (), j);
   }
-  for (j = 0 ; j < int (actions.Length ()) ; j++)
+  for (j = 0 ; j < int (actions.GetSize ()) ; j++)
   {
     csAction& a = actions[j];
     iSpriteAction* action = state->AddAction ();
     action->SetName (a.name);
     size_t k;
-    for (k = 0 ; k < a.frames.Length () ; k++)
+    for (k = 0 ; k < a.frames.GetSize () ; k++)
     {
       csFrameTime& ft = a.frames[k];
       action->AddFrame (state->GetFrame (int (ft.frameidx)), 

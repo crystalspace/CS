@@ -23,9 +23,11 @@
 
 #include "csutil/archive.h"
 #include "csutil/csendian.h"
+#include "csutil/csstring.h"
 #include "csutil/set.h"
 #include "csutil/snprintf.h"
 #include "csutil/sysfunc.h"
+#include "csutil/syspath.h"
 #include "csutil/util.h"
 #include "iutil/vfs.h"	// For csFileTime
 
@@ -75,7 +77,7 @@ csArchive::csArchive (const char *filename)
 {
   comment = 0;
   comment_length = 0;
-  csArchive::filename = csStrNew (filename);
+  csArchive::filename = CS::StrDup (filename);
 
   file = fopen (filename, "rb");
   if (!file)       			/* Create new archive file */
@@ -86,12 +88,12 @@ csArchive::csArchive (const char *filename)
 
 csArchive::~csArchive ()
 {
-  delete [] filename;
-  delete [] comment;
+  cs_free (filename);
+  cs_free (comment);
   if (file) fclose (file);
 
   size_t i;
-  for (i = 0; i < lazy.Length (); i++)
+  for (i = 0; i < lazy.GetSize (); i++)
   {
     ArchiveEntry* e = lazy[i];
     delete e;
@@ -130,7 +132,7 @@ csArchive::ArchiveEntry *csArchive::CreateArchiveEntry (const char *name, size_t
 
 void csArchive::ReadDirectory ()
 {
-  if (dir.Length ())
+  if (dir.GetSize ())
     return;                     /* Directory already read */
 
   ReadZipDirectory (file);
@@ -142,12 +144,12 @@ void csArchive::ReadDirectory ()
   // First, make a list of all possible directory components.
   csString filename, slice;
   csSet<csString> dset;
-  for (size_t i = 0, n = dir.Length(); i < n; i++)
+  for (size_t i = 0, n = dir.GetSize (); i < n; i++)
   {
     ArchiveEntry const* e = dir.Get (i);
     filename = e->filename;
     size_t sep = 0;
-    while (sep < filename.Length())
+    while (sep < filename.Length ())
     {
       size_t slash = filename.FindFirst ('/', sep);
       if (slash == (size_t)-1)
@@ -237,7 +239,7 @@ void csArchive::ReadZipDirectory (FILE *infile)
 	    	sizeof (hdr_central)) ||
 		(memcmp (buff, hdr_central, sizeof (hdr_central)) != 0))
             {
-              if (dir.Length ())
+              if (dir.GetSize ())
                 return;         /* Finished reading central directory */
               else
                 goto rebuild_cdr;       /* Broken central directory */
@@ -327,7 +329,7 @@ bool csArchive::ReadArchiveComment (FILE *infile, size_t zipfile_comment_length)
 {
   if (comment && (comment_length != zipfile_comment_length))
   {
-    delete [] comment;
+    cs_free (comment);
     comment = 0;
   }
 
@@ -336,7 +338,7 @@ bool csArchive::ReadArchiveComment (FILE *infile, size_t zipfile_comment_length)
     return true;
 
   if (!comment)
-    comment = new char [zipfile_comment_length];
+    comment = (char*)cs_malloc (zipfile_comment_length);
   return (fread (comment, 1, zipfile_comment_length, infile) ==
   	zipfile_comment_length);
 }
@@ -347,7 +349,7 @@ void csArchive::Dir () const
   csPrintf (" size | size |offset| (CRC32)| name\n");
   csPrintf ("------+------+------+--------+------\n");
   size_t fn;
-  for (fn = 0; fn < dir.Length (); fn++)
+  for (fn = 0; fn < dir.GetSize (); fn++)
   {
     ArchiveEntry *e = dir.Get (fn);
     csPrintf ("%6" PRIu32 "|%6" PRIu32 "|%6" PRIu32 "|%08" PRIx32 "|%s\n",
@@ -521,7 +523,7 @@ bool csArchive::Write (void *entry, const char *data, size_t len)
 // Flush all pending operations (if any)
 bool csArchive::Flush ()
 {
-  if (!lazy.Length () && !del.Length ())
+  if (!lazy.GetSize () && !del.GetSize ())
     return true;                /* Nothing to do */
   return WriteZipArchive ();
 }
@@ -529,7 +531,8 @@ bool csArchive::Flush ()
 // Write pending operations into ZIP archive
 bool csArchive::WriteZipArchive ()
 {
-  char temp_file[CS_MAXPATHLEN];
+  //char temp_file[CS_MAXPATHLEN];
+  csString temp_file ((size_t)CS_MAXPATHLEN);
   FILE *temp;
   char buff [16 * 1024];
   bool success = false;
@@ -540,13 +543,11 @@ bool csArchive::WriteZipArchive ()
 
   // Step one: Copy archive file into a temporary file,
   // skipping entries marked as 'deleted'
-  strcpy (temp_file, CS_TEMP_DIR);
-  size_t tmplen = strlen (temp_file);
+  temp_file = CS::Platform::GetTempDirectory ();
+  temp_file << CS_PATH_SEPARATOR;
+  temp_file += CS::Platform::GetTempFilename (temp_file.GetData ());
 
-  APPEND_SLASH (temp_file, tmplen);
-    
-  cs_snprintf (&temp_file[tmplen], CS_MAXPATHLEN - tmplen, CS_TEMP_FILE);
-  if ((temp = fopen (temp_file, "w+b")) == 0)
+  if ((temp = fopen (temp_file.GetDataSafe (), "w+b")) == 0)
     return false;               /* Cannot create temporary file */
   fseek (file, 0, SEEK_SET);
 
@@ -563,10 +564,10 @@ bool csArchive::WriteZipArchive ()
       if (!ReadLFH (lfh, file))
         goto temp_failed;
 
-      char *this_name = new char[lfh.filename_length + 1];
+      char *this_name = (char*)cs_malloc (lfh.filename_length + 1);
       if (fread (this_name, 1, lfh.filename_length, file) < lfh.filename_length)
       {
-        delete [] this_name;
+        cs_free (this_name);
         goto temp_failed;
       }
       this_name[lfh.filename_length] = 0;
@@ -576,7 +577,7 @@ bool csArchive::WriteZipArchive ()
 skip_entry:
         bytes_to_skip = lfh.extra_field_length + lfh.csize;
         bytes_to_copy = 0;
-        delete [] this_name;
+        cs_free (this_name);
       }
       else
       {
@@ -592,7 +593,7 @@ skip_entry:
            */
           goto skip_entry;
 
-        delete [] this_name;
+        cs_free (this_name);
         if (this_file->info.csize != lfh.csize)
           goto temp_failed;   /* Broken archive */
         this_file->ReadExtraField (file, lfh.extra_field_length);
@@ -653,7 +654,7 @@ skip_entry:
   } /* endwhile */
 
   /* Now we have to append all files that were added to archive */
-  for (n = 0; n < lazy.Length (); n++)
+  for (n = 0; n < lazy.GetSize (); n++)
   {
     ArchiveEntry *f = lazy.Get (n);
     if (!f->WriteFile (temp))
@@ -714,7 +715,7 @@ bool csArchive::WriteCentralDirectory (FILE *temp)
   size_t n, count = 0;
   size_t cdroffs = ftell (temp);
 
-  for (n = 0; n < dir.Length (); n++)
+  for (n = 0; n < dir.GetSize (); n++)
   {
     ArchiveEntry *f = dir.Get (n);
     // Don't write deleted or faked entries
@@ -725,7 +726,7 @@ bool csArchive::WriteCentralDirectory (FILE *temp)
     count++;
   } /* endwhile */
 
-  for (n = 0; n < lazy.Length (); n++)
+  for (n = 0; n < lazy.GetSize (); n++)
   {
     ArchiveEntry *f = lazy.Get (n);
     if (!f->WriteCDFH (temp))
@@ -750,7 +751,7 @@ bool csArchive::WriteCentralDirectory (FILE *temp)
 void csArchive::UpdateDirectory ()
 {
   /* Update archive directory: remove deleted entries first */
-  size_t n = dir.Length ();
+  size_t n = dir.GetSize ();
   while (n > 0)
   {
     n--;
@@ -760,7 +761,7 @@ void csArchive::UpdateDirectory ()
   }
   del.DeleteAll ();
 
-  for (n = 0; n < lazy.Length (); n++)
+  for (n = 0; n < lazy.GetSize (); n++)
   {
     ArchiveEntry *e = lazy.Get (n);
     e->FreeBuffer ();
@@ -894,8 +895,7 @@ bool csArchive::WriteECDR (ZIP_end_central_dir_record & ecdr, FILE *outfile)
 csArchive::ArchiveEntry::ArchiveEntry (const char *name,
   ZIP_central_directory_file_header &cdfh)
 {
-  filename = new char[strlen (name) + 1];
-  strcpy (filename, name);
+  filename = CS::StrDup (name);
   info = cdfh;
   buffer = 0;
   extrafield = 0;
@@ -908,9 +908,9 @@ csArchive::ArchiveEntry::ArchiveEntry (const char *name,
 csArchive::ArchiveEntry::~ArchiveEntry ()
 {
   FreeBuffer ();
-  delete [] comment;
-  delete [] extrafield;
-  delete [] filename;
+  cs_free (comment);
+  cs_free (extrafield);
+  cs_free (filename);
 }
 
 void csArchive::ArchiveEntry::FreeBuffer ()
@@ -1030,14 +1030,14 @@ bool csArchive::ArchiveEntry::ReadExtraField (FILE *infile,
 {
   if (extrafield && (info.extra_field_length != extra_field_length))
   {
-    delete [] extrafield;
+    cs_free (extrafield);
     extrafield = 0;
   }
   info.extra_field_length = (ush)extra_field_length;
   if (extra_field_length)
   {
     if (!extrafield)
-      extrafield = new char[extra_field_length];
+      extrafield = (char*)cs_malloc (extra_field_length);
     return (fread (extrafield, 1, extra_field_length, infile) ==
     	extra_field_length);
   }
@@ -1049,14 +1049,14 @@ bool csArchive::ArchiveEntry::ReadFileComment (FILE *infile,
 {
   if (comment && (info.file_comment_length != file_comment_length))
   {
-    delete [] comment;
+    cs_free (comment);
     comment = 0;
   }
   info.file_comment_length = (ush)file_comment_length;
   if (file_comment_length)
   {
     if (!comment)
-      comment = new char[file_comment_length];
+      comment = (char*)cs_malloc (file_comment_length);
     return (fread (comment, 1, file_comment_length, infile) ==
     	file_comment_length);
   }

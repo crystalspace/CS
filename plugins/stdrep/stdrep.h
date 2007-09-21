@@ -30,7 +30,7 @@
 #include "csutil/refarr.h"
 #include "csutil/weakref.h"
 #include "csutil/util.h"
-#include "csutil/scopedmutexlock.h"
+#include "csutil/threading/mutex.h"
 
 struct iConsoleOutput;
 struct iFile;
@@ -51,14 +51,14 @@ public:
   csTimedMessage () : msg (0) { }
   csTimedMessage (const char* m)
   {
-    msg = csStrNew (m);
+    msg = CS::StrDup (m);
     time = 0;
   }
 
 protected:
   virtual ~csTimedMessage ()
   {
-    delete[] msg;
+    cs_free (msg);
   }
 };
 
@@ -88,7 +88,7 @@ private:
   bool dest_popup[5];
   bool msg_remove[5];
   bool show_msgid[5];
-  csRef<csMutex> mutex;
+  CS::Threading::RecursiveMutex mutex;
   csRefArray<csTimedMessage> messages;
   csString lastID;
   csRef<iFont> fnt;

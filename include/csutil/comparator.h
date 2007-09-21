@@ -32,7 +32,7 @@ class csStringBase;
 /**
  * A template providing various comparison and ordering functions.
  */
-template <class T1, class T2>
+template <typename T1, typename T2 = T1>
 class csComparator
 {
 public:
@@ -65,7 +65,7 @@ public:
  * types. Assumes presence of `operator char const*()' (the cast operator).
  * Also works for normal C-strings.  Example:
  * \code
- * CS_SPECIALIZE_TEMPLATE csComparator<MyString> : 
+ * template<> csComparator<MyString> : 
  *   public csComparatorString<MyString> {};
  * \endcode
  */

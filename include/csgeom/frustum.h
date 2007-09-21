@@ -29,12 +29,14 @@
 #include "csextern.h"
 
 #include "cstypes.h"
+#include "csutil/refcount.h"
 #include "csgeom/vector3.h"
 
 class csPlane3;
 template<class T>
 class csPtr;
 class csTransform;
+class csSegment3;
 
 /** \name Polygon-to-Frustum relations
  * Return values for csFrustum::Classify. The routine makes a difference
@@ -152,7 +154,7 @@ struct CS_CRYSTALSPACE_EXPORT csClipInfo
  * case the polygon will be 0 (not specified). The back
  * plane can also be 0.
  */
-class CS_CRYSTALSPACE_EXPORT csFrustum
+class CS_CRYSTALSPACE_EXPORT csFrustum : public csRefCount
 {
 private:
   /// The origin of this frustum
@@ -165,9 +167,9 @@ private:
    */
   csVector3* vertices;
   /// Number of vertices in frustum polygon
-  int num_vertices;
+  size_t num_vertices;
   /// Max number of vertices
-  int max_vertices;
+  size_t max_vertices;
 
   /// Back clipping plane
   csPlane3* backplane;
@@ -187,21 +189,18 @@ private:
    */
   bool mirrored;
 
-  /// The reference count for this frustum
-  int ref_count;
-
   /// Clear the frustum
   void Clear ();
 
   /// Ensure vertex array is able to hold at least "num" vertices
-  void ExtendVertexArray (int num);
+  void ExtendVertexArray (size_t num);
 
 public:
 
   /// Create a new empty frustum.
   csFrustum (const csVector3& o) :
     origin (o), vertices (0), num_vertices (0), max_vertices (0),
-    backplane (0), wide (false), mirrored (false), ref_count (1)
+    backplane (0), wide (false), mirrored (false)
   { }
 
   /**
@@ -209,7 +208,7 @@ public:
    * The polygon is given relative to the origin 'o'.
    * If the given polygon is 0 then we create an empty frustum.
    */
-  csFrustum (const csVector3& o, csVector3* verts, int num_verts,
+  csFrustum (const csVector3& o, csVector3* verts, size_t num_verts,
         csPlane3* backp = 0);
 
   /**
@@ -217,11 +216,14 @@ public:
    * The vertices are not initialized but space is reserved for them.
    * The polygon is given relative to the origin 'o'.
    */
-  csFrustum (const csVector3& o, int num_verts,
+  csFrustum (const csVector3& o, size_t num_verts,
         csPlane3* backp = 0);
 
   /// Copy constructor.
   csFrustum (const csFrustum &copy);
+
+  /// Assignment operator
+  const csFrustum& operator= (const csFrustum& other);
 
   ///
   virtual ~csFrustum ();
@@ -271,23 +273,23 @@ public:
   /**
    * Get the number of vertices.
    */
-  inline int GetVertexCount () const { return num_vertices; }
+  inline size_t GetVertexCount () const { return num_vertices; }
 
   /**
    * Get a vertex.
    */
-  inline csVector3& GetVertex (int idx)
+  inline csVector3& GetVertex (size_t idx)
   {
-    CS_ASSERT (idx >= 0 && idx < num_vertices);
+    CS_ASSERT (idx < num_vertices);
     return vertices[idx];
   }
 
   /**
    * Get a vertex.
    */
-  inline const csVector3& GetVertex (int idx) const
+  inline const csVector3& GetVertex (size_t idx) const
   {
-    CS_ASSERT (idx >= 0 && idx < num_vertices);
+    CS_ASSERT (idx < num_vertices);
     return vertices[idx];
   }
 
@@ -316,8 +318,17 @@ public:
    * coordinates). Note that clipinfo needs to be preinitialized correctly
    * with CS_CLIPINFO_ORIGINAL instances and correct indices.
    */
-  static void ClipToPlane (csVector3* vertices, int& num_vertices,
+  static void ClipToPlane (csVector3* vertices, size_t& num_vertices,
     csClipInfo* clipinfo, const csVector3& v1, const csVector3& v2);
+
+  CS_DEPRECATED_METHOD_MSG("num_vertices type changed to size_t")
+  static void ClipToPlane (csVector3* vertices, int& num_vertices,
+    csClipInfo* clipinfo, const csVector3& v1, const csVector3& v2)
+  {
+    size_t nv;
+    ClipToPlane (vertices, nv, clipinfo, v1, v2);
+    num_vertices = int (nv);
+  }
 
   /**
    * Clip a frustum (defined from 0,0,0 origin) to the given plane.
@@ -327,8 +338,17 @@ public:
    * needs to be preinitialized correctly with CS_CLIPINFO_ORIGINAL
    * instances and correct indices.
    */
-  static void ClipToPlane (csVector3* vertices, int& num_vertices,
+  static void ClipToPlane (csVector3* vertices, size_t& num_vertices,
     csClipInfo* clipinfo, const csPlane3& plane);
+
+  CS_DEPRECATED_METHOD_MSG("num_vertices type changed to size_t")
+  static void ClipToPlane (csVector3* vertices, int& num_vertices,
+    csClipInfo* clipinfo, const csPlane3& plane)
+  {
+    size_t nv;
+    ClipToPlane (vertices, nv, clipinfo, plane);
+    num_vertices = int (nv);
+  }
 
   /**
    * Clip the polygon of this frustum to the postive side of an arbitrary plane
@@ -347,63 +367,70 @@ public:
 
   /**
    * Intersect a convex polygon with this volume. The convex polygon
-   * is given relative to the center point (origin) of this frustum.<p>
+   * is given relative to the center point (origin) of this frustum.
    *
    * Returns a new frustum which exactly covers the intersection
    * of the polygon with the frustum (i.e. the smallest frustum
    * which is part of this frustum and which 'sees' exactly
-   * the same of the given polygon as this frustum).<p>
+   * the same of the given polygon as this frustum).
    *
-   * This function returns 0 if there is no intersection.<p>
+   * This function returns 0 if there is no intersection.
    *
    * Note that the frustum polygon of the returned csFrustum is
    * guaranteed to be coplanar with the given polygon.
    */
-  csPtr<csFrustum> Intersect (csVector3* poly, int num) const;
+  csPtr<csFrustum> Intersect (csVector3* poly, size_t num) const;
 
   /**
    * Intersect a convex polygon with this volume. The convex polygon
-   * is given relative to the center point (origin) of this frustum.<p>
+   * is given relative to the center point (origin) of this frustum.
    *
    * Returns a new frustum which exactly covers the intersection
    * of the polygon with the frustum (i.e. the smallest frustum
    * which is part of this frustum and which 'sees' exactly
-   * the same of the given polygon as this frustum).<p>
+   * the same of the given polygon as this frustum).
    *
-   * This function returns 0 if there is no intersection.<p>
+   * This function returns 0 if there is no intersection.
    *
    * Note that the frustum polygon of the returned csFrustum is
    * guaranteed to be coplanar with the given polygon.
    */
   static csPtr<csFrustum> Intersect (
-    const csVector3& frust_origin, csVector3* frust, int num_frust,
-    csVector3* poly, int num);
+    const csVector3& frust_origin, csVector3* frust, size_t num_frust,
+    csVector3* poly, size_t num);
 
   /**
    * Intersect a triangle with this volume. The triangle
-   * is given relative to the center point (origin) of this frustum.<p>
+   * is given relative to the center point (origin) of this frustum.
    *
    * Returns a new frustum which exactly covers the intersection
    * of the triangle with the frustum (i.e. the smallest frustum
    * which is part of this frustum and which 'sees' exactly
-   * the same of the given polygon as this frustum).<p>
+   * the same of the given polygon as this frustum).
    *
-   * This function returns 0 if there is no intersection.<p>
+   * This function returns 0 if there is no intersection.
    *
    * Note that the frustum polygon of the returned csFrustum is
    * guaranteed to be coplanar with the given triangle.
    */
   static csPtr<csFrustum> Intersect (
-    const csVector3& frust_origin, csVector3* frust, int num_frust,
+    const csVector3& frust_origin, csVector3* frust, size_t num_frust,
     const csVector3& v1, const csVector3& v2, const csVector3& v3);
+
+  /**
+   * Intersect a segment with the frustum.
+   * \return True if the segment is inside the frustum at any point. The segment
+   * will be updated to be the part within the frustum
+   */
+  bool Intersect (csSegment3& segment);
 
   /**
    * Check if a polygon intersects with the frustum (i.e.
    * is visible in the frustum). Returns one of #CS_FRUST_OUTSIDE etc. values.
    * Frustum and polygon should be given relative to (0,0,0).
    */
-  static int Classify (csVector3* frustum, int num_frust,
-    csVector3* poly, int num_poly);
+  static int Classify (csVector3* frustum, size_t num_frust,
+    csVector3* poly, size_t num_poly);
 
   /**
    * This is like the above version except that it takes a vector of
@@ -412,7 +439,7 @@ public:
    * frustum.
    */
   static int BatchClassify (csVector3* frustum, csVector3* frustumNormals,
-  	int num_frust, csVector3* poly, int num_poly);
+  	size_t num_frust, csVector3* poly, size_t num_poly);
 
   /**
    * Check if a point (given relative to the origin of the frustum)
@@ -426,7 +453,7 @@ public:
    * does not work correctly if the point is in the other direction
    * from the average direction of the frustum.
    */
-  static bool Contains (csVector3* frustum, int num_frust,
+  static bool Contains (csVector3* frustum, size_t num_frust,
     const csVector3& point);
 
   /**
@@ -434,7 +461,7 @@ public:
    * frustum are relative to (0,0,0). This function also
    * checks if point is in front of given plane.
    */
-  static bool Contains (csVector3* frustum, int num_frust,
+  static bool Contains (csVector3* frustum, size_t num_frust,
     const csPlane3& plane, const csVector3& point);
 
   /// Return true if frustum is empty.
@@ -459,13 +486,6 @@ public:
    * Make the frustum empty.
    */
   void MakeEmpty ();
-
-  /// Increment reference counter
-  inline void IncRef () { ref_count++; }
-  /// Decrement reference counter
-  inline void DecRef () { if (ref_count == 1) delete this; else ref_count--; }
-  /// Get reference count
-  inline int GetRefCount () { return ref_count; }
 };
 
 /** @} */

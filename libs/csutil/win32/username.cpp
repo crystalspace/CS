@@ -20,7 +20,8 @@
 #include "csutil/csstring.h"
 #include "csutil/sysfunc.h"
 #include "csutil/util.h"
-#include <windows.h>
+
+
 #include <lmcons.h>
 
 #include "csutil/win32/wintools.h"
@@ -47,9 +48,9 @@ csString csGetUsername()
       wname = cswinAnsiToWide (buff);
     }
   }
-  char* name = csStrNew (wname);
+  char* name = CS::StrDup (wname);
   username.Replace (name);
-  delete[] name;
+  cs_free (name);
   delete[] wname;
   username.Trim();
   return username;

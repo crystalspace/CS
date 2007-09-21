@@ -24,20 +24,17 @@
 #include "iutil/comp.h"
 #include "iutil/dbghelp.h"
 #include "csutil/csstring.h"
+#include "csutil/scf_implementation.h"
 #include "csutil/strhash.h"
 
 struct iObjectRegistry;
-struct iThingFactoryState;
-struct iEngine;
-struct iSector;
-struct iMaterialWrapper;
 struct iReporter;
-struct iLoader;
-struct iMeshObjectType;
 struct csGradientShade;
 
 CS_PLUGIN_NAMESPACE_BEGIN(SyntaxService)
 {
+
+#include "csutil/win32/msvc_deprecated_warn_off.h"
 
 /**
  * This component provides services for other loaders to easily parse
@@ -60,6 +57,13 @@ protected:
 
   void ReportV (const char* msgid, int severity, 
 	iDocumentNode* errornode, const char* msg, va_list arg);
+  /**
+   * Returns whether information relevant to world saving should be kept
+   * (default behaviour is to discard such info).
+   * \sa iEngine::GetSaveableFlag()
+   */
+  bool KeepSaveInfo ();
+
   bool ParseGradientShade (iDocumentNode* node, csGradientShade& shade);
   bool WriteGradientShade (iDocumentNode* node, const csGradientShade& shade);
 
@@ -97,10 +101,39 @@ public:
 	iDocumentNode* child, iLoaderContext* ldr_context,
 	uint32 &flags, bool &mirror, bool &warp, int& msv,
 	csMatrix3 &m, csVector3 &before, csVector3 &after,
-	iString* destSector, bool& handled, bool& autoresolve);
+	iString* destSector, bool& handled, bool& autoresolve)
+  {
+    csRef<csRefCount> state;
+    CS::Utility::PortalParameters params;
+    params.flags = flags;
+    params.mirror = mirror;
+    params.warp = warp;
+    params.msv = msv;
+    params.m = m;
+    params.before = before;
+    params.after = after;
+    params.destSector = destSector;
+    params.autoresolve = autoresolve;
+    bool ret = HandlePortalParameter (child, ldr_context, state, params, handled);
+    flags = params.flags;
+    mirror = params.mirror;
+    warp = params.warp;
+    msv = params.msv;
+    m = params.m;
+    before = params.before;
+    after = params.after;
+    destSector = params.destSector;
+    autoresolve = params.autoresolve;
+    return ret;
+  }
+  virtual bool HandlePortalParameter (
+    iDocumentNode* child, iLoaderContext* ldr_context,
+    csRef<csRefCount>& parseState, CS::Utility::PortalParameters& params,
+    bool& handled);
   virtual bool ParseGradient (iDocumentNode* node, iGradient* gradient);
   virtual bool WriteGradient (iDocumentNode* node, iGradient* gradient);
-  virtual bool ParseShaderVar (iDocumentNode* node, csShaderVariable& var);
+  virtual bool ParseShaderVar (iLoaderContext* ldr_context,
+      iDocumentNode* node, csShaderVariable& var);
   virtual csRef<iShaderVariableAccessor> ParseShaderVarExpr (
     iDocumentNode* node);
   virtual bool WriteShaderVar (iDocumentNode* node, csShaderVariable& var);
@@ -113,12 +146,23 @@ public:
   virtual bool WriteZMode (iDocumentNode* node, csZBufMode zmode,
     bool allowZmesh);
   virtual bool ParseKey (iDocumentNode* node, iKeyValuePair* &keyvalue);
+  virtual csPtr<iKeyValuePair> ParseKey (iDocumentNode* node);
   virtual bool WriteKey (iDocumentNode* node, iKeyValuePair* keyvalue);
 
   virtual csRef<iRenderBuffer> ParseRenderBuffer (iDocumentNode* node);
   virtual bool WriteRenderBuffer (iDocumentNode* node, iRenderBuffer* buffer);
+  /**
+   * Read a render buffer from a data buffer. If \a filename is not 0, the
+   * returned buffer will also exhibit an iRenderBufferPersistence that returns
+   * the given filename.
+   */
+  csRef<iRenderBuffer> ReadRenderBuffer (iDataBuffer* buf, const char* filename);
+  virtual csRef<iRenderBuffer> ReadRenderBuffer (iDataBuffer* buf)
+  { return ReadRenderBuffer (buf, 0); }
+  virtual csRef<iDataBuffer> StoreRenderBuffer (iRenderBuffer* rbuf);
 
-  virtual csRef<iShader> ParseShaderRef (iDocumentNode* node);
+  virtual csRef<iShader> ParseShaderRef (iLoaderContext* ldr_context,
+      iDocumentNode* node);
 
   virtual void ReportError (const char* msgid, iDocumentNode* errornode,
 	const char* msg, ...);
@@ -143,6 +187,8 @@ public:
   virtual bool DebugCommand (const char* /*cmd*/)
   { return false; }
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 }
 CS_PLUGIN_NAMESPACE_END(SyntaxService)

@@ -26,6 +26,7 @@
 #include "csgeom/poly2d.h"
 #include "csgeom/poly3d.h"
 #include "csgeom/trimeshlod.h"
+#include "igeom/trimesh.h"
 #include "csgfx/shadervarcontext.h"
 #include "csqint.h"
 #include "cstool/rendermeshholder.h"
@@ -179,11 +180,11 @@ public:
   virtual char const* GetName () const
   { return name; }
   /// Get total number of frames in this action
-  virtual int GetFrameCount () { return (int)frames.Length (); }
+  virtual int GetFrameCount () { return (int)frames.GetSize (); }
   /// Query the frame number f.
   csSpriteFrame* GetCsFrame (int f)
   {
-    return ((size_t)f < frames.Length ())
+    return ((size_t)f < frames.GetSize ())
     	? frames [f]
 	: (csSpriteFrame*)0;
 	}
@@ -193,20 +194,20 @@ public:
     if (!reverse_action)
     {
       f++;
-      return (size_t)f<frames.Length() ? frames[f] : frames[0];
+      return (size_t)f<frames.GetSize () ? frames[f] : frames[0];
     }
     else
     {
       f--;
       return f>=0
         ? frames[f]
-	: frames[frames.Length()-1];
+	: frames[frames.GetSize ()-1];
     }
   }
   /// Query the frame number f.
   virtual iSpriteFrame* GetFrame (int f)
   {
-    return (iSpriteFrame*)(((size_t)f < frames.Length ())
+    return (iSpriteFrame*)(((size_t)f < frames.GetSize ())
     	? frames [f]
 	: (csSpriteFrame*)0);
   }
@@ -216,7 +217,7 @@ public:
     if (!reverse_action)
     {
       f++;
-      return (iSpriteFrame*)((size_t)f<frames.Length()
+      return (iSpriteFrame*)((size_t)f<frames.GetSize ()
       	? frames[f]
 	: frames[0]);
     }
@@ -225,7 +226,7 @@ public:
       f--;
       return (iSpriteFrame*)(f>=0
       	? frames[f]
-	: frames[frames.Length()-1]);
+	: frames[frames.GetSize ()-1]);
     }
   }
   /// Get delay for frame number f
@@ -284,6 +285,8 @@ public:
 };
 
 class csSprite3DMeshObject;
+
+#include "csutil/win32/msvc_deprecated_warn_off.h"
 
 /**
  * A 3D sprite based on a triangle mesh with a single texture.
@@ -542,11 +545,11 @@ public:
   /// find a named frame into the sprite.
   iSpriteFrame* FindFrame (const char * name) const;
   /// Query the number of frames
-  int GetFrameCount () const { return (int)frames.Length (); }
+  int GetFrameCount () const { return (int)frames.GetSize (); }
   /// Query the frame number f
   iSpriteFrame* GetFrame (int f) const
   {
-    return ((size_t)f < frames.Length ())
+    return ((size_t)f < frames.GetSize ())
   	? (csSpriteFrame *)frames [f]
 	: (csSpriteFrame*)0;
   }
@@ -560,7 +563,7 @@ public:
   { return (csSpriteAction2 *)actions [0]; }
   /// Get number of actions in sprite
   int GetActionCount () const
-  { return (int)actions.Length (); }
+  { return (int)actions.GetSize (); }
   /// Get action number No
   iSpriteAction* GetAction (int No) const
   { return (csSpriteAction2 *)actions [No]; }
@@ -572,11 +575,11 @@ public:
   /// find a socked based on the sprite attached to it
   iSpriteSocket* FindSocket (iMeshWrapper *mesh) const;
   /// Query the number of sockets
-  int GetSocketCount () const { return (int)sockets.Length (); }
+  int GetSocketCount () const { return (int)sockets.GetSize (); }
   /// Query the socket number f
   iSpriteSocket* GetSocket (int f) const
   {
-    return ((size_t)f < sockets.Length ())
+    return ((size_t)f < sockets.GetSize ())
   	? (csSpriteSocket *)sockets [f]
 	: (csSpriteSocket*)0;
   }
@@ -629,7 +632,6 @@ public:
   void SetupLODListeners (iSharedVariable* varm, iSharedVariable* vara);
 
   void SetupFactory ();
-  void GetObjectBoundingBox (csBox3& bbox);
   const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3 &cent);
@@ -648,16 +650,16 @@ public:
   virtual iMeshObjectType* GetMeshObjectType () const { return spr3d_type; }
   /** @} */
 
-  /**\name iPolygonMesh implementation
+  /**\name iTriangleMesh implementation
    * @{ */
-  struct PolyMesh : public scfImplementation1<PolyMesh, iPolygonMesh>
+  struct TriMesh : public scfImplementation1<TriMesh, iTriangleMesh>
   {
   private:
     csSprite3DMeshObjectFactory* factory;
     csFlags flags;
 
   public:
-    virtual int GetVertexCount ()
+    virtual size_t GetVertexCount ()
     {
       return factory->GetVertexCount ();
     }
@@ -665,14 +667,7 @@ public:
     {
       return factory->GetVertices (0);
     }
-    virtual int GetPolygonCount ()
-    {
-      return factory->GetTriangleCount ();
-    }
-
-    virtual csMeshedPolygon* GetPolygons ();
-
-    virtual int GetTriangleCount ()
+    virtual size_t GetTriangleCount ()
     {
       return factory->GetTriangleCount ();
     }
@@ -687,20 +682,17 @@ public:
     virtual csFlags& GetFlags () { return flags;  }
     virtual uint32 GetChangeNumber() const { return 0; }
 
-    PolyMesh (csSprite3DMeshObjectFactory* Factory) : 
-      scfImplementationType (this), factory(Factory), polygons (0)
+    TriMesh (csSprite3DMeshObjectFactory* Factory) : 
+      scfImplementationType (this), factory(Factory)
     {
-      flags.Set (CS_POLYMESH_TRIANGLEMESH);
     }
-    virtual ~PolyMesh ()
+    virtual ~TriMesh ()
     {
       Cleanup ();
     }
-    void Cleanup () { delete[] polygons; polygons = 0; }
-
-    csMeshedPolygon* polygons;
+    void Cleanup () { }
   };
-  friend struct PolyMesh;
+  friend struct TriMesh;
   /** @} */
 
   virtual iObjectModel* GetObjectModel () { return this; }
@@ -731,9 +723,12 @@ public:
   }
   
   iTerraFormer* GetTerraFormerColldet () { return 0; }
+  virtual iTerrainSystem* GetTerrainColldet () { return 0; }
 
   /** @} */
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * A 3D sprite based on a triangle mesh with a single texture.
@@ -1026,7 +1021,7 @@ private:
   ///
   bool force_otherskin;
 
-  iMeshObjectDrawCallback* vis_cb;
+  csRef<iMeshObjectDrawCallback> vis_cb;
 
   /**
    * Camera space bounding box is cached here.
@@ -1382,7 +1377,6 @@ public:
   void ClearLODListeners ();
   void SetupLODListeners (iSharedVariable* varm, iSharedVariable* vara);
 
-  void GetObjectBoundingBox (csBox3& bbox);
   const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3 &cent);
@@ -1394,11 +1388,11 @@ public:
   /// find a socked based on the sprite attached to it
   iSpriteSocket* FindSocket (iMeshWrapper *mesh) const;
   /// Query the number of sockets
-  int GetSocketCount () const { return (int)sockets.Length (); }
+  int GetSocketCount () const { return (int)sockets.GetSize (); }
   /// Query the socket number f
   iSpriteSocket* GetSocket (int f) const
   {
-    return ((size_t)f < sockets.Length ())
+    return ((size_t)f < sockets.GetSize ())
   	? (csSpriteSocket *)sockets [f]
 	: (csSpriteSocket*)0;
   }
@@ -1407,8 +1401,8 @@ public:
    * @{ */
   virtual iMeshObjectFactory* GetFactory () const
   {
-    csRef<iMeshObjectFactory> ifact (SCF_QUERY_INTERFACE (factory,
-    	iMeshObjectFactory));
+    csRef<iMeshObjectFactory> ifact (
+    	scfQueryInterface<iMeshObjectFactory> (factory));
     return ifact;	// DecRef is ok here.
   }
   virtual csFlags& GetFlags () { return flags; }
@@ -1417,8 +1411,6 @@ public:
     iMovable* movable, uint32 frustum_mask);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
-    if (cb) cb->IncRef ();
-    if (vis_cb) vis_cb->DecRef ();
     vis_cb = cb;
   }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const
@@ -1457,6 +1449,10 @@ public:
    */
   virtual void PositionChild (iMeshObject* child,csTicks current_time);
   /** @} */
+  virtual void BuildDecal(const csVector3* pos, float decalRadius,
+          iDecalBuilder* decalBuilder)
+  {
+  }
 
   virtual iObjectModel* GetObjectModel () { return factory->GetObjectModel (); }
 
@@ -1533,6 +1529,9 @@ private:
   iObjectRegistry* object_reg;
   csRef<iVirtualClock> vc;
   csWeakRef<iEngine> engine;
+
+public:
+  csStringID base_id;
 
 public:
   /// Constructor.

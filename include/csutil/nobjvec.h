@@ -34,6 +34,13 @@
  * Named Object Vector class
  */
 
+/* Workaround for deprecation warnings caused by types used as the template 
+ * parameter */
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
+/**\addtogroup util_containers
+ * @{ */
+
 /**
  * This class implements a typed array that correctly keeps track
  * of reference count and also is able to find by name. Assumes
@@ -52,7 +59,7 @@ public:
   size_t GetIndexByName (const char* name) const
   {
     size_t i;
-    for (i = 0 ; i < this->Length () ; i++) // see *1*
+    for (i = 0 ; i < this->GetSize () ; i++) // see *1*
     {
       T* o = (*this)[i];
       const char* n = o->QueryObject ()->GetName ();
@@ -72,5 +79,8 @@ public:
   }
 };
 
+/** @} */
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_NOBJVEC_H__

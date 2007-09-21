@@ -23,6 +23,7 @@
 #include "csgeom/vector3.h"
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
+#include "cstool/genmeshbuilder.h"
 #include "csutil/cmdhelp.h"
 #include "csutil/cscolor.h"
 #include "csutil/event.h"
@@ -62,6 +63,7 @@
 #include "ivideo/material.h"
 #include "ivideo/natwin.h"
 #include "ivideo/txtmgr.h"
+#include "imap/ldrctxt.h"
 
 #include "apps/tests/csbench/csbench.h"
 
@@ -84,15 +86,7 @@ void CsBench::Report (const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (System->object_reg, iReporter));
-  if (rep)
-    rep->ReportV (CS_REPORTER_SEVERITY_NOTIFY, "csbench", msg, arg);
-  else
-  {
-    csPrintfV (msg, arg);
-    csPrintf ("\n");
-    fflush (stdout);
-  }
+  csReportV(object_reg, CS_REPORTER_SEVERITY_NOTIFY, "csbench", msg, arg);
   va_end (arg);
 }
 
@@ -100,7 +94,7 @@ bool CsBench::ReportError (const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (System->object_reg, iReporter));
+  csRef<iReporter> rep (csQueryRegistry<iReporter> (System->object_reg));
   if (rep)
     rep->ReportV (CS_REPORTER_SEVERITY_ERROR, "csbench", msg, arg);
   else
@@ -126,8 +120,8 @@ iMeshFactoryWrapper* CsBench::CreateGenmeshLattice (int dim, float size,
   // Create our object.
   csRef<iMeshFactoryWrapper> fact = engine->CreateMeshFactory (
     "crystalspace.mesh.object.genmesh", name);
-  csRef<iGeneralFactoryState> factstate = SCF_QUERY_INTERFACE (
-    fact->GetMeshObjectFactory (), iGeneralFactoryState);
+  csRef<iGeneralFactoryState> factstate = 
+    scfQueryInterface<iGeneralFactoryState> (fact->GetMeshObjectFactory ());
   factstate->SetVertexCount (dim * dim);
   factstate->SetTriangleCount (2 * (dim-1) * (dim-1));
   int x, y;
@@ -190,12 +184,23 @@ iSector* CsBench::CreateRoom (const char* name, const char* meshname,
 	const csVector3& p1, const csVector3& p2)
 {
   iSector* room2 = engine->CreateSector (name);
-  csRef<iMeshWrapper> walls = engine->CreateSectorWallsMesh (room2, meshname);
-  csRef<iThingFactoryState> walls_state = 
-    scfQueryInterface<iThingFactoryState> (walls->GetMeshObject ()->GetFactory());
-  walls_state->AddInsideBox (p1, p2);
-  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, material);
-  walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
+
+  using namespace CS::Geometry;
+  DensityTextureMapper mapper (0.3f);
+  TesselatedBox box (p1, p2);
+  box.SetLevel (3);
+  box.SetMapper (&mapper);
+  box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+
+  // Now we make a factory and a mesh at once.
+  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
+      engine, room2, meshname, meshname, &box);
+
+  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
+    iGeneralMeshState> (walls->GetMeshObject ());
+  mesh_state->SetShadowReceiving (true);
+  walls->GetMeshObject ()->SetMaterialWrapper (material);
+
   return room2;
 }
 
@@ -291,7 +296,7 @@ bool CsBench::Initialize (int argc, const char* const argv[],
 
   // Make sure the commandline has -verbose and -console for consistent
   // results.
-  cmdline = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
+  cmdline = csQueryRegistry<iCommandLineParser> (object_reg);
   cmdline->AddOption ("verbose", "-scf");
   cmdline->AddOption ("console", 0);
 
@@ -311,19 +316,19 @@ bool CsBench::Initialize (int argc, const char* const argv[],
 	CS_REQUEST_END))
     return ReportError ("Couldn't init app!");
 
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
   if (!g3d) return ReportError ("No g3d plugin!");
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = csQueryRegistry<iEngine> (object_reg);
   if (!engine) return ReportError ("No engine plugin!");
-  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  loader = csQueryRegistry<iLoader> (object_reg);
   if (!loader) return ReportError ("No loader plugin!");
-  imageio = CS_QUERY_REGISTRY (object_reg, iImageIO);
+  imageio = csQueryRegistry<iImageIO> (object_reg);
   if (!imageio) return ReportError ("No image loader plugin!");
-  vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+  vfs = csQueryRegistry<iVFS> (object_reg);
   if (!vfs) return ReportError ("No iVFS plugin!");
-  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.shared.stringset", iStringSet);
+  strings = csQueryRegistryTagInterface<iStringSet> 
+    (object_reg, "crystalspace.shared.stringset");
   if (!strings) return ReportError ("No string set!");
 
   iGraphics2D* g2d = g3d->GetDriver2D ();
@@ -333,8 +338,8 @@ bool CsBench::Initialize (int argc, const char* const argv[],
   unlink ("csbench_report.zip");
   vfs->Mount ("/lib/report", "csbench_report.zip");
 
-  csRef<iStandardReporterListener> stdrep = CS_QUERY_REGISTRY (object_reg,
-  	iStandardReporterListener);
+  csRef<iStandardReporterListener> stdrep = 
+  	csQueryRegistry<iStandardReporterListener> (object_reg);
   if (!stdrep) return ReportError ("No stdrep plugin!");
   stdrep->SetDebugFile ("/tmp/csbench_report.txt");
   stdrep->SetMessageDestination (CS_REPORTER_SEVERITY_BUG,
@@ -427,7 +432,7 @@ iShaderManager* CsBench::GetShaderManager ()
 {
   if (!shader_mgr)
   {
-    shader_mgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
+    shader_mgr = csQueryRegistry<iShaderManager> (object_reg);
   }
   return shader_mgr;
 }
@@ -436,7 +441,7 @@ iDocumentSystem* CsBench::GetDocumentSystem ()
 {
   if (!docsys)
   {
-    docsys = CS_QUERY_REGISTRY(object_reg, iDocumentSystem);
+    docsys = csQueryRegistry<iDocumentSystem> (object_reg);
     if (docsys == 0)
     {
       docsys.AttachNew (new csTinyDocumentSystem ());
@@ -466,7 +471,8 @@ void CsBench::PerformShaderTest (const char* shaderPath, const char* shtype,
     csRef<iDocumentNode> shadernode2 = shaderDoc2->GetRoot ()
     	->GetNode ("shader");
     shadertype2 = strings->Request (shtype2);
-    shader2 = shcom->CompileShader (shadernode2);
+    csRef<iLoaderContext> ldr_context = engine->CreateLoaderContext ();
+    shader2 = shcom->CompileShader (ldr_context, shadernode2);
   }
 
   csRef<iShaderPriorityList> prilist = shcom->GetPriorities (shadernode);
@@ -478,11 +484,12 @@ void CsBench::PerformShaderTest (const char* shaderPath, const char* shtype,
   csRef<iMeshWrapper> walls (engine->FindMeshObject (
     view->GetCamera()->GetSector()->QueryObject()->GetName()));
   csRef<iThingState> ws =
-    SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
+    scfQueryInterface<iThingState> (walls->GetMeshObject ());
   for (i = 0 ; i < prilist->GetCount () ; i++)
   {
     int pri = prilist->GetPriority (i);
-    csRef<iShader> shader = shcom->CompileShader (shadernode, pri);
+    csRef<iLoaderContext> ldr_context = engine->CreateLoaderContext ();
+    csRef<iShader> shader = shcom->CompileShader (ldr_context, shadernode, pri);
     if (shader)
     {
       csRef<iMaterial> matinput = engine->CreateBaseMaterial (

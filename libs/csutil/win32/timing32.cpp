@@ -90,7 +90,7 @@ int64 csGetMicroTicks()
   // 2006/04/30 - There are some AMD X2 processors out now that incorrectly halt the instruction counter when
   //              one of the cores is put to sleep.  This can cause time to appear to jump around (forward and back)
   //              as the process is run on one core or another.  Workarounds are documented on various web sites.
-  CS_ASSERT_MSG("Timing error! Your system has reported a backwards-moving time value!", ElapsedRaw>=0);
+  // CS_ASSERT_MSG("Timing error! Your system has reported a backwards-moving time value!", ElapsedRaw>=0);
 
   // There's not much that can be done about this.  Let's presume time hasn't moved and hope we get scheduled
   //  on the same logical processor we started on sometime soon.

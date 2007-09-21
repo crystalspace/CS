@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "csver.h"
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
 #include "shellstuff.h"
@@ -28,6 +29,9 @@
 
 #include "csutil/util.h"
 
+#define VERSION_STR         CS_VERSION_MAJOR "_" CS_VERSION_MINOR
+#define VERSION_STR_DOTTED  CS_VERSION_MAJOR "." CS_VERSION_MINOR
+
 static inline bool GetRegistryInstallPath (const HKEY parentKey, 
 					   char *oInstallPath, 
 					   DWORD iBufferSize)
@@ -38,8 +42,14 @@ static inline bool GetRegistryInstallPath (const HKEY parentKey,
   HKEY m_pKey;
   LONG result;
 
-  result = RegOpenKeyEx (parentKey, "Software\\CrystalSpace",
+  result = RegOpenKeyEx (parentKey, 
+    "Software\\CrystalSpace\\" VERSION_STR_DOTTED,
     0, KEY_READ, &m_pKey);
+  if (result == ERROR_SUCCESS)
+  {
+    result = RegOpenKeyEx (parentKey, "Software\\CrystalSpace",
+      0, KEY_READ, &m_pKey);
+  }
   if (result == ERROR_SUCCESS)
   {
     result = RegQueryValueEx(
@@ -80,8 +90,14 @@ static inline bool GetRegistryInstallPath (const HKEY parentKey,
   HKEY m_pKey;
   LONG result;
 
-  result = RegOpenKeyEx (parentKey, "Software\\CrystalSpace",
+  result = RegOpenKeyEx (parentKey, 
+    "Software\\CrystalSpace\\" VERSION_STR_DOTTED,
     0, KEY_READ, &m_pKey);
+  if (result == ERROR_SUCCESS)
+  {
+    result = RegOpenKeyEx (parentKey, "Software\\CrystalSpace",
+      0, KEY_READ, &m_pKey);
+  }
   if (result == ERROR_SUCCESS)
   {
     result = RegQueryValueEx(
@@ -161,7 +177,9 @@ static inline char* FindConfigPath ()
   // the shared systemwide registry strategy; this is the best approach unless
   // someone implements a SetInstallPath() to override it before Open() is
   // called.
-  char *envpath = getenv ("CRYSTAL");
+  char *envpath = getenv ("CRYSTAL_" VERSION_STR);
+  if (!envpath || !*envpath)
+    envpath = getenv ("CRYSTAL");
   if (envpath && *envpath)
   {
     // Multiple paths. Take first one...
@@ -169,7 +187,7 @@ static inline char* FindConfigPath ()
     csString crystalPath (envpath);
 
     size_t colon = crystalPath.FindFirst (';'); 
-      // MSYS converts :-separated paths to ;-separation in Win32 style.
+    // MSYS converts :-separated paths to ;-separation in Win32 style.
     size_t subStrLen;
     if (colon == (size_t)-1)
       subStrLen = crystalPath.Length();
@@ -225,14 +243,14 @@ static inline char* FindConfigPath ()
       size_t maxLen = MIN(sizeof(programpath), 1024-30);
       memcpy (path, programpath, maxLen);
       path[maxLen] = 0;
-      strcat (path, "\\" CS_PACKAGE_NAME);
+      strcat (path, "\\" CS_PACKAGE_NAME " " VERSION_STR_DOTTED);
       return csStrNew (path);
     }
   }
 
   // nothing helps, use default
   // which is "C:\Program Files\CrystalSpace"
-  strcpy (path, "C:\\Program Files\\" CS_PACKAGE_NAME);
+  strcpy (path, "C:\\Program Files\\" CS_PACKAGE_NAME " " VERSION_STR_DOTTED);
 
   return csStrNew (path);
 }
@@ -263,9 +281,10 @@ csPathsList* csInstallationPathsHelper::GetPlatformInstallationPaths()
   // 1. CRYSTAL environment variable
   // 2. this machine's system registry
   // 3. if current working directory contains 'vfs.cfg' use this dir.
-  // 4. The dir where the app is
-  // 5. A "CrystalSpace" subfolder under the "Program Files" dir.
-  // 6. hard-wired default path
+  // 4. CS_CONFIGPATH if defined and on Cygwin
+  // 5. The dir where the app is
+  // 6. A "CrystalSpace" subfolder under the "Program Files" dir.
+  // 7. hard-wired default path
 
   // try env variable first
   // we check this before we check registry, so that one app can putenv() to
@@ -273,13 +292,14 @@ csPathsList* csInstallationPathsHelper::GetPlatformInstallationPaths()
   // the shared systemwide registry strategy; this is the best approach unless
   // someone implements a SetInstallPath() to override it before Open() is
   // called.
-  const char *envpath = getenv ("CRYSTAL");
+  const char *envpath = getenv ("CRYSTAL_" VERSION_STR);
+  if (!envpath || !*envpath)
+    envpath = getenv ("CRYSTAL");
   if (envpath && *envpath)
   {
     // Multiple paths, split.
     // Note that MSYS converts :-separated paths to ;-separation in Win32 style.
-    return 
-      new csPathsList (csPathsUtilities::ExpandAll (csPathsList (envpath)));
+    return new csPathsList (envpath, true);
   }
 
   csPathsList* paths = new csPathsList;
@@ -297,11 +317,17 @@ csPathsList* csInstallationPathsHelper::GetPlatformInstallationPaths()
 
   // No luck to fetch a config setting. Add in order:
   // - current directory
+  // - CS_CONFIGDIR if defined and on Cygwin
   // - application directory
   // - %ProgramFiles%\CrystalSpace
   // - C:\Program Files\CrystalSpace
 
   paths->AddUniqueExpanded (".");
+#ifdef __CYGWIN__
+#ifdef CS_CONFIGDIR
+  paths->AddUniqueExpanded (CS_CONFIGDIR);
+#endif
+#endif
 
   {
     char apppath[MAX_PATH + 1];
@@ -315,12 +341,13 @@ csPathsList* csInstallationPathsHelper::GetPlatformInstallationPaths()
     csString path;
     if (GetShellFolderPath (CSIDL_PROGRAM_FILES, path))
     {
-      path << CS_PATH_SEPARATOR << CS_PACKAGE_NAME;
+      path << CS_PATH_SEPARATOR << CS_PACKAGE_NAME " " VERSION_STR_DOTTED;
       paths->AddUniqueExpanded (path);
     }
   }
 
-  paths->AddUniqueExpanded ("C:\\Program Files\\" CS_PACKAGE_NAME);
+  paths->AddUniqueExpanded (
+    "C:\\Program Files\\" CS_PACKAGE_NAME " " VERSION_STR_DOTTED);
 
   return paths;
 }

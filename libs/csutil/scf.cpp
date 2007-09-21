@@ -36,7 +36,7 @@
 #include "csutil/parray.h"
 #include "csutil/memfile.h"
 #include "csutil/scfstringarray.h"
-#include "csutil/scopedmutexlock.h"
+#include "csutil/threading/mutex.h"
 #include "csutil/strset.h"
 #include "csutil/util.h"
 #include "csutil/verbosity.h"
@@ -77,10 +77,10 @@ static class csSCF *PrivateSCF = 0;
  * The SCF module loader routines (CreateInstance, RegisterClass, ...)
  * are all thread-safe.
  */
-class csSCF : public iSCF
+class csSCF : public iSCF, public scfImplementation<csSCF>
 {
 private:
-  csRef<csMutex> mutex;
+  mutable CS::Threading::RecursiveMutex mutex;
   unsigned int verbose;
 
   csStringSet contexts;
@@ -101,8 +101,13 @@ private:
 
   friend void scfInitialize (csPathsList const*, unsigned int);
 
+  virtual size_t GetInterfaceMetadataCount () const { return 0;}
+  virtual void FillInterfaceMetadata (size_t n) {;}
+
+  virtual void *QueryInterface (scfInterfaceID iInterfaceID,
+    scfInterfaceVersion iVersion);
+
 public:
-  SCF_DECLARE_IBASE;
 
   /// The global table of all known interface names
   csStringSet InterfaceRegistry;
@@ -172,7 +177,7 @@ public:
 static scfLibraryVector *LibraryRegistry = 0;
 
 /// A object of this class represents a shared library
-class scfSharedLibrary
+class scfSharedLibrary : public CS::Memory::CustomAllocated
 {
   typedef void (*scfInitFunc)(iSCF*);
   typedef void (*scfFinisFunc)();
@@ -289,13 +294,11 @@ int scfLibraryVector::CompareName (scfSharedLibrary* const& Item,
 }
 
 /// This structure contains everything we need to know about a particular class
-class scfFactory : public iFactory
+class scfFactory : public iFactory, public CS::Memory::CustomAllocated
 {
 public:
-  SCF_DECLARE_IBASE;
-
   // Class identifier
-  char *ClassID;
+  const char *ClassID;
   // Class description
   char *Description;
   // The dependency list
@@ -332,6 +335,24 @@ public:
   virtual const char *QueryClassID();
   /// Query library module name.
   virtual const char *QueryModuleName ();
+
+protected:
+  /* SCF goop, this class cannot use scfImplementation1 due to its special 
+    ref-counting usage */
+  int scfRefCount;
+  typedef csArray<void**,
+    csArrayElementHandler<void**>,
+    CS::Memory::AllocatorMalloc,
+    csArrayCapacityLinear<csArrayThresholdFixed<4> > > WeakRefOwnerArray;
+  WeakRefOwnerArray* scfWeakRefOwners;
+
+  virtual void IncRef ();
+  virtual void DecRef ();
+  virtual int GetRefCount ();
+  virtual void AddRefOwner (void** ref_owner);
+  virtual void RemoveRefOwner (void** ref_owner);
+  scfInterfaceMetadataList* GetInterfaceMetadata () { return 0; }
+  virtual void *QueryInterface (scfInterfaceID iInterfaceID, int iVersion);
 };
 
 /// This class holds a number of scfFactory structures
@@ -357,25 +378,37 @@ public:
 
 //----------------------------------------- Class factory implementation ----//
 
+#ifdef CS_REF_TRACKER
+static class csStringHash* classIDs = 0; 
+#endif
+
 scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
   const char *iFactoryClass, scfFactoryFunc iCreate, const char *iDescription,
   const char *iDepend, csStringID context)
 {
   csRefTrackerAccess::SetDescription (this, CS_TYPENAME(*this));
-  // Don't use SCF_CONSTRUCT_IBASE (0) since it will call IncRef()
+  csRefTrackerAccess::TrackConstruction (this);  
   scfWeakRefOwners = 0;
-  scfRefCount = 0; scfParent = 0;
-  ClassID = csStrNew (iClassID);
-  Description = csStrNew (iDescription);
-  Dependencies = csStrNew (iDepend);
-  FactoryClass = csStrNew (iFactoryClass);
+  scfRefCount = 0;
+#ifdef CS_REF_TRACKER
+  /* Reftracker: make sure class ID string survives destruction of this 
+   * instance */
+  ClassID = classIDs->Register (iClassID);
+#else
+  ClassID = CS::StrDup (iClassID);
+#endif
+  Description = CS::StrDup (iDescription);
+  Dependencies = CS::StrDup (iDepend);
+  FactoryClass = CS::StrDup (iFactoryClass);
   CreateFunc = iCreate;
   classContext = context;
   LibraryName =
     iLibraryName ? libraryNames->Request (iLibraryName) : csInvalidStringID;
   Library = 0;
 
-  SCF_INIT_TRACKER_ALIASES
+  csRefTrackerAccess::AddAlias(
+    static_cast<scfInterfaceTraits<iFactory>::InterfaceType*> (this),
+    this);
 }
 
 scfFactory::~scfFactory ()
@@ -387,12 +420,25 @@ scfFactory::~scfFactory ()
       scfRefCount, ClassID);
 #endif
 
+  if (scfWeakRefOwners)
+  {
+    for (size_t i = 0; i < scfWeakRefOwners->GetSize (); i++)
+    {
+      void** p = (*scfWeakRefOwners)[i];
+      *p = 0;
+    }
+    delete scfWeakRefOwners;
+    scfWeakRefOwners = 0;
+  }
+
   if (Library)
     Library->DecRef ();
-  delete [] FactoryClass;
-  delete [] Dependencies;
-  delete [] Description;
-  delete [] ClassID;
+  cs_free (FactoryClass);
+  cs_free (Dependencies);
+  cs_free (Description);
+#ifndef CS_REF_TRACKER
+  cs_free (const_cast<char*> (ClassID));
+#endif
 
   csRefTrackerAccess::TrackDestruction (this, scfRefCount);
 }
@@ -410,15 +456,12 @@ void scfFactory::IncRef ()
 
     if (Library->ok ())
     {
+      csString sym;
+      sym << FactoryClass << "_Create";
+      CreateFunc =
+        (scfFactoryFunc)csGetLibrarySymbol(Library->LibraryHandle, sym);
       if (CreateFunc == 0)
-      {
-        csString sym;
-	sym << FactoryClass << "_Create";
-	CreateFunc =
-	  (scfFactoryFunc)csGetLibrarySymbol(Library->LibraryHandle, sym);
-	if (CreateFunc == 0)
-	  csPrintLibraryError(sym);
-      }
+        csPrintLibraryError(sym);
     }
 
     if (!Library->ok () || CreateFunc == 0)
@@ -458,7 +501,7 @@ void scfFactory::DecRef ()
 void scfFactory::AddRefOwner (void** ref_owner)
 {
   if (!scfWeakRefOwners)						
-    scfWeakRefOwners = new csArray<void**> (0, 4);			
+    scfWeakRefOwners = new WeakRefOwnerArray (0, 4);			
   scfWeakRefOwners->InsertSorted (ref_owner);				
 }
 
@@ -479,7 +522,12 @@ int scfFactory::GetRefCount ()
 
 void *scfFactory::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)
 {
-  SCF_IMPLEMENTS_INTERFACE (iFactory);
+  if (iInterfaceID == scfInterfaceTraits<iFactory>::GetID () &&
+    scfCompatibleVersion (iVersion, scfInterfaceTraits<iFactory>::GetVersion ()))
+  {
+    this->IncRef ();
+    return static_cast<iFactory*> (this);
+  }
   return 0;
 }
 
@@ -491,6 +539,7 @@ iBase *scfFactory::CreateInstance ()
     return 0;
 
   iBase *instance = CreateFunc(this);
+  csRefTrackerAccess::SetDescriptionWeak (instance, ClassID);
 
   // No matter whenever we succeeded or not, decrement the refcount
   DecRef ();
@@ -529,19 +578,32 @@ const char *scfFactory::QueryModuleName ()
 
 //------------------------------------ Implementation of csSCF functions ----//
 
-SCF_IMPLEMENT_IBASE (csSCF);
-  /// @@@ plain IMPL_INTF calls the ref tracker,  problematic
-  SCF_IMPLEMENTS_INTERFACE_COMMON (iSCF, this) 
+void* csSCF::QueryInterface (scfInterfaceID iInterfaceID,
+                             scfInterfaceVersion iVersion)
+{
+  if (iInterfaceID == scfInterfaceTraits<iSCF>::GetID () &&
+    scfCompatibleVersion (iVersion, scfInterfaceTraits<iSCF>::GetVersion ()))
+  {
+    scfObject->IncRef ();
+    return static_cast<iSCF*> (scfObject);
+  }
 #ifdef CS_REF_TRACKER
-    if (refTracker) 
-    { 
-      SCF_IMPLEMENTS_INTERFACE_COMMON (iRefTracker, refTracker); 
+  if (refTracker)
+  {
+    if (iInterfaceID == scfInterfaceTraits<iRefTracker>::GetID () &&
+      scfCompatibleVersion (iVersion, scfInterfaceTraits<iRefTracker>::GetVersion ()))
+    {
+      refTracker->IncRef ();
+      return static_cast<iRefTracker*> (refTracker);
     }
+  }
 #endif
-SCF_IMPLEMENT_IBASE_END
+
+  return scfImplementation<csSCF>::QueryInterface (iInterfaceID, iVersion);
+}
 
 void csSCF::ScanPluginsInt (csPathsList const* pluginPaths,
-			    const char* context)
+                            const char* context)
 {
   if (pluginPaths)
   {
@@ -554,52 +616,52 @@ void csSCF::ScanPluginsInt (csPathsList const* pluginPaths,
       csPathsList::Entry const& pathrec = (*pluginPaths)[i];
       if (IsVerbose(SCF_VERBOSE_PLUGIN_SCAN))
       {
-	char const* x = scannedDirs.Contains(pathrec.path) ? "re-" : "";
-	csPrintfErr("SCF_NOTIFY: %sscanning plugin directory: %s "
-	  "(context `%s'; recursive %s)\n", x, pathrec.path.GetData(),
-	  GetContextName(pathrec.type),
-	  pathrec.scanRecursive ? "yes" : "no");
+        char const* x = scannedDirs.Contains(pathrec.path) ? "re-" : "";
+        csPrintfErr("SCF_NOTIFY: %sscanning plugin directory: %s "
+          "(context `%s'; recursive %s)\n", x, pathrec.path.GetData(),
+          GetContextName(pathrec.type),
+          pathrec.scanRecursive ? "yes" : "no");
       }
 
       if (plugins)
-	plugins->DeleteAll();
+        plugins->Empty();
 
       csRef<iStringArray> messages =
-	csScanPluginDir (pathrec.path, plugins, pathrec.scanRecursive);
+        csScanPluginDir (pathrec.path, plugins, pathrec.scanRecursive);
       scannedDirs.Request(pathrec.path);
 
-      if ((messages != 0) && (messages->Length() > 0))
+      if ((messages != 0) && (messages->GetSize () > 0))
       {
-	csPrintfErr("SCF_WARNING: the following issue(s) arose while "
-	  "scanning '%s':", pathrec.path.GetData());
-	for (j = 0; j < messages->Length(); j++)
-	  csPrintfErr(" %s\n", messages->Get (j));
+        csPrintfErr("SCF_WARNING: the following issue(s) arose while "
+          "scanning '%s':", pathrec.path.GetData());
+        for (j = 0; j < messages->GetSize (); j++)
+          csPrintfErr(" %s\n", messages->Get (j));
       }
 
       csRef<iDocument> metadata;
       csRef<iString> msg;
-      for (j = 0; j < plugins->Length(); j++)
+      for (j = 0; j < plugins->GetSize (); j++)
       {
-	char const* plugin = plugins->Get(j);
-	msg = csGetPluginMetadata (plugin, metadata);
-	if (msg != 0)
-	{
-	  csPrintfErr("SCF_ERROR: metadata retrieval error for %s: %s\n",
-	    plugin, msg->GetData ());
-	}
-	// It is possible for an error or warning message to be generated even
-	// when metadata is also obtained.  Likewise, it is possible for no
-	// metadata to be obtained yet also to have no error message.  The
-	// latter case is indicative of csScanPluginDir() returning "potential"
-	// plugins which turn out to not be Crystal Space plugins after all.
-	// For instance, on Windows, the scan might find a DLL which is not a
-	// Crystal Space DLL; that is, which does not contain embedded
-	// metadata.  This is a valid case, which we simply ignore since it is
-	// legal for non-CS libraries to exist alongside CS plugins in the
-	// scanned directories.
-	if (metadata)
-	  RegisterClasses(plugin, metadata, 
-	    context ? context : pathrec.type.GetData());
+        char const* plugin = plugins->Get(j);
+        msg = csGetPluginMetadata (plugin, metadata);
+        if (msg != 0)
+        {
+          csPrintfErr("SCF_ERROR: metadata retrieval error for %s: %s\n",
+            plugin, msg->GetData ());
+        }
+        // It is possible for an error or warning message to be generated even
+        // when metadata is also obtained.  Likewise, it is possible for no
+        // metadata to be obtained yet also to have no error message.  The
+        // latter case is indicative of csScanPluginDir() returning "potential"
+        // plugins which turn out to not be Crystal Space plugins after all.
+        // For instance, on Windows, the scan might find a DLL which is not a
+        // Crystal Space DLL; that is, which does not contain embedded
+        // metadata.  This is a valid case, which we simply ignore since it is
+        // legal for non-CS libraries to exist alongside CS plugins in the
+        // scanned directories.
+        if (metadata)
+          RegisterClasses(plugin, metadata, 
+          context ? context : pathrec.type.GetData());
       }
     }
   }
@@ -677,7 +739,7 @@ private:
   }
 public:
   ~StaticArrayWrapper() { delete array; }
-  size_t Length() { return array ? array->Length() : 0; }
+  size_t Length() { return array ? array->GetSize () : 0; }
   T& operator [] (size_t n) { return GetArray()[n]; }
   size_t Push (T const& what) { return GetArray().Push (what); }
 };
@@ -711,11 +773,10 @@ void scfRegisterStaticFactoryFunc (scfFactoryFunc func, const char *FactClass)
   staticFactoryFuncs.Push (ff);
 }
 
-csSCF::csSCF (unsigned int v) : verbose(v),
+csSCF::csSCF (unsigned int v) : scfImplementation<csSCF> (this), verbose(v)
 #ifdef CS_REF_TRACKER
-  refTracker(0), 
-#endif
-  scfRefCount(1), scfWeakRefOwners(0), scfParent(0)
+  ,refTracker(0)
+#endif  
 {
   SCF = PrivateSCF = this;
 #if defined(CS_DEBUG) || defined (CS_MEMORY_TRACKER)
@@ -724,6 +785,8 @@ csSCF::csSCF (unsigned int v) : verbose(v),
 
 #ifdef CS_REF_TRACKER
   refTracker = new csRefTracker();
+  if (!classIDs)
+    classIDs = new csStringHash;
 #endif
 
   if (!ClassRegistry)
@@ -734,8 +797,6 @@ csSCF::csSCF (unsigned int v) : verbose(v),
   if (!libraryNames)
     libraryNames = new csStringSet;
 
-  // We need a recursive mutex.
-  mutex = csMutex::Create (true);
 
   staticContextID = contexts.Request (SCF_STATIC_CLASS_CONTEXT);
 
@@ -768,10 +829,10 @@ csSCF::~csSCF ()
   delete libraryNames;
   libraryNames = 0;
 
-  mutex = 0;
 #ifdef CS_REF_TRACKER
   refTracker->Report ();
   delete refTracker;
+  delete classIDs; classIDs = 0;
 #endif
 #ifdef LAZY_UNLOAD
   for (size_t i = 0; i < lazyUnloadLibs.GetSize(); i++)
@@ -886,7 +947,7 @@ void csSCF::Finish ()
 
 iBase *csSCF::CreateInstance (const char *iClassID)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   // Pre-sort class registry for doing binary searches
   if (SortClassRegistry)
@@ -917,8 +978,8 @@ iBase *csSCF::CreateInstance (const char *iClassID)
 
 void csSCF::UnloadUnusedModules ()
 {
-  csScopedMutexLock lock (mutex);
-  for (size_t i = LibraryRegistry->Length (); i > 0; i--)
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
+  for (size_t i = LibraryRegistry->GetSize (); i > 0; i--)
   {
     scfSharedLibrary *sl = (scfSharedLibrary *)LibraryRegistry->Get (i - 1);
     sl->TryUnload ();
@@ -937,7 +998,7 @@ bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
   const char *iFactoryClass, const char *iDesc, const char *Dependencies, 
   const char* context)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   size_t idx;
   csStringID contextID = 
     context ? contexts.Request (context) : csInvalidStringID;
@@ -990,7 +1051,7 @@ bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
 bool csSCF::RegisterClass (scfFactoryFunc Func, const char *iClassID,
   const char *Desc, const char *Dependencies, const char* context)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   size_t idx;
   csStringID contextID = 
     context ? contexts.Request (context) : csInvalidStringID;
@@ -1042,8 +1103,8 @@ bool csSCF::RegisterClass (scfFactoryFunc Func, const char *iClassID,
 bool csSCF::RegisterFactoryFunc (scfFactoryFunc Func, const char *FactClass)
 {
   bool ok = false;
-  csScopedMutexLock lock (mutex);
-  for (size_t i = 0, n = ClassRegistry->Length(); i < n; i++)
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
+  for (size_t i = 0, n = ClassRegistry->GetSize (); i < n; i++)
   {
     scfFactory* fact = (scfFactory*)ClassRegistry->Get(i);
     if (fact->FactoryClass != 0 && strcmp(fact->FactoryClass, FactClass) == 0)
@@ -1067,7 +1128,7 @@ bool csSCF::RegisterFactoryFunc (scfFactoryFunc Func, const char *FactClass)
 
 bool csSCF::UnregisterClass (const char *iClassID)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   // If we have no class registry, we aren't initialized (or were finalized)
   if (!ClassRegistry)
@@ -1111,7 +1172,7 @@ bool csSCF::RegisterPlugin (const char* path)
 
 const char *csSCF::GetClassDescription (const char *iClassID)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   size_t idx = ClassRegistry->FindClass(iClassID);
   if (idx != (size_t)-1)
@@ -1125,7 +1186,7 @@ const char *csSCF::GetClassDescription (const char *iClassID)
 
 const char *csSCF::GetClassDependencies (const char *iClassID)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
 
   size_t idx = ClassRegistry->FindClass(iClassID);
   if (idx != (size_t)-1)
@@ -1140,7 +1201,7 @@ const char *csSCF::GetClassDependencies (const char *iClassID)
 csRef<iDocument> csSCF::GetPluginMetadata (char const *iClassID)
 {
   csRef<iDocument> metadata;
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   size_t idx = ClassRegistry->FindClass(iClassID);
   if (idx != (size_t)-1)
   {
@@ -1153,31 +1214,20 @@ csRef<iDocument> csSCF::GetPluginMetadata (char const *iClassID)
 
 bool csSCF::ClassRegistered (const char *iClassID)
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   return (ClassRegistry->FindClass(iClassID) != csArrayItemNotFound);
 }
 
 
 char const* csSCF::GetInterfaceName (scfInterfaceID i) const
 {
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   return InterfaceRegistry.Request(i);
 }
 
 scfInterfaceID csSCF::GetInterfaceID (const char *iInterface)
 {
-#ifdef CS_REF_TRACKER
-  /*
-    Bit of a hack: when 'mutex' is assigned, this very function
-    is called (to get the iRefTracker id). So mutex is 0 in this
-    case, we need to test for that.
-   */
-  if (!mutex)
-  {
-    return (scfInterfaceID)InterfaceRegistry.Request (iInterface);
-  }
-#endif
-  csScopedMutexLock lock (mutex);
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
   return (scfInterfaceID)InterfaceRegistry.Request (iInterface);
 }
 
@@ -1185,8 +1235,8 @@ csRef<iStringArray> csSCF::QueryClassList (char const* pattern)
 {
   iStringArray* v = new scfStringArray();
 
-  csScopedMutexLock lock (mutex);
-  size_t const rlen = ClassRegistry->Length();
+  CS::Threading::RecursiveMutexScopedLock lock (mutex);
+  size_t const rlen = ClassRegistry->GetSize ();
   if (rlen != 0)
   {
     size_t const plen = (pattern ? strlen(pattern) : 0);

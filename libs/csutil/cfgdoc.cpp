@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "iutil/vfs.h"
+#include "iutil/stringarray.h"
 #include "csutil/cfgdoc.h"
 #include "csutil/physfile.h"
 #include "csutil/util.h"
@@ -30,11 +31,14 @@ class csConfigDocumentIterator : public scfImplementation1<
 	csConfigDocumentIterator, iConfigIterator>
 {
   csRef<csConfigDocument> doc;
-  csHash<csConfigDocument::KeyInfo, csString>::GlobalIterator* iterator;
-  char* subsection;
-  size_t subsectionLen;
+  csHash<csConfigDocument::KeyInfo, csString>::GlobalIterator iterator;
+  csString subsection;
   const csConfigDocument::KeyInfo* currentKey;
+  const csConfigDocument::KeyInfo* nextKey;
   const char* currentKeyName;
+  const char* nextKeyName;
+
+  void FetchNext ();
 public:
 
   csConfigDocumentIterator (csConfigDocument* doc, const char* Subsection);
@@ -45,6 +49,7 @@ public:
 
   virtual void Rewind ();
   virtual bool Next();
+  virtual bool HasNext();
   virtual const char *GetKey (bool Local = false) const;
   virtual int GetInt () const;
   virtual float GetFloat () const;
@@ -56,19 +61,36 @@ public:
 
 
 csConfigDocumentIterator::csConfigDocumentIterator (csConfigDocument* d,
-						    const char* Subsection)
-  : scfImplementationType (this), doc (d), currentKey (0), currentKeyName(0)
+						    const char* Subsection) : 
+  scfImplementationType (this), doc (d), iterator (d->keys.GetIterator()),
+  subsection (Subsection), currentKey (0), nextKey (0), 
+  currentKeyName(0), nextKeyName (0)
 {
-  subsection = csStrNew (Subsection);
-  subsectionLen = subsection ? strlen (subsection) : 0;
-  iterator = new csHash<csConfigDocument::KeyInfo,
-    csString>::GlobalIterator (doc->keys.GetIterator ());
+  FetchNext ();
 }
 
 csConfigDocumentIterator::~csConfigDocumentIterator()
 {
-  delete[] subsection;
-  delete iterator;
+}
+
+void csConfigDocumentIterator::FetchNext ()
+{
+  while (iterator.HasNext ())
+  {
+    const csConfigDocument::KeyInfo* key = &iterator.Next ();
+
+    if ((subsection.IsEmpty()) ||
+      (strncasecmp (key->originalKey, subsection, subsection.Length()) == 0))
+    {
+      if (!key->cachedStringValue) continue;
+
+      nextKey = key;
+      nextKeyName = key->originalKey;
+      return;
+    }
+  }
+  nextKey = 0;
+  nextKeyName = 0;
 }
 
 iConfigFile* csConfigDocumentIterator::GetConfigFile () const
@@ -85,11 +107,13 @@ void csConfigDocumentIterator::Rewind ()
 {
   currentKey = 0;
   currentKeyName = 0;
-  iterator->Reset();
+  iterator.Reset();
+  FetchNext ();
 }
 
 bool csConfigDocumentIterator::Next()
 {
+#if 0
   while (iterator->HasNext ())
   {
     const csConfigDocument::KeyInfo* key = &iterator->Next ();
@@ -105,11 +129,21 @@ bool csConfigDocumentIterator::Next()
     }
   }
   return false;
+#endif
+  currentKey = nextKey;
+  currentKeyName = nextKeyName;
+  FetchNext ();
+  return currentKey != 0;
+}
+
+bool csConfigDocumentIterator::HasNext()
+{
+  return nextKey != 0;
 }
 
 const char* csConfigDocumentIterator::GetKey (bool Local) const
 {
-  return ((const char*)currentKeyName) + (Local ? subsectionLen : 0);
+  return ((const char*)currentKeyName) + (Local ? subsection.Length() : 0);
 }
 
 int csConfigDocumentIterator::GetInt () const
@@ -170,7 +204,7 @@ csConfigDocument::csConfigDocument ()
 csConfigDocument::csConfigDocument (const char *Filename, iVFS* vfs)
   : scfImplementationType (this), filename(0), fileVFS(vfs)
 {
-  filename = csStrNew (Filename);
+  filename = CS::StrDup (Filename);
   csRef<iFile> file;
   if (vfs)
     file = vfs->Open (Filename, VFS_FILE_READ);
@@ -200,7 +234,7 @@ csConfigDocument::csConfigDocument (iDocumentNode* node)
 
 csConfigDocument::~csConfigDocument()
 {
-  delete[] filename;
+  cs_free (filename);
 }
 
 void csConfigDocument::ParseDocument (iDocument* doc, bool Merge, bool NewWins)
@@ -241,10 +275,10 @@ void csConfigDocument::ParseNode (const char* parent, iDocumentNode* node,
       KeyInfo newInfo;
       newInfo.node = child;
       newInfo.comment = lastComment;
-      newInfo.cachedStringValue = csStrNew (child->GetContentsValue ());
-      newInfo.cachedComment = lastComment ? csStrNew (
+      newInfo.cachedStringValue = CS::StrDup (child->GetContentsValue ());
+      newInfo.cachedComment = lastComment ? CS::StrDup (
 	lastComment->GetContentsValue ()) : 0;
-      newInfo.originalKey = csStrNew (fullKey);
+      newInfo.originalKey = CS::StrDup (fullKey);
       keys.PutUnique ((const char*)downKey, newInfo);
       lastComment = 0;
     }
@@ -372,7 +406,7 @@ bool csConfigDocument::GetBool (const char *Key, bool Def) const
      strcasecmp(val, "1"   ) == 0);
 }
 
-csPtr<iStringArray> csConfigDocument::GetTuple (const char *Key) const
+csPtr<iStringArray> csConfigDocument::GetTuple (const char * /*Key*/) const
 {
   return 0;
 }

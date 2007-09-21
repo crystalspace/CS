@@ -26,6 +26,9 @@
 #include "xriface.h"
 #include "xrpriv.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(XMLRead)
+{
+
 struct csXmlReadDocWrapper :
   public scfImplementation1<csXmlReadDocWrapper, iDocument>
 {
@@ -78,7 +81,7 @@ csRef<iDocumentNode> csXmlReadDocWrapper::GetRoot ()
 
 const char* csXmlReadDocWrapper::Parse (iFile* file, bool collapse)
 {
-  char *buf = new char[file->GetSize()+1];
+  char *buf = (char*)cs_malloc (file->GetSize()+1);
   file->Read (buf, file->GetSize());
   buf[file->GetSize ()] = 0;
   const char *ret = ParseInPlace (buf, collapse);
@@ -122,7 +125,7 @@ const char* csXmlReadDocWrapper::ParseInPlace (char* buf, bool collapse)
   }
   else
   {
-    delete[] buf;
+    cs_free (buf);
     return "Data does not seem to be XML.";
   }
 }
@@ -189,6 +192,9 @@ csRef<iDocument> csXmlReadXMLPlugin::CreateDocument ()
   return csPtr<iDocument> (new csXmlReadDocWrapper(xmlread->CreateDocument()));
 }
 
-CS_IMPLEMENT_PLUGIN
-
 SCF_IMPLEMENT_FACTORY (csXmlReadXMLPlugin)
+
+}
+CS_PLUGIN_NAMESPACE_END(XMLRead)
+
+CS_IMPLEMENT_PLUGIN

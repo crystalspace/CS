@@ -28,7 +28,7 @@
 #include "csgfx/shadervarcontext.h"
 #include "cstool/rendermeshholder.h"
 #include "cstool/userrndbuf.h"
-#include "csutil/cscolor.h"
+#include "csutil/cscolor.h" 
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/flags.h"
 #include "csutil/hash.h"
@@ -40,13 +40,13 @@
 #include "iengine/light.h"
 #include "iengine/lightmgr.h"
 #include "iengine/shadcast.h"
-#include "igeom/polymesh.h"
 #include "imesh/genmesh.h"
 #include "imesh/lighting.h"
 #include "imesh/object.h"
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
 #include "iutil/virtclk.h"
+#include "iutil/strset.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/rendermesh.h"
 #include "ivideo/rndbuf.h"
@@ -56,7 +56,6 @@
 class csBSPTree;
 class csColor;
 class csColor4;
-class csPolygonMesh;
 struct iCacheManager;
 struct iEngine;
 struct iMaterialWrapper;
@@ -125,9 +124,8 @@ public:
 
   void ReplaceVariable (csShaderVariable *variable) { }
   void Clear () { }
+  bool RemoveVariable  (csShaderVariable *) { return false; }
 };
-
-#include "csutil/win32/msvc_deprecated_warn_off.h"
 
 /**
  * Genmesh version of mesh object.
@@ -140,11 +138,13 @@ class csGenmeshMeshObject : public scfImplementation5<csGenmeshMeshObject,
 						      iGeneralMeshState>
 {
 private:
+
   csRenderMeshHolder rmHolder;
   csRef<csShaderVariableContext> svcontext;
   csRef<csRenderBufferHolder> bufferHolder;
   csWeakRef<iGraphics3D> g3d;
   bool mesh_colors_dirty_flag;
+  bool mesh_user_rb_dirty_flag;
 
   uint buffers_version;
   csRef<iRenderBuffer> sorted_index_buffer;	// Only if factory back2front
@@ -155,6 +155,8 @@ private:
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
   csRef<iRenderBuffer> normal_buffer;
+
+  size_t factory_user_rb_state;
 
   csRef<iRenderBuffer> color_buffer;
   iMovable* lighting_movable;
@@ -277,7 +279,6 @@ public:
   bool IsLighting () const { return do_lighting; }
   void SetManualColors (bool m) { do_manual_colors = m; }
   bool IsManualColors () const { return do_manual_colors; }
-  void GetObjectBoundingBox (csBox3& bbox);
   const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent);
@@ -286,13 +287,6 @@ public:
   void SetShadowReceiving (bool m) { do_shadow_rec = m; }
   bool IsShadowReceiving () const { return do_shadow_rec; }
   iGeneralMeshSubMesh* FindSubMesh (const char* name) const; 
-  void AddSubMesh (unsigned int *triangles, int tricount, 
-    iMaterialWrapper *material, uint mixmode);
-  void AddSubMesh (unsigned int *triangles, int tricount, 
-    iMaterialWrapper *material)
-  {
-    AddSubMesh (triangles, tricount, material, (uint)~0);
-  }
   /** @} */
 
   iVirtualClock* vc;
@@ -387,6 +381,9 @@ public:
    * does nothing.
    */
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
+
+  virtual void BuildDecal(const csVector3* pos, float decalRadius,
+          iDecalBuilder* decalBuilder);
   /** @} */
 
   class RenderBufferAccessor : 
@@ -444,12 +441,11 @@ class csGenmeshMeshObjectFactory :
                                iMeshObjectFactory,
                                iGeneralFactoryState>
 {
-private:
+public:
   csRef<iMaterialWrapper> material;
   csDirtyAccessArray<csVector3> mesh_vertices;
   csDirtyAccessArray<csVector2> mesh_texels;
   csDirtyAccessArray<csVector3> mesh_normals;
-  csDirtyAccessArray<csColor4> mesh_colors;
 
   bool autonormals;
   bool autonormals_compress;
@@ -487,6 +483,8 @@ private:
   bool default_shadowcasting;
   bool default_shadowreceiving;
 
+  size_t user_buffer_change;
+
   float radius;
   csBox3 object_bbox;
   bool object_bbox_valid;
@@ -501,8 +499,6 @@ private:
     return anim_ctrl_fact;
   }
 
-  csMeshedPolygon* polygons;
-
   /// Calculate bounding box and radius.
   void CalculateBBoxRadius ();
 
@@ -510,7 +506,8 @@ private:
    * Setup this factory. This function will check if setup is needed.
    */
   void SetupFactory ();
-
+private:
+  csDirtyAccessArray<csColor4> mesh_colors;
 public:
   CS_LEAKGUARD_DECLARE (csGenmeshMeshObjectFactory);
 
@@ -554,7 +551,7 @@ public:
       const csVector2& uv, const csVector3& normal,
       const csColor4& color);
   void SetVertexCount (int n);
-  int GetVertexCount () const { return (int)mesh_vertices.Length (); }
+  int GetVertexCount () const { return (int)mesh_vertices.GetSize (); }
   csVector3* GetVertices ()
   {
     SetupFactory ();
@@ -570,16 +567,25 @@ public:
     SetupFactory ();
     return mesh_normals.GetArray ();
   }
+  csColor4* GetColors (bool ensureValid)
+  {
+    if (ensureValid && (mesh_colors.GetSize() == 0))
+    {
+      mesh_colors.SetCapacity (mesh_vertices.GetSize());
+      mesh_colors.SetSize (mesh_vertices.GetSize(), csColor4 (0, 0, 0, 1));
+    }
+    return mesh_colors.GetArray();
+  }
   csColor4* GetColors ()
   {
     SetupFactory ();
-    return mesh_colors.GetArray ();
+    return GetColors (true);
   }
 
   void AddTriangle (const csTriangle& tri);
   void SetTriangleCount (int n);
 
-  int GetTriangleCount () const { return (int)mesh_triangles.Length (); }
+  int GetTriangleCount () const { return (int)mesh_triangles.GetSize (); }
   csTriangle* GetTriangles ()
   {
     SetupFactory ();
@@ -588,8 +594,11 @@ public:
 
   void Invalidate ();
   void CalculateNormals (bool compress);
+  void DisableAutoNormals ()
+  { autonormals = false; }
   void Compress ();
   void GenerateBox (const csBox3& box);
+  void GenerateCapsule (float l, float r, uint sides);
   void GenerateSphere (const csEllipsoid& ellips, int rim_vertices,
       	bool cyl_mapping = false, bool toponly = false,
 	bool reversed = false);
@@ -650,10 +659,6 @@ public:
 
   /**\name iObjectModel implementation
    * @{ */
-  virtual void GetObjectBoundingBox (csBox3& bbox)
-  {
-    bbox = GetObjectBoundingBox ();
-  }
   virtual const csBox3& GetObjectBoundingBox ();
   virtual void GetRadius (float& rad, csVector3& cent)
   {
@@ -661,11 +666,6 @@ public:
     cent = object_bbox.GetCenter ();
   }
   /** @} */
-
-  /**
-   * Calculate polygons for iPolygonMesh.
-   */
-  csMeshedPolygon* GetPolygons ();
 
   void SetMixMode (uint mode)
   {
@@ -735,40 +735,6 @@ public:
   { return logparent; }
   virtual iMeshObjectType* GetMeshObjectType () const; 
 
-  //------------------ iPolygonMesh interface implementation ----------------//
-  struct PolyMesh : public scfImplementation1<PolyMesh, iPolygonMesh>
-  {
-  private:
-    csGenmeshMeshObjectFactory* factory;
-    csFlags flags;
-  public:
-    //SCF_DECLARE_IBASE;
-
-    void SetFactory (csGenmeshMeshObjectFactory* Factory)
-    { factory = Factory; }
-
-    virtual int GetVertexCount ();
-    virtual csVector3* GetVertices ();
-    virtual int GetPolygonCount ();
-    virtual csMeshedPolygon* GetPolygons ();
-    virtual int GetTriangleCount ();
-    virtual csTriangle* GetTriangles ();
-    virtual void Lock () { }
-    virtual void Unlock () { }
-    
-    virtual csFlags& GetFlags () { return flags;  }
-    virtual uint32 GetChangeNumber() const { return 0; }
-
-    PolyMesh () : scfImplementationType (this)
-    {
-      flags.Set (CS_POLYMESH_TRIANGLEMESH);
-    }
-    virtual ~PolyMesh ()
-    {
-    }
-  };
-  csRef<iPolygonMesh> polygonMesh;
-  friend struct PolyMesh;
   enum { Standard, Submeshes } polyMeshType;
 
   void SetPolyMeshStandard ();
@@ -828,8 +794,6 @@ public:
   void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
-
 /**
  * Genmesh type. This is the plugin you have to use to create instances
  * of csGenmeshMeshObjectFactory.
@@ -844,6 +808,7 @@ public:
   bool do_verbose;
   MergedSVContext::Pool mergedSVContextPool;
   csStringHash submeshNamePool;
+  csStringID base_id;
 
   /// Constructor.
   csGenmeshMeshObjectType (iBase*);

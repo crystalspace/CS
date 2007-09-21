@@ -10977,6 +10977,112 @@ typedef GLvoid (csAPIENTRY* csGLBLENDEQUATIONSEPARATEEXT) (GLenum modeRGB, GLenu
  * @{ */
 
 /** @} */
+/**\name GL_ARB_texture_float constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/texture_float.txt">http://www.opengl.org/registry/specs/ARB/texture_float.txt</a>.
+ * @{ */
+#ifndef GL_TEXTURE_RED_TYPE_ARB
+#define GL_TEXTURE_RED_TYPE_ARB                                      0x8C10
+#endif
+
+#ifndef GL_TEXTURE_GREEN_TYPE_ARB
+#define GL_TEXTURE_GREEN_TYPE_ARB                                    0x8C11
+#endif
+
+#ifndef GL_TEXTURE_BLUE_TYPE_ARB
+#define GL_TEXTURE_BLUE_TYPE_ARB                                     0x8C12
+#endif
+
+#ifndef GL_TEXTURE_ALPHA_TYPE_ARB
+#define GL_TEXTURE_ALPHA_TYPE_ARB                                    0x8C13
+#endif
+
+#ifndef GL_TEXTURE_LUMINANCE_TYPE_ARB
+#define GL_TEXTURE_LUMINANCE_TYPE_ARB                                0x8C14
+#endif
+
+#ifndef GL_TEXTURE_INTENSITY_TYPE_ARB
+#define GL_TEXTURE_INTENSITY_TYPE_ARB                                0x8C15
+#endif
+
+#ifndef GL_TEXTURE_DEPTH_TYPE_ARB
+#define GL_TEXTURE_DEPTH_TYPE_ARB                                    0x8C16
+#endif
+
+#ifndef GL_UNSIGNED_NORMALIZED_ARB
+#define GL_UNSIGNED_NORMALIZED_ARB                                   0x8C17
+#endif
+
+#ifndef GL_RGBA32F_ARB
+#define GL_RGBA32F_ARB                                               0x8814
+#endif
+
+#ifndef GL_RGB32F_ARB
+#define GL_RGB32F_ARB                                                0x8815
+#endif
+
+#ifndef GL_ALPHA32F_ARB
+#define GL_ALPHA32F_ARB                                              0x8816
+#endif
+
+#ifndef GL_INTENSITY32F_ARB
+#define GL_INTENSITY32F_ARB                                          0x8817
+#endif
+
+#ifndef GL_LUMINANCE32F_ARB
+#define GL_LUMINANCE32F_ARB                                          0x8818
+#endif
+
+#ifndef GL_LUMINANCE_ALPHA32F_ARB
+#define GL_LUMINANCE_ALPHA32F_ARB                                    0x8819
+#endif
+
+#ifndef GL_RGBA16F_ARB
+#define GL_RGBA16F_ARB                                               0x881A
+#endif
+
+#ifndef GL_RGB16F_ARB
+#define GL_RGB16F_ARB                                                0x881B
+#endif
+
+#ifndef GL_ALPHA16F_ARB
+#define GL_ALPHA16F_ARB                                              0x881C
+#endif
+
+#ifndef GL_INTENSITY16F_ARB
+#define GL_INTENSITY16F_ARB                                          0x881D
+#endif
+
+#ifndef GL_LUMINANCE16F_ARB
+#define GL_LUMINANCE16F_ARB                                          0x881E
+#endif
+
+#ifndef GL_LUMINANCE_ALPHA16F_ARB
+#define GL_LUMINANCE_ALPHA16F_ARB                                    0x881F
+#endif
+
+
+/** @} */
+
+/**\name GL_ARB_texture_float functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/texture_float.txt">http://www.opengl.org/registry/specs/ARB/texture_float.txt</a>.
+ * @{ */
+
+/** @} */
+/**\name GL_ARB_half_float_pixel constants
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/half_float_pixel.txt">http://www.opengl.org/registry/specs/ARB/half_float_pixel.txt</a>.
+ * @{ */
+#ifndef GL_HALF_FLOAT_ARB
+#define GL_HALF_FLOAT_ARB                                            0x140B
+#endif
+
+
+/** @} */
+
+/**\name GL_ARB_half_float_pixel functions
+ * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/half_float_pixel.txt">http://www.opengl.org/registry/specs/ARB/half_float_pixel.txt</a>.
+ * @{ */
+
+/** @} */
 
 
 // end of definitions
@@ -16717,6 +16823,16 @@ public:
    * @{ */
 
   /** @} */
+  /**\name GL_ARB_texture_float functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/texture_float.txt">http://www.opengl.org/registry/specs/ARB/texture_float.txt</a>.
+   * @{ */
+
+  /** @} */
+  /**\name GL_ARB_half_float_pixel functions
+   * For a description of what this ext does, see <a href="http://www.opengl.org/registry/specs/ARB/half_float_pixel.txt">http://www.opengl.org/registry/specs/ARB/half_float_pixel.txt</a>.
+   * @{ */
+
+  /** @} */
 
 // end of functions
 };
@@ -17232,6 +17348,12 @@ public:
   /** Whether the <a href="http://www.opengl.org/registry/specs/EXT/packed_depth_stencil.txt">GL_EXT_packed_depth_stencil</a> extension was found. 
    * Set by csGLExtensionManager::InitGL_EXT_packed_depth_stencil(). */
   bool CS_GL_EXT_packed_depth_stencil;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/texture_float.txt">GL_ARB_texture_float</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_texture_float(). */
+  bool CS_GL_ARB_texture_float;
+  /** Whether the <a href="http://www.opengl.org/registry/specs/ARB/half_float_pixel.txt">GL_ARB_half_float_pixel</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_ARB_half_float_pixel(). */
+  bool CS_GL_ARB_half_float_pixel;
 
 protected:
   bool tested_CS_GL_version_1_2;
@@ -17405,6 +17527,8 @@ protected:
   bool tested_CS_GL_EXT_blend_equation_separate;
   bool tested_CS_GL_EXT_texture_sRGB;
   bool tested_CS_GL_EXT_packed_depth_stencil;
+  bool tested_CS_GL_ARB_texture_float;
+  bool tested_CS_GL_ARB_half_float_pixel;
 
 };
 
@@ -23580,6 +23704,64 @@ public:
     {
 
       EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_packed_depth_stencil)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/texture_float.txt">GL_ARB_texture_float</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_texture_float. */
+  void InitGL_ARB_texture_float ()
+  {
+    if (tested_CS_GL_ARB_texture_float) return;
+    if (!extstrGL) return;
+    tested_CS_GL_ARB_texture_float = true;
+    const char* ext = "GL_ARB_texture_float";
+
+    char cfgkey[26 + 20 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_texture_float = (strstr (extstrGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_texture_float;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_texture_float)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://www.opengl.org/registry/specs/ARB/half_float_pixel.txt">GL_ARB_half_float_pixel</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_ARB_half_float_pixel. */
+  void InitGL_ARB_half_float_pixel ()
+  {
+    if (tested_CS_GL_ARB_half_float_pixel) return;
+    if (!extstrGL) return;
+    tested_CS_GL_ARB_half_float_pixel = true;
+    const char* ext = "GL_ARB_half_float_pixel";
+
+    char cfgkey[26 + 23 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_ARB_half_float_pixel = (strstr (extstrGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_ARB_half_float_pixel;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_half_float_pixel)
     }
     else
     {

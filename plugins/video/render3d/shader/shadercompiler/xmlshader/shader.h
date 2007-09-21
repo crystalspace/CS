@@ -22,15 +22,16 @@
 
 #include "iutil/selfdestruct.h"
 #include "ivideo/shader/shader.h"
+#include "imap/ldrctxt.h"
 
 #include "csutil/bitarray.h"
 #include "csutil/csobject.h"
 #include "csutil/dirtyaccessarray.h"
 
-#include "condition.h"
-#include "docwrap.h"
+#include "cpi/condition.h"
+#include "cpi/docwrap.h"
 #include "shadertech.h"
-#include "mybitarray.h"
+#include "cpi/mybitarray.h"
 
 CS_PLUGIN_NAMESPACE_BEGIN(XMLShader)
 {
@@ -83,7 +84,7 @@ class csShaderConditionResolver : public iConditionResolver
   size_t nextVariant;
   csHash<size_t, MyBitArrayTemp, TempHeapAlloc> variantIDs;
 
-  const csRenderMeshModes* modes;
+  const CS::Graphics::RenderMeshModes* modes;
   const iShaderVarStack* stacks;
 
   csString lastError;
@@ -113,7 +114,7 @@ public:
 
   void ResetEvaluationCache() { evaluator.ResetEvaluationCache(); }
 
-  void SetEvalParams (const csRenderMeshModes* modes,
+  void SetEvalParams (const CS::Graphics::RenderMeshModes* modes,
     const iShaderVarStack* stacks);
   size_t GetVariant ();
   size_t GetVariantCount () const
@@ -132,6 +133,9 @@ class csXMLShader : public scfImplementationExt2<csXMLShader,
   char* vfsStartDir;
   int forcepriority;
   csHash<csRef<iDocumentNode>, csString> programSources;
+
+  // We need a reference to the loader context for delayed loading.
+  csRef<iLoaderContext> ldr_context;
 
   // struct to hold all techniques, until we decide which to use
   struct TechniqueKeeper
@@ -185,7 +189,7 @@ class csXMLShader : public scfImplementationExt2<csXMLShader,
   bool useFallbackContext;
 
   csShaderVariableContext globalSVContext;
-  void ParseGlobalSVs (iDocumentNode* node);
+  void ParseGlobalSVs (iLoaderContext* ldr_context, iDocumentNode* node);
 
   csShaderVariableContext& GetUsedSVContext ()
   {
@@ -198,8 +202,9 @@ class csXMLShader : public scfImplementationExt2<csXMLShader,
 public:
   CS_LEAKGUARD_DECLARE (csXMLShader);
 
-  csXMLShader (csXMLShaderCompiler* compiler, iDocumentNode* source,
-    int forcepriority);
+  csXMLShader (csXMLShaderCompiler* compiler,
+      iLoaderContext* ldr_context, iDocumentNode* source,
+      int forcepriority);
   virtual ~csXMLShader();
 
   virtual iObject* QueryObject () 
@@ -211,10 +216,10 @@ public:
 
   /// Set name of the File where it was loaded from.
   void SetFileName (const char* filename)
-  { this->filename = csStrNew(filename); }
+  { this->filename = CS::StrDup(filename); }
 
-  virtual size_t GetTicket (const csRenderMeshModes& modes,
-    const iShaderVarStack* stacks);
+  virtual size_t GetTicket (const CS::Graphics::RenderMeshModes& modes,
+      const iShaderVarStack* stacks);
 
   /// Get number of passes this shader have
   virtual size_t GetNumberOfPasses (size_t ticket)
@@ -230,8 +235,8 @@ public:
   virtual bool ActivatePass (size_t ticket, size_t number);
 
   /// Setup a pass.
-  virtual bool SetupPass (size_t ticket, const csRenderMesh *mesh,
-    csRenderMeshModes& modes,
+  virtual bool SetupPass (size_t ticket, const CS::Graphics::RenderMesh *mesh,
+    CS::Graphics::RenderMeshModes& modes,
     const iShaderVarStack* stacks)
   { 
     if (IsFallbackTicket (ticket))
@@ -334,22 +339,34 @@ public:
   void ReplaceVariable (csShaderVariable *variable)
   { 
     if (useFallbackContext)
+    {
       fallbackShader->ReplaceVariable (variable);
+      return;
+    }
     GetUsedSVContext().ReplaceVariable (variable);
   }
   void Clear ()
   { 
     if (useFallbackContext)
+    {
       fallbackShader->Clear();
+      return;
+    }
     GetUsedSVContext().Clear();
+  }
+  bool RemoveVariable (csShaderVariable* variable)
+  {
+    if (useFallbackContext)
+      return fallbackShader->RemoveVariable (variable);
+    return GetUsedSVContext().RemoveVariable (variable);
   }
   /** @} */
 
   /// Set object description
   void SetDescription (const char *desc)
   {
-    delete [] allShaderMeta.description;
-    allShaderMeta.description = csStrNew (desc);
+    cs_free (allShaderMeta.description);
+    allShaderMeta.description = CS::StrDup (desc);
   }
 
   /// Return some info on this shader

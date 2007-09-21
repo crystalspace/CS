@@ -67,9 +67,10 @@ bool Maze::IsSpaceFree (const RoomCoordinate& rc) const
   return !occupied[rc.x][rc.y][rc.z];
 }
 
-bool Maze::CreateWallOrPortal (iThingFactoryState* factory_state,
+bool Maze::CreateWallOrPortal (iGeneralFactoryState* factory_state,
   	const csVector3& v1, const csVector3& v2,
   	const csVector3& v3, const csVector3& v4,
+	CS::Geometry::TextureMapper* mapper,
 	bool do_portal,
 	const RoomCoordinate& source,
 	const RoomCoordinate& dest)
@@ -92,7 +93,10 @@ bool Maze::CreateWallOrPortal (iThingFactoryState* factory_state,
   }
   else
   {
-    factory_state->AddQuad (v1, v2, v3, v4);
+    CS::Geometry::TesselatedQuad quad (v1, v2, v4);
+    quad.SetLevel (5);
+    quad.SetMapper (mapper);
+    quad.Append (factory_state);
   }
   return true;
 }
@@ -101,15 +105,24 @@ bool Maze::CreateRoom (iMaterialWrapper* wall_material,
 	int x, int y, int z, char* portals)
 {
   iSector* room = GetSector (x, y, z);
-  csRef<iMeshWrapper> walls = app->GetEngine ()
-  	->CreateSectorWallsMesh (room, "walls");
+
+  using namespace CS::Geometry;
+  csRef<iMeshFactoryWrapper> walls_factory = GeneralMeshBuilder::
+    CreateFactory (app->GetEngine (), "walls_factory");
+  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateMesh (
+      app->GetEngine (), room, "walls", walls_factory);
   if (!walls)
     return app->ReportError ("Couldn't create the walls for the room!");
 
-  csRef<iThingState> object_state = scfQueryInterface<iThingState> (
-  	walls->GetMeshObject ());
-  csRef<iThingFactoryState> factory_state = scfQueryInterface<
-  	iThingFactoryState> (walls->GetMeshObject ()->GetFactory ());
+  csRef<iGeneralMeshState> object_state = scfQueryInterface<
+    iGeneralMeshState> (walls->GetMeshObject ());
+  object_state->SetShadowReceiving (true);
+  walls->GetMeshObject ()->SetMaterialWrapper (wall_material);
+  csRef<iGeneralFactoryState> factory_state = scfQueryInterface<
+    iGeneralFactoryState> (walls_factory->GetMeshObjectFactory ());
+
+  DensityTextureMapper mapper (.3);
+
   float sx = float (x) * ROOM_DIMENSION;
   float sy = float (y) * ROOM_DIMENSION;
   float sz = float (z) * ROOM_DIMENSION;
@@ -124,6 +137,7 @@ bool Maze::CreateRoom (iMaterialWrapper* wall_material,
     	box.GetCorner (CS_BOX_CORNER_XYz),
     	box.GetCorner (CS_BOX_CORNER_XYZ),
     	box.GetCorner (CS_BOX_CORNER_xYZ),
+	&mapper,
 	portals[PORTAL_UP] == '#',
 	start_rc, RoomCoordinate (x+0, y+1, z+0)))
     return false;
@@ -132,6 +146,7 @@ bool Maze::CreateRoom (iMaterialWrapper* wall_material,
     	box.GetCorner (CS_BOX_CORNER_XyZ),
     	box.GetCorner (CS_BOX_CORNER_Xyz),
     	box.GetCorner (CS_BOX_CORNER_xyz),
+	&mapper,
 	portals[PORTAL_DOWN] == '#',
 	start_rc, RoomCoordinate (x+0, y-1, z+0)))
     return false;
@@ -140,6 +155,7 @@ bool Maze::CreateRoom (iMaterialWrapper* wall_material,
     	box.GetCorner (CS_BOX_CORNER_xyZ),
     	box.GetCorner (CS_BOX_CORNER_xYZ),
     	box.GetCorner (CS_BOX_CORNER_XYZ),
+	&mapper,
 	portals[PORTAL_FRONT] == '#',
 	start_rc, RoomCoordinate (x+0, y+0, z+1)))
     return false;
@@ -148,6 +164,7 @@ bool Maze::CreateRoom (iMaterialWrapper* wall_material,
     	box.GetCorner (CS_BOX_CORNER_Xyz),
     	box.GetCorner (CS_BOX_CORNER_XYz),
     	box.GetCorner (CS_BOX_CORNER_xYz),
+	&mapper,
 	portals[PORTAL_BACK] == '#',
 	start_rc, RoomCoordinate (x+0, y+0, z-1)))
     return false;
@@ -156,6 +173,7 @@ bool Maze::CreateRoom (iMaterialWrapper* wall_material,
     	box.GetCorner (CS_BOX_CORNER_xyz),
     	box.GetCorner (CS_BOX_CORNER_xYz),
     	box.GetCorner (CS_BOX_CORNER_xYZ),
+	&mapper,
 	portals[PORTAL_LEFT] == '#',
 	start_rc, RoomCoordinate (x-1, y+0, z+0)))
     return false;
@@ -164,12 +182,10 @@ bool Maze::CreateRoom (iMaterialWrapper* wall_material,
     	box.GetCorner (CS_BOX_CORNER_XyZ),
     	box.GetCorner (CS_BOX_CORNER_XYZ),
     	box.GetCorner (CS_BOX_CORNER_XYz),
+	&mapper,
 	portals[PORTAL_RIGHT] == '#',
 	start_rc, RoomCoordinate (x+1, y+0, z+0)))
     return false;
-
-  factory_state->SetPolygonMaterial (CS_POLYRANGE_ALL, wall_material);
-  factory_state->SetPolygonTextureMapping (CS_POLYRANGE_ALL, rd);
 
   return true;
 }
@@ -266,7 +282,7 @@ Player::Player (AppMazing* app)
 bool Player::InitCollisionDetection ()
 {
   float ps = PLAYER_SIZE / 2.0;
-  csPolygonMeshBox* box = new csPolygonMeshBox (csBox3 (
+  csTriangleMeshBox* box = new csTriangleMeshBox (csBox3 (
   	csVector3 (-ps, -ps, -ps), csVector3 (ps, ps, ps)));
   player_collider = app->GetCollisionDetectionSystem ()
   	->CreateCollider (box);
@@ -408,7 +424,7 @@ void Adversary::ThinkAndMove (float elapsed_seconds)
     Maze* maze = app->GetGame ().GetMaze ();
     const csArray<RoomCoordinate>& connections = maze->GetConnections (
 	current_location);
-    size_t moveto = (rand () >> 3) % connections.Length ();
+    size_t moveto = (rand () >> 3) % connections.GetSize ();
     if (maze->IsSpaceFree (connections[moveto]))
     {
       start.x = float (current_location.x) * ROOM_DIMENSION;
@@ -563,8 +579,9 @@ bool Game::CreateFactories ()
   fstate->SetColor (csColor (1.0, 1.0, 1.0));
   // We don't want to hit the player against the laserbeam when it is
   // visible so we disable the collision detection mesh here.
+  csStringID colldet_id = app->GetStrings ()->Request ("colldet");
   laserbeam_factory->GetMeshObjectFactory ()->GetObjectModel ()
-  	->SetPolygonMeshColldet (0);
+  	->SetTriangleData (colldet_id, 0);
 
   if (!loader->LoadTexture ("laserbeam_texture", "/lib/stdtex/blobby.jpg"))
     return app->ReportError ("Error loading 'blobby' texture!");
@@ -698,7 +715,7 @@ void Game::StartExplosion (iSector* sector, const csVector3& pos)
 void Game::HandleExplosions (csTicks elapsed_ticks)
 {
   size_t i = 0;
-  while (i < explosions.Length ())
+  while (i < explosions.GetSize ())
   {
     if (explosions[i].Handle (elapsed_ticks)) i++;
     else
@@ -724,7 +741,7 @@ void Game::Handle (csTicks elapsed_ticks)
 
   // Let all the adversaries think about what to do.
   size_t i;
-  for (i = 0 ; i < adversaries.Length () ; i++)
+  for (i = 0 ; i < adversaries.GetSize () ; i++)
     adversaries[i]->ThinkAndMove (elapsed_seconds);
 }
 

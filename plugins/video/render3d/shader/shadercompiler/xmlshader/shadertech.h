@@ -136,7 +136,7 @@ private:
   CS_DECLARE_STATIC_CLASSVAR_REF(instOuterVar, GetInstOuterVars,
     csArray<csShaderVariable*>);
 
-  void SetupInstances (csRenderMeshModes& modes, shaderPass *thispass,
+  void SetupInstances (CS::Graphics::RenderMeshModes& modes, shaderPass *thispass,
     const iShaderVarStack* stacks);
 
   // Parse a vertex attribute specifier
@@ -161,13 +161,14 @@ public:
   size_t GetNumberOfPasses()
   { return passesCount; }
   bool ActivatePass (size_t number);
-  bool SetupPass  (const csRenderMesh *mesh,
-    csRenderMeshModes& modes,
+  bool SetupPass  (const CS::Graphics::RenderMesh *mesh,
+    CS::Graphics::RenderMeshModes& modes,
     const iShaderVarStack* stacks);
   bool TeardownPass();
   bool DeactivatePass();
 
-  bool Load (iDocumentNode* node, iDocumentNode* parentSV, size_t variant);
+  bool Load (iLoaderContext* ldr_context, iDocumentNode* node,
+      iDocumentNode* parentSV, size_t variant);
 
   const char* GetFailReason()
   { return fail_reason.GetData(); }

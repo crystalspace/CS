@@ -19,6 +19,7 @@
 	virtual void *QueryInterface (scfInterfaceID iInterfaceID, int iVersion);
 	virtual void AddRefOwner (void** ref_owner);
 	virtual void RemoveRefOwner (void** ref_owner);
+        scfInterfaceMetadataList* GetInterfaceMetadata ();
 %enddef
 
 template <class T,class K> class scfImplementation1 : public K
@@ -30,16 +31,18 @@ template <class T,class K> class scfImplementationExt0 : public K
 {
 	SWIG_SCF_IMPL(scfImplementationExt0)
 };
+template <class T,class K,class J> class scfImplementationExt1 : public K
+{
+	SWIG_SCF_IMPL(scfImplementationExt1)
+	protected:
+	virtual macro_name ();
+};
 
 /* This ones are known (and chosen) not to be wrapped for the moment 
    if you need to use any of these delete the warnfilter and add the
    necessary %template directive. */
 %warnfilter(401) csView; 		// iView
-%warnfilter(401) csObject; 		// iObject
 %warnfilter(401) csGeomDebugHelper;  	// iDebugHelper
-%warnfilter(401) csPolygonMesh;  	// iPolygonMesh
-%warnfilter(401) csPolygonMeshBox;  	// iPolygonMesh
 %warnfilter(401) csEventNameRegistry; 	// iEventNameRegistry
 %warnfilter(401) csTinyDocumentSystem; 	// iDocumentSystem
-%warnfilter(401) csColliderWrapper; 	// csObject
 

@@ -19,6 +19,7 @@
 #ifndef __CS_SYS_WIN32_SHELLSTUFF_H__
 #define __CS_SYS_WIN32_SHELLSTUFF_H__
 
+#define WIN32_LEAN_AND_MEAN
 #include <shlobj.h>
 #include "csutil/csstring.h"
 #include "cachedll.h"

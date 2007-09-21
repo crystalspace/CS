@@ -58,8 +58,8 @@ void csShaderGLAFP::Deactivate()
   glDisable (GL_FRAGMENT_PROGRAM_ARB);
 }
 
-void csShaderGLAFP::SetupState (const csRenderMesh* /*mesh*/, 
-                                csRenderMeshModes& /*modes*/,
+void csShaderGLAFP::SetupState (const CS::Graphics::RenderMesh* /*mesh*/, 
+                                CS::Graphics::RenderMeshModes& /*modes*/,
 	                        const iShaderVarStack* stacks)
 {
   size_t i;
@@ -67,7 +67,7 @@ void csShaderGLAFP::SetupState (const csRenderMesh* /*mesh*/,
   csRef<csShaderVariable> var;
 
   // set variables
-  for(i = 0; i < variablemap.Length(); ++i)
+  for(i = 0; i < variablemap.GetSize (); ++i)
   {
     VariableMapEntry& mapping = variablemap[i];
 
@@ -84,7 +84,6 @@ void csShaderGLAFP::SetupState (const csRenderMesh* /*mesh*/,
     case csShaderVariable::INT:
     case csShaderVariable::FLOAT:
     case csShaderVariable::VECTOR2:
-    case csShaderVariable::COLOR:
     case csShaderVariable::VECTOR3:
     case csShaderVariable::VECTOR4:
       {
@@ -141,7 +140,6 @@ void csShaderGLAFP::SetupState (const csRenderMesh* /*mesh*/,
         case csShaderVariable::INT:
         case csShaderVariable::FLOAT:
         case csShaderVariable::VECTOR2:
-        case csShaderVariable::COLOR:
         case csShaderVariable::VECTOR3:
         case csShaderVariable::VECTOR4:
           {
@@ -313,7 +311,7 @@ bool csShaderGLAFP::Compile()
 {
   shaderPlug->Open ();
 
-  for (size_t i = 0; i < variablemap.Length ();)
+  for (size_t i = 0; i < variablemap.GetSize ();)
   {
     int dest;
     if (sscanf (variablemap[i].destination, "register %d", &dest) != 1)

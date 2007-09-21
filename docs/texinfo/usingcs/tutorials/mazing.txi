@@ -21,7 +21,7 @@ portals (@code{iEngine::CreatePortal()}).
 Creating genmesh mesh objects for the adversaries and the laserbeam
 (@pxref{MeshObject Genmesh}).
 @item
-Creating particle mesh objects for explosions (@pxref{MeshObject PartSys}).
+Creating particle mesh objects for explosions (@pxref{MeshObject Particles}).
 @item
 Doing collision detection manually (@code{csColliderWrapper} and
 @code{csColliderHelper}).
@@ -237,9 +237,10 @@ public:
   bool IsSpaceFree (const RoomCoordinate& rc) const;
 
   bool CreateGeometry ();
-  bool CreateWallOrPortal (iThingFactoryState* factory_state,
+  bool CreateWallOrPortal (iGeneralFactoryState* factory_state,
   	const csVector3& v1, const csVector3& v2,
   	const csVector3& v3, const csVector3& v4,
+	CS::Geometry::TextureMapper* mapper,
 	bool do_portal,
 	const RoomCoordinate& source,
 	const RoomCoordinate& dest);
@@ -334,9 +335,10 @@ bool Maze::CreateSector (int x, int y, int z)
   return rooms[x][y][z] != 0;
 @}
 
-bool Maze::CreateWallOrPortal (iThingFactoryState* factory_state,
+bool Maze::CreateWallOrPortal (iGeneralFactoryState* factory_state,
   	const csVector3& v1, const csVector3& v2,
   	const csVector3& v3, const csVector3& v4,
+	CS::Geometry::TextureMapper* mapper,
 	bool do_portal,
 	const RoomCoordinate& source,
 	const RoomCoordinate& dest)
@@ -359,7 +361,10 @@ bool Maze::CreateWallOrPortal (iThingFactoryState* factory_state,
   @}
   else
   @{
-    factory_state->AddQuad (v1, v2, v3, v4);
+    CS::Geometry::TesselatedQuad (v1, v2, v4);
+    quad.SetLevel (5);
+    quad.SetMapper (mapper);
+    quad.Append (factory_state);
   @}
   return true;
 @}
@@ -368,15 +373,24 @@ bool Maze::CreateRoom (iMaterialWrapper* wall_material,
 	int x, int y, int z, char* portals)
 @{
   iSector* room = GetSector (x, y, z);
-  csRef<iMeshWrapper> walls = app->GetEngine ()
-  	->CreateSectorWallsMesh (room, "walls");
+
+  using namespace CS::Geometry;
+  csRef<iMeshFactoryWrapper> walls_factory = GeneralMeshBuilder::
+    CreateFactory (app->GetEngine (), "walls_factory");
+  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateMesh (
+      app->GetEngine (), room, "walls", walls_factory);
   if (!walls)
     return app->ReportError ("Couldn't create the walls for the room!");
 
-  csRef<iThingState> object_state = scfQueryInterface<iThingState> (
-  	walls->GetMeshObject ());
-  csRef<iThingFactoryState> factory_state = scfQueryInterface<
-  	iThingFactoryState> (walls->GetMeshObject ()->GetFactory ());
+  csRef<iGeneralMeshState> object_state = scfQueryInterface<
+    iGeneralMeshState> (walls->GetMeshObject ());
+  object_state->SetShadowReceiving (true);
+  walls->GetMeshObject ()->SetMaterialWrapper (wall_material);
+  csRef<iGeneralFactoryState> factory_state = scfQueryInterface<
+    iGeneralFactoryState> (walls_factory->GetMeshObjectFactory ());
+
+  DensityTextureMapper mapper (.3);
+
   float sx = float (x) * ROOM_DIMENSION;
   float sy = float (y) * ROOM_DIMENSION;
   float sz = float (z) * ROOM_DIMENSION;
@@ -391,6 +405,7 @@ bool Maze::CreateRoom (iMaterialWrapper* wall_material,
     	box.GetCorner (CS_BOX_CORNER_XYz),
     	box.GetCorner (CS_BOX_CORNER_XYZ),
     	box.GetCorner (CS_BOX_CORNER_xYZ),
+	&mapper,
 	portals[PORTAL_UP] == '#',
 	start_rc, RoomCoordinate (x+0, y+1, z+0)))
     return false;
@@ -399,6 +414,7 @@ bool Maze::CreateRoom (iMaterialWrapper* wall_material,
     	box.GetCorner (CS_BOX_CORNER_XyZ),
     	box.GetCorner (CS_BOX_CORNER_Xyz),
     	box.GetCorner (CS_BOX_CORNER_xyz),
+	&mapper,
 	portals[PORTAL_DOWN] == '#',
 	start_rc, RoomCoordinate (x+0, y-1, z+0)))
     return false;
@@ -407,6 +423,7 @@ bool Maze::CreateRoom (iMaterialWrapper* wall_material,
     	box.GetCorner (CS_BOX_CORNER_xyZ),
     	box.GetCorner (CS_BOX_CORNER_xYZ),
     	box.GetCorner (CS_BOX_CORNER_XYZ),
+	&mapper,
 	portals[PORTAL_FRONT] == '#',
 	start_rc, RoomCoordinate (x+0, y+0, z+1)))
     return false;
@@ -415,6 +432,7 @@ bool Maze::CreateRoom (iMaterialWrapper* wall_material,
     	box.GetCorner (CS_BOX_CORNER_Xyz),
     	box.GetCorner (CS_BOX_CORNER_XYz),
     	box.GetCorner (CS_BOX_CORNER_xYz),
+	&mapper,
 	portals[PORTAL_BACK] == '#',
 	start_rc, RoomCoordinate (x+0, y+0, z-1)))
     return false;
@@ -423,6 +441,7 @@ bool Maze::CreateRoom (iMaterialWrapper* wall_material,
     	box.GetCorner (CS_BOX_CORNER_xyz),
     	box.GetCorner (CS_BOX_CORNER_xYz),
     	box.GetCorner (CS_BOX_CORNER_xYZ),
+	&mapper,
 	portals[PORTAL_LEFT] == '#',
 	start_rc, RoomCoordinate (x-1, y+0, z+0)))
     return false;
@@ -431,12 +450,10 @@ bool Maze::CreateRoom (iMaterialWrapper* wall_material,
     	box.GetCorner (CS_BOX_CORNER_XyZ),
     	box.GetCorner (CS_BOX_CORNER_XYZ),
     	box.GetCorner (CS_BOX_CORNER_XYz),
+	&mapper,
 	portals[PORTAL_RIGHT] == '#',
 	start_rc, RoomCoordinate (x+1, y+0, z+0)))
     return false;
-
-  factory_state->SetPolygonMaterial (CS_POLYRANGE_ALL, wall_material);
-  factory_state->SetPolygonTextureMapping (CS_POLYRANGE_ALL, rd);
 
   return true;
 @}
@@ -525,11 +542,11 @@ of @code{CreateRoom()} is a string describing the connections to neighbour
 nodes. Finally this function will also create a few lights using the
 @code{CreateLight()} method.
 
-The @code{CreateRoom()} function will create one thing mesh (@pxref{MeshObject Thing})
+The @code{CreateRoom()} function will create one genmesh mesh (@pxref{MeshObject Genmesh})
 for the solid walls and then it will use @code{iEngine::CreatePortal()} to create
 the individual portals to neighbour nodes wherever there needs to be a connection.
 This is done in the @code{CreateWallOrPortal()} function. This function will
-either add a wall polygon to the wall thing or else it will create a portal.
+either add a wall polygon to the wall genmesh or else it will create a portal.
 
 @node Mazing Player Class, Mazing Adversary Class, Mazing Maze Class, Tutorial Mazing
 @subsubsection Player Class
@@ -592,7 +609,7 @@ Player::Player (AppMazing* app)
 bool Player::InitCollisionDetection ()
 @{
   float ps = PLAYER_SIZE / 2.0;
-  csPolygonMeshBox* box = new csPolygonMeshBox (csBox3 (
+  csTriangleMeshBox* box = new csTriangleMeshBox (csBox3 (
   	csVector3 (-ps, -ps, -ps), csVector3 (ps, ps, ps)));
   player_collider = app->GetCollisionDetectionSystem ()
   	->CreateCollider (box);
@@ -605,8 +622,8 @@ bool Player::InitCollisionDetection ()
 First we have the constructor. In this constructor we set all the defaults for
 the movement system. In @code{InitCollisionDetection()} we set up the collider
 that the collision detection system is going to use. Basically we represent
-the player as a box. The class @code{csPolygonMeshBox} can be used to quickly
-create an implementation of @code{iPolygonMesh} for a box.
+the player as a box. The class @code{csTriangleMeshBox} can be used to quickly
+create an implementation of @code{iTriangleMesh} for a box.
 
 @example
 void Player::StartMovement (const csVector3& dir)
@@ -1237,8 +1254,9 @@ bool Game::CreateFactories ()
   fstate->SetColor (csColor (1.0, 1.0, 1.0));
   // We don't want to hit the player against the laserbeam when it is
   // visible so we disable the collision detection mesh here.
+  csStringID colldet_id = app->GetStrings ()->Request ("colldet");
   laserbeam_factory->GetMeshObjectFactory ()->GetObjectModel ()
-  	->SetPolygonMeshColldet (0);
+  	->SetTriangleData (colldet_id, 0);
 
   if (!loader->LoadTexture ("laserbeam_texture", "/lib/stdtex/blobby.jpg"))
     return app->ReportError ("Error loading 'blobby' texture!");
@@ -1304,12 +1322,12 @@ We use a genmesh for both the laserbeam and the adversary sphere
 we can orient it easily along the camera transformation. That means that
 it is a long beam oriented in the @sc{z} direction.
 
-For the explosion we use a particles mesh (@pxref{MeshObject PartSys}).
+For the explosion we use a particles mesh (@pxref{MeshObject Particles}).
 With a bit of effort we're confident that you can make a better explosion
 by tweaking the parameters and using a better texture.
 
 A few special remarks about the geometry above. On the laserbeam factory
-we use @code{iObjectModel::SetPolygonMeshColldet()} to clear the collision
+we use @code{iObjectModel::SetTriangleData()} to clear the collision
 detection mesh. The laserbeam mesh is generated at roughly the same spot
 as the camera. We don't want the collision detection system to detect hits
 with it (we use other methods to detect hits of the laserbeam with adversary).
@@ -1581,6 +1599,12 @@ private:
   csRef<iVirtualClock> vc;
 
   /**
+   * The string registry. This is used for common constants in
+   * Crystal Space.
+   */
+  csRef<iStringSet> strings;
+
+  /**
    * Set up everything that needs to be rendered on screen.  This routine is
    * called from the event handler in response to a cscmdProcess broadcast
    * message.
@@ -1616,6 +1640,7 @@ public:
   iCamera* GetCamera () const @{ return view->GetCamera (); @}
   iEngine* GetEngine () const @{ return engine; @}
   iLoader* GetLoader () const @{ return loader; @}
+  iStringSet* GetStrings () const @{ return strings; @}
   iCollideSystem* GetCollisionDetectionSystem () const @{ return cdsys; @}
   Game& GetGame () @{ return game; @}
 
@@ -1801,6 +1826,11 @@ bool AppMazing::Application()
   vc = csQueryRegistry<iVirtualClock> (r);
   if (!vc)
     return ReportError("Failed to locate the virtual clock!");
+
+  strings = csQueryRegistryTagInterface<iStringSet> (r,
+      "crystalspace.shared.stringset");
+  if (!strings)
+    return ReportError("Failed to locate the standard stringset!");
 
   // Setup game.
   if (!game.SetupGame ())

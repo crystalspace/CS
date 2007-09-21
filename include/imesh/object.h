@@ -29,6 +29,7 @@
  * \addtogroup meshplugins
  * @{ */
 
+struct iDecalBuilder;
 struct iLight;
 struct iMaterialWrapper;
 struct iMeshWrapper;
@@ -41,7 +42,13 @@ struct iObjectModel;
 struct iPortal;
 struct iRenderView;
 
-struct csRenderMesh;
+namespace CS
+{
+  namespace Graphics
+  {
+    struct RenderMesh;
+  }
+}
 
 class csColor;
 class csFlags;
@@ -75,13 +82,13 @@ class csVector3;
 #define CS_FACTORY_STATICSHAPE 2
 /** @} */
 
-SCF_VERSION (iMeshObjectDrawCallback, 0, 0, 1);
-
 /**
  * Set a callback which is called just before the object is drawn.
  */
-struct iMeshObjectDrawCallback : public iBase
+struct iMeshObjectDrawCallback : virtual public iBase
 {
+  SCF_INTERFACE (iMeshObjectDrawCallback, 0, 0, 1);
+
   /// Before drawing.
   virtual bool BeforeDrawing (iMeshObject* spr, iRenderView* rview) = 0;
 };
@@ -107,7 +114,7 @@ struct iMeshObjectDrawCallback : public iBase
  */
 struct iMeshObject : public virtual iBase
 {
-  SCF_INTERFACE(iMeshObject, 2,0,0);
+  SCF_INTERFACE(iMeshObject, 2,1,0);
   /**
    * Get the reference to the factory that created this mesh object.
    */
@@ -134,7 +141,7 @@ struct iMeshObject : public virtual iBase
    * all relevant planes for the given object. These planes correspond
    * with the clip planes kept by iRenderView.
    */
-  virtual csRenderMesh** GetRenderMeshes (int& num, iRenderView* rview, 
+  virtual CS::Graphics::RenderMesh** GetRenderMeshes (int& num, iRenderView* rview, 
     iMovable* movable, uint32 frustum_mask) = 0;
 
   /**
@@ -260,7 +267,9 @@ struct iMeshObject : public virtual iBase
    * handles are changed in some way which requires the mesh object
    * to fetch it again (i.e. to call materialwrapper->GetMaterialHandle())
    * again.
+   * \deprecated Deprecated in 1.3. Obsolete and unused.
    */
+  CS_DEPRECATED_METHOD_MSG("Obsolete and unused.")
   virtual void InvalidateMaterialHandles () = 0;
 
   /**
@@ -270,6 +279,14 @@ struct iMeshObject : public virtual iBase
    * it's current state.
    */
   virtual void PositionChild (iMeshObject* child,csTicks current_time) = 0;
+
+  /**
+   * This mesh is being asked to build a decal for its own geometry.  The
+   * mesh is given a position and radius of the decal and must create
+   * geometry through the provided iDecalBuilder.
+   */
+  virtual void BuildDecal(const csVector3* pos, float decalRadius,
+	iDecalBuilder* decalBuilder) = 0;
 };
 
 /**

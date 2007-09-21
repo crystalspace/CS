@@ -75,7 +75,7 @@ struct iLightSectorInfluence : public virtual iBase
  */
 struct iLightManager : public virtual iBase
 {
-  SCF_INTERFACE(iLightManager,2,0,0);
+  SCF_INTERFACE(iLightManager,3,0,0);
   /**
    * Return all 'relevant' light/sector influence objects that hit this
    * object. Depending on implementation in the engine this can simply
@@ -95,6 +95,22 @@ struct iLightManager : public virtual iBase
    */
   virtual const csArray<iLightSectorInfluence*>& GetRelevantLights (
       iMeshWrapper* logObject, int maxLights, bool desireSorting) = 0;
+
+  /**
+   * Return all 'relevant' light/sector influence objects for a given sector.
+   * \param sector is the sector to check for.
+   * \param maxLights maxLights is the maximum number of lights that you (as
+   * the caller of this function) are interested in. Even with this set the
+   * light manager may still return an array containing more lights. You just
+   * have to ignore the additional lights then. If you don't want to limit
+   * the number of lights you can set maxLights to -1.
+   * \param desireSorting if this is true then you will get a list sorted
+   * on light relevance. Light relevance is a function of influence radius,
+   * and intensity. If you don't need sorting then don't set this as it will
+   * decrease performance somewhat.
+   */
+  virtual const csArray<iLightSectorInfluence*>& GetRelevantLights (
+      iSector* sector, int maxLights, bool desireSorting) = 0;
 };
 
 /** @} */

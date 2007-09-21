@@ -90,8 +90,8 @@ csImageVolumeMaker::~csImageVolumeMaker()
 
 void csImageVolumeMaker::AppendPending ()
 {
-  if (pendingImages.Length() == 0) return;
-  int newDepth = Depth + (int)pendingImages.Length();
+  if (pendingImages.GetSize () == 0) return;
+  int newDepth = Depth + (int)pendingImages.GetSize ();
   void* newData;
   uint8* newAlpha = 0;
   switch (Format & CS_IMGFMT_MASK)
@@ -129,7 +129,7 @@ void csImageVolumeMaker::AppendPending ()
   uint8* curAlpha = 0;
   if (newAlpha != 0)
     curAlpha = newAlpha + (Depth * slicePix);
-  for (size_t i = 0; i < pendingImages.Length(); i++)
+  for (size_t i = 0; i < pendingImages.GetSize (); i++)
   {
     csRef<iImage> image (pendingImages[i]);
     if (image->HasKeyColor())
@@ -237,7 +237,7 @@ void csImageVolumeMaker::AddImage (iImage* source)
   if (Format == -1) Format = source->GetFormat();
   if (!manualName)
   {
-    if ((Depth + pendingImages.Length()) == 0)
+    if ((Depth + pendingImages.GetSize ()) == 0)
     {
       delete[] fName;
       fName = csStrNew (source->GetName ());

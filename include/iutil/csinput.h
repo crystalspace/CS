@@ -99,7 +99,7 @@ struct iKeyComposer : public virtual iBase
  * - csInitializer::CreateInputDrivers()
  *
  * Main ways to get pointers to this interface:
- * - CS_QUERY_REGISTRY()
+ * - csQueryRegistry<iKeyboardDriver>()
  *
  * 
  * \todo Need a simple way to query all currently-set modifiers for event 
@@ -174,7 +174,7 @@ struct iKeyboardDriver : public virtual iBase
  * - csInitializer::CreateInputDrivers()
  *
  * Main ways to get pointers to this interface:
- * - CS_QUERY_REGISTRY()
+ * - csQueryRegistry<iMouseDriver>()
  */
 struct iMouseDriver : public virtual iBase
 {
@@ -212,8 +212,6 @@ struct iMouseDriver : public virtual iBase
   virtual void DoMotion (int x, int y) = 0;
 };
 
-SCF_VERSION(iJoystickDriver, 0, 0, 1);
-
 /**
  * Generic Joystick driver.<p>
  * The joystick driver is responsible for tracking current joystick state and
@@ -228,21 +226,17 @@ SCF_VERSION(iJoystickDriver, 0, 0, 1);
  * - csInitializer::CreateInputDrivers()
  *
  * Main ways to get pointers to this interface:
- * - CS_QUERY_REGISTRY()
+ * - csQueryRegistry<iJoystickDriver>()
  */
 struct iJoystickDriver : public virtual iBase
 {
-  SCF_INTERFACE(iJoystickDriver, 2,0,0);
+  SCF_INTERFACE(iJoystickDriver, 2,1,0);
   /**
    * Call to release all joystick buttons (when focus switches from application
    * window, for example).
    */
   virtual void Reset () = 0;
 
-  /// Query last X position of joystick 'number'.
-  CS_DEPRECATED_METHOD virtual int GetLastX (uint number) const = 0;
-  /// Query last Y position of joystick 'number'.
-  CS_DEPRECATED_METHOD virtual int GetLastY (uint number) const = 0;
   /// Query last position on all axes of joystick 'number'.
   virtual const int32 *GetLast (uint number) const = 0;
   /// Query last position on 'axis' of joystick 'number'.

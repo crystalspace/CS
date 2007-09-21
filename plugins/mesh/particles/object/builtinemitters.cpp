@@ -28,8 +28,8 @@
 CS_PLUGIN_NAMESPACE_BEGIN(Particles)
 {
   // General random number generators
-  CS_IMPLEMENT_STATIC_VAR(GetVGen, csRandomVectorGen,);
-  CS_IMPLEMENT_STATIC_VAR(GetFGen, csRandomFloatGen,);
+  CS_IMPLEMENT_STATIC_VAR(GetVGen, csRandomVectorGen, ());
+  CS_IMPLEMENT_STATIC_VAR(GetFGen, csRandomFloatGen, ());
 
   /**
    * Small helper-function to calculate x^(1/3) using Newton iteration.
@@ -186,8 +186,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Particles)
         float axTemp = GetFGen ()->Get (-3.0f, 3.0f);
         
         unsigned int axis = abs ((int)axTemp);
-        unsigned int axu = (axis+1) % 3;
-        unsigned int axv = (axis+2) % 3;
+        unsigned int axu = CS::Math::NextModulo3 (axis);
+        unsigned int axv = CS::Math::NextModulo3 (axu);
 
         float sign = (axTemp > 0) ? 1 : -1;
 

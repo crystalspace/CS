@@ -485,6 +485,8 @@ MAX_RELEASE_CHECK_RATE   default: 255 unless not HAVE_MMAP
 #include "dlmalloc-settings.h"
 /*****  CS SPECIFIC SETTINGS END HERE  *****/
 
+#define _GNU_SOURCE /* Use GNU extensions on linux, for mremap */
+
 #ifndef WIN32
 #ifdef _WIN32
 #define WIN32 1
@@ -1338,10 +1340,10 @@ unsigned char _BitScanReverse(unsigned long *index, unsigned long mask);
 #      define _SC_PAGE_SIZE _SC_PAGESIZE
 #    endif
 #  endif
-#  ifdef _SC_PAGE_SIZE
+#  if defined(_SC_PAGE_SIZE) && !defined(sgi)
 #    define malloc_getpagesize sysconf(_SC_PAGE_SIZE)
 #  else
-#    if defined(BSD) || defined(DGUX) || defined(HAVE_GETPAGESIZE)
+#    if defined(BSD) || defined(DGUX) || defined(sgi) || defined(HAVE_GETPAGESIZE)
        extern size_t getpagesize();
 #      define malloc_getpagesize getpagesize()
 #    else

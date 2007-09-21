@@ -27,6 +27,7 @@
 
 #include "csutil/scf.h"
 
+#include "iutil/databuff.h"
 #include "ivideo/graph3d.h"
 
 class csBox3;
@@ -66,13 +67,35 @@ struct iThingFactoryState;
 #define CSTEX_UV_SHIFT 8 
 /** @} */
 
+namespace CS
+{
+  namespace Utility
+  {
+    struct PortalParameters
+    {
+      uint32 flags;
+      bool mirror;
+      bool warp;
+      int msv;
+      csMatrix3 m;
+      csVector3 before;
+      csVector3 after;
+      iString* destSector;
+      bool autoresolve;
+      
+      PortalParameters() : flags (0), mirror (false), warp (false), msv (-1),
+        destSector (0), autoresolve (true) {}
+    };
+  } // namespace CS
+} // namespace CS
+
 /**
  * This component provides services for other loaders to easily parse
  * properties of standard CS world syntax.
  */
 struct iSyntaxService : public virtual iBase
 {
-  SCF_INTERFACE (iSyntaxService, 2, 1, 0);
+  SCF_INTERFACE (iSyntaxService, 2, 1, 3);
   
   /**\name Parse reporting helpers
    * @{ */
@@ -255,7 +278,14 @@ struct iSyntaxService : public virtual iBase
    * flags: contains all flags found in the description.
    * Returns false on failure. Returns false in 'handled' if it couldn't
    * understand the token.
+   * \deprecated Deprecated in 1.3. Use bool HandlePortalParameter
+   *    (iDocumentNode*, iLoaderContext*, 
+   *     CS::Utility::PortalParametersParseState&, 
+   *     CS::Utility::PortalParameters&) instead
    */
+  CS_DEPRECATED_METHOD_MSG("Use bool HandlePortalParameter "
+    "(iDocumentNode*, iLoaderContext*, csRef<csRefCount>&, "
+    "CS::Utility::PortalParameters&, bool&) instead ")
   virtual bool HandlePortalParameter (
 	iDocumentNode* child, iLoaderContext* ldr_context,
 	uint32 &flags, bool &mirror, bool &warp, int& msv,
@@ -280,8 +310,8 @@ struct iSyntaxService : public virtual iBase
   /**
    * Parse a shader variable declaration
    */
-  virtual bool ParseShaderVar (iDocumentNode* node, 
-    csShaderVariable& var) = 0;
+  virtual bool ParseShaderVar (iLoaderContext* ldr_context,
+      iDocumentNode* node, csShaderVariable& var) = 0;
   /**
    * Parse a shader variable expression. Returns an acessor that can be set
    * on a shader variable. The accessor subsequently evaluates the expression.
@@ -330,6 +360,7 @@ struct iSyntaxService : public virtual iBase
    * return in "keyvalue", with refcount 1
    * Returns true if successful.
    */
+  CS_DEPRECATED_METHOD_MSG("Use the csRef<iKeyValuePair> version instead")
   virtual bool ParseKey (iDocumentNode* node, iKeyValuePair*& keyvalue) = 0;
 
   /**
@@ -345,6 +376,11 @@ struct iSyntaxService : public virtual iBase
 
   /**
    * Write a render buffer.
+   * When the render buffer exhibits an iRenderBufferPersistence interface,
+   * the render buffer data may not be stored inline in the document but in
+   * an external file. To prevent this behaviour you must provided a render
+   * buffer that exhibits an iRenderBufferPersistence interface and does not
+   * return a filename.
    */
   virtual bool WriteRenderBuffer (iDocumentNode* node, iRenderBuffer* buffer) = 0;
   
@@ -358,7 +394,44 @@ struct iSyntaxService : public virtual iBase
    * attribute mismatches, this method fails (and the loaded shader is not
    * registered with the shader manager),
    */
-  virtual csRef<iShader> ParseShaderRef (iDocumentNode* node) = 0;
+  virtual csRef<iShader> ParseShaderRef (iLoaderContext* ldr_context,
+      iDocumentNode* node) = 0;
+
+  /**
+   * Parse a key definition. A iKeyValuePair instance is
+   * returned if successful.
+   */
+  virtual csPtr<iKeyValuePair> ParseKey (iDocumentNode* node) = 0;
+  
+  /**
+   * Read a render buffer from a data buffer. Usually the buffer comes from
+   * a persistent storage (e.g. disk). It must have been written with 
+   * StoreRenderBuffer().   
+   */
+  virtual csRef<iRenderBuffer> ReadRenderBuffer (iDataBuffer* buf) = 0;
+  
+  /**
+   * Store a render buffer to a data buffer. Usually this buffer is then 
+   * stored to a persistent storage (e.g. disk).
+   */
+  virtual csRef<iDataBuffer> StoreRenderBuffer (iRenderBuffer* rbuf) = 0;
+  
+  /**
+   * Handles a common portal parameter.
+   * Returns false on failure. Returns false in 'handled' if it couldn't
+   * understand the token.
+   * \param child Child node to parse.
+   * \param ldr_context Loader context.
+   * \param parseState Internal parse state. This should be a null ref the
+   *   first time HandlePortalParameter is called. The method will
+   *   automatically set the variable to a state object. Do NOT pass in an
+   *   instance of csRefCount you created yourself.
+   * \param handled Whether the token was handled by this method.
+   */
+  virtual bool HandlePortalParameter (
+    iDocumentNode* child, iLoaderContext* ldr_context,
+    csRef<csRefCount>& parseState, CS::Utility::PortalParameters& params,
+    bool& handled) = 0;
 };
 
 /** @} */

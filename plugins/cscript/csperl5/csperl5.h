@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2002 by Mat Sutcliffe <oktal@gmx.co.uk>
+    Copyright (C) 2002, 2007 by Mat Sutcliffe <oktal@gmx.co.uk>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -20,12 +20,11 @@
 #define __CSPERL5_CSPERL5_H__
 
 #include "ivaria/script.h"
+#include "csplugincommon/script/scriptcommon.h"
 #include "iutil/comp.h"
 #include "ivaria/reporter.h"
 #include "csutil/scfstr.h"
-
-#include <string.h>
-#include <stdarg.h>
+#include "iutil/vfs.h"
 
 /*
  perl.h includes dirent.h on some configurations which conflicts with
@@ -37,6 +36,12 @@
 #define _DIRENT_H_
 #endif
 
+/*
+ The perl headers define several macros which go unused and conflict with
+ names used in CS. Therefore we undef these after including the perl headers.
+ MIN and MAX are already defined so we undef these first. We reasonably
+ assume perl's versions of MIN and MAX have the same semantics as ours.
+*/
 #undef MIN
 #undef MAX
 #include <EXTERN.h>
@@ -59,311 +64,154 @@
 
 struct iObjectRegistry;
 
-SCF_VERSION (csPerl5Object, 0, 0, 1);
-struct csPerl5Object : public iScriptObject {};
-
-class csPerl5 : public iScript
+struct csPerl5Value : public virtual iBase
 {
-  class Object : public csPerl5Object
+  SCF_INTERFACE (csPerl5Value, 1, 0, 0);
+  virtual ~csPerl5Value () {}
+};
+
+struct csPerl5Object : public virtual iBase
+{
+  SCF_INTERFACE (csPerl5Object, 1, 0, 0);
+  virtual ~csPerl5Object () {}
+};
+
+class csPerl5 : public scfImplementationExt1<csPerl5, csScriptCommon, iComponent>
+{
+protected:
+  class Object;
+
+  class Value : public scfImplementation2<csPerl5::Value, iScriptValue, csPerl5Value>
   {
     csPerl5 *parent;
     PerlInterpreter *my_perl;
 
   protected:
-    SV *self;
     friend class csPerl5;
+    friend class csPerl5::Object;
+
+    SV *self;
 
   public:
-    SCF_DECLARE_IBASE;
+    Value (csPerl5 *p, SV *s, bool incref = true)
+    : scfImplementationType (this), parent (p), my_perl (p->my_perl), self (s)
+    { if (incref && self) SvREFCNT_inc (self); }
+    virtual ~Value () { if (self) SvREFCNT_dec (self); }
 
-    Object (csPerl5 *p, SV *s);
-    virtual ~Object ();
+    iScript* GetScript () { return parent; }
 
-    bool IsType (const char *type) const
-    { return sv_isa (self, type) || sv_derived_from (self, type); }
+    unsigned GetTypes () const { return tInt | tFloat | tDouble | tBool
+      | tString | (sv_isobject(self) ? tObject : 0); }
 
-    bool Call (const char *name, const char *fmt, ...)
-    {
-      va_list va;
-      va_start (va, fmt);
-      SV *sv = parent->CallV(name,fmt,va,self);
-      va_end (va);
-      if (sv)
-	SvREFCNT_dec (sv);
-      return (sv != 0);
-    }
-    bool Call (const char *name, int &ret, const char *fmt, ...)
-    {
-      va_list va;
-      va_start (va, fmt);
-      SV *sv = parent->CallV(name,fmt,va,self);
-      va_end (va);
-      if (sv)
-      {
-	ret = SvIV (sv);
-	SvREFCNT_dec (sv);
-      }
-      return (sv != 0);
-    }
-    bool Call (const char *name, float &ret, const char *fmt, ...)
-    {
-      va_list va;
-      va_start (va, fmt);
-      SV *sv = parent->CallV(name,fmt,va,self);
-      va_end (va);
-      if (sv)
-      {
-	ret = SvNV (sv);
-	SvREFCNT_dec (sv);
-      }
-      return sv;
-    }
-    bool Call (const char *name, double &ret, const char *fmt, ...)
-    {
-      va_list va;
-      va_start (va, fmt);
-      SV *sv = parent->CallV(name,fmt,va,self);
-      va_end (va);
-      if (sv)
-      {
-	ret = SvNV (sv);
-	SvREFCNT_dec (sv);
-      }
-      return sv;
-    }
-    bool Call (const char *name, csRef<iString>& ret, const char *fmt, ...)
-    {
-      va_list va;
-      va_start (va, fmt);
-      SV *sv = parent->CallV(name,fmt,va,self);
-      va_end (va);
-      if (sv)
-      {
-	ret.AttachNew(new scfString(SvPV_nolen (sv)));
-	SvREFCNT_dec (sv);
-      }
-      return sv;
-    }
-    bool Call(const char *name, csRef<iScriptObject> &ret, const char *fmt,...)
-    {
-      va_list va;
-      va_start (va, fmt);
-      SV *sv = parent->CallV(name,fmt,va,self);
-      va_end (va);
-      if (sv)
-      {
-	ret.AttachNew(new Object (parent, sv));
-	SvREFCNT_dec (sv);
-      }
-      return sv;
-    }
-
-    bool Set (const char *name, int data)
-    { return Call ("STORE", "%s%d", name, data); }
-    bool Set (const char *name, float data)
-    { return Call ("STORE", "%s%f", name, data); }
-    bool Set (const char *name, double data)
-    { return Call ("STORE", "%s%lf", name, data); }
-    bool Set (const char *name, char const *data)
-    { return Call ("STORE", "%s%s", name, data); }
-    bool Set (const char *name, iScriptObject *data)
-    { return Call ("STORE", "%s%p", name, data); }
-    bool SetTruth (const char *name, bool data)
-    { return Call ("STORE", "%s%d", name, data ? 1 : 0); }
-    bool SetPointer (iBase *data)
-    {
-      SV *p = SvRV (self);
-      if (!SvOK (p))
-	return false;
-      sv_setiv (p, (int) data);
-      return true;
-    }
-
-    bool Get (const char *name, int &data) const
-    { return ((Object *) this)->Call ("FETCH", data, "%s", name); }
-    bool Get (const char *name, float &data) const
-    { return ((Object *) this)->Call ("FETCH", data, "%s", name); }
-    bool Get (const char *name, double &data) const
-    { return ((Object *) this)->Call ("FETCH", data, "%s", name); }
-    bool Get (const char *name, csRef<iString> &data) const
-    { return ((Object *) this)->Call ("FETCH", data, "%s", name); }
-    bool Get (const char *name, csRef<iScriptObject> &data) const
-    { return ((Object *) this)->Call ("FETCH", data, "%s", name); }
-    bool GetTruth (const char *name, bool &data) const
-    {
-      int n;
-      bool ok = ((Object *) this)->Call ("FETCH", n, "%s", name);
-      if (ok)
-	data = (bool)n;
-      return ok;
-    }
-    iBase* GetPointer () const
-    {
-      SV *p = SvRV (self);
-      if (SvOK (p))
-	return (iBase *) SvIV (p);
-      return 0;
-    }
+    int GetInt () const { return SvIV (self); }
+    double GetDouble () const { return SvNV (self); }
+    float GetFloat () const { return (float) SvNV (self); }
+    bool GetBool () const { return SvTRUE (self); }
+    const csRef<iString> GetString () const {
+      return csPtr<iString> (new scfString (SvPV_nolen (self))); }
+    csRef<iScriptObject> GetObject () const { CS_ASSERT (sv_isobject (self));
+      return csPtr<iScriptObject> (new csPerl5::Object (parent, self)); }
   };
+
+  class EmptyValue : public scfImplementation1<csPerl5::EmptyValue,iScriptValue>
+  {
+    csPerl5 *parent;
+
+  public:
+    EmptyValue (csPerl5 *p) : scfImplementationType (this), parent (p) {}
+    virtual ~EmptyValue () {}
+
+    iScript* GetScript () { return parent; }
+    unsigned GetTypes () const { return 0; }
+    int GetInt () const { return 0; }
+    double GetDouble () const { return 0; }
+    float GetFloat () const { return 0; }
+    bool GetBool () const { return false; }
+    const csRef<iString> GetString () const { return 0; }
+    csRef<iScriptObject> GetObject () const { return 0; }
+  };
+
+  class Object : public scfImplementationExt1<csPerl5::Object, csScriptObjectCommon, csPerl5Object>
+  {
+    csPerl5 *parent;
+    PerlInterpreter *my_perl;
+
+  protected:
+    friend class csPerl5;
+    friend class csPerl5::Value;
+
+    SV *self;
+
+  public:
+    Object (csPerl5 *p, SV *s, bool incref = true)
+    : scfImplementationType (this), parent (p), my_perl (p->my_perl), self (s)
+    { CS_ASSERT (self && sv_isobject (self)); if (incref) SvREFCNT_inc (self); }
+    virtual ~Object () { SvREFCNT_dec (self); }
+
+    iScript* GetScript () { return parent; }
+
+    const csRef<iString> GetClass () const;
+    bool IsA (const char *type) const;
+
+    void* GetPointer ();
+
+    csPtr<iScriptValue> Call (const char *name,
+      const csRefArray<iScriptValue> &args = csRefArray<iScriptValue> ());
+
+    bool Set (const char *name, iScriptValue *value);
+    csPtr<iScriptValue> Get (const char *name);
+  };
+
+  friend class Value;
   friend class Object;
 
-  struct eiComponent : public iComponent
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csPerl5);
-    bool Initialize (iObjectRegistry *o) { return scfParent->Init (o); }
-  } scfiComponent;
-  friend struct eiComponent;
-
-protected:
-  PerlInterpreter *my_perl;
+  iObjectRegistry *object_reg;
+  void StoreObjectReg ();
 
   csRef<iReporter> reporter;
+  csRef<iVFS> vfs;
 
-  bool Init (iObjectRegistry *);
+  PerlInterpreter *my_perl;
+
   bool CheckError (const char *caller) const;
+
+  csPtr<iScriptValue> CallBody (const char *name,
+    const csRefArray<iScriptValue> &args, SV *obj = 0);
+
   Object* Query (iScriptObject *obj) const;
-  // Caller is responsible for decref'ing SV returned from CallV(0.
-  SV* CallV (const char *name, const char *fmt, va_list va, SV *self = 0);
-  SV* CallV (const char *name, const char *fmt, va_list va, const char *self)
-  { return CallV (name, fmt, va, sv_2mortal (newSVpv (self, 0))); }
+  Value* Query (iScriptValue *val) const;
 
 public:
-  SCF_DECLARE_IBASE;
-
-  csPerl5 (iBase *);
+  csPerl5 (iBase *parent);
   virtual ~csPerl5 ();
 
   bool Initialize (iObjectRegistry *);
-  bool Store (const char *name, void *data, void *tag);
 
   bool RunText (const char *);
-  bool LoadModule (const char *);
 
-  csRef<iScriptObject> NewObject (const char *type, const char *fmt, ...);
+  bool LoadModule (const char *name);
+  bool LoadModule (const char *path, const char *filename);
+  bool LoadModuleNative (const char *path, const char *filename);
 
-  bool Call (const char *name, const char *fmt, ...)
-  {
-    va_list va;
-    va_start (va, fmt);
-    SV *sv = CallV (name, fmt, va);
-    va_end (va);
-    if (sv)
-      SvREFCNT_dec (sv);
-    return sv;
-  }
-  bool Call (const char *name, int &ret, const char *fmt, ...)
-  {
-    va_list va;
-    va_start (va, fmt);
-    SV *sv = CallV (name, fmt, va);
-    va_end (va);
-    if (sv)
-    {
-      ret = SvIV (sv);
-      SvREFCNT_dec (sv);
-    }
-    return sv;
-  }
-  bool Call (const char *name, float &ret, const char *fmt, ...)
-  {
-    va_list va;
-    va_start (va, fmt);
-    SV *sv = CallV (name, fmt, va);
-    va_end (va);
-    if (sv)
-    {
-      ret = SvNV (sv);
-      SvREFCNT_dec (sv);
-    }
-    return sv;
-  }
-  bool Call (const char *name, double &ret, const char *fmt, ...)
-  {
-    va_list va;
-    va_start (va, fmt);
-    SV *sv = CallV (name, fmt, va);
-    va_end (va);
-    if (sv)
-    {
-      ret = SvNV (sv);
-      SvREFCNT_dec (sv);
-    }
-    return sv;
-  }
-  bool Call (const char *name, csRef<iString> &ret, const char *fmt, ...)
-  {
-    va_list va;
-    va_start (va, fmt);
-    SV *sv = CallV (name, fmt, va);
-    va_end (va);
-    if (sv)
-    {
-      ret.AttachNew(new scfString(SvPV_nolen (sv)));
-      SvREFCNT_dec (sv);
-    }
-    return sv;
-  }
-  bool Call (const char *name, csRef<iScriptObject> &ret, const char *fmt, ...)
-  {
-    va_list va;
-    va_start (va, fmt);
-    SV *sv = CallV (name, fmt, va);
-    va_end (va);
-    if (sv)
-    {
-      ret.AttachNew(new Object (this, sv));
-      SvREFCNT_dec (sv);
-    }
-    return sv;
-  }
+  csPtr<iScriptObject> New (const char *, const csRefArray<iScriptValue> &);
+  csPtr<iScriptValue> Call (const char *, const csRefArray<iScriptValue> &);
 
-  bool Store (const char *name, int data)
-  { SV *sv = get_sv (name, TRUE); sv_setiv (sv, data); return true; }
-  bool Store (const char *name, float data)
-  { SV *sv = get_sv (name, TRUE); sv_setnv (sv, data); return true; }
-  bool Store (const char *name, double data)
-  { SV *sv = get_sv (name, TRUE); sv_setnv (sv, data); return true; }
-  bool Store (const char *name, char const *data)
-  { SV *sv = get_sv (name, TRUE); sv_setpv (sv, data); return true; }
-  bool Store (const char *name, iScriptObject *data)
-  {
-    SV *sv = get_sv (name, TRUE);
-    sv_setsv (sv, Query(data)->self);
-    return true;
-  }
-  bool SetTruth (const char *name, bool data)
-  { SV *sv = get_sv (name, TRUE); sv_setiv (sv, data ? 1 : 0); return true; }
+  bool Store (const char *, iScriptValue *);
+  csPtr<iScriptValue> Retrieve (const char *);
+  bool Remove (const char *);
 
-  bool Retrieve (const char *name, int &data) const
-  { SV *sv = get_sv (name, FALSE); if (sv) data = SvIV (sv); return sv; }
-  bool Retrieve (const char *name, float &data) const
-  { SV *sv = get_sv (name, FALSE); if (sv) data = SvNV (sv); return sv; }
-  bool Retrieve (const char *name, double &data) const
-  { SV *sv = get_sv (name, FALSE); if (sv) data = SvNV (sv); return sv; }
-  bool Retrieve (const char *name, csRef<iString> &data) const
-  {
-    SV *sv = get_sv (name, FALSE);
-    if (sv)
-      data.AttachNew(new scfString(SvPV_nolen (sv)));
-    return sv;
-  }
-  bool Retrieve (const char *name, csRef<iScriptObject> &data) const
-  {
-    SV *sv = get_sv (name, FALSE);
-    if (sv)
-      data.AttachNew(new Object (const_cast<csPerl5*> (this), sv));
-    return sv;
-  }
-  bool GetTruth (const char *name, bool &data) const
-  { SV *sv = get_sv (name, FALSE); if (sv) data = SvTRUE (sv); return sv; }
-
-  bool Remove (const char *name)
-  {
-    SV *sv = get_sv (name, FALSE);
-    if (sv)
-      sv_setsv(sv, &PL_sv_undef);
-    return sv;
-  }
+  csPtr<iScriptValue> RValue (int v)
+  { return csPtr<iScriptValue> (new Value (this, newSViv (v), false)); }
+  csPtr<iScriptValue> RValue (float v)
+  { return csPtr<iScriptValue> (new Value (this, newSVnv (v), false)); }
+  csPtr<iScriptValue> RValue (double v)
+  { return csPtr<iScriptValue> (new Value (this, newSVnv (v), false)); }
+  csPtr<iScriptValue> RValue (const char *v)
+  { return csPtr<iScriptValue> (new Value (this, newSVpv (v, 0), false)); }
+  csPtr<iScriptValue> RValue (bool v)
+  { return csPtr<iScriptValue> (new Value (this, newSViv (v ? 1 : 0), false)); }
+  csPtr<iScriptValue> RValue (iScriptObject *v)
+  { return csPtr<iScriptValue> (new Value (this, Query (v)->self)); }
 };
 
 #endif

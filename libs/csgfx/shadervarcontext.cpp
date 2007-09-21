@@ -87,6 +87,11 @@ void ShaderVariableContextImpl::ReplaceVariable (csShaderVariable *variable)
     variables.InsertSorted (variable, SvCompare);
 }
 
+bool ShaderVariableContextImpl::RemoveVariable (csShaderVariable* variable)
+{
+  return variables.Delete (variable);
+}
+
 } // namespace CS
 
 //---------------------------------------------------------------------------
@@ -98,7 +103,9 @@ csShaderVariableContext::csShaderVariableContext () :
 {}
 
 csShaderVariableContext::csShaderVariableContext (
-  const csShaderVariableContext& other) : scfImplementationType(this)
+  const csShaderVariableContext& other) :
+  iBase(), iShaderVariableContext(),
+  scfImplementationType(this), CS::ShaderVariableContextImpl()
 {
   variables = other.variables;
 }

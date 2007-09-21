@@ -51,7 +51,6 @@
 #include "imesh/particle.h"
 #include "imesh/sprite2d.h"
 #include "imesh/sprite3d.h"
-#include "imesh/thing.h"
 #include "iutil/cmdline.h"
 #include "iutil/comp.h"
 #include "iutil/csinput.h"
@@ -86,16 +85,7 @@ void Demo::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (System->object_reg, iReporter));
-  if (rep)
-  {
-    rep->ReportV (severity, "crystalspace.application.demo", msg, arg);
-  }
-  else
-  {
-    csPrintfV (msg, arg);
-    csPrintf ("\n");
-  }
+  csReportV(object_reg, severity, "crystalspace.application.demo", msg, arg);
   va_end (arg);
 }
 
@@ -246,44 +236,44 @@ bool Demo::Initialize (int argc, const char* const argv[],
   }
 
   // The virtual clock.
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
 
-  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  kbd = csQueryRegistry<iKeyboardDriver> (object_reg);
   if (!kbd)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No keyboard driver!");
     return false;
   }
 
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = csQueryRegistry<iEngine> (object_reg);
   if (!engine)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No engine!");
     return false;
   }
 
-  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  loader = csQueryRegistry<iLoader> (object_reg);
   if (!loader)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No loader!");
     return false;
   }
 
-  myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  myG3D = csQueryRegistry<iGraphics3D> (object_reg);
   if (!myG3D)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No 3D driver!");
     return false;
   }
 
-  myG2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
+  myG2D = csQueryRegistry<iGraphics2D> (object_reg);
   if (!myG2D)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No 2D driver!");
     return false;
   }
 
-  myVFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  myVFS = csQueryRegistry<iVFS> (object_reg);
   if (!myVFS)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No VFS!");
@@ -310,8 +300,8 @@ bool Demo::Initialize (int argc, const char* const argv[],
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
 
   // Check the demo file and mount it if required.
-  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser));
+  csRef<iCommandLineParser> cmdline (
+  	csQueryRegistry<iCommandLineParser> (object_reg));
   const char *val;
   if ((val = cmdline->GetName ()) != 0)
   {
@@ -327,14 +317,14 @@ bool Demo::Initialize (int argc, const char* const argv[],
     // user.
     csRef<iStringArray> zips = myVFS->FindFiles ("/this/*");
     size_t i;
-    for (i = 0 ; i < zips->Length () ; i++)
+    for (i = 0 ; i < zips->GetSize () ; i++)
     {
       const char* zip = zips->Get (i);
       TestDemoFile (zip, myVFS, demos);
     }
     myVFS->Mount ("/tmp/csdemo_datadir", "$@data$/");
     zips = myVFS->FindFiles ("/tmp/csdemo_datadir/*");
-    for (i = 0 ; i < zips->Length () ; i++)
+    for (i = 0 ; i < zips->GetSize () ; i++)
     {
       const char* zip = zips->Get (i);
       TestDemoFile (zip, myVFS, demos);
@@ -445,7 +435,7 @@ void Demo::SetupFrame ()
 
     ty += 10;
 
-    if (demos.Length () == 0)
+    if (demos.GetSize () == 0)
     {
       GfxWrite (tx, ty, col_black, col_bg,
     	"I could not find any data files in this and the data directory!");
@@ -463,7 +453,7 @@ void Demo::SetupFrame ()
       ty += 10;
       first_y = ty;
       size_t i;
-      for (i = 0 ; i < demos.Length () ; i++)
+      for (i = 0 ; i < demos.GetSize () ; i++)
       {
 	int bg = col_bg;
 	int fg = col_fgdata;
@@ -707,7 +697,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
     {
       if (keyCode == CSKEY_ESC)
       {
-	csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+	csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
 	if (q)
 	  q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
         return true;
@@ -1242,7 +1232,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
       //==============================
       if (keyCode == CSKEY_ESC)
       {
-	csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+	csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
 	if (q)
 	  q->GetEventOutlet()->Broadcast (csevQuit (object_reg));
         return true;
@@ -1288,7 +1278,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
     if (do_demo == 0)
     {
       selected_demo = (csMouseEventHelper::GetY(&Event) - first_y) / 10;
-      if ((selected_demo != (size_t)-1) && selected_demo < demos.Length ())
+      if ((selected_demo != (size_t)-1) && selected_demo < demos.GetSize ())
 	do_demo = 1;
     }
     else if (do_demo < 3)
@@ -1334,7 +1324,7 @@ bool Demo::DemoHandleEvent (iEvent &Event)
     if (do_demo == 0)
     {
       selected_demo = (csMouseEventHelper::GetY(&Event) - first_y) / 10;
-      if (!((selected_demo != (size_t)-1) && selected_demo < demos.Length ()))
+      if (!((selected_demo != (size_t)-1) && selected_demo < demos.GetSize ()))
         selected_demo = (size_t)-1;
     }
   }

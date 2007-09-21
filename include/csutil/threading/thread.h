@@ -25,23 +25,10 @@
 
 #include "csutil/threading/mutex.h"
 
-
-// Include implementation specific versions
-#if defined(CS_PLATFORM_WIN32)
-# include "csutil/threading/win32_thread.h"
-#elif defined(CS_PLATFORM_UNIX) || \
-  defined(CS_PLATFORM_OSX)
-# include "csutil/threading/pthread_thread.h"
-#else
-#error "No threading implementation for your platform"
-#endif
-
-
 namespace CS
 {
 namespace Threading
 {
-
   /**
    * Priority values indicate how frequently a thread runs compared to other threads.
    * Thread scheduling is handled by the underlying OS, and so the true meaning of these
@@ -78,6 +65,29 @@ namespace Threading
      */
     virtual void Run () = 0;
   };
+
+  /// OS specific thread identifier
+  typedef unsigned int ThreadID;
+
+}
+}
+
+// Include implementation specific versions
+#if defined(CS_PLATFORM_WIN32)
+# include "csutil/threading/win32_thread.h"
+#elif defined(CS_PLATFORM_UNIX) || \
+  defined(CS_PLATFORM_MACOSX)
+# include "csutil/threading/pthread_thread.h"
+#else
+#error "No threading implementation for your platform"
+#endif
+
+
+namespace CS
+{
+namespace Threading
+{
+  
   
   /**
    * Object representing a separate execution thread.
@@ -126,6 +136,12 @@ namespace Threading
 
       if (start)
         Start ();
+    }
+  
+    ~Thread ()
+    {
+      if (IsRunning ())
+        Stop ();
     }
 
     /**
@@ -206,6 +222,16 @@ namespace Threading
       ThreadBase::Yield ();
     }
 
+    /**
+     * Get an OS specific thread identifier.
+     * \remark This gets the thread id of the thread in which this function is called.
+     * For example,  OtherThread->GetThreadID() will NOT have the results that would be expected.
+     */
+    static ThreadID GetThreadID ()
+    {
+      return ThreadBase::GetThreadID ();
+    }
+
   private:
     ThreadPriority priority;
   };
@@ -214,7 +240,7 @@ namespace Threading
   /**
    * A group of threads handled as one unit.
    */
-   class ThreadGroup : private CS::NonCopyable
+  class ThreadGroup : private CS::NonCopyable
   {
   public:
 

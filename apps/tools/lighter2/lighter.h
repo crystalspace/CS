@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2005 by Marten Svanfeldt
+  Copyright (C) 2005-2006 by Marten Svanfeldt
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -21,19 +21,26 @@
 
 #include "csutil/refcount.h"
 
+#include "statistics.h"
+
 namespace lighter
 {
   class Scene;
   class Sector;
-  class Light;
-  class RadPrimitive;
+  class Light_old;
+  class Primitive;
   class Raytracer;
+  class SwapManager;
+  
+  class ElementAreasAlloc;
 
   class Lighter : public csRefCount
   {
   public:
     Lighter (iObjectRegistry *objectRegistry);
     ~Lighter ();
+
+    int Run ();
 
     // Initialize and load plugins we want
     bool Initialize ();
@@ -52,13 +59,50 @@ namespace lighter
     csRef<iPluginManager> pluginManager;
     csRef<iReporter> reporter;
     csRef<iVFS> vfs;
+    csRef<iCommandLineParser> cmdLine;
+    csRef<iConfigManager> configMgr;
     iObjectRegistry *objectRegistry;
+    csRef<iStringSet> strings;
+
+    SwapManager* swapManager;
 
   protected:
+    // Cleanup and prepare for shutdown
+    void CleanUp ();
+
     // Parse the commandline and load any files specified
-    bool LoadFiles ();
+    bool LoadFiles (Statistics::Progress& progress);
+
+    void LoadConfiguration ();
+
+    void CommandLineHelp () const;
 
     Scene *scene;
+
+    Statistics::Progress progStartup;
+    Statistics::Progress progLoadFiles;
+    Statistics::Progress progLightmapLayout;
+    Statistics::Progress progSaveFactories;
+    Statistics::Progress progInitializeMain;
+    Statistics::Progress progInitialize;
+    Statistics::Progress progInitializeLightmaps;
+    Statistics::Progress progInitializeLM;
+    Statistics::Progress progPrepareLighting;
+    Statistics::Progress progPrepareLightingUVL;
+    Statistics::Progress progPrepareLightingSector;
+    Statistics::Progress progSaveMeshesMain;
+    Statistics::Progress progSaveMeshes;
+    Statistics::Progress progSaveFinish;
+    Statistics::Progress progBuildKDTree;
+    Statistics::Progress progDirectLighting;
+    Statistics::Progress progPostproc;
+    Statistics::Progress progPostprocSector;
+    Statistics::Progress progPostprocLM;
+    Statistics::Progress progSaveResult;
+    Statistics::Progress progSaveMeshesPostLight;
+    Statistics::Progress progApplyWorldChanges;
+    Statistics::Progress progCleanup;
+    Statistics::Progress progFinished;
   };
 
   // Global lighter

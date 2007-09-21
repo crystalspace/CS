@@ -63,7 +63,9 @@ AC_DEFUN([CS_CHECK_COMMON_TOOLS_BASIC],
     CS_EMIT_BUILD_PROPERTY([CMD.MKDIRS], [$MKDIRS])
 
     CS_CHECK_PROGS([INSTALL], [install])
-    CS_EMIT_BUILD_PROPERTY([INSTALL], [$INSTALL])])
+    CS_EMIT_BUILD_PROPERTY([INSTALL], [$INSTALL])
+    AC_PROG_LN_S
+    CS_EMIT_BUILD_PROPERTY([LN_S], [$LN_S])])
 
 
 #------------------------------------------------------------------------------
@@ -97,6 +99,25 @@ AC_DEFUN([CS_CHECK_COMMON_TOOLS_DOC_DOXYGEN],
 
     CS_CHECK_TOOLS([DOT], [dot])
     CS_EMIT_BUILD_PROPERTY([CMD.DOT], [$DOT])])
+
+
+#------------------------------------------------------------------------------
+# CS_CHECK_COMMON_TOOLS_ICONS
+#	Checks for tools required by the icon generation rules from icons.jam.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_CHECK_COMMON_TOOLS_ICONS],
+    [# rsvg: for svg to png conversion
+    CS_CHECK_PROGS([RSVG], [rsvg])
+    CS_EMIT_BUILD_PROPERTY([CMD.RSVG], [$RSVG])
+
+    # icotool: for creating Win32 ICO files
+    CS_CHECK_PROGS([ICOTOOL], [icotool])
+    CS_EMIT_BUILD_PROPERTY([CMD.ICOTOOL], [$ICOTOOL])
+
+    # convert: for various image manipulations from both the svg conversion and
+    #  ICO creation.
+    CS_CHECK_PROGS([CONVERT], [convert])
+    CS_EMIT_BUILD_PROPERTY([CMD.CONVERT], [$CONVERT])])
 
 
 #------------------------------------------------------------------------------

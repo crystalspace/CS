@@ -53,6 +53,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(Spr2D)
 
 class csSprite2DMeshObjectFactory;
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * Sprite 2D version of mesh object.
  */
@@ -180,7 +182,6 @@ public:
 
   /**\name iObjectModel implementation
    * @{ */
-  void GetObjectBoundingBox (csBox3& bbox);
   const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent)
@@ -243,6 +244,10 @@ public:
    * does nothing.
    */
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
+  virtual void BuildDecal(const csVector3* pos, float decalRadius,
+          iDecalBuilder* decalBuilder)
+  {
+  }
 
   /**\name iSprite2DState implementation
    * @{ */
@@ -279,6 +284,8 @@ public:
 	const csReversibleTransform& transform);
   /** @} */
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * Factory for 2D sprites. This factory also implements iSprite2DFactoryState.
@@ -335,7 +342,7 @@ public:
   /// Has this sprite lighting?
   bool HasLighting () const { return lighting; }
 
-  int GetUVAnimationCount () const {return (int)vAnims.Length ();}
+  int GetUVAnimationCount () const {return (int)vAnims.GetSize ();}
   iSprite2DUVAnimation *CreateUVAnimation ()
   {
     csSprite2DUVAnimation *p = new csSprite2DUVAnimation (0);

@@ -45,7 +45,7 @@ public:
 
   virtual bool HasNext() const
   {
-    if (object->Children == 0 || position >= object->Children->Length())
+    if (object->Children == 0 || position >= object->Children->GetSize ())
       return false;
 
     return true;
@@ -53,7 +53,7 @@ public:
 
   virtual iObject* Next()
   {
-    if (object->Children == 0 || position >= object->Children->Length())
+    if (object->Children == 0 || position >= object->Children->GetSize ())
       return 0;
 
     iObject* result = object->Children->Get(position);
@@ -113,7 +113,7 @@ csObject::~csObject ()
   ObjRemoveAll ();
 
   if (Children) { delete Children; Children = 0; }
-  delete [] Name; Name = 0;
+  cs_free (Name); Name = 0;
 
   /*
    * @@@ This should not be required for two reasons:
@@ -134,9 +134,9 @@ csObject::~csObject ()
 void csObject::SetName (const char* newname)
 {
   char* oldname = Name;
-  Name = csStrNew (newname);
+  Name = CS::StrDup (newname);
   FireNameChangeListeners (oldname, newname);
-  delete [] oldname;
+  cs_free (oldname);
 }
 
 const char *csObject::GetName () const
@@ -212,7 +212,7 @@ void csObject::ObjRemoveAll ()
     return;
 
   size_t i;
-  for (i=Children->Length (); i>0; i--)
+  for (i=Children->GetSize (); i>0; i--)
   {
     const size_t idx = i - 1;
     iObject* child = Children->Get (idx);
@@ -242,7 +242,7 @@ iObject* csObject::GetChild (int InterfaceID, int Version,
   }
 
   size_t i;
-  for (i = 0; i < Children->Length (); i++)
+  for (i = 0; i < Children->GetSize (); i++)
   {
     if (Name)
     {
@@ -267,12 +267,38 @@ iObject* csObject::GetChild (const char *Name) const
   if (!Children || !Name)
     return 0;
 
-  for (size_t i = 0; i < Children->Length (); i++)
+  for (size_t i = 0; i < Children->GetSize (); i++)
   {
     const char *ThisName = Children->Get (i)->GetName ();
     if (ThisName != 0 && !strcmp (ThisName, Name))
       return Children->Get (i);
   }
+  return 0;
+}
+  
+iObject* csObject::GetChild (int iInterfaceID, int iVersion, 
+			     const char *Name) const
+{
+  if (!Children)
+    return 0;
+
+  for (size_t i = 0; i < Children->GetSize (); i++)
+  {
+    if (Name)
+    {
+      const char *OtherName = Children->Get (i)->GetName ();
+      if (!OtherName) continue;
+      if (strcmp (OtherName, Name) != 0) continue;
+    }
+
+    iObject *child = Children->Get(i);
+    if (child->QueryInterface(iInterfaceID, iVersion) != 0)
+    {
+      child->DecRef(); // Undo the IncRef from QueryInterface
+      return child;
+    }
+  }
+
   return 0;
 }
 
@@ -285,7 +311,7 @@ void csObject::FireNameChangeListeners (const char* oldname,
 	const char* newname)
 {
   size_t i;
-  for (i = 0 ; i < listeners.Length () ; i++)
+  for (i = 0 ; i < listeners.GetSize () ; i++)
     listeners[i]->NameChanged (this, oldname, newname);
 }
 

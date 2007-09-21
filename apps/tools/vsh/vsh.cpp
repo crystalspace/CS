@@ -282,12 +282,12 @@ static void cmd_ls (char *args)
     dir = VFS->GetCwd ();
 
   csRef<iStringArray> fl (VFS->FindFiles (dir));
-  if (fl->Length() > 0)
+  if (fl->GetSize () > 0)
   {
     bool nl = false;
 	
     size_t i;
-    for (i = 0; i < fl->Length (); i++)
+    for (i = 0; i < fl->GetSize () ; i++)
     {
       const char *fname = fl->Get (i);
       if (fullpath)
@@ -336,12 +336,12 @@ static void cmd_cp (char *args)
 
   csRef<iStringArray> fl (VFS->FindFiles (src));
   size_t i;
-  for (i = 0; i < fl->Length (); i++)
+  for (i = 0; i < fl->GetSize () ; i++)
   {
     char destname [VFS_MAX_PATH_LEN + 1];
     src = (char *)fl->Get (i);
 
-    if (fl->Length () > 1)
+    if (fl->GetSize () > 1)
     {
       size_t dirlen = strlen (src);
       if (dirlen)
@@ -439,7 +439,7 @@ static void cmd_config (char *args)
 {
   bool real_fs;
   get_option (args, real_fs);
-  iVFS *CfgVFS = real_fs ? 0 : VFS;
+  iVFS *CfgVFS = real_fs ? (iVFS*)0 : (iVFS*)VFS;
 
   iConfigFile *config =
     Cfg->AddDomain (args, CfgVFS, iConfigManager::ConfigPriorityCmdLine);
@@ -528,10 +528,10 @@ static void cmd_rpath (char *args)
 static void cmd_mounts (char* /*args*/)
 {
   csRef<iStringArray> mounts = VFS->GetMounts ();
-  if (mounts->Length ())
+  if (mounts->GetSize ())
   {
     bool nl = false;
-    for (size_t i=0; i<mounts->Length (); i++)
+    for (size_t i=0; i<mounts->GetSize () ; i++)
     {
       csPrintf ("%-19s", mounts->Get (i));
       nl = true;
@@ -557,9 +557,9 @@ static void cmd_rmounts (char *args)
   }
 
   csRef<iStringArray> rpaths = VFS->GetRealMountPaths (args);
-  if (rpaths->Length ())
+  if (rpaths->GetSize ())
   {
-    for (size_t i=0; i<rpaths->Length (); i++)
+    for (size_t i=0; i<rpaths->GetSize () ; i++)
     {
       csPrintf ("%s\n", rpaths->Get (i));
     }
@@ -605,14 +605,14 @@ int main (int argc, char *argv [])
 	CS_REQUEST_END))
     return -1;
 
-  VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  VFS = csQueryRegistry<iVFS> (object_reg);
   if (!VFS)
   {
     csPrintfErr ("Cannot load iVFS plugin\n");
     return -1;
   }
 
-  Cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+  Cfg = csQueryRegistry<iConfigManager> (object_reg);
   if (!Cfg)
   {
     csPrintfErr ("Cannot load iConfigManager plugin\n");

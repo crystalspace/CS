@@ -46,40 +46,18 @@ namespace genmeshify
   csRef<iFile> Processor::OpenPath (App* app, const char* path, 
                                     csString& fileNameToOpen)
   {
-    csString filename (path);
-    csStringArray paths;
-    paths.Push ("/lev/");
-
-    //Change path
-    bool dirSet = false;
-    size_t slashPos = filename.FindLast ('/');
-    if (slashPos != (size_t)-1)
+    const char* actualFilename;
+    csRef<iFile> file (CS::Utility::SmartFileOpen (app->vfs, path,
+      "world", &actualFilename));
+    fileNameToOpen = actualFilename;
+    if (!file.IsValid ())
     {
-      csString dir, base;
-      filename.SubString (dir, 0, slashPos);
-      filename.SubString (base, slashPos + 1);
-      fileNameToOpen = base;
-      dirSet = app->vfs->ChDirAuto (dir, &paths, 0, base);
-    }
-    if (!dirSet)
-    {
-      fileNameToOpen = "world";
-      dirSet = app->vfs->ChDirAuto (filename, &paths, 0, "world");
-    }
-    if (!dirSet)
-    {
-      app->Report ("Error opening '%s'!", filename.GetData());
+      app->Report ("Could not open a '%s' file at given path '%s'.", 
+        actualFilename, path);
       return 0;
     }
 
-    // Load it
-    csRef<iFile> buf = app->vfs->Open (fileNameToOpen, VFS_FILE_READ);
-    if (!buf) 
-    {
-      app->Report ("Error opening file 'world' for reading!");
-      return 0;
-    }
-    return buf;
+    return file;
   }
 
   bool Processor::Preload (App* app, const csStringArray& paths)
@@ -282,8 +260,25 @@ namespace genmeshify
               CloneNode (child, child_clone);
               if (!shallow)
               {
-                csRef<iDataBuffer> fullPath = app->vfs->ExpandPath (
-                  child->GetContentsValue ());
+                csRef<iDataBuffer> fullPath;
+                const char* file = child->GetAttributeValue ("file");
+                if (file)
+                {
+                  csVfsDirectoryChanger changer (app->vfs);
+                  const char* path = child->GetAttributeValue ("path");
+
+                  if (path)
+                  {
+                    changer.PushDir ();
+                    app->vfs->ChDir (path);
+                  }
+                  fullPath = app->vfs->ExpandPath (file);
+                }
+                else
+                {
+                  fullPath = app->vfs->ExpandPath (
+                    child->GetContentsValue ());
+                }
                 if (fullPath.IsValid())
                   if (!Process (fullPath->GetData(), shallow, true)) return false;
               }

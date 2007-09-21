@@ -18,7 +18,10 @@
 
 #include "cssysdef.h"
 #include "csutil/util.h"
+#include "csutil/scfstringarray.h"
 #include "defaultsconfig.h"
+
+
 
 #import <Foundation/NSEnumerator.h>
 
@@ -42,14 +45,9 @@ csPtr<iConfigFile> csGetPlatformConfig (const char* key)
 }
 
 
-SCF_IMPLEMENT_IBASE (csDefaultsConfig)
-  SCF_IMPLEMENTS_INTERFACE (iConfigFile)
-SCF_IMPLEMENT_IBASE_END
-
 csDefaultsConfig::csDefaultsConfig ()
+  : scfImplementationType (this)
 {
-  SCF_CONSTRUCT_IBASE (0);
-
   // Domain information comes from the application's bundle identifier,
   // generally.  Grab a defaults object.
   defaults = [[NSUserDefaults standardUserDefaults] retain];
@@ -65,7 +63,6 @@ csDefaultsConfig::~csDefaultsConfig()
     [domain release];
   if (defaults != nil)
     [defaults release];
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csDefaultsConfig::Open (const char* Key)
@@ -121,8 +118,8 @@ void csDefaultsConfig::Clear ()
 
 csPtr<iConfigIterator> csDefaultsConfig::Enumerate (const char* Subsection)
 {
-  if (!SubsectionExists (Subsection))
-    return 0;
+  //if (!SubsectionExists (Subsection))
+  //  return 0;
   return new csDefaultsIterator (this, Subsection);
 }
 
@@ -196,6 +193,38 @@ bool csDefaultsConfig::GetBool (const char* Key, bool Def) const
   return Def;
 }
 
+csPtr<iStringArray> csDefaultsConfig::GetTuple(const char* Key) const
+{
+
+
+ scfStringArray *items = new scfStringArray;		// the output list
+  csString item;
+
+  const char *sinp = GetStr(Key, 0);
+  const char *comp;
+  size_t len;
+  bool finished = (sinp == 0);
+
+  while (!finished)
+  {
+    comp = strchr (sinp, ',');
+    if (!comp)
+    {
+      finished = true;
+      comp = &sinp [strlen (sinp)];
+    }
+    len = strlen (sinp) - strlen (comp);
+    item = csString (sinp, len);
+    item.Trim ();
+    sinp = comp + 1;
+    items->Push (item);
+  }
+
+  csPtr<iStringArray> v(items);
+  return v;
+
+}
+
 const char* csDefaultsConfig::GetComment (const char* Key) const
 {
   return 0;
@@ -233,6 +262,22 @@ void csDefaultsConfig::SetBool (const char* Key, bool Value)
     [dict setObject:valstr forKey:keystr];
 }
 
+void csDefaultsConfig::SetTuple (const char* Key, iStringArray* Value)
+{
+  // this should output a string like
+  // abc, def, ghi
+  csString s;
+  while (!Value->IsEmpty ())
+  {
+    csString i = Value->Pop ();
+    if (!Value->IsEmpty ())
+      i.Append (", ");
+    s.Append(i);
+  }
+  SetStr (Key, s);
+}
+
+
 bool csDefaultsConfig::SetComment (const char* Key, const char* Text)
 {
   return false;
@@ -254,15 +299,11 @@ void csDefaultsConfig::SetEOFComment (const char* Text)
 }
 
 
-SCF_IMPLEMENT_IBASE (csDefaultsIterator)
-  SCF_IMPLEMENTS_INTERFACE (iConfigIterator)
-SCF_IMPLEMENT_IBASE_END
 
 csDefaultsIterator::csDefaultsIterator (
   csDefaultsConfig* Owner, const char* Subsection)
-{
-  SCF_CONSTRUCT_IBASE (0);
-
+  : scfImplementationType (this)
+{ 
   // Retain our calling parameters.
   owner = Owner;
   name = [[NSString stringWithCString:Subsection] retain];
@@ -280,6 +321,8 @@ csDefaultsIterator::csDefaultsIterator (
   // Nil out the rest.
   keyenum = nil;
   currentkey = nil;
+  nextkey = nil;
+  Next();
 }
 
 csDefaultsIterator::~csDefaultsIterator()
@@ -290,7 +333,6 @@ csDefaultsIterator::~csDefaultsIterator()
   if (keyenum != nil)
     [keyenum release];
   owner = 0;  
-  SCF_DESTRUCT_IBASE();
 }
 
 iConfigFile* csDefaultsIterator::GetConfigFile () const
@@ -309,6 +351,7 @@ void csDefaultsIterator::Rewind ()
     [keyenum release];
   keyenum = nil;
   currentkey = nil;
+  nextkey = nil;
 }
 
 // Navigate though the reg key to the next value entry.
@@ -317,8 +360,16 @@ bool csDefaultsIterator::Next()
   // Create the iterator if we haven't got one.
   if (keyenum == nil)
     keyenum = [[config->dict keyEnumerator] retain];
-  currentkey = [keyenum nextObject];
+    
+  currentkey = nextkey;
+  nextkey = [keyenum nextObject];
   return currentkey != nil;
+  
+}
+
+bool csDefaultsIterator::HasNext()
+{
+    return nextkey != nil;
 }
 
 const char* csDefaultsIterator::GetKey (bool Local) const
@@ -344,6 +395,11 @@ const char* csDefaultsIterator::GetStr () const
 bool csDefaultsIterator::GetBool () const
 {
   return config->GetBool([currentkey lossyCString], false);
+}
+
+csPtr<iStringArray> csDefaultsIterator::GetTuple () const
+{
+  return config->GetTuple([currentkey lossyCString]);
 }
 
 const char* csDefaultsIterator::GetComment () const

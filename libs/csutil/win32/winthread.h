@@ -21,6 +21,8 @@
 #include "csextern.h"
 #include "csutil/thread.h"
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 class CS_CRYSTALSPACE_EXPORT csWinThread : public csThread
 {
  public:
@@ -71,7 +73,7 @@ class CS_CRYSTALSPACE_EXPORT csWinThread : public csThread
   virtual bool SetPriority(csThreadPriority Priority);
 
   /**
-   * Return the last eror description and 0 if there was none.
+   * Return the last error description or 0 if there was none.
    */
   virtual char const* GetLastError () const;
 
@@ -144,5 +146,7 @@ class CS_CRYSTALSPACE_EXPORT csWinCondition : public csCondition
   HANDLE cond;
   char* lasterr;
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_WINTHREAD_H__

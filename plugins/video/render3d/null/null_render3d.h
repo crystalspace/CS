@@ -85,6 +85,8 @@ public:
   iTextureHandle* GetRenderTarget () const;
   bool BeginDraw (int DrawFlags);
   void FinishDraw ();
+  int GetCurrentDrawFlags() const
+  { return current_drawflags; }
   void Print (csRect const *area);
   void DrawPixmap (iTextureHandle *htex, int sx, int sy,
     int sw, int sh, int tx, int ty, int tw, int th, uint8 Alpha = 0);
@@ -116,8 +118,8 @@ public:
   {
   }
   void SetTextureState (int* units, iTextureHandle** textures, int count);
-  void DrawMesh (const csCoreRenderMesh* mymesh,
-    const csRenderMeshModes& modes,
+  void DrawMesh (const CS::Graphics::CoreRenderMesh* mymesh,
+    const CS::Graphics::RenderMeshModes& modes,
     const iShaderVarStack* stacks);
   void SetWriteMask (bool red, bool green, bool blue, bool alpha);
   void GetWriteMask (bool& red, bool& green, bool& blue, bool& alpha) const;

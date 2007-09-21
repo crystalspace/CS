@@ -164,9 +164,9 @@ bool EventTest::OnInitialize(int /*argc*/, char* /*argv*/ [])
     iSCF::SCF->QueryClassList ("crystalspace.device.joystick.");
   if (joystickClasses.IsValid())
   {
-    csRef<iPluginManager> plugmgr = CS_QUERY_REGISTRY (object_reg,
-      iPluginManager);
-    for (size_t i = 0; i < joystickClasses->Length (); i++)
+    csRef<iPluginManager> plugmgr = 
+      csQueryRegistry<iPluginManager> (object_reg);
+    for (size_t i = 0; i < joystickClasses->GetSize (); i++)
     {
       const char* className = joystickClasses->Get (i);
       iBase* b = plugmgr->LoadPlugin (className);

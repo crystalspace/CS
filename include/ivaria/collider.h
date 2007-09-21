@@ -28,11 +28,13 @@
 #include "csgeom/vector3.h"
 #include "csutil/array.h"
 #include "csutil/ref.h"
+#include "iutil/strset.h"
 
-struct iPolygonMesh;
+struct iTriangleMesh;
 struct iTerraFormer;
 struct iMeshObject;
 class csReversibleTransform;
+struct iTerrainSystem;
 
 /**
  * A structure used to return collision pairs.
@@ -48,6 +50,13 @@ struct csCollisionPair
   // Second triangle
   csVector3 a2, b2, c2;	
   //@}
+
+  /// A comparison operator in order for it to fit into iArray
+  bool operator==(const csCollisionPair& p) const
+  {
+    return (a1 == p.a1 && b1 == p.b1 && c1 == p.c1 &&
+            a2 == p.a2 && b2 == p.b2 && c2 == p.c2);
+  }
 };
 
 /**
@@ -63,7 +72,8 @@ struct csIntersectingTriangle
 enum csColliderType
 {
   CS_MESH_COLLIDER = 0,
-  CS_TERRAFORMER_COLLIDER
+  CS_TERRAFORMER_COLLIDER,
+  CS_TERRAIN_COLLIDER
 };
 
 /**
@@ -88,7 +98,7 @@ struct iCollider : public virtual iBase
  * This is the Collide plug-in. This plugin is a factory for creating
  * iCollider entities. A collider represents an entity in the
  * collision detection world. It uses the geometry data as given by
- * iPolygonMesh.
+ * iTriangleMesh.
  *
  * Main creators of instances implementing this interface:
  * - OPCODE plugin (crystalspace.collisiondetection.opcode)
@@ -102,25 +112,49 @@ struct iCollider : public virtual iBase
  */
 struct iCollideSystem : public virtual iBase
 {
-  SCF_INTERFACE (iCollideSystem, 2, 0, 0);
+  SCF_INTERFACE (iCollideSystem, 2, 2, 1);
+
+  /**
+   * Get the ID that the collision detection system prefers for getting
+   * triangle data from iObjectModel. This corresponds with the ID you
+   * would get from doing strings->Request ("colldet") where 'strings'
+   * is a reference to the standard string set.
+   */
+  virtual csStringID GetTriangleDataID () = 0;
+
+  /**
+   * Get the ID that for the base triangle mesh model from
+   * iObjectModel. This corresponds with the ID you
+   * would get from doing strings->Request ("base") where 'strings'
+   * is a reference to the standard string set.
+   */
+  virtual csStringID GetBaseDataID () = 0;
+
   /**
    * Create a iCollider for the given mesh geometry.
    * \param mesh is a structure describing the geometry from which the
    * collider will be made. You can get such a mesh either by making your
-   * own subclass of iPolygonMesh, by getting a mesh from
-   * iMeshObject->GetObjectModel()->GetPolygonMeshColldet(), or else
-   * by using csPolygonMesh, or csPolygonMeshBox.
+   * own subclass of iTriangleMesh, by getting a mesh from
+   * iMeshObject->GetObjectModel()->GetTriangleData(), or else
+   * by using csTriangleMesh, or csTriangleMeshBox. Note that the
+   * collision detection system usually uses triangle meshes with
+   * the id equal to 'colldet'.
    * \return a reference to a collider that you have to store.
    */
-  virtual csPtr<iCollider> CreateCollider (iPolygonMesh* mesh) = 0;
+  virtual csPtr<iCollider> CreateCollider (iTriangleMesh* mesh) = 0;
 
   /**
    * Create a Collider from a terrain. This should be used instead
-   * of the iPolygonMesh version in case you have a landscape because
+   * of the iTriangleMesh version in case you have a landscape because
    * this is a more optimal way to do.
    */
   virtual csPtr<iCollider> CreateCollider (iTerraFormer* mesh) = 0;
   
+  /**
+   * Create a Collider from a terrain.
+   */
+  virtual csPtr<iCollider> CreateCollider (iTerrainSystem* mesh) = 0;
+
   /**
    * Test collision between two colliders.
    * This is only supported for iCollider objects created by

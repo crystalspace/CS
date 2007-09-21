@@ -66,10 +66,6 @@ public:
   {
   }
 
-  virtual void GetObjectBoundingBox (csBox3& bbox)
-  {
-    bbox = box;
-  }
   virtual const csBox3& GetObjectBoundingBox ()
   {
     return box;
@@ -84,6 +80,7 @@ public:
     cent.Set (0, 0, 0);	// @@@ FIXME!
   }
   virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
+  virtual iTerrainSystem* GetTerrainColldet () { return 0; }
 };
 
 #include "csutil/win32/msvc_deprecated_warn_on.h"
@@ -119,13 +116,15 @@ typedef csSet<csRef<csLightSectorInfluence> > csLightSectorInfluences;
  * A light subclassing from this has a color, a position
  * and a radius.
  */
-class csLight : public scfImplementationExt5<csLight,
-                                             csObject,
-                                             iLight,
-                                             iVisibilityObject,
-                                             iShaderVariableContext,
-					     iSceneNode,
-					     iSelfDestruct>
+class csLight : 
+  public scfImplementationExt5<csLight,
+                               csObject,
+                               iLight,
+                               iVisibilityObject,
+                               scfFakeInterface<iShaderVariableContext>,
+			       iSceneNode,
+			       iSelfDestruct>,
+  public CS::ShaderVariableContextImpl
 {
 private:
   /// ID for this light (16-byte MD5).
@@ -207,8 +206,6 @@ protected:
 
   /// List of light/sector influences.
   csLightSectorInfluences influences;
-
-  csShaderVariableContext svcontext;
 
   csEngine* engine;
 public:
@@ -306,6 +303,11 @@ public:
     }
     return s;
   }
+
+  /**
+   * Get the current full sector (including parents).
+   */
+  iSector* GetFullSector ();
 
   /**
    * Set the center position.
@@ -480,45 +482,6 @@ public:
     return (iShaderVariableContext*)this;
   }
 
-  /**\name iShaderVariableContext implementation
-   * @{ */
-  /// Add a variable to this context
-  void AddVariable (csShaderVariable *variable)
-  { svcontext.AddVariable (variable); }
-
-  /// Get a named variable from this context
-  csShaderVariable* GetVariable (csStringID name) const
-  { 
-    return svcontext.GetVariable (name); 
-  }
-
-  /// Get Array of all ShaderVariables
-  const csRefArray<csShaderVariable>& GetShaderVariables () const
-  { 
-    // @@@ Will not return factory SVs
-    return svcontext.GetShaderVariables (); 
-  }
-
-  /**
-   * Push the variables of this context onto the variable stacks
-   * supplied in the "stacks" argument
-   */
-  void PushVariables (iShaderVarStack* stacks) const
-  { 
-    svcontext.PushVariables (stacks); 
-  }
-
-  bool IsEmpty () const 
-  {
-    return svcontext.IsEmpty();
-  }
-
-  void ReplaceVariable (csShaderVariable *variable)
-  { svcontext.ReplaceVariable (variable); }
-
-  void Clear () { svcontext.Clear(); }
-  /** @} */
-
   //----------------------------------------------------------------------
   // Light influence stuff.
   //----------------------------------------------------------------------
@@ -550,7 +513,7 @@ public:
 
   int GetLightCallbackCount () const
   {
-    return (int)light_cb_vector.Length ();
+    return (int)light_cb_vector.GetSize ();
   }
   
   iLightCallback* GetLightCallback (int idx) const
@@ -681,7 +644,7 @@ public:
   /// Override FreeLight
   virtual void FreeLight (iLight*) { }
 
-  virtual int GetCount () const { return (int)list.Length (); }
+  virtual int GetCount () const { return (int)list.GetSize (); }
   virtual iLight *Get (int n) const { return list.Get (n); }
   virtual int Add (iLight *obj);
   virtual bool Remove (iLight *obj);

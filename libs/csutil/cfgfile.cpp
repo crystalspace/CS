@@ -32,7 +32,7 @@
 
 /* config node */
 
-class csConfigNode
+class csConfigNode : public CS::Memory::CustomAllocated
 {
 public:
   // create a new config node. Set name to 0 to create the initial node.
@@ -79,16 +79,16 @@ private:
 csConfigNode::csConfigNode(const char *Keyname)
 {
   Prev = Next = 0;
-  Name = csStrNew(Keyname);
+  Name = CS::StrDup (Keyname);
   Data = Comment = 0;
 }
 
 csConfigNode::~csConfigNode()
 {
   Remove();
-  delete[] Name;
-  delete[] Data;
-  delete[] Comment;
+  cs_free (Name);
+  cs_free (Data);
+  cs_free (Comment);
 }
 
 const char *csConfigNode::GetName() const
@@ -130,8 +130,8 @@ void csConfigNode::Remove()
 
 void csConfigNode::SetStr(const char *s)
 {
-  delete[] Data;
-  Data = csStrNew(s);
+  cs_free (Data);
+  Data = CS::StrDup (s);
 }
 
 void csConfigNode::SetInt(int n)
@@ -170,8 +170,8 @@ void csConfigNode::SetTuple (iStringArray* Value)
 
 void csConfigNode::SetComment(const char *s)
 {
-  delete[] Comment;
-  Comment = csStrNew(s);
+  cs_free (Comment);
+  Comment = CS::StrDup (s);
 }
 
 const char *csConfigNode::GetStr() const
@@ -276,38 +276,33 @@ public:
   csConfigIterator(csConfigFile *Config, const char *Subsection);
   // Delete this iterator
   virtual ~csConfigIterator();
-
 private:
   friend class csConfigFile;
-  csConfigFile *Config;
-  csConfigNode *Node;
-  char *Subsection;
-  size_t SubsectionLength;
+  csRef<csConfigFile> Config;
+  csConfigNode* Node;
+  csConfigNode* nextNode;
+  csString Subsection;
 
   // Utility function to check if a key meets subsection requirement
   bool CheckSubsection(const char *Key) const;
   // Move to the previous node, ignoring subsection
   bool DoPrev();
-  // Move to the next node, ignoring subsection
-  bool DoNext();
   // Move to previous item and return true if the position is valid
   bool Prev ();
+  // Is there another valid key?
+  bool HasNext();
 };
 
-csConfigIterator::csConfigIterator(csConfigFile *c, const char *sub)
-  : scfImplementationType (this), Config (c)
+csConfigIterator::csConfigIterator(csConfigFile *c, const char *sub) :
+  scfImplementationType (this), Config (c), nextNode (Config->FirstNode), 
+  Subsection (sub)
 {
-  Node = Config->FirstNode;
-  Subsection = csStrNew(sub);
-  SubsectionLength = (Subsection ? strlen(Subsection) : 0);
-  Config->IncRef();
+  Next();
 }
 
 csConfigIterator::~csConfigIterator()
 {
   Config->RemoveIterator(this);
-  delete[] Subsection;
-  Config->DecRef();
 }
 
 iConfigFile *csConfigIterator::GetConfigFile() const
@@ -322,7 +317,8 @@ const char *csConfigIterator::GetSubsection() const
 
 void csConfigIterator::Rewind ()
 {
-  Node = Config->FirstNode;
+  nextNode = Config->FirstNode;
+  Next();
 }
 
 bool csConfigIterator::DoPrev()
@@ -332,17 +328,10 @@ bool csConfigIterator::DoPrev()
   return (Node->GetName() != 0);
 }
 
-bool csConfigIterator::DoNext()
-{
-  if (!Node->GetNext()) return false;
-  Node = Node->GetNext();
-  return (Node->GetName() != 0);
-}
-
 bool csConfigIterator::CheckSubsection(const char *Key) const
 {
-  return (SubsectionLength == 0 ||
-    strncasecmp(Key, Subsection, SubsectionLength) == 0);
+  return (Subsection.IsEmpty() ||
+    strncasecmp(Key, Subsection, Subsection.Length()) == 0);
 }
 
 bool csConfigIterator::Prev ()
@@ -352,24 +341,37 @@ bool csConfigIterator::Prev ()
   while (1)
   {
     if (!DoPrev()) return false;
-    if (CheckSubsection(Node->GetName())) return true;
+	if (CheckSubsection(Node->GetName())) return true;
   }
 }
 
 bool csConfigIterator::Next()
 {
-  if (!Subsection) return DoNext();
+  Node = nextNode;
+
+  if (Subsection.IsEmpty()) 
+  {
+    nextNode = Node->GetNext();
+    return Node != 0;
+  }
 
   while (1)
   {
-    if (!DoNext()) return false;
-    if (CheckSubsection(Node->GetName())) return true;
+    nextNode = nextNode->GetNext();
+    if (!nextNode || !nextNode->GetName()) break;
+    if (CheckSubsection(nextNode->GetName())) break;
   }
+  return (Node != 0) && (Node->GetName() != 0);
+}
+
+bool csConfigIterator::HasNext()
+{
+  return (nextNode != 0) && (nextNode->GetName() != 0);
 }
 
 const char *csConfigIterator::GetKey(bool Local) const
 {
-  return Node->GetName() + (Local ? SubsectionLength : 0);
+  return Node->GetName() + (Local ? Subsection.Length() : 0);
 }
 
 int csConfigIterator::GetInt() const
@@ -437,9 +439,9 @@ csConfigFile::~csConfigFile()
   delete LastNode;
   // every iterator holds a reference to this object, so when this is
   // deleted there shouldn't be any iterators left.
-  CS_ASSERT(Iterators->Length() == 0);
+  CS_ASSERT(Iterators->GetSize () == 0);
   delete Iterators;
-  delete[] Filename;
+  cs_free (Filename);
 }
 
 bool csConfigFile::IsEmpty() const
@@ -460,9 +462,9 @@ iVFS* csConfigFile::GetVFS() const
 
 void csConfigFile::SetFileName(const char *fName, iVFS *vfs)
 {
-  delete[] Filename;
+  cs_free (Filename);
 
-  Filename = csStrNew(fName);
+  Filename = CS::StrDup (fName);
   VFS = vfs;
   Dirty = true;
 }
@@ -588,14 +590,14 @@ void csConfigFile::Clear()
   // delete all nodes but the first and last one
   FirstNode->DeleteDataNodes();
   // rewind all iterators
-  for (size_t i = 0; i < Iterators->Length(); i++)
+  for (size_t i = 0; i < Iterators->GetSize (); i++)
   {
     csConfigIterator *it = Iterators->Get(i);
     it->Rewind();
   }
   if (EOFComment)
   {
-    delete[] EOFComment;
+    cs_free (EOFComment);
     EOFComment = 0;
   }
   Dirty = true;
@@ -721,13 +723,13 @@ void csConfigFile::SetTuple (const char *Key, iStringArray* Value)
     if (sa)
     {
       // its different if lengths differ
-      if (sa->Length () != Value->Length ())
+      if (sa->GetSize () != Value->GetSize ())
       {
         changed = true;
       }
       else
       {
-        for (uint i = 0 ; i < sa->Length (); i++)
+        for (uint i = 0 ; i < sa->GetSize (); i++)
         {
           // found 2 different strings in tuple
           if (sa->Get (i) != Value->Get (i))
@@ -768,7 +770,7 @@ void csConfigFile::DeleteKey(const char *Name)
   if (!Node) return;
 
   // look for iterators on that node
-  for (size_t i = 0; i < Iterators->Length(); i++)
+  for (size_t i = 0; i < Iterators->GetSize (); i++)
   {
     csConfigIterator *it = (csConfigIterator*)Iterators->Get(i);
     if (it->Node == Node) it->Prev();
@@ -908,8 +910,8 @@ void csConfigFile::RemoveIterator(csConfigIterator *it) const
 
 void csConfigFile::SetEOFComment(const char *text)
 {
-  delete[] EOFComment;
-  EOFComment = (text ? csStrNew(text) : 0);
+  cs_free (EOFComment);
+  EOFComment = (text ? CS::StrDup(text) : 0);
   Dirty = true;
 }
 

@@ -23,8 +23,7 @@
 
 #if !defined(CS_PLATFORM_WIN32)
 #error "This file is only for Windows and requires you to include csysdefs.h before"
-#endif
-
+#else
 
 namespace CS
 {
@@ -38,10 +37,12 @@ namespace Implementation
 {
 
   // Thread base-class for win32
-  class ThreadBase
+  class CS_CRYSTALSPACE_EXPORT ThreadBase
   {
   public:
     ThreadBase (Runnable* runnable);
+
+    ~ThreadBase ();
 
     void Start ();
 
@@ -58,13 +59,15 @@ namespace Implementation
       csSleep (0);
     }
 
+    static CS::Threading::ThreadID GetThreadID ();
+
   private:
     csRef<Runnable> runnable;
 
     mutable void* threadHandle;
     uint threadId;
 
-    bool isRunning;
+    int32 isRunning;
   };
 
 
@@ -72,4 +75,6 @@ namespace Implementation
 }
 }
 
-#endif
+#endif // !defined(CS_PLATFORM_WIN32)
+
+#endif // __CS_CSUTIL_THREADING_WIN32_THREAD_H__

@@ -45,7 +45,7 @@ csImageIOMultiplexer::csImageIOMultiplexer (iBase *pParent) :
 
 csImageIOMultiplexer::~csImageIOMultiplexer ()
 {
-  if (classlist) classlist->DeleteAll ();
+  if (classlist) classlist->Empty ();
 }
 
 bool csImageIOMultiplexer::Initialize (iObjectRegistry *object_reg)
@@ -69,7 +69,7 @@ void csImageIOMultiplexer::StoreDesc (
 {
   // add the formats coming in to our ever growing list
   size_t i;
-  for (i = 0; i < format.Length (); i++)
+  for (i = 0; i < format.GetSize (); i++)
     formats.Push (format[i]);
 }
 
@@ -84,7 +84,7 @@ bool csImageIOMultiplexer::LoadNextPlugin ()
     do
     {
       if (classname) classlist->DeleteIndex (0);
-      if (classlist->Length() == 0)
+      if (classlist->GetSize () == 0)
       {
 	classlist = 0;
 	plugin_mgr = 0;
@@ -117,7 +117,7 @@ const csImageIOFileFormatDescriptions& csImageIOMultiplexer::GetDescription ()
 void csImageIOMultiplexer::SetDithering (bool iEnable)
 {
   global_dither = iEnable;
-  for (size_t i = 0; i < list.Length (); i++)
+  for (size_t i = 0; i < list.GetSize (); i++)
     list[i]->SetDithering (global_dither);
 }
 
@@ -126,10 +126,10 @@ csPtr<iImage> csImageIOMultiplexer::Load (iDataBuffer* buf, int iFormat)
   bool consecutive = false; // set to true if we searched the list completely.
   do
   {
-    size_t i = list.Length();
+    size_t i = list.GetSize ();
     while (i-- > 0)
       // i is decremented after comparison but before we use it below;
-      //  hence it goes from list.Length()-1 to 0
+      //  hence it goes from list.GetSize ()-1 to 0
     {
       csRef<iImageIO> pIO = (iImageIO*)list.Get(i);
       csRef<iImage> img (pIO->Load(buf, iFormat));
@@ -141,7 +141,7 @@ csPtr<iImage> csImageIOMultiplexer::Load (iDataBuffer* buf, int iFormat)
 	  commonly than other formats and that those
 	  plugins are asked first. 
 	 */
-	if ((list.Length()-i) > 4)
+	if ((list.GetSize ()-i) > 4)
 	  // keep a 'top 4'; no need to shuffle the list
 	  // when a plugin is already one of the first asked
 	{
@@ -166,14 +166,14 @@ csPtr<iDataBuffer> csImageIOMultiplexer::Save (
   bool consecutive = false; 
   do
   {
-    size_t i = list.Length();
+    size_t i = list.GetSize ();
     while (i-- > 0)
     {
       csRef<iImageIO> pIO = (iImageIO*)list.Get(i);
       csRef<iDataBuffer> buf (pIO->Save(image, format, extraoptions));
       if (buf)
       {
-	if ((list.Length()-i) > 4)
+	if ((list.GetSize ()-i) > 4)
 	{
 	  list.Push (pIO);
 	  list.DeleteIndex (i);
@@ -195,14 +195,14 @@ csPtr<iDataBuffer> csImageIOMultiplexer::Save (iImage *image, const char *mime,
   bool consecutive = false; 
   do
   {
-    size_t i = list.Length();
+    size_t i = list.GetSize ();
     while (i-- > 0)
     {
       csRef<iImageIO> pIO = (iImageIO*)list.Get(i);
       csRef<iDataBuffer> buf (pIO->Save(image, mime, extraoptions));
       if (buf)
       {
-	if ((list.Length()-i) > 4)
+	if ((list.GetSize ()-i) > 4)
 	{
 	  list.Push (pIO);
 	  list.DeleteIndex (i);

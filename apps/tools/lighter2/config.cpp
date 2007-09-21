@@ -16,36 +16,63 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "cssysdef.h"
+#include "common.h"
 
 #include "config.h"
-
+#include "lighter.h"
 
 namespace lighter
 {
 
   Configuration globalConfig;
 
+  // @@@ Depends on lightmap precision and scale
+  static const float lightValueEpsilon = 2.0f/255.0f;
+
   Configuration::Configuration ()
   {
     //Setup defaults
     lighterProperties.doDirectLight = true;
-    lighterProperties.doRadiosity = false;
 
-    lmProperties.uTexelPerUnit = 16.0f;
-    lmProperties.vTexelPerUnit = 16.0f;
+    lmProperties.lmDensity = 4.0f;
     lmProperties.maxLightmapU = 1024;
     lmProperties.maxLightmapV = 1024;
+    lmProperties.blackThreshold = lightValueEpsilon;
+    lmProperties.normalsTolerance = 1.0f * (PI / 180.0f);
+    lmProperties.grayPDMaps = true;
 
     diProperties.pointLightMultiplier = 1.0f;
     diProperties.areaLightMultiplier = 1.0f;
-
-    radProperties.uPatchResolution = 4;
-    radProperties.vPatchResolution = 4;
   }
 
-  void Configuration::Initialize (const csStringArray& /*files*/)
+  void Configuration::Initialize ()
   {
+    csRef<iConfigManager> cfgMgr = globalLighter->configMgr;
     
+    lighterProperties.doDirectLight = cfgMgr->GetBool ("lighter2.DirectLight", 
+      lighterProperties.doDirectLight);
+
+
+    lmProperties.lmDensity = cfgMgr->GetFloat ("lighter2.lmDensity", 
+      lmProperties.lmDensity);
+
+    lmProperties.maxLightmapU = cfgMgr->GetInt ("lighter2.maxLightmapU", 
+      lmProperties.maxLightmapU);
+    lmProperties.maxLightmapV = cfgMgr->GetInt ("lighter2.maxLightmapV", 
+      lmProperties.maxLightmapV);
+   
+
+    lmProperties.blackThreshold = cfgMgr->GetFloat ("lighter2.blackThreshold", 
+      lmProperties.blackThreshold);
+    lmProperties.blackThreshold = csMax (lmProperties.blackThreshold,
+      lightValueEpsilon); // Values lower than the LM precision don't make sense
+
+    float normalsToleranceAngle = cfgMgr->GetFloat ("lighter2.normalsTolerance", 
+      1.0f);
+    lmProperties.normalsTolerance = csMax (EPSILON, normalsToleranceAngle * 
+      (PI / 180.0f));
+
+    lmProperties.grayPDMaps = cfgMgr->GetBool ("lighter2.grayPDMaps", 
+      lmProperties.grayPDMaps);
   }
 }

@@ -133,7 +133,7 @@ struct iMissingLoaderData : public virtual iBase
  */
 struct iLoader : public virtual iBase
 {
-  SCF_INTERFACE (iLoader, 1, 0, 0);
+  SCF_INTERFACE (iLoader, 2, 1, 0);
 
   /**
    * Load an image file. The image will be loaded in the format requested by
@@ -253,16 +253,15 @@ struct iLoader : public virtual iBase
    */
   virtual csPtr<iSndSysStream> LoadSoundStream (const char *fname,
   	int mode3d) = 0;
+
   /**
-   * New Sound System: Load a sound file, create a stream and create a
+   * New Sound System: Load a sound file, create sound data and create a
    * wrapper object for it.
    * \param name of the sound.
    * \param fname is the VFS filename.
-   * \param mode3d is one of CS_SND3D_DISABLE, CS_SND3D_RELATIVE, or
-   * CS_SND3D_ABSOLUTE.
    */
   virtual iSndSysWrapper* LoadSoundWrapper (const char *name,
-  	const char *fname, int mode3d) = 0;
+  	const char *fname) = 0;
 
   /**
    * Load a map file in a thread.
@@ -437,7 +436,7 @@ struct iLoader : public virtual iBase
    * factory is already in memory (with that name). This function will
    * still return true in that case and set 'result' to the correct object.
    * <br>
-   * Note! Use SCF_QUERY_INTERFACE on 'result' to detect what type was loaded.
+   * Note! Use scfQueryInterface on 'result' to detect what type was loaded.
    * \param fname is a VFS filename for the XML file.
    * \param result will be set to the loaded result (see above).
    * \param region is 0 by default which means that all loaded objects are not
@@ -483,7 +482,7 @@ struct iLoader : public virtual iBase
    * factory is already in memory (with that name). This function will
    * still return true in that case and set 'result' to the correct object.
    * <br>
-   * Note! Use SCF_QUERY_INTERFACE on 'result' to detect what type was loaded.
+   * Note! Use scfQueryInterface on 'result' to detect what type was loaded.
    * \param buffer is a buffer for the model contents.
    * \param result will be set to the loaded result (see above).
    * \param region is 0 by default which means that all loaded objects are not
@@ -528,7 +527,7 @@ struct iLoader : public virtual iBase
    * factory is already in memory (with that name). This function will
    * still return true in that case and set 'result' to the correct object.
    * <br>
-   * Note! Use SCF_QUERY_INTERFACE on 'result' to detect what type was loaded.
+   * Note! Use scfQueryInterface on 'result' to detect what type was loaded.
    * \param node is the node from which to read.
    * \param result will be set to the loaded result (see above).
    * \param region is 0 by default which means that all loaded objects are not
@@ -557,7 +556,7 @@ struct iLoader : public virtual iBase
   /**
    * Load a shader from a file.
    */
-  virtual bool LoadShader (const char* filename) = 0;
+  virtual csRef<iShader> LoadShader (const char* filename, bool registerShader = true) = 0;
   
   /**
    * Set whether to load each file into a separate region.

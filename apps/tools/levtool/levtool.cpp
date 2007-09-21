@@ -30,30 +30,16 @@
 #include "iutil/cmdline.h"
 #include "iutil/document.h"
 #include "cstool/initapp.h"
+#include "cstool/smartfileopen.h"
 #include "ivaria/reporter.h"
 #include "iutil/databuff.h"
 
 #include "levtool.h"
+#include "fixpolymesh.h"
 
 //-----------------------------------------------------------------------------
 
 CS_IMPLEMENT_APPLICATION
-
-//-----------------------------------------------------------------------------
-
-#define OP_HELP 0
-#define OP_LIST 1
-#define OP_DYNAVIS 2
-#define OP_VALIDATE 3
-#define OP_SPLITUNIT 4
-#define OP_SPLITGEOM 5
-#define OP_COMPRESS 7
-#define OP_ANALYZE 8
-#define OP_FLAGCLEAR 10
-#define OP_FLAGGOOD 11
-#define OP_FLAGBAD 12
-#define OP_TRANSLATE 13
-#define OP_PLANES 14
 
 //-----------------------------------------------------------------------------
 
@@ -719,7 +705,7 @@ bool LevTool::IsAddonAPlane (iDocumentNode* addonnode)
     return false;
   }
   size_t i;
-  for (i = 0 ; i < plane_plugins.Length () ; i++)
+  for (i = 0 ; i < plane_plugins.GetSize () ; i++)
   {
     csString* str = plane_plugins.Get (i);
     if (str->Compare (plugname))
@@ -743,7 +729,7 @@ bool LevTool::IsMeshAThing (iDocumentNode* meshnode)
     return false;
   }
   size_t i;
-  for (i = 0 ; i < thing_plugins.Length () ; i++)
+  for (i = 0 ; i < thing_plugins.GetSize () ; i++)
   {
     csString* str = thing_plugins.Get (i);
     if (str->Compare (plugname))
@@ -1025,7 +1011,7 @@ void LevTool::WriteOutThing (iDocumentNode* params_node, ltThing* th,
 void LevTool::SplitThing (iDocumentNode* meshnode, iDocumentNode* parentnode)
 {
   size_t i;
-  for (i = 0 ; i < things.Length () ; i++)
+  for (i = 0 ; i < things.GetSize () ; i++)
   {
     ltThing* th = things.Get (i);
     if (th->GetMeshNode ()->Equals (meshnode))
@@ -1250,7 +1236,7 @@ void LevTool::CloneAndMovePlanes (iDocumentNode* node, iDocumentNode* newnode)
       {
         const char* planename = child->GetContentsValue ();
 	size_t i;
-	for (i = 0 ; i < planes.Length () ; i++)
+	for (i = 0 ; i < planes.GetSize () ; i++)
 	{
 	  ltPlane* pl = planes[i];
 	  if (strcmp (pl->name, planename) == 0)
@@ -1349,7 +1335,7 @@ void LevTool::CloneAndMovePlanes (iDocument* doc, iDocument* newdoc)
 static int cnt;
 
 void LevTool::CloneAndChangeFlags (iDocumentNode* node, iDocumentNode* newnode,
-  	int op, int minsize, int maxsize, int minpoly, int maxpoly,
+  	Operation op, int minsize, int maxsize, int minpoly, int maxpoly,
 	float global_area)
 {
   const char* parentvalue = node->GetValue ();
@@ -1410,7 +1396,7 @@ void LevTool::CloneAndChangeFlags (iDocumentNode* node, iDocumentNode* newnode,
   {
     ltThing* th = 0;
     size_t i;
-    for (i = 0 ; i < things.Length () ; i++)
+    for (i = 0 ; i < things.GetSize () ; i++)
     {
       th = things.Get (i);
       if (th->GetMeshNode ()->Equals (node)) break;
@@ -1446,7 +1432,7 @@ void LevTool::CloneAndChangeFlags (iDocumentNode* node, iDocumentNode* newnode,
 }
 
 void LevTool::CloneAndChangeFlags (iDocument* doc, iDocument* newdoc,
-  	int op, int minsize, int maxsize, int minpoly, int maxpoly,
+  	Operation op, int minsize, int maxsize, int minpoly, int maxpoly,
 	float global_area)
 {
   csRef<iDocumentNode> root = doc->GetRoot ();
@@ -1609,7 +1595,7 @@ void LevTool::ValidateContents (ltThing* thing)
 void LevTool::ValidateContents ()
 {
   size_t i;
-  for (i = 0 ; i < things.Length () ; i++)
+  for (i = 0 ; i < things.GetSize () ; i++)
   {
     ltThing* th = things.Get (i);
     ValidateContents (th);
@@ -1633,12 +1619,12 @@ LevTool::~LevTool ()
 
 void LevTool::Main ()
 {
-  cmdline = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
-  vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+  cmdline = csQueryRegistry<iCommandLineParser> (object_reg);
+  vfs = csQueryRegistry<iVFS> (object_reg);
   csRef<iPluginManager> plugin_mgr = 
-    CS_QUERY_REGISTRY (object_reg, iPluginManager);
+    csQueryRegistry<iPluginManager> (object_reg);
 
-  int op = OP_HELP;
+  Operation op = OP_HELP;
 
   if (cmdline->GetOption ("inds") || cmdline->GetOption ("outds"))
     op = OP_TRANSLATE;
@@ -1654,6 +1640,7 @@ void LevTool::Main ()
   if (cmdline->GetOption ("flaggood")) op = OP_FLAGGOOD;
   if (cmdline->GetOption ("flagbad")) op = OP_FLAGBAD;
   if (cmdline->GetOption ("planes")) op = OP_PLANES;
+  if (cmdline->GetOption ("fixpolymesh")) op = OP_FIXPOLYMESH;
   if (cmdline->GetOption ("help")) op = OP_HELP;
 
   if (op == OP_HELP)
@@ -1704,6 +1691,8 @@ void LevTool::Main ()
     csPrintf ("     -maxpoly=<number>: max number of polygons (default 1000000000).\n");
     csPrintf ("  -planes:\n");          
     csPrintf ("     Move all 'addon' planes to the polygons that use them.\n");
+    csPrintf ("  -fixpolymesh:\n");       
+    csPrintf ("     Fix maps using <polymesh>es by replacing these with <trimesh>es.\n");
     csPrintf ("  -inds=<plugin>:\n");       
     csPrintf ("     Document system plugin for reading world.\n");
     csPrintf ("  -outds=<plugin>:\n");       
@@ -1752,14 +1741,9 @@ void LevTool::Main ()
     const char *inds = cmdline->GetOption ("inds");
     if (inds)
     {
-/*      inputDS = csPtr<iDocumentSystem> (CS_LOAD_PLUGIN (plugin_mgr,
-	inds, iDocumentSystem));
-      if (!inputDS)*/
-      {
-        inputDS = csPtr<iDocumentSystem> (CS_LOAD_PLUGIN (plugin_mgr,
-	  csString().Format ("crystalspace.documentsystem.%s", inds),
-	  iDocumentSystem));
-      }
+      inputDS = csLoadPlugin<iDocumentSystem> (
+          plugin_mgr,
+	  csString().Format ("crystalspace.documentsystem.%s", inds));
       if (!inputDS)
       {
 	Report (CS_REPORTER_SEVERITY_ERROR,
@@ -1772,14 +1756,8 @@ void LevTool::Main ()
     const char *outds = cmdline->GetOption ("outds");
     if (outds)
     {
-/*      outputDS = csPtr<iDocumentSystem> (CS_LOAD_PLUGIN (plugin_mgr,
-	outds, iDocumentSystem));
-      if (!outputDS)*/
-      {
-	outputDS = csPtr<iDocumentSystem> (CS_LOAD_PLUGIN (plugin_mgr,
-	  csString().Format ("crystalspace.documentsystem.%s", outds),
-	  iDocumentSystem));
-      }
+      outputDS = csLoadPlugin<iDocumentSystem> (plugin_mgr,
+	  csString().Format ("crystalspace.documentsystem.%s", outds));
       if (!outputDS)
       {
 	Report (CS_REPORTER_SEVERITY_ERROR,
@@ -1799,23 +1777,21 @@ void LevTool::Main ()
   }
 
   csString filename;
-  if (strstr (val, ".zip"))
+  csRef<iDataBuffer> buf;
   {
-    vfs->Mount ("/tmp/levtool_data", val);
-    filename = "/tmp/levtool_data/world";
+    const char* actualFilename;
+    csRef<iFile> file (CS::Utility::SmartFileOpen (vfs, val, "world", 
+      &actualFilename));
+    if (!file.IsValid ())
+    {
+      ReportError ("Could not open a '%s' file at given path '%s'.", 
+        actualFilename, val);
+      return;
+    }
+    buf = file->GetAllData ();
+    filename = actualFilename;
   }
-  else
-  {
-    filename = val;
-  }
-
-  csRef<iDataBuffer> buf = vfs->ReadFile (filename);
-  if (!buf || !buf->GetSize ())
-  {
-    ReportError ("File '%s' does not exist!", (const char*)filename);
-    return;
-  }
-
+  
   // Make backup.
   switch (op)
   {
@@ -1872,9 +1848,6 @@ void LevTool::Main ()
       new csTinyDocumentSystem ()));
   }
 
-  csRef<iDocumentNode> root = doc->GetRoot ();
-  csRef<iDocumentNode> worldnode = root->GetNode ("world");
-
   switch (op)
   {
     case OP_VALIDATE:
@@ -1917,7 +1890,7 @@ void LevTool::Main ()
 	csBox3 global_bbox;
 	global_bbox.StartBoundingBox ();
 	size_t i;
-	for (i = 0 ; i < things.Length () ; i++)
+	for (i = 0 ; i < things.GetSize () ; i++)
 	{
 	  ltThing* th = things.Get (i);
 	  th->CreateBoundingBox ();
@@ -1936,7 +1909,7 @@ void LevTool::Main ()
         int counts[51];
 	for (i = 0 ; i <= 50 ; i++)
 	  counts[i] = 0;
-	for (i = 0 ; i < things.Length () ; i++)
+	for (i = 0 ; i < things.GetSize () ; i++)
 	{
 	  ltThing* th = things.Get (i);
 	  const csBox3& b = th->GetBoundingBox ();
@@ -1981,7 +1954,7 @@ void LevTool::Main ()
 	csRef<iDocument> newdoc = newsys->CreateDocument ();
 
 	size_t i;
-	for (i = 0 ; i < things.Length () ; i++)
+	for (i = 0 ; i < things.GetSize () ; i++)
 	{
 	  ltThing* th = things.Get (i);
 	  th->CreateVertexInfo ();
@@ -2005,7 +1978,7 @@ void LevTool::Main ()
 	csRef<iDocument> newdoc = newsys->CreateDocument ();
 
 	size_t i;
-	for (i = 0 ; i < things.Length () ; i++)
+	for (i = 0 ; i < things.GetSize () ; i++)
 	{
 	  ltThing* th = things.Get (i);
 	  th->CompressVertices ();
@@ -2034,7 +2007,7 @@ void LevTool::Main ()
 	csBox3 global_bbox;
 	global_bbox.StartBoundingBox ();
 	size_t i;
-	for (i = 0 ; i < things.Length () ; i++)
+	for (i = 0 ; i < things.GetSize () ; i++)
 	{
 	  ltThing* th = things.Get (i);
 	  th->CompressVertices ();
@@ -2050,7 +2023,7 @@ void LevTool::Main ()
 		     (global_bbox.MaxZ () - global_bbox.MinZ ());
 	global_area = pow (global_area, 1.0f/3.0f);
 
-	for (i = 0 ; i < things.Length () ; i++)
+	for (i = 0 ; i < things.GetSize () ; i++)
 	{
 	  ltThing* th = things.Get (i);
 	  const csBox3& b = th->GetBoundingBox ();
@@ -2084,7 +2057,7 @@ void LevTool::Main ()
 	csBox3 global_bbox;
 	global_bbox.StartBoundingBox ();
 	size_t i;
-	for (i = 0 ; i < things.Length () ; i++)
+	for (i = 0 ; i < things.GetSize () ; i++)
 	{
 	  ltThing* th = things.Get (i);
 	  th->CreateBoundingBox ();
@@ -2096,7 +2069,7 @@ void LevTool::Main ()
 		     (global_bbox.MaxZ () - global_bbox.MinZ ());
 	global_area = pow (global_area, 1.0f/3.0f);
 
-	for (i = 0 ; i < things.Length () ; i++)
+	for (i = 0 ; i < things.GetSize () ; i++)
 	{
 	  ltThing* th = things.Get (i);
 	  const csBox3& b = th->GetBoundingBox ();
@@ -2135,7 +2108,7 @@ void LevTool::Main ()
 	csBox3 global_bbox;
 	global_bbox.StartBoundingBox ();
 	size_t i;
-	for (i = 0 ; i < things.Length () ; i++)
+	for (i = 0 ; i < things.GetSize () ; i++)
 	{
 	  ltThing* th = things.Get (i);
 	  th->CreateBoundingBox ();
@@ -2193,6 +2166,29 @@ void LevTool::Main ()
 	vfs->Sync();
       }
       break;
+
+    case OP_FIXPOLYMESH:
+      {
+	Report (CS_REPORTER_SEVERITY_NOTIFY, "Fixing <polymesh>es...");
+	csRef<iDocumentNode> root = doc->GetRoot ();
+	csRef<iDocument> newdoc = newsys->CreateDocument ();
+	csRef<iDocumentNode> newroot = newdoc->CreateRoot ();
+	CloneNode (root, newroot);
+        root = 0;
+	doc = 0;
+
+        FixPolyMesh fixer;
+        fixer.Fix (newroot);
+
+        error = newdoc->Write (vfs, filename);
+	if (error != 0)
+	{
+	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
+	  return;
+	}
+      }
+      break;
+
   }
 
   //---------------------------------------------------------------

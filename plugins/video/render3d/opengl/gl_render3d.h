@@ -26,55 +26,51 @@
 #include <GL/gl.h>
 #endif
 
-#include "csgeom/csrect.h"
-#include "csgeom/poly3d.h"
-#include "csgeom/transfrm.h"
-#include "csgeom/vector2.h"
-#include "csgeom/vector3.h"
-#include "csgfx/shadervarcontext.h"
-#include "csutil/cfgacc.h"
-#include "csutil/cscolor.h"
-#include "csutil/csstring.h"
-#include "csutil/csuctransform.h"
-#include "csutil/flags.h"
-#include "csutil/formatter.h"
-#include "csutil/parray.h"
-#include "csutil/scf_implementation.h"
-#include "csutil/scfstrset.h"
-#include "csutil/weakref.h"
-#include "csutil/weakrefarr.h"
-
 #include "iutil/comp.h"
 #include "iutil/dbghelp.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
-#include "iutil/strset.h"
-#include "ivaria/bugplug.h"
-#include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/halo.h"
-#include "ivideo/rndbuf.h"
-#include "ivideo/shader/shader.h"
 
+#include "csgeom/csrect.h"
+#include "csgeom/poly3d.h"
+#include "csgfx/shadervarcontext.h"
+#include "csutil/cfgacc.h"
+#include "csutil/csstring.h"
+#include "csutil/formatter.h"
+#include "csutil/parray.h"
+#include "csutil/scf_implementation.h"
+#include "csutil/weakref.h"
+#include "csutil/weakrefarr.h"
+
+#include "csplugincommon/opengl/glextmanager.h"
 #include "csplugincommon/opengl/glstates.h"
 
 #include "gl_txtmgr.h"
 #include "gl_renderbuffer.h"
 #include "gl_r2t_backend.h"
 
-class csGLTextureHandle;
-class csGLTextureManager;
 struct csGLExtensionManager;
-class csGLVBOBufferManager;
-class csGLRenderBuffer;
+
+struct iBugPlug;
 struct iClipper2D;
-struct iObjectRegistry;
-struct iTextureManager;
-struct iRenderBufferManager;
 struct iLightingManager;
+struct iObjectRegistry;
+struct iRenderBufferManager;
+struct iShaderManager;
+struct iTextureManager;
 
 struct iEvent;
 
+CS_PLUGIN_NAMESPACE_BEGIN(gl3d)
+{
+
+class csGLTextureHandle;
+class csGLTextureManager;
+
+/* The purpose of this class is to generate a formatted string, but only
+   if it's actually used. */
 class MakeAString
 {
 public:
@@ -187,6 +183,7 @@ class csGLGraphics3D : public scfImplementation3<csGLGraphics3D,
 {
 private:
   //friend declarations
+  friend class csGLBasicTextureHandle;
   friend class csGLSuperLightmap;
   friend class csGLRendererLightmap;
   friend class csGLTextureHandle;
@@ -270,7 +267,6 @@ private:
   //csReversibleTransform object2camera;
   csReversibleTransform world2camera;
 
-  bool verbose;
   csGraphics3DCaps rendercaps;
   GLint maxNpotsTexSize;
 
@@ -337,7 +333,7 @@ private:
   csRef<iTextureHandle> render_target;
   csGLRender2TextureBackend* r2tbackend;
 
-  /// Should we use special buffertype (VBO) or just systemmeory
+  /// Should we use special buffertype (VBO) or just system memory
   bool use_hw_render_buffers;
   csGLDRAWRANGEELEMENTS glDrawRangeElements;
   static GLvoid csAPIENTRY myDrawRangeElements (GLenum mode, GLuint start, 
@@ -358,7 +354,7 @@ private:
   //                         Private helpers
   ////////////////////////////////////////////////////////////////////
 	
-  void Report (int severity, const char* msg, ...);
+  void ParseByteSize (const char* sizeStr, size_t& size);
 
   int GetMaxTextureSize () const { return rendercaps.maxTexWidth; }
 
@@ -425,7 +421,7 @@ private:
  */ //iTextureHandle* texunit[16]; // @@@ Hardcoded max number of units
   bool texunitenabled[16]; // @@@ Hardcoded max number of units
   GLuint texunittarget[16]; // @@@ Hardcoded max number of units
-  csRef<csGLTextureHandle> needNPOTSfixup[16]; // @@@ Hardcoded max number of units
+  csRef<csGLBasicTextureHandle> needNPOTSfixup[16]; // @@@ Hardcoded max number of units
   /// Array of buffers used for NPOTS texture coord fixup
   csArray<csRef<iRenderBuffer> > npotsFixupScrap;
   /// Whether an NPOTS scrap is attached to a TC bufer
@@ -484,6 +480,7 @@ public:
   static csGLStateCache* statecache;
   static csGLExtensionManager* ext;
   csRef<csGLTextureManager> txtmgr;
+  bool verbose;
 
   csGLGraphics3D (iBase *parent);
   virtual ~csGLGraphics3D ();
@@ -493,6 +490,7 @@ public:
     int line, const char* message);
   static void OutputMarkerString (const char* function, const wchar_t* file,
     int line, MakeAString& message);
+  void Report (int severity, const char* msg, ...);
 
   ////////////////////////////////////////////////////////////////////
   //                            iGraphics3D
@@ -614,9 +612,10 @@ public:
 
   /// Begin drawing in the renderer
   bool BeginDraw (int drawflags);
-
   /// Indicate that drawing is finished
   void FinishDraw ();
+  /// Return current draw flags
+  int GetCurrentDrawFlags() const;
 
   /// Do backbuffer printing
   void Print (csRect const* area);
@@ -627,8 +626,8 @@ public:
   void TeardownInstance (size_t instParamNum, const csVertexAttrib targets[]);
 
   /// Drawroutine. Only way to draw stuff
-  void DrawMesh (const csCoreRenderMesh* mymesh,
-    const csRenderMeshModes& modes,
+  void DrawMesh (const CS::Graphics::CoreRenderMesh* mymesh,
+    const CS::Graphics::RenderMeshModes& modes,
     const iShaderVarStack* stacks);
 
   /// Draw a 2D sprite
@@ -771,6 +770,9 @@ public:
   virtual void Dump (iGraphics3D* /*g3d*/)
   { }
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(gl3d)
 
 #endif // __CS_GL_RENDER3D_H__
 

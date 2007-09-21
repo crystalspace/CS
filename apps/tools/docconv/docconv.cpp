@@ -97,10 +97,10 @@ DocConv::~DocConv ()
 
 void DocConv::Main ()
 {
-  cmdline = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
-  vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+  cmdline = csQueryRegistry<iCommandLineParser> (object_reg);
+  vfs = csQueryRegistry<iVFS> (object_reg);
   csRef<iPluginManager> plugin_mgr = 
-    CS_QUERY_REGISTRY (object_reg, iPluginManager);
+    csQueryRegistry<iPluginManager> (object_reg);
 
   int op = OP_HELP;
 
@@ -125,14 +125,8 @@ void DocConv::Main ()
     const char *inds = cmdline->GetOption ("inds");
     if (inds)
     {
-/*      inputDS = csPtr<iDocumentSystem> (CS_LOAD_PLUGIN (plugin_mgr,
-	inds, iDocumentSystem));
-      if (!inputDS)*/
-      {
-        inputDS = csPtr<iDocumentSystem> (CS_LOAD_PLUGIN (plugin_mgr,
-	  csString().Format ("crystalspace.documentsystem.%s", inds),
-	  iDocumentSystem));
-      }
+      inputDS = csLoadPlugin<iDocumentSystem> (plugin_mgr,
+	  csString().Format ("crystalspace.documentsystem.%s", inds));
       if (!inputDS)
       {
 	ReportError ("Unable to load input document system '%s'!",
@@ -144,14 +138,8 @@ void DocConv::Main ()
     const char *outds = cmdline->GetOption ("outds");
     if (outds)
     {
-/*      outputDS = csPtr<iDocumentSystem> (CS_LOAD_PLUGIN (plugin_mgr,
-	outds, iDocumentSystem));
-      if (!outputDS)*/
-      {
-	outputDS = csPtr<iDocumentSystem> (CS_LOAD_PLUGIN (plugin_mgr,
-	  csString().Format ("crystalspace.documentsystem.%s", outds),
-	  iDocumentSystem));
-      }
+      outputDS = csLoadPlugin<iDocumentSystem> (plugin_mgr,
+	  csString().Format ("crystalspace.documentsystem.%s", outds));
       if (!outputDS)
       {
 	ReportError ("Unable to load output document system '%s'!",
@@ -198,8 +186,8 @@ void DocConv::Main ()
   }
   else
   {
-    xml = csPtr<iDocumentSystem> (CS_LOAD_PLUGIN (plugin_mgr,
-      "crystalspace.documentsystem.multiplexer", iDocumentSystem));
+    xml = csLoadPlugin<iDocumentSystem> (plugin_mgr,
+      "crystalspace.documentsystem.multiplexer");
     if (xml == 0)
       xml = (csPtr<iDocumentSystem> (
 	new csTinyDocumentSystem ()));

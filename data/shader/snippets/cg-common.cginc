@@ -54,6 +54,42 @@ float3 IntersectSurface(sampler2D TexSurfaceHeight,
   return I;
 }
     
+// Copied this from some NVidia doc
+float fresnel_2(float3 eyeToVert, float3 normal, float scale, float bias, float power) 
+{ 
+    return saturate (bias + scale * pow (1.0+dot(eyeToVert, normal), power));
+} 
+
+float fresnel(float3 view, float3 normal) 
+{ 
+    // Calculated from 1.3333, which is approx. refraction index for water
+    // R0 is: 
+    // float const R0 =  pow(1.0-refractionIndexRatio, 2.0)  
+    //                 / pow(1.0+refractionIndexRatio, 2.0); 
+    const float R0 = 0.02040781341208;
+
+    // light and normal are assumed to be normalized  
+    return fresnel_2 (-view, normal, 1.0-R0, R0, 5);
+} 
+
+// From:
+//     "An Approximate Image-Space Approach for Interactive Refraction"
+//     by Chris Wyman, University of Iowa.  
+// http://www.cs.uiowa.edu/~cwyman/publications/files/approxISRefract/refrShader.fragment.cg
+//
+// Function to compute a refraction direction.  Evidently, the built-in Cg refraction
+//    computes pseudo-refraction vectors, as per previous work in the area.
+float3 refraction( float3 incident, float3 normal, float ni_nt, float ni_nt_sqr )
+{
+	float IdotN = dot( -incident, normal );
+	float cosSqr = 1 - ni_nt_sqr*(1 - IdotN*IdotN);
+	if (cosSqr < 0) 
+		cosSqr = 0;
+	else
+		cosSqr = sqrt( cosSqr );
+	return  normalize( ni_nt * incident + (ni_nt* IdotN - cosSqr) * normal ); 
+}
+
 #endif // __CG_COMMON_CG_INC__
  
 ]]></include>

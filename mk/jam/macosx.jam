@@ -55,14 +55,16 @@ rule ConstructApplicationTarget
 #    Constructs the static library target name.
 rule ConstructStaticLibraryTarget
 {
-  return lib$(<)$(SUFLIB) ;
+  local libbase = [ LibraryBaseName $(<) ] ;
+  return lib$(libbase)$(SUFLIB) ;
 }
 
 # ConstructSharedLibraryTarget target : options
 #    Constructs the shared library target name.
 rule ConstructSharedLibraryTarget
 {
-  return lib$(<).$(PACKAGE_VERSION).dylib ; 
+  local libbase = [ LibraryBaseName $(<) ] ;
+  return lib$(libbase).dylib ; 
 }
 
 # ConstructSharedLibraryLinkLib target : options
@@ -70,7 +72,8 @@ rule ConstructSharedLibraryTarget
 #    links.
 rule ConstructSharedLibraryLinkLib
 {
-  return lib$(<).$(PACKAGE_VERSION).dylib ; 
+  local libbase = [ LibraryBaseName $(<) ] ;
+  return lib$(libbase).dylib ; 
 }
 
 # ConstructPluginTarget target : options
@@ -106,12 +109,27 @@ rule SystemInstallApplication
 {
     if [ IsElem console : $(3) ]
     {
-        Depends install_bin : 
-            [ DoInstall $(<) : $(bindir) $(2) : $(INSTALL_PROGRAM) ] ;
+	local suffix = $(4) ;
+	if "$(suffix)"
+	{
+	  local target_suffixed = $(<)-$(suffix) ;
+	  local installed =
+	    [ DoInstallFile $(<) : $(bindir) $(2) : $(target_suffixed) : $(INSTALL_PROGRAM) ] ;
+	  Depends install_bin : $(installed) ;
+	  NotFile $(target_suffixed) ;
+	  local linktarget = $(<:D=$(bindir)) ;
+	  Depends install_bin : [ 
+	    InstallSymLink $(linktarget) : $(target_suffixed) ] ;
+	}
+	else
+	{
+	  Depends install_bin :
+	    [ DoInstall $(<) : $(bindir) $(2) : $(INSTALL_PROGRAM) ] ;
+	}
     }
     else
     {
-        InstallApplicationGUI $(<) : $(bindir) $(2) ;
+        InstallApplicationGUI $(<) : $(bindir) $(2) : $(4) ;
     }
 }
 
@@ -344,8 +362,21 @@ rule InstallApplicationGUI
     local target = $(wrapper:BSR=$(dir):G=install) ;
 
     InstallApplicationWrapperPrepare $(target) ;
-    Depends install_bin :
-	[ DoInstall $(wrapper) : $(2) : "$(DEEPCOPY)" ] ; 
+    local suffix = $(3) ;
+    if "$(suffix)"
+    {
+      local target_suffixed = $(<)-$(suffix).app ;
+      Depends install_bin :
+	[ DoInstallFile $(wrapper) : $(2) : $(target_suffixed) : "$(DEEPCOPY)" ] ;
+      local linktarget = $(<:D=$(dir)) ;
+      SymLink $(linktarget) : $(target_suffixed) ;
+      Depends install_bin : $(linktarget) ;
+    }
+    else
+    {
+      Depends install_bin :
+	  [ DoInstall $(wrapper) : $(2) : "$(DEEPCOPY)" ] ; 
+    }
 }
 
 actions InstallApplicationWrapperPrepare

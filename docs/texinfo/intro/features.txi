@@ -106,11 +106,11 @@ Quake @sc{md3} and @sc{mdl} to Crystal Space convertor.
 and @sc{3ds} models directly.
 
 @item
-Crystal Space native windowing system(s). @xref{AWS}. 
+Crystal Space native windowing system using CEGUI.
 
 @item
 Cross-platform support for hardware rendering via OpenGL and software 
-rendering as well as a special "null" renderer for applications like game 
+rendering as well as a special ``null'' renderer for applications like game 
 servers. @xref{3D Renderer}.
 
 @item
@@ -150,7 +150,7 @@ on a terrain) and Level Of Detail @sc{lod}. @xref{MeshObject TerrFunc}.
 
 @item
 Particle system to make fire, explosions, rain, snow, fountains, and much
-more. @xref{MeshObject PartSys}.
+more. @xref{MeshObject Particles}.
 
 @item
 Collision detection (using @sc{opcode}) or full physics using

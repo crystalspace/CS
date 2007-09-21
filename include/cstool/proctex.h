@@ -30,11 +30,13 @@
 #include "csutil/ref.h"
 #include "csutil/scf_implementation.h"
 #include "itexture/iproctex.h"
+#include "itexture/itexfact.h"
 #include "iengine/texture.h"
+#include "iutil/event.h"
+#include "iutil/eventh.h"
 
 
 struct iEngine;
-struct iEventHandler;
 struct iGraphics2D;
 struct iGraphics3D;
 struct iMaterialWrapper;
@@ -99,6 +101,14 @@ protected:
   bool always_animate;
   // Are we visible? Can be 'false' if animated w/ 'always animate'.
   bool visible;
+
+  /**
+   * Create the actual texture wrapper.
+   * The default implementation creates a texture from proc_image if that is
+   * valid, or a texture of format "rgb8" otherwise. Override this function
+   * to realize different texture formats.
+   */
+  virtual iTextureWrapper* CreateTexture (iObjectRegistry* object_reg);
 
   virtual iObject *QueryObject();
   virtual iTextureWrapper *Clone () const;

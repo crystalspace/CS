@@ -158,14 +158,7 @@ void Lighter::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (System->object_reg, iReporter));
-  if (rep)
-    rep->ReportV (severity, "crystalspace.application.cslight", msg, arg);
-  else
-  {
-    csPrintfV (msg, arg);
-    csPrintf ("\n");
-  }
+  csReportV(object_reg, severity, "crystalspace.application.cslight", msg, arg);
   va_end (arg);
 }
 
@@ -179,7 +172,7 @@ void Cleanup ()
 
 bool Lighter::SetMapDir (const char* map_dir)
 {
-  csRef<iVFS> myVFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  csRef<iVFS> myVFS = csQueryRegistry<iVFS> (object_reg);
   csStringArray paths;
   paths.Push ("/lev/");
   if (!myVFS->ChDirAuto (map_dir, &paths, 0, "world"))
@@ -219,7 +212,7 @@ bool Lighter::Initialize (int argc, const char* const argv[],
     return false;
   }
 
-  csRef<iStandardReporterListener> repl (CS_QUERY_REGISTRY (object_reg, iStandardReporterListener));
+  csRef<iStandardReporterListener> repl (csQueryRegistry<iStandardReporterListener> (object_reg));
   if (repl)
   {
     // tune the reporter to be a bit more chatty
@@ -245,24 +238,24 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   }
 
   // The virtual clock.
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
 
   // Find the pointer to engine plugin
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = csQueryRegistry<iEngine> (object_reg);
   if (!engine)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!");
     exit (-1);
   }
 
-  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  loader = csQueryRegistry<iLoader> (object_reg);
   if (!loader)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
     exit (-1);
   }
 
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
   if (!g3d)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
@@ -307,8 +300,8 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   int cmd_idx = 0;
   for (;;)
   {
-    csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
-  	  iCommandLineParser));
+    csRef<iCommandLineParser> cmdline (
+  	  csQueryRegistry<iCommandLineParser> (object_reg));
     const char* val = cmdline->GetName (cmd_idx);
     cmd_idx++;
     if (!val) break;
@@ -331,8 +324,8 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   int map_idx = 0;
   for (;;)
   {
-    csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
-  	  iCommandLineParser));
+    csRef<iCommandLineParser> cmdline (
+  	  csQueryRegistry<iCommandLineParser> (object_reg));
     const char* val = cmdline->GetName (cmd_idx);
     cmd_idx++;
     if (!val)

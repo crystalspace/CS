@@ -80,8 +80,8 @@ csGenmeshSkelAnimationControl::csGenmeshSkelAnimationControl (
   tangents_mapped = false;
   bitangents_mapped = false;
 
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> 
+    (object_reg, "crystalspace.shared.stringset");
 
 
   bones_name = strings->Request ("bones");
@@ -92,13 +92,17 @@ csGenmeshSkelAnimationControl::csGenmeshSkelAnimationControl (
 
   if (!use_parent)
   {
-    skeleton = factory->gr->CreateSkeleton(factory->GetSkeletonFactory(), "");
+    skeleton = factory->GetSkeletonGraveyard()->CreateSkeleton(factory->GetSkeletonFactory(), "");
   }
 
 }
 
 csGenmeshSkelAnimationControl::~csGenmeshSkelAnimationControl ()
 {
+  if (skeleton && factory && factory->GetSkeletonGraveyard())
+  {
+    factory->GetSkeletonGraveyard()->RemoveSkeleton (skeleton);
+  }
   delete[] animated_verts;
   delete[] animated_colors;
   delete[] animated_vert_norms;
@@ -116,18 +120,18 @@ void csGenmeshSkelAnimationControl::Initialize ()
       iSceneNode *parent_node = mesh_obj->GetMeshWrapper()->QuerySceneNode()->GetParent();
       if (parent_node)
       {
-        parent_mesh = SCF_QUERY_INTERFACE(parent_node, iMeshWrapper);
+        parent_mesh = scfQueryInterface<iMeshWrapper> (parent_node);
       }
 
       if (parent_mesh)
       {
         csRef<iGeneralMeshState> genmesh_state = 
-          SCF_QUERY_INTERFACE(parent_mesh->GetMeshObject(), iGeneralMeshState);
+          scfQueryInterface<iGeneralMeshState> (parent_mesh->GetMeshObject());
         CS_ASSERT(genmesh_state);
 
         csRef<iGenMeshSkeletonControlState> par_skel_state = 
-          SCF_QUERY_INTERFACE(genmesh_state->GetAnimationControl(),
-          iGenMeshSkeletonControlState);
+          
+          scfQueryInterface<iGenMeshSkeletonControlState> (genmesh_state->GetAnimationControl());
         CS_ASSERT(par_skel_state);
         skeleton = par_skel_state->GetSkeleton();
       }
@@ -189,7 +193,7 @@ void csGenmeshSkelAnimationControl::Update (csTicks current)
   csRef<csShaderVariable> _bones = mesh_obj->GetMeshWrapper()->GetSVContext ()->GetVariable (bones_name);
   if (_bones.IsValid())
   {
-    for (size_t i=0; i< used_bones.Length(); ++i)
+    for (size_t i=0; i< used_bones.GetSize (); ++i)
     {
       int bone_idx = used_bones[i];
       csReversibleTransform offset_tr = 
@@ -211,9 +215,9 @@ void csGenmeshSkelAnimationControl::Update (csTicks current)
     _bones.AttachNew(new csShaderVariable(bones_name));
     _bones->SetType (csShaderVariable::ARRAY);
 
-    _bones->SetArraySize (used_bones.Length()*2);
+    _bones->SetArraySize (used_bones.GetSize ()*2);
 
-    for (size_t i=0; i< used_bones.Length(); ++i)
+    for (size_t i=0; i< used_bones.GetSize (); ++i)
     {
       int bone_idx = used_bones[i];
       csReversibleTransform offset_tr = 
@@ -223,11 +227,7 @@ void csGenmeshSkelAnimationControl::Update (csTicks current)
       csRef<csShaderVariable> boneQuat;
       boneQuat.AttachNew(new csShaderVariable(csInvalidStringID));
       _bones->SetArrayElement (i*2+0, boneQuat);
-      csQuaternion quat;
-      if (quat.v.x != 0 || quat.v.y != 0 || quat.v.z != 0 || quat.w != 0)
-      {
-        boneQuat->SetValue(csVector4 (quat.v.x, quat.v.y, quat.v.z, quat.w));
-      }
+      boneQuat->SetValue(csVector4 (0, 0, 0, 1));
 
       csRef<csShaderVariable> boneOffs;
        boneOffs.AttachNew(new csShaderVariable(csInvalidStringID));
@@ -294,6 +294,7 @@ csGenmeshSkelAnimationControlFactory::csGenmeshSkelAnimationControlFactory (
   flags.SetAll(0);
   skeleton_factory = 0;
   use_parent = false;
+  the_graveyard = 0;
 }
 
 csGenmeshSkelAnimationControlFactory::~csGenmeshSkelAnimationControlFactory ()
@@ -306,7 +307,7 @@ CreateAnimationControl (iMeshObject *mesh)
   csGenmeshSkelAnimationControl* ctrl = new csGenmeshSkelAnimationControl (this, mesh, object_reg);
 
   size_t i;
-  for (i = 0 ; i < autorun_scripts.Length () ; i++)
+  for (i = 0 ; i < autorun_scripts.GetSize () ; i++)
     ctrl->GetSkeleton()->Execute (autorun_scripts[i]);
   return csPtr<iGenMeshAnimationControl> (ctrl);
 }
@@ -314,15 +315,15 @@ CreateAnimationControl (iMeshObject *mesh)
 const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
 {
   csRef<iPluginManager> plugin_mgr (
-    CS_QUERY_REGISTRY (object_reg, iPluginManager));
+    csQueryRegistry<iPluginManager> (object_reg));
 
   csRef<iLoaderPlugin> ldr_plg = CS_QUERY_PLUGIN_CLASS(plugin_mgr, 
     "crystalspace.graveyard.loader", iLoaderPlugin);
 
   if (!ldr_plg)
   {
-    ldr_plg = CS_LOAD_PLUGIN(plugin_mgr, 
-      "crystalspace.graveyard.loader", iLoaderPlugin);
+    ldr_plg = csLoadPlugin<iLoaderPlugin> (plugin_mgr, 
+      "crystalspace.graveyard.loader");
     if (!ldr_plg )
     {
       printf("Missing <crystalspace.graveyard.loader> plugin!\n");
@@ -360,16 +361,17 @@ const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
         if (!use_parent)
         {
           csRef<iBase> skf = ldr_plg->Parse(child, 0, 0, 0);
-          skeleton_factory = SCF_QUERY_INTERFACE (skf, iSkeletonFactory);
-          gr = skeleton_factory->GetGraveyard();
+          skeleton_factory = scfQueryInterface<iSkeletonFactory> (skf);
+          the_graveyard = skeleton_factory->GetGraveyard();
         }
       }
       break;
     case XMLTOKEN_SKELFILE:
       {
-        csRef<iVFS> vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
-        csRef<iDataBuffer> buf (vfs->ReadFile(child->GetContentsValue()));
-        if (buf || buf->GetSize())
+        csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
+	const char* filename = child->GetContentsValue ();
+        csRef<iDataBuffer> buf (vfs->ReadFile(filename));
+        if (buf && buf->GetSize())
         {
           csRef<iDocument> doc;
 
@@ -378,7 +380,7 @@ const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
           while (*b == ' ' || *b == '\n' || *b == '\t') b++;
           if (*b == '<')
           {
-            csRef<iDocumentSystem> xml (CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
+            csRef<iDocumentSystem> xml (csQueryRegistry<iDocumentSystem> (object_reg));
             if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
             doc = xml->CreateDocument ();
             error = doc->Parse(buf);
@@ -386,14 +388,20 @@ const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
           if (!error)
           {
             csRef<iBase> skf = ldr_plg->Parse(doc->GetRoot(), 0, 0, 0);
-            skeleton_factory = SCF_QUERY_INTERFACE (skf, iSkeletonFactory);
-            gr = skeleton_factory->GetGraveyard();
+            skeleton_factory = scfQueryInterface<iSkeletonFactory> (skf);
+            the_graveyard = skeleton_factory->GetGraveyard();
           }
           else
           {
             return error;
           }
         }
+	else
+	{
+          error_buf.Format (
+            "Can't load skeleton file '%s'!", filename);
+          return error_buf;
+	}
       }
       break;
     case XMLTOKEN_USE_BONES:
@@ -437,7 +445,7 @@ const char* csGenmeshSkelAnimationControlFactory::Load (iDocumentNode* node)
 
 const char* csGenmeshSkelAnimationControlFactory::Save (iDocumentNode* parent)
 {
-  csRef<iFactory> plugin = SCF_QUERY_INTERFACE (type, iFactory);
+  csRef<iFactory> plugin = scfQueryInterface<iFactory> (type);
   if (!plugin) return "Couldn't get Class ID";
   parent->SetAttribute ("plugin", plugin->QueryClassID ());
   return "Not implemented yet!";

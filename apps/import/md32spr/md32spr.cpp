@@ -187,10 +187,10 @@ void MD32spr::Main()
   bool head = false, torso = false, leg = false;
   //csString baseName;
 
-  cmdline = CS_QUERY_REGISTRY(object_reg, iCommandLineParser);
+  cmdline = csQueryRegistry<iCommandLineParser> (object_reg);
 
-  vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
-  out = CS_QUERY_REGISTRY(object_reg, iVFS);
+  vfs = csQueryRegistry<iVFS> (object_reg);
+  out = csQueryRegistry<iVFS> (object_reg);
   /*
      Currently we handle only .zip files. Because of the difficulty in
      accessing and reading directories consistently across platforms.
@@ -258,7 +258,8 @@ void MD32spr::Main()
   if(!player) {
     md3Files = 0;
 
-    for (i = 0; i < fileNames->Length(); i++) {
+    for (i = 0; i < fileNames->GetSize(); i++)
+    {
       const char *str = fileNames->Get(i);
       if(stristr(str,".md3"))
 	if(stristr(str,"head"))
@@ -274,7 +275,8 @@ void MD32spr::Main()
       player = false;
   }
 
-  for (i = 0; i < fileNames->Length(); i++) {
+  for (i = 0; i < fileNames->GetSize (); i++)
+  {
     const char *str = fileNames->Get(i);
 
     /* If the user forgot to give the -player option we just process all .md3 files as generic models.
@@ -355,7 +357,8 @@ void MD32spr::Main()
     weaponPath.Format ("%s%s/", mountName.GetData(), weaponDir.GetData());
     vfs->ChDir(weaponPath);
     weaponFiles = vfs->FindFiles(weaponPath);
-    for (i = 0; i < weaponFiles->Length(); i++) {
+    for (i = 0; i < weaponFiles->GetSize (); i++)
+    {
       const char *str = weaponFiles->Get(i);
       /* If this is an md3 file and it contains the weaponName, Init() it. */
       if (stristr(str, ".md3")) {
@@ -378,7 +381,7 @@ void MD32spr::Main()
     }
   }
 
-  if (weaponDir && !generic.Length())
+  if (weaponDir && !generic.GetSize ())
     ReportError
       ("Fatal Error: Weapon Directory \"%s\" not found or error allocating memory",
        weaponDir.GetData());
@@ -417,7 +420,7 @@ bool MD32spr::ReadVfsDir()
   char *str;
   size_t i = 0;
 
-  for (i = 0; i < fileNames->Length(); i++) 
+  for (i = 0; i < fileNames->GetSize (); i++) 
   {
     str = (char*)fileNames->Get(i);
 
@@ -672,9 +675,9 @@ void MD32spr::Write()
 
   if (!player && !weaponDir)
   {
-    if (generic.Length())
+    if (generic.GetSize ())
     {
-      for (i = 0; i < generic.Length(); i++)
+      for (i = 0; i < generic.GetSize (); i++)
       {
         md3Model *mdl = generic.Get(i);
         mdlName = new char[strlen(mdl->GetFileName()) + 1];
@@ -756,7 +759,7 @@ void MD32spr::Write()
     }
     if (weaponDir)
     {
-      for (i = 0; i < generic.Length(); i++)
+      for (i = 0; i < generic.GetSize (); i++)
       {
 	md3Model *mdl = generic.Get(i);
 	csRef < iDocumentSystem > xml(csPtr < iDocumentSystem >
@@ -1054,7 +1057,7 @@ void MD32spr::WriteTextures(const char *inPath, const char *outPath)
   size_t fileSize;
   csRef <iStringArray> files = vfs->FindFiles(inPath);
   char fileName[100];
-  for(i = 0; i < files->Length(); i++) 
+  for(i = 0; i < files->GetSize (); i++) 
   {
     char *str = (char*)files->Get(i);
 

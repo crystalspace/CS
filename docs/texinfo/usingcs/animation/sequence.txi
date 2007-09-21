@@ -93,7 +93,7 @@ indicate when these operations are executed relative to the start of the
 entire sequence.  So for example, if the sequence is fired at time 10050 then
 immediatelly at that point the first operation is executed.  50 milliseconds
 later the second operation is executed and finally, 130 milliseconds later
-the last operation is exexuted.
+the last operation is executed.
 
 There are a few important observations to be made about this.  First, as soon
 as a sequence is executed or fired @sc{all} operations in that sequence will

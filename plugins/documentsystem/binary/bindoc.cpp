@@ -543,6 +543,16 @@ csRef<iDocumentNode> csBinaryDocNodeIterator::Next ()
   return csPtr<iDocumentNode> (retNode);
 }
 
+size_t csBinaryDocNodeIterator::GetNextPosition () 
+{ 
+  return pos; 
+}
+
+size_t csBinaryDocNodeIterator::GetEndPosition () 
+{ 
+  return iteratedNode->ctNum(); 
+}
+
 // =================================================
 //  csBdNode
 // =================================================
@@ -573,10 +583,10 @@ csBdNode::~csBdNode ()
   {
     delete[] vstr;
     size_t i;
-    for (i = 0; i < attrs->Length(); i++)
+    for (i = 0; i < attrs->GetSize (); i++)
       doc->FreeBdAttr (attrs->Get (i));
     delete attrs;
-    for (i = 0; i < nodes->Length(); i++)
+    for (i = 0; i < nodes->GetSize (); i++)
       doc->FreeBdNode (nodes->Get (i));
     delete nodes;
   }
@@ -654,7 +664,7 @@ void csBdNode::atSetItem (csBdAttr* item, int pos)
   if (flags & BD_NODE_MODIFIED)
   {
     attrs->Put (pos, item);
-    if (attrs->Length() != 0)
+    if (attrs->GetSize () != 0)
       flags |= BD_NODE_HAS_ATTR;
   }
 }
@@ -677,7 +687,7 @@ void csBdNode::atInsertBefore (csBdAttr* item, int pos)
   if (flags & BD_NODE_MODIFIED)
   {
     attrs->Insert (pos, item);
-    if (attrs->Length() != 0)
+    if (attrs->GetSize () != 0)
       flags |= BD_NODE_HAS_ATTR;
   }
 }
@@ -687,7 +697,7 @@ void csBdNode::atRemove (int pos)
   if (flags & BD_NODE_MODIFIED)
   {
     attrs->DeleteIndex (pos);
-    if (attrs->Length() == 0)
+    if (attrs->GetSize () == 0)
       flags &= ~BD_NODE_HAS_ATTR;
   }
 }
@@ -696,7 +706,7 @@ uint csBdNode::atNum ()
 { 
   if (flags & BD_NODE_MODIFIED)
   {
-    return (uint)attrs->Length();
+    return (uint)attrs->GetSize ();
   }
   else
   {
@@ -724,7 +734,7 @@ void csBdNode::ctSetItem (csBdNode* item, int pos)
   if (flags & BD_NODE_MODIFIED)
   {
     nodes->Put (pos, item);
-    if (nodes->Length() != 0)
+    if (nodes->GetSize () != 0)
       flags |= BD_NODE_HAS_CHILDREN;
   }
 }
@@ -747,7 +757,7 @@ void csBdNode::ctInsertBefore (csBdNode* item, int pos)
   if (flags & BD_NODE_MODIFIED)
   {
     nodes->Insert (pos, item);
-    if (nodes->Length() != 0)
+    if (nodes->GetSize () != 0)
       flags |= BD_NODE_HAS_CHILDREN;
   }
 }
@@ -757,7 +767,7 @@ void csBdNode::ctRemove (int pos)
   if (flags & BD_NODE_MODIFIED)
   {
     nodes->DeleteIndex (pos);
-    if (nodes->Length() == 0)
+    if (nodes->GetSize () == 0)
       flags &= ~BD_NODE_HAS_CHILDREN;
   }
 }
@@ -766,7 +776,7 @@ uint csBdNode::ctNum ()
 {
   if (flags & BD_NODE_MODIFIED)
   {
-    return (uint)nodes->Length();
+    return (uint)nodes->GetSize ();
   }
   else
   {
@@ -1764,9 +1774,9 @@ const char* csBinaryDocument::Parse (iDataBuffer* buf, bool /* collapse */)
 const char* csBinaryDocument::Parse (iString* str, bool collapse)
 {
   csRef<csDataBuffer> newBuffer = csPtr<csDataBuffer>
-    (new csDataBuffer(str->Length()));
+    (new csDataBuffer(str->Length ()));
   memcpy (newBuffer->GetData(), str->GetData(),
-    str->Length());
+    str->Length ());
   return Parse (newBuffer, collapse);
 }
 

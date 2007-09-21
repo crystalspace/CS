@@ -25,6 +25,9 @@
 
 class csTextureManagerNull;
 
+// For GetTextureTarget ()
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * csTextureHandleNull represents a texture and all its mipmapped
  * variants.
@@ -38,13 +41,15 @@ protected:
   bool prepared;
 
   /// The texture manager
-  csTextureManagerNull *texman;
+  csRef<csTextureManagerNull> texman;
 
   int w, h, d;
   int orig_w, orig_h, orig_d;
 public:
   /// Create the mipmapped texture object
   csTextureHandleNull (csTextureManagerNull *txtmgr, iImage *image, int flags);
+  csTextureHandleNull (csTextureManagerNull *txtmgr, int w, int h, int d, 
+    int flags);
   /// Destroy the object and free all associated storage
   virtual ~csTextureHandleNull ();
 
@@ -72,7 +77,10 @@ public:
   const char* GetImageName () const { return imageName; }
   virtual void Blit (int, int, int, int, unsigned char const*, 
     TextureBlitDataFormat) {}
+  virtual TextureType GetTextureType () const { return texType2D; }
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * Software version of the texture manager. This instance of the
@@ -100,9 +108,11 @@ public:
   int GetTextureFormat ()
   { return CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA; }
 
-  ///
-  virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags);
-  ///
+  virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags,
+      iString* fail_reason = 0);
+  virtual csPtr<iTextureHandle> CreateTexture (int w, int h,
+      csImageType imagetype, const char* format, int flags,
+      iString* fail_reason = 0);
   virtual void UnregisterTexture (csTextureHandleNull* handle);
 
   virtual csPtr<iSuperLightmap> CreateSuperLightmap(int w, int h);

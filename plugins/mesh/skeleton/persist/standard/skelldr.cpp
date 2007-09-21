@@ -94,8 +94,8 @@ csSkeletonFactoryLoader::~csSkeletonFactoryLoader ()
 bool csSkeletonFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csSkeletonFactoryLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = csQueryRegistry<iReporter> (object_reg);
+  synldr = csQueryRegistry<iSyntaxService> (object_reg);
 
   xmltokens.Register ("bone", XMLTOKEN_BONE);
   xmltokens.Register ("move", XMLTOKEN_MOVE);
@@ -151,7 +151,7 @@ const char *csSkeletonFactoryLoader::ParseBone (iDocumentNode* node,
     {
       case XMLTOKEN_MOVE:
         {
-          csRef<iSyntaxService> SyntaxService = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+          csRef<iSyntaxService> SyntaxService = csQueryRegistry<iSyntaxService> (object_reg);
           csRef<iDocumentNode> vector_node = child->GetNode ("v");
           if (vector_node)
           {
@@ -195,7 +195,7 @@ const char *csSkeletonFactoryLoader::ParseBone (iDocumentNode* node,
           case XMLTOKEN_MOVE:
           {
             csReversibleTransform socket_transform;
-            csRef<iSyntaxService> SyntaxService = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+            csRef<iSyntaxService> SyntaxService = csQueryRegistry<iSyntaxService> (object_reg);
             csRef<iDocumentNode> vector_node = child->GetNode ("v");
             if (vector_node)
             {
@@ -468,7 +468,7 @@ const char *csSkeletonFactoryLoader::ParseScript (iDocumentNode* node,
   if (!script_name)
     return "Name of the script is missing!";
 
-  iSkeletonScript *script = skel_fact->CreateScript(script_name);
+  iSkeletonAnimation *script = skel_fact->CreateAnimation (script_name);
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -496,7 +496,7 @@ const char *csSkeletonFactoryLoader::ParseScript (iDocumentNode* node,
 }
 
 const char *csSkeletonFactoryLoader::ParseFrame (iDocumentNode* node, 
-  iSkeletonFactory *skel_fact, iSkeletonScript *script)
+  iSkeletonFactory *skel_fact, iSkeletonAnimation *script)
 {
   const char* frame_name = node->GetAttributeValue ("name");
   if (!frame_name)
@@ -505,7 +505,7 @@ const char *csSkeletonFactoryLoader::ParseFrame (iDocumentNode* node,
   }
   int duration = node->GetAttributeValueAsInt ("duration");
 
-  iSkeletonScriptKeyFrame *frame = script->CreateFrame(frame_name);
+  iSkeletonAnimationKeyFrame *frame = script->CreateFrame(frame_name);
   frame->SetDuration(duration);
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -544,7 +544,7 @@ const char *csSkeletonFactoryLoader::ParseFrame (iDocumentNode* node,
         break;
         case XMLTOKEN_MOVE:
         {
-          csRef<iSyntaxService> SyntaxService = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+          csRef<iSyntaxService> SyntaxService = csQueryRegistry<iSyntaxService> (object_reg);
           csRef<iDocumentNode> vector_node = child->GetNode ("v");
           if (vector_node)
           {

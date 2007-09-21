@@ -22,9 +22,15 @@
 #include <unistd.h>
 
 #include "cssysdef.h"
+#include "csver.h"
 #include "csutil/util.h"
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
+
+#define VERSION_STR            CS_VERSION_MAJOR "_" CS_VERSION_MINOR
+#define VERSION_STR_DOTTED     CS_VERSION_MAJOR "." CS_VERSION_MINOR
+
+#define CS_PACKAGE_NAME_VER    CS_PACKAGE_NAME "-" VERSION_STR_DOTTED
 
 // @@@ Re-enable recursive scanning after we rethink it.  Presently, many
 // developers run applications from within the source tree, and recursion
@@ -36,22 +42,31 @@
 #ifdef CS_COMPILER_GCC
 #warning CS_CONFIGDIR not set
 #endif
-#define CS_CONFIGDIR "/usr/local/" CS_PACKAGE_NAME
+#define CS_CONFIGDIR "/usr/local/" CS_PACKAGE_NAME_VER
 #endif
 #ifndef CS_PLUGINDIR
 #ifdef CS_COMPILER_GCC
 #warning CS_PLUGINDIR not set
 #endif
-#define CS_PLUGINDIR "/usr/local/" CS_PACKAGE_NAME "/lib"
+#define CS_PLUGINDIR "/usr/local/" CS_PACKAGE_NAME_VER "/lib"
 #endif
 
 csString csGetConfigPath ()
 {
-  const char* crystalconfig = getenv("CRYSTAL_CONFIG");
+  const char* crystalconfig;
+   
+  crystalconfig = getenv("CRYSTAL_" VERSION_STR "_CONFIG");
   if (crystalconfig)
     return crystalconfig;
   
-  const char* crystal = getenv ("CRYSTAL");
+  crystalconfig = getenv("CRYSTAL_CONFIG");
+  if (crystalconfig)
+    return crystalconfig;
+  
+  const char* crystal = getenv ("CRYSTAL_" VERSION_STR);
+  if (!crystal || !*crystal)
+    crystal = getenv ("CRYSTAL");
+    
   if (crystal)
   {
     csString path, file;
@@ -92,7 +107,8 @@ csString csGetConfigPath ()
     }
     
     csFPrintf (stderr,
-        "Failed to find vfs.cfg in '%s' (defined by CRYSTAL var).\n", crystal);
+        "Failed to find vfs.cfg in '%s' (defined by "
+        "CRYSTAL_" VERSION_STR " var).\n", crystal);
     return "";
   }
 
@@ -117,7 +133,10 @@ csPathsList* csGetPluginPaths (const char* argv0)
   if (!appPath.IsEmpty())
     paths->AddUniqueExpanded (appPath, DO_SCAN_RECURSION, "app");
 
-  const char* crystal = getenv("CRYSTAL");
+  const char* crystal = getenv ("CRYSTAL_" VERSION_STR);
+  if (!crystal || !*crystal)
+    crystal = getenv ("CRYSTAL");
+  
   if (crystal)
   {
     csString crystalPath (crystal);
@@ -144,7 +163,9 @@ csPathsList* csGetPluginPaths (const char* argv0)
     }
   }
 
-  const char* crystal_plugin = getenv("CRYSTAL_PLUGIN");
+  const char* crystal_plugin = getenv("CRYSTAL_PLUGIN_" VERSION_STR);
+  if (!crystal_plugin || !*crystal_plugin)
+    crystal_plugin = getenv("CRYSTAL_PLUGIN");
   if (crystal_plugin)
     paths->AddUniqueExpanded(crystal_plugin, DO_SCAN_RECURSION, "plugins");
 
@@ -156,11 +177,12 @@ csPathsList* csGetPluginPaths (const char* argv0)
 
 csPathsList* csInstallationPathsHelper::GetPlatformInstallationPaths()
 {
-  const char *envpath = getenv ("CRYSTAL");
+  const char *envpath = getenv ("CRYSTAL_" VERSION_STR);
+  if (!envpath || !*envpath)
+    envpath = getenv ("CRYSTAL");
   if (envpath && *envpath)
   {
-    return 
-      new csPathsList (csPathsUtilities::ExpandAll (csPathsList (envpath)));
+    return new csPathsList (envpath, true);
   }
 
   csPathsList* paths = new csPathsList;

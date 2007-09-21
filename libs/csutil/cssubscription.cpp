@@ -90,7 +90,7 @@ csEventTree *csEventTree::FindNodeInternal(csEventID &name, csEventQueue *q)
     csEventID parentID = name_reg->GetParentID(name);
     CS_ASSERT(parentID != CS_EVENT_INVALID);
     csEventTree *wrk_parent = FindNodeInternal(parentID, q);
-    for (size_t iter=0 ; iter<wrk_parent->children.Length() ; iter++) 
+    for (size_t iter=0 ; iter<wrk_parent->children.GetSize () ; iter++) 
     {
       csEventTree* child = (static_cast<csEventTree *> (wrk_parent->children[iter]));
       if (child->self == name)
@@ -107,7 +107,7 @@ void csEventTree::PushFatCopy (FatRecordObject *r)
   if (!fatNode) 
   {
     fatRecord = r;
-    for (size_t i=0 ; i<children.Length() ; i++) 
+    for (size_t i=0 ; i<children.GetSize () ; i++) 
     {
       ((csEventTree *)children[i])->PushFatCopy(r);
     }
@@ -397,7 +397,7 @@ bool csEventTree::SubscribeInternal (csHandlerID id, csEventID baseevent)
    * The scheme only becomes expensive when there are subscribers at a lot of
    * subtrees of the graft point (i.e., a lot of fat copies).
    */
-  for (size_t i=0 ; i<children.Length() ; i++) 
+  for (size_t i=0 ; i<children.GetSize () ; i++) 
   {
     if (!((csEventTree *)children[i])->SubscribeInternal (id, baseevent))
       goto fail;
@@ -483,7 +483,7 @@ void csEventTree::UnsubscribeInternal(csHandlerID id)
    * to propagate to (fatNode) children.  
    * Descend recursively and look for them. */
 
-  for (size_t i=0 ; i<children.Length() ; i++) 
+  for (size_t i=0 ; i<children.GetSize () ; i++) 
   {
     ((csEventTree *)children[i])->UnsubscribeInternal(id);
   }
@@ -672,7 +672,7 @@ void csEventTree::Dump (int depth)
     std::cerr << "No subscribers" << std::endl;
   }
 
-  for (size_t i=0 ; i<children.Length() ; i++) 
+  for (size_t i=0 ; i<children.GetSize () ; i++) 
   {
     ((csEventTree *) children[i])->Dump(depth+1);
   }

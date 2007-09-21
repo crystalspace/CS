@@ -21,27 +21,26 @@
 #define __CS_CSLOADER_H__
 
 #include <stdarg.h>
-#include "ivideo/graph3d.h"
-#include "imap/loader.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
-#include "csutil/csstring.h"
-#include "csutil/util.h"
-#include "csutil/strhash.h"
-#include "csutil/hash.h"
-#include "csutil/array.h"
-#include "csutil/refarr.h"
-#include "csutil/scopedmutexlock.h"
-#include "csutil/scf_implementation.h"
-#include "csgeom/quaternion.h"
-#include "iutil/plugin.h"
-#include "imap/services.h"
-#include "imap/ldrctxt.h"
-#include "ivaria/engseq.h"
-#include "isndsys/ss_renderer.h"
 
-class csGenerateImageTexture;
-class csGenerateImageValue;
+#include "csgeom/quaternion.h"
+#include "csutil/array.h"
+#include "csutil/csstring.h"
+#include "csutil/hash.h"
+#include "csutil/refarr.h"
+#include "csutil/scf_implementation.h"
+#include "csutil/threading/thread.h"
+#include "csutil/strhash.h"
+#include "csutil/util.h"
+#include "imap/ldrctxt.h"
+#include "imap/loader.h"
+#include "imap/services.h"
+#include "isndsys/ss_renderer.h"
+#include "iutil/comp.h"
+#include "iutil/eventh.h"
+#include "iutil/plugin.h"
+#include "ivaria/engseq.h"
+#include "ivideo/graph3d.h"
+
 class csReversibleTransform;
 class csColor;
 struct csRGBcolor;
@@ -62,15 +61,15 @@ struct iCameraPosition;
 struct iDocumentNode;
 struct iDocument;
 struct iFile;
-struct iPolygonMesh;
+struct iTriangleMesh;
 struct iShaderManager;
 struct iMeshGenerator;
 struct iSceneNode;
 struct iRenderLoop;
+struct iImposter;
 
 struct iObject;
 struct iThingState;
-struct iCollection;
 struct iMaterialWrapper;
 struct iMeshFactoryWrapper;
 struct iMeshWrapper;
@@ -84,6 +83,7 @@ struct iSequenceTrigger;
 struct iSequenceWrapper;
 struct iEngineSequenceParameters;
 struct iSharedVariable;
+struct iSceneNodeArray;
 
 class csLoader;
 struct csLoaderPluginRec;
@@ -182,6 +182,8 @@ public:
   virtual bool IsError () { return error; }
 };
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * The loader for Crystal Space maps.
  */
@@ -207,7 +209,8 @@ private:
   /// Pointer to built-in image texture loader.
   csRef<iLoaderPlugin> BuiltinImageTexLoader;
   /// Pointer to built-in checkerboard texture loader.
-  csRef<iLoaderPlugin> BuiltinCheckerTexLoader;
+  //csRef<iLoaderPlugin> BuiltinCheckerTexLoader;
+  csRef<iLoaderPlugin> BuiltinErrorTexLoader;
 
   /// Auto regions flag
   bool autoRegions;
@@ -216,8 +219,8 @@ private:
   //the hierarchy of meshes starting from 'meshWrapper'.
   void CollectAllChildren (iMeshWrapper* meshWrapper, csRefArray<iMeshWrapper>&
     meshesArray);
-  //Two useful private functions to set the CS_POLYMESH_CLOSED and
-  //CS_POLYMESH_CONVEX flags on a single mesh wrapper.
+  //Two useful private functions to set the CS_TRIMESH_CLOSED and
+  //CS_TRIMESH_CONVEX flags on a single mesh wrapper.
   void ConvexFlags (iMeshWrapper* mesh);
   void ClosedFlags (iMeshWrapper* mesh);
 
@@ -225,7 +228,7 @@ private:
   {
   private:
     /// Mutex to make the plugin vector thread-safe.
-    csRef<csMutex> mutex;
+    CS::Threading::RecursiveMutex mutex;
     iObjectRegistry* object_reg;
 
     csArray<csLoaderPluginRec*> vector;
@@ -249,6 +252,8 @@ private:
      */
     bool FindPlugin (const char* Name, iLoaderPlugin*& plug,
     	iBinaryLoaderPlugin*& binplug, iDocumentNode*& defaults);
+    /// Find a plugin's class ID by its name. Returns 0 if it is not found.
+    const char* FindPluginClassID (const char* Name);
     // add a new plugin record
     void NewPlugin (const char* ShortName, iDocumentNode* child);
     /**
@@ -266,6 +271,24 @@ private:
   csLoadedPluginVector loaded_plugins;
 
   //------------------------------------------------------------------------
+
+  /**
+   * Parse a key/value pair.
+   * Takes "editoronly" attribute into account: KVPs should only be parsed 
+   * if they're not editor-only or when the engine is in "saveable" mode.
+   */
+  bool ParseKey (iDocumentNode* node, iObject* obj);
+/*
+          iKeyValuePair* kvp = 0;
+          SyntaxService->ParseKey (child, kvp);
+          if (kvp)
+          {
+            Engine->QueryObject()->ObjAdd (kvp->QueryObject ());
+	    kvp->DecRef ();
+          }
+	  else
+	    return false;
+*/
 
   /// Parse a quaternion definition
   bool ParseQuaternion (iDocumentNode* node, csQuaternion &q);
@@ -310,7 +333,7 @@ private:
   /// Process the attributes of one shared variable
   bool ParseSharedVariable (iLoaderContext* ldr_context, iDocumentNode* node);
   /// Process the attributes of an <imposter> tag in a mesh specification.
-  bool ParseImposterSettings(iMeshWrapper* mesh,iDocumentNode *node);
+  bool ParseImposterSettings(iImposter* mesh, iDocumentNode *node);
 
   /// Parse a texture definition and add the texture to the engine
   iTextureWrapper* ParseTexture (iLoaderContext* ldr_context,
@@ -331,9 +354,6 @@ private:
   	iDocumentNode* node, const char* prefix = 0);
   /// Parse a renderloop.
   iRenderLoop* ParseRenderLoop (iDocumentNode* node, bool& set);
-  /// Parse a collection definition and add the collection to the engine
-  iCollection* ParseCollection (iLoaderContext* ldr_context,
-  	iDocumentNode* node);
   /// Parse a camera position.
   bool ParseStart (iDocumentNode* node, iCameraPosition* campos);
   /// Parse a static light definition and add the light to the engine
@@ -358,26 +378,21 @@ private:
   /// Find the named shared variable and verify its type if specified
   iSharedVariable *FindSharedVariable(const char *colvar,
 				      int verify_type );
-  /// Parse a 'polymesh' block.
-  bool ParsePolyMesh (iDocumentNode* node, iObjectModel* objmodel);
-  bool ParsePolyMeshChildBox (iDocumentNode* child,
-	csRef<iPolygonMesh>& polymesh);
-  bool ParsePolyMeshChildMesh (iDocumentNode* child,
-	csRef<iPolygonMesh>& polymesh);
+  /// Parse a 'trimesh' block.
+  bool ParseTriMesh (iDocumentNode* node, iObjectModel* objmodel);
+  bool ParseTriMeshChildBox (iDocumentNode* child,
+	csRef<iTriangleMesh>& trimesh);
+  bool ParseTriMeshChildMesh (iDocumentNode* child,
+	csRef<iTriangleMesh>& trimesh);
 
   /// -----------------------------------------------------------------------
   /// Parse a shaderlist
+  bool LoadShaderExpressions (iLoaderContext* ldr_context,
+  	iDocumentNode* node);
   bool ParseShaderList (iLoaderContext* ldr_context, iDocumentNode* node);
   bool ParseShader (iLoaderContext* ldr_context, iDocumentNode* node,
     iShaderManager* shaderMgr);
-  virtual bool LoadShader (const char* filename);
-
-  /// For heightgen.
-  csGenerateImageTexture* ParseHeightgenTexture (iDocumentNode* node);
-  /// For heightgen.
-  csGenerateImageValue* ParseHeightgenValue (iDocumentNode* node);
-  /// Parse and load a height texture
-  bool ParseHeightgen (iLoaderContext* ldr_context, iDocumentNode* node);
+  virtual csRef<iShader> LoadShader (const char* filename, bool registerShader = true);
 
   /**
    * Load a LOD control object.
@@ -415,9 +430,9 @@ private:
   	iMeshWrapper* mesh, iMeshWrapper* parent, iDocumentNode* node,
 	iStreamSource* ssource);
   /**
-   * Load the polymesh object from the map file.
+   * Load the trimesh object from the map file.
    */
-  bool LoadPolyMeshInSector (iLoaderContext* ldr_context,
+  bool LoadTriMeshInSector (iLoaderContext* ldr_context,
   	iMeshWrapper* mesh, iDocumentNode* node, iStreamSource* ssource);
 
   /**
@@ -520,7 +535,7 @@ private:
    * Add children to the region.
    */
   void AddChildrenToRegion (iLoaderContext* ldr_context,
-	const csRefArray<iSceneNode>& children);
+    const iSceneNodeArray* children);
 
   /// Report any error.
   void ReportError (const char* id, const char* description, ...)
@@ -598,8 +613,7 @@ public:
   virtual csPtr<iSndSysData> LoadSoundSysData (const char *fname);
   virtual csPtr<iSndSysStream> LoadSoundStream (const char *fname,
   	int mode3d);
-  virtual iSndSysWrapper* LoadSoundWrapper (const char *name, const char *fname,
-  	int mode3d);
+  virtual iSndSysWrapper* LoadSoundWrapper (const char *name, const char *fname);
 
   virtual csPtr<iLoaderStatus> ThreadedLoadMapFile (const char* filename,
 	iRegion* region, bool curRegOnly, bool checkDupes);
@@ -648,5 +662,7 @@ public:
   virtual csPtr<iMeshWrapper> LoadMeshObject (const char* fname,
   	iStreamSource* ssource);
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_CSLOADER_H__

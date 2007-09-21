@@ -36,14 +36,23 @@ distribution.
 #include <string.h>
 #include <assert.h>
 #include "iutil/string.h"
-#include "csutil/util.h"
 #include "csutil/array.h"
+#include "csutil/csstring.h"
+#include "csutil/fifo.h"
+#include "csutil/fixedsizeallocator.h"
+#include "csutil/memheap.h"
+#include "csutil/reftrackeraccess.h"
 #include "csutil/strset.h"
-#include "csutil/blockallocator.h"
+#include "csutil/util.h"
+#include "csgeom/math.h"
 
 #include "tinystr.h"
 
 namespace CS
+{
+namespace Implementation
+{
+namespace TinyXml
 {
 
 class TiDocument;
@@ -74,6 +83,18 @@ enum
   TIXML_ERROR_DOCUMENT_EMPTY,
 
   TIXML_ERROR_STRING_COUNT
+};
+
+struct ParseInfo
+{
+  TiDocument* document;
+  bool condenseWhiteSpace;
+  
+  const char* startOfLine;
+  int linenum;
+  
+  void BeginParse (const char* p)
+  { startOfLine = p; linenum = 1; }
 };
 
 /**
@@ -107,30 +128,9 @@ class TiXmlBase
 
 public:
   TiXmlBase () {}
-  virtual ~TiXmlBase () {}
+  ~TiXmlBase () {}
 
-  /**
-   * All TinyXml classes can print themselves to a filestream.
-   * This is a formatted print, and will insert tabs and newlines.
-   * (For an unformatted stream, use the << operator.)
-   */
-  virtual void Print( iString* cfile, int depth ) const = 0;
-
-  /**
-   * The world does not agree on whether white space should be kept or
-   * not. In order to make everyone happy, these global, static functions
-   * are provided to set whether or not TinyXml will condense all white space
-   * into a single space or not. The default is to condense. Note changing these
-   * values is not thread safe.
-   */
-  static void SetCondenseWhiteSpace( bool condense )
-  { condenseWhiteSpace = condense; }
-
-  /// Return the current white space setting.
-  static bool IsWhiteSpaceCondensed()
-  { return condenseWhiteSpace; }
-
-  static const char* SkipWhiteSpace( const char* );
+  static const char* SkipWhiteSpace( ParseInfo& parse, const char* );
 
   /**
    * Reads an XML name into the string provided. Returns
@@ -143,7 +143,8 @@ public:
    * Reads text. Returns a pointer past the given end tag.
    * Wickedly complex options, but it keeps the (sensitive) code in one place.
    */
-  static const char* ReadText(  const char* in, GrowString& buf,
+  static const char* ReadText( ParseInfo& parse, 
+        const char* in, GrowString& buf,
         bool ignoreWhiteSpace,
         const char* endTag);
 
@@ -155,8 +156,6 @@ public:
   static void PutString( const TiXmlString& str, TiXmlString* out );
 
 protected:
-  virtual const char* Parse( TiDocument* document, const char* p ) = 0;
-
   // If an entity has been found, transform it into a character.
   static const char* GetEntity( const char* in, char* value );
 
@@ -194,7 +193,6 @@ private:
     MAX_ENTITY_LENGTH = 6
   };
   static const Entity entity[ NUM_ENTITY ];
-  static bool condenseWhiteSpace;
 };
 
 
@@ -205,7 +203,7 @@ private:
  * in a document, or stand on its own. The type of a TiDocumentNode
  * can be queried, and it can be cast to its more defined type.
  */
-class TiDocumentNode : public TiXmlBase
+class TiDocumentNode : public TiXmlBase,  public CS::Memory::CustomAllocated
 {
   friend class TiDocument;
   friend class TiDocumentNodeChildren;
@@ -221,7 +219,23 @@ public:
     DOCUMENT, ELEMENT, COMMENT, UNKNOWN, TEXT, CDATA, DECLARATION, TYPECOUNT
   };
 
-  virtual ~TiDocumentNode();
+  ~TiDocumentNode();
+
+  void IncRef () 
+  { 
+    csRefTrackerAccess::TrackIncRef (this, refcount); 
+    refcount++; 
+  }
+  void DecRef ();
+  int GetRefCount () const { return refcount; }
+
+  /**
+   * All TinyXml classes can print themselves to a filestream.
+   * This is a formatted print, and will insert tabs and newlines.
+   * (For an unformatted stream, use the << operator.)
+   */
+  void Print( iString* cfile, int depth ) const;
+  const char* Parse( ParseInfo& parse, const char* p );
 
   /**
    * The meaning of 'value' changes for the specific type of
@@ -235,21 +249,15 @@ public:
    * @endverbatim
    * The subclasses will wrap this function.
    */
-  virtual const char * Value () const = 0;
+  const char * Value () const;
 
   /**
    * Changes the value of the node.
    */
-  virtual void SetValue (const char * _value) = 0;
+  void SetValue (const char * _value);
 
   /// One step up the DOM.
   TiDocumentNodeChildren* Parent() const{ return parent; }
-
-  /// Navigate to a sibling node.
-  TiDocumentNode* PreviousSibling() const { return prev; }
-
-  /// Navigate to a sibling node.
-  TiDocumentNode* PreviousSibling( const char * ) const;
 
   /// Navigate to a sibling node.
   TiDocumentNode* NextSibling() const { return next; }
@@ -280,13 +288,6 @@ public:
    */
   TiDocument* GetDocument() const;
 
-  TiDocumentNodeChildren* ToDocumentNodeChildren() const
-  {
-    int t = Type ();
-    return ( t == DOCUMENT || t == ELEMENT )
-      ? (TiDocumentNodeChildren*) this
-  : 0;
-  }
   TiDocument* ToDocument() const
   { return ( Type () == DOCUMENT ) ? (TiDocument*) this : 0; }
   TiXmlElement*  ToElement() const
@@ -300,9 +301,11 @@ public:
   TiXmlDeclaration* ToDeclaration() const
   { return ( Type () == DECLARATION ) ? (TiXmlDeclaration*) this : 0; }
 
-  virtual TiDocumentNode* Clone(TiDocument* document) const = 0;
+  csPtr<TiDocumentNode> Clone(TiDocument* document) const;
 
 protected:
+  int refcount;
+
   TiDocumentNode( );
 
   void CopyToClone( TiDocumentNode* target ) const
@@ -313,8 +316,7 @@ protected:
   NodeType type;
   TiDocumentNodeChildren* parent;
 
-  TiDocumentNode* prev;
-  TiDocumentNode* next;
+  csRef<TiDocumentNode> next;
 };
 
 /**
@@ -326,7 +328,7 @@ public:
   /// Construct an element.
   TiDocumentNodeChildren ();
 
-  virtual ~TiDocumentNodeChildren();
+  ~TiDocumentNodeChildren();
 
   /// Delete all the children of this node. Does not affect 'this'.
   void Clear();
@@ -338,31 +340,32 @@ public:
   TiDocumentNode* FirstChild( const char * value ) const;
 
   /**
-   * Add a new node related to this. Adds a child past the LastChild.
-   * Returns a pointer to the new object or 0 if an error occured.
-   */
-  TiDocumentNode* InsertEndChild( const TiDocumentNode& addThis );
-
-  /**
    * Add a new node related to this. Adds a child before the specified child.
    * Returns a pointer to the new object or 0 if an error occured.
    */
   TiDocumentNode* InsertBeforeChild( TiDocumentNode* beforeThis,
     const TiDocumentNode& addThis );
+  TiDocumentNode* InsertAfterChild( TiDocumentNode* beforeThis,
+    const TiDocumentNode& addThis );
 
   /// Delete a child of this node.
   bool RemoveChild( TiDocumentNode* removeThis );
 
+  TiDocumentNode* Previous (TiDocumentNode* child);
+  TiDocumentNode* LastChild ();
 protected:
   // Figure out what is at *p, and parse it. Returns null if it is not an xml
   // node.
-  TiDocumentNode* Identify( TiDocument* document, const char* start );
+  csPtr<TiDocumentNode> Identify( ParseInfo& parse, const char* start );
 
-  // The node is passed in by ownership. This object will delete it.
-  TiDocumentNode* LinkEndChild( TiDocumentNode* addThis );
+  /**
+   * Add a new node related to this. Adds a child past afterThis.
+   * Returns a pointer to the new object or 0 if an error occured.
+   */
+  void InsertAfterChild( TiDocumentNode* afterThis,
+    TiDocumentNode* addThis );
 
-  TiDocumentNode* firstChild;
-  TiDocumentNode* lastChild;
+  csRef<TiDocumentNode> firstChild;
 };
 
 
@@ -381,7 +384,7 @@ class TiDocumentAttribute
 public:
   /// Construct an empty attribute.
   TiDocumentAttribute() { name = 0; value = 0; }
-  ~TiDocumentAttribute () { delete[] value; }
+  ~TiDocumentAttribute () { cs_free (value); }
 
   const char* Name()  const { return name; }
   const char* Value() const { return value; }
@@ -392,8 +395,8 @@ public:
   void SetName( const char* _name )  { name = _name; }
   void SetValue( const char* _value )
   {
-    delete[] value;
-    value = csStrNew (_value);
+    cs_free (value);
+    value = CS::StrDup (_value);
   }
   /// Take over value so that this attribute has ownership.
   void TakeOverValue( char* _value )
@@ -421,12 +424,14 @@ public:
    * Attribute parsing starts: first letter of the name
    * returns: the next char after the value end quote
    */
-  const char* Parse( TiDocument* document, const char* p );
+  const char* Parse( ParseInfo& parse, TiDocumentNode* node, const char* p );
+
+private:
+  friend class TiXmlElement;
 
   // [internal use]
   void Print( iString* cfile, int depth ) const;
 
-private:
   const char* name;
   char* value;
 };
@@ -444,9 +449,12 @@ private:
 class TiDocumentAttributeSet
 {
 public:
-  csArray<TiDocumentAttribute> set;
+  csArray<TiDocumentAttribute,
+    csArrayElementHandler<TiDocumentAttribute>,
+    CS::Memory::AllocatorMalloc,
+    csArrayCapacityLinear<csArrayThresholdFixed<4> > > set;
 
-  TiDocumentAttributeSet() : set (0, 4) { }
+  TiDocumentAttributeSet() : set (0) { }
   size_t Find (const char * name) const;
   size_t FindExact (const char * reg_name) const;
 };
@@ -463,7 +471,7 @@ public:
   /// Construct an element.
   TiXmlElement ();
 
-  virtual ~TiXmlElement();
+  ~TiXmlElement();
 
   /**
    * Given an attribute name, attribute returns the value
@@ -496,7 +504,7 @@ public:
   void SetAttribute( TiDocument* document, const char * name, int value );
 
   /// Get number of attributes.
-  size_t GetAttributeCount () const { return attributeSet.set.Length (); }
+  size_t GetAttributeCount () const { return attributeSet.set.GetSize (); }
   /// Get attribute.
   const TiDocumentAttribute& GetAttribute (size_t idx) const
   {
@@ -513,30 +521,32 @@ public:
    */
   void RemoveAttribute( const char * name );
   // [internal use] Creates a new Element and returs it.
-  virtual TiDocumentNode* Clone(TiDocument* document) const;
+  csPtr<TiDocumentNode> Clone(TiDocument* document) const;
   // [internal use]
 
-  virtual void Print( iString* cfile, int depth ) const;
-
-  virtual const char * Value () const { return value; }
+  const char * Value () const { return value; }
   void SetValueRegistered (const char * _value)
   {
     value = _value;
   }
-  virtual void SetValue (const char * _value);
+  void SetValue (const char * _value);
 
 protected:
+  friend class TiDocumentNode;
+
+  void Print( iString* cfile, int depth ) const;
+
   /*  [internal use]
    * Attribtue parsing starts: next char past '<'
    * returns: next char past '>'
    */
-  virtual const char* Parse( TiDocument* document, const char* p );
+  const char* Parse( ParseInfo& parse, const char* p );
 
   /*  [internal use]
    * Reads the "value" of the element -- another element, or text.
    * This should terminate with the current end tag.
    */
-  const char* ReadValue( TiDocument* document, const char* in );
+  const char* ReadValue( ParseInfo& parse, const char* in );
 
 private:
   TiDocumentAttributeSet attributeSet;
@@ -552,28 +562,28 @@ class TiXmlComment : public TiDocumentNode
 public:
   /// Constructs an empty comment.
   TiXmlComment() { value = 0; type = COMMENT; }
-  virtual ~TiXmlComment() { delete[] value; }
+  ~TiXmlComment() { cs_free (value); }
 
   // [internal use] Creates a new Element and returs it.
-  virtual TiDocumentNode* Clone(TiDocument* document) const;
-  // [internal use]
-  virtual void Print( iString* cfile, int depth ) const;
-  virtual const char * Value () const { return value; }
-  virtual void SetValue (const char * _value)
+  csPtr<TiDocumentNode> Clone(TiDocument* document) const;
+  const char * Value () const { return value; }
+  void SetValue (const char * _value)
   {
-    delete[] value;
-    if (_value)
-      value = csStrNew (_value);
-    else
-      value = 0;
+    cs_free (value);
+    value = CS::StrDup (_value);
   }
 
 protected:
+  friend class TiDocumentNode;
+
+  // [internal use]
+  void Print( iString* cfile, int depth ) const;
+
   /*  [internal use]
    * Attribtue parsing starts: at the ! of the !--
    * returns: next char past '>'
    */
-  virtual const char* Parse( TiDocument* document, const char* p );
+  const char* Parse( ParseInfo& parse, const char* p );
 
   char* value;
 };
@@ -592,28 +602,30 @@ public:
     value = 0;
     type = TEXT;
   }
-  virtual ~TiXmlText()
+  ~TiXmlText()
   {
   }
-  virtual const char * Value () const { return value; }
+  const char * Value () const { return value; }
   void SetValueRegistered (const char * _value)
   {
     value = _value;
   }
-  virtual void SetValue (const char * _value);
-
+  void SetValue (const char * _value);
 protected :
-  // [internal use] Creates a new Element and returns it.
-  virtual TiDocumentNode* Clone(TiDocument* document) const;
+  friend class TiDocumentNode;
+
   // [internal use]
-  virtual void Print( iString* cfile, int depth ) const;
+  void Print( iString* cfile, int depth ) const;
+
+  // [internal use] Creates a new Element and returns it.
+  csPtr<TiDocumentNode> Clone(TiDocument* document) const;
   // [internal use]
   bool Blank() const;  // returns true if all white space and new lines
   /*  [internal use]
    * Attribtue parsing starts: First char of the text
    * returns: next char past '>'
    */
-  virtual const char* Parse( TiDocument* document,  const char* p );
+  const char* Parse( ParseInfo& parse, const char* p );
 
   const char* value;
 };
@@ -632,10 +644,12 @@ public:
   {
     type = CDATA;
   }
-  virtual ~TiXmlCData() {}
+  ~TiXmlCData() {}
 
 protected :
-  virtual const char* Parse( TiDocument* document,  const char* p );
+  friend class TiDocumentNode;
+
+  const char* Parse( ParseInfo& parse, const char* p );
 };
 
 /**
@@ -662,7 +676,7 @@ public:
   TiXmlDeclaration (const char * _version,
     const char * _encoding, const char * _standalone );
 
-  virtual ~TiXmlDeclaration() {}
+  ~TiXmlDeclaration() {}
 
   /// Version. Will return empty if none was found.
   const char * Version() const { return version.c_str (); }
@@ -672,17 +686,20 @@ public:
   const char * Standalone() const { return standalone.c_str (); }
 
   // [internal use] Creates a new Element and returs it.
-  virtual TiDocumentNode* Clone(TiDocument* document) const;
-  // [internal use]
-  virtual void Print( iString* cfile, int depth ) const;
-  virtual const char * Value () const { return value.c_str (); }
-  virtual void SetValue (const char * _value) { value = _value;}
+  csPtr<TiDocumentNode> Clone(TiDocument* document) const;
+  const char * Value () const { return value.c_str (); }
+  void SetValue (const char * _value) { value = _value;}
 
 protected:
+  friend class TiDocumentNode;
+
+  // [internal use]
+  void Print( iString* cfile, int depth ) const;
+
   //  [internal use]
   //  Attribtue parsing starts: next char past '<'
   //           returns: next char past '>'
-  virtual const char* Parse( TiDocument* document,  const char* p );
+  const char* Parse( ParseInfo& parse, const char* p );
 
 private:
   TiXmlString version;
@@ -702,20 +719,23 @@ class TiXmlUnknown : public TiDocumentNode
 {
 public:
   TiXmlUnknown() { type = UNKNOWN; }
-  virtual ~TiXmlUnknown() {}
+  ~TiXmlUnknown() {}
 
   // [internal use]
-  virtual TiDocumentNode* Clone(TiDocument* document) const;
-  // [internal use]
-  virtual void Print( iString* cfile, int depth ) const;
-  virtual const char * Value () const { return value.c_str (); }
-  virtual void SetValue (const char * _value) { value = _value;}
+  csPtr<TiDocumentNode> Clone(TiDocument* document) const;
+  const char * Value () const { return value.c_str (); }
+  void SetValue (const char * _value) { value = _value;}
 protected:
+  friend class TiDocumentNode;
+
+  // [internal use]
+  void Print( iString* cfile, int depth ) const;
+
   /*  [internal use]
    * Attribute parsing starts: First char of the text
    * returns: next char past '>'
    */
-  virtual const char* Parse( TiDocument* document,  const char* p );
+  const char* Parse( ParseInfo& parse, const char* p );
 
   TiXmlString value;
 };
@@ -726,15 +746,114 @@ protected:
  * XML pieces. It can be saved, loaded, and printed to the screen.
  * The 'value' of a document node is the xml file name.
  */
-class TiDocument : public TiDocumentNodeChildren
+  class TiDocument : public TiDocumentNodeChildren
 {
+  /* When e.g. the root node is deleted with DeleteNode() an avalanche of
+     node releases may follow, even to the extent that the stack is blown.
+     To work around that catch reentrants into DeleteNode() and enqueue such
+     nodes to delete instead.
+   */
+  int deleteNest;
+  csFIFO<TiDocumentNode*> destroyQueue;
+  struct FreeQueueEntry
+  {
+    int type;
+    void* ptr;
+  };
+
+  void ActualDeleteNode (TiDocumentNode* node)
+  {
+    switch (node->Type())
+    {
+      case ELEMENT: static_cast<TiXmlElement*> (node)->~TiXmlElement(); break;
+      case TEXT: static_cast<TiXmlText*> (node)->~TiXmlText(); break;
+      case DOCUMENT: static_cast<TiDocument*> (node)->~TiDocument(); break;
+      case COMMENT: static_cast<TiXmlComment*> (node)->~TiXmlComment(); break;
+      case CDATA: static_cast<TiXmlCData*> (node)->~TiXmlCData(); break;
+      case DECLARATION: 
+        static_cast<TiXmlDeclaration*> (node)->~TiXmlDeclaration();
+        break;
+      case UNKNOWN: static_cast<TiXmlUnknown*> (node)->~TiXmlUnknown(); break;
+      default: 
+        CS_ASSERT(false);
+    }
+  }
+  void ActualFreeNode (const FreeQueueEntry& node)
+  {
+    switch (node.type)
+    {
+      case ELEMENT: 
+        blk_element.Free (node.ptr); 
+        break;
+      case TEXT: 
+        blk_text.Free (node.ptr); 
+        break;
+      case COMMENT:
+      case CDATA:
+      case DECLARATION:
+      case UNKNOWN:
+        docHeap.Free (node.ptr);
+        break;
+      case DOCUMENT:
+        CS::Memory::CustomAllocated::operator delete (node.ptr);
+        break;
+      default: 
+        CS_ASSERT(false);
+    }
+  }
+  /**
+   * Array capacity. Grows exponentially until a cap is hit.
+   */
+  class FreeQueueArrayCapacity
+  {
+    enum { maxGrow = 256*1024 };
+  public:
+    FreeQueueArrayCapacity () {}
+  
+    bool IsCapacityExcessive (size_t capacity, size_t count) const
+    {
+      size_t threshold = csMin (size_t (csFindNearestPowerOf2 (int (count))),
+	size_t (maxGrow));
+      return (capacity > threshold && count < capacity - threshold);
+    }
+    size_t GetCapacity (size_t count) const
+    {
+      size_t threshold = csMin (size_t (csFindNearestPowerOf2 (int (count))), 
+	size_t (maxGrow));
+      return ((count + threshold - 1) / threshold) * threshold;
+    }
+  };
+  void EmptyDestroyQueue()
+  {
+    csArray<FreeQueueEntry, csArrayElementHandler<FreeQueueEntry>,
+      CS::Memory::AllocatorMalloc, FreeQueueArrayCapacity> freeQueue;
+    freeQueue.SetCapacity (destroyQueue.GetSize());
+    while (destroyQueue.GetSize() > 0)
+    {
+      TiDocumentNode* node = destroyQueue.PopTop ();
+      // If we delete ourselves here the queue will disappear!
+      CS_ASSERT(node != this);
+      FreeQueueEntry fqe;
+      fqe.ptr = node;
+      fqe.type = node->Type();
+      freeQueue.Push (fqe);
+      ActualDeleteNode (node);
+    }
+    for (size_t n = freeQueue.GetSize(); n-- > 0; )
+    {
+      ActualFreeNode (freeQueue[n]);
+    }
+  }
 public:
+  /// Heap used for document allocations.
+  CS::Memory::Heap docHeap;
+  typedef CS::Memory::AllocatorHeap<CS::Memory::Heap*> DocHeapAlloc;
   /// Interned strings.
   csStringSet strings;
   /// Block allocator for elements.
-  csBlockAllocator<TiXmlElement> blk_element;
+  csFixedSizeAllocator<sizeof(TiXmlElement), DocHeapAlloc> blk_element;
   /// Block allocator for text.
-  csBlockAllocator<TiXmlText> blk_text;
+  csFixedSizeAllocator<sizeof(TiXmlText), DocHeapAlloc> blk_text;
 
   /// Create an empty document, that has no name.
   TiDocument();
@@ -744,7 +863,7 @@ public:
    */
   TiDocument( const char * documentName );
 
-  virtual ~TiDocument();
+  ~TiDocument();
 
   /**
    * Correctly delete a node. This will take care to use the correct
@@ -752,22 +871,43 @@ public:
    */
   void DeleteNode (TiDocumentNode* node)
   {
-    switch (node->Type ())
+    if (deleteNest == 0)
     {
-      case ELEMENT: blk_element.Free ((TiXmlElement*)node); break;
-      case TEXT: blk_text.Free ((TiXmlText*)node); break;
-      default: delete node;
+      // No nesting yet:
+      deleteNest++;
+      FreeQueueEntry fqe;
+      fqe.ptr = node;
+      fqe.type = node->Type();
+      // Delete the node...
+      ActualDeleteNode (node);
+      // ... and all that have been enqueued by that delete.
+      if (node != this)
+        EmptyDestroyQueue();
+      else
+        CS_ASSERT (destroyQueue.GetSize() == 0);
+      deleteNest--;
+      ActualFreeNode (fqe);
+      return;
     }
+    // Nesting: enqueue for later deletion.
+    destroyQueue.Push (node);
   }
 
-  virtual const char * Value () const { return value.c_str (); }
-  virtual void SetValue (const char * _value) { value = _value;}
+  const char * Value () const { return value.c_str (); }
+  void SetValue (const char * _value) { value = _value;}
 
+private:
   /// Parse the given null terminated block of xml data.
-  virtual const char* Parse( TiDocument* document,  const char* p );
+  const char* Parse( ParseInfo& parse, const char* p );
+public:
+  const char* Parse( const char* p )
+  {
+    parse.BeginParse (p);
+    return Parse (parse, p);
+  }
 
   /// If, during parsing, a error occurs, Error will be set to true.
-  bool Error() const { return error; }
+  bool Error() const { return errorId != TIXML_NO_ERROR; }
 
   /// Contains a textual (english) description of the error if one occurs.
   const char * ErrorDesc() const { return errorDesc.c_str (); }
@@ -779,29 +919,75 @@ public:
   int ErrorId() const { return errorId; }
 
   /// If you have handled the error, it can be reset with this call.
-  void ClearError() { error = false; errorId = 0; errorDesc = ""; }
+  void ClearError() { errorId = TIXML_NO_ERROR; errorDesc = ""; }
 
   // [internal use]
-  virtual void Print( iString* cfile, int depth = 0 ) const;
+  void Print( iString* cfile, int depth = 0 ) const;
   // [internal use]
-  void SetError( int err )
+  void SetError( int err, TiDocumentNode* errorNode, const char* errorPos )
   {
-    error   = true;
     errorId = err;
     errorDesc = errorString[ errorId ];
+    if (errorNode != 0)
+    {
+      csString errorPath;
+      
+      while (errorNode != 0)
+      {
+        const char* nodeVal;
+        if ((errorNode->type == ELEMENT)
+          && (nodeVal = errorNode->Value()) && *nodeVal)
+        {
+          if (!errorPath.IsEmpty ())
+            errorPath.Insert (0, " -> ");
+	  errorPath.Insert (0, nodeVal);
+        }
+        errorNode = errorNode->parent;
+      }
+      
+      errorDesc += " (in: ";
+      csString location;
+      location.Format ("line %d", parse.linenum);
+      if (errorPos != 0)
+        location.AppendFmt (":%zu", errorPos - parse.startOfLine + 1);
+      errorDesc += location.GetDataSafe();
+      if (!errorPath.IsEmpty())
+      {
+        errorDesc += "; ";
+        errorDesc += errorPath.GetDataSafe();
+      }
+      errorDesc += ")";
+    }
   }
 
+
+  /**
+   * The world does not agree on whether white space should be kept or
+   * not. In order to make everyone happy, these functions are provided 
+   * to set whether or not TinyXml will condense all white space into a 
+   * single space or not. The default is to condense. 
+   */
+  void SetCondenseWhiteSpace( bool condense )
+  { parse.condenseWhiteSpace = condense; }
+
+  /// Return the current white space setting.
+  bool IsWhiteSpaceCondensed()
+  { return parse.condenseWhiteSpace; }
 protected :
+  friend class TiDocumentNode;
+
   // [internal use]
-  virtual TiDocumentNode* Clone(TiDocument* document) const;
+  csPtr<TiDocumentNode> Clone(TiDocument* document) const;
 
 private:
-  bool error;
   int  errorId;
+  ParseInfo parse;
   TiXmlString errorDesc;
   TiXmlString value;
 };
 
+} // namespace TinyXml
+} // namespace Implementation
 } // namespace CS
 
 #endif

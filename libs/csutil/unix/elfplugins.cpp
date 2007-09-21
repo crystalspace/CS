@@ -72,7 +72,7 @@ struct ElfReader
     Shdr* shStrings = (Shdr*)(sectTab + strTabIndex*sectEntSize);
     csRef<csMemoryMapping> stringTab = mmio->GetData (
       Endianness::ConvertOff (shStrings->sh_offset), 
-      Endianness::ConvertSize (shStrings->sh_size));
+      Endianness::ConvertSize ((uint32_t)shStrings->sh_size));
     if (!stringTab.IsValid())
     {
       errMsg = "Could not map ELF section name string table";
@@ -86,7 +86,7 @@ struct ElfReader
         Endianness::ConvertUI32 (shdr->sh_name);
       if (strcmp (name, SECTION_TAG_NAME) == 0)
       {
-        size_t size = Endianness::ConvertSize (shdr->sh_size);
+        size_t size = Endianness::ConvertSize ((uint32_t)shdr->sh_size);
         char* buf = new char[size+1];
         csRef<csMemoryMapping> metadata = mmio->GetData (
           Endianness::ConvertOff (shdr->sh_offset), size);

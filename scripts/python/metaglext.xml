@@ -7410,4 +7410,29 @@
     <token name="GL_DEPTH24_STENCIL8_EXT" value="0x88F0" />
     <token name="GL_TEXTURE_STENCIL_SIZE_EXT" value="0x88F1" />
   </extension>
+  <extension name="GL_ARB_texture_float" type="GL">
+    <token name="GL_TEXTURE_RED_TYPE_ARB" value="0x8C10" />
+    <token name="GL_TEXTURE_GREEN_TYPE_ARB" value="0x8C11" />
+    <token name="GL_TEXTURE_BLUE_TYPE_ARB" value="0x8C12" />
+    <token name="GL_TEXTURE_ALPHA_TYPE_ARB" value="0x8C13" />
+    <token name="GL_TEXTURE_LUMINANCE_TYPE_ARB" value="0x8C14" />
+    <token name="GL_TEXTURE_INTENSITY_TYPE_ARB" value="0x8C15" />
+    <token name="GL_TEXTURE_DEPTH_TYPE_ARB" value="0x8C16" />
+    <token name="GL_UNSIGNED_NORMALIZED_ARB" value="0x8C17" />
+    <token name="GL_RGBA32F_ARB" value="0x8814" />
+    <token name="GL_RGB32F_ARB" value="0x8815" />
+    <token name="GL_ALPHA32F_ARB" value="0x8816" />
+    <token name="GL_INTENSITY32F_ARB" value="0x8817" />
+    <token name="GL_LUMINANCE32F_ARB" value="0x8818" />
+    <token name="GL_LUMINANCE_ALPHA32F_ARB" value="0x8819" />
+    <token name="GL_RGBA16F_ARB" value="0x881A" />
+    <token name="GL_RGB16F_ARB" value="0x881B" />
+    <token name="GL_ALPHA16F_ARB" value="0x881C" />
+    <token name="GL_INTENSITY16F_ARB" value="0x881D" />
+    <token name="GL_LUMINANCE16F_ARB" value="0x881E" />
+    <token name="GL_LUMINANCE_ALPHA16F_ARB" value="0x881F" />
+  </extension>
+  <extension name="GL_ARB_half_float_pixel" type="GL">
+    <token name="GL_HALF_FLOAT_ARB" value="0x140B" />
+  </extension>
 </extensionlist>

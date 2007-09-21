@@ -33,6 +33,11 @@
 #include <typeinfo>
 #endif
 
+#if defined(CS_DEBUG) && !defined(CS_FIXEDSIZEALLOC_DEBUG)
+#define _CS_FIXEDSIZEALLOC_DEBUG_DEFAULTED
+#define CS_FIXEDSIZEALLOC_DEBUG
+#endif
+
 /**\addtogroup util_memory
  * @{ */
 
@@ -74,6 +79,9 @@ protected: // 'protected' allows access by test-suite.
   struct BlocksWrapper : public Allocator
   {
     csArray<uint8*> b;
+
+    BlocksWrapper () {}
+    BlocksWrapper (const Allocator& alloc) : Allocator (alloc) {}
   };
   /// List of allocated blocks; sorted by address.
   BlocksWrapper blocks;
@@ -289,12 +297,15 @@ protected: // 'protected' allows access by test-suite.
     }
     void* const node = freenode;
     freenode = freenode->next;
+#ifdef CS_FIXEDSIZEALLOC_DEBUG
+    memset (node, 0xfa, elsize);
+#endif
     return node;
   }
 private:
-  csFixedSizeAllocator (csFixedSizeAllocator const&);  // Illegal; unimplemented.
   void operator= (csFixedSizeAllocator const&); 	// Illegal; unimplemented.
 public:
+  //@{
   /**
    * Construct a new fixed size allocator.
    * \param nelem Number of elements to store in each allocation unit.
@@ -315,7 +326,33 @@ public:
       elsize = sizeof (FreeNode);
     blocksize = elsize * elcount;
   }
-
+  csFixedSizeAllocator (size_t nelem, const Allocator& alloc) : blocks (alloc),
+    elcount (nelem), elsize(Size), freenode(0), insideDisposeAll(false)
+  {
+#ifdef CS_MEMORY_TRACKER
+    blocks.SetMemTrackerInfo (typeid(*this).name());
+#endif
+    if (elsize < sizeof (FreeNode))
+      elsize = sizeof (FreeNode);
+    blocksize = elsize * elcount;
+  }
+  //@}
+  
+  /**
+   * Construct a new fixed size allocator, copying the amounts of elements to
+   * store in an allocation unit.
+   * \remarks Copy-constructing an allocator is only valid if the allocator
+   *   copied from is not empty. Attempting to copy a non-empty allocator will
+   *   cause an assertion to fail at runtime!
+   */
+  csFixedSizeAllocator (csFixedSizeAllocator const& other) : 
+    elcount (other.elcount), elsize (other.elsize), 
+    blocksize (other.blocksize), freenode (0), insideDisposeAll (false)
+  {
+    /* Technically, an allocator can be empty even with freenode != 0 */
+    CS_ASSERT(other.freenode == 0);
+  }
+  
   /**
    * Destroy all allocated objects and release memory.
    */
@@ -429,5 +466,10 @@ public:
 };
 
 /** @} */
+
+#ifdef _CS_FIXEDSIZEALLOC_DEBUG_DEFAULTED
+#undef CS_FIXEDSIZEALLOC_DEBUG
+#undef _CS_FIXEDSIZEALLOC_DEBUG_DEFAULTED
+#endif
 
 #endif // __CSUTIL_FIXEDSIZEALLOCATOR_H__

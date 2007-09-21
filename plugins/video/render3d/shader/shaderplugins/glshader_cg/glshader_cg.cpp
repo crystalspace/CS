@@ -58,7 +58,7 @@ csGLShader_CG::csGLShader_CG (iBase* parent) :
 
 csGLShader_CG::~csGLShader_CG()
 {
-  delete[] dumpDir;
+  cs_free (dumpDir);
   cgDestroyContext (context);
 }
 
@@ -68,7 +68,7 @@ void csGLShader_CG::ErrorHandler (CGcontext context, CGerror error,
   iObjectRegistry* object_reg = (iObjectRegistry*)appData;
   bool doVerbose;
   csRef<iVerbosityManager> verbosemgr (
-    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+    csQueryRegistry<iVerbosityManager> (object_reg));
   if (verbosemgr) 
     doVerbose = verbosemgr->Enabled ("renderer.shader");
   else
@@ -81,7 +81,7 @@ void csGLShader_CG::ErrorHandler (CGcontext context, CGerror error,
   if (error == CG_COMPILER_ERROR)
   {
     const char* listing = cgGetLastListing (context);
-    if (listing)
+    if (listing && *listing)
     {
       csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
 	"crystalspace.graphics3d.shader.glcg",
@@ -174,6 +174,10 @@ void csGLShader_CG::GetProfileCompilerArgs (const char* type,
     profileMacroArg.Format ("-DFRAGMENT_PROGRAM_LEVEL=0x%x", profileLevel);
     args.Push (profileMacroArg);
   }
+  csString typeStr (type);
+  typeStr.Upcase();
+  typeStr = "-DPROGRAM_TYPE_" + typeStr;
+  args.Push (typeStr);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -245,16 +249,16 @@ bool csGLShader_CG::Open()
 
   cgSetErrorHandler (ErrorHandler, object_reg);
 
-  csRef<iGraphics3D> r = CS_QUERY_REGISTRY(object_reg,iGraphics3D);
+  csRef<iGraphics3D> r = csQueryRegistry<iGraphics3D> (object_reg);
 
-  csRef<iFactory> f = SCF_QUERY_INTERFACE (r, iFactory);
+  csRef<iFactory> f = scfQueryInterface<iFactory> (r);
   if (f != 0 && strcmp ("crystalspace.graphics3d.opengl", 
 	f->QueryClassID ()) == 0)
     enable = true;
   else
     return false;
 
-  csRef<iConfigManager> config(CS_QUERY_REGISTRY (object_reg, iConfigManager));
+  csRef<iConfigManager> config(csQueryRegistry<iConfigManager> (object_reg));
 
   r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
   if (ext == 0)
@@ -330,7 +334,7 @@ bool csGLShader_CG::Open()
 
   debugDump = config->GetBool ("Video.OpenGL.Shader.Cg.DebugDump", false);
   if (debugDump)
-    dumpDir = csStrNew (config->GetStr ("Video.OpenGL.Shader.Cg.DebugDumpDir",
+    dumpDir = CS::StrDup (config->GetStr ("Video.OpenGL.Shader.Cg.DebugDumpDir",
     "/tmp/cgdump/"));
  
   // Determining what profile to use:
@@ -431,7 +435,7 @@ bool csGLShader_CG::Initialize(iObjectRegistry* reg)
 {
   object_reg = reg;
   csRef<iVerbosityManager> verbosemgr (
-    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+    csQueryRegistry<iVerbosityManager> (object_reg));
   if (verbosemgr) 
     doVerbose = verbosemgr->Enabled ("renderer.shader");
   else

@@ -64,7 +64,7 @@ vertex2fragment main (app2vertex IN,
 
 	OUT.Projcoords = clip_pos;
 
-	OUT.Spot = -objLight*Attenuation.y*0.8 + 0.5;
+	OUT.Spot = -objLight*Attenuation.y*0.4 + 0.5;
 	OUT.Spot.w = 0.5;
 
 	OUT.Distance = view_pos;

@@ -98,10 +98,10 @@ csCommonImageFile::csCommonImageFile (iObjectRegistry* object_reg, int format)
 {
 #ifdef THREADED_LOADING
   static const char queueTag[] = "crystalspace.jobqueue.imageload";
-  jobQueue = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, queueTag, iJobQueue);
+  jobQueue = csQueryRegistryTagInterface<iJobQueue> (object_reg, queueTag);
   if (!jobQueue.IsValid())
   {
-    jobQueue.AttachNew (new csThreadJobQueue ());
+    jobQueue.AttachNew (new CS::Threading::ThreadedJobQueue ());
     object_reg->Register (jobQueue, queueTag);
   }
 #endif
@@ -145,13 +145,15 @@ void csCommonImageFile::WaitForJob() const
 #endif
 }
 
-void csCommonImageFile::MakeImageData()
+void csCommonImageFile::MakeImageData() const
 {
 #ifdef THREADED_LOADING
   if (loadJob)
   {
     WaitForJob();
-    loadJob->currentLoader->ApplyTo (this);
+    // Ugly ugly ugly so we can call ApplyTo()...
+    csImageMemory* thisNonConst = const_cast<csCommonImageFile*> (this);
+    loadJob->currentLoader->ApplyTo (thisNonConst);
     loadJob = 0;
     jobQueue = 0;
   }
@@ -190,8 +192,9 @@ const char* csCommonImageFile::DataTypeString (csLoaderDataType dataType)
   switch (dataType)
   {
     case rdtR8G8B8:
-      return "r8g8b8";
+      return "b8g8r8";
     default:
+      // Let the underlying image handle the other raw data types.
       return 0;
   }
 }
@@ -204,8 +207,13 @@ const char* csCommonImageFile::GetRawFormat() const
   csRef<iImageFileLoader> currentLoader = 
     loadJob->currentLoader;
 #endif
-  return (currentLoader.IsValid()) ? 
-    DataTypeString (currentLoader->GetDataType()) : 0;
+  if (currentLoader.IsValid())
+  {
+    const char* rawFormat = DataTypeString (currentLoader->GetDataType());
+    if (rawFormat != 0) return rawFormat;
+  }
+  MakeImageData();
+  return csImageMemory::GetRawFormat ();
 }
 
 csRef<iDataBuffer> csCommonImageFile::GetRawData() const
@@ -217,7 +225,9 @@ csRef<iDataBuffer> csCommonImageFile::GetRawData() const
   csRef<iImageFileLoader> currentLoader = 
     loadJob->currentLoader;
 #endif
-  if (currentLoader.IsValid())
-    d = currentLoader->GetRawData();
-  return d;
+  if (currentLoader.IsValid()
+    && (DataTypeString (currentLoader->GetDataType()) != 0))
+    return currentLoader->GetRawData();
+  MakeImageData();
+  return csImageMemory::GetRawData ();
 }

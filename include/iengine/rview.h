@@ -180,7 +180,7 @@ public:
  */
 struct iRenderView : public virtual iBase
 {
-  SCF_INTERFACE(iRenderView, 2,0,0);
+  SCF_INTERFACE(iRenderView, 2,1,0);
   /// Get the current render context.
   virtual csRenderContext* GetRenderContext () = 0;
 
@@ -204,43 +204,6 @@ struct iRenderView : public virtual iBase
    * Get the current camera.
    */
   virtual iCamera* GetCamera () = 0;
-
-  /**
-   * Given a frustum_mask, calculate the clip settings.
-   */
-  virtual void CalculateClipSettings (uint32 frustum_mask,
-    int &clip_portal, int &clip_plane, int &clip_z_plane) = 0;
-
-  /**
-   * Test if the given bounding sphere (in world space coordinates)
-   * is visible in this render view. The optional will
-   * transform world to camera space.
-   */
-  virtual bool TestBSphere (const csReversibleTransform& w2c,
-  	const csSphere& sphere) = 0;
-
-  /**
-   * Check if the object space bounding box of an object is visible in this
-   * render view. If true is returned (visible) then clip_plane,
-   * clip_z_plane, and clip_portal will be set to the right value depending
-   * on wether or not clipping is wanted. This function also does far
-   * plane clipping. Use SetupClipPlanes() to get the clipping planes
-   * for this function.
-   * The frustum_mask will be modified according to all clip planes
-   * that were relevant for the given box. That can be used to hierarchically
-   * cull smaller objects.
-   */
-  virtual bool ClipBBox (csPlane3* planes, uint32& frustum_mask,
-  	const csBox3& obox,
-      	int& clip_portal, int& clip_plane, int& clip_z_plane) = 0;
-
-  /**
-   * Setup clipping planes in object space. The input arrays for planes
-   * should each be able to hold 10 planes. Returns a mask that you can
-   * use for the csIntersect3::BoxFrustum() function.
-   */
-  virtual void SetupClipPlanes (const csReversibleTransform& tr_o2c,
-  	csPlane3* planes, uint32& frustum_mask) = 0;
 
   /**
    * Get current sector.
@@ -267,41 +230,6 @@ struct iRenderView : public virtual iBase
    * Get the number of the current frame.
    */
   virtual uint GetCurrentFrameNumber () const = 0;
-
-  /**
-   * Check if the given bounding sphere (in camera and world space coordinates)
-   * is visibile in this render view. If the sphere is visible this
-   * function will also initialize the clip_plane, clip_z_plane, and
-   * clip_portal fields which can be used for DrawTriangleMesh or
-   * DrawPolygonMesh.
-   */
-  virtual bool ClipBSphere (
-	const csSphere &cam_sphere,
-	const csSphere &world_sphere,
-	int& clip_portal, int& clip_plane, int& clip_z_plane) = 0;
-  
-
-
-  // @@@ ADDED B/C OF FATLOOP PORTAL HACKING
-  // @@@ REMOVE AGAIN ASAP
-  virtual void CreateRenderContext () = 0;
-  virtual int GetRenderRecursionLevel () const = 0;
-  virtual void SetRenderRecursionLevel (int rec) = 0;
-  virtual void SetClipper (iClipper2D* clip) = 0;
-  virtual void ResetFogInfo () = 0;
-  virtual void SetPreviousSector (iSector* s) = 0;
-  virtual void SetClipPlane (const csPlane3& p) = 0;
-  virtual bool GetClipPlane (csPlane3& pl) const = 0;
-  virtual const csPlane3& GetClipPlane () const = 0;
-  virtual csPlane3& GetClipPlane () = 0;
-  virtual void UseClipPlane (bool u) = 0;
-  virtual void UseClipFrustum (bool u) = 0;
-  virtual void SetLastPortal (iPortal* por) = 0;
-  virtual bool IsClipperRequired () const = 0;
-  virtual iCamera* CreateNewCamera () = 0;
-  virtual void RestoreRenderContext () = 0;
-  virtual void SetThisSector (iSector* s) = 0;
-  virtual void SetupClipPlanes () = 0;
 };
 
 /** @} */

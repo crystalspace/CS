@@ -86,7 +86,7 @@ csRef<iUserRenderBufferIterator> csUserRenderBufferManager::GetBuffers() const
 {
   csRef<BufferNameIter> newIter;
   newIter.AttachNew (new BufferNameIter);
-  for (size_t i = 0; i < userBuffers.Length(); i++)
+  for (size_t i = 0; i < userBuffers.GetSize (); i++)
   {
     newIter->names.Push (userBuffers[i].name);
     newIter->buffers.Push (userBuffers[i].buf);
@@ -99,12 +99,12 @@ csRef<iUserRenderBufferIterator> csUserRenderBufferManager::GetBuffers() const
 
 bool BufferNameIter::HasNext()
 {
-  return index < names.Length();
+  return index < names.GetSize ();
 }
 
 csStringID BufferNameIter::Next (csRef<iRenderBuffer>* buf)
 {
-  if (index < names.Length())
+  if (index < names.GetSize ())
   {
     csRef<iRenderBuffer> tmp (buffers[index]);
     if (buf != 0) (*buf) = tmp;

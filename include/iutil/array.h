@@ -235,21 +235,6 @@ struct iArrayChangeAll : public virtual iArrayChangeElements<T>
    *   may be slow for large arrays.
    */
   virtual bool Delete (T const& item) = 0;
-  /**
-   * Delete the given element from the array.
-   * \remarks This is a special version of Delete() which does not
-   *   preserve the order of the remaining elements. This characteristic allows
-   *   deletions to be performed somewhat more quickly than by Delete(),
-   *   however the speed gain is largely mitigated by the fact that a linear
-   *   search is performed in order to locate \c item, thus this optimization
-   *   is mostly illusory.
-   * \deprecated The speed gain promised by this method is mostly illusory on
-   *   account of the linear search for the item. In many cases, it will be
-   *   faster to keep the array sorted, search for \c item using
-   *   FindSortedKey(), and then remove it using the plain DeleteIndex().
-   */
-  CS_DEPRECATED_METHOD_MSG("'Fast' is illusional; see documentation")
-  virtual bool DeleteFast (T const& item) = 0;
 };
 
 /**
@@ -260,7 +245,7 @@ struct iArrayChangeAll : public virtual iArrayChangeElements<T>
  * extended.
  */
 #define SCF_IARRAYCHANGEALL_INTERFACE(Name)				\
-  SCF_INTERFACE(Name, 0, 0, 1)
+  SCF_INTERFACE(Name, 0, 1, 0)
 
 /** @} */
 

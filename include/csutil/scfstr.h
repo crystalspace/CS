@@ -30,8 +30,6 @@
 #include "csutil/scf_implementation.h"
 #include "iutil/string.h"
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
-
 /// This is a thin SCF wrapper around csString
 class CS_CRYSTALSPACE_EXPORT scfString : 
   public scfImplementation1<scfString, iString>
@@ -85,35 +83,15 @@ public:
   /// Set string maximal capacity to current string length.
   virtual void ShrinkBestFit ();
 
-  /**
-   * Set string maximal capacity to current string length.
-   * \deprecated Use ShrinkBestFit() instead.
-   */
-  CS_DEPRECATED_METHOD_MSG("Use ShrinkBestFit() instead.")
-  virtual void Reclaim ()
-  { ShrinkBestFit(); }
 
   /// Clear the string (so that it contains only ending 0 character).
   virtual void Empty ();
-
-  /**
-   * Clear the string (so that it contains only ending 0 character).
-   * \deprecated Use Empty() instead.
-   */
-  /* CS_DEPRECATED_METHOD_MSG("Use Empty() instead.") */ 
-  virtual void Clear ()
-  { Empty(); }
 
   /// Get a copy of this string
   virtual csRef<iString> Clone () const;
 
   /// Get a pointer to null-terminated character data.
   virtual char const* GetData () const;
-
-  /// Get a pointer to null-terminated character data.
-  /*CS_DEPRECATED_METHOD*/ 
-  // @@@ GCC and VC always seem to prefer this GetData() and barf "deprecated".
-  virtual char* GetData ();
 
   /// Query string length
   virtual size_t Length () const;
@@ -132,6 +110,9 @@ public:
 
   /// Get character at position iPos
   virtual char GetAt (size_t iPos) const;
+
+  /// Delete iCount characters from position iPos.
+  virtual void DeleteAt (size_t iPos, size_t iCount);
 
   /// Insert another string into this one at position iPos
   virtual void Insert (size_t iPos, iString const* iStr);
@@ -236,6 +217,18 @@ public:
   /// Compare two strings ignoring case
   virtual bool CompareNoCase (const iString* iStr) const;
 
+  /// Check if two strings are equal
+  virtual bool Compare (const char* iStr) const;
+
+  /// Compare two strings ignoring case
+  virtual bool CompareNoCase (const char* iStr) const;
+
+  /// Check if this string starts with another
+  virtual bool StartsWith (const iString* iStr, bool ignore_case = false) const;
+
+  /// Check if this string starts with another
+  virtual bool StartsWith (const char* iStr, bool ignore_case = false) const;
+
   /// Append another string to this
   virtual void operator += (const iString& iStr);
 
@@ -263,7 +256,5 @@ public:
   /// Convert string to uppercase.
   virtual void Upcase();
 };
-
-#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_SCFSTR_H__

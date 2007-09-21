@@ -21,7 +21,6 @@
 #include "csutil/csstring.h"
 #include "csutil/util.h"
 
-#include <windows.h>
 #include "csutil/win32/wintools.h"
 
 struct _WinVersion 
@@ -41,9 +40,17 @@ struct _WinVersion
     }
     else
     {
-      if (vi.dwMajorVersion >= 5)
+      if (vi.dwMajorVersion >= 6)
       {
-	if (vi.dwMinorVersion >= 1)
+        version = cswinWinVista;
+      }
+      else if (vi.dwMajorVersion >= 5)
+      {
+	if (vi.dwMinorVersion >= 2)
+	{
+	  version = cswinWin2003;
+        }
+	else if (vi.dwMinorVersion >= 1)
 	{
 	  version = cswinWinXP;
 	}

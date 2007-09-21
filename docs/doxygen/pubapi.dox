@@ -16,7 +16,7 @@
 # The PROJECT_NAME tag is a single word (or a sequence of words surrounded 
 # by quotes) that should identify the project. 
 
-PROJECT_NAME           = "Crystal Space"
+PROJECT_NAME           = "Crystal Space $(VERSION)"
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. 
 # This could be handy for archiving the generated documentation or 
@@ -257,6 +257,12 @@ MAX_INITIALIZER_LINES  = 30
 
 OPTIMIZE_OUTPUT_FOR_C  = NO
 
+# If the SHORT_NAMES tag is set to YES, doxygen will generate much shorter 
+# (but less readable) file names. This can be useful is your file systems 
+# doesn't support long names like on DOS, Mac, or CD-ROM.
+
+SHORT_NAMES            = NO
+
 #---------------------------------------------------------------------------
 # configuration options related to warning and progress messages
 #---------------------------------------------------------------------------
@@ -422,7 +428,7 @@ IGNORE_PREFIX          = cs i aws scf
 # If the GENERATE_HTML tag is set to YES (the default) Doxygen will 
 # generate HTML output. 
 
-GENERATE_HTML          = YES
+GENERATE_HTML          = $(GENERATE_HTML)
 
 # The HTML_OUTPUT tag is used to specify where the HTML docs will be put. 
 # If a relative path is entered the value of OUTPUT_DIRECTORY will be 
@@ -651,6 +657,7 @@ INCLUDE_FILE_PATTERNS  =
 # omitted =1 is assumed. 
 
 PREDEFINED             = DOXYGEN_RUN \
+			 "CS_ATTRIBUTE_MALLOC=" \
 			 CS_COMPILER_GCC \
 			 "CS_CONST_METHOD=" \
 			 "CS_CRYSTALSPACE_EXPORT=" \
@@ -697,7 +704,7 @@ TAGFILES               =
 # When a file name is specified after GENERATE_TAGFILE, doxygen will create 
 # a tag file that is based on the input files it reads. 
 
-GENERATE_TAGFILE       = 
+GENERATE_TAGFILE       = $(GENERATE_TAGFILE)
 
 # If the ALLEXTERNALS tag is set to YES all external classes will be listed 
 # in the class index. If set to NO only the inherited external classes 

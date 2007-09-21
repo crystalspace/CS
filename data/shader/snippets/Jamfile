@@ -1,3 +1,6 @@
 SubDir TOP data shader snippets ;
 
-InstallData [ Wildcard *.cginc *.cscg *.inc ] : data shader snippets ;
+InstallData [ Wildcard *.cginc *.cscg *.inc *.xml *.inp ] : data shader snippets ;
+
+SubInclude TOP data shader snippets reflect ;
+SubInclude TOP data shader snippets surface ;

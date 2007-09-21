@@ -162,12 +162,13 @@ calculated per vertex).
 If this flag is set (default false) then the object will not cast shadows
 on other objects.
 @item @samp{mixmode}
-Control the transparency of this object. @@@@@@TODO: document more!
+Control the transparency of this object. See @ref{XMLServices Mixmode} for
+a list of possibilities.
 @item @samp{animcontrol}
-Add an animation control to the object. @@@@@@TODO: document more!
+Add an animation control to the object.
 @item @samp{renderbuffer}
 Using this statement you can add your own user renderbuffers to the object.
-These renderbuffers can be used by shaders. @@@@@@TODO: document more!
+These renderbuffers can be used by shaders.
 @end itemize
 
 @subsubheading Object State Interface

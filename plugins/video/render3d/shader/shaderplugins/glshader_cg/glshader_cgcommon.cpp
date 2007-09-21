@@ -43,7 +43,7 @@ CS_LEAKGUARD_IMPLEMENT (csShaderGLCGCommon);
 
 csShaderGLCGCommon::csShaderGLCGCommon (csGLShader_CG* shaderPlug, 
 					const char* type) :
-  csShaderProgram (shaderPlug->object_reg), programType (type)
+  scfImplementationType (this, shaderPlug->object_reg), programType (type)
 {
   validProgram = true;
   this->shaderPlug = shaderPlug;
@@ -69,15 +69,15 @@ void csShaderGLCGCommon::Deactivate()
   cgGLDisableProfile (programProfile);
 }
 
-void csShaderGLCGCommon::SetupState (const csRenderMesh* /*mesh*/,
-                                     csRenderMeshModes& /*modes*/,
+void csShaderGLCGCommon::SetupState (const CS::Graphics::RenderMesh* /*mesh*/,
+                                     CS::Graphics::RenderMeshModes& /*modes*/,
                                      const iShaderVarStack* stacks)
 {
   size_t i;
   csRef<csShaderVariable> var;
 
   // set variables
-  for(i = 0; i < variablemap.Length(); ++i)
+  for(i = 0; i < variablemap.GetSize (); ++i)
   {
     VariableMapEntry& mapping = variablemap[i];
     
@@ -333,12 +333,31 @@ void csShaderGLCGCommon::ResetState()
 {
 }
 
-bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr, 
-  CGGLenum type, CGprofile maxProfile, bool compiled, bool doLoad)
+bool csShaderGLCGCommon::DefaultLoadProgram (
+  iShaderDestinationResolverCG* cgResolve,
+  const char* programStr, CGGLenum type, CGprofile maxProfile, 
+  bool compiled, bool doLoad)
 {
   if (!programStr || !*programStr) return false;
 
   size_t i;
+  csString augmentedProgramStr;
+  if (cgResolve != 0)
+  {
+    const csArray<csString>& unusedParams = cgResolve->GetUnusedParameters ();
+    for (size_t i = 0; i < unusedParams.GetSize(); i++)
+    {
+      csString param (unusedParams[i]);
+      for (size_t j = 0; j < param.Length(); j++)
+      {
+        if (param[j] == '.') param[j] = '_';
+      }
+      augmentedProgramStr.AppendFmt ("#define PARAM_%s_UNUSED\n",
+        param.GetData());
+    }
+    augmentedProgramStr.Append (programStr);
+    programStr = augmentedProgramStr;
+  }
 
   CGprofile profile = CG_PROFILE_UNKNOWN;
 
@@ -364,6 +383,10 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
     args.Push (compilerArgs[i]);
   args.Push (0);
  
+  if (program)
+  {
+    cgDestroyProgram (program);
+  }
   program = cgCreateProgram (shaderPlug->context, 
     compiled ? CG_OBJECT : CG_SOURCE, programStr, 
     profile, !entrypoint.IsEmpty() ? entrypoint : "main", args.GetArray());
@@ -383,8 +406,15 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
     if (!cgGLIsProgramLoaded (program)) return false;
   }
 
+  const char* listing = cgGetLastListing (shaderPlug->context);
+  if (listing && *listing && shaderPlug->doVerbose)
+  {
+    shaderPlug->Report (CS_REPORTER_SEVERITY_WARNING,
+      "%s", listing);
+  }
+
   i = 0;
-  while (i < variablemap.Length ())
+  while (i < variablemap.GetSize ())
   {
     // Get the Cg parameter
     CGparameter param = cgGetNamedParameter (program, 
@@ -451,6 +481,8 @@ void csShaderGLCGCommon::DoDebugDump ()
 	output << "\n";
       }
     }
+    if (!cgIsParameterUsed (param, program)) output << "  not used\n";
+    if (!cgIsParameterReferenced (param)) output << "  not referenced\n";
 
     param = cgGetNextLeafParameter (param);
   }
@@ -464,7 +496,7 @@ void csShaderGLCGCommon::DoDebugDump ()
   output << cgGetProgramString (program, CG_COMPILED_PROGRAM);
   output << "\n";
 
-  csRef<iVFS> vfs = CS_QUERY_REGISTRY (objectReg, iVFS);
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectReg);
   if (debugFN.IsEmpty())
   {
     static int programCounter = 0;
@@ -484,7 +516,7 @@ void csShaderGLCGCommon::DoDebugDump ()
   }
   else
   {
-    debugFile->Write (output.GetData(), output.Length());
+    debugFile->Write (output.GetData(), output.Length ());
     csReport (objectReg, CS_REPORTER_SEVERITY_NOTIFY, 
       "crystalspace.graphics3d.shader.glcg",
       "Dumped Cg program info to '%s'", debugFN.GetData());
@@ -496,14 +528,14 @@ void csShaderGLCGCommon::WriteAdditionalDumpInfo (const char* description,
 {
   if (!shaderPlug->debugDump || !debugFN) return;
 
-  csRef<iVFS> vfs = CS_QUERY_REGISTRY (objectReg, iVFS);
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (objectReg);
   csRef<iDataBuffer> oldDump = vfs->ReadFile (debugFN, true);
 
   csString output ((char*)oldDump->GetData());
   output << description << ":\n";
   output << content;
   output << "\n";
-  if (!vfs->WriteFile (debugFN, output.GetData(), output.Length()))
+  if (!vfs->WriteFile (debugFN, output.GetData(), output.Length ()))
   {
     csReport (objectReg, CS_REPORTER_SEVERITY_WARNING, 
       "crystalspace.graphics3d.shader.glcg",
@@ -511,14 +543,14 @@ void csShaderGLCGCommon::WriteAdditionalDumpInfo (const char* description,
   }
 }
 
-bool csShaderGLCGCommon::Load (iShaderDestinationResolver*, 
+bool csShaderGLCGCommon::Load (iShaderDestinationResolver* resolve, 
 			       iDocumentNode* program)
 {
   if(!program)
     return false;
 
-  csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(
-  	shaderPlug->object_reg, iShaderManager);
+  csRef<iShaderManager> shadermgr = 
+  	csQueryRegistry<iShaderManager> (shaderPlug->object_reg);
 
   csRef<iDocumentNode> variablesnode = program->GetNode (programType);
   if(variablesnode)
@@ -549,7 +581,24 @@ bool csShaderGLCGCommon::Load (iShaderDestinationResolver*,
     }
   }
 
+  cgResolve = scfQueryInterfaceSafe<iShaderDestinationResolverCG> (resolve);
+
   return true;
+}
+
+void csShaderGLCGCommon::CollectUnusedParameters ()
+{
+  unusedParams.DeleteAll ();
+  CGparameter param = cgGetFirstLeafParameter (program, CG_PROGRAM);
+  while (param)
+  {
+    if (!cgIsParameterUsed (param, program))
+    {
+      unusedParams.Push (cgGetParameterName (param));
+    }
+
+    param = cgGetNextLeafParameter (param);
+  }
 }
 
 }

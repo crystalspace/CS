@@ -39,6 +39,8 @@
 struct iMaterialWrapper;
 class csLightningMeshObjectFactory;
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * Lightning mesh object.
  */
@@ -57,7 +59,7 @@ class csLightningMeshObject :
   csRef<iMaterialWrapper> material;
   uint MixMode;
   bool initialized;
-  iMeshObjectDrawCallback* vis_cb;
+  csRef<iMeshObjectDrawCallback> vis_cb;
   float length;  
   float wildness;
   float vibration;
@@ -80,11 +82,11 @@ public:
   virtual ~csLightningMeshObject ();
 
   //------------------------- iObjectModel implementation ----------------
-  void GetObjectBoundingBox (csBox3& bbox);
   const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (float& rad, csVector3& cent);
   virtual iTerraFormer* GetTerraFormerColldet () { return 0; }
+  virtual iTerrainSystem* GetTerrainColldet () { return 0; }
 
   ///--------------------- iMeshObject implementation ------------------------
   virtual iMeshObjectFactory* GetFactory () const { return ifactory; }
@@ -94,8 +96,6 @@ public:
     iMovable*, uint32);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
-    if (cb) cb->IncRef ();
-    if (vis_cb) vis_cb->DecRef ();
     vis_cb = cb;
   }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const
@@ -128,6 +128,10 @@ public:
    * does nothing.
    */
   virtual void PositionChild (iMeshObject* /*child*/, csTicks /*current_time*/) { }
+  virtual void BuildDecal(const csVector3* pos, float decalRadius,
+          iDecalBuilder* decalBuilder)
+  {
+  }
 
   //------------------------- iLightningState implementation ----------------
   virtual void SetOrigin(const csVector3& pos) { this->origin = pos; }
@@ -149,6 +153,8 @@ public:
   virtual float GetBandWidth () const { return this->bandwidth; }
   virtual void SetBandWidth (float /*value*/) { }
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * Factory for 2D sprites. This factory also implements iLightningFactoryState.
@@ -221,8 +227,7 @@ public:
   {     
     if (GenMeshFact)
     {
-      GenFactState = SCF_QUERY_INTERFACE(
-          GenMeshFact, iGeneralFactoryState);      
+      GenFactState = scfQueryInterface<iGeneralFactoryState> (GenMeshFact);      
       GenFactState->SetVertexCount(MaxPoints * 2);
       GenFactState->SetTriangleCount((MaxPoints - 1) * 2);
             

@@ -20,11 +20,15 @@
 #define __CSUTIL_XMLTINYPRIV_H__
 
 #include "csextern.h"
+#include "csutil/pooledscfclass.h"
 #include "csutil/scf_implementation.h"
 #include "iutil/document.h"
 #include "tinyxml.h"
 
 class csTinyXmlDocument;
+struct csTinyXmlNode;
+
+using namespace CS::Implementation::TinyXml;
 
 /**
  * This is an SCF compatible wrapper for an attribute iterator.
@@ -36,10 +40,10 @@ struct CS_CRYSTALSPACE_EXPORT csTinyXmlAttributeIterator :
 private:
   size_t current;
   size_t count;
-  CS::TiXmlElement* parent;
+  csRef<TiXmlElement> parent;
 
 public:
-  csTinyXmlAttributeIterator (CS::TiDocumentNode* parent);
+  csTinyXmlAttributeIterator (TiDocumentNode* parent);
   virtual ~csTinyXmlAttributeIterator ();
 
   virtual bool HasNext ();
@@ -53,7 +57,7 @@ struct CS_CRYSTALSPACE_EXPORT csTinyXmlAttribute :
   public scfImplementation1<csTinyXmlAttribute, iDocumentAttribute>
 {
 private:
-  CS::TiDocumentAttribute* attr;
+  TiDocumentAttribute* attr;
 
 public:
   csTinyXmlAttribute ()
@@ -61,7 +65,7 @@ public:
   {
   }
 
-  csTinyXmlAttribute (CS::TiDocumentAttribute* attr)
+  csTinyXmlAttribute (TiDocumentAttribute* attr)
     : scfImplementationType (this), attr (attr)
   {
   }
@@ -138,48 +142,63 @@ struct CS_CRYSTALSPACE_EXPORT csTinyXmlNodeIterator :
 {
 private:
   csTinyXmlDocument* doc;
-  CS::TiDocumentNode* current;
-  CS::TiDocumentNodeChildren* parent;
+  csRef<TiDocumentNode> current;
+  csRef<csTinyXmlNode> parent;
   char* value;
 
+  size_t currentPos, endPos;
 public:
   csTinyXmlNodeIterator (csTinyXmlDocument* doc,
-	CS::TiDocumentNodeChildren* parent, const char* value);
+	csTinyXmlNode* parent, const char* value);
   virtual ~csTinyXmlNodeIterator ();
 
   virtual bool HasNext ();
   virtual csRef<iDocumentNode> Next ();
+
+  virtual size_t GetNextPosition () { return currentPos; }
+  virtual size_t GetEndPosition ();
 };
 
 /**
  * This is an SCF compatible wrapper for a node in TinyXml.
  */
 struct CS_CRYSTALSPACE_EXPORT csTinyXmlNode : 
-  public scfImplementation1<csTinyXmlNode, iDocumentNode>
+  public scfImplementationPooled<scfImplementation1<csTinyXmlNode, 
+                                                    iDocumentNode> >
 {
 private:
   friend class csTinyXmlDocument;
-  CS::TiDocumentNode* node;
-  CS::TiDocumentNodeChildren* node_children;
+  csRef<TiDocumentNode> node;
+  csRef<TiDocumentNode> lastChild;
   // We keep a reference to 'doc' to avoid it being cleaned up too early.
   // We need 'doc' for the pool.
   csRef<csTinyXmlDocument> doc;
-  csTinyXmlNode* next_pool;	// Next element in pool.
 
   csTinyXmlNode (csTinyXmlDocument* doc);
 
-  CS::TiDocumentAttribute* GetAttributeInternal (const char* name);
+  TiDocumentAttribute* GetAttributeInternal (const char* name);
 
 public:
   virtual ~csTinyXmlNode ();
 
-  virtual void DecRef ();
+  void DecRef()
+  {
+    /* When the document gets destructed due the last ref to it being released
+       in the destructor of a node it's node pool asserts as the node being 
+       destructed is not yet freed. 
+       Work around that by keeping an extra ref until after the node is deleted.
+     */
+    csRef<csTinyXmlDocument> doc (this->doc);
+    scfPooledImplementationType::DecRef();
+  }
 
-  CS::TiDocumentNode* GetTiNode () { return node; }
-  void SetTiNode (CS::TiDocumentNode* node)
+  TiDocumentNode* GetTiNode () { return node; }
+  TiDocumentNodeChildren* GetTiNodeChildren () 
+  { return static_cast<TiDocumentNodeChildren*> (GetTiNode ()); }
+  void SetTiNode (TiDocumentNode* node)
   {
     csTinyXmlNode::node = node;
-    node_children = node->ToDocumentNodeChildren ();
+    lastChild = 0;
   }
 
   
@@ -227,22 +246,21 @@ class CS_CRYSTALSPACE_EXPORT csTinyXmlDocument :
   public scfImplementation1<csTinyXmlDocument, iDocument>
 {
 private:
-  CS::TiDocument* root;
+  friend struct csTinyXmlNode;
+  friend struct csTinyXmlNodeIterator;
+  csRef<TiDocument> root;
   // We keep a reference to 'sys' to avoid it being cleaned up too early.
   csRef<csTinyDocumentSystem> sys;
 
-  csTinyXmlNode* pool;
+  csTinyXmlNode::Pool pool;
 
+  /// Allocate a node instance
+  csTinyXmlNode* Alloc ();
+  /// Allocate a node instance
+  csTinyXmlNode* Alloc (TiDocumentNode*);
 public:
   csTinyXmlDocument (csTinyDocumentSystem* sys);
   virtual ~csTinyXmlDocument ();
-
-  /// Internal function: don't use!
-  csTinyXmlNode* Alloc ();
-  /// Internal function: don't use!
-  csTinyXmlNode* Alloc (CS::TiDocumentNode*);
-  /// Internal function: don't use!
-  void Free (csTinyXmlNode* n);
 
   virtual void Clear ();
   virtual csRef<iDocumentNode> CreateRoot ();

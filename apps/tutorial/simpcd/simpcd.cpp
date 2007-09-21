@@ -137,7 +137,7 @@ bool Simple::HandleEvent (iEvent& ev)
   else if ((ev.Name == csevKeyboardDown (object_reg)) && 
     (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC))
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+    csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (object_reg));
     if (q)
       q->GetEventOutlet()->Broadcast (csevQuit(object_reg));
     return true;
@@ -156,13 +156,10 @@ bool Simple::SimpleEventHandler (iEvent& ev)
 
 iCollider* Simple::InitCollider (iMeshWrapper* mesh)
 {
-  csRef<iPolygonMesh> polmesh = 
-    mesh->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet();
-  if (polmesh)
+  csColliderWrapper* wrap = csColliderHelper::InitializeCollisionWrapper (
+      cdsys, mesh);
+  if (wrap)
   {
-    csColliderWrapper* wrap = new csColliderWrapper
-    	(mesh->QueryObject (), cdsys, polmesh);
-    wrap->DecRef ();
     return wrap->GetCollider ();
   }
   else
@@ -217,7 +214,7 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
   }
 
   // The collision detection system.
-  cdsys = CS_QUERY_REGISTRY (object_reg, iCollideSystem);
+  cdsys = csQueryRegistry<iCollideSystem> (object_reg);
   if (!cdsys)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -227,7 +224,7 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
   }
 
   // The virtual clock.
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  vc = csQueryRegistry<iVirtualClock> (object_reg);
   if (!vc)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -237,7 +234,7 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
   }
 
   // Find the pointer to engine plugin
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine = csQueryRegistry<iEngine> (object_reg);
   if (!engine)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -246,7 +243,7 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
     return false;
   }
 
-  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  loader = csQueryRegistry<iLoader> (object_reg);
   if (!loader)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -255,7 +252,7 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
     return false;
   }
 
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  g3d = csQueryRegistry<iGraphics3D> (object_reg);
   if (!g3d)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -264,7 +261,7 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
     return false;
   }
 
-  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
+  kbd = csQueryRegistry<iKeyboardDriver> (object_reg);
   if (!kbd)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -296,12 +293,24 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   room = engine->CreateSector ("room");
-  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingFactoryState> walls_state = 
-    scfQueryInterface<iThingFactoryState> (walls->GetMeshObject ()->GetFactory());
-  walls_state->AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
-  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
-  walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
+ 
+  // First we make a primitive for our geometry.
+  using namespace CS::Geometry;
+  DensityTextureMapper mapper (0.3f);
+  TesselatedBox box (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
+  box.SetLevel (3);
+  box.SetMapper (&mapper);
+  box.SetFlags (Primitives::CS_PRIMBOX_INSIDE);
+
+  // Now we make a factory and a mesh at once.
+  csRef<iMeshWrapper> walls = GeneralMeshBuilder::CreateFactoryAndMesh (
+      engine, room, "walls", "walls_factory", &box);
+
+  csRef<iGeneralMeshState> mesh_state = scfQueryInterface<
+    iGeneralMeshState> (walls->GetMeshObject ());
+  mesh_state->SetShadowReceiving (true);
+  walls->GetMeshObject ()->SetMaterialWrapper (tm);
+
 
   csRef<iLight> light;
   iLightList* ll = room->GetLights ();
@@ -362,8 +371,8 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
   parent_sprite = engine->CreateMeshWrapper (
   	imeshfact, "Parent", room,
 	csVector3 (0, 5, 3.5));
-  spstate = SCF_QUERY_INTERFACE (parent_sprite->GetMeshObject (),
-  	iSprite3DState);
+  spstate = 
+  	scfQueryInterface<iSprite3DState> (parent_sprite->GetMeshObject ());
   spstate->SetAction ("default");
   parent_sprite->GetMovable ()->Transform (csZRotMatrix3 (PI/2.));
   parent_sprite->GetMovable ()->UpdateMove ();
@@ -373,7 +382,7 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
   sprite1->GetMovable ()->SetPosition (csVector3 (0, -.5, -.5));
   sprite1->GetMovable ()->Transform (csZRotMatrix3 (PI/2.));
   sprite1->GetMovable ()->UpdateMove ();
-  spstate = SCF_QUERY_INTERFACE (sprite1->GetMeshObject (), iSprite3DState);
+  spstate = scfQueryInterface<iSprite3DState> (sprite1->GetMeshObject ());
   spstate->SetAction ("default");
   sprite1->QuerySceneNode ()->SetParent (parent_sprite->QuerySceneNode ());
 
@@ -382,7 +391,7 @@ bool Simple::Initialize (iObjectRegistry* object_reg)
   sprite2->GetMovable ()->SetPosition (csVector3 (0, .5, -.5));
   sprite2->GetMovable ()->Transform (csZRotMatrix3 (PI/2.));
   sprite2->GetMovable ()->UpdateMove ();
-  spstate = SCF_QUERY_INTERFACE (sprite2->GetMeshObject (), iSprite3DState);
+  spstate = scfQueryInterface<iSprite3DState> (sprite2->GetMeshObject ());
   spstate->SetAction ("default");
   sprite2->QuerySceneNode ()->SetParent (parent_sprite->QuerySceneNode ());
 

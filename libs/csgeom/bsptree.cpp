@@ -56,37 +56,37 @@ void csBSPTree::Clear ()
   }
 }
 
+namespace
+{
+  static int ClassifyPlane (const csPlane3& plane, const csVector3& p)
+  {
+    float fcl = plane.Classify (p);
+    if (fcl < 0) return -1;
+    else if (fcl > 0) return 1;
+    else return 0;
+  }
+}
+
 size_t csBSPTree::FindBestSplitter (csTriangle* triangles, csPlane3* planes,
-	int /*num_triangles*/, csVector3* vertices,
+	int /*num_triangles*/, const csVector3* vertices,
 	const csArray<int>& triidx)
 {
   size_t i, j;
   float mincost = 1000000.0;
   size_t minidx = (size_t)-1;
-  for (i = 0 ; i < triidx.Length () ; i++)
+  for (i = 0 ; i < triidx.GetSize () ; i++)
   {
     int cnt_splits = 0;
     int cnt_left = 0;
     int cnt_right = 0;
     csPlane3& pl = planes[triidx[i]];
-    for (j = 0 ; j < triidx.Length () ; j++)
+    for (j = 0 ; j < triidx.GetSize () ; j++)
       if (i != j)
       {
         csTriangle& trj = triangles[triidx[j]];
-	float fcla, fclb, fclc;
-        fcla = pl.Classify (vertices[trj.a]);
-        fclb = pl.Classify (vertices[trj.b]);
-        fclc = pl.Classify (vertices[trj.c]);
-	int cla, clb, clc;
-	if (fcla < -EPSILON) cla = -1;
-	else if (fcla > EPSILON) cla = 1;
-	else cla = 0;
-	if (fclb < -EPSILON) clb = -1;
-	else if (fclb > EPSILON) clb = 1;
-	else clb = 0;
-	if (fclc < -EPSILON) clc = -1;
-	else if (fclc > EPSILON) clc = 1;
-	else clc = 0;
+	int cla = ClassifyPlane (pl, vertices[trj.a]);
+	int clb = ClassifyPlane (pl, vertices[trj.b]);
+	int clc = ClassifyPlane (pl, vertices[trj.c]);
 	if ((cla == -clb && cla != 0) ||
 	    (cla == -clc && cla != 0) ||
 	    (clb == -clc && clb != 0))
@@ -102,8 +102,8 @@ size_t csBSPTree::FindBestSplitter (csTriangle* triangles, csPlane3* planes,
 	    cnt_right++;
 	}
       }
-    float split = float (cnt_splits) / float (triidx.Length ());
-    float balance = float (ABS (cnt_left-cnt_right)) / float (triidx.Length ());
+    float split = float (cnt_splits) / float (triidx.GetSize ());
+    float balance = float (ABS (cnt_left-cnt_right)) / float (triidx.GetSize ());
     float cost = 10.0 * split + balance;
     if (cost < mincost)
     {
@@ -115,11 +115,11 @@ size_t csBSPTree::FindBestSplitter (csTriangle* triangles, csPlane3* planes,
 }
 
 void csBSPTree::Build (csTriangle* triangles, csPlane3* planes,
-	int num_triangles, csVector3* vertices,
+	int num_triangles, const csVector3* vertices,
 	const csArray<int>& triidx)
 {
-  CS_ASSERT (triidx.Length () > 0);
-  if (triidx.Length () == 1)
+  CS_ASSERT (triidx.GetSize () > 0);
+  if (triidx.GetSize () == 1)
   {
     splitters.Push (triidx[0]);
     return;
@@ -134,25 +134,14 @@ void csBSPTree::Build (csTriangle* triangles, csPlane3* planes,
   csArray<int> right;
   size_t i;
   split_plane = planes[triidx[idx]];
-  for (i = 0 ; i < triidx.Length () ; i++)
+  for (i = 0 ; i < triidx.GetSize () ; i++)
     if (i != idx)
     {
       int idxi = triidx[i];
       csTriangle& trj = triangles[idxi];
-      float fcla, fclb, fclc;
-      fcla = split_plane.Classify (vertices[trj.a]);
-      fclb = split_plane.Classify (vertices[trj.b]);
-      fclc = split_plane.Classify (vertices[trj.c]);
-      int cla, clb, clc;
-      if (fcla < -EPSILON) cla = -1;
-      else if (fcla > EPSILON) cla = 1;
-      else cla = 0;
-      if (fclb < -EPSILON) clb = -1;
-      else if (fclb > EPSILON) clb = 1;
-      else clb = 0;
-      if (fclc < -EPSILON) clc = -1;
-      else if (fclc > EPSILON) clc = 1;
-      else clc = 0;
+      int cla = ClassifyPlane (split_plane, vertices[trj.a]);
+      int clb = ClassifyPlane (split_plane, vertices[trj.b]);
+      int clc = ClassifyPlane (split_plane, vertices[trj.c]);
       if ((cla == -clb && cla != 0) ||
 	  (cla == -clc && cla != 0) ||
 	  (clb == -clc && clb != 0))
@@ -171,20 +160,37 @@ void csBSPTree::Build (csTriangle* triangles, csPlane3* planes,
 	  splitters.Push (idxi);
       }
     }
-  if (left.Length () > 0)
+  if (left.GetSize () > 0)
   {
     child1 = TreeNodes()->Alloc ();
     child1->Build (triangles, planes, num_triangles, vertices, left);
   }
-  if (right.Length () > 0)
+  if (right.GetSize () > 0)
   {
     child2 = TreeNodes()->Alloc ();
     child2->Build (triangles, planes, num_triangles, vertices, right);
   }
 }
 
+void csBSPTree::Build (CS::TriangleIndicesStream<int>& triangles,
+	               const csVector3* vertices)
+{
+  const size_t triComponents = triangles.GetRemainingComponents();
+  csDirtyAccessArray<csPlane3> planes ((triComponents+2)/3);
+  csArray<int> triidx;
+  csDirtyAccessArray<csTriangle> tris ((triComponents+2)/3);
+  while (triangles.HasNext())
+  {
+    CS::TriangleT<int> t (triangles.Next());
+    planes.Push (csPlane3 (vertices[t.a], vertices[t.b], vertices[t.c]));
+    triidx.Push (int (tris.Push (t)));
+  }
+
+  Build (tris.GetArray(), planes.GetArray(), tris.GetSize(), vertices, triidx);
+}
+
 void csBSPTree::Build (csTriangle* triangles, int num_triangles,
-	csVector3* vertices)
+	               const csVector3* vertices)
 {
   csPlane3* planes = new csPlane3[num_triangles];
   csArray<int> triidx;
@@ -203,7 +209,7 @@ void csBSPTree::Build (csTriangle* triangles, int num_triangles,
 void csBSPTree::Back2Front (const csVector3& pos, csDirtyAccessArray<int>& arr,
   	csSet<int>& used_indices)
 {
-  float cl = split_plane.Classify (pos);
+  int cl = ClassifyPlane (split_plane, pos);
 
   if (cl < 0)
   {
@@ -215,7 +221,7 @@ void csBSPTree::Back2Front (const csVector3& pos, csDirtyAccessArray<int>& arr,
   }
 
   size_t i;
-  for (i = 0 ; i < splitters.Length () ; i++)
+  for (i = 0 ; i < splitters.GetSize () ; i++)
     if (!used_indices.In (splitters[i]))
     {
       used_indices.AddNoTest (splitters[i]);

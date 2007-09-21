@@ -165,6 +165,22 @@ struct csPackRGB
   /**
    * Pack an array of csRGBpixel into a RGB byte array. Alpha information 
    * is discarded!
+   */
+  static inline void PackRGBpixelToRGB (const csRGBpixel* pixels, 
+    uint8* packTo, size_t numPixels)
+  {
+    uint8* bufptr = packTo;
+    while (numPixels--)
+    {
+      *bufptr++ = pixels->red;
+      *bufptr++ = pixels->green;
+      *bufptr++ = pixels->blue;
+      pixels++; 
+    }
+  }
+  /**
+   * Pack an array of csRGBpixel into a RGB byte array. Alpha information 
+   * is discarded!
    * \remarks
    * Allocates memory. Free it using delete[] when finished.
    * \param pixels Source array of csRGBpixel data
@@ -175,14 +191,7 @@ struct csPackRGB
     size_t numPixels)
   {
     uint8* buf = new uint8[numPixels * 3];
-    uint8* bufptr = buf;
-    while (numPixels--)
-    {
-      *bufptr++ = pixels->red;
-      *bufptr++ = pixels->green;
-      *bufptr++ = pixels->blue;
-      pixels++; 
-    }
+    PackRGBpixelToRGB (pixels, buf, numPixels);
     return buf;
   }
   /**

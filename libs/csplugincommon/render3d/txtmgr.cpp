@@ -21,7 +21,6 @@
 #include <stdarg.h>
 #include "csplugincommon/render3d/txtmgr.h"
 #include "csutil/util.h"
-#include "csutil/debug.h"
 #include "csgfx/imagemanipulate.h"
 #include "iutil/objreg.h"
 #include "csqint.h"
@@ -131,8 +130,8 @@ csTextureManager::csTextureManager (iObjectRegistry* object_reg,
 {
   pfmt = *iG2D->GetPixelFormat ();
 
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
+  csRef<iStringSet> strings = csQueryRegistryTagInterface<iStringSet> (
+    object_reg, "crystalspace.shared.stringset");
   CS_ASSERT(strings != 0);
   nameDiffuseTexture = strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
 }

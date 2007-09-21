@@ -30,19 +30,9 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_FACTORY (csXExtSHM)
 
 
-SCF_IMPLEMENT_IBASE(csXExtSHM)
-  SCF_IMPLEMENTS_INTERFACE(iXExtSHM)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csXExtSHM::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csXExtSHM::csXExtSHM (iBase* parent)
-{
-  SCF_CONSTRUCT_IBASE (parent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
+: scfImplementationType (this, parent)
+{  
   dpy = 0;
   screen_num = 0;
   Width = Height = 0;
@@ -54,8 +44,6 @@ csXExtSHM::csXExtSHM (iBase* parent)
 csXExtSHM::~csXExtSHM ()
 {
   DestroyMemory ();
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE();
 }
 
 bool csXExtSHM::Initialize (iObjectRegistry *object_reg)
@@ -69,7 +57,7 @@ void csXExtSHM::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
+  csRef<iReporter> rep (csQueryRegistry<iReporter> (object_reg));
   if (rep)
     rep->ReportV (severity, "crystalspace.window.x.extshm", msg, arg);
   else

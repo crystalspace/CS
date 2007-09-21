@@ -29,22 +29,20 @@
 csVfsCacheManager::csVfsCacheManager (iObjectRegistry* object_reg,
 	const char* vfsdir)
   : scfImplementationType (this), object_reg (object_reg),
-  vfsdir (csStrNew (vfsdir)),
-  vfs (0), current_type (0), current_scope (0), readonly (false)
+  vfsdir (CS::StrDup (vfsdir)),
+  vfs (0), readonly (false)
 {
 }
 
 csVfsCacheManager::~csVfsCacheManager ()
 {
-  delete[] vfsdir;
-  delete[] current_type;
-  delete[] current_scope;
+  cs_free (vfsdir);
 }
 
 iVFS* csVfsCacheManager::GetVFS ()
 {
   if (!vfs)
-    vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+    vfs = csQueryRegistry<iVFS> (object_reg);
   return vfs;
 }
 
@@ -64,20 +62,12 @@ void csVfsCacheManager::CacheName (csStringFast<512>& buf, const char* type,
 
 void csVfsCacheManager::SetCurrentType (const char* type)
 {
-  delete[] current_type;
-  if (type)
-    current_type = csStrNew (type);
-  else
-    current_type = 0;
+  current_type = type;
 }
 
 void csVfsCacheManager::SetCurrentScope (const char* scope)
 {
-  delete[] current_scope;
-  if (scope)
-    current_scope = csStrNew (scope);
-  else
-    current_scope = 0;
+  current_scope = scope;
 }
 
 bool csVfsCacheManager::CacheData (const void* data, size_t size,
@@ -87,8 +77,8 @@ bool csVfsCacheManager::CacheData (const void* data, size_t size,
   csStringFast<512> buf;
   GetVFS ()->PushDir ();
   GetVFS ()->ChDir (vfsdir);
-  CacheName (buf, type ? type : current_type,
-  	scope ? scope : current_scope, id);
+  CacheName (buf, type ? type : current_type.GetData(),
+  	scope ? scope : current_scope.GetData(), id);
   csRef<iFile> cf = GetVFS ()->Open (buf, VFS_FILE_WRITE);
   GetVFS ()->PopDir ();
 
@@ -118,8 +108,8 @@ csPtr<iDataBuffer> csVfsCacheManager::ReadCache (
   csStringFast<512> buf;
   GetVFS ()->PushDir ();
   GetVFS ()->ChDir (vfsdir);
-  CacheName (buf, type ? type : current_type,
-  	scope ? scope : current_scope, id);
+  CacheName (buf, type ? type : current_type.GetData(),
+  	scope ? scope : current_scope.GetData(), id);
   csRef<iDataBuffer> data (GetVFS ()->ReadFile (buf, false));
   GetVFS ()->PopDir ();
 

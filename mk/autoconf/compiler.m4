@@ -27,11 +27,6 @@
 #       CFLAGS variable because Autoconf's -g and -O defaults are not always
 #       desired.  This will also set the CMD.CC and COMPILER.CFLAGS variables
 #       in Jamconfig
-#       Also, it is checked whether the linker supports the --as-needed
-#       command line option, and if so, it is employed. As some libraries
-#       reportedly don't support that feature, you can put 
-#       $cs_cv_prog_link_no_as_needed and $cs_cv_prog_link_as_needed around
-#       the linker flags to disable this feature for a particular library.
 #-----------------------------------------------------------------------------
 AC_DEFUN([CS_PROG_CC],[
     CFLAGS="$CFLAGS" # Filter undesired flags
@@ -80,6 +75,12 @@ AC_DEFUN([CS_PROG_CXX],[
 #       respects the LDFLAGS environment variable.  Finally, checks if linker
 #	recognizes -shared and sets PLUGIN.LFLAGS; and checks if linker
 #	recognizes -soname and sets PLUGIN.LFLAGS.USE_SONAME to "yes".
+#
+#       Also, it is checked whether the linker supports the --as-needed
+#       command line option, and if so, it is employed. As some libraries
+#       reportedly don't support that feature, you can put 
+#       $cs_cv_prog_link_no_as_needed and $cs_cv_prog_link_as_needed around
+#       the linker flags to disable this feature for a particular library.
 #-----------------------------------------------------------------------------
 AC_DEFUN([CS_PROG_LINK],[
     AC_REQUIRE([CS_PROG_CXX])
@@ -87,6 +88,9 @@ AC_DEFUN([CS_PROG_LINK],[
 	[CS_EMIT_BUILD_PROPERTY([CMD.LINK], [AS_ESCAPE([$(CMD.C++)])])],
 	[CS_EMIT_BUILD_PROPERTY([CMD.LINK], [AS_ESCAPE([$(CMD.CC)])])])
 
+    CS_CHECK_TOOLS([LD], [ld])
+    CS_EMIT_BUILD_PROPERTY([CMD.LD], [$LD])
+    
     CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [$LDFLAGS], [+])
 
     # Check if compiler/linker recognizes -shared directive which is needed for
@@ -108,21 +112,29 @@ AC_DEFUN([CS_PROG_LINK],[
 	[CS_EMIT_BUILD_PROPERTY([PLUGIN.LFLAGS.USE_SONAME], [yes])])
 	
     # Check if binutils support response files
-    rm -f conftest.resp
-    echo "" > conftest.resp
-    CS_CHECK_BUILD([if response files are accepted], [cs_cv_prog_link_respfile], [],
-	[-Wl,@conftest.resp], [C++],
-	[CS_EMIT_BUILD_PROPERTY([LINKER.RESPONSEFILES], [yes])])
-    rm -f conftest.resp
+    rm -f conf$$.resp
+    echo "" > conf$$.resp
+    AC_CACHE_CHECK([if response files are accepted], [cs_cv_prog_link_respfile],
+	[AC_LANG_PUSH([C++])
+        cs_lflags_save="$LDFLAGS"
+	LDFLAGS="-Wl,@conf$$.resp $cs_lflags_save"
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([],[])],
+	    [cs_cv_prog_link_respfile=yes],
+	    [cs_cv_prog_link_respfile=no])
+	LDFLAGS=$cs_lflags_save
+    	AC_LANG_POP([C++])])
+    AS_IF([test $cs_cv_prog_link_respfile = yes], 
+    	[CS_EMIT_BUILD_PROPERTY([LINKER.RESPONSEFILES], [yes])])
+    rm -f conf$$.resp
     
     # Check if linker supports --as-needed.
     AC_ARG_ENABLE([as-needed], 
 	[AC_HELP_STRING([--enable-as-needed],
 	    [Utilize --as-needed linker flag, if supported by linker and if
 	    the used binutils version is recent enough to support it properly
-	    (default NO)])])
+	    (default YES)])])
     AS_IF([test -z "$enable_as_needed"], 
-	[enable_as_needed=no])
+	[enable_as_needed=yes])
     AS_IF([test "$enable_as_needed" != "no"],
 	[AC_REQUIRE([CS_CHECK_BINUTILS_2_17])
 	AS_IF([test "$cs_cv_binutils_2_17" = "yes"],
@@ -132,6 +144,20 @@ AC_DEFUN([CS_PROG_LINK],[
 	    CS_CHECK_BUILD_FLAGS([if --no-as-needed is supported], 
 		[cs_cv_prog_link_no_as_needed], [CS_CREATE_TUPLE([-Wl,--no-as-needed])], 
 		[C++])])])
+    
+    # Check if linker supports --gc-sections.
+    AC_ARG_ENABLE([gc-sections], 
+	[AC_HELP_STRING([--enable-gc-sections],
+	    [Utilize --gc-sections linker flag for some targets (default YES)])])
+    AS_IF([test -z "$enable_gc_sections"], 
+	[enable_gc_sections=yes])
+    AS_IF([test "$enable_gc_sections" != "no"],
+	[CS_CHECK_BUILD_FLAGS([if --gc-sections is supported], 
+	    [cs_cv_prog_link_gc_sections], 
+	    [CS_CREATE_TUPLE([-Wl,--gc-sections])], 
+	    [C++], 
+	    [CS_EMIT_BUILD_PROPERTY([LINK.GC_SECTIONS], 
+	        [$cs_cv_prog_link_gc_sections])])])
 ])
 
 #-----------------------------------------------------------------------------

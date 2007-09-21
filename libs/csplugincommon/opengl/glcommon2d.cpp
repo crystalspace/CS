@@ -393,7 +393,7 @@ void csGraphics2DGLCommon::OpenDriverDB (const char* phase)
   int driverDBprio = config->GetInt ("Video.OpenGL.DriverDB.Priority",
     iConfigManager::ConfigPriorityPlugin + 10);
 
-  csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+  csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
   csRef<iFile> dbfile = vfs->Open (driverDB, VFS_FILE_READ);
   if (!dbfile)
   {
@@ -402,8 +402,8 @@ void csGraphics2DGLCommon::OpenDriverDB (const char* phase)
     return;
   }
 
-  csRef<iDocumentSystem> docsys = CS_QUERY_REGISTRY (object_reg,
-    iDocumentSystem);
+  csRef<iDocumentSystem> docsys = 
+    csQueryRegistry<iDocumentSystem> (object_reg);
   if (!docsys.IsValid())
     docsys.AttachNew (new csTinyDocumentSystem ());
   csRef<iDocument> doc (docsys->CreateDocument ());
@@ -455,8 +455,7 @@ const char* csGraphics2DGLCommon::GetRendererString (const char* str)
   {
     return CS_PLATFORM_NAME;
   }
-  else
-    return 0;
+  return 0;
 }
 
 const char* csGraphics2DGLCommon::GetVersionString (const char* ver)
@@ -465,8 +464,15 @@ const char* csGraphics2DGLCommon::GetVersionString (const char* ver)
   {
     return (char*)glGetString (GL_VERSION);
   }
-  else
-    return 0;
+  else if (strcmp (ver, "glvendor") == 0)
+  {
+    /* The "vendor" part of the GL version
+     * (separated from the normal version by a space) */
+    const char* glv = (char*)glGetString (GL_VERSION);
+    const char* space = strchr (glv, ' ');
+    if (space) return space+1;
+  }
+  return 0;
 }
 
 void csGraphics2DGLCommon::Clear (int color)
@@ -826,7 +832,7 @@ bool csGraphics2DGLCommon::DebugCommand (const char* cmdstr)
 
   if (strcasecmp (cmd, "dump_fontcache") == 0)
   {
-    csRef<iImageIO> imgsaver = CS_QUERY_REGISTRY (object_reg, iImageIO);
+    csRef<iImageIO> imgsaver = csQueryRegistry<iImageIO> (object_reg);
     if (!imgsaver)
     {
       Report (CS_REPORTER_SEVERITY_WARNING,
@@ -834,7 +840,7 @@ bool csGraphics2DGLCommon::DebugCommand (const char* cmdstr)
       return false;
     }
 
-    csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+    csRef<iVFS> vfs = csQueryRegistry<iVFS> (object_reg);
     if (!vfs)
     {
       Report (CS_REPORTER_SEVERITY_WARNING,
@@ -848,7 +854,7 @@ bool csGraphics2DGLCommon::DebugCommand (const char* cmdstr)
     ((csGLFontCache*)fontCache)->DumpFontCache (images);
 
     csString outfn;
-    for (size_t i = 0; i < images.Length(); i++)
+    for (size_t i = 0; i < images.GetSize (); i++)
     {
       csRef<iDataBuffer> buf = imgsaver->Save (images[i], "image/png");
       if (!buf)
@@ -998,7 +1004,7 @@ void csGraphics2DGLCommon::csGLPixelFormatPicker::ReadPickerValue (
     }
   }
 
-  if (values.Length() == 0)
+  if (values.GetSize () == 0)
     values.Push (0);
 
   values.Sort (ReverseCompare<int>);

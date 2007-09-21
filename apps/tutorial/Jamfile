@@ -1,6 +1,5 @@
 SubDir TOP apps tutorial ;
 
-SubInclude TOP apps tutorial awstut ;
 SubInclude TOP apps tutorial pathtut ;
 SubInclude TOP apps tutorial phystut ;
 SubInclude TOP apps tutorial simpcd ;

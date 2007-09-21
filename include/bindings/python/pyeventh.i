@@ -20,21 +20,17 @@
 
 #ifndef CS_MICRO_SWIG
 
+#ifndef SWIGIMPORTED
+%template (csPyEventHandlerParent) scfImplementation1<_csPyEventHandler, iEventHandler>;
 %inline %{
 
-  struct _csPyEventHandler : public iEventHandler
+
+  struct _csPyEventHandler : public scfImplementation1<_csPyEventHandler, iEventHandler>
   {
-    SCF_DECLARE_IBASE;
-    _csPyEventHandler (PyObject * obj) : _pySelf(obj)
-    {
-      SCF_CONSTRUCT_IBASE(0);
-      IncRef();
-    }
+    _csPyEventHandler (PyObject * obj) : scfImplementationType(this), _pySelf(obj)
+    { }
     virtual ~_csPyEventHandler ()
-    {
-      SCF_DESTRUCT_IBASE();
-      DecRef();
-    }
+    { }
     virtual bool HandleEvent (iEvent & event)
     {
       PyObject * event_obj = SWIG_NewPointerObj(
@@ -82,19 +78,8 @@
 
 %}
 
-%{
-  SCF_IMPLEMENT_IBASE(_csPyEventHandler)
-    SCF_IMPLEMENTS_INTERFACE(iEventHandler)
-  SCF_IMPLEMENT_IBASE_END
-%}
-
 %pythoncode %{
 
-  def csevCommandLineHelp(reg):
-    csEventNameRegistry.GetID(reg, "crystalspace.application.commandlinehelp")
-    
-  CS_EVENTLIST_END = csInvalidStringID
-  
   class csPyEventHandler (_csPyEventHandler):
     """Python version of iEventHandler implementation.
        This class can be used as base class for event handlers in Python.
@@ -130,6 +115,16 @@
   csInitializer.SetupEventHandler = \
     staticmethod(_csInitializer_SetupEventHandler)
 
+%}
+
+#endif // SWIGIMPORTED
+
+%pythoncode %{
+
+  def csevCommandLineHelp(reg):
+    csEventNameRegistry.GetID(reg, "crystalspace.application.commandlinehelp")
+    
+  CS_EVENTLIST_END = csInvalidStringID
 %}
 
 #ifdef USE_DIRECTORS

@@ -32,6 +32,7 @@
 
 #include "csextern.h"
 #include "allocator.h"
+#include "bitops.h"
 #include "comparator.h"
 #include "hash.h"
 
@@ -287,9 +288,9 @@ public:
 
   /**
    * Return the number of stored bits.
-   * \deprecated Use GetSize() instead.
+   * \deprecated Deprecated in 1.3. Use GetSize() instead.
    */
-  /*CS_DEPRECATED_METHOD_MSG("Use GetSize() instead.")*/
+  CS_DEPRECATED_METHOD_MSG("Use GetSize() instead.")
   size_t Length () const
   {
     return GetSize();
@@ -297,9 +298,9 @@ public:
 
   /**
    * Set the number of stored bits.
-   * \deprecated Use SetSize() instead.
+   * \deprecated Deprecated in 1.3. Use SetSize() instead.
    */
-  /*CS_DEPRECATED_METHOD_MSG("Use SetSize() instead.")*/
+  CS_DEPRECATED_METHOD_MSG("Use SetSize() instead.")
   void SetLength (size_t newSize)
   {
     SetSize (newSize);
@@ -551,6 +552,30 @@ public:
       p[i] = ~p[i];
     Trim();
     return *this;
+  }
+  
+  /// Count the number of bits that are set.
+  size_t NumBitsSet() const
+  {
+    const size_t ui32perStorage = 
+      sizeof (csBitArrayStorageType) / sizeof (uint32);
+
+    union
+    {
+      csBitArrayStorageType s;
+      uint32 ui32[ui32perStorage];
+    } v;
+
+    const csBitArrayStorageType* p = GetStore();
+    size_t num = 0;
+    for (size_t i = 0; i < mLength; i++)
+    {
+      v.s = p[i];
+      for (size_t j = 0; j < ui32perStorage; j++)
+        num += CS::Utility::BitOps::ComputeBitsSet (v.ui32[j]);
+    }
+
+    return num;
   }
 
   /**

@@ -185,7 +185,7 @@ bool csPixelShaderParser::GetInstruction (const char *str,
   if (comment != (size_t)-1) line.Truncate (comment);
   line.Trim ();
   
-  if(line.Length() < 1) return true; // Ignore blank lines
+  if(line.Length () < 1) return true; // Ignore blank lines
 
   // Ignore pairing modifier
   if (line.GetAt (0) == '+')
@@ -465,11 +465,11 @@ static char GetRegType (csPSRegisterType type)
 {
   switch (type)
   {
-    case CS_PS_REG_TEX:		return 't'; break;
-    case CS_PS_REG_CONSTANT:	return 'c'; break;
-    case CS_PS_REG_TEMP:	return 'r'; break;
-    case CS_PS_REG_COLOR:	return 'v'; break;
-    default:			return '?'; break;
+    case CS_PS_REG_TEX:		return 't';
+    case CS_PS_REG_CONSTANT:	return 'c';
+    case CS_PS_REG_TEMP:	return 'r';
+    case CS_PS_REG_COLOR:	return 'v';
+    default:			return '?';
   }
 }
 
@@ -546,7 +546,7 @@ void csPixelShaderParser::WriteProgram (
 	const csArray<csPSProgramInstruction>& instrs, 
 	csString& str)
 {
-  for(size_t i = 0; i < instrs.Length (); i++)
+  for(size_t i = 0; i < instrs.GetSize (); i++)
   {
     const csPSProgramInstruction& instr = instrs.Get (i);
 

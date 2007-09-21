@@ -100,8 +100,8 @@ bool SndSysDriverOSS::Initialize (iObjectRegistry *obj_reg)
   Config.AddConfig(m_pObjectRegistry, "/config/sound.cfg");
 
   // check for optional output device name from the commandline
-  csRef<iCommandLineParser> CMDLine (CS_QUERY_REGISTRY (m_pObjectRegistry,
-    iCommandLineParser));
+  csRef<iCommandLineParser> CMDLine (
+    csQueryRegistry<iCommandLineParser> (m_pObjectRegistry));
   const char *OutputDeviceName = CMDLine->GetOption ("ossdevice");
   if (!OutputDeviceName)
     OutputDeviceName = Config->GetStr("SndSys.Driver.OSS.Device", "/dev/dsp");
@@ -246,7 +246,7 @@ bool SndSysDriverOSS::StartThread()
 
   m_bRunning=true;
   SndSysDriverRunnable* runnable = new SndSysDriverRunnable (this);
-  m_pBackgroundThread = csThread::Create(runnable);
+  m_pBackgroundThread.AttachNew (new CS::Threading::Thread (runnable, false));
   runnable->DecRef ();
 
   m_pBackgroundThread->Start();

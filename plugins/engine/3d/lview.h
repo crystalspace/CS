@@ -238,13 +238,13 @@ public:
   /// Get the number of shadows in this list.
   virtual int GetShadowCount ()
   {
-    return (int)shadows.Length ();
+    return (int)shadows.GetSize ();
   }
 
   /// Get the specified shadow.
   csFrustum* GetShadow (int idx)
   {
-    return ((size_t)idx < shadows.Length () ? (csFrustum*)shadows[idx] : 0);
+    return ((size_t)idx < shadows.GetSize () ? (csFrustum*)shadows[idx] : 0);
   }
 
   /**
@@ -253,7 +253,7 @@ public:
   void Transform (csTransform* trans)
   {
     size_t i;
-    for (i = 0 ; i < shadows.Length () ; i++)
+    for (i = 0 ; i < shadows.GetSize () ; i++)
     {
       csShadowFrustum* sf = shadows[i];
       CS_ASSERT (sf != 0);

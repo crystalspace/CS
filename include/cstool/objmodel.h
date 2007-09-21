@@ -32,25 +32,31 @@
 
 #include "csutil/refarr.h"
 #include "csutil/scf_implementation.h"
+#include "csutil/hash.h"
+#include "iutil/strset.h"
+#include "iutil/objreg.h"
 #include "imesh/objmodel.h"
-#include "igeom/polymesh.h"
+#include "igeom/trimesh.h"
 
 struct iTerraFormer;
+
+class csTMIterator;
 
 /**
  * Helper class to make it easier to implement iObjectModel in mesh
  * objects. This class does not implement the bounding box and radius
  * functions. 
  */
-class csObjectModel : public scfImplementation1<csObjectModel,iObjectModel>
+class CS_CRYSTALSPACE_EXPORT csObjectModel : 
+  public scfImplementation1<csObjectModel,iObjectModel>
 {
+  friend class csTMIterator;
+
 private:
   long shapenr;
-  iPolygonMesh* polymesh_base;
-  csRef<iPolygonMesh> polymesh_colldet;
-  csRef<iPolygonMesh> polymesh_viscull;
-  csRef<iPolygonMesh> polymesh_shadows;
   csRefArray<iObjectModelListener> listeners;
+
+  csHash<csRef<iTriangleMesh>,csStringID> trimesh;
 
 public:
   /**
@@ -58,18 +64,30 @@ public:
    * SetPolygonMesh<xxx>()!
    */
   csObjectModel (iBase* parent = 0)
-    : scfImplementationType (this, parent), shapenr (-1), polymesh_base (0)
+    : scfImplementationType (this, parent), shapenr (-1)
   {
   }
 
   virtual ~csObjectModel () {}
 
   /**
-   * Set the pointer to the base polygon mesh.
+   * Conveniance method to fetch the standard string registry from the
+   * object registry.
    */
-  void SetPolygonMeshBase (iPolygonMesh* base)
+  csRef<iStringSet> GetStandardStringSet (iObjectRegistry* object_reg)
   {
-    polymesh_base = base;
+    return csQueryRegistryTagInterface<iStringSet> (object_reg,
+	"crystalspace.shared.stringset");
+  }
+
+  /**
+   * Conveniance method to fetch the base string ID given the object
+   * registry.
+   */
+  csStringID GetBaseID (iObjectRegistry* object_reg)
+  {
+    csRef<iStringSet> strings = GetStandardStringSet (object_reg);
+    return strings->Request ("base");
   }
 
   /**
@@ -95,31 +113,17 @@ public:
   void FireListeners ()
   {
     size_t i;
-    for (i = 0 ; i < listeners.Length () ; i++)
+    for (i = 0 ; i < listeners.GetSize () ; i++)
       listeners[i]->ObjectModelChanged (this);
   }
 
   virtual long GetShapeNumber () const { return shapenr; }
-  virtual iPolygonMesh* GetPolygonMeshBase () { return polymesh_base; }
-  virtual iPolygonMesh* GetPolygonMeshColldet () { return polymesh_colldet; }
-  virtual void SetPolygonMeshColldet (iPolygonMesh* polymesh)
-  {
-    polymesh_colldet = polymesh;
-  }
-  virtual iPolygonMesh* GetPolygonMeshViscull () { return polymesh_viscull; }
-  virtual void SetPolygonMeshViscull (iPolygonMesh* polymesh)
-  {
-    polymesh_viscull = polymesh;
-  }
-  virtual iPolygonMesh* GetPolygonMeshShadows () { return polymesh_shadows; }
-  virtual void SetPolygonMeshShadows (iPolygonMesh* polymesh)
-  {
-    polymesh_shadows = polymesh;
-  }
-  virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
-  {
-    return 0;
-  }
+  virtual iTriangleMesh* GetTriangleData (csStringID);
+  virtual csPtr<iTriangleMeshIterator> GetTriangleDataIterator ();
+  virtual void SetTriangleData (csStringID, iTriangleMesh*);
+  virtual bool IsTriangleDataSet (csStringID);
+  virtual void ResetTriangleData (csStringID);
+
   virtual void AddListener (iObjectModelListener* listener)
   {
     RemoveListener (listener);
@@ -133,6 +137,7 @@ public:
   {
     return 0;
   }
+  virtual iTerrainSystem* GetTerrainColldet () { return 0; }
 };
 
 /** @} */

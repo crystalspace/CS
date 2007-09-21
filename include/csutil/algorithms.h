@@ -87,22 +87,7 @@ namespace CS
     return Func;
   }
 
-  /// \todo document me!
-  template <class T1, class T2>
-  struct ConditionAnd
-  {
-    ConditionAnd (T1 op1, T2 op2)
-    { }
 
-    template<class T>
-    CS_FORCEINLINE_TEMPLATEMETHOD bool operator () (T obj)
-    {
-      return (op1 (obj) && op2 (obj));
-    }
-  private:
-    T1 op1;
-    T2 op2;
-  };
 }
 
 #endif // __CSUTIL_ALGORITHMS_H__

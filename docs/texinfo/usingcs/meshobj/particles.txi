@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MeshObject Particles, , MeshObject Haze, MeshObject
+@node MeshObject Particles, MeshObject Portal Container, MeshObject Terrain2, MeshObject
 @subsection Particles Mesh Object
 @cindex MeshObject
 @cindex Particles Particle System
@@ -139,6 +139,7 @@ Enable or disable deep-copy on creation of particle systems.
 Set the default material for particle system factory.
 @item <mixmode>mixmode</mixmode>
 Set the default mixmode for particle system factory.
+@pxref{XMLServices Mixmode}.
 @end table
 
 @subsubheading Object Loader
@@ -154,6 +155,10 @@ Set the factory to use when creating the particle system.
 Set the material for particle system.
 @item <mixmode>mixmode</mixmode>
 Set the mixmode for particle system.
+@pxref{XMLServices Mixmode}.
+@item <preadvance>time</preadvance>
+Advance the time of the particle system object by the given duration.
+This is useful to fill a particle system after its initial creation.
 @end table
 
 @subsubheading Operation of particles
@@ -291,7 +296,11 @@ only the magnitude should be used and direction should be emitter-specific.
 
 @item @code{<initialvelocity x="" y="" z=""/>}
 @tab @samp{all}
-@tab Set initial velocity vector.
+@tab Set initial linear velocity vector.
+
+@item @code{<initialangularvelocity x="" y="" z=""/>}
+@tab @samp{all}
+@tab Set initial angular velocity vector.
 
 @item @code{<radius>rad</radius>}
 @tab @samp{sphere}, @samp{cylinder}
@@ -326,6 +335,7 @@ The built in effectors are also loadable via the normal particle loader using
 @itemize @bullet
 @item @samp{force}
 @item @samp{lincolor}
+@item @samp{forcefield}
 @end itemize
 
 @samp{Force} effector loader recognize following keywords:
@@ -348,3 +358,20 @@ TTL. It takes a fixed number of "keypoints" and then interpolates between them.
 Set a keypoint color at given time.
 @end table
 
+@samp{Velocityfield} effector is a more complicated and resource using way of giving
+intricate movements to the particles. It works by taking a function defining
+the velocity of particles as a function of position and time. It then integrates
+to the new particle positions. Each function can take a number of vector and
+scalar parameters that affects their output
+To be noted is that @samp{velocityfield} effector does not change the particle
+velocities, so any "external" movement will be integrated as normally.
+@samp{Velocityfield} effector loader recognize following keywords:
+@table @code
+@item <type>field-type</type>
+Set the field function. Currently supported values are @samp{spiral} and 
+@samp{radialpoint}.
+@item <fparam>value</fparam>
+Specify a scalar parameter.
+@item <vparam x="" y="" z="" />
+Specify a vector parameter.
+@end table
