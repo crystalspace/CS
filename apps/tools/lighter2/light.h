@@ -35,13 +35,23 @@ namespace lighter
   public:
     VisibilityTester ();
 
-    bool Unoccluded (const Primitive* ignorePrim = 0);
-    bool Unoccluded (HitIgnoreCallback* ignoreCB);
+    enum OcclusionState
+    {
+      occlOccluded,
+      occlUnoccluded,
+      occlPartial
+    };
+    OcclusionState Occlusion (const Primitive* ignorePrim = 0);
+    OcclusionState Occlusion (HitIgnoreCallback* ignoreCB);
+    
+    csColor GetFilterColor ();
 
     void CollectHits (HitPointCallback* hitCB, HitIgnoreCallback* ignoreCB);
 
     void AddSegment (KDTree* tree, const csVector3& start, const csVector3& end);
     void AddSegment (KDTree* tree, const csVector3& start, const csVector3& dir, float maxL);
+    
+    void Clear() { allSegments.DeleteAll(); }
 
   private:
     struct Segment
@@ -50,6 +60,23 @@ namespace lighter
       Ray ray;
     };
     csArray<Segment> allSegments;
+
+    csArray<HitPoint> transparentHits;
+    struct HitCallback : public HitPointCallback
+    {
+      csArray<HitPoint>& hits;
+      HitCallback (csArray<HitPoint>& hits) : hits (hits) {}
+  
+      bool RegisterHit (const Ray &ray, const HitPoint &hit)
+      {
+        if (hit.kdFlags & KDPRIM_FLAG_TRANSPARENT)
+        {
+          hits.Push (hit);
+          return true;
+        }
+        return false;
+      }
+    };
   };
 
   typedef float(*LightAttenuationFunc)(float squaredDistance, 
@@ -225,7 +252,7 @@ namespace lighter
 
     float radius;
   };
-
+  
   // Proxy light, used when light source is in different sector
   class ProxyLight : public Light
   {

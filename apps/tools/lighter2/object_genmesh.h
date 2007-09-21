@@ -40,6 +40,8 @@ namespace lighter
   public:
     Object_Genmesh (ObjectFactory_Genmesh* factory);
 
+    virtual bool Initialize (Sector* sector);
+    
     virtual void SaveMesh (Sector* sector, iDocumentNode *node);
 
     virtual void FreeNotNeededForLighting ();

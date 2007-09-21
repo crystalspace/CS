@@ -51,6 +51,8 @@ namespace lighter
         u = updateFreq;
       }
     }
+    
+    scene->PropagateLights (this);
 
     progress.SetProgress (1);
   }
@@ -532,6 +534,13 @@ namespace lighter
     Statistics::Progress portalProgress (0, 1, &progress);
     Statistics::Progress lightProgress (0, 1, &progress);
     Statistics::Progress meshProgress (0, 1, &progress);
+    
+    // Parse materials
+    iMaterialList* matList = globalLighter->engine->GetMaterialList ();
+    for (int i = 0; i < matList->GetCount (); i++)
+    {
+      ParseMaterial (matList->Get (i));
+    }
 
     // Parse sectors
     sectorProgress.SetProgress (0);
@@ -558,34 +567,6 @@ namespace lighter
       ParsePortals (srcSector, sector);
     }
     portalProgress.SetProgress (1);
-
-    // Propagate light in sectors
-    lightProgress.SetProgress (0);
-    sectIt.Reset ();
-    while (sectIt.HasNext ())
-    {
-      Sector* sector = sectIt.Next ();
-      
-      LightRefArray tmpArray = sector->allNonPDLights;
-      LightRefArray::Iterator lid = tmpArray.GetIterator ();
-      while (lid.HasNext ())
-      {
-        Light* l = lid.Next ();
-        if (l->IsRealLight ())
-          PropagateLight (l, l->GetFrustum ());
-      }
-
-      tmpArray = sector->allPDLights;
-      lid = tmpArray.GetIterator ();
-      while (lid.HasNext ())
-      {
-        Light* l = lid.Next ();
-        
-        if (l->IsRealLight ())
-          PropagateLight (l, l->GetFrustum ());
-      }
-    }
-    lightProgress.SetProgress (1);
 
     // Map mesh objects loaded from each scene file to it
     meshProgress.SetProgress (0);
@@ -761,6 +742,28 @@ namespace lighter
     srcSect->GetMeshes()->RemoveAll();
   }
 
+  void Scene::PropagateLights (Sector* sector)
+  {
+    LightRefArray tmpArray = sector->allNonPDLights;
+    LightRefArray::Iterator lid = tmpArray.GetIterator ();
+    while (lid.HasNext ())
+    {
+      Light* l = lid.Next ();
+      if (l->IsRealLight ())
+	PropagateLight (l, l->GetFrustum ());
+    }
+
+    tmpArray = sector->allPDLights;
+    lid = tmpArray.GetIterator ();
+    while (lid.HasNext ())
+    {
+      Light* l = lid.Next ();
+      
+      if (l->IsRealLight ())
+	PropagateLight (l, l->GetFrustum ());
+    }
+  }
+  
   void Scene::PropagateLight (Light* light, const csFrustum& lightFrustum, 
                               PropageState& state)
   {
@@ -809,7 +812,7 @@ namespace lighter
       }
     }
   }
-
+  
   Scene::MeshParseResult Scene::ParseMesh (LoadedFile* fileInfo,
                                            Sector *sector, 
                                            iMeshWrapper *mesh,
@@ -876,6 +879,48 @@ namespace lighter
     radFactories.Put (radFact->factoryName, radFact);
 
     return Success;
+  }
+    
+  bool Scene::ParseMaterial (iMaterialWrapper* material)
+  {
+    RadMaterial radMat;
+    
+    // No material properties from key-value-pairs yet
+#if 0
+    csRef<iObjectIterator> objiter = 
+      material->QueryObject ()->GetIterator();
+    while (objiter->HasNext())
+    {
+      iObject* obj = objiter->Next();
+      csRef<iKeyValuePair> kvp = 
+        scfQueryInterface<iKeyValuePair> (obj);
+      if (kvp.IsValid() && (strcmp (kvp->GetKey(), "lighter2") == 0))
+      {
+      }
+    }
+#endif
+    
+    csRef<iShaderVariableContext> matSVC = 
+      scfQueryInterface<iShaderVariableContext> (material->GetMaterial());
+    csRef<csShaderVariable> svTex =
+      matSVC->GetVariable (globalLighter->strings->Request ("tex diffuse"));
+    if (svTex.IsValid())
+    {
+      iTextureWrapper* texwrap = 0;
+      svTex->GetValue (texwrap);
+      if (texwrap != 0)
+      {
+        iImage* teximg = texwrap->GetImageFile ();
+        if (teximg != 0)
+        {
+          if (teximg->GetFormat() & CS_IMGFMT_ALPHA)
+            radMat.ComputeFilterImage (teximg);
+        }
+      }
+    }
+    
+    radMaterials.Put (material->QueryObject()->GetName(), radMat);
+    return true;
   }
 
   void Scene::CollectDeleteTextures (iDocumentNode* textureNode,

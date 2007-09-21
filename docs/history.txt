@@ -19,6 +19,9 @@ chronological order.
 	  the rule "ATI: 'Forceful' fixed function enable" properly applied
 	  to ATI cards on Linux making "walktest terrainf" no longer exhibit
 	  garbled text and CS logo.
+	- res added "partial" shadow support to lighter2: the alpha channel of
+	  a surface's texture is taken into consideration when casting the
+	  shadow.
 20-Sep-2007
 	- caedes, Genjix and iceeey removed some stupid code :D
 	  csQuaternion quat;

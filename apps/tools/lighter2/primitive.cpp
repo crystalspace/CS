@@ -334,6 +334,24 @@ namespace lighter
     return norm.Unit ();
   }
 
+  csVector2 Primitive::ComputeUV (const csVector3& point) const
+  {
+    float lambda, my;
+    ComputeBaryCoords (point, lambda, my);
+
+    // Clamp lambda/my
+    lambda = csClamp (lambda, 1.0f, 0.0f);
+    my = csClamp (my, 1.0f, 0.0f);
+
+    csVector2 uv;
+
+    uv = lambda * vertexData->uvs[triangle.a] + 
+      my * vertexData->uvs[triangle.b] + 
+      (1 - lambda - my) * vertexData->uvs[triangle.c];
+
+    return uv;
+  }
+
   void Primitive::ComputeMinMaxUV (csVector2 &min, csVector2 &max) const
   {
     PrimitiveBase::ComputeMinMaxUV (GetVertexData().lightmapUVs, min, max);

@@ -19,6 +19,7 @@
 #include "common.h"
 
 #include "kdtree.h"
+#include "material.h"
 #include "primitive.h"
 #include "statistics.h"
 #include "object.h"
@@ -521,6 +522,8 @@ namespace lighter
 
           if (prim->GetObject ()->GetFlags ().Check (OBJECT_FLAG_NOSHADOW))
             kdFlags |= KDPRIM_FLAG_NOSHADOW;
+	  if (prim->GetMaterial() && prim->GetMaterial()->IsTransparent())
+	    kdFlags |= KDPRIM_FLAG_TRANSPARENT;
 
           //Extract our info
           const csVector3& N = prim->GetPlane ().Normal ();

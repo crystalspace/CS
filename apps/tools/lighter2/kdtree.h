@@ -36,6 +36,7 @@ namespace lighter
   enum
   {
     KDPRIM_FLAG_NOSHADOW = 0x04,
+    KDPRIM_FLAG_TRANSPARENT = 0x08,
     KDPRIM_FLAG_MASK = 0xFFFFFFFC
   };
 

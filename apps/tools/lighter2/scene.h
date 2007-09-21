@@ -22,6 +22,7 @@
 #include "object.h"
 #include "kdtree.h"
 #include "light.h"
+#include "material.h"
 
 namespace lighter
 {
@@ -63,7 +64,7 @@ namespace lighter
 
     // Build kd tree for Sector
     void BuildKDTree (Statistics::Progress& progress);
-
+    
     // All objects in sector
     ObjectHash allObjects;
 
@@ -132,6 +133,13 @@ namespace lighter
     Lightmap* GetLightmap (uint lightmapID, Light* light);
 
     csArray<LightmapPtrDelArray*> GetAllLightmaps ();
+    
+    const RadMaterial* GetRadMaterial (iMaterialWrapper* matWrap) const
+    {
+      if (matWrap == 0) return 0;
+      return radMaterials.GetElementPointer (
+        matWrap->QueryObject()->GetName());
+    }
 
     /**
      * Helper class to perform some lightmap postprocessing
@@ -168,12 +176,14 @@ namespace lighter
     {
       csSet<csPtrKey<Portal> > seenPortals;
     };
-    void PropagateLight (Light* light, const csFrustum& lightFrustum, 
-      PropageState& state);
+    void PropagateLights (Sector* sector);
   protected:
     
     //  factories
     ObjectFactoryHash radFactories;
+    
+    // Materials
+    MaterialHash radMaterials;
  
     // All sectors
     SectorHash sectors;
@@ -237,12 +247,15 @@ namespace lighter
       iMeshWrapper *mesh, csRef<Object>& obj);
     MeshParseResult ParseMeshFactory (LoadedFile* fileInfo, 
       iMeshFactoryWrapper *factory, csRef<ObjectFactory>& radFact);
+    bool ParseMaterial (iMaterialWrapper* material);
+    void PropagateLight (Light* light, const csFrustum& lightFrustum, 
+      PropageState& state);
     void PropagateLight (Light* light, const csFrustum& lightFrustum)
     { 
       PropageState state;
       PropagateLight (light, lightFrustum, state);
     }
-
+    
     iRegion* GetRegion (iObject* obj);
     bool IsObjectFromBaseDir (iObject* obj, const char* baseDir);
     bool IsFilenameFromBaseDir (const char* filename, const char* baseDir);
