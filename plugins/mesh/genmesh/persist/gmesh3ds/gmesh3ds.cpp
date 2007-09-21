@@ -278,15 +278,24 @@ static long DataTellFunc (void *self)
 }
 
 
+#ifdef NEW_DATA_CALLBACKS
+static size_t DataReadFunc (void *self, void *buffer, size_t size)
+#else
 static int DataReadFunc (void *self, Lib3dsByte *buffer, int size)
+#endif
 {
   iFile* pData = (iFile*)self;
   return (int)pData->Read ((char*)buffer, size );
 }
 
 
+#ifdef NEW_DATA_CALLBACKS
+static size_t DataWriteFunc (void* /*self*/, const void* /*buffer*/, 
+ 	size_t /*size*/)
+#else
 static int DataWriteFunc (void* /*self*/, const Lib3dsByte* /*buffer*/,
 	int /*size*/)
+#endif
 {
   // not yet implemented
   return 0;

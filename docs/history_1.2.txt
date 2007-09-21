@@ -2,6 +2,7 @@
 
 21-Sep-2007
         - Mike Gist merged r27696 into 1.2 (GL driver DB fix).
+	- res merged r27676 and r27694 into 1.2 (lib3ds 1.3.0 support).
 18-Sep-2007
         - Mike Gist merged r27669 and r27670 into 1.2 (ATI gldriver tweaks).
 15-Sep-2007
