@@ -5643,6 +5643,8 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *RemoveDelayedRemoves = *cspacec::iEngine_RemoveDelayedRemoves;
 *DeleteAll = *cspacec::iEngine_DeleteAll;
 *ResetWorldSpecificSettings = *cspacec::iEngine_ResetWorldSpecificSettings;
+*SetDefaultKeepImage = *cspacec::iEngine_SetDefaultKeepImage;
+*GetDefaultKeepImage = *cspacec::iEngine_GetDefaultKeepImage;
 *scfGetVersion = *cspacec::iEngine_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');

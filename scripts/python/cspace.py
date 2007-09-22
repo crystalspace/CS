@@ -3754,6 +3754,8 @@ class iEngine(iBase):
     def RemoveDelayedRemoves(*args): return _cspace.iEngine_RemoveDelayedRemoves(*args)
     def DeleteAll(*args): return _cspace.iEngine_DeleteAll(*args)
     def ResetWorldSpecificSettings(*args): return _cspace.iEngine_ResetWorldSpecificSettings(*args)
+    def SetDefaultKeepImage(*args): return _cspace.iEngine_SetDefaultKeepImage(*args)
+    def GetDefaultKeepImage(*args): return _cspace.iEngine_GetDefaultKeepImage(*args)
     __swig_getmethods__["scfGetVersion"] = lambda x: _cspace.iEngine_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_cspace.iEngine_scfGetVersion)
     __swig_destroy__ = _cspace.delete_iEngine
