@@ -11,6 +11,8 @@ chronological order.
 	  was moved to a different file in cs and this breaks things.
 	- caedes added swig defines for CS_DEPRECATED_VAR and
 	  CS_DEPRECATED_VAR_MSG so this are correctly wrapped.
+	- caedes moved swig scf.i file to include/bindings/common as that
+	  is a more correct place.
 22-Sep-2007
 	- caedes fixed incorrect java/corepost.i and cleaned perl/corepost.i.
 15-Sep-2007

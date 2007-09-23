@@ -486,7 +486,7 @@ csArrayCapacityLinear<csArrayThresholdVariable >;
 %include "csutil/scf.h"
 
 // hand made scf template wrappers
-%include "bindings/scf.i"
+%include "bindings/common/scf.i"
 
 %include "iutil/dbghelp.h"
 %include "iutil/cmdline.h"
