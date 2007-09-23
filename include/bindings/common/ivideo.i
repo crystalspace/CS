@@ -7,6 +7,7 @@
 
 %ignore iNativeWindowManager::AlertV;
 %include "ivideo/natwin.h"
+%include "ivideo/rendermesh.h"
 
 %ignore GetGlyphSize(uint8, int &, int &);
 %ignore GetGlyphBitmap(uint8, int &, int &);

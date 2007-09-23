@@ -7,6 +7,11 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 22-Sep-2007
+	- caedes added swig includes for wrapping RenderPriority again, as it
+	  was moved to a different file in cs and this breaks things.
+	- caedes added swig defines for CS_DEPRECATED_VAR and
+	  CS_DEPRECATED_VAR_MSG so this are correctly wrapped.
+22-Sep-2007
 	- caedes fixed incorrect java/corepost.i and cleaned perl/corepost.i.
 15-Sep-2007
 	- caedes added swig module post files for java and perl.

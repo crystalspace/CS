@@ -121,6 +121,10 @@
 #define CS_DEPRECATED_METHOD
 #undef CS_DEPRECATED_METHOD_MSG
 #define CS_DEPRECATED_METHOD_MSG(msg)
+#undef CS_DEPRECATED_VAR
+#define CS_DEPRECATED_VAR(decl) decl
+#undef CS_DEPRECATED_VAR_MSG
+#define CS_DEPRECATED_VAR_MSG(msg,decl) decl
 #undef CS_DEPRECATED_TYPE
 #define CS_DEPRECATED_TYPE
 #undef CS_DEPRECATED_TYPE_MSG
@@ -329,6 +333,7 @@
 #define ARRAY_OBJECT_FUNCTIONS(classname,typename)
 #define LIST_OBJECT_FUNCTIONS(classname,typename)
 #define SET_OBJECT_FUNCTIONS(classname,typename)
+
 
 #if defined(SWIGPYTHON)
   %include "bindings/python/pythpre.i"
