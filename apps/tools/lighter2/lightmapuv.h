@@ -44,11 +44,12 @@ namespace lighter
      * \param factory Factory object primitives are part of
      * \param outPrims Output primitives. A number of primitive arrays. All
      *   primitives of a sub-array would fit on a single lightmap.
+     * \param noSplit Indicates that no splitting is to be done.
      */
     virtual csPtr<LightmapUVObjectLayouter> LayoutFactory (
       const FactoryPrimitiveArray& inPrims, ObjectFactoryVertexData& vertexData,
       const ObjectFactory* factory, csArray<FactoryPrimitiveArray>& outPrims,
-      csBitArray& usedVerts) = 0;
+      csBitArray& usedVerts, bool noSplit) = 0;
 
     virtual void PrepareLighting (Statistics::Progress& progress) = 0;
   };

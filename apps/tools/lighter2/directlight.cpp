@@ -249,22 +249,20 @@ namespace lighter
     if (lightPdf > 0.0f && !lightColor.IsBlack () &&
       (cosineTerm = normal * lightVec) > 0)
     {
-      //@@TODO add material...
+      VisibilityTester::OcclusionState occlusion;
       if (fullIgnore)
       {
         DirectLightingBorderIgnoreCb icb (shadowIgnorePrimitive);
-        if (!visTester.Unoccluded (&icb))
-        {
-          return csColor (0,0,0); 
-        }
+        occlusion = visTester.Occlusion (&icb);
       }
       else
       {
-        if (!visTester.Unoccluded (shadowIgnorePrimitive))
-        {
-          return csColor (0,0,0); 
-        }
+        occlusion = visTester.Occlusion (shadowIgnorePrimitive);
       }
+      if (occlusion == VisibilityTester::occlOccluded)
+        return csColor (0, 0, 0);
+      else if (occlusion == VisibilityTester::occlPartial)
+        lightColor *= visTester.GetFilterColor ();
 
       if (light->IsDeltaLight ())
         return lightColor * fabsf (cosineTerm) / lightPdf;
@@ -422,8 +420,6 @@ namespace lighter
           // Shade PD lights
           for (size_t pdli = 0; pdli < PDLights.GetSize (); ++pdli)
           {
-            Light* pdl = PDLights[pdli];
-
             csColor c;
     
             Lightmap* lm = pdLightLMs[pdli];

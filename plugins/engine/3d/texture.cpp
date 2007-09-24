@@ -33,7 +33,7 @@ csTextureWrapper::csTextureWrapper (csEngine* engine, iImage *Image)
   flags(CS_TEXTURE_3D)
 {
   image = Image;
-  keep_image = false;
+  keep_image = engine->csEngine::GetDefaultKeepImage();
   texClass = 0;
   UpdateKeyColorFromImage ();
 }
@@ -41,7 +41,7 @@ csTextureWrapper::csTextureWrapper (csEngine* engine, iImage *Image)
 csTextureWrapper::csTextureWrapper (csEngine* engine, iTextureHandle *ith) 
   : scfImplementationType (this), engine (engine)
 {
-  keep_image = false;
+  keep_image = engine->csEngine::GetDefaultKeepImage();
   texClass = 0;
 
   handle = ith;

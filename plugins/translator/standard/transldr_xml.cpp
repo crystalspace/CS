@@ -82,16 +82,17 @@ csPtr<iBase> csTranslatorLoaderXml::Parse (iDocumentNode* node,
     Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't load iConfigManager!");
     return 0;
   }
-  const char* cfglang = 0;
-  cfglang = cfg->GetStr ("Translator.Language", 0);
-  if (!cfglang)
+  // try to load the system language from the configuration.
+  csString syslang = cfg->GetStr ("Translator.Language", 0);
+  if (!syslang)
   {
-    Report (CS_REPORTER_SEVERITY_ERROR,
-    	"Couldn't found 'Translator.Language' in the cfg!");
-    return 0;
+    // finally try to find the systems language to use
+    syslang = getenv ("LANG");  // linux only
+    syslang.Truncate (syslang.FindFirst ('_'));
+    syslang.ShrinkBestFit ();
   }
   csRef<iDocumentNodeIterator> it1 = node->GetNodes ();
-  while (it1->HasNext ())
+  while (syslang && it1->HasNext ())
   {
     csRef<iDocumentNode> ch1 = it1->Next ();
     if (ch1->GetType () != CS_NODE_ELEMENT) continue;
@@ -108,7 +109,7 @@ csPtr<iBase> csTranslatorLoaderXml::Parse (iDocumentNode* node,
           	node, "Missing 'name' attribute!");
           return 0;
         }
-        if (!strcmp (cfglang, language))
+        if (!strcmp (syslang.GetData (), language))
         {
           found_language = true;
           csRef<iDocumentNodeIterator> it2 = ch1->GetNodes ();
@@ -142,7 +143,7 @@ csPtr<iBase> csTranslatorLoaderXml::Parse (iDocumentNode* node,
                       return 0;
                   }
                 }
-                if (src && dst) trans->SetMsg (src, dst);
+                if (src && dst && src != dst) trans->SetMsg (src, dst);
               }
               break;
               default:
@@ -161,8 +162,7 @@ csPtr<iBase> csTranslatorLoaderXml::Parse (iDocumentNode* node,
   if (!found_language)
   {
     Report (CS_REPORTER_SEVERITY_ERROR,
-    	"Couldn't found '%s' language!", cfglang);
-    return 0;
+      "Couldn't found '%s' language!", syslang.GetData ());
   }
   csRef<iTranslator> old = csQueryRegistry<iTranslator> (object_reg);
   object_reg->Unregister (old, "iTranslator");

@@ -79,6 +79,19 @@ AS_IF([test -n "$SWIG"],
 
 CS_CHECK_COMMON_TOOLS_ICONS
 
+AC_ARG_ENABLE([relaytool], [AC_HELP_STRING([--enable-relaytool],
+    [enable use of relaytool for some libraries (default YES)])])
+    AS_IF([test -z "$enable_relaytool"], 
+	[enable_relaytool=yes])
+AS_IF([test "$enable_relaytool" != "no"],
+    [# Note that CS comes with a copy of relaytool that, compared to the 
+    # current (as of 2007-09-18) version from apbuild-2.0.5, has some 
+    # additions and small fixes applied. Thus, prefer the version that 
+    # ships with CS.
+    CS_PATH_TOOL([RELAYTOOL], [relaytool], [], 
+	[${srcdir}/bin$PATH_SEPARATOR$PATH])
+    CS_EMIT_BUILD_PROPERTY([CMD.RELAYTOOL], [$RELAYTOOL])])
+
 #------------------------------------------------------------------------------
 # In order to avoid alienating users by forcing them to install and use Jam,
 # config.status is instructed (see far below) to build Jam on the user's behalf
@@ -1285,7 +1298,14 @@ AS_IF([test $cs_cv_lib3ds = yes],
     [CS_CHECK_BUILD([if lib3ds is sufficiently recent], [cs_cv_lib3ds_recent],
 	[AC_LANG_PROGRAM([[#include <lib3ds/io.h>]], [lib3ds_io_free(0);])],
 	[], [], [CS_EMIT_BUILD_RESULT([cs_cv_lib3ds], [3DS])], [], [],
-	[$cs_cv_lib3ds_cflags], [$cs_cv_lib3ds_lflags], [$cs_cv_lib3ds_libs])])
+	[$cs_cv_lib3ds_cflags], [$cs_cv_lib3ds_lflags], [$cs_cv_lib3ds_libs])
+	AS_IF([test $cs_cv_lib3ds_recent = yes],
+	    [CS_CHECK_BUILD([if lib3ds version is >= 1.3.0], [cs_cv_lib3ds_1_3],
+	    [AC_LANG_PROGRAM([[#include <lib3ds/io.h>
+	        size_t DataReadFunc (void *self, void *buffer, size_t size) {}]],
+	        [lib3ds_io_new (0, 0, 0, 0, DataReadFunc, 0)])],
+	    [], [C++], [CS_EMIT_BUILD_PROPERTY([LIB3DS.ONE_THREE_OH], [yes])], [], [],
+	    [$cs_cv_lib3ds_cflags], [$cs_cv_lib3ds_lflags], [$cs_cv_lib3ds_libs])])])
 
 
 
@@ -1567,6 +1587,28 @@ AS_IF([test $cs_cv_libCEGUI = yes],
 	[$cs_cv_libCEGUI_cflags],
 	[$cs_cv_libCEGUI_lflags],
 	[$cs_cv_libCEGUI_libs])])
+
+
+
+#----------------------------------------------------------------------------
+# Check for GTK.
+#----------------------------------------------------------------------------
+CS_CHECK_LIB_WITH([GTK],
+    [AC_LANG_PROGRAM([[#include <gtk/gtk.h>]],
+    [gtk_message_dialog_new (0, 0, 0, 0, 0);])], [], [],
+    [CS_EMIT_BUILD_RESULT([cs_cv_libGTK], [GTK])], [], [], [], [], [gtk+-2.0])
+
+AS_IF([test $cs_cv_libGTK = yes],
+    [CS_CHECK_BUILD([if gtk_message_dialog_format_secondary_text is available], 
+        [cs_cv_GTK_gtk_message_dialog_format_secondary_text],
+	[AC_LANG_PROGRAM(
+	    [[#include <gtk/gtk.h>]],
+	    [gtk_message_dialog_format_secondary_text (0, 0);])],
+	[], [],
+	[CS_EMIT_BUILD_PROPERTY([GTK.MESSAGE_HAS_SECONDARY], [yes])], [], [],
+	[$cs_cv_libGTK_cflags],
+	[$cs_cv_libGTK_lflags],
+	[$cs_cv_libGTK_libs])])
 
 
 

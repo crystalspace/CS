@@ -118,7 +118,7 @@ public:
    * Note that the returned object will be IncRef'ed.
    */
   virtual iObject* GetChild (int iInterfaceID, int iVersion,
-    const char *Name = 0, bool FirstName = false) const;
+    const char *Name, bool FirstName) const;
 
   /// Return the first child object with the given name
   virtual iObject *GetChild (const char *Name) const;
@@ -134,7 +134,10 @@ public:
   virtual void RemoveNameChangeListener (
   	iObjectNameChangeListener* listener);
 
+  
   virtual void ObjReleaseOld (iObject *obj);
+  virtual iObject* GetChild (int iInterfaceID, int iVersion,
+    const char *Name = 0) const;
 };
 
 #endif // __CS_CSOBJECT_H__

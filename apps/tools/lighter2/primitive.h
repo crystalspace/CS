@@ -29,9 +29,14 @@ namespace lighter
 {
   class Object;
   struct ElementProxy;
+  struct RadMaterial;
 
   class Primitive;
   
+  enum PrimitiveFlags
+  {
+  };
+
 
   /**
    * Primitive in the radiosity world.
@@ -89,6 +94,8 @@ namespace lighter
     inline const ObjectBaseVertexData& GetVertexData () const 
     { return *vertexData; }
 
+    inline csFlags& GetFlags () { return flags; }
+    inline const csFlags& GetFlags () const { return flags; }
   protected:
     /// Vertex data holder
     ObjectBaseVertexData* vertexData;
@@ -100,6 +107,8 @@ namespace lighter
     /* Plane normal seems to point into opposite direction compared to e.g.
      * auto-computed vertex normals. (FIXME?) */
     csPlane3 plane;
+    
+    csFlags flags;
   };
 
   class FactoryPrimitive : public PrimitiveBase
@@ -136,7 +145,8 @@ namespace lighter
         uFormVector (other.uFormVector), vFormVector (other.uFormVector), 
         minCoord (other.minCoord), minUV (other.minUV), maxUV (other.maxUV), 
         radObject (other.radObject), globalLightmapID (other.globalLightmapID),
-        lambdaCoeffTV (other.lambdaCoeffTV), myCoeffTV (other.myCoeffTV)
+        lambdaCoeffTV (other.lambdaCoeffTV), myCoeffTV (other.myCoeffTV),
+        material (0)
     {
     }
     inline ~Primitive () { }
@@ -157,6 +167,9 @@ namespace lighter
 
     /// Get interpolated normal at point
     csVector3 ComputeNormal (const csVector3& point) const;
+
+    /// Get interpolated UV coords at point
+    csVector2 ComputeUV (const csVector3& point) const;
 
     /// Calculate min-max UV-coords
     void ComputeMinMaxUV (csVector2 &min, csVector2 &max) const;
@@ -233,7 +246,8 @@ namespace lighter
     inline uint GetGlobalLightmapID () const { return globalLightmapID; }
     inline void SetGlobalLightmapID (uint id) { globalLightmapID = id; }
 
-    
+    inline const RadMaterial* GetMaterial () const { return material; }
+    inline void SetMaterial (const RadMaterial* mat) { material = mat; }
 protected:
     //@{
     /// Elements
@@ -273,6 +287,8 @@ protected:
     csVector3 lambdaCoeffTV, myCoeffTV;
 
     void ComputeBaryCoeffs ();
+    
+    const RadMaterial* material;
   };
 
   typedef csArray<FactoryPrimitive> FactoryPrimitiveArray;

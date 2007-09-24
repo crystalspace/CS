@@ -275,6 +275,32 @@ iObject* csObject::GetChild (const char *Name) const
   }
   return 0;
 }
+  
+iObject* csObject::GetChild (int iInterfaceID, int iVersion, 
+			     const char *Name) const
+{
+  if (!Children)
+    return 0;
+
+  for (size_t i = 0; i < Children->GetSize (); i++)
+  {
+    if (Name)
+    {
+      const char *OtherName = Children->Get (i)->GetName ();
+      if (!OtherName) continue;
+      if (strcmp (OtherName, Name) != 0) continue;
+    }
+
+    iObject *child = Children->Get(i);
+    if (child->QueryInterface(iInterfaceID, iVersion) != 0)
+    {
+      child->DecRef(); // Undo the IncRef from QueryInterface
+      return child;
+    }
+  }
+
+  return 0;
+}
 
 csPtr<iObjectIterator> csObject::GetIterator ()
 {

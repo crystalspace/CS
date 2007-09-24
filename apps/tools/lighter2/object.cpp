@@ -29,7 +29,7 @@ namespace lighter
 {
 
   ObjectFactory::ObjectFactory ()
-    : lightPerVertex (false),
+    : lightPerVertex (false), noModify (false),
     lmScale (globalConfig.GetLMProperties ().lmDensity),
     factoryWrapper (0)
   {
@@ -60,16 +60,17 @@ namespace lighter
         csArray<FactoryPrimitiveArray> newPrims;
         csRef<LightmapUVObjectLayouter> lightmaplayout = 
           uvlayout->LayoutFactory (unlayoutedPrimitives[i], vertexData, this, 
-          newPrims, usedVertices);
-        if (!lightmaplayout) return false;
-
-        for (size_t n = 0; n < newPrims.GetSize(); n++)
+          newPrims, usedVertices, noModify);
+        if (lightmaplayout)
         {
-          layoutedPrimitives.Push (LayoutedPrimitives (newPrims[n],
-            lightmaplayout, n));
-
-          AddSubmeshRemap (i, layoutedPrimitives.GetSize () - 1);
-        }
+	  for (size_t n = 0; n < newPrims.GetSize(); n++)
+	  {
+	    layoutedPrimitives.Push (LayoutedPrimitives (newPrims[n],
+	      lightmaplayout, n));
+  
+	    AddSubmeshRemap (i, layoutedPrimitives.GetSize () - 1);
+	  }
+	}
       }
       unlayoutedPrimitives.DeleteAll();
     }
