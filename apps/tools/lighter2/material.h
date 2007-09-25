@@ -48,7 +48,11 @@ namespace lighter
     T GetValue (int x, int y) const
     { return colorArray[y*width + x]; }
     T GetValueWrapped (int x, int y) const
-    { return colorArray[(y % height)*width + (x % width)]; }
+    {
+      int nx = x % width;
+      int ny = y % height;
+      return GetValue (ABS (nx), ABS (ny));
+    }
     T GetInterpolated (float x, float y) const
     {
       int x1 = int (x);

@@ -13,6 +13,8 @@ chronological order.
 	  cleaning "old" lightmaps.
 	- res made lighter2 generate different lightmap texture names for
 	  different levels.
+	- res fixed lighter2's "MaterialImage<>" class so not crash when
+	  negative coords are requested for wrapped sampling.
 21-Sep-2007
 	- Genjix added support for 3 character long locale codes at the behest
 	  or res2k (thanks!).
