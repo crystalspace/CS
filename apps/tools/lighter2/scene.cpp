@@ -1332,7 +1332,8 @@ namespace lighter
     }
   }
 
-  const char* Scene::GetSolidColorFile (const csColor& col)
+  const char* Scene::GetSolidColorFile (LoadedFile* fileInfo, 
+					  const csColor& col)
   {
     int r = int (col.red * 255.99f);
     int g = int (col.green * 255.99f);
@@ -1351,6 +1352,7 @@ namespace lighter
         file->Write (imgData->GetData (), imgData->GetSize ());
       }
     }
+    fileInfo->texFileNamesToDelete.Delete (colorStr);
     return solidColorFiles.Register (colorStr);
   }
 
@@ -1507,7 +1509,7 @@ namespace lighter
       {
         if (textureToSave.pdLightmapFiles.GetSize() == 0)
         {
-          filename = GetSolidColorFile (textureToSave.solidColor);
+          filename = GetSolidColorFile (fileInfo, textureToSave.solidColor);
         }
         else
         {

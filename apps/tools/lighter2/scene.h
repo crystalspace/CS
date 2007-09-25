@@ -230,7 +230,7 @@ namespace lighter
                               Sector* sect, LoadedFile* fileInfo);
 
     csStringHash solidColorFiles;
-    const char* GetSolidColorFile (const csColor& col);
+    const char* GetSolidColorFile (LoadedFile* fileInfo, const csColor& col);
     void SaveLightmapsToDom (iDocumentNode* root, LoadedFile* fileInfo,
                              Statistics::Progress& progress);
     

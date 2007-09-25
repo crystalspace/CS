@@ -9,6 +9,8 @@ chronological order.
 25-Sep-2007
 	- res made relaytool work better with shared libs: no link time 
 	  warnings on x86 resp. link errors on amd64.
+	- res fixed lighter2 to conserve used "single color" lightmaps when 
+	  cleaning "old" lightmaps.
 21-Sep-2007
 	- Genjix added support for 3 character long locale codes at the behest
 	  or res2k (thanks!).
