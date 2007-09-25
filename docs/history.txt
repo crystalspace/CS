@@ -11,6 +11,8 @@ chronological order.
 	  warnings on x86 resp. link errors on amd64.
 	- res fixed lighter2 to conserve used "single color" lightmaps when 
 	  cleaning "old" lightmaps.
+	- res made lighter2 generate different lightmap texture names for
+	  different levels.
 21-Sep-2007
 	- Genjix added support for 3 character long locale codes at the behest
 	  or res2k (thanks!).

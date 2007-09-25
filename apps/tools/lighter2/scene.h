@@ -198,6 +198,7 @@ namespace lighter
     {
       csRef<iDocumentNode> rootNode;
       csRef<iDocument> document;
+      csString levelName;
       csString directory; //VFS name, full path
       csSet<csString> texturesToClean;
       csSet<csString> texFileNamesToDelete;
@@ -210,7 +211,8 @@ namespace lighter
     // Save functions
     void CollectDeleteTextures (iDocumentNode* textureNode,
                                 csSet<csString>& filesToDelete);
-    void BuildLightmapTextureList (csStringArray& texturesToSave);
+    void BuildLightmapTextureList (LoadedFile* fileInfo, 
+      csStringArray& texturesToSave);
     void CleanOldLightmaps (LoadedFile* fileInfo);
     void SaveSceneFactoriesToDom (iDocumentNode* root, LoadedFile* fileInfo,
                                   Statistics::Progress& progress);
