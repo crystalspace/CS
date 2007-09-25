@@ -1372,7 +1372,8 @@ namespace lighter
     int g = int (col.green * 255.99f);
     int b = int (col.blue * 255.99f);
     csString colorStr;
-    colorStr.Format ("lightmaps/%02x%02x%02x.png", r, g, b);
+    colorStr.Format ("lightmaps/%s_%02x%02x%02x.png", 
+      fileInfo->levelName.GetData(), r, g, b);
     if (!solidColorFiles.Contains (colorStr))
     {
       csRef<iImage> img;
@@ -1455,11 +1456,9 @@ namespace lighter
           globalConfig.GetLMProperties().grayPDMaps)) continue;
 
         csString lmID (key->GetLightID ().HexString());
-        csString textureFilename = "lightmaps/";
-        textureFilename += i;
-        textureFilename += "_";
-        textureFilename += pdlightNums.Request (lmID);
-        textureFilename += ".png";
+        csString textureFilename;
+        textureFilename.Format ("lightmaps/%s_%u_%zu.png", 
+          fileInfo->levelName.GetData(), i, pdlightNums.Request (lmID));
 
         {
           // Texture file name is relative to world file

@@ -16,6 +16,11 @@ chronological order.
 	- res fixed lighter2's "MaterialImage<>" class so not crash when
 	  negative coords are requested for wrapped sampling.
 	- Marten added back PD-light support in lighter2.
+	- res made lighter2 generate level-specific lightmap texture names 
+	  also for PD light maps and solid color lightmaps (the latter is done
+	  to avoid undesired cleanups).
+	- res fixed lighter2's "MaterialImage<>" interpolation to correctly
+	  sample negative coordinates.
 21-Sep-2007
 	- Genjix added support for 3 character long locale codes at the behest
 	  or res2k (thanks!).

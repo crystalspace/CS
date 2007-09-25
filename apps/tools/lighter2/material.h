@@ -55,9 +55,9 @@ namespace lighter
     }
     T GetInterpolated (float x, float y) const
     {
-      int x1 = int (x);
+      int x1 = int (floorf (x));
       float t1 = x - x1;
-      int y1 = int (y);
+      int y1 = int (floorf (y));
       float t2 = y - y1;
       return csLerp (
         csLerp (GetValueWrapped (x1,   y1  ), 
