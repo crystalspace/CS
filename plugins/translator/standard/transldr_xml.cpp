@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2006, 2007 by Dariusz Dawidowski
-    Copyright (C) 2007 by Aamir Taki
+    Copyright (C) 2007 by Amir Taaki
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
