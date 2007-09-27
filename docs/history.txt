@@ -6,6 +6,8 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+	- res fixed lighter2 to conserve used "single color" lightmaps when 
+	  cleaning "old" lightmaps.
 21-Sep-2007
 	- iceeey fixed a bug in parsing of GL driver DB where a comparever
 	  which checks for an unknown version string type would cause a
