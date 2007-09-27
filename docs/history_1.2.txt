@@ -3,6 +3,8 @@
 27-Sep-2007
 	- res merged r27718 into 1.2 (lighter2: "single color" lightmap
 	  cleaning fix).
+	- res merged r27719 and r27722 into 1.2 (lighter2: include level name
+	  in lightmap file and texture names).
 21-Sep-2007
         - Mike Gist merged r27696 into 1.2 (GL driver DB fix).
 	- res merged r27676 and r27694 into 1.2 (lib3ds 1.3.0 support).
