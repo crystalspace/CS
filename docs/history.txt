@@ -6,6 +6,9 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+28-Sep-2007
+	- Vincent added static variants in lighter2, cslight, basemapgen and
+	  docconv Jamfiles.
 26-Sep-2007
 	- Darek made some fixes in translator and added manual fallback 
 	  list (e.g. Translator.Fallback.eu = es it en).
