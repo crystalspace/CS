@@ -1,5 +1,7 @@
 1.2 branch log.
 
+29-Sep-2007
+        - Mike Gist merged r27733 into 1.2 (material duplication fix).
 27-Sep-2007
 	- res merged r27718 into 1.2 (lighter2: "single color" lightmap
 	  cleaning fix).

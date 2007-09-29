@@ -289,7 +289,7 @@ iTextureWrapper* StdLoaderContext::FindTexture (const char* name)
       loader->ReportNotify ("Could not find texture '%s'. Attempting to load.", 
         name);
     csRef<iTextureWrapper> rc = loader->LoadTexture (name, name,
-    	CS_TEXTURE_3D, 0, true, true, true, region);
+    	CS_TEXTURE_3D, 0, true, false, true, region);
     result = rc;
   }
   return result;
