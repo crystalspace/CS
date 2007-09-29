@@ -6,6 +6,10 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Sep-2007
+        - Mike Gist changed the call to LoadTexture() in FindTexture() to not
+          create a material if the texture isn't found. This fixes a material
+          duplication bug in FindNamedMaterial().
 28-Sep-2007
 	- Vincent added static variants in lighter2, cslight, basemapgen and
 	  docconv Jamfiles.
