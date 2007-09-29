@@ -305,7 +305,7 @@ void csMeshFactoryList::RemoveAll ()
 int csMeshFactoryList::Find (iMeshFactoryWrapper *obj) const
 {
   return (int)list.Find (obj);
-}s
+}
 
 iMeshFactoryWrapper *csMeshFactoryList::FindByName (
   const char *Name) const
