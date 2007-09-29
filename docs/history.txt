@@ -7,9 +7,10 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 29-Sep-2007
-        - Mike Gist changed the call to LoadTexture() in FindTexture() to not
-          create a material if the texture isn't found. This fixes a material
-          duplication bug in FindNamedMaterial().
+	- Mike Gist changed the call to LoadTexture() in FindTexture() to not
+	  create a material if the texture isn't found. This fixes a material
+	  duplication bug in FindNamedMaterial().
+	- Vincent fixed a <comparever> entry in gldriver.xml.
 28-Sep-2007
 	- Vincent added static variants in lighter2, cslight, basemapgen and
 	  docconv Jamfiles.
@@ -56,8 +57,8 @@ chronological order.
 	  csQuaternion quat;
 	  if (quat.v.x != 0 || quat.v.y != 0 || quat.v.z != 0 || quat.w != 0)
 	    // ...
-	- Genjix fixed bug in walktest where it doesn't look where the camera is
-	  when you move left and right at start!
+	- Genjix fixed bug in walktest where it doesn't look where the camera
+	  is when you move left and right at start!
 	- Vincent applied res' fix for configure which detected lib3ds-1.3.0
 	  when lib3ds-1.2.0 was installed.
 18-Sep-2007
@@ -87,7 +88,7 @@ chronological order.
 	- res made lighter2 write out per-mesh "tex lightmap" SVs.
 	- res fixed lighter2 ignoring the material from the mesh object if it
 	  doesn't have submeshes.
-        - res deprecated the remaining csObject-related macros. Also deprecated
+	- res deprecated the remaining csObject-related macros. Also deprecated
 	  an unlogic usage of iObject::GetChild ().
 17-Sep-2007
 	- res added a driver DB tweak to disable EXT_framebuffer_object for
@@ -236,7 +237,7 @@ chronological order.
 	  between snippets to reuse program inputs, were also, incorrectly,
 	  used when resolving candidates for inputs.
 30-Aug-2007
-	- Genjix added api documentation about iSkeleton::SetTransformMode (...)
+	- Genjix added api documentation about iSkeleton::SetTransformMode(...)
 	- Genjix added joystick define to initapp.h (CS_REQUEST_JOYSTICK)
 	- Genjix hid public data member and added an accessor instead.
 	- Genjix removed useless line of code from csSkeleton.

@@ -345,7 +345,7 @@
       <conditions fulfill="all">
 	<regexp string="platform" pattern="Unix" />
 	<regexp string="renderer" pattern="^GeForce 6600" />
-	<comparever string="glvendor" pattern="eq NVIDIA 97.55" />
+	<comparever version="glvendor" relation="eq NVIDIA 97.55" />
       </conditions>
       <applicable>
         <usecfg>novbo</usecfg>
