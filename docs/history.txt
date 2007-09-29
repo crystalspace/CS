@@ -11,6 +11,7 @@ chronological order.
 	  create a material if the texture isn't found. This fixes a material
 	  duplication bug in FindNamedMaterial().
 	- Vincent fixed a <comparever> entry in gldriver.xml.
+        - Mike Gist fixed a crash in csMeshFactoryList::Remove().
 28-Sep-2007
 	- Vincent added static variants in lighter2, cslight, basemapgen and
 	  docconv Jamfiles.
