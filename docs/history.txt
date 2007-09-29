@@ -7,10 +7,11 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 29-Sep-2007
-        - Mike Gist changed the call to LoadTexture() in FindTexture() to not
-          create a material if the texture isn't found. This fixes a material
-          duplication bug in FindNamedMaterial().
-        - Vincent fixed a <comparever> entry in gldriver.xml.
+	- Mike Gist changed the call to LoadTexture() in FindTexture() to not
+	  create a material if the texture isn't found. This fixes a material
+	  duplication bug in FindNamedMaterial().
+	- Vincent fixed a <comparever> entry in gldriver.xml.
+        - Mike Gist fixed a crash in csMeshFactoryList::Remove().
 25-Sep-2007
 	- res fixed lighter2 to conserve used "single color" lightmaps when 
 	  cleaning "old" lightmaps.

@@ -286,8 +286,8 @@ bool csMeshFactoryList::Remove (iMeshFactoryWrapper *obj)
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
     factories_hash.Delete (name, obj);
-  list.Delete (obj);
   obj->QueryObject ()->RemoveNameChangeListener (listener);
+  list.Delete (obj);
   return true;
 }
 
@@ -311,7 +311,7 @@ void csMeshFactoryList::RemoveAll ()
 int csMeshFactoryList::Find (iMeshFactoryWrapper *obj) const
 {
   return (int)list.Find (obj);
-}
+}s
 
 iMeshFactoryWrapper *csMeshFactoryList::FindByName (
   const char *Name) const
