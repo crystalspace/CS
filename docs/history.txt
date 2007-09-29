@@ -7,10 +7,10 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 29-Sep-2007
-	- Mike Gist changed the call to LoadTexture() in FindTexture() to not
-	  create a material if the texture isn't found. This fixes a material
-	  duplication bug in FindNamedMaterial().
-	- Vincent fixed a <comparever> entry in gldriver.xml.
+        - Mike Gist changed the call to LoadTexture() in FindTexture() to not
+          create a material if the texture isn't found. This fixes a material
+          duplication bug in FindNamedMaterial().
+        - Vincent fixed a <comparever> entry in gldriver.xml.
 25-Sep-2007
 	- res fixed lighter2 to conserve used "single color" lightmaps when 
 	  cleaning "old" lightmaps.
@@ -27,12 +27,6 @@ chronological order.
 	  to ATI cards on Linux making "walktest terrainf" no longer exhibit
 	  garbled text and CS logo.
 20-Sep-2007
-	- caedes, Genjix and iceeey removed some stupid code :D
-	  csQuaternion quat;
-	  if (quat.v.x != 0 || quat.v.y != 0 || quat.v.z != 0 || quat.w != 0)
-	    // ...
-	- Genjix fixed bug in walktest where it doesn't look where the camera
-	  is when you move left and right at start!
 	- Vincent applied res' fix for configure which detected lib3ds-1.3.0
 	  when lib3ds-1.2.0 was installed.
 18-Sep-2007
@@ -43,17 +37,6 @@ chronological order.
 	  can't be loaded - it merely displays an error message now.
 	- res changed lighter2 to only propagate lights once through any 
 	  portal. This works around apparently occuring infinite recursions.
-	- res made lighter2 also always write out a log file "lighter2.log"
-	  with all reporter messages.
-	- res added some initial "external factory respect" support to lighter2
-	  (means factories outside the level directory won't be altered).
-	- res fixed the "split prevention" logic in the lighter2 lightmap
-	  layouter to not botch splittable meshes.
-	- res made lighter2 write out per-mesh "tex lightmap" SVs.
-	- res fixed lighter2 ignoring the material from the mesh object if it
-	  doesn't have submeshes.
-	- res deprecated the remaining csObject-related macros. Also deprecated
-	  an unlogic usage of iObject::GetChild ().
 17-Sep-2007
 	- res added a driver DB tweak to disable EXT_framebuffer_object for
 	  (now rather old) ATI drivers (see trac #261).
@@ -79,80 +62,6 @@ chronological order.
 6-Sep-2007
 	- Mike Gist fixed bug #351 (wxgl compilation problem).
 	- res fixed a null pointer access in null3d when null2d is not present.
-	- res changed glshader_cg to always use TinyXML to load the "coercion
-	  library" and creating the default coercions - needed since the 
-	  document structure is augmented after loading (resp. created from
-	  scratch).
-	- Jorrit fixed a bug in terrainf caused by genmeshify. Apparently
-	  genmeshify tried to put specific material overrides in the
-	  mesh object.
-3-Sep-2007
-	- res partially reverted r27524 and r27534: some methods that have not
-	  been fully deprecated have been removed by these changesets. Notably,
-	  a commented out CS_DEPRECATED_METHOD does not count as a deprecation
-	  as the user obviously can't get a deprecation warning for a method
-	  because the marker for it is commented out!
-	- res fixed a deallocation mismatch in VFS.
-	- res fixed some Cg errors and warnings in some weaver snippets 
-	  due the recent weaver changes.
-2-Sep-2007
-	- res added a hash computer and comparator for csMD5::Digest.
-	- res fixed the same node collapsing in the shader weaver to add 
-	  proper connections when collapsing two nodes.
-	- res fixed coerce chain creation in the Cg weaver combiner: chains
-	  could get complicated (e.g. A->B->A->C where A->C would suffice)
-	  and were incorrectly returned (the 1st and 2nd step were the same).
-	- res changed csStrNew()/new char[] to CS::StrDup()/cs_malloc() in a
-	  few places.
-	- res added an optimization to shader weaver: if the same snippet is
-	  used multiple times with the same input all copies are collapsed
-	  into one.
-	- Marten did a few more changes to the border handling in lighter2.
-	- Marten did a few cleanups.
-1-Sep-2007
-	- Jorrit removed more deprecated stuff.
-31-Aug-2007
-	- res made the Cg plugin emit warnings from the Cg compiler in verbose
-	  mode (previously it only reported issues from the compiler when an
-	  error occured).
-	- res made the Cg weaver combiner use unique identifier for 
-	  vertex-to-fragment data to avoid clashes.
-	- res fixed some snippets for that.
-	- Genjix bumped interface minor version.
-	- Genjix added animation blending to genmeshanim2. Now the there is
-	  Execute("animname", blend_factor). By default this is 0, and if all
-	  running animations for a bone are 0 then it blends equally between
-	  them all, otherwise it computes ratios based on the blend_factor and
-	  the total blend factor of all animations affecting the bone.
-	- Jorrit started removing lots of deprecated stuff in CS.
-	- Jorrit fixed an infinite loop in sprcal3d GetObjectBoundingBox()
-	  for factories.
-	- Jorrit did more deprecation removals (including legacy submesh
-	  support in genmesh).
-	- Jorrit did more deprecation removals (including SCF_QUERY_INTERFACE,
-	  CS_QUERY_REGISTRY and related).
-	- Jorrit did more deprecation removals (including CS_LOAD_PLUGIN
-	  and related).
-	- Jorrit did more deprecation removals.
-	- Jorrit fixed several parts in CS for the recent deprecation removals.
-	- Jorrit fixed a few warnings.
-	- res augmented the Cg weaver combiner to contain a number of simple,
-	  "templated" coercions (for trivial stuff such as normalization).
-	- res added "annotations" to the shader weaver: when enabled comments
-	  are added to the generated shader code that make it easier to follow
-	  it.
-	- res made the weaver-generated shader code slightly more readable by
-	  removing some indirections.
-	- res fixed an issue in shader weaver where dependencies, inserted
-	  between snippets to reuse program inputs, were also, incorrectly,
-	  used when resolving candidates for inputs.
-30-Aug-2007
-	- Genjix added api documentation about iSkeleton::SetTransformMode(...)
-	- Genjix added joystick define to initapp.h (CS_REQUEST_JOYSTICK)
-	- Genjix hid public data member and added an accessor instead.
-	- Genjix removed useless line of code from csSkeleton.
-	- Genjix replaced type integer with an easier to understand
-	  enum value.
 29-Aug-2007
         - Piotr changed remaining Win32 call to *A version.
 	- res reverted r27508, but also made sure all Win32 calls are
