@@ -6,6 +6,32 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Sep-2007
+	- Mike Gist changed the call to LoadTexture() in FindTexture() to not
+	  create a material if the texture isn't found. This fixes a material
+	  duplication bug in FindNamedMaterial().
+	- Vincent fixed a <comparever> entry in gldriver.xml.
+28-Sep-2007
+	- Vincent added static variants in lighter2, cslight, basemapgen and
+	  docconv Jamfiles.
+26-Sep-2007
+	- Darek made some fixes in translator and added manual fallback 
+	  list (e.g. Translator.Fallback.eu = es it en).
+25-Sep-2007
+	- res made relaytool work better with shared libs: no link time 
+	  warnings on x86 resp. link errors on amd64.
+	- res fixed lighter2 to conserve used "single color" lightmaps when 
+	  cleaning "old" lightmaps.
+	- res made lighter2 generate different lightmap texture names for
+	  different levels.
+	- res fixed lighter2's "MaterialImage<>" class so not crash when
+	  negative coords are requested for wrapped sampling.
+	- Marten added back PD-light support in lighter2.
+	- res made lighter2 generate level-specific lightmap texture names 
+	  also for PD light maps and solid color lightmaps (the latter is done
+	  to avoid undesired cleanups).
+	- res fixed lighter2's "MaterialImage<>" interpolation to correctly
+	  sample negative coordinates.
 21-Sep-2007
 	- Genjix added support for 3 character long locale codes at the behest
 	  or res2k (thanks!).
@@ -31,8 +57,8 @@ chronological order.
 	  csQuaternion quat;
 	  if (quat.v.x != 0 || quat.v.y != 0 || quat.v.z != 0 || quat.w != 0)
 	    // ...
-	- Genjix fixed bug in walktest where it doesn't look where the camera is
-	  when you move left and right at start!
+	- Genjix fixed bug in walktest where it doesn't look where the camera
+	  is when you move left and right at start!
 	- Vincent applied res' fix for configure which detected lib3ds-1.3.0
 	  when lib3ds-1.2.0 was installed.
 18-Sep-2007
@@ -62,7 +88,7 @@ chronological order.
 	- res made lighter2 write out per-mesh "tex lightmap" SVs.
 	- res fixed lighter2 ignoring the material from the mesh object if it
 	  doesn't have submeshes.
-        - res deprecated the remaining csObject-related macros. Also deprecated
+	- res deprecated the remaining csObject-related macros. Also deprecated
 	  an unlogic usage of iObject::GetChild ().
 17-Sep-2007
 	- res added a driver DB tweak to disable EXT_framebuffer_object for
@@ -215,7 +241,7 @@ chronological order.
 	  between snippets to reuse program inputs, were also, incorrectly,
 	  used when resolving candidates for inputs.
 30-Aug-2007
-	- Genjix added api documentation about iSkeleton::SetTransformMode (...)
+	- Genjix added api documentation about iSkeleton::SetTransformMode(...)
 	- Genjix added joystick define to initapp.h (CS_REQUEST_JOYSTICK)
 	- Genjix hid public data member and added an accessor instead.
 	- Genjix removed useless line of code from csSkeleton.

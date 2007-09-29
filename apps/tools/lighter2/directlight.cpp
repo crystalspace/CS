@@ -156,6 +156,11 @@ namespace lighter
       csVector2( 0.25f,  0.25f)
     };
 
+    if (element.primitive.GetElementType (element.element) == Primitive::ELEMENT_BORDER)
+    {
+      element.primitive.RecomputeQuadrantOffset (element.element, ElementQuadrantConstants);      
+    }
+
     for (size_t qi = 0; qi < 4; ++qi)
     {
       float rndValues[3];
@@ -197,6 +202,11 @@ namespace lighter
       csVector2( 0.25f, -0.25f),
       csVector2( 0.25f,  0.25f)
     };
+
+    if (element.primitive.GetElementType (element.element) == Primitive::ELEMENT_BORDER)
+    {
+      element.primitive.RecomputeQuadrantOffset (element.element, ElementQuadrantConstants);      
+    }
 
     // Add handling of "half" elements
     for (size_t qi = 0; qi < 4; ++qi)
@@ -406,14 +416,7 @@ namespace lighter
           // Shade non-PD lights
           csColor c;        
           c = lmElementShader (sector, ep, masterSampler);
-          /*if (elemType == Primitive::ELEMENT_BORDER)
-          {
-            c.Set (1,0,0);
-          }
-          else
-          {
-            c.Set (0,0,1);
-          }*/
+          
 
           normalLM->SetAddPixel (u, v, c * pixelAreaPart);
 
@@ -423,6 +426,9 @@ namespace lighter
             csColor c;
     
             Lightmap* lm = pdLightLMs[pdli];
+            Light* pdl = PDLights[pdli];
+
+            c = UniformShadeOneLight (sector, ep, pdl, masterSampler);
 
             lm->SetAddPixel (u, v, c * pixelAreaPart);
           }

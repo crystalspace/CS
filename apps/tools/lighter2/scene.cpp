@@ -153,6 +153,39 @@ namespace lighter
         return globalLighter->Report ("Document system error: %s!", error);
       }
 
+      // Try to extract the "level name" from the given path
+      const size_t maxPartLen = sceneFiles[i].directory.Length();
+      CS_ALLOC_STACK_ARRAY(char, pathDir, maxPartLen);
+      CS_ALLOC_STACK_ARRAY(char, pathFile, maxPartLen);
+      csSplitPath (sceneFiles[i].directory, pathDir, maxPartLen,
+        pathFile, maxPartLen);
+      if ((strlen (pathFile) == 0) || (strcmp (pathFile, "world") == 0))
+      {
+        // Impractical name, try again one level higher
+        csString tmp (pathDir);
+        csSplitPath (tmp, pathDir, maxPartLen, pathFile, maxPartLen);
+      }
+      if (strlen (pathFile) == 0)
+      {
+        // No name, use some random number
+        union
+        {
+          uint16 ui16[sizeof(uint)/sizeof(uint16)];
+          uint ui;
+        } tag;
+        csRandomGen rng;
+        for (size_t j = 0; j < sizeof(uint)/sizeof(uint16); j++)
+        {
+          tag.ui16[j] = rng.Get ((uint16)~0);
+        }
+        sceneFiles[i].levelName.Format ("%x", tag.ui);
+      }
+      else
+      {
+        // Use found file name as level name
+        sceneFiles[i].levelName = pathFile;
+      }
+
       sceneFiles[i].document = doc;
       sceneFiles[i].rootNode = doc->GetRoot ();
       // ChDirAuto() may have created an automount, use that...
@@ -954,14 +987,14 @@ namespace lighter
     }
   }
 
-  void Scene::BuildLightmapTextureList (csStringArray& texturesToSave)
+  void Scene::BuildLightmapTextureList (LoadedFile* fileInfo,
+                                        csStringArray& texturesToSave)
   {
     for (size_t i = 0; i < lightmaps.GetSize (); i++)
     {
       csString textureFilename;
-      textureFilename = "lightmaps/";
-      textureFilename += (uint)i;
-      textureFilename += ".png";
+      textureFilename.Format ("lightmaps/%s_%u.png",
+        fileInfo->levelName.GetData(), i);
       lightmaps[i]->SetFilename (textureFilename);
 
       texturesToSave.Push (lightmaps[i]->GetTextureName());
@@ -1036,7 +1069,7 @@ namespace lighter
     bool hasLightmapsLibrary = false;
     csStringArray texturesToSave;
     
-    BuildLightmapTextureList (texturesToSave);
+    BuildLightmapTextureList (fileInfo, texturesToSave);
 
     csRef <iDocumentNode> worldRoot = r->GetNode ("world");
 
@@ -1332,13 +1365,15 @@ namespace lighter
     }
   }
 
-  const char* Scene::GetSolidColorFile (const csColor& col)
+  const char* Scene::GetSolidColorFile (LoadedFile* fileInfo, 
+					  const csColor& col)
   {
     int r = int (col.red * 255.99f);
     int g = int (col.green * 255.99f);
     int b = int (col.blue * 255.99f);
     csString colorStr;
-    colorStr.Format ("lightmaps/%02x%02x%02x.png", r, g, b);
+    colorStr.Format ("lightmaps/%s_%02x%02x%02x.png", 
+      fileInfo->levelName.GetData(), r, g, b);
     if (!solidColorFiles.Contains (colorStr))
     {
       csRef<iImage> img;
@@ -1351,6 +1386,7 @@ namespace lighter
         file->Write (imgData->GetData (), imgData->GetSize ());
       }
     }
+    fileInfo->texFileNamesToDelete.Delete (colorStr);
     return solidColorFiles.Register (colorStr);
   }
 
@@ -1420,11 +1456,9 @@ namespace lighter
           globalConfig.GetLMProperties().grayPDMaps)) continue;
 
         csString lmID (key->GetLightID ().HexString());
-        csString textureFilename = "lightmaps/";
-        textureFilename += i;
-        textureFilename += "_";
-        textureFilename += pdlightNums.Request (lmID);
-        textureFilename += ".png";
+        csString textureFilename;
+        textureFilename.Format ("lightmaps/%s_%u_%zu.png", 
+          fileInfo->levelName.GetData(), i, pdlightNums.Request (lmID));
 
         {
           // Texture file name is relative to world file
@@ -1507,7 +1541,7 @@ namespace lighter
       {
         if (textureToSave.pdLightmapFiles.GetSize() == 0)
         {
-          filename = GetSolidColorFile (textureToSave.solidColor);
+          filename = GetSolidColorFile (fileInfo, textureToSave.solidColor);
         }
         else
         {
