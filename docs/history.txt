@@ -13,6 +13,8 @@ chronological order.
 	    buffer and writing out everything at once, a smaller buffer is
 	    used and the data is written out incrementally.
 	  - Scraped a few bytes off the Tiny node's memory footprint.
+	- res changed csRegExpMatcher to not allocate the 'regex_t' structure
+	  from the heap but have it inline in the class.
 29-Sep-2007
 	- Mike Gist changed the call to LoadTexture() in FindTexture() to not
 	  create a material if the texture isn't found. This fixes a material
