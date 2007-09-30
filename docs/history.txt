@@ -21,6 +21,8 @@ chronological order.
 	  - Added GetOrCreate(), which returns an element for a key if one 
 	    already exists, or adds and returns a default one if not.
 	  - Marked csHashCompute as a "pure" method.
+	- res augmented iPluginManager->LoadPlugin() to optionally be silent
+	  about plugin loading failures.
 29-Sep-2007
 	- Mike Gist changed the call to LoadTexture() in FindTexture() to not
 	  create a material if the texture isn't found. This fixes a material
