@@ -8,6 +8,11 @@ chronological order.
 
 30-Sep-2007
 	- res made some VC warning fixes.
+	- res made the following changes to TinyXML:
+	  - When writing to an iFile, instead of storing the XML to a string
+	    buffer and writing out everything at once, a smaller buffer is
+	    used and the data is written out incrementally.
+	  - Scraped a few bytes off the Tiny node's memory footprint.
 29-Sep-2007
 	- Mike Gist changed the call to LoadTexture() in FindTexture() to not
 	  create a material if the texture isn't found. This fixes a material

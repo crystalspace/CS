@@ -166,6 +166,10 @@ csTinyXmlNode::csTinyXmlNode (csTinyXmlDocument* doc)
 
 csTinyXmlNode::~csTinyXmlNode ()
 {
+  if (node->Type () == TiDocumentNode::ELEMENT)
+  {
+    static_cast<TiXmlElement*> ((TiDocumentNode*)node)->ShrinkAttributes ();
+  }
 }
 
 csRef<iDocumentNode> csTinyXmlNode::GetParent ()
@@ -604,29 +608,21 @@ const char* csTinyXmlDocument::Parse (const char* buf, bool collapse)
 
 const char* csTinyXmlDocument::Write (iFile* file)
 {
-  scfString str;
-  const char* error = Write (&str);
-  if (error) return error;
-  if (!file->Write (str.GetData (), str.Length ()))
-    return "Error writing file!";
-  return 0;
+  return root->Print (file);
 }
 
 const char* csTinyXmlDocument::Write (iString* str)
 {
   str->SetGrowsBy (0);
-  root->Print (str, 0);
-  return 0;
+  return root->Print (str);
 }
 
 const char* csTinyXmlDocument::Write (iVFS* vfs, const char* filename)
 {
-  scfString str;
-  const char* error = Write (&str);
-  if (error) return error;
-  if (!vfs->WriteFile (filename, str.GetData (), str.Length ()))
-    return "Error writing file!";
-  return 0;
+  csRef<iFile> file = vfs->Open (filename, VFS_FILE_WRITE);
+  if (!file.IsValid ())
+    return "Error opening file";
+  return root->Print (file);
 }
 
 int csTinyXmlDocument::Changeable ()
