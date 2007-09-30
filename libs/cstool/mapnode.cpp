@@ -101,8 +101,8 @@ void csNodeIterator::SkipWrongClassname ()
   if (Classname)
     while (Iterator->HasNext ())
     {
-      csRef<iKeyValuePair> KeyVal (CS_GET_NAMED_CHILD_OBJECT
-        (CurrentNode->QueryObject (), iKeyValuePair, "classname"));
+      csRef<iKeyValuePair> KeyVal (CS::GetNamedChildObject<iKeyValuePair> (
+        CurrentNode->QueryObject (), "classname"));
       if (KeyVal)
       {
         bool done = !strcmp (KeyVal->GetValue (), Classname);
