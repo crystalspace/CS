@@ -411,7 +411,7 @@ namespace lighter
     return true;
   }
 
-  void Object_Genmesh::SaveMesh (Sector* sector, iDocumentNode *node)
+  void Object_Genmesh::SaveMesh (iDocumentNode *node)
   {
     csRef<iGeneralMeshState> genMesh = 
       scfQueryInterface<iGeneralMeshState> (
@@ -474,7 +474,7 @@ namespace lighter
       }
     }
 
-    Object::SaveMesh (sector, node);
+    Object::SaveMesh (node);
 
     if (lightPerVertex)
     {

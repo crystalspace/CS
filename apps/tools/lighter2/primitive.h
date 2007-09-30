@@ -191,7 +191,8 @@ namespace lighter
     void ComputeUVTransform ();
 
     /// Update quadrant offsets
-    bool RecomputeQuadrantOffset (size_t element, csVector2 offsets[4]) const;
+    uint RecomputeQuadrantOffset (size_t element, 
+      const csVector2 inOffsets[4], csVector2 outOffsets[4]) const;
 
     /// Compute if point is inside primitive or not
     bool PointInside (const csVector3& pt) const;

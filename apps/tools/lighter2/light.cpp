@@ -65,7 +65,10 @@ namespace lighter
 
 
   //--
-  VisibilityTester::VisibilityTester ()
+  size_t VisibilityTester::rayID;
+
+  VisibilityTester::VisibilityTester (Light* light, Object* obj) : 
+    light (light), obj (obj)
   {
   }
 
@@ -87,6 +90,7 @@ namespace lighter
     s.ray.minLength = FLT_EPSILON*10.0f;
     s.ray.maxLength = maxL - FLT_EPSILON*10.0f;
     s.ray.ignoreFlags = KDPRIM_FLAG_NOSHADOW; // Ignore primitives that don't cast shadows
+    s.ray.rayID = ++rayID; // Give unique IDs to rays; needed for the ray debugger.
     s.tree = tree;
 
     allSegments.Push (s);
@@ -95,7 +99,8 @@ namespace lighter
   VisibilityTester::OcclusionState VisibilityTester::Occlusion (
     const Primitive* ignorePrim)
   {
-    HitCallback hitcb (transparentHits);
+    HitCallback hitcb (*this);
+    size_t lastHitCount = transparentHits.GetSize();
     for (size_t i = 0; i < allSegments.GetSize (); ++i)
     {
       Segment& s = allSegments[i];
@@ -105,6 +110,10 @@ namespace lighter
       {
         if (transparentHits.GetSize() == 0) return occlOccluded;
       }
+
+      if (transparentHits.GetSize() == lastHitCount)
+        globalLighter->rayDebug.RegisterUnhit (light, obj, s.ray);
+      lastHitCount = transparentHits.GetSize();
     }
 
     return (transparentHits.GetSize() != 0) ? occlPartial : occlUnoccluded;
@@ -113,7 +122,8 @@ namespace lighter
   VisibilityTester::OcclusionState VisibilityTester::Occlusion (
     HitIgnoreCallback* ignoreCB)
   {
-    HitCallback hitcb (transparentHits);
+    HitCallback hitcb (*this);
+    size_t lastHitCount = transparentHits.GetSize();
     for (size_t i = 0; i < allSegments.GetSize (); ++i)
     {
       Segment& s = allSegments[i];
@@ -122,6 +132,10 @@ namespace lighter
       {
         if (transparentHits.GetSize() == 0) return occlOccluded;
       }
+
+      if (transparentHits.GetSize() == lastHitCount)
+        globalLighter->rayDebug.RegisterUnhit (light, obj, s.ray);
+      lastHitCount = transparentHits.GetSize();
     }
 
     return (transparentHits.GetSize() != 0) ? occlPartial : occlUnoccluded;

@@ -23,6 +23,10 @@ chronological order.
 	  - Marked csHashCompute as a "pure" method.
 	- res augmented iPluginManager->LoadPlugin() to optionally be silent
 	  about plugin loading failures.
+	- res made the following changes to lighter:
+	  - Added creation of meshes visualizing traced rays and what they hit
+	    (for debugging purposes).
+	  - Made some small tweaks to improve border element behaviour.
 29-Sep-2007
 	- Mike Gist changed the call to LoadTexture() in FindTexture() to not
 	  create a material if the texture isn't found. This fixes a material

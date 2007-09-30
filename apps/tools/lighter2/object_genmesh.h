@@ -42,7 +42,7 @@ namespace lighter
 
     virtual bool Initialize (Sector* sector);
     
-    virtual void SaveMesh (Sector* sector, iDocumentNode *node);
+    virtual void SaveMesh (iDocumentNode *node);
 
     virtual void FreeNotNeededForLighting ();
 

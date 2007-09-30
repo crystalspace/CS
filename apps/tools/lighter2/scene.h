@@ -64,7 +64,7 @@ namespace lighter
 
     // Build kd tree for Sector
     void BuildKDTree (Statistics::Progress& progress);
-    
+
     // All objects in sector
     ObjectHash allObjects;
 
@@ -112,6 +112,8 @@ namespace lighter
     bool SaveLightmaps (Statistics::Progress& progress);
     // Save any mesh data that can only be saved after lighting.
     bool SaveMeshesPostLighting (Statistics::Progress& progress);
+    // Clean up all data not needed after lighting.
+    void CleanLightingData ();
 
     // Data access
     inline ObjectFactoryHash& GetFactories () 
@@ -224,17 +226,26 @@ namespace lighter
     void HandleLibraryNode (csSet<csString>& savedFactories, 
                             iDocumentNode* node, LoadedFile* fileInfo,
                             Statistics::Progress& progress, bool noModify);
-    void SaveMeshFactoryToDom (csSet<csString>& savedObjects, 
+
+    enum SaveResult
+    {
+      svFailure, svSuccess, svRemoveItem
+    };
+    SaveResult SaveMeshFactoryToDom (csSet<csString>& savedObjects, 
                                iDocumentNode* factNode, LoadedFile* fileInfo);
     void SaveSectorToDom (iDocumentNode* sectorNode, LoadedFile* fileInfo,
                           Statistics::Progress& progress);
-    void SaveMeshObjectToDom (csSet<csString>& savedObjects, iDocumentNode *objNode, 
-                              Sector* sect, LoadedFile* fileInfo);
+    SaveResult SaveMeshObjectToDom (csSet<csString>& savedObjects, 
+                                    iDocumentNode *objNode, 
+                                    Sector* sect, LoadedFile* fileInfo);
 
     csStringHash solidColorFiles;
     const char* GetSolidColorFile (LoadedFile* fileInfo, const csColor& col);
     void SaveLightmapsToDom (iDocumentNode* root, LoadedFile* fileInfo,
                              Statistics::Progress& progress);
+
+    csPtr<iDataBuffer> SaveDebugData (LoadedFile& fileInfo, 
+      iDataBuffer* sourceData, Statistics::Progress& progress);
     
     // Load functions
     bool ParseEngine (LoadedFile* fileInfo, Statistics::Progress& progress);
@@ -243,7 +254,7 @@ namespace lighter
     void ParsePortals (iSector *srcSect, Sector* sector);
     enum MeshParseResult
     {
-      Failure, Success, NotAGenMesh
+      mpFailure, mpSuccess, mpNotAGenMesh
     };
     MeshParseResult ParseMesh (LoadedFile* fileInfo, Sector *sector,  
       iMeshWrapper *mesh, csRef<Object>& obj);

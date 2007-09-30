@@ -31,7 +31,7 @@ namespace lighter
     class GlobalProgress;
 
     /// Progress for a single task.
-    class Progress
+    class Progress : public CS::Memory::CustomAllocated
     {
     protected:
       friend class GlobalProgress;

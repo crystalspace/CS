@@ -225,8 +225,7 @@ namespace lighter
     ObjectVertexData& vdata = GetVertexData();
 
     // Min xyz
-    csVector2 d = minUV -
-      (vdata.lightmapUVs[triangle.a] + csVector2(0.5f,0.5f));
+    csVector2 d = minUV - (vdata.lightmapUVs[triangle.a]);
     
     minCoord = vdata.positions[triangle.a]
       + uFormVector * d.x + vFormVector * d.y;
@@ -661,11 +660,14 @@ namespace lighter
     }
   }
 
-  bool Primitive::RecomputeQuadrantOffset (size_t element, csVector2 offsets[4]) const
+  uint Primitive::RecomputeQuadrantOffset (size_t element, 
+    const csVector2 inOffsets[4], csVector2 offsets[4]) const
   {
+    memcpy (offsets, inOffsets, sizeof (csVector2) * 4);
+
     const ObjectVertexData& vdata = GetVertexData ();
 
-    bool anyClip = false;
+    uint clipMask = 0;
 
     size_t u, v;
     GetElementUV(element, u, v);
@@ -674,7 +676,7 @@ namespace lighter
     float uvArea = csMath2::Area2 (vdata.lightmapUVs[triangle.a],
       vdata.lightmapUVs[triangle.b], vdata.lightmapUVs[triangle.c]);
 
-    csVector2 elementCenter = minUV + csVector2(u+0.5f,v+0.5f);
+    csVector2 elementCenter = minUV + csVector2(u+0.5f, v+0.5f);
     
     // Traverse the triangle edges, clip the offsets to the edge
     for (size_t e1 = 0; e1 < 3; ++e1)
@@ -699,17 +701,17 @@ namespace lighter
 
         if (dist*uvArea > 0)
         {
-          anyClip = true;
+          clipMask |= (1 << i);
           float denom = edgeN * edgeN;
           
-          csVector2 lineOffset = edgeN * (dist / denom)*0.99f;
+          csVector2 lineOffset = edgeN * (dist / denom)*(1.0f + EPSILON);
 
           offsets[i] -= lineOffset;
         }
       }
     }
 
-    return anyClip;
+    return clipMask;
   }
 
   float Primitive::ComputeElementFraction (size_t index) const
