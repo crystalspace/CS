@@ -8221,7 +8221,6 @@ iPluginManager_swigregister = _cspace.iPluginManager_swigregister
 iPluginManager_swigregister(iPluginManager)
 iPluginManager_scfGetVersion = _cspace.iPluginManager_scfGetVersion
 
-csLoadPluginAlways = _cspace.csLoadPluginAlways
 csComposeNoChar = _cspace.csComposeNoChar
 csComposeNormalChar = _cspace.csComposeNormalChar
 csComposeComposedChar = _cspace.csComposeComposedChar
@@ -8241,6 +8240,7 @@ class iKeyComposer(iBase):
     __del__ = lambda self : None;
 iKeyComposer_swigregister = _cspace.iKeyComposer_swigregister
 iKeyComposer_swigregister(iKeyComposer)
+csLoadPluginAlways = _cspace.csLoadPluginAlways
 
 class iKeyboardDriver(iBase):
     __swig_setmethods__ = {}
