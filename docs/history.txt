@@ -10,7 +10,9 @@ chronological order.
         - Mike Gist reversed the loops in csSector::UnlinkObjects() to avoid
           meshes being skipped if sl->Remove() removes a mesh object from the
           sector's mesh list.
-	- Marten fixed regex compilation on MSVC.
+	- res reverted r27755 and r27756 and fixed MSVC regex.c compilation
+	  without the need for regex_wrapper.h: just use 
+	  csutil/generic/regex.h.
 30-Sep-2007
 	- res made some VC warning fixes.
 	- res made the following changes to TinyXML:
