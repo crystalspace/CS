@@ -531,7 +531,7 @@ public:
    * Get the first element matching the given key, or, if there is 
    * none, insert \a default and return a reference to the new entry.
    */
-  T& GetOrCreate (const K& key, const T& default = T())
+  T& GetOrCreate (const K& key, const T& defaultValue = T())
   {
     if (Elements.GetSize() != 0)
     {
@@ -546,7 +546,7 @@ public:
       }
     }
     
-    return Put (key, default);
+    return Put (key, defaultValue);
   }
 
   /// Delete all the elements.
