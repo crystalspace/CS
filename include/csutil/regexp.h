@@ -25,22 +25,7 @@
 
 #include "csextern.h"
 #include "csutil/array.h"
-
-// Include system's (if available) ...
-#ifdef CS_HAVE_REGEX
-  #include <regex.h>
-#else
-// ... resp. the one included with CS.
-  #if (defined(CS_COMPILER_MSVC) || defined(CS_COMPILER_BCC)) && \
-      !defined(__STDC__)
-    #define __STDC__  1
-    #define __STDC__DEFINED
-  #endif
-  #include "generic/regex.h"
-  #ifdef __STDC__DEFINED
-    #undef __STDC__
-  #endif
-#endif
+#include "csutil/regex_wrapper.h"
 
 /**
  * Possible errors that can occur during matching.
