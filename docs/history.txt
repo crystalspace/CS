@@ -16,6 +16,11 @@ chronological order.
 	  csutil/generic/regex.h.
 	- Marten fixed compilation on gcc4.2. Don't use reserved keyword for
 	  variable names.
+	- res fixed a flaw in LocalBufferAllocate in single allocation mode:
+	  Free() was always checking whether the local buffer did not consist
+	  of the "free pattern"; however, this should not be done when the
+	  excess allocator was used, since in that case the local buffer is
+	  not touched.
 30-Sep-2007
 	- res made some VC warning fixes.
 	- res made the following changes to TinyXML:

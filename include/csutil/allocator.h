@@ -241,24 +241,28 @@ namespace CS
       {
         if (SingleAllocation)
         {
+          if (mem != (T*)localBuf)
+	    ExcessAllocator::Free (mem);
+	  else
+	  {
       #ifdef CS_DEBUG
-          /* Verify that the local buffer consists entirely of the "local
-             buffer unallocated" pattern. (Not 100% safe since a valid 
-             allocated buffer may be coincidentally filled with just that
-             pattern, but let's just assume that it's unlikely.) */
-          bool validPattern = true;
-          for (size_t n = 0; n < localSize; n++)
-          {
-            if (localBuf[n] != freePattern)
-            {
-              validPattern = false;
-              break;
-            }
-          }
-          CS_ASSERT_MSG("Free() without prior allocation", !validPattern);
-          memset (localBuf, freePattern, localSize);
+	    /* Verify that the local buffer does entirely consist of the "local
+	       buffer unallocated" pattern. (Not 100% safe since a valid 
+	       allocated buffer may be coincidentally filled with just that
+	       pattern, but let's just assume that it's unlikely.) */
+	    bool validPattern = true;
+	    for (size_t n = 0; n < localSize; n++)
+	    {
+	      if (localBuf[n] != freePattern)
+	      {
+		validPattern = false;
+		break;
+	      }
+	    }
+	    CS_ASSERT_MSG("Free() without prior allocation", !validPattern);
+	    memset (localBuf, freePattern, localSize);
       #endif
-          if (mem != (T*)localBuf) ExcessAllocator::Free (mem);
+	  }
         }
         else
         {
