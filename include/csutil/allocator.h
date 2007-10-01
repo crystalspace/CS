@@ -260,9 +260,11 @@ namespace CS
 	      }
 	    }
 	    CS_ASSERT_MSG("Free() without prior allocation", !validPattern);
-	    memset (localBuf, freePattern, localSize);
       #endif
 	  }
+      #ifdef CS_DEBUG
+	  memset (localBuf, freePattern, localSize);
+      #endif
         }
         else
         {
