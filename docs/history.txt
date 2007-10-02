@@ -18,6 +18,7 @@ chronological order.
 	  scripts/python/frozen/cspace to avoid pythonpath clash when running
 	  the tutorials.
 	- caedes merged the bindingsplit branch into trunk.
+	- caedes added new python related frozen swig files.
 01-Oct-2007
         - Mike Gist reversed the loops in csSector::UnlinkObjects() to avoid
           meshes being skipped if sl->Remove() removes a mesh object from the
