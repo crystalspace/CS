@@ -24,6 +24,11 @@ chronological order.
 	- res tweaked lighter2's border handling to ignore ray hits to 
 	  primitives neighbouring to the currently lit one in some cases. This
 	  seems to resolve some glitches.
+	- res made some tweaks to the binding-related MSVC projects:
+	  - The Python module projects now have a "py" prefix (in addition to
+	    the already existing "dll" prefix).
+	  - The Python modules are now filtered from the typical workspaces.
+	  - Added a workspace containing the Python-related projects as well.
 01-Oct-2007
         - Mike Gist reversed the loops in csSector::UnlinkObjects() to avoid
           meshes being skipped if sl->Remove() removes a mesh object from the

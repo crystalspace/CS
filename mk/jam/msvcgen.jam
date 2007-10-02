@@ -1115,7 +1115,7 @@ rule DLL
   RegisterWellKnownCompileGroup ;
   
   $(<)_TYPE = dll ;
-  MsvcProject $(<) : dll : $(<:S=$(4):E=.dll)) : $(>) ;
+  MsvcProject $(<) : dll : $(3:E=$(<:S=.dll)) : $(>) ;
   CompileGroups $(<) : all ;
 }
 
