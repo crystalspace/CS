@@ -28,7 +28,7 @@ if $(PYTHON.AVAILABLE) = "yes"
 	  [ ConcatDirs $(BUILDTOP) include ] :
 	  [ ConcatDirs $(TOP) include bindings ]
 	  [ ConcatDirs $(TOP) include bindings python ] :
-	  $(SEARCH_SOURCE) [ ConcatDirs $(TOP) scripts python cspace ] :
+	  $(SEARCH_SOURCE) [ ConcatDirs $(TOP) scripts python frozen cspace ] :
 	  $(module) :
 	  [ on $(modulepy) GetVar LOCATE ] ;
 	Depends $(module)clean : $(module)swigclean ;
@@ -37,7 +37,7 @@ if $(PYTHON.AVAILABLE) = "yes"
       {
 	SEARCH on $(common) = $(SEARCH_SOURCE) ;
 	local frozenpy = $(modulepy:G=frozenmodulepy) ;
-	SEARCH on $(frozenpy) = [ ConcatDirs $(TOP) scripts python cspace ] ;
+	SEARCH on $(frozenpy) = [ ConcatDirs $(TOP) scripts python frozen cspace ] ;
 	Copy $(modulepy) : $(frozenpy) ;
 	Depends $(modulepy) : $(frozenpy) ;
       }
@@ -96,7 +96,7 @@ Depends bindings : pythmod ;
 rule CopyCspaceInitPy
 {
   local init_py = __init__.py ;
-  local init_py_dir = [ ConcatDirs $(TOP) scripts python cspace ] ;
+  local init_py_dir = [ ConcatDirs $(TOP) scripts python frozen cspace ] ;
   SEARCH on $(init_py:G=src) = $(init_py_dir) ;
   
   MakeLocate $(init_py:G=out) : [ ConcatDirs $(LOCATE.OBJECTS) bindings python cspace ] ;

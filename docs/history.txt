@@ -14,6 +14,9 @@ chronological order.
 	- res fixed assignments for csBitArray.
         - caedes fixed some python relative jam files so they account
           correctly for the case where swig is not installed.
+	- caedes moved scripts/python/cspace folder to 
+	  scripts/python/frozen/cspace to avoid pythonpath clash when running
+	  the tutorials.
 01-Oct-2007
         - Mike Gist reversed the loops in csSector::UnlinkObjects() to avoid
           meshes being skipped if sl->Remove() removes a mesh object from the
