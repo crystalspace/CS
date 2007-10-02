@@ -1,0 +1,6 @@
+SubDir TOP plugins cscript pyiengine ;
+
+if $(PYTHON.AVAILABLE) = "yes"
+{
+  PyBindingModule ienginemod : iengine : ienginemod.cpp : : : "iengine cs Python module" ;
+}

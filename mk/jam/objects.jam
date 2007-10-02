@@ -174,7 +174,7 @@ rule HeaderRule
     HDRGRIST on $(i) = $(HDRGRIST) ;
     HDRSEARCH on $(i) = $(HDRSEARCH) ;
     HDRRULE on $(i) = [ on $(<) GetVar HDRRULE ] ;
-    HDRSCAN on $(i) = [ on $(<) GetVar HDRPATTERN ] ;
+    HDRSCAN on $(i) = [ on $(<) GetVar HDRSCAN ] ;
   }
 }
 

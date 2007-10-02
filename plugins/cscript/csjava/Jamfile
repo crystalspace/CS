@@ -81,7 +81,7 @@ if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(JAVA) && $(JAVAC) && $(CMD.SWIG) &&
   Depends csjavaclean : javaswigclean ;
 
   NotFile csjava ;
-  Depends plugins : csjava ;
+  Depends bindings : csjava ;
 
   local desc = "pure Java module" ;
   Description csjava : $(desc) ;
@@ -147,26 +147,20 @@ if $(JAVA.AVAILABLE) = "yes" && $(ANT) && $(JAVA) && $(JAVAC) && $(CMD.SWIG) &&
 
   rule InstallJavaJar
   {
-    local SUBDIR = $(2) ;
-    InstallData $(1) : $(3) ;
+    InstallBindingsData $(1) : $(2) : $(3) ;
   }
   InstallJavaJar $(jarfinal) : $(LOCATE_TARGET) : bindings java ;
 
-  rule InstallJavamod
-  {
-    local plugindir = $(appdatadir) ;
-    SystemInstallPlugin $(1) : $(2) ;
-  }
-  InstallJavamod $(javamod) : bindings java ;
+  InstallBindingsModule $(javamod) : bindings java ;
   local cleantarget ;
   if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
   {
     local debugfile = [ SplitDebugInfo $(javamod) ] ;
     cleantarget += $(debugfile) ;
     NoCare $(debugfile) ;
-    Depends install_plugin : [ DoInstall $(debugfile) :
-                                $(appdatadir) bindings java :
-                                $(INSTALL_DATA) ] ;
+    Depends install_bindings : [ DoInstall $(debugfile) :
+                                  $(appdatadir) bindings java :
+                                  $(INSTALL_DATA) ] ;
   }
 
   Always csjavaclean ;

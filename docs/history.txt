@@ -12,6 +12,12 @@ chronological order.
 	  partial or full; determine that by computing the actual element
 	  coverage.
 	- res fixed assignments for csBitArray.
+        - caedes fixed some python relative jam files so they account
+          correctly for the case where swig is not installed.
+	- caedes moved scripts/python/cspace folder to 
+	  scripts/python/frozen/cspace to avoid pythonpath clash when running
+	  the tutorials.
+	- caedes merged the bindingsplit branch into trunk.
 01-Oct-2007
         - Mike Gist reversed the loops in csSector::UnlinkObjects() to avoid
           meshes being skipped if sl->Remove() removes a mesh object from the
@@ -27,6 +33,8 @@ chronological order.
 	  of the "free pattern"; however, this should not be done when the
 	  excess allocator was used, since in that case the local buffer is
 	  not touched.
+	- caedes removed scripts/python/cspace.py as it shouldnt exist any
+	  more.
 	- res fixed another flaw in LocalBufferAllocator in single allocation
 	  mode: When Free()ing, the local buffer is now always filled with the
 	  "free pattern", i.e. also when actually freeing memory from the
@@ -87,6 +95,14 @@ chronological order.
 	  to avoid undesired cleanups).
 	- res fixed lighter2's "MaterialImage<>" interpolation to correctly
 	  sample negative coordinates.
+22-Sep-2007
+	- caedes fixed incorrect java/corepost.i and cleaned perl/corepost.i.
+	- caedes added swig includes for wrapping RenderPriority again, as it
+	  was moved to a different file in cs and this breaks things.
+	- caedes added swig defines for CS_DEPRECATED_VAR and
+	  CS_DEPRECATED_VAR_MSG so this are correctly wrapped.
+	- caedes moved swig scf.i file to include/bindings/common as that
+	  is a more correct place.
 21-Sep-2007
 	- Genjix added support for 3 character long locale codes at the behest
 	  or res2k (thanks!).
@@ -158,6 +174,7 @@ chronological order.
 	  of inavailability).
 	- res changed the xwindow plugin to have the Xaw library relayed.
 15-Sep-2007
+	- caedes added swig module post files for java and perl.
 	- res fixed a crash in the GL driver DB when <comparever> was used
 	  with an unrecognized version type.
 	- res tweaked some GL driver DB entries to take advantage of the
@@ -197,6 +214,21 @@ chronological order.
 12-Sep-2007
 	- Jorrit merged the CS AI branch into trunk (basically only a small
 	  change in PriorityQueue).
+11-Sep-2007
+	- caedes fixed setting of pythonpath inside cspython for new build 
+	  location.
+	- caedes fixed some problems in swig interface files related to
+	  building external modules, also cleaned them up a bit more.
+10-Sep-2007
+	- caedes made some changes to the swig interface files:
+	    - added SetSCFPointer and GetSCFPointer to all modules so
+	      their SCF pointers can be set.
+	    - added a system for python modules to automatically get
+	      their SCF pointers updated, use SetSCFPointer to get that
+	      updated instead of the old cvar.iSCF_SCF.
+	    - cleaned up some old commented code.
+	- caedes modified cspython to set SCF pointer in python modules
+	  using the new SetSCFPointer function.
 8-Sep-2007
 	- res fixed a crash in bezier plugin caused by a rendermanager-only
 	  change accidentally slipping in.
@@ -205,6 +237,24 @@ chronological order.
 	- iceeey made the cssaver save plugin references with the short name
 	  from the original world file, if it was loaded with the saveable
 	  flag set. This makes saving and then loading 'castle' work.
+	- res changed the output directory of the Python modules and .py glue
+	  to out/.../bindings/python.
+	- res added two new targets: "bindings" and "install_bindings" to build
+	  resp. install bindings.
+	- res changed the output/install directory to bindings/python/cspace.
+	- res added a 'bindingsclean' target.
+	- res changed the python modules to not abuse the plugin rule under
+	  MSVC to get built as a DLL any more.
+	- caedes added an initial __init__.py file for the new python
+	  bindings package (scripts/python/cspace/).
+	- res removed the crystalspace_python library and made cspython use the
+	  external python modules.
+	- res made the cspace __init__.py being copied into the
+	  bindings/python/out directory (in out/ resp. the install directory).
+	- res changed cspython plugin to augment the PYTHONPATH env var with
+	  the location for the python module files in the build path.
+	- res fixed the cspython build to properly locate the swig runtime
+	  header.
 7-Sep-2007
 	- res fixed the debug info splitting to put the debug info file into
 	  the same file as the binary (fixes separate debug info for shared
@@ -427,6 +477,9 @@ chronological order.
 	- Jorrit removed renderpriorities tag from some levels.
 	- res changed the delayed TinyXML node freeing to use less memory 
 	  allocations. Can speed up cleanup for large documents.
+        - caedes reworked the split bindings swig files so now both split
+          and monolithic bindings can be built from the same set of swig
+          interface files. this also adds a new core module to the bindings.
 8-Aug-2007
 	- Jorrit (hopefully) removed all traces of the deprecated
 	  iPolygonMesh.
@@ -698,6 +751,22 @@ chronological order.
 	  on very big commands.
 9-Jun-2007
 	- Marten made some fixes for compilation on OSX
+7-Jun-2007
+        - caedes did the following changes in swig interface files:
+          - moved all common swig interface declarations to a new folder
+            called 'include/bindings/common'.
+          - made the main module swig files a thin wrapper that declares
+            the module names and includes the real stuff lying in common/,
+            this will allow building small modules or old monolithic approach
+            for languages that havent adapted for new structure.
+          - merged cspace.i and basepre.i, thus reverting that part of the
+            split.
+          - created post swig files for all modules for python.
+        - caedes removed crystalspace_python dependency on python modules
+          jamfiles (except the 'core' module).
+        - caedes added strict aliasing disabling for the python modules to
+          account for warnings generated by swig code.
+        - caedes split csgeom bindings into one further swig module.
 6-Jun-2007
 	- caedes fixed scripting bindings for latest scf changes.
 	- res fixed the configure javac detection to quote the Java directory
@@ -753,12 +822,29 @@ chronological order.
 	  objects on a terrain (for example).
 	- Jorrit changed the hotkeys for split-view and related (now
 	  equal to 'v', 'shift-'v, and 'alt-v').
+        - Oktal started splitting the per-module language-specific parts of
+          the swig interface files (only done python/imeshpost.i so far).
 24-May-2007
 	- Jorrit fixed a bug in the socket docs.
 	- Jorrit created 1.2 branch and bumped version of trunk from 1.1
 	  to 1.3.
+        - Oktal reorganized the split swig interface files; cspace.i now
+          contains only code for the core module and modules that have yet to
+          be split; basepre.i and basepost.i contain code that was previously
+          in cspace.i and is common to all the modules.
+        - Oktal added SWIGIMPORTED guards to the split swig interface files.
+          This fixes several serious problems caused by my reorganization.
+          Also a small semantic change to the APPLY_FOR_ALL_INTERFACES stuff.
+        - Oktal moved the pure python CS_REQUEST_PLUGIN wrappers from
+          pythpost.i to cspace.i.
 22-May-2007
 	- Genjix correct SCF Test example.
+        - caedes started splitting of the swig interface files so
+          several modules can be built that work together.
+        - caedes added starting python module folders for the split
+          scripting interface.
+        - caedes removed references and dependencies from cegui from the split
+          python modules jamfiles and cpp files.
 21-May-2007
 	- res committed a patch by 'whirm' to replace the use of pushd/popd
 	  when building CS with cd/cd -: pushd/popd is a bashism while cd/cd -
