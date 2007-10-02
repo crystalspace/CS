@@ -112,7 +112,9 @@ namespace lighter
     csVector2 clippedElementQuadrantConstants[4];
     const csVector2* ElementQuadrantConstants = defElementQuadrantConstants;
 
-    if (element.primitive.GetElementType (element.element) == Primitive::ELEMENT_BORDER)
+    Primitive::ElementType elemType = 
+      element.primitive.GetElementType (element.element);
+    if (elemType == Primitive::ELEMENT_BORDER)
     {
       element.primitive.RecomputeQuadrantOffset (element.element, 
         defElementQuadrantConstants, clippedElementQuadrantConstants);
@@ -128,7 +130,8 @@ namespace lighter
       const csVector3 normal = element.primitive.ComputeNormal (pos);
 
       res += shade.ShadeLight (element.primitive.GetObject(), 
-        pos, normal, lightSampler, &element.primitive);
+        pos, normal, lightSampler, &element.primitive,
+        elemType == Primitive::ELEMENT_BORDER);
     }
     
     return res * 0.25f;
@@ -210,18 +213,51 @@ namespace lighter
   class DirectLightingBorderIgnoreCb : public HitIgnoreCallback
   {
   public:
-    explicit DirectLightingBorderIgnoreCb (const Primitive* ignorePrim)
-      : ignorePrim (ignorePrim)
+    explicit DirectLightingBorderIgnoreCb (const Primitive* ignorePrim,
+      const csVector3& rayDir, const csVector3& point) : ignorePrim (ignorePrim), 
+        rayDir (rayDir), point (point)
     {}
 
     virtual bool IgnoreHit (const Primitive* prim)
     {
-      return (prim == ignorePrim)
-       || (prim->GetPlane() == ignorePrim->GetPlane());
+      // Ignore coplanar primitives.
+      if (prim->GetPlane() == ignorePrim->GetPlane ())
+        return true;
+
+      /* If the primitive points the same direction as the ray we trace
+       * and the point to be lit is (almost) on the back of the primitive
+       * ignore if it's neighbouring.
+       *
+       * (Yes, it's a bit of a hack, but it works around errorneous shadows
+       * cast by neighbouring primitives due numerical inaccuracies.)
+       */
+      float smallDistance = 1.0f / globalConfig.GetLMProperties().lmDensity;
+      if (((prim->GetPlane().Normal() * rayDir) > 0)
+        && (prim->GetPlane().Classify (point) < smallDistance))
+      {
+        for (size_t i = 0; i < 3; i++)
+        {
+          const size_t vi = prim->GetTriangle()[i];
+          const csVector3& pi = prim->GetVertexData().positions[vi];
+
+          for (size_t j = 0; j < 3; j++)
+          {
+            const size_t vj = ignorePrim->GetTriangle()[j];
+            const csVector3& pj = ignorePrim->GetVertexData().positions[vj];
+
+            if ((pi - pj).IsZero (SMALL_EPSILON))
+              return true;
+          }
+        }
+      }
+
+      return false;
     }
 
   private:
     const Primitive* ignorePrim;
+    const csVector3 rayDir;
+    const csVector3 point;
   };
 
   csColor DirectLighting::ShadeLight (Light* light, Object* obj, 
@@ -246,7 +282,8 @@ namespace lighter
       VisibilityTester::OcclusionState occlusion;
       if (fullIgnore)
       {
-        DirectLightingBorderIgnoreCb icb (shadowIgnorePrimitive);
+        DirectLightingBorderIgnoreCb icb (shadowIgnorePrimitive, -lightVec,
+          point);
         occlusion = visTester.Occlusion (&icb);
       }
       else
