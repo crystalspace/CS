@@ -18,10 +18,6 @@ if $(PYTHON.AVAILABLE) = "yes"
   else
   {
     SEARCH on $(swigruntime) = $(SEARCH_SOURCE) ;
-    local frozenruntime = $(swigruntime:G=frozenruntime) ;
-    SEARCH on $(frozenruntime) = [ ConcatDirs $(TOP) scripts python ] ;
-    Copy $(swigruntime) : $(frozenruntime) ;
-    Depends $(swigruntime) : $(frozenruntime) ;
   }
   
   # Hack to get header output dir before "." in includes
