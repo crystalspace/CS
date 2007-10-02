@@ -20,7 +20,6 @@
 #include "cssysdef.h"
 #include "csutil/regexp.h"
 #include "csutil/util.h"
-#include "regex_wrapper.h"
 
 static int exec_flags(int flags)
 {
@@ -38,16 +37,15 @@ bool csRegExpMatcher::Compile (int flags, bool nosub)
   if (flags & csrxIgnoreCase) needFlags |= REG_ICASE;
   if (flags & csrxNewLine) needFlags |= REG_NEWLINE;
 
-  if ((regex == 0) || 
+  if ((!regexpSetup) || 
     ((needFlags & ~REG_NOSUB) != (compiledFlags & ~REG_NOSUB)) ||
     ((needFlags & REG_NOSUB) && !(compiledFlags & REG_NOSUB)))
   {
-    if (regex != 0)
-      regfree ((regex_t*)regex);
-    else
-      regex = new regex_t;
+    if (regexpSetup)
+      regfree (&regex);
 
-    int res = regcomp ((regex_t*)regex, pattern, needFlags);
+    int res = regcomp (&regex, pattern, needFlags);
+    regexpSetup = true;
 
     switch (res)
     {
@@ -71,36 +69,28 @@ bool csRegExpMatcher::Compile (int flags, bool nosub)
 }
 
 csRegExpMatcher::csRegExpMatcher (const char* pattern, bool extendedRE) : 
-  regex(0)
+  pattern (CS::StrDup (pattern)), regexpSetup (false), extendedRE (extendedRE)
 {
-  csRegExpMatcher::pattern = CS::StrDup (pattern);
-  csRegExpMatcher::extendedRE = extendedRE;
 }
 
 csRegExpMatcher::csRegExpMatcher (const csRegExpMatcher& other) :
-  regex (0)
+  pattern (CS::StrDup (other.pattern)), regexpSetup (false), 
+  extendedRE (other.extendedRE)
 {
-  pattern = CS::StrDup (other.pattern);
-  extendedRE = other.extendedRE;
 }
 
 csRegExpMatcher::~csRegExpMatcher ()
 {
-  if (regex)
-  {
-    regfree ((regex_t*)regex);
-    delete (regex_t*)regex;
-  }
+  if (regexpSetup) regfree (&regex);
   cs_free (pattern);
 }
 
 csRegExpMatcher& csRegExpMatcher::operator= (const csRegExpMatcher &other)
 {
-  if (regex)
+  if (regexpSetup)
   {
-    regfree ((regex_t*)regex);
-    delete (regex_t*)regex;
-    regex = 0;
+    regfree (&regex);
+    regexpSetup = false;
   }
   cs_free (pattern);
   
@@ -114,7 +104,7 @@ csRegExpMatchError csRegExpMatcher::Match (const char* string, int flags)
 {
   if (!Compile (flags, true))
     return compileError;
-  return (regexec ((regex_t*)regex, string, 0, 0, exec_flags(flags)) == 0) ?
+  return (regexec (&regex, string, 0, 0, exec_flags(flags)) == 0) ?
     csrxNoError : csrxNoMatch;
 }
 
@@ -126,12 +116,12 @@ csRegExpMatchError csRegExpMatcher::Match (const char* string,
   if (!Compile (flags, false))
     return compileError;
 
-  CS_ALLOC_STACK_ARRAY(regmatch_t, re_matches, ((regex_t*)regex)->re_nsub);
-  if (regexec ((regex_t*)regex, string, ((regex_t*)regex)->re_nsub,
+  CS_ALLOC_STACK_ARRAY(regmatch_t, re_matches, regex.re_nsub);
+  if (regexec (&regex, string, regex.re_nsub,
       re_matches, exec_flags(flags)) != 0)
     return csrxNoMatch;
 
-  for (size_t i = 0; i < ((regex_t*)regex)->re_nsub; i++)
+  for (size_t i = 0; i < regex.re_nsub; i++)
   {
     csRegExpMatch match;
     match.startOffset = re_matches[i].rm_so;

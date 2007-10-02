@@ -41,7 +41,7 @@ namespace lighter
       const FactoryPrimitiveArray& inPrims, ObjectFactoryVertexData& vertexData,
       const ObjectFactory* factory,
       csArray<FactoryPrimitiveArray>& outPrims,
-      csBitArray& usedVerts);
+      csBitArray& usedVerts, bool noSplit);
 
     virtual void PrepareLighting (Statistics::Progress& progress);
   protected:
@@ -98,7 +98,7 @@ namespace lighter
 
     bool ProjectPrimitives (FactoryPrimitiveArray& prims, 
       csBitArray &usedVerts, float lmscale, 
-      Vector2Array& lightmapUVs);
+      Vector2Array& lightmapUVs, bool noSplit);
     void ScaleLightmapUVs (FactoryPrimitiveArray& prims, 
       Vector2Array& lightmapUVs, float lmscale);
 

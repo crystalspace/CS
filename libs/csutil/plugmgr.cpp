@@ -168,15 +168,17 @@ void csPluginManager::QueryOptions (iComponent *obj)
   }
 }
 
-iBase *csPluginManager::LoadPlugin (const char *classID, bool init)
+iBase *csPluginManager::LoadPlugin (const char *classID, bool init,
+				    bool report)
 {
   csRef<iComponent> p (scfCreateInstance<iComponent> (classID));
   
   if (!p)
   {
-    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-    	"crystalspace.pluginmgr.loadplugin",
-    	"could not load plugin '%s'", classID);
+    if (report)
+      csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+	  "crystalspace.pluginmgr.loadplugin",
+	  "could not load plugin '%s'", classID);
   }
   else
   {
@@ -206,9 +208,10 @@ iBase *csPluginManager::LoadPlugin (const char *classID, bool init)
       if (init) QueryOptions (p);
       return p;
     }
-    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
-    	"crystalspace.pluginmgr.loadplugin",
-    	"failed to initialize plugin '%s'", classID);
+    if (report)
+      csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+	  "crystalspace.pluginmgr.loadplugin",
+	  "failed to initialize plugin '%s'", classID);
     // If we added this plugin in this call then we remove it here as well.
     if (index != csArrayItemNotFound)
       Plugins.DeleteIndex (index);

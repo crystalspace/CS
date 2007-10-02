@@ -118,7 +118,8 @@ public:
   virtual ~csPluginManager ();
 
   /// Load a plugin and (optionally) initialize it.
-  virtual iBase *LoadPlugin (const char *iClassID, bool init = true);
+  virtual iBase *LoadPlugin (const char *iClassID, bool init = true,
+			      bool report = true);
 
   /**
    * Get first of the loaded plugins that supports given interface ID.

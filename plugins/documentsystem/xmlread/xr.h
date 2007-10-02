@@ -40,6 +40,10 @@ distribution.
 #include <csutil/util.h>
 #include <csutil/array.h>
 #include <csutil/blockallocator.h>
+#include "csutil/csstring.h"
+
+CS_PLUGIN_NAMESPACE_BEGIN(XMLRead)
+{
 
 class TrDocument;
 class TrDocumentNodeChildren;
@@ -80,6 +84,12 @@ struct ParseInfo
 
   ReadNameFunc* ReadName;
   IsNameStartFunc* IsNameStart;
+
+  const char* startOfLine;
+  int linenum;
+  
+  void BeginParse (const char* p)
+  { startOfLine = p; linenum = 1; }
 };
 
 /**
@@ -115,8 +125,8 @@ public:
   TrXmlBase () {}
   virtual ~TrXmlBase () {}
 
-  static const char* SkipWhiteSpace( const char* );
-  static char* SkipWhiteSpace( char* );
+  static const char* SkipWhiteSpace( ParseInfo& parse, const char* );
+  static char* SkipWhiteSpace( ParseInfo& parse, char* );
 
   /**
    * Reads an XML name into the string provided. Returns
@@ -131,11 +141,11 @@ public:
    * This version parses in place (i.e. it modifies the in buffer and
    * returns a pointer inside that).
    */
-  static char* ReadText(char* in, char*& buf, 
+  static char* ReadText(ParseInfo& parse, char* in, char*& buf, 
     int& buflen, bool ignoreWhiteSpace, const char* endTag);
 
 protected:
-  virtual char* Parse( const ParseInfo& parse, char* p ) = 0;
+  virtual char* Parse( ParseInfo& parse, char* p ) = 0;
 
   // If an entity has been found, transform it into a character.
   static char* GetEntity( char* in, char* value );
@@ -159,7 +169,7 @@ protected:
   static bool StringEqual(const char* p, const char* endTag);
   static bool StringEqualIgnoreCase(const char* p, const char* endTag);
 
-  static const char* errorString[ TIXML_ERROR_STRING_COUNT ];
+  static const char* const errorString[ TIXML_ERROR_STRING_COUNT ];
 
 private:
   struct Entity
@@ -289,7 +299,7 @@ public:
 protected:
   // Figure out what is at *p, and parse it. Returns null if it is not an xml
   // node.
-  TrDocumentNode* Identify( const ParseInfo& parse, const char* start );
+  TrDocumentNode* Identify( ParseInfo& parse, const char* start );
 
   // The node is passed in by ownership. This object will delete it.
   TrDocumentNode* LinkEndChild( TrDocumentNode* lastChild,
@@ -347,7 +357,7 @@ public:
    * Attribute parsing starts: first letter of the name
    * returns: the next char after the value end quote
    */
-  char* Parse( const ParseInfo& parse, char* p );
+  char* Parse( ParseInfo& parse, TrDocumentNode* node, char* p );
 
 private:
   const char* name;
@@ -436,13 +446,13 @@ protected:
    * Attribtue parsing starts: next char past '<'
    * returns: next char past '>'
    */
-  virtual char* Parse( const ParseInfo& parse, char* p );
+  virtual char* Parse( ParseInfo& parse, char* p );
 
   /*  [internal use]
    * Reads the "value" of the element -- another element, or text.
    * This should terminate with the current end tag.
    */
-  char* ReadValue( const ParseInfo& parse, char* in );
+  char* ReadValue( ParseInfo& parse, char* in );
 
 private:
   TrDocumentAttributeSet attributeSet;
@@ -472,7 +482,7 @@ protected:
    * Attribtue parsing starts: at the ! of the !--
    * returns: next char past '>'
    */
-  virtual char* Parse( const ParseInfo& parse, char* p );
+  virtual char* Parse( ParseInfo& parse, char* p );
 
   char* value;
   int vallen;
@@ -504,7 +514,7 @@ protected :
    * Attribtue parsing starts: First char of the text
    * returns: next char past '>'
    */
-  virtual char* Parse( const ParseInfo& parse,  char* p );
+  virtual char* Parse( ParseInfo& parse,  char* p );
 
   char* value;
   int vallen;
@@ -527,7 +537,7 @@ public:
   virtual ~TrXmlCData() {}
 
 protected :
-  virtual char* Parse( const ParseInfo& parse,  char* p );
+  virtual char* Parse( ParseInfo& parse,  char* p );
 };
 
 /**
@@ -576,7 +586,7 @@ protected:
   //  [internal use]
   //  Attribtue parsing starts: next char past '<'
   //           returns: next char past '>'
-  virtual char* Parse( const ParseInfo& parse,  char* p );
+  virtual char* Parse( ParseInfo& parse,  char* p );
 
 private:
   const char* version;
@@ -604,7 +614,7 @@ protected:
    * Attribute parsing starts: First char of the text
    * returns: next char past '>'
    */
-  virtual char* Parse( const ParseInfo& parse,  char* p );
+  virtual char* Parse( ParseInfo& parse,  char* p );
 
   char* value;
   int vallen;
@@ -647,11 +657,18 @@ public:
 
   virtual const char * Value () { return 0; }
 
+private:
   /// Parse the given null terminated block of xml data.
-  virtual char* Parse( const ParseInfo& parse,  char* p );
+  virtual char* Parse( ParseInfo& parse,  char* p );
+public:
+  char* Parse( char* p )
+  { 
+    parse.BeginParse (p);
+    return Parse (parse, p);
+  }
 
   /// If, during parsing, a error occurs, Error will be set to true.
-  bool Error() const { return error; }
+  bool Error() const { return errorId != TIXML_NO_ERROR; }
 
   /// Contains a textual (english) description of the error if one occurs.
   const char * ErrorDesc() const { return errorDesc; }
@@ -663,14 +680,43 @@ public:
   const int ErrorId() const { return errorId; }
 
   /// If you have handled the error, it can be reset with this call.
-  void ClearError() { error = false; errorId = 0; errorDesc = ""; }
+  void ClearError() { errorId = TIXML_NO_ERROR; errorDesc = ""; }
 
   // [internal use]
-  void SetError( int err )
+  void SetError( int err, TrDocumentNode* errorNode, const char* errorPos )
   {
-    error   = true;
     errorId = err;
     errorDesc = errorString[ errorId ];
+    if (errorNode != 0)
+    {
+      csString errorPath;
+      
+      while (errorNode != 0)
+      {
+        const char* nodeVal;
+        if ((errorNode->type == ELEMENT)
+          && (nodeVal = errorNode->Value()) && *nodeVal)
+        {
+          if (!errorPath.IsEmpty ())
+            errorPath.Insert (0, " -> ");
+	  errorPath.Insert (0, nodeVal);
+        }
+        errorNode = errorNode->parent;
+      }
+      
+      errorDesc += " (in: ";
+      csString location;
+      location.Format ("line %d", parse.linenum);
+      if (errorPos != 0)
+        location.AppendFmt (":%zu", errorPos - parse.startOfLine + 1);
+      errorDesc += location.GetDataSafe();
+      if (!errorPath.IsEmpty())
+      {
+        errorDesc += "; ";
+        errorDesc += errorPath.GetDataSafe();
+      }
+      errorDesc += ")";
+    }
   }
 
   /**
@@ -686,14 +732,16 @@ public:
   bool IsWhiteSpaceCondensed()
   { return parse.condenseWhiteSpace; }
 private:
-  bool error;
   int  errorId;
-  const char* errorDesc;
+  csString errorDesc;
   ParseInfo parse;
 
   static char* ReadName_ISO_8859_1 (char* p);
   static bool IsNameStart_ISO_8859_1 (const char* p);
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(XMLRead)
 
 #endif
 

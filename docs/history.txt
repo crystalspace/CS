@@ -7,20 +7,168 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 02-Oct-2007
-	- caedes fixed some python relative jam files so they account
-	  correctly for the case where swig is not installed.
+	- res augmented lighter2's element classification algorithm to not 
+	  only rely on the position in the scanline to mark an element as
+	  partial or full; determine that by computing the actual element
+	  coverage.
+	- res fixed assignments for csBitArray.
+        - caedes fixed some python relative jam files so they account
+          correctly for the case where swig is not installed.
 01-Oct-2007
+        - Mike Gist reversed the loops in csSector::UnlinkObjects() to avoid
+          meshes being skipped if sl->Remove() removes a mesh object from the
+          sector's mesh list.
+	- Marten fixed regex compilation on MSVC.
+	- res reverted r27755 and r27756 and fixed MSVC regex.c compilation
+	  without the need for regex_wrapper.h: just use 
+	  csutil/generic/regex.h.
+	- Marten fixed compilation on gcc4.2. Don't use reserved keyword for
+	  variable names.
+	- res fixed a flaw in LocalBufferAllocator in single allocation mode:
+	  Free() was always checking whether the local buffer did not consist
+	  of the "free pattern"; however, this should not be done when the
+	  excess allocator was used, since in that case the local buffer is
+	  not touched.
 	- caedes removed scripts/python/cspace.py as it shouldnt exist any
 	  more.
+	- res fixed another flaw in LocalBufferAllocator in single allocation
+	  mode: When Free()ing, the local buffer is now always filled with the
+	  "free pattern", i.e. also when actually freeing memory from the
+	  excess allocator.
+30-Sep-2007
+	- res made some VC warning fixes.
+	- res made the following changes to TinyXML:
+	  - When writing to an iFile, instead of storing the XML to a string
+	    buffer and writing out everything at once, a smaller buffer is
+	    used and the data is written out incrementally.
+	  - Scraped a few bytes off the Tiny node's memory footprint.
+	- res changed csRegExpMatcher to not allocate the 'regex_t' structure
+	  from the heap but have it inline in the class.
+	- res made the following changes to csHash<>:
+	  - Put() and PutUnique() now return a ref to the value that was 
+	    added.
+	  - Added GetOrCreate(), which returns an element for a key if one 
+	    already exists, or adds and returns a default one if not.
+	  - Marked csHashCompute as a "pure" method.
+	- res augmented iPluginManager->LoadPlugin() to optionally be silent
+	  about plugin loading failures.
+	- res made the following changes to lighter:
+	  - Added creation of meshes visualizing traced rays and what they hit
+	    (for debugging purposes).
+	  - Made some small tweaks to improve border element behaviour.
+29-Sep-2007
+	- Mike Gist changed the call to LoadTexture() in FindTexture() to not
+	  create a material if the texture isn't found. This fixes a material
+	  duplication bug in FindNamedMaterial().
+	- Vincent fixed a <comparever> entry in gldriver.xml.
+        - Mike Gist fixed a crash in csMeshFactoryList::Remove().
+	- caedes made some shader changes:
+	  - fixed vertexlight.cgvp for undeclared matrix and incorrect
+	    attenuation.
+	  - fixed ambient.avp binding texture coordinates incorrectly.
+	  - made std_character2.xml use only software skinning (added
+	    soft-skinning.inc snippet).
+	  - added a fallback for character_bump2.xml for cards with no
+	    pixel processor.
+28-Sep-2007
+	- Vincent added static variants in lighter2, cslight, basemapgen and
+	  docconv Jamfiles.
+26-Sep-2007
+	- Darek made some fixes in translator and added manual fallback 
+	  list (e.g. Translator.Fallback.eu = es it en).
+25-Sep-2007
+	- res made relaytool work better with shared libs: no link time 
+	  warnings on x86 resp. link errors on amd64.
+	- res fixed lighter2 to conserve used "single color" lightmaps when 
+	  cleaning "old" lightmaps.
+	- res made lighter2 generate different lightmap texture names for
+	  different levels.
+	- res fixed lighter2's "MaterialImage<>" class so not crash when
+	  negative coords are requested for wrapped sampling.
+	- Marten added back PD-light support in lighter2.
+	- res made lighter2 generate level-specific lightmap texture names 
+	  also for PD light maps and solid color lightmaps (the latter is done
+	  to avoid undesired cleanups).
+	- res fixed lighter2's "MaterialImage<>" interpolation to correctly
+	  sample negative coordinates.
 22-Sep-2007
+	- caedes fixed incorrect java/corepost.i and cleaned perl/corepost.i.
 	- caedes added swig includes for wrapping RenderPriority again, as it
 	  was moved to a different file in cs and this breaks things.
 	- caedes added swig defines for CS_DEPRECATED_VAR and
 	  CS_DEPRECATED_VAR_MSG so this are correctly wrapped.
 	- caedes moved swig scf.i file to include/bindings/common as that
 	  is a more correct place.
-22-Sep-2007
-	- caedes fixed incorrect java/corepost.i and cleaned perl/corepost.i.
+21-Sep-2007
+	- Genjix added support for 3 character long locale codes at the behest
+	  or res2k (thanks!).
+	- Genjix swapped the precedence of checking system language and using
+	  config lanuage, and made a small optimisation in storage.
+	- Genjix slightly modified the behaviour of translator, namely adding
+	  fallbacks for when language is not found and defaulting to english.
+	- iceeey fixed a bug in parsing of GL driver DB where a comparever
+	  which checks for an unknown version string type would cause a
+	  compound fulfill="one" (OR) condition to short-circuit. This makes
+	  the rule "ATI: 'Forceful' fixed function enable" properly applied
+	  to ATI cards on Linux making "walktest terrainf" no longer exhibit
+	  garbled text and CS logo.
+	- res added "partial" shadow support to lighter2: the alpha channel of
+	  a surface's texture is taken into consideration when casting the
+	  shadow.
+	- res added the possibility to instruct the engine to "keep images" on
+	  texture wrappers by default. Useful for apps that need the actual
+	  image data.
+	- res made the GTK alert code also compile on GTK version 2.4.
+20-Sep-2007
+	- caedes, Genjix and iceeey removed some stupid code :D
+	  csQuaternion quat;
+	  if (quat.v.x != 0 || quat.v.y != 0 || quat.v.z != 0 || quat.w != 0)
+	    // ...
+	- Genjix fixed bug in walktest where it doesn't look where the camera
+	  is when you move left and right at start!
+	- Vincent applied res' fix for configure which detected lib3ds-1.3.0
+	  when lib3ds-1.2.0 was installed.
+18-Sep-2007
+	- res added support for the --gc-sections linker flag and made targets
+	  on unix use it.
+	- res added support for GTK message boxes to the xwindow plugin. (They
+	  look much nicer than the Xaw ones.)
+	- res updated the lib3ds check to also check for the I/O callback
+	  prototype changes introduced in lib3ds 1.3.0 and changed gmesh3ds to
+	  select the appropriate variant. Fixes trac #361.
+	- res fixed "fake relay stub" generation for when relaytool is not
+	  available.
+	- res added the line number + column reporting to the TinyXML and 
+	  xmlread error strings. Addresses trac #123.
+	- res changed the configure relaytool test to use CS_PATH_TOOL instead
+	  of hardcoding the path.
+	- res made csparser not assert/crash when the default missing texture
+	  can't be loaded - it merely displays an error message now.
+	- res changed lighter2 to only propagate lights once through any 
+	  portal. This works around apparently occuring infinite recursions.
+	- res made lighter2 also always write out a log file "lighter2.log"
+	  with all reporter messages.
+	- res added some initial "external factory respect" support to lighter2
+	  (means factories outside the level directory won't be altered).
+	- res fixed the "split prevention" logic in the lighter2 lightmap
+	  layouter to not botch splittable meshes.
+	- res made lighter2 write out per-mesh "tex lightmap" SVs.
+	- res fixed lighter2 ignoring the material from the mesh object if it
+	  doesn't have submeshes.
+	- res deprecated the remaining csObject-related macros. Also deprecated
+	  an unlogic usage of iObject::GetChild ().
+17-Sep-2007
+	- res added a driver DB tweak to disable EXT_framebuffer_object for
+	  (now rather old) ATI drivers (see trac #261).
+	- res tweaked the driver DB to enabled "hidden Radeon NPOTS" for newer
+	  ATI drivers (which have a slightly different renderer string).
+	- res made the XML parsers errors slightly more helpful by having the
+	  error message contain the hierarchy of elements in which the error
+	  occured.
+	- res added support for relaying external libraries using relaytool
+	  (that is, they're dynamically loaded, allowing graceful handling
+	  of inavailability).
+	- res changed the xwindow plugin to have the Xaw library relayed.
 15-Sep-2007
 	- caedes added swig module post files for java and perl.
 	- res fixed a crash in the GL driver DB when <comparever> was used
@@ -190,7 +338,7 @@ chronological order.
 	  between snippets to reuse program inputs, were also, incorrectly,
 	  used when resolving candidates for inputs.
 30-Aug-2007
-	- Genjix added api documentation about iSkeleton::SetTransformMode (...)
+	- Genjix added api documentation about iSkeleton::SetTransformMode(...)
 	- Genjix added joystick define to initapp.h (CS_REQUEST_JOYSTICK)
 	- Genjix hid public data member and added an accessor instead.
 	- Genjix removed useless line of code from csSkeleton.

@@ -253,6 +253,15 @@
 	</OpenGL>
       </Video>
     </config>
+    <config name="nofbo">
+      <Video>
+	<OpenGL>
+	  <UseExtension>
+	    <GL_EXT_framebuffer_object>no</GL_EXT_framebuffer_object>
+	  </UseExtension>
+	</OpenGL>
+      </Video>
+    </config>
   </configs>
   <rules>
     <!-- rule description="Some more examples">
@@ -336,7 +345,7 @@
       <conditions fulfill="all">
 	<regexp string="platform" pattern="Unix" />
 	<regexp string="renderer" pattern="^GeForce 6600" />
-	<comparever string="glvendor" pattern="eq NVIDIA 97.55" />
+	<comparever version="glvendor" relation="eq NVIDIA 97.55" />
       </conditions>
       <applicable>
         <usecfg>novbo</usecfg>
@@ -555,13 +564,29 @@
       <conditions>
 	<regexp string="vendor" pattern="^ATI" />
 	<conditions fulfill="one">
-	  <regexp string="renderer" pattern="^R\(ADEON\|adeon\) 9\(5\|6\|7\|8\).*" />
-	  <regexp string="renderer" pattern="^R\(ADEON\|adeon\) X.*" />
+	  <regexp string="renderer" pattern="R\(ADEON\|adeon\) 9\(5\|6\|7\|8\).*" />
+	  <regexp string="renderer" pattern="R\(ADEON\|adeon\) X.*" />
 	</conditions>
 	<comparever version="gl" relation="ge 2.0.5885" />
       </conditions>
       <applicable>
 	<usecfg>hiddenNPOTS</usecfg>
+      </applicable>
+    </rule>
+    
+    <!--
+      * 2007-02-15: ATI MOBILITY RADEON 9600/9700 Series, Win32, 
+                    OpenGL 2.0.6288
+		    Render targets are corrupted with GL_EXT_framebuffer_object.
+		    (See trac #261).
+      -->
+    <rule description="ATI: Work around EXT_framebuffer_object corruption">
+      <conditions>
+	<regexp string="vendor" pattern="^ATI" />
+	<comparever version="gl" relation="le 2.0.6288" />
+      </conditions>
+      <applicable>
+	<usecfg>nofbo</usecfg>
       </applicable>
     </rule>
     

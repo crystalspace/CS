@@ -34,6 +34,8 @@
 
 typedef csRefArray<iObject> csObjectContainer;
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * A generic csObject class. Any csObject can have any number of iObject
  * children attached to it. You can use scfQueryInterface to get interfaces
@@ -118,7 +120,7 @@ public:
    * Note that the returned object will be IncRef'ed.
    */
   virtual iObject* GetChild (int iInterfaceID, int iVersion,
-    const char *Name = 0, bool FirstName = false) const;
+    const char *Name, bool FirstName) const;
 
   /// Return the first child object with the given name
   virtual iObject *GetChild (const char *Name) const;
@@ -134,7 +136,12 @@ public:
   virtual void RemoveNameChangeListener (
   	iObjectNameChangeListener* listener);
 
+  
   virtual void ObjReleaseOld (iObject *obj);
+  virtual iObject* GetChild (int iInterfaceID, int iVersion,
+    const char *Name = 0) const;
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif // __CS_CSOBJECT_H__

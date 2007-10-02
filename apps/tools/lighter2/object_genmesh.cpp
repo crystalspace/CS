@@ -50,7 +50,8 @@ namespace lighter
     {
       Submesh currentSM;
       size_t newIndex = smIt.Next (currentSM);
-      if (SubmeshesMergeable (currentSM.sourceSubmesh, submesh))
+      if ((!noModify && (SubmeshesMergeable (currentSM.sourceSubmesh, submesh)))
+        || (currentSM.sourceSubmesh == submesh))
       {
         submeshIndex = newIndex;
         break;
@@ -113,9 +114,12 @@ namespace lighter
     
     if (!genFact) return; // bail
 
-    genFact->RemoveRenderBuffer ("texture coordinate lightmap");
-    genFact->Compress ();
-    genFact->DisableAutoNormals();
+    if (!noModify)
+    {
+      genFact->RemoveRenderBuffer ("texture coordinate lightmap");
+      genFact->Compress ();
+      genFact->DisableAutoNormals();
+    }
 
     const size_t vertCount = genFact->GetVertexCount ();
 
@@ -126,6 +130,10 @@ namespace lighter
     vertexData.normals.SetSize (vertCount);
     memcpy (vertexData.normals.GetArray(), genFact->GetNormals (),
       vertCount * sizeof (csVector3));
+
+    vertexData.uvs.SetSize (vertCount);
+    memcpy (vertexData.uvs.GetArray(), genFact->GetTexels (),
+      vertCount * sizeof (csVector2));
 
     if (genFact->GetSubMeshCount() > 0)
     {
@@ -148,11 +156,10 @@ namespace lighter
     else
     {
       csTriangle *tris = genFact->GetTriangles ();
-      iMaterialWrapper* material = 
-        factory->GetMeshObjectFactory()->GetMaterialWrapper();
       for (int i=0; i < genFact->GetTriangleCount ();i++)
       {
-        AddPrimitive (tris[i].a, tris[i].b, tris[i].c, material);
+        AddPrimitive (tris[i].a, tris[i].b, tris[i].c, 
+          (iMaterialWrapper*)0);
       }
     }
   }
@@ -165,24 +172,19 @@ namespace lighter
     
     if (!genFact) return; // bail
 
-    Vector2DArray uvcoords;
-    const size_t factVertCount = genFact->GetVertexCount();
-    uvcoords.SetSize (factVertCount);
-    memcpy (uvcoords.GetArray(), genFact->GetTexels(),
-      factVertCount * sizeof (csVector2));
-
-    for (size_t s = 0; s < vertexData.splits.GetSize(); s++)
+    if (noModify)
     {
-      const ObjectFactoryVertexData::SplitInfo& split = vertexData.splits[s];
-      if (split.i1 == (size_t)~0)
-        uvcoords.Push (uvcoords[split.i0]);
-      else
+      SubmeshFindHelper findHelper (this);
+  
+      // Save primitives, trianglate on the fly
+      for (uint i = 0; i < layoutedPrimitives.GetSize (); ++i)
       {
-        const csVector2& uv0 = uvcoords[split.i0];
-        const csVector2& uv1 = uvcoords[split.i1];
-        uvcoords.Push (uv0 - (uv1 - uv0) * split.t);
+	findHelper.FindSubmesh (i);
       }
+      findHelper.CommitSubmeshNames ();
+      return;
     }
+    
     // TODO: Apply 'vertexData.splits' to user buffers
 
     const size_t vertCount = vertexData.positions.GetSize ();
@@ -192,8 +194,7 @@ namespace lighter
       vertCount * sizeof (csVector3));
     memcpy (genFact->GetNormals (), vertexData.normals.GetArray(),
       vertCount * sizeof (csVector3));
-    CS_ASSERT (uvcoords.GetSize() == vertCount);
-    memcpy (genFact->GetTexels(), uvcoords.GetArray(),
+    memcpy (genFact->GetTexels(), vertexData.uvs.GetArray(),
       vertCount * sizeof (csVector2));
 
     genFact->ClearSubMeshes();
@@ -343,6 +344,15 @@ namespace lighter
     }
   }
 
+  void ObjectFactory_Genmesh::SubmeshFindHelper::CommitSubmeshNames ()
+  {
+    for (size_t i = 0; i < allocatedSubmeshes.GetSize(); i++)
+    {
+      factory->submeshNames->GetExtend (allocatedSubmeshes[i].submeshIndex) =
+        allocatedSubmeshes[i].name;
+    }
+  }
+
   int ObjectFactory_Genmesh::SubmeshFindHelper::CompareAllocSubmesh (
     ObjectFactory_Genmesh::SubmeshFindHelper::AllocatedSubmesh const& item, 
     ObjectFactory_Genmesh::SubmeshFindHelper::AllocatedSubmeshKey const& key)
@@ -362,8 +372,46 @@ namespace lighter
   {
     saverPluginName = "crystalspace.mesh.saver.genmesh";
   }
+  
+  bool Object_Genmesh::Initialize (Sector* sector)
+  {
+    if (!Object::Initialize (sector)) return false;
+    
+    csRef<iGeneralMeshState> genMesh = 
+      scfQueryInterface<iGeneralMeshState> (
+      meshWrapper->GetMeshObject());
+    if (!genMesh) return false; // bail
 
-  void Object_Genmesh::SaveMesh (Sector* sector, iDocumentNode *node)
+    bool noSubmeshes = allPrimitives.GetSize () == 1; // @@@ insufficient test
+    for (uint i = 0; i < allPrimitives.GetSize (); ++i)
+    {
+      csString submeshName;
+      submeshName = submeshNames->Get (i);
+
+      iGeneralMeshSubMesh* subMesh = genMesh->FindSubMesh (submeshName);
+      if (!subMesh && !noSubmeshes) continue;
+
+      iMaterialWrapper* material = 
+        subMesh ? subMesh->GetMaterial() : (iMaterialWrapper*)0;
+      if (material == 0)
+      {
+        csRef<iMeshObject> mo = 
+          scfQueryInterface<iMeshObject> (genMesh);
+        material = mo->GetMaterialWrapper();
+      }
+
+      const RadMaterial* radMat = sector->scene->GetRadMaterial (material);
+      if (radMat == 0) continue;
+      
+      PrimitiveArray& primitives = allPrimitives[i];
+      for (size_t p = 0; p < primitives.GetSize(); p++)
+        primitives[p].SetMaterial (radMat);
+    }
+    
+    return true;
+  }
+
+  void Object_Genmesh::SaveMesh (iDocumentNode *node)
   {
     csRef<iGeneralMeshState> genMesh = 
       scfQueryInterface<iGeneralMeshState> (
@@ -379,19 +427,20 @@ namespace lighter
    // Still may need to fix up submesh materials...
     CS::ShaderVarName lightmapName (globalLighter->strings, "tex lightmap");
 
+    bool noSubmeshes = allPrimitives.GetSize () == 1; // @@@ insufficient test
     for (uint i = 0; i < allPrimitives.GetSize (); ++i)
     {
       csString submeshName;
       submeshName = submeshNames->Get (i);
 
       iGeneralMeshSubMesh* subMesh = genMesh->FindSubMesh (submeshName);
-      if (!subMesh) continue;
+      if (!subMesh && !noSubmeshes) continue;
 
       /* Fix up material (factory may not have a material set, but mesh object
        * material does not "propagate" to submeshes) */
       // FIXME: Should detect when this is necessary
       // FIXME: also can remove mesh object material then
-      if (subMesh->GetMaterial() == 0)
+      if (subMesh && (subMesh->GetMaterial() == 0))
       {
         csRef<iMeshObject> mo = 
           scfQueryInterface<iMeshObject> (genMesh);
@@ -401,7 +450,8 @@ namespace lighter
       if (!lightPerVertex)
       {
         csRef<iShaderVariableContext> svc = 
-          scfQueryInterface<iShaderVariableContext> (subMesh);
+          scfQueryInterface<iShaderVariableContext> (
+            subMesh ? (iBase*)subMesh : (iBase*)meshWrapper);
 
         uint lmID = uint (lightmapIDs[i]);
         Lightmap* lm = sector->scene->GetLightmaps()[lmID];
@@ -424,7 +474,7 @@ namespace lighter
       }
     }
 
-    Object::SaveMesh (sector, node);
+    Object::SaveMesh (node);
 
     if (lightPerVertex)
     {

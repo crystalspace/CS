@@ -158,8 +158,8 @@ void csRegion::Clear ()
 
 iSector *csRegion::FindSector (const char *iName)
 {
-  csRef<iSector> sector (CS_GET_NAMED_CHILD_OBJECT (
-      this, iSector, iName));
+  csRef<iSector> sector (CS::GetNamedChildObject<iSector> (
+      this, iName));
   return sector;	// DecRef is ok here.
 }
 
@@ -171,8 +171,8 @@ iMeshWrapper *csRegion::FindMeshObject (const char *Name)
     char* cname = csStrNew (Name);
     char* p2 = strchr (cname, ':');
     *p2 = 0;
-    csRef<iMeshWrapper> m = CS_GET_NAMED_CHILD_OBJECT (
-        this, iMeshWrapper, cname);
+    csRef<iMeshWrapper> m = CS::GetNamedChildObject<iMeshWrapper> (
+        this, cname);
     delete[] cname;
     if (m)
     {
@@ -182,37 +182,37 @@ iMeshWrapper *csRegion::FindMeshObject (const char *Name)
   }
   else
   {
-    csRef<iMeshWrapper> m = CS_GET_NAMED_CHILD_OBJECT (
-        this, iMeshWrapper, Name);
+    csRef<iMeshWrapper> m = CS::GetNamedChildObject<iMeshWrapper> (
+        this, Name);
     return m;	// DecRef is ok here.
   }
 }
 
 iMeshFactoryWrapper *csRegion::FindMeshFactory (const char *iName)
 {
-  csRef<iMeshFactoryWrapper> mf (CS_GET_NAMED_CHILD_OBJECT (
-      this, iMeshFactoryWrapper, iName));
+  csRef<iMeshFactoryWrapper> mf (
+    CS::GetNamedChildObject<iMeshFactoryWrapper> (this, iName));
   return mf;	// DecRef is ok here.
 }
 
 iTextureWrapper *csRegion::FindTexture (const char *iName)
 {
-  csRef<iTextureWrapper> t (CS_GET_NAMED_CHILD_OBJECT (
-      this, iTextureWrapper, iName));
+  csRef<iTextureWrapper> t (CS::GetNamedChildObject<iTextureWrapper> (
+      this, iName));
   return t;	// DecRef is ok here.
 }
 
 iMaterialWrapper *csRegion::FindMaterial (const char *iName)
 {
-  csRef<iMaterialWrapper> m (CS_GET_NAMED_CHILD_OBJECT (
-      this, iMaterialWrapper, iName));
+  csRef<iMaterialWrapper> m (CS::GetNamedChildObject<iMaterialWrapper> (
+      this, iName));
   return m;	// DecRef is ok here.
 }
 
 iCameraPosition *csRegion::FindCameraPosition (const char *iName)
 {
-  csRef<iCameraPosition> cp (CS_GET_NAMED_CHILD_OBJECT (
-      this, iCameraPosition, iName));
+  csRef<iCameraPosition> cp (CS::GetNamedChildObject<iCameraPosition> (
+      this, iName));
   return cp;	// DecRef is ok here.
 }
 

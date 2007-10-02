@@ -24,6 +24,8 @@ NASM.FLAGS += -f elf ;
 
 PLUGIN.CFLAGS += $(COMPILER.C++FLAGS.PIC) ;
 LIBRARY.CFLAGS += $(COMPILER.C++FLAGS.PIC) ;
+APPLICATION.LFLAGS += $(LINK.GC_SECTIONS) ;
+PLUGIN.LFLAGS += $(LINK.GC_SECTIONS) ;
 
 # The BFD tag name under which to embed meta-information into a plugin module.
 # This much match the name expected by csGetPluginMetadata() (bfdplugins.cpp).
@@ -189,13 +191,13 @@ actions piecemeal together LinkSharedLibraryIncremental bind NEEDLIBS bind EXTRA
 
 actions LinkSharedLibraryFinal bind NEEDLIBS bind EXTRAOBJECTS
 {
-  $(CMD.LINK) -shared -o $(<) $(<).il $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS) \
-    -Wl,-soname,$(<:BS)
+  $(CMD.LINK) -shared -o $(<) $(<).il $(LINK.GC_SECTIONS) $(EXTRAOBJECTS) \
+    $(NEEDLIBS) $(LINKLIBS) -Wl,-soname,$(<:BS)
   $(RM) $(<).il
 }
 
 actions LinkSharedLibraryRsp bind NEEDLIBS bind EXTRAOBJECTS
 {
-  $(CMD.LINK) -shared -o $(<) -Wl,@$(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS) \
-    -Wl,-soname,$(<:BS)
+  $(CMD.LINK) -shared -o $(<) -Wl,@$(>) $(LINK.GC_SECTIONS) $(EXTRAOBJECTS) \
+    $(NEEDLIBS) $(LINKLIBS) -Wl,-soname,$(<:BS)
 }

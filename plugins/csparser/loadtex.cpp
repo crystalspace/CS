@@ -827,7 +827,7 @@ csPtr<iBase> csMissingTextureLoader::Parse (iDocumentNode* node,
     (ctx && ctx->HasFlags()) ? ctx->GetFlags() : CS_TEXTURE_3D, fail_reason));
   if (!TexHandle)
   {
-    ReportError (object_reg, "crystalspace.cubemaploader",
+    ReportError (object_reg, "crystalspace.missingtextureloader",
       "Error creating texture: %s", fail_reason->GetData ());
     return 0;
   }

@@ -173,7 +173,7 @@ struct iEngineSectorCallback : public virtual iBase
  */
 struct iEngine : public virtual iBase
 {
-  SCF_INTERFACE(iEngine,2,1,0);
+  SCF_INTERFACE(iEngine,2,1,1);
   
   /// Get the iObject for the engine.
   virtual iObject *QueryObject() = 0;
@@ -1313,6 +1313,22 @@ struct iEngine : public virtual iBase
    */
   virtual void ResetWorldSpecificSettings() = 0;  
   
+  /** @} */
+
+  /**\name Saving/loading
+   * @{ */
+
+  /**
+   * Set the default value for the "keep image" flag of texture wrappers.
+   */
+  virtual void SetDefaultKeepImage (bool enable) = 0;
+
+  /**
+   * Get the default value for the "keep image" flag of texture wrappers 
+    *(default OFF).
+   */
+  virtual bool GetDefaultKeepImage () = 0;
+
   /** @} */
 };
 

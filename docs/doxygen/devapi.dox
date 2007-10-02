@@ -337,6 +337,7 @@ EXCLUDE                =
 
 EXCLUDE_PATTERNS       = \
 	*/include/csutil/scf_impl.h \
+	*/include/csutil/generic/regex.h \
 	*/include/csutil/win32/AL/* \
 	*/include/csutil/win32/Cg/* \
 	*/include/csutil/win32/CEGUI* \

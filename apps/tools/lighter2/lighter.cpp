@@ -40,7 +40,7 @@ namespace lighter
   Lighter* globalLighter;
 
   Lighter::Lighter (iObjectRegistry *objectRegistry)
-    : objectRegistry (objectRegistry), scene (new Scene),
+    : objectRegistry (objectRegistry), swapManager (0), scene (new Scene),
       progStartup ("Starting up", 5),
       progLoadFiles ("Loading files", 2),
       progLightmapLayout ("Lightmap layout", 5),
@@ -78,9 +78,10 @@ namespace lighter
     // Initialize it
     if (!Initialize ()) return 1;
 
-    // Common baby light my fire
+    // Come on baby light my fire
     if (!LightEmUp ()) return 1;
 
+    // We couldn't get much higher
     return 0;
   }
 
@@ -115,6 +116,8 @@ namespace lighter
       swapManager = new SwapManager (maxSwapSize);
     }
 
+    rayDebug.SetFilterExpression (globalConfig.GetDebugProperties().rayDebugRE);
+
     // Initialize the TUI
     globalTUI.Redraw ();
     progStartup.SetProgress (0);
@@ -130,6 +133,22 @@ namespace lighter
 
       // Set ourselves up as a reporterlistener
       rep->AddReporterListener (&globalTUI);
+      
+      csRef<iStandardReporterListener> stdrep = 
+        csQueryRegistryOrLoad<iStandardReporterListener> (objectRegistry, 
+        "crystalspace.utilities.stdrep");
+      // Set up standard listener to also report to lighter2.log
+      stdrep->SetDebugFile ("/this/lighter2.log");
+      stdrep->SetMessageDestination (CS_REPORTER_SEVERITY_BUG, false, false, 
+        false, false, true, false);
+      stdrep->SetMessageDestination (CS_REPORTER_SEVERITY_ERROR, false, false, 
+        false, false, true, false);
+      stdrep->SetMessageDestination (CS_REPORTER_SEVERITY_WARNING, false, false, 
+        false, false, true, false);
+      stdrep->SetMessageDestination (CS_REPORTER_SEVERITY_NOTIFY, false, false, 
+        false, false, true, false);
+      stdrep->SetMessageDestination (CS_REPORTER_SEVERITY_DEBUG, false, false, 
+        false, false, true, false);
     }
     
     // Get plugins
@@ -151,6 +170,7 @@ namespace lighter
     engine = csQueryRegistry<iEngine> (objectRegistry);
     if (!engine) return Report ("No iEngine!");
     engine->SetSaveableFlag (true);
+    engine->SetDefaultKeepImage (true);
 
     imageIO = csQueryRegistry<iImageIO> (objectRegistry);
     if (!imageIO) return Report ("No iImageIO!");
@@ -377,6 +397,7 @@ namespace lighter
     //Save the result
     if (!scene->SaveLightmaps (progSaveResult)) return false;
     if (!scene->SaveMeshesPostLighting (progSaveMeshesPostLight)) return false;
+    scene->CleanLightingData ();
     if (!scene->ApplyWorldChanges (progApplyWorldChanges)) return false;
 
     progCleanup.SetProgress (0);

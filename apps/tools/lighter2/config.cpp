@@ -74,5 +74,9 @@ namespace lighter
 
     lmProperties.grayPDMaps = cfgMgr->GetBool ("lighter2.grayPDMaps", 
       lmProperties.grayPDMaps);
+
+
+    debugProperties.rayDebugRE =
+      cfgMgr->GetStr ("lighter2.debugOcclusionRays");
   }
 }

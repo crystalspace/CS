@@ -26,6 +26,9 @@
 #include "xriface.h"
 #include "xrpriv.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(XMLRead)
+{
+
 struct csXmlReadDocWrapper :
   public scfImplementation1<csXmlReadDocWrapper, iDocument>
 {
@@ -189,6 +192,9 @@ csRef<iDocument> csXmlReadXMLPlugin::CreateDocument ()
   return csPtr<iDocument> (new csXmlReadDocWrapper(xmlread->CreateDocument()));
 }
 
-CS_IMPLEMENT_PLUGIN
-
 SCF_IMPLEMENT_FACTORY (csXmlReadXMLPlugin)
+
+}
+CS_PLUGIN_NAMESPACE_END(XMLRead)
+
+CS_IMPLEMENT_PLUGIN

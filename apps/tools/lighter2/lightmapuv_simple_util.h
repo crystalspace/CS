@@ -226,8 +226,8 @@ namespace lighter
   static bool AllocAllPrims (const Arrays& arrays, Allocators& allocs,
     AllocResultHash& result, Statistics::Progress* progress, uint flags)
   {
-    size_t u, updateFreq;
-    float progressStep;
+    size_t u = 0, updateFreq = 0;
+    float progressStep = 0;
     if (progress && (arrays.GetSize() > 0))
     {
       updateFreq = progress->GetUpdateFrequency (arrays.GetSize());

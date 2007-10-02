@@ -20,6 +20,9 @@
 
 #include "xr.h"
 
+CS_PLUGIN_NAMESPACE_BEGIN(XMLRead)
+{
+
 /* Character types, from XML 1.0 spec.
  * We're really only interested whether a character can be a first or 
  * subsequent character for a name, so that's the info recorded here.
@@ -84,3 +87,5 @@ char* TrDocument::ReadName_ISO_8859_1 (char* p)
   return p-1;
 }
 
+}
+CS_PLUGIN_NAMESPACE_END(XMLRead)
