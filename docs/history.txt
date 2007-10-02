@@ -11,6 +11,7 @@ chronological order.
 	  only rely on the position in the scanline to mark an element as
 	  partial or full; determine that by computing the actual element
 	  coverage.
+	- res fixed assignments for csBitArray.
 01-Oct-2007
         - Mike Gist reversed the loops in csSector::UnlinkObjects() to avoid
           meshes being skipped if sl->Remove() removes a mesh object from the

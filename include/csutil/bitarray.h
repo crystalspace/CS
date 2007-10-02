@@ -131,7 +131,7 @@ public:
   typedef csBitArrayTweakable<InlinedBits, Allocator> ThisType;
   typedef Allocator AllocatorType;
 
-private:
+protected:
   template<typename BitArray> friend class csComparatorBitArray;
   template<typename BitArray> friend class csHashComputerBitArray;
 
@@ -610,11 +610,11 @@ public:
     return a;
   }
 
+  //@{
   /// Return the full backing-store.
-  csBitArrayStorageType* GetArrayBits()
-  {
-    return GetStore();
-  }
+  csBitArrayStorageType* GetArrayBits() { return GetStore(); }
+  const csBitArrayStorageType* GetArrayBits() const { return GetStore(); }
+  //@}
 };
 
 /**
@@ -630,6 +630,20 @@ public:
   explicit csBitArray (size_t size) : csBitArrayTweakable<> (size) { }
   /// Construct as duplicate of \a that (copy constructor).
   csBitArray (const csBitArray& that) : csBitArrayTweakable<> (that) { }
+
+  /// Copy from other array.
+  template<int A, typename B>
+  csBitArray& operator=(const csBitArrayTweakable<A, B>& that)
+  {
+    if (this != &that)
+    {
+      SetSize (that.GetSize());
+      memcpy (GetStore(), that.GetArrayBits(), 
+        mLength * sizeof (csBitArrayStorageType));
+    }
+    return *this;
+  }
+
 };
 
 
