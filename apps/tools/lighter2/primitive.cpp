@@ -173,7 +173,7 @@ namespace lighter
     }
 
     fy = (uint)floorf(f->y);
-    ly = (uint)ceilf(l->y);
+    ly = (uint)floorf(l->y+1);
 
     // Clip or reject
     if (fy >= vc) 
@@ -258,7 +258,7 @@ namespace lighter
     ScanConvert (scanBuffer, verts[1], verts[2], vc);
     ScanConvert (scanBuffer, verts[2], verts[0], vc);
 
-    uint maxRow = (uint)ceilf(csMax(verts[0].y, csMax(verts[1].y, verts[2].y)));
+    uint maxRow = (uint)floorf(csMax(verts[0].y, csMax(verts[1].y, verts[2].y))+1);
 
     for (uint row = 0; row < maxRow; ++row)
     {
@@ -267,8 +267,7 @@ namespace lighter
       int max = scanBuffer[row].max;
 
       // Clip
-      if (min >= uc) continue;
-      if (max < 0) continue;
+      if ((max < 0) && (min >= uc)) continue;
 
       if (min < 0)
          min = 0;
@@ -277,18 +276,16 @@ namespace lighter
 
       size_t rowOffset = row*uc;
 
-      // Left border
-      elementClassification.SetBit (2*(rowOffset+min));
-
-      for (int col = (int)(min+1); col < max; ++col)
+      for (int col = min; col <= max; ++col)
       {
-        elementClassification.SetBit (2*(rowOffset+col));
-        if (row > 0 && row < (maxRow-1))
-          elementClassification.SetBit (2*(rowOffset+col)+1);
+        float area = ComputeElementFraction (rowOffset+col);
+        if (area > 0)
+        {
+          elementClassification.SetBit (2*(rowOffset+col));
+          if (area > (1.0f - LITEPSILON))
+            elementClassification.SetBit (2*(rowOffset+col)+1);
+        }
       }
-
-      // Right border
-      elementClassification.SetBit (2*(rowOffset+max));
     }
 
     //PrintElements (elementClassification, uc, vc);
