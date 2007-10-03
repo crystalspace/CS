@@ -12,6 +12,10 @@ chronological order.
 	- res fixed a buffer overrun in lighter2: when clipping a triangle to
 	  a box, the resulting polygon can have up to seven vertices, not just
 	  six. (Really.)
+	- res changed genmesh's "lazy" color allocation to use the vertex 
+	  array capacity, not size. (This works better when the vertex buffer
+	  is "presized" and shrunk again, needed when AddVertex() is to be 
+	  used.)
 02-Oct-2007
 	- res augmented lighter2's element classification algorithm to not 
 	  only rely on the position in the scanline to mark an element as
