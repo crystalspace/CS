@@ -62,7 +62,6 @@ public:
 //-----------------------------------------------------------------------
 
 
-#include "csutil/custom_new_disable.h"
 csEventTimer::csEventTimer (iObjectRegistry* object_reg) : 
   scfImplementationType (this), 
   object_reg (object_reg),
@@ -87,7 +86,6 @@ csEventTimer::csEventTimer (iObjectRegistry* object_reg) :
   minimum_time = 2000000000;
   accumulate_elapsed = 0;
 }
-#include "csutil/custom_new_enable.h"
 
 csEventTimer::~csEventTimer ()
 {
@@ -194,7 +192,6 @@ void csEventTimer::RemoveAllTimerEvents ()
   accumulate_elapsed = 0;
 }
 
-#include "csutil/custom_new_disable.h"
 csPtr<iEventTimer> csEventTimer::GetStandardTimer (iObjectRegistry* object_reg)
 {
   csRef<iEventTimer> timer = csQueryRegistryTagInterface<iEventTimer>
@@ -206,4 +203,4 @@ csPtr<iEventTimer> csEventTimer::GetStandardTimer (iObjectRegistry* object_reg)
   }
   return csPtr<iEventTimer> (timer);
 }
-#include "csutil/custom_new_enable.h"
+

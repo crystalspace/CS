@@ -79,7 +79,6 @@ void csKeyValuePair::SetValue (const char* vname, const char* value)
   }
 }
 
-#include "csutil/custom_new_disable.h"
 csRef<iStringArray> csKeyValuePair::GetValueNames () const
 {
   csRef<iStringArray> ret;
@@ -91,4 +90,3 @@ csRef<iStringArray> csKeyValuePair::GetValueNames () const
   }
   return ret;
 }
-#include "csutil/custom_new_enable.h"

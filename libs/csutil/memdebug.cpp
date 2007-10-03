@@ -1002,7 +1002,7 @@ void operator delete (void* p)
     uintptr_t* rc = ((uintptr_t*)p)-4;
     if (rc[3] != 0xdeadbeef) 
     { 
-      free (p); // Not nice, but at least try.
+      platform_free (p); // Not nice, but at least try.
       return; 
     }
     size_t s = rc[0];
@@ -1018,7 +1018,7 @@ void operator delete[] (void* p)
     uintptr_t* rc = ((uintptr_t*)p)-4;
     if (rc[3] != 0xdeadbeef) 
     { 
-      free (p); // Not nice, but at least try.
+      platform_free (p); // Not nice, but at least try.
       return; 
     }
     size_t s = rc[0];

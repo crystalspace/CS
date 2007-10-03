@@ -32,7 +32,6 @@
 #include "iengine/mesh.h"
 #include "iengine/camera.h"
 
-#include "csutil/custom_new_disable.h"
 csMeshOnTexture::csMeshOnTexture (iObjectRegistry* object_reg)
 {
   engine = csQueryRegistry<iEngine> (object_reg);
@@ -41,7 +40,6 @@ csMeshOnTexture::csMeshOnTexture (iObjectRegistry* object_reg)
   view->SetAutoResize (false);
   cur_w = cur_h = -1;
 }
-#include "csutil/custom_new_enable.h"
 
 csMeshOnTexture::~csMeshOnTexture ()
 {

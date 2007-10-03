@@ -24,11 +24,8 @@
 
 //---------------------------------------------------------------------------
 
-#include "csutil/custom_new_disable.h"
 CS_IMPLEMENT_STATIC_CLASSVAR_REF (csBSPTree, b2fArray, B2fArray, 
   csDirtyAccessArray<int>, ());
-#include "csutil/custom_new_enable.h"
-
 namespace
 {
   CS_IMPLEMENT_STATIC_VAR (TreeNodes, csBlockAllocator<csBSPTree>, (1000));
@@ -189,7 +186,7 @@ void csBSPTree::Build (CS::TriangleIndicesStream<int>& triangles,
     triidx.Push (int (tris.Push (t)));
   }
 
-  Build (tris.GetArray(), planes.GetArray(), (int)tris.GetSize(), vertices, triidx);
+  Build (tris.GetArray(), planes.GetArray(), tris.GetSize(), vertices, triidx);
 }
 
 void csBSPTree::Build (csTriangle* triangles, int num_triangles,

@@ -242,7 +242,6 @@ iBase* csObjectRegistry::Get (char const* tag, scfInterfaceID id, int version)
   return 0;
 }
 
-#include "csutil/custom_new_disable.h"
 csPtr<iObjectRegistryIterator> csObjectRegistry::Get (
 	scfInterfaceID id, int version)
 {
@@ -276,4 +275,4 @@ csPtr<iObjectRegistryIterator> csObjectRegistry::Get ()
   }
   return csPtr<iObjectRegistryIterator> (iterator);
 }
-#include "csutil/custom_new_enable.h"
+

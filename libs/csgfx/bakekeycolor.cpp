@@ -320,7 +320,6 @@ public:
   { *(ptr+ofs) = col; }
 };
 
-#include "csutil/custom_new_disable.h"
 csRef<iImage> csBakeKeyColor::Image (iImage* source, 
 				     const csRGBpixel& transpColor)
 {
@@ -360,7 +359,6 @@ csRef<iImage> csBakeKeyColor::Image (iImage* source,
 #endif
   return result;
 }
-#include "csutil/custom_new_enable.h"
 
 class PixelIORGBA
 {

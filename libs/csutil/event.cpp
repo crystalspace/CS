@@ -119,7 +119,6 @@ uint32 csKeyEventHelper::GetModifiersBits (const csKeyModifiers& m)
   return res;
 }
 
-#include "csutil/custom_new_disable.h"
 csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
   csTicks iTime, csEventID name, csMouseEventType mType, 
   int mx, int my, uint32 axesChanged,
@@ -183,7 +182,6 @@ csEvent *csMouseEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
   ev->Add("keyModifiers", (uint32) modifiers);
   return ev;
 }
-#include "csutil/custom_new_enable.h"
 
 csMouseEventType csMouseEventHelper::GetEventType (const iEvent* event)
 {
@@ -275,7 +273,6 @@ bool csMouseEventHelper::GetEventData (const iEvent* event,
 
 //---------------------------------------------------------------------------
 
-#include "csutil/custom_new_disable.h"
 csEvent *csJoystickEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
   csTicks iTime, csEventID name, int n, 
   int x, int y, uint32 axesChanged, 
@@ -316,7 +313,6 @@ csEvent *csJoystickEventHelper::NewEvent (csRef<iEventNameRegistry> &reg,
   ev->Add("keyModifiers", (uint32) modifiers);
   return ev;
 }
-#include "csutil/custom_new_enable.h"
 
 uint csJoystickEventHelper::GetNumber(const iEvent *event)
 {
@@ -450,7 +446,6 @@ bool csInputEventHelper::GetButtonState (iEventNameRegistry *reg,
 
 //---------------------------------------------------------------------------
 
-#include "csutil/custom_new_disable.h"
 csEvent *csCommandEventHelper::NewEvent (csTicks iTime,
   csEventID name, bool broadcast, intptr_t cInfo)
 {
@@ -458,7 +453,6 @@ csEvent *csCommandEventHelper::NewEvent (csTicks iTime,
   ev->Add("cmdInfo", (int64)cInfo);
   return ev;
 }
-#include "csutil/custom_new_enable.h"
 
 uint csCommandEventHelper::GetCode(const iEvent* event)
 {
@@ -528,7 +522,6 @@ public:
 namespace CS
 {
 
-#include "csutil/custom_new_disable.h"
 csHandlerID RegisterWeakListener (iEventQueue *q, iEventHandler *listener,
   csRef<iEventHandler> &handler)
 {
@@ -549,7 +542,6 @@ csHandlerID RegisterWeakListener (iEventQueue *q, iEventHandler *listener,
   handler.AttachNew (new csWeakEventHandler (listener));
   return q->RegisterListener (handler, ename);
 }
-#include "csutil/custom_new_enable.h"
 
 void RemoveWeakListener (iEventQueue *q, csRef<iEventHandler> &handler)
 {

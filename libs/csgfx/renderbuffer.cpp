@@ -182,7 +182,6 @@ void csRenderBuffer::SetData (const void *data)
   buffer = (unsigned char*)data;
 }
 
-#include "csutil/custom_new_disable.h"
 csRef<csRenderBuffer> csRenderBuffer::CreateRenderBuffer (size_t elementCount, 
   csRenderBufferType type, csRenderBufferComponentType componentType,
   uint componentCount)
@@ -262,7 +261,6 @@ csRef<csRenderBuffer> csRenderBuffer::CreateInterleavedRenderBuffers (size_t ele
   }
   return master;
 }
-#include "csutil/custom_new_enable.h"
 
 const char* csRenderBuffer::GetDescrFromBufferName (csRenderBufferName bufferName)
 {

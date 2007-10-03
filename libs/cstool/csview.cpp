@@ -160,7 +160,6 @@ void csView::Draw (iMeshWrapper* mesh)
   Engine->Draw (Camera, Clipper, mesh);
 }
 
-#include "csutil/custom_new_disable.h"
 void csView::UpdateClipper ()
 {
   if (AutoResize) UpdateView ();
@@ -172,11 +171,8 @@ void csView::UpdateClipper ()
     else
     {
       if (!RectView)
-#include "csutil/custom_new_enable.h"
         RectView = new csBox2 (0, 0, OldWidth - 1, OldHeight - 1);
-#include "csutil/custom_new_disable.h"
       Clipper.AttachNew (new csBoxClipper (*RectView));
-#include "csutil/custom_new_enable.h"
     }
   }
 }

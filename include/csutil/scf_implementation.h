@@ -204,14 +204,12 @@ public:
     return scfRefCount;
   }
 
-#include "csutil/custom_new_disable.h"
   virtual void AddRefOwner (void** ref_owner)
   {
     if (!this->scfWeakRefOwners)
       scfWeakRefOwners = new WeakRefOwnerArray (0);
     scfWeakRefOwners->InsertSorted (ref_owner);
   }
-#include "csutil/custom_new_enable.h"
 
   virtual void RemoveRefOwner (void** ref_owner)
   {

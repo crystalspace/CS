@@ -145,7 +145,6 @@ csProcTexture::~csProcTexture ()
 
 }
 
-#include "csutil/custom_new_disable.h"
 iEventHandler* csProcTexture::SetupProcEventHandler (
 	iObjectRegistry* object_reg)
 {
@@ -229,7 +228,6 @@ bool csProcTexture::Initialize (iObjectRegistry* object_reg)
   ptReady = true;
   return true;
 }
-#include "csutil/custom_new_enable.h"
 
 bool csProcTexture::PrepareAnim ()
 {

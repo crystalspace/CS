@@ -159,7 +159,7 @@ csTriangleMeshEdge* csTriangleMeshTools::CalculateEdges (iTriangleMesh* mesh,
         if (le->vt2 == vt2s)
 	{
 	  // Found!
-	  le->tri2 = (int)i;
+	  le->tri2 = i;
 	  if (prev) prev->next = le->next;
 	  else edge_table[vt1s] = le->next;
 	  le->next = edge_collector;
@@ -185,7 +185,7 @@ csTriangleMeshEdge* csTriangleMeshTools::CalculateEdges (iTriangleMesh* mesh,
 	}
 	le->vt1 = vt1s;
 	le->vt2 = vt2s;
-	le->tri1 = (int)i;
+	le->tri1 = i;
 	le->tri2 = -1;
 	le->next = edge_table[vt1s];
 	edge_table[vt1s] = le;
@@ -456,7 +456,6 @@ bool csTriangleMeshTools::IsMeshClosed (iTriangleMesh* trimesh)
   return (numIncorrect == 0);
 }
 
-#include "csutil/custom_new_disable.h"
 bool csTriangleMeshTools::IsMeshConvex (iTriangleMesh* trimesh)
 {
   size_t num_edges;
@@ -465,7 +464,6 @@ bool csTriangleMeshTools::IsMeshConvex (iTriangleMesh* trimesh)
   size_t pccount = trimesh->GetTriangleCount ();
   csArray<size_t>* adjacent_tris;
   adjacent_tris = new csArray<size_t> [pccount];
-#include "csutil/custom_new_enable.h"
   csTriangle* tris = trimesh->GetTriangles ();
   csVector3* verts = trimesh->GetVertices ();
   size_t i;
@@ -740,7 +738,6 @@ bool csTriangleMeshTools::BoxInClosedMesh (const csBox3& box,
   return true;
 }
 
-#include "csutil/custom_new_disable.h"
 csArray<csArray<int> >* csTriangleMeshTools::CalculateVertexConnections (
     iTriangleMesh* mesh)
 {
@@ -774,4 +771,4 @@ csArray<csArray<int> >* csTriangleMeshTools::CalculateVertexConnections (
   }
   return link_array;
 }
-#include "csutil/custom_new_enable.h"
+

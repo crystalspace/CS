@@ -996,7 +996,6 @@ static bool Debug_TraverseFunc (csKDTree* treenode, void* userdata,
   return true;
 }
 
-#include "csutil/custom_new_disable.h"
 csPtr<iString> csKDTree::Debug_UnitTest ()
 {
   csTicks seed = csGetTicks ();
@@ -1228,7 +1227,6 @@ csPtr<iString> csKDTree::Debug_UnitTest ()
   rc->DecRef ();
   return 0;
 }
-#include "csutil/custom_new_enable.h"
 
 static bool Debug_TraverseFuncBenchmark (csKDTree* treenode, void*,
         uint32 cur_timestamp, uint32&)
@@ -1327,7 +1325,6 @@ void csKDTree::Debug_Statistics (int& tot_objects,
   }
 }
 
-#include "csutil/custom_new_disable.h"
 csPtr<iString> csKDTree::Debug_Statistics ()
 {
   scfString* rc = new scfString ();
@@ -1348,7 +1345,6 @@ csPtr<iString> csKDTree::Debug_Statistics ()
 
   return csPtr<iString> ((iString*)rc);
 }
-#include "csutil/custom_new_enable.h"
 
 void csKDTree::Debug_Dump (csString& str, int indent)
 {

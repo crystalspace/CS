@@ -357,7 +357,6 @@ bool csEvent::RemoveAll()
   return true;
 }
 
-#include "csutil/custom_new_disable.h"
 csRef<iEventAttributeIterator> csEvent::GetAttributeIterator()
 {
   csHash<csEvent::attribute*, csStringID>::GlobalIterator attrIter (
@@ -365,7 +364,6 @@ csRef<iEventAttributeIterator> csEvent::GetAttributeIterator()
   return csPtr<iEventAttributeIterator> (new csEventAttributeIterator (
     attrIter));
 }
-#include "csutil/custom_new_enable.h"
 
 static void IndentLevel(int level)
 {
@@ -425,12 +423,10 @@ bool csEvent::Print (int level)
   return true;
 }
 
-#include "csutil/custom_new_disable.h"
 csRef<iEvent> csEvent::CreateEvent()
 {
   return csPtr<iEvent>(new csEvent());
 }
-#include "csutil/custom_new_enable.h"
 
 //---------------------------------------------------------------------------
 

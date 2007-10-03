@@ -42,10 +42,8 @@ void scfString::ShrinkBestFit ()
 void scfString::Empty ()
 { s.Clear (); }
 
-#include "csutil/custom_new_disable.h"
 csRef<iString> scfString::Clone () const
 { return csPtr<iString>(new scfString (*this)); }
-#include "csutil/custom_new_enable.h"
 
 char const* scfString::GetData () const
 { return s.GetData (); }
@@ -88,7 +86,6 @@ void scfString::Append (char c)
   s.Append(c);
 }
 
-#include "csutil/custom_new_disable.h"
 csRef<iString> scfString::Slice(size_t start, size_t len) const
 {
   if (start==0 && len==(size_t)-1) return Clone();
@@ -102,7 +99,6 @@ csRef<iString> scfString::Slice(size_t start, size_t len) const
   csString const tmp(s.Slice(start, len));
   return csPtr<iString>(new scfString(tmp));
 }
-#include "csutil/custom_new_enable.h"
 
 csRef<iString> scfString::ReverseSlice(size_t start, size_t len) const
 {

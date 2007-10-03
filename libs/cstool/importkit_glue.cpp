@@ -76,7 +76,6 @@ namespace Utility
       return GetTempScratch()->GetData();
     }
 
-#include "csutil/custom_new_disable.h"
     bool Glue::PopulateContainer (const char* filename, 
 				  const char* path, 
 				  ImportKit::Container& container)
@@ -135,7 +134,6 @@ namespace Utility
 
       return container.models.GetSize () > 0;
     }
-#include "csutil/custom_new_enable.h"
 
 #if defined(CS_PLATFORM_WIN32) && !defined(__CYGWIN__)
   #define getcwd  _getcwd

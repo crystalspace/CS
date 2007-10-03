@@ -38,7 +38,6 @@
 #include <iostream>
 #endif
 
-#include "csutil/custom_new_disable.h"
 csEventQueue::csEventQueue (iObjectRegistry* r, size_t iLength) : 
   scfImplementationType (this),
   Registry(r), 
@@ -83,7 +82,6 @@ csEventQueue::csEventQueue (iObjectRegistry* r, size_t iLength) :
     CS_ASSERT(0);
   }
 }
-#include "csutil/custom_new_enable.h"
 
 csEventQueue::~csEventQueue ()
 {
@@ -115,7 +113,6 @@ uint32 csEventQueue::CountPool()
   return count;
 }
 
-#include "csutil/custom_new_disable.h"
 iEvent *csEventQueue::CreateRawEvent ()
 {
   csPoolEvent *e;
@@ -130,7 +127,6 @@ iEvent *csEventQueue::CreateRawEvent ()
   }
   return e;
 }
-#include "csutil/custom_new_enable.h"
 
 csPtr<iEvent> csEventQueue::CreateEvent ()
 {
@@ -447,7 +443,6 @@ void csEventQueue::RemoveAllListeners ()
   EventTree = csEventTree::CreateRootNode (HandlerRegistry, NameRegistry, this);
 }
 
-#include "csutil/custom_new_disable.h"
 csPtr<iEventOutlet> csEventQueue::CreateEventOutlet (iEventPlug* plug)
 {
   csEventOutlet* outlet = 0;
@@ -458,14 +453,12 @@ csPtr<iEventOutlet> csEventQueue::CreateEventOutlet (iEventPlug* plug)
   }
   return outlet;
 }
-#include "csutil/custom_new_enable.h"
 
 iEventOutlet* csEventQueue::GetEventOutlet()
 {
   return EventOutlets.Get(0);
 }
 
-#include "csutil/custom_new_disable.h"
 iEventCord* csEventQueue::GetEventCord (const csEventID &name)
 {
   csEventCord *cord = EventCords.Get (name, 0);
@@ -477,5 +470,4 @@ iEventCord* csEventQueue::GetEventCord (const csEventID &name)
   }
   return cord;
 }
-#include "csutil/custom_new_enable.h"
 

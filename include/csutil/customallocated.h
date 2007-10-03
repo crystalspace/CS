@@ -19,8 +19,6 @@
 #ifndef __CS_CSUTIL_CUSTOMALLOCATED_H__
 #define __CS_CSUTIL_CUSTOMALLOCATED_H__
 
-#include "csutil/custom_new_disable.h" 
-
 /**\file
  * Base class to allocate subclasses with cs_malloc().
  */
@@ -81,7 +79,5 @@ namespace CS
     };
   } // namespace Memory
 } // namespace CS
-
-#include "csutil/custom_new_enable.h" 
 
 #endif // __CS_CSUTIL_CUSTOMALLOCATED_H__

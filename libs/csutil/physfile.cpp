@@ -190,9 +190,7 @@ csPtr<iDataBuffer> csPhysicalFile::GetAllData(bool nullterm)
       {
         if (nullterm)
           buff[nread] = '\0';
-#include "csutil/custom_new_disable.h"
         data = new csDataBuffer(buff, nread + (nullterm ? 1 : 0));
-#include "csutil/custom_new_enable.h"
       }
       else
         delete[] buff;

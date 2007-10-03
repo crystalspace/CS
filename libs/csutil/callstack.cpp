@@ -30,13 +30,11 @@
 #endif
 
 #ifdef CS_PLATFORM_WIN32
-#include "win32/callstack-dbghelp.h"
-#include "csutil/custom_new_disable.h"
+  #include "win32/callstack-dbghelp.h"
   CS_IMPLEMENT_STATIC_VAR(cscDbgHelp, 
 			  CS::Debug::CallStackCreatorDbgHelp, ())
   CS_IMPLEMENT_STATIC_VAR(csnrDbgHelp, 
 			  CS::Debug::CallStackNameResolverDbgHelp, ())
-#include "csutil/custom_new_enable.h"
 
   #ifdef CS_HAVE_LIBBFD
     #include "win32/callstack-bfd.h"
@@ -154,7 +152,6 @@ using namespace CS::Debug;
 
 typedef iCallStackCreator* (*CreatorGetter)();
 
-#include "csutil/custom_new_disable.h"
 csCallStack* csCallStackHelper::CreateCallStack (int skip, bool fast)
 {
   skip += 1; /* Adjust for this function */
@@ -176,4 +173,3 @@ csCallStack* csCallStackHelper::CreateCallStack (int skip, bool fast)
   delete stack;
   return 0;
 }
-#include "csutil/custom_new_enable.h"

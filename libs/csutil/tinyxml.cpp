@@ -257,7 +257,7 @@ TiDocumentNode* TiDocumentNode::NextSibling( const char * value ) const
   return 0;
 }
 
-#include "csutil/custom_new_disable.h"
+
 csPtr<TiDocumentNode> TiDocumentNodeChildren::Identify( ParseInfo& parse,
 	const char* p )
 {
@@ -319,7 +319,6 @@ csPtr<TiDocumentNode> TiDocumentNodeChildren::Identify( ParseInfo& parse,
   }
   return returnNode;
 }
-#include "csutil/custom_new_enable.h"
 
 // -------------------------------------------------------------------------
 TiDocumentNodeChildren::TiDocumentNodeChildren ()
@@ -669,7 +668,6 @@ const char* TiXmlElement::Print( PrintState& print, int depth ) const
   return 0;
 }
 
-#include "csutil/custom_new_disable.h"
 csPtr<TiDocumentNode> TiXmlElement::Clone(TiDocument* document) const
 {
   csRef<TiXmlElement> clone;
@@ -699,6 +697,7 @@ csPtr<TiDocumentNode> TiXmlElement::Clone(TiDocument* document) const
   }
   return csPtr<TiDocumentNode> (clone);
 }
+
 
 TiDocument::TiDocument() :
   deleteNest (0),
@@ -755,7 +754,6 @@ csPtr<TiDocumentNode> TiDocument::Clone(TiDocument* document) const
   }
   return csPtr<TiDocumentNode> (clone);
 }
-#include "csutil/custom_new_enable.h"
 
 class PrintOutString : public iPrintOutput
 {
@@ -895,7 +893,6 @@ const char* TiXmlComment::Print( PrintState& print, int depth ) const
   return StrPrintf ( print, "<!--%s-->", value );
 }
 
-#include "csutil/custom_new_disable.h"
 csPtr<TiDocumentNode> TiXmlComment::Clone(TiDocument* document) const
 {
   csRef<TiXmlComment> clone;
@@ -908,7 +905,6 @@ csPtr<TiDocumentNode> TiXmlComment::Clone(TiDocument* document) const
   CopyToClone( clone );
   return csPtr<TiDocumentNode> (clone);
 }
-#include "csutil/custom_new_enable.h"
 
 
 void TiXmlText::SetValue (const char * name)
@@ -943,7 +939,7 @@ const char* TiXmlText::Print( PrintState& print, int /*depth*/ ) const
   }
 }
 
-#include "csutil/custom_new_disable.h"
+
 csPtr<TiDocumentNode> TiXmlText::Clone(TiDocument* document) const
 {  
   csRef<TiXmlText> clone;
@@ -956,7 +952,7 @@ csPtr<TiDocumentNode> TiXmlText::Clone(TiDocument* document) const
   CopyToClone( clone );
   return csPtr<TiDocumentNode> (clone);
 }
-#include "csutil/custom_new_enable.h"
+
 
 TiXmlDeclaration::TiXmlDeclaration( const char * _version,
   const char * _encoding,
@@ -993,7 +989,6 @@ const char* TiXmlDeclaration::Print( PrintState& print, int /*depth*/ ) const
   return StrPuts (print, "?>");
 }
 
-#include "csutil/custom_new_disable.h"
 csPtr<TiDocumentNode> TiXmlDeclaration::Clone(TiDocument* document) const
 {  
   csRef<TiXmlDeclaration> clone;
@@ -1009,6 +1004,7 @@ csPtr<TiDocumentNode> TiXmlDeclaration::Clone(TiDocument* document) const
   clone->standalone = standalone;
   return csPtr<TiDocumentNode> (clone);
 }
+
 
 const char* TiXmlUnknown::Print( PrintState& print, int depth ) const
 {
@@ -1033,7 +1029,7 @@ csPtr<TiDocumentNode> TiXmlUnknown::Clone(TiDocument* document) const
   CopyToClone( clone );
   return csPtr<TiDocumentNode> (clone);
 }
-#include "csutil/custom_new_enable.h"
+
 
 size_t TiDocumentAttributeSet::Find (const char * name) const
 {

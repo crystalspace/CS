@@ -339,7 +339,6 @@ inline void csList<T, MemoryAllocator>::DeleteAll ()
   head.p = tail = 0;
 }
 
-#include "csutil/custom_new_disable.h"
 /// Add one item last in the list
 template <class T, class MemoryAllocator>
 inline typename csList<T, MemoryAllocator>::Iterator 
@@ -353,7 +352,6 @@ inline typename csList<T, MemoryAllocator>::Iterator
   tail = el;
   return Iterator(el);
 }
-#include "csutil/custom_new_enable.h"
 
 /// Add one item first in the list
 template <class T, class MemoryAllocator>

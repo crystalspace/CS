@@ -49,16 +49,16 @@ static void AppendOrSetData (iGeneralFactoryState* factory, bool append,
     for (i = 0 ; i < mesh_triangles.GetSize () ; i++)
     {
       csTriangle tri = mesh_triangles[i];
-      tri.a += (int)cur_vt_count;
-      tri.b += (int)cur_vt_count;
-      tri.c += (int)cur_vt_count;
+      tri.a += cur_vt_count;
+      tri.b += cur_vt_count;
+      tri.c += cur_vt_count;
       factory->AddTriangle (tri);
     }
   }
   else
   {
-    factory->SetVertexCount ((int)mesh_vertices.GetSize ());
-    factory->SetTriangleCount ((int)mesh_triangles.GetSize ());
+    factory->SetVertexCount (mesh_vertices.GetSize ());
+    factory->SetTriangleCount (mesh_triangles.GetSize ());
     memcpy (factory->GetVertices (), mesh_vertices.GetArray (),
       sizeof (csVector3) * mesh_vertices.GetSize ());
     memcpy (factory->GetTexels (), mesh_texels.GetArray (),

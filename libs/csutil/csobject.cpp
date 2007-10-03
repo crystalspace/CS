@@ -159,7 +159,6 @@ void csObject::SetObjectParent (iObject *obj)
   ParentObject = obj;
 }
 
-#include "csutil/custom_new_disable.h"
 void csObject::ObjAdd (iObject *obj)
 {
   if (!obj)
@@ -171,7 +170,6 @@ void csObject::ObjAdd (iObject *obj)
   obj->SetObjectParent (this);
   Children->Push (obj);
 }
-#include "csutil/custom_new_enable.h"
 
 void csObject::ObjRemove (iObject *obj)
 {
@@ -304,12 +302,10 @@ iObject* csObject::GetChild (int iInterfaceID, int iVersion,
   return 0;
 }
 
-#include "csutil/custom_new_disable.h"
 csPtr<iObjectIterator> csObject::GetIterator ()
 {
   return csPtr<iObjectIterator> (new csObjectIterator (this));
 }
-#include "csutil/custom_new_enable.h"
 
 void csObject::FireNameChangeListeners (const char* oldname,
 	const char* newname)

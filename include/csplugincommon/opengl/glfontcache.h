@@ -95,12 +95,10 @@ class CS_CSPLUGINCOMMON_GL_EXPORT csGLFontCache : public csFontCache
     { 
       delete glyphRects; 
     }
-#include "csutil/custom_new_disable.h"
     void InitRects (int size) 
-    {
+    { 
       glyphRects = new CS::SubRectangles (csRect (0, 0, size, size));
     }
-#include "csutil/custom_new_enable.h"
   };
   csArray<CacheTexture> textures;
   csBlockAllocator<GLGlyphCacheData> cacheDataAlloc;

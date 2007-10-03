@@ -67,7 +67,6 @@ namespace CS
     return img;
   }
   
-#include "csutil/custom_new_disable.h"
   void UberScreenshotMaker::Setup (iCamera* camera, iEngine* engine, 
     iGraphics3D* g3d)
   {
@@ -135,4 +134,3 @@ namespace CS
     return csPtr<iImage> (PostProcessImage (finalImage));
   }
 }
-#include "csutil/custom_new_enable.h"
