@@ -31,6 +31,11 @@ chronological order.
 	  - Added a workspace containing the Python-related projects as well.
 	- caedes tweaked swig.jam rules to use a <language>freeze target, 
 	  which freezes all swig files relative to that language.
+	- caedes modified jobber-svn cel and cs files to use the
+	  <language>freeze target from above, also removed the pycscegui
+	  explicit freeze as it is included in the global target now,
+	  finally, fixed bad folder specification for the pythonfreeze (was 
+	  still only using cscript/cspython/).
 01-Oct-2007
         - Mike Gist reversed the loops in csSector::UnlinkObjects() to avoid
           meshes being skipped if sl->Remove() removes a mesh object from the
