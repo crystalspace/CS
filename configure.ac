@@ -14,7 +14,7 @@ AC_PREREQ([2.56])
 #       Also, mk/autoconf/crystal.m4 should be updated with the current version
 #         number.
 #------------------------------------------------------------------------------
-m4_define([cs_version_number], [1.2rc3])
+m4_define([cs_version_number], [1.2])
 
 
 
