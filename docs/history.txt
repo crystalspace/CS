@@ -6,6 +6,9 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+03-Oct-2007
+	- caedes changed all python tutorials to use opengl instead of
+	  software rendering.
 02-Oct-2007
 	- res augmented lighter2's element classification algorithm to not 
 	  only rely on the position in the scanline to mark an element as
