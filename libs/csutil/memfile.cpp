@@ -173,4 +173,4 @@ csPtr<iDataBuffer> csMemFile::GetAllData (bool nullterm)
     }
   }
 }
-#include "csutil/custom_new_disable.h"
+#include "csutil/custom_new_enable.h"
