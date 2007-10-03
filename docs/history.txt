@@ -36,6 +36,9 @@ chronological order.
 	  explicit freeze as it is included in the global target now,
 	  finally, fixed bad folder specification for the pythonfreeze (was 
 	  still only using cscript/cspython/).
+	- caedes moved pycscegui frozen .py file to 
+	  scripts/python/frozen/cspace/, and adapted pyceguitest tutorial to
+	  account for its new location.
 01-Oct-2007
         - Mike Gist reversed the loops in csSector::UnlinkObjects() to avoid
           meshes being skipped if sl->Remove() removes a mesh object from the
