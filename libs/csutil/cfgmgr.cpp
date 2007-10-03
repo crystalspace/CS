@@ -215,6 +215,8 @@ public:
      strcasecmp(currentValue, "on"  ) == 0 ||
      strcasecmp(currentValue, "1"   ) == 0));
   }
+
+#include "csutil/custom_new_disable.h"
   virtual csPtr<iStringArray> GetTuple() const
   {
     if (!currentValue)
@@ -246,6 +248,8 @@ public:
     csPtr<iStringArray> v(items);
     return v;
   }
+#include "csutil/custom_new_enable.h"
+
   virtual const char *GetComment() const
   {
     return currentComment ? currentComment : 0;
@@ -266,7 +270,9 @@ csConfigManager::csConfigManager(iConfigFile *dyn, bool opt)
 
   csRef<iConfigFile> dyndom(dyn);
   if (!dyndom.IsValid())
+#include "csutil/custom_new_disable.h"
     dyndom.AttachNew(new csConfigFile);
+#include "csutil/custom_new_enable.h"
   AddDomain(dyndom, PriorityMedium);
   DynamicDomain = FindConfig(dyndom);
 }
@@ -304,6 +310,7 @@ void csConfigManager::AddDomain(iConfigFile *Config, int Priority)
   }
 }
 
+#include "csutil/custom_new_disable.h"
 iConfigFile* csConfigManager::AddDomain(
   char const* path, iVFS* vfs, int priority)
 {
@@ -330,6 +337,7 @@ iConfigFile* csConfigManager::AddDomain(
   AddDomain(cfg, priority);
   return cfg; // Safe since we still hold a reference.
 }
+#include "csutil/custom_new_enable.h"
 
 void csConfigManager::RemoveDomain(iConfigFile *cfg)
 {
@@ -452,12 +460,14 @@ void csConfigManager::Clear()
       d->Cfg->Clear();
 }
 
+#include "csutil/custom_new_disable.h"
 csPtr<iConfigIterator> csConfigManager::Enumerate(const char *Subsection)
 {
   iConfigIterator *it = new csConfigManagerIterator(this, Subsection);
   Iterators.Push(it);
   return csPtr<iConfigIterator> (it);
 }
+#include "csutil/custom_new_enable.h"
 
 bool csConfigManager::KeyExists(const char *Key) const
 {

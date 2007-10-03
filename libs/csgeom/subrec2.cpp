@@ -767,9 +767,11 @@ void SubRectangles::Dump (iObjectRegistry* object_reg, const char* tag)
   csRGBpixel* newpal = new csRGBpixel[256];
   memcpy (newpal, pal, sizeof (pal));
 
+#include "csutil/custom_new_disable.h"
   csImageMemory* img = 
     new csImageMemory (w, h, (new uint8[w * h]),
     true, CS_IMGFMT_PALETTED8, newpal);
+#include "csutil/custom_new_enable.h"
 
   uint8* data = (uint8*)img->GetImageData ();
   memset (data, 0, w * h);
@@ -777,9 +779,11 @@ void SubRectangles::Dump (iObjectRegistry* object_reg, const char* tag)
   newpal = new csRGBpixel[256];
   memcpy (newpal, pal, sizeof (pal));
 
+#include "csutil/custom_new_disable.h"
   csImageMemory* img2 = 
     new csImageMemory (w, h, (new uint8[w * h]),
     true, CS_IMGFMT_PALETTED8, newpal);
+#include "csutil/custom_new_enable.h"
 
   uint8* data2 = (uint8*)img2->GetImageData ();
   memset (data2, 0, w * h);
@@ -787,9 +791,11 @@ void SubRectangles::Dump (iObjectRegistry* object_reg, const char* tag)
   newpal = new csRGBpixel[256];
   memcpy (newpal, pal, sizeof (pal));
 
+#include "csutil/custom_new_disable.h"
   csImageMemory* img3 = 
     new csImageMemory (w, h, (new uint8[w * h]),
     true, CS_IMGFMT_PALETTED8, newpal);
+#include "csutil/custom_new_enable.h"
 
   uint8* data3 = (uint8*)img3->GetImageData ();
   memset (data3, 0, w * h);

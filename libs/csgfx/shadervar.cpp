@@ -34,6 +34,7 @@ csShaderVariable::csShaderVariable (csStringID name) :
 {
 }
 
+#include "csutil/custom_new_disable.h"
 csShaderVariable& csShaderVariable::operator= (const csShaderVariable& copyFrom)
 {
   Name = copyFrom.Name;
@@ -64,3 +65,4 @@ csShaderVariable& csShaderVariable::operator= (const csShaderVariable& copyFrom)
   }
   return *this;
 }
+#include "csutil/custom_new_enable.h"

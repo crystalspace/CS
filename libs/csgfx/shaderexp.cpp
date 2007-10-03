@@ -351,6 +351,7 @@ bool csShaderExpression::Parse(iDocumentNode * node)
   return true;
 }
 
+#include "csutil/custom_new_disable.h"
 bool csShaderExpression::Evaluate(csShaderVariable* var, 
                                   csShaderVarStack& stacks)
 {
@@ -359,6 +360,7 @@ bool csShaderExpression::Evaluate(csShaderVariable* var,
     csShaderVarStack> (stacks));
   return Evaluate (var, wrapStacks);
 }
+#include "csutil/custom_new_enable.h"
 
 bool csShaderExpression::Evaluate(csShaderVariable* var, 
                                   iShaderVarStack* stacks)

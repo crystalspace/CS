@@ -561,6 +561,7 @@ static BOOL CALLBACK EnumSymCallbackNames (SYMBOL_INFO* pSymInfo,
   return TRUE;
 }
 
+#include "csutil/custom_new_disable.h"
 void* CallStackNameResolverDbgHelp::OpenParamSymbols (void* addr)
 {
   IMAGEHLP_STACK_FRAME stackFrame;
@@ -598,6 +599,7 @@ void* CallStackNameResolverDbgHelp::OpenParamSymbols (void* addr)
   }
   return 0;
 }
+#include "csutil/custom_new_enable.h"
 
 bool CallStackNameResolverDbgHelp::GetParamName (void* h, size_t n, csString& str)
 {
@@ -649,6 +651,7 @@ bool CallStackNameResolverDbgHelp::GetLineNumber (void* addr, csString& str)
 
 using namespace CS::Debug;
 
+#include "csutil/custom_new_disable.h"
 csCallStack* cswinCallStackHelper::CreateCallStack (HANDLE hProc, 
                                                     HANDLE hThread, 
                                                     CONTEXT& context,
@@ -662,4 +665,4 @@ csCallStack* cswinCallStackHelper::CreateCallStack (HANDLE hProc,
   delete stack;
   return 0;
 }
-
+#include "csutil/custom_new_enable.h"

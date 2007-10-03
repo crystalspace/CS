@@ -41,10 +41,12 @@ void csFontCache::FontDeleteNotify::BeforeDelete (iFont* font)
 
 //---------------------------------------------------------------------------
 
+#include "csutil/custom_new_disable.h"
 csFontCache::csFontCache () : head (0), tail (0), LRUAlloc (512)
 {
   deleteCallback = new FontDeleteNotify (this);
 }
+#include "csutil/custom_new_enable.h"
 
 csFontCache::~csFontCache ()
 {

@@ -1213,6 +1213,7 @@ csGeomDebugHelper::~csGeomDebugHelper ()
     return csPtr<iString> (rc); \
   }
 
+#include "csutil/custom_new_disable.h"
 csPtr<iString> csGeomDebugHelper::UnitTest ()
 {
   scfString* rc = new scfString ();
@@ -1253,3 +1254,4 @@ csPtr<iString> csGeomDebugHelper::UnitTest ()
 
   return 0;
 }
+#include "csutil/custom_new_enable.h"

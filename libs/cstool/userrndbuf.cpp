@@ -82,6 +82,7 @@ public:
   void Reset();
 };
 
+#include "csutil/custom_new_disable.h"
 csRef<iUserRenderBufferIterator> csUserRenderBufferManager::GetBuffers() const
 {
   csRef<BufferNameIter> newIter;
@@ -93,6 +94,7 @@ csRef<iUserRenderBufferIterator> csUserRenderBufferManager::GetBuffers() const
   }
   return newIter;
 }
+#include "csutil/custom_new_enable.h"
 
 //---------------------------------------------------------------------------
 

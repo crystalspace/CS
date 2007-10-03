@@ -64,6 +64,7 @@ csMemFile::csMemFile()
 { 
 }
 
+#include "csutil/custom_new_disable.h"
 csMemFile::csMemFile(const char* p, size_t s)
   : scfImplementationType (this),
   size(s), cursor(0), copyOnWrite (true)
@@ -142,6 +143,7 @@ size_t csMemFile::Write(const char* Data, size_t DataSize)
   }
   return written;
 }
+#include "csutil/custom_new_enable.h"
 
 csPtr<iDataBuffer> csMemFile::GetAllData (bool nullterm)
 {
@@ -151,6 +153,7 @@ csPtr<iDataBuffer> csMemFile::GetAllData (bool nullterm)
     if (buffer)
       memcpy (data, buffer->GetData(), size);
     *(data + size) = 0;
+#include "csutil/custom_new_disable.h"
     iDataBuffer *db = new csDataBuffer (data, size);
     return csPtr<iDataBuffer> (db);
   }
@@ -170,4 +173,4 @@ csPtr<iDataBuffer> csMemFile::GetAllData (bool nullterm)
     }
   }
 }
-
+#include "csutil/custom_new_disable.h"

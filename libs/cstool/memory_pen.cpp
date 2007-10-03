@@ -8,7 +8,8 @@ enum { PEN_OP_NOP = 0, PEN_OP_SETFLAG, PEN_OP_CLEARFLAG, PEN_OP_SETMIXMODE,
        PEN_OP_SETORIGIN, PEN_OP_TRANSLATE, PEN_OP_ROTATE, PEN_OP_DRAWLINE, PEN_OP_DRAWPOINT,
        PEN_OP_DRAWRECT, PEN_OP_DRAWMITEREDRECT, PEN_OP_DRAWROUNDRECT,
        PEN_OP_DRAWARC, PEN_OP_DRAWTRIANGLE, PEN_OP_WRITE, PEN_OP_WRITEBOXED };
-       
+
+#include "csutil/custom_new_disable.h"
 /** Clears the draw buffer out. */
 void csMemoryPen::Clear() 
 {
@@ -23,6 +24,7 @@ void csMemoryPen::Clear()
 	ClearFlag(0xffffffff);
 	SetMixMode(CS_FX_ALPHA);
 }
+#include "csutil/custom_new_enable.h"
 
 
 void  csMemoryPen::Draw(iPen *_pen) 

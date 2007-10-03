@@ -139,6 +139,7 @@ bool csInitializer::InitializeSCF (int argc, const char* const argv[])
   return true;
 }
 
+#include "csutil/custom_new_disable.h"
 iObjectRegistry* csInitializer::CreateObjectRegistry ()
 {
   return new csObjectRegistry ();
@@ -350,6 +351,7 @@ bool csInitializer::SetupConfigManager (
   config_done = true;
   return true;
 }
+#include "csutil/custom_new_enable.h"
 
 bool csInitializer::RequestPlugins (iObjectRegistry* r, ...)
 {
@@ -434,7 +436,7 @@ public:
   CS_EVENTHANDLER_NIL_CONSTRAINTS
 };
 
-
+#include "csutil/custom_new_disable.h"
 bool csInitializer::SetupEventHandler (
   iObjectRegistry* r, 
   csEventHandlerFunc evhdlr_func, 
@@ -444,6 +446,7 @@ bool csInitializer::SetupEventHandler (
   evhdlr.AttachNew (new csAppEventHandler (evhdlr_func));
   return SetupEventHandler (r, evhdlr, events);
 }
+#include "csutil/custom_new_enable.h"
 
 bool csInitializer::SetupEventHandler (iObjectRegistry* r, csEventHandlerFunc evhdlr_func)
 {

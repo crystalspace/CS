@@ -130,6 +130,7 @@ bool csEventNameRegistry::IsKindOf(const csEventID child,
   return false;
 }
 
+#include "csutil/custom_new_disable.h"
 csRef<iEventNameRegistry> csEventNameRegistry::GetRegistry (
   iObjectRegistry *object_reg) 
 {
@@ -143,6 +144,7 @@ csRef<iEventNameRegistry> csEventNameRegistry::GetRegistry (
   CS_ASSERT (name_reg != 0);
   return name_reg;
 }
+#include "csutil/custom_new_enable.h"
 
 
 /* 

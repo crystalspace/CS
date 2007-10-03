@@ -21,6 +21,7 @@ chronological order.
 	  is a weak ref one anyway, 0 items are now weeded out lazily. This
 	  makes texture removal slightly more efficient due the saving of an
 	  array search.
+        - Mike Gist fixed libs to compile with the Memory Tracker.
 02-Oct-2007
 	- res augmented lighter2's element classification algorithm to not 
 	  only rely on the position in the scanline to mark an element as

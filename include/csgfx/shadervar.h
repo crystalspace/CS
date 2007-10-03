@@ -439,7 +439,7 @@ public:
   {
     if (array) array->DeleteIndex (element);
   }
-
+#include "csutil/custom_new_disable.h"
   /// Set the number of elements in an array variable
   void SetArraySize (size_t size)
   {
@@ -449,6 +449,7 @@ public:
     }
     array->SetSize (size);
   }
+#include "csutil/custom_new_enable.h"
 
   /// Get the number of elements in an array variable
   size_t GetArraySize ()

@@ -423,7 +423,7 @@ const char* TiXmlElement::Parse( ParseInfo& parse, const char* p )
   return p;
 }
 
-
+#include "csutil/custom_new_disable.h"
 const char* TiXmlElement::ReadValue( ParseInfo& parse, const char* p )
 {
   char const* orig_p;
@@ -519,6 +519,7 @@ const char* TiXmlElement::ReadValue( ParseInfo& parse, const char* p )
   }  
   return p;
 }
+#include "csutil/custom_new_enable.h"
 
 
 const char* TiXmlUnknown::Parse( ParseInfo& parse, const char* p )

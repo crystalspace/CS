@@ -24,6 +24,7 @@
 #include "csqint.h"
 #include "csgfx/xorpat.h"
 
+#include "csutil/custom_new_disable.h"
 csPtr<iImage> csCreateXORPatternImage(int width, int height, int recdepth,
 				      float red, float green, float blue)
 {
@@ -53,5 +54,4 @@ csPtr<iImage> csCreateXORPatternImage(int width, int height, int recdepth,
 
   return csPtr<iImage> ((iImage*)image);
 }
-
-
+#include "csutil/custom_new_enable.h"
