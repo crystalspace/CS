@@ -198,6 +198,7 @@ bool csConfigNode::GetBool() const
      strcasecmp(Data, "1"   ) == 0));
 }
 
+#include "csutil/custom_new_disable.h"
 csPtr<iStringArray> csConfigNode::GetTuple() const
 {
   if (!Data)
@@ -229,6 +230,7 @@ csPtr<iStringArray> csConfigNode::GetTuple() const
   csPtr<iStringArray> v(items);
   return v;
 }
+#include "csutil/custom_new_enable.h"
 
 const char *csConfigNode::GetComment() const
 {
@@ -405,7 +407,7 @@ const char *csConfigIterator::GetComment() const
 }
 
 /* configuation object */
-
+#include "csutil/custom_new_disable.h"
 void csConfigFile::InitializeObject ()
 {
   FirstNode = new csConfigNode(0);
@@ -417,6 +419,7 @@ void csConfigFile::InitializeObject ()
   Dirty = false;
   EOFComment = 0;
 }
+#include "csutil/custom_new_enable.h"
 
 csConfigFile::csConfigFile(iBase *pBase)
   : scfImplementationType (this, pBase)
@@ -603,12 +606,14 @@ void csConfigFile::Clear()
   Dirty = true;
 }
 
+#include "csutil/custom_new_disable.h"
 csPtr<iConfigIterator> csConfigFile::Enumerate(const char *Subsection)
 {
   csConfigIterator *it = new csConfigIterator(this, Subsection);
   Iterators->Push(it);
   return csPtr<iConfigIterator> (it);
 }
+#include "csutil/custom_new_enable.h"
 
 bool csConfigFile::KeyExists(const char *Key) const
 {
@@ -782,6 +787,7 @@ void csConfigFile::DeleteKey(const char *Name)
   Dirty = true;
 }
 
+#include "csutil/custom_new_disable.h"
 bool csConfigFile::LoadNow(const char *fName, iVFS *vfs, bool overwrite)
 {
   // load the file buffer
@@ -803,6 +809,7 @@ bool csConfigFile::LoadNow(const char *fName, iVFS *vfs, bool overwrite)
 
   return true;
 }
+#include "csutil/custom_new_enable.h"
 
 void csConfigFile::LoadFromBuffer(const char *Filedata, bool overwrite)
 {
@@ -891,6 +898,7 @@ csConfigNode *csConfigFile::FindNode(const char *Name, bool isSubsection) const
   return 0;
 }
 
+#include "csutil/custom_new_disable.h"
 csConfigNode *csConfigFile::CreateNode(const char *Name)
 {
   if (!Name) return 0;
@@ -900,6 +908,7 @@ csConfigNode *csConfigFile::CreateNode(const char *Name)
   Dirty = true;
   return n;
 }
+#include "csutil/custom_new_enable.h"
 
 void csConfigFile::RemoveIterator(csConfigIterator *it) const
 {
@@ -920,6 +929,7 @@ const char *csConfigFile::GetEOFComment() const
   return EOFComment;
 }
 
+#include "csutil/custom_new_disable.h"
 void csConfigFile::ParseCommandLine (iCommandLineParser* cmdline, iVFS* vfs,
                                      bool Merge, bool NewWins)
 {
@@ -974,3 +984,4 @@ void csConfigFile::ParseCommandLine (iCommandLineParser* cmdline, iVFS* vfs,
     Dirty = false;
   }
 }
+#include "csutil/custom_new_enable.h"

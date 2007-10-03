@@ -359,6 +359,7 @@ void csKeyboardDriver::RestoreKeys ()
    */
 }
 
+#include "csutil/custom_new_disable.h"
 void csKeyboardDriver::DoKey (utf32_char codeRaw, utf32_char codeCooked, 
 			      bool iDown, bool autoRepeat, 
 			      csKeyCharType charType)
@@ -400,6 +401,7 @@ void csKeyboardDriver::DoKey (utf32_char codeRaw, utf32_char codeCooked,
 
   if (iDown) SetKeyState (codeRaw, iDown, autoRepeat);
 }
+#include "csutil/custom_new_enable.h"
 
 void csKeyboardDriver::SynthesizeCooked (utf32_char codeRaw, 
 					 const csKeyModifiers& modifiers, 
@@ -574,10 +576,12 @@ uint32 csKeyboardDriver::GetModifierState (utf32_char codeRaw) const
   return 0;
 }
 
+#include "csutil/custom_new_disable.h"
 csPtr<iKeyComposer> csKeyboardDriver::CreateKeyComposer ()
 {
   return csPtr<iKeyComposer> (new csKeyComposer ());
 }
+#include "csutil/custom_new_enable.h"
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--> Mouse driver <--//--/
 

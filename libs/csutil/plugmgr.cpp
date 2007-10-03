@@ -236,6 +236,7 @@ bool csPluginManager::RegisterPlugin (const char *classID,
   }
 }
 
+#include "csutil/custom_new_disable.h"
 csPtr<iPluginIterator> csPluginManager::GetPlugins ()
 {
   CS::Threading::RecursiveMutexScopedLock lock (mutex);
@@ -247,6 +248,7 @@ csPtr<iPluginIterator> csPluginManager::GetPlugins ()
   }
   return csPtr<iPluginIterator> (it);
 }
+#include "csutil/custom_new_enable.h"
 
 iBase *csPluginManager::QueryPlugin (const char *iInterface, int iVersion)
 {

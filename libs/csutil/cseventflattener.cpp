@@ -501,7 +501,9 @@ csEventFlattenerError csEventFlattener::Unflatten (iObjectRegistry *object_reg,
           b.Read((char *)&ui64, sizeof (uint64));
           ui64 = csLittleEndian::Convert (ui64);
 	  csRef<iEvent> e;
+#include "csutil/custom_new_disable.h"
 	  e.AttachNew (new csEvent ());
+#include "csutil/custom_new_enable.h"
 	  event->Add (name, e);
 	  csEventFlattenerError unflattenResult = 
 	    Unflatten (object_reg, e, 

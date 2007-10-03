@@ -41,11 +41,13 @@ csTinyDocumentSystem::~csTinyDocumentSystem ()
 {
 }
 
+#include "csutil/custom_new_disable.h"
 csRef<iDocument> csTinyDocumentSystem::CreateDocument ()
 {
   csRef<iDocument> doc (csPtr<iDocument> (new csTinyXmlDocument (this)));
   return doc;
 }
+#include "csutil/custom_new_enable.h"
 
 //------------------------------------------------------------------------
 
@@ -77,6 +79,7 @@ bool csTinyXmlAttributeIterator::HasNext ()
   return current != (size_t)-1;
 }
 
+#include "csutil/custom_new_disable.h"
 csRef<iDocumentAttribute> csTinyXmlAttributeIterator::Next ()
 {
   csRef<iDocumentAttribute> attr;
@@ -90,6 +93,7 @@ csRef<iDocumentAttribute> csTinyXmlAttributeIterator::Next ()
   }
   return attr;
 }
+#include "csutil/custom_new_enable.h"
 
 //------------------------------------------------------------------------
 
@@ -219,6 +223,7 @@ void csTinyXmlNode::SetValueAsFloat (float value)
   node->SetValue (buf);
 }
 
+#include "csutil/custom_new_disable.h"
 csRef<iDocumentNodeIterator> csTinyXmlNode::GetNodes ()
 {
   csRef<iDocumentNodeIterator> it;
@@ -234,6 +239,7 @@ csRef<iDocumentNodeIterator> csTinyXmlNode::GetNodes (const char* value)
   	doc, this, value));
   return it;
 }
+#include "csutil/custom_new_enable.h"
 
 csRef<iDocumentNode> csTinyXmlNode::GetNode (const char* value)
 {
@@ -421,6 +427,7 @@ float csTinyXmlNode::GetContentsValueAsFloat ()
   return val;
 }
 
+#include "csutil/custom_new_disable.h"
 csRef<iDocumentAttributeIterator> csTinyXmlNode::GetAttributes ()
 {
   csRef<iDocumentAttributeIterator> it;
@@ -455,6 +462,7 @@ csRef<iDocumentAttribute> csTinyXmlNode::GetAttribute (const char* name)
   }
   return attr;
 }
+#include "csutil/custom_new_enable.h"
 
 const char* csTinyXmlNode::GetAttributeValue (const char* name)
 {
@@ -545,12 +553,14 @@ void csTinyXmlDocument::Clear ()
   root.Invalidate ();
 }
 
+#include "csutil/custom_new_disable.h"
 csRef<iDocumentNode> csTinyXmlDocument::CreateRoot ()
 {
   Clear ();
   root.AttachNew (new CS::TiDocument ());
   return csPtr<iDocumentNode> (Alloc (root));
 }
+#include "csutil/custom_new_enable.h"
 
 csRef<iDocumentNode> csTinyXmlDocument::GetRoot ()
 {
@@ -634,10 +644,12 @@ int csTinyXmlDocument::Changeable ()
   return CS_CHANGEABLE_YES;
 }
 
+#include "csutil/custom_new_disable.h"
 csTinyXmlNode* csTinyXmlDocument::Alloc ()
 {
   return new (pool) csTinyXmlNode (this);
 }
+#include "csutil/custom_new_enable.h"
 
 csTinyXmlNode* csTinyXmlDocument::Alloc (CS::TiDocumentNode* node)
 {

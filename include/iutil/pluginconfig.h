@@ -107,6 +107,7 @@ public:
     type = CSVAR_FLOAT;
     v.f = f;
   }
+#include "csutil/custom_new_disable.h"
   /// Assign a string
   void SetString (const char* s)
   {
@@ -117,6 +118,7 @@ public:
     else
       v.s = 0;
   }
+#include "csutil/custom_new_enable.h"
   /// Assign a command
   void SetCommand ()
   {

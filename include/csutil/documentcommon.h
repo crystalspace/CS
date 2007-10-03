@@ -77,9 +77,12 @@ public:
   virtual void SetValueAsFloat (float value);
   //@}
 
+#include "csutil/custom_new_disable.h"
   /// Return empty iterator.
   virtual csRef<iDocumentNodeIterator> GetNodes ()
   { return csPtr<iDocumentNodeIterator> (new csEmptyDocumentNodeIterator); }
+#include "csutil/custom_new_enable.h"
+
   /**
    * Return iterator wrapping around the one returned by GetNodes() and
    * filtering for nodes with a value of \a value.
@@ -99,12 +102,14 @@ public:
   virtual float GetContentsValueAsFloat ();
   //@}
 
+#include "csutil/custom_new_disable.h"
   /// Return empty iterator.
   virtual csRef<iDocumentAttributeIterator> GetAttributes ()
   { 
     return csPtr<iDocumentAttributeIterator> 
       (new csEmptyDocumentAttributeIterator); 
   }
+#include "csutil/custom_new_enable.h"
 
   /// Dummy implementation.
   csRef<iDocumentAttribute> GetAttribute (const char*) { return 0; }

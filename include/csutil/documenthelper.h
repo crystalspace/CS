@@ -343,6 +343,7 @@ namespace DocSystem
    * { ... }
    * \endcode
    */
+#include "csutil/custom_new_disable.h"
   template<class T>
   csPtr<iDocumentNodeIterator> FilterDocumentNodeIterator(
     csRef<iDocumentNodeIterator> parent, T filter)
@@ -350,6 +351,7 @@ namespace DocSystem
     return new Implementation::FilterDocumentNodeIterator<T>
       (parent, filter);
   }
+#include "csutil/custom_new_enable.h"
   
   /**
    * "Flatten" a document node structure into a string, suitable for e.g.

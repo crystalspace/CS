@@ -143,9 +143,11 @@ bool csGradient::Render (csRGBpixel* pal, size_t count,
   return true;
 }
 
+#include "csutil/custom_new_disable.h"
 csPtr<iGradientShades> csGradient::GetShades ()
 {
   csRef<iGradientShades> shadesArray;
   shadesArray.AttachNew (new scfGradientShadesArray (this));
   return csPtr<iGradientShades> (shadesArray);
 }
+#include "csutil/custom_new_enable.h"

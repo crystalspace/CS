@@ -948,6 +948,7 @@ void csGLFontCache::FlushText ()
   textWriting = false;
 }
 
+#include "csutil/custom_new_disable.h"
 void csGLFontCache::DumpFontCache (csRefArray<iImage>& pages)
 {
   for (size_t t = 0; t < textures.GetSize (); t++)
@@ -967,3 +968,4 @@ void csGLFontCache::DumpFontCache (csRefArray<iImage>& pages)
     pages.Push (page);
   }
 }
+#include "csutil/custom_new_enable.h"

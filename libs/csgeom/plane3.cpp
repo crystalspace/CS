@@ -59,6 +59,7 @@ csVector3 csPlane3::FindPoint () const
   }
 }
 
+#include "csutil/custom_new_disable.h"
 namespace
 {
   typedef csDirtyAccessArray<csVector3> csgeom_csPlane3_Verts;
@@ -66,6 +67,7 @@ namespace
   CS_IMPLEMENT_STATIC_VAR (GetStatic_csgeom_csPlane3_Verts, csgeom_csPlane3_Verts,())
   CS_IMPLEMENT_STATIC_VAR (GetStatic_csgeom_csPlane3_Vis, csgeom_csPlane3_Vis,())
 }
+#include "csutil/custom_new_enable.h"
 
 bool csPlane3::ClipPolygon (
   csVector3 * &pverts,

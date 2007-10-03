@@ -456,6 +456,7 @@ bool csTriangleMeshTools::IsMeshClosed (iTriangleMesh* trimesh)
   return (numIncorrect == 0);
 }
 
+#include "csutil/custom_new_disable.h"
 bool csTriangleMeshTools::IsMeshConvex (iTriangleMesh* trimesh)
 {
   size_t num_edges;
@@ -464,6 +465,7 @@ bool csTriangleMeshTools::IsMeshConvex (iTriangleMesh* trimesh)
   size_t pccount = trimesh->GetTriangleCount ();
   csArray<size_t>* adjacent_tris;
   adjacent_tris = new csArray<size_t> [pccount];
+#include "csutil/custom_new_enable.h"
   csTriangle* tris = trimesh->GetTriangles ();
   csVector3* verts = trimesh->GetVertices ();
   size_t i;
@@ -738,6 +740,7 @@ bool csTriangleMeshTools::BoxInClosedMesh (const csBox3& box,
   return true;
 }
 
+#include "csutil/custom_new_disable.h"
 csArray<csArray<int> >* csTriangleMeshTools::CalculateVertexConnections (
     iTriangleMesh* mesh)
 {
@@ -771,4 +774,4 @@ csArray<csArray<int> >* csTriangleMeshTools::CalculateVertexConnections (
   }
   return link_array;
 }
-
+#include "csutil/custom_new_enable.h"

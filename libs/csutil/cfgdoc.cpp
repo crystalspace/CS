@@ -201,6 +201,7 @@ csConfigDocument::csConfigDocument ()
 {
 }
 
+#include "csutil/custom_new_disable.h"
 csConfigDocument::csConfigDocument (const char *Filename, iVFS* vfs)
   : scfImplementationType (this), filename(0), fileVFS(vfs)
 {
@@ -219,6 +220,7 @@ csConfigDocument::csConfigDocument (const char *Filename, iVFS* vfs)
   document = doc;
   ParseDocument (doc);
 }
+#include "csutil/custom_new_enable.h"
 
 csConfigDocument::csConfigDocument (iDocument* doc)
   : scfImplementationType (this), filename(0), document (doc)
@@ -330,12 +332,14 @@ void csConfigDocument::Clear ()
   keys.DeleteAll ();
 }
 
+#include "csutil/custom_new_disable.h"
 csPtr<iConfigIterator> csConfigDocument::Enumerate (const char* Subsection)
 {
   csRef<iConfigIterator> iter;
   iter.AttachNew (new csConfigDocumentIterator (this, Subsection));
   return csPtr<iConfigIterator> (iter);
 }
+#include "csutil/custom_new_enable.h"
 
 bool csConfigDocument::KeyExists (const char *Key) const
 {
