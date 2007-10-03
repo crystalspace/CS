@@ -85,6 +85,7 @@ private:
   void InitFormats ();
   bool FormatSupported (GLenum srcFormat, GLenum srcType);
 
+  void CompactTextures ();
 public:
   /* Format tables - maps component sizes to GL sizes.
    * A lot of source formats have the same 'type' bit only differ in 'format'.
