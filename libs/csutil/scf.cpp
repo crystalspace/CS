@@ -294,7 +294,7 @@ int scfLibraryVector::CompareName (scfSharedLibrary* const& Item,
 }
 
 /// This structure contains everything we need to know about a particular class
-class scfFactory : public CS::Memory::CustomAllocatedDerived<iFactory>
+class scfFactory : public iFactory, public CS::Memory::CustomAllocated
 {
 public:
   // Class identifier

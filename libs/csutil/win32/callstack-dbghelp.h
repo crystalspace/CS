@@ -34,8 +34,8 @@ namespace CS
 namespace Debug
 {
 
-class CallStackCreatorDbgHelp : 
-  public CS::Memory::CustomAllocatedDerived<iCallStackCreator>
+class CallStackCreatorDbgHelp : public iCallStackCreator,
+                                public CS::Memory::CustomAllocated
 {
   virtual bool CreateCallStack (csDirtyAccessArray<CallStackEntry>& entries,
     csDirtyAccessArray<uintptr_t>& params, bool fast);

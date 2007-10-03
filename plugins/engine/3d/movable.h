@@ -28,8 +28,6 @@
 #include "iengine/sector.h"
 #include "iengine/scenenode.h"
 
-#include "objlist.h"
-
 class csVector3;
 class csMatrix3;
 class csMovable;
@@ -38,23 +36,29 @@ class csMeshWrapper;
 class csCamera;
 
 /// A list of sectors as the movable uses it
-class csMovableSectorList : 
-  public CS_PLUGIN_NAMESPACE_NAME(Engine)::ObjectList<iSector, iSectorList>
+class csMovableSectorList : public scfImplementation1<csMovableSectorList,
+				iSectorList>,
+                            public csRefArrayObject<iSector>
 {
 private:
   csMovable* movable;
+
 public:
 
-  csMovableSectorList () : movable (0) {}
+  csMovableSectorList ();
   virtual ~csMovableSectorList ();
   void SetMovable (csMovable* mov) { movable = mov; }
 
   bool PrepareSector (iSector* item);
 
+  virtual int GetCount () const { return (int)GetSize (); }
+  virtual iSector *Get (int n) const { return (*this)[n]; }
   virtual int Add (iSector *obj);
   virtual bool Remove (iSector *obj);
   virtual bool Remove (int n);
   virtual void RemoveAll ();
+  virtual int Find (iSector *obj) const;
+  virtual iSector *FindByName (const char *Name) const;
 };
 
 /**

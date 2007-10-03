@@ -21,20 +21,10 @@ chronological order.
 	  is a weak ref one anyway, 0 items are now weeded out lazily. This
 	  makes texture removal slightly more efficient due the saving of an
 	  array search.
-	- res removed CS::Memory::CustomAllocated from uses in multiple 
-	  inheritance: The class is empty, but the compiler may nevertheless
-	  reserve (otherwise unused) memory for it when used as a base class
-	  in multiple inheritance in order to provide a distinct memory 
-	  address for the CustomAllocated instance. Worked around the issue by
-	  adding and employing CustomAllocatedDerived<T>, which is a
-	  CustomAllocated deriving from T: can be used when a derived class 
-	  should be custom-allocated.
 	- caedes added python cpp frozen files.
 	- caedes added some swig ignores for CustomAllocatedDerived and 
 	  CustomAllocatedDerivedVirtual new and delete operators to account
 	  for some swig warnings.
-	- res fixed compilation breakage caused by the recent CustomAllocated-
-	  related changes.
 02-Oct-2007
 	- res augmented lighter2's element classification algorithm to not 
 	  only rely on the position in the scanline to mark an element as
