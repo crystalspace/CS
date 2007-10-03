@@ -24,7 +24,7 @@
 
 #include "csgfx/imagemanipulate.h"
 
-#include "csutil/custom_new_disable.h"
+
 csRef<iImage> csImageManipulate::Rescale2D (iImage* source, int newwidth, 
     int newheight)
 {
@@ -180,7 +180,6 @@ csRef<iImage> csImageManipulate::Rescale (iImage* source, int newwidth,
   }
   return newImage;
 }
-#include "csutil/custom_new_enable.h"
 
 //---------------------- Helper functions ---------------------------
 
@@ -255,9 +254,7 @@ csRef<iImage> csImageManipulate::Mipmap2D (iImage* source, int steps,
     const int newW = MAX(1, cur_w >> 1);
     const int newH = MAX(1, cur_h >> 1);
     
-#include "csutil/custom_new_disable.h"
     nimg.AttachNew (new csImageMemory (newW, newH, simg->GetFormat()));
-#include "csutil/custom_new_enable.h"
 
     csRGBpixel *mipmap = new csRGBpixel [newW * newH];
     uint8* Alpha = nimg->GetAlphaPtr();
@@ -330,11 +327,8 @@ csRef<iImage> csImageManipulate::Blur (iImage* source, csRGBpixel* transp)
   const int Height = source->GetHeight();
 
   csRef<csImageMemory> nimg;
-
-#include "csutil/custom_new_disable.h"
   nimg.AttachNew (new csImageMemory (source->GetWidth(), 
     source->GetHeight(), source->GetFormat()));
-#include "csutil/custom_new_enable.h"
 
   csRGBpixel *mipmap = new csRGBpixel [Width * Height];
   uint8* Alpha = nimg->GetAlphaPtr();
@@ -377,7 +371,6 @@ csRef<iImage> csImageManipulate::Blur (iImage* source, csRGBpixel* transp)
   return nimg;
 }
 
-#include "csutil/custom_new_disable.h"
 csRef<iImage> csImageManipulate::Crop (iImage* source, int x, int y, 
     int width, int height)
 {
@@ -455,7 +448,6 @@ csRef<iImage> csImageManipulate::Sharpen (iImage* source, int strength,
   if ((source->GetFormat() & CS_IMGFMT_MASK) != CS_IMGFMT_TRUECOLOR)
   {
     csImageMemory* nimg = new csImageMemory (source, CS_IMGFMT_TRUECOLOR);
-#include "csutil/custom_new_enable.h"
     nimg->SetFormat (CS_IMGFMT_TRUECOLOR | 
       (source->GetAlpha() ? CS_IMGFMT_ALPHA : 0));
     original.AttachNew (nimg);
@@ -489,10 +481,8 @@ csRef<iImage> csImageManipulate::Sharpen (iImage* source, int strength,
   }
 
   csRef<csImageMemory> resimg;
-#include "csutil/custom_new_disable.h"
   resimg.AttachNew (new csImageMemory (source->GetWidth(), source->GetHeight(),
     result, true));
-#include "csutil/custom_new_enable.h"
 
   return resimg;
 }

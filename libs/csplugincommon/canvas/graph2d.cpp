@@ -945,7 +945,6 @@ void csGraphics2D::GetPixel (int x, int y, uint8 &oR, uint8 &oG, uint8 &oB, uint
   }
 }
 
-#include "csutil/custom_new_disable.h"
 csPtr<iImage> csGraphics2D::ScreenShot ()
 {
   BeginDraw ();
@@ -953,7 +952,6 @@ csPtr<iImage> csGraphics2D::ScreenShot ()
   FinishDraw ();
   return ss;
 }
-#include "csutil/custom_new_enable.h"
 
 void csGraphics2D::AlertV (int type, const char* title, const char* okMsg,
     const char* msg, va_list arg)
@@ -1115,7 +1113,6 @@ int csGraphics2D::FindRGBPalette (int r, int g, int b)
   return best_idx;
 }
 
-#include "csutil/custom_new_disable.h"
 csPtr<iGraphics2D> csGraphics2D::CreateOffscreenCanvas (
     void* memory, int width, int height, int depth,
     iOffscreenCanvasCallback* ofscb)
@@ -1132,7 +1129,6 @@ csPtr<iGraphics2D> csGraphics2D::CreateOffscreenCanvas (
     return 0;
   }
 }
-#include "csutil/custom_new_enable.h"
 
 bool csGraphics2D::DebugCommand (const char* /*cmd*/)
 {

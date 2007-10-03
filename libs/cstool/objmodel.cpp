@@ -51,13 +51,11 @@ iTriangleMesh* csObjectModel::GetTriangleData (csStringID id)
   return trimesh.Get (id, 0);
 }
 
-#include "csutil/custom_new_disable.h"
 csPtr<iTriangleMeshIterator> csObjectModel::GetTriangleDataIterator ()
 {
   csTMIterator* it = new csTMIterator (this);
   return it;
 }
-#include "csutil/custom_new_enable.h"
 
 void csObjectModel::SetTriangleData (csStringID id, iTriangleMesh* tridata)
 {

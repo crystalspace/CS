@@ -62,7 +62,6 @@ void csImageMemory::ConstructSource (iImage* source)
     memcpy (Palette, source->GetPalette(), sizeof (csRGBpixel) * 256);
 }
 
-#include "csutil/custom_new_disable.h"
 void csImageMemory::ConstructBuffers (int width, int height, void* buffer,
     bool destroy, int format, csRGBpixel *palette)
 {
@@ -80,7 +79,6 @@ void csImageMemory::ConstructBuffers (int width, int height, void* buffer,
         databuf.AttachNew (
           new CS::DataBuffer<CS::Memory::AllocatorNew<uint8> > (
             (char*)buffer, size, true));
-#include "csutil/custom_new_enable.h"
         if (Format & CS_IMGFMT_ALPHA)
         {
           Alpha =  new uint8[size];
@@ -88,7 +86,6 @@ void csImageMemory::ConstructBuffers (int width, int height, void* buffer,
         Palette = new csRGBpixel[256];
         break;
       case CS_IMGFMT_TRUECOLOR:
-#include "csutil/custom_new_disable.h"
         databuf.AttachNew (
           new CS::DataBuffer<CS::Memory::AllocatorNew<csRGBpixel> > (
             (char*)buffer, size, true));
@@ -103,7 +100,6 @@ void csImageMemory::ConstructBuffers (int width, int height, void* buffer,
   Palette = palette;
   destroy_image = destroy;
 }
-#include "csutil/custom_new_enable.h"
 
 csImageMemory::csImageMemory (int width, int height, int format) :
   scfImplementationType(this)
@@ -160,9 +156,7 @@ csImageMemory::csImageMemory (int iFormat) :
 void csImageMemory::AllocImage()
 {
   size_t size = csImageTools::ComputeDataSize (this);
-#include "csutil/custom_new_disable.h"
   databuf.AttachNew (new CS::DataBuffer<> (size));
-#include "csutil/custom_new_enable.h"
   memset (databuf->GetData(), 0, size);
   if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
   {
@@ -322,7 +316,6 @@ void csImageMemory::InternalConvertFromRGBA (iDataBuffer* imageData)
   }
 }
 
-#include "csutil/custom_new_disable.h"
 void csImageMemory::ConvertFromRGBA (csRGBpixel *iImage)
 {
   size_t size = Width * Height * Depth * sizeof (csRGBpixel);
@@ -334,7 +327,6 @@ void csImageMemory::ConvertFromRGBA (csRGBpixel *iImage)
 
   InternalConvertFromRGBA (newBuffer);
 }
-#include "csutil/custom_new_enable.h"
 
 void csImageMemory::InternalConvertFromPal8 (iDataBuffer* imageData, 
                                              uint8* alpha, 
@@ -400,7 +392,6 @@ void csImageMemory::InternalConvertFromPal8 (iDataBuffer* imageData,
     Format &= ~CS_IMGFMT_ALPHA;
 }
 
-#include "csutil/custom_new_disable.h"
 void csImageMemory::ConvertFromPal8 (uint8 *iImage, uint8* alpha, 
 				     csRGBpixel *iPalette, int nPalColors)
 {
@@ -413,7 +404,6 @@ void csImageMemory::ConvertFromPal8 (uint8 *iImage, uint8* alpha,
 
   InternalConvertFromPal8 (newBuffer, alpha, iPalette, nPalColors);
 }
-#include "csutil/custom_new_enable.h"
 
 void csImageMemory::ConvertFromPal8 (uint8 *iImage, uint8* alpha, 
                                      const csRGBcolor *iPalette,
@@ -545,7 +535,6 @@ void csImageMemory::ApplyKeyColor ()
   }
 }
 
-#include "csutil/custom_new_disable.h"
 bool csImageMemory::Copy (iImage* simage_, int x, int y,
                           int width, int height )
 {
@@ -635,4 +624,3 @@ bool csImageMemory::CopyTile (iImage* simage, int x, int y,
 
   return true;
 }
-#include "csutil/custom_new_enable.h"

@@ -1198,7 +1198,6 @@ bool csCoverageTile::TestPoint (int x, int y, float testdepth)
   return !(c & (1<<y));
 }
 
-#include "csutil/custom_new_disable.h"
 csPtr<iString> csCoverageTile::Debug_Dump ()
 {
   scfString* rc = new scfString ();
@@ -1290,7 +1289,6 @@ csPtr<iString> csCoverageTile::Debug_Dump_Cache ()
 
   return csPtr<iString> (rc);
 }
-#include "csutil/custom_new_enable.h"
 
 //---------------------------------------------------------------------------
 
@@ -2721,7 +2719,6 @@ static void DrawZoomedPixel (iGraphics2D* g2d, int x, int y, int col, int zoom)
 }
 #endif // End of THIS_IS_UNUSED
 
-#include "csutil/custom_new_disable.h"
 csPtr<iString> csTiledCoverageBuffer::Debug_Dump ()
 {
   scfString* rc = new scfString ();
@@ -2757,7 +2754,6 @@ csPtr<iString> csTiledCoverageBuffer::Debug_Dump ()
 
   return csPtr<iString> (rc);
 }
-#include "csutil/custom_new_enable.h"
 
 void csTiledCoverageBuffer::Debug_Dump (iGraphics3D* g3d, int /*zoom*/)
 {
@@ -2808,7 +2804,6 @@ void csTiledCoverageBuffer::Debug_Dump (iGraphics3D* g3d, int /*zoom*/)
     return csPtr<iString> (rc); \
   }
 
-#include "csutil/custom_new_disable.h"
 csPtr<iString> csTiledCoverageBuffer::Debug_UnitTest ()
 {
   Setup (640, 480);
@@ -2838,7 +2833,6 @@ csPtr<iString> csTiledCoverageBuffer::Debug_UnitTest ()
   rc->DecRef ();
   return 0;
 }
-#include "csutil/custom_new_enable.h"
 
 csTicks csTiledCoverageBuffer::Debug_Benchmark (int /*num_iterations*/)
 {

@@ -24,11 +24,8 @@
 
 //---------------------------------------------------------------------------
 
-#include "csutil/custom_new_disable.h"
 CS_IMPLEMENT_STATIC_CLASSVAR_REF (csBSPTree, b2fArray, B2fArray, 
   csDirtyAccessArray<int>, ());
-#include "csutil/custom_new_enable.h"
-
 namespace
 {
   CS_IMPLEMENT_STATIC_VAR (TreeNodes, csBlockAllocator<csBSPTree>, (1000));

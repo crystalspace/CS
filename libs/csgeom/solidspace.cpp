@@ -169,7 +169,7 @@ void csSolidSpace::AddClosedObject (iTriangleMesh* object)
   csTriangleMeshTools::SortTrianglesX (object, tris, tri_count, planes);
 
   CheckBox (root_bbox, root, object->GetVertices (),
-  	tris, (int)tri_count, planes);
+  	tris, tri_count, planes);
 
   delete[] tris;
   delete[] planes;

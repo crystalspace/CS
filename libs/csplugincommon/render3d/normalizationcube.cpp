@@ -60,7 +60,6 @@ csNormalizationCubeAccessor::~csNormalizationCubeAccessor ()
 {
 }
 
-#include "csutil/custom_new_disable.h"
 void csNormalizationCubeAccessor::PreGetValue (csShaderVariable *variable)
 {
   if (!texture.IsValid ())
@@ -140,4 +139,3 @@ void csNormalizationCubeAccessor::PreGetValue (csShaderVariable *variable)
   }
   variable->SetValue (texture);
 }
-#include "csutil/custom_new_enable.h"

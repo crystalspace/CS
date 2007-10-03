@@ -355,9 +355,7 @@ csGLScreenShot* csGraphics2DGLCommon::GetScreenShot ()
   }
   else
   {
-#include "csutil/custom_new_disable.h"
     res = new csGLScreenShot (this);
-#include "csutil/custom_new_enable.h"
   }
   scfRefCount++;
   return res;
@@ -388,7 +386,6 @@ void csGraphics2DGLCommon::GetPixelFormatString (const GLPixelFormat& format,
   }
 }
 
-#include "csutil/custom_new_disable.h"
 void csGraphics2DGLCommon::OpenDriverDB (const char* phase)
 {
   const char* driverDB = config->GetStr ("Video.OpenGL.DriverDB.Path",
@@ -429,7 +426,6 @@ void csGraphics2DGLCommon::OpenDriverDB (const char* phase)
 
   driverdb.Open (this, dbRoot, phase, driverDBprio);
 }
-#include "csutil/custom_new_enable.h"
 
 void csGraphics2DGLCommon::Report (int severity, const char* msg, ...)
 {

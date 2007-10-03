@@ -206,7 +206,6 @@ void csWin32RegistryConfig::Clear ()
   }
 }
 
-#include "csutil/custom_new_disable.h"
 csPtr<iConfigIterator> csWin32RegistryConfig::Enumerate (const char *Subsection)
 {
   if (!SubsectionExists (Subsection)) return 0;
@@ -215,7 +214,6 @@ csPtr<iConfigIterator> csWin32RegistryConfig::Enumerate (const char *Subsection)
   iters.Push (it);
   return it;
 }
-#include "csutil/custom_new_enable.h"
 
 bool csWin32RegistryConfig::KeyExists (const char *Key) const
 {
@@ -679,7 +677,6 @@ bool csWin32RegistryIterator::GetBool () const
   return owner->RegToBool (type, data, Def);
 }
 
-#include "csutil/custom_new_disable.h"
 csPtr<iStringArray> csWin32RegistryIterator::GetTuple() const
 {
   const char* Data = GetStr();
@@ -710,7 +707,6 @@ csPtr<iStringArray> csWin32RegistryIterator::GetTuple() const
   csPtr<iStringArray> v(items);
   return v;
 }
-#include "csutil/custom_new_enable.h"
 
 const char *csWin32RegistryIterator::GetComment () const
 {

@@ -54,7 +54,6 @@ static void MakeDir (const char* name)
   CreateDirectoryA (name, 0);
 }
 
-#include "csutil/custom_new_disable.h"
 csPtr<iConfigFile> csGetPlatformConfig (const char* Key)
 {
   csString path = csGetPlatformConfigPath (Key);
@@ -72,7 +71,6 @@ csPtr<iConfigFile> csGetPlatformConfig (const char* Key)
   // Create/read a config file; okay if missing; will be created when written
   return new csConfigFile (path);
 }
-#include "csutil/custom_new_enable.h"
 
 csString csGetPlatformConfigPath (const char* key, bool local)
 {

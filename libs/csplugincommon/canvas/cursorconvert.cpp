@@ -39,7 +39,6 @@ static inline int rgb_dist (int tR, int tG, int tB, int sR, int sG, int sB)
          B_COEF_SQ * sB * sB * (32 - ((max - tB) >> 3));
 }
 
-#include "csutil/custom_new_disable.h"
 bool csCursorConverter::ConvertTo1bpp (iImage* image, uint8*& bitmap, 
 				       uint8*& mask,
 				       const csRGBcolor forecolor, 
@@ -140,7 +139,6 @@ bool csCursorConverter::ConvertTo1bppAutoColor (iImage* image, uint8*& bitmap,
 
   return res;
 }
-#include "csutil/custom_new_enable.h"
 
 bool csCursorConverter::InternalConvertTo1bpp (iImage* image,
 					       csColorQuantizer& quantizer, 
@@ -196,7 +194,6 @@ bool csCursorConverter::InternalConvertTo1bpp (iImage* image,
   return true;
 }
 
-#include "csutil/custom_new_disable.h"
 bool csCursorConverter::ConvertTo8bpp (iImage* image, uint8*& pixels, 
 				       csRGBpixel*& palette, 
 				       const csRGBcolor* keycolor)
@@ -205,7 +202,6 @@ bool csCursorConverter::ConvertTo8bpp (iImage* image, uint8*& pixels,
   const int imgH = image->GetHeight ();
   csRef<csImageMemory> myImage;
   myImage.AttachNew (new csImageMemory (imgW, imgH, image->GetFormat ()));
-#include "csutil/custom_new_enable.h"
   myImage->SetName (image->GetName ());
 
   size_t dataSize = imgW * imgH;

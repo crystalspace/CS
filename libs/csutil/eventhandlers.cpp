@@ -165,7 +165,6 @@ csHandlerID const csEventHandlerRegistry::GetGeneric (csHandlerID id)
   return instantiation.Get (id, CS_HANDLER_INVALID);
 }
 
-#include "csutil/custom_new_disable.h"
 csRef<iEventHandlerRegistry> csEventHandlerRegistry::GetRegistry (
 	iObjectRegistry *object_reg)
 {
@@ -179,7 +178,6 @@ csRef<iEventHandlerRegistry> csEventHandlerRegistry::GetRegistry (
   CS_ASSERT (handler_reg != 0);
   return handler_reg;
 }
-#include "csutil/custom_new_enable.h"
 
 
 

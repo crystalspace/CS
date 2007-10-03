@@ -36,7 +36,6 @@ csRef<iStringArray> csInstallationPathsHelper::FindSystemRoots()
     len = GetLogicalDriveStrings(len, buffer);
   }
 
-#include "csutil/custom_new_disable.h"
   scfStringArray* p = new scfStringArray;
   for (char const* s = buffer; *s != '\0'; s += strlen(s) + 1)
     p->Push(s);
@@ -46,4 +45,3 @@ csRef<iStringArray> csInstallationPathsHelper::FindSystemRoots()
   delete[] buffer;
   return v;
 }
-#include "csutil/custom_new_enable.h"

@@ -1,7 +1,5 @@
 1.2 branch log.
 
-03-Oct-2007
-        - Mike Gist merged r27782, r27783 into 1.2 (memtracker compile fixes).
 01-Oct-2007
         - Mike Gist merged r27752 into 1.2 (UnlinkObjects() loop reversal).
 29-Sep-2007

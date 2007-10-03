@@ -166,7 +166,6 @@ void csPrintLibraryError (const char* /*iModule*/)
   }
 }
 
-#include "csutil/custom_new_disable.h"
 static void AppendStrVecString (iStringArray*& strings, const char* str)
 {
   if (!strings)
@@ -519,4 +518,3 @@ csRef<iStringArray> csScanPluginDirs (csPathsList* dirs,
 	 
   return csPtr<iStringArray> (messages);
 }
-#include "csutil/custom_new_enable.h"

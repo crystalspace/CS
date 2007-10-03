@@ -72,7 +72,7 @@ public:
   friend bool csDefaultRunLoop (iObjectRegistry *);
 };
 
-#include "csutil/custom_new_disable.h"
+
 bool csDefaultRunLoop (iObjectRegistry* r)
 {
   csRef<iEventQueue> q (csQueryRegistry<iEventQueue> (r));
@@ -94,4 +94,3 @@ bool csDefaultRunLoop (iObjectRegistry* r)
   q->RemoveListener (eh);
   return true;
 }
-#include "csutil/custom_new_enable.h"

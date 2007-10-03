@@ -440,7 +440,6 @@ scfFactory::~scfFactory ()
   csRefTrackerAccess::TrackDestruction (this, scfRefCount);
 }
 
-#include "csutil/custom_new_disable.h"
 void scfFactory::IncRef ()
 {
   csRefTrackerAccess::TrackIncRef (this, scfRefCount);
@@ -792,7 +791,6 @@ csSCF::csSCF (unsigned int v) : scfImplementation<csSCF> (this), verbose(v)
 
   if (!LibraryRegistry)
     LibraryRegistry = new scfLibraryVector ();
-#include "csutil/custom_new_enable.h"
   if (!libraryNames)
     libraryNames = new csStringSet;
 
@@ -993,7 +991,6 @@ inline static bool ContextClash (csStringID contextA, csStringID contextB)
     (contextA == contextB));
 }
 
-#include "csutil/custom_new_disable.h"
 bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
   const char *iFactoryClass, const char *iDesc, const char *Dependencies, 
   const char* context)
@@ -1099,7 +1096,6 @@ bool csSCF::RegisterClass (scfFactoryFunc Func, const char *iClassID,
   SortClassRegistry = true;
   return true;
 }
-#include "csutil/custom_new_enable.h"
 
 bool csSCF::RegisterFactoryFunc (scfFactoryFunc Func, const char *FactClass)
 {
@@ -1232,7 +1228,6 @@ scfInterfaceID csSCF::GetInterfaceID (const char *iInterface)
   return (scfInterfaceID)InterfaceRegistry.Request (iInterface);
 }
 
-#include "csutil/custom_new_disable.h"
 csRef<iStringArray> csSCF::QueryClassList (char const* pattern)
 {
   iStringArray* v = new scfStringArray();
@@ -1251,4 +1246,3 @@ csRef<iStringArray> csSCF::QueryClassList (char const* pattern)
   }
   return csPtr<iStringArray> (v);
 }
-#include "csutil/custom_new_enable.h"

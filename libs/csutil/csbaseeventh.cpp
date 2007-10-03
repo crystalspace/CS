@@ -31,7 +31,6 @@ csBaseEventHandler::EventHandlerImpl::EventHandlerImpl (
 {
 }
 
-#include "csutil/custom_new_disable.h"
 csBaseEventHandler::csBaseEventHandler() : 
   object_registry (0),
   self (CS_EVENT_INVALID)
@@ -40,7 +39,6 @@ csBaseEventHandler::csBaseEventHandler() :
     = FinalProcess = CS_EVENT_INVALID;
   eventh.AttachNew (new EventHandlerImpl (this));
 }
-#include "csutil/custom_new_enable.h"
 
 void csBaseEventHandler::Initialize (iObjectRegistry *r)
 {

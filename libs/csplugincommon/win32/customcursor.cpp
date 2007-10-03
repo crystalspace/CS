@@ -177,9 +177,7 @@ csWin32CustomCursors::CachedCursor csWin32CustomCursors::CreateCursor(
   }
   else
   {
-#include "csutil/custom_new_disable.h"
     imageRGB.AttachNew (new csImageMemory (image));
-#include "csutil/custom_new_enable.h"
     if (!doAlpha)
     {
       imageRGB->SetFormat (CS_IMGFMT_TRUECOLOR 

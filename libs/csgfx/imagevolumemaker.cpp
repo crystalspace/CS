@@ -150,23 +150,18 @@ void csImageVolumeMaker::AppendPending ()
     {
       if (palette == 0)
       {
-#include "csutil/custom_new_disable.h"
 	newImage.AttachNew (new csImageMemory (image, Format));
-#include "csutil/custom_new_enable.h"
 	palette = new csRGBpixel[256];
 	memcpy (palette, newImage->GetPalette(), sizeof (csRGBpixel) * 256);
       }
       else
       {
-#include "csutil/custom_new_disable.h"
 	newImage.AttachNew (new csImageMemory (image, 
 	  (Format & ~CS_IMGFMT_MASK) | CS_IMGFMT_TRUECOLOR));
-#include "csutil/custom_new_enable.h"
 	image = newImage;
 	size_t pixNum = image->GetWidth() * image->GetHeight();
 	csRGBpixel* px = new csRGBpixel[pixNum];
 	memcpy (px, image->GetImageData(), pixNum * sizeof (csRGBpixel));
-#include "csutil/custom_new_disable.h"
 	newImage.AttachNew (new csImageMemory (image->GetWidth(), 
 	  image->GetHeight(), Format));
 	newImage->ConvertFromRGBA (px);
@@ -178,7 +173,6 @@ void csImageVolumeMaker::AppendPending ()
       if (image->GetFormat() != Format)
       {
 	newImage.AttachNew (new csImageMemory (image, Format));
-#include "csutil/custom_new_enable.h"
 	image = newImage;
       }
     }

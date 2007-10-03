@@ -190,7 +190,6 @@ void csColliderWrapper::UpdateCollider (iTerraFormer* terrain)
 }
 //----------------------------------------------------------------------
 
-#include "csutil/custom_new_disable.h"
 csColliderWrapper* csColliderHelper::InitializeCollisionWrapper (
 	iCollideSystem* colsys, iMeshWrapper* mesh)
 {
@@ -393,7 +392,6 @@ csColliderWrapper* csColliderHelper::InitializeCollisionWrapper (
 
   return cw;
 }
-#include "csutil/custom_new_enable.h"
 
 void csColliderHelper::InitializeCollisionWrappers (iCollideSystem* colsys,
   	iEngine* engine, iRegion* region)
@@ -711,7 +709,6 @@ csColliderActor::csColliderActor ()
   rotation.Set (0, 0, 0);
 }
 
-#include "csutil/custom_new_disable.h"
 void csColliderActor::InitializeColliders (
 	const csVector3& legs, const csVector3& body, const csVector3& shift)
 {
@@ -753,7 +750,6 @@ void csColliderActor::InitializeColliders (
   csColliderActor::shift.y = -shift.y;
   csColliderActor::shift.z = -shift.z;
 }
-#include "csutil/custom_new_enable.h"
 
 void csColliderActor::InitializeColliders (iMeshWrapper* mesh,
 	const csVector3& legs, const csVector3& body, const csVector3& shift)

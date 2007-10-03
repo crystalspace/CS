@@ -216,7 +216,6 @@ static inline bool AddToPathEnv (csString dir, char **pathEnv)
 
 typedef void (WINAPI * LPFNSETDLLDIRECTORYA)(LPCSTR lpPathName);
 
-#include "csutil/custom_new_disable.h"
 bool csPlatformStartup(iObjectRegistry* r)
 {
   /* Work around QueryPerformanceCounter() issues on multiprocessor systems.
@@ -301,7 +300,6 @@ bool csPlatformStartup(iObjectRegistry* r)
 
   return ok;
 }
-#include "csutil/custom_new_enable.h"
 
 bool csPlatformShutdown(iObjectRegistry* r)
 {
@@ -536,7 +534,6 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r)
   //CanvasHidden = csevCanvasHidden (registry, "graph2d");
 
   // Put our own keyboard driver in place.
-#include "csutil/custom_new_disable.h"
   kbdDriver.AttachNew (new csWin32KeyboardDriver (r));
   if (kbdDriver == 0)
   {
@@ -555,7 +552,6 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r)
   }
   r->Register (kbdDriver, "iKeyboardDriver");
 }
-#include "csutil/custom_new_enable.h"
 
 Win32Assistant::~Win32Assistant ()
 {

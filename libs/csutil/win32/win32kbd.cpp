@@ -496,12 +496,10 @@ bool csWin32KeyboardDriver::HandleKeyMessage (HWND hWnd, UINT message,
   }
 }
 
-#include "csutil/custom_new_disable.h"
 csPtr<iKeyComposer> csWin32KeyboardDriver::CreateKeyComposer ()
 {
   return csPtr<iKeyComposer> (new csWin32KeyComposer ());
 }
-#include "csutil/custom_new_enable.h"
 
 bool csWin32KeyboardDriver::Win32KeyToCSKey (LONG vKey, LONG keyFlags, 
 					     utf32_char& rawCode, 
