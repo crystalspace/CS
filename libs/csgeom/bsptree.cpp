@@ -189,7 +189,7 @@ void csBSPTree::Build (CS::TriangleIndicesStream<int>& triangles,
     triidx.Push (int (tris.Push (t)));
   }
 
-  Build (tris.GetArray(), planes.GetArray(), tris.GetSize(), vertices, triidx);
+  Build (tris.GetArray(), planes.GetArray(), (int)tris.GetSize(), vertices, triidx);
 }
 
 void csBSPTree::Build (csTriangle* triangles, int num_triangles,

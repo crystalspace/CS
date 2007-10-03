@@ -159,7 +159,7 @@ csTriangleMeshEdge* csTriangleMeshTools::CalculateEdges (iTriangleMesh* mesh,
         if (le->vt2 == vt2s)
 	{
 	  // Found!
-	  le->tri2 = i;
+	  le->tri2 = (int)i;
 	  if (prev) prev->next = le->next;
 	  else edge_table[vt1s] = le->next;
 	  le->next = edge_collector;
@@ -185,7 +185,7 @@ csTriangleMeshEdge* csTriangleMeshTools::CalculateEdges (iTriangleMesh* mesh,
 	}
 	le->vt1 = vt1s;
 	le->vt2 = vt2s;
-	le->tri1 = i;
+	le->tri1 = (int)i;
 	le->tri2 = -1;
 	le->next = edge_table[vt1s];
 	edge_table[vt1s] = le;

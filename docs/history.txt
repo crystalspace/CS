@@ -22,6 +22,7 @@ chronological order.
 	  makes texture removal slightly more efficient due the saving of an
 	  array search.
         - Mike Gist fixed libs to compile with the Memory Tracker.
+        - Mike Gist fixed some compile warnings.
 02-Oct-2007
 	- res augmented lighter2's element classification algorithm to not 
 	  only rely on the position in the scanline to mark an element as
