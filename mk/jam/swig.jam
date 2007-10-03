@@ -169,6 +169,7 @@ if $(CMD.SWIG)
       Depends $(frozen_target) : $(target) ;
       Copy $(frozen_target) : $(target) ;
       Depends $(tag)freeze : $(frozen_target) ;
+      Depends $(language)freeze : $(tag)freeze ;
 
       if $(othertargets)
       {
@@ -218,6 +219,7 @@ if $(CMD.SWIG)
       Depends $(frozen_target) : $(target) ;
       Copy $(frozen_target) : $(target) ;
       Depends $(tag)freeze : $(frozen_target) ;
+      Depends $(language)freeze : $(tag)freeze ;
 
       if $(othertargets)
       {

@@ -29,6 +29,8 @@ chronological order.
 	    the already existing "dll" prefix).
 	  - The Python modules are now filtered from the typical workspaces.
 	  - Added a workspace containing the Python-related projects as well.
+	- caedes tweaked swig.jam rules to use a <language>freeze target, 
+	  which freezes all swig files relative to that language.
 01-Oct-2007
         - Mike Gist reversed the loops in csSector::UnlinkObjects() to avoid
           meshes being skipped if sl->Remove() removes a mesh object from the

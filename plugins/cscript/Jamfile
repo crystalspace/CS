@@ -2,6 +2,11 @@ SubDir TOP plugins cscript ;
 
 if $(PYTHON.AVAILABLE) = "yes"
 {
+  if $(CMD.SWIG)
+  {
+    # global python freeze target
+    Help pythonfreeze : "Freeze generated Swig files for all python modules" ;
+  }
   ##  PyBindingModule target : module name : glue : LinkWith : ExternalLibs : desc ;
   rule PyBindingModule
   {
