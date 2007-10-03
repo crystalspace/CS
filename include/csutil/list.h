@@ -304,7 +304,6 @@ inline void csList<T>::DeleteAll ()
   head = tail = 0;
 }
 
-#include "csutil/custom_new_disable.h"
 /// Add one item last in the list
 template <class T>
 inline typename csList<T>::Iterator csList<T>::PushBack (const T& e)
@@ -317,7 +316,6 @@ inline typename csList<T>::Iterator csList<T>::PushBack (const T& e)
   tail = el;
   return Iterator(el);
 }
-#include "csutil/custom_new_enable.h"
 
 /// Add one item first in the list
 template <class T>

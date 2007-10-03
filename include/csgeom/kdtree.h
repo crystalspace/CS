@@ -425,7 +425,6 @@ public:
     return Debug_UnitTest ();
   }
 
-#include "csutil/custom_new_disable.h"
   virtual csPtr<iString> StateTest ()
   {
     scfString* rc = new scfString ();
@@ -446,7 +445,6 @@ public:
     Debug_Dump (rc->GetCsString (), 0);
     return csPtr<iString> (rc);
   }
-#include "csutil/custom_new_enable.h"
 
   virtual void Dump (iGraphics3D* /*g3d*/) { }
   virtual bool DebugCommand (const char*) { return false; }
