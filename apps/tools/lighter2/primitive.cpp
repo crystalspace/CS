@@ -713,7 +713,6 @@ namespace lighter
 
   float Primitive::ComputeElementFraction (size_t index) const
   {
-    
     const ObjectVertexData& vdata = GetVertexData ();
 
     size_t u, v;
@@ -728,7 +727,7 @@ namespace lighter
       vdata.lightmapUVs[triangle[2]]
     };
 
-    csVector2 outVerts[6];
+    csVector2 outVerts[7];
 
     size_t numVert = 0;
 
@@ -738,7 +737,7 @@ namespace lighter
     float area = 0.0;
     if (numVert >= 3)
     {
-      // triangulize the polygon, triangles are (0,1,2), (0,2,3), (0,3,4), etc..
+      // triangulate the polygon, triangles are (0,1,2), (0,2,3), (0,3,4), etc..
       for (size_t i = 0; i < numVert - 2; ++i)
         area += fabsf(csMath2::Area2 (outVerts[0], outVerts[i + 1], outVerts[i + 2]));
     }
