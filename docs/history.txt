@@ -33,6 +33,8 @@ chronological order.
 	- caedes added some swig ignores for CustomAllocatedDerived and 
 	  CustomAllocatedDerivedVirtual new and delete operators to account
 	  for some swig warnings.
+	- res fixed compilation breakage caused by the recent CustomAllocated-
+	  related changes.
 02-Oct-2007
 	- res augmented lighter2's element classification algorithm to not 
 	  only rely on the position in the scanline to mark an element as

@@ -121,14 +121,27 @@ public:
   };
 };
 
+namespace
+{
+  // Mild hack to avoid allocation of space for CS::Memory::CustomAllocated
+  template<class Class>
+  struct scfImplementation_StoreScfObject : public CS::Memory::CustomAllocated
+  {
+  protected:
+    Class *scfObject;
+
+    scfImplementation_StoreScfObject (Class *object) : scfObject (object) {}
+  };
+}
+
 /**
  * Baseclass for the SCF implementation templates.
  * Provides common methods such as reference counting and handling of
  * weak references.
  */
 template<class Class>
-class scfImplementation : 
-  public CS::Memory::CustomAllocatedDerivedVirtual<iBase>
+class scfImplementation : public scfImplementation_StoreScfObject<Class>,
+                          public virtual iBase
 {
 public:
   /**
@@ -136,8 +149,8 @@ public:
    * Will be called from scfImplementation(Ext)N constructor
    */
   scfImplementation (Class *object, iBase *parent = 0) :
-      scfObject (object), scfRefCount (1), scfParent (parent), 
-        scfWeakRefOwners (0), metadataList (0)
+    scfImplementation_StoreScfObject<Class> (object), scfRefCount (1), 
+    scfParent (parent), scfWeakRefOwners (0), metadataList (0)
   {
     csRefTrackerAccess::TrackConstruction (object);
     if (scfParent) scfParent->IncRef ();
@@ -145,13 +158,14 @@ public:
 
   /**
    * Copy constructor.
-   * Use of the default copy constructor is nor desired since the information
+   * Use of the default copy constructor is not desired since the information
    * is insufficient to fully initialize scfImplementation; hence, an
    * explicit copy constructor must be created in the derived class that
    * initializes scfImplementation like in the normal constructor, i.e.
    * "scfImplementation (this)".
    */
-  scfImplementation (const scfImplementation& /*other*/) : iBase()
+  scfImplementation (const scfImplementation& /*other*/) :
+    scfImplementation_StoreScfObject<Class> (0), iBase()
   {
     CS_ASSERT_MSG ("To allow copying SCF classes, create a copy "
       "constructor in the derived class, and initialize scfImplementation "
@@ -236,8 +250,6 @@ public:
   }
 
 protected:
-  Class *scfObject;
-
   int scfRefCount;
   iBase *scfParent;
   typedef csArray<void**,

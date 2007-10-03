@@ -26,11 +26,6 @@
 #include "plugins/engine/3d/camera.h"
 
 //---------------------------------------------------------------------------
-csMovableSectorList::csMovableSectorList ()
-  : scfImplementationType (this)
-{
-  movable = 0;
-}
 
 csMovableSectorList::~csMovableSectorList ()
 {
@@ -81,16 +76,6 @@ bool csMovableSectorList::Remove (int n)
 void csMovableSectorList::RemoveAll ()
 {
   movable->ClearSectors ();
-}
-
-int csMovableSectorList::Find (iSector *obj) const
-{
-  return (int)csRefArrayObject<iSector>::Find (obj);
-}
-
-iSector *csMovableSectorList::FindByName (const char *Name) const
-{
-  return csRefArrayObject<iSector>::FindByName (Name);
 }
 
 //---------------------------------------------------------------------------

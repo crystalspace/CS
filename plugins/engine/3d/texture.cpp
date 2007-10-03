@@ -176,8 +176,7 @@ const char* csTextureWrapper::GetTextureClass ()
 
 //------------------------------------------------------- csTextureList -----//
 
-csTextureList::csTextureList (csEngine* engine) : scfImplementationType (this),
-  csRefArrayObject<iTextureWrapper> (16, 16), engine (engine)
+csTextureList::csTextureList (csEngine* engine) : engine (engine)
 {
 }
 
@@ -199,44 +198,4 @@ iTextureWrapper *csTextureList::NewTexture (iTextureHandle *ith)
   tm.AttachNew (new csTextureWrapper (engine, ith));
   Push (tm);
   return tm;
-}
-
-int csTextureList::GetCount () const
-{
-  return (int)this->GetSize ();
-}
-
-iTextureWrapper *csTextureList::Get (int n) const
-{
-  return csRefArrayObject<iTextureWrapper>::Get (n);
-}
-
-int csTextureList::Add (iTextureWrapper *obj)
-{
-  return (int)this->Push (obj);
-}
-
-bool csTextureList::Remove (iTextureWrapper *obj)
-{
-  return this->Delete (obj);
-}
-
-bool csTextureList::Remove (int n)
-{
-  return this->DeleteIndex (n);
-}
-
-void csTextureList::RemoveAll ()
-{
-  this->DeleteAll ();
-}
-
-int csTextureList::Find (iTextureWrapper *obj) const
-{
-  return (int)csRefArrayObject<iTextureWrapper>::Find (obj);
-}
-
-iTextureWrapper *csTextureList::FindByName (const char *Name) const
-{
-  return csRefArrayObject<iTextureWrapper>::FindByName (Name);
 }

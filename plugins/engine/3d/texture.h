@@ -30,6 +30,8 @@
 #include "iengine/texture.h"
 #include "igraphic/image.h"
 
+#include "objlist.h"
+
 class csEngine;
 class csTextureWrapper;
 struct iTextureManager;
@@ -193,9 +195,8 @@ public:
  * This class is used to hold a list of textures.
  */
 class csTextureList : 
-  public scfImplementation1<csTextureList,
-                            iTextureList>,
-  public csRefArrayObject<iTextureWrapper>
+  public CS_PLUGIN_NAMESPACE_NAME(Engine)::ObjectList<iTextureWrapper, 
+                                                      iTextureList>
 {
   csEngine* engine;
 public:
@@ -211,14 +212,6 @@ public:
    * The handle will be IncRefed
    */
   virtual iTextureWrapper *NewTexture (iTextureHandle *ith);
-  virtual int GetCount () const;
-  virtual iTextureWrapper *Get (int n) const;
-  virtual int Add (iTextureWrapper *obj);
-  virtual bool Remove (iTextureWrapper *obj);
-  virtual bool Remove (int n);
-  virtual void RemoveAll ();
-  virtual int Find (iTextureWrapper *obj) const;
-  virtual iTextureWrapper *FindByName (const char *Name) const;
 };
 
 #endif // __CS_TEXTURE_H__
