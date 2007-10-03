@@ -512,6 +512,7 @@ bool csPolygonMeshTools::IsMeshClosed (iPolygonMesh* polyMesh)
   return (numIncorrect == 0);
 }
 
+#include "csutil/custom_new_disable.h"
 bool csPolygonMeshTools::IsMeshConvex (iPolygonMesh* polyMesh)
 {
   int num_edges;
@@ -520,6 +521,7 @@ bool csPolygonMeshTools::IsMeshConvex (iPolygonMesh* polyMesh)
   int pccount = polyMesh->GetPolygonCount ();
   csArray<int>* adjacent_polygons;
   adjacent_polygons = new csArray<int> [pccount];
+#include "csutil/custom_new_enable.h"
   csMeshedPolygon* polys = polyMesh->GetPolygons ();
   csVector3* verts = polyMesh->GetVertices ();
   int i;
@@ -896,6 +898,7 @@ bool csPolygonMeshTools::BoxInClosedMesh (const csBox3& box,
   return true;
 }
 
+#include "csutil/custom_new_disable.h"
 csArray<csArray<int> > *csPolygonMeshTools::CalculateVertexConnections (iPolygonMesh* mesh)
 {
   int i,j,k;
@@ -929,5 +932,6 @@ csArray<csArray<int> > *csPolygonMeshTools::CalculateVertexConnections (iPolygon
   }
   return link_array;
 }
+#include "csutil/custom_new_enable.h"
 
 #include "csutil/win32/msvc_deprecated_warn_on.h"

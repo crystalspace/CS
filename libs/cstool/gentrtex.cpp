@@ -249,6 +249,7 @@ csGenerateImage::~csGenerateImage()
   delete tex;
 }
 
+#include "csutil/custom_new_disable.h"
 iImage *csGenerateImage::Generate(int totalw, int totalh,
   int startx, int starty, int partw, int parth)
 {
@@ -284,7 +285,7 @@ iImage *csGenerateImage::Generate(int totalw, int totalh,
 
   return result;
 }
-
+#include "csutil/custom_new_enable.h"
 
 //------------------ csGenerateImageValueFunc -----------------
 csGenerateImageValueFuncTex::~csGenerateImageValueFuncTex()
