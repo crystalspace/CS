@@ -30,6 +30,9 @@ chronological order.
 	  CustomAllocated deriving from T: can be used when a derived class 
 	  should be custom-allocated.
 	- caedes added python cpp frozen files.
+	- caedes added some swig ignores for CustomAllocatedDerived and 
+	  CustomAllocatedDerivedVirtual new and delete operators to account
+	  for some swig warnings.
 02-Oct-2007
 	- res augmented lighter2's element classification algorithm to not 
 	  only rely on the position in the scanline to mark an element as

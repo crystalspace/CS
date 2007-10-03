@@ -646,7 +646,16 @@ SET_HELPER(csStringID)
 %ignore CS::Memory::CustomAllocated::operator new[];
 %ignore CS::Memory::CustomAllocated::operator delete;
 %ignore CS::Memory::CustomAllocated::operator delete[];
+%ignore CS::Memory::CustomAllocatedDerived::operator new;
+%ignore CS::Memory::CustomAllocatedDerived::operator new[];
+%ignore CS::Memory::CustomAllocatedDerived::operator delete;
+%ignore CS::Memory::CustomAllocatedDerived::operator delete[];
+%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator new;
+%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator new[];
+%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator delete;
+%ignore CS::Memory::CustomAllocatedDerivedVirtual::operator delete[];
 %include "csutil/customallocated.h"
+
 %ignore csArray<csPluginRequest>::Capacity;
 %ignore csArray<csPluginRequest>::DefaultCompare;
 %ignore csArray<csPluginRequest>::Delete;
