@@ -127,8 +127,8 @@ public:
  * weak references.
  */
 template<class Class>
-class scfImplementation : public virtual iBase,
-  public CS::Memory::CustomAllocated
+class scfImplementation : 
+  public CS::Memory::CustomAllocatedDerivedVirtual<iBase>
 {
 public:
   /**

@@ -80,8 +80,7 @@ public:
   virtual bool GetLineNumber (void* addr, csString& lineAndFile) = 0;
 };
 
-class CallStackImpl : public csCallStack,
-		       public CS::Memory::CustomAllocated
+class CallStackImpl : public CS::Memory::CustomAllocatedDerived<csCallStack>
 {
 public:
   csDirtyAccessArray<CallStackEntry> entries;
