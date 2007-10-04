@@ -21,6 +21,7 @@
 
 #include "csutil/refcount.h"
 
+#include "raydebug.h"
 #include "statistics.h"
 
 namespace lighter
@@ -65,7 +66,7 @@ namespace lighter
     csRef<iStringSet> svStrings;
 
     SwapManager* swapManager;
-
+    RayDebugHelper rayDebug;
   protected:
     // Cleanup and prepare for shutdown
     void CleanUp ();
@@ -86,7 +87,6 @@ namespace lighter
     Statistics::Progress progInitializeMain;
     Statistics::Progress progInitialize;
     Statistics::Progress progInitializeLightmaps;
-    Statistics::Progress progInitializeLM;
     Statistics::Progress progPrepareLighting;
     Statistics::Progress progPrepareLightingUVL;
     Statistics::Progress progPrepareLightingSector;

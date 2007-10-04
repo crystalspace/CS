@@ -21,6 +21,7 @@
 
 #include "csutil/noncopyable.h"
 
+#include "light.h"
 #include "primitive.h"
 #include "raytracer.h"
 #include "sampler.h"
@@ -30,7 +31,6 @@ namespace lighter
   class Sector;
   class Raytracer;
   class Primitive;
-  class Light;
 
   class PartialElementIgnoreCallback;  
   
@@ -46,17 +46,19 @@ namespace lighter
       Statistics::Progress& progress);
 
     //-- Shade a point
-    typedef csColor (*PVLPointShader)(Sector* sector, 
+    typedef csColor (*PVLPointShader)(Sector* sector, Object* obj, 
       const csVector3& point, const csVector3& normal, 
       SamplerSequence<2>& lightSampler);
 
     // Shade a single point in space with direct lighting
-    static csColor UniformShadeAllLightsNonPD (Sector* sector, const csVector3& point,
-      const csVector3& normal, SamplerSequence<2>& lightSampler);
+    static csColor UniformShadeAllLightsNonPD (Sector* sector, Object* obj, 
+      const csVector3& point, const csVector3& normal, 
+      SamplerSequence<2>& lightSampler);
 
     // Shade a single point in space with direct lighting using a single light
-    static csColor UniformShadeRndLightNonPD (Sector* sector, const csVector3& point,
-      const csVector3& normal, SamplerSequence<2>& lightSampler);
+    static csColor UniformShadeRndLightNonPD (Sector* sector, Object* obj,
+      const csVector3& point, const csVector3& normal, 
+      SamplerSequence<2>& lightSampler);
 
     //-- Shade a lightmap element
     typedef csColor (*LMElementShader)(Sector* sector, ElementProxy element,
@@ -72,22 +74,57 @@ namespace lighter
 
     //-- Shade using one light
     // Shade a primitive element with direct lighting
-    static csColor UniformShadeOneLight (Sector* sector, const csVector3& point,
-      const csVector3& normal, Light* light, SamplerSequence<2>& lightSampler);
+    static csColor UniformShadeOneLight (Sector* sector, Object* obj, 
+      const csVector3& point, const csVector3& normal, Light* light, 
+      SamplerSequence<2>& lightSampler);
 
     // Shade a primitive element with direct lighting
     static csColor UniformShadeOneLight (Sector* sector, ElementProxy element,
       Light* light, SamplerSequence<2>& lightSampler);
 
-  private:
-    // Static methods...
-    inline static csColor ShadeLight (Light* light, const csVector3& point,
-      const csVector3& normal, SamplerSequence<2>& lightSampler,
-      const Primitive* shadowIgnorePrimitive = 0, bool fullIgnore = false);
+    template<typename T>
+    inline static csColor UniformShadeElement (T& shade, ElementProxy element, 
+      SamplerSequence<2>& lightSampler);
 
-    inline static void CollectShadowLight (Light* light, const csVector3& point,
-      const csVector3& normal, SamplerSequence<2>& lightSampler, 
-      PartialElementIgnoreCallback* ignoreCB);
+  private:
+    struct ShadeAllLightsNonPD
+    {
+      const LightRefArray& allLights;
+      ShadeAllLightsNonPD (const LightRefArray& allLights) : 
+        allLights (allLights) {}
+      inline csColor ShadeLight (Object* obj, const csVector3& point, 
+        const csVector3& normal, SamplerSequence<2>& lightSampler, 
+        const Primitive* shadowIgnorePrimitive = 0, 
+        bool fullIgnore = false);
+    };
+
+    struct ShadeRndLightNonPD
+    {
+      const LightRefArray& allLights;
+      SamplerSequence<3>& lightSampler;
+      ShadeRndLightNonPD (const LightRefArray& allLights,
+        SamplerSequence<3>& lightSampler) : allLights (allLights), 
+        lightSampler (lightSampler) {}
+      inline csColor ShadeLight (Object* obj, const csVector3& point, 
+        const csVector3& normal, SamplerSequence<2>& sampler, 
+        const Primitive* shadowIgnorePrimitive = 0, 
+        bool fullIgnore = false);
+    };
+    struct ShadeOneLight
+    {
+      Light* light;
+      ShadeOneLight (Light* light) : light (light) {}
+      inline csColor ShadeLight (Object* obj, const csVector3& point, 
+        const csVector3& normal, SamplerSequence<2>& sampler, 
+        const Primitive* shadowIgnorePrimitive = 0, 
+        bool fullIgnore = false);
+    };
+
+    // Static methods...
+    inline static csColor ShadeLight (Light* light, Object* obj, 
+      const csVector3& point, const csVector3& normal, 
+      SamplerSequence<2>& lightSampler, const Primitive* shadowIgnorePrimitive = 0, 
+      bool fullIgnore = false);
 
     class ProgressState
     {

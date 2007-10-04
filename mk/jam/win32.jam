@@ -97,6 +97,11 @@ FILEFLAGS 0x0
       VALUE "WWW", "$(PACKAGE_HOMEPAGE)"
     }
   }
+  BLOCK "VarFileInfo"
+  {
+      VALUE "Translation", 0x409, 1200
+  }
+
 }
 __EOF__
 }

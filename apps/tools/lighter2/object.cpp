@@ -29,7 +29,7 @@ namespace lighter
 {
 
   ObjectFactory::ObjectFactory ()
-    : lightPerVertex (false),
+    : lightPerVertex (false), noModify (false),
     lmScale (globalConfig.GetLMProperties ().lmDensity),
     factoryWrapper (0)
   {
@@ -60,16 +60,17 @@ namespace lighter
         csArray<FactoryPrimitiveArray> newPrims;
         csRef<LightmapUVObjectLayouter> lightmaplayout = 
           uvlayout->LayoutFactory (unlayoutedPrimitives[i], vertexData, this, 
-          newPrims, usedVertices);
-        if (!lightmaplayout) return false;
-
-        for (size_t n = 0; n < newPrims.GetSize(); n++)
+          newPrims, usedVertices, noModify);
+        if (lightmaplayout)
         {
-          layoutedPrimitives.Push (LayoutedPrimitives (newPrims[n],
-            lightmaplayout, n));
-
-          AddSubmeshRemap (i, layoutedPrimitives.GetSize () - 1);
-        }
+	  for (size_t n = 0; n < newPrims.GetSize(); n++)
+	  {
+	    layoutedPrimitives.Push (LayoutedPrimitives (newPrims[n],
+	      lightmaplayout, n));
+  
+	    AddSubmeshRemap (i, layoutedPrimitives.GetSize () - 1);
+	  }
+	}
       }
       unlayoutedPrimitives.DeleteAll();
     }
@@ -164,8 +165,8 @@ namespace lighter
   //-------------------------------------------------------------------------
 
   Object::Object (ObjectFactory* fact)
-    : lightPerVertex (fact->lightPerVertex), litColors (0), litColorsPD (0), 
-      factory (fact)
+    : lightPerVertex (fact->lightPerVertex), sector (0), litColors (0), 
+      litColorsPD (0), factory (fact)
   {
   }
   
@@ -178,6 +179,9 @@ namespace lighter
   bool Object::Initialize (Sector* sector)
   {
     if (!factory || !meshWrapper) return false;
+
+    this->sector = sector;
+
     const csReversibleTransform transform = meshWrapper->GetMovable ()->
       GetFullTransform ();
 
@@ -284,6 +288,7 @@ namespace lighter
   void Object::ParseMesh (iMeshWrapper *wrapper)
   {
     this->meshWrapper = wrapper;
+    this->meshName = wrapper->QueryObject ()->GetName ();
 
     const csFlags& meshFlags = wrapper->GetFlags ();
     if (meshFlags.Check (CS_ENTITY_NOSHADOWS))
@@ -291,7 +296,9 @@ namespace lighter
     if (meshFlags.Check (CS_ENTITY_NOLIGHTING))
       objFlags.Set (OBJECT_FLAG_NOLIGHT);
 
-    this->meshName = wrapper->QueryObject ()->GetName ();
+    if (globalLighter->rayDebug.EnableForMesh (meshName))
+      objFlags.Set (OBJECT_FLAG_RAYDEBUG);
+
     csRef<iObjectIterator> objiter = 
       wrapper->QueryObject ()->GetIterator();
     while (objiter->HasNext())
@@ -313,7 +320,7 @@ namespace lighter
     }
   }
 
-  void Object::SaveMesh (Sector* /*sector*/, iDocumentNode* node)
+  void Object::SaveMesh (iDocumentNode* node)
   {
     // Save out the object to the node
     csRef<iSaverPlugin> saver = 
@@ -450,8 +457,8 @@ namespace lighter
           {
             const csVector2 &lmUV = vertexData.lightmapUVs[index];
             csVector2& outUV = lmcoords[index];
-            outUV.x = (lmUV.x + 0.5f) * factorX;
-            outUV.y = (lmUV.y + 0.5f) * factorY;
+            outUV.x = (lmUV.x) * factorX;
+            outUV.y = (lmUV.y) * factorY;
             indicesRemapped.AddNoTest (index);
           }
         }

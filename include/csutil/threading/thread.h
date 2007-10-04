@@ -214,7 +214,7 @@ namespace Threading
     /**
      * Yield Thread frees CPU time if nothing to do.
      * \remark This Yields execution time in the thread in which this function 
-     * is called. For example,  OtherThread->Yeild() will NOT have the results 
+     * is called. For example,  OtherThread->Yield() will NOT have the results 
      * that would be expected.
      */
     static void Yield ()

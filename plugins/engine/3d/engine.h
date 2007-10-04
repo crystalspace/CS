@@ -527,6 +527,11 @@ public:
   virtual csPtr<iLoaderContext> CreateLoaderContext (
   	iRegion* region = 0, bool curRegOnly = true);
   
+  virtual void SetDefaultKeepImage (bool enable) 
+  { defaultKeepImage = enable; }
+  virtual bool GetDefaultKeepImage ()
+  { return defaultKeepImage; }
+  
   //-- Other
   
   virtual csPtr<iObjectIterator> GetNearbyObjects (iSector* sector,
@@ -928,6 +933,9 @@ private:
 
   /// 'Saveable' flag
   bool worldSaveable;
+  
+  /// Default 'keep image' flag
+  bool defaultKeepImage;
 
   /// Maximum texture aspect ratio
   int maxAspectRatio;

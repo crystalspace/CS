@@ -25,16 +25,20 @@
 # List of filters for "convenience projects" - that is, VC projects which are
 # generated but don't appear in any workspaces (since e.g. required libraries 
 # are relatively uncommon and/or not shipped with cs-win32libs).
-MSVC_CONVENIENCE_PROJECTS = _cspace perl py vos ;
+MSVC_CONVENIENCE_PROJECTS = perl ;
 
 # What the typical user will need. Presently, everything but wxWidgets.
 MsvcGenWorkspace typical : : 
-  "grp.+_(?!typical$)" wx static $(MSVC_CONVENIENCE_PROJECTS) ;
+  "grp.+_(?!typical$)" wx static $(MSVC_CONVENIENCE_PROJECTS) py ;
 
 # Similar to "typical", but with wxWidgets.
 MsvcGenWorkspace wxtypical : : 
-  "grp.+_(?!wxtypical$)" static $(MSVC_CONVENIENCE_PROJECTS) ;
+  "grp.+_(?!wxtypical$)" static $(MSVC_CONVENIENCE_PROJECTS) py ;
+
+# Similar to "typical", but with Python.
+MsvcGenWorkspace pytypical : : 
+  "grp.+_(?!pytypical$)" static $(MSVC_CONVENIENCE_PROJECTS) ;
 
 # Workspace for static variants of plugins and apps.
 MsvcGenWorkspace static : static ^lib.* : 
-  "grp.+_(?!static$)" wx $(MSVC_CONVENIENCE_PROJECTS) ;
+  "grp.+_(?!static$)" wx $(MSVC_CONVENIENCE_PROJECTS) py ;

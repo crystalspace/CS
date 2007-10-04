@@ -224,14 +224,14 @@ void csSector::FireLightVisibleCallbacks (iLight* light)
 void csSector::UnlinkObjects ()
 {
   int i;
-  for (i = 0; i < meshes.GetCount (); i++)
+  for (i = meshes.GetCount()-1; i >= 0; i--)
   {
     iMeshWrapper* m = meshes.Get (i);
     iSectorList* sl = m->GetMovable ()->GetSectors ();
     sl->Remove ((iSector*)this);
     m->GetMovable ()->UpdateMove ();
   }
-  for (i = 0; i < lights.GetCount (); i++)
+  for (i = lights.GetCount()-1; i >= 0; i--)
   {
     iLight* l = lights.Get (i);
     iSectorList* sl = l->GetMovable ()->GetSectors ();

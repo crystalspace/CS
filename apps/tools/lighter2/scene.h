@@ -22,6 +22,7 @@
 #include "object.h"
 #include "kdtree.h"
 #include "light.h"
+#include "material.h"
 
 namespace lighter
 {
@@ -111,6 +112,8 @@ namespace lighter
     bool SaveLightmaps (Statistics::Progress& progress);
     // Save any mesh data that can only be saved after lighting.
     bool SaveMeshesPostLighting (Statistics::Progress& progress);
+    // Clean up all data not needed after lighting.
+    void CleanLightingData ();
 
     // Data access
     inline ObjectFactoryHash& GetFactories () 
@@ -132,6 +135,13 @@ namespace lighter
     Lightmap* GetLightmap (uint lightmapID, Light* light);
 
     csArray<LightmapPtrDelArray*> GetAllLightmaps ();
+    
+    const RadMaterial* GetRadMaterial (iMaterialWrapper* matWrap) const
+    {
+      if (matWrap == 0) return 0;
+      return radMaterials.GetElementPointer (
+        matWrap->QueryObject()->GetName());
+    }
 
     /**
      * Helper class to perform some lightmap postprocessing
@@ -163,10 +173,19 @@ namespace lighter
       //@}
     };
     LightingPostProcessor lightmapPostProc;
+  
+    struct PropageState
+    {
+      csSet<csPtrKey<Portal> > seenPortals;
+    };
+    void PropagateLights (Sector* sector);
   protected:
     
     //  factories
     ObjectFactoryHash radFactories;
+    
+    // Materials
+    MaterialHash radMaterials;
  
     // All sectors
     SectorHash sectors;
@@ -181,6 +200,7 @@ namespace lighter
     {
       csRef<iDocumentNode> rootNode;
       csRef<iDocument> document;
+      csString levelName;
       csString directory; //VFS name, full path
       csSet<csString> texturesToClean;
       csSet<csString> texFileNamesToDelete;
@@ -193,7 +213,8 @@ namespace lighter
     // Save functions
     void CollectDeleteTextures (iDocumentNode* textureNode,
                                 csSet<csString>& filesToDelete);
-    void BuildLightmapTextureList (csStringArray& texturesToSave);
+    void BuildLightmapTextureList (LoadedFile* fileInfo, 
+      csStringArray& texturesToSave);
     void CleanOldLightmaps (LoadedFile* fileInfo);
     void SaveSceneFactoriesToDom (iDocumentNode* root, LoadedFile* fileInfo,
                                   Statistics::Progress& progress);
@@ -201,21 +222,30 @@ namespace lighter
                                Statistics::Progress& progress);
     bool SaveSceneLibrary (csSet<csString>& savedFactories, 
                            const char* libFile, LoadedFile* fileInfo,
-                           Statistics::Progress& progress);
+                           Statistics::Progress& progress, bool noModify);
     void HandleLibraryNode (csSet<csString>& savedFactories, 
                             iDocumentNode* node, LoadedFile* fileInfo,
-                            Statistics::Progress& progress);
-    void SaveMeshFactoryToDom (csSet<csString>& savedObjects, 
+                            Statistics::Progress& progress, bool noModify);
+
+    enum SaveResult
+    {
+      svFailure, svSuccess, svRemoveItem
+    };
+    SaveResult SaveMeshFactoryToDom (csSet<csString>& savedObjects, 
                                iDocumentNode* factNode, LoadedFile* fileInfo);
     void SaveSectorToDom (iDocumentNode* sectorNode, LoadedFile* fileInfo,
                           Statistics::Progress& progress);
-    void SaveMeshObjectToDom (csSet<csString>& savedObjects, iDocumentNode *objNode, 
-                              Sector* sect, LoadedFile* fileInfo);
+    SaveResult SaveMeshObjectToDom (csSet<csString>& savedObjects, 
+                                    iDocumentNode *objNode, 
+                                    Sector* sect, LoadedFile* fileInfo);
 
     csStringHash solidColorFiles;
-    const char* GetSolidColorFile (const csColor& col);
+    const char* GetSolidColorFile (LoadedFile* fileInfo, const csColor& col);
     void SaveLightmapsToDom (iDocumentNode* root, LoadedFile* fileInfo,
                              Statistics::Progress& progress);
+
+    csPtr<iDataBuffer> SaveDebugData (LoadedFile& fileInfo, 
+      iDataBuffer* sourceData, Statistics::Progress& progress);
     
     // Load functions
     bool ParseEngine (LoadedFile* fileInfo, Statistics::Progress& progress);
@@ -224,14 +254,24 @@ namespace lighter
     void ParsePortals (iSector *srcSect, Sector* sector);
     enum MeshParseResult
     {
-      Failure, Success, NotAGenMesh
+      mpFailure, mpSuccess, mpNotAGenMesh
     };
     MeshParseResult ParseMesh (LoadedFile* fileInfo, Sector *sector,  
       iMeshWrapper *mesh, csRef<Object>& obj);
-    MeshParseResult ParseMeshFactory (iMeshFactoryWrapper *factory, 
-      csRef<ObjectFactory>& radFact);
-    void PropagateLight (Light* light, const csFrustum& lightFrustum);
-
+    MeshParseResult ParseMeshFactory (LoadedFile* fileInfo, 
+      iMeshFactoryWrapper *factory, csRef<ObjectFactory>& radFact);
+    bool ParseMaterial (iMaterialWrapper* material);
+    void PropagateLight (Light* light, const csFrustum& lightFrustum, 
+      PropageState& state);
+    void PropagateLight (Light* light, const csFrustum& lightFrustum)
+    { 
+      PropageState state;
+      PropagateLight (light, lightFrustum, state);
+    }
+    
+    iRegion* GetRegion (iObject* obj);
+    bool IsObjectFromBaseDir (iObject* obj, const char* baseDir);
+    bool IsFilenameFromBaseDir (const char* filename, const char* baseDir);
   };
 }
 

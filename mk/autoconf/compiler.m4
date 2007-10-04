@@ -144,6 +144,20 @@ AC_DEFUN([CS_PROG_LINK],[
 	    CS_CHECK_BUILD_FLAGS([if --no-as-needed is supported], 
 		[cs_cv_prog_link_no_as_needed], [CS_CREATE_TUPLE([-Wl,--no-as-needed])], 
 		[C++])])])
+    
+    # Check if linker supports --gc-sections.
+    AC_ARG_ENABLE([gc-sections], 
+	[AC_HELP_STRING([--enable-gc-sections],
+	    [Utilize --gc-sections linker flag for some targets (default YES)])])
+    AS_IF([test -z "$enable_gc_sections"], 
+	[enable_gc_sections=yes])
+    AS_IF([test "$enable_gc_sections" != "no"],
+	[CS_CHECK_BUILD_FLAGS([if --gc-sections is supported], 
+	    [cs_cv_prog_link_gc_sections], 
+	    [CS_CREATE_TUPLE([-Wl,--gc-sections])], 
+	    [C++], 
+	    [CS_EMIT_BUILD_PROPERTY([LINK.GC_SECTIONS], 
+	        [$cs_cv_prog_link_gc_sections])])])
 ])
 
 #-----------------------------------------------------------------------------

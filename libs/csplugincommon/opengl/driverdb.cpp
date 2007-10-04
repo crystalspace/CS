@@ -331,6 +331,13 @@ bool csDriverDBReader::ParseCompareVer (iDocumentNode* node, bool& result)
 
   result = false;
   const char* curpos1 = db->ogl2d->GetVersionString (version);
+  if (curpos1 == 0)
+  {
+    /* @@@ Hmm... a version may just be unknown on some platforms...
+       (e.g. win32_driver on Linux), so we leave result as false (check failed)
+       and return true, indicating the parsing was successful. */
+    return true;
+  }
   const char* curpos2 = relation + rellen + 1;
   // Skip leading non-digits
   curpos1 += strcspn (curpos1, digits);
@@ -370,6 +377,7 @@ bool csDriverDBReader::ParseCompareVer (iDocumentNode* node, bool& result)
   return true;
 }
 
+#include "csutil/custom_new_disable.h"
 bool csDriverDBReader::ParseConfigs (iDocumentNode* node)
 {
   csRef<iDocumentNodeIterator> it (node->GetNodes ());
@@ -410,6 +418,7 @@ bool csDriverDBReader::ParseConfigs (iDocumentNode* node)
   }
   return true;
 }
+#include "csutil/custom_new_enable.h"
 
 bool csDriverDBReader::ParseRules (iDocumentNode* node)
 {

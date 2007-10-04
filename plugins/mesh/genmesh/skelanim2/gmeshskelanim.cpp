@@ -227,11 +227,7 @@ void csGenmeshSkelAnimationControl::Update (csTicks current)
       csRef<csShaderVariable> boneQuat;
       boneQuat.AttachNew(new csShaderVariable(csInvalidStringID));
       _bones->SetArrayElement (i*2+0, boneQuat);
-      csQuaternion quat;
-      if (quat.v.x != 0 || quat.v.y != 0 || quat.v.z != 0 || quat.w != 0)
-      {
-        boneQuat->SetValue(csVector4 (quat.v.x, quat.v.y, quat.v.z, quat.w));
-      }
+      boneQuat->SetValue(csVector4 (0, 0, 0, 1));
 
       csRef<csShaderVariable> boneOffs;
        boneOffs.AttachNew(new csShaderVariable(csInvalidStringID));

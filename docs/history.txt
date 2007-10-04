@@ -6,7 +6,249 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+04-Oct-2007
+	- andres added a VarFileInfo Block to the resources for win32 
+	  dlls/executables as they are invalid without and especially considered
+	  invalid by windows installer.
+	- andres made the search for the CS installation in the registry not to
+	  look at the version agnostic version before the version aware bit in
+	  registry
+	- res removed the "ignore neighbouring primitives" from lighter2's
+	  border element handling again. Instead, now sampling points are 
+	  ensured to be really on the primitive (wasn't always the case 
+	  before, esp. near corners), and the sampling points are slightly
+	  fudged away from the primitive to make it less likely that it hits
+	  very close primitives.
+	- caedes did the following changes to swig files:
+	  - added ARRAY_CHANGE_ALL_TEMPLATE and ARRAY_CHANGE_ALL_TEMPLATE_PTR
+	    swig macros to help in declaring iArrayChangeAll related templates
+	    to swig.
+	  - added terrain2 related includes and interfaces.
+	  - added some intermodules relationships.
+	  - changed cspace.i module include ordering.
+	  - added swig declarations for scfImplementationExt2, 
+	    scfImplementation2, scfFakeInterface, and fixed 
+	    scfImplementationExt1.
+	  - added iAnimatedImage, iProcTexture, iRenderLoop, 
+	    iRenderLoopManager and related includes.
+	  - removed some leftover commented code.
+	  - added iLightIterator, iObjectIterator, iPluginIterator, 
+	    iSectorIterator, iMeshWrapperIterator to interface
+	    list, and related missing iterator directives for swig.
+	- caedes changed cspython.cpp not to use PYTHONPATH variable name as
+	  it seems it conflicts with a Win32-specific #define inside the 
+	  python headers (reported by Lukas Erlinghagen).
+	- res fixed a use of the wrong variable in the MSVC portion of the
+	  PythMod Jam rule which caused Python module projects to not depend
+	  on the specified libraries.
+	- res fixed some botched progress tracking in lighter2.
+03-Oct-2007
+	- caedes changed all python tutorials to use opengl instead of
+	  software rendering.
+	- res fixed a buffer overrun in lighter2: when clipping a triangle to
+	  a box, the resulting polygon can have up to seven vertices, not just
+	  six. (Really.)
+	- res changed genmesh's "lazy" color allocation to use the vertex 
+	  array capacity, not size. (This works better when the vertex buffer
+	  is "presized" and shrunk again, needed when AddVertex() is to be 
+	  used.)
+	- res tweaked the gl3d texture manager to not remove a texture from
+	  the texture array immediately when the texture is freed: the array
+	  is a weak ref one anyway, 0 items are now weeded out lazily. This
+	  makes texture removal slightly more efficient due the saving of an
+	  array search.
+	- caedes added python cpp frozen files.
+	- caedes added some swig ignores for CustomAllocatedDerived and 
+	  CustomAllocatedDerivedVirtual new and delete operators to account
+	  for some swig warnings.
+02-Oct-2007
+	- res augmented lighter2's element classification algorithm to not 
+	  only rely on the position in the scanline to mark an element as
+	  partial or full; determine that by computing the actual element
+	  coverage.
+	- res fixed assignments for csBitArray.
+        - caedes fixed some python relative jam files so they account
+          correctly for the case where swig is not installed.
+	- caedes moved scripts/python/cspace folder to 
+	  scripts/python/frozen/cspace to avoid pythonpath clash when running
+	  the tutorials.
+	- caedes merged the bindingsplit branch into trunk.
+	- caedes added new python related frozen swig files.
+	- caedes adapted jobber-cel-svn.cfg and jobber-svn.cfg to account
+	  for new freeze targets introduced by bindingsplit merge.
+	- res tweaked lighter2's border handling to ignore ray hits to 
+	  primitives neighbouring to the currently lit one in some cases. This
+	  seems to resolve some glitches.
+	- res made some tweaks to the binding-related MSVC projects:
+	  - The Python module projects now have a "py" prefix (in addition to
+	    the already existing "dll" prefix).
+	  - The Python modules are now filtered from the typical workspaces.
+	  - Added a workspace containing the Python-related projects as well.
+	- caedes tweaked swig.jam rules to use a <language>freeze target, 
+	  which freezes all swig files relative to that language.
+	- caedes modified jobber-svn cel and cs files to use the
+	  <language>freeze target from above, also removed the pycscegui
+	  explicit freeze as it is included in the global target now,
+	  finally, fixed bad folder specification for the pythonfreeze (was 
+	  still only using cscript/cspython/).
+	- caedes moved pycscegui frozen .py file to 
+	  scripts/python/frozen/cspace/, and adapted pyceguitest tutorial to
+	  account for its new location.
+01-Oct-2007
+        - Mike Gist reversed the loops in csSector::UnlinkObjects() to avoid
+          meshes being skipped if sl->Remove() removes a mesh object from the
+          sector's mesh list.
+	- Marten fixed regex compilation on MSVC.
+	- res reverted r27755 and r27756 and fixed MSVC regex.c compilation
+	  without the need for regex_wrapper.h: just use 
+	  csutil/generic/regex.h.
+	- Marten fixed compilation on gcc4.2. Don't use reserved keyword for
+	  variable names.
+	- res fixed a flaw in LocalBufferAllocator in single allocation mode:
+	  Free() was always checking whether the local buffer did not consist
+	  of the "free pattern"; however, this should not be done when the
+	  excess allocator was used, since in that case the local buffer is
+	  not touched.
+	- caedes removed scripts/python/cspace.py as it shouldnt exist any
+	  more.
+	- res fixed another flaw in LocalBufferAllocator in single allocation
+	  mode: When Free()ing, the local buffer is now always filled with the
+	  "free pattern", i.e. also when actually freeing memory from the
+	  excess allocator.
+30-Sep-2007
+	- res made some VC warning fixes.
+	- res made the following changes to TinyXML:
+	  - When writing to an iFile, instead of storing the XML to a string
+	    buffer and writing out everything at once, a smaller buffer is
+	    used and the data is written out incrementally.
+	  - Scraped a few bytes off the Tiny node's memory footprint.
+	- res changed csRegExpMatcher to not allocate the 'regex_t' structure
+	  from the heap but have it inline in the class.
+	- res made the following changes to csHash<>:
+	  - Put() and PutUnique() now return a ref to the value that was 
+	    added.
+	  - Added GetOrCreate(), which returns an element for a key if one 
+	    already exists, or adds and returns a default one if not.
+	  - Marked csHashCompute as a "pure" method.
+	- res augmented iPluginManager->LoadPlugin() to optionally be silent
+	  about plugin loading failures.
+	- res made the following changes to lighter:
+	  - Added creation of meshes visualizing traced rays and what they hit
+	    (for debugging purposes).
+	  - Made some small tweaks to improve border element behaviour.
+29-Sep-2007
+	- Mike Gist changed the call to LoadTexture() in FindTexture() to not
+	  create a material if the texture isn't found. This fixes a material
+	  duplication bug in FindNamedMaterial().
+	- Vincent fixed a <comparever> entry in gldriver.xml.
+        - Mike Gist fixed a crash in csMeshFactoryList::Remove().
+	- caedes made some shader changes:
+	  - fixed vertexlight.cgvp for undeclared matrix and incorrect
+	    attenuation.
+	  - fixed ambient.avp binding texture coordinates incorrectly.
+	  - made std_character2.xml use only software skinning (added
+	    soft-skinning.inc snippet).
+	  - added a fallback for character_bump2.xml for cards with no
+	    pixel processor.
+28-Sep-2007
+	- Vincent added static variants in lighter2, cslight, basemapgen and
+	  docconv Jamfiles.
+26-Sep-2007
+	- Darek made some fixes in translator and added manual fallback 
+	  list (e.g. Translator.Fallback.eu = es it en).
+25-Sep-2007
+	- res made relaytool work better with shared libs: no link time 
+	  warnings on x86 resp. link errors on amd64.
+	- res fixed lighter2 to conserve used "single color" lightmaps when 
+	  cleaning "old" lightmaps.
+	- res made lighter2 generate different lightmap texture names for
+	  different levels.
+	- res fixed lighter2's "MaterialImage<>" class so not crash when
+	  negative coords are requested for wrapped sampling.
+	- Marten added back PD-light support in lighter2.
+	- res made lighter2 generate level-specific lightmap texture names 
+	  also for PD light maps and solid color lightmaps (the latter is done
+	  to avoid undesired cleanups).
+	- res fixed lighter2's "MaterialImage<>" interpolation to correctly
+	  sample negative coordinates.
+22-Sep-2007
+	- caedes fixed incorrect java/corepost.i and cleaned perl/corepost.i.
+	- caedes added swig includes for wrapping RenderPriority again, as it
+	  was moved to a different file in cs and this breaks things.
+	- caedes added swig defines for CS_DEPRECATED_VAR and
+	  CS_DEPRECATED_VAR_MSG so this are correctly wrapped.
+	- caedes moved swig scf.i file to include/bindings/common as that
+	  is a more correct place.
+21-Sep-2007
+	- Genjix added support for 3 character long locale codes at the behest
+	  or res2k (thanks!).
+	- Genjix swapped the precedence of checking system language and using
+	  config lanuage, and made a small optimisation in storage.
+	- Genjix slightly modified the behaviour of translator, namely adding
+	  fallbacks for when language is not found and defaulting to english.
+	- iceeey fixed a bug in parsing of GL driver DB where a comparever
+	  which checks for an unknown version string type would cause a
+	  compound fulfill="one" (OR) condition to short-circuit. This makes
+	  the rule "ATI: 'Forceful' fixed function enable" properly applied
+	  to ATI cards on Linux making "walktest terrainf" no longer exhibit
+	  garbled text and CS logo.
+	- res added "partial" shadow support to lighter2: the alpha channel of
+	  a surface's texture is taken into consideration when casting the
+	  shadow.
+	- res added the possibility to instruct the engine to "keep images" on
+	  texture wrappers by default. Useful for apps that need the actual
+	  image data.
+	- res made the GTK alert code also compile on GTK version 2.4.
+20-Sep-2007
+	- caedes, Genjix and iceeey removed some stupid code :D
+	  csQuaternion quat;
+	  if (quat.v.x != 0 || quat.v.y != 0 || quat.v.z != 0 || quat.w != 0)
+	    // ...
+	- Genjix fixed bug in walktest where it doesn't look where the camera
+	  is when you move left and right at start!
+	- Vincent applied res' fix for configure which detected lib3ds-1.3.0
+	  when lib3ds-1.2.0 was installed.
+18-Sep-2007
+	- res added support for the --gc-sections linker flag and made targets
+	  on unix use it.
+	- res added support for GTK message boxes to the xwindow plugin. (They
+	  look much nicer than the Xaw ones.)
+	- res updated the lib3ds check to also check for the I/O callback
+	  prototype changes introduced in lib3ds 1.3.0 and changed gmesh3ds to
+	  select the appropriate variant. Fixes trac #361.
+	- res fixed "fake relay stub" generation for when relaytool is not
+	  available.
+	- res added the line number + column reporting to the TinyXML and 
+	  xmlread error strings. Addresses trac #123.
+	- res changed the configure relaytool test to use CS_PATH_TOOL instead
+	  of hardcoding the path.
+	- res made csparser not assert/crash when the default missing texture
+	  can't be loaded - it merely displays an error message now.
+	- res changed lighter2 to only propagate lights once through any 
+	  portal. This works around apparently occuring infinite recursions.
+	- res made lighter2 also always write out a log file "lighter2.log"
+	  with all reporter messages.
+	- res added some initial "external factory respect" support to lighter2
+	  (means factories outside the level directory won't be altered).
+	- res fixed the "split prevention" logic in the lighter2 lightmap
+	  layouter to not botch splittable meshes.
+	- res made lighter2 write out per-mesh "tex lightmap" SVs.
+	- res fixed lighter2 ignoring the material from the mesh object if it
+	  doesn't have submeshes.
+	- res deprecated the remaining csObject-related macros. Also deprecated
+	  an unlogic usage of iObject::GetChild ().
 17-Sep-2007
+	- res added a driver DB tweak to disable EXT_framebuffer_object for
+	  (now rather old) ATI drivers (see trac #261).
+	- res tweaked the driver DB to enabled "hidden Radeon NPOTS" for newer
+	  ATI drivers (which have a slightly different renderer string).
+	- res made the XML parsers errors slightly more helpful by having the
+	  error message contain the hierarchy of elements in which the error
+	  occured.
+	- res added support for relaying external libraries using relaytool
+	  (that is, they're dynamically loaded, allowing graceful handling
+	  of inavailability).
+	- res changed the xwindow plugin to have the Xaw library relayed.
 	- res made the GL renderer support more than 16 texture image units.
 	- res made the GL framebuffer render-to-texture support work slightly
 	  better with textures larger than the framebuffer.
@@ -16,6 +258,13 @@ chronological order.
 	- res added some initial support for "heavy" (render-to-texture)
 	  portals.
 15-Sep-2007
+	- caedes added swig module post files for java and perl.
+	- res fixed a crash in the GL driver DB when <comparever> was used
+	  with an unrecognized version type.
+	- res tweaked some GL driver DB entries to take advantage of the
+	  new "glvendor" type.
+	- res fixed the default CS_DEPRECATED_VAR definition to actually emit
+	  a declaration.
 	- Marten reimplemented dependent target handling.
 	- Marten fixed a few missing consts in csFIFO.
 14-Sep-2007
@@ -55,6 +304,7 @@ chronological order.
 12-Sep-2007
 	- Jorrit merged the CS AI branch into trunk (basically only a small
 	  change in PriorityQueue).
+<<<<<<< .working
 11-Sep-2007
 	- Marten fixed a small error regarding deprecation warnings in thing.
 	- Marten made a number of improvements to the RM:
@@ -64,6 +314,23 @@ chronological order.
 	   - Handle the case of a single mesh.
 	   - Implemented proper distance sorting.
 	   - Made the sorting table be lazy evaluation.
+=======
+11-Sep-2007
+	- caedes fixed setting of pythonpath inside cspython for new build 
+	  location.
+	- caedes fixed some problems in swig interface files related to
+	  building external modules, also cleaned them up a bit more.
+10-Sep-2007
+	- caedes made some changes to the swig interface files:
+	    - added SetSCFPointer and GetSCFPointer to all modules so
+	      their SCF pointers can be set.
+	    - added a system for python modules to automatically get
+	      their SCF pointers updated, use SetSCFPointer to get that
+	      updated instead of the old cvar.iSCF_SCF.
+	    - cleaned up some old commented code.
+	- caedes modified cspython to set SCF pointer in python modules
+	  using the new SetSCFPointer function.
+>>>>>>> .merge-right.r27812
 8-Sep-2007
 	- res fixed a crash in bezier plugin caused by a rendermanager-only
 	  change accidentally slipping in.
@@ -72,6 +339,24 @@ chronological order.
 	- iceeey made the cssaver save plugin references with the short name
 	  from the original world file, if it was loaded with the saveable
 	  flag set. This makes saving and then loading 'castle' work.
+	- res changed the output directory of the Python modules and .py glue
+	  to out/.../bindings/python.
+	- res added two new targets: "bindings" and "install_bindings" to build
+	  resp. install bindings.
+	- res changed the output/install directory to bindings/python/cspace.
+	- res added a 'bindingsclean' target.
+	- res changed the python modules to not abuse the plugin rule under
+	  MSVC to get built as a DLL any more.
+	- caedes added an initial __init__.py file for the new python
+	  bindings package (scripts/python/cspace/).
+	- res removed the crystalspace_python library and made cspython use the
+	  external python modules.
+	- res made the cspace __init__.py being copied into the
+	  bindings/python/out directory (in out/ resp. the install directory).
+	- res changed cspython plugin to augment the PYTHONPATH env var with
+	  the location for the python module files in the build path.
+	- res fixed the cspython build to properly locate the swig runtime
+	  header.
 7-Sep-2007
 	- res fixed the debug info splitting to put the debug info file into
 	  the same file as the binary (fixes separate debug info for shared
@@ -177,7 +462,7 @@ chronological order.
 	  between snippets to reuse program inputs, were also, incorrectly,
 	  used when resolving candidates for inputs.
 30-Aug-2007
-	- Genjix added api documentation about iSkeleton::SetTransformMode (...)
+	- Genjix added api documentation about iSkeleton::SetTransformMode(...)
 	- Genjix added joystick define to initapp.h (CS_REQUEST_JOYSTICK)
 	- Genjix hid public data member and added an accessor instead.
 	- Genjix removed useless line of code from csSkeleton.
@@ -351,6 +636,9 @@ chronological order.
 	- Jorrit removed renderpriorities tag from some levels.
 	- res changed the delayed TinyXML node freeing to use less memory 
 	  allocations. Can speed up cleanup for large documents.
+        - caedes reworked the split bindings swig files so now both split
+          and monolithic bindings can be built from the same set of swig
+          interface files. this also adds a new core module to the bindings.
 8-Aug-2007
 	- Jorrit (hopefully) removed all traces of the deprecated
 	  iPolygonMesh.
@@ -651,6 +939,22 @@ chronological order.
 	  on very big commands.
 9-Jun-2007
 	- Marten made some fixes for compilation on OSX
+7-Jun-2007
+        - caedes did the following changes in swig interface files:
+          - moved all common swig interface declarations to a new folder
+            called 'include/bindings/common'.
+          - made the main module swig files a thin wrapper that declares
+            the module names and includes the real stuff lying in common/,
+            this will allow building small modules or old monolithic approach
+            for languages that havent adapted for new structure.
+          - merged cspace.i and basepre.i, thus reverting that part of the
+            split.
+          - created post swig files for all modules for python.
+        - caedes removed crystalspace_python dependency on python modules
+          jamfiles (except the 'core' module).
+        - caedes added strict aliasing disabling for the python modules to
+          account for warnings generated by swig code.
+        - caedes split csgeom bindings into one further swig module.
 6-Jun-2007
 	- caedes fixed scripting bindings for latest scf changes.
 	- res fixed the configure javac detection to quote the Java directory
@@ -706,12 +1010,29 @@ chronological order.
 	  objects on a terrain (for example).
 	- Jorrit changed the hotkeys for split-view and related (now
 	  equal to 'v', 'shift-'v, and 'alt-v').
+        - Oktal started splitting the per-module language-specific parts of
+          the swig interface files (only done python/imeshpost.i so far).
 24-May-2007
 	- Jorrit fixed a bug in the socket docs.
 	- Jorrit created 1.2 branch and bumped version of trunk from 1.1
 	  to 1.3.
+        - Oktal reorganized the split swig interface files; cspace.i now
+          contains only code for the core module and modules that have yet to
+          be split; basepre.i and basepost.i contain code that was previously
+          in cspace.i and is common to all the modules.
+        - Oktal added SWIGIMPORTED guards to the split swig interface files.
+          This fixes several serious problems caused by my reorganization.
+          Also a small semantic change to the APPLY_FOR_ALL_INTERFACES stuff.
+        - Oktal moved the pure python CS_REQUEST_PLUGIN wrappers from
+          pythpost.i to cspace.i.
 22-May-2007
 	- Genjix correct SCF Test example.
+        - caedes started splitting of the swig interface files so
+          several modules can be built that work together.
+        - caedes added starting python module folders for the split
+          scripting interface.
+        - caedes removed references and dependencies from cegui from the split
+          python modules jamfiles and cpp files.
 21-May-2007
 	- res committed a patch by 'whirm' to replace the use of pushd/popd
 	  when building CS with cd/cd -: pushd/popd is a bashism while cd/cd -

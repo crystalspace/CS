@@ -96,7 +96,6 @@
       self._func._cs_event_handler_wrapper = self
     def HandleEvent (self, event):
       return self._func(event)
-
   def _csInitializer_SetupEventHandler (reg, obj,
       eventids=None):
     """Replacement of C++ versions."""
@@ -114,7 +113,6 @@
   
   csInitializer.SetupEventHandler = \
     staticmethod(_csInitializer_SetupEventHandler)
-
 %}
 
 #endif // SWIGIMPORTED
