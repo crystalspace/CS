@@ -5,16 +5,14 @@
 %ignore iGeneralFactoryState::GetTriangles;
 %ignore iGeneralFactoryState::GetColors;
 #endif
+
 %include "imesh/objmodel.h"
 %include "imesh/genmesh.h"
 %include "imesh/skeleton.h"
 %include "imesh/gmeshskel2.h"
 struct csSprite2DVertex;
 %ignore iSprite2DState::GetVertices;
-%template(csSprite2DVertexArrayReadOnly) iArrayReadOnly<csSprite2DVertex>;
-%template(csSprite2DVertexArrayChangeElements) 
-iArrayChangeElements<csSprite2DVertex>;
-%template(csSprite2DVertexArrayChangeAll) iArrayChangeAll<csSprite2DVertex>;
+ARRAY_CHANGE_ALL_TEMPLATE(csSprite2DVertex)
 
 %include "imesh/sprite2d.h"
 %include "imesh/sprite3d.h"
@@ -26,6 +24,7 @@ iArrayChangeElements<csSprite2DVertex>;
 %include "imesh/thing.h"
 %template (csCharArrayArray) csArray<csArray<char> >;
 %include "imesh/terrain.h"
+%include "imesh/terrain2.h"
 
 %include "imesh/particles.h"
 
@@ -57,6 +56,26 @@ iArrayChangeElements<csSprite2DVertex>;
   csColor *GetColorByIndex(int index)
   { return &(self->GetColors()[index]); }
 }
+
+// imesh/terrain2.h
+%extend csLockedHeightData
+{
+  float Get(int x,int y)
+  { return self->data[y*self->pitch+x]; }
+
+  void Set(int x,int y,float val)
+  { self->data[y*self->pitch+x] = val; }
+}
+
+%extend csLockedMaterialMap
+{
+  unsigned char Get(int x,int y)
+  { return self->data[y*self->pitch+x]; }
+
+  void Set(int x,int y,unsigned char val)
+  { self->data[y*self->pitch+x] = val; }
+}
+
 
 /* POST */
 #ifndef SWIGIMPORTED

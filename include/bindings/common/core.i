@@ -479,6 +479,17 @@ csArrayCapacityLinear<csArrayThresholdVariable >;
 %ignore csArrayCapacityLinear;
 %ignore csArrayThresholdVariable;
 %include "csutil/array.h"
+%define ARRAY_CHANGE_ALL_TEMPLATE(typename)
+%template (typename ## ArrayReadOnly) iArrayReadOnly<typename >;
+%template (typename ## ArrayChangeElements) iArrayChangeElements<typename >;
+%template (typename ## ArrayChangeAll) iArrayChangeAll<typename >;
+%enddef
+%define ARRAY_CHANGE_ALL_TEMPLATE_PTR(typename)
+%template (typename ## ArrayReadOnly) iArrayReadOnly<typename* >;
+%template (typename ## ArrayChangeElements) iArrayChangeElements<typename* >;
+%template (typename ## ArrayChangeAll) iArrayChangeAll<typename* >;
+%enddef
+
 
 %ignore scfInitialize;
 /*%immutable iSCF::SCF;*/

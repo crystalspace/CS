@@ -19,6 +19,13 @@ chronological order.
 	  before, esp. near corners), and the sampling points are slightly
 	  fudged away from the primitive to make it less likely that it hits
 	  very close primitives.
+	- caedes did the following changes to swig files:
+	  - added ARRAY_CHANGE_ALL_TEMPLATE and ARRAY_CHANGE_ALL_TEMPLATE_PTR
+	    swig macros to help in declaring iArrayChangeAll related templates
+	    to swig.
+	  - added terrain2 related includes and interfaces.
+	  - added some intermodules relationships.
+	  - changed cspace.i module include ordering.
 03-Oct-2007
 	- caedes changed all python tutorials to use opengl instead of
 	  software rendering.

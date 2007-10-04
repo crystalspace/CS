@@ -2,10 +2,7 @@
 %include "csgfx/rgbpixel.h"
 %ignore ShaderVarName;
 %include "csgfx/shadervar.h"
-%template(csShaderVariableArrayReadOnly) iArrayReadOnly<csShaderVariable * >;
-%template(csShaderVariableArrayChangeElements)
-iArrayChangeElements<csShaderVariable * >;
-%template(csShaderVariableArray) iArrayChangeAll<csShaderVariable * >;
+ARRAY_CHANGE_ALL_TEMPLATE_PTR(csShaderVariable)
 
 %template(csImageBaseBase) scfImplementation1<csImageBase, iImage>;
 %include "csgfx/imagebase.h"

@@ -1,5 +1,8 @@
 %module imesh
 %import "bindings/core.i"
+%import "bindings/ivaria.i"
+%import "bindings/csgeom.i"
+%import "bindings/ivideo.i"
 %{
 #include "crystalspace.h"
 %}

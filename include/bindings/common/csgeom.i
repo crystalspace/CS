@@ -40,6 +40,7 @@
 %ignore csVector3::Norm (const csVector3 &);
 %ignore csVector3::Unit (const csVector3 &);
 %include "csgeom/vector3.h"
+ARRAY_CHANGE_ALL_TEMPLATE(csVector3)
 
 template<typename T> struct csVector4T {
     T x,y,z,w;
