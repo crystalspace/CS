@@ -42,6 +42,12 @@ chronological order.
 	  PythMod Jam rule which caused Python module projects to not depend
 	  on the specified libraries.
 	- res fixed some botched progress tracking in lighter2.
+	- res moved the castle textures to their own .zip file: notably, their
+	  license (CC-by-nc) differs from the other textures' one (not 
+	  separately specified, presumably LGPL). Separating the textures
+	  reduces the risk that the castle textures are mistaken as being 
+	  under the LGPL and makes it easier for clients to not distribute
+	  them should they find the license inacceptable.
 03-Oct-2007
 	- caedes changed all python tutorials to use opengl instead of
 	  software rendering.
