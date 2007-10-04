@@ -6,6 +6,13 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+04-Oct-2007
+	- andres added a VarFileInfo Block to the resources for win32 
+	  dlls/executables as they are invalid without and especially considered
+	  invalid by windows installer.
+	- andres made the search for the CS installation in the registry not to
+	  look at the version agnostic version before the version aware bit in
+	  registry
 01-Oct-2007
         - Mike Gist reversed the loops in csSector::UnlinkObjects() to avoid
           meshes being skipped if sl->Remove() removes a mesh object from the
