@@ -674,8 +674,9 @@ namespace lighter
       vdata.lightmapUVs[triangle.b], vdata.lightmapUVs[triangle.c]);
 
     csVector2 elementCenter = minUV + csVector2(u+0.5f, v+0.5f);
-    
-    // Traverse the triangle edges, clip the offsets to the edge
+
+    csVector2 edgeD[3];
+    csVector2 edgeN[3];
     for (size_t e1 = 0; e1 < 3; ++e1)
     {
       size_t e2 = CS::Math::NextModulo3 (e1);
@@ -684,26 +685,49 @@ namespace lighter
       csVector2 uv2 = vdata.lightmapUVs[triangle[e2]];
 
       // Possible violating edge        
-      csVector2 edgeD = uv2-uv1;
-      csVector2 edgeN (edgeD.y, -edgeD.x); 
+      edgeD[e1] = uv2-uv1;
+      edgeN[e1].Set (edgeD[e1].y, -edgeD[e1].x); 
+      edgeN[e1] /= edgeN[e1].Norm();
+    }
+    
+    for (size_t i = 0; i < 4; ++i)
+    {
+      csVector2 absOffset;
+      absOffset = offsets[i] + elementCenter;
 
-      for (size_t i = 0; i < 4; ++i)
+      size_t endOfLoop = 3;
+      // Traverse the triangle edges, clip the offsets to the edge
+      for (size_t e = 0; e < endOfLoop; ++e)
       {
-        csVector2 absOffset;
-        absOffset = offsets[i] + elementCenter;
+        size_t e1 = e % 3;
+        csVector2 uv1 = vdata.lightmapUVs[triangle[e1]];
 
         // Compute edge-point distance
         csVector2 pointUV1Offset = absOffset - uv1;  
-        float dist = edgeN * pointUV1Offset;        
+        float dist = edgeN[e1] * pointUV1Offset;        
 
-        if (dist*uvArea > 0)
+        if ((fabsf (dist) > EPSILON) && (dist*uvArea > 0))
         {
           clipMask |= (1 << i);
-          float denom = edgeN * edgeN;
+          float denom = edgeN[e1] * edgeN[e1];
           
-          csVector2 lineOffset = edgeN * (dist / denom)*(1.0f + EPSILON);
+          csVector2 lineOffset = edgeN[e1] * (dist / denom)*(1.0f + EPSILON);
+
+          /* Make sure the point is not just on the edge, but also on the
+             triangle */
+          const float nd = (edgeD[e1].Norm());
+          const float f = ((pointUV1Offset - lineOffset) * edgeD[e1]) / (nd * nd);
+          if (f < LITEPSILON)
+          {
+            lineOffset -= edgeD[e1] * (-f + EPSILON);
+          }
+          else if (f > 1.0f-LITEPSILON)
+          {
+            lineOffset -= edgeD[e1] * (1.0f-f - EPSILON);
+          }
 
           offsets[i] -= lineOffset;
+          absOffset -= lineOffset;
         }
       }
     }

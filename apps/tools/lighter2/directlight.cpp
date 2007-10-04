@@ -126,8 +126,15 @@ namespace lighter
       const csVector3 offsetVector = uVec * ElementQuadrantConstants[qi].x +
         vVec * ElementQuadrantConstants[qi].y;
 
-      const csVector3 pos = elementC + offsetVector;
+      csVector3 pos = elementC + offsetVector;
       const csVector3 normal = element.primitive.ComputeNormal (pos);
+      if (elemType == Primitive::ELEMENT_BORDER)
+      {
+        const float fudge = EPSILON;
+        /* Slightly offset the point on the primitive to work around unwanted 
+           occlusions by e.g. neighbouring prims */
+        pos -= element.primitive.GetPlane().Normal() * fudge;
+      }
 
       res += shade.ShadeLight (element.primitive.GetObject(), 
         pos, normal, lightSampler, &element.primitive,
@@ -223,33 +230,6 @@ namespace lighter
       // Ignore coplanar primitives.
       if (prim->GetPlane() == ignorePrim->GetPlane ())
         return true;
-
-      /* If the primitive points the same direction as the ray we trace
-       * and the point to be lit is (almost) on the back of the primitive
-       * ignore if it's neighbouring.
-       *
-       * (Yes, it's a bit of a hack, but it works around errorneous shadows
-       * cast by neighbouring primitives due numerical inaccuracies.)
-       */
-      float smallDistance = 1.0f / globalConfig.GetLMProperties().lmDensity;
-      if (((prim->GetPlane().Normal() * rayDir) > 0)
-        && (prim->GetPlane().Classify (point) < smallDistance))
-      {
-        for (size_t i = 0; i < 3; i++)
-        {
-          const size_t vi = prim->GetTriangle()[i];
-          const csVector3& pi = prim->GetVertexData().positions[vi];
-
-          for (size_t j = 0; j < 3; j++)
-          {
-            const size_t vj = ignorePrim->GetTriangle()[j];
-            const csVector3& pj = ignorePrim->GetVertexData().positions[vj];
-
-            if ((pi - pj).IsZero (SMALL_EPSILON))
-              return true;
-          }
-        }
-      }
 
       return false;
     }
