@@ -715,6 +715,10 @@ SET_HELPER(csStringID)
 %include "iutil/vfs.h"
 %include "iutil/dbghelp.h"
 %include "iutil/object.h"
+%extend iObjectIterator
+{
+  ITERATOR_FUNCTIONS(iObjectIterator)
+}
 %include "iutil/strset.h"
 %ignore CS_QUERY_REGISTRY_TAG_is_deprecated;
 %include "iutil/objreg.h"
@@ -786,6 +790,10 @@ typedef int int32_t;
 %include "csutil/eventnames.h"
 %include "iutil/eventh.h"
 %include "iutil/plugin.h"
+%extend iPluginIterator
+{
+  ITERATOR_FUNCTIONS(iPluginIterator)
+}
 
 %include "iutil/csinput.h"
 %include "iutil/cfgfile.h"

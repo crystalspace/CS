@@ -32,6 +32,9 @@ chronological order.
 	  - added iAnimatedImage, iProcTexture, iRenderLoop, 
 	    iRenderLoopManager and related includes.
 	  - removed some leftover commented code.
+	  - added iLightIterator, iObjectIterator, iPluginIterator, 
+	    iSectorIterator, iMeshWrapperIterator to interface
+	    list, and related missing iterator directives for swig.
 03-Oct-2007
 	- caedes changed all python tutorials to use opengl instead of
 	  software rendering.
