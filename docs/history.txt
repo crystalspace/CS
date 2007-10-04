@@ -26,6 +26,12 @@ chronological order.
 	  - added terrain2 related includes and interfaces.
 	  - added some intermodules relationships.
 	  - changed cspace.i module include ordering.
+	  - added swig declarations for scfImplementationExt2, 
+	    scfImplementation2, scfFakeInterface, and fixed 
+	    scfImplementationExt1.
+	  - added iAnimatedImage, iProcTexture, iRenderLoop, 
+	    iRenderLoopManager and related includes.
+	  - removed some leftover commented code.
 03-Oct-2007
 	- caedes changed all python tutorials to use opengl instead of
 	  software rendering.

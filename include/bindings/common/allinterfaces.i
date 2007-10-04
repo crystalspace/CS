@@ -21,6 +21,7 @@
 // list. Please keep the list sorted alphabetically.
 
 %define IENGINE_APPLY_FOR_EACH_INTERFACE
+  INTERFACE_APPLY(iAnimatedImage)
   INTERFACE_APPLY(iCamera)
   INTERFACE_APPLY(iCameraPosition)
   INTERFACE_APPLY(iEngine)
@@ -36,6 +37,9 @@
   INTERFACE_APPLY(iMovableListener)
   INTERFACE_APPLY(iPortal)
   INTERFACE_APPLY(iPortalContainer)
+  INTERFACE_APPLY(iProcTexture)
+  INTERFACE_APPLY(iRenderLoop)
+  INTERFACE_APPLY(iRenderLoopManager)
   INTERFACE_APPLY(iSceneNode)
   INTERFACE_APPLY(iSceneNodeArray)
   INTERFACE_APPLY(iSector)

@@ -39,6 +39,8 @@
 %include "iengine/viscull.h"
 %include "iengine/portal.h"
 %include "iengine/portalcontainer.h"
+%include "iengine/rendersteps/icontainer.h"
+%include "iengine/renderloop.h"
 
 %extend iVisibilityObjectIterator {
   ITERATOR_FUNCTIONS(iVisibilityObjectIterator)

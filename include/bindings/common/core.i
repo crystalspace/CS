@@ -816,6 +816,8 @@ typedef int int32_t;
 %immutable csImageIOFileFormatDescription::subtype;
 %template (csImageIOFileFormatDescriptions) csArray<csImageIOFileFormatDescription const*>;
 %include "igraphic/imageio.h"
+%include "igraphic/animimg.h"
+%include "itexture/iproctex.h"
 
 %template(pycsObject) scfImplementation1<csObject,iObject >;
 %include "csutil/csobject.h"
@@ -997,6 +999,7 @@ csEventID _csevJoystickEvent (iObjectRegistry *);
 }
 
 %include "cstool/primitives.h"
+
 /* List Methods */
 /****************************************************************************
  * These functions are replacements for CS's macros of the same names.

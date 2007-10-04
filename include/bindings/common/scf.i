@@ -9,6 +9,13 @@
   are wrapped.
 */
 
+
+
+template<class If>
+class scfFakeInterface
+{
+};
+
 %define SWIG_SCF_IMPL(macro_name)
 	protected:
 	virtual ~ ## macro_name ();
@@ -27,13 +34,26 @@ template <class T,class K> class scfImplementation1 : public K
 	SWIG_SCF_IMPL(scfImplementation1)
 };
 
+template <class T,class K,class J> class scfImplementation2 : public K, public J
+{
+	SWIG_SCF_IMPL(scfImplementation2)
+};
+
 template <class T,class K> class scfImplementationExt0 : public K
 {
 	SWIG_SCF_IMPL(scfImplementationExt0)
 };
-template <class T,class K,class J> class scfImplementationExt1 : public K
+template <class T,class K,class J> class scfImplementationExt1 : public K, public J
 {
 	SWIG_SCF_IMPL(scfImplementationExt1)
+	protected:
+	virtual macro_name ();
+};
+
+template <class T,class K,class J,class J2> class scfImplementationExt2 : 
+public K, public J, public J2
+{
+	SWIG_SCF_IMPL(scfImplementationExt2)
 	protected:
 	virtual macro_name ();
 };
