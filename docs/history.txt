@@ -48,6 +48,8 @@ chronological order.
 	  reduces the risk that the castle textures are mistaken as being 
 	  under the LGPL and makes it easier for clients to not distribute
 	  them should they find the license inacceptable.
+	- res fixed lighter2 to not compute the element types for a primitive
+	  if the object it belongs to is vertex-lit. Fixes trac #370.
 03-Oct-2007
 	- caedes changed all python tutorials to use opengl instead of
 	  software rendering.

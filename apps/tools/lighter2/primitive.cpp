@@ -211,6 +211,9 @@ namespace lighter
 
   void Primitive::Prepare ()
   {
+    ComputeBaryCoeffs();
+    if (radObject->lightPerVertex) return;
+
     // Reset current data
     
     // Compute min/max uv
@@ -289,8 +292,6 @@ namespace lighter
     }
 
     //PrintElements (elementClassification, uc, vc);
-
-    ComputeBaryCoeffs();
   }
 
   size_t Primitive::ComputeElementIndex (const csVector3& pt) const
