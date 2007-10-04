@@ -35,6 +35,9 @@ chronological order.
 	  - added iLightIterator, iObjectIterator, iPluginIterator, 
 	    iSectorIterator, iMeshWrapperIterator to interface
 	    list, and related missing iterator directives for swig.
+	- caedes changed cspython.cpp not to use PYTHONPATH variable name as
+	  it seems it conflicts with a Win32-specific #define inside the 
+	  python headers (reported by Lukas Erlinghagen).
 03-Oct-2007
 	- caedes changed all python tutorials to use opengl instead of
 	  software rendering.

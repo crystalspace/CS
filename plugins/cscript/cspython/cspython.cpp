@@ -98,10 +98,10 @@ bool csPython::Initialize(iObjectRegistry* object_reg)
  
   // Add compile location to pythonpath 
 #ifdef DEFAULT_PYTHMOD_PATH
-  csString PYTHONPATH (getenv ("PYTHONPATH"));
-  PYTHONPATH.Insert (0, CS_PATH_DELIMITER);
-  PYTHONPATH.Insert (0, DEFAULT_PYTHMOD_PATH);
-  setenv ("PYTHONPATH", PYTHONPATH, true);
+  csString pythonpath (getenv ("PYTHONPATH"));
+  pythonpath.Insert (0, CS_PATH_DELIMITER);
+  pythonpath.Insert (0, DEFAULT_PYTHMOD_PATH);
+  setenv ("PYTHONPATH", pythonpath, true);
 #endif
 
   Py_SetProgramName("Crystal Space -- Python");
