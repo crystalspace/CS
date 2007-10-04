@@ -9,6 +9,9 @@ chronological order.
 	- andres added a VarFileInfo Block to the resources for win32 
 	  dlls/executables as they are invalid without and especially considered
 	  invalid by windows installer.
+	- andres made the search for the CS installation in the registry not to
+	  look at the version agnostic version before the version aware bit in
+	  registry
 03-Oct-2007
 	- caedes changed all python tutorials to use opengl instead of
 	  software rendering.
