@@ -560,7 +560,6 @@ namespace lighter
           lightmaps[i]->GetHeight());
         lm->Grow (lightmaps[i]->GetWidth(), 
           lightmaps[i]->GetHeight());
-        lm->Initialize ();
         pdLights->Push (lm);
       }
       pdLightmaps.Put (light, pdLights);

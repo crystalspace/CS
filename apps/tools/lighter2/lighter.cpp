@@ -48,7 +48,6 @@ namespace lighter
       progInitializeMain ("Initialize objects", 10),
         progInitialize (0, 3, &progInitializeMain),
         progInitializeLightmaps ("Lightmaps", 3, &progInitializeMain),
-          progInitializeLM (0, 3, &progInitializeLightmaps),
           progPrepareLighting (0, 5, &progInitializeLightmaps),
             progPrepareLightingUVL (0, 95, &progPrepareLighting),
             progPrepareLightingSector (0, 5, &progPrepareLighting),
@@ -94,7 +93,7 @@ namespace lighter
     if (csCommandLineHelper::CheckHelp (objectRegistry, cmdLine))
     {
       CommandLineHelp ();
-      return true;
+      return false;
     }
 
     // Load config
@@ -254,22 +253,6 @@ namespace lighter
       delete progSector;
     }
     progInitialize.SetProgress (1);
-
-    progInitializeLM.SetProgress (0);
-    u = updateFreq = progInitializeLM.GetUpdateFrequency (
-      scene->GetLightmaps().GetSize());
-    progressStep = updateFreq * (1.0f / scene->GetLightmaps().GetSize());
-    for (size_t i = 0; i < scene->GetLightmaps().GetSize(); i++)
-    {
-      Lightmap * lm = scene->GetLightmaps ()[i];
-      lm->Initialize();
-      if (--u == 0)
-      {
-        progInitializeLM.IncProgress (progressStep);
-        u = updateFreq;
-      }
-    }
-    progInitializeLM.SetProgress (1);
 
     uvLayout->PrepareLighting (progPrepareLightingUVL);
     uvLayout.Invalidate();

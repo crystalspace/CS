@@ -87,7 +87,6 @@ namespace lighter
     Statistics::Progress progInitializeMain;
     Statistics::Progress progInitialize;
     Statistics::Progress progInitializeLightmaps;
-    Statistics::Progress progInitializeLM;
     Statistics::Progress progPrepareLighting;
     Statistics::Progress progPrepareLightingUVL;
     Statistics::Progress progPrepareLightingSector;

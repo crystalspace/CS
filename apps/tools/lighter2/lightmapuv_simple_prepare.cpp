@@ -484,11 +484,11 @@ namespace lighter
         const QueuedPDPrimitives& queue = currentQueue.queue->Get (queueIndex);
         queue.layouter->LayoutQueuedPrims (*queue.prims, queue.layoutID,
           queue.groupNum, result.allocIndex, result.positions, 0, 0);
-        if (--u == 0)
-        {
-          progressNonPDL.IncProgress (progressStep);
-          u = updateFreq;
-        }
+      }
+      if (--u == 0)
+      {
+        progressNonPDL.IncProgress (progressStep);
+        u = updateFreq;
       }
     }
     progressNonPDL.SetProgress (1);
