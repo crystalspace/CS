@@ -38,6 +38,9 @@ chronological order.
 	- caedes changed cspython.cpp not to use PYTHONPATH variable name as
 	  it seems it conflicts with a Win32-specific #define inside the 
 	  python headers (reported by Lukas Erlinghagen).
+	- res fixed a use of the wrong variable in the MSVC portion of the
+	  PythMod Jam rule which caused Python module projects to not depend
+	  on the specified libraries.
 03-Oct-2007
 	- caedes changed all python tutorials to use opengl instead of
 	  software rendering.

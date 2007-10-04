@@ -43,7 +43,7 @@ rule PythMod
     
     Description py$(2) : $(desc) ;
     DLL py$(2) : $(3) : $(2).pyd ;
-    LinkWith py$(2) : $(4) ;
+    LinkWith py$(2) : $(5) ;
     ExternalLibs py$(2) : PYTHON $(6) ;
     Depends py$(2) : $(1) ;
     CompileGroups py$(2) : all bindings ;
