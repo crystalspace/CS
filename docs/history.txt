@@ -63,6 +63,8 @@ chronological order.
 	  by 1.3.30 7 days later).
 	- caedes added a jam target for generating a python cspace.pth file on
 	  install (will automatically be run with install_bindings).
+	- res fixed lighter2 trying to set up tangents for genmeshes even if 
+	  they aren't needed.
 04-Oct-2007
 	- andres added a VarFileInfo Block to the resources for win32 
 	  dlls/executables as they are invalid without and especially considered

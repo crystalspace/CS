@@ -142,7 +142,8 @@ namespace lighter
       vertCount * sizeof (csVector2));
 
     vertexData.ResizeCustomData ();
-    SetupTangents (genFact);
+    if (globalConfig.GetLighterProperties().directionalLMs)
+      SetupTangents (genFact);
 
     if (genFact->GetSubMeshCount() > 0)
     {
