@@ -37,6 +37,8 @@ chronological order.
 	  internally assigned to the wrong block (and hence cause invalid
 	  output).
 	- res added initial support for directional lightmaps to lighter2.
+	- res changed the "classic lighting" weaver snippet to take advantage
+	  of directional lightmaps.
 04-Oct-2007
 	- andres added a VarFileInfo Block to the resources for win32 
 	  dlls/executables as they are invalid without and especially considered
