@@ -15,6 +15,8 @@ chronological order.
 	  - temporarily moved fontserv to core module, as there are problems
 	    having it in a separate module.
 	  - added array protocol declaration for iStringArray.
+	  - added iterator protocol for scfInterfaceMetadataList python
+	    wrapper.
 	- caedes changed PyBindingModule rule to not emit warnings on
 	  uninitialized variables coming from swig generated code (was like
 	  this originially but somehow the flag got removed on bindingsplit).
