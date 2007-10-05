@@ -188,6 +188,11 @@ csBugPlug::~csBugPlug ()
   }
 
   delete shadow;
+
+  if (do_profiler_log)
+  {
+    CS_PROFILER_STOP_LOGGING();
+  }
 }
 
 bool csBugPlug::Initialize (iObjectRegistry *object_reg)
