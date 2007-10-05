@@ -41,6 +41,8 @@ chronological order.
 	  of directional lightmaps.
 	- res added some (still very limited) per-map configuration support to
 	  lighter2 (only lightmap density works atm).
+	- res converted data/water.zip to use genmeshes, fixed poly meshes,
+	  and lit it with lighter2.
 04-Oct-2007
 	- andres added a VarFileInfo Block to the resources for win32 
 	  dlls/executables as they are invalid without and especially considered
