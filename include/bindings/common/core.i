@@ -794,7 +794,6 @@ typedef int int32_t;
 {
   ITERATOR_FUNCTIONS(iPluginIterator)
 }
-%include "ivideo/fontserv.h"
 
 %include "iutil/csinput.h"
 %include "iutil/cfgfile.h"

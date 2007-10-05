@@ -21,7 +21,6 @@
 // list. Please keep the list sorted alphabetically.
 
 %define IENGINE_APPLY_FOR_EACH_INTERFACE
-  INTERFACE_APPLY(iAnimatedImage)
   INTERFACE_APPLY(iCamera)
   INTERFACE_APPLY(iCameraPosition)
   INTERFACE_APPLY(iEngine)
@@ -158,6 +157,7 @@
 
 %define IVIDEO_APPLY_FOR_EACH_INTERFACE
   INTERFACE_APPLY(iFont)
+  INTERFACE_APPLY(iFontServer)
   INTERFACE_APPLY(iGraphics3D)
   INTERFACE_APPLY(iGraphics2D)
   INTERFACE_APPLY(iHalo)
@@ -170,12 +170,12 @@
 %enddef
 
 %define CORE_APPLY_FOR_EACH_INTERFACE
+  INTERFACE_APPLY(iAnimatedImage)
   INTERFACE_APPLY(iBase)
   INTERFACE_APPLY(iCacheManager)
   INTERFACE_APPLY(iCommandLineParser)
   INTERFACE_APPLY(iComponent)
   INTERFACE_APPLY(iConfigFile)
-  INTERFACE_APPLY(iFontServer)
   INTERFACE_APPLY(iConfigIterator)
   INTERFACE_APPLY(iConfigManager)
   INTERFACE_APPLY(iDataBuffer)

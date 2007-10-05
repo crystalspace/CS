@@ -20,6 +20,11 @@ chronological order.
 	- caedes changed PyBindingModule rule to not emit warnings on
 	  uninitialized variables coming from swig generated code (was like
 	  this originially but somehow the flag got removed on bindingsplit).
+	- caedes reordered cspace python package __init__.py to import
+	  modules in inheritance order, and moved fontserv back to ivideo
+	  module as the reordering takes care of type resolution problems.
+	- caedes moved iAnimatedImage to the swig core interfaces list (had been
+	  incorrectly added to the iengine interface list).
 04-Oct-2007
 	- andres added a VarFileInfo Block to the resources for win32 
 	  dlls/executables as they are invalid without and especially considered
