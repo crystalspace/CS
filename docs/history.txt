@@ -15,6 +15,9 @@ chronological order.
 	  - temporarily moved fontserv to core module, as there are problems
 	    having it in a separate module.
 	  - added array protocol declaration for iStringArray.
+	- caedes changed PyBindingModule rule to not emit warnings on
+	  uninitialized variables coming from swig generated code (was like
+	  this originially but somehow the flag got removed on bindingsplit).
 04-Oct-2007
 	- andres added a VarFileInfo Block to the resources for win32 
 	  dlls/executables as they are invalid without and especially considered
