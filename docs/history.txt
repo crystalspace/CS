@@ -45,6 +45,12 @@ chronological order.
 	  and lit it with lighter2.
 	- res changed shaderweaver to emit a meaningful message when an input
 	  for a snippet can't be matched and no default is given.
+	- caedes changed castle license to by-sa. Xotic agreed some time ago
+	  to have a license similar to cs so as to not complicate
+	  distribution, but seems we forgot to update the licenses
+	  appropriately. He still agrees that we can use the license more
+	  appropriate for cs (last time we agreed on by-sa, so thats what it
+	  is now).
 04-Oct-2007
 	- andres added a VarFileInfo Block to the resources for win32 
 	  dlls/executables as they are invalid without and especially considered
