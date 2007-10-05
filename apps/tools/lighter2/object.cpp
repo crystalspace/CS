@@ -28,9 +28,9 @@
 namespace lighter
 {
 
-  ObjectFactory::ObjectFactory ()
+  ObjectFactory::ObjectFactory (const Configuration& config)
     : lightPerVertex (false), noModify (false), hasTangents (false),
-    lmScale (globalConfig.GetLMProperties ().lmDensity),
+    lmScale (config.GetLMProperties ().lmDensity),
     factoryWrapper (0)
   {
   }

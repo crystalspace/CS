@@ -29,7 +29,8 @@
 
 namespace lighter
 {
-  ObjectFactory_Genmesh::ObjectFactory_Genmesh()
+  ObjectFactory_Genmesh::ObjectFactory_Genmesh (const Configuration& config) :
+    ObjectFactory (config)
   {
     submeshNames.AttachNew (new SubmeshNameArray);
     saverPluginName = "crystalspace.mesh.saver.factory.genmesh";

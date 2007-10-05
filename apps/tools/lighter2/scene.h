@@ -199,6 +199,7 @@ namespace lighter
 
     struct LoadedFile
     {
+      Configuration sceneConfig;
       csRef<iDocumentNode> rootNode;
       csRef<iDocument> document;
       csString levelName;
@@ -206,6 +207,8 @@ namespace lighter
       csSet<csString> texturesToClean;
       csSet<csString> texFileNamesToDelete;
       csArray<Object*> fileObjects;
+
+      LoadedFile() : sceneConfig (globalConfig) {}
     };
 
     // All files loaded into scene

@@ -160,6 +160,7 @@ namespace lighter
         csString tmp (pathDir);
         csSplitPath (tmp, pathDir, maxPartLen, pathFile, maxPartLen);
       }
+      bool defaultLevelName = true;
       if (strlen (pathFile) == 0)
       {
         // No name, use some random number
@@ -179,6 +180,26 @@ namespace lighter
       {
         // Use found file name as level name
         sceneFiles[i].levelName = pathFile;
+        // Strip off extension
+        size_t dot = sceneFiles[i].levelName.FindLast ('.');
+        if (dot != (size_t)-1)
+          sceneFiles[i].levelName.Truncate (dot);
+        defaultLevelName = false;
+      }
+      // Read lighter2.cfg in map dir
+      {
+        csRef<csConfigFile> cfgFile;
+        cfgFile.AttachNew (new csConfigFile ("lighter2.cfg", globalLighter->vfs));
+        sceneFiles[i].sceneConfig.Initialize (cfgFile);
+      }
+      // Read <level>.cfg in map dir
+      if (!defaultLevelName)
+      {
+        csString cfgname;
+        cfgname.Format ("%s.cfg", sceneFiles[i].levelName.GetData());
+        csRef<csConfigFile> cfgFile;
+        cfgFile.AttachNew (new csConfigFile (cfgname, globalLighter->vfs));
+        sceneFiles[i].sceneConfig.Initialize (cfgFile);
       }
 
       sceneFiles[i].document = doc;
@@ -944,7 +965,7 @@ namespace lighter
     if (!strcasecmp (type, "crystalspace.mesh.object.genmesh"))
     {
       // Genmesh
-      radFact.AttachNew (new ObjectFactory_Genmesh ());
+      radFact.AttachNew (new ObjectFactory_Genmesh (fileInfo->sceneConfig));
     }
     else
       return mpNotAGenMesh;

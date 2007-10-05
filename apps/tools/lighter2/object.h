@@ -56,7 +56,7 @@ namespace lighter
   class ObjectFactory : public csRefCount
   {
   public:
-    ObjectFactory ();
+    ObjectFactory (const Configuration& config);
 
     virtual bool PrepareLightmapUV (LightmapUVFactoryLayouter* uvlayout);
 

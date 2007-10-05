@@ -54,7 +54,7 @@ namespace lighter
   class ObjectFactory_Genmesh : public ObjectFactory
   {
   public:
-    ObjectFactory_Genmesh ();
+    ObjectFactory_Genmesh (const Configuration& config);
 
     // Get a new object
     virtual csPtr<Object> CreateObject ();
