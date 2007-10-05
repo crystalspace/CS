@@ -26,6 +26,8 @@ chronological order.
 	- caedes moved iAnimatedImage to the swig core interfaces list (had been
 	  incorrectly added to the iengine interface list).
 	- res changed bugplug to stop profiler logging when it's unloaded.
+	- res made bugplug's "normal drawing" also draw tangents and
+	  bitangents.
 04-Oct-2007
 	- andres added a VarFileInfo Block to the resources for win32 
 	  dlls/executables as they are invalid without and especially considered
