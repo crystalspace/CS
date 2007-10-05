@@ -28,6 +28,10 @@ chronological order.
 	- res changed bugplug to stop profiler logging when it's unloaded.
 	- res made bugplug's "normal drawing" also draw tangents and
 	  bitangents.
+	- res added a method to obtain a custom render buffer by name string 
+	  from genmeshes.
+	- res made changed the genmesh factory to allow retrieval of the
+	  tangent and bitangent buffers via GetRenderBuffer().
 04-Oct-2007
 	- andres added a VarFileInfo Block to the resources for win32 
 	  dlls/executables as they are invalid without and especially considered
