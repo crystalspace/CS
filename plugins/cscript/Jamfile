@@ -115,6 +115,9 @@ PythModDepends coremod imeshmod isndsysmod ivariamod ienginemod cstoolmod
   ivideomod imapmod csgfxmod csgeommod ;
 Depends bindings : pythmod ;
 
+# rule to move __init__.py file to the generated python bindings
+# folder.
+
 rule CopyCspaceInitPy
 {
   local init_py = __init__.py ;
@@ -129,5 +132,29 @@ rule CopyCspaceInitPy
   InstallBindingsData $(init_py:G=src) : $(init_py_dir) : bindings python cspace ;
 }
 
-CopyCspaceInitPy ;
+# rule to generate a python .pth file on install.
+# this allows to have cspace module in cs install location, but still
+# have python find it.
+
+actions CspacePthGen bind PACKAGEPATH
+{
+  echo $(PACKAGEPATH) > $(<)
+}
+
+rule InstallCspacePth
+{
+  local cspace_pth = cspace.pth ;
+  MakeLocate $(cspace_pth) : [ ConcatDirs $(libdir) python$(PYTHON.VERSION) site-packages ] ;
+  local destdir = [ ConcatDirs $(appdatadir) bindings python ] ;
+  NotFile $(destdir) ;
+  PACKAGEPATH on $(cspace_pth) = $(destdir) ;
+  CspacePthGen $(cspace_pth) ;
+  Depends install_bindings : $(cspace_pth) ;
+}
+
+if $(PYTHON.AVAILABLE) = "yes"
+{
+  CopyCspaceInitPy ;
+  InstallCspacePth ;
+}
 
