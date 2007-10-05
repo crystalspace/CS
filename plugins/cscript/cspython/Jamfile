@@ -6,7 +6,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   # cspython -- Crystal Space plugin
   #--------
   local swigruntime = swigpyruntime.h ;
-  if $(CMD.SWIG)
+  if $(DO_SWIG_PYTHON)
   {
     SwigExternalRuntime $(swigruntime) :
       python :
