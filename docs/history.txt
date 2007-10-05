@@ -11,6 +11,10 @@ chronological order.
 	  folder is created before swig is run on the modules in all
 	  situations. This fixes problems when running pythonfreeze on a clean
 	  tree.
+	- caedes made some changes to swig files:
+	  - temporarily moved fontserv to core module, as there are problems
+	    having it in a separate module.
+	  - added array protocol declaration for iStringArray.
 04-Oct-2007
 	- andres added a VarFileInfo Block to the resources for win32 
 	  dlls/executables as they are invalid without and especially considered

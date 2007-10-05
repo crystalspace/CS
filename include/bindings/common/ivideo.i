@@ -13,7 +13,7 @@
 %ignore GetGlyphBitmap(uint8, int &, int &);
 %ignore GetGlyphAlphaBitmap(uint8, int &, int &);
 %ignore GetDimensions(char const *, int &, int &);
-%include "ivideo/fontserv.h"
+//%include "ivideo/fontserv.h"
 
 %include "ivideo/halo.h"
 %include "ivideo/shader/shader.h"

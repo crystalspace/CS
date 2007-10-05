@@ -794,11 +794,13 @@ typedef int int32_t;
 {
   ITERATOR_FUNCTIONS(iPluginIterator)
 }
+%include "ivideo/fontserv.h"
 
 %include "iutil/csinput.h"
 %include "iutil/cfgfile.h"
 %include "iutil/cfgmgr.h"
 %include "iutil/stringarray.h"
+ARRAY_OBJECT_FUNCTIONS(iStringArray,const char *)
 %include "iutil/document.h"
 
 %template(scfConfigFile) scfImplementation1<csConfigFile,iConfigFile >;
