@@ -324,6 +324,15 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	    switch (inp.defaultType)
 	    {
 	      case Snippet::Technique::Input::None:
+                {
+                  if (compiler->do_verbose)
+                    compiler->Report (CS_REPORTER_SEVERITY_WARNING,
+                      inp.node, "No matching input found and no default given "
+                      "for '%s %s' of snippet '%s'",
+                      inp.type.GetData(), inp.name.GetData(), 
+                      node.tech->snippetName);
+                  return false;
+                }
 	        break;
 	      case Snippet::Technique::Input::Complex:
 	        {

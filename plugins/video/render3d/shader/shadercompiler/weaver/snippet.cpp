@@ -266,6 +266,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         else
           inputNode = child;
 
+        newInput.node = inputNode;
 	newInput.name = inputNode->GetAttributeValue ("name");
 	if (newInput.name.IsEmpty())
 	{

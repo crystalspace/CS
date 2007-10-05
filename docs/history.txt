@@ -43,6 +43,8 @@ chronological order.
 	  lighter2 (only lightmap density works atm).
 	- res converted data/water.zip to use genmeshes, fixed poly meshes,
 	  and lit it with lighter2.
+	- res changed shaderweaver to emit a meaningful message when an input
+	  for a snippet can't be matched and no default is given.
 04-Oct-2007
 	- andres added a VarFileInfo Block to the resources for win32 
 	  dlls/executables as they are invalid without and especially considered

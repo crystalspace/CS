@@ -56,6 +56,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       };
       struct Input
       {
+        csRef<iDocumentNode> node;
         csString name;
         csString type;
         csString condition;
