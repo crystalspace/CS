@@ -43,7 +43,9 @@ namespace lighter
     // Don't cast shadows
     OBJECT_FLAG_NOSHADOW = 2,
     // Include in occlusion debugging
-    OBJECT_FLAG_RAYDEBUG = 4
+    OBJECT_FLAG_RAYDEBUG = 4,
+    // Tangent space is available
+    OBJECT_FLAG_TANGENTS = 8
   };
 
   /**
@@ -73,12 +75,21 @@ namespace lighter
 
     // Name of the factory
     csString factoryName;
+  
+    //@{
+    /// Indices of tangent/bitangent in vertex data
+    size_t vdataTangents;
+    size_t vdataBitangents;
+    //@}
 
     /// Whether to light meshes of this factory per vertex
-    bool lightPerVertex;
+    bool lightPerVertex : 1;
     
     /// Whether to avoid modifying this factory
-    bool noModify;
+    bool noModify : 1;
+
+    /// Whether tangent space data is available
+    bool hasTangents : 1;
   protected:
 
     // Begin remapping of submeshes
@@ -184,20 +195,25 @@ namespace lighter
     { return bsphere; }
 
     typedef csDirtyAccessArray<csColor> LitColorArray;
-    inline LitColorArray* GetLitColors ()
-    { return litColors; }
+    inline LitColorArray* GetLitColors (size_t num)
+    { return litColors + num; }
 
     typedef csHash<LitColorArray, csPtrKey<Light> > LitColorsPDHash;
     /// Return lit colors for all PD lights
-    inline LitColorsPDHash* GetLitColorsPD ()
-    { return litColorsPD; }
+    inline LitColorsPDHash* GetLitColorsPD (size_t num)
+    { return litColorsPD + num; }
     /// Return lit colors for one PD light
-    LitColorArray* GetLitColorsPD (Light* light);
+    LitColorArray* GetLitColorsPD (Light* light, size_t num);
 
     inline const csFlags& GetFlags () const
     { return objFlags; }
 
     inline Sector* GetSector() const { return sector; }
+
+    csMatrix3 ComputeTangentSpace (const Primitive* prim,
+      const csVector3& pt) const;
+
+    csMatrix3 GetTangentSpace (size_t vert) const;
 
     // Name
     csString meshName;
@@ -246,6 +262,12 @@ namespace lighter
 
     // Internal flags
     csFlags objFlags;
+
+    //@{
+    /// Indices of tangent/bitangent in vertex data
+    size_t vdataTangents;
+    size_t vdataBitangents;
+    //@}
 
     // Renormalize lightmap UVs into buffer \a lmcoords.
     virtual void RenormalizeLightmapUVs (const LightmapPtrDelArray& lightmaps,

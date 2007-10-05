@@ -36,6 +36,7 @@ chronological order.
 	  'elsif ... else ... endif' would result in document data to be
 	  internally assigned to the wrong block (and hence cause invalid
 	  output).
+	- res added initial support for directional lightmaps to lighter2.
 04-Oct-2007
 	- andres added a VarFileInfo Block to the resources for win32 
 	  dlls/executables as they are invalid without and especially considered

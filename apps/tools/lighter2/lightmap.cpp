@@ -30,6 +30,13 @@ namespace lighter
     lightmapAllocator.SetGrowPO2 (true);
   }
 
+  Lightmap::Lightmap (const Lightmap& other) : colorArray (0), 
+    width (other.width), height (other.height),
+    lightmapAllocator (other.lightmapAllocator.GetRectangle()), texture (0)
+  {
+    lightmapAllocator.SetGrowPO2 (other.lightmapAllocator.GetGrowPO2());
+  }
+
   Lightmap::~Lightmap ()
   {
     Lock();

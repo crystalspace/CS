@@ -75,6 +75,8 @@ namespace lighter
   protected:
     friend class Object_Genmesh;
 
+    void SetupTangents (iGeneralFactoryState* genFact);
+
     // Begin remapping of submeshes
     virtual void BeginSubmeshRemap ();
 
@@ -127,7 +129,6 @@ namespace lighter
         AllocatedSubmeshKey const& key);
     };
   };
-
 }
 
 template<>

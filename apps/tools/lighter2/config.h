@@ -38,6 +38,8 @@ namespace lighter
     {
       // Direct lighting from light sources
       bool doDirectLight;
+      // HL2-style directional LMs
+      bool directionalLMs;
     };
 
     // Lightmap and lightmap layout properties

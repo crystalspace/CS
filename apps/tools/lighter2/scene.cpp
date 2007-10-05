@@ -544,10 +544,14 @@ namespace lighter
     originalSectorHash.DeleteAll ();
   }
 
-  Lightmap* Scene::GetLightmap (uint lightmapID, Light* light)
+  Lightmap* Scene::GetLightmap (uint lightmapID, size_t subLightmapNum, 
+                                Light* light)
   {
+    size_t realLmNum = lightmapID;
+    if (globalConfig.GetLighterProperties().directionalLMs)
+      realLmNum += (lightmaps.GetSize()/4) * subLightmapNum;
     if (!light || !light->IsPDLight ())
-      return lightmaps[lightmapID];
+      return lightmaps[realLmNum];
 
     light = light->GetOriginalLight();
     LightmapPtrDelArray* pdLights = pdLightmaps.Get (light, 0);
@@ -564,7 +568,7 @@ namespace lighter
       }
       pdLightmaps.Put (light, pdLights);
     }
-    return pdLights->Get (lightmapID);
+    return pdLights->Get (realLmNum);
   }
 
   csArray<LightmapPtrDelArray*> Scene::GetAllLightmaps ()
@@ -1030,11 +1034,19 @@ namespace lighter
   void Scene::BuildLightmapTextureList (LoadedFile* fileInfo,
                                         csStringArray& texturesToSave)
   {
+    size_t realNumLMs = lightmaps.GetSize();
+    if (globalConfig.GetLighterProperties().directionalLMs)
+      realNumLMs /= 4;
     for (size_t i = 0; i < lightmaps.GetSize (); i++)
     {
       csString textureFilename;
-      textureFilename.Format ("lightmaps/%s_%u.png",
-        fileInfo->levelName.GetData(), i);
+      size_t subNum = i / realNumLMs;
+      if (subNum == 0)
+        textureFilename.Format ("lightmaps/%s_%u.png",
+          fileInfo->levelName.GetData(), i);
+      else
+        textureFilename.Format ("lightmaps/%s_%u_d%zu.png",
+          fileInfo->levelName.GetData(), i % realNumLMs, subNum);
       lightmaps[i]->SetFilename (textureFilename);
 
       texturesToSave.Push (lightmaps[i]->GetTextureName());
@@ -1492,9 +1504,13 @@ namespace lighter
     filesProgress.SetProgress (0);
     csArray<SaveTexture> texturesToSave;
     csStringSet pdlightNums;
+    size_t realNumLMs = lightmaps.GetSize ();
+    if (globalConfig.GetLighterProperties().directionalLMs)
+      realNumLMs /= 4;
     for (unsigned int i = 0; i < lightmaps.GetSize (); i++)
     {
       SaveTexture savetex;
+      size_t subNum = i / realNumLMs;
       Lightmap* lm = lightmaps[i];
       savetex.lm = lm;
     #ifndef DUMP_NORMALS
@@ -1527,8 +1543,13 @@ namespace lighter
 
         csString lmID (key->GetLightID ().HexString());
         csString textureFilename;
-        textureFilename.Format ("lightmaps/%s_%u_%zu.png", 
-          fileInfo->levelName.GetData(), i, pdlightNums.Request (lmID));
+        if (subNum == 0)
+          textureFilename.Format ("lightmaps/%s_%u_%zu.png", 
+            fileInfo->levelName.GetData(), i, pdlightNums.Request (lmID));
+        else
+          textureFilename.Format ("lightmaps/%s_%u_%zu_d%zu.png", 
+            fileInfo->levelName.GetData(), i % realNumLMs, 
+            pdlightNums.Request (lmID), subNum);
 
         {
           // Texture file name is relative to world file

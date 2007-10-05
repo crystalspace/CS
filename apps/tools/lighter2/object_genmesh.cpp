@@ -29,7 +29,6 @@
 
 namespace lighter
 {
-
   ObjectFactory_Genmesh::ObjectFactory_Genmesh()
   {
     submeshNames.AttachNew (new SubmeshNameArray);
@@ -121,6 +120,12 @@ namespace lighter
       genFact->DisableAutoNormals();
     }
 
+    if (globalConfig.GetLighterProperties().directionalLMs)
+    {
+      vdataTangents = vertexData.AddCustomData (3);
+      vdataBitangents = vertexData.AddCustomData (3);
+    }
+
     const size_t vertCount = genFact->GetVertexCount ();
 
     vertexData.positions.SetSize (vertCount);
@@ -134,6 +139,9 @@ namespace lighter
     vertexData.uvs.SetSize (vertCount);
     memcpy (vertexData.uvs.GetArray(), genFact->GetTexels (),
       vertCount * sizeof (csVector2));
+
+    vertexData.ResizeCustomData ();
+    SetupTangents (genFact);
 
     if (genFact->GetSubMeshCount() > 0)
     {
@@ -197,6 +205,31 @@ namespace lighter
     memcpy (genFact->GetTexels(), vertexData.uvs.GetArray(),
       vertCount * sizeof (csVector2));
 
+    if (hasTangents)
+    {
+      // Save tangents/bitangents, if we have them anyway
+      csRef<csRenderBuffer> tangentBuf = csRenderBuffer::CreateRenderBuffer (
+        vertexData.positions.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+      csRef<csRenderBuffer> bitangentBuf = csRenderBuffer::CreateRenderBuffer (
+        vertexData.positions.GetSize(), CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+      csRenderBufferLock<csVector3> tangents (tangentBuf);
+      csRenderBufferLock<csVector3> bitangents (bitangentBuf);
+      for (size_t v = 0; v < vertCount; v++)
+      {
+        const csVector3& t = 
+          *((csVector3*)vertexData.GetCustomData (v, vdataTangents));
+        *tangents++ = t;
+        const csVector3& b = 
+          *((csVector3*)vertexData.GetCustomData (v, vdataBitangents));
+        *bitangents++ = b;
+      }
+
+      genFact->RemoveRenderBuffer ("tangent");
+      genFact->AddRenderBuffer ("tangent", tangentBuf);
+      genFact->RemoveRenderBuffer ("bitangent");
+      genFact->AddRenderBuffer ("bitangent", bitangentBuf);
+    }
+
     genFact->ClearSubMeshes();
     SubmeshFindHelper findHelper (this);
 
@@ -238,6 +271,24 @@ namespace lighter
     if (!svc1->IsEmpty() || !svc2->IsEmpty()) return false;
 
     return true;
+  }
+
+  void ObjectFactory_Genmesh::SetupTangents (iGeneralFactoryState* genFact)
+  {
+    csRef<iRenderBuffer> tangentBuf = genFact->GetRenderBuffer ("tangent");
+    csRef<iRenderBuffer> bitangentBuf = genFact->GetRenderBuffer ("bitangent");
+
+    csRenderBufferLock<csVector3> tangents (tangentBuf, CS_BUF_LOCK_READ);
+    csRenderBufferLock<csVector3> bitangents (bitangentBuf, CS_BUF_LOCK_READ);
+    const size_t vertCount = vertexData.positions.GetSize ();
+    for (size_t v = 0; v < vertCount; v++)
+    {
+      csVector3& t = *((csVector3*)vertexData.GetCustomData (v, vdataTangents));
+      t = *tangents++;
+      csVector3& b = *((csVector3*)vertexData.GetCustomData (v, vdataBitangents));
+      b = *bitangents++;
+    }
+    hasTangents = true;
   }
 
   void ObjectFactory_Genmesh::BeginSubmeshRemap ()
@@ -423,9 +474,22 @@ namespace lighter
     genMesh->SetLighting (false);
     genMesh->RemoveRenderBuffer ("color");
     genMesh->RemoveRenderBuffer ("texture coordinate lightmap");
+    for (int i = 1; i < 4; i++)
+    {
+      csString name;
+      name.Format ("color dir %d", i);
+      genMesh->RemoveRenderBuffer (name);
+    }
 
    // Still may need to fix up submesh materials...
-    CS::ShaderVarName lightmapName (globalLighter->strings, "tex lightmap");
+    CS::ShaderVarName lightmapName[4] =
+    { 
+      CS::ShaderVarName (globalLighter->strings, "tex lightmap"),
+      CS::ShaderVarName (globalLighter->strings, "tex lightmap dir 1"),
+      CS::ShaderVarName (globalLighter->strings, "tex lightmap dir 2"),
+      CS::ShaderVarName (globalLighter->strings, "tex lightmap dir 3")
+    };
+    int numLMs = globalConfig.GetLighterProperties().directionalLMs ? 4 : 1;
 
     bool noSubmeshes = allPrimitives.GetSize () == 1; // @@@ insufficient test
     for (uint i = 0; i < allPrimitives.GetSize (); ++i)
@@ -453,12 +517,15 @@ namespace lighter
           scfQueryInterface<iShaderVariableContext> (
             subMesh ? (iBase*)subMesh : (iBase*)meshWrapper);
 
-        uint lmID = uint (lightmapIDs[i]);
-        Lightmap* lm = sector->scene->GetLightmaps()[lmID];
-        csRef<csShaderVariable> svLightmap;
-        svLightmap.AttachNew (new csShaderVariable (lightmapName));
-        svLightmap->SetValue (lm->GetTexture());
-        svc->AddVariable (svLightmap);
+        for (int l = 0; l < numLMs; l++)
+        {
+          uint lmID = uint (lightmapIDs[i]);
+          Lightmap* lm = sector->scene->GetLightmap(lmID, l);
+          csRef<csShaderVariable> svLightmap;
+          svLightmap.AttachNew (new csShaderVariable (lightmapName[l]));
+          svLightmap->SetValue (lm->GetTexture());
+          svc->AddVariable (svLightmap);
+        }
       }
     }
 
@@ -529,18 +596,20 @@ namespace lighter
 
   void Object_Genmesh::SaveMeshPostLighting (Scene* scene)
   {
+    // @@@ TODO: Deal with directional colors (esp. in conjunction with PD lights)
+
     // Tack on animation control for PD lights
     if (lightPerVertex)
     {
-      scene->lightmapPostProc.ApplyAmbient (litColors->GetArray(),
+      scene->lightmapPostProc.ApplyAmbient (litColors[0].GetArray(),
         vertexData.positions.GetSize()); 
-      scene->lightmapPostProc.ApplyExposure (litColors->GetArray(),
+      scene->lightmapPostProc.ApplyExposure (litColors[0].GetArray(),
         vertexData.positions.GetSize()); 
 
       csRef<iRenderBuffer> staticColorsBuf = 
-        csRenderBuffer::CreateRenderBuffer (litColors->GetSize(), 
+        csRenderBuffer::CreateRenderBuffer (litColors[0].GetSize(), 
           CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
-      staticColorsBuf->SetData (litColors->GetArray());
+      staticColorsBuf->SetData (litColors[0].GetArray());
 
       csRef<iSyntaxService> synsrv = 
         csQueryRegistry<iSyntaxService> (globalLighter->objectRegistry);
@@ -566,7 +635,7 @@ namespace lighter
 
       csRef<iDocumentNode> paramChild = paramsDoc->GetRoot()->GetNode ("params");
 
-      if (litColorsPD && litColorsPD->GetSize() > 0)
+      if (litColorsPD && litColorsPD[0].GetSize() > 0)
       {
         csRef<iDocumentNode> animcontrolChild = 
           paramChild->CreateNodeBefore (CS_NODE_ELEMENT, 0);
@@ -581,7 +650,7 @@ namespace lighter
           synsrv->WriteRenderBuffer (staticColorsChild, staticColorsBuf);
         }
 
-        LitColorsPDHash::GlobalIterator pdIter (litColorsPD->GetIterator ());
+        LitColorsPDHash::GlobalIterator pdIter (litColorsPD[0].GetIterator ());
         while (pdIter.HasNext ())
         {
           csPtrKey<Light> light;
@@ -646,15 +715,23 @@ namespace lighter
         if (!subMesh) continue;
         csRef<iShaderVariableContext> svc = 
           scfQueryInterface<iShaderVariableContext> (subMesh);
-        csShaderVariable* sv = svc->GetVariable (
-          globalLighter->strings->Request ("tex lightmap"));
-        if (sv != 0)
+        for (int i = 0; i < 4; i++)
         {
-          iTextureWrapper* tex;
-          sv->GetValue (tex);
-          if (tex != 0)
-            lms.Add (tex->QueryObject()->GetName());
-          svc->RemoveVariable (sv);
+          csString svName;
+          if (i == 0)
+            svName = "tex lightmap";
+          else
+            svName.Format ("tex lightmap dir %d", i);
+          csShaderVariable* sv = svc->GetVariable (
+            globalLighter->strings->Request (svName));
+          if (sv != 0)
+          {
+            iTextureWrapper* tex;
+            sv->GetValue (tex);
+            if (tex != 0)
+              lms.Add (tex->QueryObject()->GetName());
+            svc->RemoveVariable (sv);
+          }
         }
       }
     }

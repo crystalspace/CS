@@ -33,6 +33,7 @@ namespace lighter
   {
     //Setup defaults
     lighterProperties.doDirectLight = true;
+    lighterProperties.directionalLMs = false;
 
     lmProperties.lmDensity = 4.0f;
     lmProperties.maxLightmapU = 1024;
@@ -51,6 +52,8 @@ namespace lighter
     
     lighterProperties.doDirectLight = cfgMgr->GetBool ("lighter2.DirectLight", 
       lighterProperties.doDirectLight);
+    lighterProperties.directionalLMs = cfgMgr->GetBool ("lighter2.BumpLMs", 
+      lighterProperties.directionalLMs);
 
 
     lmProperties.lmDensity = cfgMgr->GetFloat ("lighter2.lmDensity", 
