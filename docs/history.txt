@@ -18,6 +18,11 @@ chronological order.
 	    per fragment (e.g. comes from a normal map) or just per vertex.
 	    The lightmapping code uses that information and only utilizes
 	    directional LMs if the normal varies per fragment.
+	  - andres made jobber really use the configure script, in order to
+	    better cope with changes, like the recent python ones. Also made
+	    jobber checkout from a local repository and then 
+	    "switch --relocate;update" in order to make it more failsafe and
+	    faster.
 05-Oct-2007
 	- caedes changed mk/jam/swig.jam to make sure the bindings/python out
 	  folder is created before swig is run on the modules in all
