@@ -49,6 +49,10 @@ del types
 
 
 import core
+import ivaria
+import csgeom
+import ivideo
+import csgfx
 _SetSCFPointer = _imesh._SetSCFPointer
 _GetSCFPointer = _imesh._GetSCFPointer
 if not "core" in dir():
@@ -169,8 +173,8 @@ class iGeneralMeshCommonState(core.iBase):
     def AddRenderBuffer(*args): return _imesh.iGeneralMeshCommonState_AddRenderBuffer(*args)
     def RemoveRenderBuffer(*args): return _imesh.iGeneralMeshCommonState_RemoveRenderBuffer(*args)
     def GetRenderBufferCount(*args): return _imesh.iGeneralMeshCommonState_GetRenderBufferCount(*args)
-    def GetRenderBuffer(*args): return _imesh.iGeneralMeshCommonState_GetRenderBuffer(*args)
     def GetRenderBufferName(*args): return _imesh.iGeneralMeshCommonState_GetRenderBufferName(*args)
+    def GetRenderBuffer(*args): return _imesh.iGeneralMeshCommonState_GetRenderBuffer(*args)
     __swig_destroy__ = _imesh.delete_iGeneralMeshCommonState
     __del__ = lambda self : None;
 iGeneralMeshCommonState_swigregister = _imesh.iGeneralMeshCommonState_swigregister
@@ -1625,6 +1629,415 @@ class iTerrainFactoryState(core.iBase):
 iTerrainFactoryState_swigregister = _imesh.iTerrainFactoryState_swigregister
 iTerrainFactoryState_swigregister(iTerrainFactoryState)
 iTerrainFactoryState_scfGetVersion = _imesh.iTerrainFactoryState_scfGetVersion
+
+class csLockedHeightData(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csLockedHeightData, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csLockedHeightData, name)
+    __repr__ = _swig_repr
+    __swig_setmethods__["data"] = _imesh.csLockedHeightData_data_set
+    __swig_getmethods__["data"] = _imesh.csLockedHeightData_data_get
+    if _newclass:data = _swig_property(_imesh.csLockedHeightData_data_get, _imesh.csLockedHeightData_data_set)
+    __swig_setmethods__["pitch"] = _imesh.csLockedHeightData_pitch_set
+    __swig_getmethods__["pitch"] = _imesh.csLockedHeightData_pitch_get
+    if _newclass:pitch = _swig_property(_imesh.csLockedHeightData_pitch_get, _imesh.csLockedHeightData_pitch_set)
+    def Get(*args): return _imesh.csLockedHeightData_Get(*args)
+    def Set(*args): return _imesh.csLockedHeightData_Set(*args)
+    def __init__(self, *args): 
+        this = _imesh.new_csLockedHeightData(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _imesh.delete_csLockedHeightData
+    __del__ = lambda self : None;
+csLockedHeightData_swigregister = _imesh.csLockedHeightData_swigregister
+csLockedHeightData_swigregister(csLockedHeightData)
+
+class csLockedMaterialMap(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csLockedMaterialMap, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csLockedMaterialMap, name)
+    __repr__ = _swig_repr
+    __swig_setmethods__["data"] = _imesh.csLockedMaterialMap_data_set
+    __swig_getmethods__["data"] = _imesh.csLockedMaterialMap_data_get
+    if _newclass:data = _swig_property(_imesh.csLockedMaterialMap_data_get, _imesh.csLockedMaterialMap_data_set)
+    __swig_setmethods__["pitch"] = _imesh.csLockedMaterialMap_pitch_set
+    __swig_getmethods__["pitch"] = _imesh.csLockedMaterialMap_pitch_get
+    if _newclass:pitch = _swig_property(_imesh.csLockedMaterialMap_pitch_get, _imesh.csLockedMaterialMap_pitch_set)
+    def Get(*args): return _imesh.csLockedMaterialMap_Get(*args)
+    def Set(*args): return _imesh.csLockedMaterialMap_Set(*args)
+    def __init__(self, *args): 
+        this = _imesh.new_csLockedMaterialMap(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _imesh.delete_csLockedMaterialMap
+    __del__ = lambda self : None;
+csLockedMaterialMap_swigregister = _imesh.csLockedMaterialMap_swigregister
+csLockedMaterialMap_swigregister(csLockedMaterialMap)
+
+class iTerrainVector3Array(csgeom.csVector3ArrayChangeAll):
+    __swig_setmethods__ = {}
+    for _s in [csgeom.csVector3ArrayChangeAll]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainVector3Array, name, value)
+    __swig_getmethods__ = {}
+    for _s in [csgeom.csVector3ArrayChangeAll]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainVector3Array, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    __swig_destroy__ = _imesh.delete_iTerrainVector3Array
+    __del__ = lambda self : None;
+iTerrainVector3Array_swigregister = _imesh.iTerrainVector3Array_swigregister
+iTerrainVector3Array_swigregister(iTerrainVector3Array)
+
+class iTerrainCollisionPairArray(ivaria.csCollisionPairArrayChangeAll):
+    __swig_setmethods__ = {}
+    for _s in [ivaria.csCollisionPairArrayChangeAll]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainCollisionPairArray, name, value)
+    __swig_getmethods__ = {}
+    for _s in [ivaria.csCollisionPairArrayChangeAll]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainCollisionPairArray, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    __swig_destroy__ = _imesh.delete_iTerrainCollisionPairArray
+    __del__ = lambda self : None;
+iTerrainCollisionPairArray_swigregister = _imesh.iTerrainCollisionPairArray_swigregister
+iTerrainCollisionPairArray_swigregister(iTerrainCollisionPairArray)
+
+class iTerrainCellCollisionProperties(core.iBase):
+    __swig_setmethods__ = {}
+    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainCellCollisionProperties, name, value)
+    __swig_getmethods__ = {}
+    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainCellCollisionProperties, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetCollidable(*args): return _imesh.iTerrainCellCollisionProperties_GetCollidable(*args)
+    def SetCollidable(*args): return _imesh.iTerrainCellCollisionProperties_SetCollidable(*args)
+    def SetParameter(*args): return _imesh.iTerrainCellCollisionProperties_SetParameter(*args)
+    def Clone(*args): return _imesh.iTerrainCellCollisionProperties_Clone(*args)
+    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iTerrainCellCollisionProperties_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_imesh.iTerrainCellCollisionProperties_scfGetVersion)
+    __swig_destroy__ = _imesh.delete_iTerrainCellCollisionProperties
+    __del__ = lambda self : None;
+iTerrainCellCollisionProperties_swigregister = _imesh.iTerrainCellCollisionProperties_swigregister
+iTerrainCellCollisionProperties_swigregister(iTerrainCellCollisionProperties)
+iTerrainCellCollisionProperties_scfGetVersion = _imesh.iTerrainCellCollisionProperties_scfGetVersion
+
+class iTerrainCellRenderProperties(ivideo.iShaderVariableContext):
+    __swig_setmethods__ = {}
+    for _s in [ivideo.iShaderVariableContext]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainCellRenderProperties, name, value)
+    __swig_getmethods__ = {}
+    for _s in [ivideo.iShaderVariableContext]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainCellRenderProperties, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetVisible(*args): return _imesh.iTerrainCellRenderProperties_GetVisible(*args)
+    def SetVisible(*args): return _imesh.iTerrainCellRenderProperties_SetVisible(*args)
+    def SetParameter(*args): return _imesh.iTerrainCellRenderProperties_SetParameter(*args)
+    def Clone(*args): return _imesh.iTerrainCellRenderProperties_Clone(*args)
+    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iTerrainCellRenderProperties_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_imesh.iTerrainCellRenderProperties_scfGetVersion)
+    __swig_destroy__ = _imesh.delete_iTerrainCellRenderProperties
+    __del__ = lambda self : None;
+iTerrainCellRenderProperties_swigregister = _imesh.iTerrainCellRenderProperties_swigregister
+iTerrainCellRenderProperties_swigregister(iTerrainCellRenderProperties)
+iTerrainCellRenderProperties_scfGetVersion = _imesh.iTerrainCellRenderProperties_scfGetVersion
+
+class iTerrainCellFeederProperties(core.iBase):
+    __swig_setmethods__ = {}
+    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainCellFeederProperties, name, value)
+    __swig_getmethods__ = {}
+    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainCellFeederProperties, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetHeightmapSource(*args): return _imesh.iTerrainCellFeederProperties_SetHeightmapSource(*args)
+    def SetParameter(*args): return _imesh.iTerrainCellFeederProperties_SetParameter(*args)
+    def Clone(*args): return _imesh.iTerrainCellFeederProperties_Clone(*args)
+    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iTerrainCellFeederProperties_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_imesh.iTerrainCellFeederProperties_scfGetVersion)
+    __swig_destroy__ = _imesh.delete_iTerrainCellFeederProperties
+    __del__ = lambda self : None;
+iTerrainCellFeederProperties_swigregister = _imesh.iTerrainCellFeederProperties_swigregister
+iTerrainCellFeederProperties_swigregister(iTerrainCellFeederProperties)
+iTerrainCellFeederProperties_scfGetVersion = _imesh.iTerrainCellFeederProperties_scfGetVersion
+
+class iTerrainDataFeeder(core.iBase):
+    __swig_setmethods__ = {}
+    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainDataFeeder, name, value)
+    __swig_getmethods__ = {}
+    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainDataFeeder, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def CreateProperties(*args): return _imesh.iTerrainDataFeeder_CreateProperties(*args)
+    def PreLoad(*args): return _imesh.iTerrainDataFeeder_PreLoad(*args)
+    def Load(*args): return _imesh.iTerrainDataFeeder_Load(*args)
+    def SetParameter(*args): return _imesh.iTerrainDataFeeder_SetParameter(*args)
+    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iTerrainDataFeeder_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_imesh.iTerrainDataFeeder_scfGetVersion)
+    __swig_destroy__ = _imesh.delete_iTerrainDataFeeder
+    __del__ = lambda self : None;
+iTerrainDataFeeder_swigregister = _imesh.iTerrainDataFeeder_swigregister
+iTerrainDataFeeder_swigregister(iTerrainDataFeeder)
+iTerrainDataFeeder_scfGetVersion = _imesh.iTerrainDataFeeder_scfGetVersion
+
+class csTerrainColliderCollideSegmentResult(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csTerrainColliderCollideSegmentResult, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csTerrainColliderCollideSegmentResult, name)
+    __repr__ = _swig_repr
+    __swig_setmethods__["hit"] = _imesh.csTerrainColliderCollideSegmentResult_hit_set
+    __swig_getmethods__["hit"] = _imesh.csTerrainColliderCollideSegmentResult_hit_get
+    if _newclass:hit = _swig_property(_imesh.csTerrainColliderCollideSegmentResult_hit_get, _imesh.csTerrainColliderCollideSegmentResult_hit_set)
+    __swig_setmethods__["isect"] = _imesh.csTerrainColliderCollideSegmentResult_isect_set
+    __swig_getmethods__["isect"] = _imesh.csTerrainColliderCollideSegmentResult_isect_get
+    if _newclass:isect = _swig_property(_imesh.csTerrainColliderCollideSegmentResult_isect_get, _imesh.csTerrainColliderCollideSegmentResult_isect_set)
+    __swig_setmethods__["a"] = _imesh.csTerrainColliderCollideSegmentResult_a_set
+    __swig_getmethods__["a"] = _imesh.csTerrainColliderCollideSegmentResult_a_get
+    if _newclass:a = _swig_property(_imesh.csTerrainColliderCollideSegmentResult_a_get, _imesh.csTerrainColliderCollideSegmentResult_a_set)
+    __swig_setmethods__["b"] = _imesh.csTerrainColliderCollideSegmentResult_b_set
+    __swig_getmethods__["b"] = _imesh.csTerrainColliderCollideSegmentResult_b_get
+    if _newclass:b = _swig_property(_imesh.csTerrainColliderCollideSegmentResult_b_get, _imesh.csTerrainColliderCollideSegmentResult_b_set)
+    __swig_setmethods__["c"] = _imesh.csTerrainColliderCollideSegmentResult_c_set
+    __swig_getmethods__["c"] = _imesh.csTerrainColliderCollideSegmentResult_c_get
+    if _newclass:c = _swig_property(_imesh.csTerrainColliderCollideSegmentResult_c_get, _imesh.csTerrainColliderCollideSegmentResult_c_set)
+    def __init__(self, *args): 
+        this = _imesh.new_csTerrainColliderCollideSegmentResult(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _imesh.delete_csTerrainColliderCollideSegmentResult
+    __del__ = lambda self : None;
+csTerrainColliderCollideSegmentResult_swigregister = _imesh.csTerrainColliderCollideSegmentResult_swigregister
+csTerrainColliderCollideSegmentResult_swigregister(csTerrainColliderCollideSegmentResult)
+
+class iTerrainCollider(core.iBase):
+    __swig_setmethods__ = {}
+    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainCollider, name, value)
+    __swig_getmethods__ = {}
+    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainCollider, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def CreateProperties(*args): return _imesh.iTerrainCollider_CreateProperties(*args)
+    def CollideSegment(*args): return _imesh.iTerrainCollider_CollideSegment(*args)
+    def CollideTriangles(*args): return _imesh.iTerrainCollider_CollideTriangles(*args)
+    def Collide(*args): return _imesh.iTerrainCollider_Collide(*args)
+    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iTerrainCollider_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_imesh.iTerrainCollider_scfGetVersion)
+    __swig_destroy__ = _imesh.delete_iTerrainCollider
+    __del__ = lambda self : None;
+iTerrainCollider_swigregister = _imesh.iTerrainCollider_swigregister
+iTerrainCollider_swigregister(iTerrainCollider)
+iTerrainCollider_scfGetVersion = _imesh.iTerrainCollider_scfGetVersion
+
+class iTerrainRenderer(core.iBase):
+    __swig_setmethods__ = {}
+    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainRenderer, name, value)
+    __swig_getmethods__ = {}
+    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainRenderer, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def CreateProperties(*args): return _imesh.iTerrainRenderer_CreateProperties(*args)
+    def ConnectTerrain(*args): return _imesh.iTerrainRenderer_ConnectTerrain(*args)
+    def DisconnectTerrain(*args): return _imesh.iTerrainRenderer_DisconnectTerrain(*args)
+    def GetRenderMeshes(*args): return _imesh.iTerrainRenderer_GetRenderMeshes(*args)
+    def OnMaterialPaletteUpdate(*args): return _imesh.iTerrainRenderer_OnMaterialPaletteUpdate(*args)
+    def OnMaterialMaskUpdate(*args): return _imesh.iTerrainRenderer_OnMaterialMaskUpdate(*args)
+    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iTerrainRenderer_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_imesh.iTerrainRenderer_scfGetVersion)
+    __swig_destroy__ = _imesh.delete_iTerrainRenderer
+    __del__ = lambda self : None;
+iTerrainRenderer_swigregister = _imesh.iTerrainRenderer_swigregister
+iTerrainRenderer_swigregister(iTerrainRenderer)
+iTerrainRenderer_scfGetVersion = _imesh.iTerrainRenderer_scfGetVersion
+
+class iTerrainCellHeightDataCallback(core.iBase):
+    __swig_setmethods__ = {}
+    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainCellHeightDataCallback, name, value)
+    __swig_getmethods__ = {}
+    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainCellHeightDataCallback, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def OnHeightUpdate(*args): return _imesh.iTerrainCellHeightDataCallback_OnHeightUpdate(*args)
+    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iTerrainCellHeightDataCallback_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_imesh.iTerrainCellHeightDataCallback_scfGetVersion)
+    __swig_destroy__ = _imesh.delete_iTerrainCellHeightDataCallback
+    __del__ = lambda self : None;
+iTerrainCellHeightDataCallback_swigregister = _imesh.iTerrainCellHeightDataCallback_swigregister
+iTerrainCellHeightDataCallback_swigregister(iTerrainCellHeightDataCallback)
+iTerrainCellHeightDataCallback_scfGetVersion = _imesh.iTerrainCellHeightDataCallback_scfGetVersion
+
+class iTerrainCellLoadCallback(core.iBase):
+    __swig_setmethods__ = {}
+    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainCellLoadCallback, name, value)
+    __swig_getmethods__ = {}
+    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainCellLoadCallback, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def OnCellLoad(*args): return _imesh.iTerrainCellLoadCallback_OnCellLoad(*args)
+    def OnCellPreLoad(*args): return _imesh.iTerrainCellLoadCallback_OnCellPreLoad(*args)
+    def OnCellUnload(*args): return _imesh.iTerrainCellLoadCallback_OnCellUnload(*args)
+    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iTerrainCellLoadCallback_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_imesh.iTerrainCellLoadCallback_scfGetVersion)
+    __swig_destroy__ = _imesh.delete_iTerrainCellLoadCallback
+    __del__ = lambda self : None;
+iTerrainCellLoadCallback_swigregister = _imesh.iTerrainCellLoadCallback_swigregister
+iTerrainCellLoadCallback_swigregister(iTerrainCellLoadCallback)
+iTerrainCellLoadCallback_scfGetVersion = _imesh.iTerrainCellLoadCallback_scfGetVersion
+
+class iTerrainSystem(core.iBase):
+    __swig_setmethods__ = {}
+    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainSystem, name, value)
+    __swig_getmethods__ = {}
+    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainSystem, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetCell(*args): return _imesh.iTerrainSystem_GetCell(*args)
+    def GetCellCount(*args): return _imesh.iTerrainSystem_GetCellCount(*args)
+    def GetMaterialPalette(*args): return _imesh.iTerrainSystem_GetMaterialPalette(*args)
+    def SetMaterialPalette(*args): return _imesh.iTerrainSystem_SetMaterialPalette(*args)
+    def CollideSegment(*args): return _imesh.iTerrainSystem_CollideSegment(*args)
+    def CollideTriangles(*args): return _imesh.iTerrainSystem_CollideTriangles(*args)
+    def Collide(*args): return _imesh.iTerrainSystem_Collide(*args)
+    def GetVirtualViewDistance(*args): return _imesh.iTerrainSystem_GetVirtualViewDistance(*args)
+    def SetVirtualViewDistance(*args): return _imesh.iTerrainSystem_SetVirtualViewDistance(*args)
+    def GetAutoPreLoad(*args): return _imesh.iTerrainSystem_GetAutoPreLoad(*args)
+    def SetAutoPreLoad(*args): return _imesh.iTerrainSystem_SetAutoPreLoad(*args)
+    def PreLoadCells(*args): return _imesh.iTerrainSystem_PreLoadCells(*args)
+    def GetHeight(*args): return _imesh.iTerrainSystem_GetHeight(*args)
+    def GetTangent(*args): return _imesh.iTerrainSystem_GetTangent(*args)
+    def GetBinormal(*args): return _imesh.iTerrainSystem_GetBinormal(*args)
+    def GetNormal(*args): return _imesh.iTerrainSystem_GetNormal(*args)
+    def GetMaxLoadedCells(*args): return _imesh.iTerrainSystem_GetMaxLoadedCells(*args)
+    def SetMaxLoadedCells(*args): return _imesh.iTerrainSystem_SetMaxLoadedCells(*args)
+    def UnloadOldCells(*args): return _imesh.iTerrainSystem_UnloadOldCells(*args)
+    def AddCellLoadListener(*args): return _imesh.iTerrainSystem_AddCellLoadListener(*args)
+    def RemoveCellLoadListener(*args): return _imesh.iTerrainSystem_RemoveCellLoadListener(*args)
+    def AddCellHeightUpdateListener(*args): return _imesh.iTerrainSystem_AddCellHeightUpdateListener(*args)
+    def RemoveCellHeightUpdateListener(*args): return _imesh.iTerrainSystem_RemoveCellHeightUpdateListener(*args)
+    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iTerrainSystem_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_imesh.iTerrainSystem_scfGetVersion)
+    __swig_destroy__ = _imesh.delete_iTerrainSystem
+    __del__ = lambda self : None;
+iTerrainSystem_swigregister = _imesh.iTerrainSystem_swigregister
+iTerrainSystem_swigregister(iTerrainSystem)
+iTerrainSystem_scfGetVersion = _imesh.iTerrainSystem_scfGetVersion
+
+class iTerrainCell(core.iBase):
+    __swig_setmethods__ = {}
+    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainCell, name, value)
+    __swig_getmethods__ = {}
+    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainCell, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    NotLoaded = _imesh.iTerrainCell_NotLoaded
+    PreLoaded = _imesh.iTerrainCell_PreLoaded
+    Loaded = _imesh.iTerrainCell_Loaded
+    def GetLoadState(*args): return _imesh.iTerrainCell_GetLoadState(*args)
+    def SetLoadState(*args): return _imesh.iTerrainCell_SetLoadState(*args)
+    def GetTerrain(*args): return _imesh.iTerrainCell_GetTerrain(*args)
+    def GetName(*args): return _imesh.iTerrainCell_GetName(*args)
+    def GetRenderProperties(*args): return _imesh.iTerrainCell_GetRenderProperties(*args)
+    def GetCollisionProperties(*args): return _imesh.iTerrainCell_GetCollisionProperties(*args)
+    def GetFeederProperties(*args): return _imesh.iTerrainCell_GetFeederProperties(*args)
+    def GetGridWidth(*args): return _imesh.iTerrainCell_GetGridWidth(*args)
+    def GetGridHeight(*args): return _imesh.iTerrainCell_GetGridHeight(*args)
+    def GetHeightData(*args): return _imesh.iTerrainCell_GetHeightData(*args)
+    def LockHeightData(*args): return _imesh.iTerrainCell_LockHeightData(*args)
+    def UnlockHeightData(*args): return _imesh.iTerrainCell_UnlockHeightData(*args)
+    def GetPosition(*args): return _imesh.iTerrainCell_GetPosition(*args)
+    def GetSize(*args): return _imesh.iTerrainCell_GetSize(*args)
+    def GetMaterialMapWidth(*args): return _imesh.iTerrainCell_GetMaterialMapWidth(*args)
+    def GetMaterialMapHeight(*args): return _imesh.iTerrainCell_GetMaterialMapHeight(*args)
+    def GetMaterialPersistent(*args): return _imesh.iTerrainCell_GetMaterialPersistent(*args)
+    def LockMaterialMap(*args): return _imesh.iTerrainCell_LockMaterialMap(*args)
+    def UnlockMaterialMap(*args): return _imesh.iTerrainCell_UnlockMaterialMap(*args)
+    def SetMaterialMask(*args): return _imesh.iTerrainCell_SetMaterialMask(*args)
+    def SetBaseMaterial(*args): return _imesh.iTerrainCell_SetBaseMaterial(*args)
+    def GetBaseMaterial(*args): return _imesh.iTerrainCell_GetBaseMaterial(*args)
+    def CollideSegment(*args): return _imesh.iTerrainCell_CollideSegment(*args)
+    def CollideTriangles(*args): return _imesh.iTerrainCell_CollideTriangles(*args)
+    def Collide(*args): return _imesh.iTerrainCell_Collide(*args)
+    def GetHeight(*args): return _imesh.iTerrainCell_GetHeight(*args)
+    def GetTangent(*args): return _imesh.iTerrainCell_GetTangent(*args)
+    def GetBinormal(*args): return _imesh.iTerrainCell_GetBinormal(*args)
+    def GetNormal(*args): return _imesh.iTerrainCell_GetNormal(*args)
+    def GetRenderData(*args): return _imesh.iTerrainCell_GetRenderData(*args)
+    def SetRenderData(*args): return _imesh.iTerrainCell_SetRenderData(*args)
+    def GetCollisionData(*args): return _imesh.iTerrainCell_GetCollisionData(*args)
+    def SetCollisionData(*args): return _imesh.iTerrainCell_SetCollisionData(*args)
+    def GetFeederData(*args): return _imesh.iTerrainCell_GetFeederData(*args)
+    def SetFeederData(*args): return _imesh.iTerrainCell_SetFeederData(*args)
+    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iTerrainCell_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_imesh.iTerrainCell_scfGetVersion)
+    __swig_destroy__ = _imesh.delete_iTerrainCell
+    __del__ = lambda self : None;
+iTerrainCell_swigregister = _imesh.iTerrainCell_swigregister
+iTerrainCell_swigregister(iTerrainCell)
+iTerrainCell_scfGetVersion = _imesh.iTerrainCell_scfGetVersion
+
+class iTerrainFactoryCell(core.iBase):
+    __swig_setmethods__ = {}
+    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainFactoryCell, name, value)
+    __swig_getmethods__ = {}
+    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainFactoryCell, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetRenderProperties(*args): return _imesh.iTerrainFactoryCell_GetRenderProperties(*args)
+    def GetCollisionProperties(*args): return _imesh.iTerrainFactoryCell_GetCollisionProperties(*args)
+    def GetFeederProperties(*args): return _imesh.iTerrainFactoryCell_GetFeederProperties(*args)
+    def SetBaseMaterial(*args): return _imesh.iTerrainFactoryCell_SetBaseMaterial(*args)
+    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iTerrainFactoryCell_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_imesh.iTerrainFactoryCell_scfGetVersion)
+    __swig_destroy__ = _imesh.delete_iTerrainFactoryCell
+    __del__ = lambda self : None;
+iTerrainFactoryCell_swigregister = _imesh.iTerrainFactoryCell_swigregister
+iTerrainFactoryCell_swigregister(iTerrainFactoryCell)
+iTerrainFactoryCell_scfGetVersion = _imesh.iTerrainFactoryCell_scfGetVersion
+
+class iTerrainFactory(core.iBase):
+    __swig_setmethods__ = {}
+    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerrainFactory, name, value)
+    __swig_getmethods__ = {}
+    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, iTerrainFactory, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetRenderer(*args): return _imesh.iTerrainFactory_SetRenderer(*args)
+    def SetCollider(*args): return _imesh.iTerrainFactory_SetCollider(*args)
+    def SetFeeder(*args): return _imesh.iTerrainFactory_SetFeeder(*args)
+    def AddCell(*args): return _imesh.iTerrainFactory_AddCell(*args)
+    def SetMaxLoadedCells(*args): return _imesh.iTerrainFactory_SetMaxLoadedCells(*args)
+    def SetVirtualViewDistance(*args): return _imesh.iTerrainFactory_SetVirtualViewDistance(*args)
+    def SetAutoPreLoad(*args): return _imesh.iTerrainFactory_SetAutoPreLoad(*args)
+    __swig_getmethods__["scfGetVersion"] = lambda x: _imesh.iTerrainFactory_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_imesh.iTerrainFactory_scfGetVersion)
+    __swig_destroy__ = _imesh.delete_iTerrainFactory
+    __del__ = lambda self : None;
+iTerrainFactory_swigregister = _imesh.iTerrainFactory_swigregister
+iTerrainFactory_swigregister(iTerrainFactory)
+iTerrainFactory_scfGetVersion = _imesh.iTerrainFactory_scfGetVersion
 
 CS_PARTICLE_SORT_NONE = _imesh.CS_PARTICLE_SORT_NONE
 CS_PARTICLE_SORT_DISTANCE = _imesh.CS_PARTICLE_SORT_DISTANCE

@@ -386,6 +386,70 @@ iCollideSystem_swigregister = _ivaria.iCollideSystem_swigregister
 iCollideSystem_swigregister(iCollideSystem)
 iCollideSystem_scfGetVersion = _ivaria.iCollideSystem_scfGetVersion
 
+class csCollisionPairArrayReadOnly(core.iBase):
+    __swig_setmethods__ = {}
+    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csCollisionPairArrayReadOnly, name, value)
+    __swig_getmethods__ = {}
+    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, csCollisionPairArrayReadOnly, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetSize(*args): return _ivaria.csCollisionPairArrayReadOnly_GetSize(*args)
+    def Get(*args): return _ivaria.csCollisionPairArrayReadOnly_Get(*args)
+    def Top(*args): return _ivaria.csCollisionPairArrayReadOnly_Top(*args)
+    def Find(*args): return _ivaria.csCollisionPairArrayReadOnly_Find(*args)
+    def GetIndex(*args): return _ivaria.csCollisionPairArrayReadOnly_GetIndex(*args)
+    def IsEmpty(*args): return _ivaria.csCollisionPairArrayReadOnly_IsEmpty(*args)
+    def GetAll(*args): return _ivaria.csCollisionPairArrayReadOnly_GetAll(*args)
+    __swig_destroy__ = _ivaria.delete_csCollisionPairArrayReadOnly
+    __del__ = lambda self : None;
+csCollisionPairArrayReadOnly_swigregister = _ivaria.csCollisionPairArrayReadOnly_swigregister
+csCollisionPairArrayReadOnly_swigregister(csCollisionPairArrayReadOnly)
+
+class csCollisionPairArrayChangeElements(csCollisionPairArrayReadOnly):
+    __swig_setmethods__ = {}
+    for _s in [csCollisionPairArrayReadOnly]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csCollisionPairArrayChangeElements, name, value)
+    __swig_getmethods__ = {}
+    for _s in [csCollisionPairArrayReadOnly]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, csCollisionPairArrayChangeElements, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def Get(*args): return _ivaria.csCollisionPairArrayChangeElements_Get(*args)
+    def Top(*args): return _ivaria.csCollisionPairArrayChangeElements_Top(*args)
+    __swig_destroy__ = _ivaria.delete_csCollisionPairArrayChangeElements
+    __del__ = lambda self : None;
+csCollisionPairArrayChangeElements_swigregister = _ivaria.csCollisionPairArrayChangeElements_swigregister
+csCollisionPairArrayChangeElements_swigregister(csCollisionPairArrayChangeElements)
+
+class csCollisionPairArrayChangeAll(csCollisionPairArrayChangeElements):
+    __swig_setmethods__ = {}
+    for _s in [csCollisionPairArrayChangeElements]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csCollisionPairArrayChangeAll, name, value)
+    __swig_getmethods__ = {}
+    for _s in [csCollisionPairArrayChangeElements]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, csCollisionPairArrayChangeAll, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetSize(*args): return _ivaria.csCollisionPairArrayChangeAll_SetSize(*args)
+    def GetExtend(*args): return _ivaria.csCollisionPairArrayChangeAll_GetExtend(*args)
+    def Put(*args): return _ivaria.csCollisionPairArrayChangeAll_Put(*args)
+    def Push(*args): return _ivaria.csCollisionPairArrayChangeAll_Push(*args)
+    def PushSmart(*args): return _ivaria.csCollisionPairArrayChangeAll_PushSmart(*args)
+    def Pop(*args): return _ivaria.csCollisionPairArrayChangeAll_Pop(*args)
+    def Insert(*args): return _ivaria.csCollisionPairArrayChangeAll_Insert(*args)
+    def DeleteAll(*args): return _ivaria.csCollisionPairArrayChangeAll_DeleteAll(*args)
+    def Truncate(*args): return _ivaria.csCollisionPairArrayChangeAll_Truncate(*args)
+    def Empty(*args): return _ivaria.csCollisionPairArrayChangeAll_Empty(*args)
+    def DeleteIndex(*args): return _ivaria.csCollisionPairArrayChangeAll_DeleteIndex(*args)
+    def DeleteIndexFast(*args): return _ivaria.csCollisionPairArrayChangeAll_DeleteIndexFast(*args)
+    def Delete(*args): return _ivaria.csCollisionPairArrayChangeAll_Delete(*args)
+    __swig_destroy__ = _ivaria.delete_csCollisionPairArrayChangeAll
+    __del__ = lambda self : None;
+csCollisionPairArrayChangeAll_swigregister = _ivaria.csCollisionPairArrayChangeAll_swigregister
+csCollisionPairArrayChangeAll_swigregister(csCollisionPairArrayChangeAll)
+
 class iDynamicsStepCallback(core.iBase):
     __swig_setmethods__ = {}
     for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))

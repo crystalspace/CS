@@ -308,10 +308,13 @@ class iLightIterator(core.iBase):
     def __iter__(self):
         while self.HasNext():
             yield self.Next() 
+    __swig_getmethods__["scfGetVersion"] = lambda x: _iengine.iLightIterator_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_iengine.iLightIterator_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iLightIterator
     __del__ = lambda self : None;
 iLightIterator_swigregister = _iengine.iLightIterator_swigregister
 iLightIterator_swigregister(iLightIterator)
+iLightIterator_scfGetVersion = _iengine.iLightIterator_scfGetVersion
 
 CS_FOG_MODE_NONE = _iengine.CS_FOG_MODE_NONE
 CS_FOG_MODE_LINEAR = _iengine.CS_FOG_MODE_LINEAR
@@ -533,10 +536,13 @@ class iSectorIterator(core.iBase):
     def __iter__(self):
         while self.HasNext():
             yield self.Next() 
+    __swig_getmethods__["scfGetVersion"] = lambda x: _iengine.iSectorIterator_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_iengine.iSectorIterator_scfGetVersion)
     __swig_destroy__ = _iengine.delete_iSectorIterator
     __del__ = lambda self : None;
 iSectorIterator_swigregister = _iengine.iSectorIterator_swigregister
 iSectorIterator_swigregister(iSectorIterator)
+iSectorIterator_scfGetVersion = _iengine.iSectorIterator_scfGetVersion
 
 CS_ENGINE_CACHE_READ = _iengine.CS_ENGINE_CACHE_READ
 CS_ENGINE_CACHE_WRITE = _iengine.CS_ENGINE_CACHE_WRITE
@@ -1613,6 +1619,67 @@ class iPortalContainer(core.iBase):
 iPortalContainer_swigregister = _iengine.iPortalContainer_swigregister
 iPortalContainer_swigregister(iPortalContainer)
 iPortalContainer_scfGetVersion = _iengine.iPortalContainer_scfGetVersion
+
+class iRenderStepContainer(core.iBase):
+    __swig_setmethods__ = {}
+    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iRenderStepContainer, name, value)
+    __swig_getmethods__ = {}
+    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, iRenderStepContainer, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def AddStep(*args): return _iengine.iRenderStepContainer_AddStep(*args)
+    def DeleteStep(*args): return _iengine.iRenderStepContainer_DeleteStep(*args)
+    def GetStep(*args): return _iengine.iRenderStepContainer_GetStep(*args)
+    def Find(*args): return _iengine.iRenderStepContainer_Find(*args)
+    def GetStepCount(*args): return _iengine.iRenderStepContainer_GetStepCount(*args)
+    __swig_destroy__ = _iengine.delete_iRenderStepContainer
+    __del__ = lambda self : None;
+iRenderStepContainer_swigregister = _iengine.iRenderStepContainer_swigregister
+iRenderStepContainer_swigregister(iRenderStepContainer)
+
+CS_DEFAULT_RENDERLOOP_NAME = _iengine.CS_DEFAULT_RENDERLOOP_NAME
+class iRenderLoop(iRenderStepContainer):
+    __swig_setmethods__ = {}
+    for _s in [iRenderStepContainer]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iRenderLoop, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iRenderStepContainer]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, iRenderLoop, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def Draw(*args): return _iengine.iRenderLoop_Draw(*args)
+    __swig_getmethods__["scfGetVersion"] = lambda x: _iengine.iRenderLoop_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_iengine.iRenderLoop_scfGetVersion)
+    __swig_destroy__ = _iengine.delete_iRenderLoop
+    __del__ = lambda self : None;
+iRenderLoop_swigregister = _iengine.iRenderLoop_swigregister
+iRenderLoop_swigregister(iRenderLoop)
+iRenderLoop_scfGetVersion = _iengine.iRenderLoop_scfGetVersion
+
+class iRenderLoopManager(core.iBase):
+    __swig_setmethods__ = {}
+    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iRenderLoopManager, name, value)
+    __swig_getmethods__ = {}
+    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, iRenderLoopManager, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def Create(*args): return _iengine.iRenderLoopManager_Create(*args)
+    def Register(*args): return _iengine.iRenderLoopManager_Register(*args)
+    def Retrieve(*args): return _iengine.iRenderLoopManager_Retrieve(*args)
+    def GetName(*args): return _iengine.iRenderLoopManager_GetName(*args)
+    def Unregister(*args): return _iengine.iRenderLoopManager_Unregister(*args)
+    def Load(*args): return _iengine.iRenderLoopManager_Load(*args)
+    __swig_getmethods__["scfGetVersion"] = lambda x: _iengine.iRenderLoopManager_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_iengine.iRenderLoopManager_scfGetVersion)
+    __swig_destroy__ = _iengine.delete_iRenderLoopManager
+    __del__ = lambda self : None;
+iRenderLoopManager_swigregister = _iengine.iRenderLoopManager_swigregister
+iRenderLoopManager_swigregister(iRenderLoopManager)
+iRenderLoopManager_scfGetVersion = _iengine.iRenderLoopManager_scfGetVersion
 
 def CS_REQUEST_ENGINE ():
    return core.CS_REQUEST_PLUGIN("crystalspace.engine.3d", iEngine)
