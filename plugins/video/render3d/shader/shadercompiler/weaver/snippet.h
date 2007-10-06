@@ -54,31 +54,38 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         csString location;
         csRef<iDocumentNode> node;
       };
+      struct Attribute
+      {
+        csString name;
+        csString type;
+        csString defaultValue;
+      };
       struct Input
       {
         csRef<iDocumentNode> node;
         csString name;
         csString type;
         csString condition;
+        csString defaultValue;
         enum
         {
           None,
+          Value,
           Complex
-        } defaultType;
-        enum
-        {
-          flagPrivate = 1,
-          flagNoMerge = 2
-        };
-        uint flags;
+        } defaultType : 3;
+        bool isPrivate : 1;
+        bool noMerge : 1;
         csArray<Block> complexBlocks;
+        csArray<Attribute> attributes;
         
-        Input() : defaultType (None), flags (0) {}
+        Input() : defaultType (None), isPrivate (false), noMerge (false) {}
       };
       struct Output
       {
         csString name;
         csString type;
+        csString inheritAttrFrom;
+        csArray<Attribute> attributes;
       };
       
       Technique (const char* snippetName) : snippetName (snippetName), 
@@ -186,6 +193,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     AtomTechnique* ParseAtomTechnique (WeaverCompiler* compiler,
       iDocumentNode* node, bool canOmitCombiner, 
       const char* defaultCombinerName = 0) const;
+    bool ParseCombiner (iDocumentNode* child, 
+      Technique::CombinerPlugin& newCombiner) const;
+    bool ParseInput (iDocumentNode* child, Technique::Input& newInput, 
+      const char* defaultCombinerName) const;
+    bool ParseOutput (iDocumentNode* child, 
+      Technique::Output& newOutput) const;
+    bool ParseAttribute (iDocumentNode* child, 
+      Technique::Attribute& attr) const;
     static bool ReadBlocks (WeaverCompiler* compiler, iDocumentNode* node,
       csArray<Technique::Block>& blocks, const char* defaultCombinerName = 0);
     

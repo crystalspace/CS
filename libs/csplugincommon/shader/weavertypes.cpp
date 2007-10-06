@@ -35,7 +35,7 @@ namespace CS
         };
         static const TypeInfoMap typeInfoMap[] = {
           {"bool", 
-            {TypeInfo::Vector,  false, 1, TypeInfo::NoSemantics, TypeInfo::NoSpace, false}},
+            {TypeInfo::VectorB, false, 1, TypeInfo::NoSemantics, TypeInfo::NoSpace, false}},
           {"direction",
             {TypeInfo::Vector,  false, 3, TypeInfo::Direction,   TypeInfo::NoSpace, false}},
           {"direction_camera",
@@ -84,6 +84,8 @@ namespace CS
             {TypeInfo::Vector,  false, 4, TypeInfo::Color,       TypeInfo::NoSpace, false}},
           {"tex2d", 
             {TypeInfo::Sampler, false, 2, TypeInfo::NoSemantics, TypeInfo::NoSpace, false}},
+          {"texcube", 
+            {TypeInfo::Sampler, true,  3, TypeInfo::NoSemantics, TypeInfo::NoSpace, false}},
           {"texcoord2", 
             {TypeInfo::Vector,  false, 2, TypeInfo::Texcoord,    TypeInfo::NoSpace, false}},
 	};

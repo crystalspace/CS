@@ -56,7 +56,9 @@
     </input>
     
     <!-- Surface normal -->
-    <input name="normal" type="normal_tangent" />
+    <input name="normal" type="normal_tangent" default="value" defval="0,0,1">
+      <attribute name="perfragment" type="bool" defval="false" />
+    </input>
 
     <input name="lightmap" type="tex2d" default="complex" private="yes">
       <block location="pass">
@@ -118,30 +120,44 @@
     <block location="cg:fragmentMain">
       float3 illum_ambient = ambient;
       float3 illum_diffuse;
-      <!-- The "tex normal" test is not nice... breaks "abstraction" ... -->
-      <?if vars."tex normal".texture && vars."tex lightmap dir 1".texture ?>
+      <?if vars."tex lightmap dir 1".texture ?>
       <![CDATA[
-	/* These should really match up with those in lighter2... */
-	float3 base[3] = 
-	{ 
-	  float3 (/* -1/sqrt(6) */ -0.408248, /* 1/sqrt(2) */ 0.707107, /* 1/sqrt(3) */ 0.577350),
-	  float3 (/* sqrt(2/3) */ 0.816497, 0, /* 1/sqrt(3) */ 0.577350),
-	  float3 (/* -1/sqrt(6) */ -0.408248, /* -1/sqrt(2) */ -0.707107, /* 1/sqrt(3) */ 0.577350)
-	};
-	float3 coeff = float3 (saturate (dot (normal, base[0])),
-			       saturate (dot (normal, base[1])),
-			       saturate (dot (normal, base[2])));
-	coeff *= coeff;
-	illum_diffuse = 2 * (coeff.x * tex2D (lightmap_dir1, texCoordLM).rgb
-	                   + coeff.y * tex2D (lightmap_dir2, texCoordLM).rgb
-	                   + coeff.z * tex2D (lightmap_dir3, texCoordLM).rgb);
+	// Utilize directional LM/colors only if normal is changes per-fragment
+	if (normal_attr_perfragment)
+	{
+	  /* These should really match up with those in lighter2... */
+	  float3 base[3] = 
+	  { 
+	    float3 (/* -1/sqrt(6) */ -0.408248, /* 1/sqrt(2) */ 0.707107, /* 1/sqrt(3) */ 0.577350),
+	    float3 (/* sqrt(2/3) */ 0.816497, 0, /* 1/sqrt(3) */ 0.577350),
+	    float3 (/* -1/sqrt(6) */ -0.408248, /* -1/sqrt(2) */ -0.707107, /* 1/sqrt(3) */ 0.577350)
+	  };
+	  float3 coeff = float3 (saturate (dot (normal, base[0])),
+				 saturate (dot (normal, base[1])),
+				 saturate (dot (normal, base[2])));
+	  coeff *= coeff;
+	  
+ 	  float3 baseLit[3];
+	  baseLit[0] = tex2D (lightmap_dir1, texCoordLM).rgb;
+	  baseLit[1] = tex2D (lightmap_dir2, texCoordLM).rgb;
+	  baseLit[2] = tex2D (lightmap_dir3, texCoordLM).rgb;
+	  
+	  illum_diffuse = 2 * (coeff.x * baseLit[0]
+			     + coeff.y * baseLit[1]
+			     + coeff.z * baseLit[2]);
+	}
+	else
+	// Use plain ol' less detailed lighting otherwise
       ]]>
-      <?elsif vars."tex lightmap".texture ?>
-	illum_diffuse = 2 * tex2D (lightmap, texCoordLM).rgb;
-      <?else?>
-	illum_ambient = float3 (0, 0, 0);
-	illum_diffuse = primaryColor.rgb;
       <?endif?>
+	{
+	<?if vars."tex lightmap".texture ?>
+	  illum_diffuse = 2 * tex2D (lightmap, texCoordLM).rgb;
+	<?else?>
+	  illum_ambient = float3 (0, 0, 0);
+	  illum_diffuse = primaryColor.rgb;
+	<?endif?>
+	}
       illumination = illum_ambient + illum_diffuse;
     </block>
     

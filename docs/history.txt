@@ -6,6 +6,18 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+06-Oct-2007
+	- res made the following changes to shaderweaver:
+	  - Added a simpler way to specify default values for inputs: it can
+	    now be a value that gets assigned to the input if no match to some
+	    connected output is found.
+	  - Added "attributes" to input/output values: these store auxiliary
+	    bits of information that can be set and used by snippets to 
+	    fine-tune their behaviour. As a practical example: normals have an
+	    attribute "perfragment" which indicates whether the normal varies
+	    per fragment (e.g. comes from a normal map) or just per vertex.
+	    The lightmapping code uses that information and only utilizes
+	    directional LMs if the normal varies per fragment.
 05-Oct-2007
 	- caedes changed mk/jam/swig.jam to make sure the bindings/python out
 	  folder is created before swig is run on the modules in all

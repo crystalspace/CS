@@ -264,7 +264,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
           // Look if there's already an input that has the same tag as this.
           EmittedInput* prevInput = 0;
           csString tag;
-          if (!(inp.flags & Snippet::Technique::Input::flagNoMerge))
+          if (!inp.noMerge)
           {
             tag = GetInputTag (combiner, *comb, node.tech->GetCombiner(), 
               inp);
@@ -286,7 +286,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 
           nodeAnnotation.Append (GetAnnotation ("Input: %s %s -",
             inp.type.GetData(), inp.name.GetData()));
-          if (!(inp.flags & Snippet::Technique::Input::flagPrivate)
+          if (!(inp.isPrivate)
             && FindInput (graph, combiner, nodeAnnotation, node.tech, inp, 
             sourceTech, output, usedOutputs))
           {
@@ -334,6 +334,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
                   return false;
                 }
 	        break;
+	      case Snippet::Technique::Input::Value:
+                {
+                  node.inputDefaults.Put (inp.name, inp.defaultValue);
+                }
+                break;
 	      case Snippet::Technique::Input::Complex:
 	        {
                   if (prevInput != 0)
@@ -362,8 +367,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
                       emit.conditions.Push (inp.condition);
                     emit.tag = tag;
                     size_t index = emitInputs.Push (emit);
-                    if (!tag.IsEmpty()
-                      && !(inp.flags & Snippet::Technique::Input::flagNoMerge))
+                    if (!tag.IsEmpty() && !inp.noMerge)
                       taggedInputs.Put (tag, index);
                     
                     csString inpOutputName;
@@ -485,9 +489,29 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	  while (inputIt->HasNext())
 	  {
 	    const Snippet::Technique::Input& inp = inputIt->Next();
-	    combiner->AddInput (inp.name, inp.type);
-	    combiner->InputRename (node.inputLinks.Get (inp.name, (const char*)0),
-	      inp.name);
+            const csString& defVal = node.inputDefaults.Get (
+              inp.name, (const char*)0);
+            const char* inpRenamed;
+            if (!defVal.IsEmpty())
+            {
+              combiner->AddInputValue (inp.name, inp.type, defVal);
+              /* This causes the default attribute values to be used
+                 since there shouldn't be an "undecorated" global name. */
+              inpRenamed = inp.name;
+            }
+            else
+            {
+	      combiner->AddInput (inp.name, inp.type);
+              inpRenamed = node.inputLinks.Get (inp.name, (const char*)0);
+            }
+            combiner->InputRename (inpRenamed, inp.name);
+
+            for (size_t a = 0; a < inp.attributes.GetSize(); a++)
+            {
+              combiner->AddInputAttribute (inpRenamed,
+                inp.attributes[a].name, inp.attributes[a].type,
+                inp.attributes[a].defaultValue);
+            }
 	  }
 	}
 	{
@@ -498,7 +522,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	    const Snippet::Technique::Output& outp = outputIt->Next();
 	    combiner->AddOutput (outp.name, outp.type);
 	    combiner->OutputRename (outp.name, 
-	      node.outputRenames.Get (outp.name, (const char*)0));
+              node.outputRenames.Get (outp.name, (const char*)0));
+
+            if (!outp.inheritAttrFrom.IsEmpty())
+            {
+              const char* inheritAttrInput =
+                node.inputLinks.Get (outp.inheritAttrFrom, (const char*)0);
+              if (inheritAttrInput != 0)
+              {
+                combiner->PropagateAttributes (inheritAttrInput,
+                  outp.name);
+              }
+            }
+            for (size_t a = 0; a < outp.attributes.GetSize(); a++)
+            {
+              combiner->AddOutputAttribute (outp.name,
+                outp.attributes[a].name, outp.attributes[a].type);
+            }
 	  }
 	}
 	
