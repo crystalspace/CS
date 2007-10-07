@@ -9,5 +9,8 @@ Crystal Space.
 @menu
 @end menu
 
-@c @node Api1_4 Your Change Here
-@c @subsection Your Change Here
+@node Api1_4 iGenMeshAnimationControl changes
+@subsection @code{iGenMeshAnimationControl} changes
+
+The @code{Update} method of the @code{iGenMeshAnimationControl} interface has
+a different prototype, as more parameters have been added.

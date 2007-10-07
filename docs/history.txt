@@ -14,6 +14,9 @@ chronological order.
             - Added --quiet option to configure script invocation to reduce
 	      noise.
 	    - Update recently-outdated comments to reflect current state.
+	- res changed iGenMeshAnimationControl::Update() to also take a mesh
+	  version and vertex count (like the other Update* methods).
+	- res added multi-buffer support to gmeshanimpdl.
 06-Oct-2007
 	- res made the following changes to shaderweaver:
 	    - Added a simpler way to specify default values for inputs: it can

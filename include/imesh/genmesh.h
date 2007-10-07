@@ -468,7 +468,7 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
  */
 struct iGenMeshAnimationControl : public virtual iBase
 {
-  SCF_INTERFACE(iGenMeshAnimationControl, 2, 0, 0);
+  SCF_INTERFACE(iGenMeshAnimationControl, 2, 1, 0);
 
   /// Returns true if this control animates vertices.
   virtual bool AnimatesVertices () const = 0;
@@ -482,7 +482,8 @@ struct iGenMeshAnimationControl : public virtual iBase
   /**
    * General update method
    */
-  virtual void Update (csTicks current) = 0;
+  virtual void Update (csTicks current, int num_verts, 
+    uint32 version_id) = 0;
 
   /**
    * Given the factory vertex data, return the animated data.
