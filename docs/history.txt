@@ -6,42 +6,49 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+07-Oct-2007
+	- Eric Sunshine resolved some issues with jobber configuration
+	  following recent changes:
+	    - Restored MSVCGEN_SILENT=yes for msvcgen runs in order to reduce
+	      noise in output log.
+            - Added --quiet option to configure script invocation to reduce
+	      noise.
+	    - Update recently-outdated comments to reflect current state.
 06-Oct-2007
 	- res made the following changes to shaderweaver:
-	  - Added a simpler way to specify default values for inputs: it can
-	    now be a value that gets assigned to the input if no match to some
-	    connected output is found.
-	  - Added "attributes" to input/output values: these store auxiliary
-	    bits of information that can be set and used by snippets to 
-	    fine-tune their behaviour. As a practical example: normals have an
-	    attribute "perfragment" which indicates whether the normal varies
-	    per fragment (e.g. comes from a normal map) or just per vertex.
-	    The lightmapping code uses that information and only utilizes
-	    directional LMs if the normal varies per fragment.
-	  - andres made jobber really use the configure script, in order to
-	    better cope with changes, like the recent python ones. Also made
-	    jobber checkout from a local repository and then 
-	    "switch --relocate;update" in order to make it more failsafe and
-	    faster.
+	    - Added a simpler way to specify default values for inputs: it can
+	      now be a value that gets assigned to the input if no match to
+	      some connected output is found.
+	    - Added "attributes" to input/output values: these store auxiliary
+	      bits of information that can be set and used by snippets to
+	      fine-tune their behaviour. As a practical example: normals have
+	      an attribute "perfragment" which indicates whether the normal
+	      varies per fragment (e.g. comes from a normal map) or just per
+	      vertex.  The lightmapping code uses that information and only
+	      utilizes directional LMs if the normal varies per fragment.
+	- andres made jobber really use the CS configure script, in order to
+	  better cope with changes, like the recent Python ones. Also made
+	  jobber checkout from a local repository and then "switch --relocate;
+	  update" in order to make it more failsafe and faster.
 05-Oct-2007
 	- caedes changed mk/jam/swig.jam to make sure the bindings/python out
 	  folder is created before swig is run on the modules in all
 	  situations. This fixes problems when running pythonfreeze on a clean
 	  tree.
 	- caedes made some changes to swig files:
-	  - temporarily moved fontserv to core module, as there are problems
-	    having it in a separate module.
-	  - added array protocol declaration for iStringArray.
-	  - added iterator protocol for scfInterfaceMetadataList python
-	    wrapper.
+	    - temporarily moved fontserv to core module, as there are problems
+	      having it in a separate module.
+	    - added array protocol declaration for iStringArray.
+	    - added iterator protocol for scfInterfaceMetadataList python
+	      wrapper.
 	- caedes changed PyBindingModule rule to not emit warnings on
 	  uninitialized variables coming from swig generated code (was like
 	  this originially but somehow the flag got removed on bindingsplit).
 	- caedes reordered cspace python package __init__.py to import
 	  modules in inheritance order, and moved fontserv back to ivideo
 	  module as the reordering takes care of type resolution problems.
-	- caedes moved iAnimatedImage to the swig core interfaces list (had been
-	  incorrectly added to the iengine interface list).
+	- caedes moved iAnimatedImage to the swig core interfaces list (had
+	  been incorrectly added to the iengine interface list).
 	- res changed bugplug to stop profiler logging when it's unloaded.
 	- res made bugplug's "normal drawing" also draw tangents and
 	  bitangents.
@@ -83,9 +90,9 @@ chronological order.
 	- res fixed lighter2 trying to set up tangents for genmeshes even if 
 	  they aren't needed.
 04-Oct-2007
-	- andres added a VarFileInfo Block to the resources for win32 
-	  dlls/executables as they are invalid without and especially considered
-	  invalid by windows installer.
+	- andres added a VarFileInfo Block to the resources for win32
+	  dlls/executables as they are invalid without and especially
+	  considered invalid by windows installer.
 	- andres made the search for the CS installation in the registry not to
 	  look at the version agnostic version before the version aware bit in
 	  registry
@@ -96,21 +103,21 @@ chronological order.
 	  fudged away from the primitive to make it less likely that it hits
 	  very close primitives.
 	- caedes did the following changes to swig files:
-	  - added ARRAY_CHANGE_ALL_TEMPLATE and ARRAY_CHANGE_ALL_TEMPLATE_PTR
-	    swig macros to help in declaring iArrayChangeAll related templates
-	    to swig.
-	  - added terrain2 related includes and interfaces.
-	  - added some intermodules relationships.
-	  - changed cspace.i module include ordering.
-	  - added swig declarations for scfImplementationExt2, 
-	    scfImplementation2, scfFakeInterface, and fixed 
-	    scfImplementationExt1.
-	  - added iAnimatedImage, iProcTexture, iRenderLoop, 
-	    iRenderLoopManager and related includes.
-	  - removed some leftover commented code.
-	  - added iLightIterator, iObjectIterator, iPluginIterator, 
-	    iSectorIterator, iMeshWrapperIterator to interface
-	    list, and related missing iterator directives for swig.
+	    - added ARRAY_CHANGE_ALL_TEMPLATE and ARRAY_CHANGE_ALL_TEMPLATE_PTR
+	      swig macros to help in declaring iArrayChangeAll related
+	      templates to swig.
+	    - added terrain2 related includes and interfaces.
+	    - added some intermodules relationships.
+	    - changed cspace.i module include ordering.
+	    - added swig declarations for scfImplementationExt2, 
+	      scfImplementation2, scfFakeInterface, and fixed 
+	      scfImplementationExt1.
+	    - added iAnimatedImage, iProcTexture, iRenderLoop, 
+	      iRenderLoopManager and related includes.
+	    - removed some leftover commented code.
+	    - added iLightIterator, iObjectIterator, iPluginIterator, 
+	      iSectorIterator, iMeshWrapperIterator to interface
+	      list, and related missing iterator directives for swig.
 	- caedes changed cspython.cpp not to use PYTHONPATH variable name as
 	  it seems it conflicts with a Win32-specific #define inside the 
 	  python headers (reported by Lukas Erlinghagen).
@@ -164,10 +171,10 @@ chronological order.
 	  primitives neighbouring to the currently lit one in some cases. This
 	  seems to resolve some glitches.
 	- res made some tweaks to the binding-related MSVC projects:
-	  - The Python module projects now have a "py" prefix (in addition to
-	    the already existing "dll" prefix).
-	  - The Python modules are now filtered from the typical workspaces.
-	  - Added a workspace containing the Python-related projects as well.
+	    - The Python module projects now have a "py" prefix (in addition to
+	      the already existing "dll" prefix).
+	    - The Python modules are now filtered from the typical workspaces.
+	    - Added a workspace containing the Python-related projects as well.
 	- caedes tweaked swig.jam rules to use a <language>freeze target, 
 	  which freezes all swig files relative to that language.
 	- caedes modified jobber-svn cel and cs files to use the
@@ -202,24 +209,24 @@ chronological order.
 30-Sep-2007
 	- res made some VC warning fixes.
 	- res made the following changes to TinyXML:
-	  - When writing to an iFile, instead of storing the XML to a string
-	    buffer and writing out everything at once, a smaller buffer is
-	    used and the data is written out incrementally.
-	  - Scraped a few bytes off the Tiny node's memory footprint.
+	    - When writing to an iFile, instead of storing the XML to a string
+	      buffer and writing out everything at once, a smaller buffer is
+	      used and the data is written out incrementally.
+	    - Scraped a few bytes off the Tiny node's memory footprint.
 	- res changed csRegExpMatcher to not allocate the 'regex_t' structure
 	  from the heap but have it inline in the class.
 	- res made the following changes to csHash<>:
-	  - Put() and PutUnique() now return a ref to the value that was 
-	    added.
-	  - Added GetOrCreate(), which returns an element for a key if one 
-	    already exists, or adds and returns a default one if not.
-	  - Marked csHashCompute as a "pure" method.
+	    - Put() and PutUnique() now return a ref to the value that was 
+	      added.
+	    - Added GetOrCreate(), which returns an element for a key if one 
+	      already exists, or adds and returns a default one if not.
+	    - Marked csHashCompute as a "pure" method.
 	- res augmented iPluginManager->LoadPlugin() to optionally be silent
 	  about plugin loading failures.
 	- res made the following changes to lighter:
-	  - Added creation of meshes visualizing traced rays and what they hit
-	    (for debugging purposes).
-	  - Made some small tweaks to improve border element behaviour.
+	    - Added creation of meshes visualizing traced rays and what they
+	      hit (for debugging purposes).
+	    - Made some small tweaks to improve border element behaviour.
 29-Sep-2007
 	- Mike Gist changed the call to LoadTexture() in FindTexture() to not
 	  create a material if the texture isn't found. This fixes a material
@@ -227,13 +234,13 @@ chronological order.
 	- Vincent fixed a <comparever> entry in gldriver.xml.
         - Mike Gist fixed a crash in csMeshFactoryList::Remove().
 	- caedes made some shader changes:
-	  - fixed vertexlight.cgvp for undeclared matrix and incorrect
-	    attenuation.
-	  - fixed ambient.avp binding texture coordinates incorrectly.
-	  - made std_character2.xml use only software skinning (added
-	    soft-skinning.inc snippet).
-	  - added a fallback for character_bump2.xml for cards with no
-	    pixel processor.
+	    - fixed vertexlight.cgvp for undeclared matrix and incorrect
+	      attenuation.
+	    - fixed ambient.avp binding texture coordinates incorrectly.
+	    - made std_character2.xml use only software skinning (added
+	      soft-skinning.inc snippet).
+	    - added a fallback for character_bump2.xml for cards with no
+	      pixel processor.
 28-Sep-2007
 	- Vincent added static variants in lighter2, cslight, basemapgen and
 	  docconv Jamfiles.
@@ -285,9 +292,9 @@ chronological order.
 	- res made the GTK alert code also compile on GTK version 2.4.
 20-Sep-2007
 	- caedes, Genjix and iceeey removed some stupid code :D
-	  csQuaternion quat;
-	  if (quat.v.x != 0 || quat.v.y != 0 || quat.v.z != 0 || quat.w != 0)
-	    // ...
+	    csQuaternion quat;
+	    if (quat.v.x != 0 || quat.v.y != 0 || quat.v.z != 0 || quat.w != 0)
+	      // ...
 	- Genjix fixed bug in walktest where it doesn't look where the camera
 	  is when you move left and right at start!
 	- Vincent applied res' fix for configure which detected lib3ds-1.3.0
