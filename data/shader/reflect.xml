@@ -13,7 +13,8 @@
       </vp>
       <texture name="tex diffuse" destination="unit 0" />
       <texture name="tex lightmap" destination="unit 1" />
-      <texture name="tex reflection" destination="unit 2" />
+      <!--texture name="tex reflection" destination="unit 2" /-->
+      <texture name="tex environment" destination="unit 2" />
       <fp plugin="glfixed">
         <fixedfp>
 	  <layer>

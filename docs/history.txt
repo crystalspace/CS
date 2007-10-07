@@ -17,6 +17,8 @@ chronological order.
 	- res changed iGenMeshAnimationControl::Update() to also take a mesh
 	  version and vertex count (like the other Update* methods).
 	- res added multi-buffer support to gmeshanimpdl.
+	- res augmented lighter2 to support directional static lighting for
+	  vertex-lit objects as well.
 06-Oct-2007
 	- res made the following changes to shaderweaver:
 	    - Added a simpler way to specify default values for inputs: it can
