@@ -7,9 +7,10 @@ This section documents the major changes between versions 1.2 and 1.4 of of
 Crystal Space.
 
 @menu
+* Api1_4 iGenMeshAnimationControl changes:: @code{iGenMeshAnimationControl} changes
 @end menu
 
-@node Api1_4 iGenMeshAnimationControl changes
+@node Api1_4 iGenMeshAnimationControl changes, , Release Notes 1_4, Release Notes 1_4
 @subsection @code{iGenMeshAnimationControl} changes
 
 The @code{Update} method of the @code{iGenMeshAnimationControl} interface has

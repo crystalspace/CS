@@ -6750,14 +6750,22 @@ SWIGINTERN PyObject *_wrap_iGenMeshAnimationControl_Update(PyObject *SWIGUNUSEDP
   PyObject *resultobj = 0;
   iGenMeshAnimationControl *arg1 = (iGenMeshAnimationControl *) 0 ;
   csTicks arg2 ;
+  int arg3 ;
+  uint32 arg4 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   unsigned int val2 ;
   int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  unsigned long val4 ;
+  int ecode4 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iGenMeshAnimationControl_Update",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OOOO:iGenMeshAnimationControl_Update",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iGenMeshAnimationControl, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iGenMeshAnimationControl_Update" "', argument " "1"" of type '" "iGenMeshAnimationControl *""'"); 
@@ -6768,7 +6776,17 @@ SWIGINTERN PyObject *_wrap_iGenMeshAnimationControl_Update(PyObject *SWIGUNUSEDP
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "iGenMeshAnimationControl_Update" "', argument " "2"" of type '" "csTicks""'");
   } 
   arg2 = static_cast< csTicks >(val2);
-  (arg1)->Update(arg2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "iGenMeshAnimationControl_Update" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = static_cast< int >(val3);
+  ecode4 = SWIG_AsVal_unsigned_SS_long(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "iGenMeshAnimationControl_Update" "', argument " "4"" of type '" "uint32""'");
+  } 
+  arg4 = static_cast< uint32 >(val4);
+  (arg1)->Update(arg2,arg3,arg4);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
