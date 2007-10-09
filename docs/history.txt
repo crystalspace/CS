@@ -8,6 +8,7 @@ chronological order.
 
 09-Oct-2007
 	- res added the CS_SUPPORTS_MMX preprocessor define for MSVC projects.
+	- res made ptpdlight support MMX for a slight speed-up.
 07-Oct-2007
 	- Eric Sunshine resolved some issues with jobber configuration
 	  following recent changes:

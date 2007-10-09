@@ -2,8 +2,15 @@ SubDir TOP plugins proctex ptpdlight ;
 
 Description ptpdlight : "pseudo-dynamic lightmap procedural texture" ;
 
+PTPDLIGHT_EXTRA = ;
+if [ Property build : projgen ]
+{
+  PTPDLIGHT_EXTRA += ptpdlight_mmx.cpp ;
+}
+
 Plugin ptpdlight
-	: [ Wildcard *.cpp *.h ]
+	: [ Filter [ Wildcard *.cpp *.h ] : ptpdlight_mmx.cpp ]
+	  $(PTPDLIGHT_EXTRA)
 ;
 LinkWith ptpdlight : crystalspace ;
 Includes ptpdlight_loader.h : $(SUBDIR)/ptpdlight_loader.tok ;
