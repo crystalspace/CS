@@ -15,6 +15,9 @@ chronological order.
 	  file targets to specify per-source compile flags.
 	- res made the ptpslight MMX stuff compile on gcc.
         - Mike Gist merged a basic simdtest from the SIMD SoC branch.
+	- Jorrit did a small optimization in meshgen. Meshes that become
+	  invisible due to alpha transparency are now really made invisible
+	  for the engine. That helps performance a bit.
 07-Oct-2007
 	- Eric Sunshine resolved some issues with jobber configuration
 	  following recent changes:
@@ -2595,7 +2598,8 @@ chronological order.
 	  command.
 	- res made CS::Threading::Condition::Wait() return whether the wait
 	  timed out or ended due a change of the condition.
-	- res fixed compilation of the pthreads CS::Threading::Condition::Wait().
+	- res fixed compilation of the pthreads
+	  CS::Threading::Condition::Wait().
 	- res added a simple translator plugin from Darek Dawidowski.
 	- Anders Stenberg added a halfassed water test level (water.zip). 
 	  It's not very good right now, but could be a test bed for further
