@@ -19,9 +19,13 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "cssysdef.h"
 #include "csutil/processorspecdetection.h"
 
+using namespace CS::Platform;
+
+CS_IMPLEMENT_APPLICATION
+
 int main(int argc, char* argv[])
 {
-    CS::Platform::ProcessorSpecDetection detect;
+    ProcessorSpecDetection detect;
 
     if(detect.HasMMX())
     {
