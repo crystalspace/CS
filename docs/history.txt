@@ -13,6 +13,7 @@ chronological order.
 	  SIMD SoC branch).
 	- res made it possible to run the CFlags Jam rule on (gristed) source
 	  file targets to specify per-source compile flags.
+	- res made the ptpslight MMX stuff compile on gcc.
 07-Oct-2007
 	- Eric Sunshine resolved some issues with jobber configuration
 	  following recent changes:
