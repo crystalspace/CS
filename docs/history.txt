@@ -672,6 +672,8 @@ chronological order.
 1-Aug-2007
 	- Jorrit fixed an initialization error in gmeshskelanim2 that could
 	  cause crashes at exit. This fixes #367.
+30-Jul-2007
+        - Mike Gist fixed a few warnings.
 29-Jul-2007
 	- res made the CEL jobber import crystalspace_staticplugins_msvc.jam
 	  from CS before generating VC projects.
@@ -869,6 +871,14 @@ chronological order.
 25-Jun-2007
 	- Jorrit converted a few remaining interfaces to using SCF_INTERFACE
 	  instead of SCF_VERSION.
+        - Mike Gist added CS::SIMD namespace, containing some SIMD specific
+          functions and types.
+        - Mike Gist added preliminary SIMDCheck function. This takes up to two
+          SIMD function pointers and a c++ fallback, and decides which to use
+          based on CPU instruction set support.
+        - Mike Gist enhanced simdtest to make use of SIMDCheck. Everything in
+          CS::SIMD and using those functions and types is only tested working on
+          MSVC. Other platform support in progress.
 24-Jun-2007
         - Piotr made small bugfix in odedynam colliders ref handling.
 	- Eric Sunshine corrected "camera movement" documentation bug.
@@ -946,6 +956,11 @@ chronological order.
 4-Jun-2007
 	- Oktal fixed a mistake made during Marten's SCF clean-up, that broke
 	  some X11 canvas plugins.
+	- Mike Gist added PSD code for PPC on OSX. Still needs testing.
+3-Jun-2007
+	- Mike Gist refactored PSD (Processor Spec Detection) code and made it
+	  check for and return a bitmask of all supported instructions. Win and 
+	  unix runtime checking work well now.
 1-Jun-2007
 	- res changed the cs-config wrapper script to use '=' instead of '==' 
 	  for more POSIX compliancy.
@@ -955,6 +970,10 @@ chronological order.
 31-May-2007
 	- Marten reverted some of the changes and did some more fixes to make
 	  CS compile on GCC again after the SCF improvements.
+	- Mike Gist added basic structure for runtime instruction set detection
+	  and support for such detection on windows.
+	- Mike Gist added what's hopefully runtime instruction set detection for
+	  x86 based linux gcc.
 30-May-2007
 	- Marten made some cleanups to scfImplementation(Ext)N to reduce the 
 	  source size and hopefully speed up compilation a tiny bit.
