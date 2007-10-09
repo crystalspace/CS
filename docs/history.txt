@@ -11,6 +11,8 @@ chronological order.
 	- res made ptpdlight support MMX for a slight speed-up.
 	- res added an MMX test to configure (based on Mike Gist's work in the
 	  SIMD SoC branch).
+	- res made it possible to run the CFlags Jam rule on (gristed) source
+	  file targets to specify per-source compile flags.
 07-Oct-2007
 	- Eric Sunshine resolved some issues with jobber configuration
 	  following recent changes:
