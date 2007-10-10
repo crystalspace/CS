@@ -73,7 +73,7 @@ void csImageCubeMapMaker::UpdateName ()
     cubeImages[4].IsValid() ? cubeImages[4]->GetName() : "",
     cubeImages[5].IsValid() ? cubeImages[5]->GetName() : "");
   cs_free (fName);
-  fName = CS::StrNew (newName);
+  fName = CS::StrDup (newName);
 }
 
 const void* csImageCubeMapMaker::GetImageData ()
@@ -95,7 +95,7 @@ int csImageCubeMapMaker::GetHeight () const
 void csImageCubeMapMaker::SetName (const char *iName)
 {
   cs_free (fName);
-  fName = CS::StrNew (iName);
+  fName = CS::StrDup (iName);
   manualName = true;
 }
 
