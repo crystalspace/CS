@@ -11,6 +11,8 @@ chronological order.
           code on PPC.
 	- res fixed csImageCubeMapMaker to not use new[]/delete[] for the
 	  filename (since csImageBase uses cs_malloc()/cs_free() for it).
+	- caedes reverted r27847 on data/shader/reflect.xml as seems
+	  future accidentally slipped in :).
 09-Oct-2007
 	- res added the CS_SUPPORTS_MMX preprocessor define for MSVC projects.
 	- res made ptpdlight support MMX for a slight speed-up.
