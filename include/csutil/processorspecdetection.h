@@ -126,7 +126,7 @@ namespace CS
 
 #ifdef CS_PLATFORM_WIN32
             ProcessorSpecDetectionBase<DetectInstructionsWin> procDetect;
-#elif defined(CS_PLATFORM_POWERPC)
+#elif defined(CS_PROCESSOR_POWERPC)
             ProcessorSpecDetectionBase<DetectInstructionsGCCPPC> procDetect;
 #else
             ProcessorSpecDetectionBase<DetectInstructionsNonWinGCCx86> procDetect;

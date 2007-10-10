@@ -5,7 +5,9 @@ The overall history is in reverse (descending) chronological order, so that
 each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
-
+10-Oct-2007
+        - Mike Gist fixed a compile error in the processor spec detection
+          code on PPC.
 09-Oct-2007
 	- res added the CS_SUPPORTS_MMX preprocessor define for MSVC projects.
 	- res made ptpdlight support MMX for a slight speed-up.
