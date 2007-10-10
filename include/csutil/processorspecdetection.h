@@ -37,7 +37,7 @@ namespace CS
 
 #ifdef CS_PLATFORM_WIN32
 #include "csutil/processor/processorspecdetection_win.h"
-#elif defined(CS_PLATFORM_POWERPC)
+#elif defined(CS_PROCESSOR_POWERPC)
 #include "csutil/processor/processorspecdetection_gcc_ppc.h"
 #else
 #include "csutil/processor/processorspecdetection_nonwin_gcc_x86.h"
