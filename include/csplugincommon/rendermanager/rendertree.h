@@ -173,7 +173,7 @@ namespace RenderManager
     bool Viscull (ContextsContainer* contexts, ContextNode* context, iRenderView* rw, 
       iVisibilityCuller* culler)
     {
-      CS::Utility::MeshFilter* filter = &rw->meshFilter;
+      CS::Utility::MeshFilter* filter = &rw->GetMeshFilter();
       ViscullCallback cb (*this, context, rw, filter);
       
       culler->VisTest (rw, &cb);
