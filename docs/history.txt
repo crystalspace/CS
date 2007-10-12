@@ -18,6 +18,8 @@ chronological order.
 	  added benefit future performance for collision detection will
 	  no longer be degraded as the cache size for OPCODE will remain
 	  small.
+	- res fixed the ptpdlight VC project to contain an un-gristed
+	  ptpdlight_mmx.cpp filename.
 11-Oct-2007
 	- res changed the relaytool invocation to:
 	  - Pass multiple libs to be relayed in one command.

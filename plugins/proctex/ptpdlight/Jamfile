@@ -3,11 +3,16 @@ SubDir TOP plugins proctex ptpdlight ;
 Description ptpdlight : "pseudo-dynamic lightmap procedural texture" ;
 
 PTPDLIGHT_MMX = ;
-if "$(CS_SUPPORTS_MMX)" = "yes" || [ Property build : projgen ]
+if [ Property build : projgen ]
+{
+  PTPDLIGHT_MMX = ptpdlight_mmx.cpp ;
+}
+else if "$(CS_SUPPORTS_MMX)" = "yes"
 {
   local source = [ DoSourceGrist ptpdlight_mmx.cpp ] ;
   PTPDLIGHT_MMX = $(source) ;
 }
+
 
 Plugin ptpdlight
 	: [ Filter [ Wildcard *.cpp *.h ] : ptpdlight_mmx.cpp ]
