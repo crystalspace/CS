@@ -134,6 +134,11 @@ public:
   {
     return intersecting_triangles;
   }
+  bool CalculateIntersections (csTerraFormerCollider* terraformer);
+  bool TestSegmentTerraFormer (
+    csTerraFormerCollider* terraformer,
+    const IceMaths::Matrix4x4& transform,
+    const csVector3& start, const csVector3& end);
 
   /**
    * Get pointer to current array of collision pairs.

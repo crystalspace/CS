@@ -1,5 +1,8 @@
 1.2 branch log.
 
+12-Oct-2007
+	- Jorrit merged r27874 and 27875 in 1.2 (opcode/CollideRay
+	  optimization/fix).
 01-Oct-2007
         - Mike Gist merged r27752 into 1.2 (UnlinkObjects() loop reversal).
 29-Sep-2007
