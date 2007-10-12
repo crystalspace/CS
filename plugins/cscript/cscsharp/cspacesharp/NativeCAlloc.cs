@@ -20,24 +20,23 @@ using System.Runtime.InteropServices;
 
 namespace CrystalSpace.InteropServices
 {
-    // This is class is for do unmanaged memory related task, more specific
-    // related to the crystal space heap. We cannot use Marshall.AllocHGlobal()
-    // for alloc memory for a pointer that will be freed in the c side and vice-versa,
-    // so we alloc the memory in the C side, and we freed it in the C side also.
-    // We also cannot free a C pointer allocated in the C side by Crystal Space
-    // using Marshal.FreeHGlobal(). In case that we try to do that, we will receive
-    // a Segmentation Fault.
-    public class NativeCAlloc
+  // This is class is for do unmanaged memory related task, more specific
+  // related to the crystal space heap. We cannot use Marshall.AllocHGlobal()
+  // for alloc memory for a pointer that will be freed in the c side and vice-versa,
+  // so we alloc the memory in the C side, and we freed it in the C side also.
+  // We also cannot free a C pointer allocated in the C side by Crystal Space
+  // using Marshal.FreeHGlobal(). In case that we try to do that, we will receive
+  // a Segmentation Fault.
+  public class NativeCAlloc
+  {
+    public static IntPtr Malloc (int size)
     {
-	public static IntPtr Malloc(int size)
-	{
-	    return cspacePINVOKE.csMalloc(size);
-	}
-
-	public static void Free(IntPtr ptr)
-	{
-	    cspacePINVOKE.csFree(ptr);
-	}
+      return cspacePINVOKE.csMalloc(size);
     }
-}; //namespace CrystalSpace
 
+    public static void Free (IntPtr ptr)
+    {
+      cspacePINVOKE.csFree(ptr);
+    }
+  }
+}; //namespace CrystalSpace

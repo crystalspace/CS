@@ -27,60 +27,60 @@
 
 %template(scfSharpEventHandler) scfImplementation1<_csSharpEventHandler, iEventHandler>;
 %inline %{
-    typedef int (*EventHandler_t)(void *ev);
+  typedef int (*EventHandler_t)(void *ev);
 
-    struct _csSharpEventHandler: public scfImplementation1<_csSharpEventHandler,
-									iEventHandler>
+  struct _csSharpEventHandler: public scfImplementation1<_csSharpEventHandler,
+							iEventHandler>
+  {
+    _csSharpEventHandler(): scfImplementationType(this)
     {
-	_csSharpEventHandler(): scfImplementationType(this)
-	{
-	}
+    }
 
-	virtual ~_csSharpEventHandler()
-	{
-	}
+    virtual ~_csSharpEventHandler()
+    {
+    }
 		
-	virtual bool HandleEvent (iEvent &ev)
-	{
-		return _HandleEvent(ev);
-	}
+    virtual bool HandleEvent (iEvent &ev)
+    {
+      return _HandleEvent(ev);
+    }
 
-	bool _HandleEvent(iEvent &ev)
-	{
-	    int ret;
-	    if(m_handler)
-	    {
-		ret = m_handler((void*)&ev);
-		if(ret)
-		    return true;
-	    }
-	    return false;
-	}
+    bool _HandleEvent(iEvent &ev)
+    {
+      int ret;
+      if(m_handler)
+      {
+      ret = m_handler((void*)&ev);
+      if(ret)
+	return true;
+      }
+      return false;
+    }
 		
-	void _Connect(EventHandler_t handler)
-	{
-	    m_handler = handler;
-	}
+    void _Connect(EventHandler_t handler)
+    {
+      m_handler = handler;
+    }
 
-	CS_EVENTHANDLER_NAMES("crystalspace.cspacesharp")
-    	CS_EVENTHANDLER_NIL_CONSTRAINTS
+    CS_EVENTHANDLER_NAMES("crystalspace.cspacesharp")
+    CS_EVENTHANDLER_NIL_CONSTRAINTS
 
-	EventHandler_t m_handler;
-	};
+    EventHandler_t m_handler;
+  };
 %}
 
 %pragma(csharp) imclasscode=%{
-    //We declare this delegate in cspacePINVOKE for callbacks
-    public delegate int EventHandler_t(IntPtr eventHandler);
+  //We declare this delegate in cspacePINVOKE for callbacks
+  public delegate int EventHandler_t(IntPtr eventHandler);
 
-    [DllImport("$dllimport", EntryPoint="ConnectSharpEventHandler")]
-    public static extern void ConnectSharpEventHandler(IntPtr self, EventHandler_t handler);
+  [DllImport("$dllimport", EntryPoint="ConnectSharpEventHandler")]
+  public static extern void ConnectSharpEventHandler(IntPtr self, EventHandler_t handler);
 
-    [DllImport("$dllimport", EntryPoint="csMalloc")]
-    public static extern IntPtr csMalloc(int size);
+  [DllImport("$dllimport", EntryPoint="csMalloc")]
+  public static extern IntPtr csMalloc(int size);
 
-    [DllImport("$dllimport", EntryPoint="csFree")]
-    public static extern void csFree(IntPtr ptr);
+  [DllImport("$dllimport", EntryPoint="csFree")]
+  public static extern void csFree(IntPtr ptr);
 %}
 
 #ifdef USE_DIRECTORS
@@ -90,27 +90,27 @@
 #endif //USE_DIRECTORS
 
 %{
-    extern "C"{
-	void ConnectSharpEventHandler(void *self, EventHandler_t handler);
-	void *csMalloc(int size);
-	void csFree(void *ptr);
-    }
+  extern "C"{
+    void ConnectSharpEventHandler(void *self, EventHandler_t handler);
+    void *csMalloc(int size);
+    void csFree(void *ptr);
+  }
 
-    void ConnectSharpEventHandler(void *self, EventHandler_t handler)
-    {
-	if(self!=NULL)
-	    ((_csSharpEventHandler*)self)->_Connect(handler);
-    }
+  void ConnectSharpEventHandler(void *self, EventHandler_t handler)
+  {
+    if(self!=NULL)
+      ((_csSharpEventHandler*)self)->_Connect(handler);
+  }
 
-    void *csMalloc(int size)
-    {
-	return malloc(size);
-    }
+  void *csMalloc(int size)
+  {
+    return malloc(size);
+  }
 
-    void csFree(void *ptr)
-    {
-	free(ptr);
-    }
+  void csFree(void *ptr)
+  {
+    free(ptr);
+  }
 %}
 
 #endif //CS_MINI_SWIG

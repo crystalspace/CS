@@ -21,43 +21,45 @@ using System.Reflection;
 
 namespace CrystalSpace
 {
-    public abstract class csSharpEventHandler : _csSharpEventHandler
+  public abstract class csSharpEventHandler:_csSharpEventHandler
+  {
+    public csSharpEventHandler ()
     {
-	public csSharpEventHandler()
-	{
-	    ConnectHandler();
-	}
-
-	// We need to call the event handler even
-	// if we aren't using directors, so we implement 
-	// director functionality directly
-	private void ConnectHandler()
-	{
-	    Type derivedType = this.GetType();
-	    Type baseType = typeof(csSharpEventHandler);
-	    if(!derivedType.IsSubclassOf(baseType))
-		return;
-
-	    System.Reflection.MethodInfo HandleEventInfo= derivedType.GetMethod("HandleEvent", HandleEvent_types);
-
-	    if(HandleEventInfo.DeclaringType.IsSubclassOf(baseType))
-	    {
-		m_eventHandler += new cspacePINVOKE.EventHandler_t( Base_HandleEvent );
-		cspacePINVOKE.ConnectSharpEventHandler(_csSharpEventHandler.getCPtr(this).Handle, m_eventHandler);
-	    }
-	}
-
-	private static Type[] HandleEvent_types = { typeof(iEvent) };
-	private int Base_HandleEvent(IntPtr eventHandler)
-	{
-	    iEvent ev = new iEvent(eventHandler, false);
-	    bool ret = HandleEvent(ev);
-	    if(ret)
-		return 1;
-	    return 0;
-	}
-
-	private cspacePINVOKE.EventHandler_t m_eventHandler;
+      ConnectHandler ();
     }
-};// namespace CrystalSpace
 
+    // We need to call the event handler even
+    // if we aren't using directors, so we implement 
+    // director functionality directly
+    private void ConnectHandler ()
+    {
+      Type derivedType = this.GetType ();
+      Type baseType = typeof (csSharpEventHandler);
+      if (!derivedType.IsSubclassOf (baseType))
+	  return;
+
+        System.Reflection.MethodInfo HandleEventInfo =
+	derivedType.GetMethod ("HandleEvent", HandleEvent_types);
+
+      if (HandleEventInfo.DeclaringType.IsSubclassOf (baseType))
+      {
+	m_eventHandler += new cspacePINVOKE.EventHandler_t (Base_HandleEvent);
+	cspacePINVOKE.ConnectSharpEventHandler (_csSharpEventHandler.
+						getCPtr (this).Handle,
+						m_eventHandler);
+      }
+    }
+
+    private static Type[] HandleEvent_types = { typeof (iEvent) };
+    private int Base_HandleEvent (IntPtr eventHandler)
+    {
+      iEvent ev = new iEvent (eventHandler, false);
+      bool ret = HandleEvent (ev);
+      if (ret)
+	return 1;
+      return 0;
+    }
+
+    private cspacePINVOKE.EventHandler_t m_eventHandler;
+  }
+}; // namespace CrystalSpace

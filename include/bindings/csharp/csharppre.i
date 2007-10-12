@@ -126,28 +126,32 @@
 }
 
 %{
-    //This structure is used for return a interface
-    // pointer to the managed code
-    struct csRetInterface
-    {
-	void * ptr;
-	char *szClassName;
-	int free;
-    };
+  // This structure is used for return a interface pointer to the managed code
+  struct csRetInterface
+  {
+    void * ptr;
+    char *szClassName;
+    int free;
+  };
 
-    struct csArgs
-    {
-	int free;
-	int argc;
-	const char **argv;
-    };
+  // This structure is used for pass from managed side a string array and
+  // convert it to the int argc, char *argv[] arguments.
+  struct csArgs
+  {
+    int free;
+    int argc;
+    const char **argv;
+  };
 
-    struct csInterfaceData
-    {
-	int free;
-	int version;
-	char *name;
-    };
+  // This structure is used for pass from managed side the data about an
+  // interface for functions that require the interface name and version
+  // passing instead a Type value.
+  struct csInterfaceData
+  {
+    int free;
+    int version;
+    char *name;
+  };
 %}
 // csgeom/transfrm.h
 %ignore csTransform::operator*;

@@ -17,7 +17,8 @@ chronological order.
 	- ronsaldo moved crystalspace-sharp.pc.in from root into
 	  plugins/cscript/cscsharp/ and removed the generation of
 	  crystalspace-sharp.pc
-
+	- ronsaldo reformated the c# bindings files again.
+	- ronsaldo added SimpleRoom c# version.
 07-Oct-2007
 	- Eric Sunshine resolved some issues with jobber configuration
 	  following recent changes:
