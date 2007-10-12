@@ -579,10 +579,13 @@
                     OpenGL 2.0.6288
 		    Render targets are corrupted with GL_EXT_framebuffer_object.
 		    (See trac #261).
+      * 2007-10-12: GL_EXT_framebuffer_object seems to work fine with
+        an ATI Mobility Radeon x1600, win32 and 2.0.6174. Re-enabling
+        it on other ATI cards than the 9x000 series.
       -->
     <rule description="ATI: Work around EXT_framebuffer_object corruption">
       <conditions>
-	<regexp string="vendor" pattern="^ATI" />
+	<regexp string="renderer" pattern="R\(ADEON\|adeon\) 9\(5\|6\|7\|8\).*" />
 	<comparever version="gl" relation="le 2.0.6288" />
       </conditions>
       <applicable>
