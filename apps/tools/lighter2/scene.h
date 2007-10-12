@@ -239,6 +239,7 @@ namespace lighter
                                iDocumentNode* factNode, LoadedFile* fileInfo);
     void SaveSectorToDom (iDocumentNode* sectorNode, LoadedFile* fileInfo,
                           Statistics::Progress& progress);
+    void SaveLight (iDocumentNode* lightNode);
     SaveResult SaveMeshObjectToDom (csSet<csString>& savedObjects, 
                                     iDocumentNode *objNode, 
                                     Sector* sect, LoadedFile* fileInfo);

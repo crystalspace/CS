@@ -22,6 +22,7 @@ chronological order.
 	  ptpdlight_mmx.cpp filename.
 	- res added "light tags" - you can set on light tags and query them
 	  later (e.g. filter out certain lights when doing dynamic lighting).
+	- res augmented lighter2 to tag static lights with the tag "static".
 11-Oct-2007
 	- res changed the relaytool invocation to:
 	  - Pass multiple libs to be relayed in one command.
