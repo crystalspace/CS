@@ -125,6 +125,8 @@ bool RMTest1::RenderView (iView* view)
   if (!startSector)
     return false;
 
+  postEffects.SetupView (view);
+
   SingleRenderLayer renderLayer (defaultShaderName, defaultShader);
 
   // Pre-setup culling graph
@@ -132,6 +134,8 @@ bool RMTest1::RenderView (iView* view)
   RenderTreeType::ContextsContainer* screenContexts = 
     renderTree.CreateContextContainer ();
   screenContexts->rview = rview;
+  screenContexts->renderTarget = postEffects.GetScreenTarget ();
+
   RenderTreeType::ContextNode* startContext = renderTree.CreateContext (screenContexts,
     rview);
 
@@ -165,6 +169,8 @@ bool RMTest1::RenderView (iView* view)
     ContextRender<RenderTreeType, SingleRenderLayer> render (shaderManager, renderLayer);
     renderTree.TraverseContextContainersReverse (render);
   }
+
+  postEffects.DrawPostEffects ();
 
   return true;
 }
@@ -210,7 +216,13 @@ bool RMTest1::Initialize(iObjectRegistry* objectReg)
 
   csRef<iGraphics3D> g3d = csQueryRegistry<iGraphics3D> (objectReg);
   treePersistent.Initialize (shaderManager);
+  postEffects.Initialize (objectReg);
   portalPersistent.Initialize (shaderManager, g3d);
+
+  csRef<iLoader> loader = csQueryRegistry<iLoader> (objectReg);
+  
+  csRef<iShader> desatShader = loader->LoadShader ("/shader/desaturate.xml");
+  postEffects.AddLayer (desatShader);
 
   return true;
 }

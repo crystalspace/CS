@@ -2948,6 +2948,7 @@ bool csGLGraphics3D::SetOption (const char* name, const char* value)
 void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh, 
 				     uint flags)
 {  
+  
   if (current_drawflags & CSDRAW_2DGRAPHICS)
   {
     // Try to be compatible with 2D drawing mode

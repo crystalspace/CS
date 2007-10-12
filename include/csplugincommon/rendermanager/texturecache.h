@@ -57,13 +57,14 @@ namespace RenderManager
       return 0;
     }
     
+    uint options;
+  public:
     enum
     {
       tcacheExactSizeMatch = 1,
       tcachePowerOfTwo = 2
     };
-    uint options;
-  public:
+
     TextureCache (csImageType imgtype, const char* format, int textureFlags, 
       const char* texClass, uint options) : g3d (0), imgtype (imgtype),
       format (format), textureFlags (textureFlags), texClass (texClass), 

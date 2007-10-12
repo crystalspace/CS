@@ -51,6 +51,7 @@
 #include "csplugincommon/rendermanager/svarrayholder.h"
 #include "csplugincommon/rendermanager/svsetup.h"
 #include "csplugincommon/rendermanager/shadersetup.h"
+#include "csplugincommon/rendermanager/posteffects.h"
 #include "csplugincommon/renderstep/basesteploader.h"
 #include "csplugincommon/renderstep/basesteptype.h"
 #include "csplugincommon/renderstep/parserenderstep.h"

@@ -74,7 +74,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(Engine)
 
     //-----------------------------------------------------------------------
 
-    static const int updateInterval = 33;
+    static const int updateInterval = 15;
 
     Accessor::Accessor (csMeshWrapper* meshwrap) : 
       scfImplementationType (this), meshwrap (meshwrap),

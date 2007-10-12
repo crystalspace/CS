@@ -74,6 +74,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(RMTest1)
     RenderTreeType::PersistentData treePersistent;
     PortalSetupType::PersistentData portalPersistent;
 
+    CS::RenderManager::PostEffectManager       postEffects;
+
     csRef<iStringSet>       svNameStringSet;
     csRef<iStringSet>       stringSet;
     csRef<iShaderManager>   shaderManager;

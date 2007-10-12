@@ -186,7 +186,11 @@ void csGLRender2TextureFramebuf::FinishDraw ()
       {
         glCopyTexImage2D (textarget, 0, GL_RGBA, 0, 0, txt_w, txt_h, 0);
       }
-      tex_mm->RegenerateMipmaps();
+
+      if (!(tex_mm->GetFlags() & CS_TEXTURE_NOMIPMAPS))
+      {
+        tex_mm->RegenerateMipmaps();
+      }
     }
   }
 }

@@ -45,7 +45,7 @@
         </shader>
         <shader>
             <file>/shader/reflect/glass.xml</file>
-        </shader>
+        </shader>      
     </shaders>
     <textures>
         <texture name="walls.jpg">
