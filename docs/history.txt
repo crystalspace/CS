@@ -10,6 +10,8 @@ chronological order.
 	- Marten enabled EXT_framebuffer_object for Radeon x-series of cards.
 	- Marten fixed the parallaxtest level to work again after reversal of
 	  teapot.zip
+	- Marten fixed a bug whereby render2texture followed by normal rendering
+	  would disregard correctly reseting the scissor rectangle.
 11-Oct-2007
 	- res added a missing method to iRenderView.
 	- Marten added a beginning of a post-processing manager to the test

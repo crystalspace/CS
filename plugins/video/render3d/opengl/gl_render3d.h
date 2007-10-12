@@ -608,6 +608,7 @@ public:
     viewwidth = G2D->GetWidth();
     viewheight = G2D->GetHeight();
     needViewportUpdate = true;
+    hasOld2dClip = false;
   }
 
   /// Get the current render target (0 for screen).
