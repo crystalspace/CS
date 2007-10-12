@@ -204,22 +204,23 @@ struct iCollideSystem : public virtual iBase
   virtual void ResetCollisionPairs () = 0;
 
   /**
-   * Collide a collider with a world space ray.
+   * Collide a collider with a (infinite) world space ray.
    * \param collider is the collider to test with.
    * \param trans is the transform for the object represented by the
    * collider. If the collider belongs to a mesh object then you can get
    * the transform by calling mesh->GetMovable()->GetFullTransform().
    * \param start is the start of the ray.
-   * \param end is the end of the ray.
+   * \param pointOnRay A point on the ray other than \a start, used to
+   *   compute the ray's direction.
    * \return true if there was a collision. The array with intersecting
    * triangles will be updated (see GetIntersectingTriangles()).
    */
   virtual bool CollideRay (
   	iCollider* collider, const csReversibleTransform* trans,
-	const csVector3& start, const csVector3& end) = 0;
+	const csVector3& start, const csVector3& pointOnRay) = 0;
 
   /**
-   * Collide a collider with a world space segment. This will not
+   * Collide a collider with a (finite) world space segment. This will not
    * return collisions with triangles behind the end of the segment.
    * \param collider is the collider to test with.
    * \param trans is the transform for the object represented by the
