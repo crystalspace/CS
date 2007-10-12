@@ -8,6 +8,8 @@ chronological order.
 
 11-Oct-2007
 	- res added a missing method to iRenderView.
+	- Marten added a beginning of a post-processing manager to the test
+	  rendermanager.
 04-Oct-2007
 	- andres added a VarFileInfo Block to the resources for win32 
 	  dlls/executables as they are invalid without and especially considered
