@@ -347,6 +347,8 @@
   %include "bindings/java/javapre.i"
 #elif defined(SWIGLUA)
   %include "bindings/lua/luapre.i"
+#elif defined(SWIGCSHARP)
+  %include "bindings/csharp/csharppre.i"
 #endif
 
 %define INTERFACE_POST(T)

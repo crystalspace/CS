@@ -87,6 +87,7 @@ if $(PYTHON.AVAILABLE) = "yes"
 }
 
 SubInclude TOP plugins cscript csjava ;
+SubInclude TOP plugins cscript cscsharp ;
 SubInclude TOP plugins cscript csperl5 ;
 SubInclude TOP plugins cscript cspython ;
 SubInclude TOP plugins cscript pycscegui ;

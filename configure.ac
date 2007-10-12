@@ -11,7 +11,7 @@ AC_PREREQ([2.56])
 #------------------------------------------------------------------------------
 # cs_version_number
 #	Keep this value synchronized with CS/include/csver.h.
-#       Also, mk/autoconf/crystal.m4 should be updated with the current version
+#       Also, mk/autoconf/crystal.m4 and plugins/cscript/cscsharp/cspacesharp/AssemblyInfo.cs should be updated with the current version
 #         number.
 #------------------------------------------------------------------------------
 m4_define([cs_version_number], [1.3])
@@ -414,6 +414,29 @@ CS_PATH_PROGS([ANT], [ant], [], [$PATH$PATH_SEPARATOR$ANT_HOME/bin])
 CS_EMIT_BUILD_PROPERTY([ANT], [$ANT])
 
 
+#-----------------------------------------------------------------------------
+# Check for the underlining cli, C# compiler and nant tool
+#-----------------------------------------------------------------------------
+
+CS_CHECK_PROGS([CSHARP_COMPILER], [mcs csc cscc])
+CS_EMIT_BUILD_PROPERTY([CSHARP.COMPILER], [$CSHARP_COMPILER])
+CS_EMIT_BUILD_PROPERTY([CMD.CSC], [$CSHARP_COMPILER])
+
+CS_CHECK_PROGS([CMD_GACUTIL], [gacutil])
+CS_EMIT_BUILD_PROPERTY([CMD.GACUTIL], [$CMD_GACUTIL])
+
+CS_CHECK_PROGS([CMD_NANT], [nant NAnt])
+CS_EMIT_BUILD_PROPERTY([CMD.NANT], [$CMD_NANT])
+
+# cscsharp is experimental/testing, by default no
+AC_ARG_WITH([csharp], [AC_HELP_STRING([--with-csharp],
+    [use C# scripting interface (default NO)])])
+AS_IF([test -z "$with_csharp"], [with_csharp=no])
+
+AS_IF([test "$with_csharp" != no && test -n "$CSHARP_COMPILER" && test -n "$CMD_GACUTIL" && test "$CMD_NANT"],
+    [csharp_available=yes])
+
+CS_EMIT_BUILD_PROPERTY([CSHARP.AVAILABLE], [$csharp_available])
 
 #------------------------------------------------------------------------------
 # Check if STL is available. Although STL is not used heavily in Crystal Space,

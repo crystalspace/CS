@@ -1,0 +1,157 @@
+SubDir TOP plugins cscript cscsharp ;
+
+if $(CSHARP.AVAILABLE) = "yes" && $(CMD.CSC) && $(CMD.NANT) && $(CMD.SWIG) &&
+  ! [ Property build : projgen ]
+{
+
+    #-----------------------------
+    # Crystal Space Sharp
+    #-----------------------------
+	
+    if ! $(CSPACESHARP.MODULE.PREFIX) && ! $(CSPACESHARP.MODULE.SUFFIX)
+    {
+	switch $(TARGET.OS)
+	{
+	    case WIN32 :
+		CSPACESHARP.MODULE.PREFIX = ;
+		CSPACESHARP.MODULE.SUFFIX = .dll ;
+	    case MACOS_X :
+		CSPACESHARP.MODULE.PREFIX = lib ;
+		CSPACESHARP.MODULE.SUFFIX = .so ;
+	    case UNIX :
+		CSPACESHARP.MODULE.PREFIX = lib ;
+		CSPACESHARP.MODULE.SUFFIX = .so ;
+	    case * :
+		CSPACESHARP.MODULE.PREFIX = lib ;
+		CSPACESHARP.MODULE.SUFFIX = .so ;
+	}
+    }
+	
+    # Be wary of Jam's variable interpolation: "$(X)foo" expands to nothing if X
+    # does not have a value.  (This differs from other interpolators which would
+    # expand it to "foo".)
+    if ! $(CSPACESHARP.MODULE.PREFIX) { CSPACESHARP.MODULE.PREFIX = "" ; }
+    if ! $(CSPACESHARP.MODULE.SUFFIX) { CSPACESHARP.MODULE.SUFFIX = "" ; }
+
+    local csharpbase = [ ConcatDirs $(LOCATE_TARGET) ] ;
+    local common = [ DoSourceGrist cspacesharp.cpp ] ;
+    local csharpdir = [ ConcatDirs $(csharpbase) cspacesharp ] ;
+    Depends $(common) : $(csharpdir:G=dir) ;
+    MkDir $(csharpdir:G=dir) ;
+	
+    Swig $(common) :
+    [ DoSourceGrist cspace.i ] :
+    csharp :
+    -c++ -namespace CrystalSpace -dllimport cspacesharp :
+    [ ConcatDirs $(TOP) include ]
+    [ ConcatDirs $(BUILDTOP) include ] 
+    $(CRYSTAL.INCLUDE_DIR)
+    [ ConcatDirs $(TOP) include ] :
+    [ ConcatDirs $(TOP) include bindings ] :
+    :
+    :
+    $(csharpdir) ;
+	
+    NotFile cspacesharpmod ;
+    Depends plugins : cspacesharpmod ;
+    Description cspacesharpmod : "Crystal Space C# bindings." ;
+	
+    Clean cspacesharpclean : $(common) ;
+    CleanDir cspacesharpclean : $(csharpdir) ;
+    Depends clean : cspacesharpclean ;
+	
+    local cspacesharp = "$(CSPACESHARP.MODULE.PREFIX)cspacesharp$(CSPACESHARP.MODULE.SUFFIX)" ;
+    local cspacesharpsrc = $(common) [ DoSourceGrist cspacesharpmod.cpp ] ;
+    local cspacesharpobjs = [ CompileObjects $(cspacesharpsrc) ] ;
+	
+    local cspacesharp_TARGET = $(cspacesharp) ;
+    local cspacesharp_SOURCES = $(cspacesharpsrc) ;
+    local cspacesharp_OBJECTS = $(cspacesharpobjs) ;
+	
+    LinkWith cspacesharp : crystalspace ;
+    Depends cspacesharpmod : $(cspacesharp) ;
+    CFlags cspacesharp : $(COMPILER.CFLAGS.VISIBILITY_DEFAULT) $(PLUGIN.CFLAGS) 
+	$(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) 
+	$(COMPILER.C++FLAGS.STRICTALIASING.DISABLE) ;
+    LFlags cspacesharp : $(LINKLIBS) $(PLUGIN.LFLAGS) ;
+    MakeLocate $(cspacesharp) : $(LOCATE.TARGETS) ;
+    Depends $(cspacesharp) : $(cspacesharpobjs) ;
+    LinkPlugin $(cspacesharp) : $(cspacesharpobjs) ;
+	
+    Clean cspacesharpclean : $(cspacesharp) ;
+	
+    #-----------------------------
+    # Now build C# side module
+    #-----------------------------
+	
+    local cs_extra = [ Wildcard [ ConcatDirs cspacesharp ] : *.cs *.key ] ;
+    SEARCH on $(cs_extra) = $(SEARCH_SOURCE) ;
+    MakeLocate $(cs_extra:BSG=built) : $(csharpdir) ;
+    Clean cspacesharpclean : $(cs_extra:BSG=built) ;
+    local i ;
+    for i in $(cs_extra)
+    {
+	Depends $(i:BSG=built) : $(i) ;
+	Copy $(i:BSG=built) : $(i) ;
+    }
+	
+    local csbuildbase = $(LOCATE_TARGET) ;
+    local csbuildxml = csbuild.xml ;
+    local cspacesharpdll = crystalspace-sharp.dll ;
+    cspacesharpdll = $(cspacesharpdll:G=cspacesharpmod) ;
+    SEARCH on $(csbuildxml) = $(SEARCH_SOURCE) ;
+    Depends $(csbuildxml:G=build) : $(csbuildxml) ;
+    MakeLocate $(csbuildxml:G=build) : $(LOCATE_TARGET) ;
+    Copy $(csbuildxml:G=build) : $(csbuildxml) ;
+    Clean cspacesharpclean : $(csbuildxml:G=build) ;
+    Depends $(cspacesharpdll) : $(common) $(csbuildxml:G=build) $(cs_extra:BSG=built) ;
+    MakeLocate $(cspacesharpdll) : $(LOCATE_TARGET) ;
+	
+    actions NAnt
+    {
+	$(CSPACESHARP.NANT_PREPARE)
+	"$(CMD.NANT)" -quiet -emacs -D:build.compiler.emacs=true -buildfile:$(>)
+    }
+	
+    NAnt $(cspacesharpdll) : $(csbuildxml:G=build) ;
+    Clean cspacesharpclean : $(cspacesharpdll) ;
+    Depends cspacesharpmod : $(cspacesharpdll) ;
+	
+    local cspacesharpdll_final = $(cspacesharpdll:G=cspacesharpfinal) ;
+    MakeLocate $(cspacesharpdll_final) : $(LOCATE.TARGETS) ;
+    Copy $(cspacesharpdll_final) : $(cspacesharpdll) ;
+    Depends $(cspacesharpdll_final) : $(cspacesharpdll) ;
+    Depends cspacesharpmod : $(cspacesharpdll_final) ;
+    Clean cspacesharpclean : $(cspacesharpdll_final) ;
+
+    #---------------------------------
+    # Now install cspacesharp module
+    #---------------------------------
+
+    rule InstallCSharp
+    {
+	local plugindir = $(libdir) ;
+	SystemInstallPlugin $(1) : $(2) ;
+    }
+
+    InstallCSharp $(cspacesharp) ;
+
+    local cspacesharp-config = crystalspace-sharp.pc ;
+    InstallCSharp $(cspacesharp-config) : pkgconfig ;
+
+    actions GACUtil
+    {
+	"$(CMD.GACUTIL)" -i $(>) -package $(<)
+    }
+
+    rule InstallGAC
+    {
+	local package = $(2) ;
+	GACUtil $(package) : $(1) ;
+	Depends install_plugin : $(package) ;
+	Depends $(package) : $(1) ;
+	#Always $(package) ;
+    }
+    InstallGAC $(cspacesharpdll_final) : crystalspace-sharp ;
+}
+

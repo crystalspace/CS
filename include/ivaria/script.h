@@ -91,6 +91,11 @@ struct iScriptValue : public virtual iBase
   virtual csRef<iScriptObject> GetObject () const = 0;
 };
 
+//Fix a bug with the csharp bindings
+#ifdef SWIGCSHARP
+#define ret retval
+#endif
+
 /**
  * This provides the interface to an object in an object-oriented scripting
  * language.
@@ -407,5 +412,10 @@ struct iScript : public virtual iBase
   #undef CS_DEPRECATED_METHOD_MSG_SET
   #undef CS_DEPRECATED_METHOD_MSG_GET
 };
+
+//Fix a bug with the csharp bindings
+#ifdef SWIGCSHARP
+#undef ret
+#endif
 
 #endif // __CS_IVARIA_SCRIPT_H__

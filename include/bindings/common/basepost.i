@@ -101,6 +101,8 @@ APPLY_FOR_ALL_INTERFACES_POST
     %include bindings/java/ ## file
   #elif defined(SWIGLUA)
     %include bindings/lua/ ## file
+  #elif defined(SWIGCSHARP)
+    %include bindings/csharp/ ## file
   #endif
 %enddef
 

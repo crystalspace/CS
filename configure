@@ -727,6 +727,9 @@ ac_ct_PYTHON
 JAVA
 JAVAC
 ANT
+CSHARP_COMPILER
+CMD_GACUTIL
+CMD_NANT
 PKG_CONFIG
 ac_ct_PKG_CONFIG
 CONFIG_X11
@@ -1487,6 +1490,7 @@ Optional Packages:
   --with-perl             use Perl5 scripting interface (default NO)
   --without-python        do not use Python scripting interface
   --with-java             use Java scripting interface (default YES)
+  --with-csharp           use C# scripting interface (default NO)
   --with-x11=dir          specify location of libx11 if not detected
                           automatically; searches dir/include, dir/lib, and
                           dir
@@ -13966,6 +13970,212 @@ cs_build_prop_val="$ANT"
 fi
 
 
+
+#-----------------------------------------------------------------------------
+# Check for the underlining cli, C# compiler and nant tool
+#-----------------------------------------------------------------------------
+
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin$PATH_SEPARATOR${srcdir}/bin"
+	export PATH
+fi
+
+    for ac_prog in mcs csc cscc
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_prog_CSHARP_COMPILER+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$CSHARP_COMPILER"; then
+  ac_cv_prog_CSHARP_COMPILER="$CSHARP_COMPILER" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_CSHARP_COMPILER="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+fi
+fi
+CSHARP_COMPILER=$ac_cv_prog_CSHARP_COMPILER
+if test -n "$CSHARP_COMPILER"; then
+  { echo "$as_me:$LINENO: result: $CSHARP_COMPILER" >&5
+echo "${ECHO_T}$CSHARP_COMPILER" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+  test -n "$CSHARP_COMPILER" && break
+done
+
+cs_build_prop_val="$CSHARP_COMPILER"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CSHARP.COMPILER ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+cs_build_prop_val="$CSHARP_COMPILER"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.CSC ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin$PATH_SEPARATOR${srcdir}/bin"
+	export PATH
+fi
+
+    for ac_prog in gacutil
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_prog_CMD_GACUTIL+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$CMD_GACUTIL"; then
+  ac_cv_prog_CMD_GACUTIL="$CMD_GACUTIL" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_CMD_GACUTIL="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+fi
+fi
+CMD_GACUTIL=$ac_cv_prog_CMD_GACUTIL
+if test -n "$CMD_GACUTIL"; then
+  { echo "$as_me:$LINENO: result: $CMD_GACUTIL" >&5
+echo "${ECHO_T}$CMD_GACUTIL" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+  test -n "$CMD_GACUTIL" && break
+done
+
+cs_build_prop_val="$CMD_GACUTIL"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.GACUTIL ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+
+
+    if test "$cs_prog_path_prepared" != yes; then
+  cs_prog_path_prepared=yes
+	PATH="$PATH$PATH_SEPARATOR/usr/local/bin$PATH_SEPARATOR/sw/bin$PATH_SEPARATOR${srcdir}/bin"
+	export PATH
+fi
+
+    for ac_prog in nant NAnt
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
+if test "${ac_cv_prog_CMD_NANT+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$CMD_NANT"; then
+  ac_cv_prog_CMD_NANT="$CMD_NANT" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_prog_CMD_NANT="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+fi
+fi
+CMD_NANT=$ac_cv_prog_CMD_NANT
+if test -n "$CMD_NANT"; then
+  { echo "$as_me:$LINENO: result: $CMD_NANT" >&5
+echo "${ECHO_T}$CMD_NANT" >&6; }
+else
+  { echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6; }
+fi
+
+
+  test -n "$CMD_NANT" && break
+done
+
+cs_build_prop_val="$CMD_NANT"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CMD.NANT ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+
+# cscsharp is experimental/testing, by default no
+
+# Check whether --with-csharp was given.
+if test "${with_csharp+set}" = set; then
+  withval=$with_csharp;
+fi
+
+if test -z "$with_csharp"; then
+  with_csharp=no
+fi
+
+
+if test "$with_csharp" != no && test -n "$CSHARP_COMPILER" && test -n "$CMD_GACUTIL" && test "$CMD_NANT"; then
+  csharp_available=yes
+fi
+
+
+cs_build_prop_val="$csharp_available"
+    cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_jamconfig_text="${cs_jamconfig_text}CSHARP.AVAILABLE ?= \"$cs_build_prop_val\" ;
+"
+fi
 
 
 #------------------------------------------------------------------------------
@@ -81456,6 +81666,9 @@ ac_ct_PYTHON!$ac_ct_PYTHON$ac_delim
 JAVA!$JAVA$ac_delim
 JAVAC!$JAVAC$ac_delim
 ANT!$ANT$ac_delim
+CSHARP_COMPILER!$CSHARP_COMPILER$ac_delim
+CMD_GACUTIL!$CMD_GACUTIL$ac_delim
+CMD_NANT!$CMD_NANT$ac_delim
 PKG_CONFIG!$PKG_CONFIG$ac_delim
 ac_ct_PKG_CONFIG!$ac_ct_PKG_CONFIG$ac_delim
 CONFIG_X11!$CONFIG_X11$ac_delim
@@ -81537,9 +81750,6 @@ CONFIG_ASOUND!$CONFIG_ASOUND$ac_delim
 ac_ct_CONFIG_ASOUND!$ac_ct_CONFIG_ASOUND$ac_delim
 CONFIG_CACA!$CONFIG_CACA$ac_delim
 ac_ct_CONFIG_CACA!$ac_ct_CONFIG_CACA$ac_delim
-CONFIG_LIBCACA!$CONFIG_LIBCACA$ac_delim
-ac_ct_CONFIG_LIBCACA!$ac_ct_CONFIG_LIBCACA$ac_delim
-TTREE!$TTREE$ac_delim
 _ACEOF
 
   if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 97; then
@@ -81581,6 +81791,9 @@ _ACEOF
 ac_delim='%!_!# '
 for ac_last_try in false false false false false :; do
   cat >conf$$subs.sed <<_ACEOF
+CONFIG_LIBCACA!$CONFIG_LIBCACA$ac_delim
+ac_ct_CONFIG_LIBCACA!$ac_ct_CONFIG_LIBCACA$ac_delim
+TTREE!$TTREE$ac_delim
 CONFIG_CPPUNIT!$CONFIG_CPPUNIT$ac_delim
 ac_ct_CONFIG_CPPUNIT!$ac_ct_CONFIG_CPPUNIT$ac_delim
 CONFIG_BFD!$CONFIG_BFD$ac_delim
@@ -81589,7 +81802,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 6; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 9; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5
