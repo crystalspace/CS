@@ -11,6 +11,7 @@
       <defaultshader name="ambient" file="ambient.xml" />
     </step>
     <step plugin="crystalspace.renderloop.step.lightiter">
+      <ignoretag>static</ignoretag>
       <steps>
 	<!-- diffuse lighting -->
 	<step plugin="crystalspace.renderloop.step.generic">
