@@ -285,12 +285,6 @@ namespace RenderManager
     size_t                  totalMeshNodes;
     size_t                  totalRenderMeshes;
 
-    struct CulledObject
-    {
-      iMeshWrapper *imesh;
-      uint32 frustum_mask;
-    };
-
     /**
      * 
      */

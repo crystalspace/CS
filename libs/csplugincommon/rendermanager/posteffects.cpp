@@ -124,7 +124,7 @@ void PostEffectManager::KillScreenQuad ()
 void PostEffectManager::AllocatePingpongTextures ()
 {
   textures[0] = graphics3D->GetTextureManager ()->CreateTexture (currentWidth, currentHeight, 
-    csimg2D, "rgb8", CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS);
+    csimg2D, "rgb8", CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_NPOTS | CS_TEXTURE_CLAMP);
   textures[1] = graphics3D->GetTextureManager ()->CreateTexture (currentWidth, currentHeight, 
-    csimg2D, "rgb8", CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS);
+    csimg2D, "rgb8", CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_NPOTS | CS_TEXTURE_CLAMP);
 }
