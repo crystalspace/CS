@@ -20,6 +20,8 @@ chronological order.
 	  small.
 	- res fixed the ptpdlight VC project to contain an un-gristed
 	  ptpdlight_mmx.cpp filename.
+	- res added "light tags" - you can set on light tags and query them
+	  later (e.g. filter out certain lights when doing dynamic lighting).
 11-Oct-2007
 	- res changed the relaytool invocation to:
 	  - Pass multiple libs to be relayed in one command.

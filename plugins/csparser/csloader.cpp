@@ -4278,6 +4278,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
   bool userSpecular = false;
   csLightDynamicType dyn;
   csRefArray<csShaderVariable> shader_variables;
+  csArray<csString> tags;
   struct csHaloDef
   {
     int type;
@@ -4615,6 +4616,18 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 	  shader_variables.Push(var);
 	}
 	break;
+    case XMLTOKEN_TAG:
+      {
+        csString s (child->GetContentsValue ());
+        if (s.IsEmpty())
+        {
+	  SyntaxService->ReportError ("crystalspace.maploader.light", child,
+	    "Empty <tag> node");
+        }
+        else
+          tags.Push (s);
+      }
+      break;
     default:
 	SyntaxService->ReportBadToken (child);
 	return 0;
@@ -4706,6 +4719,9 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
   // Move the key-value pairs from 'Keys' to the light object
   l->QueryObject ()->ObjAddChildren (&Keys);
   Keys.ObjRemoveAll ();
+  
+  for (size_t t = 0; t < tags.GetSize(); t++)
+    l->AddLightTag (stringSet->Request (tags[t]));
 
   l->IncRef ();	// To make sure smart pointer doesn't release.
   return l;
