@@ -528,15 +528,57 @@ bool csOPCODECollideSystem::CollideRaySegment (
   return true;
 }
 
+bool csOPCODECollideSystem::CalculateIntersections (
+    csTerraFormerCollider* terraformer)
+{
+  // Now calculate the real intersection points for all hit faces.
+  Point* vertholder = terraformer->vertices.GetArray ();
+  if (!vertholder) return true;
+  udword* indexholder = terraformer->indexholder;
+  if (!indexholder) return true;
+  if (collision_faces.GetSize () == 0) return false;
+  Point* c;
+  size_t i;
+  for (i = 0 ; i < collision_faces.GetSize () ; i++)
+  {
+    int idx = collision_faces[i] * 3;
+    int it_idx = (int)intersecting_triangles.Push (
+	    csIntersectingTriangle ());
+    c = &vertholder[indexholder[idx+0]];
+    intersecting_triangles[it_idx].a.Set (c->x, c->y, c->z);
+    c = &vertholder[indexholder[idx+1]];
+    intersecting_triangles[it_idx].b.Set (c->x, c->y, c->z);
+    c = &vertholder[indexholder[idx+2]];
+    intersecting_triangles[it_idx].c.Set (c->x, c->y, c->z);
+  }
+  return true;
+}
+
+bool csOPCODECollideSystem::TestSegmentTerraFormer (
+    csTerraFormerCollider* terraformer,
+    const IceMaths::Matrix4x4& transform,
+    const csVector3& start, const csVector3& end)
+{
+  terraformer->UpdateOPCODEModel (start, end);
+  ColCache.Model0 = terraformer->opcode_model;
+  Ray ray (Point (start.x, start.y, start.z),
+  	   Point (end.x-start.x, end.y-start.y, end.z-start.z));
+
+  bool status = RayCol.Collide (ray, *ColCache.Model0, &transform);
+  if (status)
+  {
+    status = (RayCol.GetContactStatus () != FALSE);
+    if (status)
+      return CalculateIntersections (terraformer);
+  }
+  return false;
+}
+
+#define MAX_BEAM_LENGTH 10
 bool csOPCODECollideSystem::CollideRaySegment (
   	csTerraFormerCollider* terraformer, const csReversibleTransform* trans,
 	const csVector3& start, const csVector3& end, bool use_ray)
 {
-  terraformer->UpdateOPCODEModel (start, end);
-  //terraformer->UpdateOPCODEModel (start, sqrtf (csSquaredDist::PointPoint (
-	  //start, end)));
-  ColCache.Model0 = terraformer->opcode_model;
-
   csMatrix3 m;
   if (trans) m = trans->GetT2O ();
   csVector3 u;
@@ -565,13 +607,12 @@ bool csOPCODECollideSystem::CollideRaySegment (
   transform.m[3][1] = u.y;
   transform.m[3][2] = u.z;
 
-  Ray ray (Point (start.x, start.y, start.z),
-  	   Point (end.x-start.x, end.y-start.y, end.z-start.z));
-
   RayCol.SetHitCallback (ray_cb);
   RayCol.SetUserData ((void*)&collision_faces);
   intersecting_triangles.SetSize (0);
   collision_faces.SetSize (0);
+
+  float totalLength = sqrtf (csSquaredDist::PointPoint (start, end));
   if (use_ray)
   {
     max_dist = MAX_FLOAT;
@@ -579,41 +620,35 @@ bool csOPCODECollideSystem::CollideRaySegment (
   }
   else
   {
-    max_dist = csQsqrt (csSquaredDist::PointPoint (start, end));
+    max_dist = totalLength;
     RayCol.SetMaxDist (max_dist);
   }
-  bool isOk = RayCol.Collide (ray, *ColCache.Model0, &transform);
-  if (isOk)
+
+  if (totalLength > MAX_BEAM_LENGTH)
   {
-    bool status = (RayCol.GetContactStatus () != FALSE);
-    if (status)
+    csVector3 norm = end-start;
+    norm.Normalize ();
+    csVector3 s = start;
+    float totlen = 0;
+    while (totlen < totalLength)
     {
-      // Now calculate the real intersection points for all hit faces.
-      Point* vertholder = terraformer->vertices.GetArray ();
-      if (!vertholder) return true;
-      udword* indexholder = terraformer->indexholder;
-      if (!indexholder) return true;
-      if (collision_faces.GetSize () == 0) return false;
-      Point* c;
-      size_t i;
-      for (i = 0 ; i < collision_faces.GetSize () ; i++)
+      float len = MAX_BEAM_LENGTH;
+      totlen += MAX_BEAM_LENGTH;
+      if (totlen > totalLength)
       {
-        int idx = collision_faces[i] * 3;
-	int it_idx = (int)intersecting_triangles.Push (csIntersectingTriangle ());
-	c = &vertholder[indexholder[idx+0]];
-	intersecting_triangles[it_idx].a.Set (c->x, c->y, c->z);
-	c = &vertholder[indexholder[idx+1]];
-	intersecting_triangles[it_idx].b.Set (c->x, c->y, c->z);
-	c = &vertholder[indexholder[idx+2]];
-	intersecting_triangles[it_idx].c.Set (c->x, c->y, c->z);
+	len -= totlen - totalLength;
       }
+      csVector3 e = s + len*norm;
+      if (TestSegmentTerraFormer (terraformer, transform, s, e))
+	return true;
+      s = e;
     }
-    return status;
   }
   else
   {
-    return false;
+    return TestSegmentTerraFormer (terraformer, transform, start, end);
   }
+  return false;
 }
 
 bool csOPCODECollideSystem::CollideRaySegment (

@@ -12,6 +12,12 @@ chronological order.
 	- Jorrit did an optimization to CollideRaySegment (in opcode plugin)
 	  for old terrain. At worst this will make CollideRaySegment
 	  about eight times faster. At best it can be a lot more.
+	- Jorrit did a *huge* optimization in CollideRaySegment again.
+	  The result is that TraceBeam is now more then 10000(!) times
+	  faster compared to before my previous optimization. As an
+	  added benefit future performance for collision detection will
+	  no longer be degraded as the cache size for OPCODE will remain
+	  small.
 11-Oct-2007
 	- res changed the relaytool invocation to:
 	  - Pass multiple libs to be relayed in one command.

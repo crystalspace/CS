@@ -67,7 +67,7 @@ void csTerraFormerCollider::UpdateOPCODEModel (const csVector3 &start,
     const csVector3& end)
 {
   float res = fabs (end.x - start.x) / 2.0f;
-  float resy = fabs (end.y - start.y) / 2.0f;
+  float resy = fabs (end.z - start.z) / 2.0f;
   if (resy > res) res = resy;
 
   if (ceil (res) > resolution)
@@ -77,8 +77,8 @@ void csTerraFormerCollider::UpdateOPCODEModel (const csVector3 &start,
   }
   csVector3 center = (start + end) / 2.0f;
   csBox2 samplebox (
-      center.x - resolution, center.y - resolution,
-      center.x + resolution, center.y + resolution
+      center.x - resolution, center.z - resolution,
+      center.x + resolution, center.z + resolution
       );
   csRef<iTerraSampler> sampler = former->GetSampler (samplebox,
     resolution, resolution);
