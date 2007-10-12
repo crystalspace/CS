@@ -532,8 +532,9 @@ bool csOPCODECollideSystem::CollideRaySegment (
   	csTerraFormerCollider* terraformer, const csReversibleTransform* trans,
 	const csVector3& start, const csVector3& end, bool use_ray)
 {
-  terraformer->UpdateOPCODEModel (start, sqrtf (csSquaredDist::PointPoint (
-	  start, end)));
+  terraformer->UpdateOPCODEModel (start, end);
+  //terraformer->UpdateOPCODEModel (start, sqrtf (csSquaredDist::PointPoint (
+	  //start, end)));
   ColCache.Model0 = terraformer->opcode_model;
 
   csMatrix3 m;
