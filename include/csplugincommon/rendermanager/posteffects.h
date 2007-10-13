@@ -34,7 +34,7 @@ namespace RenderManager
 {
 
 
-  class PostEffectManager
+  class CS_CRYSTALSPACE_EXPORT PostEffectManager
   {
   public:
     PostEffectManager ();
