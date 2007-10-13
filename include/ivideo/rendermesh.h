@@ -31,6 +31,7 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
 
+#include "iengine/material.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
 
@@ -124,7 +125,7 @@ struct CoreRenderMesh
   {
   }
 
-  ~CoreRenderMesh () {}
+  ~CoreRenderMesh () { material=NULL; }
 
   /// Clipping parameter
   int clip_portal;
@@ -171,7 +172,7 @@ struct CoreRenderMesh
    * Material used for this mesh.
    * Used for e.g. sorting by material.
    */
-  iMaterialWrapper* material;
+  csRef<iMaterialWrapper> material;
 
   /** 
    * Transform object space -> world space.
