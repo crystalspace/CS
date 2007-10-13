@@ -75,7 +75,6 @@ private:
    */
   void UpdateFrustum ();
 
-  CS::Utility::MeshFilter meshFilter;
 public:
   ///
   csRenderView ();
@@ -265,8 +264,6 @@ public:
   * Destroy a specific render context (and unlink it from the previous-links)
   */
   virtual void DestroyRenderContext (csRenderContext* context);
-
-  CS::Utility::MeshFilter& GetMeshFilter () { return meshFilter; }
 };
 
 #endif // __CS_RVIEW_H__

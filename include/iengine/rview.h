@@ -27,7 +27,6 @@
  * @{ */
  
 #include "csutil/scf.h"
-#include "cstool/meshfilter.h"
 
 #include "csgeom/plane3.h"
 
@@ -179,7 +178,7 @@ public:
  */
 struct iRenderView : public virtual iBase
 {
-  SCF_INTERFACE(iRenderView, 2,2,1);
+  SCF_INTERFACE(iRenderView, 2,2,0);
   /// Get the current render context.
   virtual csRenderContext* GetRenderContext () = 0;
 
@@ -249,8 +248,6 @@ struct iRenderView : public virtual iBase
    * Destroy a specific render context (and unlink it from the previous-links)
    */
   virtual void DestroyRenderContext (csRenderContext* context) = 0;
-
-  virtual CS::Utility::MeshFilter& GetMeshFilter () = 0;
 };
 
 /** @} */
