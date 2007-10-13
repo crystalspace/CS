@@ -10,6 +10,8 @@ chronological order.
 	- res fixed a bug in DDS cubemap saving (checked for wrong subimage
 	  count).
 	- res made the DDS saver support DXT w/ cubemaps.
+	- res augmented csimagetool to support creating a cubemap from multiple
+	  images and splitting a cubemap into its subimages.
 12-Oct-2007
 	- caedes applied a patch from Lukas Erlinghagen for the pysimp.py file
 	  to account for incorrect lighting.
