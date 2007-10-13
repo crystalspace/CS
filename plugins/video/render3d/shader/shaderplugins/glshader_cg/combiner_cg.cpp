@@ -1358,8 +1358,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     }
     return annotateStr;
   }
-<<<<<<< .working
-=======
 
   void ShaderCombinerCg::AppendSnippetMap (const csHash<csString, csString>& map, 
                                            DocNodeCgAppender& appender)
@@ -1373,7 +1371,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
         appender.AppendFmt ("%s = %s;\n", toName.GetData(), fromName.GetData());
     }
   }
->>>>>>> .merge-right.r27881
   
   //-------------------------------------------------------------------------
   
