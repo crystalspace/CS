@@ -36,20 +36,20 @@ namespace lighter
     { 0.25f,  0.25f}
   };*/
 
-  DirectLighting::PVLPointShader DirectLighting::pvlPointShader = 0;
-  DirectLighting::LMElementShader DirectLighting::lmElementShader = 0;
-
-  void DirectLighting::Initialize ()
+  DirectLighting::DirectLighting (const csVector3& tangentSpaceNorm, 
+    size_t subLightmapNum) : tangentSpaceNorm (tangentSpaceNorm),
+    fancyTangentSpaceNorm (!(tangentSpaceNorm - csVector3 (0, 0, 1)).IsZero ()),
+    subLightmapNum (subLightmapNum)
   {
     if (globalLighter->configMgr->GetBool ("lighter2.DirectLightRandom", false))
     {
-      pvlPointShader = UniformShadeRndLightNonPD;
-      lmElementShader = UniformShadeRndLightNonPD;
+      pvlPointShader = &DirectLighting::UniformShadeRndLightNonPD;
+      lmElementShader = &DirectLighting::UniformShadeRndLightNonPD;
     }
     else
     {
-      pvlPointShader = UniformShadeAllLightsNonPD;
-      lmElementShader = UniformShadeAllLightsNonPD;
+      pvlPointShader = &DirectLighting::UniformShadeAllLightsNonPD;
+      lmElementShader = &DirectLighting::UniformShadeAllLightsNonPD;
     }    
   }
 
@@ -127,7 +127,7 @@ namespace lighter
         vVec * ElementQuadrantConstants[qi].y;
 
       csVector3 pos = elementC + offsetVector;
-      const csVector3 normal = element.primitive.ComputeNormal (pos);
+      const csVector3 normal = ComputeElementNormal (element, pos);
       if (elemType == Primitive::ELEMENT_BORDER)
       {
         const float fudge = EPSILON;
@@ -153,7 +153,7 @@ namespace lighter
     csColor res (0);
     for (size_t i = 0; i < allLights.GetSize (); ++i)
     {
-      res += DirectLighting::ShadeLight (allLights[i], obj, point,
+      res += lighting.ShadeLight (allLights[i], obj, point,
         normal, lightSampler, shadowIgnorePrimitive, fullIgnore);
     }
     return res;
@@ -164,7 +164,7 @@ namespace lighter
     ElementProxy element, SamplerSequence<2>& lightSampler)
   {
     const LightRefArray& allLights = sector->allNonPDLights;
-    ShadeAllLightsNonPD shade (allLights);
+    ShadeAllLightsNonPD shade (*this, allLights);
     return UniformShadeElement (shade, element, lightSampler);
   }
 
@@ -178,7 +178,7 @@ namespace lighter
     lightSampler.GetNext (rndValues);
     size_t lightIdx = (size_t) floorf (allLights.GetSize () * rndValues[2]);
 
-    return DirectLighting::ShadeLight (allLights[lightIdx], obj, point,
+    return lighting.ShadeLight (allLights[lightIdx], obj, point,
       normal, sampler, shadowIgnorePrimitive, fullIgnore);
   }
 
@@ -189,7 +189,7 @@ namespace lighter
     SamplerSequence<3> lightSampler (sampler);
     const LightRefArray& allLights = sector->allNonPDLights;
 
-    ShadeRndLightNonPD shade (allLights, lightSampler);
+    ShadeRndLightNonPD shade (*this, allLights, lightSampler);
     return UniformShadeElement (shade, element, sampler) 
       * allLights.GetSize ();
   }
@@ -206,14 +206,14 @@ namespace lighter
     SamplerSequence<2>& sampler, const Primitive* shadowIgnorePrimitive,
     bool fullIgnore)
   {
-    return DirectLighting::ShadeLight (light, obj, point,
+    return lighting.ShadeLight (light, obj, point,
       normal, sampler, shadowIgnorePrimitive, fullIgnore);
   }
 
   csColor DirectLighting::UniformShadeOneLight (Sector* sector, ElementProxy element,
     Light* light, SamplerSequence<2>& sampler)
   {
-    ShadeOneLight shade (light);
+    ShadeOneLight shade (*this, light);
     return UniformShadeElement (shade, element, sampler);
   }
 
@@ -341,7 +341,7 @@ namespace lighter
     progress.SetProgress (1);
     return;
   }
-  
+
   void DirectLighting::ShadeLightmap (Sector* sector, Object* obj, 
     SamplerSequence<2>& masterSampler, ProgressState& progress)
   {
@@ -375,7 +375,8 @@ namespace lighter
 
         //const ElementAreas& areas = prim.GetElementAreas ();
         size_t numElements = prim.GetElementCount ();        
-        Lightmap* normalLM = sector->scene->GetLightmap (prim.GetGlobalLightmapID (), (Light*)0);
+        Lightmap* normalLM = sector->scene->GetLightmap (
+          prim.GetGlobalLightmapID (), subLightmapNum, (Light*)0);
 
         ScopedSwapLock<Lightmap> lightLock (*normalLM);
 
@@ -383,7 +384,7 @@ namespace lighter
         for (size_t pdli = 0; pdli < PDLights.GetSize (); ++pdli)
         {
           Lightmap* lm = sector->scene->GetLightmap (prim.GetGlobalLightmapID (),
-            PDLights[pdli]);
+            subLightmapNum, PDLights[pdli]);
 
           lm->Lock ();
           pdLightLMs.Push (lm);
@@ -416,7 +417,7 @@ namespace lighter
 
           // Shade non-PD lights
           csColor c;        
-          c = lmElementShader (sector, ep, masterSampler);
+          c = (this->*lmElementShader) (sector, ep, masterSampler);
           
 
           normalLM->SetAddPixel (u, v, c * pixelAreaPart);
@@ -449,7 +450,7 @@ namespace lighter
     const LightRefArray& allPDLights = sector->allPDLights;
     LightRefArray PDLights;
 
-    Object::LitColorArray* litColors = obj->GetLitColors ();
+    Object::LitColorArray* litColors = obj->GetLitColors (subLightmapNum);
     const ObjectVertexData& vdata = obj->GetVertexData ();
 
     for (size_t pdli = 0; pdli < allPDLights.GetSize (); ++pdli)
@@ -464,17 +465,17 @@ namespace lighter
     for (size_t i = 0; i < vdata.positions.GetSize (); ++i)
     {
       const csVector3& pos = vdata.positions[i];
-      const csVector3& normal = vdata.normals[i];
+      const csVector3& normal = ComputeVertexNormal (obj, i);
 
       csColor& c = litColors->Get (i);
 
-      c = pvlPointShader (sector, obj, pos, normal, masterSampler);
+      c = (this->*pvlPointShader) (sector, obj, pos, normal, masterSampler);
 
       // Shade PD lights
       for (size_t pdli = 0; pdli < PDLights.GetSize (); ++pdli)
       {
         Light* pdl = PDLights[pdli];
-        Object::LitColorArray* pdlColors = obj->GetLitColorsPD (pdl);
+        Object::LitColorArray* pdlColors = obj->GetLitColorsPD (pdl, subLightmapNum);
         pdlColors->Get (i) += UniformShadeOneLight (sector, obj, pos, normal, pdl,
           masterSampler);
       }
@@ -483,4 +484,33 @@ namespace lighter
 
   }
 
+  csVector3 DirectLighting::ComputeElementNormal (ElementProxy element,
+                                                  const csVector3& pt) const
+  {
+    if (fancyTangentSpaceNorm)
+    {
+      csMatrix3 ts = element.primitive.GetObject()->ComputeTangentSpace (
+        &element.primitive, pt);
+      csVector3 v = ts * tangentSpaceNorm;
+      v.Normalize();
+      return v;
+    }
+    else
+      return element.primitive.ComputeNormal (pt);
+  }
+
+  csVector3 DirectLighting::ComputeVertexNormal (Object* obj, 
+                                                 size_t index) const
+  {
+    if (fancyTangentSpaceNorm)
+    {
+      csMatrix3 ts = obj->GetTangentSpace (index);
+      csVector3 v = ts * tangentSpaceNorm;
+      v.Normalize();
+      return v;
+    }
+    else
+      return obj->GetVertexData().normals[index];
+  }
+  
 }

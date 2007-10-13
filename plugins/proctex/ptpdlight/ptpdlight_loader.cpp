@@ -22,6 +22,7 @@
 
 #include "iutil/document.h"
 #include "iutil/objreg.h"
+#include "iutil/verbositymanager.h"
 #include "imap/loader.h"
 #include "imap/services.h"
 #include "ivaria/reporter.h"
@@ -29,6 +30,7 @@
 
 #include "csutil/cfgacc.h"
 #include "csutil/cscolor.h"
+#include "csutil/processorspecdetection.h"
 
 #include "ptpdlight.h"
 #include "ptpdlight_loader.h"
@@ -43,7 +45,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(PTPDLight)
 SCF_IMPLEMENT_FACTORY(ProctexPDLightLoader)
 
 ProctexPDLightLoader::ProctexPDLightLoader (iBase *p) :
-  scfImplementationType(this, p)
+  scfImplementationType(this, p), doMMX (false)
 {
   InitTokenTable (tokens);
 }
@@ -60,6 +62,20 @@ bool ProctexPDLightLoader::Initialize(iObjectRegistry *object_reg)
   if (cfg->GetBool ("Texture.PTPDLight.UseScheduling", true))
   {
     sched.SetBudget (cfg->GetInt ("Texture.PTPDLight.TimePerFrame", 25));
+  }
+
+  CS::Platform::ProcessorSpecDetection procSpec;
+#ifdef CS_SUPPORTS_MMX
+  doMMX = procSpec.HasMMX()
+    && cfg->GetBool ("Texture.PTPDLight.UseMMX", true);
+#endif
+  csRef<iVerbosityManager> verbosemgr (
+    csQueryRegistry<iVerbosityManager> (object_reg));
+  if (verbosemgr && verbosemgr->Enabled ("proctex.pdlight")) 
+  {
+    Report (CS_REPORTER_SEVERITY_NOTIFY, 0,
+      "PD light texture computation implementation: %s",
+      doMMX ? "MMX" : "generic");
   }
 
   return true;

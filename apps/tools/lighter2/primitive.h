@@ -171,6 +171,18 @@ namespace lighter
     /// Get interpolated UV coords at point
     csVector2 ComputeUV (const csVector3& point) const;
 
+    void ComputeCustomData (const csVector3& point, 
+      size_t customData, size_t numComps, float* out) const;
+
+    template<typename T>
+    T ComputeCustomData (const csVector3& point, size_t customData) const
+    {
+      const size_t comps = sizeof (T) / sizeof (float);
+      T r;
+      ComputeCustomData (point, customData, comps, (float*)&r);
+      return r;
+    }
+
     /// Calculate min-max UV-coords
     void ComputeMinMaxUV (csVector2 &min, csVector2 &max) const;
 

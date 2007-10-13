@@ -96,7 +96,7 @@ struct iGeneralMeshSubMesh : public virtual iBase
  */
 struct iGeneralMeshCommonState : public virtual iBase
 {
-  SCF_INTERFACE (iGeneralMeshCommonState, 1, 2, 0);
+  SCF_INTERFACE (iGeneralMeshCommonState, 1, 2, 1);
   
   /// Set lighting.
   virtual void SetLighting (bool l) = 0;
@@ -149,12 +149,17 @@ struct iGeneralMeshCommonState : public virtual iBase
   /**
    * Get independent render buffer by index
    */
-  virtual csRef<iRenderBuffer> GetRenderBuffer (int index) = 0;
+  virtual iRenderBuffer* GetRenderBuffer (int index) = 0;
 
   /**
    * Get the name of an independent render buffer by index
    */
   virtual csRef<iString> GetRenderBufferName (int index) const = 0;
+  
+  /**
+   * Get independent render buffer by name
+   */
+  virtual iRenderBuffer* GetRenderBuffer (const char* name) = 0;
   /** @} */
 };
 
@@ -174,7 +179,7 @@ struct iGeneralMeshCommonState : public virtual iBase
  */
 struct iGeneralMeshState : public virtual iGeneralMeshCommonState
 {
-  SCF_INTERFACE (iGeneralMeshState, 1, 1, 1);
+  SCF_INTERFACE (iGeneralMeshState, 1, 2, 0);
   
   /**
    * Set the animation control to use for this mesh object.
@@ -226,7 +231,7 @@ struct iGeneralMeshState : public virtual iGeneralMeshCommonState
  */
 struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
 {
-  SCF_INTERFACE (iGeneralFactoryState, 1, 1, 1);
+  SCF_INTERFACE (iGeneralFactoryState, 1, 2, 0);
   
   /// Set the color to use. Will be added to the lighting values.
   virtual void SetColor (const csColor& col) = 0;
@@ -463,7 +468,7 @@ struct iGeneralFactoryState : public virtual iGeneralMeshCommonState
  */
 struct iGenMeshAnimationControl : public virtual iBase
 {
-  SCF_INTERFACE(iGenMeshAnimationControl, 2, 0, 0);
+  SCF_INTERFACE(iGenMeshAnimationControl, 2, 1, 0);
 
   /// Returns true if this control animates vertices.
   virtual bool AnimatesVertices () const = 0;
@@ -477,7 +482,8 @@ struct iGenMeshAnimationControl : public virtual iBase
   /**
    * General update method
    */
-  virtual void Update (csTicks current) = 0;
+  virtual void Update (csTicks current, int num_verts, 
+    uint32 version_id) = 0;
 
   /**
    * Given the factory vertex data, return the animated data.

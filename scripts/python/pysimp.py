@@ -32,6 +32,8 @@ def CreateRoom(matname):
 
     walls = GeneralMeshBuilder.CreateFactoryAndMesh (engine, room, 
       "walls", "walls_factory", box)
+    walls_state = SCF_QUERY_INTERFACE(walls.GetMeshObject (), iGeneralMeshState)
+    walls_state.SetShadowReceiving(True)
     walls_factory = walls.GetMeshObject().GetFactory()
     material = engine.GetMaterialList().FindByName(matname)
     walls.GetMeshObject().SetMaterialWrapper(material)

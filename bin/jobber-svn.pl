@@ -98,7 +98,7 @@
 #     as noted above.
 #
 # $jobber_svn_flags [optional]
-#     Additional flags to pass to each of the `cvs' command invocations.  An
+#     Additional flags to pass to each of the `svn' command invocations.  An
 #     obvious example would be to set this variable to "-z9" to enable
 #     compression. No default.
 #
@@ -491,7 +491,7 @@ sub run_command {
 #------------------------------------------------------------------------------
 # Perform a recursive scan of a directory and return a sorted list of all
 # files and directories contained therein, except for the ".svn" directory and
-# its control files.  Also ignores ".cvsignore" files.
+# its control files.  Also ignores ".cvsignore" files and ".svn" directories.
 #------------------------------------------------------------------------------
 sub scandir {
     my $dir = shift;
@@ -509,7 +509,7 @@ sub svn_remove {
     return unless @{$files};
     my $paths = prepare_pathnames(@{$files});
     print "Invoking SVN delete: ${\scalar(@{$files})} paths\n";
-    run_command("$jobber_svn_command $jobber_svn_flags delete $paths") unless $TESTING;
+    run_command("$jobber_svn_command delete $paths $jobber_svn_flags") unless $TESTING;
 }
 
 #------------------------------------------------------------------------------
@@ -542,7 +542,7 @@ sub svn_add {
     $flags = '' unless defined($flags);
     print "Invoking SVN add: ${\scalar(@{$files})} paths" .
 	($flags ? " [$flags]" : '') . "\n";
-    run_command("$jobber_svn_command $jobber_svn_flags add $flags $paths") unless $TESTING;
+    run_command("$jobber_svn_command add $flags $paths $jobber_svn_flags") unless $TESTING;
 }
 
 #------------------------------------------------------------------------------
@@ -584,7 +584,7 @@ sub svn_examine {
 #------------------------------------------------------------------------------
 sub svn_checkout {
     print "URL: $jobber_svn_base_url\n";
-    run_command("$jobber_svn_command co $jobber_svn_flags $jobber_svn_base_url");
+    run_command("$jobber_svn_command co $jobber_svn_base_url $jobber_svn_flags");
 }
 
 #------------------------------------------------------------------------------
@@ -599,7 +599,7 @@ sub svn_update {
     }
     if ($dirs) {
         print "$line\n$message\n";
-        my $changes = run_command("$jobber_svn_command $jobber_svn_flags status $dirs");
+        my $changes = run_command("$jobber_svn_command status $dirs $jobber_svn_flags");
 	print $changes ? $changes : "  No files modified\n", "$line\n";
     }
 }
@@ -617,7 +617,7 @@ sub svn_commit_dirs {
     print RESPFILE $message;
     close(RESPFILE);
 
-    run_command("$jobber_svn_command $jobber_svn_flags --username $jobber_svn_user commit -F $respFileName $dirsAsText")
+    run_command("$jobber_svn_command commit --username $jobber_svn_user -F $respFileName $dirsAsText $jobber_svn_flags")
 	unless $TESTING;
     unlink($respFileName);
 }
@@ -895,8 +895,6 @@ sub validate_config {
 	    last;
 	}
     }
-
-    # $jobber_cvs_sources = $jobber_project_root unless $jobber_svna_sources;
 }
 
 #------------------------------------------------------------------------------

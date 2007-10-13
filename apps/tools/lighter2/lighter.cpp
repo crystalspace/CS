@@ -292,33 +292,48 @@ namespace lighter
     progBuildKDTree.SetProgress (1);
    
     // Shoot direct lighting
+    progDirectLighting.SetProgress (0);
     if (globalConfig.GetLighterProperties ().doDirectLight)
     {
-      DirectLighting::Initialize ();
-      progDirectLighting.SetProgress (0);
-      float sectorProgress = 1.0f / scene->GetSectors ().GetSize();
-      sectIt.Reset ();
-      while (sectIt.HasNext ())
+      int numDLPasses = 
+        globalConfig.GetLighterProperties().directionalLMs ? 4 : 1;
+      const csVector3 bases[4] =
       {
-        csRef<Sector> sect = sectIt.Next ();
-        Statistics::Progress* lightProg = 
-          progDirectLighting.CreateProgress (sectorProgress);
-        DirectLighting::ShadeDirectLighting (sect, *lightProg);
-        delete lightProg;
+        csVector3 (0, 0, 1),
+        csVector3 (/* -1/sqrt(6) */ -0.408248f, /* 1/sqrt(2) */ 0.707107f, /* 1/sqrt(3) */ 0.577350f),
+        csVector3 (/* sqrt(2/3) */ 0.816497f, 0, /* 1/sqrt(3) */ 0.577350f),
+        csVector3 (/* -1/sqrt(6) */ -0.408248f, /* -1/sqrt(2) */ -0.707107f, /* 1/sqrt(3) */ 0.577350f)
+      };
+      float sectorProgress = 
+        1.0f / (numDLPasses * scene->GetSectors ().GetSize());
+      for (int p = 0; p < numDLPasses; p++)
+      {
+        DirectLighting lighting (bases[p], p);
+        sectIt.Reset ();
+        while (sectIt.HasNext ())
+        {
+          csRef<Sector> sect = sectIt.Next ();
+          Statistics::Progress* lightProg = 
+            progDirectLighting.CreateProgress (sectorProgress);
+          lighting.ShadeDirectLighting (sect, *lightProg);
+          delete lightProg;
+        }
       }
       progDirectLighting.SetProgress (1);
     }
 
     //@@ DO OTHER LIGHTING
 
+    size_t realNumLMs = scene->GetLightmaps ().GetSize ();
+    if (globalConfig.GetLighterProperties().directionalLMs)
+      realNumLMs /= 4;
     progPostproc.SetProgress (0);
     // De-antialias the lightmaps
     {
       LightmapMaskPtrDelArray lmMasks;
-      LightmapPtrDelArray::Iterator lmIt = scene->GetLightmaps ().GetIterator ();
-      while (lmIt.HasNext ())
+      for (size_t l = 0; l < realNumLMs; l++)
       {
-        const Lightmap* lm = lmIt.Next ();
+        const Lightmap* lm = scene->GetLightmaps ()[l];
         lmMasks.Push (new LightmapMask (*lm));
       }
 
@@ -364,7 +379,7 @@ namespace lighter
 
         for (size_t lmI = 0; lmI < lightmaps.GetSize (); ++lmI)
         {
-          lightmaps[lmI]->FixupLightmap (*(lmMasks[lmI]));
+          lightmaps[lmI]->FixupLightmap (*(lmMasks[lmI % realNumLMs]));
           if (--u == 0)
           {
             progLM->IncProgress (progressStep);

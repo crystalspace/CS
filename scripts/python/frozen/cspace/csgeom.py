@@ -97,6 +97,11 @@ class csVector2(_object):
     def __abs__(*args): return _csgeom.csVector2___abs__(*args)
     def __getitem__(*args): return _csgeom.csVector2___getitem__(*args)
     def __setitem__(*args): return _csgeom.csVector2___setitem__(*args)
+    def __str__(self):
+      return "%f,%f"%(self.x,self.y)
+    def __repr__(self):
+      return "cspace.csVector2(%s)"%(self)
+
     __swig_destroy__ = _csgeom.delete_csVector2
     __del__ = lambda self : None;
 csVector2_swigregister = _csgeom.csVector2_swigregister
@@ -157,10 +162,79 @@ class csVector3(_object):
     def __getitem__(*args): return _csgeom.csVector3___getitem__(*args)
     def __setitem__(*args): return _csgeom.csVector3___setitem__(*args)
     def __nonzero__(*args): return _csgeom.csVector3___nonzero__(*args)
+    def __str__(self):
+      return "%f,%f,%f"%(self.x,self.y,self.z)
+    def __repr__(self):
+      return "cspace.csVector3(%s)"%(self)
+
     __swig_destroy__ = _csgeom.delete_csVector3
     __del__ = lambda self : None;
 csVector3_swigregister = _csgeom.csVector3_swigregister
 csVector3_swigregister(csVector3)
+
+class csVector3ArrayReadOnly(core.iBase):
+    __swig_setmethods__ = {}
+    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csVector3ArrayReadOnly, name, value)
+    __swig_getmethods__ = {}
+    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, csVector3ArrayReadOnly, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetSize(*args): return _csgeom.csVector3ArrayReadOnly_GetSize(*args)
+    def Get(*args): return _csgeom.csVector3ArrayReadOnly_Get(*args)
+    def Top(*args): return _csgeom.csVector3ArrayReadOnly_Top(*args)
+    def Find(*args): return _csgeom.csVector3ArrayReadOnly_Find(*args)
+    def GetIndex(*args): return _csgeom.csVector3ArrayReadOnly_GetIndex(*args)
+    def IsEmpty(*args): return _csgeom.csVector3ArrayReadOnly_IsEmpty(*args)
+    def GetAll(*args): return _csgeom.csVector3ArrayReadOnly_GetAll(*args)
+    __swig_destroy__ = _csgeom.delete_csVector3ArrayReadOnly
+    __del__ = lambda self : None;
+csVector3ArrayReadOnly_swigregister = _csgeom.csVector3ArrayReadOnly_swigregister
+csVector3ArrayReadOnly_swigregister(csVector3ArrayReadOnly)
+
+class csVector3ArrayChangeElements(csVector3ArrayReadOnly):
+    __swig_setmethods__ = {}
+    for _s in [csVector3ArrayReadOnly]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csVector3ArrayChangeElements, name, value)
+    __swig_getmethods__ = {}
+    for _s in [csVector3ArrayReadOnly]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, csVector3ArrayChangeElements, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def Get(*args): return _csgeom.csVector3ArrayChangeElements_Get(*args)
+    def Top(*args): return _csgeom.csVector3ArrayChangeElements_Top(*args)
+    __swig_destroy__ = _csgeom.delete_csVector3ArrayChangeElements
+    __del__ = lambda self : None;
+csVector3ArrayChangeElements_swigregister = _csgeom.csVector3ArrayChangeElements_swigregister
+csVector3ArrayChangeElements_swigregister(csVector3ArrayChangeElements)
+
+class csVector3ArrayChangeAll(csVector3ArrayChangeElements):
+    __swig_setmethods__ = {}
+    for _s in [csVector3ArrayChangeElements]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csVector3ArrayChangeAll, name, value)
+    __swig_getmethods__ = {}
+    for _s in [csVector3ArrayChangeElements]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, csVector3ArrayChangeAll, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def SetSize(*args): return _csgeom.csVector3ArrayChangeAll_SetSize(*args)
+    def GetExtend(*args): return _csgeom.csVector3ArrayChangeAll_GetExtend(*args)
+    def Put(*args): return _csgeom.csVector3ArrayChangeAll_Put(*args)
+    def Push(*args): return _csgeom.csVector3ArrayChangeAll_Push(*args)
+    def PushSmart(*args): return _csgeom.csVector3ArrayChangeAll_PushSmart(*args)
+    def Pop(*args): return _csgeom.csVector3ArrayChangeAll_Pop(*args)
+    def Insert(*args): return _csgeom.csVector3ArrayChangeAll_Insert(*args)
+    def DeleteAll(*args): return _csgeom.csVector3ArrayChangeAll_DeleteAll(*args)
+    def Truncate(*args): return _csgeom.csVector3ArrayChangeAll_Truncate(*args)
+    def Empty(*args): return _csgeom.csVector3ArrayChangeAll_Empty(*args)
+    def DeleteIndex(*args): return _csgeom.csVector3ArrayChangeAll_DeleteIndex(*args)
+    def DeleteIndexFast(*args): return _csgeom.csVector3ArrayChangeAll_DeleteIndexFast(*args)
+    def Delete(*args): return _csgeom.csVector3ArrayChangeAll_Delete(*args)
+    __swig_destroy__ = _csgeom.delete_csVector3ArrayChangeAll
+    __del__ = lambda self : None;
+csVector3ArrayChangeAll_swigregister = _csgeom.csVector3ArrayChangeAll_swigregister
+csVector3ArrayChangeAll_swigregister(csVector3ArrayChangeAll)
 
 class csVector4Float(_object):
     __swig_setmethods__ = {}
@@ -215,6 +289,11 @@ class csVector4(csVector4Float):
     def __getitem__(*args): return _csgeom.csVector4___getitem__(*args)
     def __setitem__(*args): return _csgeom.csVector4___setitem__(*args)
     def __nonzero__(*args): return _csgeom.csVector4___nonzero__(*args)
+    def __str__(self):
+      return "%f,%f,%f,%f"%(self.x,self.y,self.z,self.w)
+    def __repr__(self):
+      return "cspace.csVector4(%s)"%(self)
+
     __swig_destroy__ = _csgeom.delete_csVector4
     __del__ = lambda self : None;
 csVector4_swigregister = _csgeom.csVector4_swigregister
@@ -259,6 +338,11 @@ class csMatrix2(_object):
     def Invert(*args): return _csgeom.csMatrix2_Invert(*args)
     def Determinant(*args): return _csgeom.csMatrix2_Determinant(*args)
     def Identity(*args): return _csgeom.csMatrix2_Identity(*args)
+    def __str__(s):
+      return "%f,%f\n%f,%f"%(s.m11,s.m12,s.m21,s.m22)
+    def __repr__(s):
+      return "cspace.csMatrix2(%f,%f,%f,%f)"%(s.m11,s.m12,s.m21,s.m22)
+
     __swig_destroy__ = _csgeom.delete_csMatrix2
     __del__ = lambda self : None;
 csMatrix2_swigregister = _csgeom.csMatrix2_swigregister
@@ -331,6 +415,13 @@ class csMatrix3(_object):
     def __mul__(*args): return _csgeom.csMatrix3___mul__(*args)
     def __imul__(*args): return _csgeom.csMatrix3___imul__(*args)
     def __rmul__(*args): return _csgeom.csMatrix3___rmul__(*args)
+    def __str__(s):
+      return "%f,%f,%f\n%f,%f,%f\n%f,%f,%f"%(s.m11,s.m12,s.m13,
+                s.m21,s.m22,s.m23,s.m31,s.m32,s.m33)
+    def __repr__(s):
+      return "cspace.csMatrix3(%f,%f,%f,%f,%f,%f,%f,%f,%f)"%(s.m11,s.m12,
+                s.m13,s.m21,s.m22,s.m23,s.m31,s.m32,s.m33)
+
     __swig_destroy__ = _csgeom.delete_csMatrix3
     __del__ = lambda self : None;
 csMatrix3_swigregister = _csgeom.csMatrix3_swigregister
@@ -469,6 +560,12 @@ class csTransform(_object):
     def GetRight(*args): return _csgeom.csTransform_GetRight(*args)
     def __mul__(*args): return _csgeom.csTransform___mul__(*args)
     def __rmul__(*args): return _csgeom.csTransform___rmul__(*args)
+    def __str__(self):
+      return str(self.GetO2T())+"\n"+str(self.GetOrigin())
+    def __repr__(self):
+      return "cspace.csTransform(%s,%s)"%(repr(self.GetO2T()),
+                repr(self.GetOrigin()))
+
 csTransform_swigregister = _csgeom.csTransform_swigregister
 csTransform_swigregister(csTransform)
 csTransform_GetReflect = _csgeom.csTransform_GetReflect
@@ -1134,6 +1231,11 @@ class csTriangle(TriangleInt):
     def __getitem__(*args): return _csgeom.csTriangle___getitem__(*args)
     def __setitem__(*args): return _csgeom.csTriangle___setitem__(*args)
     def __nonzero__(*args): return _csgeom.csTriangle___nonzero__(*args)
+    def __str__(self):
+      return "%d,%d,%d"%(self.a,self.b,self.c)
+    def __repr__(self):
+      return "cspace.csTriangle(%s)"%(self)
+
     __swig_destroy__ = _csgeom.delete_csTriangle
     __del__ = lambda self : None;
 csTriangle_swigregister = _csgeom.csTriangle_swigregister
@@ -1257,6 +1359,11 @@ class csQuaternion(_object):
     def __add__(*args): return _csgeom.csQuaternion___add__(*args)
     def __sub__(*args): return _csgeom.csQuaternion___sub__(*args)
     def __mul__(*args): return _csgeom.csQuaternion___mul__(*args)
+    def __str__(self):
+      return "%s,%f"%(self.v,self.w)
+    def __repr__(self):
+      return "cspace.csQuaternion(%s)"%(self)
+
     __swig_destroy__ = _csgeom.delete_csQuaternion
     __del__ = lambda self : None;
 csQuaternion_swigregister = _csgeom.csQuaternion_swigregister

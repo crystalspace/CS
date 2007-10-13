@@ -19,10 +19,12 @@
 
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
+#include "csgfx/renderbuffer.h"
 #include "csgfx/vertexlistwalker.h"
 #include "csutil/util.h"
 #include "csutil/event.h"
 #include "iengine/engine.h"
+#include "imesh/object.h"
 #include "iutil/document.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
@@ -37,26 +39,20 @@ CS_PLUGIN_NAMESPACE_BEGIN(GMeshAnimPDL)
 
 SCF_IMPLEMENT_FACTORY (GenmeshAnimationPDLType)
 
-void GenmeshAnimationPDL::Prepare ()
+void GenmeshAnimationPDL::PrepareBuffer (iEngine* engine,
+  const GenmeshAnimationPDLFactory::ColorBuffer& factoryBuf,
+  ColorBuffer& buffer)
 {
-  if (prepared) return;
-  prepared = true;
-
-  csRef<iEngine> engine = csQueryRegistry<iEngine> (factory->type->object_reg);
-  if (!engine)
+  buffer.name = factoryBuf.name;
+  buffer.staticColors = factoryBuf.staticColors;
+  for (size_t i = 0; i < factoryBuf.lights.GetSize(); i++)
   {
-    factory->Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine!");
-    return;
-  }
-
-  for (size_t i = 0; i < factory->lights.GetSize(); i++)
-  {
-    const GenmeshAnimationPDLFactory::MappedLight& factoryLight = 
-      factory->lights[i];
+    const GenmeshAnimationPDLFactory::ColorBuffer::MappedLight& factoryLight = 
+      factoryBuf.lights[i];
     bool success = false;
-    MappedLight newLight;
+    ColorBuffer::MappedLight newLight;
     newLight.colors = factoryLight.colors;
-    newLight.light = engine->FindLightID (factoryLight.lightId);
+    newLight.light = engine->FindLightID (factoryLight.GetLightId());
     if (newLight.light)
     {
       success = true;
@@ -66,27 +62,132 @@ void GenmeshAnimationPDL::Prepare ()
     else
     {
       csString hexId;
+      const char* lightId = factoryLight.GetLightId();
       for (int i = 0; i < 16; i++)
-        hexId.AppendFmt ("%02x", factoryLight.lightId[i]);
-      factory->Report (CS_REPORTER_SEVERITY_WARNING, 
+        hexId.AppendFmt ("%02x", lightId[i]);
+      factory->type->Report (CS_REPORTER_SEVERITY_WARNING, 
         "Could not find light with ID '%s'", hexId.GetData());
     }
     if (success)
     {
-      lights.Push (newLight);
+      buffer.lights.Push (newLight);
     }
   }
-  lights.ShrinkBestFit();
+  buffer.lights.ShrinkBestFit();
+}
+
+void GenmeshAnimationPDL::Prepare ()
+{
+  if (prepared) return;
+  prepared = true;
+
+  csRef<iEngine> engine = csQueryRegistry<iEngine> (factory->type->object_reg);
+  if (!engine)
+  {
+    factory->type->Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine!");
+    return;
+  }
+
+  for (size_t b = 0; b < factory->buffers.GetSize(); b++)
+  {
+    if (factory->buffers[b].name == factory->type->colorsID)
+      PrepareBuffer (engine, factory->buffers[b], colorsBuffer);
+    else
+    {
+      ColorBuffer& buffer = buffers.GetExtend (buffers.GetSize ());
+      PrepareBuffer (engine, factory->buffers[b], buffer);
+    }
+  }
+  buffers.ShrinkBestFit ();
+}
+  
+void GenmeshAnimationPDL::UpdateBuffer (ColorBuffer& buffer, csTicks current, 
+                                        const csColor4* colors, int num_colors, 
+                                        uint32 version_id)
+{
+  if (buffer.lightsDirty || (buffer.lastMeshVersion != version_id))
+  {
+    size_t numUpdate = csMin (buffer.staticColors->GetElementCount(), 
+      (size_t)num_colors);
+
+    csDirtyAccessArray<csColor4>& combinedColors = buffer.combinedColors;
+    combinedColors.SetSize (num_colors);
+    {
+      csVertexListWalker<float, csColor> color (buffer.staticColors, 3);
+      if (colors)
+      {
+        for (size_t n = 0; n < numUpdate; n++)
+        {
+          combinedColors[n].Set ((*color).red, (*color).green, (*color).blue, 
+            colors[n].alpha);
+          ++color;
+        }
+      }
+      else
+      {
+        for (size_t n = 0; n < numUpdate; n++)
+        {
+          combinedColors[n].Set ((*color).red, (*color).green, (*color).blue, 
+            1.0f);
+          ++color;
+        }
+      }
+    }
+
+    for (size_t l = 0; l < buffer.lights.GetSize(); l++)
+    {
+      const ColorBuffer::MappedLight& light = buffer.lights[l];
+      
+      csVertexListWalker<float, csColor> color (light.colors, 3);
+      csColor lightColor = light.light->GetColor();
+
+      for (size_t n = 0; n < numUpdate; n++)
+      {
+        combinedColors[n] += *color * lightColor;
+        ++color;
+      }
+    }
+
+    colorsBuffer.lightsDirty = false;
+    colorsBuffer.lastMeshVersion = version_id;
+  }
 }
 
 GenmeshAnimationPDL::GenmeshAnimationPDL (
-  GenmeshAnimationPDLFactory* fact) : scfImplementationType(this), 
-  factory (fact), prepared (false), lightsDirty (true), lastMeshVersion (~0)
+  GenmeshAnimationPDLFactory* fact, iGeneralMeshState* genmesh) : 
+  scfImplementationType(this),  factory (fact), genmesh (genmesh),
+  prepared (false)
 {
 }
 
 GenmeshAnimationPDL::~GenmeshAnimationPDL ()
 {
+}
+
+void GenmeshAnimationPDL::Update(csTicks current, int num_verts, 
+                                 uint32 version_id)
+{
+  if (buffers.GetSize() == 0) return;
+
+  // @@@ FIXME: Bit of a waste here to always update custom buffers...
+  for (size_t b = 0; b < buffers.GetSize(); b++)
+  {
+    bool updateRB = (buffers[b].lastMeshVersion != version_id)
+      || !buffers[b].rbuf.IsValid();
+
+    UpdateBuffer (buffers[b], current, 0, num_verts, version_id);
+    if (updateRB)
+    {
+      buffers[b].rbuf = csRenderBuffer::CreateRenderBuffer (
+        buffers[b].combinedColors.GetSize(), CS_BUF_DYNAMIC, CS_BUFCOMP_FLOAT,
+        4);
+
+      const char* rbufname = factory->type->strings->Request (buffers[b].name);
+      genmesh->RemoveRenderBuffer (rbufname);
+      genmesh->AddRenderBuffer (rbufname, buffers[b].rbuf);
+    }
+    buffers[b].rbuf->SetData (buffers[b].combinedColors.GetArray());
+  }
 }
 
 const csVector3* GenmeshAnimationPDL::UpdateVertices (csTicks /*current*/,
@@ -112,64 +213,24 @@ const csColor4* GenmeshAnimationPDL::UpdateColors (csTicks current,
 {
   if (!prepared) Prepare();
 
-  if (lightsDirty || (lastMeshVersion != version_id))
-  {
-    size_t numUpdate = csMin (factory->staticColors->GetElementCount(), 
-      (size_t)num_colors);
-
-    combinedColors.SetSize (numUpdate);
-    {
-      csVertexListWalker<float, csColor> color (factory->staticColors, 3);
-      if (colors)
-      {
-        for (size_t n = 0; n < numUpdate; n++)
-        {
-          combinedColors[n].Set ((*color).red, (*color).green, (*color).blue, 
-            colors[n].alpha);
-          ++color;
-        }
-      }
-      else
-      {
-        for (size_t n = 0; n < numUpdate; n++)
-        {
-          combinedColors[n].Set ((*color).red, (*color).green, (*color).blue, 
-            1.0f);
-          ++color;
-        }
-      }
-    }
-
-    for (size_t l = 0; l < lights.GetSize(); l++)
-    {
-      const MappedLight& light = lights[l];
-      
-      csVertexListWalker<float, csColor> color (light.colors, 3);
-      csColor lightColor = light.light->GetColor();
-
-      for (size_t n = 0; n < numUpdate; n++)
-      {
-        combinedColors[n] += *color * lightColor;
-        ++color;
-      }
-    }
-
-    lightsDirty = false;
-    lastMeshVersion = version_id;
-  }
-
-  return combinedColors.GetArray();
+  if (colorsBuffer.name == 0) return colors;
+  UpdateBuffer (colorsBuffer, current, colors, num_colors, version_id);
+  return colorsBuffer.combinedColors.GetArray();
 }
 
 void GenmeshAnimationPDL::LightDisconnect (iLight* light)
 {
-  for (size_t i = 0; i < lights.GetSize(); i++)
+  for (size_t b = 0; b < buffers.GetSize(); b++)
   {
-    if (lights[i].light == light)
+    csSafeCopyArray<ColorBuffer::MappedLight>& lights = buffers[b].lights;
+    for (size_t i = 0; i < lights.GetSize(); i++)
     {
-      lights.DeleteIndexFast (i);
-      lightsDirty = true;
-      return;
+      if (lights[i].light == light)
+      {
+        lights.DeleteIndexFast (i);
+        buffers[b].lightsDirty = true;
+        return;
+      }
     }
   }
 }
@@ -188,15 +249,6 @@ void GenmeshAnimationPDLFactory::Report (iSyntaxService* synsrv,
   synsrv->Report ("crystalspace.mesh.anim.pdlight", severity, node, "%s", 
     (const char*)text);
 
-  va_end (arg);
-}
-
-void GenmeshAnimationPDLFactory::Report (int severity, const char* msg, ...)
-{
-  va_list arg;
-  va_start (arg, msg);
-  csReportV (type->object_reg, severity, "crystalspace.mesh.anim.pdlight", 
-    msg, arg);
   va_end (arg);
 }
 
@@ -241,40 +293,83 @@ bool GenmeshAnimationPDLFactory::HexToLightID (char* lightID,
   return valid;
 }
 
-const char* GenmeshAnimationPDLFactory::ParseLight (iSyntaxService* synsrv,
-                                                      iDocumentNode* node)
+const char* GenmeshAnimationPDLFactory::ParseBuffer (iSyntaxService* synsrv,
+                                                     ColorBuffer& buffer, 
+                                                     iDocumentNode* node)
+{
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_STATICCOLORS:
+        {
+          buffer.staticColors = synsrv->ParseRenderBuffer (child);
+          if (!buffer.staticColors)
+            return "Could not parse <staticcolors>";
+	}
+        break;
+      case XMLTOKEN_LIGHT:
+        {
+          ColorBuffer::MappedLight light;
+	  const char* err = ParseLight (light, synsrv, child);
+	  if (err)
+          {
+            Report (synsrv, CS_REPORTER_SEVERITY_WARNING,
+              child, "Could not parse light: %s", err);
+          }
+          else
+            buffer.lights.Push (light);
+	}
+        break;
+      default:
+        parseError.Format ("Unknown token '%s'", value);
+        return parseError;
+    }
+  }
+
+  if (!buffer.staticColors)
+    return "No <staticcolors> given";
+
+  const char* err = ValidateBufferSizes (buffer);
+  if (err) return err;
+
+  return 0;
+}
+
+const char* GenmeshAnimationPDLFactory::ParseLight (ColorBuffer::MappedLight& light,
+                                                    iSyntaxService* synsrv,
+                                                    iDocumentNode* node)
 {
   const char* lightId = node->GetAttributeValue ("lightid");
   if (!lightId)
     return "No light ID given";
 
-  MappedLight light;
   light.colors = synsrv->ParseRenderBuffer (node);
   if (!light.colors)
   {
     return "Could not parse light colors";
   }
 
-  light.lightId = new char[16];
-  if (!HexToLightID (light.lightId, lightId))
+  if (!HexToLightID (light.GetLightId(), lightId))
   {
     parseError.Format ("Invalid light ID '%s'", lightId);
     return parseError;
   }
-  else
-  {
-    lights.Push (light);
-  }
   return 0;
 }
 
-const char* GenmeshAnimationPDLFactory::ValidateBufferSizes()
+const char* GenmeshAnimationPDLFactory::ValidateBufferSizes (const ColorBuffer& buffer)
 {
-  size_t staticNum = staticColors->GetElementCount();
+  size_t staticNum = buffer.staticColors->GetElementCount();
 
-  for (size_t i = 0; i < lights.GetSize(); i++)
+  for (size_t i = 0; i < buffer.lights.GetSize(); i++)
   {
-    if (lights[i].colors->GetElementCount() != staticNum)
+    if (buffer.lights[i].colors->GetElementCount() != staticNum)
       return "Not all light colors sizes match the static colors size";
   }
 
@@ -293,9 +388,12 @@ GenmeshAnimationPDLFactory::~GenmeshAnimationPDLFactory ()
 }
 
 csPtr<iGenMeshAnimationControl> GenmeshAnimationPDLFactory::
-	CreateAnimationControl (iMeshObject* /*mesh*/)
+	CreateAnimationControl (iMeshObject* mesh)
 {
-  GenmeshAnimationPDL* ctrl = new GenmeshAnimationPDL (this);
+  csRef<iGeneralMeshState> genmesh = 
+    scfQueryInterface<iGeneralMeshState> (mesh);
+  if (!genmesh.IsValid()) return 0;
+  GenmeshAnimationPDL* ctrl = new GenmeshAnimationPDL (this, genmesh);
   return csPtr<iGenMeshAnimationControl> (ctrl);
 }
 
@@ -312,37 +410,49 @@ const char* GenmeshAnimationPDLFactory::Load (iDocumentNode* node)
     if (child->GetType () != CS_NODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
-    switch (id)
+
+    if (id == XMLTOKEN_BUFFER)
     {
-      case XMLTOKEN_STATICCOLORS:
+      // "New" style: a number of <buffer> tags
+      it = node->GetNodes ();
+      while (it->HasNext ())
+      {
+        child = it->Next ();
+        if (child->GetType () != CS_NODE_ELEMENT) continue;
+        const char* value = child->GetValue ();
+        csStringID id = xmltokens.Request (value);
+
+        if (id != XMLTOKEN_BUFFER)
         {
-          staticColors = synsrv->ParseRenderBuffer (child);
-          if (!staticColors)
-            return "Could not parse <staticcolors>";
-	}
-        break;
-      case XMLTOKEN_LIGHT:
-        {
-	  const char* err = ParseLight (synsrv, child);
-	  if (err)
-          {
-            Report (synsrv, CS_REPORTER_SEVERITY_WARNING,
-              child, "Could not parse light: %s", err);
-          }
-	}
-        break;
-      default:
-        parseError.Format ("Unknown token '%s'", value);
-        return parseError;
+          parseError.Format ("Unknown token '%s'", value);
+          return parseError;
+        }
+
+        const char* name = child->GetAttributeValue ("name");
+        if (!name || !*name)
+          return "No 'name' attribute";
+
+        ColorBuffer buf;
+        buf.name = type->strings->Request (name);
+        const char* err = ParseBuffer (synsrv, buf, child);
+        if (err != 0) return err;
+        buffers.Push (buf);
+      }
+
+      buffers.ShrinkBestFit ();
     }
+    else
+    {
+      // "Old" style: "color" buffer, at 'top level'
+      ColorBuffer colors;
+      colors.name = type->colorsID;
+      const char* err = ParseBuffer (synsrv, colors, node);
+      if (err != 0) return err;
+      buffers.Push (colors);
+      buffers.ShrinkBestFit ();
+    }
+    break;
   }
-
-  if (!staticColors)
-    return "No <staticcolors> given";
-
-  const char* err = ValidateBufferSizes();
-  if (err) return err;
-
   return 0;
 }
 
@@ -369,6 +479,16 @@ GenmeshAnimationPDLType::~GenmeshAnimationPDLType ()
 bool GenmeshAnimationPDLType::Initialize (iObjectRegistry* object_reg)
 {
   this->object_reg = object_reg;
+
+  strings = csQueryRegistryTagInterface<iStringSet> (object_reg,
+    "crystalspace.shared.stringset");
+  if (!strings.IsValid()) 
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "No shared string set");
+    return false;
+  }
+  colorsID = strings->Request ("color");
+
   return true;
 }
 
@@ -377,6 +497,15 @@ csPtr<iGenMeshAnimationControlFactory> GenmeshAnimationPDLType::
 {
   GenmeshAnimationPDLFactory* ctrl = new GenmeshAnimationPDLFactory (this);
   return csPtr<iGenMeshAnimationControlFactory> (ctrl);
+}
+
+void GenmeshAnimationPDLType::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  csReportV (object_reg, severity, "crystalspace.mesh.anim.pdlight", 
+    msg, arg);
+  va_end (arg);
 }
 
 }

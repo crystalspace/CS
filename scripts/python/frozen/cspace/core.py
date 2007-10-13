@@ -179,6 +179,12 @@ class scfInterfaceMetadataList(_object):
     __swig_setmethods__["metadataCount"] = _core.scfInterfaceMetadataList_metadataCount_set
     __swig_getmethods__["metadataCount"] = _core.scfInterfaceMetadataList_metadataCount_get
     if _newclass:metadataCount = _swig_property(_core.scfInterfaceMetadataList_metadataCount_get, _core.scfInterfaceMetadataList_metadataCount_set)
+    def __len__(*args): return _core.scfInterfaceMetadataList___len__(*args)
+    def __getitem__(*args): return _core.scfInterfaceMetadataList___getitem__(*args)
+    def content_iterator(self):
+            for idx in xrange(len(self)):
+                    yield self.__getitem__(idx)
+    def __iter__(self): return self.content_iterator()  
     def __init__(self, *args): 
         this = _core.new_scfInterfaceMetadataList(*args)
         try: self.this.append(this)
@@ -1188,10 +1194,16 @@ class iObjectIterator(iBase):
     def GetParentObj(*args): return _core.iObjectIterator_GetParentObj(*args)
     def HasNext(*args): return _core.iObjectIterator_HasNext(*args)
     def FindName(*args): return _core.iObjectIterator_FindName(*args)
+    def __iter__(self):
+        while self.HasNext():
+            yield self.Next() 
+    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iObjectIterator_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_core.iObjectIterator_scfGetVersion)
     __swig_destroy__ = _core.delete_iObjectIterator
     __del__ = lambda self : None;
 iObjectIterator_swigregister = _core.iObjectIterator_swigregister
 iObjectIterator_swigregister(iObjectIterator)
+iObjectIterator_scfGetVersion = _core.iObjectIterator_scfGetVersion
 
 class iStringSet(iBase):
     __swig_setmethods__ = {}
@@ -1949,10 +1961,16 @@ class iPluginIterator(iBase):
     __repr__ = _swig_repr
     def HasNext(*args): return _core.iPluginIterator_HasNext(*args)
     def Next(*args): return _core.iPluginIterator_Next(*args)
+    def __iter__(self):
+        while self.HasNext():
+            yield self.Next() 
+    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iPluginIterator_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_core.iPluginIterator_scfGetVersion)
     __swig_destroy__ = _core.delete_iPluginIterator
     __del__ = lambda self : None;
 iPluginIterator_swigregister = _core.iPluginIterator_swigregister
 iPluginIterator_swigregister(iPluginIterator)
+iPluginIterator_scfGetVersion = _core.iPluginIterator_scfGetVersion
 
 class iPluginManager(iBase):
     __swig_setmethods__ = {}
@@ -2202,6 +2220,15 @@ class iStringArray(iBase):
     def Empty(*args): return _core.iStringArray_Empty(*args)
     def DeleteAll(*args): return _core.iStringArray_DeleteAll(*args)
     def IsEmpty(*args): return _core.iStringArray_IsEmpty(*args)
+    def __getitem__(*args): return _core.iStringArray___getitem__(*args)
+    def __contains__(*args): return _core.iStringArray___contains__(*args)
+    def __delitem__(*args): return _core.iStringArray___delitem__(*args)
+    def __len__(*args): return _core.iStringArray___len__(*args)
+    def append(*args): return _core.iStringArray_append(*args)
+    def content_iterator(self):
+            for idx in xrange(len(self)):
+                    yield self.__getitem__(idx)
+    def __iter__(self): return self.content_iterator()  
     __swig_getmethods__["scfGetVersion"] = lambda x: _core.iStringArray_scfGetVersion
     if _newclass:scfGetVersion = staticmethod(_core.iStringArray_scfGetVersion)
     __swig_destroy__ = _core.delete_iStringArray
@@ -2613,6 +2640,40 @@ class iImageIO(iBase):
 iImageIO_swigregister = _core.iImageIO_swigregister
 iImageIO_swigregister(iImageIO)
 iImageIO_scfGetVersion = _core.iImageIO_scfGetVersion
+
+class iAnimatedImage(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iAnimatedImage, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, iAnimatedImage, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def Animate(*args): return _core.iAnimatedImage_Animate(*args)
+    def IsAnimated(*args): return _core.iAnimatedImage_IsAnimated(*args)
+    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iAnimatedImage_scfGetVersion
+    if _newclass:scfGetVersion = staticmethod(_core.iAnimatedImage_scfGetVersion)
+    __swig_destroy__ = _core.delete_iAnimatedImage
+    __del__ = lambda self : None;
+iAnimatedImage_swigregister = _core.iAnimatedImage_swigregister
+iAnimatedImage_swigregister(iAnimatedImage)
+iAnimatedImage_scfGetVersion = _core.iAnimatedImage_scfGetVersion
+
+class iProcTexture(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iProcTexture, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, iProcTexture, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetAlwaysAnimate(*args): return _core.iProcTexture_GetAlwaysAnimate(*args)
+    def SetAlwaysAnimate(*args): return _core.iProcTexture_SetAlwaysAnimate(*args)
+    def GetFactory(*args): return _core.iProcTexture_GetFactory(*args)
+iProcTexture_swigregister = _core.iProcTexture_swigregister
+iProcTexture_swigregister(iProcTexture)
 
 class pycsObject(iObject):
     __swig_setmethods__ = {}

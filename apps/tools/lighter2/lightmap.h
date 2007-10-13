@@ -30,6 +30,7 @@ namespace lighter
   {
   public:
     Lightmap (int width, int height);
+    Lightmap (const Lightmap& other);
 
     ~Lightmap ();
 

@@ -514,7 +514,7 @@ PYITERATOR_PROTOCOL(classname)
 /* Array Functions */
 #undef ARRAY_OBJECT_FUNCTIONS
 %define ARRAY_OBJECT_FUNCTIONS(classname,typename)
-        PYLIST_BASE_FUNCTIONS(classname,typename,size_t,GetSize,Get,Push,Delete,Find)
+        PYLIST_BASE_FUNCTIONS(classname,typename,size_t,GetSize,Get,Push,DeleteIndex,Find)
 %enddef
 /* Pseudo-List Functions */
 #undef LIST_OBJECT_FUNCTIONS

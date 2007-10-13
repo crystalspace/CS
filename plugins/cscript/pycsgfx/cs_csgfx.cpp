@@ -2510,89 +2510,91 @@ SWIG_Python_MustGetPtr(PyObject *obj, swig_type_info *ty, int argnum, int flags)
 #define SWIGTYPE_p_csVector3 swig_types[32]
 #define SWIGTYPE_p_csVector4 swig_types[33]
 #define SWIGTYPE_p_float swig_types[34]
-#define SWIGTYPE_p_iArrayChangeAllTcsShaderVariable_p_t swig_types[35]
-#define SWIGTYPE_p_iArrayChangeElementsTcsShaderVariable_p_t swig_types[36]
-#define SWIGTYPE_p_iArrayReadOnlyTcsShaderVariable_p_t swig_types[37]
-#define SWIGTYPE_p_iBase swig_types[38]
-#define SWIGTYPE_p_iCacheManager swig_types[39]
-#define SWIGTYPE_p_iClipper2D swig_types[40]
-#define SWIGTYPE_p_iCommandLineParser swig_types[41]
-#define SWIGTYPE_p_iComponent swig_types[42]
-#define SWIGTYPE_p_iConfigFile swig_types[43]
-#define SWIGTYPE_p_iConfigIterator swig_types[44]
-#define SWIGTYPE_p_iConfigManager swig_types[45]
-#define SWIGTYPE_p_iDataBuffer swig_types[46]
-#define SWIGTYPE_p_iDebugHelper swig_types[47]
-#define SWIGTYPE_p_iDocument swig_types[48]
-#define SWIGTYPE_p_iDocumentAttribute swig_types[49]
-#define SWIGTYPE_p_iDocumentAttributeIterator swig_types[50]
-#define SWIGTYPE_p_iDocumentNode swig_types[51]
-#define SWIGTYPE_p_iDocumentNodeIterator swig_types[52]
-#define SWIGTYPE_p_iDocumentSystem swig_types[53]
-#define SWIGTYPE_p_iEvent swig_types[54]
-#define SWIGTYPE_p_iEventAttributeIterator swig_types[55]
-#define SWIGTYPE_p_iEventCord swig_types[56]
-#define SWIGTYPE_p_iEventHandler swig_types[57]
-#define SWIGTYPE_p_iEventNameRegistry swig_types[58]
-#define SWIGTYPE_p_iEventOutlet swig_types[59]
-#define SWIGTYPE_p_iEventPlug swig_types[60]
-#define SWIGTYPE_p_iEventQueue swig_types[61]
-#define SWIGTYPE_p_iFactory swig_types[62]
-#define SWIGTYPE_p_iFile swig_types[63]
-#define SWIGTYPE_p_iImage swig_types[64]
-#define SWIGTYPE_p_iImageIO swig_types[65]
-#define SWIGTYPE_p_iJoystickDriver swig_types[66]
-#define SWIGTYPE_p_iKeyComposer swig_types[67]
-#define SWIGTYPE_p_iKeyboardDriver swig_types[68]
-#define SWIGTYPE_p_iMouseDriver swig_types[69]
-#define SWIGTYPE_p_iObject swig_types[70]
-#define SWIGTYPE_p_iObjectIterator swig_types[71]
-#define SWIGTYPE_p_iObjectNameChangeListener swig_types[72]
-#define SWIGTYPE_p_iObjectRegistry swig_types[73]
-#define SWIGTYPE_p_iObjectRegistryIterator swig_types[74]
-#define SWIGTYPE_p_iPath swig_types[75]
-#define SWIGTYPE_p_iPluginIterator swig_types[76]
-#define SWIGTYPE_p_iPluginManager swig_types[77]
-#define SWIGTYPE_p_iRenderBuffer swig_types[78]
-#define SWIGTYPE_p_iReporter swig_types[79]
-#define SWIGTYPE_p_iReporterIterator swig_types[80]
-#define SWIGTYPE_p_iReporterListener swig_types[81]
-#define SWIGTYPE_p_iSCF swig_types[82]
-#define SWIGTYPE_p_iShaderVariableAccessor swig_types[83]
-#define SWIGTYPE_p_iString swig_types[84]
-#define SWIGTYPE_p_iStringArray swig_types[85]
-#define SWIGTYPE_p_iStringSet swig_types[86]
-#define SWIGTYPE_p_iTextureHandle swig_types[87]
-#define SWIGTYPE_p_iTextureWrapper swig_types[88]
-#define SWIGTYPE_p_iTriangleMesh swig_types[89]
-#define SWIGTYPE_p_iVFS swig_types[90]
-#define SWIGTYPE_p_iVirtualClock swig_types[91]
-#define SWIGTYPE_p_int swig_types[92]
-#define SWIGTYPE_p_int16_t swig_types[93]
-#define SWIGTYPE_p_int64_t swig_types[94]
-#define SWIGTYPE_p_int8_t swig_types[95]
-#define SWIGTYPE_p_long_long swig_types[96]
-#define SWIGTYPE_p_p_csShaderVariable swig_types[97]
-#define SWIGTYPE_p_p_iRenderBuffer swig_types[98]
-#define SWIGTYPE_p_p_iTextureHandle swig_types[99]
-#define SWIGTYPE_p_p_iTextureWrapper swig_types[100]
-#define SWIGTYPE_p_p_void swig_types[101]
-#define SWIGTYPE_p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[102]
-#define SWIGTYPE_p_scfImplementation1TcsImageBase_iImage_t swig_types[103]
-#define SWIGTYPE_p_scfImplementation1TcsObject_iObject_t swig_types[104]
-#define SWIGTYPE_p_scfImplementation1TcsPath_iPath_t swig_types[105]
-#define SWIGTYPE_p_scfImplementationExt0TcsImageMemory_csImageBase_t swig_types[106]
-#define SWIGTYPE_p_scfInterfaceMetadataList swig_types[107]
-#define SWIGTYPE_p_uint16_t swig_types[108]
-#define SWIGTYPE_p_uint32_t swig_types[109]
-#define SWIGTYPE_p_uint64_t swig_types[110]
-#define SWIGTYPE_p_uint8_t swig_types[111]
-#define SWIGTYPE_p_unsigned_int swig_types[112]
-#define SWIGTYPE_p_unsigned_long swig_types[113]
-#define SWIGTYPE_p_unsigned_long_long swig_types[114]
-#define SWIGTYPE_p_void swig_types[115]
-static swig_type_info *swig_types[117];
-static swig_module_info swig_module = {swig_types, 116, 0, 0, 0, 0};
+#define SWIGTYPE_p_iAnimatedImage swig_types[35]
+#define SWIGTYPE_p_iArrayChangeAllTcsShaderVariable_p_t swig_types[36]
+#define SWIGTYPE_p_iArrayChangeElementsTcsShaderVariable_p_t swig_types[37]
+#define SWIGTYPE_p_iArrayReadOnlyTcsShaderVariable_p_t swig_types[38]
+#define SWIGTYPE_p_iBase swig_types[39]
+#define SWIGTYPE_p_iCacheManager swig_types[40]
+#define SWIGTYPE_p_iClipper2D swig_types[41]
+#define SWIGTYPE_p_iCommandLineParser swig_types[42]
+#define SWIGTYPE_p_iComponent swig_types[43]
+#define SWIGTYPE_p_iConfigFile swig_types[44]
+#define SWIGTYPE_p_iConfigIterator swig_types[45]
+#define SWIGTYPE_p_iConfigManager swig_types[46]
+#define SWIGTYPE_p_iDataBuffer swig_types[47]
+#define SWIGTYPE_p_iDebugHelper swig_types[48]
+#define SWIGTYPE_p_iDocument swig_types[49]
+#define SWIGTYPE_p_iDocumentAttribute swig_types[50]
+#define SWIGTYPE_p_iDocumentAttributeIterator swig_types[51]
+#define SWIGTYPE_p_iDocumentNode swig_types[52]
+#define SWIGTYPE_p_iDocumentNodeIterator swig_types[53]
+#define SWIGTYPE_p_iDocumentSystem swig_types[54]
+#define SWIGTYPE_p_iEvent swig_types[55]
+#define SWIGTYPE_p_iEventAttributeIterator swig_types[56]
+#define SWIGTYPE_p_iEventCord swig_types[57]
+#define SWIGTYPE_p_iEventHandler swig_types[58]
+#define SWIGTYPE_p_iEventNameRegistry swig_types[59]
+#define SWIGTYPE_p_iEventOutlet swig_types[60]
+#define SWIGTYPE_p_iEventPlug swig_types[61]
+#define SWIGTYPE_p_iEventQueue swig_types[62]
+#define SWIGTYPE_p_iFactory swig_types[63]
+#define SWIGTYPE_p_iFile swig_types[64]
+#define SWIGTYPE_p_iImage swig_types[65]
+#define SWIGTYPE_p_iImageIO swig_types[66]
+#define SWIGTYPE_p_iJoystickDriver swig_types[67]
+#define SWIGTYPE_p_iKeyComposer swig_types[68]
+#define SWIGTYPE_p_iKeyboardDriver swig_types[69]
+#define SWIGTYPE_p_iMouseDriver swig_types[70]
+#define SWIGTYPE_p_iObject swig_types[71]
+#define SWIGTYPE_p_iObjectIterator swig_types[72]
+#define SWIGTYPE_p_iObjectNameChangeListener swig_types[73]
+#define SWIGTYPE_p_iObjectRegistry swig_types[74]
+#define SWIGTYPE_p_iObjectRegistryIterator swig_types[75]
+#define SWIGTYPE_p_iPath swig_types[76]
+#define SWIGTYPE_p_iPluginIterator swig_types[77]
+#define SWIGTYPE_p_iPluginManager swig_types[78]
+#define SWIGTYPE_p_iProcTexture swig_types[79]
+#define SWIGTYPE_p_iRenderBuffer swig_types[80]
+#define SWIGTYPE_p_iReporter swig_types[81]
+#define SWIGTYPE_p_iReporterIterator swig_types[82]
+#define SWIGTYPE_p_iReporterListener swig_types[83]
+#define SWIGTYPE_p_iSCF swig_types[84]
+#define SWIGTYPE_p_iShaderVariableAccessor swig_types[85]
+#define SWIGTYPE_p_iString swig_types[86]
+#define SWIGTYPE_p_iStringArray swig_types[87]
+#define SWIGTYPE_p_iStringSet swig_types[88]
+#define SWIGTYPE_p_iTextureHandle swig_types[89]
+#define SWIGTYPE_p_iTextureWrapper swig_types[90]
+#define SWIGTYPE_p_iTriangleMesh swig_types[91]
+#define SWIGTYPE_p_iVFS swig_types[92]
+#define SWIGTYPE_p_iVirtualClock swig_types[93]
+#define SWIGTYPE_p_int swig_types[94]
+#define SWIGTYPE_p_int16_t swig_types[95]
+#define SWIGTYPE_p_int64_t swig_types[96]
+#define SWIGTYPE_p_int8_t swig_types[97]
+#define SWIGTYPE_p_long_long swig_types[98]
+#define SWIGTYPE_p_p_csShaderVariable swig_types[99]
+#define SWIGTYPE_p_p_iRenderBuffer swig_types[100]
+#define SWIGTYPE_p_p_iTextureHandle swig_types[101]
+#define SWIGTYPE_p_p_iTextureWrapper swig_types[102]
+#define SWIGTYPE_p_p_void swig_types[103]
+#define SWIGTYPE_p_scfImplementation1TcsConfigFile_iConfigFile_t swig_types[104]
+#define SWIGTYPE_p_scfImplementation1TcsImageBase_iImage_t swig_types[105]
+#define SWIGTYPE_p_scfImplementation1TcsObject_iObject_t swig_types[106]
+#define SWIGTYPE_p_scfImplementation1TcsPath_iPath_t swig_types[107]
+#define SWIGTYPE_p_scfImplementationExt0TcsImageMemory_csImageBase_t swig_types[108]
+#define SWIGTYPE_p_scfInterfaceMetadataList swig_types[109]
+#define SWIGTYPE_p_uint16_t swig_types[110]
+#define SWIGTYPE_p_uint32_t swig_types[111]
+#define SWIGTYPE_p_uint64_t swig_types[112]
+#define SWIGTYPE_p_uint8_t swig_types[113]
+#define SWIGTYPE_p_unsigned_int swig_types[114]
+#define SWIGTYPE_p_unsigned_long swig_types[115]
+#define SWIGTYPE_p_unsigned_long_long swig_types[116]
+#define SWIGTYPE_p_void swig_types[117]
+static swig_type_info *swig_types[119];
+static swig_module_info swig_module = {swig_types, 118, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -7016,7 +7018,7 @@ SWIGINTERN PyObject *csShaderVariableArrayChangeElements_swigregister(PyObject *
   return SWIG_Py_Void();
 }
 
-SWIGINTERN PyObject *_wrap_csShaderVariableArray_SetSize__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csShaderVariableArrayChangeAll_SetSize__SWIG_0(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iArrayChangeAll<csShaderVariable * > *arg1 = (iArrayChangeAll<csShaderVariable * > *) 0 ;
   size_t arg2 ;
@@ -7032,20 +7034,20 @@ SWIGINTERN PyObject *_wrap_csShaderVariableArray_SetSize__SWIG_0(PyObject *SWIGU
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:csShaderVariableArray_SetSize",&obj0,&obj1,&obj2)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OOO:csShaderVariableArrayChangeAll_SetSize",&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsShaderVariable_p_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArray_SetSize" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArrayChangeAll_SetSize" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
   }
   arg1 = reinterpret_cast< iArrayChangeAll<csShaderVariable * > * >(argp1);
   ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csShaderVariableArray_SetSize" "', argument " "2"" of type '" "size_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csShaderVariableArrayChangeAll_SetSize" "', argument " "2"" of type '" "size_t""'");
   } 
   arg2 = static_cast< size_t >(val2);
   res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csShaderVariable, 0 |  0 );
   if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csShaderVariableArray_SetSize" "', argument " "3"" of type '" "csShaderVariable *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csShaderVariableArrayChangeAll_SetSize" "', argument " "3"" of type '" "csShaderVariable *""'"); 
   }
   temp3 = reinterpret_cast< csShaderVariable * >(argp3);
   arg3 = &temp3;
@@ -7057,7 +7059,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csShaderVariableArray_SetSize__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csShaderVariableArrayChangeAll_SetSize__SWIG_1(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iArrayChangeAll<csShaderVariable * > *arg1 = (iArrayChangeAll<csShaderVariable * > *) 0 ;
   size_t arg2 ;
@@ -7068,15 +7070,15 @@ SWIGINTERN PyObject *_wrap_csShaderVariableArray_SetSize__SWIG_1(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csShaderVariableArray_SetSize",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OO:csShaderVariableArrayChangeAll_SetSize",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsShaderVariable_p_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArray_SetSize" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArrayChangeAll_SetSize" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
   }
   arg1 = reinterpret_cast< iArrayChangeAll<csShaderVariable * > * >(argp1);
   ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csShaderVariableArray_SetSize" "', argument " "2"" of type '" "size_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csShaderVariableArrayChangeAll_SetSize" "', argument " "2"" of type '" "size_t""'");
   } 
   arg2 = static_cast< size_t >(val2);
   (arg1)->SetSize(arg2);
@@ -7087,7 +7089,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csShaderVariableArray_SetSize(PyObject *self, PyObject *args) {
+SWIGINTERN PyObject *_wrap_csShaderVariableArrayChangeAll_SetSize(PyObject *self, PyObject *args) {
   int argc;
   PyObject *argv[4];
   int ii;
@@ -7108,7 +7110,7 @@ SWIGINTERN PyObject *_wrap_csShaderVariableArray_SetSize(PyObject *self, PyObjec
         _v = SWIG_CheckState(res);
       }
       if (_v) {
-        return _wrap_csShaderVariableArray_SetSize__SWIG_1(self, args);
+        return _wrap_csShaderVariableArrayChangeAll_SetSize__SWIG_1(self, args);
       }
     }
   }
@@ -7127,19 +7129,19 @@ SWIGINTERN PyObject *_wrap_csShaderVariableArray_SetSize(PyObject *self, PyObjec
         int res = SWIG_ConvertPtr(argv[2], &vptr, SWIGTYPE_p_p_csShaderVariable, 0);
         _v = SWIG_CheckState(res);
         if (_v) {
-          return _wrap_csShaderVariableArray_SetSize__SWIG_0(self, args);
+          return _wrap_csShaderVariableArrayChangeAll_SetSize__SWIG_0(self, args);
         }
       }
     }
   }
   
 fail:
-  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csShaderVariableArray_SetSize'.\n  Possible C/C++ prototypes are:\n    SetSize(size_t,csShaderVariable *const &)\n    SetSize(size_t)\n");
+  SWIG_SetErrorMsg(PyExc_NotImplementedError,"Wrong number of arguments for overloaded function 'csShaderVariableArrayChangeAll_SetSize'.\n  Possible C/C++ prototypes are:\n    SetSize(size_t,csShaderVariable *const &)\n    SetSize(size_t)\n");
   return NULL;
 }
 
 
-SWIGINTERN PyObject *_wrap_csShaderVariableArray_GetExtend(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csShaderVariableArrayChangeAll_GetExtend(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iArrayChangeAll<csShaderVariable * > *arg1 = (iArrayChangeAll<csShaderVariable * > *) 0 ;
   size_t arg2 ;
@@ -7151,15 +7153,15 @@ SWIGINTERN PyObject *_wrap_csShaderVariableArray_GetExtend(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csShaderVariableArray_GetExtend",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OO:csShaderVariableArrayChangeAll_GetExtend",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsShaderVariable_p_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArray_GetExtend" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArrayChangeAll_GetExtend" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
   }
   arg1 = reinterpret_cast< iArrayChangeAll<csShaderVariable * > * >(argp1);
   ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csShaderVariableArray_GetExtend" "', argument " "2"" of type '" "size_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csShaderVariableArrayChangeAll_GetExtend" "', argument " "2"" of type '" "size_t""'");
   } 
   arg2 = static_cast< size_t >(val2);
   {
@@ -7173,7 +7175,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csShaderVariableArray_Put(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csShaderVariableArrayChangeAll_Put(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iArrayChangeAll<csShaderVariable * > *arg1 = (iArrayChangeAll<csShaderVariable * > *) 0 ;
   size_t arg2 ;
@@ -7189,20 +7191,20 @@ SWIGINTERN PyObject *_wrap_csShaderVariableArray_Put(PyObject *SWIGUNUSEDPARM(se
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:csShaderVariableArray_Put",&obj0,&obj1,&obj2)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OOO:csShaderVariableArrayChangeAll_Put",&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsShaderVariable_p_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArray_Put" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArrayChangeAll_Put" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
   }
   arg1 = reinterpret_cast< iArrayChangeAll<csShaderVariable * > * >(argp1);
   ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csShaderVariableArray_Put" "', argument " "2"" of type '" "size_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csShaderVariableArrayChangeAll_Put" "', argument " "2"" of type '" "size_t""'");
   } 
   arg2 = static_cast< size_t >(val2);
   res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csShaderVariable, 0 |  0 );
   if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csShaderVariableArray_Put" "', argument " "3"" of type '" "csShaderVariable *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csShaderVariableArrayChangeAll_Put" "', argument " "3"" of type '" "csShaderVariable *""'"); 
   }
   temp3 = reinterpret_cast< csShaderVariable * >(argp3);
   arg3 = &temp3;
@@ -7214,7 +7216,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csShaderVariableArray_Push(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csShaderVariableArrayChangeAll_Push(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iArrayChangeAll<csShaderVariable * > *arg1 = (iArrayChangeAll<csShaderVariable * > *) 0 ;
   csShaderVariable **arg2 = 0 ;
@@ -7227,15 +7229,15 @@ SWIGINTERN PyObject *_wrap_csShaderVariableArray_Push(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csShaderVariableArray_Push",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OO:csShaderVariableArrayChangeAll_Push",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsShaderVariable_p_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArray_Push" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArrayChangeAll_Push" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
   }
   arg1 = reinterpret_cast< iArrayChangeAll<csShaderVariable * > * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csShaderVariable, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csShaderVariableArray_Push" "', argument " "2"" of type '" "csShaderVariable *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csShaderVariableArrayChangeAll_Push" "', argument " "2"" of type '" "csShaderVariable *""'"); 
   }
   temp2 = reinterpret_cast< csShaderVariable * >(argp2);
   arg2 = &temp2;
@@ -7247,7 +7249,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csShaderVariableArray_PushSmart(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csShaderVariableArrayChangeAll_PushSmart(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iArrayChangeAll<csShaderVariable * > *arg1 = (iArrayChangeAll<csShaderVariable * > *) 0 ;
   csShaderVariable **arg2 = 0 ;
@@ -7260,15 +7262,15 @@ SWIGINTERN PyObject *_wrap_csShaderVariableArray_PushSmart(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csShaderVariableArray_PushSmart",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OO:csShaderVariableArrayChangeAll_PushSmart",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsShaderVariable_p_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArray_PushSmart" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArrayChangeAll_PushSmart" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
   }
   arg1 = reinterpret_cast< iArrayChangeAll<csShaderVariable * > * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csShaderVariable, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csShaderVariableArray_PushSmart" "', argument " "2"" of type '" "csShaderVariable *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csShaderVariableArrayChangeAll_PushSmart" "', argument " "2"" of type '" "csShaderVariable *""'"); 
   }
   temp2 = reinterpret_cast< csShaderVariable * >(argp2);
   arg2 = &temp2;
@@ -7280,7 +7282,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csShaderVariableArray_Pop(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csShaderVariableArrayChangeAll_Pop(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iArrayChangeAll<csShaderVariable * > *arg1 = (iArrayChangeAll<csShaderVariable * > *) 0 ;
   csShaderVariable *result = 0 ;
@@ -7288,10 +7290,10 @@ SWIGINTERN PyObject *_wrap_csShaderVariableArray_Pop(PyObject *SWIGUNUSEDPARM(se
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csShaderVariableArray_Pop",&obj0)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"O:csShaderVariableArrayChangeAll_Pop",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsShaderVariable_p_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArray_Pop" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArrayChangeAll_Pop" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
   }
   arg1 = reinterpret_cast< iArrayChangeAll<csShaderVariable * > * >(argp1);
   result = (csShaderVariable *)(arg1)->Pop();
@@ -7302,7 +7304,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csShaderVariableArray_Insert(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csShaderVariableArrayChangeAll_Insert(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iArrayChangeAll<csShaderVariable * > *arg1 = (iArrayChangeAll<csShaderVariable * > *) 0 ;
   size_t arg2 ;
@@ -7319,20 +7321,20 @@ SWIGINTERN PyObject *_wrap_csShaderVariableArray_Insert(PyObject *SWIGUNUSEDPARM
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:csShaderVariableArray_Insert",&obj0,&obj1,&obj2)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OOO:csShaderVariableArrayChangeAll_Insert",&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsShaderVariable_p_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArray_Insert" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArrayChangeAll_Insert" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
   }
   arg1 = reinterpret_cast< iArrayChangeAll<csShaderVariable * > * >(argp1);
   ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csShaderVariableArray_Insert" "', argument " "2"" of type '" "size_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csShaderVariableArrayChangeAll_Insert" "', argument " "2"" of type '" "size_t""'");
   } 
   arg2 = static_cast< size_t >(val2);
   res3 = SWIG_ConvertPtr(obj2, &argp3, SWIGTYPE_p_csShaderVariable, 0 |  0 );
   if (!SWIG_IsOK(res3)) {
-    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csShaderVariableArray_Insert" "', argument " "3"" of type '" "csShaderVariable *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "csShaderVariableArrayChangeAll_Insert" "', argument " "3"" of type '" "csShaderVariable *""'"); 
   }
   temp3 = reinterpret_cast< csShaderVariable * >(argp3);
   arg3 = &temp3;
@@ -7344,17 +7346,17 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csShaderVariableArray_DeleteAll(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csShaderVariableArrayChangeAll_DeleteAll(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iArrayChangeAll<csShaderVariable * > *arg1 = (iArrayChangeAll<csShaderVariable * > *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csShaderVariableArray_DeleteAll",&obj0)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"O:csShaderVariableArrayChangeAll_DeleteAll",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsShaderVariable_p_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArray_DeleteAll" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArrayChangeAll_DeleteAll" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
   }
   arg1 = reinterpret_cast< iArrayChangeAll<csShaderVariable * > * >(argp1);
   (arg1)->DeleteAll();
@@ -7365,7 +7367,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csShaderVariableArray_Truncate(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csShaderVariableArrayChangeAll_Truncate(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iArrayChangeAll<csShaderVariable * > *arg1 = (iArrayChangeAll<csShaderVariable * > *) 0 ;
   size_t arg2 ;
@@ -7376,15 +7378,15 @@ SWIGINTERN PyObject *_wrap_csShaderVariableArray_Truncate(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csShaderVariableArray_Truncate",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OO:csShaderVariableArrayChangeAll_Truncate",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsShaderVariable_p_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArray_Truncate" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArrayChangeAll_Truncate" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
   }
   arg1 = reinterpret_cast< iArrayChangeAll<csShaderVariable * > * >(argp1);
   ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csShaderVariableArray_Truncate" "', argument " "2"" of type '" "size_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csShaderVariableArrayChangeAll_Truncate" "', argument " "2"" of type '" "size_t""'");
   } 
   arg2 = static_cast< size_t >(val2);
   (arg1)->Truncate(arg2);
@@ -7395,17 +7397,17 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csShaderVariableArray_Empty(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csShaderVariableArrayChangeAll_Empty(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iArrayChangeAll<csShaderVariable * > *arg1 = (iArrayChangeAll<csShaderVariable * > *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csShaderVariableArray_Empty",&obj0)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"O:csShaderVariableArrayChangeAll_Empty",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsShaderVariable_p_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArray_Empty" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArrayChangeAll_Empty" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
   }
   arg1 = reinterpret_cast< iArrayChangeAll<csShaderVariable * > * >(argp1);
   (arg1)->Empty();
@@ -7416,7 +7418,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csShaderVariableArray_DeleteIndex(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csShaderVariableArrayChangeAll_DeleteIndex(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iArrayChangeAll<csShaderVariable * > *arg1 = (iArrayChangeAll<csShaderVariable * > *) 0 ;
   size_t arg2 ;
@@ -7428,15 +7430,15 @@ SWIGINTERN PyObject *_wrap_csShaderVariableArray_DeleteIndex(PyObject *SWIGUNUSE
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csShaderVariableArray_DeleteIndex",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OO:csShaderVariableArrayChangeAll_DeleteIndex",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsShaderVariable_p_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArray_DeleteIndex" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArrayChangeAll_DeleteIndex" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
   }
   arg1 = reinterpret_cast< iArrayChangeAll<csShaderVariable * > * >(argp1);
   ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csShaderVariableArray_DeleteIndex" "', argument " "2"" of type '" "size_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csShaderVariableArrayChangeAll_DeleteIndex" "', argument " "2"" of type '" "size_t""'");
   } 
   arg2 = static_cast< size_t >(val2);
   result = (bool)(arg1)->DeleteIndex(arg2);
@@ -7447,7 +7449,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csShaderVariableArray_DeleteIndexFast(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csShaderVariableArrayChangeAll_DeleteIndexFast(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iArrayChangeAll<csShaderVariable * > *arg1 = (iArrayChangeAll<csShaderVariable * > *) 0 ;
   size_t arg2 ;
@@ -7459,15 +7461,15 @@ SWIGINTERN PyObject *_wrap_csShaderVariableArray_DeleteIndexFast(PyObject *SWIGU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csShaderVariableArray_DeleteIndexFast",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OO:csShaderVariableArrayChangeAll_DeleteIndexFast",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsShaderVariable_p_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArray_DeleteIndexFast" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArrayChangeAll_DeleteIndexFast" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
   }
   arg1 = reinterpret_cast< iArrayChangeAll<csShaderVariable * > * >(argp1);
   ecode2 = SWIG_AsVal_size_t(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csShaderVariableArray_DeleteIndexFast" "', argument " "2"" of type '" "size_t""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "csShaderVariableArrayChangeAll_DeleteIndexFast" "', argument " "2"" of type '" "size_t""'");
   } 
   arg2 = static_cast< size_t >(val2);
   result = (bool)(arg1)->DeleteIndexFast(arg2);
@@ -7478,7 +7480,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_csShaderVariableArray_Delete(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_csShaderVariableArrayChangeAll_Delete(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iArrayChangeAll<csShaderVariable * > *arg1 = (iArrayChangeAll<csShaderVariable * > *) 0 ;
   csShaderVariable **arg2 = 0 ;
@@ -7491,15 +7493,15 @@ SWIGINTERN PyObject *_wrap_csShaderVariableArray_Delete(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csShaderVariableArray_Delete",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OO:csShaderVariableArrayChangeAll_Delete",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsShaderVariable_p_t, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArray_Delete" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csShaderVariableArrayChangeAll_Delete" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
   }
   arg1 = reinterpret_cast< iArrayChangeAll<csShaderVariable * > * >(argp1);
   res2 = SWIG_ConvertPtr(obj1, &argp2, SWIGTYPE_p_csShaderVariable, 0 |  0 );
   if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csShaderVariableArray_Delete" "', argument " "2"" of type '" "csShaderVariable *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "csShaderVariableArrayChangeAll_Delete" "', argument " "2"" of type '" "csShaderVariable *""'"); 
   }
   temp2 = reinterpret_cast< csShaderVariable * >(argp2);
   arg2 = &temp2;
@@ -7511,17 +7513,17 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_delete_csShaderVariableArray(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_delete_csShaderVariableArrayChangeAll(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   iArrayChangeAll<csShaderVariable * > *arg1 = (iArrayChangeAll<csShaderVariable * > *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_csShaderVariableArray",&obj0)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"O:delete_csShaderVariableArrayChangeAll",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iArrayChangeAllTcsShaderVariable_p_t, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_csShaderVariableArray" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_csShaderVariableArrayChangeAll" "', argument " "1"" of type '" "iArrayChangeAll<csShaderVariable * > *""'"); 
   }
   arg1 = reinterpret_cast< iArrayChangeAll<csShaderVariable * > * >(argp1);
   delete arg1;
@@ -7533,7 +7535,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *csShaderVariableArray_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *csShaderVariableArrayChangeAll_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
   if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iArrayChangeAllTcsShaderVariable_p_t, SWIG_NewClientData(obj));
@@ -10592,21 +10594,21 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"csShaderVariableArrayChangeElements_Top", _wrap_csShaderVariableArrayChangeElements_Top, METH_VARARGS, NULL},
 	 { (char *)"delete_csShaderVariableArrayChangeElements", _wrap_delete_csShaderVariableArrayChangeElements, METH_VARARGS, NULL},
 	 { (char *)"csShaderVariableArrayChangeElements_swigregister", csShaderVariableArrayChangeElements_swigregister, METH_VARARGS, NULL},
-	 { (char *)"csShaderVariableArray_SetSize", _wrap_csShaderVariableArray_SetSize, METH_VARARGS, NULL},
-	 { (char *)"csShaderVariableArray_GetExtend", _wrap_csShaderVariableArray_GetExtend, METH_VARARGS, NULL},
-	 { (char *)"csShaderVariableArray_Put", _wrap_csShaderVariableArray_Put, METH_VARARGS, NULL},
-	 { (char *)"csShaderVariableArray_Push", _wrap_csShaderVariableArray_Push, METH_VARARGS, NULL},
-	 { (char *)"csShaderVariableArray_PushSmart", _wrap_csShaderVariableArray_PushSmart, METH_VARARGS, NULL},
-	 { (char *)"csShaderVariableArray_Pop", _wrap_csShaderVariableArray_Pop, METH_VARARGS, NULL},
-	 { (char *)"csShaderVariableArray_Insert", _wrap_csShaderVariableArray_Insert, METH_VARARGS, NULL},
-	 { (char *)"csShaderVariableArray_DeleteAll", _wrap_csShaderVariableArray_DeleteAll, METH_VARARGS, NULL},
-	 { (char *)"csShaderVariableArray_Truncate", _wrap_csShaderVariableArray_Truncate, METH_VARARGS, NULL},
-	 { (char *)"csShaderVariableArray_Empty", _wrap_csShaderVariableArray_Empty, METH_VARARGS, NULL},
-	 { (char *)"csShaderVariableArray_DeleteIndex", _wrap_csShaderVariableArray_DeleteIndex, METH_VARARGS, NULL},
-	 { (char *)"csShaderVariableArray_DeleteIndexFast", _wrap_csShaderVariableArray_DeleteIndexFast, METH_VARARGS, NULL},
-	 { (char *)"csShaderVariableArray_Delete", _wrap_csShaderVariableArray_Delete, METH_VARARGS, NULL},
-	 { (char *)"delete_csShaderVariableArray", _wrap_delete_csShaderVariableArray, METH_VARARGS, NULL},
-	 { (char *)"csShaderVariableArray_swigregister", csShaderVariableArray_swigregister, METH_VARARGS, NULL},
+	 { (char *)"csShaderVariableArrayChangeAll_SetSize", _wrap_csShaderVariableArrayChangeAll_SetSize, METH_VARARGS, NULL},
+	 { (char *)"csShaderVariableArrayChangeAll_GetExtend", _wrap_csShaderVariableArrayChangeAll_GetExtend, METH_VARARGS, NULL},
+	 { (char *)"csShaderVariableArrayChangeAll_Put", _wrap_csShaderVariableArrayChangeAll_Put, METH_VARARGS, NULL},
+	 { (char *)"csShaderVariableArrayChangeAll_Push", _wrap_csShaderVariableArrayChangeAll_Push, METH_VARARGS, NULL},
+	 { (char *)"csShaderVariableArrayChangeAll_PushSmart", _wrap_csShaderVariableArrayChangeAll_PushSmart, METH_VARARGS, NULL},
+	 { (char *)"csShaderVariableArrayChangeAll_Pop", _wrap_csShaderVariableArrayChangeAll_Pop, METH_VARARGS, NULL},
+	 { (char *)"csShaderVariableArrayChangeAll_Insert", _wrap_csShaderVariableArrayChangeAll_Insert, METH_VARARGS, NULL},
+	 { (char *)"csShaderVariableArrayChangeAll_DeleteAll", _wrap_csShaderVariableArrayChangeAll_DeleteAll, METH_VARARGS, NULL},
+	 { (char *)"csShaderVariableArrayChangeAll_Truncate", _wrap_csShaderVariableArrayChangeAll_Truncate, METH_VARARGS, NULL},
+	 { (char *)"csShaderVariableArrayChangeAll_Empty", _wrap_csShaderVariableArrayChangeAll_Empty, METH_VARARGS, NULL},
+	 { (char *)"csShaderVariableArrayChangeAll_DeleteIndex", _wrap_csShaderVariableArrayChangeAll_DeleteIndex, METH_VARARGS, NULL},
+	 { (char *)"csShaderVariableArrayChangeAll_DeleteIndexFast", _wrap_csShaderVariableArrayChangeAll_DeleteIndexFast, METH_VARARGS, NULL},
+	 { (char *)"csShaderVariableArrayChangeAll_Delete", _wrap_csShaderVariableArrayChangeAll_Delete, METH_VARARGS, NULL},
+	 { (char *)"delete_csShaderVariableArrayChangeAll", _wrap_delete_csShaderVariableArrayChangeAll, METH_VARARGS, NULL},
+	 { (char *)"csShaderVariableArrayChangeAll_swigregister", csShaderVariableArrayChangeAll_swigregister, METH_VARARGS, NULL},
 	 { (char *)"csImageBaseBase_IncRef", _wrap_csImageBaseBase_IncRef, METH_VARARGS, NULL},
 	 { (char *)"csImageBaseBase_DecRef", _wrap_csImageBaseBase_DecRef, METH_VARARGS, NULL},
 	 { (char *)"csImageBaseBase_GetRefCount", _wrap_csImageBaseBase_GetRefCount, METH_VARARGS, NULL},
@@ -10765,6 +10767,9 @@ static void *_p_iDocumentSystemTo_p_iBase(void *x) {
 static void *_p_iImageTo_p_iBase(void *x) {
     return (void *)((iBase *)  ((iImage *) x));
 }
+static void *_p_iAnimatedImageTo_p_iBase(void *x) {
+    return (void *)((iBase *)  ((iAnimatedImage *) x));
+}
 static void *_p_iPluginIteratorTo_p_iBase(void *x) {
     return (void *)((iBase *)  ((iPluginIterator *) x));
 }
@@ -10809,6 +10814,9 @@ static void *_p_iDataBufferTo_p_iBase(void *x) {
 }
 static void *_p_iEventHandlerTo_p_iBase(void *x) {
     return (void *)((iBase *)  ((iEventHandler *) x));
+}
+static void *_p_iProcTextureTo_p_iBase(void *x) {
+    return (void *)((iBase *)  ((iProcTexture *) x));
 }
 static void *_p_iComponentTo_p_iBase(void *x) {
     return (void *)((iBase *)  ((iComponent *) x));
@@ -10967,6 +10975,7 @@ static swig_type_info _swigt__p_iReporterListener = {"_p_iReporterListener", 0, 
 static swig_type_info _swigt__p_iEvent = {"_p_iEvent", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iReporter = {"_p_iReporter", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iDocumentSystem = {"_p_iDocumentSystem", 0, 0, 0, 0, 0};
+static swig_type_info _swigt__p_iAnimatedImage = {"_p_iAnimatedImage", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iPluginIterator = {"_p_iPluginIterator", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iEventAttributeIterator = {"_p_iEventAttributeIterator", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iObjectRegistryIterator = {"_p_iObjectRegistryIterator", 0, 0, 0, 0, 0};
@@ -10979,6 +10988,7 @@ static swig_type_info _swigt__p_iClipper2D = {"_p_iClipper2D", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iCommandLineParser = {"_p_iCommandLineParser", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iDataBuffer = {"_p_iDataBuffer", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iEventHandler = {"_p_iEventHandler", 0, 0, 0, 0, 0};
+static swig_type_info _swigt__p_iProcTexture = {"_p_iProcTexture", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iVFS = {"_p_iVFS", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iComponent = {"_p_iComponent", 0, 0, 0, 0, 0};
 static swig_type_info _swigt__p_iMouseDriver = {"_p_iMouseDriver", 0, 0, 0, 0, 0};
@@ -11065,6 +11075,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_csVector3,
   &_swigt__p_csVector4,
   &_swigt__p_float,
+  &_swigt__p_iAnimatedImage,
   &_swigt__p_iArrayChangeAllTcsShaderVariable_p_t,
   &_swigt__p_iArrayChangeElementsTcsShaderVariable_p_t,
   &_swigt__p_iArrayReadOnlyTcsShaderVariable_p_t,
@@ -11108,6 +11119,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_iPath,
   &_swigt__p_iPluginIterator,
   &_swigt__p_iPluginManager,
+  &_swigt__p_iProcTexture,
   &_swigt__p_iRenderBuffer,
   &_swigt__p_iReporter,
   &_swigt__p_iReporterIterator,
@@ -11202,6 +11214,7 @@ static swig_cast_info _swigc__p_iReporterListener[] = {{&_swigt__p_iReporterList
 static swig_cast_info _swigc__p_iEvent[] = {{&_swigt__p_iEvent, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iReporter[] = {{&_swigt__p_iReporter, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iDocumentSystem[] = {{&_swigt__p_iDocumentSystem, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_iAnimatedImage[] = {{&_swigt__p_iAnimatedImage, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iPluginIterator[] = {{&_swigt__p_iPluginIterator, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iEventAttributeIterator[] = {{&_swigt__p_iEventAttributeIterator, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iObjectRegistryIterator[] = {{&_swigt__p_iObjectRegistryIterator, 0, 0, 0},{0, 0, 0, 0}};
@@ -11214,6 +11227,7 @@ static swig_cast_info _swigc__p_iClipper2D[] = {{&_swigt__p_iClipper2D, 0, 0, 0}
 static swig_cast_info _swigc__p_iCommandLineParser[] = {{&_swigt__p_iCommandLineParser, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iDataBuffer[] = {{&_swigt__p_iDataBuffer, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iEventHandler[] = {{&_swigt__p_iEventHandler, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_iProcTexture[] = {{&_swigt__p_iProcTexture, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iVFS[] = {{&_swigt__p_iVFS, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iComponent[] = {{&_swigt__p_iComponent, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iMouseDriver[] = {{&_swigt__p_iMouseDriver, 0, 0, 0},{0, 0, 0, 0}};
@@ -11236,7 +11250,7 @@ static swig_cast_info _swigc__p_iEventCord[] = {{&_swigt__p_iEventCord, 0, 0, 0}
 static swig_cast_info _swigc__p_iPluginManager[] = {{&_swigt__p_iPluginManager, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iCacheManager[] = {{&_swigt__p_iCacheManager, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iConfigManager[] = {{&_swigt__p_iConfigManager, 0, 0, 0},{0, 0, 0, 0}};
-static swig_cast_info _swigc__p_iBase[] = {  {&_swigt__p_iFile, _p_iFileTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1TcsObject_iObject_t, _p_scfImplementation1TcsObject_iObject_tTo_p_iBase, 0, 0},  {&_swigt__p_csImageMemory, _p_csImageMemoryTo_p_iBase, 0, 0},  {&_swigt__p_iEventOutlet, _p_iEventOutletTo_p_iBase, 0, 0},  {&_swigt__p_iKeyComposer, _p_iKeyComposerTo_p_iBase, 0, 0},  {&_swigt__p_iImageIO, _p_iImageIOTo_p_iBase, 0, 0},  {&_swigt__p_iImage, _p_iImageTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1TcsImageBase_iImage_t, _p_scfImplementation1TcsImageBase_iImage_tTo_p_iBase, 0, 0},  {&_swigt__p_iStringArray, _p_iStringArrayTo_p_iBase, 0, 0},  {&_swigt__p_iFactory, _p_iFactoryTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1TcsPath_iPath_t, _p_scfImplementation1TcsPath_iPath_tTo_p_iBase, 0, 0},  {&_swigt__p_iBase, 0, 0, 0},  {&_swigt__p_iObjectRegistry, _p_iObjectRegistryTo_p_iBase, 0, 0},  {&_swigt__p_iEventNameRegistry, _p_iEventNameRegistryTo_p_iBase, 0, 0},  {&_swigt__p_iDocument, _p_iDocumentTo_p_iBase, 0, 0},  {&_swigt__p_iEventQueue, _p_iEventQueueTo_p_iBase, 0, 0},  {&_swigt__p_iKeyboardDriver, _p_iKeyboardDriverTo_p_iBase, 0, 0},  {&_swigt__p_iObjectNameChangeListener, _p_iObjectNameChangeListenerTo_p_iBase, 0, 0},  {&_swigt__p_iReporterListener, _p_iReporterListenerTo_p_iBase, 0, 0},  {&_swigt__p_iEvent, _p_iEventTo_p_iBase, 0, 0},  {&_swigt__p_iReporter, _p_iReporterTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentSystem, _p_iDocumentSystemTo_p_iBase, 0, 0},  {&_swigt__p_iPluginIterator, _p_iPluginIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iEventAttributeIterator, _p_iEventAttributeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iObjectRegistryIterator, _p_iObjectRegistryIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iObjectIterator, _p_iObjectIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iReporterIterator, _p_iReporterIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iConfigIterator, _p_iConfigIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentAttributeIterator, _p_iDocumentAttributeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentNodeIterator, _p_iDocumentNodeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iClipper2D, _p_iClipper2DTo_p_iBase, 0, 0},  {&_swigt__p_iCommandLineParser, _p_iCommandLineParserTo_p_iBase, 0, 0},  {&_swigt__p_iDataBuffer, _p_iDataBufferTo_p_iBase, 0, 0},  {&_swigt__p_iEventHandler, _p_iEventHandlerTo_p_iBase, 0, 0},  {&_swigt__p_iVFS, _p_iVFSTo_p_iBase, 0, 0},  {&_swigt__p_iComponent, _p_iComponentTo_p_iBase, 0, 0},  {&_swigt__p_iSCF, _p_iSCFTo_p_iBase, 0, 0},  {&_swigt__p_iMouseDriver, _p_iMouseDriverTo_p_iBase, 0, 0},  {&_swigt__p_iJoystickDriver, _p_iJoystickDriverTo_p_iBase, 0, 0},  {&_swigt__p_csImageBase, _p_csImageBaseTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementationExt0TcsImageMemory_csImageBase_t, _p_scfImplementationExt0TcsImageMemory_csImageBase_tTo_p_iBase, 0, 0},  {&_swigt__p_iConfigFile, _p_iConfigFileTo_p_iBase, 0, 0},  {&_swigt__p_csConfigFile, _p_csConfigFileTo_p_iBase, 0, 0},  {&_swigt__p_iEventPlug, _p_iEventPlugTo_p_iBase, 0, 0},  {&_swigt__p_iObject, _p_iObjectTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentAttribute, _p_iDocumentAttributeTo_p_iBase, 0, 0},  {&_swigt__p_csObject, _p_csObjectTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentNode, _p_iDocumentNodeTo_p_iBase, 0, 0},  {&_swigt__p_iString, _p_iStringTo_p_iBase, 0, 0},  {&_swigt__p_iPath, _p_iPathTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1TcsConfigFile_iConfigFile_t, _p_scfImplementation1TcsConfigFile_iConfigFile_tTo_p_iBase, 0, 0},  {&_swigt__p_iStringSet, _p_iStringSetTo_p_iBase, 0, 0},  {&_swigt__p_iArrayChangeAllTcsShaderVariable_p_t, _p_iArrayChangeAllTcsShaderVariable_p_tTo_p_iBase, 0, 0},  {&_swigt__p_iArrayChangeElementsTcsShaderVariable_p_t, _p_iArrayChangeElementsTcsShaderVariable_p_tTo_p_iBase, 0, 0},  {&_swigt__p_iArrayReadOnlyTcsShaderVariable_p_t, _p_iArrayReadOnlyTcsShaderVariable_p_tTo_p_iBase, 0, 0},  {&_swigt__p_iVirtualClock, _p_iVirtualClockTo_p_iBase, 0, 0},  {&_swigt__p_iTriangleMesh, _p_iTriangleMeshTo_p_iBase, 0, 0},  {&_swigt__p_iDebugHelper, _p_iDebugHelperTo_p_iBase, 0, 0},  {&_swigt__p_iEventCord, _p_iEventCordTo_p_iBase, 0, 0},  {&_swigt__p_iPluginManager, _p_iPluginManagerTo_p_iBase, 0, 0},  {&_swigt__p_iCacheManager, _p_iCacheManagerTo_p_iBase, 0, 0},  {&_swigt__p_iConfigManager, _p_iConfigManagerTo_p_iBase, 0, 0},  {&_swigt__p_iShaderVariableAccessor, _p_iShaderVariableAccessorTo_p_iBase, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_iBase[] = {  {&_swigt__p_iFile, _p_iFileTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1TcsObject_iObject_t, _p_scfImplementation1TcsObject_iObject_tTo_p_iBase, 0, 0},  {&_swigt__p_csImageMemory, _p_csImageMemoryTo_p_iBase, 0, 0},  {&_swigt__p_iEventOutlet, _p_iEventOutletTo_p_iBase, 0, 0},  {&_swigt__p_iKeyComposer, _p_iKeyComposerTo_p_iBase, 0, 0},  {&_swigt__p_iImageIO, _p_iImageIOTo_p_iBase, 0, 0},  {&_swigt__p_iImage, _p_iImageTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1TcsImageBase_iImage_t, _p_scfImplementation1TcsImageBase_iImage_tTo_p_iBase, 0, 0},  {&_swigt__p_iStringArray, _p_iStringArrayTo_p_iBase, 0, 0},  {&_swigt__p_iFactory, _p_iFactoryTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1TcsPath_iPath_t, _p_scfImplementation1TcsPath_iPath_tTo_p_iBase, 0, 0},  {&_swigt__p_iBase, 0, 0, 0},  {&_swigt__p_iObjectRegistry, _p_iObjectRegistryTo_p_iBase, 0, 0},  {&_swigt__p_iEventNameRegistry, _p_iEventNameRegistryTo_p_iBase, 0, 0},  {&_swigt__p_iDocument, _p_iDocumentTo_p_iBase, 0, 0},  {&_swigt__p_iEventQueue, _p_iEventQueueTo_p_iBase, 0, 0},  {&_swigt__p_iKeyboardDriver, _p_iKeyboardDriverTo_p_iBase, 0, 0},  {&_swigt__p_iObjectNameChangeListener, _p_iObjectNameChangeListenerTo_p_iBase, 0, 0},  {&_swigt__p_iReporterListener, _p_iReporterListenerTo_p_iBase, 0, 0},  {&_swigt__p_iEvent, _p_iEventTo_p_iBase, 0, 0},  {&_swigt__p_iReporter, _p_iReporterTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentSystem, _p_iDocumentSystemTo_p_iBase, 0, 0},  {&_swigt__p_iAnimatedImage, _p_iAnimatedImageTo_p_iBase, 0, 0},  {&_swigt__p_iPluginIterator, _p_iPluginIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iEventAttributeIterator, _p_iEventAttributeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iObjectRegistryIterator, _p_iObjectRegistryIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iObjectIterator, _p_iObjectIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iReporterIterator, _p_iReporterIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iConfigIterator, _p_iConfigIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentAttributeIterator, _p_iDocumentAttributeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentNodeIterator, _p_iDocumentNodeIteratorTo_p_iBase, 0, 0},  {&_swigt__p_iClipper2D, _p_iClipper2DTo_p_iBase, 0, 0},  {&_swigt__p_iCommandLineParser, _p_iCommandLineParserTo_p_iBase, 0, 0},  {&_swigt__p_iDataBuffer, _p_iDataBufferTo_p_iBase, 0, 0},  {&_swigt__p_iEventHandler, _p_iEventHandlerTo_p_iBase, 0, 0},  {&_swigt__p_iProcTexture, _p_iProcTextureTo_p_iBase, 0, 0},  {&_swigt__p_iVFS, _p_iVFSTo_p_iBase, 0, 0},  {&_swigt__p_iComponent, _p_iComponentTo_p_iBase, 0, 0},  {&_swigt__p_iSCF, _p_iSCFTo_p_iBase, 0, 0},  {&_swigt__p_iMouseDriver, _p_iMouseDriverTo_p_iBase, 0, 0},  {&_swigt__p_iJoystickDriver, _p_iJoystickDriverTo_p_iBase, 0, 0},  {&_swigt__p_csImageBase, _p_csImageBaseTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementationExt0TcsImageMemory_csImageBase_t, _p_scfImplementationExt0TcsImageMemory_csImageBase_tTo_p_iBase, 0, 0},  {&_swigt__p_iConfigFile, _p_iConfigFileTo_p_iBase, 0, 0},  {&_swigt__p_csConfigFile, _p_csConfigFileTo_p_iBase, 0, 0},  {&_swigt__p_iEventPlug, _p_iEventPlugTo_p_iBase, 0, 0},  {&_swigt__p_iObject, _p_iObjectTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentAttribute, _p_iDocumentAttributeTo_p_iBase, 0, 0},  {&_swigt__p_csObject, _p_csObjectTo_p_iBase, 0, 0},  {&_swigt__p_iDocumentNode, _p_iDocumentNodeTo_p_iBase, 0, 0},  {&_swigt__p_iString, _p_iStringTo_p_iBase, 0, 0},  {&_swigt__p_iPath, _p_iPathTo_p_iBase, 0, 0},  {&_swigt__p_scfImplementation1TcsConfigFile_iConfigFile_t, _p_scfImplementation1TcsConfigFile_iConfigFile_tTo_p_iBase, 0, 0},  {&_swigt__p_iStringSet, _p_iStringSetTo_p_iBase, 0, 0},  {&_swigt__p_iArrayChangeElementsTcsShaderVariable_p_t, _p_iArrayChangeElementsTcsShaderVariable_p_tTo_p_iBase, 0, 0},  {&_swigt__p_iArrayChangeAllTcsShaderVariable_p_t, _p_iArrayChangeAllTcsShaderVariable_p_tTo_p_iBase, 0, 0},  {&_swigt__p_iArrayReadOnlyTcsShaderVariable_p_t, _p_iArrayReadOnlyTcsShaderVariable_p_tTo_p_iBase, 0, 0},  {&_swigt__p_iVirtualClock, _p_iVirtualClockTo_p_iBase, 0, 0},  {&_swigt__p_iTriangleMesh, _p_iTriangleMeshTo_p_iBase, 0, 0},  {&_swigt__p_iDebugHelper, _p_iDebugHelperTo_p_iBase, 0, 0},  {&_swigt__p_iEventCord, _p_iEventCordTo_p_iBase, 0, 0},  {&_swigt__p_iPluginManager, _p_iPluginManagerTo_p_iBase, 0, 0},  {&_swigt__p_iCacheManager, _p_iCacheManagerTo_p_iBase, 0, 0},  {&_swigt__p_iConfigManager, _p_iConfigManagerTo_p_iBase, 0, 0},  {&_swigt__p_iShaderVariableAccessor, _p_iShaderVariableAccessorTo_p_iBase, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iImage[] = {  {&_swigt__p_csImageBase, _p_csImageBaseTo_p_iImage, 0, 0},  {&_swigt__p_scfImplementationExt0TcsImageMemory_csImageBase_t, _p_scfImplementationExt0TcsImageMemory_csImageBase_tTo_p_iImage, 0, 0},  {&_swigt__p_csImageMemory, _p_csImageMemoryTo_p_iImage, 0, 0},  {&_swigt__p_scfImplementation1TcsImageBase_iImage_t, _p_scfImplementation1TcsImageBase_iImage_tTo_p_iImage, 0, 0},  {&_swigt__p_iImage, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iRenderBuffer[] = {  {&_swigt__p_iRenderBuffer, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_iSCF[] = {  {&_swigt__p_iSCF, 0, 0, 0},{0, 0, 0, 0}};
@@ -11301,6 +11315,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_csVector3,
   _swigc__p_csVector4,
   _swigc__p_float,
+  _swigc__p_iAnimatedImage,
   _swigc__p_iArrayChangeAllTcsShaderVariable_p_t,
   _swigc__p_iArrayChangeElementsTcsShaderVariable_p_t,
   _swigc__p_iArrayReadOnlyTcsShaderVariable_p_t,
@@ -11344,6 +11359,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_iPath,
   _swigc__p_iPluginIterator,
   _swigc__p_iPluginManager,
+  _swigc__p_iProcTexture,
   _swigc__p_iRenderBuffer,
   _swigc__p_iReporter,
   _swigc__p_iReporterIterator,

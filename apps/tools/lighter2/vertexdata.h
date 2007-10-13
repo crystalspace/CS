@@ -32,6 +32,35 @@ namespace lighter
     Vector3Array normals;
     Vector2Array uvs;
 
+    typedef csDirtyAccessArray<float> FloatArray;
+    size_t customDataTotalComp;
+    FloatArray customData;
+
+    ObjectBaseVertexData() : customDataTotalComp (0) {}
+
+    size_t AddCustomData (size_t numComps)
+    {
+      CS_ASSERT(positions.GetSize() == 0);
+      size_t r = customDataTotalComp;
+      customDataTotalComp += numComps;
+      return r;
+    }
+
+    void ResizeCustomData ()
+    {
+      customData.SetSize (customDataTotalComp * positions.GetSize());
+    }
+
+    float* GetCustomData (size_t vert, size_t comp)
+    {
+      return customData.GetArray() + (vert * customDataTotalComp) + comp;
+    }
+
+    const float* GetCustomData (size_t vert, size_t comp) const
+    {
+      return customData.GetArray() + (vert * customDataTotalComp) + comp;
+    }
+
     //Helper functions
 
     /// Split one vertex, duplicate it and return index for new one
@@ -40,6 +69,13 @@ namespace lighter
       size_t index = positions.Push (positions[oldIndex]);
       normals.Push (normals[oldIndex]);
       uvs.Push (uvs[oldIndex]);
+      
+      customData.SetSize (customData.GetSize() + customDataTotalComp);
+      const float* cds = GetCustomData (oldIndex, 0);
+      float* cdd = GetCustomData (index, 0);
+      for (size_t c = 0; c < customDataTotalComp; c++)
+        *cdd++ = *cds++;
+
       return index;
     }
 
@@ -59,6 +95,15 @@ namespace lighter
       const csVector2& uv0 = uvs[i0];
       const csVector2& uv1 = uvs[i1];
       uvs.Push (csLerp (uv0, uv1, t));
+
+      customData.SetSize (customData.GetSize() + customDataTotalComp);
+      const float* cds1 = GetCustomData (i0, 0);
+      const float* cds2 = GetCustomData (i1, 0);
+      float* cdd = GetCustomData (index, 0);
+      for (size_t c = 0; c < customDataTotalComp; c++)
+      {
+        *cdd++ = csLerp (*cds1++, *cds2++, t);
+      }
 
       return index;
     }

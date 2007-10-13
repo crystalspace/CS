@@ -188,6 +188,11 @@ csBugPlug::~csBugPlug ()
   }
 
   delete shadow;
+
+  if (do_profiler_log)
+  {
+    CS_PROFILER_STOP_LOGGING();
+  }
 }
 
 bool csBugPlug::Initialize (iObjectRegistry *object_reg)
@@ -1674,6 +1679,8 @@ bool csBugPlug::HandleFrame (iEvent& /*event*/)
       {
         int norm_color = G3D->GetDriver2D ()->FindRGB (0, 0, 255);
         int denorm_color = G3D->GetDriver2D ()->FindRGB (128, 0, 255);
+        int tang_color = G3D->GetDriver2D ()->FindRGB (255, 0, 0);
+        int bitang_color = G3D->GetDriver2D ()->FindRGB (0, 255, 0);
         int num;
         
         csRenderMesh** rmeshes = 
@@ -1690,10 +1697,31 @@ bool csBugPlug::HandleFrame (iEvent& /*event*/)
             iRenderBuffer* bufIndex = rmeshes[n]->buffers->GetRenderBuffer (
               CS_BUFFER_INDEX);
             if (!bufPos || !bufNorm || !bufIndex) continue;
+            iRenderBuffer* bufTang = rmeshes[n]->buffers->GetRenderBuffer (
+              CS_BUFFER_TANGENT);
+            iRenderBuffer* bufBitang = rmeshes[n]->buffers->GetRenderBuffer (
+              CS_BUFFER_BINORMAL);
 
             // @@@ FIXME: Handle other component types.
             csRenderBufferLock<csVector3> positions (bufPos, CS_BUF_LOCK_READ);
             csRenderBufferLock<csVector3> normals (bufNorm, CS_BUF_LOCK_READ);
+
+            const size_t bufLockSize = sizeof (csRenderBufferLock<csVector3>);
+            uint8 tangLockStore[bufLockSize * 2];
+            csRenderBufferLock<csVector3>* tangents = 0;
+            if (bufTang != 0)
+            {
+              tangents = (csRenderBufferLock<csVector3>*)tangLockStore;
+              new (tangents) csRenderBufferLock<csVector3> (bufTang, 
+                CS_BUF_LOCK_READ);
+            }
+            csRenderBufferLock<csVector3>* bitangents = 0;
+            if (bufBitang != 0)
+            {
+              bitangents = ((csRenderBufferLock<csVector3>*)tangLockStore) + 1;
+              new (bitangents) csRenderBufferLock<csVector3> (bufBitang, 
+                CS_BUF_LOCK_READ);
+            }
 
             CS::TriangleIndicesStream<size_t> tris (bufIndex, rmeshes[n]->meshtype,
               rmeshes[n]->indexstart, rmeshes[n]->indexend);
@@ -1709,8 +1737,21 @@ bool csBugPlug::HandleFrame (iEvent& /*event*/)
                 // @@@ FIXME: Should perhaps be configurable
                 const float normScale = 0.5f; 
                 G3D->DrawLine (p, p+n*normScale, fov, color);
+                if (tangents != 0)
+                {
+                  csVector3 tng = tr_o2c.Other2ThisRelative ((*tangents)[tri[t]]);
+                  G3D->DrawLine (p, p+tng*normScale, fov, tang_color);
+                }
+                if (bitangents != 0)
+                {
+                  csVector3 bit = tr_o2c.Other2ThisRelative ((*bitangents)[tri[t]]);
+                  G3D->DrawLine (p, p+bit*normScale, fov, bitang_color);
+                }
               }
             }
+
+            if (tangents != 0) tangents->~csRenderBufferLock<csVector3>();
+            if (bitangents != 0) bitangents->~csRenderBufferLock<csVector3>();
           }
         }
       }

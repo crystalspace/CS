@@ -49,6 +49,9 @@ del types
 
 
 import core
+import iengine
+import ivideo
+import csgfx
 _SetSCFPointer = _cstool._SetSCFPointer
 _GetSCFPointer = _cstool._GetSCFPointer
 if not "core" in dir():
@@ -56,31 +59,46 @@ if not "core" in dir():
 core.AddSCFLink(_SetSCFPointer)
 CSMutableArrayHelper = core.CSMutableArrayHelper
 
-class pycsColliderWrapper(core.csObject):
+class scfFakecsColliderWrapper(_object):
     __swig_setmethods__ = {}
-    for _s in [core.csObject]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, pycsColliderWrapper, name, value)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, scfFakecsColliderWrapper, name, value)
     __swig_getmethods__ = {}
-    for _s in [core.csObject]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, pycsColliderWrapper, name)
+    __getattr__ = lambda self, name: _swig_getattr(self, scfFakecsColliderWrapper, name)
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _cstool.new_scfFakecsColliderWrapper(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cstool.delete_scfFakecsColliderWrapper
+    __del__ = lambda self : None;
+scfFakecsColliderWrapper_swigregister = _cstool.scfFakecsColliderWrapper_swigregister
+scfFakecsColliderWrapper_swigregister(scfFakecsColliderWrapper)
+
+class scfColliderWrapper(core.csObject,scfFakecsColliderWrapper):
+    __swig_setmethods__ = {}
+    for _s in [core.csObject,scfFakecsColliderWrapper]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, scfColliderWrapper, name, value)
+    __swig_getmethods__ = {}
+    for _s in [core.csObject,scfFakecsColliderWrapper]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, scfColliderWrapper, name)
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def IncRef(*args): return _cstool.pycsColliderWrapper_IncRef(*args)
-    def DecRef(*args): return _cstool.pycsColliderWrapper_DecRef(*args)
-    def GetRefCount(*args): return _cstool.pycsColliderWrapper_GetRefCount(*args)
-    def QueryInterface(*args): return _cstool.pycsColliderWrapper_QueryInterface(*args)
-    def AddRefOwner(*args): return _cstool.pycsColliderWrapper_AddRefOwner(*args)
-    def RemoveRefOwner(*args): return _cstool.pycsColliderWrapper_RemoveRefOwner(*args)
-    def GetInterfaceMetadata(*args): return _cstool.pycsColliderWrapper_GetInterfaceMetadata(*args)
-pycsColliderWrapper_swigregister = _cstool.pycsColliderWrapper_swigregister
-pycsColliderWrapper_swigregister(pycsColliderWrapper)
+    def IncRef(*args): return _cstool.scfColliderWrapper_IncRef(*args)
+    def DecRef(*args): return _cstool.scfColliderWrapper_DecRef(*args)
+    def GetRefCount(*args): return _cstool.scfColliderWrapper_GetRefCount(*args)
+    def QueryInterface(*args): return _cstool.scfColliderWrapper_QueryInterface(*args)
+    def AddRefOwner(*args): return _cstool.scfColliderWrapper_AddRefOwner(*args)
+    def RemoveRefOwner(*args): return _cstool.scfColliderWrapper_RemoveRefOwner(*args)
+    def GetInterfaceMetadata(*args): return _cstool.scfColliderWrapper_GetInterfaceMetadata(*args)
+scfColliderWrapper_swigregister = _cstool.scfColliderWrapper_swigregister
+scfColliderWrapper_swigregister(scfColliderWrapper)
 
-class csColliderWrapper(pycsColliderWrapper):
+class csColliderWrapper(scfColliderWrapper):
     __swig_setmethods__ = {}
-    for _s in [pycsColliderWrapper]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    for _s in [scfColliderWrapper]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
     __setattr__ = lambda self, name, value: _swig_setattr(self, csColliderWrapper, name, value)
     __swig_getmethods__ = {}
-    for _s in [pycsColliderWrapper]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    for _s in [scfColliderWrapper]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
     __getattr__ = lambda self, name: _swig_getattr(self, csColliderWrapper, name)
     __repr__ = _swig_repr
     def __init__(self, *args): 
@@ -612,6 +630,88 @@ class csMemoryPen(iPen):
     def WriteBoxed(*args): return _cstool.csMemoryPen_WriteBoxed(*args)
 csMemoryPen_swigregister = _cstool.csMemoryPen_swigregister
 csMemoryPen_swigregister(csMemoryPen)
+
+class scfProcTexture(core.csObject,iengine.iTextureWrapper,core.iProcTexture):
+    __swig_setmethods__ = {}
+    for _s in [core.csObject,iengine.iTextureWrapper,core.iProcTexture]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, scfProcTexture, name, value)
+    __swig_getmethods__ = {}
+    for _s in [core.csObject,iengine.iTextureWrapper,core.iProcTexture]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, scfProcTexture, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def IncRef(*args): return _cstool.scfProcTexture_IncRef(*args)
+    def DecRef(*args): return _cstool.scfProcTexture_DecRef(*args)
+    def GetRefCount(*args): return _cstool.scfProcTexture_GetRefCount(*args)
+    def QueryInterface(*args): return _cstool.scfProcTexture_QueryInterface(*args)
+    def AddRefOwner(*args): return _cstool.scfProcTexture_AddRefOwner(*args)
+    def RemoveRefOwner(*args): return _cstool.scfProcTexture_RemoveRefOwner(*args)
+    def GetInterfaceMetadata(*args): return _cstool.scfProcTexture_GetInterfaceMetadata(*args)
+scfProcTexture_swigregister = _cstool.scfProcTexture_swigregister
+scfProcTexture_swigregister(scfProcTexture)
+
+class iProcTexCallback(core.iBase):
+    __swig_setmethods__ = {}
+    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iProcTexCallback, name, value)
+    __swig_getmethods__ = {}
+    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, iProcTexCallback, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    def GetProcTexture(*args): return _cstool.iProcTexCallback_GetProcTexture(*args)
+    __swig_destroy__ = _cstool.delete_iProcTexCallback
+    __del__ = lambda self : None;
+iProcTexCallback_swigregister = _cstool.iProcTexCallback_swigregister
+iProcTexCallback_swigregister(iProcTexCallback)
+
+class csProcTexture(scfProcTexture):
+    __swig_setmethods__ = {}
+    for _s in [scfProcTexture]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csProcTexture, name, value)
+    __swig_getmethods__ = {}
+    for _s in [scfProcTexture]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, csProcTexture, name)
+    def __init__(self): raise AttributeError, "No constructor defined"
+    __repr__ = _swig_repr
+    __swig_setmethods__["last_cur_time"] = _cstool.csProcTexture_last_cur_time_set
+    __swig_getmethods__["last_cur_time"] = _cstool.csProcTexture_last_cur_time_get
+    if _newclass:last_cur_time = _swig_property(_cstool.csProcTexture_last_cur_time_get, _cstool.csProcTexture_last_cur_time_set)
+    __swig_destroy__ = _cstool.delete_csProcTexture
+    __del__ = lambda self : None;
+    def GetG3D(*args): return _cstool.csProcTexture_GetG3D(*args)
+    def GetG2D(*args): return _cstool.csProcTexture_GetG2D(*args)
+    def DisableAutoUpdate(*args): return _cstool.csProcTexture_DisableAutoUpdate(*args)
+    def Initialize(*args): return _cstool.csProcTexture_Initialize(*args)
+    def PrepareAnim(*args): return _cstool.csProcTexture_PrepareAnim(*args)
+    def SetKeyColor(*args): return _cstool.csProcTexture_SetKeyColor(*args)
+    def Animate(*args): return _cstool.csProcTexture_Animate(*args)
+    def GetDimension(*args): return _cstool.csProcTexture_GetDimension(*args)
+    __swig_getmethods__["GetRandom"] = lambda x: _cstool.csProcTexture_GetRandom
+    if _newclass:GetRandom = staticmethod(_cstool.csProcTexture_GetRandom)
+    def GetTextureWrapper(*args): return _cstool.csProcTexture_GetTextureWrapper(*args)
+csProcTexture_swigregister = _cstool.csProcTexture_swigregister
+csProcTexture_swigregister(csProcTexture)
+csProcTexture_GetRandom = _cstool.csProcTexture_GetRandom
+
+class csProcAnimated(csProcTexture):
+    __swig_setmethods__ = {}
+    for _s in [csProcTexture]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csProcAnimated, name, value)
+    __swig_getmethods__ = {}
+    for _s in [csProcTexture]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    __getattr__ = lambda self, name: _swig_getattr(self, csProcAnimated, name)
+    __repr__ = _swig_repr
+    def __init__(self, *args): 
+        this = _cstool.new_csProcAnimated(*args)
+        try: self.this.append(this)
+        except: self.this = this
+    __swig_destroy__ = _cstool.delete_csProcAnimated
+    __del__ = lambda self : None;
+    def PrepareAnim(*args): return _cstool.csProcAnimated_PrepareAnim(*args)
+    def Animate(*args): return _cstool.csProcAnimated_Animate(*args)
+csProcAnimated_swigregister = _cstool.csProcAnimated_swigregister
+csProcAnimated_swigregister(csProcAnimated)
 
 
 

@@ -132,7 +132,8 @@ namespace lighter
     LightmapPtrDelArray& GetLightmaps () 
     { return lightmaps; }
 
-    Lightmap* GetLightmap (uint lightmapID, Light* light);
+    Lightmap* GetLightmap (uint lightmapID, size_t subLightmapNum, 
+      Light* light = 0);
 
     csArray<LightmapPtrDelArray*> GetAllLightmaps ();
     
@@ -198,6 +199,7 @@ namespace lighter
 
     struct LoadedFile
     {
+      Configuration sceneConfig;
       csRef<iDocumentNode> rootNode;
       csRef<iDocument> document;
       csString levelName;
@@ -205,6 +207,8 @@ namespace lighter
       csSet<csString> texturesToClean;
       csSet<csString> texFileNamesToDelete;
       csArray<Object*> fileObjects;
+
+      LoadedFile() : sceneConfig (globalConfig) {}
     };
 
     // All files loaded into scene

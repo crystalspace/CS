@@ -211,6 +211,9 @@ namespace lighter
 
   void Primitive::Prepare ()
   {
+    ComputeBaryCoeffs();
+    if (radObject->lightPerVertex) return;
+
     // Reset current data
     
     // Compute min/max uv
@@ -289,8 +292,6 @@ namespace lighter
     }
 
     //PrintElements (elementClassification, uc, vc);
-
-    ComputeBaryCoeffs();
   }
 
   size_t Primitive::ComputeElementIndex (const csVector3& pt) const
@@ -346,6 +347,26 @@ namespace lighter
       (1 - lambda - my) * vertexData->uvs[triangle.c];
 
     return uv;
+  }
+
+  void Primitive::ComputeCustomData (const csVector3& point, 
+                                     size_t customData, 
+                                     size_t numComps, float* out) const
+  {
+    float lambda, my;
+    ComputeBaryCoords (point, lambda, my);
+
+    // Clamp lambda/my
+    lambda = csClamp (lambda, 1.0f, 0.0f);
+    my = csClamp (my, 1.0f, 0.0f);
+
+    float* va = vertexData->GetCustomData (triangle.a, customData);
+    float* vb = vertexData->GetCustomData (triangle.b, customData);
+    float* vc = vertexData->GetCustomData (triangle.c, customData);
+
+    float oneMinusLambdaMy = (1 - lambda - my);
+    for (size_t c = 0; c < numComps; c++)
+      out[c] = lambda * va[c] + my * vb[c] + oneMinusLambdaMy * vc[c];
   }
 
   void Primitive::ComputeMinMaxUV (csVector2 &min, csVector2 &max) const

@@ -759,6 +759,7 @@ void csMeshGenerator::SetFade (csMGPosition& p, float factor)
       return;
     p.last_mixmode = CS_FX_TRANSPARENT;
     SetFade (p.mesh, CS_FX_TRANSPARENT);
+    p.mesh->GetFlags ().Set (CS_ENTITY_INVISIBLE);
   }
   else if (factor < .99)
   {
@@ -769,6 +770,7 @@ void csMeshGenerator::SetFade (csMGPosition& p, float factor)
     }
     p.last_mixmode = CS_FX_SETALPHA (1.0f-factor);
     SetFade (p.mesh, p.last_mixmode);
+    p.mesh->GetFlags ().Reset (CS_ENTITY_INVISIBLE);
   }
   else
   {
@@ -778,6 +780,7 @@ void csMeshGenerator::SetFade (csMGPosition& p, float factor)
     SetFade (p.mesh, CS_FX_COPY);
     p.mesh->SetRenderPriorityRecursive (object_priority);
     p.mesh->SetZBufModeRecursive (CS_ZBUF_USE);
+    p.mesh->GetFlags ().Reset (CS_ENTITY_INVISIBLE);
   }
 }
 

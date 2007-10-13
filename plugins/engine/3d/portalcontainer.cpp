@@ -1075,6 +1075,15 @@ class PerspectiveOutlet2D3D : public PerspectiveOutlet2D
 {
   csPoly3D& dest3D;
   iCamera* cam;
+  
+  static csVector3 LerpPC (const csVector3& v1, const csVector3& v2, float t)
+  {
+    float iz1 = 1.0f / v1.z;
+    float iz2 = 1.0f / v2.z;
+    csVector3 vLerped = csLerp (v1 * iz1, v2 * iz2, t);
+    float z = 1.0f / csLerp (iz1, iz2, t);
+    return vLerped * z;
+  }
 public:
   PerspectiveOutlet2D3D (iCamera* cam, csPoly2D& dest2D, csPoly3D& dest3D) : 
     PerspectiveOutlet2D (cam->GetFOV(), cam->GetShiftX(), cam->GetShiftY(), 
@@ -1127,7 +1136,7 @@ public:
 	    const size_t vt2 = (vt+1) % orgDest3D.GetVertexCount();
 	    const float t = clipOutStatus[i].Pos;
 
-            dest3D.AddVertex (csLerp (orgDest3D[vt], orgDest3D[vt2], t));
+            dest3D.AddVertex (LerpPC (orgDest3D[vt], orgDest3D[vt2], t));
 	  }
           break;
 	case CS_VERTEX_INSIDE:
@@ -1164,9 +1173,9 @@ public:
 	    const float dx = (x2 - x1);
 	    const float t = dx ? ((x - x1) / dx) : 0.0f;
 	    
-	    dest3D.AddVertex (csLerp (
-	      csLerp (orgDest3D[edge[0][0]], orgDest3D[edge[0][1]], t1),
-	      csLerp (orgDest3D[edge[1][0]], orgDest3D[edge[1][1]], t2),
+	    dest3D.AddVertex (LerpPC (
+	      LerpPC (orgDest3D[edge[0][0]], orgDest3D[edge[0][1]], t1),
+	      LerpPC (orgDest3D[edge[1][0]], orgDest3D[edge[1][1]], t2),
 	      t));
           }
 	  break;

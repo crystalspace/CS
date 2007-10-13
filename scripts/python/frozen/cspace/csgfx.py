@@ -224,32 +224,32 @@ class csShaderVariableArrayChangeElements(csShaderVariableArrayReadOnly):
 csShaderVariableArrayChangeElements_swigregister = _csgfx.csShaderVariableArrayChangeElements_swigregister
 csShaderVariableArrayChangeElements_swigregister(csShaderVariableArrayChangeElements)
 
-class csShaderVariableArray(csShaderVariableArrayChangeElements):
+class csShaderVariableArrayChangeAll(csShaderVariableArrayChangeElements):
     __swig_setmethods__ = {}
     for _s in [csShaderVariableArrayChangeElements]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csShaderVariableArray, name, value)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csShaderVariableArrayChangeAll, name, value)
     __swig_getmethods__ = {}
     for _s in [csShaderVariableArrayChangeElements]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csShaderVariableArray, name)
+    __getattr__ = lambda self, name: _swig_getattr(self, csShaderVariableArrayChangeAll, name)
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def SetSize(*args): return _csgfx.csShaderVariableArray_SetSize(*args)
-    def GetExtend(*args): return _csgfx.csShaderVariableArray_GetExtend(*args)
-    def Put(*args): return _csgfx.csShaderVariableArray_Put(*args)
-    def Push(*args): return _csgfx.csShaderVariableArray_Push(*args)
-    def PushSmart(*args): return _csgfx.csShaderVariableArray_PushSmart(*args)
-    def Pop(*args): return _csgfx.csShaderVariableArray_Pop(*args)
-    def Insert(*args): return _csgfx.csShaderVariableArray_Insert(*args)
-    def DeleteAll(*args): return _csgfx.csShaderVariableArray_DeleteAll(*args)
-    def Truncate(*args): return _csgfx.csShaderVariableArray_Truncate(*args)
-    def Empty(*args): return _csgfx.csShaderVariableArray_Empty(*args)
-    def DeleteIndex(*args): return _csgfx.csShaderVariableArray_DeleteIndex(*args)
-    def DeleteIndexFast(*args): return _csgfx.csShaderVariableArray_DeleteIndexFast(*args)
-    def Delete(*args): return _csgfx.csShaderVariableArray_Delete(*args)
-    __swig_destroy__ = _csgfx.delete_csShaderVariableArray
+    def SetSize(*args): return _csgfx.csShaderVariableArrayChangeAll_SetSize(*args)
+    def GetExtend(*args): return _csgfx.csShaderVariableArrayChangeAll_GetExtend(*args)
+    def Put(*args): return _csgfx.csShaderVariableArrayChangeAll_Put(*args)
+    def Push(*args): return _csgfx.csShaderVariableArrayChangeAll_Push(*args)
+    def PushSmart(*args): return _csgfx.csShaderVariableArrayChangeAll_PushSmart(*args)
+    def Pop(*args): return _csgfx.csShaderVariableArrayChangeAll_Pop(*args)
+    def Insert(*args): return _csgfx.csShaderVariableArrayChangeAll_Insert(*args)
+    def DeleteAll(*args): return _csgfx.csShaderVariableArrayChangeAll_DeleteAll(*args)
+    def Truncate(*args): return _csgfx.csShaderVariableArrayChangeAll_Truncate(*args)
+    def Empty(*args): return _csgfx.csShaderVariableArrayChangeAll_Empty(*args)
+    def DeleteIndex(*args): return _csgfx.csShaderVariableArrayChangeAll_DeleteIndex(*args)
+    def DeleteIndexFast(*args): return _csgfx.csShaderVariableArrayChangeAll_DeleteIndexFast(*args)
+    def Delete(*args): return _csgfx.csShaderVariableArrayChangeAll_Delete(*args)
+    __swig_destroy__ = _csgfx.delete_csShaderVariableArrayChangeAll
     __del__ = lambda self : None;
-csShaderVariableArray_swigregister = _csgfx.csShaderVariableArray_swigregister
-csShaderVariableArray_swigregister(csShaderVariableArray)
+csShaderVariableArrayChangeAll_swigregister = _csgfx.csShaderVariableArrayChangeAll_swigregister
+csShaderVariableArrayChangeAll_swigregister(csShaderVariableArrayChangeAll)
 
 class csImageBaseBase(core.iImage):
     __swig_setmethods__ = {}

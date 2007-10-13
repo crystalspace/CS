@@ -125,6 +125,14 @@ if $(CMD.SWIG)
     MakeLocate $(target) : $(LOCATE_TARGET) ;
     if $(othertargets)
     {
+      # create an extra target to ensure target dir for language specific
+      # files is created before swig is run.
+      if $(outdir) != $(LOCATE_TARGET)
+      {
+        local othertargetsdir = $(outdir) ;
+        Depends $(target) : $(othertargetsdir) ;
+        MkDir $(othertargetsdir) ;
+      }
       MakeLocate $(othertargets) : $(outdir) ;
 
       # If any target, such as an install target, depends upon the other files,

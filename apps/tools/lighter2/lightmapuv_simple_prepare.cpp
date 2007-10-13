@@ -508,6 +508,18 @@ namespace lighter
 #endif
     }
 
+    if (globalConfig.GetLighterProperties().directionalLMs)
+    {
+      size_t numLMs = globalLightmaps.GetSize();
+      for (size_t i = 0; i < 3; i++)
+      {
+        for (size_t g = 0; g < numLMs; g++)
+        {
+          globalLightmaps.Push (new Lightmap (*(globalLightmaps[g])));
+        }
+      }
+    }
+
     progress.SetProgress (1);
   }
  

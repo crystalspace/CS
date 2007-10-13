@@ -31,13 +31,15 @@ namespace lighter
     Configuration ();
 
     // Initialize configuration
-    void Initialize ();
+    void Initialize (iConfigFile* cfgFile = 0);
    
     // Settings of what to do
     struct LighterProperties
     {
       // Direct lighting from light sources
       bool doDirectLight;
+      // HL2-style directional LMs
+      bool directionalLMs;
     };
 
     // Lightmap and lightmap layout properties

@@ -1,13 +1,13 @@
 from core import *
-from ivaria import *
-from imesh import *
-from isndsys import *
-from iengine import *
-from ivideo import *
 from imap import *
-from csgeom import *
-from cstool import *
+from isndsys import *
+from ivaria import *
 from csgfx import *
+from ivideo import *
+from csgeom import *
+from imesh import *
+from iengine import *
+from cstool import *
 try:
     from pycscegui import *
 except:

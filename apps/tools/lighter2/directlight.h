@@ -39,58 +39,60 @@ namespace lighter
   {
   public:
     // Setup
-    static void Initialize ();
+    DirectLighting (const csVector3& tangentSpaceNorm, size_t subLightmapNum);
 
     // Shade by using all primitives within range
-    static void ShadeDirectLighting (Sector* sector, 
+    void ShadeDirectLighting (Sector* sector, 
       Statistics::Progress& progress);
 
     //-- Shade a point
-    typedef csColor (*PVLPointShader)(Sector* sector, Object* obj, 
-      const csVector3& point, const csVector3& normal, 
+    typedef csColor (DirectLighting::*PVLPointShader)(Sector* sector, 
+      Object* obj, const csVector3& point, const csVector3& normal, 
       SamplerSequence<2>& lightSampler);
 
     // Shade a single point in space with direct lighting
-    static csColor UniformShadeAllLightsNonPD (Sector* sector, Object* obj, 
+    csColor UniformShadeAllLightsNonPD (Sector* sector, Object* obj, 
       const csVector3& point, const csVector3& normal, 
       SamplerSequence<2>& lightSampler);
 
     // Shade a single point in space with direct lighting using a single light
-    static csColor UniformShadeRndLightNonPD (Sector* sector, Object* obj,
+    csColor UniformShadeRndLightNonPD (Sector* sector, Object* obj,
       const csVector3& point, const csVector3& normal, 
       SamplerSequence<2>& lightSampler);
 
     //-- Shade a lightmap element
-    typedef csColor (*LMElementShader)(Sector* sector, ElementProxy element,
-      SamplerSequence<2>& lightSampler);
+    typedef csColor (DirectLighting::*LMElementShader)(Sector* sector, 
+      ElementProxy element, SamplerSequence<2>& lightSampler);
 
     // Shade a primitive element with direct lighting
-    static csColor UniformShadeAllLightsNonPD (Sector* sector, ElementProxy element,
+    csColor UniformShadeAllLightsNonPD (Sector* sector, ElementProxy element,
       SamplerSequence<2>& lightSampler);
 
     // Shade a primitive element with direct lighting using a single light
-    static csColor UniformShadeRndLightNonPD (Sector* sector, ElementProxy element,
+    csColor UniformShadeRndLightNonPD (Sector* sector, ElementProxy element,
       SamplerSequence<2>& lightSampler);
 
     //-- Shade using one light
     // Shade a primitive element with direct lighting
-    static csColor UniformShadeOneLight (Sector* sector, Object* obj, 
+    csColor UniformShadeOneLight (Sector* sector, Object* obj, 
       const csVector3& point, const csVector3& normal, Light* light, 
       SamplerSequence<2>& lightSampler);
 
     // Shade a primitive element with direct lighting
-    static csColor UniformShadeOneLight (Sector* sector, ElementProxy element,
+    csColor UniformShadeOneLight (Sector* sector, ElementProxy element,
       Light* light, SamplerSequence<2>& lightSampler);
 
     template<typename T>
-    inline static csColor UniformShadeElement (T& shade, ElementProxy element, 
+    inline csColor UniformShadeElement (T& shade, ElementProxy element, 
       SamplerSequence<2>& lightSampler);
 
   private:
     struct ShadeAllLightsNonPD
     {
+      DirectLighting& lighting;
       const LightRefArray& allLights;
-      ShadeAllLightsNonPD (const LightRefArray& allLights) : 
+      ShadeAllLightsNonPD (DirectLighting& lighting, 
+        const LightRefArray& allLights) : lighting (lighting), 
         allLights (allLights) {}
       inline csColor ShadeLight (Object* obj, const csVector3& point, 
         const csVector3& normal, SamplerSequence<2>& lightSampler, 
@@ -100,10 +102,12 @@ namespace lighter
 
     struct ShadeRndLightNonPD
     {
+      DirectLighting& lighting;
       const LightRefArray& allLights;
       SamplerSequence<3>& lightSampler;
-      ShadeRndLightNonPD (const LightRefArray& allLights,
-        SamplerSequence<3>& lightSampler) : allLights (allLights), 
+      ShadeRndLightNonPD (DirectLighting& lighting, 
+        const LightRefArray& allLights, SamplerSequence<3>& lightSampler) : 
+        lighting (lighting), allLights (allLights), 
         lightSampler (lightSampler) {}
       inline csColor ShadeLight (Object* obj, const csVector3& point, 
         const csVector3& normal, SamplerSequence<2>& sampler, 
@@ -112,16 +116,18 @@ namespace lighter
     };
     struct ShadeOneLight
     {
+      DirectLighting& lighting;
       Light* light;
-      ShadeOneLight (Light* light) : light (light) {}
+      ShadeOneLight (DirectLighting& lighting, Light* light) : 
+        lighting (lighting), light (light) {}
       inline csColor ShadeLight (Object* obj, const csVector3& point, 
         const csVector3& normal, SamplerSequence<2>& sampler, 
         const Primitive* shadowIgnorePrimitive = 0, 
         bool fullIgnore = false);
     };
 
-    // Static methods...
-    inline static csColor ShadeLight (Light* light, Object* obj, 
+    // Methods...
+    inline csColor ShadeLight (Light* light, Object* obj, 
       const csVector3& point, const csVector3& normal, 
       SamplerSequence<2>& lightSampler, const Primitive* shadowIgnorePrimitive = 0, 
       bool fullIgnore = false);
@@ -150,15 +156,23 @@ namespace lighter
       }
     };
 
-    static void ShadeLightmap (Sector* sector, Object* obj, 
+    void ShadeLightmap (Sector* sector, Object* obj, 
       SamplerSequence<2>& masterSampler, ProgressState& progress);
 
-    static void ShadePerVertex (Sector* sector, Object* obj,
+    void ShadePerVertex (Sector* sector, Object* obj,
       SamplerSequence<2>& masterSampler, ProgressState& progress);
 
-    // Static data
-    static PVLPointShader pvlPointShader;
-    static LMElementShader lmElementShader;    
+    // Helpers
+    csVector3 ComputeElementNormal (ElementProxy element,
+      const csVector3& pt) const;
+    csVector3 ComputeVertexNormal (Object* obj, size_t index) const;
+
+    // Data...
+    csVector3 tangentSpaceNorm;
+    bool fancyTangentSpaceNorm;
+    size_t subLightmapNum;
+    PVLPointShader pvlPointShader;
+    LMElementShader lmElementShader;    
   };
 }
 

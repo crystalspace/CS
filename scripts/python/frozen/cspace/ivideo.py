@@ -852,12 +852,12 @@ iHalo_swigregister = _ivideo.iHalo_swigregister
 iHalo_swigregister(iHalo)
 iHalo_scfGetVersion = _ivideo.iHalo_scfGetVersion
 
-class iShaderVarStack(csgfx.csShaderVariableArray):
+class iShaderVarStack(csgfx.csShaderVariableArrayChangeAll):
     __swig_setmethods__ = {}
-    for _s in [csgfx.csShaderVariableArray]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
+    for _s in [csgfx.csShaderVariableArrayChangeAll]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
     __setattr__ = lambda self, name, value: _swig_setattr(self, iShaderVarStack, name, value)
     __swig_getmethods__ = {}
-    for _s in [csgfx.csShaderVariableArray]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
+    for _s in [csgfx.csShaderVariableArrayChangeAll]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
     __getattr__ = lambda self, name: _swig_getattr(self, iShaderVarStack, name)
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr

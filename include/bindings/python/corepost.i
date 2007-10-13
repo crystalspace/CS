@@ -150,6 +150,14 @@ class CSMutableArrayHelper:
   size_t __len__() { return self->GetSize(); }
 }
 
+//csutil/scf_implementation.h
+%extend scfInterfaceMetadataList
+{
+  size_t __len__() { return self->metadataCount; }
+  scfInterfaceMetadata __getitem__ (size_t i) const { return self->metadata[i]; }
+}
+PYITERATOR_PROTOCOL(scfInterfaceMetadataList)
+
 %pythoncode %{
   csReport = csReporterHelper.Report
   _csmodules = []

@@ -1197,9 +1197,10 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 	      }
 	      if (okay)
               {
-                const int ascendNum = globalState->ascendStack.Pop ();
+                int ascendNum = globalState->ascendStack.Pop ();
                 eval.Ascend (ascendNum);
-		currentWrapper = wrapperStack.Pop ();
+                while (ascendNum-- > 0)
+		  currentWrapper = wrapperStack.Pop ();
               }
 	    }
 	    break;
@@ -1258,6 +1259,8 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
 		CreateElseWrapper (state, elseWrapper);
 
 		currentWrapper.child->childrenWrappers.Push (elseWrapper.child);
+		wrapperStack.Push (currentWrapper);
+		currentWrapper = elseWrapper;
 
 		WrapperStackEntry newWrapper;
 		ParseCondition (newWrapper, space + 1, valLen - cmdLen - 1,
@@ -1281,7 +1284,7 @@ void csWrappedDocumentNode::ProcessSingleWrappedNode (
                   newWrapper.child->condition = csCondAlwaysFalse;
 
 		elseWrapper.child->childrenWrappers.Push (newWrapper.child);
-		wrapperStack.Push (elseWrapper);
+		wrapperStack.Push (currentWrapper);
 		currentWrapper = newWrapper;
 	      }
 	    }
