@@ -546,7 +546,7 @@ csEngine::csEngine (iBase *iParent) :
   clearZBuf (false), defaultClearZBuf (false), 
   clearScreen (false),  defaultClearScreen (false), 
   defaultMaxLightmapWidth (256), defaultMaxLightmapHeight (256),
-  currentRenderContext (0), weakEventHandler(0)
+  currentRenderContext (0), nextLightTag (0), weakEventHandler(0)
 {
   ClearRenderPriorities ();
 }
@@ -724,6 +724,25 @@ iMeshObjectType* csEngine::GetThingType ()
   }
 
   return (iMeshObjectType*)thingMeshType;
+}
+  
+uint csEngine::GetLightTagNumber (csStringID tag)
+{
+  uint* n = lightTags.GetElementPointer (tag);
+  if (n == 0)
+  {
+    uint t = nextLightTag++;
+    lightTags.Put (tag, t);
+    return t;
+  }
+  return *n;
+}
+
+csStringID csEngine::GetLightTagString (uint num)
+{
+  csStringID s = lightTags.GetKey (num, csInvalidStringID);
+  CS_ASSERT(s != csInvalidStringID);
+  return s;
 }
 
 void csEngine::DeleteAllForce ()

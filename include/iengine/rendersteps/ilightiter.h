@@ -39,7 +39,10 @@ struct iSector;
 /// \todo Document me!
 struct iLightIterRenderStep : public virtual iBase
 {
-  SCF_INTERFACE (iLightIterRenderStep, 2, 0, 0);
+  SCF_INTERFACE (iLightIterRenderStep, 2, 0, 1);
+  
+  virtual void SetIgnoreTag (csStringID tag) = 0;
+  virtual csStringID GetIgnoreTag () = 0;
 };
 
 /// \todo Document me!
