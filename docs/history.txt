@@ -6,6 +6,15 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Oct-2007
+	- Eric Sunshine renamed build variable LIB3DS.ONE_THREE_OH to
+	  LIB3DS.GENERIC_DATA_IO_CALLBACKS to better reflect its intended
+	  meaning (a specific API change). Likewise, changed the configure
+	  "checking" message from "if lib3ds version >= 1.3.0" to "for generic
+	  data I/O callbacks" in order to clarify and reduce confusion (since
+	  the old ">= 1.3.0" message appeared immediately after a "if lib3ds is
+	  sufficiently recent" message). Also, renamed related C++ #define from
+	  NEW_DATA_CALLBACKS to LIB3DS_GENERIC_DATA_IO_CALLBACKS.
 13-Oct-2007
 	- res fixed a bug in DDS cubemap saving (checked for wrong subimage
 	  count).
@@ -38,8 +47,8 @@ chronological order.
 	  to ignore "static" tagged lights.
 11-Oct-2007
 	- res changed the relaytool invocation to:
-	  - Pass multiple libs to be relayed in one command.
-	  - Pass CS' CFLAGS.
+	    - Pass multiple libs to be relayed in one command.
+	    - Pass CS' CFLAGS.
 10-Oct-2007
         - Mike Gist fixed a compile error in the processor spec detection
           code on PPC.
