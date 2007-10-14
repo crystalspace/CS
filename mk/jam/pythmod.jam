@@ -78,13 +78,11 @@ rule PythMod
     InstallBindingsModule $(module) : $(4) ;
     if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
     {
-      SplitDebugInfo $(module) ;
-      local debugfile = [ on $(module) GetVar DEBUG_FILE_FULL ] ;
+      local debugfile = [ SplitDebugInfo $(module) ] ;
       cleantarget += $(debugfile) ;
       NoCare $(debugfile) ;
-      Depends install_bindings : [ DoInstall $(debugfile) :
-                                    $(appdatadir) $(4) :
-                                    $(INSTALL_DATA) ] ;
+      Depends install_bindings :
+      	  [ DoInstall $(debugfile) : $(appdatadir) $(4) : $(INSTALL_DATA) ] ;
     }
   }
 

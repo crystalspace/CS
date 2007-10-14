@@ -34,18 +34,20 @@ rule SplitDebugInfo
   {
     debugfile = $(binary).dbg ;
   }
-  NotFile $(debugfile) ;
-  DEBUG_FILE on $(binary) = $(debugfile) ;
+  debugfile = $(debugfile:G=$(binary:G)) ;
   local dir = [ on $(binary) GetVar LOCATE ] ;
-  DEBUG_FILE_FULL on $(binary) = [ ConcatDirs $(dir) $(debugfile) ] ;
-  DoSplitDebugInfo $(binary) ;
+  MakeLocate $(debugfile) : $(dir) ;
+  DEBUG_FILE on $(binary) = $(debugfile) ;
+  DEBUG_FILE_FULL on $(binary) = [ ConcatDirs $(dir) $(debugfile:G=) ] ;
+  SplitDebugInfo1 $(binary) ;
+  Clean clean : $(debugfile) ;
   return $(debugfile) ;
 }
 
-actions DoSplitDebugInfo bind DEBUG_FILE
+actions SplitDebugInfo1
 {
   $(CMD.OBJCOPY) --only-keep-debug $(<) $(DEBUG_FILE_FULL)
   $(CMD.OBJCOPY) --strip-unneeded $(<)
   $(CMD.OBJCOPY) --add-gnu-debuglink=$(DEBUG_FILE_FULL) $(<)
-  if [ "$(CHMOD)" ] ; then $(CHMOD) a-x $(DEBUG_FILE_FULL) ; fi
+  test -n "$(CHMOD)" && $(CHMOD) a-x $(DEBUG_FILE_FULL)
 }
