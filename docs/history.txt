@@ -23,6 +23,12 @@ chronological order.
 	- Eric Sunshine re-added 'cs-configclean' Jam target which got lost
 	  when versioned cs-config-x.y functionality was added to
 	  cs-config/Jamfile.
+	- Eric Sunshine updated cs_min_version_default to 1.3 in
+	  CS/mk/autoconf/crystal.m4. Also added commentary to various
+	  version-containing files stating that this file needs to be updated
+	  during version bumps.  (Ultimately, we should have a script in CS/bin
+	  which performs the version bump automatically rather than having to
+	  remember to do it manually in each place.)
 13-Oct-2007
 	- res fixed a bug in DDS cubemap saving (checked for wrong subimage
 	  count).
