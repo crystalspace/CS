@@ -6,6 +6,7 @@ SubDir TOP scripts cs-config ;
 
 rule csConfigGen
 {
+  NotFile $(>) ;
   LOCATE on cs-config.temppre cs-config.temppost = $(SUBDIR) ;
   Depends $(<) : Jamconfig cs-config.temppre cs-config.temppost 
   		 [ ConcatDirs $(TOP) scripts cs-config Jamfile ] ;
@@ -229,5 +230,7 @@ CS_CONFIG_GRISTED = [ DoSourceGrist cs-config ] ;
 SEARCH on $(CS_CONFIG_GRISTED) = $(SUBDIR) ;
 Depends cs-config : $(CS_CONFIG_GRISTED) ;
 Copy cs-config : $(CS_CONFIG_GRISTED) ;
+Clean clean : cs-config $(CSCONFIGNAME) ;
+Clean cs-configclean : cs-config $(CSCONFIGNAME) ;
 Help cs-config : "Build the cs-config script" ;
 Depends install_bin : [ DoInstall cs-config : $(bindir) : $(INSTALL_PROGRAM) ] ;
