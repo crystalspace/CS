@@ -30,7 +30,7 @@ chronological order.
 	  which performs the version bump automatically rather than having to
 	  remember to do it manually in each place.)
 	- Eric Sunshine fixed some problems with the SplitDebugInfo rule in
-	  split.jam which caused it to be somewhat dysfunctional. An obvious
+	  strip.jam which caused it to be somewhat dysfunctional. An obvious
 	  manifestation of these problems was that the generated .dbg files
 	  where not removed by any of the Jam 'clean' targets.
 13-Oct-2007
