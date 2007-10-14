@@ -17,7 +17,7 @@ chronological order.
 	  NEW_DATA_CALLBACKS to LIB3DS_GENERIC_DATA_IO_CALLBACKS.
 	- Eric Sunshine eliminated several compilation warnings.
 	- Eric Sunshine fixed 'using independent target "nohelp"' warning
-	  emitted by Jam when  wellbuilding cs-config.
+	  emitted by Jam when building cs-config.
     	- Eric Sunshine fixed cs-config/Jamfile so that cs-config gets removed
 	  upon 'jam clean' and 'jam distclean'.
 	- Eric Sunshine re-added 'cs-configclean' Jam target which got lost
