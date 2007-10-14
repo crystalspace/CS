@@ -12,9 +12,9 @@ chronological order.
 	- res made the DDS saver support DXT w/ cubemaps.
 	- res augmented csimagetool to support creating a cubemap from multiple
 	  images and splitting a cubemap into its subimages.
-      - Mike Gist changed csCoreRenderMesh to use a csRef instead of a normal
-        pointer to the material. This fixes a problem where the ref count on
-        some materials was incorrect.
+        - Mike Gist added matRef to Mesh (cal3d) to increase the refCount on
+          materials used by that mesh. This fixes a problem where the ref count
+          on some materials was incorrect.
 12-Oct-2007
 	- caedes applied a patch from Lukas Erlinghagen for the pysimp.py file
 	  to account for incorrect lighting.
