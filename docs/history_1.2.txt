@@ -1,5 +1,7 @@
 1.2 branch log.
 
+14-Oct-2007
+	- Mike Gist merged r27901:27902 into 1.2 (wrong refCount on mat fix).
 12-Oct-2007
 	- Jorrit merged r27874 and 27875 in 1.2 (opcode/CollideRay
 	  optimization/fix).

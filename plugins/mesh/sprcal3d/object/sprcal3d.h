@@ -525,6 +525,7 @@ private:
     csRef<iRenderBuffer> vertex_buffer;
     uint vertexVersion;
     csRenderMesh render_mesh;
+    csRef<iMaterialWrapper> matRef;
 
     Mesh() : vertexVersion((uint)~0) {}
   };
