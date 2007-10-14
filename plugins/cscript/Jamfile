@@ -86,6 +86,59 @@ if $(PYTHON.AVAILABLE) = "yes"
   }
 }
 
+if $(CSHARP.AVAILABLE) = "yes"
+{
+  ##  CSharpBindingModule target : module name : glue : LinkWith : ExternalLibs : desc ;
+  rule CSharpBindingModule
+  {
+    local target = $(1) ;
+    local module = $(2) ;
+    #----------------------------------
+    # Swig generate files for target
+    #--------------------------------
+
+    local common = $(3) ;
+    local csharpbase = [ ConcatDirs $(LOCATE.OBJECTS) bindings csharp cspace ] ;
+    local csharpdir = [ ConcatDirs $(csharpbase) $(module) ] ;
+
+    if ( ! [ Property build : projgen ] )
+    {
+      common = [ DoSourceGrist $(common) ] ;
+      Swig $(common) :
+	[ DoSourceGrist $(module).i ] :
+	csharp :
+	c++ -namespace CrystalSpace -dllimport $(module) :
+	[ ConcatDirs $(TOP) include ] 
+	[ ConcatDirs $(BUILDTOP) include ] :
+	[ ConcatDirs $(TOP) include bindings ]
+	[ ConcatDirs $(TOP) include bindings csharp ] :
+	:
+	:
+        $(csharpdir) ;
+    }
+    
+    CleanDir $(module)clean : $(csharpdir) ;
+    Clean $(module)clean : $(common) ;
+    Depends bindingsclean : $(module)clean ;
+    Depends $(module)clean : clean ;
+
+    #------------------------
+    # core - Pure C# module
+    #------------------------
+    CSharpMod $(target) : _$(moudle) :
+	    $(3) $(common) :
+	    binding csharp cspace :
+            crystalspace $(4) :
+            $(5) :
+            $(6) ;
+    Depends $(target) : $(common) ;
+    CFlags $(target) : [FDefines SWIG_GLOBAL] 
+	   $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE)
+	   $(COMPILER.C++FLAGS.WARNING.NO_UNINITIALIZED) ;
+    Depends bindingsclean : $(target)clean ;
+  }
+}
+
 SubInclude TOP plugins cscript csjava ;
 SubInclude TOP plugins cscript cscsharp ;
 SubInclude TOP plugins cscript csperl5 ;

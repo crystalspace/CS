@@ -1,0 +1,118 @@
+#============================================================================
+# Rules for creating csharp modules.
+# Copyright (C) 2006 by Jorrit Tyberghein
+#
+#    This library is free software; you can redistribute it and/or modify it
+#    under the terms of the GNU Library General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or (at your
+#    option) any later version.
+#
+#    This library is distributed in the hope that it will be useful, but
+#    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+#    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Library General Public
+#    License for more details.
+#
+#    You should have received a copy of the GNU Library General Public License
+#    along with this library; if not, write to the Free Software Foundation,
+#    Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#============================================================================
+# PythMod rule
+# Can be used to create cspace python modules.
+
+rule InstalCSharpMod
+{
+  InstalBindingsModule $(1) : $(2) ;
+}
+
+
+#--------------------------------------------------------------------------------------------------
+# CSharpMod target file : module name : source files : install dir : LinkWith : ExternalLibs : desc
+#--------------------------------------------------------------------------------------------------
+
+rule CSharpMod
+{
+  if ! $(CSPACESHARP.MODULE.PREFIX) && ! $(CSPACESHARP.MODULE.SUFFIX)
+  {
+    switch $(TARGET.OS)
+    {
+      case WIN32 :
+	CSPACESHARP.MODULE.PREFIX = ;
+	CSPACESHARP.MODULE.SUFFIX = .dll ;
+      case MACOS_X :
+	CSPACESHARP.MODULE.PREFIX = lib ;
+	CSPACESHARP.MODULE.SUFFIX = .so ;
+      case UNIX :
+	CSPACESHARP.MODULE.PREFIX = lib ;
+	CSPACESHARP.MODULE.SUFFIX = .so ;
+      case * :
+	CSPACESHARP.MODULE.PREFIX = lib ;
+	CSPACESHARP.MODULE.SUFFIX = .so ;
+    }
+  }
+
+  # Be wary of Jam's variable interpolation: "$(X)foo" expands to nothing if X
+  # does not have a value.  (This differs from other interpolators which would
+  # expand it to "foo".)
+  if ! $(CSPACESHARP.MODULE.PREFIX) { CSPACESHARP.MODULE.PREFIX = "" ; }
+  if ! $(CSPACESHARP.MODULE.SUFFIX) { CSPACESHARP.MODULE.SUFFIX = "" ; }
+
+  local target = $(1) ;
+  local module = $(2) ;
+  local cleantarget ;
+  local desc = $(7) ;
+
+  Description $(<) : $(desc) ;
+  Help $(<) : "Build the $(desc)" ;
+  local sources = [ DoSourceGrist $(3) ] ;
+  local objects = [ CompileObjects $(sources) ] ;
+  module = $(CSPACSHARP.MODULE.PREFIX)$(module)$(CSPACSHARP.MODULE.SUFFIX) ;
+
+  $(<)_TARGET = $(module) ;
+  $(<)_SOURCES = $(sources) ;
+  $(<)_OBJECTS = $(objects) ;
+  LinkWith $(<) : $(5) ;
+  ExternalLibs $(<) : $(6) ;
+  CFlags $(<) : $(PLUGIN.CFLAGS) ;
+  LFlags $(<) : $(PLUGIN.LFLAGS) $(LINKLIBS) ;
+  NotFile $(<) ;
+  Depends $(<) : $(module) ;
+  Depends bindings : $(<) ;
+  MakeLocate $(module) : [ ConcatDirs $(LOCATE.OBJECTS) $(4) ] ;
+  Depends $(module) : $(objects) ;
+  LinkPlugin $(module) : $(objects) ;
+  InstallBindingsModule $(module) : $(4) ;
+  if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
+  {
+    SplitDebugInfo $(module) ;
+    local debugfile = [ on $(module) GetVar DEBUG_FILE_FULL ] ;
+    cleantarget += $(debugfile) ;
+    NoCare $(debugfile) ;
+    Depends install_bindings : [ DoInstall $(debugfile) :
+                                  $(appdatadir) $(4) :
+				  $(INSTALL_DATA) ] ;
+  }
+
+  Always $(<)clean ;
+  NotFile $(<)clean ;
+  Clean $(<)clean : $(module) $(objects) $(cleantarget) ;
+  Depends clean : $(<)clean ;
+}
+
+#---------------------
+# CSharpLib target : input files : references 
+#---------------------
+
+actions CSC
+{
+   $(CMD.CSC) -target:$(3) $(4) -out:$(<) $(>)
+}
+
+rule CSharpLib
+{
+  local target = $(1) ;
+  local sources = [ DoSourceGrist $(2) ] ;
+
+  CSC $(target) : $(sources) : library ;
+}
+

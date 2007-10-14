@@ -6,6 +6,8 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Oct-2007
+	- ronsaldo added somes jam rules for the c# splitting.
 12-Oct-2007
 	- ronsaldo applied the c# patch, which includes the C# bindings.
 	- ronsaldo renamed plugins/cscript/cscsharp/build.xml into
