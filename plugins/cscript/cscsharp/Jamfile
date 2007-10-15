@@ -72,7 +72,7 @@ if $(CSHARP.AVAILABLE) = "yes" && $(CMD.CSC) && $(CMD.NANT) && $(CMD.SWIG) &&
   CFlags cspacesharp : $(COMPILER.CFLAGS.VISIBILITY_DEFAULT) $(PLUGIN.CFLAGS) 
     $(COMPILER.C++FLAGS.EXCEPTIONS.ENABLE) 
     $(COMPILER.C++FLAGS.STRICTALIASING.DISABLE) ;
-  LFlags cspacesharp : $(LINKLIBS) $(PLUGIN.LFLAGS) ;
+  LFlags cspacesharp : $(LINKLIBS) $(PLUGIN.LFLAGS) $(COMPILER.LFLAGS.KILLAT) ;
   MakeLocate $(cspacesharp) : $(LOCATE.TARGETS) ;
   Depends $(cspacesharp) : $(cspacesharpobjs) ;
   LinkPlugin $(cspacesharp) : $(cspacesharpobjs) ;
