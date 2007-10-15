@@ -19,10 +19,12 @@
 #ifndef __LIGHT_H__
 #define __LIGHT_H__
 
+#include "lighter.h"
 #include "raytracer.h"
 
 namespace lighter
 {
+  class Light;
   class Raytracer;
   class Sector;
   struct HitIgnoreCallback;
@@ -32,8 +34,9 @@ namespace lighter
   
   class VisibilityTester
   {
+    static size_t rayID;
   public:
-    VisibilityTester ();
+    VisibilityTester (Light* light, Object* obj);
 
     enum OcclusionState
     {
@@ -43,6 +46,7 @@ namespace lighter
     };
     OcclusionState Occlusion (const Primitive* ignorePrim = 0);
     OcclusionState Occlusion (HitIgnoreCallback* ignoreCB);
+
     
     csColor GetFilterColor ();
 
@@ -54,6 +58,10 @@ namespace lighter
     void Clear() { allSegments.DeleteAll(); }
 
   private:
+    // for RayDebugHelper
+    Light* light;
+    Object* obj;
+
     struct Segment
     {
       KDTree* tree;
@@ -64,14 +72,16 @@ namespace lighter
     csArray<HitPoint> transparentHits;
     struct HitCallback : public HitPointCallback
     {
-      csArray<HitPoint>& hits;
-      HitCallback (csArray<HitPoint>& hits) : hits (hits) {}
+      VisibilityTester& parent;
+      HitCallback (VisibilityTester& parent) : parent (parent) {}
   
       bool RegisterHit (const Ray &ray, const HitPoint &hit)
       {
+        globalLighter->rayDebug.RegisterHit (parent.light, parent.obj, 
+          ray, hit);
         if (hit.kdFlags & KDPRIM_FLAG_TRANSPARENT)
         {
-          hits.Push (hit);
+          parent.transparentHits.Push (hit);
           return true;
         }
         return false;
@@ -178,6 +188,16 @@ namespace lighter
       return lightFrustum;
     }
 
+    inline const csString& GetName () const
+    {
+      return name;
+    }
+
+    inline void SetName (const char* name)
+    {
+      this->name = name;
+    }
+
     /**
      * If the light is a proxy, returns the pointer to the "original" light.
      * If the light is not a proxy simply returns pointer to itself.
@@ -208,6 +228,7 @@ namespace lighter
     csColor color;
     csMD5::Digest lightId;
     csSphere boundingSphere;
+    csString name;
 
     csFrustum lightFrustum;
 

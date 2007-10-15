@@ -38,7 +38,8 @@
  * Note that these keys are non-unique; some dissimilar strings may generate
  * the same key. For unique keys, see csStringSet.
  */
-CS_CRYSTALSPACE_EXPORT unsigned int csHashCompute (char const*);
+CS_CRYSTALSPACE_EXPORT CS_PURE_METHOD
+unsigned int csHashCompute (char const*);
 
 /**
  * Compute a hash key for a string of a given length.
@@ -46,7 +47,8 @@ CS_CRYSTALSPACE_EXPORT unsigned int csHashCompute (char const*);
  * Note that these keys are non-unique; some dissimilar strings may generate
  * the same key. For unique keys, see csStringSet.
  */
-CS_CRYSTALSPACE_EXPORT unsigned int csHashCompute (char const*, size_t length);
+CS_CRYSTALSPACE_EXPORT CS_PURE_METHOD
+unsigned int csHashCompute (char const*, size_t length);
 
 /**
  * Template for hash value computing.
@@ -343,15 +345,22 @@ public:
    *   values for a given key, use GetAll(). If you instead want to replace an
    *   existing value for 'key', use PutUnique().
    */
-  void Put (const K& key, const T &value)
+  T& Put (const K& key, const T &value)
   {
     if (Elements.GetSize() == 0) Elements.SetSize (Modulo);
     ElementArray& values = 
       Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
-    values.Push (Element (key, value));
+    size_t idx = values.Push (Element (key, value));
     Size++;
     if (values.GetSize () > Elements.GetSize () / GrowRate
-     && Elements.GetSize () < MaxSize) Grow ();
+     && Elements.GetSize () < MaxSize)
+    {
+      Grow ();
+      /* can't use 'values[idx]' since that is no longer the place where
+         the item is stored. */
+      return *(GetElementPointer (key));
+    }
+    return values[idx].value;
   }
 
   /// Get all the elements with the given key, or empty if there are none.
@@ -380,7 +389,7 @@ public:
   }
 
   /// Add an element to the hash table, overwriting if the key already exists.
-  void PutUnique (const K& key, const T &value)
+  T& PutUnique (const K& key, const T &value)
   {
     if (Elements.GetSize() == 0) Elements.SetSize (Modulo);
     ElementArray& values = 
@@ -392,14 +401,21 @@ public:
       if (csComparator<K, K>::Compare (v.key, key) == 0)
       {
         v.value = value;
-        return;
+        return v.value;
       }
     }
 
-    values.Push (Element (key, value));
+    size_t idx = values.Push (Element (key, value));
     Size++;
     if (values.GetSize () > Elements.GetSize () / GrowRate
-     && Elements.GetSize () < MaxSize) Grow ();
+     && Elements.GetSize () < MaxSize)
+    {
+      Grow ();
+      /* can't use 'values[idx]' since that is no longer the place where
+         the item is stored. */
+      return *(GetElementPointer (key));
+    }
+    return values[idx].value;
   }
 
   /// Returns whether at least one element matches the given key.
@@ -492,7 +508,7 @@ public:
   }
 
   /**
-   * Get the first element matching the given key, or \p fallback if there is 
+   * Get the first element matching the given key, or \a fallback if there is 
    * none.
    */
   T& Get (const K& key, T& fallback)
@@ -509,6 +525,28 @@ public:
     }
 
     return fallback;
+  }
+
+  /**
+   * Get the first element matching the given key, or, if there is 
+   * none, insert \a default and return a reference to the new entry.
+   */
+  T& GetOrCreate (const K& key, const T& defaultValue = T())
+  {
+    if (Elements.GetSize() != 0)
+    {
+      ElementArray& values = 
+        Elements[csHashComputer<K>::ComputeHash (key) % Modulo];
+      const size_t len = values.GetSize ();
+      for (size_t i = 0; i < len; ++i)
+      {
+        Element& v = values[i];
+        if (csComparator<K, K>::Compare (v.key, key) == 0)
+	  return v.value;
+      }
+    }
+    
+    return Put (key, defaultValue);
   }
 
   /// Delete all the elements.

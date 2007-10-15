@@ -130,7 +130,6 @@ rule Plugin
   Always $(<)clean ;
   NotFile $(<)clean ;
   Clean $(<)clean : $(objects) $(cleanextra) ;
-  Clean clean : $(cleanextra) ;
 
   if ! [ IsElem nohelp : $(3) ]
   {

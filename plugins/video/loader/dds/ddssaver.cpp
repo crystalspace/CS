@@ -175,7 +175,7 @@ csPtr<iDataBuffer> csDDSSaver::Save (csRef<iImage> image,
     ddsHead.capabilities.caps2 |= dds::DDSCAPS2_VOLUME;
   }
   else if ((image->GetImageType() == csimgCube) 
-    && (image->HasSubImages() > 5))
+    && (image->HasSubImages() >= 5))
   {
     ddsHead.capabilities.caps1 |= dds::DDSCAPS_COMPLEX;
     ddsHead.capabilities.caps2 |= dds::DDSCAPS2_CUBEMAP
@@ -206,21 +206,24 @@ csPtr<iDataBuffer> csDDSSaver::Save (csRef<iImage> image,
   }
   else if (format == "dxt1")
   {
-    if (image->GetImageType() != csimg2D) return 0;
+    if ((image->GetImageType() != csimg2D) 
+      && (image->GetImageType() != csimgCube)) return 0;
     ddsHead.pixelformat.flags = dds::DDPF_FOURCC;
     ddsHead.pixelformat.fourcc = MakeFourCC ('D','X','T','1');
     saver = new FmtDXT (ImageLib::DC_DXT1, options);
   }
   else if (format == "dxt3")
   {
-    if (image->GetImageType() != csimg2D) return 0;
+    if ((image->GetImageType() != csimg2D) 
+      && (image->GetImageType() != csimgCube)) return 0;
     ddsHead.pixelformat.flags = dds::DDPF_FOURCC;
     ddsHead.pixelformat.fourcc = MakeFourCC ('D','X','T','3');
     saver = new FmtDXT (ImageLib::DC_DXT3, options);
   }
   else if (format == "dxt5")
   {
-    if (image->GetImageType() != csimg2D) return 0;
+    if ((image->GetImageType() != csimg2D) 
+      && (image->GetImageType() != csimgCube)) return 0;
     ddsHead.pixelformat.flags = dds::DDPF_FOURCC;
     ddsHead.pixelformat.fourcc = MakeFourCC ('D','X','T','5');
     saver = new FmtDXT (ImageLib::DC_DXT5, options);

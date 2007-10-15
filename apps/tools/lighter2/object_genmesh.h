@@ -42,7 +42,7 @@ namespace lighter
 
     virtual bool Initialize (Sector* sector);
     
-    virtual void SaveMesh (Sector* sector, iDocumentNode *node);
+    virtual void SaveMesh (iDocumentNode *node);
 
     virtual void FreeNotNeededForLighting ();
 
@@ -54,7 +54,7 @@ namespace lighter
   class ObjectFactory_Genmesh : public ObjectFactory
   {
   public:
-    ObjectFactory_Genmesh ();
+    ObjectFactory_Genmesh (const Configuration& config);
 
     // Get a new object
     virtual csPtr<Object> CreateObject ();
@@ -74,6 +74,8 @@ namespace lighter
     };
   protected:
     friend class Object_Genmesh;
+
+    void SetupTangents (iGeneralFactoryState* genFact);
 
     // Begin remapping of submeshes
     virtual void BeginSubmeshRemap ();
@@ -127,7 +129,6 @@ namespace lighter
         AllocatedSubmeshKey const& key);
     };
   };
-
 }
 
 template<>

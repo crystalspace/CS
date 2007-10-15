@@ -186,6 +186,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     newTech.priority = node->GetAttributeValueAsInt ("priority");
     
+    // Combiner nodes
     {
       bool hasCombiner = false;
       csRef<iDocumentNodeIterator> nodes = node->GetNodes ("combiner");
@@ -201,21 +202,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	}
 	
 	Technique::CombinerPlugin newCombiner;
-	newCombiner.name = child->GetAttributeValue ("name");
-	if (newCombiner.name.IsEmpty())
-	{
-	  compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
-	    "'combiner' node without 'name' attribute");
-	  return 0;
-	}
-	newCombiner.classId = child->GetAttributeValue ("plugin");
-	if (newCombiner.classId.IsEmpty())
-	{
-	  compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
-	    "'combiner' node without 'plugin' attribute");
-	  return 0;
-	}
-	newCombiner.params = child;
+        if (!ParseCombiner (child, newCombiner)) return 0;
 	
 	if (!hasCombiner)
 	{
@@ -231,6 +218,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
       }
     }
     
+    // Inputs
     {
       csRef<iDocumentNodeIterator> nodes = node->GetNodes ("input");
       while (nodes->HasNext ())
@@ -239,68 +227,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	if (child->GetType() != CS_NODE_ELEMENT) continue;
 	
 	Technique::Input newInput;
-        const char* condition = child->GetAttributeValue ("condition");
-        newInput.condition = condition;
-        if (child->GetAttributeValueAsBool ("private"))
-          newInput.flags |= Technique::Input::flagPrivate;
-        if (child->GetAttributeValueAsBool ("forcenomerge"))
-          newInput.flags |= Technique::Input::flagNoMerge;
-
-        csRef<iDocumentNode> inputNode;
-
-        const char* filename = child->GetAttributeValue ("file");
-        if (filename != 0)
-        {
-          csRef<iDocumentNode> rootNode = 
-            compiler->LoadDocumentFromFile (filename, child);
-          if (!rootNode.IsValid()) return 0;
-        
-          inputNode = rootNode->GetNode ("input");
-          if (!inputNode.IsValid())
-          {
-	    compiler->Report (CS_REPORTER_SEVERITY_WARNING,
-	      "Expected 'input' node in file '%s'", filename);
-	    return 0;
-          }
-        }
-        else
-          inputNode = child;
-
-	newInput.name = inputNode->GetAttributeValue ("name");
-	if (newInput.name.IsEmpty())
-	{
-	  compiler->Report (CS_REPORTER_SEVERITY_WARNING, inputNode,
-	    "'input' node without 'name' attribute");
-	  return 0;
-	}
-	newInput.type = inputNode->GetAttributeValue ("type");
-	if (newInput.type.IsEmpty())
-	{
-	  compiler->Report (CS_REPORTER_SEVERITY_WARNING, inputNode,
-	    "'input' node without 'type' attribute");
-	  return 0;
-	}
-	const char* def = inputNode->GetAttributeValue ("default");
-	if (def != 0)
-	{
-	  if (strcmp (def, "complex") == 0)
-	  {
-	    newInput.defaultType = Technique::Input::Complex;
-	    if (!ReadBlocks (compiler, inputNode, newInput.complexBlocks, 
-                defaultCombinerName))
-	      return 0;
-	  }
-	  else
-	  {
-	    compiler->Report (CS_REPORTER_SEVERITY_WARNING, inputNode,
-	      "Invalid 'default' attribute for 'input' node: %s", def);
-	  }
-	}
-	
+        if (!ParseInput (child, newInput, defaultCombinerName)) return 0;	
 	newTech.AddInput (newInput);
       }
     }
-    
+
+    // Outputs
     {
       csRef<iDocumentNodeIterator> nodes = node->GetNodes ("output");
       while (nodes->HasNext ())
@@ -309,21 +241,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
 	if (child->GetType() != CS_NODE_ELEMENT) continue;
 	
 	Technique::Output newOutput;
-	newOutput.name = child->GetAttributeValue ("name");
-	if (newOutput.name.IsEmpty())
-	{
-	  compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
-	    "'output' node without 'name' attribute");
-	  return 0;
-	}
-	newOutput.type = child->GetAttributeValue ("type");
-	if (newOutput.type.IsEmpty())
-	{
-	  compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
-	    "'output' node without 'type' attribute");
-	  return 0;
-	}
-	
+        if (!ParseOutput (child, newOutput)) return 0;	
 	newTech.AddOutput (newOutput);
       }
       
@@ -335,7 +253,176 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     }
     return new AtomTechnique (newTech);
   }
-  
+
+  bool Snippet::ParseCombiner (iDocumentNode* child, 
+                               Technique::CombinerPlugin& newCombiner) const
+  {
+    newCombiner.name = child->GetAttributeValue ("name");
+    if (newCombiner.name.IsEmpty())
+    {
+      compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
+        "'combiner' node without 'name' attribute");
+      return false;
+    }
+    newCombiner.classId = child->GetAttributeValue ("plugin");
+    if (newCombiner.classId.IsEmpty())
+    {
+      compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
+        "'combiner' node without 'plugin' attribute");
+      return false;
+    }
+    newCombiner.params = child;
+
+    return true;
+  }
+
+  bool Snippet::ParseInput (iDocumentNode* child, 
+                            Technique::Input& newInput, 
+                            const char* defaultCombinerName) const
+  {
+    const char* condition = child->GetAttributeValue ("condition");
+    newInput.condition = condition;
+    if (child->GetAttributeValueAsBool ("private"))
+      newInput.isPrivate = true;
+    if (child->GetAttributeValueAsBool ("forcenomerge"))
+      newInput.noMerge = true;
+
+    csRef<iDocumentNode> inputNode;
+
+    const char* filename = child->GetAttributeValue ("file");
+    if (filename != 0)
+    {
+      csRef<iDocumentNode> rootNode = 
+        compiler->LoadDocumentFromFile (filename, child);
+      if (!rootNode.IsValid()) return 0;
+    
+      inputNode = rootNode->GetNode ("input");
+      if (!inputNode.IsValid())
+      {
+	compiler->Report (CS_REPORTER_SEVERITY_WARNING,
+	  "Expected 'input' node in file '%s'", filename);
+	return false;
+      }
+    }
+    else
+      inputNode = child;
+
+    newInput.node = inputNode;
+    newInput.name = inputNode->GetAttributeValue ("name");
+    if (newInput.name.IsEmpty())
+    {
+      compiler->Report (CS_REPORTER_SEVERITY_WARNING, inputNode,
+        "'input' node without 'name' attribute");
+      return false;
+    }
+    newInput.type = inputNode->GetAttributeValue ("type");
+    if (newInput.type.IsEmpty())
+    {
+      compiler->Report (CS_REPORTER_SEVERITY_WARNING, inputNode,
+        "'input' node without 'type' attribute");
+      return false;
+    }
+    const char* def = inputNode->GetAttributeValue ("default");
+    if (def != 0)
+    {
+      if (strcmp (def, "complex") == 0)
+      {
+        newInput.defaultType = Technique::Input::Complex;
+        if (!ReadBlocks (compiler, inputNode, newInput.complexBlocks, 
+            defaultCombinerName))
+	  return 0;
+      }
+      else if (strcmp (def, "value") == 0)
+      {
+        newInput.defaultType = Technique::Input::Value;
+        newInput.defaultValue = inputNode->GetAttributeValue ("defval");
+        if (newInput.defaultValue.IsEmpty())
+        {
+          compiler->Report (CS_REPORTER_SEVERITY_WARNING, inputNode,
+            "'input' node with a 'value' default but without 'defval' attribute");
+          return false;
+        }
+      }
+      else
+      {
+        compiler->Report (CS_REPORTER_SEVERITY_WARNING, inputNode,
+          "Invalid 'default' attribute for 'input' node: %s", def);
+      }
+    }
+
+    csRef<iDocumentNodeIterator> attrNodes = child->GetNodes ("attribute");
+    while (attrNodes->HasNext ())
+    {
+      csRef<iDocumentNode> attrNode = attrNodes->Next ();
+      if (attrNode->GetType() != CS_NODE_ELEMENT) continue;
+
+      Technique::Attribute newAttr;
+      if (!ParseAttribute (attrNode, newAttr)) return false;
+      newInput.attributes.Push (newAttr);
+    }
+
+    return true;
+  }
+
+  bool Snippet::ParseOutput (iDocumentNode* child, 
+                             Technique::Output& newOutput) const
+  {
+    newOutput.name = child->GetAttributeValue ("name");
+    if (newOutput.name.IsEmpty())
+    {
+      compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
+        "'output' node without 'name' attribute");
+      return false;
+    }
+    newOutput.type = child->GetAttributeValue ("type");
+    if (newOutput.type.IsEmpty())
+    {
+      compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
+        "'output' node without 'type' attribute");
+      return false;
+    }
+
+    newOutput.inheritAttrFrom = child->GetAttributeValue ("inheritattr");
+
+
+    csRef<iDocumentNodeIterator> attrNodes = child->GetNodes ("attribute");
+    while (attrNodes->HasNext ())
+    {
+      csRef<iDocumentNode> attrNode = attrNodes->Next ();
+      if (attrNode->GetType() != CS_NODE_ELEMENT) continue;
+
+      Technique::Attribute newAttr;
+      if (!ParseAttribute (attrNode, newAttr)) return false;
+      newOutput.attributes.Push (newAttr);
+    }
+
+    return true;
+  }
+
+  bool Snippet::ParseAttribute (iDocumentNode* child, 
+                                Technique::Attribute& attr) const
+  {
+    attr.name = child->GetAttributeValue ("name");
+    if (attr.name.IsEmpty())
+    {
+      compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
+        "'attribute' node without 'name' attribute");
+      return false;
+    }
+    attr.type = child->GetAttributeValue ("type");
+    if (attr.type.IsEmpty())
+    {
+      compiler->Report (CS_REPORTER_SEVERITY_WARNING, child,
+        "'attribute' node without 'type' attribute");
+      return false;
+    }
+
+    attr.defaultValue = child->GetAttributeValue ("defval");
+
+    return true;
+
+  }
+
   bool Snippet::ReadBlocks (WeaverCompiler* compiler, iDocumentNode* node, 
 		            csArray<Technique::Block>& blocks,
                             const char* defaultCombinerName)

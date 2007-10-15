@@ -50,6 +50,7 @@ class csTerraFormerCollider : public scfImplementation1<csTerraFormerCollider, i
 public:
 
   void UpdateOPCODEModel (const csVector3 &other_pos, float resolution);
+  void UpdateOPCODEModel (const csVector3 &start, const csVector3& end);
   unsigned int* indexholder;
   csDirtyAccessArray<Point> vertices;
 

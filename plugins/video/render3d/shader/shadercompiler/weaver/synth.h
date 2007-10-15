@@ -67,6 +67,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
         csString annotation;
         const Snippet::Technique* tech;
         StringStringHash inputLinks;
+        StringStringHash inputDefaults;
         StringStringHashRev outputRenames;
       };
       typedef csArray<Node*> NodeArray;

@@ -1,0 +1,6 @@
+SubDir TOP plugins cscript pyivideo ;
+
+if $(PYTHON.AVAILABLE) = "yes"
+{
+  PyBindingModule ivideomod : ivideo : ivideomod.cpp : : : "ivideo cs Python module" ;
+}

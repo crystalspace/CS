@@ -52,12 +52,15 @@ namespace CS
     
       struct iCombiner : public virtual iBase
       {
-        SCF_INTERFACE (iCombiner, 0, 1, 0);
+        SCF_INTERFACE (iCombiner, 0, 2, 0);
         
         /// Start addition of a new snippet.
         virtual void BeginSnippet (const char* annotation = 0) = 0;
         /// Add an input of the snippet.
         virtual void AddInput (const char* name, const char* type) = 0;
+        /// Add an input of the snippet with a given value.
+        virtual void AddInputValue (const char* name, const char* type,
+          const char* value) = 0;
         /// Add an output of the snippet.
         virtual void AddOutput (const char* name, const char* type) = 0;
         /// Specify a renaming for an input.
@@ -65,14 +68,17 @@ namespace CS
         /// Specify a renaming for an output.
 	virtual void OutputRename (const char* fromName, const char* toName) = 0;
         /**
-         * Query a chain of coercions from a type to another.
-         * Nodes are atom-snippet-esque.
+         * Instruct combiner to propagate all attributes from an input (name
+         * is mapped) to an output (name is unmapped).
          */
-        /* @@@ FIXME: A bit of a design issue that weaver nodes are returned,
-                      since that means combiners have to "know" the syntax of
-                      weaver input docs! */
-        virtual csPtr<iCoerceChainIterator> QueryCoerceChain (const char* fromType,
-          const char* toType) = 0;
+        virtual void PropagateAttributes (const char* fromInput,
+          const char* toOutput) = 0;
+        /// Add an attribute to an output (name is unmapped)
+        virtual void AddOutputAttribute (const char* outputName, 
+          const char* name, const char* type) = 0;
+        /// Add an attribute to an input (name is mapped)
+        virtual void AddInputAttribute (const char* inputName,
+          const char* name, const char* type, const char* defVal) = 0;
         /**
          * Add a link from a variable (usually an output of the snippet) to
          * another variable (usually an input to some other snippet).
@@ -91,6 +97,16 @@ namespace CS
         virtual void SetOutput (const char* name,
           const char* annotation = 0) = 0;
         
+        /**
+         * Query a chain of coercions from a type to another.
+         * Nodes are atom-snippet-esque.
+         */
+        /* @@@ FIXME: A bit of a design issue that weaver nodes are returned,
+                      since that means combiners have to "know" the syntax of
+                      weaver input docs! */
+        virtual csPtr<iCoerceChainIterator> QueryCoerceChain (const char* fromType,
+          const char* toType) = 0;
+
         /**
          * Compute a cost for a coercion from one type to another.
          * Metric is arbitrary; however, when comparing two costs, the lower

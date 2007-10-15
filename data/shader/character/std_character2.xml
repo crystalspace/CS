@@ -3,7 +3,7 @@
 
   <?Include /shader/snippets/shaderframework-cg.inc ?>
 
-  <?Include /shader/character/cg-skinning.inc ?>
+  <?Include /shader/character/soft-skinning.inc ?>
   <?Include /shader/surface/cg-surface-classic.inc ?>
   <?Include /shader/lighting/cg-light-classic.inc ?>
   <?Include /shader/fog/cg-fog-sector.inc ?>

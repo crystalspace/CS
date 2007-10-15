@@ -384,7 +384,9 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
 
   if (meshCreated)
   {
+#include "csutil/custom_new_disable.h"
     rm->variablecontext.AttachNew (new csShaderVariableContext);
+#include "csutil/custom_new_enable.h"
   }
   rm->buffers = frameData.bufferHolder;
 

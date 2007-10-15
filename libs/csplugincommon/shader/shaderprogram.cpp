@@ -349,6 +349,7 @@ bool csShaderProgram::ParseCommon (iDocumentNode* child)
   return true;
 }
 
+#include "csutil/custom_new_disable.h"
 iDocumentNode* csShaderProgram::GetProgramNode ()
 {
   if (programNode.IsValid ())
@@ -397,6 +398,7 @@ csPtr<iDataBuffer> csShaderProgram::GetProgramData ()
 
   return 0;
 }
+#include "csutil/custom_new_enable.h"
 
 void csShaderProgram::DumpProgramInfo (csString& output)
 {

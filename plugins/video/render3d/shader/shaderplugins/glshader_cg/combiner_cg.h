@@ -140,6 +140,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     csRef<ShaderCombinerLoaderCg> loader;
     bool writeVP, writeFP;
     
+    struct Attribute
+    {
+      csString name;
+      csString type;
+    };
+    typedef csArray<Attribute> AttributeArray;
+    Attribute* FindAttr (AttributeArray& arr, const char* name, 
+      const char* type);
     struct Snippet
     {
       csString annotation;
@@ -155,6 +163,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       csRefArray<iDocumentNode> fragmentBody;
       csHash<csString, csString> outputMaps;
       csString links;
+
+      csHash<csString, csString> attrInputMaps;
+      csHash<csString, csString> attrOutputMaps;
     };
     size_t uniqueCounter;
     csArray<Snippet> snippets;
@@ -164,16 +175,23 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     csRefArray<iDocumentNode> definitions;
     csSet<csString> globalIDs;
     csString globals;
+
+    csHash<AttributeArray, csString> attributes;
   public:
     ShaderCombinerCg (ShaderCombinerLoaderCg* loader, bool vp, bool fp);
     
     void BeginSnippet (const char* annotation = 0);
     void AddInput (const char* name, const char* type);
+    void AddInputValue (const char* name, const char* type,
+      const char* value);
     void AddOutput (const char* name, const char* type);
     void InputRename (const char* fromName, const char* toName);
     void OutputRename (const char* fromName, const char* toName);
-    csPtr<WeaverCommon::iCoerceChainIterator> QueryCoerceChain (
-      const char* fromType, const char* toType);
+    void PropagateAttributes (const char* fromInput, const char* toOutput);
+    void AddOutputAttribute (const char* outputName,  const char* name, 
+      const char* type);
+    void AddInputAttribute (const char* inputName, const char* name, 
+      const char* type, const char* defVal);
     void Link (const char* fromName, const char* toName);
     void WriteBlock (const char* location, iDocumentNode* blockNodes);
     bool EndSnippet ();
@@ -182,6 +200,9 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
           const char* annotation = 0);
     void SetOutput (const char* name, const char* annotation = 0);
     
+    csPtr<WeaverCommon::iCoerceChainIterator> QueryCoerceChain (
+      const char* fromType, const char* toType);
+
     uint CoerceCost (const char* fromType, const char* toType);
         
     void WriteToPass (iDocumentNode* pass);
@@ -203,6 +224,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
       DocNodeCgAppender& appender);
     void AppendProgramInput (iDocumentNode* node, DocNodeCgAppender& appender);
     csString CgType (const char* weaverType);
+    csString GetAttrIdentifier (const char* var, const char* attr);
 
     csString annotateStr;
     const char* MakeComment (const char* s);

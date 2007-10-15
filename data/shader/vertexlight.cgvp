@@ -19,7 +19,7 @@ struct vertex2fragment {
 };
 
 vertex2fragment main (app2vertex IN,
-	uniform float4x4 ModelViewI : state.matrix.modelview.inverse,
+	uniform float4x4 ModelView : state.matrix.modelview,
 	  /* The matrices are bound with the state.matrix.... semantics.
 	     For more info see the Cg and ARB_vertex_program docs.
 	     */
@@ -36,13 +36,12 @@ vertex2fragment main (app2vertex IN,
 
 	float3 vertToLight = LightPos.xyz - eyeVertex;
 	float d = length (vertToLight);
-	float3 attParams = float3 (1.0f, d, d*d);
-	vertToLight *= rsqrt (d);
-      
+	vertToLight = normalize(vertToLight);
+	// this seems to be the attenuation used in cs
+        float att = 1.0 - (d/Attenuation.x);
 	OUT.Hposition = mul (ModelViewProj, IN.Position);
 	OUT.TexCoord = IN.TexCoord;
-	OUT.Color.rgb = LightColor * dot (eyeNormal, vertToLight) * dot (attParams,
-	  Attenuation);
+	OUT.Color.rgb = LightColor * max(dot (eyeNormal, vertToLight),0) * att;
 	
 	return OUT;
 }

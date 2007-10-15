@@ -23,29 +23,30 @@
 # Auxiliary rule
 rule InstallPythMod
 {
-  local plugindir = $(appdatadir) ; # Temporary override of global plugindir.
-  SystemInstallPlugin $(1) : $(2) ;
+  InstallBindingsModule $(1) : $(2) ;
 }
 
 # USAGE:
-# Pythmod targetname : dll name : src files : LinkWith : ExternalLibs : desc
+# Pythmod targetname : module name : src files : install dir : LinkWith : ExternalLibs : desc
 #
 # EXAMPLES:
-# PythMod ceguimod : _cscegui : ceguimod.cpp cs_cegui.cpp : : CEGUI : desc
-# PythMod pythmod : _cspace : pythmod.cpp : crystalspace_python : : desc
+# PythMod ceguimod : _cscegui : ceguimod.cpp cs_cegui.cpp : bindings python cspace : : CEGUI : desc
+# PythMod pythmod : _cspace : pythmod.cpp : bindings python cspace : : desc
 rule PythMod
 {
-  local desc = $(6) ;
-  local target = $(2) ;
+  local module = $(2) ;
+  local desc = $(7) ;
   local cleantarget ;
   if [ Property build : projgen ]
   {
-    Description $(2) : $(desc) ;
-    MSVCGEN.PLUGIN_EXT.$(2) = .pyd ;
-    Plugin $(2) : $(3) ;
-    LinkWith $(2) : $(4) ;
-    ExternalLibs $(2) : PYTHON $(5) ;
-    Depends $(2) : $(1) ;
+    RegisterCompileGroups bindings ;
+    
+    Description py$(2) : $(desc) ;
+    DLL py$(2) : $(3) : $(2).pyd ;
+    LinkWith py$(2) : $(5) ;
+    ExternalLibs py$(2) : PYTHON $(6) ;
+    Depends py$(2) : $(1) ;
+    CompileGroups py$(2) : all bindings ;
   }
   else
   {
@@ -55,40 +56,45 @@ rule PythMod
     local objects = [ CompileObjects $(sources) ] ;
     if $(PYTHON.MODULE_EXT)
     {
-      target = $(target:S=$(PYTHON.MODULE_EXT)) ;
+      module = $(module:S=$(PYTHON.MODULE_EXT)) ;
     }
     else
     {
-      target = [ ConstructPluginTarget $(target) ] ;
+      module = [ ConstructPluginTarget $(module) ] ;
     }
-    $(<)_TARGET = $(target) ;
+    $(<)_TARGET = $(module) ;
     $(<)_SOURCES = $(sources) ;
     $(<)_OBJECTS = $(objects) ;
-    LinkWith $(<) : $(4) ;
-    ExternalLibs $(<) : PYTHON $(5) ;
+    LinkWith $(<) : $(5) ;
+    ExternalLibs $(<) : PYTHON $(6) ;
     CFlags $(<) : $(PLUGIN.CFLAGS) ;
     LFlags $(<) : $(PLUGIN.LFLAGS) $(LINKLIBS) ;
     NotFile $(<) ;
-    Depends $(<) : $(target) ;
-    Depends plugins : $(<) ;
-    MakeLocate $(target) : $(LOCATE.TARGETS) ;
-    Depends $(target) : $(objects) ;
-    LinkPlugin $(target) : $(objects) ;
-    InstallPythMod $(target) : bindings python ;
+    Depends $(<) : $(module) ;
+    Depends bindings : $(<) ;
+    MakeLocate $(module) : [ ConcatDirs $(LOCATE.OBJECTS) $(4) ] ;
+    Depends $(module) : $(objects) ;
+    LinkPlugin $(module) : $(objects) ;
+    InstallBindingsModule $(module) : $(4) ;
     if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
     {
-      local debugfile = [ SplitDebugInfo $(target) ] ;
+      local debugfile = [ SplitDebugInfo $(module) ] ;
       cleantarget += $(debugfile) ;
       NoCare $(debugfile) ;
-      Depends install_plugin : [ DoInstall $(debugfile) :
-                                  $(appdatadir) bindings python :
-                                  $(INSTALL_DATA) ] ;
+      Depends install_bindings :
+      	  [ DoInstall $(debugfile) : $(appdatadir) $(4) : $(INSTALL_DATA) ] ;
     }
   }
 
   Always $(<)clean ;
   NotFile $(<)clean ;
-  Clean $(<)clean : $(target) $(objects) $(cleantarget) ;
+  Clean $(<)clean : $(module) $(objects) $(cleantarget) ;
   Depends clean : $(<)clean ;
 }
 
+
+# Construct pseudo target plugins
+# @@@ Here?
+Depends exe : bindings ;
+NotFile bindings ;
+Help bindings : "Build all bindings for other languages" ;

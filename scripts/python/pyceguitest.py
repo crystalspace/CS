@@ -18,16 +18,17 @@ Note to be able to run this you'll need to
 import sys, time, traceback
 from cspace import *
 try:
-    from pycscegui import *
+    # this is just a test to see if we have cegui support. note
+    # from cspace import * already imports all symbols from this module.
+    import cspace.pycscegui
 except:
-    print "pycscegui python module not present!"
+    print "cspace python bindings dont have cegui support"
     sys.exit(1)
 try:
     import cegui
 except:
     print "cegui python module not present!"
     sys.exit(1)
-
 Cegui = None
 def onQuit(args):
     print args.__dict__

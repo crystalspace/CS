@@ -160,6 +160,7 @@ rule ExtraObjects
 ##    library 'whatever' a symbol 'libwhatever_is_present' will be provided.
 rule RelayLibs
 {
+  CheckOptions relay_all : $(4) : $(<) ;
   if ! $(CMD.RELAYTOOL)
   {
     # Create fake libwhatever_is_present() symbols
@@ -180,12 +181,22 @@ rule RelayLibs
   else
   {
     local extlib ;
-    local relayparam = "--relay $(3)" ;
+    local relayparamslist = "--relay $(3)" ;
+    local relayparam = $(relayparamslist[1]) ;
+    for r in $(relayparamslist[2-])
+    {
+      relayparam = "$(relayparam) $(r)" ;
+    }
+    local cflags = "$(CCFLAGS[1])" ;
+    for c in $(CCFLAGS[2-])
+    {
+      cflags = "$(cflags) $(c)" ;
+    }
     for extlib in $(>)
     {
       CFlags $(<) : $($(extlib).CFLAGS) ;
       LFlags $(<) : 
-        "`$(CMD.RELAYTOOL) --out-dir $(LOCATE_TARGET) $(relayparam) $($(extlib).LFLAGS)`" ; 
+        "`CFLAGS=\"$(cflags)\" $(CMD.RELAYTOOL) --out-dir $(LOCATE_TARGET) $(relayparam) $($(extlib).LFLAGS)`" ; 
       
       $(<).EXTERNALLIBS += $(extlib) ;
     }

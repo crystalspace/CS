@@ -280,8 +280,8 @@ bool csMeshFactoryList::Remove (iMeshFactoryWrapper *obj)
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
     factories_hash.Delete (name, obj);
-  list.Delete (obj);
   obj->QueryObject ()->RemoveNameChangeListener (listener);
+  list.Delete (obj);
   return true;
 }
 

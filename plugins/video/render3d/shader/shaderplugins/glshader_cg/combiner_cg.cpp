@@ -399,6 +399,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     outputNode->SetValue ("output");
     outputNode->SetAttribute ("name", "output");
     outputNode->SetAttribute ("type", to);
+    outputNode->SetAttribute ("inheritattr", "input");
     
     CoerceItem item;
     item.fromType = StoredTypeName (from);
@@ -662,6 +663,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 	CgType (type).GetData(), name);
     }
   }
+
+  void ShaderCombinerCg::AddInputValue (const char* name, const char* type,
+                                        const char* value)
+  {
+    if (!currentSnippet.localIDs.Contains (name))
+    {
+      currentSnippet.localIDs.AddNoTest (name);
+      if (loader->annotateCombined)
+        currentSnippet.locals.AppendFmt ("// Input: %s %s\n", type, name);
+      currentSnippet.locals.AppendFmt ("%s %s;\n", 
+	CgType (type).GetData(), name);
+
+      csString valueExpr;
+      // @@@ Prone to break with some types :P
+      valueExpr.Format ("%s (%s)", CgType (type).GetData(), value);
+      currentSnippet.inputMaps.Put (valueExpr, name);
+    }
+  }
   
   void ShaderCombinerCg::AddOutput (const char* name, const char* type)
   {
@@ -687,12 +706,107 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     currentSnippet.outputMaps.Put (fromName, toName);
   }
   
-  csPtr<WeaverCommon::iCoerceChainIterator> 
-  ShaderCombinerCg::QueryCoerceChain (const char* fromType, const char* toType)
+  void ShaderCombinerCg::PropagateAttributes (const char* fromInput, 
+                                              const char* toOutput)
   {
-    return loader->QueryCoerceChain (fromType, toType);
+    const char* dstName = currentSnippet.outputMaps.Get (toOutput,
+      (const char*)0);
+    if (dstName == 0) return;
+
+    AttributeArray* srcAttrs = attributes.GetElementPointer (fromInput);
+    if (srcAttrs == 0) return;
+    attributes.PutUnique (dstName, *srcAttrs);
+    for (size_t a = 0; a < srcAttrs->GetSize(); a++)
+    {
+      Attribute& attr = srcAttrs->Get (a);
+      csString inId (GetAttrIdentifier (fromInput, attr.name));
+      csString outId (GetAttrIdentifier (toOutput, attr.name));
+      currentSnippet.attrInputMaps.Put (inId, outId);
+
+      AddOutputAttribute (toOutput, attr.name, attr.type);
+    }
   }
-  
+
+  void ShaderCombinerCg::AddOutputAttribute (const char* outputName,  
+    const char* name, const char* type)
+  {
+    const char* dstName = currentSnippet.outputMaps.Get (outputName,
+      (const char*)0);
+    if (dstName == 0) return;
+
+    AttributeArray& dstAttrs = attributes.GetOrCreate (dstName);
+    Attribute* a = FindAttr (dstAttrs, name, type);
+    if (a == 0)
+    {
+      Attribute newAttr;
+      newAttr.name = name;
+      newAttr.type = type;
+      dstAttrs.Push (newAttr);
+    }
+    csString outId (GetAttrIdentifier (outputName, name));
+    csString outIdMapped (GetAttrIdentifier (dstName, name));
+    currentSnippet.attrOutputMaps.Put (outId, outIdMapped);
+
+    if (loader->annotateCombined)
+    {
+      /* Snippet annotation may be multi-line, first line usually contains the 
+         name */
+      csString annotation (currentSnippet.annotation);
+      size_t linebreak = annotation.FindFirst ('\n');
+      if (linebreak != (size_t)-1) annotation.Truncate (linebreak);
+      globals.AppendFmt ("// Attribute '%s %s' for '%s'\n",
+        type, name, annotation.GetData());
+    }
+    globals.AppendFmt ("%s %s;\n", 
+      CgType (type).GetData(), outIdMapped.GetData());
+
+    if (loader->annotateCombined)
+      currentSnippet.locals.AppendFmt ("// Attribute '%s %s'\n",
+        type, name);
+    currentSnippet.locals.AppendFmt ("%s %s;\n", 
+      CgType (type).GetData(), outId.GetData());
+  }
+
+  void ShaderCombinerCg::AddInputAttribute (const char* inputName, 
+    const char* name, const char* type, const char* defVal)
+  {
+    const char* srcName = currentSnippet.inputMaps.Get (inputName,
+      (const char*)0);
+    if (srcName == 0) return;
+
+    AttributeArray* srcAttrs = attributes.GetElementPointer (inputName);
+
+    csString outId (GetAttrIdentifier (srcName, name));
+    if (loader->annotateCombined)
+      currentSnippet.locals.AppendFmt ("// Attribute '%s %s'\n",
+        type, name);
+    currentSnippet.locals.AppendFmt ("%s %s;\n", 
+      CgType (type).GetData(), outId.GetData());
+
+    Attribute* a = srcAttrs ? FindAttr (*srcAttrs, name, type) : 0;
+    if (a != 0)
+    {
+      csString inId (GetAttrIdentifier (inputName, name));
+      currentSnippet.attrInputMaps.Put (inId, outId);
+    }
+    else
+    {
+      currentSnippet.attrInputMaps.Put (defVal, outId);
+    }
+  }
+
+  ShaderCombinerCg::Attribute* ShaderCombinerCg::FindAttr (AttributeArray& arr, 
+                                                           const char* name, 
+                                                           const char* type)
+  {
+    for (size_t a = 0; a < arr.GetSize(); a++)
+    {
+      Attribute& attr = arr[a];
+      if ((attr.name == name) && (attr.type == type)) return &attr;
+    }
+    return 0;
+  }
+
   void ShaderCombinerCg::Link (const char* fromName, const char* toName)
   {
     currentSnippet.links.AppendFmt ("%s = %s;\n",
@@ -784,6 +898,12 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     outputAssign.AppendFmt ("outputColor = %s;\n", name);
   }
   
+  csPtr<WeaverCommon::iCoerceChainIterator> 
+  ShaderCombinerCg::QueryCoerceChain (const char* fromType, const char* toType)
+  {
+    return loader->QueryCoerceChain (fromType, toType);
+  }
+  
   uint ShaderCombinerCg::CoerceCost (const char* fromType, const char* toType)
   {
     return loader->CoerceCost (fromType, toType);
@@ -862,9 +982,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
             appender.Append ("// Locally used names for inputs + outputs\n");
 	  appender.Append (snippets[s].locals);
           AppendSnippetMap (snippets[s].inputMaps, appender);
+          AppendSnippetMap (snippets[s].attrInputMaps, appender);
 	  appender.Append (snippets[s].vertexBody);
           AppendProgramInput_V2FVP (snippets[s], appender);
 	  AppendSnippetMap (snippets[s].outputMaps, appender);
+          AppendSnippetMap (snippets[s].attrOutputMaps, appender);
 	  appender.Append ("}\n");
 	}
 	appender.Append (snippets[s].links);
@@ -948,9 +1070,11 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
             appender.Append ("// Locally used names for inputs + outputs\n");
 	  appender.Append (snippets[s].locals);
           AppendSnippetMap (snippets[s].inputMaps, appender);
+          AppendSnippetMap (snippets[s].attrInputMaps, appender);
           AppendProgramInput_V2FFP (snippets[s], appender);
 	  appender.Append (snippets[s].fragmentBody);
           AppendSnippetMap (snippets[s].outputMaps, appender);
+          AppendSnippetMap (snippets[s].attrOutputMaps, appender);
 	  appender.Append ("}\n");
 	}
 	appender.Append (snippets[s].links);
@@ -1202,6 +1326,14 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     return weaverType; // @@@ Hmmm... what fallback, if any?
   }
 
+  csString ShaderCombinerCg::GetAttrIdentifier (const char* var, 
+                                                const char* attr)
+  {
+    csString s;
+    s.Format ("%s_attr_%s", var, attr);
+    return s;
+  }
+
   const char* ShaderCombinerCg::MakeComment (const char* s)
   {
     const char* linebreak;
@@ -1235,7 +1367,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
     {
       csString fromName;
       const csString& toName = it.Next (fromName);
-      appender.AppendFmt ("%s = %s;\n", toName.GetData(), fromName.GetData());
+      if (fromName != toName)
+        appender.AppendFmt ("%s = %s;\n", toName.GetData(), fromName.GetData());
     }
   }
   

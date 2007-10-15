@@ -585,7 +585,7 @@ namespace lighter
           if (!remapped.Contains (index))
           {
             csVector2 &uv = vertexData.lightmapUVs[index];
-            uv = lightmapUVs[index] + move;
+            uv = lightmapUVs[index] + move + csVector2(0.5f,0.5f);
             remapped.AddNoTest (index);
           }
         }

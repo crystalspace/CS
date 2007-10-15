@@ -125,6 +125,14 @@ if $(CMD.SWIG)
     MakeLocate $(target) : $(LOCATE_TARGET) ;
     if $(othertargets)
     {
+      # create an extra target to ensure target dir for language specific
+      # files is created before swig is run.
+      if $(outdir) != $(LOCATE_TARGET)
+      {
+        local othertargetsdir = $(outdir) ;
+        Depends $(target) : $(othertargetsdir) ;
+        MkDir $(othertargetsdir) ;
+      }
       MakeLocate $(othertargets) : $(outdir) ;
 
       # If any target, such as an install target, depends upon the other files,
@@ -134,7 +142,7 @@ if $(CMD.SWIG)
 
     SWIG.FLAGS on $(target) +=
       $(SWIG.FLAGS) -$(language) $(swigflags) -I$(swigincdirs)
-      -outdir [ ConcatDirs $(outdir) ] ;
+      -outdir [ ConcatDirs $(outdir) ] -o $(target:G=:D=$(LOCATE_TARGET)) ;
 
     # Allow Swig input file to reside at location other than $(SEARCH_SOURCE).
     if $(swigfiledir)
@@ -148,7 +156,7 @@ if $(CMD.SWIG)
 
     # Scan for special Swig includes.
     HDRGRIST on $(swigfile) = $(HDRGRIST) ;
-    HDRSEARCH on $(swigfile) =
+    HDRSEARCH on $(swigfile) = [ on $(swigfile) GetVar SEARCH ]
       $(SEARCH_SOURCE:E) $(SUBDIRHDRS) $(HDRS) $(STDHDRS) ;
     HDRRULE on $(swigfile) = HeaderRule ;
     HDRSCAN on $(swigfile) = $(SWIG.HDRPATTERN) ;
@@ -169,6 +177,57 @@ if $(CMD.SWIG)
       Depends $(frozen_target) : $(target) ;
       Copy $(frozen_target) : $(target) ;
       Depends $(tag)freeze : $(frozen_target) ;
+      Depends $(language)freeze : $(tag)freeze ;
+
+      if $(othertargets)
+      {
+        local frozen_other = $(othertargets:G=$(tag)freeze) ;
+        MakeLocate $(frozen_other) : $(frozenotherdir) ;
+        Depends $(frozen_other) : $(othertargets) ;
+        Copy $(frozen_other) : $(othertargets) ;
+        Depends $(tag)freeze : $(frozen_other) ;
+      }
+
+      NotFile $(tag)freeze ;
+      Help $(tag)freeze : "Copy generated Swig files to source directory" ;
+    }
+  }
+  
+  ##  SwigExternalRuntime target : language [ : swigflags [: frozendirs [: tag ]]]
+  rule SwigExternalRuntime
+  {
+    local target = $(1) ;
+    local language = $(2) ;
+    local swigflags = $(3) ;
+    local frozentargetdir = $(4[1]) ;
+    local frozenotherdir = $(4[2-]) ;
+    local tag = $(5) ;
+
+    if ! $(frozenotherdir) { frozenotherdir = $(frozentargetdir) ; }
+    if ! $(tag) { tag = $(language) ; }
+
+    MakeLocate $(target) : $(LOCATE_TARGET) ;
+
+    SWIG.FLAGS on $(target) +=
+      $(SWIG.FLAGS) -$(language) $(swigflags) -external-runtime [ ConcatDirs $(LOCATE_TARGET) $(target) ] ;
+
+    RunSwig $(target) ;
+    Depends $(tag)swig : $(target) ;
+    NotFile $(tag)swig ;
+    Always $(tag)swig ;
+    Help $(tag)swig : "Generate Swig files for $(tag)" ;
+
+    Clean $(tag)swigclean : $(target) $(othertargets) ;
+    Depends clean : $(tag)swigclean ;
+
+    if $(frozentargetdir)
+    {
+      local frozen_target = $(target:G=$(tag)freeze) ;
+      MakeLocate $(frozen_target) : $(frozentargetdir) ;
+      Depends $(frozen_target) : $(target) ;
+      Copy $(frozen_target) : $(target) ;
+      Depends $(tag)freeze : $(frozen_target) ;
+      Depends $(language)freeze : $(tag)freeze ;
 
       if $(othertargets)
       {
@@ -186,7 +245,7 @@ if $(CMD.SWIG)
 
   actions RunSwig
   {
-    $(CMD.SWIG) $(SWIG.FLAGS) -o $(<) $(>)
+    $(CMD.SWIG) $(SWIG.FLAGS) $(>)
     $(SED) $(SWIG.SED_SCRIPT) < $(<) > $(<).sed
     $(RM) $(<)
     $(MV) $(<).sed $(<)
@@ -219,7 +278,7 @@ if $(CMD.SWIG)
   if ! $(NO_SWIG_HEADER_SCANNING)
   {
     SWIG.HDRPATTERN =
-      "^[ 	]*[%#][ 	]*include[ 	]*[<\"]([^\">]*)[\">].*$" ;
+      "^[ 	]*[%#][ 	]*i[nm][cp][lo][ur][dt]e?[ 	]*[<\"]([^\">]*)[\">].*$" ;
     RegisterHeaderRule HeaderRule : $(SWIG.HDRPATTERN) : .i ;
   }
 }

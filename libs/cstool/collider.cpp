@@ -137,13 +137,13 @@ bool csColliderWrapper::Collide (csColliderWrapper& otherCollider,
 
 csColliderWrapper* csColliderWrapper::GetColliderWrapper (csObject &object)
 {
-  csRef<csColliderWrapper> w (CS_GET_CHILD_OBJECT (&object, csColliderWrapper));
+  csRef<csColliderWrapper> w (CS::GetChildObject<csColliderWrapper> (&object));
   return w;	// This will DecRef() but that's ok in this case.
 }
 
 csColliderWrapper* csColliderWrapper::GetColliderWrapper (iObject* object)
 {
-  csRef<csColliderWrapper> w (CS_GET_CHILD_OBJECT (object, csColliderWrapper));
+  csRef<csColliderWrapper> w (CS::GetChildObject<csColliderWrapper> (object));
   return w;	// This will DecRef() but that's ok in this case.
 }
 

@@ -314,9 +314,9 @@ public:
   {
     return (int)this->user_buffer_names.GetSize ();
   }
-  csRef<iRenderBuffer> GetRenderBuffer (int index); 
+  iRenderBuffer* GetRenderBuffer (int index); 
   csRef<iString> GetRenderBufferName (int index) const;
-
+  iRenderBuffer* GetRenderBuffer (const char* name);
 
   /**\name Shadow and lighting system
    * @{ */
@@ -506,6 +506,9 @@ public:
    * Setup this factory. This function will check if setup is needed.
    */
   void SetupFactory ();
+
+  /// Update tangent and bitangent buffers
+  void UpdateTangentsBitangents ();
 private:
   csDirtyAccessArray<csColor4> mesh_colors;
 public:
@@ -571,7 +574,7 @@ public:
   {
     if (ensureValid && (mesh_colors.GetSize() == 0))
     {
-      mesh_colors.SetCapacity (mesh_vertices.GetSize());
+      mesh_colors.SetCapacity (mesh_vertices.Capacity());
       mesh_colors.SetSize (mesh_vertices.GetSize(), csColor4 (0, 0, 0, 1));
     }
     return mesh_colors.GetArray();
@@ -613,8 +616,9 @@ public:
   {
     return (int)this->user_buffer_names.GetSize ();
   }
-  csRef<iRenderBuffer> GetRenderBuffer (int index); 
+  iRenderBuffer* GetRenderBuffer (int index); 
   csRef<iString> GetRenderBufferName (int index) const;
+  iRenderBuffer* GetRenderBuffer (const char* name);
 
   /**
    * Get the string ID's for the anonymous buffers

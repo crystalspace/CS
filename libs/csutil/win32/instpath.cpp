@@ -45,7 +45,7 @@ static inline bool GetRegistryInstallPath (const HKEY parentKey,
   result = RegOpenKeyEx (parentKey, 
     "Software\\CrystalSpace\\" VERSION_STR_DOTTED,
     0, KEY_READ, &m_pKey);
-  if (result == ERROR_SUCCESS)
+  if (result != ERROR_SUCCESS)
   {
     result = RegOpenKeyEx (parentKey, "Software\\CrystalSpace",
       0, KEY_READ, &m_pKey);
@@ -93,7 +93,7 @@ static inline bool GetRegistryInstallPath (const HKEY parentKey,
   result = RegOpenKeyEx (parentKey, 
     "Software\\CrystalSpace\\" VERSION_STR_DOTTED,
     0, KEY_READ, &m_pKey);
-  if (result == ERROR_SUCCESS)
+  if (result != ERROR_SUCCESS)
   {
     result = RegOpenKeyEx (parentKey, "Software\\CrystalSpace",
       0, KEY_READ, &m_pKey);

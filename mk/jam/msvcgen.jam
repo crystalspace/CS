@@ -538,6 +538,17 @@ MSVC.CFLAGS.library ?= ;
 MSVC.CFLAGS_DEBUG.library ?= ;
 MSVC.DEFINES.library ?= ;
 MSVC.DEFINES_DEBUG.library ?= ;
+MSVC.DEPEND.dll ?= ;
+MSVC.DEPEND_DEBUG.dll ?= ;
+MSVC.LIBRARY.dll ?= ;
+MSVC.LIBRARY_DEBUG.dll ?= ;
+MSVC.LIBRARY_DELAY.dll ?= ;
+MSVC.LFLAGS.dll ?= ;
+MSVC.LFLAGS_DEBUG.dll ?= ;
+MSVC.CFLAGS.dll ?= ;
+MSVC.CFLAGS_DEBUG.dll ?= ;
+MSVC.DEFINES.dll ?= ;
+MSVC.DEFINES_DEBUG.dll ?= ;
 
 MSVC.PREFIX.appgui    ?= app ;
 MSVC.PREFIX.appcon    ?= app ;
@@ -545,6 +556,7 @@ MSVC.PREFIX.plugin    ?= plg ;
 MSVC.PREFIX.library   ?= lib ;
 MSVC.PREFIX.group     ?= grp ;
 MSVC.PREFIX.workspace ?= wks ;
+MSVC.PREFIX.dll       ?= dll ;
 
 SetProperty build : projgen : msvc ;
 SetProperty build : projgen_version : $(MSVC_VERSION) ;
@@ -765,7 +777,7 @@ rule MsvcProject
   }
 
   # Add resource file.
-  if [ IsElem $(type) : plugin appgui appcon ]
+  if [ IsElem $(type) : dll plugin appgui appcon ]
   {
     local resource = $(msvcname:S=.rc) ;
     Depends msvcgen : $(resource) ;
@@ -910,17 +922,22 @@ rule MsvcProject
 rule RegisterWellKnownCompileGroup1
 {
   local group = $(1) ;
-  if $(MSVCGEN.WELL_KNOWN_GROUP_REGISTERED.$(group)) != yes
-  {
-    MSVCGEN.WELL_KNOWN_GROUP_REGISTERED.$(group) = yes ;
-    RegisterCompileGroups $(group) ;
-  }
+  RegisterCompileGroups $(group) ;
 }
 
 rule RegisterWellKnownCompileGroup
 {
   RegisterWellKnownCompileGroup1 all ;
-  RegisterWellKnownCompileGroup1 $(1) ;
+  if "$(1)" != ""
+  {
+    RegisterWellKnownCompileGroup1 $(1) ;
+  }
+  local g ;
+  for g in $(MSVCGEN.DELAYED_COMPILE_GROUPS)
+  {
+    RegisterWellKnownCompileGroup1 $(g) ;
+  }
+  MSVCGEN.DELAYED_COMPILE_GROUPS = ;
 }
 
 rule LinkStaticPlugins
@@ -1093,6 +1110,15 @@ rule Library
   CompileGroups $(<) : all libs ;
 }
 
+rule DLL
+{
+  RegisterWellKnownCompileGroup ;
+  
+  $(<)_TYPE = dll ;
+  MsvcProject $(<) : dll : $(3:E=$(<:S=.dll)) : $(>) ;
+  CompileGroups $(<) : all ;
+}
+
 rule StaticPluginLibrary
 {
   local name = $(<) ;
@@ -1221,10 +1247,14 @@ EOT
 
 rule RegisterCompileGroups
 {
-  local i ;
-  for i in $(<)_$(MSVC.WORKSPACES)
+  if $(MSVCGEN.REGISTERED_COMPILE_GROUP.$(<)) != yes
   {
-    MsvcProject $(i) : group ;
+    local i ;
+    for i in $(<)_$(MSVC.WORKSPACES)
+    {
+      MsvcProject $(i) : group ;
+    }
+    MSVCGEN.REGISTERED_COMPILE_GROUP.$(<) = yes ;
   }
 }
 

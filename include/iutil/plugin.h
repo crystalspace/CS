@@ -61,14 +61,18 @@ struct iPluginIterator : public virtual iBase
  */
 struct iPluginManager : public virtual iBase
 {
-  SCF_INTERFACE(iPluginManager, 2,0,0);
+  SCF_INTERFACE(iPluginManager, 2,1,0);
   /**
    * Load a plugin and (optionally) initialize it.
    * If 'init' is true then the plugin will be initialized and QueryOptions()
    * will be called.
+   * \param classID Class ID of the plugin to load.
+   * \param init Whether the plugin should be initialized, that is, the
+   *   iComponent's Initialize() method should be called.
+   * \param report Whether to report loading failures using the reporter.
    */
   virtual iBase *LoadPlugin (const char *classID,
-    bool init = true) = 0;
+    bool init = true, bool report = true) = 0;
 
   /**
    * Get first of the loaded plugins that supports given interface ID.
@@ -147,9 +151,10 @@ inline csPtr<Interface> csQueryPluginClass (iPluginManager *mgr,
  */
 template<class Interface>
 inline csPtr<Interface> csLoadPlugin (iPluginManager *mgr,
-                                      const char* ClassID)
+                                      const char* ClassID,
+				      bool report = true)
 {
-  iBase* base = mgr->LoadPlugin (ClassID);
+  iBase* base = mgr->LoadPlugin (ClassID, true, report);
 
   if (base == 0) return csPtr<Interface> (0);
 
@@ -170,11 +175,12 @@ inline csPtr<Interface> csLoadPlugin (iPluginManager *mgr,
  */
 template<class Interface>
 inline csPtr<Interface> csLoadPlugin (iObjectRegistry* object_reg,
-                                      const char* ClassID)
+                                      const char* ClassID,
+				      bool report = true)
 {
   csRef<iPluginManager> mgr = csQueryRegistry<iPluginManager> (object_reg);
   if (!mgr) return 0;
-  return csLoadPlugin<Interface> (mgr, ClassID);
+  return csLoadPlugin<Interface> (mgr, ClassID, report);
 }
 
 /**
@@ -186,11 +192,12 @@ inline csPtr<Interface> csLoadPlugin (iObjectRegistry* object_reg,
  */
 template<class Interface>
 inline csPtr<Interface> csLoadPluginCheck (iPluginManager *mgr,
-                                      const char* ClassID)
+                                      const char* ClassID,
+				      bool report = true)
 {
   csRef<Interface> i = csQueryPluginClass<Interface> (mgr, ClassID);
   if (i) return (csPtr<Interface>) i;
-  i = csLoadPlugin<Interface> (mgr, ClassID);
+  i = csLoadPlugin<Interface> (mgr, ClassID, report);
   if (!i) return 0;
   return (csPtr<Interface>) i;
 }
@@ -215,7 +222,7 @@ inline csPtr<Interface> csLoadPluginCheck (iObjectRegistry* object_reg,
       	"crystalspace.plugin.load", "Couldn't find plugin manager!");
     return 0;
   }
-  csRef<Interface> i = csLoadPluginCheck<Interface> (mgr, ClassID);
+  csRef<Interface> i = csLoadPluginCheck<Interface> (mgr, ClassID, report);
   if (!i)
   {
     if (report)
@@ -232,9 +239,10 @@ inline csPtr<Interface> csLoadPluginCheck (iObjectRegistry* object_reg,
  * This is useful for unconditionally loading plugins.
  */
 inline csPtr<iBase> csLoadPluginAlways (iPluginManager *mgr,
-                                        const char* ClassID)
+                                        const char* ClassID,
+				        bool report = true)
 {
-  iBase* base = mgr->LoadPlugin (ClassID);
+  iBase* base = mgr->LoadPlugin (ClassID, true, report);
   return csPtr<iBase> (base);
 }
 
@@ -273,7 +281,7 @@ inline csPtr<Interface> csQueryRegistryOrLoad (iObjectRegistry *Reg,
       	"crystalspace.plugin.query", "Plugin manager missing!");
     return 0;
   }
-  i = csLoadPlugin<Interface> (plugmgr, classID);
+  i = csLoadPlugin<Interface> (plugmgr, classID, report);
   if (!i)
   {
     if (report)

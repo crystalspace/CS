@@ -25,7 +25,9 @@
 
 #include "csgeom/csrect.h"
 #include "csgfx/rgbpixel.h"
+#include "csutil/allocator.h"
 #include "csutil/bitarray.h"
+#include "csutil/cscolor.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/flags.h"
 #include "csutil/set.h"
@@ -84,7 +86,7 @@ public:
   {
     static CS_FORCEINLINE size_t LumelAlign (size_t n)
     {
-      static const size_t align = sizeof (Lumel);
+      static const size_t align = 8; // For MMX
       return ((n + align - 1) / align) * align;
     }
   public:
@@ -152,17 +154,27 @@ public:
     void ComputeValueBounds (const TileHelper& tiles);
     void ComputeValueBounds (const TileHelper& tiles, const csRect& area);
   public:
-    csArray<csRGBcolor> maxValues;
     csBitArray tileNonNull;
-    csArray<csRect> nonNullAreas;
     int imageX, imageY, imageW, imageH;
     csRef<LumelBufferBase> imageData;
+    struct Tile
+    {
+      csRGBcolor maxValue;
+
+      int tilePartX, tilePartY;
+      int tilePartW, tilePartH, tilePartPitch;
+      void* tilePartData;
+
+      Tile() : maxValue (0, 0, 0) {}
+    };
+    csArray<Tile> tiles;
+    csArray<csRect> nonNullAreas;
 
     PDMap (size_t tilesNum) : imageX (0), imageY (0), imageW (0), imageH (0),
       imageData (0) 
     { 
-      maxValues.SetSize (tilesNum, csRGBcolor (0, 0, 0));
       tileNonNull.SetSize (tilesNum);
+      tiles.SetSize (tilesNum);
       nonNullAreas.SetSize (tilesNum, 
         csRect (INT_MAX, INT_MAX, INT_MIN, INT_MIN));
     }
@@ -170,11 +182,14 @@ public:
       imageX (0), imageY (0), imageData (0)
     { 
       tileNonNull.SetSize (tilesNum);
+      this->tiles.SetSize (tilesNum);
       SetImage (tiles, img); 
     }
     void SetImage (const TileHelper& tiles, iImage* img);
     void Crop ();
     void GetMaxValue (csRGBcolor& maxValue);
+
+    void UpdateTiles (const TileHelper& helper);
   };
   struct MappedLight
   {
@@ -199,6 +214,10 @@ public:
 private:
   typedef csDirtyAccessArray<Lumel> LightmapScratch;
   CS_DECLARE_STATIC_CLASSVAR_REF(lightmapScratch, GetScratch, LightmapScratch);
+  typedef csDirtyAccessArray<uint64, csArrayElementHandler<uint64>,
+    CS::Memory::AllocatorAlign<8> > LightmapScratchMMX;
+  CS_DECLARE_STATIC_CLASSVAR_REF(lightmapScratchMMX, GetScratchMMX, 
+    LightmapScratchMMX);
 
   csRef<ProctexPDLightLoader> loader;
   TileHelper tiles;
@@ -212,6 +231,8 @@ private:
   {
     stateDirty = 1 << 0,
     statePrepared = 1 << 1,
+
+    stateDoMMX = 1 << 31
   };
   csFlags state;
   struct LightColorState
@@ -225,6 +246,9 @@ private:
   csHash<LightColorState, csConstPtrKey<iLight> > lightColorStates;
 
   void Report (int severity, const char* msg, ...);
+
+  void Animate_Generic ();
+  void Animate_MMX ();
 public:
   const char* AddLight (const MappedLight& light);
   void FinishLoad()

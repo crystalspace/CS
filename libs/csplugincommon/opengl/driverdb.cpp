@@ -377,6 +377,7 @@ bool csDriverDBReader::ParseCompareVer (iDocumentNode* node, bool& result)
   return true;
 }
 
+#include "csutil/custom_new_disable.h"
 bool csDriverDBReader::ParseConfigs (iDocumentNode* node)
 {
   csRef<iDocumentNodeIterator> it (node->GetNodes ());
@@ -417,6 +418,7 @@ bool csDriverDBReader::ParseConfigs (iDocumentNode* node)
   }
   return true;
 }
+#include "csutil/custom_new_enable.h"
 
 bool csDriverDBReader::ParseRules (iDocumentNode* node)
 {

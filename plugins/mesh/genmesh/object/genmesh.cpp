@@ -998,7 +998,9 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     	logparent, -1, false);
   }
 
-  if (anim_ctrl) anim_ctrl->Update (vc->GetCurrentTicks ());
+  if (anim_ctrl)
+    anim_ctrl->Update (vc->GetCurrentTicks (), factory->GetVertexCount(), 
+      factory->GetShapeNumber());
 
   const csReversibleTransform o2wt = movable->GetFullTransform ();
   const csVector3& wo = o2wt.GetOrigin ();
@@ -1580,7 +1582,7 @@ bool csGenmeshMeshObject::RemoveRenderBuffer (const char *name)
   return false;
 }
 
-csRef<iRenderBuffer> csGenmeshMeshObject::GetRenderBuffer (int index)
+iRenderBuffer* csGenmeshMeshObject::GetRenderBuffer (int index)
 {
   csStringID bufID = user_buffer_names[index];
   return userBuffers.GetRenderBuffer (bufID);
@@ -1592,6 +1594,15 @@ csRef<iString> csGenmeshMeshObject::GetRenderBufferName (int index) const
   name.AttachNew (new scfString (factory->GetStrings ()->Request 
     (user_buffer_names[index])));
   return name;
+}
+
+iRenderBuffer* csGenmeshMeshObject::GetRenderBuffer (const char* name)
+{
+  csStringID bufID = factory->GetStrings()->Request (name);
+  iRenderBuffer* buf = userBuffers.GetRenderBuffer (bufID);
+  if (buf != 0) return 0;
+
+  return factory->GetRenderBuffer (name);
 }
 
 iMeshObjectFactory* csGenmeshMeshObject::GetFactory () const
@@ -1779,6 +1790,58 @@ void csGenmeshMeshObjectFactory::SetupFactory ()
   {
     initialized = true;
     object_bbox_valid = false;
+  }
+}
+
+void csGenmeshMeshObjectFactory::UpdateTangentsBitangents ()
+{
+  if (mesh_tangents_dirty_flag)
+  {
+    if (!tangent_buffer)
+      tangent_buffer = csRenderBuffer::CreateRenderBuffer (
+        mesh_vertices.GetSize (), CS_BUF_STATIC,
+        CS_BUFCOMP_FLOAT, 3);
+    if (!binormal_buffer)
+      binormal_buffer = csRenderBuffer::CreateRenderBuffer (
+        mesh_vertices.GetSize (), CS_BUF_STATIC,
+        CS_BUFCOMP_FLOAT, 3);
+    mesh_tangents_dirty_flag = false;
+
+    size_t triNum;
+    const csTriangle* tris;
+    csDirtyAccessArray<csTriangle> triangleScratch;
+    if (subMeshes.GetSize() == 0)
+    {
+      triNum = mesh_triangles.GetSize ();
+      tris = mesh_triangles.GetArray ();
+    }
+    else
+    {
+      for (size_t i = 0; i < subMeshes.GetSize(); i++)
+      {
+        size_t scratchPos = triangleScratch.GetSize();
+        iRenderBuffer* indexBuffer = subMeshes[i]->SubMesh::GetIndices();
+        size_t indexTris = indexBuffer->GetElementCount() / 3;
+        triangleScratch.SetSize (scratchPos + indexTris);
+        csRenderBufferLock<uint8> indexLock (indexBuffer, CS_BUF_LOCK_READ);
+        memcpy (triangleScratch.GetArray() + scratchPos,
+          indexLock.Lock(), indexTris * sizeof (csTriangle));
+      }
+      triNum = triangleScratch.GetSize ();
+      tris = triangleScratch.GetArray ();
+    }
+    csVector3* tangentData = (csVector3*)cs_malloc (
+      sizeof (csVector3) * mesh_vertices.GetSize () * 2);
+    csVector3* bitangentData = tangentData + mesh_vertices.GetSize ();
+    csNormalMappingTools::CalculateTangents (triNum, tris, 
+      mesh_vertices.GetSize (), mesh_vertices.GetArray (), 
+      mesh_normals.GetArray (), mesh_texels.GetArray (), 
+      tangentData, bitangentData);
+
+    tangent_buffer->CopyInto (tangentData, mesh_vertices.GetSize ());
+    binormal_buffer->CopyInto (bitangentData, mesh_vertices.GetSize ());
+
+    cs_free (tangentData);
   }
 }
 
@@ -1985,58 +2048,12 @@ void csGenmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder,
   }
   else if (buffer == CS_BUFFER_TANGENT || buffer == CS_BUFFER_BINORMAL) 
   {
-    if (mesh_tangents_dirty_flag)
-    {
-      if (!tangent_buffer)
-        tangent_buffer = csRenderBuffer::CreateRenderBuffer (
-          mesh_vertices.GetSize (), CS_BUF_STATIC,
-          CS_BUFCOMP_FLOAT, 3);
-      if (!binormal_buffer)
-        binormal_buffer = csRenderBuffer::CreateRenderBuffer (
-          mesh_vertices.GetSize (), CS_BUF_STATIC,
-          CS_BUFCOMP_FLOAT, 3);
-      mesh_tangents_dirty_flag = false;
-
-      size_t triNum;
-      const csTriangle* tris;
-      csDirtyAccessArray<csTriangle> triangleScratch;
-      if (subMeshes.GetSize() == 0)
-      {
-        triNum = mesh_triangles.GetSize ();
-        tris = mesh_triangles.GetArray ();
-      }
-      else
-      {
-        for (size_t i = 0; i < subMeshes.GetSize(); i++)
-        {
-          size_t scratchPos = triangleScratch.GetSize();
-          iRenderBuffer* indexBuffer = subMeshes[i]->SubMesh::GetIndices();
-          size_t indexTris = indexBuffer->GetElementCount() / 3;
-          triangleScratch.SetSize (scratchPos + indexTris);
-          csRenderBufferLock<uint8> indexLock (indexBuffer, CS_BUF_LOCK_READ);
-          memcpy (triangleScratch.GetArray() + scratchPos,
-            indexLock.Lock(), indexTris * sizeof (csTriangle));
-        }
-        triNum = triangleScratch.GetSize ();
-        tris = triangleScratch.GetArray ();
-      }
-      csVector3* tangentData = new csVector3[mesh_vertices.GetSize () * 2];
-      csVector3* bitangentData = tangentData + mesh_vertices.GetSize ();
-      csNormalMappingTools::CalculateTangents (triNum, tris, 
-        mesh_vertices.GetSize (), mesh_vertices.GetArray (), 
-        mesh_normals.GetArray (), mesh_texels.GetArray (), 
-        tangentData, bitangentData);
-
-      tangent_buffer->CopyInto (tangentData, mesh_vertices.GetSize ());
-      binormal_buffer->CopyInto (bitangentData, mesh_vertices.GetSize ());
-
-      delete[] tangentData;
-    }
+    UpdateTangentsBitangents();
     holder->SetRenderBuffer (buffer, (buffer == CS_BUFFER_TANGENT) ?
       tangent_buffer : binormal_buffer);
     return;
   }
-  if (buffer == CS_BUFFER_INDEX && !back2front)
+  else if (buffer == CS_BUFFER_INDEX && !back2front)
   {
     if (mesh_triangle_dirty_flag)
     {
@@ -2263,7 +2280,7 @@ bool csGenmeshMeshObjectFactory::RemoveRenderBuffer (const char *name)
   return false;
 }
 
-csRef<iRenderBuffer> csGenmeshMeshObjectFactory::GetRenderBuffer (int index)
+iRenderBuffer* csGenmeshMeshObjectFactory::GetRenderBuffer (int index)
 {
   csStringID bufID = user_buffer_names[index];
   return userBuffers.GetRenderBuffer (bufID);
@@ -2274,6 +2291,25 @@ csRef<iString> csGenmeshMeshObjectFactory::GetRenderBufferName (int index) const
   csRef<iString> name; 
   name.AttachNew (new scfString (strings->Request (user_buffer_names[index])));
   return name;
+}
+
+iRenderBuffer* csGenmeshMeshObjectFactory::GetRenderBuffer (const char* name)
+{
+  csStringID bufID = strings->Request (name);
+  iRenderBuffer* buf = userBuffers.GetRenderBuffer (bufID);
+  if (buf != 0) return buf;
+
+  if (strcmp (name, "tangent") == 0)
+  {
+    UpdateTangentsBitangents ();
+    return tangent_buffer;
+  }
+  else if (strcmp (name, "bitangent") == 0)
+  {
+    UpdateTangentsBitangents ();
+    return binormal_buffer;
+  }
+  return 0;
 }
 
 void csGenmeshMeshObjectFactory::Invalidate ()

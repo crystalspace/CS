@@ -42,17 +42,24 @@ CS_PLUGIN_NAMESPACE_BEGIN(ShaderWeaver)
     
     void BeginSnippet (const char* annotation);
     void AddInput (const char* name, const char* type) {}
+    void AddInputValue (const char* name, const char* type, const char* value) {}
     void AddOutput (const char* name, const char* type) {}
     void InputRename (const char* fromName, const char* toName);
     void OutputRename (const char* fromName, const char* toName);
-    csPtr<CS::PluginCommon::ShaderWeaver::iCoerceChainIterator> 
-      QueryCoerceChain (const char* fromType, const char* toType) { return 0; }
+    void PropagateAttributes (const char* fromInput,
+      const char* toOutput) {};
+    void AddOutputAttribute (const char* outputName, 
+      const char* name, const char* type) {};
+    void AddInputAttribute (const char* inputName,
+      const char* name, const char* type, const char* defVal) {};
     void Link (const char* fromName, const char* toName) {}
     void WriteBlock (const char* location, iDocumentNode* blockNodes);
     bool EndSnippet ();
     void AddGlobal (const char* name, const char* type, 
       const char* annotation) {}
     void SetOutput (const char* name, const char* annotation) {}
+    csPtr<CS::PluginCommon::ShaderWeaver::iCoerceChainIterator> 
+      QueryCoerceChain (const char* fromType, const char* toType) { return 0; }
     uint CoerceCost (const char* fromType, const char* toType);
     void WriteToPass (iDocumentNode* pass);
     bool CompatibleParams (iDocumentNode* params);

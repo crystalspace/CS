@@ -203,41 +203,45 @@ namespace CS
 }
 
 template<typename Interface>
-inline CS_DEPRECATED_METHOD_MSG ("CS_GET_CHILD_OBJECT macro is deprecated")
+inline CS_DEPRECATED_METHOD_MSG ("CS_GET_CHILD_OBJECT macro is deprecated, "
+                                 "use CS::GetChildObject() instead")
 csPtr<Interface> CS_GET_CHILD_OBJECT_is_deprecated (iObject* Object)
 {
   return CS::GetChildObject<Interface> (Object);
 }
 /**
- * \deprecated Compatibility macro
+ * \deprecated Compatibility macro. Use CS::GetChildObject() instead
  * \sa CS::GetChildObject
  */
 #define CS_GET_CHILD_OBJECT(Object, Interface) \
   (CS_GET_CHILD_OBJECT_is_deprecated<Interface> (Object))
 
 template<typename Interface>
-inline CS_DEPRECATED_METHOD_MSG ("CS_GET_NAMED_CHILD_OBJECT macro is deprecated")
+inline CS_DEPRECATED_METHOD_MSG ("CS_GET_NAMED_CHILD_OBJECT macro is deprecated, "
+                                 "use CS::GetNamedChildObject() instead")
 csPtr<Interface> CS_GET_NAMED_CHILD_OBJECT_is_deprecated (iObject* Object,
   const char* Name)
 {
   return CS::GetNamedChildObject<Interface> (Object, Name);
 }
 /**
- * \deprecated Compatibility macro
+ * \deprecated Compatibility macro. Use iObject->GetChild() and 
+ *   scfQueryInterface().
  * \sa iObject::GetChild
  */
 #define CS_GET_NAMED_CHILD_OBJECT(Object, Interface, Name) \
   (CS_GET_NAMED_CHILD_OBJECT_is_deprecated<Interface> (Object, Name))
 
 template<typename Interface>
-inline CS_DEPRECATED_METHOD_MSG ("CS_GET_FIRST_NAMED_CHILD_OBJECT macro is deprecated")
+inline CS_DEPRECATED_METHOD_MSG ("CS_GET_FIRST_NAMED_CHILD_OBJECT macro is deprecated, "
+                                 "use iObject->GetChild() and scfQueryInterface() ")
 csPtr<Interface> CS_GET_FIRST_NAMED_CHILD_OBJECT_is_deprecated (iObject* Object,
   const char* Name)
 {
   return scfQueryInterfaceSafe<Interface> (Object->GetChild (Name));
 }
 /**
- * \deprecated Compatibility macro
+ * \deprecated Compatibility macro. Use CS::GetNamedChildObject() instead
  * \sa CS::GetNamedChildObject
  */
 #define CS_GET_FIRST_NAMED_CHILD_OBJECT(Object, Interface, Name) \

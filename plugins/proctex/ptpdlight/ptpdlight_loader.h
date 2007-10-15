@@ -85,6 +85,8 @@ protected:
   void Report (int severity, iDocumentNode* node, const char* msg, ...);
   bool HexToLightID (char* lightID, const char* lightIDHex);
 public:
+  bool doMMX;
+
   ProctexPDLightLoader (iBase *p);
   virtual ~ProctexPDLightLoader ();
 
