@@ -1,0 +1,7 @@
+SubDir TOP plugins cscript cshcsgfx ;
+
+if $(CSHARP.AVAILABLE) = "yes"
+{
+  CSharpBindingModule csgfxsharp : csgfx : csgfxmod.cpp : : : "csgfx cs C# module" ;
+}
+

@@ -1,0 +1,7 @@
+SubDir TOP plugins cscript cshimap ;
+
+if $(CSHARP.AVAILABLE) = "yes"
+{
+  CSharpBindingModule imapsharp : imap : imapmod.cpp : : : "imap cs C# module" ;
+}
+

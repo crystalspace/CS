@@ -20,7 +20,7 @@
 # PythMod rule
 # Can be used to create cspace python modules.
 
-rule InstalCSharpMod
+rule InstallCSharpMod
 {
   InstalBindingsModule $(1) : $(2) ;
 }
@@ -59,7 +59,6 @@ rule CSharpMod
 
   local target = $(1) ;
   local module = $(2) ;
-  local cleantarget ;
   local desc = $(7) ;
 
   Description $(<) : $(desc) ;
@@ -95,7 +94,7 @@ rule CSharpMod
 
   Always $(<)clean ;
   NotFile $(<)clean ;
-  Clean $(<)clean : $(module) $(objects) $(cleantarget) ;
+  Clean $(<)clean : $(module) $(objects) ;
   Depends clean : $(<)clean ;
 }
 

@@ -1,0 +1,7 @@
+SubDir TOP plugins cscript cshivaria ;
+
+if $(CSHARP.AVAILABLE) = "yes"
+{
+  CSharpBindingModule ivariasharp : ivaria : ivariamod.cpp : : : "ivaria cs C# module" ;
+}
+

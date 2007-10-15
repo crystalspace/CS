@@ -1,0 +1,7 @@
+SubDir TOP plugins cscript cshiengine ;
+
+if $(CSHARP.AVAILABLE) = "yes"
+{
+  CSharpBindingModule ienginesharp : iengine : ienginemod.cpp : : : "iengine cs C# module" ;
+}
+

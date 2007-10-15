@@ -1,0 +1,7 @@
+SubDir TOP plugins cscript cshcsgeom ;
+
+if $(CSHARP.AVAILABLE) = "yes"
+{
+  CSharpBindingModule csgeomsharp : csgeom : csgeommod.cpp : : : "geom cs C# module" ;
+}
+

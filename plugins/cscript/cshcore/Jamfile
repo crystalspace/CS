@@ -1,0 +1,7 @@
+SubDir TOP plugins cscript cshcore ;
+
+if $(CSHARP.AVAILABLE) = "yes"
+{
+  CSharpBindingModule coresharp : core : coremod.cpp : : : "core cs C# module" ;
+}
+

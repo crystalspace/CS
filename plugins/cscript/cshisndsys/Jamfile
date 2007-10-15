@@ -1,0 +1,7 @@
+SubDir TOP plugins cscript cshisndsys ;
+
+if $(CSHARP.AVAILABLE) = "yes"
+{
+  CSharpBindingModule isndsyssharp : isndsys : isndsysmod.cpp : : : "isndsys cs C# module" ;
+}
+
