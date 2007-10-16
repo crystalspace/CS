@@ -8,6 +8,7 @@ chronological order.
 
 16-Oct-2007
 	- ronsaldo fixed somes issues with the c# bindings building.
+	- ronsaldo added somes folders omitted from previous comit.
 15-Oct-2007
 	- ronsaldo added a COMPILER.LFLAGS.KILLAT generation which contains a
 	  -Wl,--kill-at when it is supported
