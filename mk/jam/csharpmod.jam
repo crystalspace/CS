@@ -22,15 +22,15 @@
 
 rule InstallCSharpMod
 {
-  InstalBindingsModule $(1) : $(2) ;
+  InstallBindingsModule $(1) : $(2) ;
 }
 
 
 #--------------------------------------------------------------------------------------------------
-# CSharpMod target file : module name : source files : install dir : LinkWith : ExternalLibs : desc
+# CSharpMod target : module name : source files : install dir : LinkWith : ExternalLibs : desc
 #--------------------------------------------------------------------------------------------------
 
-rule CSharpMod
+if $(CSHARP.AVAILABLE) = "yes"
 {
   if ! $(CSPACESHARP.MODULE.PREFIX) && ! $(CSPACESHARP.MODULE.SUFFIX)
   {
@@ -56,35 +56,39 @@ rule CSharpMod
   # expand it to "foo".)
   if ! $(CSPACESHARP.MODULE.PREFIX) { CSPACESHARP.MODULE.PREFIX = "" ; }
   if ! $(CSPACESHARP.MODULE.SUFFIX) { CSPACESHARP.MODULE.SUFFIX = "" ; }
+}
 
-  local target = $(1) ;
+rule CSharpMod
+{
   local module = $(2) ;
   local desc = $(7) ;
 
-  Description $(<) : $(desc) ;
-  Help $(<) : "Build the $(desc)" ;
   local sources = [ DoSourceGrist $(3) ] ;
   local objects = [ CompileObjects $(sources) ] ;
-  module = $(CSPACSHARP.MODULE.PREFIX)$(module)$(CSPACSHARP.MODULE.SUFFIX) ;
+  local target = $(CSPACESHARP.MODULE.PREFIX)$(module)$(CSPACESHARP.MODULE.SUFFIX) ;
 
-  $(<)_TARGET = $(module) ;
+  NotFile $(<) ;
+  Depends $(<) : $(target) ;
+  Depends bindings : $(<) ;
+  Description $(<) : $(desc) ;
+  Help $(<) : "Build the $(desc)" ;
+
+  $(<)_TARGET = $(target) ;
   $(<)_SOURCES = $(sources) ;
   $(<)_OBJECTS = $(objects) ;
   LinkWith $(<) : $(5) ;
   ExternalLibs $(<) : $(6) ;
   CFlags $(<) : $(PLUGIN.CFLAGS) ;
-  LFlags $(<) : $(PLUGIN.LFLAGS) $(LINKLIBS) ;
-  NotFile $(<) ;
-  Depends $(<) : $(module) ;
-  Depends bindings : $(<) ;
-  MakeLocate $(module) : [ ConcatDirs $(LOCATE.OBJECTS) $(4) ] ;
-  Depends $(module) : $(objects) ;
-  LinkPlugin $(module) : $(objects) ;
-  InstallBindingsModule $(module) : $(4) ;
+  LFlags $(<) : $(PLUGIN.LFLAGS) $(LINKLIBS) $(COMPILER.LFLAGS.KILLAT) ;
+
+  MakeLocate $(target) : [ ConcatDirs $(LOCATE.OBJECTS) $(4) ] ;
+  Depends $(target) : $(objects) ;
+  LinkPlugin $(target) : $(objects) ;
+  InstallBindingsModule $(target) : $(4) ;
   if $(LINK.DEBUG.INFO.SEPARATE) = "yes"
   {
-    SplitDebugInfo $(module) ;
-    local debugfile = [ on $(module) GetVar DEBUG_FILE_FULL ] ;
+    SplitDebugInfo $(target) ;
+    local debugfile = [ on $(target) GetVar DEBUG_FILE_FULL ] ;
     cleantarget += $(debugfile) ;
     NoCare $(debugfile) ;
     Depends install_bindings : [ DoInstall $(debugfile) :
@@ -94,7 +98,7 @@ rule CSharpMod
 
   Always $(<)clean ;
   NotFile $(<)clean ;
-  Clean $(<)clean : $(module) $(objects) ;
+  Clean $(<)clean : $(target) $(objects) ;
   Depends clean : $(<)clean ;
 }
 

@@ -9,8 +9,10 @@ chronological order.
 15-Oct-2007
 	- ronsaldo added a COMPILER.LFLAGS.KILLAT generation which contains a
 	  -Wl,--kill-at when it is supported
-	- ronsaldo added splitted modules of the csharpbindings bindings, which
+	- ronsaldo added splitted modules of the c# bindings, which
 	  only generates the .cs files.
+	- ronsaldo added building of the distinct modules of the c# bindings,
+	  and added the building of the dummy splitted c# bindings.
 13-Oct-2007
 	- ronsaldo added somes jam rules for the c# splitting.
 12-Oct-2007
