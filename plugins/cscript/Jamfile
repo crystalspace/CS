@@ -99,7 +99,7 @@ if $(CSHARP.AVAILABLE) = "yes"
     #--------------------------------
     local common = [ DoSourceGrist cs_$(module).cpp ] ;
     local csharpbase = [ ConcatDirs $(LOCATE.OBJECTS) bindings csharp ] ;
-    local csharpdir = [ ConcatDirs $(csharpbase) $(module) ] ;
+    local csharpdir = [ ConcatDirs $(csharpbase) cspacesharp ] ;
 
     Depends $(common) : $(csharpdir:G=dir) ;
     MkDir $(csharpdir:G=dir) ;
@@ -122,7 +122,8 @@ if $(CSHARP.AVAILABLE) = "yes"
     CleanDir $(modulecs)clean : $(csharpdir) ;
     Clean $(modulecs)clean : $(common) ;
     Depends bindingsclean : $(modulecs)clean ;
-    Depends clean : $(modulecs)clean  ;
+    Depends clean : $(modulecs)clean ;
+    Depends csharpmodclean : $(modulecs)clean ;
 
     #-------------------
     # C# module c side
@@ -145,7 +146,7 @@ if $(CSHARP.AVAILABLE) = "yes"
     #----------------------------
     # Prepare the C# module.
     #----------------------------
-    local cs_extra = [ Wildcard [ ConcatDirs $(module) ] : *.cs ] ;
+    local cs_extra = [ Wildcard [ ConcatDirs cspacesharp ] : *.cs ] ;
     SEARCH on $(cs_extra) = $(SEARCH_SOURCE) ;
     MakeLocate $(cs_extra:BSG=built) : $(csharpdir) ;
     Clean $(modulecs)clean : $(cs_extra:BSG=built) ;
@@ -157,7 +158,7 @@ if $(CSHARP.AVAILABLE) = "yes"
       Copy $(i:BSG=built) : $(i) ;
     }
 
-    Depends csharpmod : $(cs_extra:BSG=built) ;
+    Depends csharp_mods : $(cs_extra:BSG=built) ;
   }
 }
 

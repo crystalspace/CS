@@ -5,6 +5,7 @@ if $(CSHARP.AVAILABLE) = "yes"
   local csharpbase = [ ConcatDirs $(LOCATE.OBJECTS) bindings csharp ] ;
   local csharpdir = [ ConcatDirs $(csharpbase) cspacesharp ] ;
   MkDir $(csharpdir:G=dir) ;
+  CleanDir cspacesharpclean : $(csharpdir) ;
 
   local cs_extra = [ Wildcard [ ConcatDirs cspacesharp ] : *.cs *.key ] ;
   SEARCH on $(cs_extra) = $(SEARCH_SOURCE) ;
@@ -28,7 +29,7 @@ if $(CSHARP.AVAILABLE) = "yes"
   MakeLocate $(csbuildxml:G=build) : $(csharpbase) ;
   Copy $(csbuildxml:G=build) : $(csbuildxml) ;
   Clean csharpmodclean : $(csbuildxml:G=build) ;
-  Depends $(cspacesharpdll) : $(csbuildxml:G=build) $(cs_extra:BSG=built) $(csharp_mods) ;
+  Depends $(cspacesharpdll) : $(csbuildxml:G=build) $(cs_extra:BSG=built) csharp_mods ;
   MakeLocate $(cspacesharpdll) : $(csharpbase) ;
 	
   actions NAnt
@@ -47,4 +48,5 @@ if $(CSHARP.AVAILABLE) = "yes"
   Depends $(cspacesharpdll_final) : $(cspacesharpdll) ;
   Depends cspacesharpmod : $(cspacesharpdll_final) ;
   Clean cspacesharpclean : $(cspacesharpdll_final) ;
+  Depends csharpmodclean : cspacesharpclean ;
 }

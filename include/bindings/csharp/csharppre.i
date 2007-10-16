@@ -31,91 +31,47 @@
 %define SET_OBJECT_FUNCTIONS(classname,typename)
 %enddef
 
-%typemap(csbase) iBase "cspace";
+%ignore operator[];
+%ignore operator[] const;
+%ignore operator();
+%ignore operator+;
+%ignore operator-;
+%ignore operator*;
+%ignore operator/;
+%ignore operator%;
+%ignore operator<<;
+%ignore operator>>;
+%ignore operator&;
+%ignore operator|;
+%ignore operator^;
+%ignore operator&&;
+%ignore operator||;
+%ignore operator<;
+%ignore operator<=;
+%ignore operator>;
+%ignore operator>=;
+%ignore operator==;
+%ignore operator!=;
+%ignore operator-();
+%ignore operator!;
+%ignore operator~;
+%ignore operator++();
+%ignore operator++(int);
+%ignore operator--();
+%ignore operator--(int);
 
-#if 0
-/****************************************************************************
- * Ignore the operator overloads that C# don't support.
- * C# only support +, -, !, ~, ++, --, true, or false
- * +, -, *, /, %, &, |, ^, <<, >>, ==, !=, >, <, >=, or <=
- * FIXME: SWIG complaints about the operator, even if C# support they.
- ****************************************************************************/
-
+%ignore operator=;
 %ignore operator+=;
 %ignore operator-=;
 %ignore operator*=;
 %ignore operator/=;
 %ignore operator%=;
-%ignore operator* ();
-%ignore operator[];
 %ignore operator<<=;
 %ignore operator>>=;
 %ignore operator&=;
 %ignore operator|=;
 %ignore operator^=;
-%ignore operator&&=;
-%ignore operator||=;
-%ignore operator->;
-%ignore operator->*;
-%ignore operator,;
-%ignore operator&&;
-%ignore operator||;
-%ignore operator new;
-%ignore operator new[];
-%ignore operator delete;
-%ignore operator delete[];
 
-#else
-
-%ignore operator[];
-%rename(get) operator[] const;
-%ignore operator();
-%rename(add) operator+;
-%rename(subtract) operator-;
-%rename(multiply) operator*;
-%rename(divide) operator/;
-%rename(modulo) operator%;
-%rename(leftShift) operator<<;
-%rename(rightShift) operator>>;
-%rename(bitAnd) operator&;
-%rename(bitOr) operator|;
-%rename(bitXor) operator^;
-%ignore operator&&;
-%ignore operator||;
-%rename(isLessThan) operator<;
-%rename(equalsOrLess) operator<=;
-%rename(isGreaterThen) operator>;
-%rename(equalsOrGreater) operator>=;
-%rename(equals) operator==;
-%rename(equalsNot) operator!=;
-%ignore operator+();
-%rename(negate) operator-();
-%ignore operator!;
-//%rename(not) operator!;
-%rename(bitComplement) operator~;
-%rename(increment) operator++();
-%rename(getAndIncrement) operator++(int);
-%rename(decrement) operator--();
-%rename(getAndDecrement) operator--(int);
-
-%rename(assign) operator=;
-%rename(addAssign) operator+=;
-%rename(subtractAssign) operator-=;
-%rename(multiplyAssign) operator*=;
-%rename(divideAssign) operator/=;
-%rename(moduloAssign) operator%=;
-%rename(leftShiftAssign) operator<<=;
-%rename(rightShiftAssign) operator>>=;
-%rename(bitAssign) operator&=;
-%rename(bitOrAssign) operator|=;
-%rename(bitXorAssign) operator^=;
-
-// csutil/cscolor.h
-%rename(assign4) csColor4::operator=(const csColor&);
-%rename(multiplyAssign4) csColor4::operator*=(float);
-%rename(addAssign4) csColor4::operator+=(const csColor&);
-
-#endif
 // cstool/initapp.h
 %extend csPluginRequest
 {
@@ -156,22 +112,6 @@
 // csgeom/transfrm.h
 %ignore csTransform::operator*;
 %ignore csReversibleTransform::operator*;
-
-#ifndef CS_MINI_SWIG
-%extend csTransform
-{
-  static csMatrix3 mulmat1 (const csMatrix3& m, const csTransform& t)
-  { return m * t; }
-  static csMatrix3 mulmat2 (const csTransform& t, const csMatrix3& m)
-  { return t * m; }
-}
-%extend csReversibleTransform
-{
-  static csTransform mulrev (const csTransform& t1,
-                             const csReversibleTransform& t2)
-  { return t1 * t2; } 
-}
-#endif // CS_MINI_SWIG
 
 // iutil/event.h
 %{
@@ -362,7 +302,15 @@ ICONFIGMANAGER_CSHARPCODE
 %ignore csImageBase::GetKeyColor;
 %ignore csProcTexture::SetKeyColor;
 
-// Should probably be rewritten using csString for className
+//TODO: fix types bugs
+%ignore csImageBase::GetPalette;
+%ignore csPath::SetPositionVector;
+%ignore csPath::SetUpVector;
+%ignore csPath::SetForwardVectors;
+%ignore csPath::GetInterpolatedPosition;
+%ignore csPath::GetInterpolatedUp;
+%ignore csPath::GetInterpolatedForward;
+
 %typemap(in) (const char * iface, int iface_ver)
 {
     $1 = strdup($input.name);
@@ -427,3 +375,4 @@ ICONFIGMANAGER_CSHARPCODE
 %rename(SetVariableType) csShaderVariable::SetType;
 
 #endif SWIGCSHARP
+

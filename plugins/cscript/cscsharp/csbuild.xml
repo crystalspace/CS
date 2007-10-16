@@ -9,7 +9,7 @@
     <property name="name" value="CrystalSpace" />	
     <property name="version" value="0.1" />
 
-    <property name="src.dir" value="cspacesharp" />
+    <property name="src.basedir" value="." />
     <property name="lib.dir" value="." />
     <property name="cspacesharp.out" value="crystalspace-sharp.dll" />
 
@@ -18,7 +18,7 @@
     <target name="build" description="compiles crystal space sharp">
         <csc target="library" output="${cspacesharp.out}" debug="${debug}">
             <sources>
-                <include name="${src.dir}/*.cs" />
+                <include name="${src.basedir}/cspacesharp/*.cs" />
             </sources>
         </csc>
     </target>
