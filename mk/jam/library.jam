@@ -265,14 +265,14 @@ rule LibraryShared
     }
   }
 
-  Depends $(<) : $(linklib) ;
-  MakeLocate $(linklib) : $(LOCATE.OBJECTS)/libs ;
-  SEARCH on $(linklib) = $(LOCATE.OBJECTS)/libs ;
+  Depends $(<) : $(target) ;
+  MakeLocate $(target) : $(BUILDTOP) ;
+  SEARCH on $(target) = $(BUILDTOP) ;
   if $(linklib) != $(target)
   {
     Depends $(linklib) : $(target) ;
-    MakeLocate $(target) : $(BUILDTOP) ;
-    SEARCH on $(target) = $(BUILDTOP) ;
+    MakeLocate $(linklib) : $(LOCATE.OBJECTS)/libs ;
+    SEARCH on $(linklib) = $(LOCATE.OBJECTS)/libs ;
   }
   Depends $(target) : $(objects) ;
   $(<)_CLEANEXTRA += $(target) ;

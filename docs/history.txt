@@ -37,6 +37,8 @@ chronological order.
 	  are available (such as ARB_pixel_buffer_object).
 	- res made ptpdlight use iTextureHandle->QueryBlitBuffer()/
 	  ApplyBlitBuffer(). 
+	- res changed shared library building to place the built libraries
+	  into the top build directory and not deep within out/.
 16-Oct-2007
         - Mike Gist deprecated csProcessorCapability.
 14-Oct-2007
