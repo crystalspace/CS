@@ -54,6 +54,9 @@ chronological order.
 	  facilitate LGPL compliance when 3rd parties wish to link CS
 	  statically.
 	- res fixed some build errors that appeared with static plugins.
+	- res fixed the MSVC static plugins project to not contain the library
+	  building preprocessor definitions (which mess up importing when 
+	  building with DLLs).
 16-Oct-2007
         - Mike Gist deprecated csProcessorCapability.
 14-Oct-2007

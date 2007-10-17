@@ -1243,13 +1243,13 @@ rule StaticPluginLibrary
   {
     sources += $(STATICPLUGINS.SOURCES.$(t)) ;
     extlibs += $($(t).EXTERNALLIBS) ;
+    _MsvcDefine $(name) : $(STATICPLUGINS.$(t).MSVC_DEFINES) ;
   }
 
   $(name)_STATIC = "yes" ;
   # Set up library
   Library $(name) : $(sources) ;
   MsvcDefine $(name) : CS_STATIC_LINKED ;
-  _MsvcDefine $(name) : $(STATICPLUGINS.MSVC_DEFINES) ;
   ExternalLibs $(name) : [ RemoveDups $(extlibs) ] ;
 
   # Write out needed CFLAGS, LFLAGS
@@ -1485,7 +1485,7 @@ rule MsvcDefine1
       def = $(key) ;
     }
     _MsvcRespEmit $(target) : $(def) : define : $(mode) ;
-    STATICPLUGINS.MSVC_DEFINES += $(def) ;
+    STATICPLUGINS.$(target).MSVC_DEFINES += $(def) ;
   }
 }
 
