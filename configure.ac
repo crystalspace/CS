@@ -2441,9 +2441,14 @@ AS_IF([test $enable_leak_guard = yes],
 # Determine whether link libraries should be static or shared.
 #------------------------------------------------------------------------------
 AC_MSG_CHECKING([whether to build shared libraries])
+case $host_os in
+    mingw*|cygwin*|linux*) enable_shared_default=yes ;;
+    *) enable_shared_default=no ;;
+esac
 AC_ARG_ENABLE([shared], [AC_HELP_STRING([--enable-shared],
-    [enable creation of shared libraries (_EXPERIMENTAL_!) (default NO)])],
-    [], [enable_shared=no])
+    [enable creation of shared libraries (default YES on Win32 and Linux, 
+    NO otherwise)])],
+    [], [enable_shared=$enable_shared_default])
 AC_MSG_RESULT([$enable_shared])
 CS_EMIT_BUILD_PROPERTY([BUILD_SHARED_LIBS], [$enable_shared])
 AS_IF([test $enable_shared = yes], 
