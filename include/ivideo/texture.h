@@ -50,7 +50,7 @@ struct iGraphics3D;
  */
 struct iTextureHandle : public virtual iBase
 {
-  SCF_INTERFACE(iTextureHandle, 3,0,1);
+  SCF_INTERFACE(iTextureHandle, 3,0,2);
   /// Retrieve the flags set for this texture
   virtual int GetFlags () const = 0;
 
@@ -224,6 +224,45 @@ struct iTextureHandle : public virtual iBase
    * created and possibly the texture flags.
    */
   virtual TextureType GetTextureType() const = 0;
+
+  enum
+  {
+    /// The buffer will also be read from, so make sure it's readable
+    blitbufReadable = 1,
+    /**
+     * The returned buffer should mirror the current contents of the requested
+     * area on the texture. If this flag is not present the buffer contents
+     * will be undefined and should thus be reset entirely. However, setting
+     * this flag may incur a performance penalty.
+     */
+    blitbufRetainArea = 2
+  };
+  
+  /**
+   * Query a buffer for blitting.
+   * \par Multiple areas
+   * If multiple areas of the texture are to be updated, call 
+   * QueryBlitBuffer () for a new area before you call ApplyBlitBuffer () for
+   * the prior one. That is, the order of calls should be like:
+   * \code
+   *   uint8* buf1 = texture->QueryBlitBuffer (...);
+   *   // ... Change buf1 ...
+   *   uint8* buf2 = texture->QueryBlitBuffer (...);
+   *   texture->ApplyBlitBuffer (buf1);
+   *   // ... Change buf1 ...
+   *   // And so on
+   * \endcode
+   * This "interleaving" will result in greater runtime performance as some
+   * resources can be re-used.
+   *
+   * When multiple queried areas overlap the overlapping areas will contain
+   * undefined data on the texture.
+   */
+  virtual uint8* QueryBlitBuffer (int x, int y, int width, int height,
+    size_t& pitch, TextureBlitDataFormat format = RGBA8888,
+    uint bufFlags = 0) = 0;
+  /// Apply the given blitting buffer.
+  virtual void ApplyBlitBuffer (uint8* buf) = 0;
 };
 
 /** @} */

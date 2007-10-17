@@ -29,6 +29,12 @@ chronological order.
 	  msvc-dlls branch.
 	- res fixed msvcgen.jam to use MSVC.PREFIX.library_static instead of
 	  MSVC.PREFIX.library everywhere.
+	- res added a new interface for directly setting texture pixel data:
+	  iTextureHandle->QueryBlitBuffer()/ApplyBlitBuffer(). Instead of
+	  copying a client-provided buffer, the client writes into a renderer-
+	  provided buffer. This can save a copy (and thus give somewhat better
+	  performance) when some extensions for direct texture memory access
+	  are available (such as ARB_pixel_buffer_object).
 16-Oct-2007
         - Mike Gist deprecated csProcessorCapability.
 14-Oct-2007

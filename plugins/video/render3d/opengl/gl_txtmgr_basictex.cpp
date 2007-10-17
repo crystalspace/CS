@@ -37,7 +37,7 @@ csGLBasicTextureHandle::csGLBasicTextureHandle (int width,
                                                 int flags, 
                                                 csGLGraphics3D *iG3D) : 
   scfImplementationType (this), txtmgr (iG3D->txtmgr), 
-  textureClass (txtmgr->GetTextureClassID ("default")), Handle (0), 
+  textureClass (txtmgr->GetTextureClassID ("default")), Handle (0), pbo (0),
   orig_width (width), orig_height (height), orig_d (depth),
   uploadData(0), G3D (iG3D), texFormat((TextureBlitDataFormat)-1)
 {
@@ -96,6 +96,7 @@ csGLBasicTextureHandle::csGLBasicTextureHandle (
   textureClass (txtmgr->GetTextureClassID ("default")),
   alphaType (csAlphaMode::alphaNone),
   Handle (Handle),
+  pbo (0),
   orig_width (0),
   orig_height (0),
   orig_d (0),
@@ -111,6 +112,7 @@ csGLBasicTextureHandle::~csGLBasicTextureHandle()
 {
   Clear ();
   txtmgr->MarkTexturesDirty ();
+  if (pbo != 0) txtmgr->G3D->ext->glDeleteBuffersARB (1, &pbo);
 }
 
 bool csGLBasicTextureHandle::SynthesizeUploadData (
@@ -674,6 +676,151 @@ void csGLBasicTextureHandle::EnsureUncompressed (bool keepPixels)
     0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
   if (pixelData != 0) cs_free (pixelData);
+}
+
+uint8* csGLBasicTextureHandle::QueryBlitBuffer (int x, int y, 
+                                                int width, int height,
+                                                size_t& pitch, 
+                                                TextureBlitDataFormat format,
+                                                uint bufFlags)
+{ 
+  if (txtmgr->G3D->ext->CS_GL_ARB_pixel_buffer_object)
+  {
+    return QueryBlitBufferPBO (x, y, width, height, pitch, format, bufFlags);
+  }
+  else
+  {
+    return QueryBlitBufferGeneric (x, y, width, height, pitch, format, bufFlags);
+  }
+}
+
+void csGLBasicTextureHandle::ApplyBlitBuffer (uint8* buf)
+{ 
+  if (txtmgr->G3D->ext->CS_GL_ARB_pixel_buffer_object)
+  {
+    ApplyBlitBufferPBO (buf);
+  }
+  else
+  {
+    ApplyBlitBufferGeneric (buf);
+  }
+}
+
+uint8* csGLBasicTextureHandle::QueryBlitBufferGeneric (int x, int y, 
+                                                       int width, int height,
+                                                       size_t& pitch, 
+                                                       TextureBlitDataFormat format,
+                                                       uint bufFlags)
+{ 
+  GLenum textarget = GetGLTextureTarget();
+  if ((textarget != GL_TEXTURE_2D) && (textarget != GL_TEXTURE_RECTANGLE_ARB))
+    return 0;
+
+  bool isWholeImage = (x == 0) && (y == 0) && (width == actual_width)
+    && (height == actual_height);
+
+  BlitBuffer blitBuf;
+  blitBuf.x = x;
+  blitBuf.y = y;
+  blitBuf.width = width;
+  blitBuf.height = height;
+  blitBuf.format = format;
+  /* @@@ FIXME: Improve - prolly makes sense to reuse allocated blocks of 
+     memory. */
+  uint8* p = (uint8*)cs_malloc (width * height * 4);
+  blitBuffers.Put (p, blitBuf);
+  pitch = width * 4;
+  return p;
+}
+
+void csGLBasicTextureHandle::ApplyBlitBufferGeneric (uint8* buf)
+{ 
+  BlitBuffer* blitBuf = blitBuffers.GetElementPointer (buf);
+  if (blitBuf != 0)
+  {
+    Blit (blitBuf->x, blitBuf->y, blitBuf->width, blitBuf->height, buf, 
+      blitBuf->format);
+    blitBuffers.DeleteAll (buf);
+    cs_free (buf);
+  }
+}
+
+uint8* csGLBasicTextureHandle::QueryBlitBufferPBO (int x, int y, 
+                                                   int width, int height,
+                                                   size_t& pitch, 
+                                                   TextureBlitDataFormat format,
+                                                   uint bufFlags)
+{ 
+  GLenum textarget = GetGLTextureTarget();
+  if ((textarget != GL_TEXTURE_2D) && (textarget != GL_TEXTURE_RECTANGLE_ARB))
+    return 0;
+
+  bool isWholeImage = (x == 0) && (y == 0) && (width == actual_width)
+    && (height == actual_height);
+
+  texFormat = format;
+  if (pbo == 0)
+  {
+    GLuint textureFormat = (texFormat == RGBA8888) ? GL_RGBA : GL_BGRA;
+    Precache ();
+    G3D->ActivateTexture (this);
+
+    G3D->ext->glGenBuffersARB (1, &pbo);
+    G3D->ext->glBindBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB, pbo);
+    G3D->ext->glBufferDataARB (GL_PIXEL_UNPACK_BUFFER_ARB, 
+      actual_width * actual_height * 4, 0, GL_DYNAMIC_DRAW_ARB);
+    pboMapped = 0;
+    if ((bufFlags & iTextureHandle::blitbufRetainArea) || !isWholeImage)
+    {
+      G3D->ext->glBindBufferARB (GL_PIXEL_PACK_BUFFER_ARB, pbo);
+      glGetTexImage (textarget, 0, textureFormat, GL_UNSIGNED_BYTE, 0);
+      G3D->ext->glBindBufferARB (GL_PIXEL_PACK_BUFFER_ARB, 0);
+    }
+    glTexImage2D (textarget, 0, GL_RGBA8, actual_width, actual_height, 
+      0, textureFormat, GL_UNSIGNED_BYTE, 0);
+  }
+  else
+  {
+    G3D->ext->glBindBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB, pbo);
+  }
+  if (pboMapped == 0)
+  {
+    GLenum bufAccess = 
+      (bufFlags & blitbufReadable) ? GL_READ_WRITE_ARB : GL_WRITE_ONLY_ARB;
+    pboMapPtr = G3D->ext->glMapBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB, 
+      bufAccess);
+  }
+  pboMapped++;
+  /* @@@ FIXME: Can prolly get rid of a number of buffer bindings by state-
+     caching them */
+  G3D->ext->glBindBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB, 0);
+  uint8* p = (uint8*)pboMapPtr;
+  p += (y * actual_width + x) * 4;
+  pitch = actual_width * 4;
+  return p;
+}
+
+void csGLBasicTextureHandle::ApplyBlitBufferPBO (uint8* buf)
+{ 
+  G3D->ext->glBindBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB, pbo);
+  pboMapped--;
+  if (pboMapped == 0)
+  {
+    G3D->ext->glUnmapBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB);
+    G3D->ActivateTexture (this);
+    if (!IsWasRenderTarget())
+    {
+      SetWasRenderTarget (true);
+      SetupAutoMipping();
+    }
+    GLuint textureFormat = (texFormat == RGBA8888) ? GL_RGBA : GL_BGRA;
+    BlitBuffer* blitBuf = blitBuffers.GetElementPointer (buf);
+    glTexSubImage2D (GetGLTextureTarget(), 0, 
+      0, 0, actual_width, actual_height,
+      textureFormat, GL_UNSIGNED_BYTE,
+      0);
+    G3D->ext->glBindBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB, 0);
+  }
 }
 
 }
