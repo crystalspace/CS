@@ -53,6 +53,7 @@ chronological order.
 	  well (like what's done when build statically with Jam now) to
 	  facilitate LGPL compliance when 3rd parties wish to link CS
 	  statically.
+	- res fixed some build errors that appeared with static plugins.
 16-Oct-2007
         - Mike Gist deprecated csProcessorCapability.
 14-Oct-2007

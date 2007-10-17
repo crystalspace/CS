@@ -30,13 +30,14 @@
 #include "csutil/ref.h"
 #include "csutil/scf_implementation.h"
 #include "csutil/strhash.h"
+#include "imap/services.h"
+#include "iutil/document.h"
 #include "iutil/strset.h"
+#include "iutil/vfs.h"
 
 #include "csplugincommon/shader/shaderplugin.h"
 
 struct iDataBuffer;
-struct iFile;
-struct iSyntaxService;
 struct iObjectRegistry;
 
 /* Hack to have the Jam dependency scanner pick up shaderprogram.tok.
