@@ -40,8 +40,7 @@ CS_PROPERTY_HELPERS
 %define %cs_attribute_impl(Module,Class, type, name, getmethod, ...)
 #if #__VA_ARGS__ != ""
 %feature("shadow") Class::name##_set {
-  __swig_setmethods__[#name] = _##Module##.##Class##_##name##_set
-  name = property(_##Module##.##Class##_##name##_get, _##Module##.##Class##_##name##_set, None,
+  name = _swig_property(_##Module##.##Class##_##name##_get, _##Module##.##Class##_##name##_set, None,
                   "Class.name -> type\n\nThis is equivalent to calling the C++ cs methods:\n\tget: type Class::getmethod()\n\tset: void Class::__VA_ARGS__(type)")};
 %feature("shadow") Class::name##_get {}
 %extend Class
@@ -51,7 +50,7 @@ CS_PROPERTY_HELPERS
 
 #else
 %feature("shadow") Class::name##_get {
-  name = property(_##Module##.##Class##_##name##_get, None, None,
+  name = _swig_property(_##Module##.##Class##_##name##_get, None, None,
                   "Class.name -> type  (read-only)\n\nThis is equivalent to calling the C++ cs method:\n\tget: type Class::getmethod()")};
 #endif
 %extend Class
@@ -73,8 +72,7 @@ CS_PROPERTY_HELPERS
 /* cs_attribute_writeonly calling macro */
 %define %cs_attribute_writeonly(Module, Class, type, name, setmethod)
 %feature("shadow") Class::name##_set {
-  __swig_setmethods__[#name] = _##Module##.##Class##_##name##_set
-  name = property(None, _##Module##.##Class##_##name##_set, None,
+  name = _swig_property(None, _##Module##.##Class##_##name##_set, None,
                   "Class.name (write only) -> type\n\nWriting to this is equivalent to calling the C++ cel method:\n\tvoid Class::setmethod(type)")};
 %feature("shadow") Class::name##_get {}
 %extend Class
@@ -88,8 +86,7 @@ CS_PROPERTY_HELPERS
 %extend Class
 {
 %pythoncode %{
-  __swig_setmethods__[#name] = fix_args(_##Module##.##Class##_##setmethod)
-  name = property(_##Module##.##Class##_##getmethod, fix_args(_##Module##.##Class##_##setmethod), None,
+  name = _swig_property(_##Module##.##Class##_##getmethod, fix_args(_##Module##.##Class##_##setmethod), None,
                   "Class.name -> type\n\nThis is equivalent to calling the C++ cs methods:\n\tget: Class::getmethod()\n\tset: void Class::setmethod(...)")
 %}
 }
@@ -100,7 +97,7 @@ CS_PROPERTY_HELPERS
 %extend Class
 {
 %pythoncode %{
-  name = property(_##Module##.##Class##_##getmethod, None, None,
+  name = _swig_property(_##Module##.##Class##_##getmethod, None, None,
                   "Class.name -> type\n\nThis is equivalent to calling the C++ cs method:\n\tget: Class::getmethod()")
 %}
 }
@@ -111,8 +108,7 @@ CS_PROPERTY_HELPERS
 %extend Class
 {
 %pythoncode %{
-  __swig_setmethods__[#name] = fix_args(_##Module##.##Class##_##setmethod)
-  name = property(None, fix_args(_##Module##.##Class##_##setmethod), None,
+  name = _swig_property(None, fix_args(_##Module##.##Class##_##setmethod), None,
                   "Class.name -> type\n\nThis is equivalent to calling the C++ cs methods:\n\tget: Class::getmethod()\n\tset: void Class::setmethod(...)")
 %}
 }

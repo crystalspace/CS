@@ -39,6 +39,9 @@ chronological order.
 	  ApplyBlitBuffer(). 
 	- res changed shared library building to place the built libraries
 	  into the top build directory and not deep within out/.
+	- caedes made python bindings use -modern swig flag. This instructs
+	  swig to use modern python features only (and generates somewhat less
+	  convoluted code).
 16-Oct-2007
         - Mike Gist deprecated csProcessorCapability.
 14-Oct-2007
