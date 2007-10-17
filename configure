@@ -1476,8 +1476,8 @@ Optional Features:
                           about leaked references (default NO)
   --enable-leak-guard     enable the leak guard protection which warns about
                           objects not freed at program exit (default NO)
-  --enable-shared         enable creation of shared libraries
-                          (_EXPERIMENTAL_!) (default NO)
+  --enable-shared         enable creation of shared libraries (default YES on
+                          Win32 and Linux, NO otherwise)
   --enable-make-emulation enable emulation layer allowing project to be built
                           with `make', in addition to `jam' (default YES)
 
@@ -80829,11 +80829,15 @@ fi
 #------------------------------------------------------------------------------
 { echo "$as_me:$LINENO: checking whether to build shared libraries" >&5
 echo $ECHO_N "checking whether to build shared libraries... $ECHO_C" >&6; }
+case $host_os in
+    mingw*|cygwin*|linux*) enable_shared_default=yes ;;
+    *) enable_shared_default=no ;;
+esac
 # Check whether --enable-shared was given.
 if test "${enable_shared+set}" = set; then
   enableval=$enable_shared;
 else
-  enable_shared=no
+  enable_shared=$enable_shared_default
 fi
 
 { echo "$as_me:$LINENO: result: $enable_shared" >&5
