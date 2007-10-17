@@ -108,7 +108,7 @@ MACRO filter(x) BLOCK;
     x = x.grep(my.doc.acceptpat);
   END;
   IF my.doc.reject;
-    UNLESS my.doc.acceptpat;
+    UNLESS my.doc.rejectpat;
       my.doc.rejectpat = my.doc.reject.join('|');
     END;
     y = [];
@@ -161,12 +161,16 @@ END;
 #    tag_projtype_build
 #------------------------------------------------------------------------------
 MACRO interpolate(tag, delim) BLOCK;
+  projtype = mutator.defined(my.doc.projtype.0) 
+    ? mutator.${my.doc.projtype.0} 
+    : my.doc.projtype.0;
+  
   p = [];
   s = ${"${tag}_${build.tag}"};
   p.push(s) IF s.length > 0;
-  s = ${"${tag}_${my.doc.projtype.0}"};
+  s = ${"${tag}_${projtype}"};
   p.push(s) IF s.length > 0;
-  s = ${"${tag}_${my.doc.projtype.0}_${build.tag}"};
+  s = ${"${tag}_${projtype}_${build.tag}"};
   p.push(s) IF s.length > 0;
   GET p.join(delim);
 END;
@@ -215,9 +219,13 @@ END;
 # builds['debug'].cflagskey property (control.tlib).
 #------------------------------------------------------------------------------
 MACRO compose(tag, seed, delim, prefix, suffix) BLOCK;
+  projtype = mutator.defined(my.doc.projtype.0) 
+    ? mutator.${my.doc.projtype.0} 
+    : my.doc.projtype.0;
+  
   p = [];
   p = p.merge(build.$tag).
-    merge(projtypes.${my.doc.projtype.0}.$tag).
+    merge(projtypes.$projtype.$tag).
     merge(my.doc.${${"build.${tag}key"}}).
     merge(seed);
   GET glue(p, delim, prefix, suffix);

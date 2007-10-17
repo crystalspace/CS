@@ -25,6 +25,8 @@ chronological order.
 	      - Warning: instmesh+meshgen still has a bug at exit. Seems
 	        there is some memory corruption going on.
 	- res enabled shared libraries by default on Win32 and Linux.
+	- res merged the MSVC project shared libraries support from the
+	  msvc-dlls branch.
 16-Oct-2007
         - Mike Gist deprecated csProcessorCapability.
 14-Oct-2007
