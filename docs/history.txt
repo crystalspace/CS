@@ -46,7 +46,13 @@ chronological order.
 	- res fixed an errorneous MsvcUsePCH in the cslight Jamfile.
 	- res made shared libraries built in out/.../libs again (so they're
 	  correctly picked up by cs-config), but also added a symlink for them
-	  to the top build directory (for convenience);
+	  to the top build directory (for convenience).
+	- res fixed the MSVC projects to "decorate" the object file names for
+	  the static plugin library again.
+	- res made static plugins in MSVC be put into a separate shared lib as
+	  well (like what's done when build statically with Jam now) to
+	  facilitate LGPL compliance when 3rd parties wish to link CS
+	  statically.
 16-Oct-2007
         - Mike Gist deprecated csProcessorCapability.
 14-Oct-2007

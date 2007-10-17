@@ -126,12 +126,14 @@ END -%]
 				[%- IF my.doc.static %]
 				[%- UNLESS file.match('\\.(h|hpp|rc)$') %]
 				[%- FOREACH build IN builds %]
-				<FileConfiguration
-					Name="[% build.name %]|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="[% workbuild([file.replace('/', '_'), '.obj']) %]"/>
-				</FileConfiguration>
+                                  [% FOREACH mutator IN mutators -%]
+					<FileConfiguration
+						Name="[% build.name %][% mutator.namesuffix %]|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="[% workbuild([file.replace('/', '_'), '.obj']) %]"/>
+					</FileConfiguration>
+				[%- END %]
 				[%- END %]
 				[%- END %]
 				[%- END %]

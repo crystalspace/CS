@@ -961,6 +961,10 @@ rule LinkStaticPlugins
   optplugins = $(3) ;
   package = $(4) ;
   
+  local target_link_with target_ext_libs target_ext_libs.release target_ext_libs.debug ;
+  local target_lflags.release target_lflags.debug ;
+  local target_cflags.release target_cflags.debug ;
+  
   if $(package)
   {
     # External static plugins.
@@ -987,32 +991,27 @@ rule LinkStaticPlugins
       {
         if $(STATICPLUGIN.$(p).CFLAGS.$(mode).$(MSVC_VERSION))
         {
-	  MsvcCFlags $(target) : $(STATICPLUGIN.$(p).CFLAGS.$(mode)) : $(mode) ;
+	  target_cflags.$(mode) += $(STATICPLUGIN.$(p).CFLAGS.$(mode).$(MSVC_VERSION)) ;
 	}
 	else
 	{
-	  MsvcCFlags $(target) : $(STATICPLUGIN.$(p).CFLAGS.$(mode)) : $(mode) ;
+	  target_cflags.$(mode) += $(STATICPLUGIN.$(p).CFLAGS.$(mode)) ;
 	}
 	if $(STATICPLUGIN.$(p).LFLAGS.$(mode).$(MSVC_VERSION))
 	{
-	  lflags.$(mode) += $(STATICPLUGIN.$(p).LFLAGS.$(mode).$(MSVC_VERSION)) ;
+	  target_lflags.$(mode) += $(STATICPLUGIN.$(p).LFLAGS.$(mode).$(MSVC_VERSION)) ;
 	}
 	else
 	{
-	  lflags.$(mode) += $(STATICPLUGIN.$(p).LFLAGS.$(mode)) ;
+	  target_lflags.$(mode) += $(STATICPLUGIN.$(p).LFLAGS.$(mode)) ;
 	}
       }
-    }
-    for mode in debug release
-    {
-      MsvcLFlags $(target) : 
-	[ Reverse [ RemoveDups [ Reverse $(lflags.$(mode)) ] ] ] : $(mode) ;
     }
   }
   else
   {
     # link with static plugins
-    LinkWith $(target) : $(STATICPLUGINS.LIBRARY) ;
+    target_link_with += $(STATICPLUGINS.LIBRARY) ;
     
     # Local static plugins
     local libs p ;
@@ -1027,16 +1026,14 @@ rule LinkStaticPlugins
     # Grab flags
     for p in $(plugins)
     {
-      libs += $($(p).NEEDLIBS) ;
+      target_link_with += $($(p).NEEDLIBS) ;
 
-      ExternalLibs $(target) : $($(p).EXTERNALLIBS) ;
+      target_ext_libs += $($(p).EXTERNALLIBS) ;
       for mode in debug release
       {
-	MsvcExternalLibrary $(target) : $($(p)_$(mode)_EXTERNALLIBS) : $(mode) ;
-	MsvcExternalLibrary $(target) : $($(p)_$(mode)_EXTERNALLIBS) : $(mode) ;
+        target_ext_libs.$(mode) += $($(p)_$(mode)_EXTERNALLIBS) ;
       }
     }
-    LinkWith $(target) : $(libs) ;
   }
 
   # Generate static plugin instantiation
@@ -1045,28 +1042,116 @@ rule LinkStaticPlugins
   {
     outdir = [ Property msvcgen : outdir$(MSVC_VERSION) ] ;
   }
+  # @@@ Prefix hardcoded
+  local extrafiles_prefix = $(MSVC.PREFIX.appgui)$(<) ;
   local staticuse_out ;
   if $(package)
   {
-    # @@@ Prefix hardcoded
-    staticuse_out = $(MSVC.PREFIX.appgui)$(<)_staticuse_$(package).cpp ; 
+    staticuse_out = $(extrafiles_prefix)_staticuse_$(package).cpp ; 
   }
   else
   {
-    staticuse_out =
-      $(MSVC.PREFIX.appgui)$(<)_staticuse.cpp ; # @@@ Prefix hardcoded
+    staticuse_out = $(extrafiles_prefix)_staticuse.cpp ;
   }
+  
   MakeLocate $(staticuse_out) : $(outdir) ;
   SEARCH on $(staticuse_out) = $(outdir) ;
   
   GenerateStaticPluginInstantiation $(staticuse_out) : $(plugins) ;
   Depends msvcgen : $(staticuse_out) ;
 
-  # Add usefile to project
-  ResponseFile $($(target)_PRJ_RESPFILE) : 
-    "file|$(staticuse_out:R=$(outdir))" : notfile :
-    $($(target)_PRJ_RESPDIR) ;
-  Depends $(target) : $(staticuse_out) ;
+  # Build a shared lib containing the static plugins.
+  # This is done to be more LGPL-friendly.
+  if ( $(TRUE_STATIC_PLUGINS) != "yes" )
+  {
+    local plugin_lib_name appglue libglue ;
+    if $(package)
+    {
+      plugin_lib_name = $(target)_plugins_$(package) ;
+    }
+    else
+    {
+      plugin_lib_name = $(target)_plugins ;
+    }
+    
+    # prepare source files
+    local tag = "_static_use_$(package)" ;
+    if $(package)
+    {
+      libglue = $(extrafiles_prefix)_static_glue_lib_$(package).cpp ;
+    }
+    else
+    {
+      libglue = $(extrafiles_prefix)_static_glue_lib.cpp ;
+    }
+  
+    MakeLocate $(libglue) : $(outdir) ;
+    SEARCH on $(libglue) = $(outdir) ;
+    
+    GeneratePluginLibraryGlueLib $(libglue) : $(plugin_lib_name) : $(tag) ;
+    
+    Library $(plugin_lib_name) : : noinstall notest independent nohelp shared ;
+    ResponseFile $($(plugin_lib_name)_PRJ_RESPFILE) : 
+      "file|$(libglue:R=$(outdir))" : notfile :
+      $($(target)_PRJ_RESPDIR) ;
+    ResponseFile $($(plugin_lib_name)_PRJ_RESPFILE) : 
+      "file|$(staticuse_out:R=$(outdir))" : notfile :
+      $($(target)_PRJ_RESPDIR) ;
+    LibDepends $(plugin_lib_name) : $(target_link_with) ;
+    LFlags $(plugin_lib_name) : $(target_lflags) ;
+    Depends msvcgen : $(libglue) ;
+    
+    # prepare source files
+    if $(package)
+    {
+      appglue = $(extrafiles_prefix)_static_glue_app_$(package).cpp ;
+    }
+    else
+    {
+      appglue = $(extrafiles_prefix)_static_glue_app.cpp ;
+    }
+  
+    MakeLocate $(appglue) : $(outdir) ;
+    SEARCH on $(appglue) = $(outdir) ;
+    
+    GeneratePluginLibraryGlueApp $(appglue) : $(plugin_lib_name) ;
+    
+    ExternalLibs $(plugin_lib_name) : $(target_ext_libs) ;
+    for mode in debug release
+    {
+      MsvcLFlags $(plugin_lib_name) : 
+	[ Reverse [ RemoveDups [ Reverse $(target_lflags.$(mode)) ] ] ] : $(mode) ;
+      MsvcCFlags $(plugin_lib_name) : $(target_cflags.$(mode)) ;
+      MsvcExternalLibrary $(plugin_lib_name) : $(target_ext_libs.$(mode)) : $(mode) ;
+    }
+    LinkWith $(plugin_lib_name) : $(target_link_with) ;
+    
+    # Add usefile to project
+    ResponseFile $($(target)_PRJ_RESPFILE) : 
+      "file|$(appglue:R=$(outdir))" : notfile :
+      $($(target)_PRJ_RESPDIR) ;
+    Depends $(target) : $(appglue) ;
+    Depends msvcgen : $(appglue) ;
+    LinkWith $(target) : $(plugin_lib_name) ;
+  }
+  else
+  {
+    ExternalLibs $(target) : $(target_ext_libs) ;
+    for mode in debug release
+    {
+      MsvcLFlags $(target) : 
+	[ Reverse [ RemoveDups [ Reverse $(target_lflags.$(mode)) ] ] ] : $(mode) ;
+      MsvcCFlags $(target) : $(target_cflags.$(mode)) ;
+      MsvcExternalLibrary $(target) : $(target_ext_libs.$(mode)) : $(mode) ;
+    }
+    LinkWith $(target) : $(target_link_with) ;
+    
+    # Add usefile to project
+    ResponseFile $($(target)_PRJ_RESPFILE) : 
+      "file|$(staticuse_out:R=$(outdir))" : notfile :
+      $($(target)_PRJ_RESPDIR) ;
+    Depends $(target) : $(staticuse_out) ;
+  }
 }
 
 rule Application
