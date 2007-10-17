@@ -25,6 +25,7 @@
 #include "csgeom/vector2.h"
 #include "csgeom/vector4.h"
 #include "csgeom/sphere.h"
+#include "cstool/primitives.h"
 #include "csutil/cscolor.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/refarr.h"
@@ -284,6 +285,28 @@ static bool GetTri (char*& p, csTriangle& v)
   return true;
 }
 
+static void AppendOrSetData (iGeneralFactoryState* factory,
+    const csDirtyAccessArray<csVector3>& mesh_vertices,
+    const csDirtyAccessArray<csVector2>& mesh_texels,
+    const csDirtyAccessArray<csVector3>& mesh_normals,
+    const csDirtyAccessArray<csTriangle>& mesh_triangles)
+{
+  csColor4 black (0, 0, 0);
+  size_t cur_vt_count = factory->GetVertexCount ();
+  size_t i;
+  for (i = 0 ; i < mesh_vertices.GetSize () ; i++)
+    factory->AddVertex (mesh_vertices[i], mesh_texels[i],
+	  mesh_normals[i], black);
+  for (i = 0 ; i < mesh_triangles.GetSize () ; i++)
+  {
+    csTriangle tri = mesh_triangles[i];
+    tri.a += cur_vt_count;
+    tri.b += cur_vt_count;
+    tri.c += cur_vt_count;
+    factory->AddTriangle (tri);
+  }
+}
+
 csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	iStreamSource*, iLoaderContext* ldr_context, iBase* /* context */)
 {
@@ -381,10 +404,20 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
         {
 	  num_vt_given = true;
 	  num_tri_given = true;
-	  csBox3 box;
-	  if (!synldr->ParseBox (child, box))
-	    return 0;
-	  state->GenerateBox (box);
+
+	  using namespace CS::Geometry;
+          csBox3 box;
+          if (!synldr->ParseBox (child, box))
+            return 0;
+	  csDirtyAccessArray<csVector3> mesh_vertices;
+	  csDirtyAccessArray<csVector2> mesh_texels;
+	  csDirtyAccessArray<csVector3> mesh_normals;
+	  csDirtyAccessArray<csTriangle> mesh_triangles;
+	  Primitives::GenerateBox (box, mesh_vertices, mesh_texels,
+	      mesh_normals, mesh_triangles, 0, 0);
+	  AppendOrSetData (state, mesh_vertices, mesh_texels,
+	    mesh_normals, mesh_triangles);
+
 	  num_vt = state->GetVertexCount ();
 	  num_tri = state->GetTriangleCount ();
 	}
@@ -393,42 +426,51 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
         {
 	  num_vt_given = true;
 	  num_tri_given = true;
-	  csVector3 center (0, 0, 0);
-	  int rim_vertices = 8;
-	  csEllipsoid ellips;
-	  csRef<iDocumentAttribute> attr;
-	  csRef<iDocumentNode> c = child->GetNode ("center");
-	  if (c)
-	    if (!synldr->ParseVector (c, ellips.GetCenter ()))
-	      return 0;
-	  c = child->GetNode ("radius");
-	  if (c)
-	  {
-	    if (!synldr->ParseVector (c, ellips.GetRadius ()))
-	      return 0;
-	  }
-	  else
-	  {
-	    attr = child->GetAttribute ("radius");
-	    float radius;
-	    if (attr) radius = attr->GetValueAsFloat ();
-	    else radius = 1.0f;
-	    ellips.SetRadius (csVector3 (radius, radius, radius));
-	  }
-	  attr = child->GetAttribute ("rimvertices");
-	  if (attr) rim_vertices = attr->GetValueAsInt ();
-	  bool cylmapping, toponly, reversed;
-	  if (!synldr->ParseBoolAttribute (child, "cylindrical", cylmapping,
-	  	false, false))
-  	    return 0;
-	  if (!synldr->ParseBoolAttribute (child, "toponly", toponly,
-	  	false, false))
-  	    return 0;
-	  if (!synldr->ParseBoolAttribute (child, "reversed", reversed,
-	  	false, false))
-  	    return 0;
-	  state->GenerateSphere (ellips, rim_vertices,
-	      cylmapping, toponly, reversed);
+	  using namespace CS::Geometry;
+          csVector3 center (0, 0, 0);
+          int rim_vertices = 8;
+          csEllipsoid ellips;
+          csRef<iDocumentAttribute> attr;
+          csRef<iDocumentNode> c = child->GetNode ("center");
+          if (c)
+            if (!synldr->ParseVector (c, ellips.GetCenter ()))
+              return 0;
+          c = child->GetNode ("radius");
+          if (c)
+          {
+            if (!synldr->ParseVector (c, ellips.GetRadius ()))
+              return 0;
+          }
+          else
+          {
+            attr = child->GetAttribute ("radius");
+            float radius;
+            if (attr) radius = attr->GetValueAsFloat ();
+            else radius = 1.0f;
+            ellips.SetRadius (csVector3 (radius, radius, radius));
+          }
+          attr = child->GetAttribute ("rimvertices");
+          if (attr) rim_vertices = attr->GetValueAsInt ();
+          bool cylmapping, toponly, reversed;
+          if (!synldr->ParseBoolAttribute (child, "cylindrical", cylmapping,
+              false, false))
+            return 0;
+          if (!synldr->ParseBoolAttribute (child, "toponly", toponly,
+              false, false))
+            return 0;
+          if (!synldr->ParseBoolAttribute (child, "reversed", reversed,
+              false, false))
+            return 0;
+	  csDirtyAccessArray<csVector3> mesh_vertices;
+	  csDirtyAccessArray<csVector2> mesh_texels;
+	  csDirtyAccessArray<csVector3> mesh_normals;
+	  csDirtyAccessArray<csTriangle> mesh_triangles;
+	  Primitives::GenerateSphere (ellips, rim_vertices,
+	      mesh_vertices, mesh_texels,
+	      mesh_normals, mesh_triangles, cylmapping,
+	      toponly, reversed, 0);
+	  AppendOrSetData (state, mesh_vertices, mesh_texels,
+	    mesh_normals, mesh_triangles);
 	  num_vt = state->GetVertexCount ();
 	  num_tri = state->GetTriangleCount ();
 	}

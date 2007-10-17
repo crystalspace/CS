@@ -6,6 +6,24 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Oct-2007
+	- Jorrit fixed the genmesh loader so that you can now use multiple
+	  <box> and <sphere> statements to make a genmesh factory out of
+	  multiple primitives. Also using CS::Geometry::Primitives now.
+	- Jorrit started work on instmesh and meshgen. At this point the
+	  following things are done:
+	      - Instmesh and meshgen now work nicely together without
+	        (known) bugs. Lighting works too.
+	      - If the meshes used for meshgen don't have too many
+	        polygons and density isn't too big then instmesh+meshgen
+		is a lot faster compared to genmesh+meshgen. At the
+		very least the update time (when moving around) is
+		a lot faster. However, as soon as the total number
+		of polygons gets too big then instmesh+genmesh starts
+		to get in a disadvantage. On this further optimizations
+		have to be made.
+	      - Warning: instmesh+meshgen still has a bug at exit. Seems
+	        there is some memory corruption going on.
 16-Oct-2007
         - Mike Gist deprecated csProcessorCapability.
 14-Oct-2007
