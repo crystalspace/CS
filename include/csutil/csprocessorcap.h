@@ -28,10 +28,13 @@
 /**
  * This class is used to identify capabilities in the processor such as 
  * support for MMX and SSE
+ * \deprecated Deprecated in 1.3. csProcessorCapability is deprecated.
+ *   Please use CS::Platform::ProcessorSpecDetection instead..
  */
 class CS_CRYSTALSPACE_EXPORT
-    CS_DEPRECATED_TYPE_MSG("csProcessorCapability is deprecated. Please use CS::Platform::ProcessorSpecDetection instead.")
-    csProcessorCapability
+  CS_DEPRECATED_TYPE_MSG("csProcessorCapability is deprecated. "
+    "Please use CS::Platform::ProcessorSpecDetection instead.")
+  csProcessorCapability
 {
 public:
 
