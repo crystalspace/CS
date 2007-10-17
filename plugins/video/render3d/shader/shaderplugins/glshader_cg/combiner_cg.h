@@ -228,6 +228,8 @@ CS_PLUGIN_NAMESPACE_BEGIN(GLShaderCg)
 
     csString annotateStr;
     const char* MakeComment (const char* s);
+    void AppendSnippetMap (const csHash<csString, csString>& map, 
+      DocNodeCgAppender& appender);
     
     class DocNodeCgAppender
     {
