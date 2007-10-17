@@ -67,7 +67,7 @@ chronological order.
 	- Eric Sunshine fixed some problems with the SplitDebugInfo rule in
 	  strip.jam which caused it to be somewhat dysfunctional. An obvious
 	  manifestation of these problems was that the generated .dbg files
-	  where not removed by any of the Jam 'clean' targets.
+	  were not removed by any of the Jam 'clean' targets.
 13-Oct-2007
 	- res fixed a bug in DDS cubemap saving (checked for wrong subimage
 	  count).
@@ -544,8 +544,8 @@ chronological order.
 	  header.
 7-Sep-2007
 	- res fixed the debug info splitting to put the debug info file into
-	  the same file as the binary (fixes separate debug info for shared
-	  libs).
+	  the same directory as the binary (fixes separate debug info for
+	  shared libs).
 	- res fixed the bezier mesh sometimes returning incompletely setup
 	  render meshes.
 	- Genjix changed joytest to use CS_REQUEST_JOYSTICK as an example for
