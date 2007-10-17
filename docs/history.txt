@@ -27,6 +27,8 @@ chronological order.
 	- res enabled shared libraries by default on Win32 and Linux.
 	- res merged the MSVC project shared libraries support from the
 	  msvc-dlls branch.
+	- res fixed msvcgen.jam to use MSVC.PREFIX.library_static instead of
+	  MSVC.PREFIX.library everywhere.
 16-Oct-2007
         - Mike Gist deprecated csProcessorCapability.
 14-Oct-2007

@@ -206,8 +206,8 @@ rule MsvcExtraFile1 { }
 ##   to be accepted.  As an alternative to invoking this rule, if you wish to
 ##   change the default prefixes used by all targets you can use the MsvcConfig
 ##   rule to set the MSVC.PREFIX.appcon, MSVC.PREFIX.appgui, MSVC.PREFIX.group,
-##   MSVC.PREFIX.library, MSVC.PREFIX.plugin, and MSVC.PREFIX.workspace
-##   variables to whatever values you like.
+##   MSVC.PREFIX.library_shared, MSVC.PREFIX.library_static, MSVC.PREFIX.plugin,
+##   and MSVC.PREFIX.workspace variables to whatever values you like.
 rule MsvcGenName { MsvcGenName1 $(1) : $(2) ; }
 rule MsvcGenName1 { }
 
@@ -1106,7 +1106,7 @@ rule Plugin
   # Generate static variant of plugin
   #  Static registry
   local outdir = [ Property msvcgen : outdircommon ] ;
-  local staticreg_out = $(MSVC.PREFIX.library)$(<)_staticreg.cpp ;
+  local staticreg_out = $(MSVC.PREFIX.library_static)$(<)_staticreg.cpp ;
   MakeLocate $(staticreg_out) : $(outdir) ;
   SEARCH on $(staticreg_out) = $(outdir) ;
   GenerateStaticPluginRegistration $(staticreg_out) : $(metafile) ;
@@ -1199,12 +1199,12 @@ rule WriteDependencies
   MakeLocate $(depfile_gristed) : [ on $(depfile) GetVar LOCATE ] ;
   
   # "Artificially" insert static library itself
-  lflags.debug += $(MSVC.PREFIX.library)$(libname)_d.lib ;
-  lflags.release += $(MSVC.PREFIX.library)$(libname).lib ;
+  lflags.debug += $(MSVC.PREFIX.library_static)$(libname)_d.lib ;
+  lflags.release += $(MSVC.PREFIX.library_static)$(libname).lib ;
   # Collect other libs
   local libs = [ ResolveLibs $($(plugin).NEEDLIBS) ] ;
-  lflags.debug += $(MSVC.PREFIX.library)$(libs)_d.lib ;
-  lflags.release += $(MSVC.PREFIX.library)$(libs).lib ;
+  lflags.debug += $(MSVC.PREFIX.library_static)$(libs)_d.lib ;
+  lflags.release += $(MSVC.PREFIX.library_static)$(libs).lib ;
   
   # Defines
   local l ;
