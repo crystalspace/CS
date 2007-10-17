@@ -47,7 +47,6 @@ struct iSndSysStream;
  */
 struct iSndSysSource : public virtual iBase
 {
-  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
   SCF_INTERFACE(iSndSysSource,2,0,0);
 
   /// Set volume (0.0 = silence, 1.0 = as provided, 2.0 = twice as loud)
@@ -67,7 +66,6 @@ struct iSndSysSource : public virtual iBase
  */
 struct iSndSysSourceSoftware : public iSndSysSource
 {
-  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
   SCF_INTERFACE(iSndSysSourceSoftware,2,0,0);
 
   /**
@@ -110,7 +108,6 @@ struct iSndSysSourceSoftware : public iSndSysSource
  */
 struct iSndSysSourceOpenAL : public virtual iBase
 {
-  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
   SCF_INTERFACE(iSndSysSourceOpenAL,1,0,0);
 };
 
@@ -121,7 +118,6 @@ struct iSndSysSourceOpenAL : public virtual iBase
  */
 struct iSndSysSource3D : public virtual iBase
 {
-  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
   SCF_INTERFACE(iSndSysSource3D,2,0,0);
 
   /// set position of this source
@@ -176,7 +172,6 @@ struct iSndSysSource3D : public virtual iBase
  */
 struct iSndSysSource3DDirectionalSimple : public virtual iBase
 {
-  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
   SCF_INTERFACE(iSndSysSource3DDirectionalSimple,2,0,0);
 
   /// set direction of this source
@@ -210,7 +205,6 @@ struct iSndSysSource3DDirectionalSimple : public virtual iBase
  */
 struct iSndSysSource3DDirectional : public virtual iBase
 {
-  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
   SCF_INTERFACE(iSndSysSource3DDirectional,2,0,0);
 
   /**
@@ -270,7 +264,6 @@ struct iSndSysSource3DDirectional : public virtual iBase
  */
 struct iSndSysSource3DDoppler : public virtual iBase
 {
-  /// SCF2006 - See http://www.crystalspace3d.org/cseps/csep-0010.html
   SCF_INTERFACE (iSndSysSource3DDoppler,2,0,0);
 
   /// Set velocity (speed) of the source
@@ -279,6 +272,75 @@ struct iSndSysSource3DDoppler : public virtual iBase
   /// Get velocity (speed) of the source
   virtual const csVector3 &GetVelocity () = 0;
 };
+
+/**
+ * \todo Document me!
+ */
+struct
+  CS_DEPRECATED_TYPE_MSG ("iSndSysSourceSoftware3D is deprecated.")
+  iSndSysSourceSoftware3D : public iSndSysSourceSoftware
+{
+  SCF_INTERFACE(iSndSysSourceSoftware3D,2,0,0);
+
+  /// set position of this source
+  virtual void SetPosition(csVector3 pos) = 0;
+  /// get position of this source
+  virtual csVector3 GetPosition() = 0;
+
+  /// set position of this source
+  virtual void SetDirection(csVector3 dir) = 0;
+  /// get position of this source
+  virtual csVector3 GetDirection() = 0;
+
+  /**
+   * The directional radiation applies to sound that are oriented in a
+   * particular direction.
+   * This value is expressed in radians and describes the half-angle of a
+   * cone spreading from the position of the source and opening
+   * in the direction of the source.
+   * Set this value to 0.0f for an omni-directional sound. 
+   */
+  virtual void SetDirectionalRadiation(float rad) = 0;
+
+  /// Retrieves the current directional radiation 
+  virtual float GetDirectionalRadiation() = 0;
+
+  /**
+   * Set the greatest distance from a sound at which the sound plays at full
+   * amplitude. 
+   * When a listener is closer than this distance, the amplitude is the volume
+   * of the sound.
+   * When a listener is further than this distance, the amplitude follows the
+   * formula V = (volume / ((distance/minimum_distance) ^ rolloff_factor))
+   */
+  virtual void SetMinimumDistance (float distance) = 0;
+
+  /**
+   * Set the greatest distance from a sound at which the sound can be heard.
+   * If the distance to a listener is above this threshold, it will not be
+   * mixed into the output buffer at all.  This saves a tiny bit of processing.
+   */
+  virtual void SetMaximumDistance (float distance) = 0;
+
+  /**
+   * Retrieve the maximum distance for which a sound is heard at full volume.
+   * See SetMaximumDistance and SetMinimumDistance for distance notes.
+   */
+  virtual float GetMinimumDistance () = 0;
+
+  /**
+   * Retrieve the maximum distance for which a sound can be heard.  See
+   * SetMaximumDistance and SetMinimumDistance for distance notes.
+   */
+  virtual float GetMaximumDistance () = 0;
+
+  /// Attach a filter to this source
+//  virtual bool AttachFilter(csRef<iSound2Filter> filter) = 0;
+
+  /// Remove a filter from this source
+//  virtual bool RemoveFilter(csRef<iSound2Filter> filter)= 0;
+};
+
 
 /** @} */
 

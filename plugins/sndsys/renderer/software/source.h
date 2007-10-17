@@ -171,11 +171,15 @@ protected:
 };
 
 class SndSysSourceSoftware3D :
-  public scfImplementation4<SndSysSourceSoftware3D,
+  // (vk) for compatibility, iSndSysSourceSoftware3D was readded, and
+  //      iSndSysSourceSoftware was set as a scfFakeInterface.
+  //      To be removed later, after 1.4 if all goes well...
+  public scfImplementation5<SndSysSourceSoftware3D,
+                            iSndSysSourceSoftware3D,
                             scfFakeInterface<iSndSysSource>,
                             iSndSysSource3D,
                             iSndSysSource3DDirectionalSimple,
-                            iSndSysSourceSoftware >
+                            scfFakeInterface<iSndSysSourceSoftware> >
 {
 public:
 
