@@ -35,6 +35,8 @@ chronological order.
 	  provided buffer. This can save a copy (and thus give somewhat better
 	  performance) when some extensions for direct texture memory access
 	  are available (such as ARB_pixel_buffer_object).
+	- res made ptpdlight use iTextureHandle->QueryBlitBuffer()/
+	  ApplyBlitBuffer(). 
 16-Oct-2007
         - Mike Gist deprecated csProcessorCapability.
 14-Oct-2007

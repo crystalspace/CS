@@ -22,6 +22,7 @@
 
 #include "iengine/light.h"
 #include "imesh/lighting.h"
+#include "ivideo/texture.h"
 
 #include "csgeom/csrect.h"
 #include "csgfx/rgbpixel.h"
@@ -212,13 +213,6 @@ public:
     ~MappedLight() { delete[] lightId; }
   };
 private:
-  typedef csDirtyAccessArray<Lumel> LightmapScratch;
-  CS_DECLARE_STATIC_CLASSVAR_REF(lightmapScratch, GetScratch, LightmapScratch);
-  typedef csDirtyAccessArray<uint64, csArrayElementHandler<uint64>,
-    CS::Memory::AllocatorAlign<8> > LightmapScratchMMX;
-  CS_DECLARE_STATIC_CLASSVAR_REF(lightmapScratchMMX, GetScratchMMX, 
-    LightmapScratchMMX);
-
   csRef<ProctexPDLightLoader> loader;
   TileHelper tiles;
   csBitArray tilesDirty;
@@ -247,6 +241,28 @@ private:
 
   void Report (int severity, const char* msg, ...);
 
+  struct BlitBufHelper
+  {
+    iTextureHandle* texh;
+    uint8* lastBuf;
+
+    BlitBufHelper (iTextureHandle* texh) : texh (texh), lastBuf (0) {}
+    ~BlitBufHelper ()
+    {
+      if (lastBuf != 0) texh->ApplyBlitBuffer (lastBuf);
+    }
+
+    uint8* QueryBlitBuffer (int x, int y, int width, int height,
+                            size_t& pitch)
+    {
+      uint8* blitBuf = texh->QueryBlitBuffer (x, y, width, height,
+        pitch, iTextureHandle::BGRA8888,
+        iTextureHandle::blitbufReadable);
+      if (lastBuf != 0) texh->ApplyBlitBuffer (lastBuf);
+      lastBuf = blitBuf;
+      return blitBuf;
+    }
+  };
   void Animate_Generic ();
   void Animate_MMX ();
 public:
