@@ -597,7 +597,6 @@ actions ignore Move
 ## SymLink target : source
 rule SymLink
 {
-  
   if "$(LN_S)"
   {
     DoSymLink $(<) : $(>) ;

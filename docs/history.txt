@@ -44,6 +44,9 @@ chronological order.
 	  convoluted code).
 	- res changed docconv_static to link some unneeded plugins.
 	- res fixed an errorneous MsvcUsePCH in the cslight Jamfile.
+	- res made shared libraries built in out/.../libs again (so they're
+	  correctly picked up by cs-config), but also added a symlink for them
+	  to the top build directory (for convenience);
 16-Oct-2007
         - Mike Gist deprecated csProcessorCapability.
 14-Oct-2007
