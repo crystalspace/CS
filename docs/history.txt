@@ -42,6 +42,8 @@ chronological order.
 	- caedes made python bindings use -modern swig flag. This instructs
 	  swig to use modern python features only (and generates somewhat less
 	  convoluted code).
+	- res changed docconv_static to link some unneeded plugins.
+	- res fixed an errorneous MsvcUsePCH in the cslight Jamfile.
 16-Oct-2007
         - Mike Gist deprecated csProcessorCapability.
 14-Oct-2007
