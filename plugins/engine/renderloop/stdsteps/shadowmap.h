@@ -115,9 +115,6 @@ public:
 
   virtual void ObjectVisible (iVisibilityObject *visobject, 
     iMeshWrapper *mesh, uint32 frustum_mask);
-  
-  void SetIgnoreTag (csStringID tag) { }
-  csStringID GetIgnoreTag () { return csInvalidStringID; }
 };
 
 class csShadowmapRSLoader :

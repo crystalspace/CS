@@ -104,7 +104,6 @@ private:
 
   csStringID trw_inv_name;
 
-  csStringID ignoreTag;
 
   csRef<iShaderManager> shadermgr;
   csRef<iLightManager> lightmgr;
@@ -161,9 +160,6 @@ public:
   virtual size_t Find (iRenderStep* step) const;
   virtual size_t GetStepCount () const;
 
-  void SetIgnoreTag (csStringID tag) { ignoreTag = tag; }
-  csStringID GetIgnoreTag () { return ignoreTag; }
-  
   csPtr<iTextureHandle> GetAttenuationTexture (int attnType);
   csPtr<iTextureHandle> GetAttenuationTexture (const csVector3& attnVec);
 };
