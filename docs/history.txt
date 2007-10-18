@@ -17,6 +17,9 @@ chronological order.
 	- caedes added error printing to the python eventhandler, this
 	  way its not necessary to wrap the event handler code in
 	  try,except clauses.
+	- caedes removed try,except clauses from the python tutorials
+	  event handlers and fixed some other minor style issues in
+	  the tutorials.
 17-Oct-2007
 	- Jorrit fixed the genmesh loader so that you can now use multiple
 	  <box> and <sphere> statements to make a genmesh factory out of

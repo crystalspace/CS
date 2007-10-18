@@ -25,7 +25,13 @@ for detail on how the C++ version works.
 """
 
 import sys, time, traceback
-from cspace import *
+
+try:    # get in CS
+    from cspace import *
+except:
+    print "WARNING: Failed to import module cspace"
+    traceback.print_exc()
+    sys.exit(1) # die!!
 
 DEBUG = 0
 

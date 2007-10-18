@@ -35,6 +35,7 @@ try:    # get in CS
     from cspace import *
 except:
     print "WARNING: Failed to import module cspace"
+    traceback.print_exc()
     sys.exit(1) # die!!
 
 # utils code
@@ -54,7 +55,7 @@ def FatalError(msg="FatalError"):
     Report(CS_REPORTER_SEVERITY_ERROR,msg)
     sys.exit(1)
 
-# EventHandler
+# The application
 #############################
 class MyCsApp:
     def Init(self):
@@ -182,27 +183,18 @@ class MyCsApp:
 
 # EventHandler
 #############################
-# IMPORTANT:
-# due to the nature of the event handler (its called directly from the Cs mainloop)
-# any exceptions thrown will not display error messages/ halt the interpreter
-# (including those caused by syntax errors)
-# therefore we must add in our own code to catch this
 def EventHandler(ev):
-    try:
-        #print 'EventHandler called'
-        if ((ev.Name  == KeyboardDown) and
-            (csKeyEventHelper.GetCookedCode(ev) == CSKEY_ESC)):
-            q  = CS_QUERY_REGISTRY(object_reg, iEventQueue)
-            if q:
-                q.GetEventOutlet().Broadcast(csevQuit(object_reg))
-                return 1
-        elif ev.Name == Frame:
-            app.SetupFrame()
-            app.FinishFrame()
+    #print 'EventHandler called'
+    if ((ev.Name  == KeyboardDown) and
+        (csKeyEventHelper.GetCookedCode(ev) == CSKEY_ESC)):
+        q  = CS_QUERY_REGISTRY(object_reg, iEventQueue)
+        if q:
+            q.GetEventOutlet().Broadcast(csevQuit(object_reg))
             return 1
-    except:
-        traceback.print_exc()   # prints the usual error messages
-        sys.exit(1)             # stop dead
+    elif ev.Name == Frame:
+        app.SetupFrame()
+        app.FinishFrame()
+        return 1
     return 0
 
 # startup code
