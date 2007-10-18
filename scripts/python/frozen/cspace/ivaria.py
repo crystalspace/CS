@@ -2,7 +2,6 @@
 # Version 1.3.31
 #
 # Don't modify this file, modify the SWIG interface instead.
-# This file is compatible with both classic and new-style classes.
 
 import _ivaria
 import new
@@ -48,6 +47,16 @@ except AttributeError:
 del types
 
 
+def _swig_setattr_nondynamic_method(set):
+    def set_attr(self,name,value):
+        if (name == "thisown"): return self.this.own(value)
+        if hasattr(self,name) or (name == "this"):
+            set(self,name,value)
+        else:
+            raise AttributeError("You cannot add attributes to %s" % self)
+    return set_attr
+
+
 import core
 _SetSCFPointer = _ivaria._SetSCFPointer
 _GetSCFPointer = _ivaria._GetSCFPointer
@@ -56,11 +65,8 @@ if not "core" in dir():
 core.AddSCFLink(_SetSCFPointer)
 CSMutableArrayHelper = core.CSMutableArrayHelper
 
-class iDecal(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iDecal, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, iDecal, name)
+class iDecal(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _ivaria.new_iDecal(*args)
@@ -72,12 +78,7 @@ iDecal_swigregister = _ivaria.iDecal_swigregister
 iDecal_swigregister(iDecal)
 
 class iDecalTemplate(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iDecalTemplate, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iDecalTemplate, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetTimeToLive(*args): return _ivaria.iDecalTemplate_GetTimeToLive(*args)
@@ -113,19 +114,15 @@ class iDecalTemplate(core.iBase):
     def SetMainColor(*args): return _ivaria.iDecalTemplate_SetMainColor(*args)
     def SetTopColor(*args): return _ivaria.iDecalTemplate_SetTopColor(*args)
     def SetBottomColor(*args): return _ivaria.iDecalTemplate_SetBottomColor(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivaria.iDecalTemplate_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivaria.iDecalTemplate_scfGetVersion)
+    scfGetVersion = staticmethod(_ivaria.iDecalTemplate_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iDecalTemplate
     __del__ = lambda self : None;
 iDecalTemplate_swigregister = _ivaria.iDecalTemplate_swigregister
 iDecalTemplate_swigregister(iDecalTemplate)
 iDecalTemplate_scfGetVersion = _ivaria.iDecalTemplate_scfGetVersion
 
-class iDecalBuilder(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iDecalBuilder, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, iDecalBuilder, name)
+class iDecalBuilder(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     __swig_destroy__ = _ivaria.delete_iDecalBuilder
@@ -135,12 +132,7 @@ iDecalBuilder_swigregister = _ivaria.iDecalBuilder_swigregister
 iDecalBuilder_swigregister(iDecalBuilder)
 
 class iDecalManager(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iDecalManager, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iDecalManager, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def CreateDecal(*args): return _ivaria.iDecalManager_CreateDecal(*args)
@@ -148,8 +140,7 @@ class iDecalManager(core.iBase):
     def DeleteDecal(*args): return _ivaria.iDecalManager_DeleteDecal(*args)
     def GetDecalCount(*args): return _ivaria.iDecalManager_GetDecalCount(*args)
     def GetDecal(*args): return _ivaria.iDecalManager_GetDecal(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivaria.iDecalManager_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivaria.iDecalManager_scfGetVersion)
+    scfGetVersion = staticmethod(_ivaria.iDecalManager_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iDecalManager
     __del__ = lambda self : None;
 iDecalManager_swigregister = _ivaria.iDecalManager_swigregister
@@ -164,12 +155,7 @@ csConNoCursor = _ivaria.csConNoCursor
 csConNormalCursor = _ivaria.csConNormalCursor
 csConInsertCursor = _ivaria.csConInsertCursor
 class iConsoleWatcher(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iConsoleWatcher, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iConsoleWatcher, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def ConsoleVisibilityChanged(*args): return _ivaria.iConsoleWatcher_ConsoleVisibilityChanged(*args)
@@ -179,12 +165,7 @@ iConsoleWatcher_swigregister = _ivaria.iConsoleWatcher_swigregister
 iConsoleWatcher_swigregister(iConsoleWatcher)
 
 class iConsoleOutput(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iConsoleOutput, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iConsoleOutput, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def PutText(*args): return _ivaria.iConsoleOutput_PutText(*args)
@@ -214,12 +195,7 @@ iConsoleOutput_swigregister = _ivaria.iConsoleOutput_swigregister
 iConsoleOutput_swigregister(iConsoleOutput)
 
 class iStandardReporterListener(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iStandardReporterListener, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iStandardReporterListener, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetOutputConsole(*args): return _ivaria.iStandardReporterListener_SetOutputConsole(*args)
@@ -231,8 +207,7 @@ class iStandardReporterListener(core.iBase):
     def RemoveMessages(*args): return _ivaria.iStandardReporterListener_RemoveMessages(*args)
     def ShowMessageID(*args): return _ivaria.iStandardReporterListener_ShowMessageID(*args)
     def GetDebugFile(*args): return _ivaria.iStandardReporterListener_GetDebugFile(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivaria.iStandardReporterListener_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivaria.iStandardReporterListener_scfGetVersion)
+    scfGetVersion = staticmethod(_ivaria.iStandardReporterListener_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iStandardReporterListener
     __del__ = lambda self : None;
 iStandardReporterListener_swigregister = _ivaria.iStandardReporterListener_swigregister
@@ -240,12 +215,7 @@ iStandardReporterListener_swigregister(iStandardReporterListener)
 iStandardReporterListener_scfGetVersion = _ivaria.iStandardReporterListener_scfGetVersion
 
 class iView(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iView, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iView, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetEngine(*args): return _ivaria.iView_GetEngine(*args)
@@ -262,38 +232,22 @@ class iView(core.iBase):
     def GetClipper(*args): return _ivaria.iView_GetClipper(*args)
     def Draw(*args): return _ivaria.iView_Draw(*args)
     def SetAutoResize(*args): return _ivaria.iView_SetAutoResize(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivaria.iView_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivaria.iView_scfGetVersion)
+    scfGetVersion = staticmethod(_ivaria.iView_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iView
     __del__ = lambda self : None;
 iView_swigregister = _ivaria.iView_swigregister
 iView_swigregister(iView)
 iView_scfGetVersion = _ivaria.iView_scfGetVersion
 
-class csCollisionPair(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csCollisionPair, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csCollisionPair, name)
+class csCollisionPair(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["a1"] = _ivaria.csCollisionPair_a1_set
-    __swig_getmethods__["a1"] = _ivaria.csCollisionPair_a1_get
-    if _newclass:a1 = _swig_property(_ivaria.csCollisionPair_a1_get, _ivaria.csCollisionPair_a1_set)
-    __swig_setmethods__["b1"] = _ivaria.csCollisionPair_b1_set
-    __swig_getmethods__["b1"] = _ivaria.csCollisionPair_b1_get
-    if _newclass:b1 = _swig_property(_ivaria.csCollisionPair_b1_get, _ivaria.csCollisionPair_b1_set)
-    __swig_setmethods__["c1"] = _ivaria.csCollisionPair_c1_set
-    __swig_getmethods__["c1"] = _ivaria.csCollisionPair_c1_get
-    if _newclass:c1 = _swig_property(_ivaria.csCollisionPair_c1_get, _ivaria.csCollisionPair_c1_set)
-    __swig_setmethods__["a2"] = _ivaria.csCollisionPair_a2_set
-    __swig_getmethods__["a2"] = _ivaria.csCollisionPair_a2_get
-    if _newclass:a2 = _swig_property(_ivaria.csCollisionPair_a2_get, _ivaria.csCollisionPair_a2_set)
-    __swig_setmethods__["b2"] = _ivaria.csCollisionPair_b2_set
-    __swig_getmethods__["b2"] = _ivaria.csCollisionPair_b2_get
-    if _newclass:b2 = _swig_property(_ivaria.csCollisionPair_b2_get, _ivaria.csCollisionPair_b2_set)
-    __swig_setmethods__["c2"] = _ivaria.csCollisionPair_c2_set
-    __swig_getmethods__["c2"] = _ivaria.csCollisionPair_c2_get
-    if _newclass:c2 = _swig_property(_ivaria.csCollisionPair_c2_get, _ivaria.csCollisionPair_c2_set)
+    a1 = _swig_property(_ivaria.csCollisionPair_a1_get, _ivaria.csCollisionPair_a1_set)
+    b1 = _swig_property(_ivaria.csCollisionPair_b1_get, _ivaria.csCollisionPair_b1_set)
+    c1 = _swig_property(_ivaria.csCollisionPair_c1_get, _ivaria.csCollisionPair_c1_set)
+    a2 = _swig_property(_ivaria.csCollisionPair_a2_get, _ivaria.csCollisionPair_a2_set)
+    b2 = _swig_property(_ivaria.csCollisionPair_b2_get, _ivaria.csCollisionPair_b2_set)
+    c2 = _swig_property(_ivaria.csCollisionPair_c2_get, _ivaria.csCollisionPair_c2_set)
     def __eq__(*args): return _ivaria.csCollisionPair___eq__(*args)
     def __init__(self, *args): 
         this = _ivaria.new_csCollisionPair(*args)
@@ -304,21 +258,12 @@ class csCollisionPair(_object):
 csCollisionPair_swigregister = _ivaria.csCollisionPair_swigregister
 csCollisionPair_swigregister(csCollisionPair)
 
-class csIntersectingTriangle(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csIntersectingTriangle, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csIntersectingTriangle, name)
+class csIntersectingTriangle(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["a"] = _ivaria.csIntersectingTriangle_a_set
-    __swig_getmethods__["a"] = _ivaria.csIntersectingTriangle_a_get
-    if _newclass:a = _swig_property(_ivaria.csIntersectingTriangle_a_get, _ivaria.csIntersectingTriangle_a_set)
-    __swig_setmethods__["b"] = _ivaria.csIntersectingTriangle_b_set
-    __swig_getmethods__["b"] = _ivaria.csIntersectingTriangle_b_get
-    if _newclass:b = _swig_property(_ivaria.csIntersectingTriangle_b_get, _ivaria.csIntersectingTriangle_b_set)
-    __swig_setmethods__["c"] = _ivaria.csIntersectingTriangle_c_set
-    __swig_getmethods__["c"] = _ivaria.csIntersectingTriangle_c_get
-    if _newclass:c = _swig_property(_ivaria.csIntersectingTriangle_c_get, _ivaria.csIntersectingTriangle_c_set)
+    a = _swig_property(_ivaria.csIntersectingTriangle_a_get, _ivaria.csIntersectingTriangle_a_set)
+    b = _swig_property(_ivaria.csIntersectingTriangle_b_get, _ivaria.csIntersectingTriangle_b_set)
+    c = _swig_property(_ivaria.csIntersectingTriangle_c_get, _ivaria.csIntersectingTriangle_c_set)
     def __init__(self, *args): 
         this = _ivaria.new_csIntersectingTriangle(*args)
         try: self.this.append(this)
@@ -332,17 +277,11 @@ CS_MESH_COLLIDER = _ivaria.CS_MESH_COLLIDER
 CS_TERRAFORMER_COLLIDER = _ivaria.CS_TERRAFORMER_COLLIDER
 CS_TERRAIN_COLLIDER = _ivaria.CS_TERRAIN_COLLIDER
 class iCollider(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iCollider, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iCollider, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetColliderType(*args): return _ivaria.iCollider_GetColliderType(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivaria.iCollider_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivaria.iCollider_scfGetVersion)
+    scfGetVersion = staticmethod(_ivaria.iCollider_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iCollider
     __del__ = lambda self : None;
 iCollider_swigregister = _ivaria.iCollider_swigregister
@@ -350,12 +289,7 @@ iCollider_swigregister(iCollider)
 iCollider_scfGetVersion = _ivaria.iCollider_scfGetVersion
 
 class iCollideSystem(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iCollideSystem, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iCollideSystem, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetTriangleDataID(*args): return _ivaria.iCollideSystem_GetTriangleDataID(*args)
@@ -371,8 +305,7 @@ class iCollideSystem(core.iBase):
     def SetOneHitOnly(*args): return _ivaria.iCollideSystem_SetOneHitOnly(*args)
     def GetOneHitOnly(*args): return _ivaria.iCollideSystem_GetOneHitOnly(*args)
     def GetCollisionPairByIndex(*args): return _ivaria.iCollideSystem_GetCollisionPairByIndex(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivaria.iCollideSystem_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivaria.iCollideSystem_scfGetVersion)
+    scfGetVersion = staticmethod(_ivaria.iCollideSystem_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iCollideSystem
     __del__ = lambda self : None;
     def GetCollisionPairs (self):
@@ -387,12 +320,7 @@ iCollideSystem_swigregister(iCollideSystem)
 iCollideSystem_scfGetVersion = _ivaria.iCollideSystem_scfGetVersion
 
 class csCollisionPairArrayReadOnly(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csCollisionPairArrayReadOnly, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csCollisionPairArrayReadOnly, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetSize(*args): return _ivaria.csCollisionPairArrayReadOnly_GetSize(*args)
@@ -408,12 +336,7 @@ csCollisionPairArrayReadOnly_swigregister = _ivaria.csCollisionPairArrayReadOnly
 csCollisionPairArrayReadOnly_swigregister(csCollisionPairArrayReadOnly)
 
 class csCollisionPairArrayChangeElements(csCollisionPairArrayReadOnly):
-    __swig_setmethods__ = {}
-    for _s in [csCollisionPairArrayReadOnly]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csCollisionPairArrayChangeElements, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csCollisionPairArrayReadOnly]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csCollisionPairArrayChangeElements, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Get(*args): return _ivaria.csCollisionPairArrayChangeElements_Get(*args)
@@ -424,12 +347,7 @@ csCollisionPairArrayChangeElements_swigregister = _ivaria.csCollisionPairArrayCh
 csCollisionPairArrayChangeElements_swigregister(csCollisionPairArrayChangeElements)
 
 class csCollisionPairArrayChangeAll(csCollisionPairArrayChangeElements):
-    __swig_setmethods__ = {}
-    for _s in [csCollisionPairArrayChangeElements]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csCollisionPairArrayChangeAll, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csCollisionPairArrayChangeElements]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csCollisionPairArrayChangeAll, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetSize(*args): return _ivaria.csCollisionPairArrayChangeAll_SetSize(*args)
@@ -451,12 +369,7 @@ csCollisionPairArrayChangeAll_swigregister = _ivaria.csCollisionPairArrayChangeA
 csCollisionPairArrayChangeAll_swigregister(csCollisionPairArrayChangeAll)
 
 class iDynamicsStepCallback(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iDynamicsStepCallback, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iDynamicsStepCallback, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Step(*args): return _ivaria.iDynamicsStepCallback_Step(*args)
@@ -466,12 +379,7 @@ iDynamicsStepCallback_swigregister = _ivaria.iDynamicsStepCallback_swigregister
 iDynamicsStepCallback_swigregister(iDynamicsStepCallback)
 
 class iDynamics(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iDynamics, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iDynamics, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def CreateSystem(*args): return _ivaria.iDynamics_CreateSystem(*args)
@@ -481,8 +389,7 @@ class iDynamics(core.iBase):
     def Step(*args): return _ivaria.iDynamics_Step(*args)
     def AddStepCallback(*args): return _ivaria.iDynamics_AddStepCallback(*args)
     def RemoveStepCallback(*args): return _ivaria.iDynamics_RemoveStepCallback(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivaria.iDynamics_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivaria.iDynamics_scfGetVersion)
+    scfGetVersion = staticmethod(_ivaria.iDynamics_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iDynamics
     __del__ = lambda self : None;
 iDynamics_swigregister = _ivaria.iDynamics_swigregister
@@ -490,12 +397,7 @@ iDynamics_swigregister(iDynamics)
 iDynamics_scfGetVersion = _ivaria.iDynamics_scfGetVersion
 
 class iDynamicSystem(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iDynamicSystem, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iDynamicSystem, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def QueryObject(*args): return _ivaria.iDynamicSystem_QueryObject(*args)
@@ -530,8 +432,7 @@ class iDynamicSystem(core.iBase):
     def CreateCollider(*args): return _ivaria.iDynamicSystem_CreateCollider(*args)
     def GetCollider(*args): return _ivaria.iDynamicSystem_GetCollider(*args)
     def GetColliderCount(*args): return _ivaria.iDynamicSystem_GetColliderCount(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivaria.iDynamicSystem_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivaria.iDynamicSystem_scfGetVersion)
+    scfGetVersion = staticmethod(_ivaria.iDynamicSystem_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iDynamicSystem
     __del__ = lambda self : None;
 iDynamicSystem_swigregister = _ivaria.iDynamicSystem_swigregister
@@ -539,12 +440,7 @@ iDynamicSystem_swigregister(iDynamicSystem)
 iDynamicSystem_scfGetVersion = _ivaria.iDynamicSystem_scfGetVersion
 
 class iDynamicsMoveCallback(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iDynamicsMoveCallback, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iDynamicsMoveCallback, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Execute(*args): return _ivaria.iDynamicsMoveCallback_Execute(*args)
@@ -554,12 +450,7 @@ iDynamicsMoveCallback_swigregister = _ivaria.iDynamicsMoveCallback_swigregister
 iDynamicsMoveCallback_swigregister(iDynamicsMoveCallback)
 
 class iDynamicsCollisionCallback(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iDynamicsCollisionCallback, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iDynamicsCollisionCallback, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Execute(*args): return _ivaria.iDynamicsCollisionCallback_Execute(*args)
@@ -569,19 +460,13 @@ iDynamicsCollisionCallback_swigregister = _ivaria.iDynamicsCollisionCallback_swi
 iDynamicsCollisionCallback_swigregister(iDynamicsCollisionCallback)
 
 class iBodyGroup(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iBodyGroup, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iBodyGroup, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def AddBody(*args): return _ivaria.iBodyGroup_AddBody(*args)
     def RemoveBody(*args): return _ivaria.iBodyGroup_RemoveBody(*args)
     def BodyInGroup(*args): return _ivaria.iBodyGroup_BodyInGroup(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivaria.iBodyGroup_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivaria.iBodyGroup_scfGetVersion)
+    scfGetVersion = staticmethod(_ivaria.iBodyGroup_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iBodyGroup
     __del__ = lambda self : None;
 iBodyGroup_swigregister = _ivaria.iBodyGroup_swigregister
@@ -589,12 +474,7 @@ iBodyGroup_swigregister(iBodyGroup)
 iBodyGroup_scfGetVersion = _ivaria.iBodyGroup_scfGetVersion
 
 class iRigidBody(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iRigidBody, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iRigidBody, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def QueryObject(*args): return _ivaria.iRigidBody_QueryObject(*args)
@@ -664,12 +544,7 @@ CYLINDER_COLLIDER_GEOMETRY = _ivaria.CYLINDER_COLLIDER_GEOMETRY
 CAPSULE_COLLIDER_GEOMETRY = _ivaria.CAPSULE_COLLIDER_GEOMETRY
 SPHERE_COLLIDER_GEOMETRY = _ivaria.SPHERE_COLLIDER_GEOMETRY
 class iDynamicsColliderCollisionCallback(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iDynamicsColliderCollisionCallback, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iDynamicsColliderCollisionCallback, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Execute(*args): return _ivaria.iDynamicsColliderCollisionCallback_Execute(*args)
@@ -679,12 +554,7 @@ iDynamicsColliderCollisionCallback_swigregister = _ivaria.iDynamicsColliderColli
 iDynamicsColliderCollisionCallback_swigregister(iDynamicsColliderCollisionCallback)
 
 class iDynamicsSystemCollider(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iDynamicsSystemCollider, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iDynamicsSystemCollider, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def CreateSphereGeometry(*args): return _ivaria.iDynamicsSystemCollider_CreateSphereGeometry(*args)
@@ -719,12 +589,7 @@ iDynamicsSystemCollider_swigregister = _ivaria.iDynamicsSystemCollider_swigregis
 iDynamicsSystemCollider_swigregister(iDynamicsSystemCollider)
 
 class iJoint(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iJoint, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iJoint, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Attach(*args): return _ivaria.iJoint_Attach(*args)
@@ -755,8 +620,7 @@ class iJoint(core.iBase):
     def GetMaxForce(*args): return _ivaria.iJoint_GetMaxForce(*args)
     def SetAngularConstraintAxis(*args): return _ivaria.iJoint_SetAngularConstraintAxis(*args)
     def GetAngularConstraintAxis(*args): return _ivaria.iJoint_GetAngularConstraintAxis(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivaria.iJoint_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivaria.iJoint_scfGetVersion)
+    scfGetVersion = staticmethod(_ivaria.iJoint_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iJoint
     __del__ = lambda self : None;
 iJoint_swigregister = _ivaria.iJoint_swigregister
@@ -764,12 +628,7 @@ iJoint_swigregister(iJoint)
 iJoint_scfGetVersion = _ivaria.iJoint_scfGetVersion
 
 class iODEFrameUpdateCallback(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iODEFrameUpdateCallback, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iODEFrameUpdateCallback, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Execute(*args): return _ivaria.iODEFrameUpdateCallback_Execute(*args)
@@ -779,12 +638,7 @@ iODEFrameUpdateCallback_swigregister = _ivaria.iODEFrameUpdateCallback_swigregis
 iODEFrameUpdateCallback_swigregister(iODEFrameUpdateCallback)
 
 class iODEDynamicState(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iODEDynamicState, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iODEDynamicState, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetGlobalERP(*args): return _ivaria.iODEDynamicState_SetGlobalERP(*args)
@@ -811,8 +665,7 @@ class iODEDynamicState(core.iBase):
     def EventProcessingEnabled(*args): return _ivaria.iODEDynamicState_EventProcessingEnabled(*args)
     def EnableFastObjects(*args): return _ivaria.iODEDynamicState_EnableFastObjects(*args)
     def FastObjectsEnabled(*args): return _ivaria.iODEDynamicState_FastObjectsEnabled(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivaria.iODEDynamicState_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivaria.iODEDynamicState_scfGetVersion)
+    scfGetVersion = staticmethod(_ivaria.iODEDynamicState_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iODEDynamicState
     __del__ = lambda self : None;
 iODEDynamicState_swigregister = _ivaria.iODEDynamicState_swigregister
@@ -820,12 +673,7 @@ iODEDynamicState_swigregister(iODEDynamicState)
 iODEDynamicState_scfGetVersion = _ivaria.iODEDynamicState_scfGetVersion
 
 class iODEDynamicSystemState(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iODEDynamicSystemState, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iODEDynamicSystemState, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetERP(*args): return _ivaria.iODEDynamicSystemState_SetERP(*args)
@@ -866,8 +714,7 @@ class iODEDynamicSystemState(core.iBase):
     def GetContactSurfaceLayer(*args): return _ivaria.iODEDynamicSystemState_GetContactSurfaceLayer(*args)
     def EnableOldInertia(*args): return _ivaria.iODEDynamicSystemState_EnableOldInertia(*args)
     def IsOldInertiaEnabled(*args): return _ivaria.iODEDynamicSystemState_IsOldInertiaEnabled(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivaria.iODEDynamicSystemState_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivaria.iODEDynamicSystemState_scfGetVersion)
+    scfGetVersion = staticmethod(_ivaria.iODEDynamicSystemState_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iODEDynamicSystemState
     __del__ = lambda self : None;
 iODEDynamicSystemState_swigregister = _ivaria.iODEDynamicSystemState_swigregister
@@ -884,12 +731,7 @@ CS_ODE_JOINT_TYPE_HINGE2 = _ivaria.CS_ODE_JOINT_TYPE_HINGE2
 CS_ODE_JOINT_TYPE_FIXED = _ivaria.CS_ODE_JOINT_TYPE_FIXED
 CS_ODE_JOINT_TYPE_AMOTOR = _ivaria.CS_ODE_JOINT_TYPE_AMOTOR
 class iODEJointState(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iODEJointState, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iODEJointState, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetType(*args): return _ivaria.iODEJointState_GetType(*args)
@@ -915,8 +757,7 @@ class iODEJointState(core.iBase):
     def GetStopCFM(*args): return _ivaria.iODEJointState_GetStopCFM(*args)
     def GetSuspensionERP(*args): return _ivaria.iODEJointState_GetSuspensionERP(*args)
     def GetSuspensionCFM(*args): return _ivaria.iODEJointState_GetSuspensionCFM(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivaria.iODEJointState_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivaria.iODEJointState_scfGetVersion)
+    scfGetVersion = staticmethod(_ivaria.iODEJointState_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iODEJointState
     __del__ = lambda self : None;
 iODEJointState_swigregister = _ivaria.iODEJointState_swigregister
@@ -924,12 +765,7 @@ iODEJointState_swigregister(iODEJointState)
 iODEJointState_scfGetVersion = _ivaria.iODEJointState_scfGetVersion
 
 class iODEGeneralJointState(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iODEGeneralJointState, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iODEGeneralJointState, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetLoStop(*args): return _ivaria.iODEGeneralJointState_SetLoStop(*args)
@@ -966,20 +802,14 @@ iODEGeneralJointState_swigregister = _ivaria.iODEGeneralJointState_swigregister
 iODEGeneralJointState_swigregister(iODEGeneralJointState)
 
 class iODESliderJoint(iODEGeneralJointState):
-    __swig_setmethods__ = {}
-    for _s in [iODEGeneralJointState]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iODESliderJoint, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iODEGeneralJointState]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iODESliderJoint, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetSliderAxis(*args): return _ivaria.iODESliderJoint_SetSliderAxis(*args)
     def GetSliderAxis(*args): return _ivaria.iODESliderJoint_GetSliderAxis(*args)
     def GetSliderPosition(*args): return _ivaria.iODESliderJoint_GetSliderPosition(*args)
     def GetSliderPositionRate(*args): return _ivaria.iODESliderJoint_GetSliderPositionRate(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivaria.iODESliderJoint_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivaria.iODESliderJoint_scfGetVersion)
+    scfGetVersion = staticmethod(_ivaria.iODESliderJoint_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iODESliderJoint
     __del__ = lambda self : None;
 iODESliderJoint_swigregister = _ivaria.iODESliderJoint_swigregister
@@ -987,12 +817,7 @@ iODESliderJoint_swigregister(iODESliderJoint)
 iODESliderJoint_scfGetVersion = _ivaria.iODESliderJoint_scfGetVersion
 
 class iODEUniversalJoint(iODEGeneralJointState):
-    __swig_setmethods__ = {}
-    for _s in [iODEGeneralJointState]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iODEUniversalJoint, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iODEGeneralJointState]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iODEUniversalJoint, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetUniversalAnchor(*args): return _ivaria.iODEUniversalJoint_SetUniversalAnchor(*args)
@@ -1002,8 +827,7 @@ class iODEUniversalJoint(iODEGeneralJointState):
     def GetUniversalAnchor2(*args): return _ivaria.iODEUniversalJoint_GetUniversalAnchor2(*args)
     def GetUniversalAxis1(*args): return _ivaria.iODEUniversalJoint_GetUniversalAxis1(*args)
     def GetUniversalAxis2(*args): return _ivaria.iODEUniversalJoint_GetUniversalAxis2(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivaria.iODEUniversalJoint_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivaria.iODEUniversalJoint_scfGetVersion)
+    scfGetVersion = staticmethod(_ivaria.iODEUniversalJoint_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iODEUniversalJoint
     __del__ = lambda self : None;
 iODEUniversalJoint_swigregister = _ivaria.iODEUniversalJoint_swigregister
@@ -1015,12 +839,7 @@ CS_ODE_AMOTOR_MODE_USER = _ivaria.CS_ODE_AMOTOR_MODE_USER
 CS_ODE_AMOTOR_MODE_EULER = _ivaria.CS_ODE_AMOTOR_MODE_EULER
 CS_ODE_AMOTOR_MODE_LAST = _ivaria.CS_ODE_AMOTOR_MODE_LAST
 class iODEAMotorJoint(iODEGeneralJointState):
-    __swig_setmethods__ = {}
-    for _s in [iODEGeneralJointState]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iODEAMotorJoint, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iODEGeneralJointState]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iODEAMotorJoint, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetAMotorMode(*args): return _ivaria.iODEAMotorJoint_SetAMotorMode(*args)
@@ -1033,8 +852,7 @@ class iODEAMotorJoint(iODEGeneralJointState):
     def SetAMotorAngle(*args): return _ivaria.iODEAMotorJoint_SetAMotorAngle(*args)
     def GetAMotorAngle(*args): return _ivaria.iODEAMotorJoint_GetAMotorAngle(*args)
     def GetAMotorAngleRate(*args): return _ivaria.iODEAMotorJoint_GetAMotorAngleRate(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivaria.iODEAMotorJoint_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivaria.iODEAMotorJoint_scfGetVersion)
+    scfGetVersion = staticmethod(_ivaria.iODEAMotorJoint_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iODEAMotorJoint
     __del__ = lambda self : None;
 iODEAMotorJoint_swigregister = _ivaria.iODEAMotorJoint_swigregister
@@ -1042,12 +860,7 @@ iODEAMotorJoint_swigregister(iODEAMotorJoint)
 iODEAMotorJoint_scfGetVersion = _ivaria.iODEAMotorJoint_scfGetVersion
 
 class iODEHinge2Joint(iODEGeneralJointState):
-    __swig_setmethods__ = {}
-    for _s in [iODEGeneralJointState]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iODEHinge2Joint, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iODEGeneralJointState]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iODEHinge2Joint, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetHingeAnchor(*args): return _ivaria.iODEHinge2Joint_SetHingeAnchor(*args)
@@ -1061,8 +874,7 @@ class iODEHinge2Joint(iODEGeneralJointState):
     def GetHingeAngleRate1(*args): return _ivaria.iODEHinge2Joint_GetHingeAngleRate1(*args)
     def GetHingeAngleRate2(*args): return _ivaria.iODEHinge2Joint_GetHingeAngleRate2(*args)
     def GetAnchorError(*args): return _ivaria.iODEHinge2Joint_GetAnchorError(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivaria.iODEHinge2Joint_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivaria.iODEHinge2Joint_scfGetVersion)
+    scfGetVersion = staticmethod(_ivaria.iODEHinge2Joint_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iODEHinge2Joint
     __del__ = lambda self : None;
 iODEHinge2Joint_swigregister = _ivaria.iODEHinge2Joint_swigregister
@@ -1070,12 +882,7 @@ iODEHinge2Joint_swigregister(iODEHinge2Joint)
 iODEHinge2Joint_scfGetVersion = _ivaria.iODEHinge2Joint_scfGetVersion
 
 class iODEHingeJoint(iODEGeneralJointState):
-    __swig_setmethods__ = {}
-    for _s in [iODEGeneralJointState]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iODEHingeJoint, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iODEGeneralJointState]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iODEHingeJoint, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetHingeAnchor(*args): return _ivaria.iODEHingeJoint_SetHingeAnchor(*args)
@@ -1086,8 +893,7 @@ class iODEHingeJoint(iODEGeneralJointState):
     def GetHingeAngle(*args): return _ivaria.iODEHingeJoint_GetHingeAngle(*args)
     def GetHingeAngleRate(*args): return _ivaria.iODEHingeJoint_GetHingeAngleRate(*args)
     def GetAnchorError(*args): return _ivaria.iODEHingeJoint_GetAnchorError(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivaria.iODEHingeJoint_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivaria.iODEHingeJoint_scfGetVersion)
+    scfGetVersion = staticmethod(_ivaria.iODEHingeJoint_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iODEHingeJoint
     __del__ = lambda self : None;
 iODEHingeJoint_swigregister = _ivaria.iODEHingeJoint_swigregister
@@ -1095,12 +901,7 @@ iODEHingeJoint_swigregister(iODEHingeJoint)
 iODEHingeJoint_scfGetVersion = _ivaria.iODEHingeJoint_scfGetVersion
 
 class iODEBallJoint(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iODEBallJoint, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iODEBallJoint, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetBallAnchor(*args): return _ivaria.iODEBallJoint_SetBallAnchor(*args)
@@ -1113,8 +914,7 @@ class iODEBallJoint(core.iBase):
     def GetFeedbackTorque1(*args): return _ivaria.iODEBallJoint_GetFeedbackTorque1(*args)
     def GetFeedbackForce2(*args): return _ivaria.iODEBallJoint_GetFeedbackForce2(*args)
     def GetFeedbackTorque2(*args): return _ivaria.iODEBallJoint_GetFeedbackTorque2(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivaria.iODEBallJoint_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivaria.iODEBallJoint_scfGetVersion)
+    scfGetVersion = staticmethod(_ivaria.iODEBallJoint_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iODEBallJoint
     __del__ = lambda self : None;
 iODEBallJoint_swigregister = _ivaria.iODEBallJoint_swigregister
@@ -1125,12 +925,7 @@ CS_SEQUENCE_LIGHTCHANGE_NONE = _ivaria.CS_SEQUENCE_LIGHTCHANGE_NONE
 CS_SEQUENCE_LIGHTCHANGE_LESS = _ivaria.CS_SEQUENCE_LIGHTCHANGE_LESS
 CS_SEQUENCE_LIGHTCHANGE_GREATER = _ivaria.CS_SEQUENCE_LIGHTCHANGE_GREATER
 class iParameterESM(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iParameterESM, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iParameterESM, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetValue(*args): return _ivaria.iParameterESM_GetValue(*args)
@@ -1141,12 +936,7 @@ iParameterESM_swigregister = _ivaria.iParameterESM_swigregister
 iParameterESM_swigregister(iParameterESM)
 
 class iEngineSequenceParameters(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iEngineSequenceParameters, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iEngineSequenceParameters, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetParameterCount(*args): return _ivaria.iEngineSequenceParameters_GetParameterCount(*args)
@@ -1162,12 +952,7 @@ iEngineSequenceParameters_swigregister = _ivaria.iEngineSequenceParameters_swigr
 iEngineSequenceParameters_swigregister(iEngineSequenceParameters)
 
 class iSequenceWrapper(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSequenceWrapper, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSequenceWrapper, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def QueryObject(*args): return _ivaria.iSequenceWrapper_QueryObject(*args)
@@ -1198,12 +983,7 @@ iSequenceWrapper_swigregister = _ivaria.iSequenceWrapper_swigregister
 iSequenceWrapper_swigregister(iSequenceWrapper)
 
 class iSequenceTrigger(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSequenceTrigger, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSequenceTrigger, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def QueryObject(*args): return _ivaria.iSequenceTrigger_QueryObject(*args)
@@ -1229,12 +1009,7 @@ iSequenceTrigger_swigregister = _ivaria.iSequenceTrigger_swigregister
 iSequenceTrigger_swigregister(iSequenceTrigger)
 
 class iSequenceTimedOperation(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSequenceTimedOperation, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSequenceTimedOperation, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Do(*args): return _ivaria.iSequenceTimedOperation_Do(*args)
@@ -1244,12 +1019,7 @@ iSequenceTimedOperation_swigregister = _ivaria.iSequenceTimedOperation_swigregis
 iSequenceTimedOperation_swigregister(iSequenceTimedOperation)
 
 class iEngineSequenceManager(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iEngineSequenceManager, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iEngineSequenceManager, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetSequenceManager(*args): return _ivaria.iEngineSequenceManager_GetSequenceManager(*args)
@@ -1270,8 +1040,7 @@ class iEngineSequenceManager(core.iBase):
     def RunSequenceByName(*args): return _ivaria.iEngineSequenceManager_RunSequenceByName(*args)
     def FireTimedOperation(*args): return _ivaria.iEngineSequenceManager_FireTimedOperation(*args)
     def DestroyTimedOperations(*args): return _ivaria.iEngineSequenceManager_DestroyTimedOperations(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivaria.iEngineSequenceManager_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivaria.iEngineSequenceManager_scfGetVersion)
+    scfGetVersion = staticmethod(_ivaria.iEngineSequenceManager_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iEngineSequenceManager
     __del__ = lambda self : None;
 iEngineSequenceManager_swigregister = _ivaria.iEngineSequenceManager_swigregister
@@ -1279,12 +1048,7 @@ iEngineSequenceManager_swigregister(iEngineSequenceManager)
 iEngineSequenceManager_scfGetVersion = _ivaria.iEngineSequenceManager_scfGetVersion
 
 class iMovieRecorder(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iMovieRecorder, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iMovieRecorder, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Start(*args): return _ivaria.iMovieRecorder_Start(*args)
@@ -1293,8 +1057,7 @@ class iMovieRecorder(core.iBase):
     def Pause(*args): return _ivaria.iMovieRecorder_Pause(*args)
     def UnPause(*args): return _ivaria.iMovieRecorder_UnPause(*args)
     def IsPaused(*args): return _ivaria.iMovieRecorder_IsPaused(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivaria.iMovieRecorder_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivaria.iMovieRecorder_scfGetVersion)
+    scfGetVersion = staticmethod(_ivaria.iMovieRecorder_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iMovieRecorder
     __del__ = lambda self : None;
 iMovieRecorder_swigregister = _ivaria.iMovieRecorder_swigregister
@@ -1302,12 +1065,7 @@ iMovieRecorder_swigregister(iMovieRecorder)
 iMovieRecorder_scfGetVersion = _ivaria.iMovieRecorder_scfGetVersion
 
 class iMapNode(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iMapNode, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iMapNode, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def QueryObject(*args): return _ivaria.iMapNode_QueryObject(*args)
@@ -1321,8 +1079,7 @@ class iMapNode(core.iBase):
     def GetZVector(*args): return _ivaria.iMapNode_GetZVector(*args)
     def SetSector(*args): return _ivaria.iMapNode_SetSector(*args)
     def GetSector(*args): return _ivaria.iMapNode_GetSector(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivaria.iMapNode_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivaria.iMapNode_scfGetVersion)
+    scfGetVersion = staticmethod(_ivaria.iMapNode_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iMapNode
     __del__ = lambda self : None;
 iMapNode_swigregister = _ivaria.iMapNode_swigregister
@@ -1330,12 +1087,7 @@ iMapNode_swigregister(iMapNode)
 iMapNode_scfGetVersion = _ivaria.iMapNode_scfGetVersion
 
 class iScriptValue(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iScriptValue, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iScriptValue, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     tInt = _ivaria.iScriptValue_tInt
@@ -1358,12 +1110,7 @@ iScriptValue_swigregister = _ivaria.iScriptValue_swigregister
 iScriptValue_swigregister(iScriptValue)
 
 class iScriptObject(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iScriptObject, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iScriptObject, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetScript(*args): return _ivaria.iScriptObject_GetScript(*args)
@@ -1386,8 +1133,7 @@ class iScriptObject(core.iBase):
     def GetFloat(*args): return _ivaria.iScriptObject_GetFloat(*args)
     def Get(*args): return _ivaria.iScriptObject_Get(*args)
     def GetTruth(*args): return _ivaria.iScriptObject_GetTruth(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivaria.iScriptObject_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivaria.iScriptObject_scfGetVersion)
+    scfGetVersion = staticmethod(_ivaria.iScriptObject_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iScriptObject
     __del__ = lambda self : None;
 iScriptObject_swigregister = _ivaria.iScriptObject_swigregister
@@ -1395,12 +1141,7 @@ iScriptObject_swigregister(iScriptObject)
 iScriptObject_scfGetVersion = _ivaria.iScriptObject_scfGetVersion
 
 class iScript(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iScript, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iScript, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def RunText(*args): return _ivaria.iScript_RunText(*args)
@@ -1424,8 +1165,7 @@ class iScript(core.iBase):
     def RetrieveFloat(*args): return _ivaria.iScript_RetrieveFloat(*args)
     def Retrieve(*args): return _ivaria.iScript_Retrieve(*args)
     def GetTruth(*args): return _ivaria.iScript_GetTruth(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivaria.iScript_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivaria.iScript_scfGetVersion)
+    scfGetVersion = staticmethod(_ivaria.iScript_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iScript
     __del__ = lambda self : None;
 iScript_swigregister = _ivaria.iScript_swigregister
@@ -1433,12 +1173,7 @@ iScript_swigregister(iScript)
 iScript_scfGetVersion = _ivaria.iScript_scfGetVersion
 
 class iSimpleFormerState(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSimpleFormerState, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSimpleFormerState, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetHeightmap(*args): return _ivaria.iSimpleFormerState_SetHeightmap(*args)
@@ -1448,8 +1183,7 @@ class iSimpleFormerState(core.iBase):
     def SetFloatMap(*args): return _ivaria.iSimpleFormerState_SetFloatMap(*args)
     def GetFloatMap(*args): return _ivaria.iSimpleFormerState_GetFloatMap(*args)
     def SetMaterialScale(*args): return _ivaria.iSimpleFormerState_SetMaterialScale(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivaria.iSimpleFormerState_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivaria.iSimpleFormerState_scfGetVersion)
+    scfGetVersion = staticmethod(_ivaria.iSimpleFormerState_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iSimpleFormerState
     __del__ = lambda self : None;
 iSimpleFormerState_swigregister = _ivaria.iSimpleFormerState_swigregister
@@ -1457,12 +1191,7 @@ iSimpleFormerState_swigregister(iSimpleFormerState)
 iSimpleFormerState_scfGetVersion = _ivaria.iSimpleFormerState_scfGetVersion
 
 class iTerraFormer(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerraFormer, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iTerraFormer, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetSampler(*args): return _ivaria.iTerraFormer_GetSampler(*args)
@@ -1472,8 +1201,7 @@ class iTerraFormer(core.iBase):
     def SampleVector3(*args): return _ivaria.iTerraFormer_SampleVector3(*args)
     def SampleInteger(*args): return _ivaria.iTerraFormer_SampleInteger(*args)
     def QueryObject(*args): return _ivaria.iTerraFormer_QueryObject(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivaria.iTerraFormer_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivaria.iTerraFormer_scfGetVersion)
+    scfGetVersion = staticmethod(_ivaria.iTerraFormer_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iTerraFormer
     __del__ = lambda self : None;
 iTerraFormer_swigregister = _ivaria.iTerraFormer_swigregister
@@ -1481,12 +1209,7 @@ iTerraFormer_swigregister(iTerraFormer)
 iTerraFormer_scfGetVersion = _ivaria.iTerraFormer_scfGetVersion
 
 class iTerraSampler(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iTerraSampler, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iTerraSampler, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SampleFloat(*args): return _ivaria.iTerraSampler_SampleFloat(*args)
@@ -1498,8 +1221,7 @@ class iTerraSampler(core.iBase):
     def GetResolution(*args): return _ivaria.iTerraSampler_GetResolution(*args)
     def GetVersion(*args): return _ivaria.iTerraSampler_GetVersion(*args)
     def Cleanup(*args): return _ivaria.iTerraSampler_Cleanup(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivaria.iTerraSampler_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivaria.iTerraSampler_scfGetVersion)
+    scfGetVersion = staticmethod(_ivaria.iTerraSampler_scfGetVersion)
     __swig_destroy__ = _ivaria.delete_iTerraSampler
     __del__ = lambda self : None;
 iTerraSampler_swigregister = _ivaria.iTerraSampler_swigregister

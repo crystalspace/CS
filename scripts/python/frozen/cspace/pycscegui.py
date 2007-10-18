@@ -2,7 +2,6 @@
 # Version 1.3.31
 #
 # Don't modify this file, modify the SWIG interface instead.
-# This file is compatible with both classic and new-style classes.
 
 import _pycscegui
 import new
@@ -48,14 +47,19 @@ except AttributeError:
 del types
 
 
+def _swig_setattr_nondynamic_method(set):
+    def set_attr(self,name,value):
+        if (name == "thisown"): return self.this.own(value)
+        if hasattr(self,name) or (name == "this"):
+            set(self,name,value)
+        else:
+            raise AttributeError("You cannot add attributes to %s" % self)
+    return set_attr
+
+
 import cspace
 class iCEGUI(cspace.iBase):
-    __swig_setmethods__ = {}
-    for _s in [cspace.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iCEGUI, name, value)
-    __swig_getmethods__ = {}
-    for _s in [cspace.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iCEGUI, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Initialize(*args): return _pycscegui.iCEGUI_Initialize(*args)
@@ -73,8 +77,7 @@ class iCEGUI(cspace.iBase):
     def DisableMouseCapture(*args): return _pycscegui.iCEGUI_DisableMouseCapture(*args)
     def EnableKeyboardCapture(*args): return _pycscegui.iCEGUI_EnableKeyboardCapture(*args)
     def DisableKeyboardCapture(*args): return _pycscegui.iCEGUI_DisableKeyboardCapture(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _pycscegui.iCEGUI_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_pycscegui.iCEGUI_scfGetVersion)
+    scfGetVersion = staticmethod(_pycscegui.iCEGUI_scfGetVersion)
     __swig_destroy__ = _pycscegui.delete_iCEGUI
     __del__ = lambda self : None;
     SchemeManager = property(_pycscegui.iCEGUI_GetSchemeManagerPtr)  

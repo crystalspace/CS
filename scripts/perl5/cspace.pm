@@ -9136,6 +9136,10 @@ use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 *texTypeCube = *cspacec::iTextureHandle_texTypeCube;
 *texTypeRect = *cspacec::iTextureHandle_texTypeRect;
 *GetTextureType = *cspacec::iTextureHandle_GetTextureType;
+*blitbufReadable = *cspacec::iTextureHandle_blitbufReadable;
+*blitbufRetainArea = *cspacec::iTextureHandle_blitbufRetainArea;
+*QueryBlitBuffer = *cspacec::iTextureHandle_QueryBlitBuffer;
+*ApplyBlitBuffer = *cspacec::iTextureHandle_ApplyBlitBuffer;
 *scfGetVersion = *cspacec::iTextureHandle_scfGetVersion;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
