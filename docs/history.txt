@@ -20,6 +20,8 @@ chronological order.
 	- caedes removed try,except clauses from the python tutorials
 	  event handlers and fixed some other minor style issues in
 	  the tutorials.
+	- caedes added tutorial4.py, on a better base for creating pure
+	  python cs apps.
 17-Oct-2007
 	- Jorrit fixed the genmesh loader so that you can now use multiple
 	  <box> and <sphere> statements to make a genmesh factory out of
