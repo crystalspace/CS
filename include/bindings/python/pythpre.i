@@ -570,6 +570,21 @@ def __iter__(self):
         yield self.Next() %}
 %enddef
 
+/*
+ * Macro for implementing buffer objects
+*/
+#undef BUFFER_RW_FUNCTIONS
+%define BUFFER_RW_FUNCTIONS(ClassName,DataFunc,CountFunc,ElmtType,BufGetter)
+%extend ClassName
+{
+    PyObject * BufGetter ()
+    {
+        return PyBuffer_FromReadWriteMemory(self-> ## DataFunc ## (),self-> ## CountFunc ## ()*sizeof( ElmtType ));
+    }
+}
+%enddef
+
+
 // csStringFast typemaps
 %typemap(out) csStringFast *
 {

@@ -329,6 +329,7 @@
 #define TYPEMAP_OUTARG_ARRAY_PTR_CNT(a,b,c)
 #define TYPEMAP_ARGOUT_PTR(T)
 #define APPLY_TYPEMAP_ARGOUT_PTR(T,Args)
+#define BUFFER_RW_FUNCTIONS(classname,datafunc,countfunc)
 #define ITERATOR_FUNCTIONS(T)
 #define ARRAY_OBJECT_FUNCTIONS(classname,typename)
 #define LIST_OBJECT_FUNCTIONS(classname,typename)
@@ -820,6 +821,8 @@ ARRAY_OBJECT_FUNCTIONS(iStringArray,const char *)
 
 %ignore iDataBuffer::GetInt8;
 %include "iutil/databuff.h"
+BUFFER_RW_FUNCTIONS(iDataBuffer,GetData,GetSize,
+                int,AsBuffer)
 %include "igraphic/image.h"
 %immutable csImageIOFileFormatDescription::mime;
 %immutable csImageIOFileFormatDescription::subtype;
