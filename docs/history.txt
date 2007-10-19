@@ -6,6 +6,8 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Oct-2007
+	- caedes fixed element size in swig iDataBuffer buffer declaration.
 18-Oct-2007
 	- caedes added BUFFER_RW_FUNCTIONS macro to swig interface files,
 	  this is useful for declaring buffer like objects that can be

@@ -822,7 +822,7 @@ ARRAY_OBJECT_FUNCTIONS(iStringArray,const char *)
 %ignore iDataBuffer::GetInt8;
 %include "iutil/databuff.h"
 BUFFER_RW_FUNCTIONS(iDataBuffer,GetData,GetSize,
-                int,AsBuffer)
+                char,AsBuffer)
 %include "igraphic/image.h"
 %immutable csImageIOFileFormatDescription::mime;
 %immutable csImageIOFileFormatDescription::subtype;
