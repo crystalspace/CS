@@ -275,9 +275,14 @@ struct iSndSysSource3DDoppler : public virtual iBase
 
 /**
  * \todo Document me!
+ * \deprecated Deprecated in 1.3. iSndSysSourceSoftware3D is deprecated, use
+ *   iSndSysSource3D, iSndSysSource3DDirectional and
+ *   iSndSysSource3DDirectionalSimple instead.
  */
 struct
-  CS_DEPRECATED_TYPE_MSG ("iSndSysSourceSoftware3D is deprecated.")
+  CS_DEPRECATED_TYPE_MSG("iSndSysSourceSoftware3D is deprecated. Use "
+    "iSndSysSource3D, iSndSysSource3DDirectional and "
+    "iSndSysSource3DDirectionalSimple instead.")
   iSndSysSourceSoftware3D : public iSndSysSourceSoftware
 {
   SCF_INTERFACE(iSndSysSourceSoftware3D,2,0,0);

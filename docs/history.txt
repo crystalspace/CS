@@ -6,6 +6,10 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Oct-2007
+	- Vincent added comments about using iSndSysSource3D,
+	  iSndSysSource3DDirectional and iSndSysSource3DDirectionalSimple
+	  instead of deprecated iSndSysSourceSoftware3D interface.
 17-Oct-2007
 	- Vincent restored iSndSysSourceSoftware3D interface for the sake of
 	  compatibility and deprecated it.
