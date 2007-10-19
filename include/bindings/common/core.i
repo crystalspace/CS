@@ -173,6 +173,22 @@
 
 %include "bindings/common/allinterfaces.i"
 
+/* All this functions will are redefined later to always return
+   script objects with the proper interfaces. 
+   script definitions for all these is at common/scfsugar.i */
+/*%ignore iObject::GetChild (const char *Name);*/
+
+%rename (GetChildByName) iObject::GetChild(const char *Name) const;
+%ignore iObject::GetChild (int iInterfaceID, int iVersion,const char *Name = 0) const;
+%ignore iObject::GetChild (int iInterfaceID, int iVersion,const char *Name, bool FirstName) const;
+%rename (LoadPluginAlways) LoadPlugin (const char *classID,bool init = true, bool report = true);
+%ignore iPluginManager::QueryPlugin (const char *iInterface, int iVersion);
+%ignore iPluginManager::QueryPlugin (const char* classID,
+        const char *iInterface, int iVersion);
+%ignore iObjectRegistry::Get (char const* tag);
+%ignore iObjectRegistry::Get (char const* tag, scfInterfaceID id, int version);
+%ignore iObjectRegistry::Get (scfInterfaceID id, int version);
+%ignore iBase::QueryInterface(scfInterfaceID iInterfaceID, int iVersion);
 %ignore iBase::~iBase(); // We replace iBase dtor with one that calls DecRef().
                          // Swig already knows not to delete an SCF pointer.
 %include "typemaps.i"
@@ -334,7 +350,7 @@
 #define ARRAY_OBJECT_FUNCTIONS(classname,typename)
 #define LIST_OBJECT_FUNCTIONS(classname,typename)
 #define SET_OBJECT_FUNCTIONS(classname,typename)
-
+#define DEPRECATED_METHOD(classname,method,replacement)
 
 #if defined(SWIGPYTHON)
   %include "bindings/python/pythpre.i"
@@ -518,6 +534,9 @@ csArrayCapacityLinear<csArrayThresholdVariable >;
 
 %ignore csStringSet::GlobalIterator;
 %ignore csStringSet::GetIterator;
+DEPRECATED_METHOD(csStringSet,Clear,Empty);
+DEPRECATED_METHOD(iStringArray,Length,GetSize);
+DEPRECATED_METHOD(iStringArray,DeleteAll,Empty);
 %include "csutil/strset.h"
 %ignore csSet::GlobalIterator;
 %ignore csSet::GetIterator;
@@ -992,17 +1011,6 @@ csEventID _csevMouseMove (iObjectRegistry *,uint x);
 #undef csevJoystickEvent
 csEventID _csevJoystickEvent (iObjectRegistry *);
 
-// iutil/plugin.h
-%inline
-%{
-  csPtr<iBase> CS_LOAD_PLUGIN_ALWAYS (iPluginManager *p, const char *i)
-  {
-    printf("CS_LOAD_PLUGIN_ALWAYS is deprecated, use \
-                csLoadPluginAlways instead\n");
-    return csLoadPluginAlways(p,i);
-  }
-%}
-
 // csutil/cscolor.h
 %extend csColor
 {
@@ -1012,97 +1020,8 @@ csEventID _csevJoystickEvent (iObjectRegistry *);
 
 %include "cstool/primitives.h"
 
-/* List Methods */
-/****************************************************************************
- * These functions are replacements for CS's macros of the same names.
- * These functions can be wrapped by Swig but the macros can't.
- ****************************************************************************/
-%inline %{
-#undef SCF_QUERY_INTERFACE
-#undef SCF_QUERY_INTERFACE_SAFE
-#undef CS_QUERY_REGISTRY
-#undef CS_QUERY_REGISTRY_TAG_INTERFACE
-#undef CS_QUERY_PLUGIN_CLASS
-#undef CS_LOAD_PLUGIN
-#undef CS_GET_CHILD_OBJECT
-#undef CS_GET_NAMED_CHILD_OBJECT
-#undef CS_GET_FIRST_NAMED_CHILD_OBJECT
-
-csWrapPtr CS_QUERY_REGISTRY (iObjectRegistry *reg, const char *iface,
-  int iface_ver)
-{
-  csPtr<iBase> b (reg->Get(iface, iSCF::SCF->GetInterfaceID(iface), iface_ver));
-  return csWrapPtr (iface, iface_ver, b);
-}
-
-csWrapPtr CS_QUERY_REGISTRY_TAG_INTERFACE (iObjectRegistry *reg,
-  const char *tag, const char *iface, int iface_ver)
-{
-  csPtr<iBase> b (reg->Get(tag, iSCF::SCF->GetInterfaceID(iface), iface_ver));
-  return csWrapPtr (iface, iface_ver, b);
-}
-
-csWrapPtr SCF_QUERY_INTERFACE (iBase *obj, const char *iface, int iface_ver)
-{
-  // This call to QueryInterface ensures that IncRef is called and that
-  // the object supports the interface.  However, for type safety and
-  // object layout reasons the void pointer returned by QueryInterface
-  // can't be wrapped inside the csWrapPtr so obj must be wrapped.
-  if (obj->QueryInterface(iSCF::SCF->GetInterfaceID(iface), iface_ver))
-    return csWrapPtr (iface, iface_ver, csPtr<iBase> (obj));
-  else
-    return csWrapPtr (iface, iface_ver, csPtr<iBase> (0));
-}
-
-csWrapPtr SCF_QUERY_INTERFACE_SAFE (iBase *obj, const char *iface,
-  int iface_ver)
-{
-  if (!obj)
-    return csWrapPtr (iface, iface_ver, csPtr<iBase> (0));
-
-  // This call to QueryInterface ensures that IncRef is called and that
-  // the object supports the interface.  However, for type safety and
-  // object layout reasons the void pointer returned by QueryInterface
-  // can't be wrapped inside the csWrapPtr so obj must be wrapped.
-  if (obj->QueryInterface(iSCF::SCF->GetInterfaceID(iface), iface_ver))
-    return csWrapPtr (iface, iface_ver, csPtr<iBase> (obj));
-  else
-    return csWrapPtr (iface, iface_ver, csPtr<iBase> (0));
-}
-
-csWrapPtr CS_QUERY_PLUGIN_CLASS (iPluginManager *obj, const char *id,
-  const char *iface, int iface_ver)
-{
-  return csWrapPtr (iface, iface_ver,
-    csPtr<iBase> (obj->QueryPlugin (id, iface, iface_ver)));
-}
-
-csWrapPtr CS_LOAD_PLUGIN (iPluginManager *obj, const char *id,
-  const char *iface, int iface_ver)
-{
-  return csWrapPtr (iface, iface_ver, csPtr<iBase> (obj->LoadPlugin (id)));
-}
-
-csWrapPtr CS_GET_CHILD_OBJECT (iObject *obj, const char *iface, int iface_ver)
-{
-  return csWrapPtr (iface, iface_ver, csRef<iBase> (
-    obj->GetChild(iSCF::SCF->GetInterfaceID (iface), iface_ver)));
-}
-
-csWrapPtr CS_GET_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
-  int iface_ver, const char *name)
-{
-  return csWrapPtr (iface, iface_ver, csRef<iBase> (
-    obj->GetChild(iSCF::SCF->GetInterfaceID (iface), iface_ver, name)));
-}
-
-csWrapPtr CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
-  int iface_ver, const char *name)
-{
-  return csWrapPtr (iface, iface_ver, csRef<iBase> (
-    obj->GetChild(iSCF::SCF->GetInterfaceID (iface), iface_ver, name, true)));
-}
-%}
+// functions for returning wrapped iBase objects.
+%include "bindings/common/scfsugar.i"
 
 /* POST */
 #ifndef SWIGIMPORTED

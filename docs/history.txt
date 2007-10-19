@@ -13,6 +13,25 @@ chronological order.
 	- res added a Dump() method to GL textures.
 	- res added a tweak to the driver DB to disable PBO on ATI (where it
 	  gives incorrect results).
+	- caedes added correct swig wrapping of many common methods returning
+	  iBase which until now where using old cs macros. This wrapping
+	  allows to start using the real cs interface, so old methods have
+	  been deprecated. List of deprecated macros and new replacements:
+	   - CS_QUERY_REGISTRY -> ObjectRegistry->Get
+	   - CS_QUERY_REGISTRY_TAG_INTERFACE -> ObjectRegistry->Get
+	   - SCF_QUERY_INTERFACE -> iBase->QueryInterface
+	   - CS_QUERY_PLUGIN_CLASS -> iPluginManager->QueryPlugin
+	   - CS_LOAD_PLUGIN -> iPluginManager->LoadPlugin
+	   - CS_LOAD_PLUGIN_ALWAYS -> iPluginManager->LoadPluginAlways
+	   - CS_GET_CHILD_OBJECT -> iObject->GetChild
+	   - CS_GET_NAMED_CHILD_OBJECT -> iObject->GetChild
+	   - CS_GET_FIRST_NAMED_CHILD_OBJECT -> iObject->GetChildByName
+	  note some lesser used methods had to be renamed to cope with
+	  ambiguous overloading.
+	- caedes added a DEPRECATED_METHOD directive to swig interface
+	  files, this can be wrapped in language specific way to both
+	  avoid compile time warnings and provide run time warnings
+	  instead.
 18-Oct-2007
 	- caedes added BUFFER_RW_FUNCTIONS macro to swig interface files,
 	  this is useful for declaring buffer like objects that can be

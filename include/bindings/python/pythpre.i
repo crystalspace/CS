@@ -233,6 +233,11 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
   }
 %enddef
 
+%typemap(typecheck) (const char * iface, int iface_ver)
+{
+  $1 = PyObject_HasAttrString($input,"scfGetVersion");
+}
+
 %typemap(in) (const char * iface, int iface_ver) (csString className)
 {
   PyObject *pyname = PyObject_GetAttrString($input, "__name__");
@@ -601,6 +606,19 @@ def __iter__(self):
 {
    delete $1;
 }
+
+#undef DEPRECATED_METHOD
+%define DEPRECATED_METHOD(ClassName,Method,Replacement)
+%ignore ClassName ## :: ## Method ## ;
+%extend ClassName
+{
+  %pythoncode %{
+    def Method (*args):
+        print "ClassName.Method() is deprecated, use ClassName.Replacement() instead"
+        return self. ## Replacement ## (*args)
+  %}
+}
+%enddef
 
 #endif // ifndef CS_MINI_SWIG
 
