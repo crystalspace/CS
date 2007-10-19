@@ -333,10 +333,12 @@ public:
    * to make sure the internal format is not compressed.
    * \param keepPixels Whether to keep the existing pixel data should be 
    *   preserved.
+   * \param newTexFormat New texture format the texture should have.
    * \remarks The texture handle must be bound properly before this method
    *   is called.
    */
-  void EnsureUncompressed (bool keepPixels);
+  void EnsureUncompressed (bool keepPixels,
+    TextureBlitDataFormat newTexFormat = (TextureBlitDataFormat)~0);
 
   uint8* QueryBlitBuffer (int x, int y, int width, int height,
     size_t& pitch, TextureBlitDataFormat format, uint bufFlags);

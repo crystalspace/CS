@@ -341,23 +341,24 @@ void csGLBasicTextureHandle::Blit (int x, int y, int width,
   // Make sure mipmapping is ok.
   if (!IsWasRenderTarget() || (texFormat != format))
   {
-    texFormat = format;
     bool isWholeImage = (x == 0) && (y == 0) && (width == actual_width)
       && (height == actual_height);
+
+    if (!IsWasRenderTarget())
+    {
+      SetWasRenderTarget (true);
+      SetupAutoMipping();
+    }
 
     // Pull texture data and set as RGBA/BGRA again, to prevent compression 
     // (slooow) on subsequent glTexSubImage() calls.
     if (!isWholeImage)
     {
-      EnsureUncompressed (true);
+      EnsureUncompressed (true, format);
     }
     else
     {
-      if (!IsWasRenderTarget())
-      {
-	SetWasRenderTarget (true);
-	SetupAutoMipping();
-      }
+      texFormat = format;
 
       glTexImage2D (textarget, 0, GL_RGBA8, actual_width, 
 	actual_height, 0, textureFormat, GL_UNSIGNED_BYTE, data);
@@ -649,33 +650,42 @@ GLenum csGLBasicTextureHandle::GetGLTextureTarget() const
   }
 }
 
-void csGLBasicTextureHandle::EnsureUncompressed (bool keepPixels)
+void csGLBasicTextureHandle::EnsureUncompressed (bool keepPixels,
+  TextureBlitDataFormat newTexFormat)
 {
-  if (!G3D->ext->CS_GL_ARB_texture_compression) return;
+  if (newTexFormat == (TextureType)~0) newTexFormat = texFormat;
 
   GLenum target = GetGLTextureTarget();
   // @@@ FIXME: support more than 2D
   if (target != GL_TEXTURE_2D) return;
 
-  GLint isCompressed;
-  glGetTexLevelParameteriv (target, 0, GL_TEXTURE_COMPRESSED_ARB, 
-    &isCompressed);
-  if (!isCompressed) return;
+  bool doConvert = newTexFormat != texFormat;
+  if (!doConvert && G3D->ext->CS_GL_ARB_texture_compression)
+  {
+    GLint isCompressed;
+    glGetTexLevelParameteriv (target, 0, GL_TEXTURE_COMPRESSED_ARB, 
+      &isCompressed);
+    doConvert = isCompressed != 0;
+  }
+  if (!doConvert) return;
 
+  GLuint textureFormat = (newTexFormat == RGBA8888) ? GL_RGBA : GL_BGRA;
   uint8* pixelData = 0;
   /* @@@ FIXME: This really should use the actual internal (base?) format and 
    * not just RGBA. */
-  if (keepPixels)
+  if (keepPixels || (newTexFormat != texFormat))
   {
     pixelData = (uint8*)cs_malloc (actual_width * actual_height * 4);
-    glGetTexImage (target, 0, GL_RGBA8, GL_UNSIGNED_BYTE, 
+    glGetTexImage (target, 0, textureFormat, GL_UNSIGNED_BYTE, 
       pixelData);
   }
 
   glTexImage2D (target, 0, GL_RGBA8, actual_width, actual_height, 
-    0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+    0, textureFormat, GL_UNSIGNED_BYTE, pixelData);
 
   if (pixelData != 0) cs_free (pixelData);
+
+  texFormat = newTexFormat;
 }
 
 uint8* csGLBasicTextureHandle::QueryBlitBuffer (int x, int y, 
