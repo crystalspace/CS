@@ -10,6 +10,7 @@ chronological order.
 	- caedes fixed element size in swig iDataBuffer buffer declaration.
 	- res changed the GL texture blitting logic to make sure the texture
 	  is in the desired format even if only a partial area is changed.
+	- res added a Dump() method to GL textures.
 18-Oct-2007
 	- caedes added BUFFER_RW_FUNCTIONS macro to swig interface files,
 	  this is useful for declaring buffer like objects that can be

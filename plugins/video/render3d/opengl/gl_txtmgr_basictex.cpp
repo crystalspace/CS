@@ -20,6 +20,7 @@
 
 #include "cssysdef.h"
 
+#include "csgfx/imagememory.h"
 #include "csplugincommon/render3d/txtmgr.h"
 
 #include "gl_render3d.h"
@@ -831,6 +832,28 @@ void csGLBasicTextureHandle::ApplyBlitBufferPBO (uint8* buf)
       0);
     G3D->ext->glBindBufferARB (GL_PIXEL_UNPACK_BUFFER_ARB, 0);
   }
+}
+
+csPtr<iImage> csGLBasicTextureHandle::Dump ()
+{
+  // @@@ hmm... or just return an empty image?
+  if (GetHandle () == (GLuint)~0) return 0;
+
+  GLint tw, th;
+  csGLGraphics3D::statecache->SetTexture (GL_TEXTURE_2D, GetHandle ());
+
+  glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &tw);
+  glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &th);
+
+  uint8* data = new uint8[tw * th * 4];
+  glGetTexImage (GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+  csImageMemory* lmimg = 
+    new csImageMemory (tw, th,
+    data, true, 
+    CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA);
+
+  return csPtr<iImage> (lmimg);
 }
 
 }

@@ -343,6 +343,9 @@ public:
   uint8* QueryBlitBuffer (int x, int y, int width, int height,
     size_t& pitch, TextureBlitDataFormat format, uint bufFlags);
   void ApplyBlitBuffer (uint8* buf);
+
+  /// Dump the contents onto an image.
+  csPtr<iImage> Dump ();
 };
 
 #include "csutil/win32/msvc_deprecated_warn_on.h"
