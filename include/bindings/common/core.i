@@ -509,7 +509,14 @@ csArrayCapacityLinear<csArrayThresholdVariable >;
 
 
 %ignore scfInitialize;
-/*%immutable iSCF::SCF;*/
+%immutable iSCF::SCF;
+%inline %{
+void SetCoreSCFPointer(iSCF *scf_pointer)
+{
+  iSCF::SCF = scf_pointer;
+}
+%}
+%immutable scfInterfaceMetadata::interfaceName;
 %include "csutil/scf_interface.h"
 %include "csutil/scf.h"
 

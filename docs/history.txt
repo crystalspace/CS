@@ -33,6 +33,9 @@ chronological order.
 	  avoid compile time warnings and provide run time warnings
 	  instead.
 	- caedes fixed python tutorials to remove usage of old macros above.
+	- caedes made iSCF::SCF and scfInterfaceMetadata::interfaceName
+	  immutable inside bindings to account for some warnings, and added
+	  a function to change the global core SCF pointer.
 18-Oct-2007
 	- caedes added BUFFER_RW_FUNCTIONS macro to swig interface files,
 	  this is useful for declaring buffer like objects that can be
