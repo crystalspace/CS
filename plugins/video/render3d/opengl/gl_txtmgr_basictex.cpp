@@ -727,9 +727,6 @@ uint8* csGLBasicTextureHandle::QueryBlitBufferGeneric (int x, int y,
   if ((textarget != GL_TEXTURE_2D) && (textarget != GL_TEXTURE_RECTANGLE_ARB))
     return 0;
 
-  bool isWholeImage = (x == 0) && (y == 0) && (width == actual_width)
-    && (height == actual_height);
-
   BlitBuffer blitBuf;
   blitBuf.x = x;
   blitBuf.y = y;
