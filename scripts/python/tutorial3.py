@@ -55,16 +55,16 @@ def FatalError(msg="FatalError"):
     Report(CS_REPORTER_SEVERITY_ERROR,msg)
     sys.exit(1)
 
-# EventHandler
+# Application
 #############################
 class MyCsApp:
     def Init(self):
         Log('MyCsApp.Init()...')
-        self.vc = CS_QUERY_REGISTRY(object_reg, iVirtualClock)
-        self.engine = CS_QUERY_REGISTRY(object_reg, iEngine)
-        self.g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D)
-        self.loader = CS_QUERY_REGISTRY(object_reg, iLoader)
-        self.keybd = CS_QUERY_REGISTRY(object_reg, iKeyboardDriver)
+        self.vc = object_reg.Get(iVirtualClock)
+        self.engine = object_reg.Get(iEngine)
+        self.g3d = object_reg.Get(iGraphics3D)
+        self.loader = object_reg.Get(iLoader)
+        self.keybd = object_reg.Get(iKeyboardDriver)
         
         if self.vc==None or self.engine==None or self.g3d==None or self.keybd==None or self.loader==None:
             FatalError("Error: in object registry query")
@@ -83,7 +83,7 @@ class MyCsApp:
 
     def LoadMap(self,name):
         # Set VFS current directory to the level we want to load.
-        vfs=CS_QUERY_REGISTRY(object_reg,iVFS)
+        vfs=object_reg.Get(iVFS)
         vfs.ChDir("/lev/partsys");
         # Load the level file which is called 'world'.
         if not self.loader.LoadMapFile(name):
@@ -146,7 +146,7 @@ def EventHandler(ev):
     #print 'EventHandler called'
     if ((ev.Name  == KeyboardDown) and
         (csKeyEventHelper.GetCookedCode(ev) == CSKEY_ESC)):
-        q  = CS_QUERY_REGISTRY(object_reg, iEventQueue)
+        q  = object_reg.Get(iEventQueue)
         if q:
             q.GetEventOutlet().Broadcast(csevQuit(object_reg))
             return 1

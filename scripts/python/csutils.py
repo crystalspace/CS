@@ -88,11 +88,11 @@ class CsAppBase(csPyEventHandler,CsReporterApp):
         csDefaultRunLoop(self.oreg)
 
     def InitPlugins(self):
-        self.vc = CS_QUERY_REGISTRY(self.oreg, iVirtualClock)
-        self.engine = CS_QUERY_REGISTRY(self.oreg, iEngine)
-        self.g3d = CS_QUERY_REGISTRY (self.oreg, iGraphics3D)
-        self.loader = CS_QUERY_REGISTRY(self.oreg, iLoader)
-        self.keybd = CS_QUERY_REGISTRY(self.oreg, iKeyboardDriver)
+	self.vc = self.oreg.Get(iVirtualClock)
+        self.engine = self.oreg.Get(iEngine)
+        self.g3d = self.oreg.Get(iGraphics3D)
+        self.loader = self.oreg.Get(iLoader)
+        self.keybd = self.oreg.Get(iKeyboardDriver)
         
         if self.vc==None or self.engine==None or self.g3d==None or self.keybd==None or self.loader==None:
             self.FatalError("Error: in object registry query")
@@ -116,7 +116,7 @@ class CsAppBase(csPyEventHandler,CsReporterApp):
     def HandleEvent(self,ev):
 	if ((ev.Name  == self.KeyboardDown) and
 	    (csKeyEventHelper.GetCookedCode(ev) == CSKEY_ESC)):
-	    q  = CS_QUERY_REGISTRY(self.oreg, iEventQueue)
+	    q  = self.oreg.Get(iEventQueue)
 	    if q:
 	        q.GetEventOutlet().Broadcast(csevQuit(self.oreg))
 	        q.RemoveListener(self)
@@ -129,7 +129,7 @@ class CsAppBase(csPyEventHandler,CsReporterApp):
 
     def LoadMap(self,path,name):
         # Set VFS current directory to the level we want to load.
-        vfs=CS_QUERY_REGISTRY(self.oreg,iVFS)
+        vfs=self.oreg.Get(iVFS)
         vfs.ChDir(path);
         # Load the level file which is called 'world'.
         if not self.loader.LoadMapFile(name):
@@ -153,9 +153,12 @@ class CsAppBase(csPyEventHandler,CsReporterApp):
 
         if room==None:
             self.FatalError("Can't find a valid starting position!")
+        self.PlaceCamera(room,pos)
 
-        self.view.GetCamera().SetSector(room)
-        self.view.GetCamera().GetTransform().SetOrigin(pos)
+    def PlaceCamera(self,sector,origin):
+        camera = self.view.GetCamera()
+        camera.SetSector(sector)
+        camera.GetTransform().SetOrigin(origin)
 
     def SetupFrame (self):
         #print 'SetupFrame called',

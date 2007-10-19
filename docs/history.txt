@@ -32,6 +32,7 @@ chronological order.
 	  files, this can be wrapped in language specific way to both
 	  avoid compile time warnings and provide run time warnings
 	  instead.
+	- caedes fixed python tutorials to remove usage of old macros above.
 18-Oct-2007
 	- caedes added BUFFER_RW_FUNCTIONS macro to swig interface files,
 	  this is useful for declaring buffer like objects that can be

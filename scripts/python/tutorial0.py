@@ -51,7 +51,7 @@ def EventHandler(ev):
     #print 'EventHandler called'
     if ((ev.Name  == KeyboardDown) and
         (csKeyEventHelper.GetCookedCode(ev) == CSKEY_ESC)):
-        q  = CS_QUERY_REGISTRY(object_reg, iEventQueue)
+        q  = object_reg.Get(iEventQueue)
         if q:
             q.GetEventOutlet().Broadcast(csevQuit(object_reg))
             return 1
