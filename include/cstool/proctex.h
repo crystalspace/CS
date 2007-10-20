@@ -32,12 +32,13 @@
 #include "itexture/iproctex.h"
 #include "itexture/itexfact.h"
 #include "iengine/texture.h"
+#include "igraphic/image.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
+#include "ivideo/graph2d.h"
 
 
 struct iEngine;
-struct iGraphics2D;
 struct iGraphics3D;
 struct iMaterialWrapper;
 struct iObjectRegistry;

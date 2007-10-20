@@ -21,7 +21,7 @@ print 'imported cspace'
 
 def CreateRoom(matname):
     print 'Start creating polygons from Python script...'
-    engine = CS_QUERY_REGISTRY(object_reg, iEngine)
+    engine = object_reg.Get(iEngine)
     room = engine.GetSectors().FindByName("room")
     
     mapper = DensityTextureMapper (0.3)
@@ -32,7 +32,7 @@ def CreateRoom(matname):
 
     walls = GeneralMeshBuilder.CreateFactoryAndMesh (engine, room, 
       "walls", "walls_factory", box)
-    walls_state = SCF_QUERY_INTERFACE(walls.GetMeshObject (), iGeneralMeshState)
+    walls_state = walls.GetMeshObject ().QueryInterface(iGeneralMeshState)
     walls_state.SetShadowReceiving(True)
     walls_factory = walls.GetMeshObject().GetFactory()
     material = engine.GetMaterialList().FindByName(matname)

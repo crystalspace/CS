@@ -208,6 +208,8 @@ static const MultiplyAddProc8 maProcs8[8] = {
 
 void ProctexPDLight::Animate_Generic ()
 {
+  BlitBufHelper blitHelper (tex->GetTextureHandle ());
+
   lightBits.Clear();
   for (size_t l = 0; l < lights.GetSize(); )
   {
@@ -228,8 +230,6 @@ void ProctexPDLight::Animate_Generic ()
     l++;
   }
 
-  LightmapScratch& scratch = GetScratch();
-  scratch.SetSize (TileHelper::tileSizeX * TileHelper::tileSizeY);
   for (size_t t = 0; t < tilesDirty.GetSize(); t++)
   {
     if (!tilesDirty.IsBitSet (t)) continue;
@@ -237,28 +237,34 @@ void ProctexPDLight::Animate_Generic ()
     csRect tileRect;
     tiles.GetTileRect (t, tileRect);
 
+    size_t blitPitch;
+    Lumel* scratch = (Lumel*)blitHelper.QueryBlitBuffer (
+      tileRect.xmin, tileRect.ymin, 
+      TileHelper::tileSizeX, TileHelper::tileSizeY,
+      blitPitch);
+
     int scratchW = tileRect.Width();
     csRGBcolor scratchMax;
     {
       int lines = tileRect.Height();
-      Lumel* scratchPtr = scratch.GetArray();
+      Lumel* scratchPtr = scratch;
       if (baseMap.imageData.IsValid())
       {
         if (baseMap.imageData->IsGray())
         {
-	    uint8* basePtr = static_cast<LumelBufferGray*> (
-		(LumelBufferBase*)baseMap.imageData)->GetData()
-	      + tileRect.ymin * mat_w + tileRect.xmin;
-	    for (int y = 0; y < lines; y++)
-	    {
+	  uint8* basePtr = static_cast<LumelBufferGray*> (
+	      (LumelBufferBase*)baseMap.imageData)->GetData()
+	    + tileRect.ymin * mat_w + tileRect.xmin;
+	  for (int y = 0; y < lines; y++)
+	  {
             for (int x = 0; x < scratchW; x++)
             {
               uint8 v = basePtr[x];
               scratchPtr[x].ui = (grayToRGBmul * v) | grayToRGBalpha;
             }
-	      scratchPtr += scratchW;
-	      basePtr += mat_w;
-	    }
+	    scratchPtr += blitPitch / sizeof (Lumel);
+	    basePtr += mat_w;
+	  }
         }
         else
         {
@@ -268,7 +274,7 @@ void ProctexPDLight::Animate_Generic ()
 	  for (int y = 0; y < lines; y++)
 	  {
 	    memcpy (scratchPtr, basePtr, scratchW * sizeof (Lumel));
-	    scratchPtr += scratchW;
+	    scratchPtr += blitPitch / sizeof (Lumel);
 	    basePtr += mat_w;
 	  }
 	}
@@ -285,9 +291,9 @@ void ProctexPDLight::Animate_Generic ()
         {
           for (int x = 0; x < scratchW; x++)
           {
-            scratchPtr->ui = baseLumel.ui;
-            scratchPtr++;
+            scratchPtr[x].ui = baseLumel.ui;
           }
+          scratchPtr += blitPitch / sizeof (Lumel);
         }
         scratchMax = baseColor;
       }
@@ -315,10 +321,10 @@ void ProctexPDLight::Animate_Generic ()
       const int lines = mapTile.tilePartH;
       const int mapPitch = mapTile.tilePartPitch;
 
-      Lumel* scratchPtr = scratch.GetArray() + 
-        mapTile.tilePartY * scratchW +
+      Lumel* scratchPtr = scratch + 
+        mapTile.tilePartY * (blitPitch / sizeof (Lumel)) +
         mapTile.tilePartX;
-      int scratchPitch = scratchW - mapW;
+      int blitPitch = (blitPitch / sizeof (Lumel)) - mapW;
 
       csRGBcolor mapMax = mapTile.maxValue;
       mapMax.red   = lutR[mapMax.red]   >> shiftR;
@@ -337,7 +343,7 @@ void ProctexPDLight::Animate_Generic ()
         const uint8* mapPtr = (uint8*)(mapTile.tilePartData);
 	  
         MultiplyAddProc8 maProc = maProcs8[safeMask];
-        maProc (scratchPtr, scratchPitch, mapPtr, mapPitch,
+        maProc (scratchPtr, blitPitch, mapPtr, mapPitch,
           mapW, lines, lutR, lutG, lutB);
       }
       else
@@ -345,7 +351,7 @@ void ProctexPDLight::Animate_Generic ()
         const Lumel* mapPtr = (Lumel*)(mapTile.tilePartData);
 	  
         MultiplyAddProc maProc = maProcs[safeMask];
-        maProc (scratchPtr, scratchPitch, mapPtr, mapPitch,
+        maProc (scratchPtr, blitPitch, mapPtr, mapPitch,
           mapW, lines, lutR, lutG, lutB);
       }
 
@@ -353,15 +359,6 @@ void ProctexPDLight::Animate_Generic ()
         scratchMax.UnsafeAdd (mapMax);
       else
         scratchMax.SafeAdd (mapMax);
-    }
-
-    {
-      CS_PROFILER_ZONE(ProctexPDLight_Animate_generic_Blit)
-      tex->GetTextureHandle ()->Blit (tileRect.xmin, 
-        tileRect.ymin, 
-        tileRect.Width(), tileRect.Height(),
-        (uint8*)scratch.GetArray(),
-        iTextureHandle::BGRA8888);
     }
   }
 }

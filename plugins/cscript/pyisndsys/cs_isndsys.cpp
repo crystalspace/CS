@@ -2599,6 +2599,12 @@ static swig_module_info swig_module = {swig_types, 112, 0, 0, 0, 0};
 #  error "This python version requires swig to be run with the '-classic' option"
 # endif
 #endif
+#if (PY_VERSION_HEX <= 0x02020000)
+# error "This python version requires swig to be run with the '-nomodern' option"
+#endif
+#if (PY_VERSION_HEX <= 0x02020000)
+# error "This python version requires swig to be run with the '-nomodernargs' option"
+#endif
 
 /*-----------------------------------------------
               @(target):= _isndsys.so
@@ -3108,7 +3114,7 @@ SWIGINTERN PyObject *_wrap__SetSCFPointer(PyObject *SWIGUNUSEDPARM(self), PyObje
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:_SetSCFPointer",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"_SetSCFPointer",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSCF, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "_SetSCFPointer" "', argument " "1"" of type '" "iSCF *""'"); 
@@ -3126,7 +3132,7 @@ SWIGINTERN PyObject *_wrap__GetSCFPointer(PyObject *SWIGUNUSEDPARM(self), PyObje
   PyObject *resultobj = 0;
   iSCF *result = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)":_GetSCFPointer")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"_GetSCFPointer",0,0)) SWIG_fail;
   result = (iSCF *)GetSCFPointer();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iSCF, 0 |  0 );
   return resultobj;
@@ -3143,7 +3149,7 @@ SWIGINTERN PyObject *_wrap_iSndSysData_GetFormat(PyObject *SWIGUNUSEDPARM(self),
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysData_GetFormat",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysData_GetFormat",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysData, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysData_GetFormat" "', argument " "1"" of type '" "iSndSysData *""'"); 
@@ -3165,7 +3171,7 @@ SWIGINTERN PyObject *_wrap_iSndSysData_GetFrameCount(PyObject *SWIGUNUSEDPARM(se
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysData_GetFrameCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysData_GetFrameCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysData, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysData_GetFrameCount" "', argument " "1"" of type '" "iSndSysData *""'"); 
@@ -3187,7 +3193,7 @@ SWIGINTERN PyObject *_wrap_iSndSysData_GetDataSize(PyObject *SWIGUNUSEDPARM(self
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysData_GetDataSize",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysData_GetDataSize",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysData, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysData_GetDataSize" "', argument " "1"" of type '" "iSndSysData *""'"); 
@@ -3217,7 +3223,7 @@ SWIGINTERN PyObject *_wrap_iSndSysData_CreateStream(PyObject *SWIGUNUSEDPARM(sel
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSndSysData_CreateStream",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysData_CreateStream",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysData, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysData_CreateStream" "', argument " "1"" of type '" "iSndSysData *""'"); 
@@ -3253,7 +3259,7 @@ SWIGINTERN PyObject *_wrap_iSndSysData_SetDescription(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysData_SetDescription",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysData_SetDescription",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysData, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysData_SetDescription" "', argument " "1"" of type '" "iSndSysData *""'"); 
@@ -3282,7 +3288,7 @@ SWIGINTERN PyObject *_wrap_iSndSysData_GetDescription(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysData_GetDescription",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysData_GetDescription",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysData, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysData_GetDescription" "', argument " "1"" of type '" "iSndSysData *""'"); 
@@ -3300,7 +3306,7 @@ SWIGINTERN PyObject *_wrap_iSndSysData_scfGetVersion(PyObject *SWIGUNUSEDPARM(se
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iSndSysData_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysData_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iSndSysData_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -3316,7 +3322,7 @@ SWIGINTERN PyObject *_wrap_delete_iSndSysData(PyObject *SWIGUNUSEDPARM(self), Py
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSndSysData",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSndSysData",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysData, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSndSysData" "', argument " "1"" of type '" "iSndSysData *""'"); 
@@ -3333,7 +3339,7 @@ fail:
 
 SWIGINTERN PyObject *iSndSysData_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSndSysData, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -3349,7 +3355,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareFilter3DProperties_clean_buffer_set(Py
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysSoftwareFilter3DProperties_clean_buffer_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareFilter3DProperties_clean_buffer_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3DProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareFilter3DProperties_clean_buffer_set" "', argument " "1"" of type '" "iSndSysSoftwareFilter3DProperties *""'"); 
@@ -3377,7 +3383,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareFilter3DProperties_clean_buffer_get(Py
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysSoftwareFilter3DProperties_clean_buffer_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareFilter3DProperties_clean_buffer_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3DProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareFilter3DProperties_clean_buffer_get" "', argument " "1"" of type '" "iSndSysSoftwareFilter3DProperties *""'"); 
@@ -3402,7 +3408,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareFilter3DProperties_work_buffer_set(PyO
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysSoftwareFilter3DProperties_work_buffer_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareFilter3DProperties_work_buffer_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3DProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareFilter3DProperties_work_buffer_set" "', argument " "1"" of type '" "iSndSysSoftwareFilter3DProperties *""'"); 
@@ -3430,7 +3436,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareFilter3DProperties_work_buffer_get(PyO
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysSoftwareFilter3DProperties_work_buffer_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareFilter3DProperties_work_buffer_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3DProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareFilter3DProperties_work_buffer_get" "', argument " "1"" of type '" "iSndSysSoftwareFilter3DProperties *""'"); 
@@ -3455,7 +3461,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareFilter3DProperties_buffer_samples_set(
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysSoftwareFilter3DProperties_buffer_samples_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareFilter3DProperties_buffer_samples_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3DProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareFilter3DProperties_buffer_samples_set" "', argument " "1"" of type '" "iSndSysSoftwareFilter3DProperties *""'"); 
@@ -3483,7 +3489,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareFilter3DProperties_buffer_samples_get(
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysSoftwareFilter3DProperties_buffer_samples_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareFilter3DProperties_buffer_samples_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3DProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareFilter3DProperties_buffer_samples_get" "', argument " "1"" of type '" "iSndSysSoftwareFilter3DProperties *""'"); 
@@ -3508,7 +3514,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareFilter3DProperties_source_parameters_s
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysSoftwareFilter3DProperties_source_parameters_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareFilter3DProperties_source_parameters_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3DProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareFilter3DProperties_source_parameters_set" "', argument " "1"" of type '" "iSndSysSoftwareFilter3DProperties *""'"); 
@@ -3536,7 +3542,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareFilter3DProperties_source_parameters_g
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysSoftwareFilter3DProperties_source_parameters_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareFilter3DProperties_source_parameters_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3DProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareFilter3DProperties_source_parameters_get" "', argument " "1"" of type '" "iSndSysSoftwareFilter3DProperties *""'"); 
@@ -3561,7 +3567,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareFilter3DProperties_listener_parameters
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysSoftwareFilter3DProperties_listener_parameters_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareFilter3DProperties_listener_parameters_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3DProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareFilter3DProperties_listener_parameters_set" "', argument " "1"" of type '" "iSndSysSoftwareFilter3DProperties *""'"); 
@@ -3589,7 +3595,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareFilter3DProperties_listener_parameters
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysSoftwareFilter3DProperties_listener_parameters_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareFilter3DProperties_listener_parameters_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3DProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareFilter3DProperties_listener_parameters_get" "', argument " "1"" of type '" "iSndSysSoftwareFilter3DProperties *""'"); 
@@ -3614,7 +3620,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareFilter3DProperties_sound_format_set(Py
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysSoftwareFilter3DProperties_sound_format_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareFilter3DProperties_sound_format_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3DProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareFilter3DProperties_sound_format_set" "', argument " "1"" of type '" "iSndSysSoftwareFilter3DProperties *""'"); 
@@ -3642,7 +3648,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareFilter3DProperties_sound_format_get(Py
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysSoftwareFilter3DProperties_sound_format_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareFilter3DProperties_sound_format_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3DProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareFilter3DProperties_sound_format_get" "', argument " "1"" of type '" "iSndSysSoftwareFilter3DProperties *""'"); 
@@ -3667,7 +3673,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareFilter3DProperties_closest_speaker_dis
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysSoftwareFilter3DProperties_closest_speaker_distance_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareFilter3DProperties_closest_speaker_distance_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3DProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareFilter3DProperties_closest_speaker_distance_set" "', argument " "1"" of type '" "iSndSysSoftwareFilter3DProperties *""'"); 
@@ -3695,7 +3701,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareFilter3DProperties_closest_speaker_dis
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysSoftwareFilter3DProperties_closest_speaker_distance_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareFilter3DProperties_closest_speaker_distance_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3DProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareFilter3DProperties_closest_speaker_distance_get" "', argument " "1"" of type '" "iSndSysSoftwareFilter3DProperties *""'"); 
@@ -3720,7 +3726,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareFilter3DProperties_speaker_distance_se
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysSoftwareFilter3DProperties_speaker_distance_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareFilter3DProperties_speaker_distance_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3DProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareFilter3DProperties_speaker_distance_set" "', argument " "1"" of type '" "iSndSysSoftwareFilter3DProperties *""'"); 
@@ -3748,7 +3754,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareFilter3DProperties_speaker_distance_ge
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysSoftwareFilter3DProperties_speaker_distance_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareFilter3DProperties_speaker_distance_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3DProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareFilter3DProperties_speaker_distance_get" "', argument " "1"" of type '" "iSndSysSoftwareFilter3DProperties *""'"); 
@@ -3773,7 +3779,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareFilter3DProperties_speaker_direction_c
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysSoftwareFilter3DProperties_speaker_direction_cos_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareFilter3DProperties_speaker_direction_cos_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3DProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareFilter3DProperties_speaker_direction_cos_set" "', argument " "1"" of type '" "iSndSysSoftwareFilter3DProperties *""'"); 
@@ -3801,7 +3807,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareFilter3DProperties_speaker_direction_c
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysSoftwareFilter3DProperties_speaker_direction_cos_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareFilter3DProperties_speaker_direction_cos_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3DProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareFilter3DProperties_speaker_direction_cos_get" "', argument " "1"" of type '" "iSndSysSoftwareFilter3DProperties *""'"); 
@@ -3826,7 +3832,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareFilter3DProperties_channel_set(PyObjec
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysSoftwareFilter3DProperties_channel_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareFilter3DProperties_channel_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3DProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareFilter3DProperties_channel_set" "', argument " "1"" of type '" "iSndSysSoftwareFilter3DProperties *""'"); 
@@ -3854,7 +3860,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareFilter3DProperties_channel_get(PyObjec
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysSoftwareFilter3DProperties_channel_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareFilter3DProperties_channel_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3DProperties, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareFilter3DProperties_channel_get" "', argument " "1"" of type '" "iSndSysSoftwareFilter3DProperties *""'"); 
@@ -3872,7 +3878,7 @@ SWIGINTERN PyObject *_wrap_new_iSndSysSoftwareFilter3DProperties(PyObject *SWIGU
   PyObject *resultobj = 0;
   iSndSysSoftwareFilter3DProperties *result = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)":new_iSndSysSoftwareFilter3DProperties")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"new_iSndSysSoftwareFilter3DProperties",0,0)) SWIG_fail;
   result = (iSndSysSoftwareFilter3DProperties *)new iSndSysSoftwareFilter3DProperties();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_iSndSysSoftwareFilter3DProperties, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -3888,7 +3894,7 @@ SWIGINTERN PyObject *_wrap_delete_iSndSysSoftwareFilter3DProperties(PyObject *SW
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSndSysSoftwareFilter3DProperties",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSndSysSoftwareFilter3DProperties",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3DProperties, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSndSysSoftwareFilter3DProperties" "', argument " "1"" of type '" "iSndSysSoftwareFilter3DProperties *""'"); 
@@ -3905,7 +3911,7 @@ fail:
 
 SWIGINTERN PyObject *iSndSysSoftwareFilter3DProperties_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSndSysSoftwareFilter3DProperties, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -3921,7 +3927,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareFilter3D_Apply(PyObject *SWIGUNUSEDPAR
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysSoftwareFilter3D_Apply",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareFilter3D_Apply",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3D, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareFilter3D_Apply" "', argument " "1"" of type '" "iSndSysSoftwareFilter3D *""'"); 
@@ -3959,7 +3965,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareFilter3D_AddSubFilter__SWIG_0(PyObject
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSndSysSoftwareFilter3D_AddSubFilter",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareFilter3D_AddSubFilter",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3D, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareFilter3D_AddSubFilter" "', argument " "1"" of type '" "iSndSysSoftwareFilter3D *""'"); 
@@ -3995,7 +4001,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareFilter3D_AddSubFilter__SWIG_1(PyObject
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysSoftwareFilter3D_AddSubFilter",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareFilter3D_AddSubFilter",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3D, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareFilter3D_AddSubFilter" "', argument " "1"" of type '" "iSndSysSoftwareFilter3D *""'"); 
@@ -4077,7 +4083,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareFilter3D_GetSubFilter__SWIG_0(PyObject
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysSoftwareFilter3D_GetSubFilter",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareFilter3D_GetSubFilter",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3D, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareFilter3D_GetSubFilter" "', argument " "1"" of type '" "iSndSysSoftwareFilter3D *""'"); 
@@ -4104,7 +4110,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareFilter3D_GetSubFilter__SWIG_1(PyObject
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysSoftwareFilter3D_GetSubFilter",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareFilter3D_GetSubFilter",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3D, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareFilter3D_GetSubFilter" "', argument " "1"" of type '" "iSndSysSoftwareFilter3D *""'"); 
@@ -4167,7 +4173,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareFilter3D_GetPtr(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysSoftwareFilter3D_GetPtr",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareFilter3D_GetPtr",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3D, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareFilter3D_GetPtr" "', argument " "1"" of type '" "iSndSysSoftwareFilter3D *""'"); 
@@ -4185,7 +4191,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareFilter3D_scfGetVersion(PyObject *SWIGU
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iSndSysSoftwareFilter3D_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareFilter3D_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iSndSysSoftwareFilter3D_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -4201,7 +4207,7 @@ SWIGINTERN PyObject *_wrap_delete_iSndSysSoftwareFilter3D(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSndSysSoftwareFilter3D",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSndSysSoftwareFilter3D",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareFilter3D, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSndSysSoftwareFilter3D" "', argument " "1"" of type '" "iSndSysSoftwareFilter3D *""'"); 
@@ -4218,7 +4224,7 @@ fail:
 
 SWIGINTERN PyObject *iSndSysSoftwareFilter3D_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSndSysSoftwareFilter3D, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -4235,7 +4241,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareOutputFilter_FormatNotify(PyObject *SW
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysSoftwareOutputFilter_FormatNotify",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareOutputFilter_FormatNotify",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareOutputFilter, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareOutputFilter_FormatNotify" "', argument " "1"" of type '" "iSndSysSoftwareOutputFilter *""'"); 
@@ -4269,7 +4275,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareOutputFilter_DeliverData(PyObject *SWI
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSndSysSoftwareOutputFilter_DeliverData",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareOutputFilter_DeliverData",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareOutputFilter, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareOutputFilter_DeliverData" "', argument " "1"" of type '" "iSndSysSoftwareOutputFilter *""'"); 
@@ -4300,7 +4306,7 @@ SWIGINTERN PyObject *_wrap_delete_iSndSysSoftwareOutputFilter(PyObject *SWIGUNUS
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSndSysSoftwareOutputFilter",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSndSysSoftwareOutputFilter",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareOutputFilter, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSndSysSoftwareOutputFilter" "', argument " "1"" of type '" "iSndSysSoftwareOutputFilter *""'"); 
@@ -4317,7 +4323,7 @@ fail:
 
 SWIGINTERN PyObject *iSndSysSoftwareOutputFilter_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSndSysSoftwareOutputFilter, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -4337,7 +4343,7 @@ SWIGINTERN PyObject *_wrap_iSndSysListener_SetDirection(PyObject *SWIGUNUSEDPARM
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSndSysListener_SetDirection",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysListener_SetDirection",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysListener, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysListener_SetDirection" "', argument " "1"" of type '" "iSndSysListener *""'"); 
@@ -4378,7 +4384,7 @@ SWIGINTERN PyObject *_wrap_iSndSysListener_SetPosition(PyObject *SWIGUNUSEDPARM(
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysListener_SetPosition",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysListener_SetPosition",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysListener, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysListener_SetPosition" "', argument " "1"" of type '" "iSndSysListener *""'"); 
@@ -4411,7 +4417,7 @@ SWIGINTERN PyObject *_wrap_iSndSysListener_SetDistanceFactor(PyObject *SWIGUNUSE
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysListener_SetDistanceFactor",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysListener_SetDistanceFactor",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysListener, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysListener_SetDistanceFactor" "', argument " "1"" of type '" "iSndSysListener *""'"); 
@@ -4441,7 +4447,7 @@ SWIGINTERN PyObject *_wrap_iSndSysListener_SetRollOffFactor(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysListener_SetRollOffFactor",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysListener_SetRollOffFactor",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysListener, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysListener_SetRollOffFactor" "', argument " "1"" of type '" "iSndSysListener *""'"); 
@@ -4475,7 +4481,7 @@ SWIGINTERN PyObject *_wrap_iSndSysListener_GetDirection(PyObject *SWIGUNUSEDPARM
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSndSysListener_GetDirection",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysListener_GetDirection",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysListener, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysListener_GetDirection" "', argument " "1"" of type '" "iSndSysListener *""'"); 
@@ -4513,7 +4519,7 @@ SWIGINTERN PyObject *_wrap_iSndSysListener_GetPosition(PyObject *SWIGUNUSEDPARM(
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysListener_GetPosition",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysListener_GetPosition",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysListener, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysListener_GetPosition" "', argument " "1"" of type '" "iSndSysListener *""'"); 
@@ -4538,7 +4544,7 @@ SWIGINTERN PyObject *_wrap_iSndSysListener_GetDistanceFactor(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysListener_GetDistanceFactor",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysListener_GetDistanceFactor",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysListener, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysListener_GetDistanceFactor" "', argument " "1"" of type '" "iSndSysListener *""'"); 
@@ -4560,7 +4566,7 @@ SWIGINTERN PyObject *_wrap_iSndSysListener_GetRollOffFactor(PyObject *SWIGUNUSED
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysListener_GetRollOffFactor",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysListener_GetRollOffFactor",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysListener, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysListener_GetRollOffFactor" "', argument " "1"" of type '" "iSndSysListener *""'"); 
@@ -4578,7 +4584,7 @@ SWIGINTERN PyObject *_wrap_iSndSysListener_scfGetVersion(PyObject *SWIGUNUSEDPAR
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iSndSysListener_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysListener_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iSndSysListener_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -4594,7 +4600,7 @@ SWIGINTERN PyObject *_wrap_delete_iSndSysListener(PyObject *SWIGUNUSEDPARM(self)
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSndSysListener",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSndSysListener",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysListener, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSndSysListener" "', argument " "1"" of type '" "iSndSysListener *""'"); 
@@ -4611,7 +4617,7 @@ fail:
 
 SWIGINTERN PyObject *iSndSysListener_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSndSysListener, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -4633,7 +4639,7 @@ SWIGINTERN PyObject *_wrap_iSndSysLoader_LoadSound__SWIG_0(PyObject *SWIGUNUSEDP
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSndSysLoader_LoadSound",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysLoader_LoadSound",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysLoader_LoadSound" "', argument " "1"" of type '" "iSndSysLoader *""'"); 
@@ -4688,7 +4694,7 @@ SWIGINTERN PyObject *_wrap_iSndSysLoader_LoadSound__SWIG_1(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysLoader_LoadSound",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysLoader_LoadSound",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysLoader, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysLoader_LoadSound" "', argument " "1"" of type '" "iSndSysLoader *""'"); 
@@ -4777,7 +4783,7 @@ SWIGINTERN PyObject *_wrap_iSndSysLoader_scfGetVersion(PyObject *SWIGUNUSEDPARM(
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iSndSysLoader_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysLoader_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iSndSysLoader_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -4793,7 +4799,7 @@ SWIGINTERN PyObject *_wrap_delete_iSndSysLoader(PyObject *SWIGUNUSEDPARM(self), 
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSndSysLoader",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSndSysLoader",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysLoader, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSndSysLoader" "', argument " "1"" of type '" "iSndSysLoader *""'"); 
@@ -4810,7 +4816,7 @@ fail:
 
 SWIGINTERN PyObject *iSndSysLoader_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSndSysLoader, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -4823,7 +4829,7 @@ SWIGINTERN PyObject *_wrap_iSndSysWrapper_QueryObject(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysWrapper_QueryObject",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysWrapper_QueryObject",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysWrapper, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysWrapper_QueryObject" "', argument " "1"" of type '" "iSndSysWrapper *""'"); 
@@ -4845,7 +4851,7 @@ SWIGINTERN PyObject *_wrap_iSndSysWrapper_GetData(PyObject *SWIGUNUSEDPARM(self)
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysWrapper_GetData",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysWrapper_GetData",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysWrapper, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysWrapper_GetData" "', argument " "1"" of type '" "iSndSysWrapper *""'"); 
@@ -4870,7 +4876,7 @@ SWIGINTERN PyObject *_wrap_iSndSysWrapper_SetData(PyObject *SWIGUNUSEDPARM(self)
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysWrapper_SetData",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysWrapper_SetData",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysWrapper, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysWrapper_SetData" "', argument " "1"" of type '" "iSndSysWrapper *""'"); 
@@ -4893,7 +4899,7 @@ SWIGINTERN PyObject *_wrap_iSndSysWrapper_scfGetVersion(PyObject *SWIGUNUSEDPARM
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iSndSysWrapper_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysWrapper_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iSndSysWrapper_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -4909,7 +4915,7 @@ SWIGINTERN PyObject *_wrap_delete_iSndSysWrapper(PyObject *SWIGUNUSEDPARM(self),
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSndSysWrapper",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSndSysWrapper",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysWrapper, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSndSysWrapper" "', argument " "1"" of type '" "iSndSysWrapper *""'"); 
@@ -4926,7 +4932,7 @@ fail:
 
 SWIGINTERN PyObject *iSndSysWrapper_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSndSysWrapper, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -4944,7 +4950,7 @@ SWIGINTERN PyObject *_wrap_iSndSysManager_CreateSound(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysManager_CreateSound",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysManager_CreateSound",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysManager, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysManager_CreateSound" "', argument " "1"" of type '" "iSndSysManager *""'"); 
@@ -4976,7 +4982,7 @@ SWIGINTERN PyObject *_wrap_iSndSysManager_RemoveSound__SWIG_0(PyObject *SWIGUNUS
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysManager_RemoveSound",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysManager_RemoveSound",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysManager, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysManager_RemoveSound" "', argument " "1"" of type '" "iSndSysManager *""'"); 
@@ -5006,7 +5012,7 @@ SWIGINTERN PyObject *_wrap_iSndSysManager_RemoveSound__SWIG_1(PyObject *SWIGUNUS
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysManager_RemoveSound",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysManager_RemoveSound",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysManager, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysManager_RemoveSound" "', argument " "1"" of type '" "iSndSysManager *""'"); 
@@ -5078,7 +5084,7 @@ SWIGINTERN PyObject *_wrap_iSndSysManager_RemoveSounds(PyObject *SWIGUNUSEDPARM(
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysManager_RemoveSounds",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysManager_RemoveSounds",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysManager, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysManager_RemoveSounds" "', argument " "1"" of type '" "iSndSysManager *""'"); 
@@ -5100,7 +5106,7 @@ SWIGINTERN PyObject *_wrap_iSndSysManager_GetSoundCount(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysManager_GetSoundCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysManager_GetSoundCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysManager, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysManager_GetSoundCount" "', argument " "1"" of type '" "iSndSysManager const *""'"); 
@@ -5126,7 +5132,7 @@ SWIGINTERN PyObject *_wrap_iSndSysManager_GetSound(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysManager_GetSound",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysManager_GetSound",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysManager, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysManager_GetSound" "', argument " "1"" of type '" "iSndSysManager *""'"); 
@@ -5158,7 +5164,7 @@ SWIGINTERN PyObject *_wrap_iSndSysManager_FindSoundByName(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysManager_FindSoundByName",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysManager_FindSoundByName",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysManager, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysManager_FindSoundByName" "', argument " "1"" of type '" "iSndSysManager *""'"); 
@@ -5183,7 +5189,7 @@ SWIGINTERN PyObject *_wrap_iSndSysManager_scfGetVersion(PyObject *SWIGUNUSEDPARM
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iSndSysManager_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysManager_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iSndSysManager_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -5199,7 +5205,7 @@ SWIGINTERN PyObject *_wrap_delete_iSndSysManager(PyObject *SWIGUNUSEDPARM(self),
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSndSysManager",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSndSysManager",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysManager, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSndSysManager" "', argument " "1"" of type '" "iSndSysManager *""'"); 
@@ -5216,7 +5222,7 @@ fail:
 
 SWIGINTERN PyObject *iSndSysManager_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSndSysManager, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -5232,7 +5238,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSource_SetVolume(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysSource_SetVolume",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSource_SetVolume",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSource, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSource_SetVolume" "', argument " "1"" of type '" "iSndSysSource *""'"); 
@@ -5259,7 +5265,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSource_GetVolume(PyObject *SWIGUNUSEDPARM(self
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysSource_GetVolume",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSource_GetVolume",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSource, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSource_GetVolume" "', argument " "1"" of type '" "iSndSysSource *""'"); 
@@ -5281,7 +5287,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSource_GetStream(PyObject *SWIGUNUSEDPARM(self
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysSource_GetStream",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSource_GetStream",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSource, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSource_GetStream" "', argument " "1"" of type '" "iSndSysSource *""'"); 
@@ -5328,7 +5334,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSource_AddOutputFilter(PyObject *SWIGUNUSEDPAR
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSndSysSource_AddOutputFilter",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSource_AddOutputFilter",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSource, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSource_AddOutputFilter" "', argument " "1"" of type '" "iSndSysSource *""'"); 
@@ -5368,7 +5374,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSource_RemoveOutputFilter(PyObject *SWIGUNUSED
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSndSysSource_RemoveOutputFilter",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSource_RemoveOutputFilter",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSource, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSource_RemoveOutputFilter" "', argument " "1"" of type '" "iSndSysSource *""'"); 
@@ -5400,7 +5406,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSource_GetPtr(PyObject *SWIGUNUSEDPARM(self), 
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysSource_GetPtr",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSource_GetPtr",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSource, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSource_GetPtr" "', argument " "1"" of type '" "iSndSysSource *""'"); 
@@ -5418,7 +5424,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSource_scfGetVersion(PyObject *SWIGUNUSEDPARM(
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iSndSysSource_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSource_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iSndSysSource_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -5434,7 +5440,7 @@ SWIGINTERN PyObject *_wrap_delete_iSndSysSource(PyObject *SWIGUNUSEDPARM(self), 
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSndSysSource",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSndSysSource",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSource, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSndSysSource" "', argument " "1"" of type '" "iSndSysSource *""'"); 
@@ -5451,7 +5457,7 @@ fail:
 
 SWIGINTERN PyObject *iSndSysSource_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSndSysSource, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -5472,7 +5478,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSourceSoftware_MergeIntoBuffer(PyObject *SWIGU
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSndSysSourceSoftware_MergeIntoBuffer",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSourceSoftware_MergeIntoBuffer",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSourceSoftware, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSourceSoftware_MergeIntoBuffer" "', argument " "1"" of type '" "iSndSysSourceSoftware *""'"); 
@@ -5503,7 +5509,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSourceSoftware_ProcessOutputFilters(PyObject *
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysSourceSoftware_ProcessOutputFilters",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSourceSoftware_ProcessOutputFilters",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSourceSoftware, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSourceSoftware_ProcessOutputFilters" "', argument " "1"" of type '" "iSndSysSourceSoftware *""'"); 
@@ -5524,7 +5530,7 @@ SWIGINTERN PyObject *_wrap_delete_iSndSysSourceSoftware(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSndSysSourceSoftware",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSndSysSourceSoftware",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSourceSoftware, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSndSysSourceSoftware" "', argument " "1"" of type '" "iSndSysSourceSoftware *""'"); 
@@ -5541,7 +5547,7 @@ fail:
 
 SWIGINTERN PyObject *iSndSysSourceSoftware_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSndSysSourceSoftware, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -5557,7 +5563,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSourceSoftware3D_SetPosition(PyObject *SWIGUNU
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysSourceSoftware3D_SetPosition",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSourceSoftware3D_SetPosition",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSourceSoftware3D, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSourceSoftware3D_SetPosition" "', argument " "1"" of type '" "iSndSysSourceSoftware3D *""'"); 
@@ -5592,7 +5598,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSourceSoftware3D_GetPosition(PyObject *SWIGUNU
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysSourceSoftware3D_GetPosition",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSourceSoftware3D_GetPosition",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSourceSoftware3D, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSourceSoftware3D_GetPosition" "', argument " "1"" of type '" "iSndSysSourceSoftware3D *""'"); 
@@ -5617,7 +5623,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSourceSoftware3D_SetDirection(PyObject *SWIGUN
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysSourceSoftware3D_SetDirection",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSourceSoftware3D_SetDirection",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSourceSoftware3D, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSourceSoftware3D_SetDirection" "', argument " "1"" of type '" "iSndSysSourceSoftware3D *""'"); 
@@ -5652,7 +5658,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSourceSoftware3D_GetDirection(PyObject *SWIGUN
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysSourceSoftware3D_GetDirection",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSourceSoftware3D_GetDirection",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSourceSoftware3D, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSourceSoftware3D_GetDirection" "', argument " "1"" of type '" "iSndSysSourceSoftware3D *""'"); 
@@ -5677,7 +5683,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSourceSoftware3D_SetDirectionalRadiation(PyObj
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysSourceSoftware3D_SetDirectionalRadiation",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSourceSoftware3D_SetDirectionalRadiation",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSourceSoftware3D, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSourceSoftware3D_SetDirectionalRadiation" "', argument " "1"" of type '" "iSndSysSourceSoftware3D *""'"); 
@@ -5704,7 +5710,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSourceSoftware3D_GetDirectionalRadiation(PyObj
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysSourceSoftware3D_GetDirectionalRadiation",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSourceSoftware3D_GetDirectionalRadiation",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSourceSoftware3D, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSourceSoftware3D_GetDirectionalRadiation" "', argument " "1"" of type '" "iSndSysSourceSoftware3D *""'"); 
@@ -5729,7 +5735,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSourceSoftware3D_SetMinimumDistance(PyObject *
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysSourceSoftware3D_SetMinimumDistance",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSourceSoftware3D_SetMinimumDistance",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSourceSoftware3D, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSourceSoftware3D_SetMinimumDistance" "', argument " "1"" of type '" "iSndSysSourceSoftware3D *""'"); 
@@ -5759,7 +5765,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSourceSoftware3D_SetMaximumDistance(PyObject *
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysSourceSoftware3D_SetMaximumDistance",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSourceSoftware3D_SetMaximumDistance",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSourceSoftware3D, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSourceSoftware3D_SetMaximumDistance" "', argument " "1"" of type '" "iSndSysSourceSoftware3D *""'"); 
@@ -5786,7 +5792,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSourceSoftware3D_GetMinimumDistance(PyObject *
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysSourceSoftware3D_GetMinimumDistance",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSourceSoftware3D_GetMinimumDistance",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSourceSoftware3D, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSourceSoftware3D_GetMinimumDistance" "', argument " "1"" of type '" "iSndSysSourceSoftware3D *""'"); 
@@ -5808,7 +5814,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSourceSoftware3D_GetMaximumDistance(PyObject *
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysSourceSoftware3D_GetMaximumDistance",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSourceSoftware3D_GetMaximumDistance",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSourceSoftware3D, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSourceSoftware3D_GetMaximumDistance" "', argument " "1"" of type '" "iSndSysSourceSoftware3D *""'"); 
@@ -5829,7 +5835,7 @@ SWIGINTERN PyObject *_wrap_delete_iSndSysSourceSoftware3D(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSndSysSourceSoftware3D",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSndSysSourceSoftware3D",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSourceSoftware3D, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSndSysSourceSoftware3D" "', argument " "1"" of type '" "iSndSysSourceSoftware3D *""'"); 
@@ -5846,7 +5852,7 @@ fail:
 
 SWIGINTERN PyObject *iSndSysSourceSoftware3D_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSndSysSourceSoftware3D, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -5862,7 +5868,7 @@ SWIGINTERN PyObject *_wrap_csSndSysSoundFormat_Freq_set(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csSndSysSoundFormat_Freq_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSndSysSoundFormat_Freq_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSndSysSoundFormat, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSndSysSoundFormat_Freq_set" "', argument " "1"" of type '" "csSndSysSoundFormat *""'"); 
@@ -5890,7 +5896,7 @@ SWIGINTERN PyObject *_wrap_csSndSysSoundFormat_Freq_get(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csSndSysSoundFormat_Freq_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSndSysSoundFormat_Freq_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSndSysSoundFormat, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSndSysSoundFormat_Freq_get" "', argument " "1"" of type '" "csSndSysSoundFormat *""'"); 
@@ -5915,7 +5921,7 @@ SWIGINTERN PyObject *_wrap_csSndSysSoundFormat_Bits_set(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csSndSysSoundFormat_Bits_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSndSysSoundFormat_Bits_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSndSysSoundFormat, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSndSysSoundFormat_Bits_set" "', argument " "1"" of type '" "csSndSysSoundFormat *""'"); 
@@ -5951,7 +5957,7 @@ SWIGINTERN PyObject *_wrap_csSndSysSoundFormat_Bits_get(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csSndSysSoundFormat_Bits_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSndSysSoundFormat_Bits_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSndSysSoundFormat, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSndSysSoundFormat_Bits_get" "', argument " "1"" of type '" "csSndSysSoundFormat *""'"); 
@@ -5976,7 +5982,7 @@ SWIGINTERN PyObject *_wrap_csSndSysSoundFormat_Channels_set(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csSndSysSoundFormat_Channels_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSndSysSoundFormat_Channels_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSndSysSoundFormat, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSndSysSoundFormat_Channels_set" "', argument " "1"" of type '" "csSndSysSoundFormat *""'"); 
@@ -6012,7 +6018,7 @@ SWIGINTERN PyObject *_wrap_csSndSysSoundFormat_Channels_get(PyObject *SWIGUNUSED
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csSndSysSoundFormat_Channels_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSndSysSoundFormat_Channels_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSndSysSoundFormat, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSndSysSoundFormat_Channels_get" "', argument " "1"" of type '" "csSndSysSoundFormat *""'"); 
@@ -6037,7 +6043,7 @@ SWIGINTERN PyObject *_wrap_csSndSysSoundFormat_Flags_set(PyObject *SWIGUNUSEDPAR
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:csSndSysSoundFormat_Flags_set",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSndSysSoundFormat_Flags_set",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSndSysSoundFormat, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSndSysSoundFormat_Flags_set" "', argument " "1"" of type '" "csSndSysSoundFormat *""'"); 
@@ -6073,7 +6079,7 @@ SWIGINTERN PyObject *_wrap_csSndSysSoundFormat_Flags_get(PyObject *SWIGUNUSEDPAR
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:csSndSysSoundFormat_Flags_get",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"csSndSysSoundFormat_Flags_get",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSndSysSoundFormat, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "csSndSysSoundFormat_Flags_get" "', argument " "1"" of type '" "csSndSysSoundFormat *""'"); 
@@ -6091,7 +6097,7 @@ SWIGINTERN PyObject *_wrap_new_csSndSysSoundFormat(PyObject *SWIGUNUSEDPARM(self
   PyObject *resultobj = 0;
   csSndSysSoundFormat *result = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)":new_csSndSysSoundFormat")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"new_csSndSysSoundFormat",0,0)) SWIG_fail;
   result = (csSndSysSoundFormat *)new csSndSysSoundFormat();
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_csSndSysSoundFormat, SWIG_POINTER_NEW |  0 );
   return resultobj;
@@ -6107,7 +6113,7 @@ SWIGINTERN PyObject *_wrap_delete_csSndSysSoundFormat(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_csSndSysSoundFormat",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_csSndSysSoundFormat",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_csSndSysSoundFormat, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_csSndSysSoundFormat" "', argument " "1"" of type '" "csSndSysSoundFormat *""'"); 
@@ -6124,7 +6130,7 @@ fail:
 
 SWIGINTERN PyObject *csSndSysSoundFormat_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_csSndSysSoundFormat, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -6151,7 +6157,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStream_GetDescription(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysStream_GetDescription",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_GetDescription",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_GetDescription" "', argument " "1"" of type '" "iSndSysStream *""'"); 
@@ -6173,7 +6179,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStream_GetRenderedFormat(PyObject *SWIGUNUSEDP
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysStream_GetRenderedFormat",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_GetRenderedFormat",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_GetRenderedFormat" "', argument " "1"" of type '" "iSndSysStream *""'"); 
@@ -6195,7 +6201,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStream_Get3dMode(PyObject *SWIGUNUSEDPARM(self
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysStream_Get3dMode",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_Get3dMode",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_Get3dMode" "', argument " "1"" of type '" "iSndSysStream *""'"); 
@@ -6217,7 +6223,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStream_GetFrameCount(PyObject *SWIGUNUSEDPARM(
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysStream_GetFrameCount",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_GetFrameCount",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_GetFrameCount" "', argument " "1"" of type '" "iSndSysStream *""'"); 
@@ -6239,7 +6245,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStream_GetPosition(PyObject *SWIGUNUSEDPARM(se
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysStream_GetPosition",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_GetPosition",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_GetPosition" "', argument " "1"" of type '" "iSndSysStream *""'"); 
@@ -6261,7 +6267,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStream_ResetPosition(PyObject *SWIGUNUSEDPARM(
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysStream_ResetPosition",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_ResetPosition",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_ResetPosition" "', argument " "1"" of type '" "iSndSysStream *""'"); 
@@ -6287,7 +6293,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStream_SetPosition(PyObject *SWIGUNUSEDPARM(se
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysStream_SetPosition",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_SetPosition",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_SetPosition" "', argument " "1"" of type '" "iSndSysStream *""'"); 
@@ -6314,7 +6320,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStream_Pause(PyObject *SWIGUNUSEDPARM(self), P
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysStream_Pause",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_Pause",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_Pause" "', argument " "1"" of type '" "iSndSysStream *""'"); 
@@ -6336,7 +6342,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStream_Unpause(PyObject *SWIGUNUSEDPARM(self),
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysStream_Unpause",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_Unpause",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_Unpause" "', argument " "1"" of type '" "iSndSysStream *""'"); 
@@ -6358,7 +6364,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStream_GetPauseState(PyObject *SWIGUNUSEDPARM(
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysStream_GetPauseState",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_GetPauseState",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_GetPauseState" "', argument " "1"" of type '" "iSndSysStream *""'"); 
@@ -6384,7 +6390,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStream_SetLoopState(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysStream_SetLoopState",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_SetLoopState",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_SetLoopState" "', argument " "1"" of type '" "iSndSysStream *""'"); 
@@ -6411,7 +6417,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStream_GetLoopState(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysStream_GetLoopState",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_GetLoopState",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_GetLoopState" "', argument " "1"" of type '" "iSndSysStream *""'"); 
@@ -6436,7 +6442,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStream_SetPlayRatePercent(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysStream_SetPlayRatePercent",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_SetPlayRatePercent",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_SetPlayRatePercent" "', argument " "1"" of type '" "iSndSysStream *""'"); 
@@ -6463,7 +6469,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStream_GetPlayRatePercent(PyObject *SWIGUNUSED
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysStream_GetPlayRatePercent",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_GetPlayRatePercent",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_GetPlayRatePercent" "', argument " "1"" of type '" "iSndSysStream *""'"); 
@@ -6488,7 +6494,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStream_SetAutoUnregister(PyObject *SWIGUNUSEDP
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysStream_SetAutoUnregister",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_SetAutoUnregister",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_SetAutoUnregister" "', argument " "1"" of type '" "iSndSysStream *""'"); 
@@ -6515,7 +6521,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStream_GetAutoUnregister(PyObject *SWIGUNUSEDP
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysStream_GetAutoUnregister",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_GetAutoUnregister",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_GetAutoUnregister" "', argument " "1"" of type '" "iSndSysStream *""'"); 
@@ -6537,7 +6543,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStream_GetAutoUnregisterRequested(PyObject *SW
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysStream_GetAutoUnregisterRequested",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_GetAutoUnregisterRequested",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_GetAutoUnregisterRequested" "', argument " "1"" of type '" "iSndSysStream *""'"); 
@@ -6562,7 +6568,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStream_AdvancePosition(PyObject *SWIGUNUSEDPAR
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysStream_AdvancePosition",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_AdvancePosition",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_AdvancePosition" "', argument " "1"" of type '" "iSndSysStream *""'"); 
@@ -6612,7 +6618,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStream_GetDataPointers(PyObject *SWIGUNUSEDPAR
   PyObject * obj5 = 0 ;
   PyObject * obj6 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOO:iSndSysStream_GetDataPointers",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_GetDataPointers",7,7,&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_GetDataPointers" "', argument " "1"" of type '" "iSndSysStream *""'"); 
@@ -6667,7 +6673,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStream_InitializeSourcePositionMarker(PyObject
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysStream_InitializeSourcePositionMarker",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_InitializeSourcePositionMarker",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_InitializeSourcePositionMarker" "', argument " "1"" of type '" "iSndSysStream *""'"); 
@@ -6693,7 +6699,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStream_ProcessNotifications(PyObject *SWIGUNUS
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysStream_ProcessNotifications",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_ProcessNotifications",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_ProcessNotifications" "', argument " "1"" of type '" "iSndSysStream *""'"); 
@@ -6719,7 +6725,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStream_RegisterCallback(PyObject *SWIGUNUSEDPA
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysStream_RegisterCallback",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_RegisterCallback",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_RegisterCallback" "', argument " "1"" of type '" "iSndSysStream *""'"); 
@@ -6750,7 +6756,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStream_UnregisterCallback(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysStream_UnregisterCallback",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_UnregisterCallback",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_UnregisterCallback" "', argument " "1"" of type '" "iSndSysStream *""'"); 
@@ -6781,7 +6787,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStream_RegisterFrameNotification(PyObject *SWI
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysStream_RegisterFrameNotification",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_RegisterFrameNotification",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStream_RegisterFrameNotification" "', argument " "1"" of type '" "iSndSysStream *""'"); 
@@ -6804,7 +6810,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStream_scfGetVersion(PyObject *SWIGUNUSEDPARM(
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iSndSysStream_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStream_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iSndSysStream_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -6820,7 +6826,7 @@ SWIGINTERN PyObject *_wrap_delete_iSndSysStream(PyObject *SWIGUNUSEDPARM(self), 
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSndSysStream",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSndSysStream",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStream, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSndSysStream" "', argument " "1"" of type '" "iSndSysStream *""'"); 
@@ -6837,7 +6843,7 @@ fail:
 
 SWIGINTERN PyObject *iSndSysStream_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSndSysStream, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -6849,7 +6855,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStreamCallback_StreamLoopNotification(PyObject
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysStreamCallback_StreamLoopNotification",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStreamCallback_StreamLoopNotification",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStreamCallback, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStreamCallback_StreamLoopNotification" "', argument " "1"" of type '" "iSndSysStreamCallback *""'"); 
@@ -6870,7 +6876,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStreamCallback_StreamPauseNotification(PyObjec
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysStreamCallback_StreamPauseNotification",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStreamCallback_StreamPauseNotification",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStreamCallback, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStreamCallback_StreamPauseNotification" "', argument " "1"" of type '" "iSndSysStreamCallback *""'"); 
@@ -6891,7 +6897,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStreamCallback_StreamUnpauseNotification(PyObj
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysStreamCallback_StreamUnpauseNotification",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStreamCallback_StreamUnpauseNotification",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStreamCallback, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStreamCallback_StreamUnpauseNotification" "', argument " "1"" of type '" "iSndSysStreamCallback *""'"); 
@@ -6916,7 +6922,7 @@ SWIGINTERN PyObject *_wrap_iSndSysStreamCallback_StreamFrameNotification(PyObjec
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysStreamCallback_StreamFrameNotification",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysStreamCallback_StreamFrameNotification",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStreamCallback, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysStreamCallback_StreamFrameNotification" "', argument " "1"" of type '" "iSndSysStreamCallback *""'"); 
@@ -6942,7 +6948,7 @@ SWIGINTERN PyObject *_wrap_delete_iSndSysStreamCallback(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSndSysStreamCallback",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSndSysStreamCallback",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysStreamCallback, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSndSysStreamCallback" "', argument " "1"" of type '" "iSndSysStreamCallback *""'"); 
@@ -6959,7 +6965,7 @@ fail:
 
 SWIGINTERN PyObject *iSndSysStreamCallback_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSndSysStreamCallback, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -6975,7 +6981,7 @@ SWIGINTERN PyObject *_wrap_iSndSysRenderer_SetVolume(PyObject *SWIGUNUSEDPARM(se
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysRenderer_SetVolume",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysRenderer_SetVolume",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysRenderer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysRenderer_SetVolume" "', argument " "1"" of type '" "iSndSysRenderer *""'"); 
@@ -7002,7 +7008,7 @@ SWIGINTERN PyObject *_wrap_iSndSysRenderer_GetVolume(PyObject *SWIGUNUSEDPARM(se
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysRenderer_GetVolume",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysRenderer_GetVolume",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysRenderer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysRenderer_GetVolume" "', argument " "1"" of type '" "iSndSysRenderer *""'"); 
@@ -7032,7 +7038,7 @@ SWIGINTERN PyObject *_wrap_iSndSysRenderer_CreateStream(PyObject *SWIGUNUSEDPARM
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSndSysRenderer_CreateStream",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysRenderer_CreateStream",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysRenderer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysRenderer_CreateStream" "', argument " "1"" of type '" "iSndSysRenderer *""'"); 
@@ -7085,7 +7091,7 @@ SWIGINTERN PyObject *_wrap_iSndSysRenderer_CreateSource(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysRenderer_CreateSource",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysRenderer_CreateSource",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysRenderer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysRenderer_CreateSource" "', argument " "1"" of type '" "iSndSysRenderer *""'"); 
@@ -7133,7 +7139,7 @@ SWIGINTERN PyObject *_wrap_iSndSysRenderer_RemoveStream(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysRenderer_RemoveStream",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysRenderer_RemoveStream",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysRenderer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysRenderer_RemoveStream" "', argument " "1"" of type '" "iSndSysRenderer *""'"); 
@@ -7164,7 +7170,7 @@ SWIGINTERN PyObject *_wrap_iSndSysRenderer_RemoveSource(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysRenderer_RemoveSource",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysRenderer_RemoveSource",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysRenderer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysRenderer_RemoveSource" "', argument " "1"" of type '" "iSndSysRenderer *""'"); 
@@ -7191,7 +7197,7 @@ SWIGINTERN PyObject *_wrap_iSndSysRenderer_GetListener(PyObject *SWIGUNUSEDPARM(
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysRenderer_GetListener",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysRenderer_GetListener",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysRenderer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysRenderer_GetListener" "', argument " "1"" of type '" "iSndSysRenderer *""'"); 
@@ -7234,7 +7240,7 @@ SWIGINTERN PyObject *_wrap_iSndSysRenderer_RegisterCallback(PyObject *SWIGUNUSED
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysRenderer_RegisterCallback",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysRenderer_RegisterCallback",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysRenderer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysRenderer_RegisterCallback" "', argument " "1"" of type '" "iSndSysRenderer *""'"); 
@@ -7265,7 +7271,7 @@ SWIGINTERN PyObject *_wrap_iSndSysRenderer_UnregisterCallback(PyObject *SWIGUNUS
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysRenderer_UnregisterCallback",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysRenderer_UnregisterCallback",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysRenderer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysRenderer_UnregisterCallback" "', argument " "1"" of type '" "iSndSysRenderer *""'"); 
@@ -7288,7 +7294,7 @@ SWIGINTERN PyObject *_wrap_iSndSysRenderer_scfGetVersion(PyObject *SWIGUNUSEDPAR
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iSndSysRenderer_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysRenderer_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iSndSysRenderer_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -7304,7 +7310,7 @@ SWIGINTERN PyObject *_wrap_delete_iSndSysRenderer(PyObject *SWIGUNUSEDPARM(self)
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSndSysRenderer",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSndSysRenderer",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysRenderer, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSndSysRenderer" "', argument " "1"" of type '" "iSndSysRenderer *""'"); 
@@ -7321,7 +7327,7 @@ fail:
 
 SWIGINTERN PyObject *iSndSysRenderer_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSndSysRenderer, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -7337,7 +7343,7 @@ SWIGINTERN PyObject *_wrap_iSndSysRendererCallback_StreamAddNotification(PyObjec
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysRendererCallback_StreamAddNotification",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysRendererCallback_StreamAddNotification",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysRendererCallback, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysRendererCallback_StreamAddNotification" "', argument " "1"" of type '" "iSndSysRendererCallback *""'"); 
@@ -7367,7 +7373,7 @@ SWIGINTERN PyObject *_wrap_iSndSysRendererCallback_StreamRemoveNotification(PyOb
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysRendererCallback_StreamRemoveNotification",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysRendererCallback_StreamRemoveNotification",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysRendererCallback, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysRendererCallback_StreamRemoveNotification" "', argument " "1"" of type '" "iSndSysRendererCallback *""'"); 
@@ -7397,7 +7403,7 @@ SWIGINTERN PyObject *_wrap_iSndSysRendererCallback_SourceAddNotification(PyObjec
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysRendererCallback_SourceAddNotification",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysRendererCallback_SourceAddNotification",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysRendererCallback, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysRendererCallback_SourceAddNotification" "', argument " "1"" of type '" "iSndSysRendererCallback *""'"); 
@@ -7427,7 +7433,7 @@ SWIGINTERN PyObject *_wrap_iSndSysRendererCallback_SourceRemoveNotification(PyOb
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iSndSysRendererCallback_SourceRemoveNotification",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysRendererCallback_SourceRemoveNotification",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysRendererCallback, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysRendererCallback_SourceRemoveNotification" "', argument " "1"" of type '" "iSndSysRendererCallback *""'"); 
@@ -7453,7 +7459,7 @@ SWIGINTERN PyObject *_wrap_delete_iSndSysRendererCallback(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSndSysRendererCallback",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSndSysRendererCallback",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysRendererCallback, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSndSysRendererCallback" "', argument " "1"" of type '" "iSndSysRendererCallback *""'"); 
@@ -7470,7 +7476,7 @@ fail:
 
 SWIGINTERN PyObject *iSndSysRendererCallback_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSndSysRendererCallback, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -7491,7 +7497,7 @@ SWIGINTERN PyObject *_wrap_iSndSysRendererSoftware_AddOutputFilter(PyObject *SWI
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSndSysRendererSoftware_AddOutputFilter",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysRendererSoftware_AddOutputFilter",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysRendererSoftware, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysRendererSoftware_AddOutputFilter" "', argument " "1"" of type '" "iSndSysRendererSoftware *""'"); 
@@ -7531,7 +7537,7 @@ SWIGINTERN PyObject *_wrap_iSndSysRendererSoftware_RemoveOutputFilter(PyObject *
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSndSysRendererSoftware_RemoveOutputFilter",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysRendererSoftware_RemoveOutputFilter",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysRendererSoftware, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysRendererSoftware_RemoveOutputFilter" "', argument " "1"" of type '" "iSndSysRendererSoftware *""'"); 
@@ -7562,7 +7568,7 @@ SWIGINTERN PyObject *_wrap_delete_iSndSysRendererSoftware(PyObject *SWIGUNUSEDPA
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSndSysRendererSoftware",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSndSysRendererSoftware",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysRendererSoftware, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSndSysRendererSoftware" "', argument " "1"" of type '" "iSndSysRendererSoftware *""'"); 
@@ -7579,7 +7585,7 @@ fail:
 
 SWIGINTERN PyObject *iSndSysRendererSoftware_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSndSysRendererSoftware, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }
@@ -7600,7 +7606,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareDriver_Open(PyObject *SWIGUNUSEDPARM(s
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:iSndSysSoftwareDriver_Open",&obj0,&obj1,&obj2)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareDriver_Open",3,3,&obj0,&obj1,&obj2)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareDriver, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareDriver_Open" "', argument " "1"" of type '" "iSndSysSoftwareDriver *""'"); 
@@ -7631,7 +7637,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareDriver_Close(PyObject *SWIGUNUSEDPARM(
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysSoftwareDriver_Close",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareDriver_Close",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareDriver, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareDriver_Close" "', argument " "1"" of type '" "iSndSysSoftwareDriver *""'"); 
@@ -7653,7 +7659,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareDriver_StartThread(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysSoftwareDriver_StartThread",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareDriver_StartThread",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareDriver, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareDriver_StartThread" "', argument " "1"" of type '" "iSndSysSoftwareDriver *""'"); 
@@ -7674,7 +7680,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareDriver_StopThread(PyObject *SWIGUNUSED
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iSndSysSoftwareDriver_StopThread",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareDriver_StopThread",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareDriver, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iSndSysSoftwareDriver_StopThread" "', argument " "1"" of type '" "iSndSysSoftwareDriver *""'"); 
@@ -7692,7 +7698,7 @@ SWIGINTERN PyObject *_wrap_iSndSysSoftwareDriver_scfGetVersion(PyObject *SWIGUNU
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iSndSysSoftwareDriver_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iSndSysSoftwareDriver_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iSndSysSoftwareDriver_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -7708,7 +7714,7 @@ SWIGINTERN PyObject *_wrap_delete_iSndSysSoftwareDriver(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iSndSysSoftwareDriver",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iSndSysSoftwareDriver",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iSndSysSoftwareDriver, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iSndSysSoftwareDriver" "', argument " "1"" of type '" "iSndSysSoftwareDriver *""'"); 
@@ -7725,7 +7731,7 @@ fail:
 
 SWIGINTERN PyObject *iSndSysSoftwareDriver_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iSndSysSoftwareDriver, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }

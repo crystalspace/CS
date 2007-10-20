@@ -1395,50 +1395,20 @@ namespace lighter
     {
       //ok, have the sector, try to save all objects
       csSet<csString> savedObjects;
-      csRef<iDocumentNodeIterator> meshIt = sectorNode->GetNodes ("meshobj");
-      float nodeStep = 0.99f / meshIt->GetEndPosition ();
-      while (meshIt->HasNext ())
+      csRef<iDocumentNodeIterator> it = sectorNode->GetNodes ("meshobj");
+      float nodeStep = 1.0f / it->GetEndPosition ();
+      while (it->HasNext ())
       {
-        csRef<iDocumentNode> node = meshIt->Next ();
-        size_t nextPos = meshIt->GetNextPosition ();
+        csRef<iDocumentNode> node = it->Next ();
+        size_t nextPos = it->GetNextPosition ();
         SaveResult saveRes = SaveMeshObjectToDom (savedObjects, node, sector,
           fileInfo);
         if (saveRes == svRemoveItem)
           sectorNode->RemoveNode (node);
         progress.SetProgress (nextPos * nodeStep);
       }
-      
-      csRef<iDocumentNodeIterator> lightIt = sectorNode->GetNodes ("light");
-      while (lightIt->HasNext ())
-      {
-        csRef<iDocumentNode> node = lightIt->Next ();
-        SaveLight (node);
-      }
     }
     progress.SetProgress (1);
-  }
-
-  void Scene::SaveLight (iDocumentNode* lightNode)
-  {
-    bool hasStaticTag = false;
-    csRef<iDocumentNodeIterator> tagIt = lightNode->GetNodes ("tag");
-    while (tagIt->HasNext())
-    {
-      csRef<iDocumentNode> node = tagIt->Next ();
-      const char* tag = node->GetContentsValue ();
-      if (tag && (strcmp (tag, "static") == 0))
-      {
-        hasStaticTag = true;
-        break;
-      }
-    }
-    if (!hasStaticTag)
-    {
-      csRef<iDocumentNode> tagNode =
-        lightNode->CreateNodeBefore (CS_NODE_ELEMENT);
-      tagNode->SetValue ("tag");
-      tagNode->CreateNodeBefore (CS_NODE_TEXT)->SetValue ("static");
-    }
   }
 
   Scene::SaveResult Scene::SaveMeshObjectToDom (csSet<csString>& savedObjects, 
@@ -1595,12 +1565,12 @@ namespace lighter
         csString lmID (key->GetLightID ().HexString());
         csString textureFilename;
         if (subNum == 0)
-          textureFilename.Format ("lightmaps/%s_%u_%u.png", 
-            fileInfo->levelName.GetData(), i, (uint)pdlightNums.Request (lmID));
+          textureFilename.Format ("lightmaps/%s_%u_%zu.png", 
+            fileInfo->levelName.GetData(), i, pdlightNums.Request (lmID));
         else
-          textureFilename.Format ("lightmaps/%s_%u_%u_d%zu.png", 
+          textureFilename.Format ("lightmaps/%s_%u_%zu_d%zu.png", 
             fileInfo->levelName.GetData(), i % realNumLMs, 
-            (uint)pdlightNums.Request (lmID), subNum);
+            pdlightNums.Request (lmID), subNum);
 
         {
           // Texture file name is relative to world file

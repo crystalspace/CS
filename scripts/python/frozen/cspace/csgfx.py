@@ -2,7 +2,6 @@
 # Version 1.3.31
 #
 # Don't modify this file, modify the SWIG interface instead.
-# This file is compatible with both classic and new-style classes.
 
 import _csgfx
 import new
@@ -48,6 +47,16 @@ except AttributeError:
 del types
 
 
+def _swig_setattr_nondynamic_method(set):
+    def set_attr(self,name,value):
+        if (name == "thisown"): return self.this.own(value)
+        if hasattr(self,name) or (name == "this"):
+            set(self,name,value)
+        else:
+            raise AttributeError("You cannot add attributes to %s" % self)
+    return set_attr
+
+
 import core
 _SetSCFPointer = _csgfx._SetSCFPointer
 _GetSCFPointer = _csgfx._GetSCFPointer
@@ -56,21 +65,12 @@ if not "core" in dir():
 core.AddSCFLink(_SetSCFPointer)
 CSMutableArrayHelper = core.CSMutableArrayHelper
 
-class csRGBcolor(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csRGBcolor, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csRGBcolor, name)
+class csRGBcolor(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["red"] = _csgfx.csRGBcolor_red_set
-    __swig_getmethods__["red"] = _csgfx.csRGBcolor_red_get
-    if _newclass:red = _swig_property(_csgfx.csRGBcolor_red_get, _csgfx.csRGBcolor_red_set)
-    __swig_setmethods__["green"] = _csgfx.csRGBcolor_green_set
-    __swig_getmethods__["green"] = _csgfx.csRGBcolor_green_get
-    if _newclass:green = _swig_property(_csgfx.csRGBcolor_green_get, _csgfx.csRGBcolor_green_set)
-    __swig_setmethods__["blue"] = _csgfx.csRGBcolor_blue_set
-    __swig_getmethods__["blue"] = _csgfx.csRGBcolor_blue_get
-    if _newclass:blue = _swig_property(_csgfx.csRGBcolor_blue_get, _csgfx.csRGBcolor_blue_set)
+    red = _swig_property(_csgfx.csRGBcolor_red_get, _csgfx.csRGBcolor_red_set)
+    green = _swig_property(_csgfx.csRGBcolor_green_get, _csgfx.csRGBcolor_green_set)
+    blue = _swig_property(_csgfx.csRGBcolor_blue_get, _csgfx.csRGBcolor_blue_set)
     def __init__(self, *args): 
         this = _csgfx.new_csRGBcolor(*args)
         try: self.this.append(this)
@@ -86,24 +86,13 @@ class csRGBcolor(_object):
 csRGBcolor_swigregister = _csgfx.csRGBcolor_swigregister
 csRGBcolor_swigregister(csRGBcolor)
 
-class csRGBpixel(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csRGBpixel, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csRGBpixel, name)
+class csRGBpixel(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["red"] = _csgfx.csRGBpixel_red_set
-    __swig_getmethods__["red"] = _csgfx.csRGBpixel_red_get
-    if _newclass:red = _swig_property(_csgfx.csRGBpixel_red_get, _csgfx.csRGBpixel_red_set)
-    __swig_setmethods__["green"] = _csgfx.csRGBpixel_green_set
-    __swig_getmethods__["green"] = _csgfx.csRGBpixel_green_get
-    if _newclass:green = _swig_property(_csgfx.csRGBpixel_green_get, _csgfx.csRGBpixel_green_set)
-    __swig_setmethods__["blue"] = _csgfx.csRGBpixel_blue_set
-    __swig_getmethods__["blue"] = _csgfx.csRGBpixel_blue_get
-    if _newclass:blue = _swig_property(_csgfx.csRGBpixel_blue_get, _csgfx.csRGBpixel_blue_set)
-    __swig_setmethods__["alpha"] = _csgfx.csRGBpixel_alpha_set
-    __swig_getmethods__["alpha"] = _csgfx.csRGBpixel_alpha_get
-    if _newclass:alpha = _swig_property(_csgfx.csRGBpixel_alpha_get, _csgfx.csRGBpixel_alpha_set)
+    red = _swig_property(_csgfx.csRGBpixel_red_get, _csgfx.csRGBpixel_red_set)
+    green = _swig_property(_csgfx.csRGBpixel_green_get, _csgfx.csRGBpixel_green_set)
+    blue = _swig_property(_csgfx.csRGBpixel_blue_get, _csgfx.csRGBpixel_blue_set)
+    alpha = _swig_property(_csgfx.csRGBpixel_alpha_get, _csgfx.csRGBpixel_alpha_set)
     def __init__(self, *args): 
         this = _csgfx.new_csRGBpixel(*args)
         try: self.this.append(this)
@@ -130,12 +119,7 @@ R_COEF_SQ = _csgfx.R_COEF_SQ
 G_COEF_SQ = _csgfx.G_COEF_SQ
 B_COEF_SQ = _csgfx.B_COEF_SQ
 class iShaderVariableAccessor(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iShaderVariableAccessor, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iShaderVariableAccessor, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def PreGetValue(*args): return _csgfx.iShaderVariableAccessor_PreGetValue(*args)
@@ -145,12 +129,7 @@ iShaderVariableAccessor_swigregister = _csgfx.iShaderVariableAccessor_swigregist
 iShaderVariableAccessor_swigregister(iShaderVariableAccessor)
 
 class csShaderVariable(core.csRefCount):
-    __swig_setmethods__ = {}
-    for _s in [core.csRefCount]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csShaderVariable, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.csRefCount]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csShaderVariable, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     UNKNOWN = _csgfx.csShaderVariable_UNKNOWN
     INT = _csgfx.csShaderVariable_INT
@@ -188,12 +167,7 @@ csShaderVariable_swigregister = _csgfx.csShaderVariable_swigregister
 csShaderVariable_swigregister(csShaderVariable)
 
 class csShaderVariableArrayReadOnly(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csShaderVariableArrayReadOnly, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csShaderVariableArrayReadOnly, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetSize(*args): return _csgfx.csShaderVariableArrayReadOnly_GetSize(*args)
@@ -209,12 +183,7 @@ csShaderVariableArrayReadOnly_swigregister = _csgfx.csShaderVariableArrayReadOnl
 csShaderVariableArrayReadOnly_swigregister(csShaderVariableArrayReadOnly)
 
 class csShaderVariableArrayChangeElements(csShaderVariableArrayReadOnly):
-    __swig_setmethods__ = {}
-    for _s in [csShaderVariableArrayReadOnly]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csShaderVariableArrayChangeElements, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csShaderVariableArrayReadOnly]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csShaderVariableArrayChangeElements, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Get(*args): return _csgfx.csShaderVariableArrayChangeElements_Get(*args)
@@ -225,12 +194,7 @@ csShaderVariableArrayChangeElements_swigregister = _csgfx.csShaderVariableArrayC
 csShaderVariableArrayChangeElements_swigregister(csShaderVariableArrayChangeElements)
 
 class csShaderVariableArrayChangeAll(csShaderVariableArrayChangeElements):
-    __swig_setmethods__ = {}
-    for _s in [csShaderVariableArrayChangeElements]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csShaderVariableArrayChangeAll, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csShaderVariableArrayChangeElements]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csShaderVariableArrayChangeAll, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetSize(*args): return _csgfx.csShaderVariableArrayChangeAll_SetSize(*args)
@@ -252,12 +216,7 @@ csShaderVariableArrayChangeAll_swigregister = _csgfx.csShaderVariableArrayChange
 csShaderVariableArrayChangeAll_swigregister(csShaderVariableArrayChangeAll)
 
 class csImageBaseBase(core.iImage):
-    __swig_setmethods__ = {}
-    for _s in [core.iImage]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csImageBaseBase, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iImage]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csImageBaseBase, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def IncRef(*args): return _csgfx.csImageBaseBase_IncRef(*args)
@@ -271,12 +230,7 @@ csImageBaseBase_swigregister = _csgfx.csImageBaseBase_swigregister
 csImageBaseBase_swigregister(csImageBaseBase)
 
 class csImageBase(csImageBaseBase):
-    __swig_setmethods__ = {}
-    for _s in [csImageBaseBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csImageBase, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csImageBaseBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csImageBase, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     __swig_destroy__ = _csgfx.delete_csImageBase
@@ -299,12 +253,7 @@ csImageBase_swigregister = _csgfx.csImageBase_swigregister
 csImageBase_swigregister(csImageBase)
 
 class csImageMemoryBase(csImageBase):
-    __swig_setmethods__ = {}
-    for _s in [csImageBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csImageMemoryBase, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csImageBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csImageMemoryBase, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def IncRef(*args): return _csgfx.csImageMemoryBase_IncRef(*args)
@@ -318,12 +267,7 @@ csImageMemoryBase_swigregister = _csgfx.csImageMemoryBase_swigregister
 csImageMemoryBase_swigregister(csImageMemoryBase)
 
 class csImageMemory(csImageMemoryBase):
-    __swig_setmethods__ = {}
-    for _s in [csImageMemoryBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csImageMemory, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csImageMemoryBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csImageMemory, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgfx.new_csImageMemory(*args)

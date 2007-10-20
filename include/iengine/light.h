@@ -30,7 +30,6 @@
 #include "csutil/scf.h"
 
 #include "iengine/fview.h"
-#include "iutil/strset.h"
 
 class csColor;
 class csFlags;
@@ -231,7 +230,7 @@ struct iLightCallback : public virtual iBase
  */
 struct iLight : public virtual iBase
 {
-  SCF_INTERFACE(iLight,2,0,1);
+  SCF_INTERFACE(iLight,2,0,0);
   /// Get the id of this light. This is a 16-byte MD5.
   virtual const char* GetLightID () = 0;
 
@@ -414,12 +413,6 @@ struct iLight : public virtual iBase
    * Get the shader variable context of the light.
    */
   virtual iShaderVariableContext* GetSVContext() = 0;
-  
-  virtual void AddLightTag (csStringID tag) = 0;
-  virtual void RemoveTag (csStringID tag) = 0;
-  virtual bool IsTagSet (csStringID tag) = 0;
-  virtual size_t GetTagCount () = 0;
-  virtual void GetTags (csStringID* tags) = 0;
 };
 
 /**

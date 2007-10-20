@@ -801,8 +801,6 @@ public:
   // \todo move back to private and make accessible
   csRef<iShader> defaultShader;
 
-  uint GetLightTagNumber (csStringID tag);
-  csStringID GetLightTagString (uint num);
 private:
 
   // -- PRIVATE MEMBERS
@@ -991,11 +989,6 @@ private:
    * There is a different list for every distinct camera instance.
    */
   csHash<csImposterUpdateQueue,long> imposterUpdateQueue;
-  
-  /// Mapping of string IDs to internal light tag numbers
-  csHashReversible<uint, csStringID> lightTags;
-  /// Next light tag number to be given to a new tag
-  uint nextLightTag;
 
   CS_DECLARE_SYSTEM_EVENT_SHORTCUTS;
   csEventID CanvasResize;

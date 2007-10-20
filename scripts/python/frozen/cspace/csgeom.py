@@ -2,7 +2,6 @@
 # Version 1.3.31
 #
 # Don't modify this file, modify the SWIG interface instead.
-# This file is compatible with both classic and new-style classes.
 
 import _csgeom
 import new
@@ -48,6 +47,16 @@ except AttributeError:
 del types
 
 
+def _swig_setattr_nondynamic_method(set):
+    def set_attr(self,name,value):
+        if (name == "thisown"): return self.this.own(value)
+        if hasattr(self,name) or (name == "this"):
+            set(self,name,value)
+        else:
+            raise AttributeError("You cannot add attributes to %s" % self)
+    return set_attr
+
+
 import core
 _SetSCFPointer = _csgeom._SetSCFPointer
 _GetSCFPointer = _csgeom._GetSCFPointer
@@ -56,18 +65,11 @@ if not "core" in dir():
 core.AddSCFLink(_SetSCFPointer)
 CSMutableArrayHelper = core.CSMutableArrayHelper
 
-class csVector2(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csVector2, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csVector2, name)
+class csVector2(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["x"] = _csgeom.csVector2_x_set
-    __swig_getmethods__["x"] = _csgeom.csVector2_x_get
-    if _newclass:x = _swig_property(_csgeom.csVector2_x_get, _csgeom.csVector2_x_set)
-    __swig_setmethods__["y"] = _csgeom.csVector2_y_set
-    __swig_getmethods__["y"] = _csgeom.csVector2_y_get
-    if _newclass:y = _swig_property(_csgeom.csVector2_y_get, _csgeom.csVector2_y_set)
+    x = _swig_property(_csgeom.csVector2_x_get, _csgeom.csVector2_x_set)
+    y = _swig_property(_csgeom.csVector2_y_get, _csgeom.csVector2_y_set)
     def __init__(self, *args): 
         this = _csgeom.new_csVector2(*args)
         try: self.this.append(this)
@@ -112,21 +114,12 @@ CS_AXIS_X = _csgeom.CS_AXIS_X
 CS_AXIS_Y = _csgeom.CS_AXIS_Y
 CS_AXIS_Z = _csgeom.CS_AXIS_Z
 CS_AXIS_W = _csgeom.CS_AXIS_W
-class csVector3(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csVector3, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csVector3, name)
+class csVector3(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["x"] = _csgeom.csVector3_x_set
-    __swig_getmethods__["x"] = _csgeom.csVector3_x_get
-    if _newclass:x = _swig_property(_csgeom.csVector3_x_get, _csgeom.csVector3_x_set)
-    __swig_setmethods__["y"] = _csgeom.csVector3_y_set
-    __swig_getmethods__["y"] = _csgeom.csVector3_y_get
-    if _newclass:y = _swig_property(_csgeom.csVector3_y_get, _csgeom.csVector3_y_set)
-    __swig_setmethods__["z"] = _csgeom.csVector3_z_set
-    __swig_getmethods__["z"] = _csgeom.csVector3_z_get
-    if _newclass:z = _swig_property(_csgeom.csVector3_z_get, _csgeom.csVector3_z_set)
+    x = _swig_property(_csgeom.csVector3_x_get, _csgeom.csVector3_x_set)
+    y = _swig_property(_csgeom.csVector3_y_get, _csgeom.csVector3_y_set)
+    z = _swig_property(_csgeom.csVector3_z_get, _csgeom.csVector3_z_set)
     def __init__(self, *args): 
         this = _csgeom.new_csVector3(*args)
         try: self.this.append(this)
@@ -173,12 +166,7 @@ csVector3_swigregister = _csgeom.csVector3_swigregister
 csVector3_swigregister(csVector3)
 
 class csVector3ArrayReadOnly(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csVector3ArrayReadOnly, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csVector3ArrayReadOnly, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetSize(*args): return _csgeom.csVector3ArrayReadOnly_GetSize(*args)
@@ -194,12 +182,7 @@ csVector3ArrayReadOnly_swigregister = _csgeom.csVector3ArrayReadOnly_swigregiste
 csVector3ArrayReadOnly_swigregister(csVector3ArrayReadOnly)
 
 class csVector3ArrayChangeElements(csVector3ArrayReadOnly):
-    __swig_setmethods__ = {}
-    for _s in [csVector3ArrayReadOnly]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csVector3ArrayChangeElements, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csVector3ArrayReadOnly]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csVector3ArrayChangeElements, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Get(*args): return _csgeom.csVector3ArrayChangeElements_Get(*args)
@@ -210,12 +193,7 @@ csVector3ArrayChangeElements_swigregister = _csgeom.csVector3ArrayChangeElements
 csVector3ArrayChangeElements_swigregister(csVector3ArrayChangeElements)
 
 class csVector3ArrayChangeAll(csVector3ArrayChangeElements):
-    __swig_setmethods__ = {}
-    for _s in [csVector3ArrayChangeElements]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csVector3ArrayChangeAll, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csVector3ArrayChangeElements]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csVector3ArrayChangeAll, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetSize(*args): return _csgeom.csVector3ArrayChangeAll_SetSize(*args)
@@ -236,24 +214,13 @@ class csVector3ArrayChangeAll(csVector3ArrayChangeElements):
 csVector3ArrayChangeAll_swigregister = _csgeom.csVector3ArrayChangeAll_swigregister
 csVector3ArrayChangeAll_swigregister(csVector3ArrayChangeAll)
 
-class csVector4Float(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csVector4Float, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csVector4Float, name)
+class csVector4Float(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["x"] = _csgeom.csVector4Float_x_set
-    __swig_getmethods__["x"] = _csgeom.csVector4Float_x_get
-    if _newclass:x = _swig_property(_csgeom.csVector4Float_x_get, _csgeom.csVector4Float_x_set)
-    __swig_setmethods__["y"] = _csgeom.csVector4Float_y_set
-    __swig_getmethods__["y"] = _csgeom.csVector4Float_y_get
-    if _newclass:y = _swig_property(_csgeom.csVector4Float_y_get, _csgeom.csVector4Float_y_set)
-    __swig_setmethods__["z"] = _csgeom.csVector4Float_z_set
-    __swig_getmethods__["z"] = _csgeom.csVector4Float_z_get
-    if _newclass:z = _swig_property(_csgeom.csVector4Float_z_get, _csgeom.csVector4Float_z_set)
-    __swig_setmethods__["w"] = _csgeom.csVector4Float_w_set
-    __swig_getmethods__["w"] = _csgeom.csVector4Float_w_get
-    if _newclass:w = _swig_property(_csgeom.csVector4Float_w_get, _csgeom.csVector4Float_w_set)
+    x = _swig_property(_csgeom.csVector4Float_x_get, _csgeom.csVector4Float_x_set)
+    y = _swig_property(_csgeom.csVector4Float_y_get, _csgeom.csVector4Float_y_set)
+    z = _swig_property(_csgeom.csVector4Float_z_get, _csgeom.csVector4Float_z_set)
+    w = _swig_property(_csgeom.csVector4Float_w_get, _csgeom.csVector4Float_w_set)
     def __init__(self, *args): 
         this = _csgeom.new_csVector4Float(*args)
         try: self.this.append(this)
@@ -264,12 +231,7 @@ csVector4Float_swigregister = _csgeom.csVector4Float_swigregister
 csVector4Float_swigregister(csVector4Float)
 
 class csVector4(csVector4Float):
-    __swig_setmethods__ = {}
-    for _s in [csVector4Float]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csVector4, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csVector4Float]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csVector4, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csVector4(*args)
@@ -299,24 +261,13 @@ class csVector4(csVector4Float):
 csVector4_swigregister = _csgeom.csVector4_swigregister
 csVector4_swigregister(csVector4)
 
-class csMatrix2(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csMatrix2, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csMatrix2, name)
+class csMatrix2(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["m11"] = _csgeom.csMatrix2_m11_set
-    __swig_getmethods__["m11"] = _csgeom.csMatrix2_m11_get
-    if _newclass:m11 = _swig_property(_csgeom.csMatrix2_m11_get, _csgeom.csMatrix2_m11_set)
-    __swig_setmethods__["m12"] = _csgeom.csMatrix2_m12_set
-    __swig_getmethods__["m12"] = _csgeom.csMatrix2_m12_get
-    if _newclass:m12 = _swig_property(_csgeom.csMatrix2_m12_get, _csgeom.csMatrix2_m12_set)
-    __swig_setmethods__["m21"] = _csgeom.csMatrix2_m21_set
-    __swig_getmethods__["m21"] = _csgeom.csMatrix2_m21_get
-    if _newclass:m21 = _swig_property(_csgeom.csMatrix2_m21_get, _csgeom.csMatrix2_m21_set)
-    __swig_setmethods__["m22"] = _csgeom.csMatrix2_m22_set
-    __swig_getmethods__["m22"] = _csgeom.csMatrix2_m22_get
-    if _newclass:m22 = _swig_property(_csgeom.csMatrix2_m22_get, _csgeom.csMatrix2_m22_set)
+    m11 = _swig_property(_csgeom.csMatrix2_m11_get, _csgeom.csMatrix2_m11_set)
+    m12 = _swig_property(_csgeom.csMatrix2_m12_get, _csgeom.csMatrix2_m12_set)
+    m21 = _swig_property(_csgeom.csMatrix2_m21_get, _csgeom.csMatrix2_m21_set)
+    m22 = _swig_property(_csgeom.csMatrix2_m22_get, _csgeom.csMatrix2_m22_set)
     def __init__(self, *args): 
         this = _csgeom.new_csMatrix2(*args)
         try: self.this.append(this)
@@ -348,39 +299,18 @@ class csMatrix2(_object):
 csMatrix2_swigregister = _csgeom.csMatrix2_swigregister
 csMatrix2_swigregister(csMatrix2)
 
-class csMatrix3(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csMatrix3, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csMatrix3, name)
+class csMatrix3(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["m11"] = _csgeom.csMatrix3_m11_set
-    __swig_getmethods__["m11"] = _csgeom.csMatrix3_m11_get
-    if _newclass:m11 = _swig_property(_csgeom.csMatrix3_m11_get, _csgeom.csMatrix3_m11_set)
-    __swig_setmethods__["m12"] = _csgeom.csMatrix3_m12_set
-    __swig_getmethods__["m12"] = _csgeom.csMatrix3_m12_get
-    if _newclass:m12 = _swig_property(_csgeom.csMatrix3_m12_get, _csgeom.csMatrix3_m12_set)
-    __swig_setmethods__["m13"] = _csgeom.csMatrix3_m13_set
-    __swig_getmethods__["m13"] = _csgeom.csMatrix3_m13_get
-    if _newclass:m13 = _swig_property(_csgeom.csMatrix3_m13_get, _csgeom.csMatrix3_m13_set)
-    __swig_setmethods__["m21"] = _csgeom.csMatrix3_m21_set
-    __swig_getmethods__["m21"] = _csgeom.csMatrix3_m21_get
-    if _newclass:m21 = _swig_property(_csgeom.csMatrix3_m21_get, _csgeom.csMatrix3_m21_set)
-    __swig_setmethods__["m22"] = _csgeom.csMatrix3_m22_set
-    __swig_getmethods__["m22"] = _csgeom.csMatrix3_m22_get
-    if _newclass:m22 = _swig_property(_csgeom.csMatrix3_m22_get, _csgeom.csMatrix3_m22_set)
-    __swig_setmethods__["m23"] = _csgeom.csMatrix3_m23_set
-    __swig_getmethods__["m23"] = _csgeom.csMatrix3_m23_get
-    if _newclass:m23 = _swig_property(_csgeom.csMatrix3_m23_get, _csgeom.csMatrix3_m23_set)
-    __swig_setmethods__["m31"] = _csgeom.csMatrix3_m31_set
-    __swig_getmethods__["m31"] = _csgeom.csMatrix3_m31_get
-    if _newclass:m31 = _swig_property(_csgeom.csMatrix3_m31_get, _csgeom.csMatrix3_m31_set)
-    __swig_setmethods__["m32"] = _csgeom.csMatrix3_m32_set
-    __swig_getmethods__["m32"] = _csgeom.csMatrix3_m32_get
-    if _newclass:m32 = _swig_property(_csgeom.csMatrix3_m32_get, _csgeom.csMatrix3_m32_set)
-    __swig_setmethods__["m33"] = _csgeom.csMatrix3_m33_set
-    __swig_getmethods__["m33"] = _csgeom.csMatrix3_m33_get
-    if _newclass:m33 = _swig_property(_csgeom.csMatrix3_m33_get, _csgeom.csMatrix3_m33_set)
+    m11 = _swig_property(_csgeom.csMatrix3_m11_get, _csgeom.csMatrix3_m11_set)
+    m12 = _swig_property(_csgeom.csMatrix3_m12_get, _csgeom.csMatrix3_m12_set)
+    m13 = _swig_property(_csgeom.csMatrix3_m13_get, _csgeom.csMatrix3_m13_set)
+    m21 = _swig_property(_csgeom.csMatrix3_m21_get, _csgeom.csMatrix3_m21_set)
+    m22 = _swig_property(_csgeom.csMatrix3_m22_get, _csgeom.csMatrix3_m22_set)
+    m23 = _swig_property(_csgeom.csMatrix3_m23_get, _csgeom.csMatrix3_m23_set)
+    m31 = _swig_property(_csgeom.csMatrix3_m31_get, _csgeom.csMatrix3_m31_set)
+    m32 = _swig_property(_csgeom.csMatrix3_m32_get, _csgeom.csMatrix3_m32_set)
+    m33 = _swig_property(_csgeom.csMatrix3_m33_get, _csgeom.csMatrix3_m33_set)
     def __init__(self, *args): 
         this = _csgeom.new_csMatrix3(*args)
         try: self.this.append(this)
@@ -428,12 +358,7 @@ csMatrix3_swigregister = _csgeom.csMatrix3_swigregister
 csMatrix3_swigregister(csMatrix3)
 
 class csXRotMatrix3(csMatrix3):
-    __swig_setmethods__ = {}
-    for _s in [csMatrix3]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csXRotMatrix3, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csMatrix3]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csXRotMatrix3, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csXRotMatrix3(*args)
@@ -445,12 +370,7 @@ csXRotMatrix3_swigregister = _csgeom.csXRotMatrix3_swigregister
 csXRotMatrix3_swigregister(csXRotMatrix3)
 
 class csYRotMatrix3(csMatrix3):
-    __swig_setmethods__ = {}
-    for _s in [csMatrix3]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csYRotMatrix3, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csMatrix3]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csYRotMatrix3, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csYRotMatrix3(*args)
@@ -462,12 +382,7 @@ csYRotMatrix3_swigregister = _csgeom.csYRotMatrix3_swigregister
 csYRotMatrix3_swigregister(csYRotMatrix3)
 
 class csZRotMatrix3(csMatrix3):
-    __swig_setmethods__ = {}
-    for _s in [csMatrix3]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csZRotMatrix3, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csMatrix3]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csZRotMatrix3, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csZRotMatrix3(*args)
@@ -479,12 +394,7 @@ csZRotMatrix3_swigregister = _csgeom.csZRotMatrix3_swigregister
 csZRotMatrix3_swigregister(csZRotMatrix3)
 
 class csXScaleMatrix3(csMatrix3):
-    __swig_setmethods__ = {}
-    for _s in [csMatrix3]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csXScaleMatrix3, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csMatrix3]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csXScaleMatrix3, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csXScaleMatrix3(*args)
@@ -496,12 +406,7 @@ csXScaleMatrix3_swigregister = _csgeom.csXScaleMatrix3_swigregister
 csXScaleMatrix3_swigregister(csXScaleMatrix3)
 
 class csYScaleMatrix3(csMatrix3):
-    __swig_setmethods__ = {}
-    for _s in [csMatrix3]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csYScaleMatrix3, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csMatrix3]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csYScaleMatrix3, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csYScaleMatrix3(*args)
@@ -513,12 +418,7 @@ csYScaleMatrix3_swigregister = _csgeom.csYScaleMatrix3_swigregister
 csYScaleMatrix3_swigregister(csYScaleMatrix3)
 
 class csZScaleMatrix3(csMatrix3):
-    __swig_setmethods__ = {}
-    for _s in [csMatrix3]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csZScaleMatrix3, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csMatrix3]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csZScaleMatrix3, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csZScaleMatrix3(*args)
@@ -529,11 +429,8 @@ class csZScaleMatrix3(csMatrix3):
 csZScaleMatrix3_swigregister = _csgeom.csZScaleMatrix3_swigregister
 csZScaleMatrix3_swigregister(csZScaleMatrix3)
 
-class csTransform(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csTransform, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csTransform, name)
+class csTransform(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     __swig_destroy__ = _csgeom.delete_csTransform
     __del__ = lambda self : None;
@@ -553,8 +450,7 @@ class csTransform(_object):
     def Translate(*args): return _csgeom.csTransform_Translate(*args)
     def Other2ThisRelative(*args): return _csgeom.csTransform_Other2ThisRelative(*args)
     def Other2This(*args): return _csgeom.csTransform_Other2This(*args)
-    __swig_getmethods__["GetReflect"] = lambda x: _csgeom.csTransform_GetReflect
-    if _newclass:GetReflect = staticmethod(_csgeom.csTransform_GetReflect)
+    GetReflect = staticmethod(_csgeom.csTransform_GetReflect)
     def GetFront(*args): return _csgeom.csTransform_GetFront(*args)
     def GetUp(*args): return _csgeom.csTransform_GetUp(*args)
     def GetRight(*args): return _csgeom.csTransform_GetRight(*args)
@@ -571,12 +467,7 @@ csTransform_swigregister(csTransform)
 csTransform_GetReflect = _csgeom.csTransform_GetReflect
 
 class csReversibleTransform(csTransform):
-    __swig_setmethods__ = {}
-    for _s in [csTransform]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csReversibleTransform, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csTransform]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csReversibleTransform, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csReversibleTransform(*args)
@@ -602,12 +493,7 @@ csReversibleTransform_swigregister = _csgeom.csReversibleTransform_swigregister
 csReversibleTransform_swigregister(csReversibleTransform)
 
 class csOrthoTransform(csReversibleTransform):
-    __swig_setmethods__ = {}
-    for _s in [csReversibleTransform]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csOrthoTransform, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csReversibleTransform]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csOrthoTransform, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csOrthoTransform(*args)
@@ -620,11 +506,8 @@ class csOrthoTransform(csReversibleTransform):
 csOrthoTransform_swigregister = _csgeom.csOrthoTransform_swigregister
 csOrthoTransform_swigregister(csOrthoTransform)
 
-class csSphere(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csSphere, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csSphere, name)
+class csSphere(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csSphere(*args)
@@ -644,11 +527,8 @@ class csSphere(_object):
 csSphere_swigregister = _csgeom.csSphere_swigregister
 csSphere_swigregister(csSphere)
 
-class csEllipsoid(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csEllipsoid, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csEllipsoid, name)
+class csEllipsoid(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csEllipsoid(*args)
@@ -666,18 +546,11 @@ csEllipsoid_swigregister(csEllipsoid)
 CS_POLY_IN = _csgeom.CS_POLY_IN
 CS_POLY_ON = _csgeom.CS_POLY_ON
 CS_POLY_OUT = _csgeom.CS_POLY_OUT
-class csPlane2(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csPlane2, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csPlane2, name)
+class csPlane2(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["norm"] = _csgeom.csPlane2_norm_set
-    __swig_getmethods__["norm"] = _csgeom.csPlane2_norm_get
-    if _newclass:norm = _swig_property(_csgeom.csPlane2_norm_get, _csgeom.csPlane2_norm_set)
-    __swig_setmethods__["CC"] = _csgeom.csPlane2_CC_set
-    __swig_getmethods__["CC"] = _csgeom.csPlane2_CC_get
-    if _newclass:CC = _swig_property(_csgeom.csPlane2_CC_get, _csgeom.csPlane2_CC_set)
+    norm = _swig_property(_csgeom.csPlane2_norm_get, _csgeom.csPlane2_norm_set)
+    CC = _swig_property(_csgeom.csPlane2_CC_get, _csgeom.csPlane2_CC_set)
     def __init__(self, *args): 
         this = _csgeom.new_csPlane2(*args)
         try: self.this.append(this)
@@ -688,8 +561,7 @@ class csPlane2(_object):
     def B(*args): return _csgeom.csPlane2_B(*args)
     def C(*args): return _csgeom.csPlane2_C(*args)
     def Set(*args): return _csgeom.csPlane2_Set(*args)
-    __swig_getmethods__["Classify"] = lambda x: _csgeom.csPlane2_Classify
-    if _newclass:Classify = staticmethod(_csgeom.csPlane2_Classify)
+    Classify = staticmethod(_csgeom.csPlane2_Classify)
     def Distance(*args): return _csgeom.csPlane2_Distance(*args)
     def SquaredDistance(*args): return _csgeom.csPlane2_SquaredDistance(*args)
     def Invert(*args): return _csgeom.csPlane2_Invert(*args)
@@ -700,18 +572,11 @@ csPlane2_swigregister = _csgeom.csPlane2_swigregister
 csPlane2_swigregister(csPlane2)
 csPlane2_Classify = _csgeom.csPlane2_Classify
 
-class csPlane3(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csPlane3, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csPlane3, name)
+class csPlane3(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["norm"] = _csgeom.csPlane3_norm_set
-    __swig_getmethods__["norm"] = _csgeom.csPlane3_norm_get
-    if _newclass:norm = _swig_property(_csgeom.csPlane3_norm_get, _csgeom.csPlane3_norm_set)
-    __swig_setmethods__["DD"] = _csgeom.csPlane3_DD_set
-    __swig_getmethods__["DD"] = _csgeom.csPlane3_DD_get
-    if _newclass:DD = _swig_property(_csgeom.csPlane3_DD_get, _csgeom.csPlane3_DD_set)
+    norm = _swig_property(_csgeom.csPlane3_norm_get, _csgeom.csPlane3_norm_set)
+    DD = _swig_property(_csgeom.csPlane3_DD_get, _csgeom.csPlane3_DD_set)
     def __init__(self, *args): 
         this = _csgeom.new_csPlane3(*args)
         try: self.this.append(this)
@@ -725,14 +590,12 @@ class csPlane3(_object):
     def GetNormal(*args): return _csgeom.csPlane3_GetNormal(*args)
     def Set(*args): return _csgeom.csPlane3_Set(*args)
     def SetOrigin(*args): return _csgeom.csPlane3_SetOrigin(*args)
-    __swig_getmethods__["Classify"] = lambda x: _csgeom.csPlane3_Classify
-    if _newclass:Classify = staticmethod(_csgeom.csPlane3_Classify)
+    Classify = staticmethod(_csgeom.csPlane3_Classify)
     def Distance(*args): return _csgeom.csPlane3_Distance(*args)
     def Invert(*args): return _csgeom.csPlane3_Invert(*args)
     def Normalize(*args): return _csgeom.csPlane3_Normalize(*args)
     def FindPoint(*args): return _csgeom.csPlane3_FindPoint(*args)
-    __swig_getmethods__["FindOrthogonalPoints"] = lambda x: _csgeom.csPlane3_FindOrthogonalPoints
-    if _newclass:FindOrthogonalPoints = staticmethod(_csgeom.csPlane3_FindOrthogonalPoints)
+    FindOrthogonalPoints = staticmethod(_csgeom.csPlane3_FindOrthogonalPoints)
     def ClipPolygon(*args): return _csgeom.csPlane3_ClipPolygon(*args)
     def Description(*args): return _csgeom.csPlane3_Description(*args)
     def __imul__(*args): return _csgeom.csPlane3___imul__(*args)
@@ -745,28 +608,17 @@ csPlane3_swigregister(csPlane3)
 csPlane3_Classify = _csgeom.csPlane3_Classify
 csPlane3_FindOrthogonalPoints = _csgeom.csPlane3_FindOrthogonalPoints
 
-class csMath2(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csMath2, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csMath2, name)
+class csMath2(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_getmethods__["WhichSide2D"] = lambda x: _csgeom.csMath2_WhichSide2D
-    if _newclass:WhichSide2D = staticmethod(_csgeom.csMath2_WhichSide2D)
-    __swig_getmethods__["InPoly2D"] = lambda x: _csgeom.csMath2_InPoly2D
-    if _newclass:InPoly2D = staticmethod(_csgeom.csMath2_InPoly2D)
-    __swig_getmethods__["Area2"] = lambda x: _csgeom.csMath2_Area2
-    if _newclass:Area2 = staticmethod(_csgeom.csMath2_Area2)
-    __swig_getmethods__["Right"] = lambda x: _csgeom.csMath2_Right
-    if _newclass:Right = staticmethod(_csgeom.csMath2_Right)
-    __swig_getmethods__["Left"] = lambda x: _csgeom.csMath2_Left
-    if _newclass:Left = staticmethod(_csgeom.csMath2_Left)
-    __swig_getmethods__["Visible"] = lambda x: _csgeom.csMath2_Visible
-    if _newclass:Visible = staticmethod(_csgeom.csMath2_Visible)
-    __swig_getmethods__["PlanesEqual"] = lambda x: _csgeom.csMath2_PlanesEqual
-    if _newclass:PlanesEqual = staticmethod(_csgeom.csMath2_PlanesEqual)
-    __swig_getmethods__["PlanesClose"] = lambda x: _csgeom.csMath2_PlanesClose
-    if _newclass:PlanesClose = staticmethod(_csgeom.csMath2_PlanesClose)
+    WhichSide2D = staticmethod(_csgeom.csMath2_WhichSide2D)
+    InPoly2D = staticmethod(_csgeom.csMath2_InPoly2D)
+    Area2 = staticmethod(_csgeom.csMath2_Area2)
+    Right = staticmethod(_csgeom.csMath2_Right)
+    Left = staticmethod(_csgeom.csMath2_Left)
+    Visible = staticmethod(_csgeom.csMath2_Visible)
+    PlanesEqual = staticmethod(_csgeom.csMath2_PlanesEqual)
+    PlanesClose = staticmethod(_csgeom.csMath2_PlanesClose)
     def __init__(self, *args): 
         this = _csgeom.new_csMath2(*args)
         try: self.this.append(this)
@@ -784,28 +636,17 @@ csMath2_Visible = _csgeom.csMath2_Visible
 csMath2_PlanesEqual = _csgeom.csMath2_PlanesEqual
 csMath2_PlanesClose = _csgeom.csMath2_PlanesClose
 
-class csIntersect2(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csIntersect2, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csIntersect2, name)
+class csIntersect2(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_getmethods__["PlanePolygon"] = lambda x: _csgeom.csIntersect2_PlanePolygon
-    if _newclass:PlanePolygon = staticmethod(_csgeom.csIntersect2_PlanePolygon)
-    __swig_getmethods__["SegmentSegment"] = lambda x: _csgeom.csIntersect2_SegmentSegment
-    if _newclass:SegmentSegment = staticmethod(_csgeom.csIntersect2_SegmentSegment)
-    __swig_getmethods__["SegmentLine"] = lambda x: _csgeom.csIntersect2_SegmentLine
-    if _newclass:SegmentLine = staticmethod(_csgeom.csIntersect2_SegmentLine)
-    __swig_getmethods__["LineLine"] = lambda x: _csgeom.csIntersect2_LineLine
-    if _newclass:LineLine = staticmethod(_csgeom.csIntersect2_LineLine)
-    __swig_getmethods__["SegmentPlane"] = lambda x: _csgeom.csIntersect2_SegmentPlane
-    if _newclass:SegmentPlane = staticmethod(_csgeom.csIntersect2_SegmentPlane)
-    __swig_getmethods__["SegmentPlaneNoTest"] = lambda x: _csgeom.csIntersect2_SegmentPlaneNoTest
-    if _newclass:SegmentPlaneNoTest = staticmethod(_csgeom.csIntersect2_SegmentPlaneNoTest)
-    __swig_getmethods__["PlanePlane"] = lambda x: _csgeom.csIntersect2_PlanePlane
-    if _newclass:PlanePlane = staticmethod(_csgeom.csIntersect2_PlanePlane)
-    __swig_getmethods__["SegmentBox"] = lambda x: _csgeom.csIntersect2_SegmentBox
-    if _newclass:SegmentBox = staticmethod(_csgeom.csIntersect2_SegmentBox)
+    PlanePolygon = staticmethod(_csgeom.csIntersect2_PlanePolygon)
+    SegmentSegment = staticmethod(_csgeom.csIntersect2_SegmentSegment)
+    SegmentLine = staticmethod(_csgeom.csIntersect2_SegmentLine)
+    LineLine = staticmethod(_csgeom.csIntersect2_LineLine)
+    SegmentPlane = staticmethod(_csgeom.csIntersect2_SegmentPlane)
+    SegmentPlaneNoTest = staticmethod(_csgeom.csIntersect2_SegmentPlaneNoTest)
+    PlanePlane = staticmethod(_csgeom.csIntersect2_PlanePlane)
+    SegmentBox = staticmethod(_csgeom.csIntersect2_SegmentBox)
     def __init__(self, *args): 
         this = _csgeom.new_csIntersect2(*args)
         try: self.this.append(this)
@@ -823,11 +664,8 @@ csIntersect2_SegmentPlaneNoTest = _csgeom.csIntersect2_SegmentPlaneNoTest
 csIntersect2_PlanePlane = _csgeom.csIntersect2_PlanePlane
 csIntersect2_SegmentBox = _csgeom.csIntersect2_SegmentBox
 
-class csPoly2D(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csPoly2D, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csPoly2D, name)
+class csPoly2D(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csPoly2D(*args)
@@ -842,8 +680,7 @@ class csPoly2D(_object):
     def GetVertex(*args): return _csgeom.csPoly2D_GetVertex(*args)
     def GetFirst(*args): return _csgeom.csPoly2D_GetFirst(*args)
     def GetLast(*args): return _csgeom.csPoly2D_GetLast(*args)
-    __swig_getmethods__["In"] = lambda x: _csgeom.csPoly2D_In
-    if _newclass:In = staticmethod(_csgeom.csPoly2D_In)
+    In = staticmethod(_csgeom.csPoly2D_In)
     def MakeRoom(*args): return _csgeom.csPoly2D_MakeRoom(*args)
     def SetVertexCount(*args): return _csgeom.csPoly2D_SetVertexCount(*args)
     def AddVertex(*args): return _csgeom.csPoly2D_AddVertex(*args)
@@ -864,11 +701,8 @@ csPoly2D_swigregister = _csgeom.csPoly2D_swigregister
 csPoly2D_swigregister(csPoly2D)
 csPoly2D_In = _csgeom.csPoly2D_In
 
-class csPoly2DFactory(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csPoly2DFactory, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csPoly2DFactory, name)
+class csPoly2DFactory(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     __swig_destroy__ = _csgeom.delete_csPoly2DFactory
     __del__ = lambda self : None;
@@ -880,38 +714,22 @@ class csPoly2DFactory(_object):
 csPoly2DFactory_swigregister = _csgeom.csPoly2DFactory_swigregister
 csPoly2DFactory_swigregister(csPoly2DFactory)
 
-class csMath3(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csMath3, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csMath3, name)
+class csMath3(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_getmethods__["WhichSide3D"] = lambda x: _csgeom.csMath3_WhichSide3D
-    if _newclass:WhichSide3D = staticmethod(_csgeom.csMath3_WhichSide3D)
-    __swig_getmethods__["Visible"] = lambda x: _csgeom.csMath3_Visible
-    if _newclass:Visible = staticmethod(_csgeom.csMath3_Visible)
-    __swig_getmethods__["Between"] = lambda x: _csgeom.csMath3_Between
-    if _newclass:Between = staticmethod(_csgeom.csMath3_Between)
-    __swig_getmethods__["SetMinMax"] = lambda x: _csgeom.csMath3_SetMinMax
-    if _newclass:SetMinMax = staticmethod(_csgeom.csMath3_SetMinMax)
-    __swig_getmethods__["DoubleArea3"] = lambda x: _csgeom.csMath3_DoubleArea3
-    if _newclass:DoubleArea3 = staticmethod(_csgeom.csMath3_DoubleArea3)
-    __swig_getmethods__["Direction3"] = lambda x: _csgeom.csMath3_Direction3
-    if _newclass:Direction3 = staticmethod(_csgeom.csMath3_Direction3)
-    __swig_getmethods__["CalcNormal"] = lambda x: _csgeom.csMath3_CalcNormal
-    if _newclass:CalcNormal = staticmethod(_csgeom.csMath3_CalcNormal)
-    __swig_getmethods__["CalcPlane"] = lambda x: _csgeom.csMath3_CalcPlane
-    if _newclass:CalcPlane = staticmethod(_csgeom.csMath3_CalcPlane)
-    __swig_getmethods__["PlanesEqual"] = lambda x: _csgeom.csMath3_PlanesEqual
-    if _newclass:PlanesEqual = staticmethod(_csgeom.csMath3_PlanesEqual)
-    __swig_getmethods__["PlanesClose"] = lambda x: _csgeom.csMath3_PlanesClose
-    if _newclass:PlanesClose = staticmethod(_csgeom.csMath3_PlanesClose)
-    __swig_getmethods__["OuterPlanes"] = lambda x: _csgeom.csMath3_OuterPlanes
-    if _newclass:OuterPlanes = staticmethod(_csgeom.csMath3_OuterPlanes)
-    __swig_getmethods__["FindObserverSides"] = lambda x: _csgeom.csMath3_FindObserverSides
-    if _newclass:FindObserverSides = staticmethod(_csgeom.csMath3_FindObserverSides)
-    __swig_getmethods__["SpherePosition"] = lambda x: _csgeom.csMath3_SpherePosition
-    if _newclass:SpherePosition = staticmethod(_csgeom.csMath3_SpherePosition)
+    WhichSide3D = staticmethod(_csgeom.csMath3_WhichSide3D)
+    Visible = staticmethod(_csgeom.csMath3_Visible)
+    Between = staticmethod(_csgeom.csMath3_Between)
+    SetMinMax = staticmethod(_csgeom.csMath3_SetMinMax)
+    DoubleArea3 = staticmethod(_csgeom.csMath3_DoubleArea3)
+    Direction3 = staticmethod(_csgeom.csMath3_Direction3)
+    CalcNormal = staticmethod(_csgeom.csMath3_CalcNormal)
+    CalcPlane = staticmethod(_csgeom.csMath3_CalcPlane)
+    PlanesEqual = staticmethod(_csgeom.csMath3_PlanesEqual)
+    PlanesClose = staticmethod(_csgeom.csMath3_PlanesClose)
+    OuterPlanes = staticmethod(_csgeom.csMath3_OuterPlanes)
+    FindObserverSides = staticmethod(_csgeom.csMath3_FindObserverSides)
+    SpherePosition = staticmethod(_csgeom.csMath3_SpherePosition)
     def __init__(self, *args): 
         this = _csgeom.new_csMath3(*args)
         try: self.this.append(this)
@@ -934,20 +752,13 @@ csMath3_OuterPlanes = _csgeom.csMath3_OuterPlanes
 csMath3_FindObserverSides = _csgeom.csMath3_FindObserverSides
 csMath3_SpherePosition = _csgeom.csMath3_SpherePosition
 
-class csSquaredDist(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csSquaredDist, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csSquaredDist, name)
+class csSquaredDist(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_getmethods__["PointPoint"] = lambda x: _csgeom.csSquaredDist_PointPoint
-    if _newclass:PointPoint = staticmethod(_csgeom.csSquaredDist_PointPoint)
-    __swig_getmethods__["PointLine"] = lambda x: _csgeom.csSquaredDist_PointLine
-    if _newclass:PointLine = staticmethod(_csgeom.csSquaredDist_PointLine)
-    __swig_getmethods__["PointPlane"] = lambda x: _csgeom.csSquaredDist_PointPlane
-    if _newclass:PointPlane = staticmethod(_csgeom.csSquaredDist_PointPlane)
-    __swig_getmethods__["PointPoly"] = lambda x: _csgeom.csSquaredDist_PointPoly
-    if _newclass:PointPoly = staticmethod(_csgeom.csSquaredDist_PointPoly)
+    PointPoint = staticmethod(_csgeom.csSquaredDist_PointPoint)
+    PointLine = staticmethod(_csgeom.csSquaredDist_PointLine)
+    PointPlane = staticmethod(_csgeom.csSquaredDist_PointPlane)
+    PointPoly = staticmethod(_csgeom.csSquaredDist_PointPoly)
     def __init__(self, *args): 
         this = _csgeom.new_csSquaredDist(*args)
         try: self.this.append(this)
@@ -961,66 +772,36 @@ csSquaredDist_PointLine = _csgeom.csSquaredDist_PointLine
 csSquaredDist_PointPlane = _csgeom.csSquaredDist_PointPlane
 csSquaredDist_PointPoly = _csgeom.csSquaredDist_PointPoly
 
-class csIntersect3(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csIntersect3, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csIntersect3, name)
+class csIntersect3(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_getmethods__["PlanePolygon"] = lambda x: _csgeom.csIntersect3_PlanePolygon
-    if _newclass:PlanePolygon = staticmethod(_csgeom.csIntersect3_PlanePolygon)
-    __swig_getmethods__["SegmentFrustum"] = lambda x: _csgeom.csIntersect3_SegmentFrustum
-    if _newclass:SegmentFrustum = staticmethod(_csgeom.csIntersect3_SegmentFrustum)
-    __swig_getmethods__["SegmentTriangle"] = lambda x: _csgeom.csIntersect3_SegmentTriangle
-    if _newclass:SegmentTriangle = staticmethod(_csgeom.csIntersect3_SegmentTriangle)
-    __swig_getmethods__["SegmentPolygon"] = lambda x: _csgeom.csIntersect3_SegmentPolygon
-    if _newclass:SegmentPolygon = staticmethod(_csgeom.csIntersect3_SegmentPolygon)
-    __swig_getmethods__["SegmentPlanes"] = lambda x: _csgeom.csIntersect3_SegmentPlanes
-    if _newclass:SegmentPlanes = staticmethod(_csgeom.csIntersect3_SegmentPlanes)
-    __swig_getmethods__["SegmentPlane"] = lambda x: _csgeom.csIntersect3_SegmentPlane
-    if _newclass:SegmentPlane = staticmethod(_csgeom.csIntersect3_SegmentPlane)
-    __swig_getmethods__["ThreePlanes"] = lambda x: _csgeom.csIntersect3_ThreePlanes
-    if _newclass:ThreePlanes = staticmethod(_csgeom.csIntersect3_ThreePlanes)
-    __swig_getmethods__["PlaneXPlane"] = lambda x: _csgeom.csIntersect3_PlaneXPlane
-    if _newclass:PlaneXPlane = staticmethod(_csgeom.csIntersect3_PlaneXPlane)
-    __swig_getmethods__["PlaneYPlane"] = lambda x: _csgeom.csIntersect3_PlaneYPlane
-    if _newclass:PlaneYPlane = staticmethod(_csgeom.csIntersect3_PlaneYPlane)
-    __swig_getmethods__["PlaneZPlane"] = lambda x: _csgeom.csIntersect3_PlaneZPlane
-    if _newclass:PlaneZPlane = staticmethod(_csgeom.csIntersect3_PlaneZPlane)
-    __swig_getmethods__["PlaneAxisPlane"] = lambda x: _csgeom.csIntersect3_PlaneAxisPlane
-    if _newclass:PlaneAxisPlane = staticmethod(_csgeom.csIntersect3_PlaneAxisPlane)
-    __swig_getmethods__["SegmentZ0Plane"] = lambda x: _csgeom.csIntersect3_SegmentZ0Plane
-    if _newclass:SegmentZ0Plane = staticmethod(_csgeom.csIntersect3_SegmentZ0Plane)
-    __swig_getmethods__["SegmentXPlane"] = lambda x: _csgeom.csIntersect3_SegmentXPlane
-    if _newclass:SegmentXPlane = staticmethod(_csgeom.csIntersect3_SegmentXPlane)
-    __swig_getmethods__["SegmentYPlane"] = lambda x: _csgeom.csIntersect3_SegmentYPlane
-    if _newclass:SegmentYPlane = staticmethod(_csgeom.csIntersect3_SegmentYPlane)
-    __swig_getmethods__["SegmentZPlane"] = lambda x: _csgeom.csIntersect3_SegmentZPlane
-    if _newclass:SegmentZPlane = staticmethod(_csgeom.csIntersect3_SegmentZPlane)
-    __swig_getmethods__["SegmentAxisPlane"] = lambda x: _csgeom.csIntersect3_SegmentAxisPlane
-    if _newclass:SegmentAxisPlane = staticmethod(_csgeom.csIntersect3_SegmentAxisPlane)
-    __swig_getmethods__["SegmentXFrustum"] = lambda x: _csgeom.csIntersect3_SegmentXFrustum
-    if _newclass:SegmentXFrustum = staticmethod(_csgeom.csIntersect3_SegmentXFrustum)
-    __swig_getmethods__["SegmentYFrustum"] = lambda x: _csgeom.csIntersect3_SegmentYFrustum
-    if _newclass:SegmentYFrustum = staticmethod(_csgeom.csIntersect3_SegmentYFrustum)
-    __swig_getmethods__["BoxSegment"] = lambda x: _csgeom.csIntersect3_BoxSegment
-    if _newclass:BoxSegment = staticmethod(_csgeom.csIntersect3_BoxSegment)
-    __swig_getmethods__["ClipSegmentBox"] = lambda x: _csgeom.csIntersect3_ClipSegmentBox
-    if _newclass:ClipSegmentBox = staticmethod(_csgeom.csIntersect3_ClipSegmentBox)
-    __swig_getmethods__["BoxFrustum"] = lambda x: _csgeom.csIntersect3_BoxFrustum
-    if _newclass:BoxFrustum = staticmethod(_csgeom.csIntersect3_BoxFrustum)
-    __swig_getmethods__["BoxSphere"] = lambda x: _csgeom.csIntersect3_BoxSphere
-    if _newclass:BoxSphere = staticmethod(_csgeom.csIntersect3_BoxSphere)
-    __swig_getmethods__["BoxPlane"] = lambda x: _csgeom.csIntersect3_BoxPlane
-    if _newclass:BoxPlane = staticmethod(_csgeom.csIntersect3_BoxPlane)
-    __swig_getmethods__["BoxTriangle"] = lambda x: _csgeom.csIntersect3_BoxTriangle
-    if _newclass:BoxTriangle = staticmethod(_csgeom.csIntersect3_BoxTriangle)
-    __swig_getmethods__["BoxBox"] = lambda x: _csgeom.csIntersect3_BoxBox
-    if _newclass:BoxBox = staticmethod(_csgeom.csIntersect3_BoxBox)
-    __swig_getmethods__["FrustumFrustum"] = lambda x: _csgeom.csIntersect3_FrustumFrustum
-    if _newclass:FrustumFrustum = staticmethod(_csgeom.csIntersect3_FrustumFrustum)
-    __swig_getmethods__["TriangleTriangle"] = lambda x: _csgeom.csIntersect3_TriangleTriangle
-    if _newclass:TriangleTriangle = staticmethod(_csgeom.csIntersect3_TriangleTriangle)
+    PlanePolygon = staticmethod(_csgeom.csIntersect3_PlanePolygon)
+    SegmentFrustum = staticmethod(_csgeom.csIntersect3_SegmentFrustum)
+    SegmentTriangle = staticmethod(_csgeom.csIntersect3_SegmentTriangle)
+    SegmentPolygon = staticmethod(_csgeom.csIntersect3_SegmentPolygon)
+    SegmentPlanes = staticmethod(_csgeom.csIntersect3_SegmentPlanes)
+    SegmentPlane = staticmethod(_csgeom.csIntersect3_SegmentPlane)
+    ThreePlanes = staticmethod(_csgeom.csIntersect3_ThreePlanes)
+    PlaneXPlane = staticmethod(_csgeom.csIntersect3_PlaneXPlane)
+    PlaneYPlane = staticmethod(_csgeom.csIntersect3_PlaneYPlane)
+    PlaneZPlane = staticmethod(_csgeom.csIntersect3_PlaneZPlane)
+    PlaneAxisPlane = staticmethod(_csgeom.csIntersect3_PlaneAxisPlane)
+    SegmentZ0Plane = staticmethod(_csgeom.csIntersect3_SegmentZ0Plane)
+    SegmentXPlane = staticmethod(_csgeom.csIntersect3_SegmentXPlane)
+    SegmentYPlane = staticmethod(_csgeom.csIntersect3_SegmentYPlane)
+    SegmentZPlane = staticmethod(_csgeom.csIntersect3_SegmentZPlane)
+    SegmentAxisPlane = staticmethod(_csgeom.csIntersect3_SegmentAxisPlane)
+    SegmentXFrustum = staticmethod(_csgeom.csIntersect3_SegmentXFrustum)
+    SegmentYFrustum = staticmethod(_csgeom.csIntersect3_SegmentYFrustum)
+    BoxSegment = staticmethod(_csgeom.csIntersect3_BoxSegment)
+    ClipSegmentBox = staticmethod(_csgeom.csIntersect3_ClipSegmentBox)
+    BoxFrustum = staticmethod(_csgeom.csIntersect3_BoxFrustum)
+    BoxSphere = staticmethod(_csgeom.csIntersect3_BoxSphere)
+    BoxPlane = staticmethod(_csgeom.csIntersect3_BoxPlane)
+    BoxTriangle = staticmethod(_csgeom.csIntersect3_BoxTriangle)
+    BoxBox = staticmethod(_csgeom.csIntersect3_BoxBox)
+    FrustumFrustum = staticmethod(_csgeom.csIntersect3_FrustumFrustum)
+    TriangleTriangle = staticmethod(_csgeom.csIntersect3_TriangleTriangle)
     def __init__(self, *args): 
         this = _csgeom.new_csIntersect3(*args)
         try: self.this.append(this)
@@ -1057,11 +838,8 @@ csIntersect3_BoxBox = _csgeom.csIntersect3_BoxBox
 csIntersect3_FrustumFrustum = _csgeom.csIntersect3_FrustumFrustum
 csIntersect3_TriangleTriangle = _csgeom.csIntersect3_TriangleTriangle
 
-class csGeomDebugHelper(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csGeomDebugHelper, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csGeomDebugHelper, name)
+class csGeomDebugHelper(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csGeomDebugHelper(*args)
@@ -1082,11 +860,8 @@ CS_POL_SAME_PLANE = _csgeom.CS_POL_SAME_PLANE
 CS_POL_FRONT = _csgeom.CS_POL_FRONT
 CS_POL_BACK = _csgeom.CS_POL_BACK
 CS_POL_SPLIT_NEEDED = _csgeom.CS_POL_SPLIT_NEEDED
-class csPoly3D(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csPoly3D, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csPoly3D, name)
+class csPoly3D(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csPoly3D(*args)
@@ -1100,8 +875,7 @@ class csPoly3D(_object):
     def GetVertex(*args): return _csgeom.csPoly3D_GetVertex(*args)
     def GetFirst(*args): return _csgeom.csPoly3D_GetFirst(*args)
     def GetLast(*args): return _csgeom.csPoly3D_GetLast(*args)
-    __swig_getmethods__["In"] = lambda x: _csgeom.csPoly3D_In
-    if _newclass:In = staticmethod(_csgeom.csPoly3D_In)
+    In = staticmethod(_csgeom.csPoly3D_In)
     def MakeRoom(*args): return _csgeom.csPoly3D_MakeRoom(*args)
     def SetVertexCount(*args): return _csgeom.csPoly3D_SetVertexCount(*args)
     def AddVertex(*args): return _csgeom.csPoly3D_AddVertex(*args)
@@ -1137,30 +911,15 @@ csPoly3D_swigregister = _csgeom.csPoly3D_swigregister
 csPoly3D_swigregister(csPoly3D)
 csPoly3D_In = _csgeom.csPoly3D_In
 
-class csCompressVertex(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csCompressVertex, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csCompressVertex, name)
+class csCompressVertex(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["orig_idx"] = _csgeom.csCompressVertex_orig_idx_set
-    __swig_getmethods__["orig_idx"] = _csgeom.csCompressVertex_orig_idx_get
-    if _newclass:orig_idx = _swig_property(_csgeom.csCompressVertex_orig_idx_get, _csgeom.csCompressVertex_orig_idx_set)
-    __swig_setmethods__["x"] = _csgeom.csCompressVertex_x_set
-    __swig_getmethods__["x"] = _csgeom.csCompressVertex_x_get
-    if _newclass:x = _swig_property(_csgeom.csCompressVertex_x_get, _csgeom.csCompressVertex_x_set)
-    __swig_setmethods__["y"] = _csgeom.csCompressVertex_y_set
-    __swig_getmethods__["y"] = _csgeom.csCompressVertex_y_get
-    if _newclass:y = _swig_property(_csgeom.csCompressVertex_y_get, _csgeom.csCompressVertex_y_set)
-    __swig_setmethods__["z"] = _csgeom.csCompressVertex_z_set
-    __swig_getmethods__["z"] = _csgeom.csCompressVertex_z_get
-    if _newclass:z = _swig_property(_csgeom.csCompressVertex_z_get, _csgeom.csCompressVertex_z_set)
-    __swig_setmethods__["new_idx"] = _csgeom.csCompressVertex_new_idx_set
-    __swig_getmethods__["new_idx"] = _csgeom.csCompressVertex_new_idx_get
-    if _newclass:new_idx = _swig_property(_csgeom.csCompressVertex_new_idx_get, _csgeom.csCompressVertex_new_idx_set)
-    __swig_setmethods__["used"] = _csgeom.csCompressVertex_used_set
-    __swig_getmethods__["used"] = _csgeom.csCompressVertex_used_get
-    if _newclass:used = _swig_property(_csgeom.csCompressVertex_used_get, _csgeom.csCompressVertex_used_set)
+    orig_idx = _swig_property(_csgeom.csCompressVertex_orig_idx_get, _csgeom.csCompressVertex_orig_idx_set)
+    x = _swig_property(_csgeom.csCompressVertex_x_get, _csgeom.csCompressVertex_x_set)
+    y = _swig_property(_csgeom.csCompressVertex_y_get, _csgeom.csCompressVertex_y_set)
+    z = _swig_property(_csgeom.csCompressVertex_z_get, _csgeom.csCompressVertex_z_set)
+    new_idx = _swig_property(_csgeom.csCompressVertex_new_idx_get, _csgeom.csCompressVertex_new_idx_set)
+    used = _swig_property(_csgeom.csCompressVertex_used_get, _csgeom.csCompressVertex_used_set)
     def __init__(self, *args): 
         this = _csgeom.new_csCompressVertex(*args)
         try: self.this.append(this)
@@ -1171,41 +930,26 @@ csCompressVertex_swigregister = _csgeom.csCompressVertex_swigregister
 csCompressVertex_swigregister(csCompressVertex)
 
 class csVector3Array(csPoly3D):
-    __swig_setmethods__ = {}
-    for _s in [csPoly3D]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csVector3Array, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csPoly3D]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csVector3Array, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csVector3Array(*args)
         try: self.this.append(this)
         except: self.this = this
     def AddVertexSmart(*args): return _csgeom.csVector3Array_AddVertexSmart(*args)
-    __swig_getmethods__["CompressVertices"] = lambda x: _csgeom.csVector3Array_CompressVertices
-    if _newclass:CompressVertices = staticmethod(_csgeom.csVector3Array_CompressVertices)
+    CompressVertices = staticmethod(_csgeom.csVector3Array_CompressVertices)
     __swig_destroy__ = _csgeom.delete_csVector3Array
     __del__ = lambda self : None;
 csVector3Array_swigregister = _csgeom.csVector3Array_swigregister
 csVector3Array_swigregister(csVector3Array)
 csVector3Array_CompressVertices = _csgeom.csVector3Array_CompressVertices
 
-class TriangleInt(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, TriangleInt, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, TriangleInt, name)
+class TriangleInt(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["a"] = _csgeom.TriangleInt_a_set
-    __swig_getmethods__["a"] = _csgeom.TriangleInt_a_get
-    if _newclass:a = _swig_property(_csgeom.TriangleInt_a_get, _csgeom.TriangleInt_a_set)
-    __swig_setmethods__["b"] = _csgeom.TriangleInt_b_set
-    __swig_getmethods__["b"] = _csgeom.TriangleInt_b_get
-    if _newclass:b = _swig_property(_csgeom.TriangleInt_b_get, _csgeom.TriangleInt_b_set)
-    __swig_setmethods__["c"] = _csgeom.TriangleInt_c_set
-    __swig_getmethods__["c"] = _csgeom.TriangleInt_c_get
-    if _newclass:c = _swig_property(_csgeom.TriangleInt_c_get, _csgeom.TriangleInt_c_set)
+    a = _swig_property(_csgeom.TriangleInt_a_get, _csgeom.TriangleInt_a_set)
+    b = _swig_property(_csgeom.TriangleInt_b_get, _csgeom.TriangleInt_b_set)
+    c = _swig_property(_csgeom.TriangleInt_c_get, _csgeom.TriangleInt_c_set)
     def Set(*args): return _csgeom.TriangleInt_Set(*args)
     def __init__(self, *args): 
         this = _csgeom.new_TriangleInt(*args)
@@ -1217,12 +961,7 @@ TriangleInt_swigregister = _csgeom.TriangleInt_swigregister
 TriangleInt_swigregister(TriangleInt)
 
 class csTriangle(TriangleInt):
-    __swig_setmethods__ = {}
-    for _s in [TriangleInt]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csTriangle, name, value)
-    __swig_getmethods__ = {}
-    for _s in [TriangleInt]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csTriangle, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csTriangle(*args)
@@ -1241,24 +980,13 @@ class csTriangle(TriangleInt):
 csTriangle_swigregister = _csgeom.csTriangle_swigregister
 csTriangle_swigregister(csTriangle)
 
-class csRect(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csRect, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csRect, name)
+class csRect(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["xmin"] = _csgeom.csRect_xmin_set
-    __swig_getmethods__["xmin"] = _csgeom.csRect_xmin_get
-    if _newclass:xmin = _swig_property(_csgeom.csRect_xmin_get, _csgeom.csRect_xmin_set)
-    __swig_setmethods__["ymin"] = _csgeom.csRect_ymin_set
-    __swig_getmethods__["ymin"] = _csgeom.csRect_ymin_get
-    if _newclass:ymin = _swig_property(_csgeom.csRect_ymin_get, _csgeom.csRect_ymin_set)
-    __swig_setmethods__["xmax"] = _csgeom.csRect_xmax_set
-    __swig_getmethods__["xmax"] = _csgeom.csRect_xmax_get
-    if _newclass:xmax = _swig_property(_csgeom.csRect_xmax_get, _csgeom.csRect_xmax_set)
-    __swig_setmethods__["ymax"] = _csgeom.csRect_ymax_set
-    __swig_getmethods__["ymax"] = _csgeom.csRect_ymax_get
-    if _newclass:ymax = _swig_property(_csgeom.csRect_ymax_get, _csgeom.csRect_ymax_set)
+    xmin = _swig_property(_csgeom.csRect_xmin_get, _csgeom.csRect_xmin_set)
+    ymin = _swig_property(_csgeom.csRect_ymin_get, _csgeom.csRect_ymin_set)
+    xmax = _swig_property(_csgeom.csRect_xmax_get, _csgeom.csRect_xmax_set)
+    ymax = _swig_property(_csgeom.csRect_ymax_get, _csgeom.csRect_ymax_set)
     def __init__(self, *args): 
         this = _csgeom.new_csRect(*args)
         try: self.this.append(this)
@@ -1296,11 +1024,8 @@ class csRect(_object):
 csRect_swigregister = _csgeom.csRect_swigregister
 csRect_swigregister(csRect)
 
-class csRectRegion(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csRectRegion, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csRectRegion, name)
+class csRectRegion(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csRectRegion(*args)
@@ -1317,11 +1042,8 @@ class csRectRegion(_object):
 csRectRegion_swigregister = _csgeom.csRectRegion_swigregister
 csRectRegion_swigregister(csRectRegion)
 
-class csQuaternion(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csQuaternion, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csQuaternion, name)
+class csQuaternion(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csQuaternion(*args)
@@ -1350,12 +1072,8 @@ class csQuaternion(_object):
     def Log(*args): return _csgeom.csQuaternion_Log(*args)
     def Exp(*args): return _csgeom.csQuaternion_Exp(*args)
     def Squad(*args): return _csgeom.csQuaternion_Squad(*args)
-    __swig_setmethods__["v"] = _csgeom.csQuaternion_v_set
-    __swig_getmethods__["v"] = _csgeom.csQuaternion_v_get
-    if _newclass:v = _swig_property(_csgeom.csQuaternion_v_get, _csgeom.csQuaternion_v_set)
-    __swig_setmethods__["w"] = _csgeom.csQuaternion_w_set
-    __swig_getmethods__["w"] = _csgeom.csQuaternion_w_get
-    if _newclass:w = _swig_property(_csgeom.csQuaternion_w_get, _csgeom.csQuaternion_w_set)
+    v = _swig_property(_csgeom.csQuaternion_v_get, _csgeom.csQuaternion_v_set)
+    w = _swig_property(_csgeom.csQuaternion_w_get, _csgeom.csQuaternion_w_set)
     def __add__(*args): return _csgeom.csQuaternion___add__(*args)
     def __sub__(*args): return _csgeom.csQuaternion___sub__(*args)
     def __mul__(*args): return _csgeom.csQuaternion___mul__(*args)
@@ -1369,11 +1087,8 @@ class csQuaternion(_object):
 csQuaternion_swigregister = _csgeom.csQuaternion_swigregister
 csQuaternion_swigregister(csQuaternion)
 
-class csSpline(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csSpline, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csSpline, name)
+class csSpline(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     __swig_destroy__ = _csgeom.delete_csSpline
@@ -1399,12 +1114,7 @@ csSpline_swigregister = _csgeom.csSpline_swigregister
 csSpline_swigregister(csSpline)
 
 class csCubicSpline(csSpline):
-    __swig_setmethods__ = {}
-    for _s in [csSpline]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csCubicSpline, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csSpline]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csCubicSpline, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csCubicSpline(*args)
@@ -1418,12 +1128,7 @@ csCubicSpline_swigregister = _csgeom.csCubicSpline_swigregister
 csCubicSpline_swigregister(csCubicSpline)
 
 class csBSpline(csSpline):
-    __swig_setmethods__ = {}
-    for _s in [csSpline]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csBSpline, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csSpline]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csBSpline, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csBSpline(*args)
@@ -1437,12 +1142,7 @@ csBSpline_swigregister = _csgeom.csBSpline_swigregister
 csBSpline_swigregister(csBSpline)
 
 class csCatmullRomSpline(csBSpline):
-    __swig_setmethods__ = {}
-    for _s in [csBSpline]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csCatmullRomSpline, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csBSpline]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csCatmullRomSpline, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csCatmullRomSpline(*args)
@@ -1468,11 +1168,8 @@ CS_BOX_EDGE_XY_xY = _csgeom.CS_BOX_EDGE_XY_xY
 CS_BOX_EDGE_xY_XY = _csgeom.CS_BOX_EDGE_xY_XY
 CS_BOX_EDGE_xY_xy = _csgeom.CS_BOX_EDGE_xY_xy
 CS_BOX_EDGE_xy_xY = _csgeom.CS_BOX_EDGE_xy_xY
-class csBox2(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csBox2, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csBox2, name)
+class csBox2(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def MinX(*args): return _csgeom.csBox2_MinX(*args)
     def MinY(*args): return _csgeom.csBox2_MinY(*args)
@@ -1562,11 +1259,8 @@ CS_BOX_EDGE_xyZ_xyz = _csgeom.CS_BOX_EDGE_xyZ_xyz
 CS_BOX_EDGE_xyz_xyZ = _csgeom.CS_BOX_EDGE_xyz_xyZ
 CS_BOX_EDGE_xyZ_XyZ = _csgeom.CS_BOX_EDGE_xyZ_XyZ
 CS_BOX_EDGE_XyZ_xyZ = _csgeom.CS_BOX_EDGE_XyZ_xyZ
-class csBox3(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csBox3, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csBox3, name)
+class csBox3(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def MinX(*args): return _csgeom.csBox3_MinX(*args)
     def MinY(*args): return _csgeom.csBox3_MinY(*args)
@@ -1588,8 +1282,7 @@ class csBox3(_object):
     def GetSide(*args): return _csgeom.csBox3_GetSide(*args)
     def GetAxisPlane(*args): return _csgeom.csBox3_GetAxisPlane(*args)
     def GetVisibleSides(*args): return _csgeom.csBox3_GetVisibleSides(*args)
-    __swig_getmethods__["OtherSide"] = lambda x: _csgeom.csBox3_OtherSide
-    if _newclass:OtherSide = staticmethod(_csgeom.csBox3_OtherSide)
+    OtherSide = staticmethod(_csgeom.csBox3_OtherSide)
     def GetEdge(*args): return _csgeom.csBox3_GetEdge(*args)
     def In(*args): return _csgeom.csBox3_In(*args)
     def Overlap(*args): return _csgeom.csBox3_Overlap(*args)
@@ -1642,11 +1335,8 @@ csBox3_swigregister = _csgeom.csBox3_swigregister
 csBox3_swigregister(csBox3)
 csBox3_OtherSide = _csgeom.csBox3_OtherSide
 
-class csSegment2(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csSegment2, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csSegment2, name)
+class csSegment2(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csSegment2(*args)
@@ -1662,11 +1352,8 @@ class csSegment2(_object):
 csSegment2_swigregister = _csgeom.csSegment2_swigregister
 csSegment2_swigregister(csSegment2)
 
-class csSegment3(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csSegment3, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csSegment3, name)
+class csSegment3(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csSegment3(*args)
@@ -1683,12 +1370,7 @@ csSegment3_swigregister = _csgeom.csSegment3_swigregister
 csSegment3_swigregister(csSegment3)
 
 class csPath(core.scfPath):
-    __swig_setmethods__ = {}
-    for _s in [core.scfPath]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csPath, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.scfPath]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csPath, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csPath(*args)
@@ -1723,12 +1405,7 @@ csPath_swigregister = _csgeom.csPath_swigregister
 csPath_swigregister(csPath)
 
 class pycsTriangleMesh(core.iTriangleMesh):
-    __swig_setmethods__ = {}
-    for _s in [core.iTriangleMesh]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, pycsTriangleMesh, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iTriangleMesh]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, pycsTriangleMesh, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def IncRef(*args): return _csgeom.pycsTriangleMesh_IncRef(*args)
@@ -1742,12 +1419,7 @@ pycsTriangleMesh_swigregister = _csgeom.pycsTriangleMesh_swigregister
 pycsTriangleMesh_swigregister(pycsTriangleMesh)
 
 class pycsTriangleMeshBox(core.iTriangleMesh):
-    __swig_setmethods__ = {}
-    for _s in [core.iTriangleMesh]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, pycsTriangleMeshBox, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iTriangleMesh]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, pycsTriangleMeshBox, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def IncRef(*args): return _csgeom.pycsTriangleMeshBox_IncRef(*args)
@@ -1761,12 +1433,7 @@ pycsTriangleMeshBox_swigregister = _csgeom.pycsTriangleMeshBox_swigregister
 pycsTriangleMeshBox_swigregister(pycsTriangleMeshBox)
 
 class scfTriangleMeshPointer(core.iTriangleMesh):
-    __swig_setmethods__ = {}
-    for _s in [core.iTriangleMesh]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, scfTriangleMeshPointer, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iTriangleMesh]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, scfTriangleMeshPointer, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def IncRef(*args): return _csgeom.scfTriangleMeshPointer_IncRef(*args)
@@ -1780,12 +1447,7 @@ scfTriangleMeshPointer_swigregister = _csgeom.scfTriangleMeshPointer_swigregiste
 scfTriangleMeshPointer_swigregister(scfTriangleMeshPointer)
 
 class csTriangleMesh(pycsTriangleMesh):
-    __swig_setmethods__ = {}
-    for _s in [pycsTriangleMesh]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csTriangleMesh, name, value)
-    __swig_getmethods__ = {}
-    for _s in [pycsTriangleMesh]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csTriangleMesh, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csTriangleMesh(*args)
@@ -1810,24 +1472,13 @@ class csTriangleMesh(pycsTriangleMesh):
 csTriangleMesh_swigregister = _csgeom.csTriangleMesh_swigregister
 csTriangleMesh_swigregister(csTriangleMesh)
 
-class csTriangleVertex(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csTriangleVertex, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csTriangleVertex, name)
+class csTriangleVertex(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["pos"] = _csgeom.csTriangleVertex_pos_set
-    __swig_getmethods__["pos"] = _csgeom.csTriangleVertex_pos_get
-    if _newclass:pos = _swig_property(_csgeom.csTriangleVertex_pos_get, _csgeom.csTriangleVertex_pos_set)
-    __swig_setmethods__["idx"] = _csgeom.csTriangleVertex_idx_set
-    __swig_getmethods__["idx"] = _csgeom.csTriangleVertex_idx_get
-    if _newclass:idx = _swig_property(_csgeom.csTriangleVertex_idx_get, _csgeom.csTriangleVertex_idx_set)
-    __swig_setmethods__["con_triangles"] = _csgeom.csTriangleVertex_con_triangles_set
-    __swig_getmethods__["con_triangles"] = _csgeom.csTriangleVertex_con_triangles_get
-    if _newclass:con_triangles = _swig_property(_csgeom.csTriangleVertex_con_triangles_get, _csgeom.csTriangleVertex_con_triangles_set)
-    __swig_setmethods__["con_vertices"] = _csgeom.csTriangleVertex_con_vertices_set
-    __swig_getmethods__["con_vertices"] = _csgeom.csTriangleVertex_con_vertices_get
-    if _newclass:con_vertices = _swig_property(_csgeom.csTriangleVertex_con_vertices_get, _csgeom.csTriangleVertex_con_vertices_set)
+    pos = _swig_property(_csgeom.csTriangleVertex_pos_get, _csgeom.csTriangleVertex_pos_set)
+    idx = _swig_property(_csgeom.csTriangleVertex_idx_get, _csgeom.csTriangleVertex_idx_set)
+    con_triangles = _swig_property(_csgeom.csTriangleVertex_con_triangles_get, _csgeom.csTriangleVertex_con_triangles_set)
+    con_vertices = _swig_property(_csgeom.csTriangleVertex_con_vertices_get, _csgeom.csTriangleVertex_con_vertices_set)
     def __init__(self, *args): 
         this = _csgeom.new_csTriangleVertex(*args)
         try: self.this.append(this)
@@ -1839,11 +1490,8 @@ class csTriangleVertex(_object):
 csTriangleVertex_swigregister = _csgeom.csTriangleVertex_swigregister
 csTriangleVertex_swigregister(csTriangleVertex)
 
-class csTriangleVertices(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csTriangleVertices, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csTriangleVertices, name)
+class csTriangleVertices(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csTriangleVertices(*args)
@@ -1858,12 +1506,7 @@ csTriangleVertices_swigregister = _csgeom.csTriangleVertices_swigregister
 csTriangleVertices_swigregister(csTriangleVertices)
 
 class csTriangleMeshBox(pycsTriangleMeshBox):
-    __swig_setmethods__ = {}
-    for _s in [pycsTriangleMeshBox]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csTriangleMeshBox, name, value)
-    __swig_getmethods__ = {}
-    for _s in [pycsTriangleMeshBox]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csTriangleMeshBox, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csTriangleMeshBox(*args)
@@ -1890,12 +1533,7 @@ csTriangleMeshBox_swigregister = _csgeom.csTriangleMeshBox_swigregister
 csTriangleMeshBox_swigregister(csTriangleMeshBox)
 
 class csTriangleMeshPointer(scfTriangleMeshPointer):
-    __swig_setmethods__ = {}
-    for _s in [scfTriangleMeshPointer]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csTriangleMeshPointer, name, value)
-    __swig_getmethods__ = {}
-    for _s in [scfTriangleMeshPointer]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csTriangleMeshPointer, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _csgeom.new_csTriangleMeshPointer(*args)
@@ -1921,12 +1559,7 @@ csTriangleMeshPointer_swigregister = _csgeom.csTriangleMeshPointer_swigregister
 csTriangleMeshPointer_swigregister(csTriangleMeshPointer)
 
 class csIntArray(core.CustomAllocated):
-    __swig_setmethods__ = {}
-    for _s in [core.CustomAllocated]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csIntArray, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.CustomAllocated]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csIntArray, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     __swig_destroy__ = _csgeom.delete_csIntArray
     __del__ = lambda self : None;
@@ -1965,12 +1598,7 @@ csIntArray_swigregister = _csgeom.csIntArray_swigregister
 csIntArray_swigregister(csIntArray)
 
 class csIntArrayArray(core.CustomAllocated):
-    __swig_setmethods__ = {}
-    for _s in [core.CustomAllocated]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csIntArrayArray, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.CustomAllocated]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csIntArrayArray, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     __swig_destroy__ = _csgeom.delete_csIntArrayArray
     __del__ = lambda self : None;
@@ -2008,19 +1636,10 @@ csIntArrayArray_swigregister = _csgeom.csIntArrayArray_swigregister
 csIntArrayArray_swigregister(csIntArrayArray)
 
 class csTriangleMinMax(csTriangle):
-    __swig_setmethods__ = {}
-    for _s in [csTriangle]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csTriangleMinMax, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csTriangle]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csTriangleMinMax, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["minx"] = _csgeom.csTriangleMinMax_minx_set
-    __swig_getmethods__["minx"] = _csgeom.csTriangleMinMax_minx_get
-    if _newclass:minx = _swig_property(_csgeom.csTriangleMinMax_minx_get, _csgeom.csTriangleMinMax_minx_set)
-    __swig_setmethods__["maxx"] = _csgeom.csTriangleMinMax_maxx_set
-    __swig_getmethods__["maxx"] = _csgeom.csTriangleMinMax_maxx_get
-    if _newclass:maxx = _swig_property(_csgeom.csTriangleMinMax_maxx_get, _csgeom.csTriangleMinMax_maxx_set)
+    minx = _swig_property(_csgeom.csTriangleMinMax_minx_get, _csgeom.csTriangleMinMax_minx_set)
+    maxx = _swig_property(_csgeom.csTriangleMinMax_maxx_get, _csgeom.csTriangleMinMax_maxx_set)
     def __init__(self, *args): 
         this = _csgeom.new_csTriangleMinMax(*args)
         try: self.this.append(this)
@@ -2030,27 +1649,14 @@ class csTriangleMinMax(csTriangle):
 csTriangleMinMax_swigregister = _csgeom.csTriangleMinMax_swigregister
 csTriangleMinMax_swigregister(csTriangleMinMax)
 
-class csTriangleMeshEdge(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csTriangleMeshEdge, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csTriangleMeshEdge, name)
+class csTriangleMeshEdge(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["vt1"] = _csgeom.csTriangleMeshEdge_vt1_set
-    __swig_getmethods__["vt1"] = _csgeom.csTriangleMeshEdge_vt1_get
-    if _newclass:vt1 = _swig_property(_csgeom.csTriangleMeshEdge_vt1_get, _csgeom.csTriangleMeshEdge_vt1_set)
-    __swig_setmethods__["vt2"] = _csgeom.csTriangleMeshEdge_vt2_set
-    __swig_getmethods__["vt2"] = _csgeom.csTriangleMeshEdge_vt2_get
-    if _newclass:vt2 = _swig_property(_csgeom.csTriangleMeshEdge_vt2_get, _csgeom.csTriangleMeshEdge_vt2_set)
-    __swig_setmethods__["tri1"] = _csgeom.csTriangleMeshEdge_tri1_set
-    __swig_getmethods__["tri1"] = _csgeom.csTriangleMeshEdge_tri1_get
-    if _newclass:tri1 = _swig_property(_csgeom.csTriangleMeshEdge_tri1_get, _csgeom.csTriangleMeshEdge_tri1_set)
-    __swig_setmethods__["tri2"] = _csgeom.csTriangleMeshEdge_tri2_set
-    __swig_getmethods__["tri2"] = _csgeom.csTriangleMeshEdge_tri2_get
-    if _newclass:tri2 = _swig_property(_csgeom.csTriangleMeshEdge_tri2_get, _csgeom.csTriangleMeshEdge_tri2_set)
-    __swig_setmethods__["active"] = _csgeom.csTriangleMeshEdge_active_set
-    __swig_getmethods__["active"] = _csgeom.csTriangleMeshEdge_active_get
-    if _newclass:active = _swig_property(_csgeom.csTriangleMeshEdge_active_get, _csgeom.csTriangleMeshEdge_active_set)
+    vt1 = _swig_property(_csgeom.csTriangleMeshEdge_vt1_get, _csgeom.csTriangleMeshEdge_vt1_set)
+    vt2 = _swig_property(_csgeom.csTriangleMeshEdge_vt2_get, _csgeom.csTriangleMeshEdge_vt2_set)
+    tri1 = _swig_property(_csgeom.csTriangleMeshEdge_tri1_get, _csgeom.csTriangleMeshEdge_tri1_set)
+    tri2 = _swig_property(_csgeom.csTriangleMeshEdge_tri2_get, _csgeom.csTriangleMeshEdge_tri2_set)
+    active = _swig_property(_csgeom.csTriangleMeshEdge_active_get, _csgeom.csTriangleMeshEdge_active_set)
     def __init__(self, *args): 
         this = _csgeom.new_csTriangleMeshEdge(*args)
         try: self.this.append(this)
@@ -2060,38 +1666,22 @@ class csTriangleMeshEdge(_object):
 csTriangleMeshEdge_swigregister = _csgeom.csTriangleMeshEdge_swigregister
 csTriangleMeshEdge_swigregister(csTriangleMeshEdge)
 
-class csTriangleMeshTools(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csTriangleMeshTools, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csTriangleMeshTools, name)
+class csTriangleMeshTools(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_getmethods__["CalculateNormals"] = lambda x: _csgeom.csTriangleMeshTools_CalculateNormals
-    if _newclass:CalculateNormals = staticmethod(_csgeom.csTriangleMeshTools_CalculateNormals)
-    __swig_getmethods__["CalculatePlanes"] = lambda x: _csgeom.csTriangleMeshTools_CalculatePlanes
-    if _newclass:CalculatePlanes = staticmethod(_csgeom.csTriangleMeshTools_CalculatePlanes)
-    __swig_getmethods__["CalculateEdges"] = lambda x: _csgeom.csTriangleMeshTools_CalculateEdges
-    if _newclass:CalculateEdges = staticmethod(_csgeom.csTriangleMeshTools_CalculateEdges)
-    __swig_getmethods__["CheckActiveEdges"] = lambda x: _csgeom.csTriangleMeshTools_CheckActiveEdges
-    if _newclass:CheckActiveEdges = staticmethod(_csgeom.csTriangleMeshTools_CheckActiveEdges)
-    __swig_getmethods__["CalculateOutline"] = lambda x: _csgeom.csTriangleMeshTools_CalculateOutline
-    if _newclass:CalculateOutline = staticmethod(_csgeom.csTriangleMeshTools_CalculateOutline)
-    __swig_getmethods__["IsMeshClosed"] = lambda x: _csgeom.csTriangleMeshTools_IsMeshClosed
-    if _newclass:IsMeshClosed = staticmethod(_csgeom.csTriangleMeshTools_IsMeshClosed)
-    __swig_getmethods__["IsMeshConvex"] = lambda x: _csgeom.csTriangleMeshTools_IsMeshConvex
-    if _newclass:IsMeshConvex = staticmethod(_csgeom.csTriangleMeshTools_IsMeshConvex)
-    __swig_getmethods__["CloseMesh"] = lambda x: _csgeom.csTriangleMeshTools_CloseMesh
-    if _newclass:CloseMesh = staticmethod(_csgeom.csTriangleMeshTools_CloseMesh)
-    __swig_getmethods__["SortTrianglesX"] = lambda x: _csgeom.csTriangleMeshTools_SortTrianglesX
-    if _newclass:SortTrianglesX = staticmethod(_csgeom.csTriangleMeshTools_SortTrianglesX)
-    __swig_getmethods__["PointInClosedMesh"] = lambda x: _csgeom.csTriangleMeshTools_PointInClosedMesh
-    if _newclass:PointInClosedMesh = staticmethod(_csgeom.csTriangleMeshTools_PointInClosedMesh)
-    __swig_getmethods__["LineInClosedMesh"] = lambda x: _csgeom.csTriangleMeshTools_LineInClosedMesh
-    if _newclass:LineInClosedMesh = staticmethod(_csgeom.csTriangleMeshTools_LineInClosedMesh)
-    __swig_getmethods__["BoxInClosedMesh"] = lambda x: _csgeom.csTriangleMeshTools_BoxInClosedMesh
-    if _newclass:BoxInClosedMesh = staticmethod(_csgeom.csTriangleMeshTools_BoxInClosedMesh)
-    __swig_getmethods__["CalculateVertexConnections"] = lambda x: _csgeom.csTriangleMeshTools_CalculateVertexConnections
-    if _newclass:CalculateVertexConnections = staticmethod(_csgeom.csTriangleMeshTools_CalculateVertexConnections)
+    CalculateNormals = staticmethod(_csgeom.csTriangleMeshTools_CalculateNormals)
+    CalculatePlanes = staticmethod(_csgeom.csTriangleMeshTools_CalculatePlanes)
+    CalculateEdges = staticmethod(_csgeom.csTriangleMeshTools_CalculateEdges)
+    CheckActiveEdges = staticmethod(_csgeom.csTriangleMeshTools_CheckActiveEdges)
+    CalculateOutline = staticmethod(_csgeom.csTriangleMeshTools_CalculateOutline)
+    IsMeshClosed = staticmethod(_csgeom.csTriangleMeshTools_IsMeshClosed)
+    IsMeshConvex = staticmethod(_csgeom.csTriangleMeshTools_IsMeshConvex)
+    CloseMesh = staticmethod(_csgeom.csTriangleMeshTools_CloseMesh)
+    SortTrianglesX = staticmethod(_csgeom.csTriangleMeshTools_SortTrianglesX)
+    PointInClosedMesh = staticmethod(_csgeom.csTriangleMeshTools_PointInClosedMesh)
+    LineInClosedMesh = staticmethod(_csgeom.csTriangleMeshTools_LineInClosedMesh)
+    BoxInClosedMesh = staticmethod(_csgeom.csTriangleMeshTools_BoxInClosedMesh)
+    CalculateVertexConnections = staticmethod(_csgeom.csTriangleMeshTools_CalculateVertexConnections)
     def __init__(self, *args): 
         this = _csgeom.new_csTriangleMeshTools(*args)
         try: self.this.append(this)

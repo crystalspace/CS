@@ -157,8 +157,27 @@ protected:
 private:
   void AdjustSizePo2 ();
     
+  struct BlitBuffer
+  {
+    int x;
+    int y;
+    int width;
+    int height;
+    iTextureHandle::TextureBlitDataFormat format;
+  };
+  csHash<BlitBuffer, csPtrKey<uint8> > blitBuffers;
+  uint8* QueryBlitBufferGeneric (int x, int y, int width, int height,
+    size_t& pitch, TextureBlitDataFormat format, uint bufFlags);
+  void ApplyBlitBufferGeneric (uint8* buf);
+
+  int pboMapped;
+  void* pboMapPtr;
+  uint8* QueryBlitBufferPBO (int x, int y, int width, int height,
+    size_t& pitch, TextureBlitDataFormat format, uint bufFlags);
+  void ApplyBlitBufferPBO (uint8* buf);
 protected:
   GLuint Handle;
+  GLhandleARB pbo;
   /// Upload the texture to GL.
   void Load ();
   void Unload ();
@@ -314,10 +333,19 @@ public:
    * to make sure the internal format is not compressed.
    * \param keepPixels Whether to keep the existing pixel data should be 
    *   preserved.
+   * \param newTexFormat New texture format the texture should have.
    * \remarks The texture handle must be bound properly before this method
    *   is called.
    */
-  void EnsureUncompressed (bool keepPixels);
+  void EnsureUncompressed (bool keepPixels,
+    TextureBlitDataFormat newTexFormat = (TextureBlitDataFormat)~0);
+
+  uint8* QueryBlitBuffer (int x, int y, int width, int height,
+    size_t& pitch, TextureBlitDataFormat format, uint bufFlags);
+  void ApplyBlitBuffer (uint8* buf);
+
+  /// Dump the contents onto an image.
+  csPtr<iImage> Dump ();
 };
 
 #include "csutil/win32/msvc_deprecated_warn_on.h"

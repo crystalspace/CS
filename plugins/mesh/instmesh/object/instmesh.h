@@ -90,6 +90,7 @@ struct csInstance
 {
   csReversibleTransform transform;
   size_t id;
+  bool lighting_dirty;
 };
 
 /**
@@ -132,6 +133,7 @@ private:
 
   // The instances.
   csArray<csInstance> instances;
+  csHash<size_t, size_t> instances_hash;
   static size_t max_instance_id;
   void CalculateInstanceArrays ();
   void UpdateInstanceGeometry (size_t id);
@@ -151,6 +153,7 @@ private:
   csColor4 base_color;
   float current_lod;
   uint32 current_features;
+  uint32 changenr;
   csFlags flags;
 
   bool do_shadows;
@@ -182,6 +185,7 @@ private:
   // If the following flag is dirty then some of the affecting lights
   // has changed and we need to recalculate.
   bool lighting_dirty;
+  bool lighting_full_dirty;
 
   // choose whether to draw shadow caps or not
   bool shadow_caps;
@@ -221,6 +225,11 @@ private:
   void UpdateLighting (
       const csArray<iLightSectorInfluence*>& lights, iMovable* movable);
 
+  /**
+   * Update instances_hash.
+   */
+  void UpdateInstancesHash ();
+
 public:
   /// Constructor.
   csInstmeshMeshObject (csInstmeshMeshObjectFactory* factory);
@@ -229,6 +238,8 @@ public:
 
   /// Destructor.
   virtual ~csInstmeshMeshObject ();
+
+  uint32 GetChangeNumber() const { return changenr; }
 
   void SetMixMode (uint mode)
   {
@@ -340,6 +351,7 @@ public:
   private:
     csFlags flags;
     csInstmeshMeshObject* parent;
+
   public:
     virtual size_t GetVertexCount ();
     virtual csVector3* GetVertices ();
@@ -349,7 +361,7 @@ public:
     virtual void Unlock () { }
     
     virtual csFlags& GetFlags () { return flags;  }
-    virtual uint32 GetChangeNumber() const { return 0; }
+    virtual uint32 GetChangeNumber() const { return parent->GetChangeNumber (); }
 
     TriMesh (csInstmeshMeshObject* parent) : scfImplementationType (this),
       parent (parent)
@@ -406,6 +418,7 @@ private:
   csDirtyAccessArray<csTriangle> fact_triangles;
 
   csBox3 factory_bbox;
+  bool factory_bbox_valid;
   float factory_radius;
 
   bool autonormals;
@@ -443,9 +456,17 @@ public:
   virtual ~csInstmeshMeshObjectFactory ();
 
   /// Get the bounding box.
-  const csBox3& GetFactoryBox () const { return factory_bbox; }
+  const csBox3& GetFactoryBox ()
+  {
+    CalculateBoundingVolumes ();
+    return factory_bbox;
+  }
   /// Get the bounding radius.
-  const float GetFactoryRadius () const { return factory_radius; }
+  const float GetFactoryRadius ()
+  {
+    CalculateBoundingVolumes ();
+    return factory_radius;
+  }
 
   /// Calculate the factory bounding box and sphere.
   void CalculateBoundingVolumes ();
@@ -489,12 +510,6 @@ public:
 
   void CalculateNormals (bool compress);
   void Compress ();
-  void GenerateBox (const csBox3& box);
-  void GenerateQuad (const csVector3& v1, const csVector3& v2, 
-    const csVector3& v3, const csVector3& v4);
-  void GenerateSphere (const csEllipsoid& sphere, int rim_vertices,
-      	bool cyl_mapping = false, bool toponly = false,
-	bool reversed = false);
 
   iStringSet* GetStrings()
   { return strings; }

@@ -10,7 +10,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   {
     SwigExternalRuntime $(swigruntime) :
       python :
-      -c++ -shadow :
+      -c++ -shadow -modern :
       $(SEARCH_SOURCE) [ ConcatDirs $(TOP) scripts python ] :
       cspython ;
     Depends cspythonclean : cspythonswigclean ;

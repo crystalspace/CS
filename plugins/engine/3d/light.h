@@ -21,7 +21,6 @@
 
 #include "csgeom/transfrm.h"
 #include "cstool/objmodel.h"
-#include "csutil/bitarray.h"
 #include "csutil/cscolor.h"
 #include "csutil/csobject.h"
 #include "csutil/flags.h"
@@ -207,9 +206,6 @@ protected:
 
   /// List of light/sector influences.
   csLightSectorInfluences influences;
-  
-  /// Light tags
-  csBitArray lightTags;
 
   csEngine* engine;
 public:
@@ -598,11 +594,6 @@ public:
     CalculateLighting ();
   }
 
-  void AddLightTag (csStringID tag);
-  void RemoveTag (csStringID tag);
-  bool IsTagSet (csStringID tag);
-  size_t GetTagCount ();
-  void GetTags (csStringID* tags);
 };
 
 #include "csutil/win32/msvc_deprecated_warn_on.h"
