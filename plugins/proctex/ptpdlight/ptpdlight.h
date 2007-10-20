@@ -241,15 +241,29 @@ private:
 
   void Report (int severity, const char* msg, ...);
 
+  struct PreApplyNoop
+  {
+    void Perform (iTextureHandle*, uint8*) {}
+  };
+
+  template<typename PreApply = PreApplyNoop>
   struct BlitBufHelper
   {
+  private:
+    PreApply preApply;
     iTextureHandle* texh;
     uint8* lastBuf;
 
+    void DoApplyLast ()
+    {
+      preApply.Perform (texh, lastBuf);
+      texh->ApplyBlitBuffer (lastBuf);
+    }
+  public:
     BlitBufHelper (iTextureHandle* texh) : texh (texh), lastBuf (0) {}
     ~BlitBufHelper ()
     {
-      if (lastBuf != 0) texh->ApplyBlitBuffer (lastBuf);
+      if (lastBuf != 0) DoApplyLast ();
     }
 
     uint8* QueryBlitBuffer (int x, int y, int width, int height,
@@ -258,7 +272,7 @@ private:
       uint8* blitBuf = texh->QueryBlitBuffer (x, y, width, height,
         pitch, iTextureHandle::BGRA8888,
         iTextureHandle::blitbufReadable);
-      if (lastBuf != 0) texh->ApplyBlitBuffer (lastBuf);
+      if (lastBuf != 0) DoApplyLast ();
       lastBuf = blitBuf;
       return blitBuf;
     }
