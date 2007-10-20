@@ -302,7 +302,8 @@
 
 %include "cstypes.h"
 
-%immutable csWrapPtr::Type;
+%define CS_WRAP_PTR_IMPLEMENT(PtrName)
+%immutable PtrName::Type;
 %inline %{
 
   // This pointer wrapper can be used to prevent code-bloat by macros
@@ -317,21 +318,22 @@
   //    instance, "iEngine").
   // Version - The version of the interface this pointer represents.
 
-  struct csWrapPtr
+  struct PtrName
   {
     csRef<iBase> Ref;
     const char *Type;
     scfInterfaceVersion Version;
-    csWrapPtr (const char *t, scfInterfaceVersion v, csPtr<iBase> r)
+    PtrName (const char *t, scfInterfaceVersion v, csPtr<iBase> r)
     : Ref (r), Type (t), Version(v) {}
-    csWrapPtr (const char *t, scfInterfaceVersion v, csRef<iBase> r)
+    PtrName (const char *t, scfInterfaceVersion v, csRef<iBase> r)
     : Ref (r), Type (t), Version(v) {}
-    csWrapPtr (const csWrapPtr &p)
+    PtrName (const PtrName &p)
     : Ref (p.Ref), Type (p.Type), Version(p.Version) {}
   };
 
 %}
-
+%enddef
+CS_WRAP_PTR_IMPLEMENT(csWrapPtr)
 // Macro's expected in rest of this file: ignored by default.
 // When overriding in language-specific files, first #undef and then
 // re-%define them.

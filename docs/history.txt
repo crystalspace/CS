@@ -21,6 +21,10 @@ chronological order.
 	- res deprecated the (pretty much defunct for while now) 
 	  iImageIO::SetDithering() method.
 	- Darek updated haze docs.
+	- caedes added macros to swig bindings to allow declaring structures
+          similar to csWrapPtr in other modules.
+        - caedes added some immutable declarations in swig bindings to avoid
+	  a number of warnings.
 19-Oct-2007
 	- caedes fixed element size in swig iDataBuffer buffer declaration.
 	- res changed the GL texture blitting logic to make sure the texture

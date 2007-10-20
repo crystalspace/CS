@@ -178,9 +178,10 @@ As long as we don't call DecRef after QueryInterface, the object should end up
 with the correct reference count. That's how I understand it, anyway, but I
 know practically nothing about Python.
  ***@@@***/
+%define CS_WRAP_PTR_TYPEMAP(PtrName)
 %{
 PyObject *
-_csWrapPtr_to_Python (const csWrapPtr & wp)
+_ ## PtrName ## _to_Python (const PtrName & wp)
 {
   if (!wp.Ref.IsValid())
   {
@@ -224,6 +225,9 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
   return result;
 }
 %}
+%enddef
+
+CS_WRAP_PTR_TYPEMAP(csWrapPtr)
 
 #undef TYPEMAP_OUT_csWrapPtr
 %define TYPEMAP_OUT_csWrapPtr
