@@ -29,6 +29,9 @@
 CS_PLUGIN_NAMESPACE_BEGIN(PNGImageIO)
 {
 
+// For SetDithering()
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * The PNG image file format loader.
  */
@@ -56,6 +59,8 @@ public:
   virtual bool Initialize (iObjectRegistry* p) 
   { object_reg = p; return true; }
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * An csImageFile subclass for reading PNG files.<p>

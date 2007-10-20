@@ -31,6 +31,9 @@
 CS_PLUGIN_NAMESPACE_BEGIN(JNGImageIO)
 {
 
+// For SetDithering()
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * The JNG image file format loader.
  */
@@ -70,6 +73,8 @@ class csJNGImageIO : public scfImplementation2<csJNGImageIO,
   virtual bool Initialize (iObjectRegistry* p) 
   { object_reg = p; return true; }
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 /**
  * An csImageFile subclass for reading JNG files.<p>

@@ -73,6 +73,9 @@ void csImageIOMultiplexer::StoreDesc (
     formats.Push (format[i]);
 }
 
+// For SetDithering()
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 bool csImageIOMultiplexer::LoadNextPlugin ()
 {
   if (!classlist) return false;
@@ -107,6 +110,8 @@ bool csImageIOMultiplexer::LoadNextPlugin ()
   return true;
 }
 
+#include "csutil/win32/msvc_deprecated_warn_on.h"
+
 const csImageIOFileFormatDescriptions& csImageIOMultiplexer::GetDescription ()
 {
   // need all plugins.
@@ -114,12 +119,17 @@ const csImageIOFileFormatDescriptions& csImageIOMultiplexer::GetDescription ()
   return formats;
 }
 
+// For SetDithering()
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 void csImageIOMultiplexer::SetDithering (bool iEnable)
 {
   global_dither = iEnable;
   for (size_t i = 0; i < list.GetSize (); i++)
     list[i]->SetDithering (global_dither);
 }
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 csPtr<iImage> csImageIOMultiplexer::Load (iDataBuffer* buf, int iFormat)
 {
