@@ -305,8 +305,14 @@ ICONFIGMANAGER_CSHARPCODE
 //TODO: fix types bugs
 %ignore csImageBase::GetPalette;
 %ignore csPath::SetPositionVector;
+%ignore csPath::SetPositionVectors;
 %ignore csPath::SetUpVector;
+%ignore csPath::SetUpVectors;
+%ignore csPath::SetForwardVector;
 %ignore csPath::SetForwardVectors;
+%ignore csPath::GetPositionVector;
+%ignore csPath::GetUpVector;
+%ignore csPath::GetForwardVector;
 %ignore csPath::GetInterpolatedPosition;
 %ignore csPath::GetInterpolatedUp;
 %ignore csPath::GetInterpolatedForward;

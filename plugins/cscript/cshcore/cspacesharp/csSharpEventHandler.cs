@@ -43,7 +43,7 @@ namespace CrystalSpace
 
       if (HandleEventInfo.DeclaringType.IsSubclassOf (baseType))
       {
-	m_eventHandler += new cspacePINVOKE.EventHandler_t (Base_HandleEvent);
+	m_eventHandler += new corePINVOKE.EventHandler_t (Base_HandleEvent);
 	corePINVOKE.ConnectSharpEventHandler (_csSharpEventHandler.
 						getCPtr (this).Handle,
 						m_eventHandler);
