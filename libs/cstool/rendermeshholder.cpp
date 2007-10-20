@@ -36,12 +36,17 @@ csRenderMeshHolder::csRenderMeshPtr::csRenderMeshPtr()
   ptr = GetRMAlloc()->Alloc();// new csRenderMesh;
 }
 
+// For RenderMeshModes::flipCulling
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 csRenderMeshHolder::csRenderMeshPtr::csRenderMeshPtr (
   csRenderMeshPtr const& other)
 {
   ptr = GetRMAlloc()->Alloc();
   *ptr = *other.ptr;
 }
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 csRenderMeshHolder::csRenderMeshPtr::~csRenderMeshPtr()
 {

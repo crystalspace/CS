@@ -49,7 +49,8 @@ struct iTriangleMesh;
 /**
  * A definition of one edge.
  */
-struct CS_CRYSTALSPACE_EXPORT csTriangleMeshEdge
+struct CS_CRYSTALSPACE_EXPORT csTriangleMeshEdge : 
+  public CS::Memory::CustomAllocated
 {
   /**
    * Indices of the two vertices forming the edge.
@@ -181,7 +182,7 @@ public:
    */
   static bool PointInClosedMesh (const csVector3& point,
   	csVector3* vertices,
-  	csTriangleMinMax* tris, int tri_count,
+  	csTriangleMinMax* tris, size_t tri_count,
 	csPlane3* planes);
 
   /**
@@ -198,7 +199,7 @@ public:
    */
   static bool LineInClosedMesh (const csVector3& p1, const csVector3& p2,
   	csVector3* vertices,
-  	csTriangleMinMax* tris, int tri_count,
+  	csTriangleMinMax* tris, size_t tri_count,
 	csPlane3* planes);
 
   /**
@@ -215,7 +216,7 @@ public:
    */
   static bool BoxInClosedMesh (const csBox3& box,
   	csVector3* vertices,
-  	csTriangleMinMax* tris, int tri_count,
+  	csTriangleMinMax* tris, size_t tri_count,
 	csPlane3* planes);
 
   /**

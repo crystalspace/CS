@@ -306,6 +306,9 @@ namespace Utility
       return true;
     }
 
+// For Thing stuff
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
     bool Glue::ProbeThingFactory (ImportKit::Container& container, 
 			          iMeshFactoryWrapper* fact, const char* name)
     {
@@ -420,6 +423,8 @@ namespace Utility
       return true;
     }
 
+#include "csutil/win32/msvc_deprecated_warn_on.h"
+
     bool Glue::ProbeMeshObject (ImportKit::Container& container, 
 			        iObject* obj)
     {
@@ -430,6 +435,9 @@ namespace Utility
 	return true;
       return false;
     }
+
+// For Thing stuff
+#include "csutil/win32/msvc_deprecated_warn_off.h"
 
     bool Glue::ProbeThingObject (ImportKit::Container& container, 
 			         iMeshWrapper* wrap, const char* name)
@@ -449,6 +457,8 @@ namespace Utility
       }
       return false;
     }
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
   } // namespace Implementation
 

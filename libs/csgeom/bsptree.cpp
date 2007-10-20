@@ -68,7 +68,7 @@ namespace
 }
 
 size_t csBSPTree::FindBestSplitter (csTriangle* triangles, csPlane3* planes,
-	int /*num_triangles*/, const csVector3* vertices,
+	size_t /*num_triangles*/, const csVector3* vertices,
 	const csArray<int>& triidx)
 {
   size_t i, j;
@@ -115,7 +115,7 @@ size_t csBSPTree::FindBestSplitter (csTriangle* triangles, csPlane3* planes,
 }
 
 void csBSPTree::Build (csTriangle* triangles, csPlane3* planes,
-	int num_triangles, const csVector3* vertices,
+	size_t num_triangles, const csVector3* vertices,
 	const csArray<int>& triidx)
 {
   CS_ASSERT (triidx.GetSize () > 0);
@@ -189,17 +189,17 @@ void csBSPTree::Build (CS::TriangleIndicesStream<int>& triangles,
   Build (tris.GetArray(), planes.GetArray(), tris.GetSize(), vertices, triidx);
 }
 
-void csBSPTree::Build (csTriangle* triangles, int num_triangles,
+void csBSPTree::Build (csTriangle* triangles, size_t num_triangles,
 	               const csVector3* vertices)
 {
   csPlane3* planes = new csPlane3[num_triangles];
   csArray<int> triidx;
-  int i;
+  size_t i;
   for (i = 0 ; i < num_triangles ; i++)
   {
     csTriangle& t = triangles[i];
     planes[i].Set (vertices[t.a], vertices[t.b], vertices[t.c]);
-    triidx.Push (i);
+    triidx.Push (int (i));
   }
 
   Build (triangles, planes, num_triangles, vertices, triidx);

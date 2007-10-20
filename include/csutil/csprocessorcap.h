@@ -25,6 +25,8 @@
 
 #include "csextern.h"
 
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * This class is used to identify capabilities in the processor such as 
  * support for MMX and SSE
@@ -246,5 +248,7 @@ end_detect:
   static inline void CheckX86Processor() {}
 #endif //CS_PROCESSOR_X86
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 #endif //__CS_PROCESSORCAP_H__
