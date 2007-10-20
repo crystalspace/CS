@@ -6,6 +6,8 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Oct-2007
+	- Marten fixed a few merge errors in genmesh.
 12-Oct-2007
 	- caedes applied a patch from Lukas Erlinghagen for the pysimp.py file
 	  to account for incorrect lighting.

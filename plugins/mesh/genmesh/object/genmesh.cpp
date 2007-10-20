@@ -1598,7 +1598,7 @@ csRef<iString> csGenmeshMeshObject::GetRenderBufferName (int index) const
 
 iRenderBuffer* csGenmeshMeshObject::GetRenderBuffer (const char* name)
 {
-  csStringID bufID = factory->GetStrings()->Request (name);
+  csStringID bufID = factory->GetSVStrings()->Request (name);
   iRenderBuffer* buf = userBuffers.GetRenderBuffer (bufID);
   if (buf != 0) return 0;
 
@@ -2295,7 +2295,7 @@ csRef<iString> csGenmeshMeshObjectFactory::GetRenderBufferName (int index) const
 
 iRenderBuffer* csGenmeshMeshObjectFactory::GetRenderBuffer (const char* name)
 {
-  csStringID bufID = strings->Request (name);
+  csStringID bufID = svstrings->Request (name);
   iRenderBuffer* buf = userBuffers.GetRenderBuffer (bufID);
   if (buf != 0) return buf;
 
