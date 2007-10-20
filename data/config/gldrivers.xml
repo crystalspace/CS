@@ -503,11 +503,15 @@
     <!-- 
       * 2006-11-25: A lot of crashes with NVIDIA hardware and RECT textures.
 		    Also see http://trac.crystalspace3d.org/trac/CS/wiki/RECT%20texture%20woes
+      * 2007-10-20: Driver version 6.14.10.9371 works on an GeForce 7800. 
+        Enabling for all later drivers.
       -->
     <rule description="NVidia: RECT texture extension apparently broken">
       <conditions fulfill="all">
+        <comparever version="glvendor" relation="lt 6.14.10.9371" />
 	<regexp	string="vendor" pattern="NVIDIA" />
 	<regexp string="platform" pattern="Win32" />
+        
       </conditions>
       <applicable>
 	<usecfg>disableRECTTextures</usecfg>

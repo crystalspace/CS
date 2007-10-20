@@ -8,6 +8,7 @@ chronological order.
 
 20-Oct-2007
 	- Marten fixed a few merge errors in genmesh.
+	- Marten re-enabled RECT textures for latest Nvidia drivers on Win32.
 12-Oct-2007
 	- caedes applied a patch from Lukas Erlinghagen for the pysimp.py file
 	  to account for incorrect lighting.
