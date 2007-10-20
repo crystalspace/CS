@@ -86,6 +86,7 @@ public:
     return (uint8*)cs_malloc (height * pitch);
   }
   void ApplyBlitBuffer (uint8* buf) { cs_free (buf); }
+  BlitBufferNature GetBufferNature (uint8* buf) { return natureDirect; }
 };
 
 #include "csutil/win32/msvc_deprecated_warn_on.h"

@@ -50,7 +50,7 @@ struct iGraphics3D;
  */
 struct iTextureHandle : public virtual iBase
 {
-  SCF_INTERFACE(iTextureHandle, 3,0,2);
+  SCF_INTERFACE(iTextureHandle, 3,0,3);
   /// Retrieve the flags set for this texture
   virtual int GetFlags () const = 0;
 
@@ -263,6 +263,25 @@ struct iTextureHandle : public virtual iBase
     uint bufFlags = 0) = 0;
   /// Apply the given blitting buffer.
   virtual void ApplyBlitBuffer (uint8* buf) = 0;
+  /// Characteristics of a blit buffer
+  enum BlitBufferNature
+  {
+    /**
+     * The returned buffer is an intermediate buffer which is applied only 
+     * indirectly, possibly with a call to a foreign module.
+     * This information is mostly useful in cases where some state has to be
+     * set before a foreign call could possibly occur. An examples for such
+     * action is code that utilizes MMX which should execute the 'emms'
+     * instruction before foreign code is called.
+     */
+    natureIndirect = 0,
+    /**
+     * The returned buffer is actually a direct pointer to the texture 
+     * storage.
+     */
+    natureDirect = 1
+  };
+  virtual BlitBufferNature GetBufferNature (uint8* buf) = 0;
 };
 
 /** @} */
