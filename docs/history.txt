@@ -14,6 +14,7 @@ chronological order.
 	  corruption experienced with ATI drivers and using glTexSubImage2D.
 	- res added support for the pixel pack/unpack buffer bindings to the
 	  GL state cache.
+	- res fixed some errors in csimagetool's getopt_long() options string.
 19-Oct-2007
 	- caedes fixed element size in swig iDataBuffer buffer declaration.
 	- res changed the GL texture blitting logic to make sure the texture
