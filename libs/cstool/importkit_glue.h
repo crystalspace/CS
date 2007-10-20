@@ -52,7 +52,7 @@ namespace Utility
     };
 
 // For Thing stuff
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
     /// Bulk of the import kit implementation.
     class Glue
@@ -124,7 +124,7 @@ namespace Utility
 	const char* path, ImportKit::Container& container);
     };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
   } // namespace Implementation
 } // namespace Utility

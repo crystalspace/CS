@@ -74,7 +74,7 @@ void csImageIOMultiplexer::StoreDesc (
 }
 
 // For SetDithering()
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 bool csImageIOMultiplexer::LoadNextPlugin ()
 {
@@ -110,7 +110,7 @@ bool csImageIOMultiplexer::LoadNextPlugin ()
   return true;
 }
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 const csImageIOFileFormatDescriptions& csImageIOMultiplexer::GetDescription ()
 {
@@ -120,7 +120,7 @@ const csImageIOFileFormatDescriptions& csImageIOMultiplexer::GetDescription ()
 }
 
 // For SetDithering()
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 void csImageIOMultiplexer::SetDithering (bool iEnable)
 {
@@ -129,7 +129,7 @@ void csImageIOMultiplexer::SetDithering (bool iEnable)
     list[i]->SetDithering (global_dither);
 }
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 csPtr<iImage> csImageIOMultiplexer::Load (iDataBuffer* buf, int iFormat)
 {

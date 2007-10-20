@@ -57,7 +57,7 @@ enum csDDSRawDataType
 };
 
 // For SetDithering()
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 class csDDSImageIO : 
   public scfImplementation2<csDDSImageIO,
@@ -86,7 +86,7 @@ private:
     uint& bpp);
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 class csDDSImageFile : public csImageMemory
 {

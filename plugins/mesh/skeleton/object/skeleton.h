@@ -570,7 +570,7 @@ public:
   size_t GetID ();
 };
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 class csSkeleton :
   public scfImplementation1<csSkeleton, iSkeleton>
@@ -717,7 +717,7 @@ public:
   virtual size_t GetSocketsCount();
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 class csSkeletonSocketFactory :
   public scfImplementation1<csSkeletonSocketFactory, iSkeletonSocketFactory>

@@ -30,7 +30,7 @@ struct iEngine;
 struct iMeshWrapper;
 struct iCamera;
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * BugPlug is the hiding place for many dark creatures. While Spider only
@@ -170,6 +170,6 @@ public:
 
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 #endif // __CS_SHADOW_H__

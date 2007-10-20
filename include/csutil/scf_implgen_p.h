@@ -37,7 +37,7 @@
 #pragma once
 #endif
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /* Pre-preprocessed code starts here */
 template<class Class >
@@ -2728,4 +2728,4 @@ private:
 };
 /* Pre-preprocessed code ends here */
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"

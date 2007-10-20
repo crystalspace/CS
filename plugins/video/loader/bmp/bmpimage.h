@@ -30,7 +30,7 @@ CS_PLUGIN_NAMESPACE_BEGIN(BMPImageIO)
 {
 
 // For SetDithering()
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /**
  * The BMP image file format loader.
@@ -58,7 +58,7 @@ class csBMPImageIO : public scfImplementation2<csBMPImageIO,
   virtual bool Initialize (iObjectRegistry*) { return true; }
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 /**
  * An csImageFile subclass for reading BMP files.

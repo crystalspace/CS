@@ -26,7 +26,7 @@
 #include "csutil/ref.h"
 #include "csutil/refcount.h"
 
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 /// List of errorcodes for threads.
 enum
@@ -333,6 +333,6 @@ public:
   virtual char const* GetLastError () const = 0;
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 #endif // __CS_CSSYS_THREAD_H__

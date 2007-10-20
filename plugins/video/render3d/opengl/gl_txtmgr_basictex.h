@@ -90,7 +90,7 @@ struct csGLUploadData
 struct csGLTextureClassSettings;
 
 // For GetTextureTarget ()
-#include "csutil/win32/msvc_deprecated_warn_off.h"
+#include "csutil/deprecated_warn_off.h"
 
 class csGLBasicTextureHandle :
   public scfImplementation1<csGLBasicTextureHandle, 
@@ -349,7 +349,7 @@ public:
   csPtr<iImage> Dump ();
 };
 
-#include "csutil/win32/msvc_deprecated_warn_on.h"
+#include "csutil/deprecated_warn_on.h"
 
 }
 CS_PLUGIN_NAMESPACE_END(gl3d)
