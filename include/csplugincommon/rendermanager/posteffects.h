@@ -62,12 +62,14 @@ namespace RenderManager
 
     void AllocatePingpongTextures ();
     
-    csRef<iGraphics3D> graphics3D;    
+    csRef<iGraphics3D> graphics3D;
+
     csSimpleRenderMesh fullscreenQuad;
     csVector3* screenQuadVerts;
     csVector2* screenQuadTex;
 
     unsigned int currentWidth, currentHeight;
+    float textureCoordinateX, textureCoordinateY, textureOffsetX, textureOffsetY;
 
     csRef<iTextureHandle> textures[2];
     unsigned int activeTexture;

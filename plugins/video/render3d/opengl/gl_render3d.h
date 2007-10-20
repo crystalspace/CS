@@ -419,17 +419,12 @@ private:
   struct ImageUnit : public CS::Memory::CustomAllocated
   {
     bool enabled;
-    GLuint target;
-    csRef<csGLBasicTextureHandle> needNPOTSfixup;
-    /// Whether an NPOTS scrap is attached to a TC buffer
-    bool npotsStatus;
+    GLuint target;    
     
-    ImageUnit (): enabled (false), target (0), npotsStatus (false) {}
+    ImageUnit (): enabled (false), target (0) {}
   };
   GLint numImageUnits;
   ImageUnit* imageUnits;
-  /// Array of buffers used for NPOTS texture coord fixup
-  csArray<csRef<iRenderBuffer> > npotsFixupScrap;
   /// Whether the alpha channel of the color buffer should be scaled.
   bool needColorFixup;
   /// Amount to scale alpha channel of color buffer
@@ -450,7 +445,6 @@ private:
   void ApplyBufferChanges();
   //@}
 
-  csRef<iRenderBuffer> DoNPOTSFixup (iRenderBuffer* buffer, int unit);
   csRef<iRenderBuffer> DoColorFixup (iRenderBuffer* buffer);
 
   // Minimal float depth(z) difference to store
