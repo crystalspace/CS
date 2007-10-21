@@ -654,7 +654,7 @@ GLenum csGLBasicTextureHandle::GetGLTextureTarget() const
 void csGLBasicTextureHandle::EnsureUncompressed (bool keepPixels,
   TextureBlitDataFormat newTexFormat)
 {
-  if (newTexFormat == (TextureType)~0) newTexFormat = texFormat;
+  if (newTexFormat == (TextureBlitDataFormat)~0) newTexFormat = texFormat;
 
   GLenum target = GetGLTextureTarget();
   // @@@ FIXME: support more than 2D
