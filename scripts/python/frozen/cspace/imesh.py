@@ -231,6 +231,10 @@ class iGeneralFactoryState(iGeneralMeshCommonState):
     def GetNormalByIndex(*args): return _imesh.iGeneralFactoryState_GetNormalByIndex(*args)
     def GetTriangleByIndex(*args): return _imesh.iGeneralFactoryState_GetTriangleByIndex(*args)
     def GetColorByIndex(*args): return _imesh.iGeneralFactoryState_GetColorByIndex(*args)
+    def GetVerticesAsBuffer(*args): return _imesh.iGeneralFactoryState_GetVerticesAsBuffer(*args)
+    def GetNormalsAsBuffer(*args): return _imesh.iGeneralFactoryState_GetNormalsAsBuffer(*args)
+    def GetColorsAsBuffer(*args): return _imesh.iGeneralFactoryState_GetColorsAsBuffer(*args)
+    def GetTrianglesAsBuffer(*args): return _imesh.iGeneralFactoryState_GetTrianglesAsBuffer(*args)
     scfGetVersion = staticmethod(_imesh.iGeneralFactoryState_scfGetVersion)
     __swig_destroy__ = _imesh.delete_iGeneralFactoryState
     __del__ = lambda self : None;

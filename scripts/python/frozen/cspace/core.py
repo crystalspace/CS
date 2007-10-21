@@ -128,11 +128,12 @@ class csArrayCapacityDefault(csArrayThresholdVariableCapacityLinear):
 csArrayCapacityDefault_swigregister = _core.csArrayCapacityDefault_swigregister
 csArrayCapacityDefault_swigregister(csArrayCapacityDefault)
 
+SetCoreSCFPointer = _core.SetCoreSCFPointer
 scfCompatibleVersion = _core.scfCompatibleVersion
 class scfInterfaceMetadata(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    interfaceName = _swig_property(_core.scfInterfaceMetadata_interfaceName_get, _core.scfInterfaceMetadata_interfaceName_set)
+    interfaceName = _swig_property(_core.scfInterfaceMetadata_interfaceName_get)
     interfaceID = _swig_property(_core.scfInterfaceMetadata_interfaceID_get, _core.scfInterfaceMetadata_interfaceID_set)
     interfaceVersion = _swig_property(_core.scfInterfaceMetadata_interfaceVersion_get, _core.scfInterfaceMetadata_interfaceVersion_set)
     def __init__(self, *args): 
@@ -173,10 +174,10 @@ class iBase(object):
     def IncRef(*args): return _core.iBase_IncRef(*args)
     def DecRef(*args): return _core.iBase_DecRef(*args)
     def GetRefCount(*args): return _core.iBase_GetRefCount(*args)
-    def QueryInterface(*args): return _core.iBase_QueryInterface(*args)
     def AddRefOwner(*args): return _core.iBase_AddRefOwner(*args)
     def RemoveRefOwner(*args): return _core.iBase_RemoveRefOwner(*args)
     def GetInterfaceMetadata(*args): return _core.iBase_GetInterfaceMetadata(*args)
+    def QueryInterface(*args): return _core.iBase_QueryInterface(*args)
     scfGetVersion = staticmethod(_core.iBase_scfGetVersion)
 iBase_swigregister = _core.iBase_swigregister
 iBase_swigregister(iBase)
@@ -186,7 +187,7 @@ class iSCF(iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    SCF = _swig_property(_core.iSCF_SCF_get, _core.iSCF_SCF_set)
+    SCF = _swig_property(_core.iSCF_SCF_get)
     def RegisterClasses(*args): return _core.iSCF_RegisterClasses(*args)
     def ClassRegistered(*args): return _core.iSCF_ClassRegistered(*args)
     def CreateInstance(*args): return _core.iSCF_CreateInstance(*args)
@@ -384,9 +385,12 @@ class csStringSet(object):
     def Contains(*args): return _core.csStringSet_Contains(*args)
     def Delete(*args): return _core.csStringSet_Delete(*args)
     def Empty(*args): return _core.csStringSet_Empty(*args)
-    def Clear(*args): return _core.csStringSet_Clear(*args)
     def GetSize(*args): return _core.csStringSet_GetSize(*args)
     def IsEmpty(*args): return _core.csStringSet_IsEmpty(*args)
+    def Clear (*args):
+        print "csStringSet.Clear() is deprecated, use csStringSet.Empty() instead"
+        return self.Empty(*args)
+
 csStringSet_swigregister = _core.csStringSet_swigregister
 csStringSet_swigregister(csStringSet)
 
@@ -927,6 +931,7 @@ class iObject(iBase):
     def ObjRemove(*args): return _core.iObject_ObjRemove(*args)
     def ObjRemoveAll(*args): return _core.iObject_ObjRemoveAll(*args)
     def ObjAddChildren(*args): return _core.iObject_ObjAddChildren(*args)
+    def GetChildByName(*args): return _core.iObject_GetChildByName(*args)
     def GetIterator(*args): return _core.iObject_GetIterator(*args)
     def ObjReleaseOld(*args): return _core.iObject_ObjReleaseOld(*args)
     def AddNameChangeListener(*args): return _core.iObject_AddNameChangeListener(*args)
@@ -1533,13 +1538,13 @@ class iPluginManager(iBase):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    def LoadPlugin(*args): return _core.iPluginManager_LoadPlugin(*args)
-    def QueryPlugin(*args): return _core.iPluginManager_QueryPlugin(*args)
+    def LoadPluginAlways(*args): return _core.iPluginManager_LoadPluginAlways(*args)
     def UnloadPlugin(*args): return _core.iPluginManager_UnloadPlugin(*args)
     def RegisterPlugin(*args): return _core.iPluginManager_RegisterPlugin(*args)
     def GetPlugins(*args): return _core.iPluginManager_GetPlugins(*args)
     def Clear(*args): return _core.iPluginManager_Clear(*args)
     def QueryOptions(*args): return _core.iPluginManager_QueryOptions(*args)
+    def LoadPlugin(*args): return _core.iPluginManager_LoadPlugin(*args)
     scfGetVersion = staticmethod(_core.iPluginManager_scfGetVersion)
     __swig_destroy__ = _core.delete_iPluginManager
     __del__ = lambda self : None;
@@ -1711,7 +1716,6 @@ class iStringArray(iBase):
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetSize(*args): return _core.iStringArray_GetSize(*args)
-    def Length(*args): return _core.iStringArray_Length(*args)
     def Push(*args): return _core.iStringArray_Push(*args)
     def Pop(*args): return _core.iStringArray_Pop(*args)
     def Get(*args): return _core.iStringArray_Get(*args)
@@ -1723,8 +1727,15 @@ class iStringArray(iBase):
     def DeleteIndex(*args): return _core.iStringArray_DeleteIndex(*args)
     def Insert(*args): return _core.iStringArray_Insert(*args)
     def Empty(*args): return _core.iStringArray_Empty(*args)
-    def DeleteAll(*args): return _core.iStringArray_DeleteAll(*args)
     def IsEmpty(*args): return _core.iStringArray_IsEmpty(*args)
+    def Length (*args):
+        print "iStringArray.Length() is deprecated, use iStringArray.GetSize() instead"
+        return self.GetSize(*args)
+
+    def DeleteAll (*args):
+        print "iStringArray.DeleteAll() is deprecated, use iStringArray.Empty() instead"
+        return self.Empty(*args)
+
     def __getitem__(*args): return _core.iStringArray___getitem__(*args)
     def __contains__(*args): return _core.iStringArray___contains__(*args)
     def __delitem__(*args): return _core.iStringArray___delitem__(*args)
@@ -1955,6 +1966,7 @@ class iDataBuffer(iBase):
     def GetData(*args): return _core.iDataBuffer_GetData(*args)
     def asString(*args): return _core.iDataBuffer_asString(*args)
     def GetUint8(*args): return _core.iDataBuffer_GetUint8(*args)
+    def AsBuffer(*args): return _core.iDataBuffer_AsBuffer(*args)
     scfGetVersion = staticmethod(_core.iDataBuffer_scfGetVersion)
     __swig_destroy__ = _core.delete_iDataBuffer
     __del__ = lambda self : None;
@@ -2118,11 +2130,11 @@ class csObject(pycsObject):
     def ObjRemove(*args): return _core.csObject_ObjRemove(*args)
     def ObjRemoveAll(*args): return _core.csObject_ObjRemoveAll(*args)
     def ObjAddChildren(*args): return _core.csObject_ObjAddChildren(*args)
+    def GetChildByName(*args): return _core.csObject_GetChildByName(*args)
     def GetIterator(*args): return _core.csObject_GetIterator(*args)
     def AddNameChangeListener(*args): return _core.csObject_AddNameChangeListener(*args)
     def RemoveNameChangeListener(*args): return _core.csObject_RemoveNameChangeListener(*args)
     def ObjReleaseOld(*args): return _core.csObject_ObjReleaseOld(*args)
-    def GetChild(*args): return _core.csObject_GetChild(*args)
 csObject_swigregister = _core.csObject_swigregister
 csObject_swigregister(csObject)
 
@@ -2151,7 +2163,6 @@ csevMouseClick = _core.csevMouseClick
 csevMouseDoubleClick = _core.csevMouseDoubleClick
 csevMouseMove = _core.csevMouseMove
 csevJoystickEvent = _core.csevJoystickEvent
-CS_LOAD_PLUGIN_ALWAYS = _core.CS_LOAD_PLUGIN_ALWAYS
 class TextureMapper(object):
     thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
@@ -2226,6 +2237,7 @@ class csPrimitives(Primitives):
 csPrimitives_swigregister = _core.csPrimitives_swigregister
 csPrimitives_swigregister(csPrimitives)
 
+CS_LOAD_PLUGIN_ALWAYS = _core.CS_LOAD_PLUGIN_ALWAYS
 CS_QUERY_REGISTRY = _core.CS_QUERY_REGISTRY
 CS_QUERY_REGISTRY_TAG_INTERFACE = _core.CS_QUERY_REGISTRY_TAG_INTERFACE
 SCF_QUERY_INTERFACE = _core.SCF_QUERY_INTERFACE
@@ -2394,7 +2406,7 @@ def SyncSCFPointers():
         csmodule(corecvar.iSCF_SCF)
 def SetSCFPointer(scf_pointer):
     """Set SCF Pointer to all CrystalSpace modules"""
-    corecvar.iSCF_SCF = scf_pointer
+    SetCoreSCFPointer(scf_pointer)
     SyncSCFPointers()
 def GetSCFPointer():
     """Get SCF Pointer"""
