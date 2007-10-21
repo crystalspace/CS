@@ -6,6 +6,8 @@ each new day's entries appears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+20-Oct-2007
+        - Mike Gist added a compile fix for the OpenAL plugin on MSVC.
 19-Oct-2007
 	- Vincent added comments about using iSndSysSource3D,
 	  iSndSysSource3DDirectional and iSndSysSource3DDirectionalSimple

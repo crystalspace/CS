@@ -125,7 +125,7 @@ void SndSysSourceOpenAL2D::PerformUpdate ( bool ExternalUpdates )
   if (processedBuffers > 0)
   {
     // Unqueue any processed buffers
-    ALuint unqueued[s_NumberOfBuffers];
+    CS_ALLOC_STACK_ARRAY(ALuint, unqueued, s_NumberOfBuffers);
     alSourceUnqueueBuffers (m_Source, processedBuffers, unqueued);
     CS_ASSERT (unqueued[0] == m_Buffers[m_EmptyBuffer]);
 
@@ -223,7 +223,7 @@ bool SndSysSourceOpenAL2D::FillBuffer (ALuint buffer) {
     {
       // The both buffers have data
       // Combine the buffers
-      ALchar tempbuffer[length1+length2];
+      CS_ALLOC_STACK_ARRAY(ALuint, tempbuffer, length1+length2);
       memcpy (tempbuffer, data1, length1);
       memcpy (tempbuffer+length1, data2, length2);
 
