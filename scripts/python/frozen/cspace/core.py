@@ -2,7 +2,6 @@
 # Version 1.3.31
 #
 # Don't modify this file, modify the SWIG interface instead.
-# This file is compatible with both classic and new-style classes.
 
 import _core
 import new
@@ -48,6 +47,16 @@ except AttributeError:
 del types
 
 
+def _swig_setattr_nondynamic_method(set):
+    def set_attr(self,name,value):
+        if (name == "thisown"): return self.this.own(value)
+        if hasattr(self,name) or (name == "this"):
+            set(self,name,value)
+        else:
+            raise AttributeError("You cannot add attributes to %s" % self)
+    return set_attr
+
+
 CS_COMPILER_NAME = _core.CS_COMPILER_NAME
 CS_PLATFORM_NAME = _core.CS_PLATFORM_NAME
 CS_PROCESSOR_SIZE = _core.CS_PROCESSOR_SIZE
@@ -56,20 +65,12 @@ CS_PROCESSOR_NAME = _core.CS_PROCESSOR_NAME
 CS_WCHAR_T_SIZE = _core.CS_WCHAR_T_SIZE
 CS_PACKAGE_NAME = _core.CS_PACKAGE_NAME
 CS_PACKAGE_VERSION = _core.CS_PACKAGE_VERSION
-class csWrapPtr(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csWrapPtr, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csWrapPtr, name)
+class csWrapPtr(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["Ref"] = _core.csWrapPtr_Ref_set
-    __swig_getmethods__["Ref"] = _core.csWrapPtr_Ref_get
-    if _newclass:Ref = _swig_property(_core.csWrapPtr_Ref_get, _core.csWrapPtr_Ref_set)
-    __swig_getmethods__["Type"] = _core.csWrapPtr_Type_get
-    if _newclass:Type = _swig_property(_core.csWrapPtr_Type_get)
-    __swig_setmethods__["Version"] = _core.csWrapPtr_Version_set
-    __swig_getmethods__["Version"] = _core.csWrapPtr_Version_get
-    if _newclass:Version = _swig_property(_core.csWrapPtr_Version_get, _core.csWrapPtr_Version_set)
+    Ref = _swig_property(_core.csWrapPtr_Ref_get, _core.csWrapPtr_Ref_set)
+    Type = _swig_property(_core.csWrapPtr_Type_get)
+    Version = _swig_property(_core.csWrapPtr_Version_get, _core.csWrapPtr_Version_set)
     def __init__(self, *args): 
         this = _core.new_csWrapPtr(*args)
         try: self.this.append(this)
@@ -88,11 +89,8 @@ def fix_args(funct):
         return funct(*args)
     return _inner
 
-class csArrayThresholdVariable(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csArrayThresholdVariable, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csArrayThresholdVariable, name)
+class csArrayThresholdVariable(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _core.new_csArrayThresholdVariable(*args)
@@ -105,12 +103,7 @@ csArrayThresholdVariable_swigregister = _core.csArrayThresholdVariable_swigregis
 csArrayThresholdVariable_swigregister(csArrayThresholdVariable)
 
 class csArrayThresholdVariableCapacityLinear(csArrayThresholdVariable):
-    __swig_setmethods__ = {}
-    for _s in [csArrayThresholdVariable]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csArrayThresholdVariableCapacityLinear, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csArrayThresholdVariable]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csArrayThresholdVariableCapacityLinear, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _core.new_csArrayThresholdVariableCapacityLinear(*args)
@@ -124,12 +117,7 @@ csArrayThresholdVariableCapacityLinear_swigregister = _core.csArrayThresholdVari
 csArrayThresholdVariableCapacityLinear_swigregister(csArrayThresholdVariableCapacityLinear)
 
 class csArrayCapacityDefault(csArrayThresholdVariableCapacityLinear):
-    __swig_setmethods__ = {}
-    for _s in [csArrayThresholdVariableCapacityLinear]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csArrayCapacityDefault, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csArrayThresholdVariableCapacityLinear]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csArrayCapacityDefault, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _core.new_csArrayCapacityDefault(*args)
@@ -141,21 +129,12 @@ csArrayCapacityDefault_swigregister = _core.csArrayCapacityDefault_swigregister
 csArrayCapacityDefault_swigregister(csArrayCapacityDefault)
 
 scfCompatibleVersion = _core.scfCompatibleVersion
-class scfInterfaceMetadata(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, scfInterfaceMetadata, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, scfInterfaceMetadata, name)
+class scfInterfaceMetadata(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["interfaceName"] = _core.scfInterfaceMetadata_interfaceName_set
-    __swig_getmethods__["interfaceName"] = _core.scfInterfaceMetadata_interfaceName_get
-    if _newclass:interfaceName = _swig_property(_core.scfInterfaceMetadata_interfaceName_get, _core.scfInterfaceMetadata_interfaceName_set)
-    __swig_setmethods__["interfaceID"] = _core.scfInterfaceMetadata_interfaceID_set
-    __swig_getmethods__["interfaceID"] = _core.scfInterfaceMetadata_interfaceID_get
-    if _newclass:interfaceID = _swig_property(_core.scfInterfaceMetadata_interfaceID_get, _core.scfInterfaceMetadata_interfaceID_set)
-    __swig_setmethods__["interfaceVersion"] = _core.scfInterfaceMetadata_interfaceVersion_set
-    __swig_getmethods__["interfaceVersion"] = _core.scfInterfaceMetadata_interfaceVersion_get
-    if _newclass:interfaceVersion = _swig_property(_core.scfInterfaceMetadata_interfaceVersion_get, _core.scfInterfaceMetadata_interfaceVersion_set)
+    interfaceName = _swig_property(_core.scfInterfaceMetadata_interfaceName_get, _core.scfInterfaceMetadata_interfaceName_set)
+    interfaceID = _swig_property(_core.scfInterfaceMetadata_interfaceID_get, _core.scfInterfaceMetadata_interfaceID_set)
+    interfaceVersion = _swig_property(_core.scfInterfaceMetadata_interfaceVersion_get, _core.scfInterfaceMetadata_interfaceVersion_set)
     def __init__(self, *args): 
         this = _core.new_scfInterfaceMetadata(*args)
         try: self.this.append(this)
@@ -167,18 +146,11 @@ scfInterfaceMetadata_swigregister(scfInterfaceMetadata)
 cvar = _core.cvar
 csArrayItemNotFound = cvar.csArrayItemNotFound
 
-class scfInterfaceMetadataList(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, scfInterfaceMetadataList, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, scfInterfaceMetadataList, name)
+class scfInterfaceMetadataList(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["metadata"] = _core.scfInterfaceMetadataList_metadata_set
-    __swig_getmethods__["metadata"] = _core.scfInterfaceMetadataList_metadata_get
-    if _newclass:metadata = _swig_property(_core.scfInterfaceMetadataList_metadata_get, _core.scfInterfaceMetadataList_metadata_set)
-    __swig_setmethods__["metadataCount"] = _core.scfInterfaceMetadataList_metadataCount_set
-    __swig_getmethods__["metadataCount"] = _core.scfInterfaceMetadataList_metadataCount_get
-    if _newclass:metadataCount = _swig_property(_core.scfInterfaceMetadataList_metadataCount_get, _core.scfInterfaceMetadataList_metadataCount_set)
+    metadata = _swig_property(_core.scfInterfaceMetadataList_metadata_get, _core.scfInterfaceMetadataList_metadata_set)
+    metadataCount = _swig_property(_core.scfInterfaceMetadataList_metadataCount_get, _core.scfInterfaceMetadataList_metadataCount_set)
     def __len__(*args): return _core.scfInterfaceMetadataList___len__(*args)
     def __getitem__(*args): return _core.scfInterfaceMetadataList___getitem__(*args)
     def content_iterator(self):
@@ -194,11 +166,8 @@ class scfInterfaceMetadataList(_object):
 scfInterfaceMetadataList_swigregister = _core.scfInterfaceMetadataList_swigregister
 scfInterfaceMetadataList_swigregister(scfInterfaceMetadataList)
 
-class iBase(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iBase, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, iBase, name)
+class iBase(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def IncRef(*args): return _core.iBase_IncRef(*args)
@@ -208,24 +177,16 @@ class iBase(_object):
     def AddRefOwner(*args): return _core.iBase_AddRefOwner(*args)
     def RemoveRefOwner(*args): return _core.iBase_RemoveRefOwner(*args)
     def GetInterfaceMetadata(*args): return _core.iBase_GetInterfaceMetadata(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iBase_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iBase_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iBase_scfGetVersion)
 iBase_swigregister = _core.iBase_swigregister
 iBase_swigregister(iBase)
 iBase_scfGetVersion = _core.iBase_scfGetVersion
 
 class iSCF(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSCF, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSCF, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    __swig_setmethods__["SCF"] = _core.iSCF_SCF_set
-    __swig_getmethods__["SCF"] = _core.iSCF_SCF_get
-    if _newclass:SCF = _swig_property(_core.iSCF_SCF_get, _core.iSCF_SCF_set)
+    SCF = _swig_property(_core.iSCF_SCF_get, _core.iSCF_SCF_set)
     def RegisterClasses(*args): return _core.iSCF_RegisterClasses(*args)
     def ClassRegistered(*args): return _core.iSCF_ClassRegistered(*args)
     def CreateInstance(*args): return _core.iSCF_CreateInstance(*args)
@@ -242,8 +203,7 @@ class iSCF(iBase):
     def QueryClassList(*args): return _core.iSCF_QueryClassList(*args)
     def ScanPluginsPath(*args): return _core.iSCF_ScanPluginsPath(*args)
     def RegisterPlugin(*args): return _core.iSCF_RegisterPlugin(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iSCF_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iSCF_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iSCF_scfGetVersion)
     __swig_destroy__ = _core.delete_iSCF
     __del__ = lambda self : None;
 iSCF_swigregister = _core.iSCF_swigregister
@@ -252,12 +212,7 @@ iSCF_scfGetVersion = _core.iSCF_scfGetVersion
 
 SCF_STATIC_CLASS_CONTEXT = _core.SCF_STATIC_CLASS_CONTEXT
 class iFactory(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iFactory, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iFactory, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def CreateInstance(*args): return _core.iFactory_CreateInstance(*args)
@@ -266,8 +221,7 @@ class iFactory(iBase):
     def QueryDependencies(*args): return _core.iFactory_QueryDependencies(*args)
     def QueryClassID(*args): return _core.iFactory_QueryClassID(*args)
     def QueryModuleName(*args): return _core.iFactory_QueryModuleName(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iFactory_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iFactory_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iFactory_scfGetVersion)
     __swig_destroy__ = _core.delete_iFactory
     __del__ = lambda self : None;
 iFactory_swigregister = _core.iFactory_swigregister
@@ -288,12 +242,7 @@ CS_DBGHELP_TXTDUMP = _core.CS_DBGHELP_TXTDUMP
 CS_DBGHELP_GFXDUMP = _core.CS_DBGHELP_GFXDUMP
 CS_DBGHELP_STATETEST = _core.CS_DBGHELP_STATETEST
 class iDebugHelper(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iDebugHelper, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iDebugHelper, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetSupportedTests(*args): return _core.iDebugHelper_GetSupportedTests(*args)
@@ -302,8 +251,7 @@ class iDebugHelper(iBase):
     def Benchmark(*args): return _core.iDebugHelper_Benchmark(*args)
     def Dump(*args): return _core.iDebugHelper_Dump(*args)
     def DebugCommand(*args): return _core.iDebugHelper_DebugCommand(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iDebugHelper_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iDebugHelper_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iDebugHelper_scfGetVersion)
     __swig_destroy__ = _core.delete_iDebugHelper
     __del__ = lambda self : None;
 iDebugHelper_swigregister = _core.iDebugHelper_swigregister
@@ -312,12 +260,7 @@ scfRegisterStaticClass = _core.scfRegisterStaticClass
 iDebugHelper_scfGetVersion = _core.iDebugHelper_scfGetVersion
 
 class iCommandLineParser(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iCommandLineParser, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iCommandLineParser, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Initialize(*args): return _core.iCommandLineParser_Initialize(*args)
@@ -333,29 +276,19 @@ class iCommandLineParser(iBase):
     def GetAppPath(*args): return _core.iCommandLineParser_GetAppPath(*args)
     def GetOptionName(*args): return _core.iCommandLineParser_GetOptionName(*args)
     def GetOption(*args): return _core.iCommandLineParser_GetOption(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iCommandLineParser_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iCommandLineParser_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iCommandLineParser_scfGetVersion)
     __swig_destroy__ = _core.delete_iCommandLineParser
     __del__ = lambda self : None;
 iCommandLineParser_swigregister = _core.iCommandLineParser_swigregister
 iCommandLineParser_swigregister(iCommandLineParser)
 iCommandLineParser_scfGetVersion = _core.iCommandLineParser_scfGetVersion
 
-class csColor(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csColor, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csColor, name)
+class csColor(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["red"] = _core.csColor_red_set
-    __swig_getmethods__["red"] = _core.csColor_red_get
-    if _newclass:red = _swig_property(_core.csColor_red_get, _core.csColor_red_set)
-    __swig_setmethods__["green"] = _core.csColor_green_set
-    __swig_getmethods__["green"] = _core.csColor_green_get
-    if _newclass:green = _swig_property(_core.csColor_green_get, _core.csColor_green_set)
-    __swig_setmethods__["blue"] = _core.csColor_blue_set
-    __swig_getmethods__["blue"] = _core.csColor_blue_get
-    if _newclass:blue = _swig_property(_core.csColor_blue_get, _core.csColor_blue_set)
+    red = _swig_property(_core.csColor_red_get, _core.csColor_red_set)
+    green = _swig_property(_core.csColor_green_get, _core.csColor_green_set)
+    blue = _swig_property(_core.csColor_blue_get, _core.csColor_blue_set)
     def __init__(self, *args): 
         this = _core.new_csColor(*args)
         try: self.this.append(this)
@@ -383,16 +316,9 @@ csColor_swigregister = _core.csColor_swigregister
 csColor_swigregister(csColor)
 
 class csColor4(csColor):
-    __swig_setmethods__ = {}
-    for _s in [csColor]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csColor4, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csColor]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csColor4, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["alpha"] = _core.csColor4_alpha_set
-    __swig_getmethods__["alpha"] = _core.csColor4_alpha_get
-    if _newclass:alpha = _swig_property(_core.csColor4_alpha_get, _core.csColor4_alpha_set)
+    alpha = _swig_property(_core.csColor4_alpha_get, _core.csColor4_alpha_set)
     def __init__(self, *args): 
         this = _core.new_csColor4(*args)
         try: self.this.append(this)
@@ -409,16 +335,11 @@ class csColor4(csColor):
 csColor4_swigregister = _core.csColor4_swigregister
 csColor4_swigregister(csColor4)
 
-class csCommandLineHelper(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csCommandLineHelper, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csCommandLineHelper, name)
+class csCommandLineHelper(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_getmethods__["Help"] = lambda x: _core.csCommandLineHelper_Help
-    if _newclass:Help = staticmethod(_core.csCommandLineHelper_Help)
-    __swig_getmethods__["CheckHelp"] = lambda x: _core.csCommandLineHelper_CheckHelp
-    if _newclass:CheckHelp = staticmethod(_core.csCommandLineHelper_CheckHelp)
+    Help = staticmethod(_core.csCommandLineHelper_Help)
+    CheckHelp = staticmethod(_core.csCommandLineHelper_CheckHelp)
     def __init__(self, *args): 
         this = _core.new_csCommandLineHelper(*args)
         try: self.this.append(this)
@@ -430,11 +351,8 @@ csCommandLineHelper_swigregister(csCommandLineHelper)
 csCommandLineHelper_Help = _core.csCommandLineHelper_Help
 csCommandLineHelper_CheckHelp = _core.csCommandLineHelper_CheckHelp
 
-class csFlags(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csFlags, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csFlags, name)
+class csFlags(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _core.new_csFlags(*args)
@@ -452,11 +370,8 @@ class csFlags(_object):
 csFlags_swigregister = _core.csFlags_swigregister
 csFlags_swigregister(csFlags)
 
-class csStringSet(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csStringSet, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csStringSet, name)
+class csStringSet(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _core.new_csStringSet(*args)
@@ -475,11 +390,8 @@ class csStringSet(_object):
 csStringSet_swigregister = _core.csStringSet_swigregister
 csStringSet_swigregister(csStringSet)
 
-class csStringIDSet(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csStringIDSet, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csStringIDSet, name)
+class csStringIDSet(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _core.new_csStringIDSet(*args)
@@ -504,20 +416,14 @@ csStringIDSet_swigregister = _core.csStringIDSet_swigregister
 csStringIDSet_swigregister(csStringIDSet)
 
 class iString(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iString, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iString, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetData(*args): return _core.iString_GetData(*args)
     def DeleteAt(*args): return _core.iString_DeleteAt(*args)
     def StartsWith(*args): return _core.iString_StartsWith(*args)
     def __ne__(*args): return _core.iString___ne__(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iString_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iString_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iString_scfGetVersion)
     __swig_destroy__ = _core.delete_iString
     __del__ = lambda self : None;
     def __getitem__(*args): return _core.iString___getitem__(*args)
@@ -526,11 +432,8 @@ iString_swigregister = _core.iString_swigregister
 iString_swigregister(iString)
 iString_scfGetVersion = _core.iString_scfGetVersion
 
-class csStringParent(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csStringParent, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csStringParent, name)
+class csStringParent(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _core.new_csStringParent(*args)
@@ -548,12 +451,7 @@ csStringParent_swigregister = _core.csStringParent_swigregister
 csStringParent_swigregister(csStringParent)
 
 class csString(csStringParent):
-    __swig_setmethods__ = {}
-    for _s in [csStringParent]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csString, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csStringParent]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csString, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _core.new_csString(*args)
@@ -567,11 +465,8 @@ class csString(csStringParent):
 csString_swigregister = _core.csString_swigregister
 csString_swigregister(csString)
 
-class csRefCount(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csRefCount, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csRefCount, name)
+class csRefCount(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _core.new_csRefCount(*args)
@@ -593,11 +488,8 @@ csGetTicks = _core.csGetTicks
 csGetMicroTicks = _core.csGetMicroTicks
 csSleep = _core.csSleep
 csGetUsername = _core.csGetUsername
-class csPluginRequest(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csPluginRequest, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csPluginRequest, name)
+class csPluginRequest(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _core.new_csPluginRequest(*args)
@@ -616,50 +508,28 @@ csPluginRequest_swigregister = _core.csPluginRequest_swigregister
 csPluginRequest_swigregister(csPluginRequest)
 csGetPlatformConfigPath = _core.csGetPlatformConfigPath
 
-class csInitializer(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csInitializer, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csInitializer, name)
+class csInitializer(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_getmethods__["_CreateEnvironment"] = lambda x: _core.csInitializer__CreateEnvironment
-    if _newclass:_CreateEnvironment = staticmethod(_core.csInitializer__CreateEnvironment)
-    __swig_getmethods__["_InitializeSCF"] = lambda x: _core.csInitializer__InitializeSCF
-    if _newclass:_InitializeSCF = staticmethod(_core.csInitializer__InitializeSCF)
-    __swig_getmethods__["CreateObjectRegistry"] = lambda x: _core.csInitializer_CreateObjectRegistry
-    if _newclass:CreateObjectRegistry = staticmethod(_core.csInitializer_CreateObjectRegistry)
-    __swig_getmethods__["CreatePluginManager"] = lambda x: _core.csInitializer_CreatePluginManager
-    if _newclass:CreatePluginManager = staticmethod(_core.csInitializer_CreatePluginManager)
-    __swig_getmethods__["CreateEventQueue"] = lambda x: _core.csInitializer_CreateEventQueue
-    if _newclass:CreateEventQueue = staticmethod(_core.csInitializer_CreateEventQueue)
-    __swig_getmethods__["CreateVirtualClock"] = lambda x: _core.csInitializer_CreateVirtualClock
-    if _newclass:CreateVirtualClock = staticmethod(_core.csInitializer_CreateVirtualClock)
-    __swig_getmethods__["CreateCommandLineParser"] = lambda x: _core.csInitializer_CreateCommandLineParser
-    if _newclass:CreateCommandLineParser = staticmethod(_core.csInitializer_CreateCommandLineParser)
-    __swig_getmethods__["CreateVerbosityManager"] = lambda x: _core.csInitializer_CreateVerbosityManager
-    if _newclass:CreateVerbosityManager = staticmethod(_core.csInitializer_CreateVerbosityManager)
-    __swig_getmethods__["CreateConfigManager"] = lambda x: _core.csInitializer_CreateConfigManager
-    if _newclass:CreateConfigManager = staticmethod(_core.csInitializer_CreateConfigManager)
-    __swig_getmethods__["CreateInputDrivers"] = lambda x: _core.csInitializer_CreateInputDrivers
-    if _newclass:CreateInputDrivers = staticmethod(_core.csInitializer_CreateInputDrivers)
-    __swig_getmethods__["CreateStringSet"] = lambda x: _core.csInitializer_CreateStringSet
-    if _newclass:CreateStringSet = staticmethod(_core.csInitializer_CreateStringSet)
-    __swig_getmethods__["SetupConfigManager"] = lambda x: _core.csInitializer_SetupConfigManager
-    if _newclass:SetupConfigManager = staticmethod(_core.csInitializer_SetupConfigManager)
-    __swig_getmethods__["SetupVFS"] = lambda x: _core.csInitializer_SetupVFS
-    if _newclass:SetupVFS = staticmethod(_core.csInitializer_SetupVFS)
-    __swig_getmethods__["_RequestPlugins"] = lambda x: _core.csInitializer__RequestPlugins
-    if _newclass:_RequestPlugins = staticmethod(_core.csInitializer__RequestPlugins)
-    __swig_getmethods__["OpenApplication"] = lambda x: _core.csInitializer_OpenApplication
-    if _newclass:OpenApplication = staticmethod(_core.csInitializer_OpenApplication)
-    __swig_getmethods__["CloseApplication"] = lambda x: _core.csInitializer_CloseApplication
-    if _newclass:CloseApplication = staticmethod(_core.csInitializer_CloseApplication)
-    __swig_getmethods__["_SetupEventHandler"] = lambda x: _core.csInitializer__SetupEventHandler
-    if _newclass:_SetupEventHandler = staticmethod(_core.csInitializer__SetupEventHandler)
-    __swig_getmethods__["DestroyApplication"] = lambda x: _core.csInitializer_DestroyApplication
-    if _newclass:DestroyApplication = staticmethod(_core.csInitializer_DestroyApplication)
-    __swig_getmethods__["GetDefaultAppID"] = lambda x: _core.csInitializer_GetDefaultAppID
-    if _newclass:GetDefaultAppID = staticmethod(_core.csInitializer_GetDefaultAppID)
+    _CreateEnvironment = staticmethod(_core.csInitializer__CreateEnvironment)
+    _InitializeSCF = staticmethod(_core.csInitializer__InitializeSCF)
+    CreateObjectRegistry = staticmethod(_core.csInitializer_CreateObjectRegistry)
+    CreatePluginManager = staticmethod(_core.csInitializer_CreatePluginManager)
+    CreateEventQueue = staticmethod(_core.csInitializer_CreateEventQueue)
+    CreateVirtualClock = staticmethod(_core.csInitializer_CreateVirtualClock)
+    CreateCommandLineParser = staticmethod(_core.csInitializer_CreateCommandLineParser)
+    CreateVerbosityManager = staticmethod(_core.csInitializer_CreateVerbosityManager)
+    CreateConfigManager = staticmethod(_core.csInitializer_CreateConfigManager)
+    CreateInputDrivers = staticmethod(_core.csInitializer_CreateInputDrivers)
+    CreateStringSet = staticmethod(_core.csInitializer_CreateStringSet)
+    SetupConfigManager = staticmethod(_core.csInitializer_SetupConfigManager)
+    SetupVFS = staticmethod(_core.csInitializer_SetupVFS)
+    _RequestPlugins = staticmethod(_core.csInitializer__RequestPlugins)
+    OpenApplication = staticmethod(_core.csInitializer_OpenApplication)
+    CloseApplication = staticmethod(_core.csInitializer_CloseApplication)
+    _SetupEventHandler = staticmethod(_core.csInitializer__SetupEventHandler)
+    DestroyApplication = staticmethod(_core.csInitializer_DestroyApplication)
+    GetDefaultAppID = staticmethod(_core.csInitializer_GetDefaultAppID)
     def __init__(self, *args): 
         this = _core.new_csInitializer(*args)
         try: self.this.append(this)
@@ -688,11 +558,8 @@ csInitializer__SetupEventHandler = _core.csInitializer__SetupEventHandler
 csInitializer_DestroyApplication = _core.csInitializer_DestroyApplication
 csInitializer_GetDefaultAppID = _core.csInitializer_GetDefaultAppID
 
-class CustomAllocated(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, CustomAllocated, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, CustomAllocated, name)
+class CustomAllocated(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _core.new_CustomAllocated(*args)
@@ -704,12 +571,7 @@ CustomAllocated_swigregister = _core.CustomAllocated_swigregister
 CustomAllocated_swigregister(CustomAllocated)
 
 class csPluginRequestArray(CustomAllocated):
-    __swig_setmethods__ = {}
-    for _s in [CustomAllocated]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csPluginRequestArray, name, value)
-    __swig_getmethods__ = {}
-    for _s in [CustomAllocated]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csPluginRequestArray, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     __swig_destroy__ = _core.delete_csPluginRequestArray
     __del__ = lambda self : None;
@@ -741,21 +603,12 @@ MAX_OUTPUT_VERTICES = _core.MAX_OUTPUT_VERTICES
 CS_CLIP_OUTSIDE = _core.CS_CLIP_OUTSIDE
 CS_CLIP_CLIPPED = _core.CS_CLIP_CLIPPED
 CS_CLIP_INSIDE = _core.CS_CLIP_INSIDE
-class csVertexStatus(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csVertexStatus, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csVertexStatus, name)
+class csVertexStatus(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["Type"] = _core.csVertexStatus_Type_set
-    __swig_getmethods__["Type"] = _core.csVertexStatus_Type_get
-    if _newclass:Type = _swig_property(_core.csVertexStatus_Type_get, _core.csVertexStatus_Type_set)
-    __swig_setmethods__["Vertex"] = _core.csVertexStatus_Vertex_set
-    __swig_getmethods__["Vertex"] = _core.csVertexStatus_Vertex_get
-    if _newclass:Vertex = _swig_property(_core.csVertexStatus_Vertex_get, _core.csVertexStatus_Vertex_set)
-    __swig_setmethods__["Pos"] = _core.csVertexStatus_Pos_set
-    __swig_getmethods__["Pos"] = _core.csVertexStatus_Pos_get
-    if _newclass:Pos = _swig_property(_core.csVertexStatus_Pos_get, _core.csVertexStatus_Pos_set)
+    Type = _swig_property(_core.csVertexStatus_Type_get, _core.csVertexStatus_Type_set)
+    Vertex = _swig_property(_core.csVertexStatus_Vertex_get, _core.csVertexStatus_Vertex_set)
+    Pos = _swig_property(_core.csVertexStatus_Pos_get, _core.csVertexStatus_Pos_set)
     def __init__(self, *args): 
         this = _core.new_csVertexStatus(*args)
         try: self.this.append(this)
@@ -769,12 +622,7 @@ CS_VERTEX_ORIGINAL = _core.CS_VERTEX_ORIGINAL
 CS_VERTEX_ONEDGE = _core.CS_VERTEX_ONEDGE
 CS_VERTEX_INSIDE = _core.CS_VERTEX_INSIDE
 class iClipper2D(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iClipper2D, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iClipper2D, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Clip(*args): return _core.iClipper2D_Clip(*args)
@@ -792,12 +640,7 @@ iClipper2D_swigregister = _core.iClipper2D_swigregister
 iClipper2D_swigregister(iClipper2D)
 
 class iPath(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iPath, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iPath, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Length(*args): return _core.iPath_Length(*args)
@@ -817,8 +660,7 @@ class iPath(iBase):
     def GetInterpolatedPosition(*args): return _core.iPath_GetInterpolatedPosition(*args)
     def GetInterpolatedUp(*args): return _core.iPath_GetInterpolatedUp(*args)
     def GetInterpolatedForward(*args): return _core.iPath_GetInterpolatedForward(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iPath_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iPath_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iPath_scfGetVersion)
     __swig_destroy__ = _core.delete_iPath
     __del__ = lambda self : None;
 iPath_swigregister = _core.iPath_swigregister
@@ -826,12 +668,7 @@ iPath_swigregister(iPath)
 iPath_scfGetVersion = _core.iPath_scfGetVersion
 
 class scfPath(iPath):
-    __swig_setmethods__ = {}
-    for _s in [iPath]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, scfPath, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iPath]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, scfPath, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def IncRef(*args): return _core.scfPath_IncRef(*args)
@@ -850,12 +687,7 @@ CS_TRIMESH_CONVEX = _core.CS_TRIMESH_CONVEX
 CS_TRIMESH_NOTCONVEX = _core.CS_TRIMESH_NOTCONVEX
 CS_TRIMESH_DEFORMABLE = _core.CS_TRIMESH_DEFORMABLE
 class iTriangleMesh(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iTriangleMesh, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iTriangleMesh, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetVertexCount(*args): return _core.iTriangleMesh_GetVertexCount(*args)
@@ -874,8 +706,7 @@ class iTriangleMesh(iBase):
     def GetChangeNumber(*args): return _core.iTriangleMesh_GetChangeNumber(*args)
     def GetVertexByIndex(*args): return _core.iTriangleMesh_GetVertexByIndex(*args)
     def GetTriangleByIndex(*args): return _core.iTriangleMesh_GetTriangleByIndex(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iTriangleMesh_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iTriangleMesh_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iTriangleMesh_scfGetVersion)
     __swig_destroy__ = _core.delete_iTriangleMesh
     __del__ = lambda self : None;
 iTriangleMesh_swigregister = _core.iTriangleMesh_swigregister
@@ -888,17 +719,11 @@ CS_REPORTER_SEVERITY_WARNING = _core.CS_REPORTER_SEVERITY_WARNING
 CS_REPORTER_SEVERITY_NOTIFY = _core.CS_REPORTER_SEVERITY_NOTIFY
 CS_REPORTER_SEVERITY_DEBUG = _core.CS_REPORTER_SEVERITY_DEBUG
 class iReporterListener(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iReporterListener, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iReporterListener, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Report(*args): return _core.iReporterListener_Report(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iReporterListener_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iReporterListener_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iReporterListener_scfGetVersion)
     __swig_destroy__ = _core.delete_iReporterListener
     __del__ = lambda self : None;
 iReporterListener_swigregister = _core.iReporterListener_swigregister
@@ -906,12 +731,7 @@ iReporterListener_swigregister(iReporterListener)
 iReporterListener_scfGetVersion = _core.iReporterListener_scfGetVersion
 
 class iReporterIterator(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iReporterIterator, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iReporterIterator, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def HasNext(*args): return _core.iReporterIterator_HasNext(*args)
@@ -919,8 +739,7 @@ class iReporterIterator(iBase):
     def GetMessageSeverity(*args): return _core.iReporterIterator_GetMessageSeverity(*args)
     def GetMessageId(*args): return _core.iReporterIterator_GetMessageId(*args)
     def GetMessageDescription(*args): return _core.iReporterIterator_GetMessageDescription(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iReporterIterator_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iReporterIterator_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iReporterIterator_scfGetVersion)
     __swig_destroy__ = _core.delete_iReporterIterator
     __del__ = lambda self : None;
 iReporterIterator_swigregister = _core.iReporterIterator_swigregister
@@ -928,12 +747,7 @@ iReporterIterator_swigregister(iReporterIterator)
 iReporterIterator_scfGetVersion = _core.iReporterIterator_scfGetVersion
 
 class iReporter(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iReporter, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iReporter, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Report(*args): return _core.iReporter_Report(*args)
@@ -947,22 +761,17 @@ class iReporter(iBase):
     def ReportNotify(*args): return _core.iReporter_ReportNotify(*args)
     def ReportBug(*args): return _core.iReporter_ReportBug(*args)
     def ReportDebug(*args): return _core.iReporter_ReportDebug(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iReporter_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iReporter_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iReporter_scfGetVersion)
     __swig_destroy__ = _core.delete_iReporter
     __del__ = lambda self : None;
 iReporter_swigregister = _core.iReporter_swigregister
 iReporter_swigregister(iReporter)
 iReporter_scfGetVersion = _core.iReporter_scfGetVersion
 
-class csReporterHelper(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csReporterHelper, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csReporterHelper, name)
+class csReporterHelper(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_getmethods__["Report"] = lambda x: _core.csReporterHelper_Report
-    if _newclass:Report = staticmethod(_core.csReporterHelper_Report)
+    Report = staticmethod(_core.csReporterHelper_Report)
     def __init__(self, *args): 
         this = _core.new_csReporterHelper(*args)
         try: self.this.append(this)
@@ -974,17 +783,11 @@ csReporterHelper_swigregister(csReporterHelper)
 csReporterHelper_Report = _core.csReporterHelper_Report
 
 class iComponent(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iComponent, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iComponent, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Initialize(*args): return _core.iComponent_Initialize(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iComponent_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iComponent_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iComponent_scfGetVersion)
     __swig_destroy__ = _core.delete_iComponent
     __del__ = lambda self : None;
 iComponent_swigregister = _core.iComponent_swigregister
@@ -992,12 +795,7 @@ iComponent_swigregister(iComponent)
 iComponent_scfGetVersion = _core.iComponent_scfGetVersion
 
 class iCacheManager(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iCacheManager, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iCacheManager, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetReadOnly(*args): return _core.iCacheManager_SetReadOnly(*args)
@@ -1010,38 +808,22 @@ class iCacheManager(iBase):
     def ReadCache(*args): return _core.iCacheManager_ReadCache(*args)
     def ClearCache(*args): return _core.iCacheManager_ClearCache(*args)
     def Flush(*args): return _core.iCacheManager_Flush(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iCacheManager_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iCacheManager_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iCacheManager_scfGetVersion)
     __swig_destroy__ = _core.delete_iCacheManager
     __del__ = lambda self : None;
 iCacheManager_swigregister = _core.iCacheManager_swigregister
 iCacheManager_swigregister(iCacheManager)
 iCacheManager_scfGetVersion = _core.iCacheManager_scfGetVersion
 
-class csFileTime(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csFileTime, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csFileTime, name)
+class csFileTime(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["sec"] = _core.csFileTime_sec_set
-    __swig_getmethods__["sec"] = _core.csFileTime_sec_get
-    if _newclass:sec = _swig_property(_core.csFileTime_sec_get, _core.csFileTime_sec_set)
-    __swig_setmethods__["min"] = _core.csFileTime_min_set
-    __swig_getmethods__["min"] = _core.csFileTime_min_get
-    if _newclass:min = _swig_property(_core.csFileTime_min_get, _core.csFileTime_min_set)
-    __swig_setmethods__["hour"] = _core.csFileTime_hour_set
-    __swig_getmethods__["hour"] = _core.csFileTime_hour_get
-    if _newclass:hour = _swig_property(_core.csFileTime_hour_get, _core.csFileTime_hour_set)
-    __swig_setmethods__["day"] = _core.csFileTime_day_set
-    __swig_getmethods__["day"] = _core.csFileTime_day_get
-    if _newclass:day = _swig_property(_core.csFileTime_day_get, _core.csFileTime_day_set)
-    __swig_setmethods__["mon"] = _core.csFileTime_mon_set
-    __swig_getmethods__["mon"] = _core.csFileTime_mon_get
-    if _newclass:mon = _swig_property(_core.csFileTime_mon_get, _core.csFileTime_mon_set)
-    __swig_setmethods__["year"] = _core.csFileTime_year_set
-    __swig_getmethods__["year"] = _core.csFileTime_year_get
-    if _newclass:year = _swig_property(_core.csFileTime_year_get, _core.csFileTime_year_set)
+    sec = _swig_property(_core.csFileTime_sec_get, _core.csFileTime_sec_set)
+    min = _swig_property(_core.csFileTime_min_get, _core.csFileTime_min_set)
+    hour = _swig_property(_core.csFileTime_hour_get, _core.csFileTime_hour_set)
+    day = _swig_property(_core.csFileTime_day_get, _core.csFileTime_day_set)
+    mon = _swig_property(_core.csFileTime_mon_get, _core.csFileTime_mon_set)
+    year = _swig_property(_core.csFileTime_year_get, _core.csFileTime_year_set)
     def __init__(self, *args): 
         this = _core.new_csFileTime(*args)
         try: self.this.append(this)
@@ -1066,12 +848,7 @@ VFS_STATUS_RESOURCES = _core.VFS_STATUS_RESOURCES
 VFS_STATUS_ACCESSDENIED = _core.VFS_STATUS_ACCESSDENIED
 VFS_STATUS_IOERROR = _core.VFS_STATUS_IOERROR
 class iFile(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iFile, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iFile, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetName(*args): return _core.iFile_GetName(*args)
@@ -1084,8 +861,7 @@ class iFile(iBase):
     def GetPos(*args): return _core.iFile_GetPos(*args)
     def SetPos(*args): return _core.iFile_SetPos(*args)
     def GetAllData(*args): return _core.iFile_GetAllData(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iFile_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iFile_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iFile_scfGetVersion)
     __swig_destroy__ = _core.delete_iFile
     __del__ = lambda self : None;
 iFile_swigregister = _core.iFile_swigregister
@@ -1093,12 +869,7 @@ iFile_swigregister(iFile)
 iFile_scfGetVersion = _core.iFile_scfGetVersion
 
 class iVFS(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iVFS, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iVFS, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def ChDir(*args): return _core.iVFS_ChDir(*args)
@@ -1126,8 +897,7 @@ class iVFS(iBase):
     def GetRealPath(*args): return _core.iVFS_GetRealPath(*args)
     def GetMounts(*args): return _core.iVFS_GetMounts(*args)
     def GetRealMountPaths(*args): return _core.iVFS_GetRealMountPaths(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iVFS_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iVFS_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iVFS_scfGetVersion)
     __swig_destroy__ = _core.delete_iVFS
     __del__ = lambda self : None;
 iVFS_swigregister = _core.iVFS_swigregister
@@ -1135,12 +905,7 @@ iVFS_swigregister(iVFS)
 iVFS_scfGetVersion = _core.iVFS_scfGetVersion
 
 class iObjectNameChangeListener(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iObjectNameChangeListener, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iObjectNameChangeListener, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def NameChanged(*args): return _core.iObjectNameChangeListener_NameChanged(*args)
@@ -1150,12 +915,7 @@ iObjectNameChangeListener_swigregister = _core.iObjectNameChangeListener_swigreg
 iObjectNameChangeListener_swigregister(iObjectNameChangeListener)
 
 class iObject(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iObject, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iObject, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetName(*args): return _core.iObject_SetName(*args)
@@ -1172,8 +932,7 @@ class iObject(iBase):
     def AddNameChangeListener(*args): return _core.iObject_AddNameChangeListener(*args)
     def RemoveNameChangeListener(*args): return _core.iObject_RemoveNameChangeListener(*args)
     def GetChild(*args): return _core.iObject_GetChild(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iObject_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iObject_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iObject_scfGetVersion)
     __swig_destroy__ = _core.delete_iObject
     __del__ = lambda self : None;
 iObject_swigregister = _core.iObject_swigregister
@@ -1181,12 +940,7 @@ iObject_swigregister(iObject)
 iObject_scfGetVersion = _core.iObject_scfGetVersion
 
 class iObjectIterator(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iObjectIterator, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iObjectIterator, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Next(*args): return _core.iObjectIterator_Next(*args)
@@ -1197,8 +951,7 @@ class iObjectIterator(iBase):
     def __iter__(self):
         while self.HasNext():
             yield self.Next() 
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iObjectIterator_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iObjectIterator_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iObjectIterator_scfGetVersion)
     __swig_destroy__ = _core.delete_iObjectIterator
     __del__ = lambda self : None;
 iObjectIterator_swigregister = _core.iObjectIterator_swigregister
@@ -1206,12 +959,7 @@ iObjectIterator_swigregister(iObjectIterator)
 iObjectIterator_scfGetVersion = _core.iObjectIterator_scfGetVersion
 
 class iStringSet(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iStringSet, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iStringSet, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Request(*args): return _core.iStringSet_Request(*args)
@@ -1221,8 +969,7 @@ class iStringSet(iBase):
     def Clear(*args): return _core.iStringSet_Clear(*args)
     def GetSize(*args): return _core.iStringSet_GetSize(*args)
     def IsEmpty(*args): return _core.iStringSet_IsEmpty(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iStringSet_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iStringSet_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iStringSet_scfGetVersion)
     __swig_destroy__ = _core.delete_iStringSet
     __del__ = lambda self : None;
 iStringSet_swigregister = _core.iStringSet_swigregister
@@ -1231,20 +978,14 @@ csInvalidStringID = cvar.csInvalidStringID
 iStringSet_scfGetVersion = _core.iStringSet_scfGetVersion
 
 class iObjectRegistry(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iObjectRegistry, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iObjectRegistry, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Clear(*args): return _core.iObjectRegistry_Clear(*args)
     def Register(*args): return _core.iObjectRegistry_Register(*args)
     def Unregister(*args): return _core.iObjectRegistry_Unregister(*args)
     def Get(*args): return _core.iObjectRegistry_Get(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iObjectRegistry_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iObjectRegistry_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iObjectRegistry_scfGetVersion)
     __swig_destroy__ = _core.delete_iObjectRegistry
     __del__ = lambda self : None;
 iObjectRegistry_swigregister = _core.iObjectRegistry_swigregister
@@ -1252,12 +993,7 @@ iObjectRegistry_swigregister(iObjectRegistry)
 iObjectRegistry_scfGetVersion = _core.iObjectRegistry_scfGetVersion
 
 class iObjectRegistryIterator(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iObjectRegistryIterator, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iObjectRegistryIterator, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Reset(*args): return _core.iObjectRegistryIterator_Reset(*args)
@@ -1271,12 +1007,7 @@ iObjectRegistryIterator_swigregister(iObjectRegistryIterator)
 
 csQueryRegistryTag = _core.csQueryRegistryTag
 class iVirtualClock(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iVirtualClock, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iVirtualClock, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Advance(*args): return _core.iVirtualClock_Advance(*args)
@@ -1284,8 +1015,7 @@ class iVirtualClock(iBase):
     def Resume(*args): return _core.iVirtualClock_Resume(*args)
     def GetElapsedTicks(*args): return _core.iVirtualClock_GetElapsedTicks(*args)
     def GetCurrentTicks(*args): return _core.iVirtualClock_GetCurrentTicks(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iVirtualClock_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iVirtualClock_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iVirtualClock_scfGetVersion)
     __swig_destroy__ = _core.delete_iVirtualClock
     __del__ = lambda self : None;
 iVirtualClock_swigregister = _core.iVirtualClock_swigregister
@@ -1299,12 +1029,7 @@ CS_MAX_JOYSTICK_COUNT = _core.CS_MAX_JOYSTICK_COUNT
 CS_MAX_JOYSTICK_BUTTONS = _core.CS_MAX_JOYSTICK_BUTTONS
 CS_MAX_JOYSTICK_AXES = _core.CS_MAX_JOYSTICK_AXES
 class iEventAttributeIterator(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iEventAttributeIterator, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iEventAttributeIterator, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def HasNext(*args): return _core.iEventAttributeIterator_HasNext(*args)
@@ -1315,30 +1040,15 @@ class iEventAttributeIterator(iBase):
 iEventAttributeIterator_swigregister = _core.iEventAttributeIterator_swigregister
 iEventAttributeIterator_swigregister(iEventAttributeIterator)
 
-class csKeyEventData(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csKeyEventData, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csKeyEventData, name)
+class csKeyEventData(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["eventType"] = _core.csKeyEventData_eventType_set
-    __swig_getmethods__["eventType"] = _core.csKeyEventData_eventType_get
-    if _newclass:eventType = _swig_property(_core.csKeyEventData_eventType_get, _core.csKeyEventData_eventType_set)
-    __swig_setmethods__["codeRaw"] = _core.csKeyEventData_codeRaw_set
-    __swig_getmethods__["codeRaw"] = _core.csKeyEventData_codeRaw_get
-    if _newclass:codeRaw = _swig_property(_core.csKeyEventData_codeRaw_get, _core.csKeyEventData_codeRaw_set)
-    __swig_setmethods__["codeCooked"] = _core.csKeyEventData_codeCooked_set
-    __swig_getmethods__["codeCooked"] = _core.csKeyEventData_codeCooked_get
-    if _newclass:codeCooked = _swig_property(_core.csKeyEventData_codeCooked_get, _core.csKeyEventData_codeCooked_set)
-    __swig_setmethods__["modifiers"] = _core.csKeyEventData_modifiers_set
-    __swig_getmethods__["modifiers"] = _core.csKeyEventData_modifiers_get
-    if _newclass:modifiers = _swig_property(_core.csKeyEventData_modifiers_get, _core.csKeyEventData_modifiers_set)
-    __swig_setmethods__["autoRepeat"] = _core.csKeyEventData_autoRepeat_set
-    __swig_getmethods__["autoRepeat"] = _core.csKeyEventData_autoRepeat_get
-    if _newclass:autoRepeat = _swig_property(_core.csKeyEventData_autoRepeat_get, _core.csKeyEventData_autoRepeat_set)
-    __swig_setmethods__["charType"] = _core.csKeyEventData_charType_set
-    __swig_getmethods__["charType"] = _core.csKeyEventData_charType_get
-    if _newclass:charType = _swig_property(_core.csKeyEventData_charType_get, _core.csKeyEventData_charType_set)
+    eventType = _swig_property(_core.csKeyEventData_eventType_get, _core.csKeyEventData_eventType_set)
+    codeRaw = _swig_property(_core.csKeyEventData_codeRaw_get, _core.csKeyEventData_codeRaw_set)
+    codeCooked = _swig_property(_core.csKeyEventData_codeCooked_get, _core.csKeyEventData_codeCooked_set)
+    modifiers = _swig_property(_core.csKeyEventData_modifiers_get, _core.csKeyEventData_modifiers_set)
+    autoRepeat = _swig_property(_core.csKeyEventData_autoRepeat_get, _core.csKeyEventData_autoRepeat_set)
+    charType = _swig_property(_core.csKeyEventData_charType_get, _core.csKeyEventData_charType_set)
     def __init__(self, *args): 
         this = _core.new_csKeyEventData(*args)
         try: self.this.append(this)
@@ -1348,30 +1058,15 @@ class csKeyEventData(_object):
 csKeyEventData_swigregister = _core.csKeyEventData_swigregister
 csKeyEventData_swigregister(csKeyEventData)
 
-class csMouseEventData(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csMouseEventData, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csMouseEventData, name)
+class csMouseEventData(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["x"] = _core.csMouseEventData_x_set
-    __swig_getmethods__["x"] = _core.csMouseEventData_x_get
-    if _newclass:x = _swig_property(_core.csMouseEventData_x_get, _core.csMouseEventData_x_set)
-    __swig_setmethods__["y"] = _core.csMouseEventData_y_set
-    __swig_getmethods__["y"] = _core.csMouseEventData_y_get
-    if _newclass:y = _swig_property(_core.csMouseEventData_y_get, _core.csMouseEventData_y_set)
-    __swig_setmethods__["axes"] = _core.csMouseEventData_axes_set
-    __swig_getmethods__["axes"] = _core.csMouseEventData_axes_get
-    if _newclass:axes = _swig_property(_core.csMouseEventData_axes_get, _core.csMouseEventData_axes_set)
-    __swig_setmethods__["numAxes"] = _core.csMouseEventData_numAxes_set
-    __swig_getmethods__["numAxes"] = _core.csMouseEventData_numAxes_get
-    if _newclass:numAxes = _swig_property(_core.csMouseEventData_numAxes_get, _core.csMouseEventData_numAxes_set)
-    __swig_setmethods__["Button"] = _core.csMouseEventData_Button_set
-    __swig_getmethods__["Button"] = _core.csMouseEventData_Button_get
-    if _newclass:Button = _swig_property(_core.csMouseEventData_Button_get, _core.csMouseEventData_Button_set)
-    __swig_setmethods__["Modifiers"] = _core.csMouseEventData_Modifiers_set
-    __swig_getmethods__["Modifiers"] = _core.csMouseEventData_Modifiers_get
-    if _newclass:Modifiers = _swig_property(_core.csMouseEventData_Modifiers_get, _core.csMouseEventData_Modifiers_set)
+    x = _swig_property(_core.csMouseEventData_x_get, _core.csMouseEventData_x_set)
+    y = _swig_property(_core.csMouseEventData_y_get, _core.csMouseEventData_y_set)
+    axes = _swig_property(_core.csMouseEventData_axes_get, _core.csMouseEventData_axes_set)
+    numAxes = _swig_property(_core.csMouseEventData_numAxes_get, _core.csMouseEventData_numAxes_set)
+    Button = _swig_property(_core.csMouseEventData_Button_get, _core.csMouseEventData_Button_set)
+    Modifiers = _swig_property(_core.csMouseEventData_Modifiers_get, _core.csMouseEventData_Modifiers_set)
     def __init__(self, *args): 
         this = _core.new_csMouseEventData(*args)
         try: self.this.append(this)
@@ -1381,30 +1076,15 @@ class csMouseEventData(_object):
 csMouseEventData_swigregister = _core.csMouseEventData_swigregister
 csMouseEventData_swigregister(csMouseEventData)
 
-class csJoystickEventData(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csJoystickEventData, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csJoystickEventData, name)
+class csJoystickEventData(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["number"] = _core.csJoystickEventData_number_set
-    __swig_getmethods__["number"] = _core.csJoystickEventData_number_get
-    if _newclass:number = _swig_property(_core.csJoystickEventData_number_get, _core.csJoystickEventData_number_set)
-    __swig_setmethods__["axes"] = _core.csJoystickEventData_axes_set
-    __swig_getmethods__["axes"] = _core.csJoystickEventData_axes_get
-    if _newclass:axes = _swig_property(_core.csJoystickEventData_axes_get, _core.csJoystickEventData_axes_set)
-    __swig_setmethods__["numAxes"] = _core.csJoystickEventData_numAxes_set
-    __swig_getmethods__["numAxes"] = _core.csJoystickEventData_numAxes_get
-    if _newclass:numAxes = _swig_property(_core.csJoystickEventData_numAxes_get, _core.csJoystickEventData_numAxes_set)
-    __swig_setmethods__["axesChanged"] = _core.csJoystickEventData_axesChanged_set
-    __swig_getmethods__["axesChanged"] = _core.csJoystickEventData_axesChanged_get
-    if _newclass:axesChanged = _swig_property(_core.csJoystickEventData_axesChanged_get, _core.csJoystickEventData_axesChanged_set)
-    __swig_setmethods__["Button"] = _core.csJoystickEventData_Button_set
-    __swig_getmethods__["Button"] = _core.csJoystickEventData_Button_get
-    if _newclass:Button = _swig_property(_core.csJoystickEventData_Button_get, _core.csJoystickEventData_Button_set)
-    __swig_setmethods__["Modifiers"] = _core.csJoystickEventData_Modifiers_set
-    __swig_getmethods__["Modifiers"] = _core.csJoystickEventData_Modifiers_get
-    if _newclass:Modifiers = _swig_property(_core.csJoystickEventData_Modifiers_get, _core.csJoystickEventData_Modifiers_set)
+    number = _swig_property(_core.csJoystickEventData_number_get, _core.csJoystickEventData_number_set)
+    axes = _swig_property(_core.csJoystickEventData_axes_get, _core.csJoystickEventData_axes_set)
+    numAxes = _swig_property(_core.csJoystickEventData_numAxes_get, _core.csJoystickEventData_numAxes_set)
+    axesChanged = _swig_property(_core.csJoystickEventData_axesChanged_get, _core.csJoystickEventData_axesChanged_set)
+    Button = _swig_property(_core.csJoystickEventData_Button_get, _core.csJoystickEventData_Button_set)
+    Modifiers = _swig_property(_core.csJoystickEventData_Modifiers_get, _core.csJoystickEventData_Modifiers_set)
     def __init__(self, *args): 
         this = _core.new_csJoystickEventData(*args)
         try: self.this.append(this)
@@ -1414,18 +1094,11 @@ class csJoystickEventData(_object):
 csJoystickEventData_swigregister = _core.csJoystickEventData_swigregister
 csJoystickEventData_swigregister(csJoystickEventData)
 
-class csCommandEventData(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csCommandEventData, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csCommandEventData, name)
+class csCommandEventData(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["Code"] = _core.csCommandEventData_Code_set
-    __swig_getmethods__["Code"] = _core.csCommandEventData_Code_get
-    if _newclass:Code = _swig_property(_core.csCommandEventData_Code_get, _core.csCommandEventData_Code_set)
-    __swig_setmethods__["Info"] = _core.csCommandEventData_Info_set
-    __swig_getmethods__["Info"] = _core.csCommandEventData_Info_get
-    if _newclass:Info = _swig_property(_core.csCommandEventData_Info_get, _core.csCommandEventData_Info_set)
+    Code = _swig_property(_core.csCommandEventData_Code_get, _core.csCommandEventData_Code_set)
+    Info = _swig_property(_core.csCommandEventData_Info_get, _core.csCommandEventData_Info_set)
     def __init__(self, *args): 
         this = _core.new_csCommandEventData(*args)
         try: self.this.append(this)
@@ -1453,24 +1126,13 @@ csEventAttrDatabuffer = _core.csEventAttrDatabuffer
 csEventAttrEvent = _core.csEventAttrEvent
 csEventAttriBase = _core.csEventAttriBase
 class iEvent(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iEvent, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iEvent, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    __swig_setmethods__["Name"] = _core.iEvent_Name_set
-    __swig_getmethods__["Name"] = _core.iEvent_Name_get
-    if _newclass:Name = _swig_property(_core.iEvent_Name_get, _core.iEvent_Name_set)
+    Name = _swig_property(_core.iEvent_Name_get, _core.iEvent_Name_set)
     def GetName(*args): return _core.iEvent_GetName(*args)
-    __swig_setmethods__["Time"] = _core.iEvent_Time_set
-    __swig_getmethods__["Time"] = _core.iEvent_Time_get
-    if _newclass:Time = _swig_property(_core.iEvent_Time_get, _core.iEvent_Time_set)
-    __swig_setmethods__["Broadcast"] = _core.iEvent_Broadcast_set
-    __swig_getmethods__["Broadcast"] = _core.iEvent_Broadcast_get
-    if _newclass:Broadcast = _swig_property(_core.iEvent_Broadcast_get, _core.iEvent_Broadcast_set)
+    Time = _swig_property(_core.iEvent_Time_get, _core.iEvent_Time_set)
+    Broadcast = _swig_property(_core.iEvent_Broadcast_get, _core.iEvent_Broadcast_set)
     def AddInt8(*args): return _core.iEvent_AddInt8(*args)
     def AddUInt8(*args): return _core.iEvent_AddUInt8(*args)
     def AddInt16(*args): return _core.iEvent_AddInt16(*args)
@@ -1497,14 +1159,10 @@ class iEvent(iBase):
     def RemoveAll(*args): return _core.iEvent_RemoveAll(*args)
     def GetAttributeIterator(*args): return _core.iEvent_GetAttributeIterator(*args)
     def RetrieveString(*args): return _core.iEvent_RetrieveString(*args)
-    __swig_getmethods__["Mouse"] = _core.iEvent_Mouse_get
-    if _newclass:Mouse = _swig_property(_core.iEvent_Mouse_get)
-    __swig_getmethods__["Joystick"] = _core.iEvent_Joystick_get
-    if _newclass:Joystick = _swig_property(_core.iEvent_Joystick_get)
-    __swig_getmethods__["Command"] = _core.iEvent_Command_get
-    if _newclass:Command = _swig_property(_core.iEvent_Command_get)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iEvent_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iEvent_scfGetVersion)
+    Mouse = _swig_property(_core.iEvent_Mouse_get)
+    Joystick = _swig_property(_core.iEvent_Joystick_get)
+    Command = _swig_property(_core.iEvent_Command_get)
+    scfGetVersion = staticmethod(_core.iEvent_scfGetVersion)
     __swig_destroy__ = _core.delete_iEvent
     __del__ = lambda self : None;
 iEvent_swigregister = _core.iEvent_swigregister
@@ -1512,12 +1170,7 @@ iEvent_swigregister(iEvent)
 iEvent_scfGetVersion = _core.iEvent_scfGetVersion
 
 class iEventPlug(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iEventPlug, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iEventPlug, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetPotentiallyConflictingEvents(*args): return _core.iEventPlug_GetPotentiallyConflictingEvents(*args)
@@ -1529,12 +1182,7 @@ iEventPlug_swigregister = _core.iEventPlug_swigregister
 iEventPlug_swigregister(iEventPlug)
 
 class iEventOutlet(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iEventOutlet, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iEventOutlet, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def CreateEvent(*args): return _core.iEventOutlet_CreateEvent(*args)
@@ -1550,12 +1198,7 @@ iEventOutlet_swigregister = _core.iEventOutlet_swigregister
 iEventOutlet_swigregister(iEventOutlet)
 
 class iEventCord(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iEventCord, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iEventCord, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Insert(*args): return _core.iEventCord_Insert(*args)
@@ -1568,28 +1211,17 @@ class iEventCord(iBase):
 iEventCord_swigregister = _core.iEventCord_swigregister
 iEventCord_swigregister(iEventCord)
 
-class csKeyEventHelper(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csKeyEventHelper, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csKeyEventHelper, name)
+class csKeyEventHelper(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_getmethods__["GetRawCode"] = lambda x: _core.csKeyEventHelper_GetRawCode
-    if _newclass:GetRawCode = staticmethod(_core.csKeyEventHelper_GetRawCode)
-    __swig_getmethods__["GetCookedCode"] = lambda x: _core.csKeyEventHelper_GetCookedCode
-    if _newclass:GetCookedCode = staticmethod(_core.csKeyEventHelper_GetCookedCode)
-    __swig_getmethods__["GetEventType"] = lambda x: _core.csKeyEventHelper_GetEventType
-    if _newclass:GetEventType = staticmethod(_core.csKeyEventHelper_GetEventType)
-    __swig_getmethods__["GetAutoRepeat"] = lambda x: _core.csKeyEventHelper_GetAutoRepeat
-    if _newclass:GetAutoRepeat = staticmethod(_core.csKeyEventHelper_GetAutoRepeat)
-    __swig_getmethods__["GetCharacterType"] = lambda x: _core.csKeyEventHelper_GetCharacterType
-    if _newclass:GetCharacterType = staticmethod(_core.csKeyEventHelper_GetCharacterType)
-    __swig_getmethods__["GetEventData"] = lambda x: _core.csKeyEventHelper_GetEventData
-    if _newclass:GetEventData = staticmethod(_core.csKeyEventHelper_GetEventData)
-    __swig_getmethods__["GetModifiersBits"] = lambda x: _core.csKeyEventHelper_GetModifiersBits
-    if _newclass:GetModifiersBits = staticmethod(_core.csKeyEventHelper_GetModifiersBits)
-    __swig_getmethods__["GetModifiers"] = lambda x: _core.csKeyEventHelper_GetModifiers
-    if _newclass:GetModifiers = staticmethod(_core.csKeyEventHelper_GetModifiers)
+    GetRawCode = staticmethod(_core.csKeyEventHelper_GetRawCode)
+    GetCookedCode = staticmethod(_core.csKeyEventHelper_GetCookedCode)
+    GetEventType = staticmethod(_core.csKeyEventHelper_GetEventType)
+    GetAutoRepeat = staticmethod(_core.csKeyEventHelper_GetAutoRepeat)
+    GetCharacterType = staticmethod(_core.csKeyEventHelper_GetCharacterType)
+    GetEventData = staticmethod(_core.csKeyEventHelper_GetEventData)
+    GetModifiersBits = staticmethod(_core.csKeyEventHelper_GetModifiersBits)
+    GetModifiers = staticmethod(_core.csKeyEventHelper_GetModifiers)
     def __init__(self, *args): 
         this = _core.new_csKeyEventHelper(*args)
         try: self.this.append(this)
@@ -1607,36 +1239,21 @@ csKeyEventHelper_GetEventData = _core.csKeyEventHelper_GetEventData
 csKeyEventHelper_GetModifiersBits = _core.csKeyEventHelper_GetModifiersBits
 csKeyEventHelper_GetModifiers = _core.csKeyEventHelper_GetModifiers
 
-class csMouseEventHelper(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csMouseEventHelper, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csMouseEventHelper, name)
+class csMouseEventHelper(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_getmethods__["NewEvent"] = lambda x: _core.csMouseEventHelper_NewEvent
-    if _newclass:NewEvent = staticmethod(_core.csMouseEventHelper_NewEvent)
-    __swig_getmethods__["GetEventType"] = lambda x: _core.csMouseEventHelper_GetEventType
-    if _newclass:GetEventType = staticmethod(_core.csMouseEventHelper_GetEventType)
-    __swig_getmethods__["GetNumber"] = lambda x: _core.csMouseEventHelper_GetNumber
-    if _newclass:GetNumber = staticmethod(_core.csMouseEventHelper_GetNumber)
-    __swig_getmethods__["GetX"] = lambda x: _core.csMouseEventHelper_GetX
-    if _newclass:GetX = staticmethod(_core.csMouseEventHelper_GetX)
-    __swig_getmethods__["GetY"] = lambda x: _core.csMouseEventHelper_GetY
-    if _newclass:GetY = staticmethod(_core.csMouseEventHelper_GetY)
-    __swig_getmethods__["GetAxis"] = lambda x: _core.csMouseEventHelper_GetAxis
-    if _newclass:GetAxis = staticmethod(_core.csMouseEventHelper_GetAxis)
-    __swig_getmethods__["GetNumAxes"] = lambda x: _core.csMouseEventHelper_GetNumAxes
-    if _newclass:GetNumAxes = staticmethod(_core.csMouseEventHelper_GetNumAxes)
-    __swig_getmethods__["GetButton"] = lambda x: _core.csMouseEventHelper_GetButton
-    if _newclass:GetButton = staticmethod(_core.csMouseEventHelper_GetButton)
-    __swig_getmethods__["GetButtonState"] = lambda x: _core.csMouseEventHelper_GetButtonState
-    if _newclass:GetButtonState = staticmethod(_core.csMouseEventHelper_GetButtonState)
-    __swig_getmethods__["GetButtonMask"] = lambda x: _core.csMouseEventHelper_GetButtonMask
-    if _newclass:GetButtonMask = staticmethod(_core.csMouseEventHelper_GetButtonMask)
-    __swig_getmethods__["GetModifiers"] = lambda x: _core.csMouseEventHelper_GetModifiers
-    if _newclass:GetModifiers = staticmethod(_core.csMouseEventHelper_GetModifiers)
-    __swig_getmethods__["GetEventData"] = lambda x: _core.csMouseEventHelper_GetEventData
-    if _newclass:GetEventData = staticmethod(_core.csMouseEventHelper_GetEventData)
+    NewEvent = staticmethod(_core.csMouseEventHelper_NewEvent)
+    GetEventType = staticmethod(_core.csMouseEventHelper_GetEventType)
+    GetNumber = staticmethod(_core.csMouseEventHelper_GetNumber)
+    GetX = staticmethod(_core.csMouseEventHelper_GetX)
+    GetY = staticmethod(_core.csMouseEventHelper_GetY)
+    GetAxis = staticmethod(_core.csMouseEventHelper_GetAxis)
+    GetNumAxes = staticmethod(_core.csMouseEventHelper_GetNumAxes)
+    GetButton = staticmethod(_core.csMouseEventHelper_GetButton)
+    GetButtonState = staticmethod(_core.csMouseEventHelper_GetButtonState)
+    GetButtonMask = staticmethod(_core.csMouseEventHelper_GetButtonMask)
+    GetModifiers = staticmethod(_core.csMouseEventHelper_GetModifiers)
+    GetEventData = staticmethod(_core.csMouseEventHelper_GetEventData)
     def __init__(self, *args): 
         this = _core.new_csMouseEventHelper(*args)
         try: self.this.append(this)
@@ -1658,30 +1275,18 @@ csMouseEventHelper_GetButtonMask = _core.csMouseEventHelper_GetButtonMask
 csMouseEventHelper_GetModifiers = _core.csMouseEventHelper_GetModifiers
 csMouseEventHelper_GetEventData = _core.csMouseEventHelper_GetEventData
 
-class csJoystickEventHelper(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csJoystickEventHelper, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csJoystickEventHelper, name)
+class csJoystickEventHelper(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_getmethods__["NewEvent"] = lambda x: _core.csJoystickEventHelper_NewEvent
-    if _newclass:NewEvent = staticmethod(_core.csJoystickEventHelper_NewEvent)
-    __swig_getmethods__["GetNumber"] = lambda x: _core.csJoystickEventHelper_GetNumber
-    if _newclass:GetNumber = staticmethod(_core.csJoystickEventHelper_GetNumber)
-    __swig_getmethods__["GetAxis"] = lambda x: _core.csJoystickEventHelper_GetAxis
-    if _newclass:GetAxis = staticmethod(_core.csJoystickEventHelper_GetAxis)
-    __swig_getmethods__["GetNumAxes"] = lambda x: _core.csJoystickEventHelper_GetNumAxes
-    if _newclass:GetNumAxes = staticmethod(_core.csJoystickEventHelper_GetNumAxes)
-    __swig_getmethods__["GetButton"] = lambda x: _core.csJoystickEventHelper_GetButton
-    if _newclass:GetButton = staticmethod(_core.csJoystickEventHelper_GetButton)
-    __swig_getmethods__["GetButtonState"] = lambda x: _core.csJoystickEventHelper_GetButtonState
-    if _newclass:GetButtonState = staticmethod(_core.csJoystickEventHelper_GetButtonState)
-    __swig_getmethods__["GetButtonMask"] = lambda x: _core.csJoystickEventHelper_GetButtonMask
-    if _newclass:GetButtonMask = staticmethod(_core.csJoystickEventHelper_GetButtonMask)
-    __swig_getmethods__["GetModifiers"] = lambda x: _core.csJoystickEventHelper_GetModifiers
-    if _newclass:GetModifiers = staticmethod(_core.csJoystickEventHelper_GetModifiers)
-    __swig_getmethods__["GetEventData"] = lambda x: _core.csJoystickEventHelper_GetEventData
-    if _newclass:GetEventData = staticmethod(_core.csJoystickEventHelper_GetEventData)
+    NewEvent = staticmethod(_core.csJoystickEventHelper_NewEvent)
+    GetNumber = staticmethod(_core.csJoystickEventHelper_GetNumber)
+    GetAxis = staticmethod(_core.csJoystickEventHelper_GetAxis)
+    GetNumAxes = staticmethod(_core.csJoystickEventHelper_GetNumAxes)
+    GetButton = staticmethod(_core.csJoystickEventHelper_GetButton)
+    GetButtonState = staticmethod(_core.csJoystickEventHelper_GetButtonState)
+    GetButtonMask = staticmethod(_core.csJoystickEventHelper_GetButtonMask)
+    GetModifiers = staticmethod(_core.csJoystickEventHelper_GetModifiers)
+    GetEventData = staticmethod(_core.csJoystickEventHelper_GetEventData)
     def __init__(self, *args): 
         this = _core.new_csJoystickEventHelper(*args)
         try: self.this.append(this)
@@ -1700,16 +1305,11 @@ csJoystickEventHelper_GetButtonMask = _core.csJoystickEventHelper_GetButtonMask
 csJoystickEventHelper_GetModifiers = _core.csJoystickEventHelper_GetModifiers
 csJoystickEventHelper_GetEventData = _core.csJoystickEventHelper_GetEventData
 
-class csInputEventHelper(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csInputEventHelper, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csInputEventHelper, name)
+class csInputEventHelper(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_getmethods__["GetButton"] = lambda x: _core.csInputEventHelper_GetButton
-    if _newclass:GetButton = staticmethod(_core.csInputEventHelper_GetButton)
-    __swig_getmethods__["GetButtonState"] = lambda x: _core.csInputEventHelper_GetButtonState
-    if _newclass:GetButtonState = staticmethod(_core.csInputEventHelper_GetButtonState)
+    GetButton = staticmethod(_core.csInputEventHelper_GetButton)
+    GetButtonState = staticmethod(_core.csInputEventHelper_GetButtonState)
     def __init__(self, *args): 
         this = _core.new_csInputEventHelper(*args)
         try: self.this.append(this)
@@ -1721,20 +1321,13 @@ csInputEventHelper_swigregister(csInputEventHelper)
 csInputEventHelper_GetButton = _core.csInputEventHelper_GetButton
 csInputEventHelper_GetButtonState = _core.csInputEventHelper_GetButtonState
 
-class csCommandEventHelper(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csCommandEventHelper, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csCommandEventHelper, name)
+class csCommandEventHelper(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_getmethods__["NewEvent"] = lambda x: _core.csCommandEventHelper_NewEvent
-    if _newclass:NewEvent = staticmethod(_core.csCommandEventHelper_NewEvent)
-    __swig_getmethods__["GetCode"] = lambda x: _core.csCommandEventHelper_GetCode
-    if _newclass:GetCode = staticmethod(_core.csCommandEventHelper_GetCode)
-    __swig_getmethods__["GetInfo"] = lambda x: _core.csCommandEventHelper_GetInfo
-    if _newclass:GetInfo = staticmethod(_core.csCommandEventHelper_GetInfo)
-    __swig_getmethods__["GetEventData"] = lambda x: _core.csCommandEventHelper_GetEventData
-    if _newclass:GetEventData = staticmethod(_core.csCommandEventHelper_GetEventData)
+    NewEvent = staticmethod(_core.csCommandEventHelper_NewEvent)
+    GetCode = staticmethod(_core.csCommandEventHelper_GetCode)
+    GetInfo = staticmethod(_core.csCommandEventHelper_GetInfo)
+    GetEventData = staticmethod(_core.csCommandEventHelper_GetEventData)
     def __init__(self, *args): 
         this = _core.new_csCommandEventHelper(*args)
         try: self.this.append(this)
@@ -1774,15 +1367,10 @@ csKeyModifierTypeLast = _core.csKeyModifierTypeLast
 csKeyModifierNumLeft = _core.csKeyModifierNumLeft
 csKeyModifierNumRight = _core.csKeyModifierNumRight
 csKeyModifierNumAny = _core.csKeyModifierNumAny
-class csKeyModifiers(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csKeyModifiers, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csKeyModifiers, name)
+class csKeyModifiers(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["modifiers"] = _core.csKeyModifiers_modifiers_set
-    __swig_getmethods__["modifiers"] = _core.csKeyModifiers_modifiers_get
-    if _newclass:modifiers = _swig_property(_core.csKeyModifiers_modifiers_get, _core.csKeyModifiers_modifiers_set)
+    modifiers = _swig_property(_core.csKeyModifiers_modifiers_get, _core.csKeyModifiers_modifiers_set)
     def __getitem__(*args): return _core.csKeyModifiers___getitem__(*args)
     def __init__(self, *args): 
         this = _core.new_csKeyModifiers(*args)
@@ -1836,12 +1424,7 @@ CSEVTYPE_Keyboard = _core.CSEVTYPE_Keyboard
 CSEVTYPE_Mouse = _core.CSEVTYPE_Mouse
 CSEVTYPE_Joystick = _core.CSEVTYPE_Joystick
 class iEventQueue(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iEventQueue, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iEventQueue, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Process(*args): return _core.iEventQueue_Process(*args)
@@ -1860,8 +1443,7 @@ class iEventQueue(iBase):
     def Clear(*args): return _core.iEventQueue_Clear(*args)
     def IsEmpty(*args): return _core.iEventQueue_IsEmpty(*args)
     def RemoveAllListeners(*args): return _core.iEventQueue_RemoveAllListeners(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iEventQueue_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iEventQueue_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iEventQueue_scfGetVersion)
     __swig_destroy__ = _core.delete_iEventQueue
     __del__ = lambda self : None;
 iEventQueue_swigregister = _core.iEventQueue_swigregister
@@ -1869,12 +1451,7 @@ iEventQueue_swigregister(iEventQueue)
 iEventQueue_scfGetVersion = _core.iEventQueue_scfGetVersion
 
 class iEventNameRegistry(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iEventNameRegistry, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iEventNameRegistry, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetID(*args): return _core.iEventNameRegistry_GetID(*args)
@@ -1882,8 +1459,7 @@ class iEventNameRegistry(iBase):
     def GetParentID(*args): return _core.iEventNameRegistry_GetParentID(*args)
     def IsImmediateChildOf(*args): return _core.iEventNameRegistry_IsImmediateChildOf(*args)
     def IsKindOf(*args): return _core.iEventNameRegistry_IsKindOf(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iEventNameRegistry_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iEventNameRegistry_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iEventNameRegistry_scfGetVersion)
     __swig_destroy__ = _core.delete_iEventNameRegistry
     __del__ = lambda self : None;
 iEventNameRegistry_swigregister = _core.iEventNameRegistry_swigregister
@@ -1891,25 +1467,18 @@ iEventNameRegistry_swigregister(iEventNameRegistry)
 csHashCompute = _core.csHashCompute
 iEventNameRegistry_scfGetVersion = _core.iEventNameRegistry_scfGetVersion
 
-class csEventNameRegistry(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csEventNameRegistry, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csEventNameRegistry, name)
+class csEventNameRegistry(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     __swig_destroy__ = _core.delete_csEventNameRegistry
     __del__ = lambda self : None;
-    __swig_getmethods__["GetString"] = lambda x: _core.csEventNameRegistry_GetString
-    if _newclass:GetString = staticmethod(_core.csEventNameRegistry_GetString)
+    GetString = staticmethod(_core.csEventNameRegistry_GetString)
     def GetParentID(*args): return _core.csEventNameRegistry_GetParentID(*args)
     def IsImmediateChildOf(*args): return _core.csEventNameRegistry_IsImmediateChildOf(*args)
-    __swig_getmethods__["GetRegistry"] = lambda x: _core.csEventNameRegistry_GetRegistry
-    if _newclass:GetRegistry = staticmethod(_core.csEventNameRegistry_GetRegistry)
-    __swig_getmethods__["GetID"] = lambda x: _core.csEventNameRegistry_GetID
-    if _newclass:GetID = staticmethod(_core.csEventNameRegistry_GetID)
-    __swig_getmethods__["IsKindOf"] = lambda x: _core.csEventNameRegistry_IsKindOf
-    if _newclass:IsKindOf = staticmethod(_core.csEventNameRegistry_IsKindOf)
+    GetRegistry = staticmethod(_core.csEventNameRegistry_GetRegistry)
+    GetID = staticmethod(_core.csEventNameRegistry_GetID)
+    IsKindOf = staticmethod(_core.csEventNameRegistry_IsKindOf)
 csEventNameRegistry_swigregister = _core.csEventNameRegistry_swigregister
 csEventNameRegistry_swigregister(csEventNameRegistry)
 csEventNameRegistry_GetString = _core.csEventNameRegistry_GetString
@@ -1918,12 +1487,7 @@ csEventNameRegistry_GetID = _core.csEventNameRegistry_GetID
 csEventNameRegistry_IsKindOf = _core.csEventNameRegistry_IsKindOf
 
 class iEventHandler(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iEventHandler, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iEventHandler, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def HandleEvent(*args): return _core.iEventHandler_HandleEvent(*args)
@@ -1933,8 +1497,7 @@ class iEventHandler(iBase):
     def GenericSucc(*args): return _core.iEventHandler_GenericSucc(*args)
     def InstancePrec(*args): return _core.iEventHandler_InstancePrec(*args)
     def InstanceSucc(*args): return _core.iEventHandler_InstanceSucc(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iEventHandler_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iEventHandler_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iEventHandler_scfGetVersion)
     __swig_destroy__ = _core.delete_iEventHandler
     __del__ = lambda self : None;
 iEventHandler_swigregister = _core.iEventHandler_swigregister
@@ -1951,12 +1514,7 @@ csevFinalProcess = _core.csevFinalProcess
 iEventHandler_scfGetVersion = _core.iEventHandler_scfGetVersion
 
 class iPluginIterator(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iPluginIterator, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iPluginIterator, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def HasNext(*args): return _core.iPluginIterator_HasNext(*args)
@@ -1964,8 +1522,7 @@ class iPluginIterator(iBase):
     def __iter__(self):
         while self.HasNext():
             yield self.Next() 
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iPluginIterator_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iPluginIterator_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iPluginIterator_scfGetVersion)
     __swig_destroy__ = _core.delete_iPluginIterator
     __del__ = lambda self : None;
 iPluginIterator_swigregister = _core.iPluginIterator_swigregister
@@ -1973,12 +1530,7 @@ iPluginIterator_swigregister(iPluginIterator)
 iPluginIterator_scfGetVersion = _core.iPluginIterator_scfGetVersion
 
 class iPluginManager(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iPluginManager, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iPluginManager, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def LoadPlugin(*args): return _core.iPluginManager_LoadPlugin(*args)
@@ -1988,8 +1540,7 @@ class iPluginManager(iBase):
     def GetPlugins(*args): return _core.iPluginManager_GetPlugins(*args)
     def Clear(*args): return _core.iPluginManager_Clear(*args)
     def QueryOptions(*args): return _core.iPluginManager_QueryOptions(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iPluginManager_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iPluginManager_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iPluginManager_scfGetVersion)
     __swig_destroy__ = _core.delete_iPluginManager
     __del__ = lambda self : None;
 iPluginManager_swigregister = _core.iPluginManager_swigregister
@@ -2001,12 +1552,7 @@ csComposeNormalChar = _core.csComposeNormalChar
 csComposeComposedChar = _core.csComposeComposedChar
 csComposeUncomposeable = _core.csComposeUncomposeable
 class iKeyComposer(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iKeyComposer, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iKeyComposer, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def HandleKey(*args): return _core.iKeyComposer_HandleKey(*args)
@@ -2018,12 +1564,7 @@ iKeyComposer_swigregister(iKeyComposer)
 csLoadPluginAlways = _core.csLoadPluginAlways
 
 class iKeyboardDriver(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iKeyboardDriver, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iKeyboardDriver, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Reset(*args): return _core.iKeyboardDriver_Reset(*args)
@@ -2032,8 +1573,7 @@ class iKeyboardDriver(iBase):
     def CreateKeyComposer(*args): return _core.iKeyboardDriver_CreateKeyComposer(*args)
     def SynthesizeCooked(*args): return _core.iKeyboardDriver_SynthesizeCooked(*args)
     def GetKeyState(*args): return _core.iKeyboardDriver_GetKeyState(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iKeyboardDriver_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iKeyboardDriver_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iKeyboardDriver_scfGetVersion)
     __swig_destroy__ = _core.delete_iKeyboardDriver
     __del__ = lambda self : None;
 iKeyboardDriver_swigregister = _core.iKeyboardDriver_swigregister
@@ -2041,12 +1581,7 @@ iKeyboardDriver_swigregister(iKeyboardDriver)
 iKeyboardDriver_scfGetVersion = _core.iKeyboardDriver_scfGetVersion
 
 class iMouseDriver(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iMouseDriver, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iMouseDriver, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetDoubleClickTime(*args): return _core.iMouseDriver_SetDoubleClickTime(*args)
@@ -2057,8 +1592,7 @@ class iMouseDriver(iBase):
     def GetLastButton(*args): return _core.iMouseDriver_GetLastButton(*args)
     def DoButton(*args): return _core.iMouseDriver_DoButton(*args)
     def DoMotion(*args): return _core.iMouseDriver_DoMotion(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iMouseDriver_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iMouseDriver_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iMouseDriver_scfGetVersion)
     __swig_destroy__ = _core.delete_iMouseDriver
     __del__ = lambda self : None;
 iMouseDriver_swigregister = _core.iMouseDriver_swigregister
@@ -2066,12 +1600,7 @@ iMouseDriver_swigregister(iMouseDriver)
 iMouseDriver_scfGetVersion = _core.iMouseDriver_scfGetVersion
 
 class iJoystickDriver(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iJoystickDriver, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iJoystickDriver, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Reset(*args): return _core.iJoystickDriver_Reset(*args)
@@ -2079,8 +1608,7 @@ class iJoystickDriver(iBase):
     def GetLastButton(*args): return _core.iJoystickDriver_GetLastButton(*args)
     def DoButton(*args): return _core.iJoystickDriver_DoButton(*args)
     def DoMotion(*args): return _core.iJoystickDriver_DoMotion(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iJoystickDriver_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iJoystickDriver_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iJoystickDriver_scfGetVersion)
     __swig_destroy__ = _core.delete_iJoystickDriver
     __del__ = lambda self : None;
 iJoystickDriver_swigregister = _core.iJoystickDriver_swigregister
@@ -2088,12 +1616,7 @@ iJoystickDriver_swigregister(iJoystickDriver)
 iJoystickDriver_scfGetVersion = _core.iJoystickDriver_scfGetVersion
 
 class iConfigFile(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iConfigFile, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iConfigFile, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetFileName(*args): return _core.iConfigFile_GetFileName(*args)
@@ -2120,8 +1643,7 @@ class iConfigFile(iBase):
     def DeleteKey(*args): return _core.iConfigFile_DeleteKey(*args)
     def GetEOFComment(*args): return _core.iConfigFile_GetEOFComment(*args)
     def SetEOFComment(*args): return _core.iConfigFile_SetEOFComment(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iConfigFile_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iConfigFile_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iConfigFile_scfGetVersion)
     __swig_destroy__ = _core.delete_iConfigFile
     __del__ = lambda self : None;
 iConfigFile_swigregister = _core.iConfigFile_swigregister
@@ -2129,12 +1651,7 @@ iConfigFile_swigregister(iConfigFile)
 iConfigFile_scfGetVersion = _core.iConfigFile_scfGetVersion
 
 class iConfigIterator(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iConfigIterator, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iConfigIterator, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetConfigFile(*args): return _core.iConfigIterator_GetConfigFile(*args)
@@ -2149,8 +1666,7 @@ class iConfigIterator(iBase):
     def GetBool(*args): return _core.iConfigIterator_GetBool(*args)
     def GetTuple(*args): return _core.iConfigIterator_GetTuple(*args)
     def GetComment(*args): return _core.iConfigIterator_GetComment(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iConfigIterator_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iConfigIterator_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iConfigIterator_scfGetVersion)
     __swig_destroy__ = _core.delete_iConfigIterator
     __del__ = lambda self : None;
 iConfigIterator_swigregister = _core.iConfigIterator_swigregister
@@ -2158,12 +1674,7 @@ iConfigIterator_swigregister(iConfigIterator)
 iConfigIterator_scfGetVersion = _core.iConfigIterator_scfGetVersion
 
 class iConfigManager(iConfigFile):
-    __swig_setmethods__ = {}
-    for _s in [iConfigFile]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iConfigManager, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iConfigFile]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iConfigManager, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     PriorityMin = _core.iConfigManager_PriorityMin
@@ -2188,8 +1699,7 @@ class iConfigManager(iConfigFile):
     def SetDynamicDomainPriority(*args): return _core.iConfigManager_SetDynamicDomainPriority(*args)
     def GetDynamicDomainPriority(*args): return _core.iConfigManager_GetDynamicDomainPriority(*args)
     def FlushRemoved(*args): return _core.iConfigManager_FlushRemoved(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iConfigManager_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iConfigManager_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iConfigManager_scfGetVersion)
     __swig_destroy__ = _core.delete_iConfigManager
     __del__ = lambda self : None;
 iConfigManager_swigregister = _core.iConfigManager_swigregister
@@ -2197,12 +1707,7 @@ iConfigManager_swigregister(iConfigManager)
 iConfigManager_scfGetVersion = _core.iConfigManager_scfGetVersion
 
 class iStringArray(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iStringArray, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iStringArray, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetSize(*args): return _core.iStringArray_GetSize(*args)
@@ -2229,8 +1734,7 @@ class iStringArray(iBase):
             for idx in xrange(len(self)):
                     yield self.__getitem__(idx)
     def __iter__(self): return self.content_iterator()  
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iStringArray_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iStringArray_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iStringArray_scfGetVersion)
     __swig_destroy__ = _core.delete_iStringArray
     __del__ = lambda self : None;
 iStringArray_swigregister = _core.iStringArray_swigregister
@@ -2247,12 +1751,7 @@ CS_CHANGEABLE_NEVER = _core.CS_CHANGEABLE_NEVER
 CS_CHANGEABLE_NEWROOT = _core.CS_CHANGEABLE_NEWROOT
 CS_CHANGEABLE_YES = _core.CS_CHANGEABLE_YES
 class iDocumentAttributeIterator(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iDocumentAttributeIterator, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iDocumentAttributeIterator, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def HasNext(*args): return _core.iDocumentAttributeIterator_HasNext(*args)
@@ -2260,8 +1759,7 @@ class iDocumentAttributeIterator(iBase):
     def __iter__(self):
         while self.HasNext():
             yield self.Next() 
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iDocumentAttributeIterator_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iDocumentAttributeIterator_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iDocumentAttributeIterator_scfGetVersion)
     __swig_destroy__ = _core.delete_iDocumentAttributeIterator
     __del__ = lambda self : None;
 iDocumentAttributeIterator_swigregister = _core.iDocumentAttributeIterator_swigregister
@@ -2269,12 +1767,7 @@ iDocumentAttributeIterator_swigregister(iDocumentAttributeIterator)
 iDocumentAttributeIterator_scfGetVersion = _core.iDocumentAttributeIterator_scfGetVersion
 
 class iDocumentAttribute(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iDocumentAttribute, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iDocumentAttribute, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetName(*args): return _core.iDocumentAttribute_GetName(*args)
@@ -2286,8 +1779,7 @@ class iDocumentAttribute(iBase):
     def SetValue(*args): return _core.iDocumentAttribute_SetValue(*args)
     def SetValueAsInt(*args): return _core.iDocumentAttribute_SetValueAsInt(*args)
     def SetValueAsFloat(*args): return _core.iDocumentAttribute_SetValueAsFloat(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iDocumentAttribute_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iDocumentAttribute_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iDocumentAttribute_scfGetVersion)
     __swig_destroy__ = _core.delete_iDocumentAttribute
     __del__ = lambda self : None;
 iDocumentAttribute_swigregister = _core.iDocumentAttribute_swigregister
@@ -2295,12 +1787,7 @@ iDocumentAttribute_swigregister(iDocumentAttribute)
 iDocumentAttribute_scfGetVersion = _core.iDocumentAttribute_scfGetVersion
 
 class iDocumentNodeIterator(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iDocumentNodeIterator, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iDocumentNodeIterator, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def HasNext(*args): return _core.iDocumentNodeIterator_HasNext(*args)
@@ -2310,8 +1797,7 @@ class iDocumentNodeIterator(iBase):
     def __iter__(self):
         while self.HasNext():
             yield self.Next() 
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iDocumentNodeIterator_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iDocumentNodeIterator_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iDocumentNodeIterator_scfGetVersion)
     __swig_destroy__ = _core.delete_iDocumentNodeIterator
     __del__ = lambda self : None;
 iDocumentNodeIterator_swigregister = _core.iDocumentNodeIterator_swigregister
@@ -2319,12 +1805,7 @@ iDocumentNodeIterator_swigregister(iDocumentNodeIterator)
 iDocumentNodeIterator_scfGetVersion = _core.iDocumentNodeIterator_scfGetVersion
 
 class iDocumentNode(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iDocumentNode, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iDocumentNode, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetType(*args): return _core.iDocumentNode_GetType(*args)
@@ -2353,8 +1834,7 @@ class iDocumentNode(iBase):
     def SetAttribute(*args): return _core.iDocumentNode_SetAttribute(*args)
     def SetAttributeAsInt(*args): return _core.iDocumentNode_SetAttributeAsInt(*args)
     def SetAttributeAsFloat(*args): return _core.iDocumentNode_SetAttributeAsFloat(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iDocumentNode_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iDocumentNode_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iDocumentNode_scfGetVersion)
     __swig_destroy__ = _core.delete_iDocumentNode
     __del__ = lambda self : None;
 iDocumentNode_swigregister = _core.iDocumentNode_swigregister
@@ -2362,12 +1842,7 @@ iDocumentNode_swigregister(iDocumentNode)
 iDocumentNode_scfGetVersion = _core.iDocumentNode_scfGetVersion
 
 class iDocument(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iDocument, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iDocument, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Clear(*args): return _core.iDocument_Clear(*args)
@@ -2376,8 +1851,7 @@ class iDocument(iBase):
     def Parse(*args): return _core.iDocument_Parse(*args)
     def Write(*args): return _core.iDocument_Write(*args)
     def Changeable(*args): return _core.iDocument_Changeable(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iDocument_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iDocument_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iDocument_scfGetVersion)
     __swig_destroy__ = _core.delete_iDocument
     __del__ = lambda self : None;
 iDocument_swigregister = _core.iDocument_swigregister
@@ -2385,17 +1859,11 @@ iDocument_swigregister(iDocument)
 iDocument_scfGetVersion = _core.iDocument_scfGetVersion
 
 class iDocumentSystem(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iDocumentSystem, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iDocumentSystem, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def CreateDocument(*args): return _core.iDocumentSystem_CreateDocument(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iDocumentSystem_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iDocumentSystem_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iDocumentSystem_scfGetVersion)
     __swig_destroy__ = _core.delete_iDocumentSystem
     __del__ = lambda self : None;
 iDocumentSystem_swigregister = _core.iDocumentSystem_swigregister
@@ -2403,12 +1871,7 @@ iDocumentSystem_swigregister(iDocumentSystem)
 iDocumentSystem_scfGetVersion = _core.iDocumentSystem_scfGetVersion
 
 class scfConfigFile(iConfigFile):
-    __swig_setmethods__ = {}
-    for _s in [iConfigFile]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, scfConfigFile, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iConfigFile]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, scfConfigFile, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def IncRef(*args): return _core.scfConfigFile_IncRef(*args)
@@ -2422,12 +1885,7 @@ scfConfigFile_swigregister = _core.scfConfigFile_swigregister
 scfConfigFile_swigregister(scfConfigFile)
 
 class csConfigFile(scfConfigFile):
-    __swig_setmethods__ = {}
-    for _s in [scfConfigFile]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csConfigFile, name, value)
-    __swig_getmethods__ = {}
-    for _s in [scfConfigFile]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csConfigFile, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     __swig_destroy__ = _core.delete_csConfigFile
@@ -2462,11 +1920,8 @@ class csConfigFile(scfConfigFile):
 csConfigFile_swigregister = _core.csConfigFile_swigregister
 csConfigFile_swigregister(csConfigFile)
 
-class csRadixSorter(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csRadixSorter, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csRadixSorter, name)
+class csRadixSorter(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _core.new_csRadixSorter(*args)
@@ -2479,11 +1934,8 @@ class csRadixSorter(_object):
 csRadixSorter_swigregister = _core.csRadixSorter_swigregister
 csRadixSorter_swigregister(csRadixSorter)
 
-class csTinyDocumentSystem(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csTinyDocumentSystem, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csTinyDocumentSystem, name)
+class csTinyDocumentSystem(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _core.new_csTinyDocumentSystem(*args)
@@ -2496,20 +1948,14 @@ csTinyDocumentSystem_swigregister = _core.csTinyDocumentSystem_swigregister
 csTinyDocumentSystem_swigregister(csTinyDocumentSystem)
 
 class iDataBuffer(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iDataBuffer, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iDataBuffer, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetSize(*args): return _core.iDataBuffer_GetSize(*args)
     def GetData(*args): return _core.iDataBuffer_GetData(*args)
     def asString(*args): return _core.iDataBuffer_asString(*args)
     def GetUint8(*args): return _core.iDataBuffer_GetUint8(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iDataBuffer_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iDataBuffer_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iDataBuffer_scfGetVersion)
     __swig_destroy__ = _core.delete_iDataBuffer
     __del__ = lambda self : None;
 iDataBuffer_swigregister = _core.iDataBuffer_swigregister
@@ -2527,12 +1973,7 @@ csimg2D = _core.csimg2D
 csimg3D = _core.csimg3D
 csimgCube = _core.csimgCube
 class iImage(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iImage, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iImage, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetImageData(*args): return _core.iImage_GetImageData(*args)
@@ -2553,8 +1994,7 @@ class iImage(iBase):
     def GetImageType(*args): return _core.iImage_GetImageType(*args)
     def HasSubImages(*args): return _core.iImage_HasSubImages(*args)
     def GetSubImage(*args): return _core.iImage_GetSubImage(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iImage_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iImage_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iImage_scfGetVersion)
     __swig_destroy__ = _core.delete_iImage
     __del__ = lambda self : None;
 iImage_swigregister = _core.iImage_swigregister
@@ -2562,12 +2002,7 @@ iImage_swigregister(iImage)
 iImage_scfGetVersion = _core.iImage_scfGetVersion
 
 class csImageIOFileFormatDescriptions(CustomAllocated):
-    __swig_setmethods__ = {}
-    for _s in [CustomAllocated]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csImageIOFileFormatDescriptions, name, value)
-    __swig_getmethods__ = {}
-    for _s in [CustomAllocated]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csImageIOFileFormatDescriptions, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     __swig_destroy__ = _core.delete_csImageIOFileFormatDescriptions
     __del__ = lambda self : None;
@@ -2598,19 +2033,12 @@ csImageIOFileFormatDescriptions_swigregister(csImageIOFileFormatDescriptions)
 
 CS_IMAGEIO_LOAD = _core.CS_IMAGEIO_LOAD
 CS_IMAGEIO_SAVE = _core.CS_IMAGEIO_SAVE
-class csImageIOFileFormatDescription(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csImageIOFileFormatDescription, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csImageIOFileFormatDescription, name)
+class csImageIOFileFormatDescription(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_getmethods__["mime"] = _core.csImageIOFileFormatDescription_mime_get
-    if _newclass:mime = _swig_property(_core.csImageIOFileFormatDescription_mime_get)
-    __swig_getmethods__["subtype"] = _core.csImageIOFileFormatDescription_subtype_get
-    if _newclass:subtype = _swig_property(_core.csImageIOFileFormatDescription_subtype_get)
-    __swig_setmethods__["cap"] = _core.csImageIOFileFormatDescription_cap_set
-    __swig_getmethods__["cap"] = _core.csImageIOFileFormatDescription_cap_get
-    if _newclass:cap = _swig_property(_core.csImageIOFileFormatDescription_cap_get, _core.csImageIOFileFormatDescription_cap_set)
+    mime = _swig_property(_core.csImageIOFileFormatDescription_mime_get)
+    subtype = _swig_property(_core.csImageIOFileFormatDescription_subtype_get)
+    cap = _swig_property(_core.csImageIOFileFormatDescription_cap_get, _core.csImageIOFileFormatDescription_cap_set)
     def __init__(self, *args): 
         this = _core.new_csImageIOFileFormatDescription(*args)
         try: self.this.append(this)
@@ -2621,20 +2049,14 @@ csImageIOFileFormatDescription_swigregister = _core.csImageIOFileFormatDescripti
 csImageIOFileFormatDescription_swigregister(csImageIOFileFormatDescription)
 
 class iImageIO(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iImageIO, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iImageIO, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetDescription(*args): return _core.iImageIO_GetDescription(*args)
     def Load(*args): return _core.iImageIO_Load(*args)
     def SetDithering(*args): return _core.iImageIO_SetDithering(*args)
     def Save(*args): return _core.iImageIO_Save(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iImageIO_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iImageIO_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iImageIO_scfGetVersion)
     __swig_destroy__ = _core.delete_iImageIO
     __del__ = lambda self : None;
 iImageIO_swigregister = _core.iImageIO_swigregister
@@ -2642,18 +2064,12 @@ iImageIO_swigregister(iImageIO)
 iImageIO_scfGetVersion = _core.iImageIO_scfGetVersion
 
 class iAnimatedImage(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iAnimatedImage, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iAnimatedImage, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Animate(*args): return _core.iAnimatedImage_Animate(*args)
     def IsAnimated(*args): return _core.iAnimatedImage_IsAnimated(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _core.iAnimatedImage_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_core.iAnimatedImage_scfGetVersion)
+    scfGetVersion = staticmethod(_core.iAnimatedImage_scfGetVersion)
     __swig_destroy__ = _core.delete_iAnimatedImage
     __del__ = lambda self : None;
 iAnimatedImage_swigregister = _core.iAnimatedImage_swigregister
@@ -2661,12 +2077,7 @@ iAnimatedImage_swigregister(iAnimatedImage)
 iAnimatedImage_scfGetVersion = _core.iAnimatedImage_scfGetVersion
 
 class iProcTexture(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iProcTexture, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iProcTexture, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetAlwaysAnimate(*args): return _core.iProcTexture_GetAlwaysAnimate(*args)
@@ -2676,12 +2087,7 @@ iProcTexture_swigregister = _core.iProcTexture_swigregister
 iProcTexture_swigregister(iProcTexture)
 
 class pycsObject(iObject):
-    __swig_setmethods__ = {}
-    for _s in [iObject]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, pycsObject, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iObject]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, pycsObject, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def IncRef(*args): return _core.pycsObject_IncRef(*args)
@@ -2695,12 +2101,7 @@ pycsObject_swigregister = _core.pycsObject_swigregister
 pycsObject_swigregister(pycsObject)
 
 class csObject(pycsObject):
-    __swig_setmethods__ = {}
-    for _s in [pycsObject]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csObject, name, value)
-    __swig_getmethods__ = {}
-    for _s in [pycsObject]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csObject, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _core.new_csObject(*args)
@@ -2751,11 +2152,8 @@ csevMouseDoubleClick = _core.csevMouseDoubleClick
 csevMouseMove = _core.csevMouseMove
 csevJoystickEvent = _core.csevJoystickEvent
 CS_LOAD_PLUGIN_ALWAYS = _core.CS_LOAD_PLUGIN_ALWAYS
-class TextureMapper(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, TextureMapper, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, TextureMapper, name)
+class TextureMapper(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     __swig_destroy__ = _core.delete_TextureMapper
@@ -2765,12 +2163,7 @@ TextureMapper_swigregister = _core.TextureMapper_swigregister
 TextureMapper_swigregister(TextureMapper)
 
 class TableTextureMapper(TextureMapper):
-    __swig_setmethods__ = {}
-    for _s in [TextureMapper]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, TableTextureMapper, name, value)
-    __swig_getmethods__ = {}
-    for _s in [TextureMapper]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, TableTextureMapper, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _core.new_TableTextureMapper(*args)
@@ -2783,12 +2176,7 @@ TableTextureMapper_swigregister = _core.TableTextureMapper_swigregister
 TableTextureMapper_swigregister(TableTextureMapper)
 
 class DensityTextureMapper(TextureMapper):
-    __swig_setmethods__ = {}
-    for _s in [TextureMapper]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, DensityTextureMapper, name, value)
-    __swig_getmethods__ = {}
-    for _s in [TextureMapper]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, DensityTextureMapper, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _core.new_DensityTextureMapper(*args)
@@ -2800,30 +2188,18 @@ class DensityTextureMapper(TextureMapper):
 DensityTextureMapper_swigregister = _core.DensityTextureMapper_swigregister
 DensityTextureMapper_swigregister(DensityTextureMapper)
 
-class Primitives(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, Primitives, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, Primitives, name)
+class Primitives(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["boxTable"] = _core.Primitives_boxTable_set
-    __swig_getmethods__["boxTable"] = _core.Primitives_boxTable_get
-    if _newclass:boxTable = _swig_property(_core.Primitives_boxTable_get, _core.Primitives_boxTable_set)
-    __swig_setmethods__["quadTable"] = _core.Primitives_quadTable_set
-    __swig_getmethods__["quadTable"] = _core.Primitives_quadTable_get
-    if _newclass:quadTable = _swig_property(_core.Primitives_quadTable_get, _core.Primitives_quadTable_set)
+    boxTable = _swig_property(_core.Primitives_boxTable_get, _core.Primitives_boxTable_set)
+    quadTable = _swig_property(_core.Primitives_quadTable_get, _core.Primitives_quadTable_set)
     CS_PRIMBOX_INSIDE = _core.Primitives_CS_PRIMBOX_INSIDE
     CS_PRIMBOX_SMOOTH = _core.Primitives_CS_PRIMBOX_SMOOTH
-    __swig_getmethods__["GenerateBox"] = lambda x: _core.Primitives_GenerateBox
-    if _newclass:GenerateBox = staticmethod(_core.Primitives_GenerateBox)
-    __swig_getmethods__["GenerateQuad"] = lambda x: _core.Primitives_GenerateQuad
-    if _newclass:GenerateQuad = staticmethod(_core.Primitives_GenerateQuad)
-    __swig_getmethods__["GenerateTesselatedQuad"] = lambda x: _core.Primitives_GenerateTesselatedQuad
-    if _newclass:GenerateTesselatedQuad = staticmethod(_core.Primitives_GenerateTesselatedQuad)
-    __swig_getmethods__["GenerateCapsule"] = lambda x: _core.Primitives_GenerateCapsule
-    if _newclass:GenerateCapsule = staticmethod(_core.Primitives_GenerateCapsule)
-    __swig_getmethods__["GenerateSphere"] = lambda x: _core.Primitives_GenerateSphere
-    if _newclass:GenerateSphere = staticmethod(_core.Primitives_GenerateSphere)
+    GenerateBox = staticmethod(_core.Primitives_GenerateBox)
+    GenerateQuad = staticmethod(_core.Primitives_GenerateQuad)
+    GenerateTesselatedQuad = staticmethod(_core.Primitives_GenerateTesselatedQuad)
+    GenerateCapsule = staticmethod(_core.Primitives_GenerateCapsule)
+    GenerateSphere = staticmethod(_core.Primitives_GenerateSphere)
     def __init__(self, *args): 
         this = _core.new_Primitives(*args)
         try: self.this.append(this)
@@ -2839,12 +2215,7 @@ Primitives_GenerateCapsule = _core.Primitives_GenerateCapsule
 Primitives_GenerateSphere = _core.Primitives_GenerateSphere
 
 class csPrimitives(Primitives):
-    __swig_setmethods__ = {}
-    for _s in [Primitives]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csPrimitives, name, value)
-    __swig_getmethods__ = {}
-    for _s in [Primitives]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csPrimitives, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _core.new_csPrimitives(*args)
@@ -2865,12 +2236,7 @@ CS_GET_CHILD_OBJECT = _core.CS_GET_CHILD_OBJECT
 CS_GET_NAMED_CHILD_OBJECT = _core.CS_GET_NAMED_CHILD_OBJECT
 CS_GET_FIRST_NAMED_CHILD_OBJECT = _core.CS_GET_FIRST_NAMED_CHILD_OBJECT
 class csPyEventHandlerParent(iEventHandler):
-    __swig_setmethods__ = {}
-    for _s in [iEventHandler]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csPyEventHandlerParent, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iEventHandler]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csPyEventHandlerParent, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def IncRef(*args): return _core.csPyEventHandlerParent_IncRef(*args)
@@ -2884,12 +2250,7 @@ csPyEventHandlerParent_swigregister = _core.csPyEventHandlerParent_swigregister
 csPyEventHandlerParent_swigregister(csPyEventHandlerParent)
 
 class _csPyEventHandler(csPyEventHandlerParent):
-    __swig_setmethods__ = {}
-    for _s in [csPyEventHandlerParent]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, _csPyEventHandler, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csPyEventHandlerParent]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, _csPyEventHandler, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _core.new__csPyEventHandler(*args)
@@ -2898,10 +2259,8 @@ class _csPyEventHandler(csPyEventHandlerParent):
     __swig_destroy__ = _core.delete__csPyEventHandler
     __del__ = lambda self : None;
     def HandleEvent(*args): return _core._csPyEventHandler_HandleEvent(*args)
-    __swig_getmethods__["StaticHandlerName"] = lambda x: _core._csPyEventHandler_StaticHandlerName
-    if _newclass:StaticHandlerName = staticmethod(_core._csPyEventHandler_StaticHandlerName)
-    __swig_getmethods__["StaticID"] = lambda x: _core._csPyEventHandler_StaticID
-    if _newclass:StaticID = staticmethod(_core._csPyEventHandler_StaticID)
+    StaticHandlerName = staticmethod(_core._csPyEventHandler_StaticHandlerName)
+    StaticID = staticmethod(_core._csPyEventHandler_StaticID)
     def GenericName(*args): return _core._csPyEventHandler_GenericName(*args)
     def GenericID(*args): return _core._csPyEventHandler_GenericID(*args)
     def GenericPrec(*args): return _core._csPyEventHandler_GenericPrec(*args)

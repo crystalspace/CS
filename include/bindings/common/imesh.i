@@ -57,6 +57,15 @@ ARRAY_CHANGE_ALL_TEMPLATE(csSprite2DVertex)
   { return &(self->GetColors()[index]); }
 }
 
+BUFFER_RW_FUNCTIONS(iGeneralFactoryState,GetVertices,GetVertexCount,
+                csVector3,GetVerticesAsBuffer)
+BUFFER_RW_FUNCTIONS(iGeneralFactoryState,GetNormals,GetVertexCount,
+                csVector3,GetNormalsAsBuffer)
+BUFFER_RW_FUNCTIONS(iGeneralFactoryState,GetColors,GetVertexCount,
+                csColor4,GetColorsAsBuffer)
+BUFFER_RW_FUNCTIONS(iGeneralFactoryState,GetTriangles,GetTriangleCount,
+                csTriangle,GetTrianglesAsBuffer)
+
 // imesh/terrain2.h
 %extend csLockedHeightData
 {

@@ -2,7 +2,6 @@
 # Version 1.3.31
 #
 # Don't modify this file, modify the SWIG interface instead.
-# This file is compatible with both classic and new-style classes.
 
 import _ivideo
 import new
@@ -48,6 +47,16 @@ except AttributeError:
 del types
 
 
+def _swig_setattr_nondynamic_method(set):
+    def set_attr(self,name,value):
+        if (name == "thisown"): return self.this.own(value)
+        if hasattr(self,name) or (name == "this"):
+            set(self,name,value)
+        else:
+            raise AttributeError("You cannot add attributes to %s" % self)
+    return set_attr
+
+
 import core
 import csgfx
 _SetSCFPointer = _ivideo._SetSCFPointer
@@ -59,18 +68,11 @@ CSMutableArrayHelper = core.CSMutableArrayHelper
 
 CS_WRITE_BASELINE = _ivideo.CS_WRITE_BASELINE
 CS_WRITE_NOANTIALIAS = _ivideo.CS_WRITE_NOANTIALIAS
-class csPixelCoord(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csPixelCoord, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csPixelCoord, name)
+class csPixelCoord(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["x"] = _ivideo.csPixelCoord_x_set
-    __swig_getmethods__["x"] = _ivideo.csPixelCoord_x_get
-    if _newclass:x = _swig_property(_ivideo.csPixelCoord_x_get, _ivideo.csPixelCoord_x_set)
-    __swig_setmethods__["y"] = _ivideo.csPixelCoord_y_set
-    __swig_getmethods__["y"] = _ivideo.csPixelCoord_y_get
-    if _newclass:y = _swig_property(_ivideo.csPixelCoord_y_get, _ivideo.csPixelCoord_y_set)
+    x = _swig_property(_ivideo.csPixelCoord_x_get, _ivideo.csPixelCoord_x_set)
+    y = _swig_property(_ivideo.csPixelCoord_y_get, _ivideo.csPixelCoord_y_set)
     def __init__(self, *args): 
         this = _ivideo.new_csPixelCoord(*args)
         try: self.this.append(this)
@@ -80,54 +82,23 @@ class csPixelCoord(_object):
 csPixelCoord_swigregister = _ivideo.csPixelCoord_swigregister
 csPixelCoord_swigregister(csPixelCoord)
 
-class csPixelFormat(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csPixelFormat, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csPixelFormat, name)
+class csPixelFormat(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["RedMask"] = _ivideo.csPixelFormat_RedMask_set
-    __swig_getmethods__["RedMask"] = _ivideo.csPixelFormat_RedMask_get
-    if _newclass:RedMask = _swig_property(_ivideo.csPixelFormat_RedMask_get, _ivideo.csPixelFormat_RedMask_set)
-    __swig_setmethods__["GreenMask"] = _ivideo.csPixelFormat_GreenMask_set
-    __swig_getmethods__["GreenMask"] = _ivideo.csPixelFormat_GreenMask_get
-    if _newclass:GreenMask = _swig_property(_ivideo.csPixelFormat_GreenMask_get, _ivideo.csPixelFormat_GreenMask_set)
-    __swig_setmethods__["BlueMask"] = _ivideo.csPixelFormat_BlueMask_set
-    __swig_getmethods__["BlueMask"] = _ivideo.csPixelFormat_BlueMask_get
-    if _newclass:BlueMask = _swig_property(_ivideo.csPixelFormat_BlueMask_get, _ivideo.csPixelFormat_BlueMask_set)
-    __swig_setmethods__["AlphaMask"] = _ivideo.csPixelFormat_AlphaMask_set
-    __swig_getmethods__["AlphaMask"] = _ivideo.csPixelFormat_AlphaMask_get
-    if _newclass:AlphaMask = _swig_property(_ivideo.csPixelFormat_AlphaMask_get, _ivideo.csPixelFormat_AlphaMask_set)
-    __swig_setmethods__["RedShift"] = _ivideo.csPixelFormat_RedShift_set
-    __swig_getmethods__["RedShift"] = _ivideo.csPixelFormat_RedShift_get
-    if _newclass:RedShift = _swig_property(_ivideo.csPixelFormat_RedShift_get, _ivideo.csPixelFormat_RedShift_set)
-    __swig_setmethods__["GreenShift"] = _ivideo.csPixelFormat_GreenShift_set
-    __swig_getmethods__["GreenShift"] = _ivideo.csPixelFormat_GreenShift_get
-    if _newclass:GreenShift = _swig_property(_ivideo.csPixelFormat_GreenShift_get, _ivideo.csPixelFormat_GreenShift_set)
-    __swig_setmethods__["BlueShift"] = _ivideo.csPixelFormat_BlueShift_set
-    __swig_getmethods__["BlueShift"] = _ivideo.csPixelFormat_BlueShift_get
-    if _newclass:BlueShift = _swig_property(_ivideo.csPixelFormat_BlueShift_get, _ivideo.csPixelFormat_BlueShift_set)
-    __swig_setmethods__["AlphaShift"] = _ivideo.csPixelFormat_AlphaShift_set
-    __swig_getmethods__["AlphaShift"] = _ivideo.csPixelFormat_AlphaShift_get
-    if _newclass:AlphaShift = _swig_property(_ivideo.csPixelFormat_AlphaShift_get, _ivideo.csPixelFormat_AlphaShift_set)
-    __swig_setmethods__["RedBits"] = _ivideo.csPixelFormat_RedBits_set
-    __swig_getmethods__["RedBits"] = _ivideo.csPixelFormat_RedBits_get
-    if _newclass:RedBits = _swig_property(_ivideo.csPixelFormat_RedBits_get, _ivideo.csPixelFormat_RedBits_set)
-    __swig_setmethods__["GreenBits"] = _ivideo.csPixelFormat_GreenBits_set
-    __swig_getmethods__["GreenBits"] = _ivideo.csPixelFormat_GreenBits_get
-    if _newclass:GreenBits = _swig_property(_ivideo.csPixelFormat_GreenBits_get, _ivideo.csPixelFormat_GreenBits_set)
-    __swig_setmethods__["BlueBits"] = _ivideo.csPixelFormat_BlueBits_set
-    __swig_getmethods__["BlueBits"] = _ivideo.csPixelFormat_BlueBits_get
-    if _newclass:BlueBits = _swig_property(_ivideo.csPixelFormat_BlueBits_get, _ivideo.csPixelFormat_BlueBits_set)
-    __swig_setmethods__["AlphaBits"] = _ivideo.csPixelFormat_AlphaBits_set
-    __swig_getmethods__["AlphaBits"] = _ivideo.csPixelFormat_AlphaBits_get
-    if _newclass:AlphaBits = _swig_property(_ivideo.csPixelFormat_AlphaBits_get, _ivideo.csPixelFormat_AlphaBits_set)
-    __swig_setmethods__["PalEntries"] = _ivideo.csPixelFormat_PalEntries_set
-    __swig_getmethods__["PalEntries"] = _ivideo.csPixelFormat_PalEntries_get
-    if _newclass:PalEntries = _swig_property(_ivideo.csPixelFormat_PalEntries_get, _ivideo.csPixelFormat_PalEntries_set)
-    __swig_setmethods__["PixelBytes"] = _ivideo.csPixelFormat_PixelBytes_set
-    __swig_getmethods__["PixelBytes"] = _ivideo.csPixelFormat_PixelBytes_get
-    if _newclass:PixelBytes = _swig_property(_ivideo.csPixelFormat_PixelBytes_get, _ivideo.csPixelFormat_PixelBytes_set)
+    RedMask = _swig_property(_ivideo.csPixelFormat_RedMask_get, _ivideo.csPixelFormat_RedMask_set)
+    GreenMask = _swig_property(_ivideo.csPixelFormat_GreenMask_get, _ivideo.csPixelFormat_GreenMask_set)
+    BlueMask = _swig_property(_ivideo.csPixelFormat_BlueMask_get, _ivideo.csPixelFormat_BlueMask_set)
+    AlphaMask = _swig_property(_ivideo.csPixelFormat_AlphaMask_get, _ivideo.csPixelFormat_AlphaMask_set)
+    RedShift = _swig_property(_ivideo.csPixelFormat_RedShift_get, _ivideo.csPixelFormat_RedShift_set)
+    GreenShift = _swig_property(_ivideo.csPixelFormat_GreenShift_get, _ivideo.csPixelFormat_GreenShift_set)
+    BlueShift = _swig_property(_ivideo.csPixelFormat_BlueShift_get, _ivideo.csPixelFormat_BlueShift_set)
+    AlphaShift = _swig_property(_ivideo.csPixelFormat_AlphaShift_get, _ivideo.csPixelFormat_AlphaShift_set)
+    RedBits = _swig_property(_ivideo.csPixelFormat_RedBits_get, _ivideo.csPixelFormat_RedBits_set)
+    GreenBits = _swig_property(_ivideo.csPixelFormat_GreenBits_get, _ivideo.csPixelFormat_GreenBits_set)
+    BlueBits = _swig_property(_ivideo.csPixelFormat_BlueBits_get, _ivideo.csPixelFormat_BlueBits_set)
+    AlphaBits = _swig_property(_ivideo.csPixelFormat_AlphaBits_get, _ivideo.csPixelFormat_AlphaBits_set)
+    PalEntries = _swig_property(_ivideo.csPixelFormat_PalEntries_get, _ivideo.csPixelFormat_PalEntries_set)
+    PixelBytes = _swig_property(_ivideo.csPixelFormat_PixelBytes_get, _ivideo.csPixelFormat_PixelBytes_set)
     def complete(*args): return _ivideo.csPixelFormat_complete(*args)
     def __init__(self, *args): 
         this = _ivideo.new_csPixelFormat(*args)
@@ -138,27 +109,14 @@ class csPixelFormat(_object):
 csPixelFormat_swigregister = _ivideo.csPixelFormat_swigregister
 csPixelFormat_swigregister(csPixelFormat)
 
-class csImageArea(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csImageArea, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csImageArea, name)
+class csImageArea(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["x"] = _ivideo.csImageArea_x_set
-    __swig_getmethods__["x"] = _ivideo.csImageArea_x_get
-    if _newclass:x = _swig_property(_ivideo.csImageArea_x_get, _ivideo.csImageArea_x_set)
-    __swig_setmethods__["y"] = _ivideo.csImageArea_y_set
-    __swig_getmethods__["y"] = _ivideo.csImageArea_y_get
-    if _newclass:y = _swig_property(_ivideo.csImageArea_y_get, _ivideo.csImageArea_y_set)
-    __swig_setmethods__["w"] = _ivideo.csImageArea_w_set
-    __swig_getmethods__["w"] = _ivideo.csImageArea_w_get
-    if _newclass:w = _swig_property(_ivideo.csImageArea_w_get, _ivideo.csImageArea_w_set)
-    __swig_setmethods__["h"] = _ivideo.csImageArea_h_set
-    __swig_getmethods__["h"] = _ivideo.csImageArea_h_get
-    if _newclass:h = _swig_property(_ivideo.csImageArea_h_get, _ivideo.csImageArea_h_set)
-    __swig_setmethods__["data"] = _ivideo.csImageArea_data_set
-    __swig_getmethods__["data"] = _ivideo.csImageArea_data_get
-    if _newclass:data = _swig_property(_ivideo.csImageArea_data_get, _ivideo.csImageArea_data_set)
+    x = _swig_property(_ivideo.csImageArea_x_get, _ivideo.csImageArea_x_set)
+    y = _swig_property(_ivideo.csImageArea_y_get, _ivideo.csImageArea_y_set)
+    w = _swig_property(_ivideo.csImageArea_w_get, _ivideo.csImageArea_w_set)
+    h = _swig_property(_ivideo.csImageArea_h_get, _ivideo.csImageArea_h_set)
+    data = _swig_property(_ivideo.csImageArea_data_get, _ivideo.csImageArea_data_set)
     def __init__(self, *args): 
         this = _ivideo.new_csImageArea(*args)
         try: self.this.append(this)
@@ -169,12 +127,7 @@ csImageArea_swigregister = _ivideo.csImageArea_swigregister
 csImageArea_swigregister(csImageArea)
 
 class iOffscreenCanvasCallback(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iOffscreenCanvasCallback, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iOffscreenCanvasCallback, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def FinishDraw(*args): return _ivideo.iOffscreenCanvasCallback_FinishDraw(*args)
@@ -185,12 +138,7 @@ iOffscreenCanvasCallback_swigregister = _ivideo.iOffscreenCanvasCallback_swigreg
 iOffscreenCanvasCallback_swigregister(iOffscreenCanvasCallback)
 
 class iGraphics2D(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iGraphics2D, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iGraphics2D, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Open(*args): return _ivideo.iGraphics2D_Open(*args)
@@ -241,8 +189,7 @@ class iGraphics2D(core.iBase):
     def GetName(*args): return _ivideo.iGraphics2D_GetName(*args)
     def CreateOffscreenCanvas(*args): return _ivideo.iGraphics2D_CreateOffscreenCanvas(*args)
     def Write(*args): return _ivideo.iGraphics2D_Write(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivideo.iGraphics2D_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivideo.iGraphics2D_scfGetVersion)
+    scfGetVersion = staticmethod(_ivideo.iGraphics2D_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iGraphics2D
     __del__ = lambda self : None;
     def _PerformExtension(*args): return _ivideo.iGraphics2D__PerformExtension(*args)
@@ -335,18 +282,13 @@ CS_FX_MESH = _ivideo.CS_FX_MESH
 CS_FX_FLAT = _ivideo.CS_FX_FLAT
 CS_FX_MASK_ALPHA = _ivideo.CS_FX_MASK_ALPHA
 CS_FX_MASK_MIXMODE = _ivideo.CS_FX_MASK_MIXMODE
-class csAlphaMode(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csAlphaMode, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csAlphaMode, name)
+class csAlphaMode(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     alphaNone = _ivideo.csAlphaMode_alphaNone
     alphaBinary = _ivideo.csAlphaMode_alphaBinary
     alphaSmooth = _ivideo.csAlphaMode_alphaSmooth
-    __swig_setmethods__["autoAlphaMode"] = _ivideo.csAlphaMode_autoAlphaMode_set
-    __swig_getmethods__["autoAlphaMode"] = _ivideo.csAlphaMode_autoAlphaMode_get
-    if _newclass:autoAlphaMode = _swig_property(_ivideo.csAlphaMode_autoAlphaMode_get, _ivideo.csAlphaMode_autoAlphaMode_set)
+    autoAlphaMode = _swig_property(_ivideo.csAlphaMode_autoAlphaMode_get, _ivideo.csAlphaMode_autoAlphaMode_set)
     def __init__(self, *args): 
         this = _ivideo.new_csAlphaMode(*args)
         try: self.this.append(this)
@@ -381,33 +323,16 @@ G3DRENDERSTATE_INTERPOLATIONSTEP = _ivideo.G3DRENDERSTATE_INTERPOLATIONSTEP
 G3DRENDERSTATE_MAXPOLYGONSTODRAW = _ivideo.G3DRENDERSTATE_MAXPOLYGONSTODRAW
 G3DRENDERSTATE_GOURAUDENABLE = _ivideo.G3DRENDERSTATE_GOURAUDENABLE
 G3DRENDERSTATE_EDGES = _ivideo.G3DRENDERSTATE_EDGES
-class csGraphics3DCaps(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csGraphics3DCaps, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csGraphics3DCaps, name)
+class csGraphics3DCaps(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["minTexHeight"] = _ivideo.csGraphics3DCaps_minTexHeight_set
-    __swig_getmethods__["minTexHeight"] = _ivideo.csGraphics3DCaps_minTexHeight_get
-    if _newclass:minTexHeight = _swig_property(_ivideo.csGraphics3DCaps_minTexHeight_get, _ivideo.csGraphics3DCaps_minTexHeight_set)
-    __swig_setmethods__["minTexWidth"] = _ivideo.csGraphics3DCaps_minTexWidth_set
-    __swig_getmethods__["minTexWidth"] = _ivideo.csGraphics3DCaps_minTexWidth_get
-    if _newclass:minTexWidth = _swig_property(_ivideo.csGraphics3DCaps_minTexWidth_get, _ivideo.csGraphics3DCaps_minTexWidth_set)
-    __swig_setmethods__["maxTexHeight"] = _ivideo.csGraphics3DCaps_maxTexHeight_set
-    __swig_getmethods__["maxTexHeight"] = _ivideo.csGraphics3DCaps_maxTexHeight_get
-    if _newclass:maxTexHeight = _swig_property(_ivideo.csGraphics3DCaps_maxTexHeight_get, _ivideo.csGraphics3DCaps_maxTexHeight_set)
-    __swig_setmethods__["maxTexWidth"] = _ivideo.csGraphics3DCaps_maxTexWidth_set
-    __swig_getmethods__["maxTexWidth"] = _ivideo.csGraphics3DCaps_maxTexWidth_get
-    if _newclass:maxTexWidth = _swig_property(_ivideo.csGraphics3DCaps_maxTexWidth_get, _ivideo.csGraphics3DCaps_maxTexWidth_set)
-    __swig_setmethods__["SupportsPointSprites"] = _ivideo.csGraphics3DCaps_SupportsPointSprites_set
-    __swig_getmethods__["SupportsPointSprites"] = _ivideo.csGraphics3DCaps_SupportsPointSprites_get
-    if _newclass:SupportsPointSprites = _swig_property(_ivideo.csGraphics3DCaps_SupportsPointSprites_get, _ivideo.csGraphics3DCaps_SupportsPointSprites_set)
-    __swig_setmethods__["DestinationAlpha"] = _ivideo.csGraphics3DCaps_DestinationAlpha_set
-    __swig_getmethods__["DestinationAlpha"] = _ivideo.csGraphics3DCaps_DestinationAlpha_get
-    if _newclass:DestinationAlpha = _swig_property(_ivideo.csGraphics3DCaps_DestinationAlpha_get, _ivideo.csGraphics3DCaps_DestinationAlpha_set)
-    __swig_setmethods__["StencilShadows"] = _ivideo.csGraphics3DCaps_StencilShadows_set
-    __swig_getmethods__["StencilShadows"] = _ivideo.csGraphics3DCaps_StencilShadows_get
-    if _newclass:StencilShadows = _swig_property(_ivideo.csGraphics3DCaps_StencilShadows_get, _ivideo.csGraphics3DCaps_StencilShadows_set)
+    minTexHeight = _swig_property(_ivideo.csGraphics3DCaps_minTexHeight_get, _ivideo.csGraphics3DCaps_minTexHeight_set)
+    minTexWidth = _swig_property(_ivideo.csGraphics3DCaps_minTexWidth_get, _ivideo.csGraphics3DCaps_minTexWidth_set)
+    maxTexHeight = _swig_property(_ivideo.csGraphics3DCaps_maxTexHeight_get, _ivideo.csGraphics3DCaps_maxTexHeight_set)
+    maxTexWidth = _swig_property(_ivideo.csGraphics3DCaps_maxTexWidth_get, _ivideo.csGraphics3DCaps_maxTexWidth_set)
+    SupportsPointSprites = _swig_property(_ivideo.csGraphics3DCaps_SupportsPointSprites_get, _ivideo.csGraphics3DCaps_SupportsPointSprites_set)
+    DestinationAlpha = _swig_property(_ivideo.csGraphics3DCaps_DestinationAlpha_get, _ivideo.csGraphics3DCaps_DestinationAlpha_set)
+    StencilShadows = _swig_property(_ivideo.csGraphics3DCaps_StencilShadows_get, _ivideo.csGraphics3DCaps_StencilShadows_set)
     def __init__(self, *args): 
         this = _ivideo.new_csGraphics3DCaps(*args)
         try: self.this.append(this)
@@ -429,54 +354,23 @@ csSimpleMeshScreenspace = _ivideo.csSimpleMeshScreenspace
 CS_OPENPORTAL_ZFILL = _ivideo.CS_OPENPORTAL_ZFILL
 CS_OPENPORTAL_MIRROR = _ivideo.CS_OPENPORTAL_MIRROR
 CS_OPENPORTAL_FLOAT = _ivideo.CS_OPENPORTAL_FLOAT
-class csSimpleRenderMesh(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csSimpleRenderMesh, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csSimpleRenderMesh, name)
+class csSimpleRenderMesh(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["meshtype"] = _ivideo.csSimpleRenderMesh_meshtype_set
-    __swig_getmethods__["meshtype"] = _ivideo.csSimpleRenderMesh_meshtype_get
-    if _newclass:meshtype = _swig_property(_ivideo.csSimpleRenderMesh_meshtype_get, _ivideo.csSimpleRenderMesh_meshtype_set)
-    __swig_setmethods__["indexCount"] = _ivideo.csSimpleRenderMesh_indexCount_set
-    __swig_getmethods__["indexCount"] = _ivideo.csSimpleRenderMesh_indexCount_get
-    if _newclass:indexCount = _swig_property(_ivideo.csSimpleRenderMesh_indexCount_get, _ivideo.csSimpleRenderMesh_indexCount_set)
-    __swig_setmethods__["indices"] = _ivideo.csSimpleRenderMesh_indices_set
-    __swig_getmethods__["indices"] = _ivideo.csSimpleRenderMesh_indices_get
-    if _newclass:indices = _swig_property(_ivideo.csSimpleRenderMesh_indices_get, _ivideo.csSimpleRenderMesh_indices_set)
-    __swig_setmethods__["vertexCount"] = _ivideo.csSimpleRenderMesh_vertexCount_set
-    __swig_getmethods__["vertexCount"] = _ivideo.csSimpleRenderMesh_vertexCount_get
-    if _newclass:vertexCount = _swig_property(_ivideo.csSimpleRenderMesh_vertexCount_get, _ivideo.csSimpleRenderMesh_vertexCount_set)
-    __swig_setmethods__["vertices"] = _ivideo.csSimpleRenderMesh_vertices_set
-    __swig_getmethods__["vertices"] = _ivideo.csSimpleRenderMesh_vertices_get
-    if _newclass:vertices = _swig_property(_ivideo.csSimpleRenderMesh_vertices_get, _ivideo.csSimpleRenderMesh_vertices_set)
-    __swig_setmethods__["texcoords"] = _ivideo.csSimpleRenderMesh_texcoords_set
-    __swig_getmethods__["texcoords"] = _ivideo.csSimpleRenderMesh_texcoords_get
-    if _newclass:texcoords = _swig_property(_ivideo.csSimpleRenderMesh_texcoords_get, _ivideo.csSimpleRenderMesh_texcoords_set)
-    __swig_setmethods__["colors"] = _ivideo.csSimpleRenderMesh_colors_set
-    __swig_getmethods__["colors"] = _ivideo.csSimpleRenderMesh_colors_get
-    if _newclass:colors = _swig_property(_ivideo.csSimpleRenderMesh_colors_get, _ivideo.csSimpleRenderMesh_colors_set)
-    __swig_setmethods__["texture"] = _ivideo.csSimpleRenderMesh_texture_set
-    __swig_getmethods__["texture"] = _ivideo.csSimpleRenderMesh_texture_get
-    if _newclass:texture = _swig_property(_ivideo.csSimpleRenderMesh_texture_get, _ivideo.csSimpleRenderMesh_texture_set)
-    __swig_setmethods__["shader"] = _ivideo.csSimpleRenderMesh_shader_set
-    __swig_getmethods__["shader"] = _ivideo.csSimpleRenderMesh_shader_get
-    if _newclass:shader = _swig_property(_ivideo.csSimpleRenderMesh_shader_get, _ivideo.csSimpleRenderMesh_shader_set)
-    __swig_setmethods__["dynDomain"] = _ivideo.csSimpleRenderMesh_dynDomain_set
-    __swig_getmethods__["dynDomain"] = _ivideo.csSimpleRenderMesh_dynDomain_get
-    if _newclass:dynDomain = _swig_property(_ivideo.csSimpleRenderMesh_dynDomain_get, _ivideo.csSimpleRenderMesh_dynDomain_set)
-    __swig_setmethods__["alphaType"] = _ivideo.csSimpleRenderMesh_alphaType_set
-    __swig_getmethods__["alphaType"] = _ivideo.csSimpleRenderMesh_alphaType_get
-    if _newclass:alphaType = _swig_property(_ivideo.csSimpleRenderMesh_alphaType_get, _ivideo.csSimpleRenderMesh_alphaType_set)
-    __swig_setmethods__["z_buf_mode"] = _ivideo.csSimpleRenderMesh_z_buf_mode_set
-    __swig_getmethods__["z_buf_mode"] = _ivideo.csSimpleRenderMesh_z_buf_mode_get
-    if _newclass:z_buf_mode = _swig_property(_ivideo.csSimpleRenderMesh_z_buf_mode_get, _ivideo.csSimpleRenderMesh_z_buf_mode_set)
-    __swig_setmethods__["mixmode"] = _ivideo.csSimpleRenderMesh_mixmode_set
-    __swig_getmethods__["mixmode"] = _ivideo.csSimpleRenderMesh_mixmode_get
-    if _newclass:mixmode = _swig_property(_ivideo.csSimpleRenderMesh_mixmode_get, _ivideo.csSimpleRenderMesh_mixmode_set)
-    __swig_setmethods__["object2world"] = _ivideo.csSimpleRenderMesh_object2world_set
-    __swig_getmethods__["object2world"] = _ivideo.csSimpleRenderMesh_object2world_get
-    if _newclass:object2world = _swig_property(_ivideo.csSimpleRenderMesh_object2world_get, _ivideo.csSimpleRenderMesh_object2world_set)
+    meshtype = _swig_property(_ivideo.csSimpleRenderMesh_meshtype_get, _ivideo.csSimpleRenderMesh_meshtype_set)
+    indexCount = _swig_property(_ivideo.csSimpleRenderMesh_indexCount_get, _ivideo.csSimpleRenderMesh_indexCount_set)
+    indices = _swig_property(_ivideo.csSimpleRenderMesh_indices_get, _ivideo.csSimpleRenderMesh_indices_set)
+    vertexCount = _swig_property(_ivideo.csSimpleRenderMesh_vertexCount_get, _ivideo.csSimpleRenderMesh_vertexCount_set)
+    vertices = _swig_property(_ivideo.csSimpleRenderMesh_vertices_get, _ivideo.csSimpleRenderMesh_vertices_set)
+    texcoords = _swig_property(_ivideo.csSimpleRenderMesh_texcoords_get, _ivideo.csSimpleRenderMesh_texcoords_set)
+    colors = _swig_property(_ivideo.csSimpleRenderMesh_colors_get, _ivideo.csSimpleRenderMesh_colors_set)
+    texture = _swig_property(_ivideo.csSimpleRenderMesh_texture_get, _ivideo.csSimpleRenderMesh_texture_set)
+    shader = _swig_property(_ivideo.csSimpleRenderMesh_shader_get, _ivideo.csSimpleRenderMesh_shader_set)
+    dynDomain = _swig_property(_ivideo.csSimpleRenderMesh_dynDomain_get, _ivideo.csSimpleRenderMesh_dynDomain_set)
+    alphaType = _swig_property(_ivideo.csSimpleRenderMesh_alphaType_get, _ivideo.csSimpleRenderMesh_alphaType_set)
+    z_buf_mode = _swig_property(_ivideo.csSimpleRenderMesh_z_buf_mode_get, _ivideo.csSimpleRenderMesh_z_buf_mode_set)
+    mixmode = _swig_property(_ivideo.csSimpleRenderMesh_mixmode_get, _ivideo.csSimpleRenderMesh_mixmode_set)
+    object2world = _swig_property(_ivideo.csSimpleRenderMesh_object2world_get, _ivideo.csSimpleRenderMesh_object2world_set)
     def __init__(self, *args): 
         this = _ivideo.new_csSimpleRenderMesh(*args)
         try: self.this.append(this)
@@ -488,12 +382,7 @@ csSimpleRenderMesh_swigregister = _ivideo.csSimpleRenderMesh_swigregister
 csSimpleRenderMesh_swigregister(csSimpleRenderMesh)
 
 class iGraphics3D(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iGraphics3D, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iGraphics3D, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Open(*args): return _ivideo.iGraphics3D_Open(*args)
@@ -546,8 +435,7 @@ class iGraphics3D(core.iBase):
     def PerformExtension(*args): return _ivideo.iGraphics3D_PerformExtension(*args)
     def GetWorldToCamera(*args): return _ivideo.iGraphics3D_GetWorldToCamera(*args)
     def GetCurrentDrawFlags(*args): return _ivideo.iGraphics3D_GetCurrentDrawFlags(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivideo.iGraphics3D_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivideo.iGraphics3D_scfGetVersion)
+    scfGetVersion = staticmethod(_ivideo.iGraphics3D_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iGraphics3D
     __del__ = lambda self : None;
 iGraphics3D_swigregister = _ivideo.iGraphics3D_swigregister
@@ -570,12 +458,7 @@ CS_ALERT_ERROR = _ivideo.CS_ALERT_ERROR
 CS_ALERT_WARNING = _ivideo.CS_ALERT_WARNING
 CS_ALERT_NOTE = _ivideo.CS_ALERT_NOTE
 class iNativeWindowManager(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iNativeWindowManager, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iNativeWindowManager, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Alert(*args): return _ivideo.iNativeWindowManager_Alert(*args)
@@ -585,12 +468,7 @@ iNativeWindowManager_swigregister = _ivideo.iNativeWindowManager_swigregister
 iNativeWindowManager_swigregister(iNativeWindowManager)
 
 class iNativeWindow(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iNativeWindow, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iNativeWindow, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetTitle(*args): return _ivideo.iNativeWindow_SetTitle(*args)
@@ -603,11 +481,8 @@ cullNormal = _ivideo.cullNormal
 cullFlipped = _ivideo.cullFlipped
 cullDisabled = _ivideo.cullDisabled
 GetFlippedCullMode = _ivideo.GetFlippedCullMode
-class RenderMeshModes(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, RenderMeshModes, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, RenderMeshModes, name)
+class RenderMeshModes(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _ivideo.new_RenderMeshModes(*args)
@@ -615,82 +490,40 @@ class RenderMeshModes(_object):
         except: self.this = this
     __swig_destroy__ = _ivideo.delete_RenderMeshModes
     __del__ = lambda self : None;
-    __swig_setmethods__["z_buf_mode"] = _ivideo.RenderMeshModes_z_buf_mode_set
-    __swig_getmethods__["z_buf_mode"] = _ivideo.RenderMeshModes_z_buf_mode_get
-    if _newclass:z_buf_mode = _swig_property(_ivideo.RenderMeshModes_z_buf_mode_get, _ivideo.RenderMeshModes_z_buf_mode_set)
-    __swig_setmethods__["mixmode"] = _ivideo.RenderMeshModes_mixmode_set
-    __swig_getmethods__["mixmode"] = _ivideo.RenderMeshModes_mixmode_get
-    if _newclass:mixmode = _swig_property(_ivideo.RenderMeshModes_mixmode_get, _ivideo.RenderMeshModes_mixmode_set)
-    __swig_setmethods__["renderPrio"] = _ivideo.RenderMeshModes_renderPrio_set
-    __swig_getmethods__["renderPrio"] = _ivideo.RenderMeshModes_renderPrio_get
-    if _newclass:renderPrio = _swig_property(_ivideo.RenderMeshModes_renderPrio_get, _ivideo.RenderMeshModes_renderPrio_set)
-    __swig_setmethods__["flipCulling"] = _ivideo.RenderMeshModes_flipCulling_set
-    __swig_getmethods__["flipCulling"] = _ivideo.RenderMeshModes_flipCulling_get
-    if _newclass:flipCulling = _swig_property(_ivideo.RenderMeshModes_flipCulling_get, _ivideo.RenderMeshModes_flipCulling_set)
-    __swig_setmethods__["cullMode"] = _ivideo.RenderMeshModes_cullMode_set
-    __swig_getmethods__["cullMode"] = _ivideo.RenderMeshModes_cullMode_get
-    if _newclass:cullMode = _swig_property(_ivideo.RenderMeshModes_cullMode_get, _ivideo.RenderMeshModes_cullMode_set)
-    __swig_setmethods__["alphaType"] = _ivideo.RenderMeshModes_alphaType_set
-    __swig_getmethods__["alphaType"] = _ivideo.RenderMeshModes_alphaType_get
-    if _newclass:alphaType = _swig_property(_ivideo.RenderMeshModes_alphaType_get, _ivideo.RenderMeshModes_alphaType_set)
-    __swig_setmethods__["buffers"] = _ivideo.RenderMeshModes_buffers_set
-    __swig_getmethods__["buffers"] = _ivideo.RenderMeshModes_buffers_get
-    if _newclass:buffers = _swig_property(_ivideo.RenderMeshModes_buffers_get, _ivideo.RenderMeshModes_buffers_set)
+    z_buf_mode = _swig_property(_ivideo.RenderMeshModes_z_buf_mode_get, _ivideo.RenderMeshModes_z_buf_mode_set)
+    mixmode = _swig_property(_ivideo.RenderMeshModes_mixmode_get, _ivideo.RenderMeshModes_mixmode_set)
+    renderPrio = _swig_property(_ivideo.RenderMeshModes_renderPrio_get, _ivideo.RenderMeshModes_renderPrio_set)
+    flipCulling = _swig_property(_ivideo.RenderMeshModes_flipCulling_get, _ivideo.RenderMeshModes_flipCulling_set)
+    cullMode = _swig_property(_ivideo.RenderMeshModes_cullMode_get, _ivideo.RenderMeshModes_cullMode_set)
+    alphaType = _swig_property(_ivideo.RenderMeshModes_alphaType_get, _ivideo.RenderMeshModes_alphaType_set)
+    buffers = _swig_property(_ivideo.RenderMeshModes_buffers_get, _ivideo.RenderMeshModes_buffers_set)
 RenderMeshModes_swigregister = _ivideo.RenderMeshModes_swigregister
 RenderMeshModes_swigregister(RenderMeshModes)
 
-class CoreRenderMesh(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, CoreRenderMesh, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, CoreRenderMesh, name)
+class CoreRenderMesh(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["db_mesh_name"] = _ivideo.CoreRenderMesh_db_mesh_name_set
-    __swig_getmethods__["db_mesh_name"] = _ivideo.CoreRenderMesh_db_mesh_name_get
-    if _newclass:db_mesh_name = _swig_property(_ivideo.CoreRenderMesh_db_mesh_name_get, _ivideo.CoreRenderMesh_db_mesh_name_set)
+    db_mesh_name = _swig_property(_ivideo.CoreRenderMesh_db_mesh_name_get, _ivideo.CoreRenderMesh_db_mesh_name_set)
     def __init__(self, *args): 
         this = _ivideo.new_CoreRenderMesh(*args)
         try: self.this.append(this)
         except: self.this = this
     __swig_destroy__ = _ivideo.delete_CoreRenderMesh
     __del__ = lambda self : None;
-    __swig_setmethods__["clip_portal"] = _ivideo.CoreRenderMesh_clip_portal_set
-    __swig_getmethods__["clip_portal"] = _ivideo.CoreRenderMesh_clip_portal_get
-    if _newclass:clip_portal = _swig_property(_ivideo.CoreRenderMesh_clip_portal_get, _ivideo.CoreRenderMesh_clip_portal_set)
-    __swig_setmethods__["clip_plane"] = _ivideo.CoreRenderMesh_clip_plane_set
-    __swig_getmethods__["clip_plane"] = _ivideo.CoreRenderMesh_clip_plane_get
-    if _newclass:clip_plane = _swig_property(_ivideo.CoreRenderMesh_clip_plane_get, _ivideo.CoreRenderMesh_clip_plane_set)
-    __swig_setmethods__["clip_z_plane"] = _ivideo.CoreRenderMesh_clip_z_plane_set
-    __swig_getmethods__["clip_z_plane"] = _ivideo.CoreRenderMesh_clip_z_plane_get
-    if _newclass:clip_z_plane = _swig_property(_ivideo.CoreRenderMesh_clip_z_plane_get, _ivideo.CoreRenderMesh_clip_z_plane_set)
-    __swig_setmethods__["do_mirror"] = _ivideo.CoreRenderMesh_do_mirror_set
-    __swig_getmethods__["do_mirror"] = _ivideo.CoreRenderMesh_do_mirror_get
-    if _newclass:do_mirror = _swig_property(_ivideo.CoreRenderMesh_do_mirror_get, _ivideo.CoreRenderMesh_do_mirror_set)
-    __swig_setmethods__["meshtype"] = _ivideo.CoreRenderMesh_meshtype_set
-    __swig_getmethods__["meshtype"] = _ivideo.CoreRenderMesh_meshtype_get
-    if _newclass:meshtype = _swig_property(_ivideo.CoreRenderMesh_meshtype_get, _ivideo.CoreRenderMesh_meshtype_set)
-    __swig_setmethods__["indexstart"] = _ivideo.CoreRenderMesh_indexstart_set
-    __swig_getmethods__["indexstart"] = _ivideo.CoreRenderMesh_indexstart_get
-    if _newclass:indexstart = _swig_property(_ivideo.CoreRenderMesh_indexstart_get, _ivideo.CoreRenderMesh_indexstart_set)
-    __swig_setmethods__["indexend"] = _ivideo.CoreRenderMesh_indexend_set
-    __swig_getmethods__["indexend"] = _ivideo.CoreRenderMesh_indexend_get
-    if _newclass:indexend = _swig_property(_ivideo.CoreRenderMesh_indexend_get, _ivideo.CoreRenderMesh_indexend_set)
-    __swig_setmethods__["material"] = _ivideo.CoreRenderMesh_material_set
-    __swig_getmethods__["material"] = _ivideo.CoreRenderMesh_material_get
-    if _newclass:material = _swig_property(_ivideo.CoreRenderMesh_material_get, _ivideo.CoreRenderMesh_material_set)
-    __swig_setmethods__["object2world"] = _ivideo.CoreRenderMesh_object2world_set
-    __swig_getmethods__["object2world"] = _ivideo.CoreRenderMesh_object2world_get
-    if _newclass:object2world = _swig_property(_ivideo.CoreRenderMesh_object2world_get, _ivideo.CoreRenderMesh_object2world_set)
+    clip_portal = _swig_property(_ivideo.CoreRenderMesh_clip_portal_get, _ivideo.CoreRenderMesh_clip_portal_set)
+    clip_plane = _swig_property(_ivideo.CoreRenderMesh_clip_plane_get, _ivideo.CoreRenderMesh_clip_plane_set)
+    clip_z_plane = _swig_property(_ivideo.CoreRenderMesh_clip_z_plane_get, _ivideo.CoreRenderMesh_clip_z_plane_set)
+    do_mirror = _swig_property(_ivideo.CoreRenderMesh_do_mirror_get, _ivideo.CoreRenderMesh_do_mirror_set)
+    meshtype = _swig_property(_ivideo.CoreRenderMesh_meshtype_get, _ivideo.CoreRenderMesh_meshtype_set)
+    indexstart = _swig_property(_ivideo.CoreRenderMesh_indexstart_get, _ivideo.CoreRenderMesh_indexstart_set)
+    indexend = _swig_property(_ivideo.CoreRenderMesh_indexend_get, _ivideo.CoreRenderMesh_indexend_set)
+    material = _swig_property(_ivideo.CoreRenderMesh_material_get, _ivideo.CoreRenderMesh_material_set)
+    object2world = _swig_property(_ivideo.CoreRenderMesh_object2world_get, _ivideo.CoreRenderMesh_object2world_set)
 CoreRenderMesh_swigregister = _ivideo.CoreRenderMesh_swigregister
 CoreRenderMesh_swigregister(CoreRenderMesh)
 
 class RenderMesh(CoreRenderMesh,RenderMeshModes):
-    __swig_setmethods__ = {}
-    for _s in [CoreRenderMesh,RenderMeshModes]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, RenderMesh, name, value)
-    __swig_getmethods__ = {}
-    for _s in [CoreRenderMesh,RenderMeshModes]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, RenderMesh, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _ivideo.new_RenderMesh(*args)
@@ -698,18 +531,10 @@ class RenderMesh(CoreRenderMesh,RenderMeshModes):
         except: self.this = this
     __swig_destroy__ = _ivideo.delete_RenderMesh
     __del__ = lambda self : None;
-    __swig_setmethods__["geometryInstance"] = _ivideo.RenderMesh_geometryInstance_set
-    __swig_getmethods__["geometryInstance"] = _ivideo.RenderMesh_geometryInstance_get
-    if _newclass:geometryInstance = _swig_property(_ivideo.RenderMesh_geometryInstance_get, _ivideo.RenderMesh_geometryInstance_set)
-    __swig_setmethods__["portal"] = _ivideo.RenderMesh_portal_set
-    __swig_getmethods__["portal"] = _ivideo.RenderMesh_portal_get
-    if _newclass:portal = _swig_property(_ivideo.RenderMesh_portal_get, _ivideo.RenderMesh_portal_set)
-    __swig_setmethods__["variablecontext"] = _ivideo.RenderMesh_variablecontext_set
-    __swig_getmethods__["variablecontext"] = _ivideo.RenderMesh_variablecontext_get
-    if _newclass:variablecontext = _swig_property(_ivideo.RenderMesh_variablecontext_get, _ivideo.RenderMesh_variablecontext_set)
-    __swig_setmethods__["worldspace_origin"] = _ivideo.RenderMesh_worldspace_origin_set
-    __swig_getmethods__["worldspace_origin"] = _ivideo.RenderMesh_worldspace_origin_get
-    if _newclass:worldspace_origin = _swig_property(_ivideo.RenderMesh_worldspace_origin_get, _ivideo.RenderMesh_worldspace_origin_set)
+    geometryInstance = _swig_property(_ivideo.RenderMesh_geometryInstance_get, _ivideo.RenderMesh_geometryInstance_set)
+    portal = _swig_property(_ivideo.RenderMesh_portal_get, _ivideo.RenderMesh_portal_set)
+    variablecontext = _swig_property(_ivideo.RenderMesh_variablecontext_get, _ivideo.RenderMesh_variablecontext_set)
+    worldspace_origin = _swig_property(_ivideo.RenderMesh_worldspace_origin_get, _ivideo.RenderMesh_worldspace_origin_set)
 RenderMesh_swigregister = _ivideo.RenderMesh_swigregister
 RenderMesh_swigregister(RenderMesh)
 
@@ -719,12 +544,7 @@ CSFONT_COURIER = _ivideo.CSFONT_COURIER
 CSFONT_SMALL = _ivideo.CSFONT_SMALL
 CS_FONT_DEFAULT_GLYPH = _ivideo.CS_FONT_DEFAULT_GLYPH
 class iFontDeleteNotify(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iFontDeleteNotify, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iFontDeleteNotify, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def BeforeDelete(*args): return _ivideo.iFontDeleteNotify_BeforeDelete(*args)
@@ -733,24 +553,13 @@ class iFontDeleteNotify(core.iBase):
 iFontDeleteNotify_swigregister = _ivideo.iFontDeleteNotify_swigregister
 iFontDeleteNotify_swigregister(iFontDeleteNotify)
 
-class csBitmapMetrics(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csBitmapMetrics, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csBitmapMetrics, name)
+class csBitmapMetrics(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["width"] = _ivideo.csBitmapMetrics_width_set
-    __swig_getmethods__["width"] = _ivideo.csBitmapMetrics_width_get
-    if _newclass:width = _swig_property(_ivideo.csBitmapMetrics_width_get, _ivideo.csBitmapMetrics_width_set)
-    __swig_setmethods__["height"] = _ivideo.csBitmapMetrics_height_set
-    __swig_getmethods__["height"] = _ivideo.csBitmapMetrics_height_get
-    if _newclass:height = _swig_property(_ivideo.csBitmapMetrics_height_get, _ivideo.csBitmapMetrics_height_set)
-    __swig_setmethods__["left"] = _ivideo.csBitmapMetrics_left_set
-    __swig_getmethods__["left"] = _ivideo.csBitmapMetrics_left_get
-    if _newclass:left = _swig_property(_ivideo.csBitmapMetrics_left_get, _ivideo.csBitmapMetrics_left_set)
-    __swig_setmethods__["top"] = _ivideo.csBitmapMetrics_top_set
-    __swig_getmethods__["top"] = _ivideo.csBitmapMetrics_top_get
-    if _newclass:top = _swig_property(_ivideo.csBitmapMetrics_top_get, _ivideo.csBitmapMetrics_top_set)
+    width = _swig_property(_ivideo.csBitmapMetrics_width_get, _ivideo.csBitmapMetrics_width_set)
+    height = _swig_property(_ivideo.csBitmapMetrics_height_get, _ivideo.csBitmapMetrics_height_set)
+    left = _swig_property(_ivideo.csBitmapMetrics_left_get, _ivideo.csBitmapMetrics_left_set)
+    top = _swig_property(_ivideo.csBitmapMetrics_top_get, _ivideo.csBitmapMetrics_top_set)
     def __init__(self, *args): 
         this = _ivideo.new_csBitmapMetrics(*args)
         try: self.this.append(this)
@@ -760,15 +569,10 @@ class csBitmapMetrics(_object):
 csBitmapMetrics_swigregister = _ivideo.csBitmapMetrics_swigregister
 csBitmapMetrics_swigregister(csBitmapMetrics)
 
-class csGlyphMetrics(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csGlyphMetrics, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csGlyphMetrics, name)
+class csGlyphMetrics(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["advance"] = _ivideo.csGlyphMetrics_advance_set
-    __swig_getmethods__["advance"] = _ivideo.csGlyphMetrics_advance_get
-    if _newclass:advance = _swig_property(_ivideo.csGlyphMetrics_advance_get, _ivideo.csGlyphMetrics_advance_set)
+    advance = _swig_property(_ivideo.csGlyphMetrics_advance_get, _ivideo.csGlyphMetrics_advance_set)
     def __init__(self, *args): 
         this = _ivideo.new_csGlyphMetrics(*args)
         try: self.this.append(this)
@@ -779,12 +583,7 @@ csGlyphMetrics_swigregister = _ivideo.csGlyphMetrics_swigregister
 csGlyphMetrics_swigregister(csGlyphMetrics)
 
 class iFont(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iFont, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iFont, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def AddDeleteCallback(*args): return _ivideo.iFont_AddDeleteCallback(*args)
@@ -802,8 +601,7 @@ class iFont(core.iBase):
     def GetTextHeight(*args): return _ivideo.iFont_GetTextHeight(*args)
     def GetUnderlinePosition(*args): return _ivideo.iFont_GetUnderlinePosition(*args)
     def GetUnderlineThickness(*args): return _ivideo.iFont_GetUnderlineThickness(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivideo.iFont_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivideo.iFont_scfGetVersion)
+    scfGetVersion = staticmethod(_ivideo.iFont_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iFont
     __del__ = lambda self : None;
 iFont_swigregister = _ivideo.iFont_swigregister
@@ -811,19 +609,13 @@ iFont_swigregister(iFont)
 iFont_scfGetVersion = _ivideo.iFont_scfGetVersion
 
 class iFontServer(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iFontServer, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iFontServer, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def LoadFont(*args): return _ivideo.iFontServer_LoadFont(*args)
     def SetWarnOnError(*args): return _ivideo.iFontServer_SetWarnOnError(*args)
     def GetWarnOnError(*args): return _ivideo.iFontServer_GetWarnOnError(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivideo.iFontServer_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivideo.iFontServer_scfGetVersion)
+    scfGetVersion = staticmethod(_ivideo.iFontServer_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iFontServer
     __del__ = lambda self : None;
 iFontServer_swigregister = _ivideo.iFontServer_swigregister
@@ -831,12 +623,7 @@ iFontServer_swigregister(iFontServer)
 iFontServer_scfGetVersion = _ivideo.iFontServer_scfGetVersion
 
 class iHalo(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iHalo, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iHalo, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetWidth(*args): return _ivideo.iHalo_GetWidth(*args)
@@ -844,8 +631,7 @@ class iHalo(core.iBase):
     def SetColor(*args): return _ivideo.iHalo_SetColor(*args)
     def GetColor(*args): return _ivideo.iHalo_GetColor(*args)
     def Draw(*args): return _ivideo.iHalo_Draw(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivideo.iHalo_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivideo.iHalo_scfGetVersion)
+    scfGetVersion = staticmethod(_ivideo.iHalo_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iHalo
     __del__ = lambda self : None;
 iHalo_swigregister = _ivideo.iHalo_swigregister
@@ -853,12 +639,7 @@ iHalo_swigregister(iHalo)
 iHalo_scfGetVersion = _ivideo.iHalo_scfGetVersion
 
 class iShaderVarStack(csgfx.csShaderVariableArrayChangeAll):
-    __swig_setmethods__ = {}
-    for _s in [csgfx.csShaderVariableArrayChangeAll]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iShaderVarStack, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csgfx.csShaderVariableArrayChangeAll]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iShaderVarStack, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     __swig_destroy__ = _ivideo.delete_iShaderVarStack
@@ -867,12 +648,7 @@ iShaderVarStack_swigregister = _ivideo.iShaderVarStack_swigregister
 iShaderVarStack_swigregister(iShaderVarStack)
 
 class iShaderVariableContext(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iShaderVariableContext, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iShaderVariableContext, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def AddVariable(*args): return _ivideo.iShaderVariableContext_AddVariable(*args)
@@ -884,8 +660,7 @@ class iShaderVariableContext(core.iBase):
     def ReplaceVariable(*args): return _ivideo.iShaderVariableContext_ReplaceVariable(*args)
     def Clear(*args): return _ivideo.iShaderVariableContext_Clear(*args)
     def RemoveVariable(*args): return _ivideo.iShaderVariableContext_RemoveVariable(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivideo.iShaderVariableContext_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivideo.iShaderVariableContext_scfGetVersion)
+    scfGetVersion = staticmethod(_ivideo.iShaderVariableContext_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iShaderVariableContext
     __del__ = lambda self : None;
 iShaderVariableContext_swigregister = _ivideo.iShaderVariableContext_swigregister
@@ -897,12 +672,7 @@ TagNeutral = _ivideo.TagNeutral
 TagForbidden = _ivideo.TagForbidden
 TagRequired = _ivideo.TagRequired
 class iShaderManager(iShaderVariableContext):
-    __swig_setmethods__ = {}
-    for _s in [iShaderVariableContext]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iShaderManager, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iShaderVariableContext]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iShaderManager, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def RegisterShader(*args): return _ivideo.iShaderManager_RegisterShader(*args)
@@ -922,26 +692,18 @@ class iShaderManager(iShaderVariableContext):
     def GetTags(*args): return _ivideo.iShaderManager_GetTags(*args)
     def SetActiveLights(*args): return _ivideo.iShaderManager_SetActiveLights(*args)
     def GetActiveLights(*args): return _ivideo.iShaderManager_GetActiveLights(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivideo.iShaderManager_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivideo.iShaderManager_scfGetVersion)
+    scfGetVersion = staticmethod(_ivideo.iShaderManager_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iShaderManager
     __del__ = lambda self : None;
 iShaderManager_swigregister = _ivideo.iShaderManager_swigregister
 iShaderManager_swigregister(iShaderManager)
 iShaderManager_scfGetVersion = _ivideo.iShaderManager_scfGetVersion
 
-class csShaderMetadata(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csShaderMetadata, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csShaderMetadata, name)
+class csShaderMetadata(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["description"] = _ivideo.csShaderMetadata_description_set
-    __swig_getmethods__["description"] = _ivideo.csShaderMetadata_description_get
-    if _newclass:description = _swig_property(_ivideo.csShaderMetadata_description_get, _ivideo.csShaderMetadata_description_set)
-    __swig_setmethods__["numberOfLights"] = _ivideo.csShaderMetadata_numberOfLights_set
-    __swig_getmethods__["numberOfLights"] = _ivideo.csShaderMetadata_numberOfLights_get
-    if _newclass:numberOfLights = _swig_property(_ivideo.csShaderMetadata_numberOfLights_get, _ivideo.csShaderMetadata_numberOfLights_set)
+    description = _swig_property(_ivideo.csShaderMetadata_description_get, _ivideo.csShaderMetadata_description_set)
+    numberOfLights = _swig_property(_ivideo.csShaderMetadata_numberOfLights_get, _ivideo.csShaderMetadata_numberOfLights_set)
     def __init__(self, *args): 
         this = _ivideo.new_csShaderMetadata(*args)
         try: self.this.append(this)
@@ -952,12 +714,7 @@ csShaderMetadata_swigregister = _ivideo.csShaderMetadata_swigregister
 csShaderMetadata_swigregister(csShaderMetadata)
 
 class iShader(iShaderVariableContext):
-    __swig_setmethods__ = {}
-    for _s in [iShaderVariableContext]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iShader, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iShaderVariableContext]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iShader, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def QueryObject(*args): return _ivideo.iShader_QueryObject(*args)
@@ -970,8 +727,7 @@ class iShader(iShaderVariableContext):
     def TeardownPass(*args): return _ivideo.iShader_TeardownPass(*args)
     def DeactivatePass(*args): return _ivideo.iShader_DeactivatePass(*args)
     def GetMetadata(*args): return _ivideo.iShader_GetMetadata(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivideo.iShader_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivideo.iShader_scfGetVersion)
+    scfGetVersion = staticmethod(_ivideo.iShader_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iShader
     __del__ = lambda self : None;
 iShader_swigregister = _ivideo.iShader_swigregister
@@ -979,12 +735,7 @@ iShader_swigregister(iShader)
 iShader_scfGetVersion = _ivideo.iShader_scfGetVersion
 
 class iShaderPriorityList(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iShaderPriorityList, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iShaderPriorityList, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetCount(*args): return _ivideo.iShaderPriorityList_GetCount(*args)
@@ -995,12 +746,7 @@ iShaderPriorityList_swigregister = _ivideo.iShaderPriorityList_swigregister
 iShaderPriorityList_swigregister(iShaderPriorityList)
 
 class iShaderCompiler(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iShaderCompiler, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iShaderCompiler, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetName(*args): return _ivideo.iShaderCompiler_GetName(*args)
@@ -1014,12 +760,7 @@ iShaderCompiler_swigregister = _ivideo.iShaderCompiler_swigregister
 iShaderCompiler_swigregister(iShaderCompiler)
 
 class iTextureHandle(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iTextureHandle, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iTextureHandle, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetFlags(*args): return _ivideo.iTextureHandle_GetFlags(*args)
@@ -1057,8 +798,11 @@ class iTextureHandle(core.iBase):
     texTypeCube = _ivideo.iTextureHandle_texTypeCube
     texTypeRect = _ivideo.iTextureHandle_texTypeRect
     def GetTextureType(*args): return _ivideo.iTextureHandle_GetTextureType(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivideo.iTextureHandle_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivideo.iTextureHandle_scfGetVersion)
+    blitbufReadable = _ivideo.iTextureHandle_blitbufReadable
+    blitbufRetainArea = _ivideo.iTextureHandle_blitbufRetainArea
+    def QueryBlitBuffer(*args): return _ivideo.iTextureHandle_QueryBlitBuffer(*args)
+    def ApplyBlitBuffer(*args): return _ivideo.iTextureHandle_ApplyBlitBuffer(*args)
+    scfGetVersion = staticmethod(_ivideo.iTextureHandle_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iTextureHandle
     __del__ = lambda self : None;
 iTextureHandle_swigregister = _ivideo.iTextureHandle_swigregister
@@ -1074,12 +818,7 @@ CS_TEXTURE_NPOTS = _ivideo.CS_TEXTURE_NPOTS
 CS_TEXTURE_SCALE_UP = _ivideo.CS_TEXTURE_SCALE_UP
 CS_TEXTURE_SCALE_DOWN = _ivideo.CS_TEXTURE_SCALE_DOWN
 class iRendererLightmap(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iRendererLightmap, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iRendererLightmap, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetSLMCoords(*args): return _ivideo.iRendererLightmap_GetSLMCoords(*args)
@@ -1091,12 +830,7 @@ iRendererLightmap_swigregister = _ivideo.iRendererLightmap_swigregister
 iRendererLightmap_swigregister(iRendererLightmap)
 
 class iSuperLightmap(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSuperLightmap, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSuperLightmap, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def RegisterLightmap(*args): return _ivideo.iSuperLightmap_RegisterLightmap(*args)
@@ -1108,12 +842,7 @@ iSuperLightmap_swigregister = _ivideo.iSuperLightmap_swigregister
 iSuperLightmap_swigregister(iSuperLightmap)
 
 class iTextureManager(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iTextureManager, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iTextureManager, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def RegisterTexture(*args): return _ivideo.iTextureManager_RegisterTexture(*args)
@@ -1121,8 +850,7 @@ class iTextureManager(core.iBase):
     def GetTextureFormat(*args): return _ivideo.iTextureManager_GetTextureFormat(*args)
     def CreateSuperLightmap(*args): return _ivideo.iTextureManager_CreateSuperLightmap(*args)
     def GetMaxTextureSize(*args): return _ivideo.iTextureManager_GetMaxTextureSize(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivideo.iTextureManager_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivideo.iTextureManager_scfGetVersion)
+    scfGetVersion = staticmethod(_ivideo.iTextureManager_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iTextureManager
     __del__ = lambda self : None;
 iTextureManager_swigregister = _ivideo.iTextureManager_swigregister
@@ -1132,20 +860,14 @@ iTextureManager_scfGetVersion = _ivideo.iTextureManager_scfGetVersion
 CS_MATERIAL_VARNAME_FLATCOLOR = _ivideo.CS_MATERIAL_VARNAME_FLATCOLOR
 CS_MATERIAL_TEXTURE_DIFFUSE = _ivideo.CS_MATERIAL_TEXTURE_DIFFUSE
 class iMaterial(iShaderVariableContext):
-    __swig_setmethods__ = {}
-    for _s in [iShaderVariableContext]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iMaterial, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iShaderVariableContext]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iMaterial, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetShader(*args): return _ivideo.iMaterial_SetShader(*args)
     def GetShader(*args): return _ivideo.iMaterial_GetShader(*args)
     def GetShaders(*args): return _ivideo.iMaterial_GetShaders(*args)
     def GetTexture(*args): return _ivideo.iMaterial_GetTexture(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _ivideo.iMaterial_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_ivideo.iMaterial_scfGetVersion)
+    scfGetVersion = staticmethod(_ivideo.iMaterial_scfGetVersion)
     __swig_destroy__ = _ivideo.delete_iMaterial
     __del__ = lambda self : None;
 iMaterial_swigregister = _ivideo.iMaterial_swigregister

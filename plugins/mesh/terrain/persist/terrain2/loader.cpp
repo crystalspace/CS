@@ -40,22 +40,25 @@
 
 CS_IMPLEMENT_PLUGIN
 
-SCF_IMPLEMENT_FACTORY (csTerrainFactoryLoader)
-SCF_IMPLEMENT_FACTORY (csTerrainObjectLoader)
+CS_PLUGIN_NAMESPACE_BEGIN(Terrain2Loader)
+{
+  
+SCF_IMPLEMENT_FACTORY (csTerrain2FactoryLoader)
+SCF_IMPLEMENT_FACTORY (csTerrain2ObjectLoader)
 
 
 static const char* FACTORYERRORID = "crystalspace.mesh.loader.factory.terrain2";
 
-csTerrainFactoryLoader::csTerrainFactoryLoader (iBase* parent)
+csTerrain2FactoryLoader::csTerrain2FactoryLoader (iBase* parent)
  : scfImplementationType (this, parent)
 {
 }
 
-csTerrainFactoryLoader::~csTerrainFactoryLoader ()
+csTerrain2FactoryLoader::~csTerrain2FactoryLoader ()
 {
 }
 
-bool csTerrainFactoryLoader::Initialize (iObjectRegistry* objreg)
+bool csTerrain2FactoryLoader::Initialize (iObjectRegistry* objreg)
 {
   object_reg = objreg;
   reporter = csQueryRegistry<iReporter> (object_reg);
@@ -66,7 +69,7 @@ bool csTerrainFactoryLoader::Initialize (iObjectRegistry* objreg)
   return true;
 }
 
-csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
+csPtr<iBase> csTerrain2FactoryLoader::Parse (iDocumentNode* node,
   iStreamSource*, iLoaderContext* ldr_context, iBase* /*context*/)
 {
   csRef<iPluginManager> pluginManager = csQueryRegistry<iPluginManager> (object_reg);
@@ -211,7 +214,7 @@ csPtr<iBase> csTerrainFactoryLoader::Parse (iDocumentNode* node,
   return csPtr<iBase> (meshFactory);
 }
 
-bool csTerrainFactoryLoader::ParseParams (csArray<ParamPair>& pairs, iDocumentNode* node)
+bool csTerrain2FactoryLoader::ParseParams (csArray<ParamPair>& pairs, iDocumentNode* node)
 {
   csRef<iDocumentNodeIterator> it2 = node->GetNodes ();
 
@@ -247,7 +250,7 @@ bool csTerrainFactoryLoader::ParseParams (csArray<ParamPair>& pairs, iDocumentNo
   return true;
 }
 
-bool csTerrainFactoryLoader::ParseCell (iDocumentNode *node, 
+bool csTerrain2FactoryLoader::ParseCell (iDocumentNode *node, 
   iLoaderContext *ldr_ctx, iTerrainFactory *fact, const DefaultCellValues& defaults)
 {
   ParamPairArray renderParams, collParams, feederParams;
@@ -383,7 +386,7 @@ bool csTerrainFactoryLoader::ParseCell (iDocumentNode *node,
   return true;
 }
 
-bool csTerrainFactoryLoader::ParseDefaultCell (iDocumentNode* node, 
+bool csTerrain2FactoryLoader::ParseDefaultCell (iDocumentNode* node, 
   iLoaderContext* ldr_ctx, DefaultCellValues& defaults)
 {
   
@@ -462,16 +465,16 @@ bool csTerrainFactoryLoader::ParseDefaultCell (iDocumentNode* node,
 }
 
 
-csTerrainObjectLoader::csTerrainObjectLoader (iBase* parent)
+csTerrain2ObjectLoader::csTerrain2ObjectLoader (iBase* parent)
  : scfImplementationType (this, parent)
 {
 }
 
-csTerrainObjectLoader::~csTerrainObjectLoader ()
+csTerrain2ObjectLoader::~csTerrain2ObjectLoader ()
 {
 }
 
-bool csTerrainObjectLoader::Initialize (iObjectRegistry* objreg)
+bool csTerrain2ObjectLoader::Initialize (iObjectRegistry* objreg)
 {
   object_reg = objreg;
   reporter = csQueryRegistry<iReporter> (object_reg);
@@ -482,7 +485,7 @@ bool csTerrainObjectLoader::Initialize (iObjectRegistry* objreg)
   return true;
 }
 
-csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node, 
+csPtr<iBase> csTerrain2ObjectLoader::Parse (iDocumentNode* node, 
   iStreamSource*, iLoaderContext* ldr_context, iBase* /*context*/)
 {
   csRef<iMeshObject> mesh;
@@ -564,3 +567,6 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
 
   return csPtr<iBase>(mesh);
 }
+
+}
+CS_PLUGIN_NAMESPACE_END(Terrain2Loader)

@@ -7,8 +7,131 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 20-Oct-2007
+	- res added a method to iTextureHandle to query whether applying a
+	  blit buffer may potentially require calls into foreign code.
+	- res changed the ptpdlight MMX code to do an 'emms' if applying the
+	  blit buffer potentially calls foreign code. Actually fixes some
+	  corruption experienced with ATI drivers and using glTexSubImage2D.
+	- res added support for the pixel pack/unpack buffer bindings to the
+	  GL state cache.
+	- res fixed some errors in csimagetool's getopt_long() options string.
+	- res changed the JPG loader to only return paletted images if the
+	  loaded image is grayscale; otherwise, the quantization is left to
+	  CS.
+	- res deprecated the (pretty much defunct for while now) 
+	  iImageIO::SetDithering() method.
+	- Darek updated haze docs.
+	- caedes added macros to swig bindings to allow declaring structures
+          similar to csWrapPtr in other modules.
+        - caedes added some immutable declarations in swig bindings to avoid
+	  a number of warnings.
+	- caedes polished swig jam rule by following some advice from Eric
+	  Sunshine (removed an unecessary variable, and fixed a misleading
+	  comment).
+	- res fixed a wrong order in the shader weaver type info data.
 	- ronsaldo made compileable the modular version of the c# bindings.
+	- ronsaldo merge the trunk into the c# bindings.
+19-Oct-2007
+	- caedes fixed element size in swig iDataBuffer buffer declaration.
+	- res changed the GL texture blitting logic to make sure the texture
+	  is in the desired format even if only a partial area is changed.
+	- res added a Dump() method to GL textures.
+	- res added a tweak to the driver DB to disable PBO on ATI (where it
+	  gives incorrect results).
+	- caedes added correct swig wrapping of many common methods returning
+	  iBase which until now where using old cs macros. This wrapping
+	  allows to start using the real cs interface, so old methods have
+	  been deprecated. List of deprecated macros and new replacements:
+	   - CS_QUERY_REGISTRY -> ObjectRegistry->Get
+	   - CS_QUERY_REGISTRY_TAG_INTERFACE -> ObjectRegistry->Get
+	   - SCF_QUERY_INTERFACE -> iBase->QueryInterface
+	   - CS_QUERY_PLUGIN_CLASS -> iPluginManager->QueryPlugin
+	   - CS_LOAD_PLUGIN -> iPluginManager->LoadPlugin
+	   - CS_LOAD_PLUGIN_ALWAYS -> iPluginManager->LoadPluginAlways
+	   - CS_GET_CHILD_OBJECT -> iObject->GetChild
+	   - CS_GET_NAMED_CHILD_OBJECT -> iObject->GetChild
+	   - CS_GET_FIRST_NAMED_CHILD_OBJECT -> iObject->GetChildByName
+	  note some lesser used methods had to be renamed to cope with
+	  ambiguous overloading.
+	- caedes added a DEPRECATED_METHOD directive to swig interface
+	  files, this can be wrapped in language specific way to both
+	  avoid compile time warnings and provide run time warnings
+	  instead.
+	- caedes fixed python tutorials to remove usage of old macros above.
+	- caedes made iSCF::SCF and scfInterfaceMetadata::interfaceName
+	  immutable inside bindings to account for some warnings, and added
+	  a function to change the global core SCF pointer.
+18-Oct-2007
+	- caedes added BUFFER_RW_FUNCTIONS macro to swig interface files,
+	  this is useful for declaring buffer like objects that can be
+	  wrapped in efficient language specific buffers. Also added
+	  a python implementation for the macro (for other languages
+	  it just won't do anything until someone implements it).
+	- caedes added swig buffer declarations for iDataBuffer and
+	  iGeneralFactoryState vertices stuff.
+	- caedes added error printing to the python eventhandler, this
+	  way its not necessary to wrap the event handler code in
+	  try,except clauses.
+	- caedes removed try,except clauses from the python tutorials
+	  event handlers and fixed some other minor style issues in
+	  the tutorials.
+	- caedes added tutorial4.py, on a better base for creating pure
+	  python cs apps.
+17-Oct-2007
+	- Jorrit fixed the genmesh loader so that you can now use multiple
+	  <box> and <sphere> statements to make a genmesh factory out of
+	  multiple primitives. Also using CS::Geometry::Primitives now.
+	- Jorrit started work on instmesh and meshgen. At this point the
+	  following things are done:
+	      - Instmesh and meshgen now work nicely together without
+	        (known) bugs. Lighting works too.
+	      - If the meshes used for meshgen don't have too many
+	        polygons and density isn't too big then instmesh+meshgen
+		is a lot faster compared to genmesh+meshgen. At the
+		very least the update time (when moving around) is
+		a lot faster. However, as soon as the total number
+		of polygons gets too big then instmesh+genmesh starts
+		to get in a disadvantage. On this further optimizations
+		have to be made.
+	      - Warning: instmesh+meshgen still has a bug at exit. Seems
+	        there is some memory corruption going on.
+	- res enabled shared libraries by default on Win32 and Linux.
+	- res merged the MSVC project shared libraries support from the
+	  msvc-dlls branch.
+	- res fixed msvcgen.jam to use MSVC.PREFIX.library_static instead of
+	  MSVC.PREFIX.library everywhere.
+	- res added a new interface for directly setting texture pixel data:
+	  iTextureHandle->QueryBlitBuffer()/ApplyBlitBuffer(). Instead of
+	  copying a client-provided buffer, the client writes into a renderer-
+	  provided buffer. This can save a copy (and thus give somewhat better
+	  performance) when some extensions for direct texture memory access
+	  are available (such as ARB_pixel_buffer_object).
+	- res made ptpdlight use iTextureHandle->QueryBlitBuffer()/
+	  ApplyBlitBuffer(). 
+	- res changed shared library building to place the built libraries
+	  into the top build directory and not deep within out/.
+	- caedes made python bindings use -modern swig flag. This instructs
+	  swig to use modern python features only (and generates somewhat less
+	  convoluted code).
+	- res changed docconv_static to link some unneeded plugins.
+	- res fixed an errorneous MsvcUsePCH in the cslight Jamfile.
+	- res made shared libraries built in out/.../libs again (so they're
+	  correctly picked up by cs-config), but also added a symlink for them
+	  to the top build directory (for convenience).
+	- res fixed the MSVC projects to "decorate" the object file names for
+	  the static plugin library again.
+	- res made static plugins in MSVC be put into a separate shared lib as
+	  well (like what's done when build statically with Jam now) to
+	  facilitate LGPL compliance when 3rd parties wish to link CS
+	  statically.
+	- res fixed some build errors that appeared with static plugins.
+	- res fixed the MSVC static plugins project to not contain the library
+	  building preprocessor definitions (which mess up importing when 
+	  building with DLLs).
+	- ronsaldo moves plugins/cscript/cscharp/cspacesharp/CS.cs into 
+	   plugins/cscript/cscharp/cspacesharp/cspace.cs.
 16-Oct-2007
+	- Mike Gist deprecated csProcessorCapability.
 	- ronsaldo fixed somes issues with the c# bindings building.
 	- ronsaldo added somes folders omitted from previous comit.
 15-Oct-2007
@@ -18,9 +141,57 @@ chronological order.
 	  only generates the .cs files.
 	- ronsaldo added building of the distinct modules of the c# bindings,
 	  and added the building of the dummy splitted c# bindings.
+14-Oct-2007
+	- Eric Sunshine renamed build variable LIB3DS.ONE_THREE_OH to
+	  LIB3DS.GENERIC_DATA_IO_CALLBACKS to better reflect its intended
+	  meaning (a specific API change). Likewise, changed the configure
+	  "checking" message from "if lib3ds version >= 1.3.0" to "for generic
+	  data I/O callbacks" in order to clarify and reduce confusion (since
+	  the old ">= 1.3.0" message appeared immediately after a "if lib3ds is
+	  sufficiently recent" message). Also, renamed related C++ #define from
+	  NEW_DATA_CALLBACKS to LIB3DS_GENERIC_DATA_IO_CALLBACKS.
+	- Eric Sunshine eliminated several compilation warnings.
+	- Eric Sunshine fixed 'using independent target "nohelp"' warning
+	  emitted by Jam when building cs-config.
+    	- Eric Sunshine fixed cs-config/Jamfile so that cs-config gets removed
+	  upon 'jam clean' and 'jam distclean'.
+	- Eric Sunshine re-added 'cs-configclean' Jam target which got lost
+	  when versioned cs-config-x.y functionality was added to
+	  cs-config/Jamfile.
+	- Eric Sunshine updated cs_min_version_default to 1.3 in
+	  CS/mk/autoconf/crystal.m4. Also added commentary to various
+	  version-containing files stating that this file needs to be updated
+	  during version bumps.  (Ultimately, we should have a script in CS/bin
+	  which performs the version bump automatically rather than having to
+	  remember to do it manually in each place.)
+	- Eric Sunshine fixed some problems with the SplitDebugInfo rule in
+	  strip.jam which caused it to be somewhat dysfunctional. An obvious
+	  manifestation of these problems was that the generated .dbg files
+	  were not removed by any of the Jam 'clean' targets.
 13-Oct-2007
+	- res fixed a bug in DDS cubemap saving (checked for wrong subimage
+	  count).
+	- res made the DDS saver support DXT w/ cubemaps.
+	- res augmented csimagetool to support creating a cubemap from multiple
+	  images and splitting a cubemap into its subimages.
+        - Mike Gist added matRef to Mesh (cal3d) to increase the refCount on
+          materials used by that mesh. This fixes a problem where the ref count
+          on some materials was incorrect.
 	- ronsaldo added somes jam rules for the c# splitting.
 12-Oct-2007
+	- caedes applied a patch from Lukas Erlinghagen for the pysimp.py file
+	  to account for incorrect lighting.
+	- Jorrit did an optimization to CollideRaySegment (in opcode plugin)
+	  for old terrain. At worst this will make CollideRaySegment
+	  about eight times faster. At best it can be a lot more.
+	- Jorrit did a *huge* optimization in CollideRaySegment again.
+	  The result is that TraceBeam is now more then 10000(!) times
+	  faster compared to before my previous optimization. As an
+	  added benefit future performance for collision detection will
+	  no longer be degraded as the cache size for OPCODE will remain
+	  small.
+	- res fixed the ptpdlight VC project to contain an un-gristed
+	  ptpdlight_mmx.cpp filename.
 	- ronsaldo applied the c# patch, which includes the C# bindings.
 	- ronsaldo renamed plugins/cscript/cscsharp/build.xml into
 	  plugins/cscript/cscsharp/csbuild.xml.
@@ -33,6 +204,29 @@ chronological order.
 	  crystalspace-sharp.pc
 	- ronsaldo reformated the c# bindings files again.
 	- ronsaldo added SimpleRoom c# version.
+11-Oct-2007
+	- res changed the relaytool invocation to:
+	    - Pass multiple libs to be relayed in one command.
+	    - Pass CS' CFLAGS.
+10-Oct-2007
+        - Mike Gist fixed a compile error in the processor spec detection
+          code on PPC.
+	- res fixed csImageCubeMapMaker to not use new[]/delete[] for the
+	  filename (since csImageBase uses cs_malloc()/cs_free() for it).
+	- caedes reverted r27847 on data/shader/reflect.xml as seems
+	  future accidentally slipped in :).
+09-Oct-2007
+	- res added the CS_SUPPORTS_MMX preprocessor define for MSVC projects.
+	- res made ptpdlight support MMX for a slight speed-up.
+	- res added an MMX test to configure (based on Mike Gist's work in the
+	  SIMD SoC branch).
+	- res made it possible to run the CFlags Jam rule on (gristed) source
+	  file targets to specify per-source compile flags.
+	- res made the ptpslight MMX stuff compile on gcc.
+        - Mike Gist merged a basic simdtest from the SIMD SoC branch.
+	- Jorrit did a small optimization in meshgen. Meshes that become
+	  invisible due to alpha transparency are now really made invisible
+	  for the engine. That helps performance a bit.
 07-Oct-2007
 	- Eric Sunshine resolved some issues with jobber configuration
 	  following recent changes:
@@ -456,8 +650,8 @@ chronological order.
 	  header.
 7-Sep-2007
 	- res fixed the debug info splitting to put the debug info file into
-	  the same file as the binary (fixes separate debug info for shared
-	  libs).
+	  the same directory as the binary (fixes separate debug info for
+	  shared libs).
 	- res fixed the bezier mesh sometimes returning incompletely setup
 	  render meshes.
 	- Genjix changed joytest to use CS_REQUEST_JOYSTICK as an example for
@@ -699,6 +893,8 @@ chronological order.
 1-Aug-2007
 	- Jorrit fixed an initialization error in gmeshskelanim2 that could
 	  cause crashes at exit. This fixes #367.
+30-Jul-2007
+        - Mike Gist fixed a few warnings.
 29-Jul-2007
 	- res made the CEL jobber import crystalspace_staticplugins_msvc.jam
 	  from CS before generating VC projects.
@@ -896,6 +1092,14 @@ chronological order.
 25-Jun-2007
 	- Jorrit converted a few remaining interfaces to using SCF_INTERFACE
 	  instead of SCF_VERSION.
+        - Mike Gist added CS::SIMD namespace, containing some SIMD specific
+          functions and types.
+        - Mike Gist added preliminary SIMDCheck function. This takes up to two
+          SIMD function pointers and a c++ fallback, and decides which to use
+          based on CPU instruction set support.
+        - Mike Gist enhanced simdtest to make use of SIMDCheck. Everything in
+          CS::SIMD and using those functions and types is only tested working on
+          MSVC. Other platform support in progress.
 24-Jun-2007
         - Piotr made small bugfix in odedynam colliders ref handling.
 	- Eric Sunshine corrected "camera movement" documentation bug.
@@ -973,6 +1177,11 @@ chronological order.
 4-Jun-2007
 	- Oktal fixed a mistake made during Marten's SCF clean-up, that broke
 	  some X11 canvas plugins.
+	- Mike Gist added PSD code for PPC on OSX. Still needs testing.
+3-Jun-2007
+	- Mike Gist refactored PSD (Processor Spec Detection) code and made it
+	  check for and return a bitmask of all supported instructions. Win and 
+	  unix runtime checking work well now.
 1-Jun-2007
 	- res changed the cs-config wrapper script to use '=' instead of '==' 
 	  for more POSIX compliancy.
@@ -982,6 +1191,10 @@ chronological order.
 31-May-2007
 	- Marten reverted some of the changes and did some more fixes to make
 	  CS compile on GCC again after the SCF improvements.
+	- Mike Gist added basic structure for runtime instruction set detection
+	  and support for such detection on windows.
+	- Mike Gist added what's hopefully runtime instruction set detection for
+	  x86 based linux gcc.
 30-May-2007
 	- Marten made some cleanups to scfImplementation(Ext)N to reduce the 
 	  source size and hopefully speed up compilation a tiny bit.
@@ -2594,7 +2807,8 @@ chronological order.
 	  command.
 	- res made CS::Threading::Condition::Wait() return whether the wait
 	  timed out or ended due a change of the condition.
-	- res fixed compilation of the pthreads CS::Threading::Condition::Wait().
+	- res fixed compilation of the pthreads
+	  CS::Threading::Condition::Wait().
 	- res added a simple translator plugin from Darek Dawidowski.
 	- Anders Stenberg added a halfassed water test level (water.zip). 
 	  It's not very good right now, but could be a test bed for further

@@ -2,7 +2,6 @@
 # Version 1.3.31
 #
 # Don't modify this file, modify the SWIG interface instead.
-# This file is compatible with both classic and new-style classes.
 
 import _cstool
 import new
@@ -48,6 +47,16 @@ except AttributeError:
 del types
 
 
+def _swig_setattr_nondynamic_method(set):
+    def set_attr(self,name,value):
+        if (name == "thisown"): return self.this.own(value)
+        if hasattr(self,name) or (name == "this"):
+            set(self,name,value)
+        else:
+            raise AttributeError("You cannot add attributes to %s" % self)
+    return set_attr
+
+
 import core
 import iengine
 import ivideo
@@ -59,11 +68,8 @@ if not "core" in dir():
 core.AddSCFLink(_SetSCFPointer)
 CSMutableArrayHelper = core.CSMutableArrayHelper
 
-class scfFakecsColliderWrapper(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, scfFakecsColliderWrapper, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, scfFakecsColliderWrapper, name)
+class scfFakecsColliderWrapper(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _cstool.new_scfFakecsColliderWrapper(*args)
@@ -75,12 +81,7 @@ scfFakecsColliderWrapper_swigregister = _cstool.scfFakecsColliderWrapper_swigreg
 scfFakecsColliderWrapper_swigregister(scfFakecsColliderWrapper)
 
 class scfColliderWrapper(core.csObject,scfFakecsColliderWrapper):
-    __swig_setmethods__ = {}
-    for _s in [core.csObject,scfFakecsColliderWrapper]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, scfColliderWrapper, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.csObject,scfFakecsColliderWrapper]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, scfColliderWrapper, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def IncRef(*args): return _cstool.scfColliderWrapper_IncRef(*args)
@@ -94,12 +95,7 @@ scfColliderWrapper_swigregister = _cstool.scfColliderWrapper_swigregister
 scfColliderWrapper_swigregister(scfColliderWrapper)
 
 class csColliderWrapper(scfColliderWrapper):
-    __swig_setmethods__ = {}
-    for _s in [scfColliderWrapper]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csColliderWrapper, name, value)
-    __swig_getmethods__ = {}
-    for _s in [scfColliderWrapper]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csColliderWrapper, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _cstool.new_csColliderWrapper(*args)
@@ -110,34 +106,20 @@ class csColliderWrapper(scfColliderWrapper):
     def GetCollider(*args): return _cstool.csColliderWrapper_GetCollider(*args)
     def GetCollideSystem(*args): return _cstool.csColliderWrapper_GetCollideSystem(*args)
     def Collide(*args): return _cstool.csColliderWrapper_Collide(*args)
-    __swig_getmethods__["GetColliderWrapper"] = lambda x: _cstool.csColliderWrapper_GetColliderWrapper
-    if _newclass:GetColliderWrapper = staticmethod(_cstool.csColliderWrapper_GetColliderWrapper)
+    GetColliderWrapper = staticmethod(_cstool.csColliderWrapper_GetColliderWrapper)
     def UpdateCollider(*args): return _cstool.csColliderWrapper_UpdateCollider(*args)
 csColliderWrapper_swigregister = _cstool.csColliderWrapper_swigregister
 csColliderWrapper_swigregister(csColliderWrapper)
 csColliderWrapper_GetColliderWrapper = _cstool.csColliderWrapper_GetColliderWrapper
 
-class csTraceBeamResult(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csTraceBeamResult, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csTraceBeamResult, name)
+class csTraceBeamResult(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["closest_tri"] = _cstool.csTraceBeamResult_closest_tri_set
-    __swig_getmethods__["closest_tri"] = _cstool.csTraceBeamResult_closest_tri_get
-    if _newclass:closest_tri = _swig_property(_cstool.csTraceBeamResult_closest_tri_get, _cstool.csTraceBeamResult_closest_tri_set)
-    __swig_setmethods__["closest_isect"] = _cstool.csTraceBeamResult_closest_isect_set
-    __swig_getmethods__["closest_isect"] = _cstool.csTraceBeamResult_closest_isect_get
-    if _newclass:closest_isect = _swig_property(_cstool.csTraceBeamResult_closest_isect_get, _cstool.csTraceBeamResult_closest_isect_set)
-    __swig_setmethods__["closest_mesh"] = _cstool.csTraceBeamResult_closest_mesh_set
-    __swig_getmethods__["closest_mesh"] = _cstool.csTraceBeamResult_closest_mesh_get
-    if _newclass:closest_mesh = _swig_property(_cstool.csTraceBeamResult_closest_mesh_get, _cstool.csTraceBeamResult_closest_mesh_set)
-    __swig_setmethods__["sqdistance"] = _cstool.csTraceBeamResult_sqdistance_set
-    __swig_getmethods__["sqdistance"] = _cstool.csTraceBeamResult_sqdistance_get
-    if _newclass:sqdistance = _swig_property(_cstool.csTraceBeamResult_sqdistance_get, _cstool.csTraceBeamResult_sqdistance_set)
-    __swig_setmethods__["end_sector"] = _cstool.csTraceBeamResult_end_sector_set
-    __swig_getmethods__["end_sector"] = _cstool.csTraceBeamResult_end_sector_get
-    if _newclass:end_sector = _swig_property(_cstool.csTraceBeamResult_end_sector_get, _cstool.csTraceBeamResult_end_sector_set)
+    closest_tri = _swig_property(_cstool.csTraceBeamResult_closest_tri_get, _cstool.csTraceBeamResult_closest_tri_set)
+    closest_isect = _swig_property(_cstool.csTraceBeamResult_closest_isect_get, _cstool.csTraceBeamResult_closest_isect_set)
+    closest_mesh = _swig_property(_cstool.csTraceBeamResult_closest_mesh_get, _cstool.csTraceBeamResult_closest_mesh_set)
+    sqdistance = _swig_property(_cstool.csTraceBeamResult_sqdistance_get, _cstool.csTraceBeamResult_sqdistance_set)
+    end_sector = _swig_property(_cstool.csTraceBeamResult_end_sector_get, _cstool.csTraceBeamResult_end_sector_set)
     def __init__(self, *args): 
         this = _cstool.new_csTraceBeamResult(*args)
         try: self.this.append(this)
@@ -147,22 +129,14 @@ class csTraceBeamResult(_object):
 csTraceBeamResult_swigregister = _cstool.csTraceBeamResult_swigregister
 csTraceBeamResult_swigregister(csTraceBeamResult)
 
-class csColliderHelper(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csColliderHelper, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csColliderHelper, name)
+class csColliderHelper(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_getmethods__["InitializeCollisionWrapper"] = lambda x: _cstool.csColliderHelper_InitializeCollisionWrapper
-    if _newclass:InitializeCollisionWrapper = staticmethod(_cstool.csColliderHelper_InitializeCollisionWrapper)
-    __swig_getmethods__["InitializeCollisionWrappers"] = lambda x: _cstool.csColliderHelper_InitializeCollisionWrappers
-    if _newclass:InitializeCollisionWrappers = staticmethod(_cstool.csColliderHelper_InitializeCollisionWrappers)
-    __swig_getmethods__["CollideArray"] = lambda x: _cstool.csColliderHelper_CollideArray
-    if _newclass:CollideArray = staticmethod(_cstool.csColliderHelper_CollideArray)
-    __swig_getmethods__["CollidePath"] = lambda x: _cstool.csColliderHelper_CollidePath
-    if _newclass:CollidePath = staticmethod(_cstool.csColliderHelper_CollidePath)
-    __swig_getmethods__["TraceBeam"] = lambda x: _cstool.csColliderHelper_TraceBeam
-    if _newclass:TraceBeam = staticmethod(_cstool.csColliderHelper_TraceBeam)
+    InitializeCollisionWrapper = staticmethod(_cstool.csColliderHelper_InitializeCollisionWrapper)
+    InitializeCollisionWrappers = staticmethod(_cstool.csColliderHelper_InitializeCollisionWrappers)
+    CollideArray = staticmethod(_cstool.csColliderHelper_CollideArray)
+    CollidePath = staticmethod(_cstool.csColliderHelper_CollidePath)
+    TraceBeam = staticmethod(_cstool.csColliderHelper_TraceBeam)
     def __init__(self, *args): 
         this = _cstool.new_csColliderHelper(*args)
         try: self.this.append(this)
@@ -177,11 +151,8 @@ csColliderHelper_CollideArray = _cstool.csColliderHelper_CollideArray
 csColliderHelper_CollidePath = _cstool.csColliderHelper_CollidePath
 csColliderHelper_TraceBeam = _cstool.csColliderHelper_TraceBeam
 
-class csColliderActor(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csColliderActor, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csColliderActor, name)
+class csColliderActor(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _cstool.new_csColliderActor(*args)
@@ -210,11 +181,8 @@ class csColliderActor(_object):
 csColliderActor_swigregister = _cstool.csColliderActor_swigregister
 csColliderActor_swigregister(csColliderActor)
 
-class csView(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csView, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csView, name)
+class csView(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _cstool.new_csView(*args)
@@ -249,11 +217,8 @@ csfxBlueScreen = _cstool.csfxBlueScreen
 csfxWhiteOut = _cstool.csfxWhiteOut
 csfxScreenDPFX = _cstool.csfxScreenDPFX
 csfxScreenDPFXPartial = _cstool.csfxScreenDPFXPartial
-class csPixmap(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csPixmap, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csPixmap, name)
+class csPixmap(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     __swig_destroy__ = _cstool.delete_csPixmap
@@ -272,12 +237,7 @@ csPixmap_swigregister(csPixmap)
 csfxShadeVert = _cstool.csfxShadeVert
 
 class csSimplePixmap(csPixmap):
-    __swig_setmethods__ = {}
-    for _s in [csPixmap]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csSimplePixmap, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csPixmap]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csSimplePixmap, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _cstool.new_csSimplePixmap(*args)
@@ -296,18 +256,11 @@ class csSimplePixmap(csPixmap):
 csSimplePixmap_swigregister = _cstool.csSimplePixmap_swigregister
 csSimplePixmap_swigregister(csSimplePixmap)
 
-class csShortestDistanceResult(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csShortestDistanceResult, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csShortestDistanceResult, name)
+class csShortestDistanceResult(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["sqdistance"] = _cstool.csShortestDistanceResult_sqdistance_set
-    __swig_getmethods__["sqdistance"] = _cstool.csShortestDistanceResult_sqdistance_get
-    if _newclass:sqdistance = _swig_property(_cstool.csShortestDistanceResult_sqdistance_get, _cstool.csShortestDistanceResult_sqdistance_set)
-    __swig_setmethods__["direction"] = _cstool.csShortestDistanceResult_direction_set
-    __swig_getmethods__["direction"] = _cstool.csShortestDistanceResult_direction_get
-    if _newclass:direction = _swig_property(_cstool.csShortestDistanceResult_direction_get, _cstool.csShortestDistanceResult_direction_set)
+    sqdistance = _swig_property(_cstool.csShortestDistanceResult_sqdistance_get, _cstool.csShortestDistanceResult_sqdistance_set)
+    direction = _swig_property(_cstool.csShortestDistanceResult_direction_get, _cstool.csShortestDistanceResult_direction_set)
     def __init__(self, *args): 
         this = _cstool.new_csShortestDistanceResult(*args)
         try: self.this.append(this)
@@ -317,21 +270,12 @@ class csShortestDistanceResult(_object):
 csShortestDistanceResult_swigregister = _cstool.csShortestDistanceResult_swigregister
 csShortestDistanceResult_swigregister(csShortestDistanceResult)
 
-class csScreenTargetResult(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csScreenTargetResult, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csScreenTargetResult, name)
+class csScreenTargetResult(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_setmethods__["mesh"] = _cstool.csScreenTargetResult_mesh_set
-    __swig_getmethods__["mesh"] = _cstool.csScreenTargetResult_mesh_get
-    if _newclass:mesh = _swig_property(_cstool.csScreenTargetResult_mesh_get, _cstool.csScreenTargetResult_mesh_set)
-    __swig_setmethods__["isect"] = _cstool.csScreenTargetResult_isect_set
-    __swig_getmethods__["isect"] = _cstool.csScreenTargetResult_isect_get
-    if _newclass:isect = _swig_property(_cstool.csScreenTargetResult_isect_get, _cstool.csScreenTargetResult_isect_set)
-    __swig_setmethods__["polygon_idx"] = _cstool.csScreenTargetResult_polygon_idx_set
-    __swig_getmethods__["polygon_idx"] = _cstool.csScreenTargetResult_polygon_idx_get
-    if _newclass:polygon_idx = _swig_property(_cstool.csScreenTargetResult_polygon_idx_get, _cstool.csScreenTargetResult_polygon_idx_set)
+    mesh = _swig_property(_cstool.csScreenTargetResult_mesh_get, _cstool.csScreenTargetResult_mesh_set)
+    isect = _swig_property(_cstool.csScreenTargetResult_isect_get, _cstool.csScreenTargetResult_isect_set)
+    polygon_idx = _swig_property(_cstool.csScreenTargetResult_polygon_idx_get, _cstool.csScreenTargetResult_polygon_idx_set)
     def __init__(self, *args): 
         this = _cstool.new_csScreenTargetResult(*args)
         try: self.this.append(this)
@@ -341,16 +285,11 @@ class csScreenTargetResult(_object):
 csScreenTargetResult_swigregister = _cstool.csScreenTargetResult_swigregister
 csScreenTargetResult_swigregister(csScreenTargetResult)
 
-class csEngineTools(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csEngineTools, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, csEngineTools, name)
+class csEngineTools(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_getmethods__["FindShortestDistance"] = lambda x: _cstool.csEngineTools_FindShortestDistance
-    if _newclass:FindShortestDistance = staticmethod(_cstool.csEngineTools_FindShortestDistance)
-    __swig_getmethods__["FindScreenTarget"] = lambda x: _cstool.csEngineTools_FindScreenTarget
-    if _newclass:FindScreenTarget = staticmethod(_cstool.csEngineTools_FindScreenTarget)
+    FindShortestDistance = staticmethod(_cstool.csEngineTools_FindShortestDistance)
+    FindScreenTarget = staticmethod(_cstool.csEngineTools_FindScreenTarget)
     def __init__(self, *args): 
         this = _cstool.new_csEngineTools(*args)
         try: self.this.append(this)
@@ -362,11 +301,8 @@ csEngineTools_swigregister(csEngineTools)
 csEngineTools_FindShortestDistance = _cstool.csEngineTools_FindShortestDistance
 csEngineTools_FindScreenTarget = _cstool.csEngineTools_FindScreenTarget
 
-class Primitive(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, Primitive, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, Primitive, name)
+class Primitive(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     __swig_destroy__ = _cstool.delete_Primitive
@@ -376,12 +312,7 @@ Primitive_swigregister = _cstool.Primitive_swigregister
 Primitive_swigregister(Primitive)
 
 class TesselatedQuad(Primitive):
-    __swig_setmethods__ = {}
-    for _s in [Primitive]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, TesselatedQuad, name, value)
-    __swig_getmethods__ = {}
-    for _s in [Primitive]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, TesselatedQuad, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _cstool.new_TesselatedQuad(*args)
@@ -397,12 +328,7 @@ TesselatedQuad_swigregister = _cstool.TesselatedQuad_swigregister
 TesselatedQuad_swigregister(TesselatedQuad)
 
 class TesselatedBox(Primitive):
-    __swig_setmethods__ = {}
-    for _s in [Primitive]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, TesselatedBox, name, value)
-    __swig_getmethods__ = {}
-    for _s in [Primitive]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, TesselatedBox, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _cstool.new_TesselatedBox(*args)
@@ -420,12 +346,7 @@ TesselatedBox_swigregister = _cstool.TesselatedBox_swigregister
 TesselatedBox_swigregister(TesselatedBox)
 
 class Box(Primitive):
-    __swig_setmethods__ = {}
-    for _s in [Primitive]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, Box, name, value)
-    __swig_getmethods__ = {}
-    for _s in [Primitive]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, Box, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _cstool.new_Box(*args)
@@ -441,12 +362,7 @@ Box_swigregister = _cstool.Box_swigregister
 Box_swigregister(Box)
 
 class Capsule(Primitive):
-    __swig_setmethods__ = {}
-    for _s in [Primitive]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, Capsule, name, value)
-    __swig_getmethods__ = {}
-    for _s in [Primitive]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, Capsule, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _cstool.new_Capsule(*args)
@@ -460,12 +376,7 @@ Capsule_swigregister = _cstool.Capsule_swigregister
 Capsule_swigregister(Capsule)
 
 class Sphere(Primitive):
-    __swig_setmethods__ = {}
-    for _s in [Primitive]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, Sphere, name, value)
-    __swig_getmethods__ = {}
-    for _s in [Primitive]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, Sphere, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _cstool.new_Sphere(*args)
@@ -484,18 +395,12 @@ class Sphere(Primitive):
 Sphere_swigregister = _cstool.Sphere_swigregister
 Sphere_swigregister(Sphere)
 
-class GeneralMeshBuilder(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, GeneralMeshBuilder, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, GeneralMeshBuilder, name)
+class GeneralMeshBuilder(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
-    __swig_getmethods__["CreateFactory"] = lambda x: _cstool.GeneralMeshBuilder_CreateFactory
-    if _newclass:CreateFactory = staticmethod(_cstool.GeneralMeshBuilder_CreateFactory)
-    __swig_getmethods__["CreateMesh"] = lambda x: _cstool.GeneralMeshBuilder_CreateMesh
-    if _newclass:CreateMesh = staticmethod(_cstool.GeneralMeshBuilder_CreateMesh)
-    __swig_getmethods__["CreateFactoryAndMesh"] = lambda x: _cstool.GeneralMeshBuilder_CreateFactoryAndMesh
-    if _newclass:CreateFactoryAndMesh = staticmethod(_cstool.GeneralMeshBuilder_CreateFactoryAndMesh)
+    CreateFactory = staticmethod(_cstool.GeneralMeshBuilder_CreateFactory)
+    CreateMesh = staticmethod(_cstool.GeneralMeshBuilder_CreateMesh)
+    CreateFactoryAndMesh = staticmethod(_cstool.GeneralMeshBuilder_CreateFactoryAndMesh)
     def __init__(self, *args): 
         this = _cstool.new_GeneralMeshBuilder(*args)
         try: self.this.append(this)
@@ -517,11 +422,8 @@ CS_PEN_FILL = _cstool.CS_PEN_FILL
 CS_PEN_SWAPCOLORS = _cstool.CS_PEN_SWAPCOLORS
 CS_PEN_TEXTURE_ONLY = _cstool.CS_PEN_TEXTURE_ONLY
 CS_PEN_TEXTURE = _cstool.CS_PEN_TEXTURE
-class iPen(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iPen, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, iPen, name)
+class iPen(object):
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SetFlag(*args): return _cstool.iPen_SetFlag(*args)
@@ -553,12 +455,7 @@ iPen_swigregister = _cstool.iPen_swigregister
 iPen_swigregister(iPen)
 
 class csPen(iPen):
-    __swig_setmethods__ = {}
-    for _s in [iPen]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csPen, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iPen]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csPen, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _cstool.new_csPen(*args)
@@ -592,12 +489,7 @@ csPen_swigregister = _cstool.csPen_swigregister
 csPen_swigregister(csPen)
 
 class csMemoryPen(iPen):
-    __swig_setmethods__ = {}
-    for _s in [iPen]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csMemoryPen, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iPen]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csMemoryPen, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _cstool.new_csMemoryPen(*args)
@@ -632,12 +524,7 @@ csMemoryPen_swigregister = _cstool.csMemoryPen_swigregister
 csMemoryPen_swigregister(csMemoryPen)
 
 class scfProcTexture(core.csObject,iengine.iTextureWrapper,core.iProcTexture):
-    __swig_setmethods__ = {}
-    for _s in [core.csObject,iengine.iTextureWrapper,core.iProcTexture]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, scfProcTexture, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.csObject,iengine.iTextureWrapper,core.iProcTexture]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, scfProcTexture, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def IncRef(*args): return _cstool.scfProcTexture_IncRef(*args)
@@ -651,12 +538,7 @@ scfProcTexture_swigregister = _cstool.scfProcTexture_swigregister
 scfProcTexture_swigregister(scfProcTexture)
 
 class iProcTexCallback(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iProcTexCallback, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iProcTexCallback, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def GetProcTexture(*args): return _cstool.iProcTexCallback_GetProcTexture(*args)
@@ -666,17 +548,10 @@ iProcTexCallback_swigregister = _cstool.iProcTexCallback_swigregister
 iProcTexCallback_swigregister(iProcTexCallback)
 
 class csProcTexture(scfProcTexture):
-    __swig_setmethods__ = {}
-    for _s in [scfProcTexture]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csProcTexture, name, value)
-    __swig_getmethods__ = {}
-    for _s in [scfProcTexture]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csProcTexture, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
-    __swig_setmethods__["last_cur_time"] = _cstool.csProcTexture_last_cur_time_set
-    __swig_getmethods__["last_cur_time"] = _cstool.csProcTexture_last_cur_time_get
-    if _newclass:last_cur_time = _swig_property(_cstool.csProcTexture_last_cur_time_get, _cstool.csProcTexture_last_cur_time_set)
+    last_cur_time = _swig_property(_cstool.csProcTexture_last_cur_time_get, _cstool.csProcTexture_last_cur_time_set)
     __swig_destroy__ = _cstool.delete_csProcTexture
     __del__ = lambda self : None;
     def GetG3D(*args): return _cstool.csProcTexture_GetG3D(*args)
@@ -687,20 +562,14 @@ class csProcTexture(scfProcTexture):
     def SetKeyColor(*args): return _cstool.csProcTexture_SetKeyColor(*args)
     def Animate(*args): return _cstool.csProcTexture_Animate(*args)
     def GetDimension(*args): return _cstool.csProcTexture_GetDimension(*args)
-    __swig_getmethods__["GetRandom"] = lambda x: _cstool.csProcTexture_GetRandom
-    if _newclass:GetRandom = staticmethod(_cstool.csProcTexture_GetRandom)
+    GetRandom = staticmethod(_cstool.csProcTexture_GetRandom)
     def GetTextureWrapper(*args): return _cstool.csProcTexture_GetTextureWrapper(*args)
 csProcTexture_swigregister = _cstool.csProcTexture_swigregister
 csProcTexture_swigregister(csProcTexture)
 csProcTexture_GetRandom = _cstool.csProcTexture_GetRandom
 
 class csProcAnimated(csProcTexture):
-    __swig_setmethods__ = {}
-    for _s in [csProcTexture]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, csProcAnimated, name, value)
-    __swig_getmethods__ = {}
-    for _s in [csProcTexture]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, csProcAnimated, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     __repr__ = _swig_repr
     def __init__(self, *args): 
         this = _cstool.new_csProcAnimated(*args)

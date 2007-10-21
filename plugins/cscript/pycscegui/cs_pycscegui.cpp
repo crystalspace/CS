@@ -2835,6 +2835,12 @@ static swig_module_info swig_module = {swig_types, 348, 0, 0, 0, 0};
 #  error "This python version requires swig to be run with the '-classic' option"
 # endif
 #endif
+#if (PY_VERSION_HEX <= 0x02020000)
+# error "This python version requires swig to be run with the '-nomodern' option"
+#endif
+#if (PY_VERSION_HEX <= 0x02020000)
+# error "This python version requires swig to be run with the '-nomodernargs' option"
+#endif
 
 /*-----------------------------------------------
               @(target):= _pycscegui.so
@@ -2951,7 +2957,7 @@ SWIGINTERN PyObject *_wrap_iCEGUI_Initialize__SWIG_0(PyObject *SWIGUNUSEDPARM(se
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:iCEGUI_Initialize",&obj0,&obj1)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iCEGUI_Initialize",2,2,&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iCEGUI, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iCEGUI_Initialize" "', argument " "1"" of type '" "iCEGUI *""'"); 
@@ -2978,7 +2984,7 @@ SWIGINTERN PyObject *_wrap_iCEGUI_Initialize__SWIG_1(PyObject *SWIGUNUSEDPARM(se
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iCEGUI_Initialize",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iCEGUI_Initialize",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iCEGUI, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iCEGUI_Initialize" "', argument " "1"" of type '" "iCEGUI *""'"); 
@@ -3039,7 +3045,7 @@ SWIGINTERN PyObject *_wrap_iCEGUI_Render(PyObject *SWIGUNUSEDPARM(self), PyObjec
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iCEGUI_Render",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iCEGUI_Render",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iCEGUI, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iCEGUI_Render" "', argument " "1"" of type '" "iCEGUI const *""'"); 
@@ -3061,7 +3067,7 @@ SWIGINTERN PyObject *_wrap_iCEGUI_GetSystemPtr(PyObject *SWIGUNUSEDPARM(self), P
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iCEGUI_GetSystemPtr",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iCEGUI_GetSystemPtr",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iCEGUI, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iCEGUI_GetSystemPtr" "', argument " "1"" of type '" "iCEGUI const *""'"); 
@@ -3083,7 +3089,7 @@ SWIGINTERN PyObject *_wrap_iCEGUI_GetFontManagerPtr(PyObject *SWIGUNUSEDPARM(sel
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iCEGUI_GetFontManagerPtr",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iCEGUI_GetFontManagerPtr",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iCEGUI, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iCEGUI_GetFontManagerPtr" "', argument " "1"" of type '" "iCEGUI const *""'"); 
@@ -3105,7 +3111,7 @@ SWIGINTERN PyObject *_wrap_iCEGUI_GetGlobalEventSetPtr(PyObject *SWIGUNUSEDPARM(
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iCEGUI_GetGlobalEventSetPtr",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iCEGUI_GetGlobalEventSetPtr",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iCEGUI, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iCEGUI_GetGlobalEventSetPtr" "', argument " "1"" of type '" "iCEGUI const *""'"); 
@@ -3127,7 +3133,7 @@ SWIGINTERN PyObject *_wrap_iCEGUI_GetImagesetManagerPtr(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iCEGUI_GetImagesetManagerPtr",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iCEGUI_GetImagesetManagerPtr",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iCEGUI, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iCEGUI_GetImagesetManagerPtr" "', argument " "1"" of type '" "iCEGUI const *""'"); 
@@ -3149,7 +3155,7 @@ SWIGINTERN PyObject *_wrap_iCEGUI_GetLoggerPtr(PyObject *SWIGUNUSEDPARM(self), P
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iCEGUI_GetLoggerPtr",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iCEGUI_GetLoggerPtr",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iCEGUI, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iCEGUI_GetLoggerPtr" "', argument " "1"" of type '" "iCEGUI const *""'"); 
@@ -3171,7 +3177,7 @@ SWIGINTERN PyObject *_wrap_iCEGUI_GetMouseCursorPtr(PyObject *SWIGUNUSEDPARM(sel
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iCEGUI_GetMouseCursorPtr",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iCEGUI_GetMouseCursorPtr",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iCEGUI, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iCEGUI_GetMouseCursorPtr" "', argument " "1"" of type '" "iCEGUI const *""'"); 
@@ -3193,7 +3199,7 @@ SWIGINTERN PyObject *_wrap_iCEGUI_GetSchemeManagerPtr(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iCEGUI_GetSchemeManagerPtr",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iCEGUI_GetSchemeManagerPtr",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iCEGUI, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iCEGUI_GetSchemeManagerPtr" "', argument " "1"" of type '" "iCEGUI const *""'"); 
@@ -3215,7 +3221,7 @@ SWIGINTERN PyObject *_wrap_iCEGUI_GetWindowFactoryManagerPtr(PyObject *SWIGUNUSE
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iCEGUI_GetWindowFactoryManagerPtr",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iCEGUI_GetWindowFactoryManagerPtr",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iCEGUI, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iCEGUI_GetWindowFactoryManagerPtr" "', argument " "1"" of type '" "iCEGUI const *""'"); 
@@ -3237,7 +3243,7 @@ SWIGINTERN PyObject *_wrap_iCEGUI_GetWindowManagerPtr(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iCEGUI_GetWindowManagerPtr",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iCEGUI_GetWindowManagerPtr",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iCEGUI, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iCEGUI_GetWindowManagerPtr" "', argument " "1"" of type '" "iCEGUI const *""'"); 
@@ -3258,7 +3264,7 @@ SWIGINTERN PyObject *_wrap_iCEGUI_EnableMouseCapture(PyObject *SWIGUNUSEDPARM(se
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iCEGUI_EnableMouseCapture",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iCEGUI_EnableMouseCapture",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iCEGUI, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iCEGUI_EnableMouseCapture" "', argument " "1"" of type '" "iCEGUI *""'"); 
@@ -3279,7 +3285,7 @@ SWIGINTERN PyObject *_wrap_iCEGUI_DisableMouseCapture(PyObject *SWIGUNUSEDPARM(s
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iCEGUI_DisableMouseCapture",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iCEGUI_DisableMouseCapture",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iCEGUI, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iCEGUI_DisableMouseCapture" "', argument " "1"" of type '" "iCEGUI *""'"); 
@@ -3300,7 +3306,7 @@ SWIGINTERN PyObject *_wrap_iCEGUI_EnableKeyboardCapture(PyObject *SWIGUNUSEDPARM
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iCEGUI_EnableKeyboardCapture",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iCEGUI_EnableKeyboardCapture",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iCEGUI, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iCEGUI_EnableKeyboardCapture" "', argument " "1"" of type '" "iCEGUI *""'"); 
@@ -3321,7 +3327,7 @@ SWIGINTERN PyObject *_wrap_iCEGUI_DisableKeyboardCapture(PyObject *SWIGUNUSEDPAR
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:iCEGUI_DisableKeyboardCapture",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iCEGUI_DisableKeyboardCapture",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iCEGUI, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "iCEGUI_DisableKeyboardCapture" "', argument " "1"" of type '" "iCEGUI *""'"); 
@@ -3339,7 +3345,7 @@ SWIGINTERN PyObject *_wrap_iCEGUI_scfGetVersion(PyObject *SWIGUNUSEDPARM(self), 
   PyObject *resultobj = 0;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":iCEGUI_scfGetVersion")) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"iCEGUI_scfGetVersion",0,0)) SWIG_fail;
   result = (int)iCEGUI_scfGetVersion();
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
@@ -3355,7 +3361,7 @@ SWIGINTERN PyObject *_wrap_delete_iCEGUI(PyObject *SWIGUNUSEDPARM(self), PyObjec
   int res1 = 0 ;
   PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:delete_iCEGUI",&obj0)) SWIG_fail;
+  if(!PyArg_UnpackTuple(args,(char *)"delete_iCEGUI",1,1,&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_iCEGUI, SWIG_POINTER_DISOWN |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "delete_iCEGUI" "', argument " "1"" of type '" "iCEGUI *""'"); 
@@ -3372,7 +3378,7 @@ fail:
 
 SWIGINTERN PyObject *iCEGUI_swigregister(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *obj;
-  if (!PyArg_ParseTuple(args,(char*)"O|swigregister", &obj)) return NULL;
+  if (!PyArg_UnpackTuple(args,(char*)"swigregister", 1, 1,&obj)) return NULL;
   SWIG_TypeNewClientData(SWIGTYPE_p_iCEGUI, SWIG_NewClientData(obj));
   return SWIG_Py_Void();
 }

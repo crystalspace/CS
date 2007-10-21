@@ -278,7 +278,7 @@ static long DataTellFunc (void *self)
 }
 
 
-#ifdef NEW_DATA_CALLBACKS
+#ifdef LIB3DS_GENERIC_DATA_IO_CALLBACKS
 static size_t DataReadFunc (void *self, void *buffer, size_t size)
 #else
 static int DataReadFunc (void *self, Lib3dsByte *buffer, int size)
@@ -289,7 +289,7 @@ static int DataReadFunc (void *self, Lib3dsByte *buffer, int size)
 }
 
 
-#ifdef NEW_DATA_CALLBACKS
+#ifdef LIB3DS_GENERIC_DATA_IO_CALLBACKS
 static size_t DataWriteFunc (void* /*self*/, const void* /*buffer*/, 
  	size_t /*size*/)
 #else

@@ -42,6 +42,8 @@
       Py_DECREF(event_obj);
       if (!result)
       {
+        if (PyErr_Occurred ())
+                PyErr_Print ();
         return false;
       }
       bool res = PyInt_AsLong(result);

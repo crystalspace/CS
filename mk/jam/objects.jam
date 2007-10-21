@@ -141,9 +141,11 @@ rule CompileObject
     # different from $(SEARCH_SOURCE).
     HDRS on $(<) = $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ;
 
-    # propagate target specific-defines
+    # propagate target specific defines
     DEFINES on $(<) += $(DEFINES) ;
   }
+  
+  $(<)_OBJECTS += $(targets) ;
 
   return $(targets) ;
 }

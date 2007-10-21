@@ -20,24 +20,18 @@
 #include "cssysdef.h"
 #include <limits.h>
 
-#include "ivideo/texture.h"
 #include "iengine/engine.h"
 #include "ivaria/profile.h"
 #include "ivaria/reporter.h"
 
-#include "csgeom/fixed.h"
 #include "csgeom/math.h"
 #include "csgfx/imageautoconvert.h"
-#include "csutil/cscolor.h"
-#include "csutil/csstring.h"
 
 #include "ptpdlight.h"
 #include "ptpdlight_loader.h"
 
 CS_DECLARE_PROFILER
 CS_DECLARE_PROFILER_ZONE(ProctexPDLight_Animate)
-CS_DECLARE_PROFILER_ZONE(ProctexPDLight_Animate_inner)
-CS_DECLARE_PROFILER_ZONE(ProctexPDLight_Animate_Blit)
 
 CS_PLUGIN_NAMESPACE_BEGIN(PTPDLight)
 {
@@ -80,9 +74,6 @@ CS_PLUGIN_NAMESPACE_BEGIN(PTPDLight)
   }
 
 //---------------------------------------------------------------------------
-
-CS_IMPLEMENT_STATIC_CLASSVAR_REF(ProctexPDLight, lightmapScratch, GetScratch,
-                                 ProctexPDLight::LightmapScratch, ());
 
 void ProctexPDLight::PDMap::ComputeValueBounds (const csRect& area, 
                                                 csRGBcolor& maxValue, 
@@ -141,6 +132,10 @@ void ProctexPDLight::PDMap::ComputeValueBounds (const csRect& area,
       map += mapPitch;
     }
   }
+
+  // Align line start+end on 2-pixel-boundary (for MMX)
+  nonNullArea.xmin &= ~1;
+  nonNullArea.xmax = (nonNullArea.xmax+1) & ~1;
 }
 
 void ProctexPDLight::PDMap::ComputeValueBounds (const TileHelper& tiles)
@@ -152,13 +147,12 @@ void ProctexPDLight::PDMap::ComputeValueBounds (const TileHelper& tiles)
 void ProctexPDLight::PDMap::ComputeValueBounds (const TileHelper& tiles, 
                                                 const csRect& area)
 {
-  maxValues.SetSize (tileNonNull.GetSize());
   nonNullAreas.SetSize (tileNonNull.GetSize());
   if (!imageData) 
   {
     for (size_t t = 0; t < tileNonNull.GetSize(); t++)
     {
-      maxValues[t].Set (0, 0, 0);
+      this->tiles[t].maxValue.Set (0, 0, 0);
       nonNullAreas[t].Set (INT_MAX, INT_MAX, INT_MIN, INT_MIN);
     }
     return;
@@ -171,7 +165,7 @@ void ProctexPDLight::PDMap::ComputeValueBounds (const TileHelper& tiles,
     r.Intersect (area);
     if (r.IsEmpty()) 
     {
-      maxValues[t].Set (0, 0, 0);
+      this->tiles[t].maxValue.Set (0, 0, 0);
       nonNullAreas[t].Set (INT_MAX, INT_MAX, INT_MIN, INT_MIN);
       continue;
     }
@@ -179,7 +173,7 @@ void ProctexPDLight::PDMap::ComputeValueBounds (const TileHelper& tiles,
     csRGBcolor maxValue;
     csRect nonNullArea;
     ComputeValueBounds (r, maxValue, nonNullArea);
-    maxValues[t] = maxValue;
+    this->tiles[t].maxValue = maxValue;
     nonNullAreas[t] = nonNullArea;
     if (maxValue.red + maxValue.green + maxValue.blue > 0)
     {
@@ -283,14 +277,55 @@ void ProctexPDLight::PDMap::Crop ()
 void ProctexPDLight::PDMap::GetMaxValue (csRGBcolor& maxValue)
 {
   maxValue.Set (0, 0, 0);
-  for (size_t m = 0; m < maxValues.GetSize(); m++)
+  for (size_t m = 0; m < tiles.GetSize(); m++)
   {
-    const csRGBcolor& color = maxValues[m];
+    const csRGBcolor& color = tiles[m].maxValue;
     if (color.red > maxValue.red) maxValue.red = color.red;
     if (color.green > maxValue.green) maxValue.green = color.green;
     if (color.blue > maxValue.blue) maxValue.blue = color.blue;
   }
 }
+
+void ProctexPDLight::PDMap::UpdateTiles (const TileHelper& helper)
+{
+  for (size_t t = 0; t < tiles.GetSize(); t++)
+  {
+    Tile& tile = tiles[t];
+    
+    csRect tileRect;
+    helper.GetTileRect (t, tileRect);
+
+    const csRect& lightInTile (nonNullAreas[t]);
+
+    tile.tilePartX = (lightInTile.xmin - tileRect.xmin);
+    tile.tilePartY = (lightInTile.ymin - tileRect.ymin);
+
+    tile.tilePartW = csMin (lightInTile.xmax, imageX + imageW)
+      - csMax (lightInTile.xmin, imageX);
+    tile.tilePartH = csMin (lightInTile.ymax, imageY + imageH)
+      - csMax (lightInTile.ymin, imageY);
+    tile.tilePartPitch = imageW - tile.tilePartW;
+
+    if (imageData->IsGray())
+    {
+      tile.tilePartData = static_cast<LumelBufferGray*> (
+	  (LumelBufferBase*)imageData)->GetData()
+        + (lightInTile.ymin - imageY) * imageW
+        + (lightInTile.xmin - imageX);
+    }
+    else
+    {
+      tile.tilePartData = static_cast<LumelBufferRGB*> (
+	  (LumelBufferBase*)imageData)->GetData()
+        + (lightInTile.ymin - imageY) * imageW
+        + (lightInTile.xmin - imageX);
+    }
+  }
+  tiles.ShrinkBestFit ();
+  nonNullAreas.DeleteAll ();
+}
+
+// --------------------------------------------------------------------------
 
 void ProctexPDLight::Report (int severity, const char* msg, ...)
 {
@@ -325,6 +360,7 @@ ProctexPDLight::ProctexPDLight (ProctexPDLightLoader* loader, iImage* img) :
 {
   mat_w = img->GetWidth();
   mat_h = img->GetHeight();
+  if (loader->doMMX) state.Set (stateDoMMX);
 }
 
 ProctexPDLight::ProctexPDLight (ProctexPDLightLoader* loader, int w, int h) : 
@@ -335,6 +371,7 @@ ProctexPDLight::ProctexPDLight (ProctexPDLightLoader* loader, int w, int h) :
 {
   mat_w = w;
   mat_h = h;
+  if (loader->doMMX) state.Set (stateDoMMX);
 }
 
 ProctexPDLight::~ProctexPDLight ()
@@ -397,181 +434,14 @@ bool ProctexPDLight::PrepareAnim ()
       lights.DeleteIndexFast (i);
   }
   lights.ShrinkBestFit();
+  for (size_t i = 0; i < lights.GetSize(); i++)
+  {
+    lights[i].map.UpdateTiles (tiles);
+  }
   lightBits.SetSize (lights.GetSize ());
   state.Set (statePrepared);
   return true;
 }
-
-#if defined(CS_LITTLE_ENDIAN)
-static const int shiftR = 16;
-static const int shiftG =  8;
-static const int shiftB =  0;
-static const uint32 grayToRGBmul = 0x00010101;
-static const uint32 grayToRGBalpha = 0xff000000;
-#else
-static const int shiftR =  8;
-static const int shiftG = 16;
-static const int shiftB = 24;
-static const uint32 grayToRGBmul = 0x01010100;
-static const uint32 grayToRGBalpha = 0x000000ff;
-#endif
-
-template<int shift>
-static void ComputeLUT (csFixed16 v, uint32* lut)
-{
-  for (int x = 0; x < 256; x++)
-  {
-    *lut++ = csMin (int (v * x), 255) << shift;
-  }
-}
-
-enum
-{
-  safeR = 1,
-  safeG = 2,
-  safeB = 4,
-
-  safeAll = safeR | safeG | safeB
-};
-
-template<int safeMask>
-static void MultiplyAddLumels (ProctexPDLight::Lumel* dst, size_t dstPitch,
-                               const ProctexPDLight::Lumel* map, size_t mapPitch,
-                               int columns, int rows,
-                               const uint32* lutR, 
-                               const uint32* lutG, 
-                               const uint32* lutB)
-{
-  for (int y = 0; y < rows; y++)
-  {
-    for (int x = 0; x < columns; x++)
-    {
-      const ProctexPDLight::Lumel mapVal = *map++;
-      uint32 dstVal = dst->ui;
-      if (safeMask & safeR)
-      {
-        // Possible overflow may occur
-        uint32 r = dstVal & (0xff << shiftR);
-        r += lutR[mapVal.c.red];
-        if (r > (0xff << shiftR)) r = (0xff << shiftR);
-        dstVal &= ~(0xff << shiftR);
-        dstVal |= r;
-      }
-      else
-        // Overflow can't occur
-        dstVal += lutR[mapVal.c.red];
-
-      if (safeMask & safeG)
-      {
-        uint32 g = dstVal & (0xff << shiftG);
-        g += lutG[mapVal.c.green];
-        if (g > (0xff << shiftG)) g = (0xff << shiftG);
-        dstVal &= ~(0xff << shiftG);
-        dstVal |= g;
-      }
-      else
-        dstVal += lutG[mapVal.c.green];
-
-      if (safeMask & safeB)
-      {
-        uint32 b = dstVal & (0xff << shiftB);
-        b += lutB[mapVal.c.blue];
-        if (b > (0xff << shiftB)) b = (0xff << shiftB);
-        dstVal &= ~(0xff << shiftB);
-        dstVal |= b;
-      }
-      else
-        dstVal += lutB[mapVal.c.blue];
-
-      (dst++)->ui = dstVal;
-    }
-    dst += dstPitch;
-    map += mapPitch;
-  }
-}
-
-template<int safeMask>
-static void MultiplyAddLumels8 (ProctexPDLight::Lumel* dst, size_t dstPitch,
-                                const uint8* map, size_t mapPitch,
-                                int columns, int rows,
-                                const uint32* lutR, 
-                                const uint32* lutG, 
-                                const uint32* lutB)
-{
-  for (int y = 0; y < rows; y++)
-  {
-    for (int x = 0; x < columns; x++)
-    {
-      const uint8 v = *map++;
-      uint32 dstVal = dst->ui;
-      if (safeMask & safeR)
-      {
-        // Possible overflow may occur
-        uint32 r = dstVal & (0xff << shiftR);
-        r += lutR[v];
-        if (r > (0xff << shiftR)) r = (0xff << shiftR);
-        dstVal &= ~(0xff << shiftR);
-        dstVal |= r;
-      }
-      else
-        // Overflow can't occur
-        dstVal += lutR[v];
-
-      if (safeMask & safeG)
-      {
-        uint32 g = dstVal & (0xff << shiftG);
-        g += lutG[v];
-        if (g > (0xff << shiftG)) g = (0xff << shiftG);
-        dstVal &= ~(0xff << shiftG);
-        dstVal |= g;
-      }
-      else
-        dstVal += lutG[v];
-
-      if (safeMask & safeB)
-      {
-        uint32 b = dstVal & (0xff << shiftB);
-        b += lutB[v];
-        if (b > (0xff << shiftB)) b = (0xff << shiftB);
-        dstVal &= ~(0xff << shiftB);
-        dstVal |= b;
-      }
-      else
-        dstVal += lutB[v];
-
-      (dst++)->ui = dstVal;
-    }
-    dst += dstPitch;
-    map += mapPitch;
-  }
-}
-
-typedef void (*MultiplyAddProc) (ProctexPDLight::Lumel* dst, size_t dstPitch,
-                                 const ProctexPDLight::Lumel* map, size_t mapPitch,
-                                 int columns, int rows,
-                                 const uint32* lutR, 
-                                 const uint32* lutG, 
-                                 const uint32* lutB);
-typedef void (*MultiplyAddProc8) (ProctexPDLight::Lumel* dst, size_t dstPitch,
-                                  const uint8* map, size_t mapPitch,
-                                  int columns, int rows,
-                                  const uint32* lutR, 
-                                  const uint32* lutG, 
-                                  const uint32* lutB);
-
-static const MultiplyAddProc maProcs[8] = {
-  MultiplyAddLumels<0>, MultiplyAddLumels<1>, 
-  MultiplyAddLumels<2>, MultiplyAddLumels<3>, 
-  MultiplyAddLumels<4>, MultiplyAddLumels<5>, 
-  MultiplyAddLumels<6>, MultiplyAddLumels<7>
-};
-
-static const MultiplyAddProc8 maProcs8[8] = {
-  MultiplyAddLumels8<0>, MultiplyAddLumels8<1>, 
-  MultiplyAddLumels8<2>, MultiplyAddLumels8<3>, 
-  MultiplyAddLumels8<4>, MultiplyAddLumels8<5>, 
-  MultiplyAddLumels8<6>, MultiplyAddLumels8<7>
-};
 
 void ProctexPDLight::Animate (csTicks current_time)
 {
@@ -582,176 +452,13 @@ void ProctexPDLight::Animate (csTicks current_time)
     csTicks startTime = csGetTicks();
 
     CS_PROFILER_ZONE(ProctexPDLight_Animate)
-    lightBits.Clear();
-    for (size_t l = 0; l < lights.GetSize(); )
-    {
-      MappedLight& light = lights[l];
-      if (!light.light)
-      {
-        tilesDirty |= light.map.tileNonNull;
-        lightColorStates.DeleteAll ((iLight*)light.light);
-        lights.DeleteIndexFast (l);
-        lightBits.SetSize (lights.GetSize ());
-        continue;
-      }
-      if (dirtyLights.Contains ((iLight*)light.light))
-      {
-        tilesDirty |= light.map.tileNonNull;
-        lightBits.SetBit (l);
-      }
-      l++;
-    }
+#ifdef CS_SUPPORTS_MMX
+    if (state.Check (stateDoMMX))
+      Animate_MMX ();
+    else
+#endif
+      Animate_Generic ();
 
-    LightmapScratch& scratch = GetScratch();
-    scratch.SetSize (TileHelper::tileSizeX * TileHelper::tileSizeY);
-    for (size_t t = 0; t < tilesDirty.GetSize(); t++)
-    {
-      if (!tilesDirty.IsBitSet (t)) continue;
-
-      csRect tileRect;
-      tiles.GetTileRect (t, tileRect);
-
-      int scratchW = tileRect.Width();
-      csRGBcolor scratchMax;
-      {
-        int lines = tileRect.Height();
-        Lumel* scratchPtr = scratch.GetArray();
-        if (baseMap.imageData.IsValid())
-        {
-          if (baseMap.imageData->IsGray())
-          {
-	    uint8* basePtr = static_cast<LumelBufferGray*> (
-		(LumelBufferBase*)baseMap.imageData)->GetData()
-	      + tileRect.ymin * mat_w + tileRect.xmin;
-	    for (int y = 0; y < lines; y++)
-	    {
-              for (int x = 0; x < scratchW; x++)
-              {
-                uint8 v = basePtr[x];
-                scratchPtr[x].ui = (grayToRGBmul * v) | grayToRGBalpha;
-              }
-	      scratchPtr += scratchW;
-	      basePtr += mat_w;
-	    }
-          }
-          else
-          {
-	    Lumel* basePtr = static_cast<LumelBufferRGB*> (
-		(LumelBufferBase*)baseMap.imageData)->GetData()
-	      + tileRect.ymin * mat_w + tileRect.xmin;
-	    for (int y = 0; y < lines; y++)
-	    {
-	      memcpy (scratchPtr, basePtr, scratchW * sizeof (Lumel));
-	      scratchPtr += scratchW;
-	      basePtr += mat_w;
-	    }
-	  }
-	  scratchMax = baseMap.maxValues[t];
-        }
-        else
-        {
-          Lumel baseLumel;
-          baseLumel.c.red   = baseColor.red;
-          baseLumel.c.green = baseColor.green;
-          baseLumel.c.blue  = baseColor.blue;
-          baseLumel.c.alpha = 0;
-          for (int y = 0; y < lines; y++)
-          {
-            for (int x = 0; x < scratchW; x++)
-            {
-              scratchPtr->ui = baseLumel.ui;
-              scratchPtr++;
-            }
-          }
-          scratchMax = baseColor;
-        }
-      }
-      for (size_t i = 0; i < lights.GetSize(); i++)
-      {
-        if (!lightBits.IsBitSet (i)) continue;
-        MappedLight& light = lights[i];
-        if (!light.map.tileNonNull.IsBitSet (t)) continue;
-
-        const csRect& lightInTile (light.map.nonNullAreas[t]);
-        uint32 lutR[256];
-        uint32 lutG[256];
-        uint32 lutB[256];
-
-        const csColor& lightColor = light.light->GetColor ();
-        lightColorStates.GetElementPointer ((iLight*)light.light)->lastColor =
-          lightColor;
-        ComputeLUT<shiftR> (lightColor.red,   lutR);
-        ComputeLUT<shiftG> (lightColor.green, lutG);
-        ComputeLUT<shiftB> (lightColor.blue,  lutB);
-
-        int mapW = csMin (lightInTile.xmax, light.map.imageX + light.map.imageW)
-          - csMax (lightInTile.xmin, light.map.imageX);
-        int lines = csMin (lightInTile.ymax, light.map.imageY + light.map.imageH)
-          - csMax (lightInTile.ymin, light.map.imageY);
-        int mapPitch = light.map.imageW - mapW;
-
-        Lumel* scratchPtr = scratch.GetArray() + 
-          (lightInTile.ymin - tileRect.ymin) * scratchW +
-           lightInTile.xmin - tileRect.xmin;
-        int scratchPitch = scratchW - mapW;
-
-        csRGBcolor mapMax = light.map.maxValues[t];
-        mapMax.red   = lutR[mapMax.red]   >> shiftR;
-        mapMax.green = lutG[mapMax.green] >> shiftG;
-        mapMax.blue  = lutB[mapMax.blue]  >> shiftB;
-        
-        CS_PROFILER_ZONE(ProctexPDLight_Animate_inner)
-        if (light.map.imageData->IsGray())
-        {
-	  const uint8* mapPtr = static_cast<LumelBufferGray*> (
-		  (LumelBufferBase*)light.map.imageData)->GetData()
-	    + (lightInTile.ymin - light.map.imageY) * light.map.imageW
-	    + (lightInTile.xmin - light.map.imageX) ;
-	  
-          int safeMask = 0;
-          if (scratchMax.red   + mapMax.red   > 255) safeMask |= safeR;
-          if (scratchMax.green + mapMax.green > 255) safeMask |= safeG;
-          if (scratchMax.blue  + mapMax.blue  > 255) safeMask |= safeB;
-          MultiplyAddProc8 maProc = maProcs8[safeMask];
-          maProc (scratchPtr, scratchPitch, mapPtr, mapPitch,
-            mapW, lines, lutR, lutG, lutB);
-
-          if (safeMask == 0)
-            scratchMax.UnsafeAdd (mapMax);
-          else
-            scratchMax.SafeAdd (mapMax);
-        }
-        else
-        {
-	  const Lumel* mapPtr = static_cast<LumelBufferRGB*> (
-		  (LumelBufferBase*)light.map.imageData)->GetData()
-	    + (lightInTile.ymin - light.map.imageY) * light.map.imageW
-	    + (lightInTile.xmin - light.map.imageX) ;
-	  
-          int safeMask = 0;
-          if (scratchMax.red   + mapMax.red   > 255) safeMask |= safeR;
-          if (scratchMax.green + mapMax.green > 255) safeMask |= safeG;
-          if (scratchMax.blue  + mapMax.blue  > 255) safeMask |= safeB;
-          MultiplyAddProc maProc = maProcs[safeMask];
-          maProc (scratchPtr, scratchPitch, mapPtr, mapPitch,
-            mapW, lines, lutR, lutG, lutB);
-
-          if (safeMask == 0)
-            scratchMax.UnsafeAdd (mapMax);
-          else
-            scratchMax.SafeAdd (mapMax);
-        }
-      }
-
-      {
-        CS_PROFILER_ZONE(ProctexPDLight_Animate_Blit)
-        tex->GetTextureHandle ()->Blit (tileRect.xmin, 
-          tileRect.ymin, 
-          tileRect.Width(), tileRect.Height(),
-          (uint8*)scratch.GetArray(),
-          iTextureHandle::BGRA8888);
-      }
-    }
     state.Reset (stateDirty);
     dirtyLights.DeleteAll ();
     tilesDirty.Clear ();

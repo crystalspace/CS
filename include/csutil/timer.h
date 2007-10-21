@@ -30,12 +30,11 @@
 #include "csutil/scf_implementation.h"
 #include "iutil/timer.h"
 #include "iutil/eventnames.h"
+#include "iutil/virtclk.h"
 
 struct iEvent;
 struct iObjectRegistry;
-struct iVirtualClock;
 struct iEventHandler;
-struct timerevent;
 
 /**
  * This class implements a timer. You can add operations to it and they
@@ -45,6 +44,12 @@ class CS_CRYSTALSPACE_EXPORT csEventTimer :
   public scfImplementation1<csEventTimer, iEventTimer>
 {
 private:
+  struct timerevent
+  {
+    csRef<iTimerEvent> event;
+    csTicks delay;
+    int time_left;
+  };
   iObjectRegistry* object_reg;
   csEventID FinalProcess;
   csArray<timerevent> timerevents;

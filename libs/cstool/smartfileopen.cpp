@@ -79,14 +79,3 @@ namespace CS
     }
   } // namespace Utility
 } // namespace CS
-
-  static bool IsVfsDir (iVFS* vfs, const char* path)
-  {
-    if (!vfs->Exists (path)) return false;
-    csRef<iFile> probe = vfs->Open (path, VFS_FILE_READ);
-    return !probe.IsValid();
-  }
-
-
-
-

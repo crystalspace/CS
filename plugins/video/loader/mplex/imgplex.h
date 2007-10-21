@@ -32,6 +32,9 @@
 CS_PLUGIN_NAMESPACE_BEGIN(ImgPlex)
 {
 
+// For SetDithering()
+#include "csutil/win32/msvc_deprecated_warn_off.h"
+
 /**
  * Through this plugin you can load/save a set of different formats.
  * It works by loading other plzugins and transfers execution to them.
@@ -70,6 +73,8 @@ class csImageIOMultiplexer :
   	iImageIO::FileFormatDescription *format = 0,
     	const char* extraoptions = 0);
 };
+
+#include "csutil/win32/msvc_deprecated_warn_on.h"
 
 }
 CS_PLUGIN_NAMESPACE_END(ImgPlex)

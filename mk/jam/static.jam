@@ -269,7 +269,7 @@ rule LinkStaticPlugins
   # construct initialization sourcefile
   local staticobject = [ BuildStaticUseFile $(plugins) : $(target) : $(package) ] ;
   
-  # Build a shared libs containing the static plugins.
+  # Build a shared lib containing the static plugins.
   # This is done to be more LGPL-friendly.
   if ( $(BUILD_SHARED_LIBS) = "yes" ) && ( $(TRUE_STATIC_PLUGINS) != "yes" )
   {

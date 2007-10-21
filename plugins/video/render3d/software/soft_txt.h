@@ -115,6 +115,16 @@ protected:
 
   /// Create all mipmapped bitmaps from the first level.
   void CreateMipmaps ();
+
+  struct BlitBuffer
+  {
+    int x;
+    int y;
+    int width;
+    int height;
+    iTextureHandle::TextureBlitDataFormat format;
+  };
+  csHash<BlitBuffer, csPtrKey<uint8> > blitBuffers;
 public:
   /// Create the mipmapped texture object
   csSoftwareTextureHandle (csSoftwareTextureManager *texman, iImage *image,
@@ -185,6 +195,11 @@ public:
   {
     return texType2D;
   }
+
+  uint8* QueryBlitBuffer (int x, int y, int width, int height,
+    size_t& pitch, TextureBlitDataFormat format, uint bufFlags);
+  void ApplyBlitBuffer (uint8* buf);
+  BlitBufferNature GetBufferNature (uint8* buf) { return natureDirect; }
 };
 
 #include "csutil/win32/msvc_deprecated_warn_on.h"

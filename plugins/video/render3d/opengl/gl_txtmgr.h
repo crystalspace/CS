@@ -141,6 +141,8 @@ public:
    */
   bool enableNonPowerOfTwo2DTextures;
 
+  bool hasPBO;
+
   csGLTextureManager (iObjectRegistry* object_reg,
         iGraphics2D* iG2D, iConfigFile *config,
         csGLGraphics3D *G3D);

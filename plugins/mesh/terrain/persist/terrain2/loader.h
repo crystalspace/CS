@@ -29,19 +29,22 @@ struct iObjectRegistry;
 struct iSyntaxService;
 struct iVFS;
 
+CS_PLUGIN_NAMESPACE_BEGIN(Terrain2Loader)
+{
+
 /**
  *
  */
-class csTerrainFactoryLoader :
-  public scfImplementation2<csTerrainFactoryLoader,
+class csTerrain2FactoryLoader :
+  public scfImplementation2<csTerrain2FactoryLoader,
                             iLoaderPlugin,
                             iComponent>
 {
 public:
   /// Constructor
-  csTerrainFactoryLoader (iBase*);
+  csTerrain2FactoryLoader (iBase*);
   /// Destructor
-  virtual ~csTerrainFactoryLoader ();
+  virtual ~csTerrain2FactoryLoader ();
 
   /// Setup the plugin with the system driver
   bool Initialize (iObjectRegistry *objreg);
@@ -94,8 +97,8 @@ private:
 /**
  *
  */
-class csTerrainObjectLoader :
-  public scfImplementation2<csTerrainObjectLoader,
+class csTerrain2ObjectLoader :
+  public scfImplementation2<csTerrain2ObjectLoader,
                             iLoaderPlugin,
                             iComponent>
 {
@@ -111,10 +114,10 @@ private:
 
 public:
   /// Constructor
-  csTerrainObjectLoader (iBase*);
+  csTerrain2ObjectLoader (iBase*);
 
   /// Destructor
-  virtual ~csTerrainObjectLoader ();
+  virtual ~csTerrain2ObjectLoader ();
 
   /// Register plugin with system driver
   bool Initialize (iObjectRegistry *objreg);
@@ -124,5 +127,8 @@ public:
     iStreamSource*, iLoaderContext* ldr_context,
     iBase *context);
 };
+
+}
+CS_PLUGIN_NAMESPACE_END(Terrain2Loader)
 
 #endif // __CS_CHUNKLDR_H

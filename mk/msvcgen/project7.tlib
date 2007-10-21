@@ -45,8 +45,9 @@ END -%]
 	</Platforms>
 	<Configurations>
 [% FOREACH build IN builds -%]
+  [% FOREACH mutator IN mutators -%]
 		<Configuration
-			Name="[% build.name %]|Win32"
+			Name="[% build.name %][% mutator.namesuffix %]|Win32"
 			OutputDirectory="[% workbuild([]) %]"
 			IntermediateDirectory="[% workbuild([]) %]"
 [% interpolate('global') -%]
@@ -56,7 +57,7 @@ END -%]
 				Name="VCCLCompilerTool"
 [% interpolate('compiler') -%]
 				PreprocessorDefinitions="
-[%- composedefs(['WIN32']) %]"
+[%- d = ['WIN32']; composedefs(d.merge(mutator.defines)) %]"
 				OptimizeForProcessor="1"
 				AdditionalOptions="[% flags(compose('cflags', [], ' ')) | html %] [% flags(compose('cflags7', [], ' ')) | html %]"
 				AdditionalIncludeDirectories="[% composedirs('incdirs', ['.']) %]"
@@ -77,10 +78,8 @@ END -%]
 [% interpolate('linker') -%]
 				AdditionalOptions="[% flags(compose('lflags', [], ' ')) | html %] [% flags(compose('lflags7', [], ' ')) | html %]"
 				AdditionalDependencies="[% compose('libs', [], ' ') %]"
-				IgnoreImportLibrary="TRUE"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="[% composedirs('libdirs', []) %]"
-				ProgramDatabaseFile="[% workbuild([my.doc.rawtarget.0,'.pdb']) %]"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCLibrarianTool"
@@ -111,6 +110,7 @@ END -%]
 			<Tool
 				Name="VCWebDeploymentTool"/>
 		</Configuration>
+  [% END -%]
 [% END -%]
 	</Configurations>
 	<Files>
@@ -126,12 +126,14 @@ END -%]
 				[%- IF my.doc.static %]
 				[%- UNLESS file.match('\\.(h|hpp|rc)$') %]
 				[%- FOREACH build IN builds %]
-				<FileConfiguration
-					Name="[% build.name %]|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						ObjectFile="[% workbuild([file.replace('/', '_'), '.obj']) %]"/>
-				</FileConfiguration>
+                                  [% FOREACH mutator IN mutators -%]
+					<FileConfiguration
+						Name="[% build.name %][% mutator.namesuffix %]|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="[% workbuild([file.replace('/', '_'), '.obj']) %]"/>
+					</FileConfiguration>
+				[%- END %]
 				[%- END %]
 				[%- END %]
 				[%- END %]

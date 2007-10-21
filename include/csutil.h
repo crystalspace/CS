@@ -102,6 +102,7 @@
 #include "csutil/pooledscfclass.h"
 #include "csutil/prfxcfg.h"
 #include "csutil/priorityqueue.h"
+#include "csutil/processorspecdetection.h"
 #include "csutil/ptrwrap.h"
 #include "csutil/radixsort.h"
 #include "csutil/randomgen.h"

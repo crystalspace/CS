@@ -63,7 +63,57 @@ csTerraFormerCollider::~csTerraFormerCollider ()
   delete[] indexholder;
 }
 
-void csTerraFormerCollider::UpdateOPCODEModel (const csVector3 &other_pos, float res)
+void csTerraFormerCollider::UpdateOPCODEModel (const csVector3 &start,
+    const csVector3& end)
+{
+  float res = fabs (end.x - start.x) / 2.0f;
+  float resy = fabs (end.z - start.z) / 2.0f;
+  if (resy > res) res = resy;
+
+  if (ceil (res) > resolution)
+  {
+    resolution = (unsigned int)ceil (res);
+    InitOPCODEModel ();
+  }
+  csVector3 center = (start + end) / 2.0f;
+  csBox2 samplebox (
+      center.x - resolution, center.z - resolution,
+      center.x + resolution, center.z + resolution
+      );
+  csRef<iTerraSampler> sampler = former->GetSampler (samplebox,
+    resolution, resolution);
+
+  const csVector3 *v = sampler->SampleVector3 (stringVertices);
+
+  int index = 0;
+  for (unsigned int y = 0 ; y < resolution ; y++)
+  {
+    for (unsigned int x = 0 ; x < resolution ; x++)
+    {
+      vertices[index].Set (v[index].x,v[index].y,v[index].z);
+      index++;
+    }
+  }
+  
+  int i = 0;
+  for (unsigned int y = 0 ; y < resolution-1 ; y++)
+  {
+    int yr = y * resolution;
+    for (unsigned int x = 0 ; x < resolution-1 ; x++)
+    {
+      indexholder[i++] = yr + x;
+      indexholder[i++] = yr+resolution + x;
+      indexholder[i++] = yr + x+1;
+      indexholder[i++] = yr + x+1;
+      indexholder[i++] = yr+resolution + x;
+      indexholder[i++] = yr+resolution + x+1;
+    }
+  }
+  opcode_model->Build (OPCC);
+}
+
+void csTerraFormerCollider::UpdateOPCODEModel (const csVector3 &other_pos,
+    float res)
 {
   if (ceil (res) > resolution)
   {
@@ -72,16 +122,18 @@ void csTerraFormerCollider::UpdateOPCODEModel (const csVector3 &other_pos, float
   }
   csRef<iTerraSampler> sampler = former->GetSampler (
     csBox2 (other_pos.x - resolution, other_pos.z - resolution,
-    other_pos.x + resolution, other_pos.z + resolution), resolution , resolution);
+    other_pos.x + resolution, other_pos.z + resolution), resolution,
+    resolution);
 
   const csVector3 *v = sampler->SampleVector3 (stringVertices);
 
+  int index = 0;
   for (unsigned int y = 0 ; y < resolution ; y++)
   {
     for (unsigned int x = 0 ; x < resolution ; x++)
     {
-      int index = y*resolution + x;
       vertices[index].Set (v[index].x,v[index].y,v[index].z);
+      index++;
     }
   }
   

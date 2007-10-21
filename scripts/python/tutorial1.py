@@ -25,7 +25,13 @@ for detail on how the C++ version works.
 """
 
 import sys, time, traceback
-from cspace import *
+
+try:    # get in CS
+    from cspace import *
+except:
+    print "WARNING: Failed to import module cspace"
+    traceback.print_exc()
+    sys.exit(1) # die!!
 
 DEBUG = 0
 
@@ -33,11 +39,11 @@ def CreateRoom (matname):
     if DEBUG: print 'Start creating polygons from Python script...'
     if DEBUG: print 'object_reg=',object_reg
     if DEBUG: print 'dir(object_reg)=',dir(object_reg)
-    engine = CS_QUERY_REGISTRY(object_reg, iEngine)
+    engine = object_reg.Get(iEngine)
     if DEBUG: print 'engine=',engine
-    vc = CS_QUERY_REGISTRY(object_reg, iVirtualClock)
+    vc = object_reg.Get(iVirtualClock)
     if DEBUG: print 'vc=',vc
-    loader = CS_QUERY_REGISTRY(object_reg, iLoader)
+    loader = object_reg.Get(iLoader)
     if DEBUG: print 'loader=',loader
     matname = 'mystone'
     loader.LoadTexture (matname, "/lib/stdtex/bricks.jpg")
@@ -45,7 +51,7 @@ def CreateRoom (matname):
     walls = engine.CreateSectorWallsMesh(room, "walls")
     if DEBUG: print 'walls=',walls
     material=engine.GetMaterialList().FindByName(matname)
-    walls_state = SCF_QUERY_INTERFACE(walls.GetMeshObject().GetFactory(), iThingFactoryState)
+    walls_state = walls.GetMeshObject().GetFactory().QueryInterface(iThingFactoryState)
     walls_state.AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5))
     walls_state.SetPolygonMaterial (CS_POLYRANGE_LAST, material);
     walls_state.SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
@@ -86,7 +92,7 @@ def HandleEvent (ev):
     if DEBUG: print 'HandleEvent called'
     if ((ev.Name  == KeyboardDown) and
         (csKeyEventHelper.GetCookedCode(ev) == CSKEY_ESC)):
-        q  = CS_QUERY_REGISTRY(object_reg, iEventQueue)
+        q  = object_reg.Get(iEventQueue)
         if q:
             q.GetEventOutlet().Broadcast(csevQuit(object_reg))
             return 1
@@ -147,26 +153,26 @@ if csCommandLineHelper.CheckHelp(object_reg):
     sys.exit(0)
  
 if DEBUG: print 'Getting virtual clock...'
-vc = CS_QUERY_REGISTRY(object_reg, iVirtualClock)
+vc = object_reg.Get(iVirtualClock)
 
 if DEBUG: print 'Getting engine...'
-engine = CS_QUERY_REGISTRY(object_reg, iEngine)
+engine = object_reg.Get(iEngine)
 if not engine:
     Report(CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!")
     sys.exit(1)
 
 if DEBUG: print 'Getting 3D graphics...'
-myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D)
+myG3D = object_reg.Get(iGraphics3D)
 if not myG3D:
     Report(CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D loader plugin!")
     sys.exit(1)
 
-LevelLoader = CS_QUERY_REGISTRY(object_reg, iLoader)
+LevelLoader = object_reg.Get(iLoader)
 if not LevelLoader:
     Report(CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!")
     sys.exit(1)
 
-kbd = CS_QUERY_REGISTRY(object_reg, iKeyboardDriver)
+kbd = object_reg.Get(iKeyboardDriver)
 if not kbd:
     Report(CS_REPORTER_SEVERITY_ERROR, "No iKeyboardDriver!")
     sys.exit(1)
@@ -196,7 +202,7 @@ Report(CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...")
 LevelLoader.LoadTexture("stone", "/lib/std/stone4.gif")
 room = engine.CreateSector("room")
  
-plugin_mgr = CS_QUERY_REGISTRY(object_reg, iPluginManager)
+plugin_mgr = object_reg.Get(iPluginManager)
  
 if 0:
     Report(CS_REPORTER_SEVERITY_NOTIFY, "Loading script.python plugin...")

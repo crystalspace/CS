@@ -2,7 +2,6 @@
 # Version 1.3.31
 #
 # Don't modify this file, modify the SWIG interface instead.
-# This file is compatible with both classic and new-style classes.
 
 import _imap
 import new
@@ -48,6 +47,16 @@ except AttributeError:
 del types
 
 
+def _swig_setattr_nondynamic_method(set):
+    def set_attr(self,name,value):
+        if (name == "thisown"): return self.this.own(value)
+        if hasattr(self,name) or (name == "this"):
+            set(self,name,value)
+        else:
+            raise AttributeError("You cannot add attributes to %s" % self)
+    return set_attr
+
+
 import core
 _SetSCFPointer = _imap._SetSCFPointer
 _GetSCFPointer = _imap._GetSCFPointer
@@ -57,12 +66,7 @@ core.AddSCFLink(_SetSCFPointer)
 CSMutableArrayHelper = core.CSMutableArrayHelper
 
 class iLoaderStatus(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iLoaderStatus, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iLoaderStatus, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def IsReady(*args): return _imap.iLoaderStatus_IsReady(*args)
@@ -73,12 +77,7 @@ iLoaderStatus_swigregister = _imap.iLoaderStatus_swigregister
 iLoaderStatus_swigregister(iLoaderStatus)
 
 class iMissingLoaderData(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iMissingLoaderData, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iMissingLoaderData, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def MissingMaterial(*args): return _imap.iMissingLoaderData_MissingMaterial(*args)
@@ -94,12 +93,7 @@ iMissingLoaderData_swigregister = _imap.iMissingLoaderData_swigregister
 iMissingLoaderData_swigregister(iMissingLoaderData)
 
 class iLoader(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iLoader, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iLoader, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def LoadImage(*args): return _imap.iLoader_LoadImage(*args)
@@ -118,8 +112,7 @@ class iLoader(core.iBase):
     def LoadShader(*args): return _imap.iLoader_LoadShader(*args)
     def SetAutoRegions(*args): return _imap.iLoader_SetAutoRegions(*args)
     def GetAutoRegions(*args): return _imap.iLoader_GetAutoRegions(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imap.iLoader_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imap.iLoader_scfGetVersion)
+    scfGetVersion = staticmethod(_imap.iLoader_scfGetVersion)
     __swig_destroy__ = _imap.delete_iLoader
     __del__ = lambda self : None;
 iLoader_swigregister = _imap.iLoader_swigregister
@@ -127,17 +120,11 @@ iLoader_swigregister(iLoader)
 iLoader_scfGetVersion = _imap.iLoader_scfGetVersion
 
 class iLoaderPlugin(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iLoaderPlugin, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iLoaderPlugin, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Parse(*args): return _imap.iLoaderPlugin_Parse(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imap.iLoaderPlugin_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imap.iLoaderPlugin_scfGetVersion)
+    scfGetVersion = staticmethod(_imap.iLoaderPlugin_scfGetVersion)
     __swig_destroy__ = _imap.delete_iLoaderPlugin
     __del__ = lambda self : None;
 iLoaderPlugin_swigregister = _imap.iLoaderPlugin_swigregister
@@ -145,17 +132,11 @@ iLoaderPlugin_swigregister(iLoaderPlugin)
 iLoaderPlugin_scfGetVersion = _imap.iLoaderPlugin_scfGetVersion
 
 class iBinaryLoaderPlugin(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iBinaryLoaderPlugin, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iBinaryLoaderPlugin, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def Parse(*args): return _imap.iBinaryLoaderPlugin_Parse(*args)
-    __swig_getmethods__["scfGetVersion"] = lambda x: _imap.iBinaryLoaderPlugin_scfGetVersion
-    if _newclass:scfGetVersion = staticmethod(_imap.iBinaryLoaderPlugin_scfGetVersion)
+    scfGetVersion = staticmethod(_imap.iBinaryLoaderPlugin_scfGetVersion)
     __swig_destroy__ = _imap.delete_iBinaryLoaderPlugin
     __del__ = lambda self : None;
 iBinaryLoaderPlugin_swigregister = _imap.iBinaryLoaderPlugin_swigregister
@@ -163,12 +144,7 @@ iBinaryLoaderPlugin_swigregister(iBinaryLoaderPlugin)
 iBinaryLoaderPlugin_scfGetVersion = _imap.iBinaryLoaderPlugin_scfGetVersion
 
 class iSaver(core.iBase):
-    __swig_setmethods__ = {}
-    for _s in [core.iBase]: __swig_setmethods__.update(getattr(_s,'__swig_setmethods__',{}))
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iSaver, name, value)
-    __swig_getmethods__ = {}
-    for _s in [core.iBase]: __swig_getmethods__.update(getattr(_s,'__swig_getmethods__',{}))
-    __getattr__ = lambda self, name: _swig_getattr(self, iSaver, name)
+    thisown = _swig_property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc='The membership flag')
     def __init__(self): raise AttributeError, "No constructor defined"
     __repr__ = _swig_repr
     def SaveMapFile(*args): return _imap.iSaver_SaveMapFile(*args)
