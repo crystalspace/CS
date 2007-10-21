@@ -174,28 +174,46 @@
   }
 %enddef
 
+%define CS_WRAP_PTR_TYPEMAP(PtrName)
+%{
+csRetInterface 
+_ ## PtrName ## _to_CSharp(const PtrName & wp)
+{   
+    char __className[1024];
+    csRetInterface result;
+    iBase * ibase = (iBase *)wp.Ref;
+    void * ptr = ibase->QueryInterface(iSCF::SCF->GetInterfaceID(wp.Type), wp.Version);
+
+
+    ibase->DecRef(); // Undo IncRef from QueryInterface
+    if (ptr == 0)
+    {
+      result.ptr = NULL;
+      memset((void*)result.szClassName, 0, sizeof(result.szClassName));
+      result.szClassName = strdup("<dummy>");
+      result.free = 1; //Should be freed the className?
+    }
+    else
+    {
+      sprintf(__className, "CrystalSpace.%s", wp.Type);
+      result.szClassName = strdup(__className);
+      result.ptr = ptr;
+      result.free = 1; //Should be freed the className?
+    }
+
+    return result;
+}
+
+%}
+%enddef
+
+CS_WRAP_PTR_TYPEMAP(csWrapPtr)
+
 #undef TYPEMAP_OUT_csWrapPtr
 %define TYPEMAP_OUT_csWrapPtr
   %typemap(out) csWrapPtr
   {
-    char __className[1024];
-    iBase * ibase = (iBase *)$1.Ref;
-    void * ptr = ibase->QueryInterface(iSCF::SCF->GetInterfaceID($1.Type), $1.Version);
-    ibase->DecRef(); // Undo IncRef from QueryInterface
-    if (ptr == 0)
-    {
-      $result.ptr = NULL;
-      memset((void*)$result.szClassName, 0, sizeof($result.szClassName));
-      $result.szClassName = strdup("<dummy>");
-      $result.free = 1; //Should be freed the className?
-    }
-    else
-    {
-      sprintf(__className, "CrystalSpace.%s", $1.Type);
-      $result.szClassName = strdup(__className);
-      $result.ptr = ptr;
-      $result.free = 1; //Should be freed the className?
-    }
+    $result = _csWrapPtr_to_CSharp($1);
   }
   //%typemap(out) csWrapPtr %{ $result = $1; %}
   %typemap(ctype) csWrapPtr "csRetInterface";
@@ -237,7 +255,7 @@ APPLY_FOR_EACH_INTERFACE
 // automatically. Prior versions do not.
 #if (SWIG_VERSION < 0x010323)
 #define IEVENTOUTLET_BROADCAST 		\
-public void Broadcast (int iCode) { Broadcast(iCode, new HandleRef(this, IntPtr.Zero)); }
+public void Broadcast (int iCode) { Broadcast(iCode, new SWIGTYPE_p_intptr_t()); }
 #else
 #define IEVENTOUTLET_BROADCAST
 #endif
@@ -250,15 +268,15 @@ public void Broadcast (int iCode) { Broadcast(iCode, new HandleRef(this, IntPtr.
   IEVENTOUTLET_BROADCAST
 %}
 %enddef
-IEVENTOUTLET_CSHARPCODE
 
+IEVENTOUTLET_CSHARPCODE
 
 // iutil/cfgmgr.h
 // Swig 1.3.21 (and possibly earlier) have a bug where enums are emitted as
 // illegal C# code:
-//   public final static int ConfigPriorityFoo = iConfigManager::PriorityFoo;
+//   public static int ConfigPriorityFoo = iConfigManager::PriorityFoo;
 // rather than the legal code:
-//   public final static int ConfigPriorityFoo = iConfigManager.PriorityFoo;
+//   public static int ConfigPriorityFoo = iConfigManager.PriorityFoo;
 // We work around this by %ignoring those constants and defining them maually.
 %ignore iConfigManager::ConfigPriorityPlugin;
 %ignore iConfigManager::ConfigPriorityApplication;
@@ -271,15 +289,15 @@ IEVENTOUTLET_CSHARPCODE
 %typemap(cscode) iConfigManager
 %{
   INTERFACE_EQUALS
-  public const int ConfigPriorityPlugin =
+  public static readonly int ConfigPriorityPlugin =
     iConfigManager.PriorityVeryLow;
-  public const int ConfigPriorityApplication =
+  public static readonly int ConfigPriorityApplication =
     iConfigManager.PriorityLow;
-  public const int ConfigPriorityUserGlobal =
+  public static readonly int ConfigPriorityUserGlobal =
     iConfigManager.PriorityMedium;
-  public const int ConfigPriorityUserApp =
+  public static readonly int ConfigPriorityUserApp =
     iConfigManager.PriorityHigh;
-  public const int ConfigPriorityCmdLine =
+  public static readonly int ConfigPriorityCmdLine =
     iConfigManager.PriorityVeryHigh;
 %}
 %enddef
@@ -297,6 +315,9 @@ ICONFIGMANAGER_CSHARPCODE
 %ignore CS_IMGFMT_INVALID;
 %ignore CSKEY_BACKSPACE;
 %ignore CS_BOUNDINGBOX_MAXVALUE;
+
+// It is defined only for iBase, and we use it using polymorphism
+%ignore QueryInterface;
 
 //TODO: fix the bug
 %ignore csImageBase::GetKeyColor;
@@ -321,6 +342,11 @@ ICONFIGMANAGER_CSHARPCODE
 {
     $1 = strdup($input.name);
     $2 = $input.version;
+}
+
+%typemap(typecheck) (const char * iface, int iface_ver)
+{
+
 }
 
 %typemap(ctype) (const char * iface, int iface_ver) "csInterfaceData"
